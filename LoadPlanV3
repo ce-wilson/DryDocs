@@ -1,0 +1,403 @@
+# DryDocs — Plan v3 (delta on v2)
+
+This is a **delta** on `drydocs_plan.md` (v2). v2 still applies as the base — same ontology stack (DPROD → DCAT → PROV-O / PROV-DM → OpenLineage → DQV → SWO → ORG), same TDQ pipeline, same KGoT seam. v3 adds the corporate scaffolding, two-port Application pattern, scheduler-as-requirement, channel typology, support team derivation, Control-M server mesh, BMC condition-event dependency model, versioning, and Oracle refresh cadence.
+
+Read v2 first; v3 sections below either **add to**, **amend**, or **resolve open questions in** specific v2 sections.
+
+---
+
+## §A. Goal — restated (amends v2 §1)
+
+**Primary use case**: production support inventory. Each support team covers 8–15 business applications and there is no single source of truth for jobs, datasets, or SLAs. This graph is that source of truth.
+
+**Secondary lens**: data products. The DPROD/DCAT framing from v2 stays — it's how teams want to *view* what they support, not the destination.
+
+This reordering matters because it changes which queries are first-class (support-team-by-app, all-jobs-for-app, lineage-from-failed-job-to-incident-queue) and what the Streamlit nav prioritizes.
+
+---
+
+## §B. Corporate + catalog modeling (new — slots in as v2 §4.0)
+
+Two parallel hierarchies live in the graph; both are real, both are needed.
+
+**Canonical corporate (annual report, effective-dated):**
+
+```
+:Company {name:"JPMC"}
+  -[:HAS_BUSINESS_SEGMENT {effective_from, effective_to}]->
+:BusinessSegment {code:"CCB"|"CIB"|"AWM"|"Corp"}
+```
+
+Pre-Q2-2024 has CCB, CIB, CB, AWM. Post-Q2-2024 has CCB, CIB, AWM, Corp. Edges carry `effective_from` / `effective_to` so a historical query (e.g., "who owned this app on 2024-01-15") returns the right segment.
+
+**Internal product catalog (Oracle source):**
+
+```
+:BusinessSegment -[:HAS_LOB]-> :CatalogLOB {lob_id, code:"AWMCIB"|"CCB"|"CT"|"HR"|"ET"|...}
+:CatalogLOB     -[:HAS_PRODUCT_LINE]-> :ProductLine
+:ProductLine    -[:HAS_PRODUCT]-> :Product {product_id}
+:Product        -[:HAS_APPLICATION]-> :Application {seal_id}
+:Application    -[:HAS_DEV_TEAM]-> :DevTeam {team_id}
+```
+
+Catalog LOBs (AWMCIB, CT, HR, ET) don't 1:1 align with corporate segments. Reconciliation:
+
+```
+:CatalogLOB -[:RECONCILES_TO {confidence, source}]-> :BusinessSegment
+```
+
+`AWMCIB` → splits across `AWM` and `CIB` with `confidence < 1.0` and `source='manual'`. The graph keeps both views; queries pick which lens to use.
+
+**Refresh cadence**: catalog hierarchy refreshes weekly or monthly from Oracle. Applications are the most stable (years). See §I.
+
+---
+
+## §C. Application two-port pattern (new — directive in v2 §5)
+
+Every `:Application` is created with two child nodes, always:
+
+```
+(:Application {seal_id})
+  -[:HAS_PORT]->(:EventProcessing  {active: true|false})
+  -[:HAS_PORT]->(:BatchProcessing  {active: true|false})
+```
+
+Rules:
+- Always create both children at Application load time. Mark `active=false` if the app has no work in that mode.
+- **Humans, org, dev team, product catalog edges → `:Application`**.
+- **Control-M jobs, files, servers, schedulers, transformations, channels → `:BatchProcessing`**.
+- **APIs, event channels, real-time consumers → `:EventProcessing`**.
+
+This is a fan-out reducer. Without it, `:Application` would carry hundreds of edges per app. With it, `:Application` stays a stable identity node and operational chaos lives one level down. Streamlit drilldowns become natural (Application card → pick a port → see the operational graph for that channel).
+
+Constraint: `(:Application)-[:HAS_PORT]->(:EventProcessing)` and `(:Application)-[:HAS_PORT]->(:BatchProcessing)` exist exactly once each per app. Enforced by post-load assertion query.
+
+---
+
+## §D. Scheduler-as-requirement (new — amends v2 §4.5 scheduler treatment)
+
+Phase 1 ingests Control-M only. But `:Application` (or `:BatchProcessing`) declares which orchestrators it depends on, even when not yet ingested:
+
+```
+:BatchProcessing -[:REQUIRES_SCHEDULER]-> :SchedulerKind {name:"ControlM"|"Autosys"|"Airflow"}
+```
+
+`:SchedulerKind` is a small placeholder vocabulary (4–5 nodes), not a runtime instance. A separate `:Scheduler {kind:"ControlM", instance:"prod-east"}` represents an actual deployed scheduler — only Control-M instances exist in phase 1.
+
+Streamlit "Application" page shows the kinds an app requires (Control-M, Autosys, Airflow) so support teams know what platforms they're on the hook for, even if Autosys/Airflow ingestion is phase 2+.
+
+---
+
+## §E. Channel typology (new — slots into v2 §4.x)
+
+`:Channel` is a node type. Subtypes by origin:
+
+```
+:Channel:SftpChannel       — files arriving via SFTP from another app or vendor
+:Channel:UserSftpChannel   — files uploaded by a human user
+:Channel:UploadChannel     — UI-driven file upload
+:Channel:ApiChannel        — file produced by an API call (often by a predecessor job)
+:Channel:UpstreamJobChannel — file produced by another Control-M job upstream
+```
+
+Why this matters: jobs labeled `FW` (file watcher) don't tell you the *origin* of the file. Modeling channels makes the discrepancy queryable — "show me all FW jobs whose file actually came from a user SFTP, not an upstream system" surfaces hidden dependencies.
+
+Edges:
+
+```
+:DataFile -[:ARRIVED_VIA]-> :Channel
+:Channel  -[:ORIGINATES_FROM]-> :Application | :Vendor | :Person | :Job
+```
+
+The TDQ pipeline (v2 §4.4) is unchanged — the channel sits *upstream* of the data file arrival; the data file + control file pair → TDQ check still works the same way.
+
+---
+
+## §F. Application contacts & support team derivation (new — replaces v2 incident-queue sketch)
+
+ServiceNow incident-queue data isn't accurate enough to seed. Replace with a chain that pulls from **two parallel canonical sources** for application contacts plus the org hierarchy. SEAL is the registry of record for application identity and operate-side contacts; PAT carries the product structure and dev/agile contacts. Where they overlap (App Owner ↔ Software Engineer; CTO ↔ Product Contact), the graph captures the overlap structurally — same `:Employee` node, multiple `:Membership`s.
+
+### F.1 SEAL — application registry of record
+
+SEAL is where every Application gets its `seal_id`. It carries identity, governance flags, and the operate-side contacts.
+
+Properties loaded onto `:Application`:
+
+| Property | Type | Purpose |
+|---|---|---|
+| `seal_id` | string (PK) | Canonical identifier |
+| `name` | string | Display name |
+| `deployment_module` | string | Where the app deploys |
+| `data_retention` | int (days) | Data lifecycle |
+| `risk_level` | enum: LOW/MEDIUM/HIGH/CRITICAL | Risk tier |
+| `sox_governed` | boolean | SOX flag |
+| `status` | enum: BUILD/OPERATE/RETIRED | Lifecycle stage — **the primary inventory filter** |
+
+Contacts from SEAL: **App Owner, Data Owner, L2 Operate Manager, Risk Manager, CTO**.
+
+### F.2 PAT — product hierarchy + dev/agile contacts
+
+PAT carries the product structure (already in §B: `Product → Application`) plus per-app contacts: **Agility Lead** and **Software Engineers** (multiple). One of the software engineers is typically also the SEAL App Owner — captured by shared `:Employee` node, not asserted.
+
+PAT also names a **Product Contact** at the Product level, who frequently *is* the CTO listed against several Applications under that Product. Same overlap rule.
+
+### F.3 Modeling — W3C ORG `Membership` pattern
+
+We already have ORG in the stack; use its reified Membership pattern so contacts get temporal validity and source attribution:
+
+```
+(:Application)-[:HAS_MEMBERSHIP]->(:Membership {source, valid_from, valid_to})
+                                    -[:OF_ROLE]->(:Role {name})
+                                    -[:HELD_BY]->(:Employee)
+
+(:Product)-[:HAS_MEMBERSHIP]->(:Membership {source})-[:OF_ROLE]->(:Role)-[:HELD_BY]->(:Employee)
+```
+
+`Membership.source` is `'SEAL'` or `'PAT'`. Roles seeded:
+
+| Source | Roles |
+|---|---|
+| SEAL | App Owner, Data Owner, L2 Operate Manager, Risk Manager, CTO |
+| PAT  | Agility Lead, Software Engineer, Product Contact |
+
+The roles vocabulary lives in `ontology/roles.py`. `:Role` is a small fixed set (~8 nodes), not free text.
+
+### F.4 Support team derivation
+
+```cypher
+MATCH (a:Application {status:'OPERATE'})
+      -[:HAS_MEMBERSHIP]->(m:Membership {source:'SEAL'})
+      -[:OF_ROLE]->(:Role {name:'L2 Operate Manager'})
+MATCH (m)-[:HELD_BY]->(mgr:Employee)
+MATCH (mgr)-[:MANAGES*1..6]->(emp:Employee)-[:MEMBER_OF]->(g:ServiceNowGroup)
+RETURN a.seal_id, a.name, g.name AS sn_group, count(DISTINCT emp) AS team_size
+```
+
+Saved as a Streamlit page (§L "Support Team by App"), not a stored edge. When SN incident-queue data becomes reliable, add it as a corroborating edge — don't replace the derivation.
+
+### F.5 Reconciliation — when SEAL and PAT disagree
+
+Both sources can list contacts and sometimes they conflict. SEAL wins for operate-side roles; PAT wins for dev-side roles. Both `:Membership`s are kept either way — Streamlit surfaces disagreements rather than the loader silently picking one. A "Reconciliation Issues" page (§L) shows:
+
+- Apps with no L2 Operate Manager in SEAL (blocks support-team derivation).
+- Apps where the SEAL App Owner isn't any PAT Software Engineer.
+- Products where the PAT Product Contact differs from the CTO of every child Application.
+- Apps in SEAL with `status='OPERATE'` that have no PAT entry at all.
+
+### F.6 Loaders for §F
+
+- `seal_applications.py` — SEAL extract (likely Oracle); loads `:Application` properties + the 5 SEAL Memberships.
+- `pat_applications.py` — PAT extract; reconciles by app name → `seal_id`; loads Agility Lead + Software Engineer Memberships at app level, Product Contact at product level.
+- `employees.py` — HR feed.
+- `org_hierarchy.py` — manager → reports edges (the `:MANAGES` chain).
+- `servicenow_groups.py` — SN export → `:MEMBER_OF` edges.
+- `dev_teams.py` — Oracle catalog (still relevant for `:DevTeam → :DEVELOPS_APPLICATION → :Application`, `:HAS_JIRA_BOARD`, `:HAS_MEMBER`).
+
+---
+
+## §G. Control-M server mesh (new — resolves v2 §11 Q3)
+
+Control-M folders are hosted on 4–5 specific servers (P12, P14, P32, P33, …). Each folder lives on exactly one server; folders are not duplicated across servers.
+
+```
+:ControlMServer {name:"P12"|"P14"|"P32"|"P33"|...}
+:JobFolder      -[:RUNS_ON]-> :ControlMServer
+:ControlMServer -[:INSTANCE_OF]-> :SwoClass {iri:"http://www.ebi.ac.uk/swo/...Platform"}
+```
+
+`:RUNS_ON` carries a `since` timestamp so server migrations are auditable. From the BMC schema (§G next), `DEF_TABLES.DATA_CENTER` is the source field for this — load it as a property on the folder, then dedupe to `:ControlMServer` nodes.
+
+---
+
+## §H. BMC Control-M dependency model (new — from BMC-CONTROL-M-LOOP.txt)
+
+The BMC schema is **condition-event** based, not direct job-to-job:
+
+| BMC table | Concept | Local label |
+|---|---|---|
+| `DEF_JOB` | Job definition | `:ControlMJob` |
+| `DEF_TABLES` | **Folder** (BMC calls them "tables" — naming gotcha, do not collapse with `:Table`) | `:JobFolder` |
+| `DEF_LINKI_P` | IN condition (job consumes) | `:Condition` (incoming side) |
+| `DEF_LINKO_P` | OUT condition (job emits) | `:Condition` (outgoing side) |
+
+Modeling rule: dependencies route through `:Condition` nodes, not direct edges. Two jobs are connected when one's OUT condition matches another's IN condition (with same cyclic type).
+
+```
+(:ControlMJob {job_id, version_serial})
+  -[:EMITS_OUT_CONDITION {sign, odate, cyclic_type}]->
+(:Condition {name, cyclic_type})
+  <-[:REQUIRES_IN_CONDITION {cyclic_type}]-
+(:ControlMJob {job_id, version_serial})
+```
+
+Plus a **derived** convenience edge that materializes the join from the BMC SQL:
+
+```
+(:ControlMJob)-[:DEPENDS_ON {derived: true, via_condition}]->(:ControlMJob)
+```
+
+Derived edges are computed, not loaded — re-derived on every refresh. They make Cypher lineage queries fast without losing the event semantics.
+
+Other BMC fields to capture:
+- `VERSION_SERIAL` → `:ControlMJob.version_serial` (history axis; combined with §H1 versioning).
+- `CYCLIC_TYPE` → property on the relationship; matters because cyclic jobs only depend within the same cyclic type.
+- `ODATE` → property on emit/require edges; this is the **business-date axis** that pairs with the TDQ pipeline's `business_date`.
+- `USER_DAILY` filter from the SQL → load only active job definitions; quarantine the rest as `:ControlMJob {active: false}`.
+
+The BMC SQL also reveals an important shape: **conditions are namespaced by parent table** (folder). Same condition name in different folders = different `:Condition` nodes. Key the `:Condition` node by `(folder_id, condition_name, cyclic_type)`.
+
+---
+
+## §I. Versioning + Oracle refresh cadence (new — combines answers to Q1 & Q6)
+
+Tracking rule: **anything at or above `:Application` versions on update**. Below `:Application` (BatchProcessing children: jobs, folders, files, etc.) does *not* version — those refresh in place.
+
+Implementation:
+
+```
+(:Application)-[:HAS_VERSION {version_id, valid_from, valid_to, source}]->(:ApplicationSnapshot)
+```
+
+Snapshots store the relationship state as of `valid_from`. New snapshot is created when:
+- L2 operate manager changes
+- Dev team mapping changes
+- Product catalog reassignment (Product → Application)
+- Business segment reassignment (only triggers if effective-dating crossed)
+
+Same pattern applies to `:Product`, `:ProductLine`, `:CatalogLOB`, `:BusinessSegment`. Snapshot tables intentionally stay light — they hold relationship deltas, not the full subgraph.
+
+**Oracle source loaders** (refresh cadence):
+
+| Oracle source | Loader | Cadence | Versions on change? |
+|---|---|---|---|
+| Product catalog | `catalog_*.py` | Weekly or monthly | Yes (at/above Application) |
+| **SEAL** application registry | `seal_applications.py` | Weekly | Yes — properties + 5 SEAL Memberships |
+| **PAT** product/app contacts | `pat_applications.py` | Weekly | Yes — Agility Lead, Software Engineer, Product Contact |
+| Dev teams | `dev_teams.py` | Weekly | Yes |
+| BMC `DEF_JOB`, `DEF_TABLES`, `DEF_LINKI_P`, `DEF_LINKO_P` | `controlm_*.py` | Daily | No (refresh in place) |
+| HR org hierarchy | `org_hierarchy.py` | Weekly | Yes (`:MANAGES` chain feeds support-team derivation) |
+| ServiceNow groups | `servicenow_groups.py` | Weekly | Yes |
+
+Connection: `oracledb` driver (formerly `cx_Oracle`). Add to deps. Read-only Oracle creds in `.env`.
+
+---
+
+## §J. Schema amendments (amends v2 §5)
+
+New constraints:
+
+```cypher
+CREATE CONSTRAINT business_segment_code IF NOT EXISTS FOR (s:BusinessSegment)  REQUIRE s.code IS UNIQUE;
+CREATE CONSTRAINT catalog_lob_id        IF NOT EXISTS FOR (l:CatalogLOB)       REQUIRE l.lob_id IS UNIQUE;
+CREATE CONSTRAINT product_id            IF NOT EXISTS FOR (p:Product)          REQUIRE p.product_id IS UNIQUE;
+CREATE CONSTRAINT application_seal      IF NOT EXISTS FOR (a:Application)      REQUIRE a.seal_id IS UNIQUE;
+CREATE CONSTRAINT devteam_id            IF NOT EXISTS FOR (d:DevTeam)          REQUIRE d.team_id IS UNIQUE;
+CREATE CONSTRAINT employee_id           IF NOT EXISTS FOR (e:Employee)         REQUIRE e.employee_id IS UNIQUE;
+CREATE CONSTRAINT sn_group_id           IF NOT EXISTS FOR (g:ServiceNowGroup)  REQUIRE g.group_id IS UNIQUE;
+CREATE CONSTRAINT controlm_server_name  IF NOT EXISTS FOR (s:ControlMServer)   REQUIRE s.name IS UNIQUE;
+CREATE CONSTRAINT folder_id             IF NOT EXISTS FOR (f:JobFolder)        REQUIRE f.folder_id IS UNIQUE;
+CREATE CONSTRAINT job_id                IF NOT EXISTS FOR (j:ControlMJob)      REQUIRE (j.job_id, j.version_serial) IS NODE KEY;
+CREATE CONSTRAINT condition_key         IF NOT EXISTS FOR (c:Condition)        REQUIRE (c.folder_id, c.name, c.cyclic_type) IS NODE KEY;
+CREATE CONSTRAINT scheduler_kind        IF NOT EXISTS FOR (k:SchedulerKind)    REQUIRE k.name IS UNIQUE;
+CREATE CONSTRAINT app_snapshot_id       IF NOT EXISTS FOR (s:ApplicationSnapshot) REQUIRE s.snapshot_id IS UNIQUE;
+CREATE CONSTRAINT role_name             IF NOT EXISTS FOR (r:Role)             REQUIRE r.name IS UNIQUE;
+CREATE CONSTRAINT membership_id         IF NOT EXISTS FOR (m:Membership)       REQUIRE m.membership_id IS UNIQUE;
+CREATE INDEX      application_status    IF NOT EXISTS FOR (a:Application)      ON (a.status);
+CREATE INDEX      application_risk      IF NOT EXISTS FOR (a:Application)      ON (a.risk_level);
+```
+
+New labels (added to v2's vocabulary):
+
+```
+:Company  :BusinessSegment  :CatalogLOB  :ProductLine  :Product  :Application
+:EventProcessing  :BatchProcessing
+:DevTeam  :Employee  :JiraBoard  :ServiceNowGroup
+:Role  :Membership
+:ControlMServer  :JobFolder  :ControlMJob  :Condition
+:SchedulerKind  :Scheduler
+:Channel  :SftpChannel  :UserSftpChannel  :UploadChannel  :ApiChannel  :UpstreamJobChannel
+:ApplicationSnapshot  :ProductSnapshot  :CatalogLOBSnapshot
+```
+
+New relationships (added to v2's vocabulary):
+
+```
+ORG     :HAS_BUSINESS_SEGMENT  :HAS_LOB  :HAS_PRODUCT_LINE  :HAS_PRODUCT  :HAS_APPLICATION
+        :HAS_DEV_TEAM  :HAS_PORT  :HAS_MEMBERSHIP  :OF_ROLE  :HELD_BY
+        :MANAGES  :MEMBER_OF
+        :DEVELOPS_APPLICATION  :HAS_JIRA_BOARD  :HAS_MEMBER  :RECONCILES_TO
+LOCAL   :REQUIRES_SCHEDULER  :ARRIVED_VIA  :ORIGINATES_FROM  :RUNS_ON
+        :EMITS_OUT_CONDITION  :REQUIRES_IN_CONDITION  :DEPENDS_ON (derived)
+META    :HAS_VERSION
+```
+
+---
+
+## §K. Loader amendments (amends v2 §6)
+
+New ingest path: **Path D — Oracle catalog + reference data**. Runs on a weekly/monthly cron (separate CLI: `drydocs refresh-catalog`). Order matters:
+
+1. `business_segments.py` — annual-report sourced; effective-dated.
+2. `catalog_lobs.py` — Oracle catalog.
+3. `product_lines.py`, `products.py` — Oracle catalog.
+4. `seal_applications.py` — SEAL is registry of record. Loads `:Application` properties (seal_id, name, deployment_module, data_retention, risk_level, sox_governed, status) **and always creates `:EventProcessing` + `:BatchProcessing` ports** plus the 5 SEAL `:Membership`s (App Owner, Data Owner, L2 Operate Manager, Risk Manager, CTO).
+5. `pat_applications.py` — PAT extract; reconciles by app name → `seal_id`; loads Agility Lead + Software Engineer Memberships at app level, Product Contact Membership at product level.
+6. `dev_teams.py`, `employees.py`, `org_hierarchy.py` — dev-team + HR feed.
+7. `servicenow_groups.py` — SN export.
+8. Snapshot writer — diff against last load, emit `:ApplicationSnapshot` etc. for at/above-app changes.
+
+Path A (Control-M CSV from v2) becomes Path A' fed by **BMC base tables** instead of CSV in phase 1+:
+
+- `controlm_folders.py` — DEF_TABLES (filter `USER_DAILY IS NOT NULL`); also produces `:ControlMServer` from DATA_CENTER.
+- `controlm_jobs.py` — DEF_JOB; node-key on `(job_id, version_serial)`.
+- `controlm_conditions_in.py` — DEF_LINKI_P → `:Condition` + `:REQUIRES_IN_CONDITION`.
+- `controlm_conditions_out.py` — DEF_LINKO_P → `:Condition` + `:EMITS_OUT_CONDITION`.
+- `controlm_dependencies_derived.py` — runs the BMC join and materializes `:DEPENDS_ON {derived:true}`.
+
+CSV ingestion (v2 Path A) stays available as a fallback or for offline replay; same loader interfaces, different source adapters.
+
+---
+
+## §L. Streamlit amendments (amends v2 §8)
+
+New / changed pages:
+
+- **Application Inventory** (new, primary page): paginated/searchable list of 1991 apps; filters by BusinessSegment / CatalogLOB / ProductLine / SchedulerKind / **status** (BUILD/OPERATE/RETIRED) / **risk_level** / **sox_governed**. Click → Application Detail.
+- **Application Detail** (new): card with corporate hierarchy crumb (Segment > LOB > ProductLine > Product > App); SEAL properties (deployment module, data retention, risk level, SOX, status); the two ports; **all SEAL Memberships** (App Owner, Data Owner, L2 Operate Manager, Risk Manager, CTO) and **all PAT Memberships** (Agility Lead, Software Engineers, inherited Product Contact); dev team(s); derived support team; required schedulers; version history (snapshots).
+- **Support Team by App** (new, headline derived view): the §F.4 Cypher rendered as a sortable table; the page support engineers will live in.
+- **Reconciliation Issues** (new — covers §F.5): apps missing SEAL L2 Operate Manager; SEAL App Owner ↔ PAT Software Engineer mismatches; PAT Product Contact ↔ child-app CTO mismatches; SEAL OPERATE-status apps with no PAT entry. Clickable rows jump to Application Detail.
+- **Channel Onramps** (new): every `:Channel`, what it feeds, which apps depend on it. Highlights FW jobs whose channel origin disagrees with the assumed upstream.
+- **Control-M Job Graph** (changed): condition-event view (Job → Condition → Job) with toggle to show derived `:DEPENDS_ON` only. Folder filter, server filter.
+- **Version History** (new): timeline of ApplicationSnapshot, ProductSnapshot, CatalogLOBSnapshot deltas — answers "what changed last week."
+- **Pipeline Explorer** (changed): unchanged shape, but now starts from BatchProcessing of an app, not from a Folder.
+- **Data Quality Scoreboard, Arrivals & TDQ, Recent Runs, Risks, Ontology Coverage** — unchanged from v2.
+
+Auth: read-only Neo4j user. App search uses the `application_seal` constraint as a fast lookup.
+
+---
+
+## §M. Updated milestones (replaces v2 §10)
+
+Catalog scaffolding moves to the front because everything else attaches to it.
+
+1. **M0 — Skeleton** (½ day): Poetry deps (+ `oracledb`), Neo4j bootstrap, ontology seed (DPROD/DCAT/PROV/DQV/SWO/ORG anchor terms), constraints from §J.
+2. **M1 — Oracle catalog scaffolding + SEAL** (4 days): BusinessSegments → CatalogLOB → ProductLine → Product → Application (with SEAL properties + two-port creation + 5 SEAL Memberships) → DevTeam. Snapshot writer for at/above-app changes.
+3. **M2 — PAT + employees + org chart + SN groups** (3 days): PAT Memberships (Agility Lead, Software Engineer, Product Contact); employees; `:MANAGES` chain; SN group memberships; reconciliation issue surface; §F.4 support-team derivation Cypher tested end-to-end.
+4. **M3 — BMC Control-M ingest** (3 days): folders + servers, jobs (versioned), conditions in/out, derived `:DEPENDS_ON`. SchedulerKind requirement edges from app to "ControlM".
+5. **M4 — TDQ pipeline + channels** (3 days): channel typology, file pair tracker, TDQ check Activities, DQV measurements (per v2 §4.4 unchanged).
+6. **M5 — OpenLineage path** (2 days): event ingester + reconciliation + PROV projection (per v2 §4.3 unchanged).
+7. **M6 — Streamlit** (4 days): all pages from §L; Application Detail and Support Team by App land first.
+8. **M7 — KGoT seams** (1 day): `kg.client`, `:Thought` label, agent-id provenance.
+
+---
+
+## §N. Remaining open questions
+
+Most v2 questions are now answered. What's still open:
+
+1. **HR org hierarchy feed** — is there an authoritative manager-reports-to feed available to the loader? Without it the §F derivation can't run end-to-end. If unavailable, propose a manual seed of just the L2 managers' direct reports as a stopgap.
+2. **PAT extract format** — what shape does the PAT L2-operate-manager extract take (CSV, Oracle table, REST)? Affects the loader.
+3. **ServiceNow group export** — same question; CSV or live API?
+4. **Snapshot retention** — keep all `:ApplicationSnapshot` history forever, or rotate after N years?
+5. **OpenLineage** — still open from v2: native emission from any of (Ab Initio, Informatica, JavaSpark, SQL procs), or all synthesized?
+6. **Channel origin attribution** — when a `:Channel` originates from an upstream Control-M job (§E `:UpstreamJobChannel`), is that derivable from BMC condition matching, or does it require manual annotation per FW job?
