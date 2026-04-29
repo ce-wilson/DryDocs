@@ -93,11 +93,12 @@ Streamlit "Application" page shows the kinds an app requires (Control-M, Autosys
 `:Channel` is a node type. Subtypes by origin:
 
 ```
-:Channel:SftpChannel       — files arriving via SFTP from another app or vendor
-:Channel:UserSftpChannel   — files uploaded by a human user
-:Channel:UploadChannel     — UI-driven file upload
-:Channel:ApiChannel        — file produced by an API call (often by a predecessor job)
+:Channel:SftpChannel        — files arriving via SFTP from another app or vendor
+:Channel:UserSftpChannel    — files uploaded by a human user via SFTP
+:Channel:UploadChannel      — UI-driven file upload
+:Channel:ApiChannel         — file produced by an API call (often by a predecessor job)
 :Channel:UpstreamJobChannel — file produced by another Control-M job upstream
+:Channel:TimeChannel        — no upstream; job is time-triggered (start-of-day, cron-style)
 ```
 
 Why this matters: jobs labeled `FW` (file watcher) don't tell you the *origin* of the file. Modeling channels makes the discrepancy queryable — "show me all FW jobs whose file actually came from a user SFTP, not an upstream system" surfaces hidden dependencies.
@@ -110,6 +111,16 @@ Edges:
 ```
 
 The TDQ pipeline (v2 §4.4) is unchanged — the channel sits *upstream* of the data file arrival; the data file + control file pair → TDQ check still works the same way.
+
+### E.1 Channel-origin attribution rule
+
+When a Control-M job's channel can't be told from the BMC data alone, apply this heuristic during the derived projection step:
+
+1. **If the job has an IN condition matching an upstream job's OUT condition** → `:Channel:UpstreamJobChannel`, `:ORIGINATES_FROM` the upstream `:ControlMJob`. (Computed from the §H derived `:DEPENDS_ON` materialization.)
+2. **Else if the job has no IN condition at all** → `:Channel:TimeChannel`, with start-of-day default schedule annotation.
+3. **Else** (job has IN conditions that don't match an upstream job's OUT) → fall back to file/table/db trigger inference from the job's name/type and watch path: `:SftpChannel`, `:UserSftpChannel`, `:UploadChannel`, `:ApiChannel`. Manual annotation may be needed for FW jobs whose origin disagrees with their naming.
+
+The attribution is computed, not declared — re-derived on every BMC refresh.
 
 ---
 
@@ -186,12 +197,16 @@ Both sources can list contacts and sometimes they conflict. SEAL wins for operat
 
 ### F.6 Loaders for §F
 
-- `seal_applications.py` — SEAL extract (likely Oracle); loads `:Application` properties + the 5 SEAL Memberships.
-- `pat_applications.py` — PAT extract; reconciles by app name → `seal_id`; loads Agility Lead + Software Engineer Memberships at app level, Product Contact at product level.
-- `employees.py` — HR feed.
-- `org_hierarchy.py` — manager → reports edges (the `:MANAGES` chain).
-- `servicenow_groups.py` — SN export → `:MEMBER_OF` edges.
-- `dev_teams.py` — Oracle catalog (still relevant for `:DevTeam → :DEVELOPS_APPLICATION → :Application`, `:HAS_JIRA_BOARD`, `:HAS_MEMBER`).
+Phase 1 sources SEAL and PAT from CSV; phase 2 swaps to Oracle (§I, §K).
+
+- `seal_applications.py` — **SEAL Application Data** (CSV → Oracle phase 2). `:Application` properties + the two SEAL ports.
+- `seal_contacts.py` — **SEAL Contact Data** (CSV → Oracle phase 2). The 5 SEAL Memberships per app.
+- `pat_product_mapping.py` — **PAT product mapping** (CSV → Oracle phase 2). One row per dev team with comma-separated `seal_ids`; emits `:DevTeam → :DEVELOPS_APPLICATION → :Application` edges and (when product context is present) `:Product → :HAS_APPLICATION → :Application`. Reconciled by `seal_id` only.
+- `pat_team_members.py` — **PAT team members → dev team** (CSV → Oracle phase 2). Agility Lead + Software Engineer Memberships at app level; `:DevTeam → :HAS_MEMBER → :Employee`.
+- `employees.py` — Oracle.
+- `org_hierarchy.py` — **Oracle `psgmgr.EMP_HIER`**; `:MANAGES` chain.
+- `servicenow_groups.py` — **CSV phase 1, Oracle phase 3** → `:MEMBER_OF`.
+- `dev_teams.py` — Oracle catalog (still relevant for `:HAS_JIRA_BOARD` and team metadata).
 
 ---
 
@@ -211,14 +226,44 @@ Control-M folders are hosted on 4–5 specific servers (P12, P14, P32, P33, …)
 
 ## §H. BMC Control-M dependency model (new — from BMC-CONTROL-M-LOOP.txt)
 
-The BMC schema is **condition-event** based, not direct job-to-job:
+The BMC schema is **condition-event** based, not direct job-to-job. **All BMC base tables are exposed under the `psgmgr` schema with the same names** (confirmed: substitute `BMC.` → `psgmgr.`):
 
-| BMC table | Concept | Local label |
-|---|---|---|
-| `DEF_JOB` | Job definition | `:ControlMJob` |
-| `DEF_TABLES` | **Folder** (BMC calls them "tables" — naming gotcha, do not collapse with `:Table`) | `:JobFolder` |
-| `DEF_LINKI_P` | IN condition (job consumes) | `:Condition` (incoming side) |
-| `DEF_LINKO_P` | OUT condition (job emits) | `:Condition` (outgoing side) |
+| psgmgr table | Concept | Local label | Key fields |
+|---|---|---|---|
+| `psgmgr.DEF_JOB` | Job definition | `:ControlMJob` | `JOB_ID`, `JOB_NAME`, `TABLE_ID`, `VERSION_SERIAL`, `CYCLIC_TYPE`, `JOB_ORDER` |
+| `psgmgr.DEF_TABLES` | **Folder** (BMC calls them "tables" — naming gotcha, do not collapse with `:Table`) | `:JobFolder` | `TABLE_ID`, `PARENT_TABLE`, `DATA_CENTER`, `USER_DAILY` |
+| `psgmgr.DEF_LINKI_P` | IN condition (job consumes); rows carry **Table/Folder ID and Job ID** | `:Condition` (incoming side) | `TABLE_ID`, `JOB_ID`, `CONDITION`, `VERSION_SERIAL` |
+| `psgmgr.DEF_LINKO_P` | OUT condition (job emits) | `:Condition` (outgoing side) | `TABLE_ID`, `JOB_ID`, `CONDITION`, `SIGN`, `ODATE`, `VERSION_SERIAL` |
+
+The internal `psgmgr.CM_JOB_DEF` view referenced earlier is treated as an alternative curated projection — evaluate during M3, but the canonical loader queries `psgmgr.DEF_*` tables.
+
+The dependency join SQL (psgmgr-substituted) lives in `loaders/sql/controlm_dependencies_psgmgr.sql` (see deliverable below).
+
+### H.1 Phase-1 scope: structural lineage only
+
+Phase 1 ingests **only the structural facts** from BMC — folders, jobs, conditions, derived `:DEPENDS_ON`. No execution history, no run timings. The `:ControlMJob` node carries definition properties (`job_id`, `job_name`, `version_serial`, `cyclic_type`, `parent_table`) but no `last_start_time` / `avg_duration` / etc.
+
+Phase 2 supplements each `:ControlMJob` with **aggregate datetime metrics**:
+
+```
+(:ControlMJob)
+   .avg_start_time   -- rolling N-day average
+   .avg_end_time
+   .avg_duration_sec
+   .last_start_time
+   .last_end_time
+   .last_status
+```
+
+Plus per-execution detail nodes when needed:
+
+```
+(:ControlMJob)-[:HAS_EXECUTION]->(:JobRun {kind:'controlm_execution',
+                                            run_date, start_time, end_time,
+                                            duration_sec, status})
+```
+
+`:JobRun` in phase 1 is reserved for **loader runs** (`kind:'load'` — see §K). The kind discriminator keeps both axes on the same label without needing a second hierarchy.
 
 Modeling rule: dependencies route through `:Condition` nodes, not direct edges. Two jobs are connected when one's OUT condition matches another's IN condition (with same cyclic type).
 
@@ -268,15 +313,34 @@ Same pattern applies to `:Product`, `:ProductLine`, `:CatalogLOB`, `:BusinessSeg
 
 **Oracle source loaders** (refresh cadence):
 
-| Oracle source | Loader | Cadence | Versions on change? |
+**Confirmed source matrix** — phase-1 file extracts arrive as **CSV** (saved that way for clean APOC / `LOAD CSV` ingestion). Phase-2 swaps SEAL/PAT to Oracle; ServiceNow swaps in phase 3.
+
+| Source | Phase-1 | Phase-2 | Phase-3 | Loader | Cadence | Versions on change? |
+|---|---|---|---|---|---|---|
+| Business segments | Annual report (manual seed) | manual | manual | `business_segments.py` | Annual / on reorg | Yes — effective-dated |
+| Product catalog | Oracle | Oracle | Oracle | `catalog_*.py` | Weekly / monthly | Yes (at/above Application) |
+| Dev teams | Oracle | Oracle | Oracle | `dev_teams.py` | Weekly | Yes |
+| **SEAL Application Data** | CSV | Oracle | Oracle | `seal_applications.py` | Weekly | Yes — properties + ports |
+| **SEAL Contact Data** | CSV | Oracle | Oracle | `seal_contacts.py` | Weekly | Yes — 5 SEAL Memberships |
+| **PAT product mapping** (1 row per dev team; `seal_ids` = comma-separated) | CSV | Oracle | Oracle | `pat_product_mapping.py` | Weekly | Yes — `:DevTeam → :DEVELOPS_APPLICATION → :Application` and `:Product → :HAS_APPLICATION → :Application` |
+| **PAT team-members → dev team** | CSV | Oracle | Oracle | `pat_team_members.py` | Weekly | Yes — Agility Lead + Software Engineer Memberships, dev-team Employee membership |
+| HR org hierarchy | **Oracle `psgmgr.EMP_HIER`** | Oracle | Oracle | `org_hierarchy.py` | Weekly | Yes (`:MANAGES` chain) |
+| BMC Control-M | **Oracle `psgmgr.DEF_*`** | Oracle | Oracle | `controlm_*.py` | Daily | No (refresh in place) |
+| ServiceNow groups | CSV | CSV | Oracle | `servicenow_groups.py` | Weekly | Yes |
+
+CSV everywhere in phase 1 means **one source adapter** (`CsvAdapter`) covers all file-based loaders — no Excel handling needed. APOC's `apoc.load.csv` and the built-in `LOAD CSV WITH HEADERS` both work without a Python intermediary.
+
+**Snapshot retention**: keep `:ApplicationSnapshot`, `:ProductSnapshot`, `:CatalogLOBSnapshot` for **5 years** rolling. A nightly cleanup job deletes snapshots older than that.
+
+**`:JobRun` semantics across phases**:
+
+| Phase | `:JobRun {kind: ...}` | Purpose | Retention |
 |---|---|---|---|
-| Product catalog | `catalog_*.py` | Weekly or monthly | Yes (at/above Application) |
-| **SEAL** application registry | `seal_applications.py` | Weekly | Yes — properties + 5 SEAL Memberships |
-| **PAT** product/app contacts | `pat_applications.py` | Weekly | Yes — Agility Lead, Software Engineer, Product Contact |
-| Dev teams | `dev_teams.py` | Weekly | Yes |
-| BMC `DEF_JOB`, `DEF_TABLES`, `DEF_LINKI_P`, `DEF_LINKO_P` | `controlm_*.py` | Daily | No (refresh in place) |
-| HR org hierarchy | `org_hierarchy.py` | Weekly | Yes (`:MANAGES` chain feeds support-team derivation) |
-| ServiceNow groups | `servicenow_groups.py` | Weekly | Yes |
+| 1 | `'load'` | One per loader execution (PAT, SEAL, BMC, etc.). Each ingest produces one. | Keep all in phase 1; revisit when volume justifies pruning. |
+| 2 | `'controlm_execution'` | One per Control-M job run. Carries `start_time`, `end_time`, `duration_sec`, `status`. Also drives the aggregate metrics in §H.1. | TBD in phase 2 — likely 90-day rolling window for full detail + aggregate stats kept on `:ControlMJob` indefinitely. |
+| 2 / 3 | `'lineage_event'` | OpenLineage events when (and if) ETL tools emit them natively. See §K. | TBD — match phase-2 run-history policy. |
+
+In phase 1 there are no Control-M execution `:JobRun`s — the BMC ingest is **structural only** (§H.1).
 
 Connection: `oracledb` driver (formerly `cx_Oracle`). Add to deps. Read-only Oracle creds in `.env`.
 
@@ -335,16 +399,42 @@ META    :HAS_VERSION
 
 ## §K. Loader amendments (amends v2 §6)
 
-New ingest path: **Path D — Oracle catalog + reference data**. Runs on a weekly/monthly cron (separate CLI: `drydocs refresh-catalog`). Order matters:
+New ingest path: **Path D — reference data refresh** (mixed Oracle + file sources). Runs on weekly/monthly cron (separate CLI: `drydocs refresh-reference`). Order matters because each step assumes its predecessors:
 
-1. `business_segments.py` — annual-report sourced; effective-dated.
-2. `catalog_lobs.py` — Oracle catalog.
-3. `product_lines.py`, `products.py` — Oracle catalog.
-4. `seal_applications.py` — SEAL is registry of record. Loads `:Application` properties (seal_id, name, deployment_module, data_retention, risk_level, sox_governed, status) **and always creates `:EventProcessing` + `:BatchProcessing` ports** plus the 5 SEAL `:Membership`s (App Owner, Data Owner, L2 Operate Manager, Risk Manager, CTO).
-5. `pat_applications.py` — PAT extract; reconciles by app name → `seal_id`; loads Agility Lead + Software Engineer Memberships at app level, Product Contact Membership at product level.
-6. `dev_teams.py`, `employees.py`, `org_hierarchy.py` — dev-team + HR feed.
-7. `servicenow_groups.py` — SN export.
-8. Snapshot writer — diff against last load, emit `:ApplicationSnapshot` etc. for at/above-app changes.
+1. `business_segments.py` — annual-report seed; effective-dated.
+2. `catalog_lobs.py` — Oracle.
+3. `product_lines.py`, `products.py` — Oracle.
+4. `seal_applications.py` — **SEAL Application Data** (Excel/CSV → Oracle in phase 2). Loads `:Application` properties (seal_id, name, deployment_module, data_retention, risk_level, sox_governed, status) **and always creates `:EventProcessing` + `:BatchProcessing` ports**. Memberships from this file only if App Owner / Data Owner are columns; otherwise wait for `seal_contacts.py`.
+5. `seal_contacts.py` — **SEAL Contact Data** (Excel/CSV → Oracle in phase 2). Loads the 5 SEAL `:Membership`s (App Owner, Data Owner, L2 Operate Manager, Risk Manager, CTO).
+6. `pat_product_mapping.py` — **PAT product mapping** (CSV → Oracle in phase 2). **One row per dev team**; key fields include `team_id`, `team_name`, optional `product_id`, and a multi-valued `seal_ids` column carrying 0, 1, or many comma-separated numeric seal_ids. Loader splits the CSV string, MERGEs `:Application{seal_id}` for each id (orphan flag if SEAL hasn't loaded the app yet), and creates `:DevTeam → :DEVELOPS_APPLICATION → :Application` edges. If `product_id` is present, also `:DevTeam → :DEVELOPS_FOR_PRODUCT → :Product` and `:Product → :HAS_APPLICATION → :Application`. Reconciliation between PAT and SEAL is **on `seal_id` only** — no fuzzy name matching.
+7. `pat_team_members.py` — **PAT team members → dev team** (CSV → Oracle in phase 2). Loads Agility Lead + Software Engineer Memberships at the app level and `:DevTeam → :HAS_MEMBER → :Employee` edges. Also reconciles via `seal_id`.
+8. `dev_teams.py`, `employees.py` — Oracle.
+9. `org_hierarchy.py` — **Oracle `psgmgr.EMP_HIER`**; `:MANAGES` chain.
+10. `servicenow_groups.py` — file/export.
+11. Snapshot writer — diff against last load, emit `:ApplicationSnapshot` etc. for at/above-app changes.
+
+**Source adapter abstraction** (so phase-2 swap doesn't ripple). Every loader is `Loader(adapter, row_model, cypher)`. Adapters:
+
+- `CsvAdapter(path)` — reads CSV. Used for SEAL, PAT, ServiceNow in phase 1.
+- `OracleAdapter(query, conn)` — runs SQL. Used for catalog, BMC, HR from day one; SEAL/PAT in phase 2; ServiceNow in phase 3.
+
+No Excel handling — the user is saving all phase-1 extracts as CSV for clean `apoc.load.csv` / `LOAD CSV WITH HEADERS` ingestion. Phase 2 swap = configuration only.
+
+`data/raw/` layout for phase-1 file extracts:
+
+```
+data/raw/
+├── seal/
+│   ├── seal_application_data__YYYYMMDD.csv
+│   └── seal_contact_data__YYYYMMDD.csv
+├── pat/
+│   ├── pat_product_mapping__YYYYMMDD.csv
+│   └── pat_team_members__YYYYMMDD.csv
+└── servicenow/
+    └── servicenow_groups__YYYYMMDD.csv
+```
+
+Date-suffixed filenames let the snapshot writer compare against the last accepted file deterministically.
 
 Path A (Control-M CSV from v2) becomes Path A' fed by **BMC base tables** instead of CSV in phase 1+:
 
@@ -378,26 +468,47 @@ Auth: read-only Neo4j user. App search uses the `application_seal` constraint as
 
 ## §M. Updated milestones (replaces v2 §10)
 
-Catalog scaffolding moves to the front because everything else attaches to it.
+Catalog scaffolding moves to the front because everything else attaches to it. OpenLineage and Control-M run-history move *out* of phase 1 because they aren't needed for the inventory use case yet.
+
+### Phase 1 — Inventory + structural lineage
 
 1. **M0 — Skeleton** (½ day): Poetry deps (+ `oracledb`), Neo4j bootstrap, ontology seed (DPROD/DCAT/PROV/DQV/SWO/ORG anchor terms), constraints from §J.
-2. **M1 — Oracle catalog scaffolding + SEAL** (4 days): BusinessSegments → CatalogLOB → ProductLine → Product → Application (with SEAL properties + two-port creation + 5 SEAL Memberships) → DevTeam. Snapshot writer for at/above-app changes.
-3. **M2 — PAT + employees + org chart + SN groups** (3 days): PAT Memberships (Agility Lead, Software Engineer, Product Contact); employees; `:MANAGES` chain; SN group memberships; reconciliation issue surface; §F.4 support-team derivation Cypher tested end-to-end.
-4. **M3 — BMC Control-M ingest** (3 days): folders + servers, jobs (versioned), conditions in/out, derived `:DEPENDS_ON`. SchedulerKind requirement edges from app to "ControlM".
-5. **M4 — TDQ pipeline + channels** (3 days): channel typology, file pair tracker, TDQ check Activities, DQV measurements (per v2 §4.4 unchanged).
-6. **M5 — OpenLineage path** (2 days): event ingester + reconciliation + PROV projection (per v2 §4.3 unchanged).
-7. **M6 — Streamlit** (4 days): all pages from §L; Application Detail and Support Team by App land first.
-8. **M7 — KGoT seams** (1 day): `kg.client`, `:Thought` label, agent-id provenance.
+2. **M1 — Oracle catalog scaffolding + SEAL files** (4 days): BusinessSegments → CatalogLOB → ProductLine → Product → Application (with SEAL Application Data + two-port creation) → SEAL Contact Data (5 Memberships) → DevTeam. Source adapters: Oracle for catalog, CSV for SEAL. Snapshot writer for at/above-app changes.
+3. **M2 — PAT files + employees + org chart + SN groups** (3 days): PAT product mapping → `:DevTeam → :Application` (with comma-separated `seal_ids` splay) and Product Contact; PAT team members → Agility Lead + Software Engineer Memberships and `:DevTeam → :HAS_MEMBER → :Employee`; employees; `:MANAGES` chain from `psgmgr.EMP_HIER`; SN group memberships (CSV); reconciliation issue surface; §F.4 support-team derivation Cypher tested end-to-end.
+4. **M3 — BMC Control-M structural ingest** (3 days): query `psgmgr.DEF_*`; folders + servers from `DATA_CENTER`, jobs (versioned by `VERSION_SERIAL`), conditions in/out keyed by `(folder_id, name, cyclic_type)`, derived `:DEPENDS_ON` from `controlm_dependencies_psgmgr.sql`. SchedulerKind requirement edges from app to "ControlM". **No execution history yet** (§H.1).
+5. **M4 — TDQ pipeline + channels** (3 days): channel typology with the §E.1 attribution rule, file-pair tracker, TDQ check Activities, DQV measurements (per v2 §4.4 unchanged).
+6. **M5 — Streamlit** (4 days): all pages from §L; Application Detail and Support Team by App land first.
+7. **M6 — KGoT seams** (1 day): `kg.client`, `:Thought` label, agent-id provenance.
+
+### Phase 2 — Run history + Oracle SEAL/PAT
+
+1. **P2-A — Source adapter swap** (1 day): re-point `seal_*` and `pat_*` loaders from `CsvAdapter` to `OracleAdapter` once the Oracle replicas land. Row models, validators, and Cypher untouched.
+2. **P2-B — BMC run history + metrics** (4 days): ingest Control-M execution rows; emit `:JobRun {kind:'controlm_execution'}` with `start_time` / `end_time` / `duration_sec` / `status`; roll up `avg_start_time` / `avg_end_time` / `avg_duration_sec` / `last_*` properties on `:ControlMJob` (§H.1). New Streamlit pages: SLA timeline, run-history timeline per app/folder/job. Decide retention policy (likely 90 days full detail, aggregates kept indefinitely on `:ControlMJob`).
+3. **P2-C — OpenLineage ingestion** (3 days, conditional): only if any of (Ab Initio, Informatica, JavaSpark, SQL procs) emit OL events natively. Path B from v2 §4.3 wires up: event ingester + dataset reconciliation + PROV projection. Tools that don't emit natively stay synthesized from BMC + TDQ.
+
+### Phase 3 — ServiceNow Oracle + agentic system
+
+1. **P3-A — ServiceNow source swap** (1 day): re-point `servicenow_groups.py` from `CsvAdapter` to `OracleAdapter` once SN data is in Oracle (or wire to the live SN API if that path is preferred).
+2. **P3-B — Agentic system** (multi-week): KGoT-style agent built on `kg.client` from M6. Out of scope for this plan.
 
 ---
 
 ## §N. Remaining open questions
 
-Most v2 questions are now answered. What's still open:
+All architectural questions for **phase 1** are resolved:
 
-1. **HR org hierarchy feed** — is there an authoritative manager-reports-to feed available to the loader? Without it the §F derivation can't run end-to-end. If unavailable, propose a manual seed of just the L2 managers' direct reports as a stopgap.
-2. **PAT extract format** — what shape does the PAT L2-operate-manager extract take (CSV, Oracle table, REST)? Affects the loader.
-3. **ServiceNow group export** — same question; CSV or live API?
-4. **Snapshot retention** — keep all `:ApplicationSnapshot` history forever, or rotate after N years?
-5. **OpenLineage** — still open from v2: native emission from any of (Ab Initio, Informatica, JavaSpark, SQL procs), or all synthesized?
-6. **Channel origin attribution** — when a `:Channel` originates from an upstream Control-M job (§E `:UpstreamJobChannel`), is that derivable from BMC condition matching, or does it require manual annotation per FW job?
+| Question | Resolution |
+|---|---|
+| HR org hierarchy feed | **Oracle `psgmgr.EMP_HIER`** |
+| BMC Control-M source | **Oracle `psgmgr.DEF_*`** (substitute psgmgr for BMC; same table names) |
+| SEAL extract format | **CSV in phase 1, Oracle in phase 2**; two files (Application Data, Contact Data) |
+| PAT extract format | **CSV in phase 1, Oracle in phase 2**; two files (product mapping with comma-separated `seal_ids`, team-members → dev team) |
+| ServiceNow groups | **CSV in phase 1, Oracle in phase 3** |
+| Snapshot retention | **5 years** rolling for at/above-Application snapshots |
+| Channel origin attribution | Heuristic in §E.1: predecessor/in-condition → `:UpstreamJobChannel`; no in-condition → `:TimeChannel`; else file/table/db trigger |
+| Phase-1 file format | All CSV, ingested via APOC / `LOAD CSV`. No Excel adapter |
+| PAT/SEAL reconciliation | **on `seal_id` only**, no fuzzy name matching |
+| OpenLineage native emission | Out of scope for phase 1; ingestion path scheduled for **P2-C** if any tools emit natively |
+| Operational run retention | Out of scope for phase 1 — Control-M ingest is **structural only** (§H.1); execution history + datetime metrics (avg start / end / duration) are **P2-B**; retention policy decided then |
+
+No phase-1 architectural blockers remain. Open items moving forward are operational (CSV column lists for SEAL Application Data, SEAL Contact Data, PAT product mapping, PAT team members, ServiceNow groups) — those are M0 schema-discovery tasks, not plan questions.
