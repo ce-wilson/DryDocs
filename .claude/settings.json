@@ -1,0 +1,11 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(poetry --version)",
+      "Bash(py --version)",
+      "Bash(poetry run *)",
+      "Bash(poetry update *)",
+      "Bash(poetry config *)"
+    ]
+  }
+}

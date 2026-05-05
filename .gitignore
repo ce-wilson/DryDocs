@@ -1,0 +1,22 @@
+# Credentials — never commit these
+.env
+Neo4j-*.txt
+
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.venv/
+dist/
+build/
+*.egg-info/
+
+# Test / type / lint caches
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# OS
+.DS_Store
+Thumbs.db

@@ -1,0 +1,46 @@
+[tool.poetry]
+name = "drydocs"
+version = "0.1.0"
+description = "Production support inventory + data product knowledge graph for D&A batches."
+authors = ["Production Support Team"]
+readme = "README.md"
+packages = [{ include = "drydocs" }]
+
+[tool.poetry.dependencies]
+python = "^3.11"
+neo4j = "^5.20"
+oracledb = "^2.2"
+pandas = "^2.2"
+pydantic = "^2.7"
+pydantic-settings = "^2.3"
+python-dotenv = "^1.0"
+typer = "^0.12"
+click = ">=8.0,<8.2"
+rich = "^13.7"
+streamlit = "^1.36"
+streamlit-agraph = "^0.0.45"
+
+[tool.poetry.group.dev.dependencies]
+pytest = "^8.2"
+pytest-cov = "^5.0"
+testcontainers = { version = "^4.5", extras = ["neo4j"] }
+ruff = "^0.5"
+mypy = "^1.10"
+
+[tool.poetry.scripts]
+drydocs = "drydocs.cli:app"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "B", "UP", "N", "RUF"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-ra --strict-markers"
