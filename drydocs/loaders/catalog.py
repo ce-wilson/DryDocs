@@ -13,9 +13,14 @@ needs to change — the model field names stay constant.
 from __future__ import annotations
 
 from datetime import date
-from typing import Any
+from pathlib import Path
+from typing import Any, ClassVar
 
 from pydantic import BaseModel, ConfigDict, Field, field_validator
+
+from .base import BaseLoader
+
+_CYPHER = Path(__file__).resolve().parent / "cypher"
 
 
 def _date_or_none(v: Any) -> date | None:
@@ -97,3 +102,31 @@ class DevTeamRow(BaseModel):
             "loader writes :Product->:HAS_DEV_TEAM->:DevTeam."
         ),
     )
+
+
+class CatalogLOBsLoader(BaseLoader):
+    name: ClassVar[str] = "catalog_lobs.v1"
+    cypher_path: ClassVar[Path | None] = _CYPHER / "catalog_lobs.cypher"
+    row_model: ClassVar[type] = CatalogLOBRow
+    source_label: ClassVar[str] = "oracle"
+
+
+class ProductLinesLoader(BaseLoader):
+    name: ClassVar[str] = "product_lines.v1"
+    cypher_path: ClassVar[Path | None] = _CYPHER / "product_lines.cypher"
+    row_model: ClassVar[type] = ProductLineRow
+    source_label: ClassVar[str] = "oracle"
+
+
+class ProductsLoader(BaseLoader):
+    name: ClassVar[str] = "products.v1"
+    cypher_path: ClassVar[Path | None] = _CYPHER / "products.cypher"
+    row_model: ClassVar[type] = ProductRow
+    source_label: ClassVar[str] = "oracle"
+
+
+class DevTeamsLoader(BaseLoader):
+    name: ClassVar[str] = "dev_teams.v1"
+    cypher_path: ClassVar[Path | None] = _CYPHER / "dev_teams.cypher"
+    row_model: ClassVar[type] = DevTeamRow
+    source_label: ClassVar[str] = "oracle"

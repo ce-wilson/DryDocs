@@ -250,7 +250,7 @@ def apply_m3_supplement() -> None:
         cli.execute_file(M3_SUPPLEMENT_FILE)
     console.print("[green]M3 ontology supplement applied.[/]")
     if M1_ROLE_VOCAB_UPGRADE.exists():
-    cli.execute_file(M1_ROLE_VOCAB_UPGRADE)
+        cli.execute_file(M1_ROLE_VOCAB_UPGRADE)
     console.print("[green]Role vocabulary aligned to SEAL spec.[/]")
 
 
