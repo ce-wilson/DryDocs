@@ -1,32 +1,33 @@
 -- =============================================================================
 -- controlm_folders.sql
 --
--- Source view : psgmgr.CM_DEF_VTAB
---               (wraps dtsremgr.DEF_TAB; governed access via CM_RO_USER)
--- Projection  : columns the ControlMFolderRow model expects.
+-- Source table : psgmgr.CM_DEF_VTAB  (replicated copy of dtsremgr.DEF_VTAB;
+--                                     governed access via CM_RO_USER)
+-- Projection   : columns the ControlMFolderRow model expects.
 --
--- TODO — column-name confirmation:
---   The exact column names below are based on the BMC DEF_TAB canonical
---   schema. Confirm against psgmgr.CM_DEF_VTAB after the SQL re-upload
---   completes; rename aliases here if anything differs.
+-- Key schema findings from the actual DDL:
+--   * The folder NAME is SCHED_TABLE (NOT a "PARENT_TABLE" column — that
+--     name lives only on the job side as a denormalized FK).
+--   * There is NO IS_CURRENT_VERSION column on the folder table; versioning
+--     applies only to jobs and conditions.
+--   * There is NO VERSION_SERIAL on the folder table either.
+--   * The only active-scheduling filter on folders is USER_DAILY IS NOT NULL.
 --
--- Filter rule:
---   IS_CURRENT_VERSION = 1   — only current-version definitions (replaces
---                              the earlier USER_DAILY filter; LNKO_P
---                              confirms this column exists on the family).
---   USER_DAILY IS NOT NULL   — kept ANDed in case both filters apply on
---                              the folder side; remove if it doesn't.
+-- The folder-level deletion columns (TBL_DELETION_*) are intentionally
+-- omitted from the projection — soft-deletes are out of scope for M3.
 -- =============================================================================
 
 SELECT
-    T.TABLE_ID         AS folder_id,
-    T.PARENT_TABLE     AS parent_table,   -- TODO confirm: maybe TABLE_NAME
-    T.DATA_CENTER      AS data_center,
-    T.USER_DAILY       AS user_daily,
-    T.IS_CURRENT_VERSION AS is_current_version,
-    T.VERSION_SERIAL   AS version_serial,
-    T.CAPTURE_DATE     AS capture_date
+    T.TABLE_ID       AS folder_id,
+    T.SCHED_TABLE    AS sched_table,        -- folder name
+    T.DATA_CENTER    AS data_center,        -- Control-M server (P12/P14/P32/P33)
+    T.USER_DAILY     AS user_daily,
+    T.TABLE_STATUS   AS table_status,
+    T.TABLE_TYPE     AS table_type,
+    T.INSTANCE_NAME  AS instance_name,
+    T.LAST_UPDATED   AS last_updated,
+    T.LAST_UPDATED_USER AS last_updated_user,
+    T.CAPTURE_DATE   AS capture_date
 FROM   psgmgr.CM_DEF_VTAB T
-WHERE  T.IS_CURRENT_VERSION = 1
-  AND  T.USER_DAILY IS NOT NULL
+WHERE  T.USER_DAILY IS NOT NULL
 ;

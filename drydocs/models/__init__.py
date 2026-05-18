@@ -19,7 +19,13 @@ from .catalog import (
     ProductLineRow,
     ProductRow,
 )
-from .controlm import ControlMConditionRow, ControlMFolderRow, ControlMJobRow
+from .controlm import (
+    ControlMConditionInRow,
+    ControlMConditionOutRow,
+    ControlMDependencyRow,
+    ControlMFolderRow,
+    ControlMJobRow,
+)
 
 __all__ = [
     # SEAL
@@ -31,9 +37,11 @@ __all__ = [
     "ProductLineRow",
     "ProductRow",
     "DevTeamRow",
-    # Control-M (M3 part 1)
+    # Control-M (M3 part 1 — folders + jobs)
     "ControlMFolderRow",
     "ControlMJobRow",
-    # Control-M (M3 part 2 — pending column-list confirmation)
-    "ControlMConditionRow",
+    # Control-M (M3 part 2 — conditions + derived dependencies)
+    "ControlMConditionInRow",
+    "ControlMConditionOutRow",
+    "ControlMDependencyRow",
 ]

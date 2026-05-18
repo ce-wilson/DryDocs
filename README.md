@@ -1,118 +1,145 @@
-# DryDocs — M3 Part 1: Control-M Folders + Jobs
+# DryDocs — M3: Control-M Structural Lineage
 
-Loads BMC Control-M folder and job *definitions* from Oracle (`psgmgr.DEF_*`) into the graph. **Structural only** — phase 1 doesn't ingest execution history; that's phase 2 (P2-B per v3 §M).
+Loads BMC Control-M folder, job, condition definitions and the derived `:DEPENDS_ON` dependency graph from Oracle (`psgmgr.*`). **Structural only** — phase 1 doesn't ingest execution history; that's phase 2 (P2-B per v3 §M).
 
 This pack layers on top of M0 + M1. CLI is a strict superset.
 
 ## What this delivers
 
-- **`controlm_folders.py`** — loads `psgmgr.CM_DEF_VTAB` (the `dtsremgr.DEF_TAB` passthrough). Creates `:JobFolder` nodes (with composite labels `:JobFolder:Collection` so the PROV anchor is visible at query time) and the `:ControlMServer` mesh (deduped on DATA_CENTER value, labeled `:ControlMServer:Platform`).
-- **`controlm_jobs.py`** — loads `psgmgr.DEF_JOB`. Creates `:ControlMJob:Activity` nodes with composite NODE KEY `(job_id, version_serial)` so version history is non-destructive.
-- **Pydantic row models** (`drydocs/models/controlm.py`) — `ControlMFolderRow` and `ControlMJobRow`, with tolerant coercers for empty/null fields and an `.active` derived property on folders.
-- **SQL projections** (`drydocs/loaders/sql/controlm_folders.sql`, `controlm_jobs.sql`) — exactly the columns the row models expect, with `T.USER_DAILY IS NOT NULL` active filter.
-- **Ontology supplement** (`drydocs/schema/m3_ontology_supplement.cypher`) — adds three local-namespace anchor terms (`:ControlMServer`, `:JobFolder`, `:ControlMJob`) and wires them via `:SUBCLASS_OF` to the PROV anchors M0 already seeded (`prov:Collection`, `prov:Activity`).
-- **Concept-mapping doc** (`docs/m3_controlm_concept_mapping.md`) — local label ↔ ontology term table; the naming-gotcha callout (BMC "tables" are folders); what's out of scope for M3 part 1.
-- **CLI additions** — `ingest-controlm`, `apply-m3-supplement`, `m3-verify`. Existing `load <name>` registry gains `controlm_folders` and `controlm_jobs`.
-- **Sample CSVs** mirroring the SQL projection (`controlm_folders__sample.csv`, `controlm_jobs__sample.csv`) so the loaders are dry-runnable offline.
-- **Unit tests** (no Neo4j needed) for the row models and Cypher templates.
+### M3 part 1 — folders + jobs
+
+- **`controlm_folders.py`** — loads `psgmgr.CM_DEF_VTAB` (replicated copy of `dtsremgr.DEF_VTAB`). Creates `:JobFolder:Collection` nodes (folder name = `SCHED_TABLE`) and the `:ControlMServer:Platform` mesh (deduped on `DATA_CENTER`).
+- **`controlm_jobs.py`** — loads `psgmgr.CM_DEF_VJOB`. Creates `:ControlMJob:Activity` nodes with composite NODE KEY `(job_id, version_serial)`. Captures the business-app name (`APPLICATION` column) for later reconciliation to `:Application.seal_id`.
+
+### M3 part 2 — conditions + derived dependencies
+
+- **`controlm_conditions_in.py`** — loads `psgmgr.CM_DEF_LNKI_P_VW`. Creates `:Condition:Entity` nodes (composite key `(folder_id, name, version_serial)`) and `:REQUIRES_IN_CONDITION` edges with the boolean-expression metadata (`AND_OR`, `PARENTHESES`, `ORDER_`).
+- **`controlm_conditions_out.py`** — loads `psgmgr.CM_DEF_LNKO_P_VW`. Reuses the same `:Condition` nodes; creates `:EMITS_OUT_CONDITION` edges with the `SIGN` operator (`+`/`-`).
+- **`controlm_dependencies_derived.py`** — materializes `:DEPENDS_ON` edges from the recursive predecessor SQL. Each edge carries `via_condition`, `recursion_level`, and `dependency_path`. Cycle-safe by construction (path-INSTR guard in the SQL).
+- **`controlm_dependencies_recursive.sql`** — the canonical Oracle recursive CTE. Walks backwards from a successor through condition matching; cyclic-type matching intentionally disabled; recursion cap of 10 with full-path cycle detection.
+
+### Support files
+
+- Pydantic row models in `drydocs/models/controlm.py` — five distinct models matching the five source schemas.
+- Five SQL projections in `drydocs/loaders/sql/` — one per source view, locked to real columns from the uploaded DDL.
+- Five Cypher templates in `drydocs/loaders/cypher/`.
+- Sample CSVs in `data/samples/` exercising the full chain end-to-end (8 folders, 15 jobs, 8 in-conditions, 8 out-conditions, 13 derived dependencies).
+- Ontology supplement at `drydocs/schema/m3_ontology_supplement.cypher`.
+- Concept-mapping doc at `docs/m3_controlm_concept_mapping.md`.
 
 ## Drop-in mapping
 
 ```
-drydocs_m3_folders_jobs/                  C:\coding\projects\DryDocs\
+drydocs_m3_folders_jobs/                                C:\coding\projects\DryDocs\
 ├── drydocs/
 │   ├── models/
-│   │   ├── controlm.py                   drydocs/models/controlm.py          (new)
-│   │   └── __init__.py                   drydocs/models/__init__.py          (overwrites)
+│   │   ├── controlm.py                                 drydocs/models/controlm.py        (new)
+│   │   └── __init__.py                                 drydocs/models/__init__.py        (overwrites)
 │   ├── loaders/
-│   │   ├── controlm_folders.py           drydocs/loaders/controlm_folders.py (new)
-│   │   ├── controlm_jobs.py              drydocs/loaders/controlm_jobs.py    (new)
+│   │   ├── controlm_folders.py                         drydocs/loaders/controlm_folders.py            (new)
+│   │   ├── controlm_jobs.py                            drydocs/loaders/controlm_jobs.py               (new)
+│   │   ├── controlm_conditions_in.py                   drydocs/loaders/controlm_conditions_in.py      (new)
+│   │   ├── controlm_conditions_out.py                  drydocs/loaders/controlm_conditions_out.py     (new)
+│   │   ├── controlm_dependencies_derived.py            drydocs/loaders/controlm_dependencies_derived.py (new)
 │   │   ├── cypher/
-│   │   │   ├── controlm_folders.cypher   drydocs/loaders/cypher/...          (new)
-│   │   │   └── controlm_jobs.cypher      drydocs/loaders/cypher/...          (new)
+│   │   │   ├── controlm_folders.cypher                 drydocs/loaders/cypher/...        (new)
+│   │   │   ├── controlm_jobs.cypher                    drydocs/loaders/cypher/...        (new)
+│   │   │   ├── controlm_conditions_in.cypher           drydocs/loaders/cypher/...        (new)
+│   │   │   ├── controlm_conditions_out.cypher          drydocs/loaders/cypher/...        (new)
+│   │   │   └── controlm_dependencies_derived.cypher    drydocs/loaders/cypher/...        (new)
 │   │   └── sql/
-│   │       ├── controlm_folders.sql      drydocs/loaders/sql/...             (new)
-│   │       └── controlm_jobs.sql         drydocs/loaders/sql/...             (new)
+│   │       ├── controlm_folders.sql                    drydocs/loaders/sql/...           (new)
+│   │       ├── controlm_jobs.sql                       drydocs/loaders/sql/...           (new)
+│   │       ├── controlm_conditions_in.sql              drydocs/loaders/sql/...           (new)
+│   │       ├── controlm_conditions_out.sql             drydocs/loaders/sql/...           (new)
+│   │       └── controlm_dependencies_recursive.sql     drydocs/loaders/sql/...           (new)
 │   ├── schema/
-│   │   └── m3_ontology_supplement.cypher drydocs/schema/...                  (new)
-│   └── cli.py                            drydocs/cli.py                      (overwrites M1)
+│   │   └── m3_ontology_supplement.cypher               drydocs/schema/...                (new)
+│   └── cli.py                                          drydocs/cli.py                    (overwrites M1)
 ├── data/samples/
-│   ├── controlm_folders__sample.csv      data/samples/...                    (new)
-│   └── controlm_jobs__sample.csv         data/samples/...                    (new)
+│   ├── controlm_folders__sample.csv                    data/samples/...                  (new)
+│   ├── controlm_jobs__sample.csv                       data/samples/...                  (new)
+│   ├── controlm_conditions_in__sample.csv              data/samples/...                  (new)
+│   ├── controlm_conditions_out__sample.csv             data/samples/...                  (new)
+│   └── controlm_dependencies__sample.csv               data/samples/...                  (new)
 ├── tests/unit/
-│   ├── test_controlm_models.py           tests/unit/...                      (new)
-│   └── test_controlm_cypher.py           tests/unit/...                      (new)
+│   ├── test_controlm_models.py                         tests/unit/...                    (overwrites)
+│   └── test_controlm_cypher.py                         tests/unit/...                    (overwrites)
 └── docs/
-    └── m3_controlm_concept_mapping.md    docs/...                            (new)
+    └── m3_controlm_concept_mapping.md                  docs/...                          (new)
 ```
-
-`cli.py` and `drydocs/models/__init__.py` overwrite the M1 versions — strict supersets, every prior command still works.
 
 ## Run order
 
 ```powershell
-# One-time after M0 bootstrap: add the Control-M anchor terms.
+# One-time: add the Control-M anchor terms to the ontology backbone.
 poetry run drydocs apply-m3-supplement
 
-# Sample-mode: load folders + jobs from data/samples/
+# Sample-mode: full M3 chain (folders -> jobs -> conditions in/out -> deps).
 poetry run drydocs ingest-controlm
 
-# Or: production mode against Oracle (uses the SQL projections in drydocs/loaders/sql/)
-poetry run drydocs ingest-controlm --use-oracle
+# Production mode against Oracle psgmgr views.
+poetry run drydocs ingest-controlm --use-oracle --folder-filter "CCB_AUTO_%"
 
-# Verify M3 part-1 invariants.
+# Verify M3 invariants.
 poetry run drydocs m3-verify
 ```
 
-Expected output of `m3-verify` after loading the sample CSVs (8 folders, 15 jobs, 4 servers P12/P14/P32/P33):
+Expected output of `m3-verify` after the sample chain (8 folders, 15 jobs, 5 conditions distinct, 13 derived dependency edges):
 
 ```
-                    M3 (part 1) invariants
-+--------------------------------------------+-----+----------------------------+
-| Check                                      | OK  | Detail                     |
-+============================================+=====+============================+
-| every folder has a server                  | yes | folders=8 srv_links=8      |
-| every job has a folder                     | yes | jobs=15 with_folder=15     |
-| no duplicate (job_id, version_serial)      | yes | dupes=0                    |
-| ControlM SchedulerKind seeded              | yes | n=1                        |
-| M3 local anchor terms seeded               | yes | n=3 (expect >= 3 ...)      |
-| active folders contain at least one job    | yes | empty=0 total=7            |
-+--------------------------------------------+-----+----------------------------+
+                          M3 (part 1 + part 2) invariants
++--------------------------------------------------+-----+---------------------------------+
+| Check                                            | OK  | Detail                          |
++==================================================+=====+=================================+
+| every folder has a server                        | yes | folders=8 srv_links=8           |
+| every job has a folder                           | yes | jobs=15 with_folder=15          |
+| no duplicate (job_id, version_serial)            | yes | dupes=0                         |
+| ControlM SchedulerKind seeded                    | yes | n=1                             |
+| M3 local anchor terms seeded                     | yes | n=3 (expect >= 3 ...)           |
+| active folders contain at least one job          | yes | empty=0 total=7                 |
+| no orphan conditions                             | yes | orphan=0 total=5                |
+| DEPENDS_ON edges have recursion_level + path     | yes | total=13 missing_level=0 ...    |
++--------------------------------------------------+-----+---------------------------------+
 ```
 
-(The retired folder `F00102 CCB_AUTO_RETIRED` lands as `active: false` and is excluded from the last check, which is why `total=7` rather than 8.)
+## Schema notes worth knowing
 
-## Loader semantics
+Three things in the real schema that didn't match the BMC canonical references:
 
-**Composite key on `:ControlMJob`.** The NODE KEY constraint M0 seeded — `REQUIRE (j.job_id, j.version_serial) IS NODE KEY` — means a new `VERSION_SERIAL` for the same `job_id` creates a **new node**. History is non-destructive: the previous version is still queryable, marked with its old `last_seen_at`. Phase-2 execution history (`:JobRun {kind:'controlm_execution'}`) attaches to specific versions, not just to job_id.
+1. **Folder name lives in `SCHED_TABLE`**, not `PARENT_TABLE`. `PARENT_TABLE` is on the job side as a denormalized FK to the folder's `SCHED_TABLE` value. The folder loader uses `SCHED_TABLE`; the job loader keeps `PARENT_TABLE` as a property for query convenience.
 
-**Folder containment uses `:CONTAINS_JOB`.** That's the local edge type. It plays the role of `prov:hadMember` against the `:JobFolder:Collection` anchor — the supplement records that mapping at the term level. We don't use `prov:hadMember` as the actual relationship type because the SCM cardinality and lifecycle semantics differ slightly from the canonical PROV definition.
+2. **Folders are not versioned.** `CM_DEF_VTAB` has no `IS_CURRENT_VERSION` or `VERSION_SERIAL`. Only `USER_DAILY IS NOT NULL` filters active folders.
 
-**Server dedup is by `DATA_CENTER` value.** If two folders share `P12` they share one `:ControlMServer` node. The `:RUNS_ON` edge carries `since` (set on create) and `last_seen_at` (updated each refresh) so a folder migration (e.g., P12 → P32) is visible as a stale edge that needs review.
+3. **LNKI and LNKO have different schemas.** LNKI has `AND_OR` / `PARENTHESES` / `ORDER_` for the boolean-expression tree. LNKO has `SIGN` (`+`/`-`). Distinct row models — they can't share one — but both write to the same `:Condition` node when `(folder_id, name, version_serial)` matches.
+
+## Cyclic-type handling
+
+The canonical recursive SQL **intentionally disables** cyclic-type matching (`-- AND J_SUB.JOB_CYCLIC_IN = D_SUB.JOB_CYCLIC_OUT`). The commented line is preserved in `controlm_dependencies_recursive.sql` so the design intent travels with the code. Cross-cyclic-type dependencies are real (e.g., a 15-minute cyclic FW job feeds a daily ETL job), and the cycle-safety comes from the `INSTR(dependency_path, ...)` guard, not from cyclic-type filtering.
 
 ## Phase-2 swap
 
 When the BMC ingest moves from samples to production:
 
 ```powershell
-# Production cadence (daily):
-poetry run drydocs ingest-controlm --use-oracle
+poetry run drydocs ingest-controlm --use-oracle --folder-filter "%"
 ```
 
-The SQL files in `drydocs/loaders/sql/` are the source of truth — edit table/column names there if the corporate `psgmgr` schema diverges from the BMC canonical names. Row models, Cypher templates, and loaders don't change.
+For a focused refresh of just one product line:
 
-## What's NOT in this pack (M3 part 2)
+```powershell
+poetry run drydocs ingest-controlm --use-oracle --folder-filter "CCB_HL_%"
+```
 
-- `:Condition` nodes (`psgmgr.CM_DEF_LNKI_P_VW` / `psgmgr.CM_DEF_LNKO_P_VW`). SQL projections already drafted in `drydocs/loaders/sql/controlm_conditions_in.sql` and `controlm_conditions_out.sql`. `ControlMConditionRow` is in `models/controlm.py`. Loader + Cypher: M3 part 2.
-- `:EMITS_OUT_CONDITION` and `:REQUIRES_IN_CONDITION` edges: M3 part 2.
-- Derived `:DEPENDS_ON` edges. SQL already drafted in the savepoint v2 loader pack at `drydocs_loaders/sql/controlm_dependencies_psgmgr.sql`; M3 part 2 wires it to a `controlm_dependencies_derived.py` loader that re-derives after every refresh.
-- Folder → `:BatchProcessing` port linkage. Requires a folder-naming-convention resolver + reliable PAT data. Defer to M3 phase or M4.
-- `:REQUIRES_SCHEDULER → :SchedulerKind {name:"ControlM"}` edges on `:Application`. Post-load step after folder → application mapping exists.
+The SQL files in `drydocs/loaders/sql/` are the source of truth — edit there if the corporate `psgmgr` schema diverges from the DDL we locked. Row models, Cypher templates, and loaders don't change.
 
-## What's NOT in phase 1 at all (phase 2 / 3)
+## What's NOT in this pack
 
-- Per-execution `:JobRun {kind:'controlm_execution'}` history with `start_time`, `end_time`, `duration_sec` (P2-B).
+- Per-execution `:JobRun {kind:'controlm_execution'}` history with `start_time` / `end_time` / `duration_sec` (P2-B).
 - Rolled-up datetime metrics on `:ControlMJob` (`avg_start_time`, `avg_end_time`, `avg_duration_sec`).
+- Folder → `:BatchProcessing` linkage. Requires a folder-naming-convention resolver + reliable PAT data.
+- `:REQUIRES_SCHEDULER → :SchedulerKind {name:"ControlM"}` edges on `:Application`. Post-load step.
+- Quantitative-resource modeling (`CM_DEF_LNKI_Q_VW`). Out of scope.
 - OpenLineage event ingestion (P2-C, conditional).
 
 ## Tests
@@ -123,14 +150,12 @@ poetry run pytest tests/unit/ -v
 
 Coverage:
 
-- `test_controlm_models.py` — folder + job pydantic validation, optional-field handling, composite-key constraints, empty-value coercion.
-- `test_controlm_cypher.py` — every template uses `UNWIND $batch AS row`, MERGE-based idempotency, composite NODE KEY pattern on `:ControlMJob`, `:JobFolder:Collection` and `:ControlMServer:Platform` label composition, supplement wires correctly to PROV anchors.
-
-Integration tests (testcontainers-neo4j) land alongside the §F.4 support-team derivation in M2 → M3 part 2 once the full Application → BatchProcessing → JobFolder → ControlMJob path exists.
+- `test_controlm_models.py` — pydantic validation for all five row models; confirms `SCHED_TABLE` (not `PARENT_TABLE`) on the folder side; confirms LNKI has boolean-expression columns while LNKO has `SIGN`; confirms recursion_level >= 1 on dependency rows.
+- `test_controlm_cypher.py` — every Cypher uses `UNWIND $batch AS row` + MERGE-based idempotency; folder Cypher uses `SCHED_TABLE`; conditions share composite key; derived deps carry `recursion_level` + `dependency_path`; recursive SQL has the cycle guard and recursion cap.
 
 ## Next step
 
 1. Run `apply-m3-supplement` then `ingest-controlm` against the bundled samples; confirm `m3-verify` passes.
-2. Confirm the exact `psgmgr.CM_DEF_VTAB` and `psgmgr.CM_DEF_VJOB` column names with the BMC DBA (uploads of `CM_DEF_VJOB.sql` and `CM_DEF_VTAB.sql` came through empty — confirm by inline paste or DDL query); adjust `drydocs/loaders/sql/controlm_*.sql` if anything differs.
-3. Switch to `--use-oracle` against a non-prod psgmgr replica; re-run `m3-verify`.
-4. M3 part 2 begins with conditions in/out (`psgmgr.CM_DEF_LNKI_P_VW` / `CM_DEF_LNKO_P_VW`) and the derived `:DEPENDS_ON` materialization. Recursive-predecessor SQL needs re-upload (the existing file is 0 bytes).
+2. Run `ingest-controlm --use-oracle --folder-filter "<one folder>"` against a non-prod psgmgr replica; spot-check the derived `:DEPENDS_ON` edges against a known dependency tree.
+3. Widen the folder filter incrementally; re-run `m3-verify` after each refresh.
+4. Phase 2 (P2-B) wires up the per-execution `:JobRun` history for SLA tracking.

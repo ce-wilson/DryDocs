@@ -41,7 +41,9 @@ LOGGER = logging.getLogger("drydocs.cli")
 SCHEMA_DIR = Path(__file__).resolve().parent / "schema"
 CONSTRAINTS_FILE = SCHEMA_DIR / "constraints.cypher"
 ONTOLOGY_FILE = SCHEMA_DIR / "ontology.cypher"
+M1_ROLE_VOCAB_UPGRADE = SCHEMA_DIR / "m1_role_vocabulary_update.cypher"
 M3_SUPPLEMENT_FILE = SCHEMA_DIR / "m3_ontology_supplement.cypher"
+M3_CONSTRAINTS_UPGRADE = SCHEMA_DIR / "m3_constraints_upgrade.cypher"
 
 LOADER_REGISTRY: dict[str, type] = {
     "seal_applications":  seal_apps_mod.SealApplicationsLoader,
@@ -247,6 +249,9 @@ def apply_m3_supplement() -> None:
     with _client() as cli:
         cli.execute_file(M3_SUPPLEMENT_FILE)
     console.print("[green]M3 ontology supplement applied.[/]")
+    if M1_ROLE_VOCAB_UPGRADE.exists():
+    cli.execute_file(M1_ROLE_VOCAB_UPGRADE)
+    console.print("[green]Role vocabulary aligned to SEAL spec.[/]")
 
 
 @app.command(name="ingest-controlm")

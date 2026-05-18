@@ -1,35 +1,26 @@
 // =============================================================================
 // seal_contacts.cypher
 //
-// Loads SEAL Contact Data into the W3C ORG Membership pattern (v3 §F.3):
+// Loads SEAL Contact extract (long format) for the roles NOT embedded in
+// DECO_SEAL_APP_INFO: Backup Information Owner, Design Authority, Chief
+// Business Technologist, L1 / L2 Operate Manager, Backup Application
+// Owner, Risk Manager.
 //
-//     (:Application)-[:HAS_MEMBERSHIP]->(:Membership)
-//                                          -[:OF_ROLE]->(:Role)
-//                                          -[:HELD_BY]->(:Employee)
+// The three contacts embedded in DECO (App Owner, CTO, PIO) are loaded
+// by seal_applications.cypher directly from the application row — this
+// loader is for everything else.
 //
-// The membership_id is deterministic: seal_id|SEAL|role_name|employee_id.
-// Re-running with the same row is a no-op (MERGE).
-//
-// Roles are constrained to the eight-role vocabulary seeded by M0;
-// pydantic SealContactRow rejects rows whose role_name doesn't canonicalize
-// to one of the SEAL five.
-//
-// Parameters (passed by BaseLoader._flush):
-//   $batch       list of validated dicts (keys: seal_id, role_name,
-//                                         employee_id, employee_name,
-//                                         employee_email)
-//   $run_id      UUID of this loader's :JobRun
-//   $loaded_at   ISO datetime string
-//   $loader      loader version tag
+// Parameters: $batch (SealContactRow dicts with app_id, role_name,
+//             employee_sid, employee_name, employee_email),
+//             $run_id, $loaded_at, $loader.
 // =============================================================================
 
 UNWIND $batch AS row
 
-MATCH (a:Application {seal_id: row.seal_id})
+MATCH (a:Application {seal_id: row.app_id})
 MATCH (r:Role {name: row.role_name})
 
-// Employee upsert (or create if PAT/SEAL referenced before HR feed lands)
-MERGE (e:Employee {employee_id: row.employee_id})
+MERGE (e:Employee {employee_id: row.employee_sid})
   ON CREATE SET e.created_at = datetime($loaded_at),
                 e.source     = 'SEAL'
 SET e.full_name    = coalesce(row.employee_name, e.full_name),
@@ -37,9 +28,8 @@ SET e.full_name    = coalesce(row.employee_name, e.full_name),
     e.last_seen_at = datetime($loaded_at),
     e.last_run_id  = $run_id
 
-// Reified Membership: deterministic id keeps re-runs idempotent.
 MERGE (a)-[:HAS_MEMBERSHIP]->(m:Membership {
-    membership_id: row.seal_id + '|SEAL|' + row.role_name + '|' + row.employee_id
+    membership_id: row.app_id + '|SEAL|' + row.role_name + '|' + row.employee_sid
 })
   ON CREATE SET m.source     = 'SEAL',
                 m.valid_from = date(),
@@ -56,7 +46,6 @@ MERGE (m)-[r2:HELD_BY]->(e)
   ON CREATE SET r2.first_seen_at = datetime($loaded_at), r2.source = 'SEAL'
 SET r2.last_seen_at = datetime($loaded_at)
 
-// Provenance: this run touched this Membership.
 WITH m
 MATCH (run:JobRun {run_id: $run_id})
 MERGE (m)-[r3:WAS_GENERATED_BY {source: 'SEAL'}]->(run)

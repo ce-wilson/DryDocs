@@ -1,29 +1,16 @@
-seal_id,role_name,employee_id,employee_name,employee_email
-100123,App Owner,E0042,John Doe,john.doe@firm.com
-100123,Data Owner,E0099,Jane Roe,jane.roe@firm.com
-100123,L2 Operate Manager,E0015,Mike Smith,mike.smith@firm.com
-100123,Risk Manager,E0301,Sarah Brown,sarah.brown@firm.com
-100123,CTO,E0888,Alex Chen,alex.chen@firm.com
-100456,App Owner,E0042,John Doe,john.doe@firm.com
-100456,Data Owner,E0099,Jane Roe,jane.roe@firm.com
-100456,L2 Operate Manager,E0015,Mike Smith,mike.smith@firm.com
-100456,Risk Manager,E0301,Sarah Brown,sarah.brown@firm.com
-100456,CTO,E0888,Alex Chen,alex.chen@firm.com
-100789,App Owner,E0501,Pat Lee,pat.lee@firm.com
-100789,Data Owner,E0502,Robin Park,robin.park@firm.com
-100789,L2 Operate Manager,E0015,Mike Smith,mike.smith@firm.com
-100789,Risk Manager,E0301,Sarah Brown,sarah.brown@firm.com
-100789,CTO,E0888,Alex Chen,alex.chen@firm.com
-200555,App Owner,E0701,Sam Khan,sam.khan@firm.com
-200555,Data Owner,E0702,Mei Wang,mei.wang@firm.com
-200555,L2 Manager,E0703,Dana Reed,dana.reed@firm.com
-200555,Risk Manager,E0704,Lou Carter,lou.carter@firm.com
-200555,CTO,E0888,Alex Chen,alex.chen@firm.com
-301002,App Owner,E0901,Casey Wu,casey.wu@firm.com
-301002,L2 Operate Manager,E0902,Erin Long,erin.long@firm.com
-301002,Risk Manager,E0903,Hank Diaz,hank.diaz@firm.com
-400777,App Owner,E1001,Quinn Tao,quinn.tao@firm.com
-400777,Data Owner,E1002,Riley Vega,riley.vega@firm.com
-400777,L2 Operate Manager,E0015,Mike Smith,mike.smith@firm.com
-400777,Risk Manager,E0301,Sarah Brown,sarah.brown@firm.com
-400777,CTO,E0888,Alex Chen,alex.chen@firm.com
+app_id,role_name,employee_sid,employee_name,employee_email
+82507,Backup Information Owner,K123456,Pat Lee,pat.lee@firm.com
+82507,Design Authority,K234567,Robin Park,robin.park@firm.com
+82507,Chief Business Technologist,K345678,Sam Khan,sam.khan@firm.com
+82507,L2 Operate Manager,K456789,Mei Wang,mei.wang@firm.com
+82507,Risk Manager,K567890,Dana Reed,dana.reed@firm.com
+111027,Backup Information Owner,L123456,Casey Wu,casey.wu@firm.com
+111027,Design Authority,L234567,Erin Long,erin.long@firm.com
+111027,Chief Business Technologist,L345678,Hank Diaz,hank.diaz@firm.com
+111027,L1 Operate Manager,L456789,Quinn Tao,quinn.tao@firm.com
+111027,L2 Operate Manager,L567890,Riley Vega,riley.vega@firm.com
+111027,Risk Manager,L678901,Tess Reyes,tess.reyes@firm.com
+110865,Backup Information Owner,M123456,Jordan Foster,jordan.foster@firm.com
+110865,Design Authority,M234567,Aiden Cross,aiden.cross@firm.com
+110865,L2 Operate Manager,M345678,Riley Vega,riley.vega@firm.com
+110865,Risk Manager,M456789,Skylar Park,skylar.park@firm.com
