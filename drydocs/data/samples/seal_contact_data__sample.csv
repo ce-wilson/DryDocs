@@ -1,0 +1,29 @@
+seal_id,role_name,employee_id,employee_name,employee_email
+100123,App Owner,E0042,John Doe,john.doe@firm.com
+100123,Data Owner,E0099,Jane Roe,jane.roe@firm.com
+100123,L2 Operate Manager,E0015,Mike Smith,mike.smith@firm.com
+100123,Risk Manager,E0301,Sarah Brown,sarah.brown@firm.com
+100123,CTO,E0888,Alex Chen,alex.chen@firm.com
+100456,App Owner,E0042,John Doe,john.doe@firm.com
+100456,Data Owner,E0099,Jane Roe,jane.roe@firm.com
+100456,L2 Operate Manager,E0015,Mike Smith,mike.smith@firm.com
+100456,Risk Manager,E0301,Sarah Brown,sarah.brown@firm.com
+100456,CTO,E0888,Alex Chen,alex.chen@firm.com
+100789,App Owner,E0501,Pat Lee,pat.lee@firm.com
+100789,Data Owner,E0502,Robin Park,robin.park@firm.com
+100789,L2 Operate Manager,E0015,Mike Smith,mike.smith@firm.com
+100789,Risk Manager,E0301,Sarah Brown,sarah.brown@firm.com
+100789,CTO,E0888,Alex Chen,alex.chen@firm.com
+200555,App Owner,E0701,Sam Khan,sam.khan@firm.com
+200555,Data Owner,E0702,Mei Wang,mei.wang@firm.com
+200555,L2 Manager,E0703,Dana Reed,dana.reed@firm.com
+200555,Risk Manager,E0704,Lou Carter,lou.carter@firm.com
+200555,CTO,E0888,Alex Chen,alex.chen@firm.com
+301002,App Owner,E0901,Casey Wu,casey.wu@firm.com
+301002,L2 Operate Manager,E0902,Erin Long,erin.long@firm.com
+301002,Risk Manager,E0903,Hank Diaz,hank.diaz@firm.com
+400777,App Owner,E1001,Quinn Tao,quinn.tao@firm.com
+400777,Data Owner,E1002,Riley Vega,riley.vega@firm.com
+400777,L2 Operate Manager,E0015,Mike Smith,mike.smith@firm.com
+400777,Risk Manager,E0301,Sarah Brown,sarah.brown@firm.com
+400777,CTO,E0888,Alex Chen,alex.chen@firm.com

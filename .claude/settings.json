@@ -5,7 +5,11 @@
       "Bash(py --version)",
       "Bash(poetry run *)",
       "Bash(poetry update *)",
-      "Bash(poetry config *)"
+      "Bash(poetry config *)",
+      "PowerShell($env:NEO4J_URI; $env:NEO4J_USER; $env:NEO4J_DATABASE)",
+      "PowerShell($env:NEO4J_URI)",
+      "PowerShell($env:NEO4J_USER)",
+      "PowerShell($env:NEO4J_DATABASE)"
     ]
   }
 }

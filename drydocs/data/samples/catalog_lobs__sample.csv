@@ -1,0 +1,6 @@
+lob_id,code,name,reconciles_to_segment,reconcile_confidence
+LOB001,CCB,Consumer & Community Banking,CCB,1.0
+LOB002,AWMCIB,Asset & Wealth Management + Commercial & Investment Bank (legacy),AWM,0.5
+LOB003,CT,Corporate Technology,Corp,1.0
+LOB004,HR,Human Resources (Other Corporate),Corp,1.0
+LOB005,ET,Enterprise Technology,Corp,1.0

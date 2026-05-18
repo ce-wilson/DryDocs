@@ -1,0 +1,11 @@
+seal_id,name,deployment_module,data_retention_days,risk_level,sox_governed,status
+100123,Trade Surveillance,api-gateway-v2,2555,HIGH,true,OPERATE
+100456,Position Reporting,batch-cluster-east,1825,CRITICAL,true,OPERATE
+100789,Auto Loan Origination,onboarding-svc,2555,MEDIUM,true,BUILD
+200555,Card Risk Engine,batch-cluster-west,2555,CRITICAL,true,OPERATE
+301002,Mortgage Servicing Hub,onprem-mortgage-1,3650,HIGH,true,OPERATE
+301003,Mortgage Servicing Reports,batch-cluster-east,3650,MEDIUM,true,OPERATE
+301004,Mortgage Servicing Tax,batch-cluster-east,3650,LOW,false,OPERATE
+301005,Mortgage Servicing Sunset,batch-cluster-east,90,LOW,false,RETIRED
+400777,Account Core Ledger,batch-cluster-east,2555,CRITICAL,true,OPERATE
+400888,Account Core Reports,api-gateway-v2,1825,MEDIUM,true,OPERATE
