@@ -38,27 +38,40 @@ class Neo4jClient:
             self._driver.close()
             self._driver = None
 
-    def run(self, cypher: str, params: dict[str, Any] | None = None) -> list[dict[str, Any]]:
-        """Run a single Cypher statement and return rows as plain dicts."""
+    def run(
+        self,
+        cypher: str,
+        params: dict[str, Any] | None = None,
+        **kwargs: Any,
+    ) -> list[dict[str, Any]]:
+        """Run a single Cypher statement and return rows as plain dicts.
+
+        Bind values may be supplied as a ``params`` dict, as keyword
+        arguments, or both; kwargs win on key collision (matches the
+        underlying driver's ``tx.run`` behavior).
+        """
         assert self._driver is not None, "Use Neo4jClient as a context manager"
+        bind = {**(params or {}), **kwargs}
         with self._driver.session(database=self._database) as session:
             return session.execute_write(
-                lambda tx: [dict(r) for r in tx.run(cypher, params or {})]
+                lambda tx: [dict(r) for r in tx.run(cypher, bind)]
             )
 
-    def run_script(self, script: str) -> None:
+    def run_script(self, script: str, params: dict[str, Any] | None = None) -> None:
         """Run a multi-statement Cypher script via ``apoc.cypher.runMany``.
 
         Each statement in *script* must be terminated by a semicolon.
         APOC runs each statement in its own transaction, so DDL (CREATE
-        CONSTRAINT) and DML (MERGE) can coexist in the same file.
+        CONSTRAINT) and DML (MERGE) can coexist in the same file. The
+        optional ``params`` dict is forwarded to every statement as the
+        binding map.
         """
         assert self._driver is not None, "Use Neo4jClient as a context manager"
         with self._driver.session(database=self._database) as session:
             session.execute_write(
                 lambda tx: tx.run(
-                    "CALL apoc.cypher.runMany($script, {}) YIELD row RETURN row",
-                    {"script": script},
+                    "CALL apoc.cypher.runMany($script, $params) YIELD row RETURN row",
+                    {"script": script, "params": params or {}},
                 ).consume()
             )
 

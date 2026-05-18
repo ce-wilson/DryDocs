@@ -1,13 +1,15 @@
-"""drydocs CLI — M0 + M1 + M3 (part 1) entry point.
+"""drydocs CLI — M0 + M1 + M3 entry point.
 
 This file SUPERSEDES the M1 cli.py.  Strict superset — every M0/M1 command
 still works; M3 commands are additive.
 
-  M3 (part 1)
-  -----------
-  drydocs ingest-controlm     load folders then jobs against samples or Oracle
+  M3 (parts 1 + 2)
+  ----------------
+  drydocs ingest-controlm     load the full Control-M chain (folders ->
+                              jobs -> conditions in/out -> derived deps);
+                              ``--skip-part2`` stops after folders + jobs
   drydocs apply-m3-supplement add Control-M local-namespace anchor terms
-  drydocs m3-verify           assert M3 (part 1) invariants
+  drydocs m3-verify           assert M3 (part 1 + part 2) invariants
 """
 from __future__ import annotations
 
@@ -22,6 +24,7 @@ from .adapters import CsvAdapter, OracleAdapter
 from .config import load_settings
 from .loaders import seal_applications as seal_apps_mod
 from .loaders import seal_contacts as seal_contacts_mod
+from .loaders.base import BaseLoader
 from .loaders.business_segments import refresh_business_segments
 from .loaders.catalog import (
     CatalogLOBsLoader,
@@ -29,6 +32,9 @@ from .loaders.catalog import (
     ProductLinesLoader,
     ProductsLoader,
 )
+from .loaders.controlm_conditions_in import ControlMConditionsInLoader
+from .loaders.controlm_conditions_out import ControlMConditionsOutLoader
+from .loaders.controlm_dependencies_derived import ControlMDependenciesDerivedLoader
 from .loaders.controlm_folders import ControlMFoldersLoader
 from .loaders.controlm_jobs import ControlMJobsLoader
 from .neo4j_client import Neo4jClient
@@ -45,6 +51,11 @@ M1_ROLE_VOCAB_UPGRADE = SCHEMA_DIR / "m1_role_vocabulary_update.cypher"
 M3_SUPPLEMENT_FILE = SCHEMA_DIR / "m3_ontology_supplement.cypher"
 M3_CONSTRAINTS_UPGRADE = SCHEMA_DIR / "m3_constraints_upgrade.cypher"
 
+# Bundled CSV samples ship inside the package so dev-mode commands work
+# from any cwd — including from an installed wheel where there is no repo
+# root. Override with --samples-dir to point at an alternate fixture set.
+DEFAULT_SAMPLES_DIR = Path(__file__).resolve().parent / "data" / "samples"
+
 LOADER_REGISTRY: dict[str, type] = {
     "seal_applications":  seal_apps_mod.SealApplicationsLoader,
     "seal_contacts":      seal_contacts_mod.SealContactsLoader,
@@ -55,7 +66,13 @@ LOADER_REGISTRY: dict[str, type] = {
     # M3 (part 1):
     "controlm_folders":   ControlMFoldersLoader,
     "controlm_jobs":      ControlMJobsLoader,
+    # M3 (part 2):
+    "controlm_conditions_in":       ControlMConditionsInLoader,
+    "controlm_conditions_out":      ControlMConditionsOutLoader,
+    "controlm_dependencies_derived": ControlMDependenciesDerivedLoader,
 }
+
+SQL_DIR = Path(__file__).resolve().parent / "loaders" / "sql"
 
 
 # --- helpers -----------------------------------------------------------------
@@ -186,7 +203,11 @@ def load(
 
 @app.command(name="refresh-reference")
 def refresh_reference(
-    samples_dir: Path = typer.Option(Path("data/samples"), "--samples-dir"),
+    samples_dir: Path = typer.Option(
+        DEFAULT_SAMPLES_DIR,
+        "--samples-dir",
+        help="Directory holding the *__sample.csv fixtures. Defaults to the bundled package samples.",
+    ),
     snapshot: bool = typer.Option(True),
 ) -> None:
     """M1 reference-refresh chain (catalog + SEAL + dev teams). Weekly cadence."""
@@ -248,64 +269,71 @@ def apply_m3_supplement() -> None:
         console.print(f"[red]Missing: {M3_SUPPLEMENT_FILE}[/]"); raise typer.Exit(1)
     with _client() as cli:
         cli.execute_file(M3_SUPPLEMENT_FILE)
-    console.print("[green]M3 ontology supplement applied.[/]")
-    if M1_ROLE_VOCAB_UPGRADE.exists():
-        cli.execute_file(M1_ROLE_VOCAB_UPGRADE)
-    console.print("[green]Role vocabulary aligned to SEAL spec.[/]")
+        console.print("[green]M3 ontology supplement applied.[/]")
+        if M1_ROLE_VOCAB_UPGRADE.exists():
+            cli.execute_file(M1_ROLE_VOCAB_UPGRADE)
+            console.print("[green]Role vocabulary aligned to SEAL spec.[/]")
 
 
 @app.command(name="ingest-controlm")
 def ingest_controlm(
     samples_dir: Path = typer.Option(
-        Path("data/samples"),
+        DEFAULT_SAMPLES_DIR,
         "--samples-dir",
-        help="Directory holding controlm_folders__sample.csv + controlm_jobs__sample.csv.",
+        help=(
+            "Directory holding the controlm_*__sample.csv files. Defaults to "
+            "the bundled package samples — works from any cwd."
+        ),
     ),
     use_oracle: bool = typer.Option(
         False,
         "--use-oracle",
-        help="Run against psgmgr.CM_DEF_VTAB + psgmgr.CM_DEF_VJOB instead of samples.",
+        help="Run against psgmgr views instead of bundled samples.",
     ),
-    folders_sql_path: Path = typer.Option(
-        Path(__file__).resolve().parent / "loaders" / "sql" / "controlm_folders.sql",
-        "--folders-sql",
-    ),
-    jobs_sql_path: Path = typer.Option(
-        Path(__file__).resolve().parent / "loaders" / "sql" / "controlm_jobs.sql",
-        "--jobs-sql",
+    skip_part2: bool = typer.Option(
+        False,
+        "--skip-part2",
+        help="Stop after folders + jobs (M3 part 1 only).",
     ),
 ) -> None:
-    """M3 part 1: load Control-M folders then jobs.
+    """M3 chain: folders -> jobs -> conditions in/out -> derived dependencies.
 
-    Order is enforced — jobs MATCH their parent folder by folder_id.
+    Order is enforced — jobs MATCH their parent folder by folder_id;
+    conditions MATCH their parent job by (folder_id, job_id); derived
+    dependencies MATCH both endpoint jobs by the same composite key.
+
     Run nightly in production; ad-hoc against samples in dev.
     """
-    with _client() as cli:
-        # Folders first.
-        if use_oracle:
-            sql = folders_sql_path.read_text(encoding="utf-8")
-            adapter = _oracle_adapter(sql)
-        else:
-            sample = samples_dir / "controlm_folders__sample.csv"
-            adapter = _csv_adapter(sample)
-        console.print("[cyan]>> controlm_folders[/]")
-        summary = ControlMFoldersLoader(cli, adapter).load()
-        console.print(
-            f"   rows={summary.rows_processed} rejected={summary.rows_rejected}"
-        )
+    stages: list[tuple[str, type[BaseLoader], str, str]] = [
+        ("controlm_folders",     ControlMFoldersLoader,
+         "controlm_folders__sample.csv",      "controlm_folders.sql"),
+        ("controlm_jobs",        ControlMJobsLoader,
+         "controlm_jobs__sample.csv",         "controlm_jobs.sql"),
+    ]
+    if not skip_part2:
+        stages.extend([
+            ("controlm_conditions_in",  ControlMConditionsInLoader,
+             "controlm_conditions_in__sample.csv",  "controlm_conditions_in.sql"),
+            ("controlm_conditions_out", ControlMConditionsOutLoader,
+             "controlm_conditions_out__sample.csv", "controlm_conditions_out.sql"),
+            ("controlm_dependencies_derived", ControlMDependenciesDerivedLoader,
+             "controlm_dependencies__sample.csv",
+             "controlm_dependencies_recursive.sql"),
+        ])
 
-        # Then jobs.
-        if use_oracle:
-            sql = jobs_sql_path.read_text(encoding="utf-8")
-            adapter = _oracle_adapter(sql)
-        else:
-            sample = samples_dir / "controlm_jobs__sample.csv"
-            adapter = _csv_adapter(sample)
-        console.print("[cyan]>> controlm_jobs[/]")
-        summary = ControlMJobsLoader(cli, adapter).load()
-        console.print(
-            f"   rows={summary.rows_processed} rejected={summary.rows_rejected}"
-        )
+    with _client() as cli:
+        for stage_name, cls, sample_csv, sql_file in stages:
+            if use_oracle:
+                sql = (SQL_DIR / sql_file).read_text(encoding="utf-8")
+                adapter = _oracle_adapter(sql)
+            else:
+                sample = samples_dir / sample_csv
+                adapter = _csv_adapter(sample)
+            console.print(f"[cyan]>> {stage_name}[/]")
+            summary = cls(cli, adapter).load()
+            console.print(
+                f"   rows={summary.rows_processed} rejected={summary.rows_rejected}"
+            )
 
 
 @app.command(name="m3-verify")
@@ -367,12 +395,14 @@ def m3_verify() -> None:
             ))
 
         # Local-namespace anchor terms present (post supplement).
+        # Parentheses around the OR group — without them, AND binds tighter
+        # and the IRI-prefix filter only constrains the JobFolder branch.
         rows = cli.run("""
             MATCH (n:OntologyTerm:LocalClass)
             WHERE n.iri STARTS WITH 'https://drydocs.local/ontology#'
-              AND n.iri ENDS WITH 'JobFolder'
-               OR n.iri ENDS WITH 'ControlMJob'
-               OR n.iri ENDS WITH 'ControlMServer'
+              AND (n.iri ENDS WITH 'JobFolder'
+                   OR n.iri ENDS WITH 'ControlMJob'
+                   OR n.iri ENDS WITH 'ControlMServer')
             RETURN count(DISTINCT n) AS n
         """)
         if rows:
@@ -398,7 +428,46 @@ def m3_verify() -> None:
                 f"empty={r['empty_folders']} total={r['total']}",
             ))
 
-    t = Table(title="M3 (part 1) invariants")
+        # Every :Condition has at least one job referencing it (IN or OUT).
+        # Orphans would mean a condition definition without a producer or
+        # consumer — meaningless and almost certainly a load bug.
+        rows = cli.run("""
+            MATCH (c:Condition)
+            OPTIONAL MATCH (c)<-[:REQUIRES_IN_CONDITION|EMITS_OUT_CONDITION]-(:ControlMJob)
+            WITH c, count(*) AS refs
+            RETURN sum(CASE WHEN refs = 0 THEN 1 ELSE 0 END) AS orphan,
+                   count(c) AS total
+        """)
+        if rows:
+            r = rows[0]
+            checks.append((
+                "no orphan conditions",
+                r["orphan"] == 0,
+                f"orphan={r['orphan']} total={r['total']}",
+            ))
+
+        # Every derived :DEPENDS_ON edge must carry recursion_level and
+        # dependency_path — those are the cycle-safety and shortest-path
+        # provenance fields written by the recursive SQL.
+        rows = cli.run("""
+            MATCH ()-[r:DEPENDS_ON]->()
+            WHERE r.derived = true
+            RETURN count(r) AS total,
+                   sum(CASE WHEN r.recursion_level IS NULL THEN 1 ELSE 0 END) AS missing_level,
+                   sum(CASE WHEN r.dependency_path IS NULL THEN 1 ELSE 0 END) AS missing_path
+        """)
+        if rows:
+            r = rows[0]
+            checks.append((
+                "DEPENDS_ON edges have recursion_level + path",
+                r["missing_level"] == 0 and r["missing_path"] == 0,
+                (
+                    f"total={r['total']} missing_level={r['missing_level']} "
+                    f"missing_path={r['missing_path']}"
+                ),
+            ))
+
+    t = Table(title="M3 (part 1 + part 2) invariants")
     t.add_column("Check"); t.add_column("OK", justify="center"); t.add_column("Detail")
     failed = 0
     for name, ok, detail in checks:

@@ -23,7 +23,7 @@ This pack layers on top of M0 + M1. CLI is a strict superset.
 - Pydantic row models in `drydocs/models/controlm.py` — five distinct models matching the five source schemas.
 - Five SQL projections in `drydocs/loaders/sql/` — one per source view, locked to real columns from the uploaded DDL.
 - Five Cypher templates in `drydocs/loaders/cypher/`.
-- Sample CSVs in `data/samples/` exercising the full chain end-to-end (8 folders, 15 jobs, 8 in-conditions, 8 out-conditions, 13 derived dependencies).
+- Sample CSVs in `drydocs/data/samples/` exercising the full chain end-to-end (8 folders, 15 jobs, 8 in-conditions, 8 out-conditions, 13 derived dependencies). The CLI's `--samples-dir` defaults to this package-bundled directory, so sample-mode commands work from any cwd.
 - Ontology supplement at `drydocs/schema/m3_ontology_supplement.cypher`.
 - Concept-mapping doc at `docs/m3_controlm_concept_mapping.md`.
 
@@ -56,12 +56,12 @@ drydocs_m3_folders_jobs/                                C:\coding\projects\DryDo
 │   ├── schema/
 │   │   └── m3_ontology_supplement.cypher               drydocs/schema/...                (new)
 │   └── cli.py                                          drydocs/cli.py                    (overwrites M1)
-├── data/samples/
-│   ├── controlm_folders__sample.csv                    data/samples/...                  (new)
-│   ├── controlm_jobs__sample.csv                       data/samples/...                  (new)
-│   ├── controlm_conditions_in__sample.csv              data/samples/...                  (new)
-│   ├── controlm_conditions_out__sample.csv             data/samples/...                  (new)
-│   └── controlm_dependencies__sample.csv               data/samples/...                  (new)
+├── drydocs/data/samples/
+│   ├── controlm_folders__sample.csv                    drydocs/data/samples/...          (new)
+│   ├── controlm_jobs__sample.csv                       drydocs/data/samples/...          (new)
+│   ├── controlm_conditions_in__sample.csv              drydocs/data/samples/...          (new)
+│   ├── controlm_conditions_out__sample.csv             drydocs/data/samples/...          (new)
+│   └── controlm_dependencies__sample.csv               drydocs/data/samples/...          (new)
 ├── tests/unit/
 │   ├── test_controlm_models.py                         tests/unit/...                    (overwrites)
 │   └── test_controlm_cypher.py                         tests/unit/...                    (overwrites)
