@@ -25,6 +25,8 @@ reliably reconcile to a SEAL appcode.** The folder-name appcode (this
 module) is the canonical mechanism for tying folders to applications,
 mediated by a small appcode-to-SEAL crosswalk that lives outside this
 module (M3 phase / M4 deliverable).
+Application codes are used for security in the production environment. The code is for naming standard at
+folder and job level.  Application Codes are 3 alphanumeric numeric characters.
 """
 from __future__ import annotations
 
@@ -38,14 +40,19 @@ ENVIRONMENT_MAP = {
 
 LOB_CODE_MAP = {
     "R": "Retail",
-    "Y": "Credit Cards"  # provisional
+    "Y": "Testing3",  # provisional placeholder
+    "K": "Testing2",  # provisional
+    "B": "Testing",  # provisional
     }
 
 FOLDER_TYPE_MAP = {
-    "G": "Smart folder",
+    "G": "Group Table/Smart folder",
     "D": "Daily",
+    "W": "Weekly",
     "M": "Monthly",
-    "R": "Ad-hoc"  # provisional
+    "Q": "Quarterly",
+    "H": "Holiday",
+    "R": "Request Job/ Ad-hoc"  # provisional
 }
 
 
