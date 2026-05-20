@@ -1,0 +1,19 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(Get-ChildItem -Recurse -Filter \"*.py\")",
+      "Bash(Select-Object -ExpandProperty FullName)",
+      "Bash(awk '{print $5, $9}')",
+      "Bash(read d *)",
+      "Bash(poetry install *)",
+      "Bash(cd /tmp)",
+      "Bash(poetry '--directory=C:\\\\coding\\\\projects\\\\DryDocs\\\\.claude\\\\worktrees\\\\gallant-tharp-f68b54' run python -c ' *)",
+      "Bash(git add *)",
+      "Bash(git commit -m ' *)",
+      "Bash(git -C 'C:\\\\coding\\\\projects\\\\DryDocs' status --short)",
+      "Bash(git -C 'C:\\\\coding\\\\projects\\\\DryDocs' log --oneline --decorate main..claude/gallant-tharp-f68b54)",
+      "Bash(git -C 'C:\\\\coding\\\\projects\\\\DryDocs' merge --ff-only claude/gallant-tharp-f68b54)",
+      "Bash(git -C 'C:\\\\coding\\\\projects\\\\DryDocs' log --oneline -3)"
+    ]
+  }
+}
