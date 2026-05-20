@@ -1,0 +1,341 @@
+# =============================================================================
+# relationship_vocabulary.yaml  —  DryDocs relationship registry
+#
+# SECTION 1 (prov_matrix): the 9-row decision table. Stable — do not edit.
+#   Pick the row whose from_type/to_type matches your node classifications.
+#   The neo4j_label in that row is what you use in Cypher, unless a more
+#   specific existing label is already established (see local_relationships).
+#
+# SECTION 2 (local_relationships): one entry per declared relationship.
+#   Add here BEFORE writing any Cypher. Status lifecycle:
+#     planned    → declared but loader not yet written
+#     active     → supplement + loader both exist
+#     deprecated → no longer loaded; data kept in graph
+#     removed    → data and code both deleted
+#
+# Fields:
+#   id            unique snake_case identifier
+#   neo4j_label   the Cypher relationship type
+#   role          edge property for disambiguation (null = label is sufficient)
+#   from_node     source node label
+#   to_node       target node label
+#   prov_maps_to  PROV-O / W3C term this maps to (null = local-only)
+#   note          plain-English description + any gotchas
+#   supplement    schema file where LocalRelationship is declared (null = base PROV-O)
+#   loader        cypher file that writes this relationship
+#   domain        controlm | seal | catalog | all
+#   status        planned | active | deprecated | removed
+# =============================================================================
+
+
+# ── SECTION 1: Decision matrix ────────────────────────────────────────────────
+# Step 1: classify your source node (Activity / Entity / Agent / Collection).
+# Step 2: classify your target node.
+# Step 3: read the neo4j_label. Add a `role` property if the same label is
+#         used in multiple contexts (e.g., USED {role: "reads_config"}).
+# ─────────────────────────────────────────────────────────────────────────────
+prov_matrix:
+
+  - from_type:   Activity
+    to_type:     Activity
+    prov_term:   "prov:wasInformedBy"
+    neo4j_label: WAS_INFORMED_BY
+    note: >
+      One activity's execution depended on outputs produced by another.
+      Examples: ControlMJob waiting on a predecessor job's OUT condition.
+
+  - from_type:   Activity
+    to_type:     Entity
+    prov_term:   "prov:used"
+    neo4j_label: USED
+    note: >
+      Activity consumed / read an entity. Use role= to distinguish multiple
+      uses on the same activity (e.g., role: reads_config vs role: reads_input).
+
+  - from_type:   Activity
+    to_type:     Entity
+    prov_term:   "prov:generated"
+    neo4j_label: GENERATED
+    note: >
+      Activity produced an entity. Inverse of wasGeneratedBy — use this form
+      when the natural edge direction is Activity→Entity (e.g., job emits
+      an OUT condition). role= distinguishes multiple output types.
+
+  - from_type:   Activity
+    to_type:     Agent
+    prov_term:   "prov:wasAssociatedWith"
+    neo4j_label: WAS_ASSOCIATED_WITH
+    note: >
+      Activity linked to an agent (person, software system, org unit).
+      role= on the edge records the agent's participation type.
+
+  - from_type:   Entity
+    to_type:     Activity
+    prov_term:   "prov:wasGeneratedBy"
+    neo4j_label: WAS_GENERATED_BY
+    note: >
+      Entity was produced by an activity. Standard provenance direction —
+      edge flows Entity→Activity. Already used by BaseLoader for all nodes.
+
+  - from_type:   Entity
+    to_type:     Entity
+    prov_term:   "prov:wasDerivedFrom"
+    neo4j_label: WAS_DERIVED_FROM
+    note: >
+      Entity was transformed or computed from another entity.
+      Examples: a derived dataset, a report generated from raw data.
+
+  - from_type:   Entity
+    to_type:     Agent
+    prov_term:   "prov:wasAttributedTo"
+    neo4j_label: WAS_ATTRIBUTED_TO
+    note: >
+      Entity ownership or authorship attributed to an agent.
+      Examples: a script owned by a team, a dataset attributed to an app.
+
+  - from_type:   Agent
+    to_type:     Agent
+    prov_term:   "prov:actedOnBehalfOf"
+    neo4j_label: ACTED_ON_BEHALF_OF
+    note: >
+      Agent delegation — one agent acting for another.
+      Examples: a service account acting on behalf of an application.
+
+  - from_type:   Collection
+    to_type:     any
+    prov_term:   "prov:hadMember"
+    neo4j_label: HAD_MEMBER
+    note: >
+      Collection contains a member entity or activity.
+      Examples: JobFolder (Collection) contains ControlMJob (Activity).
+
+
+# ── SECTION 2: Local relationships ───────────────────────────────────────────
+# Ordered by domain, then by loader execution order within each domain.
+# ─────────────────────────────────────────────────────────────────────────────
+local_relationships:
+
+  # ── M3: Control-M ────────────────────────────────────────────────────────
+
+  - id:           m3_runs_on
+    neo4j_label:  RUNS_ON
+    role:         ~
+    from_node:    JobFolder
+    to_node:      ControlMServer
+    prov_maps_to: ~
+    note: >
+      Physical hosting — folder is scheduled on a specific Control-M server
+      (DATA_CENTER value). No direct PROV-O equivalent; infrastructure
+      placement relationship. Edge carries since + last_seen_at for
+      migration auditability.
+    supplement:   m3_ontology_supplement.cypher
+    loader:       controlm_folders.cypher
+    domain:       controlm
+    status:       active
+
+  - id:           m3_contains_job
+    neo4j_label:  CONTAINS_JOB
+    role:         ~
+    from_node:    JobFolder
+    to_node:      ControlMJob
+    prov_maps_to: "prov:hadMember"
+    note: >
+      JobFolder (prov:Collection) contains ControlMJob (prov:Activity).
+      Matrix row: Collection → any = HAD_MEMBER. CONTAINS_JOB is kept as
+      the label for query clarity; semantics are hadMember.
+    supplement:   m3_ontology_supplement.cypher
+    loader:       controlm_jobs.cypher
+    domain:       controlm
+    status:       active
+
+  - id:           m3_requires_in_condition
+    neo4j_label:  REQUIRES_IN_CONDITION
+    role:         ~
+    from_node:    ControlMJob
+    to_node:      Condition
+    prov_maps_to: "prov:used"
+    note: >
+      Job requires a named IN condition to be present before execution.
+      Matrix row: Activity → Entity = USED. REQUIRES_IN_CONDITION kept for
+      domain clarity. Edge carries odate, and_or, parentheses, order_
+      for boolean-expression reconstruction.
+    supplement:   m3_ontology_supplement.cypher
+    loader:       controlm_conditions_in.cypher
+    domain:       controlm
+    status:       active
+
+  - id:           m3_emits_out_condition
+    neo4j_label:  EMITS_OUT_CONDITION
+    role:         ~
+    from_node:    ControlMJob
+    to_node:      Condition
+    prov_maps_to: "prov:generated"
+    note: >
+      Job emits a named OUT condition on completion. SIGN='+' posts the
+      condition; SIGN='-' removes it. Matrix row: Activity → Entity =
+      GENERATED. EMITS_OUT_CONDITION kept for domain clarity.
+    supplement:   m3_ontology_supplement.cypher
+    loader:       controlm_conditions_out.cypher
+    domain:       controlm
+    status:       active
+
+  - id:           m3_was_informed_by
+    neo4j_label:  WAS_INFORMED_BY
+    role:         ~
+    from_node:    ControlMJob
+    to_node:      ControlMJob
+    prov_maps_to: "prov:wasInformedBy"
+    note: >
+      Derived dependency edge. Successor job was informed by predecessor
+      via a shared OUT→IN condition pair. Direction: (successor)→(predecessor).
+      Matrix row: Activity → Activity = WAS_INFORMED_BY. Carries via_condition,
+      recursion_level, dependency_path, derived=true. Replaces DEPENDS_ON.
+    supplement:   m3_ontology_supplement.cypher
+    loader:       controlm_dependencies_derived.cypher
+    domain:       controlm
+    status:       active
+
+  # ── SEAL ─────────────────────────────────────────────────────────────────
+
+  - id:           seal_has_port
+    neo4j_label:  HAS_PORT
+    role:         ~
+    from_node:    Application
+    to_node:      Port
+    prov_maps_to: ~
+    note: >
+      Application exposes a data port (EventProcessing or BatchProcessing).
+      Maps to dprod:hasPort pattern. Port kind is stored as a node property.
+      No PROV-O equivalent; structural dprod relationship.
+    supplement:   seal_ontology_supplement.cypher
+    loader:       seal_applications.cypher
+    domain:       seal
+    status:       active
+
+  - id:           seal_has_membership
+    neo4j_label:  HAS_MEMBERSHIP
+    role:         ~
+    from_node:    Application
+    to_node:      Membership
+    prov_maps_to: ~
+    note: >
+      Application has a role-holder membership record. Maps to
+      org:hasMembership. Membership nodes carry valid_from/valid_to
+      for temporal role tracking.
+    supplement:   seal_ontology_supplement.cypher
+    loader:       seal_applications.cypher
+    domain:       seal
+    status:       active
+
+  - id:           seal_of_role
+    neo4j_label:  OF_ROLE
+    role:         ~
+    from_node:    Membership
+    to_node:      Role
+    prov_maps_to: ~
+    note: >
+      Membership is for a specific named role. Maps to org:role property
+      in the W3C ORG ontology.
+    supplement:   seal_ontology_supplement.cypher
+    loader:       seal_applications.cypher
+    domain:       seal
+    status:       active
+
+  - id:           seal_held_by
+    neo4j_label:  HELD_BY
+    role:         ~
+    from_node:    Membership
+    to_node:      Employee
+    prov_maps_to: ~
+    note: >
+      Membership is held by an employee. Inverse of org:member /
+      org:hasMember. Direction chosen so the membership record is the
+      natural starting point for role queries.
+    supplement:   seal_ontology_supplement.cypher
+    loader:       seal_applications.cypher
+    domain:       seal
+    status:       active
+
+  # ── Catalog ──────────────────────────────────────────────────────────────
+
+  - id:           catalog_reconciles_to
+    neo4j_label:  RECONCILES_TO
+    role:         ~
+    from_node:    CatalogLOB
+    to_node:      BusinessSegment
+    prov_maps_to: ~
+    note: >
+      Catalog LOB reconciled to a canonical corporate business segment.
+      Approximate mapping (skos:closeMatch semantics). Edge carries a
+      confidence property (0.0–1.0). Not always 1:1 (e.g., AWMCIB splits
+      across segments).
+    supplement:   catalog_ontology_supplement.cypher
+    loader:       catalog_lobs.cypher
+    domain:       catalog
+    status:       active
+
+  - id:           catalog_has_product_line
+    neo4j_label:  HAS_PRODUCT_LINE
+    role:         ~
+    from_node:    CatalogLOB
+    to_node:      ProductLine
+    prov_maps_to: ~
+    note:         "LOB contains product lines. Local catalog hierarchy."
+    supplement:   catalog_ontology_supplement.cypher
+    loader:       product_lines.cypher
+    domain:       catalog
+    status:       active
+
+  - id:           catalog_has_product
+    neo4j_label:  HAS_PRODUCT
+    role:         ~
+    from_node:    ProductLine
+    to_node:      Product
+    prov_maps_to: ~
+    note:         "Product line contains products. Local catalog hierarchy."
+    supplement:   catalog_ontology_supplement.cypher
+    loader:       products.cypher
+    domain:       catalog
+    status:       active
+
+  - id:           catalog_has_dev_team
+    neo4j_label:  HAS_DEV_TEAM
+    role:         ~
+    from_node:    Product
+    to_node:      DevTeam
+    prov_maps_to: ~
+    note:         "Product has an owning dev team. Local organizational linkage."
+    supplement:   catalog_ontology_supplement.cypher
+    loader:       dev_teams.cypher
+    domain:       catalog
+    status:       active
+
+  - id:           catalog_has_jira_board
+    neo4j_label:  HAS_JIRA_BOARD
+    role:         ~
+    from_node:    DevTeam
+    to_node:      JiraBoard
+    prov_maps_to: ~
+    note:         "Dev team's Jira planning board. Local tooling linkage."
+    supplement:   catalog_ontology_supplement.cypher
+    loader:       dev_teams.cypher
+    domain:       catalog
+    status:       active
+
+  # ── Cross-domain provenance ───────────────────────────────────────────────
+
+  - id:           prov_was_generated_by
+    neo4j_label:  WAS_GENERATED_BY
+    role:         ~
+    from_node:    "*"
+    to_node:      JobRun
+    prov_maps_to: "prov:wasGeneratedBy"
+    note: >
+      Standard provenance edge written by BaseLoader._flush on every loader
+      run. Source property on the edge (e.g., 'BMC', 'SEAL', 'catalog')
+      distinguishes origin. Declared in base ontology.cypher; no supplement
+      entry needed.
+    supplement:   ~
+    loader:       "*"
+    domain:       all
+    status:       active

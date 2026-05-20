@@ -48,8 +48,10 @@ SCHEMA_DIR = Path(__file__).resolve().parent / "schema"
 CONSTRAINTS_FILE = SCHEMA_DIR / "constraints.cypher"
 ONTOLOGY_FILE = SCHEMA_DIR / "ontology.cypher"
 M1_ROLE_VOCAB_UPGRADE = SCHEMA_DIR / "m1_role_vocabulary_update.cypher"
-M3_SUPPLEMENT_FILE = SCHEMA_DIR / "m3_ontology_supplement.cypher"
-M3_CONSTRAINTS_UPGRADE = SCHEMA_DIR / "m3_constraints_upgrade.cypher"
+M3_SUPPLEMENT_FILE      = SCHEMA_DIR / "m3_ontology_supplement.cypher"
+M3_CONSTRAINTS_UPGRADE  = SCHEMA_DIR / "m3_constraints_upgrade.cypher"
+SEAL_SUPPLEMENT_FILE    = SCHEMA_DIR / "seal_ontology_supplement.cypher"
+CATALOG_SUPPLEMENT_FILE = SCHEMA_DIR / "catalog_ontology_supplement.cypher"
 
 # Bundled CSV samples ship inside the package so dev-mode commands work
 # from any cwd — including from an installed wheel where there is no repo
@@ -275,6 +277,36 @@ def apply_m3_supplement() -> None:
             console.print("[green]Role vocabulary aligned to SEAL spec.[/]")
 
 
+@app.command(name="apply-seal-supplement")
+def apply_seal_supplement() -> None:
+    """Apply the SEAL ontology supplement (idempotent).
+
+    Declares :Application, :Port, :Membership, :Role, :Employee node types
+    and their LocalRelationship mappings (HAS_PORT, HAS_MEMBERSHIP, OF_ROLE,
+    HELD_BY). Safe to re-run.
+    """
+    if not SEAL_SUPPLEMENT_FILE.exists():
+        console.print(f"[red]Missing: {SEAL_SUPPLEMENT_FILE}[/]"); raise typer.Exit(1)
+    with _client() as cli:
+        cli.execute_file(SEAL_SUPPLEMENT_FILE)
+        console.print("[green]SEAL ontology supplement applied.[/]")
+
+
+@app.command(name="apply-catalog-supplement")
+def apply_catalog_supplement() -> None:
+    """Apply the Catalog ontology supplement (idempotent).
+
+    Declares :CatalogLOB, :BusinessSegment, :ProductLine, :Product,
+    :DevTeam, :JiraBoard node types and their LocalRelationship mappings.
+    Safe to re-run.
+    """
+    if not CATALOG_SUPPLEMENT_FILE.exists():
+        console.print(f"[red]Missing: {CATALOG_SUPPLEMENT_FILE}[/]"); raise typer.Exit(1)
+    with _client() as cli:
+        cli.execute_file(CATALOG_SUPPLEMENT_FILE)
+        console.print("[green]Catalog ontology supplement applied.[/]")
+
+
 @app.command(name="ingest-controlm")
 def ingest_controlm(
     samples_dir: Path = typer.Option(
@@ -446,11 +478,11 @@ def m3_verify() -> None:
                 f"orphan={r['orphan']} total={r['total']}",
             ))
 
-        # Every derived :DEPENDS_ON edge must carry recursion_level and
+        # Every derived :WAS_INFORMED_BY edge must carry recursion_level and
         # dependency_path — those are the cycle-safety and shortest-path
         # provenance fields written by the recursive SQL.
         rows = cli.run("""
-            MATCH ()-[r:DEPENDS_ON]->()
+            MATCH ()-[r:WAS_INFORMED_BY]->()
             WHERE r.derived = true
             RETURN count(r) AS total,
                    sum(CASE WHEN r.recursion_level IS NULL THEN 1 ELSE 0 END) AS missing_level,
@@ -459,7 +491,7 @@ def m3_verify() -> None:
         if rows:
             r = rows[0]
             checks.append((
-                "DEPENDS_ON edges have recursion_level + path",
+                "WAS_INFORMED_BY edges have recursion_level + path",
                 r["missing_level"] == 0 and r["missing_path"] == 0,
                 (
                     f"total={r['total']} missing_level={r['missing_level']} "

@@ -1,15 +1,18 @@
 // =============================================================================
-// controlm_dependencies_derived.cypher  —  materialize :DEPENDS_ON edges
+// controlm_dependencies_derived.cypher  —  materialize :WAS_INFORMED_BY edges
 //
 // Consumes the output rows of controlm_dependencies_recursive.sql. Each
 // input row is (successor job, matching condition, predecessor job) plus
 // recursion_level and dependency_path.
 //
 // Materializes:
-//   (:ControlMJob {successor}) -[:DEPENDS_ON {derived:true,
-//                                              via_condition,
-//                                              recursion_level,
-//                                              dependency_path}]-> (:ControlMJob {predecessor})
+//   (:ControlMJob {successor}) -[:WAS_INFORMED_BY {derived:true,
+//                                                   via_condition,
+//                                                   recursion_level,
+//                                                   dependency_path}]-> (:ControlMJob {predecessor})
+//
+// Relationship maps to prov:wasInformedBy — both endpoints are prov:Activity
+// subclasses. Direction: (successor)→(predecessor).
 //
 // Match strategy:
 //   * JOB_ID is folder-scoped in BMC — same JOB_ID appears across
@@ -41,7 +44,7 @@ MATCH (p:ControlMJob {
     job_id:    row.dependent_job_id
 })
 
-MERGE (j)-[r:DEPENDS_ON {via_condition: row.out_condition}]->(p)
+MERGE (j)-[r:WAS_INFORMED_BY {via_condition: row.out_condition}]->(p)
   ON CREATE SET r.derived         = true,
                 r.recursion_level = row.recursion_level,
                 r.dependency_path = row.dependency_path,

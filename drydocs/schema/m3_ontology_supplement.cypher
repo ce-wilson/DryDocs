@@ -47,3 +47,67 @@ MERGE (lc)-[r:SUBCLASS_OF]->(pc)
 MERGE (k:SchedulerKind {name: "ControlM"})
   ON CREATE SET k.kind_label      = "BMC Control-M",
                 k.phase_supported = 1;
+
+
+// =============================================================================
+// :LocalRelationship declarations  —  M3 relationship → PROV-O mapping
+//
+// Each block declares one relationship type used by M3 loaders and wires it
+// to the PROV-O anchor seeded by ontology.cypher via :MAPS_TO.
+// Relationship types without a PROV-O equivalent carry no :MAPS_TO edge.
+// =============================================================================
+
+// RUNS_ON  —  JobFolder → ControlMServer
+// Infrastructure placement; no PROV-O equivalent.
+MERGE (n:OntologyTerm:LocalRelationship {iri: "https://drydocs.local/ontology#runsOn"})
+  SET n.label  = "RUNS_ON",
+      n.domain = "JobFolder",
+      n.range  = "ControlMServer",
+      n.notes  = "Folder is scheduled on a Control-M server (DATA_CENTER). "
+               + "Edge carries since + last_seen_at for migration audit.";
+
+// CONTAINS_JOB  —  JobFolder → ControlMJob  (prov:hadMember)
+MERGE (n:OntologyTerm:LocalRelationship {iri: "https://drydocs.local/ontology#containsJob"})
+  SET n.label  = "CONTAINS_JOB",
+      n.domain = "JobFolder",
+      n.range  = "ControlMJob",
+      n.notes  = "JobFolder (prov:Collection) contains ControlMJob (prov:Activity). "
+               + "Semantics: prov:hadMember.";
+MATCH (local:OntologyTerm:LocalRelationship {iri: "https://drydocs.local/ontology#containsJob"})
+MATCH (prov:OntologyTerm:ProvProperty       {iri: "http://www.w3.org/ns/prov#hadMember"})
+MERGE (local)-[:MAPS_TO]->(prov);
+
+// REQUIRES_IN_CONDITION  —  ControlMJob → Condition  (prov:used)
+MERGE (n:OntologyTerm:LocalRelationship {iri: "https://drydocs.local/ontology#requiresInCondition"})
+  SET n.label  = "REQUIRES_IN_CONDITION",
+      n.domain = "ControlMJob",
+      n.range  = "Condition",
+      n.notes  = "Job requires a named IN condition before execution. "
+               + "Semantics: prov:used. Edge carries odate, and_or, parentheses, order_.";
+MATCH (local:OntologyTerm:LocalRelationship {iri: "https://drydocs.local/ontology#requiresInCondition"})
+MATCH (prov:OntologyTerm:ProvProperty       {iri: "http://www.w3.org/ns/prov#used"})
+MERGE (local)-[:MAPS_TO]->(prov);
+
+// EMITS_OUT_CONDITION  —  ControlMJob → Condition  (prov:generated)
+MERGE (n:OntologyTerm:LocalRelationship {iri: "https://drydocs.local/ontology#emitsOutCondition"})
+  SET n.label  = "EMITS_OUT_CONDITION",
+      n.domain = "ControlMJob",
+      n.range  = "Condition",
+      n.notes  = "Job emits a named OUT condition on completion. "
+               + "SIGN='+' posts; SIGN='-' removes. Semantics: prov:generated.";
+MATCH (local:OntologyTerm:LocalRelationship {iri: "https://drydocs.local/ontology#emitsOutCondition"})
+MATCH (prov:OntologyTerm:ProvProperty       {iri: "http://www.w3.org/ns/prov#generated"})
+MERGE (local)-[:MAPS_TO]->(prov);
+
+// WAS_INFORMED_BY  —  ControlMJob → ControlMJob  (prov:wasInformedBy)
+// Replaces the local DEPENDS_ON label used in earlier drafts.
+MERGE (n:OntologyTerm:LocalRelationship {iri: "https://drydocs.local/ontology#wasInformedBy"})
+  SET n.label  = "WAS_INFORMED_BY",
+      n.domain = "ControlMJob",
+      n.range  = "ControlMJob",
+      n.notes  = "Derived dependency. Successor job was informed by predecessor via "
+               + "shared OUT→IN condition. Direction: (successor)→(predecessor). "
+               + "Carries via_condition, recursion_level, dependency_path, derived=true.";
+MATCH (local:OntologyTerm:LocalRelationship {iri: "https://drydocs.local/ontology#wasInformedBy"})
+MATCH (prov:OntologyTerm:ProvProperty       {iri: "http://www.w3.org/ns/prov#wasInformedBy"})
+MERGE (local)-[:MAPS_TO]->(prov);
