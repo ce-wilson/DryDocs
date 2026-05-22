@@ -13,7 +13,13 @@
       "Bash(git -C 'C:\\\\coding\\\\projects\\\\DryDocs' status --short)",
       "Bash(git -C 'C:\\\\coding\\\\projects\\\\DryDocs' log --oneline --decorate main..claude/gallant-tharp-f68b54)",
       "Bash(git -C 'C:\\\\coding\\\\projects\\\\DryDocs' merge --ff-only claude/gallant-tharp-f68b54)",
-      "Bash(git -C 'C:\\\\coding\\\\projects\\\\DryDocs' log --oneline -3)"
+      "Bash(git -C 'C:\\\\coding\\\\projects\\\\DryDocs' log --oneline -3)",
+      "mcp__Claude_in_Chrome__list_connected_browsers",
+      "mcp__Claude_in_Chrome__tabs_context_mcp",
+      "mcp__Claude_in_Chrome__navigate",
+      "Bash(python -m http.server 8765 --bind 127.0.0.1)",
+      "mcp__Claude_in_Chrome__browser_batch",
+      "Bash(kill %1)"
     ]
   }
 }
