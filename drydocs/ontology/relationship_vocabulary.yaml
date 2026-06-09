@@ -38,12 +38,8 @@
 #     says org:Organization. Both are valid ORG classes; org:FormalOrganization
 #     is the more precise term and is adopted here. Update the supplement
 #     comment when convenient.
-#   * RUNS_ON (ControlMFolder→ControlMServer) renamed SCHEDULED_ON; the RUNS_ON
+#   * RUNS_ON (JobFolder→ControlMServer) renamed SCHEDULED_ON; the RUNS_ON
 #     label is reassigned to execution-host placement (see m3_runs_on_* below).
-#   * 2026-06-09: node label JobFolder RENAMED to ControlMFolder (dd:ControlMFolder).
-#     Supplements and loaders still write :JobFolder — update
-#     m3_ontology_supplement.cypher + controlm_*.cypher and migrate graph data
-#     (MATCH (n:JobFolder) SET n:ControlMFolder REMOVE n:JobFolder).
 #   * Section 4 mermaid edges (develops / owns / stored_in / contains /
 #     DEPENDS_ON) pre-date the ontology and are normalized to
 #     SCREAMING_SNAKE labels with PROV-O mappings where the matrix allows.
@@ -316,7 +312,7 @@ prov_matrix:
     neo4j_label: HAD_MEMBER
     note: >
       Collection contains a member entity or activity.
-      Examples: ControlMFolder (Collection) contains ControlMJob (Activity).
+      Examples: JobFolder (Collection) contains ControlMJob (Activity).
 
 
 # ── SECTION 2: Local relationships ───────────────────────────────────────────
@@ -329,7 +325,7 @@ local_relationships:
   - id:           m3_scheduled_on
     neo4j_label:  SCHEDULED_ON
     role:         ~
-    from_node:    ControlMFolder
+    from_node:    JobFolder
     to_node:      ControlMServer
     prov_maps_to: ~
     note: >
@@ -347,7 +343,7 @@ local_relationships:
   - id:           m3_runs_on
     neo4j_label:  RUNS_ON
     role:         ~
-    from_node:    ControlMFolder
+    from_node:    JobFolder
     to_node:      ControlMServer
     prov_maps_to: ~
     note: >
@@ -355,7 +351,7 @@ local_relationships:
       consolidated documentation. RUNS_ON is reassigned to ControlMJob/
       ETLProcess → ExecutionHost (m3_runs_on_agent_host / m3_runs_on_etl_host).
       Migrate existing edges with:
-      MATCH (f:JobFolder)-[r:RUNS_ON]->(s:ControlMServer)   // legacy label
+      MATCH (f:JobFolder)-[r:RUNS_ON]->(s:ControlMServer)
       then re-create as SCHEDULED_ON and delete r.
     supplement:   m3_ontology_supplement.cypher
     loader:       controlm_folders.cypher
@@ -365,11 +361,11 @@ local_relationships:
   - id:           m3_contains_job
     neo4j_label:  CONTAINS_JOB
     role:         ~
-    from_node:    ControlMFolder
+    from_node:    JobFolder
     to_node:      ControlMJob
     prov_maps_to: "prov:hadMember"
     note: >
-      ControlMFolder (prov:Collection) contains ControlMJob (prov:Activity).
+      JobFolder (prov:Collection) contains ControlMJob (prov:Activity).
       Matrix row: Collection → any = HAD_MEMBER. CONTAINS_JOB is kept as
       the label for query clarity; semantics are hadMember.
     supplement:   m3_ontology_supplement.cypher
@@ -477,7 +473,7 @@ local_relationships:
     neo4j_label:  DEPLOYS_FOLDER
     role:         ~
     from_node:    Deployment
-    to_node:      ControlMFolder
+    to_node:      JobFolder
     prov_maps_to: "prov:used"
     note: >
       Deployment ships a folder definition. Matrix row: Activity → Entity
@@ -490,7 +486,7 @@ local_relationships:
   - id:           p2_authored_by
     neo4j_label:  AUTHORED_BY
     role:         ~
-    from_node:    ControlMFolder
+    from_node:    JobFolder
     to_node:      Developer
     prov_maps_to: "prov:wasAttributedTo"
     note: >
@@ -853,10 +849,10 @@ local_relationships:
     neo4j_label:  CONTAINS_FOLDER
     role:         ~
     from_node:    Batch
-    to_node:      ControlMFolder
+    to_node:      JobFolder
     prov_maps_to: "prov:hadMember"
     note: >
-      Was mermaid "CONTAINS". Batch (prov:Collection) → ControlMFolder.
+      Was mermaid "CONTAINS". Batch (prov:Collection) → JobFolder.
       Matrix row: Collection → any = HAD_MEMBER; domain label kept.
     supplement:   catalog_ontology_supplement.cypher
     loader:       ~
