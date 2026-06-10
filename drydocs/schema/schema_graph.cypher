@@ -80,6 +80,8 @@ MERGE (n:SchemaMeta:Product {name: 'Product'})
   SET n.class = 'dd:Product', n.prov_type = 'Entity';
 MERGE (n:SchemaMeta:JiraBoard {name: 'JiraBoard'})
   SET n.class = 'dd:JiraBoard', n.prov_type = 'Entity';
+MERGE (n:SchemaMeta:AreaProduct {name: 'AreaProduct'})
+  SET n.class = 'dd:AreaProduct', n.prov_type = 'Entity';
 
 // — Architecture flow (planned) —
 MERGE (n:SchemaMeta:Code {name: 'Code'})
@@ -211,6 +213,30 @@ MERGE (a)-[r:HAS_DEV_TEAM]->(b)
 MATCH (a:SchemaMeta {name: 'DevTeam'}), (b:SchemaMeta {name: 'JiraBoard'})
 MERGE (a)-[r:HAS_JIRA_BOARD]->(b)
   SET r.vocab_id = 'catalog_has_jira_board', r.prov_maps_to = null, r.domain = 'catalog', r.status = 'active';
+
+MATCH (a:SchemaMeta {name: 'Product'}), (b:SchemaMeta {name: 'Application'})
+MERGE (a)-[r:HAS_APPLICATION]->(b)
+  SET r.vocab_id = 'catalog_has_application', r.prov_maps_to = null, r.domain = 'catalog', r.status = 'planned';
+
+MATCH (a:SchemaMeta {name: 'Product'}), (b:SchemaMeta {name: 'AreaProduct'})
+MERGE (a)-[r:HAS_AREA_PRODUCT]->(b)
+  SET r.vocab_id = 'catalog_has_area_product', r.prov_maps_to = null, r.domain = 'catalog', r.status = 'planned';
+
+MATCH (a:SchemaMeta {name: 'AreaProduct'}), (b:SchemaMeta {name: 'DevTeam'})
+MERGE (a)-[r:HAS_DEV_TEAM]->(b)
+  SET r.vocab_id = 'catalog_area_product_has_dev_team', r.prov_maps_to = null, r.domain = 'catalog', r.status = 'planned';
+
+MATCH (a:SchemaMeta {name: 'DevTeam'}), (b:SchemaMeta {name: 'Product'})
+MERGE (a)-[r:SUPPORTS]->(b)
+  SET r.vocab_id = 'catalog_supports', r.prov_maps_to = null, r.domain = 'catalog', r.status = 'planned';
+
+MATCH (a:SchemaMeta {name: 'DevTeam'}), (b:SchemaMeta {name: 'AreaProduct'})
+MERGE (a)-[r:SUPPORTS]->(b)
+  SET r.vocab_id = 'catalog_supports_area_product', r.prov_maps_to = null, r.domain = 'catalog', r.status = 'planned';
+
+MATCH (a:SchemaMeta {name: 'DevTeam'}), (b:SchemaMeta {name: 'Membership'})
+MERGE (a)-[r:HAS_MEMBERSHIP]->(b)
+  SET r.vocab_id = 'catalog_dev_team_has_membership', r.prov_maps_to = null, r.domain = 'catalog', r.status = 'planned';
 
 // — Architecture flow —
 MATCH (a:SchemaMeta {name: 'DevTeam'}), (b:SchemaMeta {name: 'Application'})

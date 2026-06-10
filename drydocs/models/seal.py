@@ -123,10 +123,11 @@ _ROLE_CANONICAL: dict[str, str] = {
     # Backup Information Owner
     "backup information owner": "Backup Information Owner",
     "bio": "Backup Information Owner",
-    # CTO
+    # CTO / Tech Partner (PAT name for the same application-level tech lead role)
     "cto": "CTO",
     "chief technology officer": "CTO",
     "chief tech officer": "CTO",
+    "tech partner": "CTO",
     # Design Authority
     "design authority": "Design Authority",
     "da": "Design Authority",

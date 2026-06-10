@@ -52,6 +52,7 @@ How to use: when writing a new relationship, find your **source node's Source ty
 | DevTeam | Agent | Agent | org:OrganizationalUnit |
 | ProductLine | Entity | Entity | dd:ProductLine (local) |
 | Product | Entity | Entity | dd:Product (local) |
+| AreaProduct | Entity | Entity | dd:AreaProduct (local)⁸ |
 | JiraBoard | Entity | Entity | dd:JiraBoard (local) |
 
 ## Architecture flow (planned, normalized from pre-ontology diagram)
@@ -79,3 +80,5 @@ How to use: when writing a new relationship, find your **source node's Source ty
 ⁶ Candidate `prov:Location` if STORED_IN is ever mapped to `prov:atLocation`.
 
 ⁷ Renamed from JobFolder (2026-06-09). Supplements and loaders still write `:JobFolder` until migrated: `MATCH (n:JobFolder) SET n:ControlMFolder REMOVE n:JobFolder`.
+
+⁸ Area Product Group / Team of Teams (Align/PAT terminology). Sits between Product and DevTeam in the hierarchy: `Product -[:HAS_AREA_PRODUCT]-> AreaProduct -[:HAS_DEV_TEAM]-> DevTeam`. DevTeams also carry `SUPPORTS {team_type, sponsored}` edges to both Product and AreaProduct — `team_type` (aligned|flex|dedicated) is an edge property, not a fixed node attribute.

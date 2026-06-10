@@ -44,6 +44,7 @@ CREATE INDEX      application_name    IF NOT EXISTS FOR (a:Application)         
 CREATE CONSTRAINT port_unique         IF NOT EXISTS FOR (p:Port)                REQUIRE (p.parent_seal_id, p.kind) IS NODE KEY;
 
 // --- People / org chart ------------------------------------------------------
+CREATE CONSTRAINT area_product_id     IF NOT EXISTS FOR (ap:AreaProduct)        REQUIRE ap.area_product_id IS UNIQUE;
 CREATE CONSTRAINT devteam_id          IF NOT EXISTS FOR (d:DevTeam)             REQUIRE d.team_id IS UNIQUE;
 CREATE CONSTRAINT employee_id         IF NOT EXISTS FOR (e:Employee)            REQUIRE e.employee_id IS UNIQUE;
 CREATE CONSTRAINT sn_group_id         IF NOT EXISTS FOR (g:ServiceNowGroup)     REQUIRE g.group_id IS UNIQUE;
@@ -51,6 +52,7 @@ CREATE CONSTRAINT jira_board_id       IF NOT EXISTS FOR (b:JiraBoard)           
 
 // Reified Membership pattern (W3C ORG)
 CREATE CONSTRAINT role_name           IF NOT EXISTS FOR (r:Role)                REQUIRE r.name IS UNIQUE;
+CREATE CONSTRAINT role_id             IF NOT EXISTS FOR (r:Role)                REQUIRE r.role_id IS UNIQUE;
 CREATE CONSTRAINT membership_id       IF NOT EXISTS FOR (m:Membership)          REQUIRE m.membership_id IS UNIQUE;
 
 // --- Schedulers --------------------------------------------------------------

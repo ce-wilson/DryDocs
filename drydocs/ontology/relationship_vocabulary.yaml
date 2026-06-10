@@ -204,6 +204,11 @@ node_classifications:
     prov_type:  Entity
     note:       "Planning tool artifact; local."
 
+  - label:      AreaProduct
+    class:      "dd:AreaProduct"
+    prov_type:  Entity
+    note:       "Area Product Group / Team of Teams. Intermediate between Product and DevTeam in the PAT hierarchy. catalog_ontology_supplement.cypher."
+
   # — Architecture flow (Section 4, normalized from pre-ontology diagram) —
   - label:      Code
     class:      "dd:Code"
@@ -762,6 +767,90 @@ local_relationships:
     loader:       dev_teams.cypher
     domain:       catalog
     status:       active
+
+  - id:           catalog_has_application
+    neo4j_label:  HAS_APPLICATION
+    role:         ~
+    from_node:    Product
+    to_node:      Application
+    prov_maps_to: ~
+    note: >
+      Product owns a set of SEAL-registered applications. Kept as local label
+      for query clarity; matrix would say WAS_ATTRIBUTED_TO (Entity→Agent).
+      Written by pat_product_mapping loader; resolves the SnapshotWriter
+      references at writer.py:45,67.
+    supplement:   catalog_ontology_supplement.cypher
+    loader:       pat_product_mapping.cypher
+    domain:       catalog
+    status:       planned
+
+  - id:           catalog_has_area_product
+    neo4j_label:  HAS_AREA_PRODUCT
+    role:         ~
+    from_node:    Product
+    to_node:      AreaProduct
+    prov_maps_to: ~
+    note:         "Product contains Area Product Groups (Team of Teams). Local catalog hierarchy."
+    supplement:   catalog_ontology_supplement.cypher
+    loader:       area_products.cypher
+    domain:       catalog
+    status:       planned
+
+  - id:           catalog_area_product_has_dev_team
+    neo4j_label:  HAS_DEV_TEAM
+    role:         ~
+    from_node:    AreaProduct
+    to_node:      DevTeam
+    prov_maps_to: ~
+    note:         "Area Product Group contains DevTeams. Same label as Product→DevTeam; from_node type distinguishes context in queries."
+    supplement:   catalog_ontology_supplement.cypher
+    loader:       area_products.cypher
+    domain:       catalog
+    status:       planned
+
+  - id:           catalog_supports
+    neo4j_label:  SUPPORTS
+    role:         ~
+    from_node:    DevTeam
+    to_node:      Product
+    prov_maps_to: ~
+    note: >
+      DevTeam supports a Product. Edge properties: team_type (aligned|flex|dedicated),
+      sponsored (bool). Agent→Entity has no PROV-O matrix row; local-only.
+      team_type is on the edge, not the node — a team can be Aligned to its
+      Home Product and Dedicated to a Sponsoring Product simultaneously.
+    supplement:   catalog_ontology_supplement.cypher
+    loader:       pat_product_mapping.cypher
+    domain:       catalog
+    status:       planned
+
+  - id:           catalog_supports_area_product
+    neo4j_label:  SUPPORTS
+    role:         ~
+    from_node:    DevTeam
+    to_node:      AreaProduct
+    prov_maps_to: ~
+    note:         "DevTeam supports an AreaProduct. Same label as catalog_supports; target node type distinguishes."
+    supplement:   catalog_ontology_supplement.cypher
+    loader:       pat_product_mapping.cypher
+    domain:       catalog
+    status:       planned
+
+  - id:           catalog_dev_team_has_membership
+    neo4j_label:  HAS_MEMBERSHIP
+    role:         ~
+    from_node:    DevTeam
+    to_node:      Membership
+    prov_maps_to: ~
+    note: >
+      DevTeam has a timed role-holder membership. Reuses the org:Membership
+      n-ary pattern from SEAL (Application→Membership). PAT-side human roles:
+      Tech Partner, Area Tech Partner, Software Engineering Manager,
+      Software Engineer, SRE Director, etc.
+    supplement:   catalog_ontology_supplement.cypher
+    loader:       pat_team_roles.cypher
+    domain:       catalog
+    status:       planned
 
   # ── Architecture flow (Section 4, converted from pre-ontology diagram) ───
   # Original mermaid labels (develops, owns, stored_in, contains, CONTAINS,

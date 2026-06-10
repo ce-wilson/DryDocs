@@ -1,20 +1,20 @@
-"""Oracle catalog row models — restored from the M1 pack.
+"""Catalog loaders — product hierarchy, PAT team mapping, and area products.
 
-These models target the canonical product catalog hierarchy:
+Target hierarchy:
 
     BusinessSegment -> CatalogLOB -> ProductLine -> Product -> Application
-                                                              -> DevTeam
+                                                            -> AreaProduct -> DevTeam
+                                                            -> DevTeam (home team)
 
-Each loader runs an Oracle SQL query that projects to the columns named
-below. When the team confirms exact catalog table names + column names
-in their psgmgr (or other) schema, only the SQL SELECT in each loader
+Row models are defined here alongside their loaders. When the team confirms
+exact catalog table names + column names, only the SQL SELECT in each loader
 needs to change — the model field names stay constant.
 """
 from __future__ import annotations
 
 from datetime import date
 from pathlib import Path
-from typing import Any, ClassVar
+from typing import Any, ClassVar, Optional
 
 from pydantic import BaseModel, ConfigDict, Field, field_validator
 
@@ -104,6 +104,56 @@ class DevTeamRow(BaseModel):
     )
 
 
+class AreaProductRow(BaseModel):
+    """Area Product Group (Team of Teams) — intermediate between Product and
+    DevTeam in the PAT/Align hierarchy."""
+
+    model_config = ConfigDict(populate_by_name=True, str_strip_whitespace=True, extra="ignore")
+
+    area_product_id: str = Field(..., min_length=1)
+    name: str = Field(..., min_length=1)
+    parent_product_id: str = Field(..., min_length=1)
+
+
+_VALID_TEAM_TYPES = {"aligned", "flex", "dedicated"}
+
+
+class PatProductMappingRow(BaseModel):
+    """PAT product mapping — links DevTeam to home Product, optional AreaProduct,
+    and SEAL applications. Records team type and sponsored status."""
+
+    model_config = ConfigDict(populate_by_name=True, str_strip_whitespace=True, extra="ignore")
+
+    team_id: str = Field(..., min_length=1)
+    product_id: str = Field(..., min_length=1)
+    area_product_id: Optional[str] = None
+    seal_ids: Optional[str] = Field(None, description="Comma-separated SEAL app IDs.")
+    team_type: str = Field(..., description="aligned | flex | dedicated")
+    sponsored: bool = False
+    sponsored_product_id: Optional[str] = None
+
+    @field_validator("team_type", mode="before")
+    @classmethod
+    def _check_team_type(cls, v: Any) -> str:
+        v = str(v).strip().lower()
+        if v not in _VALID_TEAM_TYPES:
+            raise ValueError(f"team_type must be one of {_VALID_TEAM_TYPES}; got {v!r}")
+        return v
+
+
+class PatTeamRoleRow(BaseModel):
+    """PAT team role assignment — links Employee to DevTeam via a named Role.
+    Follows the org:Membership n-ary pattern used by SEAL application roles."""
+
+    model_config = ConfigDict(populate_by_name=True, str_strip_whitespace=True, extra="ignore")
+
+    team_id: str = Field(..., min_length=1)
+    employee_sid: str = Field(..., min_length=1)
+    role_id: str = Field(..., min_length=1)
+    valid_from: Optional[str] = None
+    valid_to: Optional[str] = None
+
+
 class CatalogLOBsLoader(BaseLoader):
     name: ClassVar[str] = "catalog_lobs.v1"
     cypher_path: ClassVar[Path | None] = _CYPHER / "catalog_lobs.cypher"
@@ -130,3 +180,24 @@ class DevTeamsLoader(BaseLoader):
     cypher_path: ClassVar[Path | None] = _CYPHER / "dev_teams.cypher"
     row_model: ClassVar[type] = DevTeamRow
     source_label: ClassVar[str] = "oracle"
+
+
+class AreaProductsLoader(BaseLoader):
+    name: ClassVar[str] = "area_products.v1"
+    cypher_path: ClassVar[Path | None] = _CYPHER / "area_products.cypher"
+    row_model: ClassVar[type] = AreaProductRow
+    source_label: ClassVar[str] = "pat"
+
+
+class PatProductMappingLoader(BaseLoader):
+    name: ClassVar[str] = "pat_product_mapping.v1"
+    cypher_path: ClassVar[Path | None] = _CYPHER / "pat_product_mapping.cypher"
+    row_model: ClassVar[type] = PatProductMappingRow
+    source_label: ClassVar[str] = "pat"
+
+
+class PatTeamRolesLoader(BaseLoader):
+    name: ClassVar[str] = "pat_team_roles.v1"
+    cypher_path: ClassVar[Path | None] = _CYPHER / "pat_team_roles.cypher"
+    row_model: ClassVar[type] = PatTeamRoleRow
+    source_label: ClassVar[str] = "pat"

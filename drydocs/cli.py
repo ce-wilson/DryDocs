@@ -27,8 +27,11 @@ from .loaders import seal_contacts as seal_contacts_mod
 from .loaders.base import BaseLoader
 from .loaders.business_segments import refresh_business_segments
 from .loaders.catalog import (
+    AreaProductsLoader,
     CatalogLOBsLoader,
     DevTeamsLoader,
+    PatProductMappingLoader,
+    PatTeamRolesLoader,
     ProductLinesLoader,
     ProductsLoader,
 )
@@ -65,6 +68,10 @@ LOADER_REGISTRY: dict[str, type] = {
     "product_lines":      ProductLinesLoader,
     "products":           ProductsLoader,
     "dev_teams":          DevTeamsLoader,
+    # PAT (catalog expansion):
+    "area_products":          AreaProductsLoader,
+    "pat_product_mapping":    PatProductMappingLoader,
+    "pat_team_roles":         PatTeamRolesLoader,
     # M3 (part 1):
     "controlm_folders":   ControlMFoldersLoader,
     "controlm_jobs":      ControlMJobsLoader,
@@ -297,8 +304,9 @@ def apply_catalog_supplement() -> None:
     """Apply the Catalog ontology supplement (idempotent).
 
     Declares :CatalogLOB, :BusinessSegment, :ProductLine, :Product,
-    :DevTeam, :JiraBoard node types and their LocalRelationship mappings.
-    Safe to re-run.
+    :DevTeam, :JiraBoard, :AreaProduct node types, PAT relationship
+    mappings (HAS_APPLICATION, HAS_AREA_PRODUCT, SUPPORTS), and seeds all
+    19 canonical Role nodes (PAT + SEAL).  Safe to re-run.
     """
     if not CATALOG_SUPPLEMENT_FILE.exists():
         console.print(f"[red]Missing: {CATALOG_SUPPLEMENT_FILE}[/]"); raise typer.Exit(1)
