@@ -1,9 +1,13 @@
 // =============================================================================
-// ontology.cypher  —  M0 ontology backbone seed
+// ontology.cypher  —  ontology backbone seed
 //
-// Seeds anchor terms (`:OntologyTerm + :<Source>Class | :<Source>Property`),
-// the F.3 Role vocabulary, SchedulerKind nodes, effective-dated BusinessSegments
-// under :Company JPMC, and a baseline DQ catalog (5 dimensions x 2 metrics).
+// Seeds W3C anchor terms (:OntologyTerm + :<Source>Class | :<Source>Property),
+// SchedulerKind nodes, effective-dated BusinessSegments under :Company JPMC,
+// and a baseline DQV catalog (5 dimensions × 10 metrics).
+//
+// Role seeds have been removed from this file. The full role vocabulary
+// (SEAL + PAT + D&A + CCB Operations) is owned exclusively by
+// catalog_ontology_supplement.cypher, which must be applied after bootstrap.
 //
 // Idempotent. Safe to re-run.
 //
@@ -117,19 +121,6 @@ MERGE (n:OntologyTerm:SwoProperty {iri:"http://www.ebi.ac.uk/swo/SWO_0000150"}) 
 MERGE (n:OntologyTerm:OlClass {iri:"https://openlineage.io/spec/Run"})     SET n.label = "OL Run";
 MERGE (n:OntologyTerm:OlClass {iri:"https://openlineage.io/spec/Job"})     SET n.label = "OL Job";
 MERGE (n:OntologyTerm:OlClass {iri:"https://openlineage.io/spec/Dataset"}) SET n.label = "OL Dataset";
-
-
-// ----- Roles (F.3) ----------------------------------------------------------
-//   Eight roles. SEAL contributes the operate-side five; PAT contributes the
-//   dev-side three. Same Employee can hold multiple Memberships across both.
-MERGE (r:Role {name:"App Owner"})          SET r.source = "SEAL", r.description = "Application owner of record (SEAL).";
-MERGE (r:Role {name:"Data Owner"})         SET r.source = "SEAL", r.description = "Data owner accountable for the application's data (SEAL).";
-MERGE (r:Role {name:"L2 Operate Manager"}) SET r.source = "SEAL", r.description = "Tier-2 operate manager. Drives support-team derivation (F.4).";
-MERGE (r:Role {name:"Risk Manager"})       SET r.source = "SEAL", r.description = "Risk owner (SEAL).";
-MERGE (r:Role {name:"CTO"})                SET r.source = "SEAL", r.description = "Chief technology officer for the application (SEAL).";
-MERGE (r:Role {name:"Agility Lead"})       SET r.source = "PAT",  r.description = "Agile delivery lead for the application (PAT).";
-MERGE (r:Role {name:"Software Engineer"})  SET r.source = "PAT",  r.description = "Engineer on the application's dev team (PAT, multi-valued).";
-MERGE (r:Role {name:"Product Contact"})    SET r.source = "PAT",  r.description = "Product-level contact (PAT). Often overlaps CTO.";
 
 
 // ----- SchedulerKind --------------------------------------------------------

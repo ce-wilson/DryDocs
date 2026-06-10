@@ -1,15 +1,15 @@
-"""drydocs CLI — M0 + M1 + M3 entry point.
+"""drydocs CLI — entry point for all bootstrap, supplement, and ingest commands.
 
-This file SUPERSEDES the M1 cli.py.  Strict superset — every M0/M1 command
-still works; M3 commands are additive.
+Bootstrap order (first run):
+  1. drydocs bootstrap                  — constraints + ontology backbone
+  2. drydocs apply-ontology-supplement  — Control-M local anchor terms
+  3. drydocs apply-seal-supplement      — SEAL domain terms
+  4. drydocs apply-catalog-supplement   — Catalog/PAT domain terms + all Role seeds
 
-  M3 (parts 1 + 2)
-  ----------------
-  drydocs ingest-controlm     load the full Control-M chain (folders ->
-                              jobs -> conditions in/out -> derived deps);
-                              ``--skip-part2`` stops after folders + jobs
-  drydocs apply-m3-supplement add Control-M local-namespace anchor terms
-  drydocs m3-verify           assert M3 (part 1 + part 2) invariants
+Ingest commands:
+  drydocs refresh-reference   — catalog + SEAL weekly refresh chain
+  drydocs ingest-controlm     — Control-M chain (folders → jobs → conditions → deps)
+  drydocs load <name> --csv   — single loader against a CSV file
 """
 from __future__ import annotations
 
@@ -48,11 +48,9 @@ console = Console()
 LOGGER = logging.getLogger("drydocs.cli")
 
 SCHEMA_DIR = Path(__file__).resolve().parent / "schema"
-CONSTRAINTS_FILE = SCHEMA_DIR / "constraints.cypher"
-ONTOLOGY_FILE = SCHEMA_DIR / "ontology.cypher"
-M1_ROLE_VOCAB_UPGRADE = SCHEMA_DIR / "m1_role_vocabulary_update.cypher"
-M3_SUPPLEMENT_FILE      = SCHEMA_DIR / "m3_ontology_supplement.cypher"
-M3_CONSTRAINTS_UPGRADE  = SCHEMA_DIR / "m3_constraints_upgrade.cypher"
+CONSTRAINTS_FILE        = SCHEMA_DIR / "constraints.cypher"
+ONTOLOGY_FILE           = SCHEMA_DIR / "ontology.cypher"
+ONTOLOGY_SUPPLEMENT_FILE = SCHEMA_DIR / "ontology_supplement.cypher"
 SEAL_SUPPLEMENT_FILE    = SCHEMA_DIR / "seal_ontology_supplement.cypher"
 CATALOG_SUPPLEMENT_FILE = SCHEMA_DIR / "catalog_ontology_supplement.cypher"
 
@@ -266,22 +264,21 @@ def m1_verify() -> None:
 
 # --- M3 commands -------------------------------------------------------------
 
-@app.command(name="apply-m3-supplement")
-def apply_m3_supplement() -> None:
-    """Apply the Control-M ontology supplement (idempotent).
+@app.command(name="apply-ontology-supplement")
+def apply_ontology_supplement() -> None:
+    """Apply the base ontology supplement (idempotent).
 
     Adds local-namespace anchor terms (:ControlMServer, :JobFolder,
-    :ControlMJob) and wires them via :SUBCLASS_OF to the PROV anchors M0
-    seeded. Safe to re-run.
+    :ControlMJob) and wires them via :SUBCLASS_OF to the PROV anchors
+    seeded by ontology.cypher. Also declares Control-M LocalRelationship
+    mappings (SCHEDULED_ON, CONTAINS_JOB, REQUIRES_IN_CONDITION,
+    EMITS_OUT_CONDITION, WAS_INFORMED_BY). Safe to re-run.
     """
-    if not M3_SUPPLEMENT_FILE.exists():
-        console.print(f"[red]Missing: {M3_SUPPLEMENT_FILE}[/]"); raise typer.Exit(1)
+    if not ONTOLOGY_SUPPLEMENT_FILE.exists():
+        console.print(f"[red]Missing: {ONTOLOGY_SUPPLEMENT_FILE}[/]"); raise typer.Exit(1)
     with _client() as cli:
-        cli.execute_file(M3_SUPPLEMENT_FILE)
-        console.print("[green]M3 ontology supplement applied.[/]")
-        if M1_ROLE_VOCAB_UPGRADE.exists():
-            cli.execute_file(M1_ROLE_VOCAB_UPGRADE)
-            console.print("[green]Role vocabulary aligned to SEAL spec.[/]")
+        cli.execute_file(ONTOLOGY_SUPPLEMENT_FILE)
+        console.print("[green]Ontology supplement applied.[/]")
 
 
 @app.command(name="apply-seal-supplement")
@@ -384,7 +381,7 @@ def m3_verify() -> None:
         # Every folder has a server.
         rows = cli.run("""
             MATCH (f:JobFolder)
-            OPTIONAL MATCH (f)-[:RUNS_ON]->(srv:ControlMServer)
+            OPTIONAL MATCH (f)-[:SCHEDULED_ON]->(srv:ControlMServer)
             WITH count(f) AS folders, count(srv) AS srv_links
             RETURN folders, srv_links
         """)

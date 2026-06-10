@@ -59,10 +59,19 @@ CREATE CONSTRAINT membership_id       IF NOT EXISTS FOR (m:Membership)          
 CREATE CONSTRAINT scheduler_kind      IF NOT EXISTS FOR (k:SchedulerKind)       REQUIRE k.name IS UNIQUE;
 
 // --- Control-M / BMC ---------------------------------------------------------
+// Node key uses natural identity (folder_id, job_id) without version_serial —
+// loaders filter to IS_CURRENT_VERSION='1' so one canonical node per logical
+// entity; version_serial stays as an audit property only.
 CREATE CONSTRAINT controlm_server     IF NOT EXISTS FOR (s:ControlMServer)      REQUIRE s.name IS UNIQUE;
 CREATE CONSTRAINT folder_id           IF NOT EXISTS FOR (f:JobFolder)           REQUIRE f.folder_id IS UNIQUE;
-CREATE CONSTRAINT controlmjob_key     IF NOT EXISTS FOR (j:ControlMJob)         REQUIRE (j.job_id, j.version_serial) IS NODE KEY;
-CREATE CONSTRAINT condition_key       IF NOT EXISTS FOR (c:Condition)           REQUIRE (c.folder_id, c.name, c.cyclic_type) IS NODE KEY;
+
+// Drop old versioned key (included version_serial in earlier M3 drafts) then
+// create the correct natural key. Both statements are idempotent.
+DROP CONSTRAINT controlmjob_key IF EXISTS;
+CREATE CONSTRAINT controlmjob_key     IF NOT EXISTS FOR (j:ControlMJob)         REQUIRE (j.folder_id, j.job_id) IS NODE KEY;
+
+DROP CONSTRAINT condition_key IF EXISTS;
+CREATE CONSTRAINT condition_key       IF NOT EXISTS FOR (c:Condition)           REQUIRE (c.folder_id, c.name) IS NODE KEY;
 CREATE INDEX      job_name            IF NOT EXISTS FOR (j:ControlMJob)         ON  (j.job_name);
 
 // --- Data assets / files / channels -----------------------------------------
