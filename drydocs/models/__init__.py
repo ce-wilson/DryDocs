@@ -25,6 +25,7 @@ from .controlm import (
     ControlMDependencyRow,
     ControlMFolderRow,
     ControlMJobRow,
+    ControlMVariableRow,
 )
 
 __all__ = [
@@ -44,4 +45,6 @@ __all__ = [
     "ControlMConditionInRow",
     "ControlMConditionOutRow",
     "ControlMDependencyRow",
+    # Control-M (C3/C4 normalization — variables)
+    "ControlMVariableRow",
 ]

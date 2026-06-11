@@ -15,7 +15,7 @@ from __future__ import annotations
 
 from typing import Any
 
-from pydantic import BaseModel, ConfigDict, Field, field_validator
+from pydantic import AliasChoices, BaseModel, ConfigDict, Field, field_validator
 
 
 def _int_or_none(v: Any) -> int | None:
@@ -305,6 +305,72 @@ class ControlMConditionOutRow(BaseModel):
     )
     @classmethod
     def _str_lnko(cls, v: Any) -> str | None:
+        return _str_or_none(v)
+
+
+class ControlMVariableRow(BaseModel):
+    """One variable definition from ``psgmgr.CM_DEF_SETVAR`` (name to be
+    confirmed — the view behind the SQL Developer variable extract).
+
+    Accepts BOTH column shapes:
+      * the formal projection from ``controlm_variables.sql``
+        (data_center, folder_id, folder_name, job_id, job_name, appl_type,
+        var_scope, var_name, var_value), and
+      * the raw SQL Developer export headers
+        (TABLE_NAME | JOB_NAME | JOB_ID | APPL_TYPE | NAME | VALUE) —
+        note TABLE_NAME in that export actually carries TABLE_ID values.
+
+    Duplicate (job, var_name) definitions are legitimate in the source —
+    %%FileWatch-TIME_LIMIT was observed defined twice on one job with
+    different values. Never dedupe at the model layer.
+    """
+
+    model_config = ConfigDict(
+        populate_by_name=True,
+        str_strip_whitespace=True,
+        extra="ignore",
+    )
+
+    folder_id: str = Field(
+        ...,
+        min_length=1,
+        validation_alias=AliasChoices("folder_id", "table_name", "table_id"),
+        description="TABLE_ID (the raw extract mislabels it TABLE_NAME).",
+    )
+    job_id: str = Field(..., min_length=1)
+    var_name: str = Field(
+        ...,
+        min_length=1,
+        validation_alias=AliasChoices("var_name", "name"),
+        description="Variable name including the %% prefix.",
+    )
+    var_value: str | None = Field(
+        None,
+        validation_alias=AliasChoices("var_value", "value"),
+    )
+    data_center: str | None = Field(
+        None,
+        description="Control-M server; absent from the raw SQL Developer export.",
+    )
+    folder_name: str | None = Field(
+        None, description="SCHED_TABLE; only present in the formal projection."
+    )
+    job_name: str | None = None
+    appl_type: str | None = Field(
+        None, description="OS / FileWatch / AIAWSWLK / ... (plugin job type)."
+    )
+    var_scope: str | None = Field(
+        None,
+        description="FOLDER (smart-folder header row) or JOB; derived in SQL.",
+    )
+
+    @field_validator(
+        "var_value", "data_center", "folder_name", "job_name",
+        "appl_type", "var_scope",
+        mode="before",
+    )
+    @classmethod
+    def _str_var(cls, v: Any) -> str | None:
         return _str_or_none(v)
 
 

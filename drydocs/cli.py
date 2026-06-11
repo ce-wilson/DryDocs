@@ -22,6 +22,8 @@ from rich.table import Table
 
 from .adapters import CsvAdapter, OracleAdapter
 from .config import load_settings
+from .controlm import VariableCoverage, classify_job_variables
+from .models import ControlMVariableRow
 from .loaders import seal_applications as seal_apps_mod
 from .loaders import seal_contacts as seal_contacts_mod
 from .loaders.base import BaseLoader
@@ -515,6 +517,103 @@ def m3_verify() -> None:
     if failed:
         console.print(f"[red]{failed} invariant(s) failed.[/]"); raise typer.Exit(1)
     console.print("[green]All M3 (part 1) invariants passed.[/]")
+
+
+@app.command(name="analyze-variables")
+def analyze_variables(
+    csv_path: Path = typer.Option(
+        DEFAULT_SAMPLES_DIR / "controlm_variables__sample.csv",
+        "--csv",
+        help=(
+            "Variable extract. Accepts the formal projection "
+            "(controlm_variables.sql) or the raw SQL Developer export "
+            "(TABLE_NAME|JOB_NAME|JOB_ID|APPL_TYPE|NAME|VALUE)."
+        ),
+    ),
+    delimiter: str = typer.Option(",", "--delimiter", help="Field delimiter; use '|' for raw exports."),
+    use_oracle: bool = typer.Option(
+        False, "--use-oracle", help="Run controlm_variables.sql against psgmgr instead of a file."
+    ),
+) -> None:
+    """Phase-A variable taxonomy coverage report (no Neo4j required).
+
+    Classifies every variable definition (LITERAL / VAR_REF / SYSTEM_FUNC /
+    DYNAMIC_NAME / FLOW_REF / PLUGIN_NS / EMBEDDED_SHELL / SEMANTIC_FACT /
+    MALFORMED), confirms _D/_Q/_P environment triplets per job, and prints
+    the coverage numbers that validate the taxonomy before Phase B
+    (resolution) and Phase C (command parsing) build on it.
+    """
+    if use_oracle:
+        sql = (SQL_DIR / "controlm_variables.sql").read_text(encoding="utf-8")
+        adapter = _oracle_adapter(sql)
+    else:
+        adapter = CsvAdapter(csv_path, delimiter=delimiter)
+        if not csv_path.exists():
+            console.print(f"[red]File not found: {csv_path}[/]")
+            raise typer.Exit(2)
+
+    # group definitions per job — env-triplet confirmation needs the
+    # sibling variables of the same job
+    per_job: dict[tuple, list[tuple[str, str | None]]] = {}
+    job_meta: dict[tuple, str] = {}
+    rejected = 0
+    with adapter:
+        for raw in adapter.rows():
+            try:
+                row = ControlMVariableRow.model_validate(raw)
+            except Exception:  # noqa: BLE001 — count + continue, like BaseLoader
+                rejected += 1
+                continue
+            dc = row.data_center or "UNKNOWN"
+            key = (dc, row.folder_id, row.job_id)
+            per_job.setdefault(key, []).append((row.var_name, row.var_value))
+            job_meta[key] = dc
+
+    cov = VariableCoverage()
+    for key, defs in per_job.items():
+        for cv in classify_job_variables(defs):
+            cov.add(cv, data_center=job_meta[key], job_key=key)
+
+    console.print(
+        f"definitions={cov.total} jobs={len(cov.jobs_seen)} rejected={rejected}"
+    )
+
+    t = Table(title="Variable kind distribution")
+    t.add_column("Kind"); t.add_column("Count", justify="right"); t.add_column("%", justify="right")
+    for kind, pct in cov.pct_by_kind.items():
+        t.add_row(kind, str(cov.by_kind[kind]), f"{pct:.2f}")
+    console.print(t)
+
+    if len(cov.by_dc_kind) > 1:
+        t = Table(title="Kind by data center")
+        kinds = [k for k, _ in cov.by_kind.most_common()]
+        t.add_column("Data center")
+        for k in kinds:
+            t.add_column(k, justify="right")
+        for dc, counter in sorted(cov.by_dc_kind.items()):
+            t.add_row(dc, *(str(counter.get(k, 0)) for k in kinds))
+        console.print(t)
+
+    for title, counter, n in (
+        ("Plugin namespaces", cov.plugin_namespaces, 10),
+        ("Semantic fact types", cov.fact_types, 15),
+        ("System functions in use", cov.system_funcs, 10),
+        ("Most-referenced variables (resolution hot set)", cov.referenced_names, 15),
+        ("Cross-flow reference targets", cov.flow_targets, 10),
+    ):
+        if not counter:
+            continue
+        t = Table(title=title)
+        t.add_column("Name"); t.add_column("Count", justify="right")
+        for name, cnt in counter.most_common(n):
+            t.add_row(name, str(cnt))
+        console.print(t)
+
+    if cov.malformed_samples:
+        console.print("[yellow]Malformed samples (first "
+                      f"{len(cov.malformed_samples)}):[/]")
+        for s in cov.malformed_samples:
+            console.print(f"  {s}")
 
 
 @app.command()

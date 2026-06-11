@@ -17,6 +17,9 @@ build/
 .mypy_cache/
 .ruff_cache/
 
+# Sample / local data — may contain sensitive source data
+drydocs/data/
+
 # OS
 .DS_Store
 Thumbs.db
