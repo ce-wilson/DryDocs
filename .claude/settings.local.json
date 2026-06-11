@@ -19,7 +19,10 @@
       "mcp__Claude_in_Chrome__navigate",
       "Bash(python -m http.server 8765 --bind 127.0.0.1)",
       "mcp__Claude_in_Chrome__browser_batch",
-      "Bash(kill %1)"
+      "Bash(kill %1)",
+      "Bash(git -C /c/coding/projects/DryDocs stash -u)",
+      "Bash(git -C /c/coding/projects/DryDocs stash pop)",
+      "Bash(git -C /c/coding/projects/DryDocs status --short)"
     ]
   }
 }
