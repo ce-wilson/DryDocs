@@ -24,8 +24,10 @@ class VariableCoverage:
     plugin_namespaces: Counter = field(default_factory=Counter)
     fact_types: Counter = field(default_factory=Counter)
     system_funcs: Counter = field(default_factory=Counter)
+    system_vars: Counter = field(default_factory=Counter)
     referenced_names: Counter = field(default_factory=Counter)
     flow_targets: Counter = field(default_factory=Counter)
+    global_targets: Counter = field(default_factory=Counter)
     malformed_samples: list[str] = field(default_factory=list)
     jobs_seen: set = field(default_factory=set)
 
@@ -47,10 +49,14 @@ class VariableCoverage:
             self.fact_types[cv.fact_type] += 1
         for fn in cv.system_funcs:
             self.system_funcs[fn] += 1
+        for sv in cv.system_vars:
+            self.system_vars[sv] += 1
         for ref in cv.all_var_refs:  # %%VAR and %%$VAR user references alike
             self.referenced_names[ref] += 1
         for flow, _var in cv.flow_refs:
             self.flow_targets[flow] += 1
+        for gv in cv.global_refs:
+            self.global_targets[gv] += 1
         if cv.kind is VariableKind.MALFORMED and len(self.malformed_samples) < self.MAX_MALFORMED_SAMPLES:
             self.malformed_samples.append(f"{cv.raw_name!r} = {(cv.raw_value or '')[:120]!r}")
         if job_key is not None:

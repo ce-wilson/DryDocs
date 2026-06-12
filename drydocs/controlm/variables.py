@@ -15,17 +15,31 @@ pointer is a pointer, not a fact):
                     is shell text for the Phase-C mini-parser
     PLUGIN_NS       namespaced name (%%FileWatch-*, %%UCM-*) — routed to the
                     matching APPL_TYPE handler
-    FLOW_REF        value points into another flow's namespace (%%\FLOW\VAR)
-                    — becomes a REFERENCES_FLOW edge candidate, never inlined
+    FLOW_REF        value is a global (%%\VAR) or pool-qualified
+                    (%%\\POOL\VAR) reference — vendor scopes for cross-job
+                    shared state (controlm-variables.md §Scope Levels); this
+                    shop uses pools to hand values between dataflow jobs.
+                    Becomes a REFERENCES_FLOW edge candidate, never inlined
     DYNAMIC_NAME    adjacent %%refs compose a variable *name* at runtime
                     (%%SCRIPT_PATH_%%HOSTNM, %%TENV%%CURRENVIRON) — resolve
                     per-environment in Phase B, ambiguous by construction
     SEMANTIC_FACT   name in the fact registry (SEAL, FID_*, DATAFLOW, ...)
                     with a plain value — mined directly into STG_APP_FACT
-    SYSTEM_FUNC     value uses only %%$ functions (%%$ODATE, %%$CALCDATE...)
-                    — canonicalized to symbolic tokens, never "resolved"
-    VAR_REF         value references other plain %%vars — Phase B substitutes
+    SYSTEM_FUNC     value uses only Control-M system tokens — functions
+                    (CALCDATE, SUBSTR, GETENV, WCALC, BLANK) and/or system
+                    variables (ODATE, ORDERID, JOBNAME, ...), in either
+                    %%TOKEN or century-format %%$TOKEN syntax — canonicalized
+                    to symbolic tokens, never "resolved"
+    VAR_REF         value references other USER variables — Phase B substitutes
     LITERAL         none of the above
+
+Vendor reference: vendor-bmc/controlm-variables.md (Control-M SaaS docs
+applied to 9.0.21.300 — see its version notice). Confirmed there: resolution
+priority job > folder > global > system; SMART-folder variables inherit to
+sub-folders and jobs; resolution happens at execution time (so date tokens
+are canonicalized, not resolved). The doc's name/value constraint table
+(alphanumeric-only names, 214-char values) is contradicted by observed
+9.0.x production data and is NOT enforced here.
 """
 from __future__ import annotations
 
@@ -48,23 +62,51 @@ class VariableKind(str, Enum):
 
 # --- token grammar ------------------------------------------------------------
 
-# any %%$TOKEN — but NOT all of these are system functions: this shop
-# references user variables with both %%VAR and %%$VAR syntax (observed:
-# %%$PRD_END_DATE_1, %%$DROPBOX, %%$MONTH_END_DATE). Tokens are split into
-# true system functions vs dollar-referenced user vars via KNOWN_SYSTEM_FUNCS.
+# any %%$TOKEN — the classic AutoEdit century-format (4-digit-year) notation
+# for system tokens, still live in 9.0.x even though the SaaS docs drop it.
+# NOT every %%$TOKEN is a system token though: this shop also references
+# user variables with dollar syntax (observed: %%$PRD_END_DATE_1,
+# %%$DROPBOX). Tokens are split via the registries below.
 DOLLAR_TOKEN_RE = re.compile(r"%%\$([A-Za-z][A-Za-z0-9_]*)")
 
-# Control-M system functions confirmed in the extract. ODATE-prefixed
-# variants (ODATE_1 etc.) are treated as system date tokens.
-KNOWN_SYSTEM_FUNCS = frozenset({"ODATE", "CALCDATE", "SUBSTR"})
+# Control-M function library, per vendor-bmc/controlm-variables.md
+# (§Variable Functions): CALCDATE, SUBSTR, GETENV, WCALC, BLANK. Both
+# %%FUNC and %%$FUNC syntaxes occur (observed: %%$CALCDATE ... and plain
+# %%SUBSTR %%DATACENTER 1 1).
+KNOWN_SYSTEM_FUNCS = frozenset({"CALCDATE", "SUBSTR", "GETENV", "WCALC", "BLANK"})
+
+# Control-M system variables, per vendor-bmc/controlm-variables.md
+# (§System Variables Reference): job-general, scheduling, environment, and
+# action variables. Referenced as %%NAME or century-format %%$NAME — never
+# user-defined, so they must NOT enter the Phase-B resolution hot set.
+KNOWN_SYSTEM_VARIABLES = frozenset({
+    # job general
+    "JOBNAME", "OWNER", "APPLIC", "ORDERID", "RUNCOUNT",
+    # scheduling (ODATE-prefixed variants like ODATE_1 handled separately)
+    "ODATE", "NEXT", "ODAY", "OMONTH", "OYEAR", "OWDAY",
+    # environment
+    "DATE", "TIME", "MONTH", "DAY", "YEAR", "WDAY",
+    # action / status
+    "COMPSTAT", "AVG_TIME", "JOBID", "NODEID",
+})
 
 
 def _is_system_func(token: str) -> bool:
-    return token.upper() in KNOWN_SYSTEM_FUNCS or token.upper().startswith("ODATE")
+    return token.upper() in KNOWN_SYSTEM_FUNCS
 
-# %%\FLOW\VAR or %%\\FLOW\\VAR (cross-flow variable pointer; both single and
-# double backslash separators occur in the wild)
-FLOW_REF_RE = re.compile(r"%%\\+(\w+)\\+(\w+)")
+
+def _is_system_var(token: str) -> bool:
+    t = token.upper()
+    return t in KNOWN_SYSTEM_VARIABLES or t.startswith("ODATE")
+
+# backslash-scoped references, per vendor-bmc/controlm-variables.md
+# (§Scope Levels): %%\VAR is a GLOBAL variable (server-wide), %%\\POOL\VAR
+# is a pool-qualified reference. This shop uses the two-segment form to
+# hand values between jobs of a dataflow (%%\\SCRA_REPORTING\PROID) — the
+# graph treats both as cross-job shared state. Separator backslash count
+# varies in the wild; match one-or-more.
+POOL_REF_RE = re.compile(r"%%\\+(\w+)\\+(\w+)")     # %%\\POOL\VAR
+GLOBAL_REF_RE = re.compile(r"%%\\+(\w+)(?!\\|\w)")  # %%\VAR with no second segment
 
 # plain %%VAR reference — no $ (system func), no \ (flow ref), no dash
 # (namespaced names never appear as in-value references)
@@ -135,16 +177,19 @@ class ClassifiedVariable:
     fact_type: str | None = None               # FACT_REGISTRY hit, if any
     env_candidate: str | None = None           # D/Q/P/T suffix letter (unconfirmed)
     env_tag: str | None = None                 # confirmed by classify_job_variables
-    plain_refs: tuple[str, ...] = ()           # %%VAR names referenced in value
+    plain_refs: tuple[str, ...] = ()           # user %%VAR references in value
     dollar_refs: tuple[str, ...] = ()          # user vars referenced as %%$VAR
-    system_funcs: tuple[str, ...] = ()         # ODATE, CALCDATE, ... used in value
-    flow_refs: tuple[tuple[str, str], ...] = ()  # (flow, var) pointers in value
+    system_funcs: tuple[str, ...] = ()         # CALCDATE, SUBSTR, GETENV, ...
+    system_vars: tuple[str, ...] = ()          # ODATE, ORDERID, JOBNAME, ...
+    flow_refs: tuple[tuple[str, str], ...] = ()  # (pool/flow, var) two-segment refs
+    global_refs: tuple[str, ...] = ()          # %%\VAR single-segment global refs
     has_adjacent_refs: bool = False            # dynamic-name composition hazard
 
     @property
     def all_var_refs(self) -> tuple[str, ...]:
-        """Every user-variable reference, regardless of %% / %%$ syntax —
-        the Phase-B resolution input set."""
+        """Every USER-variable reference, regardless of %% / %%$ syntax —
+        the Phase-B resolution input set. System variables and functions
+        are excluded: they canonicalize to symbolic tokens, not lookups."""
         return self.plain_refs + self.dollar_refs
 
     def with_env_tag(self, env_tag: str) -> "ClassifiedVariable":
@@ -170,13 +215,30 @@ def classify_variable(name: str, value: str | None) -> ClassifiedVariable:
     # feature extraction up front, on the value text
     text = val or ""
     dollar_tokens = DOLLAR_TOKEN_RE.findall(text)
-    system_funcs = tuple(t for t in dollar_tokens if _is_system_func(t))
-    dollar_refs = tuple(t for t in dollar_tokens if not _is_system_func(t))
-    flow_refs = tuple(FLOW_REF_RE.findall(text))
-    # plain refs, excluding tokens already consumed as %%$ tokens / flow refs
-    scrubbed = FLOW_REF_RE.sub(" ", DOLLAR_TOKEN_RE.sub(" ", text))
-    plain_refs = tuple(PLAIN_REF_RE.findall(scrubbed))
+    flow_refs = tuple(POOL_REF_RE.findall(text))
+    scrubbed = POOL_REF_RE.sub(" ", DOLLAR_TOKEN_RE.sub(" ", text))
+    global_refs = tuple(GLOBAL_REF_RE.findall(scrubbed))
+    scrubbed = GLOBAL_REF_RE.sub(" ", scrubbed)
+    plain_tokens = PLAIN_REF_RE.findall(scrubbed)
     has_adjacent = bool(ADJACENT_REF_RE.search(scrubbed))
+
+    # route every token: system function / system variable / user reference.
+    # Both %%TOKEN and century-format %%$TOKEN syntaxes carry system tokens.
+    system_funcs = tuple(
+        t for t in (*dollar_tokens, *plain_tokens) if _is_system_func(t)
+    )
+    system_vars = tuple(
+        t for t in (*dollar_tokens, *plain_tokens)
+        if _is_system_var(t) and not _is_system_func(t)
+    )
+    dollar_refs = tuple(
+        t for t in dollar_tokens
+        if not _is_system_func(t) and not _is_system_var(t)
+    )
+    plain_refs = tuple(
+        t for t in plain_tokens
+        if not _is_system_func(t) and not _is_system_var(t)
+    )
 
     env_m = ENV_SUFFIX_RE.match(bare) if is_valid_name else None
     env_candidate = env_m.group("env") if env_m else None
@@ -190,6 +252,7 @@ def classify_variable(name: str, value: str | None) -> ClassifiedVariable:
     ns = bare.split("-", 1)[0] if is_valid_name and "-" in bare else None
 
     any_user_refs = bool(plain_refs or dollar_refs)
+    any_system_tokens = bool(system_funcs or system_vars)
     common = dict(
         raw_name=raw_name,
         raw_value=val,
@@ -200,7 +263,9 @@ def classify_variable(name: str, value: str | None) -> ClassifiedVariable:
         plain_refs=plain_refs,
         dollar_refs=dollar_refs,
         system_funcs=system_funcs,
+        system_vars=system_vars,
         flow_refs=flow_refs,
+        global_refs=global_refs,
         has_adjacent_refs=has_adjacent,
     )
 
@@ -211,13 +276,13 @@ def classify_variable(name: str, value: str | None) -> ClassifiedVariable:
         kind = VariableKind.EMBEDDED_SHELL
     elif ns is not None:
         kind = VariableKind.PLUGIN_NS
-    elif flow_refs:
+    elif flow_refs or global_refs:
         kind = VariableKind.FLOW_REF
     elif has_adjacent:
         kind = VariableKind.DYNAMIC_NAME
-    elif fact_type is not None and not any_user_refs and not system_funcs:
+    elif fact_type is not None and not any_user_refs and not any_system_tokens:
         kind = VariableKind.SEMANTIC_FACT
-    elif system_funcs and not any_user_refs:
+    elif any_system_tokens and not any_user_refs:
         kind = VariableKind.SYSTEM_FUNC
     elif any_user_refs:
         kind = VariableKind.VAR_REF

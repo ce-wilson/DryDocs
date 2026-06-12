@@ -112,6 +112,37 @@ def test_dollar_user_refs_split_from_system_funcs() -> None:
     assert "PRD_END_DATE_1" in cv.all_var_refs
 
 
+def test_system_variables_not_user_refs() -> None:
+    # vendor-bmc/controlm-variables.md §System Variables Reference:
+    # ORDERID / JOBNAME are system variables — they must NOT enter the
+    # Phase-B resolution hot set. Real row: %%UCM-KEYVALUE on folder 185675.
+    cv = classify_variable(
+        "%%UCM-KEYVALUE",
+        "JOB_NAME=%%JOBNAME;ORDER_ID=%%ORDERID;FEED_NAME=%%FEED_NAME",
+    )
+    assert "JOBNAME" in cv.system_vars
+    assert "ORDERID" in cv.system_vars
+    assert cv.all_var_refs == ("FEED_NAME",)
+
+
+def test_plain_substr_is_system_function() -> None:
+    # classic AutoEdit function syntax without the $ prefix
+    # (real row: %%HOSTNM on folder 155768)
+    cv = classify_variable("%%HOSTNM", "%%SUBSTR %%DATACENTER 1 1")
+    assert cv.kind is VariableKind.VAR_REF      # DATACENTER needs resolution
+    assert cv.system_funcs == ("SUBSTR",)
+    assert cv.all_var_refs == ("DATACENTER",)
+
+
+def test_single_backslash_global_ref() -> None:
+    # vendor §Scope Levels: %%\VAR is a server-global variable — must be
+    # captured, not silently dropped by both the pool and plain-ref regexes
+    cv = classify_variable("%%BASE", r"%%\BASEPATH/data")
+    assert cv.kind is VariableKind.FLOW_REF
+    assert cv.global_refs == ("BASEPATH",)
+    assert cv.plain_refs == ()
+
+
 def test_malformed_name_extracts_no_namespace() -> None:
     # '%%CALCDATE %%$ODATE -1' as a NAME must not pollute the namespace table
     cv = classify_variable("%%CALCDATE %%$ODATE -1", "")
@@ -195,6 +226,10 @@ def test_sample_classifies_end_to_end() -> None:
     assert cov.by_kind["EMBEDDED_SHELL"] > 0     # PRECMD/POSTCMD rows exist
     assert cov.by_kind["FLOW_REF"] > 0           # %%\FLOW\VAR rows exist
     assert cov.fact_types["SEAL"] >= 1           # %%SEAL 34544 + UCM-SEALID
-    assert cov.system_funcs["ODATE"] > 0
+    assert cov.system_vars["ODATE"] > 0          # system variable, not function
+    assert cov.system_funcs["CALCDATE"] > 0
+    # system variables must NOT appear in the user-resolution hot set
+    assert "ORDERID" not in cov.referenced_names
+    assert "JOBNAME" not in cov.referenced_names
     # the unclassifiable junk rows land in MALFORMED, not in a crash
     assert cov.by_kind["MALFORMED"] >= 1

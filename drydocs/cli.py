@@ -22,7 +22,12 @@ from rich.table import Table
 
 from .adapters import CsvAdapter, OracleAdapter
 from .config import load_settings
-from .controlm import VariableCoverage, classify_job_variables
+from .controlm import (
+    VariableCoverage,
+    classify_job_variables,
+    resolve_job,
+)
+from .controlm.staging import build_staging_rows, collect_jobs
 from .models import ControlMVariableRow
 from .loaders import seal_applications as seal_apps_mod
 from .loaders import seal_contacts as seal_contacts_mod
@@ -534,14 +539,19 @@ def analyze_variables(
     use_oracle: bool = typer.Option(
         False, "--use-oracle", help="Run controlm_variables.sql against psgmgr instead of a file."
     ),
+    resolve: bool = typer.Option(
+        False, "--resolve",
+        help="Also run the Phase-B resolver (folder scope -> job scope) and report resolution coverage.",
+    ),
 ) -> None:
-    """Phase-A variable taxonomy coverage report (no Neo4j required).
+    """Variable taxonomy coverage report (no Neo4j required).
 
     Classifies every variable definition (LITERAL / VAR_REF / SYSTEM_FUNC /
     DYNAMIC_NAME / FLOW_REF / PLUGIN_NS / EMBEDDED_SHELL / SEMANTIC_FACT /
     MALFORMED), confirms _D/_Q/_P environment triplets per job, and prints
-    the coverage numbers that validate the taxonomy before Phase B
-    (resolution) and Phase C (command parsing) build on it.
+    the coverage numbers that validate the taxonomy. With --resolve, each
+    job's definitions are resolved under its folder scope (Phase B) and
+    resolution coverage is reported.
     """
     if use_oracle:
         sql = (SQL_DIR / "controlm_variables.sql").read_text(encoding="utf-8")
@@ -556,6 +566,7 @@ def analyze_variables(
     # sibling variables of the same job
     per_job: dict[tuple, list[tuple[str, str | None]]] = {}
     job_meta: dict[tuple, str] = {}
+    folder_headers: set[tuple] = set()
     rejected = 0
     with adapter:
         for raw in adapter.rows():
@@ -568,6 +579,10 @@ def analyze_variables(
             key = (dc, row.folder_id, row.job_id)
             per_job.setdefault(key, []).append((row.var_name, row.var_value))
             job_meta[key] = dc
+            # folder-scope rows: var_scope from the formal projection, or the
+            # smart-folder header heuristic (JOB_ID = 1) for raw extracts
+            if row.var_scope == "FOLDER" or (row.var_scope is None and row.job_id == "1"):
+                folder_headers.add(key)
 
     cov = VariableCoverage()
     for key, defs in per_job.items():
@@ -598,8 +613,10 @@ def analyze_variables(
         ("Plugin namespaces", cov.plugin_namespaces, 10),
         ("Semantic fact types", cov.fact_types, 15),
         ("System functions in use", cov.system_funcs, 10),
-        ("Most-referenced variables (resolution hot set)", cov.referenced_names, 15),
-        ("Cross-flow reference targets", cov.flow_targets, 10),
+        ("System variables in use", cov.system_vars, 10),
+        ("Most-referenced USER variables (resolution hot set)", cov.referenced_names, 15),
+        ("Pool / cross-flow reference targets", cov.flow_targets, 10),
+        ("Global variable references", cov.global_targets, 10),
     ):
         if not counter:
             continue
@@ -614,6 +631,138 @@ def analyze_variables(
                       f"{len(cov.malformed_samples)}):[/]")
         for s in cov.malformed_samples:
             console.print(f"  {s}")
+
+    if not resolve:
+        return
+
+    # --- Phase B: resolve each job under its folder scope ---
+    from collections import Counter as _Counter
+
+    folder_defs: dict[tuple, list[tuple[str, str | None]]] = {
+        (k[0], k[1]): defs for k, defs in per_job.items() if k in folder_headers
+    }
+    total = fully = with_variants = with_externals = 0
+    unresolved_names: "_Counter[str]" = _Counter()
+    max_depth_seen = 0
+    for key, defs in per_job.items():
+        if key in folder_headers:
+            # the header IS the folder scope — resolve it standalone
+            rvs = resolve_job(defs, [])
+        else:
+            # resolve under the folder scope, but count only this job's own
+            # definitions (the folder rows are counted on the header)
+            fdefs = folder_defs.get((key[0], key[1]), [])
+            rvs = [rv for rv in resolve_job(fdefs, defs) if rv.scope == "JOB"]
+        for rv in rvs:
+            total += 1
+            fully += rv.is_fully_resolved
+            with_variants += bool(rv.variants)
+            with_externals += bool(rv.external_refs)
+            max_depth_seen = max(max_depth_seen, rv.resolution_depth)
+            for u in rv.unresolved:
+                unresolved_names[u] += 1
+
+    t = Table(title="Phase-B resolution coverage")
+    t.add_column("Metric"); t.add_column("Value", justify="right")
+    t.add_row("definitions resolved", str(total))
+    t.add_row("fully resolved", f"{fully} ({100 * fully / total:.1f}%)" if total else "0")
+    t.add_row("with env variants", str(with_variants))
+    t.add_row("with external (global/pool) refs", str(with_externals))
+    t.add_row("max substitution depth", str(max_depth_seen))
+    console.print(t)
+
+    if unresolved_names:
+        t = Table(title="Top unresolved names (runtime-provided candidates)")
+        t.add_column("Name"); t.add_column("Count", justify="right")
+        for name, cnt in unresolved_names.most_common(15):
+            t.add_row(name, str(cnt))
+        console.print(t)
+
+
+@app.command(name="normalize-variables")
+def normalize_variables(
+    csv_path: Path = typer.Option(
+        DEFAULT_SAMPLES_DIR / "controlm_variables__sample.csv",
+        "--csv",
+        help="Variable extract (formal projection or raw SQL Developer export).",
+    ),
+    delimiter: str = typer.Option(",", "--delimiter", help="Field delimiter; use '|' for raw exports."),
+    use_oracle: bool = typer.Option(
+        False, "--use-oracle", help="Run controlm_variables.sql against psgmgr instead of a file."
+    ),
+    out_dir: Path = typer.Option(
+        Path("stg_out"), "--out-dir",
+        help="Output directory for the STG_* load files.",
+    ),
+) -> None:
+    """Classify + resolve the variable extract and emit staging load files.
+
+    Writes stg_variable.csv, stg_parse_quality.csv, and stg_run.csv with
+    columns matching controlm_staging_ddl.sql exactly — load them into the
+    DRYDOCS_STG schema via SQL Developer import or SQL*Loader. No database
+    write access required from this command.
+    """
+    import csv as _csv
+    import uuid
+    from datetime import datetime, timezone
+
+    if use_oracle:
+        sql = (SQL_DIR / "controlm_variables.sql").read_text(encoding="utf-8")
+        adapter = _oracle_adapter(sql)
+    else:
+        if not csv_path.exists():
+            console.print(f"[red]File not found: {csv_path}[/]")
+            raise typer.Exit(2)
+        adapter = CsvAdapter(csv_path, delimiter=delimiter)
+
+    started_at = datetime.now(timezone.utc)
+    run_id = str(uuid.uuid4())
+    rejected = 0
+
+    def _validated():
+        nonlocal rejected
+        for raw in adapter.rows():
+            try:
+                yield ControlMVariableRow.model_validate(raw)
+            except Exception:  # noqa: BLE001 — count + continue, like BaseLoader
+                rejected += 1
+
+    with adapter:
+        jobs = collect_jobs(_validated())
+    variable_rows, quality_rows = build_staging_rows(jobs, run_id)
+    ended_at = datetime.now(timezone.utc)
+
+    run_row = {
+        "run_id": run_id,
+        "started_at": started_at.strftime("%Y-%m-%d %H:%M:%S"),
+        "ended_at": ended_at.strftime("%Y-%m-%d %H:%M:%S"),
+        "status": "SUCCEEDED",
+        "data_centers": ",".join(sorted({jd.data_center for jd in jobs.values()})),
+        "src_job_count": len(jobs),
+        "src_var_count": sum(len(jd.defs) for jd in jobs.values()),
+        "normalizer_version": "phase-a.1",
+        "notes": f"source={'oracle' if use_oracle else csv_path.name}; rejected={rejected}",
+    }
+
+    out_dir.mkdir(parents=True, exist_ok=True)
+    for name, rows in (
+        ("stg_run.csv", [run_row]),
+        ("stg_variable.csv", variable_rows),
+        ("stg_parse_quality.csv", quality_rows),
+    ):
+        path = out_dir / name
+        with open(path, "w", encoding="utf-8", newline="") as fh:
+            writer = _csv.DictWriter(fh, fieldnames=list(rows[0].keys()))
+            writer.writeheader()
+            writer.writerows(rows)
+        console.print(f"[green]{path}[/] ({len(rows)} rows)")
+
+    fully = sum(1 for r in variable_rows if r["is_fully_resolved"] == "Y")
+    console.print(
+        f"run_id={run_id} jobs={len(jobs)} definitions={run_row['src_var_count']} "
+        f"stg_variable_rows={len(variable_rows)} "
+        f"fully_resolved={100 * fully / len(variable_rows):.1f}% rejected={rejected}"
+    )
 
 
 @app.command()
