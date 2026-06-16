@@ -16,6 +16,8 @@ normalization stream.
 ## Commit timeline (newest first)
 
 ```
+62753b3  Realign stale tests with schema-consolidation refactors
+d3bac54  Refresh git-readme as A→B→C rebase guide
 cb6e056  Add Phase C command/script parser — invocations, file ops, file refs, facts
 520f9ca  Add Phase B variable resolver, staging output, and vendor-doc validation
 1f08b65  minor updates to settings and readme        (internal-standards/, bmc text)
@@ -92,9 +94,19 @@ poetry run drydocs analyze-variables --resolve        # coverage tables
 poetry run drydocs normalize-variables --out-dir stg_out   # writes 8 CSVs
 ```
 
-Expect 102 passing in the four variable-stream files. The 6 failures in
-`test_schema.py`, `test_folder_name_parser.py`, `test_controlm_cypher.py`
-**pre-exist on `main`** and are unrelated to this stream — do not let them block a rebase.
+Expect 102 passing in the four variable-stream files, and `pytest tests/unit/`
+green overall: **157 passed, 4 skipped** (the skips are `test_schema.py` YAML
+checks that no-op when PyYAML is not installed — not failures).
+
+> **History:** before `62753b3`, six tests in `test_schema.py`,
+> `test_folder_name_parser.py`, and `test_controlm_cypher.py` failed on `main`.
+> They were **not** Control-M-stream bugs — they asserted pre-refactor behavior
+> (constraint count, the `"Group Table/Smart folder"` label, the `(folder_id,
+> name)` Condition key, the `:WAS_INFORMED_BY` edge rename, and the
+> `ontology_supplement.cypher` rename) left stale by the schema-consolidation
+> work documented below. `62753b3` realigned them to the shipped code. If you
+> are rebasing across that boundary and see these resurface, take the updated
+> assertions — do not delete the tests; they guard live code.
 
 ---
 
