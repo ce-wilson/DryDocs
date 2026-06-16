@@ -111,15 +111,43 @@ def test_folder_scope_inherited_and_job_overrides() -> None:
 def test_longest_match_consumes_prefix_leaves_literal() -> None:
     # real: %%FileWatch-FILE_PATH|%%DROPBOX/%%FILE_NAME_PREFIX_%%FILE_NM_SUFFIX.%%FILE_EXT
     # (folder 185894): FILE_NAME_PREFIX is defined, FILE_NAME_PREFIX_ is not —
-    # the binding consumes its prefix and the underscore stays literal
+    # the binding consumes its prefix and the underscore stays literal.
+    # The '.' between %%FILE_NM_SUFFIX and %%FILE_EXT is a concatenation
+    # delimiter (consumed); the single dot in the result is FILE_EXT's value.
     out = _by_name(resolve_job(
         [("%%DROPBOX", "/d"), ("%%FILE_NAME_PREFIX", "CMS_IDW"),
          ("%%FILE_NM_SUFFIX", "????"), ("%%FILE_EXT", ".dat")],
         [("%%FileWatch-FILE_PATH",
           "%%DROPBOX/%%FILE_NAME_PREFIX_%%FILE_NM_SUFFIX.%%FILE_EXT")],
     ))
-    assert out["FileWatch-FILE_PATH"].resolved_value == "/d/CMS_IDW_????..dat"
+    assert out["FileWatch-FILE_PATH"].resolved_value == "/d/CMS_IDW_????.dat"
     assert out["FileWatch-FILE_PATH"].is_fully_resolved
+
+
+def test_concat_delimiter_consumed_smuggled_dot_survives() -> None:
+    # SME-confirmed (2026-06-11): %%FILE_NM_PREFIX.%%BUS_DATE.%%FILE_NM_SUFFIX.%%EXTENSION
+    # with FILE_NM_SUFFIX='.' and EXTENSION='dat' -> a clean filename. Every
+    # '.' between %%refs is a consumed delimiter; the ONLY surviving dot is
+    # the smuggled FILE_NM_SUFFIX value '.' (the legacy dot-smuggling pattern).
+    out = _by_name(resolve_job(
+        [("%%FILE_NM_PREFIX", "Originations_Daily_CRM_Indicator_"),
+         ("%%BUS_DATE", "%%$ODATE"),
+         ("%%FILE_NM_SUFFIX", "."),
+         ("%%EXTENSION", "dat")],
+        [("%%WATCH", "%%FILE_NM_PREFIX.%%BUS_DATE.%%FILE_NM_SUFFIX.%%EXTENSION")],
+    ))
+    assert out["WATCH"].resolved_value == "Originations_Daily_CRM_Indicator_{ODATE}.dat"
+    assert out["WATCH"].is_fully_resolved
+
+
+def test_period_after_literal_text_is_kept() -> None:
+    # a '.' that does NOT terminate a variable name stays literal:
+    # in 'f.%%EXT' the dot follows literal 'f', not a %%ref
+    out = _by_name(resolve_job(
+        [("%%EXT", "ctl")],
+        [("%%PATH", "%%nodir/f.%%EXT")],
+    ))
+    assert out["PATH"].resolved_value == "%%nodir/f.ctl"
 
 
 def test_defined_name_beats_shorter_system_token_on_tie() -> None:

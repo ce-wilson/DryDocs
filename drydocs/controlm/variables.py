@@ -184,6 +184,7 @@ class ClassifiedVariable:
     flow_refs: tuple[tuple[str, str], ...] = ()  # (pool/flow, var) two-segment refs
     global_refs: tuple[str, ...] = ()          # %%\VAR single-segment global refs
     has_adjacent_refs: bool = False            # dynamic-name composition hazard
+    value_is_delimiter: bool = False           # value is pure punctuation (dot-smuggling)
 
     @property
     def all_var_refs(self) -> tuple[str, ...]:
@@ -253,6 +254,13 @@ def classify_variable(name: str, value: str | None) -> ClassifiedVariable:
 
     any_user_refs = bool(plain_refs or dollar_refs)
     any_system_tokens = bool(system_funcs or system_vars)
+    # Dot-smuggling detector (metadata-plan Phase 2): a value that is wholly
+    # punctuation — '.', '_', '-', '/' — is a literal delimiter parked in a
+    # variable so it survives concatenation-delimiter stripping (e.g.
+    # FILE_NM_SUFFIX='.'). Pattern-based by construction: it flags the
+    # PRACTICE regardless of the variable name people gave it.
+    stripped = text.strip()
+    value_is_delimiter = bool(stripped) and not any(c.isalnum() for c in stripped)
     common = dict(
         raw_name=raw_name,
         raw_value=val,
@@ -267,6 +275,7 @@ def classify_variable(name: str, value: str | None) -> ClassifiedVariable:
         flow_refs=flow_refs,
         global_refs=global_refs,
         has_adjacent_refs=has_adjacent,
+        value_is_delimiter=value_is_delimiter,
     )
 
     # precedence chain — see module docstring for the rationale

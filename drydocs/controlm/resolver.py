@@ -18,6 +18,18 @@ Semantics (vendor-bmc/controlm-variables.md + observed 9.0.x behavior):
       FILE_NAME_PREFIX (defined) and leaves the literal ``_``, even though
       ``FILE_NAME_PREFIX_`` is the maximal word token.
 
+  Concatenation delimiter.  A period directly between a variable reference
+      and a following ``%%`` reference (``%%A.%%B``) is Control-M's
+      concatenation *delimiter* — it terminates the name and is CONSUMED,
+      not emitted. Literal dots in a composed value therefore come from
+      variable *values*, not the template: the smuggled-dot pattern
+      ``%%PREFIX.%%DATE.%%SUFFIX.%%EXT`` with ``SUFFIX='.'`` resolves to
+      ``<prefix><date>.<ext>`` — the only surviving dot is SUFFIX's value.
+      (SME-confirmed against production, 2026-06-11.) A period after literal
+      text (``f.%%EXT``) is kept — it never terminated a variable name.
+      Note: the ``..`` literal-period escape is not handled here (this shop
+      smuggles dots via values, not ``..``); flagged in the metadata plan.
+
   Canonical tokens, not values.  System variables resolve at execution
       time, so they canonicalize to symbolic tokens: ``%%$ODATE`` ->
       ``{ODATE}``, ``%%ORDERID`` -> ``{ORDERID}``. Date arithmetic
@@ -123,6 +135,18 @@ class _Env:
         return None
 
 
+def _consume_delimiter(text: str, i: int) -> int:
+    """Skip a concatenation-delimiter period at ``i``.
+
+    Called immediately after a variable substitution: a single ``.`` that
+    sits between the just-substituted variable and a following ``%%``
+    reference is Control-M's name terminator — consumed, not emitted. A
+    period followed by anything other than ``%%`` is left for the normal
+    literal path (so ``%%VAR.txt`` keeps its dot; only ``%%A.%%B`` drops it).
+    """
+    return i + 1 if text.startswith(".%%", i) else i
+
+
 def _substitute_once(
     text: str, env: _Env, blocked: set[str]
 ) -> tuple[str, bool, set[str]]:
@@ -172,11 +196,11 @@ def _substitute_once(
         ):
             out.append(env[user_name])
             pass_seen.add(user_name)
-            i = j + len(user_name)
+            i = _consume_delimiter(text, j + len(user_name))
             changed = True
         elif is_system:
             out.append("{" + word.upper() + "}")
-            i = j + len(word)
+            i = _consume_delimiter(text, j + len(word))
             changed = True
         else:
             # no binding: keep the %%NAME text visible and move past it
