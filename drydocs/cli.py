@@ -27,7 +27,7 @@ from .controlm import (
     classify_job_variables,
     resolve_job,
 )
-from .controlm.staging import build_staging_rows, collect_jobs
+from .controlm.staging import build_staging_bundle, collect_jobs
 from .models import ControlMVariableRow
 from .loaders import seal_applications as seal_apps_mod
 from .loaders import seal_contacts as seal_contacts_mod
@@ -729,7 +729,7 @@ def normalize_variables(
 
     with adapter:
         jobs = collect_jobs(_validated())
-    variable_rows, quality_rows = build_staging_rows(jobs, run_id)
+    bundle = build_staging_bundle(jobs, run_id)
     ended_at = datetime.now(timezone.utc)
 
     run_row = {
@@ -740,28 +740,39 @@ def normalize_variables(
         "data_centers": ",".join(sorted({jd.data_center for jd in jobs.values()})),
         "src_job_count": len(jobs),
         "src_var_count": sum(len(jd.defs) for jd in jobs.values()),
-        "normalizer_version": "phase-a.1",
+        "normalizer_version": "phase-c.1",
         "notes": f"source={'oracle' if use_oracle else csv_path.name}; rejected={rejected}",
     }
 
     out_dir.mkdir(parents=True, exist_ok=True)
-    for name, rows in (
+    tables = (
         ("stg_run.csv", [run_row]),
-        ("stg_variable.csv", variable_rows),
-        ("stg_parse_quality.csv", quality_rows),
-    ):
+        ("stg_variable.csv", bundle.variable),
+        ("stg_parse_quality.csv", bundle.parse_quality),
+        ("stg_invocation.csv", bundle.invocation),
+        ("stg_file_op.csv", bundle.file_op),
+        ("stg_file_ref.csv", bundle.file_ref),
+        ("stg_notification.csv", bundle.notification),
+        ("stg_app_fact.csv", bundle.app_fact),
+    )
+    for name, rows in tables:
         path = out_dir / name
+        if not rows:
+            console.print(f"[yellow]{path} (0 rows — skipped)[/]")
+            continue
         with open(path, "w", encoding="utf-8", newline="") as fh:
             writer = _csv.DictWriter(fh, fieldnames=list(rows[0].keys()))
             writer.writeheader()
             writer.writerows(rows)
         console.print(f"[green]{path}[/] ({len(rows)} rows)")
 
-    fully = sum(1 for r in variable_rows if r["is_fully_resolved"] == "Y")
+    fully = sum(1 for r in bundle.variable if r["is_fully_resolved"] == "Y")
     console.print(
         f"run_id={run_id} jobs={len(jobs)} definitions={run_row['src_var_count']} "
-        f"stg_variable_rows={len(variable_rows)} "
-        f"fully_resolved={100 * fully / len(variable_rows):.1f}% rejected={rejected}"
+        f"variable={len(bundle.variable)} invocation={len(bundle.invocation)} "
+        f"file_op={len(bundle.file_op)} file_ref={len(bundle.file_ref)} "
+        f"notification={len(bundle.notification)} app_fact={len(bundle.app_fact)} "
+        f"fully_resolved={100 * fully / len(bundle.variable):.1f}% rejected={rejected}"
     )
 
 

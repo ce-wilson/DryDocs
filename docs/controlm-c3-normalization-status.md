@@ -18,7 +18,7 @@ and command parsing happen in **Python, not recursive SQL**.
 | DDL   | Staging schema for the DBA | **Delivered** — pending DBA execution (see below) |
 | A     | Variable extract + taxonomy classifier + staging output | **Code complete** — pending production run (see below) |
 | B     | Fixed-point variable resolver (offline AutoEdit simulation) | **Complete** |
-| C     | Command parsing: FileWatch / OS launcher registry / PRECMD-POSTCMD shell / AIAWSWLK | Not started |
+| C     | Command parsing: FileWatch / OS launcher registry / PRECMD-POSTCMD shell / AIAWSWLK | **Code complete** — registry grows iteratively (Phase E) |
 | D     | Graph load (staging → Neo4j under `:JobRun`) | Not started |
 | E     | TDQ loop (DQV measurements, launcher-registry growth from unparsed backlog) | Not started |
 
@@ -30,12 +30,15 @@ and command parsing happen in **Python, not recursive SQL**.
 | Variable extraction SQL | `drydocs/loaders/sql/controlm_variables.sql` |
 | Taxonomy classifier (9 kinds) | `drydocs/controlm/variables.py` |
 | Resolver (Phase B) | `drydocs/controlm/resolver.py` |
-| Staging-row builder | `drydocs/controlm/staging.py` |
+| Command parser + launcher registry (Phase C) | `drydocs/controlm/commands.py` |
+| Path canonicalizer + role classifier (Phase C) | `drydocs/controlm/paths.py` |
+| Fact / notification routing (Phase C) | `drydocs/controlm/facts.py` |
+| Staging-row builder (all 8 STG_ tables) | `drydocs/controlm/staging.py` |
 | Coverage report | `drydocs/controlm/variable_report.py` |
 | Row model (accepts raw extract headers) | `drydocs/models/controlm.py` → `ControlMVariableRow` |
 | Sample fixture (323 real rows) | `drydocs/data/samples/controlm_variables__sample.csv` |
-| Vendor reference (validated against) | `vendor-bmc/controlm-variables.md` |
-| Tests (62 across classifier/resolver/staging) | `tests/unit/test_variable_{classifier,resolver,staging}.py` |
+| Vendor reference (validated against) | `vendor-bmc/controlm-{variables,os-job-parameters,file-watcher,api-job-types,file-transfer-job}.md` |
+| Tests (102 across classifier/resolver/staging/commands) | `tests/unit/test_{variable_classifier,variable_resolver,variable_staging,command_parser}.py` |
 
 CLI (no Neo4j needed):
 
@@ -43,6 +46,32 @@ CLI (no Neo4j needed):
 drydocs analyze-variables [--csv FILE] [--delimiter "|"] [--use-oracle] [--resolve]
 drydocs normalize-variables [--csv FILE] [--delimiter "|"] [--use-oracle] --out-dir DIR
 ```
+
+`normalize-variables` now writes all 8 staging files: stg_run, stg_variable,
+stg_parse_quality, **stg_invocation, stg_file_op, stg_file_ref,
+stg_notification, stg_app_fact**.
+
+## Phase C design notes (for Phase E registry growth)
+
+- **Launcher registry** lives in `commands.py::LAUNCHER_REGISTRY` — a list of
+  `(regex on executable basename, invocation_type, rule_id)`. Add a rule;
+  don't touch parser logic. Seeded types: ABINITIO (`.m`, dtlaunch.sh),
+  INFORMATICA (pmcmd, `m_*`), VALIDATION_UTIL (run_data_validation.sh,
+  run_calp_temp.sh), PYTHON/PYSPARK, SHELL_SCRIPT, FILE_TRANSFER, UNKNOWN.
+- **Unmatched executables** → `invocation_type=UNKNOWN`, surfaced in
+  `ParsedCommand.unparsed`; these drive registry growth. On the sample, zero
+  UNKNOWN remain after seeding.
+- **Shell quoting gotcha (fixed):** production PRECMD/POSTCMD often wrap the
+  whole shell string in double quotes; `split_statements` strips a single
+  fully-enclosing quote pair before splitting on `;`/`|`/`&&`.
+- **File ops** (`mkdir/cp/mv/rm/rmdir/sed/chmod/...`) → STG_FILE_OP; verb set
+  matches the vendor pre/post-transfer command list. **Container overrides**
+  (UCM) → inner command extracted and re-parsed (the `python /app/app.py`
+  case). **FileWatch `*FILE_PATH`** → STG_FILE_REF WATCH_INPUT.
+- **Vendor nuance recorded:** controlm-os-job-parameters.md says folder
+  variables don't transfer to job *scripts* — that's the runtime shell env,
+  NOT Control-M %%-substitution into command fields, so Phase B folder→job
+  resolution remains correct for parsing.
 
 ---
 

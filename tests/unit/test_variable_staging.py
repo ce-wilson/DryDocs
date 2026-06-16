@@ -4,7 +4,11 @@ from __future__ import annotations
 from pathlib import Path
 
 from drydocs.adapters.csv_adapter import CsvAdapter
-from drydocs.controlm.staging import build_staging_rows, collect_jobs
+from drydocs.controlm.staging import (
+    build_staging_bundle,
+    build_staging_rows,
+    collect_jobs,
+)
 from drydocs.models import ControlMVariableRow
 
 SAMPLE = (
@@ -105,6 +109,70 @@ def test_env_variant_extra_rows() -> None:
     assert variants["D"]["is_fully_resolved"] == "Y"
     # variant rows share the base row's ordinal (same source definition)
     assert {r["src_ordinal"] for r in script} == {base[0]["src_ordinal"]}
+
+
+# every column of the Phase-C tables, in DDL order (minus identity PK)
+STG_INVOCATION_COLUMNS = [
+    "run_id", "data_center", "folder_id", "job_id", "seq",
+    "invocation_source", "invocation_type", "executable_path",
+    "script_path", "config_path", "args_json", "raw_command",
+    "is_classified", "classifier_rule",
+]
+STG_FILE_OP_COLUMNS = [
+    "run_id", "data_center", "folder_id", "job_id", "seq", "op_type",
+    "src_pattern", "tgt_pattern", "source_field", "raw_statement",
+]
+STG_APP_FACT_COLUMNS = [
+    "run_id", "data_center", "folder_id", "job_id", "fact_type",
+    "fact_value", "environment", "source_var",
+]
+
+
+def test_bundle_routes_shell_to_invocation_and_file_ops() -> None:
+    jobs = collect_jobs([
+        _row("100", "2", "%%POSTCMD",
+             "sh /x/run_data_validation.sh TBL,{ODATE},YES; mv a b"),
+    ])
+    bundle = build_staging_bundle(jobs, "run-1")
+    assert list(bundle.invocation[0].keys()) == STG_INVOCATION_COLUMNS
+    assert bundle.invocation[0]["invocation_type"] == "VALIDATION_UTIL"
+    assert list(bundle.file_op[0].keys()) == STG_FILE_OP_COLUMNS
+    assert bundle.file_op[0]["op_type"] == "MOVE"
+    q = bundle.parse_quality[0]
+    assert q["cmd_present"] == "Y" and q["cmd_classified"] == "Y"
+
+
+def test_bundle_routes_facts_and_notifications() -> None:
+    jobs = collect_jobs([
+        _row("100", "2", "%%SEAL", "34544"),
+        _row("100", "2", "%%NOTIFY", "a@x.com;b@x.com"),
+    ])
+    bundle = build_staging_bundle(jobs, "run-1")
+    assert list(bundle.app_fact[0].keys()) == STG_APP_FACT_COLUMNS
+    assert bundle.app_fact[0]["fact_type"] == "SEAL"
+    assert len(bundle.notification) == 2
+
+
+def test_bundle_routes_filewatch_path() -> None:
+    jobs = collect_jobs([
+        _row("100", "2", "%%FileWatch-FILE_PATH",
+             "/data/dropbox/RPM/tbl_{ODATE}.dat"),
+    ])
+    bundle = build_staging_bundle(jobs, "run-1")
+    assert bundle.file_ref[0]["ref_role"] == "WATCH_INPUT"
+    assert bundle.file_ref[0]["date_token"] == "{ODATE}"
+
+
+def test_sample_bundle_smoke() -> None:
+    with CsvAdapter(SAMPLE) as adapter:
+        rows = [ControlMVariableRow.model_validate(r) for r in adapter.rows()]
+    bundle = build_staging_bundle(collect_jobs(rows), "run-sample")
+    # all invocations classified or routed (no UNKNOWN leakage from the sample)
+    assert all(i["invocation_type"] != "UNKNOWN" for i in bundle.invocation)
+    # facts + notifications + file refs all present
+    assert bundle.app_fact and bundle.notification and bundle.file_ref
+    assert any(i["invocation_type"] == "VALIDATION_UTIL" for i in bundle.invocation)
+    assert any(i["invocation_type"] == "PYTHON" for i in bundle.invocation)
 
 
 def test_sample_end_to_end_counts() -> None:
