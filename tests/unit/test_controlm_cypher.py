@@ -146,18 +146,21 @@ def test_conditions_out_carries_sign() -> None:
 
 
 def test_conditions_share_composite_key() -> None:
-    """Both IN and OUT loaders key :Condition the same way so the same
-    node is shared when (folder_id, name, version_serial) matches."""
+    """Both IN and OUT loaders key :Condition the same way so the same node
+    is shared when (folder_id, name) matches. version_serial was dropped
+    from the key in the constraints correction (condition_key is now
+    (folder_id, name) only — see constraints.cypher)."""
     for name in ("controlm_conditions_in.cypher", "controlm_conditions_out.cypher"):
         text = (CYPHER_DIR / name).read_text(encoding="utf-8")
         assert "folder_id: row.folder_id" in text
         assert "name: row.condition_name" in text
-        assert "version_serial: row.version_serial" in text
 
 
 def test_dependencies_materializes_derived_edge() -> None:
     text = (CYPHER_DIR / "controlm_dependencies_derived.cypher").read_text(encoding="utf-8")
-    assert ":DEPENDS_ON" in text
+    # the derived predecessor edge is :WAS_INFORMED_BY (PROV-O wasInformedBy),
+    # not the earlier :DEPENDS_ON working name
+    assert ":WAS_INFORMED_BY" in text
     assert "derived" in text
     assert "via_condition" in text
     assert "recursion_level" in text
@@ -208,7 +211,9 @@ def test_recursive_sql_cyclic_type_disabled() -> None:
 # ---- Ontology supplement -------------------------------------------------
 
 def test_m3_supplement_wires_to_prov_anchors() -> None:
-    text = (SCHEMA_DIR / "m3_ontology_supplement.cypher").read_text(encoding="utf-8")
+    # m3_ontology_supplement.cypher was renamed to ontology_supplement.cypher
+    # in the schema consolidation (bootstrap step 3).
+    text = (SCHEMA_DIR / "ontology_supplement.cypher").read_text(encoding="utf-8")
     assert "SUBCLASS_OF" in text
     assert "http://www.w3.org/ns/prov#Collection" in text
     assert "http://www.w3.org/ns/prov#Activity" in text

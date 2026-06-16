@@ -18,7 +18,10 @@ CONSTRAINTS_FILE = SCHEMA_DIR / "constraints.cypher"
 ONTOLOGY_FILE    = SCHEMA_DIR / "ontology.cypher"
 VOCAB_FILE       = ONTOLOGY_DIR / "relationship_vocabulary.yaml"
 
-EXPECTED_CONSTRAINTS = 33
+# 35 after schema consolidation: m3_constraints_upgrade.cypher absorbed into
+# constraints.cypher + the PAT area_product_id constraint. Bump this when you
+# intentionally add/remove a CREATE CONSTRAINT.
+EXPECTED_CONSTRAINTS = 35
 
 EXPECTED_ONTOLOGY_LABELS = [
     "DprodClass",

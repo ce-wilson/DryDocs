@@ -16,7 +16,7 @@ def test_real_folder_name_from_recursive_sample() -> None:
     assert p.lob == "Retail"
     assert p.app_code == "ARA"
     assert p.folder_type_code == "G"
-    assert p.folder_type == "Smart folder"
+    assert p.folder_type == "Group Table/Smart folder"
     assert p.segments == ("HLDM", "111027", "PEX", "RFND", "DLY")
 
 
@@ -31,7 +31,7 @@ def test_auto_appcode() -> None:
     p = parse_folder_name("PRAUTG-AUTO-15001-AUT-RFND-DLY")
     assert p.app_code == "AUT"
     assert p.lob == "Retail"
-    assert p.folder_type == "Smart folder"
+    assert p.folder_type == "Group Table/Smart folder"
 
 
 def test_no_segments_after_prefix() -> None:
