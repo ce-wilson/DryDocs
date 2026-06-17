@@ -1,4 +1,24 @@
-"""Control-M domain utilities."""
+"""Control-M domain utilities.
+
+Definition interchange format
+-----------------------------
+The target environment (Control-M 9.0.21.300) imports and exports job &
+folder *definitions* as **XML**. XML is therefore the **primary source and
+sink** for the remediation spin-off: import the **legacy** definition XML,
+analyze/normalize it here, and export a **greenfield** definition XML — the
+greenfield XML is the artifact handed to the dev team as a Jira (they hold
+deploy rights; we author, per SoD).
+
+The Oracle extract (``psgmgr.*``) and the Neo4j graph are the **corroborating
+source of truth**: a parsed legacy XML must reconcile with the loaded snapshot,
+and a greenfield XML is trusted only once it re-derives the same resolved
+behavior (offline equivalence proof).
+
+NOTE: XML is being **phased out** — BMC's SaaS direction replaces it with the
+**JSON Automation API** (name-as-key; see ``vendor-bmc/controlm-api-*.md``).
+Keep import/export behind a format-agnostic interface so a JSON backend can be
+added when the platform migrates; do not bake XML assumptions into the engine.
+"""
 from .commands import (
     Invocation,
     FileOp,
