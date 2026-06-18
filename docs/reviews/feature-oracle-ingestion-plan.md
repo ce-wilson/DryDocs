@@ -98,3 +98,39 @@ it ships; SQL-Developer-only work is invisible, untested on the real path, and n
 ports. **Data discipline:** commit only sanitized SQL *structure* — never paste real
 result rows into the (public) repo. Optional middle ground: SQLcl runs the committed
 `.sql` from the command line in thin mode if you want CLI without full plumbing.
+
+## Saving data locally (real result/sample data)
+
+Real data **never** goes in the repo (public producer). It lives **only** under
+`drydocs/data/` — which is gitignored — so the model can use it while it stays off
+GitHub.
+
+**Status check (the planned sample test case): present.** The sampling case from
+the prior iteration is saved locally at
+`drydocs/data/samples/controlm_variables__sample.csv` — **323 rows**, gitignored.
+The full `drydocs/data/samples/` set (folders, jobs, conditions, dependencies, SEAL,
+catalog) is also present. The four sample-backed tests run against it locally and
+skip elsewhere — exactly as designed.
+
+**Where it goes:**
+- **Inputs / samples** → `drydocs/data/samples/` (gitignored).
+- **Run output** → `drydocs/data/stg_out/` (gitignored). Note: `normalize-variables`
+  defaults to `stg_out/` at the repo root, which is **not** under `drydocs/data/`;
+  `.gitignore` now guards `stg_out/` and `/stg_*/`, but prefer
+  `--out-dir drydocs/data/stg_out` so output persists in the data area (and isn't
+  left in `/tmp`, where prior runs landed and were lost).
+
+**Format — what works best for the model:**
+- **CSV is the default** for tabular sample/extract/staging data. It's the
+  pipeline-native format (`CsvAdapter`, the `STG_*` outputs), the most
+  **token-efficient** for flat rows (no per-row key repetition), and the model reads
+  it directly. Use header rows.
+- **JSON only for nested / metadata** — run manifests, scope-bind records, the
+  scenario-coverage / `tree_*` snapshots, or columns that are themselves structured
+  (`args_json`). For flat rows JSON wastes tokens (repeated keys), so don't default
+  to it.
+- **Not Parquet** for model consumption — it's binary; the model can't read it
+  without a tool. Fine for archival/scale, not for handing to the model.
+
+Rule of thumb: **tabular → CSV; nested/metadata → JSON**; keep slices the model
+reads small, and never let real rows leave `drydocs/data/`.
