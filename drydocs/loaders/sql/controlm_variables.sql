@@ -23,6 +23,17 @@
 --   (verify whether CM_DEF_SETVAR carries its own IS_CURRENT_VERSION /
 --    VERSION_SERIAL like the LNKI/LNKO views; add the filter if so)
 --
+-- Scope binds  : optional, NULL = no filter on that dimension. Used for
+--                sampling and targeted re-pulls (pass NULL for the full
+--                population). The same four binds appear on every psgmgr
+--                extract; folder-grained extracts use only :folder_filter /
+--                :row_cap.
+--   :folder_filter  folder-name LIKE pattern (e.g. 'CCB_AUTO_%')
+--   :run_as         job run-as account (J.OWNER), exact match
+--   :employee_sid   owning employee SID — mapped to J.AUTHOR ** VERIFY: may
+--                   be OWNER or VERSION_USER depending on how SIDs are set **
+--   :row_cap        unordered sample cap (ROWNUM); NULL = unlimited
+--
 -- NOTE: duplicate (job, variable-name) definitions are legitimate in the
 -- source (observed: %%FileWatch-TIME_LIMIT defined twice on one job with
 -- different values). Do NOT dedupe here — definition order is preserved
@@ -47,4 +58,9 @@ JOIN   psgmgr.CM_DEF_VJOB  J  ON V.TABLE_ID = J.TABLE_ID
 JOIN   psgmgr.CM_DEF_VTAB  T  ON J.TABLE_ID = T.TABLE_ID
 WHERE  J.IS_CURRENT_VERSION = '1'
   AND  T.USER_DAILY IS NOT NULL
+  -- optional scope (any bind NULL = no filter on that dimension)
+  AND  (:folder_filter IS NULL OR T.SCHED_TABLE LIKE :folder_filter)
+  AND  (:run_as        IS NULL OR J.OWNER        =  :run_as)
+  AND  (:employee_sid  IS NULL OR J.AUTHOR       =  :employee_sid)  -- ** VERIFY column **
+  AND  (:row_cap       IS NULL OR ROWNUM        <=  :row_cap)
 ;

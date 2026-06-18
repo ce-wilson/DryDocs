@@ -107,7 +107,7 @@ def _csv_adapter(csv_path: Path) -> CsvAdapter:
     return CsvAdapter(csv_path)
 
 
-def _oracle_adapter(query: str) -> OracleAdapter:
+def _oracle_adapter(query: str, bind_params: dict | None = None) -> OracleAdapter:
     _, oracle_cfg, _ = load_settings()
     if not oracle_cfg.configured:
         console.print("[red]Oracle not configured.[/]")
@@ -117,7 +117,43 @@ def _oracle_adapter(query: str) -> OracleAdapter:
         password=oracle_cfg.password.get_secret_value(),
         dsn=oracle_cfg.dsn,
         query=query,
+        bind_params=bind_params,
     )
+
+
+def _scope_binds(
+    folder: str | None = None,
+    run_as: str | None = None,
+    employee_sid: str | None = None,
+    row_cap: int | None = None,
+) -> dict:
+    """Build the standard psgmgr-extract scope binds.
+
+    Every Control-M extract SQL accepts these four `:bind` names with
+    NULL-tolerant predicates (a None value = no filter on that dimension).
+    Folder-grained extracts (folders, conditions) reference only
+    ``folder_filter`` / ``row_cap`` and ignore the rest — python-oracledb
+    drops named binds the statement does not use, so the full dict is safe to
+    pass to any extract.
+    """
+    return {
+        "folder_filter": folder,
+        "run_as": run_as,
+        "employee_sid": employee_sid,
+        "row_cap": row_cap,
+    }
+
+
+# Reusable scope CLI options — attach to any command that runs a psgmgr extract.
+_SCOPE_HELP = "psgmgr scope (Oracle only); omit for the full population."
+def _folder_opt():
+    return typer.Option(None, "--folder", help=f"Folder-name LIKE pattern, e.g. 'CCB_AUTO_%'. {_SCOPE_HELP}")
+def _run_as_opt():
+    return typer.Option(None, "--run-as", help=f"Job run-as account (OWNER), exact. {_SCOPE_HELP}")
+def _employee_sid_opt():
+    return typer.Option(None, "--employee-sid", help=f"Owning employee SID (AUTHOR — verify). {_SCOPE_HELP}")
+def _row_cap_opt():
+    return typer.Option(None, "--row-cap", help=f"Unordered ROWNUM sample cap. {_SCOPE_HELP}")
 
 
 # --- callback ---------------------------------------------------------------
@@ -339,6 +375,10 @@ def ingest_controlm(
         "--skip-part2",
         help="Stop after folders + jobs (M3 part 1 only).",
     ),
+    folder: str | None = _folder_opt(),
+    run_as: str | None = _run_as_opt(),
+    employee_sid: str | None = _employee_sid_opt(),
+    row_cap: int | None = _row_cap_opt(),
 ) -> None:
     """M3 chain: folders -> jobs -> conditions in/out -> derived dependencies.
 
@@ -346,8 +386,12 @@ def ingest_controlm(
     conditions MATCH their parent job by (folder_id, job_id); derived
     dependencies MATCH both endpoint jobs by the same composite key.
 
-    Run nightly in production; ad-hoc against samples in dev.
+    Run nightly in production; ad-hoc against samples in dev. With
+    --use-oracle, --folder / --run-as / --employee-sid / --row-cap scope every
+    extract in the chain (folder/row-cap apply to all; run-as/employee-sid
+    apply to the job, variable, and dependency-anchor extracts).
     """
+    scope = _scope_binds(folder, run_as, employee_sid, row_cap)
     stages: list[tuple[str, type[BaseLoader], str, str]] = [
         ("controlm_folders",     ControlMFoldersLoader,
          "controlm_folders__sample.csv",      "controlm_folders.sql"),
@@ -369,7 +413,7 @@ def ingest_controlm(
         for stage_name, cls, sample_csv, sql_file in stages:
             if use_oracle:
                 sql = (SQL_DIR / sql_file).read_text(encoding="utf-8")
-                adapter = _oracle_adapter(sql)
+                adapter = _oracle_adapter(sql, scope)
             else:
                 sample = samples_dir / sample_csv
                 adapter = _csv_adapter(sample)
@@ -543,6 +587,10 @@ def analyze_variables(
         False, "--resolve",
         help="Also run the Phase-B resolver (folder scope -> job scope) and report resolution coverage.",
     ),
+    folder: str | None = _folder_opt(),
+    run_as: str | None = _run_as_opt(),
+    employee_sid: str | None = _employee_sid_opt(),
+    row_cap: int | None = _row_cap_opt(),
 ) -> None:
     """Variable taxonomy coverage report (no Neo4j required).
 
@@ -551,11 +599,12 @@ def analyze_variables(
     MALFORMED), confirms _D/_Q/_P environment triplets per job, and prints
     the coverage numbers that validate the taxonomy. With --resolve, each
     job's definitions are resolved under its folder scope (Phase B) and
-    resolution coverage is reported.
+    resolution coverage is reported. With --use-oracle, --folder / --run-as /
+    --employee-sid / --row-cap scope the psgmgr extract.
     """
     if use_oracle:
         sql = (SQL_DIR / "controlm_variables.sql").read_text(encoding="utf-8")
-        adapter = _oracle_adapter(sql)
+        adapter = _oracle_adapter(sql, _scope_binds(folder, run_as, employee_sid, row_cap))
     else:
         adapter = CsvAdapter(csv_path, delimiter=delimiter)
         if not csv_path.exists():
@@ -694,13 +743,19 @@ def normalize_variables(
         Path("stg_out"), "--out-dir",
         help="Output directory for the STG_* load files.",
     ),
+    folder: str | None = _folder_opt(),
+    run_as: str | None = _run_as_opt(),
+    employee_sid: str | None = _employee_sid_opt(),
+    row_cap: int | None = _row_cap_opt(),
 ) -> None:
     """Classify + resolve the variable extract and emit staging load files.
 
     Writes stg_variable.csv, stg_parse_quality.csv, and stg_run.csv with
     columns matching controlm_staging_ddl.sql exactly — load them into the
     DRYDOCS_STG schema via SQL Developer import or SQL*Loader. No database
-    write access required from this command.
+    write access required from this command. With --use-oracle, --folder /
+    --run-as / --employee-sid / --row-cap scope the extract (handy for fresh
+    samples from a single folder or owner).
     """
     import csv as _csv
     import uuid
@@ -708,7 +763,7 @@ def normalize_variables(
 
     if use_oracle:
         sql = (SQL_DIR / "controlm_variables.sql").read_text(encoding="utf-8")
-        adapter = _oracle_adapter(sql)
+        adapter = _oracle_adapter(sql, _scope_binds(folder, run_as, employee_sid, row_cap))
     else:
         if not csv_path.exists():
             console.print(f"[red]File not found: {csv_path}[/]")

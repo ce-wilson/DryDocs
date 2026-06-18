@@ -16,6 +16,10 @@
 -- Filter:
 --   L.IS_CURRENT_VERSION = '1'  — only current versions
 --   T.USER_DAILY IS NOT NULL    — only actively-scheduled folders
+--
+-- Scope binds (optional, NULL = no filter): :folder_filter (T.SCHED_TABLE
+-- LIKE) and :row_cap (ROWNUM sample cap). :run_as / :employee_sid are not
+-- applied here (no CM_DEF_VJOB join at condition grain).
 -- =============================================================================
 
 SELECT
@@ -33,4 +37,7 @@ FROM   psgmgr.CM_DEF_LNKO_P_VW L
 JOIN   psgmgr.CM_DEF_VTAB     T   ON L.TABLE_ID = T.TABLE_ID
 WHERE  L.IS_CURRENT_VERSION = '1'
   AND  T.USER_DAILY IS NOT NULL
+  -- optional scope (any bind NULL = no filter on that dimension)
+  AND  (:folder_filter IS NULL OR T.SCHED_TABLE LIKE :folder_filter)
+  AND  (:row_cap       IS NULL OR ROWNUM        <=  :row_cap)
 ;

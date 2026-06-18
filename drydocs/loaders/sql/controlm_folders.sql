@@ -15,6 +15,11 @@
 --
 -- The folder-level deletion columns (TBL_DELETION_*) are intentionally
 -- omitted from the projection — soft-deletes are out of scope for M3.
+--
+-- Scope binds (optional, NULL = no filter): :folder_filter (T.SCHED_TABLE
+-- LIKE) and :row_cap (ROWNUM sample cap). :run_as / :employee_sid do not
+-- apply at folder grain (no job/owner on CM_DEF_VTAB) — scope by folder, or
+-- use the job/variable extracts for owner scoping.
 -- =============================================================================
 
 SELECT
@@ -30,4 +35,7 @@ SELECT
     T.CAPTURE_DATE   AS capture_date
 FROM   psgmgr.CM_DEF_VTAB T
 WHERE  T.USER_DAILY IS NOT NULL
+  -- optional scope (any bind NULL = no filter on that dimension)
+  AND  (:folder_filter IS NULL OR T.SCHED_TABLE LIKE :folder_filter)
+  AND  (:row_cap       IS NULL OR ROWNUM        <=  :row_cap)
 ;

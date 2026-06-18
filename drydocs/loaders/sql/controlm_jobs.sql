@@ -15,6 +15,10 @@
 --                                  VARCHAR2(1) — the literal must be a
 --                                  string, not a number)
 --   T.USER_DAILY IS NOT NULL    — only actively-scheduled folders
+--
+-- Scope binds (optional, NULL = no filter; shared across all psgmgr extracts):
+--   :folder_filter  folder-name LIKE pattern   :run_as        J.OWNER exact
+--   :employee_sid   J.AUTHOR ** VERIFY **       :row_cap       ROWNUM sample cap
 -- =============================================================================
 
 SELECT
@@ -50,4 +54,9 @@ FROM   psgmgr.CM_DEF_VJOB J
 JOIN   psgmgr.CM_DEF_VTAB T   ON J.TABLE_ID = T.TABLE_ID
 WHERE  J.IS_CURRENT_VERSION = '1'
   AND  T.USER_DAILY IS NOT NULL
+  -- optional scope (any bind NULL = no filter on that dimension)
+  AND  (:folder_filter IS NULL OR T.SCHED_TABLE LIKE :folder_filter)
+  AND  (:run_as        IS NULL OR J.OWNER        =  :run_as)
+  AND  (:employee_sid  IS NULL OR J.AUTHOR       =  :employee_sid)  -- ** VERIFY column **
+  AND  (:row_cap       IS NULL OR ROWNUM        <=  :row_cap)
 ;

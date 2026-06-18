@@ -23,13 +23,15 @@
 --      that the Neo4j loader uses as a stable key for the derived
 --      :DEPENDS_ON edges.
 --
--- Bind variable:
---   :folder_filter   one-or-many folder names to anchor the recursion.
---                    Use Oracle list-IN-binding syntax or pre-expand
---                    the list in application code. Example:
---                       'PRARAG-HLDM-111027-PEX-RFND-DLY'
---                    Replace with '%' or expand to all folders to derive
---                    dependencies across the full estate.
+-- Scope binds (optional, NULL = no filter; scope the ANCHOR set only —
+-- recursion then walks predecessors across folder boundaries):
+--   :folder_filter  anchor folder-name LIKE pattern (e.g.
+--                   'PRARAG-HLDM-111027-PEX-RFND-DLY' or 'CCB_AUTO_%');
+--                   NULL anchors on the whole estate.
+--   :run_as         anchor job run-as account (JOB_DEF.OWNER), exact
+--   :employee_sid   anchor owning employee SID — JOB_DEF.AUTHOR ** VERIFY **
+--   :row_cap        unordered sample cap (ROWNUM) on the final result
+-- NOTE: :folder_filter is now a scalar LIKE pattern, not an IN-list.
 -- =============================================================================
 
 WITH RecursiveJobDependencies (
@@ -79,7 +81,10 @@ WITH RecursiveJobDependencies (
                  AND JOB_DEF.JOB_ID         = LNKI.JOB_ID
                  AND JOB_DEF.VERSION_SERIAL = LNKI.VERSION_SERIAL
         WHERE  TAB_DEF.USER_DAILY IS NOT NULL
-          AND  JOB_DEF.PARENT_TABLE IN (:folder_filter)
+          -- optional scope on the anchor set (NULL bind = no filter)
+          AND  (:folder_filter IS NULL OR JOB_DEF.PARENT_TABLE LIKE :folder_filter)
+          AND  (:run_as        IS NULL OR JOB_DEF.OWNER        =  :run_as)
+          AND  (:employee_sid  IS NULL OR JOB_DEF.AUTHOR       =  :employee_sid)  -- ** VERIFY column **
     ) J_SUB
     JOIN (
         SELECT DISTINCT
@@ -181,5 +186,6 @@ SELECT
     dependency_path
 FROM   RecursiveJobDependencies
 WHERE  recursion_level < 30
+  AND  (:row_cap IS NULL OR ROWNUM <= :row_cap)   -- optional unordered sample cap
 ORDER BY in_job_name, recursion_level
 ;

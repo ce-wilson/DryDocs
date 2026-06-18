@@ -23,6 +23,15 @@ SAMPLE = (
     / "drydocs" / "data" / "samples" / "controlm_variables__sample.csv"
 )
 
+# The production extract is gitignored (stays company-side / regenerate via
+# `normalize-variables --use-oracle`). Tests that read it are skipped — not
+# failed — where it is absent, so the suite is green on any clone. The inline
+# cases below give deterministic, CSV-free coverage of every classifier path.
+requires_sample = pytest.mark.skipif(
+    not SAMPLE.exists(),
+    reason="production sample CSV absent (gitignored); regenerate locally via psgmgr",
+)
+
 
 # --- single-definition classification ----------------------------------------
 
@@ -204,6 +213,7 @@ def test_model_accepts_raw_extract_headers() -> None:
     assert row.data_center is None
 
 
+@requires_sample
 def test_sample_classifies_end_to_end() -> None:
     per_job: dict[tuple, list[tuple[str, str | None]]] = {}
     with CsvAdapter(SAMPLE) as adapter:

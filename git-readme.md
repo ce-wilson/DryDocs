@@ -151,28 +151,49 @@ any of these, keep `staging` downstream of the rest.
 
 ## Acceptance oracle — how the company side confirms the port landed
 
-The code is re-applied, not byte-compared, so **these numbers are the contract.**
-After applying, on the company side:
+The code is re-applied, not byte-compared, so behavior is the contract. The
+variable-stream tests split in two: most are **inline** (no data file) and run
+anywhere; a few read the **production sample CSV**, which is `.gitignore`d and
+does not transfer. So there are two tracks.
+
+### Track 1 — portable (any clone, no sample present)
 
 ```
 poetry run pytest tests/unit/test_variable_classifier.py \
                   tests/unit/test_variable_resolver.py \
                   tests/unit/test_variable_staging.py \
                   tests/unit/test_command_parser.py -q
-poetry run drydocs normalize-variables --out-dir stg_out   # writes 8 CSVs
 ```
 
-Expected (verified against the bundled sample, 2026-06-18):
+Expect **86 passed, 3 skipped** — the 3 skips are the sample-backed tests
+(`test_sample_*`), which skip (not fail) when the production CSV is absent. Full
+suite `pytest tests/unit/` is green: passing + sample-skips + the 4 `test_schema.py`
+PyYAML skips. **Zero failures is the Track-1 contract.** A `FileNotFoundError` on
+`controlm_variables__sample.csv` means the skip guard was lost in the port.
 
-- **89 passed** across the four variable-stream files.
-- `pytest tests/unit/` green overall: **159 passed, 4 skipped** (the skips are
-  `test_schema.py` YAML checks that no-op when PyYAML is not installed — not failures).
-- `normalize-variables` on the bundled sample emits: jobs=82, definitions=323,
-  `stg_variable`=326, `stg_parse_quality`=82, **`stg_invocation`=6, `stg_file_op`=16,
-  `stg_file_ref`=92, `stg_notification`=14, `stg_app_fact`=66**, fully_resolved=86.2%.
+### Track 2 — full (production sample present, or pulled fresh from `psgmgr`)
 
-If a count drifts, the port is incomplete — diff the failing area against the phase
-descriptions below, not against commit hashes.
+Either restore a sample at `drydocs/data/samples/controlm_variables__sample.csv`,
+or pull fresh (read-only):
+
+```
+poetry run drydocs normalize-variables --use-oracle --folder 'CCB_AUTO_%' --row-cap 5000 --out-dir stg_out
+```
+
+With the **bundled sample**, the counts are deterministic and verified
+(2026-06-18): the four-file suite is **89 passed**; `normalize-variables` emits
+jobs=82, definitions=323, `stg_variable`=326, `stg_parse_quality`=82,
+**`stg_invocation`=6, `stg_file_op`=16, `stg_file_ref`=92, `stg_notification`=14,
+`stg_app_fact`=66**, fully_resolved=86.2%.
+
+With a **fresh production pull** the counts will differ (different population) — so
+judge it on *runs clean, no `UNKNOWN` invocation leakage, plausible coverage %*,
+not the bundled numbers. Every `psgmgr` extract accepts the scope binds
+`--folder` / `--run-as` / `--employee-sid` / `--row-cap` (NULL = full population);
+use them to keep a fresh pull small and targeted.
+
+If a Track-1 test fails (not skips), the port is incomplete — diff the failing
+area against the phase descriptions below, not against commit hashes.
 
 > **History:** before `62753b3`, six tests in `test_schema.py`,
 > `test_folder_name_parser.py`, and `test_controlm_cypher.py` failed on `main`.

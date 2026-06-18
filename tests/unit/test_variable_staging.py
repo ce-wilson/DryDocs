@@ -3,6 +3,8 @@ from __future__ import annotations
 
 from pathlib import Path
 
+import pytest
+
 from drydocs.adapters.csv_adapter import CsvAdapter
 from drydocs.controlm.staging import (
     build_staging_bundle,
@@ -14,6 +16,14 @@ from drydocs.models import ControlMVariableRow
 SAMPLE = (
     Path(__file__).resolve().parents[2]
     / "drydocs" / "data" / "samples" / "controlm_variables__sample.csv"
+)
+
+# Gitignored production extract — skip (don't fail) the sample-backed tests
+# where it is absent, so the suite is green on any clone. Inline cases above
+# cover staging routing deterministically without it.
+requires_sample = pytest.mark.skipif(
+    not SAMPLE.exists(),
+    reason="production sample CSV absent (gitignored); regenerate locally via psgmgr",
 )
 
 # every column of STG_VARIABLE except the identity PK, in DDL order
@@ -163,6 +173,7 @@ def test_bundle_routes_filewatch_path() -> None:
     assert bundle.file_ref[0]["date_token"] == "{ODATE}"
 
 
+@requires_sample
 def test_sample_bundle_smoke() -> None:
     with CsvAdapter(SAMPLE) as adapter:
         rows = [ControlMVariableRow.model_validate(r) for r in adapter.rows()]
@@ -175,6 +186,7 @@ def test_sample_bundle_smoke() -> None:
     assert any(i["invocation_type"] == "PYTHON" for i in bundle.invocation)
 
 
+@requires_sample
 def test_sample_end_to_end_counts() -> None:
     with CsvAdapter(SAMPLE) as adapter:
         rows = [ControlMVariableRow.model_validate(r) for r in adapter.rows()]
