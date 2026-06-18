@@ -124,24 +124,33 @@ def _oracle_adapter(query: str, bind_params: dict | None = None) -> OracleAdapte
 def _scope_binds(
     folder: str | None = None,
     run_as: str | None = None,
+    developer_sid: str | None = None,
     row_cap: int | None = None,
 ) -> dict:
     """Build the standard psgmgr-extract scope binds.
 
-    Every Control-M extract SQL accepts these `:bind` names with NULL-tolerant
-    predicates (a None value = no filter on that dimension). Folder-grained
-    extracts (folders, conditions) reference only ``folder_filter`` /
-    ``row_cap`` and ignore ``run_as`` — python-oracledb drops named binds the
-    statement does not use, so the full dict is safe to pass to any extract.
+    NULL-tolerant: a None value = no filter on that dimension. Folder-grained
+    extracts (folders, conditions) ignore ``run_as``; python-oracledb drops
+    named binds a statement does not use, so the full dict is safe everywhere.
 
-    Employee-SID scoping is intentionally absent here: employee identity is not
-    on the definition rows — it lives in the action-audit table
-    psgmgr.CM_AUD_ACTS, so it belongs on a future audit extract (configure
-    later). ``run_as`` is the tenant FID (service) user the job runs as.
+      folder_filter  folder-name LIKE pattern
+      run_as         tenant FID (service) user the job runs as — J.OWNER
+      developer_sid  human developer who authored/changed the definition;
+                     matched on J.AUTHOR / J.CREATION_USER / J.CHANGE_USERID
+                     (jobs) and T.LAST_UPDATED_USER (folders/conditions),
+                     joined back to the employee hierarchy. Control-M SIDs
+                     start with a lowercase letter; a SID ending in lowercase
+                     'p' is the automation release process, not a person.
+      row_cap        unordered ROWNUM sample cap
+
+    Operational employee identity (who *ran* actions, vs who authored the
+    definition) is separate and not here — it lives in psgmgr.CM_AUD_ACTS;
+    wire it on a future audit extract.
     """
     return {
         "folder_filter": folder,
         "run_as": run_as,
+        "developer_sid": developer_sid,
         "row_cap": row_cap,
     }
 
@@ -152,6 +161,8 @@ def _folder_opt():
     return typer.Option(None, "--folder", help=f"Folder-name LIKE pattern, e.g. 'CCB_AUTO_%'. {_SCOPE_HELP}")
 def _run_as_opt():
     return typer.Option(None, "--run-as", help=f"Tenant FID (service) user the job runs as — J.OWNER, exact. {_SCOPE_HELP}")
+def _developer_sid_opt():
+    return typer.Option(None, "--developer-sid", help=f"Developer SID who authored/changed the def — J.AUTHOR/CREATION_USER/CHANGE_USERID or folder LAST_UPDATED_USER. {_SCOPE_HELP}")
 def _row_cap_opt():
     return typer.Option(None, "--row-cap", help=f"Unordered ROWNUM sample cap. {_SCOPE_HELP}")
 
@@ -377,6 +388,7 @@ def ingest_controlm(
     ),
     folder: str | None = _folder_opt(),
     run_as: str | None = _run_as_opt(),
+    developer_sid: str | None = _developer_sid_opt(),
     row_cap: int | None = _row_cap_opt(),
 ) -> None:
     """M3 chain: folders -> jobs -> conditions in/out -> derived dependencies.
@@ -386,11 +398,11 @@ def ingest_controlm(
     dependencies MATCH both endpoint jobs by the same composite key.
 
     Run nightly in production; ad-hoc against samples in dev. With
-    --use-oracle, --folder / --run-as / --row-cap scope every extract in the
-    chain (folder/row-cap apply to all; run-as applies to the job and
-    dependency-anchor extracts).
+    --use-oracle, --folder / --run-as / --developer-sid / --row-cap scope every
+    extract in the chain (folder/developer-sid/row-cap apply to all; run-as
+    applies to the job, variable, and dependency-anchor extracts).
     """
-    scope = _scope_binds(folder, run_as, row_cap)
+    scope = _scope_binds(folder, run_as, developer_sid, row_cap)
     stages: list[tuple[str, type[BaseLoader], str, str]] = [
         ("controlm_folders",     ControlMFoldersLoader,
          "controlm_folders__sample.csv",      "controlm_folders.sql"),
@@ -588,6 +600,7 @@ def analyze_variables(
     ),
     folder: str | None = _folder_opt(),
     run_as: str | None = _run_as_opt(),
+    developer_sid: str | None = _developer_sid_opt(),
     row_cap: int | None = _row_cap_opt(),
 ) -> None:
     """Variable taxonomy coverage report (no Neo4j required).
@@ -598,11 +611,11 @@ def analyze_variables(
     the coverage numbers that validate the taxonomy. With --resolve, each
     job's definitions are resolved under its folder scope (Phase B) and
     resolution coverage is reported. With --use-oracle, --folder / --run-as /
-    --row-cap scope the psgmgr extract.
+    --developer-sid / --row-cap scope the psgmgr extract.
     """
     if use_oracle:
         sql = (SQL_DIR / "controlm_variables.sql").read_text(encoding="utf-8")
-        adapter = _oracle_adapter(sql, _scope_binds(folder, run_as, row_cap))
+        adapter = _oracle_adapter(sql, _scope_binds(folder, run_as, developer_sid, row_cap))
     else:
         adapter = CsvAdapter(csv_path, delimiter=delimiter)
         if not csv_path.exists():
@@ -743,6 +756,7 @@ def normalize_variables(
     ),
     folder: str | None = _folder_opt(),
     run_as: str | None = _run_as_opt(),
+    developer_sid: str | None = _developer_sid_opt(),
     row_cap: int | None = _row_cap_opt(),
 ) -> None:
     """Classify + resolve the variable extract and emit staging load files.
@@ -751,8 +765,8 @@ def normalize_variables(
     columns matching controlm_staging_ddl.sql exactly — load them into the
     DRYDOCS_STG schema via SQL Developer import or SQL*Loader. No database
     write access required from this command. With --use-oracle, --folder /
-    --run-as / --row-cap scope the extract (handy for fresh samples from a
-    single folder or run-as FID).
+    --run-as / --developer-sid / --row-cap scope the extract (handy for fresh
+    samples from a single folder, run-as FID, or developer).
     """
     import csv as _csv
     import uuid
@@ -760,7 +774,7 @@ def normalize_variables(
 
     if use_oracle:
         sql = (SQL_DIR / "controlm_variables.sql").read_text(encoding="utf-8")
-        adapter = _oracle_adapter(sql, _scope_binds(folder, run_as, row_cap))
+        adapter = _oracle_adapter(sql, _scope_binds(folder, run_as, developer_sid, row_cap))
     else:
         if not csv_path.exists():
             console.print(f"[red]File not found: {csv_path}[/]")

@@ -19,8 +19,10 @@
 -- Scope binds (optional, NULL = no filter; shared across all psgmgr extracts):
 --   :folder_filter  folder-name LIKE pattern
 --   :run_as         tenant FID (service) user — J.OWNER, exact
+--   :developer_sid  authoring developer SID — J.AUTHOR/CREATION_USER/CHANGE_USERID
+--                   (lowercase-initial; trailing 'p' = automation release process)
 --   :row_cap        ROWNUM sample cap
---   (employee-SID scoping is not here — see psgmgr.CM_AUD_ACTS, configure later)
+--   (operational who-ran-it identity is separate — psgmgr.CM_AUD_ACTS, later)
 -- =============================================================================
 
 SELECT
@@ -59,5 +61,6 @@ WHERE  J.IS_CURRENT_VERSION = '1'
   -- optional scope (any bind NULL = no filter on that dimension)
   AND  (:folder_filter IS NULL OR T.SCHED_TABLE LIKE :folder_filter)
   AND  (:run_as        IS NULL OR J.OWNER        =  :run_as)   -- tenant FID user
+  AND  (:developer_sid IS NULL OR :developer_sid IN (J.AUTHOR, J.CREATION_USER, J.CHANGE_USERID))
   AND  (:row_cap       IS NULL OR ROWNUM        <=  :row_cap)
 ;

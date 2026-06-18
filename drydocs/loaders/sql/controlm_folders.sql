@@ -17,9 +17,10 @@
 -- omitted from the projection — soft-deletes are out of scope for M3.
 --
 -- Scope binds (optional, NULL = no filter): :folder_filter (T.SCHED_TABLE
--- LIKE) and :row_cap (ROWNUM sample cap). :run_as does not apply at folder
--- grain (no job/owner on CM_DEF_VTAB) — use the job/variable extracts for
--- run-as scoping. (Employee-SID scoping lives in psgmgr.CM_AUD_ACTS; later.)
+-- LIKE), :developer_sid (last editor of the folder — T.LAST_UPDATED_USER),
+-- :row_cap (ROWNUM sample cap). :run_as does not apply at folder grain (no
+-- job/owner on CM_DEF_VTAB) — use the job/variable extracts for run-as
+-- scoping. (Operational who-ran-it identity is separate — CM_AUD_ACTS, later.)
 -- =============================================================================
 
 SELECT
@@ -36,6 +37,7 @@ SELECT
 FROM   psgmgr.CM_DEF_VTAB T
 WHERE  T.USER_DAILY IS NOT NULL
   -- optional scope (any bind NULL = no filter on that dimension)
-  AND  (:folder_filter IS NULL OR T.SCHED_TABLE LIKE :folder_filter)
-  AND  (:row_cap       IS NULL OR ROWNUM        <=  :row_cap)
+  AND  (:folder_filter IS NULL OR T.SCHED_TABLE       LIKE :folder_filter)
+  AND  (:developer_sid IS NULL OR T.LAST_UPDATED_USER =    :developer_sid)
+  AND  (:row_cap       IS NULL OR ROWNUM             <=    :row_cap)
 ;

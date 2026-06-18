@@ -189,9 +189,13 @@ jobs=82, definitions=323, `stg_variable`=326, `stg_parse_quality`=82,
 With a **fresh production pull** the counts will differ (different population) — so
 judge it on *runs clean, no `UNKNOWN` invocation leakage, plausible coverage %*,
 not the bundled numbers. Every `psgmgr` extract accepts the scope binds
-`--folder` and `--row-cap` (NULL = full population); job-bearing extracts also
-take `--run-as` (the tenant FID/service user, `J.OWNER`). Use them to keep a
-fresh pull small and targeted. (Employee-SID scoping is deferred — that identity
+`--folder`, `--developer-sid`, and `--row-cap` (NULL = full population);
+job-bearing extracts also take `--run-as`. `--run-as` = the tenant FID/service
+user (`J.OWNER`); `--developer-sid` = the human who authored/changed the def
+(`AUTHOR`/`CREATION_USER`/`CHANGE_USERID` on jobs, `LAST_UPDATED_USER` on
+folders) — Control-M SIDs start lowercase and a trailing lowercase `p` marks the
+automation release process, not a person. Use these to keep a fresh pull small
+and targeted. (Operational *who-ran-it* identity is separate and deferred — it
 lives in the action-audit table `psgmgr.CM_AUD_ACTS`, not the definition rows.)
 
 If a Track-1 test fails (not skips), the port is incomplete — diff the failing
