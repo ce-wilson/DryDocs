@@ -1,43 +1,93 @@
-# DryDocs — Merge / Rebase Guide
+# DryDocs — Port Guide (producer → company `main`)
 
-This repo diverges from the company baseline in several directions. Use this file
-when pulling changes across, or when rebasing local work onto the Control-M
-normalization stream.
+This repo is the **producer** side. Work is built here on `main`, committed, and
+pushed to `github.com/ce-wilson/DryDocs`. The **company** side fetches `main` and
+applies it onto company `main` (GitHub Enterprise). This file is the instruction
+set for that apply; it rides inside the repo, so the company-side reader has it.
+
+**The two histories are disjoint.** This repo was `git init`-ed fresh, not cloned
+from company `main`, so there is **no common ancestor** — git has no merge-base to
+3-way merge against. "Rebase" here therefore means **cherry-pick / `git am` the
+commits onto `main`**, and every path is exactly one of:
+
+- a **clean-add** — the path does not exist on `main`, so it applies untouched; or
+- a **collision** — both sides created the same path independently. Git **cannot**
+  auto-merge it (no base), so it must be reconciled by hand, every time.
+
+The job of this file is to tell the company-side reader which paths are which and
+what to keep in each collision. Direction is one-way (producer → company); company
+`main` never becomes a remote here, and nothing is pulled back.
+
+> Note on merge drivers: a `.gitattributes merge=ours` rule does **not** help here.
+> With no merge-base, cherry-pick keeps the current branch (company `main`) and
+> drops the incoming side — the opposite of porting work *in*. Use the **Canonical-
+> here** list below instead (take this repo's version wholesale for those paths).
+
+What diverges, by stream:
 
 - **Control-M C3/C4 normalization** (variable taxonomy → resolver → command parser) —
-  done **here first**, Phases A/B/C complete; push TO company, do not pull over.
-- **Product ontology** (PAT/SEAL roles, AreaProduct hierarchy) — take FROM this repo
-- **Schema consolidation** — patch files deleted, bootstrap order cleaned up; evaluate per file
-- **Internal standards** (`internal-standards/`) — folder-naming, data-center-naming,
-  description-metadata, calendar-projection plans; additive, take FROM this repo.
+  authored **here first**, Phases A/B/C complete; apply TO company, never overwrite locally.
+- **Product ontology** (PAT/SEAL roles, AreaProduct hierarchy) — take FROM this repo.
+- **Internal standards** (`internal-standards/`) — folder/data-center naming,
+  description-metadata + calendar-projection plans, and the Control-M **governance
+  corpus** (remediation flow, DAT/HLT naming, NFR catalog, escalation/SCIM, rules
+  registry); additive, take FROM this repo.
+- **Schema consolidation** — patch files deleted, bootstrap order cleaned up; evaluate per file.
 
 ---
 
-## Commit timeline (newest first)
+## Commit range to apply
+
+Don't hand-maintain a hash list — it goes stale and a rebase rewrites the SHAs.
+Regenerate it instead:
+
+The deliverable lives on `main` (the `controlm-spinoff` branch is not used for the
+port). On the company side, after fetching, list the commits to apply:
 
 ```
-62753b3  Realign stale tests with schema-consolidation refactors
-d3bac54  Refresh git-readme as A→B→C rebase guide
-cb6e056  Add Phase C command/script parser — invocations, file ops, file refs, facts
-520f9ca  Add Phase B variable resolver, staging output, and vendor-doc validation
-1f08b65  minor updates to settings and readme        (internal-standards/, bmc text)
-91882df  Add Control-M variable taxonomy (Phase A) and staging DDL
-f3f1a83  new sql
-6c5b7b5  update-pat-seal-roles
-0eb98a5  updated relationship_vocabulary.yaml to include new relationships
+git log --oneline --reverse cewilson/main    # full line — histories are disjoint, so all of it is "new" vs company main
 ```
 
-The three Control-M normalization commits are **`91882df` → `520f9ca` → `cb6e056`**
-(Phase A → B → C), applied in that order.
+Hashes are transferred intact by `git fetch`, so a SHA you see locally resolves
+identically on the company side once the branch is fetched. Identify commits by
+**subject**, not SHA. The Control-M normalization stream is the three commits with
+subjects **"…variable taxonomy (Phase A)…" → "…variable resolver… (Phase B)…" →
+"…Phase C command/script parser…"**, applied in that order; everything else is
+additive docs + ontology.
 
 ---
 
-# Rebasing local changes onto the Control-M stream (A → B → C)
+# Applying this work onto company `main` (disjoint histories)
 
-If you have local changes and need to land them on top of Phases A–C, this is the
-map of what each phase touched and where conflicts will surface.
+There is no merge-base, so this is a cherry-pick, not a true rebase. Each path is
+either a **clean-add** (applies untouched) or a **collision** (hand-reconcile).
 
-## Files added (no conflict risk — pure additions)
+## How the company side applies it
+
+```
+git remote add cewilson https://github.com/ce-wilson/DryDocs.git
+git fetch cewilson main
+git switch -c drydocs-port main
+git cherry-pick <oldest>^..<newest>     # range from the log command above
+```
+
+Clean-adds apply silently. Cherry-pick stops on each collision; resolve per the
+Collisions table, `git add`, then `git cherry-pick --continue`. Equivalent path:
+`git format-patch` on the producer side + `git am --3way` on the company side.
+
+## Canonical-here — take this repo's version wholesale on collision
+
+For these paths, **do not hand-merge** — this repo is authoritative; replace
+`main`'s version. They are local-authored in full:
+
+- `drydocs/controlm/` — the entire normalization package (Phase A/B/C).
+- `internal-standards/` — every file (naming standards, governance corpus, plans).
+- `drydocs/loaders/sql/controlm_variables.sql`, `drydocs/loaders/sql/ddl/controlm_staging_ddl.sql`.
+- `drydocs/ontology/relationship_vocabulary.yaml`, `drydocs/schema/catalog_ontology_supplement.cypher`.
+
+`drydocs/data/` is `.gitignore`d — sample CSVs stay local and never transfer.
+
+## Clean-adds — apply untouched (paths absent on company `main`)
 
 | File | Phase | Purpose |
 |---|---|---|
@@ -56,7 +106,21 @@ map of what each phase touched and where conflicts will surface.
 | `tests/unit/test_variable_staging.py` | B (ext. C) | |
 | `tests/unit/test_command_parser.py` | C | |
 
-## Files modified (potential conflict points)
+## Collisions — git cannot auto-merge; reconcile by hand
+
+Two kinds of row here, and they collide differently:
+
+- **Integration points** — `drydocs/cli.py`, `drydocs/models/controlm.py`,
+  `drydocs/models/__init__.py`. These are pre-existing DryDocs infrastructure, so
+  they exist on company `main` and **will** conflict — hand-merge per the column.
+- **Phase-evolution rows** — `drydocs/controlm/*.py` (`__init__.py`, `variables.py`,
+  `staging.py`, `variable_report.py`). The multi-phase tag describes how they grew
+  A→B→C *here*. They collide on the company side **only if** company `main` already
+  has a `drydocs/controlm/` package; if not, they're clean-adds. Either way they're
+  Canonical-here — take this repo's version, don't merge.
+
+With no merge-base, cherry-pick conflicts on each integration point. Resolve by
+preserving the column below.
 
 | File | Phases | What to preserve when resolving |
 |---|---|---|
@@ -83,20 +147,30 @@ variables.py      (no intra-package deps)
 `__init__.py` imports `staging` last (it pulls in everything). If you split or move
 any of these, keep `staging` downstream of the rest.
 
-## Sanity check after rebase
+## Acceptance oracle — how the company side confirms the port landed
+
+The code is re-applied, not byte-compared, so **these numbers are the contract.**
+After applying, on the company side:
 
 ```
 poetry run pytest tests/unit/test_variable_classifier.py \
                   tests/unit/test_variable_resolver.py \
                   tests/unit/test_variable_staging.py \
                   tests/unit/test_command_parser.py -q
-poetry run drydocs analyze-variables --resolve        # coverage tables
 poetry run drydocs normalize-variables --out-dir stg_out   # writes 8 CSVs
 ```
 
-Expect 102 passing in the four variable-stream files, and `pytest tests/unit/`
-green overall: **157 passed, 4 skipped** (the skips are `test_schema.py` YAML
-checks that no-op when PyYAML is not installed — not failures).
+Expected (verified against the bundled sample, 2026-06-18):
+
+- **89 passed** across the four variable-stream files.
+- `pytest tests/unit/` green overall: **159 passed, 4 skipped** (the skips are
+  `test_schema.py` YAML checks that no-op when PyYAML is not installed — not failures).
+- `normalize-variables` on the bundled sample emits: jobs=82, definitions=323,
+  `stg_variable`=326, `stg_parse_quality`=82, **`stg_invocation`=6, `stg_file_op`=16,
+  `stg_file_ref`=92, `stg_notification`=14, `stg_app_fact`=66**, fully_resolved=86.2%.
+
+If a count drifts, the port is incomplete — diff the failing area against the phase
+descriptions below, not against commit hashes.
 
 > **History:** before `62753b3`, six tests in `test_schema.py`,
 > `test_folder_name_parser.py`, and `test_controlm_cypher.py` failed on `main`.
@@ -107,6 +181,14 @@ checks that no-op when PyYAML is not installed — not failures).
 > work documented below. `62753b3` realigned them to the shipped code. If you
 > are rebasing across that boundary and see these resurface, take the updated
 > assertions — do not delete the tests; they guard live code.
+
+> **Concat-dot bugfix (`89d6648`):** `resolver.py` mishandled variable names
+> containing a dot-separator (e.g. `%%SCRIPT_PATH.%%ENV`). The token boundary
+> logic was treating the dot as part of the variable name rather than a literal
+> separator, causing over-substitution. If you are rebasing Phase B work across
+> this commit, re-verify resolver output on any variables that use the
+> `name.suffix` or `prefix.%%ref` concatenation pattern — the fix changes
+> resolved values, not just parse counts.
 
 ---
 
