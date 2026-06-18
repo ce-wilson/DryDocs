@@ -61,7 +61,7 @@ print(f"  folder_name parser: environment={p.environment} lob={p.lob} OK")
 # ── 3. Unit tests ─────────────────────────────────────────────────────────────
 Write-Host "  >> unit tests" -ForegroundColor Cyan
 poetry run pytest tests/unit/ -q 2>&1 | Select-Object -Last 4 | Write-Host
-Write-Host "     (4 pre-existing known failures are expected)" -ForegroundColor Yellow
+Write-Host "     (4 skipped: PyYAML not installed - expected)" -ForegroundColor Yellow
 
 Write-Host ""
 Write-Host "Smoke PASSED." -ForegroundColor Green

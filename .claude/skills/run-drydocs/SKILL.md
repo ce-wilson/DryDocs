@@ -27,7 +27,7 @@ This verifies:
 - CLI entry point (`drydocs --help`, subcommand `--help`)
 - All five Control-M Pydantic row models against bundled sample CSVs (8 folders, 13 jobs, 10 conditions_in, 10 dependencies)
 - Folder name parser (environment/LOB/type decoding)
-- Unit test suite (66 pass, 4 pre-existing known failures — see Gotchas)
+- Unit test suite (159 pass, 4 skipped — see Gotchas)
 
 ## Direct model/adapter invocation (for PRs touching internal code)
 
@@ -59,11 +59,21 @@ NEO4J_DATABASE=<database>
 
 Then:
 ```powershell
-poetry run drydocs check                  # verify Neo4j + APOC
-poetry run drydocs bootstrap              # apply constraints + ontology seed
-poetry run drydocs apply-m3-supplement    # seed ControlM anchor terms (idempotent)
-poetry run drydocs ingest-controlm        # full M3 chain: folders -> jobs -> conditions -> deps
-poetry run drydocs m3-verify              # assert 8 invariants; all should be "yes"
+poetry run drydocs check                       # verify Neo4j + APOC
+poetry run drydocs bootstrap                   # apply constraints + ontology seed
+poetry run drydocs apply-ontology-supplement   # base ontology (idempotent)
+poetry run drydocs apply-m3-supplement         # ControlM anchor terms (idempotent)
+poetry run drydocs apply-catalog-supplement    # Catalog ontology (idempotent)
+poetry run drydocs apply-seal-supplement       # SEAL ontology (idempotent)
+poetry run drydocs ingest-controlm             # full M3 chain: folders -> jobs -> conditions -> deps
+poetry run drydocs m1-verify                   # assert M1 invariants
+poetry run drydocs m3-verify                   # assert M3 invariants; all should be "yes"
+```
+
+Offline (no Neo4j):
+```powershell
+poetry run drydocs analyze-variables           # variable taxonomy coverage report
+poetry run drydocs load --help                 # single-loader: folders/jobs/conditions/deps from CSV or Oracle
 ```
 
 Sample-mode (bundled CSVs, no Oracle):
@@ -86,13 +96,12 @@ Same as agent path — DryDocs is pure CLI with no interactive TUI or GUI. Comma
 poetry run pytest tests/unit/ -v
 ```
 
-66 pass, 4 known failures (see Gotchas).
+159 pass, 4 skipped (see Gotchas).
 
 ## Gotchas
 
-**4 pre-existing test failures in the suite:**
-- `test_conditions_share_composite_key` and `test_dependencies_materializes_derived_edge`: tests assert `:DEPENDS_ON` relationship name, but the Cypher uses `:WAS_INFORMED_BY` (the PROV-O term). The tests are stale; the code is correct.
-- `test_real_folder_name_from_recursive_sample` and `test_auto_appcode`: tests expect `"Smart folder"` for type code `G`, but the parser returns `"Group Table/Smart folder"` (the BMC canonical term). Tests are stale.
+**4 skipped tests (PyYAML not installed):**
+`tests/unit/test_schema.py` has 4 tests that skip with `SKIPPED: PyYAML not installed`. PyYAML is not in `pyproject.toml`. These are expected skips, not failures.
 
 **CsvAdapter is a context manager, not iterable.** `list(adapter)` raises `TypeError: 'CsvAdapter' object is not iterable`. Always use `with CsvAdapter(...) as a: for r in a.rows()`.
 

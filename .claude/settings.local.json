@@ -29,7 +29,21 @@
       "Bash(dir /B \"C:\\\\coding\\\\projects\\\\DryDocs\\\\vendor-bmc\\\\controlm-*.md\")",
       "Bash(poetry -C /c/coding/projects/DryDocs run drydocs normalize-variables --out-dir /tmp/stg_out)",
       "Read(//tmp/stg_out/**)",
-      "Bash(git -C /c/coding/projects/DryDocs log --oneline -3)"
+      "Bash(git -C /c/coding/projects/DryDocs log --oneline -3)",
+      "Read(//tmp/stg_c/**)",
+      "Bash(poetry run *)",
+      "Bash(git -C /c/coding/projects/DryDocs show 1f08b65 --stat)",
+      "Bash(git -C /c/coding/projects/DryDocs add drydocs/cli.py drydocs/controlm/__init__.py drydocs/controlm/staging.py drydocs/controlm/commands.py drydocs/controlm/facts.py drydocs/controlm/paths.py tests/unit/test_command_parser.py tests/unit/test_variable_staging.py docs/controlm-c3-normalization-status.md)",
+      "Bash(git -C /c/coding/projects/DryDocs add git-readme.md)",
+      "Bash(grep -vE \"^\\(platform|cachedir|rootdir|configfile|plugins|collected|warnings summary|Docs:|=====|^$\\)\")",
+      "Bash(grep -vE \"^\\(platform|cachedir|rootdir|configfile|plugins|collected|warnings|Docs:|=====|^$\\)\")",
+      "Bash(git -C /c/coding/projects/DryDocs add tests/unit/test_schema.py tests/unit/test_folder_name_parser.py tests/unit/test_controlm_cypher.py)",
+      "Bash(git -C /c/coding/projects/DryDocs commit -m ' *)",
+      "Bash(python -m pytest tests/unit/test_variable_resolver.py tests/unit/test_variable_classifier.py -q)",
+      "Bash(python -m pytest -q)",
+      "Bash(xargs wc -l)",
+      "Bash(git checkout *)",
+      "PowerShell(cd C:\\\\coding\\\\projects\\\\DryDocs; powershell .claude/skills/run-drydocs/smoke.ps1 2>&1)"
     ]
   }
 }
