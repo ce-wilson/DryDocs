@@ -60,14 +60,14 @@ stay skipped — confirm with the operator if a new one appears.
 
 ## Track-1 acceptance (the contract)
 
+Run as a SINGLE line (multi-line `\` continuations break in some agent shells):
+
 ```
-poetry run pytest tests/unit/test_variable_classifier.py \
-                  tests/unit/test_variable_resolver.py \
-                  tests/unit/test_variable_staging.py \
-                  tests/unit/test_command_parser.py -q
+poetry run pytest tests/unit/test_variable_classifier.py tests/unit/test_variable_resolver.py tests/unit/test_variable_staging.py tests/unit/test_command_parser.py -q
 ```
 
-Expect **86 passed, 3 skipped, 0 failed**. The 3 skips are the sample-backed
+(If `poetry` is not on PATH, use `python -m pytest <same files> -q`.) Expect
+**86 passed, 3 skipped, 0 failed**. The 3 skips are the sample-backed
 tests (`test_sample_classifies_end_to_end`, `test_sample_bundle_smoke`,
 `test_sample_end_to_end_counts`) — the production CSV is gitignored and never
 transfers, so they skip, not fail. A `FileNotFoundError` instead of a skip means
