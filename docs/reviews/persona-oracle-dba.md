@@ -197,3 +197,86 @@ Open questions:
 
 → Handed to Phase 2 (Neo4j architect) for graph/ontology review of this staging
 design and the incremental→idempotent-MERGE-into-graph path.
+
+---
+
+## 1.8 Addenda from Phase 2 (Neo4j Architect review)
+
+Five additions to the Phase-1 design following the graph-side review. All are
+additive — no Phase-1 decision is reversed.
+
+**A — Date types at the Oracle→Python→Neo4j boundary.**
+`CAPTURE_DATE`, `VERSION_TIMESTAMP`, `LAST_UPDATED`, `ACTIVE_FROM`, `ACTIVE_TILL` are
+Oracle TIMESTAMP/DATE columns. The Python normalizer must convert these to ISO 8601
+strings before placing them in the batch dict (e.g. `col.isoformat()` for Python
+`datetime` objects). The Cypher loader files must then wrap them:
+```cypher
+SET j.capture_date      = datetime(row.capture_date),
+    j.version_timestamp = datetime(row.version_timestamp),
+    ...
+```
+This enables Neo4j temporal operators and range queries on these properties. The
+existing loaders set them as raw Python values (likely strings in some formats),
+which are stored as-is and do not support `datetime()` comparisons.
+
+**B — Stale-edge cleanup in the incremental batch loop.**
+The per-job delete+insert in `STG_` (Oracle) correctly captures the current state
+per changed job. However, the graph-side incremental loader must also delete stale
+edges (e.g. old `REQUIRES_IN_CONDITION` / `EMITS_OUT_CONDITION` edges) before
+re-asserting the current set. Add a new Cypher file:
+```
+drydocs/loaders/cypher/stale_edge_cleanup.cypher
+```
+Content:
+```cypher
+// Precondition: $changed_keys = [{folder_id, job_id}, ...] for the current batch.
+UNWIND $changed_keys AS key
+MATCH (j:ControlMJob {folder_id: key.folder_id, job_id: key.job_id})
+OPTIONAL MATCH (j)-[r:REQUIRES_IN_CONDITION|EMITS_OUT_CONDITION]->()
+DELETE r
+```
+This step runs immediately before the condition re-assert step in the
+`IncrementalControlMLoader` batch loop. It does not affect the Oracle staging
+design; it is a pure Neo4j graph operation.
+
+**C — Annotate `:JobRun` with `STG_LOAD_CONTROL` metadata.**
+After advancing the Oracle HWM in `STG_LOAD_CONTROL`, the Python incremental loader
+should also update the corresponding `:JobRun` node in Neo4j:
+```cypher
+MERGE (run:JobRun {run_id: $run_id})
+SET run.load_mode          = $load_mode,
+    run.hwm_version_serial = $hwm_version_serial,
+    run.hwm_capture_date   = datetime($hwm_capture_date),
+    run.rows_applied       = $rows_applied
+```
+This makes load provenance visible to graph-side tools without requiring a separate
+query to Oracle. No new DDL needed.
+
+**D — Developer SID → Employee graph edge (when Phase-1 open question 3 is resolved).**
+Once `CREATION_USER`/`CHANGE_USERID` on `CM_DEF_VJOB` are confirmed (open question
+3), the graph attribution link should be:
+```cypher
+// For each SID-bearing column in JOB_DEVELOPER_VIEW:
+MATCH (j:ControlMJob {folder_id: row.folder_id, job_id: row.job_id})
+MATCH (e:Employee {employee_id: row.developer_sid})   -- normalized SID
+MERGE (j)-[r:WAS_ASSOCIATED_WITH {role: row.role}]->(e)
+  ON CREATE SET r.first_seen_at = datetime($loaded_at)
+SET r.last_seen_at = datetime($loaded_at), r.last_run_id = $run_id
+```
+The `developer_sid` expression from `JOB_DEVELOPER_VIEW` (`UPPER(REGEXP_REPLACE(sid,
+'p$',''))`) must also be applied in Python before the MATCH. No new Oracle table is
+needed (no `STG_DEV_SID`). No new graph node type is needed (reuse `:Employee`).
+
+**E — `controlm_folders.cypher` must write `SCHEDULED_ON` not `RUNS_ON`.**
+The relationship vocabulary renamed `RUNS_ON` → `SCHEDULED_ON` for the
+folder→server placement edge. `controlm_folders.cypher` currently writes `RUNS_ON`.
+Update the loader before or alongside the incremental deployment:
+```cypher
+// In controlm_folders.cypher, change:
+MERGE (f)-[r:RUNS_ON]->(srv)
+// to:
+MERGE (f)-[r:SCHEDULED_ON]->(srv)
+```
+Include the one-time graph migration (create new edges, delete old) when the loader
+is updated. This is a single-loader change with a matching graph migration; the
+Oracle staging design is unaffected.
