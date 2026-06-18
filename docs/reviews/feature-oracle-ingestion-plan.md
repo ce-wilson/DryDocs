@@ -69,3 +69,24 @@ Each iteration fills content into the **fixed file set** above and commits on
 files the company already knows to take. Open questions that gate the work live in
 [persona-oracle-dba.md](persona-oracle-dba.md) §1.7 (confirm `CM_DEF_SETVAR`;
 `CAPTURE_DATE` semantics; `CREATION_USER`/`CHANGE_USERID` existence; retention).
+
+## Ad-hoc testing approach (decided)
+
+Split by purpose — don't force everything through one tool:
+
+- **Explore / discover → SQL Developer.** Fast, GUI, already connected via
+  thin-JDBC, real data stays local. Use it for the §1.7 open questions (confirm the
+  `CM_DEF_SETVAR` object, whether `CAPTURE_DATE` is per-row or per-snapshot, whether
+  `CREATION_USER`/`CHANGE_USERID` exist), eyeballing data, and prototyping a WHERE
+  clause. The project-via-VS-Code overhead is **not** worth it for one-off pokes.
+- **Validate / land → the project (VS Code, company-side checkout).** Once a query
+  or DDL is a keeper, move it into the repo SQL file and run it through the real
+  ship path — `drydocs … --use-oracle` + the `OracleAdapter` + `pytest`. That is the
+  only way to exercise what actually ships: bind variables, the Kerberos adapter,
+  idempotent re-runs. SQL Developer can't prove those.
+
+Why it benefits the project: the repo stays the source of truth and gets tested as
+it ships; SQL-Developer-only work is invisible, untested on the real path, and never
+ports. **Data discipline:** commit only sanitized SQL *structure* — never paste real
+result rows into the (public) repo. Optional middle ground: SQLcl runs the committed
+`.sql` from the command line in thin mode if you want CLI without full plumbing.
