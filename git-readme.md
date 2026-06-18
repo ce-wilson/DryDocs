@@ -1,8 +1,8 @@
-# DryDocs — Port Guide (producer → `I738092_jpmcgb/DryDocs`)
+# DryDocs — Port Guide (producer → `<company-org>/DryDocs`)
 
 This repo is the **producer** side. Work is built here on `main`, committed, and
 pushed to `github.com/ce-wilson/DryDocs`. The **company** target is
-`I738092_jpmcgb/DryDocs` on GitHub Enterprise (`[github]` host); its maintainer
+`<company-org>/DryDocs` on GitHub Enterprise (`[github]` host); its maintainer
 fetches `main` from the producer and applies it onto the company `main`. This file
 is the instruction set for that apply; it rides inside the repo, so the
 company-side reader has it.
@@ -59,7 +59,7 @@ additive docs + ontology.
 
 ---
 
-# Applying this work onto `I738092_jpmcgb/DryDocs` `main` (disjoint histories)
+# Applying this work onto `<company-org>/DryDocs` `main` (disjoint histories)
 
 There is no merge-base, so this is a cherry-pick, not a true rebase. Each path is
 either a **clean-add** (applies untouched) or a **collision** (hand-reconcile).
