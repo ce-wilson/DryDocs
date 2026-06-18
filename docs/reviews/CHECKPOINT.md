@@ -8,3 +8,6 @@ last_updated: 2026-06-18T00:00:00Z
 
 ## Log (one line per completed unit; newest at bottom)
 - (none yet)
+
+## Run log (one line per wake that had budget — tracks the VARIABLE daily reset; newest at bottom)
+- (none yet)

@@ -20,6 +20,13 @@ before the usage limit. If usage looks near-limit, finish the current append +
 checkpoint, then stop. When all phases are done, write the summary and set
 `status: COMPLETE`.
 
+**Variable reset / cadence.** The daily usage limit resets at a time that **varies
+day to day**, so the routine fires **hourly** rather than at a fixed clock time —
+most wakes may have no budget (cut off near-instantly, no harm) and the first wake
+after the reset resumes. As the FIRST action of each wake, append
+`- <ISO timestamp> wake` to `CHECKPOINT.md`'s `## Run log`; over days this run-log
+**tracks** when the reset actually makes budget available (no hardcoded time).
+
 **Secrets discipline:** keep all output architecture-level. Reference schema object
 names only (already in the repo). NO real SIDs, data values, credentials, emails,
 or the company GHE org. Save results **per persona** in the files below.
