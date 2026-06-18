@@ -72,18 +72,17 @@ existence-checked `CREATE TABLE/INDEX` (catch ORA-00955 / check `ALL_TABLES`);
 ```
 Advanced **only** after a committed batch — the restart point.
 
-**B. `STG_DEV_SID` — developer-SID dimension + the convention, encoded.**
+**B. Developer-SID normalization — inline expression, NO table this phase.**
+A materialized `STG_DEV_SID` dimension is **deferred to a later phase** (not
+needed yet). Until then, normalize the SID inline wherever it's used — strip the
+trailing automation `p` and canonicalize case:
+```sql
+UPPER(REGEXP_REPLACE(sid, 'p$', ''))            AS developer_sid   -- base human SID
+CASE WHEN sid LIKE '%p' THEN 'Y' ELSE 'N' END    AS is_automation   -- trailing lowercase p
 ```
-(sid            VARCHAR2 PRIMARY KEY,
- is_automation  CHAR(1),   -- 'Y' when REGEXP_LIKE(sid,'p$') AND lowercase-initial
- first_seen_run VARCHAR2, last_seen_run VARCHAR2,
- job_count      NUMBER)
-```
-Populated from `DISTINCT` of `AUTHOR/CREATION_USER/CHANGE_USERID` (jobs) +
-`LAST_UPDATED_USER` (folders). `is_automation` derives the trailing-`p` rule so the
-graph can separate human developers from the release process. (SIDs are mildly
-sensitive identity data — keep in `DRYDOCS_STG`, analyst read-only, never in the
-public producer repo.)
+(Detect on the raw value — `UPPER()` first would mask the lowercase-`p` marker.)
+This covers the scope-bind and attribution use cases with zero new objects or
+grants; promote to a real dimension only when query patterns justify it.
 
 **C. `STG_SAMPLE_MANIFEST` — sample provenance.**
 ```
@@ -97,8 +96,9 @@ scenario coverage that produced it.
 **D. Extend the base views (`CREATE OR REPLACE`, idempotent).**
 Add `CREATION_USER`, `CHANGE_USERID` to `JOB_DETAILED_VIEW`; add a
 `JOB_DEVELOPER_VIEW` that unions the four SID-bearing columns to one
-`(data_center, folder_id, job_id, role, sid, is_automation)` shape for the
-dev-SID scope + the dimension load.
+`(data_center, folder_id, job_id, role, sid)` shape, applying the inline
+`developer_sid` / `is_automation` expressions from **B** as derived columns —
+no dimension table.
 
 ---
 
@@ -167,8 +167,8 @@ tracks the overall run.
   system privilege.
 - **Python normalizer account — two new grants:**
   1. `SELECT, INSERT, UPDATE, DELETE ON STG_LOAD_CONTROL` (needs **UPDATE** to
-     advance the HWM), and `SELECT, INSERT, DELETE` on `STG_DEV_SID` /
-     `STG_SAMPLE_MANIFEST`.
+     advance the HWM), and `SELECT, INSERT, DELETE` on `STG_SAMPLE_MANIFEST`.
+     (No `STG_DEV_SID` — deferred; the inline SID expression needs no object.)
   2. **`UPDATE` on the existing staging tables** — incremental's per-job replace is
      delete+insert, so INSERT/DELETE still suffice there; **but** if any table moves
      to true row-level MERGE later, add `UPDATE`. Flag for the grant script.
@@ -178,8 +178,10 @@ tracks the overall run.
 
 ## 1.7 Summary & open decisions (for the user)
 
-**Recommended:** add `STG_LOAD_CONTROL`, `STG_DEV_SID`, `STG_SAMPLE_MANIFEST` and
-the view extensions as a new framework DDL file; implement incremental as
+**Recommended:** add `STG_LOAD_CONTROL` and `STG_SAMPLE_MANIFEST` plus the view
+extensions as a new framework DDL file (developer-SID handled inline via the
+`UPPER(REGEXP_REPLACE(sid,'p$',''))` expression — `STG_DEV_SID` dimension
+**deferred to a later phase**); implement incremental as
 **watermark (VERSION_SERIAL / hash) → changed-job extract → per-job delete+insert →
 commit+advance HWM**, keeping full-refresh as the baseline/rebuild path.
 
