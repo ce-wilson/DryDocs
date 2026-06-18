@@ -39,7 +39,7 @@ the accumulated lessons from prior ports. Read both.
 
 | Path | Resolution |
 |---|---|
-| `drydocs/cli.py` | Keep company `m6-verify`; **add** producer `analyze-variables` + `normalize-variables` and the `_scope_binds` / `--folder/--run-as/--developer-sid/--row-cap` options; merge imports. |
+| `drydocs/cli.py` | Keep company `m6-verify` (and `ingest-controlm-xml` etc.); **add** producer `analyze-variables` + `normalize-variables`, `m3-verify` (validates the ported M3 structural layer — keep it, it is **not** a stray), the `_scope_binds` / `--folder/--run-as/--developer-sid/--row-cap` options, and the `_oracle_adapter(query, bind_params=None)` change; merge imports. Confirm your `OracleAdapter` accepts `bind_params` and forwards it to `cursor.execute` (company Kerberos adapter already does). |
 | `drydocs/models/__init__.py` | Union — keep **all** row models from both sides in imports + `__all__`. |
 | `drydocs/models/controlm.py` | Keep company `ControlMQuantitativeRow`; add producer `ControlMVariableRow` (`AliasChoices` import is shared). |
 | `tests/unit/test_schema.py` | Keep company `EXPECTED_CONSTRAINTS = 44` (ahead of producer's 35). |
