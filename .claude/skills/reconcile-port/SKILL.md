@@ -57,6 +57,11 @@ stay skipped — confirm with the operator if a new one appears.
 - Condition key: `scope_key` vs producer `folder_id`.
 - Suite size: company suite is much larger (scrapers/Confluence). **Do not chase
   the producer's `159 passed` full-suite number** — only zero *new* failures matters.
+- `drydocs/adapters/oracle_adapter.py`: company version is **Kerberos-aware**
+  (thick via `_init_thick_client` / `externalauth` when `ORACLE_KERBEROS=True`);
+  the producer version is thin-only. **Keep company's** — it carries the JPMC
+  connection config (`client_path`, `tns_admin`, TNS alias). The producer's
+  scope-bind SQL runs under it unchanged.
 
 ## Track-1 acceptance (the contract)
 
@@ -79,13 +84,23 @@ Bundled exact counts (89 passed; `normalize-variables` → inv=6, file_op=16,
 file_ref=92, notif=14, app_fact=66, 86.2%) only hold with the bundled sample
 present. For a fresh `psgmgr` pull:
 
-- Use **python-oracledb thin mode** — `OracleAdapter` does not call
-  `init_oracle_client`, so it needs no Oracle client and avoids the OCI / Kerberos
-  thick-client SPN errors (ORA-12514 / ORA-12638). Use a thin dsn
-  `host:port/service` (same transport class as SQL Developer thin-JDBC).
-- Scope to keep it small: `--folder` (SCHED_TABLE LIKE), `--run-as` (tenant FID =
-  `OWNER`), `--developer-sid` (`AUTHOR`/`CREATION_USER`/`CHANGE_USERID`, or folder
-  `LAST_UPDATED_USER`), `--row-cap`. NULL = full population.
+- **Connection mode is environment-specific — check before assuming.** The
+  producer's `OracleAdapter` is thin-only (no `init_oracle_client`), but the
+  COMPANY adapter is Kerberos-aware and goes THICK when `ORACLE_KERBEROS=True`
+  (calls `_init_thick_client` + `connect(externalauth=True)` against a TNS
+  alias). In that config a plain `--use-oracle` run uses OCI and WILL hit the
+  real Kerberos SPN errors (ORA-12514 / ORA-12638) — that is a DBA / SPN /
+  tnsnames issue, NOT a code toggle. Thin mode is only an option if you can set
+  `ORACLE_KERBEROS=False` AND supply a real `host:port/service` DSN (a TNS alias
+  like `SPIDERP` resolves only via tnsnames and won't work thin).
+- Scope binds are **connection-mode agnostic** (NULL-tolerant SQL predicates —
+  they work the same under thick/Kerberos once the SQL is ported): `--folder`
+  (SCHED_TABLE LIKE), `--run-as` (tenant FID = `OWNER`), `--developer-sid`
+  (`AUTHOR`/`CREATION_USER`/`CHANGE_USERID`, or folder `LAST_UPDATED_USER`),
+  `--row-cap`. NULL = full population. If your `normalize-variables` lacks these
+  flags or the SQL still pulls all ~1.1M rows, you have NOT yet ported the scope
+  commits — re-port `controlm_variables.sql` wholesale and merge the cli.py
+  scope options (see the collision ledger).
 - This run also **verifies the `psgmgr.CM_DEF_SETVAR` source-view name** (still
   flagged unverified). Confirm it and report.
 - Judge a fresh pull on *runs clean / no UNKNOWN invocation leakage / plausible
