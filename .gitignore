@@ -2,6 +2,9 @@
 .env
 Neo4j-*.txt
 
+# Local Claude settings (machine-local paths / personal permission rules)
+.claude/settings.local.json
+
 # Python
 __pycache__/
 *.py[cod]
