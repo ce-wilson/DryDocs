@@ -40,6 +40,7 @@ that exist on both sides and diverge). So the rule for this feature:
 | 5 | CLI surface | one append-only block in `drydocs/cli.py` (`--incremental` flag / `load-staging`) | **Collision — the only real merge point**; keep tiny, delegate to #3 |
 | 6 | Tests | `tests/unit/test_oracle_incremental.py` **(new)** | **Clean-add** |
 | 7 | This plan / sync contract | `docs/reviews/feature-oracle-ingestion-plan.md` **(new)** | **Clean-add** |
+| 8 | Ad-hoc / investigation queries (kept, sanitized; NOT loaded) | `drydocs/loaders/sql/adhoc/` **(new dir)** | **Clean-add** |
 
 Everything is a clean-add or wholesale-take **except** the `cli.py` block (and,
 only if needed, one line in `models/__init__.py`). That is the entire collision
@@ -84,6 +85,13 @@ Split by purpose — don't force everything through one tool:
   ship path — `drydocs … --use-oracle` + the `OracleAdapter` + `pytest`. That is the
   only way to exercise what actually ships: bind variables, the Kerberos adapter,
   idempotent re-runs. SQL Developer can't prove those.
+
+- **Keep / version → `drydocs/loaders/sql/adhoc/`.** The third bucket: a
+  worth-keeping investigation/profiling/QA query that isn't ship-path loader SQL.
+  Save it there (sanitized) so the discovery work is versioned, portable, and
+  rerunnable — without polluting the pipeline (`adhoc/` is not loaded). Seeded with
+  `preflight_open_questions.sql` (the §1.7 probes). Promote to
+  `drydocs/loaders/sql/` only if it becomes part of ingestion.
 
 Why it benefits the project: the repo stays the source of truth and gets tested as
 it ships; SQL-Developer-only work is invisible, untested on the real path, and never
