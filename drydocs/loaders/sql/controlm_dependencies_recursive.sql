@@ -28,10 +28,12 @@
 --   :folder_filter  anchor folder-name LIKE pattern (e.g.
 --                   'PRARAG-HLDM-111027-PEX-RFND-DLY' or 'CCB_AUTO_%');
 --                   NULL anchors on the whole estate.
---   :run_as         anchor job run-as account (JOB_DEF.OWNER), exact
---   :employee_sid   anchor owning employee SID — JOB_DEF.AUTHOR ** VERIFY **
+--   :run_as         anchor job tenant FID (service) user — JOB_DEF.OWNER, exact
 --   :row_cap        unordered sample cap (ROWNUM) on the final result
 -- NOTE: :folder_filter is now a scalar LIKE pattern, not an IN-list.
+-- (Employee-SID scoping is not here — employee identity lives in the
+--  action-audit table psgmgr.CM_AUD_ACTS, not the definition rows; wire it on
+--  a future audit extract, configure later.)
 -- =============================================================================
 
 WITH RecursiveJobDependencies (
@@ -83,8 +85,7 @@ WITH RecursiveJobDependencies (
         WHERE  TAB_DEF.USER_DAILY IS NOT NULL
           -- optional scope on the anchor set (NULL bind = no filter)
           AND  (:folder_filter IS NULL OR JOB_DEF.PARENT_TABLE LIKE :folder_filter)
-          AND  (:run_as        IS NULL OR JOB_DEF.OWNER        =  :run_as)
-          AND  (:employee_sid  IS NULL OR JOB_DEF.AUTHOR       =  :employee_sid)  -- ** VERIFY column **
+          AND  (:run_as        IS NULL OR JOB_DEF.OWNER        =  :run_as)   -- tenant FID user
     ) J_SUB
     JOIN (
         SELECT DISTINCT

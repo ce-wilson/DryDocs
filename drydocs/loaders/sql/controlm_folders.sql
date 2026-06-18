@@ -17,9 +17,9 @@
 -- omitted from the projection — soft-deletes are out of scope for M3.
 --
 -- Scope binds (optional, NULL = no filter): :folder_filter (T.SCHED_TABLE
--- LIKE) and :row_cap (ROWNUM sample cap). :run_as / :employee_sid do not
--- apply at folder grain (no job/owner on CM_DEF_VTAB) — scope by folder, or
--- use the job/variable extracts for owner scoping.
+-- LIKE) and :row_cap (ROWNUM sample cap). :run_as does not apply at folder
+-- grain (no job/owner on CM_DEF_VTAB) — use the job/variable extracts for
+-- run-as scoping. (Employee-SID scoping lives in psgmgr.CM_AUD_ACTS; later.)
 -- =============================================================================
 
 SELECT

@@ -189,8 +189,10 @@ jobs=82, definitions=323, `stg_variable`=326, `stg_parse_quality`=82,
 With a **fresh production pull** the counts will differ (different population) — so
 judge it on *runs clean, no `UNKNOWN` invocation leakage, plausible coverage %*,
 not the bundled numbers. Every `psgmgr` extract accepts the scope binds
-`--folder` / `--run-as` / `--employee-sid` / `--row-cap` (NULL = full population);
-use them to keep a fresh pull small and targeted.
+`--folder` and `--row-cap` (NULL = full population); job-bearing extracts also
+take `--run-as` (the tenant FID/service user, `J.OWNER`). Use them to keep a
+fresh pull small and targeted. (Employee-SID scoping is deferred — that identity
+lives in the action-audit table `psgmgr.CM_AUD_ACTS`, not the definition rows.)
 
 If a Track-1 test fails (not skips), the port is incomplete — diff the failing
 area against the phase descriptions below, not against commit hashes.

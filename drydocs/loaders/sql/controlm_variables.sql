@@ -25,14 +25,14 @@
 --
 -- Scope binds  : optional, NULL = no filter on that dimension. Used for
 --                sampling and targeted re-pulls (pass NULL for the full
---                population). The same four binds appear on every psgmgr
---                extract; folder-grained extracts use only :folder_filter /
---                :row_cap.
+--                population). The same binds appear on every psgmgr extract;
+--                folder-grained extracts use only :folder_filter / :row_cap.
 --   :folder_filter  folder-name LIKE pattern (e.g. 'CCB_AUTO_%')
---   :run_as         job run-as account (J.OWNER), exact match
---   :employee_sid   owning employee SID — mapped to J.AUTHOR ** VERIFY: may
---                   be OWNER or VERSION_USER depending on how SIDs are set **
+--   :run_as         tenant FID (service) user the job runs as — J.OWNER, exact
 --   :row_cap        unordered sample cap (ROWNUM); NULL = unlimited
+--   (Employee-SID scoping is NOT here — employee identity is not on the
+--    definition rows; it lives in the action-audit table psgmgr.CM_AUD_ACTS.
+--    Wire it on a future audit extract; configure later.)
 --
 -- NOTE: duplicate (job, variable-name) definitions are legitimate in the
 -- source (observed: %%FileWatch-TIME_LIMIT defined twice on one job with
@@ -60,7 +60,6 @@ WHERE  J.IS_CURRENT_VERSION = '1'
   AND  T.USER_DAILY IS NOT NULL
   -- optional scope (any bind NULL = no filter on that dimension)
   AND  (:folder_filter IS NULL OR T.SCHED_TABLE LIKE :folder_filter)
-  AND  (:run_as        IS NULL OR J.OWNER        =  :run_as)
-  AND  (:employee_sid  IS NULL OR J.AUTHOR       =  :employee_sid)  -- ** VERIFY column **
+  AND  (:run_as        IS NULL OR J.OWNER        =  :run_as)   -- tenant FID user
   AND  (:row_cap       IS NULL OR ROWNUM        <=  :row_cap)
 ;

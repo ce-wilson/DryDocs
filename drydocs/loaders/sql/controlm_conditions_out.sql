@@ -18,8 +18,9 @@
 --   T.USER_DAILY IS NOT NULL    — only actively-scheduled folders
 --
 -- Scope binds (optional, NULL = no filter): :folder_filter (T.SCHED_TABLE
--- LIKE) and :row_cap (ROWNUM sample cap). :run_as / :employee_sid are not
--- applied here (no CM_DEF_VJOB join at condition grain).
+-- LIKE) and :row_cap (ROWNUM sample cap). :run_as is not applied here (no
+-- CM_DEF_VJOB join at condition grain). (Employee-SID scoping lives in
+-- psgmgr.CM_AUD_ACTS; configure later.)
 -- =============================================================================
 
 SELECT

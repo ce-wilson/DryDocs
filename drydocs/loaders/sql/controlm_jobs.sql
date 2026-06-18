@@ -17,8 +17,10 @@
 --   T.USER_DAILY IS NOT NULL    — only actively-scheduled folders
 --
 -- Scope binds (optional, NULL = no filter; shared across all psgmgr extracts):
---   :folder_filter  folder-name LIKE pattern   :run_as        J.OWNER exact
---   :employee_sid   J.AUTHOR ** VERIFY **       :row_cap       ROWNUM sample cap
+--   :folder_filter  folder-name LIKE pattern
+--   :run_as         tenant FID (service) user — J.OWNER, exact
+--   :row_cap        ROWNUM sample cap
+--   (employee-SID scoping is not here — see psgmgr.CM_AUD_ACTS, configure later)
 -- =============================================================================
 
 SELECT
@@ -56,7 +58,6 @@ WHERE  J.IS_CURRENT_VERSION = '1'
   AND  T.USER_DAILY IS NOT NULL
   -- optional scope (any bind NULL = no filter on that dimension)
   AND  (:folder_filter IS NULL OR T.SCHED_TABLE LIKE :folder_filter)
-  AND  (:run_as        IS NULL OR J.OWNER        =  :run_as)
-  AND  (:employee_sid  IS NULL OR J.AUTHOR       =  :employee_sid)  -- ** VERIFY column **
+  AND  (:run_as        IS NULL OR J.OWNER        =  :run_as)   -- tenant FID user
   AND  (:row_cap       IS NULL OR ROWNUM        <=  :row_cap)
 ;
