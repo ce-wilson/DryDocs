@@ -7,10 +7,12 @@
 --                ad-hoc analysis, and (2) normalized write-back staging tables
 --                that the Python normalizer populates.
 --
--- Target schema: DRYDOCS_STG  (adjust to site standard; all objects unqualified
---                so the script runs as the owning schema)
+-- Target schema: <maint_mgr>  (all objects are unqualified so the script runs
+--                under the owning maintenance account placeholder)
 --
--- Sources      : psgmgr.CM_DEF_VTAB    (folders; "tables" in BMC naming)
+-- Sources      : Control-M source objects follow the CM_* naming convention
+--                under psgmgr, for example:
+--                psgmgr.CM_DEF_VTAB    (folders; "tables" in BMC naming)
 --                psgmgr.CM_DEF_VJOB    (jobs, ~100 cols, version history)
 --                psgmgr.CM_DEF_SETVAR  (job/folder variables)  ** VERIFY NAME **
 --                  -- TODO(DBA/dev): confirm the variable view name. The extract
@@ -27,10 +29,11 @@
 -- Load pattern : full refresh. The Python normalizer DELETEs by RUN_ID (or
 --                truncates) and bulk-inserts. Each run is recorded in STG_RUN.
 --
--- Grants needed BY this schema:
---   GRANT SELECT ON psgmgr.CM_DEF_VTAB   TO DRYDOCS_STG;
---   GRANT SELECT ON psgmgr.CM_DEF_VJOB   TO DRYDOCS_STG;
---   GRANT SELECT ON psgmgr.CM_DEF_SETVAR TO DRYDOCS_STG;   -- verify name
+-- Ownership / grants:
+--   <maint_mgr> owns the staging objects created by this script.
+--   Source reads follow the Control-M CM_* convention and are granted via
+--   the read role CM_RO_USER.
+--
 -- Grants needed FOR consumers: see Section 6.
 -- =============================================================================
 

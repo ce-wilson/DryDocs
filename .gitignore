@@ -22,6 +22,9 @@ build/
 
 # Sample / local data — may contain sensitive source data
 drydocs/data/
+# Staging / extract output (real data — keep local, never commit)
+stg_out/
+/stg_*/
 
 # OS
 .DS_Store
