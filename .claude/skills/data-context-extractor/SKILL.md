@@ -1,227 +1,177 @@
 ---
 name: data-context-extractor
-description: >
-  Generate or improve a company-specific data analysis skill by extracting tribal knowledge from analysts.
-
-  BOOTSTRAP MODE - Triggers: "Create a data context skill", "Set up data analysis for our warehouse",
-  "Help me create a skill for our database", "Generate a data skill for [company]"
-  → Discovers schemas, asks key questions, generates initial skill with reference files
-
-  ITERATION MODE - Triggers: "Add context about [domain]", "The skill needs more info about [topic]",
-  "Update the data skill with [metrics/tables/terminology]", "Improve the [domain] reference"
-  → Loads existing skill, asks targeted questions, appends/updates reference files
-
-  Use when data analysts want Claude to understand their company's specific data warehouse,
-  terminology, metrics definitions, and common query patterns.
+description: "DryDocs domain context extractor. Adds platform or application domain knowledge to the DryDocs knowledge graph for DataAsset node population and AppDataFlow lineage mapping. Use when: (1) a target platform (Oracle, Snowflake, Teradata, S3, SQLServer, Linux) needs its key data objects documented as DataAsset nodes, (2) a specific Application (by SEAL ID) needs its AppDataFlow and cross-platform lineage mapped, (3) interviewing a domain expert using DryDocs use case questions. Outputs machine-first §META §DATAASSETS §JOBS §UC §CYPHER §OQ reference files. DO NOT generate SQL analyst skills, relational schemas, or any artifact that bypasses the Neo4j graph model."
 ---
 
-# Data Context Extractor
+# DryDocs Domain Context Extractor
 
-A meta-skill that extracts company-specific data knowledge from analysts and generates tailored data analysis skills.
-
-## How It Works
-
-This skill has two modes:
-
-1. **Bootstrap Mode**: Create a new data analysis skill from scratch
-2. **Iteration Mode**: Improve an existing skill by adding domain-specific reference files
+Adds domain knowledge to the DryDocs knowledge graph — either for a **target data
+platform** (to populate `:DataAsset` nodes) or for an **Application domain** (to
+populate `:AppDataFlow` lineage). This skill replaces the generic SQL data analyst
+skill builder.
 
 ---
 
-## Bootstrap Mode
+## Critical constraints — read before every run
 
-Use when: User wants to create a new data context skill for their warehouse.
+- **DO NOT generate SQL SKILL.md files.** Output is always machine-first graph
+  reference docs in `§META §DATAASSETS §JOBS §UC §CYPHER §OQ` format.
+- **DO NOT introduce new node types.** Only use labels already in the DryDocs
+  ontology. See `references/nodes.md` for the complete list.
+- **DO NOT introduce new relationship types.** Only use: `USED`, `GENERATED`,
+  `ORCHESTRATES`, `HAS_DATA_FLOW`, `REPRESENTS_CATALOG_DATASET`, and the existing
+  DryDocs edge vocabulary in `references/nodes.md §RELATIONSHIPS`.
+- **Platform is always a property on `:DataAsset`, never a node.** Creating a
+  `:DataPlatform` node with data edges causes a supernode — forbidden.
+- **Sanitize before committing.** Internal versions (real SEAL IDs, server names,
+  schema names) go to `drydocs/data/data-catalog/` (gitignored). Public sanitized
+  versions go to `docs/patterns/data-catalog/`.
 
-### Phase 1: Database Connection & Discovery
+---
 
-**Step 1: Identify the database type**
+## Two modes
 
-Ask: "What data warehouse are you using?"
+### Mode A — Platform Domain
+Use when a target platform (Snowflake, Teradata, Oracle, S3, SQLServer, Linux)
+needs to be documented so `:DataAsset` nodes can be populated and lineage edges
+(`USED`/`GENERATED`) can be written by the DataAsset loader.
 
-Common options:
-- **BigQuery**
-- **Snowflake**
-- **PostgreSQL/Redshift**
-- **Databricks**
+### Mode B — Application Domain
+Use when a specific Application (identified by SEAL ID) needs its `:AppDataFlow`
+and cross-platform lineage context documented.
 
-Use `~~data warehouse` tools (query and schema) to connect. If unclear, check available MCP tools in the current session.
+Both modes use the same 7 interview questions (`references/use-cases.md`) and
+produce output in machine-first format (`references/domain-template.md`).
 
-**Step 2: Explore the schema**
+---
 
-Use `~~data warehouse` schema tools to:
-1. List available datasets/schemas
-2. Identify the most important tables (ask user: "Which 3-5 tables do analysts query most often?")
-3. Pull schema details for those key tables
+## Mode A — Platform Domain
 
-Sample exploration queries by dialect:
-```sql
--- BigQuery: List datasets
-SELECT schema_name FROM INFORMATION_SCHEMA.SCHEMATA
+### Step 1 — Identify the platform
 
--- BigQuery: List tables in a dataset
-SELECT table_name FROM `project.dataset.INFORMATION_SCHEMA.TABLES`
+Ask: "Which target platform are you documenting?"
 
--- Snowflake: List schemas
-SHOW SCHEMAS IN DATABASE my_database
+Valid `platform` property values (these are string properties on `:DataAsset`, never
+graph node labels or types):
 
--- Snowflake: List tables
-SHOW TABLES IN SCHEMA my_schema
+`oracle` | `snowflake` | `teradata` | `s3` | `sqlserver` | `linux`
+
+See `references/platforms.md` for URN patterns and sanitization rules per platform.
+
+### Step 2 — Identify key data objects
+
+Ask: "Which 3–5 tables, files, or schemas do Control-M jobs most often read from
+or write to on this platform?"
+
+For each object, capture the `references/domain-template.md §DATAASSETS` fields:
+
+| Field | Graph property | Ask the domain expert |
+|---|---|---|
+| Object name | `DataAsset.name` | "What is the table or file name?" |
+| Schema/bucket/path | `DataAsset.namespace` | "What schema or directory path contains it?" |
+| Format | `DataAsset.format` | TABLE / FILE / VIEW / STREAM |
+| External feed? | `DataAsset.isExternalFeed` | "Does this originate outside your org's own jobs?" |
+| Source of record? | `DataAsset.isSourceOfRecord` | "Is this the business-authoritative copy of this data?" |
+
+Construct `assetId` as:
+```
+urn:drydocs:dataasset:{platform}:{namespace}:{name}
 ```
 
-### Phase 2: Core Questions (Ask These)
+### Step 3 — Interview using DryDocs use case questions
 
-After schema discovery, ask these questions conversationally (not all at once):
+Work through `references/use-cases.md` for this platform's objects. For each UC:
+- "Which jobs PRODUCE (GENERATED) objects on this platform?"
+- "Which jobs CONSUME (USED) objects on this platform?"
+- Capture `(job → direction → asset)` triples
 
-**Entity Disambiguation (Critical)**
-> "When people here say 'user' or 'customer', what exactly do they mean? Are there different types?"
+### Step 4 — Generate output files
 
-Listen for:
-- Multiple entity types (user vs account vs organization)
-- Relationships between them (1:1, 1:many, many:many)
-- Which ID fields link them together
+**Internal (gitignored, real names):**
+`drydocs/data/data-catalog/<platform>-domain.md`
 
-**Primary Identifiers**
-> "What's the main identifier for a [customer/user/account]? Are there multiple IDs for the same entity?"
+**Public (sanitized, committed):**
+`docs/patterns/data-catalog/<platform>-domain.md`
 
-Listen for:
-- Primary keys vs business keys
-- UUID vs integer IDs
-- Legacy ID systems
+Use `references/domain-template.md` format exactly. Run `§SANITIZE` checklist
+before writing the public version.
 
-**Key Metrics**
-> "What are the 2-3 metrics people ask about most? How is each one calculated?"
+---
 
-Listen for:
-- Exact formulas (ARR = monthly_revenue × 12)
-- Which tables/columns feed each metric
-- Time period conventions (trailing 7 days, calendar month, etc.)
+## Mode B — Application Domain
 
-**Data Hygiene**
-> "What should ALWAYS be filtered out of queries? (test data, fraud, internal users, etc.)"
+### Step 1 — Identify the Application
 
-Listen for:
-- Standard WHERE clauses to always include
-- Flag columns that indicate exclusions (is_test, is_internal, is_fraud)
-- Specific values to exclude (status = 'deleted')
+Ask: "What is the SEAL ID (organizational application ID) for this Application?"
 
-**Common Gotchas**
-> "What mistakes do new analysts typically make with this data?"
-
-Listen for:
-- Confusing column names
-- Timezone issues
-- NULL handling quirks
-- Historical vs current state tables
-
-### Phase 3: Generate the Skill
-
-Create a skill with this structure:
-
-```
-[company]-data-analyst/
-├── SKILL.md
-└── references/
-    ├── entities.md          # Entity definitions and relationships
-    ├── metrics.md           # KPI calculations
-    ├── tables/              # One file per domain
-    │   ├── [domain1].md
-    │   └── [domain2].md
-    └── dashboards.json      # Optional: existing dashboards catalog
+Run discovery query to see current graph state:
+```cypher
+MATCH (app:Application {seal_id: $sealId})
+OPTIONAL MATCH (app)-[:HAS_BATCH_PROCESS]->(bp:BatchProcess)
+OPTIONAL MATCH (app)-[:HAS_EVENT_PROCESS]->(ep:EventProcess)
+OPTIONAL MATCH (app)-[:HAS_DATA_FLOW]->(flow:AppDataFlow)
+RETURN app, bp, ep, flow
 ```
 
-**SKILL.md Template**: See `references/skill-template.md`
+### Step 2 — Map the data flow
 
-**SQL Dialect Section**: See `references/sql-dialects.md` and include the appropriate dialect notes.
+Ask: "What do this application's Control-M jobs do — what data do they read, and
+what do they produce?"
 
-**Reference File Template**: See `references/domain-template.md`
+For each job group or Control-M folder:
+- `AppDataFlow.flowName` → descriptive name of the pipeline / folder
+- `AppDataFlow.dataflowUrn` → `urn:li:dataFlow:{controlm,<flowName>,<data_center>}`
+- Inputs → `DataAsset {isExternalFeed: ?}` ←`[:USED]`← ControlMJob
+- Outputs → ControlMJob →`[:GENERATED]`→ `DataAsset {isSourceOfRecord: ?}`
 
-### Phase 4: Package and Deliver
+### Step 3 — Interview using DryDocs use case questions
 
-1. Create all files in the skill directory
-2. Package as a zip file
-3. Present to user with summary of what was captured
+Work through `references/use-cases.md` scoped to this application and its
+platforms. All 7 UC questions apply; focus on UCs most relevant to this domain.
 
----
+### Step 4 — Generate output files
 
-## Iteration Mode
-
-Use when: User has an existing skill but needs to add more context.
-
-### Step 1: Load Existing Skill
-
-Ask user to upload their existing skill (zip or folder), or locate it if already in the session.
-
-Read the current SKILL.md and reference files to understand what's already documented.
-
-### Step 2: Identify the Gap
-
-Ask: "What domain or topic needs more context? What queries are failing or producing wrong results?"
-
-Common gaps:
-- A new data domain (marketing, finance, product, etc.)
-- Missing metric definitions
-- Undocumented table relationships
-- New terminology
-
-### Step 3: Targeted Discovery
-
-For the identified domain:
-
-1. **Explore relevant tables**: Use `~~data warehouse` schema tools to find tables in that domain
-2. **Ask domain-specific questions**:
-   - "What tables are used for [domain] analysis?"
-   - "What are the key metrics for [domain]?"
-   - "Any special filters or gotchas for [domain] data?"
-
-3. **Generate new reference file**: Create `references/[domain].md` using the domain template
-
-### Step 4: Update and Repackage
-
-1. Add the new reference file
-2. Update SKILL.md's "Knowledge Base Navigation" section to include the new domain
-3. Repackage the skill
-4. Present the updated skill to user
+**Internal:** `drydocs/data/data-catalog/<seal-id>-lineage.md`
+**Public:** `docs/patterns/data-catalog/<app-domain>-lineage.md`
 
 ---
 
-## Reference File Standards
+## Output file locations
 
-Each reference file should include:
+```
+docs/patterns/data-catalog/            ← sanitized, public, committed to repo
+├── <platform>-domain.md               ← Mode A output
+├── <app-domain>-lineage.md            ← Mode B output
+└── (existing shared reference files already committed)
 
-### For Table Documentation
-- **Location**: Full table path
-- **Description**: What this table contains, when to use it
-- **Primary Key**: How to uniquely identify rows
-- **Update Frequency**: How often data refreshes
-- **Key Columns**: Table with column name, type, description, notes
-- **Relationships**: How this table joins to others
-- **Sample Queries**: 2-3 common query patterns
-
-### For Metrics Documentation
-- **Metric Name**: Human-readable name
-- **Definition**: Plain English explanation
-- **Formula**: Exact calculation with column references
-- **Source Table(s)**: Where the data comes from
-- **Caveats**: Edge cases, exclusions, gotchas
-
-### For Entity Documentation
-- **Entity Name**: What it's called
-- **Definition**: What it represents in the business
-- **Primary Table**: Where to find this entity
-- **ID Field(s)**: How to identify it
-- **Relationships**: How it relates to other entities
-- **Common Filters**: Standard exclusions (internal, test, etc.)
+drydocs/data/data-catalog/             ← internal, gitignored, never committed
+├── <platform>-domain.md               ← Mode A with real names/SIDs
+└── <seal-id>-lineage.md               ← Mode B with real SEAL ID / team names
+```
 
 ---
 
-## Quality Checklist
+## Reference files
 
-Before delivering a generated skill, verify:
+| File | Load when |
+|---|---|
+| `references/use-cases.md` | Starting the domain interview (UC1–UC7 questions) |
+| `references/nodes.md` | Choosing node types and properties during generation |
+| `references/domain-template.md` | Writing the output reference file |
+| `references/cypher-patterns.md` | Running discovery queries in Neo4j Browser |
+| `references/platforms.md` | Checking platform URN patterns + sanitization rules |
 
-- [ ] SKILL.md has complete frontmatter (name, description)
-- [ ] Entity disambiguation section is clear
-- [ ] Key terminology is defined
-- [ ] Standard filters/exclusions are documented
-- [ ] At least 2-3 sample queries per domain
-- [ ] SQL uses correct dialect syntax
-- [ ] Reference files are linked from SKILL.md navigation section
+---
+
+## Quality checklist
+
+- [ ] Output format: machine-first `§META §DATAASSETS §JOBS §UC §CYPHER §OQ`
+- [ ] No new node types introduced — only labels in `references/nodes.md`
+- [ ] No new relationship types — only edges in `references/nodes.md §RELATIONSHIPS`
+- [ ] Platform is a property on `DataAsset`, not a graph node or label
+- [ ] `assetId` URN: `urn:drydocs:dataasset:{platform}:{namespace}:{name}`
+- [ ] `dataflowUrn` DataHub format: `urn:li:dataFlow:{controlm,<flowId>,<cluster>}`
+- [ ] All `[TO-BE-UPDATED]` markers replaced with actual domain-specific answers
+- [ ] Sanitized public version: no real SEAL IDs, SIDs, server names, org names
+- [ ] Internal version in `drydocs/data/data-catalog/` (gitignored)
+- [ ] Public version in `docs/patterns/data-catalog/` committed to feature branch

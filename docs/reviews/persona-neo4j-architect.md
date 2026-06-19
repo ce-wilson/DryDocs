@@ -872,3 +872,207 @@ clarifications that the DBA team can append to their implementation ticket.
    `apoc.periodic.iterate` for the age-out cleanup vs native `CALL IN TRANSACTIONS`.)
 
 → Phase 2 complete. Hand off to Phase 3 (synthesis).
+
+---
+
+## 2.7 Data Catalog & Lineage Integration (addendum — 2026-06-18)
+
+**Source:** `docs/patterns/data-catalog/` (7 sanitized reference files committed to
+`feature/oracle-ingestion` and merged to `main`). Internal originals in
+`drydocs/data/data-catalog/` (gitignored, retain full CCB detail).
+
+**Standard confirmed:** LinkedIn DataHub entity model + DCAT v2 (W3C) + OpenLineage.
+The `urn:li:` prefix is the conclusive DataHub identifier. The data catalog team
+follows this standard; DryDocs should align to it for cross-team interoperability.
+
+---
+
+### The two-plane model
+
+```
+DATA CATALOG PLANE                     PROCESS GRAPH PLANE (DryDocs)
+──────────────────────                 ──────────────────────────────
+CatalogDistribution                    ControlMJob + DataAsset
+  -[DATASET_OWNED_BY]-> Application <─── Application  (SHARED NODE — same node)
+CatalogWorker ◄──────────────────────── Employee
+CatalogWorkerGroup ◄─────────────────── DevTeam
+                                        AppDataFlow  ← DataHub dataFlow
+                                        ControlMJob  ← DataHub dataJob
+                                        DataAsset    ← DataHub dataset
+```
+
+`:Application` (keyed by organizational app ID) is the bridge. It is the **same
+node** in both planes — never duplicate it as `CatalogApplication`. The existing
+DryDocs `Application(seal_id)` constraint handles MERGE from both sides.
+
+---
+
+### 3rd Application child node — AppDataFlow
+
+DataHub's own entity model provides the exact pattern needed:
+
+```
+DataHub:   corpGroup ──▶ dataFlow ──▶ dataJob ──▶ (consumes/produces) ──▶ dataset
+DryDocs: Application ──▶ AppDataFlow ──▶ ControlMJob ──▶ (USED/GENERATED) ──▶ DataAsset
+```
+
+The full Application child pattern becomes:
+
+```
+:Application {appId / seal_id}
+  ├─[:HAS_BATCH_PROCESS]──▶ :BatchProcess {appId}    ← existing
+  ├─[:HAS_EVENT_PROCESS]──▶ :EventProcess {appId}    ← existing
+  └─[:HAS_DATA_FLOW]───────▶ :AppDataFlow             ← NEW (this addendum)
+                             {appId, dataflowUrn, flowName, orchestrator, cluster}
+```
+
+`AppDataFlow.orchestrator = 'controlm'` and `AppDataFlow.cluster = data_center`
+make this node emit a DataHub-compatible URN:
+`urn:li:dataFlow:{controlm,<folder-or-job-group-name>,<data_center>}`
+
+---
+
+### DataAsset node
+
+Represents a named data object as seen by the orchestration layer. Platform is a
+**property**, not a node — the `DataPlatform` supernode risk analysis
+(`lineage-design-top3.md §Supernode Mitigation`) disqualifies it as a node.
+
+```
+:DataAsset
+  { assetId            -- UNIQUE key (drydocs:dataasset:{platform}:{namespace}:{name})
+  , name               -- table/file/object name
+  , platform           -- 'oracle' | 'snowflake' | 'teradata' | 's3' | 'sqlserver' | 'linux'
+  , namespace          -- schema/bucket/path
+  , env                -- 'PROD' | 'DEV' | 'TEST'
+  , format             -- 'TABLE' | 'FILE' | 'VIEW' | 'STREAM'
+  , isExternalFeed     -- boolean: third-party / upstream data feed
+  , isSourceOfRecord   -- boolean: business source-of-record for this data
+  }
+```
+
+---
+
+### New relationships
+
+| Edge | From | To | Notes |
+|---|---|---|---|
+| `HAS_DATA_FLOW` | `Application` | `AppDataFlow` | 3rd facet of Application |
+| `ORCHESTRATES` | `AppDataFlow` | `ControlMJob` | pipeline → task containment |
+| `USED` | `ControlMJob` | `DataAsset` | PROV-O prov:used; input |
+| `GENERATED` | `ControlMJob` | `DataAsset` | PROV-O prov:wasGeneratedBy; output |
+| `REPRESENTS_CATALOG_DATASET` | `DataAsset` | `CatalogDataset` | optional bridge; populate only when URN confirmed |
+
+`USED` and `GENERATED` map directly to `prov:used` (Activity → Entity) and
+`prov:wasGeneratedBy` (Entity → Activity) — consistent with the existing PROV-O
+ontology without adding new vocabulary.
+
+---
+
+### Constraints and indexes to add
+
+Add to `drydocs/schema/constraints.cypher`:
+
+```cypher
+-- AppDataFlow
+CREATE CONSTRAINT app_data_flow_urn IF NOT EXISTS
+  FOR (f:AppDataFlow) REQUIRE f.dataflowUrn IS UNIQUE;
+
+-- DataAsset
+CREATE CONSTRAINT data_asset_id IF NOT EXISTS
+  FOR (a:DataAsset) REQUIRE a.assetId IS UNIQUE;
+
+-- Performance indexes (platform + name are the two most common filter axes)
+CREATE INDEX data_asset_platform_idx IF NOT EXISTS
+  FOR (a:DataAsset) ON (a.platform);
+
+CREATE INDEX data_asset_name_idx IF NOT EXISTS
+  FOR (a:DataAsset) ON (a.name);
+```
+
+Add to `drydocs/schema/catalog_ontology_supplement.cypher` (or a new
+`data_lineage_supplement.cypher`):
+
+```cypher
+// AppDataFlow — prov:Activity cluster, DataHub dataFlow analogue
+MERGE (lc:OntologyTerm:LocalClass {iri: "https://drydocs.local/ontology#AppDataFlow"})
+  ON CREATE SET lc.label        = "Application Data Flow",
+               lc.prov_type    = "Activity",
+               lc.datahub_entity = "dataFlow",
+               lc.openlineage_entity = "Job",
+               lc.source       = "drydocs.data_lineage_supplement";
+MERGE (pc:OntologyTerm:ProvClass {iri: "http://www.w3.org/ns/prov#Activity"})
+MERGE (lc)-[r:SUBCLASS_OF]->(pc) ON CREATE SET r.source = "drydocs.data_lineage_supplement";
+
+// DataAsset — prov:Entity, DataHub dataset analogue
+MERGE (lc:OntologyTerm:LocalClass {iri: "https://drydocs.local/ontology#DataAsset"})
+  ON CREATE SET lc.label        = "Data Asset",
+               lc.prov_type    = "Entity",
+               lc.datahub_entity = "dataset",
+               lc.openlineage_entity = "Dataset",
+               lc.source       = "drydocs.data_lineage_supplement";
+MERGE (pc:OntologyTerm:ProvClass {iri: "http://www.w3.org/ns/prov#Entity"})
+MERGE (lc)-[r:SUBCLASS_OF]->(pc) ON CREATE SET r.source = "drydocs.data_lineage_supplement";
+```
+
+---
+
+### Supernode prevention — platform as property
+
+The `:DataPlatform` node would accumulate millions of edges (one per ControlMJob
+that runs on Snowflake, Oracle, etc.) — a classic modeling supernode.
+
+**Rule:** `platform` is a property on `:DataAsset` and `:ControlMJob`, not a node.
+The `data_catalog_schema.cypher` in `docs/patterns/` already documents a
+`:DataPlatform` meta-node for schema documentation only (`:SchemaMeta` label);
+that node has no data edges.
+
+---
+
+### The DryDocs lineage moat
+
+No enterprise data catalog can answer "what is the full path for data that ends up
+in table X?" at the cross-platform level. Catalogs observe data AT REST; Control-M
+orchestrates all hops. The DryDocs unique query:
+
+```cypher
+MATCH (tgt:DataAsset {name: $targetName, isSourceOfRecord: true})
+MATCH path = (src:DataAsset {isExternalFeed: true})
+             <-[:USED]-(j1:ControlMJob)-[:GENERATED]->(mid:DataAsset)
+             <-[:USED]-(j2:ControlMJob)-[:GENERATED]->(tgt)
+RETURN path,
+       [n IN nodes(path) WHERE n:DataAsset | n.name + '@' + n.platform] AS platformHops
+```
+
+traces: `[s3-file] → FileWatcher job → [oracle-staging] → ETL job → [teradata] →
+Export job → [snowflake-table]`.
+
+---
+
+### Updated priority table (incorporating catalog items)
+
+| Priority | Action | File | Notes |
+|---|---|---|---|
+| **P0** | RUNS_ON → SCHEDULED_ON loader + data migration | `controlm_folders.cypher` | Edge collision blocker |
+| **P0** | `stale_edge_cleanup.cypher` | new | Required before incremental loader runs |
+| **P0** | datetime() wrapping in M3 loaders | `controlm_jobs.cypher`, `controlm_folders.cypher` | Temporal operators broken without this |
+| **P1** | `:ControlMFolder` rename migration | `constraints.cypher` | Vocabulary/constraint/loader drift |
+| **P1** | `:JobRun` HWM annotation | incremental loader Python | Graph-side audit of Oracle HWM state |
+| **P1** | `last_run_id` range index on condition edges | `constraints.cypher` | Age-out cleanup enabler |
+| **P1-NEW** | `AppDataFlow` + `DataAsset` constraints + indexes | `constraints.cypher` | Gate for any data-lineage loader |
+| **P1-NEW** | Ontology supplement for `AppDataFlow` + `DataAsset` | new supplement or extend `catalog_ontology_supplement.cypher` | PROV-O wiring |
+| **P2** | `:Script(executable_path)` + `:File` constraints | `constraints.cypher` | Gate for STG_INVOCATION / STG_FILE_REF loaders |
+| **P2-NEW** | `AppDataFlow` population loader (stub) | new `drydocs/loaders/app_data_flow_loader.py` | Populate one node per Application per DC; `ORCHESTRATES` edges from folders |
+| **P2-NEW** | `DataAsset` population loader | new | Parse STG_INVOCATION + STG_FILE_REF for input/output objects |
+| **P3-NEW** | `REPRESENTS_CATALOG_DATASET` bridge edges | additive | Only when catalog URN can be resolved; not blocking |
+
+---
+
+### Reference files (all in public repo)
+
+- `docs/patterns/data-catalog/ontology-standard.md` — DataHub + DCAT v2 + OpenLineage
+- `docs/patterns/data-catalog/enterprise-data-catalog-ontology.md` — 17-node-type ontology
+- `docs/patterns/data-catalog/lineage-design-top3.md` — 3 patterns + hybrid recommendation
+- `docs/patterns/data-catalog/data-catalog-schema.cypher` — constraints + meta-graph + bridge
+- `docs/patterns/data-catalog/data-catalog-drydocs-crosswalk.md` — two-plane model
+- `docs/patterns/data-catalog/classifiers-example.csv` — 20-row classifier taxonomy
