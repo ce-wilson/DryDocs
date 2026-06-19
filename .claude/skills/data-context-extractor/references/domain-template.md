@@ -1,147 +1,142 @@
-# Domain Reference File Template
+# DryDocs Domain Reference — Output Template
 
-Use this template when creating reference files for specific data domains (e.g., revenue, users, marketing).
+Machine-first format. Fill one instance of this template per platform domain
+(Mode A) or per application domain (Mode B). Replace all `[PLACEHOLDER]` values.
+Mark unknowns `[TO-BE-UPDATED]` — do not leave blank.
 
 ---
 
 ```markdown
-# [DOMAIN_NAME] Tables
-
-This document contains [domain]-related tables, metrics, and query patterns.
-
----
-
-## Quick Reference
-
-### Business Context
-
-[2-3 sentences explaining what this domain covers and key concepts]
-
-### Entity Clarification
-
-**"[AMBIGUOUS_TERM]" can mean:**
-- **[MEANING_1]**: [DEFINITION] ([TABLE]: [ID_FIELD])
-- **[MEANING_2]**: [DEFINITION] ([TABLE]: [ID_FIELD])
-
-Always clarify which one before querying.
-
-### Standard Filters
-
-For [domain] queries, always:
-```sql
-WHERE [STANDARD_FILTER_1]
-  AND [STANDARD_FILTER_2]
+<!-- §META -->
+```yaml
+domain: [platform-name OR app-domain-name]
+mode: [Platform | Application]
+platform: [oracle | snowflake | teradata | s3 | sqlserver | linux]   # Mode A: primary platform
+seal_id: [INTERNAL — gitignored version only; omit from public file]  # Mode B
+version: 0.1
+status: DRAFT
+last_updated: [ISO-DATE]
+populated_from: [interview with <role> on <date>]
+open_questions: [count of remaining [TO-BE-UPDATED] markers]
 ```
 
 ---
 
-## Key Tables
+## §SCOPE — Business context
 
-### [TABLE_1_NAME]
-**Location**: `[project.dataset.table]` or `[schema.table]`
-**Description**: [What this table contains, when to use it]
-**Primary Key**: [COLUMN(S)]
-**Update Frequency**: [Daily/Hourly/Real-time] ([LAG] lag)
-**Partitioned By**: [PARTITION_COLUMN] (if applicable)
+[2–3 sentences: what data lives on this platform / what this application does with
+data. No internal names, SEAL IDs, or server addresses in the public version.]
 
-| Column | Type | Description | Notes |
-|--------|------|-------------|-------|
-| **[column_1]** | [TYPE] | [DESCRIPTION] | [GOTCHA_OR_CONTEXT] |
-| **[column_2]** | [TYPE] | [DESCRIPTION] | |
-| **[column_3]** | [TYPE] | [DESCRIPTION] | Nullable |
-
-**Relationships**:
-- Joins to `[OTHER_TABLE]` on `[JOIN_KEY]`
-- Parent of `[CHILD_TABLE]` via `[FOREIGN_KEY]`
-
-**Nested/Struct Fields** (if applicable):
-- `[struct_name].[field_1]`: [DESCRIPTION]
-- `[struct_name].[field_2]`: [DESCRIPTION]
+**Why this domain matters for DryDocs lineage:**
+[Which DryDocs use cases (UC1–UC7) this domain is the primary entry point for.]
 
 ---
 
-### [TABLE_2_NAME]
-[REPEAT FORMAT]
+## §DATAASSETS — Key data objects
+
+One row per named data object (table / file / view / stream) that Control-M jobs
+interact with on this platform.
+
+| assetId | name | namespace | env | format | isExternalFeed | isSourceOfRecord | notes |
+|---|---|---|---|---|---|---|---|
+| `urn:drydocs:dataasset:<platform>:<namespace>:<name>` | [name] | [schema/path] | PROD | TABLE | false | false | |
+| `urn:drydocs:dataasset:<platform>:<namespace>:<name>` | [name] | [bucket/prefix] | PROD | FILE | true | false | external vendor feed |
+| `urn:drydocs:dataasset:<platform>:<namespace>:<name>` | [name] | [schema/path] | PROD | TABLE | false | true | source of record |
+
+**isExternalFeed = true** when data originates outside the org's own Control-M jobs
+(third-party vendor drop, partner S3 upload, upstream market data feed).
+
+**isSourceOfRecord = true** when this object is the business-authoritative copy
+cited in reporting, compliance, or downstream system feeds.
 
 ---
 
-## Key Metrics
+## §JOBS — ControlMJob ↔ DataAsset edges
 
-| Metric | Definition | Table | Formula | Notes |
-|--------|------------|-------|---------|-------|
-| [METRIC_1] | [DEFINITION] | [TABLE] | `[FORMULA]` | [CAVEATS] |
-| [METRIC_2] | [DEFINITION] | [TABLE] | `[FORMULA]` | |
+For each job that reads from or writes to objects on this platform. These rows
+drive the `USED` / `GENERATED` edge population in the DataAsset loader (Stream C.4).
+
+| Job pattern (folder / job name) | Direction | DataAsset name | platform | Notes |
+|---|---|---|---|---|
+| [FOLDER_NAME / JOB_NAME] | USED (reads) | [asset name] | [platform] | [context — e.g. "reads staging table"] |
+| [FOLDER_NAME / JOB_NAME] | GENERATED (writes) | [asset name] | [platform] | [context — e.g. "final load to DW"] |
+
+**Direction key:**
+- `USED` → the job reads / consumes this asset (input)
+- `GENERATED` → the job writes / produces this asset (output)
 
 ---
 
-## Sample Queries
+## §UC — Use case answers for this domain
 
-### [QUERY_PURPOSE_1]
-```sql
--- [Brief description of what this query does]
-SELECT
-    [columns]
-FROM [table]
-WHERE [standard_filters]
-GROUP BY [grouping]
-ORDER BY [ordering]
+Filled during the UC1–UC7 interview (`references/use-cases.md`). Replace `[ANSWER]`
+with domain-specific findings; mark remaining unknowns `[TO-BE-UPDATED]`.
+
+| UC | Question | Answer for this domain | Graph entry point |
+|---|---|---|---|
+| UC1 | File not received | [ANSWER] | `FileWatcher job → REQUIRES_IN_CONDITION →` |
+| UC2 | Table not loaded | [ANSWER] | `ControlMJob → DataAsset {platform} →` |
+| UC3 | Impact of broken job | [ANSWER] | `ControlMJob → EMITS_OUT_CONDITION →` |
+| UC4 | Dev team for app | [ANSWER — internal] | `Application → HAS_MEMBERSHIP → Employee` |
+| UC5 | App/folder counts | [ANSWER] | `COUNT(Application) WHERE platform=$p` |
+| UC6 | Source of record | [ANSWER] | `DataAsset {isSourceOfRecord:true} ←` |
+| UC7 | End-to-end lineage | [ANSWER] | `isExternalFeed → ... → isSourceOfRecord` |
+
+---
+
+## §CYPHER — Domain-specific discovery queries
+
+```cypher
+-- All DataAssets on this platform
+MATCH (a:DataAsset {platform: '<platform>'})
+RETURN a.name, a.namespace, a.format, a.isExternalFeed, a.isSourceOfRecord
+ORDER BY a.namespace, a.name;
+
+-- Jobs that read from this platform (inputs)
+MATCH (j:ControlMJob)-[:USED]->(a:DataAsset {platform: '<platform>'})
+RETURN j.folder_id, j.job_id, a.name, a.namespace;
+
+-- Jobs that write to this platform (outputs)
+MATCH (j:ControlMJob)-[:GENERATED]->(a:DataAsset {platform: '<platform>'})
+RETURN j.folder_id, j.job_id, a.name, a.namespace;
+
+-- End-to-end lineage through this platform
+MATCH path = (src:DataAsset {isExternalFeed: true})
+             <-[:USED]-(j:ControlMJob)-[:GENERATED]->(tgt:DataAsset {platform: '<platform>'})
+RETURN path,
+       src.name + '@' + src.platform AS source,
+       tgt.name AS target;
+
+-- Application ownership of jobs on this platform (UC4)
+MATCH (app:Application)-[:HAS_DATA_FLOW]->(:AppDataFlow)-[:ORCHESTRATES]->(j:ControlMJob)
+      -[:GENERATED]->(a:DataAsset {platform: '<platform>'})
+RETURN app.seal_id, count(DISTINCT j) AS jobCount, count(DISTINCT a) AS assetCount;
 ```
 
-### [QUERY_PURPOSE_2]
-```sql
-[ANOTHER_COMMON_QUERY]
-```
+---
 
-### [QUERY_PURPOSE_3]: [More Complex Pattern]
-```sql
-WITH [cte_name] AS (
-    [CTE_LOGIC]
-)
-SELECT
-    [final_columns]
-FROM [cte_name]
-[joins_and_filters]
-```
+## §OQ — Open questions
+
+Mark any unknowns surfaced during the interview. These gate follow-up loaders.
+
+1. [TO-BE-UPDATED]: Confirm `isSourceOfRecord` candidates with data governance team
+2. [TO-BE-UPDATED]: Confirm which external feeds set `isExternalFeed = true`
+3. [TO-BE-UPDATED]: Confirm DataHub `dataset_urn` for `REPRESENTS_CATALOG_DATASET` bridge
+4. [TO-BE-UPDATED]: Are there additional DataAsset candidates not covered in this interview?
 
 ---
 
-## Common Gotchas
+## §SANITIZE — Checklist before committing public version
 
-1. **[GOTCHA_1]**: [EXPLANATION]
-   - Wrong: `[INCORRECT_APPROACH]`
-   - Right: `[CORRECT_APPROACH]`
+Run before writing to `docs/patterns/data-catalog/<file>.md`:
 
-2. **[GOTCHA_2]**: [EXPLANATION]
-
----
-
-## Related Dashboards (if applicable)
-
-| Dashboard | Link | Use For |
-|-----------|------|---------|
-| [DASHBOARD_1] | [URL] | [DESCRIPTION] |
-| [DASHBOARD_2] | [URL] | [DESCRIPTION] |
+- [ ] No real SEAL IDs — replace with `<seal-id-placeholder>`
+- [ ] No real server names or SIDs — replace with `<server>` / `<sid>`
+- [ ] No real employee IDs or names — replace with `<employee-id>`
+- [ ] No internal org names or company GHE org references
+- [ ] No real schema names if sensitive — replace with `<schema>`
+- [ ] No real bucket names if sensitive — replace with `<bucket-name>`
+- [ ] Asset names: use generic names if sensitive, specific if already public
+- [ ] UC4 answers (team names, escalation contacts) — internal file ONLY
+- [ ] Internal version saved to `drydocs/data/data-catalog/` (gitignored)
 ```
-
----
-
-## Tips for Creating Domain Files
-
-1. **Start with the most-queried tables** - Don't try to document everything
-2. **Include column-level detail only for important columns** - Skip obvious ones like `created_at`
-3. **Real query examples > abstract descriptions** - Show don't tell
-4. **Document the gotchas prominently** - These save the most time
-5. **Keep sample queries runnable** - Use real table/column names
-6. **Note nested/struct fields explicitly** - These trip people up
-
-## Suggested Domain Files
-
-Common domains to document (create separate files for each):
-
-- `revenue.md` - Billing, subscriptions, ARR, transactions
-- `users.md` - Accounts, authentication, user attributes
-- `product.md` - Feature usage, events, sessions
-- `growth.md` - DAU/WAU/MAU, retention, activation
-- `sales.md` - CRM, pipeline, opportunities
-- `marketing.md` - Campaigns, attribution, leads
-- `support.md` - Tickets, CSAT, response times
