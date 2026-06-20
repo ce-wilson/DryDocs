@@ -1,0 +1,229 @@
+# =============================================================================
+# backlog.yaml — the machine-readable backlog agents pull from.
+#
+# This is the SOURCE OF TRUTH for work items. 02-backlog.md is the human-readable
+# view of the same items; IDEAS.md is the low-friction inbox that feeds this file.
+#
+# HOW AN AGENT PULLS WORK:
+#   1. Find the next item with status: todo whose every depends_on id is status: done.
+#   2. Set it status: in_progress (commit that change).
+#   3. Do exactly that item — stay inside the named agent's layer. Anything ambiguous
+#      goes to the HITL gate (docs/restructure/03-hitl-sme-flow.md), not auto-decided.
+#   4. Meet the `acceptance` test, then set status: done.
+#
+# STATUS lifecycle (mirrors relationship_vocabulary.yaml's idiom on purpose):
+#   todo | in_progress | blocked | done
+#
+# FIELDS:
+#   id          stable short id (matches 02-backlog.md)
+#   epic        grouping
+#   agent       which sub-agent owns it (.claude/agents/) or "main" for the Opus session
+#   model       suggested model tier
+#   priority    p0 (blocker) | p1 | p2 | p3
+#   status      todo | in_progress | blocked | done
+#   depends_on  list of ids that must be `done` first ([] = startable now)
+#   inputs      files/paths/registry keys the agent needs
+#   acceptance  the pass/fail test for "done"
+#   notes       optional
+# =============================================================================
+
+schema: drydocs.backlog.v1
+updated: 2026-06-20
+
+items:
+
+  # ── Epic A — Reference hygiene (reference-librarian, haiku) ────────────────
+  - id: A1
+    epic: reference-hygiene
+    agent: reference-librarian
+    model: haiku
+    priority: p2
+    status: todo
+    depends_on: []
+    inputs: [reference/REGISTRY.yaml]
+    acceptance: "every entry marked ok/stale; stale paths fixed or flagged"
+
+  - id: A2
+    epic: reference-hygiene
+    agent: reference-librarian
+    model: haiku
+    priority: p3
+    status: todo
+    depends_on: []
+    inputs: [external/orchestration/bmc-controlm/SOURCE-MANIFEST.md]
+    acceptance: "every .md in bmc-controlm/ accounted for in the manifest"
+
+  - id: A3
+    epic: reference-hygiene
+    agent: reference-librarian
+    model: haiku
+    priority: p3
+    status: todo
+    depends_on: []
+    inputs: [reference/research/README.md, docs/restructure/00-conceptual-model.md]
+    acceptance: ">=5 rows, each with a working link and a 'why it matters'"
+
+  # ── Epic B — Taxonomy capture (taxonomy-importer, sonnet) — Phase 1 ────────
+  - id: B1
+    epic: taxonomy-capture
+    agent: taxonomy-importer
+    model: sonnet
+    priority: p1
+    status: todo
+    depends_on: []
+    inputs: ["drydocs/data/samples/controlm_*.csv", "config/source-registry.yaml#controlm-psgmgr"]
+    acceptance: "node counts == m3-verify (8 folders/15 jobs/5 conditions); zero meaning edges in the file"
+    notes: "Start here — most mature domain; shapes the HITL gate against known data."
+
+  - id: B2
+    epic: taxonomy-capture
+    agent: taxonomy-importer
+    model: sonnet
+    priority: p1
+    status: todo
+    depends_on: []
+    inputs: ["drydocs/data/samples/seal_*.csv", "config/source-registry.yaml#seal-extract"]
+    acceptance: "every Application has its two-port classification; no ownership semantics asserted"
+
+  - id: B3
+    epic: taxonomy-capture
+    agent: taxonomy-importer
+    model: sonnet
+    priority: p1
+    status: todo
+    depends_on: []
+    inputs: ["drydocs/data/samples/{catalog_lobs,product_lines,products}_*.csv", "config/source-registry.yaml#catalog-pat"]
+    acceptance: "hierarchy matches catalog samples; confidential names referenced by id, not value"
+
+  - id: B4
+    epic: taxonomy-capture
+    agent: taxonomy-importer
+    model: sonnet
+    priority: p2
+    status: todo
+    depends_on: []
+    inputs: ["config/source-registry.yaml#oracle-schemas", "internal/schemas/"]
+    acceptance: "structure present; no real schema/table/SID values committed outside internal/"
+
+  # ── Epic C — Ontology mapping + HITL (ontology-mapper, sonnet) — Phase 2 ───
+  - id: C1
+    epic: ontology-mapping
+    agent: ontology-mapper
+    model: sonnet
+    priority: p1
+    status: todo
+    depends_on: [B1]
+    inputs: [config/taxonomy/controlm.yaml, drydocs/ontology/relationship_vocabulary.yaml, docs/RELATIONSHIP_GUIDE.md]
+    acceptance: "each Control-M edge type traces to a matrix row or recorded alias; gate run logged"
+
+  - id: C2
+    epic: ontology-mapping
+    agent: ontology-mapper
+    model: sonnet
+    priority: p1
+    status: todo
+    depends_on: [B2]
+    inputs: [config/taxonomy/seal.yaml, reference/standards/dprod-ekgf/README.md, reference/standards/w3c-org/README.md]
+    acceptance: "DPROD/ORG terms cited; mappings confirmed"
+
+  - id: C3
+    epic: ontology-mapping
+    agent: ontology-mapper
+    model: sonnet
+    priority: p1
+    status: todo
+    depends_on: [B3]
+    inputs: [config/taxonomy/lob-product-team.yaml, drydocs/ontology/relationship_vocabulary.yaml]
+    acceptance: "no free-text union ranges (resolve SUPPORTS Product-vs-AreaProduct); each edge has precise from/to + authority tag"
+
+  - id: C4
+    epic: ontology-mapping
+    agent: ontology-mapper
+    model: sonnet
+    priority: p1
+    status: todo
+    depends_on: [C1, C2, C3]
+    inputs: [drydocs/ontology/relationship_vocabulary.yaml, config/taxonomy-ontology-map.yaml]
+    acceptance: "test_schema.py drift guard green; map summary == vocabulary active count"
+
+  # ── Epic D — Config-driven loaders (pipeline-config + main) — Phase 3 ──────
+  - id: D1
+    epic: config-loaders
+    agent: main
+    model: opus
+    priority: p0
+    status: todo
+    depends_on: []
+    inputs: [drydocs/loaders/cypher/controlm_folders.cypher, drydocs/loaders/cypher/controlm_jobs.cypher, docs/reviews/drydocs-consolidated-plan.md]
+    acceptance: "RUNS_ON->SCHEDULED_ON + datetime() + stale_edge_cleanup landed; migrations idempotent; m3-verify green; tests green"
+    notes: "P0 prerequisite for any production load (consolidated-plan B.1/B.2/B.3)."
+
+  - id: D2
+    epic: config-loaders
+    agent: pipeline-config
+    model: sonnet
+    priority: p2
+    status: todo
+    depends_on: [C3, D1]
+    inputs: [config/precedence.yaml, drydocs/loaders/cypher/catalog_lobs.cypher]
+    acceptance: "flipping order: in precedence.yaml changes RECONCILES_TO resolution with no code edit"
+
+  - id: D3
+    epic: config-loaders
+    agent: pipeline-config
+    model: sonnet
+    priority: p2
+    status: todo
+    depends_on: [C4, D1]
+    inputs: [config/source-registry.yaml, drydocs/cli.py]
+    acceptance: "loading a source with confirmed:false fails fast with a clear message"
+
+  # ── Epic E — Context graph pilot (ontology-mapper + main) — Phase 4 ────────
+  - id: E1
+    epic: context-graph
+    agent: ontology-mapper
+    model: sonnet
+    priority: p2
+    status: todo
+    depends_on: [C1]
+    inputs: [reference/standards/sosa-ssn/README.md, drydocs/ontology/relationship_vocabulary.yaml]
+    acceptance: "sosa:* terms present with IRIs; status planned->confirmed via gate"
+
+  - id: E2
+    epic: context-graph
+    agent: main
+    model: opus
+    priority: p2
+    status: todo
+    depends_on: [E1]
+    inputs: [config/taxonomy-ontology-map.yaml]
+    acceptance: "one Cypher query returns latest result + resultTime per folder on sample data; documented in docs/"
+
+  # ── Epic F — Orchestrator expansion (pipeline-config) — Phase 5 ────────────
+  - id: F1
+    epic: orchestrator-expansion
+    agent: pipeline-config
+    model: sonnet
+    priority: p3
+    status: todo
+    depends_on: [C1]
+    inputs: [external/orchestration/autosys/README.md, config/source-registry.yaml]
+    acceptance: "AutoSys crosswalk fully mapped to baseline; no invented concepts; gate logged; confirmed:true"
+
+  - id: F2
+    epic: orchestrator-expansion
+    agent: pipeline-config
+    model: sonnet
+    priority: p3
+    status: todo
+    depends_on: [C1]
+    inputs: [external/orchestration/airflow/README.md, config/source-registry.yaml]
+    acceptance: "Airflow/MWAA crosswalk fully mapped to baseline; no invented concepts; gate logged; confirmed:true"
+
+# Roll-up the dispatcher can glance at (keep in sync, or regenerate).
+summary:
+  todo: 18
+  in_progress: 0
+  blocked: 0
+  done: 0
+  next_ready: [A1, A2, A3, B1, B2, B3, B4, D1]   # status:todo with all depends_on done

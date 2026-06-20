@@ -1,5 +1,9 @@
 # DryDocs1 — sub-agent backlog
 
+> **This is the human-readable view.** The machine source of truth agents pull from is
+> [`backlog.yaml`](backlog.yaml); new ideas are captured in [`IDEAS.md`](IDEAS.md) and groomed
+> into the yaml. Keep the two in sync (same ids). See `CLAUDE.md` §0 for the work ritual.
+
 Work units sized for lower-cost sub-agents. Each item names: **agent**, **inputs**, **output**,
 **acceptance test**, **precedence/HITL** touchpoints. The main (Opus) session dispatches and
 reviews; it does not do these itself. Status: ☐ todo · ◐ in progress · ☑ done.

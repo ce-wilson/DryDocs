@@ -9,6 +9,38 @@ in**, **which external reference to call**, and **which sub-agent owns the task*
 
 ---
 
+## 0. How to work — surfaces, backlog, session ritual
+
+**The git repo is the single source of truth. Surfaces (Claude Code, Cowork, Projects, remote)
+are lenses onto it, not separate workspaces.** Git is the cross-platform sync layer — pull at
+the start, push at the end, and every machine stays identical.
+
+**Where to work, by output type:**
+- output is a **commit** → **Claude Code** (CLI/desktop/IDE). All repo work, running the
+  pipeline, the HITL gate, and **dispatching the sub-agents** happen here (the `.claude/agents/`
+  only exist here).
+- output is an **artifact/document** (SME interview, deck, diagram, research) → **Cowork**;
+  the result comes back as a commit.
+- output is a **captured thought** → append to [`docs/restructure/IDEAS.md`](docs/restructure/IDEAS.md)
+  (the idea inbox). Use **Projects** for this when away from the repo.
+
+**The backlog (what agents pull from):**
+- [`docs/restructure/backlog.yaml`](docs/restructure/backlog.yaml) — machine-readable source of
+  truth. [`02-backlog.md`](docs/restructure/02-backlog.md) is the human view; `IDEAS.md` is the
+  inbox that grooms into the yaml.
+- **Pull rule (give this to a sub-agent verbatim):** *"Take the next `status: todo` item in
+  `backlog.yaml` whose every `depends_on` is `done`; set it `in_progress`; do exactly that item,
+  staying inside your layer; meet its `acceptance`; set it `done`."* Anything ambiguous → the HITL
+  gate ([`docs/restructure/03-hitl-sme-flow.md`](docs/restructure/03-hitl-sme-flow.md)), never auto-decided.
+
+**Session ritual (keeps every platform aligned):**
+1. **Start:** `git pull` → read this file → read `backlog.yaml`, pick the next ready item.
+2. **During:** the in-session Task list is *ephemeral* working memory for the one item — distinct
+   from the durable `backlog.yaml`.
+3. **End:** update the item's `status`, `git push`. Anything unfinished or newly noticed → `IDEAS.md`.
+
+---
+
 ## 1. The four layers (read this before modeling anything)
 
 DryDocs is built in four conceptual layers. Most past confusion came from collapsing them.
