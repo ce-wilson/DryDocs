@@ -30,7 +30,7 @@ What diverges, by stream:
 - **Control-M C3/C4 normalization** (variable taxonomy → resolver → command parser) —
   authored **here first**, Phases A/B/C complete; apply TO company, never overwrite locally.
 - **Product ontology** (PAT/SEAL roles, AreaProduct hierarchy) — take FROM this repo.
-- **Internal standards** (`internal-standards/`) — folder/data-center naming,
+- **Internal standards** (`knowledge/standards/`) — folder/data-center naming,
   description-metadata + calendar-projection plans, and the Control-M **governance
   corpus** (remediation flow, DAT/HLT naming, NFR catalog, escalation/SCIM, rules
   registry); additive, take FROM this repo.
@@ -83,7 +83,7 @@ For these paths, **do not hand-merge** — this repo is authoritative; replace
 `main`'s version. They are local-authored in full:
 
 - `drydocs/controlm/` — the entire normalization package (Phase A/B/C).
-- `internal-standards/` — every file (naming standards, governance corpus, plans).
+- `knowledge/standards/` — every file (naming standards, governance corpus, plans).
 - `drydocs/loaders/sql/controlm_variables.sql`, `drydocs/loaders/sql/ddl/controlm_staging_ddl.sql`.
 - `drydocs/ontology/relationship_vocabulary.yaml`, `drydocs/schema/catalog_ontology_supplement.cypher`.
 
@@ -262,7 +262,7 @@ each `%%` site; canonical symbolic tokens (`{ODATE}`, CALCDATE compaction `{ODAT
 cross-pass blocked-set kills self-reference loops; env-triplet variant expansion
 (`%%SCRIPT_PATH_%%HOSTNM`); global/pool refs kept verbatim. Sample: 86% fully resolved.
 
-Vendor validation (`vendor-bmc/controlm-variables.md`) corrected three things in
+Vendor validation (`vendor/bmc-controlm/controlm-variables.md`) corrected three things in
 `variables.py`: system variables exist without `$` (`%%ORDERID`, `%%JOBNAME`); `%%$X`
 is century-format syntax; `%%\VAR` (global) vs `%%\\POOL\VAR` (pool) both captured.
 

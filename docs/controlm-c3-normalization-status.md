@@ -37,7 +37,7 @@ and command parsing happen in **Python, not recursive SQL**.
 | Coverage report | `drydocs/controlm/variable_report.py` |
 | Row model (accepts raw extract headers) | `drydocs/models/controlm.py` → `ControlMVariableRow` |
 | Sample fixture (323 real rows) | `drydocs/data/samples/controlm_variables__sample.csv` |
-| Vendor reference (validated against) | `vendor-bmc/controlm-{variables,os-job-parameters,file-watcher,api-job-types,file-transfer-job}.md` |
+| Vendor reference (validated against) | `vendor/bmc-controlm/controlm-{variables,os-job-parameters,file-watcher,api-job-types,file-transfer-job}.md` |
 | Tests (102 across classifier/resolver/staging/commands) | `tests/unit/test_{variable_classifier,variable_resolver,variable_staging,command_parser}.py` |
 
 CLI (no Neo4j needed):
@@ -127,7 +127,7 @@ stg_notification, stg_app_fact**.
 ## Phase C entry criteria / first moves
 
 - Validate handler designs against the vendor docs BEFORE coding:
-  `vendor-bmc/controlm-file-watcher.md`, `controlm-os-job-parameters.md`,
+  `vendor/bmc-controlm/controlm-file-watcher.md`, `controlm-os-job-parameters.md`,
   `controlm-api-job-types.md` (same drill as the variables doc — it caught
   three classifier corrections).
 - 59% of jobs define **zero variables** — their classification rests

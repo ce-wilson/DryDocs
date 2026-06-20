@@ -27,7 +27,7 @@ the accumulated lessons from prior ports. Read both.
    - **Clean-adds** (path absent here) → apply untouched.
    - **Canonical-here** → take the producer version wholesale, do **not**
      hand-merge: `git checkout cewilson/main -- <path>`. This includes the
-     entire `drydocs/controlm/` package, `internal-standards/`, the Control-M
+     entire `drydocs/controlm/` package, `knowledge/standards/`, the Control-M
      SQL/DDL, `relationship_vocabulary.yaml`, `catalog_ontology_supplement.cypher`,
      **and the `tests/unit/test_variable_*` files** (taking these wholesale
      avoids re-deriving the skip guards — see ledger note).
