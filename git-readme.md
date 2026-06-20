@@ -1,7 +1,14 @@
-# DryDocs — Port Guide (producer → `<company-org>/DryDocs`)
+# DryDocs1 — Port Guide (producer `ce-wilson/DryDocs1` → `<company-org>/DryDocs`)
+
+> **DryDocs1 is version 1: a structural rewrite of DryDocs, not an increment on it.**
+> It re-founds the project on the four-layer model (taxonomy → ontology → knowledge
+> graph → context graph) with a clean external/internal split, a configuration layer,
+> and an SME guided gate — see [`CLAUDE.md`](CLAUDE.md) and [`docs/restructure/`](docs/restructure/).
+> The earlier `ce-wilson/DryDocs` producer is **superseded** by this repo. Throughout this
+> guide, "producer" now means `ce-wilson/DryDocs1`.
 
 This repo is the **producer** side. Work is built here on `main`, committed, and
-pushed to `github.com/ce-wilson/DryDocs`. The **company** target is
+pushed to `github.com/ce-wilson/DryDocs1`. The **company** target is
 `<company-org>/DryDocs` on GitHub Enterprise (`[github]` host); its maintainer
 fetches `main` from the producer and applies it onto the company `main`. This file
 is the instruction set for that apply; it rides inside the repo, so the
@@ -27,6 +34,11 @@ what to keep in each collision. Direction is one-way (producer → company); com
 
 What diverges, by stream:
 
+- **v1 restructure (NEW — the defining change of this version)** — the four-layer
+  re-foundation: `reference/` + `external/orchestration/` (external tiers), `config/`
+  (configuration layer), `internal/` (confidential split), `.claude/agents/` (sub-agents),
+  `CLAUDE.md` (routing brain), `docs/restructure/` (model + plan + backlog + HITL flow).
+  Almost entirely **clean-adds** — take FROM this repo. See the dedicated section below.
 - **Control-M C3/C4 normalization** (variable taxonomy → resolver → command parser) —
   authored **here first**, Phases A/B/C complete; apply TO company, never overwrite locally.
 - **Product ontology** (PAT/SEAL roles, AreaProduct hierarchy) — take FROM this repo.
@@ -35,6 +47,38 @@ What diverges, by stream:
   corpus** (remediation flow, DAT/HLT naming, NFR catalog, escalation/SCIM, rules
   registry); additive, take FROM this repo.
 - **Schema consolidation** — patch files deleted, bootstrap order cleaned up; evaluate per file.
+
+---
+
+## v1 restructure — the new top-level layout (take FROM this repo)
+
+The defining change of version 1. These are the structural commits (`8800946` restructure
++ `be1eac9` drift-guard) and are almost entirely **clean-adds** on the company side (the
+paths don't exist there yet). Take them wholesale.
+
+| Path | What it is | Disposition |
+|---|---|---|
+| `CLAUDE.md` | routing brain: four layers, all external refs, sub-agents, precedence | clean-add |
+| `reference/` | Tier-1 external: Neo4j/Oracle platforms + ontology standards (PROV-O, ORG, DPROD, SOSA/SSN, DCAT) + research, indexed by `REGISTRY.yaml` | clean-add |
+| `external/orchestration/` | Tier-2 external: BMC baseline (moved from `vendor/bmc-controlm/`) + AutoSys/Airflow placeholders + crosswalks | rename + clean-add |
+| `config/` | configuration layer: `precedence.yaml`, `source-registry.yaml`, `taxonomy-ontology-map.yaml`, `taxonomy/` | clean-add |
+| `internal/` + `PUBLISH-BOUNDARY.md` | confidential split for the private-but-sometimes-public repo | clean-add |
+| `.claude/agents/` | four sub-agents (reference-librarian, taxonomy-importer, ontology-mapper, pipeline-config) | clean-add |
+| `docs/restructure/` | conceptual model, project plan, sub-agent backlog, HITL SME flow | clean-add |
+
+**One rename to handle on the company side:** `vendor/bmc-controlm/` →
+`external/orchestration/bmc-controlm/`. If company `main` still has `vendor/bmc-controlm/`,
+delete it after taking the new path (across disjoint history git sees the move as
+delete+add). Doc/code references to the old path were repointed in the same commit.
+
+**Drift guard now enforced:** `tests/unit/test_schema.py` requires PyYAML (added as a dev
+dep) and fails CI if a relationship is `active` without its supplement block. It is the
+safety net behind the ontology workflow — keep it green.
+
+> **Next upgrade — internal import:** the internal data sources (SEAL, the LOB→Product→Team
+> org taxonomy, Oracle schemas) are imported through the new taxonomy → config → ontology →
+> HITL → loader flow, with confidential data isolated in `internal/`. The implementation
+> plan is [`knowledge/upgrade-plans/internal-import.md`](knowledge/upgrade-plans/internal-import.md).
 
 ---
 
@@ -47,7 +91,7 @@ The deliverable lives on `main` (the `controlm-spinoff` branch is not used for t
 port). On the company side, after fetching, list the commits to apply:
 
 ```
-git log --oneline --reverse cewilson/main    # full line — histories are disjoint, so all of it is "new" vs company main
+git log --oneline --reverse drydocs1/main    # full line — histories are disjoint, so all of it is "new" vs company main
 ```
 
 Hashes are transferred intact by `git fetch`, so a SHA you see locally resolves
@@ -67,8 +111,8 @@ either a **clean-add** (applies untouched) or a **collision** (hand-reconcile).
 ## How the company side applies it
 
 ```
-git remote add cewilson https://github.com/ce-wilson/DryDocs.git
-git fetch cewilson main
+git remote add drydocs1 https://github.com/ce-wilson/DryDocs1.git
+git fetch drydocs1 main
 git switch -c drydocs-port main
 git cherry-pick <oldest>^..<newest>     # range from the log command above
 ```
@@ -86,6 +130,9 @@ For these paths, **do not hand-merge** — this repo is authoritative; replace
 - `knowledge/standards/` — every file (naming standards, governance corpus, plans).
 - `drydocs/loaders/sql/controlm_variables.sql`, `drydocs/loaders/sql/ddl/controlm_staging_ddl.sql`.
 - `drydocs/ontology/relationship_vocabulary.yaml`, `drydocs/schema/catalog_ontology_supplement.cypher`.
+- **v1 restructure — entire new top-level layout (all canonical-here, take wholesale):**
+  `CLAUDE.md`, `PUBLISH-BOUNDARY.md`, `reference/`, `external/orchestration/`, `config/`,
+  `internal/`, `.claude/agents/`, `docs/restructure/`.
 
 `drydocs/data/` is `.gitignore`d — sample CSVs stay local and never transfer.
 
