@@ -68,4 +68,4 @@ Practical notes:
 - **Scheduling plane:** [controlm-job-scheduling](controlm-job-scheduling.md) (two-plane model; ordering feeds it)
 - **`%%ODATE` / `%%CALCDATE`:** [controlm-variables](controlm-variables.md)
 - **New Day / Order Method / User Daily:** [controlm-folder-definition-parameters](controlm-folder-definition-parameters.md)
-- **Default time-of-day (internal):** ODATE sets the *date*; when a folder declares **no time**, the **data center name** supplies the default time (all EST) — see [data-center-naming-convention](../internal-standards/data-center-naming-convention.md).
+- **Default time-of-day (internal):** ODATE sets the *date*; when a folder declares **no time**, the **data center name** supplies the default time (all EST) — see [data-center-naming-convention](../../../knowledge/standards/technology/data-center-naming-convention.md).

@@ -65,7 +65,7 @@ This naming format underpins Control-M **access control** (security restricts/al
 - Together with **Job Name**, the Folder Name determines the **position of the job in the Control-M Folder hierarchy**. May include a folder name **or a folder path**.
 - EXAMPLE (serial number): `SchFld03`. EXAMPLE (time period): `SeptOctFld2`.
 
-> 🔗 **Internal standard governs this value:** the company's **PRAOCG** convention defines valid folder names here — see [folder-naming-convention](../internal-standards/folder-naming-convention.md). (Also referenced from [folder-definition-parameters](controlm-folder-definition-parameters.md).)
+> 🔗 **Internal standard governs this value:** the company's **PRAOCG** convention defines valid folder names here — see [folder-naming-convention](../../../knowledge/standards/technology/folder-naming-convention.md). (Also referenced from [folder-definition-parameters](controlm-folder-definition-parameters.md).)
 
 ---
 
@@ -105,7 +105,7 @@ This naming format underpins Control-M **access control** (security restricts/al
 | **Variable Name** | **None** *(the description is not exposed as a `%%` variable — metadata only, cannot drive runtime behavior)* |
 | **Alternate Names** | EM Utilities `DESCRIPTION` · Report `DESCRIPTION` · Server Utilities `-description` · z/OS `Description` · EM API `description` |
 
-> 🔗 **Internal planned use:** the company plans to repurpose this 4000-char free-text field as a **structured metadata carrier** (pipe-delimited key:value pairs) for graph relationship extraction — see [description-field-metadata-plan](../internal-standards/description-field-metadata-plan.md). The vendor constraints that enable this: 4000-char capacity, free text, case-sensitive, no character restrictions documented.
+> 🔗 **Internal planned use:** the company plans to repurpose this 4000-char free-text field as a **structured metadata carrier** (pipe-delimited key:value pairs) for graph relationship extraction — see [description-field-metadata-plan](../../../knowledge/standards/technology/description-field-metadata-plan.md). The vendor constraints that enable this: 4000-char capacity, free text, case-sensitive, no character restrictions documented.
 
 ---
 
@@ -113,5 +113,5 @@ This naming format underpins Control-M **access control** (security restricts/al
 - **Folder hierarchy / SMART params:** [controlm-folder-definition-parameters](controlm-folder-definition-parameters.md)
 - **Ordering / `%%ODATE`:** [controlm-order-parameters](controlm-order-parameters.md)
 - **`%%JOBNAME` and variable rules:** [controlm-variables](controlm-variables.md)
-- **Internal folder naming (PRAOCG):** [folder-naming-convention](../internal-standards/folder-naming-convention.md)
-- **Internal Description-field metadata plan:** [description-field-metadata-plan](../internal-standards/description-field-metadata-plan.md)
+- **Internal folder naming (PRAOCG):** [folder-naming-convention](../../../knowledge/standards/technology/folder-naming-convention.md)
+- **Internal Description-field metadata plan:** [description-field-metadata-plan](../../../knowledge/standards/technology/description-field-metadata-plan.md)

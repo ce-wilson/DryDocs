@@ -1,3 +1,15 @@
+---
+standard: control-m-description-metadata
+domain: technology
+taxonomy_path: technology/orchestration/control-m/job
+governs: ControlMJob.description      # repurposed as a structured metadata carrier
+authority: internal-standards         # config/precedence.yaml tier 2 — refines the BMC baseline
+refines: bmc-baseline
+applies_to_source: controlm-psgmgr
+status: planned
+trust_tier: internal / SME-asserted / planned
+---
+
 # PLANNED PHASE — Description-Field Metadata & Variable Modernization
 
 **Corpus:** INTERNAL (company-specific plan) — *not* vendor documentation.
@@ -14,7 +26,7 @@
 
 **Plan:** repurpose Description to carry **information we don't capture anywhere else**, in a parseable structure, to create **relationships in the knowledge graph**.
 
-**Vendor constraints that make this viable** (see [general-parameters → Description](../vendor-bmc/controlm-general-parameters.md#description)):
+**Vendor constraints that make this viable** (see [general-parameters → Description](../../../external/orchestration/bmc-controlm/controlm-general-parameters.md#description)):
 - 1–**4000 characters**, free text, optional, case-sensitive — ample room for key:value metadata.
 - **Variable Name: None** — the field is *not* runtime-accessible as a `%%` variable. It's **metadata-only**: safe to restructure without affecting job execution. (Corollary: it can never *drive* behavior — purely descriptive/graph-feed.)
 
@@ -105,7 +117,7 @@ The legacy job illustrates the hazards agents must handle when parsing/resolving
 Define the **proper-variable template**: canonical names (e.g. `DROPBOX_DIR` not `DRPBX_DIR`), when a variable is warranted vs a literal, no punctuation-as-value, direct paths over indirection chains. Plus the **Description metadata template**: approved key list (table above as seed), `key: value | key: value` format, split-on-first-colon rule, escaping convention (to define).
 
 ### Phase 2 — Validate (don't break)
-Inventory existing variables/descriptions estate-wide and validate against the template **read-only**. Classify: conforming / non-conforming-but-functional / hazardous (e.g. concatenation-dot patterns). **Nothing is changed in this phase** — resolution behavior of legacy patterns (per [controlm-variables](../vendor-bmc/controlm-variables.md) scope/resolution rules, incl. `VARIABLE_INC_SEC`) must be preserved.
+Inventory existing variables/descriptions estate-wide and validate against the template **read-only**. Classify: conforming / non-conforming-but-functional / hazardous (e.g. concatenation-dot patterns). **Nothing is changed in this phase** — resolution behavior of legacy patterns (per [controlm-variables](../../../external/orchestration/bmc-controlm/controlm-variables.md) scope/resolution rules, incl. `VARIABLE_INC_SEC`) must be preserved.
 
 ### Phase 3 — Modernize via ontology
 Map each job/folder's variables + description metadata onto the **DryDocs ontology** so the graph *defines what the job is doing* (dataset series, delivery route, source system, support queue, SEAL application). Remediate legacy patterns to the template only once the graph confirms equivalence (the modern job above is the worked example: 5 locals → 0, path direct, metadata moved to Description/variables where it's queryable).

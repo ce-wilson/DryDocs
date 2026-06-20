@@ -1,3 +1,15 @@
+---
+standard: control-m-calendar-projection
+domain: technology
+taxonomy_path: technology/orchestration/control-m/calendar
+governs: ControlMJob.schedule         # calendar/RBC → run projection (scheduling plane)
+authority: internal-standards         # config/precedence.yaml tier 2 — refines the BMC baseline
+refines: bmc-baseline
+applies_to_source: controlm-psgmgr
+status: planned
+trust_tier: internal / SME-asserted / planned
+---
+
 # PLANNED PHASE — Calendar Resolution & Run Projection
 
 **Corpus:** INTERNAL (company plan) — *not* vendor documentation.
@@ -8,7 +20,7 @@
 
 ## Scope framing: what "projection" can honestly mean
 
-Control-M's **two-plane model** ([job-scheduling](../vendor-bmc/controlm-job-scheduling.md)) splits *when eligible* (scheduling plane) from *whether/if it runs* (prerequisites: events, resources). A definition-driven projection can reproduce the **scheduling plane** exactly; the prerequisite plane is runtime-dependent.
+Control-M's **two-plane model** ([job-scheduling](../../../external/orchestration/bmc-controlm/controlm-job-scheduling.md)) splits *when eligible* (scheduling plane) from *whether/if it runs* (prerequisites: events, resources). A definition-driven projection can reproduce the **scheduling plane** exactly; the prerequisite plane is runtime-dependent.
 
 So the projection target, in increasing ambition:
 1. **Order-date set** — which ODATEs a job/folder will be ordered on. *(Deterministic from definitions — the core deliverable.)*
@@ -21,13 +33,13 @@ So the projection target, in increasing ambition:
 
 | Input | Source doc | Notes |
 |---|---|---|
-| Calendar definitions (Regular/Periodic/RBC) | [controlm-calendars](../vendor-bmc/controlm-calendars.md) incl. **Authoritative Additions** | Regular: explicit days + recurrence per **year**; Periodic: periods `A–Z,1–9`, ≤255 days each, may overlap |
+| Calendar definitions (Regular/Periodic/RBC) | [controlm-calendars](../../../external/orchestration/bmc-controlm/controlm-calendars.md) incl. **Authoritative Additions** | Regular: explicit days + recurrence per **year**; Periodic: periods `A–Z,1–9`, ≤255 days each, may overlap |
 | **RBC include/exclude lists per entity** | calendars doc → *Specific Rule-based calendar scheduling* table | The combination semantics: include lists schedule, exclude lists remove order dates; Folder RBCs vs Control-M RBCs |
 | Job ↔ parent SMART folder **AND/OR relationship** | same | Governs how job criteria combine with folder RBC |
-| Folder hierarchy + inheritance | [folder-definition-parameters](../vendor-bmc/controlm-folder-definition-parameters.md), [subfolder-creation](../vendor-bmc/controlm-subfolder-creation.md) | SMART → sub-folder → job |
-| Scheduling criteria (6 types), cyclic settings | [job-scheduling](../vendor-bmc/controlm-job-scheduling.md) | Every Day / None / Specific Dates / Use Parent / Advanced(RBC) / etc. |
+| Folder hierarchy + inheritance | [folder-definition-parameters](../../../external/orchestration/bmc-controlm/controlm-folder-definition-parameters.md), [subfolder-creation](../../../external/orchestration/bmc-controlm/controlm-subfolder-creation.md) | SMART → sub-folder → job |
+| Scheduling criteria (6 types), cyclic settings | [job-scheduling](../../../external/orchestration/bmc-controlm/controlm-job-scheduling.md) | Every Day / None / Specific Dates / Use Parent / Advanced(RBC) / etc. |
 | Confirmation calendars + **8 exception policies** + **Shift By (−62..+62)** | calendars + job-scheduling docs | Applied *after* base date-set resolution |
-| Order Method + New Day / **User Daily** time | folder-definition-parameters; [order-parameters](../vendor-bmc/controlm-order-parameters.md) | Automatic (New Day), Specific User Daily (e.g. `PUDLY0900` → 09:00 ordering), Manual = excluded from projection |
+| Order Method + New Day / **User Daily** time | folder-definition-parameters; [order-parameters](../../../external/orchestration/bmc-controlm/controlm-order-parameters.md) | Automatic (New Day), Specific User Daily (e.g. `PUDLY0900` → 09:00 ordering), Manual = excluded from projection |
 | ODATE mechanics (current working date / select date / wait-for-ODATE) | order-parameters | Date semantics of the projection rows |
 | **DC default time** | data-center-naming-convention (INTERNAL) | `E####` in server name, EST, when folder/job declares no time |
 | Activity periods / Keep Active / retroactive | calendars + job-scheduling docs | Blackouts and extension windows |

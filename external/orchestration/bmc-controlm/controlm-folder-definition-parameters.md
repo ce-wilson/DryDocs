@@ -41,7 +41,7 @@ Tiers: **[VERBATIM]** = transcribed from the BMC Help screenshot · **[GROUNDED]
 |---|---|
 | **SMART** | Defines whether a folder is SMART. When selected, the folder has an extended set of folder definition parameters and can include Sub Folders. The jobs and Sub Folders in the SMART Folder can **inherit scheduling definitions** from the SMART Folder that contains them. To define a regular folder, clear the check box (see Regular folder parameters). |
 | **Folder Type** | Indicates whether the folder type is a regular folder, a SMART folder, or a Sub Folder. Value: **SMART**. |
-| **Folder Name** | Defines the name of the folder; indicates the folder where the job belongs. **Length 1–64 (z/OS 1–8); case-sensitive; invalid chars: blanks, single quotes, `$ / * ?`, space; not a variable; formerly "Table Name".** Full param detail → [general-parameters](controlm-general-parameters.md#folder-name). → *Internal standard governs this value:* see [folder-naming-convention](../internal-standards/folder-naming-convention.md). |
+| **Folder Name** | Defines the name of the folder; indicates the folder where the job belongs. **Length 1–64 (z/OS 1–8); case-sensitive; invalid chars: blanks, single quotes, `$ / * ?`, space; not a variable; formerly "Table Name".** Full param detail → [general-parameters](controlm-general-parameters.md#folder-name). → *Internal standard governs this value:* see [folder-naming-convention](../../../knowledge/standards/technology/folder-naming-convention.md). |
 | **Description** | Provides a description of the job in free text. A well-written description helps determine why the job was defined and how it fits into your business workflow. |
 | **Folder Library** | Defines the name of the library that contains the job's folder. **Only z/OS folders.** |
 | **Control-M/Server** | Defines the name of the Control-M/Server (or Control-M for z/OS) that processes the job. |
@@ -70,7 +70,7 @@ Tiers: **[VERBATIM]** = transcribed from the BMC Help screenshot · **[GROUNDED]
 The **Site Standard** + **Business Parameters** + **Enforce Validations** parameters are the *vendor mechanism* by which an organization can enforce folder/job definition rules (including naming). The company's **PRAOCG folder naming convention** is an *internal standard* that maps onto this mechanism. The two are deliberately kept in **separate corpora**:
 
 - **Vendor (this file):** the Folder Name field exists; Site Standards can enforce rules. *(capability — "what's possible")*
-- **Internal:** [folder-naming-convention](../internal-standards/folder-naming-convention.md) defines what a valid folder name *is* here. *(conformance — "our standard")*
+- **Internal:** [folder-naming-convention](../../../knowledge/standards/technology/folder-naming-convention.md) defines what a valid folder name *is* here. *(conformance — "our standard")*
 
 This is the two-stage validation split — see [[project-drydocs-scrape-two-corpus]].
 

@@ -1,8 +1,20 @@
+---
+standard: control-m-folder-naming
+domain: technology
+taxonomy_path: technology/orchestration/control-m/folder
+governs: JobFolder.name              # the 6-char folder name (SCHED_TABLE)
+authority: internal-standards         # config/precedence.yaml tier 2 — refines the BMC baseline
+refines: bmc-baseline
+applies_to_source: controlm-psgmgr
+status: active
+trust_tier: internal / SME-asserted / mutable
+---
+
 # Internal Standard — Control-M Folder Naming Convention (PRAOCG)
 
 **Corpus:** INTERNAL (company-specific standard) — *not* vendor documentation.
 **Captured:** 2026-06-11, from SME (chat). Source of record: SME knowledge; confirm against the canonical internal standards page when available.
-**Role:** Conformance layer — defines what a *valid* Control-M folder name is **here**. The vendor side only says the Folder Name field exists ([controlm-folder-definition-parameters](../vendor-bmc/controlm-folder-definition-parameters.md)); this defines how we fill it.
+**Role:** Conformance layer — defines what a *valid* Control-M folder name is **here**. The vendor side only says the Folder Name field exists ([controlm-folder-definition-parameters](../../../external/orchestration/bmc-controlm/controlm-folder-definition-parameters.md)); this defines how we fill it.
 
 > ⚠️ **Trust tier:** internal / mutable / SME-asserted. "The **majority** follow" this convention — it is a strong norm, not a guaranteed invariant. Items marked *(to confirm)* are gaps the SME did not fully enumerate; do **not** invent values for them.
 

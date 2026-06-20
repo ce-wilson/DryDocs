@@ -1,3 +1,15 @@
+---
+standard: control-m-data-center-naming
+domain: technology
+taxonomy_path: technology/orchestration/control-m/data-center
+governs: ControlMServer.data_center   # DC name encodes the default execution time
+authority: internal-standards         # config/precedence.yaml tier 2 — refines the BMC baseline
+refines: bmc-baseline
+applies_to_source: controlm-psgmgr
+status: active
+trust_tier: internal / SME-asserted / mutable
+---
+
 # Internal Standard — Control-M Data Center Naming Convention
 
 **Corpus:** INTERNAL (company-specific standard) — *not* vendor documentation.
@@ -12,7 +24,7 @@
 
 **If a folder does not declare a time, the data center name supplies the default time.** **All times are EST (Eastern).**
 
-This is the time-of-day counterpart to ODATE: ordering/scheduling sets the **date** (`%%ODATE`, see [controlm-order-parameters](../vendor-bmc/controlm-order-parameters.md)); the **DC name supplies the default time** when the folder is silent on it.
+This is the time-of-day counterpart to ODATE: ordering/scheduling sets the **date** (`%%ODATE`, see [controlm-order-parameters](../../../external/orchestration/bmc-controlm/controlm-order-parameters.md)); the **DC name supplies the default time** when the folder is silent on it.
 
 ---
 
@@ -46,7 +58,7 @@ Application codes span DCs (e.g. PRICD in P012/P014/P032) — DC↔application i
 ## Why this matters for the knowledge graph
 
 - A folder's effective run time = **declared folder time** if present, **else** the DC's `E####` default. Any timing analysis must apply this fallback, not assume folders always carry an explicit time.
-- All times normalize to **EST** — no per-job timezone math needed for this default (timezone-specific ordering is a separate concern; see "Wait for Order Date to run" in [controlm-order-parameters](../vendor-bmc/controlm-order-parameters.md)).
+- All times normalize to **EST** — no per-job timezone math needed for this default (timezone-specific ordering is a separate concern; see "Wait for Order Date to run" in [controlm-order-parameters](../../../external/orchestration/bmc-controlm/controlm-order-parameters.md)).
 - The DC name parses into attributes (environment, instance, default time) — candidate node properties; a folder → data-center → default-time edge captures the fallback.
 
 ---
