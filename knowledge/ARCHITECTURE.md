@@ -94,9 +94,25 @@ DB / profiling available) — they are recommendations for the fork.
   two highest-value, lowest-risk wins. T1 lives on the `feat/llm-nav-p0-vector`
   branch; fold it in there alongside the upgrade-plan refinements.
 
-## 6. Net
+## 6. Operational entry points (`scripts/`)
+
+Ingestion is invoked through the Python CLI (`poetry run drydocs ...`). For
+scheduled go-live (Control-M / cron), `scripts/` adds two thin shell wrappers —
+no logic, just the canonical chain, fail-fast:
+
+- `scripts/ingest.sh` — check → bootstrap → ontology supplements → `ingest-controlm`
+  → m1/m3-verify. Runnable today; args pass through to `ingest-controlm`.
+- `scripts/embed.sh` — vector embedding pass. **Forward-looking**: needs the `embed`
+  command from `feat/llm-nav-p0-vector`; guarded to exit cleanly until that lands.
+
+Kept separate so bulk MERGE isn't taxed by vector-index writes (finding **T7**).
+NB: distinct from the `.sh`/`.ksh` matched in `drydocs/controlm/commands.py`, which
+classify the *job command strings being ingested* — opposite direction. See
+`scripts/README.md`.
+
+## 7. Net
 - **Now (this fork):** unambiguous top-level `vendor/` vs `knowledge/` split,
-  signposted, zero code risk.
+  signposted, zero code risk; plus operational `scripts/` wrappers (§6).
 - **Next (separate PR):** the loader subpackage split (§4a) with import shims +
   tests; the data-catalog doc move (§4b).
 - **Tuning:** apply T1/T2 first; T3–T4 when a perf budget/profiling exists.
