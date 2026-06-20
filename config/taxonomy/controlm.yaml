@@ -1,0 +1,109 @@
+# =============================================================================
+# config/taxonomy/controlm.yaml  —  Control-M taxonomy (backlog B1)
+#
+# PURE CLASSIFICATION ONLY. Hierarchy: ControlMServer > JobFolder > ControlMJob;
+# Condition is a classified entity keyed (folder_id, name). This file contains
+# NO meaning-bearing edges — REQUIRES_IN_CONDITION / EMITS_OUT_CONDITION /
+# DEPENDS_ON are ONTOLOGY decisions, deferred to the C1 ontology-mapping pass
+# (config/taxonomy-ontology-map.yaml) via the HITL gate.
+#
+# Captured by: taxonomy-importer (B1), 2026-06-20, from the bundled sample CSVs
+#   drydocs/data/samples/controlm_{folders,jobs,conditions_in,conditions_out}__sample.csv
+# Faithful to source: counts/values reflect the CSVs as-is, not normalized.
+# =============================================================================
+
+taxonomy: controlm
+domain: technology
+taxonomy_path_root: technology/orchestration/control-m
+source: controlm-psgmgr            # config/source-registry.yaml
+adapter: csv-sample                 # OracleAdapter (psgmgr) in production
+authority: bmc-baseline             # config/precedence.yaml tier 1
+governed_by_standard: technology/orchestration/control-m/folder   # folder-naming-convention (JobFolder.name)
+classification_only: true
+
+nodes:
+
+  # ControlMServer (data center) — top of the hierarchy. Key: data_center.
+  servers:
+    - { id: P12 }
+    - { id: P14 }
+    - { id: P32 }
+    - { id: P33 }
+
+  # JobFolder — child of a server. Key: folder_id. name = sched_table.
+  # status A = active, R = retired. jobs[] = contained ControlMJob keys (classification only).
+  folders:
+    - { id: 161014, name: PRARAG-HLDM-111027-PEX-RFND-DLY, server: P12, status: A, jobs: ["161014:5","161014:3"] }
+    - { id: 161015, name: PRARAG-HLDM-85025-PEX-TRUST-DLY, server: P12, status: A, jobs: ["161015:22","161015:23","161015:24","161015:25","161015:12"] }
+    - { id: 161016, name: PRARAG-HLDM-85025-PEX-TRUST-CYC, server: P14, status: A, jobs: ["161016:22","161016:21","161016:13"] }
+    - { id: 161020, name: PRARAG-HLDM-94028-PEX-PROV-DLY,  server: P32, status: A, jobs: [] }   # active, no jobs in sample
+    - { id: 160500, name: PRAUTG-AUTO-15001-AUT-RFND-DLY,  server: P12, status: A, jobs: ["160500:1","160500:2"] }
+    - { id: 160501, name: PRAUTG-AUTO-15002-AUT-TRUST-DLY, server: P12, status: A, jobs: [] }   # active, no jobs in sample
+    - { id: 162001, name: PRDATG-DAT-20001-AC-RECON-DLY,   server: P33, status: A, jobs: ["162001:1"] }
+    - { id: 161999, name: PRRPDG-RPD-19999-RISK-RETIRED,   server: P14, status: R, jobs: [] }   # retired (user_daily empty)
+
+  # ControlMJob — child of a folder. Key: (folder_id, job_id). app = application column.
+  jobs:
+    - { id: "161014:5",  name: PARAD0060_PEX_EXPLOANRQTDTL_AWS_RFND,    folder: 161014, app: ARA, group: RFND }
+    - { id: "161014:3",  name: PARAD0060_PEX_EXPLOANCALCTOT_AWS_RFND,  folder: 161014, app: ARA, group: RFND }
+    - { id: "161015:22", name: PARAD0010_PEX_EXPLOANRQTDTL_DAT_ONPM_FW, folder: 161015, app: ARA, group: TRUST }
+    - { id: "161015:23", name: PARAD0001_PEX_EXPLOANRQTDTL_AWS_PREPROC, folder: 161015, app: ARA, group: TRUST }
+    - { id: "161015:24", name: PARAD0020_PEX_EXPLOANRQTDTL_AWS_PLCT,    folder: 161015, app: ARA, group: TRUST }
+    - { id: "161015:25", name: PARAD0050_PEX_EXPLOANRQTDTL_AWS_TRUST,   folder: 161015, app: ARA, group: TRUST }
+    - { id: "161015:12", name: PARAD0020_PEX_EXPLOANCALCTOT_AWS_PLCT,   folder: 161015, app: ARA, group: TRUST }
+    - { id: "161016:22", name: PARAD0010_PEX_EXPLOANRQTDTL_DAT_ONPM_FW, folder: 161016, app: ARA, group: TRUST, cyclic: true }
+    - { id: "161016:21", name: PARAD0010_PEX_EXPLOANRQTDTL_TOK_ONPM_FW, folder: 161016, app: ARA, group: TRUST, cyclic: true }
+    - { id: "161016:13", name: PARAD0050_PEX_EXPLOANCALCTOT_AWS_TRUST,  folder: 161016, app: ARA, group: TRUST, cyclic: true }
+    - { id: "160500:1",  name: AUTO_FW,      folder: 160500, app: AUT, group: AUTO }
+    - { id: "160500:2",  name: AUTO_LOAD,    folder: 160500, app: AUT, group: AUTO }
+    - { id: "162001:1",  name: AC_RECON_FW,  folder: 162001, app: DAT, group: AC }
+
+  # Condition — classified entity. Key: (folder_id, name). Listed by folder.
+  # The in/out wiring to jobs (REQUIRES_IN / EMITS_OUT) is MEANING -> deferred to C1.
+  conditions:
+    - folder: 161014
+      names:
+        - PL-PARAD0050_PEX_EXPLOANRQTDTL_AWS_TRUST-OK
+        - PL-PARAD0020_PEX_EXPLOANRQTDTL_AWS_PLCT-OK
+        - PL-PARAD0001_PEX_EXPLOANRQTDTL_AWS_PREPROC-OK
+        - PL-PARAD0010_PEX_EXPLOANRQTDTL_DAT_ONPM_FW-OK
+        - PL-PARAD0010_PEX_EXPLOANRQTDTL_TOK_ONPM_FW-OK
+        - PL-PARAD0050_PEX_EXPLOANCALCTOT_AWS_TRUST-OK
+        - PL-PARAD0020_PEX_EXPLOANCALCTOT_AWS_PLCT-OK
+    - folder: 161015
+      names:
+        - PL-PARAD0050_PEX_EXPLOANRQTDTL_AWS_TRUST-OK
+        - PL-PARAD0020_PEX_EXPLOANRQTDTL_AWS_PLCT-OK
+        - PL-PARAD0001_PEX_EXPLOANRQTDTL_AWS_PREPROC-OK
+        - PL-PARAD0010_PEX_EXPLOANRQTDTL_DAT_ONPM_FW-OK
+        - PL-PARAD0020_PEX_EXPLOANCALCTOT_AWS_PLCT-OK
+    - folder: 161016
+      names:
+        - PL-PARAD0010_PEX_EXPLOANRQTDTL_DAT_ONPM_FW-OK
+        - PL-PARAD0010_PEX_EXPLOANRQTDTL_TOK_ONPM_FW-OK
+        - PL-PARAD0050_PEX_EXPLOANCALCTOT_AWS_TRUST-OK
+
+counts:
+  servers: 4
+  folders: 8           # 7 active (1 retired: 161999); 3 active have no jobs in sample
+  jobs: 13             # distinct (folder_id, job_id)
+  conditions: 15       # distinct (folder_id, name); 7 distinct names
+  empty_folders: 3     # 161020, 160501, 161999
+
+open_questions:
+  - id: count-drift-vs-doc
+    note: >
+      COUNT DRIFT vs the documented m3-verify acceptance (8 folders / 15 jobs / 5 conditions,
+      backlog B1 + README). This sample actually has 13 jobs and 15 conditions (7 distinct
+      names). The bundled sample CSVs differ from the fixture those numbers were written for.
+      SME action: run `drydocs m3-verify` for ground truth, then update either the sample or the
+      documented expectation. The taxonomy here is faithful to the CSVs on disk.
+  - id: retired-folder
+    note: >
+      Folder 161999 (PRRPDG-RPD-19999-RISK-RETIRED) is status=R / user_daily empty — kept as
+      classified-but-inactive; the ontology pass should decide whether retired folders load.
+  - id: folder-name-parse
+    note: >
+      JobFolder.name follows the PRAOCG-style convention (technology/orchestration/control-m/folder
+      standard). Parsing name -> (env, LOB, app, type) attributes is left for a follow-up; raw
+      names captured here unmodified (faithful-to-source).

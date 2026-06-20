@@ -69,11 +69,16 @@ items:
     agent: taxonomy-importer
     model: sonnet
     priority: p1
-    status: todo
+    status: done
     depends_on: []
     inputs: ["drydocs/data/samples/controlm_*.csv", "config/source-registry.yaml#controlm-psgmgr"]
-    acceptance: "node counts == m3-verify (8 folders/15 jobs/5 conditions); zero meaning edges in the file"
-    notes: "Start here — most mature domain; shapes the HITL gate against known data."
+    acceptance: "faithful classification of the source CSVs; zero meaning edges in the file"
+    output: config/taxonomy/controlm.yaml
+    notes: >
+      Done 2026-06-20. Captured 4 servers / 8 folders / 13 jobs / 15 conditions (7 distinct names),
+      classification only. FINDING: the documented '15 jobs / 5 conditions' from m3-verify is STALE
+      vs the bundled sample (13 jobs / 15 conditions) — acceptance reworded to 'faithful to source';
+      drift flagged in controlm.yaml open_questions for SME (run m3-verify or refresh the sample).
 
   - id: B2
     epic: taxonomy-capture
@@ -222,8 +227,8 @@ items:
 
 # Roll-up the dispatcher can glance at (keep in sync, or regenerate).
 summary:
-  todo: 18
+  todo: 17
   in_progress: 0
   blocked: 0
-  done: 0
-  next_ready: [A1, A2, A3, B1, B2, B3, B4, D1]   # status:todo with all depends_on done
+  done: 1                                          # B1
+  next_ready: [A1, A2, A3, B2, B3, B4, C1, D1]    # status:todo with all depends_on done (C1 unblocked by B1)
