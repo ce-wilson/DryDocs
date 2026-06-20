@@ -208,8 +208,13 @@ poetry run drydocs ingest-controlm --use-oracle --folder "CCB_AUTO_%"
 poetry run drydocs m3-verify
 ```
 
-Expected `m3-verify` output after the sample chain (8 folders, 15 jobs, 5 distinct
-conditions, 13 derived dependency edges):
+Expected `m3-verify` output after the sample chain. **Reconciled 2026-06-20 to the bundled
+sample:** 8 folders, **13 jobs**, **15 conditions** (7 distinct names), **10 derived dependency
+edges**. The bundled sample is a *reduced* fixture — 2 active folders (`161020`, `160501`) carry
+no jobs, so the "active folders contain at least one job" invariant reports `empty=2`. That is a
+known sample gap (folders included without their jobs); close it by regenerating the sample from
+`psgmgr`. (Earlier docs said 15 jobs / 5 conditions / 13 deps — that was a different, larger
+fixture.)
 
 ```
                           M3 (part 1 + part 2) invariants
@@ -217,15 +222,18 @@ conditions, 13 derived dependency edges):
 | Check                                            | OK  | Detail                          |
 +==================================================+=====+=================================+
 | every folder has a server                        | yes | folders=8 srv_links=8           |
-| every job has a folder                            | yes | jobs=15 with_folder=15          |
+| every job has a folder                            | yes | jobs=13 with_folder=13          |
 | no duplicate (folder_id, job_id)                 | yes | dupes=0                         |
 | ControlM SchedulerKind seeded                     | yes | n=1                             |
 | M3 local anchor terms seeded                      | yes | n=3 (expect >= 3 ...)           |
-| active folders contain at least one job          | yes | empty=0 total=7                 |
-| no orphan conditions                              | yes | orphan=0 total=5                |
-| DEPENDS_ON edges have recursion_level + path     | yes | total=13 missing_level=0 ...    |
+| active folders contain at least one job          | no* | empty=2 total=7 (sample gap)    |
+| no orphan conditions                              | yes | orphan=0 total=15               |
+| DEPENDS_ON edges have recursion_level + path     | yes | total=10 missing_level=0 ...    |
 +--------------------------------------------------+-----+---------------------------------+
 ```
+
+> *`empty=2` is the known bundled-sample gap noted above: folders `161020` and `160501` are
+> active but jobless in the fixture. Regenerate the sample from `psgmgr` to restore `empty=0`.
 
 ### Schema notes worth knowing
 

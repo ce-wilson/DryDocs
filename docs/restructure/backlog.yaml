@@ -76,9 +76,10 @@ items:
     output: config/taxonomy/controlm.yaml
     notes: >
       Done 2026-06-20. Captured 4 servers / 8 folders / 13 jobs / 15 conditions (7 distinct names),
-      classification only. FINDING: the documented '15 jobs / 5 conditions' from m3-verify is STALE
-      vs the bundled sample (13 jobs / 15 conditions) — acceptance reworded to 'faithful to source';
-      drift flagged in controlm.yaml open_questions for SME (run m3-verify or refresh the sample).
+      classification only. Count drift RESOLVED: bundled sample treated as canonical; README
+      m3-verify block reconciled (8/13/15/10). Residual flagged: sample is reduced (folders 161020,
+      160501 active-but-jobless -> m3-verify empty=2) — regenerate from psgmgr to restore. See
+      controlm.yaml open_questions#count-drift-vs-doc (status: resolved-2026-06-20).
 
   - id: B2
     epic: taxonomy-capture

@@ -92,12 +92,15 @@ counts:
 
 open_questions:
   - id: count-drift-vs-doc
+    status: resolved-2026-06-20
     note: >
-      COUNT DRIFT vs the documented m3-verify acceptance (8 folders / 15 jobs / 5 conditions,
-      backlog B1 + README). This sample actually has 13 jobs and 15 conditions (7 distinct
-      names). The bundled sample CSVs differ from the fixture those numbers were written for.
-      SME action: run `drydocs m3-verify` for ground truth, then update either the sample or the
-      documented expectation. The taxonomy here is faithful to the CSVs on disk.
+      RESOLVED: the bundled sample CSVs are treated as canonical (the on-disk artifact the
+      loaders/tests use; the intended larger fixture can't be regenerated without psgmgr). The
+      stale README m3-verify expected-output block was reconciled to the actual sample —
+      8 folders / 13 jobs / 15 conditions (7 distinct names) / 10 derived deps. RESIDUAL (for SME):
+      the sample is REDUCED — folders 161020 and 160501 are active but jobless, so the m3-verify
+      "active folders contain a job" invariant reports empty=2. Regenerate the sample from psgmgr
+      to restore the complete fixture (empty=0).
   - id: retired-folder
     note: >
       Folder 161999 (PRRPDG-RPD-19999-RISK-RETIRED) is status=R / user_daily empty — kept as
