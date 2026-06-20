@@ -122,7 +122,7 @@ def test_dollar_user_refs_split_from_system_funcs() -> None:
 
 
 def test_system_variables_not_user_refs() -> None:
-    # vendor/bmc-controlm/controlm-variables.md §System Variables Reference:
+    # external/orchestration/bmc-controlm/controlm-variables.md §System Variables Reference:
     # ORDERID / JOBNAME are system variables — they must NOT enter the
     # Phase-B resolution hot set. Real row: %%UCM-KEYVALUE on folder 185675.
     cv = classify_variable(

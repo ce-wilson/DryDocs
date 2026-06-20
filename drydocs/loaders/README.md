@@ -12,7 +12,7 @@ into a `.cypher` template → provenance `:JobRun`). Loaders are grouped here by
 - `controlm_folders` · `controlm_jobs`
 - `controlm_conditions_in` · `controlm_conditions_out`
 - `controlm_dependencies_derived` · `controlm`
-- SQL extracts live in `sql/` (Oracle); reference docs in `../../vendor/bmc-controlm/`.
+- SQL extracts live in `sql/` (Oracle); reference docs in `../../external/orchestration/bmc-controlm/`.
 
 ## Internally-sourced
 - SEAL: `seal_applications` · `seal_contacts`

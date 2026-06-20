@@ -33,7 +33,7 @@ pointer is a pointer, not a fact):
     VAR_REF         value references other USER variables — Phase B substitutes
     LITERAL         none of the above
 
-Vendor reference: vendor/bmc-controlm/controlm-variables.md (Control-M SaaS docs
+Vendor reference: external/orchestration/bmc-controlm/controlm-variables.md (Control-M SaaS docs
 applied to 9.0.21.300 — see its version notice). Confirmed there: resolution
 priority job > folder > global > system; SMART-folder variables inherit to
 sub-folders and jobs; resolution happens at execution time (so date tokens
@@ -69,13 +69,13 @@ class VariableKind(str, Enum):
 # %%$DROPBOX). Tokens are split via the registries below.
 DOLLAR_TOKEN_RE = re.compile(r"%%\$([A-Za-z][A-Za-z0-9_]*)")
 
-# Control-M function library, per vendor/bmc-controlm/controlm-variables.md
+# Control-M function library, per external/orchestration/bmc-controlm/controlm-variables.md
 # (§Variable Functions): CALCDATE, SUBSTR, GETENV, WCALC, BLANK. Both
 # %%FUNC and %%$FUNC syntaxes occur (observed: %%$CALCDATE ... and plain
 # %%SUBSTR %%DATACENTER 1 1).
 KNOWN_SYSTEM_FUNCS = frozenset({"CALCDATE", "SUBSTR", "GETENV", "WCALC", "BLANK"})
 
-# Control-M system variables, per vendor/bmc-controlm/controlm-variables.md
+# Control-M system variables, per external/orchestration/bmc-controlm/controlm-variables.md
 # (§System Variables Reference): job-general, scheduling, environment, and
 # action variables. Referenced as %%NAME or century-format %%$NAME — never
 # user-defined, so they must NOT enter the Phase-B resolution hot set.
@@ -99,7 +99,7 @@ def _is_system_var(token: str) -> bool:
     t = token.upper()
     return t in KNOWN_SYSTEM_VARIABLES or t.startswith("ODATE")
 
-# backslash-scoped references, per vendor/bmc-controlm/controlm-variables.md
+# backslash-scoped references, per external/orchestration/bmc-controlm/controlm-variables.md
 # (§Scope Levels): %%\VAR is a GLOBAL variable (server-wide), %%\\POOL\VAR
 # is a pool-qualified reference. This shop uses the two-segment form to
 # hand values between jobs of a dataflow (%%\\SCRA_REPORTING\PROID) — the

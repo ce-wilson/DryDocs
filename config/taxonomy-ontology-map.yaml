@@ -1,0 +1,84 @@
+# =============================================================================
+# config/taxonomy-ontology-map.yaml — the HITL-confirmed bridge.
+#
+# THE central artifact of the configuration layer. Each entry says:
+#   "this imported TAXONOMY element  →  apply THIS ONTOLOGY rule."
+#
+# Lifecycle of every entry:
+#   proposed   → ontology-mapper drafted it from the PROV matrix
+#   confirmed  → SME approved via the guided gate (docs/restructure/03-hitl-sme-flow.md)
+#   applied    → a loader has written it to the graph
+#   rejected   → SME declined; kept for audit, never loaded
+#
+# A taxonomy NEVER becomes graph edges until its mapping is `confirmed`.
+# This is the fix for the POC drift (relationships that ignored taxonomy/ontology).
+# =============================================================================
+
+schema: drydocs.taxonomy-ontology-map.v1
+updated: 2026-06-20
+
+mappings:
+
+  # ---- Example: a confirmed orchestration mapping (already live) -----------
+  - id: job-contains
+    taxonomy:
+      source: controlm-psgmgr
+      element: "Folder contains Job"      # raw classification from the import
+    ontology:
+      from_node: JobFolder                 # prov:Collection
+      to_node: ControlMJob                 # prov:Activity
+      prov_type_from: Collection
+      prov_type_to: Activity
+      matrix_row: "Collection → any = prov:hadMember"
+      neo4j_label: CONTAINS_JOB            # domain alias mapping to hadMember
+      prov_maps_to: "prov:hadMember"
+    precedence_authority: bmc-baseline
+    status: applied
+    confirmed_by: "(seed)"
+    confirmed_on: 2026-06-09
+
+  # ---- Example: a PROPOSED mapping awaiting the SME gate -------------------
+  - id: oracle-schema-asset
+    taxonomy:
+      source: oracle-schemas
+      element: "Schema contains Table (script reads/writes Table)"
+    ontology:
+      from_node: ControlMJob               # or Script (prov:Entity/Plan)
+      to_node: DataAsset                   # prov:Entity (dcat:Dataset)
+      prov_type_from: Activity
+      prov_type_to: Entity
+      matrix_row: "Activity → Entity = prov:used / prov:generated"
+      neo4j_label: USED                    # GENERATED for outputs
+      prov_maps_to: "prov:used"
+    precedence_authority: internal-standards   # naming normalized by knowledge/standards
+    status: proposed                       # <-- SME must confirm before load
+    open_questions:
+      - "Is the script the Activity, or the ControlMJob? (affects from_node)"
+      - "Real schema/table names are confidential → resolve in internal/, not here."
+
+  # ---- Example: a PROPOSED context-graph (SOSA/SSN) mapping ----------------
+  - id: jobrun-observation
+    taxonomy:
+      source: controlm-psgmgr
+      element: "Job execution produced a run with a status at a time"
+    ontology:
+      from_node: ControlMJobRun            # planned execution node
+      to_node: ControlMJob                 # the feature of interest
+      pattern: "SOSA observation"
+      sosa_mapping:
+        feature_of_interest: ControlMJob
+        observed_property: "run-status | run-duration | freshness"
+        result_time: "resultTime"
+      neo4j_label: OBSERVES                 # proposed; not yet in vocabulary
+      prov_maps_to: ~                       # SOSA, not PROV — record separately
+    precedence_authority: bmc-baseline
+    status: proposed
+    open_questions:
+      - "Source of run history: Control-M history API vs psgmgr? (gates the loader)"
+      - "Register sosa:* terms in relationship_vocabulary.yaml before any label is written."
+
+# Counts the gate reports to the SME each run.
+summary:
+  applied: 1
+  proposed: 2
+  rejected: 0

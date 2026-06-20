@@ -1,0 +1,203 @@
+{
+  "schema": "drydocs.depgraph/architect-input.v1",
+  "repo": "ce-wilson/DryDocs",
+  "branch": "refactor/vendor-internal-separation",
+  "commit": "683322c970525956ca8cfdaeab94a85a3ea9be76",
+  "package_root": "drydocs",
+  "stats": {
+    "internal_modules": 48,
+    "internal_edges": 88,
+    "is_dag": true,
+    "cycles": []
+  },
+  "layers": {
+    "L0_ontology": [
+      "drydocs.ontology.namespaces"
+    ],
+    "L1_models": [
+      "drydocs.models.catalog",
+      "drydocs.models.seal",
+      "drydocs.models.controlm"
+    ],
+    "L2_io_adapters": [
+      "drydocs.adapters.base",
+      "drydocs.adapters.csv_adapter",
+      "drydocs.adapters.oracle_adapter"
+    ],
+    "L2_persistence": [
+      "drydocs.neo4j_client",
+      "drydocs.snapshots.writer"
+    ],
+    "L3_loaders_core": [
+      "drydocs.loaders.base",
+      "drydocs.loaders.catalog",
+      "drydocs.loaders.business_segments",
+      "drydocs.loaders.seal_applications",
+      "drydocs.loaders.seal_contacts"
+    ],
+    "L3_loaders_vendor": [
+      "drydocs.loaders.controlm",
+      "drydocs.loaders.controlm_folders",
+      "drydocs.loaders.controlm_jobs",
+      "drydocs.loaders.controlm_conditions_in",
+      "drydocs.loaders.controlm_conditions_out",
+      "drydocs.loaders.controlm_dependencies_derived"
+    ],
+    "L3_vendor_domain": [
+      "drydocs.controlm.commands",
+      "drydocs.controlm.facts",
+      "drydocs.controlm.folder_name",
+      "drydocs.controlm.paths",
+      "drydocs.controlm.resolver",
+      "drydocs.controlm.staging",
+      "drydocs.controlm.variables",
+      "drydocs.controlm.variable_report"
+    ],
+    "L4_entrypoint": [
+      "drydocs.cli"
+    ],
+    "config": [
+      "drydocs.config"
+    ]
+  },
+  "vendor_classification": {
+    "definition": "module identified as BMC Control-M (vendor) specific",
+    "vendor_modules": [
+      "drydocs.controlm",
+      "drydocs.controlm.commands",
+      "drydocs.controlm.facts",
+      "drydocs.controlm.folder_name",
+      "drydocs.controlm.paths",
+      "drydocs.controlm.resolver",
+      "drydocs.controlm.staging",
+      "drydocs.controlm.variable_report",
+      "drydocs.controlm.variables",
+      "drydocs.loaders.controlm",
+      "drydocs.loaders.controlm_conditions_in",
+      "drydocs.loaders.controlm_conditions_out",
+      "drydocs.loaders.controlm_dependencies_derived",
+      "drydocs.loaders.controlm_folders",
+      "drydocs.loaders.controlm_jobs",
+      "drydocs.models.controlm"
+    ],
+    "core_modules": [
+      "drydocs",
+      "drydocs.adapters",
+      "drydocs.adapters.base",
+      "drydocs.adapters.csv_adapter",
+      "drydocs.adapters.oracle_adapter",
+      "drydocs.cli",
+      "drydocs.config",
+      "drydocs.loaders",
+      "drydocs.loaders.base",
+      "drydocs.loaders.business_segments",
+      "drydocs.loaders.catalog",
+      "drydocs.loaders.seal_applications",
+      "drydocs.loaders.seal_contacts",
+      "drydocs.models",
+      "drydocs.models.catalog",
+      "drydocs.models.seal",
+      "drydocs.neo4j_client",
+      "drydocs.ontology",
+      "drydocs.ontology.namespaces",
+      "drydocs.snapshots",
+      "drydocs.snapshots.writer"
+    ]
+  },
+  "external_dependency_boundary": {
+    "neo4j": [
+      "drydocs.neo4j_client"
+    ],
+    "oracledb": [
+      "drydocs.adapters.oracle_adapter"
+    ],
+    "typer+rich": [
+      "drydocs.cli"
+    ],
+    "pydantic": [
+      "drydocs.config",
+      "drydocs.loaders.base",
+      "drydocs.loaders.catalog",
+      "drydocs.loaders.controlm_folders",
+      "drydocs.models.*"
+    ],
+    "note": "external deps are already well-isolated to single owner modules (good); streamlit declared in pyproject but unused in code"
+  },
+  "hotspots": {
+    "fan_in_top": {
+      "drydocs.models": 12,
+      "drydocs.loaders.base": 11,
+      "drydocs.controlm.variables": 6,
+      "drydocs.neo4j_client": 5,
+      "drydocs.controlm": 4,
+      "drydocs.adapters.csv_adapter": 3
+    },
+    "fan_out_top": {
+      "drydocs.cli": 18,
+      "drydocs.controlm": 8,
+      "drydocs.controlm.staging": 6,
+      "drydocs.loaders": 5,
+      "drydocs.loaders.controlm": 5,
+      "tests.unit.test_command_parser": 4
+    }
+  },
+  "boundary_violations": {
+    "core_to_vendor_edges": [
+      {
+        "from": "drydocs.cli",
+        "to": "drydocs.controlm",
+        "kind": "orchestration"
+      },
+      {
+        "from": "drydocs.cli",
+        "to": "drydocs.controlm.staging",
+        "kind": "orchestration"
+      },
+      {
+        "from": "drydocs.cli",
+        "to": "drydocs.loaders.controlm_conditions_in",
+        "kind": "orchestration"
+      },
+      {
+        "from": "drydocs.cli",
+        "to": "drydocs.loaders.controlm_conditions_out",
+        "kind": "orchestration"
+      },
+      {
+        "from": "drydocs.cli",
+        "to": "drydocs.loaders.controlm_dependencies_derived",
+        "kind": "orchestration"
+      },
+      {
+        "from": "drydocs.cli",
+        "to": "drydocs.loaders.controlm_folders",
+        "kind": "orchestration"
+      },
+      {
+        "from": "drydocs.cli",
+        "to": "drydocs.loaders.controlm_jobs",
+        "kind": "orchestration"
+      },
+      {
+        "from": "drydocs.loaders",
+        "to": "drydocs.loaders.controlm",
+        "kind": "barrel_reexport"
+      },
+      {
+        "from": "drydocs.models",
+        "to": "drydocs.models.controlm",
+        "kind": "barrel_reexport"
+      }
+    ],
+    "interpretation": "Vendor code does NOT leak UPWARD into core domain/models/adapters. All core->vendor coupling is concentrated in (a) cli.py orchestration and (b) two __init__ barrel re-exports. This is the entire surface the separation refactor must address."
+  },
+  "separation_seam": {
+    "clean": "drydocs.controlm.* is a self-contained vendor domain; drydocs.models/adapters/neo4j_client/snapshots/ontology have ZERO vendor imports",
+    "mixed": "drydocs.loaders/ interleaves 5 core loaders + 6 controlm loaders in one package, joined by loaders.base (fan-in 11) and the loaders.__init__ barrel",
+    "recommended_targets": [
+      "extract vendor loaders to drydocs.loaders.controlm subpackage or drydocs.controlm.loaders",
+      "split cli.py vendor subcommands behind a vendor plugin/registry to remove 7 direct controlm imports from the entrypoint",
+      "split models.__init__ / loaders.__init__ barrels so core barrel never imports vendor"
+    ]
+  }
+}

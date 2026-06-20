@@ -1,0 +1,72 @@
+# =============================================================================
+# config/source-registry.yaml — every data-pipeline source, declared once.
+#
+# Each entry binds a SOURCE to: its orchestrator (Tier-2 vendor), its adapter,
+# the taxonomy it feeds, and its crosswalk-confirmation state. Loaders and the
+# `pipeline-config` agent read this; nothing loads until `confirmed: true`.
+# =============================================================================
+
+schema: drydocs.source-registry.v1
+updated: 2026-06-20
+
+sources:
+  # ---- Orchestration metadata (Tier-2 vendors) -----------------------------
+  - id: controlm-psgmgr
+    kind: orchestration
+    orchestrator: bmc-controlm          # baseline — no crosswalk needed
+    adapter: oracle                     # OracleAdapter over psgmgr.* views
+    feeds_taxonomy: [folders, jobs, conditions, dependencies, variables]
+    confirmed: true
+    notes: "Live. The canonical structural-lineage feed. See README §Control-M lineage."
+
+  - id: autosys-export
+    kind: orchestration
+    orchestrator: autosys
+    adapter: ~                          # TBD
+    feeds_taxonomy: [folders, jobs, conditions, dependencies]
+    confirmed: false                    # placeholder — crosswalk not SME-confirmed
+    crosswalk: external/orchestration/autosys/README.md
+    notes: "Placeholder. Activate only after crosswalk passes the HITL gate."
+
+  - id: airflow-mwaa
+    kind: orchestration
+    orchestrator: airflow
+    adapter: ~
+    feeds_taxonomy: [folders, jobs, conditions, dependencies]
+    confirmed: false
+    crosswalk: external/orchestration/airflow/README.md
+    notes: "Placeholder. Activate only after crosswalk passes the HITL gate."
+
+  # ---- Internal reference data (Tier-3 confidential) -----------------------
+  - id: seal-extract
+    kind: internal
+    orchestrator: ~
+    adapter: csv                        # CsvAdapter (samples) / internal extract in prod
+    feeds_taxonomy: [applications, ports, memberships, roles, employees]
+    confirmed: true
+    notes: "Live. SEAL applications + ownership."
+
+  - id: catalog-pat
+    kind: internal
+    orchestrator: ~
+    adapter: csv
+    feeds_taxonomy: [lob, product_lines, products, area_products, dev_teams]
+    confirmed: true
+    notes: "Live. LOB→Product→Team catalog (lowest precedence authority)."
+
+  # ---- Data platforms (sources of DataAsset/lineage) -----------------------
+  - id: oracle-schemas
+    kind: data-platform
+    orchestrator: ~
+    adapter: oracle
+    feeds_taxonomy: [schemas, tables, scripts]
+    confirmed: false                    # ingestion pipeline planned (see backlog)
+    notes: "Oracle DB schemas/scripts as taxonomy → DataAsset. Real names are confidential."
+
+  - id: snowflake
+    kind: data-platform
+    orchestrator: ~
+    adapter: ~
+    feeds_taxonomy: [schemas, tables]
+    confirmed: false
+    notes: "Expansion placeholder."

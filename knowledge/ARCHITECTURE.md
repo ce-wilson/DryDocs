@@ -1,3 +1,9 @@
+> **Update 2026-06-20:** the two-bucket `vendor/` vs `knowledge/` split described here was
+> extended into the three-tier model in [`../CLAUDE.md`](../CLAUDE.md) §2–3. `vendor/bmc-controlm/`
+> now lives at `external/orchestration/bmc-controlm/`; `reference/` (platforms + standards),
+> `config/` (configuration layer), and `internal/` (confidential) were added. This file is kept
+> as the original rationale. See [`../docs/restructure/00-conceptual-model.md`](../docs/restructure/00-conceptual-model.md).
+
 # DryDocs — repository organization & tuning plan
 
 Authored as a Python-architect + performance pass, on the

@@ -15,7 +15,7 @@ and a greenfield XML is trusted only once it re-derives the same resolved
 behavior (offline equivalence proof).
 
 NOTE: XML is being **phased out** — BMC's SaaS direction replaces it with the
-**JSON Automation API** (name-as-key; see ``vendor/bmc-controlm/controlm-api-*.md``).
+**JSON Automation API** (name-as-key; see ``external/orchestration/bmc-controlm/controlm-api-*.md``).
 Keep import/export behind a format-agnostic interface so a JSON backend can be
 added when the platform migrates; do not bake XML assumptions into the engine.
 """

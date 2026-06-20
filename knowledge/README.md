@@ -4,7 +4,7 @@ DryDocs-owned, human-authored knowledge that determines what the graph *means*:
 the ontology, naming standards, and design decisions that the loaders and schema
 encode. This is the "source of truth" prose behind the structured graph.
 
-Contrast with [`../vendor/`](../vendor/README.md), which holds **external vendor**
+Contrast with [`../external/orchestration/`](../external/orchestration/README.md), which holds **external vendor**
 reference material that merely supports building the project.
 
 ## Contents

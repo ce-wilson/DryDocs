@@ -262,7 +262,7 @@ each `%%` site; canonical symbolic tokens (`{ODATE}`, CALCDATE compaction `{ODAT
 cross-pass blocked-set kills self-reference loops; env-triplet variant expansion
 (`%%SCRIPT_PATH_%%HOSTNM`); global/pool refs kept verbatim. Sample: 86% fully resolved.
 
-Vendor validation (`vendor/bmc-controlm/controlm-variables.md`) corrected three things in
+Vendor validation (`external/orchestration/bmc-controlm/controlm-variables.md`) corrected three things in
 `variables.py`: system variables exist without `$` (`%%ORDERID`, `%%JOBNAME`); `%%$X`
 is century-format syntax; `%%\VAR` (global) vs `%%\\POOL\VAR` (pool) both captured.
 

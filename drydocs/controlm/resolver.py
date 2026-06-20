@@ -3,7 +3,7 @@ r"""Control-M variable resolver (C3/C4 normalization, Phase B).
 Reproduces AutoEdit substitution offline — the vendor's "Variable
 Simulation" — against the definition extract, without executing jobs.
 
-Semantics (vendor/bmc-controlm/controlm-variables.md + observed 9.0.x behavior):
+Semantics (external/orchestration/bmc-controlm/controlm-variables.md + observed 9.0.x behavior):
 
   Sequential assignment.  A job's variable definitions are an ORDERED list
       of assignments, not a set: each value is resolved against the
