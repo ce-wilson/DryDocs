@@ -58,12 +58,12 @@ node_classifications:
   - label:      ControlMJob
     class:      "dd:ControlMJob"
     prov_type:  Activity
-    note:       "Job definition; acts as a prov:Activity at runtime. m3_ontology_supplement.cypher."
+    note:       "Job definition; acts as a prov:Activity at runtime. ontology_supplement.cypher."
 
   - label:      ControlMFolder
     class:      "dd:ControlMFolder"
     prov_type:  Collection
-    note:       "prov:Collection of jobs. m3_ontology_supplement.cypher."
+    note:       "prov:Collection of jobs. ontology_supplement.cypher."
 
   - label:      ControlMServer
     class:      "dd:ControlMServer"
@@ -71,12 +71,12 @@ node_classifications:
     note: >
       Local platform/infrastructure class — no W3C equivalent. NOT an Agent:
       edges targeting it cannot use prov:wasAssociatedWith (see p2_deployed_to).
-      m3_ontology_supplement.cypher.
+      ontology_supplement.cypher.
 
   - label:      Condition
     class:      "dd:Condition"
     prov_type:  Entity
-    note:       "Named scheduling condition (prov:Entity). m3_ontology_supplement.cypher."
+    note:       "Named scheduling condition (prov:Entity). ontology_supplement.cypher."
 
   - label:      JobRun
     class:      "dd:JobRun"
@@ -340,7 +340,7 @@ local_relationships:
       RENAMED from RUNS_ON (see m3_runs_on, deprecated) so the RUNS_ON label
       can be reused for execution-host placement with role properties.
 
-    supplement:   m3_ontology_supplement.cypher
+    supplement:   ontology_supplement.cypher
     loader:       controlm_folders.cypher
     domain:       controlm
     status:       active
@@ -358,7 +358,7 @@ local_relationships:
       Migrate existing edges with:
       MATCH (f:JobFolder)-[r:RUNS_ON]->(s:ControlMServer)
       then re-create as SCHEDULED_ON and delete r.
-    supplement:   m3_ontology_supplement.cypher
+    supplement:   ontology_supplement.cypher
     loader:       controlm_folders.cypher
     domain:       controlm
     status:       deprecated
@@ -373,7 +373,7 @@ local_relationships:
       JobFolder (prov:Collection) contains ControlMJob (prov:Activity).
       Matrix row: Collection → any = HAD_MEMBER. CONTAINS_JOB is kept as
       the label for query clarity; semantics are hadMember.
-    supplement:   m3_ontology_supplement.cypher
+    supplement:   ontology_supplement.cypher
     loader:       controlm_jobs.cypher
     domain:       controlm
     status:       active
@@ -389,7 +389,7 @@ local_relationships:
       Matrix row: Activity → Entity = USED. REQUIRES_IN_CONDITION kept for
       domain clarity. Edge carries odate, and_or, parentheses, order_
       for boolean-expression reconstruction.
-    supplement:   m3_ontology_supplement.cypher
+    supplement:   ontology_supplement.cypher
     loader:       controlm_conditions_in.cypher
     domain:       controlm
     status:       active
@@ -404,7 +404,7 @@ local_relationships:
       Job emits a named OUT condition on completion. SIGN='+' posts the
       condition; SIGN='-' removes it. Matrix row: Activity → Entity =
       GENERATED. EMITS_OUT_CONDITION kept for domain clarity.
-    supplement:   m3_ontology_supplement.cypher
+    supplement:   ontology_supplement.cypher
     loader:       controlm_conditions_out.cypher
     domain:       controlm
     status:       active
@@ -420,7 +420,7 @@ local_relationships:
       via a shared OUT→IN condition pair. Direction: (successor)→(predecessor).
       Matrix row: Activity → Activity = WAS_INFORMED_BY. Carries via_condition,
       recursion_level, dependency_path, derived=true. Replaces DEPENDS_ON.
-    supplement:   m3_ontology_supplement.cypher
+    supplement:   ontology_supplement.cypher
     loader:       controlm_dependencies_derived.cypher
     domain:       controlm
     status:       active
@@ -436,7 +436,7 @@ local_relationships:
       from the pre-ontology "DEPENDS_ON" edge in the architecture diagram:
       DEPENDS_ON is retired (job→job replaced by WAS_INFORMED_BY; job→file
       is matrix row Activity → Entity = USED with role=file_dependency).
-    supplement:   m3_ontology_supplement.cypher
+    supplement:   ontology_supplement.cypher
     loader:       ~
     domain:       controlm
     status:       planned
@@ -452,7 +452,7 @@ local_relationships:
     note: >
       Deployment activity associated with the developer who ran it.
       Matrix row: Activity → Agent = WAS_ASSOCIATED_WITH. Feed: Change/CI-CD.
-    supplement:   m3_ontology_supplement.cypher
+    supplement:   ontology_supplement.cypher
     loader:       ~
     domain:       controlm
     status:       planned
@@ -469,7 +469,7 @@ local_relationships:
       local platform class, not an Agent. Mapping set to null (local infra
       placement, same family as SCHEDULED_ON). If a PROV mapping is required,
       reclassify ControlMServer as prov:SoftwareAgent first. Feed: Change/CI-CD.
-    supplement:   m3_ontology_supplement.cypher
+    supplement:   ontology_supplement.cypher
     loader:       ~
     domain:       controlm
     status:       planned
@@ -483,7 +483,7 @@ local_relationships:
     note: >
       Deployment ships a folder definition. Matrix row: Activity → Entity
       (Collection ⊑ Entity) = USED. Feed: Change/CI-CD.
-    supplement:   m3_ontology_supplement.cypher
+    supplement:   ontology_supplement.cypher
     loader:       ~
     domain:       controlm
     status:       planned
@@ -497,7 +497,7 @@ local_relationships:
     note: >
       Folder authorship. Matrix row: Entity → Agent = WAS_ATTRIBUTED_TO.
       Feed: Folder XML / Git blame.
-    supplement:   m3_ontology_supplement.cypher
+    supplement:   ontology_supplement.cypher
     loader:       ~
     domain:       controlm
     status:       planned
@@ -513,7 +513,7 @@ local_relationships:
       generic prov:wasInfluencedBy (valid but weak); the tighter PROV pattern
       would treat ControlMJob as a prov:Plan via qualified association.
       Feed: Control-M history API.
-    supplement:   m3_ontology_supplement.cypher
+    supplement:   ontology_supplement.cypher
     loader:       ~
     domain:       controlm
     status:       planned
@@ -528,7 +528,7 @@ local_relationships:
       Run executed as a service account (Run-as-User; EPV rows with
       Use Case='CONTROL-M'). Matrix row: Activity → Agent.
       Feed: Control-M history API.
-    supplement:   m3_ontology_supplement.cypher
+    supplement:   ontology_supplement.cypher
     loader:       ~
     domain:       controlm
     status:       planned
@@ -542,7 +542,7 @@ local_relationships:
     note: >
       Job command line invokes a script/JAR (CMDLINE / MEMNAME; Jar Path +
       Task Json Path). Matrix row: Activity → Entity = USED.
-    supplement:   m3_ontology_supplement.cypher
+    supplement:   ontology_supplement.cypher
     loader:       ~
     domain:       controlm
     status:       planned
@@ -559,7 +559,7 @@ local_relationships:
       Script); the graph edge runs the INVERSE direction for query
       ergonomics. Treat TRIGGERS as inverse-of wasStartedBy.
       Feed: Informatica / Ab Initio / DPL metadata.
-    supplement:   m3_ontology_supplement.cypher
+    supplement:   ontology_supplement.cypher
     loader:       ~
     domain:       controlm
     status:       planned
@@ -575,7 +575,7 @@ local_relationships:
       PROCO-CDS-UTIL#). Infrastructure placement; no PROV mapping.
       Same label as m3_runs_on_etl_host — role property disambiguates.
       Feed: CMDB / Control-M agent map.
-    supplement:   m3_ontology_supplement.cypher
+    supplement:   ontology_supplement.cypher
     loader:       ~
     domain:       controlm
     status:       planned
@@ -590,7 +590,7 @@ local_relationships:
       ETL workload runs on an engine/cluster entry point (Connector ·
       Region / Bucket Name). Infrastructure placement; no PROV mapping.
       Feed: CMDB / ETL engine config.
-    supplement:   m3_ontology_supplement.cypher
+    supplement:   ontology_supplement.cypher
     loader:       ~
     domain:       controlm
     status:       planned
@@ -604,7 +604,7 @@ local_relationships:
     note: >
       ETL reads a source dataset (Source Zone + Source Glue Database).
       Matrix row: Activity → Entity = USED. Feed: Informatica / Ab Initio.
-    supplement:   m3_ontology_supplement.cypher
+    supplement:   ontology_supplement.cypher
     loader:       ~
     domain:       controlm
     status:       planned
@@ -619,7 +619,7 @@ local_relationships:
       ETL writes a target dataset (Target Zone + Glue database / bucket /
       partition keys). Matrix row: Activity → Entity = GENERATED.
       Feed: Informatica / Ab Initio.
-    supplement:   m3_ontology_supplement.cypher
+    supplement:   ontology_supplement.cypher
     loader:       ~
     domain:       controlm
     status:       planned
@@ -636,7 +636,7 @@ local_relationships:
       requires Agent → Agent — this is why ExecutionHost is classified
       prov:SoftwareAgent in node_classifications. Edge carries environment.
       Feed: CMDB / IAM.
-    supplement:   m3_ontology_supplement.cypher
+    supplement:   ontology_supplement.cypher
     loader:       ~
     domain:       controlm
     status:       planned

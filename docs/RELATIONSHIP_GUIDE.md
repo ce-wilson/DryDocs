@@ -37,10 +37,10 @@ New relationships should use the standard label from the matrix above.
 
 | Node label | PROV-O / W3C type | Supplement |
 |---|---|---|
-| `ControlMJob` | `prov:Activity` | `m3_ontology_supplement.cypher` |
-| `JobFolder` | `prov:Collection` | `m3_ontology_supplement.cypher` |
-| `ControlMServer` | local Platform | `m3_ontology_supplement.cypher` |
-| `Condition` | `prov:Entity` | `m3_ontology_supplement.cypher` |
+| `ControlMJob` | `prov:Activity` | `ontology_supplement.cypher` |
+| `JobFolder` | `prov:Collection` | `ontology_supplement.cypher` |
+| `ControlMServer` | local Platform | `ontology_supplement.cypher` |
+| `Condition` | `prov:Entity` | `ontology_supplement.cypher` |
 | `JobRun` | `prov:Activity` | *(base ontology)* |
 | `Application` | `prov:SoftwareAgent` | `seal_ontology_supplement.cypher` |
 | `Employee` | `prov:Agent` | `seal_ontology_supplement.cypher` |
@@ -276,7 +276,7 @@ drydocs/
     namespaces.py                     ← IRI prefix definitions
   schema/
     ontology.cypher                   ← PROV-O base terms (do not edit)
-    m3_ontology_supplement.cypher     ← Control-M local terms
+    ontology_supplement.cypher     ← Control-M local terms
     seal_ontology_supplement.cypher   ← SEAL local terms
     catalog_ontology_supplement.cypher← Catalog local terms
     constraints.cypher                ← node key constraints

@@ -22,10 +22,10 @@ DryDocs classifies every relationship by PROV-O source / target type, then picks
 
 | Node label      | PROV-O / W3C type      | Supplement                         |
 |:----------------|:-----------------------|:-----------------------------------|
-| ControlMJob     | prov:Activity          | m3_ontology_supplement.cypher      |
-| JobFolder       | prov:Collection        | m3_ontology_supplement.cypher      |
-| ControlMServer  | local Platform         | m3_ontology_supplement.cypher      |
-| Condition       | prov:Entity            | m3_ontology_supplement.cypher      |
+| ControlMJob     | prov:Activity          | ontology_supplement.cypher      |
+| JobFolder       | prov:Collection        | ontology_supplement.cypher      |
+| ControlMServer  | local Platform         | ontology_supplement.cypher      |
+| Condition       | prov:Entity            | ontology_supplement.cypher      |
 | JobRun          | prov:Activity          | base ontology                      |
 | Application     | prov:SoftwareAgent     | seal_ontology_supplement.cypher    |
 | Employee        | prov:Agent             | seal_ontology_supplement.cypher    |
