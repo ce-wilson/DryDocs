@@ -1,0 +1,116 @@
+# =============================================================================
+# config/taxonomy/business-application.yaml  —  Business Application taxonomy (B2)
+#
+# GENERIC CONCEPT: BusinessApplication. SEAL is the SOURCE OF RECORD (the
+# authoritative registry); the unique identifier is the SEALID (= app_id). The
+# concept is deliberately decoupled from the vendor system — SEAL is one source
+# of record for it, not the concept itself.
+#
+# PURE CLASSIFICATION ONLY: BusinessApplication ▸ Port; Membership ▸ Role ▸ Employee.
+# No meaning edges (ownership/attribution semantics) — those are ontology (C2).
+#
+# Built from the SYNTHETIC sample (publishable shape). The SOURCE (seal-extract) is
+# Internal-Confidential: in production, real names/emails/SIDs are NOT written here —
+# referenced by SID/SEALID; real rosters live in internal/. Captured 2026-06-20.
+# =============================================================================
+
+taxonomy: business-application
+domain: business
+taxonomy_path_root: business/application
+concept: BusinessApplication           # generic node concept (graph label today: :Application)
+source: seal-extract                   # config/source-registry.yaml
+source_of_record: SEAL                 # authoritative registry for BusinessApplication
+identifier: SEALID                     # the unique id (= app_id); how every app is keyed
+authority: lob-product-team            # config/precedence.yaml tier 3
+classification: Internal-Confidential  # config/classification.yaml (source sensitivity)
+classification_only: true
+
+nodes:
+
+  # BusinessApplication — keyed by SEALID. Each exposes the SEAL two-port model.
+  # info_classification is SEAL's OWN sensitivity label (correlates with our axis — see OQ).
+  business_applications:
+    - sealid: 82507
+      name: Database Scanning Tools
+      short_name: db scanning
+      state: Operate
+      lob: CCB
+      info_classification: Internal
+      ports: [EventProcessing, BatchProcessing]
+    - sealid: 111027
+      name: Chase MyHome Advice Reporting & Analytics
+      short_name: CMH-ADV-R&A
+      state: Operate
+      lob: CCB
+      info_classification: Highly Confidential
+      ports: [EventProcessing, BatchProcessing]
+    - sealid: 110865
+      name: Home Loan Servicing Reporting & Analytics
+      short_name: HL-SERV-R&A
+      state: Operate
+      lob: CCB
+      info_classification: Highly Confidential
+      ports: [EventProcessing, BatchProcessing]
+
+  # Port — the two-port classification (DPROD). Structural: every BusinessApplication has both.
+  ports:
+    - kind: EventProcessing
+    - kind: BatchProcessing
+
+  # Membership ▸ Role ▸ Employee (n-ary). Keyed (sealid, role, sid). Employees referenced by
+  # SID only — real names/emails are confidential (synthetic in the sample) -> internal/.
+  memberships:
+    - sealid: 82507
+      roles:
+        - { role: Backup Information Owner, sid: K123456 }
+        - { role: Design Authority, sid: K234567 }
+        - { role: Chief Business Technologist, sid: K345678 }
+        - { role: L2 Operate Manager, sid: K456789 }
+        - { role: Risk Manager, sid: K567890 }
+    - sealid: 111027
+      roles:
+        - { role: Backup Information Owner, sid: L123456 }
+        - { role: Design Authority, sid: L234567 }
+        - { role: Chief Business Technologist, sid: L345678 }
+        - { role: L1 Operate Manager, sid: L456789 }
+        - { role: L2 Operate Manager, sid: L567890 }
+        - { role: Risk Manager, sid: L678901 }
+    - sealid: 110865
+      roles:
+        - { role: Backup Information Owner, sid: M123456 }
+        - { role: Design Authority, sid: M234567 }
+        - { role: L2 Operate Manager, sid: M345678 }
+        - { role: Risk Manager, sid: M456789 }
+
+  # Role — distinct role types observed (org:Role).
+  roles:
+    - Backup Information Owner
+    - Design Authority
+    - Chief Business Technologist
+    - L1 Operate Manager
+    - L2 Operate Manager
+    - Risk Manager
+
+counts:
+  business_applications: 3
+  ports_per_app: 2          # EventProcessing + BatchProcessing
+  memberships: 15
+  distinct_roles: 6
+  distinct_employees: 15    # by SID
+
+open_questions:
+  - id: two-port-derivation
+    note: >
+      The EventProcessing/BatchProcessing ports are the SEAL two-port model (DPROD). The sample
+      extract has no explicit port column — ports are treated as structural (every app has both).
+      SME: confirm whether some BusinessApplications are single-port.
+  - id: info-classification-correlation
+    note: >
+      SEAL's own info_classification (Internal / Highly Confidential) correlates with our
+      sensitivity axis (config/classification.yaml). Candidate to seed a per-application
+      classification at ontology time. Flag for C2.
+  - id: source-of-record
+    note: >
+      SEAL is the source of record for BusinessApplication, keyed by SEALID. Other systems
+      (Control-M job APPLICATION column, catalog) reference apps; reconcile to SEALID, do not
+      mint new app identities. (Reconciliation is a meaning edge -> ontology.)

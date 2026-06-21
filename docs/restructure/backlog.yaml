@@ -86,30 +86,44 @@ items:
     agent: taxonomy-importer
     model: sonnet
     priority: p1
-    status: todo
+    status: done
     depends_on: []
     inputs: ["drydocs/data/samples/seal_*.csv", "config/source-registry.yaml#seal-extract"]
-    acceptance: "every Application has its two-port classification; no ownership semantics asserted"
+    acceptance: "every BusinessApplication has its two-port classification; no ownership semantics asserted"
+    output: config/taxonomy/business-application.yaml
+    notes: >
+      Done 2026-06-20. Generic concept BusinessApplication (SEAL = source of record, id = SEALID,
+      per SME note). 3 apps / 2 ports each / 15 memberships / 6 roles. Employees by SID (real
+      names confidential -> internal/). classification: Internal-Confidential. Noted SEAL's own
+      info_classification correlates with the sensitivity axis (flag for C2).
 
   - id: B3
     epic: taxonomy-capture
     agent: taxonomy-importer
     model: sonnet
     priority: p1
-    status: todo
+    status: done
     depends_on: []
-    inputs: ["drydocs/data/samples/{catalog_lobs,product_lines,products}_*.csv", "config/source-registry.yaml#catalog-pat"]
+    inputs: ["drydocs/data/samples/{catalog_lobs,product_lines,products,dev_teams}_*.csv", "config/source-registry.yaml#catalog-pat"]
     acceptance: "hierarchy matches catalog samples; confidential names referenced by id, not value"
+    output: config/taxonomy/lob-product-team.yaml
+    notes: >
+      Done 2026-06-20. LOB ▸ ProductLine ▸ Product ▸ DevTeam: 5/5/6/6. AreaProduct + BusinessSegment
+      NOT in sample (flagged OQ). classification: Internal-Confidential.
 
   - id: B4
     epic: taxonomy-capture
     agent: taxonomy-importer
     model: sonnet
     priority: p2
-    status: todo
+    status: done
     depends_on: []
     inputs: ["config/source-registry.yaml#oracle-schemas", "internal/schemas/"]
     acceptance: "structure present; no real schema/table/SID values committed outside internal/"
+    output: config/taxonomy/oracle-schemas.yaml
+    notes: >
+      Done 2026-06-20 as a SHAPE TEMPLATE (no sample; source confirmed:false). Schema ▸ Table; Script
+      with placeholder ids; real names -> internal/schemas/ by id. classification: Internal-Confidential.
 
   # ── Epic C — Ontology mapping + HITL (ontology-mapper, sonnet) — Phase 2 ───
   - id: C1
@@ -228,8 +242,8 @@ items:
 
 # Roll-up the dispatcher can glance at (keep in sync, or regenerate).
 summary:
-  todo: 17
+  todo: 14
   in_progress: 0
   blocked: 0
-  done: 1                                          # B1
-  next_ready: [A1, A2, A3, B2, B3, B4, C1, D1]    # status:todo with all depends_on done (C1 unblocked by B1)
+  done: 4                                          # B1, B2, B3, B4
+  next_ready: [A1, A2, A3, C1, C2, C3, D1]        # C1/C2/C3 unblocked by B1/B2/B3

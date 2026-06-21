@@ -1,0 +1,54 @@
+# =============================================================================
+# config/taxonomy/oracle-schemas.yaml  —  Oracle data taxonomy (B4)
+#
+# SHAPE TEMPLATE ONLY. There is no sample and the source is not yet confirmed
+# (config/source-registry.yaml#oracle-schemas confirmed: false). This file fixes the
+# STRUCTURE — Schema ▸ Table; Script — with placeholder ids. Real schema/table/object
+# names are CONFIDENTIAL and live in internal/schemas/, referenced here by stable id.
+#
+# PURE CLASSIFICATION ONLY: Schema ▸ Table; Script. The Table -> DataAsset mapping and
+# job USED/GENERATED edges are ontology (see config/taxonomy-ontology-map.yaml#oracle-schema-asset).
+# Captured 2026-06-20 (template).
+# =============================================================================
+
+taxonomy: oracle-schemas
+domain: data
+taxonomy_path_root: data/oracle
+source: oracle-schemas
+authority: internal-standards          # config/precedence.yaml tier 2
+classification: Internal-Confidential  # real object names are confidential
+classification_only: true
+status: placeholder                    # populate from the Oracle extract when confirmed
+
+nodes:
+
+  # Schema — top of the data hierarchy. Real owner/schema names -> internal/schemas/ by id.
+  schemas:
+    - { id: SCHEMA_001, name_ref: "internal/schemas/#schema-001", tables: [TBL_001_A, TBL_001_B] }   # template
+
+  # Table — child of a Schema. Maps to DataAsset at ontology time.
+  tables:
+    - { id: TBL_001_A, schema: SCHEMA_001, name_ref: "internal/schemas/#tbl-001-a" }   # template
+    - { id: TBL_001_B, schema: SCHEMA_001, name_ref: "internal/schemas/#tbl-001-b" }   # template
+
+  # Script — executable artifacts (Control-M job scripts) that read/write Oracle objects.
+  scripts:
+    - { id: SCRIPT_001, name_ref: "internal/schemas/#script-001" }   # template
+
+counts:
+  schemas: 0      # template only — no real objects captured yet
+  tables: 0
+  scripts: 0
+
+open_questions:
+  - id: not-confirmed
+    note: >
+      Source not confirmed (source-registry confirmed: false) and no sample exists. This is a
+      SHAPE TEMPLATE; populate via the Oracle extract (Oracle `db:` skill). Real schema/table/
+      object names and SIDs are Internal-Confidential -> internal/schemas/, referenced by id.
+  - id: dataasset-mapping
+    note: >
+      Table -> DataAsset (dcat:Dataset / prov:Entity) and ControlMJob -[USED/GENERATED]-> DataAsset
+      is the proposed oracle-schema-asset entry in taxonomy-ontology-map.yaml. Maps at ontology time.
+  - id: depends-on-constraints
+    note: "DataAsset loader depends on :Script/:File constraints (consolidated-plan Stream B.7)."
