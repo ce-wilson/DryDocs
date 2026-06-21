@@ -154,9 +154,171 @@ mappings:
       - "Source of run history: Control-M history API vs psgmgr? (gates the loader)"
       - "Register sosa:* terms in relationship_vocabulary.yaml before any label is written."
 
+  # ---- C2: BusinessApplication / SEAL edges (reuse ACTIVE vocab — batch) ----
+  # Source taxonomy: config/taxonomy/business-application.yaml. Concept =
+  # BusinessApplication (graph label :Application); SEAL = source of record; key = SEALID.
+  # All reuse active seal_* vocabulary terms (DPROD + W3C ORG).
+
+  - id: app-has-port
+    taxonomy: { source: seal-extract, element: "BusinessApplication exposes a data Port (Event/Batch)" }
+    ontology:
+      from_node: BusinessApplication       # prov:SoftwareAgent (label :Application)
+      to_node: Port                         # dprod:Port (prov:Entity)
+      matrix_row: "structural dprod relationship (no PROV row)"
+      neo4j_label: HAS_PORT
+      prov_maps_to: ~                        # dprod:hasPort pattern, not PROV
+    precedence_authority: lob-product-team
+    reuses_vocab: seal_has_port (active)
+    status: confirmed
+    confirmed_by: SME
+    confirmed_on: 2026-06-21
+
+  - id: app-has-membership
+    taxonomy: { source: seal-extract, element: "BusinessApplication has a role-holder membership" }
+    ontology:
+      from_node: BusinessApplication
+      to_node: Membership                   # org:Membership (n-ary)
+      matrix_row: "org:hasMembership (no PROV row)"
+      neo4j_label: HAS_MEMBERSHIP
+      prov_maps_to: ~
+    precedence_authority: lob-product-team
+    reuses_vocab: seal_has_membership (active)
+    status: confirmed
+    confirmed_by: SME
+    confirmed_on: 2026-06-21
+
+  - id: membership-of-role
+    taxonomy: { source: seal-extract, element: "Membership is for a named Role" }
+    ontology:
+      from_node: Membership
+      to_node: Role                          # org:Role
+      matrix_row: "org:role (no PROV row)"
+      neo4j_label: OF_ROLE
+      prov_maps_to: ~
+    precedence_authority: lob-product-team
+    reuses_vocab: seal_of_role (active)
+    status: confirmed
+    confirmed_by: SME
+    confirmed_on: 2026-06-21
+
+  - id: membership-held-by
+    taxonomy: { source: seal-extract, element: "Membership is held by an Employee (by SID)" }
+    ontology:
+      from_node: Membership
+      to_node: Employee                      # prov:Agent; referenced by SID
+      matrix_row: "inverse org:member (no PROV row)"
+      neo4j_label: HELD_BY
+      prov_maps_to: ~
+    precedence_authority: lob-product-team
+    reuses_vocab: seal_held_by (active)
+    status: confirmed
+    confirmed_by: SME
+    confirmed_on: 2026-06-21
+
+  # ---- C3: LOB→Product→Team edges (reuse ACTIVE vocab — batch) --------------
+  # Source taxonomy: config/taxonomy/lob-product-team.yaml.
+
+  - id: lob-has-product-line
+    taxonomy: { source: catalog-pat, element: "LOB contains ProductLine" }
+    ontology:
+      from_node: CatalogLOB
+      to_node: ProductLine
+      matrix_row: "local catalog hierarchy (no PROV row)"
+      neo4j_label: HAS_PRODUCT_LINE
+      prov_maps_to: ~
+    precedence_authority: lob-product-team
+    reuses_vocab: catalog_has_product_line (active)
+    status: confirmed
+    confirmed_by: SME
+    confirmed_on: 2026-06-21
+
+  - id: product-line-has-product
+    taxonomy: { source: catalog-pat, element: "ProductLine contains Product" }
+    ontology:
+      from_node: ProductLine
+      to_node: Product
+      matrix_row: "local catalog hierarchy (no PROV row)"
+      neo4j_label: HAS_PRODUCT
+      prov_maps_to: ~
+    precedence_authority: lob-product-team
+    reuses_vocab: catalog_has_product (active)
+    status: confirmed
+    confirmed_by: SME
+    confirmed_on: 2026-06-21
+
+  - id: product-has-dev-team
+    taxonomy: { source: catalog-pat, element: "Product has owning DevTeam" }
+    ontology:
+      from_node: Product
+      to_node: DevTeam
+      matrix_row: "local organizational linkage (no PROV row)"
+      neo4j_label: HAS_DEV_TEAM
+      prov_maps_to: ~
+    precedence_authority: lob-product-team
+    reuses_vocab: catalog_has_dev_team (active)
+    status: confirmed
+    confirmed_by: SME
+    confirmed_on: 2026-06-21
+
+  - id: lob-reconciles-to-segment
+    taxonomy: { source: catalog-pat, element: "LOB reconciles to a corporate BusinessSegment (confidence)" }
+    ontology:
+      from_node: CatalogLOB
+      to_node: BusinessSegment
+      matrix_row: "skos:closeMatch (approximate; no PROV row)"
+      neo4j_label: RECONCILES_TO
+      prov_maps_to: ~                        # carries confidence 0.0–1.0; not 1:1 (AWMCIB=0.5)
+    precedence_authority: lob-product-team
+    reuses_vocab: catalog_reconciles_to (active)
+    status: confirmed
+    confirmed_by: SME
+    confirmed_on: 2026-06-21
+
+  # ---- C3 DECISION: resolve the SUPPORTS range ambiguity -------------------
+  # NOT in the current sample (no AreaProduct / SUPPORTS rows), but the vocabulary has
+  # SUPPORTS with range "Product OR AreaProduct" (free-text union) — consolidated-plan E.2.
+  - id: dev-team-supports
+    taxonomy: { source: catalog-pat, element: "DevTeam is aligned to / supports an AreaProduct (team_type, sponsored)" }
+    ontology:
+      from_node: DevTeam                     # org:OrganizationalUnit (Agent)
+      to_node: AreaProduct                   # RESOLVED: range = AreaProduct (Team-of-Teams)
+      matrix_row: "Agent → Entity — no PROV row; local"
+      neo4j_label: SUPPORTS
+      prov_maps_to: ~
+      edge_properties: { team_type: "aligned | flex | dedicated", sponsored: bool }   # 'aligned to' = team_type aligned
+    precedence_authority: lob-product-team
+    reuses_vocab: catalog_supports_area_product (planned -> set active in C4)
+    status: confirmed
+    confirmed_by: SME
+    confirmed_on: 2026-06-21
+    decision_resolved: >
+      SME 2026-06-21: SUPPORTS targets AreaProduct (not Product). Product is reached via the
+      hierarchy (Product ▸ AreaProduct ▸ DevTeam), so a DevTeam→Product SUPPORTS edge is dropped
+      in favor of DevTeam→AreaProduct. "aligned to" is captured by team_type=aligned on the edge.
+      C4: set catalog_supports_area_product active; deprecate catalog_supports (DevTeam→Product).
+
+  - id: dev-team-develops-app
+    taxonomy: { source: catalog-pat, element: "DevTeam develops a BusinessApplication (joined by SEALID)" }
+    ontology:
+      from_node: DevTeam                     # org:OrganizationalUnit (Agent)
+      to_node: BusinessApplication           # prov:SoftwareAgent (label :Application); key = SEALID
+      join_key: SEALID                        # reconcile catalog DevTeam <-> SEAL app by SEALID
+      matrix_row: "Agent → Agent — no PROV fit (actedOnBehalfOf = delegation, not development); local"
+      neo4j_label: DEVELOPS
+      prov_maps_to: ~                          # alt inverse: Application WAS_ATTRIBUTED_TO DevTeam (Entity→Agent)
+    precedence_authority: lob-product-team
+    reuses_vocab: arch_develops (planned -> set active in C4)
+    status: confirmed
+    confirmed_by: SME
+    confirmed_on: 2026-06-21
+    note: >
+      SME 2026-06-21: DevTeam DEVELOPS BusinessApplication, reconciled by SEALID. Cross-source
+      edge (lob-product-team taxonomy -> business-application taxonomy); the join (which team
+      builds which app) comes from catalog<->SEAL ownership reconciliation.
+
 # Counts the gate reports to the SME each run.
 summary:
-  applied: 1
-  confirmed: 4        # C1 Control-M edges (2026-06-21)
+  applied: 1          # job-contains
+  confirmed: 14       # C1 (4) + C2 (4) + C3 (6: 4 hierarchy + SUPPORTS→AreaProduct + DEVELOPS→app)
   proposed: 2         # oracle-schema-asset, jobrun-observation
   rejected: 0

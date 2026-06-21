@@ -147,20 +147,30 @@ items:
     agent: ontology-mapper
     model: sonnet
     priority: p1
-    status: todo
+    status: done
     depends_on: [B2]
-    inputs: [config/taxonomy/seal.yaml, reference/standards/dprod-ekgf/README.md, reference/standards/w3c-org/README.md]
+    inputs: [config/taxonomy/business-application.yaml, reference/standards/dprod-ekgf/README.md, reference/standards/w3c-org/README.md]
     acceptance: "DPROD/ORG terms cited; mappings confirmed"
+    output: config/taxonomy-ontology-map.yaml
+    notes: >
+      Done 2026-06-21 via HITL gate. 4 confirmed (batch, reuse active seal_*): HAS_PORT (dprod),
+      HAS_MEMBERSHIP (org), OF_ROLE (org), HELD_BY (org). Concept BusinessApplication / SEALID.
 
   - id: C3
     epic: ontology-mapping
     agent: ontology-mapper
     model: sonnet
     priority: p1
-    status: todo
+    status: done
     depends_on: [B3]
     inputs: [config/taxonomy/lob-product-team.yaml, drydocs/ontology/relationship_vocabulary.yaml]
     acceptance: "no free-text union ranges (resolve SUPPORTS Product-vs-AreaProduct); each edge has precise from/to + authority tag"
+    output: config/taxonomy-ontology-map.yaml
+    notes: >
+      Done 2026-06-21 via HITL gate. 4 hierarchy edges confirmed + SUPPORTS range RESOLVED:
+      SUPPORTS → AreaProduct ('aligned to' = team_type=aligned); NEW DevTeam DEVELOPS
+      BusinessApplication joined by SEALID. C4 must set catalog_supports_area_product + arch_develops
+      active and deprecate catalog_supports (DevTeam→Product). Gate logged.
 
   - id: C4
     epic: ontology-mapping
@@ -248,8 +258,8 @@ items:
 
 # Roll-up the dispatcher can glance at (keep in sync, or regenerate).
 summary:
-  todo: 13
+  todo: 11
   in_progress: 0
   blocked: 0
-  done: 5                                          # B1-B4, C1
-  next_ready: [A1, A2, A3, C2, C3, D1]            # C2/C3 ready; C4 waits on C2+C3
+  done: 7                                          # B1-B4, C1-C3
+  next_ready: [A1, A2, A3, C4, D1]               # C4 unblocked (C1+C2+C3 done)
