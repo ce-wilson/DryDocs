@@ -13,6 +13,7 @@
 schema: drydocs.reference-registry.v1
 updated: 2026-06-20
 classification: External       # ALL reference material is External (public) — see config/classification.yaml
+verified: 2026-06-21           # A1: local mirrors (../llm-graph-builder, ../sdw-sosa-ssn) + all platform/standard docs resolve; no stale entries
 
 platforms:
   - id: neo4j

@@ -38,30 +38,33 @@ items:
     agent: reference-librarian
     model: haiku
     priority: p2
-    status: todo
+    status: done
     depends_on: []
     inputs: [reference/REGISTRY.yaml]
     acceptance: "every entry marked ok/stale; stale paths fixed or flagged"
+    notes: "Done 2026-06-21. All local mirrors + platform/standard doc paths resolve; no stale entries. verified: 2026-06-21 in REGISTRY.yaml."
 
   - id: A2
     epic: reference-hygiene
     agent: reference-librarian
     model: haiku
     priority: p3
-    status: todo
+    status: done
     depends_on: []
     inputs: [external/orchestration/bmc-controlm/SOURCE-MANIFEST.md]
     acceptance: "every .md in bmc-controlm/ accounted for in the manifest"
+    notes: "Done 2026-06-21. All 26 bmc-controlm .md files are referenced in SOURCE-MANIFEST.md (0 uncovered)."
 
   - id: A3
     epic: reference-hygiene
     agent: reference-librarian
     model: haiku
     priority: p3
-    status: todo
+    status: done
     depends_on: []
     inputs: [reference/research/README.md, docs/restructure/00-conceptual-model.md]
     acceptance: ">=5 rows, each with a working link and a 'why it matters'"
+    notes: "Done 2026-06-21. 7 rows with working links (3 Neo4j blogs + PROV-O/SOSA/ORG/agent-memory) + why-it-matters."
 
   # ── Epic B — Taxonomy capture (taxonomy-importer, sonnet) — Phase 1 ────────
   - id: B1
@@ -264,8 +267,8 @@ items:
 
 # Roll-up the dispatcher can glance at (keep in sync, or regenerate).
 summary:
-  todo: 10
+  todo: 7
   in_progress: 0
   blocked: 0
-  done: 8                                          # B1-B4, C1-C4 (Epics B + C complete)
-  next_ready: [A1, A2, A3, D1]                   # Epic D (config-driven loaders); D1 is the P0 gate
+  done: 11                                         # B1-B4, C1-C4, A1-A3 (Epics A + B + C complete)
+  next_ready: [D1]                               # Epic D (config-driven loaders); D1 is the P0 gate
