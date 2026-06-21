@@ -131,10 +131,16 @@ items:
     agent: ontology-mapper
     model: sonnet
     priority: p1
-    status: todo
+    status: done
     depends_on: [B1]
     inputs: [config/taxonomy/controlm.yaml, drydocs/ontology/relationship_vocabulary.yaml, docs/RELATIONSHIP_GUIDE.md]
     acceptance: "each Control-M edge type traces to a matrix row or recorded alias; gate run logged"
+    output: config/taxonomy-ontology-map.yaml
+    notes: >
+      Done 2026-06-21. 4 edges confirmed via HITL gate (batch — all reuse active vocab terms):
+      SCHEDULED_ON (null PROV, infra), REQUIRES_IN_CONDITION (prov:used), EMITS_OUT_CONDITION
+      (prov:generated), WAS_INFORMED_BY (prov:wasInformedBy). CONTAINS_JOB already applied.
+      Gate run logged in config/gate-log.md.
 
   - id: C2
     epic: ontology-mapping
@@ -242,8 +248,8 @@ items:
 
 # Roll-up the dispatcher can glance at (keep in sync, or regenerate).
 summary:
-  todo: 14
+  todo: 13
   in_progress: 0
   blocked: 0
-  done: 4                                          # B1, B2, B3, B4
-  next_ready: [A1, A2, A3, C1, C2, C3, D1]        # C1/C2/C3 unblocked by B1/B2/B3
+  done: 5                                          # B1-B4, C1
+  next_ready: [A1, A2, A3, C2, C3, D1]            # C2/C3 ready; C4 waits on C2+C3

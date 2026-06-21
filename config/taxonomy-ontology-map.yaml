@@ -37,6 +37,83 @@ mappings:
     confirmed_by: "(seed)"
     confirmed_on: 2026-06-09
 
+  # ---- C1: Control-M edges (reuse ACTIVE vocabulary terms — batch-confirm) --
+  # Source taxonomy: config/taxonomy/controlm.yaml. Each reuses an existing
+  # `status: active` entry in relationship_vocabulary.yaml (the mature M3 model),
+  # so the matrix row + node classifications are already confirmed — no new terms.
+
+  - id: folder-scheduled-on
+    taxonomy:
+      source: controlm-psgmgr
+      element: "Folder is scheduled on a Control-M server (data center)"
+    ontology:
+      from_node: JobFolder                 # prov:Collection
+      to_node: ControlMServer              # local Platform — NOT an Agent
+      prov_type_from: Collection
+      prov_type_to: "n/a (infrastructure)"
+      matrix_row: "no PROV row — infrastructure placement"
+      neo4j_label: SCHEDULED_ON
+      prov_maps_to: ~                       # null on purpose: ControlMServer is not an Agent
+    precedence_authority: bmc-baseline
+    reuses_vocab: m3_scheduled_on (active)
+    status: confirmed
+    confirmed_by: SME
+    confirmed_on: 2026-06-21
+
+  - id: job-requires-in-condition
+    taxonomy:
+      source: controlm-psgmgr
+      element: "Job requires a named IN condition before it runs"
+    ontology:
+      from_node: ControlMJob               # prov:Activity
+      to_node: Condition                   # prov:Entity
+      prov_type_from: Activity
+      prov_type_to: Entity
+      matrix_row: "Activity → Entity = prov:used"
+      neo4j_label: REQUIRES_IN_CONDITION   # domain alias mapping to prov:used
+      prov_maps_to: "prov:used"
+    precedence_authority: bmc-baseline
+    reuses_vocab: m3_requires_in_condition (active)
+    status: confirmed
+    confirmed_by: SME
+    confirmed_on: 2026-06-21
+
+  - id: job-emits-out-condition
+    taxonomy:
+      source: controlm-psgmgr
+      element: "Job emits a named OUT condition on completion (SIGN +/-)"
+    ontology:
+      from_node: ControlMJob               # prov:Activity
+      to_node: Condition                   # prov:Entity
+      prov_type_from: Activity
+      prov_type_to: Entity
+      matrix_row: "Activity → Entity = prov:generated"
+      neo4j_label: EMITS_OUT_CONDITION     # domain alias mapping to prov:generated
+      prov_maps_to: "prov:generated"
+    precedence_authority: bmc-baseline
+    reuses_vocab: m3_emits_out_condition (active)
+    status: confirmed
+    confirmed_by: SME
+    confirmed_on: 2026-06-21
+
+  - id: job-was-informed-by
+    taxonomy:
+      source: controlm-psgmgr
+      element: "Successor job depends on predecessor via shared OUT→IN condition (derived)"
+    ontology:
+      from_node: ControlMJob               # prov:Activity (successor)
+      to_node: ControlMJob                 # prov:Activity (predecessor)
+      prov_type_from: Activity
+      prov_type_to: Activity
+      matrix_row: "Activity → Activity = prov:wasInformedBy"
+      neo4j_label: WAS_INFORMED_BY         # replaces the retired DEPENDS_ON
+      prov_maps_to: "prov:wasInformedBy"
+    precedence_authority: bmc-baseline
+    reuses_vocab: m3_was_informed_by (active)
+    status: confirmed
+    confirmed_by: SME
+    confirmed_on: 2026-06-21
+
   # ---- Example: a PROPOSED mapping awaiting the SME gate -------------------
   - id: oracle-schema-asset
     taxonomy:
@@ -80,5 +157,6 @@ mappings:
 # Counts the gate reports to the SME each run.
 summary:
   applied: 1
-  proposed: 2
+  confirmed: 4        # C1 Control-M edges (2026-06-21)
+  proposed: 2         # oracle-schema-asset, jobrun-observation
   rejected: 0
