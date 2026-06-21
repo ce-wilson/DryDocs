@@ -1,0 +1,790 @@
+{
+  "schema": "depgraph-machine-first/v1",
+  "projects": [
+    "drydocs",
+    "tests"
+  ],
+  "nodes": [
+    {
+      "file_id": "drydocs/__init__.py",
+      "name": "__init__.py",
+      "extension": ".py",
+      "rel_path": "__init__.py",
+      "abs_path": "C:/coding/projects/sandbox/DRYDOCS/drydocs/__init__.py",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/adapters/__init__.py",
+      "name": "__init__.py",
+      "extension": ".py",
+      "rel_path": "adapters/__init__.py",
+      "abs_path": "C:/coding/projects/sandbox/DRYDOCS/drydocs/adapters/__init__.py",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/adapters/base.py",
+      "name": "base.py",
+      "extension": ".py",
+      "rel_path": "adapters/base.py",
+      "abs_path": "C:/coding/projects/sandbox/DRYDOCS/drydocs/adapters/base.py",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/adapters/csv_adapter.py",
+      "name": "csv_adapter.py",
+      "extension": ".py",
+      "rel_path": "adapters/csv_adapter.py",
+      "abs_path": "C:/coding/projects/sandbox/DRYDOCS/drydocs/adapters/csv_adapter.py",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/adapters/oracle_adapter.py",
+      "name": "oracle_adapter.py",
+      "extension": ".py",
+      "rel_path": "adapters/oracle_adapter.py",
+      "abs_path": "C:/coding/projects/sandbox/DRYDOCS/drydocs/adapters/oracle_adapter.py",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/cli.py",
+      "name": "cli.py",
+      "extension": ".py",
+      "rel_path": "cli.py",
+      "abs_path": "C:/coding/projects/sandbox/DRYDOCS/drydocs/cli.py",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/config.py",
+      "name": "config.py",
+      "extension": ".py",
+      "rel_path": "config.py",
+      "abs_path": "C:/coding/projects/sandbox/DRYDOCS/drydocs/config.py",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/controlm/__init__.py",
+      "name": "__init__.py",
+      "extension": ".py",
+      "rel_path": "controlm/__init__.py",
+      "abs_path": "C:/coding/projects/sandbox/DRYDOCS/drydocs/controlm/__init__.py",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/controlm/commands.py",
+      "name": "commands.py",
+      "extension": ".py",
+      "rel_path": "controlm/commands.py",
+      "abs_path": "C:/coding/projects/sandbox/DRYDOCS/drydocs/controlm/commands.py",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/controlm/facts.py",
+      "name": "facts.py",
+      "extension": ".py",
+      "rel_path": "controlm/facts.py",
+      "abs_path": "C:/coding/projects/sandbox/DRYDOCS/drydocs/controlm/facts.py",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/controlm/folder_name.py",
+      "name": "folder_name.py",
+      "extension": ".py",
+      "rel_path": "controlm/folder_name.py",
+      "abs_path": "C:/coding/projects/sandbox/DRYDOCS/drydocs/controlm/folder_name.py",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/controlm/paths.py",
+      "name": "paths.py",
+      "extension": ".py",
+      "rel_path": "controlm/paths.py",
+      "abs_path": "C:/coding/projects/sandbox/DRYDOCS/drydocs/controlm/paths.py",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/controlm/resolver.py",
+      "name": "resolver.py",
+      "extension": ".py",
+      "rel_path": "controlm/resolver.py",
+      "abs_path": "C:/coding/projects/sandbox/DRYDOCS/drydocs/controlm/resolver.py",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/controlm/staging.py",
+      "name": "staging.py",
+      "extension": ".py",
+      "rel_path": "controlm/staging.py",
+      "abs_path": "C:/coding/projects/sandbox/DRYDOCS/drydocs/controlm/staging.py",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/controlm/variable_report.py",
+      "name": "variable_report.py",
+      "extension": ".py",
+      "rel_path": "controlm/variable_report.py",
+      "abs_path": "C:/coding/projects/sandbox/DRYDOCS/drydocs/controlm/variable_report.py",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/controlm/variables.py",
+      "name": "variables.py",
+      "extension": ".py",
+      "rel_path": "controlm/variables.py",
+      "abs_path": "C:/coding/projects/sandbox/DRYDOCS/drydocs/controlm/variables.py",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/loaders/__init__.py",
+      "name": "__init__.py",
+      "extension": ".py",
+      "rel_path": "loaders/__init__.py",
+      "abs_path": "C:/coding/projects/sandbox/DRYDOCS/drydocs/loaders/__init__.py",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/loaders/base.py",
+      "name": "base.py",
+      "extension": ".py",
+      "rel_path": "loaders/base.py",
+      "abs_path": "C:/coding/projects/sandbox/DRYDOCS/drydocs/loaders/base.py",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/loaders/business_segments.py",
+      "name": "business_segments.py",
+      "extension": ".py",
+      "rel_path": "loaders/business_segments.py",
+      "abs_path": "C:/coding/projects/sandbox/DRYDOCS/drydocs/loaders/business_segments.py",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/loaders/catalog.py",
+      "name": "catalog.py",
+      "extension": ".py",
+      "rel_path": "loaders/catalog.py",
+      "abs_path": "C:/coding/projects/sandbox/DRYDOCS/drydocs/loaders/catalog.py",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/loaders/controlm.py",
+      "name": "controlm.py",
+      "extension": ".py",
+      "rel_path": "loaders/controlm.py",
+      "abs_path": "C:/coding/projects/sandbox/DRYDOCS/drydocs/loaders/controlm.py",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/loaders/controlm_conditions_in.py",
+      "name": "controlm_conditions_in.py",
+      "extension": ".py",
+      "rel_path": "loaders/controlm_conditions_in.py",
+      "abs_path": "C:/coding/projects/sandbox/DRYDOCS/drydocs/loaders/controlm_conditions_in.py",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/loaders/controlm_conditions_out.py",
+      "name": "controlm_conditions_out.py",
+      "extension": ".py",
+      "rel_path": "loaders/controlm_conditions_out.py",
+      "abs_path": "C:/coding/projects/sandbox/DRYDOCS/drydocs/loaders/controlm_conditions_out.py",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/loaders/controlm_dependencies_derived.py",
+      "name": "controlm_dependencies_derived.py",
+      "extension": ".py",
+      "rel_path": "loaders/controlm_dependencies_derived.py",
+      "abs_path": "C:/coding/projects/sandbox/DRYDOCS/drydocs/loaders/controlm_dependencies_derived.py",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/loaders/controlm_folders.py",
+      "name": "controlm_folders.py",
+      "extension": ".py",
+      "rel_path": "loaders/controlm_folders.py",
+      "abs_path": "C:/coding/projects/sandbox/DRYDOCS/drydocs/loaders/controlm_folders.py",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/loaders/controlm_jobs.py",
+      "name": "controlm_jobs.py",
+      "extension": ".py",
+      "rel_path": "loaders/controlm_jobs.py",
+      "abs_path": "C:/coding/projects/sandbox/DRYDOCS/drydocs/loaders/controlm_jobs.py",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/loaders/seal_applications.py",
+      "name": "seal_applications.py",
+      "extension": ".py",
+      "rel_path": "loaders/seal_applications.py",
+      "abs_path": "C:/coding/projects/sandbox/DRYDOCS/drydocs/loaders/seal_applications.py",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/loaders/seal_contacts.py",
+      "name": "seal_contacts.py",
+      "extension": ".py",
+      "rel_path": "loaders/seal_contacts.py",
+      "abs_path": "C:/coding/projects/sandbox/DRYDOCS/drydocs/loaders/seal_contacts.py",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/models/__init__.py",
+      "name": "__init__.py",
+      "extension": ".py",
+      "rel_path": "models/__init__.py",
+      "abs_path": "C:/coding/projects/sandbox/DRYDOCS/drydocs/models/__init__.py",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/models/catalog.py",
+      "name": "catalog.py",
+      "extension": ".py",
+      "rel_path": "models/catalog.py",
+      "abs_path": "C:/coding/projects/sandbox/DRYDOCS/drydocs/models/catalog.py",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/models/controlm.py",
+      "name": "controlm.py",
+      "extension": ".py",
+      "rel_path": "models/controlm.py",
+      "abs_path": "C:/coding/projects/sandbox/DRYDOCS/drydocs/models/controlm.py",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/models/seal.py",
+      "name": "seal.py",
+      "extension": ".py",
+      "rel_path": "models/seal.py",
+      "abs_path": "C:/coding/projects/sandbox/DRYDOCS/drydocs/models/seal.py",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/neo4j_client.py",
+      "name": "neo4j_client.py",
+      "extension": ".py",
+      "rel_path": "neo4j_client.py",
+      "abs_path": "C:/coding/projects/sandbox/DRYDOCS/drydocs/neo4j_client.py",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/ontology/__init__.py",
+      "name": "__init__.py",
+      "extension": ".py",
+      "rel_path": "ontology/__init__.py",
+      "abs_path": "C:/coding/projects/sandbox/DRYDOCS/drydocs/ontology/__init__.py",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/ontology/namespaces.py",
+      "name": "namespaces.py",
+      "extension": ".py",
+      "rel_path": "ontology/namespaces.py",
+      "abs_path": "C:/coding/projects/sandbox/DRYDOCS/drydocs/ontology/namespaces.py",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/snapshots/__init__.py",
+      "name": "__init__.py",
+      "extension": ".py",
+      "rel_path": "snapshots/__init__.py",
+      "abs_path": "C:/coding/projects/sandbox/DRYDOCS/drydocs/snapshots/__init__.py",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/snapshots/writer.py",
+      "name": "writer.py",
+      "extension": ".py",
+      "rel_path": "snapshots/writer.py",
+      "abs_path": "C:/coding/projects/sandbox/DRYDOCS/drydocs/snapshots/writer.py",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "tests/unit/__init__.py",
+      "name": "__init__.py",
+      "extension": ".py",
+      "rel_path": "unit/__init__.py",
+      "abs_path": "C:/coding/projects/sandbox/DRYDOCS/tests/unit/__init__.py",
+      "project": "tests",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "tests/unit/test_base_loader_smoke.py",
+      "name": "test_base_loader_smoke.py",
+      "extension": ".py",
+      "rel_path": "unit/test_base_loader_smoke.py",
+      "abs_path": "C:/coding/projects/sandbox/DRYDOCS/tests/unit/test_base_loader_smoke.py",
+      "project": "tests",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "tests/unit/test_classification.py",
+      "name": "test_classification.py",
+      "extension": ".py",
+      "rel_path": "unit/test_classification.py",
+      "abs_path": "C:/coding/projects/sandbox/DRYDOCS/tests/unit/test_classification.py",
+      "project": "tests",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "tests/unit/test_command_parser.py",
+      "name": "test_command_parser.py",
+      "extension": ".py",
+      "rel_path": "unit/test_command_parser.py",
+      "abs_path": "C:/coding/projects/sandbox/DRYDOCS/tests/unit/test_command_parser.py",
+      "project": "tests",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "tests/unit/test_controlm_cypher.py",
+      "name": "test_controlm_cypher.py",
+      "extension": ".py",
+      "rel_path": "unit/test_controlm_cypher.py",
+      "abs_path": "C:/coding/projects/sandbox/DRYDOCS/tests/unit/test_controlm_cypher.py",
+      "project": "tests",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "tests/unit/test_controlm_models.py",
+      "name": "test_controlm_models.py",
+      "extension": ".py",
+      "rel_path": "unit/test_controlm_models.py",
+      "abs_path": "C:/coding/projects/sandbox/DRYDOCS/tests/unit/test_controlm_models.py",
+      "project": "tests",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "tests/unit/test_folder_name_parser.py",
+      "name": "test_folder_name_parser.py",
+      "extension": ".py",
+      "rel_path": "unit/test_folder_name_parser.py",
+      "abs_path": "C:/coding/projects/sandbox/DRYDOCS/tests/unit/test_folder_name_parser.py",
+      "project": "tests",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "tests/unit/test_namespaces.py",
+      "name": "test_namespaces.py",
+      "extension": ".py",
+      "rel_path": "unit/test_namespaces.py",
+      "abs_path": "C:/coding/projects/sandbox/DRYDOCS/tests/unit/test_namespaces.py",
+      "project": "tests",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "tests/unit/test_schema.py",
+      "name": "test_schema.py",
+      "extension": ".py",
+      "rel_path": "unit/test_schema.py",
+      "abs_path": "C:/coding/projects/sandbox/DRYDOCS/tests/unit/test_schema.py",
+      "project": "tests",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "tests/unit/test_variable_classifier.py",
+      "name": "test_variable_classifier.py",
+      "extension": ".py",
+      "rel_path": "unit/test_variable_classifier.py",
+      "abs_path": "C:/coding/projects/sandbox/DRYDOCS/tests/unit/test_variable_classifier.py",
+      "project": "tests",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "tests/unit/test_variable_resolver.py",
+      "name": "test_variable_resolver.py",
+      "extension": ".py",
+      "rel_path": "unit/test_variable_resolver.py",
+      "abs_path": "C:/coding/projects/sandbox/DRYDOCS/tests/unit/test_variable_resolver.py",
+      "project": "tests",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "tests/unit/test_variable_staging.py",
+      "name": "test_variable_staging.py",
+      "extension": ".py",
+      "rel_path": "unit/test_variable_staging.py",
+      "abs_path": "C:/coding/projects/sandbox/DRYDOCS/tests/unit/test_variable_staging.py",
+      "project": "tests",
+      "circular": false,
+      "kind": "file"
+    }
+  ],
+  "edges": [
+    [
+      "drydocs/adapters/__init__.py",
+      "drydocs/adapters/base.py"
+    ],
+    [
+      "drydocs/adapters/__init__.py",
+      "drydocs/adapters/csv_adapter.py"
+    ],
+    [
+      "drydocs/adapters/__init__.py",
+      "drydocs/adapters/oracle_adapter.py"
+    ],
+    [
+      "drydocs/cli.py",
+      "drydocs/adapters/__init__.py"
+    ],
+    [
+      "drydocs/cli.py",
+      "drydocs/config.py"
+    ],
+    [
+      "drydocs/cli.py",
+      "drydocs/controlm/__init__.py"
+    ],
+    [
+      "drydocs/cli.py",
+      "drydocs/controlm/staging.py"
+    ],
+    [
+      "drydocs/cli.py",
+      "drydocs/loaders/__init__.py"
+    ],
+    [
+      "drydocs/cli.py",
+      "drydocs/loaders/base.py"
+    ],
+    [
+      "drydocs/cli.py",
+      "drydocs/loaders/business_segments.py"
+    ],
+    [
+      "drydocs/cli.py",
+      "drydocs/loaders/catalog.py"
+    ],
+    [
+      "drydocs/cli.py",
+      "drydocs/loaders/controlm_conditions_in.py"
+    ],
+    [
+      "drydocs/cli.py",
+      "drydocs/loaders/controlm_conditions_out.py"
+    ],
+    [
+      "drydocs/cli.py",
+      "drydocs/loaders/controlm_dependencies_derived.py"
+    ],
+    [
+      "drydocs/cli.py",
+      "drydocs/loaders/controlm_folders.py"
+    ],
+    [
+      "drydocs/cli.py",
+      "drydocs/loaders/controlm_jobs.py"
+    ],
+    [
+      "drydocs/cli.py",
+      "drydocs/models/__init__.py"
+    ],
+    [
+      "drydocs/cli.py",
+      "drydocs/neo4j_client.py"
+    ],
+    [
+      "drydocs/cli.py",
+      "drydocs/snapshots/__init__.py"
+    ],
+    [
+      "drydocs/controlm/__init__.py",
+      "drydocs/controlm/commands.py"
+    ],
+    [
+      "drydocs/controlm/__init__.py",
+      "drydocs/controlm/facts.py"
+    ],
+    [
+      "drydocs/controlm/__init__.py",
+      "drydocs/controlm/folder_name.py"
+    ],
+    [
+      "drydocs/controlm/__init__.py",
+      "drydocs/controlm/paths.py"
+    ],
+    [
+      "drydocs/controlm/__init__.py",
+      "drydocs/controlm/resolver.py"
+    ],
+    [
+      "drydocs/controlm/__init__.py",
+      "drydocs/controlm/staging.py"
+    ],
+    [
+      "drydocs/controlm/__init__.py",
+      "drydocs/controlm/variable_report.py"
+    ],
+    [
+      "drydocs/controlm/__init__.py",
+      "drydocs/controlm/variables.py"
+    ],
+    [
+      "drydocs/controlm/facts.py",
+      "drydocs/controlm/variables.py"
+    ],
+    [
+      "drydocs/controlm/resolver.py",
+      "drydocs/controlm/variables.py"
+    ],
+    [
+      "drydocs/controlm/staging.py",
+      "drydocs/controlm/commands.py"
+    ],
+    [
+      "drydocs/controlm/staging.py",
+      "drydocs/controlm/facts.py"
+    ],
+    [
+      "drydocs/controlm/staging.py",
+      "drydocs/controlm/paths.py"
+    ],
+    [
+      "drydocs/controlm/staging.py",
+      "drydocs/controlm/resolver.py"
+    ],
+    [
+      "drydocs/controlm/staging.py",
+      "drydocs/controlm/variables.py"
+    ],
+    [
+      "drydocs/controlm/staging.py",
+      "drydocs/models/__init__.py"
+    ],
+    [
+      "drydocs/controlm/variable_report.py",
+      "drydocs/controlm/variables.py"
+    ],
+    [
+      "drydocs/loaders/__init__.py",
+      "drydocs/loaders/base.py"
+    ],
+    [
+      "drydocs/loaders/__init__.py",
+      "drydocs/loaders/catalog.py"
+    ],
+    [
+      "drydocs/loaders/__init__.py",
+      "drydocs/loaders/controlm.py"
+    ],
+    [
+      "drydocs/loaders/__init__.py",
+      "drydocs/loaders/seal_applications.py"
+    ],
+    [
+      "drydocs/loaders/__init__.py",
+      "drydocs/loaders/seal_contacts.py"
+    ],
+    [
+      "drydocs/loaders/base.py",
+      "drydocs/adapters/__init__.py"
+    ],
+    [
+      "drydocs/loaders/base.py",
+      "drydocs/neo4j_client.py"
+    ],
+    [
+      "drydocs/loaders/business_segments.py",
+      "drydocs/neo4j_client.py"
+    ],
+    [
+      "drydocs/loaders/catalog.py",
+      "drydocs/loaders/base.py"
+    ],
+    [
+      "drydocs/loaders/controlm.py",
+      "drydocs/loaders/controlm_conditions_in.py"
+    ],
+    [
+      "drydocs/loaders/controlm.py",
+      "drydocs/loaders/controlm_conditions_out.py"
+    ],
+    [
+      "drydocs/loaders/controlm.py",
+      "drydocs/loaders/controlm_dependencies_derived.py"
+    ],
+    [
+      "drydocs/loaders/controlm.py",
+      "drydocs/loaders/controlm_folders.py"
+    ],
+    [
+      "drydocs/loaders/controlm.py",
+      "drydocs/loaders/controlm_jobs.py"
+    ],
+    [
+      "drydocs/loaders/controlm_conditions_in.py",
+      "drydocs/loaders/base.py"
+    ],
+    [
+      "drydocs/loaders/controlm_conditions_in.py",
+      "drydocs/models/__init__.py"
+    ],
+    [
+      "drydocs/loaders/controlm_conditions_out.py",
+      "drydocs/loaders/base.py"
+    ],
+    [
+      "drydocs/loaders/controlm_conditions_out.py",
+      "drydocs/models/__init__.py"
+    ],
+    [
+      "drydocs/loaders/controlm_dependencies_derived.py",
+      "drydocs/loaders/base.py"
+    ],
+    [
+      "drydocs/loaders/controlm_dependencies_derived.py",
+      "drydocs/models/__init__.py"
+    ],
+    [
+      "drydocs/loaders/controlm_folders.py",
+      "drydocs/controlm/__init__.py"
+    ],
+    [
+      "drydocs/loaders/controlm_folders.py",
+      "drydocs/loaders/base.py"
+    ],
+    [
+      "drydocs/loaders/controlm_folders.py",
+      "drydocs/models/__init__.py"
+    ],
+    [
+      "drydocs/loaders/controlm_jobs.py",
+      "drydocs/loaders/base.py"
+    ],
+    [
+      "drydocs/loaders/controlm_jobs.py",
+      "drydocs/models/__init__.py"
+    ],
+    [
+      "drydocs/loaders/seal_applications.py",
+      "drydocs/loaders/base.py"
+    ],
+    [
+      "drydocs/loaders/seal_applications.py",
+      "drydocs/models/__init__.py"
+    ],
+    [
+      "drydocs/loaders/seal_contacts.py",
+      "drydocs/loaders/base.py"
+    ],
+    [
+      "drydocs/loaders/seal_contacts.py",
+      "drydocs/models/__init__.py"
+    ],
+    [
+      "drydocs/models/__init__.py",
+      "drydocs/models/catalog.py"
+    ],
+    [
+      "drydocs/models/__init__.py",
+      "drydocs/models/controlm.py"
+    ],
+    [
+      "drydocs/models/__init__.py",
+      "drydocs/models/seal.py"
+    ],
+    [
+      "drydocs/snapshots/__init__.py",
+      "drydocs/snapshots/writer.py"
+    ],
+    [
+      "drydocs/snapshots/writer.py",
+      "drydocs/neo4j_client.py"
+    ]
+  ],
+  "stats": {
+    "projects": [
+      "drydocs",
+      "tests"
+    ],
+    "files": 49,
+    "edges": 70,
+    "circular_files": 0
+  }
+}
