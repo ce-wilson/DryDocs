@@ -26,8 +26,22 @@ file-tree snapshot (noisier; includes `.claude/skills`), scan the repo root with
 ## Compare
 
 Each snapshot's summary line reports `files`, `edges`, `circular_files`. To see what changed:
-- diff the two most recent `.json` files (committed → `git diff`; or any JSON diff tool), or
-- watch the summary counts (a jump in `edges` or any `circular_files > 0` is worth a look).
+- **Open [`viewer.html`](viewer.html)** in a browser — load a snapshot in **A**, a second in **B**;
+  it renders the graph (cytoscape.js, MIT, CDN — no build) and colors the diff
+  (green = added in B, red = removed, grey = unchanged). Views: directory **Structure**,
+  Structure+files, or **Dependencies** (Python imports). Compares by project-relative path,
+  so different projects (e.g. `drydocs-original` vs `drydocs1`) align.
+- or diff the two `.json` files (`git diff` / any JSON diff tool), or watch the summary counts.
+
+### Seeded comparison — the v1 rewrite (original vs this version)
+- `tree-original.json` — full tree at commit `683322c` (pre-rewrite): 494 files / 103 dirs, has `vendor/`.
+- `tree-this-version.json` — current v1: 540 files / 124 dirs; adds `reference/ external/ config/ internal/`
+  (the four layers), `vendor/` → `external/orchestration/bmc-controlm`.
+- Load both in the viewer (A = this-version, B = original, or swap) to see the restructure.
+
+> Neo4j path (alternative): `depgraph cypher --from <snapshot>.json -o load.cypher`, load into Neo4j,
+> and visualize in Neo4j Browser / Bloom. NVL (`@neo4j-nvl/base`) is the native lib but needs a
+> build and is licensed for Neo4j-backed apps — `viewer.html` is the zero-friction option.
 
 ## Housekeeping
 
