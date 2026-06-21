@@ -7,9 +7,9 @@
 //
 // Outputs:
 //   (:JobFolder {folder_id, sched_table, user_daily, table_status, ...})
-//     -[:RUNS_ON {since}]-> (:ControlMServer:Platform {name})
+//     -[:SCHEDULED_ON {since}]-> (:ControlMServer:Platform {name})
 //
-// Each folder runs on exactly one server. The :RUNS_ON.since timestamp
+// Each folder is scheduled on exactly one server. The :SCHEDULED_ON.since timestamp
 // (set on create) plus last_seen_at (updated each refresh) make folder
 // migrations between servers auditable.
 //
@@ -47,9 +47,11 @@ SET f.sched_table       = row.sched_table,
     f.table_status      = row.table_status,
     f.table_type        = row.table_type,
     f.instance_name     = row.instance_name,
-    f.last_updated      = row.last_updated,
+    f.last_updated      = CASE WHEN row.last_updated IS NULL OR row.last_updated = '' THEN null
+                               ELSE datetime(replace(row.last_updated, ' ', 'T')) END,
     f.last_updated_user = row.last_updated_user,
-    f.capture_date      = row.capture_date,
+    f.capture_date      = CASE WHEN row.capture_date IS NULL OR row.capture_date = '' THEN null
+                               ELSE datetime(replace(row.capture_date, ' ', 'T')) END,
     f.environment_code  = row.environment_code,
     f.environment       = row.environment,
     f.lob_code          = row.lob_code,
@@ -61,8 +63,9 @@ SET f.sched_table       = row.sched_table,
     f.last_seen_at      = datetime($loaded_at),
     f.last_run_id       = $run_id
 
-// Folder -> Server.
-MERGE (f)-[r:RUNS_ON]->(srv)
+// Folder -> Server.  (B.1: renamed RUNS_ON -> SCHEDULED_ON per the vocabulary;
+// run migrate_runs_on_to_scheduled_on.cypher once on any existing graph.)
+MERGE (f)-[r:SCHEDULED_ON]->(srv)
   ON CREATE SET r.since        = datetime($loaded_at),
                 r.source       = 'psgmgr.CM_DEF_VTAB',
                 r.loader       = $loader

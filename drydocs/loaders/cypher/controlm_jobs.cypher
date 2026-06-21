@@ -60,15 +60,19 @@ SET j.version_serial     = row.version_serial,
     j.memname            = row.memname,
     j.priority           = row.priority,
     j.critical           = row.critical,
-    j.active_from        = row.active_from,
-    j.active_till        = row.active_till,
+    j.active_from        = CASE WHEN row.active_from IS NULL OR row.active_from = '' THEN null
+                                ELSE datetime(replace(row.active_from, ' ', 'T')) END,
+    j.active_till        = CASE WHEN row.active_till IS NULL OR row.active_till = '' THEN null
+                                ELSE datetime(replace(row.active_till, ' ', 'T')) END,
     j.end_folder         = row.end_folder,
     j.is_current_version = row.is_current_version,
     j.version_opcode     = row.version_opcode,
-    j.version_timestamp  = row.version_timestamp,
+    j.version_timestamp  = row.version_timestamp,    // string: compact Oracle version marker (YYYYMMDDHHMMSS), NOT ISO — deliberately not a datetime
+
     j.version_user       = row.version_user,
     j.instance_name      = row.instance_name,
-    j.capture_date       = row.capture_date,
+    j.capture_date       = CASE WHEN row.capture_date IS NULL OR row.capture_date = '' THEN null
+                                ELSE datetime(replace(row.capture_date, ' ', 'T')) END,
     j.active             = row.is_current_version = '1',
     j.last_seen_at       = datetime($loaded_at),
     j.last_run_id        = $run_id

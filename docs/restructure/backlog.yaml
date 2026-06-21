@@ -197,11 +197,17 @@ items:
     agent: main
     model: opus
     priority: p0
-    status: todo
+    status: done
     depends_on: []
     inputs: [drydocs/loaders/cypher/controlm_folders.cypher, drydocs/loaders/cypher/controlm_jobs.cypher, docs/reviews/drydocs-consolidated-plan.md]
     acceptance: "RUNS_ON->SCHEDULED_ON + datetime() + stale_edge_cleanup landed; migrations idempotent; m3-verify green; tests green"
-    notes: "P0 prerequisite for any production load (consolidated-plan B.1/B.2/B.3)."
+    notes: >
+      Done 2026-06-21. B.1: folders.cypher writes SCHEDULED_ON (was RUNS_ON — a real bug;
+      cli.py m3-verify already expected SCHEDULED_ON) + idempotent migrate_runs_on_to_scheduled_on.cypher.
+      B.2: stale_edge_cleanup.cypher (for the incremental loader). B.3: empty-safe, space->T-tolerant
+      datetime() on capture_date/last_updated/active_from/active_till; version_timestamp left as string
+      (compact YYYYMMDDHHMMSS, not ISO). 164 tests pass. m3-verify needs a live Neo4j+APOC to run; the
+      loader now matches its SCHEDULED_ON expectation. (D2/D3 = config-driven loaders, next.)
 
   - id: D2
     epic: config-loaders
@@ -267,8 +273,8 @@ items:
 
 # Roll-up the dispatcher can glance at (keep in sync, or regenerate).
 summary:
-  todo: 7
+  todo: 6
   in_progress: 0
   blocked: 0
-  done: 11                                         # B1-B4, C1-C4, A1-A3 (Epics A + B + C complete)
-  next_ready: [D1]                               # Epic D (config-driven loaders); D1 is the P0 gate
+  done: 12                                         # A1-A3, B1-B4, C1-C4, D1 (Epics A,B,C + P0 done)
+  next_ready: [D2, D3]                            # config-driven loaders (D2 needs C3✓+D1✓; D3 needs C4✓+D1✓)
