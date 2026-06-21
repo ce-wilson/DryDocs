@@ -61,7 +61,7 @@ paths don't exist there yet). Take them wholesale.
 | `CLAUDE.md` | routing brain: four layers, all external refs, sub-agents, precedence | clean-add |
 | `reference/` | Tier-1 external: Neo4j/Oracle platforms + ontology standards (PROV-O, ORG, DPROD, SOSA/SSN, DCAT) + research, indexed by `REGISTRY.yaml` | clean-add |
 | `external/orchestration/` | Tier-2 external: BMC baseline (moved from `vendor/bmc-controlm/`) + AutoSys/Airflow placeholders + crosswalks | rename + clean-add |
-| `config/` | configuration layer: `precedence.yaml`, `source-registry.yaml`, `taxonomy-ontology-map.yaml`, `taxonomy/` | clean-add |
+| `config/` | configuration layer: `precedence.yaml`, `source-registry.yaml`, `classification.yaml` (sensitivity axis), `taxonomy-ontology-map.yaml`, `taxonomy/` (Control-M + BusinessApplication + LOB→Product→Team + Oracle-schema captured) | clean-add |
 | `internal/` + `PUBLISH-BOUNDARY.md` | confidential split for the private-but-sometimes-public repo | clean-add |
 | `.claude/agents/` | four sub-agents (reference-librarian, taxonomy-importer, ontology-mapper, pipeline-config) | clean-add |
 | `docs/restructure/` | conceptual model, project plan, sub-agent backlog, HITL SME flow | clean-add |
@@ -71,9 +71,18 @@ paths don't exist there yet). Take them wholesale.
 delete it after taking the new path (across disjoint history git sees the move as
 delete+add). Doc/code references to the old path were repointed in the same commit.
 
-**Drift guard now enforced:** `tests/unit/test_schema.py` requires PyYAML (added as a dev
-dep) and fails CI if a relationship is `active` without its supplement block. It is the
-safety net behind the ontology workflow — keep it green.
+**Two guards now enforced (require PyYAML, a dev dep):**
+- `tests/unit/test_schema.py` — fails CI if a relationship is `active` without its supplement
+  block (the ontology-drift safety net).
+- `tests/unit/test_classification.py` — fails CI if any source in `source-registry.yaml` lacks a
+  valid sensitivity `classification` + `source` (the publish-boundary safety net). Sensitivity
+  tiers: `External` / `Internal-Public` / `Internal` / `Internal-Confidential`
+  (`config/classification.yaml`), distinct from the provenance tier in each `SOURCE-MANIFEST`.
+
+**Post-push code-structure snapshot (drift comparison):** after each push, generate a
+timestamped dependency-graph snapshot with the `depgraph` tool (a stdlib-only sibling repo) and
+compare to the previous one — see
+[`knowledge/depgraph-snapshots/README.md`](knowledge/depgraph-snapshots/README.md).
 
 > **Next upgrade — internal import:** the internal data sources (SEAL, the LOB→Product→Team
 > org taxonomy, Oracle schemas) are imported through the new taxonomy → config → ontology →
