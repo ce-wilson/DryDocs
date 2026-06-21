@@ -155,18 +155,27 @@ MERGE (n:OntologyTerm:LocalRelationship {iri: "https://drydocs.local/ontology#ar
       n.notes  = "Area Product Group contains DevTeams. Same relationship label as "
                + "Product→DevTeam; query context (from_node label) distinguishes the two.";
 
-// SUPPORTS  —  DevTeam → Product / AreaProduct
+// SUPPORTS  —  DevTeam → AreaProduct   (range resolved by SME 2026-06-21; was "Product or AreaProduct")
 // Edge properties: team_type (aligned|flex|dedicated), sponsored (bool).
 // Agent→Entity has no PROV-O matrix row; local-only.
 MERGE (n:OntologyTerm:LocalRelationship {iri: "https://drydocs.local/ontology#supports"})
   SET n.label  = "SUPPORTS",
       n.domain = "DevTeam",
-      n.range  = "Product or AreaProduct",
-      n.notes  = "DevTeam supports a Product or AreaProduct. "
-               + "Edge carries team_type (aligned|flex|dedicated) and sponsored (bool). "
-               + "team_type is an edge property, not a node property — a team can be Aligned "
-               + "to its Home Product and Dedicated to a Sponsoring Product simultaneously. "
-               + "Agent→Entity has no PROV-O matrix row; local-only.";
+      n.range  = "AreaProduct",
+      n.notes  = "DevTeam is aligned to / supports an AreaProduct (Team-of-Teams). Range resolved "
+               + "to AreaProduct (SME 2026-06-21); Product is reached via Product▸AreaProduct▸DevTeam. "
+               + "Edge carries team_type (aligned|flex|dedicated) and sponsored (bool); 'aligned to' "
+               + "= team_type=aligned. Agent→Entity has no PROV-O matrix row; local-only.";
+
+// DEVELOPS  —  DevTeam → BusinessApplication (graph label :Application), joined by SEALID
+// SME 2026-06-21. Agent→Agent has no PROV matrix fit; local. Cross-source edge (catalog↔SEAL).
+MERGE (n:OntologyTerm:LocalRelationship {iri: "https://drydocs.local/ontology#develops"})
+  SET n.label  = "DEVELOPS",
+      n.domain = "DevTeam",
+      n.range  = "Application",
+      n.notes  = "DevTeam develops a BusinessApplication (graph label :Application), reconciled by "
+               + "SEALID. Agent→Agent has no PROV-O matrix row (actedOnBehalfOf is delegation, not "
+               + "development); local-only. Inverse alt: Application -[:WAS_ATTRIBUTED_TO]-> DevTeam.";
 
 // HAS_MEMBERSHIP (DevTeam source)  —  DevTeam → Membership
 // Reuses org:Membership n-ary pattern from SEAL. Sourced from PAT team-role data.

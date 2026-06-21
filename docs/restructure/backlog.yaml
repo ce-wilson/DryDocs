@@ -177,10 +177,16 @@ items:
     agent: ontology-mapper
     model: sonnet
     priority: p1
-    status: todo
+    status: done
     depends_on: [C1, C2, C3]
     inputs: [drydocs/ontology/relationship_vocabulary.yaml, config/taxonomy-ontology-map.yaml]
     acceptance: "test_schema.py drift guard green; map summary == vocabulary active count"
+    notes: >
+      Done 2026-06-21. Reconciled vocabulary to the confirmed map: catalog_supports_area_product
+      + arch_develops set active (added DEVELOPS block to catalog_ontology_supplement.cypher);
+      catalog_supports (DevTeam→Product) deprecated. Drift guard green (9 passed); 164 passed.
+      Remaining phase-2 `planned` entries (m3_invokes/triggers, p2_*, etc.) stay planned until
+      their taxonomy is captured — not re-gated now (no data). Epic C complete.
 
   # ── Epic D — Config-driven loaders (pipeline-config + main) — Phase 3 ──────
   - id: D1
@@ -258,8 +264,8 @@ items:
 
 # Roll-up the dispatcher can glance at (keep in sync, or regenerate).
 summary:
-  todo: 11
+  todo: 10
   in_progress: 0
   blocked: 0
-  done: 7                                          # B1-B4, C1-C3
-  next_ready: [A1, A2, A3, C4, D1]               # C4 unblocked (C1+C2+C3 done)
+  done: 8                                          # B1-B4, C1-C4 (Epics B + C complete)
+  next_ready: [A1, A2, A3, D1]                   # Epic D (config-driven loaders); D1 is the P0 gate

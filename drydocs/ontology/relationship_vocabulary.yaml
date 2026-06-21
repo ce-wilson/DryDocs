@@ -814,15 +814,15 @@ local_relationships:
     from_node:    DevTeam
     to_node:      Product
     prov_maps_to: ~
+    deprecated_at: 2026-06-21
     note: >
-      DevTeam supports a Product. Edge properties: team_type (aligned|flex|dedicated),
-      sponsored (bool). Agent→Entity has no PROV-O matrix row; local-only.
-      team_type is on the edge, not the node — a team can be Aligned to its
-      Home Product and Dedicated to a Sponsoring Product simultaneously.
+      DEPRECATED 2026-06-21 (C4): superseded by catalog_supports_area_product. SME resolved the
+      SUPPORTS range to AreaProduct — a DevTeam→Product SUPPORTS edge is not modeled; Product is
+      reached via Product▸AreaProduct▸DevTeam. Kept for audit.
     supplement:   catalog_ontology_supplement.cypher
     loader:       pat_product_mapping.cypher
     domain:       catalog
-    status:       planned
+    status:       deprecated
 
   - id:           catalog_supports_area_product
     neo4j_label:  SUPPORTS
@@ -830,11 +830,15 @@ local_relationships:
     from_node:    DevTeam
     to_node:      AreaProduct
     prov_maps_to: ~
-    note:         "DevTeam supports an AreaProduct. Same label as catalog_supports; target node type distinguishes."
+    note: >
+      DevTeam is aligned to / supports an AreaProduct (Team-of-Teams). Confirmed via HITL gate
+      (C3, SME 2026-06-21) as THE SUPPORTS edge — range is AreaProduct (the DevTeam→Product form
+      is deprecated). Edge carries team_type (aligned|flex|dedicated) + sponsored (bool);
+      'aligned to' = team_type=aligned. Agent→Entity has no PROV-O matrix row; local-only.
     supplement:   catalog_ontology_supplement.cypher
     loader:       pat_product_mapping.cypher
     domain:       catalog
-    status:       planned
+    status:       active
 
   - id:           catalog_dev_team_has_membership
     neo4j_label:  HAS_MEMBERSHIP
@@ -862,18 +866,19 @@ local_relationships:
     neo4j_label:  DEVELOPS
     role:         ~
     from_node:    DevTeam
-    to_node:      Application
+    to_node:      Application          # the BusinessApplication concept; key = SEALID
+    join_key:     SEALID
     prov_maps_to: ~
     note: >
-      Was mermaid "develops". DevTeam (Agent) → Application (SoftwareAgent):
-      no PROV matrix row fits Agent → Agent ownership (actedOnBehalfOf is
-      delegation, not development), so this stays local. If Application is
-      treated as an Entity in this context, the alternative is the inverse
-      edge Application -[:WAS_ATTRIBUTED_TO {role: developed_by}]-> DevTeam.
+      DevTeam develops a BusinessApplication (graph label :Application), reconciled by SEALID.
+      Confirmed via HITL gate (C3/C4, SME 2026-06-21). DevTeam (Agent) → Application
+      (SoftwareAgent): no PROV matrix row fits Agent→Agent ownership (actedOnBehalfOf is
+      delegation, not development), so local-only. Cross-source edge (catalog↔SEAL ownership
+      reconciliation). Inverse alt: Application -[:WAS_ATTRIBUTED_TO {role: developed_by}]-> DevTeam.
     supplement:   catalog_ontology_supplement.cypher
     loader:       ~
     domain:       architecture
-    status:       planned
+    status:       active
 
   - id:           arch_owns_code
     neo4j_label:  WAS_ATTRIBUTED_TO

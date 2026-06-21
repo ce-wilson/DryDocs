@@ -25,3 +25,12 @@ records the date, the item, confirmed / edited / rejected counts, and reasons fo
 - **Edited:** 1 (SUPPORTS retargeted + DEVELOPS added) · **Rejected:** 0
 - **C4 follow-up:** set `catalog_supports_area_product` + `arch_develops` active in the
   vocabulary; deprecate `catalog_supports` (DevTeam→Product).
+
+## 2026-06-21 — C4 · vocabulary reconciliation (no gate decisions)
+- `catalog_supports_area_product` → **active** (SUPPORTS range = AreaProduct)
+- `arch_develops` → **active** (DevTeam DEVELOPS Application by SEALID; added a `DEVELOPS`
+  LocalRelationship block to `catalog_ontology_supplement.cypher` so the drift guard passes)
+- `catalog_supports` (DevTeam→Product) → **deprecated** (kept for audit)
+- Drift guard `test_schema.py` green (9 passed); full suite 164 passed.
+- Phase-2 `planned` entries (m3_invokes/triggers, p2_*, …) left planned — no taxonomy captured
+  yet, not re-gated. **Epic C complete (C1–C4).**
