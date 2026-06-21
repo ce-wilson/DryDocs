@@ -1,0 +1,74 @@
+# =============================================================================
+# config/classification.yaml — sensitivity classification (the THIRD axis).
+#
+# DryDocs ingestion carries three independent axes:
+#   (1) precedence authority — which source wins on conflict   (config/precedence.yaml)
+#   (2) provenance tier       — TRUST: vendor's words vs Claude inference
+#                               (VERBATIM / GROUNDED / SYNTHESIZED, decided at
+#                                ingestion, recorded in each SOURCE-MANIFEST)
+#   (3) sensitivity classification — THIS file: who may see it / may it be published
+#
+# The classification is DECIDED AT INGESTION TIME and recorded per source. It drives
+# the GitHub publish boundary (PUBLISH-BOUNDARY.md) like a .gitignore: the
+# non-publishable tiers never enter a public push.
+# =============================================================================
+
+schema: drydocs.classification.v1
+updated: 2026-06-20
+
+levels:
+  - id: External
+    rank: 0
+    publishable: true
+    description: >
+      Publicly available third-party material — vendor docs fetched from a public URL,
+      ontology standards, academic research.
+    homes: [reference/, external/]
+    requires: [source_url, captured_at]      # External => must cite the public URL + fetch date
+
+  - id: Internal-Public                       # "Internal-Public Availability"
+    rank: 1
+    publishable: true
+    description: >
+      Internally authored but cleared for public availability — design prose, ontology
+      docs, generic naming standards. Contains no confidential identifiers.
+    homes: [knowledge/]
+
+  - id: Internal
+    rank: 2
+    publishable: false
+    description: >
+      Internal-only — shareable inside the company but NOT for public GitHub. Operational
+      metadata and internal process docs. No real secrets / PII.
+    homes: [internal/]
+
+  - id: Internal-Confidential
+    rank: 3
+    publishable: false
+    description: >
+      Confidential — real rosters, people, SIDs, schema object names, secrets, PII/PCI/MNPi.
+      Highest protection.
+    homes: [internal/]
+
+# The GitHub publish boundary (a .gitignore-style guard).
+publish_rule:
+  publish_when: "level.publishable == true"            # External + Internal-Public
+  exclude_from_public_push: [Internal, Internal-Confidential]
+  enforced_by: "PUBLISH-BOUNDARY.md (+ .gitignore on the public remote)"
+  note: >
+    The directory layout aligns with this — reference/ + external/ + knowledge/ are
+    publishable; internal/ is not — but the per-source `classification` label is the
+    authoritative driver of what is excluded from a public push.
+
+# Required on EVERY ingested source (a data feed OR a document corpus).
+required_on_every_source:
+  - classification      # one of levels[].id — in config/source-registry.yaml (feeds)
+                        #   and in each SOURCE-MANIFEST (document corpora)
+  - source              # the system/path the data came from (e.g. oracle:psgmgr)
+required_for_external:  # additionally, when classification == External:
+  - source_url          # the public URL the content was fetched from
+  - captured_at         # the ingestion / fetch date
+
+# NB: this axis is SENSITIVITY, not TRUST. The provenance tier
+# (VERBATIM/GROUNDED/SYNTHESIZED) lives in each SOURCE-MANIFEST and answers a
+# different question (is this the vendor's words or Claude's inference?).

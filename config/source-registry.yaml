@@ -4,6 +4,11 @@
 # Each entry binds a SOURCE to: its orchestrator (Tier-2 vendor), its adapter,
 # the taxonomy it feeds, and its crosswalk-confirmation state. Loaders and the
 # `pipeline-config` agent read this; nothing loads until `confirmed: true`.
+#
+# REQUIRED on every entry (enforced by tests/unit/test_classification.py):
+#   classification — one of config/classification.yaml levels (sensitivity / publish tier)
+#   source         — the system/path the data comes from
+#   (External sources additionally need source_url + captured_at)
 # =============================================================================
 
 schema: drydocs.source-registry.v1
@@ -12,6 +17,8 @@ updated: 2026-06-20
 sources:
   # ---- Orchestration metadata (Tier-2 vendors) -----------------------------
   - id: controlm-psgmgr
+    classification: Internal            # operational scheduling metadata; not for public GitHub
+    source: "oracle:psgmgr.CM_DEF_* views"
     kind: orchestration
     orchestrator: bmc-controlm          # baseline — no crosswalk needed
     adapter: oracle                     # OracleAdapter over psgmgr.* views
@@ -20,6 +27,8 @@ sources:
     notes: "Live. The canonical structural-lineage feed. See README §Control-M lineage."
 
   - id: autosys-export
+    classification: Internal
+    source: "autosys export (TBD)"
     kind: orchestration
     orchestrator: autosys
     adapter: ~                          # TBD
@@ -29,6 +38,8 @@ sources:
     notes: "Placeholder. Activate only after crosswalk passes the HITL gate."
 
   - id: airflow-mwaa
+    classification: Internal
+    source: "MWAA DAG export (TBD)"
     kind: orchestration
     orchestrator: airflow
     adapter: ~
@@ -39,6 +50,8 @@ sources:
 
   # ---- Internal reference data (Tier-3 confidential) -----------------------
   - id: seal-extract
+    classification: Internal-Confidential   # real applications, ownership, employees, SEAL ids
+    source: "SEAL extract (internal)"
     kind: internal
     orchestrator: ~
     adapter: csv                        # CsvAdapter (samples) / internal extract in prod
@@ -47,6 +60,8 @@ sources:
     notes: "Live. SEAL applications + ownership."
 
   - id: catalog-pat
+    classification: Internal-Confidential   # real LOB→Product→Team rosters, team names
+    source: "PAT/Catalog extract (internal)"
     kind: internal
     orchestrator: ~
     adapter: csv
@@ -56,6 +71,8 @@ sources:
 
   # ---- Data platforms (sources of DataAsset/lineage) -----------------------
   - id: oracle-schemas
+    classification: Internal-Confidential   # real schema/table/object names
+    source: "oracle:<schema> (internal)"
     kind: data-platform
     orchestrator: ~
     adapter: oracle
@@ -64,6 +81,8 @@ sources:
     notes: "Oracle DB schemas/scripts as taxonomy → DataAsset. Real names are confidential."
 
   - id: snowflake
+    classification: Internal-Confidential
+    source: "snowflake (TBD)"
     kind: data-platform
     orchestrator: ~
     adapter: ~

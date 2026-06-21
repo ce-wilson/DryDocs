@@ -93,20 +93,24 @@ Oracle (source DB) and Snowflake (future) are **data platforms**, referenced via
 
 ---
 
-## 3. Internal vs external — the publish boundary
+## 3. Sensitivity classification — the publish boundary
 
-This repo is **private but sometimes published**. Keep the boundary clean:
+This repo is **private but sometimes published**. Every ingested source carries a **sensitivity
+classification** ([`config/classification.yaml`](config/classification.yaml)), decided at
+ingestion and required on every source (enforced by `tests/unit/test_classification.py`). It
+drives the GitHub publish boundary like a `.gitignore`:
 
-| Bucket | Provenance | Publishable? |
-|--------|-----------|--------------|
-| `reference/`, `external/` | external (vendor / standards / public knowledge) | **Yes** |
-| `knowledge/` | internal, graph-*defining* design prose | Yes (no secrets) |
-| `internal/` | internal, **confidential** (real LOB→Product→Team rosters, SEAL data, real SIDs/schemas) | **NO — stripped on publish** |
-| `drydocs/` | code | Yes (no embedded secrets) |
+| Classification | Publishable? | Typical home |
+|----------------|--------------|--------------|
+| **External** | **Yes** | `reference/`, `external/` (public vendor/standards; cite `source_url`) |
+| **Internal-Public** | **Yes** | `knowledge/` (internal design prose, no secrets) |
+| **Internal** | **NO — excluded from public push** | `internal/` (operational metadata) |
+| **Internal-Confidential** | **NO — excluded + extra protection** | `internal/` (real rosters, SIDs, schemas, PII) |
 
 **Never** commit real SIDs, credentials, server addresses, GHE org names, or production data
-values outside `internal/` (which is git-ignored from any public push). See
-[`PUBLISH-BOUNDARY.md`](PUBLISH-BOUNDARY.md).
+values outside `internal/`. When registering a source, **set its `classification`** — there is no
+unlabeled default. See [`PUBLISH-BOUNDARY.md`](PUBLISH-BOUNDARY.md). (This is *sensitivity*; the
+*trust* axis — VERBATIM/GROUNDED/SYNTHESIZED — lives in each `SOURCE-MANIFEST`.)
 
 ---
 

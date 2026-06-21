@@ -10,7 +10,8 @@ via the guided gate (`docs/restructure/03-hitl-sme-flow.md`).
 | File | Purpose |
 |------|---------|
 | [`precedence.yaml`](precedence.yaml) | The authority order when sources disagree: BMC baseline → internal standards → LOB→Product→Team. |
-| [`source-registry.yaml`](source-registry.yaml) | Every pipeline source: which orchestrator, which adapter, which taxonomy it feeds, confirmed crosswalk. |
+| [`source-registry.yaml`](source-registry.yaml) | Every pipeline source: orchestrator, adapter, taxonomy fed, confirmed crosswalk, **and its `classification` + `source`**. |
+| [`classification.yaml`](classification.yaml) | The sensitivity vocabulary (External / Internal-Public / Internal / Internal-Confidential) that drives the GitHub publish boundary. Required on every source. |
 | [`taxonomy-ontology-map.yaml`](taxonomy-ontology-map.yaml) | The HITL-confirmed bindings: "this imported taxonomy → apply this ontology rule." |
 | `taxonomy/` | Imported raw hierarchies (apps, products, schemas, scripts, variables, LOB→Product→Team) as **pure classification** — no meaning-bearing edges yet. |
 
@@ -32,3 +33,12 @@ problem where relationships were created that did not follow taxonomy/ontology c
 ## Precedence in one sentence
 When two sources describe the same thing differently, the **higher-precedence authority wins**,
 and the loser is recorded as an alias/closeMatch — never silently dropped.
+
+## The three axes (don't conflate them)
+Every ingested source carries three independent labels:
+1. **Precedence authority** ([`precedence.yaml`](precedence.yaml)) — *which source wins on conflict*.
+2. **Provenance tier** (in each `SOURCE-MANIFEST`) — *trust*: vendor's words vs Claude inference
+   (`VERBATIM`/`GROUNDED`/`SYNTHESIZED`), decided at ingestion.
+3. **Sensitivity classification** ([`classification.yaml`](classification.yaml)) — *who may see it /
+   may it be published*. Drives the GitHub publish boundary. **Required on every source**, enforced
+   by `tests/unit/test_classification.py`.

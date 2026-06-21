@@ -5,6 +5,7 @@
 **Purpose:** Track all scraped documentation sources, identify overlaps, and maintain cross-reference guide
 
 **Version Notice:** ⚠️ SaaS source | Target: Control-M 9.0.21.300
+**Classification:** `External` (public BMC documentation fetched from documents.bmc.com URLs — see per-doc URL + Date Scraped below). Publishable. See `config/classification.yaml`.
 
 ---
 
