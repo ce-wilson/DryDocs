@@ -10,18 +10,26 @@ project to a Neo4j-style dependency model + machine-first JSON).
 ## Command (after `git push`)
 
 ```powershell
-$ts  = Get-Date -Format "yyyyMMdd-HHmmss"
-$out = "C:\coding\projects\sandbox\DRYDOCS\knowledge\depgraph-snapshots\depgraph.$ts.json"
-Set-Location C:\coding\projects\sandbox\depgraph
-$env:PYTHONPATH = "."
-python -m depgraph.cli scan `
-  C:\coding\projects\sandbox\DRYDOCS\drydocs `
-  C:\coding\projects\sandbox\DRYDOCS\tests `
-  --project drydocs1 -o $out
+.\snapshot.ps1            # -> drydocs1-YYYYMMDD.json   (code graph: drydocs/ + tests/)
+.\snapshot.ps1 -Tree      # -> drydocs1-tree-YYYYMMDD.json  (full repo file tree)
 ```
 
-Focused scan = `drydocs/` (the package) + `tests/` — the project's own code. For a full
-file-tree snapshot (noisier; includes `.claude/skills`), scan the repo root with `--tree`.
+[`snapshot.ps1`](snapshot.ps1) runs depgraph and writes `<project>-<date>.json` with a **`meta`
+header** so each snapshot is self-identifying:
+
+```jsonc
+"meta": {
+  "project": "drydocs1", "captured_at": "...", "date": "YYYYMMDD",
+  "scan": ["drydocs","tests"], "tree": false,
+  "git": { "commit": "<short>", "full": "...", "branch": "main",
+           "describe": "...", "subject": "...", "dirty": false, "pr": <num|null> }
+}
+```
+
+`pr` is best-effort (parsed from recent commit subjects/bodies — `pull request #N`, `(#N)`).
+The header is **prepended** to depgraph's JSON without reformatting (clean diffs, no BOM), and
+`viewer.html` shows `@<commit> (branch) PR#<n>` in its stats. Focused scan = `drydocs/` + `tests/`
+(the project's own code); `-Tree` captures the full file tree (noisier; includes `.claude/skills`).
 
 ## Compare
 

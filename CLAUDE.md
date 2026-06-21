@@ -37,10 +37,10 @@ the start, push at the end, and every machine stays identical.
 1. **Start:** `git pull` → read this file → read `backlog.yaml`, pick the next ready item.
 2. **During:** the in-session Task list is *ephemeral* working memory for the one item — distinct
    from the durable `backlog.yaml`.
-3. **End:** update the item's `status`, `git push`, then **run a depgraph snapshot**
-   (timestamped code-structure capture for drift comparison — see
-   [`knowledge/depgraph-snapshots/README.md`](knowledge/depgraph-snapshots/README.md)). Anything
-   unfinished or newly noticed → `IDEAS.md`.
+3. **End:** update the item's `status`, `git push`, then **run `knowledge/depgraph-snapshots/snapshot.ps1`**
+   (writes `<project>-<date>.json` with a git-commit `meta` header for drift comparison — see
+   [`knowledge/depgraph-snapshots/README.md`](knowledge/depgraph-snapshots/README.md); view with
+   `viewer.html`). Anything unfinished or newly noticed → `IDEAS.md`.
 
 ---
 

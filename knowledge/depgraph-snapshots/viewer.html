@@ -93,6 +93,7 @@ function parse(raw, fallbackName){
   const deps = d.edges || [];
   return {
     name: (d.projects && d.projects.join('+')) || fallbackName,
+    meta: d.meta || null,
     nodes, byId, contains, deps,
     stats: { files: nodes.filter(n=>n.kind==='file').length,
              dirs:  nodes.filter(n=>n.kind==='dir').length,
@@ -166,7 +167,7 @@ function render(){
       { selector:'node.add', style:{ 'background-color':'#3fb950' } },
       { selector:'node.del', style:{ 'background-color':'#f85149' } },
       { selector:'edge', style:{ 'width':1,'line-color':'#30363d','target-arrow-color':'#30363d',
-        'target-arrow-shape':'triangle','arrow-scale':.6,'curve-style':'haystack' } },
+        'target-arrow-shape':'triangle','arrow-scale':.6,'curve-style':'straight' } },
       { selector:'edge.add', style:{ 'line-color':'#3fb950','target-arrow-color':'#3fb950','width':1.4 } },
       { selector:'edge.del', style:{ 'line-color':'#f85149','target-arrow-color':'#f85149','width':1.4 } },
       { selector:'.dim', style:{ 'opacity':.12 } },
@@ -185,10 +186,11 @@ function render(){
 function drawStats(){
   const s=document.getElementById('stats'), A=state.A, B=state.B;
   if(!A){ s.innerHTML='<span class="hint">No snapshot loaded.</span>'; return; }
-  let html = `<div><b>A</b> ${A.name} <span class="muted">· ${A.stats.files} files / ${A.stats.dirs} dirs / ${A.stats.deps} imports</span></div>`;
+  const ver = m => m && m.git && m.git.commit ? ` <span class="muted">@${m.git.commit}${m.git.branch?' ('+m.git.branch+')':''}${m.git.pr?' PR#'+m.git.pr:''}</span>` : '';
+  let html = `<div><b>A</b> ${A.name}${ver(A.meta)} <span class="muted">· ${A.stats.files} files / ${A.stats.dirs} dirs / ${A.stats.deps} imports</span></div>`;
   document.getElementById('legend').hidden = !B;
   if(B){
-    html += `<div><b>B</b> ${B.name} <span class="muted">· ${B.stats.files} files / ${B.stats.dirs} dirs / ${B.stats.deps} imports</span></div>`;
+    html += `<div><b>B</b> ${B.name}${ver(B.meta)} <span class="muted">· ${B.stats.files} files / ${B.stats.dirs} dirs / ${B.stats.deps} imports</span></div>`;
     const add = cy.nodes('.add').length, del = cy.nodes('.del').length, same = cy.nodes('.same').length;
     html += `<div style="margin-top:6px"><span class="chip c-add">+${add} added</span><span class="chip c-del">−${del} removed</span><span class="chip c-same">${same} unchanged</span></div>`;
     const addD = cy.nodes('.add').filter('.dir').map(n=>n.data('rel'));
