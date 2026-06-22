@@ -214,10 +214,20 @@ items:
     agent: pipeline-config
     model: sonnet
     priority: p2
-    status: todo
+    status: done
     depends_on: [C3, D1]
     inputs: [config/precedence.yaml, drydocs/loaders/cypher/catalog_lobs.cypher]
     acceptance: "flipping order: in precedence.yaml changes RECONCILES_TO resolution with no code edit"
+    output: drydocs/precedence.py
+    notes: >
+      Done 2026-06-21. New drydocs/precedence.py: PrecedenceResolver reads config/precedence.yaml
+      (order + active toggles + conflict_policy); resolve(claims) -> highest active authority with
+      an opinion wins, losers kept as aliases (skos:closeMatch, never dropped). Wired into the
+      RECONCILES_TO path: CatalogLOBsLoader.to_params resolves via resolve_lob_reconciliation;
+      catalog_lobs.cypher now records r.authority + r.aliases. test_precedence.py (10 tests) proves
+      the acceptance — flipping order: in a YAML (loaded via from_yaml) flips both the resolver
+      winner AND the catalog reconciled segment, no code edit. pyyaml promoted to a runtime dep.
+      174 passed.
 
   - id: D3
     epic: config-loaders
@@ -273,8 +283,8 @@ items:
 
 # Roll-up the dispatcher can glance at (keep in sync, or regenerate).
 summary:
-  todo: 6
+  todo: 5
   in_progress: 0
   blocked: 0
-  done: 12                                         # A1-A3, B1-B4, C1-C4, D1 (Epics A,B,C + P0 done)
-  next_ready: [D2, D3]                            # config-driven loaders (D2 needs C3✓+D1✓; D3 needs C4✓+D1✓)
+  done: 13                                         # A1-A3, B1-B4, C1-C4, D1, D2 (Epics A,B,C + P0 + precedence)
+  next_ready: [D3]                                # D3 needs C4✓+D1✓ (confirmed-gating guard)

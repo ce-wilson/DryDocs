@@ -14,13 +14,48 @@ from __future__ import annotations
 
 from datetime import date
 from pathlib import Path
-from typing import Any, ClassVar, Optional
+from typing import Any, ClassVar, Iterable, Optional
 
 from pydantic import BaseModel, ConfigDict, Field, field_validator
 
 from .base import BaseLoader
+from ..precedence import Claim, PrecedenceResolver
 
 _CYPHER = Path(__file__).resolve().parent / "cypher"
+
+# The product catalog feed speaks for the org-taxonomy authority (precedence.yaml#order
+# id 'lob-product-team'). When a more-authoritative reconciliation override exists
+# (e.g. an internal-standards crosswalk), pass it through `extra_reconcile_claims`
+# below — the precedence.yaml order, not this code, decides which one wins.
+_CATALOG_AUTHORITY = "lob-product-team"
+
+
+def resolve_lob_reconciliation(
+    model: "CatalogLOBRow",
+    resolver: PrecedenceResolver,
+    extra_claims: Iterable[Claim] = (),
+) -> dict[str, Any]:
+    """Resolve a CatalogLOB's :RECONCILES_TO target through the precedence chain.
+
+    Returns the params the catalog_lobs.cypher RECONCILES_TO block consumes:
+    the winning segment + confidence, the winning authority, and any losing
+    claims recorded as aliases (skos:closeMatch — never dropped).
+    """
+    claims = [
+        Claim(
+            authority=_CATALOG_AUTHORITY,
+            value=model.reconciles_to_segment,
+            confidence=model.reconcile_confidence,
+        ),
+        *extra_claims,
+    ]
+    res = resolver.resolve(claims)
+    return {
+        "reconciles_to_segment": res.value,
+        "reconcile_confidence": res.confidence,
+        "reconcile_authority": res.authority,
+        "reconcile_aliases": res.alias_strings(),
+    }
 
 
 def _date_or_none(v: Any) -> date | None:
@@ -159,6 +194,23 @@ class CatalogLOBsLoader(BaseLoader):
     cypher_path: ClassVar[Path | None] = _CYPHER / "catalog_lobs.cypher"
     row_model: ClassVar[type] = CatalogLOBRow
     source_label: ClassVar[str] = "oracle"
+
+    # Precedence chain (config-driven). Lazy so importing the module needs no file I/O.
+    _resolver: ClassVar[PrecedenceResolver | None] = None
+
+    @classmethod
+    def resolver(cls) -> PrecedenceResolver:
+        if cls._resolver is None:
+            cls._resolver = PrecedenceResolver.from_yaml()
+        return cls._resolver
+
+    def to_params(self, model: BaseModel) -> dict:
+        params = super().to_params(model)
+        # Resolve :RECONCILES_TO through precedence.yaml rather than trusting the
+        # raw catalog column — so flipping `order:` reorders the winner with no
+        # code edit (D2 acceptance).
+        params.update(resolve_lob_reconciliation(model, self.resolver()))  # type: ignore[arg-type]
+        return params
 
 
 class ProductLinesLoader(BaseLoader):

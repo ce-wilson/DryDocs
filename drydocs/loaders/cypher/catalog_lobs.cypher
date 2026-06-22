@@ -5,10 +5,18 @@
 // edge per v3 §B (catalog LOBs may not 1:1 align with corporate segments —
 // e.g. AWMCIB).
 //
+// The reconciliation target is resolved through the precedence chain
+// (config/precedence.yaml) by CatalogLOBsLoader, NOT taken raw from the catalog
+// column. The winning authority is recorded on the edge (r.authority) and any
+// losing authorities are kept as aliases (r.aliases — skos:closeMatch, never
+// dropped; see precedence.yaml#conflict_policy). See drydocs/precedence.py.
+//
 // Parameters:
 //   $batch        list of validated dicts (lob_id, code, name,
-//                                          reconciles_to_segment,
-//                                          reconcile_confidence)
+//                                          reconciles_to_segment,   // resolved winner
+//                                          reconcile_confidence,    // winner's confidence
+//                                          reconcile_authority,     // winning authority id
+//                                          reconcile_aliases)       // [str] losing claims
 //   $run_id, $loaded_at, $loader, $source_label  — see BaseLoader.
 // =============================================================================
 
@@ -35,6 +43,8 @@ FOREACH (_ IN CASE
                   r.source        = 'catalog',
                   r.loader        = $loader
   SET r.confidence   = row.reconcile_confidence,
+      r.authority    = row.reconcile_authority,   // winning precedence authority
+      r.aliases      = row.reconcile_aliases,      // losing claims (skos:closeMatch)
       r.last_seen_at = datetime($loaded_at),
       r.last_run_id  = $run_id
 );

@@ -19,6 +19,7 @@ click = ">=8.0,<8.2"
 rich = "^13.7"
 streamlit = "^1.36"
 streamlit-agraph = "^0.0.45"
+pyyaml = "^6.0.3"          # runtime: the precedence resolver reads config/*.yaml at load time
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^8.2"
@@ -26,7 +27,6 @@ pytest-cov = "^5.0"
 testcontainers = { version = "^4.5", extras = ["neo4j"] }
 ruff = "^0.5"
 mypy = "^1.10"
-pyyaml = "^6.0.3"
 
 [tool.poetry.scripts]
 drydocs = "drydocs.cli:app"
