@@ -23,12 +23,18 @@
 #   role          edge property for disambiguation (null = label is sufficient)
 #   from_node     source node label
 #   to_node       target node label
-#   prov_maps_to  PROV-O / W3C term this maps to (null = local-only)
+#   prov_maps_to  PROV-O term this maps to (null = local-only or non-PROV standard)
+#   sosa_maps_to  SOSA/SSN term this maps to (experimental context-graph edges only)
 #   note          plain-English description + any gotchas
 #   supplement    schema file where LocalRelationship is declared (null = base PROV-O)
 #   loader        cypher file that writes this relationship
-#   domain        controlm | seal | catalog | architecture | all
+#   domain        controlm | seal | catalog | architecture | context | all
 #   status        planned | active | deprecated | removed
+#
+# EXPERIMENTAL / early adoption: SOSA/SSN (domain: context) terms are W3C but
+# NOT a declared *company* standard. They are seeded only by the opt-in
+# sosa_experimental_supplement.cypher and tagged adoption:"experimental" in the
+# graph. They use status: planned here until the SME confirms via the gate.
 #
 # Sync history: updated 2026-06-09 from DryDocs Consolidated Documentation
 # (Sections 1–4, 6). Corrections applied during that audit:
@@ -236,6 +242,38 @@ node_classifications:
     class:      "dd:File"
     prov_type:  Entity
     note:       "File delivered via MFTS agent (fmSubPathId); job input dependency."
+
+  # — Context graph (SOSA/SSN, EXPERIMENTAL / early adoption) ————————————————
+  # SOSA/SSN is a W3C standard but NOT a declared *company* standard. These
+  # classes are seeded only by the opt-in sosa_experimental_supplement.cypher
+  # (never by `drydocs bootstrap`); every graph term carries adoption:
+  # "experimental". prov_type below is the natural behavioural fit so the PROV
+  # matrix still works if needed, but the SOSA class is primary here. The wiring
+  # of these to ControlMJobRun is the open gate decision — see the
+  # `jobrun-observation` entry in config/taxonomy-ontology-map.yaml.
+  - label:      Observation
+    class:      "sosa:Observation"
+    prov_type:  Activity
+    note:       "EXPERIMENTAL. A single health/run reading about a job/folder. sosa_experimental_supplement.cypher."
+
+  - label:      Sensor
+    class:      "sosa:Sensor"
+    prov_type:  Agent
+    note:       "EXPERIMENTAL. Monitoring source (Control-M history API, health probe). sosa_experimental_supplement.cypher."
+
+  - label:      Result
+    class:      "sosa:Result"
+    prov_type:  Entity
+    note:       "EXPERIMENTAL. Value an observation produced; may carry a dqv:QualityMeasurement. sosa_experimental_supplement.cypher."
+
+  - label:      ObservableProperty
+    class:      "sosa:ObservableProperty"
+    prov_type:  Entity
+    note:       "EXPERIMENTAL. What is observed: run-status, run-duration, exit-status, freshness. sosa_experimental_supplement.cypher."
+
+  # NOTE: ControlMJob and JobFolder (declared above as prov:Activity / Collection)
+  # ALSO act as sosa:FeatureOfInterest — an orthogonal context-graph role recorded
+  # via :CAN_ACT_AS in the supplement. Their primary classification is unchanged.
 
 
 # ── SECTION 1: Decision matrix ────────────────────────────────────────────────
@@ -970,3 +1008,70 @@ local_relationships:
     loader:       "*"
     domain:       all
     status:       active
+
+  # ── Context graph (SOSA/SSN — EXPERIMENTAL / early adoption) ───────────────
+  # NOT a declared company standard. Declared so the ontology-mapper can carry
+  # the `jobrun-observation` map entry through the HITL gate. SOSA edges sit
+  # OUTSIDE the PROV matrix (prov_maps_to: ~) and map to a sosa:* term instead.
+  # Loaders are intentionally null — no instance data until the gated pilot (E2).
+
+  - id:           sosa_observes
+    neo4j_label:  OBSERVES
+    role:         ~
+    from_node:    Observation
+    to_node:      ControlMJob          # or JobFolder — both can act as sosa:FeatureOfInterest
+    prov_maps_to: ~
+    sosa_maps_to: "sosa:hasFeatureOfInterest"
+    note: >
+      EXPERIMENTAL. Observation is about a feature of interest (the job/folder).
+      Open gate decision: is ControlMJobRun itself the Observation, or a separate
+      Observation node? See config/taxonomy-ontology-map.yaml `jobrun-observation`.
+    supplement:   sosa_experimental_supplement.cypher
+    loader:       ~
+    domain:       context
+    status:       planned
+
+  - id:           sosa_has_result
+    neo4j_label:  HAS_RESULT
+    role:         ~
+    from_node:    Observation
+    to_node:      Result
+    prov_maps_to: ~
+    sosa_maps_to: "sosa:hasResult"
+    note: >
+      EXPERIMENTAL. Observation produced a result; the result carries resultTime
+      (xsd:dateTime) and may carry a dqv:QualityMeasurement (freshness_sla etc.).
+    supplement:   sosa_experimental_supplement.cypher
+    loader:       ~
+    domain:       context
+    status:       planned
+
+  - id:           sosa_made_by_sensor
+    neo4j_label:  MADE_BY_SENSOR
+    role:         ~
+    from_node:    Observation
+    to_node:      Sensor
+    prov_maps_to: ~
+    sosa_maps_to: "sosa:madeBySensor"
+    note: >
+      EXPERIMENTAL. Observation was made by a monitoring source (Control-M
+      history API / health probe).
+    supplement:   sosa_experimental_supplement.cypher
+    loader:       ~
+    domain:       context
+    status:       planned
+
+  - id:           sosa_observed_property
+    neo4j_label:  OF_OBSERVABLE_PROPERTY
+    role:         ~
+    from_node:    Observation
+    to_node:      ObservableProperty
+    prov_maps_to: ~
+    sosa_maps_to: "sosa:observedProperty"
+    note: >
+      EXPERIMENTAL. Observation targets an observable property (run-status,
+      run-duration, exit-status, freshness).
+    supplement:   sosa_experimental_supplement.cypher
+    loader:       ~
+    domain:       context
+    status:       planned

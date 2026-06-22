@@ -74,6 +74,7 @@ standards:
   - id: sosa-ssn
     iri: http://www.w3.org/ns/sosa/
     role: observation-temporal-ontology
+    adoption: experimental        # W3C standard, NOT a declared company standard; opt-in supplement only, pending HITL gate (Epic E)
     why: >
       Spatio-Temporal Data on the Web (SOSA/SSN). Feeds the CONTEXT-graph layer:
       Observation / Sensor / Result / phenomenonTime patterns for "what matters right

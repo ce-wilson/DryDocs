@@ -46,6 +46,9 @@ What diverges, by stream:
   description-metadata + calendar-projection plans, and the Control-M **governance
   corpus** (remediation flow, DAT/HLT naming, NFR catalog, escalation/SCIM, rules
   registry); additive, take FROM this repo.
+- **Context graph — SOSA/SSN (EXPERIMENTAL)** — observation/temporal vocabulary for layer 4,
+  wired as early-adoption: opt-in supplement, never in bootstrap, not a declared *company*
+  standard. Entirely additive **clean-adds** — take FROM this repo. See the dedicated section below.
 - **Schema consolidation** — patch files deleted, bootstrap order cleaned up; evaluate per file.
 
 ---
@@ -455,7 +458,29 @@ DELETE r;
 | `apply-m3-supplement` | `apply-ontology-supplement` |
 
 Stale constants removed: `M1_ROLE_VOCAB_UPGRADE`, `M3_SUPPLEMENT_FILE`, `M3_CONSTRAINTS_UPGRADE`.
-Added: `ONTOLOGY_SUPPLEMENT_FILE`. Also fixed: `m3-verify` Cypher used `RUNS_ON` (now `SCHEDULED_ON`).
+Added: `ONTOLOGY_SUPPLEMENT_FILE`, `SOSA_SUPPLEMENT_FILE` (+ `apply-sosa-supplement` command — see
+below). Also fixed: `m3-verify` Cypher used `RUNS_ON` (now `SCHEDULED_ON`).
+
+### Context graph — SOSA/SSN (EXPERIMENTAL / early adoption, clean-add)
+
+Seeds the layer-4 observation/temporal vocabulary. SOSA/SSN is a W3C standard but **not a
+declared *company* standard**, so it is deliberately fenced off from the production model and
+every term carries `adoption:"experimental"`. All paths are **clean-adds / additive** — take
+FROM this repo. Files touched:
+
+| Path | Change |
+|---|---|
+| `drydocs/schema/sosa_experimental_supplement.cypher` | NEW — seeds 6 `sosa:` classes + 6 properties, `:CAN_ACT_AS` role wiring (ControlMJob/JobFolder → `sosa:FeatureOfInterest`), 4 `LocalRelationship`→`MAPS_TO`→`sosa:*` edges. Opt-in only. |
+| `drydocs/ontology/namespaces.py` | + `sosa` / `ssn` prefixes (note trailing `/`, not `#`) |
+| `drydocs/ontology/relationship_vocabulary.yaml` | + 4 SOSA node classes & 4 relationships (`domain: context`, `status: planned`); new `sosa_maps_to` field; `domain` enum gains `context` |
+| `config/taxonomy-ontology-map.yaml` | `jobrun-observation` unblocked + `adoption: experimental` |
+| `reference/standards/README.md` + `reference/REGISTRY.yaml` | standards split into **Declared/Adopted** vs **Experimental/Early-Adoption**; SOSA tagged `adoption: experimental` |
+| `drydocs/cli.py` | + `apply-sosa-supplement` (opt-in; NOT in bootstrap) |
+| `tests/unit/test_namespaces.py` | + sosa/ssn prefix + trailing-slash expand assertions |
+
+Promotion to **Declared/Adopted** happens only after the SME confirms the `jobrun-observation`
+mapping through the HITL gate (backlog Epic E); the `ontology-mapper` owns that step. No instance
+data (Observations/Sensors/Results) is loaded — that is the gated context-graph pilot (E2).
 
 ### Bootstrap order (authoritative)
 
@@ -465,4 +490,11 @@ Added: `ONTOLOGY_SUPPLEMENT_FILE`. Also fixed: `m3-verify` Cypher used `RUNS_ON`
 3. ontology_supplement.cypher         (was m3_ontology_supplement.cypher)
 4. seal_ontology_supplement.cypher
 5. catalog_ontology_supplement.cypher  (owns all 31 Role seeds)
+
+Optional / experimental — NOT part of `drydocs bootstrap`:
+6. sosa_experimental_supplement.cypher  (run via `drydocs apply-sosa-supplement`)
 ```
+
+> Note: step 6's `:CAN_ACT_AS` role edges MATCH the Control-M anchors from step 3, so apply it
+> after the backbone exists. On a graph without the backbone it lands the self-contained terms
+> but silently no-ops the role wiring (re-run after bootstrap — idempotent).

@@ -146,13 +146,17 @@ mappings:
         feature_of_interest: ControlMJob
         observed_property: "run-status | run-duration | freshness"
         result_time: "resultTime"
-      neo4j_label: OBSERVES                 # proposed; not yet in vocabulary
+      neo4j_label: OBSERVES                 # now registered: sosa_observes (status planned)
+      sosa_maps_to: "sosa:hasFeatureOfInterest"
       prov_maps_to: ~                       # SOSA, not PROV — record separately
     precedence_authority: bmc-baseline
+    adoption: experimental                  # SOSA/SSN is W3C but NOT a declared company standard
     status: proposed
+    resolved:
+      - "sosa:* terms now registered in relationship_vocabulary.yaml + sosa_experimental_supplement.cypher (sosa_observes/has_result/made_by_sensor/observed_property), all status planned / adoption experimental."
     open_questions:
       - "Source of run history: Control-M history API vs psgmgr? (gates the loader)"
-      - "Register sosa:* terms in relationship_vocabulary.yaml before any label is written."
+      - "Is ControlMJobRun itself the sosa:Observation, or a separate Observation node observing it? (modelling choice — confirm at gate before E2 loader)"
 
   # ---- C2: BusinessApplication / SEAL edges (reuse ACTIVE vocab — batch) ----
   # Source taxonomy: config/taxonomy/business-application.yaml. Concept =

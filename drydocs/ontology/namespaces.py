@@ -24,6 +24,18 @@ NAMESPACES: dict[str, str] = {
     "obi":  "http://purl.obolibrary.org/obo/",
     "iao":  "http://purl.obolibrary.org/obo/",
 
+    # SOSA/SSN — observation/temporal vocabulary for the layer-4 context graph.
+    # EXPERIMENTAL / early-adoption: a W3C standard, but NOT yet a declared
+    # *company* standard. Terms are registered here so the ontology-mapper can
+    # reference them, but they are seeded only by the opt-in
+    # sosa_experimental_supplement.cypher (never by `drydocs bootstrap`).
+    # Note the trailing "/" (not "#") in both IRIs — sosa:Observation expands to
+    # http://www.w3.org/ns/sosa/Observation. Add OWL-Time ("time":
+    # "http://www.w3.org/2006/time#") only if interval/duration semantics are
+    # needed beyond xsd:dateTime resultTime/phenomenonTime.
+    "sosa": "http://www.w3.org/ns/sosa/",
+    "ssn":  "http://www.w3.org/ns/ssn/",
+
     # OpenLineage doesn't publish an OWL ontology; we treat it as a label
     # vocabulary inside the graph (see :OlClass nodes in ontology.cypher).
     "ol":   "https://openlineage.io/spec/",

@@ -6,6 +6,11 @@ Bootstrap order (first run):
   3. drydocs apply-seal-supplement      — SEAL domain terms
   4. drydocs apply-catalog-supplement   — Catalog/PAT domain terms + all Role seeds
 
+Optional / experimental:
+  drydocs apply-sosa-supplement — EARLY ADOPTION: SOSA/SSN observation+temporal
+                                  terms for the layer-4 context graph. NOT a
+                                  declared company standard; not in bootstrap.
+
 Ingest commands:
   drydocs refresh-reference   — catalog + SEAL weekly refresh chain
   drydocs ingest-controlm     — Control-M chain (folders → jobs → conditions → deps)
@@ -65,6 +70,7 @@ ONTOLOGY_FILE           = SCHEMA_DIR / "ontology.cypher"
 ONTOLOGY_SUPPLEMENT_FILE = SCHEMA_DIR / "ontology_supplement.cypher"
 SEAL_SUPPLEMENT_FILE    = SCHEMA_DIR / "seal_ontology_supplement.cypher"
 CATALOG_SUPPLEMENT_FILE = SCHEMA_DIR / "catalog_ontology_supplement.cypher"
+SOSA_SUPPLEMENT_FILE    = SCHEMA_DIR / "sosa_experimental_supplement.cypher"
 
 # Bundled CSV samples ship inside the package so dev-mode commands work
 # from any cwd — including from an installed wheel where there is no repo
@@ -411,6 +417,28 @@ def apply_catalog_supplement() -> None:
     with _client() as cli:
         cli.execute_file(CATALOG_SUPPLEMENT_FILE)
         console.print("[green]Catalog ontology supplement applied.[/]")
+
+
+@app.command(name="apply-sosa-supplement")
+def apply_sosa_supplement() -> None:
+    """Apply the EXPERIMENTAL SOSA/SSN supplement (opt-in; idempotent).
+
+    Seeds the observation/temporal vocabulary for the layer-4 context graph:
+    sosa:Observation / Sensor / FeatureOfInterest / ObservableProperty / Result
+    terms, the :CAN_ACT_AS role wiring (ControlMJob/JobFolder ALSO act as
+    sosa:FeatureOfInterest), and candidate LocalRelationships (OBSERVES,
+    HAS_RESULT, MADE_BY_SENSOR, OF_OBSERVABLE_PROPERTY) mapping to sosa:* props.
+
+    EARLY ADOPTION: SOSA/SSN is a W3C standard but NOT a declared *company*
+    standard. This is intentionally NOT part of `drydocs bootstrap` — every
+    term is tagged adoption:"experimental". No instance data is loaded (that is
+    the gated context-graph pilot). Safe to re-run.
+    """
+    if not SOSA_SUPPLEMENT_FILE.exists():
+        console.print(f"[red]Missing: {SOSA_SUPPLEMENT_FILE}[/]"); raise typer.Exit(1)
+    with _client() as cli:
+        cli.execute_file(SOSA_SUPPLEMENT_FILE)
+        console.print("[yellow]Experimental SOSA/SSN supplement applied (early adoption).[/]")
 
 
 @app.command(name="ingest-controlm")
