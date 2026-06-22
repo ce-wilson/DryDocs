@@ -47,9 +47,29 @@ Each snapshot's summary line reports `files`, `edges`, `circular_files`. To see 
   (the four layers), `vendor/` → `external/orchestration/bmc-controlm`.
 - Load both in the viewer (A = this-version, B = original, or swap) to see the restructure.
 
-> Neo4j path (alternative): `depgraph cypher --from <snapshot>.json -o load.cypher`, load into Neo4j,
-> and visualize in Neo4j Browser / Bloom. NVL (`@neo4j-nvl/base`) is the native lib but needs a
-> build and is licensed for Neo4j-backed apps — `viewer.html` is the zero-friction option.
+### Live Neo4j connection (viewer.html)
+The viewer's **🔌 Live Neo4j** button fetches the graph straight from a Neo4j **Query API v2**
+endpoint and renders it as **A** (Dependencies view) — no file load, no build.
+- Enter the **Query API URL** (`https://<id>.databases.neo4j.io/db/<db>/query/v2`), **user**, and
+  **password**. "Remember" persists only the URL + user in `localStorage`; the **password is never
+  stored** and creds are held in memory for the session.
+- It runs `MATCH (f:CodeFile) …` + `MATCH (a:CodeFile)-[:DEPENDS_ON]->(b) …`, so the graph must be
+  loaded first (below). Aura's Query API sends `access-control-allow-origin: *`, so this works even
+  from `file://`; if a different endpoint blocks CORS, serve the folder over http
+  (`python -m http.server`) and reopen.
+
+### Loading the graph into Neo4j
+```bash
+depgraph cypher <project-root> --project drydocs --profile base -o load.cypher
+# then run load.cypher's 3 statements (constraint, nodes, edges) against the DB.
+```
+On **Aura single-instance** you can't `CREATE DATABASE depgraph` — load into the default db
+(the instance id) and the `CodeFile`/`DEPENDS_ON` meta-graph coexists with the domain graph
+(distinct labels, no overlap). You can also visualize natively in the **Aura Console → Query**
+tab: `MATCH p=(:CodeFile)-[:DEPENDS_ON]->(:CodeFile) RETURN p`.
+
+> NVL (`@neo4j-nvl/base`) is the native lib but needs a build and is licensed for Neo4j-backed
+> apps — `viewer.html` (cytoscape, MIT) stays the zero-friction option, now with a live mode.
 
 ## Housekeeping
 

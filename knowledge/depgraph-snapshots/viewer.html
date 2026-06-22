@@ -7,9 +7,18 @@
   unchanged = grey). Compares by project-relative path, so e.g. drydocs-original vs
   drydocs1 align. No build step — cytoscape.js (MIT) via CDN.
 
+  Two data sources:
+    1. Snapshot JSON  — load a file (A), add a second (B) to diff. Offline, no DB.
+    2. Live Neo4j     — the "Live Neo4j" button fetches CodeFile/DEPENDS_ON straight
+       from an Aura/Neo4j Query API v2 endpoint and renders it as A. Credentials are
+       typed at runtime and held in memory only (never written to this file or disk).
+       If the browser blocks the request with a CORS error, serve this file over http
+       (e.g. `python -m http.server` in this folder) instead of opening it as file://.
+
   Note on Neo4j: NVL is the Neo4j-native viz library but is licensed for Neo4j-backed
   apps and needs a build; depgraph also emits load.cypher for the Neo4j Browser/Bloom
-  path. This file is the zero-friction "just open it" option.
+  path (and the Aura Console's own Query tab visualizes it natively). This file is the
+  zero-friction "just open it" option, now with an optional live connection.
 -->
 <script src="https://unpkg.com/cytoscape@3.30.2/dist/cytoscape.min.js"></script>
 <style>
@@ -46,6 +55,15 @@
   #tip{ position:absolute; padding:6px 8px; background:#000a; border:1px solid var(--line);
         border-radius:6px; font-size:11px; pointer-events:none; display:none; max-width:340px; }
   .hint{ color:var(--muted); font-size:12px; }
+  #conn{ position:absolute; top:10px; right:10px; width:340px; z-index:5;
+         background:rgba(26,33,43,.97); border:1px solid var(--line); border-radius:10px;
+         padding:12px 14px; display:flex; flex-direction:column; gap:8px; }
+  #conn label{ display:flex; flex-direction:column; gap:3px; font-size:11px; color:var(--muted); }
+  #conn label.conn-check{ flex-direction:row; align-items:center; gap:6px; }
+  #conn input[type=text], #conn input[type=password]{ background:#0d1117; color:var(--ink);
+         border:1px solid var(--line); border-radius:6px; padding:5px 7px; font:inherit; width:100%; }
+  #conn .conn-row{ display:flex; gap:8px; align-items:center; }
+  #conn #c-go{ border-color:var(--accent); }
 </style>
 
 <div id="app">
@@ -68,6 +86,9 @@
       <button id="swap" title="swap A and B">Swap A/B</button>
       <input type="search" id="search" placeholder="filter path…">
     </div>
+    <div class="grp">
+      <button id="live" title="Fetch the live graph from a Neo4j Query API v2 endpoint">🔌 Live Neo4j</button>
+    </div>
     <span class="hint" id="hint">Load a snapshot JSON to start. Add a second to compare.</span>
   </header>
   <main>
@@ -79,6 +100,21 @@
       <div><span class="sw" style="background:var(--same)"></span>unchanged</div>
     </div>
     <div id="tip"></div>
+    <div id="conn" hidden>
+      <div class="conn-row"><b>Connect to Neo4j</b> <span class="muted">(Query API v2)</span></div>
+      <label>Query API URL<input id="c-url" type="text" placeholder="https://<id>.databases.neo4j.io/db/<db>/query/v2"></label>
+      <label>User<input id="c-user" type="text" placeholder="neo4j or instance id" autocomplete="off"></label>
+      <label>Password<input id="c-pass" type="password" autocomplete="off"></label>
+      <label class="conn-check"><input id="c-remember" type="checkbox"> remember URL + user (this browser)</label>
+      <div class="conn-row">
+        <button id="c-go">Fetch graph</button>
+        <button id="c-cancel">Cancel</button>
+      </div>
+      <div id="c-msg" class="muted"></div>
+      <div class="muted" style="font-size:11px;margin-top:4px">
+        Credentials stay in memory. Password is never stored. CORS-blocked from file://? Serve over http.
+      </div>
+    </div>
   </main>
 </div>
 
@@ -214,6 +250,69 @@ document.getElementById('fileB').addEventListener('change', e=>loadFile(e.target
 document.getElementById('view').addEventListener('change', e=>{ state.view=e.target.value; if(state.A) render(); });
 document.getElementById('fit').addEventListener('click', ()=>cy&&cy.fit(null,30));
 document.getElementById('swap').addEventListener('click', ()=>{ [state.A,state.B]=[state.B,state.A]; if(state.A) render(); });
+// ---- Live Neo4j (Query API v2) ------------------------------------------------
+// Builds a snapshot object in the same shape parse() returns, from CodeFile nodes
+// and DEPENDS_ON edges, then renders it as slot A in the Dependencies view.
+const conn = document.getElementById('conn');
+const cmsg = document.getElementById('c-msg');
+const LS = 'depgraph-viewer-conn';
+function openConn(){
+  try{ const s = JSON.parse(localStorage.getItem(LS)||'{}');
+    if(s.url) document.getElementById('c-url').value = s.url;
+    if(s.user) document.getElementById('c-user').value = s.user;
+    if(s.url||s.user) document.getElementById('c-remember').checked = true;
+  }catch(e){}
+  conn.hidden = false; cmsg.textContent=''; document.getElementById('c-pass').focus();
+}
+document.getElementById('live').addEventListener('click', openConn);
+document.getElementById('c-cancel').addEventListener('click', ()=>{ conn.hidden = true; });
+
+async function queryApi(url, auth, statement){
+  const res = await fetch(url, { method:'POST',
+    headers:{ 'Content-Type':'application/json', 'Accept':'application/json', 'Authorization':'Basic '+auth },
+    body: JSON.stringify({ statement }) });
+  const j = await res.json().catch(()=>({}));
+  if(!res.ok || (j.errors && j.errors.length))
+    throw new Error((j.errors && j.errors[0] && (j.errors[0].message||j.errors[0].error)) || ('HTTP '+res.status));
+  return j.data ? j.data.values : [];
+}
+document.getElementById('c-go').addEventListener('click', async ()=>{
+  const url = document.getElementById('c-url').value.trim();
+  const user = document.getElementById('c-user').value.trim();
+  const pass = document.getElementById('c-pass').value;
+  if(!url || !user){ cmsg.textContent='URL and user are required.'; return; }
+  const auth = btoa(user+':'+pass);
+  cmsg.textContent = 'Connecting…';
+  try{
+    const nodeRows = await queryApi(url, auth,
+      'MATCH (f:CodeFile) RETURN f.fileId, coalesce(f.name, f.fileId), coalesce(f.relPath, f.fileId), coalesce(f.project,"") ORDER BY f.fileId');
+    const edgeRows = await queryApi(url, auth,
+      'MATCH (a:CodeFile)-[:DEPENDS_ON]->(b:CodeFile) RETURN a.fileId, b.fileId');
+    if(!nodeRows.length){ cmsg.textContent='Connected, but no :CodeFile nodes found. Run load.cypher first.'; return; }
+    const nodes = nodeRows.map(([file_id,name,rel_path,project])=>({ file_id, name, rel_path, project, kind:'file' }));
+    const snap = {
+      name: (nodes[0].project || 'neo4j') + ' (live)',
+      meta: { git:{ commit:'live', branch:new URL(url).hostname.split('.')[0] } },
+      nodes, byId:new Map(nodes.map(n=>[n.file_id,n])),
+      contains: [], deps: edgeRows.map(([f,t])=>[f,t]),
+      stats:{ files:nodes.length, dirs:0, deps:edgeRows.length, contains:0 },
+    };
+    state.A = snap; state.B = null;
+    state.view = 'deps'; document.getElementById('view').value = 'deps';
+    render();
+    document.getElementById('hint').textContent = `Live: ${snap.stats.files} files / ${snap.stats.deps} imports from Neo4j.`;
+    if(document.getElementById('c-remember').checked)
+      localStorage.setItem(LS, JSON.stringify({ url, user }));
+    else localStorage.removeItem(LS);
+    conn.hidden = true;
+  }catch(err){
+    const cors = /Failed to fetch|NetworkError|CORS/i.test(err.message);
+    cmsg.textContent = cors
+      ? 'Request blocked (likely CORS on file://). Serve this folder over http and retry.'
+      : 'Error: '+err.message;
+  }
+});
+
 document.getElementById('search').addEventListener('input', e=>{
   const q=e.target.value.trim().toLowerCase(); if(!cy) return;
   if(!q){ cy.elements().removeClass('dim hi'); return; }

@@ -1,5 +1,8 @@
 # Credentials — never commit these
-.env
+# .env, .env.local, ".env copy.example" — any variant may hold real secrets;
+# the committed template (.env.example) is re-included below.
+.env*
+!.env.example
 Neo4j-*.txt
 
 # Local Claude settings (machine-local paths / personal permission rules)
