@@ -49,6 +49,11 @@ from .loaders.controlm_folders import ControlMFoldersLoader
 from .loaders.controlm_jobs import ControlMJobsLoader
 from .neo4j_client import Neo4jClient
 from .snapshots import SnapshotWriter
+from .source_registry import (
+    SourceRegistry,
+    UnconfirmedSourceError,
+    UnknownSourceError,
+)
 
 app = typer.Typer(no_args_is_help=True, rich_markup_mode="rich")
 console = Console()
@@ -88,8 +93,45 @@ LOADER_REGISTRY: dict[str, type] = {
 
 SQL_DIR = Path(__file__).resolve().parent / "loaders" / "sql"
 
+# Which source-registry entry each loader draws from. The confirmed-gate (D3)
+# uses this to refuse a loader whose source's crosswalk is not SME-confirmed.
+LOADER_SOURCE: dict[str, str] = {
+    "seal_applications":             "seal-extract",
+    "seal_contacts":                 "seal-extract",
+    "catalog_lobs":                  "catalog-pat",
+    "product_lines":                 "catalog-pat",
+    "products":                      "catalog-pat",
+    "dev_teams":                     "catalog-pat",
+    "area_products":                 "catalog-pat",
+    "pat_product_mapping":           "catalog-pat",
+    "pat_team_roles":                "catalog-pat",
+    "controlm_folders":              "controlm-psgmgr",
+    "controlm_jobs":                 "controlm-psgmgr",
+    "controlm_conditions_in":        "controlm-psgmgr",
+    "controlm_conditions_out":       "controlm-psgmgr",
+    "controlm_dependencies_derived": "controlm-psgmgr",
+}
+
 
 # --- helpers -----------------------------------------------------------------
+
+_registry: SourceRegistry | None = None
+
+
+def _source_registry() -> SourceRegistry:
+    global _registry
+    if _registry is None:
+        _registry = SourceRegistry.from_yaml()
+    return _registry
+
+
+def _gate_source(source_id: str) -> None:
+    """Confirmed-gate (D3): fail fast (exit 2) unless the source is SME-confirmed."""
+    try:
+        _source_registry().require_confirmed(source_id)
+    except (UnconfirmedSourceError, UnknownSourceError) as exc:
+        console.print(f"[red]{exc}[/]")
+        raise typer.Exit(2) from exc
 
 def _client() -> Neo4jClient:
     cfg, _, _ = load_settings()
@@ -249,6 +291,8 @@ def load(
     cls = LOADER_REGISTRY.get(name)
     if cls is None:
         console.print(f"[red]Unknown loader: {name}[/]"); raise typer.Exit(2)
+    if name in LOADER_SOURCE:
+        _gate_source(LOADER_SOURCE[name])  # confirmed-gate before any DB write
     if csv_path is not None:
         adapter = _csv_adapter(csv_path)
     elif sql is not None:
@@ -272,6 +316,9 @@ def refresh_reference(
     snapshot: bool = typer.Option(True),
 ) -> None:
     """M1 reference-refresh chain (catalog + SEAL + dev teams). Weekly cadence."""
+    # Confirmed-gate (D3): both feeds must be SME-confirmed before any write.
+    _gate_source("catalog-pat")
+    _gate_source("seal-extract")
     chain = [
         ("catalog_lobs",      CatalogLOBsLoader,             "catalog_lobs__sample.csv"),
         ("product_lines",     ProductLinesLoader,            "product_lines__sample.csv"),
@@ -402,6 +449,8 @@ def ingest_controlm(
     extract in the chain (folder/developer-sid/row-cap apply to all; run-as
     applies to the job, variable, and dependency-anchor extracts).
     """
+    # Confirmed-gate (D3): the Control-M source must be SME-confirmed before any write.
+    _gate_source("controlm-psgmgr")
     scope = _scope_binds(folder, run_as, developer_sid, row_cap)
     stages: list[tuple[str, type[BaseLoader], str, str]] = [
         ("controlm_folders",     ControlMFoldersLoader,
