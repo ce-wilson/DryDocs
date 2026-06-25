@@ -1,3 +1,5 @@
+@claude - https://console.neo4j.io/projects/8992a0b9-2827-537f-b362-3821da9505e9/home
+
 # DryDocs
 
 **Production-support inventory + data-product knowledge graph for D&A (Data & Analytics) batches.**
