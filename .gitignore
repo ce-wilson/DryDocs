@@ -29,6 +29,21 @@ drydocs/data/
 stg_out/
 /stg_*/
 
+# SDLC-Docs — Fidelity-internal source corpus: keep LOCAL for reference, never commit/publish.
+# Internal-Confidential per PUBLISH-BOUNDARY.md (real org name "Fidelity/FMR", internal fmr.com
+# URLs, internal tool/standard code names). Ignore the WHOLE corpus (docx/doc/pdf/xls/txt/json,
+# any type) and keep only the clean design artifacts SDLC-Docs/extracted/*.md tracked.
+/SDLC-Docs/*
+!/SDLC-Docs/extracted/
+/SDLC-Docs/extracted/*
+!/SDLC-Docs/extracted/*.md
+
+# Local doc-extraction helper scripts (temporary; generated the SDLC-Docs corpus)
+/.tmp_*
+
+# Editor workspace settings (machine-local)
+/.vscode/
+
 # OS
 .DS_Store
 Thumbs.db
