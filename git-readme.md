@@ -50,6 +50,12 @@ What diverges, by stream:
   wired as early-adoption: opt-in supplement, never in bootstrap, not a declared *company*
   standard. Entirely additive **clean-adds** — take FROM this repo. See the dedicated section below.
 - **Schema consolidation** — patch files deleted, bootstrap order cleaned up; evaluate per file.
+- **Architecture decisions + modular split (NEW)** — `docs/decisions/` ADRs (0001 ontology base
+  scope; 0002 component & database topology + 0002-a core-extraction plan), `MODULE_MAP.md` +
+  `tests/unit/test_module_boundary.py` (the core/component boundary guard), and the
+  `SDLC-Docs/extracted/` design trail. All **clean-adds** — take FROM this repo. ADR 0002 foretells a
+  structural `drydocs/ → drydocs-core` + component-package move (Phase B, **not yet executed**); see the
+  dedicated section below.
 
 ---
 
@@ -91,6 +97,30 @@ compare to the previous one — see
 > org taxonomy, Oracle schemas) are imported through the new taxonomy → config → ontology →
 > HITL → loader flow, with confidential data isolated in `internal/`. The implementation
 > plan is [`knowledge/upgrade-plans/internal-import.md`](knowledge/upgrade-plans/internal-import.md).
+
+---
+
+## Architecture decisions + modular split (NEW — clean-adds; structural change ahead)
+
+Newer than the v1 restructure commits. All **clean-adds** on the company side (paths absent there);
+take FROM this repo.
+
+| Path | What it is | Disposition |
+|---|---|---|
+| `docs/decisions/0001-*.md` | ADR 0001 — ontology base scope (PROV spine) | clean-add |
+| `docs/decisions/0002-*.md`, `0002-a-*.md`, `0002-b-*.md` | ADR 0002 — component & database topology + core-extraction plan + spinoff-rebase checklist | clean-add |
+| `MODULE_MAP.md` | the `drydocs-core` ↔ component boundary (authoritative) | clean-add |
+| `tests/unit/test_module_boundary.py` | stdlib guard enforcing the boundary (Track-1 portable, no data) | clean-add |
+| `SDLC-Docs/extracted/*.md` | design trail (feasibility, C+D adoption, issue-driven loop, modular plan) | clean-add |
+
+**Heads-up — a structural path-move is coming (ADR 0002 D3, Phase B).** The modular split will move
+code out of the flat `drydocs/` package into `drydocs-core` + component packages (`drydocs-load` /
+`drydocs-lineage` / `drydocs-deepdoc`). When that lands, expect a large **rename wave**: across disjoint
+history git sees each move as delete+add (same as the `vendor/ → external/` rename above), and the
+per-file collision rules in this guide will be **superseded** by the package boundary in
+`MODULE_MAP.md`. Until Phase B executes, the layout is unchanged and all current cherry-pick rules still
+apply. The boundary guard is **Track-1 portable** (pure stdlib, no sample data) — add it to the Track-1
+acceptance run.
 
 ---
 
