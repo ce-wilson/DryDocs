@@ -57,14 +57,22 @@ PROCEDURE:
    git-readme's "Schema consolidation" section. Authoritative bootstrap order:
    constraints → ontology → ontology_supplement → seal_ontology_supplement →
    catalog_ontology_supplement.
+9. ARCHITECTURE-DECISIONS STREAM + MODULAR SPLIT (all clean-adds): docs/decisions/ (ADR 0001
+   ontology base; ADR 0002 component & database topology + 0002-a/0002-b), MODULE_MAP.md, and
+   tests/unit/test_module_boundary.py apply untouched — see git-readme.md's "Architecture decisions
+   + modular split" section. It also flags the planned drydocs/ → drydocs-core package move
+   (ADR 0002, Phase B), which is NOT yet executed; this port still targets the flat drydocs/ layout.
 
 ACCEPTANCE GATE (behavior is the contract, not a byte-compare):
 - Track 1 (portable, no production sample present):
     poetry run pytest tests/unit/test_variable_classifier.py tests/unit/test_variable_resolver.py \
-                      tests/unit/test_variable_staging.py tests/unit/test_command_parser.py -q
-  Expect 86 passed, 3 skipped (the 3 skips are sample-backed test_sample_*, which skip when
-  the .gitignore'd production CSV is absent). A FileNotFoundError on
-  controlm_variables__sample.csv means the skip guard was lost — fix it.
+                      tests/unit/test_variable_staging.py tests/unit/test_command_parser.py \
+                      tests/unit/test_module_boundary.py -q
+  Expect 88 passed, 3 skipped — the four variable-stream files give 86 passed / 3 skipped (the 3
+  skips are sample-backed test_sample_*, which skip when the .gitignore'd production CSV is absent),
+  plus 2 from the stdlib core/component boundary guard (test_module_boundary.py, ADR 0002-a Phase A;
+  pure stdlib, no data, so it runs anywhere). A FileNotFoundError on controlm_variables__sample.csv
+  means the skip guard was lost — fix it.
 - Full `pytest tests/unit/` must be green (passes + sample-skips + the PyYAML test_schema.py
   skips). ZERO failures is the contract. Both CI guards must pass: test_schema.py (no `active`
   relationship without its supplement block) and test_classification.py (every source in
