@@ -28,7 +28,7 @@
 # =============================================================================
 
 schema: drydocs.backlog.v1
-updated: 2026-06-20
+updated: 2026-06-26
 
 items:
 
@@ -298,10 +298,135 @@ items:
     inputs: [external/orchestration/airflow/README.md, config/source-registry.yaml]
     acceptance: "Airflow/MWAA crosswalk fully mapped to baseline; no invented concepts; gate logged; confirmed:true"
 
+  # ── Epic G — Modular architecture / component topology (main + ADR 0002) ───
+  # Groomed 2026-06-26 from ADR 0002 follow-ups 1–6 (docs/decisions/0002-*.md), accepted
+  # via the SME gate (config/gate-log.md, 2026-06-26). Edition = Neo4j Enterprise (committed).
+  - id: G1
+    epic: component-topology
+    agent: main
+    model: opus
+    priority: p1
+    status: todo
+    depends_on: []
+    inputs: [docs/decisions/0002-component-database-topology.md, drydocs/schema/, drydocs/neo4j_client.py]
+    acceptance: >
+      Provisioning authored + validated on a LOCAL Neo4j Enterprise (Docker, free dev license):
+      CREATE DATABASE drydocs + drydocs_context, CREATE COMPOSITE DATABASE drydocs_all aliasing
+      both; assetId/jobId uniqueness constraints + indexes in BOTH data DBs (proxy-node keys);
+      a drydocs_all smoke query reads both constituents and writes neither. Scripts are
+      target-agnostic (run unchanged against any multi-DB-capable DBMS).
+    notes: >
+      ADR 0002 follow-up #1, split for infra reality. TESTING is capped at ONE database on the live
+      Aura tier (single node) — multi-DB + composite are Enterprise-only features. So the topology is
+      authored + proven on a LOCAL Enterprise instance now; the LIVE deploy is G7 (blocked on infra).
+      No data load — provisioning + proxy-node constraints only. See memory drydocs1-live-neo4j.
+
+  - id: G7
+    epic: component-topology
+    agent: main
+    model: opus
+    priority: p2
+    status: blocked
+    depends_on: [G1]
+    inputs: [docs/decisions/0002-component-database-topology.md]
+    acceptance: >
+      The G1 topology (drydocs + drydocs_context + drydocs_all composite + proxy-node constraints)
+      is deployed to the production target and a drydocs_all smoke query passes there.
+    notes: >
+      ADR 0002 follow-up #1 (LIVE deploy). BLOCKED: the current Aura tier is limited to ONE node /
+      one database — it cannot host drydocs_context + a composite. Unblock = a multi-DB-capable
+      Enterprise target (Aura Virtual Dedicated Cloud / Business Critical, or self-managed Neo4j
+      Enterprise). Procurement/ops gate, not a code gate. Until then G4's deepdoc runs local-only.
+
+  - id: G2
+    epic: component-topology
+    agent: main
+    model: opus
+    priority: p1
+    status: todo
+    depends_on: []
+    inputs: [docs/decisions/0002-a-drydocs-core-extraction-plan.md, drydocs/, tests/]
+    acceptance: >
+      Per 0002-A done criteria: drydocs-core imports cleanly with NO component dependency;
+      drydocs-load runs the existing pipeline unchanged; tests/unit/test_module_boundary.py
+      passes; gates green (pytest -q, package import, --help).
+    output: core/ (drydocs-core) + load/ (drydocs-load)
+    notes: >
+      ADR 0002 follow-up #2; plan = 0002-A (thin, zero behavior change). BLOCKS G3 + G4. Shim/
+      re-export first, then relocate; borderline staging.py + snapshots/writer.py → load (0002-A §6).
+
+  - id: G3
+    epic: component-topology
+    agent: main
+    model: opus
+    priority: p2
+    status: todo
+    depends_on: [G2]
+    inputs: [docs/decisions/0002-b-spinoff-rebase-checklist.md, "ce-wilson/DryDocs-v0-archive@controlm-spinoff"]
+    acceptance: >
+      Per 0002-B: drydocs-remediation runs detect → transform → prove → Jira using ONLY
+      drydocs-core for parsing + read-only corroboration; no-graph-write test, Jira-only test,
+      and offline-equivalence proof all pass; boundary test holds for the new package.
+    output: remediation/ (drydocs-remediation)
+    notes: >
+      ADR 0002 follow-up #3; checklist = 0002-B. Re-home its Control-M parsing onto core (drop the
+      spinoff's own parser); keep only remediation logic. Writes NO graph; Jira = SoR. See
+      reconcile-port skill. On done: mark the controlm-spinoff archive superseded.
+
+  - id: G4
+    epic: component-topology
+    agent: main
+    model: opus
+    priority: p3
+    status: todo
+    depends_on: [G1, G2]
+    inputs: [docs/decisions/0002-component-database-topology.md, drydocs/controlm/commands.py]
+    acceptance: >
+      drydocs-lineage and drydocs-deepdoc exist as separate packages that import ONLY drydocs-core
+      and SHARE the core command-line/lineage parser; lineage writes curated lineage to drydocs;
+      deepdoc writes to drydocs_context stamping reliability/trust; neither imports the other;
+      boundary test passes.
+    notes: >
+      ADR 0002 follow-up #4 (D2). Scaffold only — wiring the real triggers (phased curation for
+      lineage; on-failure for deepdoc) is later. deepdoc needs drydocs_context (G1).
+
+  - id: G5
+    epic: component-topology
+    agent: ontology-mapper
+    model: sonnet
+    priority: p2
+    status: todo
+    depends_on: []
+    inputs: [docs/restructure/03-hitl-sme-flow.md, docs/decisions/0002-component-database-topology.md]
+    acceptance: >
+      03-hitl-sme-flow.md gains a "promotion: drydocs_context → drydocs" section stating an
+      uncertain node is promoted ONLY via a gate-confirmed WRITE to drydocs (status: proposed →
+      loader), never an in-place cross-DB edit; includes the per-item decision presentation + the
+      gate-log audit requirement.
+    notes: >
+      ADR 0002 follow-up #5. Documents the trust-promotion path (trust axis = DB boundary). No
+      code. Writable now; references G1's DBs conceptually, not as a hard dep.
+
+  - id: G6
+    epic: component-topology
+    agent: reference-librarian
+    model: haiku
+    priority: p3
+    status: todo
+    depends_on: []
+    inputs: [docs/decisions/0002-component-database-topology.md]
+    acceptance: >
+      The three rejected alternatives (Community single-DB, two-mode capability, polyrepo) are
+      discoverable from the architecture entry point (linked/cross-referenced from the restructure
+      index or README), not only inside the ADR — so they are not re-litigated.
+    notes: >
+      ADR 0002 follow-up #6. The ADR already records them in Options Considered; this just adds a
+      durable pointer. Small hygiene task.
+
 # Roll-up the dispatcher can glance at (keep in sync, or regenerate).
 summary:
-  todo: 4
+  todo: 10
   in_progress: 0
-  blocked: 0
-  done: 14                                         # A1-A3, B1-B4, C1-C4, D1, D2, D3 (Epics A,B,C,D complete)
-  next_ready: [E1, F1, F2]                        # E1 needs C1✓ (SOSA draft); F1/F2 need C1✓ (orchestrator crosswalk drafts)
+  blocked: 1                                       # G7 — live multi-DB deploy needs an Enterprise target
+  done: 14                                         # A1-A3, B1-B4, C1-C4, D1-D3 (Epics A,B,C,D complete)
+  next_ready: [E1, F1, F2, G1, G2, G5, G6]        # +Epic G (ADR 0002, ACCEPTED). G1 = local-Enterprise validation; live deploy (G7) blocked: Aura tier = 1 node.

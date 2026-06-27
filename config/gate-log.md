@@ -34,3 +34,19 @@ records the date, the item, confirmed / edited / rejected counts, and reasons fo
 - Drift guard `test_schema.py` green (9 passed); full suite 164 passed.
 - Phase-2 `planned` entries (m3_invokes/triggers, p2_*, …) left planned — no taxonomy captured
   yet, not re-gated. **Epic C complete (C1–C4).**
+
+## 2026-06-26 — ADR 0002 · component & database topology (architecture acceptance)
+- **Presented:** 1 ADR for acceptance (`docs/decisions/0002-component-database-topology.md`) +
+  1 real sub-decision (Neo4j edition / license commitment).
+- **Decision (SME):** **Accept as-is** — `PROPOSED → ACCEPTED`. D1 (Enterprise multi-DB +
+  composite), D2 (two components: `drydocs-lineage` + `drydocs-deepdoc`), D3 (monorepo +
+  `drydocs-core`) all confirmed.
+- **Edition:** **Committed to Neo4j Enterprise** — accepted the recurring license cost; trust
+  isolation is structural (separate transaction domains), the ADR's core value. Community
+  single-DB stays a **rejected alternative** only (not an interim fallback).
+- **Edited:** 0 · **Rejected:** 0
+- **Effect:** the `drydocs-core` extraction (0002-A) and spinoff rebase (0002-B) plans are
+  **ungated** (still `PLANNED`, now ready to execute). ADR follow-ups 1–6 ready to groom into
+  `backlog.yaml`. Confirmed by SME (chad.wilson).
+- **Note:** ADRs are architecture decisions, not taxonomy→ontology mappings — gated here by the
+  same SME-control principle (`03-hitl-sme-flow.md`), logged for the same audit trail.

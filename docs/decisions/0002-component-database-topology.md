@@ -1,8 +1,10 @@
 # ADR 0002 — Component & database topology: modular components over isolated graphs
 
 ```yaml
-status: PROPOSED        # PROPOSED | ACCEPTED | SUPERSEDED
+status: ACCEPTED        # PROPOSED | ACCEPTED | SUPERSEDED
 date: 2026-06-26
+accepted_on: 2026-06-26
+accepted_by: chad.wilson (SME gate)
 deciders: [chad.wilson, SME-gate]
 layer: cross-cutting    # architecture; affects layers 3 (KG) and 4 (context)
 affects:
@@ -167,6 +169,9 @@ repeatedly**, not production. `drydocs_context` **can be written now** precisely
    `docs/restructure/03-hitl-sme-flow.md`.
 6. Add a "considered & rejected" note (Community single-DB, two-mode capability, polyrepo) so the
    alternatives are not re-litigated.
-7. Route through the SME gate (`docs/restructure/03-hitl-sme-flow.md`) to move this ADR
-   `PROPOSED → ACCEPTED` before any wiring.
+7. ~~Route through the SME gate (`docs/restructure/03-hitl-sme-flow.md`) to move this ADR
+   `PROPOSED → ACCEPTED` before any wiring.~~ **DONE 2026-06-26** — accepted as-is by the SME;
+   Enterprise edition committed (D1 firm, Community fallback stays a rejected alternative only).
+   Gate run logged in `config/gate-log.md`. The extraction (0002-A) and rebase (0002-B) plans are
+   now ungated; follow-ups 1–6 are ready to groom into `backlog.yaml`.
 ```

@@ -85,6 +85,39 @@ reviews; it does not do these itself. Status: ☐ todo · ◐ in progress · ☑
 - **F2** ☐ Same for Airflow/MWAA.
   *Accept:* as F1.
 
+## Epic G — Modular architecture / component topology (agent: main + ADR 0002)
+
+Groomed 2026-06-26 from **ADR 0002** (`docs/decisions/0002-*.md`), accepted via the SME gate.
+Edition = **Neo4j Enterprise** (committed). `core` extraction (G2) is the hinge — G3/G4 wait on it.
+**Infra note:** the live Aura tier is capped at **1 node / 1 database**, so the multi-DB topology
+is built + tested on a **local Enterprise** instance (G1); the live deploy (G7) is blocked on infra.
+
+- **G1** ☐ P1 Author + **locally validate** the multi-DB topology (`drydocs`, `drydocs_context`,
+  the `drydocs_all` composite + `assetId`/`jobId` proxy-node constraints) on a local Neo4j
+  **Enterprise** (Docker, free dev license).
+  *Accept:* the three DBs + composite exist locally; constraints in both data DBs; a `drydocs_all`
+  smoke query reads both and writes neither; scripts are target-agnostic.
+- **G2** ☐ P1 Extract `drydocs-core` from `drydocs/` per **0002-A** (thin, zero behavior change);
+  remainder becomes `drydocs-load`.
+  *Accept:* core imports with no component dep; load runs unchanged; `test_module_boundary.py`
+  passes; gates green. **Blocks G3 + G4.**
+- **G3** ☐ P2 Rebase the archived `controlm-spinoff` onto `drydocs-core` as `drydocs-remediation`
+  per **0002-B**.
+  *Accept:* detect→transform→prove→Jira on core only; no-graph-write + Jira-only + equivalence
+  tests pass. (depends: G2)
+- **G4** ☐ P3 Scaffold `drydocs-lineage` + `drydocs-deepdoc` as separate packages sharing the core
+  parser; deepdoc → `drydocs_context` with `reliability`/`trust`.
+  *Accept:* both import only core, neither imports the other; boundary test passes. (depends: G1, G2)
+- **G5** ☐ P2 Document the promotion path `drydocs_context → HITL gate → drydocs` in
+  `03-hitl-sme-flow.md` (gate-confirmed write, never a cross-DB edit).
+  *Accept:* the promotion section exists with the decision presentation + audit requirement.
+- **G6** ☐ P3 Add a durable "considered & rejected" pointer (Community single-DB, two-mode
+  capability, polyrepo) from the architecture entry point so alternatives aren't re-litigated.
+  *Accept:* the three rejected options are discoverable outside the ADR.
+- **G7** 🚧 P2 *blocked* — Deploy the G1 topology to the **live** multi-DB target.
+  *Blocked on:* the current Aura tier is capped at **1 node / 1 database**; needs a multi-DB-capable
+  Enterprise instance (Aura VDC / Business Critical, or self-managed Enterprise). (depends: G1)
+
 ---
 
 ## Review checklist for the dispatcher (run after each item)
