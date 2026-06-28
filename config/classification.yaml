@@ -72,3 +72,30 @@ required_for_external:  # additionally, when classification == External:
 # NB: this axis is SENSITIVITY, not TRUST. The provenance tier
 # (VERBATIM/GROUNDED/SYNTHESIZED) lives in each SOURCE-MANIFEST and answers a
 # different question (is this the vendor's words or Claude's inference?).
+
+# Public producer ceiling — ce-wilson/DryDocs is a public repo.
+# Internal-Public is the maximum tier that may appear in any tracked file here.
+# Everything Internal or above must live in a gitignored twin (drydocs/data/ etc.).
+public_producer:
+  ceiling_tier: Internal-Public
+  flow: one-way               # public → internal; never pulled back via git
+
+# Sanitization map — how to demote a higher-tier value to Internal-Public so a
+# doc or fixture can be committed to this repo.
+sanitize:
+  real_seal_or_app_id:   "<seal-id> / <app-id>"
+  real_lob_product_name: "<LoB> or a generic role (e.g. 'a cards LoB')"
+  real_system_codename:  "generic functional name (e.g. 'Business Catalog')"
+  real_infra_object:     "placeholder or synthetic example"
+  roster_row:            "synthetic name, or omit"
+  internal_ghe_repo_id:  "<internal-ghe>"
+  real_location_row:     "synthetic or omit"
+
+# Paths that are Internal-only regardless of content — never port outward.
+excluded_paths:
+  - ".github/skills/**"
+  - ".vscode/**"
+  - "drydocs/data/**"              # gitignored — real source/sample data + internal twins
+  - "stg_out/"                     # gitignored — extract/staging output (real data)
+  - "stg_*/"
+  - "team_locations__sample.csv"   # real location rows, even if non-PII
