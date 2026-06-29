@@ -19,3 +19,5 @@ last_updated: 2026-06-18T17:15:00Z
 - 2026-06-18T15:30:00Z interactive (operator-driven Phase 1, not a scheduled wake)
 - 2026-06-18T16:00:00Z wake
 - 2026-06-18T17:30:00Z wake
+- 2026-06-18T18:00:00Z wake
+- 2026-06-25T00:00:00Z wake

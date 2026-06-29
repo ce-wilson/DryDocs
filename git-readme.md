@@ -14,6 +14,13 @@ fetches `main` from the producer and applies it onto the company `main`. This fi
 is the instruction set for that apply; it rides inside the repo, so the
 company-side reader has it.
 
+> **Publishing boundary.** This is the **public** producer end of a one-way pipe.
+> Only sanitized `internal-public`-tier content may be committed here — no real
+> SEAL/app IDs, LOB/Product names, internal system code-names, infra object names,
+> or org rosters. See [`PUBLISH-BOUNDARY.md`](PUBLISH-BOUNDARY.md) for the rule and
+> [`config/classification.yaml`](config/classification.yaml) for the tiers. Real source material
+> stays gitignored under `drydocs/data/`.
+
 **The two histories are disjoint.** This repo was `git init`-ed fresh, not cloned
 from company `main`, so there is **no common ancestor** — git has no merge-base to
 3-way merge against. "Rebase" here therefore means **cherry-pick / `git am` the

@@ -15,6 +15,12 @@ catalog alongside batch orchestration at scale.
 | `data-catalog-drydocs-crosswalk.md` | Crosswalk between the data catalog (data plane) and DryDocs (process plane) |
 | `lineage-design-top3.md` | Top 3 Neo4j modeling patterns for cross-platform orchestration lineage |
 | `classifiers-example.csv` | Example regulatory classifier taxonomy (replace `<OrgCatalog>:` prefix with your namespace) |
+| `dataset-registration-architecture.md` | Sanitized platform-capability + dataset-registration reference (10 capabilities, 4 use-case patterns, semantic-engine framework, metamodel) |
+
+> **Sanitized vs internal twins.** Every doc here is the **public, placeholder-based**
+> version. The raw, identifier-bearing originals (real SEAL IDs, LOB/Product names,
+> system code-names) live gitignored under `drydocs/data/data-catalog/` with a `ccb-`
+> prefix and must never be committed to this repo. See [`PUBLISH-BOUNDARY.md`](../../../PUBLISH-BOUNDARY.md).
 
 ## The two-plane model
 
