@@ -1,7 +1,9 @@
 """Module-boundary guard for the drydocs-core extraction (ADR 0002 / 0002-a, Phase A).
 
-Phase A is *logical only* — no files have moved into a ``core/`` package yet — so this
-test enforces the boundary on the CURRENT ``drydocs/`` layout, per ``MODULE_MAP.md``:
+Phase A is *logical*; the physical split is staged. A transitional ``drydocs_core`` shim
+package now exists (re-exports the surface, ADR 0002-a Phase B step 1), but the core modules
+still physically live under ``drydocs/``. This test enforces the boundary across BOTH, per
+``MODULE_MAP.md``:
 
   * **Core imports nothing from any component.** The parse / model / config / driver layer
     (models, adapters, neo4j_client, config, precedence, source_registry, ontology, controlm)
@@ -17,10 +19,12 @@ from __future__ import annotations
 import ast
 from pathlib import Path
 
-PKG_ROOT = Path(__file__).resolve().parents[2] / "drydocs"
-REPO_ROOT = PKG_ROOT.parent
+REPO_ROOT = Path(__file__).resolve().parents[2]
+# Packages scanned for the boundary: the monolith plus the transitional core shim.
+PKG_ROOTS = [REPO_ROOT / "drydocs", REPO_ROOT / "drydocs_core"]
 
-# Dotted prefixes that make up drydocs-core (see MODULE_MAP.md).
+# Dotted prefixes that make up drydocs-core (see MODULE_MAP.md). Includes the
+# `drydocs_core` shim package (ADR 0002-a Phase B step 1; re-exports the surface).
 CORE_PREFIXES: tuple[str, ...] = (
     "drydocs.models",
     "drydocs.adapters",
@@ -30,6 +34,7 @@ CORE_PREFIXES: tuple[str, ...] = (
     "drydocs.source_registry",
     "drydocs.ontology",
     "drydocs.controlm",
+    "drydocs_core",
 )
 
 # Component group -> the dotted prefixes that belong to it.
@@ -61,7 +66,9 @@ def _package_of(path: Path) -> str:
 
 
 def _imported_drydocs_modules(path: Path) -> set[str]:
-    """Return the set of ``drydocs.*`` modules imported by ``path`` (relative imports resolved)."""
+    """First-party modules imported by ``path`` (relative imports resolved; ``from pkg import
+    name`` expanded to ``pkg.name`` so a component leaf-import like ``from drydocs import
+    loaders`` is caught, not just ``from drydocs.loaders import x``)."""
     tree = ast.parse(path.read_text(encoding="utf-8"), filename=str(path))
     pkg = _package_of(path)
     mods: set[str] = set()
@@ -74,14 +81,22 @@ def _imported_drydocs_modules(path: Path) -> set[str]:
                 base = pkg
                 for _ in range(node.level - 1):
                     base = base.rsplit(".", 1)[0] if "." in base else base
-                mods.add(f"{base}.{node.module}" if node.module else base)
-            elif node.module:
-                mods.add(node.module)
-    return {m for m in mods if m == "drydocs" or m.startswith("drydocs.")}
+                root = f"{base}.{node.module}" if node.module else base
+            else:
+                root = node.module or ""
+            if root:
+                mods.add(root)
+                for alias in node.names:
+                    mods.add(f"{root}.{alias.name}")
+    return {m for m in mods if m == "drydocs" or m.startswith(("drydocs.", "drydocs_core"))}
 
 
 def _iter_py_files():
-    return sorted(PKG_ROOT.rglob("*.py"))
+    files: list[Path] = []
+    for root in PKG_ROOTS:
+        if root.exists():
+            files.extend(root.rglob("*.py"))
+    return sorted(files)
 
 
 def test_core_does_not_import_components():

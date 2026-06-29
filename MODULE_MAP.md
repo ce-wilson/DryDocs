@@ -5,10 +5,13 @@
 > (ADR 0002) and its extraction plan
 > [`docs/decisions/0002-a-drydocs-core-extraction-plan.md`](docs/decisions/0002-a-drydocs-core-extraction-plan.md).
 >
-> **Phase A is logical only — no files have moved.** This map is the source of truth for what *will*
-> become `drydocs-core` vs the component packages, and it is enforced today by
-> [`tests/unit/test_module_boundary.py`](tests/unit/test_module_boundary.py). The invariant survives the
-> Phase B physical split unchanged; only the package names update.
+> **Status:** the boundary is logical; the physical split is staged. A transitional
+> [`drydocs_core/`](drydocs_core/__init__.py) shim package now exists (ADR 0002-a Phase B step 1) — it
+> **re-exports** the surface below while the modules still physically live under `drydocs/`. Components
+> import `drydocs_core.*`; when the files relocate (Phase B step 2+), only those re-exports flip. The
+> invariant is enforced across **both** packages by
+> [`tests/unit/test_module_boundary.py`](tests/unit/test_module_boundary.py) and survives the physical
+> split unchanged; only the package names update.
 
 ## Invariant
 
