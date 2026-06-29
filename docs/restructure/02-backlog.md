@@ -61,10 +61,10 @@ reviews; it does not do these itself. Status: ☐ todo · ◐ in progress · ☑
 - **D1** ☐ P0 graph fixes first (from consolidated plan): `RUNS_ON→SCHEDULED_ON` (B.1),
   `datetime()` wrapping (B.3), `stale_edge_cleanup.cypher` (B.2).
   *Accept:* migrations idempotent; `m3-verify` green; tests green.
-- **D2** ☐ Wire the precedence resolver into catalog reconciliation (`RECONCILES_TO`) — read
+- **D2** ☑ Wire the precedence resolver into catalog reconciliation (`RECONCILES_TO`) — read
   `config/precedence.yaml` instead of hardcoded order.
   *Accept:* flipping `order:` in `precedence.yaml` changes resolution with no code edit.
-- **D3** ☐ Make `source-registry.yaml#confirmed` gate loader activation (a source with
+- **D3** ☑ Make `source-registry.yaml#confirmed` gate loader activation (a source with
   `confirmed: false` cannot run).
   *Accept:* attempting to load an unconfirmed source fails fast with a clear message.
 

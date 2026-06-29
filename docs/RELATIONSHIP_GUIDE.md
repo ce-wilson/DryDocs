@@ -187,7 +187,7 @@ Then:
 Run these once per environment, in order, after `drydocs bootstrap`:
 
 ```bash
-drydocs apply-m3-supplement       # Control-M node types + relationships
+drydocs apply-ontology-supplement  # Control-M node types + relationships
 drydocs apply-seal-supplement     # SEAL node types + relationships
 drydocs apply-catalog-supplement  # Catalog node types + relationships
 ```
