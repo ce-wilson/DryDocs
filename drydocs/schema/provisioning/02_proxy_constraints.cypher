@@ -1,13 +1,13 @@
 // =============================================================================
 // provisioning/02_proxy_constraints.cypher  —  G1 (ADR 0002 D1, proxy-node keys)
 //
-// Run in EACH data database — BOTH drydocs AND drydocs_context:
+// Run in EACH data database — BOTH drydocs AND ddcontext:
 //   cypher-shell -d drydocs         -f 02_proxy_constraints.cypher
-//   cypher-shell -d drydocs_context -f 02_proxy_constraints.cypher
+//   cypher-shell -d ddcontext -f 02_proxy_constraints.cypher
 //
 // The composite joins the two DBs by BUSINESS KEY (proxy-node pattern) — never by
 // internal node id — so both DBs must carry the same uniqueness on the join keys, and
-// `drydocs_context` records survive every `drydocs` rebuild and re-link automatically.
+// `ddcontext` records survive every `drydocs` rebuild and re-link automatically.
 //
 // Identity is the EXISTING canonical business key (ADR 0001: "identity is always a
 // business key"); no identity is invented here:

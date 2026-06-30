@@ -13,17 +13,21 @@
 // Ground truth — structured KG (main load + drydocs-lineage). Trust: VERBATIM/GROUNDED.
 CREATE DATABASE drydocs IF NOT EXISTS;
 
+// Cross-platform lineage (drydocs-lineage). Trust: VERBATIM/GROUNDED.
+CREATE DATABASE ddlineage IF NOT EXISTS;
+
 // Isolated uncertain context (drydocs-deepdoc, on-demand). Trust: SYNTHESIZED/unverified.
 // Its own transaction domain: a transaction cannot span databases, so uncertain data
 // here can NEVER be written into `drydocs` by accident (the trust axis = the DB boundary).
-CREATE DATABASE drydocs_context IF NOT EXISTS;
+CREATE DATABASE ddcontext IF NOT EXISTS;
 
-// Composite — stores no data of its own; aliases the two constituents. The platform
-// enforces read-from-many / write-to-one, so support queries read both while writes
+// Composite — stores no data of its own; aliases all three constituents. The platform
+// enforces read-from-many / write-to-one, so support queries read all while writes
 // still land in exactly one constituent (no cross-DB writes).
-CREATE COMPOSITE DATABASE drydocs_all IF NOT EXISTS;
-CREATE ALIAS drydocs_all.drydocs         IF NOT EXISTS FOR DATABASE drydocs;
-CREATE ALIAS drydocs_all.drydocs_context IF NOT EXISTS FOR DATABASE drydocs_context;
+CREATE COMPOSITE DATABASE ddall IF NOT EXISTS;
+CREATE ALIAS ddall.drydocs    IF NOT EXISTS FOR DATABASE drydocs;
+CREATE ALIAS ddall.ddlineage  IF NOT EXISTS FOR DATABASE ddlineage;
+CREATE ALIAS ddall.ddcontext  IF NOT EXISTS FOR DATABASE ddcontext;
 
 // Verify (optional):
 //   SHOW DATABASES YIELD name, type, currentStatus WHERE name STARTS WITH 'drydocs';
