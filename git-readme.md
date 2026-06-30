@@ -1,14 +1,15 @@
-# DryDocs1 — Port Guide (producer `ce-wilson/DryDocs1` → `<company-org>/DryDocs`)
+# DryDocs — Port Guide (producer `ce-wilson/DryDocs` → `<company-org>/DryDocs`)
 
-> **DryDocs1 is version 1: a structural rewrite of DryDocs, not an increment on it.**
+> **This repo is version 1: a structural rewrite of the original DryDocs, not an increment on it.**
 > It re-founds the project on the four-layer model (taxonomy → ontology → knowledge
 > graph → context graph) with a clean external/internal split, a configuration layer,
 > and an SME guided gate — see [`CLAUDE.md`](CLAUDE.md) and [`docs/restructure/`](docs/restructure/).
-> The earlier `ce-wilson/DryDocs` producer is **superseded** by this repo. Throughout this
-> guide, "producer" now means `ce-wilson/DryDocs1`.
+> The earlier off-track producer was archived as `ce-wilson/DryDocs-v0-archive` (read-only,
+> dead history) and the v1 rewrite was renamed into its place. Throughout this guide,
+> "producer" means `ce-wilson/DryDocs` (github.com).
 
 This repo is the **producer** side. Work is built here on `main`, committed, and
-pushed to `github.com/ce-wilson/DryDocs1`. The **company** target is
+pushed to `github.com/ce-wilson/DryDocs`. The **company** target is
 `<company-org>/DryDocs` on GitHub Enterprise (`[github]` host); its maintainer
 fetches `main` from the producer and applies it onto the company `main`. This file
 is the instruction set for that apply; it rides inside the repo, so the
@@ -140,7 +141,7 @@ The deliverable lives on `main` (the `controlm-spinoff` branch is not used for t
 port). On the company side, after fetching, list the commits to apply:
 
 ```
-git log --oneline --reverse drydocs1/main    # full line — histories are disjoint, so all of it is "new" vs company main
+git log --oneline --reverse cewilson/main    # full line — histories are disjoint, so all of it is "new" vs company main
 ```
 
 Hashes are transferred intact by `git fetch`, so a SHA you see locally resolves
@@ -160,8 +161,8 @@ either a **clean-add** (applies untouched) or a **collision** (hand-reconcile).
 ## How the company side applies it
 
 ```
-git remote add drydocs1 https://github.com/ce-wilson/DryDocs1.git
-git fetch drydocs1 main
+git remote add cewilson https://github.com/ce-wilson/DryDocs.git
+git fetch cewilson main
 git switch -c drydocs-port main
 git cherry-pick <oldest>^..<newest>     # range from the log command above
 ```
