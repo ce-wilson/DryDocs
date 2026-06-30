@@ -1,13 +1,14 @@
 ---
 name: data-context-extractor
-description: "DryDocs domain context extractor. Adds platform or application domain knowledge to the DryDocs knowledge graph for DataAsset node population and AppDataFlow lineage mapping. Use when: (1) a target platform (Oracle, Snowflake, Teradata, S3, SQLServer, Linux) needs its key data objects documented as DataAsset nodes, (2) a specific Application (by SEAL ID) needs its AppDataFlow and cross-platform lineage mapped, (3) interviewing a domain expert using DryDocs use case questions. Outputs machine-first §META §DATAASSETS §JOBS §UC §CYPHER §OQ reference files. DO NOT generate SQL analyst skills, relational schemas, or any artifact that bypasses the Neo4j graph model."
+description: "DryDocs domain context extractor. Adds platform, application, or organizational context to the DryDocs knowledge graph. Use when: (1) a target platform (Oracle, Snowflake, Teradata, S3, SQLServer, Linux, or reference documents) needs its data objects documented as DataAsset nodes, (2) a specific Application (by SEAL ID) needs its AppDataFlow and cross-platform lineage mapped, (3) the corporate hierarchy (BusinessSegment → CatalogLOB → ProductLine → Product → Application) needs inter-dependency queries answered, or (4) reference documents (PDF annual reports, 10-K filings) need content extracted into ddcontext as SYNTHESIZED DataAsset or BusinessSegment nodes. Outputs machine-first §META §DATAASSETS §JOBS §UC §CYPHER §OQ reference files. DO NOT generate SQL analyst skills, relational schemas, or any artifact that bypasses the Neo4j graph model."
 ---
 
 # DryDocs Domain Context Extractor
 
-Adds domain knowledge to the DryDocs knowledge graph — either for a **target data
-platform** (to populate `:DataAsset` nodes) or for an **Application domain** (to
-populate `:AppDataFlow` lineage). This skill replaces the generic SQL data analyst
+Adds domain knowledge to the DryDocs knowledge graph — for a **target data
+platform** (DataAsset nodes), an **Application domain** (AppDataFlow lineage),
+or an **organizational/segment context** (BusinessSegment → LOB → Product chains
+and inter-dependency queries). This skill replaces the generic SQL data analyst
 skill builder.
 
 ---
@@ -18,30 +19,45 @@ skill builder.
   reference docs in `§META §DATAASSETS §JOBS §UC §CYPHER §OQ` format.
 - **DO NOT introduce new node types.** Only use labels already in the DryDocs
   ontology. See `references/nodes.md` for the complete list.
-- **DO NOT introduce new relationship types.** Only use: `USED`, `GENERATED`,
-  `ORCHESTRATES`, `HAS_DATA_FLOW`, `REPRESENTS_CATALOG_DATASET`, and the existing
-  DryDocs edge vocabulary in `references/nodes.md §RELATIONSHIPS`.
+- **DO NOT introduce new relationship types.** Only use the edge vocabulary in
+  `references/nodes.md §RELATIONSHIPS`. Flag unknowns as `[TO-BE-UPDATED]`.
 - **Platform is always a property on `:DataAsset`, never a node.** Creating a
   `:DataPlatform` node with data edges causes a supernode — forbidden.
 - **Sanitize before committing.** Internal versions (real SEAL IDs, server names,
   schema names) go to `drydocs/data/data-catalog/` (gitignored). Public sanitized
   versions go to `docs/patterns/data-catalog/`.
+- **Document classification drives the target database.**
+  - Public-domain documents (annual reports, 10-K SEC filings): `classification: External`,
+    `trust: VERBATIM / GROUNDED`, load directly into `drydocs`. No sanitization needed.
+    Always cite `source_url`.
+  - Internal documents: `trust: SYNTHESIZED`, target `ddcontext` only.
+    Never write to `drydocs` without HITL gate confirmation.
 
 ---
 
-## Two modes
+## Three modes
 
 ### Mode A — Platform Domain
-Use when a target platform (Snowflake, Teradata, Oracle, S3, SQLServer, Linux)
-needs to be documented so `:DataAsset` nodes can be populated and lineage edges
-(`USED`/`GENERATED`) can be written by the DataAsset loader.
+Use when a target platform (Snowflake, Teradata, Oracle, S3, SQLServer, Linux,
+or reference documents) needs to be documented so `:DataAsset` nodes can be
+populated and lineage edges (`USED`/`GENERATED`) can be written by the DataAsset
+loader. Valid `platform` values: `oracle | snowflake | teradata | s3 | sqlserver | linux | document`.
 
 ### Mode B — Application Domain
 Use when a specific Application (identified by SEAL ID) needs its `:AppDataFlow`
 and cross-platform lineage context documented.
 
-Both modes use the same 7 interview questions (`references/use-cases.md`) and
-produce output in machine-first format (`references/domain-template.md`).
+### Mode C — Org Hierarchy / Segment Context
+Use when you need to:
+- Map **BusinessSegment → CatalogLOB → ProductLine → Product → Application** chains
+- Answer inter-dependency questions: which apps/jobs belong to a segment? which
+  teams support a product? what is the cross-segment blast radius?
+- Extract business segment metrics from reference documents (annual reports, 10-K
+  filings) into `ddcontext` as `trust: SYNTHESIZED` content
+
+Mode C uses UC8–UC11 (`references/use-cases.md`) in addition to or instead of UC1–UC7.
+
+All modes produce output in machine-first format (`references/domain-template.md`).
 
 ---
 
@@ -54,7 +70,10 @@ Ask: "Which target platform are you documenting?"
 Valid `platform` property values (these are string properties on `:DataAsset`, never
 graph node labels or types):
 
-`oracle` | `snowflake` | `teradata` | `s3` | `sqlserver` | `linux`
+`oracle` | `snowflake` | `teradata` | `s3` | `sqlserver` | `linux` | `document`
+
+`document` = reference documents (PDF annual reports, 10-K filings, org charts).
+Document DataAssets always carry `trust: SYNTHESIZED` and target `ddcontext`.
 
 See `references/platforms.md` for URN patterns and sanitization rules per platform.
 
@@ -136,17 +155,80 @@ platforms. All 7 UC questions apply; focus on UCs most relevant to this domain.
 
 ---
 
+## Mode C — Org Hierarchy / Segment Context
+
+### Step 1 — Identify the scope
+
+Ask: "Are you documenting a segment, a LOB, a product line, or a product?"
+
+Starting nodes and their keys:
+- `BusinessSegment.code` — CCB / CIB / AWM / Corp / CB
+- `CatalogLOB.lob_code` — internal LOB code
+- `ProductLine.product_line_id` — product line identifier
+- `Product.product_id` — product identifier
+
+Run the schema discovery query first:
+```cypher
+MATCH (co:Company)-[:HAS_BUSINESS_SEGMENT]->(seg:BusinessSegment)
+OPTIONAL MATCH (lob:CatalogLOB)-[:RECONCILES_TO]->(seg)
+RETURN co.name, seg.code, seg.name, collect(lob.lob_code) AS lobs;
+```
+
+### Step 2 — Map inter-dependencies
+
+For each scope node, capture:
+- Which LOBs `RECONCILES_TO` each segment (with `confidence`)
+- Which ProductLines and Products exist under each LOB
+- Which Applications are owned by each Product (`HAS_APPLICATION`)
+- Which AreaProducts and DevTeams are aligned under each Product (`HAS_AREA_PRODUCT` + `SUPPORTS`)
+- Which Control-M jobs run under those applications
+
+Use `references/use-cases.md` UC8–UC11 to drive the interview.
+
+### Step 3 — Extract document metrics (optional)
+
+If ingesting from a reference document:
+
+**Public-domain documents (annual reports, 10-K SEC filings):**
+- `classification: External` — no sanitization needed; data is in the public domain
+- Model the document as `DataAsset {platform: 'document', trust: 'VERBATIM'}` for
+  direct quotes, or `trust: 'GROUNDED'` for derived/calculated facts
+- Always set `source_url` to the public filing URL
+- Load directly into `drydocs` — no ddcontext staging required
+- Carry extracted metrics as properties on `BusinessSegment` nodes in `drydocs`
+- Write `GENERATED` edges: document → BusinessSegment, document → DataAsset (firmwide)
+
+**Internal documents:**
+- `classification: Internal-Public` or higher
+- Model as `DataAsset {platform: 'document', trust: 'SYNTHESIZED'}`
+- Target `ddcontext` only; promote to `drydocs` via HITL gate
+
+### Step 4 — Generate output files
+
+**Internal (gitignored, real LOB/product/team names):**
+`drydocs/data/data-catalog/<segment-code>-context.md`
+
+**Public (sanitized, committed):**
+`docs/patterns/data-catalog/<segment-code>-context.md`
+
+Use `references/domain-template.md` format. Mode C output replaces `§JOBS` with
+`§HIERARCHY` (the LOB→Product→App chain) and adds a `§SEGMENTS` section.
+
+---
+
 ## Output file locations
 
 ```
 docs/patterns/data-catalog/            ← sanitized, public, committed to repo
 ├── <platform>-domain.md               ← Mode A output
 ├── <app-domain>-lineage.md            ← Mode B output
+├── <segment-code>-context.md          ← Mode C output (sanitized)
 └── (existing shared reference files already committed)
 
 drydocs/data/data-catalog/             ← internal, gitignored, never committed
 ├── <platform>-domain.md               ← Mode A with real names/SIDs
-└── <seal-id>-lineage.md               ← Mode B with real SEAL ID / team names
+├── <seal-id>-lineage.md               ← Mode B with real SEAL ID / team names
+└── <segment-code>-context.md          ← Mode C with real LOB/product/team data
 ```
 
 ---
@@ -155,23 +237,34 @@ drydocs/data/data-catalog/             ← internal, gitignored, never committed
 
 | File | Load when |
 |---|---|
-| `references/use-cases.md` | Starting the domain interview (UC1–UC7 questions) |
+| `references/use-cases.md` | Starting the domain interview (UC1–UC7 for Mode A/B; UC8–UC11 for Mode C) |
 | `references/nodes.md` | Choosing node types and properties during generation |
 | `references/domain-template.md` | Writing the output reference file |
-| `references/cypher-patterns.md` | Running discovery queries in Neo4j Browser |
+| `references/cypher-patterns.md` | Running discovery queries; Mode C patterns in §Mode C section |
 | `references/platforms.md` | Checking platform URN patterns + sanitization rules |
 
 ---
 
 ## Quality checklist
 
+### All modes
 - [ ] Output format: machine-first `§META §DATAASSETS §JOBS §UC §CYPHER §OQ`
 - [ ] No new node types introduced — only labels in `references/nodes.md`
 - [ ] No new relationship types — only edges in `references/nodes.md §RELATIONSHIPS`
-- [ ] Platform is a property on `DataAsset`, not a graph node or label
-- [ ] `assetId` URN: `urn:drydocs:dataasset:{platform}:{namespace}:{name}`
-- [ ] `dataflowUrn` DataHub format: `urn:li:dataFlow:{controlm,<flowId>,<cluster>}`
 - [ ] All `[TO-BE-UPDATED]` markers replaced with actual domain-specific answers
 - [ ] Sanitized public version: no real SEAL IDs, SIDs, server names, org names
 - [ ] Internal version in `drydocs/data/data-catalog/` (gitignored)
 - [ ] Public version in `docs/patterns/data-catalog/` committed to feature branch
+
+### Mode A / B additional checks
+- [ ] Platform is a property on `DataAsset`, not a graph node or label
+- [ ] `assetId` URN: `urn:drydocs:dataasset:{platform}:{namespace}:{name}`
+- [ ] `dataflowUrn` DataHub format: `urn:li:dataFlow:{controlm,<flowId>,<cluster>}`
+
+### Mode C additional checks
+- [ ] Segment codes verified against live graph: CCB / CIB / AWM / Corp (active), CB (retired)
+- [ ] LOB → BusinessSegment `RECONCILES_TO` edges include `confidence` property
+- [ ] `§HIERARCHY` section documents the full LOB → ProductLine → Product → App chain
+- [ ] Cross-segment dependency queries (UC11) scoped to active segments only (no CB)
+- [ ] **Public documents** (annual reports, 10-K): `classification: External`, `trust: VERBATIM/GROUNDED`, `source_url` set, load to `drydocs` — no sanitization, no ddcontext staging
+- [ ] **Internal documents**: `trust: SYNTHESIZED`, `reliability` set (0.0–1.0), target `ddcontext` only

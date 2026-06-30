@@ -158,11 +158,108 @@ RETURN path,
 
 ---
 
+---
+
+## UC8 — "Which applications belong to this business segment?" (Mode C — Segment Context)
+
+**Ask the domain expert:**
+"For segment CCB / CIB / AWM / Corp — which catalog LOBs reconcile to it?
+Which product lines and products fall under those LOBs? Which SEAL applications
+are owned by those products?"
+
+**Graph traversal this answers:**
+```
+BusinessSegment ← [:RECONCILES_TO] ← CatalogLOB
+  → [:HAS_PRODUCT_LINE] → ProductLine
+  → [:HAS_PRODUCT] → Product
+  → [:HAS_APPLICATION] → Application
+```
+
+**[TO-BE-UPDATED: fill during interview]**
+- Segment code: [ANSWER]
+- LOBs reconciling to it (with confidence): [ANSWER — internal]
+- Product lines under those LOBs: [ANSWER — internal]
+- SEAL application count: [ANSWER — internal]
+- Cypher: see `cypher-patterns.md` Mode C, UC8
+
+---
+
+## UC9 — "What product lines exist under this LOB?" (Mode C — Product Hierarchy)
+
+**Ask the domain expert:**
+"For a given LOB code — what product lines does it contain? How many products
+per line? How many SEAL-registered applications per product?"
+
+**Graph traversal this answers:**
+```
+CatalogLOB -[:HAS_PRODUCT_LINE]-> ProductLine
+           -[:HAS_PRODUCT]-> Product
+           -[:HAS_APPLICATION]-> Application
+```
+
+**[TO-BE-UPDATED: fill during interview]**
+- LOB code: [ANSWER]
+- Product line count: [ANSWER]
+- Products per line (range): [ANSWER]
+- Application count per product (range): [ANSWER]
+- Cypher: see `cypher-patterns.md` Mode C, UC9
+
+---
+
+## UC10 — "Which teams support this product?" (Mode C — Team Ownership)
+
+**Ask the domain expert:**
+"For a given product — which AreaProduct Groups sit under it? Which DevTeams
+are aligned to (SUPPORTS) those APGs? Which SEAL applications does each team develop?"
+
+**Graph traversal this answers:**
+```
+Product -[:HAS_AREA_PRODUCT]-> AreaProduct
+        <-[:SUPPORTS {team_type}]- DevTeam
+        -[:DEVELOPS]-> Application
+```
+
+**[TO-BE-UPDATED: fill during interview — internal, gitignore]**
+- Product id / name: [ANSWER — internal]
+- AreaProduct Groups: [ANSWER — internal]
+- DevTeams with team_type (aligned / flex / dedicated): [ANSWER — internal]
+- Applications each team develops: [ANSWER — internal]
+- Escalation contacts (via Membership): [ANSWER — internal]
+- Cypher: see `cypher-patterns.md` Mode C, UC10
+
+---
+
+## UC11 — "Segment-level blast radius" (Mode C — Cross-Segment Impact)
+
+**Ask the domain expert:**
+"If jobs from segment X stall, which downstream applications in OTHER segments
+are blocked? How many condition hops does the impact cross?"
+
+**Graph traversal this answers:**
+```
+BusinessSegment → (LOB→Product→App→Flow→Job) -[:EMITS_OUT_CONDITION]->
+  Condition <-[:REQUIRES_IN_CONDITION]- downstream Job
+  → (App→Product→LOB→BusinessSegment) for the downstream segment
+```
+
+**[TO-BE-UPDATED: fill during interview]**
+- Source segment: [ANSWER]
+- Known cross-segment condition dependencies: [ANSWER]
+- Typical depth (condition hops): [ANSWER]
+- Most-impacted downstream segments: [ANSWER]
+- Cypher: see `cypher-patterns.md` Mode C, UC11
+
+---
+
 ## Interview tips
 
-- Ask UC1 and UC2 first — they surface the most concrete DataAsset candidates
-- UC7 is the hardest to answer in one session; seed it and leave `[TO-BE-UPDATED]`
-- UC4 answers are internal — capture in the gitignored file only
+- **Mode A/B** (platform/application): Ask UC1 and UC2 first — most concrete DataAsset candidates
+- **Mode C** (org hierarchy): Ask UC8 first to map segment→LOB, then drill into UC9 (product lines) and UC10 (teams)
+- UC7 and UC11 are the hardest; seed them and leave `[TO-BE-UPDATED]`
+- UC4, UC10 answers are internal — capture in the gitignored file only
 - If a UC doesn't apply to this domain, mark `N/A — not applicable: <reason>`
 - Confirm `isExternalFeed` and `isSourceOfRecord` with a data governance contact,
   not just the developer — these drive business-critical lineage queries
+- **Segment metrics from public documents** (annual reports, 10-K SEC filings): `classification: External`,
+  `trust: VERBATIM/GROUNDED`, set `source_url`, load directly to `drydocs` — no sanitization, no staging
+- **Segment metrics from internal documents**: `trust: SYNTHESIZED`, target `ddcontext`, promote via HITL gate

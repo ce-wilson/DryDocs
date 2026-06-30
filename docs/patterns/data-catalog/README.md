@@ -16,6 +16,8 @@ catalog alongside batch orchestration at scale.
 | `lineage-design-top3.md` | Top 3 Neo4j modeling patterns for cross-platform orchestration lineage |
 | `classifiers-example.csv` | Example regulatory classifier taxonomy (replace `<OrgCatalog>:` prefix with your namespace) |
 | `dataset-registration-architecture.md` | Sanitized platform-capability + dataset-registration reference (10 capabilities, 4 use-case patterns, semantic-engine framework, metamodel) |
+| `ingestion-formalization.md` | Ingestion formalization: app-support-first design, built aligned not coupled to enterprise catalog |
+| `jpmc-annual-report-domain.md` | Machine-first domain reference for JPMorgan Chase Annual Report 2024 + MD&A 10-K; `§META §DATAASSETS §JOBS §UC §CYPHER §OQ` format; produced by `data-context-extractor` skill (Mode C) |
 
 > **Sanitized vs internal twins.** Every doc here is the **public, placeholder-based**
 > version. The raw, identifier-bearing originals (real SEAL IDs, LOB/Product names,

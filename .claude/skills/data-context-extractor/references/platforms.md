@@ -16,6 +16,24 @@ on `:DataAsset` and `:ControlMJob`.
 | `s3` | AWS S3 object storage | FILE, STREAM | `urn:li:dataPlatform:{s3}` |
 | `sqlserver` | Microsoft SQL Server | TABLE, VIEW | `urn:li:dataPlatform:{sqlserver}` |
 | `linux` | Linux filesystem (SFTP landing zone, local files) | FILE | `urn:li:dataPlatform:{linux}` |
+| `document` | Reference documents (PDF annual reports, 10-K filings, org charts) | PDF, METRICS | local only — no DataHub platform |
+
+**Document classification drives the target database and sanitization:**
+
+| Document type | Classification | Trust | Target DB | Sanitize? |
+|---|---|---|---|---|
+| Public annual reports, 10-K SEC filings | External | VERBATIM / GROUNDED | `drydocs` | No — public domain; cite `source_url` |
+| Internal slide decks, design docs, org charts | Internal-Public | SYNTHESIZED | `ddcontext` | Yes — omit internal names before committing |
+| Internal-confidential documents | Internal-Confidential | SYNTHESIZED | `ddcontext` | Never commit even sanitized |
+
+> **External documents** (annual reports, SEC filings, public vendor docs) are in the
+> public domain. They carry `classification: External`, require no sanitization, and
+> their content can be loaded directly into `drydocs`. Extract with `trust: VERBATIM`
+> for direct quotes or `trust: GROUNDED` for derived/calculated facts. Always add
+> `source_url` pointing to the public source.
+>
+> **Internal documents** carry `trust: SYNTHESIZED` and always target `ddcontext`.
+> Promotion to `drydocs` requires HITL gate confirmation.
 
 ---
 
@@ -33,6 +51,7 @@ urn:drydocs:dataasset:s3:<bucket-name>/<prefix>:<filename-pattern>
 urn:drydocs:dataasset:teradata:<database>:<TABLE_NAME>
 urn:drydocs:dataasset:sqlserver:<database>.<schema>:<TABLE_NAME>
 urn:drydocs:dataasset:linux:<host-path>:<filename-pattern>
+urn:drydocs:dataasset:document:<org-namespace>:<document-name>   ← Mode C / ddcontext only
 ```
 
 ---
