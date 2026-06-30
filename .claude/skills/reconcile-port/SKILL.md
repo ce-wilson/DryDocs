@@ -45,6 +45,7 @@ the accumulated lessons from prior ports. Read both.
 | `tests/unit/test_schema.py` | Keep company `EXPECTED_CONSTRAINTS = 44` (ahead of producer's 35). |
 | `tests/unit/test_controlm_cypher.py` | Keep company version (`scope_key` + version_serial-as-property). |
 | `tests/unit/test_variable_classifier.py`, `test_variable_staging.py` | **Canonical-here — take producer wholesale.** They already carry `skipif(not SAMPLE.exists())` guards (producer commit `9e9fe1c`). Do not re-write your own guard; that caused redundant divergence in a prior port. |
+| `pyproject.toml` | Union — preserve company's Python-version constraints, Oracle/Kerberos deps, and any extra test deps; **add** producer's new deps: `requests` (aura manager) and `pypdf` (PDF ingestion). Neither conflicts with company deps. |
 
 **Skipped-commit policy:** the early overlap commits where company content is
 already richer (prior ports skipped `3bc7adb`, `0eb98a5`, `6c5b7b5`, `0063f07`)
@@ -56,7 +57,7 @@ stay skipped — confirm with the operator if a new one appears.
 - `EXPECTED_CONSTRAINTS = 44` vs producer 35 (local consolidation).
 - Condition key: `scope_key` vs producer `folder_id`.
 - Suite size: company suite is much larger (scrapers/Confluence). **Do not chase
-  the producer's `159 passed` full-suite number** — only zero *new* failures matters.
+  the producer's `186 passed` full-suite number** — only zero *new* failures matters.
 - `drydocs/adapters/oracle_adapter.py`: company version is **Kerberos-aware**
   (thick via `_init_thick_client` / `externalauth` when `ORACLE_KERBEROS=True`);
   the producer version is thin-only. **Keep company's** — it carries the JPMC
@@ -68,15 +69,17 @@ stay skipped — confirm with the operator if a new one appears.
 Run as a SINGLE line (multi-line `\` continuations break in some agent shells):
 
 ```
-poetry run pytest tests/unit/test_variable_classifier.py tests/unit/test_variable_resolver.py tests/unit/test_variable_staging.py tests/unit/test_command_parser.py -q
+poetry run pytest tests/unit/test_variable_classifier.py tests/unit/test_variable_resolver.py tests/unit/test_variable_staging.py tests/unit/test_command_parser.py tests/unit/test_module_boundary.py -q
 ```
 
 (If `poetry` is not on PATH, use `python -m pytest <same files> -q`.) Expect
-**86 passed, 3 skipped, 0 failed**. The 3 skips are the sample-backed
+**88 passed, 3 skipped, 0 failed**. The 3 skips are the sample-backed
 tests (`test_sample_classifies_end_to_end`, `test_sample_bundle_smoke`,
 `test_sample_end_to_end_counts`) — the production CSV is gitignored and never
 transfers, so they skip, not fail. A `FileNotFoundError` instead of a skip means
 the skip guard was lost in the port (re-apply the Canonical-here test files).
+`test_module_boundary.py` is pure stdlib (no sample needed) — 2 tests, always
+pass; it guards the `drydocs-core` ↔ component boundary (ADR 0002 D3).
 
 ## Track-2 (optional — real data, or fresh sample)
 
