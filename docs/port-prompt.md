@@ -1,4 +1,4 @@
-# Port prompt — apply DryDocs1 onto the original `<company-org>/DryDocs` base
+# Port prompt — apply DryDocs onto the original `<company-org>/DryDocs` base
 
 Hand this prompt to an agent working in a clean checkout of the company
 `<company-org>/DryDocs` `main` (GitHub Enterprise). It executes the one-way
@@ -7,7 +7,7 @@ source of truth for the per-path disposition tables. This prompt is the actionab
 wrapper; `git-readme.md` is the authority.
 
 ```text
-You are porting the DryDocs1 PRODUCER repo (ce-wilson/DryDocs1, github.com) onto the
+You are porting the DryDocs PRODUCER repo (ce-wilson/DryDocs, github.com) onto the
 original/superseded <company-org>/DryDocs base (GitHub Enterprise). This is a ONE-WAY
 producer→consumer apply. Work in a clean checkout of company `main`.
 
@@ -24,13 +24,13 @@ collision (reconcile by hand, every time).
 
 PROCEDURE:
 1. From the company main checkout:
-     git remote add drydocs1 https://github.com/ce-wilson/DryDocs1.git
-     git fetch drydocs1 main
-2. READ THE GUIDE FIRST: `git show drydocs1/main:git-readme.md`. Internalize its three
+     git remote add cewilson https://github.com/ce-wilson/DryDocs.git
+     git fetch cewilson main
+2. READ THE GUIDE FIRST: `git show cewilson/main:git-readme.md`. Internalize its three
    tables (Canonical-here, Clean-adds, Collisions) before touching anything.
 3. git switch -c drydocs-port main
 4. List the commit range (histories disjoint → all of it is new vs company main):
-     git log --oneline --reverse drydocs1/main
+     git log --oneline --reverse cewilson/main
    Identify commits by SUBJECT, not SHA (a rebase rewrites SHAs). The Control-M
    normalization stream is the three subjects "…variable taxonomy (Phase A)…" →
    "…variable resolver (Phase B)…" → "…Phase C command/script parser…", applied in that
@@ -80,7 +80,7 @@ ACCEPTANCE GATE (behavior is the contract, not a byte-compare):
 
 BOUNDARIES:
 - One-way only. Never add company main as a remote on the producer; never push back to
-  ce-wilson/DryDocs1.
+  ce-wilson/DryDocs.
 - drydocs/data/ is .gitignore'd — sample CSVs stay local, never transfer.
 - Never commit real SIDs, credentials, server addresses, GHE org names, or production data
   values; internal/ is the only home for confidential data and is stripped on publish
