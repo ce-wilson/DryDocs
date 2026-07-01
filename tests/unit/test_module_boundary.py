@@ -41,9 +41,14 @@ CORE_PREFIXES: tuple[str, ...] = (
 COMPONENT_GROUPS: dict[str, tuple[str, ...]] = {
     "load": ("drydocs.loaders", "drydocs.cli", "drydocs.snapshots"),
     # drydocs-review — SME review + graph acceptance + docs publish (Epic H).
-    # Add graph_review / publishing here when they land (H2 / H5); the default-deny
-    # test below FORCES that so a new review module can't be silently unguarded.
-    "review": ("drydocs.graph_verify", "drydocs.review_labels"),
+    # The default-deny test below FORCES a new review module to be classified here
+    # rather than being silently unguarded. Add publishing (H5) when it lands.
+    "review": (
+        "drydocs.graph_verify",
+        "drydocs.review_labels",
+        "drydocs.graph_review",
+        "drydocs.sme_notes",
+    ),
 }
 ALL_COMPONENT_PREFIXES: tuple[str, ...] = tuple(
     p for prefixes in COMPONENT_GROUPS.values() for p in prefixes

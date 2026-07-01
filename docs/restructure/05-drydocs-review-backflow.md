@@ -130,9 +130,14 @@ Tracked as **Epic H** in [`backlog.yaml`](backlog.yaml).
   takes a duck-typed `GraphRunner`, so the module never imports Neo4j and is fully offline).
   Example suite [`graph-tests/vendor-bmc-smoke.yaml`](../../graph-tests/vendor-bmc-smoke.yaml).
   27 unit tests; both YAML seeds `classification: Internal-Public`.
+- **H2 — done (2026-07-01).** [`drydocs/graph_review.py`](../../drydocs/graph_review.py): pure
+  `render_review({label: [props]})` → self-contained HTML, `hidden_props` + `_`-keys stripped, review-spine
+  provenance on each section header. 6 unit tests.
+- **H3 — done (2026-07-01).** [`drydocs/sme_notes.py`](../../drydocs/sme_notes.py): `SME[sid] $FR/$UC/$OQ/$NOTES`
+  harvester (read-only `harvest_tree`/`route`, excludes `data/`). 5 unit tests, synthetic SIDs.
 - **H6 — done (2026-07-01).** Boundary guard closed: `review` component group +
   `test_every_module_is_classified` (default-deny). Boundary guard 3 passed; Track-1 92 passed / 0 failed.
-- **H2–H5 — todo** (graph_review, sme_notes, HITL page generator, publishing), per sequencing.
+- **H4–H5 — todo** (HITL page generator, publishing) — offline mechanisms; gated instances deferred (below).
 
 ## Deferred / gated — the to-do list (NOT built today)
 

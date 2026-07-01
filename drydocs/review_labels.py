@@ -107,3 +107,11 @@ class ReviewLabels:
                 if label not in seen:
                     seen.append(label)
         return seen
+
+    def sources_for_label(self, label: str) -> list[SourceLabels]:
+        """Every source that populates ``label`` (its provenance), in file order.
+
+        The reverse of :meth:`labels_for` — used by ``graph_review`` to put the
+        source provenance on each label's section header.
+        """
+        return [src for src in self._sources.values() if label in src.labels]

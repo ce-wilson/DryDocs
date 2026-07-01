@@ -127,10 +127,10 @@ code). Full plan: [`05-drydocs-review-backflow.md`](05-drydocs-review-backflow.m
 - **H1** ✅ P2 *done 2026-07-01* — Reproduced `graph_verify` + `review_labels` (the offline spine):
   pure load/evaluate, duck-typed graph runner (no Neo4j import), vendor-BMC seeds at Internal-Public,
   27 unit tests; not wired into `cli.py` (entrypoint-boundary TODO). Full suite 214 passed.
-- **H2** ☐ P2 Reproduce `graph_review` (pure HTML renderer, no Neo4j in module).
-  *Accept:* renders a fixture row set offline, `hidden_props` stripped, one section per DATA label. (depends: H1)
-- **H3** ☐ P3 Reproduce `sme_notes` harvester (routes `$FR/$UC/$OQ/$NOTES`; synthetic SIDs only).
-  *Accept:* unit test on a fixture tree; no real SIDs committed. (depends: H1)
+- **H2** ✅ P2 *done 2026-07-01* — `drydocs/graph_review.py`: pure `render_review` (self-contained HTML,
+  one section per label, `hidden_props`/`_`-keys stripped, spine provenance on headers). 6 tests.
+- **H3** ✅ P3 *done 2026-07-01* — `drydocs/sme_notes.py`: `SME[sid] $FR/$UC/$OQ/$NOTES` harvester
+  (read-only `harvest_tree` + `route`; excludes `data/`). 5 tests, synthetic SIDs.
 - **H4** ☐ P3 Reproduce the HITL prompt-page **generator** (renderer over
   `04-sme-checklist-and-load-plan.md` + `taxonomy-ontology-map.yaml` + `classification.yaml`).
   *Accept:* emits interactive checklist pages (localStorage, no-write-until-confirmed, parent+child);
