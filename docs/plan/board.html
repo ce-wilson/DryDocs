@@ -1,0 +1,374 @@
+<!doctype html>
+<html><head><meta charset="utf-8">
+<title>DryDocs — project board</title>
+<style>:root{color-scheme:light}
+body{font-family:system-ui,sans-serif;margin:0;padding:1.5rem 2rem 4rem;max-width:96rem;
+  margin-left:auto;margin-right:auto;color:#1a1a1a;background:#fff}
+h1{font-size:1.5rem;margin:.2rem 0}
+h2{font-size:1rem;margin:0}
+h3{font-size:1rem;margin:.3rem 0 .2rem}
+.subtitle{color:#555;margin:.1rem 0 1rem}
+.roadmap{display:flex;flex-wrap:wrap;gap:.75rem;margin:1rem 0 1.5rem}
+.phase-card{border:1px solid #e2e2e2;border-radius:8px;padding:.6rem .8rem;background:#fafafa;
+  flex:1 1 13rem;min-width:13rem}
+.phase-head{display:flex;align-items:center;gap:.4rem;font-size:.8rem;color:#555}
+.phase-id{font-weight:700;color:#111}
+.release{margin-left:auto;background:#e0e7ff;color:#3730a3;border-radius:4px;padding:0 .35rem;
+  font-size:.75rem}
+.goal{font-size:.82rem;color:#444;margin:.2rem 0}
+.progress{height:.4rem;background:#e5e7eb;border-radius:4px;overflow:hidden;margin:.3rem 0 .15rem}
+.progress-bar{height:100%;background:#2563eb}
+.progress-text{font-size:.75rem;color:#666;margin:0}
+.status-badge{display:inline-block;padding:.05rem .4rem;border-radius:4px;font-size:.72rem;
+  text-transform:uppercase;letter-spacing:.02em}
+.status-todo{background:#e5e7eb;color:#374151}
+.status-in_progress{background:#fde68a;color:#92400e}
+.status-blocked{background:#fecaca;color:#991b1b}
+.status-done{background:#bbf7d0;color:#166534}
+.filters{display:flex;flex-wrap:wrap;gap:.6rem;align-items:end;margin:1rem 0;
+  border:1px solid #e2e2e2;border-radius:8px;padding:.7rem .9rem;background:#f9fafb}
+.filters label{display:flex;flex-direction:column;font-size:.75rem;color:#444;gap:.15rem}
+.filters select,.filters input[type=search]{font:inherit;padding:.25rem .4rem;border:1px solid #ccc;
+  border-radius:4px;min-width:9rem}
+.filters button{font:inherit;padding:.3rem .7rem;border:1px solid #ccc;border-radius:4px;
+  background:#fff;cursor:pointer}
+.board{display:grid;grid-template-columns:repeat(4,1fr);gap:.9rem;align-items:start}
+.column{border:1px solid #e2e2e2;border-radius:8px;background:#fafafa;min-height:4rem}
+.column-head{display:flex;justify-content:space-between;align-items:center;padding:.5rem .7rem;
+  border-bottom:1px solid #e2e2e2}
+.count{background:#e5e7eb;border-radius:10px;padding:0 .5rem;font-size:.78rem}
+.column-body{padding:.5rem;display:flex;flex-direction:column;gap:.5rem}
+.card{border:1px solid #e2e2e2;border-radius:6px;padding:.5rem .6rem;background:#fff;cursor:pointer;
+  font-size:.85rem}
+.card.ready{border-color:#2563eb;box-shadow:0 0 0 1px #2563eb inset}
+.card.hidden{display:none}
+.card.highlight{outline:2px solid #f59e0b}
+.card-head{display:flex;gap:.4rem;align-items:baseline;flex-wrap:wrap}
+.card-id{font-weight:700;font-family:ui-monospace,monospace;font-size:.8rem}
+.card-title{font-weight:500}
+.chips{display:flex;flex-wrap:wrap;gap:.25rem;margin:.3rem 0}
+.chip{background:#eef2ff;color:#3730a3;border-radius:4px;padding:.02rem .4rem;font-size:.72rem}
+.epic{color:#666;font-size:.72rem;margin-top:.15rem}
+.deps{font-size:.75rem;color:#555;margin-top:.25rem}
+.deps-label{color:#888}
+.dep-link{color:#2563eb;text-decoration:none;margin-right:.3rem}
+.dep-link:hover{text-decoration:underline}
+.detail{display:none;margin-top:.4rem;border-top:1px dashed #ddd;padding-top:.35rem;font-size:.8rem}
+.card.expanded .detail{display:block}
+.acceptance,.notes{margin:.2rem 0}
+.empty{color:#999;font-size:.85rem;padding:.4rem}
+.capture{margin-top:2rem;border:1px solid #e2e2e2;border-radius:8px;padding:.8rem 1rem;
+  background:#f9fafb}
+.capture-row{display:flex;gap:.5rem;flex-wrap:wrap;align-items:center}
+.capture input[type=text]{flex:1 1 20rem;font:inherit;padding:.35rem .5rem;border:1px solid #ccc;
+  border-radius:4px}
+.capture select{font:inherit;padding:.35rem .4rem;border:1px solid #ccc;border-radius:4px}
+.capture button{font:inherit;padding:.35rem .8rem;border:1px solid #2563eb;border-radius:4px;
+  background:#2563eb;color:#fff;cursor:pointer}
+.capture-hint{font-size:.78rem;color:#666;margin:.4rem 0 0}
+.capture-status{font-size:.78rem;color:#166534;margin:.3rem 0 0;min-height:1.1em}</style>
+</head><body>
+<h1>DryDocs — project board</h1>
+<p class="subtitle">Rendered from <code>docs/restructure/backlog.yaml</code> (updated 2026-07-01) &middot; 38 items. The repo is the system of record; this page is a working aid.</p>
+<div class="roadmap">
+<div class="phase-card"><div class="phase-head"><span class="phase-id">P0</span><span class="status-badge status-done">done</span></div><h3>Restructure scaffolding</h3><p class="goal">Four-layer model, external/internal split, config layer, publish boundary, sub-agents.</p><div class="progress"><div class="progress-bar" style="width:100%"></div></div><p class="progress-text">3 / 3</p></div>
+<div class="phase-card"><div class="phase-head"><span class="phase-id">P1</span><span class="status-badge status-done">done</span></div><h3>Taxonomy capture</h3><p class="goal">Live sources captured in config/taxonomy/ as pure classification (Epic B).</p><div class="progress"><div class="progress-bar" style="width:100%"></div></div><p class="progress-text">4 / 4</p></div>
+<div class="phase-card"><div class="phase-head"><span class="phase-id">P2</span><span class="status-badge status-done">done</span></div><h3>Ontology mapping + HITL</h3><p class="goal">Every graph edge traces to an SME-confirmed taxonomy→ontology mapping (Epic C).</p><div class="progress"><div class="progress-bar" style="width:100%"></div></div><p class="progress-text">4 / 4</p></div>
+<div class="phase-card"><div class="phase-head"><span class="phase-id">P3</span><span class="status-badge status-done">done</span></div><h3>Config-driven loaders</h3><p class="goal">Precedence + source gating read config/, not hardcoded logic (Epic D).</p><div class="progress"><div class="progress-bar" style="width:100%"></div></div><p class="progress-text">3 / 3</p></div>
+<div class="phase-card"><div class="phase-head"><span class="phase-id">P4</span><span class="status-badge status-todo">todo</span></div><h3>Context graph pilot</h3><p class="goal">SOSA/SSN observation modeling answers one live support question (Epic E).</p><div class="progress"><div class="progress-bar" style="width:0%"></div></div><p class="progress-text">0 / 2</p></div>
+<div class="phase-card"><div class="phase-head"><span class="phase-id">P5</span><span class="status-badge status-todo">todo</span></div><h3>Orchestrator expansion</h3><p class="goal">AutoSys + Airflow land as BMC-baseline concepts via confirmed crosswalks (Epic F).</p><div class="progress"><div class="progress-bar" style="width:0%"></div></div><p class="progress-text">0 / 2</p></div>
+<div class="phase-card"><div class="phase-head"><span class="phase-id">P6</span><span class="status-badge status-in_progress">in_progress</span></div><h3>Modular architecture / component topology</h3><p class="goal">ADR 0002 — core extraction, multi-DB topology, component packages (Epic G).</p><div class="progress"><div class="progress-bar" style="width:0%"></div></div><p class="progress-text">0 / 9</p></div>
+<div class="phase-card"><div class="phase-head"><span class="phase-id">P7</span><span class="status-badge status-done">done</span></div><h3>Review toolkit back-flow</h3><p class="goal">Company SME-review/HITL toolkit reproduced generically, offline (Epic H).</p><div class="progress"><div class="progress-bar" style="width:100%"></div></div><p class="progress-text">7 / 7</p></div>
+<div class="phase-card"><div class="phase-head"><span class="phase-id">P8</span><span class="status-badge status-in_progress">in_progress</span><span class="release">v0.3.0</span></div><h3>Planning &amp; release infrastructure</h3><p class="goal">Repo-native project board + capture loop; groundwork for versioned releases (Epic I).</p><div class="progress"><div class="progress-bar" style="width:50%"></div></div><p class="progress-text">2 / 4</p></div>
+</div>
+<div class="filters">
+  <label>Module<select id="f-module"><option value="">All</option>
+<option value="config">config</option>
+<option value="docs">docs</option>
+<option value="drydocs-core">drydocs-core</option>
+<option value="drydocs-lineage">drydocs-lineage</option>
+<option value="drydocs-load">drydocs-load</option>
+<option value="drydocs-plan">drydocs-plan</option>
+<option value="drydocs-remediation">drydocs-remediation</option>
+<option value="drydocs-review">drydocs-review</option>
+<option value="graph-infra">graph-infra</option>
+<option value="ontology">ontology</option>
+<option value="reference">reference</option>
+<option value="taxonomy">taxonomy</option>
+</select></label>
+  <label>Phase<select id="f-phase"><option value="">All</option>
+<option value="0">P0 — Restructure scaffolding</option>
+<option value="1">P1 — Taxonomy capture</option>
+<option value="2">P2 — Ontology mapping + HITL</option>
+<option value="3">P3 — Config-driven loaders</option>
+<option value="4">P4 — Context graph pilot</option>
+<option value="5">P5 — Orchestrator expansion</option>
+<option value="6">P6 — Modular architecture / component topology</option>
+<option value="7">P7 — Review toolkit back-flow</option>
+<option value="8">P8 — Planning &amp; release infrastructure</option>
+</select></label>
+  <label>Epic<select id="f-epic"><option value="">All</option>
+<option value="component-topology">component-topology</option>
+<option value="config-loaders">config-loaders</option>
+<option value="context-graph">context-graph</option>
+<option value="drydocs-review-backflow">drydocs-review-backflow</option>
+<option value="ontology-mapping">ontology-mapping</option>
+<option value="orchestrator-expansion">orchestrator-expansion</option>
+<option value="project-board">project-board</option>
+<option value="reference-hygiene">reference-hygiene</option>
+<option value="taxonomy-capture">taxonomy-capture</option>
+</select></label>
+  <label>Type<select id="f-type"><option value="">All</option>
+<option value="bug">bug</option>
+<option value="chore">chore</option>
+<option value="requirement">requirement</option>
+<option value="task">task</option>
+</select></label>
+  <label>Search<input type="search" id="f-search" placeholder="id or title"></label>
+  <button type="button" id="f-clear">Clear filters</button>
+</div>
+<div class="board">
+<div class="column" data-status="todo"><div class="column-head"><h2>To do</h2><span class="count" data-count-for="todo">12</span></div><div class="column-body"><div class="card ready" id="card-E1" data-id="E1" data-module="ontology" data-phase="4" data-epic="context-graph" data-type="task" data-status="todo" data-search="e1 register sosa/ssn observation terms via the gate" tabindex="0"><div class="card-head"><span class="card-id">E1</span><span class="card-title">Register SOSA/SSN observation terms via the gate</span></div><div class="chips"><span class="chip" data-kind="module">ontology</span><span class="chip" data-kind="phase">P4</span><span class="chip" data-kind="type">task</span><span class="chip" data-kind="priority">p2</span><span class="chip" data-kind="model-agent">sonnet / ontology-mapper</span></div><div class="epic">context-graph</div><div class="deps"><span class="deps-label">depends on:</span> <a class="dep-link" href="#card-C1" data-target="card-C1">C1</a></div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> sosa:* terms present with IRIs; status planned-&gt;confirmed via gate</p><p class="notes"><strong>Notes:</strong> Registration step DONE (main, 2026-06-22): sosa/ssn prefixes in namespaces.py; terms seeded in drydocs/schema/sosa_experimental_supplement.cypher (opt-in `drydocs apply-sosa-supplement`, NOT in bootstrap; every term adoption:&quot;experimental&quot;); 4 context relationships in relationship_vocabulary.yaml (sosa_observes/has_result/ made_by_sensor/observed_property, status planned, domain context); README split into Declared-Adopted vs Experimental/Early-Adoption. REMAINING for ontology-mapper: take the `jobrun-observation` map entry through the HITL gate (resolve ControlMJobRun-as-Observation vs separate-Observation-node; run-history source), then planned-&gt;confirmed.
+</p></div></div>
+<div class="card" id="card-E2" data-id="E2" data-module="ontology" data-phase="4" data-epic="context-graph" data-type="requirement" data-status="todo" data-search="e2 answer one folder health/freshness question with a context query" tabindex="0"><div class="card-head"><span class="card-id">E2</span><span class="card-title">Answer one folder health/freshness question with a context query</span></div><div class="chips"><span class="chip" data-kind="module">ontology</span><span class="chip" data-kind="phase">P4</span><span class="chip" data-kind="type">requirement</span><span class="chip" data-kind="priority">p2</span><span class="chip" data-kind="model-agent">opus / main</span></div><div class="epic">context-graph</div><div class="deps"><span class="deps-label">depends on:</span> <a class="dep-link" href="#card-E1" data-target="card-E1">E1</a></div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> one Cypher query returns latest result + resultTime per folder on sample data; documented in docs/</p></div></div>
+<div class="card ready" id="card-F1" data-id="F1" data-module="config" data-phase="5" data-epic="orchestrator-expansion" data-type="requirement" data-status="todo" data-search="f1 map the autosys crosswalk to the bmc baseline" tabindex="0"><div class="card-head"><span class="card-id">F1</span><span class="card-title">Map the AutoSys crosswalk to the BMC baseline</span></div><div class="chips"><span class="chip" data-kind="module">config</span><span class="chip" data-kind="phase">P5</span><span class="chip" data-kind="type">requirement</span><span class="chip" data-kind="priority">p3</span><span class="chip" data-kind="model-agent">sonnet / pipeline-config</span></div><div class="epic">orchestrator-expansion</div><div class="deps"><span class="deps-label">depends on:</span> <a class="dep-link" href="#card-C1" data-target="card-C1">C1</a></div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> AutoSys crosswalk fully mapped to baseline; no invented concepts; gate logged; confirmed:true</p></div></div>
+<div class="card ready" id="card-F2" data-id="F2" data-module="config" data-phase="5" data-epic="orchestrator-expansion" data-type="requirement" data-status="todo" data-search="f2 map the airflow/mwaa crosswalk to the bmc baseline" tabindex="0"><div class="card-head"><span class="card-id">F2</span><span class="card-title">Map the Airflow/MWAA crosswalk to the BMC baseline</span></div><div class="chips"><span class="chip" data-kind="module">config</span><span class="chip" data-kind="phase">P5</span><span class="chip" data-kind="type">requirement</span><span class="chip" data-kind="priority">p3</span><span class="chip" data-kind="model-agent">sonnet / pipeline-config</span></div><div class="epic">orchestrator-expansion</div><div class="deps"><span class="deps-label">depends on:</span> <a class="dep-link" href="#card-C1" data-target="card-C1">C1</a></div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> Airflow/MWAA crosswalk fully mapped to baseline; no invented concepts; gate logged; confirmed:true</p></div></div>
+<div class="card" id="card-G3" data-id="G3" data-module="drydocs-remediation" data-phase="6" data-epic="component-topology" data-type="requirement" data-status="todo" data-search="g3 rebase the remediation spinoff onto drydocs-core" tabindex="0"><div class="card-head"><span class="card-id">G3</span><span class="card-title">Rebase the remediation spinoff onto drydocs-core</span></div><div class="chips"><span class="chip" data-kind="module">drydocs-remediation</span><span class="chip" data-kind="phase">P6</span><span class="chip" data-kind="type">requirement</span><span class="chip" data-kind="priority">p2</span><span class="chip" data-kind="model-agent">opus / main</span></div><div class="epic">component-topology</div><div class="deps"><span class="deps-label">depends on:</span> <a class="dep-link" href="#card-G2" data-target="card-G2">G2</a></div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> Per 0002-B: drydocs-remediation runs detect → transform → prove → Jira using ONLY drydocs-core for parsing + read-only corroboration; no-graph-write test, Jira-only test, and offline-equivalence proof all pass; boundary test holds for the new package.
+</p><p class="notes"><strong>Notes:</strong> ADR 0002 follow-up #3; checklist = 0002-B. Re-home its Control-M parsing onto core (drop the spinoff&#x27;s own parser); keep only remediation logic. Writes NO graph; Jira = SoR. See reconcile-port skill. On done: mark the controlm-spinoff archive superseded.
+</p></div></div>
+<div class="card" id="card-G4" data-id="G4" data-module="drydocs-lineage" data-phase="6" data-epic="component-topology" data-type="requirement" data-status="todo" data-search="g4 scaffold the lineage and deepdoc component packages" tabindex="0"><div class="card-head"><span class="card-id">G4</span><span class="card-title">Scaffold the lineage and deepdoc component packages</span></div><div class="chips"><span class="chip" data-kind="module">drydocs-lineage</span><span class="chip" data-kind="phase">P6</span><span class="chip" data-kind="type">requirement</span><span class="chip" data-kind="priority">p3</span><span class="chip" data-kind="model-agent">opus / main</span></div><div class="epic">component-topology</div><div class="deps"><span class="deps-label">depends on:</span> <a class="dep-link" href="#card-G1" data-target="card-G1">G1</a> <a class="dep-link" href="#card-G2" data-target="card-G2">G2</a></div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> drydocs-lineage and drydocs-deepdoc exist as separate packages that import ONLY drydocs-core and SHARE the core command-line/lineage parser; lineage writes curated lineage to drydocs; deepdoc writes to drydocs_context stamping reliability/trust; neither imports the other; boundary test passes.
+</p><p class="notes"><strong>Notes:</strong> ADR 0002 follow-up #4 (D2). Scaffold only — wiring the real triggers (phased curation for lineage; on-failure for deepdoc) is later. deepdoc needs drydocs_context (G1). The lineage package is then populated by re-homing the depgraph prototype — see G9 + ADR 0002-C.
+</p></div></div>
+<div class="card ready" id="card-G8" data-id="G8" data-module="drydocs-core" data-phase="6" data-epic="component-topology" data-type="task" data-status="todo" data-search="g8 fold the depgraph parser deltas into the core control-m parser" tabindex="0"><div class="card-head"><span class="card-id">G8</span><span class="card-title">Fold the depgraph parser deltas into the core Control-M parser</span></div><div class="chips"><span class="chip" data-kind="module">drydocs-core</span><span class="chip" data-kind="phase">P6</span><span class="chip" data-kind="type">task</span><span class="chip" data-kind="priority">p2</span><span class="chip" data-kind="model-agent">opus / main</span></div><div class="epic">component-topology</div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> The three depgraph parser deltas are folded into the drydocs-core Control-M parser (drydocs/controlm/commands.py, re-exported by drydocs_core): (1) .pset -&gt; ABINITIO launcher rule; (2) _looks_script() so `spark-submit --master yarn x.py` resolves x.py NOT yarn (a live correctness bug) — with a regression test; (3) +pset in the direct-script extension regex. Core parser reproduces depgraph&#x27;s test_controlm.py outputs (25 processes / 13 INVOKES on the 13-job sample). Gates green; boundary test unaffected.
+</p><p class="notes"><strong>Notes:</strong> ADR 0002-C §3. Independently valuable — fixes a live spark-submit bug DryDocs still has and collapses the dual-parser sync tax depgraph itself flags (&quot;keep in sync with DryDocs&quot;). Fold is a CORE change, never a component-side parser fork (0002-A §4). Do early; does not need the G2 physical relocate (the shim re-exports the file). BLOCKS the clean G9 re-home.
+</p></div></div>
+<div class="card" id="card-G9" data-id="G9" data-module="drydocs-lineage" data-phase="6" data-epic="component-topology" data-type="requirement" data-status="todo" data-search="g9 re-home the depgraph lineage assets onto drydocs-core" tabindex="0"><div class="card-head"><span class="card-id">G9</span><span class="card-title">Re-home the depgraph lineage assets onto drydocs-core</span></div><div class="chips"><span class="chip" data-kind="module">drydocs-lineage</span><span class="chip" data-kind="phase">P6</span><span class="chip" data-kind="type">requirement</span><span class="chip" data-kind="priority">p3</span><span class="chip" data-kind="model-agent">opus / main</span></div><div class="epic">component-topology</div><div class="deps"><span class="deps-label">depends on:</span> <a class="dep-link" href="#card-G4" data-target="card-G4">G4</a> <a class="dep-link" href="#card-G8" data-target="card-G8">G8</a></div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> depgraph&#x27;s lineage assets are re-homed into the lineage/ package on drydocs-core (per 0002-C §4): model v2 (ProcessNode/DataAssetNode/typed rels) reconciled to DryDocs identity (assetId / ControlMJob(folder_id,job_id) URNs), controlm_inventory extractor, html-review SME surface, the curated drydocs-DB load (depgraph&#x27;s planned Fork-3 profile), and the RHEL run-as-user collector. lineage imports ONLY drydocs_core.* and contains no Control-M parse code of its own; writes ground truth ONLY to drydocs; shared-parser + boundary + ground-truth tests pass; gates green. depgraph feat/controlm-lineage recorded as superseded source material.
+</p><p class="notes"><strong>Notes:</strong> ADR 0002-C (Option A — absorb). Re-home, not merge: histories disjoint, use reconcile-port. Parser is dropped (already in core via G8). Validate the ProcessNode/DataAsset -&gt; DCAT/PROV/SWO mapping with neo4j-modeling before authoring load Cypher with neo4j-cypher (MERGE, UNWIND, no CYPHER 25). On done: mark depgraph PR #2 superseded for the lineage assets in ADR 0002 rollout.
+</p></div></div>
+<div class="card ready" id="card-G5" data-id="G5" data-module="docs" data-phase="6" data-epic="component-topology" data-type="chore" data-status="todo" data-search="g5 document the context→ground-truth promotion path" tabindex="0"><div class="card-head"><span class="card-id">G5</span><span class="card-title">Document the context→ground-truth promotion path</span></div><div class="chips"><span class="chip" data-kind="module">docs</span><span class="chip" data-kind="phase">P6</span><span class="chip" data-kind="type">chore</span><span class="chip" data-kind="priority">p2</span><span class="chip" data-kind="model-agent">sonnet / ontology-mapper</span></div><div class="epic">component-topology</div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> 03-hitl-sme-flow.md gains a &quot;promotion: drydocs_context → drydocs&quot; section stating an uncertain node is promoted ONLY via a gate-confirmed WRITE to drydocs (status: proposed → loader), never an in-place cross-DB edit; includes the per-item decision presentation + the gate-log audit requirement.
+</p><p class="notes"><strong>Notes:</strong> ADR 0002 follow-up #5. Documents the trust-promotion path (trust axis = DB boundary). No code. Writable now; references G1&#x27;s DBs conceptually, not as a hard dep.
+</p></div></div>
+<div class="card ready" id="card-G6" data-id="G6" data-module="docs" data-phase="6" data-epic="component-topology" data-type="chore" data-status="todo" data-search="g6 cross-link the rejected topology alternatives" tabindex="0"><div class="card-head"><span class="card-id">G6</span><span class="card-title">Cross-link the rejected topology alternatives</span></div><div class="chips"><span class="chip" data-kind="module">docs</span><span class="chip" data-kind="phase">P6</span><span class="chip" data-kind="type">chore</span><span class="chip" data-kind="priority">p3</span><span class="chip" data-kind="model-agent">haiku / reference-librarian</span></div><div class="epic">component-topology</div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> The three rejected alternatives (Community single-DB, two-mode capability, polyrepo) are discoverable from the architecture entry point (linked/cross-referenced from the restructure index or README), not only inside the ADR — so they are not re-litigated.
+</p><p class="notes"><strong>Notes:</strong> ADR 0002 follow-up #6. The ADR already records them in Options Considered; this just adds a durable pointer. Small hygiene task.
+</p></div></div>
+<div class="card ready" id="card-I3" data-id="I3" data-module="docs" data-phase="8" data-epic="project-board" data-type="requirement" data-status="todo" data-search="i3 groom-backlog skill: raw notes -&gt; backlog items" tabindex="0"><div class="card-head"><span class="card-id">I3</span><span class="card-title">Groom-backlog skill: raw notes -&gt; backlog items</span></div><div class="chips"><span class="chip" data-kind="module">docs</span><span class="chip" data-kind="phase">P8</span><span class="chip" data-kind="type">requirement</span><span class="chip" data-kind="priority">p2</span><span class="chip" data-kind="model-agent">opus / main</span></div><div class="epic">project-board</div><div class="deps"><span class="deps-label">depends on:</span> <a class="dep-link" href="#card-I1" data-target="card-I1">I1</a></div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> .claude/skills/groom-backlog/SKILL.md exists: takes raw notes (pasted text, IDEAS.md inbox, or a transcribed photo of paper notes), emits either IDEAS.md inbox lines or full v2 items (title/type/module/phase/acceptance), asks the user only when module/phase is genuinely ambiguous, moves groomed lines to the IDEAS.md audit trail, updates summary/next_ready, and regenerates the board once I2 has landed. test_backlog.py green after a groom run.
+</p><p class="notes"><strong>Notes:</strong> Author the skill once with opus (it shapes every future grooming run); routine weekly grooming then runs on sonnet. This is the paper-notes killer — capture stays zero-schema.
+</p></div></div>
+<div class="card ready" id="card-I4" data-id="I4" data-module="docs" data-phase="8" data-epic="project-board" data-type="chore" data-status="todo" data-search="i4 regenerate the board in the session-end ritual" tabindex="0"><div class="card-head"><span class="card-id">I4</span><span class="card-title">Regenerate the board in the session-end ritual</span></div><div class="chips"><span class="chip" data-kind="module">docs</span><span class="chip" data-kind="phase">P8</span><span class="chip" data-kind="type">chore</span><span class="chip" data-kind="priority">p3</span><span class="chip" data-kind="model-agent">haiku / main</span></div><div class="epic">project-board</div><div class="deps"><span class="deps-label">depends on:</span> <a class="dep-link" href="#card-I2" data-target="card-I2">I2</a></div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> The CLAUDE.md session ritual regenerates docs/plan/board.html at session end alongside the depgraph snapshot (render script wired next to snapshot.ps1), so the committed board can never go stale for more than one session.
+</p></div></div></div></div>
+<div class="column" data-status="in_progress"><div class="column-head"><h2>In progress</h2><span class="count" data-count-for="in_progress">2</span></div><div class="column-body"><div class="card" id="card-G1" data-id="G1" data-module="graph-infra" data-phase="6" data-epic="component-topology" data-type="task" data-status="in_progress" data-search="g1 author and locally validate the multi-db topology" tabindex="0"><div class="card-head"><span class="card-id">G1</span><span class="card-title">Author and locally validate the multi-DB topology</span></div><div class="chips"><span class="chip" data-kind="module">graph-infra</span><span class="chip" data-kind="phase">P6</span><span class="chip" data-kind="type">task</span><span class="chip" data-kind="priority">p1</span><span class="chip" data-kind="model-agent">opus / main</span></div><div class="epic">component-topology</div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> Provisioning authored + validated on a LOCAL Neo4j Enterprise (Docker, free dev license): CREATE DATABASE drydocs + drydocs_context, CREATE COMPOSITE DATABASE drydocs_all aliasing both; assetId/jobId uniqueness constraints + indexes in BOTH data DBs (proxy-node keys); a drydocs_all smoke query reads both constituents and writes neither. Scripts are target-agnostic (run unchanged against any multi-DB-capable DBMS).
+</p><p class="notes"><strong>Notes:</strong> ADR 0002 follow-up #1, split for infra reality. TESTING is capped at ONE database on the live Aura tier (single node) — multi-DB + composite are Enterprise-only features. So the topology is authored + proven on a LOCAL Enterprise instance now; the LIVE deploy is G7 (blocked on infra). No data load — provisioning + proxy-node constraints only. See memory drydocs1-live-neo4j.
+</p></div></div>
+<div class="card" id="card-G2" data-id="G2" data-module="drydocs-core" data-phase="6" data-epic="component-topology" data-type="task" data-status="in_progress" data-search="g2 extract drydocs-core behind the boundary shim" tabindex="0"><div class="card-head"><span class="card-id">G2</span><span class="card-title">Extract drydocs-core behind the boundary shim</span></div><div class="chips"><span class="chip" data-kind="module">drydocs-core</span><span class="chip" data-kind="phase">P6</span><span class="chip" data-kind="type">task</span><span class="chip" data-kind="priority">p1</span><span class="chip" data-kind="model-agent">opus / main</span></div><div class="epic">component-topology</div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> Per 0002-A done criteria: drydocs-core imports cleanly with NO component dependency; drydocs-load runs the existing pipeline unchanged; tests/unit/test_module_boundary.py passes; gates green (pytest -q, package import, --help).
+</p><p class="notes"><strong>Notes:</strong> ADR 0002 follow-up #2; plan = 0002-A (thin, zero behavior change). BLOCKS G3 + G4. Shim/ re-export first, then relocate; borderline staging.py + snapshots/writer.py → load (0002-A §6).
+</p></div></div></div></div>
+<div class="column" data-status="blocked"><div class="column-head"><h2>Blocked</h2><span class="count" data-count-for="blocked">1</span></div><div class="column-body"><div class="card" id="card-G7" data-id="G7" data-module="graph-infra" data-phase="6" data-epic="component-topology" data-type="task" data-status="blocked" data-search="g7 deploy the multi-db topology to the live target" tabindex="0"><div class="card-head"><span class="card-id">G7</span><span class="card-title">Deploy the multi-DB topology to the live target</span></div><div class="chips"><span class="chip" data-kind="module">graph-infra</span><span class="chip" data-kind="phase">P6</span><span class="chip" data-kind="type">task</span><span class="chip" data-kind="priority">p2</span><span class="chip" data-kind="model-agent">opus / main</span></div><div class="epic">component-topology</div><div class="deps"><span class="deps-label">depends on:</span> <a class="dep-link" href="#card-G1" data-target="card-G1">G1</a></div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> The G1 topology (drydocs + drydocs_context + drydocs_all composite + proxy-node constraints) is deployed to the production target and a drydocs_all smoke query passes there.
+</p><p class="notes"><strong>Notes:</strong> ADR 0002 follow-up #1 (LIVE deploy). BLOCKED: the current Aura tier is limited to ONE node / one database — it cannot host drydocs_context + a composite. Unblock = a multi-DB-capable Enterprise target (Aura Virtual Dedicated Cloud / Business Critical, or self-managed Neo4j Enterprise). Procurement/ops gate, not a code gate. Until then G4&#x27;s deepdoc runs local-only.
+</p></div></div></div></div>
+<div class="column" data-status="done"><div class="column-head"><h2>Done</h2><span class="count" data-count-for="done">23</span></div><div class="column-body"><div class="card" id="card-A1" data-id="A1" data-module="reference" data-phase="0" data-epic="reference-hygiene" data-type="chore" data-status="done" data-search="a1 audit reference registry paths for staleness" tabindex="0"><div class="card-head"><span class="card-id">A1</span><span class="card-title">Audit reference registry paths for staleness</span></div><div class="chips"><span class="chip" data-kind="module">reference</span><span class="chip" data-kind="phase">P0</span><span class="chip" data-kind="type">chore</span><span class="chip" data-kind="priority">p2</span><span class="chip" data-kind="model-agent">haiku / reference-librarian</span></div><div class="epic">reference-hygiene</div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> every entry marked ok/stale; stale paths fixed or flagged</p><p class="notes"><strong>Notes:</strong> Done 2026-06-21. All local mirrors + platform/standard doc paths resolve; no stale entries. verified: 2026-06-21 in REGISTRY.yaml.</p></div></div>
+<div class="card" id="card-A2" data-id="A2" data-module="reference" data-phase="0" data-epic="reference-hygiene" data-type="chore" data-status="done" data-search="a2 account for every bmc doc in the source manifest" tabindex="0"><div class="card-head"><span class="card-id">A2</span><span class="card-title">Account for every BMC doc in the source manifest</span></div><div class="chips"><span class="chip" data-kind="module">reference</span><span class="chip" data-kind="phase">P0</span><span class="chip" data-kind="type">chore</span><span class="chip" data-kind="priority">p3</span><span class="chip" data-kind="model-agent">haiku / reference-librarian</span></div><div class="epic">reference-hygiene</div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> every .md in bmc-controlm/ accounted for in the manifest</p><p class="notes"><strong>Notes:</strong> Done 2026-06-21. All 26 bmc-controlm .md files are referenced in SOURCE-MANIFEST.md (0 uncovered).</p></div></div>
+<div class="card" id="card-A3" data-id="A3" data-module="reference" data-phase="0" data-epic="reference-hygiene" data-type="chore" data-status="done" data-search="a3 seed the research index with linked rationale" tabindex="0"><div class="card-head"><span class="card-id">A3</span><span class="card-title">Seed the research index with linked rationale</span></div><div class="chips"><span class="chip" data-kind="module">reference</span><span class="chip" data-kind="phase">P0</span><span class="chip" data-kind="type">chore</span><span class="chip" data-kind="priority">p3</span><span class="chip" data-kind="model-agent">haiku / reference-librarian</span></div><div class="epic">reference-hygiene</div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> &gt;=5 rows, each with a working link and a &#x27;why it matters&#x27;</p><p class="notes"><strong>Notes:</strong> Done 2026-06-21. 7 rows with working links (3 Neo4j blogs + PROV-O/SOSA/ORG/agent-memory) + why-it-matters.</p></div></div>
+<div class="card" id="card-B1" data-id="B1" data-module="taxonomy" data-phase="1" data-epic="taxonomy-capture" data-type="task" data-status="done" data-search="b1 capture control-m folders/jobs/conditions as taxonomy" tabindex="0"><div class="card-head"><span class="card-id">B1</span><span class="card-title">Capture Control-M folders/jobs/conditions as taxonomy</span></div><div class="chips"><span class="chip" data-kind="module">taxonomy</span><span class="chip" data-kind="phase">P1</span><span class="chip" data-kind="type">task</span><span class="chip" data-kind="priority">p1</span><span class="chip" data-kind="model-agent">sonnet / taxonomy-importer</span></div><div class="epic">taxonomy-capture</div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> faithful classification of the source CSVs; zero meaning edges in the file</p><p class="notes"><strong>Notes:</strong> Done 2026-06-20. Captured 4 servers / 8 folders / 13 jobs / 15 conditions (7 distinct names), classification only. Count drift RESOLVED: bundled sample treated as canonical; README m3-verify block reconciled (8/13/15/10). Residual flagged: sample is reduced (folders 161020, 160501 active-but-jobless -&gt; m3-verify empty=2) — regenerate from psgmgr to restore. See controlm.yaml open_questions#count-drift-vs-doc (status: resolved-2026-06-20).
+</p></div></div>
+<div class="card" id="card-B2" data-id="B2" data-module="taxonomy" data-phase="1" data-epic="taxonomy-capture" data-type="task" data-status="done" data-search="b2 capture seal business applications as taxonomy" tabindex="0"><div class="card-head"><span class="card-id">B2</span><span class="card-title">Capture SEAL business applications as taxonomy</span></div><div class="chips"><span class="chip" data-kind="module">taxonomy</span><span class="chip" data-kind="phase">P1</span><span class="chip" data-kind="type">task</span><span class="chip" data-kind="priority">p1</span><span class="chip" data-kind="model-agent">sonnet / taxonomy-importer</span></div><div class="epic">taxonomy-capture</div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> every BusinessApplication has its two-port classification; no ownership semantics asserted</p><p class="notes"><strong>Notes:</strong> Done 2026-06-20. Generic concept BusinessApplication (SEAL = source of record, id = SEALID, per SME note). 3 apps / 2 ports each / 15 memberships / 6 roles. Employees by SID (real names confidential -&gt; internal/). classification: Internal-Confidential. Noted SEAL&#x27;s own info_classification correlates with the sensitivity axis (flag for C2).
+</p></div></div>
+<div class="card" id="card-B3" data-id="B3" data-module="taxonomy" data-phase="1" data-epic="taxonomy-capture" data-type="task" data-status="done" data-search="b3 capture the lob→product→team hierarchy as taxonomy" tabindex="0"><div class="card-head"><span class="card-id">B3</span><span class="card-title">Capture the LOB→Product→Team hierarchy as taxonomy</span></div><div class="chips"><span class="chip" data-kind="module">taxonomy</span><span class="chip" data-kind="phase">P1</span><span class="chip" data-kind="type">task</span><span class="chip" data-kind="priority">p1</span><span class="chip" data-kind="model-agent">sonnet / taxonomy-importer</span></div><div class="epic">taxonomy-capture</div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> hierarchy matches catalog samples; confidential names referenced by id, not value</p><p class="notes"><strong>Notes:</strong> Done 2026-06-20. LOB ▸ ProductLine ▸ Product ▸ DevTeam: 5/5/6/6. AreaProduct + BusinessSegment NOT in sample (flagged OQ). classification: Internal-Confidential.
+</p></div></div>
+<div class="card" id="card-B4" data-id="B4" data-module="taxonomy" data-phase="1" data-epic="taxonomy-capture" data-type="task" data-status="done" data-search="b4 capture the oracle schema shape template as taxonomy" tabindex="0"><div class="card-head"><span class="card-id">B4</span><span class="card-title">Capture the Oracle schema shape template as taxonomy</span></div><div class="chips"><span class="chip" data-kind="module">taxonomy</span><span class="chip" data-kind="phase">P1</span><span class="chip" data-kind="type">task</span><span class="chip" data-kind="priority">p2</span><span class="chip" data-kind="model-agent">sonnet / taxonomy-importer</span></div><div class="epic">taxonomy-capture</div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> structure present; no real schema/table/SID values committed outside internal/</p><p class="notes"><strong>Notes:</strong> Done 2026-06-20 as a SHAPE TEMPLATE (no sample; source confirmed:false). Schema ▸ Table; Script with placeholder ids; real names -&gt; internal/schemas/ by id. classification: Internal-Confidential.
+</p></div></div>
+<div class="card" id="card-C1" data-id="C1" data-module="ontology" data-phase="2" data-epic="ontology-mapping" data-type="task" data-status="done" data-search="c1 confirm control-m edge mappings through the hitl gate" tabindex="0"><div class="card-head"><span class="card-id">C1</span><span class="card-title">Confirm Control-M edge mappings through the HITL gate</span></div><div class="chips"><span class="chip" data-kind="module">ontology</span><span class="chip" data-kind="phase">P2</span><span class="chip" data-kind="type">task</span><span class="chip" data-kind="priority">p1</span><span class="chip" data-kind="model-agent">sonnet / ontology-mapper</span></div><div class="epic">ontology-mapping</div><div class="deps"><span class="deps-label">depends on:</span> <a class="dep-link" href="#card-B1" data-target="card-B1">B1</a></div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> each Control-M edge type traces to a matrix row or recorded alias; gate run logged</p><p class="notes"><strong>Notes:</strong> Done 2026-06-21. 4 edges confirmed via HITL gate (batch — all reuse active vocab terms): SCHEDULED_ON (null PROV, infra), REQUIRES_IN_CONDITION (prov:used), EMITS_OUT_CONDITION (prov:generated), WAS_INFORMED_BY (prov:wasInformedBy). CONTAINS_JOB already applied. Gate run logged in config/gate-log.md.
+</p></div></div>
+<div class="card" id="card-C2" data-id="C2" data-module="ontology" data-phase="2" data-epic="ontology-mapping" data-type="task" data-status="done" data-search="c2 confirm seal mappings against dprod/org terms" tabindex="0"><div class="card-head"><span class="card-id">C2</span><span class="card-title">Confirm SEAL mappings against DPROD/ORG terms</span></div><div class="chips"><span class="chip" data-kind="module">ontology</span><span class="chip" data-kind="phase">P2</span><span class="chip" data-kind="type">task</span><span class="chip" data-kind="priority">p1</span><span class="chip" data-kind="model-agent">sonnet / ontology-mapper</span></div><div class="epic">ontology-mapping</div><div class="deps"><span class="deps-label">depends on:</span> <a class="dep-link" href="#card-B2" data-target="card-B2">B2</a></div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> DPROD/ORG terms cited; mappings confirmed</p><p class="notes"><strong>Notes:</strong> Done 2026-06-21 via HITL gate. 4 confirmed (batch, reuse active seal_*): HAS_PORT (dprod), HAS_MEMBERSHIP (org), OF_ROLE (org), HELD_BY (org). Concept BusinessApplication / SEALID.
+</p></div></div>
+<div class="card" id="card-C3" data-id="C3" data-module="ontology" data-phase="2" data-epic="ontology-mapping" data-type="task" data-status="done" data-search="c3 confirm catalog hierarchy mappings; resolve supports range" tabindex="0"><div class="card-head"><span class="card-id">C3</span><span class="card-title">Confirm catalog hierarchy mappings; resolve SUPPORTS range</span></div><div class="chips"><span class="chip" data-kind="module">ontology</span><span class="chip" data-kind="phase">P2</span><span class="chip" data-kind="type">task</span><span class="chip" data-kind="priority">p1</span><span class="chip" data-kind="model-agent">sonnet / ontology-mapper</span></div><div class="epic">ontology-mapping</div><div class="deps"><span class="deps-label">depends on:</span> <a class="dep-link" href="#card-B3" data-target="card-B3">B3</a></div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> no free-text union ranges (resolve SUPPORTS Product-vs-AreaProduct); each edge has precise from/to + authority tag</p><p class="notes"><strong>Notes:</strong> Done 2026-06-21 via HITL gate. 4 hierarchy edges confirmed + SUPPORTS range RESOLVED: SUPPORTS → AreaProduct (&#x27;aligned to&#x27; = team_type=aligned); NEW DevTeam DEVELOPS BusinessApplication joined by SEALID. C4 must set catalog_supports_area_product + arch_develops active and deprecate catalog_supports (DevTeam→Product). Gate logged.
+</p></div></div>
+<div class="card" id="card-C4" data-id="C4" data-module="ontology" data-phase="2" data-epic="ontology-mapping" data-type="task" data-status="done" data-search="c4 reconcile the relationship vocabulary with the confirmed map" tabindex="0"><div class="card-head"><span class="card-id">C4</span><span class="card-title">Reconcile the relationship vocabulary with the confirmed map</span></div><div class="chips"><span class="chip" data-kind="module">ontology</span><span class="chip" data-kind="phase">P2</span><span class="chip" data-kind="type">task</span><span class="chip" data-kind="priority">p1</span><span class="chip" data-kind="model-agent">sonnet / ontology-mapper</span></div><div class="epic">ontology-mapping</div><div class="deps"><span class="deps-label">depends on:</span> <a class="dep-link" href="#card-C1" data-target="card-C1">C1</a> <a class="dep-link" href="#card-C2" data-target="card-C2">C2</a> <a class="dep-link" href="#card-C3" data-target="card-C3">C3</a></div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> test_schema.py drift guard green; map summary == vocabulary active count</p><p class="notes"><strong>Notes:</strong> Done 2026-06-21. Reconciled vocabulary to the confirmed map: catalog_supports_area_product + arch_develops set active (added DEVELOPS block to catalog_ontology_supplement.cypher); catalog_supports (DevTeam→Product) deprecated. Drift guard green (9 passed); 164 passed. Remaining phase-2 `planned` entries (m3_invokes/triggers, p2_*, etc.) stay planned until their taxonomy is captured — not re-gated now (no data). Epic C complete.
+</p></div></div>
+<div class="card" id="card-D1" data-id="D1" data-module="drydocs-load" data-phase="3" data-epic="config-loaders" data-type="bug" data-status="done" data-search="d1 land the p0 loader fixes (scheduled_on, datetime, stale edges)" tabindex="0"><div class="card-head"><span class="card-id">D1</span><span class="card-title">Land the P0 loader fixes (SCHEDULED_ON, datetime, stale edges)</span></div><div class="chips"><span class="chip" data-kind="module">drydocs-load</span><span class="chip" data-kind="phase">P3</span><span class="chip" data-kind="type">bug</span><span class="chip" data-kind="priority">p0</span><span class="chip" data-kind="model-agent">opus / main</span></div><div class="epic">config-loaders</div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> RUNS_ON-&gt;SCHEDULED_ON + datetime() + stale_edge_cleanup landed; migrations idempotent; m3-verify green; tests green</p><p class="notes"><strong>Notes:</strong> Done 2026-06-21. B.1: folders.cypher writes SCHEDULED_ON (was RUNS_ON — a real bug; cli.py m3-verify already expected SCHEDULED_ON) + idempotent migrate_runs_on_to_scheduled_on.cypher. B.2: stale_edge_cleanup.cypher (for the incremental loader). B.3: empty-safe, space-&gt;T-tolerant datetime() on capture_date/last_updated/active_from/active_till; version_timestamp left as string (compact YYYYMMDDHHMMSS, not ISO). 164 tests pass. m3-verify needs a live Neo4j+APOC to run; the loader now matches its SCHEDULED_ON expectation. (D2/D3 = config-driven loaders, next.)
+</p></div></div>
+<div class="card" id="card-D2" data-id="D2" data-module="config" data-phase="3" data-epic="config-loaders" data-type="task" data-status="done" data-search="d2 drive catalog reconciliation from precedence.yaml" tabindex="0"><div class="card-head"><span class="card-id">D2</span><span class="card-title">Drive catalog reconciliation from precedence.yaml</span></div><div class="chips"><span class="chip" data-kind="module">config</span><span class="chip" data-kind="phase">P3</span><span class="chip" data-kind="type">task</span><span class="chip" data-kind="priority">p2</span><span class="chip" data-kind="model-agent">sonnet / pipeline-config</span></div><div class="epic">config-loaders</div><div class="deps"><span class="deps-label">depends on:</span> <a class="dep-link" href="#card-C3" data-target="card-C3">C3</a> <a class="dep-link" href="#card-D1" data-target="card-D1">D1</a></div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> flipping order: in precedence.yaml changes RECONCILES_TO resolution with no code edit</p><p class="notes"><strong>Notes:</strong> Done 2026-06-21. New drydocs/precedence.py: PrecedenceResolver reads config/precedence.yaml (order + active toggles + conflict_policy); resolve(claims) -&gt; highest active authority with an opinion wins, losers kept as aliases (skos:closeMatch, never dropped). Wired into the RECONCILES_TO path: CatalogLOBsLoader.to_params resolves via resolve_lob_reconciliation; catalog_lobs.cypher now records r.authority + r.aliases. test_precedence.py (10 tests) proves the acceptance — flipping order: in a YAML (loaded via from_yaml) flips both the resolver winner AND the catalog reconciled segment, no code edit. pyyaml promoted to a runtime dep. 174 passed.
+</p></div></div>
+<div class="card" id="card-D3" data-id="D3" data-module="config" data-phase="3" data-epic="config-loaders" data-type="task" data-status="done" data-search="d3 fail fast when loading an unconfirmed source" tabindex="0"><div class="card-head"><span class="card-id">D3</span><span class="card-title">Fail fast when loading an unconfirmed source</span></div><div class="chips"><span class="chip" data-kind="module">config</span><span class="chip" data-kind="phase">P3</span><span class="chip" data-kind="type">task</span><span class="chip" data-kind="priority">p2</span><span class="chip" data-kind="model-agent">sonnet / pipeline-config</span></div><div class="epic">config-loaders</div><div class="deps"><span class="deps-label">depends on:</span> <a class="dep-link" href="#card-C4" data-target="card-C4">C4</a> <a class="dep-link" href="#card-D1" data-target="card-D1">D1</a></div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> loading a source with confirmed:false fails fast with a clear message</p><p class="notes"><strong>Notes:</strong> Done 2026-06-21. New drydocs/source_registry.py: SourceRegistry.require_confirmed(id) raises UnconfirmedSourceError (clear message + crosswalk pointer) for confirmed:false or missing-flag (fail-closed), UnknownSourceError for undeclared ids. cli.py: LOADER_SOURCE map + _gate_source() wired into load / refresh-reference / ingest-controlm — gate fires BEFORE any adapter/Neo4j touch (exit 2). test_source_registry.py (6) incl. a CliRunner test proving `drydocs load` fails fast for an unconfirmed source. 180 passed.
+</p></div></div>
+<div class="card" id="card-H1" data-id="H1" data-module="drydocs-review" data-phase="7" data-epic="drydocs-review-backflow" data-type="task" data-status="done" data-search="h1 reproduce graph_verify + review_labels (offline spine)" tabindex="0"><div class="card-head"><span class="card-id">H1</span><span class="card-title">Reproduce graph_verify + review_labels (offline spine)</span></div><div class="chips"><span class="chip" data-kind="module">drydocs-review</span><span class="chip" data-kind="phase">P7</span><span class="chip" data-kind="type">task</span><span class="chip" data-kind="priority">p2</span><span class="chip" data-kind="model-agent">opus / main</span></div><div class="epic">drydocs-review-backflow</div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> graph_verify + review_labels reproduced generically (offline spine): review_labels is a typed accessor over a sanitized review-labels.yaml (vendor-bmc seed, no internal sources); graph_verify loads YAML TC-* suites + evaluate is pure/offline with unit tests; both carry a classification entry; Track-1 stays green. No real SIDs / sources / Confluence coords.
+</p><p class="notes"><strong>Notes:</strong> Done 2026-07-01. drydocs/review_labels.py + drydocs/graph_verify.py (pure load/evaluate; run_* takes a duck-typed GraphRunner so no Neo4j import), config/review-labels.yaml + graph-tests/vendor-bmc-smoke.yaml (both classification: Internal-Public), tests/unit/test_review_labels.py + test_graph_verify.py (27 tests). NOT wired into cli.py (entrypoint-boundary decision — see H-TODO). Full suite 214 passed.
+</p></div></div>
+<div class="card" id="card-H2" data-id="H2" data-module="drydocs-review" data-phase="7" data-epic="drydocs-review-backflow" data-type="task" data-status="done" data-search="h2 reproduce the graph_review html renderer" tabindex="0"><div class="card-head"><span class="card-id">H2</span><span class="card-title">Reproduce the graph_review HTML renderer</span></div><div class="chips"><span class="chip" data-kind="module">drydocs-review</span><span class="chip" data-kind="phase">P7</span><span class="chip" data-kind="type">task</span><span class="chip" data-kind="priority">p2</span><span class="chip" data-kind="model-agent">opus / main</span></div><div class="epic">drydocs-review-backflow</div><div class="deps"><span class="deps-label">depends on:</span> <a class="dep-link" href="#card-H1" data-target="card-H1">H1</a></div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> graph_review reproduced: pure HTML renderer (no Neo4j in module — CLI hands it rows), one section per DATA label, hidden_props stripped; offline unit test renders a fixture row set. classification set.
+</p><p class="notes"><strong>Notes:</strong> Done 2026-07-01. drydocs/graph_review.py: render_review({label: [props]}) → self-contained HTML, DEFAULT_HIDDEN_PROPS + `_`-prefixed keys stripped, provenance from the review spine on each header; group_rows() helper. 6 unit tests. Added to review boundary group.
+</p></div></div>
+<div class="card" id="card-H3" data-id="H3" data-module="drydocs-review" data-phase="7" data-epic="drydocs-review-backflow" data-type="task" data-status="done" data-search="h3 reproduce the sme-notes harvester" tabindex="0"><div class="card-head"><span class="card-id">H3</span><span class="card-title">Reproduce the SME-notes harvester</span></div><div class="chips"><span class="chip" data-kind="module">drydocs-review</span><span class="chip" data-kind="phase">P7</span><span class="chip" data-kind="type">task</span><span class="chip" data-kind="priority">p3</span><span class="chip" data-kind="model-agent">opus / main</span></div><div class="epic">drydocs-review-backflow</div><div class="deps"><span class="deps-label">depends on:</span> <a class="dep-link" href="#card-H1" data-target="card-H1">H1</a></div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> sme_notes harvester reproduced: scans repo for owner-attributed notes, routes typed sub-tags to $FR/$UC/$OQ/$NOTES; SID format is generic/synthetic, no real SIDs committed. Unit test on a fixture tree.
+</p><p class="notes"><strong>Notes:</strong> Done 2026-07-01. drydocs/sme_notes.py: SME[sid] $FR/$UC/$OQ/$NOTES grammar; harvest_text/file/tree (read-only, excludes data/ + non-source exts) + route(). 5 unit tests (synthetic SIDs). Boundary group.
+</p></div></div>
+<div class="card" id="card-H4" data-id="H4" data-module="drydocs-review" data-phase="7" data-epic="drydocs-review-backflow" data-type="task" data-status="done" data-search="h4 reproduce the hitl gate-page generator" tabindex="0"><div class="card-head"><span class="card-id">H4</span><span class="card-title">Reproduce the HITL gate-page generator</span></div><div class="chips"><span class="chip" data-kind="module">drydocs-review</span><span class="chip" data-kind="phase">P7</span><span class="chip" data-kind="type">task</span><span class="chip" data-kind="priority">p3</span><span class="chip" data-kind="model-agent">opus / main</span></div><div class="epic">drydocs-review-backflow</div><div class="deps"><span class="deps-label">depends on:</span> <a class="dep-link" href="#card-H1" data-target="card-H1">H1</a> <a class="dep-link" href="#card-H2" data-target="card-H2">H2</a></div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> HITL prompt-page GENERATOR reproduced: a renderer over 04-sme-checklist-and-load-plan.md + taxonomy-ontology-map.yaml + classification.yaml that emits interactive checklist pages (localStorage persistence, &quot;no graph write until confirmed&quot;, parent-index + per-step-child structure). Example page seeded from vendor-bmc, never real data. Producer already owns all three inputs + gate-log.md record.
+</p><p class="notes"><strong>Notes:</strong> Done 2026-07-01. drydocs/gate_pages.py: GateSpec + render_gate_page → self-contained interactive HTML (checkbox per confirmation, localStorage persistence, progress bar, classification badge, mapping table, &quot;no graph write until confirmed&quot; banner). Example config/gate-prompts/vendor-bmc-example.yaml (Internal-Public). 6 unit tests. GATED/DEFERRED: rendering pages from REAL PAT/SEAL steps (Internal- Confidential) → gitignored twin, through the HITL gate; not built.
+</p></div></div>
+<div class="card" id="card-H5" data-id="H5" data-module="drydocs-review" data-phase="7" data-epic="drydocs-review-backflow" data-type="task" data-status="done" data-search="h5 reproduce the publishing pipeline with a pluggable publisher" tabindex="0"><div class="card-head"><span class="card-id">H5</span><span class="card-title">Reproduce the publishing pipeline with a pluggable publisher</span></div><div class="chips"><span class="chip" data-kind="module">drydocs-review</span><span class="chip" data-kind="phase">P7</span><span class="chip" data-kind="type">task</span><span class="chip" data-kind="priority">p3</span><span class="chip" data-kind="model-agent">opus / main</span></div><div class="epic">drydocs-review-backflow</div><div class="deps"><span class="deps-label">depends on:</span> <a class="dep-link" href="#card-H4" data-target="card-H4">H4</a></div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> drydocs/publishing/ pipeline reproduced (assembler/validator/preview) with the Confluence push ABSTRACTED behind a generic pluggable publisher interface — no toby_publish_confluence, no space coords. Local preview + XML/macro-allow-list validation covered by a unit test.
+</p><p class="notes"><strong>Notes:</strong> Done 2026-07-01. drydocs/publishing/ package: assemble() (template wrap), validator (well-formed XML + macro allow-list), write_preview(), Publisher Protocol + NoopPublisher/LocalPublisher (Confluence push abstracted — no toby_publish_confluence / space coords). 10 unit tests. GATED/DEFERRED: a real ConfluencePublisher (space coords, auth, internal wrapper) → company gitignored twin; not built.
+</p></div></div>
+<div class="card" id="card-H6" data-id="H6" data-module="drydocs-review" data-phase="7" data-epic="drydocs-review-backflow" data-type="task" data-status="done" data-search="h6 close the module-boundary blind spot (default-deny)" tabindex="0"><div class="card-head"><span class="card-id">H6</span><span class="card-title">Close the module-boundary blind spot (default-deny)</span></div><div class="chips"><span class="chip" data-kind="module">drydocs-review</span><span class="chip" data-kind="phase">P7</span><span class="chip" data-kind="type">task</span><span class="chip" data-kind="priority">p2</span><span class="chip" data-kind="model-agent">sonnet / main</span></div><div class="epic">drydocs-review-backflow</div><div class="deps"><span class="deps-label">depends on:</span> <a class="dep-link" href="#card-H1" data-target="card-H1">H1</a></div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> Boundary guard closes the blind spot: (a) a `review` COMPONENT_GROUP added to test_module_boundary.py + MODULE_MAP.md rows for the landed drydocs-review modules; (b) a new default-deny test asserts every scanned .py resolves to exactly one bucket (core or a component group), failing with the list of stragglers, exempting package __init__.py. Passes on producer today (only drydocs/__init__.py unclassified). Track-1 stays green.
+</p><p class="notes"><strong>Notes:</strong> Done 2026-07-01. review group = (graph_verify, review_labels); test_every_module_is_classified added (default-deny, flags UNCLASSIFIED + AMBIGUOUS). MODULE_MAP.md rows + note added. Boundary guard 3 passed; Track-1 92 passed / 0 failed. graph_review (H2) / publishing (H5) get added to the review group when they land — the default-deny test now FORCES that.
+</p></div></div>
+<div class="card" id="card-H7" data-id="H7" data-module="docs" data-phase="7" data-epic="drydocs-review-backflow" data-type="chore" data-status="done" data-search="h7 document the canonical-company back-flow rule" tabindex="0"><div class="card-head"><span class="card-id">H7</span><span class="card-title">Document the Canonical-COMPANY back-flow rule</span></div><div class="chips"><span class="chip" data-kind="module">docs</span><span class="chip" data-kind="phase">P7</span><span class="chip" data-kind="type">chore</span><span class="chip" data-kind="priority">p3</span><span class="chip" data-kind="model-agent">haiku / main</span></div><div class="epic">drydocs-review-backflow</div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> The back-flow reconciliation direction (Canonical-COMPANY for all drydocs-review paths — keep company&#x27;s originals, do not overwrite with the sanitized public template) is documented in the port guide, the port prompt, and the reconcile-port divergence ledger.
+</p><p class="notes"><strong>Notes:</strong> Done 2026-07-01 alongside this plan. The cross-boundary rule that prevents the next port from clobbering company&#x27;s wired originals.</p></div></div>
+<div class="card" id="card-I1" data-id="I1" data-module="docs" data-phase="8" data-epic="project-board" data-type="task" data-status="done" data-search="i1 backlog schema v2: plan, modules, titles, validation" tabindex="0"><div class="card-head"><span class="card-id">I1</span><span class="card-title">Backlog schema v2: plan, modules, titles, validation</span></div><div class="chips"><span class="chip" data-kind="module">docs</span><span class="chip" data-kind="phase">P8</span><span class="chip" data-kind="type">task</span><span class="chip" data-kind="priority">p1</span><span class="chip" data-kind="model-agent">opus / main</span></div><div class="epic">project-board</div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> backlog.yaml declares drydocs.backlog.v2 with a plan: (phases incl. goal/status) and a modules: registry; every item carries title/type/module/phase; tests/unit/test_backlog.py validates the schema (unique ids, deps resolve + acyclic, module/phase/enums valid, summary + next_ready computed-consistent) and passes; full suite stays green.
+</p><p class="notes"><strong>Notes:</strong> Done 2026-07-01 (this change). Fields chosen so a future to-do lands as type: requirement + module + phase — requirement-to-module traceability without leaving git. summary/next_ready are now test-enforced, no longer hand-trusted.
+</p></div></div>
+<div class="card" id="card-I2" data-id="I2" data-module="drydocs-plan" data-phase="8" data-epic="project-board" data-type="requirement" data-status="done" data-search="i2 render the backlog as an html project board" tabindex="0"><div class="card-head"><span class="card-id">I2</span><span class="card-title">Render the backlog as an HTML project board</span></div><div class="chips"><span class="chip" data-kind="module">drydocs-plan</span><span class="chip" data-kind="phase">P8</span><span class="chip" data-kind="type">requirement</span><span class="chip" data-kind="priority">p1</span><span class="chip" data-kind="model-agent">sonnet / main</span></div><div class="epic">project-board</div><div class="deps"><span class="deps-label">depends on:</span> <a class="dep-link" href="#card-I1" data-target="card-I1">I1</a></div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> drydocs/plan_board.py renders backlog.yaml -&gt; docs/plan/board.html, self-contained (roadmap strip from plan: with computed per-phase progress, kanban columns by status, client-side filters by module/phase/epic/type, depends_on rendered as links, quick-capture box that formats a paste-ready IDEAS.md line to clipboard); module classified in MODULE_MAP.md + test_module_boundary.py (new `plan` component group — default-deny will force it); offline unit tests on a fixture backlog; the rendered board is committed. Entry point = thin script beside snapshot.ps1 until the cli.py entrypoint-boundary TODO (MODULE_MAP.md) is resolved.
+</p><p class="notes"><strong>Notes:</strong> Done 2026-07-01. Built by a sonnet agent per the model matrix; opus review pass done. drydocs/plan_board.py (pure, deterministic — no build timestamps, backlog `updated:` shown instead) + scripts/render_board.py + tests/unit/test_plan_board.py (16 tests) + `plan` COMPONENT_GROUP in test_module_boundary.py + MODULE_MAP.md row. Board committed at docs/plan/board.html. Board replaces 02-backlog.md as the human view.
+</p></div></div></div></div>
+</div>
+<div class="capture">
+  <h2>Quick capture</h2>
+  <div class="capture-row">
+    <input type="text" id="capture-text" placeholder="a thought, idea, bug, or question">
+    <select id="capture-tag">
+<option value="idea">idea</option>
+<option value="bug">bug</option>
+<option value="doc">doc</option>
+<option value="source">source</option>
+<option value="question">question</option>
+<option value="chore">chore</option>
+</select>
+    <button type="button" id="capture-copy">Copy line</button>
+  </div>
+  <p class="capture-hint">Copies <code>- [tag] text</code> to your clipboard — paste into docs/restructure/IDEAS.md — the repo is the system of record.</p>
+  <p class="capture-status" id="capture-status"></p>
+</div>
+<script>
+const FILTER_KEY = "drydocs.board.filters";
+const cards = () => Array.from(document.querySelectorAll(".card"));
+
+function currentFilters() {
+  return {
+    module: document.getElementById("f-module").value,
+    phase: document.getElementById("f-phase").value,
+    epic: document.getElementById("f-epic").value,
+    type: document.getElementById("f-type").value,
+    q: document.getElementById("f-search").value.trim().toLowerCase(),
+  };
+}
+
+function applyFilters() {
+  const f = currentFilters();
+  const counts = { todo: 0, in_progress: 0, blocked: 0, done: 0 };
+  cards().forEach((card) => {
+    const matches =
+      (!f.module || card.dataset.module === f.module) &&
+      (!f.phase || card.dataset.phase === f.phase) &&
+      (!f.epic || card.dataset.epic === f.epic) &&
+      (!f.type || card.dataset.type === f.type) &&
+      (!f.q || card.dataset.search.includes(f.q));
+    card.classList.toggle("hidden", !matches);
+    if (matches) counts[card.dataset.status] = (counts[card.dataset.status] || 0) + 1;
+  });
+  Object.keys(counts).forEach((status) => {
+    const el = document.querySelector('[data-count-for="' + status + '"]');
+    if (el) el.textContent = counts[status];
+  });
+  localStorage.setItem(FILTER_KEY, JSON.stringify(f));
+}
+
+function restoreFilters() {
+  let saved = {};
+  try {
+    saved = JSON.parse(localStorage.getItem(FILTER_KEY) || "{}");
+  } catch (e) {
+    saved = {};
+  }
+  if (saved.module) document.getElementById("f-module").value = saved.module;
+  if (saved.phase) document.getElementById("f-phase").value = saved.phase;
+  if (saved.epic) document.getElementById("f-epic").value = saved.epic;
+  if (saved.type) document.getElementById("f-type").value = saved.type;
+  if (saved.q) document.getElementById("f-search").value = saved.q;
+}
+
+function clearFilters() {
+  ["f-module", "f-phase", "f-epic", "f-type"].forEach((id) => (document.getElementById(id).value = ""));
+  document.getElementById("f-search").value = "";
+  applyFilters();
+}
+
+function jumpToCard(id) {
+  const target = document.getElementById(id);
+  if (!target) return;
+  target.scrollIntoView({ behavior: "smooth", block: "center" });
+  target.classList.add("highlight");
+  setTimeout(() => target.classList.remove("highlight"), 1500);
+}
+
+function wireCards() {
+  cards().forEach((card) => {
+    card.addEventListener("click", (evt) => {
+      if (evt.target.closest("a.dep-link")) return;
+      card.classList.toggle("expanded");
+    });
+    card.addEventListener("keydown", (evt) => {
+      if (evt.key === "Enter" || evt.key === " ") {
+        evt.preventDefault();
+        card.classList.toggle("expanded");
+      }
+    });
+  });
+  document.querySelectorAll("a.dep-link").forEach((a) => {
+    a.addEventListener("click", (evt) => {
+      evt.preventDefault();
+      jumpToCard(a.dataset.target);
+    });
+  });
+}
+
+function wireFilters() {
+  ["f-module", "f-phase", "f-epic", "f-type"].forEach((id) =>
+    document.getElementById(id).addEventListener("change", applyFilters)
+  );
+  document.getElementById("f-search").addEventListener("input", applyFilters);
+  document.getElementById("f-clear").addEventListener("click", clearFilters);
+}
+
+function copyText(text) {
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    return navigator.clipboard.writeText(text);
+  }
+  const ta = document.createElement("textarea");
+  ta.value = text;
+  ta.style.position = "fixed";
+  ta.style.opacity = "0";
+  document.body.appendChild(ta);
+  ta.focus();
+  ta.select();
+  try {
+    document.execCommand("copy");
+  } finally {
+    document.body.removeChild(ta);
+  }
+  return Promise.resolve();
+}
+
+function wireCapture() {
+  const btn = document.getElementById("capture-copy");
+  const status = document.getElementById("capture-status");
+  btn.addEventListener("click", () => {
+    const tag = document.getElementById("capture-tag").value;
+    const text = document.getElementById("capture-text").value.trim();
+    if (!text) {
+      status.textContent = "Type something to capture first.";
+      return;
+    }
+    const line = "- [" + tag + "] " + text;
+    copyText(line).then(() => {
+      status.textContent = "Copied: " + line;
+    }).catch(() => {
+      status.textContent = "Could not copy automatically — select and copy: " + line;
+    });
+  });
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+  wireCards();
+  wireFilters();
+  wireCapture();
+  restoreFilters();
+  applyFilters();
+});
+</script>
+</body></html>

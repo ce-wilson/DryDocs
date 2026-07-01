@@ -51,6 +51,10 @@ COMPONENT_GROUPS: dict[str, tuple[str, ...]] = {
         "drydocs.gate_pages",
         "drydocs.publishing",
     ),
+    # drydocs-plan — backlog.yaml -> HTML project board renderer (Epic I).
+    "plan": (
+        "drydocs.plan_board",
+    ),
 }
 ALL_COMPONENT_PREFIXES: tuple[str, ...] = tuple(
     p for prefixes in COMPONENT_GROUPS.values() for p in prefixes

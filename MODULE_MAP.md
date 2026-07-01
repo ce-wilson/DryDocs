@@ -46,6 +46,7 @@
 | `drydocs/review_labels.py` | `drydocs-review` — the review spine (source→DATA-label map); consumed by review | — (pure config) |
 | *(future H2)* `drydocs/graph_review.py` | `drydocs-review` — renders live-graph rows → SME review HTML | — (reads graph; writes HTML) |
 | *(future H5)* `drydocs/publishing/**` | `drydocs-review` — docs publish pipeline (Confluence push abstracted) | external (docs target) |
+| `drydocs/plan_board.py` | `drydocs-plan` — backlog.yaml → HTML project board renderer (Epic I) | `docs/plan/board.html` |
 | *(future)* `drydocs-lineage` | C2 — curated cmd-line lineage | `drydocs` |
 | *(future)* `drydocs-deepdoc` | C3 — on-demand deep dive | `drydocs_context` |
 | *(separate module)* `drydocs-remediation` | C1 — failures → Jira | — (no graph write) |
@@ -56,6 +57,11 @@
 > **default-deny** (`test_every_module_is_classified`): every module must resolve to exactly one
 > bucket, so a new review module (graph_review / publishing) that isn't classified here will
 > **fail the boundary test** rather than being silently unguarded.
+>
+> **`drydocs-plan` note.** Same default-deny discipline: `drydocs/plan_board.py` is a pure,
+> offline renderer (backlog.yaml → `docs/plan/board.html`, no Neo4j, no imports from other
+> components) classified into its own `plan` COMPONENT_GROUP, mirroring how `review` is declared —
+> it exists precisely so a future `drydocs-plan` module that isn't added here fails the same guard.
 >
 > **TODO (deferred — architecture decision, not HITL).** Wiring `graph-verify` / `graph-review`
 > into `drydocs/cli.py` would make `cli.py` (a `drydocs-load` module) import the `drydocs-review`
