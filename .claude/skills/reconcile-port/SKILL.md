@@ -63,6 +63,19 @@ stay skipped — confirm with the operator if a new one appears.
   the producer version is thin-only. **Keep company's** — it carries the JPMC
   connection config (`client_path`, `tns_admin`, TNS alias). The producer's
   scope-bind SQL runs under it unchanged.
+- **Company-only modules the producer has never had** (surfaced by the
+  2026-06-30 port report; ~175 company-only paths). These are **not** clean-adds
+  and must never be deleted or "reconciled" — they simply do not exist producer
+  side, so an inbound port leaves them untouched:
+  - *Architectural / low-sanitization-risk* — `graph_review.py`, `graph_verify.py`,
+    `sme_notes.py`, `drydocs/publishing/`, `site/`. These are back-flow candidates
+    (reproduce generically in the public producer via the screenshot/describe
+    channel; set `classification` on each). If/when the producer grows a generic
+    same-named file, it becomes a **collision** — add a ledger row then.
+  - *Internal data-bearing — never back-flow as values* — `locations.py`
+    (DSNs/server locations), `seal_deployments.py` (real SEAL IDs),
+    `controlm_app_codes.py` (app-code values), ServiceNow HPSM config. Company-side
+    only; at most a bare schema/template may cross, never the values.
 
 ## Track-1 acceptance (the contract)
 

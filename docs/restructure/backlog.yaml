@@ -436,10 +436,116 @@ items:
       ADR 0002 follow-up #6. The ADR already records them in Options Considered; this just adds a
       durable pointer. Small hygiene task.
 
+  # ── Epic H — drydocs-review back-flow (main, opus) ────────────────────────
+  # REVERSE of the normal port: reproduce the company-authored generic SME-review/
+  # HITL toolkit GENERICALLY in this public producer. Re-implement from screenshots/
+  # descriptions — never copy company code. See docs/restructure/05-drydocs-review-backflow.md.
+  - id: H1
+    epic: drydocs-review-backflow
+    agent: main
+    model: opus
+    priority: p2
+    status: todo
+    depends_on: []
+    inputs: [docs/restructure/05-drydocs-review-backflow.md, config/classification.yaml]
+    acceptance: >
+      graph_verify + review_labels reproduced generically (offline spine): review_labels is a typed
+      accessor over a sanitized review-labels.yaml (vendor-bmc seed, no internal sources); graph_verify
+      loads YAML TC-* suites + evaluate is pure/offline with unit tests; both carry a classification entry;
+      Track-1 stays green. No real SIDs / sources / Confluence coords.
+    notes: "Sequencing step 1. Loader+evaluate are pure → unit-testable with no live graph."
+
+  - id: H2
+    epic: drydocs-review-backflow
+    agent: main
+    model: opus
+    priority: p2
+    status: todo
+    depends_on: [H1]
+    inputs: [docs/restructure/05-drydocs-review-backflow.md]
+    acceptance: >
+      graph_review reproduced: pure HTML renderer (no Neo4j in module — CLI hands it rows), one section
+      per DATA label, hidden_props stripped; offline unit test renders a fixture row set. classification set.
+    notes: "Sequencing step 2."
+
+  - id: H3
+    epic: drydocs-review-backflow
+    agent: main
+    model: opus
+    priority: p3
+    status: todo
+    depends_on: [H1]
+    inputs: [docs/restructure/05-drydocs-review-backflow.md]
+    acceptance: >
+      sme_notes harvester reproduced: scans repo for owner-attributed notes, routes typed sub-tags to
+      $FR/$UC/$OQ/$NOTES; SID format is generic/synthetic, no real SIDs committed. Unit test on a fixture tree.
+    notes: "Sequencing step 3. Read-only harvester."
+
+  - id: H4
+    epic: drydocs-review-backflow
+    agent: main
+    model: opus
+    priority: p3
+    status: todo
+    depends_on: [H1, H2]
+    inputs: [docs/restructure/04-sme-checklist-and-load-plan.md, config/taxonomy-ontology-map.yaml, config/classification.yaml]
+    acceptance: >
+      HITL prompt-page GENERATOR reproduced: a renderer over 04-sme-checklist-and-load-plan.md +
+      taxonomy-ontology-map.yaml + classification.yaml that emits interactive checklist pages (localStorage
+      persistence, "no graph write until confirmed", parent-index + per-step-child structure). Example page
+      seeded from vendor-bmc, never real data. Producer already owns all three inputs + gate-log.md record.
+    notes: "Sequencing step 4. Renderer only — the durable record stays gate-log.md + taxonomy-ontology-map.yaml."
+
+  - id: H5
+    epic: drydocs-review-backflow
+    agent: main
+    model: opus
+    priority: p3
+    status: todo
+    depends_on: [H4]
+    inputs: [docs/restructure/05-drydocs-review-backflow.md]
+    acceptance: >
+      drydocs/publishing/ pipeline reproduced (assembler/validator/preview) with the Confluence push
+      ABSTRACTED behind a generic pluggable publisher interface — no toby_publish_confluence, no space coords.
+      Local preview + XML/macro-allow-list validation covered by a unit test.
+    notes: "Sequencing step 5 (last). Highest sanitization surface."
+
+  - id: H6
+    epic: drydocs-review-backflow
+    agent: main
+    model: sonnet
+    priority: p2
+    status: todo
+    depends_on: [H1]
+    inputs: [tests/unit/test_module_boundary.py, MODULE_MAP.md]
+    acceptance: >
+      Boundary guard closes the blind spot: (a) a `review` COMPONENT_GROUP added to
+      test_module_boundary.py + MODULE_MAP.md rows for the landed drydocs-review modules; (b) a new
+      default-deny test asserts every scanned .py resolves to exactly one bucket (core or a component
+      group), failing with the list of stragglers, exempting package __init__.py. Passes on producer today
+      (only drydocs/__init__.py unclassified). Track-1 stays green.
+    notes: >
+      Fixes the allow-list flaw the review surfaced. Landable incrementally as H1..H5 modules arrive;
+      the default-deny half is landable now on its own.
+
+  - id: H7
+    epic: drydocs-review-backflow
+    agent: main
+    model: haiku
+    priority: p3
+    status: done
+    depends_on: []
+    inputs: [git-readme.md, docs/port-prompt.md, .claude/skills/reconcile-port/SKILL.md]
+    acceptance: >
+      The back-flow reconciliation direction (Canonical-COMPANY for all drydocs-review paths — keep
+      company's originals, do not overwrite with the sanitized public template) is documented in the port
+      guide, the port prompt, and the reconcile-port divergence ledger.
+    notes: "Done 2026-07-01 alongside this plan. The cross-boundary rule that prevents the next port from clobbering company's wired originals."
+
 # Roll-up the dispatcher can glance at (keep in sync, or regenerate).
 summary:
-  todo: 8
+  todo: 14                                         # +H1-H6 (Epic H, drydocs-review back-flow)
   in_progress: 2                                   # G1 (provisioning authored) + G2 (core shim, step 1)
   blocked: 1                                       # G7 — live multi-DB deploy needs an Enterprise target
-  done: 14                                         # A1-A3, B1-B4, C1-C4, D1-D3 (Epics A,B,C,D complete)
-  next_ready: [E1, F1, F2, G1, G2, G5, G6]        # +Epic G (ADR 0002, ACCEPTED). G1 = local-Enterprise validation; live deploy (G7) blocked: Aura tier = 1 node.
+  done: 15                                         # A1-A3, B1-B4, C1-C4, D1-D3, H7 (Epics A,B,C,D complete)
+  next_ready: [E1, F1, F2, G1, G2, G5, G6, H1, H6] # +Epic H (back-flow). H1 = offline spine; H6 default-deny guard landable now.

@@ -132,6 +132,42 @@ acceptance run.
 
 ---
 
+## `drydocs-review` — back-flow stream (Canonical-COMPANY; KEEP YOUR VERSION)
+
+**This is the one place the normal direction reverses.** The company authored a
+generic SME-review / HITL toolkit — the **`drydocs-review` component** — to close the
+"how does the SME see what loaded and tell the agent what to change" loop. The
+producer committed to the HITL SME gate as a concept but shipped it *docs-only*, so
+that tooling is being **reproduced generically here** as a public template (plan:
+[`docs/restructure/05-drydocs-review-backflow.md`](docs/restructure/05-drydocs-review-backflow.md)).
+It is re-implemented from descriptions, **not** copied from company code.
+
+Consequence for you, the company-side reader: once the producer's generic versions
+land, these paths exist on **both** sides and will show up as **collisions**. Resolve
+them the **opposite** way to everything else in this guide:
+
+> **Canonical-COMPANY — keep your version; do NOT apply the producer's copy over it.**
+> The producer's `drydocs-review` files are the sanitized *public template*. Yours carry
+> the real Confluence wiring (`toby_publish_confluence`), the real `review-labels.yaml`,
+> the real space coordinates, and real `SME[SID]` data. Take **company wholesale** for:
+>
+> - `graph_review.py`, `graph_verify.py`, `review_labels.py`, `sme_notes.py`
+> - `drydocs/publishing/**` and `review-labels.yaml`
+> - the HITL prompt-page generator + any generated `pages/`
+
+If you have `git fetch`ed and see the producer touch these, drop the incoming side and
+keep `main`'s. This is the reverse of the Canonical-here rule — it protects your wired,
+internal-data originals from being clobbered by the public template. (Mirrored in the
+`reconcile-port` skill's divergence ledger and [`docs/port-prompt.md`](docs/port-prompt.md).)
+
+**Boundary guard note:** the producer will also add a `review` `COMPONENT_GROUP` to
+`tests/unit/test_module_boundary.py` + `MODULE_MAP.md`, and flip the guard to
+**default-deny** (every module must classify into exactly one bucket, else the test
+fails). That change is generic and Track-1 portable — take it FROM the producer; it is
+what forces your company-only modules to be classified rather than silently unguarded.
+
+---
+
 ## Commit range to apply
 
 Don't hand-maintain a hash list — it goes stale and a rebase rewrites the SHAs.

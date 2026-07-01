@@ -63,6 +63,17 @@ PROCEDURE:
    + modular split" section. It also flags the planned drydocs/ → drydocs-core package move
    (ADR 0002, Phase B), which is NOT yet executed; this port still targets the flat drydocs/ layout.
 
+10. BACK-FLOW STREAM — REVERSE DIRECTION (Canonical-COMPANY): the producer is
+   reproducing the company-authored `drydocs-review` SME/HITL toolkit GENERICALLY as a
+   public template (graph_review.py, graph_verify.py, review_labels.py, sme_notes.py,
+   drydocs/publishing/**, review-labels.yaml, the HITL prompt-page generator). If the
+   producer touches any of these, KEEP COMPANY'S VERSION — drop the incoming side. The
+   producer copy is sanitized; yours holds the real Confluence wiring
+   (toby_publish_confluence), real review-labels.yaml, and real SME[SID] data. This is
+   the OPPOSITE of the Canonical-here rule. See git-readme.md "`drydocs-review` — back-flow
+   stream". (The `review` COMPONENT_GROUP + default-deny flip in test_module_boundary.py
+   IS taken FROM the producer — it is generic and forces your modules to be classified.)
+
 ACCEPTANCE GATE (behavior is the contract, not a byte-compare):
 - Track 1 (portable, no production sample present):
     poetry run pytest tests/unit/test_variable_classifier.py tests/unit/test_variable_resolver.py \

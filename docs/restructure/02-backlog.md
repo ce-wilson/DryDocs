@@ -118,6 +118,33 @@ is built + tested on a **local Enterprise** instance (G1); the live deploy (G7) 
   *Blocked on:* the current Aura tier is capped at **1 node / 1 database**; needs a multi-DB-capable
   Enterprise instance (Aura VDC / Business Critical, or self-managed Enterprise). (depends: G1)
 
+## Epic H — `drydocs-review` back-flow (main)
+
+**REVERSE of the normal port.** Reproduce the company-authored generic SME-review / HITL toolkit
+generically in this public producer (re-implement from screenshots/descriptions, never copy company
+code). Full plan: [`05-drydocs-review-backflow.md`](05-drydocs-review-backflow.md).
+
+- **H1** ☐ P2 Reproduce `graph_verify` + `review_labels` (the offline spine).
+  *Accept:* `review_labels` typed accessor over a sanitized `review-labels.yaml` (vendor-bmc seed);
+  `graph_verify` loads YAML `TC-*` suites, evaluate pure/offline, unit-tested; classification set;
+  Track-1 green.
+- **H2** ☐ P2 Reproduce `graph_review` (pure HTML renderer, no Neo4j in module).
+  *Accept:* renders a fixture row set offline, `hidden_props` stripped, one section per DATA label. (depends: H1)
+- **H3** ☐ P3 Reproduce `sme_notes` harvester (routes `$FR/$UC/$OQ/$NOTES`; synthetic SIDs only).
+  *Accept:* unit test on a fixture tree; no real SIDs committed. (depends: H1)
+- **H4** ☐ P3 Reproduce the HITL prompt-page **generator** (renderer over
+  `04-sme-checklist-and-load-plan.md` + `taxonomy-ontology-map.yaml` + `classification.yaml`).
+  *Accept:* emits interactive checklist pages (localStorage, no-write-until-confirmed, parent+child);
+  example seeded from vendor-bmc. (depends: H1, H2)
+- **H5** ☐ P3 Reproduce `drydocs/publishing/` with the Confluence push abstracted behind a pluggable publisher.
+  *Accept:* assembler/validator/preview + local preview test; no `toby_publish_confluence`, no space coords. (depends: H4)
+- **H6** ☐ P2 Close the boundary-guard blind spot: add a `review` `COMPONENT_GROUP` +
+  flip `test_module_boundary.py` to **default-deny** (every module must classify).
+  *Accept:* default-deny test passes on producer today (only `drydocs/__init__.py` exempt); Track-1 green.
+  (depends: H1; default-deny half landable now)
+- **H7** ✅ P3 *done 2026-07-01* — Document the **Canonical-COMPANY** back-flow reconciliation direction
+  in `git-readme.md`, `port-prompt.md`, and the `reconcile-port` divergence ledger.
+
 ---
 
 ## Review checklist for the dispatcher (run after each item)
