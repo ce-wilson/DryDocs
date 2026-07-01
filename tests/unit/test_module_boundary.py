@@ -40,6 +40,10 @@ CORE_PREFIXES: tuple[str, ...] = (
 # Component group -> the dotted prefixes that belong to it.
 COMPONENT_GROUPS: dict[str, tuple[str, ...]] = {
     "load": ("drydocs.loaders", "drydocs.cli", "drydocs.snapshots"),
+    # drydocs-review — SME review + graph acceptance + docs publish (Epic H).
+    # Add graph_review / publishing here when they land (H2 / H5); the default-deny
+    # test below FORCES that so a new review module can't be silently unguarded.
+    "review": ("drydocs.graph_verify", "drydocs.review_labels"),
 }
 ALL_COMPONENT_PREFIXES: tuple[str, ...] = tuple(
     p for prefixes in COMPONENT_GROUPS.values() for p in prefixes
@@ -132,3 +136,40 @@ def test_components_do_not_import_each_other():
         "A component must not import another component; route shared code through core. "
         "See MODULE_MAP.md / ADR 0002-a.\n  " + "\n  ".join(violations)
     )
+
+
+def test_every_module_is_classified():
+    """Default-deny: every scanned module resolves to EXACTLY ONE bucket.
+
+    The two tests above are an *allow-list* — a module in neither ``CORE_PREFIXES`` nor
+    any component group is skipped by both, so it is silently unguarded (the boundary
+    blind spot). This flips the guard to default-deny: a module classified into no
+    bucket fails as UNCLASSIFIED; a module in more than one bucket fails as AMBIGUOUS.
+    Package ``__init__.py`` markers are exempt (they carry no importable logic of their
+    own beyond re-exports). When a new module lands (e.g. drydocs-review's graph_review),
+    this test fails until it is placed in MODULE_MAP.md + the tables above.
+    """
+    unclassified: list[str] = []
+    ambiguous: list[str] = []
+    for path in _iter_py_files():
+        if path.name == "__init__.py":
+            continue
+        module = _module_name(path)
+        in_core = _matches(module, CORE_PREFIXES)
+        owning = [g for g, prefixes in COMPONENT_GROUPS.items() if _matches(module, prefixes)]
+        if in_core and owning:
+            ambiguous.append(f"{module}  (core + {owning})")
+        elif len(owning) > 1:
+            ambiguous.append(f"{module}  ({owning})")
+        elif not in_core and not owning:
+            unclassified.append(module)
+
+    problems: list[str] = []
+    if unclassified:
+        problems.append(
+            "UNCLASSIFIED — add each to CORE_PREFIXES or a COMPONENT_GROUP (and MODULE_MAP.md):\n  "
+            + "\n  ".join(unclassified)
+        )
+    if ambiguous:
+        problems.append("AMBIGUOUS — classified into more than one bucket:\n  " + "\n  ".join(ambiguous))
+    assert not problems, "\n".join(problems)

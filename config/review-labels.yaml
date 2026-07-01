@@ -1,0 +1,32 @@
+# =============================================================================
+# config/review-labels.yaml — the "review spine" (drydocs-review component).
+#
+# Maps each ingestion SOURCE to the DATA node labels it populates, in CHAIN ORDER,
+# with SME provenance. This is the shared spine consumed by the drydocs-review
+# component: graph-review renders one section per label; graph-verify validates a
+# suite's declared targets against it.
+#
+# Pure config — no Neo4j, no graph writes. Typed accessor: drydocs/review_labels.py.
+#
+# classification: Internal-Public. This committed spine is seeded from the
+# vendor-BMC baseline (generic Control-M object labels — publishable). Real
+# internal source->label chains (SEAL/PAT) live in a gitignored twin and are
+# confirmed through the HITL gate before they drive any load — see
+# docs/restructure/03-hitl-sme-flow.md. Never commit real sources here.
+# =============================================================================
+classification: Internal-Public
+schema: drydocs.review-labels.v1
+updated: 2026-07-01
+
+sources:
+  - id: bmc-controlm-structure
+    provenance: "BMC Control-M folder/job export (vendor baseline; VERBATIM)"
+    labels: [JobFolder, ControlMJob, Condition]        # chain order: folder -> job -> condition
+
+  - id: bmc-controlm-variables
+    provenance: "Control-M variable normalization, Phases A/B/C (GROUNDED)"
+    labels: [ControlMJob, JobRun]                       # variables resolve onto the run
+
+  - id: bmc-controlm-lineage
+    provenance: "curated command-line lineage (C2; GROUNDED)"
+    labels: [ControlMJob, JobRun, Condition]

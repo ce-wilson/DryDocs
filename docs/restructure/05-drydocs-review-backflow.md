@@ -122,7 +122,36 @@ company reads) and [`docs/port-prompt.md`](../port-prompt.md), and in the
 
 ## Status
 
-Plan only — no modules reproduced yet. Tracked as **Epic H** in
-[`backlog.yaml`](backlog.yaml). The screenshot/description channel is the input; when
-a module's spec arrives, reproduce it generically here with tests + a `classification`
-entry, following the sequencing above.
+Tracked as **Epic H** in [`backlog.yaml`](backlog.yaml).
+
+- **H1 — done (2026-07-01).** The offline spine: [`drydocs/review_labels.py`](../../drydocs/review_labels.py)
+  (typed accessor over [`config/review-labels.yaml`](../../config/review-labels.yaml)) +
+  [`drydocs/graph_verify.py`](../../drydocs/graph_verify.py) (pure `load`/`evaluate`; `run_*`
+  takes a duck-typed `GraphRunner`, so the module never imports Neo4j and is fully offline).
+  Example suite [`graph-tests/vendor-bmc-smoke.yaml`](../../graph-tests/vendor-bmc-smoke.yaml).
+  27 unit tests; both YAML seeds `classification: Internal-Public`.
+- **H6 — done (2026-07-01).** Boundary guard closed: `review` component group +
+  `test_every_module_is_classified` (default-deny). Boundary guard 3 passed; Track-1 92 passed / 0 failed.
+- **H2–H5 — todo** (graph_review, sme_notes, HITL page generator, publishing), per sequencing.
+
+## Deferred / gated — the to-do list (NOT built today)
+
+Everything below either needs the **HITL SME gate** or an **architecture decision**, so
+per scope it is documented here rather than built:
+
+1. **Real internal review spine (HITL-gated).** The committed `review-labels.yaml` is the
+   vendor-BMC generic seed. The real internal source→label chains (SEAL / PAT sources) are
+   `Internal`/`Internal-Confidential`, live in a gitignored twin, and must be confirmed
+   through the gate ([`03-hitl-sme-flow.md`](03-hitl-sme-flow.md), logged to
+   [`gate-log.md`](../../config/gate-log.md)) before they drive any load. Never commit here.
+2. **Real acceptance suites (HITL-gated).** `graph-tests/vendor-bmc-smoke.yaml` asserts only
+   shape/consistency. Suites that assert real counts/IDs are `Internal` and depend on a
+   *confirmed* load — those go in the gitignored twin, gated the same way.
+3. **CLI wiring of `graph-verify` (architecture decision, not HITL).** Adding a
+   `drydocs graph-verify` command makes `cli.py` (`drydocs-load`) import the `drydocs-review`
+   component → a components-don't-import-each-other violation. Resolve by exempting the
+   *entrypoint* from that rule first (see the TODO in [`MODULE_MAP.md`](../../MODULE_MAP.md)).
+   Until then, `graph_verify` is used via its API / a thin script.
+4. **Running against a live graph.** `run_suite` reads a real Neo4j graph; it writes no meaning
+   edges (read-only), so *running* it is not HITL-gated — but it needs a provisioned graph
+   (Epic G) to exercise beyond the offline unit tests.

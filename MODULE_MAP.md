@@ -42,9 +42,26 @@
 | `drydocs/loaders/**` | `drydocs-load` (main) | `drydocs` ground truth |
 | `drydocs/cli.py` | `drydocs-load` (entrypoint) | — (orchestrates loaders) |
 | `drydocs/snapshots/` | `drydocs-load` (tooling) | depgraph snapshot |
+| `drydocs/graph_verify.py` | `drydocs-review` — data-driven Cypher acceptance runner (Epic H) | — (reads graph; asserts) |
+| `drydocs/review_labels.py` | `drydocs-review` — the review spine (source→DATA-label map); consumed by review | — (pure config) |
+| *(future H2)* `drydocs/graph_review.py` | `drydocs-review` — renders live-graph rows → SME review HTML | — (reads graph; writes HTML) |
+| *(future H5)* `drydocs/publishing/**` | `drydocs-review` — docs publish pipeline (Confluence push abstracted) | external (docs target) |
 | *(future)* `drydocs-lineage` | C2 — curated cmd-line lineage | `drydocs` |
 | *(future)* `drydocs-deepdoc` | C3 — on-demand deep dive | `drydocs_context` |
 | *(separate module)* `drydocs-remediation` | C1 — failures → Jira | — (no graph write) |
+
+> **`drydocs-review` note.** All review modules own a run cadence or do external I/O, so
+> none are core. `review_labels` is a *pure config accessor* parked in the component; promote
+> to `drydocs_core.config` only if a **non-review** second consumer appears. The guard is now
+> **default-deny** (`test_every_module_is_classified`): every module must resolve to exactly one
+> bucket, so a new review module (graph_review / publishing) that isn't classified here will
+> **fail the boundary test** rather than being silently unguarded.
+>
+> **TODO (deferred — architecture decision, not HITL).** Wiring `graph-verify` / `graph-review`
+> into `drydocs/cli.py` would make `cli.py` (a `drydocs-load` module) import the `drydocs-review`
+> component — a components-don't-import-each-other violation. Resolve by exempting the
+> *entrypoint* from that rule (the CLI is the top-level orchestrator) before adding the commands.
+> Until then, `graph_verify` is a library module used via its API / a thin script.
 
 ## Future, land in core when first written
 - `§`-format I/O (`§META …§OQ §SUPPLEMENTS §DOC §LEDGER`) → `drydocs_core.sigfmt`.
