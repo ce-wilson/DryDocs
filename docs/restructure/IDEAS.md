@@ -30,10 +30,9 @@ Tags help grooming: `idea` · `bug` · `doc` · `source` (new data source) · `q
   with the board), start CHANGELOG.md back-filled from completed epics. (2026-07-01 architecture review)
 - [chore] CI: GitHub Actions running the CLAUDE.md gates (pytest -q, import drydocs.cli,
   drydocs --help, ruff) on every push; classification test as publish-boundary guard. (same review)
-- [chore] Fragment cleanup: DryDocs1→DryDocs in CLAUDE.md:1 + 01-project-plan.md:1-4 (repo URL,
-  merged branch line); drydocs1→drydocs in knowledge/depgraph-snapshots/snapshot.ps1 + its README;
-  drop the stray `@claude - <Aura console URL>` line at README.md:1; "superseded" banners on
-  docs/reviews/ persona+SDLC docs + consolidated plan; README for SDLC-Docs/ marking it frozen. (same review)
+- [doc] .claude/skills/run-drydocs/SKILL.md Gotchas are stale: PyYAML IS a runtime dep since D2
+  (the "4 skipped tests / PyYAML not installed" notes are outdated), and test counts have moved.
+  Refresh next time the skill is touched. (noticed 2026-07-01 while authoring groom-backlog)
 - [idea] cli.py regroup: split the 937-line flat command list into domain subcommand groups
   (schema/ingest/verify/variables) — NOT milestone names; rename m1-verify/m3-verify →
   verify-reference/verify-controlm with deprecation aliases at the v1.0 window. (same review)
@@ -46,6 +45,10 @@ Tags help grooming: `idea` · `bug` · `doc` · `source` (new data source) · `q
 
 <!-- when you promote an idea, move its line here with the resulting backlog id -->
 
+- 2026-07-01 — [chore] fragment cleanup (naming drift, banners, SDLC-Docs README) → **J1**
+  (Epic J, release-infrastructure) via the groom-backlog skill's demonstration run. Sibling
+  lines (versioning reset, CI, cli regroup, unused deps, integration tests) stay in the inbox
+  pending user decisions (semver start version, rename window).
 - 2026-07-01 — Epic I (I1–I4, project board & planning infrastructure) groomed into `backlog.yaml`
   from the architecture-review plan; schema upgraded to `drydocs.backlog.v2` (I1 done same day).
 - 2026-06-20 — initial backlog A1–F2 seeded directly into `backlog.yaml` from `02-backlog.md`.

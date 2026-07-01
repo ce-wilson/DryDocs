@@ -874,7 +874,7 @@ items:
     agent: main
     model: opus
     priority: p2
-    status: in_progress
+    status: done
     depends_on: [I1]
     inputs: [docs/restructure/IDEAS.md, docs/restructure/backlog.yaml, docs/restructure/02-backlog.md]
     acceptance: >
@@ -884,8 +884,12 @@ items:
       ambiguous, moves groomed lines to the IDEAS.md audit trail, updates summary/next_ready,
       and regenerates the board once I2 has landed. test_backlog.py green after a groom run.
     notes: >
-      Author the skill once with opus (it shapes every future grooming run); routine weekly
-      grooming then runs on sonnet. This is the paper-notes killer — capture stays zero-schema.
+      Done 2026-07-01 (authored on opus per the model matrix; routine runs on sonnet).
+      .claude/skills/groom-backlog/SKILL.md (promote/inbox/merge procedure, field guide,
+      ambiguity + HITL rules, groom-run mechanics) + validate.py (standalone schema gate for
+      envs without pytest — test_backlog.py wins on disagreement). Demonstration groom run:
+      IDEAS inbox fragment-cleanup line -> J1 (Epic J, release-infrastructure); audit trail
+      updated; validator green; board regenerated.
 
   - id: I4
     epic: project-board
@@ -904,11 +908,41 @@ items:
       depgraph snapshot (render script wired next to snapshot.ps1), so the committed board can
       never go stale for more than one session.
 
+  # ── Epic J — Release infrastructure (main) — Phase 8 ──────────────────────
+  # Groomed 2026-07-01 from the IDEAS inbox (architecture-review follow-ups) via the
+  # groom-backlog skill (I3's demonstration run). Sibling inbox lines (versioning
+  # reset, CI, cli regroup) stay parked pending user decisions (semver start, rename
+  # window) — promote them here when decided.
+  - id: J1
+    epic: release-infrastructure
+    title: "Sweep the iteration fragments (naming drift, superseded banners)"
+    type: chore
+    module: docs
+    phase: 8
+    agent: main
+    model: haiku
+    priority: p2
+    status: todo
+    depends_on: []
+    inputs: [CLAUDE.md, docs/restructure/01-project-plan.md, knowledge/depgraph-snapshots/snapshot.ps1, README.md, docs/reviews/, SDLC-Docs/]
+    acceptance: >
+      DryDocs1 -> DryDocs in CLAUDE.md:1 and 01-project-plan.md (title, repo URL; merged-branch
+      line removed); drydocs1 -> drydocs in knowledge/depgraph-snapshots/snapshot.ps1 + its README
+      (existing drydocs1-*.json snapshot files left untouched as history); the stray
+      "@claude - <Aura console URL>" line removed from README.md:1; a "Superseded by the Phase 0-5
+      restructure plan" banner on docs/reviews/drydocs-consolidated-plan.md and the persona/SDLC
+      review docs; a README in SDLC-Docs/ marking it a frozen reference corpus that fed the ADRs.
+      Tests stay green.
+    notes: >
+      From the 2026-07-01 architecture review fragment audit. Pure find-and-replace with a
+      checklist — haiku tier. No live code touched (m1/m3-verify renames are a separate,
+      v1.0-window decision still parked in the IDEAS inbox).
+
 # Roll-up the dispatcher can glance at. COMPUTED views — test_backlog.py enforces
 # that these match the items exactly; update them with any status change.
 summary:
-  todo: 11                                          # E1-E2, F1-F2, G3-G6, G8-G9, I4
-  in_progress: 3                                    # G1 (provisioning) + G2 (core shim) + I3 (groom skill)
+  todo: 12                                          # E1-E2, F1-F2, G3-G6, G8-G9, I4, J1
+  in_progress: 2                                    # G1 (provisioning authored) + G2 (core shim, step 1)
   blocked: 1                                        # G7 — live multi-DB deploy needs an Enterprise target
-  done: 23                                          # A1-A3, B1-B4, C1-C4, D1-D3, H1-H7, I1-I2
-  next_ready: [E1, F1, F2, G5, G6, G8, I4]          # todo items whose every depends_on is done (test-enforced)
+  done: 24                                          # A1-A3, B1-B4, C1-C4, D1-D3, H1-H7, I1-I3
+  next_ready: [E1, F1, F2, G5, G6, G8, I4, J1]      # todo items whose every depends_on is done (test-enforced)
