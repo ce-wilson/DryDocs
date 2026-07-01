@@ -560,7 +560,59 @@ items:
       boundary test passes.
     notes: >
       ADR 0002 follow-up #4 (D2). Scaffold only — wiring the real triggers (phased curation for
-      lineage; on-failure for deepdoc) is later. deepdoc needs drydocs_context (G1).
+      lineage; on-failure for deepdoc) is later. deepdoc needs drydocs_context (G1). The lineage
+      package is then populated by re-homing the depgraph prototype — see G9 + ADR 0002-C.
+
+  - id: G8
+    epic: component-topology
+    title: "Fold the depgraph parser deltas into the core Control-M parser"
+    type: task
+    module: drydocs-core
+    phase: 6
+    agent: main
+    model: opus
+    priority: p2
+    status: todo
+    depends_on: []
+    inputs: [docs/decisions/0002-c-depgraph-lineage-rehome.md, drydocs/controlm/commands.py, "ce-wilson/depgraph@feat/controlm-lineage:depgraph/controlm/commands.py"]
+    acceptance: >
+      The three depgraph parser deltas are folded into the drydocs-core Control-M parser
+      (drydocs/controlm/commands.py, re-exported by drydocs_core): (1) .pset -> ABINITIO launcher
+      rule; (2) _looks_script() so `spark-submit --master yarn x.py` resolves x.py NOT yarn (a live
+      correctness bug) — with a regression test; (3) +pset in the direct-script extension regex.
+      Core parser reproduces depgraph's test_controlm.py outputs (25 processes / 13 INVOKES on the
+      13-job sample). Gates green; boundary test unaffected.
+    notes: >
+      ADR 0002-C §3. Independently valuable — fixes a live spark-submit bug DryDocs still has and
+      collapses the dual-parser sync tax depgraph itself flags ("keep in sync with DryDocs"). Fold
+      is a CORE change, never a component-side parser fork (0002-A §4). Do early; does not need the
+      G2 physical relocate (the shim re-exports the file). BLOCKS the clean G9 re-home.
+
+  - id: G9
+    epic: component-topology
+    title: "Re-home the depgraph lineage assets onto drydocs-core"
+    type: requirement
+    module: drydocs-lineage
+    phase: 6
+    agent: main
+    model: opus
+    priority: p3
+    status: todo
+    depends_on: [G4, G8]
+    inputs: [docs/decisions/0002-c-depgraph-lineage-rehome.md, "ce-wilson/depgraph@feat/controlm-lineage"]
+    acceptance: >
+      depgraph's lineage assets are re-homed into the lineage/ package on drydocs-core (per
+      0002-C §4): model v2 (ProcessNode/DataAssetNode/typed rels) reconciled to DryDocs identity
+      (assetId / ControlMJob(folder_id,job_id) URNs), controlm_inventory extractor, html-review SME
+      surface, the curated drydocs-DB load (depgraph's planned Fork-3 profile), and the RHEL
+      run-as-user collector. lineage imports ONLY drydocs_core.* and contains no Control-M parse
+      code of its own; writes ground truth ONLY to drydocs; shared-parser + boundary + ground-truth
+      tests pass; gates green. depgraph feat/controlm-lineage recorded as superseded source material.
+    notes: >
+      ADR 0002-C (Option A — absorb). Re-home, not merge: histories disjoint, use reconcile-port.
+      Parser is dropped (already in core via G8). Validate the ProcessNode/DataAsset -> DCAT/PROV/SWO
+      mapping with neo4j-modeling before authoring load Cypher with neo4j-cypher (MERGE, UNWIND, no
+      CYPHER 25). On done: mark depgraph PR #2 superseded for the lineage assets in ADR 0002 rollout.
 
   - id: G5
     epic: component-topology
@@ -852,8 +904,8 @@ items:
 # Roll-up the dispatcher can glance at. COMPUTED views — test_backlog.py enforces
 # that these match the items exactly; update them with any status change.
 summary:
-  todo: 11                                          # E1-E2, F1-F2, G3-G6, I2-I4
+  todo: 13                                          # E1-E2, F1-F2, G3-G6, G8-G9, I2-I4
   in_progress: 2                                    # G1 (provisioning authored) + G2 (core shim, step 1)
   blocked: 1                                        # G7 — live multi-DB deploy needs an Enterprise target
   done: 22                                          # A1-A3, B1-B4, C1-C4, D1-D3, H1-H7, I1
-  next_ready: [E1, F1, F2, G5, G6, I2, I3]          # todo items whose every depends_on is done (test-enforced)
+  next_ready: [E1, F1, F2, G5, G6, G8, I2, I3]      # todo items whose every depends_on is done (test-enforced)
