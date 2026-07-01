@@ -131,12 +131,12 @@ code). Full plan: [`05-drydocs-review-backflow.md`](05-drydocs-review-backflow.m
   one section per label, `hidden_props`/`_`-keys stripped, spine provenance on headers). 6 tests.
 - **H3** ✅ P3 *done 2026-07-01* — `drydocs/sme_notes.py`: `SME[sid] $FR/$UC/$OQ/$NOTES` harvester
   (read-only `harvest_tree` + `route`; excludes `data/`). 5 tests, synthetic SIDs.
-- **H4** ☐ P3 Reproduce the HITL prompt-page **generator** (renderer over
-  `04-sme-checklist-and-load-plan.md` + `taxonomy-ontology-map.yaml` + `classification.yaml`).
-  *Accept:* emits interactive checklist pages (localStorage, no-write-until-confirmed, parent+child);
-  example seeded from vendor-bmc. (depends: H1, H2)
-- **H5** ☐ P3 Reproduce `drydocs/publishing/` with the Confluence push abstracted behind a pluggable publisher.
-  *Accept:* assembler/validator/preview + local preview test; no `toby_publish_confluence`, no space coords. (depends: H4)
+- **H4** ✅ P3 *done 2026-07-01* — `drydocs/gate_pages.py`: `render_gate_page(spec)` → interactive HTML
+  (checkbox per confirmation, localStorage, progress bar, classification badge, "no write until confirmed").
+  Example `config/gate-prompts/vendor-bmc-example.yaml`. 6 tests. *Gated:* real PAT/SEAL gate pages deferred.
+- **H5** ✅ P3 *done 2026-07-01* — `drydocs/publishing/`: `assemble` + validator (well-formed XML + macro
+  allow-list) + `write_preview` + `Publisher` Protocol (Noop/Local; Confluence push abstracted). 10 tests.
+  *Gated:* a real `ConfluencePublisher` (space coords/auth) deferred to the company twin.
 - **H6** ✅ P2 *done 2026-07-01* — Closed the boundary-guard blind spot: `review` `COMPONENT_GROUP`
   (graph_verify, review_labels) + `test_every_module_is_classified` (default-deny: UNCLASSIFIED +
   AMBIGUOUS) + MODULE_MAP rows. Boundary guard 3 passed; Track-1 92 passed / 0 failed.

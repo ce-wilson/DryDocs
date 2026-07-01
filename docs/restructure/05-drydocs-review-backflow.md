@@ -135,9 +135,18 @@ Tracked as **Epic H** in [`backlog.yaml`](backlog.yaml).
   provenance on each section header. 6 unit tests.
 - **H3 — done (2026-07-01).** [`drydocs/sme_notes.py`](../../drydocs/sme_notes.py): `SME[sid] $FR/$UC/$OQ/$NOTES`
   harvester (read-only `harvest_tree`/`route`, excludes `data/`). 5 unit tests, synthetic SIDs.
+- **H4 — done (2026-07-01).** [`drydocs/gate_pages.py`](../../drydocs/gate_pages.py): `render_gate_page(spec)`
+  → self-contained interactive HTML (checkbox per confirmation, localStorage persistence, progress bar,
+  classification badge, mapping table, "no graph write until confirmed" banner). Example
+  [`config/gate-prompts/vendor-bmc-example.yaml`](../../config/gate-prompts/vendor-bmc-example.yaml). 6 unit tests.
+- **H5 — done (2026-07-01).** [`drydocs/publishing/`](../../drydocs/publishing/__init__.py): `assemble` +
+  validator (well-formed XML + macro allow-list) + `write_preview` + `Publisher` Protocol
+  (Noop/Local; Confluence push abstracted — no `toby_publish_confluence`, no space coords). 10 unit tests.
 - **H6 — done (2026-07-01).** Boundary guard closed: `review` component group +
   `test_every_module_is_classified` (default-deny). Boundary guard 3 passed; Track-1 92 passed / 0 failed.
-- **H4–H5 — todo** (HITL page generator, publishing) — offline mechanisms; gated instances deferred (below).
+
+**Epic H offline scope is complete** — all six review modules reproduced generically (241 unit tests pass).
+What remains is HITL/company-gated or an architecture decision (below).
 
 ## Deferred / gated — the to-do list (NOT built today)
 
@@ -160,3 +169,11 @@ per scope it is documented here rather than built:
 4. **Running against a live graph.** `run_suite` reads a real Neo4j graph; it writes no meaning
    edges (read-only), so *running* it is not HITL-gated — but it needs a provisioned graph
    (Epic G) to exercise beyond the offline unit tests.
+5. **Real gate pages (HITL-gated).** `gate_pages.render_gate_page` renders any spec; the committed
+   example is vendor-BMC. Pages for real PAT/SEAL load steps encode `Internal-Confidential` data
+   (real LoB/Sub-LoB/Product-Line, SEAL ids) — those specs + rendered pages live in a gitignored
+   twin and are produced as part of a gated load run, never committed here.
+6. **Real `ConfluencePublisher` (company-gated).** The publishing pipeline ships offline publishers
+   only (`Noop`/`Local`). A real Confluence push (space coordinates, auth, the internal
+   `toby_publish_confluence` wrapper) is a company-side implementation of the `Publisher` Protocol in
+   the gitignored twin — deliberately absent from this public template.

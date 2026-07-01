@@ -1,0 +1,35 @@
+# Example SME gate-prompt spec — generic vendor-BMC load step (publishable).
+# classification: Internal-Public. Real PAT/SEAL gate specs (real LoB/SEAL data) are
+# Internal-Confidential and live in a gitignored twin — never commit them here.
+classification: Internal-Public
+schema: drydocs.gate-prompt.v1
+id: vendor-bmc-structural
+title: "SME Gate Prompt — Control-M structural skeleton (example)"
+step: "Step 0 of the load plan (example) — vendor-BMC folder/job/condition skeleton"
+summary: >
+  Loads the Control-M folder → job → condition skeleton from the vendor-BMC baseline
+  export. This is a generic, publishable example of a gate page; no internal data is
+  in scope. No graph write happens until the mappings below are confirmed.
+sections:
+  - title: "A. Scope confirmation"
+    confirmations:
+      - "The vendor-BMC export is the authoritative source for folder/job/condition structure."
+      - "No SEAL / PAT / application / person data is in scope for this step."
+      - "The raw export stays in a gitignored path and is never committed or published."
+  - title: "B. Sign-off"
+    confirmations:
+      - "All mappings below were reviewed and are correct."
+      - "Safe to transcribe the decision into config/gate-log.md and flip the mappings to status: confirmed."
+mapping:
+  - n: 1
+    element: "Folder (name, id)"
+    target: ":JobFolder {folder_id, name}"
+    edge: "—"
+  - n: 2
+    element: "Job (name, id)"
+    target: ":ControlMJob {job_id, name}"
+    edge: ":JobFolder -[:CONTAINS_JOB]-> :ControlMJob"
+  - n: 3
+    element: "In/Out condition"
+    target: ":Condition {folder_id, name}"
+    edge: ":ControlMJob -[:REQUIRES_IN|EMITS_OUT]-> :Condition"

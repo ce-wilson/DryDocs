@@ -42,12 +42,14 @@ COMPONENT_GROUPS: dict[str, tuple[str, ...]] = {
     "load": ("drydocs.loaders", "drydocs.cli", "drydocs.snapshots"),
     # drydocs-review — SME review + graph acceptance + docs publish (Epic H).
     # The default-deny test below FORCES a new review module to be classified here
-    # rather than being silently unguarded. Add publishing (H5) when it lands.
+    # rather than being silently unguarded.
     "review": (
         "drydocs.graph_verify",
         "drydocs.review_labels",
         "drydocs.graph_review",
         "drydocs.sme_notes",
+        "drydocs.gate_pages",
+        "drydocs.publishing",
     ),
 }
 ALL_COMPONENT_PREFIXES: tuple[str, ...] = tuple(
