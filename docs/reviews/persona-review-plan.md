@@ -1,5 +1,9 @@
 # DryDocs — Multi-Persona Project Review (resumable routine plan)
 
+> **STATUS: Superseded (2026-07-01).** This review/plan is complete; its findings were rolled
+> into `docs/decisions/` (ADRs), `MODULE_MAP.md`, and `docs/restructure/backlog.yaml`.
+> Kept for historical reference.
+
 Autonomous, resumable review of DryDocs from two expert personas, run as a daily
 routine **within usage limits**, checkpointing after every unit so it resumes
 across days until complete.

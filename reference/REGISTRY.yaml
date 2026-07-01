@@ -53,7 +53,7 @@ platforms:
       Repos as reference sources: code provenance (authorship → :Developer), and the
       external repos mirrored under the sandbox root used as modeling references.
     repos:
-      - https://github.com/ce-wilson/DryDocs1     # this project (target)
+      - https://github.com/ce-wilson/DryDocs     # this project (target)
 
 standards:
   - id: prov-o

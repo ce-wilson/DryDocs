@@ -1,5 +1,9 @@
 # Feature: Oracle Ingestion — scaffold + sync contract
 
+> **STATUS: Superseded (2026-07-01).** This review/plan is complete; its findings were rolled
+> into `docs/decisions/` (ADRs), `MODULE_MAP.md`, and `docs/restructure/backlog.yaml`.
+> Kept for historical reference.
+
 **Branch mapping:** producer `feature/oracle-ingestion`  →  company `psgmgr-base`.
 This feature delivers the supplemental staging + incremental-ingestion work from
 [persona-oracle-dba.md](persona-oracle-dba.md), and will iterate. The point of this

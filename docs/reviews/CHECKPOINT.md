@@ -1,5 +1,9 @@
 # Persona Review — CHECKPOINT
 
+> **STATUS: Superseded (2026-07-01).** This review/plan is complete; its findings were rolled
+> into `docs/decisions/` (ADRs), `MODULE_MAP.md`, and `docs/restructure/backlog.yaml`.
+> Kept for historical reference.
+
 status: COMPLETE           # NOT_STARTED | IN_PROGRESS | COMPLETE
 current_phase: 3           # 1 = Oracle DBA, 2 = Neo4j architect, 3 = synthesis
 current_task: 3.1

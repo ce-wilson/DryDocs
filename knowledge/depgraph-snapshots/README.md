@@ -10,8 +10,8 @@ project to a Neo4j-style dependency model + machine-first JSON).
 ## Command (after `git push`)
 
 ```powershell
-.\snapshot.ps1            # -> drydocs1-YYYYMMDD.json   (code graph: drydocs/ + tests/)
-.\snapshot.ps1 -Tree      # -> drydocs1-tree-YYYYMMDD.json  (full repo file tree)
+.\snapshot.ps1            # -> drydocs-YYYYMMDD.json   (code graph: drydocs/ + tests/)
+.\snapshot.ps1 -Tree      # -> drydocs-tree-YYYYMMDD.json  (full repo file tree)
 ```
 
 [`snapshot.ps1`](snapshot.ps1) runs depgraph and writes `<project>-<date>.json` with a **`meta`
@@ -19,7 +19,7 @@ header** so each snapshot is self-identifying:
 
 ```jsonc
 "meta": {
-  "project": "drydocs1", "captured_at": "...", "date": "YYYYMMDD",
+  "project": "drydocs", "captured_at": "...", "date": "YYYYMMDD",
   "scan": ["drydocs","tests"], "tree": false,
   "git": { "commit": "<short>", "full": "...", "branch": "main",
            "describe": "...", "subject": "...", "dirty": false, "pr": <num|null> }
@@ -38,7 +38,11 @@ Each snapshot's summary line reports `files`, `edges`, `circular_files`. To see 
   it renders the graph (cytoscape.js, MIT, CDN — no build) and colors the diff
   (green = added in B, red = removed, grey = unchanged). Views: directory **Structure**,
   Structure+files, or **Dependencies** (Python imports). Compares by project-relative path,
-  so different projects (e.g. `drydocs-original` vs `drydocs1`) align.
+  so different projects (e.g. `drydocs-original` vs `drydocs`) align.
+
+> **Historical note:** Snapshots captured before 2026-07-01 are named `drydocs1-*.json`
+> (the project's original name). Files are intentionally not renamed; the historical record
+> is preserved as-is. New snapshots follow the `drydocs-<date>.json` convention.
 - or diff the two `.json` files (`git diff` / any JSON diff tool), or watch the summary counts.
 
 ### Seeded comparison — the v1 rewrite (original vs this version)

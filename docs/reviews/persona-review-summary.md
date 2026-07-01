@@ -1,5 +1,9 @@
 # DryDocs Multi-Persona Review — Synthesis Summary
 
+> **STATUS: Superseded (2026-07-01).** This review/plan is complete; its findings were rolled
+> into `docs/decisions/` (ADRs), `MODULE_MAP.md`, and `docs/restructure/backlog.yaml`.
+> Kept for historical reference.
+
 **Review scope:** Oracle-side supplemental staging design (Phase 1 / Oracle DBA
 persona) + graph/ontology architecture (Phase 2 / Neo4j Architect persona). Both
 personas reviewed the same target: the DryDocs incremental-ingestion feature for

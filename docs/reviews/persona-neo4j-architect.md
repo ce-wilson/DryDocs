@@ -1,5 +1,9 @@
 # Persona Review — Neo4j Architect / Ontology (Phase 2)
 
+> **STATUS: Superseded (2026-07-01).** This review/plan is complete; its findings were rolled
+> into `docs/decisions/` (ADRs), `MODULE_MAP.md`, and `docs/restructure/backlog.yaml`.
+> Kept for historical reference.
+
 Reviewer persona: **Neo4j Architect** (via `neo4j-getting-started-skill`,
 `neo4j-modeling-skill`, `neo4j-cypher-skill`, `neo4j-import-skill`). Mandate:
 review the Phase-1 Oracle DBA staging design from a graph/ontology standpoint;

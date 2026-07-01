@@ -1,7 +1,6 @@
-# DryDocs1 — project plan (context-graph restructure)
+# DryDocs — project plan (context-graph restructure)
 
-**Target repo:** https://github.com/ce-wilson/DryDocs1.git
-**Branch:** `restructure/context-graph-layering`
+**Target repo:** https://github.com/ce-wilson/DryDocs.git
 **Viewpoint:** production support / development support throughout.
 **Date:** 2026-06-20
 

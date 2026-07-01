@@ -3,8 +3,8 @@
   `meta` header (git commit / branch / PR / capture date) so each snapshot is
   self-identifying and comparable. Run after a push.
 
-    .\snapshot.ps1                       # code graph: drydocs/ + tests/  -> drydocs1-YYYYMMDD.json
-    .\snapshot.ps1 -Tree                 # full file tree (repo root)      -> drydocs1-tree-YYYYMMDD.json
+    .\snapshot.ps1                       # code graph: drydocs/ + tests/  -> drydocs-YYYYMMDD.json
+    .\snapshot.ps1 -Tree                 # full file tree (repo root)      -> drydocs-tree-YYYYMMDD.json
     .\snapshot.ps1 -Project myproj       # override the project name
 
   The header is prepended to depgraph's JSON (formatting preserved, no BOM) so the
@@ -12,7 +12,7 @@
 #>
 [CmdletBinding()]
 param(
-  [string]$Project = "drydocs1",
+  [string]$Project = "drydocs",
   [switch]$Tree
 )
 $ErrorActionPreference = "Stop"

@@ -1,5 +1,9 @@
 # DryDocs — SDLC Documentation Session Plan
 
+> **STATUS: Superseded (2026-07-01).** This review/plan is complete; its findings were rolled
+> into `docs/decisions/` (ADRs), `MODULE_MAP.md`, and `docs/restructure/backlog.yaml`.
+> Kept for historical reference.
+
 Resumable, persona-driven maintenance of living SDLC documents for the two primary
 DryDocs flows: **Oracle Ingestion** and **Neo4j Schema Meta**.
 

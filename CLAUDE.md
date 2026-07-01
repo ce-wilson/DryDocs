@@ -1,4 +1,4 @@
-# DryDocs1 — agent operating guide
+# DryDocs — agent operating guide
 
 **DryDocs is a production-support / development-support knowledge graph for D&A batch
 processing.** It answers: *what runs, what it depends on, who owns it, which application

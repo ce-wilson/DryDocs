@@ -1,5 +1,9 @@
 # Persona Review — Oracle DBA (Phase 1)
 
+> **STATUS: Superseded (2026-07-01).** This review/plan is complete; its findings were rolled
+> into `docs/decisions/` (ADRs), `MODULE_MAP.md`, and `docs/restructure/backlog.yaml`.
+> Kept for historical reference.
+
 Reviewer persona: **Oracle DBA** (via the `db` skill). Mandate: treat `psgmgr` as
 the read-only source of truth; design a **supplemental** staging layer extending
 `DRYDOCS_STG`, built through the DryDocs Python framework using **existing roles**;

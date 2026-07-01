@@ -1,5 +1,9 @@
 # DryDocs — Consolidated Work Plan
 
+> **STATUS: Superseded (2026-07-01).** This plan preceded the v1 restructure. Its surviving
+> work streams were absorbed into `docs/restructure/01-project-plan.md` (Phases 2–3) and are
+> tracked in `docs/restructure/backlog.yaml`. Kept for historical reference.
+
 **Supersedes:** `persona-review-plan.md` (review COMPLETE; this plan owns next steps)
 **Date:** 2026-06-18
 **Branch:** `feature/oracle-ingestion` → company `psgmgr-base`

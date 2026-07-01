@@ -1,5 +1,9 @@
 # Oracle Ingestion — Living SDLC Document
 
+> **STATUS: Superseded (2026-07-01).** This review/plan is complete; its findings were rolled
+> into `docs/decisions/` (ADRs), `MODULE_MAP.md`, and `docs/restructure/backlog.yaml`.
+> Kept for historical reference.
+
 <!-- §META -->
 ```yaml
 persona: oracle-dba
