@@ -1,8 +1,12 @@
-# DryDocs1 — sub-agent backlog
+# DryDocs — sub-agent backlog
 
 > **This is the human-readable view.** The machine source of truth agents pull from is
 > [`backlog.yaml`](backlog.yaml); new ideas are captured in [`IDEAS.md`](IDEAS.md) and groomed
 > into the yaml. Keep the two in sync (same ids). See `CLAUDE.md` §0 for the work ritual.
+>
+> **Status glyphs here are best-effort — `backlog.yaml` `status:` is authoritative** (and now
+> test-enforced by `tests/unit/test_backlog.py`). Once the rendered HTML board lands (item I2),
+> that board replaces this file as the human view.
 
 Work units sized for lower-cost sub-agents. Each item names: **agent**, **inputs**, **output**,
 **acceptance test**, **precedence/HITL** touchpoints. The main (Opus) session dispatches and
@@ -142,6 +146,26 @@ code). Full plan: [`05-drydocs-review-backflow.md`](05-drydocs-review-backflow.m
   AMBIGUOUS) + MODULE_MAP rows. Boundary guard 3 passed; Track-1 92 passed / 0 failed.
 - **H7** ✅ P3 *done 2026-07-01* — Document the **Canonical-COMPANY** back-flow reconciliation direction
   in `git-readme.md`, `port-prompt.md`, and the `reconcile-port` divergence ledger.
+
+## Epic I — Project board & planning infrastructure (main) — Phase 8
+
+Groomed 2026-07-01 from the architecture review. Principle: **the backlog is the database, the
+board is a render of it, capture/transcription is an agent job.** Model discipline for daily
+usage limits: opus only where a decision changes the schema or a boundary; sonnet for anything
+with a written acceptance test; haiku for renames/ritual wiring.
+
+- **I1** ☑ P1 *done 2026-07-01* — Backlog schema v2: `plan:` (phases w/ goals + status),
+  `modules:` registry, and `title`/`type`/`module`/`phase` on every item, so a future to-do lands
+  as `type: requirement` aligned to a module + phase. `tests/unit/test_backlog.py` enforces the
+  schema and keeps `summary:`/`next_ready:` computed-consistent.
+- **I2** ☐ P1 (sonnet) — `drydocs/plan_board.py` renders `backlog.yaml` → `docs/plan/board.html`:
+  self-contained roadmap strip + kanban + module/phase/epic/type filters + quick-capture box.
+  *Accept:* offline tests; classified in MODULE_MAP + boundary test; board committed. (depends: I1)
+- **I3** ☐ P2 (opus authors; sonnet runs) — `groom-backlog` skill: raw notes / paper-note photos →
+  IDEAS lines or full v2 items; asks only on ambiguous module/phase; audit trail updated.
+  *Accept:* `test_backlog.py` green after a groom run. (depends: I1)
+- **I4** ☐ P3 (haiku) — Session-end ritual regenerates the board alongside the depgraph snapshot.
+  *Accept:* CLAUDE.md ritual + render script wired next to `snapshot.ps1`. (depends: I2)
 
 ---
 

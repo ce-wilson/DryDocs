@@ -26,10 +26,26 @@ Tags help grooming: `idea` · `bug` · `doc` · `source` (new data source) · `q
 
 <!-- add new ideas at the top -->
 
-- _(empty — add your first idea here)_
+- [chore] Versioning reset: adopt semver policy (VERSIONING.md), cut first tag (v0.2.0 or v0.3.0
+  with the board), start CHANGELOG.md back-filled from completed epics. (2026-07-01 architecture review)
+- [chore] CI: GitHub Actions running the CLAUDE.md gates (pytest -q, import drydocs.cli,
+  drydocs --help, ruff) on every push; classification test as publish-boundary guard. (same review)
+- [chore] Fragment cleanup: DryDocs1→DryDocs in CLAUDE.md:1 + 01-project-plan.md:1-4 (repo URL,
+  merged branch line); drydocs1→drydocs in knowledge/depgraph-snapshots/snapshot.ps1 + its README;
+  drop the stray `@claude - <Aura console URL>` line at README.md:1; "superseded" banners on
+  docs/reviews/ persona+SDLC docs + consolidated plan; README for SDLC-Docs/ marking it frozen. (same review)
+- [idea] cli.py regroup: split the 937-line flat command list into domain subcommand groups
+  (schema/ingest/verify/variables) — NOT milestone names; rename m1-verify/m3-verify →
+  verify-reference/verify-controlm with deprecation aliases at the v1.0 window. (same review)
+- [chore] Remove unused deps: pandas, streamlit, streamlit-agraph (runtime), pypdf (dev) — declared
+  in pyproject.toml, imported nowhere; ~100MB install weight. (same review)
+- [idea] Integration tests: testcontainers[neo4j] is already a dev dep but unused — one end-to-end
+  CSV→Neo4j load test would cover the untested Cypher-execution path. (same review)
 
 ## Recently groomed (audit trail)
 
 <!-- when you promote an idea, move its line here with the resulting backlog id -->
 
+- 2026-07-01 — Epic I (I1–I4, project board & planning infrastructure) groomed into `backlog.yaml`
+  from the architecture-review plan; schema upgraded to `drydocs.backlog.v2` (I1 done same day).
 - 2026-06-20 — initial backlog A1–F2 seeded directly into `backlog.yaml` from `02-backlog.md`.

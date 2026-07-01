@@ -2,7 +2,8 @@
 # backlog.yaml — the machine-readable backlog agents pull from.
 #
 # This is the SOURCE OF TRUTH for work items. 02-backlog.md is the human-readable
-# view of the same items; IDEAS.md is the low-friction inbox that feeds this file.
+# view of the same items (superseded by the rendered board once I2 lands);
+# IDEAS.md is the inbox that feeds this file.
 #
 # HOW AN AGENT PULLS WORK:
 #   1. Find the next item with status: todo whose every depends_on id is status: done.
@@ -14,27 +15,97 @@
 # STATUS lifecycle (mirrors relationship_vocabulary.yaml's idiom on purpose):
 #   todo | in_progress | blocked | done
 #
-# FIELDS:
+# FIELDS (v2 — validated by tests/unit/test_backlog.py):
 #   id          stable short id (matches 02-backlog.md)
+#   title       REQUIRED plain-English one-liner — never rely on the id/codename alone
+#   type        requirement (future capability ask) | task | chore | bug
+#   module      which module/work area it lands in — must be in `modules:` below
+#   phase       which plan phase it belongs to — must be an id in `plan.phases` below
 #   epic        grouping
 #   agent       which sub-agent owns it (.claude/agents/) or "main" for the Opus session
-#   model       suggested model tier
+#   model       suggested model tier (haiku | sonnet | opus)
 #   priority    p0 (blocker) | p1 | p2 | p3
 #   status      todo | in_progress | blocked | done
 #   depends_on  list of ids that must be `done` first ([] = startable now)
 #   inputs      files/paths/registry keys the agent needs
 #   acceptance  the pass/fail test for "done"
 #   notes       optional
+#
+# The `summary:` roll-up and `next_ready:` list at the bottom are COMPUTED views —
+# test_backlog.py fails if they drift from the items, so update them with any status change.
 # =============================================================================
 
-schema: drydocs.backlog.v1
-updated: 2026-06-26
+schema: drydocs.backlog.v2
+updated: 2026-07-01
+
+# ── The high-level project plan (rendered as the board's roadmap strip) ───────
+plan:
+  phases:
+    - id: 0
+      title: Restructure scaffolding
+      goal: "Four-layer model, external/internal split, config layer, publish boundary, sub-agents."
+      status: done
+    - id: 1
+      title: Taxonomy capture
+      goal: "Live sources captured in config/taxonomy/ as pure classification (Epic B)."
+      status: done
+    - id: 2
+      title: Ontology mapping + HITL
+      goal: "Every graph edge traces to an SME-confirmed taxonomy→ontology mapping (Epic C)."
+      status: done
+    - id: 3
+      title: Config-driven loaders
+      goal: "Precedence + source gating read config/, not hardcoded logic (Epic D)."
+      status: done
+    - id: 4
+      title: Context graph pilot
+      goal: "SOSA/SSN observation modeling answers one live support question (Epic E)."
+      status: todo
+    - id: 5
+      title: Orchestrator expansion
+      goal: "AutoSys + Airflow land as BMC-baseline concepts via confirmed crosswalks (Epic F)."
+      status: todo
+    - id: 6
+      title: Modular architecture / component topology
+      goal: "ADR 0002 — core extraction, multi-DB topology, component packages (Epic G)."
+      status: in_progress
+    - id: 7
+      title: Review toolkit back-flow
+      goal: "Company SME-review/HITL toolkit reproduced generically, offline (Epic H)."
+      status: done
+    - id: 8
+      title: Planning & release infrastructure
+      goal: "Repo-native project board + capture loop; groundwork for versioned releases (Epic I)."
+      status: in_progress
+      release: v0.3.0
+
+# ── Module / work-area registry (item.module must be one of these) ───────────
+# Code components mirror MODULE_MAP.md; the rest are repo work areas so that
+# non-code requirements still align to something a future phase can pick up.
+modules:
+  - drydocs-core         # parse/model/config/driver layer (MODULE_MAP.md)
+  - drydocs-load         # loaders + cli + snapshots
+  - drydocs-review       # graph_verify / review_labels / graph_review / gate_pages / publishing
+  - drydocs-plan         # future: the project-board renderer (Epic I)
+  - drydocs-lineage      # future component (G4)
+  - drydocs-deepdoc      # future component (G4)
+  - drydocs-remediation  # future component (G3)
+  - reference            # reference/ + external/ vendor & standards material
+  - taxonomy             # config/taxonomy/ captures
+  - ontology             # drydocs/schema/, relationship vocabulary, mappings
+  - config               # config/ precedence, registries, crosswalks
+  - graph-infra          # Neo4j topology, provisioning, deployment targets
+  - docs                 # plans, ADRs, process docs, skills, rituals
 
 items:
 
   # ── Epic A — Reference hygiene (reference-librarian, haiku) ────────────────
   - id: A1
     epic: reference-hygiene
+    title: "Audit reference registry paths for staleness"
+    type: chore
+    module: reference
+    phase: 0
     agent: reference-librarian
     model: haiku
     priority: p2
@@ -46,6 +117,10 @@ items:
 
   - id: A2
     epic: reference-hygiene
+    title: "Account for every BMC doc in the source manifest"
+    type: chore
+    module: reference
+    phase: 0
     agent: reference-librarian
     model: haiku
     priority: p3
@@ -57,6 +132,10 @@ items:
 
   - id: A3
     epic: reference-hygiene
+    title: "Seed the research index with linked rationale"
+    type: chore
+    module: reference
+    phase: 0
     agent: reference-librarian
     model: haiku
     priority: p3
@@ -69,6 +148,10 @@ items:
   # ── Epic B — Taxonomy capture (taxonomy-importer, sonnet) — Phase 1 ────────
   - id: B1
     epic: taxonomy-capture
+    title: "Capture Control-M folders/jobs/conditions as taxonomy"
+    type: task
+    module: taxonomy
+    phase: 1
     agent: taxonomy-importer
     model: sonnet
     priority: p1
@@ -86,6 +169,10 @@ items:
 
   - id: B2
     epic: taxonomy-capture
+    title: "Capture SEAL business applications as taxonomy"
+    type: task
+    module: taxonomy
+    phase: 1
     agent: taxonomy-importer
     model: sonnet
     priority: p1
@@ -102,6 +189,10 @@ items:
 
   - id: B3
     epic: taxonomy-capture
+    title: "Capture the LOB→Product→Team hierarchy as taxonomy"
+    type: task
+    module: taxonomy
+    phase: 1
     agent: taxonomy-importer
     model: sonnet
     priority: p1
@@ -116,6 +207,10 @@ items:
 
   - id: B4
     epic: taxonomy-capture
+    title: "Capture the Oracle schema shape template as taxonomy"
+    type: task
+    module: taxonomy
+    phase: 1
     agent: taxonomy-importer
     model: sonnet
     priority: p2
@@ -131,6 +226,10 @@ items:
   # ── Epic C — Ontology mapping + HITL (ontology-mapper, sonnet) — Phase 2 ───
   - id: C1
     epic: ontology-mapping
+    title: "Confirm Control-M edge mappings through the HITL gate"
+    type: task
+    module: ontology
+    phase: 2
     agent: ontology-mapper
     model: sonnet
     priority: p1
@@ -147,6 +246,10 @@ items:
 
   - id: C2
     epic: ontology-mapping
+    title: "Confirm SEAL mappings against DPROD/ORG terms"
+    type: task
+    module: ontology
+    phase: 2
     agent: ontology-mapper
     model: sonnet
     priority: p1
@@ -161,6 +264,10 @@ items:
 
   - id: C3
     epic: ontology-mapping
+    title: "Confirm catalog hierarchy mappings; resolve SUPPORTS range"
+    type: task
+    module: ontology
+    phase: 2
     agent: ontology-mapper
     model: sonnet
     priority: p1
@@ -177,6 +284,10 @@ items:
 
   - id: C4
     epic: ontology-mapping
+    title: "Reconcile the relationship vocabulary with the confirmed map"
+    type: task
+    module: ontology
+    phase: 2
     agent: ontology-mapper
     model: sonnet
     priority: p1
@@ -194,6 +305,10 @@ items:
   # ── Epic D — Config-driven loaders (pipeline-config + main) — Phase 3 ──────
   - id: D1
     epic: config-loaders
+    title: "Land the P0 loader fixes (SCHEDULED_ON, datetime, stale edges)"
+    type: bug
+    module: drydocs-load
+    phase: 3
     agent: main
     model: opus
     priority: p0
@@ -211,6 +326,10 @@ items:
 
   - id: D2
     epic: config-loaders
+    title: "Drive catalog reconciliation from precedence.yaml"
+    type: task
+    module: config
+    phase: 3
     agent: pipeline-config
     model: sonnet
     priority: p2
@@ -231,6 +350,10 @@ items:
 
   - id: D3
     epic: config-loaders
+    title: "Fail fast when loading an unconfirmed source"
+    type: task
+    module: config
+    phase: 3
     agent: pipeline-config
     model: sonnet
     priority: p2
@@ -250,6 +373,10 @@ items:
   # ── Epic E — Context graph pilot (ontology-mapper + main) — Phase 4 ────────
   - id: E1
     epic: context-graph
+    title: "Register SOSA/SSN observation terms via the gate"
+    type: task
+    module: ontology
+    phase: 4
     agent: ontology-mapper
     model: sonnet
     priority: p2
@@ -269,6 +396,10 @@ items:
 
   - id: E2
     epic: context-graph
+    title: "Answer one folder health/freshness question with a context query"
+    type: requirement
+    module: ontology
+    phase: 4
     agent: main
     model: opus
     priority: p2
@@ -280,6 +411,10 @@ items:
   # ── Epic F — Orchestrator expansion (pipeline-config) — Phase 5 ────────────
   - id: F1
     epic: orchestrator-expansion
+    title: "Map the AutoSys crosswalk to the BMC baseline"
+    type: requirement
+    module: config
+    phase: 5
     agent: pipeline-config
     model: sonnet
     priority: p3
@@ -290,6 +425,10 @@ items:
 
   - id: F2
     epic: orchestrator-expansion
+    title: "Map the Airflow/MWAA crosswalk to the BMC baseline"
+    type: requirement
+    module: config
+    phase: 5
     agent: pipeline-config
     model: sonnet
     priority: p3
@@ -303,6 +442,10 @@ items:
   # via the SME gate (config/gate-log.md, 2026-06-26). Edition = Neo4j Enterprise (committed).
   - id: G1
     epic: component-topology
+    title: "Author and locally validate the multi-DB topology"
+    type: task
+    module: graph-infra
+    phase: 6
     agent: main
     model: opus
     priority: p1
@@ -329,6 +472,10 @@ items:
 
   - id: G7
     epic: component-topology
+    title: "Deploy the multi-DB topology to the live target"
+    type: task
+    module: graph-infra
+    phase: 6
     agent: main
     model: opus
     priority: p2
@@ -346,6 +493,10 @@ items:
 
   - id: G2
     epic: component-topology
+    title: "Extract drydocs-core behind the boundary shim"
+    type: task
+    module: drydocs-core
+    phase: 6
     agent: main
     model: opus
     priority: p1
@@ -370,6 +521,10 @@ items:
 
   - id: G3
     epic: component-topology
+    title: "Rebase the remediation spinoff onto drydocs-core"
+    type: requirement
+    module: drydocs-remediation
+    phase: 6
     agent: main
     model: opus
     priority: p2
@@ -388,6 +543,10 @@ items:
 
   - id: G4
     epic: component-topology
+    title: "Scaffold the lineage and deepdoc component packages"
+    type: requirement
+    module: drydocs-lineage
+    phase: 6
     agent: main
     model: opus
     priority: p3
@@ -405,6 +564,10 @@ items:
 
   - id: G5
     epic: component-topology
+    title: "Document the context→ground-truth promotion path"
+    type: chore
+    module: docs
+    phase: 6
     agent: ontology-mapper
     model: sonnet
     priority: p2
@@ -422,6 +585,10 @@ items:
 
   - id: G6
     epic: component-topology
+    title: "Cross-link the rejected topology alternatives"
+    type: chore
+    module: docs
+    phase: 6
     agent: reference-librarian
     model: haiku
     priority: p3
@@ -442,6 +609,10 @@ items:
   # descriptions — never copy company code. See docs/restructure/05-drydocs-review-backflow.md.
   - id: H1
     epic: drydocs-review-backflow
+    title: "Reproduce graph_verify + review_labels (offline spine)"
+    type: task
+    module: drydocs-review
+    phase: 7
     agent: main
     model: opus
     priority: p2
@@ -461,6 +632,10 @@ items:
 
   - id: H2
     epic: drydocs-review-backflow
+    title: "Reproduce the graph_review HTML renderer"
+    type: task
+    module: drydocs-review
+    phase: 7
     agent: main
     model: opus
     priority: p2
@@ -477,6 +652,10 @@ items:
 
   - id: H3
     epic: drydocs-review-backflow
+    title: "Reproduce the SME-notes harvester"
+    type: task
+    module: drydocs-review
+    phase: 7
     agent: main
     model: opus
     priority: p3
@@ -492,6 +671,10 @@ items:
 
   - id: H4
     epic: drydocs-review-backflow
+    title: "Reproduce the HITL gate-page generator"
+    type: task
+    module: drydocs-review
+    phase: 7
     agent: main
     model: opus
     priority: p3
@@ -512,6 +695,10 @@ items:
 
   - id: H5
     epic: drydocs-review-backflow
+    title: "Reproduce the publishing pipeline with a pluggable publisher"
+    type: task
+    module: drydocs-review
+    phase: 7
     agent: main
     model: opus
     priority: p3
@@ -530,6 +717,10 @@ items:
 
   - id: H6
     epic: drydocs-review-backflow
+    title: "Close the module-boundary blind spot (default-deny)"
+    type: task
+    module: drydocs-review
+    phase: 7
     agent: main
     model: sonnet
     priority: p2
@@ -550,6 +741,10 @@ items:
 
   - id: H7
     epic: drydocs-review-backflow
+    title: "Document the Canonical-COMPANY back-flow rule"
+    type: chore
+    module: docs
+    phase: 7
     agent: main
     model: haiku
     priority: p3
@@ -562,10 +757,103 @@ items:
       guide, the port prompt, and the reconcile-port divergence ledger.
     notes: "Done 2026-07-01 alongside this plan. The cross-boundary rule that prevents the next port from clobbering company's wired originals."
 
-# Roll-up the dispatcher can glance at (keep in sync, or regenerate).
+  # ── Epic I — Project board & planning infrastructure (main) — Phase 8 ─────
+  # Groomed 2026-07-01 from the architecture review: the backlog is the database,
+  # the board is a render of it, capture/transcription is an agent job. Model
+  # discipline (daily-usage limits): opus/fable only where a decision changes the
+  # schema or a boundary; sonnet for anything with an acceptance test already
+  # written; haiku for lookups, renames, ritual wiring.
+  - id: I1
+    epic: project-board
+    title: "Backlog schema v2: plan, modules, titles, validation"
+    type: task
+    module: docs
+    phase: 8
+    agent: main
+    model: opus
+    priority: p1
+    status: done
+    depends_on: []
+    inputs: [docs/restructure/backlog.yaml, MODULE_MAP.md, tests/unit/test_classification.py]
+    acceptance: >
+      backlog.yaml declares drydocs.backlog.v2 with a plan: (phases incl. goal/status) and a
+      modules: registry; every item carries title/type/module/phase; tests/unit/test_backlog.py
+      validates the schema (unique ids, deps resolve + acyclic, module/phase/enums valid,
+      summary + next_ready computed-consistent) and passes; full suite stays green.
+    notes: >
+      Done 2026-07-01 (this change). Fields chosen so a future to-do lands as
+      type: requirement + module + phase — requirement-to-module traceability without
+      leaving git. summary/next_ready are now test-enforced, no longer hand-trusted.
+
+  - id: I2
+    epic: project-board
+    title: "Render the backlog as an HTML project board"
+    type: requirement
+    module: drydocs-plan
+    phase: 8
+    agent: main
+    model: sonnet
+    priority: p1
+    status: todo
+    depends_on: [I1]
+    inputs: [docs/restructure/backlog.yaml, drydocs/gate_pages.py, MODULE_MAP.md]
+    acceptance: >
+      drydocs/plan_board.py renders backlog.yaml -> docs/plan/board.html, self-contained
+      (roadmap strip from plan: with computed per-phase progress, kanban columns by status,
+      client-side filters by module/phase/epic/type, depends_on rendered as links, quick-capture
+      box that formats a paste-ready IDEAS.md line to clipboard); module classified in
+      MODULE_MAP.md + test_module_boundary.py (new `plan` component group — default-deny will
+      force it); offline unit tests on a fixture backlog; the rendered board is committed.
+      Entry point = thin script beside snapshot.ps1 until the cli.py entrypoint-boundary TODO
+      (MODULE_MAP.md) is resolved.
+    notes: >
+      Build with sonnet (gate_pages.py is the pattern to follow); one opus review pass on the
+      schema->render contract before merge. Board replaces 02-backlog.md as the human view.
+
+  - id: I3
+    epic: project-board
+    title: "Groom-backlog skill: raw notes -> backlog items"
+    type: requirement
+    module: docs
+    phase: 8
+    agent: main
+    model: opus
+    priority: p2
+    status: todo
+    depends_on: [I1]
+    inputs: [docs/restructure/IDEAS.md, docs/restructure/backlog.yaml, docs/restructure/02-backlog.md]
+    acceptance: >
+      .claude/skills/groom-backlog/SKILL.md exists: takes raw notes (pasted text, IDEAS.md inbox,
+      or a transcribed photo of paper notes), emits either IDEAS.md inbox lines or full v2 items
+      (title/type/module/phase/acceptance), asks the user only when module/phase is genuinely
+      ambiguous, moves groomed lines to the IDEAS.md audit trail, updates summary/next_ready,
+      and regenerates the board once I2 has landed. test_backlog.py green after a groom run.
+    notes: >
+      Author the skill once with opus (it shapes every future grooming run); routine weekly
+      grooming then runs on sonnet. This is the paper-notes killer — capture stays zero-schema.
+
+  - id: I4
+    epic: project-board
+    title: "Regenerate the board in the session-end ritual"
+    type: chore
+    module: docs
+    phase: 8
+    agent: main
+    model: haiku
+    priority: p3
+    status: todo
+    depends_on: [I2]
+    inputs: [CLAUDE.md, knowledge/depgraph-snapshots/snapshot.ps1]
+    acceptance: >
+      The CLAUDE.md session ritual regenerates docs/plan/board.html at session end alongside the
+      depgraph snapshot (render script wired next to snapshot.ps1), so the committed board can
+      never go stale for more than one session.
+
+# Roll-up the dispatcher can glance at. COMPUTED views — test_backlog.py enforces
+# that these match the items exactly; update them with any status change.
 summary:
-  todo: 8                                           # Epic H fully done (offline scope); non-H todo remains
-  in_progress: 2                                   # G1 (provisioning authored) + G2 (core shim, step 1)
-  blocked: 1                                       # G7 — live multi-DB deploy needs an Enterprise target
-  done: 21                                         # A1-A3, B1-B4, C1-C4, D1-D3, H1-H7 (all Epic H offline mechanisms)
-  next_ready: [E1, F1, F2, G1, G2, G5, G6]         # Epic H offline scope complete; remaining H work is HITL/company-gated (see 05-*.md)
+  todo: 11                                          # E1-E2, F1-F2, G3-G6, I2-I4
+  in_progress: 2                                    # G1 (provisioning authored) + G2 (core shim, step 1)
+  blocked: 1                                        # G7 — live multi-DB deploy needs an Enterprise target
+  done: 22                                          # A1-A3, B1-B4, C1-C4, D1-D3, H1-H7, I1
+  next_ready: [E1, F1, F2, G5, G6, I2, I3]          # todo items whose every depends_on is done (test-enforced)
