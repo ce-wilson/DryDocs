@@ -18,6 +18,20 @@ param(
 $ErrorActionPreference = "Stop"
 $here = $PSScriptRoot
 $repo = (Resolve-Path "$here\..\..").Path
+
+# --- refresh the project board (best-effort; part of the session-end ritual) --
+# backlog.yaml -> docs/plan/board.html. Deterministic render: a resulting git
+# diff on board.html means the committed board was stale — commit the refresh.
+try {
+  Push-Location $repo
+  $env:PYTHONPATH = "."
+  & python scripts/render_board.py | Write-Host
+  Pop-Location
+} catch {
+  Pop-Location -ErrorAction SilentlyContinue
+  Write-Warning "board refresh skipped: $($_.Exception.Message)"
+}
+
 $dep  = (Resolve-Path "$here\..\..\..\depgraph").Path
 
 # --- git metadata (best-effort) ---------------------------------------------

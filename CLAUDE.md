@@ -26,8 +26,9 @@ the start, push at the end, and every machine stays identical.
 
 **The backlog (what agents pull from):**
 - [`docs/restructure/backlog.yaml`](docs/restructure/backlog.yaml) — machine-readable source of
-  truth. [`02-backlog.md`](docs/restructure/02-backlog.md) is the human view; `IDEAS.md` is the
-  inbox that grooms into the yaml.
+  truth (schema `drydocs.backlog.v2`, guarded by `tests/unit/test_backlog.py`). The human view is
+  the rendered board [`docs/plan/board.html`](docs/plan/board.html) (`02-backlog.md` is the legacy
+  text view); `IDEAS.md` is the inbox, groomed into the yaml via the **`groom-backlog` skill**.
 - **Pull rule (give this to a sub-agent verbatim):** *"Take the next `status: todo` item in
   `backlog.yaml` whose every `depends_on` is `done`; set it `in_progress`; do exactly that item,
   staying inside your layer; meet its `acceptance`; set it `done`."* Anything ambiguous → the HITL
@@ -37,10 +38,14 @@ the start, push at the end, and every machine stays identical.
 1. **Start:** `git pull` → read this file → read `backlog.yaml`, pick the next ready item.
 2. **During:** the in-session Task list is *ephemeral* working memory for the one item — distinct
    from the durable `backlog.yaml`.
-3. **End:** update the item's `status`, `git push`, then **run `knowledge/depgraph-snapshots/snapshot.ps1`**
-   (writes `<project>-<date>.json` with a git-commit `meta` header for drift comparison — see
+3. **End:** update the item's `status`, **regenerate the board** (`python scripts/render_board.py`
+   — `snapshot.ps1` also does this), commit + `git push`, then **run
+   `knowledge/depgraph-snapshots/snapshot.ps1`** (writes `<project>-<date>.json` with a git-commit
+   `meta` header for drift comparison — see
    [`knowledge/depgraph-snapshots/README.md`](knowledge/depgraph-snapshots/README.md); view with
    `viewer.html`). Anything unfinished or newly noticed → `IDEAS.md`.
+   *Stale-board check (renders are deterministic):* re-render, then `git diff --quiet docs/plan/board.html`
+   — any diff means the committed board didn't match the backlog; commit the refresh.
 
 ---
 
