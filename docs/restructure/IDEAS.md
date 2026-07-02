@@ -26,6 +26,16 @@ Tags help grooming: `idea` · `bug` · `doc` · `source` (new data source) · `q
 
 <!-- add new ideas at the top -->
 
+- [doc] README.md still says :DEPENDS_ON for the derived job->job edge; the loader + m3-verify
+  write :WAS_INFORMED_BY (vocab m3_was_informed_by; DEPENDS_ON retired). Reconcile the README.
+  (2026-07-01 Control-M naming review with SME)
+- [idea] REQUIRES_SCHEDULER (:BatchProcessing -> :SchedulerKind) appears in README/plans but is
+  NOT registered in relationship_vocabulary.yaml — register status: planned + gate before wiring
+  the post-load step. (same review)
+- [idea] "Application contains folders" support view (SME's mental model): derive
+  Folder -> :BatchProcessing from job.APPLICATION reconciliation + the folder-naming resolver;
+  SME-gated DERIVED edge, never base ingest (BMC puts APPLICATION on the job; folders can hold
+  mixed applications). (same review)
 - [chore] Versioning reset: adopt semver policy (VERSIONING.md), cut first tag (v0.2.0 or v0.3.0
   with the board), start CHANGELOG.md back-filled from completed epics. (2026-07-01 architecture review)
 - [chore] CI: GitHub Actions running the CLAUDE.md gates (pytest -q, import drydocs.cli,
