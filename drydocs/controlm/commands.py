@@ -36,6 +36,7 @@ from dataclasses import dataclass, field
 # new launchers (Phase E).
 LAUNCHER_REGISTRY: list[tuple[re.Pattern, str, str]] = [
     (re.compile(r"\.m$"),                       "ABINITIO",       "abinitio.graph_or_plan"),
+    (re.compile(r"\.pset$"),                    "ABINITIO",       "abinitio.pset"),
     (re.compile(r"^m_\w+", re.I),               "INFORMATICA",    "informatica.mapping_prefix"),
     (re.compile(r"^pmcmd$", re.I),              "INFORMATICA",    "informatica.pmcmd"),
     (re.compile(r"^run_data_validation\.sh$"),  "VALIDATION_UTIL","validation.run_data_validation"),
@@ -192,6 +193,15 @@ def _looks_config(token: str) -> bool:
     return token.endswith(".json") or token.endswith(".cfg") or token.endswith(".ini")
 
 
+def _looks_script(token: str) -> bool:
+    # a script token has a path separator or a file extension and is not a
+    # flag — lets us skip option *values* like `--master yarn` when hunting
+    # for the real script in `spark-submit ... /path/job.py`
+    return (not token.startswith("-")) and (
+        "/" in token or "\\" in token or bool(re.search(r"\.\w+$", token))
+    )
+
+
 def classify_executable(executable: str) -> tuple[str, str | None]:
     """Return (invocation_type, classifier_rule) for an executable token."""
     base = _basename(executable)
@@ -222,13 +232,21 @@ def parse_invocation_statement(statement: str) -> Invocation | None:
     script_path: str | None = None
     executable_path: str | None = verb
     if itype in {"PYTHON", "PYSPARK"} or _basename(verb).startswith("python"):
-        script_path = next((a for a in args if not a.startswith("-")), None)
-    elif re.search(r"\.(sh|ksh|bash|pl|m|py)$", _basename(verb)):
+        # prefer a script-looking token (skips `--master yarn` option values),
+        # then fall back to the first bare non-flag arg (e.g. `python -m module`)
+        script_path = (
+            next((a for a in args if _looks_script(a)), None)
+            or next((a for a in args if not a.startswith("-")), None)
+        )
+    elif re.search(r"\.(sh|ksh|bash|pl|m|py|pset)$", _basename(verb)):
         script_path = verb
     # for Ab Initio launched via a wrapper (run_calp_temp.sh foo.m), surface
-    # the .m argument as the script
+    # the .m/.pset argument as the script
     if script_path is None:
-        script_path = next((a for a in args if a.endswith(".m") or a.endswith(".py")), None)
+        script_path = next(
+            (a for a in args if a.endswith(".m") or a.endswith(".py") or a.endswith(".pset")),
+            None,
+        )
 
     config_path = next((a for a in args if _looks_config(a)), None)
 

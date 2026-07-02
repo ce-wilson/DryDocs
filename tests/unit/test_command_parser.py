@@ -190,3 +190,61 @@ def test_fid_env_triplet_carries_environment() -> None:
     facts, _ = route_fact(out["FID_P"], "K0003")
     assert facts[0].fact_type == "FID"
     assert facts[0].environment == "P"
+
+
+# --- G8: depgraph parser-delta fold (ADR 0002-C §3) -----------------------------
+
+def test_pset_classified_abinitio() -> None:
+    itype, rule = classify_executable("/opt/scripts/hldm/trust.pset")
+    assert itype == "ABINITIO"
+    assert rule == "abinitio.pset"
+
+
+def test_pset_direct_script_path() -> None:
+    inv = parse_command("/opt/scripts/hldm/trust.pset").invocations
+    assert len(inv) == 1
+    assert inv[0].invocation_type == "ABINITIO"
+    assert inv[0].script_path == "/opt/scripts/hldm/trust.pset"
+
+
+def test_spark_submit_skips_option_values() -> None:
+    # regression: the real script is the .py, NOT `yarn` (value of --master)
+    inv = parse_command(
+        "spark-submit --master yarn /opt/spark/refine_loans.py --date {ODATE}"
+    ).invocations
+    assert inv[0].invocation_type == "PYSPARK"
+    assert inv[0].script_path == "/opt/spark/refine_loans.py"
+
+
+def test_python_dash_m_module_falls_back_to_bare_arg() -> None:
+    inv = parse_command("python -m mypkg.run").invocations
+    assert inv[0].invocation_type == "PYTHON"
+    assert inv[0].script_path == "mypkg.run"
+
+
+def test_sample_reproduces_depgraph_oracle() -> None:
+    """Equivalence with depgraph's test_controlm.py on the 13-job sample:
+    13 INVOKES; 8 abinitio .pset + 5 shell .ksh (4 distinct) -> 12 distinct
+    children + 13 jobs = 25 processes."""
+    import csv
+    from pathlib import Path
+
+    import pytest
+
+    sample = Path("drydocs/data/samples/controlm_jobs__sample.csv")
+    if not sample.exists():
+        pytest.skip("gitignored production sample not present")
+    rows = list(csv.DictReader(sample.open(encoding="utf-8-sig")))
+    invocations = []
+    for row in rows:
+        parsed = parse_command(row["cmd_line"])
+        assert len(parsed.invocations) == 1, row["cmd_line"]
+        invocations.append(parsed.invocations[0])
+    assert len(invocations) == 13  # 13 INVOKES
+    assert all(inv.is_classified for inv in invocations)  # no UNKNOWN left
+    by_type: dict[str, int] = {}
+    for inv in invocations:
+        by_type[inv.invocation_type] = by_type.get(inv.invocation_type, 0) + 1
+    assert by_type == {"ABINITIO": 8, "SHELL_SCRIPT": 5}
+    distinct_children = {inv.script_path for inv in invocations}
+    assert len(distinct_children) == 12  # + 13 jobs = 25 processes
