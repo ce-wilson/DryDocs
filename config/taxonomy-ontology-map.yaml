@@ -114,6 +114,33 @@ mappings:
     confirmed_by: SME
     confirmed_on: 2026-06-21
 
+  # ---- K1: SEAL application attribution (PROPOSED — registration before the gate) --
+  # Source: 2026-07-01 company reconciliation (SME-reviewed at source; spec-level on
+  # both repos here — no loader, no supplement, no gate log yet). Activation is K2.
+
+  - id: job-seal-app-ref
+    taxonomy:
+      source: controlm-variable-normalization
+      element: "Job is attributed to its SEAL-registered application (fact_type SEAL)"
+    ontology:
+      from_node: ControlMJob                # prov:Activity
+      to_node: Application                  # prov:SoftwareAgent (SEAL-registered)
+      prov_type_from: Activity
+      prov_type_to: Agent
+      matrix_row: "Activity → Agent = prov:wasAssociatedWith"
+      neo4j_label: WAS_ASSOCIATED_WITH
+      role: seal_app_ref
+      prov_maps_to: "prov:wasAssociatedWith"
+    precedence_authority: bmc-baseline
+    reuses_vocab: m3_seal_app_ref (planned)
+    source_evidence: "STG_APP_FACT semantic facts (fact_type SEAL), fed by the Control-M variable-normalization stream (config/source-registry.yaml); NEVER raw job.APPLICATION — documented unreliable for SEAL identity in both repos' loader comments."
+    status: proposed                        # <-- SME must confirm at the gate (K2)
+    provenance_note: "2026-07-01 company reconciliation; spec-level on both repos; producer registration K1, activation K2."
+    open_questions:
+      - "Match policy: is a one-to-one job-to-application match accepted as-is?"
+      - "Zero-unmatched jobs — surfaced how, and to whom, before load?"
+      - "Multi-hit matches (a job resolving to more than one candidate application) — deterministic triage/precedence rule, or gate-time SME call per case?"
+
   # ---- Example: a PROPOSED mapping awaiting the SME gate -------------------
   - id: oracle-schema-asset
     taxonomy:
@@ -324,5 +351,5 @@ mappings:
 summary:
   applied: 1          # job-contains
   confirmed: 14       # C1 (4) + C2 (4) + C3 (6: 4 hierarchy + SUPPORTS→AreaProduct + DEVELOPS→app)
-  proposed: 2         # oracle-schema-asset, jobrun-observation
+  proposed: 3         # job-seal-app-ref, oracle-schema-asset, jobrun-observation
   rejected: 0

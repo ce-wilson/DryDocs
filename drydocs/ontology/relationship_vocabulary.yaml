@@ -571,6 +571,30 @@ local_relationships:
     domain:       controlm
     status:       planned
 
+  - id:           m3_seal_app_ref
+    neo4j_label:  WAS_ASSOCIATED_WITH
+    role:         seal_app_ref
+    from_node:    ControlMJob
+    to_node:      Application
+    prov_maps_to: "prov:wasAssociatedWith"
+    note: >
+      Job attribution to its SEAL-registered application. Matrix row:
+      Activity → Agent = WAS_ASSOCIATED_WITH. role=seal_app_ref discriminates
+      this instance from any future owner/author roles on the same label
+      (see the planned WAS_ASSOCIATED_WITH {role:owner} idea in docs/reviews/).
+      Feed: STG_APP_FACT semantic facts (fact_type SEAL) via the C3/C4
+      variable-normalization stream — NEVER raw job.APPLICATION, which both
+      repos' loader comments document as unreliable for SEAL identity.
+      Registered 2026-07-01 from the company reconciliation (spec-level on
+      both repos as of this writing: no loader, no supplement, no gate log).
+      Activation requires the HITL gate to confirm the match policy
+      (one-to-one accepted, zero-unmatched surfaced, multi-hit resolved via
+      deterministic triage/precedence) — see backlog K2.
+    supplement:   ~
+    loader:       ~
+    domain:       controlm
+    status:       planned
+
   - id:           m3_invokes
     neo4j_label:  INVOKES
     role:         ~

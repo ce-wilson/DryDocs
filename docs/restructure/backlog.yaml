@@ -971,7 +971,7 @@ items:
     agent: ontology-mapper
     model: sonnet
     priority: p2
-    status: todo
+    status: done
     depends_on: []
     inputs: [drydocs/ontology/relationship_vocabulary.yaml, config/taxonomy-ontology-map.yaml, docs/RELATIONSHIP_GUIDE.md]
     acceptance: >
@@ -981,9 +981,13 @@ items:
       drafted status: proposed citing the 2026-07-01 company reconciliation; test_schema.py
       drift guard green (planned entries carry no supplement/loader claims).
     notes: >
-      Registration only — activation is K2 after the gate. Do NOT cite the company FR
-      status as authority (their docs read ACTIVE with no runtime backing — treat FR text
-      and code separately, their own fidelity note).
+      Done 2026-07-01 (ontology-mapper agent, sonnet; opus review). m3_seal_app_ref
+      registered planned (no supplement/loader claims); map entry job-seal-app-ref
+      status proposed with the three gate open-questions (match policy / zero-unmatched
+      surfacing / multi-hit triage); map summary proposed 2->3, counts verified vs
+      computed. RELATIONSHIP_GUIDE needed no change (generic matrix only). FLAGGED for
+      K2: config/source-registry.yaml has NO STG_APP_FACT / variable-normalization-stream
+      source entry yet — register it (pipeline-config) before the loader.
 
   - id: K2
     epic: seal-attribution
@@ -1018,8 +1022,8 @@ items:
 # Roll-up the dispatcher can glance at. COMPUTED views — test_backlog.py enforces
 # that these match the items exactly; update them with any status change.
 summary:
-  todo: 12                                          # E1-E2, F1-F2, G3-G6, G8-G9, K1-K2
+  todo: 11                                          # E1-E2, F1-F2, G3-G6, G8-G9, K2
   in_progress: 1                                    # G2 (core shim, step 1)
   blocked: 1                                        # G7 — live multi-DB deploy needs an Enterprise target
-  done: 27                                          # A1-A3, B1-B4, C1-C4, D1-D3, G1, H1-H7, I1-I4, J1
-  next_ready: [E1, F1, F2, G5, G6, G8, K1]          # todo items whose every depends_on is done (test-enforced)
+  done: 28                                          # A1-A3, B1-B4, C1-C4, D1-D3, G1, H1-H7, I1-I4, J1, K1
+  next_ready: [E1, F1, F2, G5, G6, G8, K2]          # todo items whose every depends_on is done (test-enforced)
