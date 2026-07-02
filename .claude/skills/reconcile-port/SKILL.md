@@ -76,6 +76,17 @@ stay skipped — confirm with the operator if a new one appears.
     (DSNs/server locations), `seal_deployments.py` (real SEAL IDs),
     `controlm_app_codes.py` (app-code values), ServiceNow HPSM config. Company-side
     only; at most a bare schema/template may cross, never the values.
+- **`seal_app_ref` (Epic K) — back-flow-origin, so check before taking wholesale.**
+  Producer `main` carries a `job-seal-app-ref` relationship + `m3_seal_app_ref` mapping
+  as `status: planned`/`proposed` in `relationship_vocabulary.yaml` +
+  `taxonomy-ontology-map.yaml` (both normally Canonical-here → take producer). But Epic K
+  was **groomed from company reconciliation** — the concept came FROM the company. So:
+  - While it is `planned`/`proposed` on the producer, it is **inert** (no graph impact) —
+    taking the producer ontology files wholesale is safe.
+  - **If company `main` has already promoted `m3_seal_app_ref` to `active`/`confirmed`
+    (or has a live loader for it), that specific entry is a back-flow COLLISION — keep
+    the company's active version; do NOT downgrade it to the producer's `planned` state.**
+    Reconcile per-entry, not by taking the whole file blindly.
 
 ## Track-1 acceptance (the contract)
 

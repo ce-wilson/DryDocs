@@ -71,10 +71,14 @@ What diverges, by stream:
   render `backlog.yaml` (now **schema v2**) into `docs/plan/board.html`; plus the `groom-backlog` skill and
   a new `tests/unit/test_backlog.py` schema guard. All **clean-adds** — take FROM this repo. `plan_board`
   is its own `plan` component group in the boundary guard (imports core only).
-- **`seal_app_ref` attribution (Epic K)** — additive `status: planned`/`proposed` entries in
-  `drydocs/ontology/relationship_vocabulary.yaml` + `config/taxonomy-ontology-map.yaml` (both already
-  Canonical-here). Groomed from company reconciliation; not yet active, so no graph impact — take the
-  ontology files FROM this repo as usual.
+- **`seal_app_ref` attribution (Epic K) — back-flow-origin, check before taking wholesale.** Additive
+  `status: planned`/`proposed` entries in `drydocs/ontology/relationship_vocabulary.yaml` +
+  `config/taxonomy-ontology-map.yaml` (both normally Canonical-here). It was **groomed from company
+  reconciliation** — the concept came FROM you. While `planned`/`proposed` it is inert (no graph impact),
+  so taking the producer files is safe. **But if company `main` has already promoted `m3_seal_app_ref` to
+  `active`/`confirmed` (or has a live loader), that entry is a back-flow COLLISION — keep your active
+  version, do not downgrade it to the producer's `planned` state.** Reconcile that entry per-item, not by
+  blindly overwriting the file.
 
 ---
 
