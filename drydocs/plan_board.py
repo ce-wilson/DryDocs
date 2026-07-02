@@ -190,7 +190,8 @@ def _render_phase_card(phase: Phase, items: tuple[WorkItem, ...]) -> str:
     return (
         '<div class="phase-card">'
         f'<div class="phase-head"><span class="phase-id">P{_esc(phase.id)}</span>'
-        f'<span class="status-badge status-{_esc(phase.status)}">{_esc(phase.status)}</span>{release}</div>'
+        f'<span class="status-badge status-{_esc(phase.status)}">'
+        f"{_esc(phase.status)}</span>{release}</div>"
         f'<h3>{_esc(phase.title)}</h3>'
         f'<p class="goal">{_esc(phase.goal)}</p>'
         '<div class="progress"><div class="progress-bar" style="width:'
@@ -205,7 +206,8 @@ def _render_item_card(item: WorkItem, ready_ids: frozenset[str]) -> str:
     if item.id in ready_ids:
         classes += " ready"
     dep_links = " ".join(
-        f'<a class="dep-link" href="#card-{_esc(dep)}" data-target="card-{_esc(dep)}">{_esc(dep)}</a>'
+        f'<a class="dep-link" href="#card-{_esc(dep)}" data-target="card-{_esc(dep)}">'
+        f"{_esc(dep)}</a>"
         for dep in item.depends_on
     )
     deps_html = (
@@ -231,7 +233,8 @@ def _render_item_card(item: WorkItem, ready_ids: frozenset[str]) -> str:
         f'<div class="{classes}" id="card-{_esc(item.id)}" data-id="{_esc(item.id)}" '
         f'data-module="{_esc(item.module)}" data-phase="{_esc(item.phase)}" '
         f'data-epic="{_esc(item.epic)}" data-type="{_esc(item.type)}" '
-        f'data-status="{_esc(item.status)}" data-search="{_esc((item.id + " " + item.title).lower())}" '
+        f'data-status="{_esc(item.status)}" '
+        f'data-search="{_esc((item.id + " " + item.title).lower())}" '
         'tabindex="0">'
         f'<div class="card-head"><span class="card-id">{_esc(item.id)}</span>'
         f'<span class="card-title">{_esc(item.title)}</span></div>'
@@ -402,7 +405,9 @@ function restoreFilters() {
 }
 
 function clearFilters() {
-  ["f-module", "f-phase", "f-epic", "f-type"].forEach((id) => (document.getElementById(id).value = ""));
+  ["f-module", "f-phase", "f-epic", "f-type"].forEach(
+    (id) => (document.getElementById(id).value = "")
+  );
   document.getElementById("f-search").value = "";
   applyFilters();
 }
@@ -501,10 +506,14 @@ document.addEventListener("DOMContentLoaded", () => {
         "The repo is the system of record; this page is a working aid.</p>\n"
         f'<div class="roadmap">\n{roadmap}\n</div>\n'
         '<div class="filters">\n'
-        f'  <label>Module<select id="f-module"><option value="">All</option>\n{module_opts}\n</select></label>\n'
-        f'  <label>Phase<select id="f-phase"><option value="">All</option>\n{phase_opts}\n</select></label>\n'
-        f'  <label>Epic<select id="f-epic"><option value="">All</option>\n{epic_opts}\n</select></label>\n'
-        f'  <label>Type<select id="f-type"><option value="">All</option>\n{type_opts}\n</select></label>\n'
+        '  <label>Module<select id="f-module"><option value="">All</option>\n'
+        f"{module_opts}\n</select></label>\n"
+        '  <label>Phase<select id="f-phase"><option value="">All</option>\n'
+        f"{phase_opts}\n</select></label>\n"
+        '  <label>Epic<select id="f-epic"><option value="">All</option>\n'
+        f"{epic_opts}\n</select></label>\n"
+        '  <label>Type<select id="f-type"><option value="">All</option>\n'
+        f"{type_opts}\n</select></label>\n"
         '  <label>Search<input type="search" id="f-search" placeholder="id or title"></label>\n'
         '  <button type="button" id="f-clear">Clear filters</button>\n'
         "</div>\n"
@@ -512,7 +521,8 @@ document.addEventListener("DOMContentLoaded", () => {
         '<div class="capture">\n'
         "  <h2>Quick capture</h2>\n"
         '  <div class="capture-row">\n'
-        '    <input type="text" id="capture-text" placeholder="a thought, idea, bug, or question">\n'
+        '    <input type="text" id="capture-text" '
+        'placeholder="a thought, idea, bug, or question">\n'
         f'    <select id="capture-tag">\n{tag_opts}\n</select>\n'
         '    <button type="button" id="capture-copy">Copy line</button>\n'
         "  </div>\n"

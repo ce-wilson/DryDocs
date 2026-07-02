@@ -13,7 +13,6 @@ from drydocs.controlm.facts import route_fact
 from drydocs.controlm.paths import build_file_ref, canonicalize_path, classify_role
 from drydocs.controlm.variables import classify_variable
 
-
 # --- statement splitting ------------------------------------------------------
 
 def test_split_respects_quotes() -> None:

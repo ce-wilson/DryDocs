@@ -144,11 +144,20 @@ def split_statements(command: str) -> list[str]:
             i += 1
             continue
         if ch == ";":
-            out.append("".join(buf)); buf = []; i += 1; continue
+            out.append("".join(buf))
+            buf = []
+            i += 1
+            continue
         if ch in "&|" and i + 1 < n and command[i + 1] == ch:
-            out.append("".join(buf)); buf = []; i += 2; continue
+            out.append("".join(buf))
+            buf = []
+            i += 2
+            continue
         if ch == "|":  # single pipe — treat as a statement boundary too
-            out.append("".join(buf)); buf = []; i += 1; continue
+            out.append("".join(buf))
+            buf = []
+            i += 1
+            continue
         buf.append(ch)
         i += 1
     out.append("".join(buf))

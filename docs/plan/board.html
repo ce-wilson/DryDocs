@@ -297,7 +297,9 @@ function restoreFilters() {
 }
 
 function clearFilters() {
-  ["f-module", "f-phase", "f-epic", "f-type"].forEach((id) => (document.getElementById(id).value = ""));
+  ["f-module", "f-phase", "f-epic", "f-type"].forEach(
+    (id) => (document.getElementById(id).value = "")
+  );
   document.getElementById("f-search").value = "";
   applyFilters();
 }
