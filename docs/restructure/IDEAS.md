@@ -26,6 +26,16 @@ Tags help grooming: `idea` · `bug` · `doc` · `source` (new data source) · `q
 
 <!-- add new ideas at the top -->
 
+- [source] Back-flow the company's SEAL attribution edge (UC-NS-005, ACTIVE there):
+  (ControlMJob)-[:WAS_ASSOCIATED_WITH {role:'seal_app_ref'}]->(Application) from STG_APP_FACT.
+  Producer has only the generic matrix row — register the instance edge in
+  relationship_vocabulary.yaml + reproduce a generic loader (H-style: re-implement, never copy).
+  Concept traces to our own FR-NS-013 (docs/reviews/sdlc-neo4j-schema.md). This IS the
+  "Application -> Job -> dependent job" support view. (2026-07-01, company screenshots)
+- [bug] node_classifications says label ControlMFolder but every loader/edge writes :JobFolder
+  (controlm_folders.cypher MERGEs JobFolder:Collection; edge entries say from_node: JobFolder) —
+  same drift visible in the company copy. Decide the winning name via the gate, then fix the
+  losing side everywhere. (same screenshots)
 - [doc] README.md still says :DEPENDS_ON for the derived job->job edge; the loader + m3-verify
   write :WAS_INFORMED_BY (vocab m3_was_informed_by; DEPENDS_ON retired). Reconcile the README.
   (2026-07-01 Control-M naming review with SME)
