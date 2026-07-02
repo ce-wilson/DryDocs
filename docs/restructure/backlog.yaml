@@ -579,7 +579,7 @@ items:
     agent: main
     model: opus
     priority: p2
-    status: todo
+    status: in_progress
     depends_on: []
     inputs: [docs/decisions/0002-c-depgraph-lineage-rehome.md, drydocs/controlm/commands.py, "ce-wilson/depgraph@feat/controlm-lineage:depgraph/controlm/commands.py"]
     acceptance: >
