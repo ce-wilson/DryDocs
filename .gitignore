@@ -41,6 +41,22 @@ stg_out/
 # Local doc-extraction helper scripts (temporary; generated the SDLC-Docs corpus)
 /.tmp_*
 
+# Oracle Kerberos connection — the FILLED config holds a real SID/hosts/alias.
+# Only the .sample.txt is committed.
+libs/oracle_kerberos/oracle_kerberos_connection.txt
+
+# Local real-data working area (Internal-Confidential): consolidated
+# troubleshooting notes, screenshots with live values, filled configs.
+# Never committed; travels to the company side by hand, not by git.
+/internal-local/
+
+# Raw screenshots dropped in the repo root during troubleshooting/porting —
+# they contain live SIDs, hostnames, EPV objects, ADFS client IDs. Never commit.
+# (Move them into internal-local/ when done; ignored here as a safety net.)
+/oracle-connection-*.png
+/raiidr-*.png
+/ss-*.png
+
 # Editor workspace settings (machine-local)
 /.vscode/
 

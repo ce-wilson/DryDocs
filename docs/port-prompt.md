@@ -74,6 +74,23 @@ PROCEDURE:
    stream". (The `review` COMPONENT_GROUP + default-deny flip in test_module_boundary.py
    IS taken FROM the producer — it is generic and forces your modules to be classified.)
 
+11. ORACLE-KERBEROS-LOGIN MODULE (clean-add, with ONE company-side caveat):
+   `libs/oracle_kerberos/**` (spider_login.py + __init__.py + README.md +
+   oracle_kerberos_connection.sample.txt) and tests/unit/test_oracle_kerberos_login.py
+   are a standalone Kerberos external-auth login for the Spider/PSGMGR schema. They apply
+   UNTOUCHED — the module has no drydocs/ imports and does NOT touch the port-frozen
+   drydocs/adapters/oracle_adapter.py. The .gitignore gains three protective rules
+   (`libs/oracle_kerberos/oracle_kerberos_connection.txt`, `/internal-local/`, and the root
+   `oracle-connection-*.png`/`raiidr-*.png`/`ss-*.png` screenshot globs) — MERGE these into
+   company .gitignore additively (keep any company rules).
+   CAVEAT: the producer copy is SANITIZED (placeholders only; the real filled config and
+   consolidated notes live in the gitignored `internal-local/`, which never transfers). If
+   company main already carries its own `libs/oracle_kerberos/` reproduced from the raiidr
+   project (real hosts/SID/alias in a tracked file), treat it like the back-flow stream
+   (step 10): KEEP COMPANY'S VERSION, drop the incoming sanitized side. Only clean-add when
+   the path is absent company-side. Acceptance: `poetry run pytest
+   tests/unit/test_oracle_kerberos_login.py -q` → 27 passed (no oracledb/network needed).
+
 ACCEPTANCE GATE (behavior is the contract, not a byte-compare):
 - Track 1 (portable, no production sample present):
     poetry run pytest tests/unit/test_variable_classifier.py tests/unit/test_variable_resolver.py \

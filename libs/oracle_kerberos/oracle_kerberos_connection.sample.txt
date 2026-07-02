@@ -1,0 +1,40 @@
+# oracle_kerberos connection config — SAMPLE
+#
+# Copy to oracle_kerberos_connection.txt (same folder, or point at it with
+# --config / $ORACLE_KERBEROS_CONFIG) and fill in YOUR values.
+# The filled-in file is gitignored — NEVER commit a real SID, hostname,
+# service name, or cache path.
+
+# Your personal SID (drives the default FILE: cache path C:\Users\<sid>\krb5cc_<sid>).
+# Leave kerberos5_cc_name blank to use that default.
+sid              = <SID>
+
+# Informational only — the connection ALWAYS goes through the TNS alias below,
+# never a hand-built single-host descriptor (the service floats between RAC nodes).
+hostname         = <db-host.example.com>
+port_no          = 6336
+
+# The TNS ALIAS from tnsnames.ora (deliberately resolved via TNSNAMES, not EZCONNECT).
+servicename      = <SERVICE_ALIAS_O_READWRITE>
+
+# Folder containing tnsnames.ora with the alias above (dual ADDRESS_LIST entries).
+tns_admin        = C:\Users\<SID>\TNSNAMES
+
+# 64-bit Oracle 19c full/instant client bin (must match Python bitness).
+oracle_client_path = C:\Program Files\Oracle\Product\19.0.0.0\client_1920\bin
+
+# MIT Kerberos config (the official one for your org). Used in FILE: cache mode only.
+krb5_config      = C:\Users\<SID>\krb5.conf
+
+# Credential cache. Leave BLANK for the SID default FILE: cache (recommended —
+# matches the kinit / SQL Developer flow). Set to MSLSA: to use the Windows LSA
+# cache instead (no MIT library involved; opt-in).
+kerberos5_cc_name =
+
+# ODPI trace verbosity. Keep 0; 64 floods stderr (including your full PATH)
+# and hides real errors. Enable only while debugging the client itself.
+dpi_debug_level  = 0
+
+# Optional tuning (defaults shown).
+# tcp_connect_timeout = 15
+# call_timeout_ms     = 30000
