@@ -63,7 +63,18 @@ What diverges, by stream:
   `tests/unit/test_module_boundary.py` (the core/component boundary guard), and the
   `SDLC-Docs/extracted/` design trail. All **clean-adds** — take FROM this repo. ADR 0002 foretells a
   structural `drydocs/ → drydocs-core` + component-package move (Phase B, **not yet executed**); see the
-  dedicated section below.
+  dedicated section below. (ADR **0002-c** — depgraph-lineage re-home — is a newer clean-add in the same set.)
+- **`drydocs-review` back-flow (NEW — REVERSE direction)** — the company-authored SME/HITL toolkit,
+  reproduced here generically. **Canonical-COMPANY on collision** — keep your version. See the dedicated
+  "`drydocs-review` — back-flow stream" section below.
+- **`drydocs-plan` project board (NEW — Epic I)** — `drydocs/plan_board.py` + `scripts/render_board.py`
+  render `backlog.yaml` (now **schema v2**) into `docs/plan/board.html`; plus the `groom-backlog` skill and
+  a new `tests/unit/test_backlog.py` schema guard. All **clean-adds** — take FROM this repo. `plan_board`
+  is its own `plan` component group in the boundary guard (imports core only).
+- **`seal_app_ref` attribution (Epic K)** — additive `status: planned`/`proposed` entries in
+  `drydocs/ontology/relationship_vocabulary.yaml` + `config/taxonomy-ontology-map.yaml` (both already
+  Canonical-here). Groomed from company reconciliation; not yet active, so no graph impact — take the
+  ontology files FROM this repo as usual.
 
 ---
 
@@ -88,13 +99,16 @@ paths don't exist there yet). Take them wholesale.
 delete it after taking the new path (across disjoint history git sees the move as
 delete+add). Doc/code references to the old path were repointed in the same commit.
 
-**Two guards now enforced (require PyYAML, a dev dep):**
+**Three guards now enforced (require PyYAML, a dev dep):**
 - `tests/unit/test_schema.py` — fails CI if a relationship is `active` without its supplement
   block (the ontology-drift safety net).
 - `tests/unit/test_classification.py` — fails CI if any source in `source-registry.yaml` lacks a
   valid sensitivity `classification` + `source` (the publish-boundary safety net). Sensitivity
   tiers: `External` / `Internal-Public` / `Internal` / `Internal-Confidential`
   (`config/classification.yaml`), distinct from the provenance tier in each `SOURCE-MANIFEST`.
+- `tests/unit/test_backlog.py` (NEW — Epic I) — fails CI if `docs/restructure/backlog.yaml` violates
+  **schema v2**: missing `title/type/module/phase`, duplicate/cyclic/unresolved ids, unknown module or
+  phase, or a `summary:`/`next_ready:` roll-up that drifts from the items (both are computed views).
 
 **Post-push code-structure snapshot (drift comparison):** after each push, generate a
 timestamped dependency-graph snapshot with the `depgraph` tool (a stdlib-only sibling repo) and
@@ -116,7 +130,7 @@ take FROM this repo.
 | Path | What it is | Disposition |
 |---|---|---|
 | `docs/decisions/0001-*.md` | ADR 0001 — ontology base scope (PROV spine) | clean-add |
-| `docs/decisions/0002-*.md`, `0002-a-*.md`, `0002-b-*.md` | ADR 0002 — component & database topology + core-extraction plan + spinoff-rebase checklist | clean-add |
+| `docs/decisions/0002-*.md`, `0002-a-*.md`, `0002-b-*.md`, `0002-c-*.md` | ADR 0002 — component & database topology + core-extraction plan + spinoff-rebase checklist + depgraph-lineage re-home | clean-add |
 | `MODULE_MAP.md` | the `drydocs-core` ↔ component boundary (authoritative) | clean-add |
 | `tests/unit/test_module_boundary.py` | stdlib guard enforcing the boundary (Track-1 portable, no data) | clean-add |
 | `SDLC-Docs/extracted/*.md` | design trail (feasibility, C+D adoption, issue-driven loop, modular plan) | clean-add |
@@ -151,9 +165,12 @@ them the **opposite** way to everything else in this guide:
 > the real Confluence wiring (`toby_publish_confluence`), the real `review-labels.yaml`,
 > the real space coordinates, and real `SME[SID]` data. Take **company wholesale** for:
 >
-> - `graph_review.py`, `graph_verify.py`, `review_labels.py`, `sme_notes.py`
-> - `drydocs/publishing/**` and `review-labels.yaml`
-> - the HITL prompt-page generator + any generated `pages/`
+> - `drydocs/graph_review.py`, `drydocs/graph_verify.py`, `drydocs/review_labels.py`,
+>   `drydocs/sme_notes.py`
+> - `drydocs/gate_pages.py` (the HITL prompt-page generator) + any generated `pages/`
+> - `drydocs/publishing/**`
+> - `config/review-labels.yaml`, `config/gate-prompts/**`, `graph-tests/**` (seed spine,
+>   gate-prompt specs, acceptance suites — company's real ones win)
 
 If you have `git fetch`ed and see the producer touch these, drop the incoming side and
 keep `main`'s. This is the reverse of the Canonical-here rule — it protects your wired,
