@@ -58,3 +58,30 @@ decisions on the new/ambiguous ones. The agent always tells you the count up fro
 Every gate run appends a short log (date, items confirmed/edited/rejected, your reasons for
 rejections) to the mapping file's history or a sibling `config/gate-log.md`, so the evolution of
 the model is reviewable later.
+
+## Promotion: `drydocs_context` → `drydocs` (trust axis = DB boundary)
+
+The multi-DB topology (ADR 0002) keeps **uncertain** context (`drydocs-deepdoc` output, stamped
+`reliability`/`trust`) in `drydocs_context`, structurally isolated from the **curated ground
+truth** in `drydocs`. Moving a node across that boundary is a *trust promotion*, and it runs
+through this gate like any other meaning decision:
+
+- **Promotion is ONLY ever a gate-confirmed WRITE to `drydocs`** — the item is presented as
+  `status: proposed`, and on **Confirm** a *loader* writes the ground-truth shape into `drydocs`
+  (constraint-on-key MERGE on the canonical URN / business key).
+- **Never an in-place cross-DB edit.** There is no "move", no relabel-in-place, no direct
+  `drydocs_context` → `drydocs` copy outside a loader. The original `drydocs_context` record is
+  left intact (it is the provenance of the promotion) — the composite (`drydocs_all`) continues
+  to join both on the shared business key.
+- **Per-item decision presentation** — each candidate promotion is shown in the same frame as
+  §"The decision the agent presents": the uncertain node, its `reliability`/`trust` stamps, the
+  evidence that matured it (verified against source, SME attestation, corroborating extract),
+  and the exact ground-truth write it would become. Routing rules apply unchanged: low
+  confidence or open questions **pause**; nothing batches unless it reuses an already-confirmed
+  classification.
+- **Gate-log audit requirement** — every promotion (and every rejection) lands in the §"Audit
+  trail" log with the evidence cited, so `drydocs` can always answer *why* a once-uncertain
+  fact is now ground truth.
+- **Timing caveat (ADR 0002 rollout):** promotion is **paused until core stabilizes** — the
+  destroy-and-rebuild development loop makes `drydocs` disposable right now; `drydocs_context`
+  records survive rebuilds and re-link through the URN key, so nothing is lost by waiting.
