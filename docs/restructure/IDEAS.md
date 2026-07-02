@@ -26,12 +26,6 @@ Tags help grooming: `idea` · `bug` · `doc` · `source` (new data source) · `q
 
 <!-- add new ideas at the top -->
 
-- [source] Back-flow the company's SEAL attribution edge (UC-NS-005, ACTIVE there):
-  (ControlMJob)-[:WAS_ASSOCIATED_WITH {role:'seal_app_ref'}]->(Application) from STG_APP_FACT.
-  Producer has only the generic matrix row — register the instance edge in
-  relationship_vocabulary.yaml + reproduce a generic loader (H-style: re-implement, never copy).
-  Concept traces to our own FR-NS-013 (docs/reviews/sdlc-neo4j-schema.md). This IS the
-  "Application -> Job -> dependent job" support view. (2026-07-01, company screenshots)
 - [bug] node_classifications says label ControlMFolder but every loader/edge writes :JobFolder
   (controlm_folders.cypher MERGEs JobFolder:Collection; edge entries say from_node: JobFolder) —
   same drift visible in the company copy. Decide the winning name via the gate, then fix the
@@ -65,6 +59,11 @@ Tags help grooming: `idea` · `bug` · `doc` · `source` (new data source) · `q
 
 <!-- when you promote an idea, move its line here with the resulting backlog id -->
 
+- 2026-07-01 — [source] seal_app_ref attribution → **K1 + K2** (Epic K, phase 9). CORRECTED
+  during grooming by the company reconciliation answers: the edge is spec-level on BOTH sides
+  (their FR-NS-013/UC-NS-005 docs read ACTIVE with no loader/vocab/gate behind them); the feed
+  is STG_APP_FACT semantic facts, NOT job.APPLICATION (explicitly unreliable for SEAL identity).
+  Promoted as build items with the company's write shape, gate sequence, and verify shapes.
 - 2026-07-01 — [chore] fragment cleanup (naming drift, banners, SDLC-Docs README) → **J1**
   (Epic J, release-infrastructure) via the groom-backlog skill's demonstration run. Sibling
   lines (versioning reset, CI, cli regroup, unused deps, integration tests) stay in the inbox
