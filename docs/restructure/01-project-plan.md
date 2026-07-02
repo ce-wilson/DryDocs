@@ -10,6 +10,10 @@ Re-found DryDocs on the four-layer model (taxonomy → ontology → knowledge gr
 graph), with a clean external/internal split, a configuration-driven pipeline, and an SME
 guided gate — so that lower-cost sub-agents can implement work units safely.
 
+> **Architecture decisions** live in [`docs/decisions/`](../decisions/README.md) (ADR index) —
+> including the **rejected alternatives** (Community single-DB, two-`--mode` capability,
+> polyrepo) with the structural reasons they fell, so they are not re-litigated here.
+
 ## Phases
 
 ### Phase 0 — Restructure scaffolding ✅ (done in this change)
