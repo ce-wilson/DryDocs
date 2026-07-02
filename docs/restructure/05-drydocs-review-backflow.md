@@ -161,11 +161,15 @@ per scope it is documented here rather than built:
 2. **Real acceptance suites (HITL-gated).** `graph-tests/vendor-bmc-smoke.yaml` asserts only
    shape/consistency. Suites that assert real counts/IDs are `Internal` and depend on a
    *confirmed* load — those go in the gitignored twin, gated the same way.
-3. **CLI wiring of `graph-verify` (architecture decision, not HITL).** Adding a
-   `drydocs graph-verify` command makes `cli.py` (`drydocs-load`) import the `drydocs-review`
-   component → a components-don't-import-each-other violation. Resolve by exempting the
-   *entrypoint* from that rule first (see the TODO in [`MODULE_MAP.md`](../../MODULE_MAP.md)).
-   Until then, `graph_verify` is used via its API / a thin script.
+3. **CLI wiring of review commands — RESOLVED (option A, entrypoint exemption).** Wiring
+   `graph-verify` / `graph-review` / `sme-notes` / `docs-*` into `cli.py` makes it import the
+   `drydocs-review` component. The CLI is the composition root, so it is **exempt** from the
+   components-don't-import-each-other rule via `ENTRYPOINT_MODULES` in
+   [`tests/unit/test_module_boundary.py`](../../tests/unit/test_module_boundary.py) (still
+   default-deny classified in `load`). **This is the canonical answer to the port-side A/B/C
+   question: option A.** A company port whose `cli.py` owns the review commands passes the guard
+   unchanged — do NOT extract a `review_cli.py` sub-app (option B), which creates a company-only
+   structure the producer lacks and re-collides on every future port.
 4. **Running against a live graph.** `run_suite` reads a real Neo4j graph; it writes no meaning
    edges (read-only), so *running* it is not HITL-gated — but it needs a provisioned graph
    (Epic G) to exercise beyond the offline unit tests.

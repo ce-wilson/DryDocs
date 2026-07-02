@@ -63,11 +63,15 @@
 > components) classified into its own `plan` COMPONENT_GROUP, mirroring how `review` is declared —
 > it exists precisely so a future `drydocs-plan` module that isn't added here fails the same guard.
 >
-> **TODO (deferred — architecture decision, not HITL).** Wiring `graph-verify` / `graph-review`
-> into `drydocs/cli.py` would make `cli.py` (a `drydocs-load` module) import the `drydocs-review`
-> component — a components-don't-import-each-other violation. Resolve by exempting the
-> *entrypoint* from that rule (the CLI is the top-level orchestrator) before adding the commands.
-> Until then, `graph_verify` is a library module used via its API / a thin script.
+> **Entrypoint exemption (RESOLVED — was the ADR 0002-a TODO).** Wiring `graph-verify` /
+> `graph-review` / `sme-notes` / `docs-*` commands into `drydocs/cli.py` makes `cli.py` import the
+> `drydocs-review` component. The CLI is the **composition root / top-level orchestrator**, not a peer
+> component, so it is **exempt** from the components-don't-import-each-other rule via
+> `ENTRYPOINT_MODULES` in [`tests/unit/test_module_boundary.py`](tests/unit/test_module_boundary.py). It
+> stays subject to default-deny classification (remains in `load`) and to core-imports-nothing. This is
+> the canonical resolution — a company port whose `cli.py` already owns the review commands passes the
+> guard **unchanged**; do NOT extract a separate `review_cli.py` sub-app (that creates a company-only
+> structure the producer lacks and re-collides on every future port).
 
 ## Future, land in core when first written
 - `§`-format I/O (`§META …§OQ §SUPPLEMENTS §DOC §LEDGER`) → `drydocs_core.sigfmt`.

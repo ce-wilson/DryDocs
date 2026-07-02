@@ -60,6 +60,14 @@ ALL_COMPONENT_PREFIXES: tuple[str, ...] = tuple(
     p for prefixes in COMPONENT_GROUPS.values() for p in prefixes
 )
 
+# The CLI composition root legitimately wires MULTIPLE components together (it is the
+# top-level orchestrator, not a peer component), so it is exempt from the
+# "components don't import each other" rule below. It is STILL subject to default-deny
+# classification (it lives in the `load` group) and to the core-imports-nothing rule.
+# This resolves the ADR 0002-a entrypoint TODO (see MODULE_MAP.md): a port whose cli.py
+# owns review/plan commands and imports those components passes the guard unchanged.
+ENTRYPOINT_MODULES: frozenset[str] = frozenset({"drydocs.cli", "drydocs_core.cli"})
+
 
 def _matches(module: str, prefixes: tuple[str, ...]) -> bool:
     return any(module == p or module.startswith(p + ".") for p in prefixes)
@@ -133,6 +141,8 @@ def test_components_do_not_import_each_other():
     violations: list[str] = []
     for path in _iter_py_files():
         module = _module_name(path)
+        if module in ENTRYPOINT_MODULES:
+            continue  # composition root may wire any component (see ENTRYPOINT_MODULES)
         owning = [g for g, prefixes in COMPONENT_GROUPS.items() if _matches(module, prefixes)]
         if not owning:
             continue
@@ -147,6 +157,20 @@ def test_components_do_not_import_each_other():
         "A component must not import another component; route shared code through core. "
         "See MODULE_MAP.md / ADR 0002-a.\n  " + "\n  ".join(violations)
     )
+
+
+def test_entrypoint_is_exempt_but_still_classified():
+    """The CLI composition root may import any component (it is the top-level orchestrator),
+    yet is still classified into exactly one component group for default-deny. This is the
+    resolution of the entrypoint TODO — a port whose cli.py owns review/plan commands passes.
+    """
+    for entry in ENTRYPOINT_MODULES:
+        owning = [g for g, prefixes in COMPONENT_GROUPS.items() if _matches(entry, prefixes)]
+        # An entrypoint that exists must land in exactly one group; a not-yet-present
+        # entrypoint (e.g. drydocs_core.cli) is allowed to be absent (zero groups).
+        assert len(owning) <= 1, f"{entry} classified into multiple groups: {owning}"
+    # the concrete, present entrypoint is in `load`
+    assert _matches("drydocs.cli", COMPONENT_GROUPS["load"])
 
 
 def test_every_module_is_classified():

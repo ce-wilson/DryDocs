@@ -96,11 +96,12 @@ ACCEPTANCE GATE (behavior is the contract, not a byte-compare):
     poetry run pytest tests/unit/test_variable_classifier.py tests/unit/test_variable_resolver.py \
                       tests/unit/test_variable_staging.py tests/unit/test_command_parser.py \
                       tests/unit/test_module_boundary.py -q
-  Expect 89 passed, 3 skipped — the four variable-stream files give 86 passed / 3 skipped (the 3
+  Expect 90 passed, 3 skipped — the four variable-stream files give 86 passed / 3 skipped (the 3
   skips are sample-backed test_sample_*, which skip when the .gitignore'd production CSV is absent),
-  plus 3 from the stdlib core/component boundary guard (test_module_boundary.py, ADR 0002-a Phase A;
-  pure stdlib, no data — now includes the default-deny test_every_module_is_classified from Epic H6).
-  A FileNotFoundError on controlm_variables__sample.csv means the skip guard was lost — fix it.
+  plus 4 from the stdlib core/component boundary guard (test_module_boundary.py, ADR 0002-a Phase A;
+  pure stdlib, no data — includes the default-deny test_every_module_is_classified and the
+  entrypoint-exemption test from Epic H6). A FileNotFoundError on controlm_variables__sample.csv
+  means the skip guard was lost — fix it.
 - Full `pytest tests/unit/` must be green (passes + sample-skips + the PyYAML test_schema.py
   skips). ZERO failures is the contract. Both CI guards must pass: test_schema.py (no `active`
   relationship without its supplement block) and test_classification.py (every source in
