@@ -34,7 +34,14 @@ Each file carries its own **📑 Provenance** block after the version notice wit
 >
 > Confirmed 2026-06-11: the synthesized JSON is also **structurally wrong** vs the real API — canonical Automation API uses the object **name as the JSON key** (`"FolderSample": { "Type": "Folder", ... }`), jobs nested as named keys, types like `Job:Command`; my files invented a `"Name"` property + `"Jobs": []` array matching neither real form. Each API file carries a top-of-file warning.
 >
-> **GAP:** We do **not yet have** the XML-format definition docs (the real source-of-record for 9.0.21.300 config) — e.g. XML export schema, ctmpsm. That is the corpus actually worth ingesting next.
+> **GAP (acquisition STARTED 2026-07-02):** the XML-format definition docs (the real
+> source-of-record for 9.0.21.300 config) are now tracked in
+> `controlm-xml-definition-format.md` — an **acquisition stub**: exact fetch list
+> identified, fetch blocked by documents.bmc.com 403 bot-protection from the producer
+> environment; complete it from the company network, or better, from the local `.dtd`
+> files in `<EM home>\Default\data\Resource` + a real `exportdeftable` output. Key fact
+> already banked: XML definition files are **deprecated from 9.0.21.100, fully supported
+> until 9.0.22** — our 9.0.21.300 sits inside the supported-but-deprecated window.
 
 ---
 
