@@ -91,6 +91,15 @@ PROCEDURE:
    the path is absent company-side. Acceptance: `poetry run pytest
    tests/unit/test_oracle_kerberos_login.py -q` → 27 passed (no oracledb/network needed).
 
+12. VENDOR ICON REGISTRY (clean-add): `drydocs-icons/**` — self-contained asset
+   package (manifest.json as the single source of truth: id -> label/category/paths/
+   brand hex/provenance/verified; vendors/{packaged,generic,external}; png/ rasters;
+   SOURCE.md provenance + colour-status table; Plex-embedded index.html sheet).
+   ~2.7MB of public vendor marks, classification External, no code imports — applies
+   untouched, no collisions expected. (If the feature/controlm-db-skill stream is
+   ported in the same pass, its Control-M-skills step arrives as a second step 12 —
+   renumber; both are independent clean-add bundles.)
+
 ACCEPTANCE GATE (behavior is the contract, not a byte-compare):
 - Track 1 (portable, no production sample present):
     poetry run pytest tests/unit/test_variable_classifier.py tests/unit/test_variable_resolver.py \
