@@ -50,12 +50,16 @@ libs/oracle_kerberos/oracle_kerberos_connection.txt
 # Never committed; travels to the company side by hand, not by git.
 /internal-local/
 
-# Raw screenshots dropped in the repo root during troubleshooting/porting —
-# they contain live SIDs, hostnames, EPV objects, ADFS client IDs. Never commit.
-# (Move them into internal-local/ when done; ignored here as a safety net.)
-/oracle-connection-*.png
-/raiidr-*.png
-/ss-*.png
+# Raw screenshots/images dropped in the REPO ROOT during troubleshooting/porting —
+# they routinely contain live SIDs, hostnames, EPV objects, ADFS client IDs.
+# Blanket rule: no root-level images are ever committed (verified: none tracked).
+# Committed images live in purposeful homes (drydocs-icons/, docs/). Move drops
+# into internal-local/ when done; this is the safety net.
+/*.png
+/*.webp
+/*.svg
+/*.jpg
+/*.jpeg
 
 # Editor workspace settings (machine-local)
 /.vscode/
