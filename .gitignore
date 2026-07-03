@@ -18,6 +18,12 @@ dist/
 build/
 *.egg-info/
 
+# Node (web/)
+node_modules/
+
+# ADK local runtime state (agents/ — session DBs the api_server writes)
+.adk/
+
 # Test / type / lint caches
 .pytest_cache/
 .mypy_cache/

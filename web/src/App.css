@@ -1,0 +1,52 @@
+main {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 1.5rem;
+  text-align: left;
+}
+
+section {
+  border: 1px solid #8884;
+  border-radius: 8px;
+  padding: 1rem;
+  margin: 1rem 0;
+}
+
+.note { opacity: 0.7; font-size: 0.9rem; }
+
+.row {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+  flex-wrap: wrap;
+  margin: 0.5rem 0;
+}
+
+input, select, textarea {
+  font: inherit;
+  padding: 0.35rem 0.5rem;
+  border: 1px solid #8886;
+  border-radius: 6px;
+  background: transparent;
+  color: inherit;
+}
+
+textarea { width: 100%; font-family: monospace; }
+
+button.primary { border-color: #646cff; }
+
+.status { font-size: 0.85rem; opacity: 0.8; word-break: break-all; }
+
+.scroll { overflow-x: auto; max-height: 420px; overflow-y: auto; }
+
+table { border-collapse: collapse; font-size: 0.85rem; }
+th, td { border: 1px solid #8884; padding: 0.3rem 0.5rem; text-align: left; }
+
+pre {
+  background: #8881;
+  padding: 0.75rem;
+  border-radius: 6px;
+  font-size: 0.8rem;
+  white-space: pre-wrap;
+  word-break: break-word;
+}

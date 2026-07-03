@@ -26,6 +26,20 @@ Tags help grooming: `idea` · `bug` · `doc` · `source` (new data source) · `q
 
 <!-- add new ideas at the top -->
 
+- 2026-07-03 — [chore] the local `neo4j-drydocs-ee` Docker container's password is literally the
+  string `<password>` (copy-paste artifact at creation). Fine for sandbox; change it before
+  anything less throwaway. (Found while wiring web/ + agents/ to it.)
+- 2026-07-03 — [idea] web/ front end shipped as a throwaway test page (no design pass). Needs:
+  plan/wireframes, a real C4 rendering (NVL?), and a decision on whether the basic Cypher flow
+  keeps talking bolt-from-browser or goes through a thin API.
+- 2026-07-03 — [question] LLM key strategy for the ADK agents (core_ingest, controlm_fix):
+  GOOGLE_API_KEY (Gemini) vs routing to Anthropic via LiteLLM; company side is Fusion SmartSDK
+  on ADK, so Gemini-shaped is the safer default.
+- 2026-07-03 — [chore] `common/` shows up in ADK `/list-apps` (it's a shared-tools package, not
+  an app). Cosmetic; hide or restructure later.
+- 2026-07-03 — [chore] repo `.venv` has no pytest (and poetry isn't on PATH in plain PowerShell)
+  — the `poetry run pytest -q` gate can't run as documented on this machine; reinstall dev deps.
+
 - [bug] node_classifications says label ControlMFolder but every loader/edge writes :JobFolder
   (controlm_folders.cypher MERGEs JobFolder:Collection; edge entries say from_node: JobFolder) —
   same drift visible in the company copy. Decide the winning name via the gate, then fix the
