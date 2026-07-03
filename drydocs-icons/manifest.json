@@ -1,0 +1,362 @@
+{
+  "registry": "Home Lending \u2014 External Vendors",
+  "note": "Single source of truth. category groups the sheet; hex drives colour; verified=false means confirm the brand colour (e.g. from brandcolorcode) and/or supply an official asset.",
+  "categories": {
+    "integration": "Data & Integration",
+    "platform": "Platform & Data Stores",
+    "ops": "Ops & Observability",
+    "devtrack": "Dev & Tracking",
+    "lending": "Lending & Business",
+    "auto": "Auto Reports \u2014 Manufacturers",
+    "infra": "Infrastructure & Facilities",
+    "people": "Users & Personas"
+  },
+  "icons": {
+    "bmc": {
+      "label": "BMC",
+      "category": "ops",
+      "hex": "#FE5000",
+      "verified": true,
+      "svg": "vendors/packaged/bmc.svg",
+      "provenance": "simple-icons"
+    },
+    "splunk": {
+      "label": "Splunk",
+      "category": "ops",
+      "hex": "#000000",
+      "verified": true,
+      "svg": "vendors/packaged/splunk.svg",
+      "provenance": "simple-icons"
+    },
+    "informatica": {
+      "label": "Informatica",
+      "category": "integration",
+      "hex": "#FF4D00",
+      "verified": false,
+      "svg": "vendors/external/informatica.svg",
+      "provenance": "simple-icons (cached snapshot; not in current set)"
+    },
+    "ab-initio": {
+      "label": "Ab Initio",
+      "category": "integration",
+      "hex": "#E31A2E",
+      "verified": true,
+      "svg": "vendors/external/ab-initio/wordmark.svg",
+      "raster": "vendors/external/ab-initio/block.png",
+      "square": "vendors/external/ab-initio/tile.png",
+      "display": "raster",
+      "provenance": "self-supplied (non-official red-block + official wordmark svg)"
+    },
+    "alteryx": {
+      "label": "Alteryx",
+      "category": "integration",
+      "hex": "#0078C8",
+      "verified": false,
+      "svg": "vendors/external/alteryx.svg",
+      "provenance": "simple-icons (cached snapshot; not in current set)"
+    },
+    "oracle": {
+      "label": "Oracle",
+      "category": "platform",
+      "hex": "#C74634",
+      "verified": false,
+      "alias": "GOS",
+      "svg": "vendors/external/oracle.svg",
+      "provenance": "simple-icons (cached snapshot; not in current set)"
+    },
+    "redhat": {
+      "label": "Red Hat",
+      "category": "platform",
+      "hex": "#EE0000",
+      "verified": true,
+      "svg": "vendors/packaged/redhat.svg",
+      "provenance": "simple-icons"
+    },
+    "aws-s3": {
+      "label": "Amazon S3",
+      "category": "platform",
+      "hex": "#7AA116",
+      "verified": true,
+      "svg": "vendors/packaged/aws-s3.svg",
+      "provenance": "aws-icons (AWS Architecture Icons)"
+    },
+    "neo4j": {
+      "label": "neo4j",
+      "category": "platform",
+      "hex": "#4581C3",
+      "verified": true,
+      "svg": "vendors/packaged/neo4j.svg",
+      "provenance": "simple-icons"
+    },
+    "github": {
+      "label": "GitHub",
+      "category": "devtrack",
+      "hex": "#181717",
+      "verified": true,
+      "svg": "vendors/packaged/github.svg",
+      "provenance": "simple-icons"
+    },
+    "jira": {
+      "label": "Jira",
+      "category": "devtrack",
+      "hex": "#0052CC",
+      "verified": true,
+      "svg": "vendors/packaged/jira.svg",
+      "provenance": "simple-icons"
+    },
+    "atlassian": {
+      "label": "Atlassian",
+      "category": "devtrack",
+      "hex": "#0052CC",
+      "verified": true,
+      "svg": "vendors/packaged/atlassian.svg",
+      "provenance": "simple-icons"
+    },
+    "bitbucket": {
+      "label": "Bitbucket",
+      "category": "devtrack",
+      "hex": "#0052CC",
+      "verified": true,
+      "svg": "vendors/packaged/bitbucket.svg",
+      "provenance": "simple-icons"
+    },
+    "confluence": {
+      "label": "Confluence",
+      "category": "devtrack",
+      "hex": "#172B4D",
+      "verified": true,
+      "svg": "vendors/packaged/confluence.svg",
+      "provenance": "simple-icons"
+    },
+    "experian": {
+      "label": "Experian",
+      "category": "lending",
+      "hex": "#632678",
+      "verified": false,
+      "svg": "vendors/external/experian/placeholder.svg",
+      "needs_asset": true,
+      "provenance": "none available \u2014 upload official logo"
+    },
+    "salesforce": {
+      "label": "Salesforce",
+      "category": "lending",
+      "hex": "#00A1E0",
+      "verified": false,
+      "svg": "vendors/external/salesforce.svg",
+      "provenance": "simple-icons (cached snapshot; not in current set)"
+    },
+    "subaru": {
+      "label": "Subaru",
+      "category": "auto",
+      "hex": "#013C74",
+      "verified": true,
+      "svg": "vendors/external/auto/subaru.svg",
+      "raster": "vendors/external/auto/subaru-256.png",
+      "display": "raster",
+      "provenance": "self-supplied (transparent vector)"
+    },
+    "maserati": {
+      "label": "Maserati",
+      "category": "auto",
+      "hex": "#0C2340",
+      "verified": true,
+      "raster": "vendors/external/auto/maserati.png",
+      "square": "vendors/external/auto/maserati-tile.png",
+      "display": "raster",
+      "provenance": "self-supplied (white field removed to transparent)"
+    },
+    "aws-glue": {
+      "label": "AWS Glue",
+      "category": "integration",
+      "hex": "#7AA116",
+      "verified": true,
+      "svg": "vendors/packaged/aws-glue.svg",
+      "provenance": "aws-icons (AWS Architecture Icons)"
+    },
+    "aws-lambda": {
+      "label": "AWS Lambda",
+      "category": "platform",
+      "hex": "#D86613",
+      "verified": true,
+      "svg": "vendors/packaged/aws-lambda.svg",
+      "provenance": "aws-icons (AWS Architecture Icons)"
+    },
+    "snowflake": {
+      "label": "Snowflake",
+      "category": "platform",
+      "hex": "#29B5E8",
+      "verified": true,
+      "svg": "vendors/packaged/snowflake.svg",
+      "provenance": "simple-icons"
+    },
+    "sqlserver": {
+      "label": "SQL Server",
+      "category": "platform",
+      "hex": "#CC2927",
+      "verified": false,
+      "svg": "vendors/external/sqlserver.svg",
+      "provenance": "simple-icons (cached snapshot; not in current set)"
+    },
+    "teradata": {
+      "label": "Teradata",
+      "category": "platform",
+      "hex": "#F37440",
+      "verified": true,
+      "svg": "vendors/packaged/teradata.svg",
+      "provenance": "simple-icons"
+    },
+    "server": {
+      "label": "Server",
+      "category": "infra",
+      "hex": "#475569",
+      "verified": true,
+      "svg": "vendors/generic/server.svg",
+      "provenance": "Material Design Icons (Apache-2.0)",
+      "generic": true
+    },
+    "data-center": {
+      "label": "Data Center",
+      "category": "infra",
+      "hex": "#475569",
+      "verified": true,
+      "svg": "vendors/generic/data-center.svg",
+      "provenance": "Material Design Icons (Apache-2.0)",
+      "generic": true
+    },
+    "gen-database": {
+      "label": "Database",
+      "category": "infra",
+      "hex": "#475569",
+      "verified": true,
+      "svg": "vendors/generic/gen-database.svg",
+      "provenance": "Material Design Icons (Apache-2.0)",
+      "generic": true
+    },
+    "storage": {
+      "label": "Storage",
+      "category": "infra",
+      "hex": "#475569",
+      "verified": true,
+      "svg": "vendors/generic/storage.svg",
+      "provenance": "Material Design Icons (Apache-2.0)",
+      "generic": true
+    },
+    "gen-cloud": {
+      "label": "Cloud",
+      "category": "infra",
+      "hex": "#475569",
+      "verified": true,
+      "svg": "vendors/generic/gen-cloud.svg",
+      "provenance": "Material Design Icons (Apache-2.0)",
+      "generic": true
+    },
+    "network": {
+      "label": "Network",
+      "category": "infra",
+      "hex": "#475569",
+      "verified": true,
+      "svg": "vendors/generic/network.svg",
+      "provenance": "Material Design Icons (Apache-2.0)",
+      "generic": true
+    },
+    "building": {
+      "label": "Building",
+      "category": "infra",
+      "hex": "#475569",
+      "verified": true,
+      "svg": "vendors/generic/building.svg",
+      "provenance": "Material Design Icons (Apache-2.0)",
+      "generic": true
+    },
+    "campus": {
+      "label": "Campus",
+      "category": "infra",
+      "hex": "#475569",
+      "verified": true,
+      "svg": "vendors/generic/campus.svg",
+      "provenance": "Material Design Icons (Apache-2.0)",
+      "generic": true
+    },
+    "warehouse": {
+      "label": "Warehouse",
+      "category": "infra",
+      "hex": "#475569",
+      "verified": true,
+      "svg": "vendors/generic/warehouse.svg",
+      "provenance": "Material Design Icons (Apache-2.0)",
+      "generic": true
+    },
+    "dev": {
+      "label": "Developer",
+      "category": "people",
+      "hex": "#2E7D5B",
+      "verified": true,
+      "svg": "vendors/generic/dev.svg",
+      "provenance": "Material Design Icons (Apache-2.0)",
+      "generic": true
+    },
+    "business": {
+      "label": "Business",
+      "category": "people",
+      "hex": "#1E3A8A",
+      "verified": true,
+      "svg": "vendors/generic/business.svg",
+      "provenance": "Material Design Icons (Apache-2.0)",
+      "generic": true
+    },
+    "analyst": {
+      "label": "Analyst",
+      "category": "people",
+      "hex": "#6D28D9",
+      "verified": true,
+      "svg": "vendors/generic/analyst.svg",
+      "provenance": "Material Design Icons (Apache-2.0)",
+      "generic": true
+    },
+    "admin": {
+      "label": "Admin / Ops",
+      "category": "people",
+      "hex": "#B45309",
+      "verified": true,
+      "svg": "vendors/generic/admin.svg",
+      "provenance": "Material Design Icons (Apache-2.0)",
+      "generic": true
+    },
+    "security": {
+      "label": "Security",
+      "category": "people",
+      "hex": "#B91C1C",
+      "verified": true,
+      "svg": "vendors/generic/security.svg",
+      "provenance": "Material Design Icons (Apache-2.0)",
+      "generic": true
+    },
+    "customer": {
+      "label": "Customer / Support",
+      "category": "people",
+      "hex": "#0E7490",
+      "verified": true,
+      "svg": "vendors/generic/customer.svg",
+      "provenance": "Material Design Icons (Apache-2.0)",
+      "generic": true
+    },
+    "exec": {
+      "label": "Executive",
+      "category": "people",
+      "hex": "#A16207",
+      "verified": true,
+      "svg": "vendors/generic/exec.svg",
+      "provenance": "Material Design Icons (Apache-2.0)",
+      "generic": true
+    },
+    "team": {
+      "label": "Team",
+      "category": "people",
+      "hex": "#475569",
+      "verified": true,
+      "svg": "vendors/generic/team.svg",
+      "provenance": "Material Design Icons (Apache-2.0)",
+      "generic": true
+    }
+  }
+}
