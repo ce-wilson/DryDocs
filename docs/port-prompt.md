@@ -96,9 +96,18 @@ PROCEDURE:
    brand hex/provenance/verified; vendors/{packaged,generic,external}; png/ rasters;
    SOURCE.md provenance + colour-status table; Plex-embedded index.html sheet).
    ~2.7MB of public vendor marks, classification External, no code imports — applies
-   untouched, no collisions expected. (If the feature/controlm-db-skill stream is
-   ported in the same pass, its Control-M-skills step arrives as a second step 12 —
-   renumber; both are independent clean-add bundles.)
+   untouched, no collisions expected.
+
+13. CONTROL-M AGENT SKILLS (clean-add): `.claude/skills/controlm-db/**` and
+   `.claude/skills/controlm-runbook-automation/**` — two self-contained Claude Code
+   skill bundles (each a SKILL.md plus a references/ folder, no code imports).
+   `controlm-db` ingests and queries the CM_ replica (references: er-model,
+   schema-crosswalk, ingest, query-cookbook); `controlm-runbook-automation` covers
+   plan → fix-package → toolchain remediation. Both live under `.claude/skills/`,
+   which the company base does not carry, so they apply UNTOUCHED — no collisions
+   expected. (These merged to producer main from the feature/controlm-db-skill
+   stream; they are independent of the step-12 icon bundle — either can be ported
+   alone.)
 
 ACCEPTANCE GATE (behavior is the contract, not a byte-compare):
 - Track 1 (portable, no production sample present):
