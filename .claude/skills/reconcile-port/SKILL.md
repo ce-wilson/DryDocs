@@ -46,6 +46,7 @@ the accumulated lessons from prior ports. Read both.
 | `tests/unit/test_controlm_cypher.py` | Keep company version (`scope_key` + version_serial-as-property). |
 | `tests/unit/test_variable_classifier.py`, `test_variable_staging.py` | **Canonical-here — take producer wholesale.** They already carry `skipif(not SAMPLE.exists())` guards (producer commit `9e9fe1c`). Do not re-write your own guard; that caused redundant divergence in a prior port. |
 | `pyproject.toml` | Union — preserve company's Python-version constraints, Oracle/Kerberos deps, and any extra test deps; **add** producer's new deps: `requests` (aura manager) and `pypdf` (PDF ingestion). Neither conflicts with company deps. |
+| `tests/unit/test_module_boundary.py` | **Canonical-here — take producer wholesale.** It carries the `ENTRYPOINT_MODULES` exemption (`drydocs.cli` is the composition root and may wire any component), which is the settled resolution to the company `cli.py` → review-module cross-import failure — do NOT extract review commands into a sub-app or collapse groups to dodge the guard (that was options B/C, rejected; A is documented in `MODULE_MAP.md`). |
 
 **Skipped-commit policy:** the early overlap commits where company content is
 already richer (prior ports skipped `3bc7adb`, `0eb98a5`, `6c5b7b5`, `0063f07`)
