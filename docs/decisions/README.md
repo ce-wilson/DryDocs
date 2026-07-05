@@ -12,6 +12,7 @@ session that never opens the ADR body.
 | [0002-a — drydocs-core extraction plan](0002-a-drydocs-core-extraction-plan.md) | Staged core/component split behind the `drydocs_core` shim; boundary enforced by `tests/unit/test_module_boundary.py` |
 | [0002-b — spinoff rebase checklist](0002-b-spinoff-rebase-checklist.md) | `controlm-spinoff` → `drydocs-remediation` re-home flow |
 | [0002-c — depgraph lineage re-home](0002-c-depgraph-lineage-rehome.md) | `depgraph@feat/controlm-lineage` absorbed as `drydocs-lineage`; one parser in core (delta fold = backlog G8, done) |
+| [0003 — "Application" naming disambiguation](0003-application-naming-disambiguation.md) | Source terms verbatim on source nodes; `:Application` stays the SEAL-keyed canon; reconcile by relationship; bind renderers substitute in code regions only (comments/strings verbatim); BMC labels take the `ControlM` prefix (`JobFolder` → `ControlMFolder`) |
 
 ## Rejected alternatives worth not re-litigating (ADR 0002, "Options Considered")
 
