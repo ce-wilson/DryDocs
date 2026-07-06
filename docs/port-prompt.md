@@ -109,7 +109,7 @@ PROCEDURE:
    stream; they are independent of the step-12 icon bundle — either can be ported
    alone.)
 
-13. CONTROL-M CHAIN — COMPANY-SIDE CHANGE TO PRESERVE (2026-07, see ADR 0003):
+14. CONTROL-M CHAIN — COMPANY-SIDE CHANGE TO PRESERVE (2026-07, see ADR 0003):
    ORACLE BIND RENDERER FIX (Canonical-COMPANY, back-flow rule): company commit
       "fix(oracle-adapter): don't treat :tokens in SQL comments/strings as binds"
       hardened `_render_sql` in the company `jdbc_oracle_adapter.py` to substitute

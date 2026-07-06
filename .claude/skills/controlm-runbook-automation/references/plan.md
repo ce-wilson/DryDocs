@@ -27,7 +27,7 @@ Ingest the CM_ replica across all data centers → staging → graph
 (`controlm-db` skill → `references/ingest.md`): folders, jobs, variables, in/out conditions, derived
 `:WAS_INFORMED_BY` edges (the derived job→job dependency; `DEPENDS_ON` is the
 retired name). This *deliberately imports stale folders too* — staleness is
-a finding, not noise. Stale signals to tag on `:JobFolder`:
+a finding, not noise. Stale signals to tag on `:ControlMFolder`:
 - `USER_DAILY IS NULL` (not actively scheduled) — excluded from the standard
   extracts, so run a separate stale-inventory pass **without** that filter
 - naming that fails `parse_folder_name` / predates the current standard

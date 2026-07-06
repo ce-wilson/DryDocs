@@ -92,9 +92,9 @@ predicate — see the query cookbook's history note.
 
 ## §GRAPH — where rows land
 
-Loaders map staging rows to the DryDocs ontology: folders → `:JobFolder` nodes
-(a `node_classifications` entry still says `ControlMFolder` — naming drift
-pending a gate decision), jobs → job nodes; SETVAR → variable properties/nodes;
+Loaders map staging rows to the DryDocs ontology: folders → `:ControlMFolder`
+nodes (renamed from `:JobFolder`, ADR 0003 — the naming drift is resolved),
+jobs → job nodes; SETVAR → variable properties/nodes;
 in/out conditions → the derived **`:WAS_INFORMED_BY`** edge (job B ⟶ job A on
 shared condition name; vocab `m3_was_informed_by` — the older `DEPENDS_ON` name
 is retired). New
