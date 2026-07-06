@@ -26,6 +26,15 @@ Tags help grooming: `idea` · `bug` · `doc` · `source` (new data source) · `q
 
 <!-- add new ideas at the top -->
 
+- 2026-07-05 — [idea] Provenance diet + source audit fields: Oracle-loaded Control-M shows
+  generated-by/run-timestamp edges outnumbering the true domain relationships (full-refresh
+  `WAS_GENERATED_BY` → `:JobRun` supernode, persona review Issue 3). Rework the time series to
+  carry *changes to the record*: pull tracking becomes node properties (`last_seen_at`/
+  `last_run_id`), source authorship becomes a standard envelope (job created by/at + last
+  updated by/at from CM_ `CREATION_USER`/`CHANGE_USERID` etc.), edges only on actual change.
+  Each source declares its own audit-field mapping — needs HITL per dataset. Big change;
+  scope/approach/phases planned in `06-provenance-source-audit-fields.md`. Groom to backlog
+  when ready; Phase 0 is a gate session.
 - 2026-07-03 — [chore] the local `neo4j-drydocs-ee` Docker container's password is literally the
   string `<password>` (copy-paste artifact at creation). Fine for sandbox; change it before
   anything less throwaway. (Found while wiring web/ + agents/ to it.)
