@@ -565,7 +565,7 @@ FROM this repo. Files touched:
 
 | Path | Change |
 |---|---|
-| `drydocs/schema/sosa_experimental_supplement.cypher` | NEW — seeds 6 `sosa:` classes + 6 properties, `:CAN_ACT_AS` role wiring (ControlMJob/JobFolder → `sosa:FeatureOfInterest`), 4 `LocalRelationship`→`MAPS_TO`→`sosa:*` edges. Opt-in only. |
+| `drydocs/schema/sosa_experimental_supplement.cypher` | NEW — seeds 6 `sosa:` classes + 6 properties, `:CAN_ACT_AS` role wiring (ControlMJob/ControlMFolder → `sosa:FeatureOfInterest`), 4 `LocalRelationship`→`MAPS_TO`→`sosa:*` edges. Opt-in only. |
 | `drydocs/ontology/namespaces.py` | + `sosa` / `ssn` prefixes (note trailing `/`, not `#`) |
 | `drydocs/ontology/relationship_vocabulary.yaml` | + 4 SOSA node classes & 4 relationships (`domain: context`, `status: planned`); new `sosa_maps_to` field; `domain` enum gains `context` |
 | `config/taxonomy-ontology-map.yaml` | `jobrun-observation` unblocked + `adoption: experimental` |

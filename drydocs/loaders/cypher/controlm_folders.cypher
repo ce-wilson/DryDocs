@@ -1,12 +1,12 @@
 // =============================================================================
-// controlm_folders.cypher  —  psgmgr.CM_DEF_VTAB -> :JobFolder + :ControlMServer
+// controlm_folders.cypher  —  psgmgr.CM_DEF_VTAB -> :ControlMFolder + :ControlMServer
 //
 // Source: psgmgr.CM_DEF_VTAB (replicated copy of dtsremgr.DEF_VTAB).
 // BMC calls folders "tables" — naming gotcha lives in
 // docs/m3_controlm_concept_mapping.md.
 //
 // Outputs:
-//   (:JobFolder {folder_id, sched_table, user_daily, table_status, ...})
+//   (:ControlMFolder {folder_id, sched_table, user_daily, table_status, ...})
 //     -[:SCHEDULED_ON {since}]-> (:ControlMServer:Platform {name})
 //
 // Each folder is scheduled on exactly one server. The :SCHEDULED_ON.since timestamp
@@ -39,7 +39,7 @@ SET srv.last_seen_at = datetime($loaded_at),
 // (environment, lob_code, app_code, folder_type_code) via
 // drydocs.controlm.folder_name.parse_folder_name before sending the
 // batch — those parsed properties arrive as row fields.
-MERGE (f:JobFolder:Collection {folder_id: row.folder_id})
+MERGE (f:ControlMFolder:Collection {folder_id: row.folder_id})
   ON CREATE SET f.created_at = datetime($loaded_at),
                 f.source     = 'psgmgr.CM_DEF_VTAB'
 SET f.sched_table       = row.sched_table,

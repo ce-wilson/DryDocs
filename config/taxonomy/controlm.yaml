@@ -1,7 +1,7 @@
 # =============================================================================
 # config/taxonomy/controlm.yaml  —  Control-M taxonomy (backlog B1)
 #
-# PURE CLASSIFICATION ONLY. Hierarchy: ControlMServer > JobFolder > ControlMJob;
+# PURE CLASSIFICATION ONLY. Hierarchy: ControlMServer > ControlMFolder > ControlMJob;
 # Condition is a classified entity keyed (folder_id, name). This file contains
 # NO meaning-bearing edges — REQUIRES_IN_CONDITION / EMITS_OUT_CONDITION /
 # DEPENDS_ON are ONTOLOGY decisions, deferred to the C1 ontology-mapping pass
@@ -19,7 +19,7 @@ source: controlm-psgmgr            # config/source-registry.yaml
 adapter: csv-sample                 # OracleAdapter (psgmgr) in production
 authority: bmc-baseline             # config/precedence.yaml tier 1
 classification: Internal            # config/classification.yaml (source sensitivity)
-governed_by_standard: technology/orchestration/control-m/folder   # folder-naming-convention (JobFolder.name)
+governed_by_standard: technology/orchestration/control-m/folder   # folder-naming-convention (ControlMFolder.name)
 classification_only: true
 
 nodes:
@@ -31,7 +31,7 @@ nodes:
     - { id: P32 }
     - { id: P33 }
 
-  # JobFolder — child of a server. Key: folder_id. name = sched_table.
+  # ControlMFolder — child of a server. Key: folder_id. name = sched_table.
   # status A = active, R = retired. jobs[] = contained ControlMJob keys (classification only).
   folders:
     - { id: 161014, name: PRARAG-HLDM-111027-PEX-RFND-DLY, server: P12, status: A, jobs: ["161014:5","161014:3"] }
@@ -108,6 +108,6 @@ open_questions:
       classified-but-inactive; the ontology pass should decide whether retired folders load.
   - id: folder-name-parse
     note: >
-      JobFolder.name follows the PRAOCG-style convention (technology/orchestration/control-m/folder
+      ControlMFolder.name follows the PRAOCG-style convention (technology/orchestration/control-m/folder
       standard). Parsing name -> (env, LOB, app, type) attributes is left for a follow-up; raw
       names captured here unmodified (faithful-to-source).

@@ -25,7 +25,7 @@ mappings:
       source: controlm-psgmgr
       element: "Folder contains Job"      # raw classification from the import
     ontology:
-      from_node: JobFolder                 # prov:Collection
+      from_node: ControlMFolder                 # prov:Collection
       to_node: ControlMJob                 # prov:Activity
       prov_type_from: Collection
       prov_type_to: Activity
@@ -47,7 +47,7 @@ mappings:
       source: controlm-psgmgr
       element: "Folder is scheduled on a Control-M server (data center)"
     ontology:
-      from_node: JobFolder                 # prov:Collection
+      from_node: ControlMFolder                 # prov:Collection
       to_node: ControlMServer              # local Platform — NOT an Agent
       prov_type_from: Collection
       prov_type_to: "n/a (infrastructure)"

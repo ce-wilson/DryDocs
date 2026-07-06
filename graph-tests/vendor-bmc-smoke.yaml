@@ -7,25 +7,25 @@ description: >
   Baseline structural invariants for a Control-M load: folders and jobs exist and
   every job is contained by a folder. Counts are NOT asserted here (they are
   environment-specific and would be Internal) — only shape/consistency.
-targets: [JobFolder, ControlMJob, Condition]
+targets: [ControlMFolder, ControlMJob, Condition]
 cases:
   - id: TC-01
     description: at least one job folder exists
-    cypher: "MATCH (f:JobFolder) RETURN count(f) AS n"
+    cypher: "MATCH (f:ControlMFolder) RETURN count(f) AS n"
     assert: nonempty
 
   - id: TC-02
-    description: every ControlMJob is contained by a JobFolder (no orphans)
+    description: every ControlMJob is contained by a ControlMFolder (no orphans)
     cypher: >
       MATCH (j:ControlMJob)
-      WHERE NOT (j)<-[:CONTAINS_JOB]-(:JobFolder)
+      WHERE NOT (j)<-[:CONTAINS_JOB]-(:ControlMFolder)
       RETURN j.job_id AS orphan_job
     assert: empty
 
   - id: TC-03
     description: no job folder is nameless
     cypher: >
-      MATCH (f:JobFolder)
+      MATCH (f:ControlMFolder)
       WHERE f.name IS NULL OR f.name = ''
       RETURN f AS nameless_folder
     assert: empty

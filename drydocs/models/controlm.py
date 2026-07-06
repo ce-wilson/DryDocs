@@ -138,7 +138,7 @@ class ControlMJobRow(BaseModel):
     # --- identity + composite key ---
     job_id: str = Field(..., min_length=1)
     version_serial: int = Field(..., ge=0)
-    folder_id: str = Field(..., min_length=1, description="FK to JobFolder.folder_id.")
+    folder_id: str = Field(..., min_length=1, description="FK to ControlMFolder.folder_id.")
     job_name: str = Field(..., min_length=1)
     parent_table: str | None = Field(
         None,

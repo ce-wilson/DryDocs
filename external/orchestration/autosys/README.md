@@ -8,7 +8,7 @@ orchestration source and records how it will crosswalk to the **BMC Control-M ba
 | AutoSys native | BMC baseline concept | DryDocs node | Confidence |
 |----------------|----------------------|--------------|------------|
 | Job (`insert_job`) | Job | `ControlMJob` | high |
-| Box job | Folder / subfolder grouping | `JobFolder` (Collection) | medium |
+| Box job | Folder / subfolder grouping | `ControlMFolder` (Collection) | medium |
 | `condition:` (s(job), d(file)) | IN condition | `REQUIRES_IN_CONDITION` → `Condition` | high |
 | `condition` success → downstream | OUT condition / dependency | `EMITS_OUT_CONDITION` / `WAS_INFORMED_BY` | medium |
 | Machine (`machine:`) | execution host | `ExecutionHost` | high |
@@ -23,4 +23,4 @@ orchestration source and records how it will crosswalk to the **BMC Control-M ba
    baseline node/edge types — no new concepts).
 
 > Reminder: a "box job" is not a new graph concept — it crosswalks to the existing
-> `JobFolder`/grouping. Inventing `:AutoSysBox` would re-introduce taxonomy/ontology drift.
+> `ControlMFolder`/grouping. Inventing `:AutoSysBox` would re-introduce taxonomy/ontology drift.

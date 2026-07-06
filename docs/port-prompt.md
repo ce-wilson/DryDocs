@@ -109,8 +109,8 @@ PROCEDURE:
    stream; they are independent of the step-12 icon bundle — either can be ported
    alone.)
 
-13. CONTROL-M CHAIN — TWO COMPANY-SIDE CHANGES TO PRESERVE (2026-07, see ADR 0003):
-   a. ORACLE BIND RENDERER FIX (Canonical-COMPANY, back-flow rule): company commit
+13. CONTROL-M CHAIN — COMPANY-SIDE CHANGE TO PRESERVE (2026-07, see ADR 0003):
+   ORACLE BIND RENDERER FIX (Canonical-COMPANY, back-flow rule): company commit
       "fix(oracle-adapter): don't treat :tokens in SQL comments/strings as binds"
       hardened `_render_sql` in the company `jdbc_oracle_adapter.py` to substitute
       binds ONLY in code regions (`--` and `/* */` comments, 'single-quoted strings',
@@ -121,18 +121,6 @@ PROCEDURE:
       are correct as-is and must survive the port byte-identical. If any incoming
       producer commit de-colonizes SQL comments, DROP that hunk (a producer-side
       attempt was made and reverted 2026-07-05; verify none leaks into the range).
-   b. LABEL RENAME `JobFolder` → `ControlMFolder` (company-side, 2026-07): the
-      producer cypher loaders are Canonical-here and may still say `:JobFolder`.
-      Taking them WHOLESALE would clobber the company rename. Until the producer
-      executes the rename (ADR 0003 follow-up 1), after resolving each Canonical-here
-      Control-M cypher/constraints file, re-apply company-side:
-      `JobFolder` → `ControlMFolder` in cypher loaders, constraints, and any
-      graph-review label maps, then re-run the graph-review page to confirm the
-      `ControlMFolder` section renders. Acceptance: `grep -R "JobFolder" drydocs/`
-      on the port branch returns nothing.
-      (Also note: `config/review-labels.yaml` gained a company-authored
-      `controlm-psgmgr` review source — already covered by step 10 back-flow:
-      KEEP COMPANY'S VERSION.)
 
 ACCEPTANCE GATE (behavior is the contract, not a byte-compare):
 - Track 1 (portable, no production sample present):

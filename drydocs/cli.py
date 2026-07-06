@@ -375,7 +375,7 @@ def m1_verify() -> None:
 def apply_ontology_supplement() -> None:
     """Apply the base ontology supplement (idempotent).
 
-    Adds local-namespace anchor terms (:ControlMServer, :JobFolder,
+    Adds local-namespace anchor terms (:ControlMServer, :ControlMFolder,
     :ControlMJob) and wires them via :SUBCLASS_OF to the PROV anchors
     seeded by ontology.cypher. Also declares Control-M LocalRelationship
     mappings (SCHEDULED_ON, CONTAINS_JOB, REQUIRES_IN_CONDITION,
@@ -425,7 +425,7 @@ def apply_sosa_supplement() -> None:
 
     Seeds the observation/temporal vocabulary for the layer-4 context graph:
     sosa:Observation / Sensor / FeatureOfInterest / ObservableProperty / Result
-    terms, the :CAN_ACT_AS role wiring (ControlMJob/JobFolder ALSO act as
+    terms, the :CAN_ACT_AS role wiring (ControlMJob/ControlMFolder ALSO act as
     sosa:FeatureOfInterest), and candidate LocalRelationships (OBSERVES,
     HAS_RESULT, MADE_BY_SENSOR, OF_OBSERVABLE_PROPERTY) mapping to sosa:* props.
 
@@ -519,7 +519,7 @@ def m3_verify() -> None:
     with _client() as cli:
         # Every folder has a server.
         rows = cli.run("""
-            MATCH (f:JobFolder)
+            MATCH (f:ControlMFolder)
             OPTIONAL MATCH (f)-[:SCHEDULED_ON]->(srv:ControlMServer)
             WITH count(f) AS folders, count(srv) AS srv_links
             RETURN folders, srv_links
@@ -535,7 +535,7 @@ def m3_verify() -> None:
         # Every job has a folder.
         rows = cli.run("""
             MATCH (j:ControlMJob)
-            OPTIONAL MATCH (f:JobFolder)-[:CONTAINS_JOB]->(j)
+            OPTIONAL MATCH (f:ControlMFolder)-[:CONTAINS_JOB]->(j)
             WITH count(j) AS jobs, count(f) AS with_folder
             RETURN jobs, with_folder
         """)
@@ -572,11 +572,11 @@ def m3_verify() -> None:
 
         # Local-namespace anchor terms present (post supplement).
         # Parentheses around the OR group — without them, AND binds tighter
-        # and the IRI-prefix filter only constrains the JobFolder branch.
+        # and the IRI-prefix filter only constrains the ControlMFolder branch.
         rows = cli.run("""
             MATCH (n:OntologyTerm:LocalClass)
             WHERE n.iri STARTS WITH 'https://drydocs.local/ontology#'
-              AND (n.iri ENDS WITH 'JobFolder'
+              AND (n.iri ENDS WITH 'ControlMFolder'
                    OR n.iri ENDS WITH 'ControlMJob'
                    OR n.iri ENDS WITH 'ControlMServer')
             RETURN count(DISTINCT n) AS n
@@ -590,7 +590,7 @@ def m3_verify() -> None:
 
         # Every active folder has at least one active job (sample-friendly bound).
         rows = cli.run("""
-            MATCH (f:JobFolder {active: true})
+            MATCH (f:ControlMFolder {active: true})
             OPTIONAL MATCH (f)-[:CONTAINS_JOB]->(j:ControlMJob)
             WITH f, count(j) AS jc
             RETURN sum(CASE WHEN jc = 0 THEN 1 ELSE 0 END) AS empty_folders,

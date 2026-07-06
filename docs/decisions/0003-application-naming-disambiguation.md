@@ -120,8 +120,11 @@ company originals. The renderer fix supersedes it.
 
 ## Follow-up (small, bounded)
 
-1. Producer-side label rename `JobFolder` → `ControlMFolder` (cypher loaders,
-   constraints, README, docs) + migration cypher for existing local graphs.
+1. ~~Producer-side label rename `JobFolder` → `ControlMFolder` (cypher loaders,
+   constraints, README, docs) + migration cypher for existing local graphs.~~
+   **DONE 2026-07-05** — repo-wide rename; migration at
+   `drydocs/migrations/20260705_rename_jobfolder_to_controlmfolder.cypher`
+   (constraint `folder_id` → `controlmfolder_id`).
 2. Add rules 1–4 to `docs/RELATIONSHIP_GUIDE.md` ("naming collisions").
 3. Route through the SME gate (`docs/restructure/03-hitl-sme-flow.md`) to move
    this ADR `PROPOSED → ACCEPTED`.

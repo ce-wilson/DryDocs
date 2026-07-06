@@ -5,7 +5,7 @@ from drydocs.graph_review import DEFAULT_HIDDEN_PROPS, group_rows, render_review
 from drydocs.review_labels import ReviewLabels
 
 _ROWS = {
-    "JobFolder": [{"name": "CCB_DAILY", "folder_id": "F1", "_internal_id": 42, "version_serial": 7}],
+    "ControlMFolder": [{"name": "CCB_DAILY", "folder_id": "F1", "_internal_id": 42, "version_serial": 7}],
     "ControlMJob": [{"name": "load_x", "job_id": "J1"}, {"name": "load_y", "job_id": "J2"}],
 }
 
@@ -20,7 +20,7 @@ def test_group_rows_splits_by_label() -> None:
 
 def test_render_has_one_section_per_label_and_counts() -> None:
     out = render_review(_ROWS)
-    assert "<h2>JobFolder" in out
+    assert "<h2>ControlMFolder" in out
     assert "<h2>ControlMJob" in out
     assert "load_x" in out and "load_y" in out
 
@@ -40,7 +40,7 @@ def test_provenance_from_spine_on_header() -> None:
     spine = ReviewLabels.from_dict(
         {
             "sources": [
-                {"id": "bmc-x", "provenance": "vendor baseline", "labels": ["JobFolder", "ControlMJob"]}
+                {"id": "bmc-x", "provenance": "vendor baseline", "labels": ["ControlMFolder", "ControlMJob"]}
             ]
         }
     )

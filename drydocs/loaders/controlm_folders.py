@@ -2,12 +2,12 @@
 
 Source: ``psgmgr.CM_DEF_VTAB`` (replicated copy of ``dtsremgr.DEF_VTAB``)
 via OracleAdapter; CSV via CsvAdapter for samples / dev. Produces
-:JobFolder nodes and the :ControlMServer mesh (deduped on DATA_CENTER).
+:ControlMFolder nodes and the :ControlMServer mesh (deduped on DATA_CENTER).
 
 The loader parses the ``SCHED_TABLE`` folder name into structured
 properties (environment / lob / app_code / folder_type) using
 :func:`drydocs.controlm.folder_name.parse_folder_name`. The Cypher
-template writes those properties onto the :JobFolder node so downstream
+template writes those properties onto the :ControlMFolder node so downstream
 queries can filter by environment, LOB, or appcode without re-parsing.
 
 Active filter (``USER_DAILY IS NOT NULL``) lives in the SQL projection.

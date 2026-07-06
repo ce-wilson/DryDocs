@@ -40,10 +40,11 @@ Tags help grooming: `idea` · `bug` · `doc` · `source` (new data source) · `q
 - 2026-07-03 — [chore] repo `.venv` has no pytest (and poetry isn't on PATH in plain PowerShell)
   — the `poetry run pytest -q` gate can't run as documented on this machine; reinstall dev deps.
 
-- [bug] node_classifications says label ControlMFolder but every loader/edge writes :JobFolder
+- ~~[bug] node_classifications says label ControlMFolder but every loader/edge writes :JobFolder
   (controlm_folders.cypher MERGEs JobFolder:Collection; edge entries say from_node: JobFolder) —
   same drift visible in the company copy. Decide the winning name via the gate, then fix the
-  losing side everywhere. (same screenshots)
+  losing side everywhere. (same screenshots)~~ RESOLVED 2026-07-05: `ControlMFolder` won
+  (ADR 0003); repo-wide rename + `drydocs/migrations/20260705_rename_jobfolder_to_controlmfolder.cypher`.
 - [doc] README.md still says :DEPENDS_ON for the derived job->job edge; the loader + m3-verify
   write :WAS_INFORMED_BY (vocab m3_was_informed_by; DEPENDS_ON retired). Reconcile the README.
   (2026-07-01 Control-M naming review with SME)

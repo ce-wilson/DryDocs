@@ -23,12 +23,12 @@ sections:
 mapping:
   - n: 1
     element: "Folder (name, id)"
-    target: ":JobFolder {folder_id, name}"
+    target: ":ControlMFolder {folder_id, name}"
     edge: "—"
   - n: 2
     element: "Job (name, id)"
     target: ":ControlMJob {job_id, name}"
-    edge: ":JobFolder -[:CONTAINS_JOB]-> :ControlMJob"
+    edge: ":ControlMFolder -[:CONTAINS_JOB]-> :ControlMJob"
   - n: 3
     element: "In/Out condition"
     target: ":Condition {folder_id, name}"

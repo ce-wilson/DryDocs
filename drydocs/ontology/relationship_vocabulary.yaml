@@ -44,7 +44,7 @@
 #     says org:Organization. Both are valid ORG classes; org:FormalOrganization
 #     is the more precise term and is adopted here. Update the supplement
 #     comment when convenient.
-#   * RUNS_ON (JobFolder→ControlMServer) renamed SCHEDULED_ON; the RUNS_ON
+#   * RUNS_ON (ControlMFolder→ControlMServer) renamed SCHEDULED_ON; the RUNS_ON
 #     label is reassigned to execution-host placement (see m3_runs_on_* below).
 #   * Section 4 mermaid edges (develops / owns / stored_in / contains /
 #     DEPENDS_ON) pre-date the ontology and are normalized to
@@ -271,7 +271,7 @@ node_classifications:
     prov_type:  Entity
     note:       "EXPERIMENTAL. What is observed: run-status, run-duration, exit-status, freshness. sosa_experimental_supplement.cypher."
 
-  # NOTE: ControlMJob and JobFolder (declared above as prov:Activity / Collection)
+  # NOTE: ControlMJob and ControlMFolder (declared above as prov:Activity / Collection)
   # ALSO act as sosa:FeatureOfInterest — an orthogonal context-graph role recorded
   # via :CAN_ACT_AS in the supplement. Their primary classification is unchanged.
 
@@ -355,7 +355,7 @@ prov_matrix:
     neo4j_label: HAD_MEMBER
     note: >
       Collection contains a member entity or activity.
-      Examples: JobFolder (Collection) contains ControlMJob (Activity).
+      Examples: ControlMFolder (Collection) contains ControlMJob (Activity).
 
 
 # ── SECTION 2: Local relationships ───────────────────────────────────────────
@@ -368,7 +368,7 @@ local_relationships:
   - id:           m3_scheduled_on
     neo4j_label:  SCHEDULED_ON
     role:         ~
-    from_node:    JobFolder
+    from_node:    ControlMFolder
     to_node:      ControlMServer
     prov_maps_to: ~
     note: >
@@ -386,7 +386,7 @@ local_relationships:
   - id:           m3_runs_on
     neo4j_label:  RUNS_ON
     role:         ~
-    from_node:    JobFolder
+    from_node:    ControlMFolder
     to_node:      ControlMServer
     prov_maps_to: ~
     note: >
@@ -394,7 +394,7 @@ local_relationships:
       consolidated documentation. RUNS_ON is reassigned to ControlMJob/
       ETLProcess → ExecutionHost (m3_runs_on_agent_host / m3_runs_on_etl_host).
       Migrate existing edges with:
-      MATCH (f:JobFolder)-[r:RUNS_ON]->(s:ControlMServer)
+      MATCH (f:ControlMFolder)-[r:RUNS_ON]->(s:ControlMServer)
       then re-create as SCHEDULED_ON and delete r.
     supplement:   ontology_supplement.cypher
     loader:       controlm_folders.cypher
@@ -404,11 +404,11 @@ local_relationships:
   - id:           m3_contains_job
     neo4j_label:  CONTAINS_JOB
     role:         ~
-    from_node:    JobFolder
+    from_node:    ControlMFolder
     to_node:      ControlMJob
     prov_maps_to: "prov:hadMember"
     note: >
-      JobFolder (prov:Collection) contains ControlMJob (prov:Activity).
+      ControlMFolder (prov:Collection) contains ControlMJob (prov:Activity).
       Matrix row: Collection → any = HAD_MEMBER. CONTAINS_JOB is kept as
       the label for query clarity; semantics are hadMember.
     supplement:   ontology_supplement.cypher
@@ -516,7 +516,7 @@ local_relationships:
     neo4j_label:  DEPLOYS_FOLDER
     role:         ~
     from_node:    Deployment
-    to_node:      JobFolder
+    to_node:      ControlMFolder
     prov_maps_to: "prov:used"
     note: >
       Deployment ships a folder definition. Matrix row: Activity → Entity
@@ -529,7 +529,7 @@ local_relationships:
   - id:           p2_authored_by
     neo4j_label:  AUTHORED_BY
     role:         ~
-    from_node:    JobFolder
+    from_node:    ControlMFolder
     to_node:      Developer
     prov_maps_to: "prov:wasAttributedTo"
     note: >
@@ -1005,10 +1005,10 @@ local_relationships:
     neo4j_label:  CONTAINS_FOLDER
     role:         ~
     from_node:    Batch
-    to_node:      JobFolder
+    to_node:      ControlMFolder
     prov_maps_to: "prov:hadMember"
     note: >
-      Was mermaid "CONTAINS". Batch (prov:Collection) → JobFolder.
+      Was mermaid "CONTAINS". Batch (prov:Collection) → ControlMFolder.
       Matrix row: Collection → any = HAD_MEMBER; domain label kept.
     supplement:   catalog_ontology_supplement.cypher
     loader:       ~
@@ -1043,7 +1043,7 @@ local_relationships:
     neo4j_label:  OBSERVES
     role:         ~
     from_node:    Observation
-    to_node:      ControlMJob          # or JobFolder — both can act as sosa:FeatureOfInterest
+    to_node:      ControlMJob          # or ControlMFolder — both can act as sosa:FeatureOfInterest
     prov_maps_to: ~
     sosa_maps_to: "sosa:hasFeatureOfInterest"
     note: >

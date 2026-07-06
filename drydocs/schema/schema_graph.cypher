@@ -14,7 +14,7 @@
 // Node properties:  name, class (CURIE per namespaces.py), prov_type
 // Edge properties:  vocab_id, role, prov_maps_to, domain, status
 //
-// NOTE: node label JobFolder was renamed ControlMFolder (2026-06-09); this
+// NOTE: node label ControlMFolder was renamed ControlMFolder (2026-06-09); this
 // schema uses the new label. Deprecated entries (m3_runs_on RUNS_ON
 // ControlMFolder→ControlMServer, renamed SCHEDULED_ON) are excluded.
 //

@@ -5,7 +5,7 @@
 // by ontology.cypher. Idempotent. Apply once after bootstrap; no-op on re-run.
 //
 // Covers:
-//   Control-M structural lineage (M3): ControlMServer, JobFolder, ControlMJob
+//   Control-M structural lineage (M3): ControlMServer, ControlMFolder, ControlMJob
 //
 // Domain-specific supplements (apply separately after this file):
 //   seal_ontology_supplement.cypher    — Application, Port, Membership, Role, Employee
@@ -20,7 +20,7 @@ MERGE (n:OntologyTerm:LocalClass {iri: "https://drydocs.local/ontology#ControlMS
   SET n.label = "Control-M Server",
       n.notes = "BMC Control-M scheduler runtime host. Maps loosely to swo:Platform.";
 
-MERGE (n:OntologyTerm:LocalClass {iri: "https://drydocs.local/ontology#JobFolder"})
+MERGE (n:OntologyTerm:LocalClass {iri: "https://drydocs.local/ontology#ControlMFolder"})
   SET n.label = "Control-M Job Folder",
       n.notes = "BMC nomenclature calls these 'tables' (psgmgr.CM_DEF_VTAB; "
               + "wraps dtsremgr.DEF_TAB). A folder is a prov:Collection of "
@@ -34,7 +34,7 @@ MERGE (n:OntologyTerm:LocalClass {iri: "https://drydocs.local/ontology#ControlMJ
 
 // ----- :SUBCLASS_OF wiring to PROV anchors -----------------------------------
 
-MATCH (lc:OntologyTerm:LocalClass {iri: "https://drydocs.local/ontology#JobFolder"})
+MATCH (lc:OntologyTerm:LocalClass {iri: "https://drydocs.local/ontology#ControlMFolder"})
 MATCH (pc:OntologyTerm:ProvClass   {iri: "http://www.w3.org/ns/prov#Collection"})
 MERGE (lc)-[r:SUBCLASS_OF]->(pc)
   ON CREATE SET r.source = "drydocs.ontology_supplement";
@@ -56,22 +56,22 @@ MERGE (k:SchedulerKind {name: "ControlM"})
 // :LocalRelationship declarations — Control-M relationship → PROV-O mapping
 // =============================================================================
 
-// SCHEDULED_ON  —  JobFolder → ControlMServer
+// SCHEDULED_ON  —  ControlMFolder → ControlMServer
 // Infrastructure placement; no PROV-O equivalent. (Renamed from RUNS_ON.)
 MERGE (n:OntologyTerm:LocalRelationship {iri: "https://drydocs.local/ontology#scheduledOn"})
   SET n.label  = "SCHEDULED_ON",
-      n.domain = "JobFolder",
+      n.domain = "ControlMFolder",
       n.range  = "ControlMServer",
       n.notes  = "Folder is scheduled on a Control-M server (DATA_CENTER). "
                + "Edge carries since + last_seen_at for migration audit. "
                + "Renamed from RUNS_ON; RUNS_ON reassigned to job/ETL → ExecutionHost.";
 
-// CONTAINS_JOB  —  JobFolder → ControlMJob  (prov:hadMember)
+// CONTAINS_JOB  —  ControlMFolder → ControlMJob  (prov:hadMember)
 MERGE (n:OntologyTerm:LocalRelationship {iri: "https://drydocs.local/ontology#containsJob"})
   SET n.label  = "CONTAINS_JOB",
-      n.domain = "JobFolder",
+      n.domain = "ControlMFolder",
       n.range  = "ControlMJob",
-      n.notes  = "JobFolder (prov:Collection) contains ControlMJob (prov:Activity). "
+      n.notes  = "ControlMFolder (prov:Collection) contains ControlMJob (prov:Activity). "
                + "Semantics: prov:hadMember.";
 MATCH (local:OntologyTerm:LocalRelationship {iri: "https://drydocs.local/ontology#containsJob"})
 MATCH (prov:OntologyTerm:ProvProperty       {iri: "http://www.w3.org/ns/prov#hadMember"})

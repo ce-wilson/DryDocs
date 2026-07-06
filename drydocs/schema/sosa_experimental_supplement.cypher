@@ -22,7 +22,7 @@
 //   * SOSA *layers on top of* PROV — it does not replace it. PROV/ORG/DPROD
 //     answer layers 1-3 ("what runs, depends, who owns"); SOSA answers layer 4
 //     ("what matters right now").
-//   * Multi-classification: ControlMJob / JobFolder keep their PROV behavioural
+//   * Multi-classification: ControlMJob / ControlMFolder keep their PROV behavioural
 //     types (Activity / Collection) AND additionally play sosa:FeatureOfInterest
 //     (orthogonal axes — see :CAN_ACT_AS below). No existing label changes.
 //   * SOSA relationships sit OUTSIDE the PROV 9-row matrix (same as how DPROD
@@ -48,7 +48,7 @@ MERGE (n:OntologyTerm:SosaClass {iri:"http://www.w3.org/ns/sosa/Sensor"})
       n.notes = "The monitoring source making the observation (e.g. Control-M history API, a health probe).";
 MERGE (n:OntologyTerm:SosaClass {iri:"http://www.w3.org/ns/sosa/FeatureOfInterest"})
   SET n.label = "Feature of Interest", n.adoption = "experimental",
-      n.notes = "The thing observed. ControlMJob / JobFolder can act as this (see :CAN_ACT_AS).";
+      n.notes = "The thing observed. ControlMJob / ControlMFolder can act as this (see :CAN_ACT_AS).";
 MERGE (n:OntologyTerm:SosaClass {iri:"http://www.w3.org/ns/sosa/ObservableProperty"})
   SET n.label = "Observable Property", n.adoption = "experimental",
       n.notes = "What is observed: run-status, run-duration, exit-status, freshness.";
@@ -85,7 +85,7 @@ MATCH (foi:OntologyTerm:SosaClass {iri:"http://www.w3.org/ns/sosa/FeatureOfInter
 MERGE (lc)-[r:CAN_ACT_AS]->(foi)
   ON CREATE SET r.source = "drydocs.sosa_experimental_supplement", r.adoption = "experimental";
 
-MATCH (lc:OntologyTerm:LocalClass {iri:"https://drydocs.local/ontology#JobFolder"})
+MATCH (lc:OntologyTerm:LocalClass {iri:"https://drydocs.local/ontology#ControlMFolder"})
 MATCH (foi:OntologyTerm:SosaClass {iri:"http://www.w3.org/ns/sosa/FeatureOfInterest"})
 MERGE (lc)-[r:CAN_ACT_AS]->(foi)
   ON CREATE SET r.source = "drydocs.sosa_experimental_supplement", r.adoption = "experimental";

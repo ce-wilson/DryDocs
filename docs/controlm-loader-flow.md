@@ -3,7 +3,7 @@
 **Purpose:** baseline flow of the Control-M loaders and the graph schema they produce, for review/correction **against `drydocs/schema/schema_graph.cypher`**. Seed for the `controlm-spinoff` engine.
 **Created:** 2026-06-11 (on `main`). **Sources read:** `drydocs/loaders/controlm_*.py` + `drydocs/loaders/cypher/controlm_*.cypher` + `drydocs/schema/schema_graph.cypher`.
 
-> ⚠️ **Drift found during this mapping — needs correction (see §4).** The loaders still write `:JobFolder` and folder-`:RUNS_ON`-server; the schema (updated 2026-06-09) renamed these to `:ControlMFolder` and `:SCHEDULED_ON`. The diagrams below show **loader-actual** with the schema target flagged.
+> ⚠️ **Drift found during this mapping — needs correction (see §4).** The loaders still write `:ControlMFolder` and folder-`:RUNS_ON`-server; the schema (updated 2026-06-09) renamed these to `:ControlMFolder` and `:SCHEDULED_ON`. The diagrams below show **loader-actual** with the schema target flagged.
 
 ---
 
@@ -56,7 +56,7 @@ Every loader inherits `BaseLoader`: opens a `:JobRun {kind:'load'}`, and every n
 ```mermaid
 flowchart LR
   SRV(["ControlMServer:Platform<br/>{name = data_center}"])
-  FOLDER(["JobFolder:Collection ⚠️<br/>{folder_id, sched_table,<br/>environment/lob/app_code…}"])
+  FOLDER(["ControlMFolder:Collection ⚠️<br/>{folder_id, sched_table,<br/>environment/lob/app_code…}"])
   JOB(["ControlMJob:Activity<br/>key (folder_id, job_id)<br/>{job_name, task_type, cmd_line…}"])
   COND(["Condition:Entity<br/>key (folder_id, name)"])
   APP(["Application (SEAL)<br/>{seal_id}"])
@@ -82,7 +82,7 @@ flowchart LR
 
 | Element | Loader writes | schema_graph.cypher | vocab_id | status |
 |---|---|---|---|---|
-| Folder node | `:JobFolder:Collection` | **`:ControlMFolder`** (renamed 2026-06-09) | — | ⚠️ drift |
+| Folder node | `:ControlMFolder:Collection` | **`:ControlMFolder`** (renamed 2026-06-09) | — | ⚠️ drift |
 | Server node | `:ControlMServer:Platform` | `:ControlMServer` | — | ✅ |
 | Job node | `:ControlMJob:Activity` | `:ControlMJob` (Activity) | — | ✅ |
 | Condition node | `:Condition:Entity` | `:Condition` (Entity) | — | ✅ |
@@ -99,7 +99,7 @@ flowchart LR
 
 ## 4. Corrections needed (review actions)
 
-1. **`:JobFolder` → `:ControlMFolder`** — align `controlm_folders.cypher` (+ `controlm_jobs.cypher` MATCH, conditions MATCHes) to the renamed label, **or** revert the schema. Pick one source of truth.
+1. **`:ControlMFolder` → `:ControlMFolder`** — align `controlm_folders.cypher` (+ `controlm_jobs.cypher` MATCH, conditions MATCHes) to the renamed label, **or** revert the schema. Pick one source of truth.
 2. **Folder→Server `RUNS_ON` → `SCHEDULED_ON` — FUNCTIONAL BREAK, not just naming.** The schema (`m3_scheduled_on`, status `active`) and **`cli.py:391` already read `(f)-[:SCHEDULED_ON]->(:ControlMServer)`**, but `controlm_folders.cypher` still **writes `RUNS_ON`** — so that query path matches nothing on a freshly loaded graph. `relationship_vocabulary.yaml` documents the 2026-06-09 rename + migration (match `RUNS_ON`, recreate as `SCHEDULED_ON`, delete old). Fix: update the loader to write `SCHEDULED_ON`; migrate existing graphs. (`RUNS_ON` is reserved for the planned Job→ExecutionHost edge.) **Highest-priority correction.**
 3. **Control-M → SEAL `:Application` bridge is unwired** — folder `app_code` (positions 3-5 of the folder name) is the documented "canonical mechanism," but no loader emits the edge. Decide owner: a Control-M-side derived loader, or the ontology side. (Note: `ControlMJob.application` is the Control-M app code, **not** SEAL — do not join on it.)
 4. **`ControlMJobRun` (execution history, M3 P2)** is in the schema as `:Activity` but **not** produced by these phase-1 structural loaders — confirm it stays out of the spin-off baseline (definitions only) or is in scope.

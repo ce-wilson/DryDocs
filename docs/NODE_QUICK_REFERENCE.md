@@ -79,6 +79,6 @@ How to use: when writing a new relationship, find your **source node's Source ty
 
 ⁶ Candidate `prov:Location` if STORED_IN is ever mapped to `prov:atLocation`.
 
-⁷ Renamed from JobFolder (2026-06-09). Supplements and loaders still write `:JobFolder` until migrated: `MATCH (n:JobFolder) SET n:ControlMFolder REMOVE n:JobFolder`.
+⁷ Renamed from ControlMFolder (2026-06-09). Supplements and loaders still write `:ControlMFolder` until migrated: `MATCH (n:ControlMFolder) SET n:ControlMFolder REMOVE n:ControlMFolder`.
 
 ⁸ Area Product Group / Team of Teams (Align/PAT terminology). Sits between Product and DevTeam in the hierarchy: `Product -[:HAS_AREA_PRODUCT]-> AreaProduct -[:HAS_DEV_TEAM]-> DevTeam`. DevTeams also carry `SUPPORTS {team_type, sponsored}` edges to both Product and AreaProduct — `team_type` (aligned|flex|dedicated) is an edge property, not a fixed node attribute.

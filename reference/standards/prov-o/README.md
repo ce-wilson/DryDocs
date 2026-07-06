@@ -23,7 +23,7 @@ is PROV-O.
 - **Activity** — something that happens over time (`ControlMJob`, `JobRun`, `ETLProcess`).
 - **Entity** — a thing (`Condition`, `Script`, `DataSource`, `File`).
 - **Agent** — bears responsibility (`Application`, `Employee`, `AppUser`).
-- **Collection** (⊑ Entity) — groups members (`JobFolder`, `Code`, `Batch`).
+- **Collection** (⊑ Entity) — groups members (`ControlMFolder`, `Code`, `Batch`).
 
 ## Discipline (this is where past drift happened)
 1. Classify both nodes by PROV type **before** picking a label.

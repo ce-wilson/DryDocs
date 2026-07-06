@@ -19,7 +19,7 @@ vocabulary so production-support questions become first-class:
 
 ## Mapping sketch (proposal — goes through the HITL gate before any graph write)
 
-- `ControlMJob` / `JobFolder` → can act as `sosa:FeatureOfInterest`.
+- `ControlMJob` / `ControlMFolder` → can act as `sosa:FeatureOfInterest`.
 - A monitoring source (Control-M history API, a health probe) → `sosa:Sensor`.
 - One health/run reading → `sosa:Observation` → `sosa:Result` (+ `resultTime`).
 - `run-duration`, `exit-status`, `freshness` → `sosa:ObservableProperty`.

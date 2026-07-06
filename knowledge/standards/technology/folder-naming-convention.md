@@ -2,7 +2,7 @@
 standard: control-m-folder-naming
 domain: technology
 taxonomy_path: technology/orchestration/control-m/folder
-governs: JobFolder.name              # the 6-char folder name (SCHED_TABLE)
+governs: ControlMFolder.name              # the 6-char folder name (SCHED_TABLE)
 authority: internal-standards         # config/precedence.yaml tier 2 — refines the BMC baseline
 refines: bmc-baseline
 applies_to_source: controlm-psgmgr

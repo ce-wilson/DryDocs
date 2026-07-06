@@ -10,13 +10,13 @@
 // with a newer VERSION_SERIAL update the same node in place.  Run
 // m3_constraints_upgrade.cypher to lock this on existing graphs.
 //
-// Prereq: controlm_folders must have loaded so the parent :JobFolder
+// Prereq: controlm_folders must have loaded so the parent :ControlMFolder
 // exists. If a job references a folder we haven't loaded yet, the MATCH
 // silently drops that job; rerun folders then jobs.
 //
 // PARENT_TABLE (folder name denormalized on the job) is kept as a property
 // for query convenience but is NOT used as a relationship key — the FK is
-// TABLE_ID via :CONTAINS_JOB to the :JobFolder.
+// TABLE_ID via :CONTAINS_JOB to the :ControlMFolder.
 //
 // APPLICATION is the **Control-M app code**, NOT the SEAL business-app
 // name.  Different teams use it differently: some put a Platform name
@@ -34,7 +34,7 @@
 UNWIND $batch AS row
 
 // Folder must exist (loaded by controlm_folders before this runs).
-MATCH (f:JobFolder {folder_id: row.folder_id})
+MATCH (f:ControlMFolder {folder_id: row.folder_id})
 
 // Composite-key Job upsert. (folder_id, job_id) is the natural identity;
 // version_serial flows through as a property.

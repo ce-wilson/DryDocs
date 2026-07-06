@@ -57,10 +57,10 @@ def test_load_suite_parses_cases(tmp_path) -> None:
         """
         suite: demo
         description: a demo
-        targets: [JobFolder]
+        targets: [ControlMFolder]
         cases:
           - id: TC-01
-            cypher: "MATCH (f:JobFolder) RETURN f"
+            cypher: "MATCH (f:ControlMFolder) RETURN f"
             assert: nonempty
           - id: TC-02
             cypher: "RETURN 1 AS n"
@@ -70,7 +70,7 @@ def test_load_suite_parses_cases(tmp_path) -> None:
     )
     suite = load_suite(p)
     assert suite.name == "demo"
-    assert suite.targets == ("JobFolder",)
+    assert suite.targets == ("ControlMFolder",)
     assert [c.id for c in suite.cases] == ["TC-01", "TC-02"]
     assert suite.cases[1].assertion is Assertion.EQUALS
 
@@ -106,7 +106,7 @@ class _FakeGraph:
 
 def test_run_suite_all_pass_exit_zero() -> None:
     suite = _mini_suite()
-    graph = _FakeGraph({"JobFolder": [{"f": 1}], "orphan": []})  # folder exists, no orphans
+    graph = _FakeGraph({"ControlMFolder": [{"f": 1}], "orphan": []})  # folder exists, no orphans
     results = run_suite(graph, suite)
     assert exit_code(results) == 0
     assert all(r.passed for r in results)
@@ -114,7 +114,7 @@ def test_run_suite_all_pass_exit_zero() -> None:
 
 def test_run_suite_failure_exit_one() -> None:
     suite = _mini_suite()
-    graph = _FakeGraph({"JobFolder": [], "orphan": [{"orphan": "J1"}]})  # both fail
+    graph = _FakeGraph({"ControlMFolder": [], "orphan": [{"orphan": "J1"}]})  # both fail
     results = run_suite(graph, suite)
     assert exit_code(results) == 1
     assert not any(r.passed for r in results)
@@ -126,7 +126,7 @@ def _mini_suite() -> Suite:
     return Suite(
         name="mini",
         cases=(
-            Case(id="TC-a", cypher="MATCH (f:JobFolder) RETURN f", assertion=Assertion.NONEMPTY),
+            Case(id="TC-a", cypher="MATCH (f:ControlMFolder) RETURN f", assertion=Assertion.NONEMPTY),
             Case(id="TC-b", cypher="RETURN orphan", assertion=Assertion.EMPTY),
         ),
     )

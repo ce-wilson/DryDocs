@@ -63,7 +63,10 @@ CREATE CONSTRAINT scheduler_kind      IF NOT EXISTS FOR (k:SchedulerKind)       
 // loaders filter to IS_CURRENT_VERSION='1' so one canonical node per logical
 // entity; version_serial stays as an audit property only.
 CREATE CONSTRAINT controlm_server     IF NOT EXISTS FOR (s:ControlMServer)      REQUIRE s.name IS UNIQUE;
-CREATE CONSTRAINT folder_id           IF NOT EXISTS FOR (f:JobFolder)           REQUIRE f.folder_id IS UNIQUE;
+// Drop the JobFolder-era constraint name, then create against the renamed
+// label (ADR 0003: BMC labels take the ControlM prefix). Both idempotent.
+DROP CONSTRAINT folder_id IF EXISTS;
+CREATE CONSTRAINT controlmfolder_id   IF NOT EXISTS FOR (f:ControlMFolder)      REQUIRE f.folder_id IS UNIQUE;
 
 // Drop old versioned key (included version_serial in earlier M3 drafts) then
 // create the correct natural key. Both statements are idempotent.

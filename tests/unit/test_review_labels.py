@@ -12,7 +12,7 @@ from drydocs.review_labels import (
 _DOC = {
     "classification": "Internal-Public",
     "sources": [
-        {"id": "src-a", "provenance": "vendor", "labels": ["JobFolder", "ControlMJob"]},
+        {"id": "src-a", "provenance": "vendor", "labels": ["ControlMFolder", "ControlMJob"]},
         {"id": "src-b", "provenance": "grounded", "labels": ["ControlMJob", "JobRun"]},
     ],
 }
@@ -26,13 +26,13 @@ def test_from_dict_parses_sources() -> None:
 
 def test_labels_for_returns_chain_order() -> None:
     rl = ReviewLabels.from_dict(_DOC)
-    assert rl.labels_for("src-a") == ("JobFolder", "ControlMJob")
+    assert rl.labels_for("src-a") == ("ControlMFolder", "ControlMJob")
 
 
 def test_all_labels_is_distinct_first_seen() -> None:
     rl = ReviewLabels.from_dict(_DOC)
     # ControlMJob appears in both sources but only once, in first-seen order
-    assert rl.all_labels() == ["JobFolder", "ControlMJob", "JobRun"]
+    assert rl.all_labels() == ["ControlMFolder", "ControlMJob", "JobRun"]
 
 
 def test_unknown_source_raises() -> None:

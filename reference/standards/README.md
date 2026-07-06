@@ -41,7 +41,7 @@ A **context graph** answers "what matters *right now*." That is inherently tempo
 job-run freshness, last-success time, current health, observation windows. SOSA/SSN
 (`Observation`, `Sensor`, `Result`, `phenomenonTime`, `resultTime`) is the standard pattern
 for that. It is the bridge from the static knowledge graph (layers 1–3) to the context graph
-(layer 4). It **layers on top of PROV** — `ControlMJob` / `JobFolder` keep their PROV types
+(layer 4). It **layers on top of PROV** — `ControlMJob` / `ControlMFolder` keep their PROV types
 and *additionally* play `sosa:FeatureOfInterest` — so nothing in the adopted model changes.
 Local mirror: `../../sdw-sosa-ssn`.
 

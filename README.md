@@ -13,7 +13,7 @@ The graph spans four domains, loaded by independent command chains:
 
 | Domain | Source | What it adds | Status |
 | --- | --- | --- | --- |
-| **Control-M structural lineage** | Oracle `psgmgr.*` (BMC Control-M) | `:JobFolder`, `:ControlMServer`, `:ControlMJob`, `:Condition`, derived `:DEPENDS_ON` | Live (see below) |
+| **Control-M structural lineage** | Oracle `psgmgr.*` (BMC Control-M) | `:ControlMFolder`, `:ControlMServer`, `:ControlMJob`, `:Condition`, derived `:DEPENDS_ON` | Live (see below) |
 | **SEAL applications** | Internal SEAL extract | `:Application` (two-port: `:EventProcessing` / `:BatchProcessing`), `:Port`, `:Membership`, `:Role`, `:Employee` | Live |
 | **Catalog / PAT** | Internal product catalog | `:CatalogLOB`, `:BusinessSegment`, `:ProductLine`, `:Product`, `:AreaProduct`, `:DevTeam` + team-alignment edges | Live |
 | **Control-M variable normalization (C3/C4)** | Oracle `psgmgr` variable extract | Variable taxonomy → resolver → command parser → Oracle `DRYDOCS_STG` staging | Staging only — graph load (Phase D) not started |
@@ -143,7 +143,7 @@ execution history.
 ### What it delivers
 
 **Folders + jobs**
-- **`controlm_folders.py`** — loads `psgmgr.CM_DEF_VTAB` (replicated copy of `dtsremgr.DEF_VTAB`). Creates `:JobFolder:Collection` nodes (folder name = `SCHED_TABLE`) and the `:ControlMServer:Platform` mesh (deduped on `DATA_CENTER`).
+- **`controlm_folders.py`** — loads `psgmgr.CM_DEF_VTAB` (replicated copy of `dtsremgr.DEF_VTAB`). Creates `:ControlMFolder:Collection` nodes (folder name = `SCHED_TABLE`) and the `:ControlMServer:Platform` mesh (deduped on `DATA_CENTER`).
 - **`controlm_jobs.py`** — loads `psgmgr.CM_DEF_VJOB`. Creates `:ControlMJob:Activity` nodes keyed `(folder_id, job_id)`. Captures the business-app name (`APPLICATION` column) for later reconciliation to `:Application.seal_id`.
 
 **Conditions + derived dependencies**

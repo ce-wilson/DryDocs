@@ -9,10 +9,10 @@
 // Run once per environment after deploying the loader change.
 // (RUNS_ON is reassigned to execution-host placement with a role property — see
 // relationship_vocabulary.yaml m3_runs_on_agent_host / m3_runs_on_etl_host — so
-// this only touches JobFolder->ControlMServer edges.)
+// this only touches ControlMFolder->ControlMServer edges.)
 // =============================================================================
 
-MATCH (f:JobFolder)-[r:RUNS_ON]->(srv:ControlMServer)
+MATCH (f:ControlMFolder)-[r:RUNS_ON]->(srv:ControlMServer)
 MERGE (f)-[s:SCHEDULED_ON]->(srv)
   ON CREATE SET s.since  = r.since,
                 s.source = r.source,

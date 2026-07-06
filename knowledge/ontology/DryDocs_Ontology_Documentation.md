@@ -20,7 +20,7 @@ constrains).
 | taxonomy_path | Element | Parent | Captured from |
 |:--------------|:--------|:-------|:--------------|
 | `technology/orchestration/control-m/server` | ControlMServer (data center) | — | controlm-psgmgr |
-| `technology/orchestration/control-m/folder` | JobFolder | server | controlm-psgmgr |
+| `technology/orchestration/control-m/folder` | ControlMFolder | server | controlm-psgmgr |
 | `technology/orchestration/control-m/job` | ControlMJob | folder | controlm-psgmgr |
 | `technology/orchestration/control-m/condition` | Condition | job | controlm-psgmgr |
 | `technology/orchestration/control-m/variable` | Variable (9 VariableKinds) | job | controlm-psgmgr (C3/C4) |
@@ -28,7 +28,7 @@ constrains).
 > The **variable taxonomy** (`VariableKind`: MALFORMED · EMBEDDED_SHELL · PLUGIN_NS · FLOW_REF ·
 > DYNAMIC_NAME · SEMANTIC_FACT · SYSTEM_FUNC · VAR_REF · LITERAL) is a worked example already
 > implemented in `drydocs/controlm/variables.py`. The folder-naming standard
-> (`…/control-m/folder`) parses `JobFolder.name` into taxonomy attributes (env · LOB · app · type).
+> (`…/control-m/folder`) parses `ControlMFolder.name` into taxonomy attributes (env · LOB · app · type).
 
 ### 1.2 Business — org & applications (Catalog/PAT, SEAL)
 | taxonomy_path | Element | Parent | Captured from |
@@ -58,7 +58,7 @@ gate** before any edge is written. This is the join between layer 1 (taxonomy) a
 
 | Taxonomy element | PROV-O / W3C type | Neo4j label | Precedence authority | status |
 |:-----------------|:------------------|:------------|:---------------------|:-------|
-| JobFolder | prov:Collection | JobFolder | bmc-baseline | active |
+| ControlMFolder | prov:Collection | ControlMFolder | bmc-baseline | active |
 | ControlMJob | prov:Activity | ControlMJob | bmc-baseline | active |
 | Condition | prov:Entity | Condition | bmc-baseline | active |
 | ControlMServer | local Platform | ControlMServer | bmc-baseline | active |
@@ -98,7 +98,7 @@ DryDocs classifies every relationship by PROV-O source / target type, then picks
 | Node label      | PROV-O / W3C type      | Supplement                         |
 |:----------------|:-----------------------|:-----------------------------------|
 | ControlMJob     | prov:Activity          | ontology_supplement.cypher      |
-| JobFolder       | prov:Collection        | ontology_supplement.cypher      |
+| ControlMFolder       | prov:Collection        | ontology_supplement.cypher      |
 | ControlMServer  | local Platform         | ontology_supplement.cypher      |
 | Condition       | prov:Entity            | ontology_supplement.cypher      |
 | JobRun          | prov:Activity          | base ontology                      |
@@ -122,8 +122,8 @@ Extends Control-M graph from scheduled to actual runtime execution.
 |:--------------------------|:-----------------------------|:-----------------------|:---------------------------------|
 | DEPLOYED_BY               | Deployment → Developer       | prov:wasAssociatedWith | Change / CI-CD                   |
 | DEPLOYED_TO               | Deployment → ControlMServer  | prov:wasAssociatedWith | Change / CI-CD                   |
-| DEPLOYS_FOLDER            | Deployment → JobFolder       | prov:used              | Change / CI-CD                   |
-| AUTHORED_BY               | JobFolder → Developer        | prov:wasAttributedTo   | Folder XML / Git blame           |
+| DEPLOYS_FOLDER            | Deployment → ControlMFolder       | prov:used              | Change / CI-CD                   |
+| AUTHORED_BY               | ControlMFolder → Developer        | prov:wasAttributedTo   | Folder XML / Git blame           |
 | INSTANCE_OF               | ControlMJobRun → ControlMJob | prov:wasInfluencedBy   | Control-M history API            |
 | EXECUTED_BY               | ControlMJobRun → AppUser     | prov:wasAssociatedWith | Control-M history API            |
 | INVOKES                   | ControlMJob → Script         | prov:used              | Folder XML (CMDLINE / MEMNAME)   |
@@ -174,7 +174,7 @@ Used when the AWS Glue Plugin runs on a workstation.
 | Connector · Region / Bucket Name (AWS-side cluster entry point)                                                  | ExecutionHost for the ETL engine; edge ETLProcess -[:RUNS_ON {role:'etl_host'}]-> ExecutionHost             | m3_runs_on_etl_host (planned)               |
 | Control_M · Run as User; EPV/Passwords · FID rows with Use Case='CONTROL-M'                                      | AppUser (service account); edge ControlMJob -[:EXECUTED_BY]-> AppUser                                       | m3_executed_by (planned)                    |
 | EPV · FID rows with Use Case='AWS'/'DPL'/'CCMS' plus Environment                                                 | AppUser -[:DELEGATES_TO]-> ExecutionHost per environment                                                    | m3_delegates_to (planned)                   |
-| Control_M · Folder Name (+ Domain fallback), Environment, Server                                                 | JobFolder + JobFolder -[:SCHEDULED_ON]-> ControlMServer (already loaded by M3)                              | m3_scheduled_on (active)                    |
+| Control_M · Folder Name (+ Domain fallback), Environment, Server                                                 | ControlMFolder + ControlMFolder -[:SCHEDULED_ON]-> ControlMServer (already loaded by M3)                              | m3_scheduled_on (active)                    |
 | Control_M · In Conditions                                                                                        | ControlMJob -[:REQUIRES_IN_CONDITION]-> Condition (folder-level, already loaded by M3)                      | m3_requires_in_condition (active)           |
 | Connector · Application ID; Glue · Publisher Seal                                                                | Application (SEAL) node; the Data-Delivery SEAL owns the ETLProcess, the Publisher SEAL owns the DataTarget | linked via SEAL loaders (out of M3 scope)   |
 

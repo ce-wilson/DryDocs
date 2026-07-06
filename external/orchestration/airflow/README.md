@@ -7,7 +7,7 @@ and records how it will crosswalk to the **BMC Control-M baseline**.
 
 | Airflow native | BMC baseline concept | DryDocs node | Confidence |
 |----------------|----------------------|--------------|------------|
-| DAG | Folder | `JobFolder` (Collection) | high |
+| DAG | Folder | `ControlMFolder` (Collection) | high |
 | Task | Job | `ControlMJob` | high |
 | `task >> task` (dependency) | OUT→IN dependency | `WAS_INFORMED_BY` | high |
 | `ExternalTaskSensor` / dataset | IN condition | `REQUIRES_IN_CONDITION` → `Condition` | medium |

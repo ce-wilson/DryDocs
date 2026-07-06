@@ -57,7 +57,7 @@ answers a real support question end-to-end on sample data.
 Activate AutoSys and/or Airflow: complete crosswalk → HITL confirm → `confirmed: true` → loader
 emitting baseline types only.
 **Gate:** crosswalk confirmed; no new concepts invented. **Acceptance:** sample AutoSys/Airflow
-data lands as baseline `ControlMJob`/`JobFolder`/`Condition` nodes.
+data lands as baseline `ControlMJob`/`ControlMFolder`/`Condition` nodes.
 
 ## Sequencing
 ```

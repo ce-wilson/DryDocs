@@ -15,7 +15,7 @@ scope for the extractor skill.
 | `BatchProcess` | `appId` | `prov:Activity` | Application | Batch operations facet of Application |
 | `EventProcess` | `appId` | `prov:Activity` | Application | Event-driven operations facet of Application |
 | `ControlMJob` | `(folder_id, job_id)` | `prov:Activity` | Orchestration | Individual Control-M job / task |
-| `ControlMFolder` | `folder_id` | `prov:Collection` | Orchestration | Job folder (label rename from `:JobFolder` in progress) |
+| `ControlMFolder` | `folder_id` | `prov:Collection` | Orchestration | Job folder (label rename from `:ControlMFolder` in progress) |
 | `ControlMServer` | `name` | local | Orchestration | Execution server / data center host (not a PROV Agent) |
 | `Condition` | `(folder_id, name)` | `prov:Entity` | Orchestration | Job dependency condition (in/out) |
 | `DataAsset` | `assetId` | `prov:Entity` | Lineage | Named data object seen by the orchestration layer |

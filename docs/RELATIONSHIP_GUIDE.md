@@ -38,7 +38,7 @@ New relationships should use the standard label from the matrix above.
 | Node label | PROV-O / W3C type | Supplement |
 |---|---|---|
 | `ControlMJob` | `prov:Activity` | `ontology_supplement.cypher` |
-| `JobFolder` | `prov:Collection` | `ontology_supplement.cypher` |
+| `ControlMFolder` | `prov:Collection` | `ontology_supplement.cypher` |
 | `ControlMServer` | local Platform | `ontology_supplement.cypher` |
 | `Condition` | `prov:Entity` | `ontology_supplement.cypher` |
 | `JobRun` | `prov:Activity` | *(base ontology)* |

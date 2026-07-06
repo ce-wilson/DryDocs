@@ -24,7 +24,7 @@ governs**. This binds the prose standard to the structured model (`config/taxono
 standard:       control-m-folder-naming
 domain:         technology                              # top taxonomy domain
 taxonomy_path:  technology/orchestration/control-m/folder   # where it applies
-governs:        JobFolder.name                          # the taxonomy element it constrains
+governs:        ControlMFolder.name                          # the taxonomy element it constrains
 authority:      internal-standards                      # config/precedence.yaml tier 2
 refines:        bmc-baseline                            # sits on top of the vendor baseline
 applies_to_source: controlm-psgmgr
@@ -54,7 +54,7 @@ Data" layers):
 ### technology/orchestration/control-m/
 | Standard | `taxonomy_path` | governs | status |
 |----------|-----------------|---------|--------|
-| [folder-naming-convention](technology/folder-naming-convention.md) | `…/control-m/folder` | `JobFolder.name` — PRAOCG 6-char code (env · LOB · app/platform · type) | active |
+| [folder-naming-convention](technology/folder-naming-convention.md) | `…/control-m/folder` | `ControlMFolder.name` — PRAOCG 6-char code (env · LOB · app/platform · type) | active |
 | [data-center-naming-convention](technology/data-center-naming-convention.md) | `…/control-m/data-center` | `ControlMServer.data_center` — DC name encodes the default execution time (EST) | active |
 | [description-field-metadata-plan](technology/description-field-metadata-plan.md) | `…/control-m/job` | `ControlMJob.description` — repurposed as pipe-delimited key:value metadata | 🔵 planned |
 | [calendar-resolution-projection-plan](technology/calendar-resolution-projection-plan.md) | `…/control-m/calendar` | `ControlMJob.schedule` — resolve calendars to project when jobs run | 🔵 planned |

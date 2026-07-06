@@ -21,7 +21,7 @@ updated: 2026-07-01
 sources:
   - id: bmc-controlm-structure
     provenance: "BMC Control-M folder/job export (vendor baseline; VERBATIM)"
-    labels: [JobFolder, ControlMJob, Condition]        # chain order: folder -> job -> condition
+    labels: [ControlMFolder, ControlMJob, Condition]        # chain order: folder -> job -> condition
 
   - id: bmc-controlm-variables
     provenance: "Control-M variable normalization, Phases A/B/C (GROUNDED)"

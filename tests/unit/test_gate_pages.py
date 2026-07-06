@@ -21,7 +21,7 @@ _DOC = {
         {"title": "A. Scope", "confirmations": ["source is authoritative", "no PII in scope"]},
         {"title": "B. Sign-off", "confirmations": ["safe to confirm"]},
     ],
-    "mapping": [{"n": 1, "element": "Folder", "target": ":JobFolder", "edge": "—"}],
+    "mapping": [{"n": 1, "element": "Folder", "target": ":ControlMFolder", "edge": "—"}],
 }
 
 
@@ -47,7 +47,7 @@ def test_render_includes_gate_semantics() -> None:
     assert "localStorage" in out                    # persistence wired
     assert "CLASSIFICATION: Internal-Public" in out
     assert "0 / 3" in out                            # progress counter seeded
-    assert ":JobFolder" in out                       # mapping table rendered
+    assert ":ControlMFolder" in out                       # mapping table rendered
 
 
 def test_render_is_self_contained() -> None:
