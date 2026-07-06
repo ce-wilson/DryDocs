@@ -122,6 +122,20 @@ PROCEDURE:
       producer commit de-colonizes SQL comments, DROP that hunk (a producer-side
       attempt was made and reverted 2026-07-05; verify none leaks into the range).
 
+15. PROVENANCE AUDIT-FIELDS — PLAN ONLY (clean-add doc; NOTHING to wire yet).
+    docs/restructure/06-provenance-source-audit-fields.md is an SME-signed-off plan
+    (Phase 0 not started). It ports as a doc, untouched. When it SHIPS (Phase 1+):
+    - config/audit-fields.yaml (public, Canonical-here) = frozen envelope prop names
+      (source_created_at/_by, source_updated_at/_by) + the full Control-M entry (BMC
+      columns are publishable mechanism) + STUB entries for every other registry id.
+    - Confidential source→column mappings (SEAL, catalog-pat, oracle-schemas — all
+      Internal-Confidential) are authored COMPANY-SIDE ONLY in a gitignored internal
+      twin the loader merges over the public file; they never flow back (one-way).
+    - test_audit_fields.py (ships both sides) is the drift gate: every confirmed:true
+      registry source MUST have an audit-fields entry, same id, envelope props only.
+      On company main it stays RED until the stub is filled via 03-hitl-sme-flow.md —
+      that red test IS the sync signal. Sequence producer-first.
+
 ACCEPTANCE GATE (behavior is the contract, not a byte-compare):
 - Track 1 (portable, no production sample present):
     poetry run pytest tests/unit/test_variable_classifier.py tests/unit/test_variable_resolver.py \

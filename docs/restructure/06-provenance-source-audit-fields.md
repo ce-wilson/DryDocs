@@ -22,7 +22,8 @@ Two related observations from loading Control-M out of Oracle:
    fact** (`last_pulled` / `last_seen_at`), not an edge-grade one. Meanwhile the
    fact that *is* worth first-class treatment — **who created and who last changed
    the record in the source system, and when** — is not carried into the graph at
-   all: `controlm_jobs.sql` selects `J.AUTHOR` but uses
+   all: `controlm_jobs.sql` selects `J.AUTHOR` (SME: in this scenario `AUTHOR` is
+   the Functional ID of the Control-M team, not an individual editor) but uses
    `CREATION_USER`/`CREATION_DATE`/`CHANGE_USERID`/`CHANGE_DATE` only as filter
    predicates; `controlm_folders.sql` does extract
    `LAST_UPDATED`/`LAST_UPDATED_USER`.
@@ -103,3 +104,12 @@ before deleting anything.
   editor); the gate must define each, per source, not globally.
 - Property-only pull tracking loses per-run membership; confirm no consumer needs
   it (Phase 0) before Phase 2 removes it.
+
+## Review record
+
+- **2026-07-06 — Chad Wilson (SME), plan sign-off.** Direction and phasing approved
+  for grooming into `backlog.yaml`. One clarification captured inline (Problem §2):
+  Control-M `J.AUTHOR` is the Functional ID of the Control-M team, not an individual
+  editor — carried forward as an input to the Phase 0 field gate. Envelope property
+  names, per-source column→envelope mappings, and the time-series use case remain
+  open for Phase 0 (unchanged by this review).
