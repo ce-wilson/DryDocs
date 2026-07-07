@@ -27,6 +27,7 @@ from .controlm import (
     ControlMJobRow,
     ControlMVariableRow,
 )
+from .registry import SoftwareProductRow
 
 __all__ = [
     # SEAL
@@ -47,4 +48,6 @@ __all__ = [
     "ControlMDependencyRow",
     # Control-M (C3/C4 normalization — variables)
     "ControlMVariableRow",
+    # Software registry (plan 07 / ADR 0004)
+    "SoftwareProductRow",
 ]

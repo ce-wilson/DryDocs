@@ -77,6 +77,10 @@ DROP CONSTRAINT condition_key IF EXISTS;
 CREATE CONSTRAINT condition_key       IF NOT EXISTS FOR (c:Condition)           REQUIRE (c.folder_id, c.name) IS NODE KEY;
 CREATE INDEX      job_name            IF NOT EXISTS FOR (j:ControlMJob)         ON  (j.job_name);
 
+// --- Software registry (plan 07 / ADR 0004) ----------------------------------
+CREATE CONSTRAINT vendor_id           IF NOT EXISTS FOR (v:Vendor)              REQUIRE v.vendor_id IS UNIQUE;
+CREATE CONSTRAINT softwareproduct_id  IF NOT EXISTS FOR (p:SoftwareProduct)     REQUIRE p.product_id IS UNIQUE;
+
 // --- Data assets / files / channels -----------------------------------------
 CREATE CONSTRAINT table_qualified     IF NOT EXISTS FOR (t:Distribution)        REQUIRE (t.database_nm, t.schema_nm, t.table_nm) IS NODE KEY;
 CREATE INDEX      file_arrival        IF NOT EXISTS FOR (f:File)                ON  (f.arrived_at);

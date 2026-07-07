@@ -139,11 +139,17 @@ Snowflake gets a row when it stops being a future.
   (Entity); `MADE_BY` → `prov:wasAttributedTo`; `USES_SOFTWARE` local edge —
   all registered `status: planned` in `relationship_vocabulary.yaml`
   (`reg_made_by` / `reg_uses_software`). Phases 1 and 2 are ungated.
-- **Phase 1 — registry seed + loader.** `software-registry.yaml` with DryDocs'
-  own stack (~10 rows); schema unit test (like `test_backlog`/classification);
-  small loader MERGEs `(:Vendor)`, `(:SoftwareProduct)-[:MADE_BY]->(:Vendor)`,
-  and DryDocs' own `USES_SOFTWARE` edges. Constraints: `vendor_id`,
-  `softwareproduct_id`.
+- **Phase 1 — registry seed + loader. ✅ DONE 2026-07-07** (built, offline-
+  verified; the graph write runs when the Docker EE container is wired):
+  `config/taxonomy/software-registry.yaml` (6 vendors / 7 products, base list
+  above); `SoftwareRegistryLoader` + `RegistryYamlAdapter`
+  (`drydocs/loaders/software_registry.py` → `software_registry.cypher`);
+  constraints `vendor_id` + `softwareproduct_id`;
+  `registry_ontology_supplement.cypher` (+ `drydocs
+  apply-registry-supplement` / `drydocs load-software-registry` commands);
+  source-registry entry `software-registry` (confirmed, Internal-Public);
+  vocabulary entries flipped `planned → active`; guarded by
+  `tests/unit/test_software_registry.py` (7 tests).
 - **Phase 2 — retire `vendor-bmc` from tooling.** Rename corpus id →
   `bmc-docs` across review-labels.yaml, `config/gate-prompts/`, `graph-tests/`,
   the four unit tests, docs. Baseline-grep → rename → re-grep → tests

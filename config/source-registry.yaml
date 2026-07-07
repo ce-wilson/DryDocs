@@ -69,6 +69,17 @@ sources:
     confirmed: true
     notes: "Live. LOB→Product→Team catalog (lowest precedence authority)."
 
+  # ---- Reference ledgers (repo-committed, publishable) ----------------------
+  - id: software-registry
+    classification: Internal-Public     # DryDocs' own stack only; no company catalog rows
+    source: "config/taxonomy/software-registry.yaml"
+    kind: reference
+    orchestrator: ~
+    adapter: yaml                       # RegistryYamlAdapter (flattens vendors/products)
+    feeds_taxonomy: [vendors, software_products]
+    confirmed: true                     # SME gate 2026-07-07 (ADR 0004; config/gate-log.md)
+    notes: "Third-party software registry (plan 07). Vendor = brand only; graph is the lookup."
+
   # ---- Data platforms (sources of DataAsset/lineage) -----------------------
   - id: oracle-schemas
     classification: Internal-Confidential   # real schema/table/object names

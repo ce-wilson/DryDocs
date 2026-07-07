@@ -1,0 +1,110 @@
+# =============================================================================
+# config/taxonomy/software-registry.yaml — third-party software registry.
+#
+# The LEDGER for plan 07 / ADR 0004: Vendor = the brand/company ONLY;
+# SoftwareProduct = what a vendor ships, with role absorbing the Tier-1/Tier-2
+# split. The graph is the lookup (loader: drydocs/loaders/software_registry.py
+# MERGEs :Vendor, :SoftwareProduct, MADE_BY, and DryDocs' own USES_SOFTWARE
+# edges); this file is the source of truth.
+#
+# Field set (SME-gated 2026-07-07): product name, publisher, publisherURL,
+# category, version-if-known. Company governance columns (owner SIDs, gspcId,
+# sealId, support/EOL dates) are Phase-4 material — internal/-side only, never
+# here. Drivers/utilities/etc. (the catalog long tail) stay out by design.
+#
+# Vendor ids match drydocs-icons/manifest.json where an icon exists.
+# Guarded by tests/unit/test_software_registry.py.
+# =============================================================================
+
+schema: drydocs.software-registry.v1
+classification: Internal-Public
+updated: 2026-07-07
+adr: docs/decisions/0004-software-registry-vendor-terminology.md
+
+# Reserved Application id for DryDocs itself (no SEAL id producer-side; the
+# company copy reconciles this to the real SEAL id at port time).
+drydocs_application_id: DRYDOCS-SELF
+
+vendors:
+  - id: neo4j
+    name: Neo4j
+    publisher_url: https://neo4j.com/
+  - id: bmc
+    name: BMC Software
+    publisher_url: https://www.bmc.com/
+  - id: oracle
+    name: Oracle
+    publisher_url: https://www.oracle.com/
+  - id: psf
+    name: Python Software Foundation
+    publisher_url: https://www.python.org/
+  - id: abinitio
+    name: Ab Initio Software
+    publisher_url: https://www.abinitio.com/
+  - id: informatica
+    name: Informatica
+    publisher_url: https://www.informatica.com/
+
+products:
+  - id: neo4j
+    vendor: neo4j
+    name: Neo4j
+    category: DBMS - Graph Database
+    role: graph-platform
+    type: commercial              # EE via local Docker; community edition open-source
+    versions: ["5.x"]             # catalog window 5.19-5.26; pin when container verifiable
+    used_by_drydocs: true
+
+  - id: neo4j-bloom
+    vendor: neo4j
+    name: Neo4j Bloom
+    category: BI - Graph Analytics/Visualization
+    role: tool
+    type: commercial
+    versions: ["2.x"]
+    used_by_drydocs: false        # separate catalog product; company-side usage TBD
+
+  - id: controlm
+    vendor: bmc
+    name: Control-M
+    category: Workload Automation
+    role: orchestrator
+    type: commercial
+    versions: ["9.0.21.300"]      # company runtime — known
+    used_by_drydocs: true         # the baseline orchestration source we ingest
+
+  - id: oracle-db
+    vendor: oracle
+    name: Oracle Database
+    category: DBMS - Relational
+    role: data-platform
+    type: commercial
+    versions: ["19c"]             # company psgmgr host — VERIFY on connection
+    used_by_drydocs: true
+
+  - id: python
+    vendor: psf
+    name: Python
+    category: Language Runtime
+    role: tool
+    type: open-source
+    versions: ["3.11+"]           # pyproject floor; 3.13 in local use
+    used_by_drydocs: true
+
+  - id: abinitio
+    vendor: abinitio
+    name: Ab Initio (Co>Operating System)
+    category: Data Integration (ETL)
+    role: tool
+    type: commercial
+    versions: []                  # unknown — plan-07 Phase 3 CMD_LINE detection target
+    used_by_drydocs: false        # application-side product; row pre-created for Phase 3
+
+  - id: informatica-powercenter
+    vendor: informatica
+    name: PowerCenter
+    category: Data Integration (ETL)
+    role: tool
+    type: commercial
+    versions: []                  # unknown — Phase 3 detection target (pmcmd)
+    used_by_drydocs: false

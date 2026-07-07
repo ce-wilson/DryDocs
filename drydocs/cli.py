@@ -5,6 +5,8 @@ Bootstrap order (first run):
   2. drydocs apply-ontology-supplement  — Control-M local anchor terms
   3. drydocs apply-seal-supplement      — SEAL domain terms
   4. drydocs apply-catalog-supplement   — Catalog/PAT domain terms + all Role seeds
+  5. drydocs apply-registry-supplement  — software-registry terms (Vendor,
+                                          SoftwareProduct, MADE_BY, USES_SOFTWARE)
 
 Optional / experimental:
   drydocs apply-sosa-supplement — EARLY ADOPTION: SOSA/SSN observation+temporal
@@ -12,9 +14,11 @@ Optional / experimental:
                                   declared company standard; not in bootstrap.
 
 Ingest commands:
-  drydocs refresh-reference   — catalog + SEAL weekly refresh chain
-  drydocs ingest-controlm     — Control-M chain (folders → jobs → conditions → deps)
-  drydocs load <name> --csv   — single loader against a CSV file
+  drydocs refresh-reference       — catalog + SEAL weekly refresh chain
+  drydocs ingest-controlm         — Control-M chain (folders → jobs → conditions → deps)
+  drydocs load <name> --csv       — single loader against a CSV file
+  drydocs load-software-registry  — third-party software registry from
+                                    config/taxonomy/software-registry.yaml
 """
 from __future__ import annotations
 
@@ -52,6 +56,11 @@ from .loaders.controlm_conditions_out import ControlMConditionsOutLoader
 from .loaders.controlm_dependencies_derived import ControlMDependenciesDerivedLoader
 from .loaders.controlm_folders import ControlMFoldersLoader
 from .loaders.controlm_jobs import ControlMJobsLoader
+from .loaders.software_registry import (
+    DEFAULT_REGISTRY_PATH,
+    RegistryYamlAdapter,
+    SoftwareRegistryLoader,
+)
 from .neo4j_client import Neo4jClient
 from .snapshots import SnapshotWriter
 from .source_registry import (
@@ -71,6 +80,7 @@ ONTOLOGY_SUPPLEMENT_FILE = SCHEMA_DIR / "ontology_supplement.cypher"
 SEAL_SUPPLEMENT_FILE    = SCHEMA_DIR / "seal_ontology_supplement.cypher"
 CATALOG_SUPPLEMENT_FILE = SCHEMA_DIR / "catalog_ontology_supplement.cypher"
 SOSA_SUPPLEMENT_FILE    = SCHEMA_DIR / "sosa_experimental_supplement.cypher"
+REGISTRY_SUPPLEMENT_FILE = SCHEMA_DIR / "registry_ontology_supplement.cypher"
 
 # Bundled CSV samples ship inside the package so dev-mode commands work
 # from any cwd — including from an installed wheel where there is no repo
@@ -417,6 +427,46 @@ def apply_catalog_supplement() -> None:
     with _client() as cli:
         cli.execute_file(CATALOG_SUPPLEMENT_FILE)
         console.print("[green]Catalog ontology supplement applied.[/]")
+
+
+@app.command(name="apply-registry-supplement")
+def apply_registry_supplement() -> None:
+    """Apply the software-registry ontology supplement (idempotent).
+
+    Declares :Vendor (org:Organization) and :SoftwareProduct
+    (dd:SoftwareProduct) node types plus the MADE_BY (prov:wasAttributedTo)
+    and USES_SOFTWARE (local) relationship mappings — plan 07 / ADR 0004,
+    gate-confirmed 2026-07-07. Safe to re-run.
+    """
+    if not REGISTRY_SUPPLEMENT_FILE.exists():
+        console.print(f"[red]Missing: {REGISTRY_SUPPLEMENT_FILE}[/]"); raise typer.Exit(1)
+    with _client() as cli:
+        cli.execute_file(REGISTRY_SUPPLEMENT_FILE)
+        console.print("[green]Registry ontology supplement applied.[/]")
+
+
+@app.command(name="load-software-registry")
+def load_software_registry(
+    registry_path: Path = typer.Option(
+        DEFAULT_REGISTRY_PATH,
+        "--registry",
+        help="Path to software-registry.yaml (defaults to the committed ledger).",
+    ),
+) -> None:
+    """Load the third-party software registry (plan 07 / ADR 0004).
+
+    MERGEs :Vendor and :SoftwareProduct from
+    config/taxonomy/software-registry.yaml, attributes products via MADE_BY,
+    and wires DryDocs' own stack to the reserved :Application node via
+    USES_SOFTWARE. Idempotent — the YAML is the source of truth.
+    """
+    _gate_source("software-registry")  # confirmed-gate before any DB write
+    if not registry_path.exists():
+        console.print(f"[red]Missing: {registry_path}[/]"); raise typer.Exit(1)
+    adapter = RegistryYamlAdapter(registry_path)
+    with _client() as cli:
+        summary = SoftwareRegistryLoader(cli, adapter).load()
+    console.print(summary.as_dict())
 
 
 @app.command(name="apply-sosa-supplement")
