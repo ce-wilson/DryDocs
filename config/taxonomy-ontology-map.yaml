@@ -179,30 +179,101 @@ mappings:
       - "Is the script the Activity, or the ControlMJob? (affects from_node)"
       - "Real schema/table names are confidential → resolve in internal/, not here."
 
-  # ---- Example: a PROPOSED context-graph (SOSA/SSN) mapping ----------------
+  # ---- E1: SOSA/SSN jobrun-observation — GATE PREP (SME NOT present) --------
+  # SOSA registration (E1 registration step) is already done: sosa/ssn prefixes in
+  # drydocs/ontology/namespaces.py, terms seeded in sosa_experimental_supplement.cypher
+  # (opt-in, experimental), and the 4 context relationships below registered
+  # status: planned in relationship_vocabulary.yaml. This entry stops at status: proposed —
+  # it PREPARES the open modelling decision for the HITL gate (config/gate-prompts/
+  # sosa-jobrun-observation.yaml); nothing here is confirmed, no vocabulary status changes,
+  # no graph write.
   - id: jobrun-observation
     taxonomy:
       source: controlm-psgmgr
-      element: "Job execution produced a run with a status at a time"
+      element: "Job execution produced a run with a status at a time (run-history source: psgmgr CM_HIST_VW)"
     ontology:
-      from_node: ControlMJobRun            # planned execution node
-      to_node: ControlMJob                 # the feature of interest
+      from_node: ControlMJobRun            # planned execution node (prov:Activity)
+      to_node: ControlMJob                 # the feature of interest (prov:Activity / sosa:FeatureOfInterest)
       pattern: "SOSA observation"
       sosa_mapping:
         feature_of_interest: ControlMJob
         observed_property: "run-status | run-duration | freshness"
         result_time: "resultTime"
-      neo4j_label: OBSERVES                 # now registered: sosa_observes (status planned)
+      neo4j_label: OBSERVES                 # registered: sosa_observes (status planned)
       sosa_maps_to: "sosa:hasFeatureOfInterest"
       prov_maps_to: ~                       # SOSA, not PROV — record separately
     precedence_authority: bmc-baseline
     adoption: experimental                  # SOSA/SSN is W3C but NOT a declared company standard
-    status: proposed
+    status: proposed                        # <-- gate not yet run; SME was absent when this was drafted
+    source_mechanism: >
+      Run-history source = psgmgr CM_HIST_VW (see .claude/skills/controlm-db/references/
+      query-cookbook.md §HIST — expensive, materializes before ROWNUM; every extract must
+      bind an indexed predicate). Join identity: CM_HIST_VW.JOB_MEM_NAME = CM_DEF_VJOB.JOB_NAME
+      — the only reliable link from a run row back to its job definition. MEMNAME is a
+      separate CM_DEF_VJOB column, already demoted to informational-only in the q1q3 gate
+      (":ControlMJob.memname — may be junk; never a key/join") — it is NEVER used as a join
+      key here either.
     resolved:
-      - "sosa:* terms now registered in relationship_vocabulary.yaml + sosa_experimental_supplement.cypher (sosa_observes/has_result/made_by_sensor/observed_property), all status planned / adoption experimental."
+      - "sosa:* terms now registered in relationship_vocabulary.yaml + sosa_experimental_supplement.cypher (sosa_observes/has_result/made_by_sensor/observed_property), all status planned / adoption experimental. (E1 registration step — done.)"
+    decision_for_gate:
+      question: >
+        Is a Control-M job run itself the sosa:Observation (ControlMJobRun node dual-typed
+        with Observation semantics), or is a separate Observation node attached to the run
+        (ControlMJobRun stays a pure prov:Activity; a distinct :Observation node points at it)?
+      option_a:
+        name: "ControlMJobRun IS the Observation (dual-typed node)"
+        shape: "(:ControlMJobRun:Observation {…}) -[:OBSERVES]-> (:ControlMJob) ; (:ControlMJobRun:Observation) -[:HAS_RESULT]-> (:Result)"
+        prov_reading: >
+          ControlMJobRun is already classified prov:Activity (node_classifications; phase-2
+          execution-lineage entries p2_instance_of / m3_executed_by depend on it). PROV has no
+          rule against an Activity also carrying sosa:Observation semantics — W3C guidance
+          commonly aligns sosa:Observation with prov:Activity (an observation IS an activity
+          that generates a Result), so dual-typing does not conflict with prov_type: Activity.
+        sosa_reading: >
+          Matches the SSN pattern most literally — one run row = one observation event. No
+          extra node or extra edge between the run and its Observation; cheapest to load and
+          query (single hop OBSERVES/HAS_RESULT off the run node the E2 loader already creates).
+        tradeoffs: >
+          Couples the experimental, opt-in vocabulary onto a node the CORE (non-experimental)
+          execution-lineage stream depends on (p2_instance_of, m3_executed_by, EXECUTED_BY). If
+          SOSA/SSN adoption is later reversed, the Observation label/edges must be stripped from
+          a core-lineage node instead of being dropped as an isolated subgraph.
+      option_b:
+        name: "Separate :Observation node references the run"
+        shape: "(:Observation) -[:OBSERVES]-> (:ControlMJob) ; (:Observation) -[:HAS_RESULT]-> (:Result) ; link Observation → ControlMJobRun NOT YET a registered relationship"
+        prov_reading: >
+          Keeps ControlMJobRun a clean prov:Activity with zero dependency on the experimental
+          vocabulary. The edge from Observation to the specific run it is about does not exist
+          in relationship_vocabulary.yaml yet — a 5th term (e.g. local OF_RUN) would need to be
+          registered status: planned before this option is loadable.
+        sosa_reading: >
+          Also SSN-valid — SOSA explicitly allows Observations to exist without a strict
+          one-to-one binding to a single Activity notion; a Sensor can emit repeated
+          Observations about the same FeatureOfInterest independent of execution-lineage nodes.
+        tradeoffs: >
+          Fully isolates the experimental subgraph (clean rollback: delete all :Observation
+          nodes/edges, core lineage untouched) but requires a 5th vocabulary term AND doubles
+          node count per run for no added source information — CM_HIST_VW is already
+          one-row-per-run, so a separate node duplicates identity rather than adding meaning.
+      recommendation:
+        option: A
+        rationale: >
+          CM_HIST_VW is inherently one-row-per-run; that row already carries everything an
+          Observation needs (status, timing, result) and everything a JobRun needs (which job,
+          which odate). Splitting it into two nodes recreates one identity as two without new
+          information, and adds a join every loader/query would repeat. Option A's rollback
+          safety is not materially worse than Option B's: a dual-typed node's experimental
+          labels/edges (Observation, OBSERVES, HAS_RESULT, MADE_BY_SENSOR,
+          OF_OBSERVABLE_PROPERTY) can be dropped with `REMOVE r:Observation` + edge deletes,
+          same effort as deleting Option B's separate node, without touching the underlying
+          ControlMJobRun / prov:Activity data. NOT a decision — recommendation only; the SME
+          must confirm, edit, or reject at the gate.
     open_questions:
-      - "Source of run history: Control-M history API vs psgmgr? (gates the loader)"
-      - "Is ControlMJobRun itself the sosa:Observation, or a separate Observation node observing it? (modelling choice — confirm at gate before E2 loader)"
+      - "Confirm the modelling choice above (Option A recommended) before the E2 loader is written."
+      - "Result cardinality: does CM_HIST_VW emit exactly one row per (job, odate, run attempt), or can retries/reruns produce multiple rows needing a run-attempt discriminator on the node key?"
+      - "ObservableProperty scope for the pilot: is 'run-status' alone sufficient for E2, or should duration/freshness load in the same pass?"
+      - "Does confirming this mapping imply promoting SOSA/SSN's adoption status generally, or stay scoped to this one pilot edge (adoption: experimental persists either way until a separate company-standard decision)?"
+    gate_status: "NOT RUN — SME absent when this entry was prepared. Do not set status: confirmed, do not flip any relationship_vocabulary.yaml status from planned, do not write to Neo4j. See config/gate-prompts/sosa-jobrun-observation.yaml."
 
   # ---- C2: BusinessApplication / SEAL edges (reuse ACTIVE vocab — batch) ----
   # Source taxonomy: config/taxonomy/business-application.yaml. Concept =

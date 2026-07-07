@@ -1,0 +1,104 @@
+# SME gate-prompt spec — invocation-pattern -> software product table (plan-07 Phase 3).
+# GATE-PREP ONLY: this spec proposes the pattern table for SME confirmation. It does
+# NOT flip any invocation_patterns row to confirmed, does NOT touch a loader (none
+# exists yet for this edge), and is not itself a confirmation — the SME ticks this
+# page BEFORE config/taxonomy/software-registry.yaml#invocation_patterns rows move
+# past status: proposed. Mechanism-only: publishable vendor-public launcher names
+# and synthetic examples only — no real CMD_LINE values, job names, or SEAL ids.
+# classification: Internal-Public.
+classification: Internal-Public
+schema: drydocs.gate-prompt.v1
+id: software-usage-patterns
+title: "SME Gate — Control-M CMD_LINE invocation-pattern -> software product table (plan-07 Phase 3)"
+step: "Pre-build gate for plan-07 Phase 3 — confirms the pattern table BEFORE any derivation loader is written"
+summary: >
+  Proposes the invocation-pattern -> product-id table (config/taxonomy/software-registry.yaml
+  #invocation_patterns) that a future loader will apply over the Phase-C command/script
+  parser's STG_INVOCATION output (drydocs/controlm/commands.py, parsed from RESOLVED
+  CM_DEF_VJOB.CMD_LINE) to derive
+  (:Application)-[:USES_SOFTWARE {source:'controlm-cmdline'}]->(:SoftwareProduct) edges.
+  CM_DEF_VJOB.APPL_TYPE is explicitly NOT the basis — recorded dead-end (doc 07 "What
+  already feeds it": Ab Initio/Informatica workloads run as plain OS commands, so job/
+  application types under-represent the real software running). Covers the pattern rows
+  themselves, which STG_INVOCATION field each reads, the coverage-metric policy for
+  unclassified invocations, and the derived edge shape. No graph write happens until every
+  confirmation below is ticked and logged to config/gate-log.md; every invocation_patterns
+  row stays status: proposed until then, and no loader is built ahead of this gate.
+meta:
+  Module: "drydocs-core"
+  Source: "STG_INVOCATION rows (drydocs/controlm/commands.py, Phase-C command/script parser) — parsed from RESOLVED CM_DEF_VJOB.CMD_LINE, LAUNCHER_REGISTRY-classified"
+  Registry ref: "software-registry — confirmed (config/source-registry.yaml); config/taxonomy/software-registry.yaml#invocation_patterns (this gate, status: proposed)"
+  Classification: "Internal-Public (this page, mechanism only) — pattern ids/regexes/example launcher names only; no real CMD_LINE or job data"
+  Ontology map: "drydocs/ontology/relationship_vocabulary.yaml#reg_uses_software (status: planned, ADR 0004 Phase 0) — this gate proposes the derivation rule, not a vocabulary change"
+  Source of record: "docs/restructure/07-software-registry.md §Phase 3 + §Risks (coverage-metric policy)"
+
+mapping:
+  - n: 1
+    element: "STG_INVOCATION.script_path matching abinitio-graph-or-plan (\\.m$) or abinitio-pset (\\.pset$)"
+    target: ":SoftwareProduct {id: 'abinitio'}  [existing node, Phase 1]"
+    edge: "(:Application)-[:USES_SOFTWARE {source:'controlm-cmdline'}]->(:SoftwareProduct)  [PROPOSED — no loader yet]"
+  - n: 2
+    element: "STG_INVOCATION.executable_path matching abinitio-dtlaunch-wrapper (^dtlaunch\\.sh$)"
+    target: ":SoftwareProduct {id: 'abinitio'}"
+    edge: "same USES_SOFTWARE shape  [PROPOSED — launcher-only signal, independent of the graph argument]"
+  - n: 3
+    element: "STG_INVOCATION.executable_path matching informatica-mapping-prefix (^m_\\w+) or informatica-pmcmd (pmcmd)"
+    target: ":SoftwareProduct {id: 'informatica-powercenter'}"
+    edge: "same USES_SOFTWARE shape  [PROPOSED]"
+  - n: 4
+    element: "STG_INVOCATION.executable_path matching python-interpreter (python[0-9.]*$) or .script_path matching python-script (\\.py$)"
+    target: ":SoftwareProduct {id: 'python'}"
+    edge: "same USES_SOFTWARE shape  [PROPOSED]"
+  - n: 5
+    element: "STG_INVOCATION row matching no pattern row (is_classified=false, or an invocation_type with no product yet — PYSPARK, FILE_TRANSFER, VALIDATION_UTIL, generic SHELL_SCRIPT)"
+    target: "no node written"
+    edge: "no edge — surfaced only as a per-load-run coverage metric (count + % unclassified), never a guessed USES_SOFTWARE edge"
+
+provenance:
+  - label: "(:Application)-[:USES_SOFTWARE {source:'controlm-cmdline'}]->(:SoftwareProduct)  [PROPOSED, no loader yet]"
+    source_object: "STG_INVOCATION (drydocs/controlm/commands.py output over resolved CM_DEF_VJOB.CMD_LINE)"
+    key: "(Application.seal_id, SoftwareProduct.id)"
+    loader: "not yet built — this gate authorizes the pattern table only; the derivation loader is a separate later step"
+    properties:
+      - {name: source, origin: derived, from: "literal 'controlm-cmdline'", note: "provenance tag distinguishing this edge from the Phase-1 used_by_drydocs static edges already loaded on the same :SoftwareProduct nodes"}
+      - {name: pattern_id, origin: derived, from: "the invocation_patterns row id that matched", note: "PROPOSED edge property — traces the edge back to the exact rule that fired, for later audit"}
+      - {name: classifier_rule, origin: source, from: "STG_INVOCATION.classifier_rule (Phase-C parser, commands.py LAUNCHER_REGISTRY)", note: "carried through unchanged — the parser's own discriminator, not re-derived by this table"}
+      - {name: target product id, origin: derived, from: "invocation_patterns pattern-row match against STG_INVOCATION.executable_path or .script_path", note: "the field read differs per row — see the second provenance block below"}
+  - label: "invocation_patterns row (config/taxonomy/software-registry.yaml, this gate)"
+    source_object: "LAUNCHER_REGISTRY (drydocs/controlm/commands.py)"
+    key: "id"
+    loader: "n/a — proposal artifact; RegistryYamlAdapter (drydocs/loaders/software_registry.py) does not read this section"
+    properties:
+      - {name: product, origin: source, from: "products[].id in this same registry file (Phase 1)", note: "must already exist — no speculative product rows added here"}
+      - {name: field, origin: derived, from: "STG_INVOCATION.executable_path (launcher token, argv[0] post wrapper-strip) or .script_path (resolved script/graph/mapping target)", note: "which field the rule reads is explicit per row — never ambiguous"}
+      - {name: "pattern / match_type", origin: derived, from: "restated from the LAUNCHER_REGISTRY regex in commands.py", note: "human-readable restatement for gate review, not an independently-evaluated copy"}
+      - {name: classifier_rule, origin: source, from: "commands.py LAUNCHER_REGISTRY rule id", note: "traceability pin — if the parser rule changes, this ref goes stale and the row needs re-review, never trusted silently"}
+
+sections:
+  - title: "A. Pattern-table rows"
+    confirmations:
+      - "abinitio-graph-or-plan (.m) and abinitio-pset (.pset) map to product 'abinitio', both matched on STG_INVOCATION.script_path."
+      - "abinitio-dtlaunch-wrapper (dtlaunch.sh) maps to product 'abinitio' via STG_INVOCATION.executable_path — the launcher name alone is sufficient signal, independent of the graph argument."
+      - "informatica-mapping-prefix (^m_\\w+) and informatica-pmcmd (pmcmd) both map to product 'informatica-powercenter', both matched on STG_INVOCATION.executable_path."
+      - "python-interpreter (python[0-9.]*$, executable_path) and python-script (\\.py$, script_path) both map to product 'python'."
+      - "No pattern row proposes a product that does not already exist in this registry's products: list (Phase 1) — no speculative products introduced here."
+  - title: "B. Which STG_INVOCATION field each rule reads"
+    confirmations:
+      - "executable_path = the launcher token (argv[0] after wrapper-stripping: sh/bash/ksh/env/nohup/exec unwrapped) — used by dtlaunch-wrapper, informatica-mapping-prefix, informatica-pmcmd, python-interpreter."
+      - "script_path = the resolved script/graph/mapping target, populated whether the file is invoked directly or surfaced from a wrapper argument — used by abinitio-graph-or-plan, abinitio-pset, python-script."
+      - "No pattern row matches on invocation_type or classifier_rule directly; classifier_rule is carried on each row as a traceability cross-reference to commands.py only, never re-evaluated independently by this table."
+  - title: "C. Coverage-metric policy (doc 07 §Risks)"
+    confirmations:
+      - "Unclassified invocations (STG_INVOCATION.is_classified=false, or classified into an invocation_type with no pattern row here) are reported as a coverage percentage per load run — never guessed at or mapped to a nearest product."
+      - "Known opaque wrappers (e.g. a site-local run_all.sh, and the parser's own abioncloud.runscript_wrapper rule which types as generic SHELL_SCRIPT rather than ABINITIO) are the expected long tail and stay unclassified until reviewed and added as their own named row."
+      - "PYSPARK (spark-submit/pyspark), FILE_TRANSFER (sftp/ftp/scp/aft), VALIDATION_UTIL, and generic SHELL_SCRIPT invocation_types have no pattern row here because no registry product exists for them yet — this is a 'add the product first' decision (like Phase 4), not a coverage gap to guess around."
+      - "The informatica-mapping-prefix rule (^m_\\w+) carries a known false-positive risk — any m_*.sh wrapper matches, not only genuine Informatica mapping wrappers — flagged in the pattern row's note, not silently accepted."
+  - title: "D. Derived edge shape"
+    confirmations:
+      - "(:Application)-[:USES_SOFTWARE {source:'controlm-cmdline', pattern_id, classifier_rule}]->(:SoftwareProduct) is DERIVED end-to-end — every property traces to the Phase-C parser output or this pattern table, never to CM_DEF_VJOB.APPL_TYPE (confirmed dead-end, doc 07)."
+      - "source:'controlm-cmdline' is distinct from the Phase-1 used_by_drydocs static edges already loaded for DryDocs' own stack (python, oracle-db, neo4j, controlm) — the same :SoftwareProduct node can carry both edge provenances, on separate edges, without conflict."
+      - "No loader writes this edge yet. This gate authorizes the pattern table only; building the derivation loader is a separate, later backlog item gated on this table reaching status: confirmed."
+  - title: "E. Sign-off"
+    confirmations:
+      - "The pattern rows (A), field mapping (B), coverage-metric policy (C), and derived edge shape (D) above are reviewed and correct, OR amended via explicit SME edits recorded in config/gate-log.md."
+      - "Safe to transcribe this decision into config/gate-log.md and flip the confirmed pattern rows in config/taxonomy/software-registry.yaml#invocation_patterns from status: proposed to status: confirmed."

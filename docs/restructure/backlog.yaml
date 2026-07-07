@@ -384,7 +384,7 @@ items:
     agent: ontology-mapper
     model: sonnet
     priority: p2
-    status: todo
+    status: in_progress
     depends_on: [C1]
     inputs: [reference/standards/sosa-ssn/README.md, drydocs/ontology/relationship_vocabulary.yaml]
     acceptance: "sosa:* terms present with IRIs; status planned->confirmed via gate"
@@ -422,7 +422,7 @@ items:
     agent: pipeline-config
     model: sonnet
     priority: p3
-    status: todo
+    status: in_progress
     depends_on: [C1]
     inputs: [external/orchestration/autosys/README.md, config/source-registry.yaml]
     acceptance: "AutoSys crosswalk fully mapped to baseline; no invented concepts; gate logged; confirmed:true"
@@ -436,7 +436,7 @@ items:
     agent: pipeline-config
     model: sonnet
     priority: p3
-    status: todo
+    status: in_progress
     depends_on: [C1]
     inputs: [external/orchestration/airflow/README.md, config/source-registry.yaml]
     acceptance: "Airflow/MWAA crosswalk fully mapped to baseline; no invented concepts; gate logged; confirmed:true"
@@ -998,7 +998,7 @@ items:
     agent: main
     model: sonnet
     priority: p2
-    status: todo
+    status: in_progress
     depends_on: [K1]
     inputs: [drydocs/controlm/staging.py, drydocs/loaders/, config/source-registry.yaml, docs/restructure/03-hitl-sme-flow.md]
     acceptance: >
@@ -1022,8 +1022,8 @@ items:
 # Roll-up the dispatcher can glance at. COMPUTED views — test_backlog.py enforces
 # that these match the items exactly; update them with any status change.
 summary:
-  todo: 8                                           # E1-E2, F1-F2, G3-G4, G9, K2
-  in_progress: 1                                    # G2 (core shim, step 1)
+  todo: 4                                           # E2, G3-G4, G9
+  in_progress: 5                                    # E1, F1, F2, K2 (gate-prep dispatched 2026-07-07; awaiting HITL), G2 (core shim, step 1)
   blocked: 1                                        # G7 — live multi-DB deploy needs an Enterprise target
   done: 31                                          # A1-A3, B1-B4, C1-C4, D1-D3, G1, G5-G6, G8, H1-H7, I1-I4, J1, K1
-  next_ready: [E1, F1, F2, K2]                      # todo items whose every depends_on is done (test-enforced)
+  next_ready: []                                    # todo items whose every depends_on is done (test-enforced)

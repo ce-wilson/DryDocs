@@ -1,0 +1,190 @@
+# =============================================================================
+# config/crosswalks/airflow-to-bmc.yaml
+#
+# AWS Airflow / MWAA (Apache Airflow) -> BMC Control-M baseline crosswalk.
+#
+# BMC Control-M is the canonical orchestrator (config/precedence.yaml, authority 1,
+# id bmc-baseline). Airflow is NOT a new set of graph concepts: every row below maps
+# a native Airflow term onto an EXISTING baseline concept / DryDocs node. Any Airflow
+# concept with no baseline equivalent is flagged `fidelity: no-equivalent` and must be
+# routed to `ontology-mapper` (never invented here) per CLAUDE.md "Onboarding a new
+# orchestrator" and external/orchestration/airflow/README.md's drift warning.
+#
+# STOP AT THE GATE: this whole file is `status: proposed`. Nothing here authorizes a
+# graph write. The row set becomes usable only after it passes the HITL gate
+# (docs/restructure/03-hitl-sme-flow.md; gate spec:
+# config/gate-prompts/airflow-crosswalk.yaml) and `config/source-registry.yaml`
+# source id `airflow-mwaa` is flipped to `confirmed: true`.
+#
+# classification: External — public Apache Airflow object-model concepts only. No
+# company data, no real DAG/task names, no MWAA environment identifiers.
+# =============================================================================
+
+schema: drydocs.crosswalk.v1
+updated: 2026-07-07
+id: airflow-to-bmc
+orchestrator: airflow
+baseline: bmc-controlm
+classification: External
+source_registry_ref: airflow-mwaa       # config/source-registry.yaml id
+narrative_ref: external/orchestration/airflow/README.md
+gate_spec: config/gate-prompts/airflow-crosswalk.yaml
+status: proposed                        # crosswalk-wide status; flips at the gate
+
+rows:
+  - n: 1
+    native: "DAG (`with DAG(dag_id=...) as dag:`)"
+    baseline: Folder
+    node: "ControlMFolder (Collection)"
+    fidelity: approximate
+    status: proposed
+    note: >
+      A statically-defined DAG maps cleanly to a Folder. Fidelity drops to approximate
+      because Airflow DAGs can be generated dynamically at parse time (a Python loop
+      producing N DAGs) — Control-M Folders are defined statically. The crosswalk
+      target is still Folder; dynamic-generation handling is an ingestion-time concern,
+      not a new graph concept.
+
+  - n: 2
+    native: "Task (`PythonOperator(task_id=...)` etc.)"
+    baseline: Job
+    node: ControlMJob
+    fidelity: exact
+    status: proposed
+    note: "One Airflow task instance definition = one Control-M job. Direct match."
+
+  - n: 3
+    native: "Task dependency (`task_a >> task_b`, `set_downstream`)"
+    baseline: "OUT->IN dependency"
+    node: WAS_INFORMED_BY
+    fidelity: exact
+    status: proposed
+    note: "Airflow's explicit bitshift dependency graph is a direct match to Control-M producer->consumer dependency edges."
+
+  - n: 4
+    native: "`ExternalTaskSensor` (cross-DAG wait)"
+    baseline: "IN condition"
+    node: "REQUIRES_IN_CONDITION -> Condition"
+    fidelity: approximate
+    status: proposed
+    note: >
+      Waits on another DAG/task's state — conceptually an IN condition, but the sensor
+      polls a task-instance state store rather than consuming a discrete condition
+      token. Behaviorally similar, mechanically different; note for the loader design.
+
+  - n: 5
+    native: "Dataset-aware scheduling (`Dataset(uri)` outlets/schedule)"
+    baseline: "IN/OUT condition (data-driven)"
+    node: "REQUIRES_IN_CONDITION / EMITS_OUT_CONDITION -> Condition"
+    fidelity: approximate
+    status: proposed
+    note: >
+      Airflow Datasets are closer in spirit to Control-M conditions than
+      ExternalTaskSensor is (both are "produced token unlocks consumer"), but Datasets
+      are typed objects with their own catalog (URI, extra metadata) that condition
+      names do not carry. Flag for SME: may warrant a richer Condition property set,
+      not a new node type.
+
+  - n: 6
+    native: "Operator (e.g. `BashOperator`, `SparkSubmitOperator`, `PythonOperator`)"
+    baseline: "invoked script / ETL process"
+    node: "INVOKES -> Script / ETLProcess"
+    fidelity: approximate
+    status: proposed
+    note: >
+      Fidelity depends entirely on operator type: BashOperator/SparkSubmitOperator map
+      cleanly to "invokes a script/job"; PythonOperator (arbitrary inline Python
+      callable) has no equivalent Control-M concept beyond "a script ran" — the
+      callable body itself is invisible to a crosswalk row. Needs per-operator review,
+      not a single blanket mapping.
+
+  - n: 7
+    native: "Trigger rule (`trigger_rule=`: all_success / one_failed / all_done / none_failed / ...)"
+    baseline: "no direct baseline equivalent for the full vocabulary"
+    node: "n/a (condition-logic property, not a node)"
+    fidelity: no-equivalent
+    status: proposed
+    note: >
+      Control-M expresses dependency success/failure branching through IN-condition
+      combinations (AND/OR condition sets) and On-Do statement actions, not a
+      per-task trigger-rule enum. Values like all_success / all_failed loosely map to
+      condition-set logic; one_failed / none_failed / all_done have no clean baseline
+      analog. FLAG for SME before any loader attempts to translate trigger_rule values.
+
+  - n: 8
+    native: "Connection / Pool / Queue (`pool=`, Airflow Connection id)"
+    baseline: "execution host / engine"
+    node: ExecutionHost
+    fidelity: approximate
+    status: proposed
+    note: >
+      A Connection often names a target system (DB, API) rather than the execution
+      host running the task (that's the worker/queue), so this is a looser match than
+      AutoSys `machine:` -> ExecutionHost. May need to split into two baseline
+      properties (execution host vs. target system) — flag for SME.
+
+  - n: 9
+    native: "`owner` (`default_args={'owner': ...}`)"
+    baseline: "run-as user"
+    node: AppUser
+    fidelity: approximate
+    status: proposed
+    note: >
+      Airflow `owner` is typically a human/team label shown in the UI, not a run-as
+      service identity the way Control-M OWNER is. Same node target, weaker fidelity —
+      needs an explicit normalization rule before treating it as equivalent to
+      AutoSys/Control-M OWNER.
+
+  - n: 10
+    native: "Schedule (`schedule_interval` cron string, or custom `Timetable` class)"
+    baseline: "scheduling (calendar / cyclic definition)"
+    node: "job schedule properties"
+    fidelity: approximate
+    status: proposed
+    note: >
+      A plain cron string maps cleanly to Control-M scheduling. A custom Timetable
+      subclass (arbitrary Python logic deciding the next run) has no baseline analog —
+      it is code, not data — and cannot be crosswalked row-by-row.
+
+  - n: 11
+    native: "XCom (cross-task value passing)"
+    baseline: "no-equivalent"
+    node: "n/a"
+    fidelity: no-equivalent
+    status: proposed
+    note: >
+      XCom is an in-DAG-run data-passing mechanism (small values between tasks via the
+      metadata DB), with no Control-M object counterpart (Control-M jobs communicate
+      via conditions/variables/files, not an inter-task value store). Do not attempt to
+      model XCom as a graph node/edge; it is an execution-time detail, not structural
+      lineage.
+
+  - n: 12
+    native: "Dynamic task mapping (`task.expand(...)`)"
+    baseline: "no-equivalent (drift risk)"
+    node: "n/a"
+    fidelity: no-equivalent
+    status: proposed
+    note: >
+      Generates N task instances at runtime from a mapped input; Control-M has no
+      static-definition analog (folders/jobs are defined ahead of run time, not
+      expanded per-run from data). Treating a mapped task as "a Job" would misrepresent
+      cardinality. FLAG explicitly — this is the clearest AutoSys/Airflow-vs-baseline
+      concept mismatch in this crosswalk and must not be silently approximated.
+
+# Fidelity gaps carried forward to the gate for explicit SME sign-off.
+no_equivalent_flags:
+  - row: 7
+    concept: "Trigger rule vocabulary (one_failed / none_failed / all_done, etc.)"
+    disposition: "Do not translate 1:1; needs an explicit condition-logic design, not a field copy."
+  - row: 11
+    concept: "XCom"
+    disposition: "Execution-time detail — never model as a graph node/edge."
+  - row: 12
+    concept: "Dynamic task mapping (.expand())"
+    disposition: "Cardinality mismatch vs static Folder/Job definitions — flag as drift risk, route to ontology-mapper if a modeling need emerges."
+open_questions:
+  - row: 6
+    question: "Per-operator crosswalk table needed (BashOperator vs PythonOperator vs SparkSubmitOperator, etc.) before a loader can classify INVOKES targets."
+  - row: 8
+    question: "Does Connection need to split into 'target system' vs 'execution host/queue' as two baseline properties?"

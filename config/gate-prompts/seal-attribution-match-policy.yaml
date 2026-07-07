@@ -1,0 +1,101 @@
+# SME gate-prompt spec — SEAL attribution match policy (m3_seal_app_ref, backlog K2).
+# GATE-PREP ONLY: this spec proposes the match policy for SME confirmation. It does
+# NOT flip m3_seal_app_ref, does NOT touch loaders, and is not itself a confirmation —
+# the SME ticks this page (or an equivalent review) BEFORE any loader activation.
+# Mechanism-only: fact-type names, node keys, edge shape — no real SEAL ids, app
+# names, or job names. classification: Internal-Public.
+classification: Internal-Public
+schema: drydocs.gate-prompt.v1
+id: seal-attribution-match-policy
+title: "SME Gate — SEAL attribution match policy (job -> Application, m3_seal_app_ref)"
+step: "Pre-activation gate for backlog K2 — confirms the match policy BEFORE the loader is built"
+summary: >
+  Proposes the match policy for attributing a ControlMJob to its SEAL-registered
+  Application via STG_APP_FACT semantic facts (fact_type SEAL/FID/APP_NAME/ALIAS),
+  per the K1 vocabulary registration (m3_seal_app_ref, status: planned) and the K1
+  taxonomy-ontology-map entry (job-seal-app-ref, status: proposed). Covers fact-type
+  precedence, the one-to-one accept rule, zero-unmatched surfacing, multi-hit triage,
+  the edge write shape, and load sequencing. No graph write happens until every
+  confirmation below is ticked and logged to config/gate-log.md; m3_seal_app_ref stays
+  status: planned until then.
+meta:
+  Module: "drydocs-load"
+  Source: "STG_APP_FACT rows (drydocs/controlm/staging.py) — fact_type SEAL/FID/APP_NAME/ALIAS, emitted by facts.route_fact from SEMANTIC_FACT variables classified in drydocs/controlm/variables.py FACT_REGISTRY"
+  Registry ref: "STG_APP_FACT variable-normalization stream — registration pending (confirmed: false); another agent is adding a config/source-registry.yaml entry for it in parallel (intended id pattern: stg-app-fact)"
+  Classification: "Internal-Public (this page, mechanism only) · underlying STG_APP_FACT data is Internal / Internal-Confidential (real SEAL ids, app names, job names never appear here)"
+  Taxonomy: "config/taxonomy/controlm.yaml (ControlMJob) + config/taxonomy/business-application.yaml (Application, key SEALID)"
+  Ontology map: "config/taxonomy-ontology-map.yaml#job-seal-app-ref (status: proposed) + drydocs/ontology/relationship_vocabulary.yaml#m3_seal_app_ref (status: planned)"
+  Source of record: "backlog.yaml Epic K (K1 done, K2 this gate) + drydocs/controlm/staging.py + drydocs/controlm/facts.py"
+
+mapping:
+  - n: 1
+    element: "STG_APP_FACT row, fact_type=SEAL (fact_value = candidate seal_id)"
+    target: ":Application {seal_id}  [existing node — matched, not created]"
+    edge: "(:ControlMJob {folder_id, job_id})-[:WAS_ASSOCIATED_WITH {role: 'seal_app_ref'}]->(:Application)  [PROPOSED — precedence tier 1, direct]"
+  - n: 2
+    element: "STG_APP_FACT row, fact_type=FID (fact_value = functional/service id)"
+    target: ":Application {seal_id}  [via FID -> seal_id reconciliation]"
+    edge: "same WAS_ASSOCIATED_WITH shape  [PROPOSED — precedence tier 2, fallback]"
+  - n: 3
+    element: "STG_APP_FACT row, fact_type=APP_NAME (fact_value = application name string)"
+    target: ":Application {seal_id}  [via name-string reconciliation]"
+    edge: "same WAS_ASSOCIATED_WITH shape  [PROPOSED — precedence tier 3, fallback]"
+  - n: 4
+    element: "STG_APP_FACT row, fact_type=ALIAS (fact_value = known alias string)"
+    target: ":Application {seal_id}  [via alias-table reconciliation]"
+    edge: "same WAS_ASSOCIATED_WITH shape  [PROPOSED — precedence tier 4, fallback, lowest confidence]"
+  - n: 5
+    element: "ControlMJob with zero STG_APP_FACT rows resolving to any Application across all four fact types"
+    target: "no edge written — job stays unattributed"
+    edge: "SURFACED as an unmatched count in the verify coverage invariant, never silently dropped  [PROPOSED]"
+  - n: 6
+    element: "ControlMJob whose STG_APP_FACT rows resolve to MORE THAN ONE distinct Application (multi-hit)"
+    target: "candidate Application set (>1)"
+    edge: "resolved by fact-type precedence first; residual ties go to deterministic conflict triage, never a silent pick  [PROPOSED]"
+
+provenance:
+  - label: "(:ControlMJob)-[:WAS_ASSOCIATED_WITH {role: 'seal_app_ref'}]->(:Application)"
+    source_object: "STG_APP_FACT"
+    key: "(folder_id, job_id) node key on :ControlMJob; seal_id on :Application"
+    loader: "seal_attribution.cypher (K2, not yet written)"
+    properties:
+      - {name: seal_id, origin: source, from: "STG_APP_FACT.fact_value where fact_type='SEAL' (or resolved via FID/APP_NAME/ALIAS reconciliation)", note: "identity of the target :Application; never job.APPLICATION"}
+      - {name: fact_type, origin: source, from: "STG_APP_FACT.fact_type", note: "SEAL | FID | APP_NAME | ALIAS — drives the precedence tier"}
+      - {name: match_method, origin: derived, from: "precedence resolution over fact_type tiers (SEAL > FID > APP_NAME > ALIAS)", note: "recorded on the edge so mixed-precedence attribution stays auditable"}
+      - {name: source, origin: derived, from: "'controlm-variable-normalization' (fixed loader-identity string)", note: "distinguishes this edge's provenance from any future owner/author WAS_ASSOCIATED_WITH role"}
+      - {name: first_seen_at, origin: derived, from: "ON CREATE SET — current load-run clock", note: "set once, on first MERGE only"}
+      - {name: last_seen_at, origin: derived, from: "SET on every load run that re-confirms the match", note: "updated every run, whether created or matched"}
+      - {name: last_run_id, origin: derived, from: "SET to the current run_id on every load run", note: "ties the edge to the STG_* run_id lineage"}
+
+sections:
+  - title: "A. Fact-type precedence order (SEAL-fact precedence)"
+    confirmations:
+      - "Proposed precedence order, highest to lowest confidence: SEAL (direct SEALID/seal_id literal) > FID (functional/service id, reconciled to a SEAL owner) > APP_NAME (name-string reconciliation) > ALIAS (alias-table reconciliation, lowest confidence)."
+      - "A job with a fact_type=SEAL hit is attributed via that fact alone; lower-tier facts on the same job are recorded as corroborating evidence only, never override a SEAL-tier match."
+      - "When the top available tier for a job yields exactly one candidate Application, that candidate is accepted without further SME review (one-to-one accept rule)."
+  - title: "B. Zero-unmatched surfacing (coverage invariant)"
+    confirmations:
+      - "Every load run reports two counts: edges written (matched) and jobs with zero STG_APP_FACT resolution across all four fact types (unmatched) — the sum is checked against the eligible-job count so nothing is silently dropped."
+      - "Unmatched jobs are NOT treated as an error that blocks the run; they are surfaced in the coverage report for follow-up, and the job keeps no WAS_ASSOCIATED_WITH {role: seal_app_ref} edge until a fact resolves."
+      - "The coverage invariant becomes part of graph_verify (K2 acceptance: 'Verify gains a coverage invariant... no silent drops')."
+  - title: "C. Multi-hit conflict triage"
+    confirmations:
+      - "Multi-hit is defined as: after applying fact-type precedence (section A), more than one distinct seal_id still remains at the SAME tier for the same job."
+      - "Proposed default triage rule: deterministic tie-break by (a) most-recent STG_APP_FACT.run_id, then (b) lexicographically lowest seal_id — applied ONLY as a last resort so behavior is reproducible, never randomized."
+      - "Every multi-hit job (before or after tie-break) is logged in the coverage report as a flagged case, distinct from clean one-to-one matches, so the SME can audit tie-break decisions after the fact."
+      - "OPEN QUESTION FOR SME: is the proposed deterministic tie-break (section C, item 2) acceptable as the default, or should multi-hit cases instead pause for a per-case SME call at load time (per the routing rules in docs/restructure/03-hitl-sme-flow.md)?"
+  - title: "D. Edge write shape"
+    confirmations:
+      - "Edge shape confirmed: MERGE (j:ControlMJob {folder_id: $folder_id, job_id: $job_id})-[r:WAS_ASSOCIATED_WITH {role: 'seal_app_ref'}]->(a:Application {seal_id: $seal_id})."
+      - "ON CREATE SET r.first_seen_at, r.source, r.match_method (set once, at first attribution)."
+      - "SET (every run) r.last_seen_at, r.last_run_id (re-confirmed on each subsequent load run that still resolves the same match)."
+      - "The (folder_id, job_id) node key on :ControlMJob and the seal_id key on :Application are both PRE-EXISTING identities (from the controlm-psgmgr and seal-extract loaders respectively) — this loader creates no new job or application nodes, only the edge."
+  - title: "E. Sequencing preconditions"
+    confirmations:
+      - "The attribution loader runs ONLY after both the ControlMJob and Application identities already exist in the graph (controlm-psgmgr folder/job load + seal-extract application load must have completed)."
+      - "job.APPLICATION (the raw CM_DEF_VJOB.APPLICATION column / the ControlMApplication grouping) is NEVER used as a substitute or fallback for SEAL identity in this loader — it is a Control-M grouping, not business/SEAL identity (documented unreliable in both repos' loader comments, and kept structurally separate as :ControlMApplication, see application-contains-folder in taxonomy-ontology-map.yaml)."
+      - "source and match_method stay explicit per edge (section D) specifically so a future mixed-precedence load (e.g. some jobs matched on SEAL, others on ALIAS) remains auditable rather than opaque."
+  - title: "F. Sign-off"
+    confirmations:
+      - "The precedence order (A), zero-unmatched surfacing (B), multi-hit triage (C), edge write shape (D), and sequencing preconditions (E) above are reviewed and correct, OR amended via explicit SME edits recorded in config/gate-log.md."
+      - "Safe to transcribe this decision into config/gate-log.md, flip drydocs/ontology/relationship_vocabulary.yaml#m3_seal_app_ref from status: planned to status: active (with its supplement + loader entries filled in), and build the K2 loader."

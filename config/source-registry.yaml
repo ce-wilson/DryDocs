@@ -33,9 +33,15 @@ sources:
     orchestrator: autosys
     adapter: ~                          # TBD
     feeds_taxonomy: [folders, jobs, conditions, dependencies]
-    confirmed: false                    # placeholder — crosswalk not SME-confirmed
-    crosswalk: external/orchestration/autosys/README.md
-    notes: "Placeholder. Activate only after crosswalk passes the HITL gate."
+    confirmed: false                    # placeholder — crosswalk not SME-confirmed (stopped at HITL gate)
+    crosswalk: config/crosswalks/autosys-to-bmc.yaml
+    gate_spec: config/gate-prompts/autosys-crosswalk.yaml
+    notes: >
+      Placeholder. 11-row draft crosswalk to bmc-controlm (config/crosswalks/autosys-to-bmc.yaml)
+      is status: proposed, stopped at the HITL gate — SME not yet run. See
+      external/orchestration/autosys/README.md for the narrative summary. Activate
+      (confirmed: true) only after the gate spec above is SME-confirmed and logged in
+      config/gate-log.md.
 
   - id: airflow-mwaa
     classification: Internal
@@ -44,9 +50,15 @@ sources:
     orchestrator: airflow
     adapter: ~
     feeds_taxonomy: [folders, jobs, conditions, dependencies]
-    confirmed: false
-    crosswalk: external/orchestration/airflow/README.md
-    notes: "Placeholder. Activate only after crosswalk passes the HITL gate."
+    confirmed: false                    # placeholder — crosswalk not SME-confirmed (stopped at HITL gate)
+    crosswalk: config/crosswalks/airflow-to-bmc.yaml
+    gate_spec: config/gate-prompts/airflow-crosswalk.yaml
+    notes: >
+      Placeholder. 12-row draft crosswalk to bmc-controlm (config/crosswalks/airflow-to-bmc.yaml)
+      is status: proposed, stopped at the HITL gate — SME not yet run. See
+      external/orchestration/airflow/README.md for the narrative summary. Activate
+      (confirmed: true) only after the gate spec above is SME-confirmed and logged in
+      config/gate-log.md.
 
   # ---- Internal reference data (Tier-3 confidential) -----------------------
   - id: seal-extract
@@ -100,3 +112,28 @@ sources:
     feeds_taxonomy: [schemas, tables]
     confirmed: false
     notes: "Expansion placeholder."
+
+  # ---- Staging semantic-fact streams (C3/C4 variable normalization) --------
+  - id: stg-app-fact
+    classification: Internal             # mechanism-only entry; no real SEAL/FID/app-name values here
+    source: "oracle:DRYDOCS_STG.STG_APP_FACT (Python normalizer output over CM_DEF_SETVAR)"
+    kind: staging
+    orchestrator: ~                      # not an orchestration vendor — a staging table fed by the C3/C4 variable-normalization stream
+    adapter: oracle
+    feeds_taxonomy: [applications]       # semantic facts attribute a ControlMJob to an Application (SEAL)
+    confirmed: false                     # registered per K1 flag — not yet SME-confirmed; no loader exists yet (see K2)
+    notes: >
+      Registered per K1's flag (docs/restructure/backlog.yaml Epic K): job.APPLICATION
+      (CM_DEF_VJOB) is NOT reliable SEAL identity — the SEAL-attribution feed is this
+      table's semantic facts instead. Rows carry fact_type in {SEAL, FID, APP_NAME,
+      ALIAS, ...} + fact_value, one row per (run, job, fact_type) — see
+      docs/controlm-staging-ingestion-flow.md (STG_APP_FACT ER block) and
+      docs/reviews/sdlc-oracle-ingestion.md §FR-OI-007. Feeds the planned
+      m3_seal_app_ref mapping (WAS_ASSOCIATED_WITH, role seal_app_ref,
+      drydocs/ontology/relationship_vocabulary.yaml, status: planned) and the
+      corresponding taxonomy-ontology-map.yaml entry (status: proposed). Mechanism-only
+      here — no real SEAL id / FID / application-name values, column/fact-type names
+      only. Activate (confirmed: true) only after the K2 match-policy gate (SEAL-fact
+      precedence; one-to-one accepted, zero-unmatched surfaced, multi-hit triage) is
+      SME-confirmed via the HITL gate and logged in config/gate-log.md — see
+      docs/restructure/03-hitl-sme-flow.md.

@@ -1,0 +1,117 @@
+# SME gate-prompt spec — AutoSys -> BMC Control-M baseline crosswalk (F1).
+# Reviews config/crosswalks/autosys-to-bmc.yaml row-by-row before the `autosys-export`
+# source in config/source-registry.yaml is ever flipped to confirmed: true. No loader
+# exists yet; this gate is the crosswalk sign-off, not a load-step sign-off.
+# Mechanism-only: public AutoSys/CA-Broadcom JIL object-model concepts, no company
+# data. classification: External.
+classification: External
+schema: drydocs.gate-prompt.v1
+id: autosys-crosswalk
+title: "SME Gate — AutoSys to BMC Control-M baseline crosswalk"
+step: "Onboarding step 2 of external/orchestration/autosys/README.md (crosswalk confirmation, before source activation)"
+summary: >
+  Confirms the AutoSys -> BMC Control-M baseline crosswalk in
+  config/crosswalks/autosys-to-bmc.yaml. Every native AutoSys concept maps to an
+  EXISTING baseline concept/DryDocs node (never a new one) per CLAUDE.md's
+  orchestrator-onboarding guardrail. Two rows have no baseline equivalent and are
+  flagged for explicit disposition rather than silent approximation. Confirming this
+  gate does NOT activate the source or authorize any graph write — it only allows
+  `confirmed: true` to be set in config/source-registry.yaml for `autosys-export`,
+  which still gates every future load.
+meta:
+  Module: "drydocs-core"
+  Source: "AutoSys JIL object-model concepts (CA/Broadcom Workload Automation public documentation) — no live export yet"
+  Registry ref: "autosys-export — NOT YET confirmed (config/source-registry.yaml); orchestrator: autosys, crosswalks to bmc-controlm (baseline)"
+  Classification: "External (public vendor concepts only) — this page External"
+  Precedence: "bmc-baseline is authority 1 (config/precedence.yaml) — AutoSys concepts map TO it, never redefine it"
+  Crosswalk file: "config/crosswalks/autosys-to-bmc.yaml (11 rows)"
+  Source of record: "external/orchestration/autosys/README.md"
+mapping:
+  - n: 1
+    element: "Job (insert_job job_type: c)"
+    target: ":ControlMJob"
+    edge: "—  [PROPOSED]"
+  - n: 2
+    element: "Box job (insert_job job_type: box)"
+    target: ":ControlMFolder:Collection"
+    edge: "—  [PROPOSED — approximate fidelity]"
+  - n: 3
+    element: "condition: s(job)/f(job)/n(job) status predicate"
+    target: ":Condition"
+    edge: "(:ControlMJob)-[:REQUIRES_IN_CONDITION]->(:Condition)  [PROPOSED]"
+  - n: 4
+    element: "condition: d(file) file predicate"
+    target: ":Condition"
+    edge: "(:ControlMJob)-[:REQUIRES_IN_CONDITION]->(:Condition)  [PROPOSED — approximate, open question]"
+  - n: 5
+    element: "Job success feeding downstream condition:"
+    target: "(consumer job)"
+    edge: "(consumer)-[:WAS_INFORMED_BY]->(producer)  [PROPOSED — approximate]"
+  - n: 6
+    element: "machine:"
+    target: ":ExecutionHost"
+    edge: "—  [PROPOSED]"
+  - n: 7
+    element: "owner:"
+    target: ":AppUser"
+    edge: "—  [PROPOSED]"
+  - n: 8
+    element: "Calendar (insert_calendar / run_calendar / exclude_calendar)"
+    target: "job schedule properties"
+    edge: "—  [PROPOSED — approximate]"
+  - n: 9
+    element: "Job status model (SU/FA/RU/OH/OI/IN/QU/TE)"
+    target: "ControlMJob status property"
+    edge: "—  [PROPOSED — approximate, needs value-mapping table]"
+  - n: 10
+    element: "Global/box-scoped variables (profile:, export:)"
+    target: "n/a"
+    edge: "NO-EQUIVALENT — do not model via this crosswalk"
+  - n: 11
+    element: "n_retrys: / alarm_if_fail: / alarm_if_terminated:"
+    target: "ControlMJob property (no dedicated node)"
+    edge: "—  [PROPOSED — approximate]"
+provenance:
+  - label: ":ControlMJob (crosswalk target — AutoSys Job)"
+    source_object: "AutoSys JIL job definition (insert_job)"
+    key: "job_name"
+    loader: "n/a — crosswalk sign-off only, no loader exists yet"
+    properties:
+      - {name: job_name, origin: source, from: "insert_job: <name>", note: "native-field carryover"}
+      - {name: machine, origin: source, from: "machine:", note: "native-field carryover"}
+      - {name: owner, origin: source, from: "owner:", note: "native-field carryover"}
+      - {name: baseline_equivalent, origin: derived, from: "crosswalk row 1 (native Job -> baseline Job)", note: "crosswalk-translated value — exact fidelity"}
+  - label: ":ControlMFolder (crosswalk target — AutoSys Box job)"
+    source_object: "AutoSys JIL box job definition (insert_job job_type: box)"
+    key: "box_name"
+    loader: "n/a — crosswalk sign-off only"
+    properties:
+      - {name: box_name, origin: source, from: "insert_job: <name> job_type: box", note: "native-field carryover"}
+      - {name: baseline_equivalent, origin: derived, from: "crosswalk row 2 (native Box job -> baseline Folder)", note: "crosswalk-translated value — approximate fidelity; box can self-schedule, Folder cannot identically"}
+  - label: ":Condition (crosswalk target — AutoSys condition:)"
+    source_object: "AutoSys JIL condition: attribute"
+    key: "predicate expression"
+    loader: "n/a — crosswalk sign-off only"
+    properties:
+      - {name: predicate, origin: source, from: "condition: s(job)|f(job)|n(job)|d(file)", note: "native-field carryover"}
+      - {name: baseline_equivalent, origin: derived, from: "crosswalk rows 3-5 (native condition -> baseline IN/OUT condition)", note: "crosswalk-translated value — row 4 (d(file)) flagged approximate/open-question, may need a FileWatcher-job mapping instead"}
+sections:
+  - title: "A. Scope confirmation"
+    confirmations:
+      - "This gate reviews config/crosswalks/autosys-to-bmc.yaml only — it does not activate the autosys-export source and does not authorize any graph write."
+      - "No real AutoSys job/box/machine names are in scope; all rows describe public JIL object-model concepts."
+      - "BMC Control-M remains the baseline (config/precedence.yaml authority 1); every row maps AutoSys TO the baseline, none invent a new DryDocs node/edge type."
+  - title: "B. Row-by-row fidelity review"
+    confirmations:
+      - "Rows 1, 3, 6, 7 (Job, status-predicate condition, machine, owner) are exact fidelity and confirmed correct."
+      - "Rows 2, 4, 5, 8, 9, 11 (box job, file predicate, downstream dependency, calendar, status model, retry/alert properties) are approximate fidelity — the SME accepts the approximation and its noted caveat."
+      - "Row 4's open question (does d(file) need its own FileWatcher-job baseline mapping instead of folding into Condition?) is resolved or explicitly deferred."
+      - "Row 9's open question (authoritative AutoSys status vocabulary needs a live export, not JIL docs alone) is acknowledged as a follow-up before loader implementation."
+  - title: "C. No-equivalent concepts"
+    confirmations:
+      - "Row 10 (global/box-scoped variables) is confirmed NO-EQUIVALENT — it will not be modeled as a graph concept via this crosswalk; any future variable-graph need routes through ontology-mapper, not this file."
+      - "No AutoSys concept in this crosswalk has been silently approximated into a new node/edge type — every non-exact row is explicitly flagged."
+  - title: "D. Sign-off"
+    confirmations:
+      - "All 11 rows in config/crosswalks/autosys-to-bmc.yaml were reviewed and are correct as either exact, approximate, or no-equivalent."
+      - "Safe to transcribe into config/gate-log.md and set confirmed: true (autosys-export source row status only — a loader must still be implemented and separately gated before any load runs)."
