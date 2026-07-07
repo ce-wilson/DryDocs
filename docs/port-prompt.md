@@ -157,6 +157,50 @@ PROCEDURE:
     - Acceptance: Track 1 = docmeta unit tests pass with no network/credentials (connector
       stubs SKIP, not fail); Track 2 = docs-fetch/docs-load run clean against real sources.
 
+17. SOFTWARE REGISTRY STREAM (plan-07, ADR 0004 — mostly clean-adds, ONE rename to coordinate):
+    docs/decisions/0004-*.md + docs/restructure/07-software-registry.md,
+    config/taxonomy/software-registry.yaml (6 vendors / 7 products; includes an
+    `invocation_patterns:` section that is status: proposed and INERT to the loader —
+    Phase 3 is gated, do not wire it), drydocs/loaders/software_registry.py +
+    software_registry.cypher + registry_ontology_supplement.cypher, the
+    `load-software-registry` / `apply-registry-supplement` CLI commands, vocabulary
+    entries reg_made_by/reg_uses_software (active), tests/unit/test_software_registry.py,
+    and the `software-registry` source-registry entry — all generic, apply untouched.
+    THE RENAME (plan-07 Phase 2, 2026-07-07): the producer renamed the back-flow seed
+    files `graph-tests/vendor-bmc-smoke.yaml` → `bmc-docs-smoke.yaml` (suite id
+    `bmc-docs-smoke`) and `config/gate-prompts/vendor-bmc-example.yaml` →
+    `bmc-docs-example.yaml` (spec id `bmc-docs-structural`). These paths are
+    Canonical-COMPANY (step 10) — but the producer's GENERIC tests
+    (test_graph_verify.py, test_gate_pages.py), which you DO take, now assert the NEW
+    names. So apply the rename to your own seed twins as a deliberate COMPANY-SIDE
+    commit (`git mv` + suite/spec id, JobFolder-rename playbook) — your REAL suites and
+    gate specs under other filenames are untouched. If you skip the rename, drop the
+    producer's two renamed test functions in the same commit and log why; do not leave
+    Track-1-adjacent tests red.
+
+18. GATE-PAGE STANDARD + PREPPED-GATES BATCH (2026-07-07 — EVALUATE the renderer, clean-add the rest):
+    - drydocs/gate_pages.py gained a GENERIC extension (meta header card;
+      ProvenanceBlock/PropRow with origin source|derived badges), the format is directed
+      in docs/restructure/03-hitl-sme-flow.md §"Gate-page format (STANDARD)", and
+      tests/unit/test_gate_pages.py now ENFORCES it for every committed
+      config/gate-prompts/*.yaml (meta keys Module/Source/Registry ref/Classification +
+      ≥1 provenance block). gate_pages.py is a step-10 Canonical-COMPANY path, but this
+      delta is pure mechanism (no wiring): FOLD it into your copy (or take the producer
+      file if your copy has no divergent wiring), then bring your real gate specs up to
+      the standard before the enforcement test lands — otherwise take neither the
+      renderer delta nor the new tests, as one deliberate decision.
+    - Clean-adds (all stopped AT the HITL gate — status: proposed / confirmed: false;
+      NOTHING here is SME-confirmed; no gate-log entries were written): five gate specs
+      (sosa-jobrun-observation, autosys-crosswalk, airflow-crosswalk,
+      seal-attribution-match-policy, software-usage-patterns), config/crosswalks/
+      (autosys-to-bmc.yaml, airflow-to-bmc.yaml), the jobrun-observation map-entry
+      enrichment, and source-registry deltas (crosswalk/gate_spec pointers on
+      autosys-export/airflow-mwaa; NEW stg-app-fact entry, confirmed: false). Per the
+      Epic-K back-flow bullet: if your registry already carries a live STG_APP_FACT
+      entry or an active seal_app_ref, that is a COLLISION — keep yours.
+    - config/gate-log.md is an APPEND-ONLY AUDIT: on collision, merge additively
+      (union of entries, chronological) — never drop either side's gate records.
+
 ACCEPTANCE GATE (behavior is the contract, not a byte-compare):
 - Track 1 (portable, no production sample present):
     poetry run pytest tests/unit/test_variable_classifier.py tests/unit/test_variable_resolver.py \

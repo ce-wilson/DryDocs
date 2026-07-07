@@ -73,6 +73,18 @@ stay skipped — confirm with the operator if a new one appears.
     (reproduce generically in the public producer via the screenshot/describe
     channel; set `classification` on each). If/when the producer grows a generic
     same-named file, it becomes a **collision** — add a ledger row then.
+- **`drydocs-review` collisions are LIVE (ledger row, 2026-07-07).** The producer's
+  generic twins landed 2026-07-01 (Epic H: `graph_review.py`, `graph_verify.py`,
+  `review_labels.py`, `sme_notes.py`, `gate_pages.py`, `drydocs/publishing/**`,
+  `config/review-labels.yaml`, `config/gate-prompts/**`, `graph-tests/**`) — resolve
+  **Canonical-COMPANY** per port-prompt step 10 / git-readme "`drydocs-review` —
+  back-flow stream". Three 2026-07-07 refinements (port-prompt steps 17–18):
+  (a) seed-file rename `vendor-bmc-*` → `bmc-docs-*` must be applied company-side
+  (the producer's generic tests assert the new names); (b) the `gate_pages.py`
+  meta-card + SOURCE/DERIVED provenance extension is pure mechanism — fold into the
+  company copy and upgrade real specs to the test-enforced standard format, or
+  decline delta + tests together; (c) `config/gate-log.md` merges ADDITIVELY
+  (append-only audit — never drop either side's entries).
   - *Internal data-bearing — never back-flow as values* — `locations.py`
     (DSNs/server locations), `seal_deployments.py` (real SEAL IDs),
     `controlm_app_codes.py` (app-code values), ServiceNow HPSM config. Company-side

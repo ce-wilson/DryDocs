@@ -196,6 +196,22 @@ internal-data originals from being clobbered by the public template. (Mirrored i
 fails). That change is generic and Track-1 portable — take it FROM the producer; it is
 what forces your company-only modules to be classified rather than silently unguarded.
 
+**2026-07-07 update — three refinements to this stream** (details: port-prompt steps
+17–18):
+
+1. **Seed-file rename (ADR 0004):** `graph-tests/vendor-bmc-smoke.yaml` →
+   `bmc-docs-smoke.yaml` and `config/gate-prompts/vendor-bmc-example.yaml` →
+   `bmc-docs-example.yaml` (ids renamed too). The producer's generic tests now assert
+   the new names — apply the same rename to your seed twins as a deliberate
+   company-side commit; your real suites/specs under other filenames are untouched.
+2. **Gate-page STANDARD format:** `gate_pages.py` gained a generic meta-card +
+   SOURCE/DERIVED provenance extension, directed in `03-hitl-sme-flow.md`
+   §"Gate-page format" and test-enforced for every committed gate spec. Pure
+   mechanism — fold it into your copy and upgrade your real specs to the standard
+   (or decline the delta AND its tests together, logged).
+3. **`config/gate-log.md` is append-only audit:** on collision merge additively
+   (union of entries, chronological); never drop either side's gate records.
+
 ---
 
 ## Commit range to apply
