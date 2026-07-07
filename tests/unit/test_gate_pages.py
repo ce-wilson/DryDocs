@@ -57,7 +57,7 @@ def test_render_is_self_contained() -> None:
 
 
 def test_committed_example_spec_loads_and_renders() -> None:
-    spec = load_gate_spec(DEFAULT_GATE_PROMPTS_DIR / "vendor-bmc-example.yaml")
+    spec = load_gate_spec(DEFAULT_GATE_PROMPTS_DIR / "bmc-docs-example.yaml")
     assert spec.classification in {"External", "Internal-Public"}
     out = render_gate_page(spec)
     assert spec.title in out

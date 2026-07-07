@@ -9,7 +9,8 @@
 # Pure config — no Neo4j, no graph writes. Typed accessor: drydocs/review_labels.py.
 #
 # classification: Internal-Public. This committed spine is seeded from the
-# vendor-BMC baseline (generic Control-M object labels — publishable). Real
+# bmc-docs baseline (generic Control-M object labels — publishable; corpus id
+# per ADR 0004). Real
 # internal source->label chains (SEAL/PAT) live in a gitignored twin and are
 # confirmed through the HITL gate before they drive any load — see
 # docs/restructure/03-hitl-sme-flow.md. Never commit real sources here.
@@ -20,7 +21,7 @@ updated: 2026-07-01
 
 sources:
   - id: bmc-controlm-structure
-    provenance: "BMC Control-M folder/job export (vendor baseline; VERBATIM)"
+    provenance: "BMC Control-M folder/job export (bmc-docs baseline; VERBATIM)"
     labels: [ControlMFolder, ControlMJob, Condition]        # chain order: folder -> job -> condition
 
   - id: bmc-controlm-variables

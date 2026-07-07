@@ -1,18 +1,19 @@
-# Example SME gate-prompt spec — generic vendor-BMC load step (publishable).
+# Example SME gate-prompt spec — generic bmc-docs load step (publishable).
+# (Corpus id per ADR 0004: `bmc-docs` names the BMC documentation corpus.)
 # classification: Internal-Public. Real PAT/SEAL gate specs (real LoB/SEAL data) are
 # Internal-Confidential and live in a gitignored twin — never commit them here.
 classification: Internal-Public
 schema: drydocs.gate-prompt.v1
-id: vendor-bmc-structural
+id: bmc-docs-structural
 title: "SME Gate Prompt — Control-M structural skeleton (example)"
-step: "Step 0 of the load plan (example) — vendor-BMC folder/job/condition skeleton"
+step: "Step 0 of the load plan (example) — bmc-docs folder/job/condition skeleton"
 summary: >
-  Loads the Control-M folder → job → condition skeleton from the vendor-BMC baseline
+  Loads the Control-M folder → job → condition skeleton from the bmc-docs baseline
   export. This is a generic, publishable example of a gate page; no internal data is
   in scope. No graph write happens until the mappings below are confirmed.
 meta:
   Module: "drydocs-core"
-  Source: "vendor-BMC baseline export (synthesized example corpus)"
+  Source: "bmc-docs baseline export (synthesized example corpus)"
   Software: "controlm (Control-M) MADE_BY bmc — config/taxonomy/software-registry.yaml"
   Registry ref: "controlm-psgmgr — confirmed (config/source-registry.yaml)"
   Classification: "Internal-Public (example — no internal data in scope)"
@@ -28,7 +29,7 @@ provenance:
 sections:
   - title: "A. Scope confirmation"
     confirmations:
-      - "The vendor-BMC export is the authoritative source for folder/job/condition structure."
+      - "The bmc-docs export is the authoritative source for folder/job/condition structure."
       - "No SEAL / PAT / application / person data is in scope for this step."
       - "The raw export stays in a gitignored path and is never committed or published."
   - title: "B. Sign-off"

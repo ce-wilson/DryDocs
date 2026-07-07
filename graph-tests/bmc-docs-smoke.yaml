@@ -1,8 +1,10 @@
-# Vendor-BMC baseline smoke suite — generic Control-M structural invariants.
+# bmc-docs baseline smoke suite — generic Control-M structural invariants.
+# (Corpus id per ADR 0004: `bmc-docs` names the BMC documentation corpus, not a
+# vendor relationship — "vendor" means the brand in the software registry.)
 # classification: Internal-Public (no internal counts/IDs — safe to publish).
 classification: Internal-Public
 schema: drydocs.graph-tests.v1
-suite: vendor-bmc-smoke
+suite: bmc-docs-smoke
 description: >
   Baseline structural invariants for a Control-M load: folders and jobs exist and
   every job is contained by a folder. Counts are NOT asserted here (they are

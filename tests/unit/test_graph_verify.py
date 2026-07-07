@@ -133,14 +133,14 @@ def _mini_suite() -> Suite:
 
 
 # ---- committed example suite + spine integration --------------------------
-def test_committed_vendor_bmc_suite_loads() -> None:
+def test_committed_bmc_docs_suite_loads() -> None:
     suites = load_suites(DEFAULT_GRAPH_TESTS_DIR)
     names = {s.name for s in suites}
-    assert "vendor-bmc-smoke" in names
+    assert "bmc-docs-smoke" in names
 
 
 def test_suite_targets_are_known_to_the_spine() -> None:
     """The committed suite's targets must all be declared in the review spine."""
-    suite = next(s for s in load_suites(DEFAULT_GRAPH_TESTS_DIR) if s.name == "vendor-bmc-smoke")
+    suite = next(s for s in load_suites(DEFAULT_GRAPH_TESTS_DIR) if s.name == "bmc-docs-smoke")
     spine = ReviewLabels.load()
     assert unknown_targets(suite, spine) == []

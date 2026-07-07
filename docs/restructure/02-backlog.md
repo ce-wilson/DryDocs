@@ -137,7 +137,7 @@ code). Full plan: [`05-drydocs-review-backflow.md`](05-drydocs-review-backflow.m
   (read-only `harvest_tree` + `route`; excludes `data/`). 5 tests, synthetic SIDs.
 - **H4** ✅ P3 *done 2026-07-01* — `drydocs/gate_pages.py`: `render_gate_page(spec)` → interactive HTML
   (checkbox per confirmation, localStorage, progress bar, classification badge, "no write until confirmed").
-  Example `config/gate-prompts/vendor-bmc-example.yaml`. 6 tests. *Gated:* real PAT/SEAL gate pages deferred.
+  Example `config/gate-prompts/bmc-docs-example.yaml` (renamed per ADR 0004). 6 tests. *Gated:* real PAT/SEAL gate pages deferred.
 - **H5** ✅ P3 *done 2026-07-01* — `drydocs/publishing/`: `assemble` + validator (well-formed XML + macro
   allow-list) + `write_preview` + `Publisher` Protocol (Noop/Local; Confluence push abstracted). 10 tests.
   *Gated:* a real `ConfluencePublisher` (space coords/auth) deferred to the company twin.

@@ -8,8 +8,9 @@ query plus an assertion on the result shape (`empty` / `nonempty` / `equals`).
   and are **pure/offline** (unit-tested with no Neo4j). Only running a suite touches
   the graph.
 - **classification: Internal-Public.** The committed example
-  ([`vendor-bmc-smoke.yaml`](vendor-bmc-smoke.yaml)) is a generic vendor-BMC smoke
-  test. Real acceptance suites that encode internal counts/IDs belong in a gitignored
+  ([`bmc-docs-smoke.yaml`](bmc-docs-smoke.yaml)) is a generic smoke test seeded from
+  the bmc-docs corpus (BMC Control-M docs baseline; corpus id per ADR 0004). Real
+  acceptance suites that encode internal counts/IDs belong in a gitignored
   `graph-tests/` twin, never here.
 
 ## Suite format

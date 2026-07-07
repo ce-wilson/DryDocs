@@ -66,7 +66,8 @@ category/version metadata, queryable ("which applications use Ab Initio?").
 
 1. Plan-07 Phase 1: seed `software-registry.yaml` (base list in the plan),
    schema test, loader, constraints, supplement blocks for the two edges.
+   ✅ Done 2026-07-07 (`caa1e79`).
 2. Plan-07 Phase 2: execute the `vendor-bmc` → `bmc-docs` rename
-   (baseline-grep → rename → re-grep → tests).
+   (baseline-grep → rename → re-grep → tests). ✅ Done 2026-07-07.
 3. Sweep trust-axis prose for "vendor's words" phrasing when files are next
    touched (not a dedicated pass).

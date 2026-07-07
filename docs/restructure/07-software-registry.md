@@ -150,10 +150,15 @@ Snowflake gets a row when it stops being a future.
   source-registry entry `software-registry` (confirmed, Internal-Public);
   vocabulary entries flipped `planned → active`; guarded by
   `tests/unit/test_software_registry.py` (7 tests).
-- **Phase 2 — retire `vendor-bmc` from tooling.** Rename corpus id →
-  `bmc-docs` across review-labels.yaml, `config/gate-prompts/`, `graph-tests/`,
-  the four unit tests, docs. Baseline-grep → rename → re-grep → tests
-  (JobFolder-rename playbook). Icons directory untouched (Brands).
+- **Phase 2 — retire `vendor-bmc` from tooling. ✅ DONE 2026-07-07.**
+  Renamed corpus id → `bmc-docs`: `graph-tests/bmc-docs-smoke.yaml`
+  (suite id) + `config/gate-prompts/bmc-docs-example.yaml` (spec id) via
+  `git mv`; review-labels.yaml prose; the two unit-test references
+  (test_gate_pages, test_graph_verify); live doc links (graph-tests README,
+  05-backflow, 02-backlog). Baseline-grep → rename → re-grep → tests
+  (JobFolder-rename playbook). Historical records (gate-log, ADR text,
+  backlog notes, ARCHITECTURE.md pre-restructure paths) left verbatim.
+  Icons directory untouched (Brands).
 - **Phase 3 — derived app→software edges from `CMD_LINE`.** An
   invocation-pattern → product-id table (inside the registry yaml,
   HITL-confirmed) applied over the command parser's `STG_INVOCATION` output;

@@ -73,7 +73,9 @@ Reproduce the **tooling**; never bring the **artifacts it produced**.
 | The publishing *pipeline* (assembler / validator / preview) | `toby_publish_confluence` (internal wrapper) → a generic pluggable publisher; Confluence space coordinates |
 | The HITL prompt-page **generator** (interactive checklist, localStorage, "no write until confirmed", logs to `gate-log.md`) | The produced pages — the real SME gate pages are `CLASSIFICATION: INTERNAL-CONFIDENTIAL` (real LoB/Sub-LoB/Product-Line, row counts, `business_segment_code`) |
 
-Seed every generator example from the synthesized `vendor-bmc` corpus, never real data.
+Seed every generator example from the synthesized `bmc-docs` corpus (renamed from
+`vendor-bmc` per ADR 0004 — it names a documentation corpus, not a vendor relationship),
+never real data.
 
 ## Boundary-guard fix (part of this epic)
 
@@ -128,7 +130,8 @@ Tracked as **Epic H** in [`backlog.yaml`](backlog.yaml).
   (typed accessor over [`config/review-labels.yaml`](../../config/review-labels.yaml)) +
   [`drydocs/graph_verify.py`](../../drydocs/graph_verify.py) (pure `load`/`evaluate`; `run_*`
   takes a duck-typed `GraphRunner`, so the module never imports Neo4j and is fully offline).
-  Example suite [`graph-tests/vendor-bmc-smoke.yaml`](../../graph-tests/vendor-bmc-smoke.yaml).
+  Example suite [`graph-tests/bmc-docs-smoke.yaml`](../../graph-tests/bmc-docs-smoke.yaml)
+  (named `vendor-bmc-smoke.yaml` until the ADR 0004 rename).
   27 unit tests; both YAML seeds `classification: Internal-Public`.
 - **H2 — done (2026-07-01).** [`drydocs/graph_review.py`](../../drydocs/graph_review.py): pure
   `render_review({label: [props]})` → self-contained HTML, `hidden_props` + `_`-keys stripped, review-spine
@@ -138,7 +141,8 @@ Tracked as **Epic H** in [`backlog.yaml`](backlog.yaml).
 - **H4 — done (2026-07-01).** [`drydocs/gate_pages.py`](../../drydocs/gate_pages.py): `render_gate_page(spec)`
   → self-contained interactive HTML (checkbox per confirmation, localStorage persistence, progress bar,
   classification badge, mapping table, "no graph write until confirmed" banner). Example
-  [`config/gate-prompts/vendor-bmc-example.yaml`](../../config/gate-prompts/vendor-bmc-example.yaml). 6 unit tests.
+  [`config/gate-prompts/bmc-docs-example.yaml`](../../config/gate-prompts/bmc-docs-example.yaml)
+  (named `vendor-bmc-example.yaml` until the ADR 0004 rename). 6 unit tests.
 - **H5 — done (2026-07-01).** [`drydocs/publishing/`](../../drydocs/publishing/__init__.py): `assemble` +
   validator (well-formed XML + macro allow-list) + `write_preview` + `Publisher` Protocol
   (Noop/Local; Confluence push abstracted — no `toby_publish_confluence`, no space coords). 10 unit tests.
@@ -154,11 +158,11 @@ Everything below either needs the **HITL SME gate** or an **architecture decisio
 per scope it is documented here rather than built:
 
 1. **Real internal review spine (HITL-gated).** The committed `review-labels.yaml` is the
-   vendor-BMC generic seed. The real internal source→label chains (SEAL / PAT sources) are
+   bmc-docs generic seed. The real internal source→label chains (SEAL / PAT sources) are
    `Internal`/`Internal-Confidential`, live in a gitignored twin, and must be confirmed
    through the gate ([`03-hitl-sme-flow.md`](03-hitl-sme-flow.md), logged to
    [`gate-log.md`](../../config/gate-log.md)) before they drive any load. Never commit here.
-2. **Real acceptance suites (HITL-gated).** `graph-tests/vendor-bmc-smoke.yaml` asserts only
+2. **Real acceptance suites (HITL-gated).** `graph-tests/bmc-docs-smoke.yaml` asserts only
    shape/consistency. Suites that assert real counts/IDs are `Internal` and depend on a
    *confirmed* load — those go in the gitignored twin, gated the same way.
 3. **CLI wiring of review commands — RESOLVED (option A, entrypoint exemption).** Wiring
