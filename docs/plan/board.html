@@ -70,6 +70,8 @@ h3{font-size:1rem;margin:.3rem 0 .2rem}
 </head><body>
 <h1>DryDocs — project board</h1>
 <p class="subtitle">Rendered from <code>docs/restructure/backlog.yaml</code> (updated 2026-07-01) &middot; 41 items. The repo is the system of record; this page is a working aid.</p>
+<p class="subtitle">Location: <code id="board-url"></code> <button type="button" id="board-url-copy">copy</button></p>
+<script>document.getElementById('board-url').textContent=window.location.href;document.getElementById('board-url-copy').onclick=function(){navigator.clipboard.writeText(window.location.href);};</script>
 <div class="roadmap">
 <div class="phase-card"><div class="phase-head"><span class="phase-id">P0</span><span class="status-badge status-done">done</span></div><h3>Restructure scaffolding</h3><p class="goal">Four-layer model, external/internal split, config layer, publish boundary, sub-agents.</p><div class="progress"><div class="progress-bar" style="width:100%"></div></div><p class="progress-text">3 / 3</p></div>
 <div class="phase-card"><div class="phase-head"><span class="phase-id">P1</span><span class="status-badge status-done">done</span></div><h3>Taxonomy capture</h3><p class="goal">Live sources captured in config/taxonomy/ as pure classification (Epic B).</p><div class="progress"><div class="progress-bar" style="width:100%"></div></div><p class="progress-text">4 / 4</p></div>

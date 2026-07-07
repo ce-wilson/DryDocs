@@ -67,6 +67,13 @@ libs/oracle_kerberos/oracle_kerberos_connection.txt
 /*.jpg
 /*.jpeg
 
+# Vendor PDF posters/manuals — copyrighted BMC (and other vendor) binaries kept
+# as LOCAL reference only. This repo is sometimes published; the *.md files in
+# external/orchestration/ are our own summaries and are publishable, the raw
+# vendor PDFs are not. Facts from the poster are transcribed in the controlm-db
+# skill (references/er-model.md).
+external/orchestration/**/*.pdf
+
 # Editor workspace settings (machine-local)
 /.vscode/
 

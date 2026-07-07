@@ -504,6 +504,14 @@ document.addEventListener("DOMContentLoaded", () => {
         f'<p class="subtitle">Rendered from <code>docs/restructure/backlog.yaml</code> '
         f"(updated {_esc(backlog.updated)}) &middot; {total_items} items. "
         "The repo is the system of record; this page is a working aid.</p>\n"
+        # Self-locating URL: filled client-side so the committed HTML stays
+        # byte-identical across machines (producer C:\ vs company I:\) and the
+        # stale-board determinism check keeps working.
+        '<p class="subtitle">Location: <code id="board-url"></code> '
+        '<button type="button" id="board-url-copy">copy</button></p>\n'
+        "<script>document.getElementById('board-url').textContent=window.location.href;"
+        "document.getElementById('board-url-copy').onclick=function(){"
+        "navigator.clipboard.writeText(window.location.href);};</script>\n"
         f'<div class="roadmap">\n{roadmap}\n</div>\n'
         '<div class="filters">\n'
         '  <label>Module<select id="f-module"><option value="">All</option>\n'

@@ -9,6 +9,27 @@
 
 ---
 
+## 🗺️ PHYSICAL DATA MODEL — poster (added 2026-07-02)
+
+- **File:** `BMC_ControlM_SVR_v6.4.01_DB_Poster.pdf` — BMC Control-M/Server 6.4.01
+  physical data model (the `CMS_*` definition + `CMR_*` runtime tables, seven
+  groups, PKs + columns + relationships).
+- **Classification:** `External` doc, but the **raw PDF is a copyrighted BMC
+  binary → gitignored** (`external/orchestration/**/*.pdf`), kept as local
+  reference only. This repo is sometimes published; the summaries are ours, the
+  vendor binary is not.
+- **Trust:** the schema facts (table names / PKs / columns) are **GROUNDED** to
+  BMC and transcribed into the `controlm-db` skill
+  (`.claude/skills/controlm-db/references/er-model.md`). The vendor→company
+  `CM_` crosswalk and all query recipes in that skill are **SYNTHESIZED**.
+- **Version caveat:** poster is **6.4.01**; our target is **9.0.21.300**. Use it
+  for entity relationships and column semantics, not for exact `psgmgr` object /
+  column names — those come from `drydocs/loaders/sql/controlm_*.sql`. Newer
+  version splits combined `CMS_CON_J` into `LNKI`/`LNKO` and adds the versioned
+  `DEF_V*` view layer. See the skill's `schema-crosswalk.md`.
+
+---
+
 ## 📑 PROVENANCE MODEL (read before graph ingestion)
 
 Every `controlm-*.md` file was produced by **WebFetch of a single BMC page, then summarized and restructured by Claude.** These files are a human/agent *reference*, **not a source-of-record.** Before loading any of this into the knowledge graph, classify content into three tiers and set `provenance` on each chunk accordingly:
