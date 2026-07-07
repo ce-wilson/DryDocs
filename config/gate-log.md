@@ -50,3 +50,17 @@ records the date, the item, confirmed / edited / rejected counts, and reasons fo
   `backlog.yaml`. Confirmed by SME (chad.wilson).
 - **Note:** ADRs are architecture decisions, not taxonomy→ontology mappings — gated here by the
   same SME-control principle (`03-hitl-sme-flow.md`), logged for the same audit trail.
+
+## 2026-07-07 — Plan 07 Phase 0 · software-registry terminology + vocabulary (ADR 0004)
+- **Presented:** 5 items, all new types → all paused for individual decision (0 batched):
+  ADR 0004 terminology bundle + 2 node classifications + 2 edges.
+- **Decisions (SME, chad.wilson): 5× Confirm, 0 edited, 0 rejected, 0 skipped.**
+  - ADR 0004 **ACCEPTED**: vendor = brand only; `SoftwareProduct.role` absorbs Tier-1/Tier-2;
+    trust-axis prose drops "vendor's words"; `vendor-bmc` tooling id → `bmc-docs`.
+  - `Vendor` = `org:Organization` (Agent); `SoftwareProduct` = `dd:SoftwareProduct` (Entity).
+  - `MADE_BY` → `prov:wasAttributedTo` (Entity → Agent matrix row).
+  - `USES_SOFTWARE` → local domain edge (`prov_maps_to: ~`; Agent → Entity has no PROV row;
+    precedent `arch_contains`). Properties: version, source, status.
+- **Effect:** plan-07 Phases 1 (registry seed + loader) and 2 (`bmc-docs` rename) are
+  **ungated**. Vocabulary entries `reg_made_by` / `reg_uses_software` registered
+  `status: planned` (supplement + loader land in Phase 1, per invariant 3).

@@ -243,6 +243,17 @@ node_classifications:
     prov_type:  Entity
     note:       "File delivered via MFTS agent (fmSubPathId); job input dependency."
 
+  # — Software registry (plan 07, gated 2026-07-07) —
+  - label:      Vendor
+    class:      "org:Organization"
+    prov_type:  Agent
+    note:       "Third-party software company/brand ONLY (ADR 0004). Ids shared with drydocs-icons manifest. Phase 1 supplement TBD."
+
+  - label:      SoftwareProduct
+    class:      "dd:SoftwareProduct"
+    prov_type:  Entity
+    note:       "What a Vendor ships (Control-M, Neo4j, Oracle DB). role attribute (orchestrator|data-platform|graph-platform|tool) absorbs the Tier-1/Tier-2 split. Phase 1 supplement TBD."
+
   # — Context graph (SOSA/SSN, EXPERIMENTAL / early adoption) ————————————————
   # SOSA/SSN is a W3C standard but NOT a declared *company* standard. These
   # classes are seeded only by the opt-in sosa_experimental_supplement.cypher
@@ -1013,6 +1024,40 @@ local_relationships:
     supplement:   catalog_ontology_supplement.cypher
     loader:       ~
     domain:       architecture
+    status:       planned
+
+  # ── Software registry (plan 07, gate-confirmed 2026-07-07) ───────────────
+
+  - id:           reg_made_by
+    neo4j_label:  MADE_BY
+    role:         ~
+    from_node:    SoftwareProduct
+    to_node:      Vendor
+    prov_maps_to: "prov:wasAttributedTo"
+    note: >
+      SoftwareProduct (Entity) → Vendor (Agent). Matrix row: Entity → Agent =
+      wasAttributedTo; domain label kept (ADR 0004). Supplement + loader land
+      in plan-07 Phase 1.
+    supplement:   ~
+    loader:       ~
+    domain:       registry
+    status:       planned
+
+  - id:           reg_uses_software
+    neo4j_label:  USES_SOFTWARE
+    role:         ~
+    from_node:    Application
+    to_node:      SoftwareProduct
+    prov_maps_to: ~
+    note: >
+      Application (Agent) → SoftwareProduct (Entity). LOCAL domain edge — PROV
+      has no Agent → Entity usage row (prov:used is Activity → Entity); same
+      precedent as arch_contains. Edge properties: version, source, status.
+      Derived candidates come from CMD_LINE invocation patterns (plan-07
+      Phase 3), never base ingest. Supplement + loader land in Phase 1.
+    supplement:   ~
+    loader:       ~
+    domain:       registry
     status:       planned
 
   # ── Cross-domain provenance ───────────────────────────────────────────────

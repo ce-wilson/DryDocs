@@ -133,12 +133,12 @@ Snowflake gets a row when it stops being a future.
 
 ## Phases
 
-- **Phase 0 — ADR 0004 + vocabulary gate.** One short ADR fixing the words:
-  Vendor = brand; SoftwareProduct with `role` attribute; trust-axis prose stops
-  saying "vendor's words" (the manifests' VERBATIM/GROUNDED/SYNTHESIZED tiers
-  already carry that meaning); Tier-2 heading stays but is documented as a role
-  value. Register `Vendor`/`SoftwareProduct`/`USES_SOFTWARE`/`MADE_BY` in
-  `relationship_vocabulary.yaml` as `status: planned` → HITL gate.
+- **Phase 0 — ADR 0004 + vocabulary gate. ✅ DONE 2026-07-07** (gate record in
+  `config/gate-log.md`): ADR 0004 ACCEPTED (5× Confirm, 0 edits); `Vendor` =
+  `org:Organization` (Agent), `SoftwareProduct` = `dd:SoftwareProduct`
+  (Entity); `MADE_BY` → `prov:wasAttributedTo`; `USES_SOFTWARE` local edge —
+  all registered `status: planned` in `relationship_vocabulary.yaml`
+  (`reg_made_by` / `reg_uses_software`). Phases 1 and 2 are ungated.
 - **Phase 1 — registry seed + loader.** `software-registry.yaml` with DryDocs'
   own stack (~10 rows); schema unit test (like `test_backlog`/classification);
   small loader MERGEs `(:Vendor)`, `(:SoftwareProduct)-[:MADE_BY]->(:Vendor)`,
