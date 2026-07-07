@@ -136,6 +136,27 @@ PROCEDURE:
       On company main it stays RED until the stub is filled via 03-hitl-sme-flow.md —
       that red test IS the sync signal. Sequence producer-first.
 
+16. DOCMETA — DOCUMENT INGESTION (PLAN ONLY for now; MIXED stream when it ships).
+    Today only docs port (clean-adds, untouched): knowledge/upgrade-plans/docmeta-component.md,
+    docs/reviews/doc-knowledge-ingestion-review.md, the git-readme.md heads-up bullet, and the
+    IDEAS.md T1–T4 capture lines. When the component SHIPS (plan §6 becomes the authority):
+    - Clean-adds: drydocs/docmeta/** (pipeline/registry/cleaner/tokenizer/manifest/chunker/
+      curation/freshness + connector INTERFACES), config/doc-source-registry.yaml +
+      tests/unit/test_doc_registry.py, the `docmeta` COMPONENT_GROUP in
+      test_module_boundary.py + MODULE_MAP.md row, the drydocs_docs provisioning delta.
+    - Canonical-COMPANY (back-flow rule, step 10 applies): your wired Confluence connector
+      internals (toby/confluence.exe), real space keys/site ids, real curation_owner SIDs,
+      any registry entries carrying internal coordinates. If your side still runs the old
+      drydocs.scrapers package, keep your connector internals inside the producer's docmeta
+      structure, then retire drydocs.scrapers once Track 1 is green.
+    - COMPANY MUST SUPPLEMENT (cannot be built producer-side): vendor fetches blocked by
+      bot-protection (documents.bmc.com 403 — complete the XML-definition acquisition stub
+      from the company network or local .dtd files), Graph API app registration for
+      SharePoint/Teams, mailbox access for email, the multi-DB Enterprise Neo4j target
+      (G7), and all SME curation (producer content arrives unapproved).
+    - Acceptance: Track 1 = docmeta unit tests pass with no network/credentials (connector
+      stubs SKIP, not fail); Track 2 = docs-fetch/docs-load run clean against real sources.
+
 ACCEPTANCE GATE (behavior is the contract, not a byte-compare):
 - Track 1 (portable, no production sample present):
     poetry run pytest tests/unit/test_variable_classifier.py tests/unit/test_variable_resolver.py \

@@ -71,6 +71,15 @@ What diverges, by stream:
   render `backlog.yaml` (now **schema v2**) into `docs/plan/board.html`; plus the `groom-backlog` skill and
   a new `tests/unit/test_backlog.py` schema guard. All **clean-adds** — take FROM this repo. `plan_board`
   is its own `plan` component group in the boundary guard (imports core only).
+- **`drydocs-docmeta` document ingestion (PLANNED — heads-up, not yet built).** A document-
+  ingestion component (vendor docs + internal guidance + SME context → `drydocs_docs` /
+  `drydocs_context`) is planned in
+  [`knowledge/upgrade-plans/docmeta-component.md`](knowledge/upgrade-plans/docmeta-component.md).
+  When it lands it is a **mixed** stream: pipeline/registry/tests are clean-adds; the working
+  Confluence connector wiring is **Canonical-COMPANY** (same rule as `drydocs-review`); and the
+  company side must **supplement** vendor fetches blocked producer-side (documents.bmc.com 403),
+  T4 connector credentials (Graph API, mailbox, Toby), and the multi-DB Neo4j target. Full
+  disposition table + two-track acceptance oracle: plan §6.
 - **`seal_app_ref` attribution (Epic K) — back-flow-origin, check before taking wholesale.** Additive
   `status: planned`/`proposed` entries in `drydocs/ontology/relationship_vocabulary.yaml` +
   `config/taxonomy-ontology-map.yaml` (both normally Canonical-here). It was **groomed from company
