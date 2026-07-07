@@ -26,6 +26,48 @@ Tags help grooming: `idea` · `bug` · `doc` · `source` (new data source) · `q
 
 <!-- add new ideas at the top -->
 
+- 2026-07-07 — [idea] Third-party software registry ("TechStack"): Vendor → SoftwareProduct →
+  `(:Application)-[:USES_SOFTWARE {version}]->()` — answers "which apps use Ab Initio / Oracle 19"
+  and gives Oracle/Neo4j the classification BMC already has. Kills the `vendor-bmc` tooling id
+  (→ `bmc-docs`) and reduces "vendor" to one meaning (brand). Modeled on the internal software
+  library's Vendor/Product/status/version-status shape; `APPL_TYPE` (AIAWSWLK = Ab Initio)
+  already feeds Phase 3. Plan: `07-software-registry.md`. Phase 0 = ADR 0004 + vocab gate.
+- 2026-07-06 — [idea] **`drydocs-docmeta` component plan written** — full plan in
+  `knowledge/upgrade-plans/docmeta-component.md`: component boundary (new `docmeta`
+  COMPONENT_GROUP, imports core only, CLI via entrypoint exemption), config
+  `doc-source-registry.yaml` + test guard, `drydocs_docs` DB + composite delta, phases
+  P0 (benchmark) → P7 (T4 connectors), Port A inventory (bkup scraper → producer:
+  carry cleaner/tokenizer/manifest, adapt registry/confluence-interface, drop migrate),
+  Port B git-readme §6 (clean-adds / Canonical-COMPANY connector wiring / company
+  supplements: blocked vendor fetches, Graph-API creds, Enterprise multi-DB target).
+  Heads-up bullet added to git-readme.md. Groom phases P1–P3 to backlog after the P0
+  benchmark verdict; ADR 0004 is the P1 gate output. Supersedes/absorbs the four
+  T1–T4 lines below into a sequenced plan.
+- 2026-07-06 — [idea] **T1 — vendor-doc KG traversal benchmark:** load ONE external vendor
+  corpus (BMC Control-M — manifest + trust tiers already exist) into a local, throwaway
+  Document→Chunk→Entity Neo4j graph (patterns from the mirrored `llm-graph-builder`; the
+  graphrag upgrade plan's "no documents to chunk" skip is obsolete for this corpus). Benchmark
+  agent retrieval — graph traversal vs manifest-routed markdown reading vs plain vector RAG —
+  on a fixed support-question set (accuracy / latency / tokens). Only SYNTHESIZED-labeled
+  chunks may carry inference; VERBATIM/GROUNDED cite the source URL. Outcome decides how big
+  the doc-ingestion module gets. (Full review: `docs/reviews/doc-knowledge-ingestion-review.md`.)
+- 2026-07-06 — [source] **T2 — internal platform guidance ingestion:** bring
+  `knowledge/standards/{technology,business,data}/` into the software KG through the curation
+  gate (SME-confirmed only). Frontmatter already binds each standard to `taxonomy_path` /
+  `governs` / `applies_to_source` — those become the graph link keys. (same review)
+- 2026-07-06 — [source] **T3 — internal product/agile/software guidance:** `docs/Product/`,
+  SDLC docs, and the unmanaged root-level strays (PDFs/images) — classify, manifest, then
+  ingest via the same pipeline. Prereq: a doc-source registry (documents get the
+  `source-registry.yaml` treatment: classification + connector + trust default + `refresh:`
+  policy, test-enforced); port the DryDocs-bkup scraper provenance machinery (sha256,
+  token-count, curation_status ladder) into a single `drydocs-docmeta` component — one module
+  for external AND internal, split lives in config not code. (same review)
+- 2026-07-06 — [source] **T4 — SME business-application context:** Confluence (bkup scraper
+  exists) → SharePoint/Teams (Graph API) → email connectors, landing in the EXISTING
+  `drydocs_context` DB (Internal-Confidential, unverified-by-default, survives core rebuilds;
+  promotion via the G5 gate path). Raw content stays `internal/`/gitignored; cross-link to
+  business applications via the G1 proxy-node keys. Software KG target = new `drydocs_docs`
+  DB in the composite (local now; live rides G7). (same review)
 - 2026-07-05 — [idea] Provenance diet + source audit fields: Oracle-loaded Control-M shows
   generated-by/run-timestamp edges outnumbering the true domain relationships (full-refresh
   `WAS_GENERATED_BY` → `:JobRun` supernode, persona review Issue 3). Rework the time series to
