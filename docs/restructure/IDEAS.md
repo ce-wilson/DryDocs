@@ -30,8 +30,9 @@ Tags help grooming: `idea` · `bug` · `doc` · `source` (new data source) · `q
   `(:Application)-[:USES_SOFTWARE {version}]->()` — answers "which apps use Ab Initio / Oracle 19"
   and gives Oracle/Neo4j the classification BMC already has. Kills the `vendor-bmc` tooling id
   (→ `bmc-docs`) and reduces "vendor" to one meaning (brand). Modeled on the internal software
-  library's Vendor/Product/status/version-status shape; `APPL_TYPE` (AIAWSWLK = Ab Initio)
-  already feeds Phase 3. Plan: `07-software-registry.md`. Phase 0 = ADR 0004 + vocab gate.
+  library's Vendor/Product/status/version-status shape; Phase 3 derives edges from CMD_LINE via
+  the command parser (`APPL_TYPE` = dead-end per SME — Ab Initio/Informatica run as OS cmds,
+  job types under-used). Plan: `07-software-registry.md`. Phase 0 = ADR 0004 + vocab gate.
 - 2026-07-06 — [idea] **`drydocs-docmeta` component plan written** — full plan in
   `knowledge/upgrade-plans/docmeta-component.md`: component boundary (new `docmeta`
   COMPONENT_GROUP, imports core only, CLI via entrypoint exemption), config

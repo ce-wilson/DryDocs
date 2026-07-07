@@ -88,12 +88,19 @@ products:
     type: commercial
 ```
 
-## What already feeds it (no new extraction needed for Phase 3)
+## What already feeds it
 
-- `CM_DEF_VJOB.APPL_TYPE` (`OS` / `FileWatch` / `AIAWSWLK` / …) — `AIAWSWLK`
-  *is* the Ab Initio marker; job → APPL_TYPE → product, job → folder →
-  application gives derived `USES_SOFTWARE` candidates from data already in
-  staging.
+- `CM_DEF_VJOB.APPL_TYPE` — **dead-end for product derivation** (SME,
+  2026-07-07): Ab Initio / Informatica workloads run as plain OS *commands*,
+  so the Control-M job/application types are not used to their full potential
+  and don't reflect the actual software. Do not build the mapping on
+  `APPL_TYPE`; at best it contributes a weak secondary signal
+  (`AIAWSWLK`-typed jobs exist but are the exception, not the census).
+- **`CMD_LINE` is the real signal.** The Phase C command/script parser
+  (`drydocs/controlm/commands.py` → typed `STG_INVOCATION` rows) already
+  decomposes `CMD_LINE`; product detection = an invocation-pattern table
+  (e.g. Ab Initio `air`/`m_run`-style launchers, Informatica `pmcmd`) keyed to
+  registry ids. Harder than a column read, but it measures what actually runs.
 - `:Application` nodes already exist keyed on `seal_id` (constraint
   `application_seal`).
 - `drydocs-icons/manifest.json` ids double as `Vendor.id` — the brand axis is
@@ -119,11 +126,12 @@ products:
   `bmc-docs` across review-labels.yaml, `config/gate-prompts/`, `graph-tests/`,
   the four unit tests, docs. Baseline-grep → rename → re-grep → tests
   (JobFolder-rename playbook). Icons directory untouched (Brands).
-- **Phase 3 — derived app→software edges.** Map `APPL_TYPE` values →
-  product ids (small table inside the registry yaml, HITL-confirmed); derive
-  `(:Application)-[:USES_SOFTWARE {source:'controlm-appl-type'}]->()` for apps
-  whose jobs carry the marker. DERIVED edges, gate before load — never base
-  ingest.
+- **Phase 3 — derived app→software edges from `CMD_LINE`.** An
+  invocation-pattern → product-id table (inside the registry yaml,
+  HITL-confirmed) applied over the command parser's `STG_INVOCATION` output;
+  derive `(:Application)-[:USES_SOFTWARE {source:'controlm-cmdline'}]->()`.
+  `APPL_TYPE` is explicitly NOT the basis (dead-end, see above). DERIVED
+  edges, gate before load — never base ingest.
 - **Phase 4 — company-side catalog ingest (optional, company repo).** The
   internal software library exports; ingest as an `internal/` source with its
   statuses (approved/version-allowed/governed-by) as properties. Producer keeps
@@ -141,8 +149,10 @@ products:
 
 ## Risks / open questions
 
-- `APPL_TYPE` coverage: how many APPL_TYPE values map cleanly to products?
-  (Expect OS to be "not a product" — the mapping table needs an `ignore` list.)
+- Invocation-pattern coverage: wrapper scripts hide the real launcher
+  (`run_all.sh` telling us nothing) — expect a long tail the pattern table
+  can't classify; report unclassified invocations as a coverage metric rather
+  than guessing.
 - DryDocs-as-Application: needs its own node id producer-side (no SEAL there);
   use a reserved id, company side reconciles to the real SEAL.
 - The `bmc-docs` rename touches the drydocs-review back-flow surface — company
