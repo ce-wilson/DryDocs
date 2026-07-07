@@ -43,7 +43,10 @@ gate — out of scope for G1.
 
 ## Validation status
 
-Scripts authored and self-consistent. **Live validation pending** a Neo4j Enterprise
-instance (Docker not available in the authoring environment) — run `provision.ps1`
-against a local Enterprise and confirm the smoke returns without error to close G1's
-acceptance.
+**Live-validated 2026-07-07** against a local Docker Enterprise instance
+(`neo4j:5.26-enterprise-ubi10`): 01 → 02 (×3) → smoke all succeeded; smoke returned
+`0 / 0 / 0` on the fresh topology and `SHOW DATABASES` shows all four DryDocs
+databases online. This closes G1's acceptance.
+
+Note: nothing runs this at container startup — provisioning is a deliberate one-time
+step after the DBMS is up (re-runnable safely thanks to `IF NOT EXISTS`).
