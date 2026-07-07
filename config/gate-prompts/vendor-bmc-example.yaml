@@ -10,6 +10,21 @@ summary: >
   Loads the Control-M folder → job → condition skeleton from the vendor-BMC baseline
   export. This is a generic, publishable example of a gate page; no internal data is
   in scope. No graph write happens until the mappings below are confirmed.
+meta:
+  Module: "drydocs-core"
+  Source: "vendor-BMC baseline export (synthesized example corpus)"
+  Software: "controlm (Control-M) MADE_BY bmc — config/taxonomy/software-registry.yaml"
+  Registry ref: "controlm-psgmgr — confirmed (config/source-registry.yaml)"
+  Classification: "Internal-Public (example — no internal data in scope)"
+provenance:
+  - label: ":ControlMFolder"
+    source_object: "folder export record"
+    key: "folder_id"
+    loader: "controlm_folders"
+    properties:
+      - {name: folder_id, origin: source, from: "folder id field"}
+      - {name: name, origin: source, from: "folder name field"}
+      - {name: app_code, origin: derived, from: "name positional parse", note: "example of an inferred property — always badge DERIVED"}
 sections:
   - title: "A. Scope confirmation"
     confirmations:

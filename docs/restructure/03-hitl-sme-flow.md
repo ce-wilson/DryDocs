@@ -59,6 +59,30 @@ Every gate run appends a short log (date, items confirmed/edited/rejected, your 
 rejections) to the mapping file's history or a sibling `config/gate-log.md`, so the evolution of
 the model is reviewable later.
 
+## Gate-page format (STANDARD — all gate reviews follow this)
+
+Every gate review page is rendered by `drydocs/gate_pages.py` from a spec in
+`config/gate-prompts/` and follows the same four-part structure (established by
+`controlm-q1q3-phase1`, SME-accepted 2026-07-07; enforced by `tests/unit/test_gate_pages.py`):
+
+1. **Meta header card** — the review's coordinates, always including: `Module`, `Source`
+   (system/path, no vendor prose — cite `config/taxonomy/software-registry.yaml` ids per
+   ADR 0004), `Registry ref` (the `config/source-registry.yaml` id + confirmation state),
+   and `Classification`. Add `Taxonomy` / `Ontology map` / `Source of record` refs when the
+   gate binds a mapping.
+2. **Mini-ER overview** — source element → graph target → edge, one row per mapping;
+   anything not yet gated/loaded is tagged `[PROPOSED]`.
+3. **Property provenance** — per label, every property badged **SOURCE** (straight column)
+   or **DERIVED** (with the derivation rule), so the SME always sees what came from the
+   source versus what DryDocs inferred. Scope filters and proposed normalizations are
+   DERIVED rows with notes.
+4. **Confirmations** — the tick-through sections; the last confirmation is always "safe to
+   transcribe into `config/gate-log.md`".
+
+Committed specs are **mechanism-only** (column names and rules — never real folder names,
+SIDs, or data values); pages for real PAT/SEAL steps render from a gitignored twin. Rendered
+HTML goes to a gitignored dir (`internal-local/gate-pages/`), never the repo.
+
 ## Promotion: `drydocs_context` → `drydocs` (trust axis = DB boundary)
 
 The multi-DB topology (ADR 0002) keeps **uncertain** context (`drydocs-deepdoc` output, stamped

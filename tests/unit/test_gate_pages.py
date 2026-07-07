@@ -99,6 +99,21 @@ def test_provenance_rejects_bad_origin() -> None:
         spec_from_dict(bad)
 
 
+def test_all_committed_specs_follow_the_standard_format() -> None:
+    """Every gate spec follows 03-hitl-sme-flow.md §Gate-page format: meta header
+    (Module/Source/Registry ref/Classification) + provenance with the source-vs-derived split."""
+    specs = sorted(DEFAULT_GATE_PROMPTS_DIR.glob("*.yaml"))
+    assert specs, "no committed gate specs found"
+    required_meta = {"Module", "Source", "Registry ref", "Classification"}
+    for path in specs:
+        spec = load_gate_spec(path)
+        meta_keys = {k for k, _ in spec.meta}
+        assert required_meta <= meta_keys, f"{path.name}: meta missing {required_meta - meta_keys}"
+        assert spec.provenance, f"{path.name}: no provenance blocks (source-vs-derived split)"
+        origins = {p.origin for b in spec.provenance for p in b.properties}
+        assert origins <= {"source", "derived"}, f"{path.name}: bad origins {origins}"
+
+
 def test_committed_q1q3_spec_loads_and_renders() -> None:
     spec = load_gate_spec(DEFAULT_GATE_PROMPTS_DIR / "controlm-q1q3-phase1.yaml")
     assert spec.classification == "Internal-Public"
