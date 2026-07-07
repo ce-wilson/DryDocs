@@ -37,6 +37,25 @@ mappings:
     confirmed_by: "(seed)"
     confirmed_on: 2026-06-09
 
+  # ---- 2026-07-07 gate: Q1–Q3 resolutions (controlm-q1q3-phase1) ------------
+  - id: application-contains-folder
+    taxonomy:
+      source: controlm-psgmgr
+      element: "Control-M APPLICATION groups folders (CM_DEF_VJOB.APPLICATION — NOT the business application)"
+    ontology:
+      from_node: ControlMApplication            # prov:Collection (new label, this gate)
+      to_node: ControlMFolder                   # prov:Collection
+      prov_type_from: Collection
+      prov_type_to: Collection
+      matrix_row: "Collection → any = prov:hadMember"
+      neo4j_label: CONTAINS_FOLDER
+      prov_maps_to: "prov:hadMember"
+    precedence_authority: bmc-baseline
+    reuses_vocab: m3_contains_folder (planned)
+    status: confirmed                           # applied only when the loader extension lands
+    confirmed_by: SME
+    confirmed_on: 2026-07-07
+
   # ---- C1: Control-M edges (reuse ACTIVE vocabulary terms — batch-confirm) --
   # Source taxonomy: config/taxonomy/controlm.yaml. Each reuses an existing
   # `status: active` entry in relationship_vocabulary.yaml (the mature M3 model),

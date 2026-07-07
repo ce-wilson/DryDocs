@@ -64,3 +64,28 @@ records the date, the item, confirmed / edited / rejected counts, and reasons fo
 - **Effect:** plan-07 Phases 1 (registry seed + loader) and 2 (`bmc-docs` rename) are
   **ungated**. Vocabulary entries `reg_made_by` / `reg_uses_software` registered
   `status: planned` (supplement + loader land in Phase 1, per invariant 3).
+
+## 2026-07-07 — Control-M Q1–Q3 resolutions + phase-1 load scope (controlm-q1q3-phase1)
+- **Presented:** 15 confirmations across 4 sections (gate page
+  `config/gate-prompts/controlm-q1q3-phase1.yaml`, first use of the meta + provenance
+  source-vs-derived renderer). **SME accepted the page in full** (chad.wilson).
+- **Confirmed: 15 · Edited: 0 · Rejected: 0.** Key decisions:
+  - **Q1 joins:** conditions (LNKI/LNKO) + SETVAR extracts join `CM_DEF_VJOB` in SQL
+    (current-version guaranteed in-extract); folder header rows = `JOB_ID=1` / SMART Table.
+    Two-pass load: pass 1 = folder+job nodes, pass 2 = dependencies via recursive
+    in/out-condition query.
+  - **Q2 audit envelope:** `CREATION_USER/CREATION_DATE` + `CHANGE_USERID/CHANGE_DATE`;
+    `VERSION_USER/VERSION_TIMESTAMP` duplicate the CHANGE pair — excluded. `USER`=`USER_ID`.
+    Trailing-'p' SID strip approved as a *derived* property. `IS_CURRENT_VERSION` needs a
+    domain-value probe before it stays a hard filter (legacy-folder caveat).
+  - **Q3 labels:** two-labels-per-folder-row confirmed (`ControlMFolder` + one
+    `ControlMServer` per unique `DATA_CENTER`). **New label `ControlMApplication:Collection`**
+    (Control-M grouping ≠ business `:Application`); **new edge `CONTAINS_FOLDER`** registered
+    `m3_contains_folder status: planned`; map entry `application-contains-folder` confirmed.
+    Variables stay staging-only (node-vs-property deferred).
+  - **Phase-1 scope:** initial load = active folders only (`USER_DAILY IS NOT NULL`) as a
+    readability choice, NOT semantics (manual-order/-PRPL folders run in production; support
+    ownership = escalation-DB rule). `CTLM_ID` (`TABLE_ID||'.'||JOB_ID`) approved as derived
+    identity alongside the `(folder_id, job_id)` key. `MEMNAME` demoted to informational.
+- **Effect:** loader changes (VJOB joins, audit-envelope projection, ControlMApplication
+  MERGE) are ungated; 06a updated with the resolutions.

@@ -427,6 +427,24 @@ local_relationships:
     domain:       controlm
     status:       active
 
+  - id:           m3_contains_folder
+    neo4j_label:  CONTAINS_FOLDER
+    role:         ~
+    from_node:    ControlMApplication
+    to_node:      ControlMFolder
+    prov_maps_to: "prov:hadMember"
+    note: >
+      ControlMApplication (prov:Collection — the Control-M APPLICATION grouping from
+      CM_DEF_VJOB, deliberately NOT the business :Application / SEAL concept) contains
+      ControlMFolder (prov:Collection). Matrix row: Collection → any = HAD_MEMBER;
+      symmetric with CONTAINS_JOB one level down. SME gate 2026-07-07
+      (controlm-q1q3-phase1; config/gate-log.md). Planned until the controlm_jobs
+      loader extension MERGEs the application nodes.
+    supplement:   ~
+    loader:       ~
+    domain:       controlm
+    status:       planned
+
   - id:           m3_requires_in_condition
     neo4j_label:  REQUIRES_IN_CONDITION
     role:         ~

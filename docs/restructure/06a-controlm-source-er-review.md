@@ -139,3 +139,31 @@ replication time — never authorship.
 - **Q3 — labels.** Confirm the two-labels-per-folder-row pattern
   (`ControlMFolder` + `ControlMServer` from `DATA_CENTER`) and whether
   variables should become nodes or stay properties/staging.
+
+## SME resolutions (2026-07-07 — gate `controlm-q1q3-phase1`, see `config/gate-log.md`)
+
+- **Q1 — RESOLVED: join in SQL.** Conditions and SETVAR extracts join `CM_DEF_VJOB`
+  in the extract (current-version guaranteed there, not at graph load). Folder-scope
+  header rows are `JOB_ID = 1` / `TASK_TYPE = SMART Table` (the folder itself).
+  Load is two-pass: pass 1 = folder + job nodes in one extract; pass 2 = dependencies
+  from a recursive in/out-condition query.
+- **Q2 — RESOLVED: envelope = CREATION_* + CHANGE_*.** `VERSION_USER`/`VERSION_TIMESTAMP`
+  duplicate `CHANGE_USERID`/`CHANGE_DATE` on the current version — excluded from the
+  envelope. `USER`/`USER_ID` column-name variants are the same field. Derived
+  `employee_sid` = `*_USER` minus the trailing `p` (kept distinct from the raw column).
+  ⚠ `IS_CURRENT_VERSION` is unreliable across legacy vs new folders — domain-value
+  probe required before it remains a hard filter.
+- **Q3 — RESOLVED: labels confirmed; one addition.** Two-labels-per-folder-row stands.
+  New: `:ControlMApplication:Collection` (from `CM_DEF_VJOB.APPLICATION` — the Control-M
+  grouping, deliberately not the business `:Application`/SEAL concept) with
+  `(:ControlMApplication)-[:CONTAINS_FOLDER]->(:ControlMFolder)` (`m3_contains_folder`,
+  planned). Variables stay staging-only; node-vs-property deferred.
+- **Identity:** `ctlm_id` = `TABLE_ID || '.' || JOB_ID` approved as a *derived* property
+  alongside the `(folder_id, job_id)` node key. `MEMNAME` is demoted to informational —
+  may duplicate `JOB_NAME` or hold junk; never a key or join (`cm_avg_run.JOB_MEM_NAME`
+  joins on `JOB_NAME`).
+- **Phase-1 scope:** initial load = `USER_DAILY IS NOT NULL` folders only, recorded as a
+  **readability choice, not semantics** — `USER_DAILY` is a mutable scheduling mode
+  (manual ↔ scheduled); manual-order folders (incl. parallel-run copies) run in
+  production, and support ownership comes from the escalation-DB rule, never the name
+  or this column. The review module decides retention of manual-order folders later.
