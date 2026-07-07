@@ -63,30 +63,52 @@ statuses, the get-request metadata, real app→software mappings) are
 company-side data — `internal/` twin or company repo only, like the `ccb-`
 convention.
 
+**Field set (SME, 2026-07-07, from the company catalog export):** keep
+**product name, publisher, publisherURL, category, version-if-known** — and
+nothing else. The export's other columns (owner names/SIDs, `gspcId`,
+`sealId`, evaluation decisions, support/EOL dates) are company governance
+data: Internal/Internal-Confidential, Phase-4 material only, never in the
+producer registry.
+
 ```yaml
 # config/taxonomy/software-registry.yaml  (shape sketch)
 schema: drydocs.software-registry.v1
 classification: Internal-Public          # producer copy: DryDocs' own stack only
 vendors:
-  - id: bmc            # matches drydocs-icons manifest id
-    name: BMC Software
+  - id: neo4j          # matches drydocs-icons manifest id
+    name: Neo4j
+    publisher_url: https://neo4j.com/
 products:
-  - id: controlm
-    vendor: bmc
-    name: Control-M
-    role: orchestrator
-    type: commercial
   - id: neo4j
     vendor: neo4j
     name: Neo4j
+    category: DBMS — Graph Database
     role: graph-platform
-    type: commercial   # EE via Docker; community edition open-source
-  - id: oracle-db
-    vendor: oracle
-    name: Oracle Database
-    role: data-platform
-    type: commercial
+    type: commercial            # EE via Docker; community edition open-source
+    versions: ["5.x"]           # known-in-use, refine when verifiable
 ```
+
+## Base list (Phase 1 seed — cherry-picked 2026-07-07)
+
+From the catalog screenshots + what DryDocs/the batch estate demonstrably use.
+One vendor search returns ~300 catalog rows (Bloom → drivers → utilities) —
+the registry deliberately takes the handful that matter and skips the long
+tail (drivers/utilities are dependencies, not products we track):
+
+| Vendor | Product | Category | URL | Version (if known) |
+|---|---|---|---|---|
+| Neo4j | Neo4j | DBMS — Graph Database | neo4j.com | 5.x (EE via local Docker; catalog shows a 5.19–5.26 window) |
+| Neo4j | Neo4j Bloom | BI — Graph Analytics/Visualization | neo4j.com | 2.x (catalog; separate product, kept because we have it) |
+| BMC Software | Control-M | Workload Automation | bmc.com | **9.0.21.300** (company runtime — known) |
+| Oracle | Oracle Database | DBMS — Relational | oracle.com | 19c (company `psgmgr` host — VERIFY) |
+| Python Software Foundation | Python | Language Runtime | python.org | 3.11+ (3.13 in local use) |
+| Ab Initio Software | Ab Initio (Co>Operating System) | Data Integration (ETL) | abinitio.com | unknown — Phase 3 detection target |
+| Informatica | PowerCenter | Data Integration (ETL) | informatica.com | unknown — Phase 3 detection target (`pmcmd`) |
+
+Ab Initio and Informatica earn rows *before* any `USES_SOFTWARE` edges exist —
+Phase 3's invocation-pattern table needs product ids to point at. Drivers,
+Cypher Shell, Helm charts, `neovis.js` etc. stay out (dependency tail).
+Snowflake gets a row when it stops being a future.
 
 ## What already feeds it
 
@@ -132,11 +154,13 @@ products:
   derive `(:Application)-[:USES_SOFTWARE {source:'controlm-cmdline'}]->()`.
   `APPL_TYPE` is explicitly NOT the basis (dead-end, see above). DERIVED
   edges, gate before load — never base ingest.
-- **Phase 4 — company-side catalog ingest (optional, company repo).** The
-  internal software library exports; ingest as an `internal/` source with its
-  statuses (approved/version-allowed/governed-by) as properties. Producer keeps
-  only the schema slot. This is where "which apps are on Oracle **19**" gets
-  real version data; producer-side the version stays an edge property.
+- **Phase 4 — company-side catalog ingest: DEFERRED until necessary (SME,
+  2026-07-07).** The catalog is noisy at product grain (~300 rows per vendor
+  search: product + drivers + utilities + every minor version as a row), and
+  wholesale ingest buys nothing the four kept fields don't already give.
+  Revisit only when a real query needs the governance statuses
+  (approved/version-allowed/EOL dates) — then it's an `internal/` source,
+  owner SIDs and `gspcId`/`sealId` included, never producer-side.
 
 ## Deliberately NOT doing (KISS)
 
