@@ -41,6 +41,15 @@ manifest + `JOB_DEVELOPER_VIEW`). Ad-hoc probes: `sql/adhoc/`.
    disambiguate downstream.
 6. **`developer_sid` semantics.** Control-M SIDs start with a lowercase letter; a
    SID ending in lowercase `p` is the automation **release process**, not a person.
+   `AUTHOR` on `CM_DEF_VJOB` is the Control-M team's Functional ID, not an
+   individual editor (SME clarification, ADR-06 review).
+7. **Audit columns are gated — don't project them ad hoc.**
+   `CREATION_USER`/`CREATION_DATE`/`CHANGE_USERID`/`CHANGE_DATE` are deliberately
+   filter-only in today's extracts. Promoting them to graph properties is the
+   HITL-gated audit-envelope plan
+   (`docs/restructure/06-provenance-source-audit-fields.md`, Phase 0/1) — the
+   per-source column→envelope mapping needs the SME gate first, because the
+   columns' semantics differ (author ≠ creator ≠ last editor).
 
 ## §INCREMENTAL — watermark load
 
@@ -92,11 +101,16 @@ predicate — see the query cookbook's history note.
 
 ## §GRAPH — where rows land
 
-Loaders map staging rows to the DryDocs ontology: folders → `:ControlMFolder`
-nodes (renamed from `:JobFolder`, ADR 0003 — the naming drift is resolved),
-jobs → job nodes; SETVAR → variable properties/nodes;
-in/out conditions → the derived **`:WAS_INFORMED_BY`** edge (job B ⟶ job A on
-shared condition name; vocab `m3_was_informed_by` — the older `DEPENDS_ON` name
-is retired). New
-relationship types go through `docs/RELATIONSHIP_GUIDE.md` + the HITL gate — never
-invent an edge type inside a loader.
+Loaders map staging rows to the DryDocs ontology. Folders MERGE **two nodes**
+per row: `:ControlMFolder` (renamed from `:JobFolder`, ADR 0003) plus a
+`:ControlMServer` from `DATA_CENTER`, linked by `SCHEDULED_ON`. Jobs →
+`:ControlMJob` under `CONTAINS_JOB`; in/out conditions → `:Condition` via
+`REQUIRES_IN_CONDITION` / `EMITS_OUT_CONDITION`, and the derived
+**`:WAS_INFORMED_BY`** edge (job B ⟶ job A on shared condition name; vocab
+`m3_was_informed_by` — the older `DEPENDS_ON` name is retired). SETVAR is
+**staging-only** today — its graph representation (nodes vs properties) is an
+open design decision; don't assume a variable node exists. The extract-level ER
+(tables, joins, audit columns, label map) is drawn in
+`docs/restructure/06a-controlm-source-er-review.md`. New relationship types go
+through `docs/RELATIONSHIP_GUIDE.md` + the HITL gate — never invent an edge type
+inside a loader.
