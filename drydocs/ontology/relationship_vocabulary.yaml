@@ -151,6 +151,18 @@ node_classifications:
     class:      "prov:SoftwareAgent"
     prov_type:  Agent
     note:       "SEAL-registered application. seal_ontology_supplement.cypher."
+    proposed_reclass: >
+      GATE-BOUND PROPOSAL (2026-07-08 review, NOT applied): reclass to class "prov:Entity" /
+      "dprod:DataProduct", prov_type Entity. Rationale: this node currently carries three
+      incompatible PROV types at once — SoftwareAgent (here), dprod:Port children (Entity
+      semantics, seal_has_port), and org:Membership/org:Role role-holders (Organization
+      semantics, seal_has_membership/seal_of_role/seal_held_by — see their own
+      proposed_deprecation notes below). A SEAL application is a data-product/asset record,
+      not an Agent and not an Organization. See config/taxonomy-ontology-map.yaml
+      #application-as-dataproduct and config/gate-prompts/seal-tom-attribution-reshape.yaml.
+      DO NOT flip `class`/`prov_type` above until the SME confirms — active loaders,
+      seal_has_port/seal_has_membership/seal_of_role/seal_held_by (status: active), and the
+      drift guard all depend on the CURRENT SoftwareAgent typing.
 
   - label:      Employee
     class:      "prov:Agent"
@@ -175,6 +187,43 @@ node_classifications:
     class:      "dprod:Port"
     prov_type:  Entity
     note:       "Data port (EventProcessing / BatchProcessing). dprod namespace is the EKGF working default pending the corporate IRI."
+
+  # — SEAL reshape (PROPOSED, GATE-BOUND — 2026-07-08 review, no supplement/loader exist) —
+  # These three node classes exist ONLY so the proposed edges below (seal_had_primary_source /
+  # seal_app_attributed_to_employee / seal_qualified_attribution / seal_attribution_has_agent /
+  # seal_attribution_had_role) type-check under the PROV matrix once confirmed. Nothing here is
+  # active. See config/taxonomy-ontology-map.yaml and config/gate-prompts/
+  # seal-tom-attribution-reshape.yaml.
+  - label:      Document
+    class:      "prov:Entity"
+    prov_type:  Entity
+    note: >
+      PROPOSED (not yet built): a scraped SEAL/PAT source page — the future drydocs-docmeta
+      component (planned; see knowledge/upgrade-plans/docmeta-component.md). Registered here
+      only so prov:hadPrimarySource (seal_had_primary_source) type-checks Entity -> Entity.
+      No supplement/loader exists yet; do not treat as active until docmeta itself is built
+      and separately gated.
+
+  - label:      Attribution
+    class:      "prov:Attribution"
+    prov_type:  n/a
+    note: >
+      PROPOSED: reified n-ary node for the SEAL Technical Operating Model (TOM)
+      qualified-attribution pattern — Application -[:QUALIFIED_ATTRIBUTION]-> Attribution
+      -[:HAS_AGENT]-> Employee, Attribution -[:HAD_ROLE]-> TOMRole. Same pattern family as
+      org:Membership (n-ary relation node, not itself a PROV participant — prov:Attribution
+      rdfs:subClassOf prov:Influence). No supplement/loader exists yet.
+
+  - label:      TOMRole
+    class:      "skos:Concept"
+    prov_type:  n/a
+    note: >
+      PROPOSED: SEAL Technical Operating Model role vocabulary — a shared skos:Concept scheme
+      (skos:ConceptScheme) with 6 concepts: cto, application_owner, information_owner,
+      data_owner, operate_manager, risk_compliance_officer. DISTINCT from :Role (org:Role,
+      used for the PAT product hierarchy only, e.g. catalog_dev_team_has_membership) — do not
+      conflate the two. Reached via Attribution -[:HAD_ROLE]-> TOMRole (prov:hadRole). No
+      supplement/loader exists yet.
 
   # — Catalog (active) —
   - label:      CatalogLOB
@@ -761,6 +810,14 @@ local_relationships:
       Application has a role-holder membership record. Maps to
       org:hasMembership. Membership nodes carry valid_from/valid_to
       for temporal role tracking.
+    proposed_deprecation: >
+      GATE-BOUND PROPOSAL (2026-07-08 review, NOT applied): deprecate in favor of the SEAL TOM
+      qualified-attribution pattern (seal_qualified_attribution / seal_attribution_has_agent /
+      seal_attribution_had_role, all status: planned). org:Membership/org:Role is the wrong
+      pattern for SEAL's Technical Operating Model role-holders (a governance model DISTINCT
+      from real organizations); org: stays for the PAT product hierarchy only (e.g.
+      catalog_dev_team_has_membership). Status stays `active` here until the SME confirms —
+      see config/gate-prompts/seal-tom-attribution-reshape.yaml.
     supplement:   seal_ontology_supplement.cypher
     loader:       seal_applications.cypher
     domain:       seal
@@ -775,6 +832,11 @@ local_relationships:
     note: >
       Membership is for a specific named role. Maps to org:role property
       in the W3C ORG ontology.
+    proposed_deprecation: >
+      GATE-BOUND PROPOSAL (2026-07-08 review, NOT applied): deprecate alongside seal_has_membership
+      / seal_held_by — same TOM-vs-PAT reasoning (see seal_has_membership's proposed_deprecation
+      note). Replacement: Attribution -[:HAD_ROLE]-> TOMRole (seal_attribution_had_role, planned).
+      Status stays `active` here until the SME confirms.
     supplement:   seal_ontology_supplement.cypher
     loader:       seal_applications.cypher
     domain:       seal
@@ -790,10 +852,111 @@ local_relationships:
       Membership is held by an employee. Inverse of org:member /
       org:hasMember. Direction chosen so the membership record is the
       natural starting point for role queries.
+    proposed_deprecation: >
+      GATE-BOUND PROPOSAL (2026-07-08 review, NOT applied): deprecate alongside seal_has_membership
+      / seal_of_role — same TOM-vs-PAT reasoning (see seal_has_membership's proposed_deprecation
+      note). Replacement: Attribution -[:HAS_AGENT]-> Employee (seal_attribution_has_agent,
+      planned), reached via Application -[:QUALIFIED_ATTRIBUTION]-> Attribution. Status stays
+      `active` here until the SME confirms.
     supplement:   seal_ontology_supplement.cypher
     loader:       seal_applications.cypher
     domain:       seal
     status:       active
+
+  # ── SEAL — PROPOSED reshape (GATE-BOUND, 2026-07-08 review) ────────────────
+  # Nothing below is active. The :Application node stays classed prov:SoftwareAgent (see
+  # node_classifications) until the SME confirms; these entries exist ONLY so the proposed
+  # edges type-check under the PROV matrix once that reclass is confirmed. All carry
+  # supplement: ~ / loader: ~ on purpose — no supplement/loader claims for a planned-only
+  # proposal. See config/taxonomy-ontology-map.yaml (application-as-dataproduct,
+  # seal-tom-attribution, seal-doc-source-of-record) and
+  # config/gate-prompts/seal-tom-attribution-reshape.yaml.
+
+  - id:           seal_had_primary_source
+    neo4j_label:  HAD_PRIMARY_SOURCE
+    role:         ~
+    from_node:    Application
+    to_node:      Document
+    prov_maps_to: "prov:hadPrimarySource"
+    note: >
+      PROPOSED. Entity -> Entity, a sub-property of prov:wasDerivedFrom: the Application
+      record (once reclassed prov:Entity/dprod:DataProduct — see node_classifications
+      proposed_reclass) was primarily sourced from a scraped SEAL/PAT Document. Generalizes
+      to any fact/entity extracted from a scraped page, not just Application; Application is
+      the concrete instance in scope for this gate. Requires the future drydocs-docmeta
+      component (Document node, loader) — see knowledge/upgrade-plans/docmeta-component.md.
+      Matrix row: Entity -> Entity = prov:wasDerivedFrom family.
+    supplement:   ~
+    loader:       ~
+    domain:       seal
+    status:       planned
+
+  - id:           seal_app_attributed_to_employee
+    neo4j_label:  WAS_ATTRIBUTED_TO
+    role:         tom_role_holder
+    from_node:    Application
+    to_node:      Employee
+    prov_maps_to: "prov:wasAttributedTo"
+    note: >
+      PROPOSED. Simple/collapsed form of the TOM attribution pattern (matrix row Entity ->
+      Agent = wasAttributedTo). Coexists with the qualified/reified form below
+      (seal_qualified_attribution / seal_attribution_has_agent / seal_attribution_had_role),
+      which carries the specific TOM role. role=tom_role_holder distinguishes this instance
+      from arch_owns_code (role=owner) and reg_made_by on the same WAS_ATTRIBUTED_TO label.
+      Depends on the proposed :Application reclass (SoftwareAgent -> Entity) — does NOT
+      type-check under the CURRENT active classification.
+    supplement:   ~
+    loader:       ~
+    domain:       seal
+    status:       planned
+
+  - id:           seal_qualified_attribution
+    neo4j_label:  QUALIFIED_ATTRIBUTION
+    role:         ~
+    from_node:    Application
+    to_node:      Attribution
+    prov_maps_to: "prov:qualifiedAttribution"
+    note: >
+      PROPOSED. Reified/n-ary form of the TOM attribution pattern (same family as
+      org:Membership — Attribution is a PROV Influence node, not itself Activity / Entity /
+      Agent / Collection, so no matrix row applies directly). Entry point to Attribution
+      -[:HAS_AGENT]-> Employee and Attribution -[:HAD_ROLE]-> TOMRole below. Depends on the
+      proposed :Application reclass.
+    supplement:   ~
+    loader:       ~
+    domain:       seal
+    status:       planned
+
+  - id:           seal_attribution_has_agent
+    neo4j_label:  HAS_AGENT
+    role:         ~
+    from_node:    Attribution
+    to_node:      Employee
+    prov_maps_to: "prov:agent"
+    note: >
+      PROPOSED. prov:agent inside the qualified-attribution reification — names which
+      Employee the Attribution is about. No independent matrix row (Attribution is prov_type
+      n/a, same family as seal_held_by's org:member inverse).
+    supplement:   ~
+    loader:       ~
+    domain:       seal
+    status:       planned
+
+  - id:           seal_attribution_had_role
+    neo4j_label:  HAD_ROLE
+    role:         ~
+    from_node:    Attribution
+    to_node:      TOMRole
+    prov_maps_to: "prov:hadRole"
+    note: >
+      PROPOSED. prov:hadRole inside the qualified-attribution reification — names which TOM
+      role (cto | application_owner | information_owner | data_owner | operate_manager |
+      risk_compliance_officer) the Attribution is about. TOMRole is a skos:Concept, DISTINCT
+      from :Role (org:Role, PAT hierarchy only) — see node_classifications.
+    supplement:   ~
+    loader:       ~
+    domain:       seal
+    status:       planned
 
   # ── Catalog ──────────────────────────────────────────────────────────────
 

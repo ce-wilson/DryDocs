@@ -54,3 +54,36 @@ active:
   bmc-baseline: true
   internal-standards: true
   lob-product-team: true
+
+# =============================================================================
+# PROPOSED addition (GATE-BOUND, 2026-07-08 review) — NOT part of the live chain above.
+# drydocs/precedence.py#PrecedenceResolver reads ONLY `order:` / `active:` / `conflict_policy:`
+# above; this block is a separate top-level key and is therefore INERT to the resolver — adding
+# it here does not change is_active()/rank() for bmc-baseline / internal-standards /
+# lob-product-team, and does not affect tests/unit/test_precedence.py. Wiring this into the live
+# `order:`/`active:` chain (with an explicit `authority:` number) is a SEPARATE, later step, done
+# only after the SME confirms at the gate.
+# =============================================================================
+proposed_additions:
+  - id: seal-pat-source-of-record
+    role: internal-source-of-record
+    governs: [internal-product-identity, internal-business-identity, application-fact-provenance]
+    source: "drydocs-docmeta scraped SEAL/PAT corpus (planned component; see knowledge/upgrade-plans/docmeta-component.md)"
+    rationale: >
+      PROPOSED 2026-07-08 review: register SEAL/PAT scraped documentation as the authoritative
+      source for internal product/business IDENTITY — when a scraped SEAL/PAT fact conflicts
+      with the catalog/PAT taxonomy on what an internal application/product IS (not who owns
+      it), SEAL/PAT wins once this is activated. Distinct from, and narrower than,
+      lob-product-team (which governs ownership/business-context, not fact identity). This is
+      one of two linked source-of-record mechanisms — the other is `prov:hadPrimarySource` on
+      every extracted fact (see config/taxonomy-ontology-map.yaml#seal-doc-source-of-record and
+      drydocs/ontology/relationship_vocabulary.yaml#seal_had_primary_source, both
+      status: planned/proposed).
+    status: proposed
+    gate_prompt: config/gate-prompts/seal-tom-attribution-reshape.yaml
+    activation_note: >
+      NOT wired into the live `order:`/`active:` chain the resolver reads. Activating this
+      authority is a separate, later change: append an entry to `order:` above with an explicit
+      `authority:` number (placement relative to the existing 3 authorities is itself an open
+      question for the SME) and add it to `active:` — only after gate confirmation, never as a
+      side effect of confirming this proposed_additions block alone.

@@ -25,6 +25,42 @@ This plan covers **two ports**:
 
 ---
 
+> **Callout — SEAL/PAT docs as source of record + the SEAL entity reshape they drive**
+> **(2026-07-08 review; GATE-BOUND — nothing applied, edge-meaning goes through the HITL gate).**
+>
+> **Documentation treatment (the source-of-record question).** Each scraped SEAL/PAT page is a
+> `Document` Entity (`prov:Entity`; Document→Chunk with the sha256 / token-count / `curation_status`
+> envelope), classified Internal / Internal-Confidential → `drydocs_context`; raw text stays under
+> `internal/`. Trust axis: VERBATIM (scraped text) / GROUNDED (extractions that cite the page) /
+> SYNTHESIZED (inference only). **"Source of record" is two mechanisms:** (1) register SEAL/PAT as the
+> authoritative source in `config/precedence.yaml` (they win internal product/business conflicts);
+> (2) every fact/record extracted from a page carries **`prov:hadPrimarySource → (that Document)`** —
+> `Entity→Entity`, a sub-property of `prov:wasDerivedFrom`. Promotion context → ground-truth (`drydocs`)
+> only via the **G5 gate** (a gate-confirmed write, never an in-place cross-DB edit).
+>
+> **The `:Application` reshape this feeds (fixes a real typing muddle).** The node is currently
+> `prov:SoftwareAgent` yet also carries `dprod` ports (→ Entity), `org:Membership → org:Role`
+> (→ Organization), and the proposed K1/K2 `wasAssociatedWith` (→ Agent) — three incompatible types.
+> Because `hadPrimarySource` is `Entity→Entity`, an extracted app record MUST be an Entity — which is
+> also *correct*: a SEAL application is a **data-product / asset (`prov:Entity` / `dprod:DataProduct`)**,
+> not an Agent and not an Organization. Its **Technical-Operating-Model** role-holders (CTO, application
+> owner, information owner, data owner, operate manager, risk & compliance officer — a governance model
+> DISTINCT from the PAT product org) are **attribution on the asset**:
+> `Application —prov:qualifiedAttribution→ (:Attribution){ prov:agent → Employee, prov:hadRole → Role }`,
+> the TOM roles a shared `skos:Concept` vocabulary. `org:Membership`/`org:Role` stays for the **PAT
+> hierarchy only** (DevTeam etc. — real organizations); the bug was reusing PAT's `org:` pattern for
+> SEAL's TOM. Deprecate `seal_has_membership`/`seal_of_role`/`seal_held_by`; keep `seal_has_port`.
+> **K1/K2** (`job —wasAssociatedWith→ Application`, needs Agent) must be re-shaped to an attribution/
+> domain edge to the app-as-Entity — still `proposed`, so resolve it there.
+>
+> **Process (ontology-mapper via the gate):** deprecate the three `seal_*` membership terms; register
+> `prov:hadPrimarySource` + `prov:wasAttributedTo`/`qualifiedAttribution` (+ `prov:hadRole`) + the TOM
+> Role vocab as `status: planned`; flip the `:Application` node class (`SoftwareAgent` → `Entity`/
+> `DataProduct`); re-open the K2 job→app mapping; log in `config/gate-log.md`. Nothing applied until
+> SME-confirmed. Also flagged for the port in `git-readme.md`.
+
+---
+
 ## 1. Component identity and boundary
 
 ### 1.1 `docmeta` vs the reserved `drydocs-deepdoc` (decision for the gate)

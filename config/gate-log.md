@@ -89,3 +89,49 @@ records the date, the item, confirmed / edited / rejected counts, and reasons fo
     identity alongside the `(folder_id, job_id)` key. `MEMNAME` demoted to informational.
 - **Effect:** loader changes (VJOB joins, audit-envelope projection, ControlMApplication
   MERGE) are ungated; 06a updated with the resolutions.
+
+## 2026-07-08 — SEAL ontology reshape + scraped-docs source-of-record (GATE-BOUND, PENDING)
+- **Presented:** draft only — the `ontology-mapper` has drafted the proposal per the 2026-07-08
+  review write-ups (`knowledge/upgrade-plans/docmeta-component.md` top callout, `git-readme.md`
+  heads-up bullet, `docs/restructure/IDEAS.md` 2026-07-08 [question] entry). The gate page
+  (`config/gate-prompts/seal-tom-attribution-reshape.yaml`, 7 sections A–G) has NOT yet been
+  reviewed by an SME. **STATUS: PENDING SME CONFIRMATION.**
+- **Items drafted (all `status: proposed` / `status: planned` — nothing applied, nothing
+  active flipped):**
+  - **(a)** `:Application` node reclass: `prov:SoftwareAgent` → `prov:Entity`/`dprod:DataProduct`
+    — recorded as `proposed_reclass` note on `relationship_vocabulary.yaml#node_classifications
+    #Application`; the live `class`/`prov_type` fields are untouched (still SoftwareAgent/Agent).
+  - **(b)** SEAL Technical Operating Model (TOM) role-holders (cto, application_owner,
+    information_owner, data_owner, operate_manager, risk_compliance_officer) re-shaped as
+    attribution on the asset: `prov:wasAttributedTo` (simple) + `prov:qualifiedAttribution` +
+    `prov:agent` + `prov:hadRole` (reified) against a new `TOMRole` (`skos:Concept`) vocabulary,
+    distinct from `:Role` (`org:Role`, PAT hierarchy only). New `status: planned` vocabulary
+    entries: `seal_had_primary_source`, `seal_app_attributed_to_employee`,
+    `seal_qualified_attribution`, `seal_attribution_has_agent`, `seal_attribution_had_role`; new
+    `node_classifications` entries `Document`, `Attribution`, `TOMRole`.
+  - **(c)** Proposed deprecation of `seal_has_membership` / `seal_of_role` / `seal_held_by`
+    (org:Membership/org:Role pattern) — recorded as `proposed_deprecation` notes; all three stay
+    `status: active`. `seal_has_port` (dprod) explicitly KEPT, untouched.
+  - **(d)** `prov:hadPrimarySource` (Entity→Entity, sub-property of `wasDerivedFrom`) registered
+    for scraped SEAL/PAT page → extracted fact provenance (depends on the future
+    `drydocs-docmeta` component, not yet built).
+  - **(e)** SEAL/PAT proposed as the source-of-record authority for internal product/business
+    identity — recorded in `config/precedence.yaml#proposed_additions` as a documented block
+    OUTSIDE the live `order:`/`active:` chain the resolver reads; no ranking/activation change.
+  - **(f)** K1/K2 (`job-seal-app-ref` / `m3_seal_app_ref`, `job —wasAssociatedWith→ Application`)
+    re-opened: annotated with a `type_conflict_note` (wasAssociatedWith requires an Agent target;
+    no longer type-checks once (a) is confirmed) and a `proposed_reshape` (two undecided
+    candidates: `USED` vs. a local domain edge) — kept `status: proposed`.
+- **New map entries (`config/taxonomy-ontology-map.yaml`, all `status: proposed`):**
+  `application-as-dataproduct`, `seal-tom-attribution`, `seal-doc-source-of-record`. Summary
+  counts updated: `proposed: 3 → 6`; `applied`/`confirmed`/`rejected` untouched.
+- **Verification:** no `status: active`/`confirmed` entry was flipped in either
+  `relationship_vocabulary.yaml` or `config/taxonomy-ontology-map.yaml`; every new vocabulary
+  entry carries `supplement: ~` / `loader: ~` (no supplement/loader claims for a planned-only
+  proposal — the drift guard `test_vocabulary_active_entries_declared_in_supplements` only checks
+  `status: active` entries, so it is unaffected); `config/precedence.yaml`'s live `order:`/
+  `active:` block (read by `PrecedenceResolver`) is unchanged — the new authority lives in a
+  separate `proposed_additions` key the resolver never reads.
+- **Next step:** an SME must review `config/gate-prompts/seal-tom-attribution-reshape.yaml`
+  (sections A–G) and record Confirm / edit / reject per item. Nothing here is confirmed until
+  that review happens and this entry is updated (or a follow-up entry added) with the outcome.

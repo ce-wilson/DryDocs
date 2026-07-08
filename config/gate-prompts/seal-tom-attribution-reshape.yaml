@@ -1,0 +1,123 @@
+# SME gate-prompt spec — SEAL ontology reshape + scraped-docs source-of-record (2026-07-08 review).
+# GATE-BOUND: this page proposes six linked confirmations. NOTHING here is applied — no
+# relationship_vocabulary.yaml status flips (the :Application node stays prov:SoftwareAgent,
+# seal_has_membership/seal_of_role/seal_held_by stay status: active), no
+# taxonomy-ontology-map.yaml status flips to confirmed, no config/precedence.yaml order:/active:
+# change, no graph write. Mechanism-only: no real SEAL ids, app names, employee names, or job
+# names. classification: Internal-Public.
+classification: Internal-Public
+schema: drydocs.gate-prompt.v1
+id: seal-tom-attribution-reshape
+title: "SME Gate — SEAL ontology reshape + scraped-docs source-of-record"
+step: "Pre-activation gate for the 2026-07-08 review — resolves the :Application typing conflict before any of it is built"
+summary: >
+  The :Application node currently carries three incompatible PROV types at once: prov:SoftwareAgent
+  (node_classifications), dprod:Port children (Entity semantics, seal_has_port), and org:Membership
+  /org:Role role-holders (Organization semantics, seal_has_membership/seal_of_role/seal_held_by).
+  This page proposes: (a) reclass :Application to prov:Entity/dprod:DataProduct; (b) replace the
+  SEAL Technical Operating Model (TOM) role-holders with prov:qualifiedAttribution + prov:hadRole
+  against a shared skos:Concept role vocabulary, instead of org:Membership/org:Role (which stays for
+  the PAT product hierarchy only); (c) deprecate seal_has_membership/seal_of_role/seal_held_by
+  (seal_has_port is KEPT); (d) register prov:hadPrimarySource so every fact extracted from a scraped
+  SEAL/PAT page cites its source Document; (e) register SEAL/PAT as the proposed precedence
+  authority for internal product/business identity; (f) re-open K2 (job->Application) since
+  wasAssociatedWith requires an Agent target and no longer type-checks once (a) is confirmed. No
+  graph write happens until every confirmation below is ticked and logged to config/gate-log.md.
+meta:
+  Module: "drydocs-core (ontology) · drydocs-docmeta (planned, not yet built)"
+  Source: "SEAL/PAT scraped documentation corpus (planned drydocs-docmeta component) + the existing SEAL/PAT extract (seal-extract, config/taxonomy/business-application.yaml) already loaded via seal_ontology_supplement.cypher"
+  Registry ref: "config/source-registry.yaml — seal-extract (existing, confirmed); the future docmeta scrape source (seal-pat-scrape) is NOT yet registered — see open question in section D"
+  Classification: "Internal-Public (this page, mechanism only) · underlying SEAL/PAT extract data is Internal / Internal-Confidential (real SEAL ids, app names, employee names never appear here)"
+  Taxonomy: "config/taxonomy/business-application.yaml (Application, key SEALID)"
+  Ontology map: "config/taxonomy-ontology-map.yaml #application-as-dataproduct / #seal-tom-attribution / #seal-doc-source-of-record (all status: proposed) + drydocs/ontology/relationship_vocabulary.yaml (Application proposed_reclass note; seal_had_primary_source / seal_app_attributed_to_employee / seal_qualified_attribution / seal_attribution_has_agent / seal_attribution_had_role, all status: planned)"
+  Source of record: "knowledge/upgrade-plans/docmeta-component.md (top callout) · git-readme.md (heads-up bullet) · docs/restructure/IDEAS.md 2026-07-08 [question] entry · config/precedence.yaml proposed_additions#seal-pat-source-of-record"
+
+mapping:
+  - n: 1
+    element: ":Application node class — CURRENT: prov:SoftwareAgent"
+    target: "prov:Entity / dprod:DataProduct"
+    edge: "node reclassification, not an edge  [PROPOSED — not a matrix row]"
+  - n: 2
+    element: "TOM role-holder attribution (simple form) — replaces the CURRENT seal_has_membership/seal_of_role/seal_held_by path"
+    target: "(:Application)-[:WAS_ATTRIBUTED_TO {role: tom_role_holder}]->(:Employee)"
+    edge: "matrix row Entity -> Agent = prov:wasAttributedTo  [PROPOSED]"
+  - n: 3
+    element: "TOM role-holder attribution (qualified/reified form — carries the specific role)"
+    target: "(:Application)-[:QUALIFIED_ATTRIBUTION]->(:Attribution)-[:HAS_AGENT]->(:Employee) ; (:Attribution)-[:HAD_ROLE]->(:TOMRole)"
+    edge: "prov:qualifiedAttribution / prov:agent / prov:hadRole  [PROPOSED]"
+  - n: 4
+    element: "TOM role vocabulary: cto, application_owner, information_owner, data_owner, operate_manager, risk_compliance_officer"
+    target: ":TOMRole {skos:Concept} in a shared skos:ConceptScheme — DISTINCT from :Role (org:Role, PAT hierarchy only)"
+    edge: "reached via (:Attribution)-[:HAD_ROLE]->(:TOMRole)  [PROPOSED]"
+  - n: 5
+    element: "Scraped SEAL/PAT page fact/record provenance"
+    target: ":Document {…} (prov:Entity — future drydocs-docmeta component, not yet built)"
+    edge: "(:Application)-[:HAD_PRIMARY_SOURCE]->(:Document)  [PROPOSED — prov:hadPrimarySource, sub-property of wasDerivedFrom]"
+  - n: 6
+    element: "K1/K2 job->Application attribution — CURRENT: (:ControlMJob)-[:WAS_ASSOCIATED_WITH {role: seal_app_ref}]->(:Application), requires Agent target"
+    target: "re-shape target: candidate (a) USED (Activity->Entity) or (b) a local domain edge (prov_maps_to: ~)"
+    edge: "NOT decided — flagged for this gate, see section F  [PROPOSED — re-open, still status: proposed either way]"
+
+provenance:
+  - label: "node_classifications#Application (relationship_vocabulary.yaml)"
+    source_object: "SEAL/PAT extract (seal-extract) + the 2026-07-08 review write-up"
+    key: "label: Application"
+    loader: "~ (node classification metadata, not a loader)"
+    properties:
+      - {name: current_class, origin: source, from: "relationship_vocabulary.yaml node_classifications (as-shipped, status: active)", note: "prov:SoftwareAgent — unchanged by this page alone"}
+      - {name: proposed_class, origin: derived, from: "2026-07-08 review rationale (three-incompatible-types conflict)", note: "prov:Entity / dprod:DataProduct — proposed only"}
+      - {name: proposed_prov_type, origin: derived, from: "PROV matrix fit given the three existing edge families on this node", note: "Entity"}
+  - label: "(:Application)-[:QUALIFIED_ATTRIBUTION]->(:Attribution)"
+    source_object: "seal-extract Technical Operating Model role-holder fields (mechanism only — no real role-holder data in scope here)"
+    key: "Application.seal_id (existing key) ; Attribution has no independent business key, one per (Application, TOMRole) pair"
+    loader: "~ (none yet — proposal only, no loader exists)"
+    properties:
+      - {name: agent, origin: derived, from: "prov:agent — Attribution -[:HAS_AGENT]-> Employee", note: "which Employee the attribution names"}
+      - {name: had_role, origin: derived, from: "prov:hadRole — Attribution -[:HAD_ROLE]-> TOMRole", note: "which of the 6 TOM roles"}
+      - {name: tom_role_scope, origin: source, from: "SEAL Technical Operating Model field set: cto, application_owner, information_owner, data_owner, operate_manager, risk_compliance_officer", note: "fixed 6-concept vocabulary as currently understood; see open question in section B"}
+  - label: "(:Application)-[:HAD_PRIMARY_SOURCE]->(:Document)"
+    source_object: "planned drydocs-docmeta scrape corpus (not yet built)"
+    key: "Document.doc_id (URN, per knowledge/upgrade-plans/docmeta-component.md) ; Application.seal_id"
+    loader: "~ (none yet — depends on the docmeta component itself being built and separately gated)"
+    properties:
+      - {name: source_document, origin: derived, from: "prov:hadPrimarySource, sub-property of prov:wasDerivedFrom", note: "Entity -> Entity; requires Application to be an Entity, hence depends on mapping #1"}
+      - {name: trust_axis, origin: source, from: "Document/Chunk VERBATIM | GROUNDED | SYNTHESIZED classification (docmeta-component.md)", note: "carried on the Document/Chunk nodes themselves, out of scope for this edge"}
+
+sections:
+  - title: "A. Application node reclass — SoftwareAgent -> Entity/DataProduct"
+    confirmations:
+      - "The three-incompatible-types conflict is understood: :Application is currently prov:SoftwareAgent (Agent) yet also carries dprod:Port children (Entity semantics, seal_has_port) and org:Membership/org:Role role-holders (Organization semantics, seal_has_membership/seal_of_role/seal_held_by)."
+      - "Reclass :Application to prov:Entity / dprod:DataProduct is the correct fit: a SEAL application is a data-product/asset record, not an Agent and not an Organization."
+      - "This reclass is NOT applied by ticking this box — relationship_vocabulary.yaml#node_classifications#Application stays class: \"prov:SoftwareAgent\" (status quo) until an engineer flips it as a separate, logged follow-up after this gate."
+  - title: "B. TOM role-holder attribution — qualifiedAttribution + hadRole + the Role vocabulary"
+    confirmations:
+      - "TOM role-holders (cto, application_owner, information_owner, data_owner, operate_manager, risk_compliance_officer) are attribution ON the asset, not membership IN an organization — replace org:Membership/org:Role with prov:qualifiedAttribution + prov:hadRole for this concept only."
+      - "The simple form (:Application)-[:WAS_ATTRIBUTED_TO {role: tom_role_holder}]->(:Employee) and the qualified/reified form (:Application)-[:QUALIFIED_ATTRIBUTION]->(:Attribution)-[:HAS_AGENT]->(:Employee), (:Attribution)-[:HAD_ROLE]->(:TOMRole) are both reviewed and understood as coexisting (simple form for basic queries, qualified form for the specific role)."
+      - "TOMRole (skos:Concept, a shared skos:ConceptScheme with 6 concepts) is understood as DISTINCT from :Role (org:Role, used for the PAT product hierarchy only) — the two vocabularies are never conflated."
+      - "OPEN QUESTION FOR SME: are the 6 listed TOM roles exhaustive and stable, or should the skos:Concept scheme be modeled open-ended for future roles?"
+      - "OPEN QUESTION FOR SME: is the simple wasAttributedTo edge written alongside the qualified form on every load, or is only the qualified form loaded (simple form omitted, derivable by traversal)?"
+  - title: "C. Deprecate the three seal_* membership edges (seal_has_port is KEPT)"
+    confirmations:
+      - "seal_has_membership, seal_of_role, and seal_held_by (all currently status: active, org:Membership/org:Role pattern) are proposed for deprecation in favor of the qualifiedAttribution + hadRole pattern in section B."
+      - "seal_has_port (dprod:Port, structural — unrelated to the TOM role-holder question) is explicitly KEPT, not touched by this reshape."
+      - "Deprecation here means: relationship_vocabulary.yaml's proposed_deprecation notes on the three edges are reviewed and accepted as the plan, but status stays `active` in the vocabulary until the actual deprecation (RELATIONSHIP_GUIDE.md deprecation steps: status: deprecated + deprecated_at, remove from *-verify, leave data in graph) is done as a separate, logged follow-up."
+  - title: "D. Scraped-docs source-of-record — prov:hadPrimarySource + precedence authority"
+    confirmations:
+      - "Every fact/record extracted from a scraped SEAL/PAT page carries prov:hadPrimarySource (Entity -> Entity, sub-property of prov:wasDerivedFrom) back to the Document it was extracted from — which requires the Application node to be an Entity (depends on section A)."
+      - "SEAL/PAT is proposed as the authoritative source for internal product/business IDENTITY (config/precedence.yaml proposed_additions#seal-pat-source-of-record) — distinct from lob-product-team, which governs ownership/business-context, not identity. This proposed_additions block is documented only and is NOT wired into the live order:/active: chain the resolver reads; ticking this box does not change PrecedenceResolver behavior."
+      - "OPEN QUESTION FOR SME: the future drydocs-docmeta component (Document/Chunk nodes, scraper, source registration as seal-pat-scrape) does not exist yet — this section proposes the ontology mapping only; the component itself is a separate build + gate (see knowledge/upgrade-plans/docmeta-component.md)."
+  - title: "E. Cross-check — active edges that assume :Application is an Agent"
+    confirmations:
+      - "arch_develops / dev-team-develops-app (DevTeam -[:DEVELOPS]-> Application, Agent -> Agent local edge, no PROV matrix row in use) is flagged for SME awareness: reclassing Application to Entity turns this into an Agent -> Entity local edge, which still has no PROV matrix row either way, so this edge is NOT expected to break — but the SME should confirm it stays local/unmapped rather than silently reinterpreted."
+      - "No other CONFIRMED/ACTIVE edge in relationship_vocabulary.yaml targets :Application as an Agent besides the two just reviewed (arch_develops) and the K1/K2 edge covered in section F — reviewed and confirmed as the complete list for this gate."
+  - title: "F. K1/K2 re-shape — job->Application attribution"
+    confirmations:
+      - "The K1 mapping (job-seal-app-ref / m3_seal_app_ref) requires :Application to be a prov:Agent (matrix row Activity -> Agent = prov:wasAssociatedWith) — once section A is confirmed, this no longer type-checks and MUST be re-shaped, not carried forward as-is."
+      - "Two re-shape candidates are presented, NEITHER decided here: (a) (:ControlMJob)-[:USED]->(:Application) (matrix row Activity -> Entity = prov:used, role=seal_app_ref) if the job is read as consuming/referencing the app record; (b) a local domain edge (prov_maps_to: ~) analogous to arch_contains_batch / dev-team-develops-app, reading \"job belongs to this business application\" as containment/ownership rather than usage."
+      - "K2's existing open questions (match policy, zero-unmatched surfacing, multi-hit triage — see config/gate-prompts/seal-attribution-match-policy.yaml) are UNCHANGED and independent of this re-shape question; both must be resolved before the K2 loader is built."
+      - "OPEN QUESTION FOR SME: pick (a), (b), or a third alternative for the K2 re-shape — or defer the choice until section A is actually applied (i.e. confirm the re-shape is needed and in-scope, but leave the specific edge shape for a follow-up gate)."
+  - title: "G. Sign-off"
+    confirmations:
+      - "Sections A-F above are reviewed and the direction is correct, OR amended via explicit SME edits recorded in config/gate-log.md."
+      - "Nothing on this page is applied by ticking boxes here: relationship_vocabulary.yaml keeps :Application as prov:SoftwareAgent and seal_has_membership/seal_of_role/seal_held_by as status: active; config/taxonomy-ontology-map.yaml keeps application-as-dataproduct / seal-tom-attribution / seal-doc-source-of-record / job-seal-app-ref as status: proposed; config/precedence.yaml keeps the seal-pat-source-of-record entry out of the live order:/active: chain. Each of those flips is a SEPARATE, logged follow-up after this gate is signed off."
+      - "Safe to transcribe this decision into config/gate-log.md, and — only once transcribed — begin the separate follow-up work items (node reclass, new supplement blocks, deprecation of the three seal_* edges, K2 re-shape, precedence wiring) each as their own logged change."

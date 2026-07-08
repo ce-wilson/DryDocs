@@ -88,6 +88,23 @@ What diverges, by stream:
   `active`/`confirmed` (or has a live loader), that entry is a back-flow COLLISION — keep your active
   version, do not downgrade it to the producer's `planned` state.** Reconcile that entry per-item, not by
   blindly overwriting the file.
+- **SEAL entity reshape + scraped-docs source-of-record (2026-07-08 review — GATE-BOUND, inert until
+  SME-confirmed; do NOT take as applied).** Two linked decisions the `drydocs-docmeta` scrape drives —
+  full write-up in [`knowledge/upgrade-plans/docmeta-component.md`](knowledge/upgrade-plans/docmeta-component.md)
+  + IDEAS.md 2026-07-08. **(1) The `:Application` node is mis-typed.** It is `prov:SoftwareAgent` yet also
+  carries `dprod` ports (→ Entity), `org:Membership → org:Role` (→ Organization), and the K1/K2
+  `wasAssociatedWith` (→ Agent) — three incompatible types on one node. It should be a
+  **`prov:Entity` / `dprod:DataProduct`** (an asset/record). Its Technical-Operating-Model role-holders
+  (CTO, application owner, information owner, data owner, operate manager, risk & compliance officer — a
+  governance model **distinct from the PAT product org**) become **`prov:qualifiedAttribution` +
+  `prov:hadRole`** (Role = shared `skos:Concept` vocab), NOT `org:Membership` — which stays for the PAT
+  hierarchy ONLY. Deprecate `seal_has_membership`/`seal_of_role`/`seal_held_by`; keep `seal_has_port`.
+  **K1/K2 must be re-shaped** (they need Agent today) — still `proposed`, so fix it there. **(2) Scraped
+  SEAL/PAT pages are the source of record** via `config/precedence.yaml` authority + **`prov:hadPrimarySource`**
+  on every extracted fact (Entity→Entity — which is *why* the app record must be an Entity). **Port impact:**
+  if company `main` has already typed `:Application` as Agent or applied any `seal_*` membership edge, this
+  is a back-flow reconciliation to resolve at the gate — do not blind-overwrite in either direction. Route
+  via `ontology-mapper` + the HITL gate; log in `config/gate-log.md`.
 
 ---
 

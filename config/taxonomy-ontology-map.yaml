@@ -159,6 +159,124 @@ mappings:
       - "Match policy: is a one-to-one job-to-application match accepted as-is?"
       - "Zero-unmatched jobs — surfaced how, and to whom, before load?"
       - "Multi-hit matches (a job resolving to more than one candidate application) — deterministic triage/precedence rule, or gate-time SME call per case?"
+    type_conflict_note: >
+      2026-07-08 review: this mapping requires :Application to be a prov:Agent (matrix row
+      Activity -> Agent = prov:wasAssociatedWith). The proposed SEAL reshape
+      (application-as-dataproduct, this file) reclasses :Application to prov:Entity /
+      dprod:DataProduct, which no longer type-checks against wasAssociatedWith. If the reshape
+      is confirmed, this mapping must be RE-SHAPED, not carried forward as-is — see
+      proposed_reshape below. Still status: proposed; not resolved by this note.
+    proposed_reshape: >
+      Re-shape the job<->app link as an attribution/domain edge to the app-as-Entity instead of
+      wasAssociatedWith. Two candidates, NOT decided: (a) ControlMJob -[:USED]-> Application
+      (matrix row Activity -> Entity = prov:used, role=seal_app_ref) if the job is read as
+      consuming/referencing the app record; (b) a local domain edge (prov_maps_to: ~) analogous
+      to arch_contains_batch / dev-team-develops-app, since "job belongs to this business
+      application" reads closer to a containment/ownership fact than a used/consumed fact.
+      Flagged for the SME at the same gate that confirms application-as-dataproduct — see
+      config/gate-prompts/seal-tom-attribution-reshape.yaml section F (K2 re-shape).
+
+  # ---- SEAL ontology reshape — GATE-BOUND (2026-07-08 review) --------------
+  # Nothing in this block is applied. The :Application node stays classed prov:SoftwareAgent
+  # (status: active in relationship_vocabulary.yaml#node_classifications) until the SME
+  # confirms; see config/gate-prompts/seal-tom-attribution-reshape.yaml and the review
+  # write-ups (knowledge/upgrade-plans/docmeta-component.md, git-readme.md,
+  # docs/restructure/IDEAS.md 2026-07-08 [question] entry).
+
+  - id: application-as-dataproduct
+    taxonomy:
+      source: seal-extract
+      element: "BusinessApplication (SEAL-registered) is a data-product/asset record, not a software agent"
+    ontology:
+      from_node: Application               # CURRENT (active): prov:SoftwareAgent — see node_classifications
+      to_node: ~                            # node reclassification, not an edge
+      current_class: "prov:SoftwareAgent"
+      proposed_class: "prov:Entity / dprod:DataProduct"
+      prov_type_from: Agent
+      proposed_prov_type: Entity
+      matrix_row: "n/a — node reclassification, not a matrix edge"
+      rationale: >
+        :Application currently carries three incompatible PROV types on one node: SoftwareAgent
+        (node_classifications), dprod:Port children (Entity semantics, seal_has_port — active),
+        and org:Membership/org:Role role-holders (Organization semantics,
+        seal_has_membership/seal_of_role/seal_held_by — active, C2). A SEAL application is a
+        data-product/asset, not an Agent and not an Organization — prov:Entity / dprod:DataProduct
+        is the precise fit, and it is also the type prov:hadPrimarySource (Entity -> Entity)
+        requires of the source-of-record edge (seal-doc-source-of-record below).
+    precedence_authority: lob-product-team
+    standards_cited: ["PROV-O (prov:Entity)", "DPROD/EKGF (dprod:DataProduct)"]
+    reuses_vocab: "node_classifications#Application proposed_reclass (relationship_vocabulary.yaml)"
+    status: proposed
+    proposed_at: 2026-07-08
+    open_questions:
+      - "Reclassing :Application breaks the current Agent-target assumption used by both seal_app_attributed_to_employee's simple form and the K1/K2 job->app edge (m3_seal_app_ref / job-seal-app-ref) — both must be re-shaped in the same gate decision (see the type_conflict_note / proposed_reshape on job-seal-app-ref above)."
+      - "Any other edge that currently assumes :Application is an Agent (e.g. arch_develops DevTeam->Application / dev-team-develops-app, C3 — Agent->Agent local, no PROV row either way) needs a re-check once this reclass is confirmed — flagged for the SME, not resolved here; those edges are NOT expected to break (no PROV matrix row was in use), but the SME should confirm."
+
+  - id: seal-tom-attribution
+    taxonomy:
+      source: seal-extract
+      element: "SEAL Technical Operating Model (TOM) role-holders (cto, application_owner, information_owner, data_owner, operate_manager, risk_compliance_officer) attributed to the BusinessApplication asset"
+    ontology:
+      from_node: Application                # PROPOSED class: prov:Entity / dprod:DataProduct
+      to_node: Employee                      # prov:Agent
+      prov_type_from: Entity                 # after the proposed reclass
+      prov_type_to: Agent
+      matrix_row: "Entity -> Agent = prov:wasAttributedTo (simple form)"
+      neo4j_label: WAS_ATTRIBUTED_TO
+      role: tom_role_holder
+      prov_maps_to: "prov:wasAttributedTo"
+      qualified_form:
+        pattern: "Application -[:QUALIFIED_ATTRIBUTION]-> (:Attribution) -[:HAS_AGENT]-> Employee ; (:Attribution) -[:HAD_ROLE]-> TOMRole"
+        prov_maps_to: ["prov:qualifiedAttribution", "prov:agent", "prov:hadRole"]
+        role_vocabulary: "TOMRole (skos:Concept) — 6 concepts: cto, application_owner, information_owner, data_owner, operate_manager, risk_compliance_officer, in a shared skos:ConceptScheme. DISTINCT from :Role (org:Role, PAT hierarchy only)."
+      reuses_vocab: "seal_app_attributed_to_employee (planned) / seal_qualified_attribution (planned) / seal_attribution_has_agent (planned) / seal_attribution_had_role (planned)"
+    precedence_authority: lob-product-team
+    standards_cited: ["PROV-O (prov:wasAttributedTo, prov:qualifiedAttribution, prov:agent, prov:hadRole)", "SKOS (skos:Concept)"]
+    status: proposed
+    depends_on: application-as-dataproduct
+    proposed_at: 2026-07-08
+    note: >
+      Replaces org:Membership/org:Role for SEAL's TOM role-holders ONLY — org: stays for the PAT
+      product hierarchy (DevTeam etc., real organizations; catalog_dev_team_has_membership and the
+      C2 seal_* membership edges are a DIFFERENT governance concept mistakenly sharing the org:
+      pattern). Proposes deprecating seal_has_membership / seal_of_role / seal_held_by (currently
+      status: active — NOT flipped here; see their proposed_deprecation notes in
+      relationship_vocabulary.yaml). seal_has_port is KEPT (dprod:Port structural edge, unrelated
+      to this reshape).
+    open_questions:
+      - "Confirm the 6 TOM roles are exhaustive/stable, or if the SME wants the skos:Concept scheme open-ended for future roles."
+      - "Confirm whether the simple wasAttributedTo edge (role=tom_role_holder) is written alongside the qualified form on every load, or only the qualified form (simple form omitted) — affects loader design once this is confirmed."
+
+  - id: seal-doc-source-of-record
+    taxonomy:
+      source: seal-pat-scrape           # future drydocs-docmeta component source id — NOT yet registered in config/source-registry.yaml
+      element: "SEAL/PAT scraped documentation page is the source of record for an extracted Application fact/record"
+    ontology:
+      from_node: Application                # PROPOSED class: prov:Entity / dprod:DataProduct
+      to_node: Document                      # prov:Entity — scraped SEAL/PAT page (drydocs-docmeta, planned)
+      prov_type_from: Entity
+      prov_type_to: Entity
+      matrix_row: "Entity -> Entity = prov:wasDerivedFrom family (prov:hadPrimarySource is a sub-property)"
+      neo4j_label: HAD_PRIMARY_SOURCE
+      prov_maps_to: "prov:hadPrimarySource"
+      reuses_vocab: "seal_had_primary_source (planned)"
+    precedence_authority: lob-product-team    # SEAL/PAT proposed as the authority for internal product/business identity — see config/precedence.yaml `proposed_additions` block
+    standards_cited: ["PROV-O (prov:hadPrimarySource, sub-property of prov:wasDerivedFrom)"]
+    status: proposed
+    depends_on: application-as-dataproduct
+    proposed_at: 2026-07-08
+    source_of_record_mechanism: >
+      Two linked mechanisms, both proposed: (1) register SEAL/PAT as the authoritative
+      precedence source for internal product/business identity in config/precedence.yaml (a
+      documented proposed_additions entry, NOT wired into the live order:/active: chain — see
+      that file); (2) every fact/record extracted from a scraped page carries this
+      hadPrimarySource edge back to the Document it was extracted from. Trust axis
+      (VERBATIM/GROUNDED/SYNTHESIZED) and classification (Internal / Internal-Confidential) are
+      carried on the Document/Chunk nodes themselves, per
+      knowledge/upgrade-plans/docmeta-component.md — out of scope for this entry.
+    open_questions:
+      - "The drydocs-docmeta component (Document/Chunk nodes, scraper, loader) does not exist yet — this mapping type-checks against the PROPOSED node_classifications entries only (Application reclass + the new Document classification); it cannot be loaded until docmeta itself is built and separately gated."
+      - "Does every extracted Application fact get its own hadPrimarySource edge (fact-level granularity), or one edge per Application node against its primary source page (node-level granularity)? Affects loader design once docmeta lands."
 
   # ---- Example: a PROPOSED mapping awaiting the SME gate -------------------
   - id: oracle-schema-asset
@@ -441,5 +559,5 @@ mappings:
 summary:
   applied: 1          # job-contains
   confirmed: 14       # C1 (4) + C2 (4) + C3 (6: 4 hierarchy + SUPPORTS→AreaProduct + DEVELOPS→app)
-  proposed: 3         # job-seal-app-ref, oracle-schema-asset, jobrun-observation
+  proposed: 6         # job-seal-app-ref, oracle-schema-asset, jobrun-observation, application-as-dataproduct, seal-tom-attribution, seal-doc-source-of-record
   rejected: 0

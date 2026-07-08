@@ -26,6 +26,28 @@ Tags help grooming: `idea` · `bug` · `doc` · `source` (new data source) · `q
 
 <!-- add new ideas at the top -->
 
+- 2026-07-08 — [question] **SEAL ontology reshape + scraped-docs source-of-record (GATE-BOUND).**
+  `:Application` is mis-typed `prov:SoftwareAgent` but also carries `dprod` ports (Entity),
+  `org:Membership→org:Role` (Organization), and K1/K2 `wasAssociatedWith` (Agent) — 3 incompatible
+  types. Reshape: `:Application` → **`prov:Entity`/`dprod:DataProduct`**; its Technical-Operating-Model
+  governance roles (CTO / application-owner / information-owner / data-owner / operate-manager /
+  risk-compliance — DISTINCT from the PAT product org) → **`prov:qualifiedAttribution`+`prov:hadRole`**
+  (Role = shared skos vocab), NOT `org:Membership` (keep `org:` for the PAT hierarchy only); deprecate
+  `seal_has_membership`/`seal_of_role`/`seal_held_by`, keep `seal_has_port`. Scraped SEAL/PAT pages =
+  source of record via `config/precedence.yaml` authority + **`prov:hadPrimarySource`** on extracted
+  facts (Entity→Entity — the reason the app record must be an Entity); pages land as `Document` entities
+  in `drydocs_context` (VERBATIM/GROUNDED/SYNTHESIZED trust). K1/K2 job→app needs re-shaping (needs Agent
+  today, still `proposed`). Route: `ontology-mapper` → HITL gate; register hadPrimarySource / wasAttributedTo
+  / qualifiedAttribution(+hadRole) + TOM Role vocab as `planned`, flip the `:Application` node class, re-open
+  K2, log `gate-log.md`. Full write-ups: `knowledge/upgrade-plans/docmeta-component.md` + `git-readme.md`.
+- 2026-07-08 — [bug] **Design-doc HTML render — Chrome vs Brave.** Chrome did NOT render the
+  L3 output as a full page; **Brave (latest — brave.com/latest) rendered it correctly**. Seen on
+  `docs/design/controlm-ingestion-tdd.html`. Investigate the Chrome discrepancy (likely a CSS /
+  print-view / `file://` quirk, not the markup — anchors + tables validated fine). Brave is the
+  reference VIEWER; L4's headless PDF uses **Edge/Chrome** — Brave's background services HANG
+  headless `--print-to-pdf` on this box (confirmed 2026-07-08, 2× 180s timeouts; Edge rendered in
+  3.5s). Same Chromium print engine, so the PDF layout is identical. Still: confirm the screen
+  `.html` renders full-page in Chrome, or adjust the screen CSS.
 - 2026-07-08 — [doc] **BRD outline (Epic L, deferred)** — the third canonical doc type after
   TDD (L1) and Runbook (L8). Parked, not promoted: the BRD is a work-in-progress upstream and
   the user flagged it as "definitely a later phase", so there is no stable outline to write an
