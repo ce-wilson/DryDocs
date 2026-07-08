@@ -1122,7 +1122,7 @@ items:
     agent: main
     model: sonnet
     priority: p3
-    status: todo
+    status: done
     depends_on: [L3]
     inputs: [scripts/render_design_doc.py, PUBLISH-BOUNDARY.md, config/classification.yaml]
     acceptance: >
@@ -1135,6 +1135,12 @@ items:
     notes: >
       The paper bridge: print -> pen -> scan. The blank pdf is a reproducible throwaway;
       the SCANNED pdf is the valuable artifact that L6 feeds back by anchor.
+    progress: >
+      2026-07-08 — DONE (user sign-off). drydocs/doc_pdf.py (browser discovery Edge/Chrome-first —
+      Brave HANGS headless on this box, 2x 180s; Edge rendered in 3.5s; fixed --headless=new print
+      flags; /CreationDate+/ModDate normalized) + scripts/doc_to_pdf.py + tests/unit/test_doc_pdf.py
+      (4). PDF is BUILD-ON-DEMAND (option A): docs/design/*.pdf gitignored + untracked. Structurally
+      reproducible, not byte-identical (trailer /ID varies, by design).
   - id: L5
     epic: doc-infrastructure
     title: "Digital HITL: per-section SAVE/annotate control keyed to anchors"
@@ -1144,7 +1150,7 @@ items:
     agent: main
     model: sonnet
     priority: p3
-    status: todo
+    status: done
     depends_on: [L3]
     inputs: [drydocs/gate_pages.py, drydocs/plan_board.py, scripts/render_design_doc.py]
     acceptance: >
@@ -1157,6 +1163,11 @@ items:
       Closes the gap the user flagged — HTML reads well for humans+agents but is hard to
       mark up; this is the WIP "save button", COMPOSED from two existing primitives
       rather than invented.
+    progress: >
+      2026-07-08 — DONE (user sign-off). design_doc.py screen render gained a per-anchor annotate
+      control (localStorage) + "Copy feedback" clipboard export in the feedback_yaml format; print
+      output stays clean. docs/design/feedback/README.md documents the format. test_design_doc.py
+      now 17 tests (3 new). Verified live (✎ buttons + toolbar render).
   - id: L6
     epic: doc-infrastructure
     title: "Paper HITL: print-margin anchors + scan->transcribe skill"
@@ -1231,8 +1242,8 @@ items:
 # Roll-up the dispatcher can glance at. COMPUTED views — test_backlog.py enforces
 # that these match the items exactly; update them with any status change.
 summary:
-  todo: 9                                           # E2, G3-G4, G9, L4-L8
+  todo: 7                                           # E2, G3-G4, G9, L6-L8
   in_progress: 5                                    # E1, F1, F2, K2 (awaiting HITL), G2 (core shim)
   blocked: 1                                        # G7 — live multi-DB deploy needs an Enterprise target
-  done: 33                                          # A1-A3, B1-B4, C1-C4, D1-D3, G1, G5-G6, G8, H1-H7, I1-I4, J1, K1, L1, L3
-  next_ready: [L4, L5]                              # L3 done → L4 (pdf) + L5 (digital HITL) unblocked
+  done: 35                                          # A1-A3, B1-B4, C1-C4, D1-D3, G1, G5-G6, G8, H1-H7, I1-I4, J1, K1, L1, L3-L5
+  next_ready: [L6, L7]                              # L4+L5 done → L6 (paper HITL) + L7 (context ingest) unblocked

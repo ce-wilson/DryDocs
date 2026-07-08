@@ -74,6 +74,12 @@ libs/oracle_kerberos/oracle_kerberos_connection.txt
 # skill (references/er-model.md).
 external/orchestration/**/*.pdf
 
+# Design-doc PDFs (Epic L / L4) — BUILD-ON-DEMAND from the .md via scripts/doc_to_pdf.py.
+# The .md is the source of truth and the .html/.print.html renders are committed; the PDF is a
+# regenerable binary (not byte-identical run-to-run — trailer /ID varies), so it is not tracked.
+# Regenerate before printing for the pen/paper loop.
+docs/design/*.pdf
+
 # Editor workspace settings (machine-local)
 /.vscode/
 

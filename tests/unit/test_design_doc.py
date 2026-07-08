@@ -7,7 +7,7 @@ from __future__ import annotations
 
 from pathlib import Path
 
-from drydocs.design_doc import doc_title, render_body, render_doc, write_doc
+from drydocs.design_doc import doc_title, feedback_yaml, render_body, render_doc, write_doc
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
 CONTROLM_TDD = REPO_ROOT / "docs" / "design" / "controlm-ingestion-tdd.md"
@@ -96,6 +96,36 @@ def test_real_tdd_anchors_survive_no_leakage() -> None:
         for anchor in ("front-matter", "traceability-matrix", "design-data-mapping", "hitl-gate"):
             assert f'id="{anchor}"' in html, f"missing id={anchor} in {mode}"
         assert "<table>" in html and "<pre" in html  # the mapping tables + SQL blocks rendered
+
+
+def test_screen_has_feedback_layer_print_does_not() -> None:
+    md = "# Doc\n\n<!-- anchor: purpose-scope -->\n## Purpose\ntext"
+    screen = render_doc(md, "screen")
+    printed = render_doc(md, "print")
+    for marker in ("drydocs-doc-feedback:", "Copy feedback", "dd-note-btn", "localStorage"):
+        assert marker in screen, f"screen missing {marker}"
+        assert marker not in printed, f"print leaked {marker}"
+
+
+def test_feedback_yaml_format() -> None:
+    out = feedback_yaml("controlm-ingestion-tdd", {"traceability-matrix": "row FR-CMI-003 is wrong\ncheck stage 1", "hitl-gate": ""})
+    assert out == (
+        "# design-doc feedback — paste into docs/design/feedback/controlm-ingestion-tdd-rev<N>.yaml\n"
+        "doc: controlm-ingestion-tdd\n"
+        "notes:\n"
+        "  - anchor: traceability-matrix\n"
+        "    note: |\n"
+        "      row FR-CMI-003 is wrong\n"
+        "      check stage 1\n"
+    )  # empty hitl-gate note is skipped
+
+
+def test_write_doc_uses_stem_as_doc_id(tmp_path) -> None:
+    src = tmp_path / "runbook-startup.md"
+    src.write_text("# Runbook\n\n<!-- anchor: startup -->\n## Startup\ngo", encoding="utf-8")
+    html_path, _ = write_doc(src)
+    # the doc id is embedded as the JS DOC constant (localStorage key is built from it at runtime)
+    assert 'var DOC="runbook-startup"' in html_path.read_text(encoding="utf-8")
 
 
 def test_write_doc_emits_both_surfaces(tmp_path) -> None:

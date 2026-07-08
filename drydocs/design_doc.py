@@ -311,16 +311,108 @@ h2, h3, table, pre { break-inside: avoid; }
 """
 
 
-def render_doc(md: str, mode: str = "screen") -> str:
-    """Render a full self-contained HTML document. ``mode`` is 'screen' or 'print'."""
-    css = _PRINT_CSS if mode == "print" else _SCREEN_CSS
+def _slug(text: str) -> str:
+    return re.sub(r"[^a-z0-9]+", "-", text.lower()).strip("-") or "doc"
+
+
+def feedback_yaml(doc_id: str, notes: dict[str, str]) -> str:
+    """The CANONICAL anchor-keyed feedback format. The screen save-button's clipboard
+    export (``_FEEDBACK_JS``) mirrors this byte-for-byte — keep the two in sync. Empty
+    notes are skipped; multi-line notes use a YAML block scalar."""
+    out = [
+        f"# design-doc feedback — paste into docs/design/feedback/{doc_id}-rev<N>.yaml",
+        f"doc: {doc_id}",
+        "notes:",
+    ]
+    for anchor, note in notes.items():
+        text = (note or "").replace("\r", "")
+        if not text.strip():
+            continue
+        out.append(f"  - anchor: {anchor}")
+        out.append("    note: |")
+        out.extend(f"      {line}" for line in text.split("\n"))
+    return "\n".join(out) + "\n"
+
+
+# HITL layer for the SCREEN surface only (@media print hides it). Static → deterministic.
+_FEEDBACK_CSS = """
+.dd-note-btn { border:1px solid var(--line); background:var(--bg); color:var(--mid); cursor:pointer; font-size:12px; line-height:1; padding:2px 6px; border-radius:5px; margin-right:6px; }
+.dd-note-btn:hover { color:var(--link); border-color:var(--link); }
+.dd-note-box { margin:6px 0 10px; }
+.dd-note-box textarea { width:100%; min-height:56px; font:13px/1.4 "Segoe UI",system-ui,sans-serif; color:var(--ink); background:var(--faint); border:1px solid var(--line); border-radius:6px; padding:8px; resize:vertical; }
+.dd-annotated { box-shadow:-3px 0 0 var(--link); padding-left:8px; }
+.dd-fb-bar { position:fixed; right:16px; bottom:16px; display:flex; gap:8px; align-items:center; background:var(--bg); border:1px solid var(--line); border-radius:10px; padding:8px 12px; box-shadow:0 2px 10px rgba(0,0,0,.15); font-size:13px; z-index:50; }
+.dd-fb-bar button { cursor:pointer; border:1px solid var(--link); background:var(--link); color:#fff; border-radius:6px; padding:5px 10px; font-size:13px; }
+.dd-fb-bar .dd-badge { font-weight:700; }
+.dd-toast { position:fixed; right:16px; bottom:64px; background:var(--ink); color:var(--bg); padding:8px 12px; border-radius:8px; font-size:13px; z-index:60; opacity:0; transition:opacity .2s; }
+.dd-toast.show { opacity:1; }
+@media print { .dd-note-btn, .dd-note-box, .dd-fb-bar, .dd-toast { display:none !important; } }
+"""
+
+_FEEDBACK_JS = r"""
+(function(){
+  var DOC="__DOCID__", KEY="drydocs-doc-feedback:"+DOC;
+  function load(){ try{return JSON.parse(localStorage.getItem(KEY)||"{}");}catch(e){return {};} }
+  function save(){ localStorage.setItem(KEY, JSON.stringify(state)); }
+  var state=load(), badge;
+  function count(){ return Object.keys(state).filter(function(k){return (state[k]||"").trim();}).length; }
+  function refresh(){ if(badge) badge.textContent=count(); }
+  function toast(msg){ var t=document.createElement("div"); t.className="dd-toast"; t.textContent=msg; document.body.appendChild(t); requestAnimationFrame(function(){t.classList.add("show");}); setTimeout(function(){t.classList.remove("show"); setTimeout(function(){t.remove();},250);},1600); }
+  function exportYaml(){
+    var lines=["# design-doc feedback — paste into docs/design/feedback/"+DOC+"-rev<N>.yaml","doc: "+DOC,"notes:"];
+    Object.keys(state).forEach(function(a){
+      var note=(state[a]||"").replace(/\r/g,""); if(!note.trim()) return;
+      lines.push("  - anchor: "+a); lines.push("    note: |");
+      note.split("\n").forEach(function(l){ lines.push("      "+l); });
+    });
+    return lines.join("\n")+"\n";
+  }
+  function attach(el){
+    var id=el.id;
+    var btn=document.createElement("button"); btn.className="dd-note-btn"; btn.type="button"; btn.textContent="✎"; btn.title="Annotate #"+id;
+    var box=document.createElement("div"); box.className="dd-note-box"; box.style.display=(state[id]||"").trim()?"block":"none";
+    var ta=document.createElement("textarea"); ta.value=state[id]||""; ta.setAttribute("placeholder","note for #"+id+" …");
+    ta.addEventListener("input",function(){ state[id]=ta.value; save(); refresh(); el.classList.toggle("dd-annotated", !!ta.value.trim()); });
+    if((state[id]||"").trim()) el.classList.add("dd-annotated");
+    box.appendChild(ta);
+    btn.addEventListener("click",function(){ box.style.display=box.style.display==="none"?"block":"none"; if(box.style.display==="block") ta.focus(); });
+    el.insertAdjacentElement("afterend", box); el.insertAdjacentElement("beforebegin", btn);
+  }
+  document.addEventListener("DOMContentLoaded",function(){
+    document.querySelectorAll("main [id]").forEach(attach);
+    var bar=document.createElement("div"); bar.className="dd-fb-bar";
+    var lbl=document.createElement("span"); lbl.innerHTML='notes <span class="dd-badge">0</span>'; badge=lbl.querySelector(".dd-badge");
+    var ex=document.createElement("button"); ex.type="button"; ex.textContent="Copy feedback";
+    ex.addEventListener("click",function(){ var y=exportYaml();
+      var done=function(){toast("feedback copied — paste into docs/design/feedback/");};
+      if(navigator.clipboard&&navigator.clipboard.writeText){ navigator.clipboard.writeText(y).then(done,function(){fallback(y);}); } else { fallback(y); }
+    });
+    function fallback(y){ var t=document.createElement("textarea"); t.value=y; document.body.appendChild(t); t.select(); try{document.execCommand("copy"); toast("feedback copied");}catch(e){toast("copy failed — select the box");} t.remove(); }
+    bar.appendChild(lbl); bar.appendChild(ex); document.body.appendChild(bar); refresh();
+  });
+})();
+"""
+
+
+def _feedback_html(doc_id: str) -> str:
+    return f"<script>\n{_FEEDBACK_JS.replace('__DOCID__', doc_id)}\n</script>"
+
+
+def render_doc(md: str, mode: str = "screen", doc_id: str | None = None) -> str:
+    """Render a full self-contained HTML document. ``mode`` is 'screen' or 'print'.
+    Screen mode embeds the HITL annotate/save layer (per-anchor localStorage note + a
+    clipboard export in the ``feedback_yaml`` format); print mode omits it entirely."""
+    screen = mode != "print"
+    css = (_SCREEN_CSS + _FEEDBACK_CSS) if screen else _PRINT_CSS
     title = html.escape(doc_title(md))
     body = render_body(md)
+    did = html.escape(doc_id or _slug(doc_title(md)), quote=True)
+    feedback = _feedback_html(did) if screen else ""
     return (
         "<!doctype html>\n<html lang=\"en\">\n<head>\n<meta charset=\"utf-8\">\n"
         '<meta name="viewport" content="width=device-width, initial-scale=1">\n'
         f"<title>{title}</title>\n<style>\n{css}</style>\n</head>\n<body>\n"
-        f"<main>\n{body}\n</main>\n</body>\n</html>\n"
+        f"<main>\n{body}\n</main>\n{feedback}\n</body>\n</html>\n"
     )
 
 
@@ -331,6 +423,6 @@ def write_doc(md_path: str | Path, out_dir: str | Path | None = None) -> tuple[P
     out_dir = Path(out_dir) if out_dir else md_path.parent
     html_path = out_dir / f"{md_path.stem}.html"
     print_path = out_dir / f"{md_path.stem}.print.html"
-    html_path.write_text(render_doc(md, "screen"), encoding="utf-8")
+    html_path.write_text(render_doc(md, "screen", doc_id=md_path.stem), encoding="utf-8")
     print_path.write_text(render_doc(md, "print"), encoding="utf-8")
     return html_path, print_path

@@ -49,6 +49,7 @@
 | `drydocs/plan_board.py` | `drydocs-plan` — backlog.yaml → HTML project board renderer (Epic I) | `docs/plan/board.html` |
 | `drydocs/doc_outline.py` | `drydocs-docgen` — canonical doc-outline completeness + traceability validator (Epic L) | — (pure; validates docs) |
 | `drydocs/design_doc.py` | `drydocs-docgen` — deterministic Markdown→HTML/print.html renderer (Epic L) | `docs/design/*.{html,print.html}` |
+| `drydocs/doc_pdf.py` | `drydocs-docgen` — headless-Chromium print.html→PDF (Brave-first), date-normalized (Epic L) | `docs/design/*.pdf` (build-on-demand) |
 | *(future)* `drydocs-lineage` | C2 — curated cmd-line lineage | `drydocs` |
 | *(future)* `drydocs-deepdoc` | C3 — on-demand deep dive | `drydocs_context` |
 | *(separate module)* `drydocs-remediation` | C1 — failures → Jira | — (no graph write) |

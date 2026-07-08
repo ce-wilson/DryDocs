@@ -60,6 +60,7 @@ COMPONENT_GROUPS: dict[str, tuple[str, ...]] = {
     "docgen": (
         "drydocs.doc_outline",
         "drydocs.design_doc",
+        "drydocs.doc_pdf",
     ),
 }
 ALL_COMPONENT_PREFIXES: tuple[str, ...] = tuple(
