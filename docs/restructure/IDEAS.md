@@ -26,6 +26,13 @@ Tags help grooming: `idea` · `bug` · `doc` · `source` (new data source) · `q
 
 <!-- add new ideas at the top -->
 
+- 2026-07-08 — [doc] **BRD outline (Epic L, deferred)** — the third canonical doc type after
+  TDD (L1) and Runbook (L8). Parked, not promoted: the BRD is a work-in-progress upstream and
+  the user flagged it as "definitely a later phase", so there is no stable outline to write an
+  acceptance test against yet. When the BRD shape settles, promote as `docs/design/templates/
+  brd.outline.yaml` (reuse the `drydocs.doc-outline.v1` schema + traceability spine) into Epic L.
+  Seed from the corpus: `SDLC-Docs/BRD - Table of Contents.docx`, `business requirements document
+  template 31.docx`, `Business Requirements Template - FULL CDI Version.docx`.
 - 2026-07-07 — [question] **Same-row-derived node relationships** (city/state/country
   pattern): when ONE source row fans out into multiple nodes at different hierarchy
   grains, check what relationships (if any) belong BETWEEN those derived nodes — not
@@ -145,6 +152,13 @@ Tags help grooming: `idea` · `bug` · `doc` · `source` (new data source) · `q
 
 <!-- when you promote an idea, move its line here with the resulting backlog id -->
 
+- 2026-07-08 — Epic L (**documentation infrastructure**, new phase 10) groomed into `backlog.yaml`
+  from the deterministic-documentation design conversation. Canonical per-doc-type outlines (stable
+  anchors = the render/traceability/HITL id namespace), md-as-source deterministic render, and the
+  digital + pen/paper markup loop. `tdd.outline.yaml` drafted same day (L1 in_progress). New module
+  `drydocs-docgen`. Sequence (user-set): TDD (L1) → render/feedback (L3–L7) → Runbook (L8, capstone);
+  runbook resequenced from L2 → L8. BRD parked above (later phase). Distinct from the
+  `drydocs-docmeta` ingestion idea (2026-07-06).
 - 2026-07-01 — [source] seal_app_ref attribution → **K1 + K2** (Epic K, phase 9). CORRECTED
   during grooming by the company reconciliation answers: the edge is spec-level on BOTH sides
   (their FR-NS-013/UC-NS-005 docs read ACTIVE with no loader/vocab/gate behind them); the feed
