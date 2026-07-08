@@ -15,6 +15,19 @@ in**, **which external reference to call**, and **which sub-agent owns the task*
 are lenses onto it, not separate workspaces.** Git is the cross-platform sync layer — pull at
 the start, push at the end, and every machine stays identical.
 
+**Git model (branch discipline; the two meanings of "port").** `main` is the trunk. Two unrelated
+things share the word *port* — never conflate them:
+- **Cross-repo port** — producer `ce-wilson/DryDocs` → company `<org>/DryDocs` ([`git-readme.md`](git-readme.md)):
+  apply commit ranges onto the other repo's *disjoint* `main`. This is **not** a branch operation here.
+- **Within-repo branch → `--no-ff` merge → delete.** Branch (`feat/`, `fix/`, `port/`) when: you are
+  **bringing external work IN** (scraper re-home, reconcile-port, any "repoint" — *always* branch these);
+  a multi-commit stream / epic slice you want to review or revert as a unit; risky / experimental /
+  parallel work; anything an agent does in a worktree/fork; or anything you want as a PR.
+- **Default:** small, verified, sequential work commits **directly on `main`** (the repo's linear norm).
+- **Branch guardrail (this is what prevents the main-vs-branch mix-ups):** ALWAYS run
+  `git branch --show-current` immediately before committing and name the target branch — HEAD can change
+  between turns, agents, worktrees, or forks, so never assume it persisted. Wrong branch → stop and confirm.
+
 **Where to work, by output type:**
 - output is a **commit** → **Claude Code** (CLI/desktop/IDE). All repo work, running the
   pipeline, the HITL gate, and **dispatching the sub-agents** happen here (the `.claude/agents/`
