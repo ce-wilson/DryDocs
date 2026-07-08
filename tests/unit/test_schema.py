@@ -21,8 +21,10 @@ VOCAB_FILE       = ONTOLOGY_DIR / "relationship_vocabulary.yaml"
 # 35 after schema consolidation: m3_constraints_upgrade.cypher absorbed into
 # constraints.cypher + the PAT area_product_id constraint. 37 after the
 # software registry (plan 07 / ADR 0004): vendor_id + softwareproduct_id.
+# 38 after controlmapplication_name (folder-pass grouping label; gate
+# controlm-q1q3-phase1, load-order definition 2026-07-07).
 # Bump this when you intentionally add/remove a CREATE CONSTRAINT.
-EXPECTED_CONSTRAINTS = 37
+EXPECTED_CONSTRAINTS = 38
 
 EXPECTED_ONTOLOGY_LABELS = [
     "DprodClass",

@@ -435,15 +435,17 @@ local_relationships:
     prov_maps_to: "prov:hadMember"
     note: >
       ControlMApplication (prov:Collection — the Control-M APPLICATION grouping from
-      CM_DEF_VJOB, deliberately NOT the business :Application / SEAL concept) contains
-      ControlMFolder (prov:Collection). Matrix row: Collection → any = HAD_MEMBER;
-      symmetric with CONTAINS_JOB one level down. SME gate 2026-07-07
-      (controlm-q1q3-phase1; config/gate-log.md). Planned until the controlm_jobs
-      loader extension MERGEs the application nodes.
-    supplement:   ~
-    loader:       ~
+      the folder HEADER ROW in CM_DEF_VJOB (JOB_ID=1), deliberately NOT the business
+      :Application / SEAL concept) contains ControlMFolder (prov:Collection). Matrix
+      row: Collection → any = HAD_MEMBER; symmetric with CONTAINS_JOB one level down.
+      SME gate 2026-07-07 (controlm-q1q3-phase1; config/gate-log.md). Loader landed
+      in the FOLDER pass, not jobs (load-order definition 2026-07-07): the folders
+      extract LEFT JOINs the header row so both field-derived grouping labels
+      (ControlMServer, ControlMApplication) exist before the jobs pass runs.
+    supplement:   ontology_supplement.cypher
+    loader:       controlm_folders.cypher
     domain:       controlm
-    status:       planned
+    status:       active
 
   - id:           m3_requires_in_condition
     neo4j_label:  REQUIRES_IN_CONDITION

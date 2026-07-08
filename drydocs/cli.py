@@ -582,6 +582,22 @@ def m3_verify() -> None:
                 f"folders={r['folders']} srv_links={r['srv_links']}",
             ))
 
+        # Every application grouping contains at least one folder (no orphan
+        # :ControlMApplication nodes — they only exist via the header-row join).
+        rows = cli.run("""
+            MATCH (a:ControlMApplication)
+            OPTIONAL MATCH (a)-[:CONTAINS_FOLDER]->(f:ControlMFolder)
+            WITH count(DISTINCT a) AS apps, count(DISTINCT CASE WHEN f IS NOT NULL THEN a END) AS with_folder
+            RETURN apps, with_folder
+        """)
+        if rows:
+            r = rows[0]
+            checks.append((
+                "every ControlMApplication contains a folder",
+                r["apps"] == r["with_folder"],
+                f"apps={r['apps']} with_folder={r['with_folder']}",
+            ))
+
         # Every job has a folder.
         rows = cli.run("""
             MATCH (j:ControlMJob)

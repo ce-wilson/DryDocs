@@ -51,8 +51,8 @@ mappings:
       neo4j_label: CONTAINS_FOLDER
       prov_maps_to: "prov:hadMember"
     precedence_authority: bmc-baseline
-    reuses_vocab: m3_contains_folder (planned)
-    status: confirmed                           # applied only when the loader extension lands
+    reuses_vocab: m3_contains_folder (active)
+    status: confirmed                           # APPLIED 2026-07-07 — folder-pass loader extension (header-row join)
     confirmed_by: SME
     confirmed_on: 2026-07-07
 

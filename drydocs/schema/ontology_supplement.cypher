@@ -77,6 +77,19 @@ MATCH (local:OntologyTerm:LocalRelationship {iri: "https://drydocs.local/ontolog
 MATCH (prov:OntologyTerm:ProvProperty       {iri: "http://www.w3.org/ns/prov#hadMember"})
 MERGE (local)-[:MAPS_TO]->(prov);
 
+// CONTAINS_FOLDER  —  ControlMApplication → ControlMFolder  (prov:hadMember)
+MERGE (n:OntologyTerm:LocalRelationship {iri: "https://drydocs.local/ontology#containsFolder"})
+  SET n.label  = "CONTAINS_FOLDER",
+      n.domain = "ControlMApplication",
+      n.range  = "ControlMFolder",
+      n.notes  = "ControlMApplication (prov:Collection; Control-M APPLICATION grouping "
+               + "from the folder header row — NOT the SEAL business Application) "
+               + "contains ControlMFolder (prov:Collection). Semantics: prov:hadMember. "
+               + "Gate controlm-q1q3-phase1 (2026-07-07).";
+MATCH (local:OntologyTerm:LocalRelationship {iri: "https://drydocs.local/ontology#containsFolder"})
+MATCH (prov:OntologyTerm:ProvProperty       {iri: "http://www.w3.org/ns/prov#hadMember"})
+MERGE (local)-[:MAPS_TO]->(prov);
+
 // REQUIRES_IN_CONDITION  —  ControlMJob → Condition  (prov:used)
 MERGE (n:OntologyTerm:LocalRelationship {iri: "https://drydocs.local/ontology#requiresInCondition"})
   SET n.label  = "REQUIRES_IN_CONDITION",

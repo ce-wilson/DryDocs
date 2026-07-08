@@ -59,6 +59,56 @@ def test_folders_uses_sched_table_not_parent_table() -> None:
     assert "row.parent_table" not in text
 
 
+def test_folders_creates_application_grouping() -> None:
+    """The folder pass derives BOTH grouping labels (load-order definition,
+    2026-07-07): DATA_CENTER -> :ControlMServer and the header-row APPLICATION
+    -> :ControlMApplication with CONTAINS_FOLDER (gate controlm-q1q3-phase1)."""
+    text = (CYPHER_DIR / "controlm_folders.cypher").read_text(encoding="utf-8")
+    assert "MERGE (srv:ControlMServer:Platform {name: row.data_center})" in text
+    assert "MERGE (app:ControlMApplication:Collection {name: row.application})" in text
+    assert "CONTAINS_FOLDER" in text
+    # Null guard: folders without a header row must not merge a null-keyed app.
+    assert "row.application IS NOT NULL" in text
+
+
+def test_folder_sql_joins_header_row_for_application() -> None:
+    """APPLICATION comes from the folder header row (JOB_ID=1, SMART Table) —
+    CM_DEF_VTAB has no APPLICATION column. LEFT JOIN so header-less folders load."""
+    text = (SQL_DIR / "controlm_folders.sql").read_text(encoding="utf-8")
+    assert "LEFT JOIN psgmgr.CM_DEF_VJOB H" in text
+    assert "H.JOB_ID   = 1" in text or "H.JOB_ID = 1" in text
+    assert "H.APPLICATION" in text
+    assert "H.IS_CURRENT_VERSION = '1'" in text   # string literal, VARCHAR2(1)
+
+
+def test_ingest_chain_order_is_enforced() -> None:
+    """The ingest-controlm chain order (nodes before relationships; both
+    folder-pass grouping labels before jobs; dependencies in a separate pass):
+    folders -> jobs -> conditions in/out -> derived dependencies."""
+    cli_src = (ROOT / "drydocs" / "cli.py").read_text(encoding="utf-8")
+    ingest = cli_src[cli_src.index("def ingest_controlm"):]
+    positions = [
+        ingest.index(f'("{stage}"')
+        for stage in (
+            "controlm_folders",
+            "controlm_jobs",
+            "controlm_conditions_in",
+            "controlm_conditions_out",
+            "controlm_dependencies_derived",
+        )
+    ]
+    assert positions == sorted(positions), "ingest-controlm stage order drifted"
+
+
+def test_constraints_cover_folder_pass_labels() -> None:
+    """Constraints exist BEFORE import for every MERGE key the folder pass
+    touches (import pre-flight rule: constraints back MERGE lookups)."""
+    text = (SCHEMA_DIR / "constraints.cypher").read_text(encoding="utf-8")
+    assert "controlm_server" in text
+    assert "controlmfolder_id" in text
+    assert "controlmapplication_name" in text
+
+
 def test_jobs_keeps_parent_table_property() -> None:
     text = (CYPHER_DIR / "controlm_jobs.cypher").read_text(encoding="utf-8")
     assert "row.parent_table" in text

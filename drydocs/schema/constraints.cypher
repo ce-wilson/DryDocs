@@ -63,6 +63,9 @@ CREATE CONSTRAINT scheduler_kind      IF NOT EXISTS FOR (k:SchedulerKind)       
 // loaders filter to IS_CURRENT_VERSION='1' so one canonical node per logical
 // entity; version_serial stays as an audit property only.
 CREATE CONSTRAINT controlm_server     IF NOT EXISTS FOR (s:ControlMServer)      REQUIRE s.name IS UNIQUE;
+// Control-M APPLICATION grouping (folder header row; gate controlm-q1q3-phase1).
+// NOT the SEAL business :Application — see ADR 0003 naming rules.
+CREATE CONSTRAINT controlmapplication_name IF NOT EXISTS FOR (a:ControlMApplication) REQUIRE a.name IS UNIQUE;
 // Drop the JobFolder-era constraint name, then create against the renamed
 // label (ADR 0003: BMC labels take the ControlM prefix). Both idempotent.
 DROP CONSTRAINT folder_id IF EXISTS;

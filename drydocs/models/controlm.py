@@ -44,9 +44,14 @@ class ControlMFolderRow(BaseModel):
       * Active-scheduling filter is ``USER_DAILY IS NOT NULL``.
 
     Expected projection (matches ``drydocs/loaders/sql/controlm_folders.sql``):
-        folder_id, sched_table, data_center, user_daily,
+        folder_id, sched_table, data_center, application, user_daily,
         table_status, table_type, instance_name, last_updated,
         last_updated_user, capture_date
+
+    ``application`` comes from the folder HEADER ROW (``CM_DEF_VJOB`` where
+    ``JOB_ID = 1`` — the SMART-Table header per the ``controlm-q1q3-phase1``
+    gate), LEFT JOINed in the SQL: CM_DEF_VTAB itself carries no APPLICATION
+    column. Optional so pre-extension sample CSVs still validate.
     """
 
     model_config = ConfigDict(
@@ -65,6 +70,14 @@ class ControlMFolderRow(BaseModel):
         ...,
         min_length=1,
         description="Control-M server (P12 / P14 / P32 / P33 / ...).",
+    )
+    application: str | None = Field(
+        None,
+        description=(
+            "Control-M APPLICATION grouping from the folder header row "
+            "(CM_DEF_VJOB JOB_ID=1) — becomes :ControlMApplication. "
+            "NOT the SEAL business application."
+        ),
     )
     user_daily: str | None = Field(
         None,
@@ -89,7 +102,7 @@ class ControlMFolderRow(BaseModel):
         description="Audit timestamp from the psgmgr replication.",
     )
 
-    @field_validator("user_daily", "table_status", "instance_name",
+    @field_validator("application", "user_daily", "table_status", "instance_name",
                       "last_updated", "last_updated_user", "capture_date",
                       mode="before")
     @classmethod
