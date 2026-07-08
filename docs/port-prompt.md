@@ -122,9 +122,10 @@ PROCEDURE:
       producer commit de-colonizes SQL comments, DROP that hunk (a producer-side
       attempt was made and reverted 2026-07-05; verify none leaks into the range).
 
-15. PROVENANCE AUDIT-FIELDS — PLAN ONLY (clean-add doc; NOTHING to wire yet).
-    docs/restructure/06-provenance-source-audit-fields.md is an SME-signed-off plan
-    (Phase 0 not started). It ports as a doc, untouched. When it SHIPS (Phase 1+):
+15. PROVENANCE AUDIT-FIELDS — PLAN + PHASE-1 ENVELOPE SHIPPED (2026-07; was plan-only).
+    docs/restructure/06-provenance-source-audit-fields.md (SME-signed-off) ports as a doc.
+    Phase 1 has now SHIPPED (commit subject "…source audit envelope") — the plan's "when it
+    ships" list below is now REAL, apply it:
     - config/audit-fields.yaml (public, Canonical-here) = frozen envelope prop names
       (source_created_at/_by, source_updated_at/_by) + the full Control-M entry (BMC
       columns are publishable mechanism) + STUB entries for every other registry id.
@@ -201,6 +202,45 @@ PROCEDURE:
     - config/gate-log.md is an APPEND-ONLY AUDIT: on collision, merge additively
       (union of entries, chronological) — never drop either side's gate records.
 
+19. CONTROL-M LOAD-ORDER CONTRACT + :ControlMApplication (2026-07, commit "enforce the ingest
+    load order; ControlMApplication lands in the folder pass" — Canonical-here + ONE constraint bump):
+    the ingest-controlm chain order is now CONTRACTUAL (test_ingest_chain_order_is_enforced) and the
+    folder pass derives a SECOND grouping node — header-row APPLICATION -> :ControlMApplication (+
+    CONTAINS_FOLDER), distinct from :ControlMServer AND from the SEAL :Application. Carries: the
+    controlm_folders/jobs .cypher + Control-M SQL deltas + folder_name.py (Canonical-here — the
+    Control-M loaders, step 6), a NEW constraint controlmapplication_name (EXPECTED_CONSTRAINTS 37 ->
+    38 in test_schema.py — reconcile the count with any company-side constraint edits), and the
+    companion docs docs/design/controlm-ingestion-tdd.md + docs/restructure/08-source-column-mappings.md
+    (clean-add docs). Load-order contract detailed in docs/controlm-staging-ingestion-flow.md §3a.
+
+20. DESIGN-DOC PIPELINE — drydocs-docgen (Epic L, 2026-07-08 — all CLEAN-ADDS):
+    a component that renders design docs deterministically from their .md source (the .md is the
+    single source of truth). Apply untouched (new paths, no company collision expected): drydocs/
+    doc_outline.py (canonical-outline completeness + traceability validator), drydocs/design_doc.py
+    (stdlib markdown->HTML/print.html renderer, NO new dependency), drydocs/doc_pdf.py (headless-
+    Chromium print.html->PDF), scripts/render_design_doc.py + scripts/doc_to_pdf.py, docs/design/
+    templates/tdd.outline.yaml, docs/design/feedback/README.md, tests/unit/{test_doc_outline,
+    test_design_doc,test_doc_pdf}.py, the `docgen` COMPONENT_GROUP in test_module_boundary.py + the
+    MODULE_MAP.md rows, and the .gitignore rule `docs/design/*.pdf` (MERGE additively). The committed
+    renders docs/design/controlm-ingestion-tdd.{html,print.html} port as generated artifacts; the
+    .pdf is BUILD-ON-DEMAND (gitignored — do NOT port it, regenerate company-side). snapshot.ps1 gains
+    a design-doc render step + the CLAUDE.md ritual stale-render check (Canonical-here). Not wired into
+    cli.py (entrypoint-boundary TODO).
+
+21. SEAL ONTOLOGY RESHAPE + SCRAPED-DOCS SOURCE-OF-RECORD — GATE-BOUND PROPOSAL (2026-07-08;
+    NOTHING applied — collision-sensitive; read the git-readme.md heads-up "SEAL entity reshape…"):
+    relationship_vocabulary.yaml + config/taxonomy-ontology-map.yaml are step-6 Canonical-here, but
+    this delta only ADDS planned/proposed material: 5 planned edges (hadPrimarySource, wasAttributedTo,
+    qualifiedAttribution, agent, hadRole), Document/Attribution/TOMRole node classes, proposed_deprecation
+    notes on the ACTIVE seal_has_membership/seal_of_role/seal_held_by edges, a proposed_reclass note on
+    :Application (SoftwareAgent -> Entity/DataProduct), and 3 proposed map entries + a re-opened
+    job-seal-app-ref (K1). COLLISION RULE (Epic-K back-flow, step 18): if company main has ALREADY typed
+    :Application as Agent or promoted any seal_* membership edge to active, KEEP YOURS and reconcile the
+    reshape at the gate — do not blind-take the producer's proposed statuses. Clean-adds: config/
+    gate-prompts/seal-tom-attribution-reshape.yaml (step-18 gate-page standard), the config/precedence.yaml
+    `proposed_additions` key (inert to the resolver), and the config/gate-log.md entry (APPEND-ONLY, union
+    on collision). Nothing is SME-confirmed; no active graph impact.
+
 ACCEPTANCE GATE (behavior is the contract, not a byte-compare):
 - Track 1 (portable, no production sample present):
     poetry run pytest tests/unit/test_variable_classifier.py tests/unit/test_variable_resolver.py \
@@ -213,9 +253,11 @@ ACCEPTANCE GATE (behavior is the contract, not a byte-compare):
   entrypoint-exemption test from Epic H6). A FileNotFoundError on controlm_variables__sample.csv
   means the skip guard was lost — fix it.
 - Full `pytest tests/unit/` must be green (passes + sample-skips + the PyYAML test_schema.py
-  skips). ZERO failures is the contract. Both CI guards must pass: test_schema.py (no `active`
-  relationship without its supplement block) and test_classification.py (every source in
-  source-registry.yaml has a valid sensitivity classification). New dep: PyYAML.
+  skips). ZERO failures is the contract. Now also covers the docgen tests (test_doc_outline /
+  test_design_doc / test_doc_pdf — portable, stdlib + PyYAML, no data/network). Both CI guards must
+  pass: test_schema.py (no `active` relationship without its supplement block) and
+  test_classification.py (every source in source-registry.yaml has a valid sensitivity
+  classification). New dep: PyYAML.
 
 BOUNDARIES:
 - One-way only. Never add company main as a remote on the producer; never push back to
