@@ -1,6 +1,8 @@
 # Technical Design — Control-M Ingestion (the `ingest-controlm` M3 chain)
 
-**Status:** DESCRIPTIVE — **Rev 2, 2026-07-07** (reflects commit `107581d`:
+<!-- anchor: front-matter -->
+**Status:** DESCRIPTIVE — **Rev 3, 2026-07-08** (restructured to the canonical TDD outline
+— `docs/design/templates/tdd.outline.yaml`, Epic L; content still reflects commit `107581d`:
 enforced load order + `:ControlMApplication` in the folder pass) ·
 **Classification:** Internal (mirrors `config/taxonomy/controlm.yaml`; uses only the
 committed sample fixtures — no real SIDs/servers) ·
@@ -13,6 +15,11 @@ Worked example throughout:
 poetry run drydocs ingest-controlm --use-oracle --folder 'PRARAG-HLDM-85025-PEX%'
 ```
 
+> **What changed in Rev 3 (2026-07-08).** Restructured to the canonical TDD outline
+> (`docs/design/templates/tdd.outline.yaml`, Epic L): added Purpose & scope, Definitions,
+> Classification & security, QA & tests, and a **requirements traceability matrix**, and
+> tagged every section with a stable `<!-- anchor -->`. Documentation-only — no code change.
+>
 > **What changed in Rev 2**
 > 1. The chain order is now **contractual** (a test enforces it) and framed as the
 >    standard Neo4j import discipline — see §3b.
@@ -27,6 +34,23 @@ poetry run drydocs ingest-controlm --use-oracle --folder 'PRARAG-HLDM-85025-PEX%
 
 ---
 
+<!-- anchor: purpose-scope -->
+## Purpose & scope
+
+**Purpose.** Document the `ingest-controlm` chain (the "M3" load) end to end — how the
+Control-M scheduler definitions in the `psgmgr` replica become the DryDocs knowledge graph
+— so a support engineer can read, trust, and extend the loader.
+
+**In scope.** The five-pass load (constraints → folders → jobs → conditions → derived
+dependencies), the source tables + filters, the field→node/edge mapping, the enforced
+load-order contract, and the taxonomy→ontology binding each edge traces to.
+
+**Out of scope.** SEAL application attribution (`WAS_ASSOCIATED_WITH {role: seal_app_ref}`)
+— gated and separate, tracked as **K2**, running only after this chain; vector/embedding
+passes; and the live multi-DB deploy (**G7**). These are named where they touch the chain
+but specified elsewhere.
+
+<!-- anchor: context-frame -->
 ## 1. Where this sits — the four-layer frame
 
 DryDocs is built in four layers (`CLAUDE.md` §1). Control-M ingestion walks the first three,
@@ -45,6 +69,25 @@ taxonomy→ontology map.
 
 ---
 
+<!-- anchor: definitions -->
+## Definitions, acronyms & references
+
+| Term | Meaning |
+|---|---|
+| `psgmgr` | the read-only Control-M metadata replica (grantee `CM_RO_USER`) DryDocs reads |
+| `CM_DEF_VTAB` / `CM_DEF_VJOB` | folder (schedule) table / job-definition table on the replica |
+| `CM_DEF_LNKI_P_VW` / `CM_DEF_LNKO_P_VW` | IN-condition (consumed) / OUT-condition (emitted) views |
+| header row | `CM_DEF_VJOB` where `JOB_ID = 1` — the SMART-table header carrying folder-grain `APPLICATION` |
+| `:ControlMApplication` | Control-M `APPLICATION` grouping node — **not** the SEAL business app |
+| SEAL `:Application` | the business application (SEALID); a different concept, attributed via K2 |
+| PROV | W3C PROV-O; label duals (`:Collection`/`:Activity`/`:Entity`) encode PROV type |
+| `m3-verify` | the post-load graph-invariant check (`drydocs … m3-verify`) |
+
+**References.** Companion `docs/controlm-staging-ingestion-flow.md` (§3a — the load-order
+contract); `config/taxonomy/controlm.yaml` (taxonomy); `config/taxonomy-ontology-map.yaml`
+(confirmed bindings); `CLAUDE.md` §1 (four-layer model); ADR 0003 (`ControlMFolder` naming).
+
+<!-- anchor: detailed-design -->
 ## 2. Source system — the `psgmgr` CM_ replica
 
 Production reads a **read-only replica** (`psgmgr`, grantee `CM_RO_USER`). The chain touches
@@ -83,6 +126,7 @@ four objects — and, new in Rev 2, reads `CM_DEF_VJOB` a *second* way (the fold
 
 ---
 
+<!-- anchor: design-summary -->
 ## 3. ER diagram & the order the tables are used
 
 ### 3a. Source ER (physical, incl. the header-row LEFT JOIN)
@@ -154,6 +198,7 @@ no-orphan-`:ControlMApplication` check. (Contract detailed in
 
 ---
 
+<!-- anchor: design-data-mapping -->
 ## 4. Field → Label / Node / Edge mapping
 
 ### Stage 1 — folders → `:ControlMFolder:Collection` + `:ControlMServer:Platform` + **`:ControlMApplication:Collection`**
@@ -240,7 +285,8 @@ Example folders in the sample: **161015** `PRARAG-HLDM-85025-PEX-TRUST-DLY` (P12
 
 ---
 
-## 6. Ontology (layer 2)
+<!-- anchor: hitl-gate -->
+## 6. Ontology (layer 2) — HITL gate & what's not yet live
 
 `config/taxonomy-ontology-map.yaml` is the HITL-confirmed bridge. Lifecycle
 `proposed → confirmed → applied` — a taxonomy never becomes edges until confirmed.
@@ -344,6 +390,53 @@ cli.ingest_controlm(use_oracle=True, folder='PRARAG-HLDM-85025-PEX%')
 
 ---
 
+<!-- anchor: classification-security -->
+## 8. Classification & security
+
+**Classification: Internal** (`config/classification.yaml`; mirrors
+`config/taxonomy/controlm.yaml`). This doc uses only the committed sample fixtures — no real
+SIDs, server names, or schema values — so it is publishable under `PUBLISH-BOUNDARY.md`;
+real values live in `internal/`.
+
+**Injection-safety.** The `--folder` value is never string-interpolated into SQL. Every
+`.sql` file is read verbatim and executed with `:folder_filter` as a **bind variable**
+(`cursor.execute(query, binds)`, `oracle_adapter.py:61`); `%` is an ordinary bound `LIKE`
+wildcard. The source is a **read-only** replica (`psgmgr`, grantee `CM_RO_USER`) — the chain
+has no write path back to Control-M.
+
+<!-- anchor: qa-tests -->
+## 9. QA & tests
+
+| What it proves | Test / verify |
+|---|---|
+| Load order is contractual (constraints → folders → jobs → conditions → deps) | `test_ingest_chain_order_is_enforced` |
+| No orphan `:ControlMApplication` (every app node reaches a folder) | `m3-verify` no-orphan check |
+| `SCHEDULED_ON` written (not the retired `RUNS_ON`); every folder placed on a server | `m3-verify` |
+| Constraints present (37 → **38** with `controlmapplication_name`) | `EXPECTED_CONSTRAINTS`, bootstrap |
+| Dependency pass creates no ghost nodes (MATCH both endpoints) | `m3-verify` dependency check |
+| Every edge traces to a confirmed taxonomy→ontology row | `test_schema.py` drift guard |
+
+`m1/m3-verify` require a live Neo4j (+ APOC); the unit and contract tests run offline.
+
+<!-- anchor: traceability-matrix -->
+## 10. Requirements traceability matrix
+
+The ingestion-chain requirements this design satisfies, each traced to the design section
+that realizes it and the test that proves it. (Reverse traceability for a DESCRIPTIVE doc:
+ids are `FR/NFR-CMI-*`, scoped to this chain; the SEAL row is spec-level, gated as K2.)
+
+| Requirement | Description | Design section | Component / module | Test / verify | Status |
+|---|---|---|---|---|---|
+| FR-CMI-001 | Read Control-M defs from the read-only `psgmgr` replica via bound SQL | detailed-design | `adapters/oracle_adapter.py`, `controlm_*.sql` | injection-safety note (`oracle_adapter.py:61`) | done |
+| FR-CMI-002 | Enforce the load order (constraints → folders → jobs → conditions → deps) | design-summary | `cli.ingest_controlm`, loaders | `test_ingest_chain_order_is_enforced` | done |
+| FR-CMI-003 | Folder pass derives two grouping nodes: `:ControlMServer` + `:ControlMApplication` | design-data-mapping | `controlm_folders.cypher`, `folder_name.py` | `m3-verify` no-orphan-`:ControlMApplication` | done |
+| FR-CMI-004 | Job identity is folder-scoped `(folder_id, job_id)`; child pass MATCHes its folder | design-data-mapping | `controlm_jobs.cypher`, `constraints.cypher` | `m3-verify`; NODE KEY constraint | done |
+| FR-CMI-005 | Derive job→job `WAS_INFORMED_BY` from the IN=OUT condition seam, edge-only | design-data-mapping | `controlm_deps.cypher` | `m3-verify` dependency check | done |
+| FR-CMI-006 | Every edge traces to a HITL-confirmed taxonomy→ontology binding | hitl-gate | `config/taxonomy-ontology-map.yaml`, `gate-log.md` | `test_schema.py` drift guard | done |
+| NFR-CMI-001 | No real SIDs/servers committed; Internal classification; SQL injection-safe | classification-security | `config/classification.yaml`, `oracle_adapter.py` | `test_classification.py` | done |
+| FR-CMI-007 | SEAL attribution runs only after jobs + `:Application` exist, gate-confirmed | hitl-gate | K2 loader (planned) | K2 HITL gate | planned |
+
+<!-- anchor: appendices -->
 ## Appendix — sticky-note gotchas
 
 1. Load order is **contractual** (`test_ingest_chain_order_is_enforced`): constraints → folders

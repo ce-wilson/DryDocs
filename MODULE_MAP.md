@@ -47,6 +47,7 @@
 | *(future H2)* `drydocs/graph_review.py` | `drydocs-review` — renders live-graph rows → SME review HTML | — (reads graph; writes HTML) |
 | *(future H5)* `drydocs/publishing/**` | `drydocs-review` — docs publish pipeline (Confluence push abstracted) | external (docs target) |
 | `drydocs/plan_board.py` | `drydocs-plan` — backlog.yaml → HTML project board renderer (Epic I) | `docs/plan/board.html` |
+| `drydocs/doc_outline.py` | `drydocs-docgen` — canonical doc-outline completeness + traceability validator (Epic L) | — (pure; validates docs) |
 | *(future)* `drydocs-lineage` | C2 — curated cmd-line lineage | `drydocs` |
 | *(future)* `drydocs-deepdoc` | C3 — on-demand deep dive | `drydocs_context` |
 | *(separate module)* `drydocs-remediation` | C1 — failures → Jira | — (no graph write) |
@@ -62,6 +63,11 @@
 > offline renderer (backlog.yaml → `docs/plan/board.html`, no Neo4j, no imports from other
 > components) classified into its own `plan` COMPONENT_GROUP, mirroring how `review` is declared —
 > it exists precisely so a future `drydocs-plan` module that isn't added here fails the same guard.
+>
+> **`drydocs-docgen` note.** Same discipline: `drydocs/doc_outline.py` validates a design doc
+> against its canonical `*.outline.yaml` (completeness + requirement traceability, Epic L). Pure,
+> offline (stdlib + PyYAML), imports no component; classified into its own `docgen` COMPONENT_GROUP.
+> The L3 renderer + L5 save-button widget land in this same group.
 >
 > **Entrypoint exemption (RESOLVED — was the ADR 0002-a TODO).** Wiring `graph-verify` /
 > `graph-review` / `sme-notes` / `docs-*` commands into `drydocs/cli.py` makes `cli.py` import the

@@ -55,6 +55,11 @@ COMPONENT_GROUPS: dict[str, tuple[str, ...]] = {
     "plan": (
         "drydocs.plan_board",
     ),
+    # drydocs-docgen — canonical doc-outline validation + deterministic render + HITL
+    # markup (Epic L). Imports only stdlib + config; never a component.
+    "docgen": (
+        "drydocs.doc_outline",
+    ),
 }
 ALL_COMPONENT_PREFIXES: tuple[str, ...] = tuple(
     p for prefixes in COMPONENT_GROUPS.values() for p in prefixes
