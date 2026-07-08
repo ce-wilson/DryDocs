@@ -1,0 +1,355 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>DryDocs — Control-M Ingestion TDD (print, Rev 2)</title>
+<style>
+  :root { --ink:#1a1a1a; --mid:#555; --line:#bdbdbd; --fill:#eee; --faint:#f6f6f6; }
+  @page { size: Letter; margin: 0.6in 0.62in 0.55in 0.62in; }
+  * { box-sizing: border-box; }
+  html { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  body { font: 10.5px/1.45 "Segoe UI", system-ui, Arial, sans-serif; color: var(--ink); margin: 0; }
+  .page { break-before: page; } .page:first-of-type { break-before: auto; }
+  h1 { font-size: 21px; margin: 0 0 2px; letter-spacing:-0.2px; }
+  h2 { font-size: 14px; margin: 0 0 8px; padding-bottom:4px; border-bottom: 2px solid var(--ink);
+       text-transform: uppercase; letter-spacing: 0.6px; }
+  h3 { font-size: 11.5px; margin: 13px 0 5px; padding-bottom:2px; border-bottom:1px solid var(--line); }
+  .kicker { font-size: 9px; text-transform: uppercase; letter-spacing: 1.4px; color: var(--mid); }
+  .sub { color: var(--mid); font-size: 9.5px; margin: 2px 0 0; }
+  p { margin: 6px 0; } strong { font-weight: 700; }
+  .new { background:#e4e4e4; padding:0 3px; border-radius:2px; font-weight:700; }
+  code { font-family: "Cascadia Mono","Consolas",monospace; font-size: 9.2px; background: var(--faint); padding: 0 2px; border-radius: 2px; }
+  table { width:100%; border-collapse: collapse; margin: 7px 0; font-size: 9.1px; }
+  th, td { border: 1px solid var(--line); padding: 3px 5px; text-align: left; vertical-align: top; }
+  th { background: var(--fill); font-weight: 700; }
+  td code, th code { background: transparent; padding: 0; }
+  .num { width: 20px; text-align:center; color: var(--mid); }
+  tr.hl td { background:#e9e9e9; }
+  pre { font-family: "Cascadia Mono","Consolas",monospace; font-size: 8.4px; line-height: 1.35;
+        border: 1px solid var(--line); background: var(--faint); padding: 7px 9px; margin: 7px 0;
+        white-space: pre; overflow: hidden; border-radius: 3px; }
+  pre.sql { background:#fbfbfb; }
+  figcaption { font-size: 8.6px; color: var(--mid); margin: -3px 0 8px; }
+  .call { border:1px solid var(--ink); border-left: 4px solid var(--ink); padding: 6px 9px; margin: 8px 0; background: var(--faint); font-size: 9.6px; }
+  .call b { text-transform: uppercase; letter-spacing:0.5px; font-size:8.6px; }
+  .notes { break-inside: avoid; margin: 12px 0 0; }
+  .notes .lbl { font-size: 8px; text-transform: uppercase; letter-spacing: 1.6px; color: var(--mid); border-top: 1px solid var(--ink); padding-top: 3px; }
+  .rule { height: 84px; margin-top: 4px; background-image: repeating-linear-gradient(#fff 0 27px, var(--line) 27px 28px); border-bottom: 1px solid var(--line); }
+  .rule.tall { height: 224px; }
+  .foot { position: fixed; bottom: 0.18in; left: 0; right: 0; font-size: 7.5px; color: var(--mid); letter-spacing: 0.5px; display:flex; justify-content: space-between; }
+  ol.tight { margin: 6px 0 0 16px; padding: 0; } ol.tight li { margin: 3px 0; }
+  .lede { font-size: 9.5px; color: var(--mid); }
+  .two { display:grid; grid-template-columns: 1fr 1fr; gap: 0 14px; }
+</style>
+</head>
+<body>
+
+<div class="foot"><span>DryDocs · Technical Design · Rev 2 (2026-07-07)</span><span>Control-M Ingestion — the <code>ingest-controlm</code> M3 chain</span></div>
+
+<!-- PAGE 1 -->
+<section class="page">
+  <p class="kicker">DryDocs · Technical Design Document · Rev 2</p>
+  <h1>Control-M Ingestion — the <code>ingest-controlm</code> chain</h1>
+  <p class="sub"><strong>Rev 2 · 2026-07-07</strong> — reflects commit <code>107581d</code>
+     (enforced load order + <code>:ControlMApplication</code> in the folder pass) &nbsp;·&nbsp;
+     <strong>Classification</strong> Internal &nbsp;·&nbsp; <strong>Companion</strong>
+     <code>docs/controlm-staging-ingestion-flow.md</code> §3a (load-order contract).</p>
+
+  <div class="call"><b>What changed in Rev 2</b><br>
+    <strong>1.</strong> The chain order is now <strong>contractual</strong> (a test enforces it),
+    framed as standard Neo4j import discipline — see §3b. &nbsp;
+    <strong>2.</strong> The <strong>folder pass now derives two grouping labels</strong>, not one:
+    <code>DATA_CENTER → :ControlMServer</code> <em>and</em> header-row
+    <code>APPLICATION → :ControlMApplication</code> (+ <code>CONTAINS_FOLDER</code>). See §2, §4, §6.</div>
+
+  <pre>poetry run drydocs ingest-controlm --use-oracle --folder 'PRARAG-HLDM-85025-PEX%'</pre>
+  <p class="lede">Reminder: <code>--folder</code> is a <strong>bind variable</strong>, not interpolated
+     (<code>cursor.execute(query, binds)</code>, <code>oracle_adapter.py:61</code>); <code>%</code> is a
+     bound <code>LIKE</code> wildcard, injection-safe.</p>
+
+  <h2>1 · The four-layer frame</h2>
+  <table>
+    <tr><th>Layer</th><th>This chain's contribution</th><th>Artifact</th></tr>
+    <tr><td><strong>1 · Taxonomy</strong></td><td><code>ControlMApplication</code>, <code>ControlMServer &gt; ControlMFolder &gt; ControlMJob</code>, <code>Condition</code></td><td><code>config/taxonomy/controlm.yaml</code></td></tr>
+    <tr><td><strong>2 · Ontology</strong></td><td>PROV binding per edge, HITL-confirmed</td><td><code>config/taxonomy-ontology-map.yaml</code></td></tr>
+    <tr><td><strong>3 · Knowledge graph</strong></td><td>populated Neo4j nodes + edges</td><td>Neo4j</td></tr>
+    <tr><td><strong>4 · Context graph</strong></td><td>— (future)</td><td>—</td></tr>
+  </table>
+  <p class="lede">Rule: import as taxonomy (classification) → apply the confirmed ontology rule → then load.</p>
+
+  <div class="notes"><div class="lbl">Notes</div><div class="rule"></div></div>
+</section>
+
+<!-- PAGE 2 -->
+<section class="page">
+  <h2>2 · Source system — the psgmgr CM_ replica</h2>
+  <p>Read-only replica (<code>psgmgr</code>, grantee <code>CM_RO_USER</code>). Four objects — and, new in
+     Rev 2, a <strong>second read of <code>CM_DEF_VJOB</code></strong> (the folder header row):</p>
+  <table>
+    <tr><th class="num">#</th><th>Concept</th><th>Vendor (6.4.01)</th><th>psgmgr replica</th><th>Grain / use</th></tr>
+    <tr><td class="num">1</td><td>Folder / schedule table</td><td><code>CMS_SCHEDT</code></td><td><code>CM_DEF_VTAB</code></td><td>one row / folder</td></tr>
+    <tr><td class="num">2</td><td>Job definition</td><td><code>CMS_JOBDEF</code></td><td><code>CM_DEF_VJOB</code></td><td>one row / (folder, job, version)</td></tr>
+    <tr class="hl"><td class="num">2b</td><td><strong>Folder header row</strong></td><td>SMART-table hdr</td><td><code>CM_DEF_VJOB</code> <code>JOB_ID = 1</code></td><td><strong>folder-grain <code>APPLICATION</code></strong> — LEFT-JOINed into the folder extract</td></tr>
+    <tr><td class="num">3</td><td>IN-conditions</td><td><code>CMS_CON_J</code> (in)</td><td><code>CM_DEF_LNKI_P_VW</code></td><td>one row / (job, condition)</td></tr>
+    <tr><td class="num">4</td><td>OUT-conditions</td><td><code>CMS_CON_J</code> (out)</td><td><code>CM_DEF_LNKO_P_VW</code></td><td>one row / (job, condition)</td></tr>
+  </table>
+
+  <h3>Filters &amp; join keys</h3>
+  <table>
+    <tr><th>Item</th><th>Detail</th></tr>
+    <tr><td><code>IS_CURRENT_VERSION = '1'</code></td><td><strong>String</strong> (<code>VARCHAR2(1)</code>) — jobs, conditions, <strong>and the header-row join</strong>. Not on folders (no version column).</td></tr>
+    <tr><td><code>USER_DAILY IS NOT NULL</code></td><td>the only "actively scheduled" gate on a folder.</td></tr>
+    <tr><td>Job ↔ folder</td><td><code>CM_DEF_VJOB.TABLE_ID = CM_DEF_VTAB.TABLE_ID</code></td></tr>
+    <tr class="hl"><td><strong>Header ↔ folder (new)</strong></td><td><code>CM_DEF_VJOB.(TABLE_ID, JOB_ID=1, IS_CURRENT_VERSION='1')</code> — LEFT JOIN</td></tr>
+    <tr><td>Condition ↔ job</td><td><code>CM_DEF_LNK{I,O}_P_VW.(TABLE_ID, JOB_ID, VERSION_SERIAL)</code></td></tr>
+    <tr><td>Dependency (derived)</td><td><code>LNKI(B).CONDITION = LNKO(A).CONDITION</code> ⇒ B depends on A</td></tr>
+  </table>
+
+  <div class="call"><b>Three different "applications" — keep them apart</b><br>
+    header-row <code>:ControlMApplication</code> (a Control-M grouping) &nbsp;≠&nbsp; SEAL
+    <code>:Application</code> (business app, <code>seal_id</code>) &nbsp;≠&nbsp; the folder-name
+    <code>app_code</code> (positions 3–5). Also: folder name = <code>SCHED_TABLE</code>, not the
+    denormalized <code>PARENT_TABLE</code> on the job.</div>
+
+  <div class="notes"><div class="lbl">Notes</div><div class="rule"></div></div>
+</section>
+
+<!-- PAGE 3 -->
+<section class="page">
+  <h2>3 · ER diagram &amp; the order the tables are used</h2>
+
+  <h3>3a · Source ER (incl. the header-row LEFT JOIN)</h3>
+  <pre>        CM_DEF_VTAB  (folder)                    PK: TABLE_ID
+        |  SCHED_TABLE (name), DATA_CENTER,       filter: USER_DAILY IS NOT NULL
+        |  USER_DAILY, TABLE_STATUS
+        |
+        |  LEFT JOIN CM_DEF_VJOB H  ON H.TABLE_ID=TABLE_ID AND H.JOB_ID=1   <== NEW
+        |            (SMART-table header row -> H.APPLICATION)   IS_CURRENT_VERSION='1'
+        |
+        |  TABLE_ID (1)---------------(many)
+        v
+        CM_DEF_VJOB  (job)                        PK: (TABLE_ID, JOB_ID, VERSION_SERIAL)
+        |  JOB_NAME, APPLICATION, OWNER, AUTHOR,  filter: IS_CURRENT_VERSION='1'
+        |  NODE_ID, CMD_LINE, CYCLIC
+        |
+   +----+----+  (TABLE_ID, JOB_ID, VERSION_SERIAL)
+   v         v
+ LNKI_P_VW  LNKO_P_VW                             filter: IS_CURRENT_VERSION='1'
+ (IN cond)  (OUT cond, SIGN +/-)
+     +---- derived: LNKI.CONDITION = LNKO.CONDITION ----+</pre>
+
+  <h3>3b · Load order — now a CONTRACT (<code>test_ingest_chain_order_is_enforced</code>)</h3>
+  <p class="lede">Standard Neo4j import discipline: constraints first; all nodes before any relationships;
+     relationship passes <code>MATCH</code> endpoints (never <code>MERGE</code>), so a missing endpoint surfaces
+     instead of a ghost node.</p>
+  <table>
+    <tr><th class="num">#</th><th>Pass</th><th>Nodes MERGEd</th><th>Relationships</th><th>Endpoint rule</th></tr>
+    <tr><td class="num">0</td><td><code>constraints.cypher</code> (bootstrap)</td><td>—</td><td>—</td><td>every key below is constraint-backed</td></tr>
+    <tr class="hl"><td class="num">1</td><td><strong>folders</strong></td><td><code>:ControlMFolder</code> + <strong>two grouping labels</strong>: <code>DATA_CENTER→:ControlMServer</code>, header <code>APPLICATION→:ControlMApplication</code></td><td><code>SCHEDULED_ON</code>, <code>CONTAINS_FOLDER</code></td><td>self-contained — all endpoints created here</td></tr>
+    <tr><td class="num">2</td><td><strong>jobs</strong></td><td><code>:ControlMJob</code></td><td><code>CONTAINS_JOB</code></td><td>MATCH folder (from pass 1)</td></tr>
+    <tr><td class="num">3</td><td><strong>conditions in / out</strong></td><td><code>:Condition</code> (shared <code>(folder_id,name)</code>)</td><td><code>REQUIRES_IN</code> / <code>EMITS_OUT</code></td><td>MATCH job <code>(folder_id, job_id)</code></td></tr>
+    <tr><td class="num">4</td><td><strong>dependencies</strong> (separate, edge-only)</td><td><em>none</em></td><td><code>WAS_INFORMED_BY</code></td><td>MATCH <strong>both</strong> jobs — never creates nodes</td></tr>
+    <tr><td class="num">—</td><td>SEAL attribution (K2, <strong>gated</strong>)</td><td><em>none</em></td><td><code>WAS_ASSOCIATED_WITH</code></td><td>only after jobs <em>and</em> <code>:Application</code> exist</td></tr>
+  </table>
+  <figcaption>Passes 3–5 run unless <code>--skip-part2</code>. Both grouping nodes exist before jobs.
+     <code>m3-verify</code> gained a no-orphan-<code>:ControlMApplication</code> check.</figcaption>
+
+  <h3>3c · Target graph model (Rev 2)</h3>
+  <pre> (:ControlMApplication:Collection {name})           <== NEW (header-row APPLICATION)
+        |  CONTAINS_FOLDER                                (prov:hadMember)
+        v
+ (:ControlMServer:Platform {name})
+        ^  SCHEDULED_ON {since}                           (no PROV - infra)
+        |
+ (:ControlMFolder:Collection {folder_id, sched_table, env, lob, app_code, folder_type, active})
+        |  CONTAINS_JOB                                   (prov:hadMember)
+        v
+ (:ControlMJob:Activity {folder_id, job_id, job_name, application, owner, author, cmd_line, ...})
+        |  REQUIRES_IN_CONDITION {odate, and_or, isn}        (prov:used)
+        |  EMITS_OUT_CONDITION   {odate, sign, isn}          (prov:generated)
+        v
+ (:Condition:Entity {folder_id, name, version_serial})
+
+ (:ControlMJob) --WAS_INFORMED_BY {via_condition, recursion_level, dependency_path}--> (:ControlMJob)
+ every node    --WAS_GENERATED_BY {source:'BMC'}--> (:JobRun {run_id, kind:'load'})</pre>
+
+  <div class="notes"><div class="lbl">Notes</div><div class="rule"></div></div>
+</section>
+
+<!-- PAGE 4 -->
+<section class="page">
+  <h2>4 · Field → Label / Node / Edge mapping</h2>
+
+  <h3>Stage 1 — folders → Folder + Server + <span class="new">ControlMApplication</span></h3>
+  <p class="lede">Source <code>CM_DEF_VTAB</code> <strong>LEFT JOIN</strong> <code>CM_DEF_VJOB</code> header row.</p>
+  <table>
+    <tr><th>SQL column</th><th>Node property</th><th>Notes</th></tr>
+    <tr><td><code>T.TABLE_ID</code></td><td><code>ControlMFolder.folder_id</code></td><td>node key (UNIQUE)</td></tr>
+    <tr><td><code>T.SCHED_TABLE</code></td><td><code>.sched_table</code></td><td>authoritative folder name</td></tr>
+    <tr><td><code>T.DATA_CENTER</code></td><td><code>ControlMServer.name</code></td><td>P12/P14/P32/P33</td></tr>
+    <tr class="hl"><td><code>H.APPLICATION</code></td><td><code>ControlMApplication.name</code></td><td><strong>NEW</strong> — header row (<code>JOB_ID=1</code>); may be NULL</td></tr>
+    <tr><td><code>T.USER_DAILY</code></td><td><code>.user_daily</code>, <code>.active</code></td><td><code>active = not null/empty</code></td></tr>
+    <tr><td><em>parsed</em> <code>SCHED_TABLE</code></td><td><code>.environment/.lob/.app_code/.folder_type</code></td><td>via <code>folder_name.py</code></td></tr>
+  </table>
+  <p><strong>Edges:</strong> <code>(:ControlMFolder)-[:SCHEDULED_ON {since}]-&gt;(:ControlMServer)</code>;
+     <span class="new">(:ControlMApplication)-[:CONTAINS_FOLDER]-&gt;(:ControlMFolder)</span> — only when
+     <code>row.application</code> non-null (<code>WHERE</code> guard: the null-key-MERGE safeguard). Header-less
+     folders load without an application node.</p>
+
+  <h3>Stage 2 — jobs → <code>:ControlMJob:Activity</code></h3>
+  <p>Node key <code>(folder_id, job_id)</code> (JOB_ID folder-scoped); <code>VERSION_SERIAL</code> = audit property.</p>
+  <table>
+    <tr><th>SQL column</th><th>→ property</th></tr>
+    <tr><td><code>TABLE_ID</code>, <code>JOB_ID</code></td><td><code>.folder_id</code>, <code>.job_id</code> (key; folder MATCHed)</td></tr>
+    <tr><td><code>JOB_NAME</code>, <code>APPLICATION</code>, <code>GROUP_NAME</code>, <code>TASK_TYPE</code></td><td><code>.job_name</code>, <code>.application</code> (≠ SEAL), <code>.group_name</code>, <code>.task_type</code></td></tr>
+    <tr><td><code>OWNER</code>, <code>AUTHOR</code>, <code>NODE_ID</code>, <code>CMD_LINE</code></td><td><code>.owner</code>, <code>.author</code>, <code>.node_id</code>, <code>.cmd_line</code></td></tr>
+    <tr><td><code>CYCLIC*</code>, <code>IS_CURRENT_VERSION</code>, <code>VERSION_*</code></td><td>props; <code>.active = IS_CURRENT_VERSION='1'</code></td></tr>
+  </table>
+  <p><strong>Edge:</strong> <code>(:ControlMFolder)-[:CONTAINS_JOB]-&gt;(:ControlMJob)</code>.</p>
+
+  <h3>Stages 3 &amp; 4 — conditions → <code>:Condition:Entity</code> &nbsp;·&nbsp; Pass 4 — dependencies (edge-only)</h3>
+  <div class="two">
+    <table>
+      <tr><th>Stage</th><th>Edge (job → condition)</th></tr>
+      <tr><td>3 IN (<code>LNKI_P_VW</code>)</td><td><code>REQUIRES_IN_CONDITION {odate, and_or, parentheses, isn}</code></td></tr>
+      <tr><td>4 OUT (<code>LNKO_P_VW</code>)</td><td><code>EMITS_OUT_CONDITION {odate, sign, isn}</code></td></tr>
+    </table>
+    <p style="font-size:9px;align-self:center"><strong>Dependencies</strong> is a <strong>pure edge pass</strong>:
+      MERGEs no nodes, MATCHes both jobs <code>(folder_id, job_id)</code>, dir successor→predecessor;
+      <code>recursion_level</code>/<code>dependency_path</code> ON CREATE only; key <code>via_condition</code>.</p>
+  </div>
+
+  <h3>Identity &amp; provenance</h3>
+  <table>
+    <tr><th>Node</th><th>Key constraint</th></tr>
+    <tr class="hl"><td><code>:ControlMApplication</code></td><td><code>name</code> UNIQUE — <strong>new</strong> (<code>controlmapplication_name</code>; EXPECTED 37→38)</td></tr>
+    <tr><td><code>:ControlMServer</code></td><td><code>name</code> UNIQUE</td></tr>
+    <tr><td><code>:ControlMFolder</code></td><td><code>folder_id</code> UNIQUE</td></tr>
+    <tr><td><code>:ControlMJob</code></td><td><code>(folder_id, job_id)</code> NODE KEY</td></tr>
+    <tr><td><code>:Condition</code></td><td><code>(folder_id, name)</code> NODE KEY</td></tr>
+  </table>
+  <p class="lede">Every touched node also gets <code>-[:WAS_GENERATED_BY {source:'BMC'}]-&gt;(:JobRun)</code>
+     (plan 06 proposes to demote this blanket edge).</p>
+
+  <div class="notes"><div class="lbl">Notes</div><div class="rule"></div></div>
+</section>
+
+<!-- PAGE 5 -->
+<section class="page">
+  <h2>5 · Taxonomy (layer 1)</h2>
+  <p><code>config/taxonomy/controlm.yaml</code> — <strong>pure classification</strong> (<code>classification_only: true</code>;
+     <code>authority: bmc-baseline</code>; <code>classification: Internal</code>). Hierarchy
+     <code>ControlMServer &gt; ControlMFolder &gt; ControlMJob</code>; <code>Condition</code> keyed <code>(folder_id, name)</code>.
+     The <code>controlm-q1q3-phase1</code> gate (2026-07-07) added <span class="new">ControlMApplication</span> as a
+     folder grouping (Control-M <code>APPLICATION</code>, <em>not</em> the SEAL business app).</p>
+  <p>Sample example folders: <strong>161015</strong> <code>PRARAG-HLDM-85025-PEX-TRUST-DLY</code> (P12) &amp;
+     <strong>161016</strong> <code>PRARAG-HLDM-85025-PEX-TRUST-CYC</code> (P14).</p>
+
+  <h2>6 · Ontology (layer 2)</h2>
+  <p><code>config/taxonomy-ontology-map.yaml</code> — HITL-confirmed bridge. Lifecycle
+     <code>proposed → confirmed → applied</code>.</p>
+  <table>
+    <tr><th>Edge (Neo4j)</th><th>From → To (PROV)</th><th>Matrix row</th><th>PROV term</th><th>Status</th></tr>
+    <tr class="hl"><td><code>CONTAINS_FOLDER</code></td><td>Collection → Collection</td><td>Collection → any</td><td><code>prov:hadMember</code></td><td><strong>applied (Rev 2)</strong></td></tr>
+    <tr><td><code>CONTAINS_JOB</code></td><td>Collection → Activity</td><td>Collection → any</td><td><code>prov:hadMember</code></td><td>applied</td></tr>
+    <tr><td><code>SCHEDULED_ON</code></td><td>Collection → Platform</td><td>infra (no PROV)</td><td>—</td><td>confirmed</td></tr>
+    <tr><td><code>REQUIRES_IN_CONDITION</code></td><td>Activity → Entity</td><td>Activity → Entity</td><td><code>prov:used</code></td><td>confirmed</td></tr>
+    <tr><td><code>EMITS_OUT_CONDITION</code></td><td>Activity → Entity</td><td>Activity → Entity</td><td><code>prov:generated</code></td><td>confirmed</td></tr>
+    <tr><td><code>WAS_INFORMED_BY</code></td><td>Activity → Activity</td><td>Activity → Activity</td><td><code>prov:wasInformedBy</code></td><td>confirmed</td></tr>
+    <tr><td><code>WAS_GENERATED_BY</code></td><td>Entity/Activity → JobRun</td><td>—</td><td><code>prov:wasGeneratedBy</code></td><td>applied</td></tr>
+  </table>
+  <p><code>CONTAINS_FOLDER</code> reuses vocab <code>m3_contains_folder</code> (flipped <strong>planned → active</strong> this
+     gate); the loader that lands it is the <strong>folder pass</strong> (<code>controlm_folders.cypher</code>), not jobs.
+     Label duals encode PROV type: <code>:ControlMApplication:Collection</code>, <code>:ControlMFolder:Collection</code>,
+     <code>:ControlMJob:Activity</code>, <code>:Condition:Entity</code>, <code>:JobRun</code>. <code>ControlMServer</code> is a
+     local <strong>Platform</strong>, deliberately not a <code>prov:Agent</code>.</p>
+  <p class="lede"><em>Not yet live:</em> <code>WAS_ASSOCIATED_WITH</code> job→SEAL app (proposed, K2);
+     <code>OBSERVES</code> job-run SOSA observation (proposed, gate not run).</p>
+
+  <div class="notes"><div class="lbl">Notes</div><div class="rule tall"></div></div>
+</section>
+
+<!-- PAGE 6 -->
+<section class="page">
+  <h2>7 · Worked example — <code>--folder 'PRARAG-HLDM-85025-PEX%'</code></h2>
+
+  <h3>7a · What the pattern matches</h3>
+  <p><code>SCHED_TABLE LIKE 'PRARAG-HLDM-85025-PEX%'</code> is a <strong>prefix</strong> match → both 85025
+     folders: <code>161015</code> (…-DLY, P12) and <code>161016</code> (…-CYC, P14). Not <code>161014</code>
+     (…-<strong>111027</strong>-…). Drop the <code>%</code> for a single exact folder.</p>
+
+  <h3>7b · Folder-name parse</h3>
+  <div class="two">
+    <table>
+      <tr><th>Pos</th><th>Char</th><th>Meaning</th></tr>
+      <tr><td>1</td><td><code>P</code></td><td>environment = <strong>Production</strong></td></tr>
+      <tr><td>2</td><td><code>R</code></td><td>LOB = <strong>Retail</strong></td></tr>
+      <tr><td>3–5</td><td><code>ARA</code></td><td>app_code = <strong>ARA</strong></td></tr>
+      <tr><td>6</td><td><code>G</code></td><td>folder_type = <strong>Smart folder</strong></td></tr>
+    </table>
+    <div class="call" style="align-self:center"><b>Trap.</b><br>Folder <em>type</em> = prefix pos 6 (<code>G</code>),
+      not the <code>DLY</code>/<code>CYC</code> suffix. And this <code>app_code=ARA</code> is a <strong>third</strong>
+      thing, separate from the header-row <code>:ControlMApplication</code> (§7d).</div>
+  </div>
+
+  <h3>7c · The five SQL steps (one shared bind dict)</h3>
+  <pre>binds = {"folder_filter": "PRARAG-HLDM-85025-PEX%", "run_as": None, "developer_sid": None, "row_cap": None}</pre>
+  <pre class="sql">-- Step 1 · folders  (Rev 2: LEFT JOIN the header row for APPLICATION)
+SELECT T.TABLE_ID AS folder_id, T.SCHED_TABLE AS sched_table, T.DATA_CENTER AS data_center,
+       H.APPLICATION AS application, T.USER_DAILY, ...
+FROM   psgmgr.CM_DEF_VTAB T
+LEFT JOIN psgmgr.CM_DEF_VJOB H
+       ON  H.TABLE_ID = T.TABLE_ID
+       AND H.JOB_ID   = 1                 -- SMART-Table header row
+       AND H.IS_CURRENT_VERSION = '1'
+WHERE  T.USER_DAILY IS NOT NULL
+  AND  T.SCHED_TABLE LIKE :folder_filter;  -- -> 161015, 161016
+
+-- Steps 2-5 (jobs, IN/OUT conditions, recursive dependencies): UNCHANGED this commit.
+--   each joins CM_DEF_VTAB and filters SCHED_TABLE LIKE :folder_filter
+--   step 5 anchors on JOB_DEF.PARENT_TABLE LIKE :folder_filter, then recurses across folders.</pre>
+
+  <h3>7d · What lands in the graph (from the sample)</h3>
+  <ol class="tight">
+    <li><strong>2 folders</strong> (<code>161015</code>, <code>161016</code>) → <code>SCHEDULED_ON</code> P12, P14; both parse env=Production, lob=Retail, app_code=ARA.</li>
+    <li><strong>:ControlMApplication (Rev 2):</strong> under <code>--use-oracle</code>, each folder's header row (<code>JOB_ID=1</code>) supplies <code>APPLICATION</code> → a <code>:ControlMApplication {name}</code> node + <code>CONTAINS_FOLDER</code> to the folder. <em>(CSV sample mode without header rows: <code>application</code> NULL → <code>WHERE</code> guard skips it; folders still load.)</em></li>
+    <li><strong>8 jobs</strong> (5 in 161015 + 3 in 161016), each <code>CONTAINS_JOB</code>.</li>
+    <li><strong>Condition nodes</strong> (5 DLY + 3 CYC names) wired by <code>REQUIRES_IN</code> / <code>EMITS_OUT</code>, shared where names match.</li>
+    <li><strong>WAS_INFORMED_BY</strong> among ARA jobs where IN-cond = another's OUT-cond (e.g. <code>…_PLCT → …_PREPROC → …_FW</code>).</li>
+    <li>Every node gets one <code>WAS_GENERATED_BY</code> → this run's <code>:JobRun</code>.</li>
+  </ol>
+
+  <div class="notes"><div class="lbl">Notes</div><div class="rule"></div></div>
+</section>
+
+<!-- PAGE 7 -->
+<section class="page">
+  <h3>7e · Execution path (code)</h3>
+  <pre>cli.ingest_controlm(use_oracle=True, folder='PRARAG-HLDM-85025-PEX%')
+  -> _gate_source("controlm-psgmgr")                    # D3 confirmed-gate
+  -> scope  = _scope_binds(folder, None, None, None)
+  -> stages = [folders, jobs, cond_in, cond_out, deps]  # order IS the contract
+  -> for stage in stages:
+        sql     = (SQL_DIR / stage.sql).read_text()      # static file, verbatim
+        adapter = OracleAdapter(query=sql, bind_params=scope)
+        cursor.execute(sql, scope)                        # <- BIND, not string-format
+        rows -> Loader.load() -> UNWIND $batch ... MERGE  # the .cypher for that stage</pre>
+
+  <h2>Appendix — sticky-note gotchas</h2>
+  <ol class="tight">
+    <li>Load order is <strong>contractual</strong> (<code>test_ingest_chain_order_is_enforced</code>): constraints → folders → jobs → conditions → <strong>deps (edge-only)</strong> → K2 (gated).</li>
+    <li>Folder pass now makes <strong>two</strong> grouping nodes: <code>:ControlMServer</code> (DATA_CENTER) and <code>:ControlMApplication</code> (header-row APPLICATION, <code>JOB_ID=1</code>, LEFT JOIN + <code>WHERE</code> guard).</li>
+    <li>Three "applications": header-row <code>:ControlMApplication</code> ≠ SEAL <code>:Application</code> ≠ folder-name <code>app_code</code>.</li>
+    <li><code>IS_CURRENT_VERSION = '1'</code> is a <strong>string</strong>; folders use <code>USER_DAILY IS NOT NULL</code>.</li>
+    <li>Folder name = <code>SCHED_TABLE</code> (truth) vs <code>PARENT_TABLE</code> (denormalized on job).</li>
+    <li><code>JOB_ID</code> is <strong>folder-scoped</strong> → identity <code>(folder_id, job_id)</code>.</li>
+    <li>Folder <em>type</em> = prefix position 6 (<code>G</code>), not the <code>DLY</code>/<code>CYC</code> suffix.</li>
+    <li><code>--folder</code> is a <strong>bind</strong>, prefix <code>LIKE</code>; <code>%</code> matches DLY <em>and</em> CYC.</li>
+    <li>Dependencies pass <strong>creates no nodes</strong> — MATCHes both jobs; a missing endpoint surfaces, no ghost node.</li>
+  </ol>
+
+  <div class="notes"><div class="lbl">Open questions / follow-ups</div><div class="rule tall"></div></div>
+</section>
+
+</body>
+</html>
