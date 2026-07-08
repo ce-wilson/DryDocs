@@ -48,6 +48,7 @@
 | *(future H5)* `drydocs/publishing/**` | `drydocs-review` — docs publish pipeline (Confluence push abstracted) | external (docs target) |
 | `drydocs/plan_board.py` | `drydocs-plan` — backlog.yaml → HTML project board renderer (Epic I) | `docs/plan/board.html` |
 | `drydocs/doc_outline.py` | `drydocs-docgen` — canonical doc-outline completeness + traceability validator (Epic L) | — (pure; validates docs) |
+| `drydocs/design_doc.py` | `drydocs-docgen` — deterministic Markdown→HTML/print.html renderer (Epic L) | `docs/design/*.{html,print.html}` |
 | *(future)* `drydocs-lineage` | C2 — curated cmd-line lineage | `drydocs` |
 | *(future)* `drydocs-deepdoc` | C3 — on-demand deep dive | `drydocs_context` |
 | *(separate module)* `drydocs-remediation` | C1 — failures → Jira | — (no graph write) |

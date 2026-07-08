@@ -1085,7 +1085,7 @@ items:
     agent: main
     model: sonnet
     priority: p2
-    status: todo
+    status: done
     depends_on: [L1]
     inputs: [scripts/render_board.py, drydocs/plan_board.py, drydocs/gate_pages.py, docs/design/controlm-ingestion-tdd.md]
     acceptance: >
@@ -1098,9 +1098,21 @@ items:
       regen; full suite green.
     output: scripts/render_design_doc.py + drydocs/design_doc.py
     notes: >
-      Needs a markdown renderer — one small PINNED dep (markdown/mistune); deterministic
-      given the pinned version + fixed template. Adds drydocs-docgen to MODULE_MAP.md +
-      the boundary default-deny group.
+      Renderer approach = B2 (user, 2026-07-08): stdlib hand-rolled markdown-SUBSET renderer,
+      NO new dependency — determinism is intrinsic (no library version to drift) and matches
+      the repo's hand-built-HTML pattern. Subset: headings, GFM tables, fenced code, bold,
+      italic, inline code, links, blockquotes, ordered/unordered (nested) lists, hr, anchors.
+    progress: >
+      2026-07-08 — DONE (user sign-off; option 1 — the generated print.html is accepted as the
+      single-source-derived artifact, retiring the hand-crafted one).
+      drydocs/design_doc.py (render_body/render_doc/write_doc; `<!-- anchor: id -->` -> element
+      id; screen + print CSS, print CSS reuses the prior hand-tuned look); scripts/
+      render_design_doc.py CLI; tests/unit/test_design_doc.py (14 tests) pass via direct driver;
+      render is byte-identical across re-runs (deterministic). Generated controlm-ingestion-tdd.
+      {html,print.html} from the .md — the .md is now the SINGLE SOURCE (hand-maintained
+      print.html RETIRED; it loses the bespoke page-1/callout/footer chrome that was hand-authored
+      and never in the md). Ritual hook: snapshot.ps1 refreshes docs/design/*.md + the CLAUDE.md
+      stale-render check extended. boundary 4/4; backlog green.
   - id: L4
     epic: doc-infrastructure
     title: "Deterministic PDF step (.print.html -> .pdf, pinned headless)"
@@ -1219,8 +1231,8 @@ items:
 # Roll-up the dispatcher can glance at. COMPUTED views — test_backlog.py enforces
 # that these match the items exactly; update them with any status change.
 summary:
-  todo: 10                                          # E2, G3-G4, G9, L3-L8
+  todo: 9                                           # E2, G3-G4, G9, L4-L8
   in_progress: 5                                    # E1, F1, F2, K2 (awaiting HITL), G2 (core shim)
   blocked: 1                                        # G7 — live multi-DB deploy needs an Enterprise target
-  done: 32                                          # A1-A3, B1-B4, C1-C4, D1-D3, G1, G5-G6, G8, H1-H7, I1-I4, J1, K1, L1
-  next_ready: [L3]                                  # L1 done → L3 (deterministic renderer) unblocked; test-enforced
+  done: 33                                          # A1-A3, B1-B4, C1-C4, D1-D3, G1, G5-G6, G8, H1-H7, I1-I4, J1, K1, L1, L3
+  next_ready: [L4, L5]                              # L3 done → L4 (pdf) + L5 (digital HITL) unblocked

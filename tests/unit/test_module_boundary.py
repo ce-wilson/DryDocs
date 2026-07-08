@@ -59,6 +59,7 @@ COMPONENT_GROUPS: dict[str, tuple[str, ...]] = {
     # markup (Epic L). Imports only stdlib + config; never a component.
     "docgen": (
         "drydocs.doc_outline",
+        "drydocs.design_doc",
     ),
 }
 ALL_COMPONENT_PREFIXES: tuple[str, ...] = tuple(

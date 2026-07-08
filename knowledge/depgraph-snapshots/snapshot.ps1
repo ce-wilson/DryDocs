@@ -32,6 +32,20 @@ try {
   Write-Warning "board refresh skipped: $($_.Exception.Message)"
 }
 
+# --- refresh the design docs (best-effort; part of the session-end ritual) ----
+# docs/design/*.md -> <stem>.html + <stem>.print.html (Epic L). Deterministic render:
+# a resulting git diff on a doc render means the committed HTML was stale — commit it.
+try {
+  Push-Location $repo
+  $env:PYTHONPATH = "."
+  $designDocs = Get-ChildItem "$repo\docs\design\*.md" -ErrorAction SilentlyContinue
+  if ($designDocs) { & python scripts/render_design_doc.py @($designDocs.FullName) | Write-Host }
+  Pop-Location
+} catch {
+  Pop-Location -ErrorAction SilentlyContinue
+  Write-Warning "design-doc refresh skipped: $($_.Exception.Message)"
+}
+
 $dep  = (Resolve-Path "$here\..\..\..\depgraph").Path
 
 # --- git metadata (best-effort) ---------------------------------------------
