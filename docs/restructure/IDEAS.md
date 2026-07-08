@@ -26,6 +26,16 @@ Tags help grooming: `idea` · `bug` · `doc` · `source` (new data source) · `q
 
 <!-- add new ideas at the top -->
 
+- 2026-07-07 — [question] **Same-row-derived node relationships** (city/state/country
+  pattern): when ONE source row fans out into multiple nodes at different hierarchy
+  grains, check what relationships (if any) belong BETWEEN those derived nodes — not
+  just from each back to the row's entity. Live case: a CM_DEF_VTAB row (+ header join)
+  now yields folder + ControlMServer + ControlMApplication; folder connects to both
+  (SCHEDULED_ON / CONTAINS_FOLDER), but should app↔server relate directly, or only
+  through the folder (risk: fan-out edges that restate a join)? Generic rule wanted for
+  the ontology layer (chain the hierarchy city→state→country vs star-to-entity), then
+  verify existing loaders against it. Route through ontology-mapper + the HITL gate;
+  candidate m3-verify/graph-tests invariant once decided.
 - 2026-07-07 — [idea] **Source column mappings** (per-source column ledger): every source is a
   wide table used narrowly (CM_DEF_VJOB 100+ cols → ~26 projected; HR roster → SID/location/
   cost-center subset) and the used/excluded/why record is scattered (SQL headers, 06a, gate
