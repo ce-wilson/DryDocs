@@ -238,6 +238,16 @@ def test_folder_sql_uses_sched_table() -> None:
     assert "T.IS_CURRENT_VERSION" not in text
 
 
+def test_jobs_sql_projects_the_audit_envelope() -> None:
+    """Doc 06 Phase 1: the envelope columns are PROJECTED, not filter-only
+    (gate controlm-q1q3-phase1; mapping in config/audit-fields.yaml)."""
+    text = (SQL_DIR / "controlm_jobs.sql").read_text(encoding="utf-8")
+    for col in ("J.CREATION_USER", "J.CREATION_DATE", "J.CHANGE_USERID", "J.CHANGE_DATE"):
+        assert f"{col} " in text or f"{col}\t" in text.replace("  ", " "), f"missing projection {col}"
+    assert "AS creation_user" in text
+    assert "AS change_date" in text
+
+
 def test_jobs_sql_filters_current_version_as_string() -> None:
     text = (SQL_DIR / "controlm_jobs.sql").read_text(encoding="utf-8")
     # IS_CURRENT_VERSION is VARCHAR2(1); literal must be a string.

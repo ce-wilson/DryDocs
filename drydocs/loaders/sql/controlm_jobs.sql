@@ -53,7 +53,14 @@ SELECT
     J.VERSION_TIMESTAMP   AS version_timestamp,
     J.VERSION_USER        AS version_user,
     J.INSTANCE_NAME       AS instance_name,
-    J.CAPTURE_DATE        AS capture_date
+    J.CAPTURE_DATE        AS capture_date,
+    -- source audit envelope (doc 06 Phase 1; gate controlm-q1q3-phase1):
+    -- CREATION_* + CHANGE_* are the envelope; VERSION_* are current-version
+    -- duplicates and stay non-envelope audit properties.
+    J.CREATION_USER       AS creation_user,
+    J.CREATION_DATE       AS creation_date,
+    J.CHANGE_USERID       AS change_userid,
+    J.CHANGE_DATE         AS change_date
 FROM   psgmgr.CM_DEF_VJOB J
 JOIN   psgmgr.CM_DEF_VTAB T   ON J.TABLE_ID = T.TABLE_ID
 WHERE  J.IS_CURRENT_VERSION = '1'

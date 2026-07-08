@@ -139,7 +139,14 @@ class ControlMJobRow(BaseModel):
         job_order, owner, author, node_id, cmd_line, description,
         memname, priority, critical, active_from, active_till,
         end_folder, is_current_version, version_opcode,
-        version_timestamp, version_user, instance_name, capture_date
+        version_timestamp, version_user, instance_name, capture_date,
+        creation_user, creation_date, change_userid, change_date
+
+    The last four are the SOURCE AUDIT ENVELOPE (doc 06 Phase 1; column
+    mapping SME-confirmed at gate ``controlm-q1q3-phase1``): they become the
+    ``source_created_by/_at`` + ``source_updated_by/_at`` node properties per
+    ``config/audit-fields.yaml``. ``VERSION_USER``/``VERSION_TIMESTAMP`` stay
+    projected but are NOT the envelope (current-version duplicates, per gate).
     """
 
     model_config = ConfigDict(
@@ -198,6 +205,16 @@ class ControlMJobRow(BaseModel):
     instance_name: str | None = None
     capture_date: str | None = None
 
+    # --- source audit envelope (doc 06; gate controlm-q1q3-phase1) ---
+    creation_user: str | None = Field(
+        None, description="Original creator SID (CREATION_USER) -> source_created_by.")
+    creation_date: str | None = Field(
+        None, description="Creation timestamp (CREATION_DATE) -> source_created_at.")
+    change_userid: str | None = Field(
+        None, description="Last editor SID (CHANGE_USERID) -> source_updated_by.")
+    change_date: str | None = Field(
+        None, description="Last change timestamp (CHANGE_DATE) -> source_updated_at.")
+
     # --- coercers ---
 
     @field_validator("version_serial", mode="before")
@@ -216,6 +233,7 @@ class ControlMJobRow(BaseModel):
         "description", "memname", "priority", "critical", "active_from",
         "active_till", "end_folder", "is_current_version", "version_opcode",
         "version_timestamp", "version_user", "instance_name", "capture_date",
+        "creation_user", "creation_date", "change_userid", "change_date",
         mode="before",
     )
     @classmethod
