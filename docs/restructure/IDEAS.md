@@ -26,6 +26,15 @@ Tags help grooming: `idea` · `bug` · `doc` · `source` (new data source) · `q
 
 <!-- add new ideas at the top -->
 
+- 2026-07-07 — [idea] **Source column mappings** (per-source column ledger): every source is a
+  wide table used narrowly (CM_DEF_VJOB 100+ cols → ~26 projected; HR roster → SID/location/
+  cost-center subset) and the used/excluded/why record is scattered (SQL headers, 06a, gate
+  provenance). Plan: `08-source-column-mappings.md` — `config/source-mappings/<source-id>.yaml`
+  keyed to source-registry (gains a `mapping:` pointer), dispositions
+  projected/filter-only/excluded/deferred with origin source|derived reused from gate pages,
+  coverage test vs db-skill profile census, SQL SELECT-list drift guard, ccb- twin for
+  confidential censuses. ODCS v3 vocabulary-compatible, no dependency. Groom Phase 0–1 to
+  backlog when ready.
 - 2026-07-07 — [idea] Third-party software registry ("TechStack"): Vendor → SoftwareProduct →
   `(:Application)-[:USES_SOFTWARE {version}]->()` — answers "which apps use Ab Initio / Oracle 19"
   and gives Oracle/Neo4j the classification BMC already has. Kills the `vendor-bmc` tooling id
