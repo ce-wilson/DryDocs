@@ -75,6 +75,16 @@ SET j.version_serial     = row.version_serial,
     j.capture_date       = CASE WHEN row.capture_date IS NULL OR row.capture_date = '' THEN null
                                 ELSE datetime(replace(row.capture_date, ' ', 'T')) END,
     j.active             = row.is_current_version = '1',
+
+    // source audit envelope (config/audit-fields.yaml, controlm-psgmgr entry;
+    // gate controlm-q1q3-phase1). Datetimes normalized at the boundary.
+    j.source_created_by  = row.creation_user,
+    j.source_created_at  = CASE WHEN row.creation_date IS NULL OR row.creation_date = '' THEN null
+                                ELSE datetime(replace(row.creation_date, ' ', 'T')) END,
+    j.source_updated_by  = row.change_userid,
+    j.source_updated_at  = CASE WHEN row.change_date IS NULL OR row.change_date = '' THEN null
+                                ELSE datetime(replace(row.change_date, ' ', 'T')) END,
+
     j.last_seen_at       = datetime($loaded_at),
     j.last_run_id        = $run_id
 

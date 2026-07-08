@@ -33,6 +33,12 @@ Tags help grooming: `idea` · `bug` · `doc` · `source` (new data source) · `q
   brd.outline.yaml` (reuse the `drydocs.doc-outline.v1` schema + traceability spine) into Epic L.
   Seed from the corpus: `SDLC-Docs/BRD - Table of Contents.docx`, `business requirements document
   template 31.docx`, `Business Requirements Template - FULL CDI Version.docx`.
+- 2026-07-07 — [idea] **Property-level ontology terms for the audit envelope**: the four
+  envelope props (audit-fields.yaml) deserve standard-term bindings — dct:creator/dct:created/
+  dct:modified (Dublin Core) or PROV qualified attribution (prov:wasAttributedTo +
+  prov:generatedAtTime). relationship_vocabulary.yaml covers EDGES only; decide whether
+  property-term bindings get their own registry or a vocabulary-file section (SOSA is NOT the
+  home — the envelope is authorship provenance, not observation). Route via ontology-mapper.
 - 2026-07-07 — [question] **Same-row-derived node relationships** (city/state/country
   pattern): when ONE source row fans out into multiple nodes at different hierarchy
   grains, check what relationships (if any) belong BETWEEN those derived nodes — not

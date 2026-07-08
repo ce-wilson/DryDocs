@@ -57,6 +57,12 @@ SET f.sched_table       = row.sched_table,
     f.last_updated      = CASE WHEN row.last_updated IS NULL OR row.last_updated = '' THEN null
                                ELSE datetime(replace(row.last_updated, ' ', 'T')) END,
     f.last_updated_user = row.last_updated_user,
+    // source audit envelope (audit-fields.yaml): CM_DEF_VTAB has no creation
+    // columns — updated-side only. Kept alongside the raw-named props above;
+    // the raw pair retires in the doc-06 Phase 3 migration.
+    f.source_updated_by = row.last_updated_user,
+    f.source_updated_at = CASE WHEN row.last_updated IS NULL OR row.last_updated = '' THEN null
+                               ELSE datetime(replace(row.last_updated, ' ', 'T')) END,
     f.capture_date      = CASE WHEN row.capture_date IS NULL OR row.capture_date = '' THEN null
                                ELSE datetime(replace(row.capture_date, ' ', 'T')) END,
     f.environment_code  = row.environment_code,

@@ -78,11 +78,26 @@ before deleting anything.
   property names and each source's column→envelope mapping; settle the time-series
   use case above. Deliverable: confirmed `config/audit-fields.yaml` (+ schema
   test), gate record. *No graph or loader changes.*
+  **✅ DONE for Control-M 2026-07-07** (gate `controlm-q1q3-phase1`, gate-log +
+  06a §SME resolutions): envelope = `CREATION_*` + `CHANGE_*` (`VERSION_*`
+  excluded as current-version duplicates; `CAPTURE_DATE` never authorship);
+  `config/audit-fields.yaml` created with the confirmed controlm-psgmgr entry +
+  `stub` entries for the other confirmed sources (SEAL/PAT envelope gates =
+  Phase 4; software-registry likely needs none — git history is its audit
+  trail). Guarded by `tests/unit/test_audit_fields.py`.
 - **Phase 1 — Control-M audit envelope.** Extend `controlm_jobs.sql` /
   `controlm_folders.sql` extracts and their cypher to SET the envelope
   properties (normalize to `datetime()` — fixes the strings-as-dates review issue
   while touching these lines). Standardize `first_seen_at`/`last_seen_at`/
   `last_run_id` on all Control-M loaders. Tests per loader.
+  **✅ DONE 2026-07-07** (same session): jobs extract projects
+  `CREATION_USER/DATE` + `CHANGE_USERID/DATE` (was filter-only) → cypher SETs
+  `source_created_by/_at` + `source_updated_by/_at` with boundary `datetime()`
+  normalization; folders SET the updated-side pair from `LAST_UPDATED*` (no
+  creation columns on `CM_DEF_VTAB`; raw-named props retire in Phase 3).
+  Deferred within phase: derived `employee_sid` (strip trailing 'p' — gated,
+  separate build); the `first_seen_at` naming standardization (nodes use
+  `created_at` today — fold into Phase 3's migration rather than churn twice).
 - **Phase 2 — provenance-edge diet.** Delta detection in loaders (checksum or
   version compare); `WAS_GENERATED_BY` only on create/change; full-refresh writes
   counts on `:JobRun` only. Vocabulary note updated via the gate.
