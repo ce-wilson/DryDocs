@@ -90,6 +90,10 @@ plan:
       title: Source governance ledgers
       goal: "Per-source governance as test-enforced config: audit envelope + edge diet (doc 06, Epic M) and column-mapping ledgers (doc 08, Epic N); property-term bindings via the gate."
       status: in_progress   # doc-06 Phases 0-1 (Control-M envelope) shipped 2026-07-07 pre-groom
+    - id: 12
+      title: Web console / graph visualization
+      goal: "Browser front-end over the knowledge graph: navigable C4/graph views, with a decided browser↔Neo4j access path (bolt-from-browser vs a thin API)."
+      status: in_progress   # design pass in flight (feat/web-console-design-pass); Epic O / O1
 
 # ── Module / work-area registry (item.module must be one of these) ───────────
 # Code components mirror MODULE_MAP.md; the rest are repo work areas so that
@@ -103,6 +107,7 @@ modules:
   - drydocs-lineage      # future component (G4)
   - drydocs-deepdoc      # future component (G4)
   - drydocs-remediation  # future component (G3)
+  - drydocs-web          # JS/TS front-end under web/ (Epic O, phase 12) — console + graph viz; not a Python package, so absent from MODULE_MAP.md/test_module_boundary.py
   - reference            # reference/ + external/ vendor & standards material
   - taxonomy             # config/taxonomy/ captures
   - ontology             # drydocs/schema/, relationship vocabulary, mappings
@@ -1061,8 +1066,81 @@ items:
     notes: >
       Done 2026-07-09 (user decision: v0.3.0 over v0.2.0 — matches phase 8's release: field;
       0.1.0 was the poetry-init stub, 0.2.0 skipped). Promoted from the parked IDEAS
-      versioning-reset line. Sibling parked lines (CI, cli.py regroup, unused-dep removal,
-      integration tests) remain in the inbox pending their own decisions.
+      versioning-reset line. Sibling parked lines (cli.py regroup) remain in the inbox
+      pending their own decisions; CI + unused-dep removal promoted 2026-07-09 (J5, J6).
+
+  - id: J4
+    epic: release-infrastructure
+    title: "Refresh the run-drydocs skill: stale test counts, PyYAML gotcha, dropped Aura, m3-supplement rename"
+    type: chore
+    module: docs
+    phase: 8
+    agent: main
+    model: haiku
+    priority: p3
+    status: todo
+    depends_on: []
+    inputs: [.claude/skills/run-drydocs/SKILL.md, pyproject.toml]
+    acceptance: >
+      .claude/skills/run-drydocs/SKILL.md is reconciled to current reality: the two
+      "PyYAML not installed / 4 skipped" Gotchas are removed (PyYAML is a runtime dep since
+      D2 — pyproject.toml [tool.poetry.dependencies]); the "159 pass, 4 skipped" counts
+      (lines 30, 99) are refreshed to the current suite; the dropped Neo4j Aura references
+      (Aura ruled out 2026-07-06) are repointed to the Docker EE / local-Neo4j path; and the
+      stale apply-m3-supplement command (line 65) is reconciled to apply-ontology-supplement.
+      No functional change to the skill; smoke.ps1 still runs.
+    notes: >
+      Groomed 2026-07-09 from the IDEAS line. Verified 2026-07-09: SKILL.md still asserts
+      PyYAML uninstalled (x2), "159 pass", Aura, and apply-m3-supplement — all stale. Same
+      doc-drift hygiene class as J1/J2.
+
+  - id: J5
+    epic: release-infrastructure
+    title: "CI: GitHub Actions running the CLAUDE.md gates + the classification publish-boundary guard"
+    type: chore
+    module: docs
+    phase: 8
+    agent: main
+    model: sonnet
+    priority: p2
+    status: todo
+    depends_on: []
+    inputs: [pyproject.toml, tests/unit/, CLAUDE.md, tests/unit/test_classification.py]
+    acceptance: >
+      A .github/workflows/ci.yml runs on push + pull_request: checkout, set up Python
+      (3.11 + 3.12) + Poetry (cached), poetry install, then the CLAUDE.md acceptance gates —
+      poetry run pytest -q, python -c "import drydocs.cli", drydocs --help, and ruff check —
+      plus the publish-boundary guard (test_classification.py) and test_schema.py; the
+      network-dependent Neo4j steps are excluded (unit-test scope only); the workflow is green
+      on main with no test/code changes required to pass.
+    notes: >
+      Groomed 2026-07-09 from the parked IDEAS CI line (2026-07-01 architecture review; user
+      confirmed promote 2026-07-09). Turns the CLAUDE.md §6 gates into an enforced push guard;
+      the classification test is the automated half of the publish boundary (PUBLISH-BOUNDARY.md).
+
+  - id: J6
+    epic: release-infrastructure
+    title: "Drop the unused streamlit dependencies (streamlit + streamlit-agraph)"
+    type: chore
+    module: docs
+    phase: 8
+    agent: main
+    model: haiku
+    priority: p3
+    status: todo
+    depends_on: []
+    inputs: [pyproject.toml, poetry.lock]
+    acceptance: >
+      streamlit and streamlit-agraph are removed from pyproject.toml
+      [tool.poetry.dependencies] and poetry.lock is regenerated (poetry remove / poetry lock);
+      a repo grep confirms neither is imported anywhere; pandas and pypdf are RETAINED (pandas
+      kept deliberately for analytical work per drydocs/adapters/csv_adapter.py; pypdf is used
+      by scripts/ingest_jpmc_reports.py); poetry run pytest -q stays green and drydocs --help works.
+    notes: >
+      Groomed 2026-07-09 from the parked unused-deps IDEAS line, SCOPED after verification: the
+      original note also named pandas (intentional — csv_adapter.py:6-8) and pypdf (now imported
+      by scripts/ingest_jpmc_reports.py:27), so only the two streamlit packages are actually dead
+      (imported nowhere). Removes the heaviest unused install weight.
 
   # ── Epic K — SEAL application attribution (seal_app_ref) — Phase 9 ────────
   # Groomed 2026-07-01 from the company reconciliation answers (SME-run prompt).
@@ -1545,11 +1623,42 @@ items:
       a test requires a ledger for every confirmed source. Full suite green.
     notes: "Doc 08 Phase 1. Profile-census refresh via the db skill is doc-08 Phase 2 (not this item)."
 
+  # ── Epic O — Web console / graph visualization (main) — Phase 12 ───────────
+  # Groomed 2026-07-09 (user decision: promote to a module + phase — the web/ front-end
+  # design pass is in flight on branches). NEW module drydocs-web (JS/TS under web/, not a
+  # Python package, so absent from MODULE_MAP.md/test_module_boundary.py). This is the
+  # browser surface over the graph — distinct from every Python component.
+  - id: O1
+    epic: web-console
+    title: "Web console design pass: wireframes, a real C4/graph rendering, and the browser↔Neo4j access decision"
+    type: requirement
+    module: drydocs-web
+    phase: 12
+    agent: main
+    model: opus
+    priority: p2
+    status: in_progress
+    depends_on: []
+    inputs: [web/, docs/decisions/]
+    acceptance: >
+      The web/ front-end leaves its throwaway-test-page state: wireframes committed; a
+      decision recorded (ADR or design doc) on the browser↔Neo4j access path — bolt-from-
+      browser vs a thin API — with rationale; the console renders a REAL C4 / graph view of
+      the knowledge graph (NVL or an agraph-successor in web/, against the local EE DB)
+      rather than the test page; drydocs-web's build/run is documented. No secrets in web/
+      (publish boundary).
+    notes: >
+      Groomed 2026-07-09 from the 2026-07-03 IDEAS note (updated 2026-07-09 with the active
+      branches). Marked in_progress: a design pass is actively in flight (branches
+      feature/ui-dark-landing-myapps + origin/feat/web-console-design-pass, untracked UI-WIP/).
+      Plan change (user-approved): created module drydocs-web + phase 12. The architecture is
+      still open — the bolt-vs-thin-API call is the crux of this item.
+
 # Roll-up the dispatcher can glance at. COMPUTED views — test_backlog.py enforces
 # that these match the items exactly; update them with any status change.
 summary:
-  todo: 15                                          # C5, C6, E2, G3-G4, G9, J2, K3, L7-L9, M2-M4, N2
-  in_progress: 5                                    # E1, F1, F2, K2 (awaiting HITL), G2 (core shim)
+  todo: 18                                          # C5, C6, E2, G3-G4, G9, J2, J4-J6, K3, L7-L9, M2-M4, N2
+  in_progress: 6                                    # E1, F1, F2, K2 (awaiting HITL), G2 (core shim), O1 (web design pass)
   blocked: 0
   done: 40                                          # A1-A3, B1-B4, C1-C4, D1-D3, G1, G5-G7, G8, H1-H7, I1-I4, J1, J3, K1, L1, L3-L6, M1, N1
-  next_ready: [C5, C6, J2, K3, L7, L8, L9, M2, M3, M4, N2]  # +C6, +J2 groomed 2026-07-09; J3 (v0.3.0 release) done same day
+  next_ready: [C5, C6, J2, J4, J5, J6, K3, L7, L8, L9, M2, M3, M4, N2]  # +J4/J5/J6 groomed 2026-07-09 (run-drydocs refresh, CI, streamlit-dep drop)

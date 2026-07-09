@@ -50,36 +50,39 @@ Tags help grooming: `idea` · `bug` · `doc` · `source` (new data source) · `q
   manifest-routed markdown vs vector RAG) + ADR 0004 still remain before P1–P3 promote.
 - 2026-07-03 — [chore] the local `neo4j-drydocs-ee` Docker container's password is literally the
   string `<password>` (copy-paste artifact at creation). Fine for sandbox; change it before
-  anything less throwaway. (Found while wiring web/ + agents/ to it.)
-- 2026-07-03 — [idea] web/ front end shipped as a throwaway test page (no design pass). Needs:
-  plan/wireframes, a real C4 rendering (NVL?), and a decision on whether the basic Cypher flow
-  keeps talking bolt-from-browser or goes through a thin API. (2026-07-09: a design pass is now
-  in flight — branches `feature/ui-dark-landing-myapps` + `origin/feat/web-console-design-pass`,
-  untracked `UI-WIP/`; promote to a backlog item once a web module/phase is decided — currently
-  no `drydocs-web` module nor UI phase exists in backlog.yaml, so it's a plan change.)
-- 2026-07-03 — [question] LLM key strategy for the ADK agents (core_ingest, controlm_fix):
+  anything less throwaway. (Found while wiring web/ + agents/ to it.)- 2026-07-03 — [question] LLM key strategy for the ADK agents (core_ingest, controlm_fix):
   GOOGLE_API_KEY (Gemini) vs routing to Anthropic via LiteLLM; company side is Fusion SmartSDK
   on ADK, so Gemini-shaped is the safer default.
 - 2026-07-03 — [chore] `common/` shows up in ADK `/list-apps` (it's a shared-tools package, not
-  an app). Cosmetic; hide or restructure later.
-- 2026-07-03 — [chore] repo `.venv` has no pytest (and poetry isn't on PATH in plain PowerShell)
-  — the `poetry run pytest -q` gate can't run as documented on this machine; reinstall dev deps.
-- [chore] CI: GitHub Actions running the CLAUDE.md gates (pytest -q, import drydocs.cli,
-  drydocs --help, ruff) on every push; classification test as publish-boundary guard. (same review)
-- [doc] .claude/skills/run-drydocs/SKILL.md Gotchas are stale: PyYAML IS a runtime dep since D2
-  (the "4 skipped tests / PyYAML not installed" notes are outdated), and test counts have moved.
-  Refresh next time the skill is touched. (noticed 2026-07-01 while authoring groom-backlog)
-- [idea] cli.py regroup: split the 937-line flat command list into domain subcommand groups
+  an app). Cosmetic; hide or restructure later.- [idea] cli.py regroup: split the 937-line flat command list into domain subcommand groups
   (schema/ingest/verify/variables) — NOT milestone names; rename m1-verify/m3-verify →
   verify-reference/verify-controlm with deprecation aliases at the v1.0 window. (same review)
-- [chore] Remove unused deps: pandas, streamlit, streamlit-agraph (runtime), pypdf (dev) — declared
-  in pyproject.toml, imported nowhere; ~100MB install weight. (same review)
 - [idea] Integration tests: testcontainers[neo4j] is already a dev dep but unused — one end-to-end
-  CSV→Neo4j load test would cover the untested Cypher-execution path. (same review)
+  CSV→Neo4j load test would cover the untested Cypher-execution path. (same review; verified
+  unused + kept parked in the 2026-07-09 groom.)
 
 ## Recently groomed (audit trail)
 
 <!-- when you promote an idea, move its line here with the resulting backlog id -->
+
+- 2026-07-09 groom run (Opus session) — 4 promoted / 1 retired; web/ became a plan change:
+  - [chore] repo `.venv` has no pytest / poetry not on PATH → **RETIRED (resolved this session)**:
+    pipx + Poetry 2.4.1 installed, in-project `.venv`, dev deps synced; `poetry run pytest -q`
+    → 453 passed / 3 skipped. The documented gate now runs. (See memory `drydocs-python-toolchain`.)
+  - [doc] `run-drydocs/SKILL.md` stale Gotchas → **J4** (Epic J, phase 8). Verified 2026-07-09:
+    still claims "PyYAML not installed" (×2), "159 pass", Aura, and `apply-m3-supplement` — all stale.
+  - [chore] CI (GitHub Actions gates + classification publish-boundary guard) → **J5** (user
+    confirmed promote 2026-07-09).
+  - [chore] unused deps → **J6** (Epic J), **scoped after verification**: only `streamlit` +
+    `streamlit-agraph` are dead; `pandas` is intentional (`csv_adapter.py`) and `pypdf` is now used
+    (`scripts/ingest_jpmc_reports.py`) — the original note's "imported nowhere" claim corrected.
+  - [idea] web/ front end → **O1** + NEW module `drydocs-web` + NEW **phase 12 "Web console /
+    graph visualization"** (plan change, user-approved). Marked in_progress — design pass in flight
+    (branches `feature/ui-dark-landing-myapps` + `feat/web-console-design-pass`, untracked `UI-WIP/`).
+  - Kept parked: BRD outline (later phase), `drydocs-docmeta` plan (gated on the P0 benchmark verdict
+    + ADR 0004), the `<password>` EE container (deferred), LLM-key strategy (open question), `common/`
+    in `/list-apps` (cosmetic), cli.py regroup (gated on the v1.0 rename window), and the testcontainers
+    integration test (testcontainers[neo4j] confirmed unused; not selected this run).
 
 - 2026-07-09 — [chore] Versioning reset (parked since 2026-07-01) → **J3** (Epic J, phase 8),
   executed same day: adopted SemVer (VERSIONING.md), bumped pyproject 0.1.0 → 0.3.0, back-filled
