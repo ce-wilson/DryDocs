@@ -321,9 +321,11 @@ objects:
       column_count: ~
       census: pending
     note: >
-      Graph targets are PROPOSED ONLY pending gate controlm-hosts-topology
-      (config/gate-prompts/controlm-hosts-topology.yaml) — every column lands
-      staging-only until then. Object is NOT versioned (no
+      Gate controlm-hosts-topology CONFIRMED 2026-07-09 (config/gate-log.md;
+      spec config/gate-prompts/controlm-hosts-topology.yaml) — columns stay
+      staging-only until the hosts loader + RUNS_ON resolution pass are
+      built (gate-log residuals: P3 DC value-domain check, P4 resolution
+      census, DC scope call). Object is NOT versioned (no
       IS_CURRENT_VERSION/VERSION_SERIAL) and has no USER_DAILY; grain assumed
       (DATA_CENTER, GRPNAME, NODEID) pending the dup probe.
     columns:

@@ -140,7 +140,7 @@ node_classifications:
     class:      "dd:ControlMHostGroup"
     prov_type:  Collection
     note: >
-      GATE-BOUND (controlm-hosts-topology, 2026-07-09 — NOT confirmed): a
+      Gate controlm-hosts-topology CONFIRMED 2026-07-09 (config/gate-log.md): a
       Control-M host group / node group (vendor 6.4.01 poster: CMS_NODGRP;
       replica: psgmgr CM_HOSTS) — the load-balancing set of agent hosts a
       job's NODE_ID can resolve to; the group name may itself be a DNS/LB
@@ -778,8 +778,8 @@ local_relationships:
 
   # ── M3: host topology (CM_HOSTS — GATE-BOUND, controlm-hosts-topology) ────
   # Registered 2026-07-09 from the psgmgr CM_HOSTS review (internal profile:
-  # 22 DCs / 5,396 groups / 8,161 nodeids). NOTHING below is active — status
-  # planned, supplement/loader deliberately ~ until the gate confirms. Use
+  # 22 DCs / 5,396 groups / 8,161 nodeids). Gate CONFIRMED 2026-07-09
+  # (config/gate-log.md); status stays planned until the loader ships. Use
   # case: server-patching / maintenance-window planning (host → jobs that can
   # land on it → folder avg start/end windows via the planned temporal
   # runtime supplement).
@@ -791,7 +791,8 @@ local_relationships:
     to_node:      ControlMHostGroup
     prov_maps_to: ~
     note: >
-      GATE-BOUND (controlm-hosts-topology). Definition-time placement, the
+      Gate CONFIRMED 2026-07-09 (config/gate-log.md); planned = loader not
+      yet built. Definition-time placement, the
       2-HOP case: the job's NODE_ID names a host group (matches a
       CM_HOSTS.GRPNAME) and Control-M load-balances the run across the
       group's member hosts (reach hosts via CONTAINS_HOST). Derived
@@ -815,7 +816,8 @@ local_relationships:
     to_node:      ExecutionHost
     prov_maps_to: "prov:hadMember"
     note: >
-      GATE-BOUND (controlm-hosts-topology). Host-group membership from psgmgr
+      Gate CONFIRMED 2026-07-09 (config/gate-log.md); planned = loader not
+      yet built. Host-group membership from psgmgr
       CM_HOSTS: one edge per (DATA_CENTER, GRPNAME, NODEID) row; each
       distinct NODEID MERGEs one ExecutionHost (keyed on nodeid alone,
       pending the multi-group probe P2c). Matrix row: Collection → any =
@@ -834,13 +836,14 @@ local_relationships:
     to_node:      ControlMServer
     prov_maps_to: ~
     note: >
-      GATE-BOUND (controlm-hosts-topology). A host group is defined per data
-      center (CM_HOSTS.DATA_CENTER — 22 distinct incl. non-production).
-      OPEN QUESTION gating this edge: CM_HOSTS carries long-form DC names
-      (<Pnnn>-E<hhmm>-<suffix>, the default-time encoding) while the folder
-      extract has been read as short codes — the ControlMServer node-key
-      normalization rule must be confirmed at the gate before this edge
-      loads (adhoc/profile_cm_hosts.sql P3). Infrastructure placement; no
+      Gate CONFIRMED 2026-07-09 (config/gate-log.md). A host group is defined
+      per data center (CM_HOSTS.DATA_CENTER — 22 distinct incl.
+      non-production). DC key rule (SME, via knowledge/standards/technology/
+      data-center-naming-convention.md): long-form name is the NATIVE
+      DATA_CENTER value — exact match; segments (environment, instance,
+      default_time E<hhmm> EST) are candidate parsed properties. Loader
+      blocked on the gate-log residuals: P3 value-domain verification
+      (adhoc/profile_cm_hosts.sql) + the 22-DC-vs-production scope call. Infrastructure placement; no
       PROV mapping (SCHEDULED_ON precedent).
     supplement:   ~
     loader:       ~

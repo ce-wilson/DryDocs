@@ -65,7 +65,9 @@ Application codes span DCs (e.g. PRICD in P012/P014/P032) — DC↔application i
 
 ## Open items to confirm (do not fill speculatively)
 
-1. Environments beyond `P` = Production (segment 1 prefix).
+1. Environments beyond `P` = Production (segment 1 prefix). *Evidence 2026-07-09:* the
+   CM_HOSTS profile found **22 distinct DATA_CENTER values** (vs the 4 known production
+   DCs) — non-production environment prefixes exist; enumeration still to confirm.
 2. Range/meaning of the instance number (`032`).
 3. Full set of `E####` default times across data centers.
 4. Confirm `E` is always Eastern (SME stated all times are EST).

@@ -39,8 +39,9 @@ sources:
     notes: >
       Live. The canonical structural-lineage feed. See README §Control-M
       lineage. CM_HOSTS (host-group membership) added 2026-07-09 via the
-      add-source-object walkthrough — staging-only until gate
-      controlm-hosts-topology confirms the graph landing.
+      add-source-object walkthrough; gate controlm-hosts-topology SME-confirmed
+      same day (config/gate-log.md) — staging-only until the hosts loader +
+      RUNS_ON resolution pass ship (P3/P4 residual verifications first).
 
   - id: autosys-export
     classification: Internal

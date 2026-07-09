@@ -156,3 +156,38 @@ records the date, the item, confirmed / edited / rejected counts, and reasons fo
 - **Transcription:** vocabulary `docs_describes`/`docs_chunk_part_of`/`docs_first_chunk`/
   `docs_next_chunk` planned -> active (supplement: ontology_supplement.cypher, loader:
   bmc_docs.cypher); 4 map entries confirmed; source `bmc-docs` confirmed: true.
+
+## 2026-07-09 — CM_HOSTS host topology (controlm-hosts-topology)
+- **Presented:** 18 confirmations (gate page `config/gate-prompts/controlm-hosts-topology.yaml`;
+  sections: A naming, B resolution rule, C data-center normalization, D use case, E sign-off)
+- **Confirmed:** 18 — SME acceptance 2026-07-09 ("I've reviewed and agree / sign off").
+- **Edited:** 0 · **Rejected:** 0
+- **Decisions now binding:**
+  - New label `ControlMHostGroup` (prov:Collection) for CM_HOSTS.GRPNAME groups; member hosts
+    REUSE `ExecutionHost` (one node per distinct NODEID). "ControlMGroup" rejected as a name —
+    collides with the CM_DEF_VJOB.GROUP_NAME application-group concept.
+  - NODE_ID resolution rule: GRPNAME match → `RUNS_ON {role: host_group}` (2-hop via
+    CONTAINS_HOST); member-NODEID match → `RUNS_ON {role: agent_host}` (1-hop hard-coded);
+    GROUP MATCH WINS (mirrors Control-M's own resolution); UNMATCHED reported as coverage,
+    never guessed; NULL NODE_ID → no edge. Rerun host-affinity deferred to phase-2 runtime.
+  - `CONTAINS_HOST` = prov:hadMember (CONTAINS_JOB family), carries participation_type +
+    last_capture_date.
+  - Section C resolved via the EXISTING internal standard
+    `knowledge/standards/technology/data-center-naming-convention.md` (tier-2, SME-asserted
+    2026-06-11): DC name = `<env><instance>-E<hhmm>-<suffix>` — P = Production, E#### =
+    default execution time (EST) applied when a folder declares no time, suffix ignored.
+    The standard's observed inventory shows LONG-FORM names are the native DATA_CENTER
+    values → ControlMServer key rule = exact long-form match, parsed segments
+    (environment, instance, default_time) as candidate properties.
+  - Use case: server-patching / maintenance-window planning; timing half depends on the
+    planned temporal runtime supplement (cm_avg_run) — separate pass, not this gate.
+- **Residual verifications before the loader ships (not new decisions):**
+  1. P3 probe (adhoc/profile_cm_hosts.sql) — confirm CM_HOSTS vs CM_DEF_VTAB DATA_CENTER
+     value domains actually match exactly.
+  2. DC scope call — load all 22 data centers or production-only (`P` prefix); the 22
+     observed (vs 4 production) supports the standard's open item 1 (environments beyond P).
+  3. P4 resolution census — BOTH-match collisions expected zero; P2a participation-type domain.
+- **Transcription:** 3 map entries (`job-runs-on-host-group`, `host-group-contains-host`,
+  `host-group-defined-on`) proposed → confirmed; vocabulary terms stay `status: planned`
+  (correct lifecycle — supplement/loader not yet built); CM_HOSTS extract stays staging-only
+  until the hosts loader + RUNS_ON resolution pass are built against these decisions.
