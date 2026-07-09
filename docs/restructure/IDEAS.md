@@ -64,8 +64,6 @@ Tags help grooming: `idea` · `bug` · `doc` · `source` (new data source) · `q
   an app). Cosmetic; hide or restructure later.
 - 2026-07-03 — [chore] repo `.venv` has no pytest (and poetry isn't on PATH in plain PowerShell)
   — the `poetry run pytest -q` gate can't run as documented on this machine; reinstall dev deps.
-- [chore] Versioning reset: adopt semver policy (VERSIONING.md), cut first tag (v0.2.0 or v0.3.0
-  with the board), start CHANGELOG.md back-filled from completed epics. (2026-07-01 architecture review)
 - [chore] CI: GitHub Actions running the CLAUDE.md gates (pytest -q, import drydocs.cli,
   drydocs --help, ruff) on every push; classification test as publish-boundary guard. (same review)
 - [doc] .claude/skills/run-drydocs/SKILL.md Gotchas are stale: PyYAML IS a runtime dep since D2
@@ -82,6 +80,12 @@ Tags help grooming: `idea` · `bug` · `doc` · `source` (new data source) · `q
 ## Recently groomed (audit trail)
 
 <!-- when you promote an idea, move its line here with the resulting backlog id -->
+
+- 2026-07-09 — [chore] Versioning reset (parked since 2026-07-01) → **J3** (Epic J, phase 8),
+  executed same day: adopted SemVer (VERSIONING.md), bumped pyproject 0.1.0 → 0.3.0, back-filled
+  CHANGELOG.md from the completed epics, cut annotated tag **v0.3.0** (user decision over v0.2.0 —
+  matches plan phase 8's `release:` field). Sibling parked lines (CI, cli.py regroup, unused-dep
+  removal, integration tests) stay in the inbox.
 
 - 2026-07-09 groom run (this session) — weekly inbox groom, 2 promoted / 5 retired / 2 kept-updated:
   - [doc] README still says `:DEPENDS_ON` for the derived job→job edge → **J2** (Epic J, phase 8).

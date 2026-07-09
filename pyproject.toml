@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "drydocs"
-version = "0.1.0"
+version = "0.3.0"
 description = "Production support inventory + data product knowledge graph for D&A batches."
 authors = ["Production Support Team"]
 readme = "README.md"
