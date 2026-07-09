@@ -19,7 +19,10 @@ from drydocs.models.docs import BmcDocChunkRow
 ROOT = Path(__file__).resolve().parent.parent.parent
 CYPHER_PATH = ROOT / "drydocs" / "loaders" / "cypher" / "bmc_docs.cypher"
 
-EXPECTED_DOC_COUNT = 26
+# 26 at first load (2026-07-08); 27 after controlm-api-installation.md
+# (Automation API Monthly doc set — remediation TDD OQ-1 spike, 2026-07-09).
+# Bump when the corpus intentionally grows.
+EXPECTED_DOC_COUNT = 27
 
 
 def _all_rows() -> list[dict]:
@@ -40,7 +43,7 @@ def test_corpus_dir_exists() -> None:
     assert DEFAULT_CORPUS_DIR.exists()
 
 
-def test_corpus_has_26_documents() -> None:
+def test_corpus_document_count() -> None:
     rows = _all_rows()
     doc_ids = {row["doc_id"] for row in rows}
     assert len(doc_ids) == EXPECTED_DOC_COUNT, sorted(doc_ids)
