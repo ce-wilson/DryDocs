@@ -620,9 +620,68 @@ mappings:
     confirmed_by: SME
     confirmed_on: 2026-07-08
 
+  # ---- CM_HOSTS host topology (PROPOSED 2026-07-09 — gate controlm-hosts-topology) ----
+  # psgmgr CM_HOSTS = the BMC CMS_NODGRP host-group membership replica.
+  # Internal profile 2026-07-09: 22 DCs / 5,396 groups / 8,161 nodeids.
+  # Use case: server-patching / maintenance-window planning. Nothing loads
+  # until the gate (config/gate-prompts/controlm-hosts-topology.yaml) confirms.
+
+  - id: job-runs-on-host-group
+    taxonomy:
+      source: controlm-psgmgr
+      element: "Job's NODE_ID names a host group (CM_HOSTS.GRPNAME) — Control-M load-balances across its member hosts (2-hop)"
+    ontology:
+      from_node: ControlMJob                    # prov:Activity
+      to_node: ControlMHostGroup                # prov:Collection (new label, this gate)
+      prov_type_from: Activity
+      prov_type_to: Collection
+      matrix_row: "no PROV row — infrastructure placement (SCHEDULED_ON precedent)"
+      neo4j_label: RUNS_ON
+      edge_properties: { role: host_group, derived: true }
+      prov_maps_to: ~
+    precedence_authority: bmc-baseline
+    reuses_vocab: m3_runs_on_host_group (planned)
+    status: proposed
+    gate_spec: config/gate-prompts/controlm-hosts-topology.yaml
+
+  - id: host-group-contains-host
+    taxonomy:
+      source: controlm-psgmgr
+      element: "Host group contains a member agent host (one CM_HOSTS row per DATA_CENTER/GRPNAME/NODEID)"
+    ontology:
+      from_node: ControlMHostGroup              # prov:Collection
+      to_node: ExecutionHost                    # prov:SoftwareAgent (existing label, reused)
+      prov_type_from: Collection
+      prov_type_to: Agent
+      matrix_row: "Collection → any = prov:hadMember"
+      neo4j_label: CONTAINS_HOST
+      edge_properties: { participation_type: "VARCHAR2(1), domain probe pending" }
+      prov_maps_to: "prov:hadMember"
+    precedence_authority: bmc-baseline
+    reuses_vocab: m3_host_group_contains_host (planned)
+    status: proposed
+    gate_spec: config/gate-prompts/controlm-hosts-topology.yaml
+
+  - id: host-group-defined-on
+    taxonomy:
+      source: controlm-psgmgr
+      element: "Host group is defined per data center (CM_HOSTS.DATA_CENTER, long-form names — normalization open question)"
+    ontology:
+      from_node: ControlMHostGroup              # prov:Collection
+      to_node: ControlMServer                   # local Platform — NOT an Agent
+      prov_type_from: Collection
+      prov_type_to: "n/a (infrastructure)"
+      matrix_row: "no PROV row — infrastructure placement"
+      neo4j_label: DEFINED_ON
+      prov_maps_to: ~
+    precedence_authority: bmc-baseline
+    reuses_vocab: m3_host_group_defined_on (planned)
+    status: proposed
+    gate_spec: config/gate-prompts/controlm-hosts-topology.yaml
+
 # Counts the gate reports to the SME each run.
 summary:
   applied: 1          # job-contains
   confirmed: 18       # C1 (4) + C2 (4) + C3 (6) + bmc-docs lexical (4: doc-describes-product, doc-chunk-part-of, doc-first-chunk, doc-next-chunk — gate 2026-07-08)
-  proposed: 6         # job-seal-app-ref, oracle-schema-asset, jobrun-observation, application-as-dataproduct, seal-tom-attribution, seal-doc-source-of-record
+  proposed: 9         # job-seal-app-ref, oracle-schema-asset, jobrun-observation, application-as-dataproduct, seal-tom-attribution, seal-doc-source-of-record + CM_HOSTS topology (3: job-runs-on-host-group, host-group-contains-host, host-group-defined-on — 2026-07-09)
   rejected: 0

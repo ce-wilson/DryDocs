@@ -1,0 +1,102 @@
+# SME gate-prompt spec — CM_HOSTS host-topology modelling decision.
+# Prepared with the SME NOT present — this page STOPS at the gate. Nothing here is confirmed:
+# no relationship_vocabulary.yaml status flips from planned, no taxonomy-ontology-map.yaml
+# status flips to confirmed, no graph write, and the CM_HOSTS extract stays staging-only.
+# Mechanism-only: column names, counts, and rules — no real group/host/DC values.
+classification: Internal-Public
+schema: drydocs.gate-prompt.v1
+id: controlm-hosts-topology
+title: "SME Gate — CM_HOSTS host groups, execution hosts, and the job NODE_ID resolution rule"
+step: "Resolves the host-topology model before the hosts loader + RUNS_ON resolution pass are written"
+summary: >
+  psgmgr.CM_HOSTS is the replica of the BMC node-group membership structure (vendor 6.4.01
+  poster: CMS_NODGRP). Internal profile 2026-07-09: 22 distinct data centers, 5,396 distinct
+  group names, 8,161 distinct node ids. A job definition carries ONE polymorphic NODE_ID field
+  that names EITHER a host group (Control-M load-balances the run across the group's member
+  hosts — in many cases the group fronts a load-balancer DNS alias, and a rerun sticks to the
+  host the first attempt landed on) OR a hard-coded member host. Proposed model: BOTH hops are
+  real — 2-hop Job -[:RUNS_ON {role: host_group}]-> ControlMHostGroup -[:CONTAINS_HOST]->
+  ExecutionHost when NODE_ID matches a GRPNAME, and 1-hop Job -[:RUNS_ON {role: agent_host}]->
+  ExecutionHost when it matches a member NODEID; group match wins, mirroring Control-M's own
+  resolution. Driving use case: server-patching / maintenance-window planning — for a given
+  host (or group), find every job that can land on it, then compute the quiet window from
+  avg folder start/end times (the planned temporal runtime supplement, cm_avg_run).
+meta:
+  Module: "drydocs-core · Control-M host topology (M3 extension)"
+  Source: "oracle:psgmgr.CM_HOSTS — host-group membership replica (CAPTURE_DATE, DATA_CENTER, GRPNAME, NODEID, PARTICIPATION_TYPE)"
+  Software: "controlm (Control-M) MADE_BY bmc — config/taxonomy/software-registry.yaml"
+  Registry ref: "controlm-psgmgr — confirmed (config/source-registry.yaml); CM_HOSTS object added 2026-07-09, staging-only"
+  Classification: "Internal (source data) · this page Internal-Public (mechanism only)"
+  Ledger: "config/source-mappings/controlm-psgmgr.yaml CM_HOSTS (all five columns projected → staging:*)"
+  Ontology map: "config/taxonomy-ontology-map.yaml job-runs-on-host-group / host-group-contains-host / host-group-defined-on (status: proposed) + relationship_vocabulary.yaml m3_runs_on_host_group / m3_host_group_contains_host / m3_host_group_defined_on (status: planned) + m3_runs_on_agent_host (planned, feed updated)"
+  Probes: "drydocs/loaders/sql/adhoc/profile_cm_hosts.sql (P1 grain, P2 domains, P3 DC match, P4 resolution census, P5 capture uniformity)"
+mapping:
+  - n: 1
+    element: "Host group (CM_HOSTS.GRPNAME per DATA_CENTER) — new label, PROPOSED name ControlMHostGroup"
+    target: ":ControlMHostGroup {name, data_center} (prov:Collection)"
+    edge: "—  [PROPOSED — named after the 9.0.x vendor term 'host group'; NOT 'ControlMGroup', which would collide with the CM_DEF_VJOB.GROUP_NAME application-group concept]"
+  - n: 2
+    element: "Member agent host (CM_HOSTS.NODEID) — REUSES the existing ExecutionHost label"
+    target: ":ExecutionHost {nodeid} (prov:SoftwareAgent — existing classification)"
+    edge: "—  [PROPOSED — one node per distinct NODEID (8,161); no new class minted]"
+  - n: 3
+    element: "Group membership — one CM_HOSTS row per (DATA_CENTER, GRPNAME, NODEID)"
+    target: "CONTAINS_HOST {participation_type, last_capture_date}"
+    edge: "(:ControlMHostGroup)-[:CONTAINS_HOST]->(:ExecutionHost)  [PROPOSED — prov:hadMember, CONTAINS_JOB/CONTAINS_FOLDER family]"
+  - n: 4
+    element: "Job targets a host group (NODE_ID matches a GRPNAME) — the 2-hop case"
+    target: "RUNS_ON {role: host_group, derived: true}"
+    edge: "(:ControlMJob)-[:RUNS_ON {role: host_group}]->(:ControlMHostGroup)  [PROPOSED — derived resolution pass after jobs + hosts both load]"
+  - n: 5
+    element: "Job hard-codes a member host (NODE_ID matches a NODEID only) — the 1-hop case"
+    target: "RUNS_ON {role: agent_host, derived: true}"
+    edge: "(:ControlMJob)-[:RUNS_ON {role: agent_host}]->(:ExecutionHost)  [PROPOSED — reuses the already-planned m3_runs_on_agent_host term]"
+  - n: 6
+    element: "Host group belongs to a data center (CM_HOSTS.DATA_CENTER)"
+    target: "DEFINED_ON"
+    edge: "(:ControlMHostGroup)-[:DEFINED_ON]->(:ControlMServer)  [PROPOSED — BLOCKED on the DC-name normalization open question]"
+provenance:
+  - label: ":ControlMHostGroup / :ExecutionHost / CONTAINS_HOST"
+    source_object: "psgmgr CM_HOSTS"
+    key: "(DATA_CENTER, GRPNAME, NODEID) — assumed grain, dup probe P1 pending"
+    loader: "~ (none yet — extract sql/controlm_hosts.sql is staging-only until this gate resolves)"
+    properties:
+      - {name: data_center, origin: source, from: DATA_CENTER, note: "long-form DC name (<Pnnn>-E<hhmm>-<suffix>); 22 distinct incl. non-production"}
+      - {name: name, origin: source, from: GRPNAME, note: "group name; may itself be a DNS/LB alias (contains dots) — group_kind LOGICAL|DNS_ALIAS derivable, probe P2b"}
+      - {name: nodeid, origin: source, from: NODEID, note: "member host FQDN; ExecutionHost node key (multi-group membership probe P2c pending)"}
+      - {name: participation_type, origin: source, from: PARTICIPATION_TYPE, note: "VARCHAR2(1); observed 'P' only — full domain + BMC semantics = probe P2a + reference-librarian follow-up"}
+      - {name: last_capture_date, origin: source, from: CAPTURE_DATE, note: "replication timestamp — never authorship; snapshot-uniformity probe P5"}
+  - label: "RUNS_ON resolution pass (derived)"
+    source_object: "CM_DEF_VJOB.NODE_ID × CM_HOSTS (GRPNAME | NODEID)"
+    key: "per current-version job"
+    loader: "~ (derived pass, runs after jobs + hosts passes — the WAS_INFORMED_BY pattern)"
+    properties:
+      - {name: resolution_rule, origin: derived, from: "NODE_ID = GRPNAME → role host_group; else NODE_ID = NODEID → role agent_host; else UNMATCHED (reported as coverage, never guessed)", note: "group match WINS when both match — mirrors Control-M's own host-group-first resolution; BOTH-match collisions should be zero (probe P4)"}
+      - {name: null_node_id, origin: derived, from: "NODE_ID IS NULL", note: "no edge written; counted in the coverage report"}
+      - {name: case_fold, origin: derived, from: "probe P4c", note: "whether matching needs UPPER() normalization — open question"}
+sections:
+  - title: "A. Label naming"
+    confirmations:
+      - "New label ControlMHostGroup adopted for CM_HOSTS.GRPNAME groups (9.0.x vendor term 'host group'; 6.4.01 poster entity CMS_NODGRP)."
+      - "NOT named ControlMGroup: CM_DEF_VJOB.GROUP_NAME / ControlMJob.group_name already carries the application-group concept — the two must never conflate."
+      - "Member hosts REUSE the existing ExecutionHost label (prov:SoftwareAgent, already the target of the planned RUNS_ON {role: agent_host}) — no new server class is minted."
+  - title: "B. The two-hop / one-hop resolution rule (the core decision)"
+    confirmations:
+      - "A job's NODE_ID is polymorphic: it names either a host group (2-hop — Control-M load-balances across CONTAINS_HOST members) or a hard-coded member host (1-hop)."
+      - "Resolution precedence: GROUP MATCH WINS over a direct host match, mirroring Control-M's own resolution; the P4 census confirms BOTH-match collisions are zero (or the precedence gets explicit SME sign-off here)."
+      - "UNMATCHED NODE_IDs are reported as a coverage metric per load run — never guessed at (the invocation-patterns coverage-policy precedent)."
+      - "Rerun host affinity (a rerun executes on the host the first attempt landed on — where its files/logs live) is RUNTIME state: deliberately deferred to phase-2 ControlMJobRun/SOSA, never written on these definition edges."
+  - title: "C. Data-center normalization (blocks DEFINED_ON)"
+    confirmations:
+      - "CM_HOSTS.DATA_CENTER carries long-form names (<Pnnn>-E<hhmm>-<suffix>, the default-time encoding) and 22 distinct values incl. non-production; the folder extract's ControlMServer nodes have been read as short codes."
+      - "Probe P3 (value-domain MINUS both directions) decides the ControlMServer node-key rule: exact match, leading-segment normalization, or long-form adopted as the key — SME records the rule here before DEFINED_ON (or any DC-scoped RUNS_ON predicate) loads."
+      - "Scope decision: load all 22 data centers or production-only — SME call."
+  - title: "D. Use case — maintenance-window planning"
+    confirmations:
+      - "Driving use case understood: for a host (or group) scheduled for patching, traverse CONTAINS_HOST/RUNS_ON inbound to every job that can land on it, then compute the quiet window from avg folder start/end times."
+      - "The timing half depends on the planned temporal runtime supplement (cm_avg_run → avg/median start+run times as job/folder properties) — a separate, already-planned pass; this gate only delivers the topology half."
+      - "Window math caveat acknowledged: fold-level windows come from critical-path timing, not naive path sums (the TDQ-failure ETA rule)."
+  - title: "E. Sign-off"
+    confirmations:
+      - "This page was prepared with the SME NOT present — nothing here is confirmed. No vocabulary status flips, no map status flips, no loader, no graph write happen from this page alone."
+      - "Safe to transcribe into config/gate-log.md once an SME has reviewed this page and recorded the calls (A naming, B resolution rule, C DC rule + scope, D use-case framing)."

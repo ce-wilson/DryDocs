@@ -12,19 +12,35 @@
 # =============================================================================
 
 schema: drydocs.source-registry.v1
-updated: 2026-06-20
+updated: 2026-07-09
 
 sources:
   # ---- Orchestration metadata (Tier-2 vendors) -----------------------------
   - id: controlm-psgmgr
     classification: Internal            # operational scheduling metadata; not for public GitHub
-    source: "oracle:psgmgr.CM_DEF_* views"
+    source: "oracle:psgmgr.CM_* objects"
     kind: orchestration
     orchestrator: bmc-controlm          # baseline — no crosswalk needed
     adapter: oracle                     # OracleAdapter over psgmgr.* views
-    feeds_taxonomy: [folders, jobs, conditions, dependencies, variables]
+    # locator — granular source coordinates (SEAL app → platform → service →
+    # schema → objects). Mechanism committed here; REAL values (SEAL id, DB
+    # service/TNS name) are Internal-Confidential and live only in the
+    # internal/ twin + connection env (internal-local/) — the publish
+    # boundary is why a public "test Oracle container" is never needed.
+    locator:
+      application: ~                    # SEAL id of the owning application — internal/ twin only
+      source_product: controlm          # what the data IS  — config/taxonomy/software-registry.yaml product id
+      platform: oracle-db               # what CARRIES it   — software-registry product id (the replica's DB)
+      service: ~                        # DB service/TNS — connection env (internal-local/), never committed
+      schema: psgmgr                    # established public vocabulary
+      mapping: config/source-mappings/controlm-psgmgr.yaml   # object/column ledger
+    feeds_taxonomy: [folders, jobs, conditions, dependencies, variables, hosts]
     confirmed: true
-    notes: "Live. The canonical structural-lineage feed. See README §Control-M lineage."
+    notes: >
+      Live. The canonical structural-lineage feed. See README §Control-M
+      lineage. CM_HOSTS (host-group membership) added 2026-07-09 via the
+      add-source-object walkthrough — staging-only until gate
+      controlm-hosts-topology confirms the graph landing.
 
   - id: autosys-export
     classification: Internal

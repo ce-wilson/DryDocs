@@ -74,6 +74,8 @@ The vendor entity model (groups, PKs, key columns, relationships): [`references/
 | Conditions a job **emits** (out) | `CMS_CON_J` (ROWTYPE=out) | `CM_DEF_LNKO_P_VW` | `(TABLE_ID, JOB_ID, CONDITION, SIGN)` |
 | On-Do action blocks | `CMS_ONSTMT` + `CMS_DO` | (not yet replicated) | `(JOB_ID, IF_NO, DO_NO)` |
 | Quantitative / control resources | `CMS_QR_J` / `CMS_CTL_J` | (not yet replicated) | `(resource, JOB_ID)` |
+| Which hosts a node/host group balances across (job `NODE_ID` target) | `CMS_NODGRP` | `CM_HOSTS` | `(DATA_CENTER, GRPNAME, NODEID)` — gate `controlm-hosts-topology` pending |
+| Agent/node identity + versions | `CMS_NODID` / `CMR_NODES` | (not replicated) | `NODEID` |
 | Runtime / history of runs | `CMR_AJF`, `CMR_RUNINF`, `CMR_IOALOG` | `CM_HIST_VW` (expensive) | `ORDERNO` |
 | Who **ran** an action (audit) | — | `CM_AUD_ACTS` | action-time identity |
 | Escalation / SCIM routing | — | `CM_ESCALATION_DB` | `EJOBNAME` join, `ECOMPONENT='SEAL'` |

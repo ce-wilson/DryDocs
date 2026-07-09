@@ -190,6 +190,7 @@ _EXPECTED_OBJECTS = [
     "CM_DEF_LNKI_P_VW",
     "CM_DEF_LNKO_P_VW",
     "CM_DEF_SETVAR",
+    "CM_HOSTS",
 ]
 
 
@@ -276,6 +277,20 @@ def test_setvar_object_flags_its_name_unverified(controlm: SourceMapping) -> Non
     assert "VERIFY NAME" in setvar.note
     assert setvar.columns  # TABLE_ID, JOB_ID, NAME, VALUE
     assert setvar.projected() == ["TABLE_ID", "JOB_ID", "NAME", "VALUE"]
+
+
+def test_cm_hosts_is_staging_only_pending_the_topology_gate(controlm: SourceMapping) -> None:
+    """CM_HOSTS (host-group membership) landed 2026-07-09 via add-source-object:
+    all five columns projected, but staging-only — the graph landing
+    (ControlMHostGroup/ExecutionHost/CONTAINS_HOST/RUNS_ON resolution) is
+    gate-bound (controlm-hosts-topology), the CM_DEF_SETVAR precedent."""
+    hosts = controlm.get("CM_HOSTS")
+    assert hosts.projected() == [
+        "DATA_CENTER", "GRPNAME", "NODEID", "PARTICIPATION_TYPE", "CAPTURE_DATE",
+    ]
+    for col in hosts.columns:
+        assert col.target is not None and col.target.startswith("staging:"), col.name
+    assert "controlm-hosts-topology" in (hosts.note or "")
 
 
 def test_all_columns_have_a_valid_disposition_and_origin(controlm: SourceMapping) -> None:

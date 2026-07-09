@@ -173,3 +173,14 @@ Tags help grooming: `idea` · `bug` · `doc` · `source` (new data source) · `q
 - 2026-07-01 — Epic I (I1–I4, project board & planning infrastructure) groomed into `backlog.yaml`
   from the architecture-review plan; schema upgraded to `drydocs.backlog.v2` (I1 done same day).
 - 2026-06-20 — initial backlog A1–F2 seeded directly into `backlog.yaml` from `02-backlog.md`.
+- 2026-07-09 — **CM_HOSTS host topology** prepped to the gate via the NEW `add-source-object`
+  skill (the "add an object to an existing source" walkthrough — profile → ledger → ontology →
+  gate → extract). Artifacts: `sql/controlm_hosts.sql` + `sql/adhoc/profile_cm_hosts.sql`,
+  ledger object CM_HOSTS (staging-only), vocab `m3_runs_on_host_group` /
+  `m3_host_group_contains_host` / `m3_host_group_defined_on` (planned), gate
+  `config/gate-prompts/controlm-hosts-topology.yaml` (AWAITING SME). Groom: (1) the gate
+  session; (2) the hosts loader + RUNS_ON resolution pass build (blocked on the gate);
+  (3) the **maintenance-window use case** — host → jobs → avg folder start/end quiet-window
+  query; depends on the temporal runtime supplement (cm_avg_run) which should be promoted
+  from PLANNED. Also new: `locator:` block on source-registry entries (SEAL app → platform →
+  service → schema → mapping); real SEAL/service values = internal/ twin.

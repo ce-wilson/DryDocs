@@ -136,6 +136,19 @@ node_classifications:
       ExecutionHost can legally map to prov:actedOnBehalfOf, which requires
       Agent → Agent. Local subclass dd:ExecutionHost.
 
+  - label:      ControlMHostGroup
+    class:      "dd:ControlMHostGroup"
+    prov_type:  Collection
+    note: >
+      GATE-BOUND (controlm-hosts-topology, 2026-07-09 — NOT confirmed): a
+      Control-M host group / node group (vendor 6.4.01 poster: CMS_NODGRP;
+      replica: psgmgr CM_HOSTS) — the load-balancing set of agent hosts a
+      job's NODE_ID can resolve to; the group name may itself be a DNS/LB
+      alias. Key (data_center, name); members are ExecutionHost nodes.
+      Deliberately NOT named "ControlMGroup": CM_DEF_VJOB.GROUP_NAME
+      (ControlMJob.group_name) is the application-group concept — a different
+      thing entirely; "host group" is the 9.0.x vendor term.
+
   - label:      DataSource
     class:      "dcat:Dataset"
     prov_type:  Entity
@@ -737,8 +750,12 @@ local_relationships:
     note: >
       Job executes on a Control-M agent host (Control_M · Host, e.g.
       PROCO-CDS-UTIL#). Infrastructure placement; no PROV mapping.
-      Same label as m3_runs_on_etl_host — role property disambiguates.
-      Feed: CMDB / Control-M agent map.
+      Same label as m3_runs_on_etl_host / m3_runs_on_host_group — role
+      property disambiguates. Feed UPDATED 2026-07-09: psgmgr CM_HOSTS +
+      the NODE_ID resolution pass — this role is the 1-hop HARD-CODED case
+      (job's NODE_ID matches a member NODEID, not a GRPNAME). Group match
+      wins when both match (mirrors Control-M's own resolution) — see
+      m3_runs_on_host_group and config/gate-prompts/controlm-hosts-topology.yaml.
     supplement:   ontology_supplement.cypher
     loader:       ~
     domain:       controlm
@@ -755,6 +772,77 @@ local_relationships:
       Region / Bucket Name). Infrastructure placement; no PROV mapping.
       Feed: CMDB / ETL engine config.
     supplement:   ontology_supplement.cypher
+    loader:       ~
+    domain:       controlm
+    status:       planned
+
+  # ── M3: host topology (CM_HOSTS — GATE-BOUND, controlm-hosts-topology) ────
+  # Registered 2026-07-09 from the psgmgr CM_HOSTS review (internal profile:
+  # 22 DCs / 5,396 groups / 8,161 nodeids). NOTHING below is active — status
+  # planned, supplement/loader deliberately ~ until the gate confirms. Use
+  # case: server-patching / maintenance-window planning (host → jobs that can
+  # land on it → folder avg start/end windows via the planned temporal
+  # runtime supplement).
+
+  - id:           m3_runs_on_host_group
+    neo4j_label:  RUNS_ON
+    role:         host_group
+    from_node:    ControlMJob
+    to_node:      ControlMHostGroup
+    prov_maps_to: ~
+    note: >
+      GATE-BOUND (controlm-hosts-topology). Definition-time placement, the
+      2-HOP case: the job's NODE_ID names a host group (matches a
+      CM_HOSTS.GRPNAME) and Control-M load-balances the run across the
+      group's member hosts (reach hosts via CONTAINS_HOST). Derived
+      resolution pass that runs AFTER both the jobs pass and the hosts pass
+      (the WAS_INFORMED_BY derived-pass pattern); group match wins over a
+      direct host match, mirroring Control-M's own resolution. Same RUNS_ON
+      label as role=agent_host (the 1-hop hard-coded case) — role
+      disambiguates. Infrastructure placement; no PROV mapping (SCHEDULED_ON
+      precedent). Runtime rerun-affinity (a rerun sticks to the host of the
+      first attempt) is per-run state — phase-2 ControlMJobRun/SOSA, NOT this
+      definition edge.
+    supplement:   ~
+    loader:       ~
+    domain:       controlm
+    status:       planned
+
+  - id:           m3_host_group_contains_host
+    neo4j_label:  CONTAINS_HOST
+    role:         ~
+    from_node:    ControlMHostGroup
+    to_node:      ExecutionHost
+    prov_maps_to: "prov:hadMember"
+    note: >
+      GATE-BOUND (controlm-hosts-topology). Host-group membership from psgmgr
+      CM_HOSTS: one edge per (DATA_CENTER, GRPNAME, NODEID) row; each
+      distinct NODEID MERGEs one ExecutionHost (keyed on nodeid alone,
+      pending the multi-group probe P2c). Matrix row: Collection → any =
+      HAD_MEMBER; domain label kept (CONTAINS_JOB / CONTAINS_FOLDER family).
+      Edge carries participation_type (VARCHAR2(1) — value domain + BMC
+      semantics pending probe P2a) and last_capture_date.
+    supplement:   ~
+    loader:       ~
+    domain:       controlm
+    status:       planned
+
+  - id:           m3_host_group_defined_on
+    neo4j_label:  DEFINED_ON
+    role:         ~
+    from_node:    ControlMHostGroup
+    to_node:      ControlMServer
+    prov_maps_to: ~
+    note: >
+      GATE-BOUND (controlm-hosts-topology). A host group is defined per data
+      center (CM_HOSTS.DATA_CENTER — 22 distinct incl. non-production).
+      OPEN QUESTION gating this edge: CM_HOSTS carries long-form DC names
+      (<Pnnn>-E<hhmm>-<suffix>, the default-time encoding) while the folder
+      extract has been read as short codes — the ControlMServer node-key
+      normalization rule must be confirmed at the gate before this edge
+      loads (adhoc/profile_cm_hosts.sql P3). Infrastructure placement; no
+      PROV mapping (SCHEDULED_ON precedent).
+    supplement:   ~
     loader:       ~
     domain:       controlm
     status:       planned

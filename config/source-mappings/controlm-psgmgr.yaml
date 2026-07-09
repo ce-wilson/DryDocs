@@ -34,7 +34,7 @@
 schema: drydocs.source-mapping.v1
 source: controlm-psgmgr
 classification: Internal-Public
-updated: 2026-07-08
+updated: 2026-07-09
 
 objects:
   # ---------------------------------------------------------------------------
@@ -296,3 +296,51 @@ objects:
         IS_CURRENT_VERSION/VERSION_SERIAL (like the LNKI/LNKO views) is an open
         question noted in the SQL header. Sweeps the rest pending the
         view-name + column-census verification (doc 08 Phase 2).
+
+  # ---------------------------------------------------------------------------
+  # CM_HOSTS (host-group membership) — replica of the BMC node-group structure
+  # (vendor 6.4.01 poster: CMS_NODGRP; agent identity CMS_NODID/CMR_NODES is
+  # NOT replicated). Added 2026-07-09 via the add-source-object walkthrough.
+  # Extract: sql/controlm_hosts.sql; probes: sql/adhoc/profile_cm_hosts.sql.
+  # STAGING-ONLY until the controlm-hosts-topology gate confirms the graph
+  # landing (ControlMHostGroup / ExecutionHost / CONTAINS_HOST / the RUNS_ON
+  # {role: host_group | agent_host} NODE_ID resolution pass) — the
+  # CM_DEF_SETVAR staging-only precedent. Use case: server-patching /
+  # maintenance-window planning.
+  # ---------------------------------------------------------------------------
+  - name: CM_HOSTS
+    kind: table
+    profile:
+      profiled_on: ~
+      via: >
+        internal SQL Developer initial pass 2026-07-09 (22 distinct
+        DATA_CENTERs / 5,396 GRPNAMEs / 8,161 NODEIDs) + column view; formal
+        census still doc 08 Phase 2; remaining probes in
+        sql/adhoc/profile_cm_hosts.sql (grain, participation domain, DC
+        value-domain match, NODE_ID resolution census)
+      column_count: ~
+      census: pending
+    note: >
+      Graph targets are PROPOSED ONLY pending gate controlm-hosts-topology
+      (config/gate-prompts/controlm-hosts-topology.yaml) — every column lands
+      staging-only until then. Object is NOT versioned (no
+      IS_CURRENT_VERSION/VERSION_SERIAL) and has no USER_DAILY; grain assumed
+      (DATA_CENTER, GRPNAME, NODEID) pending the dup probe.
+    columns:
+      - {name: DATA_CENTER, disposition: projected, origin: source, target: "staging:data_center",
+         note: "long-form DC name (<Pnnn>-E<hhmm>-<suffix>, default-time encoding); 22 distinct incl. non-production; proposed ControlMHostGroup key part + DEFINED_ON join — ControlMServer key normalization is a gate open question"}
+      - {name: GRPNAME, disposition: projected, origin: source, target: "staging:grpname",
+         note: "host-group name (5,396 distinct); may itself be a DNS/LB alias (contains dots); proposed ControlMHostGroup.name key part; NOT the CM_DEF_VJOB.GROUP_NAME application-group concept"}
+      - {name: NODEID, disposition: projected, origin: source, target: "staging:nodeid",
+         note: "member agent host FQDN (8,161 distinct); proposed ExecutionHost.nodeid node key; also the direct-match target for hard-coded CM_DEF_VJOB.NODE_ID values (1-hop RUNS_ON {role: agent_host})"}
+      - {name: PARTICIPATION_TYPE, disposition: projected, origin: source, target: "staging:participation_type",
+         note: "VARCHAR2(1); observed 'P' only so far — full value domain + BMC semantics pending probe P2a; proposed CONTAINS_HOST edge property"}
+      - {name: CAPTURE_DATE, disposition: projected, origin: source, target: "staging:capture_date",
+         note: "replication timestamp — never authorship; snapshot-uniformity probe pending (P5); proposed to land as last_capture_date on the membership edge"}
+    default_disposition:
+      disposition: excluded
+      reason: scope
+      note: >
+        The column view shows exactly these five columns; this sweep is
+        defensive only, in case the live table carries columns added since
+        that check.
