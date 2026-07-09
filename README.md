@@ -304,5 +304,5 @@ Coverage highlights:
 
 - [`knowledge/ARCHITECTURE.md`](knowledge/ARCHITECTURE.md) — repo organization + tuning plan.
 - [`docs/controlm-loader-flow.md`](docs/controlm-loader-flow.md) — Control-M loader walkthrough.
-- [`docs/NODE_QUICK_REFERENCE.md`](docs/NODE_QUICK_REFERENCE.md) / [`docs/RELATIONSHIP_GUIDE.md`](docs/RELATIONSHIP_GUIDE.md) — node + relationship catalog.
+- [`knowledge/ontology/NODE_QUICK_REFERENCE.md`](knowledge/ontology/NODE_QUICK_REFERENCE.md) / [`docs/RELATIONSHIP_GUIDE.md`](docs/RELATIONSHIP_GUIDE.md) — node + relationship catalog.
 - [`docs/history/`](docs/history/README.md) — frozen M0 / M1 / planning milestone docs.

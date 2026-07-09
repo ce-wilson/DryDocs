@@ -71,14 +71,19 @@ What diverges, by stream:
   render `backlog.yaml` (now **schema v2**) into `docs/plan/board.html`; plus the `groom-backlog` skill and
   a new `tests/unit/test_backlog.py` schema guard. All **clean-adds** — take FROM this repo. `plan_board`
   is its own `plan` component group in the boundary guard (imports core only).
-- **`drydocs-docmeta` document ingestion (PLANNED — heads-up, not yet built).** A document-
+- **`drydocs-docmeta` document ingestion (P0 CORPUS LOAD SHIPPED; rest PLANNED).** A document-
   ingestion component (vendor docs + internal guidance + SME context → `drydocs_docs` /
-  `drydocs_context`) is planned in
+  `drydocs_context`) planned in
   [`knowledge/upgrade-plans/docmeta-component.md`](knowledge/upgrade-plans/docmeta-component.md).
-  When it lands it is a **mixed** stream: pipeline/registry/tests are clean-adds; the working
-  Confluence connector wiring is **Canonical-COMPANY** (same rule as `drydocs-review`); and the
-  company side must **supplement** vendor fetches blocked producer-side (documents.bmc.com 403),
-  T4 connector credentials (Graph API, mailbox, Toby), and the multi-DB Neo4j target. Full
+  **Its first increment has now shipped:** the **bmc-docs lexical loader** (P0) — the converted BMC
+  docs corpus as a deterministic `Document`→`Chunk` graph, gate-accepted 13/13 and loaded live
+  producer-side (see the "Newer streams" bullet below + `docs/port-prompt.md` step 22). The rest is
+  still a **mixed** stream: pipeline/registry/tests are clean-adds; the working Confluence connector
+  wiring is **Canonical-COMPANY** (same rule as `drydocs-review`); and the company side must
+  **supplement** vendor fetches blocked producer-side (documents.bmc.com 403), T4 connector
+  credentials (Graph API, mailbox, Toby), and the multi-DB Neo4j target — **G7 is now done
+  producer-side** (Aura dropped 2026-07-06; the `neo4j:5.26-enterprise-ubi10` container IS the
+  producer target), but the **company-side live multi-DB deploy remains a port concern**. Full
   disposition table + two-track acceptance oracle: plan §6.
 - **`seal_app_ref` attribution (Epic K) — back-flow-origin, check before taking wholesale.** Additive
   `status: planned`/`proposed` entries in `drydocs/ontology/relationship_vocabulary.yaml` +
@@ -105,6 +110,40 @@ What diverges, by stream:
   if company `main` has already typed `:Application` as Agent or applied any `seal_*` membership edge, this
   is a back-flow reconciliation to resolve at the gate — do not blind-overwrite in either direction. Route
   via `ontology-mapper` + the HITL gate; log in `config/gate-log.md`.
+- **Newer streams (2026-07 — index only; the actionable per-path steps live in
+  [`docs/port-prompt.md`](docs/port-prompt.md)).** These shipped after the streams narrated above and are
+  not all expanded into tables here; the port-prompt step number is the authority for each:
+    - **Software registry** (plan-07 / ADR 0004) — `config/taxonomy/software-registry.yaml` + loader +
+      supplement + `load-software-registry`/`apply-registry-supplement` CLI + vocab `reg_made_by`/
+      `reg_uses_software`; clean-adds. ONE company-side rename of the back-flow seed twins
+      (`vendor-bmc-*` → `bmc-docs-*`). **Step 17.**
+    - **Gate-page STANDARD + prepped gates** — generic `gate_pages.py` meta-card + provenance extension
+      (Canonical-COMPANY mechanism), five `status: proposed` gate specs + crosswalks (none SME-confirmed),
+      `gate-log.md` append-only union. **Step 18.**
+    - **Control-M load-order contract + `:ControlMApplication`** — contractual ingest order + header-row
+      APPLICATION → `:ControlMApplication` grouping node; Canonical-here Control-M loaders; a new
+      `controlmapplication_name` constraint. **Step 19.**
+    - **Design-doc pipeline — `drydocs-docgen` (Epic L)** — deterministic `.md`→HTML/print/PDF renderers,
+      all clean-adds, not wired into `cli.py`; plus the **L6 paper-HITL loop** (print-margin anchors +
+      `transcribe-doc-markup` skill; scans dir Internal). **Step 20.**
+    - **Provenance audit envelope (doc 06 / M-series)** — Phase 1 (source audit envelope) **and** Phase 2
+      (M1: `WAS_GENERATED_BY` **delta-only**, `row_checksum`) SHIPPED; Control-M loaders/cyphers +
+      `base.py` are Canonical-here; `graph-tests/provenance-diet.yaml` is a back-flow seed; confidential
+      source→column maps authored company-side only (one-way). **Steps 15 + 22.**
+    - **Source-governance column ledger (doc 08 / N1)** — `drydocs/source_mappings.py` (pure config
+      accessor, parked in the review boundary group) + `config/source-mappings/controlm-psgmgr.yaml`;
+      clean-adds, but the `MODULE_MAP.md` row + boundary-guard membership must travel. **Step 23.**
+    - **bmc-docs lexical corpus — docmeta P0, SHIPPED & gate-accepted** — converted BMC docs →
+      `Document`→`Chunk` lexical graph (`drydocs/loaders/bmc_docs.py` + cypher + `models/docs.py`,
+      `load-bmc-docs`), 4 `active` `docs_*` edges, +2 constraints. Generic loader = clean-add;
+      `config/gate-prompts/bmc-docs-lexical-load.yaml` + `graph-tests/bmc-docs-lexical.yaml` are back-flow
+      (Canonical-COMPANY); `gate-log.md` union. **Step 22.**
+    - **Release / versioning (v0.3.0)** — `VERSIONING.md` + `CHANGELOG.md` clean-adds; the
+      `pyproject.toml` version is the **producer's** cadence — **KEEP the company's version string** on
+      collision, and the annotated `v0.3.0` tag does **not** cherry-pick. **Step 24.**
+    - **`NODE_QUICK_REFERENCE.md` rehomed** — moved `docs/` → `knowledge/ontology/` (a delete+add rename
+      across disjoint history; README + `docs/RELATIONSHIP_GUIDE.md` links repointed). The table in
+      §"PAT Product Ontology" below now names the new path.
 
 ---
 
@@ -518,7 +557,7 @@ and the full PAT human role vocabulary.
 | `drydocs/loaders/cypher/pat_product_mapping.cypher` | HAS_APPLICATION (Product→Application) + SUPPORTS edges |
 | `drydocs/loaders/cypher/pat_team_roles.cypher` | DevTeam HAS_MEMBERSHIP n-ary pattern |
 | `drydocs/models/seal.py` | Added `"tech partner": "CTO"` to `_ROLE_CANONICAL` |
-| `docs/NODE_QUICK_REFERENCE.md` | `AreaProduct` row in Catalog (active) table |
+| `knowledge/ontology/NODE_QUICK_REFERENCE.md` | `AreaProduct` row in Catalog (active) table (rehomed from `docs/` — see the "Newer streams" note above) |
 | `docs/Product/` | `product-overview.md`, `Technology_Team_Types.md`, `technology_roles_and_responsibilities.md`, `quad-mermaid.js` |
 
 **New graph topology:**

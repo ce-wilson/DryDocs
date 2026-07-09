@@ -53,72 +53,24 @@ Tags help grooming: `idea` · `bug` · `doc` · `source` (new data source) · `q
   Port B git-readme §6 (clean-adds / Canonical-COMPANY connector wiring / company
   supplements: blocked vendor fetches, Graph-API creds, Enterprise multi-DB target).
   Heads-up bullet added to git-readme.md. Groom phases P1–P3 to backlog after the P0
-  benchmark verdict; ADR 0004 is the P1 gate output. Supersedes/absorbs the four
-  T1–T4 lines below into a sequenced plan.
-- 2026-07-06 — [idea] **T1 — vendor-doc KG traversal benchmark:** load ONE external vendor
-  corpus (BMC Control-M — manifest + trust tiers already exist) into a local, throwaway
-  Document→Chunk→Entity Neo4j graph (patterns from the mirrored `llm-graph-builder`; the
-  graphrag upgrade plan's "no documents to chunk" skip is obsolete for this corpus). Benchmark
-  agent retrieval — graph traversal vs manifest-routed markdown reading vs plain vector RAG —
-  on a fixed support-question set (accuracy / latency / tokens). Only SYNTHESIZED-labeled
-  chunks may carry inference; VERBATIM/GROUNDED cite the source URL. Outcome decides how big
-  the doc-ingestion module gets. (Full review: `docs/reviews/doc-knowledge-ingestion-review.md`.)
-- 2026-07-06 — [source] **T2 — internal platform guidance ingestion:** bring
-  `knowledge/standards/{technology,business,data}/` into the software KG through the curation
-  gate (SME-confirmed only). Frontmatter already binds each standard to `taxonomy_path` /
-  `governs` / `applies_to_source` — those become the graph link keys. (same review)
-- 2026-07-06 — [source] **T3 — internal product/agile/software guidance:** `docs/Product/`,
-  SDLC docs, and the unmanaged root-level strays (PDFs/images) — classify, manifest, then
-  ingest via the same pipeline. Prereq: a doc-source registry (documents get the
-  `source-registry.yaml` treatment: classification + connector + trust default + `refresh:`
-  policy, test-enforced); port the DryDocs-bkup scraper provenance machinery (sha256,
-  token-count, curation_status ladder) into a single `drydocs-docmeta` component — one module
-  for external AND internal, split lives in config not code. (same review)
-- 2026-07-06 — [source] **T4 — SME business-application context:** Confluence (bkup scraper
-  exists) → SharePoint/Teams (Graph API) → email connectors, landing in the EXISTING
-  `drydocs_context` DB (Internal-Confidential, unverified-by-default, survives core rebuilds;
-  promotion via the G5 gate path). Raw content stays `internal/`/gitignored; cross-link to
-  business applications via the G1 proxy-node keys. Software KG target = new `drydocs_docs`
-  DB in the composite (local now; live rides G7). (same review)
+  benchmark verdict; ADR 0004 is the P1 gate output. The four T1–T4 tier lines were folded
+  INTO this sequenced plan (P0→P7) and moved to the audit trail (2026-07-09). P0's corpus
+  load is already substantially executed: the bmc-docs lexical loader (Document→Chunk,
+  llm-graph-builder pattern) shipped and gate `bmc-docs-lexical-load` was ACCEPTED 13/13,
+  LOADED LIVE (commits 12423f4/24d6a4b) — the WRITTEN benchmark verdict (traversal vs
+  manifest-routed markdown vs vector RAG) + ADR 0004 still remain before P1–P3 promote.
 - 2026-07-03 — [chore] the local `neo4j-drydocs-ee` Docker container's password is literally the
   string `<password>` (copy-paste artifact at creation). Fine for sandbox; change it before
-  anything less throwaway. (Found while wiring web/ + agents/ to it.)
-- 2026-07-03 — [idea] web/ front end shipped as a throwaway test page (no design pass). Needs:
-  plan/wireframes, a real C4 rendering (NVL?), and a decision on whether the basic Cypher flow
-  keeps talking bolt-from-browser or goes through a thin API.
-- 2026-07-03 — [question] LLM key strategy for the ADK agents (core_ingest, controlm_fix):
+  anything less throwaway. (Found while wiring web/ + agents/ to it.)- 2026-07-03 — [question] LLM key strategy for the ADK agents (core_ingest, controlm_fix):
   GOOGLE_API_KEY (Gemini) vs routing to Anthropic via LiteLLM; company side is Fusion SmartSDK
   on ADK, so Gemini-shaped is the safer default.
 - 2026-07-03 — [chore] `common/` shows up in ADK `/list-apps` (it's a shared-tools package, not
-  an app). Cosmetic; hide or restructure later.
-- 2026-07-03 — [chore] repo `.venv` has no pytest (and poetry isn't on PATH in plain PowerShell)
-  — the `poetry run pytest -q` gate can't run as documented on this machine; reinstall dev deps.
-
-- ~~[bug] node_classifications says label ControlMFolder but every loader/edge writes :JobFolder
-  (controlm_folders.cypher MERGEs JobFolder:Collection; edge entries say from_node: JobFolder) —
-  same drift visible in the company copy. Decide the winning name via the gate, then fix the
-  losing side everywhere. (same screenshots)~~ RESOLVED 2026-07-05: `ControlMFolder` won
-  (ADR 0003); repo-wide rename + `drydocs/migrations/20260705_rename_jobfolder_to_controlmfolder.cypher`.
-- [doc] README.md still says :DEPENDS_ON for the derived job->job edge; the loader + m3-verify
-  write :WAS_INFORMED_BY (vocab m3_was_informed_by; DEPENDS_ON retired). Reconcile the README.
-  (2026-07-01 Control-M naming review with SME)
-- [idea] REQUIRES_SCHEDULER (:BatchProcessing -> :SchedulerKind) appears in README/plans but is
-  NOT registered in relationship_vocabulary.yaml — register status: planned + gate before wiring
-  the post-load step. (same review)
-- [chore] Versioning reset: adopt semver policy (VERSIONING.md), cut first tag (v0.2.0 or v0.3.0
-  with the board), start CHANGELOG.md back-filled from completed epics. (2026-07-01 architecture review)
-- [chore] CI: GitHub Actions running the CLAUDE.md gates (pytest -q, import drydocs.cli,
-  drydocs --help, ruff) on every push; classification test as publish-boundary guard. (same review)
-- [doc] .claude/skills/run-drydocs/SKILL.md Gotchas are stale: PyYAML IS a runtime dep since D2
-  (the "4 skipped tests / PyYAML not installed" notes are outdated), and test counts have moved.
-  Refresh next time the skill is touched. (noticed 2026-07-01 while authoring groom-backlog)
-- [idea] cli.py regroup: split the 937-line flat command list into domain subcommand groups
+  an app). Cosmetic; hide or restructure later.- [idea] cli.py regroup: split the 937-line flat command list into domain subcommand groups
   (schema/ingest/verify/variables) — NOT milestone names; rename m1-verify/m3-verify →
   verify-reference/verify-controlm with deprecation aliases at the v1.0 window. (same review)
-- [chore] Remove unused deps: pandas, streamlit, streamlit-agraph (runtime), pypdf (dev) — declared
-  in pyproject.toml, imported nowhere; ~100MB install weight. (same review)
 - [idea] Integration tests: testcontainers[neo4j] is already a dev dep but unused — one end-to-end
-  CSV→Neo4j load test would cover the untested Cypher-execution path. (same review)
+  CSV→Neo4j load test would cover the untested Cypher-execution path. (same review; verified
+  unused + kept parked in the 2026-07-09 groom.)
 
 ## Recently groomed (audit trail)
 
@@ -132,6 +84,53 @@ Tags help grooming: `idea` · `bug` · `doc` · `source` (new data source) · `q
   paste, save) → **L10** (amended same day: instruction block, not a free-text notes field).
   (chat note after reviewing docs/design/feedback/scans/; answered the open question — the
   export is .yaml per feedback_yaml, not markdown)
+- 2026-07-09 groom run (Opus session) — 4 promoted / 1 retired; web/ became a plan change:
+  - [chore] repo `.venv` has no pytest / poetry not on PATH → **RETIRED (resolved this session)**:
+    pipx + Poetry 2.4.1 installed, in-project `.venv`, dev deps synced; `poetry run pytest -q`
+    → 453 passed / 3 skipped. The documented gate now runs. (See memory `drydocs-python-toolchain`.)
+  - [doc] `run-drydocs/SKILL.md` stale Gotchas → **J4** (Epic J, phase 8). Verified 2026-07-09:
+    still claims "PyYAML not installed" (×2), "159 pass", Aura, and `apply-m3-supplement` — all stale.
+  - [chore] CI (GitHub Actions gates + classification publish-boundary guard) → **J5** (user
+    confirmed promote 2026-07-09).
+  - [chore] unused deps → **J6** (Epic J), **scoped after verification**: only `streamlit` +
+    `streamlit-agraph` are dead; `pandas` is intentional (`csv_adapter.py`) and `pypdf` is now used
+    (`scripts/ingest_jpmc_reports.py`) — the original note's "imported nowhere" claim corrected.
+  - [idea] web/ front end → **O1** + NEW module `drydocs-web` + NEW **phase 12 "Web console /
+    graph visualization"** (plan change, user-approved). Marked in_progress — design pass in flight
+    (branches `feature/ui-dark-landing-myapps` + `feat/web-console-design-pass`, untracked `UI-WIP/`).
+  - Kept parked: BRD outline (later phase), `drydocs-docmeta` plan (gated on the P0 benchmark verdict
+    + ADR 0004), the `<password>` EE container (deferred), LLM-key strategy (open question), `common/`
+    in `/list-apps` (cosmetic), cli.py regroup (gated on the v1.0 rename window), and the testcontainers
+    integration test (testcontainers[neo4j] confirmed unused; not selected this run).
+
+- 2026-07-09 — [chore] Versioning reset (parked since 2026-07-01) → **J3** (Epic J, phase 8),
+  executed same day: adopted SemVer (VERSIONING.md), bumped pyproject 0.1.0 → 0.3.0, back-filled
+  CHANGELOG.md from the completed epics, cut annotated tag **v0.3.0** (user decision over v0.2.0 —
+  matches plan phase 8's `release:` field). Sibling parked lines (CI, cli.py regroup, unused-dep
+  removal, integration tests) stay in the inbox.
+
+- 2026-07-09 groom run (this session) — weekly inbox groom, 2 promoted / 5 retired / 2 kept-updated:
+  - [doc] README still says `:DEPENDS_ON` for the derived job→job edge → **J2** (Epic J, phase 8).
+    VERIFIED 2026-07-09: the loader `controlm_dependencies_derived.cypher` MERGEs `:WAS_INFORMED_BY`
+    and vocab `m3_was_informed_by` is active ("Replaces DEPENDS_ON") — README is the stale side
+    (4 refs: README.md:16,139,152,231). Naming-drift doc hygiene, same class as J1.
+  - [idea] `REQUIRES_SCHEDULER` (:BatchProcessing → :SchedulerKind) unregistered → **C6** (Epic C,
+    phase 2 — re-opened). VERIFIED 2026-07-09 still absent from `relationship_vocabulary.yaml`;
+    register `status: planned` + HITL gate before wiring the post-load step (edge-meaning ⇒ gate).
+  - [idea] **T1** vendor-doc KG traversal benchmark → SUPERSEDED by the `drydocs-docmeta` plan (its
+    P0 spike) AND substantially executed: the bmc-docs lexical loader (Document→Chunk,
+    llm-graph-builder) shipped + gate `bmc-docs-lexical-load` ACCEPTED 13/13, LOADED LIVE (commits
+    `12423f4`/`24d6a4b`). Written benchmark verdict + ADR 0004 still pending before P1–P3 promote.
+  - [source] **T2/T3/T4** internal-platform / product-process / SME-context ingestion → ABSORBED into
+    the `drydocs-docmeta` sequenced plan (`knowledge/upgrade-plans/docmeta-component.md`, phases
+    P0→P7); tracked there until the P0 verdict + ADR 0004 gate, per the docmeta note's own instruction.
+  - [bug] `node_classifications` ControlMFolder-vs-`:JobFolder` drift → CLOSED (already RESOLVED
+    2026-07-05, ADR 0003 + rename migration); the struck line is retired from the inbox.
+  - kept + updated in-inbox: the `drydocs-docmeta` plan note (records the bmc-docs load; T1–T4 folded)
+    and the web/ front-end note (flagged the now-active design-pass branches). Parked pending user
+    decisions (semver start, CI, cli.py regroup, unused-dep removal, integration tests), open
+    questions (LLM key strategy), and piggyback chores stay in the inbox.
+
 
 - 2026-07-08 groom run (this session) — **new phase 11 "Source governance ledgers"** + 9 items:
   - [question] SEAL ontology reshape + scraped-docs source-of-record → **K3** (gate session;
