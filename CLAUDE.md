@@ -97,7 +97,7 @@ Index: [`reference/REGISTRY.yaml`](reference/REGISTRY.yaml)
 
 | Platform | What it is | How to call it |
 |----------|-----------|----------------|
-| **Neo4j** | the graph platform itself | `neo4j-skills` plugin (cypher, modeling, import, graphrag, vector-index, gds, aura, …) + [`reference/platforms/neo4j/`](reference/platforms/neo4j/README.md) |
+| **Neo4j** | the graph platform itself | `neo4j-skills` plugin (cypher, modeling, import, graphrag, vector-index, gds, …; the `aura-*` skills are removed locally — Aura was ruled out for the Docker EE container, 2026-07-06; a plugin update may restore them, delete again) + [`reference/platforms/neo4j/`](reference/platforms/neo4j/README.md) |
 | **Ontology standards** | PROV-O, W3C ORG, DPROD/EKGF, **SOSA/SSN**, DCAT, SKOS | [`reference/standards/`](reference/standards/README.md) |
 | **Academic research** | papers backing modeling choices | [`reference/research/`](reference/research/README.md) |
 
