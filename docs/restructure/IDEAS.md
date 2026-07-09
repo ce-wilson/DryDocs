@@ -26,6 +26,17 @@ Tags help grooming: `idea` · `bug` · `doc` · `source` (new data source) · `q
 
 <!-- add new ideas at the top -->
 
+- 2026-07-09 — [idea] **Control-M Workbench as the remediation greenfield test bed — PARKED**
+  (user call, 2026-07-09). The Workbench Docker image (dev Control-M, plain `docker run`, no
+  Kubernetes/Helm) would let fix packages be DEPLOYED + EXECUTED against a disposable env
+  before the Jira handoff — stronger than the offline equivalence proof, still SoD-safe.
+  Blocked here: image lives on distribution.bmc.com (not Docker Hub; pull attempt 401) and
+  needs an EPD-entitled account + identity token — an entitlement/machine-boundary question,
+  not a technical one. Ports 8443/7005 verified free on this box. Revisit when OQ-1 closes
+  company-side or entitlement is resolved. Refs: `controlm-api-installation.md` (corpus,
+  §Workbench + SYNTHESIZED notes), `drydocs-remediation-tdd.md` §HITL OQ-1. (Control-M for
+  Kubernetes / Helm-chart offering deliberately SKIPPED — different product, agents-in-K8s,
+  no current use case.)
 - 2026-07-08 — [doc] **BRD outline (Epic L, deferred)** — the third canonical doc type after
   TDD (L1) and Runbook (L8). Parked, not promoted: the BRD is a work-in-progress upstream and
   the user flagged it as "definitely a later phase", so there is no stable outline to write an
