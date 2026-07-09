@@ -122,7 +122,7 @@ PROCEDURE:
       producer commit de-colonizes SQL comments, DROP that hunk (a producer-side
       attempt was made and reverted 2026-07-05; verify none leaks into the range).
 
-15. PROVENANCE AUDIT-FIELDS — PLAN + PHASE-1 ENVELOPE SHIPPED (2026-07; was plan-only).
+15. PROVENANCE AUDIT-FIELDS + WAS_GENERATED_BY — PHASES 1-2 SHIPPED (2026-07; was plan-only).
     docs/restructure/06-provenance-source-audit-fields.md (SME-signed-off) ports as a doc.
     Phase 1 has now SHIPPED (commit subject "…source audit envelope") — the plan's "when it
     ships" list below is now REAL, apply it:
@@ -136,11 +136,21 @@ PROCEDURE:
       registry source MUST have an audit-fields entry, same id, envelope props only.
       On company main it stays RED until the stub is filled via 03-hitl-sme-flow.md —
       that red test IS the sync signal. Sequence producer-first.
+    - PHASE 2 (M1, commit "…WAS_GENERATED_BY only on create/change") NOW SHIPPED — Canonical-here
+      (Control-M loaders, step 6): drydocs/loaders/base.py computes a sha256 row_checksum in
+      to_params (volatile fields excluded, key-order independent) and LoadSummary gains rows_changed;
+      all four node-writing Control-M cyphers (controlm_folders/jobs/conditions_in/conditions_out.cypher)
+      guard the WAS_GENERATED_BY tail with FOREACH-over-CASE on checksum change + SET n.row_checksum
+      (DELTA-ONLY edges — kills the full-refresh :JobRun supernode); JobRun.rows_changed derived at
+      _close_run. tests/unit/test_row_checksum.py is a clean-add; graph-tests/provenance-diet.yaml is a
+      BACK-FLOW seed (Canonical-COMPANY, step 10 — keep yours on collision). The prov_was_generated_by
+      vocab note is now delta-only semantics (note-only, no status change).
 
-16. DOCMETA — DOCUMENT INGESTION (PLAN ONLY for now; MIXED stream when it ships).
-    Today only docs port (clean-adds, untouched): knowledge/upgrade-plans/docmeta-component.md,
+16. DOCMETA — DOCUMENT INGESTION (P0 CORPUS LOAD SHIPPED — see step 22; the rest PLAN ONLY; MIXED stream).
+    P0 (corpus load) has SHIPPED as the bmc-docs lexical loader — apply it per STEP 22. The remaining
+    docmeta docs still port as clean-adds, untouched: knowledge/upgrade-plans/docmeta-component.md,
     docs/reviews/doc-knowledge-ingestion-review.md, the git-readme.md heads-up bullet, and the
-    IDEAS.md T1–T4 capture lines. When the component SHIPS (plan §6 becomes the authority):
+    IDEAS.md T1–T4 capture lines. When the rest of the component SHIPS (plan §6 becomes the authority):
     - Clean-adds: drydocs/docmeta/** (pipeline/registry/cleaner/tokenizer/manifest/chunker/
       curation/freshness + connector INTERFACES), config/doc-source-registry.yaml +
       tests/unit/test_doc_registry.py, the `docmeta` COMPONENT_GROUP in
@@ -154,7 +164,9 @@ PROCEDURE:
       bot-protection (documents.bmc.com 403 — complete the XML-definition acquisition stub
       from the company network or local .dtd files), Graph API app registration for
       SharePoint/Teams, mailbox access for email, the multi-DB Enterprise Neo4j target
-      (G7), and all SME curation (producer content arrives unapproved).
+      (G7 — DONE producer-side on the neo4j:5.26-enterprise-ubi10 container after Aura was dropped
+      2026-07-06; the COMPANY-side live multi-DB deploy is what remains), and all SME curation
+      (producer content arrives unapproved).
     - Acceptance: Track 1 = docmeta unit tests pass with no network/credentials (connector
       stubs SKIP, not fail); Track 2 = docs-fetch/docs-load run clean against real sources.
 
@@ -209,7 +221,8 @@ PROCEDURE:
     CONTAINS_FOLDER), distinct from :ControlMServer AND from the SEAL :Application. Carries: the
     controlm_folders/jobs .cypher + Control-M SQL deltas + folder_name.py (Canonical-here — the
     Control-M loaders, step 6), a NEW constraint controlmapplication_name (EXPECTED_CONSTRAINTS 37 ->
-    38 in test_schema.py — reconcile the count with any company-side constraint edits), and the
+    38 for THIS stream in test_schema.py; step 22 later adds document_id + chunk_id, so the CURRENT
+    baseline is 40 — reconcile the final count with any company-side constraint edits), and the
     companion docs docs/design/controlm-ingestion-tdd.md + docs/restructure/08-source-column-mappings.md
     (clean-add docs). Load-order contract detailed in docs/controlm-staging-ingestion-flow.md §3a.
 
@@ -226,6 +239,17 @@ PROCEDURE:
     .pdf is BUILD-ON-DEMAND (gitignored — do NOT port it, regenerate company-side). snapshot.ps1 gains
     a design-doc render step + the CLAUDE.md ritual stale-render check (Canonical-here). Not wired into
     cli.py (entrypoint-boundary TODO).
+    L6 UPDATE (2026-07-08, all additive): design_doc.py gained PRINT-ONLY margin anchors (dd-margin-tag
+    spans in a padding gutter, headless-Chromium-safe) + a Rev/commit FOOTER derived from the doc front
+    matter (never git state/timestamps — render stays byte-deterministic); the screen surface is
+    untouched. NEW skill .claude/skills/transcribe-doc-markup/ (scanned annotated printout -> faithful
+    transcription shown FIRST -> anchor-keyed feedback via the SAME feedback_yaml() as the L5 digital
+    loop) + its fixture (tests/fixtures/transcribe_doc_markup/) and test (test_transcribe_doc_markup.py)
+    — clean-adds. The scans dir docs/design/feedback/scans/** is TRIPLE-GUARDED Internal (.gitignore +
+    classification excluded_paths + README) — MERGE the .gitignore and classification rules ADDITIVELY.
+    test_doc_outline now GLOB-tests every committed docs/design/*-tdd.md. The drydocs-remediation TDD
+    (docs/design/drydocs-remediation-tdd.{md,html,print.html}; contract = ADR 0002-B, detect ->
+    transform -> prove -> Jira, no graph write / SoD) is a clean-add rendered design doc.
 
 21. SEAL ONTOLOGY RESHAPE + SCRAPED-DOCS SOURCE-OF-RECORD — GATE-BOUND PROPOSAL (2026-07-08;
     NOTHING applied — collision-sensitive; read the git-readme.md heads-up "SEAL entity reshape…"):
@@ -241,6 +265,56 @@ PROCEDURE:
     `proposed_additions` key (inert to the resolver), and the config/gate-log.md entry (APPEND-ONLY, union
     on collision). Nothing is SME-confirmed; no active graph impact.
 
+22. BMC-DOCS LEXICAL LOADER — DOCMETA P0, SHIPPED & GATE-ACCEPTED (2026-07-08; commits "…bmc-docs
+    lexical loader … STOPPED AT GATE" then "ACCEPTED 13/13 … LOADED LIVE" — MIXED stream). The
+    converted BMC docs corpus (external/orchestration/bmc-controlm/, 26 pages) loads as a DETERMINISTIC
+    llm-graph-builder LEXICAL graph — no LLM/embeddings: H2-section chunking (seq-0 preamble), :Document
+    + :Chunk nodes (BOTH prov:Entity) with PART_OF + FIRST_CHUNK/NEXT_CHUNK chains (out-degree <= 1),
+    per-chunk trust tier VERBATIM|GROUNDED|SYNTHESIZED stamped per the SOURCE-MANIFEST default rule
+    (SYNTHESIZED is Claude inference, NEVER vendor ground truth), and the software-ontology hook
+    (Document)-[:DESCRIBES {target_version}]->(SoftwareProduct controlm). LOAD ORDER: the software
+    registry (step 17) loads FIRST — DESCRIBES MATCHes the product, never MERGEs a stub.
+    - Clean-adds (generic — take FROM producer): drydocs/loaders/bmc_docs.py,
+      drydocs/loaders/cypher/bmc_docs.cypher, drydocs/models/docs.py (BmcDocChunkRow),
+      tests/unit/test_bmc_docs.py.
+    - Canonical-here (step 6): +2 constraints document_id + chunk_id in constraints.cypher (these drive
+      EXPECTED_CONSTRAINTS to 40 — see step 19); 4 now-ACTIVE edges docs_describes / docs_chunk_part_of
+      / docs_first_chunk / docs_next_chunk in relationship_vocabulary.yaml + their matching
+      ontology_supplement.cypher blocks (test_schema.py REQUIRES the supplement block for every active
+      edge); 4 confirmed entries in config/taxonomy-ontology-map.yaml.
+    - Integration points (collision, ADDITIVE — preserve existing bodies): drydocs/cli.py gains the
+      load-bmc-docs command + a `from .loaders.bmc_docs import …`; drydocs/models/__init__.py adds
+      BmcDocChunkRow to imports + __all__.
+    - source-registry: NEW `bmc-docs` entry (classification External, confirmed: true, gate_spec
+      pointer) — merge into config/source-registry.yaml (test_classification gate).
+    - BACK-FLOW (Canonical-COMPANY, step 10/18 rule): config/gate-prompts/bmc-docs-lexical-load.yaml and
+      graph-tests/bmc-docs-lexical.yaml are gate-seed twins — if company main carries its own, KEEP
+      COMPANY'S and drop the incoming; config/gate-log.md gains the 2026-07-08 acceptance entry — merge
+      APPEND-ONLY (union).
+    - Acceptance: poetry run pytest tests/unit/test_bmc_docs.py -q (portable — the corpus .md files are
+      committed under external/, no network/DB). The company-side LIVE load is a Track-2 concern.
+
+23. SOURCE-GOVERNANCE COLUMN LEDGER — doc 08 / N1 (2026-07-08 — clean-adds + one boundary-guard row).
+    drydocs/source_mappings.py (schema drydocs.source-mapping.v1; a TYPED, PURE-config accessor in the
+    review_labels pattern — no pandas/Neo4j; projected / filter-only / excluded / deferred disposition
+    per profiled column), config/source-mappings/controlm-psgmgr.yaml (transcribes ONLY already-decided
+    dispositions from the q1q3 gate + audit-fields: 5 objects, 69 projected rows; census pending — doc
+    08 Phase 2), tests/unit/test_source_mappings.py. All CLEAN-ADDS — take FROM producer. BOUNDARY
+    GUARD: source_mappings.py is classified into the drydocs-review COMPONENT_GROUP (parked there as a
+    pure config accessor) — its MODULE_MAP.md row + the test_module_boundary.py membership MUST travel
+    with it (default-deny guard, step 10/18), else test_module_boundary goes red. It is GENERIC doc-08
+    tooling, NOT the company's wired review internals, so take it clean — unlike the rest of the review
+    group. doc-08 authority: docs/restructure/08-source-column-mappings.md (a step-19 clean-add doc).
+
+24. RELEASE / VERSIONING — v0.3.0 (2026-07-09 — clean-add docs; DO NOT take the version string).
+    VERSIONING.md (SemVer policy: single source = the pyproject version, annotated vX.Y.Z tags mirror
+    it, 0.x pre-1.0 bump rules, the public surface, the release ritual) and CHANGELOG.md (Keep a
+    Changelog; [0.3.0] back-filled from phases 0-11, cross-referencing backlog ids) are CLEAN-ADDS —
+    take FROM producer. pyproject.toml version (0.1.0 -> 0.3.0) is the PRODUCER's release
+    cadence: on collision KEEP COMPANY'S version string (the company repo versions on its own schedule).
+    Git TAGS are NOT transferred by cherry-pick — the v0.3.0 annotated tag stays producer-side; the
+    company tags its own releases.
+
 ACCEPTANCE GATE (behavior is the contract, not a byte-compare):
 - Track 1 (portable, no production sample present):
     poetry run pytest tests/unit/test_variable_classifier.py tests/unit/test_variable_resolver.py \
@@ -254,10 +328,12 @@ ACCEPTANCE GATE (behavior is the contract, not a byte-compare):
   means the skip guard was lost — fix it.
 - Full `pytest tests/unit/` must be green (passes + sample-skips + the PyYAML test_schema.py
   skips). ZERO failures is the contract. Now also covers the docgen tests (test_doc_outline /
-  test_design_doc / test_doc_pdf — portable, stdlib + PyYAML, no data/network). Both CI guards must
-  pass: test_schema.py (no `active` relationship without its supplement block) and
-  test_classification.py (every source in source-registry.yaml has a valid sensitivity
-  classification). New dep: PyYAML.
+  test_design_doc / test_doc_pdf) AND the newer-stream tests (test_bmc_docs, test_source_mappings,
+  test_row_checksum, test_transcribe_doc_markup) — all portable: stdlib + PyYAML, the committed BMC
+  corpus under external/, no network/DB. test_schema.py now expects EXPECTED_CONSTRAINTS = 40 (steps
+  19 + 22) and a supplement block for the 4 active `docs_*` edges. Both CI guards must pass:
+  test_schema.py (no `active` relationship without its supplement block) and test_classification.py
+  (every source in source-registry.yaml has a valid sensitivity classification). New dep: PyYAML.
 
 BOUNDARIES:
 - One-way only. Never add company main as a remote on the producer; never push back to
@@ -266,5 +342,7 @@ BOUNDARIES:
 - Never commit real SIDs, credentials, server addresses, GHE org names, or production data
   values; internal/ is the only home for confidential data and is stripped on publish
   (PUBLISH-BOUNDARY.md).
+- The producer versions on its own cadence (v0.3.0, step 24): never overwrite the company's
+  pyproject version string and never import the producer's git tags.
 - When done, open drydocs-port as a PR onto company main; do not fast-forward main directly.
 ```
