@@ -1336,7 +1336,7 @@ items:
     agent: main
     model: sonnet
     priority: p3
-    status: todo
+    status: in_progress
     depends_on: [L5]
     inputs: [drydocs/design_doc.py, docs/design/feedback/README.md, tests/unit/test_design_doc.py]
     acceptance: >
@@ -1367,7 +1367,7 @@ items:
     agent: main
     model: sonnet
     priority: p3
-    status: todo
+    status: in_progress
     depends_on: [L5]
     inputs: [drydocs/design_doc.py, drydocs/doc_outline.py, docs/design/feedback/README.md, tests/unit/test_design_doc.py]
     acceptance: >
@@ -1540,8 +1540,8 @@ items:
 # Roll-up the dispatcher can glance at. COMPUTED views — test_backlog.py enforces
 # that these match the items exactly; update them with any status change.
 summary:
-  todo: 15                                          # C5, E2, G3-G4, G9, K3, L7-L11, M2-M4, N2
-  in_progress: 5                                    # E1, F1, F2, K2 (awaiting HITL), G2 (core shim)
+  todo: 13                                          # C5, E2, G3-G4, G9, K3, L7-L9, M2-M4, N2
+  in_progress: 7                                    # E1, F1, F2, K2 (awaiting HITL), G2 (core shim), L10, L11 (pulled 2026-07-09)
   blocked: 0
   done: 39                                          # A1-A3, B1-B4, C1-C4, D1-D3, G1, G5-G7, G8, H1-H7, I1-I4, J1, K1, L1, L3-L6, M1, N1
-  next_ready: [C5, K3, L7, L8, L9, L10, L11, M2, M3, M4, N2]  # L10+L11 groomed 2026-07-09 (depend L5, done) → ready
+  next_ready: [C5, K3, L7, L8, L9, M2, M3, M4, N2]  # L10+L11 pulled in_progress 2026-07-09 (main session)
