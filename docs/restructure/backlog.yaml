@@ -520,17 +520,21 @@ items:
     agent: main
     model: opus
     priority: p2
-    status: blocked
+    status: done
     depends_on: [G1]
     inputs: [docs/decisions/0002-component-database-topology.md]
     acceptance: >
       The G1 topology (drydocs + drydocs_context + drydocs_all composite + proxy-node constraints)
       is deployed to the production target and a drydocs_all smoke query passes there.
     notes: >
-      ADR 0002 follow-up #1 (LIVE deploy). BLOCKED: the current Aura tier is limited to ONE node /
-      one database — it cannot host drydocs_context + a composite. Unblock = a multi-DB-capable
-      Enterprise target (Aura Virtual Dedicated Cloud / Business Critical, or self-managed Neo4j
-      Enterprise). Procurement/ops gate, not a code gate. Until then G4's deepdoc runs local-only.
+      ADR 0002 follow-up #1 (LIVE deploy). Was BLOCKED on the Aura single-DB tier; Aura was
+      dropped 2026-07-06 (Docker EE is the committed enterprise path), which RE-SCOPES the
+      producer-side live target to the self-managed EE container. DONE 2026-07-08, verified
+      live: container neo4jtest (neo4j:5.26-enterprise-ubi10, named volume neo4j-testdata) —
+      drydocs + ddlineage + ddcontext + ddall composite all online; the provisioning smoke
+      read all three constituents through ddall (0/0/0, pre-ingest) and wrote nothing.
+      The COMPANY-side live target remains a port concern (multi-DB Enterprise there —
+      see docmeta plan / port-prompt), not a producer backlog item.
 
   - id: G2
     epic: component-topology
@@ -1475,6 +1479,6 @@ items:
 summary:
   todo: 13                                          # C5, E2, G3-G4, G9, K3, L7-L9, M2-M4, N2
   in_progress: 5                                    # E1, F1, F2, K2 (awaiting HITL), G2 (core shim)
-  blocked: 1                                        # G7 — live multi-DB deploy needs an Enterprise target
-  done: 38                                          # A1-A3, B1-B4, C1-C4, D1-D3, G1, G5-G6, G8, H1-H7, I1-I4, J1, K1, L1, L3-L6, M1, N1
+  blocked: 0
+  done: 39                                          # A1-A3, B1-B4, C1-C4, D1-D3, G1, G5-G7, G8, H1-H7, I1-I4, J1, K1, L1, L3-L6, M1, N1
   next_ready: [C5, K3, L7, L8, L9, M2, M3, M4, N2]  # L6/M1/N1 done 2026-07-08 → L8 (runbook capstone), M2, N2 unblocked
