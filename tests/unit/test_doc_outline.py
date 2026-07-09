@@ -127,3 +127,12 @@ def test_real_tdd_outline_loads() -> None:
 def test_controlm_tdd_conforms_to_outline() -> None:
     problems = validate_paths(TDD_OUTLINE, CONTROLM_TDD)
     assert problems == [], "Control-M TDD drifted from tdd.outline.yaml:\n  " + "\n  ".join(problems)
+
+
+def test_every_committed_tdd_conforms_to_outline() -> None:
+    """Every docs/design/*-tdd.md validates — new TDDs are auto-covered, no enumeration."""
+    tdds = sorted((REPO_ROOT / "docs" / "design").glob("*-tdd.md"))
+    assert tdds, "no committed TDDs found"
+    for tdd in tdds:
+        problems = validate_paths(TDD_OUTLINE, tdd)
+        assert problems == [], f"{tdd.name} drifted from tdd.outline.yaml:\n  " + "\n  ".join(problems)

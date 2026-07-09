@@ -1,0 +1,158 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Technical Design — drydocs-remediation (Control-M fix packages: detect → transform → prove → Jira)</title>
+<style>
+:root { color-scheme: light dark; --ink:#1a1a1a; --mid:#555; --line:#d0d0d0; --faint:#f6f6f6; --bg:#fff; --link:#0a58ca; }
+@media (prefers-color-scheme: dark) { :root { --ink:#e6e6e6; --mid:#a0a0a0; --line:#3a3a3a; --faint:#1c1c1c; --bg:#141414; --link:#6ea8fe; } }
+:root[data-theme="dark"] { --ink:#e6e6e6; --mid:#a0a0a0; --line:#3a3a3a; --faint:#1c1c1c; --bg:#141414; --link:#6ea8fe; }
+:root[data-theme="light"] { --ink:#1a1a1a; --mid:#555; --line:#d0d0d0; --faint:#f6f6f6; --bg:#fff; --link:#0a58ca; }
+* { box-sizing: border-box; }
+body { font: 15px/1.6 "Segoe UI", system-ui, Arial, sans-serif; color: var(--ink); background: var(--bg); margin: 0; }
+main { max-width: 900px; margin: 0 auto; padding: 32px 24px 80px; }
+h1 { font-size: 28px; margin: 0 0 6px; letter-spacing:-0.3px; }
+h2 { font-size: 20px; margin: 34px 0 10px; padding-bottom:5px; border-bottom: 2px solid var(--ink); }
+h3 { font-size: 16px; margin: 22px 0 8px; }
+h4,h5,h6 { font-size: 14px; margin: 16px 0 6px; }
+p { margin: 10px 0; } strong { font-weight: 700; }
+a { color: var(--link); } a:hover { text-decoration: underline; }
+code { font-family: "Cascadia Mono","Consolas",monospace; font-size: 0.88em; background: var(--faint); padding: 1px 4px; border-radius: 3px; }
+pre { font-family: "Cascadia Mono","Consolas",monospace; font-size: 12.5px; line-height:1.45; border:1px solid var(--line); background: var(--faint); padding: 12px 14px; border-radius: 6px; overflow-x: auto; }
+pre code { background: none; padding: 0; }
+table { border-collapse: collapse; margin: 14px 0; font-size: 13.5px; display:block; overflow-x:auto; }
+th,td { border:1px solid var(--line); padding: 6px 9px; text-align:left; vertical-align: top; }
+th { background: var(--faint); font-weight:700; }
+blockquote { margin: 14px 0; padding: 2px 16px; border-left: 4px solid var(--line); color: var(--mid); }
+ul,ol { margin: 10px 0; padding-left: 26px; } li { margin: 4px 0; }
+hr { border:none; border-top:1px solid var(--line); margin: 26px 0; }
+:target { scroll-margin-top: 12px; } :target > :first-child, h2:target, h3:target { outline: 2px solid var(--link); outline-offset: 4px; }
+
+.dd-note-btn { border:1px solid var(--line); background:var(--bg); color:var(--mid); cursor:pointer; font-size:12px; line-height:1; padding:2px 6px; border-radius:5px; margin-right:6px; }
+.dd-note-btn:hover { color:var(--link); border-color:var(--link); }
+.dd-note-box { margin:6px 0 10px; }
+.dd-note-box textarea { width:100%; min-height:56px; font:13px/1.4 "Segoe UI",system-ui,sans-serif; color:var(--ink); background:var(--faint); border:1px solid var(--line); border-radius:6px; padding:8px; resize:vertical; }
+.dd-annotated { box-shadow:-3px 0 0 var(--link); padding-left:8px; }
+.dd-fb-bar { position:fixed; right:16px; bottom:16px; display:flex; gap:8px; align-items:center; background:var(--bg); border:1px solid var(--line); border-radius:10px; padding:8px 12px; box-shadow:0 2px 10px rgba(0,0,0,.15); font-size:13px; z-index:50; }
+.dd-fb-bar button { cursor:pointer; border:1px solid var(--link); background:var(--link); color:#fff; border-radius:6px; padding:5px 10px; font-size:13px; }
+.dd-fb-bar .dd-badge { font-weight:700; }
+.dd-toast { position:fixed; right:16px; bottom:64px; background:var(--ink); color:var(--bg); padding:8px 12px; border-radius:8px; font-size:13px; z-index:60; opacity:0; transition:opacity .2s; }
+.dd-toast.show { opacity:1; }
+@media print { .dd-note-btn, .dd-note-box, .dd-fb-bar, .dd-toast { display:none !important; } }
+</style>
+</head>
+<body>
+<main>
+<h1>Technical Design — <code>drydocs-remediation</code> (Control-M fix packages: detect → transform → prove → Jira)</h1>
+<p id="front-matter"><strong>Status:</strong> PRESCRIPTIVE — specifies an UNBUILT component. <strong>Rev 1, 2026-07-08</strong>, authored at commit <code>24d6a4b</code> (backlog <strong>G3</strong> <code>todo</code>, gated on <strong>G2</strong> core extraction; contract = ADR 0002-B). · <strong>Classification:</strong> Internal-Public — mechanism only; real folder/job names, fix-rule values, and Jira coordinates live company-side. · <strong>Audience:</strong> the production-support SME (author of fixes) + the source-app dev teams who deploy them. · <strong>Companion:</strong> <code>docs/decisions/0002-b-spinoff-rebase-checklist.md</code> (the rebase contract this design realizes); <code>docs/design/controlm-ingestion-tdd.md</code> (the ingest chain that later <em>reflects</em> a landed fix); <code>MODULE_MAP.md</code> (&quot;C1 — failures → Jira; no graph write&quot;).</p>
+<p>Worked example throughout (synthetic, mechanism-only): a FileWatcher job in folder <code>PRARAF-FW1D-…</code> fails repeatedly on a mis-declared watch path; its Description field carries no metadata block; ownership is ambiguous in <code>cm_escalation_db</code>. The remediation loop produces a greenfield definition + metadata supplement and hands it to the owning dev team.</p>
+<blockquote><p><strong>Read-me-first.</strong> This component <strong>writes no graph, deploys nothing</strong>. Separation of duties is the founding constraint: production support authors the fix; the source application&#x27;s dev team holds deploy rights. The only durable outputs are the greenfield definition artifact and the Jira ticket (the system of record for the handoff). Closure is observed, not performed: after the dev team lands the change, the next <code>ingest-controlm</code> load reflects it and the ticket closes.</p></blockquote>
+<hr>
+<h2 id="purpose-scope">Purpose &amp; scope</h2>
+<p><strong>Purpose.</strong> Specify how DryDocs turns <em>detected Control-M definition/metadata defects</em> into <em>deployable greenfield fix packages</em> — deterministically where a rule can be coded, agent- assisted where investigation is required — without ever touching production or the graph.</p>
+<p><strong>In scope.</strong></p>
+<ul><li>The remediation loop: acquire → detect → classify → transform → prove → package → Jira.</li><li>The <strong>two-tier fix model</strong>: Tier-1 deterministic Python rules vs Tier-2 agentic investigation (debug skills + Control-M skills + graph search over the loaded DB).</li><li>The <strong>acquisition seam</strong> (<code>DefinitionFormat</code>) and the open API spike: <em>what can be pulled</em> from the Control-M environment programmatically (TBD — see §HITL).</li><li>The metadata supplement: what a &quot;fixed&quot; definition carries (Description-field metadata block, ownership/SEAL alignment) and where those standards come from.</li></ul>
+<p><strong>Out of scope.</strong> Deployment (dev teams, SoD); any graph write (structural invariant); runbook <em>generation</em> (the <code>controlm-runbook-automation</code> skill — remediation is its fix-package half&#x27;s engine, not its author); SEAL attribution loading (<strong>K2</strong>, gated); the description-field metadata <em>standard itself</em> (its own plan — consumed here, defined there).</p>
+<h2 id="context-frame">1. Where this sits — the four-layer frame</h2>
+<table><thead><tr><th>Layer</th><th>Remediation&#x27;s relationship</th><th>Direction</th></tr></thead><tbody><tr><td><strong>1. Taxonomy</strong></td><td>folder-naming decode (PRAOCG positions), fix-rule categories</td><td>read</td></tr><tr><td><strong>2. Ontology</strong></td><td>conformance rules cite confirmed mappings (what edges <em>should</em> exist)</td><td>read</td></tr><tr><td><strong>3. Knowledge graph</strong></td><td>corroboration + investigation surface: sample Control-M topology, the software registry, and the <strong>bmc-docs lexical corpus</strong> (vendor legality)</td><td><strong>read-only</strong></td></tr><tr><td><strong>4. Context graph</strong></td><td>future: failure/freshness context sharpens detection</td><td>read (future)</td></tr></tbody></table>
+<p><code>drydocs-remediation</code> is a <strong>consumer</strong> of all four layers and a producer of <strong>none</strong> — its outputs leave the system (XML artifact + Jira). This is the inverse of every loader and the reason the no-graph-write test is structural, not stylistic.</p>
+<hr>
+<h2 id="definitions">Definitions, acronyms &amp; references</h2>
+<table><thead><tr><th>Term</th><th>Meaning</th></tr></thead><tbody><tr><td>greenfield definition</td><td>a regenerated folder/job definition that re-derives the SAME resolved behavior as the legacy one, minus the defect — new artifact, not an edit</td></tr><tr><td>SoD</td><td>separation of duties — support authors, dev deploys; the constraint that shapes the whole loop</td></tr><tr><td><code>DefinitionFormat</code></td><td>the format-agnostic read/write seam (XML impl now; JSON/Automation-API impl later — BMC is phasing XML out; deprecated from 9.0.21.100, supported until 9.0.22)</td></tr><tr><td><code>ctm-remediate</code></td><td>the archived standalone spin-off (<code>DryDocs-v0-archive@controlm-spinoff</code>) whose remediation logic is re-homed here (ADR 0002-B: re-home, don&#x27;t replay)</td></tr><tr><td>Tier-1 / Tier-2</td><td>deterministic Python fix vs agent-assisted fix — see §3</td></tr><tr><td><code>-PRPL</code> parking</td><td>greenfield definitions may be loaded to a parallel-run folder left in <strong>manual order</strong> so the dev team can inspect before anything runs</td></tr><tr><td><code>cm_escalation_db</code></td><td>the escalation/ownership table (EJOBNAME join) deciding <em>which team gets the Jira</em></td></tr><tr><td>metadata block</td><td>the pipe-delimited key:value convention for the 4000-char Description field (own plan; consumed here)</td></tr><tr><td>equivalence proof</td><td>offline demonstration that greenfield resolved behavior == legacy resolved behavior, via <code>drydocs_core</code> resolution</td></tr></tbody></table>
+<p><strong>References.</strong> ADR 0002 (component topology, D3) + <strong>0002-B</strong> (rebase checklist — the step-by-step contract); ADR 0002-A (core extraction, the G2 dependency); <code>.claude/skills/controlm-db</code> + <code>controlm-runbook-automation</code> (the Tier-2 skill surface); <code>graph-tests/bmc-docs-lexical.yaml</code> (the corpus the Tier-2 agent searches); <code>config/gate-log.md</code> 2026-07-08 (bmc-docs trust tiers — the VERBATIM/GROUNDED-only rule).</p>
+<h2 id="design-summary">2. Design summary</h2>
+<pre class="mermaid"><code>flowchart LR
+    A[&quot;ACQUIRE&lt;br/&gt;legacy definition&lt;br/&gt;(DefinitionFormat: XML now,&lt;br/&gt;API pull = spike TBD)&quot;] --&gt; B[&quot;DETECT&lt;br/&gt;failure-driven batches +&lt;br/&gt;standards-rule sweep&quot;]
+    B --&gt; C{&quot;CLASSIFY&lt;br/&gt;fix tier&quot;}
+    C --&gt;|&quot;rule codeable&quot;| D1[&quot;TIER 1 — deterministic Python&lt;br/&gt;idempotent transform rules&lt;br/&gt;(unit-tested, no judgment)&quot;]
+    C --&gt;|&quot;needs investigation&quot;| D2[&quot;TIER 2 — agentic&lt;br/&gt;debug skills + Control-M skills +&lt;br/&gt;graph search (topology, registry,&lt;br/&gt;bmc-docs VERBATIM/GROUNDED)&quot;]
+    D1 --&gt; E[&quot;PROVE&lt;br/&gt;offline equivalence:&lt;br/&gt;greenfield == legacy&lt;br/&gt;resolved behavior&quot;]
+    D2 --&gt;|&quot;HITL review&lt;br/&gt;mandatory&quot;| E
+    E --&gt; F[&quot;PACKAGE&lt;br/&gt;greenfield definition +&lt;br/&gt;metadata supplement&quot;]
+    F --&gt; G[&quot;JIRA (SoR)&lt;br/&gt;to owning team via&lt;br/&gt;cm_escalation_db;&lt;br/&gt;optional -PRPL parking&quot;]
+    G -.-&gt;|&quot;team deploys;&lt;br/&gt;next ingest reflects it&quot;| H[&quot;ticket closes&quot;]</code></pre>
+<p>One loop, two lanes. Everything a <em>rule</em> can express runs deterministic and silent; anything needing judgment runs agent-assisted and <strong>always</strong> passes human review before it becomes a ticket. Both lanes converge on the same exit criteria: an equivalence proof and a Jira. The graph — including the freshly loaded bmc-docs corpus — is the investigation surface, never the write target.</p>
+<h2 id="detailed-design">3. Detailed design</h2>
+<h3>Stage A — Acquire (the <code>DefinitionFormat</code> seam)</h3>
+<p>The engine never parses raw vendor formats directly; it reads through <code>DefinitionFormat</code>:</p>
+<table><thead><tr><th>Source</th><th>Status</th><th>Notes</th></tr></thead><tbody><tr><td>Definition <strong>XML</strong> export (<code>exportdeftable</code> / env export)</td><td><strong>now</strong> — the 9.0.21.300 reality</td><td>XML deprecated from 9.0.21.100 but supported to 9.0.22 — inside the window</td></tr><tr><td><strong>API pull</strong></td><td><strong>SPIKE, TBD</strong> — the user is probing what the environment exposes programmatically</td><td>lands as a second <code>DefinitionFormat</code> impl if viable; findings gate at §HITL (OQ-1)</td></tr><tr><td><code>psgmgr</code> replica + loaded graph</td><td>corroboration only, read-only</td><td>legacy definition must <em>reconcile</em> with both before any transform is trusted</td></tr></tbody></table>
+<p>Format assumptions stay out of the engine (ADR 0002-B §0 note) — the transform rules operate on the parsed model from <code>drydocs_core.controlm</code>, never on format syntax.</p>
+<h3>Stage B — Detect</h3>
+<p>Two feeds, one queue:</p>
+<ul><li><strong>Failure-driven batches</strong> (the primary use case): a production failure names the folder/ jobs; remediation sweeps <em>that batch</em> for every defect class it knows.</li><li><strong>Standards sweep</strong>: the internal rules registry (naming, metadata-block presence, ownership resolvability via <code>cm_escalation_db</code>) run as read-only checks — company-side rule <em>values</em>, producer-side rule <em>mechanism</em>.</li></ul>
+<p>Each finding is a typed defect: <code>{defect_class, folder/job key, evidence, suggested_tier}</code>.</p>
+<h3>Stage C — Classify: the two-tier fix model</h3>
+<p><strong>Tier 1 — deterministic Python.</strong> A fix whose rule is fully expressible in code: metadata- block templating into Description, naming normalization, dead-parameter cleanup, derived field supplements (e.g. SEAL id resolved from an unambiguous escalation-DB row). Properties: idempotent, unit-tested per rule, batch-safe, no LLM anywhere. These are the &quot;some of the meta updates can be coded in Python&quot; class — the default lane whenever possible.</p>
+<p><strong>Tier 2 — agentic.</strong> A fix requiring investigation or judgment: ambiguous ownership, conflicting metadata, behavior-affecting changes, defects with no coded rule yet. The agent works with:</p>
+<ol><li><strong>debug skills</strong> (log/diagnostic interpretation),</li><li><strong>Control-M skills</strong> (<code>controlm-db</code> for replica queries; <code>controlm-runbook-automation</code> for the fix-package procedure),</li><li><strong>graph search over the loaded DB</strong> — the sample Control-M topology, the software registry, and the <strong>bmc-docs lexical corpus</strong> for vendor legality (&quot;is this definition shape legal per Control-M?&quot;), constrained to chunks with <code>provenance IN [VERBATIM, GROUNDED]</code> — <strong>SYNTHESIZED chunks are never citable evidence</strong> (the two-corpus rule, gate 2026-07-08).</li></ol>
+<p>Tier-2 output is a <em>proposed</em> transform + cited evidence; <strong>HITL review is mandatory</strong> before it proceeds to Stage D. A Tier-2 fix that recurs identically is a candidate to be <em>promoted into a Tier-1 rule</em> (with its own unit test) — the loop&#x27;s learning mechanism.</p>
+<h3>Stage D — Transform + prove</h3>
+<p>Port of the spin-off&#x27;s core (ADR 0002-B §4): <code>remediation/transform.py</code> produces the greenfield definition; <code>remediation/equivalence.py</code> proves it. The proof reuses <code>drydocs_core</code> resolution so it is apples-to-apples: parse legacy → resolve; parse greenfield → resolve; assert equal resolved behavior (schedule, command, conditions, variables) modulo the intended fix, which is itself asserted <em>changed</em>.</p>
+<h3>Stage E — Package + handoff</h3>
+<p><code>remediation/jira.py</code> emits one ticket per batch to the owning team (resolved via the escalation-DB rule; unresolvable ownership is itself a defect, surfaced not guessed): greenfield artifact attached, equivalence proof + evidence citations in the body. Optional <code>-PRPL</code> parking: the greenfield definition loaded to a parallel folder in <strong>manual order</strong> for dev-team inspection. Jira is the SoR; there is no app-side ticket store.</p>
+<h3 id="design-data-mapping">Source → column-level field mapping</h3>
+<p><strong>N/A — no ingestion.</strong> This component loads nothing into the graph. The column-level view of what it <em>reads</em> lives with the sources themselves (<code>config/source-mappings/</code>, doc 08).</p>
+<h2 id="classification-security">4. Classification &amp; security</h2>
+<ul><li><strong>This document:</strong> Internal-Public — mechanism only. Real folder/job names, real rule values, real Jira project coordinates, and the filled rules registry are <strong>Internal</strong> and live in the company twin (same split as <code>review-labels</code>/gate pages).</li><li><strong>Definition XML is Internal by content</strong> (real job names, hosts, run-as users): artifacts stay in gitignored workspace paths producer-side; the producer repo carries fixtures only (synthetic definitions).</li><li><strong>No credentials in the engine:</strong> Jira auth and any API-pull credentials are company-side config, never committed (PUBLISH-BOUNDARY.md).</li><li><strong>The SoD constraint is also a security property:</strong> the component holds no deploy permissions to hold safely.</li></ul>
+<h2 id="qa-tests">5. QA &amp; tests</h2>
+<p>The ADR 0002-B verification gates, as tests (all offline):</p>
+<table><thead><tr><th>Gate</th><th>Test</th></tr></thead><tbody><tr><td><strong>No-graph-write</strong> (structural)</td><td>mock <code>Neo4jClient</code>; assert no write transaction ever opens</td></tr><tr><td><strong>Jira-only side effects</strong></td><td>emitter-boundary test: sole side effects = artifact + Jira call</td></tr><tr><td><strong>Offline equivalence</strong></td><td>greenfield re-derives legacy resolved behavior via <code>drydocs_core</code></td></tr><tr><td><strong>Core boundary</strong></td><td><code>drydocs-remediation</code> imports only <code>drydocs_core.*</code> (module-boundary guard extended)</td></tr><tr><td><strong>Tier-1 rules</strong></td><td>one unit test per coded rule: fixture-in → expected transform, idempotency (f(f(x)) == f(x))</td></tr><tr><td><strong>Tier-2 evidence discipline</strong></td><td>citation check: agent evidence references resolve to VERBATIM/GROUNDED chunks only</td></tr><tr><td>Suite gates</td><td><code>poetry run pytest -q</code>, package import, <code>--help</code></td></tr></tbody></table>
+<h2 id="hitl-gate">6. HITL gate &amp; open questions</h2>
+<p><strong>Gates this design already binds to:</strong> every Tier-2 fix passes human review before Jira (per-fix HITL, not per-design); promoting a Tier-2 pattern to a Tier-1 rule is a reviewed change (rule + test); the metadata-block standard arrives through its own plan&#x27;s gate.</p>
+<p><strong>Open questions (the spike list):</strong></p>
+<ul><li><strong>OQ-1 — API pull (TBD, user spike in progress):</strong> what does the environment expose programmatically to <em>pull</em> definitions/config (Automation API availability at 9.0.21.300 vs XML export only)? Outcome decides the second <code>DefinitionFormat</code> impl and whether acquisition can be self-service or stays export-file-driven.</li><li><strong>OQ-2 — rules registry shape:</strong> where Tier-1 rules live (config YAML per the repo idiom vs code-only) and how company-side rule values twin with producer-side mechanism.</li><li><strong>OQ-3 — PoC batch selection:</strong> first failure-driven batch to run end-to-end (a FileWatcher defect class is the standing candidate).</li><li><strong>OQ-4 — Tier-2 agent runtime:</strong> which agent surface executes the investigation (Claude Code session with skills vs a scripted ADK agent) — interacts with the LLM-key question already in IDEAS.</li></ul>
+<h2 id="traceability-matrix">7. Requirements traceability matrix</h2>
+<table><thead><tr><th>Requirement</th><th>Design section</th><th>Component / module</th><th>Test / verify</th><th>Status</th></tr></thead><tbody><tr><td>FR-REM-1 — acquire legacy definitions format-agnostically</td><td>design-summary; detailed-design (Stage A)</td><td><code>DefinitionFormat</code> (XML impl)</td><td>fixture parse round-trip test</td><td>planned</td></tr><tr><td>FR-REM-2 — detect defects in failure-driven batches + standards sweep</td><td>detailed-design (Stage B)</td><td><code>remediation/detect.py</code></td><td>per-defect-class fixture tests</td><td>planned</td></tr><tr><td>FR-REM-3 — deterministic Tier-1 metadata fixes in Python</td><td>detailed-design (Stage C)</td><td><code>remediation/transform.py</code> rules</td><td>per-rule unit tests + idempotency</td><td>planned</td></tr><tr><td>FR-REM-4 — agent-assisted Tier-2 fixes w/ skills + graph search</td><td>detailed-design (Stage C)</td><td>agent surface + skills + read-only graph</td><td>evidence-citation check (VERBATIM/GROUNDED only); mandatory HITL review</td><td>planned</td></tr><tr><td>FR-REM-5 — offline equivalence proof</td><td>detailed-design (Stage D)</td><td><code>remediation/equivalence.py</code></td><td>equivalence test via <code>drydocs_core</code> resolution</td><td>planned</td></tr><tr><td>FR-REM-6 — Jira handoff to owning team (SoR)</td><td>detailed-design (Stage E)</td><td><code>remediation/jira.py</code></td><td>Jira-only side-effect boundary test</td><td>planned</td></tr><tr><td>NFR-REM-1 — no graph write, ever</td><td>context-frame; qa-tests</td><td>whole component</td><td>structural no-graph-write test</td><td>planned</td></tr><tr><td>NFR-REM-2 — core boundary (imports drydocs_core only)</td><td>qa-tests</td><td>package layout</td><td>module-boundary guard</td><td>planned (blocked on G2)</td></tr><tr><td>NFR-REM-3 — publish boundary honoured</td><td>classification-security</td><td>repo layout / twins</td><td>classification tests; fixtures synthetic</td><td>planned</td></tr><tr><td>UC-REM-1 — failed FileWatcher batch → greenfield + metadata + Jira (worked example)</td><td>design-summary; detailed-design</td><td>end-to-end loop</td><td>PoC acceptance run (OQ-3)</td><td>planned</td></tr></tbody></table>
+<h2 id="decisions-discussions">8. Decisions &amp; discussions</h2>
+<ul><li><strong>Re-home, don&#x27;t replay</strong> (ADR 0002-B): the archived spin-off is source <em>material</em>; its parser is dropped for <code>drydocs_core.controlm</code> (already strengthened by G8&#x27;s folded deltas).</li><li><strong>Two tiers, one exit:</strong> the deterministic/agentic split is an <em>authoring</em> distinction, not two pipelines — both lanes meet the same proof + handoff bar, which keeps SoD and audit uniform. Tier-2→Tier-1 promotion is the intended direction of travel over time.</li><li><strong>Sequencing:</strong> G3 stays blocked on G2 (core physically extractable). This TDD is deliberately PRESCRIPTIVE now so the API spike (OQ-1) and rule inventory can proceed against a stable contract; flip sections DESCRIPTIVE as they land.</li><li><strong>Why the graph read includes the docs corpus:</strong> vendor legality was previously a skill-file lookup; with the bmc-docs lexical graph loaded (2026-07-08), Tier-2 evidence can be a <em>graph citation</em> (doc → chunk, tier-filtered) — the two-corpus validation model operationalized.</li></ul>
+<h2 id="appendices">Appendix A — Tier examples (mechanism-level)</h2>
+<table><thead><tr><th>Defect class</th><th>Tier</th><th>Rule sketch</th></tr></thead><tbody><tr><td>Description missing metadata block</td><td>1</td><td>render template from resolvable facts; insert; idempotent re-run</td></tr><tr><td>Trailing-&#x27;p&#x27; SID in ownership field</td><td>1</td><td>strip per the gated employee_sid rule</td></tr><tr><td>Watch-path typo vs actual file drops</td><td>2</td><td>debug skill on failure logs + graph lookup of sibling FileWatchers + vendor doc check (file-watcher chunk, GROUNDED)</td></tr><tr><td>Ambiguous APPLICATION vs folder decode</td><td>2</td><td>escalation-DB + folder-name decode + SME confirm</td></tr><tr><td>Dead schedule (folder in manual order, years unrun)</td><td>2</td><td>CM_HIST corroboration; recommend decommission ticket, not transform</td></tr></tbody></table>
+</main>
+<script>
+
+(function(){
+  var DOC="drydocs-remediation-tdd", KEY="drydocs-doc-feedback:"+DOC;
+  function load(){ try{return JSON.parse(localStorage.getItem(KEY)||"{}");}catch(e){return {};} }
+  function save(){ localStorage.setItem(KEY, JSON.stringify(state)); }
+  var state=load(), badge;
+  function count(){ return Object.keys(state).filter(function(k){return (state[k]||"").trim();}).length; }
+  function refresh(){ if(badge) badge.textContent=count(); }
+  function toast(msg){ var t=document.createElement("div"); t.className="dd-toast"; t.textContent=msg; document.body.appendChild(t); requestAnimationFrame(function(){t.classList.add("show");}); setTimeout(function(){t.classList.remove("show"); setTimeout(function(){t.remove();},250);},1600); }
+  function exportYaml(){
+    var lines=["# design-doc feedback — paste into docs/design/feedback/"+DOC+"-rev<N>.yaml","doc: "+DOC,"notes:"];
+    Object.keys(state).forEach(function(a){
+      var note=(state[a]||"").replace(/\r/g,""); if(!note.trim()) return;
+      lines.push("  - anchor: "+a); lines.push("    note: |");
+      note.split("\n").forEach(function(l){ lines.push("      "+l); });
+    });
+    return lines.join("\n")+"\n";
+  }
+  function attach(el){
+    var id=el.id;
+    var btn=document.createElement("button"); btn.className="dd-note-btn"; btn.type="button"; btn.textContent="✎"; btn.title="Annotate #"+id;
+    var box=document.createElement("div"); box.className="dd-note-box"; box.style.display=(state[id]||"").trim()?"block":"none";
+    var ta=document.createElement("textarea"); ta.value=state[id]||""; ta.setAttribute("placeholder","note for #"+id+" …");
+    ta.addEventListener("input",function(){ state[id]=ta.value; save(); refresh(); el.classList.toggle("dd-annotated", !!ta.value.trim()); });
+    if((state[id]||"").trim()) el.classList.add("dd-annotated");
+    box.appendChild(ta);
+    btn.addEventListener("click",function(){ box.style.display=box.style.display==="none"?"block":"none"; if(box.style.display==="block") ta.focus(); });
+    el.insertAdjacentElement("afterend", box); el.insertAdjacentElement("beforebegin", btn);
+  }
+  document.addEventListener("DOMContentLoaded",function(){
+    document.querySelectorAll("main [id]").forEach(attach);
+    var bar=document.createElement("div"); bar.className="dd-fb-bar";
+    var lbl=document.createElement("span"); lbl.innerHTML='notes <span class="dd-badge">0</span>'; badge=lbl.querySelector(".dd-badge");
+    var ex=document.createElement("button"); ex.type="button"; ex.textContent="Copy feedback";
+    ex.addEventListener("click",function(){ var y=exportYaml();
+      var done=function(){toast("feedback copied — paste into docs/design/feedback/");};
+      if(navigator.clipboard&&navigator.clipboard.writeText){ navigator.clipboard.writeText(y).then(done,function(){fallback(y);}); } else { fallback(y); }
+    });
+    function fallback(y){ var t=document.createElement("textarea"); t.value=y; document.body.appendChild(t); t.select(); try{document.execCommand("copy"); toast("feedback copied");}catch(e){toast("copy failed — select the box");} t.remove(); }
+    bar.appendChild(lbl); bar.appendChild(ex); document.body.appendChild(bar); refresh();
+  });
+})();
+
+</script>
+</body>
+</html>
