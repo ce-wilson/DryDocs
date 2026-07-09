@@ -52,7 +52,7 @@ plan:
     - id: 2
       title: Ontology mapping + HITL
       goal: "Every graph edge traces to an SME-confirmed taxonomy→ontology mapping (Epic C)."
-      status: done
+      status: in_progress   # re-opened 2026-07-08: C5 (same-row-derived relationship rule)
     - id: 3
       title: Config-driven loaders
       goal: "Precedence + source gating read config/, not hardcoded logic (Epic D)."
@@ -86,6 +86,10 @@ plan:
       title: Documentation infrastructure
       goal: "Every design doc (TDD/Runbook/BRD) conforms to a canonical outline; deterministic md→HTML/PDF render; HITL markup loop (digital + pen/paper) re-attaches to a requirement-traceability spine (Epic L)."
       status: in_progress
+    - id: 11
+      title: Source governance ledgers
+      goal: "Per-source governance as test-enforced config: audit envelope + edge diet (doc 06, Epic M) and column-mapping ledgers (doc 08, Epic N); property-term bindings via the gate."
+      status: in_progress   # doc-06 Phases 0-1 (Control-M envelope) shipped 2026-07-07 pre-groom
 
 # ── Module / work-area registry (item.module must be one of these) ───────────
 # Code components mirror MODULE_MAP.md; the rest are repo work areas so that
@@ -310,6 +314,31 @@ items:
       catalog_supports (DevTeam→Product) deprecated. Drift guard green (9 passed); 164 passed.
       Remaining phase-2 `planned` entries (m3_invokes/triggers, p2_*, etc.) stay planned until
       their taxonomy is captured — not re-gated now (no data). Epic C complete.
+
+  - id: C5
+    epic: ontology-mapping
+    title: "Rule for relationships between nodes derived from the SAME source row (city/state/country pattern)"
+    type: task
+    module: ontology
+    phase: 2
+    agent: ontology-mapper
+    model: sonnet
+    priority: p2
+    status: todo
+    depends_on: []
+    inputs: [docs/RELATIONSHIP_GUIDE.md, drydocs/loaders/cypher/controlm_folders.cypher, config/taxonomy-ontology-map.yaml, docs/restructure/03-hitl-sme-flow.md]
+    acceptance: >
+      A generic rule for same-row-derived node relationships (chain the hierarchy vs
+      star-to-entity; when a direct derived-node edge restates a join and is banned) is
+      documented in RELATIONSHIP_GUIDE.md and SME-confirmed via the HITL gate; existing
+      loaders audited against it (live case: CM_DEF_VTAB row -> folder + ControlMServer +
+      ControlMApplication — should app<->server relate directly or only through the
+      folder?); an m3-verify or graph-tests invariant added, or its omission recorded in
+      the gate log. Full suite green.
+    notes: >
+      Groomed 2026-07-08 from the IDEAS question (captured 2026-07-07 while landing the
+      folder-pass ControlMApplication extension). Re-opens phase 2 — methodology gap, not
+      a new source.
 
   # ── Epic D — Config-driven loaders (pipeline-config + main) — Phase 3 ──────
   - id: D1
@@ -1004,7 +1033,7 @@ items:
     model: sonnet
     priority: p2
     status: in_progress
-    depends_on: [K1]
+    depends_on: [K1, K3]
     inputs: [drydocs/controlm/staging.py, drydocs/loaders/, config/source-registry.yaml, docs/restructure/03-hitl-sme-flow.md]
     acceptance: >
       Gate sequence honored: the match policy (SEAL-fact precedence; one-to-one accepted,
@@ -1023,6 +1052,38 @@ items:
       Fidelity notes adopted: never key off job.APPLICATION without a declared
       reconciliation policy; keep source/match_method explicit so mixed pipelines stay
       auditable; attribution loads only after both job and application identities exist.
+      2026-07-08 TYPE CONFLICT (see taxonomy-ontology-map job-seal-app-ref
+      type_conflict_note): wasAssociatedWith needs :Application to be a prov:Agent, but
+      the K3 reshape reclasses it prov:Entity/dprod:DataProduct — run the K3 gate FIRST;
+      the match-policy gate spec (seal-attribution-match-policy) may need its edge shape
+      revised to the reshaped form before ticking. depends_on gains K3.
+
+  - id: K3
+    epic: seal-attribution
+    title: "Run the SEAL entity-reshape gate (:Application -> Entity/DataProduct; TOM roles -> qualifiedAttribution)"
+    type: task
+    module: ontology
+    phase: 9
+    agent: ontology-mapper
+    model: sonnet
+    priority: p1
+    status: todo
+    depends_on: []
+    inputs: [config/gate-prompts/seal-tom-attribution-reshape.yaml, drydocs/ontology/relationship_vocabulary.yaml, config/taxonomy-ontology-map.yaml, knowledge/upgrade-plans/docmeta-component.md]
+    acceptance: >
+      The seal-tom-attribution-reshape gate is SME-run and transcribed: gate-log entry;
+      the :Application node class flips to prov:Entity/dprod:DataProduct (or the SME's
+      edit); TOM governance roles bind via prov:qualifiedAttribution + prov:hadRole
+      (Role = shared skos vocab, org:Membership stays PAT-only);
+      seal_has_membership/seal_of_role/seal_held_by deprecation recorded;
+      hadPrimarySource/wasAttributedTo/qualifiedAttribution vocabulary entries flip per
+      the SME calls; the job-seal-app-ref map entry is re-shaped consistently (unblocks
+      K2). Drift guards green.
+    notes: >
+      Groomed 2026-07-08 from the IDEAS reshape question. Agent-side prep already landed
+      (0986d6d): gate spec + planned vocabulary registrations + map type_conflict_note.
+      The remaining action is the SME gate session itself + transcription — the most
+      consequential pending gate (three incompatible PROV types on one node today).
 
   # ── Epic L — Documentation infrastructure (main) — Phase 10 ───────────────
   # Groomed 2026-07-08 from the deterministic-documentation design conversation.
@@ -1239,11 +1300,162 @@ items:
       (L5→L3 renderer, L6→L4 pdf); intentionally NOT gated on L7 (context ingest), which
       the runbook doesn't need — say the word to make it strictly last.
 
+  - id: L9
+    epic: doc-infrastructure
+    title: "Design-doc screen HTML renders partial in Chrome (Brave renders it correctly)"
+    type: bug
+    module: drydocs-docgen
+    phase: 10
+    agent: main
+    model: sonnet
+    priority: p3
+    status: todo
+    depends_on: [L3]
+    inputs: [docs/design/controlm-ingestion-tdd.html, drydocs/design_doc.py]
+    acceptance: >
+      The L3 screen .html renders full-page in current Chrome (root cause identified —
+      likely CSS/print-view/file:// quirk, markup already validated), or the screen CSS
+      is adjusted; the L4 PDF path stays pinned to Edge/Chrome headless (Brave hangs
+      headless --print-to-pdf on this box, confirmed 2x 180s timeouts). Renderer tests green.
+    notes: "Groomed 2026-07-08 from IDEAS (seen same day; Brave = reference viewer for now)."
+
+  # ── Epic M — Provenance diet + audit envelope (doc 06) — Phase 11 ──────────
+  # Groomed 2026-07-08 from the 2026-07-05 IDEAS line + the 2026-07-07 property-terms
+  # line. Doc 06 Phases 0-1 (Control-M envelope: audit-fields.yaml + jobs/folders
+  # extraction) shipped 2026-07-07 PRE-groom (gate controlm-q1q3-phase1) — recorded
+  # here for traceability, not re-itemized. M1/M2 = doc 06 Phases 2/3; M3 = Phase 4
+  # (+ Phase 5 docs folded in); M4 = the property-term bindings.
+  - id: M1
+    epic: provenance-audit
+    title: "Provenance-edge diet: WAS_GENERATED_BY only on create/change (delta detection)"
+    type: task
+    module: drydocs-load
+    phase: 11
+    agent: main
+    model: sonnet
+    priority: p2
+    status: todo
+    depends_on: []
+    inputs: [docs/restructure/06-provenance-source-audit-fields.md, drydocs/loaders/, drydocs/ontology/relationship_vocabulary.yaml]
+    acceptance: >
+      Loaders detect record change (checksum or version compare, e.g. VERSION_SERIAL) and
+      write WAS_GENERATED_BY -> :JobRun only on create/actual change; full-refresh runs
+      record counts on the :JobRun node instead of blanket membership edges; the
+      prov_was_generated_by vocabulary note is updated via the gate; offline unit tests
+      prove no-change rows write no provenance edge. Full suite green.
+    notes: "Doc 06 Phase 2 — the fix for the full-refresh supernode (persona review Issue 3)."
+
+  - id: M2
+    epic: provenance-audit
+    title: "Migrate existing graphs: delete blanket WAS_GENERATED_BY edges, backfill envelope"
+    type: task
+    module: drydocs-load
+    phase: 11
+    agent: main
+    model: sonnet
+    priority: p3
+    status: todo
+    depends_on: [M1]
+    inputs: [drydocs/migrations/, docs/restructure/06-provenance-source-audit-fields.md]
+    acceptance: >
+      A drydocs/migrations/ file (pattern: the ControlMFolder rename) batch-deletes
+      blanket WAS_GENERATED_BY edges on existing sandbox graphs — destructive, so
+      HITL-confirmed before running; envelope properties backfilled where recoverable;
+      m3-verify updated; the raw-named folder props (last_updated/last_updated_user)
+      retired in favor of the envelope pair. Migration idempotent; suite green.
+    notes: "Doc 06 Phase 3. Also absorbs the first_seen_at naming standardization deferred from Phase 1."
+
+  - id: M3
+    epic: provenance-audit
+    title: "Audit envelope for the remaining sources (SEAL, catalog) via per-source gates"
+    type: requirement
+    module: config
+    phase: 11
+    agent: pipeline-config
+    model: sonnet
+    priority: p3
+    status: todo
+    depends_on: []
+    inputs: [config/audit-fields.yaml, config/source-registry.yaml, docs/restructure/03-hitl-sme-flow.md]
+    acceptance: >
+      The seal-extract and catalog-pat audit-fields stubs are resolved through per-source
+      HITL gates (real column mappings authored in the internal twin — Internal-Confidential
+      never lands producer-side; producer entries flip stub -> confirmed with gate ids);
+      their loaders SET the envelope; software-registry's stub gets an explicit decision
+      (git history as audit trail). Doc 06 Phase 5 docs (loader README, port-prompt/
+      git-readme disposition row) land with it. test_audit_fields green both sides.
+    notes: "Doc 06 Phase 4 + 5. Gates are per-source pauses — sequence producer-first per port-prompt step 15."
+
+  - id: M4
+    epic: provenance-audit
+    title: "Property-level ontology terms for the audit envelope (dct:/prov:, via the gate)"
+    type: task
+    module: ontology
+    phase: 11
+    agent: ontology-mapper
+    model: sonnet
+    priority: p3
+    status: todo
+    depends_on: []
+    inputs: [config/audit-fields.yaml, drydocs/ontology/relationship_vocabulary.yaml, reference/standards/]
+    acceptance: >
+      The four envelope properties carry standard-term bindings — dct:creator/dct:created/
+      dct:modified or PROV qualified attribution — decided via the HITL gate, including
+      WHERE property-term bindings live (own registry vs a vocabulary-file section:
+      relationship_vocabulary.yaml covers edges only today). SOSA explicitly ruled out in
+      the record (authorship provenance, not observation). Drift guards green.
+    notes: "Groomed 2026-07-08 from the 2026-07-07 IDEAS line (raised while answering 'where are the SOSA mappings for created by?')."
+
+  # ── Epic N — Source column mappings (doc 08) — Phase 11 ────────────────────
+  # Groomed 2026-07-08 from the 2026-07-07 IDEAS line; plan = docs/restructure/
+  # 08-source-column-mappings.md (Phases 0-1 promoted per the plan's own note;
+  # profile integration / render / ODCS export stay in the plan doc until these land).
+  - id: N1
+    epic: source-column-mappings
+    title: "Column-ledger schema + accessor + the Control-M ledger (transcription, no gate)"
+    type: task
+    module: config
+    phase: 11
+    agent: main
+    model: sonnet
+    priority: p2
+    status: todo
+    depends_on: []
+    inputs: [docs/restructure/08-source-column-mappings.md, drydocs/loaders/sql/, config/gate-prompts/controlm-q1q3-phase1.yaml, docs/restructure/06a-controlm-source-er-review.md]
+    acceptance: >
+      drydocs.source-mapping.v1 schema + typed accessor (pattern: review_labels.py) +
+      unit tests; config/source-mappings/controlm-psgmgr.yaml seeded by TRANSCRIBING
+      already-gated decisions (q1q3 envelope, employee_sid, MEMNAME demotion, filter
+      columns, phase-1 scope sweep) + the SQL headers' scope rules — no new gate needed;
+      dispositions projected/filter-only/excluded/deferred with origin source|derived;
+      classification Internal-Public, mechanism-only. Full suite green.
+    notes: "Doc 08 Phase 0. The accessor's boundary-group classification (config vs review) is decided at build per the default-deny guard."
+
+  - id: N2
+    epic: source-column-mappings
+    title: "Column-ledger drift guards: coverage vs profile census + SQL SELECT-list parse + registry pointer"
+    type: task
+    module: config
+    phase: 11
+    agent: main
+    model: sonnet
+    priority: p2
+    status: todo
+    depends_on: [N1]
+    inputs: [config/source-mappings/, drydocs/loaders/sql/, config/source-registry.yaml]
+    acceptance: >
+      Per doc 08 Phase 1: coverage test (every profiled column accounted for; new columns
+      since last census must be dispositioned by name, never swept); SQL drift guard
+      (loader SELECT ... AS list set-equals the ledger's projected columns; strict regex
+      first, sqlglot only if it lies); source-registry entries gain a mapping: pointer and
+      a test requires a ledger for every confirmed source. Full suite green.
+    notes: "Doc 08 Phase 1. Profile-census refresh via the db skill is doc-08 Phase 2 (not this item)."
+
 # Roll-up the dispatcher can glance at. COMPUTED views — test_backlog.py enforces
 # that these match the items exactly; update them with any status change.
 summary:
-  todo: 7                                           # E2, G3-G4, G9, L6-L8
+  todo: 16                                          # C5, E2, G3-G4, G9, K3, L6-L9, M1-M4, N1-N2
   in_progress: 5                                    # E1, F1, F2, K2 (awaiting HITL), G2 (core shim)
   blocked: 1                                        # G7 — live multi-DB deploy needs an Enterprise target
   done: 35                                          # A1-A3, B1-B4, C1-C4, D1-D3, G1, G5-G6, G8, H1-H7, I1-I4, J1, K1, L1, L3-L5
-  next_ready: [L6, L7]                              # L4+L5 done → L6 (paper HITL) + L7 (context ingest) unblocked
+  next_ready: [C5, K3, L6, L7, L9, M1, M3, M4, N1]  # todo items whose every depends_on is done (test-enforced)
