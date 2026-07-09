@@ -78,6 +78,7 @@ sections:
       - "Join = (SCHED_TABLE, JOB_MEM_NAME = JOB_NAME), acknowledged WEAKER than the (folder_id, job_id) node key; -CYC/-DLY twin folders each carry stats rows and land on their own job nodes."
       - "P4 coverage census (both directions: stats rows matched to jobs; active jobs having stats) sets the expected coverage baseline before the loader ships."
       - "MEMNAME is never used for identity/joins — consistent with its controlm-q1q3-phase1 demotion."
+      - "Performance: the ONLY Oracle join in this package is the one-off P4 coverage probe (run the scoped P4s smoke test first; plan-check + bounded call timeout before estate-wide; per-DC fallback). The production extract is a plain projection; the loader's job match runs GRAPH-side and requires an index on ControlMJob(parent_table, job_name) before the estate-wide supplement pass."
   - title: "C. Normalization + statistics rules"
     confirmations:
       - ">24h post-midnight clock normalized in Python to time-of-day + start_next_day (never in SQL); P3a confirms the value range first."

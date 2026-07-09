@@ -94,6 +94,31 @@ FROM   psgmgr.CM_AVG_RUN;
 --     Measures what fraction of stats rows land on a job node, and what
 --     fraction of active jobs get stats (both directions matter for the
 --     gate's coverage expectations).
+--
+--     PERFORMANCE NOTE: this is the ONLY Oracle join in the CM_AVG_RUN
+--     package (the extract is a plain projection; the loader's job match
+--     runs graph-side). The VJOB⨝VTAB subquery walks ~240K+ current-version
+--     rows on a versioned view — CM_HIST_VW caution applies. Run P4s (the
+--     scoped smoke test) FIRST; check the plan (EXPLAIN PLAN / autotrace)
+--     and set a bounded call timeout before the estate-wide P4a/P4b. If
+--     estate-wide is slow, run per DATA_CENTER instead.
+
+-- P4s. Scoped smoke test — one folder family first (substitute a real
+--      prefix locally; do not commit it). Cheap on both sides.
+-- SELECT COUNT(*) AS stats_rows,
+--        SUM(CASE WHEN j.JOB_NAME IS NOT NULL THEN 1 ELSE 0 END) AS matched_to_job
+-- FROM   psgmgr.CM_AVG_RUN a
+-- LEFT JOIN (SELECT DISTINCT t.SCHED_TABLE, v.JOB_NAME
+--            FROM   psgmgr.CM_DEF_VJOB v
+--            JOIN   psgmgr.CM_DEF_VTAB t ON t.TABLE_ID = v.TABLE_ID
+--            WHERE  v.IS_CURRENT_VERSION = '1'
+--              AND  t.USER_DAILY IS NOT NULL
+--              AND  t.SCHED_TABLE LIKE '<FOLDER-PREFIX>%') j
+--        ON  j.SCHED_TABLE = a.SCHED_TABLE
+--        AND j.JOB_NAME    = a.JOB_MEM_NAME
+-- WHERE  a.SCHED_TABLE LIKE '<FOLDER-PREFIX>%';
+
+-- P4a. Estate-wide, stats → jobs direction.
 SELECT COUNT(*) AS stats_rows,
        SUM(CASE WHEN j.JOB_NAME IS NOT NULL THEN 1 ELSE 0 END) AS matched_to_job
 FROM   psgmgr.CM_AVG_RUN a
@@ -105,6 +130,7 @@ LEFT JOIN (SELECT DISTINCT t.SCHED_TABLE, v.JOB_NAME
        ON  j.SCHED_TABLE = a.SCHED_TABLE
        AND j.JOB_NAME    = a.JOB_MEM_NAME;
 
+-- P4b. Estate-wide, jobs → stats direction.
 SELECT COUNT(*) AS active_jobs,
        SUM(CASE WHEN a.JOB_MEM_NAME IS NOT NULL THEN 1 ELSE 0 END) AS jobs_with_stats
 FROM  (SELECT DISTINCT t.SCHED_TABLE, v.JOB_NAME
