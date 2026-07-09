@@ -44,6 +44,7 @@
 | `drydocs/snapshots/` | `drydocs-load` (tooling) | depgraph snapshot |
 | `drydocs/graph_verify.py` | `drydocs-review` — data-driven Cypher acceptance runner (Epic H) | — (reads graph; asserts) |
 | `drydocs/review_labels.py` | `drydocs-review` — the review spine (source→DATA-label map); consumed by review | — (pure config) |
+| `drydocs/source_mappings.py` | `drydocs-review` — per-source column ledger accessor (doc 08); projected/filter-only/excluded/deferred disposition per profiled column | — (pure config) |
 | *(future H2)* `drydocs/graph_review.py` | `drydocs-review` — renders live-graph rows → SME review HTML | — (reads graph; writes HTML) |
 | *(future H5)* `drydocs/publishing/**` | `drydocs-review` — docs publish pipeline (Confluence push abstracted) | external (docs target) |
 | `drydocs/plan_board.py` | `drydocs-plan` — backlog.yaml → HTML project board renderer (Epic I) | `docs/plan/board.html` |
@@ -55,8 +56,9 @@
 | *(separate module)* `drydocs-remediation` | C1 — failures → Jira | — (no graph write) |
 
 > **`drydocs-review` note.** All review modules own a run cadence or do external I/O, so
-> none are core. `review_labels` is a *pure config accessor* parked in the component; promote
-> to `drydocs_core.config` only if a **non-review** second consumer appears. The guard is now
+> none are core. `review_labels` and `source_mappings` are *pure config accessors* parked in
+> the component; promote either to `drydocs_core.config` only if a **non-review** second
+> consumer appears. The guard is now
 > **default-deny** (`test_every_module_is_classified`): every module must resolve to exactly one
 > bucket, so a new review module (graph_review / publishing) that isn't classified here will
 > **fail the boundary test** rather than being silently unguarded.

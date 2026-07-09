@@ -1,0 +1,298 @@
+# =============================================================================
+# config/source-mappings/controlm-psgmgr.yaml — the column ledger for source
+# `controlm-psgmgr` (config/source-registry.yaml id).
+#
+# THE LEDGER: per source OBJECT (a psgmgr CM_ table/view), one row per column
+# recording its DISPOSITION — projected (lands in staging/graph) | filter-only
+# (WHERE clause only) | excluded (deliberate no, with a reason) | deferred
+# (named future use) — plus WHERE it lands (`target: Label.property` or
+# `staging:<field>`). A `default_disposition` sweeps the long tail of the 100+
+# column source tables so this file stays writable; the Phase-1 coverage test
+# (not yet built) reconciles the swept count against a real column census.
+#
+# THIS IS PHASE 0 (transcription, no new gate): every disposition below is
+# TRANSCRIBED from already-decided sources — never invented:
+#   - the five drydocs/loaders/sql/controlm_*.sql projections (the SELECT
+#     lists + their header-comment scope rules) and the matching
+#     drydocs/loaders/cypher/controlm_*.cypher SET clauses (what actually
+#     lands as a node/edge property vs. stays in the staging batch dict)
+#   - the controlm-q1q3-phase1 gate (config/gate-prompts/controlm-q1q3-phase1.yaml)
+#     and docs/restructure/06a-controlm-source-er-review.md §SME resolutions
+#   - config/audit-fields.yaml (the source_created_*/source_updated_* envelope
+#     mapping for CM_DEF_VJOB / CM_DEF_VTAB)
+#
+# No column census has been run yet (doc 08 Phase 2 does that against the live
+# view/table via the controlm-db skill) — every `profile:` block below is a
+# `census: pending` placeholder, not a real inventory count. Column names are
+# vendor-schema mechanism (no data values) — classification: Internal-Public,
+# even though the real source (config/source-registry.yaml) is classification:
+# Internal. Typed accessor: drydocs/source_mappings.py.
+#
+# Guarded (future, doc 08 Phase 1 — not yet built): coverage test, SQL drift
+# guard, config/source-registry.yaml `mapping:` pointer test.
+# =============================================================================
+schema: drydocs.source-mapping.v1
+source: controlm-psgmgr
+classification: Internal-Public
+updated: 2026-07-08
+
+objects:
+  # ---------------------------------------------------------------------------
+  # CM_DEF_VTAB (folders) — replicated copy of dtsremgr.DEF_VTAB. Per
+  # drydocs/models/controlm.py: "a table, not a view, despite the family name."
+  # Loader: drydocs/loaders/controlm_folders.py + sql/controlm_folders.sql +
+  # cypher/controlm_folders.cypher.
+  # ---------------------------------------------------------------------------
+  - name: CM_DEF_VTAB
+    kind: table
+    profile:
+      profiled_on: ~
+      via: "sql/controlm_folders.sql header + docs/restructure/06a (no controlm-db skill profile run yet)"
+      column_count: ~
+      census: pending
+    note: >
+      APPLICATION (the :ControlMApplication grouping) is NOT a native CM_DEF_VTAB
+      column — CM_DEF_VTAB carries no APPLICATION column at all. It comes from the
+      folder HEADER ROW on CM_DEF_VJOB (JOB_ID=1, TASK_TYPE=SMART Table) via the
+      LEFT JOIN in controlm_folders.sql; see that column's entry under the
+      CM_DEF_VJOB object below (gate controlm-q1q3-phase1 §Q3).
+    columns:
+      - {name: TABLE_ID, disposition: projected, origin: source, target: "ControlMFolder.folder_id"}
+      - {name: SCHED_TABLE, disposition: projected, origin: source, target: "ControlMFolder.sched_table",
+         note: "folder name; also the :folder_filter scope-bind (LIKE) target shared across all five psgmgr extracts; source of the parsed environment/lob/app_code/folder_type properties (folder_name.py)"}
+      - {name: DATA_CENTER, disposition: projected, origin: source, target: "ControlMServer.name",
+         note: "Control-M server code (P12/P14/P32/P33); one :ControlMServer node per unique value"}
+      - {name: USER_DAILY, disposition: projected, origin: source, target: "ControlMFolder.user_daily",
+         note: "the WHERE-clause active-scheduling filter (USER_DAILY IS NOT NULL) reused as the join-scope gate across all five psgmgr extracts; also derives ControlMFolder.active — a phase-1 READABILITY choice, not a semantic active/inactive claim (manual-order folders run in production too)",
+         decided_by: controlm-q1q3-phase1}
+      - {name: TABLE_STATUS, disposition: projected, origin: source, target: "ControlMFolder.table_status",
+         note: "VARCHAR2(1) folder lifecycle status code; BMC definition still to confirm (06a)"}
+      - {name: TABLE_TYPE, disposition: projected, origin: source, target: "ControlMFolder.table_type",
+         note: "folder type code (Smart Folder / Sub-Folder / etc.)"}
+      - {name: INSTANCE_NAME, disposition: projected, origin: source, target: "ControlMFolder.instance_name"}
+      - {name: LAST_UPDATED, disposition: projected, origin: source, target: "ControlMFolder.last_updated",
+         note: "audit: source-updated-at; also lands as ControlMFolder.source_updated_at (config/audit-fields.yaml — CM_DEF_VTAB has no creation columns, updated-side only)"}
+      - {name: LAST_UPDATED_USER, disposition: projected, origin: source, target: "ControlMFolder.last_updated_user",
+         note: "audit: source-updated-by; also lands as ControlMFolder.source_updated_by (audit-fields.yaml); also the :developer_sid scope-bind target at folder grain (last editor of the folder)"}
+      - {name: CAPTURE_DATE, disposition: projected, origin: source, target: "ControlMFolder.capture_date",
+         note: "replication timestamp — never authorship; excluded from the audit envelope (audit-fields.yaml)"}
+    default_disposition:
+      disposition: excluded
+      reason: scope
+      note: >
+        Phase-1 inventory+lineage projection (06a). Named exclusions from the SQL
+        header: the folder-level soft-delete columns (TBL_DELETION_*) are
+        intentionally omitted — soft-deletes are out of scope for M3. Sweeps
+        every other unprojected CM_DEF_VTAB column; surface on request.
+
+  # ---------------------------------------------------------------------------
+  # CM_DEF_VJOB (jobs) — replicated copy of dtsremgr.DEF_VJOB. 100+ columns on
+  # the live table; ~30 projected for the inventory+lineage use case (06a).
+  # Loader: drydocs/loaders/controlm_jobs.py + sql/controlm_jobs.sql +
+  # cypher/controlm_jobs.cypher.
+  # ---------------------------------------------------------------------------
+  - name: CM_DEF_VJOB
+    kind: view
+    profile:
+      profiled_on: ~
+      via: "sql/controlm_jobs.sql header + docs/restructure/06a (no controlm-db skill profile run yet)"
+      column_count: ~
+      census: pending
+    columns:
+      - {name: JOB_ID, disposition: projected, origin: source, target: "ControlMJob.job_id",
+         note: "folder-scoped (same JOB_ID recurs across folders); JOB_ID=1 = the folder header/SMART-Table row (gate Q3)"}
+      - {name: VERSION_SERIAL, disposition: projected, origin: source, target: "ControlMJob.version_serial",
+         note: "edit-history counter; captured as a PROPERTY, not part of node identity — the node key is (folder_id, job_id)"}
+      - {name: TABLE_ID, disposition: projected, origin: source, target: "ControlMJob.folder_id",
+         note: "FK to ControlMFolder.folder_id"}
+      - {name: JOB_NAME, disposition: projected, origin: source, target: "ControlMJob.job_name",
+         note: "= JOB_MEM_NAME join key in cm_avg_run (planned runtime supplement)"}
+      - {name: PARENT_TABLE, disposition: projected, origin: source, target: "ControlMJob.parent_table",
+         note: "denormalized folder name kept for query convenience; NOT a relationship key (CONTAINS_JOB keys on folder_id)"}
+      - {name: APPLICATION, disposition: projected, origin: source, target: "ControlMJob.application",
+         note: "the Control-M APPLICATION grouping — NOT the SEAL business :Application; on the folder-header row (JOB_ID=1) the same value ALSO lands as ControlMApplication.name via controlm_folders.sql's LEFT JOIN (gate controlm-q1q3-phase1 §Q3, :ControlMApplication:Collection)",
+         decided_by: controlm-q1q3-phase1}
+      - {name: GROUP_NAME, disposition: projected, origin: source, target: "ControlMJob.group_name"}
+      - {name: TASK_TYPE, disposition: projected, origin: source, target: "ControlMJob.task_type",
+         note: "Job / Smart Folder / etc.; TASK_TYPE = SMART Table marks the folder-header row"}
+      - {name: CYCLIC, disposition: projected, origin: source, target: "ControlMJob.cyclic", note: "Y/N flag"}
+      - {name: CYCLIC_TYPE, disposition: projected, origin: source, target: "ControlMJob.cyclic_type",
+         note: "1-char type code; NOT used for condition matching in the canonical recursive-dependency SQL"}
+      - {name: JOB_ORDER, disposition: projected, origin: source, target: "ControlMJob.job_order"}
+      - {name: OWNER, disposition: projected, origin: source, target: "ControlMJob.owner",
+         note: "run-as tenant Functional ID (service identity, not a person); also the :run_as scope-bind (exact match)"}
+      - {name: AUTHOR, disposition: projected, origin: source, target: "ControlMJob.author",
+         note: "authoring SID; distinct person from OWNER/CREATION_USER/CHANGE_USERID per 06a; also a :developer_sid scope-bind candidate"}
+      - {name: NODE_ID, disposition: projected, origin: source, target: "ControlMJob.node_id", note: "target host or agent"}
+      - {name: CMD_LINE, disposition: projected, origin: source, target: "ControlMJob.cmd_line",
+         note: "Phase-3 USES_SOFTWARE signal (plan-07)"}
+      - {name: DESCRIPTION, disposition: projected, origin: source, target: "ControlMJob.description"}
+      - {name: MEMNAME, disposition: projected, origin: source, target: "ControlMJob.memname",
+         note: "DEMOTED to informational only — may duplicate JOB_NAME or hold junk; never a key/join (cm_avg_run.JOB_MEM_NAME joins on JOB_NAME, not MEMNAME)",
+         decided_by: controlm-q1q3-phase1}
+      - {name: PRIORITY, disposition: projected, origin: source, target: "ControlMJob.priority"}
+      - {name: CRITICAL, disposition: projected, origin: source, target: "ControlMJob.critical"}
+      - {name: ACTIVE_FROM, disposition: projected, origin: source, target: "ControlMJob.active_from"}
+      - {name: ACTIVE_TILL, disposition: projected, origin: source, target: "ControlMJob.active_till"}
+      - {name: END_FOLDER, disposition: projected, origin: source, target: "ControlMJob.end_folder", note: "Y/N — last job in folder"}
+      - {name: IS_CURRENT_VERSION, disposition: projected, origin: source, target: "ControlMJob.is_current_version",
+         note: "the WHERE-clause active-version filter (= '1'; VARCHAR2(1), string literal); domain-value probe pending — unreliable across legacy vs. new folders (gate controlm-q1q3-phase1 §Q2)",
+         decided_by: controlm-q1q3-phase1,
+         derived_also: {target: "ControlMJob.active", rule: "IS_CURRENT_VERSION = '1'"}}
+      - {name: VERSION_OPCODE, disposition: projected, origin: source, target: "ControlMJob.version_opcode"}
+      - {name: VERSION_TIMESTAMP, disposition: projected, origin: source, target: "ControlMJob.version_timestamp",
+         note: "current-version duplicate of CHANGE_DATE — kept as a plain (non-envelope) audit property, string not datetime (config/audit-fields.yaml, gate §Q2)",
+         decided_by: controlm-q1q3-phase1}
+      - {name: VERSION_USER, disposition: projected, origin: source, target: "ControlMJob.version_user",
+         note: "current-version duplicate of CHANGE_USERID — kept as a plain (non-envelope) audit property (config/audit-fields.yaml, gate §Q2)",
+         decided_by: controlm-q1q3-phase1}
+      - {name: INSTANCE_NAME, disposition: projected, origin: source, target: "ControlMJob.instance_name"}
+      - {name: CAPTURE_DATE, disposition: projected, origin: source, target: "ControlMJob.capture_date",
+         note: "replication timestamp — never authorship"}
+      - {name: CREATION_USER, disposition: projected, origin: source, target: "ControlMJob.source_created_by",
+         note: "SOURCE AUDIT ENVELOPE (config/audit-fields.yaml). Derived employee_sid (strip trailing 'p') approved at the gate but NOT YET BUILT in this loader — PROPOSED only (project-memory: decided-but-unbuilt derived_also).",
+         decided_by: controlm-q1q3-phase1,
+         derived_also: {target: "ControlMJob.employee_sid", rule: "strip trailing 'p'"}}
+      - {name: CREATION_DATE, disposition: projected, origin: source, target: "ControlMJob.source_created_at",
+         note: "SOURCE AUDIT ENVELOPE (config/audit-fields.yaml)", decided_by: controlm-q1q3-phase1}
+      - {name: CHANGE_USERID, disposition: projected, origin: source, target: "ControlMJob.source_updated_by",
+         note: "SOURCE AUDIT ENVELOPE (config/audit-fields.yaml); also a :developer_sid scope-bind candidate",
+         decided_by: controlm-q1q3-phase1}
+      - {name: CHANGE_DATE, disposition: projected, origin: source, target: "ControlMJob.source_updated_at",
+         note: "SOURCE AUDIT ENVELOPE (config/audit-fields.yaml)", decided_by: controlm-q1q3-phase1}
+      - {name: APPL_TYPE, disposition: projected, origin: source, target: "staging:appl_type",
+         note: "OS / FileWatch / AIAWSWLK / plugin job type; surfaced only via controlm_variables.sql (not selected by controlm_jobs.sql itself); variables stay staging-only for now — node-vs-property deferred (gate controlm-q1q3-phase1 §Q3)"}
+    default_disposition:
+      disposition: excluded
+      reason: scope
+      note: >
+        Phase-1 inventory+lineage projection (06a/SQL header): schedule-detail
+        columns (DAY_STR, INTERVAL_SEQUENCE, MONTH_1..MONTH_12, etc.) and every
+        other unprojected CM_DEF_VJOB column (100+ total on the live table) —
+        surface later when a use case demands it.
+
+  # ---------------------------------------------------------------------------
+  # CM_DEF_LNKI_P_VW (IN conditions) — wraps dtsremgr.DEF_LNKI_P. Schema
+  # confirmed from the actual DDL per 06a: twelve columns, all twelve selected.
+  # Loader: drydocs/loaders/controlm_conditions_in.py + sql/controlm_conditions_in.sql
+  # + cypher/controlm_conditions_in.cypher.
+  # ---------------------------------------------------------------------------
+  - name: CM_DEF_LNKI_P_VW
+    kind: view
+    profile:
+      profiled_on: ~
+      via: "sql/controlm_conditions_in.sql header + docs/restructure/06a DDL check (no controlm-db skill profile run yet)"
+      column_count: ~
+      census: pending
+    columns:
+      - {name: TABLE_ID, disposition: projected, origin: source, target: "Condition.folder_id"}
+      - {name: JOB_ID, disposition: projected, origin: source, target: "staging:job_id",
+         note: "join key to MATCH the owning :ControlMJob (folder_id, job_id); not stored as a Condition/edge property"}
+      - {name: VERSION_SERIAL, disposition: projected, origin: source, target: "Condition.version_serial",
+         note: "current-version filter is already applied at SQL ingest (gate §Q1) — the loaded value is always the current definition"}
+      - {name: CONDITION, disposition: projected, origin: source, target: "Condition.name", note: "node-key component with folder_id"}
+      - {name: ODATE, disposition: projected, origin: source, target: "REQUIRES_IN_CONDITION.odate", note: "operational date"}
+      - {name: AND_OR, disposition: projected, origin: source, target: "REQUIRES_IN_CONDITION.and_or",
+         note: "boolean operator between adjacent IN conditions"}
+      - {name: PARENTHESES, disposition: projected, origin: source, target: "REQUIRES_IN_CONDITION.parentheses",
+         note: "expression grouping marker"}
+      - {name: ORDER_, disposition: projected, origin: source, target: "REQUIRES_IN_CONDITION.order_",
+         note: "evaluation order within the IN-condition expression"}
+      - {name: ISN_, disposition: projected, origin: source, target: "REQUIRES_IN_CONDITION.isn"}
+      - {name: VERSION_OPCODE, disposition: projected, origin: source, target: "REQUIRES_IN_CONDITION.version_opcode"}
+      - {name: IS_CURRENT_VERSION, disposition: projected, origin: source, target: "staging:is_current_version",
+         note: "the WHERE-clause filter (= '1'); selected in the extract but NOT persisted onto the :Condition node or REQUIRES_IN_CONDITION edge in controlm_conditions_in.cypher — current-version is already guaranteed at SQL ingest (gate §Q1)"}
+      - {name: CAPTURE_DATE, disposition: projected, origin: source, target: "Condition.last_capture_date",
+         note: "SQL column CAPTURE_DATE lands as the graph property last_capture_date"}
+    default_disposition:
+      disposition: excluded
+      reason: scope
+      note: >
+        06a's DDL check found exactly these twelve columns (all confirmed
+        selected); this sweep is defensive only, in case the live view carries
+        columns added since that check.
+
+  # ---------------------------------------------------------------------------
+  # CM_DEF_LNKO_P_VW (OUT conditions) — wraps dtsremgr.DEF_LNKO_P. Schema
+  # confirmed from the actual DDL per 06a: ten columns, all ten selected.
+  # Keyed identically to CM_DEF_LNKI_P_VW so IN/OUT references share one
+  # :Condition node per (folder_id, name). Loader:
+  # drydocs/loaders/controlm_conditions_out.py + sql/controlm_conditions_out.sql
+  # + cypher/controlm_conditions_out.cypher.
+  # ---------------------------------------------------------------------------
+  - name: CM_DEF_LNKO_P_VW
+    kind: view
+    profile:
+      profiled_on: ~
+      via: "sql/controlm_conditions_out.sql header + docs/restructure/06a DDL check (no controlm-db skill profile run yet)"
+      column_count: ~
+      census: pending
+    columns:
+      - {name: TABLE_ID, disposition: projected, origin: source, target: "Condition.folder_id"}
+      - {name: JOB_ID, disposition: projected, origin: source, target: "staging:job_id",
+         note: "join key to MATCH the owning :ControlMJob (folder_id, job_id); not stored as a Condition/edge property"}
+      - {name: VERSION_SERIAL, disposition: projected, origin: source, target: "Condition.version_serial",
+         note: "current-version filter is already applied at SQL ingest (gate §Q1)"}
+      - {name: CONDITION, disposition: projected, origin: source, target: "Condition.name", note: "node-key component with folder_id"}
+      - {name: ODATE, disposition: projected, origin: source, target: "EMITS_OUT_CONDITION.odate", note: "operational date"}
+      - {name: SIGN, disposition: projected, origin: source, target: "EMITS_OUT_CONDITION.sign",
+         note: "'+' = add the condition (success); '-' = remove it (cleanup)"}
+      - {name: ISN_, disposition: projected, origin: source, target: "EMITS_OUT_CONDITION.isn"}
+      - {name: VERSION_OPCODE, disposition: projected, origin: source, target: "EMITS_OUT_CONDITION.version_opcode"}
+      - {name: IS_CURRENT_VERSION, disposition: projected, origin: source, target: "staging:is_current_version",
+         note: "the WHERE-clause filter (= '1'); selected in the extract but NOT persisted onto the :Condition node or EMITS_OUT_CONDITION edge in controlm_conditions_out.cypher — current-version is already guaranteed at SQL ingest (gate §Q1)"}
+      - {name: CAPTURE_DATE, disposition: projected, origin: source, target: "Condition.last_capture_date",
+         note: "SQL column CAPTURE_DATE lands as the graph property last_capture_date"}
+    default_disposition:
+      disposition: excluded
+      reason: scope
+      note: >
+        06a's DDL check found exactly these ten columns (all confirmed
+        selected); this sweep is defensive only, in case the live view carries
+        columns added since that check.
+
+  # ---------------------------------------------------------------------------
+  # CM_DEF_SETVAR (variable definitions) — ** VERIFY NAME **. sql/controlm_variables.sql
+  # flags this object name as unconfirmed: it is "the object behind the
+  # (TABLE_NAME|JOB_NAME|JOB_ID|APPL_TYPE|NAME|VALUE) extract"; substitute the
+  # confirmed view/table name before production use (doc 08 Phase 2 verifies it
+  # alongside the real column census). Loader:
+  # drydocs/loaders/controlm_variables*.py + sql/controlm_variables.sql.
+  # Variables stay STAGING-ONLY for now — node-vs-property is deferred, not
+  # implied (gate controlm-q1q3-phase1 §Q3).
+  # ---------------------------------------------------------------------------
+  - name: CM_DEF_SETVAR
+    kind: view
+    profile:
+      profiled_on: ~
+      via: "sql/controlm_variables.sql header + docs/restructure/06a (object name UNVERIFIED; no controlm-db skill profile run yet)"
+      column_count: ~
+      census: pending
+    note: >
+      ** VERIFY NAME ** — substitute the confirmed view/table name once the
+      controlm-db skill profiles it (doc 08 Phase 2). The extract also joins
+      CM_DEF_VJOB (TABLE_ID, JOB_ID) and CM_DEF_VTAB (TABLE_ID) for DATA_CENTER /
+      SCHED_TABLE / JOB_NAME context and derives var_scope (FOLDER when
+      JOB_NAME = SCHED_TABLE, else JOB) — those are already dispositioned under
+      the CM_DEF_VTAB / CM_DEF_VJOB objects above, or are wholly SQL-derived
+      (var_scope), not native CM_DEF_SETVAR columns; not duplicated here.
+      Duplicate (job, variable-name) definitions are legitimate in the source
+      (observed: %%FileWatch-TIME_LIMIT defined twice on one job with different
+      values) — never dedupe.
+    columns:
+      - {name: TABLE_ID, disposition: projected, origin: source, target: "staging:folder_id",
+         note: "join key to CM_DEF_VJOB/CM_DEF_VTAB context; the raw SQL Developer export mislabels this column TABLE_NAME (drydocs/models/controlm.py ControlMVariableRow handles both aliases)"}
+      - {name: JOB_ID, disposition: projected, origin: source, target: "staging:job_id"}
+      - {name: NAME, disposition: projected, origin: source, target: "staging:var_name",
+         note: "variable name including the %% prefix"}
+      - {name: VALUE, disposition: projected, origin: source, target: "staging:var_value"}
+    default_disposition:
+      disposition: excluded
+      reason: scope
+      note: >
+        Object name unverified (** VERIFY NAME **) — only the four columns
+        behind the confirmed (TABLE_NAME|JOB_NAME|JOB_ID|APPL_TYPE|NAME|VALUE)
+        extract are dispositioned here; whether CM_DEF_SETVAR carries its own
+        IS_CURRENT_VERSION/VERSION_SERIAL (like the LNKI/LNKO views) is an open
+        question noted in the SQL header. Sweeps the rest pending the
+        view-name + column-census verification (doc 08 Phase 2).

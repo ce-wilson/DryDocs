@@ -46,6 +46,7 @@ COMPONENT_GROUPS: dict[str, tuple[str, ...]] = {
     "review": (
         "drydocs.graph_verify",
         "drydocs.review_labels",
+        "drydocs.source_mappings",
         "drydocs.graph_review",
         "drydocs.sme_notes",
         "drydocs.gate_pages",
