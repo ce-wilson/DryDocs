@@ -1336,7 +1336,7 @@ items:
     agent: main
     model: sonnet
     priority: p3
-    status: in_progress
+    status: done
     depends_on: [L5]
     inputs: [drydocs/design_doc.py, docs/design/feedback/README.md, tests/unit/test_design_doc.py]
     acceptance: >
@@ -1357,6 +1357,13 @@ items:
       job is walking the SME through create-file/copy/paste). Enhances L5 (copy button
       verified working by the user). Answers the note's open question: the export
       extension is .yaml (drydocs.design_doc.feedback_yaml), not .md.
+    progress: >
+      2026-07-09 — DONE. design_doc.py: _sme_feedback_panel + sme_feedback_filename
+      (Rev from front matter, deterministic; placeholder rev<N> when undeclared);
+      appended after the last section in screen mode only, no element ids inside so the
+      annotate layer never attaches to its own instructions. Verified at runtime
+      (headless-Edge DOM dump: panel present, 0 controls inside; exact filename
+      controlm-ingestion-tdd-rev3.yaml rendered). 3 new tests; feedback README updated.
 
   - id: L11
     epic: doc-infrastructure
@@ -1367,7 +1374,7 @@ items:
     agent: main
     model: sonnet
     priority: p3
-    status: in_progress
+    status: done
     depends_on: [L5]
     inputs: [drydocs/design_doc.py, drydocs/doc_outline.py, docs/design/feedback/README.md, tests/unit/test_design_doc.py]
     acceptance: >
@@ -1389,6 +1396,17 @@ items:
       (>2 vs >=2) with the user at implementation if it matters in practice. The anchor
       derivation is the design core: feedback re-attaches by anchor, so subsection anchors
       must be as stable as the authored section anchors.
+    progress: >
+      2026-07-09 — DONE. design_doc.py: _inject_subsection_anchors (screen-only post-pass)
+      derives <parent>--<slug-of-subsection-text> ids for sub-headings one level down and
+      for top-level items of numbered lists, when the group has >2 members; anchored
+      subheadings count toward the threshold but keep their authored id; dedupe -2/-3
+      deterministic; JS attach() gained an LI branch (button afterbegin / box beforeend).
+      doc_outline.py: DERIVED_ANCHOR_SEP + feedback_anchor_valid (a derived note degrades
+      to its parent section if the slug changes; "--" now reserved in authored ids).
+      Verified at runtime (headless-Edge DOM dump: 29/29 ids present, controls on all
+      derived h3s + 9 list items; print surface byte-identical to pre-change). 7+3 new
+      tests; feedback README documents the namespace.
 
   # ── Epic M — Provenance diet + audit envelope (doc 06) — Phase 11 ──────────
   # Groomed 2026-07-08 from the 2026-07-05 IDEAS line + the 2026-07-07 property-terms
@@ -1541,7 +1559,7 @@ items:
 # that these match the items exactly; update them with any status change.
 summary:
   todo: 13                                          # C5, E2, G3-G4, G9, K3, L7-L9, M2-M4, N2
-  in_progress: 7                                    # E1, F1, F2, K2 (awaiting HITL), G2 (core shim), L10, L11 (pulled 2026-07-09)
+  in_progress: 5                                    # E1, F1, F2, K2 (awaiting HITL), G2 (core shim)
   blocked: 0
-  done: 39                                          # A1-A3, B1-B4, C1-C4, D1-D3, G1, G5-G7, G8, H1-H7, I1-I4, J1, K1, L1, L3-L6, M1, N1
-  next_ready: [C5, K3, L7, L8, L9, M2, M3, M4, N2]  # L10+L11 pulled in_progress 2026-07-09 (main session)
+  done: 41                                          # A1-A3, B1-B4, C1-C4, D1-D3, G1, G5-G7, G8, H1-H7, I1-I4, J1, K1, L1, L3-L6, L10, L11, M1, N1
+  next_ready: [C5, K3, L7, L8, L9, M2, M3, M4, N2]  # L10+L11 done 2026-07-09 (nothing depended on them)

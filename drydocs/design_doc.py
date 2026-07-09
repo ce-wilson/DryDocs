@@ -393,6 +393,153 @@ def feedback_yaml(doc_id: str, notes: dict[str, str]) -> str:
     return "\n".join(out) + "\n"
 
 
+# ── L11: derived subsection anchors (screen only) ────────────────────────────
+# When an anchored section has MORE THAN TWO subsections (sub-headings one level down,
+# or a numbered step list with 3+ top-level items), each subsection gets its own annotate
+# control so feedback keys to the exact subsection. The derived id is
+# ``<parent-anchor>--<slug-of-subsection-text>`` — CONTENT-derived, never positional, so a
+# note on "1.b" survives someone inserting a new "1.a". Screen surface only: the print
+# render (and its margin tags / the doc_outline authored namespace) is untouched.
+# Consequence for authors: don't use ``--`` inside an authored anchor id — the double
+# hyphen is reserved as the derived-anchor separator (see doc_outline.DERIVED_ANCHOR_SEP).
+_SUB_SEP = "--"
+_H_BLOCK = re.compile(r'^<h([1-6])(?:\s+id="([^"]+)")?>(.*)</h\1>$')
+_OL_OPEN = re.compile(r'^<ol(?:\s+id="([^"]+)")?>')
+_LIST_TOKEN = re.compile(r"<(/?)(ol|ul|li)(?:\s[^>]*)?>")
+_ANY_TAG = re.compile(r"<[^>]+>")
+
+
+def _strip_tags(fragment: str) -> str:
+    return html.unescape(_ANY_TAG.sub("", fragment))
+
+
+def _derived_id(parent: str, text: str, used: set[str]) -> str:
+    """``parent--slug`` from the subsection's leading text; deduped deterministically."""
+    words = _strip_tags(text).split()
+    base = _slug(" ".join(words[:6]))[:40].strip("-") or "item"
+    cand, n = base, 1
+    while f"{parent}{_SUB_SEP}{cand}" in used:
+        n += 1
+        cand = f"{base}-{n}"
+    full = f"{parent}{_SUB_SEP}{cand}"
+    used.add(full)
+    return full
+
+
+def _li_lead_text(rest: str) -> str:
+    """The item's own leading content: up to its first nested list or its close tag."""
+    cut = len(rest)
+    for stop in ("<ol", "<ul", "</li"):
+        pos = rest.find(stop)
+        if pos >= 0:
+            cut = min(cut, pos)
+    return rest[:cut]
+
+
+def _inject_li_ids(ol_html: str, parent: str, used: set[str]) -> str:
+    """Give each TOP-LEVEL <li> of a numbered list a derived id — only when the list has
+    more than two top-level items (the L11 threshold)."""
+    depth = 0
+    positions: list[int] = []
+    for m in _LIST_TOKEN.finditer(ol_html):
+        closing, tag = m.group(1) == "/", m.group(2)
+        if tag in ("ol", "ul"):
+            depth += -1 if closing else 1
+        elif tag == "li" and not closing and depth == 1:
+            positions.append(m.start())
+    if len(positions) <= 2:
+        return ol_html
+    out: list[str] = []
+    last = 0
+    for pos in positions:
+        out.append(ol_html[last:pos])
+        tag_end = ol_html.index(">", pos) + 1
+        did = _derived_id(parent, _li_lead_text(ol_html[tag_end:]), used)
+        out.append(f'<li id="{did}">')
+        last = tag_end
+    out.append(ol_html[last:])
+    return "".join(out)
+
+
+def _inject_subsection_anchors(body_html: str) -> str:
+    """SCREEN-ONLY post-pass over the rendered body: derived ids for subsections of
+    anchored sections (see the L11 block comment above). Pure string work on whole block
+    lines — safe because the renderer emits each heading/list block as a single line and
+    escapes markup inside code fences, so nothing inside a <pre> can false-match."""
+    lines = body_html.split("\n")
+    stack: list[tuple[str, int]] = []  # nearest anchored ancestors: (anchor, heading level)
+    # (parent, level) -> {"total": all subheadings seen, "unanchored": their line indexes}
+    heading_groups: dict[tuple[str, int], dict] = {}
+    ol_candidates: list[tuple[int, str]] = []  # (line index, parent anchor)
+
+    for idx, line in enumerate(lines):
+        hm = _H_BLOCK.match(line)
+        if hm:
+            level, hid = int(hm.group(1)), hm.group(2)
+            while stack and stack[-1][1] >= level:
+                stack.pop()
+            if stack:
+                group = heading_groups.setdefault((stack[-1][0], level), {"total": 0, "unanchored": []})
+                group["total"] += 1  # anchored subheadings count toward the >2 threshold
+                if not hid:
+                    group["unanchored"].append(idx)
+            if hid:
+                stack.append((hid, level))
+            continue
+        om = _OL_OPEN.match(line)
+        if om:
+            parent = om.group(1) or (stack[-1][0] if stack else None)
+            if parent:
+                ol_candidates.append((idx, parent))
+
+    used: set[str] = set()
+    for (parent, _level), group in heading_groups.items():
+        if group["total"] > 2:
+            for idx in group["unanchored"]:
+                hm = _H_BLOCK.match(lines[idx])
+                did = _derived_id(parent, hm.group(3), used)
+                lines[idx] = f"<h{hm.group(1)} id=\"{did}\">{hm.group(3)}</h{hm.group(1)}>"
+    for idx, parent in ol_candidates:
+        lines[idx] = _inject_li_ids(lines[idx], parent, used)
+    return "\n".join(lines)
+
+
+# ── L10: the appendix "SME - Feedback" instruction panel (screen only) ───────
+def sme_feedback_filename(doc_id: str, md: str) -> str:
+    """The exact per-doc feedback filename, with the doc's declared Rev baked in
+    (``controlm-ingestion-tdd-rev3.yaml``). Falls back to the ``rev<N>`` placeholder for a
+    doc that declares no Rev — same front-matter source as ``doc_rev_footer``, so the
+    render stays deterministic (no git/timestamp reads)."""
+    m = _REV_RE.search(md)
+    rev = m.group(1) if m else "<N>"
+    return f"{doc_id}-rev{rev}.yaml"
+
+
+def _sme_feedback_panel(doc_id: str, md: str) -> str:
+    """Static HOW-TO block appended below the last section: walks the SME through
+    annotate → copy → create-file → paste. Deliberately carries NO element ids, so the
+    annotate layer never attaches controls to its own instructions."""
+    fname = html.escape(sme_feedback_filename(doc_id, md))
+    return (
+        '<hr class="dd-sme-divider">\n'
+        '<section class="dd-sme-feedback" aria-label="SME - Feedback">\n'
+        "<h2>SME - Feedback</h2>\n"
+        "<p>How to return your notes on this document:</p>\n"
+        "<ol>\n"
+        "<li>Click the <strong>✎</strong> button beside any section (or numbered step) and type "
+        "your note — notes save in your browser as you type.</li>\n"
+        "<li>When finished, click <strong>Copy feedback</strong> in the bottom-right toolbar. "
+        "Your notes are copied as anchor-keyed YAML.</li>\n"
+        "<li>Create the feedback file (it is YAML, <em>not</em> markdown) — "
+        f"<strong>Copy To:</strong> <code>docs/design/feedback/</code> · "
+        f"<strong>File Name:</strong> <code>{fname}</code></li>\n"
+        "<li>Paste the copied block into that file, save, and commit (or send the file back "
+        "to the team).</li>\n"
+        "</ol>\n"
+        "</section>"
+    )
+
+
 # HITL layer for the SCREEN surface only (@media print hides it). Static → deterministic.
 _FEEDBACK_CSS = """
 .dd-note-btn { border:1px solid var(--line); background:var(--bg); color:var(--mid); cursor:pointer; font-size:12px; line-height:1; padding:2px 6px; border-radius:5px; margin-right:6px; }
@@ -405,7 +552,8 @@ _FEEDBACK_CSS = """
 .dd-fb-bar .dd-badge { font-weight:700; }
 .dd-toast { position:fixed; right:16px; bottom:64px; background:var(--ink); color:var(--bg); padding:8px 12px; border-radius:8px; font-size:13px; z-index:60; opacity:0; transition:opacity .2s; }
 .dd-toast.show { opacity:1; }
-@media print { .dd-note-btn, .dd-note-box, .dd-fb-bar, .dd-toast { display:none !important; } }
+.dd-sme-feedback ol li { margin: 6px 0; }
+@media print { .dd-note-btn, .dd-note-box, .dd-fb-bar, .dd-toast, .dd-sme-feedback, .dd-sme-divider { display:none !important; } }
 """
 
 _FEEDBACK_JS = r"""
@@ -435,7 +583,8 @@ _FEEDBACK_JS = r"""
     if((state[id]||"").trim()) el.classList.add("dd-annotated");
     box.appendChild(ta);
     btn.addEventListener("click",function(){ box.style.display=box.style.display==="none"?"block":"none"; if(box.style.display==="block") ta.focus(); });
-    el.insertAdjacentElement("afterend", box); el.insertAdjacentElement("beforebegin", btn);
+    if(el.tagName==="LI"){ el.insertAdjacentElement("afterbegin", btn); el.appendChild(box); }
+    else { el.insertAdjacentElement("afterend", box); el.insertAdjacentElement("beforebegin", btn); }
   }
   document.addEventListener("DOMContentLoaded",function(){
     document.querySelectorAll("main [id]").forEach(attach);
@@ -466,10 +615,16 @@ def render_doc(md: str, mode: str = "screen", doc_id: str | None = None) -> str:
     title = html.escape(doc_title(md))
     body = render_body(md)
     footer = ""
-    if not screen:
+    doc_id = doc_id or _slug(doc_title(md))
+    if screen:
+        # L11 derived subsection anchors first, THEN the L10 panel — the panel's own
+        # numbered steps must never grow annotate controls.
+        body = _inject_subsection_anchors(body)
+        body = f"{body}\n{_sme_feedback_panel(doc_id, md)}"
+    else:
         body = _inject_margin_anchors(body)
         footer = f'<footer class="dd-print-footer">{html.escape(doc_rev_footer(md))}</footer>\n'
-    did = html.escape(doc_id or _slug(doc_title(md)), quote=True)
+    did = html.escape(doc_id, quote=True)
     feedback = _feedback_html(did) if screen else ""
     return (
         "<!doctype html>\n<html lang=\"en\">\n<head>\n<meta charset=\"utf-8\">\n"

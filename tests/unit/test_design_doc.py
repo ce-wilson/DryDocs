@@ -7,7 +7,15 @@ from __future__ import annotations
 
 from pathlib import Path
 
-from drydocs.design_doc import doc_rev_footer, doc_title, feedback_yaml, render_body, render_doc, write_doc
+from drydocs.design_doc import (
+    doc_rev_footer,
+    doc_title,
+    feedback_yaml,
+    render_body,
+    render_doc,
+    sme_feedback_filename,
+    write_doc,
+)
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
 CONTROLM_TDD = REPO_ROOT / "docs" / "design" / "controlm-ingestion-tdd.md"
@@ -182,3 +190,94 @@ def test_rev_footer_matches_real_tdd() -> None:
 def test_print_render_is_still_deterministic_with_margins_and_footer() -> None:
     md = CONTROLM_TDD.read_text(encoding="utf-8")
     assert render_doc(md, "print") == render_doc(md, "print")
+
+
+# ── L10: the appendix "SME - Feedback" instruction panel ─────────────────────
+def test_sme_feedback_panel_screen_only_with_exact_filename() -> None:
+    md = "# Doc\n\n**Rev 7, 2026-01-01**\n\n<!-- anchor: purpose-scope -->\n## Purpose\ntext"
+    screen = render_doc(md, "screen", doc_id="mydoc")
+    printed = render_doc(md, "print", doc_id="mydoc")
+    assert "SME - Feedback" in screen
+    assert "<code>docs/design/feedback/</code>" in screen
+    assert "<code>mydoc-rev7.yaml</code>" in screen  # exact per-doc filename, Rev baked in
+    assert "not</em> markdown" in screen             # the "is it markdown?" answer
+    assert "SME - Feedback" not in printed
+    assert "dd-sme-feedback" not in printed
+
+
+def test_sme_feedback_filename_placeholder_without_rev() -> None:
+    assert sme_feedback_filename("mydoc", "# Doc\n\nno rev here") == "mydoc-rev<N>.yaml"
+
+
+def test_sme_panel_steps_carry_no_ids() -> None:
+    # the panel's own <ol> must never grow annotate controls: no ids inside the section
+    md = "# Doc\n\n<!-- anchor: purpose-scope -->\n## Purpose\ntext"
+    screen = render_doc(md, "screen", doc_id="mydoc")
+    panel = screen.split('<section class="dd-sme-feedback"', 1)[1].split("</section>", 1)[0]
+    assert ' id="' not in panel
+
+
+# ── L11: derived subsection anchors ──────────────────────────────────────────
+def test_three_subheadings_get_derived_ids_screen_only() -> None:
+    md = (
+        "# Doc\n\n<!-- anchor: detailed-design -->\n## Design\n\n"
+        "### Stage one parse\ntext\n\n### Stage two resolve\ntext\n\n### Stage three load\ntext"
+    )
+    screen = render_doc(md, "screen", doc_id="d")
+    printed = render_doc(md, "print", doc_id="d")
+    for did in (
+        "detailed-design--stage-one-parse",
+        "detailed-design--stage-two-resolve",
+        "detailed-design--stage-three-load",
+    ):
+        assert f'<h3 id="{did}">' in screen, f"missing derived id {did}"
+        assert did not in printed  # print namespace stays authored-only
+
+
+def test_two_subheadings_stay_unanchored() -> None:
+    md = (
+        "# Doc\n\n<!-- anchor: detailed-design -->\n## Design\n\n"
+        "### Stage one\ntext\n\n### Stage two\ntext"
+    )
+    screen = render_doc(md, "screen", doc_id="d")
+    assert "detailed-design--" not in screen
+
+
+def test_numbered_steps_get_derived_ids() -> None:
+    md = (
+        "# Doc\n\n<!-- anchor: startup -->\n## Startup\n\n"
+        "1. Pull the repo\n2. Start the container\n3. Run the loaders\n"
+    )
+    screen = render_doc(md, "screen", doc_id="d")
+    printed = render_doc(md, "print", doc_id="d")
+    assert '<li id="startup--pull-the-repo">' in screen
+    assert '<li id="startup--start-the-container">' in screen
+    assert '<li id="startup--run-the-loaders">' in screen
+    assert "startup--" not in printed
+
+
+def test_two_step_list_stays_unanchored() -> None:
+    md = "# Doc\n\n<!-- anchor: startup -->\n## Startup\n\n1. Pull\n2. Start\n"
+    assert "startup--" not in render_doc(md, "screen", doc_id="d")
+
+
+def test_duplicate_subsection_text_dedupes_deterministically() -> None:
+    md = (
+        "# Doc\n\n<!-- anchor: sec -->\n## Sec\n\n"
+        "### Review\ntext\n\n### Review\ntext\n\n### Review\ntext"
+    )
+    screen = render_doc(md, "screen", doc_id="d")
+    for did in ("sec--review", "sec--review-2", "sec--review-3"):
+        assert f'<h3 id="{did}">' in screen
+    assert render_doc(md, "screen", doc_id="d") == screen  # still deterministic
+
+
+def test_anchored_subheading_counts_toward_threshold_but_keeps_its_id() -> None:
+    md = (
+        "# Doc\n\n<!-- anchor: sec -->\n## Sec\n\n"
+        "<!-- anchor: sec-own -->\n### Owned\ntext\n\n### Plain a\ntext\n\n### Plain b\ntext"
+    )
+    screen = render_doc(md, "screen", doc_id="d")
+    assert '<h3 id="sec-own">' in screen           # authored id untouched
+    assert '<h3 id="sec--plain-a">' in screen      # 3 subsections total → derive the rest
+    assert '<h3 id="sec--plain-b">' in screen

@@ -8,7 +8,7 @@ from __future__ import annotations
 
 from pathlib import Path
 
-from drydocs.doc_outline import Outline, check, load_outline, validate_paths
+from drydocs.doc_outline import Outline, check, feedback_anchor_valid, load_outline, validate_paths
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
 TDD_OUTLINE = REPO_ROOT / "docs" / "design" / "templates" / "tdd.outline.yaml"
@@ -136,3 +136,20 @@ def test_every_committed_tdd_conforms_to_outline() -> None:
     for tdd in tdds:
         problems = validate_paths(TDD_OUTLINE, tdd)
         assert problems == [], f"{tdd.name} drifted from tdd.outline.yaml:\n  " + "\n  ".join(problems)
+
+
+# ── L11: derived subsection anchors in the feedback namespace ─────────────────
+FB_DOC = "<!-- anchor: purpose -->\n## Purpose\n\n<!-- anchor: detailed-design -->\n## Design\n"
+
+
+def test_feedback_anchor_valid_authored() -> None:
+    assert feedback_anchor_valid("detailed-design", FB_DOC)
+
+
+def test_feedback_anchor_valid_derived_from_authored_base() -> None:
+    assert feedback_anchor_valid("detailed-design--stage-two-resolve", FB_DOC)
+
+
+def test_feedback_anchor_invalid_unknown_base() -> None:
+    assert not feedback_anchor_valid("nonexistent", FB_DOC)
+    assert not feedback_anchor_valid("nonexistent--stage-one", FB_DOC)
