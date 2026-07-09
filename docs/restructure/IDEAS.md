@@ -124,6 +124,9 @@ Tags help grooming: `idea` · `bug` · `doc` · `source` (new data source) · `q
 
 <!-- when you promote an idea, move its line here with the resulting backlog id -->
 
+- 2026-07-09 — [idea] design-doc feedback: per-subsection annotate controls when a section
+  has >2 subsections (1.a/1.b/1.c… or steps 1/2/3) so feedback keys to the exact subsection
+  → **L11**. (chat note, same review pass as L10; design core = stable derived sub-anchors)
 - 2026-07-09 — [idea] design-doc feedback widget: appendix "SME - Feedback" panel (divider +
   static HITL how-to: annotate, Copy feedback, create docs/design/feedback/<doc>-rev<N>.yaml,
   paste, save) → **L10** (amended same day: instruction block, not a free-text notes field).

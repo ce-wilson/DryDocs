@@ -1358,6 +1358,38 @@ items:
       verified working by the user). Answers the note's open question: the export
       extension is .yaml (drydocs.design_doc.feedback_yaml), not .md.
 
+  - id: L11
+    epic: doc-infrastructure
+    title: "Design-doc feedback: per-subsection annotate controls when a section has >2 subsections"
+    type: task
+    module: drydocs-docgen
+    phase: 10
+    agent: main
+    model: sonnet
+    priority: p3
+    status: todo
+    depends_on: [L5]
+    inputs: [drydocs/design_doc.py, drydocs/doc_outline.py, docs/design/feedback/README.md, tests/unit/test_design_doc.py]
+    acceptance: >
+      when a rendered section contains MORE THAN TWO subsections (nested sub-headings
+      like 1.a/1.b/1.c/1.d, or a numbered step list 1/2/3), the screen .html renders an
+      annotate (pencil) control on EACH subsection, not just the section header, so the
+      exported feedback keys to the specific subsection (tighter control); each
+      subsection control uses a STABLE derived anchor (parent anchor + deterministic
+      subsection suffix — never positional-only, so notes survive re-renders and
+      subsection insertion), and that derived-anchor namespace is accepted by the
+      feedback_yaml format / doc_outline anchor validation and documented in
+      docs/design/feedback/README.md; sections with two or fewer subsections keep the
+      single section-level control; print output unchanged; render stays deterministic;
+      test_design_doc.py extended (cases: 3+ sub-headings, numbered step list, <=2
+      subsections unchanged); full suite green.
+    notes: >
+      Groomed 2026-07-09 from a chat note (follow-on to L10, same review pass). Threshold
+      is the user's ">2" (examples given: 1.a-1.d, steps 1-3); confirm the exact boundary
+      (>2 vs >=2) with the user at implementation if it matters in practice. The anchor
+      derivation is the design core: feedback re-attaches by anchor, so subsection anchors
+      must be as stable as the authored section anchors.
+
   # ── Epic M — Provenance diet + audit envelope (doc 06) — Phase 11 ──────────
   # Groomed 2026-07-08 from the 2026-07-05 IDEAS line + the 2026-07-07 property-terms
   # line. Doc 06 Phases 0-1 (Control-M envelope: audit-fields.yaml + jobs/folders
@@ -1508,8 +1540,8 @@ items:
 # Roll-up the dispatcher can glance at. COMPUTED views — test_backlog.py enforces
 # that these match the items exactly; update them with any status change.
 summary:
-  todo: 14                                          # C5, E2, G3-G4, G9, K3, L7-L10, M2-M4, N2
+  todo: 15                                          # C5, E2, G3-G4, G9, K3, L7-L11, M2-M4, N2
   in_progress: 5                                    # E1, F1, F2, K2 (awaiting HITL), G2 (core shim)
   blocked: 0
   done: 39                                          # A1-A3, B1-B4, C1-C4, D1-D3, G1, G5-G7, G8, H1-H7, I1-I4, J1, K1, L1, L3-L6, M1, N1
-  next_ready: [C5, K3, L7, L8, L9, L10, M2, M3, M4, N2]  # L10 groomed 2026-07-09 (depends L5, done) → ready
+  next_ready: [C5, K3, L7, L8, L9, L10, L11, M2, M3, M4, N2]  # L10+L11 groomed 2026-07-09 (depend L5, done) → ready
