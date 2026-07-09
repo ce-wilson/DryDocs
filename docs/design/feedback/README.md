@@ -10,8 +10,14 @@ produce the same anchor-keyed YAML:
 - **Digital (L5):** open the doc's `.html`, click **✎** on a section, type a note (saved in your
   browser via `localStorage`), then **Copy feedback** — it puts a paste-ready block on your
   clipboard. Paste it here as `<doc-id>-rev<N>.yaml`.
-- **Paper (L6, planned):** print the `.pdf`, annotate by hand, scan into `scans/`, and the
-  transcribe skill turns the markup into the same anchor-keyed YAML.
+- **Paper (L6):** print the `.print.html` (or its build-on-demand `.pdf`,
+  `scripts/doc_to_pdf.py`) — each section's stable anchor id is visible in the page's left
+  margin gutter, plus a `Rev N · commit <hash>` footer on every page
+  (`drydocs/design_doc.py:_inject_margin_anchors` / `doc_rev_footer`). Annotate by hand,
+  scan into `scans/` (Internal by default — never published, see `scans/README.md`), and
+  the `.claude/skills/transcribe-doc-markup` skill turns the pen markup into the same
+  anchor-keyed YAML — transcribing faithfully first, then keying each note to the margin
+  anchor nearest it.
 
 ## Format (`drydocs.design_doc.feedback_yaml`)
 

@@ -7,7 +7,7 @@ from __future__ import annotations
 
 from pathlib import Path
 
-from drydocs.design_doc import doc_title, feedback_yaml, render_body, render_doc, write_doc
+from drydocs.design_doc import doc_rev_footer, doc_title, feedback_yaml, render_body, render_doc, write_doc
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
 CONTROLM_TDD = REPO_ROOT / "docs" / "design" / "controlm-ingestion-tdd.md"
@@ -135,3 +135,50 @@ def test_write_doc_emits_both_surfaces(tmp_path) -> None:
     assert html_path.name == "sample.html" and print_path.name == "sample.print.html"
     assert 'id="purpose-scope"' in html_path.read_text(encoding="utf-8")
     assert "@page" in print_path.read_text(encoding="utf-8")  # print CSS present
+
+
+# ── L6: print-margin anchors + Rev/commit footer ────────────────────────────
+def test_margin_anchor_tag_print_only() -> None:
+    md = "# Doc\n\n<!-- anchor: purpose-scope -->\n## Purpose\ntext"
+    printed = render_doc(md, "print")
+    screen = render_doc(md, "screen")
+    assert '<h2 id="purpose-scope"><span class="dd-margin-tag" aria-hidden="true">purpose-scope</span>Purpose</h2>' in printed
+    assert "dd-margin-tag" not in screen  # the digital surface carries no gutter tags
+
+
+def test_margin_anchor_skips_hr() -> None:
+    # hr is a void element (can't hold a child span) — no anchor in practice attaches to
+    # one, but the injector must not choke or misplace a tag if it ever did.
+    md = "<!-- anchor: mid-break -->\n---\n"
+    printed = render_doc(md, "print")
+    assert '<hr id="mid-break">' in printed
+    assert '<span class="dd-margin-tag"' not in printed
+
+
+def test_rev_footer_print_only() -> None:
+    md = "# Doc\n\ntext"
+    printed = render_doc(md, "print")
+    screen = render_doc(md, "screen")
+    assert '<footer class="dd-print-footer">' in printed
+    assert "dd-print-footer" not in screen
+
+
+def test_rev_footer_reads_declared_rev_and_commit() -> None:
+    md = "**Status:** DESCRIPTIVE — **Rev 7, 2026-01-01** (reflects commit `abc1234`)"
+    assert doc_rev_footer(md) == "Rev 7 · commit abc1234"
+
+
+def test_rev_footer_placeholder_when_undeclared() -> None:
+    # a doc with no declared Rev/commit still gets a footer — the fixed placeholder,
+    # never blank, and never derived from git state or a render timestamp.
+    assert doc_rev_footer("# Doc\n\nno rev mentioned here") == "Rev — · commit —"
+
+
+def test_rev_footer_matches_real_tdd() -> None:
+    md = CONTROLM_TDD.read_text(encoding="utf-8")
+    assert doc_rev_footer(md) == "Rev 3 · commit 107581d"
+
+
+def test_print_render_is_still_deterministic_with_margins_and_footer() -> None:
+    md = CONTROLM_TDD.read_text(encoding="utf-8")
+    assert render_doc(md, "print") == render_doc(md, "print")

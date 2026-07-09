@@ -99,3 +99,9 @@ excluded_paths:
   - "stg_out/"                     # gitignored — extract/staging output (real data)
   - "stg_*/"
   - "team_locations__sample.csv"   # real location rows, even if non-PII
+  - "docs/design/feedback/scans/**"  # gitignored — raw paper-HITL scans (Epic L / L6);
+                                      # Internal by default, see scans/README.md; the
+                                      # ANCHOR-KEYED TRANSCRIPTION derived from a scan
+                                      # (docs/design/feedback/<doc>-rev<N>.yaml) is a
+                                      # separate, publishable-by-default artifact — not
+                                      # covered by this exclusion

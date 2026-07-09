@@ -290,7 +290,7 @@ _PRINT_CSS = """\
 * { box-sizing: border-box; }
 html { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
 body { font: 10.5px/1.45 "Segoe UI", system-ui, Arial, sans-serif; color: var(--ink); margin: 0; }
-main { max-width: 7.2in; margin: 0 auto; }
+main { max-width: 7.2in; margin: 0 auto; padding-left: 0.62in; position: relative; }
 h1 { font-size: 21px; margin: 0 0 2px; letter-spacing:-0.2px; }
 h2 { font-size: 14px; margin: 16px 0 8px; padding-bottom:4px; border-bottom: 2px solid var(--ink); text-transform: uppercase; letter-spacing: 0.6px; }
 h3 { font-size: 11.5px; margin: 13px 0 5px; padding-bottom:2px; border-bottom:1px solid var(--line); }
@@ -308,7 +308,66 @@ blockquote { margin: 7px 0; padding: 2px 10px; border-left: 3px solid var(--line
 ul,ol { margin: 6px 0 6px 16px; padding: 0; } li { margin: 3px 0; }
 hr { border:none; border-top:1px solid var(--line); margin: 10px 0; }
 h2, h3, table, pre { break-inside: avoid; }
+
+/* L6 paper HITL: each anchored block sits in the left gutter (main's own padding-left,
+   reserved above) so a printed page carries the anchor id beside its section — no @page
+   margin-box support required, so headless Chromium print-to-pdf renders it reliably. */
+h1, h2, h3, h4, h5, h6, p, table, pre, ul, ol, blockquote { position: relative; }
+.dd-margin-tag {
+  position: absolute; left: -0.6in; top: 0.1em; width: 0.54in;
+  font: 6.2px/1.15 "Cascadia Mono","Consolas",monospace; text-align: right;
+  color: var(--mid); letter-spacing: 0.1px; word-break: break-word;
+}
+/* Rev/commit footer: `position: fixed` repeats on every printed page in Chromium's
+   headless print-to-pdf (the standard running-footer technique) without needing CSS
+   Paged-Media margin-box content(), which Chromium supports only partially. */
+.dd-print-footer {
+  position: fixed; left: 0.62in; right: 0.62in; bottom: 0.12in;
+  font-size: 8px; color: var(--mid); text-align: center;
+  border-top: 1px solid var(--line); padding-top: 3px;
+}
 """
+
+
+# ── L6: print-margin anchors + Rev/commit footer ────────────────────────────
+# The paper HITL loop (Epic L / L6): a printed .print.html gets annotated by pen, scanned,
+# and the transcribe-doc-markup skill re-attaches each pen note to a section anchor. That
+# only works if the anchor id is VISIBLE on the printed page next to its section — so print
+# mode (only) decorates each anchored block with a small tag in the page's left gutter.
+# `<hr>` is a void element (can't hold a child span) and is deliberately excluded; no anchor
+# in the real TDD ever attaches to one (front-matter/headings/paragraphs only).
+_MARGIN_TAG_OPEN = re.compile(
+    r'(<(?:h[1-6]|p|table|pre|ul|ol|blockquote)\s+id="([a-zA-Z][\w-]*)"[^>]*>)'
+)
+
+
+def _inject_margin_anchors(body_html: str) -> str:
+    """PRINT-ONLY: tag each anchored block with its stable anchor id in the left gutter
+    (``.dd-margin-tag`` in ``_PRINT_CSS``). Pure string substitution on the already-rendered
+    body — deterministic, and leaves the screen render (and its tests) untouched."""
+    def _tag(m: re.Match[str]) -> str:
+        opening, anchor = m.group(1), m.group(2)
+        return f'{opening}<span class="dd-margin-tag" aria-hidden="true">{html.escape(anchor)}</span>'
+    return _MARGIN_TAG_OPEN.sub(_tag, body_html)
+
+
+_REV_RE = re.compile(r"\bRev\s+(\d+)\b")
+_COMMIT_RE = re.compile(r"\bcommit\s+`([0-9a-fA-F]{6,40})`")
+_REV_PLACEHOLDER = "Rev —"     # em dash: a doc that declares no Rev still gets a footer
+_COMMIT_PLACEHOLDER = "—"
+
+
+def doc_rev_footer(md: str) -> str:
+    """The deterministic 'Rev N · commit <hash>' footer string. Derived STRICTLY from
+    the doc's own declared front matter (the ``Rev N`` / `` `commit abc123` `` text an
+    author writes in — see controlm-ingestion-tdd.md's front-matter anchor) — never from
+    git state or a render-time timestamp, so the render stays byte-deterministic. A doc
+    that declares neither gets the fixed placeholder, not an empty/blank footer."""
+    rev_m = _REV_RE.search(md)
+    commit_m = _COMMIT_RE.search(md)
+    rev = f"Rev {rev_m.group(1)}" if rev_m else _REV_PLACEHOLDER
+    commit = commit_m.group(1) if commit_m else _COMMIT_PLACEHOLDER
+    return f"{rev} · commit {commit}"
 
 
 def _slug(text: str) -> str:
@@ -406,13 +465,17 @@ def render_doc(md: str, mode: str = "screen", doc_id: str | None = None) -> str:
     css = (_SCREEN_CSS + _FEEDBACK_CSS) if screen else _PRINT_CSS
     title = html.escape(doc_title(md))
     body = render_body(md)
+    footer = ""
+    if not screen:
+        body = _inject_margin_anchors(body)
+        footer = f'<footer class="dd-print-footer">{html.escape(doc_rev_footer(md))}</footer>\n'
     did = html.escape(doc_id or _slug(doc_title(md)), quote=True)
     feedback = _feedback_html(did) if screen else ""
     return (
         "<!doctype html>\n<html lang=\"en\">\n<head>\n<meta charset=\"utf-8\">\n"
         '<meta name="viewport" content="width=device-width, initial-scale=1">\n'
         f"<title>{title}</title>\n<style>\n{css}</style>\n</head>\n<body>\n"
-        f"<main>\n{body}\n</main>\n{feedback}\n</body>\n</html>\n"
+        f"<main>\n{body}\n</main>\n{footer}{feedback}\n</body>\n</html>\n"
     )
 
 

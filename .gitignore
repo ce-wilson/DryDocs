@@ -80,6 +80,13 @@ external/orchestration/**/*.pdf
 # Regenerate before printing for the pen/paper loop.
 docs/design/*.pdf
 
+# Paper-HITL scans (Epic L / L6) — raw scanned/photographed annotated printouts. Internal
+# by default (see docs/design/feedback/scans/README.md + config/classification.yaml
+# excluded_paths): never published unless a human deliberately reclassifies. Keep the
+# README (the classification note) tracked; the raw scans are not.
+docs/design/feedback/scans/*
+!docs/design/feedback/scans/README.md
+
 # Editor workspace settings (machine-local)
 /.vscode/
 
