@@ -28,6 +28,7 @@ from .controlm import (
     ControlMVariableRow,
 )
 from .registry import SoftwareProductRow
+from .docs import BmcDocChunkRow
 
 __all__ = [
     # SEAL
@@ -50,4 +51,6 @@ __all__ = [
     "ControlMVariableRow",
     # Software registry (plan 07 / ADR 0004)
     "SoftwareProductRow",
+    # bmc-docs lexical graph (Document -> Chunk)
+    "BmcDocChunkRow",
 ]

@@ -92,6 +92,30 @@ sources:
     confirmed: true                     # SME gate 2026-07-07 (ADR 0004; config/gate-log.md)
     notes: "Third-party software registry (plan 07). Vendor = brand only; graph is the lookup."
 
+  # ---- Docs corpora (converted documentation → lexical graph) ---------------
+  - id: bmc-docs
+    classification: External             # public BMC documentation, converted; cite source_url per doc
+    source: "external/orchestration/bmc-controlm/controlm-*.md (26 converted BMC pages; SOURCE-MANIFEST.md = provenance model)"
+    source_url: "https://documents.bmc.com/ (per-doc URLs in each file header)"
+    captured_at: 2026-06-11
+    kind: docs
+    orchestrator: ~
+    adapter: markdown                    # BmcDocsAdapter (H2 chunking, manifest tier rule)
+    feeds_taxonomy: [documents, chunks]
+    confirmed: false                     # flips when gate bmc-docs-lexical-load is SME-accepted
+    gate_spec: config/gate-prompts/bmc-docs-lexical-load.yaml
+    notes: >
+      The converted BMC docs corpus loaded as the llm-graph-builder LEXICAL graph
+      (Document -> Chunk chains) with per-chunk provenance tier
+      VERBATIM|GROUNDED|SYNTHESIZED per the SOURCE-MANIFEST default rule —
+      SYNTHESIZED chunks are Claude inference, never vendor ground truth (the
+      two-corpus rule). Software-ontology hook: (Document)-[:DESCRIBES
+      {target_version}]->(SoftwareProduct controlm); load ORDER: the software
+      registry loads first (DESCRIBES MATCHes the product, never MERGEs it).
+      NOT a source-of-record (the XML-format acquisition stub tracks the real
+      9.0.21.300 config SoR). User-directed 2026-07-08: the local EE DB carries
+      only sample Control-M data, so this corpus is the demonstrable content.
+
   # ---- Data platforms (sources of DataAsset/lineage) -----------------------
   - id: oracle-schemas
     classification: Internal-Confidential   # real schema/table/object names

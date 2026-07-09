@@ -303,6 +303,28 @@ node_classifications:
     prov_type:  Entity
     note:       "What a Vendor ships (Control-M, Neo4j, Oracle DB). role attribute (orchestrator|data-platform|graph-platform|tool) absorbs the Tier-1/Tier-2 split. registry_ontology_supplement.cypher."
 
+  # — Docs corpus (lexical graph, llm-graph-builder pattern) — GATE-BOUND ————
+  - label:      Document
+    class:      "prov:Entity"
+    prov_type:  Entity
+    note: >
+      A converted external/internal document (first corpus: bmc-docs, the 26
+      converted BMC Control-M pages). Carries source_url + scraped_on +
+      trust_default; NOT a source-of-record — the SOURCE-MANIFEST provenance
+      model governs. Gate: bmc-docs-lexical-load (2026-07-08, pending).
+      Distinct from the SEAL-reshape's planned Document-in-drydocs_context
+      idea — same class; this one lands beside the software registry so
+      DESCRIBES can reach :SoftwareProduct in-database.
+
+  - label:      Chunk
+    class:      "prov:Entity"
+    prov_type:  Entity
+    note: >
+      A section-level slice of a Document (H2 chunking, deterministic — no
+      LLM). Carries provenance tier VERBATIM|GROUNDED|SYNTHESIZED per the
+      corpus SOURCE-MANIFEST default rule; SYNTHESIZED chunks are Claude
+      inference and never vendor ground truth. Gate: bmc-docs-lexical-load.
+
   # — Context graph (SOSA/SSN, EXPERIMENTAL / early adoption) ————————————————
   # SOSA/SSN is a W3C standard but NOT a declared *company* standard. These
   # classes are seeded only by the opt-in sosa_experimental_supplement.cypher
@@ -1242,6 +1264,76 @@ local_relationships:
     loader:       software_registry.py
     domain:       registry
     status:       active
+
+  # ── Docs corpus — lexical graph (Document→Chunk; llm-graph-builder pattern) ─
+  # Registered 2026-07-08 for the bmc-docs corpus load (user-directed; only
+  # sample Control-M data can reach this DB, so the converted BMC docs are the
+  # demonstrable content). ALL FOUR ARE GATE-BOUND: status planned until the
+  # bmc-docs-lexical-load gate is SME-accepted (config/gate-prompts/).
+
+  - id:           docs_describes
+    neo4j_label:  DESCRIBES
+    role:         ~
+    from_node:    Document
+    to_node:      SoftwareProduct
+    prov_maps_to: ~
+    note: >
+      Document (prov:Entity) is ABOUT a SoftwareProduct — the software-ontology
+      hook: dcterms:subject / foaf:primaryTopic pattern, no PROV row (Entity →
+      Entity aboutness is not derivation; deliberately NOT wasDerivedFrom).
+      Edge carries target_version (the corpus documents SaaS pages applied to
+      9.0.21.300). Vendor hop rides the existing MADE_BY (product → brand).
+    supplement:   ~
+    loader:       ~
+    domain:       docs
+    status:       planned
+
+  - id:           docs_chunk_part_of
+    neo4j_label:  PART_OF
+    role:         ~
+    from_node:    Chunk
+    to_node:      Document
+    prov_maps_to: ~
+    note: >
+      Lexical-graph containment (llm-graph-builder pattern): Chunk belongs to
+      its Document. dcterms:isPartOf pattern; equivalently the inverse of
+      prov:hadMember (Collection reading) — recorded as structural, not PROV,
+      to keep the lexical graph distinct from the domain Collections.
+    supplement:   ~
+    loader:       ~
+    domain:       docs
+    status:       planned
+
+  - id:           docs_first_chunk
+    neo4j_label:  FIRST_CHUNK
+    role:         ~
+    from_node:    Document
+    to_node:      Chunk
+    prov_maps_to: ~
+    note: >
+      Lexical-graph sequence anchor (llm-graph-builder pattern): entry point
+      to the chunk chain. Local structural edge; no standard term (sequence —
+      same null-mapping precedent as SCHEDULED_ON).
+    supplement:   ~
+    loader:       ~
+    domain:       docs
+    status:       planned
+
+  - id:           docs_next_chunk
+    neo4j_label:  NEXT_CHUNK
+    role:         ~
+    from_node:    Chunk
+    to_node:      Chunk
+    prov_maps_to: ~
+    note: >
+      Lexical-graph reading order (llm-graph-builder pattern): singly-linked
+      chunk chain within one Document (out-degree <= 1, enforced by
+      graph-tests/bmc-docs-lexical.yaml). Local structural edge; no standard
+      term.
+    supplement:   ~
+    loader:       ~
+    domain:       docs
+    status:       planned
 
   # ── Cross-domain provenance ───────────────────────────────────────────────
 

@@ -23,8 +23,10 @@ VOCAB_FILE       = ONTOLOGY_DIR / "relationship_vocabulary.yaml"
 # software registry (plan 07 / ADR 0004): vendor_id + softwareproduct_id.
 # 38 after controlmapplication_name (folder-pass grouping label; gate
 # controlm-q1q3-phase1, load-order definition 2026-07-07).
+# 40 after document_id + chunk_id (bmc-docs lexical graph, gate
+# bmc-docs-lexical-load 2026-07-08).
 # Bump this when you intentionally add/remove a CREATE CONSTRAINT.
-EXPECTED_CONSTRAINTS = 38
+EXPECTED_CONSTRAINTS = 40
 
 EXPECTED_ONTOLOGY_LABELS = [
     "DprodClass",

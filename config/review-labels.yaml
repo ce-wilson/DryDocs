@@ -31,3 +31,7 @@ sources:
   - id: bmc-controlm-lineage
     provenance: "curated command-line lineage (C2; GROUNDED)"
     labels: [ControlMJob, JobRun, Condition]
+
+  - id: bmc-docs
+    provenance: "converted BMC documentation corpus (VERBATIM/GROUNDED/SYNTHESIZED per chunk)"
+    labels: [Document, Chunk]

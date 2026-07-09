@@ -19,6 +19,8 @@ Ingest commands:
   drydocs load <name> --csv       — single loader against a CSV file
   drydocs load-software-registry  — third-party software registry from
                                     config/taxonomy/software-registry.yaml
+  drydocs load-bmc-docs           — bmc-docs lexical graph (Document -> Chunk)
+                                    from external/orchestration/bmc-controlm/
 """
 from __future__ import annotations
 
@@ -41,6 +43,11 @@ from .models import ControlMVariableRow
 from .loaders import seal_applications as seal_apps_mod
 from .loaders import seal_contacts as seal_contacts_mod
 from .loaders.base import BaseLoader
+from .loaders.bmc_docs import (
+    DEFAULT_CORPUS_DIR,
+    BmcDocsAdapter,
+    BmcDocsLoader,
+)
 from .loaders.business_segments import refresh_business_segments
 from .loaders.catalog import (
     AreaProductsLoader,
@@ -105,6 +112,8 @@ LOADER_REGISTRY: dict[str, type] = {
     "controlm_conditions_in":       ControlMConditionsInLoader,
     "controlm_conditions_out":      ControlMConditionsOutLoader,
     "controlm_dependencies_derived": ControlMDependenciesDerivedLoader,
+    # bmc-docs lexical graph (Document -> Chunk):
+    "bmc_docs":           BmcDocsLoader,
 }
 
 SQL_DIR = Path(__file__).resolve().parent / "loaders" / "sql"
@@ -126,6 +135,10 @@ LOADER_SOURCE: dict[str, str] = {
     "controlm_conditions_in":        "controlm-psgmgr",
     "controlm_conditions_out":       "controlm-psgmgr",
     "controlm_dependencies_derived": "controlm-psgmgr",
+    # This source id is registered by the dispatcher in parallel
+    # (config/source-registry.yaml); until it is SME-confirmed, `_gate_source`
+    # fails fast (exit 2) on `load-bmc-docs` — that is correct, not a bug.
+    "bmc_docs":                      "bmc-docs",
 }
 
 
@@ -466,6 +479,32 @@ def load_software_registry(
     adapter = RegistryYamlAdapter(registry_path)
     with _client() as cli:
         summary = SoftwareRegistryLoader(cli, adapter).load()
+    console.print(summary.as_dict())
+
+
+@app.command(name="load-bmc-docs")
+def load_bmc_docs(
+    corpus_dir: Path = typer.Option(
+        DEFAULT_CORPUS_DIR,
+        "--corpus-dir",
+        help="Directory of controlm-*.md docs (defaults to external/orchestration/bmc-controlm).",
+    ),
+) -> None:
+    """Load the BMC documentation corpus as a Document -> Chunk lexical graph.
+
+    Manual chunking + MERGE (Neo4j llm-graph-builder pattern) — chunk-only, no
+    LLM extraction, no embeddings, fully deterministic. Splits each doc on H2
+    headings, classifies every chunk's provenance tier per the
+    SOURCE-MANIFEST default tier rule, and wires each :Document to its
+    :SoftwareProduct via DESCRIBES (MATCH only — run
+    `drydocs load-software-registry` first).
+    """
+    _gate_source("bmc-docs")  # confirmed-gate before any DB write
+    if not corpus_dir.exists():
+        console.print(f"[red]Missing: {corpus_dir}[/]"); raise typer.Exit(1)
+    adapter = BmcDocsAdapter(corpus_dir)
+    with _client() as cli:
+        summary = BmcDocsLoader(cli, adapter).load()
     console.print(summary.as_dict())
 
 

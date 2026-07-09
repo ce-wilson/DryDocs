@@ -555,9 +555,66 @@ mappings:
       edge (lob-product-team taxonomy -> business-application taxonomy); the join (which team
       builds which app) comes from catalog<->SEAL ownership reconciliation.
 
+  # ---- bmc-docs lexical load (2026-07-08 — GATE PREP, SME not yet run) ------
+  # User-directed: only sample Control-M data can reach the local EE DB, so the
+  # converted BMC docs corpus (external/orchestration/bmc-controlm/, 26 docs)
+  # becomes the demonstrable content — loaded as the llm-graph-builder lexical
+  # graph (Document→Chunk) and hooked to the software ontology (DESCRIBES →
+  # SoftwareProduct controlm, MADE_BY → bmc already active). Gate spec:
+  # config/gate-prompts/bmc-docs-lexical-load.yaml. All four stop at proposed.
+
+  - id: doc-describes-product
+    taxonomy: { source: bmc-docs, element: "A converted BMC doc is ABOUT the Control-M product" }
+    ontology:
+      from_node: Document                    # prov:Entity
+      to_node: SoftwareProduct               # dd:SoftwareProduct (Entity)
+      matrix_row: "Entity → Entity aboutness — no PROV row (NOT wasDerivedFrom); dcterms:subject / foaf:primaryTopic pattern"
+      neo4j_label: DESCRIBES
+      prov_maps_to: ~
+      edge_properties: { target_version: "9.0.21.300 (corpus version notice)" }
+    precedence_authority: bmc-baseline
+    reuses_vocab: docs_describes (planned)
+    status: proposed
+
+  - id: doc-chunk-part-of
+    taxonomy: { source: bmc-docs, element: "A section chunk belongs to its document (H2 chunking)" }
+    ontology:
+      from_node: Chunk                       # prov:Entity
+      to_node: Document                      # prov:Entity
+      matrix_row: "structural containment — dcterms:isPartOf pattern (lexical graph, kept off prov:hadMember to stay distinct from domain Collections)"
+      neo4j_label: PART_OF
+      prov_maps_to: ~
+    precedence_authority: bmc-baseline
+    reuses_vocab: docs_chunk_part_of (planned)
+    status: proposed
+
+  - id: doc-first-chunk
+    taxonomy: { source: bmc-docs, element: "Document's chunk chain entry point" }
+    ontology:
+      from_node: Document
+      to_node: Chunk
+      matrix_row: "no standard term — sequence anchor (SCHEDULED_ON null-mapping precedent)"
+      neo4j_label: FIRST_CHUNK
+      prov_maps_to: ~
+    precedence_authority: bmc-baseline
+    reuses_vocab: docs_first_chunk (planned)
+    status: proposed
+
+  - id: doc-next-chunk
+    taxonomy: { source: bmc-docs, element: "Reading order between adjacent chunks of one document" }
+    ontology:
+      from_node: Chunk
+      to_node: Chunk
+      matrix_row: "no standard term — singly-linked sequence (out-degree <= 1)"
+      neo4j_label: NEXT_CHUNK
+      prov_maps_to: ~
+    precedence_authority: bmc-baseline
+    reuses_vocab: docs_next_chunk (planned)
+    status: proposed
+
 # Counts the gate reports to the SME each run.
 summary:
   applied: 1          # job-contains
   confirmed: 14       # C1 (4) + C2 (4) + C3 (6: 4 hierarchy + SUPPORTS→AreaProduct + DEVELOPS→app)
-  proposed: 6         # job-seal-app-ref, oracle-schema-asset, jobrun-observation, application-as-dataproduct, seal-tom-attribution, seal-doc-source-of-record
+  proposed: 10        # job-seal-app-ref, oracle-schema-asset, jobrun-observation, application-as-dataproduct, seal-tom-attribution, seal-doc-source-of-record, doc-describes-product, doc-chunk-part-of, doc-first-chunk, doc-next-chunk
   rejected: 0

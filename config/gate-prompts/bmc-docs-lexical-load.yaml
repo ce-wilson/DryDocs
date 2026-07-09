@@ -1,0 +1,93 @@
+# SME gate spec — bmc-docs corpus lexical-graph load (Document→Chunk + software-ontology hook).
+# User-directed 2026-07-08: the local EE DB carries only SAMPLE Control-M data, so the
+# converted BMC docs corpus becomes the demonstrable graph content. Model = the Neo4j
+# llm-graph-builder "manual chunking + MERGE" pattern (chunk-only, no LLM, no embeddings —
+# deterministic). classification: Internal-Public (mechanism + public-doc metadata only).
+classification: Internal-Public
+schema: drydocs.gate-prompt.v1
+id: bmc-docs-lexical-load
+title: "SME Gate — bmc-docs lexical load (Document→Chunk) + DESCRIBES → software ontology"
+step: "New source + 2 node types + 4 edge types — everything stops at proposed/planned until this gate"
+summary: >
+  Loads the 26 converted BMC Control-M docs (external/orchestration/bmc-controlm/) as a
+  lexical graph — Document nodes with H2-section Chunk chains — and hooks each Document to
+  the software registry via DESCRIBES → SoftwareProduct 'controlm' (MADE_BY → 'bmc' already
+  active). Per-chunk provenance tier (VERBATIM|GROUNDED|SYNTHESIZED) is stamped from the
+  SOURCE-MANIFEST default rule so Claude-synthesized content can never masquerade as vendor
+  ground truth. No graph write happens until the confirmations below are ticked.
+meta:
+  Module: "drydocs-load"
+  Source: "external/orchestration/bmc-controlm/controlm-*.md — 26 converted BMC pages + SOURCE-MANIFEST.md provenance model"
+  Software: "controlm (Control-M) MADE_BY bmc — config/taxonomy/software-registry.yaml (DESCRIBES target)"
+  Registry ref: "bmc-docs — NEW, confirmed: false until this gate (config/source-registry.yaml)"
+  Classification: "External source / Internal-Public mechanism — public BMC docs, per-doc source_url cited"
+  Taxonomy: "documents, chunks (lexical structure only — no meaning edges beyond the four below)"
+  Ontology map: "doc-describes-product, doc-chunk-part-of, doc-first-chunk, doc-next-chunk — all proposed (config/taxonomy-ontology-map.yaml)"
+  Source of record: "NOT SoR — reference corpus; the XML-definition acquisition stub tracks the real 9.0.21.300 config SoR"
+provenance:
+  - label: ":Document"
+    source_object: "controlm-*.md file header"
+    key: "doc_id"
+    loader: "bmc_docs"
+    properties:
+      - {name: doc_id, origin: derived, from: "file stem (e.g. controlm-variables)"}
+      - {name: title, origin: source, from: "first H1 line"}
+      - {name: source_url / source_page, origin: source, from: "header Source/Document lines (documents.bmc.com)"}
+      - {name: scraped_on, origin: source, from: "header 'Date Scraped'"}
+      - {name: trust_default, origin: source, from: "per-file provenance block / manifest default"}
+      - {name: target_version, origin: source, from: "version notice — SaaS pages applied to 9.0.21.300", note: "corpus-wide caveat, kept on every doc"}
+      - {name: subject_product_id, origin: derived, from: "constant 'controlm' (registry id)", note: "the software-ontology hook"}
+  - label: ":Chunk"
+    source_object: "H2 section of the markdown body"
+    key: "chunk_id"
+    loader: "bmc_docs"
+    properties:
+      - {name: chunk_id, origin: derived, from: "doc_id + '#' + zero-padded seq"}
+      - {name: seq / heading / level, origin: derived, from: "H2 split; preamble = seq 0", note: "H3+ stays inside its parent H2 chunk"}
+      - {name: text, origin: source, from: "section body verbatim", note: "External classification — publishable"}
+      - {name: provenance, origin: derived, from: "SOURCE-MANIFEST default tier rule (heading keywords + majority-code); tier_rule stamped", note: "SYNTHESIZED = Claude inference, NEVER vendor ground truth (two-corpus rule)"}
+mapping:
+  - n: 1
+    element: "Converted BMC doc file"
+    target: ":Document:Entity {doc_id}"
+    edge: "— [PROPOSED node type]"
+  - n: 2
+    element: "H2 section of a doc"
+    target: ":Chunk:Entity {chunk_id}"
+    edge: "(chunk)-[:PART_OF]->(doc)  [PROPOSED — dcterms:isPartOf pattern]"
+  - n: 3
+    element: "Chunk reading order"
+    target: "chunk chain"
+    edge: "(doc)-[:FIRST_CHUNK]->(c0); (c)-[:NEXT_CHUNK]->(c+1)  [PROPOSED — sequence, no standard term]"
+  - n: 4
+    element: "Doc is ABOUT Control-M"
+    target: ":SoftwareProduct {product_id: controlm} (MATCHed, never MERGEd — registry loads first)"
+    edge: "(doc)-[:DESCRIBES {target_version}]->(sp)  [PROPOSED — dcterms:subject / foaf:primaryTopic pattern; NOT wasDerivedFrom]"
+  - n: 5
+    element: "Vendor attribution"
+    target: ":Vendor {vendor_id: bmc}"
+    edge: "rides the EXISTING (sp)-[:MADE_BY]->(v) — no new edge"
+sections:
+  - title: "A. Source + scope"
+    confirmations:
+      - "bmc-docs is registered (classification External, confirmed pending this gate); the corpus is a REFERENCE, not a source-of-record — the XML-definition stub remains the SoR gap for 9.0.21.300 config."
+      - "Load order: software registry FIRST, then bmc-docs — DESCRIBES MATCHes the controlm product and silently skips if absent (same prereq pattern as jobs→folders); never MERGEs a stub product."
+      - "Documents land in the SAME database as the registry nodes (an in-DB DESCRIBES edge requires co-location); migrating the corpus to a dedicated docs DB is the docmeta component's future call, not this load's."
+  - title: "B. Lexical model (llm-graph-builder pattern, deterministic)"
+    confirmations:
+      - "Node types Document + Chunk are prov:Entity; chunking is H2-section based with a seq-0 preamble — deterministic, no LLM, no embeddings."
+      - "PART_OF / FIRST_CHUNK / NEXT_CHUNK are structural lexical edges (dcterms:isPartOf pattern + null-term sequence edges) — deliberately NOT prov:hadMember, keeping the lexical graph distinct from domain Collections."
+      - "NEXT_CHUNK is a singly-linked chain (out-degree <= 1) — enforced live by graph-tests/bmc-docs-lexical.yaml."
+  - title: "C. Trust tiers (the two-corpus rule)"
+    confirmations:
+      - "Every chunk carries provenance VERBATIM|GROUNDED|SYNTHESIZED stamped by the SOURCE-MANIFEST default rule (Patterns/Best Practices/Use Cases/Notes-for-Planning-Agents/Vendor-Attributes/majority-code → SYNTHESIZED; Authoritative Corrections → VERBATIM; else GROUNDED), with the rule id recorded on the chunk."
+      - "SYNTHESIZED chunks are Claude inference and must NEVER be treated as vendor ground truth in any downstream query or validation — the vendor-legality layer reads VERBATIM/GROUNDED only."
+      - "The four controlm-api-*.md files document the SaaS JSON API (format mismatch with our XML environment, manifest decision 2026-06-11) — they load like the rest but their tier stamps + the doc-level target_version caveat carry the demotion; no special-casing in the loader."
+  - title: "D. Software-ontology hook"
+    confirmations:
+      - "DESCRIBES (Document → SoftwareProduct) is the aboutness edge: dcterms:subject / foaf:primaryTopic pattern, Entity→Entity, explicitly NOT prov:wasDerivedFrom (the docs are not derived from the product)."
+      - "target_version 9.0.21.300 sits on the DESCRIBES edge (the corpus-wide SaaS-vs-installed caveat); vendor attribution rides the existing MADE_BY, no new doc→vendor edge in this phase."
+  - title: "E. Sign-off"
+    confirmations:
+      - "All four vocabulary entries (docs_describes, docs_chunk_part_of, docs_first_chunk, docs_next_chunk) may flip planned → active with supplement + loader recorded; Document/Chunk node classifications stand."
+      - "Safe to transcribe into config/gate-log.md, flip bmc-docs to confirmed: true, and run the load (registry supplement → load-software-registry → load-bmc-docs) against the live EE container."
