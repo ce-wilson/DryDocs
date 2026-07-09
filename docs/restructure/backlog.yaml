@@ -1238,7 +1238,7 @@ items:
     agent: main
     model: sonnet
     priority: p3
-    status: todo
+    status: done
     depends_on: [L4]
     inputs: [scripts/doc_to_pdf.py, .claude/skills/groom-backlog/SKILL.md, config/classification.yaml]
     acceptance: >
@@ -1250,7 +1250,11 @@ items:
       demonstrated on a fixture scan.
     notes: >
       The pen/paper loop the user works best in; annotations re-attach to requirements by
-      anchor, surviving re-renders.
+      anchor, surviving re-renders. Done 2026-07-08 (sonnet agent): print-only margin
+      anchors + front-matter-derived Rev/commit footer in design_doc.py (deterministic —
+      no git/timestamp reads); transcribe-doc-markup skill emits via the SAME
+      feedback_yaml() as L5 so paper/digital are shape-identical; scans dir triple-guarded
+      (gitignore + classification excluded_paths + README). 11 new tests.
   - id: L7
     epic: doc-infrastructure
     title: "Ingest the traceability matrix + feedback as DryDocs context (via the gate)"
@@ -1334,7 +1338,7 @@ items:
     agent: main
     model: sonnet
     priority: p2
-    status: todo
+    status: done
     depends_on: []
     inputs: [docs/restructure/06-provenance-source-audit-fields.md, drydocs/loaders/, drydocs/ontology/relationship_vocabulary.yaml]
     acceptance: >
@@ -1343,7 +1347,14 @@ items:
       record counts on the :JobRun node instead of blanket membership edges; the
       prov_was_generated_by vocabulary note is updated via the gate; offline unit tests
       prove no-change rows write no provenance edge. Full suite green.
-    notes: "Doc 06 Phase 2 — the fix for the full-refresh supernode (persona review Issue 3)."
+    notes: >
+      Doc 06 Phase 2 — the fix for the full-refresh supernode (persona review Issue 3).
+      Done 2026-07-08 (sonnet agent): sha256 row_checksum in to_params (volatile fields
+      excluded: capture_date + batch/bookkeeping params); WAS_GENERATED_BY guarded by
+      FOREACH-over-CASE on checksum change in all 4 node-writing cyphers
+      (dependencies_derived never had the tail); JobRun.rows_changed derived from the
+      actual edge count at _close_run; prov_was_generated_by note updated (note-only);
+      graph-tests/provenance-diet.yaml live suite. 40 new tests.
 
   - id: M2
     epic: provenance-audit
@@ -1419,7 +1430,7 @@ items:
     agent: main
     model: sonnet
     priority: p2
-    status: todo
+    status: done
     depends_on: []
     inputs: [docs/restructure/08-source-column-mappings.md, drydocs/loaders/sql/, config/gate-prompts/controlm-q1q3-phase1.yaml, docs/restructure/06a-controlm-source-er-review.md]
     acceptance: >
@@ -1429,7 +1440,15 @@ items:
       columns, phase-1 scope sweep) + the SQL headers' scope rules — no new gate needed;
       dispositions projected/filter-only/excluded/deferred with origin source|derived;
       classification Internal-Public, mechanism-only. Full suite green.
-    notes: "Doc 08 Phase 0. The accessor's boundary-group classification (config vs review) is decided at build per the default-deny guard."
+    notes: >
+      Doc 08 Phase 0. Done 2026-07-08 (sonnet agent): drydocs/source_mappings.py
+      (review group per the default-deny guard; MODULE_MAP row) +
+      config/source-mappings/controlm-psgmgr.yaml (5 objects, 69 projected rows, census
+      pending). Honest deviation from the plan sketch, ledger matches the REAL SQL:
+      IS_CURRENT_VERSION/USER_DAILY are projected (they are SELECTed, not filter-only),
+      with filter roles in notes; LNKI/LNKO IS_CURRENT_VERSION targets
+      staging:is_current_version (never SET on the graph); bind params + the var_scope
+      CASE documented as notes, not fake column rows. 27 new tests.
 
   - id: N2
     epic: source-column-mappings
@@ -1454,8 +1473,8 @@ items:
 # Roll-up the dispatcher can glance at. COMPUTED views — test_backlog.py enforces
 # that these match the items exactly; update them with any status change.
 summary:
-  todo: 16                                          # C5, E2, G3-G4, G9, K3, L6-L9, M1-M4, N1-N2
+  todo: 13                                          # C5, E2, G3-G4, G9, K3, L7-L9, M2-M4, N2
   in_progress: 5                                    # E1, F1, F2, K2 (awaiting HITL), G2 (core shim)
   blocked: 1                                        # G7 — live multi-DB deploy needs an Enterprise target
-  done: 35                                          # A1-A3, B1-B4, C1-C4, D1-D3, G1, G5-G6, G8, H1-H7, I1-I4, J1, K1, L1, L3-L5
-  next_ready: [C5, K3, L6, L7, L9, M1, M3, M4, N1]  # todo items whose every depends_on is done (test-enforced)
+  done: 38                                          # A1-A3, B1-B4, C1-C4, D1-D3, G1, G5-G6, G8, H1-H7, I1-I4, J1, K1, L1, L3-L6, M1, N1
+  next_ready: [C5, K3, L7, L8, L9, M2, M3, M4, N2]  # L6/M1/N1 done 2026-07-08 → L8 (runbook capstone), M2, N2 unblocked
