@@ -197,7 +197,7 @@ mappings:
     provenance_note: "Registered per backlog C6 (2026-07-09) to close the README/LoadPlanV3-vs-vocab drift. Edge meaning ⇒ HITL gate; not auto-decided."
     open_questions:
       - "Attach point: ports are application-level ((:Application)-[:HAS_PORT]->(:Port), kind∈{EventProcessing=events/API, BatchProcessing=batch}), so README.md:263 ('on :Application') and LoadPlanV3.md:82 ('the :BatchProcessing port') describe the SAME app batch port. SME call = keep the edge on the batch :Port (as here) or hoist to :Application. REQUIRES_SCHEDULER is batch-only (the EventProcessing/API port is not scheduler-driven)."
-      - "TARGET (to_node): :SchedulerKind is slated for deprecation → :AisCapability + :AiTool (user 2026-07-09; not yet defined in the ontology). The target here is PROVISIONAL — re-target/reshape onto the replacement class(es) at the gate once defined; whether REQUIRES_SCHEDULER becomes one edge or two is itself an SME call. See the IDEAS SchedulerKind-deprecation capture."
+      - "TARGET (to_node): :SchedulerKind is slated for deprecation → :AisCapability + :AiTool (user 2026-07-09; not yet defined in the ontology). The target here is PROVISIONAL — re-target/reshape onto the replacement class(es) at the gate once defined; whether REQUIRES_SCHEDULER becomes one edge or two is itself an SME call. See config/taxonomy/platforms.yaml (reconciliation placeholder) + the IDEAS SchedulerKind-deprecation capture."
       - "Confirm null-PROV/infrastructure is correct, vs a weak prov:used / prov:wasInfluencedBy."
 
   # ---- SEAL ontology reshape — GATE-BOUND (2026-07-08 review) --------------

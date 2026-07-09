@@ -34,6 +34,7 @@ Tags help grooming: `idea` · `bug` · `doc` · `source` (new data source) · `q
   edge or two). Touches: the C6 `requires-scheduler` map entry (target provisional), F1/F2
   orchestrator crosswalks, `ontology.cypher` seeds + the `scheduler_kind` constraint, README.
   Ontology/node-meaning ⇒ HITL gate; groom into an item once the two classes are defined.
+  Reconciliation placeholder created: `config/taxonomy/platforms.yaml` (status: placeholder).
 
 - 2026-07-08 — [doc] **BRD outline (Epic L, deferred)** — the third canonical doc type after
   TDD (L1) and Runbook (L8). Parked, not promoted: the BRD is a work-in-progress upstream and

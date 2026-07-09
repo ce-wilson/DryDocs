@@ -17,6 +17,10 @@ The `taxonomy-importer` sub-agent writes here. Keep imports faithful to the sour
 | Oracle schemas/tables/scripts | `oracle-schemas` | Schema ▸ Table; Script |
 | Control-M variables | `controlm-psgmgr` | variable-class ▸ variable |
 
+> **`platforms.yaml`** is a *placeholder*, not a source import — the reconciliation surface for the
+> platform / execution-technology taxonomy (`:SchedulerKind`, slated for deprecation →
+> `:AisCapability` + `:AiTool`). Held until the HITL gate; see its header for the open questions.
+
 ## Format
 One file per taxonomy, e.g. `lob-product-team.yaml`:
 ```yaml
