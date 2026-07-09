@@ -1341,18 +1341,22 @@ items:
     inputs: [drydocs/design_doc.py, docs/design/feedback/README.md, tests/unit/test_design_doc.py]
     acceptance: >
       the screen .html gains an "SME - Feedback" section below the appendix / last outline
-      section, separated by a divider line, containing (1) a free-text "Notes/SME
-      Instructions or Expectations" area persisted in localStorage (same mechanism as the
-      per-section notes) and included in the Copy-feedback export — if that requires a
-      doc-level field beside the anchor-keyed notes, the feedback_yaml format and
-      docs/design/feedback/README.md are extended together; and (2) the paste destination
-      displayed to the SME: Copy To docs/design/feedback/, File Name
-      <doc-stem>-rev<N>.yaml (YAML — not markdown); print output unchanged; render stays
-      deterministic; test_design_doc.py extended; full suite green.
+      section, separated by a divider line, containing a SHORT static instruction block
+      telling the reviewer exactly what to do with their annotations — numbered steps in
+      plain language, concretely: annotate sections with the per-section pencil control;
+      click "Copy feedback" (bottom toolbar); create the file
+      docs/design/feedback/<doc-stem>-rev<N>.yaml (YAML — not markdown; the exact
+      per-doc filename with the doc's current Rev is rendered into the instructions, ready
+      to copy); paste the clipboard contents in and save/commit. Print output unchanged;
+      render stays deterministic (Rev comes from front matter, no git/timestamp reads);
+      test_design_doc.py extended; full suite green.
     notes: >
-      Groomed 2026-07-09 from a chat note after reviewing docs/design/feedback/scans/.
-      Enhances L5 (copy button verified working by the user). Answers the note's open
-      question: the export extension is .yaml (drydocs.design_doc.feedback_yaml), not .md.
+      Groomed 2026-07-09 from a chat note after reviewing docs/design/feedback/scans/;
+      amended same day — the panel is a static HOW-TO instruction block, NOT a free-text
+      notes area (user call: the anchor-keyed notes already capture content; the panel's
+      job is walking the SME through create-file/copy/paste). Enhances L5 (copy button
+      verified working by the user). Answers the note's open question: the export
+      extension is .yaml (drydocs.design_doc.feedback_yaml), not .md.
 
   # ── Epic M — Provenance diet + audit envelope (doc 06) — Phase 11 ──────────
   # Groomed 2026-07-08 from the 2026-07-05 IDEAS line + the 2026-07-07 property-terms
