@@ -71,6 +71,17 @@ node_classifications:
     prov_type:  Collection
     note:       "prov:Collection of jobs. ontology_supplement.cypher."
 
+  - label:      ControlMApplication
+    class:      "dd:ControlMApplication"
+    prov_type:  Collection
+    note: >
+      Control-M APPLICATION grouping from the folder HEADER ROW in CM_DEF_VJOB
+      (JOB_ID=1) — deliberately NOT the business :Application / SEAL concept.
+      prov:Collection of ControlMFolder (see m3_contains_folder). Written in
+      the FOLDER pass. SME gate controlm-q1q3-phase1 (2026-07-07); entry added
+      2026-07-09 to close the node_classifications gap (the edge was
+      registered without its node). ontology_supplement.cypher.
+
   - label:      ControlMServer
     class:      "dd:ControlMServer"
     prov_type:  n/a

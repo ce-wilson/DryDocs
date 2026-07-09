@@ -5,7 +5,8 @@
 // by ontology.cypher. Idempotent. Apply once after bootstrap; no-op on re-run.
 //
 // Covers:
-//   Control-M structural lineage (M3): ControlMServer, ControlMFolder, ControlMJob
+//   Control-M structural lineage (M3): ControlMServer, ControlMFolder, ControlMJob,
+//                                      ControlMApplication (gate controlm-q1q3-phase1)
 //
 // Domain-specific supplements (apply separately after this file):
 //   seal_ontology_supplement.cypher    — Application, Port, Membership, Role, Employee
@@ -31,6 +32,13 @@ MERGE (n:OntologyTerm:LocalClass {iri: "https://drydocs.local/ontology#ControlMJ
       n.notes = "A scheduled job definition. Composite key (folder_id, job_id). "
               + "Acts as a prov:Activity at runtime; phase-2 attaches per-execution :JobRun history.";
 
+MERGE (n:OntologyTerm:LocalClass {iri: "https://drydocs.local/ontology#ControlMApplication"})
+  SET n.label = "Control-M Application",
+      n.notes = "Control-M APPLICATION grouping from the folder header row "
+              + "(CM_DEF_VJOB JOB_ID=1) — NOT the business :Application / SEAL "
+              + "concept. A prov:Collection of folders. "
+              + "Gate controlm-q1q3-phase1 (2026-07-07).";
+
 
 // ----- :SUBCLASS_OF wiring to PROV anchors -----------------------------------
 
@@ -41,6 +49,11 @@ MERGE (lc)-[r:SUBCLASS_OF]->(pc)
 
 MATCH (lc:OntologyTerm:LocalClass {iri: "https://drydocs.local/ontology#ControlMJob"})
 MATCH (pc:OntologyTerm:ProvClass   {iri: "http://www.w3.org/ns/prov#Activity"})
+MERGE (lc)-[r:SUBCLASS_OF]->(pc)
+  ON CREATE SET r.source = "drydocs.ontology_supplement";
+
+MATCH (lc:OntologyTerm:LocalClass {iri: "https://drydocs.local/ontology#ControlMApplication"})
+MATCH (pc:OntologyTerm:ProvClass   {iri: "http://www.w3.org/ns/prov#Collection"})
 MERGE (lc)-[r:SUBCLASS_OF]->(pc)
   ON CREATE SET r.source = "drydocs.ontology_supplement";
 

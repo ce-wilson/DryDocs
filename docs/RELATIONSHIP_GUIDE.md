@@ -35,6 +35,10 @@ New relationships should use the standard label from the matrix above.
 
 ## Node type quick reference
 
+Abridged — the full per-domain catalog (source/target types, gate-bound proposals,
+registry/docs-corpus/SOSA labels) is
+[`knowledge/ontology/NODE_QUICK_REFERENCE.md`](../knowledge/ontology/NODE_QUICK_REFERENCE.md).
+
 | Node label | PROV-O / W3C type | Supplement |
 |---|---|---|
 | `ControlMJob` | `prov:Activity` | `ontology_supplement.cypher` |
