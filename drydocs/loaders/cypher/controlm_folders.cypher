@@ -85,12 +85,23 @@ MERGE (f)-[r:SCHEDULED_ON]->(srv)
 SET r.last_seen_at = datetime($loaded_at),
     r.last_run_id  = $run_id
 
-// Provenance: this loader run touched this folder.
+// Provenance: this loader run touched this folder — delta-only (doc 06
+// Phase 2, provenance-edge diet; SME sign-off 2026-07-06). WAS_GENERATED_BY
+// fires only when the folder was just created (no prior row_checksum) or
+// the incoming checksum differs from the stored one. row_checksum is
+// always refreshed so the next run compares against this run's content.
+// Placed BEFORE the ControlMApplication block: the WHERE guard below drops
+// header-less rows from the remainder of the statement, so this section
+// (and everything above it) must already be written.
 WITH f, row
 MATCH (run:JobRun {run_id: $run_id})
-MERGE (f)-[r:WAS_GENERATED_BY {source: 'BMC'}]->(run)
-  ON CREATE SET r.first_seen_at = datetime($loaded_at)
-SET r.last_seen_at = datetime($loaded_at)
+WITH f, row, run, (f.row_checksum IS NULL OR f.row_checksum <> row.row_checksum) AS row_changed
+FOREACH (_ IN CASE WHEN row_changed THEN [1] ELSE [] END |
+    MERGE (f)-[r:WAS_GENERATED_BY {source: 'BMC'}]->(run)
+      ON CREATE SET r.first_seen_at = datetime($loaded_at)
+    SET r.last_seen_at = datetime($loaded_at)
+)
+SET f.row_checksum = row.row_checksum
 
 // Control-M application grouping (second field-derived label of this pass).
 // Placed AFTER the provenance tail: the WHERE below drops header-less rows

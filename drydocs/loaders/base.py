@@ -20,6 +20,8 @@ loader's :JobRun).
 """
 from __future__ import annotations
 
+import hashlib
+import json
 import logging
 import uuid
 from dataclasses import dataclass, field
@@ -36,6 +38,54 @@ if TYPE_CHECKING:
 LOGGER = logging.getLogger(__name__)
 
 
+# ---- row checksum (doc 06 Phase 2 — provenance-edge diet) -------------------
+#
+# Fields excluded by default because they are volatile (change every run even
+# when the underlying source record is unchanged) or are BaseLoader batch-level
+# params rather than row content:
+#   - capture_date: the ETL/replication pull timestamp, not a source-record
+#     value; would make every row look "changed" on every run.
+#   - run_id / loaded_at / loader / source_label: passed by BaseLoader._flush
+#     as separate query params, never merged into a row dict today — excluded
+#     defensively so a future refactor can't silently poison every hash.
+#   - last_seen_at / last_run_id / row_checksum: cypher-side bookkeeping
+#     properties, never legitimately part of a row's own domain content.
+DEFAULT_CHECKSUM_EXCLUDE: frozenset[str] = frozenset(
+    {
+        "capture_date",
+        "run_id",
+        "loaded_at",
+        "loader",
+        "source_label",
+        "last_seen_at",
+        "last_run_id",
+        "row_checksum",
+    }
+)
+
+
+def compute_row_checksum(
+    params: dict[str, Any],
+    *,
+    exclude: frozenset[str] | set[str] = DEFAULT_CHECKSUM_EXCLUDE,
+) -> str:
+    """Deterministic content hash of a loader row's domain fields.
+
+    Used to gate ``WAS_GENERATED_BY`` (doc 06 Phase 2): the same row hashes
+    identically on every run it is unchanged, so the Cypher template can skip
+    the provenance edge for a full-refresh no-op and write it only on create
+    or actual change.
+
+    ``params`` is whatever :meth:`BaseLoader.to_params` produced for one row
+    (i.e. what lands in ``$batch``) — dict key order is irrelevant (the
+    canonical form sorts keys); pass a wider ``exclude`` set if a loader's
+    row dict carries extra volatile fields beyond :data:`DEFAULT_CHECKSUM_EXCLUDE`.
+    """
+    filtered = {k: v for k, v in params.items() if k not in exclude}
+    canonical = json.dumps(filtered, sort_keys=True, default=str, separators=(",", ":"))
+    return hashlib.sha256(canonical.encode("utf-8")).hexdigest()
+
+
 @dataclass
 class LoadSummary:
     """Result of a single loader run."""
@@ -46,6 +96,7 @@ class LoadSummary:
     completed_at: str | None = None
     rows_processed: int = 0
     rows_rejected: int = 0
+    rows_changed: int = 0
     rejects: list[dict] = field(default_factory=list)
     status: str = "STARTED"
 
@@ -57,6 +108,7 @@ class LoadSummary:
             "completed_at": self.completed_at,
             "rows_processed": self.rows_processed,
             "rows_rejected": self.rows_rejected,
+            "rows_changed": self.rows_changed,
             "status": self.status,
         }
 
@@ -186,16 +238,28 @@ class BaseLoader:
         )
 
     def _close_run(self, *, status: str, summary: LoadSummary) -> None:
-        self.client.run(
+        # rows_changed is derived from the graph itself rather than tracked in
+        # Python: since Cypher templates now write :WAS_GENERATED_BY only on
+        # create/change (doc 06 Phase 2), every edge pointing at THIS run was,
+        # by construction, written because a row was new or actually differed
+        # — counting them gives the full-refresh "what changed" total without
+        # any per-row bookkeeping on the Python side.
+        result = self.client.run(
             """
             MATCH (run:JobRun {run_id: $run_id})
+            OPTIONAL MATCH (run)<-[gen:WAS_GENERATED_BY]-()
+            WITH run, count(gen) AS rows_changed
             SET run.status         = $status,
                 run.completed_at   = datetime(),
                 run.rows_processed = $rows_processed,
-                run.rows_rejected  = $rows_rejected
+                run.rows_rejected  = $rows_rejected,
+                run.rows_changed   = rows_changed
+            RETURN rows_changed
             """,
             run_id=self.run_id,
             status=status,
             rows_processed=summary.rows_processed,
             rows_rejected=summary.rows_rejected,
         )
+        if result:
+            summary.rows_changed = result[0].get("rows_changed", 0)

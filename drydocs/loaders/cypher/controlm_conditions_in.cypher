@@ -51,9 +51,17 @@ SET r.odate          = row.odate,
     r.last_seen_at   = datetime($loaded_at),
     r.last_run_id    = $run_id
 
-// Provenance.
-WITH c
+// Provenance — delta-only (doc 06 Phase 2, provenance-edge diet; SME
+// sign-off 2026-07-06). WAS_GENERATED_BY fires only when the condition
+// was just created (no prior row_checksum) or the incoming checksum
+// differs from the stored one. row_checksum is always refreshed so the
+// next run compares against this run's content.
+WITH c, row
 MATCH (run:JobRun {run_id: $run_id})
-MERGE (c)-[r:WAS_GENERATED_BY {source: 'BMC'}]->(run)
-  ON CREATE SET r.first_seen_at = datetime($loaded_at)
-SET r.last_seen_at = datetime($loaded_at);
+WITH c, row, run, (c.row_checksum IS NULL OR c.row_checksum <> row.row_checksum) AS row_changed
+FOREACH (_ IN CASE WHEN row_changed THEN [1] ELSE [] END |
+    MERGE (c)-[r:WAS_GENERATED_BY {source: 'BMC'}]->(run)
+      ON CREATE SET r.first_seen_at = datetime($loaded_at)
+    SET r.last_seen_at = datetime($loaded_at)
+)
+SET c.row_checksum = row.row_checksum;

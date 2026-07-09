@@ -23,7 +23,7 @@ from pydantic import BaseModel
 
 from ..controlm import parse_folder_name
 from ..models import ControlMFolderRow
-from .base import BaseLoader
+from .base import BaseLoader, compute_row_checksum
 
 
 class ControlMFoldersLoader(BaseLoader):
@@ -35,7 +35,10 @@ class ControlMFoldersLoader(BaseLoader):
     source_label: ClassVar[str] = "oracle"
 
     def to_params(self, model: BaseModel) -> dict:
-        """Add parsed-folder-name fields to the row params."""
+        """Add parsed-folder-name fields to the row params, then the delta
+        checksum (doc 06 Phase 2) computed over the FULL row including the
+        parsed fields — they are a deterministic function of sched_table so
+        including them doesn't destabilize the hash."""
         params = model.model_dump(mode="json")
         parsed = parse_folder_name(params.get("sched_table") or "")
         params["environment_code"] = parsed.environment_code
@@ -46,4 +49,5 @@ class ControlMFoldersLoader(BaseLoader):
         params["folder_type_code"] = parsed.folder_type_code
         params["folder_type"] = parsed.folder_type
         params["prefix_recognized"] = parsed.prefix_recognized
+        params["row_checksum"] = compute_row_checksum(params)
         return params

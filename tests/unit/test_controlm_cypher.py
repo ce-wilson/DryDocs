@@ -206,6 +206,76 @@ def test_conditions_share_composite_key() -> None:
         assert "name: row.condition_name" in text
 
 
+# ---- provenance-edge diet (doc 06 Phase 2, SME sign-off 2026-07-06) ------
+
+PROVENANCE_GUARDED_CYPHERS = [
+    "controlm_folders.cypher",
+    "controlm_jobs.cypher",
+    "controlm_conditions_in.cypher",
+    "controlm_conditions_out.cypher",
+]
+
+
+@pytest.mark.parametrize("name", PROVENANCE_GUARDED_CYPHERS)
+def test_was_generated_by_is_checksum_guarded(name: str) -> None:
+    """WAS_GENERATED_BY may only be written inside a FOREACH-over-CASE guard
+    keyed on a stored-vs-incoming row_checksum comparison — never
+    unconditionally, which is what made :JobRun a supernode on every full
+    refresh (persona review Issue 3)."""
+    text = (CYPHER_DIR / name).read_text(encoding="utf-8")
+    assert "row_checksum IS NULL OR" in text
+    assert "<> row.row_checksum) AS row_changed" in text
+    assert "FOREACH (_ IN CASE WHEN row_changed THEN [1] ELSE [] END |" in text
+
+    foreach_start = text.index("FOREACH (_ IN CASE WHEN row_changed")
+    close_match = re.search(r"^\)\s*$", text[foreach_start:], re.MULTILINE)
+    assert close_match, f"{name}: FOREACH block has no standalone closing paren"
+    foreach_end = foreach_start + close_match.end()
+
+    # Exactly one WAS_GENERATED_BY MERGE (comments may still name the label
+    # in prose; only count non-comment code lines), and it must live INSIDE
+    # the FOREACH body (i.e. conditionally), not before/after it.
+    code_lines = [
+        l for l in text.splitlines() if l.strip() and not l.strip().startswith("//")
+    ]
+    code = "\n".join(code_lines)
+    assert code.count("WAS_GENERATED_BY") == 1
+    assert "WAS_GENERATED_BY" in text[foreach_start:foreach_end]
+
+
+@pytest.mark.parametrize("name", PROVENANCE_GUARDED_CYPHERS)
+def test_row_checksum_is_persisted_on_the_node(name: str) -> None:
+    """Every guarded loader SETs n.row_checksum = row.row_checksum after the
+    FOREACH so the next run's comparison is against this run's content."""
+    text = (CYPHER_DIR / name).read_text(encoding="utf-8")
+    assert re.search(r"SET \w\.row_checksum = row\.row_checksum", text), (
+        f"{name}: missing row_checksum SET"
+    )
+
+
+def test_folders_application_block_survives_the_provenance_guard() -> None:
+    """The deliberate tail order in controlm_folders.cypher (provenance BEFORE
+    the WHERE-guarded ControlMApplication block, because that WHERE drops
+    header-less rows for the remainder of the statement) must be preserved:
+    the app/CONTAINS_FOLDER block still executes for rows with an
+    application value, after the checksum-guarded provenance section."""
+    text = (CYPHER_DIR / "controlm_folders.cypher").read_text(encoding="utf-8")
+    provenance_idx = text.index("AS row_changed")
+    application_idx = text.index("MERGE (app:ControlMApplication:Collection", provenance_idx)
+    where_idx = text.index("WHERE row.application IS NOT NULL", provenance_idx)
+    contains_folder_idx = text.index("CONTAINS_FOLDER", application_idx)
+    assert provenance_idx < where_idx < application_idx < contains_folder_idx
+
+
+def test_dependencies_derived_has_no_was_generated_by() -> None:
+    """controlm_dependencies_derived.cypher only MERGEs an edge between two
+    already-loaded jobs — it creates no new node, so it never had (and still
+    has no) a WAS_GENERATED_BY tail. Confirms this loader is out of scope for
+    the checksum guard."""
+    text = (CYPHER_DIR / "controlm_dependencies_derived.cypher").read_text(encoding="utf-8")
+    assert "WAS_GENERATED_BY" not in text
+
+
 def test_dependencies_materializes_derived_edge() -> None:
     text = (CYPHER_DIR / "controlm_dependencies_derived.cypher").read_text(encoding="utf-8")
     # the derived predecessor edge is :WAS_INFORMED_BY (PROV-O wasInformedBy),

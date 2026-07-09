@@ -12,8 +12,10 @@ from __future__ import annotations
 from pathlib import Path
 from typing import ClassVar
 
+from pydantic import BaseModel
+
 from ..models import ControlMConditionInRow
-from .base import BaseLoader
+from .base import BaseLoader, compute_row_checksum
 
 
 class ControlMConditionsInLoader(BaseLoader):
@@ -23,3 +25,10 @@ class ControlMConditionsInLoader(BaseLoader):
     )
     row_model: ClassVar[type] = ControlMConditionInRow
     source_label: ClassVar[str] = "oracle"
+
+    def to_params(self, model: BaseModel) -> dict:
+        """Add the delta checksum (doc 06 Phase 2) the Cypher template uses
+        to gate :WAS_GENERATED_BY on the shared :Condition node."""
+        params = model.model_dump(mode="json")
+        params["row_checksum"] = compute_row_checksum(params)
+        return params

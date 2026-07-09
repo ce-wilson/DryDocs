@@ -169,6 +169,48 @@ def test_multi_statement_loader_routes_to_run_script(smoke_cypher_files: None) -
     assert params["batch"] == [{"id": "a", "value": 1}]
 
 
+def test_close_run_records_rows_changed_from_edge_count(smoke_cypher_files: None) -> None:
+    """_close_run counts WAS_GENERATED_BY edges attached to this run's
+    :JobRun and records the total as rows_changed on both the node and the
+    LoadSummary (doc 06 Phase 2 — provenance-edge diet full-refresh
+    accounting). Since Cypher templates now write the edge only on
+    create/change, this count IS the changed-row total for the run."""
+
+    class _ChangeCountingClient(_FakeNeo4jClient):
+        def run(self, cypher: str, params: dict[str, Any] | None = None, **kwargs: Any) -> list[dict]:
+            bind = {**(params or {}), **kwargs}
+            self.run_calls.append((cypher, bind))
+            if "rows_changed" in cypher:
+                return [{"rows_changed": 1}]
+            return []
+
+    client = _ChangeCountingClient()
+    adapter = _FakeAdapter([{"id": "a", "value": 1}, {"id": "b", "value": 2}])
+
+    summary = _SingleStatementLoader(client, adapter, batch_size=10).load()
+
+    assert summary.rows_changed == 1
+    assert summary.as_dict()["rows_changed"] == 1
+    close_call = next(
+        (cypher, bind) for cypher, bind in client.run_calls if "rows_changed" in cypher
+    )
+    _, bind = close_call
+    assert bind["run_id"] == summary.run_id
+    assert "WAS_GENERATED_BY" in close_call[0]
+
+
+def test_close_run_rows_changed_defaults_to_zero_with_no_result(smoke_cypher_files: None) -> None:
+    """If the client returns no rows for the close-run query (e.g. the fake
+    client's default), rows_changed stays at its LoadSummary default rather
+    than raising."""
+    client = _FakeNeo4jClient()
+    adapter = _FakeAdapter([{"id": "a", "value": 1}])
+
+    summary = _SingleStatementLoader(client, adapter).load()
+
+    assert summary.rows_changed == 0
+
+
 def test_invalid_rows_are_rejected_not_raised(smoke_cypher_files: None) -> None:
     client = _FakeNeo4jClient()
     adapter = _FakeAdapter([

@@ -1252,10 +1252,27 @@ local_relationships:
     to_node:      JobRun
     prov_maps_to: "prov:wasGeneratedBy"
     note: >
-      Standard provenance edge written by BaseLoader._flush on every loader
-      run. Source property on the edge (e.g., 'BMC', 'SEAL', 'catalog')
-      distinguishes origin. Declared in base ontology.cypher; no supplement
-      entry needed.
+      DELTA-ONLY as of doc 06 Phase 2 (provenance-edge diet; SME sign-off
+      2026-07-06) for the Control-M loaders (controlm_folders / controlm_jobs
+      / controlm_conditions_in / controlm_conditions_out). The edge is written
+      only when a node was just created or its content actually changed since
+      the last run — NOT on every touched node of a full refresh, which used
+      to make :JobRun a supernode (persona review Issue 3). Each Cypher
+      template computes a per-row content checksum in Python
+      (BaseLoader.to_params / compute_row_checksum, excluding volatile fields
+      like capture_date) and stores it as n.row_checksum; the template
+      compares it against the stored value (FOREACH-over-CASE guard) before
+      MERGEing the edge, then always refreshes row_checksum. Pull provenance
+      ("we touched this node this run") stays a node property
+      (last_seen_at/last_run_id) — unchanged by this phase. Full-refresh
+      totals (rows_processed, rows_rejected, rows_changed) are recorded on
+      the :JobRun node itself by BaseLoader._close_run, which derives
+      rows_changed by counting the WAS_GENERATED_BY edges attached to that
+      run (only created for create/change, so the count is exact). Other
+      domains (SEAL, catalog, registry) are still blanket-written by
+      BaseLoader._flush on every touched node — doc 06 Phase 4 generalizes
+      the delta pattern to them; until then this note applies to the
+      Control-M loaders only.
     supplement:   ~
     loader:       "*"
     domain:       all

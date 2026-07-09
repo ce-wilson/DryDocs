@@ -96,9 +96,17 @@ MERGE (f)-[r:CONTAINS_JOB]->(j)
 SET r.last_seen_at = datetime($loaded_at),
     r.last_run_id  = $run_id
 
-// Provenance attribution.
-WITH j
+// Provenance attribution — delta-only (doc 06 Phase 2, provenance-edge diet;
+// SME sign-off 2026-07-06). WAS_GENERATED_BY fires only when the job was
+// just created (no prior row_checksum) or the incoming checksum differs
+// from the stored one — NOT on every full-refresh touch. row_checksum is
+// always refreshed so the next run compares against this run's content.
+WITH j, row
 MATCH (run:JobRun {run_id: $run_id})
-MERGE (j)-[r:WAS_GENERATED_BY {source: 'BMC'}]->(run)
-  ON CREATE SET r.first_seen_at = datetime($loaded_at)
-SET r.last_seen_at = datetime($loaded_at);
+WITH j, row, run, (j.row_checksum IS NULL OR j.row_checksum <> row.row_checksum) AS row_changed
+FOREACH (_ IN CASE WHEN row_changed THEN [1] ELSE [] END |
+    MERGE (j)-[r:WAS_GENERATED_BY {source: 'BMC'}]->(run)
+      ON CREATE SET r.first_seen_at = datetime($loaded_at)
+    SET r.last_seen_at = datetime($loaded_at)
+)
+SET j.row_checksum = row.row_checksum;

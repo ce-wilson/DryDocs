@@ -1,0 +1,35 @@
+# provenance-diet suite — structural invariants for the provenance-edge diet
+# (doc 06 Phase 2, SME sign-off 2026-07-06): WAS_GENERATED_BY is delta-only,
+# so full-refresh accounting must live on the :JobRun node and must never
+# imply more changed rows than were processed.
+# classification: Internal-Public (shape/consistency only — no counts/IDs).
+classification: Internal-Public
+schema: drydocs.graph-tests.v1
+suite: provenance-diet
+description: >
+  Cheap live-graph check for the provenance-edge diet: WAS_GENERATED_BY is
+  written only on create/change (never a blanket full-refresh edge), and
+  BaseLoader._close_run records that total as JobRun.rows_changed by
+  counting the edges attached to the run. These two invariants catch a
+  regression back to the pre-diet "blanket MERGE on every touched node"
+  behavior (persona review Issue 3 — full-load :JobRun supernode).
+targets: [JobRun]
+cases:
+  - id: TC-01
+    description: rows_changed never exceeds rows_processed on any completed JobRun
+    cypher: >
+      MATCH (run:JobRun)
+      WHERE run.status = 'OK' AND run.rows_changed > run.rows_processed
+      RETURN run.run_id AS bad_run
+    assert: empty
+
+  - id: TC-02
+    description: recorded rows_changed matches the actual WAS_GENERATED_BY edge count attached to the run
+    cypher: >
+      MATCH (run:JobRun)
+      WHERE run.status = 'OK'
+      OPTIONAL MATCH (run)<-[gen:WAS_GENERATED_BY]-()
+      WITH run, count(gen) AS actual
+      WHERE run.rows_changed <> actual
+      RETURN run.run_id AS mismatched_run
+    assert: empty
