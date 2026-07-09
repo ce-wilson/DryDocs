@@ -135,3 +135,24 @@ records the date, the item, confirmed / edited / rejected counts, and reasons fo
 - **Next step:** an SME must review `config/gate-prompts/seal-tom-attribution-reshape.yaml`
   (sections A–G) and record Confirm / edit / reject per item. Nothing here is confirmed until
   that review happens and this entry is updated (or a follow-up entry added) with the outcome.
+
+## 2026-07-08 — bmc-docs lexical load (bmc-docs-lexical-load)
+- **Presented:** 13 confirmations (gate page `config/gate-prompts/bmc-docs-lexical-load.yaml`;
+  sections: A source+scope, B lexical model, C trust tiers, D software-ontology hook, E sign-off)
+- **Confirmed:** 13 — SME acceptance 2026-07-08 ("I accept").
+- **Edited:** 0 · **Rejected:** 0
+- **Decisions now binding:**
+  - Node types `Document` + `Chunk` = `prov:Entity`; llm-graph-builder lexical model
+    (H2 chunking, seq-0 preamble; deterministic, no LLM/embeddings).
+  - `PART_OF` (dcterms:isPartOf pattern), `FIRST_CHUNK`/`NEXT_CHUNK` (null-term sequence,
+    out-degree <= 1) — structural, deliberately NOT prov:hadMember.
+  - `DESCRIBES` (Document -> SoftwareProduct) = dcterms:subject / foaf:primaryTopic pattern,
+    NOT wasDerivedFrom; `target_version` on the edge; vendor hop rides MADE_BY.
+  - Per-chunk trust tier VERBATIM|GROUNDED|SYNTHESIZED per the SOURCE-MANIFEST default rule
+    (tier_rule stamped); SYNTHESIZED never vendor ground truth; api-* files load unspecial-cased.
+  - Load order: software registry FIRST; DESCRIBES MATCHes the product, never MERGEs.
+  - Documents co-locate with the registry nodes (in-DB DESCRIBES); a dedicated docs DB is
+    the docmeta component's future call.
+- **Transcription:** vocabulary `docs_describes`/`docs_chunk_part_of`/`docs_first_chunk`/
+  `docs_next_chunk` planned -> active (supplement: ontology_supplement.cypher, loader:
+  bmc_docs.cypher); 4 map entries confirmed; source `bmc-docs` confirmed: true.

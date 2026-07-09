@@ -81,3 +81,12 @@ sources:
   - id: software-registry
     status: stub                             # repo-committed ledger: git history IS the audit trail
     notes: "Envelope likely unnecessary (git blame answers who/when); decide at a Phase 4 gate."
+
+  - id: bmc-docs
+    status: stub                             # docs corpus: BMC is the author; scraped_on = capture, not authorship
+    notes: >
+      Confirmed 2026-07-08 (gate bmc-docs-lexical-load). The corpus files are
+      repo-committed (git history = our copy's audit trail); per-doc scraped_on is
+      replication/capture time, never authorship — same rule as CAPTURE_DATE. A real
+      envelope (BMC page authorship) is not exposed by the source; decide whether the
+      stub is permanent at a doc-06 Phase 4 gate.

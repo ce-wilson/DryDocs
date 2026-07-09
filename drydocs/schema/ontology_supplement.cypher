@@ -77,6 +77,48 @@ MATCH (local:OntologyTerm:LocalRelationship {iri: "https://drydocs.local/ontolog
 MATCH (prov:OntologyTerm:ProvProperty       {iri: "http://www.w3.org/ns/prov#hadMember"})
 MERGE (local)-[:MAPS_TO]->(prov);
 
+// --- Docs corpus lexical graph (gate bmc-docs-lexical-load, 2026-07-08) -----
+
+// Document + Chunk local class anchors (both prov:Entity).
+MERGE (n:OntologyTerm:LocalClass {iri: "https://drydocs.local/ontology#Document"})
+  SET n.label = "Document",
+      n.notes = "Converted external/internal document (first corpus: bmc-docs). "
+              + "prov:Entity; NOT a source-of-record — SOURCE-MANIFEST provenance model governs.";
+MERGE (n:OntologyTerm:LocalClass {iri: "https://drydocs.local/ontology#Chunk"})
+  SET n.label = "Chunk",
+      n.notes = "H2-section slice of a Document (deterministic chunking, no LLM). prov:Entity; "
+              + "carries provenance tier VERBATIM|GROUNDED|SYNTHESIZED — SYNTHESIZED is never vendor ground truth.";
+
+// DESCRIBES  —  Document → SoftwareProduct  (dcterms:subject / foaf:primaryTopic pattern)
+MERGE (n:OntologyTerm:LocalRelationship {iri: "https://drydocs.local/ontology#describes"})
+  SET n.label  = "DESCRIBES",
+      n.domain = "Document",
+      n.range  = "SoftwareProduct",
+      n.notes  = "Document is ABOUT a SoftwareProduct — dcterms:subject / foaf:primaryTopic "
+               + "pattern; no PROV row (aboutness, deliberately NOT wasDerivedFrom). "
+               + "Edge carries target_version. Gate bmc-docs-lexical-load (2026-07-08).";
+
+// PART_OF  —  Chunk → Document  (dcterms:isPartOf pattern; lexical containment)
+MERGE (n:OntologyTerm:LocalRelationship {iri: "https://drydocs.local/ontology#partOf"})
+  SET n.label  = "PART_OF",
+      n.domain = "Chunk",
+      n.range  = "Document",
+      n.notes  = "Lexical-graph containment (llm-graph-builder pattern) — dcterms:isPartOf "
+               + "pattern; kept off prov:hadMember to stay distinct from domain Collections.";
+
+// FIRST_CHUNK / NEXT_CHUNK  —  sequence edges (no standard term; SCHEDULED_ON precedent)
+MERGE (n:OntologyTerm:LocalRelationship {iri: "https://drydocs.local/ontology#firstChunk"})
+  SET n.label  = "FIRST_CHUNK",
+      n.domain = "Document",
+      n.range  = "Chunk",
+      n.notes  = "Chunk-chain entry point. Local structural sequence edge; no standard term.";
+MERGE (n:OntologyTerm:LocalRelationship {iri: "https://drydocs.local/ontology#nextChunk"})
+  SET n.label  = "NEXT_CHUNK",
+      n.domain = "Chunk",
+      n.range  = "Chunk",
+      n.notes  = "Reading order within one Document; singly-linked (out-degree <= 1). "
+               + "Local structural sequence edge; no standard term.";
+
 // CONTAINS_FOLDER  —  ControlMApplication → ControlMFolder  (prov:hadMember)
 MERGE (n:OntologyTerm:LocalRelationship {iri: "https://drydocs.local/ontology#containsFolder"})
   SET n.label  = "CONTAINS_FOLDER",

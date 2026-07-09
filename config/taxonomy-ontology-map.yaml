@@ -573,8 +573,10 @@ mappings:
       prov_maps_to: ~
       edge_properties: { target_version: "9.0.21.300 (corpus version notice)" }
     precedence_authority: bmc-baseline
-    reuses_vocab: docs_describes (planned)
-    status: proposed
+    reuses_vocab: docs_describes (active)
+    status: confirmed                            # APPLIED by load-bmc-docs
+    confirmed_by: SME
+    confirmed_on: 2026-07-08
 
   - id: doc-chunk-part-of
     taxonomy: { source: bmc-docs, element: "A section chunk belongs to its document (H2 chunking)" }
@@ -585,8 +587,10 @@ mappings:
       neo4j_label: PART_OF
       prov_maps_to: ~
     precedence_authority: bmc-baseline
-    reuses_vocab: docs_chunk_part_of (planned)
-    status: proposed
+    reuses_vocab: docs_chunk_part_of (active)
+    status: confirmed                            # APPLIED by load-bmc-docs
+    confirmed_by: SME
+    confirmed_on: 2026-07-08
 
   - id: doc-first-chunk
     taxonomy: { source: bmc-docs, element: "Document's chunk chain entry point" }
@@ -597,8 +601,10 @@ mappings:
       neo4j_label: FIRST_CHUNK
       prov_maps_to: ~
     precedence_authority: bmc-baseline
-    reuses_vocab: docs_first_chunk (planned)
-    status: proposed
+    reuses_vocab: docs_first_chunk (active)
+    status: confirmed                            # APPLIED by load-bmc-docs
+    confirmed_by: SME
+    confirmed_on: 2026-07-08
 
   - id: doc-next-chunk
     taxonomy: { source: bmc-docs, element: "Reading order between adjacent chunks of one document" }
@@ -609,12 +615,14 @@ mappings:
       neo4j_label: NEXT_CHUNK
       prov_maps_to: ~
     precedence_authority: bmc-baseline
-    reuses_vocab: docs_next_chunk (planned)
-    status: proposed
+    reuses_vocab: docs_next_chunk (active)
+    status: confirmed                            # APPLIED by load-bmc-docs
+    confirmed_by: SME
+    confirmed_on: 2026-07-08
 
 # Counts the gate reports to the SME each run.
 summary:
   applied: 1          # job-contains
-  confirmed: 14       # C1 (4) + C2 (4) + C3 (6: 4 hierarchy + SUPPORTS→AreaProduct + DEVELOPS→app)
-  proposed: 10        # job-seal-app-ref, oracle-schema-asset, jobrun-observation, application-as-dataproduct, seal-tom-attribution, seal-doc-source-of-record, doc-describes-product, doc-chunk-part-of, doc-first-chunk, doc-next-chunk
+  confirmed: 18       # C1 (4) + C2 (4) + C3 (6) + bmc-docs lexical (4: doc-describes-product, doc-chunk-part-of, doc-first-chunk, doc-next-chunk — gate 2026-07-08)
+  proposed: 6         # job-seal-app-ref, oracle-schema-asset, jobrun-observation, application-as-dataproduct, seal-tom-attribution, seal-doc-source-of-record
   rejected: 0

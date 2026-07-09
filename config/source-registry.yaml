@@ -102,7 +102,7 @@ sources:
     orchestrator: ~
     adapter: markdown                    # BmcDocsAdapter (H2 chunking, manifest tier rule)
     feeds_taxonomy: [documents, chunks]
-    confirmed: false                     # flips when gate bmc-docs-lexical-load is SME-accepted
+    confirmed: true                      # gate bmc-docs-lexical-load SME-accepted 2026-07-08 (config/gate-log.md)
     gate_spec: config/gate-prompts/bmc-docs-lexical-load.yaml
     notes: >
       The converted BMC docs corpus loaded as the llm-graph-builder LEXICAL graph

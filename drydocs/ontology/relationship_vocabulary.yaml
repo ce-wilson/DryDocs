@@ -1283,10 +1283,10 @@ local_relationships:
       Entity aboutness is not derivation; deliberately NOT wasDerivedFrom).
       Edge carries target_version (the corpus documents SaaS pages applied to
       9.0.21.300). Vendor hop rides the existing MADE_BY (product → brand).
-    supplement:   ~
-    loader:       ~
+    supplement:   ontology_supplement.cypher
+    loader:       bmc_docs.cypher
     domain:       docs
-    status:       planned
+    status:       active    # gate bmc-docs-lexical-load accepted 2026-07-08 (config/gate-log.md)
 
   - id:           docs_chunk_part_of
     neo4j_label:  PART_OF
@@ -1299,10 +1299,10 @@ local_relationships:
       its Document. dcterms:isPartOf pattern; equivalently the inverse of
       prov:hadMember (Collection reading) — recorded as structural, not PROV,
       to keep the lexical graph distinct from the domain Collections.
-    supplement:   ~
-    loader:       ~
+    supplement:   ontology_supplement.cypher
+    loader:       bmc_docs.cypher
     domain:       docs
-    status:       planned
+    status:       active    # gate bmc-docs-lexical-load accepted 2026-07-08 (config/gate-log.md)
 
   - id:           docs_first_chunk
     neo4j_label:  FIRST_CHUNK
@@ -1314,10 +1314,10 @@ local_relationships:
       Lexical-graph sequence anchor (llm-graph-builder pattern): entry point
       to the chunk chain. Local structural edge; no standard term (sequence —
       same null-mapping precedent as SCHEDULED_ON).
-    supplement:   ~
-    loader:       ~
+    supplement:   ontology_supplement.cypher
+    loader:       bmc_docs.cypher
     domain:       docs
-    status:       planned
+    status:       active    # gate bmc-docs-lexical-load accepted 2026-07-08 (config/gate-log.md)
 
   - id:           docs_next_chunk
     neo4j_label:  NEXT_CHUNK
@@ -1330,10 +1330,10 @@ local_relationships:
       chunk chain within one Document (out-degree <= 1, enforced by
       graph-tests/bmc-docs-lexical.yaml). Local structural edge; no standard
       term.
-    supplement:   ~
-    loader:       ~
+    supplement:   ontology_supplement.cypher
+    loader:       bmc_docs.cypher
     domain:       docs
-    status:       planned
+    status:       active    # gate bmc-docs-lexical-load accepted 2026-07-08 (config/gate-log.md)
 
   # ── Cross-domain provenance ───────────────────────────────────────────────
 
