@@ -373,8 +373,13 @@ items:
       config/taxonomy-ontology-map.yaml (summary proposed 6→7) carrying the 3 gate open-questions
       (domain node :Application-vs-:BatchProcessing per README.md:263 vs LoadPlanV3; SchedulerKind
       node_classifications gap; null-PROV confirmation). No graph write until the HITL gate. Drift
-      guards green (test_schema.py skips planned entries; prov_matrix unaffected). SchedulerKind
-      node-classification gap captured in IDEAS for a follow-up/gate decision.
+      guards green (test_schema.py skips planned entries; prov_matrix unaffected).
+      2026-07-09 user clarifications (same day, both captured as gate open-questions + IDEAS,
+      nothing wired): (a) SEAL two-port model is (:Application)-[:HAS_PORT]->(:Port {kind}) —
+      EventProcessing (events/API) + BatchProcessing (batch); REQUIRES_SCHEDULER is batch-only, so
+      from_node refined BatchProcessing→Port (the batch :Port). (b) :SchedulerKind slated for
+      deprecation → :AisCapability + :AiTool (not yet defined), so the to_node target is provisional
+      and re-targets at the gate — SchedulerKind-deprecation captured as its own IDEAS item.
 
   # ── Epic D — Config-driven loaders (pipeline-config + main) — Phase 3 ──────
   - id: D1

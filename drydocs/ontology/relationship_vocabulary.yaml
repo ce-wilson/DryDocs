@@ -836,27 +836,37 @@ local_relationships:
   - id:           seal_requires_scheduler
     neo4j_label:  REQUIRES_SCHEDULER
     role:         ~
-    from_node:    BatchProcessing
-    to_node:      SchedulerKind
+    from_node:    Port                       # the BATCH port specifically — :Port:BatchProcessing {kind: "BatchProcessing"}; NOT the EventProcessing/API port
+    to_node:      SchedulerKind              # PROVISIONAL — slated for deprecation → :AisCapability + :AiTool (user 2026-07-09; not yet defined). See OQ (2).
     prov_maps_to: ~
     note: >
       GATE-BOUND, status: planned — NOT wired (loader: ~). Registered per backlog C6
       (2026-07-09) to close the drift where REQUIRES_SCHEDULER appears in README.md:263 and
-      docs/history/LoadPlanV3.md:82,393 but was absent from this registry. Semantics: a
-      BatchProcessing data port (the SEAL two-port model; a :Port with kind=BatchProcessing)
-      requires a scheduler technology — SchedulerKind {name: ControlM|Autosys|Airflow}, already
-      seeded in ontology.cypher. prov_maps_to is NULL: infrastructure/capability placement
-      (which orchestrator runs the batch port), the SAME FAMILY as SCHEDULED_ON
-      (m3_scheduled_on) — not a provenance/derivation edge; SchedulerKind is a local platform
-      classifier, not a prov Agent/Entity.
+      docs/history/LoadPlanV3.md:82,393 but was absent from this registry. Semantics: the SEAL
+      two-port model is (:Application)-[:HAS_PORT]->(:Port {kind}) with EXACTLY TWO ports per app
+      — EventProcessing (events/API) and BatchProcessing (batch); the loader creates multi-label
+      :Port:EventProcessing / :Port:BatchProcessing nodes (seal_applications.cypher:96-105;
+      config/taxonomy/business-application.yaml). REQUIRES_SCHEDULER attaches to the BATCH port
+      ONLY — batch is what an orchestrator schedules; the EventProcessing/API port is not
+      scheduler-driven — pointing at a scheduler technology, SchedulerKind {name: ControlM|
+      Autosys|Airflow} seeded in ontology.cypher. from_node is the canonical :Port class
+      (kind-discriminated, matching seal_has_port); the batch-only constraint is the kind filter.
+      prov_maps_to is NULL: infrastructure/capability placement (which orchestrator runs the
+      batch port), the SAME FAMILY as SCHEDULED_ON (m3_scheduled_on) — not a provenance/
+      derivation edge; SchedulerKind is a local platform classifier, not a prov Agent/Entity.
       HITL-GATE OPEN QUESTIONS (edge meaning ⇒ the gate; do not auto-decide — route via
       ontology-mapper + docs/restructure/03-hitl-sme-flow.md; mirrored in the map entry
       requires-scheduler):
-        (1) DOMAIN NODE — README.md:263 phrases the edge on :Application ("post-load step"),
-            while LoadPlanV3.md:82 + the C6 spec use the :BatchProcessing port. The SME picks
-            the true subject (Application vs its BatchProcessing port).
-        (2) NODE CLASS — :SchedulerKind has no node_classifications entry yet (pre-existing
-            gap); classify it (local-platform / no-PROV, like ControlMServer) at the same gate.
+        (1) ATTACH POINT — ports are application-level ((:Application)-[:HAS_PORT]->(:Port)),
+            so README.md:263 ("on :Application") and LoadPlanV3.md:82 ("the :BatchProcessing
+            port") describe the SAME app batch port. The remaining SME call is only whether the
+            edge sits on the batch :Port (kind=BatchProcessing, as registered here) or is hoisted
+            to :Application with the kind as an edge/context property.
+        (2) TARGET NODE — :SchedulerKind is SLATED FOR DEPRECATION in favor of :AisCapability +
+            :AiTool (user 2026-07-09; those classes are not yet defined in the ontology), so this
+            to_node is PROVISIONAL — re-target / reshape REQUIRES_SCHEDULER onto the replacement
+            class(es) at the gate once they are defined (one edge or two is itself an SME call).
+            (SchedulerKind also lacks a node_classifications entry today — moot if it is deprecated.)
         (3) Confirm null-PROV/infra is correct vs a weak prov:used / prov:wasInfluencedBy.
       No supplement block and no loader land until the gate confirms — planned entries are
       inert and test_schema.py skips them.

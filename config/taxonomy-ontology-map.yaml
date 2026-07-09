@@ -182,10 +182,10 @@ mappings:
       source: seal-extract
       element: "A BatchProcessing data port requires a scheduler technology (which orchestrator runs its batch)"
     ontology:
-      from_node: BatchProcessing            # a :Port (kind=BatchProcessing); README.md:263 phrases it on :Application — see open_questions
-      to_node: SchedulerKind                # local platform classifier {name: ControlM|Autosys|Airflow}, seeded ontology.cypher
+      from_node: Port                       # the BATCH port: :Port:BatchProcessing {kind:"BatchProcessing"}; app-level (:Application)-[:HAS_PORT]->(:Port), two per app (EventProcessing/API + BatchProcessing)
+      to_node: SchedulerKind                # PROVISIONAL — slated for deprecation → :AisCapability + :AiTool (user 2026-07-09; not yet defined). Today: {name: ControlM|Autosys|Airflow}, seeded ontology.cypher
       prov_type_from: Entity                # dprod port (Entity semantics)
-      prov_type_to: ~                        # SchedulerKind has no node_classifications entry yet
+      prov_type_to: ~                        # target class unsettled (SchedulerKind deprecating; replacements undefined)
       matrix_row: "n/a — infrastructure/capability placement, no PROV row (same family as SCHEDULED_ON)"
       neo4j_label: REQUIRES_SCHEDULER
       role: ~
@@ -196,8 +196,8 @@ mappings:
     status: proposed                         # <-- SME must confirm at the gate (backlog C6)
     provenance_note: "Registered per backlog C6 (2026-07-09) to close the README/LoadPlanV3-vs-vocab drift. Edge meaning ⇒ HITL gate; not auto-decided."
     open_questions:
-      - "Domain node: README.md:263 puts the edge on :Application ('post-load step'); LoadPlanV3.md:82 + the C6 spec use the :BatchProcessing port. Which is the true subject?"
-      - ":SchedulerKind has no node_classifications entry yet (pre-existing gap) — classify it (local-platform / no-PROV, like ControlMServer) as part of confirming this edge."
+      - "Attach point: ports are application-level ((:Application)-[:HAS_PORT]->(:Port), kind∈{EventProcessing=events/API, BatchProcessing=batch}), so README.md:263 ('on :Application') and LoadPlanV3.md:82 ('the :BatchProcessing port') describe the SAME app batch port. SME call = keep the edge on the batch :Port (as here) or hoist to :Application. REQUIRES_SCHEDULER is batch-only (the EventProcessing/API port is not scheduler-driven)."
+      - "TARGET (to_node): :SchedulerKind is slated for deprecation → :AisCapability + :AiTool (user 2026-07-09; not yet defined in the ontology). The target here is PROVISIONAL — re-target/reshape onto the replacement class(es) at the gate once defined; whether REQUIRES_SCHEDULER becomes one edge or two is itself an SME call. See the IDEAS SchedulerKind-deprecation capture."
       - "Confirm null-PROV/infrastructure is correct, vs a weak prov:used / prov:wasInfluencedBy."
 
   # ---- SEAL ontology reshape — GATE-BOUND (2026-07-08 review) --------------
