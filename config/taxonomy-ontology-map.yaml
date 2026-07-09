@@ -685,9 +685,37 @@ mappings:
     confirmed_on: 2026-07-09
     gate_spec: config/gate-prompts/controlm-hosts-topology.yaml
 
+  # ---- CM_AVG_RUN runtime-stats supplement (PROPOSED 2026-07-09 — gate controlm-avg-run-supplement) ----
+  # NOT an edge mapping: a PROPERTY SUPPLEMENT onto existing :ControlMJob nodes
+  # (opt-in supplement pattern — software registry / SOSA precedent), per the
+  # SME direction of 2026-07-07. No relationship_vocabulary.yaml terms are
+  # created; the loader MATCHes job nodes, never MERGEs them.
+
+  - id: job-runtime-stats-supplement
+    taxonomy:
+      source: controlm-psgmgr
+      element: "CM_AVG_RUN row supplies avg/median start+run timing for a job (join SCHED_TABLE + JOB_MEM_NAME = JOB_NAME)"
+    ontology:
+      from_node: ControlMJob                    # prov:Activity — properties land here
+      to_node: ~                                # no target node — property supplement, not an edge
+      prov_type_from: Activity
+      prov_type_to: "n/a (no edge)"
+      matrix_row: "no matrix row — node-property supplement (opt-in supplement pattern)"
+      neo4j_label: ~
+      property_targets:
+        - "ControlMJob.avg_start_time (normalized from the >24h clock; + start_next_day flag)"
+        - "ControlMJob.avg_run_time / min_run_time / max_run_time / run_time_std_dev (seconds)"
+        - "ControlMJob.dow_median_start_time / dow_median_run_time (derived in Python from SAMPLES_*)"
+        - "ControlMFolder.window_start / window_end (derived folder rollup — min job start .. max job end; the maintenance-window primitive)"
+      prov_maps_to: ~
+    precedence_authority: bmc-baseline
+    reuses_vocab: ~                             # deliberately none — no edge terms
+    status: proposed
+    gate_spec: config/gate-prompts/controlm-avg-run-supplement.yaml
+
 # Counts the gate reports to the SME each run.
 summary:
   applied: 1          # job-contains
   confirmed: 21       # C1 (4) + C2 (4) + C3 (6) + bmc-docs lexical (4 — gate 2026-07-08) + CM_HOSTS topology (3: job-runs-on-host-group, host-group-contains-host, host-group-defined-on — gate 2026-07-09)
-  proposed: 6         # job-seal-app-ref, oracle-schema-asset, jobrun-observation, application-as-dataproduct, seal-tom-attribution, seal-doc-source-of-record
+  proposed: 7         # job-seal-app-ref, oracle-schema-asset, jobrun-observation, application-as-dataproduct, seal-tom-attribution, seal-doc-source-of-record, job-runtime-stats-supplement (2026-07-09)
   rejected: 0

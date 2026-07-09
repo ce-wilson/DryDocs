@@ -34,7 +34,7 @@ sources:
       service: ~                        # DB service/TNS — connection env (internal-local/), never committed
       schema: psgmgr                    # established public vocabulary
       mapping: config/source-mappings/controlm-psgmgr.yaml   # object/column ledger
-    feeds_taxonomy: [folders, jobs, conditions, dependencies, variables, hosts]
+    feeds_taxonomy: [folders, jobs, conditions, dependencies, variables, hosts, runtime_stats]
     confirmed: true
     notes: >
       Live. The canonical structural-lineage feed. See README §Control-M
@@ -42,6 +42,9 @@ sources:
       add-source-object walkthrough; gate controlm-hosts-topology SME-confirmed
       same day (config/gate-log.md) — staging-only until the hosts loader +
       RUNS_ON resolution pass ship (P3/P4 residual verifications first).
+      CM_AVG_RUN (runtime stats) added 2026-07-09 same walkthrough — gate
+      controlm-avg-run-supplement AWAITING SME; property supplement onto
+      :ControlMJob, no new vocabulary.
 
   - id: autosys-export
     classification: Internal

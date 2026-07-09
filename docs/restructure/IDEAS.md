@@ -184,3 +184,12 @@ Tags help grooming: `idea` · `bug` · `doc` · `source` (new data source) · `q
   query; depends on the temporal runtime supplement (cm_avg_run) which should be promoted
   from PLANNED. Also new: `locator:` block on source-registry entries (SEAL app → platform →
   service → schema → mapping); real SEAL/service values = internal/ twin.
+- 2026-07-09 — **CM_AVG_RUN runtime-stats supplement** prepped to the gate via
+  `add-source-object` (second run of the walkthrough, same day as CM_HOSTS). Artifacts:
+  `sql/controlm_avg_run.sql` + `sql/adhoc/profile_cm_avg_run.sql`, ledger object CM_AVG_RUN
+  (14 cols, staging-only), map `job-runtime-stats-supplement` (proposed; property supplement —
+  NO new vocab), gate `config/gate-prompts/controlm-avg-run-supplement.yaml` (AWAITING SME).
+  This IS the temporal-runtime-supplement phase-1 promotion (timing half of the
+  maintenance-window use case; hosts topology gate signed off same day). Groom: gate session;
+  supplement loader build (blocked on gate + probes P0/P2/P7); NODE_GROUP↔RUNS_ON
+  cross-validation report as a remediation feeder.
