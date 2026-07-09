@@ -124,6 +124,11 @@ Tags help grooming: `idea` · `bug` · `doc` · `source` (new data source) · `q
 
 <!-- when you promote an idea, move its line here with the resulting backlog id -->
 
+- 2026-07-09 — [idea] design-doc feedback widget: appendix "SME - Feedback" panel (divider,
+  Notes/SME Instructions or Expectations field, Copy To path + file name) → **L10**. (chat
+  note after reviewing docs/design/feedback/scans/; answered the open question — the export
+  is .yaml per feedback_yaml, not markdown)
+
 - 2026-07-08 groom run (this session) — **new phase 11 "Source governance ledgers"** + 9 items:
   - [question] SEAL ontology reshape + scraped-docs source-of-record → **K3** (gate session;
     K2 gains `depends_on: K3` — the wasAssociatedWith/Entity type conflict means the reshape

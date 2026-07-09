@@ -36,7 +36,7 @@
 # =============================================================================
 
 schema: drydocs.backlog.v2
-updated: 2026-07-08
+updated: 2026-07-09
 
 # ── The high-level project plan (rendered as the board's roadmap strip) ───────
 plan:
@@ -1327,6 +1327,33 @@ items:
       headless --print-to-pdf on this box, confirmed 2x 180s timeouts). Renderer tests green.
     notes: "Groomed 2026-07-08 from IDEAS (seen same day; Brave = reference viewer for now)."
 
+  - id: L10
+    epic: doc-infrastructure
+    title: "Design-doc feedback widget: appendix 'SME - Feedback' panel with notes field + paste destination"
+    type: task
+    module: drydocs-docgen
+    phase: 10
+    agent: main
+    model: sonnet
+    priority: p3
+    status: todo
+    depends_on: [L5]
+    inputs: [drydocs/design_doc.py, docs/design/feedback/README.md, tests/unit/test_design_doc.py]
+    acceptance: >
+      the screen .html gains an "SME - Feedback" section below the appendix / last outline
+      section, separated by a divider line, containing (1) a free-text "Notes/SME
+      Instructions or Expectations" area persisted in localStorage (same mechanism as the
+      per-section notes) and included in the Copy-feedback export — if that requires a
+      doc-level field beside the anchor-keyed notes, the feedback_yaml format and
+      docs/design/feedback/README.md are extended together; and (2) the paste destination
+      displayed to the SME: Copy To docs/design/feedback/, File Name
+      <doc-stem>-rev<N>.yaml (YAML — not markdown); print output unchanged; render stays
+      deterministic; test_design_doc.py extended; full suite green.
+    notes: >
+      Groomed 2026-07-09 from a chat note after reviewing docs/design/feedback/scans/.
+      Enhances L5 (copy button verified working by the user). Answers the note's open
+      question: the export extension is .yaml (drydocs.design_doc.feedback_yaml), not .md.
+
   # ── Epic M — Provenance diet + audit envelope (doc 06) — Phase 11 ──────────
   # Groomed 2026-07-08 from the 2026-07-05 IDEAS line + the 2026-07-07 property-terms
   # line. Doc 06 Phases 0-1 (Control-M envelope: audit-fields.yaml + jobs/folders
@@ -1477,8 +1504,8 @@ items:
 # Roll-up the dispatcher can glance at. COMPUTED views — test_backlog.py enforces
 # that these match the items exactly; update them with any status change.
 summary:
-  todo: 13                                          # C5, E2, G3-G4, G9, K3, L7-L9, M2-M4, N2
+  todo: 14                                          # C5, E2, G3-G4, G9, K3, L7-L10, M2-M4, N2
   in_progress: 5                                    # E1, F1, F2, K2 (awaiting HITL), G2 (core shim)
   blocked: 0
   done: 39                                          # A1-A3, B1-B4, C1-C4, D1-D3, G1, G5-G7, G8, H1-H7, I1-I4, J1, K1, L1, L3-L6, M1, N1
-  next_ready: [C5, K3, L7, L8, L9, M2, M3, M4, N2]  # L6/M1/N1 done 2026-07-08 → L8 (runbook capstone), M2, N2 unblocked
+  next_ready: [C5, K3, L7, L8, L9, L10, M2, M3, M4, N2]  # L10 groomed 2026-07-09 (depends L5, done) → ready
