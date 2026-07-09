@@ -26,6 +26,12 @@ Tags help grooming: `idea` · `bug` · `doc` · `source` (new data source) · `q
 
 <!-- add new ideas at the top -->
 
+- 2026-07-09 — [idea] `:SchedulerKind` has no `node_classifications` entry in
+  `relationship_vocabulary.yaml` (surfaced while doing C6). It is a local platform/technology
+  classifier (ControlM/Autosys/Airflow), no W3C/PROV equivalent — same family as ControlMServer.
+  Classify it at the `REQUIRES_SCHEDULER` gate (see the `requires-scheduler` map entry), or as a
+  standalone node-classification follow-up if that gate stalls.
+
 - 2026-07-08 — [doc] **BRD outline (Epic L, deferred)** — the third canonical doc type after
   TDD (L1) and Runbook (L8). Parked, not promoted: the BRD is a work-in-progress upstream and
   the user flagged it as "definitely a later phase", so there is no stable outline to write an

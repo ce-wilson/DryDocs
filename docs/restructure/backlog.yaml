@@ -354,7 +354,7 @@ items:
     agent: ontology-mapper
     model: sonnet
     priority: p3
-    status: todo
+    status: done
     depends_on: []
     inputs: [drydocs/ontology/relationship_vocabulary.yaml, docs/RELATIONSHIP_GUIDE.md, docs/restructure/03-hitl-sme-flow.md]
     acceptance: >
@@ -367,6 +367,14 @@ items:
       Groomed 2026-07-09 from the IDEAS line (2026-07-01 Control-M naming review). Verified
       2026-07-09 still absent from relationship_vocabulary.yaml. Ontology/edge-meaning decision
       ⇒ the gate, never auto-decided; re-opens phase 2 alongside C5.
+      DONE 2026-07-09: registered seal_requires_scheduler (BatchProcessing → SchedulerKind,
+      status: planned, prov_maps_to: ~ null-PROV/infra — same family as SCHEDULED_ON, loader
+      NOT wired) in relationship_vocabulary.yaml, plus a proposed `requires-scheduler` entry in
+      config/taxonomy-ontology-map.yaml (summary proposed 6→7) carrying the 3 gate open-questions
+      (domain node :Application-vs-:BatchProcessing per README.md:263 vs LoadPlanV3; SchedulerKind
+      node_classifications gap; null-PROV confirmation). No graph write until the HITL gate. Drift
+      guards green (test_schema.py skips planned entries; prov_matrix unaffected). SchedulerKind
+      node-classification gap captured in IDEAS for a follow-up/gate decision.
 
   # ── Epic D — Config-driven loaders (pipeline-config + main) — Phase 3 ──────
   - id: D1
@@ -1657,8 +1665,8 @@ items:
 # Roll-up the dispatcher can glance at. COMPUTED views — test_backlog.py enforces
 # that these match the items exactly; update them with any status change.
 summary:
-  todo: 18                                          # C5, C6, E2, G3-G4, G9, J2, J4-J6, K3, L7-L9, M2-M4, N2
+  todo: 17                                          # C5, E2, G3-G4, G9, J2, J4-J6, K3, L7-L9, M2-M4, N2
   in_progress: 6                                    # E1, F1, F2, K2 (awaiting HITL), G2 (core shim), O1 (web design pass)
   blocked: 0
-  done: 40                                          # A1-A3, B1-B4, C1-C4, D1-D3, G1, G5-G7, G8, H1-H7, I1-I4, J1, J3, K1, L1, L3-L6, M1, N1
-  next_ready: [C5, C6, J2, J4, J5, J6, K3, L7, L8, L9, M2, M3, M4, N2]  # +J4/J5/J6 groomed 2026-07-09 (run-drydocs refresh, CI, streamlit-dep drop)
+  done: 41                                          # A1-A3, B1-B4, C1-C4, C6, D1-D3, G1, G5-G7, G8, H1-H7, I1-I4, J1, J3, K1, L1, L3-L6, M1, N1
+  next_ready: [C5, J2, J4, J5, J6, K3, L7, L8, L9, M2, M3, M4, N2]  # C6 done 2026-07-09 (REQUIRES_SCHEDULER registered planned + gate-routed)

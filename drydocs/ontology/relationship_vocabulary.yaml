@@ -833,6 +833,38 @@ local_relationships:
     domain:       seal
     status:       active
 
+  - id:           seal_requires_scheduler
+    neo4j_label:  REQUIRES_SCHEDULER
+    role:         ~
+    from_node:    BatchProcessing
+    to_node:      SchedulerKind
+    prov_maps_to: ~
+    note: >
+      GATE-BOUND, status: planned — NOT wired (loader: ~). Registered per backlog C6
+      (2026-07-09) to close the drift where REQUIRES_SCHEDULER appears in README.md:263 and
+      docs/history/LoadPlanV3.md:82,393 but was absent from this registry. Semantics: a
+      BatchProcessing data port (the SEAL two-port model; a :Port with kind=BatchProcessing)
+      requires a scheduler technology — SchedulerKind {name: ControlM|Autosys|Airflow}, already
+      seeded in ontology.cypher. prov_maps_to is NULL: infrastructure/capability placement
+      (which orchestrator runs the batch port), the SAME FAMILY as SCHEDULED_ON
+      (m3_scheduled_on) — not a provenance/derivation edge; SchedulerKind is a local platform
+      classifier, not a prov Agent/Entity.
+      HITL-GATE OPEN QUESTIONS (edge meaning ⇒ the gate; do not auto-decide — route via
+      ontology-mapper + docs/restructure/03-hitl-sme-flow.md; mirrored in the map entry
+      requires-scheduler):
+        (1) DOMAIN NODE — README.md:263 phrases the edge on :Application ("post-load step"),
+            while LoadPlanV3.md:82 + the C6 spec use the :BatchProcessing port. The SME picks
+            the true subject (Application vs its BatchProcessing port).
+        (2) NODE CLASS — :SchedulerKind has no node_classifications entry yet (pre-existing
+            gap); classify it (local-platform / no-PROV, like ControlMServer) at the same gate.
+        (3) Confirm null-PROV/infra is correct vs a weak prov:used / prov:wasInfluencedBy.
+      No supplement block and no loader land until the gate confirms — planned entries are
+      inert and test_schema.py skips them.
+    supplement:   seal_ontology_supplement.cypher
+    loader:       ~
+    domain:       seal
+    status:       planned
+
   - id:           seal_has_membership
     neo4j_label:  HAS_MEMBERSHIP
     role:         ~
