@@ -72,7 +72,7 @@ series — see `docs/restructure/00-conceptual-model.md`.)
 | Layer | Answers | Where it lives | Owner agent |
 |-------|---------|----------------|-------------|
 | **1. Taxonomy** | "What *category* is this?" | `config/taxonomy/`, imported hierarchies (apps, products, Oracle schemas, scripts, Control-M variables, LOB→Product→Team) | `taxonomy-importer` |
-| **2. Ontology** | "What do the connections *mean*?" | `drydocs/schema/*.cypher`, `drydocs/ontology/`, `knowledge/ontology/` | `ontology-mapper` |
+| **2. Ontology** | "What do the connections *mean*?" | `drydocs_core/schema/*.cypher`, `drydocs_core/ontology/`, `knowledge/ontology/` | `ontology-mapper` |
 | **3. Knowledge graph** | "What is connected *and* what does it mean?" | the populated Neo4j graph | (loaders) |
 | **4. Context graph** | "What matters *right now* for this task?" | task-scoped projections: temporal state, ownership, permissions, current health | (future) |
 

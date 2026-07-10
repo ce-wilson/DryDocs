@@ -95,7 +95,7 @@ Record findings as conclusions in the feature plan — **never commit real rows*
 
 Connection is Kerberos external-auth (Thick mode) via `libs/oracle_kerberos/`
 (`connect()` / `OracleAdapter(query, bind_params)`). No adapter changes needed for
-new extracts. Do **not** touch `drydocs/adapters/oracle_adapter.py` (port-frozen).
+new extracts. Do **not** touch `drydocs_core/adapters/oracle_adapter.py` (port-frozen).
 For `CM_HIST_VW` and any runtime view, set a bounded `call_timeout` and an indexed
 predicate — see the query cookbook's history note.
 

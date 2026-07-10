@@ -28,14 +28,14 @@ and command parsing happen in **Python, not recursive SQL**.
 |----------|------|
 | Staging DDL (DBA script) | `drydocs/loaders/sql/ddl/controlm_staging_ddl.sql` |
 | Variable extraction SQL | `drydocs/loaders/sql/controlm_variables.sql` |
-| Taxonomy classifier (9 kinds) | `drydocs/controlm/variables.py` |
-| Resolver (Phase B) | `drydocs/controlm/resolver.py` |
-| Command parser + launcher registry (Phase C) | `drydocs/controlm/commands.py` |
-| Path canonicalizer + role classifier (Phase C) | `drydocs/controlm/paths.py` |
-| Fact / notification routing (Phase C) | `drydocs/controlm/facts.py` |
-| Staging-row builder (all 8 STG_ tables) | `drydocs/controlm/staging.py` |
-| Coverage report | `drydocs/controlm/variable_report.py` |
-| Row model (accepts raw extract headers) | `drydocs/models/controlm.py` → `ControlMVariableRow` |
+| Taxonomy classifier (9 kinds) | `drydocs_core/controlm/variables.py` |
+| Resolver (Phase B) | `drydocs_core/controlm/resolver.py` |
+| Command parser + launcher registry (Phase C) | `drydocs_core/controlm/commands.py` |
+| Path canonicalizer + role classifier (Phase C) | `drydocs_core/controlm/paths.py` |
+| Fact / notification routing (Phase C) | `drydocs_core/controlm/facts.py` |
+| Staging-row builder (all 8 STG_ tables) | `drydocs/staging.py` |
+| Coverage report | `drydocs_core/controlm/variable_report.py` |
+| Row model (accepts raw extract headers) | `drydocs_core/models/controlm.py` → `ControlMVariableRow` |
 | Sample fixture (323 real rows) | `drydocs/data/samples/controlm_variables__sample.csv` |
 | Vendor reference (validated against) | `external/orchestration/bmc-controlm/controlm-{variables,os-job-parameters,file-watcher,api-job-types,file-transfer-job}.md` |
 | Tests (102 across classifier/resolver/staging/commands) | `tests/unit/test_{variable_classifier,variable_resolver,variable_staging,command_parser}.py` |

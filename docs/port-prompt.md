@@ -67,8 +67,11 @@ PROCEDURE:
 9. ARCHITECTURE-DECISIONS STREAM + MODULAR SPLIT (all clean-adds): docs/decisions/ (ADR 0001
    ontology base; ADR 0002 component & database topology + 0002-a/0002-b), MODULE_MAP.md, and
    tests/unit/test_module_boundary.py apply untouched — see git-readme.md's "Architecture decisions
-   + modular split" section. It also flags the planned drydocs/ → drydocs-core package move
-   (ADR 0002, Phase B), which is NOT yet executed; this port still targets the flat drydocs/ layout.
+   + modular split" section. UPDATE (2026-07-10): the drydocs/ → drydocs-core move has now been
+   EXECUTED (Phase B, thin variant per ADR 0002-a-1 — core is physically drydocs_core/, the
+   remainder keeps the drydocs name). Ranges cut BEFORE 2026-07-10 target the flat layout; the
+   relocate range arrives as a rename wave — PORT-MANIFEST.yaml carries the current paths and
+   git-readme.md's "structural path-move LANDED" section carries the rename-wave rules.
 
 10. BACK-FLOW STREAM — REVERSE DIRECTION (Canonical-COMPANY): the producer is
    reproducing the company-authored `drydocs-review` SME/HITL toolkit GENERICALLY as a

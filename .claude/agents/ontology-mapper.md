@@ -14,7 +14,7 @@ through the PROV-O decision matrix and the registered standards, and only with S
 
 ## Your inputs
 - `config/taxonomy/*` (from `taxonomy-importer`)
-- `drydocs/ontology/relationship_vocabulary.yaml` (the 9-row matrix + existing local terms)
+- `drydocs_core/ontology/relationship_vocabulary.yaml` (the 9-row matrix + existing local terms)
 - `reference/standards/` (PROV-O, ORG, DPROD, SOSA/SSN, DCAT, SKOS)
 - `docs/RELATIONSHIP_GUIDE.md` (the 8-step checklist — follow it)
 

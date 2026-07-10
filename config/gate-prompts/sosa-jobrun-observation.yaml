@@ -23,8 +23,8 @@ meta:
   Registry ref: "controlm-psgmgr — confirmed (config/source-registry.yaml); orchestrator: bmc-controlm (baseline)"
   Classification: "Internal (source data) · this page Internal-Public (mechanism only)"
   Taxonomy: "config/taxonomy/controlm.yaml (job/run elements); no dedicated run-history taxonomy file yet"
-  Ontology map: "config/taxonomy-ontology-map.yaml `jobrun-observation` (status: proposed) + drydocs/ontology/relationship_vocabulary.yaml (sosa_observes / sosa_has_result / sosa_made_by_sensor / sosa_observed_property, all status: planned, adoption: experimental)"
-  Source of record: "reference/standards/sosa-ssn/README.md + drydocs/schema/sosa_experimental_supplement.cypher"
+  Ontology map: "config/taxonomy-ontology-map.yaml `jobrun-observation` (status: proposed) + drydocs_core/ontology/relationship_vocabulary.yaml (sosa_observes / sosa_has_result / sosa_made_by_sensor / sosa_observed_property, all status: planned, adoption: experimental)"
+  Source of record: "reference/standards/sosa-ssn/README.md + drydocs_core/schema/sosa_experimental_supplement.cypher"
 mapping:
   - n: 1
     element: "OPTION A (recommended): ControlMJobRun dual-typed as the sosa:Observation"
@@ -61,7 +61,7 @@ provenance:
       - {name: oscompstat, origin: source, from: OSCOMPSTAT, note: "OS-level completion status"}
       - {name: dual_type_merge, origin: derived, from: "MERGE (:ControlMJobRun:Observation)", note: "loader shape choice — applies ONLY if the gate confirms Option A"}
   - label: "SOSA term bindings (relationship_vocabulary.yaml, status: planned)"
-    source_object: "drydocs/ontology/relationship_vocabulary.yaml local_relationships"
+    source_object: "drydocs_core/ontology/relationship_vocabulary.yaml local_relationships"
     key: "sosa_maps_to"
     loader: "~"
     properties:

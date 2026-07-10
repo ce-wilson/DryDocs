@@ -20,12 +20,12 @@ summary: >
   status: planned until then.
 meta:
   Module: "drydocs-load"
-  Source: "STG_APP_FACT rows (drydocs/controlm/staging.py) — fact_type SEAL/FID/APP_NAME/ALIAS, emitted by facts.route_fact from SEMANTIC_FACT variables classified in drydocs/controlm/variables.py FACT_REGISTRY"
+  Source: "STG_APP_FACT rows (drydocs/staging.py) — fact_type SEAL/FID/APP_NAME/ALIAS, emitted by facts.route_fact from SEMANTIC_FACT variables classified in drydocs_core/controlm/variables.py FACT_REGISTRY"
   Registry ref: "STG_APP_FACT variable-normalization stream — registration pending (confirmed: false); another agent is adding a config/source-registry.yaml entry for it in parallel (intended id pattern: stg-app-fact)"
   Classification: "Internal-Public (this page, mechanism only) · underlying STG_APP_FACT data is Internal / Internal-Confidential (real SEAL ids, app names, job names never appear here)"
   Taxonomy: "config/taxonomy/controlm.yaml (ControlMJob) + config/taxonomy/business-application.yaml (Application, key SEALID)"
-  Ontology map: "config/taxonomy-ontology-map.yaml#job-seal-app-ref (status: proposed) + drydocs/ontology/relationship_vocabulary.yaml#m3_seal_app_ref (status: planned)"
-  Source of record: "backlog.yaml Epic K (K1 done, K2 this gate) + drydocs/controlm/staging.py + drydocs/controlm/facts.py"
+  Ontology map: "config/taxonomy-ontology-map.yaml#job-seal-app-ref (status: proposed) + drydocs_core/ontology/relationship_vocabulary.yaml#m3_seal_app_ref (status: planned)"
+  Source of record: "backlog.yaml Epic K (K1 done, K2 this gate) + drydocs/staging.py + drydocs_core/controlm/facts.py"
 
 mapping:
   - n: 1
@@ -98,4 +98,4 @@ sections:
   - title: "F. Sign-off"
     confirmations:
       - "The precedence order (A), zero-unmatched surfacing (B), multi-hit triage (C), edge write shape (D), and sequencing preconditions (E) above are reviewed and correct, OR amended via explicit SME edits recorded in config/gate-log.md."
-      - "Safe to transcribe this decision into config/gate-log.md, flip drydocs/ontology/relationship_vocabulary.yaml#m3_seal_app_ref from status: planned to status: active (with its supplement + loader entries filled in), and build the K2 loader."
+      - "Safe to transcribe this decision into config/gate-log.md, flip drydocs_core/ontology/relationship_vocabulary.yaml#m3_seal_app_ref from status: planned to status: active (with its supplement + loader entries filled in), and build the K2 loader."

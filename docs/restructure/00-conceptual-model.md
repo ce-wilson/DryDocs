@@ -17,7 +17,7 @@ Neo4j series:
 | # | Layer | Question | DryDocs home | Built from |
 |---|-------|----------|--------------|------------|
 | 1 | **Taxonomy** | What category is this? | `config/taxonomy/` | imported hierarchies — apps, products, LOB→Product→Team, Oracle schemas, scripts, Control-M variables |
-| 2 | **Ontology** | What do the connections mean? | `drydocs/schema/`, `drydocs/ontology/`, `knowledge/ontology/` | PROV-O matrix + ORG + DPROD + SOSA/SSN + DCAT |
+| 2 | **Ontology** | What do the connections mean? | `drydocs_core/schema/`, `drydocs_core/ontology/`, `knowledge/ontology/` | PROV-O matrix + ORG + DPROD + SOSA/SSN + DCAT |
 | 3 | **Knowledge graph** | What is connected *and* what does it mean? | the Neo4j graph | loaders applying confirmed mappings |
 | 4 | **Context graph** | What matters right now (for this support decision)? | task-scoped projections (future) | temporal state (SOSA/SSN), ownership, permissions, current health |
 

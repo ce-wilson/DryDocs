@@ -115,7 +115,7 @@ products:
 #
 # schema: drydocs.software-registry.invocation-patterns.v1
 #
-# Purpose: map STG_INVOCATION rows (drydocs/controlm/commands.py, the Phase-C
+# Purpose: map STG_INVOCATION rows (drydocs_core/controlm/commands.py, the Phase-C
 # command/script parser over RESOLVED CM_DEF_VJOB.CMD_LINE) to a `products:`
 # id above, so a later loader can derive
 #   (:Application)-[:USES_SOFTWARE {source:'controlm-cmdline'}]->(:SoftwareProduct)
@@ -131,7 +131,7 @@ products:
 # status: proposed -> confirmed.
 #
 # Field glossary — each row's `field` names the STG_INVOCATION column the
-# match rule reads (see Invocation dataclass, drydocs/controlm/commands.py):
+# match rule reads (see Invocation dataclass, drydocs_core/controlm/commands.py):
 #   - executable_path = the LAUNCHER token: argv[0] after wrapper-stripping
 #     (sh/bash/ksh/env/nohup/exec unwrapped) — e.g. `pmcmd`, `dtlaunch.sh`,
 #     `python3.11`. This is also the token classify_executable() matches

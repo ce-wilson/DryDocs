@@ -2,7 +2,7 @@
 # relationship_vocabulary.yaml  —  DryDocs relationship registry
 #
 # SECTION 0 (node_classifications): every node label in the graph mapped to a
-#   CURIE that expands via drydocs/ontology/namespaces.py. All local labels
+#   CURIE that expands via drydocs_core/ontology/namespaces.py. All local labels
 #   live under dd: (https://drydocs.local/ontology#).
 #
 # SECTION 1 (prov_matrix): the 9-row decision table. Stable — do not edit.

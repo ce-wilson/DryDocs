@@ -82,7 +82,7 @@ Once Q1–Q3 are answered, update `docs/reviews/feature-oracle-ingestion-plan.md
 | 1 | `drydocs/loaders/sql/ddl/controlm_staging_supplement_ddl.sql` | **EXISTS** (scaffold) |
 | 2 | `drydocs/loaders/sql/controlm_*.sql` (add incremental predicates) | **EXISTS** (scope binds in place) |
 | 3 | `drydocs/loaders/controlm_incremental.py` | **NOT YET** — iteration 1 |
-| 4 | `drydocs/models/controlm_loadcontrol.py` + 1-line `models/__init__.py` import | **NOT YET** |
+| 4 | `drydocs_core/models/controlm_loadcontrol.py` + 1-line `models/__init__.py` import | **NOT YET** |
 | 5 | `drydocs/cli.py` — append-only `--incremental` / `load-staging` block | **NOT YET** |
 | 6 | `tests/unit/test_oracle_incremental.py` | **NOT YET** |
 
@@ -98,7 +98,7 @@ Once Q1–Q3 are answered, update `docs/reviews/feature-oracle-ingestion-plan.md
 
 **Gate: answer Q1–Q3 first (SQL Developer), then:**
 
-1. **Model** — `drydocs/models/controlm_loadcontrol.py`: `LoadControlRow` dataclass +
+1. **Model** — `drydocs_core/models/controlm_loadcontrol.py`: `LoadControlRow` dataclass +
    `SampleManifestRow`; one-line import in `models/__init__.py`.
 
 2. **DDL** — flesh out `controlm_staging_supplement_ddl.sql`:
@@ -161,7 +161,7 @@ Sample data:     drydocs/data/samples/controlm_variables__sample.csv  (323 rows,
 
 ## Do NOT do on the producer side
 
-- Modify `drydocs/adapters/oracle_adapter.py`
+- Modify `drydocs_core/adapters/oracle_adapter.py`
 - Commit real company data, SIDs, credentials, or the company GHE org namespace
 - Create files outside the fixed minimum-component set without updating the plan
 - Use the literal GHE org — always `<company-org>` as placeholder

@@ -140,7 +140,7 @@ unmanaged root-level strays (classify or evict them).
 
 ## 2. Graph targets
 
-- **`drydocs_docs` (NEW data DB)** — the software KG. Extend `drydocs/schema/provisioning/`
+- **`drydocs_docs` (NEW data DB)** — the software KG. Extend `drydocs_core/schema/provisioning/`
   (G1 pattern): `CREATE DATABASE drydocs_docs`, add to the composite, uniqueness on
   `Document.doc_id` (URN from source id + path) and `Chunk.chunk_id`. Keeps docs out of the
   structural DB so core destroy/rebuild freedom survives.
@@ -238,7 +238,7 @@ then it is a heads-up, like the ADR 0002 Phase B rename warning.*
 | `drydocs/docmeta/**` (except `connectors/confluence*` impl) | pipeline, registry models, cleaner/tokenizer/manifest/chunker/curation/freshness |
 | `config/doc-source-registry.yaml` + `tests/unit/test_doc_registry.py` | registry + guard (Track-1 portable) |
 | `docmeta` group in `tests/unit/test_module_boundary.py` + `MODULE_MAP.md` row | default-deny forces your company-only connector modules to classify |
-| `drydocs/schema/provisioning/` delta (`drydocs_docs` + composite update) | target-agnostic scripts, G1 pattern |
+| `drydocs_core/schema/provisioning/` delta (`drydocs_docs` + composite update) | target-agnostic scripts, G1 pattern |
 | `knowledge/upgrade-plans/docmeta-component.md`, ADR 0004, review doc | plans/decisions |
 | planned entries in `relationship_vocabulary.yaml` / `taxonomy-ontology-map.yaml` | **inert while `planned`** — but if company has already promoted any doc edge to `active`, that entry is a back-flow collision: keep your active version (same rule as `seal_app_ref`) |
 

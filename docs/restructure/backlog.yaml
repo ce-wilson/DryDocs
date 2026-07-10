@@ -114,7 +114,7 @@ modules:
   - drydocs-web          # JS/TS front-end under web/ (Epic O, phase 12) — console + graph viz; not a Python package, so absent from MODULE_MAP.md/test_module_boundary.py
   - reference            # reference/ + external/ vendor & standards material
   - taxonomy             # config/taxonomy/ captures
-  - ontology             # drydocs/schema/, relationship vocabulary, mappings
+  - ontology             # drydocs_core/schema/, relationship vocabulary, mappings
   - config               # config/ precedence, registries, crosswalks
   - graph-infra          # Neo4j topology, provisioning, deployment targets
   - docs                 # plans, ADRs, process docs, skills, rituals
@@ -257,7 +257,7 @@ items:
     priority: p1
     status: done
     depends_on: [B1]
-    inputs: [config/taxonomy/controlm.yaml, drydocs/ontology/relationship_vocabulary.yaml, docs/RELATIONSHIP_GUIDE.md]
+    inputs: [config/taxonomy/controlm.yaml, drydocs_core/ontology/relationship_vocabulary.yaml, docs/RELATIONSHIP_GUIDE.md]
     acceptance: "each Control-M edge type traces to a matrix row or recorded alias; gate run logged"
     output: config/taxonomy-ontology-map.yaml
     notes: >
@@ -295,7 +295,7 @@ items:
     priority: p1
     status: done
     depends_on: [B3]
-    inputs: [config/taxonomy/lob-product-team.yaml, drydocs/ontology/relationship_vocabulary.yaml]
+    inputs: [config/taxonomy/lob-product-team.yaml, drydocs_core/ontology/relationship_vocabulary.yaml]
     acceptance: "no free-text union ranges (resolve SUPPORTS Product-vs-AreaProduct); each edge has precise from/to + authority tag"
     output: config/taxonomy-ontology-map.yaml
     notes: >
@@ -315,7 +315,7 @@ items:
     priority: p1
     status: done
     depends_on: [C1, C2, C3]
-    inputs: [drydocs/ontology/relationship_vocabulary.yaml, config/taxonomy-ontology-map.yaml]
+    inputs: [drydocs_core/ontology/relationship_vocabulary.yaml, config/taxonomy-ontology-map.yaml]
     acceptance: "test_schema.py drift guard green; map summary == vocabulary active count"
     notes: >
       Done 2026-06-21. Reconciled vocabulary to the confirmed map: catalog_supports_area_product
@@ -360,7 +360,7 @@ items:
     priority: p3
     status: done
     depends_on: []
-    inputs: [drydocs/ontology/relationship_vocabulary.yaml, docs/RELATIONSHIP_GUIDE.md, docs/restructure/03-hitl-sme-flow.md]
+    inputs: [drydocs_core/ontology/relationship_vocabulary.yaml, docs/RELATIONSHIP_GUIDE.md, docs/restructure/03-hitl-sme-flow.md]
     acceptance: >
       REQUIRES_SCHEDULER (:BatchProcessing → :SchedulerKind), which appears in README/plans
       but is NOT in relationship_vocabulary.yaml, is registered there status: planned with its
@@ -420,9 +420,9 @@ items:
     depends_on: [C3, D1]
     inputs: [config/precedence.yaml, drydocs/loaders/cypher/catalog_lobs.cypher]
     acceptance: "flipping order: in precedence.yaml changes RECONCILES_TO resolution with no code edit"
-    output: drydocs/precedence.py
+    output: drydocs_core/precedence.py
     notes: >
-      Done 2026-06-21. New drydocs/precedence.py: PrecedenceResolver reads config/precedence.yaml
+      Done 2026-06-21. New drydocs_core/precedence.py: PrecedenceResolver reads config/precedence.yaml
       (order + active toggles + conflict_policy); resolve(claims) -> highest active authority with
       an opinion wins, losers kept as aliases (skos:closeMatch, never dropped). Wired into the
       RECONCILES_TO path: CatalogLOBsLoader.to_params resolves via resolve_lob_reconciliation;
@@ -444,9 +444,9 @@ items:
     depends_on: [C4, D1]
     inputs: [config/source-registry.yaml, drydocs/cli.py]
     acceptance: "loading a source with confirmed:false fails fast with a clear message"
-    output: drydocs/source_registry.py
+    output: drydocs_core/source_registry.py
     notes: >
-      Done 2026-06-21. New drydocs/source_registry.py: SourceRegistry.require_confirmed(id)
+      Done 2026-06-21. New drydocs_core/source_registry.py: SourceRegistry.require_confirmed(id)
       raises UnconfirmedSourceError (clear message + crosswalk pointer) for confirmed:false or
       missing-flag (fail-closed), UnknownSourceError for undeclared ids. cli.py: LOADER_SOURCE
       map + _gate_source() wired into load / refresh-reference / ingest-controlm — gate fires
@@ -465,11 +465,11 @@ items:
     priority: p2
     status: in_progress
     depends_on: [C1]
-    inputs: [reference/standards/sosa-ssn/README.md, drydocs/ontology/relationship_vocabulary.yaml]
+    inputs: [reference/standards/sosa-ssn/README.md, drydocs_core/ontology/relationship_vocabulary.yaml]
     acceptance: "sosa:* terms present with IRIs; status planned->confirmed via gate"
     notes: >
       Registration step DONE (main, 2026-06-22): sosa/ssn prefixes in namespaces.py;
-      terms seeded in drydocs/schema/sosa_experimental_supplement.cypher (opt-in
+      terms seeded in drydocs_core/schema/sosa_experimental_supplement.cypher (opt-in
       `drydocs apply-sosa-supplement`, NOT in bootstrap; every term adoption:"experimental");
       4 context relationships in relationship_vocabulary.yaml (sosa_observes/has_result/
       made_by_sensor/observed_property, status planned, domain context); README split into
@@ -534,7 +534,7 @@ items:
     priority: p1
     status: done
     depends_on: []
-    inputs: [docs/decisions/0002-component-database-topology.md, drydocs/schema/, drydocs/neo4j_client.py]
+    inputs: [docs/decisions/0002-component-database-topology.md, drydocs_core/schema/, drydocs_core/neo4j_client.py]
     acceptance: >
       Provisioning authored + validated on a LOCAL Neo4j Enterprise (Docker, free dev license):
       CREATE DATABASE drydocs + drydocs_context, CREATE COMPOSITE DATABASE drydocs_all aliasing
@@ -547,7 +547,7 @@ items:
       authored + proven on a LOCAL Enterprise instance now; the LIVE deploy is G7 (blocked on infra).
       No data load — provisioning + proxy-node constraints only. See memory drydocs1-live-neo4j.
     progress: >
-      2026-06-28 — AUTHORED: drydocs/schema/provisioning/ (01_databases.cypher, 02_proxy_constraints.cypher,
+      2026-06-28 — AUTHORED: drydocs_core/schema/provisioning/ (01_databases.cypher, 02_proxy_constraints.cypher,
       smoke_drydocs_all.cypher, provision.ps1, README.md). Proxy-node keys reuse canonical identity
       (DataAsset.assetId, ControlMJob(folder_id,job_id)) — no identity invented.
       2026-07-01 — VALIDATED, DONE: scripts executed in provision.ps1 order via cypher-shell inside a
@@ -647,7 +647,7 @@ items:
     priority: p3
     status: todo
     depends_on: [G1, G2]
-    inputs: [docs/decisions/0002-component-database-topology.md, drydocs/controlm/commands.py]
+    inputs: [docs/decisions/0002-component-database-topology.md, drydocs_core/controlm/commands.py]
     acceptance: >
       drydocs-lineage and drydocs-deepdoc exist as separate packages that import ONLY drydocs-core
       and SHARE the core command-line/lineage parser; lineage writes curated lineage to drydocs;
@@ -669,10 +669,10 @@ items:
     priority: p2
     status: done
     depends_on: []
-    inputs: [docs/decisions/0002-c-depgraph-lineage-rehome.md, drydocs/controlm/commands.py, "ce-wilson/depgraph@feat/controlm-lineage:depgraph/controlm/commands.py"]
+    inputs: [docs/decisions/0002-c-depgraph-lineage-rehome.md, drydocs_core/controlm/commands.py, "ce-wilson/depgraph@feat/controlm-lineage:depgraph/controlm/commands.py"]
     acceptance: >
       The three depgraph parser deltas are folded into the drydocs-core Control-M parser
-      (drydocs/controlm/commands.py, re-exported by drydocs_core): (1) .pset -> ABINITIO launcher
+      (drydocs_core/controlm/commands.py, re-exported by drydocs_core): (1) .pset -> ABINITIO launcher
       rule; (2) _looks_script() so `spark-submit --master yarn x.py` resolves x.py NOT yarn (a live
       correctness bug) — with a regression test; (3) +pset in the direct-script extension regex.
       Core parser reproduces depgraph's test_controlm.py outputs (25 processes / 13 INVOKES on the
@@ -1054,7 +1054,7 @@ items:
     priority: p3
     status: todo
     depends_on: []
-    inputs: [README.md, drydocs/ontology/relationship_vocabulary.yaml, drydocs/loaders/cypher/controlm_dependencies_derived.cypher]
+    inputs: [README.md, drydocs_core/ontology/relationship_vocabulary.yaml, drydocs/loaders/cypher/controlm_dependencies_derived.cypher]
     acceptance: >
       README.md describes the derived job→job dependency edge as :WAS_INFORMED_BY — matching
       the loader (controlm_dependencies_derived.cypher MERGEs :WAS_INFORMED_BY) and the vocab
@@ -1156,7 +1156,7 @@ items:
       streamlit and streamlit-agraph are removed from pyproject.toml
       [tool.poetry.dependencies] and poetry.lock is regenerated (poetry remove / poetry lock);
       a repo grep confirms neither is imported anywhere; pandas and pypdf are RETAINED (pandas
-      kept deliberately for analytical work per drydocs/adapters/csv_adapter.py; pypdf is used
+      kept deliberately for analytical work per drydocs_core/adapters/csv_adapter.py; pypdf is used
       by scripts/ingest_jpmc_reports.py); poetry run pytest -q stays green and drydocs --help works.
     notes: >
       Groomed 2026-07-09 from the parked unused-deps IDEAS line, SCOPED after verification: the
@@ -1182,7 +1182,7 @@ items:
     priority: p2
     status: done
     depends_on: []
-    inputs: [drydocs/ontology/relationship_vocabulary.yaml, config/taxonomy-ontology-map.yaml, docs/RELATIONSHIP_GUIDE.md]
+    inputs: [drydocs_core/ontology/relationship_vocabulary.yaml, config/taxonomy-ontology-map.yaml, docs/RELATIONSHIP_GUIDE.md]
     acceptance: >
       m3_seal_app_ref registered in relationship_vocabulary.yaml (WAS_ASSOCIATED_WITH,
       role seal_app_ref, ControlMJob -> Application, prov:wasAssociatedWith, status
@@ -1209,7 +1209,7 @@ items:
     priority: p2
     status: in_progress
     depends_on: [K1, K3]
-    inputs: [drydocs/controlm/staging.py, drydocs/loaders/, config/source-registry.yaml, docs/restructure/03-hitl-sme-flow.md]
+    inputs: [drydocs/staging.py, drydocs/loaders/, config/source-registry.yaml, docs/restructure/03-hitl-sme-flow.md]
     acceptance: >
       Gate sequence honored: the match policy (SEAL-fact precedence; one-to-one accepted,
       zero unmatched surfaced, multi-hit -> deterministic conflict triage or precedence
@@ -1249,7 +1249,7 @@ items:
     priority: p1
     status: done
     depends_on: []
-    inputs: [config/gate-prompts/seal-tom-attribution-reshape.yaml, drydocs/ontology/relationship_vocabulary.yaml, config/taxonomy-ontology-map.yaml, knowledge/upgrade-plans/docmeta-component.md]
+    inputs: [config/gate-prompts/seal-tom-attribution-reshape.yaml, drydocs_core/ontology/relationship_vocabulary.yaml, config/taxonomy-ontology-map.yaml, knowledge/upgrade-plans/docmeta-component.md]
     acceptance: >
       The seal-tom-attribution-reshape gate is SME-run and transcribed: gate-log entry;
       the :Application node class flips to prov:Entity/dprod:DataProduct (or the SME's
@@ -1301,7 +1301,7 @@ items:
     priority: p2
     status: todo
     depends_on: [K3]
-    inputs: [config/gate-log.md, drydocs/ontology/relationship_vocabulary.yaml, config/taxonomy-ontology-map.yaml, drydocs/schema/, config/precedence.yaml]
+    inputs: [config/gate-log.md, drydocs_core/ontology/relationship_vocabulary.yaml, config/taxonomy-ontology-map.yaml, drydocs_core/schema/, config/precedence.yaml]
     acceptance: >
       Per the 2026-07-10 gate sign-off (config/gate-log.md), each applied as its OWN logged change
       with drift guards green: (1) node_classifications#Application class flips prov:SoftwareAgent ->
@@ -1338,7 +1338,7 @@ items:
     priority: p3
     status: todo
     depends_on: []
-    inputs: [config/gate-log.md, config/taxonomy/lob-product-team.yaml, drydocs/ontology/relationship_vocabulary.yaml, config/taxonomy-ontology-map.yaml]
+    inputs: [config/gate-log.md, config/taxonomy/lob-product-team.yaml, drydocs_core/ontology/relationship_vocabulary.yaml, config/taxonomy-ontology-map.yaml]
     acceptance: >
       A ProductRole skos ConceptScheme (Area Product Owner, Product Owner, Product Architect, Tech
       Partner, Data Owner, Data Certifier, Analytics Lead; CTO shared with the TOMRole scheme) is
@@ -1536,7 +1536,7 @@ items:
     priority: p3
     status: todo
     depends_on: [L1, L5]
-    inputs: [docs/design/templates/tdd.outline.yaml, drydocs/ontology/relationship_vocabulary.yaml, docs/restructure/03-hitl-sme-flow.md]
+    inputs: [docs/design/templates/tdd.outline.yaml, drydocs_core/ontology/relationship_vocabulary.yaml, docs/restructure/03-hitl-sme-flow.md]
     acceptance: >
       the requirements traceability matrix (requirement -> design-section anchor ->
       component/module -> test) and the anchor-keyed feedback are modeled as DryDocs graph
@@ -1691,7 +1691,7 @@ items:
     priority: p2
     status: done
     depends_on: []
-    inputs: [docs/restructure/06-provenance-source-audit-fields.md, drydocs/loaders/, drydocs/ontology/relationship_vocabulary.yaml]
+    inputs: [docs/restructure/06-provenance-source-audit-fields.md, drydocs/loaders/, drydocs_core/ontology/relationship_vocabulary.yaml]
     acceptance: >
       Loaders detect record change (checksum or version compare, e.g. VERSION_SERIAL) and
       write WAS_GENERATED_BY -> :JobRun only on create/actual change; full-refresh runs
@@ -1759,7 +1759,7 @@ items:
     priority: p3
     status: todo
     depends_on: []
-    inputs: [config/audit-fields.yaml, drydocs/ontology/relationship_vocabulary.yaml, reference/standards/]
+    inputs: [config/audit-fields.yaml, drydocs_core/ontology/relationship_vocabulary.yaml, reference/standards/]
     acceptance: >
       The four envelope properties carry standard-term bindings — dct:creator/dct:created/
       dct:modified or PROV qualified attribution — decided via the HITL gate, including

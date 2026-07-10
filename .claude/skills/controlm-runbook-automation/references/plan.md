@@ -35,7 +35,7 @@ a finding, not noise. Stale signals to tag on `:ControlMFolder`:
 - `-PRPL` (parallel/pre-release) or decommissioned SCIM status
 
 ### P2 — CMDLINE lineage extension (parser EXISTS; join is NEW)
-`drydocs/controlm/commands.py` (`parse_command` → `Invocation`/`FileOp`,
+`drydocs_core/controlm/commands.py` (`parse_command` → `Invocation`/`FileOp`,
 `classify_executable`) already decomposes `CMD_LINE`. Extend the classification
 with the two launcher shapes seen in production runbooks:
 1. **Framework launcher**: `<framework-launcher>.sh -env <env> -pipeline <PIPELINE_GUID>`
@@ -169,8 +169,8 @@ the generator picks them up like everything else.
 |---|---|
 | CM_ ingest (folders/jobs/vars/conditions) | **EXISTS** — loaders + staging DDL (see `controlm-db` → `references/ingest.md`) |
 | Condition → `:WAS_INFORMED_BY` lineage | **EXISTS** — derived edge + recursive SQL |
-| Folder-name grammar parse (PRAOCG / standards) | **EXISTS** — `drydocs/controlm/folder_name.py` |
-| CMDLINE parse (invocations, file ops, configs) | **EXISTS** — `drydocs/controlm/commands.py` (Phase C) |
+| Folder-name grammar parse (PRAOCG / standards) | **EXISTS** — `drydocs_core/controlm/folder_name.py` |
+| CMDLINE parse (invocations, file ops, configs) | **EXISTS** — `drydocs_core/controlm/commands.py` (Phase C) |
 | Launcher-GUID → metadata-service join | **NEW** — P2; needs the REST client + GUID extraction rule |
 | File-name component standard (FilePrefix/…/FilePattern) | **PROPOSED** on the website; repo has no decomposer yet — implement as a pure function + `CM_JOB_FILE_NAME_STANDARD`-shaped staging table |
 | Description-field key:value metadata | **PLANNED** (3-phase plan exists in docs/memory); P5 is its first consumer |

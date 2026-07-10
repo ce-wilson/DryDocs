@@ -66,7 +66,7 @@ Work top to bottom. Each step has exactly one file to touch.
 
 ### Step 1 — Check the vocabulary
 
-Open [`drydocs/ontology/relationship_vocabulary.yaml`](../drydocs/ontology/relationship_vocabulary.yaml).
+Open [`drydocs_core/ontology/relationship_vocabulary.yaml`](../drydocs_core/ontology/relationship_vocabulary.yaml).
 Search for your source node, target node, or intent. If an entry already
 exists with `status: active`, use it — do not create a duplicate.
 
@@ -95,7 +95,7 @@ If this is the only use of this label on these nodes, `role` can be omitted.
 ### Step 6 — Register in the vocabulary
 
 Add an entry to `local_relationships` in
-`drydocs/ontology/relationship_vocabulary.yaml`:
+`drydocs_core/ontology/relationship_vocabulary.yaml`:
 
 ```yaml
 - id:           domain_relationship_name        # unique snake_case id

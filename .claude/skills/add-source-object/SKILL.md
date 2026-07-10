@@ -71,7 +71,7 @@ list (+ one object-specific assertion).
 Never invent an edge inside a loader. For each new concept:
 
 1. Classify new node labels via the PROV matrix
-   (`drydocs/ontology/relationship_vocabulary.yaml` §0/§1); check for label
+   (`drydocs_core/ontology/relationship_vocabulary.yaml` §0/§1); check for label
    collisions with existing properties/labels before naming.
 2. Register vocabulary entries as `status: planned`, `supplement: ~`,
    `loader: ~` (the SEAL-reshape precedent for gate-bound terms).

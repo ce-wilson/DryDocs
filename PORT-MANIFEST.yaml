@@ -35,13 +35,15 @@
 # =============================================================================
 schema: drydocs.port-manifest.v1
 classification: Internal-Public
-updated: 2026-07-09
+updated: 2026-07-10   # Phase B relocate (ADR 0002-a-1): core paths now drydocs_core/*;
+                      # the remainder keeps the drydocs/ name (thin variant). Renamed-path
+                      # rows below were the promised "path-column diff, not a prose rewrite".
 direction: "producer -> company (one-way; back-flow only as sanitized reproduction)"
 default: "clean-add when absent on consumer; evaluate when both sides created the path"
 
 rows:
   # ---- per-entry files (checkout of the whole file is FORBIDDEN) ------------
-  - path: "drydocs/ontology/relationship_vocabulary.yaml"
+  - path: "drydocs_core/ontology/relationship_vocabulary.yaml"
     disposition: per-entry
     entry_rule: >
       id-keyed (local_relationships[].id, node_classifications[].label). NEVER
@@ -98,20 +100,26 @@ rows:
   - path: "graph-tests/**"
     disposition: canonical-company
     note: "consumer's real acceptance suites win; seed twins follow producer renames as deliberate consumer commits"
-  - path: "drydocs/adapters/oracle_adapter.py"
+  - path: "drydocs_core/adapters/oracle_adapter.py"
     disposition: canonical-company
-    note: "PORT-FROZEN: consumer is Kerberos/thick with real connection config; producer is thin-only"
+    note: >
+      PORT-FROZEN: consumer is Kerberos/thick with real connection config; producer is
+      thin-only. Phase B relocate interaction: APPLY the rename (drydocs/adapters/ ->
+      drydocs_core/adapters/) but keep the CONSUMER's file content at the new path.
 
   # ---- producer-canonical (take wholesale on collision) ---------------------
-  - path: "drydocs/controlm/**"
+  - path: "drydocs_core/controlm/**"
     disposition: canonical-producer
     note: "the normalization package (Phases A/B/C) is authored producer-side"
+  - path: "drydocs/staging.py"
+    disposition: canonical-producer
+    note: "the load-cadence staging bundle builder — relocated OUT of controlm/ in Phase B (0002-a §6 borderline); stays in the drydocs remainder"
   - path: "knowledge/standards/**"
     disposition: canonical-producer
   - path: "drydocs/loaders/**"
     disposition: canonical-producer
     note: "Control-M loaders/SQL/DDL/cypher incl. base.py (provenance diet) — producer-authored"
-  - path: "drydocs/schema/**"
+  - path: "drydocs_core/schema/**"
     disposition: canonical-producer
     note: "supplements + constraints; consumer evaluates constraint-count deltas via its own test_schema expectations"
   - path: "tests/unit/test_variable_*.py"
@@ -152,12 +160,12 @@ rows:
   - path: "drydocs/cli.py"
     disposition: evaluate
     note: "composition root; both sides add commands — merge per collision ledger (keep consumer verbs, add producer verbs)"
-  - path: "drydocs/models/__init__.py"
+  - path: "drydocs_core/models/__init__.py"
     disposition: evaluate
-    note: "union of row-model exports from both sides"
-  - path: "drydocs/models/controlm.py"
+    note: "union of row-model exports from both sides (path moved from drydocs/models/ in Phase B)"
+  - path: "drydocs_core/models/controlm.py"
     disposition: evaluate
-    note: "keep consumer-only rows (e.g. ControlMQuantitativeRow), add producer rows"
+    note: "keep consumer-only rows (e.g. ControlMQuantitativeRow), add producer rows (path moved in Phase B)"
   - path: "tests/unit/test_schema.py"
     disposition: evaluate
     note: "consumer EXPECTED_CONSTRAINTS is ahead (44 vs 35) — keep consumer count, take producer drift-guard logic"

@@ -284,7 +284,7 @@ poetry run drydocs analyze-variables --resolve
 poetry run drydocs normalize-variables --out-dir stg_out
 ```
 
-Lives in `drydocs/controlm/` (`variables.py`, `resolver.py`, `commands.py`, `paths.py`,
+Lives in `drydocs_core/controlm/` (`variables.py`, `resolver.py`, `commands.py`, `paths.py`,
 `facts.py`, `staging.py`, `variable_report.py`); staging DDL in
 `drydocs/loaders/sql/ddl/`. Full status + runbook:
 [`docs/controlm-c3-normalization-status.md`](docs/controlm-c3-normalization-status.md).

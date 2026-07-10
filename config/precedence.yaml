@@ -57,7 +57,7 @@ active:
 
 # =============================================================================
 # PROPOSED addition (GATE-BOUND, 2026-07-08 review) — NOT part of the live chain above.
-# drydocs/precedence.py#PrecedenceResolver reads ONLY `order:` / `active:` / `conflict_policy:`
+# drydocs_core/precedence.py#PrecedenceResolver reads ONLY `order:` / `active:` / `conflict_policy:`
 # above; this block is a separate top-level key and is therefore INERT to the resolver — adding
 # it here does not change is_active()/rank() for bmc-baseline / internal-standards /
 # lob-product-team, and does not affect tests/unit/test_precedence.py. Wiring this into the live
@@ -77,7 +77,7 @@ proposed_additions:
       lob-product-team (which governs ownership/business-context, not fact identity). This is
       one of two linked source-of-record mechanisms — the other is `prov:hadPrimarySource` on
       every extracted fact (see config/taxonomy-ontology-map.yaml#seal-doc-source-of-record and
-      drydocs/ontology/relationship_vocabulary.yaml#seal_had_primary_source, both
+      drydocs_core/ontology/relationship_vocabulary.yaml#seal_had_primary_source, both
       status: planned/proposed).
     status: proposed
     gate_prompt: config/gate-prompts/seal-tom-attribution-reshape.yaml

@@ -34,4 +34,4 @@ classification of one source: parent/child, type-of, member-of. One file per tax
 3. Write `config/taxonomy/<name>.yaml` as classification.
 4. Report: counts per node type, any ambiguities, and a one-line "ready for ontology-mapper".
 
-You never write to Neo4j and never edit `drydocs/schema/` or supplements.
+You never write to Neo4j and never edit `drydocs_core/schema/` or supplements.

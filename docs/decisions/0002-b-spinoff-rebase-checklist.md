@@ -18,7 +18,7 @@ skill: reconcile-port   # disjoint-history reconcile flow
 
 ---
 
-## 0. What the spinoff actually is (from `drydocs/controlm/__init__.py`)
+## 0. What the spinoff actually is (from `drydocs_core/controlm/__init__.py`)
 
 An **independent process** that:
 1. **Imports** the *legacy* Control-M job/folder **definition XML** (the env imports/exports

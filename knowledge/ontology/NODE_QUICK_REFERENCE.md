@@ -1,6 +1,6 @@
 # DryDocs Node Quick Reference
 
-Generated from `drydocs/ontology/relationship_vocabulary.yaml` (node_classifications).
+Generated from `drydocs_core/ontology/relationship_vocabulary.yaml` (node_classifications).
 Created 2026-06-09; updated 2026-07-09 (software registry, docs corpus, ControlMApplication,
 SEAL TOM reshape proposals, SOSA context graph). Companion to
 [`docs/RELATIONSHIP_GUIDE.md`](../../docs/RELATIONSHIP_GUIDE.md); lives beside
