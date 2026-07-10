@@ -20,10 +20,13 @@ Invariants (0002-B §0/§3 — each lands as a test with the real implementation
 - **Format-agnostic definitions.** No XML assumption outside the
   :class:`~drydocs_remediation.formats.XmlDefinitionFormat` implementation.
 
-Scaffold status (2026-07-10): interfaces + contracts only — bodies raise
-``NotImplementedError`` until the M0 PoC slice lands (plans:
-``internal/remediation/``; contract: ``docs/design/drydocs-remediation-tdd.md``, which
-wins on conflict).
+M0 slice status (2026-07-10): IMPLEMENTED — transcript load (the gate-1 fallback
+format), the R1 dot-smuggling detector, and the order-paired equivalence proof.
+STILL STUBS — ``XmlDefinitionFormat`` (blocked on the vendor schema acquisition, see
+``formats.py``), ``transform`` (Gate 3) and ``jira`` (M1). The equivalence verdict on
+the real M0 unit stays PENDING ground truth (info item A3 / the ``var.text`` rule B1)
+— see ``internal/remediation/m0/``. Contract: ``docs/design/drydocs-remediation-tdd.md``
+wins on conflict.
 """
 from . import detect, equivalence, formats, jira, transform
 

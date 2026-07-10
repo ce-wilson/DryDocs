@@ -70,9 +70,17 @@ for the handoff (ADR 0002, D3).
 3. [ ] **Re-home parsing:** delete the spinoff's own Control-M parse code; call
        `drydocs_core.controlm` instead. Any parse divergence the spinoff relied on becomes either
        a core change (PR to core) or a thin remediation-side adapter — never a fork of the parser.
-4. [ ] **Port remediation logic only:** the failure-pattern detection, the legacy→greenfield XML
+4. [~] **Port remediation logic only:** the failure-pattern detection, the legacy→greenfield XML
        transform rules, the offline equivalence check, and the Jira emitter. Put the XML read/
        write behind a `DefinitionFormat` interface (XML impl now, JSON impl later).
+       *(PARTIAL 2026-07-10 — the M0 slice: `TranscriptDefinitionFormat` (the gate-1 fallback;
+       XML impl is BLOCKED on the vendor schema acquisition, see the corpus stub — implementing
+       from memory would ship SYNTHESIZED guesses as vendor truth), the R1 dot-smuggling
+       detector over the core classifier, and the order-paired equivalence proof over the core
+       resolver. Engine run on the real M0 unit reproduces the worked example verbatim
+       (internal/remediation/m0/engine-run-2026-07-10.md); sanitized twins pinned as unit tests.
+       REMAINING: transform (Gate 3) + jira emitter (M1); XML I/O on schema acquisition;
+       equivalence verdict pending ground truth A3 / var.text rule B1.)*
 5. [ ] **Wire the corroboration reads:** legacy XML must reconcile with the Oracle `psgmgr.*`
        extract and the loaded `drydocs` snapshot — all **read-only** via `drydocs_core` adapters +
        `Neo4jClient(database="drydocs")`.

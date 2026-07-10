@@ -1,9 +1,10 @@
 """drydocs-remediation scaffold guards (ADR 0002-B §2 step 1, G3).
 
 The real verification gates (no-graph-write, Jira-only, equivalence proof — 0002-B §3)
-land WITH the implementations. At scaffold time we pin the structural contract: the
-package imports cleanly, the format seam is abstract, and the stubs are honest about
-being stubs (NotImplementedError, not silent no-ops).
+land WITH the implementations. Here we pin the structural contract: the package imports
+cleanly, the format seam is abstract, and the remaining stubs are honest about being
+stubs (NotImplementedError, not silent no-ops). The implemented M0 behavior lives in
+``test_remediation_m0.py``.
 """
 from __future__ import annotations
 
@@ -12,8 +13,8 @@ from pathlib import Path
 import pytest
 
 import drydocs_remediation
-from drydocs_remediation.detect import Finding, detect_findings
-from drydocs_remediation.equivalence import EquivalenceReport, prove_equivalence
+from drydocs_remediation.detect import Finding
+from drydocs_remediation.equivalence import EquivalenceReport
 from drydocs_remediation.formats import DefinitionFormat, DefinitionSet, XmlDefinitionFormat
 from drydocs_remediation.jira import JiraRef, emit_handoff
 from drydocs_remediation.transform import propose_greenfield
@@ -30,7 +31,8 @@ def test_definition_format_is_abstract() -> None:
         DefinitionFormat()  # type: ignore[abstract]
 
 
-def test_stubs_raise_not_implemented() -> None:
+def test_remaining_stubs_raise_not_implemented() -> None:
+    """XML I/O is schema-acquisition-blocked; transform + jira are the M1 slice."""
     ds = DefinitionSet()
     xml = XmlDefinitionFormat()
     with pytest.raises(NotImplementedError):
@@ -38,11 +40,7 @@ def test_stubs_raise_not_implemented() -> None:
     with pytest.raises(NotImplementedError):
         xml.dump(ds, Path("greenfield.xml"))
     with pytest.raises(NotImplementedError):
-        detect_findings(ds)
-    with pytest.raises(NotImplementedError):
         propose_greenfield(ds, [])
-    with pytest.raises(NotImplementedError):
-        prove_equivalence(ds, ds)
     with pytest.raises(NotImplementedError):
         emit_handoff([], Path("greenfield.xml"), EquivalenceReport(equivalent=True))
 

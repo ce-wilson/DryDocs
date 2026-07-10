@@ -1,0 +1,17 @@
+# SYNTHETIC fixture — mechanism-only reproduction of the M0 legacy shape
+# (5-variable indirection + dot-smuggling). No real folder/job/path values.
+schema: drydocs.remediation.transcript.v1
+source: synthetic test fixture (no real system)
+folder:
+  name: FOLDER-SYNTH-SAMPLE-DLY
+  variables: []
+jobs:
+  - name: JOB0001_SAMPLE_DAILY_INDICATOR_TOK_FW
+    type: FileWatcher
+    watch_template: "%%DIR_A.%%PFX.%%BDATE.%%SUFX.%%EXT"
+    variables:
+      - {name: "%%DIR_A", value: "/data/sample/in/"}
+      - {name: "%%PFX", value: "Sample_File_"}
+      - {name: "%%BDATE", value: "%%$ODATE"}
+      - {name: "%%SUFX", value: "."}
+      - {name: "%%EXT", value: "tok"}

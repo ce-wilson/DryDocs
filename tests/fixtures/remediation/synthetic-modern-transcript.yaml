@@ -1,0 +1,14 @@
+# SYNTHETIC fixture — mechanism-only reproduction of the M0 modern-rewrite shape
+# (%%var.text style; the var.text dot rule B1 is what makes it diverge under the
+# current resolver). No real folder/job/path values.
+schema: drydocs.remediation.transcript.v1
+source: synthetic test fixture (no real system)
+folder:
+  name: FOLDER-SYNTH-SAMPLE-DLY
+  variables: []
+jobs:
+  - name: JOB0001b_SAMPLE_DAILY_INDICATOR_TOK_FW
+    type: FileWatcher
+    watch_template: "%%DIR_B.Sample_File_.%%$ODATE.tok"
+    variables:
+      - {name: "%%DIR_B", value: "/data/sample/in/"}

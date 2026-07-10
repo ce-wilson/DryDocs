@@ -663,9 +663,16 @@ items:
       top-level drydocs_remediation/ package (naming per the drydocs_core convention, note in
       0002-B) — formats (DefinitionFormat seam) / detect / transform / equivalence / jira (only
       side-effect boundary), contracts in docstrings, bodies NotImplementedError; pyproject +
-      boundary-test `remediation` group + MODULE_MAP row + test_remediation_scaffold.py. NEXT:
-      greenfield the M0 PoC slice (detect + XmlDefinitionFormat.load against the R-registry),
-      then equivalence, then the Jira emitter (M1).
+      boundary-test `remediation` group + MODULE_MAP row + test_remediation_scaffold.py.
+      2026-07-10 (later) — M0 SLICE IMPLEMENTED: TranscriptDefinitionFormat (gate-1 fallback;
+      XML impl BLOCKED on vendor schema acquisition — corpus stub), R1 dot-smuggling detector
+      (core classifier), order-paired equivalence proof (core resolver, __DRYDOCS_WATCH__
+      probe). Engine run on the REAL M0 unit reproduces the worked example verbatim — legacy
+      baseline clean, R1 fires, shipped modern rewrite still diverges (MATCH=False) — recorded
+      internal/remediation/m0/engine-run-2026-07-10.md; sanitized twins pinned as
+      test_remediation_m0.py (6 tests). Verdict PENDING A3 ground truth + B1 var.text rule
+      (company-side; core resolver deliberately untouched). NEXT: transform (Gate 3, ratified
+      rules only) + jira emitter (M1); XML I/O when the schema lands; A3 unblock company-side.
 
   - id: G4
     epic: component-topology
