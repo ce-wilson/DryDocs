@@ -776,6 +776,31 @@ items:
       ADR 0002 follow-up #6. The ADR already records them in Options Considered; this just adds a
       durable pointer. Small hygiene task.
 
+  - id: G10
+    epic: component-topology
+    title: "Re-review the two governance reference docs held out of the G3 doc port"
+    type: task
+    module: drydocs-remediation
+    phase: 6
+    agent: main
+    model: sonnet
+    priority: p3
+    status: todo
+    depends_on: [G3]
+    inputs: [internal/remediation/README.md]
+    acceptance: >
+      The two governance reference documents deliberately held out of the repo at the
+      2026-07-10 G3 doc port (identified ONLY in internal/remediation/README.md §HELD — do not
+      name them here) are re-reviewed with the SME; each is EITHER landed under internal/ with
+      an explicit sensitivity classification (test_classification green) OR recorded as
+      permanently out-of-repo with the engine's out-of-band read path documented; the README's
+      §HELD section is updated with the outcome either way.
+    notes: >
+      Created 2026-07-10 (user call: keep them out of the repo for now). This item is
+      deliberately SANITIZED — the doc identities, content class, and durable location live in
+      the publish-excluded internal/remediation/README.md, not here. Timing: gated on G3 because
+      the remediation engine's escalation-facing features are what would need them.
+
   # ── Epic H — drydocs-review back-flow (main, opus) ────────────────────────
   # REVERSE of the normal port: reproduce the company-authored generic SME-review/
   # HITL toolkit GENERICALLY in this public producer. Re-implement from screenshots/
@@ -2046,7 +2071,7 @@ items:
 # Roll-up the dispatcher can glance at. COMPUTED views — test_backlog.py enforces
 # that these match the items exactly; update them with any status change.
 summary:
-  todo: 24                                          # G3 pulled in_progress 2026-07-10
+  todo: 25                                          # +G10 (held-docs re-review, gated on G3) 2026-07-10
   in_progress: 7                                   # E1, F1, F2, K2, P2 (awaiting HITL), O1 (web design pass), G3 (spinoff rebase)
   blocked: 0
   done: 45                                          # G2 physical relocate DONE 2026-07-10 (ADR 0002-A-1)

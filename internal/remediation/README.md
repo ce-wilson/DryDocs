@@ -18,16 +18,20 @@ The rule source and plans the `drydocs-remediation` component (G3) builds from:
 | `standards-normalization-plan.md` | predecessor plan — EVALUATE against current `knowledge/standards/` before relying on it |
 | `governance/` | the R13–R29 source corpus (naming standards, NFR catalog, critical-batch/self-heal, greenfield recommendations) |
 
-## HELD FOR REVIEW — not yet ported (user call 2026-07-10)
+## HELD — KEPT OUT OF THE REPO (user decision 2026-07-10)
 
-Two governance docs are **deliberately absent**, pending the user's classification review
-(candidate Internal-Confidential — real escalation routing / queue registry):
+Two governance docs are **deliberately absent** and stay out for now (reviewed 2026-07-10:
+real escalation routing / queue-registry content, candidate Internal-Confidential):
 
 - `governance/escalation-scim-reference.md`
 - `governance/scim-hpsm-queue-registry.md`
 
-They remain readable in the archive. Cross-references to them from the ported docs
-(e.g. critical-batch §self-heal, nfr-catalog) will dangle until the review lands them here.
+**Durable location:** `ce-wilson/DryDocs-v0-archive@controlm-spinoff` (tip `3e6a39a`),
+`internal-standards/governance/` — the archive branch is the system of record for them;
+scratchpad copies are ephemeral. **Re-entry is tracked as backlog item G10** (sanitized —
+it names this README section, not the docs). Until G10 lands them or records a permanent
+out-of-band read path, cross-references from the ported docs (critical-batch §self-heal,
+nfr-catalog) dangle by design.
 
 ## Caveats
 
