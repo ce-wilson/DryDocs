@@ -20,7 +20,7 @@ from drydocs_remediation.jira import JiraRef
 
 def test_package_surface() -> None:
     assert set(drydocs_remediation.__all__) == {
-        "detect", "equivalence", "formats", "jira", "transform",
+        "corroborate", "detect", "equivalence", "formats", "jira", "transform",
     }
 
 

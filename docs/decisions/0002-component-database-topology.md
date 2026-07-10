@@ -9,7 +9,9 @@ deciders: [chad.wilson, SME-gate]
 layer: cross-cutting    # architecture; affects layers 3 (KG) and 4 (context)
 affects:
   - drydocs/            # → monorepo: drydocs-core + component packages
-  - external repo: ce-wilson/DryDocs-v0-archive@controlm-spinoff (to be rebased)
+  - external repo: ce-wilson/DryDocs-v0-archive@controlm-spinoff — SUPERSEDED 2026-07-10
+    # (G3 / 0002-B DONE: remediation re-homed as drydocs_remediation on drydocs_core;
+    #  stop maintaining the archive branch — it remains readable as source material only)
   - deployment: Neo4j edition (Enterprise) + database provisioning
 supersedes_plan: SDLC-Docs/extracted/modular-architecture-plan.md
 ```

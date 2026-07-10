@@ -1,7 +1,7 @@
 # ADR 0002-B — `controlm-spinoff` → `drydocs-remediation` rebase checklist
 
 ```yaml
-status: IN_PROGRESS     # PLANNED | IN_PROGRESS | DONE — G3 pulled 2026-07-10; archive inventory underway
+status: DONE            # PLANNED | IN_PROGRESS | DONE — G3 closed 2026-07-10; §5 criteria met; controlm-spinoff archive SUPERSEDED
 date: 2026-06-26
 companion_to: docs/decisions/0002-component-database-topology.md   # ADR 0002, D3
 depends_on: docs/decisions/0002-a-drydocs-core-extraction-plan.md  # core must exist first
@@ -67,9 +67,11 @@ for the handoff (ADR 0002, D3).
        remediation code; its remediation IP is the plans + the R1–R29 rules registry + the
        governance corpus. Parser divergence check: current core strictly AHEAD, zero
        archive-only deltas → step 3 is a no-op, no core PRs needed.)*
-3. [ ] **Re-home parsing:** delete the spinoff's own Control-M parse code; call
+3. [x] **Re-home parsing:** delete the spinoff's own Control-M parse code; call
        `drydocs_core.controlm` instead. Any parse divergence the spinoff relied on becomes either
        a core change (PR to core) or a thin remediation-side adapter — never a fork of the parser.
+       *(NO-OP by inventory, 2026-07-10: all 8 archive parser modules diffed — current core
+       strictly ahead, zero archive-only deltas; the component was built calling core from birth.)*
 4. [~] **Port remediation logic only:** the failure-pattern detection, the legacy→greenfield XML
        transform rules, the offline equivalence check, and the Jira emitter. Put the XML read/
        write behind a `DefinitionFormat` interface (XML impl now, JSON impl later).
@@ -92,25 +94,34 @@ for the handoff (ADR 0002, D3).
        as a defect), and the structural no-graph-write guard. 26 remediation tests green.
        REMAINING: Tier-2 agentic lane (FR-REM-4, gated per-fix HITL), corroboration reads
        (§2 step 5), XML I/O (schema acquisition), M2 generalization of detect/prove.)*
-5. [ ] **Wire the corroboration reads:** legacy XML must reconcile with the Oracle `psgmgr.*`
+5. [x] **Wire the corroboration reads:** legacy XML must reconcile with the Oracle `psgmgr.*`
        extract and the loaded `drydocs` snapshot — all **read-only** via `drydocs_core` adapters +
        `Neo4jClient(database="drydocs")`.
-6. [ ] **Jira handoff:** emit the ticket (greenfield XML attached, equivalence proof in body).
+       *(MECHANISM DONE 2026-07-10: `corroborate.reconcile_variables` (pure) +
+       `corroborate.ReadOnlyGraph` — the sole graph path, refuses write Cypher BEFORE the driver.
+       The schema-specific live queries are Track-2, written company-side through the wrapper.)*
+6. [x] **Jira handoff:** emit the ticket (greenfield XML attached, equivalence proof in body).
        Jira = SoR; no app-side ticket store, no graph write.
+       *(BOUNDARY DONE 2026-07-10: pure deterministic render + `JiraSubmitter` sole wire;
+       unproven packages refuse to emit; REST impl + real tickets are company-side operations.)*
 
 ## 3. Verification gates (the invariants, as tests)
 
-- [ ] **No-graph-write test:** a unit test asserts `drydocs-remediation` opens no write
+- [x] **No-graph-write test:** a unit test asserts `drydocs-remediation` opens no write
       transaction against any DB (mock `Neo4jClient`, assert read-only / session.run never on a
       write path). This is the structural guarantee that remediation can't pollute ground truth.
-- [ ] **Jira-only output:** the component's sole side effects are the greenfield XML artifact +
-      the Jira call; assert via the emitter boundary.
-- [ ] **Offline equivalence proof:** greenfield XML re-derives the same resolved behavior as the
+      *(test_remediation_no_graph_write.py — structural AST guard; test_remediation_corroborate.py
+      — runtime: write Cypher raises before the spy driver, boundary confirmed empty.)*
+- [x] **Jira-only output:** the component's sole side effects are the greenfield XML artifact +
+      the Jira call; assert via the emitter boundary. *(test_remediation_handoff.py)*
+- [x] **Offline equivalence proof:** greenfield XML re-derives the same resolved behavior as the
       legacy XML (the parser's resolved-value output matches) — reuses `drydocs_core` resolution
-      so the proof is apples-to-apples.
-- [ ] **Core boundary holds:** `drydocs-remediation` imports only `drydocs_core.*` (0002-A §4
-      boundary test extended to the new package).
-- [ ] Existing gates green: `poetry run pytest -q`, package imports, `--help`.
+      so the proof is apples-to-apples. *(test_remediation_m0.py + test_remediation_tier1.py;
+      the REAL M0 unit's verdict stays pending ground truth A3/B1 — a data fact, not a gate gap.)*
+- [x] **Core boundary holds:** `drydocs-remediation` imports only `drydocs_core.*` (0002-A §4
+      boundary test extended to the new package). *(`remediation` COMPONENT_GROUP, default-deny.)*
+- [x] Existing gates green: `poetry run pytest -q`, package imports, `--help`.
+      *(505+ passed / 3 expected skips at close, 2026-07-10.)*
 
 ## 4. Old → new home map (filled 2026-07-10, archive tip `3e6a39a`)
 

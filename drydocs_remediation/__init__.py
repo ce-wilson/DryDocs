@@ -24,13 +24,15 @@ Status (2026-07-10): M0 slice + the Tier-1/handoff slice IMPLEMENTED — transcr
 (the gate-1 fallback format), the R1 dot-smuggling detector, the order-paired
 equivalence proof, the ratified-only Tier-1 transform engine (FR-REM-3; first rule:
 canonical variable rename), and the Jira handoff boundary (FR-REM-6; render is pure,
-``JiraSubmitter`` is the only wire, REST impl is company-side). STILL STUBS —
-``XmlDefinitionFormat`` (blocked on the vendor schema acquisition, see ``formats.py``);
-Tier-2 (agentic) fixes and corroboration reads are future slices. The equivalence
+``JiraSubmitter`` is the only wire, REST impl is company-side), and read-only
+corroboration (``corroborate`` — pure reconcile + the ``ReadOnlyGraph`` wrapper that
+refuses write Cypher before the driver; live schema-specific queries are Track-2,
+company-side). STILL STUBS — ``XmlDefinitionFormat`` (blocked on the vendor schema
+acquisition, see ``formats.py``); Tier-2 (agentic) fixes are a future slice. The equivalence
 verdict on the real M0 unit stays PENDING ground truth (info item A3 / the ``var.text``
 rule B1) — see ``internal/remediation/m0/``. Contract:
 ``docs/design/drydocs-remediation-tdd.md`` wins on conflict.
 """
-from . import detect, equivalence, formats, jira, transform
+from . import corroborate, detect, equivalence, formats, jira, transform
 
-__all__ = ["detect", "equivalence", "formats", "jira", "transform"]
+__all__ = ["corroborate", "detect", "equivalence", "formats", "jira", "transform"]
