@@ -213,20 +213,13 @@ node_classifications:
     note:       "Data port (EventProcessing / BatchProcessing). dprod namespace is the EKGF working default pending the corporate IRI."
 
   # — SEAL reshape (PROPOSED, GATE-BOUND — 2026-07-08 review, no supplement/loader exist) —
-  # These three node classes exist ONLY so the proposed edges below (seal_had_primary_source /
-  # seal_app_attributed_to_employee / seal_qualified_attribution / seal_attribution_has_agent /
-  # seal_attribution_had_role) type-check under the PROV matrix once confirmed. Nothing here is
-  # active. See config/taxonomy-ontology-map.yaml and config/gate-prompts/
-  # seal-tom-attribution-reshape.yaml.
-  - label:      Document
-    class:      "prov:Entity"
-    prov_type:  Entity
-    note: >
-      PROPOSED (not yet built): a scraped SEAL/PAT source page — the future drydocs-docmeta
-      component (planned; see knowledge/upgrade-plans/docmeta-component.md). Registered here
-      only so prov:hadPrimarySource (seal_had_primary_source) type-checks Entity -> Entity.
-      No supplement/loader exists yet; do not treat as active until docmeta itself is built
-      and separately gated.
+  # These two node classes exist ONLY so the proposed edges below (seal_app_attributed_to_employee /
+  # seal_qualified_attribution / seal_attribution_has_agent / seal_attribution_had_role)
+  # type-check under the PROV matrix once confirmed. Nothing here is active. See
+  # config/taxonomy-ontology-map.yaml and config/gate-prompts/seal-tom-attribution-reshape.yaml.
+  # (seal_had_primary_source targets :Document — declared ONCE in the docs-corpus section
+  # below; the duplicate SEAL-reshape Document entry was merged into it 2026-07-09,
+  # tech-debt audit F4 — one label, one classification entry.)
 
   - label:      Attribution
     class:      "prov:Attribution"
@@ -335,10 +328,14 @@ node_classifications:
       A converted external/internal document (first corpus: bmc-docs, the 26
       converted BMC Control-M pages). Carries source_url + scraped_on +
       trust_default; NOT a source-of-record — the SOURCE-MANIFEST provenance
-      model governs. Gate: bmc-docs-lexical-load (2026-07-08, pending).
-      Distinct from the SEAL-reshape's planned Document-in-drydocs_context
-      idea — same class; this one lands beside the software registry so
-      DESCRIBES can reach :SoftwareProduct in-database.
+      model governs. Gate: bmc-docs-lexical-load (accepted 2026-07-08).
+      THE single :Document classification (dedupe 2026-07-09, tech-debt audit
+      F4): also covers the SEAL-reshape / drydocs-docmeta use — a scraped
+      SEAL/PAT source page targeted by seal_had_primary_source
+      (prov:hadPrimarySource type-checks Entity -> Entity against this
+      entry); that use stays PROPOSED until docmeta is built and gated.
+      Lands beside the software registry so DESCRIBES can reach
+      :SoftwareProduct in-database.
 
   - label:      Chunk
     class:      "prov:Entity"

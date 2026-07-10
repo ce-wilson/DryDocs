@@ -15,7 +15,7 @@
 # =============================================================================
 
 schema: drydocs.taxonomy-ontology-map.v1
-updated: 2026-06-20
+updated: 2026-07-09
 
 mappings:
 
@@ -52,7 +52,8 @@ mappings:
       prov_maps_to: "prov:hadMember"
     precedence_authority: bmc-baseline
     reuses_vocab: m3_contains_folder (active)
-    status: confirmed                           # APPLIED 2026-07-07 — folder-pass loader extension (header-row join)
+    status: applied                             # loader: controlm_folders.cypher (folder-pass header-row join)
+    applied_on: 2026-07-07
     confirmed_by: SME
     confirmed_on: 2026-07-07
 
@@ -598,7 +599,8 @@ mappings:
       edge_properties: { target_version: "9.0.21.300 (corpus version notice)" }
     precedence_authority: bmc-baseline
     reuses_vocab: docs_describes (active)
-    status: confirmed                            # APPLIED by load-bmc-docs
+    status: applied                              # loader: bmc_docs.cypher (load-bmc-docs, live 2026-07-08)
+    applied_on: 2026-07-08
     confirmed_by: SME
     confirmed_on: 2026-07-08
 
@@ -612,7 +614,8 @@ mappings:
       prov_maps_to: ~
     precedence_authority: bmc-baseline
     reuses_vocab: docs_chunk_part_of (active)
-    status: confirmed                            # APPLIED by load-bmc-docs
+    status: applied                              # loader: bmc_docs.cypher (load-bmc-docs, live 2026-07-08)
+    applied_on: 2026-07-08
     confirmed_by: SME
     confirmed_on: 2026-07-08
 
@@ -626,7 +629,8 @@ mappings:
       prov_maps_to: ~
     precedence_authority: bmc-baseline
     reuses_vocab: docs_first_chunk (active)
-    status: confirmed                            # APPLIED by load-bmc-docs
+    status: applied                              # loader: bmc_docs.cypher (load-bmc-docs, live 2026-07-08)
+    applied_on: 2026-07-08
     confirmed_by: SME
     confirmed_on: 2026-07-08
 
@@ -640,7 +644,8 @@ mappings:
       prov_maps_to: ~
     precedence_authority: bmc-baseline
     reuses_vocab: docs_next_chunk (active)
-    status: confirmed                            # APPLIED by load-bmc-docs
+    status: applied                              # loader: bmc_docs.cypher (load-bmc-docs, live 2026-07-08)
+    applied_on: 2026-07-08
     confirmed_by: SME
     confirmed_on: 2026-07-08
 
@@ -739,7 +744,7 @@ mappings:
 
 # Counts the gate reports to the SME each run.
 summary:
-  applied: 1          # job-contains
-  confirmed: 21       # C1 (4) + C2 (4) + C3 (6) + bmc-docs lexical (4 — gate 2026-07-08) + CM_HOSTS topology (3 — gate 2026-07-09)
+  applied: 6          # job-contains, application-contains-folder, doc-describes-product, doc-chunk-part-of, doc-first-chunk, doc-next-chunk (comment-APPLIED entries promoted 2026-07-09, tech-debt F2)
+  confirmed: 17       # recomputed 2026-07-09 after F2 promotion (bmc-docs 4 + application-contains-folder moved to applied)
   proposed: 8         # job-seal-app-ref, oracle-schema-asset, jobrun-observation, application-as-dataproduct, seal-tom-attribution, seal-doc-source-of-record, job-runtime-stats-supplement, requires-scheduler (merge 2026-07-09)
   rejected: 0
