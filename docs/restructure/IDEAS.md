@@ -37,6 +37,16 @@ Tags help grooming: `idea` · `bug` · `doc` · `source` (new data source) · `q
   §Workbench + SYNTHESIZED notes), `drydocs-remediation-tdd.md` §HITL OQ-1. (Control-M for
   Kubernetes / Helm-chart offering deliberately SKIPPED — different product, agents-in-K8s,
   no current use case.)
+- 2026-07-09 — [idea] `:SchedulerKind` slated for **DEPRECATION → `:AisCapability` + `:AiTool`**
+  (user 2026-07-09). Today SchedulerKind is a small placeholder vocab (ControlM/Autosys/Airflow,
+  seeded `ontology.cypher` + the `scheduler_kind` constraint) with no `node_classifications` entry.
+  The replacement classes are **not yet defined** — needs the SME to specify what `:AisCapability`
+  and `:AiTool` represent and how the app batch port's `REQUIRES_SCHEDULER` re-targets them (one
+  edge or two). Touches: the C6 `requires-scheduler` map entry (target provisional), F1/F2
+  orchestrator crosswalks, `ontology.cypher` seeds + the `scheduler_kind` constraint, README.
+  Ontology/node-meaning ⇒ HITL gate; groom into an item once the two classes are defined.
+  Reconciliation placeholder created: `config/taxonomy/platforms.yaml` (status: placeholder).
+
 - 2026-07-08 — [doc] **BRD outline (Epic L, deferred)** — the third canonical doc type after
   TDD (L1) and Runbook (L8). Parked, not promoted: the BRD is a work-in-progress upstream and
   the user flagged it as "definitely a later phase", so there is no stable outline to write an
@@ -202,3 +212,11 @@ Tags help grooming: `idea` · `bug` · `doc` · `source` (new data source) · `q
   comment-`APPLIED` entries → `status: applied`, stale `updated:`; (3) structured
   `vocab_id:` + `capture:` fields at the next gate (taxonomy-first erosion — see main's
   `platforms.yaml` retrofit `fa7a00c`).
+- 2026-07-09 — [idea] **Port-boundary tech-debt audit written** (`docs/reviews/tech-debt-port-boundary.md`,
+  /tech-debt run): the publisher→consumer break points CAN be segregated — six break classes
+  (A reverse-direction Canonical-COMPANY, B per-entry, C integration hand-merges, D env/wiring,
+  E gitignored assets, F rename waves) + the meta-debt (dispositions are prose-only across
+  git-readme/port-prompt/reconcile-port, no guard). Groom: (1) PORT-MANIFEST.yaml +
+  test_port_manifest (priority 40 — MUST land BEFORE ADR 0002 Phase B rename wave);
+  (2) per-entry reconciler guards (status-downgrade, gate-log append-only); (3) Class-A
+  connector/overlay physical split (do with Phase B).

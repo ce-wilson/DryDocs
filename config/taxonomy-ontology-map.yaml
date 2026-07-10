@@ -176,6 +176,30 @@ mappings:
       Flagged for the SME at the same gate that confirms application-as-dataproduct — see
       config/gate-prompts/seal-tom-attribution-reshape.yaml section F (K2 re-shape).
 
+  # ---- REQUIRES_SCHEDULER (backlog C6, 2026-07-09) — documented but unregistered ----
+  - id: requires-scheduler
+    taxonomy:
+      source: seal-extract
+      element: "A BatchProcessing data port requires a scheduler technology (which orchestrator runs its batch)"
+    ontology:
+      from_node: Port                       # the BATCH port: :Port:BatchProcessing {kind:"BatchProcessing"}; app-level (:Application)-[:HAS_PORT]->(:Port), two per app (EventProcessing/API + BatchProcessing)
+      to_node: SchedulerKind                # PROVISIONAL — slated for deprecation → :AisCapability + :AiTool (user 2026-07-09; not yet defined). Today: {name: ControlM|Autosys|Airflow}, seeded ontology.cypher
+      prov_type_from: Entity                # dprod port (Entity semantics)
+      prov_type_to: ~                        # target class unsettled (SchedulerKind deprecating; replacements undefined)
+      matrix_row: "n/a — infrastructure/capability placement, no PROV row (same family as SCHEDULED_ON)"
+      neo4j_label: REQUIRES_SCHEDULER
+      role: ~
+      prov_maps_to: ~
+    precedence_authority: bmc-baseline
+    reuses_vocab: seal_requires_scheduler (planned)
+    source_evidence: "README.md:263 + docs/history/LoadPlanV3.md:82,393 (documented as a post-load edge); no loader/extract yet — status: planned in relationship_vocabulary.yaml, not wired."
+    status: proposed                         # <-- SME must confirm at the gate (backlog C6)
+    provenance_note: "Registered per backlog C6 (2026-07-09) to close the README/LoadPlanV3-vs-vocab drift. Edge meaning ⇒ HITL gate; not auto-decided."
+    open_questions:
+      - "Attach point: ports are application-level ((:Application)-[:HAS_PORT]->(:Port), kind∈{EventProcessing=events/API, BatchProcessing=batch}), so README.md:263 ('on :Application') and LoadPlanV3.md:82 ('the :BatchProcessing port') describe the SAME app batch port. SME call = keep the edge on the batch :Port (as here) or hoist to :Application. REQUIRES_SCHEDULER is batch-only (the EventProcessing/API port is not scheduler-driven)."
+      - "TARGET (to_node): :SchedulerKind is slated for deprecation → :AisCapability + :AiTool (user 2026-07-09; not yet defined in the ontology). The target here is PROVISIONAL — re-target/reshape onto the replacement class(es) at the gate once defined; whether REQUIRES_SCHEDULER becomes one edge or two is itself an SME call. See config/taxonomy/platforms.yaml (reconciliation placeholder) + the IDEAS SchedulerKind-deprecation capture."
+      - "Confirm null-PROV/infrastructure is correct, vs a weak prov:used / prov:wasInfluencedBy."
+
   # ---- SEAL ontology reshape — GATE-BOUND (2026-07-08 review) --------------
   # Nothing in this block is applied. The :Application node stays classed prov:SoftwareAgent
   # (status: active in relationship_vocabulary.yaml#node_classifications) until the SME
@@ -716,6 +740,6 @@ mappings:
 # Counts the gate reports to the SME each run.
 summary:
   applied: 1          # job-contains
-  confirmed: 21       # C1 (4) + C2 (4) + C3 (6) + bmc-docs lexical (4 — gate 2026-07-08) + CM_HOSTS topology (3: job-runs-on-host-group, host-group-contains-host, host-group-defined-on — gate 2026-07-09)
-  proposed: 7         # job-seal-app-ref, oracle-schema-asset, jobrun-observation, application-as-dataproduct, seal-tom-attribution, seal-doc-source-of-record, job-runtime-stats-supplement (2026-07-09)
+  confirmed: 21       # C1 (4) + C2 (4) + C3 (6) + bmc-docs lexical (4 — gate 2026-07-08) + CM_HOSTS topology (3 — gate 2026-07-09)
+  proposed: 8         # job-seal-app-ref, oracle-schema-asset, jobrun-observation, application-as-dataproduct, seal-tom-attribution, seal-doc-source-of-record, job-runtime-stats-supplement, requires-scheduler (merge 2026-07-09)
   rejected: 0
