@@ -39,7 +39,8 @@ hr { border:none; border-top:1px solid var(--line); margin: 26px 0; }
 .dd-fb-bar .dd-badge { font-weight:700; }
 .dd-toast { position:fixed; right:16px; bottom:64px; background:var(--ink); color:var(--bg); padding:8px 12px; border-radius:8px; font-size:13px; z-index:60; opacity:0; transition:opacity .2s; }
 .dd-toast.show { opacity:1; }
-@media print { .dd-note-btn, .dd-note-box, .dd-fb-bar, .dd-toast { display:none !important; } }
+.dd-sme-feedback ol li { margin: 6px 0; }
+@media print { .dd-note-btn, .dd-note-box, .dd-fb-bar, .dd-toast, .dd-sme-feedback, .dd-sme-divider { display:none !important; } }
 </style>
 </head>
 <body>
@@ -74,22 +75,22 @@ hr { border:none; border-top:1px solid var(--line); margin: 26px 0; }
     G -.-&gt;|&quot;team deploys;&lt;br/&gt;next ingest reflects it&quot;| H[&quot;ticket closes&quot;]</code></pre>
 <p>One loop, two lanes. Everything a <em>rule</em> can express runs deterministic and silent; anything needing judgment runs agent-assisted and <strong>always</strong> passes human review before it becomes a ticket. Both lanes converge on the same exit criteria: an equivalence proof and a Jira. The graph — including the freshly loaded bmc-docs corpus — is the investigation surface, never the write target.</p>
 <h2 id="detailed-design">3. Detailed design</h2>
-<h3>Stage A — Acquire (the <code>DefinitionFormat</code> seam)</h3>
+<h3 id="detailed-design--stage-a-acquire-the-definitionformat">Stage A — Acquire (the <code>DefinitionFormat</code> seam)</h3>
 <p>The engine never parses raw vendor formats directly; it reads through <code>DefinitionFormat</code>:</p>
 <table><thead><tr><th>Source</th><th>Status</th><th>Notes</th></tr></thead><tbody><tr><td>Definition <strong>XML</strong> export (<code>exportdeftable</code> / env export)</td><td><strong>now</strong> — the 9.0.21.300 reality</td><td>XML deprecated from 9.0.21.100 but supported to 9.0.22 — inside the window</td></tr><tr><td><strong>API pull</strong></td><td><strong>SPIKE, TBD</strong> — the user is probing what the environment exposes programmatically</td><td>lands as a second <code>DefinitionFormat</code> impl if viable; findings gate at §HITL (OQ-1)</td></tr><tr><td><code>psgmgr</code> replica + loaded graph</td><td>corroboration only, read-only</td><td>legacy definition must <em>reconcile</em> with both before any transform is trusted</td></tr></tbody></table>
 <p>Format assumptions stay out of the engine (ADR 0002-B §0 note) — the transform rules operate on the parsed model from <code>drydocs_core.controlm</code>, never on format syntax.</p>
-<h3>Stage B — Detect</h3>
+<h3 id="detailed-design--stage-b-detect">Stage B — Detect</h3>
 <p>Two feeds, one queue:</p>
 <ul><li><strong>Failure-driven batches</strong> (the primary use case): a production failure names the folder/ jobs; remediation sweeps <em>that batch</em> for every defect class it knows.</li><li><strong>Standards sweep</strong>: the internal rules registry (naming, metadata-block presence, ownership resolvability via <code>cm_escalation_db</code>) run as read-only checks — company-side rule <em>values</em>, producer-side rule <em>mechanism</em>.</li></ul>
 <p>Each finding is a typed defect: <code>{defect_class, folder/job key, evidence, suggested_tier}</code>.</p>
-<h3>Stage C — Classify: the two-tier fix model</h3>
+<h3 id="detailed-design--stage-c-classify-the-two-tier">Stage C — Classify: the two-tier fix model</h3>
 <p><strong>Tier 1 — deterministic Python.</strong> A fix whose rule is fully expressible in code: metadata- block templating into Description, naming normalization, dead-parameter cleanup, derived field supplements (e.g. SEAL id resolved from an unambiguous escalation-DB row). Properties: idempotent, unit-tested per rule, batch-safe, no LLM anywhere. These are the &quot;some of the meta updates can be coded in Python&quot; class — the default lane whenever possible.</p>
 <p><strong>Tier 2 — agentic.</strong> A fix requiring investigation or judgment: ambiguous ownership, conflicting metadata, behavior-affecting changes, defects with no coded rule yet. The agent works with:</p>
-<ol><li><strong>debug skills</strong> (log/diagnostic interpretation),</li><li><strong>Control-M skills</strong> (<code>controlm-db</code> for replica queries; <code>controlm-runbook-automation</code> for the fix-package procedure),</li><li><strong>graph search over the loaded DB</strong> — the sample Control-M topology, the software registry, and the <strong>bmc-docs lexical corpus</strong> for vendor legality (&quot;is this definition shape legal per Control-M?&quot;), constrained to chunks with <code>provenance IN [VERBATIM, GROUNDED]</code> — <strong>SYNTHESIZED chunks are never citable evidence</strong> (the two-corpus rule, gate 2026-07-08).</li></ol>
+<ol><li id="detailed-design--debug-skills-log-diagnostic-interpretati"><strong>debug skills</strong> (log/diagnostic interpretation),</li><li id="detailed-design--control-m-skills-controlm-db-for-replica"><strong>Control-M skills</strong> (<code>controlm-db</code> for replica queries; <code>controlm-runbook-automation</code> for the fix-package procedure),</li><li id="detailed-design--graph-search-over-the-loaded-db"><strong>graph search over the loaded DB</strong> — the sample Control-M topology, the software registry, and the <strong>bmc-docs lexical corpus</strong> for vendor legality (&quot;is this definition shape legal per Control-M?&quot;), constrained to chunks with <code>provenance IN [VERBATIM, GROUNDED]</code> — <strong>SYNTHESIZED chunks are never citable evidence</strong> (the two-corpus rule, gate 2026-07-08).</li></ol>
 <p>Tier-2 output is a <em>proposed</em> transform + cited evidence; <strong>HITL review is mandatory</strong> before it proceeds to Stage D. A Tier-2 fix that recurs identically is a candidate to be <em>promoted into a Tier-1 rule</em> (with its own unit test) — the loop&#x27;s learning mechanism.</p>
-<h3>Stage D — Transform + prove</h3>
+<h3 id="detailed-design--stage-d-transform-prove">Stage D — Transform + prove</h3>
 <p>Port of the spin-off&#x27;s core (ADR 0002-B §4): <code>remediation/transform.py</code> produces the greenfield definition; <code>remediation/equivalence.py</code> proves it. The proof reuses <code>drydocs_core</code> resolution so it is apples-to-apples: parse legacy → resolve; parse greenfield → resolve; assert equal resolved behavior (schedule, command, conditions, variables) modulo the intended fix, which is itself asserted <em>changed</em>.</p>
-<h3>Stage E — Package + handoff</h3>
+<h3 id="detailed-design--stage-e-package-handoff">Stage E — Package + handoff</h3>
 <p><code>remediation/jira.py</code> emits one ticket per batch to the owning team (resolved via the escalation-DB rule; unresolvable ownership is itself a defect, surfaced not guessed): greenfield artifact attached, equivalence proof + evidence citations in the body. Optional <code>-PRPL</code> parking: the greenfield definition loaded to a parallel folder in <strong>manual order</strong> for dev-team inspection. Jira is the SoR; there is no app-side ticket store.</p>
 <h3 id="design-data-mapping">Source → column-level field mapping</h3>
 <p><strong>N/A — no ingestion.</strong> This component loads nothing into the graph. The column-level view of what it <em>reads</em> lives with the sources themselves (<code>config/source-mappings/</code>, doc 08).</p>
@@ -108,6 +109,17 @@ hr { border:none; border-top:1px solid var(--line); margin: 26px 0; }
 <ul><li><strong>Re-home, don&#x27;t replay</strong> (ADR 0002-B): the archived spin-off is source <em>material</em>; its parser is dropped for <code>drydocs_core.controlm</code> (already strengthened by G8&#x27;s folded deltas).</li><li><strong>Two tiers, one exit:</strong> the deterministic/agentic split is an <em>authoring</em> distinction, not two pipelines — both lanes meet the same proof + handoff bar, which keeps SoD and audit uniform. Tier-2→Tier-1 promotion is the intended direction of travel over time.</li><li><strong>Sequencing:</strong> G3 stays blocked on G2 (core physically extractable). This TDD is deliberately PRESCRIPTIVE now so the API spike (OQ-1) and rule inventory can proceed against a stable contract; flip sections DESCRIPTIVE as they land.</li><li><strong>Why the graph read includes the docs corpus:</strong> vendor legality was previously a skill-file lookup; with the bmc-docs lexical graph loaded (2026-07-08), Tier-2 evidence can be a <em>graph citation</em> (doc → chunk, tier-filtered) — the two-corpus validation model operationalized.</li></ul>
 <h2 id="appendices">Appendix A — Tier examples (mechanism-level)</h2>
 <table><thead><tr><th>Defect class</th><th>Tier</th><th>Rule sketch</th></tr></thead><tbody><tr><td>Description missing metadata block</td><td>1</td><td>render template from resolvable facts; insert; idempotent re-run</td></tr><tr><td>Trailing-&#x27;p&#x27; SID in ownership field</td><td>1</td><td>strip per the gated employee_sid rule</td></tr><tr><td>Watch-path typo vs actual file drops</td><td>2</td><td>debug skill on failure logs + graph lookup of sibling FileWatchers + vendor doc check (file-watcher chunk, GROUNDED)</td></tr><tr><td>Ambiguous APPLICATION vs folder decode</td><td>2</td><td>escalation-DB + folder-name decode + SME confirm</td></tr><tr><td>Dead schedule (folder in manual order, years unrun)</td><td>2</td><td>CM_HIST corroboration; recommend decommission ticket, not transform</td></tr></tbody></table>
+<hr class="dd-sme-divider">
+<section class="dd-sme-feedback" aria-label="SME - Feedback">
+<h2>SME - Feedback</h2>
+<p>How to return your notes on this document:</p>
+<ol>
+<li>Click the <strong>✎</strong> button beside any section (or numbered step) and type your note — notes save in your browser as you type.</li>
+<li>When finished, click <strong>Copy feedback</strong> in the bottom-right toolbar. Your notes are copied as anchor-keyed YAML.</li>
+<li>Create the feedback file (it is YAML, <em>not</em> markdown) — <strong>Copy To:</strong> <code>docs/design/feedback/</code> · <strong>File Name:</strong> <code>drydocs-remediation-tdd-rev1.yaml</code></li>
+<li>Paste the copied block into that file, save, and commit (or send the file back to the team).</li>
+</ol>
+</section>
 </main>
 <script>
 
@@ -137,7 +149,8 @@ hr { border:none; border-top:1px solid var(--line); margin: 26px 0; }
     if((state[id]||"").trim()) el.classList.add("dd-annotated");
     box.appendChild(ta);
     btn.addEventListener("click",function(){ box.style.display=box.style.display==="none"?"block":"none"; if(box.style.display==="block") ta.focus(); });
-    el.insertAdjacentElement("afterend", box); el.insertAdjacentElement("beforebegin", btn);
+    if(el.tagName==="LI"){ el.insertAdjacentElement("afterbegin", btn); el.appendChild(box); }
+    else { el.insertAdjacentElement("afterend", box); el.insertAdjacentElement("beforebegin", btn); }
   }
   document.addEventListener("DOMContentLoaded",function(){
     document.querySelectorAll("main [id]").forEach(attach);

@@ -42,8 +42,8 @@ erDiagram
         number  VERSION_SERIAL "incremental change signal"
         date    CAPTURE_DATE "replication stamp; coarse HWM only"
     }
-    CM_DEF_SETVAR {
-        number  TABLE_ID PK,FK "** object name still unverified **"
+    CM_DEF_SETVAR_VW {
+        number  TABLE_ID PK,FK "object name confirmed 2026-07-10"
         number  JOB_ID PK,FK
         varchar NAME "dupes per (job,name) legitimate"
         varchar VALUE
@@ -136,11 +136,11 @@ erDiagram
 
     %% ---- source joins ----
     CM_DEF_VTAB ||--o{ CM_DEF_VJOB : "TABLE_ID"
-    CM_DEF_VJOB ||--o{ CM_DEF_SETVAR : "TABLE_ID + JOB_ID"
+    CM_DEF_VJOB ||--o{ CM_DEF_SETVAR_VW : "TABLE_ID + JOB_ID"
 
     %% ---- views project sources ----
     CM_DEF_VJOB ||..|| JOB_DETAILED_VIEW : projects
-    CM_DEF_SETVAR ||..|| JOB_VARIABLE_VIEW : projects
+    CM_DEF_SETVAR_VW ||..|| JOB_VARIABLE_VIEW : projects
     CM_DEF_VJOB ||..|| JOB_DEVELOPER_VIEW : projects
 
     %% ---- every staging row carries its producing run ----
@@ -223,7 +223,7 @@ flowchart TD
 | 0.2 | `MEMLIB` / `OVERLIB` / `APPL_TYPE` exist on `CM_DEF_VJOB`? | Drop absent columns from `JOB_DETAILED_VIEW` before compile |
 | 0.3 | **NEW** — `IS_CURRENT_VERSION` domain values across legacy vs new folders | Decides whether `= '1'` stays a hard filter in both views (gate Q2 caveat) |
 | 0.4 | **NEW** — `CREATION_USER` / `CHANGE_USERID` exist on `CM_DEF_VJOB`? | Required by `JOB_DEVELOPER_VIEW`'s CROSS APPLY; drop branches if absent |
-| — | Confirm the real object behind placeholder `psgmgr.CM_DEF_SETVAR` | Blocks the variable extract, the variable HWM hash, and both files that flag `** VERIFY NAME **` |
+| ✓ | RESOLVED 2026-07-10 — object confirmed as `psgmgr.CM_DEF_SETVAR_VW` (a view carrying its own `IS_CURRENT_VERSION` / `VERSION_SERIAL`); extracts now filter `V.IS_CURRENT_VERSION = '1'` | Unblocked the variable extract + HWM hash; the `** VERIFY NAME **` flags are removed |
 
 ### Recurring stages (each is one Control-M job)
 
@@ -325,15 +325,17 @@ the folder must appear in its own coverage report.
 | Analyst role | SELECT on views + staging + `STG_COVERAGE_SUMMARY` |
 
 Delta vs the old note: `UPDATE` on `STG_LOAD_CONTROL` is new and required; no new psgmgr
-grant is needed for the dev-SID columns (columns on already-granted objects) — the only
-open psgmgr grant question is the real `CM_DEF_SETVAR` object.
+grant is needed for the dev-SID columns (columns on already-granted objects) — and the
+variable object is now confirmed as `CM_DEF_SETVAR_VW`, closing the last open psgmgr
+grant question.
 
 ---
 
 ## 6. Open items (blocking, carried + new)
 
-1. **`CM_DEF_SETVAR` real name** — still unverified; blocks variable extract, variable
-   HWM hashing, and the two `** VERIFY NAME **` flags.
+1. **`CM_DEF_SETVAR_VW` real name — RESOLVED 2026-07-10.** Confirmed against live
+   `psgmgr` as a view carrying its own `IS_CURRENT_VERSION` / `VERSION_SERIAL`; the
+   extracts filter `V.IS_CURRENT_VERSION = '1'` and the `** VERIFY NAME **` flags are removed.
 2. **`CAPTURE_DATE` per-row or per-extract-uniform?** Decides its role as change signal
    vs coarse HWM only.
 3. **`CREATION_USER` / `CHANGE_USERID` existence** on `CM_DEF_VJOB` (pre-flight 0.4).

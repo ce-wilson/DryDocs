@@ -8,6 +8,11 @@
 > dead history) and the v1 rewrite was renamed into its place. Throughout this guide,
 > "producer" means `ce-wilson/DryDocs` (github.com).
 
+> **Machine-readable dispositions: [`PORT-MANIFEST.yaml`](PORT-MANIFEST.yaml) is the
+> AUTHORITY** for how each path resolves on collision (first match wins; guarded by
+> `tests/unit/test_port_manifest.py`). This guide and `docs/port-prompt.md` are the
+> narrative around it — when they disagree, the manifest wins and the prose is stale.
+
 This repo is the **producer** side. Work is built here on `main`, committed, and
 pushed to `github.com/ce-wilson/DryDocs`. The **company** target is
 `<company-org>/DryDocs` on GitHub Enterprise (`[github]` host); its maintainer
@@ -330,7 +335,7 @@ For these paths, **do not hand-merge** — this repo is authoritative; replace
 |---|---|---|
 | `drydocs/controlm/variables.py` | A | `VariableKind` (9 kinds) + `classify_variable()` / `classify_job_variables()` |
 | `drydocs/controlm/variable_report.py` | A | `VariableCoverage` accumulator |
-| `drydocs/loaders/sql/controlm_variables.sql` | A | Variable extract query (`psgmgr.CM_DEF_SETVAR` — **name unverified**) |
+| `drydocs/loaders/sql/controlm_variables.sql` | A | Variable extract query (`psgmgr.CM_DEF_SETVAR_VW` — **name VERIFIED live 2026-07-10**; carries its own `IS_CURRENT_VERSION`, filtered `= '1'`) |
 | `drydocs/loaders/sql/ddl/controlm_staging_ddl.sql` | A | Full staging-layer DDL (8 STG_ tables + views) |
 | `drydocs/controlm/resolver.py` | B | Offline AutoEdit substitution engine |
 | `drydocs/controlm/staging.py` | B (ext. C) | STG_ row builder — `build_staging_bundle` / `collect_jobs` |
@@ -526,10 +531,10 @@ and `STG_COVERAGE_SUMMARY`. Surrogate identity PKs (duplicate `(job, var_name)` 
 legitimate). All keys carry `DATA_CENTER` (TABLE_ID may collide across the 4 DCs).
 < 3M rows / < 2 GB; no partitioning.
 
-> **TODO (DBA)**: confirm the variable source view name. The SQL Developer extract used
-> `TABLE_NAME|JOB_NAME|JOB_ID|APPL_TYPE|NAME|VALUE` (`TABLE_NAME` carries `TABLE_ID`
-> values). The query uses `psgmgr.CM_DEF_SETVAR` — verify before running. Flagged in
-> both `controlm_variables.sql` and the DDL.
+> **RESOLVED (2026-07-10, live psgmgr check):** the variable source object is the view
+> `psgmgr.CM_DEF_SETVAR_VW`, which carries its own `IS_CURRENT_VERSION`/`VERSION_SERIAL`
+> — the extracts filter `V.IS_CURRENT_VERSION = '1'` so superseded variable rows do not
+> leak. The old `CM_DEF_SETVAR` name and the DBA-verify TODO are retired.
 
 See `docs/controlm-c3-normalization-status.md` for the full status + operational runbook.
 

@@ -13,7 +13,7 @@ with optional scope binds:
 |------|---------------|-----------|
 | `controlm_folders.sql` | `CM_DEF_VTAB` | `ControlMFolderRow` |
 | `controlm_jobs.sql` | `CM_DEF_VJOB` ⨝ `CM_DEF_VTAB` | `ControlMJobRow` |
-| `controlm_variables.sql` | `CM_DEF_SETVAR` ⨝ VJOB ⨝ VTAB | `ControlMVariableRow` |
+| `controlm_variables.sql` | `CM_DEF_SETVAR_VW` ⨝ VJOB ⨝ VTAB | `ControlMVariableRow` |
 | `controlm_conditions_in.sql` | `CM_DEF_LNKI_P_VW` ⨝ VTAB | in-condition |
 | `controlm_conditions_out.sql` | `CM_DEF_LNKO_P_VW` ⨝ VTAB | out-condition |
 | `controlm_dependencies_recursive.sql` | derived from in/out | dependency edge |

@@ -189,7 +189,9 @@ _EXPECTED_OBJECTS = [
     "CM_DEF_VJOB",
     "CM_DEF_LNKI_P_VW",
     "CM_DEF_LNKO_P_VW",
-    "CM_DEF_SETVAR",
+    "CM_DEF_SETVAR_VW",
+    "CM_HOSTS",
+    "CM_AVG_RUN",
 ]
 
 
@@ -270,12 +272,39 @@ def test_lnki_lnko_is_current_version_is_staging_only(controlm: SourceMapping) -
         assert disp.target == "staging:is_current_version"
 
 
-def test_setvar_object_flags_its_name_unverified(controlm: SourceMapping) -> None:
-    setvar = controlm.get("CM_DEF_SETVAR")
+def test_setvar_object_name_is_confirmed(controlm: SourceMapping) -> None:
+    setvar = controlm.get("CM_DEF_SETVAR_VW")
     assert setvar.note is not None
-    assert "VERIFY NAME" in setvar.note
+    assert "VERIFY NAME" not in setvar.note
+    assert "confirmed" in setvar.note.lower()
     assert setvar.columns  # TABLE_ID, JOB_ID, NAME, VALUE
     assert setvar.projected() == ["TABLE_ID", "JOB_ID", "NAME", "VALUE"]
+
+
+def test_cm_hosts_is_staging_only_pending_the_topology_gate(controlm: SourceMapping) -> None:
+    """CM_HOSTS (host-group membership) landed 2026-07-09 via add-source-object:
+    all five columns projected, but staging-only — the graph landing
+    (ControlMHostGroup/ExecutionHost/CONTAINS_HOST/RUNS_ON resolution) is
+    gate-bound (controlm-hosts-topology), the CM_DEF_SETVAR_VW precedent."""
+    hosts = controlm.get("CM_HOSTS")
+    assert hosts.projected() == [
+        "DATA_CENTER", "GRPNAME", "NODEID", "PARTICIPATION_TYPE", "CAPTURE_DATE",
+    ]
+    for col in hosts.columns:
+        assert col.target is not None and col.target.startswith("staging:"), col.name
+    assert "controlm-hosts-topology" in (hosts.note or "")
+
+
+def test_cm_avg_run_is_staging_only_with_the_weak_join_key_documented(controlm: SourceMapping) -> None:
+    """CM_AVG_RUN (runtime stats) landed 2026-07-09 via add-source-object:
+    14 columns projected, staging-only pending gate controlm-avg-run-supplement;
+    the join key is (SCHED_TABLE, JOB_MEM_NAME = JOB_NAME) — never MEMNAME."""
+    stats = controlm.get("CM_AVG_RUN")
+    assert len(stats.projected()) == 14
+    for col in stats.columns:
+        assert col.target is not None and col.target.startswith("staging:"), col.name
+    assert "controlm-avg-run-supplement" in (stats.note or "")
+    assert "never MEMNAME" in stats.note
 
 
 def test_all_columns_have_a_valid_disposition_and_origin(controlm: SourceMapping) -> None:

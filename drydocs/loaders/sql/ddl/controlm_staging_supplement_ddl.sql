@@ -8,8 +8,8 @@
 -- Branch: producer feature/oracle-ingestion -> company psgmgr-base.
 -- Target schema: DRYDOCS_STG (all objects unqualified; run as the owning schema).
 -- Site-specific names are PLACEHOLDERS — substitute per site, do not hardcode:
---   DRYDOCS_STG, CM_RO_USER, <PY_NORMALIZER_USER>, and the unverified
---   psgmgr.CM_DEF_SETVAR object.
+--   DRYDOCS_STG, CM_RO_USER, <PY_NORMALIZER_USER>, and the
+--   psgmgr.CM_DEF_SETVAR_VW object (name confirmed 2026-07-10).
 --
 -- Idempotent by construction: CREATE OR REPLACE for views; existence-checked
 -- CREATE for tables/indexes (ORA-00955 swallowed); GRANT is idempotent.
@@ -24,7 +24,7 @@
 BEGIN
   EXECUTE IMMEDIATE '
     CREATE TABLE stg_load_control (
-      source_object       VARCHAR2(128 CHAR) NOT NULL,   -- CM_DEF_VJOB | CM_DEF_VTAB | CM_DEF_SETVAR | ...
+      source_object       VARCHAR2(128 CHAR) NOT NULL,   -- CM_DEF_VJOB | CM_DEF_VTAB | CM_DEF_SETVAR_VW | ...
       data_center         VARCHAR2(40 CHAR)  NOT NULL,
       load_mode           VARCHAR2(12 CHAR)  DEFAULT ''INCREMENTAL'' NOT NULL,  -- FULL | INCREMENTAL
       hwm_capture_date    TIMESTAMP,                       -- coarse high-water mark
@@ -99,5 +99,5 @@ FROM (
 --     GRANT SELECT ON job_developer_view  TO <PY_NORMALIZER_USER>;
 --     GRANT SELECT ON stg_load_control, stg_sample_manifest, job_developer_view TO <ANALYST_ROLE>;
 --   Source reads use the EXISTING CM_RO_USER grants (dev-SID columns are columns
---   on already-granted CM_DEF_VJOB/VTAB — no new psgmgr grant; confirm CM_DEF_SETVAR).
+--   on already-granted CM_DEF_VJOB/VTAB — no new psgmgr grant; CM_DEF_SETVAR_VW confirmed).
 -- =============================================================================

@@ -36,7 +36,7 @@
 # =============================================================================
 
 schema: drydocs.backlog.v2
-updated: 2026-07-09
+updated: 2026-07-10
 
 # ── The high-level project plan (rendered as the board's roadmap strip) ───────
 plan:
@@ -94,6 +94,10 @@ plan:
       title: Web console / graph visualization
       goal: "Browser front-end over the knowledge graph: navigable C4/graph views, with a decided browser↔Neo4j access path (bolt-from-browser vs a thin API)."
       status: in_progress   # design pass in flight (feat/web-console-design-pass); Epic O / O1
+    - id: 13
+      title: Runtime topology & maintenance windows
+      goal: "Control-M host topology (CM_HOSTS) + runtime-stats supplement (CM_AVG_RUN) loaded per their gates; the maintenance-window question (best patch window for a host/group) answerable from the graph (Epic P)."
+      status: in_progress   # PLAN CHANGE groomed 2026-07-09 (autonomous session) -- ratify; hosts gate signed off same day, avg-run gate awaiting SME
 
 # ── Module / work-area registry (item.module must be one of these) ───────────
 # Code components mirror MODULE_MAP.md; the rest are repo work areas so that
@@ -1223,17 +1227,22 @@ items:
       the K3 reshape reclasses it prov:Entity/dprod:DataProduct — run the K3 gate FIRST;
       the match-policy gate spec (seal-attribution-match-policy) may need its edge shape
       revised to the reshaped form before ticking. depends_on gains K3.
+      2026-07-10: K3 gate SIGNED OFF — the reshape IS confirmed needed (post-reclass
+      wasAssociatedWith no longer type-checks against an Entity target), but the specific edge
+      shape (a: prov:used vs b: local BELONGS_TO_APPLICATION) is DEFERRED to a K2 follow-up gate.
+      K2 stays in_progress: still needs (1) that deferred edge-shape decision and (2) its own
+      match-policy gate before the loader is built.
 
   - id: K3
     epic: seal-attribution
-    title: "Run the SEAL entity-reshape gate (:Application -> Entity/DataProduct; TOM roles -> qualifiedAttribution)"
+    title: "Run the BusinessApplication entity-reshape gate (:Application -> Entity/DataProduct; TOM roles -> qualifiedAttribution)"
     type: task
     module: ontology
     phase: 9
     agent: ontology-mapper
     model: sonnet
     priority: p1
-    status: todo
+    status: done
     depends_on: []
     inputs: [config/gate-prompts/seal-tom-attribution-reshape.yaml, drydocs/ontology/relationship_vocabulary.yaml, config/taxonomy-ontology-map.yaml, knowledge/upgrade-plans/docmeta-component.md]
     acceptance: >
@@ -1250,6 +1259,96 @@ items:
       (0986d6d): gate spec + planned vocabulary registrations + map type_conflict_note.
       The remaining action is the SME gate session itself + transcription — the most
       consequential pending gate (three incompatible PROV types on one node today).
+      2026-07-10: STARTED — in_progress = awaiting HITL (the E1/F1/F2/K2/P2 pattern); the
+      agent-side prep is complete, only the SME gate session remains. No graph/vocab write
+      until the gate is signed off and transcribed to config/gate-log.md.
+      2026-07-10 (user request): RENAMED "SEAL entity-reshape" -> "BusinessApplication
+      entity-reshape gate" to normalize to the ontology naming convention for
+      internally-developed applications — the taxonomy concept is BusinessApplication
+      (config/taxonomy/business-application.yaml, key SEALID) while the graph node label is
+      still :Application (relationship_vocabulary.yaml node_classifications:174; the vocab
+      already flags the mismatch at :1292 "DevTeam develops a BusinessApplication (graph
+      label :Application)"). NEW gate open-question this rename raises: alongside the class
+      reclass (prov:SoftwareAgent -> prov:Entity/dprod:DataProduct, gate section A), the SME
+      should decide whether to normalize the node LABEL :Application -> :BusinessApplication.
+      A node-label change is an ontology/node-meaning decision -> gate-bound, NOT auto-applied;
+      the label stays :Application until the gate confirms. The gate spec
+      (seal-tom-attribution-reshape.yaml) does not yet carry this label question — add it to
+      section A before the SME session.
+      2026-07-10: GATE SIGNED OFF (SME chad.wilson) — full transcription in config/gate-log.md
+      (2026-07-10 entry). Outcome: A confirmed (Entity/DataProduct); B confirmed with a REVISED
+      two-family role model (7 SEAL Technical Operational roles on :Application via qualified
+      attribution + a TOMRole scheme; CTO shared; Product Cabinet split out -> K5); C confirmed
+      (deprecate the 3 seal_* edges, keep seal_has_port); D confirmed (hadPrimarySource + docmeta
+      now a required dependency); E decided FLIP arch_develops -> WAS_ATTRIBUTED_TO {role:
+      developed_by}; F/K2 edge shape DEFERRED; label normalization :Application -> :BusinessApplication
+      confirmed-direction. K3 = run+transcribe the gate = DONE. The mechanical application of every
+      flip is K4; the Product Cabinet is K5.
+
+  - id: K4
+    epic: seal-attribution
+    title: "Apply the BusinessApplication entity-reshape gate outcome (reclass + label + TOMRole attribution + deprecations + provenance + precedence)"
+    type: task
+    module: ontology
+    phase: 9
+    agent: ontology-mapper
+    model: sonnet
+    priority: p2
+    status: todo
+    depends_on: [K3]
+    inputs: [config/gate-log.md, drydocs/ontology/relationship_vocabulary.yaml, config/taxonomy-ontology-map.yaml, drydocs/schema/, config/precedence.yaml]
+    acceptance: >
+      Per the 2026-07-10 gate sign-off (config/gate-log.md), each applied as its OWN logged change
+      with drift guards green: (1) node_classifications#Application class flips prov:SoftwareAgent ->
+      prov:Entity/dprod:DataProduct AND the label normalizes :Application -> :BusinessApplication
+      across the vocabulary, loaders, supplements and tests; (2) a TOMRole skos ConceptScheme (the 7
+      SEAL Technical Operational roles; CTO shared with K5's ProductRole scheme) + the
+      qualifiedAttribution/hadRole supplement land (seal_qualified_attribution /
+      seal_attribution_has_agent / seal_attribution_had_role planned -> active with supplement blocks);
+      (3) seal_has_membership / seal_of_role / seal_held_by deprecated (RELATIONSHIP_GUIDE steps;
+      seal_has_port KEPT); (4) seal_had_primary_source activated as an edge (Document nodes wait on the
+      drydocs-docmeta component); (5) arch_develops flips to
+      (:Application)-[:WAS_ATTRIBUTED_TO {role: developed_by}]->(:DevTeam); (6) map entries
+      application-as-dataproduct / seal-tom-attribution / seal-doc-source-of-record flip proposed ->
+      confirmed (carrying vocab_id + capture per F5/C7) -> applied with loaders; (7) the SEAL/PAT
+      precedence proposed_additions block wired into the live order/active chain. Full suite green.
+    notes: >
+      Created 2026-07-10 from the K3 gate sign-off. The gate confirmed the DIRECTION; this is the
+      mechanical APPLICATION, each flip its own logged change (gate section G discipline). Does NOT
+      include the K2 job->app edge (deferred) or the Product Cabinet (K5). CTO is shared between the
+      TOMRole (here) and ProductRole (K5) schemes — coordinate the two. PORT NARRATIVE (added
+      2026-07-10 review): when the :Application -> :BusinessApplication rename applies, ALSO update
+      git-readme.md's SEAL-reshape section (currently instructs the consumer "do NOT take as
+      applied" — becomes wrong), add the port-prompt step, and check PORT-MANIFEST per-entry notes
+      — the prose-mirror drift class from docs/reviews/tech-debt-port-boundary.md.
+
+  - id: K5
+    epic: seal-attribution
+    title: "Product Cabinet attribution model (product-scoped ProductRole scheme + cross-role reporting edges + DevTeam matrix)"
+    type: task
+    module: ontology
+    phase: 9
+    agent: ontology-mapper
+    model: sonnet
+    priority: p3
+    status: todo
+    depends_on: []
+    inputs: [config/gate-log.md, config/taxonomy/lob-product-team.yaml, drydocs/ontology/relationship_vocabulary.yaml, config/taxonomy-ontology-map.yaml]
+    acceptance: >
+      A ProductRole skos ConceptScheme (Area Product Owner, Product Owner, Product Architect, Tech
+      Partner, Data Owner, Data Certifier, Analytics Lead; CTO shared with the TOMRole scheme) is
+      proposed and SME-confirmed via its OWN HITL gate, scoped to the PAT hierarchy nodes
+      (:Product / :AreaProduct, NOT :Application), with Area Product Owner explicitly NOT tying to a
+      business application; the cross-family reporting edges (Tech Partner manages Application Owner;
+      TOM Information Owner reports to Data Owner; Data Certifier relates to the app Information Owner)
+      are modeled as org:reportsTo-style edges or explicitly recorded as deferred; the
+      DevTeam -> BusinessApplication matrix (M:N) is confirmed. No graph write before the gate;
+      drift guards green.
+    notes: >
+      Split out of K3 at the 2026-07-10 gate (SME "ok to split"). Product Cabinet is PAT/Product-layer,
+      distinct from the SEAL app reshape (K3/K4). CTO is the shared concept between the TOMRole and
+      ProductRole schemes. Related to Epic C (catalog hierarchy) — the :Product/:AreaProduct nodes come
+      from config/taxonomy/lob-product-team.yaml.
 
   # ── Epic L — Documentation infrastructure (main) — Phase 10 ───────────────
   # Groomed 2026-07-08 from the deterministic-documentation design conversation.
@@ -1489,6 +1588,87 @@ items:
       headless --print-to-pdf on this box, confirmed 2x 180s timeouts). Renderer tests green.
     notes: "Groomed 2026-07-08 from IDEAS (seen same day; Brave = reference viewer for now)."
 
+  - id: L10
+    epic: doc-infrastructure
+    title: "Design-doc feedback widget: appendix 'SME - Feedback' panel with notes field + paste destination"
+    type: task
+    module: drydocs-docgen
+    phase: 10
+    agent: main
+    model: sonnet
+    priority: p3
+    status: done
+    depends_on: [L5]
+    inputs: [drydocs/design_doc.py, docs/design/feedback/README.md, tests/unit/test_design_doc.py]
+    acceptance: >
+      the screen .html gains an "SME - Feedback" section below the appendix / last outline
+      section, separated by a divider line, containing a SHORT static instruction block
+      telling the reviewer exactly what to do with their annotations — numbered steps in
+      plain language, concretely: annotate sections with the per-section pencil control;
+      click "Copy feedback" (bottom toolbar); create the file
+      docs/design/feedback/<doc-stem>-rev<N>.yaml (YAML — not markdown; the exact
+      per-doc filename with the doc's current Rev is rendered into the instructions, ready
+      to copy); paste the clipboard contents in and save/commit. Print output unchanged;
+      render stays deterministic (Rev comes from front matter, no git/timestamp reads);
+      test_design_doc.py extended; full suite green.
+    notes: >
+      Groomed 2026-07-09 from a chat note after reviewing docs/design/feedback/scans/;
+      amended same day — the panel is a static HOW-TO instruction block, NOT a free-text
+      notes area (user call: the anchor-keyed notes already capture content; the panel's
+      job is walking the SME through create-file/copy/paste). Enhances L5 (copy button
+      verified working by the user). Answers the note's open question: the export
+      extension is .yaml (drydocs.design_doc.feedback_yaml), not .md.
+    progress: >
+      2026-07-09 — DONE. design_doc.py: _sme_feedback_panel + sme_feedback_filename
+      (Rev from front matter, deterministic; placeholder rev<N> when undeclared);
+      appended after the last section in screen mode only, no element ids inside so the
+      annotate layer never attaches to its own instructions. Verified at runtime
+      (headless-Edge DOM dump: panel present, 0 controls inside; exact filename
+      controlm-ingestion-tdd-rev3.yaml rendered). 3 new tests; feedback README updated.
+
+  - id: L11
+    epic: doc-infrastructure
+    title: "Design-doc feedback: per-subsection annotate controls when a section has >2 subsections"
+    type: task
+    module: drydocs-docgen
+    phase: 10
+    agent: main
+    model: sonnet
+    priority: p3
+    status: done
+    depends_on: [L5]
+    inputs: [drydocs/design_doc.py, drydocs/doc_outline.py, docs/design/feedback/README.md, tests/unit/test_design_doc.py]
+    acceptance: >
+      when a rendered section contains MORE THAN TWO subsections (nested sub-headings
+      like 1.a/1.b/1.c/1.d, or a numbered step list 1/2/3), the screen .html renders an
+      annotate (pencil) control on EACH subsection, not just the section header, so the
+      exported feedback keys to the specific subsection (tighter control); each
+      subsection control uses a STABLE derived anchor (parent anchor + deterministic
+      subsection suffix — never positional-only, so notes survive re-renders and
+      subsection insertion), and that derived-anchor namespace is accepted by the
+      feedback_yaml format / doc_outline anchor validation and documented in
+      docs/design/feedback/README.md; sections with two or fewer subsections keep the
+      single section-level control; print output unchanged; render stays deterministic;
+      test_design_doc.py extended (cases: 3+ sub-headings, numbered step list, <=2
+      subsections unchanged); full suite green.
+    notes: >
+      Groomed 2026-07-09 from a chat note (follow-on to L10, same review pass). Threshold
+      is the user's ">2" (examples given: 1.a-1.d, steps 1-3); confirm the exact boundary
+      (>2 vs >=2) with the user at implementation if it matters in practice. The anchor
+      derivation is the design core: feedback re-attaches by anchor, so subsection anchors
+      must be as stable as the authored section anchors.
+    progress: >
+      2026-07-09 — DONE. design_doc.py: _inject_subsection_anchors (screen-only post-pass)
+      derives <parent>--<slug-of-subsection-text> ids for sub-headings one level down and
+      for top-level items of numbered lists, when the group has >2 members; anchored
+      subheadings count toward the threshold but keep their authored id; dedupe -2/-3
+      deterministic; JS attach() gained an LI branch (button afterbegin / box beforeend).
+      doc_outline.py: DERIVED_ANCHOR_SEP + feedback_anchor_valid (a derived note degrades
+      to its parent section if the slug changes; "--" now reserved in authored ids).
+      Verified at runtime (headless-Edge DOM dump: 29/29 ids present, controls on all
+      derived h3s + 9 list items; print surface byte-identical to pre-change). 7+3 new
+      tests; feedback README documents the namespace.
+
   # ── Epic M — Provenance diet + audit envelope (doc 06) — Phase 11 ──────────
   # Groomed 2026-07-08 from the 2026-07-05 IDEAS line + the 2026-07-07 property-terms
   # line. Doc 06 Phases 0-1 (Control-M envelope: audit-fields.yaml + jobs/folders
@@ -1667,11 +1847,176 @@ items:
       Plan change (user-approved): created module drydocs-web + phase 12. The architecture is
       still open — the bolt-vs-thin-API call is the crux of this item.
 
+  # ── Epic P — Runtime topology & maintenance windows — Phase 13 ─────────────
+  # Born 2026-07-09: CM_HOSTS + CM_AVG_RUN onboarded via the add-source-object
+  # walkthrough; gate controlm-hosts-topology SIGNED OFF 18/18 same day
+  # (config/gate-log.md); gate controlm-avg-run-supplement prepped, awaiting SME.
+  - id: P1
+    epic: runtime-topology
+    title: "Run the CM_HOSTS + CM_AVG_RUN profiling probes internally; record conclusions + the DC scope call"
+    type: task
+    module: config
+    phase: 13
+    agent: main
+    model: haiku
+    priority: p1
+    status: todo
+    depends_on: []
+    inputs: [drydocs/loaders/sql/adhoc/profile_cm_hosts.sql, drydocs/loaders/sql/adhoc/profile_cm_avg_run.sql]
+    acceptance: >
+      Conclusions (counts/domains/match rates only — never result rows) recorded for
+      cm_hosts P1–P5 and cm_avg_run P0–P8 (P4s scoped smoke test BEFORE the estate-wide
+      join, per the user's performance flag) in the two gate specs' provenance blocks +
+      the ledger via fields; the 22-DC-vs-production scope call appended to
+      config/gate-log.md as the controlm-hosts-topology residual resolution.
+    notes: "User-run on the internal network (no producer-side psgmgr access); agent transcribes."
+
+  - id: P2
+    epic: runtime-topology
+    title: "CM_AVG_RUN supplement gate session (controlm-avg-run-supplement) — SME review"
+    type: task
+    module: ontology
+    phase: 13
+    agent: main
+    model: opus
+    priority: p1
+    status: in_progress
+    depends_on: []
+    inputs: [config/gate-prompts/controlm-avg-run-supplement.yaml, config/gate-log.md]
+    acceptance: >
+      SME records Confirm/edit/reject per section (A landing shape, B weak-key join
+      policy, C normalization rules, D refresh, E use case) in config/gate-log.md;
+      map entry job-runtime-stats-supplement flips proposed→confirmed only then.
+    notes: "in_progress = awaiting HITL (the E1/F1/F2/K2 pattern); gate page rendered + delivered 2026-07-09."
+
+  - id: P3
+    epic: runtime-topology
+    title: "Hosts loader + derived RUNS_ON resolution pass (group wins; coverage-reported)"
+    type: task
+    module: drydocs-load
+    phase: 13
+    agent: main
+    model: sonnet
+    priority: p1
+    status: todo
+    depends_on: [P1]
+    inputs: [drydocs/loaders/sql/controlm_hosts.sql, config/gate-prompts/controlm-hosts-topology.yaml, config/gate-log.md]
+    acceptance: >
+      Loader MERGEs :ControlMHostGroup {data_center,name} + :ExecutionHost {nodeid} +
+      CONTAINS_HOST {participation_type,last_capture_date} (+ DEFINED_ON only per the
+      P1 DC-key verification); the derived pass (runs AFTER jobs+hosts) writes RUNS_ON
+      {role: host_group|agent_host, derived:true} per the gate's group-wins rule;
+      UNMATCHED/NULL reported as coverage, never guessed; vocabulary m3_runs_on_host_group
+      / m3_host_group_contains_host (+ agent_host) flip planned→active with supplement
+      blocks (test_schema green); map entries flip confirmed→applied with applied_on
+      (test_taxonomy_ontology_map green).
+
+  - id: P4
+    epic: runtime-topology
+    title: "CM_AVG_RUN property-supplement loader: normalized timings + day-of-week medians + folder windows"
+    type: task
+    module: drydocs-load
+    phase: 13
+    agent: main
+    model: sonnet
+    priority: p1
+    status: todo
+    depends_on: [P1, P2]
+    inputs: [drydocs/loaders/sql/controlm_avg_run.sql, config/gate-prompts/controlm-avg-run-supplement.yaml]
+    acceptance: >
+      Supplement pass MATCHes existing :ControlMJob on (parent_table, job_name) — never
+      MERGEs; index on ControlMJob(parent_table, job_name) created BEFORE the estate-wide
+      run; >24h clock normalized in Python (avg_start_time + start_next_day); FileWatcher
+      rows flagged via APPL_TYPE and excluded from blended stats; day-of-week medians
+      derived from SAMPLES_*; ControlMFolder.window_start/window_end rolled up with the
+      DC-default-time fallback (knowledge/standards/technology/data-center-naming-convention.md);
+      unmatched stats rows = coverage metric; map entry flips confirmed→applied.
+
+  - id: P5
+    epic: runtime-topology
+    title: "Maintenance-window query: best patch window for a host or host group"
+    type: requirement
+    module: drydocs-load
+    phase: 13
+    agent: main
+    model: sonnet
+    priority: p2
+    status: todo
+    depends_on: [P3, P4]
+    inputs: [config/gate-prompts/controlm-hosts-topology.yaml]
+    acceptance: >
+      Given a host (nodeid) or group name, a committed query/utility returns every job
+      that can land on it (2-hop group + 1-hop hard-coded) with normalized folder windows
+      and the computed quiet window(s); window math is critical-path based, never a path
+      sum (the standing TDQ-ETA rule); demonstrated against sample data with the
+      NODE_GROUP↔RUNS_ON cross-validation reported as a metadata-findings list
+      (remediation feeder).
+
+  # (J7/J8 groomed 2026-07-09 — tech-debt remediation tails, docs/reviews/*.md)
+  - id: J7
+    epic: release-infrastructure
+    title: "Per-entry port reconciler guards: status no-downgrade + gate-log append-only + version-string rule"
+    type: chore
+    module: config
+    phase: 8
+    agent: main
+    model: sonnet
+    priority: p2
+    status: todo
+    depends_on: []
+    inputs: [PORT-MANIFEST.yaml, tests/unit/test_taxonomy_ontology_map.py, config/gate-log.md]
+    acceptance: >
+      Executable checks behind the PORT-MANIFEST per-entry entry_rules, REUSING the map
+      guard's loaders (no second YAML parser): (1) a fixture-driven test proving a
+      vocabulary/map merge that downgrades active/confirmed→planned/proposed FAILS;
+      (2) gate-log append-only check (existing entries are a prefix of the merged file);
+      (3) the pyproject version-string rule asserted in the manifest test. Rules
+      runnable consumer-side during reconcile-port (documented in that skill).
+    notes: "docs/reviews/tech-debt-port-boundary.md Phase 2; sequenced AFTER the map guard (landed ede0b94) by design."
+
+  - id: J8
+    epic: release-infrastructure
+    title: "Skip-guard policy test: tests reading gitignored assets must skip, not fail"
+    type: chore
+    module: config
+    phase: 8
+    agent: main
+    model: sonnet
+    priority: p3
+    status: todo
+    depends_on: []
+    inputs: [tests/unit/, .gitignore, PORT-MANIFEST.yaml]
+    acceptance: >
+      A policy test scans tests/unit/ for references to drydocs/data/ or internal-local/
+      and fails if the referencing test lacks a skipif/importorskip guard — the exact
+      failure a prior port hit (skip guard lost, FileNotFoundError instead of skip).
+    notes: "docs/reviews/tech-debt-port-boundary.md Phase 4 (Class E)."
+
+  - id: C7
+    epic: ontology-mapping
+    title: "Structured map fields at the next gate: vocab_id required, capture taxonomy-or-waived"
+    type: chore
+    module: ontology
+    phase: 2
+    agent: ontology-mapper
+    model: sonnet
+    priority: p3
+    status: todo
+    depends_on: []
+    inputs: [config/taxonomy-ontology-map.yaml, tests/unit/test_taxonomy_ontology_map.py, .claude/skills/add-source-object/SKILL.md]
+    acceptance: >
+      test_taxonomy_ontology_map extended: every mapping confirmed after 2026-07-10 must
+      carry vocab_id (or explicit ~ with a reason note) AND a capture field naming its
+      config/taxonomy/ file or waived-with-reason — the taxonomy-first erosion fix
+      (audit F5; the platforms.yaml retrofit precedent); add-source-object step 3 and the
+      ontology-mapper agent instructions updated to fill both.
+    notes: "docs/reviews/tech-debt-taxonomy-ontology-map.md Phase 3."
+
 # Roll-up the dispatcher can glance at. COMPUTED views — test_backlog.py enforces
 # that these match the items exactly; update them with any status change.
 summary:
-  todo: 17                                          # C5, E2, G3-G4, G9, J2, J4-J6, K3, L7-L9, M2-M4, N2
-  in_progress: 6                                    # E1, F1, F2, K2 (awaiting HITL), G2 (core shim), O1 (web design pass)
+  todo: 25                                          # K3 done + K4/K5 added 2026-07-10
+  in_progress: 7                                   # E1, F1, F2, K2, P2 (awaiting HITL), G2 (core shim), O1 (web design pass)
   blocked: 0
-  done: 41                                          # A1-A3, B1-B4, C1-C4, C6, D1-D3, G1, G5-G7, G8, H1-H7, I1-I4, J1, J3, K1, L1, L3-L6, M1, N1
-  next_ready: [C5, J2, J4, J5, J6, K3, L7, L8, L9, M2, M3, M4, N2]  # C6 done 2026-07-09 (REQUIRES_SCHEDULER registered planned + gate-routed)
+  done: 44                                          # K3 gate SIGNED OFF 2026-07-10
+  next_ready: [C5, J2, J4, J5, J6, L7, L8, L9, M2, M3, M4, N2, P1, J7, J8, C7, K4, K5]  # K3 done; K4/K5 added 2026-07-10

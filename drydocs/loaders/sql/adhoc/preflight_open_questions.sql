@@ -6,8 +6,10 @@
 -- Do NOT commit their result rows — record conclusions in the feature plan.
 -- =============================================================================
 
--- Q1. Confirm the real variable object (the unverified CM_DEF_SETVAR). Find the
---     object whose columns match the delivered extract shape.
+-- Q1. [RESOLVED 2026-07-10] The variable object is psgmgr.CM_DEF_SETVAR_VW —
+--     confirmed against live psgmgr: a valid view carrying TABLE_ID/JOB_ID/NAME/
+--     VALUE plus its own IS_CURRENT_VERSION/VERSION_SERIAL. The probe below found
+--     it by matching the delivered extract shape.
 SELECT table_name, COUNT(*) AS matched_cols
 FROM   all_tab_columns
 WHERE  owner = 'PSGMGR'

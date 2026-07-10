@@ -26,6 +26,17 @@ Tags help grooming: `idea` · `bug` · `doc` · `source` (new data source) · `q
 
 <!-- add new ideas at the top -->
 
+- 2026-07-09 — [idea] **Control-M Workbench as the remediation greenfield test bed — PARKED**
+  (user call, 2026-07-09). The Workbench Docker image (dev Control-M, plain `docker run`, no
+  Kubernetes/Helm) would let fix packages be DEPLOYED + EXECUTED against a disposable env
+  before the Jira handoff — stronger than the offline equivalence proof, still SoD-safe.
+  Blocked here: image lives on distribution.bmc.com (not Docker Hub; pull attempt 401) and
+  needs an EPD-entitled account + identity token — an entitlement/machine-boundary question,
+  not a technical one. Ports 8443/7005 verified free on this box. Revisit when OQ-1 closes
+  company-side or entitlement is resolved. Refs: `controlm-api-installation.md` (corpus,
+  §Workbench + SYNTHESIZED notes), `drydocs-remediation-tdd.md` §HITL OQ-1. (Control-M for
+  Kubernetes / Helm-chart offering deliberately SKIPPED — different product, agents-in-K8s,
+  no current use case.)
 - 2026-07-09 — [idea] `:SchedulerKind` slated for **DEPRECATION → `:AisCapability` + `:AiTool`**
   (user 2026-07-09). Today SchedulerKind is a small placeholder vocab (ControlM/Autosys/Airflow,
   seeded `ontology.cypher` + the `scheduler_kind` constraint) with no `node_classifications` entry.
@@ -75,6 +86,14 @@ Tags help grooming: `idea` · `bug` · `doc` · `source` (new data source) · `q
 
 <!-- when you promote an idea, move its line here with the resulting backlog id -->
 
+- 2026-07-09 — [idea] design-doc feedback: per-subsection annotate controls when a section
+  has >2 subsections (1.a/1.b/1.c… or steps 1/2/3) so feedback keys to the exact subsection
+  → **L11**. (chat note, same review pass as L10; design core = stable derived sub-anchors)
+- 2026-07-09 — [idea] design-doc feedback widget: appendix "SME - Feedback" panel (divider +
+  static HITL how-to: annotate, Copy feedback, create docs/design/feedback/<doc>-rev<N>.yaml,
+  paste, save) → **L10** (amended same day: instruction block, not a free-text notes field).
+  (chat note after reviewing docs/design/feedback/scans/; answered the open question — the
+  export is .yaml per feedback_yaml, not markdown)
 - 2026-07-09 groom run (Opus session) — 4 promoted / 1 retired; web/ became a plan change:
   - [chore] repo `.venv` has no pytest / poetry not on PATH → **RETIRED (resolved this session)**:
     pipx + Poetry 2.4.1 installed, in-project `.venv`, dev deps synced; `poetry run pytest -q`
@@ -122,6 +141,7 @@ Tags help grooming: `idea` · `bug` · `doc` · `source` (new data source) · `q
     decisions (semver start, CI, cli.py regroup, unused-dep removal, integration tests), open
     questions (LLM key strategy), and piggyback chores stay in the inbox.
 
+
 - 2026-07-08 groom run (this session) — **new phase 11 "Source governance ledgers"** + 9 items:
   - [question] SEAL ontology reshape + scraped-docs source-of-record → **K3** (gate session;
     K2 gains `depends_on: K3` — the wasAssociatedWith/Entity type conflict means the reshape
@@ -162,11 +182,16 @@ Tags help grooming: `idea` · `bug` · `doc` · `source` (new data source) · `q
 - 2026-07-01 — Epic I (I1–I4, project board & planning infrastructure) groomed into `backlog.yaml`
   from the architecture-review plan; schema upgraded to `drydocs.backlog.v2` (I1 done same day).
 - 2026-06-20 — initial backlog A1–F2 seeded directly into `backlog.yaml` from `02-backlog.md`.
-- 2026-07-09 — [idea] **Port-boundary tech-debt audit written** (`docs/reviews/tech-debt-port-boundary.md`,
-  /tech-debt run): the publisher→consumer break points CAN be segregated — six break classes
-  (A reverse-direction Canonical-COMPANY, B per-entry, C integration hand-merges, D env/wiring,
-  E gitignored assets, F rename waves) + the meta-debt (dispositions are prose-only across
-  git-readme/port-prompt/reconcile-port, no guard). Groom: (1) PORT-MANIFEST.yaml +
-  test_port_manifest (priority 40 — MUST land BEFORE ADR 0002 Phase B rename wave);
-  (2) per-entry reconciler guards (status-downgrade, gate-log append-only); (3) Class-A
-  connector/overlay physical split (do with Phase B).
+- 2026-07-09 groom run (remote session) — 8 promoted / 0 inboxed; PLAN CHANGE: new phase 13
+  "Runtime topology & maintenance windows" + Epic P (ratify — the phase-12/O1 precedent):
+  - CM_HOSTS + CM_AVG_RUN onboarding (add-source-object walkthrough ×2; hosts gate SIGNED OFF
+    18/18, avg-run gate awaiting SME) → **P1** (internal probes + DC scope call), **P2**
+    (avg-run gate session, in_progress awaiting HITL), **P3** (hosts loader + RUNS_ON
+    resolution pass), **P4** (avg-run property-supplement loader + job-name index),
+    **P5** (the maintenance-window query — the driving use case).
+  - Port-boundary tech-debt audit (docs/reviews/tech-debt-port-boundary.md) → **J7** (per-entry
+    reconciler guards) + **J8** (skip-guard policy test); Phase-1 PORT-MANIFEST.yaml + guard
+    EXECUTED pre-groom (5cfcfa7) — no item, the doc-06 precedent.
+  - Taxonomy-ontology-map audit (docs/reviews/tech-debt-taxonomy-ontology-map.md) → **C7**
+    (vocab_id + capture fields at the next gate); F1–F4 fixes EXECUTED pre-groom
+    (c396d75, ede0b94).

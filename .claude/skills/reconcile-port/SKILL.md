@@ -21,8 +21,11 @@ the accumulated lessons from prior ports. Read both.
    `git tag -f pre-cewilson-port`. Add/refresh the remote and fetch:
    `git remote add cewilson https://github.com/ce-wilson/DryDocs.git` (ignore if
    it exists), then `git fetch cewilson main`.
-2. **Read the guide:** `git show cewilson/main:git-readme.md`. Follow its
-   "Clean-adds", "Canonical-here", and "Collisions" sections.
+2. **Read the manifest first:** `git show cewilson/main:PORT-MANIFEST.yaml` —
+   the machine-readable disposition per path (first match wins; per-entry rows
+   FORBID whole-file checkout). Then the narrative:
+   `git show cewilson/main:git-readme.md` ("Clean-adds", "Canonical-here",
+   "Collisions" sections). Manifest wins on disagreement.
 3. **Apply onto `main`** (skip the optional scratch branch unless asked):
    - **Clean-adds** (path absent here) → apply untouched.
    - **Canonical-here** → take the producer version wholesale, do **not**
@@ -145,8 +148,10 @@ present. For a fresh `psgmgr` pull:
   flags or the SQL still pulls all ~1.1M rows, you have NOT yet ported the scope
   commits — re-port `controlm_variables.sql` wholesale and merge the cli.py
   scope options (see the collision ledger).
-- This run also **verifies the `psgmgr.CM_DEF_SETVAR` source-view name** (still
-  flagged unverified). Confirm it and report.
+- The `psgmgr.CM_DEF_SETVAR_VW` source-view name is **confirmed** (2026-07-10,
+  against live `psgmgr` — a view with its own `IS_CURRENT_VERSION` /
+  `VERSION_SERIAL`, so the variable extracts now filter `V.IS_CURRENT_VERSION = '1'`).
+  If a future port surfaces a different object, re-confirm and report.
 - Judge a fresh pull on *runs clean / no UNKNOWN invocation leakage / plausible
   coverage*, **not** the bundled counts.
 
@@ -158,7 +163,7 @@ Port Report: cewilson/main -> <company>/main
 - What conflicted + resolution: <per collision ledger>
 - What was skipped: <commits + why>
 - Track-1 result: <N passed, 3 skipped, 0 failed>
-- Track-2 status: <ran/blocked + CM_DEF_SETVAR finding>
+- Track-2 status: <ran/blocked + CM_DEF_SETVAR_VW finding>
 - State: branch ahead of <company>/main by N; NOT pushed; backup tag pre-cewilson-port
 - New divergences observed: <add to the ledger if any>
 ```

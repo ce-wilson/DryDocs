@@ -37,3 +37,20 @@ notes:
 (the same id namespace the renderer emits and `doc_outline.py` validates). `<N>` is the doc's
 Rev the feedback was taken against. Groomed feedback becomes edits to the `.md` (the single
 source) and/or backlog items — never hand-edits to the derived `.html`/`.pdf`.
+
+### Derived subsection anchors (L11)
+
+When a section has **more than two** subsections (sub-headings, or a numbered step list with
+3+ items), the screen render gives each subsection its own annotate control under a **derived**
+anchor: `<authored-anchor>--<subsection-slug>` (e.g. `detailed-design--stage-2-variable-pass`).
+The slug comes from the subsection's own text — content-derived, never positional — so a note
+on step "1.b" survives someone inserting a new "1.a". Validity rule
+(`doc_outline.feedback_anchor_valid`): a derived anchor re-attaches as long as its base
+authored anchor exists; if the subsection text (and so its slug) later changes, the note
+degrades to the parent section rather than dangling. Consequence for authors: `--` (double
+hyphen) is **reserved** as the derived separator — never use it inside an authored anchor id.
+
+The screen render also ends with a static **SME - Feedback** panel (L10) that walks the
+reviewer through the mechanics: annotate → **Copy feedback** → create
+`docs/design/feedback/<doc-stem>-rev<N>.yaml` (the exact per-doc filename, current Rev baked
+in, is rendered in the panel) → paste and save. The file is YAML, not markdown.

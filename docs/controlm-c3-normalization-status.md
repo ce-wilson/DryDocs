@@ -77,11 +77,13 @@ stg_notification, stg_app_fact**.
 
 ## Remaining Phase A steps (operational — no code work)
 
-1. **Confirm the variable source view name.**
-   The DDL and `controlm_variables.sql` use the placeholder
-   `psgmgr.CM_DEF_SETVAR` (flagged `** VERIFY VIEW NAME **` in both files).
-   Identify the actual object behind the SQL Developer extract
-   (`TABLE_NAME|JOB_NAME|JOB_ID|APPL_TYPE|NAME|VALUE`) and substitute it.
+1. **Confirm the variable source view name — DONE (2026-07-10).**
+   Confirmed against live `psgmgr`: the object is `psgmgr.CM_DEF_SETVAR_VW`, a
+   valid view carrying `TABLE_ID/JOB_ID/NAME/VALUE` plus its own
+   `IS_CURRENT_VERSION` / `VERSION_SERIAL`. Substituted throughout the DDL and
+   `controlm_variables*.sql`; the extracts now filter `V.IS_CURRENT_VERSION = '1'`
+   (the view stores version history — like LNKI/LNKO — so without it superseded
+   variable rows leak into the extract).
 
 2. **DBA runs the staging DDL** (`controlm_staging_ddl.sql`):
    - Section 0 pre-flight FIRST: (0.1) TABLE_ID-unique-across-data-centers

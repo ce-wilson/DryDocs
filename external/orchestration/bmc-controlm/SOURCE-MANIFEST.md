@@ -30,6 +30,23 @@
 
 ---
 
+## 🔌 AUTOMATION API — Monthly/on-prem doc set (added 2026-07-09)
+
+- **File:** `controlm-api-installation.md` — Automation API Installation (REST API server /
+  CLI / Workbench) from the **Monthly (on-prem)** documentation set
+  (`documents.bmc.com/supportu/API/Monthly/...`) — a DIFFERENT doc set than the four SaaS
+  `controlm-api-*.md` files below; the JSON-format demotion warning does NOT apply to it
+  (installation reference, no job-definition syntax).
+- **Why:** the `drydocs-remediation` TDD **OQ-1** acquisition spike ("what can be pulled").
+  Key banked fact (VERBATIM in-file): monthly API releases are compatible with
+  **Control-M 9.0.20 and higher** → our 9.0.21.300 is in range.
+- **Acquisition:** fetched 2026-07-09 via a real browser session — direct programmatic fetch
+  still returns the known documents.bmc.com **403** (bot protection).
+- **Trust:** procedures/tables GROUNDED; two compatibility/Java statements VERBATIM;
+  the "Notes for Planning Agents" OQ-1 analysis SYNTHESIZED.
+
+---
+
 ## 📑 PROVENANCE MODEL (read before graph ingestion)
 
 Every `controlm-*.md` file was produced by **WebFetch of a single BMC page, then summarized and restructured by Claude.** These files are a human/agent *reference*, **not a source-of-record.** Before loading any of this into the knowledge graph, classify content into three tiers and set `provenance` on each chunk accordingly:

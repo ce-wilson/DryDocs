@@ -92,7 +92,7 @@ Once Q1–Q3 are answered, update `docs/reviews/feature-oracle-ingestion-plan.md
 - `cli.py` → append-only; the only real merge point
 - `oracle_adapter.py` → **NEVER touch** (company Kerberos divergence)
 - No real company values, GHE org, credentials in any committed file
-- Placeholders: `DRYDOCS_STG`, `CM_RO_USER`, `<PY_NORMALIZER_USER>`, `CM_DEF_SETVAR`
+- Placeholders: `DRYDOCS_STG`, `CM_RO_USER`, `<PY_NORMALIZER_USER>`  (`CM_DEF_SETVAR` resolved 2026-07-10 → `CM_DEF_SETVAR_VW`, no longer a placeholder)
 
 ### Iteration 1 work units (each checkpointable)
 

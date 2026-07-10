@@ -44,6 +44,23 @@ import yaml
 #: ``<!-- anchor: some-id -->`` — the section marker.
 ANCHOR_RE = re.compile(r"<!--\s*anchor:\s*([a-z0-9][a-z0-9-]*)\s*-->", re.IGNORECASE)
 
+#: L11 — the screen render derives per-subsection feedback anchors as
+#: ``<authored-anchor>--<subsection-slug>`` (design_doc._inject_subsection_anchors), so
+#: ``--`` is RESERVED: never use a double hyphen inside an authored anchor id.
+DERIVED_ANCHOR_SEP = "--"
+
+
+def feedback_anchor_valid(anchor: str, md: str) -> bool:
+    """Whether a feedback-file anchor re-attaches to this doc: either an AUTHORED anchor
+    (``<!-- anchor: id -->`` present in the md) or an L11 DERIVED subsection anchor
+    (``<authored>--<slug>``) whose base section is authored — a derived note degrades to
+    its parent section if the subsection text (and so its slug) later changes."""
+    anchors = set(doc_anchors(md))
+    if anchor.lower() in anchors:
+        return True
+    base = anchor.lower().split(DERIVED_ANCHOR_SEP, 1)[0]
+    return base in anchors
+
 
 @dataclass
 class Outline:

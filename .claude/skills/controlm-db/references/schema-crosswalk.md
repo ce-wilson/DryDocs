@@ -12,7 +12,7 @@ the committed loaders; verify object names against
 |---------|-------------------------|--------------------------------------------|----------------------------|-------------|
 | Job definition | `CMS_JOBDEF` | `DEF_VJOB` | `CM_DEF_VJOB` | ✅ |
 | Folder / schedule table | `CMS_SCHEDT` | `DEF_VTAB` | `CM_DEF_VTAB` | ✅ |
-| Job variables (SETVAR) | `CMS_SETVAR` | `DEF_SETVAR` | `CM_DEF_SETVAR` | ✅ (name **VERIFY**) |
+| Job variables (SETVAR) | `CMS_SETVAR` | `DEF_SETVAR` | `CM_DEF_SETVAR_VW` | ✅ (name confirmed 2026-07-10) |
 | In-conditions (consumed) | `CMS_CON_J` (in rows) | `DEF_LNKI_P` | `CM_DEF_LNKI_P_VW` | ✅ |
 | Out-conditions (emitted) | `CMS_CON_J` (out rows) | `DEF_LNKO_P` | `CM_DEF_LNKO_P_VW` | ✅ |
 | Run history / active | `CMR_AJF`, `CMR_RUNINF`, `CMR_IOALOG` | (runtime) | `CM_HIST_VW` | ✅ (expensive) |
@@ -28,8 +28,10 @@ the committed loaders; verify object names against
 appended when the replica is exposed as a **view** over the copied table (the
 condition links `CM_DEF_LNKI_P_VW` / `CM_DEF_LNKO_P_VW`; the `_P` = prerequisite).
 `CM_RO_USER` is the read-only grantee. Confirm any object with the data-dictionary
-probe in `ingest.md` — the replica is a **subset** and names carry a `VERIFY`
-where the loader itself is unconfirmed (`CM_DEF_SETVAR`).
+probe in `ingest.md` — the replica is a **subset**. The variable object
+`CM_DEF_SETVAR_VW` (the last name that carried a `VERIFY`) was confirmed against
+live `psgmgr` 2026-07-10: it is a view (hence the `_VW`) with its own
+`IS_CURRENT_VERSION` / `VERSION_SERIAL`.
 
 ## §COL — column crosswalk (the renames that bite)
 
@@ -75,7 +77,7 @@ versioning. Same concept, different column:
 ## §KEYS — join keys in the replica
 
 - Job ↔ folder: `CM_DEF_VJOB.TABLE_ID = CM_DEF_VTAB.TABLE_ID`.
-- Variable ↔ job: `CM_DEF_SETVAR.(TABLE_ID, JOB_ID) = CM_DEF_VJOB.(TABLE_ID, JOB_ID)`.
+- Variable ↔ job: `CM_DEF_SETVAR_VW.(TABLE_ID, JOB_ID) = CM_DEF_VJOB.(TABLE_ID, JOB_ID)`.
 - Condition ↔ job/folder: `CM_DEF_LNK{I,O}_P_VW.(TABLE_ID, JOB_ID)` → job; join
   folder via `TABLE_ID`.
 - **Dependency edge** (derived, not stored): job B **depends on** job A when

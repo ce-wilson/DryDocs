@@ -34,7 +34,7 @@
 schema: drydocs.source-mapping.v1
 source: controlm-psgmgr
 classification: Internal-Public
-updated: 2026-07-08
+updated: 2026-07-09
 
 objects:
   # ---------------------------------------------------------------------------
@@ -252,33 +252,33 @@ objects:
         columns added since that check.
 
   # ---------------------------------------------------------------------------
-  # CM_DEF_SETVAR (variable definitions) — ** VERIFY NAME **. sql/controlm_variables.sql
-  # flags this object name as unconfirmed: it is "the object behind the
-  # (TABLE_NAME|JOB_NAME|JOB_ID|APPL_TYPE|NAME|VALUE) extract"; substitute the
-  # confirmed view/table name before production use (doc 08 Phase 2 verifies it
-  # alongside the real column census). Loader:
+  # CM_DEF_SETVAR_VW (variable definitions) — object name CONFIRMED 2026-07-10
+  # against live psgmgr: it is "the object behind the
+  # (TABLE_NAME|JOB_NAME|JOB_ID|APPL_TYPE|NAME|VALUE) extract", a valid view that
+  # also carries its own IS_CURRENT_VERSION / VERSION_SERIAL (like the LNKI/LNKO
+  # views). The full column census is still doc 08 Phase 2. Loader:
   # drydocs/loaders/controlm_variables*.py + sql/controlm_variables.sql.
   # Variables stay STAGING-ONLY for now — node-vs-property is deferred, not
   # implied (gate controlm-q1q3-phase1 §Q3).
   # ---------------------------------------------------------------------------
-  - name: CM_DEF_SETVAR
+  - name: CM_DEF_SETVAR_VW
     kind: view
     profile:
       profiled_on: ~
-      via: "sql/controlm_variables.sql header + docs/restructure/06a (object name UNVERIFIED; no controlm-db skill profile run yet)"
+      via: "sql/controlm_variables.sql header + docs/restructure/06a (object name CONFIRMED 2026-07-10 against live psgmgr; full controlm-db skill column census still pending)"
       column_count: ~
       census: pending
     note: >
-      ** VERIFY NAME ** — substitute the confirmed view/table name once the
-      controlm-db skill profiles it (doc 08 Phase 2). The extract also joins
-      CM_DEF_VJOB (TABLE_ID, JOB_ID) and CM_DEF_VTAB (TABLE_ID) for DATA_CENTER /
-      SCHED_TABLE / JOB_NAME context and derives var_scope (FOLDER when
-      JOB_NAME = SCHED_TABLE, else JOB) — those are already dispositioned under
-      the CM_DEF_VTAB / CM_DEF_VJOB objects above, or are wholly SQL-derived
-      (var_scope), not native CM_DEF_SETVAR columns; not duplicated here.
-      Duplicate (job, variable-name) definitions are legitimate in the source
-      (observed: %%FileWatch-TIME_LIMIT defined twice on one job with different
-      values) — never dedupe.
+      Object name confirmed 2026-07-10 (psgmgr.CM_DEF_SETVAR_VW); full column
+      census still pending the controlm-db skill profile (doc 08 Phase 2). The
+      extract also joins CM_DEF_VJOB (TABLE_ID, JOB_ID) and CM_DEF_VTAB (TABLE_ID)
+      for DATA_CENTER / SCHED_TABLE / JOB_NAME context and derives var_scope
+      (FOLDER when JOB_NAME = SCHED_TABLE, else JOB) — those are already
+      dispositioned under the CM_DEF_VTAB / CM_DEF_VJOB objects above, or are
+      wholly SQL-derived (var_scope), not native CM_DEF_SETVAR_VW columns; not
+      duplicated here. Duplicate (job, variable-name) definitions are legitimate
+      in the source (observed: %%FileWatch-TIME_LIMIT defined twice on one job
+      with different values) — never dedupe.
     columns:
       - {name: TABLE_ID, disposition: projected, origin: source, target: "staging:folder_id",
          note: "join key to CM_DEF_VJOB/CM_DEF_VTAB context; the raw SQL Developer export mislabels this column TABLE_NAME (drydocs/models/controlm.py ControlMVariableRow handles both aliases)"}
@@ -290,9 +290,122 @@ objects:
       disposition: excluded
       reason: scope
       note: >
-        Object name unverified (** VERIFY NAME **) — only the four columns
-        behind the confirmed (TABLE_NAME|JOB_NAME|JOB_ID|APPL_TYPE|NAME|VALUE)
-        extract are dispositioned here; whether CM_DEF_SETVAR carries its own
-        IS_CURRENT_VERSION/VERSION_SERIAL (like the LNKI/LNKO views) is an open
-        question noted in the SQL header. Sweeps the rest pending the
-        view-name + column-census verification (doc 08 Phase 2).
+        Only the four columns behind the (TABLE_NAME|JOB_NAME|JOB_ID|APPL_TYPE|
+        NAME|VALUE) extract are dispositioned here. CM_DEF_SETVAR_VW carries its
+        own IS_CURRENT_VERSION/VERSION_SERIAL (confirmed 2026-07-10, like the
+        LNKI/LNKO views); the extract now filters V.IS_CURRENT_VERSION = '1'
+        (filter-only — used in WHERE, not projected/SET). Sweeps the rest pending
+        the full column census (doc 08 Phase 2).
+
+  # ---------------------------------------------------------------------------
+  # CM_HOSTS (host-group membership) — replica of the BMC node-group structure
+  # (vendor 6.4.01 poster: CMS_NODGRP; agent identity CMS_NODID/CMR_NODES is
+  # NOT replicated). Added 2026-07-09 via the add-source-object walkthrough.
+  # Extract: sql/controlm_hosts.sql; probes: sql/adhoc/profile_cm_hosts.sql.
+  # STAGING-ONLY until the controlm-hosts-topology gate confirms the graph
+  # landing (ControlMHostGroup / ExecutionHost / CONTAINS_HOST / the RUNS_ON
+  # {role: host_group | agent_host} NODE_ID resolution pass) — the
+  # CM_DEF_SETVAR_VW staging-only precedent. Use case: server-patching /
+  # maintenance-window planning.
+  # ---------------------------------------------------------------------------
+  - name: CM_HOSTS
+    kind: table
+    profile:
+      profiled_on: ~
+      via: >
+        internal SQL Developer initial pass 2026-07-09 (22 distinct
+        DATA_CENTERs / 5,396 GRPNAMEs / 8,161 NODEIDs) + column view; formal
+        census still doc 08 Phase 2; remaining probes in
+        sql/adhoc/profile_cm_hosts.sql (grain, participation domain, DC
+        value-domain match, NODE_ID resolution census)
+      column_count: ~
+      census: pending
+    note: >
+      Gate controlm-hosts-topology CONFIRMED 2026-07-09 (config/gate-log.md;
+      spec config/gate-prompts/controlm-hosts-topology.yaml) — columns stay
+      staging-only until the hosts loader + RUNS_ON resolution pass are
+      built (gate-log residuals: P3 DC value-domain check, P4 resolution
+      census, DC scope call). Object is NOT versioned (no
+      IS_CURRENT_VERSION/VERSION_SERIAL) and has no USER_DAILY; grain assumed
+      (DATA_CENTER, GRPNAME, NODEID) pending the dup probe.
+    columns:
+      - {name: DATA_CENTER, disposition: projected, origin: source, target: "staging:data_center",
+         note: "long-form DC name (<Pnnn>-E<hhmm>-<suffix>, default-time encoding); 22 distinct incl. non-production; proposed ControlMHostGroup key part + DEFINED_ON join — ControlMServer key normalization is a gate open question"}
+      - {name: GRPNAME, disposition: projected, origin: source, target: "staging:grpname",
+         note: "host-group name (5,396 distinct); may itself be a DNS/LB alias (contains dots); proposed ControlMHostGroup.name key part; NOT the CM_DEF_VJOB.GROUP_NAME application-group concept"}
+      - {name: NODEID, disposition: projected, origin: source, target: "staging:nodeid",
+         note: "member agent host FQDN (8,161 distinct); proposed ExecutionHost.nodeid node key; also the direct-match target for hard-coded CM_DEF_VJOB.NODE_ID values (1-hop RUNS_ON {role: agent_host})"}
+      - {name: PARTICIPATION_TYPE, disposition: projected, origin: source, target: "staging:participation_type",
+         note: "VARCHAR2(1); observed 'P' only so far — full value domain + BMC semantics pending probe P2a; proposed CONTAINS_HOST edge property"}
+      - {name: CAPTURE_DATE, disposition: projected, origin: source, target: "staging:capture_date",
+         note: "replication timestamp — never authorship; snapshot-uniformity probe pending (P5); proposed to land as last_capture_date on the membership edge"}
+    default_disposition:
+      disposition: excluded
+      reason: scope
+      note: >
+        The column view shows exactly these five columns; this sweep is
+        defensive only, in case the live table carries columns added since
+        that check.
+
+  # ---------------------------------------------------------------------------
+  # CM_AVG_RUN (runtime statistics) — per-job avg/min/max start+run times plus
+  # RAW per-run sample arrays (~20 runs). Name verified live (SME query
+  # 2026-07-07/09). Added 2026-07-09 via the add-source-object walkthrough.
+  # Extract: sql/controlm_avg_run.sql; probes: sql/adhoc/profile_cm_avg_run.sql.
+  # STAGING-ONLY until the controlm-avg-run-supplement gate confirms the
+  # landing: timing PROPERTIES onto existing :ControlMJob nodes + derived
+  # folder windows — NO new labels/edges (opt-in supplement pattern). Use
+  # case: maintenance-window planning + TDQ-failure ETA (critical-path).
+  # ---------------------------------------------------------------------------
+  - name: CM_AVG_RUN
+    kind: table
+    profile:
+      profiled_on: ~
+      via: >
+        SME result-grid review 2026-07-07 (14 columns; semantics: >24h
+        start-time clock, seconds run times, JOB_MEM_NAME = JOB_NAME,
+        FileWatcher watch/wait caveat); data TYPES unknown — probe P0 in
+        sql/adhoc/profile_cm_avg_run.sql; formal census doc 08 Phase 2
+      column_count: ~
+      census: pending
+    note: >
+      Graph landing is PROPOSED ONLY pending gate controlm-avg-run-supplement
+      (config/gate-prompts/controlm-avg-run-supplement.yaml) — every column
+      lands staging-only until then. Join to jobs is the WEAK key
+      (SCHED_TABLE, JOB_MEM_NAME = JOB_NAME), never MEMNAME, never
+      TABLE_ID/JOB_ID; -CYC/-DLY twin folders each carry rows; supplement
+      pass MATCHes existing job nodes, never MERGEs.
+    columns:
+      - {name: DATA_CENTER, disposition: projected, origin: source, target: "staging:data_center",
+         note: "long-form DC name — same domain as CM_HOSTS (probe P6 confirms vs CM_DEF_VTAB)"}
+      - {name: INSTANCE_NAME, disposition: projected, origin: source, target: "staging:instance_name",
+         note: "relation to DATA_CENTER unclear (sampled instance code disagreed with the DC number) — probe P2b"}
+      - {name: SCHED_TABLE, disposition: projected, origin: source, target: "staging:sched_table",
+         note: "folder name; join-key part; also the :folder_filter scope-bind target"}
+      - {name: JOB_MEM_NAME, disposition: projected, origin: source, target: "staging:job_mem_name",
+         note: "= CM_DEF_VJOB.JOB_NAME (SME 2026-07-07) — the supplement join key with SCHED_TABLE; MEMNAME is never a key"}
+      - {name: NODE_GROUP, disposition: projected, origin: source, target: "staging:node_group",
+         note: "runtime host-group placement — cross-validates the definition-side RUNS_ON resolution (gate controlm-hosts-topology); probe P5 classifies GROUP/DIRECT_HOST/UNMATCHED"}
+      - {name: DSN, disposition: projected, origin: source, target: "staging:dsn",
+         note: "null in every sampled row — probe P3b; flip to excluded if always null"}
+      - {name: AVG_START_TIME, disposition: projected, origin: source, target: "staging:avg_start_time",
+         note: "Control-M >24h post-midnight clock (293502 ≈ 05:35:02 next day) — normalized in Python to time-of-day + next_day flag; proposed ControlMJob.avg_start_time"}
+      - {name: AVG_RUN_TIME, disposition: projected, origin: source, target: "staging:avg_run_time",
+         note: "seconds; proposed ControlMJob.avg_run_time; FileWatcher rows = watch/wait duration, flagged not blended"}
+      - {name: MIN_RUN_TIME, disposition: projected, origin: source, target: "staging:min_run_time", note: "seconds"}
+      - {name: MAX_RUN_TIME, disposition: projected, origin: source, target: "staging:max_run_time", note: "seconds"}
+      - {name: STD_DEV, disposition: projected, origin: source, target: "staging:std_dev",
+         note: "run-time spread; large values flag unstable-runtime jobs for window planning"}
+      - {name: SAMPLES_RUN_TIME, disposition: projected, origin: source, target: "staging:samples_run_time",
+         note: "raw comma array of per-run seconds (~20) — day-of-week medians computed in Python; probe P7 checks parseability/length"}
+      - {name: SAMPLES_START_TIME, disposition: projected, origin: source, target: "staging:samples_start_time",
+         note: "raw comma array of <ts>:<odate> pairs — start-time medians per day-of-week; probe P7"}
+      - {name: CAPTURE_DATE, disposition: projected, origin: source, target: "staging:capture_date",
+         note: "replication timestamp — never authorship; snapshot-vs-history probe P8 decides refresh strategy"}
+    default_disposition:
+      disposition: excluded
+      reason: scope
+      note: >
+        The result grid showed exactly these fourteen columns; this sweep is
+        defensive only, in case the live table carries columns the grid
+        scroll hid or that were added since.

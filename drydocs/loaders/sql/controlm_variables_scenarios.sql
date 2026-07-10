@@ -16,7 +16,8 @@
 --   run on ANY clone. Steps:
 --     [ ] Verify each scenario predicate against real psgmgr (some are
 --         approximations of the Python taxonomy — see ** REFINE ** markers).
---     [ ] Confirm the source view name (psgmgr.CM_DEF_SETVAR — still unverified).
+--     [x] Source view name confirmed: psgmgr.CM_DEF_SETVAR_VW (verified
+--         2026-07-10 against live psgmgr).
 --     [ ] Run the consolidated query; SANITIZE values (paths, SIDs, SEAL ids,
 --         emails) before committing — production data must not land in the repo
 --         or the public producer mirror.
@@ -120,10 +121,11 @@ WITH v AS (
         CASE WHEN J.JOB_NAME = T.SCHED_TABLE THEN 'FOLDER' ELSE 'JOB' END AS var_scope,
         V.NAME         AS var_name,
         V.VALUE        AS var_value
-    FROM   psgmgr.CM_DEF_SETVAR V              -- ** VERIFY VIEW NAME **
+    FROM   psgmgr.CM_DEF_SETVAR_VW V
     JOIN   psgmgr.CM_DEF_VJOB  J  ON V.TABLE_ID = J.TABLE_ID AND V.JOB_ID = J.JOB_ID
     JOIN   psgmgr.CM_DEF_VTAB  T  ON J.TABLE_ID = T.TABLE_ID
-    WHERE  J.IS_CURRENT_VERSION = '1'
+    WHERE  V.IS_CURRENT_VERSION = '1'
+      AND  J.IS_CURRENT_VERSION = '1'
       AND  T.USER_DAILY IS NOT NULL
 )
 SELECT 'SEMANTIC_FACT'       AS scenario, s.* FROM (SELECT v.* FROM v WHERE v.var_name IN ('%%SEAL','%%SEALID','%%DATAFLOW') FETCH FIRST 1 ROW ONLY) s
