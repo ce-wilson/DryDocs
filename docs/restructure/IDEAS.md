@@ -26,6 +26,13 @@ Tags help grooming: `idea` · `bug` · `doc` · `source` (new data source) · `q
 
 <!-- add new ideas at the top -->
 
+- 2026-07-10 — [idea] **Phase C packaging (deferred by ADR 0002-A-1 at the G2 relocate)**: the
+  pieces deliberately NOT executed in Phase B — (a) make `drydocs-core` independently
+  installable (packaging-only commit: per-package pyprojects + path deps, NO file moves),
+  (b) the remainder's 4-way component split (load/review/plan/docgen as real packages) and
+  load's final name. Promote (a) early if G3's spinoff rebase needs to pip-install core from
+  a clean env rather than consume the monorepo; (b) waits for Phase C proper. Refs: ADR
+  0002-A-1 §Consequences, PORT-MANIFEST header sequencing note (rename wave = path-column diff).
 - 2026-07-09 — [idea] **Control-M Workbench as the remediation greenfield test bed — PARKED**
   (user call, 2026-07-09). The Workbench Docker image (dev Control-M, plain `docker run`, no
   Kubernetes/Helm) would let fix packages be DEPLOYED + EXECUTED against a disposable env
