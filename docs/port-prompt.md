@@ -2,9 +2,11 @@
 
 Hand this prompt to an agent working in a clean checkout of the company
 `<company-org>/DryDocs` `main` (GitHub Enterprise). It executes the one-way
-producer→consumer port described in [`git-readme.md`](../git-readme.md), which stays the
-source of truth for the per-path disposition tables. This prompt is the actionable
-wrapper; `git-readme.md` is the authority.
+producer→consumer port described in [`git-readme.md`](../git-readme.md). Since 2026-07-09
+the per-path dispositions are machine-readable in [`PORT-MANIFEST.yaml`](../PORT-MANIFEST.yaml)
+(repo root) — the manifest is the WHAT (mechanical, first-matching-glob-row-wins);
+`git-readme.md` stays the narrative authority (the WHY); this prompt is the actionable
+wrapper whose numbered steps carry sequencing + context, not disposition authority.
 
 ```text
 You are porting the DryDocs PRODUCER repo (ce-wilson/DryDocs, github.com) onto the
@@ -12,9 +14,12 @@ original/superseded <company-org>/DryDocs base (GitHub Enterprise). This is a ON
 producer→consumer apply. Work in a clean checkout of company `main`.
 
 AUTHORITATIVE INSTRUCTIONS: the producer carries its own port guide at `git-readme.md`
-(repo root). Fetch it and follow it exactly — it holds the per-path disposition tables
-(Canonical-here / Clean-adds / Collisions) and the acceptance oracle. If anything in this
-prompt and git-readme.md disagree, git-readme.md wins. Do not duplicate or improvise around it.
+(repo root) AND the machine-readable `PORT-MANIFEST.yaml` (repo root, schema
+drydocs.port-manifest.v1 — see step 25). For WHAT to do with a path, the manifest is the
+authority: first row whose glob matches the path wins, top-down; unmatched paths take its
+default (clean-add if absent consumer-side, evaluate if both sides created it). For WHY
+and the acceptance oracle, git-readme.md wins over this prompt. Fetch and internalize
+BOTH before touching anything. Do not duplicate or improvise around them.
 
 CRITICAL CAVEAT — DISJOINT HISTORIES. The producer was `git init`-ed fresh; there is NO
 common ancestor with company main, so there is no 3-way merge base. This is a CHERRY-PICK
@@ -26,8 +31,10 @@ PROCEDURE:
 1. From the company main checkout:
      git remote add cewilson https://github.com/ce-wilson/DryDocs.git
      git fetch cewilson main
-2. READ THE GUIDE FIRST: `git show cewilson/main:git-readme.md`. Internalize its three
-   tables (Canonical-here, Clean-adds, Collisions) before touching anything.
+2. READ THE GUIDES FIRST: `git show cewilson/main:git-readme.md` AND
+   `git show cewilson/main:PORT-MANIFEST.yaml`. Internalize the manifest's disposition
+   rows + the guide's three tables (Canonical-here, Clean-adds, Collisions) before
+   touching anything.
 3. git switch -c drydocs-port main
 4. List the commit range (histories disjoint → all of it is new vs company main):
      git log --oneline --reverse cewilson/main
@@ -250,6 +257,14 @@ PROCEDURE:
     test_doc_outline now GLOB-tests every committed docs/design/*-tdd.md. The drydocs-remediation TDD
     (docs/design/drydocs-remediation-tdd.{md,html,print.html}; contract = ADR 0002-B, detect ->
     transform -> prove -> Jira, no graph write / SoD) is a clean-add rendered design doc.
+    L10/L11 UPDATE (2026-07-10 merge, all additive): design_doc.py gained the appendix
+    "SME - Feedback" panel (a STATIC HITL how-to block: annotate, Copy feedback, save the
+    docs/design/feedback/<doc>-rev<N>.yaml — not a free-text field) + per-subsection annotate
+    controls when a section has >2 subsections (feedback keys to derived sub-anchors);
+    doc_outline.py + test_design_doc/test_doc_outline extended; the committed
+    controlm-ingestion-tdd / drydocs-remediation-tdd .html renders are REGENERATED — take the
+    code and the regenerated renders together (or re-render company-side; renders are
+    deterministic). docs/design/feedback/README.md + the verify skill's SKILL.md deltas ride along.
 
 21. SEAL ONTOLOGY RESHAPE + SCRAPED-DOCS SOURCE-OF-RECORD — GATE-BOUND PROPOSAL (2026-07-08;
     NOTHING applied — collision-sensitive; read the git-readme.md heads-up "SEAL entity reshape…"):
@@ -264,10 +279,21 @@ PROCEDURE:
     gate-prompts/seal-tom-attribution-reshape.yaml (step-18 gate-page standard), the config/precedence.yaml
     `proposed_additions` key (inert to the resolver), and the config/gate-log.md entry (APPEND-ONLY, union
     on collision). Nothing is SME-confirmed; no active graph impact.
+    K3 UPDATE (2026-07-10, commit "K3 BusinessApplication entity-reshape gate SIGNED OFF"): the reshape
+    gate has now been HELD and SIGNED OFF — config/gate-log.md carries the 2026-07-10 K3 entry (union
+    APPEND-ONLY as ever) confirming the DIRECTION: :Application reclasses prov:SoftwareAgent ->
+    prov:Entity/dprod:DataProduct and the label normalizes :Application -> :BusinessApplication, with
+    TOMRole attribution + seal_* edge deprecations to follow. The APPLICATION has NOT shipped (producer
+    backlog K4, todo): vocabulary/map statuses in this range still read proposed/planned and the
+    collision rule above applies UNCHANGED. A LATER port carries the label rename + status flips —
+    git-readme.md's SEAL-reshape heads-up gets rewritten then (K4's notes track exactly that), and the
+    PORT-MANIFEST sequencing note (step 25) makes that rename wave a path-column diff.
 
 22. BMC-DOCS LEXICAL LOADER — DOCMETA P0, SHIPPED & GATE-ACCEPTED (2026-07-08; commits "…bmc-docs
     lexical loader … STOPPED AT GATE" then "ACCEPTED 13/13 … LOADED LIVE" — MIXED stream). The
-    converted BMC docs corpus (external/orchestration/bmc-controlm/, 26 pages) loads as a DETERMINISTIC
+    converted BMC docs corpus (external/orchestration/bmc-controlm/, 27 pages — 26 at first load;
+    controlm-api-installation.md joined 2026-07-09 via the remediation OQ-1 spike, with its
+    SOURCE-MANIFEST entry; tests pin EXPECTED_DOC_COUNT = 27) loads as a DETERMINISTIC
     llm-graph-builder LEXICAL graph — no LLM/embeddings: H2-section chunking (seq-0 preamble), :Document
     + :Chunk nodes (BOTH prov:Entity) with PART_OF + FIRST_CHUNK/NEXT_CHUNK chains (out-degree <= 1),
     per-chunk trust tier VERBATIM|GROUNDED|SYNTHESIZED stamped per the SOURCE-MANIFEST default rule
@@ -315,6 +341,71 @@ PROCEDURE:
     Git TAGS are NOT transferred by cherry-pick — the v0.3.0 annotated tag stays producer-side; the
     company tags its own releases.
 
+25. PORT-MANIFEST — MACHINE-READABLE DISPOSITIONS (2026-07-09, commit "PORT-MANIFEST.yaml —
+    machine-readable port dispositions + guard"; READ IT AT STEP 2, EVERY PORT):
+    PORT-MANIFEST.yaml (repo root; schema drydocs.port-manifest.v1, classification Internal-Public)
+    is now THE mechanical authority for per-path dispositions — first glob row that matches a path
+    wins, top-down; unmatched paths take the default (clean-add if absent consumer-side, evaluate if
+    both sides created the path). Its disposition vocabulary (clean-add / canonical-producer /
+    canonical-company / union-append / per-entry / evaluate / never-port) subsumes this prompt's
+    Canonical-here / back-flow / append-only phrasing; the numbered steps here remain narrative
+    (sequencing + why). PER-ENTRY rows (relationship_vocabulary.yaml, taxonomy-ontology-map.yaml,
+    pyproject.toml, …) FORBID whole-file checkout — resolve inside the file by id, never downgrading
+    a consumer entry whose status is active/confirmed/applied. Clean-adds: PORT-MANIFEST.yaml itself
+    + tests/unit/test_port_manifest.py (its portable guard) + the reconcile-port skill repoint +
+    docs/reviews/tech-debt-port-boundary.md (its origin audit). SEQUENCING NOTE (recorded in the
+    manifest header): the manifest lands BEFORE the ADR 0002 Phase B package split, so that rename
+    wave arrives in a later range as a manifest path-column diff, not a prose rewrite.
+
+26. CM_HOSTS + CM_AVG_RUN ONBOARDING — EPIC P: EXTRACT + GATE ONLY, NO LOADERS YET (2026-07-09/10,
+    commits "add-source-object walkthrough skill + CM_HOSTS host topology to the gate" ->
+    "controlm-hosts-topology SME sign-off — 18/18" -> "CM_AVG_RUN runtime-stats supplement to the
+    gate" -> "CM_AVG_RUN P4 join performance guard" -> "confirm CM_DEF_SETVAR -> CM_DEF_SETVAR_VW;
+    filter V.IS_CURRENT_VERSION" + sweep stragglers):
+    - Clean-adds: .claude/skills/add-source-object/ (guided object-onboarding walkthrough — the
+      step-13 skills rule applies), the extract + profile SQL (drydocs/loaders/sql/controlm_hosts.sql,
+      controlm_avg_run.sql, adhoc/profile_cm_hosts.sql, adhoc/profile_cm_avg_run.sql — the adhoc/
+      dir is new), and the two gate specs config/gate-prompts/controlm-hosts-topology.yaml +
+      controlm-avg-run-supplement.yaml (step-18 gate-page standard; gate-seed twin rule does NOT
+      apply — these are producer-authored gates, not company back-flow seeds).
+    - Per-entry merges (manifest rules): config/source-registry.yaml gains the cm_hosts + cm_avg_run
+      objects under controlm-psgmgr; config/source-mappings/controlm-psgmgr.yaml grows 5 -> 7 object
+      ledgers (supersedes step 23's "5 objects" count; test_source_mappings extended to match);
+      taxonomy-ontology-map.yaml + relationship_vocabulary.yaml gain the host-topology entries —
+      ExecutionHost/HostGroup node classes and the m3_runs_on_agent_host / m3_runs_on_etl_host /
+      m3_runs_on_host_group edges (RUNS_ON label, role-disambiguated) with UPDATED feed notes
+      (psgmgr CM_HOSTS + the NODE_ID resolution pass: hard-coded 1-hop vs group 2-hop).
+    - GATE STATUS SPLIT (do not conflate): controlm-hosts-topology is SME-CONFIRMED 2026-07-09,
+      18/18 (config/gate-log.md union-append; its map entries read status: confirmed);
+      controlm-avg-run-supplement is AWAITING SME (proposed — a ControlMJob PROPERTY supplement:
+      avg/min/max/std-dev run times + a scoped join-performance smoke test first, NOT a node
+      stream). The m3_runs_on_* edges stay status: planned — NO loaders, cypher, CLI commands, or
+      constraints shipped for either object (producer backlog P3/P4) — EXPECTED_CONSTRAINTS stays 40.
+    - SETVAR_VW FIX (Canonical-here, the step-6 Control-M SQL rule): CM_DEF_SETVAR is confirmed as
+      the CM_DEF_SETVAR_VW view + the V.IS_CURRENT_VERSION filter wherever the variables extract
+      joins it (variables SQL + both new extracts + the controlm-db skill references). If your
+      replica exposes the base table instead, reconcile the view name as a DELIBERATE company-side
+      decision — do not silently drop the IS_CURRENT_VERSION filter.
+    - knowledge/standards/technology/data-center-naming-convention.md gained the hosts-gate DC scope
+      note (Canonical-here, step-6 knowledge/standards rule).
+
+27. TAXONOMY-ONTOLOGY MAP GUARD + VOCAB_ID MIGRATION + C6 REGISTRATION (2026-07-09, commits
+    "tech-debt F1+F3", "tech-debt F4+F2 point fixes", "C6 — register REQUIRES_SCHEDULER",
+    "platforms.yaml placeholder"):
+    - tests/unit/test_taxonomy_ontology_map.py — NEW portable drift guard (clean-add, PyYAML-only):
+      the map's summary block is COMPUTED (recount enforced after any merge), entries carry
+      vocab_id linkage into relationship_vocabulary.yaml, statuses must be real (the F2 fix made
+      `applied` truthful). TAKE IT — the manifest's per-entry rules lean on this guard. The F3
+      migration rewrote existing map entries with vocab_id (per-entry merge; never downgrade
+      confirmed/applied). F4 deduped the Document node-class label in the vocabulary.
+    - C6: REQUIRES_SCHEDULER (:BatchProcessing -> :SchedulerKind) is now REGISTERED in
+      relationship_vocabulary.yaml + the map as status: planned, GATE-BOUND — do NOT activate.
+      Heads-up riding with it: :SchedulerKind itself is slated for deprecation -> :AisCapability +
+      :AiTool (parked in IDEAS.md until the SME defines the classes); config/taxonomy/platforms.yaml
+      is a status: placeholder clean-add recording that reconciliation.
+    - Audit docs (clean-adds): docs/reviews/tech-debt-taxonomy-ontology-map.md (the F1-F5 origin;
+      tech-debt-port-boundary.md already rode in with step 25).
+
 ACCEPTANCE GATE (behavior is the contract, not a byte-compare):
 - Track 1 (portable, no production sample present):
     poetry run pytest tests/unit/test_variable_classifier.py tests/unit/test_variable_resolver.py \
@@ -329,11 +420,14 @@ ACCEPTANCE GATE (behavior is the contract, not a byte-compare):
 - Full `pytest tests/unit/` must be green (passes + sample-skips + the PyYAML test_schema.py
   skips). ZERO failures is the contract. Now also covers the docgen tests (test_doc_outline /
   test_design_doc / test_doc_pdf) AND the newer-stream tests (test_bmc_docs, test_source_mappings,
-  test_row_checksum, test_transcribe_doc_markup) — all portable: stdlib + PyYAML, the committed BMC
-  corpus under external/, no network/DB. test_schema.py now expects EXPECTED_CONSTRAINTS = 40 (steps
-  19 + 22) and a supplement block for the 4 active `docs_*` edges. Both CI guards must pass:
-  test_schema.py (no `active` relationship without its supplement block) and test_classification.py
-  (every source in source-registry.yaml has a valid sensitivity classification). New dep: PyYAML.
+  test_row_checksum, test_transcribe_doc_markup, test_port_manifest, test_taxonomy_ontology_map)
+  — all portable: stdlib + PyYAML, the committed BMC corpus under external/, no network/DB.
+  test_schema.py expects EXPECTED_CONSTRAINTS = 40 (steps 19 + 22; UNCHANGED by steps 25-27 — the
+  Epic P loaders are not built yet) and a supplement block for the 4 active `docs_*` edges;
+  test_bmc_docs pins EXPECTED_DOC_COUNT = 27 (step 22). Both CI guards must pass: test_schema.py
+  (no `active` relationship without its supplement block) and test_classification.py (every source
+  in source-registry.yaml has a valid sensitivity classification). New dep: PyYAML.
+  Producer-side reference at this range head (2026-07-10): 483 passed / 3 skipped.
 
 BOUNDARIES:
 - One-way only. Never add company main as a remote on the producer; never push back to
