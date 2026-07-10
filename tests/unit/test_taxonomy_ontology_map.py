@@ -19,7 +19,7 @@ yaml = pytest.importorskip("yaml")
 
 REPO = Path(__file__).resolve().parents[2]
 MAP_FILE = REPO / "config" / "taxonomy-ontology-map.yaml"
-VOCAB_FILE = REPO / "drydocs" / "ontology" / "relationship_vocabulary.yaml"
+VOCAB_FILE = REPO / "drydocs_core" / "ontology" / "relationship_vocabulary.yaml"
 
 VALID_STATUSES = {"proposed", "confirmed", "applied", "rejected"}
 

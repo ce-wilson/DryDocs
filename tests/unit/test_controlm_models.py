@@ -6,7 +6,7 @@ from __future__ import annotations
 import pytest
 from pydantic import ValidationError
 
-from drydocs.models import (
+from drydocs_core.models import (
     ControlMConditionInRow,
     ControlMConditionOutRow,
     ControlMDependencyRow,

@@ -18,7 +18,7 @@ from typing import TYPE_CHECKING, ClassVar, Iterator
 
 import yaml
 
-from ..models.registry import SoftwareProductRow
+from drydocs_core.models.registry import SoftwareProductRow
 from .base import BaseLoader
 
 if TYPE_CHECKING:  # pragma: no cover

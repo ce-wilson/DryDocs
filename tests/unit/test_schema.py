@@ -12,8 +12,8 @@ try:
 except ImportError:
     _YAML_AVAILABLE = False
 
-SCHEMA_DIR   = Path(__file__).resolve().parents[2] / "drydocs" / "schema"
-ONTOLOGY_DIR = Path(__file__).resolve().parents[2] / "drydocs" / "ontology"
+SCHEMA_DIR   = Path(__file__).resolve().parents[2] / "drydocs_core" / "schema"
+ONTOLOGY_DIR = Path(__file__).resolve().parents[2] / "drydocs_core" / "ontology"
 CONSTRAINTS_FILE = SCHEMA_DIR / "constraints.cypher"
 ONTOLOGY_FILE    = SCHEMA_DIR / "ontology.cypher"
 VOCAB_FILE       = ONTOLOGY_DIR / "relationship_vocabulary.yaml"
@@ -91,7 +91,7 @@ def test_ontology_merges_are_idempotent() -> None:
 def test_vocabulary_file_exists() -> None:
     assert VOCAB_FILE.exists(), (
         f"relationship_vocabulary.yaml not found at {VOCAB_FILE}. "
-        "Run: create drydocs/ontology/relationship_vocabulary.yaml"
+        "Run: create drydocs_core/ontology/relationship_vocabulary.yaml"
     )
 
 

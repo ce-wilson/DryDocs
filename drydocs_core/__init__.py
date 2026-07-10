@@ -1,24 +1,24 @@
-"""drydocs-core — shared transformation surface (TRANSITIONAL SHIM · ADR 0002-a Phase B, step 1).
+"""drydocs-core — shared transformation surface (ADR 0002-a Phase B, physical).
 
-Realizes the first, zero-risk step of the core extraction
-([0002-a §6 step 1](../docs/decisions/0002-a-drydocs-core-extraction-plan.md)):
-introduce the `drydocs_core` package and **re-export** the shared surface while the files
-physically still live under `drydocs/`. Components import from `drydocs_core.*` instead of
-`drydocs.*`; when the modules later relocate into this package (Phase B step 2+), only these
-re-exports flip — no component import site changes.
+The core modules physically live HERE as of the Phase B relocate
+([0002-a](../docs/decisions/0002-a-drydocs-core-extraction-plan.md), thin variant per
+[0002-a-1](../docs/decisions/0002-a-1-phase-b-thin-relocate.md)): the shared models,
+adapters, the Control-M command-line/lineage parser (`controlm`), the Neo4j driver, the
+config layer (`config` / `precedence` / `source_registry`), the ontology namespaces +
+vocabulary, and the schema/ontology `.cypher` resources.
 
-Surface (per 0002-a §3): the shared models, adapters, the Control-M command-line/lineage
-parser (`controlm`), the Neo4j driver, the config layer (`config` / `precedence` /
-`source_registry`), and the ontology namespaces. It **never** re-exports loaders / cli /
-snapshots — that is the component layer (enforced by `tests/unit/test_module_boundary.py`).
+Core imports nothing from any component; components (the `drydocs` package: loaders /
+cli / snapshots / review / plan / docgen) import only `drydocs_core.*` — enforced by
+`tests/unit/test_module_boundary.py`. The load-cadence staging bundle builder lives
+component-side as `drydocs.staging` (0002-a §6 borderline decision).
 
-Usage during the shim::
+Usage::
 
     from drydocs_core import controlm, models
     client = drydocs_core.Neo4jClient(uri, user, password, database="drydocs_context")
 """
-from drydocs import adapters, config, controlm, models, ontology, precedence, source_registry
-from drydocs.neo4j_client import Neo4jClient
+from . import adapters, config, controlm, models, ontology, precedence, source_registry
+from .neo4j_client import Neo4jClient
 
 __all__ = [
     "adapters",

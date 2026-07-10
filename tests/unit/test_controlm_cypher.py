@@ -9,7 +9,7 @@ import pytest
 ROOT = Path(__file__).resolve().parent.parent.parent
 CYPHER_DIR = ROOT / "drydocs" / "loaders" / "cypher"
 SQL_DIR = ROOT / "drydocs" / "loaders" / "sql"
-SCHEMA_DIR = ROOT / "drydocs" / "schema"
+SCHEMA_DIR = ROOT / "drydocs_core" / "schema"
 
 ALL_CYPHERS = [
     "controlm_folders.cypher",

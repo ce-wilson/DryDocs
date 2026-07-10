@@ -31,15 +31,17 @@ import typer
 from rich.console import Console
 from rich.table import Table
 
-from .adapters import CsvAdapter, OracleAdapter
-from .config import load_settings
-from .controlm import (
+import drydocs_core
+from drydocs_core.adapters import CsvAdapter, OracleAdapter
+from drydocs_core.config import load_settings
+from drydocs_core.controlm import (
     VariableCoverage,
     classify_job_variables,
     resolve_job,
 )
-from .controlm.staging import build_staging_bundle, collect_jobs
-from .models import ControlMVariableRow
+from drydocs_core.models import ControlMVariableRow
+
+from .staging import build_staging_bundle, collect_jobs
 from .loaders import seal_applications as seal_apps_mod
 from .loaders import seal_contacts as seal_contacts_mod
 from .loaders.base import BaseLoader
@@ -68,19 +70,20 @@ from .loaders.software_registry import (
     RegistryYamlAdapter,
     SoftwareRegistryLoader,
 )
-from .neo4j_client import Neo4jClient
-from .snapshots import SnapshotWriter
-from .source_registry import (
+from drydocs_core.neo4j_client import Neo4jClient
+from drydocs_core.source_registry import (
     SourceRegistry,
     UnconfirmedSourceError,
     UnknownSourceError,
 )
 
+from .snapshots import SnapshotWriter
+
 app = typer.Typer(no_args_is_help=True, rich_markup_mode="rich")
 console = Console()
 LOGGER = logging.getLogger("drydocs.cli")
 
-SCHEMA_DIR = Path(__file__).resolve().parent / "schema"
+SCHEMA_DIR = Path(drydocs_core.__file__).resolve().parent / "schema"
 CONSTRAINTS_FILE        = SCHEMA_DIR / "constraints.cypher"
 ONTOLOGY_FILE           = SCHEMA_DIR / "ontology.cypher"
 ONTOLOGY_SUPPLEMENT_FILE = SCHEMA_DIR / "ontology_supplement.cypher"

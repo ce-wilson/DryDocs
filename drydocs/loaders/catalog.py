@@ -19,7 +19,7 @@ from typing import Any, ClassVar, Iterable, Optional
 from pydantic import BaseModel, ConfigDict, Field, field_validator
 
 from .base import BaseLoader
-from ..precedence import Claim, PrecedenceResolver
+from drydocs_core.precedence import Claim, PrecedenceResolver
 
 _CYPHER = Path(__file__).resolve().parent / "cypher"
 

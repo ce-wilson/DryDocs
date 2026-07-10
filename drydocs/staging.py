@@ -21,12 +21,12 @@ import json
 from dataclasses import dataclass, field
 from typing import Iterable
 
-from ..models import ControlMVariableRow
-from .commands import extract_container_command, parse_command
-from .facts import route_fact
-from .paths import build_file_ref
-from .resolver import ResolvedVariable, resolve_job
-from .variables import ClassifiedVariable, VariableKind, classify_job_variables
+from drydocs_core.models import ControlMVariableRow
+from drydocs_core.controlm.commands import extract_container_command, parse_command
+from drydocs_core.controlm.facts import route_fact
+from drydocs_core.controlm.paths import build_file_ref
+from drydocs_core.controlm.resolver import ResolvedVariable, resolve_job
+from drydocs_core.controlm.variables import ClassifiedVariable, VariableKind, classify_job_variables
 
 _ENV_NAME_TO_LETTER = {"Development": "D", "QA": "Q", "Production": "P"}
 

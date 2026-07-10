@@ -17,8 +17,8 @@ yaml = pytest.importorskip("yaml", reason="PyYAML not installed")
 REPO = Path(__file__).resolve().parents[2]
 REGISTRY_FILE = REPO / "config" / "taxonomy" / "software-registry.yaml"
 CYPHER_FILE = REPO / "drydocs" / "loaders" / "cypher" / "software_registry.cypher"
-CONSTRAINTS_FILE = REPO / "drydocs" / "schema" / "constraints.cypher"
-SUPPLEMENT_FILE = REPO / "drydocs" / "schema" / "registry_ontology_supplement.cypher"
+CONSTRAINTS_FILE = REPO / "drydocs_core" / "schema" / "constraints.cypher"
+SUPPLEMENT_FILE = REPO / "drydocs_core" / "schema" / "registry_ontology_supplement.cypher"
 
 # ADR 0004: role absorbs the Tier-1/Tier-2 split; type mirrors the company
 # catalog's Software Type axis.
@@ -67,7 +67,7 @@ def test_vendors_carry_publisher_url() -> None:
 
 def test_adapter_flattens_and_rows_validate() -> None:
     from drydocs.loaders.software_registry import RegistryYamlAdapter
-    from drydocs.models.registry import SoftwareProductRow
+    from drydocs_core.models.registry import SoftwareProductRow
 
     doc = _doc()
     with RegistryYamlAdapter(REGISTRY_FILE) as adapter:

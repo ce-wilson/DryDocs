@@ -13,7 +13,7 @@ import pytest
 try:
     import yaml
 
-    from drydocs.source_registry import (
+    from drydocs_core.source_registry import (
         SourceRegistry,
         UnconfirmedSourceError,
         UnknownSourceError,

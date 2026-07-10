@@ -3,7 +3,7 @@ from __future__ import annotations
 
 import pytest
 
-from drydocs.ontology.namespaces import NAMESPACES, expand
+from drydocs_core.ontology.namespaces import NAMESPACES, expand
 
 
 def test_required_prefixes_present() -> None:

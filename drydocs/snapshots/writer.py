@@ -22,7 +22,7 @@ from datetime import datetime, timedelta, timezone
 from typing import TYPE_CHECKING, Any
 
 if TYPE_CHECKING:
-    from ..neo4j_client import Neo4jClient
+    from drydocs_core.neo4j_client import Neo4jClient
 
 LOGGER = logging.getLogger(__name__)
 

@@ -14,7 +14,7 @@ from drydocs.loaders.bmc_docs import (
     BmcDocsLoader,
     classify_chunk_tier,
 )
-from drydocs.models.docs import BmcDocChunkRow
+from drydocs_core.models.docs import BmcDocChunkRow
 
 ROOT = Path(__file__).resolve().parent.parent.parent
 CYPHER_PATH = ROOT / "drydocs" / "loaders" / "cypher" / "bmc_docs.cypher"

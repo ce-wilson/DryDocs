@@ -29,7 +29,6 @@ from .facts import route_fact
 from .folder_name import ParsedFolderName, parse_folder_name
 from .paths import FileRef, build_file_ref, canonicalize_path, classify_role
 from .resolver import ResolvedVariable, resolve_job, resolve_layers
-from .staging import build_staging_bundle, build_staging_rows, collect_jobs
 from .variable_report import VariableCoverage
 from .variables import (
     ClassifiedVariable,
@@ -59,7 +58,7 @@ __all__ = [
     "canonicalize_path",
     "classify_role",
     "route_fact",
-    "build_staging_bundle",
-    "build_staging_rows",
-    "collect_jobs",
 ]
+# NOTE (0002-a §6 borderline): the staging bundle builder (build_staging_bundle /
+# build_staging_rows / collect_jobs) is load-cadence-coupled and lives component-side
+# as drydocs.staging — core must not re-export it (boundary test enforces).

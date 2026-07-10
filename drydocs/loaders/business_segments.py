@@ -12,7 +12,7 @@ from __future__ import annotations
 
 import logging
 
-from ..neo4j_client import Neo4jClient
+from drydocs_core.neo4j_client import Neo4jClient
 
 LOGGER = logging.getLogger(__name__)
 

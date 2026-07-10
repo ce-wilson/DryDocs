@@ -11,7 +11,7 @@ from __future__ import annotations
 from pathlib import Path
 from typing import ClassVar
 
-from ..models import SealApplicationRow
+from drydocs_core.models import SealApplicationRow
 from .base import BaseLoader
 
 
