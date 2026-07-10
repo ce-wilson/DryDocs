@@ -50,8 +50,16 @@ for the handoff (ADR 0002, D3).
 
 ## 2. Rebase steps (re-home, don't replay)
 
-1. [ ] **Scaffold** `remediation/` as `drydocs-remediation` with a `drydocs-core` path
+1. [x] **Scaffold** `remediation/` as `drydocs-remediation` with a `drydocs-core` path
        dependency (per 0002-A §5). Own entrypoint/cadence: *failure-pattern detection*, not cron.
+       *(DONE 2026-07-10, IN-MONOREPO variant per ADR 0002-A-1 + user call: the package is
+       top-level `drydocs_remediation/` — a bare `remediation/` dir would claim the generic
+       `import remediation` name; `drydocs_remediation` matches the `drydocs_core` convention.
+       Same single Poetry distribution (no path dep needed — 0002-A §5 mechanics deferred to
+       Phase C); boundary test gains the `remediation` COMPONENT_GROUP; modules =
+       formats (DefinitionFormat seam) / detect / transform / equivalence / jira (the only
+       side-effect boundary); all bodies NotImplementedError pending the M0 PoC slice;
+       tests/unit/test_remediation_scaffold.py pins the structural contract.)*
 2. [x] **Inventory the archive:** list the spinoff's modules and tag each — *remediation logic*
        (keep, port) vs. *Control-M parsing* (drop; replaced by `drydocs_core.controlm`) vs.
        *dead/superseded* (leave behind). Record the map in this file's §4.

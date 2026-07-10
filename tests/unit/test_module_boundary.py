@@ -20,8 +20,13 @@ import ast
 from pathlib import Path
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
-# Packages scanned for the boundary: the monolith plus the transitional core shim.
-PKG_ROOTS = [REPO_ROOT / "drydocs", REPO_ROOT / "drydocs_core"]
+# Packages scanned for the boundary: the component remainder, physical core, and the
+# remediation component (G3 scaffold, 2026-07-10).
+PKG_ROOTS = [
+    REPO_ROOT / "drydocs",
+    REPO_ROOT / "drydocs_core",
+    REPO_ROOT / "drydocs_remediation",
+]
 
 # Dotted prefixes that make up drydocs-core (see MODULE_MAP.md). Since the Phase B
 # relocate the physical package is the whole of core (ADR 0002-a-1).
@@ -56,6 +61,11 @@ COMPONENT_GROUPS: dict[str, tuple[str, ...]] = {
         "drydocs.doc_outline",
         "drydocs.design_doc",
         "drydocs.doc_pdf",
+    ),
+    # drydocs-remediation — detect → transform → prove → Jira (ADR 0002-B, G3).
+    # Writes NO graph; Jira is the SoR; imports only drydocs_core.
+    "remediation": (
+        "drydocs_remediation",
     ),
 }
 ALL_COMPONENT_PREFIXES: tuple[str, ...] = tuple(

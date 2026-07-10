@@ -55,7 +55,7 @@
 | `drydocs/doc_pdf.py` | `drydocs-docgen` — headless-Chromium print.html→PDF (Brave-first), date-normalized (Epic L) | `docs/design/*.pdf` (build-on-demand) |
 | *(future)* `drydocs-lineage` | C2 — curated cmd-line lineage | `drydocs` |
 | *(future)* `drydocs-deepdoc` | C3 — on-demand deep dive | `drydocs_context` |
-| *(separate module)* `drydocs-remediation` | C1 — failures → Jira | — (no graph write) |
+| `drydocs_remediation/**` | `drydocs-remediation` (C1) — detect → transform → prove → Jira (ADR 0002-B; scaffolded 2026-07-10, in-monorepo per 0002-A-1) | — (**no graph write**; Jira = SoR; the `jira.py` module is the only side-effect boundary) |
 
 > **`drydocs-review` note.** All review modules own a run cadence or do external I/O, so
 > none are core. `review_labels` and `source_mappings` are *pure config accessors* parked in

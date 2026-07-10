@@ -658,9 +658,14 @@ items:
       throughout — nothing knowledge/-eligible unsanitized); provenance README records the rule
       (unratified R-rules stay gate-bound; TDD wins on conflict). HELD for user classification
       review: governance/escalation-scim-reference.md + scim-hpsm-queue-registry.md (candidate
-      Internal-Confidential). NEXT: the held-docs review, then scaffold remediation/ (§2 step 1;
-      packaging call per the Phase-C inbox note), then greenfield detect/transform/equivalence/
-      jira guided by the ported rules.
+      Internal-Confidential). Held-docs decision: KEPT OUT (user call, same day) — re-entry is
+      G10 (sanitized). 2026-07-10 (later) — §2 STEP 1 SCAFFOLD DONE (in-monorepo, user call):
+      top-level drydocs_remediation/ package (naming per the drydocs_core convention, note in
+      0002-B) — formats (DefinitionFormat seam) / detect / transform / equivalence / jira (only
+      side-effect boundary), contracts in docstrings, bodies NotImplementedError; pyproject +
+      boundary-test `remediation` group + MODULE_MAP row + test_remediation_scaffold.py. NEXT:
+      greenfield the M0 PoC slice (detect + XmlDefinitionFormat.load against the R-registry),
+      then equivalence, then the Jira emitter (M1).
 
   - id: G4
     epic: component-topology
