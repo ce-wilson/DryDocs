@@ -409,6 +409,46 @@ PROCEDURE:
     - Audit docs (clean-adds): docs/reviews/tech-debt-taxonomy-ontology-map.md (the F1-F5 origin;
       tech-debt-port-boundary.md already rode in with step 25).
 
+28. PHASE B PHYSICAL RELOCATE — THE RENAME WAVE (2026-07-10; commits "0002-A-1 — Phase B thin
+    relocate (amends 0002-A step 4)" -> "G2 physical relocate — drydocs-core extraction (thin,
+    per ADR 0002-A-1)" -> "re-path moved core references" -> "G2 DONE", merged --no-ff as
+    "Merge feat/g2-core-relocate: …"). Port this range ON ITS OWN — do not mix it with feature
+    ranges. Read git-readme.md's "structural path-move LANDED" section + the re-pathed
+    PORT-MANIFEST.yaml FIRST.
+    - WHAT MOVED (42 renames, content ~unchanged): models/, adapters/, controlm/ (minus the
+      staging builder), ontology/ (+ relationship_vocabulary.yaml), schema/ (.cypher resources),
+      neo4j_client.py, config.py, precedence.py, source_registry.py -> drydocs_core/;
+      drydocs/controlm/staging.py -> drydocs/staging.py. The drydocs/ package REMAINS (load /
+      review / plan / docgen components — the drydocs-load rename was DELIBERATELY not executed,
+      ADR 0002-A-1); the drydocs console script, `import drydocs.cli`, and the single-pyproject
+      packaging are all unchanged (drydocs_core was already in packages since the step-9 shim).
+    - APPLY THE RENAMES FIRST: across disjoint history each move arrives as delete+add. Safest:
+      replay the moves as your own `git mv` batch (producer content is byte-identical for pure
+      moves), then apply the range's content diffs on top; if you cherry-pick instead, verify
+      every "deleted" core file reappeared under drydocs_core/ before resolving content.
+    - MOVED canonical-company paths (see their manifest notes): drydocs_core/adapters/
+      oracle_adapter.py (PORT-FROZEN) and drydocs_core/ontology/relationship_vocabulary.yaml
+      (per-entry) — apply the RENAME, keep YOUR content/entries at the new path.
+    - COMPANY-SIDE REPOINT (your files — the incoming commits cannot do this for you): every
+      consumer-only module (locations.py, seal_deployments.py, controlm_app_codes.py, the wired
+      review internals, your cli.py command bodies) that imports drydocs.models / .adapters /
+      .controlm / .neo4j_client / .config / .precedence / .source_registry / .ontology must
+      repoint to drydocs_core.*. The staging builder (build_staging_bundle / build_staging_rows /
+      collect_jobs) moved to drydocs.staging and core's controlm/__init__ NO LONGER re-exports
+      it — repoint those imports too. Any hardcoded drydocs/schema | drydocs/ontology paths in
+      your local configs/scripts follow the same rewrite.
+    - tests/unit/test_module_boundary.py is canonical-producer and arrives with
+      CORE_PREFIXES = drydocs_core: after taking it, RE-ADD your consumer-only modules to its
+      COMPONENT_GROUPS (default-deny fails on unclassified modules — same drill as when
+      default-deny first landed).
+    - Clean-adds riding along: docs/decisions/0002-a-1-phase-b-thin-relocate.md; MODULE_MAP.md /
+      CLAUDE.md / git-readme.md / PORT-MANIFEST.yaml updates are canonical-producer as usual.
+      Side-fix in the range: drydocs/__init__.py __version__ bumped to match pyproject — on
+      collision keep YOUR version string (step-24 rule).
+    - Acceptance: full unit suite green AFTER your repoint; boundary test green; the CLAUDE.md §6
+      gates unchanged (import drydocs.cli / drydocs --help). Producer reference at range head:
+      483 passed / 3 skipped.
+
 ACCEPTANCE GATE (behavior is the contract, not a byte-compare):
 - Track 1 (portable, no production sample present):
     poetry run pytest tests/unit/test_variable_classifier.py tests/unit/test_variable_resolver.py \
