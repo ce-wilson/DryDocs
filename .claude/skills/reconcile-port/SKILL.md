@@ -21,8 +21,11 @@ the accumulated lessons from prior ports. Read both.
    `git tag -f pre-cewilson-port`. Add/refresh the remote and fetch:
    `git remote add cewilson https://github.com/ce-wilson/DryDocs.git` (ignore if
    it exists), then `git fetch cewilson main`.
-2. **Read the guide:** `git show cewilson/main:git-readme.md`. Follow its
-   "Clean-adds", "Canonical-here", and "Collisions" sections.
+2. **Read the manifest first:** `git show cewilson/main:PORT-MANIFEST.yaml` —
+   the machine-readable disposition per path (first match wins; per-entry rows
+   FORBID whole-file checkout). Then the narrative:
+   `git show cewilson/main:git-readme.md` ("Clean-adds", "Canonical-here",
+   "Collisions" sections). Manifest wins on disagreement.
 3. **Apply onto `main`** (skip the optional scratch branch unless asked):
    - **Clean-adds** (path absent here) → apply untouched.
    - **Canonical-here** → take the producer version wholesale, do **not**

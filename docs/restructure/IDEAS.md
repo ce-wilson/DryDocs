@@ -220,3 +220,10 @@ Tags help grooming: `idea` · `bug` · `doc` · `source` (new data source) · `q
   test_port_manifest (priority 40 — MUST land BEFORE ADR 0002 Phase B rename wave);
   (2) per-entry reconciler guards (status-downgrade, gate-log append-only); (3) Class-A
   connector/overlay physical split (do with Phase B).
+- 2026-07-09 — [chore] **Tech-debt remediation executed (steps 1–3 of the unified two-audit
+  plan)**: F4 Document dedupe + F2 applied-status promotion (`c396d75`), F1/F3 map guard +
+  vocab_id migration — 9 tests (`ede0b94`), P1 PORT-MANIFEST.yaml + 7-test guard + authority
+  pointers in git-readme/reconcile-port. REMAINING to groom: P2 per-entry reconciler checks
+  (consumer-side, reuse the map guard's checks — no-downgrade + gate-log append-only);
+  P4 skip-guard policy test; P3+F6 ride ADR 0002 Phase B (manifest sequencing rule now in
+  force: manifest EXISTS, Phase B may proceed when scheduled).

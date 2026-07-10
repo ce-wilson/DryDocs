@@ -8,6 +8,11 @@
 > dead history) and the v1 rewrite was renamed into its place. Throughout this guide,
 > "producer" means `ce-wilson/DryDocs` (github.com).
 
+> **Machine-readable dispositions: [`PORT-MANIFEST.yaml`](PORT-MANIFEST.yaml) is the
+> AUTHORITY** for how each path resolves on collision (first match wins; guarded by
+> `tests/unit/test_port_manifest.py`). This guide and `docs/port-prompt.md` are the
+> narrative around it — when they disagree, the manifest wins and the prose is stale.
+
 This repo is the **producer** side. Work is built here on `main`, committed, and
 pushed to `github.com/ce-wilson/DryDocs`. The **company** target is
 `<company-org>/DryDocs` on GitHub Enterprise (`[github]` host); its maintainer
