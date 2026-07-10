@@ -1,7 +1,7 @@
 # ADR 0002-A — `drydocs-core` extraction plan (thin)
 
 ```yaml
-status: IN_PROGRESS     # PLANNED | IN_PROGRESS | DONE — Phase B relocate executing 2026-07-10
+status: DONE            # PLANNED | IN_PROGRESS | DONE — Phase B relocate executed 2026-07-10 (thin, 0002-a-1)
 amended_by: docs/decisions/0002-a-1-phase-b-thin-relocate.md   # §6 step 4 + §5 packaging deferred to Phase C
 date: 2026-06-26
 companion_to: docs/decisions/0002-component-database-topology.md   # ADR 0002, D3

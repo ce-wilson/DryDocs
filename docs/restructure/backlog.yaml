@@ -590,14 +590,14 @@ items:
     agent: main
     model: opus
     priority: p1
-    status: in_progress
+    status: done
     depends_on: []
     inputs: [docs/decisions/0002-a-drydocs-core-extraction-plan.md, drydocs/, tests/]
     acceptance: >
       Per 0002-A done criteria: drydocs-core imports cleanly with NO component dependency;
       drydocs-load runs the existing pipeline unchanged; tests/unit/test_module_boundary.py
       passes; gates green (pytest -q, package import, --help).
-    output: core/ (drydocs-core) + load/ (drydocs-load)
+    output: drydocs_core/ (physical core) + drydocs/ (component remainder — thin layout per ADR 0002-A-1)
     notes: >
       ADR 0002 follow-up #2; plan = 0002-A (thin, zero behavior change). BLOCKS G3 + G4. Shim/
       re-export first, then relocate; borderline staging.py + snapshots/writer.py → load (0002-A §6).
@@ -613,6 +613,14 @@ items:
       import drydocs.cli + drydocs_core OK; drydocs --help renders and the CLI exits 0 via
       CliRunner (the Store-venv drydocs.cmd wrapper mis-reports exit -1 — wrapper artifact, not
       a CLI defect). REMAINING: only the physical relocate (Phase B step 2+, when core stabilizes).
+      2026-07-10 — PHYSICAL RELOCATE DONE (branch feat/g2-core-relocate; thin variant ratified as
+      ADR 0002-A-1, amends 0002-A §6 step 4): 42 git renames move models/adapters/controlm/ontology/
+      schema/neo4j_client/config/precedence/source_registry into drydocs_core/ (shim -> real
+      package); staging.py -> drydocs/staging.py (load side, §6 borderline as decided); remainder
+      KEEPS the drydocs name (4 component groups; rename + per-component packaging = Phase C).
+      Boundary test enforces CORE_PREFIXES=drydocs_core; PORT-MANIFEST re-pathed (the promised
+      path-column diff) + git-readme rename-wave rules. ALL GATES GREEN post-move: 483/3, imports,
+      --help. ITEM COMPLETE — G3 + G4 unblocked.
 
   - id: G3
     epic: component-topology
@@ -2021,7 +2029,7 @@ items:
 # that these match the items exactly; update them with any status change.
 summary:
   todo: 25                                          # K3 done + K4/K5 added 2026-07-10
-  in_progress: 7                                   # E1, F1, F2, K2, P2 (awaiting HITL), G2 (core shim), O1 (web design pass)
+  in_progress: 6                                   # E1, F1, F2, K2, P2 (awaiting HITL), O1 (web design pass)
   blocked: 0
-  done: 44                                          # K3 gate SIGNED OFF 2026-07-10
-  next_ready: [C5, J2, J4, J5, J6, L7, L8, L9, M2, M3, M4, N2, P1, J7, J8, C7, K4, K5]  # K3 done; K4/K5 added 2026-07-10
+  done: 45                                          # G2 physical relocate DONE 2026-07-10 (ADR 0002-A-1)
+  next_ready: [C5, J2, J4, J5, J6, L7, L8, L9, M2, M3, M4, N2, P1, J7, J8, C7, K4, K5, G3, G4]  # G2 done -> G3/G4 unblock
