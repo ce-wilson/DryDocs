@@ -192,3 +192,13 @@ Tags help grooming: `idea` · `bug` · `doc` · `source` (new data source) · `q
   maintenance-window use case; hosts topology gate signed off same day). Groom: gate session;
   supplement loader build (blocked on gate + probes P0/P2/P7); NODE_GROUP↔RUNS_ON
   cross-validation report as a remediation feeder.
+- 2026-07-09 — [idea] **Taxonomy→ontology map tech-debt audit written**
+  (`docs/reviews/tech-debt-taxonomy-ontology-map.md`, /tech-debt run): the map is the ONLY
+  unguarded ledger (siblings all have accessor+test); summary counts hand-bumped by two
+  sessions same day (the backlog analog conflicted in today's merge). Groom: (1) map guard —
+  `drydocs/taxonomy_ontology_map.py` + `test_taxonomy_ontology_map.py` (computed summary,
+  lifecycle enum, reuses_vocab referential check, map↔vocab label agreement) — priority 36;
+  (2) point fixes: duplicate `Document` node classification (two entries!), five
+  comment-`APPLIED` entries → `status: applied`, stale `updated:`; (3) structured
+  `vocab_id:` + `capture:` fields at the next gate (taxonomy-first erosion — see main's
+  `platforms.yaml` retrofit `fa7a00c`).
