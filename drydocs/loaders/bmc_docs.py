@@ -29,7 +29,7 @@ from typing import TYPE_CHECKING, ClassVar, Iterator
 
 from pydantic import BaseModel
 
-from ..models.docs import BmcDocChunkRow
+from drydocs_core.models.docs import BmcDocChunkRow
 from .base import BaseLoader, compute_row_checksum
 
 if TYPE_CHECKING:  # pragma: no cover

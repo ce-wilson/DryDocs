@@ -43,7 +43,7 @@ Run `ingest.sh` first, then `embed.sh`.
 ## Naming caveat — these are NOT the `.sh` the loader classifies
 
 Do not confuse these operational wrappers with the `.sh`/`.ksh` references inside
-`drydocs/controlm/commands.py`. Those match the **command strings of the Control-M
+`drydocs_core/controlm/commands.py`. Those match the **command strings of the Control-M
 jobs being ingested** (e.g. `run_data_validation.sh` → `VALIDATION_UTIL`) — i.e.
 shell scripts as *graph data going in*. The scripts here run *DryDocs itself*.
 Opposite directions; don't conflate them.

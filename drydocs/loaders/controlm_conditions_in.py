@@ -14,7 +14,7 @@ from typing import ClassVar
 
 from pydantic import BaseModel
 
-from ..models import ControlMConditionInRow
+from drydocs_core.models import ControlMConditionInRow
 from .base import BaseLoader, compute_row_checksum
 
 

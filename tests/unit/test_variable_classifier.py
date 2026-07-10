@@ -9,14 +9,14 @@ from pathlib import Path
 
 import pytest
 
-from drydocs.adapters.csv_adapter import CsvAdapter
-from drydocs.controlm import (
+from drydocs_core.adapters.csv_adapter import CsvAdapter
+from drydocs_core.controlm import (
     VariableCoverage,
     VariableKind,
     classify_job_variables,
     classify_variable,
 )
-from drydocs.models import ControlMVariableRow
+from drydocs_core.models import ControlMVariableRow
 
 SAMPLE = (
     Path(__file__).resolve().parents[2]

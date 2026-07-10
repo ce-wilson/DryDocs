@@ -32,8 +32,8 @@ from typing import TYPE_CHECKING, Any, ClassVar
 from pydantic import BaseModel, ValidationError
 
 if TYPE_CHECKING:
-    from ..adapters import Adapter
-    from ..neo4j_client import Neo4jClient
+    from drydocs_core.adapters import Adapter
+    from drydocs_core.neo4j_client import Neo4jClient
 
 LOGGER = logging.getLogger(__name__)
 

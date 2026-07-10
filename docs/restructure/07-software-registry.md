@@ -12,7 +12,7 @@ the Tier-2 orchestration category (BMC/AutoSys/Airflow), the trust axis
 ("vendor's words" vs inference), the `vendor-bmc` corpus ID baked into tooling
 (review-labels, gate-prompts, graph-tests), the brand/logo registry
 (`drydocs-icons/vendors/` — includes Neo4j, Oracle, Snowflake), and loose
-module-speak ("the vendor domain" = `drydocs/controlm/`). Meanwhile Oracle and
+module-speak ("the vendor domain" = `drydocs_core/controlm/`). Meanwhile Oracle and
 Neo4j — third-party software we depend on just as much as BMC — have no
 registry entry at all, only prose roles in `reference/REGISTRY.yaml`.
 
@@ -119,7 +119,7 @@ Snowflake gets a row when it stops being a future.
   `APPL_TYPE`; at best it contributes a weak secondary signal
   (`AIAWSWLK`-typed jobs exist but are the exception, not the census).
 - **`CMD_LINE` is the real signal.** The Phase C command/script parser
-  (`drydocs/controlm/commands.py` → typed `STG_INVOCATION` rows) already
+  (`drydocs_core/controlm/commands.py` → typed `STG_INVOCATION` rows) already
   decomposes `CMD_LINE`; product detection = an invocation-pattern table
   (e.g. Ab Initio `air`/`m_run`-style launchers, Informatica `pmcmd`) keyed to
   registry ids. Harder than a column read, but it measures what actually runs.

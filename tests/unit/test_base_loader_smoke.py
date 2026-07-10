@@ -17,7 +17,7 @@ import pytest
 from pydantic import BaseModel
 
 from drydocs.loaders.base import BaseLoader
-from drydocs.neo4j_client import Neo4jClient
+from drydocs_core.neo4j_client import Neo4jClient
 
 
 # ---- in-memory fakes -------------------------------------------------------

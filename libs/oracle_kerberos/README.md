@@ -125,7 +125,7 @@ python spider_login.py --verify
 
 ## 7. Relationship to the DryDocs pipeline
 
-This module is deliberately **outside** `drydocs/` — `drydocs/adapters/
+This module is deliberately **outside** `drydocs/` — `drydocs_core/adapters/
 oracle_adapter.py` is port-frozen (company Kerberos divergence) and must not
 be touched. Company-side, the ingestion loaders can import `connect()` from
 this module (or the company's own `libs/oracle_kerberos`) without any adapter

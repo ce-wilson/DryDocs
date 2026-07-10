@@ -325,7 +325,7 @@ mappings:
 
   # ---- E1: SOSA/SSN jobrun-observation — GATE PREP (SME NOT present) --------
   # SOSA registration (E1 registration step) is already done: sosa/ssn prefixes in
-  # drydocs/ontology/namespaces.py, terms seeded in sosa_experimental_supplement.cypher
+  # drydocs_core/ontology/namespaces.py, terms seeded in sosa_experimental_supplement.cypher
   # (opt-in, experimental), and the 4 context relationships below registered
   # status: planned in relationship_vocabulary.yaml. This entry stops at status: proposed —
   # it PREPARES the open modelling decision for the HITL gate (config/gate-prompts/

@@ -1,7 +1,7 @@
 """Folder name parser — verifies the production naming convention."""
 from __future__ import annotations
 
-from drydocs.controlm import parse_folder_name
+from drydocs_core.controlm import parse_folder_name
 
 
 def test_real_folder_name_from_recursive_sample() -> None:

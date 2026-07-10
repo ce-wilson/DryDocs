@@ -307,7 +307,7 @@ gate); the loader that lands it is the **folder pass** (`controlm_folders.cypher
 **Label duals encode PROV type:** `:ControlMApplication:Collection`, `:ControlMFolder:Collection`,
 `:ControlMJob:Activity`, `:Condition:Entity`, `:JobRun` (Activity). `ControlMServer` is a local
 **Platform**, deliberately *not* a `prov:Agent` (so `SCHEDULED_ON` carries no PROV term). Anchor
-terms seeded by `drydocs/schema/ontology.cypher`; the `m3_contains_folder` supplement in
+terms seeded by `drydocs_core/schema/ontology.cypher`; the `m3_contains_folder` supplement in
 `ontology_supplement.cypher`.
 
 *Not yet live:* `WAS_ASSOCIATED_WITH` job→SEAL app (`proposed`, K2); `OBSERVES` job-run SOSA

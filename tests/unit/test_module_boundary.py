@@ -1,18 +1,18 @@
-"""Module-boundary guard for the drydocs-core extraction (ADR 0002 / 0002-a, Phase A).
+"""Module-boundary guard for the drydocs-core extraction (ADR 0002 / 0002-a, Phase B).
 
-Phase A is *logical*; the physical split is staged. A transitional ``drydocs_core`` shim
-package now exists (re-exports the surface, ADR 0002-a Phase B step 1), but the core modules
-still physically live under ``drydocs/``. This test enforces the boundary across BOTH, per
-``MODULE_MAP.md``:
+Phase B is PHYSICAL (2026-07-10, thin variant per ADR 0002-a-1): the core modules live in
+``drydocs_core/`` for real; the ``drydocs`` package is the component remainder (load /
+review / plan / docgen — the rename to per-component packages is Phase C). This test
+enforces the boundary across BOTH packages, per ``MODULE_MAP.md``:
 
   * **Core imports nothing from any component.** The parse / model / config / driver layer
-    (models, adapters, neo4j_client, config, precedence, source_registry, ontology, controlm)
-    must never import the component layer (loaders / cli / snapshots — graph-write + run cadence).
-  * **Components import only core, never each other.**
+    (``drydocs_core``: models, adapters, neo4j_client, config, precedence, source_registry,
+    ontology, controlm) must never import the component layer.
+  * **Components import only core, never each other.** (The load-cadence staging builder
+    lives component-side as ``drydocs.staging`` — 0002-a §6 borderline decision.)
 
 It parses files with ``ast`` and never imports ``drydocs`` itself, so it has no DB or driver
-side effects and runs anywhere. When Phase B physically splits packages, update the prefix
-tables below to the new package names; the invariant is unchanged.
+side effects and runs anywhere.
 """
 from __future__ import annotations
 
@@ -23,23 +23,17 @@ REPO_ROOT = Path(__file__).resolve().parents[2]
 # Packages scanned for the boundary: the monolith plus the transitional core shim.
 PKG_ROOTS = [REPO_ROOT / "drydocs", REPO_ROOT / "drydocs_core"]
 
-# Dotted prefixes that make up drydocs-core (see MODULE_MAP.md). Includes the
-# `drydocs_core` shim package (ADR 0002-a Phase B step 1; re-exports the surface).
+# Dotted prefixes that make up drydocs-core (see MODULE_MAP.md). Since the Phase B
+# relocate the physical package is the whole of core (ADR 0002-a-1).
 CORE_PREFIXES: tuple[str, ...] = (
-    "drydocs.models",
-    "drydocs.adapters",
-    "drydocs.neo4j_client",
-    "drydocs.config",
-    "drydocs.precedence",
-    "drydocs.source_registry",
-    "drydocs.ontology",
-    "drydocs.controlm",
     "drydocs_core",
 )
 
 # Component group -> the dotted prefixes that belong to it.
 COMPONENT_GROUPS: dict[str, tuple[str, ...]] = {
-    "load": ("drydocs.loaders", "drydocs.cli", "drydocs.snapshots"),
+    # drydocs.staging = the load-cadence staging bundle builder (0002-a §6 borderline;
+    # relocated out of core's controlm/ in Phase B).
+    "load": ("drydocs.loaders", "drydocs.cli", "drydocs.snapshots", "drydocs.staging"),
     # drydocs-review — SME review + graph acceptance + docs publish (Epic H).
     # The default-deny test below FORCES a new review module to be classified here
     # rather than being silently unguarded.

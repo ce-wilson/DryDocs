@@ -3,15 +3,15 @@ routing. Scenarios transcribed from real production rows.
 """
 from __future__ import annotations
 
-from drydocs.controlm.commands import (
+from drydocs_core.controlm.commands import (
     classify_executable,
     extract_container_command,
     parse_command,
     split_statements,
 )
-from drydocs.controlm.facts import route_fact
-from drydocs.controlm.paths import build_file_ref, canonicalize_path, classify_role
-from drydocs.controlm.variables import classify_variable
+from drydocs_core.controlm.facts import route_fact
+from drydocs_core.controlm.paths import build_file_ref, canonicalize_path, classify_role
+from drydocs_core.controlm.variables import classify_variable
 
 # --- statement splitting ------------------------------------------------------
 
@@ -182,7 +182,7 @@ def test_route_notification_splits_addresses() -> None:
 
 
 def test_fid_env_triplet_carries_environment() -> None:
-    from drydocs.controlm.variables import classify_job_variables
+    from drydocs_core.controlm.variables import classify_job_variables
     out = {cv.name: cv for cv in classify_job_variables(
         [("%%FID_D", "B0001"), ("%%FID_Q", "H0002"), ("%%FID_P", "K0003")]
     )}

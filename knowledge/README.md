@@ -11,7 +11,7 @@ reference material that merely supports building the project.
 
 | Path | What it is |
 |------|-----------|
-| `ontology/` | The DryDocs ontology documentation (`DryDocs_Ontology_Documentation.md`) — the canonical class/relationship model the `drydocs/schema/*.cypher` and `drydocs/ontology/` code implement. |
+| `ontology/` | The DryDocs ontology documentation (`DryDocs_Ontology_Documentation.md`) — the canonical class/relationship model the `drydocs_core/schema/*.cypher` and `drydocs_core/ontology/` code implement. |
 | `standards/` | Internal conventions: data-center & folder naming, calendar-resolution and description-field plans. The rules loaders apply when normalizing source data. |
 | `upgrade-plans/` | Forward-looking improvement plans (e.g. GraphRAG / LLM-navigation upgrade). |
 

@@ -13,7 +13,7 @@ from typing import ClassVar
 
 from pydantic import BaseModel
 
-from ..models import ControlMConditionOutRow
+from drydocs_core.models import ControlMConditionOutRow
 from .base import BaseLoader, compute_row_checksum
 
 

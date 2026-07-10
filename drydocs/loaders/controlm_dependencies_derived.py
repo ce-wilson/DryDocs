@@ -17,7 +17,7 @@ from __future__ import annotations
 from pathlib import Path
 from typing import ClassVar
 
-from ..models import ControlMDependencyRow
+from drydocs_core.models import ControlMDependencyRow
 from .base import BaseLoader
 
 

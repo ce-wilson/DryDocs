@@ -13,7 +13,7 @@ import pytest
 try:
     import yaml
 
-    from drydocs.precedence import (
+    from drydocs_core.precedence import (
         Claim,
         PrecedenceResolver,
         UnknownAuthorityError,

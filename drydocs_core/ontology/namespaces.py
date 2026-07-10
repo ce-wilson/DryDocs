@@ -1,6 +1,6 @@
 """Namespace prefixes used across the knowledge graph.
 
-Keep this in sync with ``drydocs/schema/ontology.cypher``. When the corporate
+Keep this in sync with ``drydocs_core/schema/ontology.cypher``. When the corporate
 DPROD namespace is published internally, swap the ``dprod`` value here.
 """
 from __future__ import annotations

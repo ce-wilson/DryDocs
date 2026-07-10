@@ -27,7 +27,7 @@ constrains).
 
 > The **variable taxonomy** (`VariableKind`: MALFORMED · EMBEDDED_SHELL · PLUGIN_NS · FLOW_REF ·
 > DYNAMIC_NAME · SEMANTIC_FACT · SYSTEM_FUNC · VAR_REF · LITERAL) is a worked example already
-> implemented in `drydocs/controlm/variables.py`. The folder-naming standard
+> implemented in `drydocs_core/controlm/variables.py`. The folder-naming standard
 > (`…/control-m/folder`) parses `ControlMFolder.name` into taxonomy attributes (env · LOB · app · type).
 
 ### 1.2 Business — org & applications (Catalog/PAT, SEAL)
@@ -73,7 +73,7 @@ gate** before any edge is written. This is the join between layer 1 (taxonomy) a
 
 > Precedence (`config/precedence.yaml`): when sources disagree, **bmc-baseline → internal-standards
 > → lob-product-team**. Full node typing is in §4; full edge rules in §3; the relationship
-> registry is `drydocs/ontology/relationship_vocabulary.yaml`.
+> registry is `drydocs_core/ontology/relationship_vocabulary.yaml`.
 
 ## 3. Relationship Mapping
 

@@ -112,7 +112,7 @@ no logic, just the canonical chain, fail-fast:
   command from `feat/llm-nav-p0-vector`; guarded to exit cleanly until that lands.
 
 Kept separate so bulk MERGE isn't taxed by vector-index writes (finding **T7**).
-NB: distinct from the `.sh`/`.ksh` matched in `drydocs/controlm/commands.py`, which
+NB: distinct from the `.sh`/`.ksh` matched in `drydocs_core/controlm/commands.py`, which
 classify the *job command strings being ingested* — opposite direction. See
 `scripts/README.md`.
 

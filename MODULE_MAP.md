@@ -1,17 +1,16 @@
-# MODULE_MAP — drydocs-core vs component boundary (ADR 0002-a Phase A)
+# MODULE_MAP — drydocs-core vs component boundary (ADR 0002-a Phase B)
 
 > Authoritative module boundary for the modular split in
 > [`docs/decisions/0002-component-database-topology.md`](docs/decisions/0002-component-database-topology.md)
 > (ADR 0002) and its extraction plan
 > [`docs/decisions/0002-a-drydocs-core-extraction-plan.md`](docs/decisions/0002-a-drydocs-core-extraction-plan.md).
 >
-> **Status:** the boundary is logical; the physical split is staged. A transitional
-> [`drydocs_core/`](drydocs_core/__init__.py) shim package now exists (ADR 0002-a Phase B step 1) — it
-> **re-exports** the surface below while the modules still physically live under `drydocs/`. Components
-> import `drydocs_core.*`; when the files relocate (Phase B step 2+), only those re-exports flip. The
-> invariant is enforced across **both** packages by
-> [`tests/unit/test_module_boundary.py`](tests/unit/test_module_boundary.py) and survives the physical
-> split unchanged; only the package names update.
+> **Status: PHYSICAL (Phase B relocate executed 2026-07-10, thin variant per
+> [ADR 0002-a-1](docs/decisions/0002-a-1-phase-b-thin-relocate.md)).** The core modules
+> live in [`drydocs_core/`](drydocs_core/__init__.py) for real; the `drydocs` package is the
+> component remainder (load / review / plan / docgen) and KEEPS its name until Phase C
+> (per-component packaging). The invariant is enforced across **both** packages by
+> [`tests/unit/test_module_boundary.py`](tests/unit/test_module_boundary.py).
 
 ## Invariant
 
@@ -21,19 +20,21 @@
 
 ## Core — `drydocs-core` (shared; stable surface)
 
-| Module (today) | Becomes | Role |
-|---|---|---|
-| `drydocs/models/` | `drydocs_core.models` | typed rows/entities (catalog, controlm, seal) |
-| `drydocs/adapters/` | `drydocs_core.adapters` | source adapters (base, csv, oracle) — transform, no graph write |
-| `drydocs/neo4j_client.py` | `drydocs_core.neo4j` | driver/session lifecycle; caller passes the DB name |
-| `drydocs/config.py`, `precedence.py`, `source_registry.py` | `drydocs_core.config` | declarative config layer (CLAUDE.md §4) |
-| `drydocs/ontology/` | `drydocs_core.ontology` | namespace / URN vocab |
-| `drydocs/controlm/` (whole package) | `drydocs_core.controlm` | **the shared Control-M parser** — `commands.py` (CMD_LINE→invocations/file-ops) + `paths.py` (file-ref canonicalization) are the lineage parser **C2 (`drydocs-lineage`) and C3 (`drydocs-deepdoc`) both wrap** |
+| Module (physical) | Role |
+|---|---|
+| `drydocs_core/models/` | typed rows/entities (catalog, controlm, seal, docs, registry) |
+| `drydocs_core/adapters/` | source adapters (base, csv, oracle) — transform, no graph write |
+| `drydocs_core/neo4j_client.py` | driver/session lifecycle; caller passes the DB name |
+| `drydocs_core/config.py`, `precedence.py`, `source_registry.py` | declarative config layer (CLAUDE.md §4) |
+| `drydocs_core/ontology/` | namespace / URN vocab + `relationship_vocabulary.yaml` |
+| `drydocs_core/schema/` | ground-truth DDL/seed `.cypher` resources (constraints, ontology + supplements) |
+| `drydocs_core/controlm/` | **the shared Control-M parser** — `commands.py` (CMD_LINE→invocations/file-ops) + `paths.py` (file-ref canonicalization) are the lineage parser **C2 (`drydocs-lineage`) and C3 (`drydocs-deepdoc`) both wrap** |
 
-**Borderline, parked in core for Phase A** (resolve at the Phase B move, not now):
-- `drydocs/controlm/staging.py` — builds the loader staging bundle; the `controlm/__init__.py`
-  re-export couples it to the parser package, so it stays inside `drydocs.controlm` (core) for Phase A.
-  Candidate to move to `drydocs-load` in Phase B *iff* no second consumer appears.
+**Borderline — RESOLVED at the Phase B move (0002-a §6):**
+- `drydocs/staging.py` (was `controlm/staging.py`) — builds the loader staging bundle;
+  load-cadence-coupled, so it relocated OUT of core into the `load` component group. Core's
+  `controlm/__init__.py` no longer re-exports it.
+- `drydocs/snapshots/writer.py` — writes the graph; stays component-side (load).
 
 ## Components (import core only)
 
@@ -42,6 +43,7 @@
 | `drydocs/loaders/**` | `drydocs-load` (main) | `drydocs` ground truth |
 | `drydocs/cli.py` | `drydocs-load` (entrypoint) | — (orchestrates loaders) |
 | `drydocs/snapshots/` | `drydocs-load` (tooling) | depgraph snapshot |
+| `drydocs/staging.py` | `drydocs-load` (staging bundle builder; ex `controlm/staging.py`) | — (builds loader input) |
 | `drydocs/graph_verify.py` | `drydocs-review` — data-driven Cypher acceptance runner (Epic H) | — (reads graph; asserts) |
 | `drydocs/review_labels.py` | `drydocs-review` — the review spine (source→DATA-label map); consumed by review | — (pure config) |
 | `drydocs/source_mappings.py` | `drydocs-review` — per-source column ledger accessor (doc 08); projected/filter-only/excluded/deferred disposition per profiled column | — (pure config) |

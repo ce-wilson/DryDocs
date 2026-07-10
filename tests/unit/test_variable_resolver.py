@@ -7,7 +7,7 @@ production extract (controlm_variables__sample.csv): 183213/188252
 """
 from __future__ import annotations
 
-from drydocs.controlm.resolver import (
+from drydocs_core.controlm.resolver import (
     MAX_DEPTH,
     ResolvedVariable,
     resolve_job,

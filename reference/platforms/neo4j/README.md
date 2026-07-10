@@ -32,4 +32,4 @@ The `neo4j-skills` plugin is the authoritative, version-current reference. Pick 
 - Server: Neo4j 5.x with **APOC** (loaders use `apoc.cypher.runMany`). Target 2025.x/2026.x.
 - Connection: `NEO4J_URI` / `NEO4J_USER` / `NEO4J_PASSWORD` from `.env`.
 - The ontology backbone (PROV-O terms + supplements) is applied by `drydocs bootstrap` and
-  the `apply-*-supplement` commands. See `drydocs/schema/`.
+  the `apply-*-supplement` commands. See `drydocs_core/schema/`.

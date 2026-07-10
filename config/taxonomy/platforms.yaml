@@ -5,7 +5,7 @@
 # reconciliation surface for the "platform" layer — the *what runs it* technology
 # taxonomy that today is split across three half-models:
 #   1. :SchedulerKind — placeholder vocab {ControlM, Autosys, Airflow}, seeded in
-#      drydocs/schema/ontology.cypher + the scheduler_kind constraint. SLATED FOR
+#      drydocs_core/schema/ontology.cypher + the scheduler_kind constraint. SLATED FOR
 #      DEPRECATION -> :AisCapability + :AiTool (user 2026-07-09).
 #   2. :Scheduler {kind, instance} — a *deployed* scheduler instance
 #      (docs/history/LoadPlanV3.md; not yet built), vs the SchedulerKind classifier.
@@ -18,7 +18,7 @@
 # ontology/node-meaning => the gate, never auto-decided.
 #
 # Related: config/taxonomy-ontology-map.yaml#requires-scheduler (to_node
-# provisional), drydocs/ontology/relationship_vocabulary.yaml#seal_requires_scheduler
+# provisional), drydocs_core/ontology/relationship_vocabulary.yaml#seal_requires_scheduler
 # (planned), backlog C6, docs/restructure/IDEAS.md (SchedulerKind-deprecation capture).
 # =============================================================================
 

@@ -30,7 +30,7 @@ the accumulated lessons from prior ports. Read both.
    - **Clean-adds** (path absent here) → apply untouched.
    - **Canonical-here** → take the producer version wholesale, do **not**
      hand-merge: `git checkout cewilson/main -- <path>`. This includes the
-     entire `drydocs/controlm/` package, `knowledge/standards/`, the Control-M
+     entire `drydocs_core/controlm/` package, `knowledge/standards/`, the Control-M
      SQL/DDL, `relationship_vocabulary.yaml`, `catalog_ontology_supplement.cypher`,
      **and the `tests/unit/test_variable_*` files** (taking these wholesale
      avoids re-deriving the skip guards — see ledger note).
@@ -43,8 +43,8 @@ the accumulated lessons from prior ports. Read both.
 | Path | Resolution |
 |---|---|
 | `drydocs/cli.py` | Keep company `m6-verify` (and `ingest-controlm-xml` etc.); **add** producer `analyze-variables` + `normalize-variables`, `m3-verify` (validates the ported M3 structural layer — keep it, it is **not** a stray), the `_scope_binds` / `--folder/--run-as/--developer-sid/--row-cap` options, and the `_oracle_adapter(query, bind_params=None)` change; merge imports. Confirm your `OracleAdapter` accepts `bind_params` and forwards it to `cursor.execute` (company Kerberos adapter already does). |
-| `drydocs/models/__init__.py` | Union — keep **all** row models from both sides in imports + `__all__`. |
-| `drydocs/models/controlm.py` | Keep company `ControlMQuantitativeRow`; add producer `ControlMVariableRow` (`AliasChoices` import is shared). |
+| `drydocs_core/models/__init__.py` | Union — keep **all** row models from both sides in imports + `__all__`. |
+| `drydocs_core/models/controlm.py` | Keep company `ControlMQuantitativeRow`; add producer `ControlMVariableRow` (`AliasChoices` import is shared). |
 | `tests/unit/test_schema.py` | Keep company `EXPECTED_CONSTRAINTS = 44` (ahead of producer's 35). |
 | `tests/unit/test_controlm_cypher.py` | Keep company version (`scope_key` + version_serial-as-property). |
 | `tests/unit/test_variable_classifier.py`, `test_variable_staging.py` | **Canonical-here — take producer wholesale.** They already carry `skipif(not SAMPLE.exists())` guards (producer commit `9e9fe1c`). Do not re-write your own guard; that caused redundant divergence in a prior port. |
@@ -62,7 +62,7 @@ stay skipped — confirm with the operator if a new one appears.
 - Condition key: `scope_key` vs producer `folder_id`.
 - Suite size: company suite is much larger (scrapers/Confluence). **Do not chase
   the producer's `186 passed` full-suite number** — only zero *new* failures matters.
-- `drydocs/adapters/oracle_adapter.py`: company version is **Kerberos-aware**
+- `drydocs_core/adapters/oracle_adapter.py`: company version is **Kerberos-aware**
   (thick via `_init_thick_client` / `externalauth` when `ORACLE_KERBEROS=True`);
   the producer version is thin-only. **Keep company's** — it carries the JPMC
   connection config (`client_path`, `tns_admin`, TNS alias). The producer's

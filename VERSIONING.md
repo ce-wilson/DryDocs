@@ -17,7 +17,7 @@ Breaking-vs-additive is judged against the surfaces other tools/agents depend on
 2. **The config schemas** — `drydocs.backlog.v2`, `source-registry`, `taxonomy-ontology-map`,
    `classification`, `source-mapping`, `doc-outline` (their shape + the validators that guard them).
 3. **The graph model** — node labels and the **active** terms in
-   `drydocs/ontology/relationship_vocabulary.yaml`. (`status: planned` terms are not yet public.)
+   `drydocs_core/ontology/relationship_vocabulary.yaml`. (`status: planned` terms are not yet public.)
 
 Internal refactors, docs, and anything behind the HITL gate that is still `planned` are **not**
 part of the public surface.

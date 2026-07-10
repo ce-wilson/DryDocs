@@ -1,7 +1,7 @@
 # Control-M Loader Flow — Ingestion Baseline (for schema review)
 
-**Purpose:** baseline flow of the Control-M loaders and the graph schema they produce, for review/correction **against `drydocs/schema/schema_graph.cypher`**. Seed for the `controlm-spinoff` engine.
-**Created:** 2026-06-11 (on `main`). **Sources read:** `drydocs/loaders/controlm_*.py` + `drydocs/loaders/cypher/controlm_*.cypher` + `drydocs/schema/schema_graph.cypher`.
+**Purpose:** baseline flow of the Control-M loaders and the graph schema they produce, for review/correction **against `drydocs_core/schema/schema_graph.cypher`**. Seed for the `controlm-spinoff` engine.
+**Created:** 2026-06-11 (on `main`). **Sources read:** `drydocs/loaders/controlm_*.py` + `drydocs/loaders/cypher/controlm_*.cypher` + `drydocs_core/schema/schema_graph.cypher`.
 
 > ⚠️ **Drift found during this mapping — needs correction (see §4).** The loaders still write `:ControlMFolder` and folder-`:RUNS_ON`-server; the schema (updated 2026-06-09) renamed these to `:ControlMFolder` and `:SCHEDULED_ON`. The diagrams below show **loader-actual** with the schema target flagged.
 
@@ -112,4 +112,4 @@ flowchart LR
 - Provenance (`:JobRun` + `WAS_GENERATED_BY`) is uniform across all loaders — keep it in the spin-off.
 - Resolve §4 drift **before** the engine lift (M1) so the baseline schema is internally consistent.
 
-Related: `drydocs/schema/schema_graph.cypher`, `drydocs/ontology/relationship_vocabulary.yaml`, [[project_controlm_c3_normalization]], [[project-controlm-remediation-spinoff]]
+Related: `drydocs_core/schema/schema_graph.cypher`, `drydocs_core/ontology/relationship_vocabulary.yaml`, [[project_controlm_c3_normalization]], [[project-controlm-remediation-spinoff]]

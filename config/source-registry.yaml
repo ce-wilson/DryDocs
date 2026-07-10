@@ -174,7 +174,7 @@ sources:
       docs/controlm-staging-ingestion-flow.md (STG_APP_FACT ER block) and
       docs/reviews/sdlc-oracle-ingestion.md §FR-OI-007. Feeds the planned
       m3_seal_app_ref mapping (WAS_ASSOCIATED_WITH, role seal_app_ref,
-      drydocs/ontology/relationship_vocabulary.yaml, status: planned) and the
+      drydocs_core/ontology/relationship_vocabulary.yaml, status: planned) and the
       corresponding taxonomy-ontology-map.yaml entry (status: proposed). Mechanism-only
       here — no real SEAL id / FID / application-name values, column/fact-type names
       only. Activate (confirmed: true) only after the K2 match-policy gate (SEAL-fact

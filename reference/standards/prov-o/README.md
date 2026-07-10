@@ -2,7 +2,7 @@
 
 **IRI:** `http://www.w3.org/ns/prov#`. The backbone of the DryDocs ontology. Every node carries
 provenance and the **9-row decision matrix** in
-[`../../../drydocs/ontology/relationship_vocabulary.yaml`](../../../drydocs/ontology/relationship_vocabulary.yaml)
+[`../../../drydocs_core/ontology/relationship_vocabulary.yaml`](../../../drydocs_core/ontology/relationship_vocabulary.yaml)
 is PROV-O.
 
 ## The matrix (memorize this)

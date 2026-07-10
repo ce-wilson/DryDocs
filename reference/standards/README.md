@@ -30,7 +30,7 @@ Two tiers, by adoption status:
 | [**SOSA/SSN**](sosa-ssn/README.md) | `http://www.w3.org/ns/sosa/` | **context (temporal/observation)** | feeds layer 4; W3C but **not a declared company standard** |
 
 SOSA/SSN is opt-in only — seeded by `drydocs apply-sosa-supplement`
-(`drydocs/schema/sosa_experimental_supplement.cypher`), **never** by `drydocs bootstrap`.
+(`drydocs_core/schema/sosa_experimental_supplement.cypher`), **never** by `drydocs bootstrap`.
 Every term carries `adoption:"experimental"` in the graph. Promotion to **Declared /
 Adopted** happens only after the SME confirms the `jobrun-observation` mapping through the
 HITL gate (`docs/restructure/03-hitl-sme-flow.md`); see backlog Epic E.

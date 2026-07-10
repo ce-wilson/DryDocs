@@ -19,7 +19,7 @@ meta:
   Registry ref: "controlm-psgmgr — confirmed (config/source-registry.yaml); orchestrator: bmc-controlm (baseline)"
   Classification: "Internal (source data) · this page Internal-Public (mechanism only)"
   Taxonomy: "config/taxonomy/ — folders, jobs, conditions, dependencies, variables"
-  Ontology map: "config/taxonomy-ontology-map.yaml + drydocs/ontology/relationship_vocabulary.yaml"
+  Ontology map: "config/taxonomy-ontology-map.yaml + drydocs_core/ontology/relationship_vocabulary.yaml"
   Source of record: "docs/restructure/06a-controlm-source-er-review.md (+ SME answers 2026-07-07)"
 mapping:
   - n: 1

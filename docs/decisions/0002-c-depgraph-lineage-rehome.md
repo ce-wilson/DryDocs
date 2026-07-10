@@ -28,7 +28,7 @@ A **stdlib-only companion prototype** to DryDocs, not an independent tool. Its C
 work, on the `feat/controlm-lineage` branch (PR #2), self-identifies as a DryDocs port:
 
 1. `depgraph/controlm/commands.py` is *"a faithful stdlib-only **port** of DryDocs'
-   `drydocs/controlm/commands.py`"* with deltas marked `# depgraph:` and a standing note —
+   `drydocs_core/controlm/commands.py`"* with deltas marked `# depgraph:` and a standing note —
    **"Keep in sync with DryDocs when that parser changes."** (This dual-maintenance tax is the
    thing the re-home eliminates.)
 2. It consumes a **CSV export of DryDocs'** `controlm_jobs.sql` projection (psgmgr.CM_DEF_VJOB).
@@ -71,7 +71,7 @@ depgraph-side stays a fork.
 ## 3. Parser-delta fold (depgraph → `drydocs-core`) — backlog **G8**
 
 depgraph's port found and fixed real gaps the **current** DryDocs parser
-(`drydocs/controlm/commands.py`, re-exported by `drydocs_core`) still has. Fold these **into
+(`drydocs_core/controlm/commands.py`, re-exported by `drydocs_core`) still has. Fold these **into
 core**, then depgraph's parser ceases to exist (the component imports `drydocs_core.controlm`).
 Verified against both trees on 2026-06-29:
 

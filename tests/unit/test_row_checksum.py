@@ -12,7 +12,7 @@ from drydocs.loaders.controlm_conditions_in import ControlMConditionsInLoader
 from drydocs.loaders.controlm_conditions_out import ControlMConditionsOutLoader
 from drydocs.loaders.controlm_folders import ControlMFoldersLoader
 from drydocs.loaders.controlm_jobs import ControlMJobsLoader
-from drydocs.models import (
+from drydocs_core.models import (
     ControlMConditionInRow,
     ControlMConditionOutRow,
     ControlMFolderRow,

@@ -70,9 +70,9 @@ def test_critical_rows_are_pinned(manifest: dict) -> None:
     expected = {
         "drydocs/publishing/**": "canonical-company",
         "config/gate-prompts/**": "canonical-company",
-        "drydocs/adapters/oracle_adapter.py": "canonical-company",
+        "drydocs_core/adapters/oracle_adapter.py": "canonical-company",
         "config/gate-log.md": "union-append",
-        "drydocs/ontology/relationship_vocabulary.yaml": "per-entry",
+        "drydocs_core/ontology/relationship_vocabulary.yaml": "per-entry",
         "config/taxonomy-ontology-map.yaml": "per-entry",
         "drydocs/data/**": "never-port",
     }

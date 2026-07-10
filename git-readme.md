@@ -67,8 +67,9 @@ What diverges, by stream:
   scope; 0002 component & database topology + 0002-a core-extraction plan), `MODULE_MAP.md` +
   `tests/unit/test_module_boundary.py` (the core/component boundary guard), and the
   `SDLC-Docs/extracted/` design trail. All **clean-adds** — take FROM this repo. ADR 0002 foretells a
-  structural `drydocs/ → drydocs-core` + component-package move (Phase B, **not yet executed**); see the
-  dedicated section below. (ADR **0002-c** — depgraph-lineage re-home — is a newer clean-add in the same set.)
+  structural `drydocs/ → drydocs-core` move (Phase B, **EXECUTED 2026-07-10** — thin variant per
+  ADR **0002-a-1**: core is physically `drydocs_core/`, the remainder KEEPS the `drydocs` name; see the
+  dedicated section below). (ADR **0002-c** — depgraph-lineage re-home — is a newer clean-add in the same set.)
 - **`drydocs-review` back-flow (NEW — REVERSE direction)** — the company-authored SME/HITL toolkit,
   reproduced here generically. **Canonical-COMPANY on collision** — keep your version. See the dedicated
   "`drydocs-review` — back-flow stream" section below.
@@ -209,14 +210,23 @@ take FROM this repo.
 | `tests/unit/test_module_boundary.py` | stdlib guard enforcing the boundary (Track-1 portable, no data) | clean-add |
 | `SDLC-Docs/extracted/*.md` | design trail (feasibility, C+D adoption, issue-driven loop, modular plan) | clean-add |
 
-**Heads-up — a structural path-move is coming (ADR 0002 D3, Phase B).** The modular split will move
-code out of the flat `drydocs/` package into `drydocs-core` + component packages (`drydocs-load` /
-`drydocs-lineage` / `drydocs-deepdoc`). When that lands, expect a large **rename wave**: across disjoint
-history git sees each move as delete+add (same as the `vendor/ → external/` rename above), and the
-per-file collision rules in this guide will be **superseded** by the package boundary in
-`MODULE_MAP.md`. Until Phase B executes, the layout is unchanged and all current cherry-pick rules still
-apply. The boundary guard is **Track-1 portable** (pure stdlib, no sample data) — add it to the Track-1
-acceptance run.
+**The structural path-move LANDED (ADR 0002 D3, Phase B — EXECUTED 2026-07-10, thin variant per
+ADR 0002-a-1).** Core moved physically into `drydocs_core/` (models, adapters, controlm minus the
+staging builder, ontology + vocabulary, schema `.cypher`, neo4j_client, config, precedence,
+source_registry); the **remainder keeps the `drydocs` package name** (load / review / plan / docgen —
+the per-component split is Phase C). Consequences for the NEXT port range:
+- Expect the **rename wave**: across disjoint history git sees each move as delete+add (same as the
+  `vendor/ → external/` rename above). Apply the renames, then apply content per disposition.
+- **PORT-MANIFEST.yaml carries the current paths** (its rows were re-pathed with the move — the
+  promised "path-column diff"); paths in this guide's older tables predate the relocate — where they
+  disagree, the manifest wins.
+- The port-frozen `oracle_adapter.py` and the per-entry `relationship_vocabulary.yaml` moved WITH
+  core: apply the rename, keep your content (see their manifest notes).
+- `drydocs/controlm/staging.py` → `drydocs/staging.py` (stays in the remainder; core's
+  `controlm/__init__` no longer re-exports it — consumer code importing the staging builder from
+  `drydocs.controlm` must repoint to `drydocs.staging`).
+The boundary guard is **Track-1 portable** (pure stdlib, no sample data) — it now enforces
+`drydocs_core` as the core prefix.
 
 ---
 

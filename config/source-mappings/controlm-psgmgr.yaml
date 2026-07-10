@@ -39,7 +39,7 @@ updated: 2026-07-09
 objects:
   # ---------------------------------------------------------------------------
   # CM_DEF_VTAB (folders) — replicated copy of dtsremgr.DEF_VTAB. Per
-  # drydocs/models/controlm.py: "a table, not a view, despite the family name."
+  # drydocs_core/models/controlm.py: "a table, not a view, despite the family name."
   # Loader: drydocs/loaders/controlm_folders.py + sql/controlm_folders.sql +
   # cypher/controlm_folders.cypher.
   # ---------------------------------------------------------------------------
@@ -281,7 +281,7 @@ objects:
       with different values) — never dedupe.
     columns:
       - {name: TABLE_ID, disposition: projected, origin: source, target: "staging:folder_id",
-         note: "join key to CM_DEF_VJOB/CM_DEF_VTAB context; the raw SQL Developer export mislabels this column TABLE_NAME (drydocs/models/controlm.py ControlMVariableRow handles both aliases)"}
+         note: "join key to CM_DEF_VJOB/CM_DEF_VTAB context; the raw SQL Developer export mislabels this column TABLE_NAME (drydocs_core/models/controlm.py ControlMVariableRow handles both aliases)"}
       - {name: JOB_ID, disposition: projected, origin: source, target: "staging:job_id"}
       - {name: NAME, disposition: projected, origin: source, target: "staging:var_name",
          note: "variable name including the %% prefix"}

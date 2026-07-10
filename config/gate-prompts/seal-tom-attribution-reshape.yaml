@@ -29,7 +29,7 @@ meta:
   Registry ref: "config/source-registry.yaml — seal-extract (existing, confirmed); the future docmeta scrape source (seal-pat-scrape) is NOT yet registered — see open question in section D"
   Classification: "Internal-Public (this page, mechanism only) · underlying SEAL/PAT extract data is Internal / Internal-Confidential (real SEAL ids, app names, employee names never appear here)"
   Taxonomy: "config/taxonomy/business-application.yaml (Application, key SEALID)"
-  Ontology map: "config/taxonomy-ontology-map.yaml #application-as-dataproduct / #seal-tom-attribution / #seal-doc-source-of-record (all status: proposed) + drydocs/ontology/relationship_vocabulary.yaml (Application proposed_reclass note; seal_had_primary_source / seal_app_attributed_to_employee / seal_qualified_attribution / seal_attribution_has_agent / seal_attribution_had_role, all status: planned)"
+  Ontology map: "config/taxonomy-ontology-map.yaml #application-as-dataproduct / #seal-tom-attribution / #seal-doc-source-of-record (all status: proposed) + drydocs_core/ontology/relationship_vocabulary.yaml (Application proposed_reclass note; seal_had_primary_source / seal_app_attributed_to_employee / seal_qualified_attribution / seal_attribution_has_agent / seal_attribution_had_role, all status: planned)"
   Source of record: "knowledge/upgrade-plans/docmeta-component.md (top callout) · git-readme.md (heads-up bullet) · docs/restructure/IDEAS.md 2026-07-08 [question] entry · config/precedence.yaml proposed_additions#seal-pat-source-of-record"
 
 mapping:
