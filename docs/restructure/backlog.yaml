@@ -36,7 +36,7 @@
 # =============================================================================
 
 schema: drydocs.backlog.v2
-updated: 2026-07-09
+updated: 2026-07-10
 
 # ── The high-level project plan (rendered as the board's roadmap strip) ───────
 plan:
@@ -1227,17 +1227,22 @@ items:
       the K3 reshape reclasses it prov:Entity/dprod:DataProduct — run the K3 gate FIRST;
       the match-policy gate spec (seal-attribution-match-policy) may need its edge shape
       revised to the reshaped form before ticking. depends_on gains K3.
+      2026-07-10: K3 gate SIGNED OFF — the reshape IS confirmed needed (post-reclass
+      wasAssociatedWith no longer type-checks against an Entity target), but the specific edge
+      shape (a: prov:used vs b: local BELONGS_TO_APPLICATION) is DEFERRED to a K2 follow-up gate.
+      K2 stays in_progress: still needs (1) that deferred edge-shape decision and (2) its own
+      match-policy gate before the loader is built.
 
   - id: K3
     epic: seal-attribution
-    title: "Run the SEAL entity-reshape gate (:Application -> Entity/DataProduct; TOM roles -> qualifiedAttribution)"
+    title: "Run the BusinessApplication entity-reshape gate (:Application -> Entity/DataProduct; TOM roles -> qualifiedAttribution)"
     type: task
     module: ontology
     phase: 9
     agent: ontology-mapper
     model: sonnet
     priority: p1
-    status: todo
+    status: done
     depends_on: []
     inputs: [config/gate-prompts/seal-tom-attribution-reshape.yaml, drydocs/ontology/relationship_vocabulary.yaml, config/taxonomy-ontology-map.yaml, knowledge/upgrade-plans/docmeta-component.md]
     acceptance: >
@@ -1254,6 +1259,92 @@ items:
       (0986d6d): gate spec + planned vocabulary registrations + map type_conflict_note.
       The remaining action is the SME gate session itself + transcription — the most
       consequential pending gate (three incompatible PROV types on one node today).
+      2026-07-10: STARTED — in_progress = awaiting HITL (the E1/F1/F2/K2/P2 pattern); the
+      agent-side prep is complete, only the SME gate session remains. No graph/vocab write
+      until the gate is signed off and transcribed to config/gate-log.md.
+      2026-07-10 (user request): RENAMED "SEAL entity-reshape" -> "BusinessApplication
+      entity-reshape gate" to normalize to the ontology naming convention for
+      internally-developed applications — the taxonomy concept is BusinessApplication
+      (config/taxonomy/business-application.yaml, key SEALID) while the graph node label is
+      still :Application (relationship_vocabulary.yaml node_classifications:174; the vocab
+      already flags the mismatch at :1292 "DevTeam develops a BusinessApplication (graph
+      label :Application)"). NEW gate open-question this rename raises: alongside the class
+      reclass (prov:SoftwareAgent -> prov:Entity/dprod:DataProduct, gate section A), the SME
+      should decide whether to normalize the node LABEL :Application -> :BusinessApplication.
+      A node-label change is an ontology/node-meaning decision -> gate-bound, NOT auto-applied;
+      the label stays :Application until the gate confirms. The gate spec
+      (seal-tom-attribution-reshape.yaml) does not yet carry this label question — add it to
+      section A before the SME session.
+      2026-07-10: GATE SIGNED OFF (SME chad.wilson) — full transcription in config/gate-log.md
+      (2026-07-10 entry). Outcome: A confirmed (Entity/DataProduct); B confirmed with a REVISED
+      two-family role model (7 SEAL Technical Operational roles on :Application via qualified
+      attribution + a TOMRole scheme; CTO shared; Product Cabinet split out -> K5); C confirmed
+      (deprecate the 3 seal_* edges, keep seal_has_port); D confirmed (hadPrimarySource + docmeta
+      now a required dependency); E decided FLIP arch_develops -> WAS_ATTRIBUTED_TO {role:
+      developed_by}; F/K2 edge shape DEFERRED; label normalization :Application -> :BusinessApplication
+      confirmed-direction. K3 = run+transcribe the gate = DONE. The mechanical application of every
+      flip is K4; the Product Cabinet is K5.
+
+  - id: K4
+    epic: seal-attribution
+    title: "Apply the BusinessApplication entity-reshape gate outcome (reclass + label + TOMRole attribution + deprecations + provenance + precedence)"
+    type: task
+    module: ontology
+    phase: 9
+    agent: ontology-mapper
+    model: sonnet
+    priority: p2
+    status: todo
+    depends_on: [K3]
+    inputs: [config/gate-log.md, drydocs/ontology/relationship_vocabulary.yaml, config/taxonomy-ontology-map.yaml, drydocs/schema/, config/precedence.yaml]
+    acceptance: >
+      Per the 2026-07-10 gate sign-off (config/gate-log.md), each applied as its OWN logged change
+      with drift guards green: (1) node_classifications#Application class flips prov:SoftwareAgent ->
+      prov:Entity/dprod:DataProduct AND the label normalizes :Application -> :BusinessApplication
+      across the vocabulary, loaders, supplements and tests; (2) a TOMRole skos ConceptScheme (the 7
+      SEAL Technical Operational roles; CTO shared with K5's ProductRole scheme) + the
+      qualifiedAttribution/hadRole supplement land (seal_qualified_attribution /
+      seal_attribution_has_agent / seal_attribution_had_role planned -> active with supplement blocks);
+      (3) seal_has_membership / seal_of_role / seal_held_by deprecated (RELATIONSHIP_GUIDE steps;
+      seal_has_port KEPT); (4) seal_had_primary_source activated as an edge (Document nodes wait on the
+      drydocs-docmeta component); (5) arch_develops flips to
+      (:Application)-[:WAS_ATTRIBUTED_TO {role: developed_by}]->(:DevTeam); (6) map entries
+      application-as-dataproduct / seal-tom-attribution / seal-doc-source-of-record flip proposed ->
+      confirmed (carrying vocab_id + capture per F5/C7) -> applied with loaders; (7) the SEAL/PAT
+      precedence proposed_additions block wired into the live order/active chain. Full suite green.
+    notes: >
+      Created 2026-07-10 from the K3 gate sign-off. The gate confirmed the DIRECTION; this is the
+      mechanical APPLICATION, each flip its own logged change (gate section G discipline). Does NOT
+      include the K2 job->app edge (deferred) or the Product Cabinet (K5). CTO is shared between the
+      TOMRole (here) and ProductRole (K5) schemes — coordinate the two.
+
+  - id: K5
+    epic: seal-attribution
+    title: "Product Cabinet attribution model (product-scoped ProductRole scheme + cross-role reporting edges + DevTeam matrix)"
+    type: task
+    module: ontology
+    phase: 9
+    agent: ontology-mapper
+    model: sonnet
+    priority: p3
+    status: todo
+    depends_on: []
+    inputs: [config/gate-log.md, config/taxonomy/lob-product-team.yaml, drydocs/ontology/relationship_vocabulary.yaml, config/taxonomy-ontology-map.yaml]
+    acceptance: >
+      A ProductRole skos ConceptScheme (Area Product Owner, Product Owner, Product Architect, Tech
+      Partner, Data Owner, Data Certifier, Analytics Lead; CTO shared with the TOMRole scheme) is
+      proposed and SME-confirmed via its OWN HITL gate, scoped to the PAT hierarchy nodes
+      (:Product / :AreaProduct, NOT :Application), with Area Product Owner explicitly NOT tying to a
+      business application; the cross-family reporting edges (Tech Partner manages Application Owner;
+      TOM Information Owner reports to Data Owner; Data Certifier relates to the app Information Owner)
+      are modeled as org:reportsTo-style edges or explicitly recorded as deferred; the
+      DevTeam -> BusinessApplication matrix (M:N) is confirmed. No graph write before the gate;
+      drift guards green.
+    notes: >
+      Split out of K3 at the 2026-07-10 gate (SME "ok to split"). Product Cabinet is PAT/Product-layer,
+      distinct from the SEAL app reshape (K3/K4). CTO is the shared concept between the TOMRole and
+      ProductRole schemes. Related to Epic C (catalog hierarchy) — the :Product/:AreaProduct nodes come
+      from config/taxonomy/lob-product-team.yaml.
 
   # ── Epic L — Documentation infrastructure (main) — Phase 10 ───────────────
   # Groomed 2026-07-08 from the deterministic-documentation design conversation.
@@ -1920,8 +2011,8 @@ items:
 # Roll-up the dispatcher can glance at. COMPUTED views — test_backlog.py enforces
 # that these match the items exactly; update them with any status change.
 summary:
-  todo: 24                                          # recomputed by groom 2026-07-09
+  todo: 25                                          # K3 done + K4/K5 added 2026-07-10
   in_progress: 7                                   # E1, F1, F2, K2, P2 (awaiting HITL), G2 (core shim), O1 (web design pass)
   blocked: 0
-  done: 43                                          # recomputed by groom 2026-07-09
-  next_ready: [C5, J2, J4, J5, J6, K3, L7, L8, L9, M2, M3, M4, N2, P1, J7, J8, C7]  # recomputed by groom 2026-07-09
+  done: 44                                          # K3 gate SIGNED OFF 2026-07-10
+  next_ready: [C5, J2, J4, J5, J6, L7, L8, L9, M2, M3, M4, N2, P1, J7, J8, C7, K4, K5]  # K3 done; K4/K5 added 2026-07-10

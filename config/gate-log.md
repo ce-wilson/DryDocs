@@ -191,3 +191,47 @@ records the date, the item, confirmed / edited / rejected counts, and reasons fo
   `host-group-defined-on`) proposed → confirmed; vocabulary terms stay `status: planned`
   (correct lifecycle — supplement/loader not yet built); CM_HOSTS extract stays staging-only
   until the hosts loader + RUNS_ON resolution pass are built against these decisions.
+
+## 2026-07-10 — BusinessApplication entity-reshape gate — SIGNED OFF (K3; resolves the 2026-07-08 PENDING entry)
+- **Gate:** `config/gate-prompts/seal-tom-attribution-reshape.yaml` (sections A–G). **SME: chad.wilson.**
+  Backlog **K3** (renamed 2026-07-10 "SEAL entity-reshape" → "BusinessApplication entity-reshape gate").
+- **§A — CONFIRMED.** `:Application` reclass `prov:SoftwareAgent` → `prov:Entity` / `dprod:DataProduct`.
+- **§B — CONFIRMED, role model REVISED by the SME into two families at two node scopes:**
+  - **SEAL Technical Operational Contacts** — attach to `:Application` via `prov:qualifiedAttribution` +
+    `prov:hadRole` against the `TOMRole` skos scheme. **Complete + fixed** set: Application Owner,
+    Primary Information Owner, Backup Information Owner (1–2 persons), CTO, Technology Risk & Controls,
+    Design Authority, Operate Manager L1 / L2 (one or both; 1–3 persons for 24h / 2–3 locations).
+    Multi-person roles ⇒ the **qualified/reified form is loaded** (simple `wasAttributedTo` optional/
+    derivable). The spec's old flat 6 are subsumed: `data_owner` → Information Owner;
+    `risk_compliance_officer` → Technology Risk & Controls; **Design Authority** is new.
+  - **Product Cabinet** — a SEPARATE family on the PAT `:Product`/`:AreaProduct` scope (NOT on
+    `:Application`): Area Product Owner (`:AreaProduct`, does not tie to an app), Product Owner,
+    Product Architect, Tech Partner (**manages** the Application Owner), Data Owner (TOM Information
+    Owner may report to it), Data Certifier (relates to the app Information Owner), Analytics Lead.
+  - **CTO is in BOTH families** (the shared concept). **DevTeam→BusinessApplication is a matrix (M:N).**
+  - **DECISION (SME "ok to split"):** the Product Cabinet is split to its own follow-up item + gate →
+    backlog **K5**, keeping K3 scoped to the SEAL app reshape.
+- **§C — CONFIRMED** (in line with §A): deprecate `seal_has_membership` / `seal_of_role` / `seal_held_by`
+  for the qualifiedAttribution + hadRole pattern; `seal_has_port` KEPT.
+- **§D — CONFIRMED:** add `prov:hadPrimarySource`; SME requires scraped source documentation to be
+  **reachable and extracted for accuracy in DryDocs** → promotes `drydocs-docmeta` (Document/Chunk +
+  scraper/extractor) from parked to a REQUIRED dependency of K3's provenance goal.
+- **§E — DECIDED (flip):** now that `:Application` is an Entity, flip `arch_develops` from the local
+  `(:DevTeam)-[:DEVELOPS]->(:Application)` (`prov_maps_to: ~`) to the PROV-valid inverse
+  `(:Application)-[:WAS_ATTRIBUTED_TO {role: developed_by}]->(:DevTeam)` (Entity→Agent = `prov:wasAttributedTo`).
+- **§F / K2 — DEFERRED:** the re-shape IS needed and in-scope (post-reclass `wasAssociatedWith` no longer
+  type-checks), but the edge shape — (a) `prov:used` vs (b) a local `BELONGS_TO_APPLICATION` domain edge —
+  is deferred to a K2 follow-up gate. `job-seal-app-ref` / `m3_seal_app_ref` stay `status: proposed`.
+  K2's independent match-policy gate (`seal-attribution-match-policy.yaml`) is unchanged and still required.
+- **NEW gate decision — label normalization:** alongside the class reclass, the node LABEL normalizes
+  `:Application` → `:BusinessApplication` (the taxonomy concept name for internally-developed apps).
+  Confirmed-direction; the label change is gate-bound and lands with K4.
+- **§G — SIGNED OFF** (chad.wilson, 2026-07-10). **Confirmed: A, B, C, D · Decided: E (flip), label · Edited: 1 (§B two-family model + Product-Cabinet split) · Deferred: 1 (§F/K2 edge shape) · Rejected: 0.**
+- **Lifecycle (per §G — flips are SEPARATE logged follow-ups, NOT applied in this commit):** this commit
+  records the gate outcome (this entry) + K3 → done. The mechanical application of every flip — the
+  `:Application` class reclass + label normalization, the `TOMRole` scheme + qualifiedAttribution
+  supplement (planned→active), the three `seal_*` deprecations, `seal_had_primary_source` activation,
+  the `arch_develops`→`WAS_ATTRIBUTED_TO` flip, the map entries `application-as-dataproduct` /
+  `seal-tom-attribution` / `seal-doc-source-of-record` proposed→confirmed→applied (with `vocab_id` +
+  `capture` per F5/C7), and the SEAL/PAT precedence wiring — is **backlog K4**. The Product Cabinet is
+  **K5**. K2's edge shape stays deferred.
