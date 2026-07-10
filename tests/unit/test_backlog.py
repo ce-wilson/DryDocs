@@ -29,7 +29,7 @@ AGENTS_DIR = REPO_ROOT / ".claude" / "agents"
 STATUSES = {"todo", "in_progress", "blocked", "done"}
 TYPES = {"requirement", "task", "chore", "bug"}
 PRIORITIES = {"p0", "p1", "p2", "p3"}
-MODELS = {"haiku", "sonnet", "opus"}
+MODELS = {"haiku", "sonnet", "opus", "fable"}  # fable = Mythos-class top tier (2026-07-10); opus stays valid for existing items
 REQUIRED_FIELDS = (
     "id", "title", "type", "module", "phase", "epic",
     "agent", "model", "priority", "status", "depends_on", "acceptance",

@@ -39,7 +39,7 @@ as `- [tag] one line. (why/where seen)` with tag ∈ idea | bug | doc | source |
 | `module` | From the `modules:` registry in backlog.yaml. Code work → the MODULE_MAP component; non-code → a work area (taxonomy/ontology/config/reference/graph-infra/docs). |
 | `phase` | From `plan.phases`. A note that fits no phase is a **plan change** — propose a new phase to the user, never invent one silently. |
 | `agent` | A `.claude/agents/` name for scoped layer work, else `main`. |
-| `model` | The model matrix: **opus** only where a decision changes schema/ontology/boundary; **sonnet** for work with a written acceptance test; **haiku** for lookups, renames, ritual wiring. |
+| `model` | The model matrix: **fable** (Mythos-class, the top tier since 2026-07-10) only where a decision changes schema/ontology/boundary; **opus** = the former top tier, still valid on existing items (re-tier to fable when a groom touches them); **sonnet** for work with a written acceptance test; **haiku** for lookups, renames, ritual wiring. |
 | `priority` | p0 blocker / p1 / p2 / p3. |
 | `depends_on` | Ids that must be `done` first; `[]` if startable now. |
 | `acceptance` | A pass/fail test. If you cannot write one, the note is not ready — inbox it. |

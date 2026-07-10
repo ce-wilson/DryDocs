@@ -629,7 +629,7 @@ items:
     module: drydocs-remediation
     phase: 6
     agent: main
-    model: opus
+    model: fable
     priority: p2
     status: todo
     depends_on: [G2]
@@ -643,6 +643,10 @@ items:
       ADR 0002 follow-up #3; checklist = 0002-B. Re-home its Control-M parsing onto core (drop the
       spinoff's own parser); keep only remediation logic. Writes NO graph; Jira = SoR. See
       reconcile-port skill. On done: mark the controlm-spinoff archive superseded.
+      RE-TIERED opus -> fable 2026-07-10 (user call): the matrix top slot (boundary-changing
+      judgment) now points at the Mythos-class tier; G2 (same class) ran on fable end-to-end.
+      MODELS enum extended in test_backlog.py + validate.py; G4/K4 are re-tier candidates at
+      their next groom touch.
 
   - id: G4
     epic: component-topology
