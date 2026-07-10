@@ -34,6 +34,7 @@ mappings:
       prov_maps_to: "prov:hadMember"
     precedence_authority: bmc-baseline
     status: applied
+    applied_on: 2026-06-09
     confirmed_by: "(seed)"
     confirmed_on: 2026-06-09
 
@@ -51,7 +52,7 @@ mappings:
       neo4j_label: CONTAINS_FOLDER
       prov_maps_to: "prov:hadMember"
     precedence_authority: bmc-baseline
-    reuses_vocab: m3_contains_folder (active)
+    vocab_id: m3_contains_folder
     status: applied                             # loader: controlm_folders.cypher (folder-pass header-row join)
     applied_on: 2026-07-07
     confirmed_by: SME
@@ -75,7 +76,7 @@ mappings:
       neo4j_label: SCHEDULED_ON
       prov_maps_to: ~                       # null on purpose: ControlMServer is not an Agent
     precedence_authority: bmc-baseline
-    reuses_vocab: m3_scheduled_on (active)
+    vocab_id: m3_scheduled_on
     status: confirmed
     confirmed_by: SME
     confirmed_on: 2026-06-21
@@ -93,7 +94,7 @@ mappings:
       neo4j_label: REQUIRES_IN_CONDITION   # domain alias mapping to prov:used
       prov_maps_to: "prov:used"
     precedence_authority: bmc-baseline
-    reuses_vocab: m3_requires_in_condition (active)
+    vocab_id: m3_requires_in_condition
     status: confirmed
     confirmed_by: SME
     confirmed_on: 2026-06-21
@@ -111,7 +112,7 @@ mappings:
       neo4j_label: EMITS_OUT_CONDITION     # domain alias mapping to prov:generated
       prov_maps_to: "prov:generated"
     precedence_authority: bmc-baseline
-    reuses_vocab: m3_emits_out_condition (active)
+    vocab_id: m3_emits_out_condition
     status: confirmed
     confirmed_by: SME
     confirmed_on: 2026-06-21
@@ -129,7 +130,7 @@ mappings:
       neo4j_label: WAS_INFORMED_BY         # replaces the retired DEPENDS_ON
       prov_maps_to: "prov:wasInformedBy"
     precedence_authority: bmc-baseline
-    reuses_vocab: m3_was_informed_by (active)
+    vocab_id: m3_was_informed_by
     status: confirmed
     confirmed_by: SME
     confirmed_on: 2026-06-21
@@ -152,7 +153,7 @@ mappings:
       role: seal_app_ref
       prov_maps_to: "prov:wasAssociatedWith"
     precedence_authority: bmc-baseline
-    reuses_vocab: m3_seal_app_ref (planned)
+    vocab_id: m3_seal_app_ref
     source_evidence: "STG_APP_FACT semantic facts (fact_type SEAL), fed by the Control-M variable-normalization stream (config/source-registry.yaml); NEVER raw job.APPLICATION — documented unreliable for SEAL identity in both repos' loader comments."
     status: proposed                        # <-- SME must confirm at the gate (K2)
     provenance_note: "2026-07-01 company reconciliation; spec-level on both repos; producer registration K1, activation K2."
@@ -192,7 +193,7 @@ mappings:
       role: ~
       prov_maps_to: ~
     precedence_authority: bmc-baseline
-    reuses_vocab: seal_requires_scheduler (planned)
+    vocab_id: seal_requires_scheduler
     source_evidence: "README.md:263 + docs/history/LoadPlanV3.md:82,393 (documented as a post-load edge); no loader/extract yet — status: planned in relationship_vocabulary.yaml, not wired."
     status: proposed                         # <-- SME must confirm at the gate (backlog C6)
     provenance_note: "Registered per backlog C6 (2026-07-09) to close the README/LoadPlanV3-vs-vocab drift. Edge meaning ⇒ HITL gate; not auto-decided."
@@ -230,7 +231,7 @@ mappings:
         requires of the source-of-record edge (seal-doc-source-of-record below).
     precedence_authority: lob-product-team
     standards_cited: ["PROV-O (prov:Entity)", "DPROD/EKGF (dprod:DataProduct)"]
-    reuses_vocab: "node_classifications#Application proposed_reclass (relationship_vocabulary.yaml)"
+    vocab_id: ~                             # node reclass, not an edge — see relationship_vocabulary.yaml node_classifications#Application proposed_reclass
     status: proposed
     proposed_at: 2026-07-08
     open_questions:
@@ -254,7 +255,7 @@ mappings:
         pattern: "Application -[:QUALIFIED_ATTRIBUTION]-> (:Attribution) -[:HAS_AGENT]-> Employee ; (:Attribution) -[:HAD_ROLE]-> TOMRole"
         prov_maps_to: ["prov:qualifiedAttribution", "prov:agent", "prov:hadRole"]
         role_vocabulary: "TOMRole (skos:Concept) — 6 concepts: cto, application_owner, information_owner, data_owner, operate_manager, risk_compliance_officer, in a shared skos:ConceptScheme. DISTINCT from :Role (org:Role, PAT hierarchy only)."
-      reuses_vocab: "seal_app_attributed_to_employee (planned) / seal_qualified_attribution (planned) / seal_attribution_has_agent (planned) / seal_attribution_had_role (planned)"
+      vocab_id: [seal_app_attributed_to_employee, seal_qualified_attribution, seal_attribution_has_agent, seal_attribution_had_role]
     precedence_authority: lob-product-team
     standards_cited: ["PROV-O (prov:wasAttributedTo, prov:qualifiedAttribution, prov:agent, prov:hadRole)", "SKOS (skos:Concept)"]
     status: proposed
@@ -284,7 +285,7 @@ mappings:
       matrix_row: "Entity -> Entity = prov:wasDerivedFrom family (prov:hadPrimarySource is a sub-property)"
       neo4j_label: HAD_PRIMARY_SOURCE
       prov_maps_to: "prov:hadPrimarySource"
-      reuses_vocab: "seal_had_primary_source (planned)"
+      vocab_id: seal_had_primary_source
     precedence_authority: lob-product-team    # SEAL/PAT proposed as the authority for internal product/business identity — see config/precedence.yaml `proposed_additions` block
     standards_cited: ["PROV-O (prov:hadPrimarySource, sub-property of prov:wasDerivedFrom)"]
     status: proposed
@@ -432,7 +433,7 @@ mappings:
       neo4j_label: HAS_PORT
       prov_maps_to: ~                        # dprod:hasPort pattern, not PROV
     precedence_authority: lob-product-team
-    reuses_vocab: seal_has_port (active)
+    vocab_id: seal_has_port
     status: confirmed
     confirmed_by: SME
     confirmed_on: 2026-06-21
@@ -446,7 +447,7 @@ mappings:
       neo4j_label: HAS_MEMBERSHIP
       prov_maps_to: ~
     precedence_authority: lob-product-team
-    reuses_vocab: seal_has_membership (active)
+    vocab_id: seal_has_membership
     status: confirmed
     confirmed_by: SME
     confirmed_on: 2026-06-21
@@ -460,7 +461,7 @@ mappings:
       neo4j_label: OF_ROLE
       prov_maps_to: ~
     precedence_authority: lob-product-team
-    reuses_vocab: seal_of_role (active)
+    vocab_id: seal_of_role
     status: confirmed
     confirmed_by: SME
     confirmed_on: 2026-06-21
@@ -474,7 +475,7 @@ mappings:
       neo4j_label: HELD_BY
       prov_maps_to: ~
     precedence_authority: lob-product-team
-    reuses_vocab: seal_held_by (active)
+    vocab_id: seal_held_by
     status: confirmed
     confirmed_by: SME
     confirmed_on: 2026-06-21
@@ -491,7 +492,7 @@ mappings:
       neo4j_label: HAS_PRODUCT_LINE
       prov_maps_to: ~
     precedence_authority: lob-product-team
-    reuses_vocab: catalog_has_product_line (active)
+    vocab_id: catalog_has_product_line
     status: confirmed
     confirmed_by: SME
     confirmed_on: 2026-06-21
@@ -505,7 +506,7 @@ mappings:
       neo4j_label: HAS_PRODUCT
       prov_maps_to: ~
     precedence_authority: lob-product-team
-    reuses_vocab: catalog_has_product (active)
+    vocab_id: catalog_has_product
     status: confirmed
     confirmed_by: SME
     confirmed_on: 2026-06-21
@@ -519,7 +520,7 @@ mappings:
       neo4j_label: HAS_DEV_TEAM
       prov_maps_to: ~
     precedence_authority: lob-product-team
-    reuses_vocab: catalog_has_dev_team (active)
+    vocab_id: catalog_has_dev_team
     status: confirmed
     confirmed_by: SME
     confirmed_on: 2026-06-21
@@ -533,7 +534,7 @@ mappings:
       neo4j_label: RECONCILES_TO
       prov_maps_to: ~                        # carries confidence 0.0–1.0; not 1:1 (AWMCIB=0.5)
     precedence_authority: lob-product-team
-    reuses_vocab: catalog_reconciles_to (active)
+    vocab_id: catalog_reconciles_to
     status: confirmed
     confirmed_by: SME
     confirmed_on: 2026-06-21
@@ -551,7 +552,7 @@ mappings:
       prov_maps_to: ~
       edge_properties: { team_type: "aligned | flex | dedicated", sponsored: bool }   # 'aligned to' = team_type aligned
     precedence_authority: lob-product-team
-    reuses_vocab: catalog_supports_area_product (planned -> set active in C4)
+    vocab_id: catalog_supports_area_product
     status: confirmed
     confirmed_by: SME
     confirmed_on: 2026-06-21
@@ -571,7 +572,7 @@ mappings:
       neo4j_label: DEVELOPS
       prov_maps_to: ~                          # alt inverse: Application WAS_ATTRIBUTED_TO DevTeam (Entity→Agent)
     precedence_authority: lob-product-team
-    reuses_vocab: arch_develops (planned -> set active in C4)
+    vocab_id: arch_develops
     status: confirmed
     confirmed_by: SME
     confirmed_on: 2026-06-21
@@ -598,7 +599,7 @@ mappings:
       prov_maps_to: ~
       edge_properties: { target_version: "9.0.21.300 (corpus version notice)" }
     precedence_authority: bmc-baseline
-    reuses_vocab: docs_describes (active)
+    vocab_id: docs_describes
     status: applied                              # loader: bmc_docs.cypher (load-bmc-docs, live 2026-07-08)
     applied_on: 2026-07-08
     confirmed_by: SME
@@ -613,7 +614,7 @@ mappings:
       neo4j_label: PART_OF
       prov_maps_to: ~
     precedence_authority: bmc-baseline
-    reuses_vocab: docs_chunk_part_of (active)
+    vocab_id: docs_chunk_part_of
     status: applied                              # loader: bmc_docs.cypher (load-bmc-docs, live 2026-07-08)
     applied_on: 2026-07-08
     confirmed_by: SME
@@ -628,7 +629,7 @@ mappings:
       neo4j_label: FIRST_CHUNK
       prov_maps_to: ~
     precedence_authority: bmc-baseline
-    reuses_vocab: docs_first_chunk (active)
+    vocab_id: docs_first_chunk
     status: applied                              # loader: bmc_docs.cypher (load-bmc-docs, live 2026-07-08)
     applied_on: 2026-07-08
     confirmed_by: SME
@@ -643,7 +644,7 @@ mappings:
       neo4j_label: NEXT_CHUNK
       prov_maps_to: ~
     precedence_authority: bmc-baseline
-    reuses_vocab: docs_next_chunk (active)
+    vocab_id: docs_next_chunk
     status: applied                              # loader: bmc_docs.cypher (load-bmc-docs, live 2026-07-08)
     applied_on: 2026-07-08
     confirmed_by: SME
@@ -669,7 +670,7 @@ mappings:
       edge_properties: { role: host_group, derived: true }
       prov_maps_to: ~
     precedence_authority: bmc-baseline
-    reuses_vocab: m3_runs_on_host_group (planned)
+    vocab_id: m3_runs_on_host_group
     status: confirmed                           # gate controlm-hosts-topology 2026-07-09 (config/gate-log.md)
     confirmed_by: SME
     confirmed_on: 2026-07-09
@@ -689,7 +690,7 @@ mappings:
       edge_properties: { participation_type: "VARCHAR2(1), domain probe pending" }
       prov_maps_to: "prov:hadMember"
     precedence_authority: bmc-baseline
-    reuses_vocab: m3_host_group_contains_host (planned)
+    vocab_id: m3_host_group_contains_host
     status: confirmed                           # gate controlm-hosts-topology 2026-07-09 (config/gate-log.md)
     confirmed_by: SME
     confirmed_on: 2026-07-09
@@ -708,7 +709,7 @@ mappings:
       neo4j_label: DEFINED_ON
       prov_maps_to: ~
     precedence_authority: bmc-baseline
-    reuses_vocab: m3_host_group_defined_on (planned)
+    vocab_id: m3_host_group_defined_on
     status: confirmed                           # gate 2026-07-09; DC key rule = exact long-form name per knowledge/standards/technology/data-center-naming-convention.md; loader blocked on P3 value-domain verification + the 22-DC-vs-production scope call (gate-log residuals)
     confirmed_by: SME
     confirmed_on: 2026-07-09
@@ -738,7 +739,7 @@ mappings:
         - "ControlMFolder.window_start / window_end (derived folder rollup — min job start .. max job end; the maintenance-window primitive)"
       prov_maps_to: ~
     precedence_authority: bmc-baseline
-    reuses_vocab: ~                             # deliberately none — no edge terms
+    vocab_id: ~                             # deliberately none — property supplement, no edge terms
     status: proposed
     gate_spec: config/gate-prompts/controlm-avg-run-supplement.yaml
 
