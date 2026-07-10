@@ -30,10 +30,11 @@ ORDER  BY J.JOB_NAME;
 ```sql
 SELECT CASE WHEN J.JOB_NAME = T.SCHED_TABLE THEN 'FOLDER' ELSE 'JOB' END AS scope,
        V.NAME AS var_name, V.VALUE AS var_value
-FROM   psgmgr.CM_DEF_SETVAR V
+FROM   psgmgr.CM_DEF_SETVAR_VW V
 JOIN   psgmgr.CM_DEF_VJOB   J ON V.TABLE_ID = J.TABLE_ID AND V.JOB_ID = J.JOB_ID
 JOIN   psgmgr.CM_DEF_VTAB   T ON J.TABLE_ID = T.TABLE_ID
-WHERE  J.IS_CURRENT_VERSION = '1'
+WHERE  V.IS_CURRENT_VERSION = '1'   -- the view stores version history; filter or you get superseded rows
+  AND  J.IS_CURRENT_VERSION = '1'
   AND  T.USER_DAILY IS NOT NULL
   AND  T.SCHED_TABLE = :folder
 ORDER  BY scope DESC, var_name;   -- FOLDER rows first (inherited), then JOB rows

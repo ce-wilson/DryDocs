@@ -1,11 +1,11 @@
 -- =============================================================================
 -- controlm_variables.sql
 --
--- Source table : psgmgr.CM_DEF_SETVAR (replicated copy of dtsremgr.DEF_SETVAR)
---                ** VERIFY NAME ** — this is the object behind the
---                (TABLE_NAME|JOB_NAME|JOB_ID|APPL_TYPE|NAME|VALUE) extract;
---                substitute the confirmed view name before production use.
---                Joined to CM_DEF_VJOB + CM_DEF_VTAB for context.
+-- Source view  : psgmgr.CM_DEF_SETVAR_VW (replicated copy of dtsremgr.DEF_SETVAR)
+--                Confirmed 2026-07-10 against live psgmgr: this is the object
+--                behind the (TABLE_NAME|JOB_NAME|JOB_ID|APPL_TYPE|NAME|VALUE)
+--                extract — a view carrying its own IS_CURRENT_VERSION /
+--                VERSION_SERIAL. Joined to CM_DEF_VJOB + CM_DEF_VTAB for context.
 --
 -- Projection   : one row per variable definition with job + folder context.
 --                Matches the ControlMVariableRow model. Variable scope is
@@ -18,10 +18,12 @@
 --                variables at all.
 --
 -- Filter rule  :
+--   V.IS_CURRENT_VERSION = '1'  — current-version variable rows only
 --   J.IS_CURRENT_VERSION = '1'  — current-version jobs only
 --   T.USER_DAILY IS NOT NULL    — actively-scheduled folders only
---   (verify whether CM_DEF_SETVAR carries its own IS_CURRENT_VERSION /
---    VERSION_SERIAL like the LNKI/LNKO views; add the filter if so)
+--   (CM_DEF_SETVAR_VW carries its own IS_CURRENT_VERSION / VERSION_SERIAL like
+--    the LNKI/LNKO views — confirmed 2026-07-10 — so the V-filter is applied;
+--    without it the extract returns superseded variable rows.)
 --
 -- Scope binds  : optional, NULL = no filter on that dimension. Used for
 --                sampling and targeted re-pulls (pass NULL for the full
@@ -57,11 +59,12 @@ SELECT
                           AS var_scope,
     V.NAME                AS var_name,
     V.VALUE               AS var_value
-FROM   psgmgr.CM_DEF_SETVAR V                  -- ** VERIFY VIEW NAME **
+FROM   psgmgr.CM_DEF_SETVAR_VW V
 JOIN   psgmgr.CM_DEF_VJOB  J  ON V.TABLE_ID = J.TABLE_ID
                              AND V.JOB_ID   = J.JOB_ID
 JOIN   psgmgr.CM_DEF_VTAB  T  ON J.TABLE_ID = T.TABLE_ID
-WHERE  J.IS_CURRENT_VERSION = '1'
+WHERE  V.IS_CURRENT_VERSION = '1'
+  AND  J.IS_CURRENT_VERSION = '1'
   AND  T.USER_DAILY IS NOT NULL
   -- optional scope (any bind NULL = no filter on that dimension)
   AND  (:folder_filter IS NULL OR T.SCHED_TABLE LIKE :folder_filter)

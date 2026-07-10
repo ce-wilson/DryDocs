@@ -14,10 +14,10 @@
 --                under psgmgr, for example:
 --                psgmgr.CM_DEF_VTAB    (folders; "tables" in BMC naming)
 --                psgmgr.CM_DEF_VJOB    (jobs, ~100 cols, version history)
---                psgmgr.CM_DEF_SETVAR  (job/folder variables)  ** VERIFY NAME **
---                  -- TODO(DBA/dev): confirm the variable view name. The extract
---                  -- delivered as (TABLE_NAME|JOB_NAME|JOB_ID|APPL_TYPE|NAME|VALUE)
---                  -- came from this object; substitute the real name throughout.
+--                psgmgr.CM_DEF_SETVAR_VW  (job/folder variables)
+--                  -- Confirmed 2026-07-10 against live psgmgr: the variable view
+--                  -- behind the (TABLE_NAME|JOB_NAME|JOB_ID|APPL_TYPE|NAME|VALUE)
+--                  -- extract; carries its own IS_CURRENT_VERSION / VERSION_SERIAL.
 --
 -- Volumes (capture 2026-06, 4 data centers):
 --   Folders : ~18,800   (P012: 2,230 / P014: 4,188 / P021: 7,914 / P032: 4,441)
@@ -171,11 +171,12 @@ SELECT
          THEN 'Y' ELSE 'N' END             AS has_var_ref,       -- references another %%VAR
     CASE WHEN INSTR(V.NAME, '-') > 0
          THEN 'Y' ELSE 'N' END             AS is_namespaced      -- %%FileWatch-*, %%UCM-*
-FROM   psgmgr.CM_DEF_SETVAR V              -- ** VERIFY VIEW NAME (header TODO) **
+FROM   psgmgr.CM_DEF_SETVAR_VW V
 JOIN   psgmgr.CM_DEF_VJOB  J  ON V.TABLE_ID = J.TABLE_ID
                              AND V.JOB_ID   = J.JOB_ID
 JOIN   psgmgr.CM_DEF_VTAB  T  ON J.TABLE_ID = T.TABLE_ID
-WHERE  J.IS_CURRENT_VERSION = '1'
+WHERE  V.IS_CURRENT_VERSION = '1'
+  AND  J.IS_CURRENT_VERSION = '1'
 ;
 
 COMMENT ON TABLE job_variable_view IS

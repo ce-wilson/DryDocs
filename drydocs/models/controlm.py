@@ -340,8 +340,8 @@ class ControlMConditionOutRow(BaseModel):
 
 
 class ControlMVariableRow(BaseModel):
-    """One variable definition from ``psgmgr.CM_DEF_SETVAR`` (name to be
-    confirmed — the view behind the SQL Developer variable extract).
+    """One variable definition from ``psgmgr.CM_DEF_SETVAR_VW`` — the view
+    behind the SQL Developer variable extract (name confirmed 2026-07-10).
 
     Accepts BOTH column shapes:
       * the formal projection from ``controlm_variables.sql``

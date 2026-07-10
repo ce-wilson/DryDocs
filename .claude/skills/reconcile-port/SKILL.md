@@ -148,8 +148,10 @@ present. For a fresh `psgmgr` pull:
   flags or the SQL still pulls all ~1.1M rows, you have NOT yet ported the scope
   commits — re-port `controlm_variables.sql` wholesale and merge the cli.py
   scope options (see the collision ledger).
-- This run also **verifies the `psgmgr.CM_DEF_SETVAR` source-view name** (still
-  flagged unverified). Confirm it and report.
+- The `psgmgr.CM_DEF_SETVAR_VW` source-view name is **confirmed** (2026-07-10,
+  against live `psgmgr` — a view with its own `IS_CURRENT_VERSION` /
+  `VERSION_SERIAL`, so the variable extracts now filter `V.IS_CURRENT_VERSION = '1'`).
+  If a future port surfaces a different object, re-confirm and report.
 - Judge a fresh pull on *runs clean / no UNKNOWN invocation leakage / plausible
   coverage*, **not** the bundled counts.
 
@@ -161,7 +163,7 @@ Port Report: cewilson/main -> <company>/main
 - What conflicted + resolution: <per collision ledger>
 - What was skipped: <commits + why>
 - Track-1 result: <N passed, 3 skipped, 0 failed>
-- Track-2 status: <ran/blocked + CM_DEF_SETVAR finding>
+- Track-2 status: <ran/blocked + CM_DEF_SETVAR_VW finding>
 - State: branch ahead of <company>/main by N; NOT pushed; backup tag pre-cewilson-port
 - New divergences observed: <add to the ledger if any>
 ```

@@ -160,7 +160,7 @@ sources:
   # ---- Staging semantic-fact streams (C3/C4 variable normalization) --------
   - id: stg-app-fact
     classification: Internal             # mechanism-only entry; no real SEAL/FID/app-name values here
-    source: "oracle:DRYDOCS_STG.STG_APP_FACT (Python normalizer output over CM_DEF_SETVAR)"
+    source: "oracle:DRYDOCS_STG.STG_APP_FACT (Python normalizer output over CM_DEF_SETVAR_VW)"
     kind: staging
     orchestrator: ~                      # not an orchestration vendor — a staging table fed by the C3/C4 variable-normalization stream
     adapter: oracle

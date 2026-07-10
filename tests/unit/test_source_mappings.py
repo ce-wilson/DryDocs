@@ -189,7 +189,7 @@ _EXPECTED_OBJECTS = [
     "CM_DEF_VJOB",
     "CM_DEF_LNKI_P_VW",
     "CM_DEF_LNKO_P_VW",
-    "CM_DEF_SETVAR",
+    "CM_DEF_SETVAR_VW",
     "CM_HOSTS",
     "CM_AVG_RUN",
 ]
@@ -272,10 +272,11 @@ def test_lnki_lnko_is_current_version_is_staging_only(controlm: SourceMapping) -
         assert disp.target == "staging:is_current_version"
 
 
-def test_setvar_object_flags_its_name_unverified(controlm: SourceMapping) -> None:
-    setvar = controlm.get("CM_DEF_SETVAR")
+def test_setvar_object_name_is_confirmed(controlm: SourceMapping) -> None:
+    setvar = controlm.get("CM_DEF_SETVAR_VW")
     assert setvar.note is not None
-    assert "VERIFY NAME" in setvar.note
+    assert "VERIFY NAME" not in setvar.note
+    assert "confirmed" in setvar.note.lower()
     assert setvar.columns  # TABLE_ID, JOB_ID, NAME, VALUE
     assert setvar.projected() == ["TABLE_ID", "JOB_ID", "NAME", "VALUE"]
 
@@ -284,7 +285,7 @@ def test_cm_hosts_is_staging_only_pending_the_topology_gate(controlm: SourceMapp
     """CM_HOSTS (host-group membership) landed 2026-07-09 via add-source-object:
     all five columns projected, but staging-only — the graph landing
     (ControlMHostGroup/ExecutionHost/CONTAINS_HOST/RUNS_ON resolution) is
-    gate-bound (controlm-hosts-topology), the CM_DEF_SETVAR precedent."""
+    gate-bound (controlm-hosts-topology), the CM_DEF_SETVAR_VW precedent."""
     hosts = controlm.get("CM_HOSTS")
     assert hosts.projected() == [
         "DATA_CENTER", "GRPNAME", "NODEID", "PARTICIPATION_TYPE", "CAPTURE_DATE",

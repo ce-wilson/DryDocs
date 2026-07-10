@@ -39,7 +39,7 @@ distinct or every query is wrong:
 |-------|-------|----------------|------------|
 | **Vendor physical model** | BMC (poster) | `CMS_JOBDEF`, `CMR_AJF` | the 6.4.01 physical data model — **entity/relationship ground truth** |
 | **Control-M runtime DB** | `dtsremgr` | `DEF_VJOB`, `DEF_VTAB`, `DEF_SETVAR`, `DEF_LNKI_P` | the live Control-M schema (9.0.21.300) the company replicates FROM |
-| **Company replica** | `psgmgr` | `CM_DEF_VJOB`, `CM_DEF_VTAB`, `CM_DEF_SETVAR`, `CM_DEF_LNKI_P_VW`, `CM_HIST_VW`, `CM_AUD_ACTS`, `CM_ESCALATION_DB` | the read-only `CM_`-prefixed copy we actually query |
+| **Company replica** | `psgmgr` | `CM_DEF_VJOB`, `CM_DEF_VTAB`, `CM_DEF_SETVAR_VW`, `CM_DEF_LNKI_P_VW`, `CM_HIST_VW`, `CM_AUD_ACTS`, `CM_ESCALATION_DB` | the read-only `CM_`-prefixed copy we actually query |
 
 **Version caveat (load-bearing):** the poster is **6.4.01**; the company runs
 **9.0.21.300**. Use the poster for *entity relationships and column semantics*
@@ -69,7 +69,7 @@ The vendor entity model (groups, PKs, key columns, relationships): [`references/
 |-----------|---------------|----------------|-------------|
 | A job definition | `CMS_JOBDEF` | `CM_DEF_VJOB` | `(TABLE_ID, JOB_ID)` current version |
 | A folder / schedule table | `CMS_SCHEDT` | `CM_DEF_VTAB` | `TABLE_ID`; name = `SCHED_TABLE` |
-| A job's variables (SETVAR) | `CMS_SETVAR` | `CM_DEF_SETVAR` | `(TABLE_ID, JOB_ID, NAME)` |
+| A job's variables (SETVAR) | `CMS_SETVAR` | `CM_DEF_SETVAR_VW` | `(TABLE_ID, JOB_ID, NAME)` |
 | Conditions a job **consumes** (in) | `CMS_CON_J` (ROWTYPE=in) | `CM_DEF_LNKI_P_VW` | `(TABLE_ID, JOB_ID, CONDITION, ODATE)` |
 | Conditions a job **emits** (out) | `CMS_CON_J` (ROWTYPE=out) | `CM_DEF_LNKO_P_VW` | `(TABLE_ID, JOB_ID, CONDITION, SIGN)` |
 | On-Do action blocks | `CMS_ONSTMT` + `CMS_DO` | (not yet replicated) | `(JOB_ID, IF_NO, DO_NO)` |

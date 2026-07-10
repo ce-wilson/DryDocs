@@ -252,33 +252,33 @@ objects:
         columns added since that check.
 
   # ---------------------------------------------------------------------------
-  # CM_DEF_SETVAR (variable definitions) — ** VERIFY NAME **. sql/controlm_variables.sql
-  # flags this object name as unconfirmed: it is "the object behind the
-  # (TABLE_NAME|JOB_NAME|JOB_ID|APPL_TYPE|NAME|VALUE) extract"; substitute the
-  # confirmed view/table name before production use (doc 08 Phase 2 verifies it
-  # alongside the real column census). Loader:
+  # CM_DEF_SETVAR_VW (variable definitions) — object name CONFIRMED 2026-07-10
+  # against live psgmgr: it is "the object behind the
+  # (TABLE_NAME|JOB_NAME|JOB_ID|APPL_TYPE|NAME|VALUE) extract", a valid view that
+  # also carries its own IS_CURRENT_VERSION / VERSION_SERIAL (like the LNKI/LNKO
+  # views). The full column census is still doc 08 Phase 2. Loader:
   # drydocs/loaders/controlm_variables*.py + sql/controlm_variables.sql.
   # Variables stay STAGING-ONLY for now — node-vs-property is deferred, not
   # implied (gate controlm-q1q3-phase1 §Q3).
   # ---------------------------------------------------------------------------
-  - name: CM_DEF_SETVAR
+  - name: CM_DEF_SETVAR_VW
     kind: view
     profile:
       profiled_on: ~
-      via: "sql/controlm_variables.sql header + docs/restructure/06a (object name UNVERIFIED; no controlm-db skill profile run yet)"
+      via: "sql/controlm_variables.sql header + docs/restructure/06a (object name CONFIRMED 2026-07-10 against live psgmgr; full controlm-db skill column census still pending)"
       column_count: ~
       census: pending
     note: >
-      ** VERIFY NAME ** — substitute the confirmed view/table name once the
-      controlm-db skill profiles it (doc 08 Phase 2). The extract also joins
-      CM_DEF_VJOB (TABLE_ID, JOB_ID) and CM_DEF_VTAB (TABLE_ID) for DATA_CENTER /
-      SCHED_TABLE / JOB_NAME context and derives var_scope (FOLDER when
-      JOB_NAME = SCHED_TABLE, else JOB) — those are already dispositioned under
-      the CM_DEF_VTAB / CM_DEF_VJOB objects above, or are wholly SQL-derived
-      (var_scope), not native CM_DEF_SETVAR columns; not duplicated here.
-      Duplicate (job, variable-name) definitions are legitimate in the source
-      (observed: %%FileWatch-TIME_LIMIT defined twice on one job with different
-      values) — never dedupe.
+      Object name confirmed 2026-07-10 (psgmgr.CM_DEF_SETVAR_VW); full column
+      census still pending the controlm-db skill profile (doc 08 Phase 2). The
+      extract also joins CM_DEF_VJOB (TABLE_ID, JOB_ID) and CM_DEF_VTAB (TABLE_ID)
+      for DATA_CENTER / SCHED_TABLE / JOB_NAME context and derives var_scope
+      (FOLDER when JOB_NAME = SCHED_TABLE, else JOB) — those are already
+      dispositioned under the CM_DEF_VTAB / CM_DEF_VJOB objects above, or are
+      wholly SQL-derived (var_scope), not native CM_DEF_SETVAR_VW columns; not
+      duplicated here. Duplicate (job, variable-name) definitions are legitimate
+      in the source (observed: %%FileWatch-TIME_LIMIT defined twice on one job
+      with different values) — never dedupe.
     columns:
       - {name: TABLE_ID, disposition: projected, origin: source, target: "staging:folder_id",
          note: "join key to CM_DEF_VJOB/CM_DEF_VTAB context; the raw SQL Developer export mislabels this column TABLE_NAME (drydocs/models/controlm.py ControlMVariableRow handles both aliases)"}
@@ -290,12 +290,12 @@ objects:
       disposition: excluded
       reason: scope
       note: >
-        Object name unverified (** VERIFY NAME **) — only the four columns
-        behind the confirmed (TABLE_NAME|JOB_NAME|JOB_ID|APPL_TYPE|NAME|VALUE)
-        extract are dispositioned here; whether CM_DEF_SETVAR carries its own
-        IS_CURRENT_VERSION/VERSION_SERIAL (like the LNKI/LNKO views) is an open
-        question noted in the SQL header. Sweeps the rest pending the
-        view-name + column-census verification (doc 08 Phase 2).
+        Only the four columns behind the (TABLE_NAME|JOB_NAME|JOB_ID|APPL_TYPE|
+        NAME|VALUE) extract are dispositioned here. CM_DEF_SETVAR_VW carries its
+        own IS_CURRENT_VERSION/VERSION_SERIAL (confirmed 2026-07-10, like the
+        LNKI/LNKO views); the extract now filters V.IS_CURRENT_VERSION = '1'
+        (filter-only — used in WHERE, not projected/SET). Sweeps the rest pending
+        the full column census (doc 08 Phase 2).
 
   # ---------------------------------------------------------------------------
   # CM_HOSTS (host-group membership) — replica of the BMC node-group structure
