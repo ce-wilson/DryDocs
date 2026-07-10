@@ -671,8 +671,14 @@ items:
       baseline clean, R1 fires, shipped modern rewrite still diverges (MATCH=False) — recorded
       internal/remediation/m0/engine-run-2026-07-10.md; sanitized twins pinned as
       test_remediation_m0.py (6 tests). Verdict PENDING A3 ground truth + B1 var.text rule
-      (company-side; core resolver deliberately untouched). NEXT: transform (Gate 3, ratified
-      rules only) + jira emitter (M1); XML I/O when the schema lands; A3 unblock company-side.
+      (company-side; core resolver deliberately untouched). 2026-07-10 (later) — TIER-1/HANDOFF
+      SLICE DONE (TDD FR-REM-3/6 + NFR-REM-1; archive "M1 repo split" noted SUPERSEDED by
+      0002-B): ratified-only Tier-1 engine + canonical-rename rule (idempotent, equivalence-
+      preserving; unratified skipped loudly; rule values company-side, registry shape = OQ-2
+      open), Jira handoff boundary (pure render, JiraSubmitter sole wire, unproven packages
+      refuse, ownership surfaced-not-guessed), structural no-graph-write guard; TDD traceability
+      matrix statuses updated + re-rendered. REMAINING on G3: Tier-2 agentic lane (FR-REM-4),
+      corroboration reads (0002-B §2 step 5), XML I/O (schema acquisition), A3/B1 company-side.
 
   - id: G4
     epic: component-topology

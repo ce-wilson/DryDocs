@@ -20,13 +20,16 @@ Invariants (0002-B §0/§3 — each lands as a test with the real implementation
 - **Format-agnostic definitions.** No XML assumption outside the
   :class:`~drydocs_remediation.formats.XmlDefinitionFormat` implementation.
 
-M0 slice status (2026-07-10): IMPLEMENTED — transcript load (the gate-1 fallback
-format), the R1 dot-smuggling detector, and the order-paired equivalence proof.
-STILL STUBS — ``XmlDefinitionFormat`` (blocked on the vendor schema acquisition, see
-``formats.py``), ``transform`` (Gate 3) and ``jira`` (M1). The equivalence verdict on
-the real M0 unit stays PENDING ground truth (info item A3 / the ``var.text`` rule B1)
-— see ``internal/remediation/m0/``. Contract: ``docs/design/drydocs-remediation-tdd.md``
-wins on conflict.
+Status (2026-07-10): M0 slice + the Tier-1/handoff slice IMPLEMENTED — transcript load
+(the gate-1 fallback format), the R1 dot-smuggling detector, the order-paired
+equivalence proof, the ratified-only Tier-1 transform engine (FR-REM-3; first rule:
+canonical variable rename), and the Jira handoff boundary (FR-REM-6; render is pure,
+``JiraSubmitter`` is the only wire, REST impl is company-side). STILL STUBS —
+``XmlDefinitionFormat`` (blocked on the vendor schema acquisition, see ``formats.py``);
+Tier-2 (agentic) fixes and corroboration reads are future slices. The equivalence
+verdict on the real M0 unit stays PENDING ground truth (info item A3 / the ``var.text``
+rule B1) — see ``internal/remediation/m0/``. Contract:
+``docs/design/drydocs-remediation-tdd.md`` wins on conflict.
 """
 from . import detect, equivalence, formats, jira, transform
 

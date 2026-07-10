@@ -232,16 +232,16 @@ change (rule + test); the metadata-block standard arrives through its own plan's
 
 | Requirement | Design section | Component / module | Test / verify | Status |
 |---|---|---|---|---|
-| FR-REM-1 — acquire legacy definitions format-agnostically | design-summary; detailed-design (Stage A) | `DefinitionFormat` (XML impl) | fixture parse round-trip test | planned |
-| FR-REM-2 — detect defects in failure-driven batches + standards sweep | detailed-design (Stage B) | `remediation/detect.py` | per-defect-class fixture tests | planned |
-| FR-REM-3 — deterministic Tier-1 metadata fixes in Python | detailed-design (Stage C) | `remediation/transform.py` rules | per-rule unit tests + idempotency | planned |
+| FR-REM-1 — acquire legacy definitions format-agnostically | design-summary; detailed-design (Stage A) | `DefinitionFormat` (transcript impl live; XML impl schema-blocked) | fixture parse round-trip test (green) | partial (2026-07-10) |
+| FR-REM-2 — detect defects in failure-driven batches + standards sweep | detailed-design (Stage B) | `drydocs_remediation/detect.py` (R1 detector) | per-defect-class fixture tests (R1 green) | partial (2026-07-10) |
+| FR-REM-3 — deterministic Tier-1 metadata fixes in Python | detailed-design (Stage C) | `drydocs_remediation/transform.py` (ratified-only engine + canonical-rename rule) | per-rule unit tests + idempotency (green) | partial (2026-07-10) |
 | FR-REM-4 — agent-assisted Tier-2 fixes w/ skills + graph search | detailed-design (Stage C) | agent surface + skills + read-only graph | evidence-citation check (VERBATIM/GROUNDED only); mandatory HITL review | planned |
-| FR-REM-5 — offline equivalence proof | detailed-design (Stage D) | `remediation/equivalence.py` | equivalence test via `drydocs_core` resolution | planned |
-| FR-REM-6 — Jira handoff to owning team (SoR) | detailed-design (Stage E) | `remediation/jira.py` | Jira-only side-effect boundary test | planned |
-| NFR-REM-1 — no graph write, ever | context-frame; qa-tests | whole component | structural no-graph-write test | planned |
-| NFR-REM-2 — core boundary (imports drydocs_core only) | qa-tests | package layout | module-boundary guard | planned (blocked on G2) |
-| NFR-REM-3 — publish boundary honoured | classification-security | repo layout / twins | classification tests; fixtures synthetic | planned |
-| UC-REM-1 — failed FileWatcher batch → greenfield + metadata + Jira (worked example) | design-summary; detailed-design | end-to-end loop | PoC acceptance run (OQ-3) | planned |
+| FR-REM-5 — offline equivalence proof | detailed-design (Stage D) | `drydocs_remediation/equivalence.py` (watch paths; schedule/command/conditions = M2 generalization) | equivalence tests via `drydocs_core` resolution (green) | partial (2026-07-10) |
+| FR-REM-6 — Jira handoff to owning team (SoR) | detailed-design (Stage E) | `drydocs_remediation/jira.py` (render + `JiraSubmitter` boundary; REST impl company-side) | Jira-only side-effect boundary test (green) | partial (2026-07-10) |
+| NFR-REM-1 — no graph write, ever | context-frame; qa-tests | whole component | structural no-graph-write test (green); runtime mock half lands with corroboration | partial (2026-07-10) |
+| NFR-REM-2 — core boundary (imports drydocs_core only) | qa-tests | package layout | module-boundary guard (`remediation` group, green) | done (2026-07-10) |
+| NFR-REM-3 — publish boundary honoured | classification-security | repo layout / twins | classification tests green; fixtures synthetic; real M0 artifacts under `internal/` | in force (2026-07-10) |
+| UC-REM-1 — failed FileWatcher batch → greenfield + metadata + Jira (worked example) | design-summary; detailed-design | end-to-end loop | PoC acceptance run (OQ-3); gates 1/2/4 mechanized, verdict pending A3/B1 | partial (2026-07-10) |
 
 <!-- anchor: decisions-discussions -->
 ## 8. Decisions & discussions

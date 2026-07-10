@@ -81,6 +81,17 @@ for the handoff (ADR 0002, D3).
        (internal/remediation/m0/engine-run-2026-07-10.md); sanitized twins pinned as unit tests.
        REMAINING: transform (Gate 3) + jira emitter (M1); XML I/O on schema acquisition;
        equivalence verdict pending ground truth A3 / var.text rule B1.)*
+       *(FURTHER 2026-07-10 — the Tier-1/handoff slice (TDD FR-REM-3/6 + NFR-REM-1; NOTE:
+       the archive's "M1 = standalone ctm-remediate repo split" is SUPERSEDED by this ADR —
+       the engine stayed in drydocs_core, the component in-monorepo): ratified-only Tier-1
+       transform engine with the canonical-variable-rename rule (idempotent, behavior-
+       preserving under the equivalence proof; unratified rules skipped loudly — rule VALUES
+       stay company-side, registry data shape = TDD OQ-2, deliberately open), the Jira
+       handoff boundary (pure deterministic render; JiraSubmitter is the only wire, REST
+       impl company-side; unproven packages refuse to emit; unresolved ownership surfaced
+       as a defect), and the structural no-graph-write guard. 26 remediation tests green.
+       REMAINING: Tier-2 agentic lane (FR-REM-4, gated per-fix HITL), corroboration reads
+       (§2 step 5), XML I/O (schema acquisition), M2 generalization of detect/prove.)*
 5. [ ] **Wire the corroboration reads:** legacy XML must reconcile with the Oracle `psgmgr.*`
        extract and the loaded `drydocs` snapshot — all **read-only** via `drydocs_core` adapters +
        `Neo4jClient(database="drydocs")`.

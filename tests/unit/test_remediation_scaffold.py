@@ -14,10 +14,8 @@ import pytest
 
 import drydocs_remediation
 from drydocs_remediation.detect import Finding
-from drydocs_remediation.equivalence import EquivalenceReport
 from drydocs_remediation.formats import DefinitionFormat, DefinitionSet, XmlDefinitionFormat
-from drydocs_remediation.jira import JiraRef, emit_handoff
-from drydocs_remediation.transform import propose_greenfield
+from drydocs_remediation.jira import JiraRef
 
 
 def test_package_surface() -> None:
@@ -32,17 +30,13 @@ def test_definition_format_is_abstract() -> None:
 
 
 def test_remaining_stubs_raise_not_implemented() -> None:
-    """XML I/O is schema-acquisition-blocked; transform + jira are the M1 slice."""
+    """XML I/O stays schema-acquisition-blocked (see formats.py)."""
     ds = DefinitionSet()
     xml = XmlDefinitionFormat()
     with pytest.raises(NotImplementedError):
         xml.load(Path("legacy.xml"))
     with pytest.raises(NotImplementedError):
         xml.dump(ds, Path("greenfield.xml"))
-    with pytest.raises(NotImplementedError):
-        propose_greenfield(ds, [])
-    with pytest.raises(NotImplementedError):
-        emit_handoff([], Path("greenfield.xml"), EquivalenceReport(equivalent=True))
 
 
 def test_finding_and_refs_are_value_objects() -> None:
