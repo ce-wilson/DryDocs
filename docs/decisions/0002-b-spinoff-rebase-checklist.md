@@ -52,9 +52,13 @@ for the handoff (ADR 0002, D3).
 
 1. [ ] **Scaffold** `remediation/` as `drydocs-remediation` with a `drydocs-core` path
        dependency (per 0002-A §5). Own entrypoint/cadence: *failure-pattern detection*, not cron.
-2. [ ] **Inventory the archive:** list the spinoff's modules and tag each — *remediation logic*
+2. [x] **Inventory the archive:** list the spinoff's modules and tag each — *remediation logic*
        (keep, port) vs. *Control-M parsing* (drop; replaced by `drydocs_core.controlm`) vs.
        *dead/superseded* (leave behind). Record the map in this file's §4.
+       *(DONE 2026-07-10, archive tip `3e6a39a` — see §4. Headline: the archive contains NO
+       remediation code; its remediation IP is the plans + the R1–R29 rules registry + the
+       governance corpus. Parser divergence check: current core strictly AHEAD, zero
+       archive-only deltas → step 3 is a no-op, no core PRs needed.)*
 3. [ ] **Re-home parsing:** delete the spinoff's own Control-M parse code; call
        `drydocs_core.controlm` instead. Any parse divergence the spinoff relied on becomes either
        a core change (PR to core) or a thin remediation-side adapter — never a fork of the parser.
@@ -81,16 +85,28 @@ for the handoff (ADR 0002, D3).
       boundary test extended to the new package).
 - [ ] Existing gates green: `poetry run pytest -q`, package imports, `--help`.
 
-## 4. Old → new home map (fill during step 2)
+## 4. Old → new home map (filled 2026-07-10, archive tip `3e6a39a`)
 
-| Archive module (`controlm-spinoff`) | Disposition | New home |
+**Headline finding:** the archive carries **no remediation code** — detect / transform /
+equivalence / Jira were never built. The spinoff's remediation IP is entirely in
+`internal-standards/`: the phased plans, the **R1–R29 machine-checkable rules registry**
+(explicitly "the single source for both validation (Gate 2) and greenfield generation
+(Gate 3)" — this IS the detect/transform rule set), and its `governance/` corpus. The
+§2-step-4 modules are therefore **greenfield builds guided by the ported docs**, not ports.
+
+| Archive path (`controlm-spinoff`) | Disposition | New home / note |
 |---|---|---|
-| _Control-M parse/resolve_ | drop | `drydocs_core.controlm` |
-| _failure-pattern detection_ | port | `remediation/detect.py` |
-| _legacy→greenfield XML transform_ | port (behind `DefinitionFormat`) | `remediation/transform.py` |
-| _equivalence check_ | port | `remediation/equivalence.py` |
-| _Jira emit_ | port | `remediation/jira.py` |
-| _(to be enumerated)_ | | |
+| `drydocs/controlm/*` (parser, 8 modules + staging) | **drop** | superseded by `drydocs_core.controlm`; diffed all 8: current core strictly AHEAD (ABINITIO `.pset`, spark-submit `_looks_script`, doc-path refs) — ZERO archive-only deltas, **no core PRs needed** |
+| `drydocs/` rest (models/adapters/loaders/cli/schema/ontology/snapshots), `tests/`, `scripts/` | leave | the pre-reorg monolith, superseded by current main |
+| `internal-standards/standards-rules-registry.md` (R1–R29) | **PORT** | the detect (Gate 2) + greenfield (Gate 3) rule source; marked "Corpus: INTERNAL" — classification decided at ingestion; rules carry ratification status (✅/🟡/❓) → unratified rules stay gate-bound |
+| `internal-standards/governance/**` (10 docs: escalation-scim-reference, scim-hpsm-queue-registry, critical-batch-and-self-heal, nfr-catalog, nfr-consistency-and-greenfield, command-line-and-variables-standard, dat/hlt-naming-standards, greenfield-recommendations, CONTINUATION-PLAN) | **PORT, per-doc classification** | R13–R29 source corpus. SCIM/HPSM/escalation content is likely Internal(-Confidential) → `internal/`; pure-mechanism naming standards may join `knowledge/standards/` — classify each at ingestion, never blanket |
+| `internal-standards/controlm-remediation-{spinoff-plan,flow,m0-poc-scope,phases-m1-m4-scope,information-needed}.md` + `m0-poc-worked-example.md` (~630 lines) | **PORT** | component source material; reconcile against the NEWER `docs/design/drydocs-remediation-tdd.md` — the TDD contract wins on conflict |
+| `internal-standards/standards-normalization-plan.md` | evaluate | possible predecessor of current `knowledge/standards/` content — compare before porting |
+| `internal-standards/{calendar-resolution-projection-plan, data-center-naming-convention, description-field-metadata-plan, folder-naming-convention, README}.md` | leave | already carried into `knowledge/standards/` |
+| `internal-standards/{SAVE-POINT, main-branch-gap-analysis, cron-actions}.md` | leave | point-in-time session/gap notes; rituals superseded by current CLAUDE.md |
+| `vendor-bmc/**` | leave | fully carried to `external/orchestration/bmc-controlm/` (verified: zero archive-only docs) |
+| `bmc-9-0-22-creating-a-job.txt` | leave | raw scrape; superseded by the converted corpus |
+| `docs/**`, `DryDocs_Ontology_Documentation.md`, `git-readme.md`, `.claude/**` | leave | superseded by current main |
 
 ## 5. Done criteria
 

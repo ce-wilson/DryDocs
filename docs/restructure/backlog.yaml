@@ -647,6 +647,16 @@ items:
       judgment) now points at the Mythos-class tier; G2 (same class) ran on fable end-to-end.
       MODELS enum extended in test_backlog.py + validate.py; G4/K4 are re-tier candidates at
       their next groom touch.
+    progress: >
+      2026-07-10 — PULLED; 0002-B preconditions all ticked (ADR 0002 ACCEPTED; core physical;
+      archive readable at 3e6a39a). STEP 2 INVENTORY DONE (0002-B §4 filled): the archive has NO
+      remediation code — its IP is the R1-R29 rules registry (the Gate-2/Gate-3 rule source) +
+      the governance corpus (10 docs, NOT carried) + 6 remediation plan docs (~630 lines).
+      Parser diff: current core strictly ahead, zero archive-only deltas -> §2 step 3 is a no-op,
+      no core PRs. NEXT: port the doc set (per-doc classification at ingestion — SCIM/escalation
+      content likely internal/), then scaffold remediation/ (§2 step 1; packaging call per the
+      2026-07-10 Phase-C inbox note), then greenfield-build detect/transform/equivalence/jira
+      guided by the ported rules.
 
   - id: G4
     epic: component-topology
