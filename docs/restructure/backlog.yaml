@@ -608,6 +608,11 @@ items:
       test_module_boundary.py extended to scan drydocs_core (passes, stdlib). REMAINING: physical
       relocate (Phase B step 2+, when core stabilizes) + run full gates (poetry pytest -q, import,
       --help) to confirm pipeline unchanged — deferred (poetry/deps absent in the authoring env).
+      2026-07-10 — FULL GATES RUN, ALL GREEN (toolchain fixed 2026-07-09): poetry run pytest -q =
+      483 passed / 3 skipped (expected gitignored-CSV skips); test_module_boundary.py 4 passed;
+      import drydocs.cli + drydocs_core OK; drydocs --help renders and the CLI exits 0 via
+      CliRunner (the Store-venv drydocs.cmd wrapper mis-reports exit -1 — wrapper artifact, not
+      a CLI defect). REMAINING: only the physical relocate (Phase B step 2+, when core stabilizes).
 
   - id: G3
     epic: component-topology
