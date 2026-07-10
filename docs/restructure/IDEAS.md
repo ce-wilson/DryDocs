@@ -26,13 +26,21 @@ Tags help grooming: `idea` · `bug` · `doc` · `source` (new data source) · `q
 
 <!-- add new ideas at the top -->
 
+- 2026-07-10 — [idea] **Remediation next slices — tracked in the TDD, not itemized here**
+  (captured at the G3 close, same day). What remains after G3/0002-B closed: the Tier-2
+  agentic lane (FR-REM-4 — gated on OQ-2 registry shape + OQ-4 agent runtime, both open
+  HITL questions), XML I/O (gated on the vendor schema acquisition — company-side .dtd /
+  exportdeftable, corpus stub has the fetch list), and the A3 ground-truth watched filename
+  + B1 var.text rule (company-side; adjudicates the real M0 unit's equivalence verdict —
+  the resolver stays untouched until then). Groom into items only when their gates open;
+  `docs/design/drydocs-remediation-tdd.md` §6/§7 is the tracking surface.
 - 2026-07-10 — [idea] **Phase C packaging (deferred by ADR 0002-A-1 at the G2 relocate)**: the
   pieces deliberately NOT executed in Phase B — (a) make `drydocs-core` independently
   installable (packaging-only commit: per-package pyprojects + path deps, NO file moves),
   (b) the remainder's 4-way component split (load/review/plan/docgen as real packages) and
-  load's final name. Promote (a) early if G3's spinoff rebase needs to pip-install core from
-  a clean env rather than consume the monorepo; (b) waits for Phase C proper. Refs: ADR
-  0002-A-1 §Consequences, PORT-MANIFEST header sequencing note (rename wave = path-column diff).
+  load's final name. UPDATED at the G3 close (same day): G3 completed IN-MONOREPO, so
+  trigger (a) expired unfired — no early promotion needed; the whole line now waits for
+  Phase C proper. Refs: ADR 0002-A-1 §Consequences, PORT-MANIFEST header sequencing note.
 - 2026-07-09 — [idea] **Control-M Workbench as the remediation greenfield test bed — PARKED**
   (user call, 2026-07-09). The Workbench Docker image (dev Control-M, plain `docker run`, no
   Kubernetes/Helm) would let fix packages be DEPLOYED + EXECUTED against a disposable env
@@ -92,6 +100,18 @@ Tags help grooming: `idea` · `bug` · `doc` · `source` (new data source) · `q
 ## Recently groomed (audit trail)
 
 <!-- when you promote an idea, move its line here with the resulting backlog id -->
+
+- 2026-07-10 groom run (G3-close session) — 0 promoted / 1 inboxed / 1 kept-updated / 0 merged:
+  - inboxed: remediation next slices (Tier-2 FR-REM-4 gated on OQ-2/OQ-4; XML I/O on schema
+    acquisition; A3/B1 company-side) — deliberately NOT itemized; the TDD §6/§7 tracks them,
+    groom when their gates open.
+  - kept-updated: the Phase-C packaging line — G3 closed IN-MONOREPO so its early-promotion
+    trigger (a) expired unfired; the line waits for Phase C proper.
+  - all other inbox lines remain parked on their recorded gates (no change today: Workbench/
+    entitlement, SchedulerKind/SME classes, BRD, docmeta/P0-verdict+ADR-0004, container
+    password, LLM keys, common/ cosmetic, cli regroup/v1.0 window, testcontainers).
+  - backlog database untouched this run (G3/G10 changes landed in-session pre-groom:
+    G3 done 46, G10 ready — see commits ca9f165..ef57602).
 
 - 2026-07-09 — [idea] design-doc feedback: per-subsection annotate controls when a section
   has >2 subsections (1.a/1.b/1.c… or steps 1/2/3) so feedback keys to the exact subsection
