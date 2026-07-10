@@ -631,7 +631,7 @@ items:
     agent: main
     model: fable
     priority: p2
-    status: todo
+    status: in_progress
     depends_on: [G2]
     inputs: [docs/decisions/0002-b-spinoff-rebase-checklist.md, "ce-wilson/DryDocs-v0-archive@controlm-spinoff"]
     acceptance: >
@@ -2032,8 +2032,8 @@ items:
 # Roll-up the dispatcher can glance at. COMPUTED views — test_backlog.py enforces
 # that these match the items exactly; update them with any status change.
 summary:
-  todo: 25                                          # K3 done + K4/K5 added 2026-07-10
-  in_progress: 6                                   # E1, F1, F2, K2, P2 (awaiting HITL), O1 (web design pass)
+  todo: 24                                          # G3 pulled in_progress 2026-07-10
+  in_progress: 7                                   # E1, F1, F2, K2, P2 (awaiting HITL), O1 (web design pass), G3 (spinoff rebase)
   blocked: 0
   done: 45                                          # G2 physical relocate DONE 2026-07-10 (ADR 0002-A-1)
-  next_ready: [C5, J2, J4, J5, J6, L7, L8, L9, M2, M3, M4, N2, P1, J7, J8, C7, K4, K5, G3, G4]  # G2 done -> G3/G4 unblock
+  next_ready: [C5, J2, J4, J5, J6, L7, L8, L9, M2, M3, M4, N2, P1, J7, J8, C7, K4, K5, G4]  # G3 pulled; G4 still ready

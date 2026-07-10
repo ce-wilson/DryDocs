@@ -1,7 +1,7 @@
 # ADR 0002-B — `controlm-spinoff` → `drydocs-remediation` rebase checklist
 
 ```yaml
-status: PLANNED         # PLANNED | IN_PROGRESS | DONE
+status: IN_PROGRESS     # PLANNED | IN_PROGRESS | DONE — G3 pulled 2026-07-10; archive inventory underway
 date: 2026-06-26
 companion_to: docs/decisions/0002-component-database-topology.md   # ADR 0002, D3
 depends_on: docs/decisions/0002-a-drydocs-core-extraction-plan.md  # core must exist first
@@ -40,13 +40,13 @@ for the handoff (ADR 0002, D3).
 
 ## 1. Preconditions (do not start until all true)
 
-- [ ] ADR 0002 is **ACCEPTED** (SME gate) — wiring is gated on acceptance.
-- [ ] `drydocs-core` extraction (0002-A) is **DONE**; the core parser surface
+- [x] ADR 0002 is **ACCEPTED** (SME gate) — wiring is gated on acceptance. *(verified 2026-07-10)*
+- [x] `drydocs-core` extraction (0002-A) is **DONE**; the core parser surface
       (`resolve_job`, `extract_container_command`, `Invocation`/`FileOp`, models, adapters) is
-      importable as `drydocs_core.*`.
-- [ ] Read access to `ce-wilson/DryDocs-v0-archive@controlm-spinoff` confirmed; clone it
+      importable as `drydocs_core.*`. *(physical relocate merged `0546e21`, 2026-07-10)*
+- [x] Read access to `ce-wilson/DryDocs-v0-archive@controlm-spinoff` confirmed; clone it
       read-only for reference (it is *source material*, not a merge base — histories are
-      disjoint after the reorg).
+      disjoint after the reorg). *(ls-remote verified 2026-07-10: branch tip `3e6a39a`)*
 
 ## 2. Rebase steps (re-home, don't replay)
 
