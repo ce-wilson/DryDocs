@@ -162,3 +162,11 @@ Tags help grooming: `idea` · `bug` · `doc` · `source` (new data source) · `q
 - 2026-07-01 — Epic I (I1–I4, project board & planning infrastructure) groomed into `backlog.yaml`
   from the architecture-review plan; schema upgraded to `drydocs.backlog.v2` (I1 done same day).
 - 2026-06-20 — initial backlog A1–F2 seeded directly into `backlog.yaml` from `02-backlog.md`.
+- 2026-07-09 — [idea] **Port-boundary tech-debt audit written** (`docs/reviews/tech-debt-port-boundary.md`,
+  /tech-debt run): the publisher→consumer break points CAN be segregated — six break classes
+  (A reverse-direction Canonical-COMPANY, B per-entry, C integration hand-merges, D env/wiring,
+  E gitignored assets, F rename waves) + the meta-debt (dispositions are prose-only across
+  git-readme/port-prompt/reconcile-port, no guard). Groom: (1) PORT-MANIFEST.yaml +
+  test_port_manifest (priority 40 — MUST land BEFORE ADR 0002 Phase B rename wave);
+  (2) per-entry reconciler guards (status-downgrade, gate-log append-only); (3) Class-A
+  connector/overlay physical split (do with Phase B).
