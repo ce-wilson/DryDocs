@@ -1,7 +1,8 @@
 # ADR 0002-A — `drydocs-core` extraction plan (thin)
 
 ```yaml
-status: PLANNED         # PLANNED | IN_PROGRESS | DONE
+status: IN_PROGRESS     # PLANNED | IN_PROGRESS | DONE — Phase B relocate executing 2026-07-10
+amended_by: docs/decisions/0002-a-1-phase-b-thin-relocate.md   # §6 step 4 + §5 packaging deferred to Phase C
 date: 2026-06-26
 companion_to: docs/decisions/0002-component-database-topology.md   # ADR 0002, D3
 gated_by: ADR 0002 PROPOSED → ACCEPTED        # no file moves until accepted
@@ -92,7 +93,10 @@ Each step ends green on the existing gates: `poetry run pytest -q`,
 2. Move the unambiguous core modules (§2 rows marked core) into `core/`; update imports; run
    gates.
 3. Resolve the two borderline modules (§6 decisions below); run gates.
-4. Rename the remainder to `drydocs-load`; point the `drydocs` script at it; run gates.
+4. ~~Rename the remainder to `drydocs-load`; point the `drydocs` script at it; run gates.~~
+   **AMENDED by 0002-A-1 (2026-07-10):** the remainder keeps the `drydocs` name (it now
+   hosts four component groups, not just load); rename + per-component packaging deferred
+   to Phase C.
 5. Add `test_module_boundary.py`; run gates. **Stop here** — C2/C3 packaging is a separate
    follow-up (Phase C). The `drydocs-remediation` rebase is **planned in 0002-b** and executed in a
    separate module/effort (depends on this extraction being DONE).
