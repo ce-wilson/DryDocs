@@ -653,10 +653,14 @@ items:
       remediation code — its IP is the R1-R29 rules registry (the Gate-2/Gate-3 rule source) +
       the governance corpus (10 docs, NOT carried) + 6 remediation plan docs (~630 lines).
       Parser diff: current core strictly ahead, zero archive-only deltas -> §2 step 3 is a no-op,
-      no core PRs. NEXT: port the doc set (per-doc classification at ingestion — SCIM/escalation
-      content likely internal/), then scaffold remediation/ (§2 step 1; packaging call per the
-      2026-07-10 Phase-C inbox note), then greenfield-build detect/transform/equivalence/jira
-      guided by the ported rules.
+      no core PRs. 2026-07-10 (later) — DOC PORT DONE: 17 docs VERBATIM -> internal/remediation/
+      (+governance/), classification Internal (content check found real folder/job/QR/VR values
+      throughout — nothing knowledge/-eligible unsanitized); provenance README records the rule
+      (unratified R-rules stay gate-bound; TDD wins on conflict). HELD for user classification
+      review: governance/escalation-scim-reference.md + scim-hpsm-queue-registry.md (candidate
+      Internal-Confidential). NEXT: the held-docs review, then scaffold remediation/ (§2 step 1;
+      packaging call per the Phase-C inbox note), then greenfield detect/transform/equivalence/
+      jira guided by the ported rules.
 
   - id: G4
     epic: component-topology
