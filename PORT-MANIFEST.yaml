@@ -38,6 +38,8 @@ classification: Internal-Public
 updated: 2026-07-10   # Phase B relocate (ADR 0002-a-1): core paths now drydocs_core/*;
                       # the remainder keeps the drydocs/ name (thin variant). Renamed-path
                       # rows below were the promised "path-column diff, not a prose rewrite".
+                      # Same day, later: drydocs_remediation/** + internal/remediation/**
+                      # rows added (G3 remediation component stream).
 direction: "producer -> company (one-way; back-flow only as sanitized reproduction)"
 default: "clean-add when absent on consumer; evaluate when both sides created the path"
 
@@ -114,6 +116,16 @@ rows:
   - path: "drydocs/staging.py"
     disposition: canonical-producer
     note: "the load-cadence staging bundle builder — relocated OUT of controlm/ in Phase B (0002-a §6 borderline); stays in the drydocs remainder"
+  - path: "drydocs_remediation/**"
+    disposition: canonical-producer
+    note: "the remediation component (G3/0002-B): producer-authored mechanism; rule VALUES + Jira REST + live corroboration queries stay company-side and never flow back"
+  - path: "internal/remediation/**"
+    disposition: canonical-producer
+    note: >
+      spinoff doc port + real M0 artifacts (Internal — never in any PUBLIC mirror; fine on
+      the private company remote). Producer-authored files take producer on collision;
+      company-side ADDITIONS here (e.g. the G10 landings per the README §HELD) are
+      company-only files — they never collide and never flow back.
   - path: "knowledge/standards/**"
     disposition: canonical-producer
   - path: "drydocs/loaders/**"

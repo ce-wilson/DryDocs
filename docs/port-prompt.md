@@ -449,6 +449,52 @@ PROCEDURE:
       gates unchanged (import drydocs.cli / drydocs --help). Producer reference at range head:
       483 passed / 3 skipped.
 
+29. REMEDIATION COMPONENT STREAM — G3 / ADR 0002-B EXECUTED END-TO-END (2026-07-10, after the
+    step-28 relocate; commits "G3 step 2 — archive inventory" -> "G3 doc port" -> "G10 —
+    sanitized re-review item" -> "scaffold drydocs_remediation" -> "M0 PoC slice" -> "Tier-1
+    transform engine + Jira handoff boundary" -> "G3 CLOSED — corroboration wired", plus the
+    planning chores around them):
+    - NEW PACKAGE (clean-adds; manifest row drydocs_remediation/** canonical-producer):
+      drydocs_remediation/ — formats (DefinitionFormat seam: TranscriptDefinitionFormat live,
+      schema drydocs.remediation.transcript.v1; XmlDefinitionFormat BLOCKED on the vendor
+      schema acquisition — do NOT implement it from memory), detect (R1 dot-smuggling over the
+      core classifier; findings ratified=False until the registry is machine-readable),
+      transform (ratified-only Tier-1 engine + canonical-variable-rename; rule VALUES are
+      COMPANY-SIDE — inject your ratified name map, never commit it producer-side), equivalence
+      (order-paired resolved-watch proof via drydocs_core), jira (pure render + JiraSubmitter
+      boundary — your REST impl + credentials stay company-side config), corroborate
+      (reconcile_variables + ReadOnlyGraph, the component's SOLE graph path — write Cypher
+      refused before the driver; write your live schema-specific queries THROUGH this wrapper).
+    - pyproject.toml (per-entry): the packages list gains { include = "drydocs_remediation" } —
+      apply that delta; keep your version string as ever.
+    - tests/unit/test_module_boundary.py (canonical-producer): gains the remediation
+      COMPONENT_GROUP + PKG_ROOT — after taking it, RE-ADD your consumer-only modules to the
+      groups (the step-28 drill). NEW portable suites (all clean-adds, no network/DB):
+      test_remediation_{scaffold,m0,tier1,handoff,no_graph_write,corroborate}.py + the
+      SYNTHETIC fixtures tests/fixtures/remediation/ (mechanism twins; real values never in tests).
+    - internal/remediation/** (clean-add; manifest row canonical-producer): the spinoff doc
+      port (rules registry R1-R29, remediation plans, governance corpus subset) + the real M0
+      transcripts and the 2026-07-10 engine-run record. Internal BY CONTENT — fine on the
+      private company remote, NEVER in any public mirror. TWO governance docs are deliberately
+      ABSENT repo-wide (user keep-out decision): their identities live ONLY in
+      internal/remediation/README.md §HELD; re-entry is backlog G10 (sanitized — do not name
+      them in publishable files, including this prompt). Company-side additions under this
+      tree (e.g. G10 landings) are yours alone and never flow back.
+    - DECISION DOCS (canonical-producer): 0002-B is fully ticked + DONE; ADR 0002 records the
+      controlm-spinoff archive SUPERSEDED — company-side, STOP treating the archive branch as
+      live source; it remains readable reference only. 0002-A-1 rode in with step 28.
+    - DESIGN DOC: docs/design/drydocs-remediation-tdd.md traceability matrix statuses updated
+      (NFR-REM-1/2 done, most FRs partial) + regenerated .html/.print.html — take the .md and
+      renders together or re-render (deterministic).
+    - PLANNING STREAM (producer planning, take as prior practice): backlog.yaml (G3 done, G10
+      added SANITIZED, model field `fable` now legal), tests/unit/test_backlog.py +
+      .claude/skills/groom-backlog/ (MODELS enum gains "fable"; matrix text), board render,
+      IDEAS.md union-append (one Phase-C packaging capture line).
+    - KNOWN-PENDING carried by design (do not "fix" during the port): the real M0 unit's
+      equivalence verdict awaits the ground-truth watched filename (A3) + the var.text dot
+      rule (B1) — BOTH are company-side unblocks; the core resolver is deliberately untouched
+      until then. Tier-2 agentic lane (FR-REM-4) and XML I/O are future slices per the TDD.
+
 ACCEPTANCE GATE (behavior is the contract, not a byte-compare):
 - Track 1 (portable, no production sample present):
     poetry run pytest tests/unit/test_variable_classifier.py tests/unit/test_variable_resolver.py \
@@ -462,15 +508,19 @@ ACCEPTANCE GATE (behavior is the contract, not a byte-compare):
   means the skip guard was lost — fix it.
 - Full `pytest tests/unit/` must be green (passes + sample-skips + the PyYAML test_schema.py
   skips). ZERO failures is the contract. Now also covers the docgen tests (test_doc_outline /
-  test_design_doc / test_doc_pdf) AND the newer-stream tests (test_bmc_docs, test_source_mappings,
+  test_design_doc / test_doc_pdf), the newer-stream tests (test_bmc_docs, test_source_mappings,
   test_row_checksum, test_transcribe_doc_markup, test_port_manifest, test_taxonomy_ontology_map)
-  — all portable: stdlib + PyYAML, the committed BMC corpus under external/, no network/DB.
-  test_schema.py expects EXPECTED_CONSTRAINTS = 40 (steps 19 + 22; UNCHANGED by steps 25-27 — the
-  Epic P loaders are not built yet) and a supplement block for the 4 active `docs_*` edges;
-  test_bmc_docs pins EXPECTED_DOC_COUNT = 27 (step 22). Both CI guards must pass: test_schema.py
-  (no `active` relationship without its supplement block) and test_classification.py (every source
-  in source-registry.yaml has a valid sensitivity classification). New dep: PyYAML.
-  Producer-side reference at this range head (2026-07-10): 483 passed / 3 skipped.
+  AND the remediation suites (step 29: test_remediation_scaffold / _m0 / _tier1 / _handoff /
+  _no_graph_write / _corroborate — synthetic fixtures, no network/DB). All portable: stdlib +
+  PyYAML, the committed BMC corpus under external/, no network/DB.
+  test_schema.py expects EXPECTED_CONSTRAINTS = 40 (steps 19 + 22; UNCHANGED by steps 25-29 — the
+  Epic P loaders are not built yet and remediation loads nothing) and a supplement block for the
+  4 active `docs_*` edges; test_bmc_docs pins EXPECTED_DOC_COUNT = 27 (step 22). Both CI guards
+  must pass: test_schema.py (no `active` relationship without its supplement block) and
+  test_classification.py (every source in source-registry.yaml has a valid sensitivity
+  classification). New dep: PyYAML.
+  Producer-side reference: 483 passed / 3 skipped at the step-28 relocate head;
+  516 passed / 3 skipped at the step-29 remediation head (2026-07-10).
 
 BOUNDARIES:
 - One-way only. Never add company main as a remote on the producer; never push back to
