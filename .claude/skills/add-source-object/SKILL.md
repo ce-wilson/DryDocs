@@ -62,7 +62,7 @@ the formal column census stays `census: pending` until doc-08 Phase 2 runs.
 Add the object to `config/source-mappings/<source>.yaml`: one disposition per
 profiled column (`projected` | `filter-only` | `excluded`+reason | `deferred`),
 a `default_disposition` sweep, and `staging:*` targets while the graph landing
-is still gate-bound (the CM_DEF_SETVAR precedent). Update the ledger's
+is still gate-bound (the CM_DEF_SETVAR_VW precedent). Update the ledger's
 `updated:` date and `tests/unit/test_source_mappings.py`'s expected-objects
 list (+ one object-specific assertion).
 

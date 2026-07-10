@@ -1316,7 +1316,11 @@ items:
       Created 2026-07-10 from the K3 gate sign-off. The gate confirmed the DIRECTION; this is the
       mechanical APPLICATION, each flip its own logged change (gate section G discipline). Does NOT
       include the K2 job->app edge (deferred) or the Product Cabinet (K5). CTO is shared between the
-      TOMRole (here) and ProductRole (K5) schemes — coordinate the two.
+      TOMRole (here) and ProductRole (K5) schemes — coordinate the two. PORT NARRATIVE (added
+      2026-07-10 review): when the :Application -> :BusinessApplication rename applies, ALSO update
+      git-readme.md's SEAL-reshape section (currently instructs the consumer "do NOT take as
+      applied" — becomes wrong), add the port-prompt step, and check PORT-MANIFEST per-entry notes
+      — the prose-mirror drift class from docs/reviews/tech-debt-port-boundary.md.
 
   - id: K5
     epic: seal-attribution

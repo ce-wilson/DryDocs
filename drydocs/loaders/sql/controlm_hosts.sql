@@ -11,7 +11,7 @@
 -- GATE-BOUND: the graph landing (ControlMHostGroup / ExecutionHost /
 -- CONTAINS_HOST / RUNS_ON resolution) is proposed only — see
 -- config/gate-prompts/controlm-hosts-topology.yaml. Until the SME confirms,
--- rows are staging-only (the CM_DEF_SETVAR precedent).
+-- rows are staging-only (the CM_DEF_SETVAR_VW precedent).
 --
 -- Key schema findings (internal profile 2026-07-09 + column view):
 --   * No IS_CURRENT_VERSION / VERSION_SERIAL — the object is NOT versioned;

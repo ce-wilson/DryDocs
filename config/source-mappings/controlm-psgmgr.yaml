@@ -305,7 +305,7 @@ objects:
   # STAGING-ONLY until the controlm-hosts-topology gate confirms the graph
   # landing (ControlMHostGroup / ExecutionHost / CONTAINS_HOST / the RUNS_ON
   # {role: host_group | agent_host} NODE_ID resolution pass) — the
-  # CM_DEF_SETVAR staging-only precedent. Use case: server-patching /
+  # CM_DEF_SETVAR_VW staging-only precedent. Use case: server-patching /
   # maintenance-window planning.
   # ---------------------------------------------------------------------------
   - name: CM_HOSTS

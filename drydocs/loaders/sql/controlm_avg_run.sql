@@ -11,7 +11,7 @@
 -- GATE-BOUND: the graph landing (avg/median timing PROPERTIES onto existing
 -- :ControlMJob nodes + derived folder-level windows — NO new labels/edges)
 -- is proposed only — see config/gate-prompts/controlm-avg-run-supplement.yaml.
--- Until the SME confirms, rows are staging-only (CM_DEF_SETVAR precedent).
+-- Until the SME confirms, rows are staging-only (CM_DEF_SETVAR_VW precedent).
 --
 -- Known semantics (SME 2026-07-07; verify via adhoc/profile_cm_avg_run.sql):
 --   * Join to jobs: (SCHED_TABLE, JOB_MEM_NAME) = (folder name,
