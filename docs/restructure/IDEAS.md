@@ -182,48 +182,16 @@ Tags help grooming: `idea` · `bug` · `doc` · `source` (new data source) · `q
 - 2026-07-01 — Epic I (I1–I4, project board & planning infrastructure) groomed into `backlog.yaml`
   from the architecture-review plan; schema upgraded to `drydocs.backlog.v2` (I1 done same day).
 - 2026-06-20 — initial backlog A1–F2 seeded directly into `backlog.yaml` from `02-backlog.md`.
-- 2026-07-09 — **CM_HOSTS host topology** prepped to the gate via the NEW `add-source-object`
-  skill (the "add an object to an existing source" walkthrough — profile → ledger → ontology →
-  gate → extract). Artifacts: `sql/controlm_hosts.sql` + `sql/adhoc/profile_cm_hosts.sql`,
-  ledger object CM_HOSTS (staging-only), vocab `m3_runs_on_host_group` /
-  `m3_host_group_contains_host` / `m3_host_group_defined_on` (planned), gate
-  `config/gate-prompts/controlm-hosts-topology.yaml` (AWAITING SME). Groom: (1) the gate
-  session; (2) the hosts loader + RUNS_ON resolution pass build (blocked on the gate);
-  (3) the **maintenance-window use case** — host → jobs → avg folder start/end quiet-window
-  query; depends on the temporal runtime supplement (cm_avg_run) which should be promoted
-  from PLANNED. Also new: `locator:` block on source-registry entries (SEAL app → platform →
-  service → schema → mapping); real SEAL/service values = internal/ twin.
-- 2026-07-09 — **CM_AVG_RUN runtime-stats supplement** prepped to the gate via
-  `add-source-object` (second run of the walkthrough, same day as CM_HOSTS). Artifacts:
-  `sql/controlm_avg_run.sql` + `sql/adhoc/profile_cm_avg_run.sql`, ledger object CM_AVG_RUN
-  (14 cols, staging-only), map `job-runtime-stats-supplement` (proposed; property supplement —
-  NO new vocab), gate `config/gate-prompts/controlm-avg-run-supplement.yaml` (AWAITING SME).
-  This IS the temporal-runtime-supplement phase-1 promotion (timing half of the
-  maintenance-window use case; hosts topology gate signed off same day). Groom: gate session;
-  supplement loader build (blocked on gate + probes P0/P2/P7); NODE_GROUP↔RUNS_ON
-  cross-validation report as a remediation feeder.
-- 2026-07-09 — [idea] **Taxonomy→ontology map tech-debt audit written**
-  (`docs/reviews/tech-debt-taxonomy-ontology-map.md`, /tech-debt run): the map is the ONLY
-  unguarded ledger (siblings all have accessor+test); summary counts hand-bumped by two
-  sessions same day (the backlog analog conflicted in today's merge). Groom: (1) map guard —
-  `drydocs/taxonomy_ontology_map.py` + `test_taxonomy_ontology_map.py` (computed summary,
-  lifecycle enum, reuses_vocab referential check, map↔vocab label agreement) — priority 36;
-  (2) point fixes: duplicate `Document` node classification (two entries!), five
-  comment-`APPLIED` entries → `status: applied`, stale `updated:`; (3) structured
-  `vocab_id:` + `capture:` fields at the next gate (taxonomy-first erosion — see main's
-  `platforms.yaml` retrofit `fa7a00c`).
-- 2026-07-09 — [idea] **Port-boundary tech-debt audit written** (`docs/reviews/tech-debt-port-boundary.md`,
-  /tech-debt run): the publisher→consumer break points CAN be segregated — six break classes
-  (A reverse-direction Canonical-COMPANY, B per-entry, C integration hand-merges, D env/wiring,
-  E gitignored assets, F rename waves) + the meta-debt (dispositions are prose-only across
-  git-readme/port-prompt/reconcile-port, no guard). Groom: (1) PORT-MANIFEST.yaml +
-  test_port_manifest (priority 40 — MUST land BEFORE ADR 0002 Phase B rename wave);
-  (2) per-entry reconciler guards (status-downgrade, gate-log append-only); (3) Class-A
-  connector/overlay physical split (do with Phase B).
-- 2026-07-09 — [chore] **Tech-debt remediation executed (steps 1–3 of the unified two-audit
-  plan)**: F4 Document dedupe + F2 applied-status promotion (`c396d75`), F1/F3 map guard +
-  vocab_id migration — 9 tests (`ede0b94`), P1 PORT-MANIFEST.yaml + 7-test guard + authority
-  pointers in git-readme/reconcile-port. REMAINING to groom: P2 per-entry reconciler checks
-  (consumer-side, reuse the map guard's checks — no-downgrade + gate-log append-only);
-  P4 skip-guard policy test; P3+F6 ride ADR 0002 Phase B (manifest sequencing rule now in
-  force: manifest EXISTS, Phase B may proceed when scheduled).
+- 2026-07-09 groom run (remote session) — 8 promoted / 0 inboxed; PLAN CHANGE: new phase 13
+  "Runtime topology & maintenance windows" + Epic P (ratify — the phase-12/O1 precedent):
+  - CM_HOSTS + CM_AVG_RUN onboarding (add-source-object walkthrough ×2; hosts gate SIGNED OFF
+    18/18, avg-run gate awaiting SME) → **P1** (internal probes + DC scope call), **P2**
+    (avg-run gate session, in_progress awaiting HITL), **P3** (hosts loader + RUNS_ON
+    resolution pass), **P4** (avg-run property-supplement loader + job-name index),
+    **P5** (the maintenance-window query — the driving use case).
+  - Port-boundary tech-debt audit (docs/reviews/tech-debt-port-boundary.md) → **J7** (per-entry
+    reconciler guards) + **J8** (skip-guard policy test); Phase-1 PORT-MANIFEST.yaml + guard
+    EXECUTED pre-groom (5cfcfa7) — no item, the doc-06 precedent.
+  - Taxonomy-ontology-map audit (docs/reviews/tech-debt-taxonomy-ontology-map.md) → **C7**
+    (vocab_id + capture fields at the next gate); F1–F4 fixes EXECUTED pre-groom
+    (c396d75, ede0b94).
