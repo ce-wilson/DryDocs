@@ -1,7 +1,7 @@
 # ADR 0002-C — `depgraph@feat/controlm-lineage` → `drydocs-lineage` re-home plan
 
 ```yaml
-status: IN_PROGRESS     # PLANNED | IN_PROGRESS | DONE — G9 pulled 2026-07-10; asset re-home underway (branch port/depgraph-lineage-rehome)
+status: DONE            # PLANNED | IN_PROGRESS | DONE — G9 closed 2026-07-11; all §4 assets re-homed, §5 gates ticked (branch port/depgraph-lineage-rehome)
 date: 2026-06-29
 companion_to: docs/decisions/0002-component-database-topology.md   # ADR 0002, D2 (drydocs-lineage)
 depends_on: docs/decisions/0002-a-drydocs-core-extraction-plan.md  # core must exist first
@@ -109,10 +109,10 @@ Re-home **only the lineage assets**; the parser is already in core (§3). Old �
 | `model.py` v2 — `ProcessNode`/`DataAssetNode`/typed rels (`INVOKES/TRIGGERS/READS/WRITES`) | **PORTED 2026-07-10** — lineage layer only; identity = ControlMJob NODE-KEY composite; rels normalized to the REGISTERED planned vocabulary (m3_invokes/m3_triggers/m3_reads_from/m3_writes_to; READS/WRITES aliases); code layer left behind | `drydocs_lineage/model.py` |
 | `extractors/controlm_inventory.py` (CSV export → ProcessNodes + INVOKES) | **PORTED 2026-07-10** — parses via the shared core parser | `drydocs_lineage/extractors/controlm_inventory.py` |
 | `tests/test_controlm.py` + `tests/fixtures/controlm/jobs.csv` (synthetic twin) | **PORTED 2026-07-10** — the §5 oracle, pytest-style, green against core | `tests/unit/test_lineage_inventory.py` + `tests/fixtures/lineage/jobs.csv` |
-| `profiles/html_review.py` (self-contained SME review page) | port — NEXT SLICE | `drydocs_lineage/review.py` — the lineage SME surface |
-| `profiles/drydocs.py` ("Fork 3", planned — MERGE into `drydocs`) | **build here — NEXT SLICE** (rel vocabulary is gate-bound; no live load before the HITL gate) | `drydocs_lineage/writer.py` — the curated write to `drydocs` |
+| `profiles/html_review.py` (self-contained SME review page) | **PORTED 2026-07-11** — LineageGraph, `node_target` (polymorphic wording), registered rel spellings; base-layer `mark_cycles`/multi-project stayed behind; CLI entry `drydocs lineage-review` | `drydocs_lineage/review.py` — the lineage SME surface |
+| `profiles/drydocs.py` ("Fork 3", planned — MERGE into `drydocs`) | **BUILT 2026-07-11** (never existed depgraph-side) — `plan_curated` (pure review/dry-run) + `write_curated` (constraint-on-key MERGE, UNWIND, no CYPHER 25; job endpoints MATCHed — the M3 load owns them). GATE-BOUND in code: refuses live load (`GateBoundVocabularyError`) until the registry flips the four vocab ids `active`; refuses any DB but `drydocs` (`TrustBoundaryError`) | `drydocs_lineage/writer.py` — the curated write to `drydocs` |
 | `examples/drydocs.load.cypher` | leave behind — inspected 2026-07-10: it is the Fork-1 (CodeFile) base profile, not lineage | stays in depgraph |
-| `collect/rua_inventory.sh` (+ `.conf`, README) — RHEL run-as-user collector | port — NEXT SLICE | `drydocs_lineage/collect/` |
+| `collect/rua_inventory.sh` (+ `.conf`, README) — RHEL run-as-user collector | **PORTED 2026-07-11** — shell verbatim (LF pinned by .gitattributes; `COLLECTOR_VERSION` bundle schema unchanged so bundles from either copy stay ingestible); README re-pointed at the lineage extractor-to-be | `drydocs_lineage/collect/` |
 | depgraph base layer (`python_imports.py`, `profiles/base.py`) | **leave behind** | stays in depgraph; out of the topology |
 
 **Re-home rules (per 0002-A §4 + D3):**
@@ -135,14 +135,17 @@ Re-home **only the lineage assets**; the parser is already in core (§3). Old �
 - [x] **Core boundary holds:** `test_module_boundary.py` (0002-A §4) extended to `lineage/` —
       imports only `drydocs_core.*`; no `lineage→deepdoc` / `deepdoc→lineage` import.
       *(`lineage` COMPONENT_GROUP since G4; default-deny green over the ported modules.)*
-- [ ] **Writes ground truth only:** `drydocs-lineage` opens write transactions **only** against
+- [x] **Writes ground truth only:** `drydocs-lineage` opens write transactions **only** against
       `drydocs` (not `drydocs_context`) — the D2 trust boundary, asserted structurally.
-      *(Lands with the Fork-3 writer, next slice.)*
+      *(test_lineage_writer.py, 2026-07-11: writer.py is the sole DB-touching module; the
+      context DB's name is unnameable in non-docstring code; a client bound elsewhere is
+      refused at runtime — plus the vocabulary gate itself: live load refuses while the four
+      m3_* ids are `status: planned`.)*
 - [x] **Parser equivalence (§3):** core parser reproduces depgraph's `test_controlm.py` outputs,
       incl. the new `spark-submit --master yarn` regression. *(GREEN 2026-07-10; see the §3
       count correction — the real oracle figures are 4 jobs / 7 processes / 4 INVOKES.)*
 - [x] Existing gates green: `poetry run pytest -q`, `python -c "import drydocs.cli"`, `drydocs --help`.
-      *(532 passed / 3 skipped at slice 1.)*
+      *(532 passed / 3 skipped at slice 1; 566 / 3 at close.)*
 
 ## 6. Sequencing (where this sits in Epic G)
 
@@ -161,6 +164,10 @@ G2 (core extraction)  ──blocks──►  G8 (parser-delta fold)  ──►  
 - On **G9 done:** depgraph PR #2 is **superseded** for the lineage assets — record it here and in
   ADR 0002's rollout note; stop maintaining `feat/controlm-lineage` as a lineage source. depgraph
   may continue to exist for its base/python-import layer only (or be retired).
+  **RECORDED 2026-07-11 (G9 close):** `ce-wilson/depgraph@feat/controlm-lineage` (PR #2, tip
+  `5b09a0d`) is SUPERSEDED for the lineage assets — every §4 row is dispositioned (ported / built
+  here / left behind); ADR 0002's `affects:` block carries the matching record. The branch is
+  readable source material only; the base/python-import layer is out of scope of this record.
 
 ## 7. Done criteria
 
@@ -169,3 +176,9 @@ G2 (core extraction)  ──blocks──►  G8 (parser-delta fold)  ──►  
 parser-equivalence tests pass; gates green. depgraph's Control-M parser no longer exists as a
 second copy (folded into core, §3). The depgraph `feat/controlm-lineage` branch is recorded as
 **superseded source material**.
+
+**MET 2026-07-11.** One deliberate qualification: the *write* half of the loop exists as
+gate-bound mechanics — `plan_curated` is live (the curation review surface), `write_curated`
+refuses by design until the HITL gate flips the four vocabulary entries `active`. That refusal
+IS the D2 contract, not a gap; the remaining stub is `curation.curate` (phased cadence —
+trigger wiring, a G4-scoped future item, not part of this re-home).

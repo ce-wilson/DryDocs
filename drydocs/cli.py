@@ -607,6 +607,43 @@ def ingest_controlm(
             )
 
 
+@app.command(name="lineage-review")
+def lineage_review(
+    source: Path = typer.Argument(
+        ..., help="controlm_jobs CSV export (or a directory to search for one)."
+    ),
+    out: Path = typer.Option(
+        Path("lineage-review.html"), "--out", "-o", help="Output HTML path."
+    ),
+    doc_id: str | None = typer.Option(
+        None, "--doc-id", help="Review-page identity (defaults to the source stem)."
+    ),
+) -> None:
+    """Render the lineage SME review page from a Control-M jobs CSV (no Neo4j).
+
+    The drydocs-lineage curation surface (ADR 0002-C): one self-contained HTML
+    file — folder sections, job cards with their INVOKES dependencies, an
+    assertion panel, per-folder SME notes with JSON export. Candidates only;
+    nothing here writes the graph (the curated write is gate-bound in
+    drydocs_lineage.writer).
+    """
+    from drydocs_lineage.extractors import ControlMInventoryExtractor  # noqa: PLC0415
+    from drydocs_lineage.model import LineageGraph  # noqa: PLC0415
+    from drydocs_lineage.review import to_html  # noqa: PLC0415
+
+    if not source.exists():
+        console.print(f"[red]Source not found: {source}[/]")
+        raise typer.Exit(2)
+    graph = LineageGraph()
+    ControlMInventoryExtractor().extract(source, graph)
+    out.write_text(to_html(graph, doc_id=doc_id or source.stem), encoding="utf-8")
+    st = graph.stats()
+    console.print(
+        f"[green]wrote {out}[/] — processes={st['processes']} "
+        f"data_assets={st['data_assets']} rels={st['rels']}"
+    )
+
+
 @app.command(name="m3-verify")
 def m3_verify() -> None:
     """Assert M3 (part 1) invariants on the populated graph."""

@@ -1,0 +1,109 @@
+"""Lineage SME review page — port of depgraph's test_html_review.py (0002-C §4).
+
+Same expectations as the prototype's suite (self-contained page, folder sections,
+job metadata, dependency kinds, assertion panel, per-folder notes + export),
+adapted to the re-homed surface: LineageGraph, node_target instead of host, the
+registered rel spellings.
+"""
+from __future__ import annotations
+
+from pathlib import Path
+
+import pytest
+
+from drydocs_lineage.extractors import ControlMInventoryExtractor
+from drydocs_lineage.model import LineageGraph, ProcessNode, process_id
+from drydocs_lineage.review import to_html
+
+FIXTURE = Path(__file__).resolve().parents[1] / "fixtures" / "lineage" / "jobs.csv"
+
+
+@pytest.fixture()
+def page() -> str:
+    g = LineageGraph()
+    ControlMInventoryExtractor().extract(FIXTURE, g)
+    return to_html(g, doc_id="synthetic-twin", generated_at="2026-07-11 00:00 UTC")
+
+
+def test_self_contained(page: str) -> None:
+    # no external resources — everything inline (a strict-CSP SME browser must render it)
+    assert page.startswith("<!doctype html>")
+    assert "<style>" in page and "<script>" in page
+    assert "http://" not in page
+    assert "src=" not in page
+
+
+def test_shows_folder_sections_and_jobs(page: str) -> None:
+    assert "PRARAG-HLDM-85025-PEX-TRUST-DLY" in page
+    assert "PEX_SPARK_REFINE" in page
+
+
+def test_shows_run_as_and_node_target(page: str) -> None:
+    assert "svc.hldm" in page
+    assert "host-emr-01" in page
+    # the polymorphic wording, not the prototype's "host (server)" claim
+    assert "node target" in page
+
+
+def test_shows_invoked_dependency_kinds(page: str) -> None:
+    assert "pyspark" in page
+    assert "abinitio" in page
+    assert "INVOKES" in page
+
+
+def test_assertion_panel_passes_for_clean_fixture(page: str) -> None:
+    # fixture jobs all carry node_target + run_as and every cmd_line resolves
+    assert "all checks passed" in page
+
+
+def test_comment_box_per_folder_and_export(page: str) -> None:
+    assert 'class="note"' in page
+    assert "exportNotes()" in page
+    assert "drydocs-lineage-review-" in page   # localStorage namespace is ours
+
+
+def test_html_escaped() -> None:
+    # markup-looking tokens in a cmd_line must be escaped, never raw
+    g = LineageGraph()
+    g.add_process(ProcessNode(
+        node_id=process_id("controlm_job", "1.2"), kind="controlm_job",
+        name="J_ESC", command="run.sh --tag <odate> & echo 'x'",
+        node_target="host-x", run_as="svc.x", folder="F",
+    ))
+    html = to_html(g, doc_id="esc")
+    assert "<odate>" not in html
+    assert "&lt;odate&gt;" in html
+
+
+def test_unresolved_dependency_flags_review_needed() -> None:
+    # an INVOKES child of kind "unknown" (unclassified cmd_line) must flip the panel
+    g = LineageGraph()
+    jid = process_id("controlm_job", "1.2")
+    cid = process_id("unknown", "mystery_bin")
+    g.add_process(ProcessNode(node_id=jid, kind="controlm_job", name="J",
+                              node_target="h", run_as="u", folder="F"))
+    g.add_process(ProcessNode(node_id=cid, kind="unknown", name="mystery_bin"))
+    g.add_rel(jid, "INVOKES", cid)
+    html = to_html(g, doc_id="warn")
+    assert "review needed" in html
+    assert "1 unresolved" in html
+
+
+def test_prototype_rel_spellings_render_as_registered(page_graph=None) -> None:
+    # READS normalizes to READS_FROM at the model layer; the page shows the
+    # registered spelling only
+    g = LineageGraph()
+    jid = process_id("controlm_job", "1.2")
+    cid = process_id("shell_script", "/opt/x.sh")
+    g.add_process(ProcessNode(node_id=jid, kind="controlm_job", name="J",
+                              node_target="h", run_as="u", folder="F"))
+    g.add_process(ProcessNode(node_id=cid, kind="shell_script", name="x.sh"))
+    g.add_rel(jid, "READS", cid)  # prototype spelling in, registered out
+    html = to_html(g, doc_id="rels")
+    assert "READS_FROM" in html
+
+
+def test_empty_graph_page_points_at_the_cli() -> None:
+    html = to_html(LineageGraph(), doc_id="empty")
+    assert "No Control-M jobs in this graph" in html
+    assert "lineage-review" in html

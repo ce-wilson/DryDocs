@@ -19,18 +19,21 @@ Invariants:
 - **The parser is core's.** Any parse gap found here becomes a core change, never a
   local fork (the G3/0002-B rule, same reasoning).
 
-Status (2026-07-10): G4 scaffold + the G9 re-home first slice (ADR 0002-C §4) —
-``model`` (the depgraph lineage layer reconciled to DryDocs identity: the ControlMJob
-NODE-KEY composite, the registered gate-bound rel vocabulary m3_invokes / m3_triggers /
-m3_reads_from / m3_writes_to) and ``extractors.controlm_inventory`` (CSV projection →
-ProcessNodes + INVOKES candidates, parsing via the SHARED core parser — the depgraph
-fork is retired). STILL STUBS: ``curation.curate`` (phased cadence) and
-``writer.write_curated`` (Fork-3 mechanics, next slice; rel vocabulary is gate-bound —
-no live load before the HITL gate).
+Status (2026-07-11): G9 re-home complete (ADR 0002-C §4) — ``model`` (the depgraph
+lineage layer reconciled to DryDocs identity: the ControlMJob NODE-KEY composite, the
+registered gate-bound rel vocabulary m3_invokes / m3_triggers / m3_reads_from /
+m3_writes_to), ``extractors.controlm_inventory`` (CSV projection → ProcessNodes +
+INVOKES candidates, parsing via the SHARED core parser — the depgraph fork is
+retired), ``review`` (the self-contained SME review page), ``collect/`` (the RHEL
+run-as-user collector, shell assets), and ``writer`` (Fork-3 curated-write mechanics —
+GATE-BOUND: the vocabulary is ``status: planned``, so ``write_curated`` refuses a live
+load until the HITL gate flips it active; ``plan_curated`` is the review surface).
+STILL A STUB: ``curation.curate`` (phased cadence — trigger wiring is later work).
 """
-from . import curation, extractors, model, writer
+from . import curation, extractors, model, review, writer
 
-#: The write target — ground truth. The trust axis IS the DB boundary (ADR 0002 D1).
-DATABASE = "drydocs"
+#: The write target — ground truth. Defined AT the write boundary (writer.py);
+#: the trust axis IS the DB boundary (ADR 0002 D1).
+DATABASE = writer.DATABASE
 
-__all__ = ["DATABASE", "curation", "extractors", "model", "writer"]
+__all__ = ["DATABASE", "curation", "extractors", "model", "review", "writer"]

@@ -757,7 +757,7 @@ items:
     agent: main
     model: fable
     priority: p3
-    status: in_progress
+    status: done
     depends_on: [G4, G8]
     inputs: [docs/decisions/0002-c-depgraph-lineage-rehome.md, "ce-wilson/depgraph@feat/controlm-lineage"]
     acceptance: >
@@ -787,6 +787,15 @@ items:
       ticked; ground-truth-only pends the writer. Suite 532/3. REMAINING for G9 close: review.py
       (html_review port), collect/ port, Fork-3 writer build (rel vocab gate-bound — no live
       load before the HITL gate), 0002-C DONE + depgraph PR #2 superseded record, merge --no-ff.
+      2026-07-11 — SLICE 2 + CLOSE: review.py ported (SME surface; node_target wording, registered
+      rel spellings; CLI drydocs lineage-review) + collect/ ported (shell verbatim, LF pinned,
+      bundle schema unchanged) + Fork-3 writer BUILT (plan_curated pure review + write_curated:
+      constraint-on-key MERGE/UNWIND, job endpoints MATCHed, vocab_id stamped; REFUSES live load
+      while m3_* ids are planned — GateBoundVocabularyError — and any DB but drydocs —
+      TrustBoundaryError). §5 ground-truth-only gate ticked structurally (test_lineage_writer).
+      0002-C DONE; depgraph PR #2 (tip 5b09a0d) recorded SUPERSEDED in 0002-C §6 + ADR 0002
+      affects. Suite 566/3. Acceptance met — curate() cadence stub is G4 trigger-wiring scope,
+      not G9.
 
   - id: G5
     epic: component-topology
@@ -2125,7 +2134,7 @@ items:
 # that these match the items exactly; update them with any status change.
 summary:
   todo: 23                                          # G9 pulled in_progress 2026-07-10 (re-tiered opus -> fable on touch)
-  in_progress: 7                                   # E1, F1, F2, K2, P2 (awaiting HITL), O1 (web design pass), G9 (depgraph re-home)
+  in_progress: 6                                   # E1, F1, F2, K2, P2 (awaiting HITL), O1 (web design pass)
   blocked: 0
-  done: 47                                          # G4 lineage/deepdoc scaffold DONE 2026-07-10
+  done: 48                                          # G9 depgraph lineage re-home DONE 2026-07-11
   next_ready: [C5, J2, J4, J5, J6, L7, L8, L9, M2, M3, M4, N2, P1, J7, J8, C7, K4, K5, G10]  # G9 pulled
