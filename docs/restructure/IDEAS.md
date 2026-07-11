@@ -26,6 +26,18 @@ Tags help grooming: `idea` · `bug` · `doc` · `source` (new data source) · `q
 
 <!-- add new ideas at the top -->
 
+- 2026-07-10 — [idea] **/tech-debt review of port/depgraph-lineage-rehome (G9 slice 1)** — verdict:
+  clean re-home (shared-parser AST guard, gate-bound vocab discipline, boundary registered);
+  4 findings for the next G9 slice: (1) `ProcessNode.host` documents NODE_ID as "server it runs
+  on" but the SIGNED-OFF controlm-hosts-topology gate made NODE_ID polymorphic (host GROUP in
+  the common case, group wins) — re-document/rename before consumers key on it, align with
+  Epic P's RUNS_ON resolution; (2) the extractor's CSV column contract duplicates
+  controlm_jobs.sql aliases as strings with SILENT-drop failure — extend N2's SQL SELECT-list
+  drift guard to cover it; (3) extractor has no coverage accounting (stale/nameless/no-target
+  skips are silent — the STG_PARSE_QUALITY / UNMATCHED house rule says report, never drop);
+  (4) SCHEMA_COMPAT's depgraph-machine-first/v2 shim needs a sunset criterion (G9 close?).
+  Cosmetic: model docstring says `#proc#`/`#data#`, helpers emit `proc#`/`data#`.
+
 - 2026-07-10 — [idea] **Remediation next slices — tracked in the TDD, not itemized here**
   (captured at the G3 close, same day). What remains after G3/0002-B closed: the Tier-2
   agentic lane (FR-REM-4 — gated on OQ-2 registry shape + OQ-4 agent runtime, both open
