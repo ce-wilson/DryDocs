@@ -36,7 +36,7 @@
 # =============================================================================
 
 schema: drydocs.backlog.v2
-updated: 2026-07-10
+updated: 2026-07-11
 
 # ── The high-level project plan (rendered as the board's roadmap strip) ───────
 plan:
@@ -862,6 +862,31 @@ items:
       deliberately SANITIZED — the doc identities, content class, and durable location live in
       the publish-excluded internal/remediation/README.md, not here. Timing: gated on G3 because
       the remediation engine's escalation-facing features are what would need them.
+
+  - id: G11
+    epic: component-topology
+    title: "Lineage inventory extractor reports its skips — coverage accounting, never silent drops"
+    type: task
+    module: drydocs-lineage
+    phase: 6
+    agent: main
+    model: sonnet
+    priority: p3
+    status: todo
+    depends_on: [G9]
+    inputs: [drydocs_lineage/extractors/controlm_inventory.py, tests/unit/test_lineage_inventory.py, tests/fixtures/lineage/jobs.csv]
+    acceptance: >
+      ControlMInventoryExtractor.extract exposes a coverage summary — rows read, current
+      jobs added, and every skip BY REASON (stale version_serial, nameless row, invocation
+      with no resolvable target, unparsed cmd_line) — so nothing is dropped silently (the
+      STG_PARSE_QUALITY / UNMATCHED house rule: report, never drop). Counts pinned by tests
+      on the synthetic fixture (5 rows -> 4 current jobs + 1 stale skip); the
+      `drydocs lineage-review` CLI prints the summary alongside the graph stats. Full suite
+      green.
+    notes: >
+      Groomed 2026-07-11 from the 2026-07-10 /tech-debt review of G9 slice 1 (finding #3;
+      findings #1/#4 were fixed same day, #2 merged into N2). Non-HITL: pure reporting on
+      the candidate side — curation/write semantics untouched.
 
   # ── Epic H — drydocs-review back-flow (main, opus) ────────────────────────
   # REVERSE of the normal port: reproduce the company-authored generic SME-review/
@@ -1925,14 +1950,21 @@ items:
     priority: p2
     status: todo
     depends_on: [N1]
-    inputs: [config/source-mappings/, drydocs/loaders/sql/, config/source-registry.yaml]
+    inputs: [config/source-mappings/, drydocs/loaders/sql/, config/source-registry.yaml, drydocs_lineage/extractors/controlm_inventory.py]
     acceptance: >
       Per doc 08 Phase 1: coverage test (every profiled column accounted for; new columns
       since last census must be dispositioned by name, never swept); SQL drift guard
       (loader SELECT ... AS list set-equals the ledger's projected columns; strict regex
       first, sqlglot only if it lies); source-registry entries gain a mapping: pointer and
-      a test requires a ledger for every confirmed source. Full suite green.
-    notes: "Doc 08 Phase 1. Profile-census refresh via the db skill is doc-08 Phase 2 (not this item)."
+      a test requires a ledger for every confirmed source. The guard ALSO covers the
+      lineage extractor's CSV column contract — the header names
+      drydocs_lineage/extractors/controlm_inventory.py expects must set-match the
+      controlm_jobs.sql aliases (today they are duplicated as strings and a renamed alias
+      fails by silent drop). Full suite green.
+    notes: >
+      Doc 08 Phase 1. Profile-census refresh via the db skill is doc-08 Phase 2 (not this
+      item). MERGED 2026-07-11: G9 tech-debt finding #2 (extractor CSV-contract drift) —
+      same guard, one more consumer of the same SELECT list.
 
   # ── Epic O — Web console / graph visualization (main) — Phase 12 ───────────
   # Groomed 2026-07-09 (user decision: promote to a module + phase — the web/ front-end
@@ -2110,6 +2142,32 @@ items:
       failure a prior port hit (skip guard lost, FileNotFoundError instead of skip).
     notes: "docs/reviews/tech-debt-port-boundary.md Phase 4 (Class E)."
 
+  - id: J9
+    epic: release-infrastructure
+    title: "End-to-end CSV -> Neo4j load integration test via testcontainers (opt-in, Docker-gated)"
+    type: task
+    module: drydocs-load
+    phase: 8
+    agent: main
+    model: sonnet
+    priority: p3
+    status: todo
+    depends_on: []
+    inputs: [tests/, drydocs/loaders/, drydocs/data/samples/, pyproject.toml]
+    acceptance: >
+      An integration-marked pytest module spins a testcontainers[neo4j] instance, runs
+      bootstrap + the M3 sample chain (bundled CSVs, no Oracle) end-to-end, and asserts
+      the m3-verify invariants against the loaded graph — covering the Cypher-execution
+      path (Neo4jClient.run/run_script + loader cypher) the unit suite never executes.
+      Auto-SKIPS (never fails) when Docker is unavailable; excluded from the default
+      `pytest tests/unit -q` run so its timing is unchanged; how-to-run documented
+      (README or run-drydocs SKILL). Full unit suite stays green.
+    notes: >
+      Promoted 2026-07-11 under the "groom remaining non-HITL items" directive — parked
+      since the 2026-07-01 review; testcontainers[neo4j] verified an unused dev dep
+      2026-07-09. No HITL surface: sample CSVs + existing loaders only, no new edge
+      meanings.
+
   - id: C7
     epic: ontology-mapping
     title: "Structured map fields at the next gate: vocab_id required, capture taxonomy-or-waived"
@@ -2133,8 +2191,8 @@ items:
 # Roll-up the dispatcher can glance at. COMPUTED views — test_backlog.py enforces
 # that these match the items exactly; update them with any status change.
 summary:
-  todo: 23                                          # G9 pulled in_progress 2026-07-10 (re-tiered opus -> fable on touch)
+  todo: 25                                          # +G11 (lineage coverage accounting), +J9 (testcontainers e2e) — 2026-07-11 groom
   in_progress: 6                                   # E1, F1, F2, K2, P2 (awaiting HITL), O1 (web design pass)
   blocked: 0
   done: 48                                          # G9 depgraph lineage re-home DONE 2026-07-11
-  next_ready: [C5, J2, J4, J5, J6, L7, L8, L9, M2, M3, M4, N2, P1, J7, J8, C7, K4, K5, G10]  # G9 pulled
+  next_ready: [C5, J2, J4, J5, J6, L7, L8, L9, M2, M3, M4, N2, P1, J7, J8, C7, K4, K5, G10, G11, J9]  # G11 (G9 done), J9 (no deps)

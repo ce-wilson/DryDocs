@@ -26,17 +26,15 @@ Tags help grooming: `idea` · `bug` · `doc` · `source` (new data source) · `q
 
 <!-- add new ideas at the top -->
 
-- 2026-07-10 — [idea] **/tech-debt review of port/depgraph-lineage-rehome (G9 slice 1)** — verdict:
-  clean re-home (shared-parser AST guard, gate-bound vocab discipline, boundary registered);
-  4 findings for the next G9 slice: (1) ~~ProcessNode.host~~ **FIXED same day**: renamed
-  `node_target` w/ polymorphic semantics (gate controlm-hosts-topology), legacy-`host`
-  from_dict shim + regression test; (2) the extractor's CSV column contract duplicates
-  controlm_jobs.sql aliases as strings with SILENT-drop failure — extend N2's SQL SELECT-list
-  drift guard to cover it; (3) extractor has no coverage accounting (stale/nameless/no-target
-  skips are silent — the STG_PARSE_QUALITY / UNMATCHED house rule says report, never drop);
-  (4) ~~SCHEMA_COMPAT sunset~~ **FIXED same day** (sunset comment: shrink to {SCHEMA} at G9
-  close). Cosmetic docstring ~~`#proc#`~~ also fixed. REMAINING to groom: (2) CSV-contract
-  drift guard (fold into N2) + (3) extractor coverage accounting.
+- 2026-07-11 — [idea] **Lineage live-load gate session** (captured at the G9 close). The Fork-3
+  writer is built and REFUSES by design: the four vocabulary entries (m3_invokes / m3_triggers /
+  m3_reads_from / m3_writes_to) are `status: planned`, so `write_curated` raises
+  GateBoundVocabularyError until the HITL gate flips them active. When the SME schedules that
+  gate: review a `plan_curated` output + the lineage-review page for a real extract, confirm
+  the vocabulary (and the writer's Script.path key + DataAsset URN mapping), flip statuses,
+  first live curated write. HITL-dependent — groom into an item when the gate is scheduled.
+  Refs: 0002-C §4/§7, drydocs_lineage/writer.py, tests/unit/test_lineage_writer.py (the gate
+  test flips deliberately at activation).
 
 - 2026-07-10 — [idea] **Remediation next slices — tracked in the TDD, not itemized here**
   (captured at the G3 close, same day). What remains after G3/0002-B closed: the Tier-2
@@ -105,13 +103,31 @@ Tags help grooming: `idea` · `bug` · `doc` · `source` (new data source) · `q
   an app). Cosmetic; hide or restructure later.- [idea] cli.py regroup: split the 937-line flat command list into domain subcommand groups
   (schema/ingest/verify/variables) — NOT milestone names; rename m1-verify/m3-verify →
   verify-reference/verify-controlm with deprecation aliases at the v1.0 window. (same review)
-- [idea] Integration tests: testcontainers[neo4j] is already a dev dep but unused — one end-to-end
-  CSV→Neo4j load test would cover the untested Cypher-execution path. (same review; verified
-  unused + kept parked in the 2026-07-09 groom.)
 
 ## Recently groomed (audit trail)
 
 <!-- when you promote an idea, move its line here with the resulting backlog id -->
+
+- 2026-07-11 groom run (G9-close session; directive: groom the remaining NON-HITL items) —
+  2 promoted / 1 merged / 1 inboxed:
+  - [idea] G9 tech-debt finding #3 (extractor coverage accounting — stale/nameless/no-target
+    skips are silent) → **G11** (drydocs-lineage, phase 6; ready — G9 done). Report, never
+    drop: the STG_PARSE_QUALITY / UNMATCHED house rule applied to the candidate side.
+  - [idea] G9 tech-debt finding #2 (extractor CSV column contract duplicates controlm_jobs.sql
+    aliases as strings, silent-drop on alias rename) → **MERGED into N2** (the SQL SELECT-list
+    drift guard gains the extractor as a second consumer of the same list). The 2026-07-10
+    tech-debt line is fully dispositioned (#1/#4 fixed same day, #2→N2, #3→G11) and retires.
+  - [idea] testcontainers end-to-end CSV→Neo4j load test (parked since 2026-07-01) → **J9**
+    (drydocs-load, phase 8; ready — no deps, no HITL surface). Covers the never-executed
+    Cypher path; opt-in + Docker-gated so the unit suite is untouched.
+  - inboxed: the lineage live-load gate session (HITL-dependent by definition — the Fork-3
+    writer's refusal IS the gate; groom when the SME schedules it).
+  - kept parked, unchanged (each on its recorded non-HITL-groomable gate): remediation next
+    slices (OQ-2/OQ-4 + company-side), Phase C packaging (plan gate), Workbench (entitlement),
+    SchedulerKind → AisCapability/AiTool (SME class definitions = HITL), BRD outline (later
+    phase, user call), docmeta P1–P3 (P0 written verdict + ADR 0004), EE container password
+    (user deferred), LLM key strategy (open user question), common/ in /list-apps (cosmetic),
+    cli.py regroup (v1.0 rename window).
 
 - 2026-07-10 groom run (G3-close session) — 0 promoted / 1 inboxed / 1 kept-updated / 0 merged:
   - inboxed: remediation next slices (Tier-2 FR-REM-4 gated on OQ-2/OQ-4; XML I/O on schema
