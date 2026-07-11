@@ -86,6 +86,12 @@ Oracle mode:
 poetry run drydocs ingest-controlm --use-oracle --folder-filter "CCB_AUTO_%"
 ```
 
+**SQL logging (HITL trail):** every `--use-oracle` extract writes a per-run log —
+run metadata → handshake → the exact SQL (binds rendered for review; execution stays
+parameterized) → the CSV result — to `SPIDERP_LOGDIR` (default `~/logs/DryDocs`,
+outside the repo, never committed). One log per ingest stage; the console echoes
+`[sql-log] log: <path>`. Full guide: `docs/oracle-sql-logging.md`.
+
 ## Run (human path)
 
 Same as agent path — DryDocs is pure CLI with no interactive TUI or GUI. Commands complete and return.

@@ -181,7 +181,9 @@ def _csv_adapter(csv_path: Path) -> CsvAdapter:
     return CsvAdapter(csv_path)
 
 
-def _oracle_adapter(query: str, bind_params: dict | None = None) -> OracleAdapter:
+def _oracle_adapter(
+    query: str, bind_params: dict | None = None, name: str | None = None
+) -> OracleAdapter:
     _, oracle_cfg, _ = load_settings()
     if not oracle_cfg.configured:
         console.print("[red]Oracle not configured.[/]")
@@ -192,6 +194,7 @@ def _oracle_adapter(query: str, bind_params: dict | None = None) -> OracleAdapte
         dsn=oracle_cfg.dsn,
         query=query,
         bind_params=bind_params,
+        name=name,
     )
 
 
@@ -593,7 +596,7 @@ def ingest_controlm(
         for stage_name, cls, sample_csv, sql_file in stages:
             if use_oracle:
                 sql = (SQL_DIR / sql_file).read_text(encoding="utf-8")
-                adapter = _oracle_adapter(sql, scope)
+                adapter = _oracle_adapter(sql, scope, name=sql_file)
             else:
                 sample = samples_dir / sample_csv
                 adapter = _csv_adapter(sample)
@@ -800,7 +803,10 @@ def analyze_variables(
     """
     if use_oracle:
         sql = (SQL_DIR / "controlm_variables.sql").read_text(encoding="utf-8")
-        adapter = _oracle_adapter(sql, _scope_binds(folder, run_as, developer_sid, row_cap))
+        adapter = _oracle_adapter(
+            sql, _scope_binds(folder, run_as, developer_sid, row_cap),
+            name="controlm_variables.sql",
+        )
     else:
         adapter = CsvAdapter(csv_path, delimiter=delimiter)
         if not csv_path.exists():
@@ -959,7 +965,10 @@ def normalize_variables(
 
     if use_oracle:
         sql = (SQL_DIR / "controlm_variables.sql").read_text(encoding="utf-8")
-        adapter = _oracle_adapter(sql, _scope_binds(folder, run_as, developer_sid, row_cap))
+        adapter = _oracle_adapter(
+            sql, _scope_binds(folder, run_as, developer_sid, row_cap),
+            name="controlm_variables.sql",
+        )
     else:
         if not csv_path.exists():
             console.print(f"[red]File not found: {csv_path}[/]")
