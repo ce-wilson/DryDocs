@@ -3,7 +3,7 @@
 Reads a CSV export of ``psgmgr.CM_DEF_VJOB`` (the projection in the load side's
 ``controlm_jobs.sql``) and turns each current-version job into a
 :class:`~drydocs_lineage.model.ProcessNode` carrying the authoritative
-job/cmd/host/run_as/folder/application. It then parses each CMD_LINE — via the
+job/cmd/node_target/run_as/folder/application. It then parses each CMD_LINE — via the
 SHARED core parser, ``drydocs_core.controlm.parse_command`` (the depgraph fork is
 gone; 0002-C §3/G8) — to find the *next lower dependency*, the script/executable the
 job launches, and links it with an ``INVOKES`` rel (m3_invokes, prov:used). Shared
@@ -17,7 +17,9 @@ Column contract (CSV header == controlm_jobs.sql aliases):
     job_id, version_serial, folder_id, job_name, parent_table, application,
     owner, author, node_id, cmd_line, is_current_version, ...   (extras ignored)
 Mapping → ProcessNode:
-    node_id→host   owner→run_as   job_name→name   parent_table→folder
+    node_id→node_target (POLYMORPHIC: host group OR hard-coded host — gate
+    controlm-hosts-topology; resolved by the Epic P RUNS_ON pass, not here)
+    owner→run_as   job_name→name   parent_table→folder
     application→application   cmd_line→command
 """
 from __future__ import annotations
@@ -87,7 +89,7 @@ class ControlMInventoryExtractor:
             kind="controlm_job",
             name=job_name,
             command=cmd,
-            host=(row.get("node_id") or "").strip(),
+            node_target=(row.get("node_id") or "").strip(),
             run_as=(row.get("owner") or "").strip(),
             folder=folder,
             application=(row.get("application") or "").strip(),

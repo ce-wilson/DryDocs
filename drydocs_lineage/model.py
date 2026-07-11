@@ -6,7 +6,7 @@ The depgraph prototype's *lineage layer*, reconciled to DryDocs identity and ont
   ``(folder_id, job_id)`` (``constraints.cypher: controlmjob_key``) — the same
   ``folder_id.job_id`` key the prototype used. Invoked artifacts key on their
   canonicalized target; data assets on ``(kind, location)`` (the D1 ``assetId``
-  proxy-key shape). Ids are namespaced (``#proc#`` / ``#data#``) so rel endpoints
+  proxy-key shape). Ids are namespaced (``proc#`` / ``data#``) so rel endpoints
   resolve unambiguously across the two registries.
 - **Ontology.** The typed rels are the ALREADY-REGISTERED gate-bound vocabulary
   entries (all ``status: planned`` — nothing here activates them):
@@ -27,7 +27,9 @@ from __future__ import annotations
 from dataclasses import asdict, dataclass, field
 
 SCHEMA = "drydocs.lineage-graph.v1"
-#: accepted on load: our schema + the depgraph prototype's (lineage sections only)
+#: accepted on load: our schema + the depgraph prototype's (lineage sections only).
+#: SUNSET: the prototype spelling dies at G9 close — once the last depgraph export
+#: is re-imported, shrink this to {SCHEMA} (tech-debt review 2026-07-10, F4).
 SCHEMA_COMPAT = {SCHEMA, "depgraph-machine-first/v2"}
 
 #: typed relationship labels — the registered (planned, gate-bound) vocabulary
@@ -51,7 +53,12 @@ class ProcessNode:
     kind: str             # "controlm_job" | "shell" | "spark_job" | "sql" | ...
     name: str             # job name or script basename
     command: str = ""     # the raw command line (Control-M jobs)
-    host: str = ""        # server it runs on (Control-M CM_DEF_VJOB.NODE_ID)
+    node_target: str = ""  # Control-M CM_DEF_VJOB.NODE_ID — POLYMORPHIC per gate
+                           # controlm-hosts-topology (2026-07-09): a host GROUP in
+                           # the common case (load-balanced across CM_HOSTS members,
+                           # group match wins) or a hard-coded agent host. NOT
+                           # reliably "the server it runs on" — resolution is the
+                           # Epic P RUNS_ON pass; reruns stick to the first host.
     run_as: str = ""      # system user OR software agent (Control-M OWNER / FID)
     path: str = ""        # script/artifact path, once resolved
     folder: str = ""      # Control-M folder (PARENT_TABLE) — review grouping
@@ -131,6 +138,9 @@ class LineageGraph:
         for p in data.get("processes", []):
             p = dict(p)
             p.pop("project", None)  # depgraph multi-repo field — dropped on re-home
+            if "host" in p:         # legacy key (prototype + pre-rename v1) → node_target
+                p.setdefault("node_target", p.pop("host") or "")
+                p.pop("host", None)
             g.add_process(ProcessNode(**p))
         for d in data.get("data_assets", []):
             d = dict(d)

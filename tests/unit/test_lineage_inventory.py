@@ -72,7 +72,7 @@ def test_stale_version_skipped(graph: LineageGraph) -> None:
 
 def test_field_mapping(graph: LineageGraph) -> None:
     job = next(p for p in graph.processes.values() if p.name == "PEX_SPARK_REFINE")
-    assert job.host == "host-emr-01"      # node_id -> host
+    assert job.node_target == "host-emr-01"  # node_id -> node_target (host-or-group; gate controlm-hosts-topology)
     assert job.run_as == "svc.hldm"       # owner -> run_as
     assert job.application == "ARA"
     assert job.folder.startswith("PRARAG-HLDM-90001")
@@ -97,6 +97,25 @@ def test_rel_vocabulary_is_the_registered_set() -> None:
     g.add_rel("proc#a:1", "READS", "data#b:2")
     assert g.rels == {("proc#a:1", "READS_FROM", "data#b:2")}
     assert REL_ALIASES == {"READS": "READS_FROM", "WRITES": "WRITES_TO"}
+
+
+def test_legacy_host_key_normalizes_to_node_target() -> None:
+    """Prototype exports (and pre-rename v1 files) carry `host`; from_dict must
+    normalize it to node_target — the polymorphic NODE_ID target (gate
+    controlm-hosts-topology: host GROUP in the common case, not a server)."""
+    from drydocs_lineage.model import LineageGraph
+
+    g = LineageGraph.from_dict({
+        "schema": "depgraph-machine-first/v2",
+        "processes": [{
+            "node_id": "proc#controlm_job:1.2", "kind": "controlm_job",
+            "name": "J", "host": "SOME-GROUP", "project": "dropped",
+        }],
+        "data_assets": [], "rels": [],
+    })
+    job = g.processes["proc#controlm_job:1.2"]
+    assert job.node_target == "SOME-GROUP"
+    assert not hasattr(job, "host")
 
 
 def test_no_parse_code_of_its_own() -> None:

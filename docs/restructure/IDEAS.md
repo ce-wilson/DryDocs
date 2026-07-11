@@ -28,15 +28,15 @@ Tags help grooming: `idea` · `bug` · `doc` · `source` (new data source) · `q
 
 - 2026-07-10 — [idea] **/tech-debt review of port/depgraph-lineage-rehome (G9 slice 1)** — verdict:
   clean re-home (shared-parser AST guard, gate-bound vocab discipline, boundary registered);
-  4 findings for the next G9 slice: (1) `ProcessNode.host` documents NODE_ID as "server it runs
-  on" but the SIGNED-OFF controlm-hosts-topology gate made NODE_ID polymorphic (host GROUP in
-  the common case, group wins) — re-document/rename before consumers key on it, align with
-  Epic P's RUNS_ON resolution; (2) the extractor's CSV column contract duplicates
+  4 findings for the next G9 slice: (1) ~~ProcessNode.host~~ **FIXED same day**: renamed
+  `node_target` w/ polymorphic semantics (gate controlm-hosts-topology), legacy-`host`
+  from_dict shim + regression test; (2) the extractor's CSV column contract duplicates
   controlm_jobs.sql aliases as strings with SILENT-drop failure — extend N2's SQL SELECT-list
   drift guard to cover it; (3) extractor has no coverage accounting (stale/nameless/no-target
   skips are silent — the STG_PARSE_QUALITY / UNMATCHED house rule says report, never drop);
-  (4) SCHEMA_COMPAT's depgraph-machine-first/v2 shim needs a sunset criterion (G9 close?).
-  Cosmetic: model docstring says `#proc#`/`#data#`, helpers emit `proc#`/`data#`.
+  (4) ~~SCHEMA_COMPAT sunset~~ **FIXED same day** (sunset comment: shrink to {SCHEMA} at G9
+  close). Cosmetic docstring ~~`#proc#`~~ also fixed. REMAINING to groom: (2) CSV-contract
+  drift guard (fold into N2) + (3) extractor coverage accounting.
 
 - 2026-07-10 — [idea] **Remediation next slices — tracked in the TDD, not itemized here**
   (captured at the G3 close, same day). What remains after G3/0002-B closed: the Tier-2
