@@ -80,6 +80,14 @@ class Invocation:
     is_classified: bool
     classifier_rule: str | None
 
+    @property
+    def target(self) -> str:
+        """Best identifier for the launched artifact: script, else executable,
+        else the raw statement — what lineage/deepdoc key the child node on.
+        (Folded from the depgraph prototype at the G9 re-home, ADR 0002-C §3 —
+        the fold's API delta; shared by C2/C3, so it lives in core.)"""
+        return self.script_path or self.executable_path or self.raw_command
+
 
 @dataclass(frozen=True)
 class FileOp:

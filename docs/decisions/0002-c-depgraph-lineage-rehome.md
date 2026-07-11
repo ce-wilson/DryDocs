@@ -1,7 +1,7 @@
 # ADR 0002-C — `depgraph@feat/controlm-lineage` → `drydocs-lineage` re-home plan
 
 ```yaml
-status: PLANNED         # PLANNED | IN_PROGRESS | DONE
+status: IN_PROGRESS     # PLANNED | IN_PROGRESS | DONE — G9 pulled 2026-07-10; asset re-home underway (branch port/depgraph-lineage-rehome)
 date: 2026-06-29
 companion_to: docs/decisions/0002-component-database-topology.md   # ADR 0002, D2 (drydocs-lineage)
 depends_on: docs/decisions/0002-a-drydocs-core-extraction-plan.md  # core must exist first
@@ -59,14 +59,14 @@ depgraph-side stays a fork.
 ## 2. Preconditions (do not start the asset re-home until all true)
 
 - [x] ADR 0002 **ACCEPTED** (2026-06-26 SME gate).
-- [ ] `drydocs-core` extraction (0002-A / backlog **G2**) is **DONE** — the core parser surface
+- [x] `drydocs-core` extraction (0002-A / backlog **G2**) is **DONE** — the core parser surface
       (`resolve_job`, `extract_container_command`, `Invocation`/`FileOp`, models, adapters) is
-      importable as `drydocs_core.*`. *(G2 is at STEP 1 — the re-export shim; physical relocate is
-      deferred until core stabilizes. The parser-delta fold (§3) can land before that; the asset
-      re-home (§4) needs the scaffolded `lineage/` package from **G4**.)*
-- [ ] Read access to `ce-wilson/depgraph@feat/controlm-lineage` confirmed; treat it as
+      importable as `drydocs_core.*`. *(Physical relocate merged `0546e21` 2026-07-10, thin
+      variant per 0002-A-1; G4 scaffolded `drydocs_lineage/` the same day; G8's parser deltas
+      were verified present in core during the G3 archive diff.)*
+- [x] Read access to `ce-wilson/depgraph@feat/controlm-lineage` confirmed; treat it as
       **source material**, not a merge base (histories are disjoint; this is a re-home, not a
-      cherry-pick).
+      cherry-pick). *(Cloned read-only to the session scratchpad, 2026-07-10.)*
 
 ## 3. Parser-delta fold (depgraph → `drydocs-core`) — backlog **G8**
 
