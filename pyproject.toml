@@ -4,7 +4,7 @@ version = "0.3.0"
 description = "Production support inventory + data product knowledge graph for D&A batches."
 authors = ["Production Support Team"]
 readme = "README.md"
-packages = [{ include = "drydocs" }, { include = "drydocs_core" }, { include = "drydocs_remediation" }]
+packages = [{ include = "drydocs" }, { include = "drydocs_core" }, { include = "drydocs_remediation" }, { include = "drydocs_lineage" }, { include = "drydocs_deepdoc" }]
 
 [tool.poetry.dependencies]
 python = "^3.11"

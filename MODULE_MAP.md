@@ -53,8 +53,8 @@
 | `drydocs/doc_outline.py` | `drydocs-docgen` — canonical doc-outline completeness + traceability validator (Epic L) | — (pure; validates docs) |
 | `drydocs/design_doc.py` | `drydocs-docgen` — deterministic Markdown→HTML/print.html renderer (Epic L) | `docs/design/*.{html,print.html}` |
 | `drydocs/doc_pdf.py` | `drydocs-docgen` — headless-Chromium print.html→PDF (Brave-first), date-normalized (Epic L) | `docs/design/*.pdf` (build-on-demand) |
-| *(future)* `drydocs-lineage` | C2 — curated cmd-line lineage | `drydocs` |
-| *(future)* `drydocs-deepdoc` | C3 — on-demand deep dive | `drydocs_context` |
+| `drydocs_lineage/**` | `drydocs-lineage` (C2) — proactive/curated cmd-line lineage on the shared core parser (scaffolded 2026-07-10, G4; populated by the depgraph re-home, G9/0002-C) | `drydocs` (curated/CONFIRMED only; `writer.py` is the sole write boundary) |
+| `drydocs_deepdoc/**` | `drydocs-deepdoc` (C3) — reactive on-failure deep dive on the shared core parser (scaffolded 2026-07-10, G4) | `drydocs_context` (reliability/trust stamped; proxy-node keys; `writer.py` sole boundary; promotion = HITL gate, never cross-DB edit) |
 | `drydocs_remediation/**` | `drydocs-remediation` (C1) — detect → transform → prove → Jira (ADR 0002-B; scaffolded 2026-07-10, in-monorepo per 0002-A-1) | — (**no graph write**; Jira = SoR; the `jira.py` module is the only side-effect boundary) |
 
 > **`drydocs-review` note.** All review modules own a run cadence or do external I/O, so

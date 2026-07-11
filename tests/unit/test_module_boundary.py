@@ -26,6 +26,8 @@ PKG_ROOTS = [
     REPO_ROOT / "drydocs",
     REPO_ROOT / "drydocs_core",
     REPO_ROOT / "drydocs_remediation",
+    REPO_ROOT / "drydocs_lineage",
+    REPO_ROOT / "drydocs_deepdoc",
 ]
 
 # Dotted prefixes that make up drydocs-core (see MODULE_MAP.md). Since the Phase B
@@ -66,6 +68,16 @@ COMPONENT_GROUPS: dict[str, tuple[str, ...]] = {
     # Writes NO graph; Jira is the SoR; imports only drydocs_core.
     "remediation": (
         "drydocs_remediation",
+    ),
+    # drydocs-lineage — proactive/curated cmd-line lineage → drydocs (ADR 0002 D2 C2, G4).
+    "lineage": (
+        "drydocs_lineage",
+    ),
+    # drydocs-deepdoc — reactive on-failure deep dive → drydocs_context with
+    # reliability/trust stamps (ADR 0002 D2 C3, G4). Never imports lineage — the
+    # components-don't-import-each-other test IS the D2 separation.
+    "deepdoc": (
+        "drydocs_deepdoc",
     ),
 }
 ALL_COMPONENT_PREFIXES: tuple[str, ...] = tuple(
