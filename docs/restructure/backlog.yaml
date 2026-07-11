@@ -773,6 +773,20 @@ items:
       Parser is dropped (already in core via G8). Validate the ProcessNode/DataAsset -> DCAT/PROV/SWO
       mapping with neo4j-modeling before authoring load Cypher with neo4j-cypher (MERGE, UNWIND, no
       CYPHER 25). On done: mark depgraph PR #2 superseded for the lineage assets in ADR 0002 rollout.
+      RE-TIERED opus -> fable 2026-07-10 on pull (groom-touch policy).
+    progress: >
+      2026-07-10 — PULLED; branch port/depgraph-lineage-rehome (external-work-in rule); 0002-C
+      preconditions ticked; depgraph@feat/controlm-lineage cloned read-only (tip 5b09a0d). SLICE 1
+      DONE (29faffe): model.py ported (lineage layer only; identity = ControlMJob NODE-KEY
+      composite; rels normalized to the REGISTERED planned vocabulary m3_invokes/m3_triggers/
+      m3_reads_from/m3_writes_to — no new edge types invented; code layer left behind) +
+      extractors/controlm_inventory.py (shared core parser; scaffold extract.py superseded).
+      Core fold delta #4: Invocation.target property + regression test (0002-C §3 rule). Oracle
+      ported + GREEN against core (ADR count correction recorded: real figures 4 jobs / 7
+      processes / 4 INVOKES); §5 gates: shared-parser, boundary, parser-equivalence, suite all
+      ticked; ground-truth-only pends the writer. Suite 532/3. REMAINING for G9 close: review.py
+      (html_review port), collect/ port, Fork-3 writer build (rel vocab gate-bound — no live
+      load before the HITL gate), 0002-C DONE + depgraph PR #2 superseded record, merge --no-ff.
 
   - id: G5
     epic: component-topology
