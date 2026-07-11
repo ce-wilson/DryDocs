@@ -63,10 +63,11 @@ if ($m.Success) { $pr = [int]$m.Groups[1].Value }
 Pop-Location
 
 # --- scan + name -------------------------------------------------------------
-# Code graph spans all three packages since the Phase B relocate (ADR 0002-A-1,
-# 2026-07-10): drydocs (components) + drydocs_core + drydocs_remediation.
+# Code graph spans every top-level package since the Phase B relocate (ADR
+# 0002-A-1, 2026-07-10): drydocs (components) + drydocs_core + drydocs_remediation
+# + drydocs_lineage + drydocs_deepdoc (G4/G9, 2026-07-11).
 if ($Tree) { $targets = @($repo);                       $tag = "-tree" }
-else       { $targets = @("$repo\drydocs","$repo\drydocs_core","$repo\drydocs_remediation","$repo\tests"); $tag = "" }
+else       { $targets = @("$repo\drydocs","$repo\drydocs_core","$repo\drydocs_remediation","$repo\drydocs_lineage","$repo\drydocs_deepdoc","$repo\tests"); $tag = "" }
 $date = Get-Date -Format "yyyyMMdd"
 $out  = Join-Path $here ("{0}{1}-{2}.json" -f $Project, $tag, $date)
 if (Test-Path $out) { $out = Join-Path $here ("{0}{1}-{2}-{3}.json" -f $Project, $tag, $date, (Get-Date -Format "HHmm")) }
