@@ -694,9 +694,9 @@ items:
     module: drydocs-lineage
     phase: 6
     agent: main
-    model: opus
+    model: fable
     priority: p3
-    status: todo
+    status: in_progress
     depends_on: [G1, G2]
     inputs: [docs/decisions/0002-component-database-topology.md, drydocs_core/controlm/commands.py]
     acceptance: >
@@ -2096,8 +2096,8 @@ items:
 # Roll-up the dispatcher can glance at. COMPUTED views — test_backlog.py enforces
 # that these match the items exactly; update them with any status change.
 summary:
-  todo: 25                                          # G10 unblocks (G3 done)
-  in_progress: 6                                   # E1, F1, F2, K2, P2 (awaiting HITL), O1 (web design pass)
+  todo: 24                                          # G4 pulled in_progress 2026-07-10 (re-tiered opus -> fable on touch)
+  in_progress: 7                                   # E1, F1, F2, K2, P2 (awaiting HITL), O1 (web design pass), G4 (lineage/deepdoc scaffold)
   blocked: 0
   done: 46                                          # G3 spinoff rebase DONE 2026-07-10 (0002-B; archive superseded)
-  next_ready: [C5, J2, J4, J5, J6, L7, L8, L9, M2, M3, M4, N2, P1, J7, J8, C7, K4, K5, G4, G10]  # G3 done -> G10 ready
+  next_ready: [C5, J2, J4, J5, J6, L7, L8, L9, M2, M3, M4, N2, P1, J7, J8, C7, K4, K5, G10]  # G4 pulled
