@@ -1,5 +1,10 @@
 # Tech-debt audit — the taxonomy→ontology mapping layer
 
+> **TRACKING (2026-07-11):** findings F1–F4 EXECUTED pre-groom (`c396d75`, `ede0b94`);
+> the remaining structured-fields work rides backlog **C7** (vocab_id required +
+> capture taxonomy-or-waived at the next gate), `todo`/ready — gate-timed by design.
+> This report is the rationale record, not the open-work list.
+
 **Date:** 2026-07-09 · **Scope:** `config/taxonomy-ontology-map.yaml`,
 `drydocs/ontology/relationship_vocabulary.yaml`, `config/taxonomy/*`, the schema
 supplements, and the guards (`tests/unit/test_schema.py`) · **Method:** `/tech-debt`

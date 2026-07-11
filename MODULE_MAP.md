@@ -47,13 +47,15 @@
 | `drydocs/graph_verify.py` | `drydocs-review` — data-driven Cypher acceptance runner (Epic H) | — (reads graph; asserts) |
 | `drydocs/review_labels.py` | `drydocs-review` — the review spine (source→DATA-label map); consumed by review | — (pure config) |
 | `drydocs/source_mappings.py` | `drydocs-review` — per-source column ledger accessor (doc 08); projected/filter-only/excluded/deferred disposition per profiled column | — (pure config) |
-| *(future H2)* `drydocs/graph_review.py` | `drydocs-review` — renders live-graph rows → SME review HTML | — (reads graph; writes HTML) |
-| *(future H5)* `drydocs/publishing/**` | `drydocs-review` — docs publish pipeline (Confluence push abstracted) | external (docs target) |
+| `drydocs/graph_review.py` | `drydocs-review` — renders live-graph rows → SME review HTML (H2) | — (reads graph; writes HTML) |
+| `drydocs/sme_notes.py` | `drydocs-review` — SME-notes harvester: owner-attributed inline `SME[sid] $FR/$UC/$OQ/$NOTES` comments → requirement buckets (Epic H) | — (scans repo; reports) |
+| `drydocs/gate_pages.py` | `drydocs-review` — HITL SME-gate prompt-page generator (load-step spec → self-contained interactive review page; repo stays the system of record) | gate pages (offline HTML) |
+| `drydocs/publishing/**` | `drydocs-review` — docs publish pipeline (Confluence push abstracted, H5) | external (docs target) |
 | `drydocs/plan_board.py` | `drydocs-plan` — backlog.yaml → HTML project board renderer (Epic I) | `docs/plan/board.html` |
 | `drydocs/doc_outline.py` | `drydocs-docgen` — canonical doc-outline completeness + traceability validator (Epic L) | — (pure; validates docs) |
 | `drydocs/design_doc.py` | `drydocs-docgen` — deterministic Markdown→HTML/print.html renderer (Epic L) | `docs/design/*.{html,print.html}` |
 | `drydocs/doc_pdf.py` | `drydocs-docgen` — headless-Chromium print.html→PDF (Brave-first), date-normalized (Epic L) | `docs/design/*.pdf` (build-on-demand) |
-| `drydocs_lineage/**` | `drydocs-lineage` (C2) — proactive/curated cmd-line lineage on the shared core parser (scaffolded 2026-07-10, G4; populated by the depgraph re-home, G9/0002-C) | `drydocs` (curated/CONFIRMED only; `writer.py` is the sole write boundary) |
+| `drydocs_lineage/**` | `drydocs-lineage` (C2) — proactive/curated cmd-line lineage on the shared core parser (G4 scaffold; POPULATED by the depgraph re-home G9/0002-C, DONE 2026-07-11: model/extractor/review/collect/writer) | `drydocs` (curated/CONFIRMED only; `writer.py` is the sole write boundary, gate-bound until the vocab flips active) |
 | `drydocs_deepdoc/**` | `drydocs-deepdoc` (C3) — reactive on-failure deep dive on the shared core parser (scaffolded 2026-07-10, G4) | `drydocs_context` (reliability/trust stamped; proxy-node keys; `writer.py` sole boundary; promotion = HITL gate, never cross-DB edit) |
 | `drydocs_remediation/**` | `drydocs-remediation` (C1) — detect → transform → prove → Jira (ADR 0002-B; scaffolded 2026-07-10, in-monorepo per 0002-A-1) | — (**no graph write**; Jira = SoR; the `jira.py` module is the only side-effect boundary) |
 

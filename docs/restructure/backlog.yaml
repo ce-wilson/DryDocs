@@ -1183,7 +1183,7 @@ items:
 
   - id: J2
     epic: release-infrastructure
-    title: "Reconcile README's derived job→job edge: :DEPENDS_ON → :WAS_INFORMED_BY"
+    title: "README reconcile: :DEPENDS_ON → :WAS_INFORMED_BY + feature currency (lineage-review, SQL run-log)"
     type: chore
     module: docs
     phase: 8
@@ -1192,18 +1192,23 @@ items:
     priority: p3
     status: todo
     depends_on: []
-    inputs: [README.md, drydocs_core/ontology/relationship_vocabulary.yaml, drydocs/loaders/cypher/controlm_dependencies_derived.cypher]
+    inputs: [README.md, drydocs_core/ontology/relationship_vocabulary.yaml, drydocs/loaders/cypher/controlm_dependencies_derived.cypher, docs/oracle-sql-logging.md]
     acceptance: >
       README.md describes the derived job→job dependency edge as :WAS_INFORMED_BY — matching
       the loader (controlm_dependencies_derived.cypher MERGEs :WAS_INFORMED_BY) and the vocab
       (m3_was_informed_by, active, "Replaces DEPENDS_ON") — not :DEPENDS_ON; the four stale
       references (README.md:16,139,152,231) are reconciled. No loader/vocab change (README is
-      the only stale side). Tests stay green.
+      the only stale side). PLUS feature currency (merged from the 2026-07-11 documentation
+      tech-debt review, D3): the CLI reference gains `lineage-review`; the --use-oracle
+      paragraph notes the per-run SQL log (link docs/oracle-sql-logging.md); Tests highlights
+      mention the lineage suites; the ARCHITECTURE.md "Further reading" line says historical
+      rationale, not current organization. Tests stay green.
     notes: >
       Groomed 2026-07-09 from the IDEAS line (2026-07-01 Control-M naming review). Verified
       2026-07-09: loader controlm_dependencies_derived.cypher MERGEs :WAS_INFORMED_BY and vocab
       m3_was_informed_by is active + "Replaces DEPENDS_ON" — README is the stale side. Naming-
-      drift doc hygiene, same class as J1.
+      drift doc hygiene, same class as J1. MERGED 2026-07-11: README feature-currency gap
+      (docs/reviews/tech-debt-documentation.md D3) — one README pass covers both.
 
   - id: J3
     epic: release-infrastructure

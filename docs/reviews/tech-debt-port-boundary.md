@@ -1,5 +1,9 @@
 # Tech-debt audit — the publisher→consumer (port) boundary
 
+> **TRACKING (2026-07-11):** Phase 1 (PORT-MANIFEST.yaml + guard) EXECUTED `5cfcfa7`;
+> Phases 2–4 ride backlog **J7** (per-entry reconciler guards) + **J8** (skip-guard policy
+> test), both `todo`/ready. This report is the rationale record, not the open-work list.
+
 **Date:** 2026-07-09 · **Scope:** producer `ce-wilson/DryDocs` (publisher) → company
 `<org>/DryDocs` (consumer) port boundary — can the *known break points* be segregated?
 · **Method:** `/tech-debt` framework (Impact + Risk) × (6 − Effort) · **Classification:** Internal-Public

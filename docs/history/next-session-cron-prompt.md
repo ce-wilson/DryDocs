@@ -1,5 +1,9 @@
 # New Session Prompt — Cron Task: feature/oracle-ingestion build-out
 
+> **STATUS: Superseded — historical.** The oracle-ingestion stream this prompt resumes
+> shipped long ago (see the banner'd plans in `docs/reviews/`); moved here from `docs/`
+> root at the 2026-07-11 documentation tech-debt review (D6). Do not paste into a session.
+
 Paste this into a new Claude Code session (on branch `feature/oracle-ingestion`) to
 pick up where the last session ended.
 

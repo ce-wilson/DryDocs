@@ -108,6 +108,17 @@ Tags help grooming: `idea` · `bug` · `doc` · `source` (new data source) · `q
 
 <!-- when you promote an idea, move its line here with the resulting backlog id -->
 
+- 2026-07-11 — /tech-debt documentation audit (docs/reviews/tech-debt-documentation.md) —
+  0 promoted / 1 merged / 5 executed with the review / 3 deduped:
+  merged: README feature-currency gap → **J2** (title broadened; one README pass).
+  executed (D-numbers per the report): D2 login tribal-knowledge doc committed under
+  internal/ with classification; D5 MODULE_MAP drift (future-markers on shipped H2/H5
+  modules; sme_notes/gate_pages rows added; lineage row = populated); D6 stale cron prompt
+  → docs/history/ + banner; D7 root console dump → gitignored internal-local/; D8 tracking
+  headers on the two 2026-07-09 tech-debt reports.
+  deduped: skill staleness → J4; missing runbook → L8; UI-WIP → O1. Structural verdict:
+  clean — all point-in-time reviews banner'd, living docs came through the relocate clean.
+
 - 2026-07-11 groom run (G9-close session; directive: groom the remaining NON-HITL items) —
   2 promoted / 1 merged / 1 inboxed:
   - [idea] G9 tech-debt finding #3 (extractor coverage accounting — stale/nameless/no-target
