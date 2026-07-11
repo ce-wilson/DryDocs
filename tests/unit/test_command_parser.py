@@ -247,3 +247,16 @@ def test_sample_reproduces_depgraph_oracle() -> None:
     assert by_type == {"ABINITIO": 8, "SHELL_SCRIPT": 5}
     distinct_children = {inv.script_path for inv in invocations}
     assert len(distinct_children) == 12  # + 13 jobs = 25 processes
+
+
+def test_invocation_target_prefers_script_then_executable() -> None:
+    """`target` (folded from the depgraph prototype, ADR 0002-C §3) keys lineage
+    child nodes: script wins, executable is the fallback, raw statement last."""
+    from drydocs_core.controlm import parse_command
+
+    spark = parse_command(
+        "spark-submit --master yarn /opt/spark/refine_loans.py --date {ODATE}"
+    ).invocations[0]
+    assert spark.target == "/opt/spark/refine_loans.py"      # script wins over exe
+    mod = parse_command("python -m mypkg.run").invocations[0]
+    assert mod.target == "mypkg.run"

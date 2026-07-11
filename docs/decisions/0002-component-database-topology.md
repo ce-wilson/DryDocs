@@ -12,6 +12,10 @@ affects:
   - external repo: ce-wilson/DryDocs-v0-archive@controlm-spinoff — SUPERSEDED 2026-07-10
     # (G3 / 0002-B DONE: remediation re-homed as drydocs_remediation on drydocs_core;
     #  stop maintaining the archive branch — it remains readable as source material only)
+  - external repo: ce-wilson/depgraph@feat/controlm-lineage (PR #2) — SUPERSEDED 2026-07-11
+    # (G9 / 0002-C DONE: the lineage assets re-homed as drydocs_lineage on drydocs_core;
+    #  stop maintaining the branch as a lineage source — readable source material only.
+    #  depgraph's base/python-import layer is untouched by this record.)
   - deployment: Neo4j edition (Enterprise) + database provisioning
 supersedes_plan: SDLC-Docs/extracted/modular-architecture-plan.md
 ```

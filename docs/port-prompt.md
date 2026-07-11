@@ -495,6 +495,45 @@ PROCEDURE:
       rule (B1) — BOTH are company-side unblocks; the core resolver is deliberately untouched
       until then. Tier-2 agentic lane (FR-REM-4) and XML I/O are future slices per the TDD.
 
+30. LINEAGE COMPONENT STREAM — G4 SCAFFOLD + G9 / ADR 0002-C RE-HOME + THE SQL RUN-LOG PORT
+    (2026-07-10/11; commits "G4 — scaffold drydocs_lineage (C2) + drydocs_deepdoc (C3)" ->
+    "G9 slice 1 — re-home depgraph model + inventory extractor onto core" -> "0002-C slice-1
+    record" -> the port/depgraph-lineage-rehome branch commits (tech-debt inbox, node_target
+    rename, slice 2 + close) -> merge --no-ff, plus the SQL-logging merge "port/oracle-sql-run-log"
+    that landed mid-stream):
+    - NEW PACKAGES (clean-adds; canonical-producer): drydocs_lineage/ — model (ProcessNode/
+      DataAssetNode reconciled to the ControlMJob NODE-KEY composite; rels normalized to the
+      REGISTERED planned vocabulary m3_invokes/m3_triggers/m3_reads_from/m3_writes_to),
+      extractors/controlm_inventory (parses via the SHARED core parser — no fork), review
+      (self-contained SME page; CLI `drydocs lineage-review`), collect/ (RHEL run-as-user
+      collector, *.sh is LF — .gitattributes rule rides along), writer (Fork-3: plan_curated +
+      write_curated — GATE-BOUND: refuses live load while the four m3_* registry entries are
+      status: planned, and refuses any DB but drydocs). drydocs_deepdoc/ — scaffold only
+      (investigate/writer stubs; write target drydocs_context).
+    - CORE DELTAS that rode with G9 (take them; they are core changes, not component forks):
+      Invocation.target property + regression test (fold delta #4); the G8 parser deltas were
+      already in your core if you took step 28/29.
+    - SQL RUN-LOG (PARALLEL IMPLEMENTATION — read item 14 first): producer's OracleAdapter +
+      NEW drydocs_core/adapters/sql_run_log.py now tee every --use-oracle extract to a per-run
+      log (SPIDERP_LOGDIR/SPIDERP_CALLER; render display-only, execution stays parameterized;
+      born with your bind-renderer hardening). Company-side you ALREADY log via the JDBC path
+      (jdbc_oracle_adapter.py/SpiderpRunner) — take these files only if you also run the
+      python OracleAdapter path; either way DO NOT port your JDBC files back here.
+    - tests/unit/ (clean-adds): test_lineage_{inventory,review,writer}.py +
+      test_lineage_deepdoc_scaffold.py + test_sql_run_log.py + tests/fixtures/lineage/jobs.csv
+      (SYNTHETIC twin — value-fake). test_module_boundary.py gains the lineage/deepdoc
+      COMPONENT_GROUPS + PKG_ROOTS — after taking it, RE-ADD your consumer-only modules (the
+      step-28 drill). pyproject packages list gains lineage/deepdoc includes.
+    - DECISION DOCS (canonical-producer): 0002-C DONE (all §4 dispositions + §5 ticks); ADR
+      0002 affects: block records ce-wilson/depgraph@feat/controlm-lineage (PR #2, 5b09a0d)
+      SUPERSEDED for the lineage assets — company-side, stop treating that branch as live
+      lineage source. docs/oracle-sql-logging.md is the producer-path logging guide (mechanism
+      only; your JDBC guide stays yours).
+    - KNOWN-PENDING carried by design (do not "fix" during the port): write_curated refuses
+      until the HITL gate flips the vocabulary active (that refusal IS the D2 contract);
+      curation.curate is a stub (phased-cadence trigger wiring, G4-scoped future);
+      node_target is POLYMORPHIC (gate controlm-hosts-topology) — resolution is Epic P.
+
 ACCEPTANCE GATE (behavior is the contract, not a byte-compare):
 - Track 1 (portable, no production sample present):
     poetry run pytest tests/unit/test_variable_classifier.py tests/unit/test_variable_resolver.py \
