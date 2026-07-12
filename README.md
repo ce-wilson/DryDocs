@@ -13,7 +13,7 @@ The graph spans four domains, loaded by independent command chains:
 
 | Domain | Source | What it adds | Status |
 | --- | --- | --- | --- |
-| **Control-M structural lineage** | Oracle `psgmgr.*` (BMC Control-M) | `:ControlMFolder`, `:ControlMServer`, `:ControlMJob`, `:Condition`, derived `:DEPENDS_ON` | Live (see below) |
+| **Control-M structural lineage** | Oracle `psgmgr.*` (BMC Control-M) | `:ControlMFolder`, `:ControlMServer`, `:ControlMJob`, `:Condition`, derived `:WAS_INFORMED_BY` | Live (see below) |
 | **SEAL applications** | Internal SEAL extract | `:Application` (two-port: `:EventProcessing` / `:BatchProcessing`), `:Port`, `:Membership`, `:Role`, `:Employee` | Live |
 | **Catalog / PAT** | Internal product catalog | `:CatalogLOB`, `:BusinessSegment`, `:ProductLine`, `:Product`, `:AreaProduct`, `:DevTeam` + team-alignment edges | Live |
 | **Control-M variable normalization (C3/C4)** | Oracle `psgmgr` variable extract | Variable taxonomy → resolver → command parser → Oracle `DRYDOCS_STG` staging | Staging only — graph load (Phase D) not started |
@@ -86,6 +86,12 @@ for its options.
 - `analyze-variables [--resolve]` — variable-taxonomy coverage report.
 - `normalize-variables --out-dir DIR` — classify + resolve and emit the 8 `STG_*` staging CSVs.
 
+**Lineage (no Neo4j needed)**
+- `lineage-review <jobs.csv>` — render the drydocs-lineage SME review page (one
+  self-contained HTML: folder sections, job cards + INVOKES dependencies, assertion
+  panel, exportable notes). Candidates only — the curated write is gate-bound in
+  `drydocs_lineage.writer`.
+
 **Verify & ops**
 - `m1-verify` / `m3-verify` — assert domain invariants on the populated graph.
 - `snapshot` / `prune-snapshots --years N` — (re)compute / prune entity snapshots.
@@ -93,7 +99,10 @@ for its options.
 Every command that runs an Oracle extract accepts `--use-oracle` plus the scope binds
 `--folder` (folder-name LIKE pattern), `--run-as` (tenant FID/service user — `J.OWNER`),
 `--developer-sid` (human author/changer), and `--row-cap` (ROWNUM sample cap). A `None`
-bind = no filter on that dimension.
+bind = no filter on that dimension. Every `--use-oracle` extract also writes a per-run
+SQL log (run metadata → the exact SQL → CSV result) to `SPIDERP_LOGDIR` (default
+`~/logs/DryDocs`, outside the repo) so the HITL can verify what was extracted — see
+[`docs/oracle-sql-logging.md`](docs/oracle-sql-logging.md).
 
 ## Architecture
 
@@ -136,8 +145,8 @@ for the original two-bucket rationale this extends.
 
 ## Control-M structural lineage
 
-Loads BMC Control-M folder, job, and condition definitions and the derived `:DEPENDS_ON`
-dependency graph from Oracle (`psgmgr.*`). **Structural only** — this pass does not ingest
+Loads BMC Control-M folder, job, and condition definitions and the derived `:WAS_INFORMED_BY`
+dependency graph (the registered m3_was_informed_by edge — replaces the older DEPENDS_ON name) from Oracle (`psgmgr.*`). **Structural only** — this pass does not ingest
 execution history.
 
 ### What it delivers
@@ -149,7 +158,7 @@ execution history.
 **Conditions + derived dependencies**
 - **`controlm_conditions_in.py`** — loads `psgmgr.CM_DEF_LNKI_P_VW`. Creates `:Condition:Entity` nodes (key `(folder_id, name)`) and `:REQUIRES_IN_CONDITION` edges with boolean-expression metadata (`AND_OR`, `PARENTHESES`, `ORDER_`).
 - **`controlm_conditions_out.py`** — loads `psgmgr.CM_DEF_LNKO_P_VW`. Reuses the same `:Condition` nodes; creates `:EMITS_OUT_CONDITION` edges with the `SIGN` operator (`+`/`-`).
-- **`controlm_dependencies_derived.py`** — materializes `:DEPENDS_ON` edges from the recursive predecessor SQL. Each edge carries `via_condition`, `recursion_level`, and `dependency_path`. Cycle-safe by construction (path-`INSTR` guard in the SQL).
+- **`controlm_dependencies_derived.py`** — materializes `:WAS_INFORMED_BY` edges from the recursive predecessor SQL. Each edge carries `via_condition`, `recursion_level`, and `dependency_path`. Cycle-safe by construction (path-`INSTR` guard in the SQL).
 - **`controlm_dependencies_recursive.sql`** — the canonical Oracle recursive CTE. Walks backwards from a successor through condition matching; cyclic-type matching intentionally disabled; recursion cap of 10 with full-path cycle detection.
 
 ### File map
@@ -228,7 +237,7 @@ fixture.)
 | M3 local anchor terms seeded                      | yes | n=3 (expect >= 3 ...)           |
 | active folders contain at least one job          | no* | empty=2 total=7 (sample gap)    |
 | no orphan conditions                              | yes | orphan=0 total=15               |
-| DEPENDS_ON edges have recursion_level + path     | yes | total=10 missing_level=0 ...    |
+| WAS_INFORMED_BY edges have recursion_level + path | yes | total=10 missing_level=0 ...    |
 +--------------------------------------------------+-----+---------------------------------+
 ```
 
@@ -299,10 +308,12 @@ Coverage highlights:
 - `test_controlm_models.py` / `test_controlm_cypher.py` — structural-lineage row models and Cypher (idempotent `UNWIND $batch` + MERGE; `SCHED_TABLE` on the folder side; shared `:Condition` key; recursive SQL cycle guard).
 - `test_variable_classifier.py` / `test_variable_resolver.py` / `test_variable_staging.py` / `test_command_parser.py` — the C3/C4 normalization stream. A few sample-backed tests skip when the production CSV is absent.
 - `test_schema.py`, `test_namespaces.py`, `test_folder_name_parser.py`, `test_base_loader_smoke.py` — schema/ontology and loader-core guards.
+- `test_lineage_inventory.py` / `test_lineage_review.py` / `test_lineage_writer.py` — the drydocs-lineage component (shared-parser oracle, SME page, gate-bound Fork-3 writer + ground-truth-only boundary).
+- `test_sql_run_log.py` — the per-extract SQL log + display-only bind renderer (code-regions-only substitution pinned byte-identical on the recursive extract).
 
 ## Further reading
 
-- [`knowledge/ARCHITECTURE.md`](knowledge/ARCHITECTURE.md) — repo organization + tuning plan.
+- [`knowledge/ARCHITECTURE.md`](knowledge/ARCHITECTURE.md) — the original repo-organization rationale (historical; the current boundary is [`MODULE_MAP.md`](MODULE_MAP.md) + `CLAUDE.md`).
 - [`docs/controlm-loader-flow.md`](docs/controlm-loader-flow.md) — Control-M loader walkthrough.
 - [`knowledge/ontology/NODE_QUICK_REFERENCE.md`](knowledge/ontology/NODE_QUICK_REFERENCE.md) / [`docs/RELATIONSHIP_GUIDE.md`](docs/RELATIONSHIP_GUIDE.md) — node + relationship catalog.
 - [`docs/history/`](docs/history/README.md) — frozen M0 / M1 / planning milestone docs.

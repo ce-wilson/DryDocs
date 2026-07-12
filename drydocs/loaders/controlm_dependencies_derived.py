@@ -1,8 +1,8 @@
-"""Control-M derived :DEPENDS_ON edges (M3 part 2).
+"""Control-M derived :WAS_INFORMED_BY edges (M3 part 2).
 
 Consumes the output of the recursive predecessor SQL
 (``drydocs/loaders/sql/controlm_dependencies_recursive.sql``) and
-materializes ``:DEPENDS_ON`` edges between :ControlMJob nodes.
+materializes ``:WAS_INFORMED_BY`` edges between :ControlMJob nodes.
 
 Cycle detection happens **in the SQL** via path-INSTR + recursion-level
 cap; this loader writes the result without any further filtering.
