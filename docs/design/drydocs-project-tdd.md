@@ -1,9 +1,9 @@
 # Technical Design — DryDocs (the platform: layers, components, governance, and the graph)
 
 <!-- anchor: front-matter -->
-**Status:** DESCRIPTIVE — documents the built system as of **Rev 1, 2026-07-12**, authored at
-commit `a77dec4` (post G2 core extraction, G3 remediation component, G4 scaffolds, G9 lineage
-re-home). ·
+**Status:** DESCRIPTIVE — documents the built system as of **Rev 2, 2026-07-12** (Rev 1 +
+expanded module topology + C4-model views), authored at commit `ac2ea2e` (post G2 core
+extraction, G3 remediation component, G4 scaffolds, G9 lineage re-home). ·
 **Classification:** Internal-Public — mechanism only; real folder/job/host/SEAL values live
 company-side or in gitignored twins. ·
 **Audience:** engineers joining the project (any surface), and the company-side maintainer
@@ -152,16 +152,41 @@ N/A at this altitude — the per-column dispositions are the ledgers themselves
 (`controlm-ingestion-tdd.md` §4) renders the field→node/edge map; duplicating either here
 would create a third copy to drift.
 
-**5. Component topology (ADR 0002, executed).** `drydocs_core` (models, adapters, config
-accessors, ontology, the shared Control-M parser) is imported by components and imports no
-component. Components: `drydocs-load` (loaders + CLI composition root),
-`drydocs-review` (graph review/verify, gate pages, publishing — consumer-canonical wiring),
-`drydocs-plan` (board), `drydocs-docgen` (outline validator, deterministic renderer, PDF,
-markup transcription), `drydocs_lineage` (extractors + curated-write boundary; G9),
-`drydocs_deepdoc` (scaffold), `drydocs_remediation` (detect→transform→prove→Jira; writes
-neither graph nor production), `drydocs-web` (JS/TS console, in design). The boundary is
-default-deny: an unclassified module fails `test_module_boundary.py`; `cli.py` is the
-exempted composition root.
+**5. Component topology (ADR 0002, executed).** One slim core, eight components, one
+enforced rule set: *core imports no component; components import only core; every module
+classifies into exactly one bucket or the build fails* (default-deny,
+`test_module_boundary.py`); `cli.py` is the exempted composition root. Note the codename
+collision up front: the project's component codenames **C1–C3** (remediation, lineage,
+deepdoc) are unrelated to the **C4 model's** levels 1–4 used in the appendix diagrams.
+
+| Package / module | Codename | Role | Writes | Notes / guards |
+|---|---|---|---|---|
+| `drydocs_core` | — | typed row models; adapters (csv, oracle); Neo4j client; config accessors (registry, precedence, classification); ontology vocabulary + namespaces; the **shared Control-M parser** (`commands`/`paths`/`variables`/`resolver`/`staging`) | nothing | imports no component; lineage and deepdoc wrap its parser (an AST guard proves lineage carries no parse code of its own) |
+| `drydocs-load` (`drydocs/loaders/**` + `cli.py`) | main | SQL extracts → models → MERGE per confirmed mappings; delta provenance; the CLI | `drydocs` DB (sole ground-truth writer) | J9 testcontainers e2e; graph-tests acceptance |
+| `drydocs-review` | — | `graph_review`/`graph_verify`, `review_labels`, `source_mappings` accessor, `gate_pages`, `sme_notes`, `publishing/` | HTML / Confluence artifacts | consumer-canonical wiring (port manifest); gate-page format test-enforced |
+| `drydocs-plan` | — | `plan_board` — backlog.yaml → board render | `docs/plan/board.html` | pure/offline; own boundary bucket |
+| `drydocs-docgen` | — | `doc_outline` validator, `design_doc` deterministic renderer, `doc_pdf`, markup transcription | `docs/design/*` renders, PDFs | outline auto-discovery test covers every committed TDD |
+| `drydocs_lineage` | **C2** | extractors (Control-M inventory) → `LineageGraph` candidates; curated-write boundary | curated lineage only — **gate-bound** (writer refuses until the rel vocabulary confirms) | G9 re-home; candidates never ground truth |
+| `drydocs_deepdoc` | **C3** | on-demand deep-dive passes (scaffold) | `drydocs_context` (future) | G4 scaffold |
+| `drydocs_remediation` | **C1** | detect → classify → transform → prove → package | **Jira packages only** — no graph, no production | separation of duties is structural (ADR 0002-B) |
+| `drydocs-web` | — | JS/TS console + graph viz (design in flight, Epic O) | — | not a Python package; outside the boundary guard by design |
+
+The import direction is the architecture (this is also the C4 Level-3 view):
+
+```
+                        ┌────────────────────────────┐
+                        │        drydocs_core        │
+                        │ models · adapters · config │
+                        │ ontology · Control-M parser│
+                        └──────────────▲─────────────┘
+          imports core only ──────────┤ (core imports NO component)
+   ┌──────────┬──────────┬────────────┼───────────┬──────────┬─────────────┐
+   │          │          │            │           │          │             │
+ load      review      plan        docgen     lineage(C2) deepdoc(C3) remediation(C1)
+   │                                                                       │
+   └── cli.py = composition root (ENTRYPOINT exemption: may wire any) ─────┘
+        components NEVER import each other · default-deny classification
+```
 
 **6. Two-repository operating model.** Producer (public, sanitized mechanism) → company
 (private, wired) across disjoint histories; applies are cherry-picks/checkouts driven by
@@ -240,8 +265,78 @@ guarded surfaces stay clean, unguarded surfaces cause incidents — is documente
 <!-- anchor: appendices -->
 ## Appendices
 
-Component ↔ write-target summary: `drydocs-load` → `drydocs` DB (sole ground-truth writer);
-`drydocs_lineage` → curated lineage only, gate-bound (writer stubbed until the vocabulary
-gate); `drydocs-review` → HTML/Confluence artifacts; `drydocs-docgen` → `docs/design/*`
-renders; `drydocs-plan` → `docs/plan/board.html`; `drydocs_remediation` → Jira packages
-only; `drydocs_deepdoc` → (future) `drydocs_context`.
+### Appendix A — C4-model views (Levels 1–4)
+
+*(C4 model = Context / Container / Component / Code — unrelated to the component codenames
+C1–C3 above. ASCII on purpose: the renderer is deterministic and JS-free, so these render
+identically in repo, print/PDF, and hosted views.)*
+
+**Level 1 — System context.** Who uses DryDocs and what it touches.
+
+```
+  Production-support SME            Source-app dev teams
+  (gate sign-off, queries,          (receive fix packages;
+   doc annotation)                   hold deploy rights)
+        │                                  ▲
+        ▼                                  │ Jira handoff
+ ┌───────────────────────────────────────────────────────┐
+ │                       DryDocs                         │
+ │   governed knowledge graph for batch production       │
+ │   support: ingest → gate → load → answer → repair     │
+ └───────────────────────────────────────────────────────┘
+    │ read-only        │ read           │ publish        │ port (one-way)
+    ▼                  ▼                ▼                ▼
+ Orchestrator DB    Org/app         Confluence /     Company repo
+ replica (CM_       registries      generated docs   (consumer; real
+ schema, Oracle)    (SEAL, PAT)                      wiring + data)
+```
+
+**Level 2 — Containers.** Runnable things and stores.
+
+```
+ ┌─ Python monorepo (this repo) ───────────────────────────────┐
+ │  drydocs_core + 8 components (§5) · pytest + CI gates (J5)  │
+ └───────────────┬─────────────────────────────┬───────────────┘
+                 │ bolt                        │ writes files
+                 ▼                             ▼
+ ┌─ Neo4j EE container ─────────┐   ┌─ Repo doc surfaces ───────┐
+ │  drydocs         (ground     │   │  docs/design/* renders    │
+ │                   truth)     │   │  docs/plan/board.html     │
+ │  drydocs_docs    (lexical    │   │  gate pages (rendered to  │
+ │                   corpus)    │   │  internal-local/)         │
+ │  drydocs_context (future)    │   └───────────────────────────┘
+ └──────────────────────────────┘
+ ┌─ Config ledgers (git) ──────────────────────────────────────┐
+ │  source-registry · classification · source-mappings ·       │
+ │  taxonomy-ontology-map · precedence · PORT-MANIFEST         │
+ └──────────────────────────────────────────────────────────────┘
+```
+
+**Level 3 — Components.** The import-direction diagram in §5 *is* the L3 view.
+
+**Level 4 — Code (exemplar: the load/provenance path).** The pattern every loader follows —
+chosen because it carries the two hardest guarantees (fail-closed config, delta provenance):
+
+```
+ cli.py: ingest-controlm
+   └► FoldersLoader(BaseLoader).run()
+        ├─ source_registry.require_confirmed(source)      # fail closed
+        ├─ adapter.fetch(sql, scope_binds)                # read-only extract
+        ├─ Model.model_validate(row)  → to_params()
+        │     └─ compute_row_checksum(row, exclude=volatile)   # sha256
+        ├─ cypher template per row:
+        │     MERGE (n:Label {key…}) SET n += props
+        │     FOREACH (CASE row_checksum changed-or-new →
+        │        MERGE (n)-[:WAS_GENERATED_BY]->(run))    # delta diet
+        │     SET n.row_checksum, n.last_seen_at, n.last_run_id
+        └─ _close_run(): (:JobRun) rows_processed / rows_rejected;
+              rows_changed = count(WAS_GENERATED_BY to this run)   # exact
+```
+
+### Appendix B — Component ↔ write-target summary
+
+`drydocs-load` → `drydocs` DB (sole ground-truth writer); `drydocs_lineage` → curated
+lineage only, gate-bound (writer stubbed until the vocabulary gate); `drydocs-review` →
+HTML/Confluence artifacts; `drydocs-docgen` → `docs/design/*` renders; `drydocs-plan` →
+`docs/plan/board.html`; `drydocs_remediation` → Jira packages only; `drydocs_deepdoc` →
+(future) `drydocs_context`.

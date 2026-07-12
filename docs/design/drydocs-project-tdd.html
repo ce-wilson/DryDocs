@@ -46,7 +46,7 @@ hr { border:none; border-top:1px solid var(--line); margin: 26px 0; }
 <body>
 <main>
 <h1>Technical Design — DryDocs (the platform: layers, components, governance, and the graph)</h1>
-<p id="front-matter"><strong>Status:</strong> DESCRIPTIVE — documents the built system as of <strong>Rev 1, 2026-07-12</strong>, authored at commit <code>a77dec4</code> (post G2 core extraction, G3 remediation component, G4 scaffolds, G9 lineage re-home). · <strong>Classification:</strong> Internal-Public — mechanism only; real folder/job/host/SEAL values live company-side or in gitignored twins. · <strong>Audience:</strong> engineers joining the project (any surface), and the company-side maintainer reconciling ports. · <strong>Companion:</strong> <code>CLAUDE.md</code> (the operating guide this design formalizes); <code>docs/design/controlm-ingestion-tdd.md</code> (the ingestion pipeline in depth); <code>docs/design/drydocs-remediation-tdd.md</code> (the C1 component); <code>MODULE_MAP.md</code> + ADR 0002 family (component topology); <code>docs/whitepaper/drydocs-whitepaper.md</code> (the external framing).</p>
+<p id="front-matter"><strong>Status:</strong> DESCRIPTIVE — documents the built system as of <strong>Rev 2, 2026-07-12</strong> (Rev 1 + expanded module topology + C4-model views), authored at commit <code>ac2ea2e</code> (post G2 core extraction, G3 remediation component, G4 scaffolds, G9 lineage re-home). · <strong>Classification:</strong> Internal-Public — mechanism only; real folder/job/host/SEAL values live company-side or in gitignored twins. · <strong>Audience:</strong> engineers joining the project (any surface), and the company-side maintainer reconciling ports. · <strong>Companion:</strong> <code>CLAUDE.md</code> (the operating guide this design formalizes); <code>docs/design/controlm-ingestion-tdd.md</code> (the ingestion pipeline in depth); <code>docs/design/drydocs-remediation-tdd.md</code> (the C1 component); <code>MODULE_MAP.md</code> + ADR 0002 family (component topology); <code>docs/whitepaper/drydocs-whitepaper.md</code> (the external framing).</p>
 <p>Worked example throughout (the sanitized sample family already committed in <code>config/taxonomy/controlm.yaml</code>): folders <code>PRARAG-HLDM-85025-PEX-TRUST-{DLY,CYC}</code> on server <code>P32</code>, their jobs, conditions, and the <code>ARA</code> application grouping.</p>
 <blockquote><p><strong>Read-me-first.</strong> DryDocs is a <em>governance machine that happens to load a graph</em>, not a graph with governance bolted on. Every section below reduces to one pattern: a machine-readable ledger, a test that fails on drift, and a human gate wherever meaning is assigned. When extending the system, find the ledger first.</p></blockquote>
 <hr>
@@ -81,7 +81,21 @@ hr { border:none; border-top:1px solid var(--line); margin: 26px 0; }
 <p><strong>4. Load contract.</strong> Loaders (component <code>drydocs-load</code>) read extracts (scope-bound, read-only SQL against the replica), map rows through pydantic models, and MERGE per the confirmed mapping. Provenance: every run is a <code>:JobRun</code> activity; <code>WAS_GENERATED_BY</code> edges are <strong>delta-only</strong> (per-row <code>row_checksum</code>; edge on create/content-change only — the supernode diet), while pull provenance stays node properties (<code>last_seen_at</code>, <code>last_run_id</code>) and run totals live on the <code>:JobRun</code>. Source authorship rides the gate-approved audit envelope (<code>source_created_by/_at</code>, <code>source_updated_by/_at</code> per <code>config/audit-fields.yaml</code>). Supplements (software registry, SOSA experimental, future timing stats) are opt-in passes that MATCH existing nodes and never MERGE identity.</p>
 <h3 id="design-data-mapping">Source → column-level field mapping</h3>
 <p>N/A at this altitude — the per-column dispositions are the ledgers themselves (<code>config/source-mappings/controlm-psgmgr.yaml</code>) and the pipeline TDD (<code>controlm-ingestion-tdd.md</code> §4) renders the field→node/edge map; duplicating either here would create a third copy to drift.</p>
-<p><strong>5. Component topology (ADR 0002, executed).</strong> <code>drydocs_core</code> (models, adapters, config accessors, ontology, the shared Control-M parser) is imported by components and imports no component. Components: <code>drydocs-load</code> (loaders + CLI composition root), <code>drydocs-review</code> (graph review/verify, gate pages, publishing — consumer-canonical wiring), <code>drydocs-plan</code> (board), <code>drydocs-docgen</code> (outline validator, deterministic renderer, PDF, markup transcription), <code>drydocs_lineage</code> (extractors + curated-write boundary; G9), <code>drydocs_deepdoc</code> (scaffold), <code>drydocs_remediation</code> (detect→transform→prove→Jira; writes neither graph nor production), <code>drydocs-web</code> (JS/TS console, in design). The boundary is default-deny: an unclassified module fails <code>test_module_boundary.py</code>; <code>cli.py</code> is the exempted composition root.</p>
+<p><strong>5. Component topology (ADR 0002, executed).</strong> One slim core, eight components, one enforced rule set: <em>core imports no component; components import only core; every module classifies into exactly one bucket or the build fails</em> (default-deny, <code>test_module_boundary.py</code>); <code>cli.py</code> is the exempted composition root. Note the codename collision up front: the project&#x27;s component codenames <strong>C1–C3</strong> (remediation, lineage, deepdoc) are unrelated to the <strong>C4 model&#x27;s</strong> levels 1–4 used in the appendix diagrams.</p>
+<table><thead><tr><th>Package / module</th><th>Codename</th><th>Role</th><th>Writes</th><th>Notes / guards</th></tr></thead><tbody><tr><td><code>drydocs_core</code></td><td>—</td><td>typed row models; adapters (csv, oracle); Neo4j client; config accessors (registry, precedence, classification); ontology vocabulary + namespaces; the <strong>shared Control-M parser</strong> (<code>commands</code>/<code>paths</code>/<code>variables</code>/<code>resolver</code>/<code>staging</code>)</td><td>nothing</td><td>imports no component; lineage and deepdoc wrap its parser (an AST guard proves lineage carries no parse code of its own)</td></tr><tr><td><code>drydocs-load</code> (<code>drydocs/loaders/**</code> + <code>cli.py</code>)</td><td>main</td><td>SQL extracts → models → MERGE per confirmed mappings; delta provenance; the CLI</td><td><code>drydocs</code> DB (sole ground-truth writer)</td><td>J9 testcontainers e2e; graph-tests acceptance</td></tr><tr><td><code>drydocs-review</code></td><td>—</td><td><code>graph_review</code>/<code>graph_verify</code>, <code>review_labels</code>, <code>source_mappings</code> accessor, <code>gate_pages</code>, <code>sme_notes</code>, <code>publishing/</code></td><td>HTML / Confluence artifacts</td><td>consumer-canonical wiring (port manifest); gate-page format test-enforced</td></tr><tr><td><code>drydocs-plan</code></td><td>—</td><td><code>plan_board</code> — backlog.yaml → board render</td><td><code>docs/plan/board.html</code></td><td>pure/offline; own boundary bucket</td></tr><tr><td><code>drydocs-docgen</code></td><td>—</td><td><code>doc_outline</code> validator, <code>design_doc</code> deterministic renderer, <code>doc_pdf</code>, markup transcription</td><td><code>docs/design/*</code> renders, PDFs</td><td>outline auto-discovery test covers every committed TDD</td></tr><tr><td><code>drydocs_lineage</code></td><td><strong>C2</strong></td><td>extractors (Control-M inventory) → <code>LineageGraph</code> candidates; curated-write boundary</td><td>curated lineage only — <strong>gate-bound</strong> (writer refuses until the rel vocabulary confirms)</td><td>G9 re-home; candidates never ground truth</td></tr><tr><td><code>drydocs_deepdoc</code></td><td><strong>C3</strong></td><td>on-demand deep-dive passes (scaffold)</td><td><code>drydocs_context</code> (future)</td><td>G4 scaffold</td></tr><tr><td><code>drydocs_remediation</code></td><td><strong>C1</strong></td><td>detect → classify → transform → prove → package</td><td><strong>Jira packages only</strong> — no graph, no production</td><td>separation of duties is structural (ADR 0002-B)</td></tr><tr><td><code>drydocs-web</code></td><td>—</td><td>JS/TS console + graph viz (design in flight, Epic O)</td><td>—</td><td>not a Python package; outside the boundary guard by design</td></tr></tbody></table>
+<p>The import direction is the architecture (this is also the C4 Level-3 view):</p>
+<pre><code>                        ┌────────────────────────────┐
+                        │        drydocs_core        │
+                        │ models · adapters · config │
+                        │ ontology · Control-M parser│
+                        └──────────────▲─────────────┘
+          imports core only ──────────┤ (core imports NO component)
+   ┌──────────┬──────────┬────────────┼───────────┬──────────┬─────────────┐
+   │          │          │            │           │          │             │
+ load      review      plan        docgen     lineage(C2) deepdoc(C3) remediation(C1)
+   │                                                                       │
+   └── cli.py = composition root (ENTRYPOINT exemption: may wire any) ─────┘
+        components NEVER import each other · default-deny classification</code></pre>
 <p><strong>6. Two-repository operating model.</strong> Producer (public, sanitized mechanism) → company (private, wired) across disjoint histories; applies are cherry-picks/checkouts driven by <code>PORT-MANIFEST.yaml</code> dispositions (clean-add / canonical-producer / canonical-company / union-append / per-entry / evaluate / never-port), with <code>git-readme.md</code> and <code>docs/port-prompt.md</code> as narrative. Back-flow is re-derived mechanism only, never values.</p>
 <h2 id="classification-security">Classification &amp; security</h2>
 <p>The repo is private-but-sometimes-published. Tiers: External / Internal-Public (publishable) vs Internal / Internal-Confidential (excluded; <code>internal/</code> twins + gitignored <code>internal-local/</code>). Enforced by <code>test_classification.py</code> (every source classified), <code>test_publishing.py</code> (publish pipeline validation), root-image/<code>internal-local/</code> gitignore safety nets, and CI (J5) running the guards on every push. Mechanism-not-instance is the writing rule: object/column names are public vocabulary; SIDs, hosts, folder names, service names, and rosters never leave the internal side. Secrets: architecture-level only; external auth (Kerberos) config lives in the consumer&#x27;s environment, never in git.</p>
@@ -94,7 +108,58 @@ hr { border:none; border-top:1px solid var(--line); margin: 26px 0; }
 <h2 id="decisions-discussions">Decisions &amp; discussions</h2>
 <p>ADR 0001 (PROV spine as ontology base) · ADR 0002 + a/b/c (component/database topology; core extraction — executed; remediation rebase — executed; lineage re-home — in flight, G9) · ADR 0003 (<code>JobFolder</code>→<code>ControlMFolder</code>) · ADR 0004 (software registry, vendor = brand only). Live discussions ride the backlog and gate specs; the recurring architectural theme — guarded surfaces stay clean, unguarded surfaces cause incidents — is documented in <code>docs/reviews/tech-debt-*.md</code>.</p>
 <h2 id="appendices">Appendices</h2>
-<p>Component ↔ write-target summary: <code>drydocs-load</code> → <code>drydocs</code> DB (sole ground-truth writer); <code>drydocs_lineage</code> → curated lineage only, gate-bound (writer stubbed until the vocabulary gate); <code>drydocs-review</code> → HTML/Confluence artifacts; <code>drydocs-docgen</code> → <code>docs/design/*</code> renders; <code>drydocs-plan</code> → <code>docs/plan/board.html</code>; <code>drydocs_remediation</code> → Jira packages only; <code>drydocs_deepdoc</code> → (future) <code>drydocs_context</code>.</p>
+<h3>Appendix A — C4-model views (Levels 1–4)</h3>
+<p><em>(C4 model = Context / Container / Component / Code — unrelated to the component codenames C1–C3 above. ASCII on purpose: the renderer is deterministic and JS-free, so these render identically in repo, print/PDF, and hosted views.)</em></p>
+<p><strong>Level 1 — System context.</strong> Who uses DryDocs and what it touches.</p>
+<pre><code>  Production-support SME            Source-app dev teams
+  (gate sign-off, queries,          (receive fix packages;
+   doc annotation)                   hold deploy rights)
+        │                                  ▲
+        ▼                                  │ Jira handoff
+ ┌───────────────────────────────────────────────────────┐
+ │                       DryDocs                         │
+ │   governed knowledge graph for batch production       │
+ │   support: ingest → gate → load → answer → repair     │
+ └───────────────────────────────────────────────────────┘
+    │ read-only        │ read           │ publish        │ port (one-way)
+    ▼                  ▼                ▼                ▼
+ Orchestrator DB    Org/app         Confluence /     Company repo
+ replica (CM_       registries      generated docs   (consumer; real
+ schema, Oracle)    (SEAL, PAT)                      wiring + data)</code></pre>
+<p><strong>Level 2 — Containers.</strong> Runnable things and stores.</p>
+<pre><code> ┌─ Python monorepo (this repo) ───────────────────────────────┐
+ │  drydocs_core + 8 components (§5) · pytest + CI gates (J5)  │
+ └───────────────┬─────────────────────────────┬───────────────┘
+                 │ bolt                        │ writes files
+                 ▼                             ▼
+ ┌─ Neo4j EE container ─────────┐   ┌─ Repo doc surfaces ───────┐
+ │  drydocs         (ground     │   │  docs/design/* renders    │
+ │                   truth)     │   │  docs/plan/board.html     │
+ │  drydocs_docs    (lexical    │   │  gate pages (rendered to  │
+ │                   corpus)    │   │  internal-local/)         │
+ │  drydocs_context (future)    │   └───────────────────────────┘
+ └──────────────────────────────┘
+ ┌─ Config ledgers (git) ──────────────────────────────────────┐
+ │  source-registry · classification · source-mappings ·       │
+ │  taxonomy-ontology-map · precedence · PORT-MANIFEST         │
+ └──────────────────────────────────────────────────────────────┘</code></pre>
+<p><strong>Level 3 — Components.</strong> The import-direction diagram in §5 <em>is</em> the L3 view.</p>
+<p><strong>Level 4 — Code (exemplar: the load/provenance path).</strong> The pattern every loader follows — chosen because it carries the two hardest guarantees (fail-closed config, delta provenance):</p>
+<pre><code> cli.py: ingest-controlm
+   └► FoldersLoader(BaseLoader).run()
+        ├─ source_registry.require_confirmed(source)      # fail closed
+        ├─ adapter.fetch(sql, scope_binds)                # read-only extract
+        ├─ Model.model_validate(row)  → to_params()
+        │     └─ compute_row_checksum(row, exclude=volatile)   # sha256
+        ├─ cypher template per row:
+        │     MERGE (n:Label {key…}) SET n += props
+        │     FOREACH (CASE row_checksum changed-or-new →
+        │        MERGE (n)-[:WAS_GENERATED_BY]-&gt;(run))    # delta diet
+        │     SET n.row_checksum, n.last_seen_at, n.last_run_id
+        └─ _close_run(): (:JobRun) rows_processed / rows_rejected;
+              rows_changed = count(WAS_GENERATED_BY to this run)   # exact</code></pre>
+<h3>Appendix B — Component ↔ write-target summary</h3>
+<p><code>drydocs-load</code> → <code>drydocs</code> DB (sole ground-truth writer); <code>drydocs_lineage</code> → curated lineage only, gate-bound (writer stubbed until the vocabulary gate); <code>drydocs-review</code> → HTML/Confluence artifacts; <code>drydocs-docgen</code> → <code>docs/design/*</code> renders; <code>drydocs-plan</code> → <code>docs/plan/board.html</code>; <code>drydocs_remediation</code> → Jira packages only; <code>drydocs_deepdoc</code> → (future) <code>drydocs_context</code>.</p>
 <hr class="dd-sme-divider">
 <section class="dd-sme-feedback" aria-label="SME - Feedback">
 <h2>SME - Feedback</h2>
@@ -102,7 +167,7 @@ hr { border:none; border-top:1px solid var(--line); margin: 26px 0; }
 <ol>
 <li>Click the <strong>✎</strong> button beside any section (or numbered step) and type your note — notes save in your browser as you type.</li>
 <li>When finished, click <strong>Copy feedback</strong> in the bottom-right toolbar. Your notes are copied as anchor-keyed YAML.</li>
-<li>Create the feedback file (it is YAML, <em>not</em> markdown) — <strong>Copy To:</strong> <code>docs/design/feedback/</code> · <strong>File Name:</strong> <code>drydocs-project-tdd-rev1.yaml</code></li>
+<li>Create the feedback file (it is YAML, <em>not</em> markdown) — <strong>Copy To:</strong> <code>docs/design/feedback/</code> · <strong>File Name:</strong> <code>drydocs-project-tdd-rev2.yaml</code></li>
 <li>Paste the copied block into that file, save, and commit (or send the file back to the team).</li>
 </ol>
 </section>
