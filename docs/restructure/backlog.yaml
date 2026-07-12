@@ -1970,7 +1970,7 @@ items:
     agent: main
     model: sonnet
     priority: p2
-    status: todo
+    status: done
     depends_on: [N1]
     inputs: [config/source-mappings/, drydocs/loaders/sql/, config/source-registry.yaml, drydocs_lineage/extractors/controlm_inventory.py]
     acceptance: >
@@ -1986,7 +1986,19 @@ items:
     notes: >
       Doc 08 Phase 1. Profile-census refresh via the db skill is doc-08 Phase 2 (not this
       item). MERGED 2026-07-11: G9 tech-debt finding #2 (extractor CSV-contract drift) —
-      same guard, one more consumer of the same SELECT list.
+      same guard, one more consumer of the same SELECT list. DONE 2026-07-11:
+      tests/unit/test_source_mapping_drift.py — (1) SQL drift guard: strict paren-aware
+      item grammar (QUAL.COL AS alias source items; expression items classify derived,
+      internals deferred like WHERE parsing); per-object UNION across loader SQLs
+      set-equals the ledger's projected columns (holds exactly on the real ledger —
+      CM_DEF_VJOB spans jobs+variables SQLs; folders' H alias = the header-row join);
+      (2) census reconciliation via new census_failures() accessor method (pending -> [],
+      recorded census must balance explicit + sweep count:, so new columns disposition
+      BY NAME); (3) registry test: every confirmed source has a locator.mapping ledger
+      or sits on the frozen shrink-only LEDGER_PENDING list (seal/catalog/software-
+      registry/bmc-docs — pre-doc-08 legacy, named debt); (4) the merged extractor
+      CSV contract: CSV_CONTRACT constant AST-matched to the code's row.get() keys and
+      subset-checked against controlm_jobs.sql aliases.
 
   # ── Epic O — Web console / graph visualization (main) — Phase 12 ───────────
   # Groomed 2026-07-09 (user decision: promote to a module + phase — the web/ front-end
@@ -2219,8 +2231,8 @@ items:
 # Roll-up the dispatcher can glance at. COMPUTED views — test_backlog.py enforces
 # that these match the items exactly; update them with any status change.
 summary:
-  todo: 20                                          # J2+J4+J6+J8+G11 done 2026-07-11 (non-HITL execution batch)
+  todo: 19                                          # J2+J4+J6+J8+G11+N2 done 2026-07-11 (non-HITL execution batch)
   in_progress: 6                                   # E1, F1, F2, K2, P2 (awaiting HITL), O1 (web design pass)
   blocked: 0
-  done: 53                                          # J8 skip-guard policy DONE 2026-07-11
-  next_ready: [C5, J5, L7, L8, L9, M2, M3, M4, N2, P1, J7, C7, K4, K5, G10, J9]  # J8 done
+  done: 54                                          # N2 column-ledger drift guards DONE 2026-07-11
+  next_ready: [C5, J5, L7, L8, L9, M2, M3, M4, P1, J7, C7, K4, K5, G10, J9]  # N2 done

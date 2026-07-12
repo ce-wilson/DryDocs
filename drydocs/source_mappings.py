@@ -119,7 +119,7 @@ class MappedObject:
         A declared ``default_disposition`` sweeps the long tail by design (doc 08
         §Direction), so once one is present every profiled column is accounted
         for and this returns ``[]`` — the *count* reconciliation (profiled total
-        vs. rows + sweep) is the Phase-1 coverage test's job, not this method's.
+        vs. rows + sweep) is :meth:`census_failures`' job, not this method's.
         Without a sweep, any profiled column absent from the explicit list is
         genuinely unaccounted and is returned, in the order given.
         """
@@ -127,6 +127,38 @@ class MappedObject:
             return []
         known = set(self.column_names())
         return [c for c in profile_columns if c not in known]
+
+    def census_failures(self) -> list[str]:
+        """Doc 08 Phase-1 coverage reconciliation — count must balance exactly.
+
+        While the census is pending (``profile.column_count`` is null) there is
+        nothing to reconcile and this returns ``[]``. Once a census records a
+        count: ``explicit rows + default_disposition.count == column_count``,
+        where ``count:`` is the frozen size of the swept tail AT census time.
+        A later census that raises ``column_count`` therefore FAILS here until
+        the new columns are dispositioned BY NAME — new columns never fall into
+        the sweep silently (doc 08 §Risks).
+        """
+        if self.profile is None or self.profile.column_count is None:
+            return []
+        explicit = len(self.columns)
+        swept = None
+        if self.default_disposition is not None:
+            swept = self.default_disposition.get("count")
+            if swept is None:
+                return [
+                    f"{self.name}: census recorded (column_count="
+                    f"{self.profile.column_count}) but default_disposition carries no "
+                    "count: — the swept tail must be counted once a census exists"
+                ]
+        total = explicit + int(swept or 0)
+        if total != self.profile.column_count:
+            return [
+                f"{self.name}: {explicit} explicit + {int(swept or 0)} swept = {total} "
+                f"!= column_count {self.profile.column_count} — new columns since the "
+                "census must be dispositioned BY NAME, never swept"
+            ]
+        return []
 
 
 @dataclass(frozen=True)
@@ -326,6 +358,13 @@ class SourceMapping:
         """Profiled columns of ``object_name`` with no disposition row, and not
         covered by that object's default sweep."""
         return self.get(object_name).unaccounted(profile_columns)
+
+    def census_failures(self) -> list[str]:
+        """Count-reconciliation failures across every object (doc 08 Phase 1)."""
+        failures: list[str] = []
+        for obj in self.objects_by_name.values():
+            failures.extend(obj.census_failures())
+        return failures
 
     def to_records(self) -> list[dict[str, Any]]:
         """Flat, DataFrame-ready view — one record per (object, column) disposition

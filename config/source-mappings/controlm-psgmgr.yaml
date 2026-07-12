@@ -28,8 +28,12 @@
 # even though the real source (config/source-registry.yaml) is classification:
 # Internal. Typed accessor: drydocs/source_mappings.py.
 #
-# Guarded (future, doc 08 Phase 1 — not yet built): coverage test, SQL drift
-# guard, config/source-registry.yaml `mapping:` pointer test.
+# Guarded (doc 08 Phase 1, BUILT 2026-07-11 — N2): coverage/census reconciliation
+# (census_failures; pending census = nothing to reconcile, a recorded census must
+# balance explicit rows + the sweep's frozen count:), SQL drift guard (loader
+# SELECT lists set-equal the projected columns per object, union across files),
+# and the source-registry confirmed-source ledger test —
+# tests/unit/test_source_mapping_drift.py.
 # =============================================================================
 schema: drydocs.source-mapping.v1
 source: controlm-psgmgr

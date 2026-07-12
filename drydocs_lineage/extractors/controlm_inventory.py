@@ -35,6 +35,16 @@ from ..model import LineageGraph, ProcessNode, process_id
 # header tokens that identify a Control-M jobs CSV when searching a directory
 _JOBS_CSV_HINTS = ("job_name", "cmd_line", "node_id")
 
+#: every CSV header this extractor consumes (the column contract). Guarded by
+#: tests/unit/test_source_mapping_drift.py (N2): each name must remain an alias
+#: in controlm_jobs.sql's SELECT list, and this tuple must match the row.get()
+#: keys in the code — a renamed alias fails the guard instead of silently
+#: dropping the column (the G9 tech-debt finding #2).
+CSV_CONTRACT = (
+    "application", "cmd_line", "folder_id", "is_current_version", "job_id",
+    "job_name", "node_id", "owner", "parent_table",
+)
+
 
 @dataclass
 class ExtractCoverage:
