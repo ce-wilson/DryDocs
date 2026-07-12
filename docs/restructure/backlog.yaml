@@ -847,7 +847,7 @@ items:
     agent: main
     model: fable
     priority: p3
-    status: in_progress
+    status: done
     depends_on: [G3]
     inputs: [internal/remediation/README.md]
     acceptance: >
@@ -862,6 +862,7 @@ items:
       deliberately SANITIZED — the doc identities, content class, and durable location live in
       the publish-excluded internal/remediation/README.md, not here. Timing: gated on G3 because
       the remediation engine's escalation-facing features are what would need them.
+      CLOSED 2026-07-12 at the SME gate: outcome recorded in the README §HELD (sanitized here).
 
   - id: G11
     epic: component-topology
@@ -2260,7 +2261,7 @@ items:
 # that these match the items exactly; update them with any status change.
 summary:
   todo: 15                                          # G10 pulled in_progress 2026-07-12
-  in_progress: 7                                   # E1, F1, F2, K2, P2 (awaiting HITL), O1 (web design pass), G10 (held-docs re-review)
+  in_progress: 6                                   # E1, F1, F2, K2, P2 (awaiting HITL), O1 (web design pass)
   blocked: 0
-  done: 57                                          # J9 e2e testcontainers DONE 2026-07-11 (caught 2 real bugs)
-  next_ready: [C5, L7, L8, L9, M2, M3, M4, P1, C7, K4, K5]  # G10 pulled
+  done: 58                                          # G10 held-docs SME gate DONE 2026-07-12 (kept out permanently; README §HELD)
+  next_ready: [C5, L7, L8, L9, M2, M3, M4, P1, C7, K4, K5]  # G10 done

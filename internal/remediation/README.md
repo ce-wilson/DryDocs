@@ -18,20 +18,30 @@ The rule source and plans the `drydocs-remediation` component (G3) builds from:
 | `standards-normalization-plan.md` | predecessor plan — EVALUATE against current `knowledge/standards/` before relying on it |
 | `governance/` | the R13–R29 source corpus (naming standards, NFR catalog, critical-batch/self-heal, greenfield recommendations) |
 
-## HELD — KEPT OUT OF THE REPO (user decision 2026-07-10)
+## HELD — PERMANENTLY OUT OF THE REPO (G10 SME gate, 2026-07-12)
 
-Two governance docs are **deliberately absent** and stay out for now (reviewed 2026-07-10:
-real escalation routing / queue-registry content, candidate Internal-Confidential):
+Two governance docs are **deliberately absent, permanently** (held 2026-07-10 at the G3
+doc port; re-reviewed with the SME 2026-07-12 at the G10 gate — decision: keep out, both):
 
 - `governance/escalation-scim-reference.md`
 - `governance/scim-hpsm-queue-registry.md`
 
-**Durable location:** `ce-wilson/DryDocs-v0-archive@controlm-spinoff` (tip `3e6a39a`),
-`internal-standards/governance/` — the archive branch is the system of record for them;
-scratchpad copies are ephemeral. **Re-entry is tracked as backlog item G10** (sanitized —
-it names this README section, not the docs). Until G10 lands them or records a permanent
-out-of-band read path, cross-references from the ported docs (critical-batch §self-heal,
-nfr-catalog) dangle by design.
+**Why:** the only corpus docs carrying real employee names, internal hostnames, and the
+full SEAL↔queue↔SNOW-group ownership roster — candidate Internal-Confidential; kept off
+this producer remote entirely rather than relying on the publish strip.
+
+**System of record / out-of-band read path:**
+`ce-wilson/DryDocs-v0-archive@controlm-spinoff` (tip `3e6a39a`),
+`internal-standards/governance/` — re-clone read-only when needed; scratchpad copies are
+ephemeral, never commit them. The remediation engine consumes their DATA the way it
+consumes all rule values: **company-side injection** (the Tier-1 seam) — nothing
+producer-side builds against these files. Their engine-relevant MECHANISMS (the column-Y
+`EAPPLICATION` conformance rule, the queue-code grammar, the job↔SCIM 1:1 integrity rule)
+may later be extracted sanitized into `knowledge/` per the Caveats extraction path —
+per doc, through the usual classification decision.
+
+Cross-references from the ported docs (critical-batch §self-heal, nfr-catalog) dangle
+**permanently** by this decision; resolve them in the archive.
 
 ## Caveats
 
