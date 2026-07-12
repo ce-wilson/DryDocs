@@ -311,6 +311,13 @@ Coverage highlights:
 - `test_lineage_inventory.py` / `test_lineage_review.py` / `test_lineage_writer.py` — the drydocs-lineage component (shared-parser oracle, SME page, gate-bound Fork-3 writer + ground-truth-only boundary).
 - `test_sql_run_log.py` — the per-extract SQL log + display-only bind renderer (code-regions-only substitution pinned byte-identical on the recursive extract).
 
+End-to-end (opt-in; Docker + testcontainers — a throwaway Neo4j, the real CLI chain,
+the m3-verify core invariants; deselected from all default runs):
+
+```powershell
+poetry run pytest tests/integration -m integration -q
+```
+
 ## Further reading
 
 - [`knowledge/ARCHITECTURE.md`](knowledge/ARCHITECTURE.md) — the original repo-organization rationale (historical; the current boundary is [`MODULE_MAP.md`](MODULE_MAP.md) + `CLAUDE.md`).

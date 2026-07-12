@@ -224,3 +224,27 @@ def test_invalid_rows_are_rejected_not_raised(smoke_cypher_files: None) -> None:
     assert summary.rows_processed == 1
     assert summary.rows_rejected == 1
     assert summary.rejects[0]["row_index"] == 1
+
+
+def test_code_semicolons_ignores_comments_and_strings() -> None:
+    """runMany dispatch (J9 e2e finding): a ';' inside a // comment routed a
+    single-statement template to apoc.cypher.runMany, which split it mid-comment."""
+    from drydocs.loaders.base import _code_semicolons
+
+    single = (
+        "UNWIND $batch AS row\n"
+        "// kept alongside the raw-named props above; retires in doc-06 Phase 3\n"
+        "MERGE (f:Thing {id: row.id})\n"
+        "SET f.note = 'a ; in a string', f.other = \"another ; here\"\n"
+        "/* block comment; with a semicolon */\n"
+        ";\n"
+    )
+    assert _code_semicolons(single) == 1  # only the terminator counts
+
+    multi = "CREATE CONSTRAINT x IF NOT EXISTS FOR (n:A) REQUIRE n.id IS UNIQUE;\nMERGE (n:A {id: 1});\n"
+    assert _code_semicolons(multi) == 2
+
+    # the real template that broke: single statement despite its comment ';'
+    from pathlib import Path
+    folders = Path(__file__).resolve().parents[2] / "drydocs" / "loaders" / "cypher" / "controlm_folders.cypher"
+    assert _code_semicolons(folders.read_text(encoding="utf-8")) <= 1

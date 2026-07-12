@@ -696,16 +696,20 @@ def m3_verify() -> None:
                 f"jobs={r['jobs']} with_folder={r['with_folder']}",
             ))
 
-        # Composite key sanity — no duplicate (job_id, version_serial).
+        # Composite key sanity — no duplicate (folder_id, job_id): the NODE KEY.
+        # JOB_ID alone is folder-scoped in BMC (the same JOB_ID legitimately
+        # appears in multiple folders, e.g. a DLY/CYC promoted pair) — grouping
+        # without folder_id was a stale pre-composite-key check (caught by the
+        # J9 e2e run against the bundled sample, which carries such a pair).
         rows = cli.run("""
             MATCH (j:ControlMJob)
-            WITH j.job_id AS jid, j.version_serial AS vs, count(*) AS n
+            WITH j.folder_id AS fid, j.job_id AS jid, count(*) AS n
             WHERE n > 1
             RETURN count(*) AS dupes
         """)
         if rows:
             checks.append((
-                "no duplicate (job_id, version_serial)",
+                "no duplicate (folder_id, job_id)",
                 rows[0]["dupes"] == 0,
                 f"dupes={rows[0]['dupes']}",
             ))

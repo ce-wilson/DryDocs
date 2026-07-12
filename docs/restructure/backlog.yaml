@@ -2206,7 +2206,7 @@ items:
     agent: main
     model: sonnet
     priority: p3
-    status: todo
+    status: done
     depends_on: []
     inputs: [tests/, drydocs/loaders/, drydocs/data/samples/, pyproject.toml]
     acceptance: >
@@ -2221,7 +2221,20 @@ items:
       Promoted 2026-07-11 under the "groom remaining non-HITL items" directive — parked
       since the 2026-07-01 review; testcontainers[neo4j] verified an unused dev dep
       2026-07-09. No HITL surface: sample CSVs + existing loaders only, no new edge
-      meanings.
+      meanings. DONE 2026-07-11 (same day): tests/integration/test_e2e_load.py —
+      testcontainers Neo4j (community 5.26 + APOC), the REAL CLI chain (check/bootstrap/
+      apply-ontology-supplement/ingest-controlm) via CliRunner, the m3-verify core
+      invariants asserted directly + m3-verify smoke; integration marker deselected by
+      default (pyproject addopts), auto-skips without Docker; run documented in README +
+      run-drydocs SKILL. VERIFIED LIVE (3 passed, ~25s warm) — and the run CAUGHT TWO
+      REAL BUGS, both fixed with regression pins: (1) BaseLoader's run()/runMany dispatch
+      counted semicolons inside comments — the doc-06 audit-envelope comment in
+      controlm_folders.cypher routed a single-statement template to apoc.cypher.runMany,
+      which sheared it mid-comment (every folders load on stock APOC failed);
+      _code_semicolons() now counts code semicolons only. (2) m3-verify's dupe check
+      grouped (job_id, version_serial) — stale vs the (folder_id, job_id) NODE KEY;
+      the sample's legitimate DLY/CYC promoted pair (job_id 22 in two folders) proved
+      it; check now groups the composite.
 
   - id: C7
     epic: ontology-mapping
@@ -2246,8 +2259,8 @@ items:
 # Roll-up the dispatcher can glance at. COMPUTED views — test_backlog.py enforces
 # that these match the items exactly; update them with any status change.
 summary:
-  todo: 17                                          # J2+J4+J5+J6+J7+J8+G11+N2 done 2026-07-11 (non-HITL execution batch)
+  todo: 16                                          # J2+J4+J5+J6+J7+J8+J9+G11+N2 done 2026-07-11 (non-HITL execution batch)
   in_progress: 6                                   # E1, F1, F2, K2, P2 (awaiting HITL), O1 (web design pass)
   blocked: 0
-  done: 56                                          # J5 CI workflow DONE 2026-07-11
-  next_ready: [C5, L7, L8, L9, M2, M3, M4, P1, C7, K4, K5, G10, J9]  # J5 done
+  done: 57                                          # J9 e2e testcontainers DONE 2026-07-11 (caught 2 real bugs)
+  next_ready: [C5, L7, L8, L9, M2, M3, M4, P1, C7, K4, K5, G10]  # J9 done

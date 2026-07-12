@@ -106,6 +106,16 @@ poetry run pytest tests/unit/ -v
 
 Full suite green; the only expected skips are sample-backed tests (see Gotchas).
 
+End-to-end (opt-in, needs Docker — spins a throwaway Neo4j via testcontainers and
+drives bootstrap → supplement → ingest-controlm → invariants through the real CLI):
+
+```powershell
+poetry run pytest tests/integration -m integration -q
+```
+
+It is deselected from every default run (`-m "not integration"` in pyproject) and
+auto-skips when Docker is down. First run pulls the `neo4j:5.26` image.
+
 ## Gotchas
 
 **Expected skips (production sample CSV absent):** a few tests in

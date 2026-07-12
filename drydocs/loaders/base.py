@@ -38,6 +38,43 @@ if TYPE_CHECKING:
 LOGGER = logging.getLogger(__name__)
 
 
+def _code_semicolons(cypher: str) -> int:
+    """Count semicolons OUTSIDE comments and string literals.
+
+    apoc.cypher.runMany splits statements on every ';' it sees, including one
+    inside a ``//`` comment — so the run()/runMany dispatch must only count
+    code semicolons or a commented ';' shears a single-statement template
+    mid-comment (ProcedureCallFailed / SyntaxException).
+    """
+    count = 0
+    i, n = 0, len(cypher)
+    while i < n:
+        two = cypher[i : i + 2]
+        ch = cypher[i]
+        if two == "//":
+            j = cypher.find("\n", i)
+            i = n if j == -1 else j
+        elif two == "/*":
+            j = cypher.find("*/", i + 2)
+            i = n if j == -1 else j + 2
+        elif ch in ("'", '"'):
+            quote = ch
+            i += 1
+            while i < n:
+                if cypher[i] == "\\":
+                    i += 2
+                    continue
+                if cypher[i] == quote:
+                    i += 1
+                    break
+                i += 1
+        else:
+            if ch == ";":
+                count += 1
+            i += 1
+    return count
+
+
 # ---- row checksum (doc 06 Phase 2 — provenance-edge diet) -------------------
 #
 # Fields excluded by default because they are volatile (change every run even
@@ -214,9 +251,12 @@ class BaseLoader:
             "source_label": self.source_label,
         }
         # Use APOC runMany for multi-statement scripts; a single UNWIND
-        # template runs faster via plain run() — try plain first, fall
-        # back to runMany if the script has multiple statements.
-        if cypher.count(";") > 1:
+        # template runs faster via plain run() — and runMany SPLITS on
+        # semicolons wherever they appear, so a ';' inside a // comment
+        # must not route us there (it would shear the statement mid-comment;
+        # found by the J9 e2e test on controlm_folders.cypher's audit-envelope
+        # comment). Count code semicolons only.
+        if _code_semicolons(cypher) > 1:
             self.client.run_script(cypher, params=params)
         else:
             self.client.run(cypher, **params)

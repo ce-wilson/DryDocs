@@ -43,4 +43,10 @@ select = ["E", "F", "W", "I", "B", "UP", "N", "RUF"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
-addopts = "-ra --strict-markers"
+# integration (Docker/testcontainers) is opt-in: deselected by default so the
+# CLAUDE.md gates and CI keep unit-suite timing (J9). Run it with:
+#   poetry run pytest tests/integration -m integration -q
+addopts = "-ra --strict-markers -m 'not integration'"
+markers = [
+    "integration: end-to-end tests requiring Docker (testcontainers); opt-in via -m integration",
+]
