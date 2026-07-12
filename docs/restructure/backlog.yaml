@@ -872,7 +872,7 @@ items:
     agent: main
     model: sonnet
     priority: p3
-    status: todo
+    status: done
     depends_on: [G9]
     inputs: [drydocs_lineage/extractors/controlm_inventory.py, tests/unit/test_lineage_inventory.py, tests/fixtures/lineage/jobs.csv]
     acceptance: >
@@ -886,7 +886,11 @@ items:
     notes: >
       Groomed 2026-07-11 from the 2026-07-10 /tech-debt review of G9 slice 1 (finding #3;
       findings #1/#4 were fixed same day, #2 merged into N2). Non-HITL: pure reporting on
-      the candidate side — curation/write semantics untouched.
+      the candidate side — curation/write semantics untouched. DONE 2026-07-11 (same day):
+      ExtractCoverage dataclass (rows/jobs/skips-by-reason/invocations incl. unresolved +
+      no-target, plus empty/unparsed command buckets); extract() returns it; CLI prints
+      "coverage: ..." after the graph stats; fixture counts pinned (5 rows -> 4 jobs +
+      1 stale) + synthetic nameless/empty/unknown case + row-bucket totality check.
 
   # ── Epic H — drydocs-review back-flow (main, opus) ────────────────────────
   # REVERSE of the normal port: reproduce the company-authored generic SME-review/
@@ -2209,8 +2213,8 @@ items:
 # Roll-up the dispatcher can glance at. COMPUTED views — test_backlog.py enforces
 # that these match the items exactly; update them with any status change.
 summary:
-  todo: 22                                          # J2+J4+J6 done 2026-07-11 (non-HITL execution batch)
+  todo: 21                                          # J2+J4+J6+G11 done 2026-07-11 (non-HITL execution batch)
   in_progress: 6                                   # E1, F1, F2, K2, P2 (awaiting HITL), O1 (web design pass)
   blocked: 0
-  done: 51                                          # J6 streamlit removal DONE 2026-07-11
-  next_ready: [C5, J5, L7, L8, L9, M2, M3, M4, N2, P1, J7, J8, C7, K4, K5, G10, G11, J9]  # J2, J4, J6 done
+  done: 52                                          # G11 extractor coverage DONE 2026-07-11
+  next_ready: [C5, J5, L7, L8, L9, M2, M3, M4, N2, P1, J7, J8, C7, K4, K5, G10, J9]  # G11 done

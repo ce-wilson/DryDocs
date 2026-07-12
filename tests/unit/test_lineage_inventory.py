@@ -118,6 +118,60 @@ def test_legacy_host_key_normalizes_to_node_target() -> None:
     assert not hasattr(job, "host")
 
 
+# -- coverage accounting (G11 — report every skip by reason, never drop silently) ---
+
+def test_coverage_counts_pinned_on_fixture() -> None:
+    g = LineageGraph()
+    cov = ControlMInventoryExtractor().extract(FIXTURE, g)
+    # 5 rows -> 4 current jobs + 1 stale skip; every current job has a parsed cmd
+    assert cov.rows_read == 5
+    assert cov.jobs_added == 4
+    assert cov.skipped_stale_version == 1
+    assert cov.skipped_nameless == 0
+    assert cov.invocations_added == 4
+    assert cov.invocations_unresolved == 0
+    assert cov.invocations_no_target == 0
+    assert cov.commands_empty == 0
+    assert cov.commands_unparsed == 0
+
+
+def test_coverage_reports_nameless_empty_and_unresolved(tmp_path) -> None:
+    csv_path = tmp_path / "jobs.csv"
+    csv_path.write_text(
+        "job_id,folder_id,job_name,parent_table,owner,node_id,cmd_line,is_current_version\n"
+        "1,10,JOB_EMPTY_CMD,F1,svc.x,h1,,1\n"          # kept; empty command
+        "2,10,,F1,svc.x,h1,/opt/x.sh,1\n"              # nameless -> skipped
+        "3,10,JOB_UNKNOWN,F1,svc.x,h1,mystery_bin,1\n"  # UNKNOWN kind -> unresolved
+        "4,10,JOB_STALE,F1,svc.x,h1,/opt/y.sh,0\n",     # stale -> skipped
+        encoding="utf-8",
+    )
+    g = LineageGraph()
+    cov = ControlMInventoryExtractor().extract(csv_path, g)
+    assert cov.rows_read == 4
+    assert cov.jobs_added == 2
+    assert cov.skipped_nameless == 1
+    assert cov.skipped_stale_version == 1
+    assert cov.commands_empty == 1
+    assert cov.invocations_added == 1
+    assert cov.invocations_unresolved == 1  # mystery_bin classified UNKNOWN, still a candidate
+    # the accounting is total: every row lands in exactly one row-level bucket
+    assert cov.rows_read == (
+        cov.jobs_added + cov.skipped_nameless + cov.skipped_stale_version
+    )
+    # dict view carries every counter (machine-readable for future STG_PARSE_QUALITY hookup)
+    assert set(cov.as_dict()) >= {
+        "rows_read", "jobs_added", "skipped_stale_version", "skipped_nameless",
+        "commands_empty", "commands_unparsed", "invocations_added",
+        "invocations_unresolved", "invocations_no_target",
+    }
+    assert "skipped: stale=1 nameless=1" in cov.summary()
+
+
+def test_coverage_missing_source_is_all_zero(tmp_path) -> None:
+    cov = ControlMInventoryExtractor().extract(tmp_path / "nope", LineageGraph())
+    assert cov.rows_read == 0 and cov.jobs_added == 0
+
+
 def test_no_parse_code_of_its_own() -> None:
     # 0002-C §5: lineage contains NO Control-M parse code (no LAUNCHER_REGISTRY,
     # no parse_command definition) — the parser is core's, full stop.

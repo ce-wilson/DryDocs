@@ -635,13 +635,14 @@ def lineage_review(
         console.print(f"[red]Source not found: {source}[/]")
         raise typer.Exit(2)
     graph = LineageGraph()
-    ControlMInventoryExtractor().extract(source, graph)
+    coverage = ControlMInventoryExtractor().extract(source, graph)
     out.write_text(to_html(graph, doc_id=doc_id or source.stem), encoding="utf-8")
     st = graph.stats()
     console.print(
         f"[green]wrote {out}[/] — processes={st['processes']} "
         f"data_assets={st['data_assets']} rels={st['rels']}"
     )
+    console.print(f"coverage: {coverage.summary()}")
 
 
 @app.command(name="m3-verify")

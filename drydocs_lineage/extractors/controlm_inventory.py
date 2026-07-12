@@ -25,6 +25,7 @@ Mapping → ProcessNode:
 from __future__ import annotations
 
 import csv
+from dataclasses import asdict, dataclass
 from pathlib import Path
 
 from drydocs_core.controlm import parse_command
@@ -33,6 +34,36 @@ from ..model import LineageGraph, ProcessNode, process_id
 
 # header tokens that identify a Control-M jobs CSV when searching a directory
 _JOBS_CSV_HINTS = ("job_name", "cmd_line", "node_id")
+
+
+@dataclass
+class ExtractCoverage:
+    """Per-run accounting — every skip is counted BY REASON, never silent
+    (the STG_PARSE_QUALITY / UNMATCHED house rule applied to the candidate side).
+    """
+
+    rows_read: int = 0
+    jobs_added: int = 0                 # distinct current-version job nodes
+    skipped_stale_version: int = 0      # is_current_version present and != 1
+    skipped_nameless: int = 0           # row with no job_name
+    commands_empty: int = 0             # job kept, but cmd_line blank — no candidate
+    commands_unparsed: int = 0          # job kept, cmd_line present but 0 invocations
+    invocations_added: int = 0          # INVOKES candidates linked
+    invocations_unresolved: int = 0     # added but kind UNKNOWN (review page warns)
+    invocations_no_target: int = 0      # parsed invocation without a resolvable target
+
+    def as_dict(self) -> dict[str, int]:
+        return asdict(self)
+
+    def summary(self) -> str:
+        return (
+            f"rows={self.rows_read} jobs={self.jobs_added} "
+            f"invocations={self.invocations_added} "
+            f"(unresolved={self.invocations_unresolved}) | skipped: "
+            f"stale={self.skipped_stale_version} nameless={self.skipped_nameless} "
+            f"no_target={self.invocations_no_target} | commands: "
+            f"empty={self.commands_empty} unparsed={self.commands_unparsed}"
+        )
 
 
 def _basename(path: str) -> str:
@@ -44,14 +75,21 @@ class ControlMInventoryExtractor:
 
     name = "controlm-inventory"
 
-    def extract(self, source: str | Path, into: LineageGraph) -> None:
-        """``source`` is the jobs CSV (preferred) or a directory to search."""
+    def extract(self, source: str | Path, into: LineageGraph) -> ExtractCoverage:
+        """``source`` is the jobs CSV (preferred) or a directory to search.
+
+        Returns the run's :class:`ExtractCoverage` so callers can report what
+        was read, added, and skipped (by reason) — nothing drops silently.
+        """
+        coverage = ExtractCoverage()
         csv_path = self._resolve_csv(Path(source))
         if csv_path is None:
-            return  # nothing to do — no Control-M export present
+            return coverage  # nothing to do — no Control-M export present
         with csv_path.open(newline="", encoding="utf-8-sig") as fh:
             for row in csv.DictReader(fh):
-                self._row(row, into)
+                coverage.rows_read += 1
+                self._row(row, into, coverage)
+        return coverage
 
     # -- internals --------------------------------------------------------------
     def _resolve_csv(self, root: Path) -> Path | None:
@@ -67,13 +105,15 @@ class ControlMInventoryExtractor:
                     return cand
         return None
 
-    def _row(self, row: dict, into: LineageGraph) -> None:
+    def _row(self, row: dict, into: LineageGraph, coverage: ExtractCoverage) -> None:
         # only current-version definitions (CSV may already be filtered)
         icv = (row.get("is_current_version") or "").strip()
         if icv and icv != "1":
+            coverage.skipped_stale_version += 1
             return
         job_name = (row.get("job_name") or "").strip()
         if not job_name:
+            coverage.skipped_nameless += 1
             return
         folder = (row.get("parent_table") or row.get("folder_id") or "").strip()
         folder_id = (row.get("folder_id") or "").strip()
@@ -84,6 +124,8 @@ class ControlMInventoryExtractor:
         # (folder_id, job_id); fall back to folder/job_name for hand-made CSVs.
         key = f"{folder_id}.{job_id}" if (folder_id and job_id) else f"{folder}/{job_name}"
         jid = process_id("controlm_job", key)
+        if jid not in into.processes:
+            coverage.jobs_added += 1
         into.add_process(ProcessNode(
             node_id=jid,
             kind="controlm_job",
@@ -95,9 +137,17 @@ class ControlMInventoryExtractor:
             application=(row.get("application") or "").strip(),
         ))
 
-        for inv in parse_command(cmd).invocations:
+        if not cmd:
+            coverage.commands_empty += 1
+            return
+        invocations = parse_command(cmd).invocations
+        if not invocations:
+            coverage.commands_unparsed += 1
+            return
+        for inv in invocations:
             target = inv.target
             if not target:
+                coverage.invocations_no_target += 1
                 continue
             kind = inv.invocation_type.lower()
             cid = process_id(kind, target)
@@ -108,3 +158,6 @@ class ControlMInventoryExtractor:
                 path=inv.script_path or inv.executable_path or "",
             ))
             into.add_rel(jid, "INVOKES", cid)
+            coverage.invocations_added += 1
+            if kind == "unknown":
+                coverage.invocations_unresolved += 1
