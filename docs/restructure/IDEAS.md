@@ -26,6 +26,14 @@ Tags help grooming: `idea` · `bug` · `doc` · `source` (new data source) · `q
 
 <!-- add new ideas at the top -->
 
+- 2026-07-11 — [chore] **ruff cleanup so CI can gate on lint** (found executing J5). The
+  J5 workflow runs `ruff check` as ADVISORY (continue-on-error) because the repo carries
+  ~757 pre-existing findings (E/F/W/I/B/UP/N/RUF select in pyproject; 334 auto-fixable) —
+  gating would have required a mass fix inside a CI chore, churning every file right
+  before company ports. Promote when ready: staged cleanup (auto-fixables first, then
+  per-rule), then flip the CI step to blocking. Coordinate with a port lull — the diff
+  touches everything.
+
 - 2026-07-11 — [idea] **Lineage live-load gate session** (captured at the G9 close). The Fork-3
   writer is built and REFUSES by design: the four vocabulary entries (m3_invokes / m3_triggers /
   m3_reads_from / m3_writes_to) are `status: planned`, so `write_curated` raises
