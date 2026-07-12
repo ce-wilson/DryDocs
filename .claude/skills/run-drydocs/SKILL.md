@@ -8,7 +8,7 @@ DryDocs is a Python CLI (Poetry, Python 3.11+) that loads Control-M job graph da
 ## Prerequisites
 
 ```powershell
-# Python 3.11+ required; 3.13 confirmed working.
+# Python 3.11+ required; 3.12 confirmed working.
 python --version
 
 # Install deps (already done if .venv exists)
@@ -27,7 +27,7 @@ This verifies:
 - CLI entry point (`drydocs --help`, subcommand `--help`)
 - All five Control-M Pydantic row models against bundled sample CSVs (8 folders, 13 jobs, 10 conditions_in, 10 dependencies)
 - Folder name parser (environment/LOB/type decoding)
-- Unit test suite (159 pass, 4 skipped — see Gotchas)
+- Unit test suite (full suite green; the only expected skips are the gitignored-sample-backed tests — see Gotchas)
 
 ## Direct model/adapter invocation (for PRs touching internal code)
 
@@ -35,8 +35,8 @@ Import and exercise specific layers without the CLI:
 
 ```powershell
 poetry run python 2>&1 << 'EOF'
-from drydocs.models.controlm import ControlMFolderRow
-from drydocs.adapters.csv_adapter import CsvAdapter
+from drydocs_core.models.controlm import ControlMFolderRow
+from drydocs_core.adapters.csv_adapter import CsvAdapter
 from pathlib import Path
 
 with CsvAdapter(Path("drydocs/data/samples/controlm_folders__sample.csv")) as a:
@@ -49,11 +49,13 @@ CsvAdapter is a context manager — `with` is required; direct iteration is not 
 
 ## Full integration chain (requires Neo4j)
 
-Configure `.env` at repo root:
+The target is the **local Docker EE container** (`neo4j:5.26-enterprise`; Aura was ruled
+out 2026-07-06). Configure `.env` at repo root — note Docker may remap the host ports
+(see `internal/helpmeloginlocalneo4j.md`; check with `docker port <container>`):
 ```
-NEO4J_URI=neo4j+s://<instance>.databases.neo4j.io
-NEO4J_USER=<user>
-NEO4J_PASSWORD=<password>
+NEO4J_URI=bolt://localhost:7689     # host-mapped Bolt port — verify, defaults may be remapped
+NEO4J_USER=neo4j
+NEO4J_PASSWORD=<password>           # local secret, never committed
 NEO4J_DATABASE=<database>
 ```
 
@@ -61,10 +63,10 @@ Then:
 ```powershell
 poetry run drydocs check                       # verify Neo4j + APOC
 poetry run drydocs bootstrap                   # apply constraints + ontology seed
-poetry run drydocs apply-ontology-supplement   # base ontology (idempotent)
-poetry run drydocs apply-m3-supplement         # ControlM anchor terms (idempotent)
+poetry run drydocs apply-ontology-supplement   # base + ControlM anchor terms (idempotent)
 poetry run drydocs apply-catalog-supplement    # Catalog ontology (idempotent)
 poetry run drydocs apply-seal-supplement       # SEAL ontology (idempotent)
+poetry run drydocs apply-registry-supplement   # software-registry ontology (idempotent)
 poetry run drydocs ingest-controlm             # full M3 chain: folders -> jobs -> conditions -> deps
 poetry run drydocs m1-verify                   # assert M1 invariants
 poetry run drydocs m3-verify                   # assert M3 invariants; all should be "yes"
@@ -102,27 +104,37 @@ Same as agent path — DryDocs is pure CLI with no interactive TUI or GUI. Comma
 poetry run pytest tests/unit/ -v
 ```
 
-159 pass, 4 skipped (see Gotchas).
+Full suite green; the only expected skips are sample-backed tests (see Gotchas).
 
 ## Gotchas
 
-**4 skipped tests (PyYAML not installed):**
-`tests/unit/test_schema.py` has 4 tests that skip with `SKIPPED: PyYAML not installed`. PyYAML is not in `pyproject.toml`. These are expected skips, not failures.
+**Expected skips (production sample CSV absent):** a few tests in
+`test_variable_classifier.py` / `test_variable_staging.py` skip with
+`production sample CSV absent (gitignored); regenerate locally via psgmgr`. Expected —
+the CSV is deliberately gitignored; regenerate via an Oracle extract if you need them.
+
+**Core imports live in `drydocs_core`.** Since the Phase B relocate (2026-07-10, ADR
+0002-A-1), models/adapters/parser/config are `drydocs_core.*`; `drydocs.*` is the
+component remainder (loaders/cli/review/plan/docgen). `ModuleNotFoundError: No module
+named 'drydocs.models'` means a pre-relocate path.
 
 **CsvAdapter is a context manager, not iterable.** `list(adapter)` raises `TypeError: 'CsvAdapter' object is not iterable`. Always use `with CsvAdapter(...) as a: for r in a.rows()`.
 
-**Neo4j Aura requires network access.** `drydocs check` will fail with `gaierror: [Errno 11001] getaddrinfo failed` in any environment without outbound internet (CI sandbox, restricted corporate network). The model/adapter layer and unit tests are the correct validation path in those environments.
-
-**PyYAML not installed** — 4 schema tests are skipped with `SKIPPED: PyYAML not installed`. This is expected; PyYAML is not in `pyproject.toml`.
+**Docker may remap the Neo4j host ports.** The local EE container's 7474/7687 can land
+on different host ports (e.g. 7476/7689). `drydocs check` failing with a connection
+refusal usually means the `.env` URI points at the wrong host port — check with
+`docker port <container>` (see `internal/helpmeloginlocalneo4j.md`).
 
 **Rich output encoding on Windows.** The CLI uses Rich for terminal output with box-drawing characters. Capture output with `| Out-String` in PowerShell before doing string matching, or pipe to Python: `poetry run drydocs --help | python -c "import sys; print(sys.stdin.read())"`.
 
 ## Troubleshooting
 
-**`gaierror: getaddrinfo failed`** → Neo4j Aura host not reachable from this network. Run smoke script instead for local validation.
+**Connection refused / `ServiceUnavailable` on `drydocs check`** → the local Neo4j
+container isn't running, or the host port in `.env` is stale (Docker remap — see
+Gotchas). Run the smoke script instead for offline validation.
 
 **`NEO4J_PASSWORD is empty`** → `.env` file missing or `NEO4J_PASSWORD=` not set. Copy `.env.example` to `.env` and fill in values.
 
-**`APOC not available`** → Neo4j instance does not have APOC plugin. Required for `bootstrap`. Enable APOC in your Aura instance settings.
+**`APOC not available`** → the Neo4j container lacks the APOC plugin. Required for `bootstrap`. Start the container with `NEO4J_PLUGINS='["apoc"]'` (or drop the APOC jar into the container's plugins dir).
 
-**Import errors on `drydocs.*`** → `poetry install` was not run or the venv is not activated. Run `poetry install` from repo root.
+**Import errors on `drydocs.*` / `drydocs_core.*`** → `poetry install` was not run or the venv is not activated. Run `poetry install` from repo root.

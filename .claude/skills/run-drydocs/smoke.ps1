@@ -29,12 +29,12 @@ Check "m3-verify --help" {
 # ── 2. Model + adapter layer (no Neo4j needed) ────────────────────────────────
 Check "model + adapter layer" {
     @'
-from drydocs.models.controlm import (
+from drydocs_core.models.controlm import (
     ControlMFolderRow, ControlMJobRow,
     ControlMConditionInRow,
     ControlMDependencyRow,
 )
-from drydocs.adapters.csv_adapter import CsvAdapter
+from drydocs_core.adapters.csv_adapter import CsvAdapter
 from pathlib import Path
 
 samples = Path("drydocs/data/samples")
@@ -50,7 +50,7 @@ for fname, Model, expected_min in checks:
     assert len(rows) >= expected_min, f"{fname}: got {len(rows)}, want >= {expected_min}"
     print(f"  {fname}: {len(rows)} rows OK")
 
-from drydocs.controlm.folder_name import parse_folder_name
+from drydocs_core.controlm.folder_name import parse_folder_name
 p = parse_folder_name("PRARAG-HLDM-111027-PEX-RFND-DLY")
 assert p.prefix_recognized
 assert p.environment == "Production"
@@ -61,7 +61,7 @@ print(f"  folder_name parser: environment={p.environment} lob={p.lob} OK")
 # ── 3. Unit tests ─────────────────────────────────────────────────────────────
 Write-Host "  >> unit tests" -ForegroundColor Cyan
 poetry run pytest tests/unit/ -q 2>&1 | Select-Object -Last 4 | Write-Host
-Write-Host "     (4 skipped: PyYAML not installed - expected)" -ForegroundColor Yellow
+Write-Host "     (3 skipped: production sample CSV absent, gitignored - expected)" -ForegroundColor Yellow
 
 Write-Host ""
 Write-Host "Smoke PASSED." -ForegroundColor Green
@@ -70,6 +70,6 @@ Write-Host ""
 Write-Host "Full ingest chain (requires .env with NEO4J_* set):"
 Write-Host "  poetry run drydocs check"
 Write-Host "  poetry run drydocs bootstrap"
-Write-Host "  poetry run drydocs apply-m3-supplement"
+Write-Host "  poetry run drydocs apply-ontology-supplement   # (+ seal/catalog/registry supplements)"
 Write-Host "  poetry run drydocs ingest-controlm"
 Write-Host "  poetry run drydocs m3-verify"

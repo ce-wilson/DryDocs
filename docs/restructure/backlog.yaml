@@ -1243,7 +1243,7 @@ items:
     agent: main
     model: haiku
     priority: p3
-    status: todo
+    status: done
     depends_on: []
     inputs: [.claude/skills/run-drydocs/SKILL.md, pyproject.toml]
     acceptance: >
@@ -1257,7 +1257,13 @@ items:
     notes: >
       Groomed 2026-07-09 from the IDEAS line. Verified 2026-07-09: SKILL.md still asserts
       PyYAML uninstalled (x2), "159 pass", Aura, and apply-m3-supplement — all stale. Same
-      doc-drift hygiene class as J1/J2.
+      doc-drift hygiene class as J1/J2. DONE 2026-07-11: all four staleness classes fixed
+      (counts now count-free "suite green + expected sample skips"; PyYAML gotchas replaced
+      by the real skip reason; Aura → local Docker EE with the port-remap gotcha; supplement
+      chain reconciled to the real commands incl. apply-registry-supplement). BONUS finding
+      fixed in-scope: smoke.ps1 + the direct-invocation snippet still imported pre-relocate
+      drydocs.models/adapters/controlm — broken since Phase B; repointed to drydocs_core,
+      smoke PASSES again (566/3).
 
   - id: J5
     epic: release-infrastructure
@@ -2196,8 +2202,8 @@ items:
 # Roll-up the dispatcher can glance at. COMPUTED views — test_backlog.py enforces
 # that these match the items exactly; update them with any status change.
 summary:
-  todo: 25                                          # +G11 (lineage coverage accounting), +J9 (testcontainers e2e) — 2026-07-11 groom
+  todo: 24                                          # J4 done 2026-07-11 (non-HITL execution batch)
   in_progress: 6                                   # E1, F1, F2, K2, P2 (awaiting HITL), O1 (web design pass)
   blocked: 0
-  done: 48                                          # G9 depgraph lineage re-home DONE 2026-07-11
-  next_ready: [C5, J2, J4, J5, J6, L7, L8, L9, M2, M3, M4, N2, P1, J7, J8, C7, K4, K5, G10, G11, J9]  # G11 (G9 done), J9 (no deps)
+  done: 49                                          # J4 skill refresh DONE 2026-07-11
+  next_ready: [C5, J2, J5, J6, L7, L8, L9, M2, M3, M4, N2, P1, J7, J8, C7, K4, K5, G10, G11, J9]  # J4 done
