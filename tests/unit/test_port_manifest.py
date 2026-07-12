@@ -99,3 +99,14 @@ def test_overrides_precede_their_broader_glob(manifest: dict) -> None:
     # same shape for the drydocs/ tree: the frozen adapter + review modules are
     # file-specific rows, and no broad drydocs/** row may exist at all
     assert "drydocs/**" not in paths, "no blanket drydocs/** row — keep dispositions explicit"
+
+
+def test_pyproject_row_pins_the_version_string_rule(manifest: dict) -> None:
+    """J7 rule (3): the pyproject.toml row is per-entry and its entry_rule keeps
+    the CONSUMER's version string (per-repo release cadence) — a port must never
+    carry the producer's version or its v* release tags across."""
+    row = next(r for r in manifest["rows"] if r["path"] == "pyproject.toml")
+    assert row["disposition"] == "per-entry"
+    rule = row["entry_rule"].lower()
+    assert "version string" in rule and "consumer" in rule, rule
+    assert "tags never cherry-pick" in rule, rule

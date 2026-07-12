@@ -2146,7 +2146,7 @@ items:
     agent: main
     model: sonnet
     priority: p2
-    status: todo
+    status: done
     depends_on: []
     inputs: [PORT-MANIFEST.yaml, tests/unit/test_taxonomy_ontology_map.py, config/gate-log.md]
     acceptance: >
@@ -2156,7 +2156,14 @@ items:
       (2) gate-log append-only check (existing entries are a prefix of the merged file);
       (3) the pyproject version-string rule asserted in the manifest test. Rules
       runnable consumer-side during reconcile-port (documented in that skill).
-    notes: "docs/reviews/tech-debt-port-boundary.md Phase 2; sequenced AFTER the map guard (landed ede0b94) by design."
+    notes: >
+      docs/reviews/tech-debt-port-boundary.md Phase 2; sequenced AFTER the map guard
+      (landed ede0b94) by design. DONE 2026-07-11: tests/unit/test_port_reconcile_guards.py
+      — executable entry rules (vocab active no-downgrade + map confirmed/applied
+      no-downgrade + no dropped entries + gate-log byte-prefix append-only), fixture-proven
+      both directions, plus env-gated LIVE comparison (RECONCILE_BEFORE_DIR=<snapshot dir>)
+      verified pass AND fail against a doctored snapshot; version-string rule asserted in
+      test_port_manifest.py; consumer-side usage documented in the reconcile-port skill.
 
   - id: J8
     epic: release-infrastructure
@@ -2231,8 +2238,8 @@ items:
 # Roll-up the dispatcher can glance at. COMPUTED views — test_backlog.py enforces
 # that these match the items exactly; update them with any status change.
 summary:
-  todo: 19                                          # J2+J4+J6+J8+G11+N2 done 2026-07-11 (non-HITL execution batch)
+  todo: 18                                          # J2+J4+J6+J7+J8+G11+N2 done 2026-07-11 (non-HITL execution batch)
   in_progress: 6                                   # E1, F1, F2, K2, P2 (awaiting HITL), O1 (web design pass)
   blocked: 0
-  done: 54                                          # N2 column-ledger drift guards DONE 2026-07-11
-  next_ready: [C5, J5, L7, L8, L9, M2, M3, M4, P1, J7, C7, K4, K5, G10, J9]  # N2 done
+  done: 55                                          # J7 port reconciler guards DONE 2026-07-11
+  next_ready: [C5, J5, L7, L8, L9, M2, M3, M4, P1, C7, K4, K5, G10, J9]  # J7 done

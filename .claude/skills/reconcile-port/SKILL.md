@@ -125,6 +125,30 @@ test `test_entrypoint_is_exempt_but_still_classified`), always pass; it guards t
 composition root and may import any component (`ENTRYPOINT_MODULES`) — a company `cli.py`
 that owns the review commands passes as-is; do NOT extract a `review_cli.py` sub-app.
 
+## Per-entry guards — run them around the merge (J7)
+
+The PORT-MANIFEST `per-entry` / `union-append` entry_rules are executable
+(`tests/unit/test_port_reconcile_guards.py`): status no-downgrade (vocabulary
+`active`, map `confirmed`/`applied`), no dropped entries, gate-log append-only.
+Use them to PROVE the merge respected the rules instead of eyeballing:
+
+```
+# 1. BEFORE applying the port — snapshot the consumer copies
+mkdir "$env:TEMP/reconcile-before"
+cp drydocs_core/ontology/relationship_vocabulary.yaml, config/taxonomy-ontology-map.yaml, config/gate-log.md "$env:TEMP/reconcile-before/"
+
+# 2. apply the range / resolve collisions as usual
+
+# 3. AFTER — the guards fail on any downgrade, dropped entry, or audit truncation
+$env:RECONCILE_BEFORE_DIR = "$env:TEMP/reconcile-before"
+poetry run pytest tests/unit/test_port_reconcile_guards.py -q
+```
+
+Without `RECONCILE_BEFORE_DIR` the live checks skip and only the fixture-driven
+mechanics run — so the file is safe in every CI. The pyproject version-string
+rule is asserted separately in `test_port_manifest.py` (keep the consumer's
+version; producer `v*` tags never cherry-pick).
+
 ## Track-2 (optional — real data, or fresh sample)
 
 Bundled exact counts (89 passed; `normalize-variables` → inv=6, file_op=16,
