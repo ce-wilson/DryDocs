@@ -1303,7 +1303,7 @@ items:
     agent: main
     model: haiku
     priority: p3
-    status: todo
+    status: done
     depends_on: []
     inputs: [pyproject.toml, poetry.lock]
     acceptance: >
@@ -1316,7 +1316,9 @@ items:
       Groomed 2026-07-09 from the parked unused-deps IDEAS line, SCOPED after verification: the
       original note also named pandas (intentional — csv_adapter.py:6-8) and pypdf (now imported
       by scripts/ingest_jpmc_reports.py:27), so only the two streamlit packages are actually dead
-      (imported nowhere). Removes the heaviest unused install weight.
+      (imported nowhere). Removes the heaviest unused install weight. DONE 2026-07-11:
+      poetry remove streamlit streamlit-agraph (lock regenerated, transitive deps pruned);
+      import scan clean; pandas + pypdf retained; suite 566/3 + drydocs --help green.
 
   # ── Epic K — SEAL application attribution (seal_app_ref) — Phase 9 ────────
   # Groomed 2026-07-01 from the company reconciliation answers (SME-run prompt).
@@ -2207,8 +2209,8 @@ items:
 # Roll-up the dispatcher can glance at. COMPUTED views — test_backlog.py enforces
 # that these match the items exactly; update them with any status change.
 summary:
-  todo: 23                                          # J2+J4 done 2026-07-11 (non-HITL execution batch)
+  todo: 22                                          # J2+J4+J6 done 2026-07-11 (non-HITL execution batch)
   in_progress: 6                                   # E1, F1, F2, K2, P2 (awaiting HITL), O1 (web design pass)
   blocked: 0
-  done: 50                                          # J2 README reconcile DONE 2026-07-11
-  next_ready: [C5, J5, J6, L7, L8, L9, M2, M3, M4, N2, P1, J7, J8, C7, K4, K5, G10, G11, J9]  # J2, J4 done
+  done: 51                                          # J6 streamlit removal DONE 2026-07-11
+  next_ready: [C5, J5, L7, L8, L9, M2, M3, M4, N2, P1, J7, J8, C7, K4, K5, G10, G11, J9]  # J2, J4, J6 done

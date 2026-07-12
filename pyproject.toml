@@ -17,8 +17,6 @@ python-dotenv = "^1.0"
 typer = "^0.12"
 click = ">=8.0,<8.2"
 rich = "^13.7"
-streamlit = "^1.36"
-streamlit-agraph = "^0.0.45"
 pyyaml = "^6.0.3"          # runtime: the precedence resolver reads config/*.yaml at load time
 
 [tool.poetry.group.dev.dependencies]
