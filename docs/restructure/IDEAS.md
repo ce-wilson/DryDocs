@@ -26,6 +26,12 @@ Tags help grooming: `idea` · `bug` · `doc` · `source` (new data source) · `q
 
 <!-- add new ideas at the top -->
 
+- 2026-07-12 — [doc] **/documentation skill has NO white-paper guideline** (types: README, API,
+  runbook, architecture, onboarding). Wrote docs/whitepaper/drydocs-whitepaper.md deriving
+  structure from the architecture-doc type + white-paper conventions; if white papers recur,
+  add a "White paper" type to the skill (exec summary → problem → approach → architecture →
+  governance → roadmap) and consider an Epic L outline for it (whitepaper.outline.yaml).
+
 - 2026-07-11 — [chore] **ruff cleanup so CI can gate on lint** (found executing J5). The
   J5 workflow runs `ruff check` as ADVISORY (continue-on-error) because the repo carries
   ~757 pre-existing findings (E/F/W/I/B/UP/N/RUF select in pyproject; 334 auto-fixable) —
