@@ -26,28 +26,17 @@ Tags help grooming: `idea` · `bug` · `doc` · `source` (new data source) · `q
 
 <!-- add new ideas at the top -->
 
-- 2026-07-12 — [idea] **From the artifact-design review**: (1) add a governed-render-fidelity
-  rule (CLAUDE.md or docgen skill): TDDs/gate pages/board publish VERBATIM — never restyled —
-  because the HITL loop keys anchors on them; editorial treatment is for non-governed
-  outward-facing docs only (whitepaper, website). (2) Point the O1 web-console design pass at
-  the artifact-design skill's "UI, not a document" checklist + its AI-default-looks list as a
-  review lens for the UI-WIP/ mockups. (3) The whitepaper's "overnight ledger" identity
-  (greenbar/banner-page/mono-display; hosted artifact) is a candidate seed for the dry-docs.com
-  site visual language — canonical source stays docs/whitepaper/drydocs-whitepaper.md.
+- 2026-07-12 — [idea] **dry-docs.com site visual language**: seed from the whitepaper's
+  "overnight ledger" identity (greenbar/banner-page/mono-display; canonical source stays
+  docs/whitepaper/drydocs-whitepaper.md). Parked until website work starts — the site is
+  not started and the domain's availability is unresolved. (Re-inboxed slim at the
+  2026-07-13 groom from the artifact-design-review line, sub-item 3.)
 
 - 2026-07-12 — [doc] **/documentation skill has NO white-paper guideline** (types: README, API,
   runbook, architecture, onboarding). Wrote docs/whitepaper/drydocs-whitepaper.md deriving
   structure from the architecture-doc type + white-paper conventions; if white papers recur,
   add a "White paper" type to the skill (exec summary → problem → approach → architecture →
   governance → roadmap) and consider an Epic L outline for it (whitepaper.outline.yaml).
-
-- 2026-07-11 — [chore] **ruff cleanup so CI can gate on lint** (found executing J5). The
-  J5 workflow runs `ruff check` as ADVISORY (continue-on-error) because the repo carries
-  ~757 pre-existing findings (E/F/W/I/B/UP/N/RUF select in pyproject; 334 auto-fixable) —
-  gating would have required a mass fix inside a CI chore, churning every file right
-  before company ports. Promote when ready: staged cleanup (auto-fixables first, then
-  per-rule), then flip the CI step to blocking. Coordinate with a port lull — the diff
-  touches everything.
 
 - 2026-07-11 — [idea] **Lineage live-load gate session** (captured at the G9 close). The Fork-3
   writer is built and REFUSES by design: the four vocabulary entries (m3_invokes / m3_triggers /
@@ -130,6 +119,29 @@ Tags help grooming: `idea` · `bug` · `doc` · `source` (new data source) · `q
 ## Recently groomed (audit trail)
 
 <!-- when you promote an idea, move its line here with the resulting backlog id -->
+
+- 2026-07-13 groom run (weekly inbox groom) — 2 promoted / 1 merged / 1 re-inboxed:
+  - [chore] ruff cleanup → CI lint gate (2026-07-11, found executing J5) → **J10** (Epic J,
+    phase 8; ready — J5 done and live on main). The user's timing flag preserved in the item
+    notes: execute during a port lull, the diff touches every Python file.
+  - [idea] artifact-design review sub-item 1 (governed-render-fidelity rule: governed
+    surfaces — design-doc renders, gate pages, board — publish VERBATIM; editorial treatment
+    only for outward-facing docs) → **L12** (Epic L, phase 10).
+  - [idea] artifact-design review sub-item 2 (artifact-design skill's "UI, not a document"
+    checklist + AI-default-looks list as the UI-WIP/ review lens) → **MERGED into O1** notes;
+    O1 re-tiered opus → fable on the groom touch (G3 policy — the bolt-vs-thin-API call is a
+    boundary decision).
+  - [idea] artifact-design review sub-item 3 (whitepaper "overnight ledger" identity as the
+    dry-docs.com visual seed) → re-inboxed as its own slim line, parked until website work starts.
+  - kept parked, unchanged (each on its recorded gate): /documentation whitepaper doc-type
+    (trigger "white papers recur" hasn't fired), lineage live-load gate session (HITL —
+    groom when the SME schedules it), remediation next slices (TDD §6/§7 tracks), Phase C
+    packaging (plan gate), Workbench (entitlement), SchedulerKind → AisCapability/AiTool
+    (SME class definitions), BRD outline (later phase), docmeta P1–P3 (P0 written verdict +
+    ADR 0004), EE container password (user deferred), LLM key strategy (open question),
+    common/ in /list-apps (cosmetic), cli.py regroup (v1.0 rename window).
+  - hygiene: deleted the stray empty docs/restructure/IDEAS.md.tmp (interrupted-write leftover,
+    0 bytes, untracked).
 
 - 2026-07-11 — /tech-debt documentation audit (docs/reviews/tech-debt-documentation.md) —
   0 promoted / 1 merged / 5 executed with the review / 3 deduped:

@@ -36,7 +36,7 @@
 # =============================================================================
 
 schema: drydocs.backlog.v2
-updated: 2026-07-11
+updated: 2026-07-13
 
 # ── The high-level project plan (rendered as the board's roadmap strip) ───────
 plan:
@@ -1843,6 +1843,34 @@ items:
       derived h3s + 9 list items; print surface byte-identical to pre-change). 7+3 new
       tests; feedback README documents the namespace.
 
+  - id: L12
+    epic: doc-infrastructure
+    title: "Document the governed-render-fidelity rule: governed surfaces publish verbatim; editorial styling only for outward-facing docs"
+    type: chore
+    module: docs
+    phase: 10
+    agent: main
+    model: haiku
+    priority: p2
+    status: todo
+    depends_on: []
+    inputs: [CLAUDE.md, docs/design/, docs/plan/board.html, docs/whitepaper/drydocs-whitepaper.md]
+    acceptance: >
+      A governed-render-fidelity rule is documented where agents will hit it (CLAUDE.md
+      working agreements and/or the docgen-adjacent skill docs — placement recorded in
+      these notes when done): governed surfaces (docs/design/* renders, gate pages,
+      docs/plan/board.html) are published/shared VERBATIM from their deterministic
+      renderers — never restyled, summarized, or editorially reworked — because the
+      HITL loop keys anchors on them (L5 digital / L6 paper feedback re-attachment);
+      editorial/design treatment (artifact-design pass, the whitepaper's visual
+      identity) applies ONLY to non-governed outward-facing docs (whitepaper, website).
+      The rule names both surface classes. No renderer code change.
+    notes: >
+      Groomed 2026-07-13 from the 2026-07-12 IDEAS line (artifact-design review,
+      sub-item 1 of 3). Sub-item 2 merged into O1 (design-lens note); sub-item 3
+      (whitepaper "overnight ledger" identity as the dry-docs.com visual seed)
+      re-inboxed, parked until website work starts.
+
   # ── Epic M — Provenance diet + audit envelope (doc 06) — Phase 11 ──────────
   # Groomed 2026-07-08 from the 2026-07-05 IDEAS line + the 2026-07-07 property-terms
   # line. Doc 06 Phases 0-1 (Control-M envelope: audit-fields.yaml + jobs/folders
@@ -2021,7 +2049,7 @@ items:
     module: drydocs-web
     phase: 12
     agent: main
-    model: opus
+    model: fable
     priority: p2
     status: in_progress
     depends_on: []
@@ -2039,6 +2067,11 @@ items:
       feature/ui-dark-landing-myapps + origin/feat/web-console-design-pass, untracked UI-WIP/).
       Plan change (user-approved): created module drydocs-web + phase 12. The architecture is
       still open — the bolt-vs-thin-API call is the crux of this item.
+      MERGED 2026-07-13 (groom, IDEAS 2026-07-12 artifact-design review sub-item 2): the
+      design pass applies the artifact-design skill's "UI, not a document" checklist + its
+      AI-default-looks list as the review lens over the UI-WIP/ mockups. RE-TIERED
+      opus -> fable on this groom touch (the G3 groom-touch policy; the bolt-vs-thin-API
+      call is a boundary decision, the matrix top slot).
 
   # ── Epic P — Runtime topology & maintenance windows — Phase 13 ─────────────
   # Born 2026-07-09: CM_HOSTS + CM_AVG_RUN onboarded via the add-source-object
@@ -2237,6 +2270,34 @@ items:
       the sample's legitimate DLY/CYC promoted pair (job_id 22 in two folders) proved
       it; check now groups the composite.
 
+  - id: J10
+    epic: release-infrastructure
+    title: "Ruff cleanup: fix the pre-existing lint findings in stages, then flip the CI ruff step to blocking"
+    type: chore
+    module: docs
+    phase: 8
+    agent: main
+    model: sonnet
+    priority: p3
+    status: todo
+    depends_on: [J5]
+    inputs: [pyproject.toml, .github/workflows/ci.yml]
+    acceptance: >
+      Staged cleanup of the ~757 pre-existing ruff findings (E/F/W/I/B/UP/N/RUF select
+      in pyproject): (1) the auto-fixable findings (~334) land first as their own
+      reviewable commit(s); (2) the remainder resolved per-rule in batches, any rule
+      deliberately kept carrying an explicit pyproject ignore with a reason comment;
+      end state: `poetry run ruff check .` exits 0 AND the ci.yml ruff step drops
+      continue-on-error (blocking). Full suite green at every stage.
+    notes: >
+      Groomed 2026-07-13 from the 2026-07-11 IDEAS line (found executing J5 — the CI
+      workflow runs ruff ADVISORY because gating would have required this mass fix
+      inside a CI chore). TIMING (user flag preserved): the diff touches every Python
+      file — execute during a port lull, coordinated with the company-port cadence
+      (git-readme.md), never right before a port. Module `docs` chosen per the J5
+      precedent (release/CI infrastructure work area); the fixes span every Python
+      package, so no single component module fits.
+
   - id: C7
     epic: ontology-mapping
     title: "Structured map fields at the next gate: vocab_id required, capture taxonomy-or-waived"
@@ -2260,8 +2321,8 @@ items:
 # Roll-up the dispatcher can glance at. COMPUTED views — test_backlog.py enforces
 # that these match the items exactly; update them with any status change.
 summary:
-  todo: 15                                          # G10 pulled in_progress 2026-07-12
+  todo: 17                                          # +J10 (ruff cleanup), +L12 (render-fidelity rule) groomed 2026-07-13
   in_progress: 6                                   # E1, F1, F2, K2, P2 (awaiting HITL), O1 (web design pass)
   blocked: 0
   done: 58                                          # G10 held-docs SME gate DONE 2026-07-12 (kept out permanently; README §HELD)
-  next_ready: [C5, L7, L8, L9, M2, M3, M4, P1, C7, K4, K5]  # G10 done
+  next_ready: [C5, L7, L8, L9, L12, M2, M3, M4, P1, C7, K4, K5, J10]  # J10 dep J5 done; L12 no deps
