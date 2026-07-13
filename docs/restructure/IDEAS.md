@@ -26,6 +26,15 @@ Tags help grooming: `idea` · `bug` · `doc` · `source` (new data source) · `q
 
 <!-- add new ideas at the top -->
 
+- 2026-07-12 — [idea] **From the artifact-design review**: (1) add a governed-render-fidelity
+  rule (CLAUDE.md or docgen skill): TDDs/gate pages/board publish VERBATIM — never restyled —
+  because the HITL loop keys anchors on them; editorial treatment is for non-governed
+  outward-facing docs only (whitepaper, website). (2) Point the O1 web-console design pass at
+  the artifact-design skill's "UI, not a document" checklist + its AI-default-looks list as a
+  review lens for the UI-WIP/ mockups. (3) The whitepaper's "overnight ledger" identity
+  (greenbar/banner-page/mono-display; hosted artifact) is a candidate seed for the dry-docs.com
+  site visual language — canonical source stays docs/whitepaper/drydocs-whitepaper.md.
+
 - 2026-07-12 — [doc] **/documentation skill has NO white-paper guideline** (types: README, API,
   runbook, architecture, onboarding). Wrote docs/whitepaper/drydocs-whitepaper.md deriving
   structure from the architecture-doc type + white-paper conventions; if white papers recur,
