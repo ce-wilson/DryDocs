@@ -316,3 +316,12 @@ records the date, the item, confirmed / edited / rejected counts, and reasons fo
   **confirmed** (confirmed_by/confirmed_on set; vocab_id stays deliberately none — property
   supplement); backlog **P2 → done**. The loader is NOT authorized to ship until the P1 probes
   record their conclusions (§D) — build may start, load may not.
+
+## 2026-07-14 — SOSA JobRun observation gate (E1) — DEFERRED by the SME
+
+- Gate `config/gate-prompts/sosa-jobrun-observation.yaml` was presented alongside the F1/F2/P2
+  sessions; **SME call: defer — not ready yet** (chad.wilson, 2026-07-14). No confirmations recorded,
+  nothing flips: the four sosa_* vocabulary terms stay `status: planned`, the `jobrun-observation`
+  map entry stays `status: proposed`, and the supplement stays opt-in/experimental. Re-present at a
+  future session; the open design question (ControlMJobRun-as-Observation vs separate Observation
+  node, run-history source) remains the gate's crux.

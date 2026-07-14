@@ -476,6 +476,8 @@ items:
       Declared-Adopted vs Experimental/Early-Adoption. REMAINING for ontology-mapper: take the
       `jobrun-observation` map entry through the HITL gate (resolve ControlMJobRun-as-Observation
       vs separate-Observation-node; run-history source), then planned->confirmed.
+      GATE SESSION DEFERRED 2026-07-14 (SME: not ready yet) — page stays rendered/pending;
+      nothing flips; re-present at a future session (see gate-log 2026-07-14 deferral note).
 
   - id: E2
     epic: context-graph
