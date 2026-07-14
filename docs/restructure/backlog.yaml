@@ -2150,7 +2150,7 @@ items:
     agent: main
     model: opus
     priority: p1
-    status: in_progress
+    status: done          # SIGNED OFF 2026-07-14, 1 SME edit (§B ctlm_id join upgrade); map entry confirmed; loader still blocked on P1 probes
     depends_on: []
     inputs: [config/gate-prompts/controlm-avg-run-supplement.yaml, config/gate-log.md]
     acceptance: >
@@ -2366,7 +2366,7 @@ items:
 # that these match the items exactly; update them with any status change.
 summary:
   todo: 17                                          # +J10 (ruff cleanup), +L12 (render-fidelity rule) groomed 2026-07-13
-  in_progress: 4                                   # E1, K2, P2 (awaiting HITL), O1 (web design pass)
+  in_progress: 3                                   # E1, K2 (awaiting HITL), O1 (web design pass)
   blocked: 0
-  done: 61                                          # F1+F2 crosswalk gates SIGNED OFF 2026-07-14 (Epic F complete)
+  done: 62                                          # F1+F2+P2 gates SIGNED OFF 2026-07-14
   next_ready: [C5, L7, L8, L9, L12, M2, M3, M4, P1, C7, K4, K5, J10]  # J10 dep J5 done; L12 no deps

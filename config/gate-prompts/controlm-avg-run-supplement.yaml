@@ -13,8 +13,11 @@ summary: >
   start+run times PLUS raw per-run sample arrays (~20 runs, start samples carry :odate), so
   day-of-week medians are computable without a CM_HIST scan. Proposed landing (SME direction
   2026-07-07, formalized here): a PROPERTY SUPPLEMENT onto existing :ControlMJob nodes — no
-  new labels, no new edges; the loader MATCHes jobs via the weak key (SCHED_TABLE,
-  JOB_MEM_NAME = JOB_NAME) and never MERGEs. Derived folder-level windows (min job start ..
+  new labels, no new edges; the loader MATCHes jobs — preferring ctlm_id (SME edit
+  2026-07-14: the internal psgmgr changes now derive folder_id.job_id as a single
+  ctlm_id, e.g. 161015.7 — the (folder_id, job_id) node key in composite form) where
+  the replica exposes it, falling back to the weak key (SCHED_TABLE, JOB_MEM_NAME =
+  JOB_NAME) — and never MERGEs. Derived folder-level windows (min job start ..
   max job end) are the maintenance-window primitive. This is the timing half of the
   maintenance-window use case signed off at gate controlm-hosts-topology (2026-07-09), and
   the runtime input to the TDQ-failure ETA (critical-path, never path-sum). Bonus:
@@ -33,7 +36,7 @@ mapping:
   - n: 1
     element: "Aggregate timing → job properties"
     target: "ControlMJob.avg_start_time (+ start_next_day flag), avg_run_time, min_run_time, max_run_time, run_time_std_dev"
-    edge: "—  [PROPOSED — property supplement; loader MATCHes (SCHED_TABLE, JOB_NAME), never MERGEs; unmatched rows = coverage metric]"
+    edge: "—  [PROPOSED — property supplement; loader MATCHes via ctlm_id (folder_id.job_id) where present, else (SCHED_TABLE, JOB_NAME); never MERGEs; unmatched rows = coverage metric]"
   - n: 2
     element: ">24h post-midnight clock normalization"
     target: "derived: HHMISS with HH up to ~30+ (e.g. 293502 ≈ 05:35:02 next day) → time-of-day + start_next_day"
@@ -60,7 +63,8 @@ provenance:
     key: "(DATA_CENTER, SCHED_TABLE, JOB_MEM_NAME) — assumed grain, dup probe P2 pending; -CYC/-DLY twin folders each carry rows"
     loader: "~ (none yet — supplement pass, written only after this gate resolves; runs AFTER the jobs pass)"
     properties:
-      - {name: join_rule, origin: derived, from: "SCHED_TABLE + JOB_MEM_NAME = CM_DEF_VJOB.JOB_NAME", note: "SME 2026-07-07: JOB_MEM_NAME is the distributed-era job name; MEMNAME (separate CM_DEF_VJOB column, demoted at the q1q3 gate) is NEVER a join key"}
+      - {name: join_rule, origin: derived, from: "ctlm_id (folder_id.job_id) preferred; fallback SCHED_TABLE + JOB_MEM_NAME = CM_DEF_VJOB.JOB_NAME", note: "SME 2026-07-14: internal psgmgr derives ctlm_id = folder_id.job_id (e.g. 161015.7) — split on '.' IS the (folder_id, job_id) node key; probes P0/P4 verify its presence + coverage on CM_AVG_RUN. SME 2026-07-07 stands: MEMNAME is NEVER a join key"}
+      - {name: ctlm_id, origin: source, from: "ctlm_id (internal psgmgr derived column, folder_id.job_id composite)", note: "strong join key where present; parsed folder_id/job_id must round-trip to the node key exactly — mismatches are a P4 census finding"}
       - {name: avg_start_time, origin: source, from: AVG_START_TIME, note: ">24h clock; normalization rule = mapping n:2"}
       - {name: avg/min/max_run_time, origin: source, from: "AVG_RUN_TIME / MIN_RUN_TIME / MAX_RUN_TIME", note: "seconds"}
       - {name: run_time_std_dev, origin: source, from: STD_DEV, note: "large spread flags unstable-runtime jobs for window planning"}
@@ -73,9 +77,10 @@ sections:
       - "Timing lands as PROPERTIES on existing :ControlMJob nodes (opt-in supplement pattern — software-registry/SOSA precedent); no new node labels, no new relationship types, no relationship_vocabulary.yaml entries."
       - "The supplement loader MATCHes job nodes and never MERGEs them (the DESCRIBES load-order precedent) — stats rows that match no active current-version job are reported as a coverage metric, never node-creating."
       - "Property list per mapping n:1–n:3 confirmed (aggregates + normalized start + day-of-week medians); anything beyond it needs a new gate item."
-  - title: "B. Join policy — the weak key"
+  - title: "B. Join policy — ctlm_id preferred, weak key fallback"
     confirmations:
-      - "Join = (SCHED_TABLE, JOB_MEM_NAME = JOB_NAME), acknowledged WEAKER than the (folder_id, job_id) node key; -CYC/-DLY twin folders each carry stats rows and land on their own job nodes."
+      - "SME EDIT 2026-07-14 (recorded at sign-off): the internal psgmgr changes derive ctlm_id = folder_id.job_id (e.g. 161015.7) — the (folder_id, job_id) node key in composite form. The loader joins on ctlm_id wherever the replica exposes it (split on '.' → the node key directly); P0 confirms its presence/type on CM_AVG_RUN and P4 censuses its coverage."
+      - "Fallback join = (SCHED_TABLE, JOB_MEM_NAME = JOB_NAME) for rows without a usable ctlm_id, acknowledged WEAKER than the node key; -CYC/-DLY twin folders each carry stats rows and land on their own job nodes."
       - "P4 coverage census (both directions: stats rows matched to jobs; active jobs having stats) sets the expected coverage baseline before the loader ships."
       - "MEMNAME is never used for identity/joins — consistent with its controlm-q1q3-phase1 demotion."
       - "Performance: the ONLY Oracle join in this package is the one-off P4 coverage probe (run the scoped P4s smoke test first; plan-check + bounded call timeout before estate-wide; per-DC fallback). The production extract is a plain projection; the loader's job match runs GRAPH-side and requires an index on ControlMJob(parent_table, job_name) before the estate-wide supplement pass."

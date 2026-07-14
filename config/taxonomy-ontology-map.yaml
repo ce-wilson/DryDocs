@@ -724,7 +724,7 @@ mappings:
   - id: job-runtime-stats-supplement
     taxonomy:
       source: controlm-psgmgr
-      element: "CM_AVG_RUN row supplies avg/median start+run timing for a job (join SCHED_TABLE + JOB_MEM_NAME = JOB_NAME)"
+      element: "CM_AVG_RUN row supplies avg/median start+run timing for a job (join ctlm_id = folder_id.job_id where present — SME edit 2026-07-14; fallback SCHED_TABLE + JOB_MEM_NAME = JOB_NAME)"
     ontology:
       from_node: ControlMJob                    # prov:Activity — properties land here
       to_node: ~                                # no target node — property supplement, not an edge
@@ -740,12 +740,14 @@ mappings:
       prov_maps_to: ~
     precedence_authority: bmc-baseline
     vocab_id: ~                             # deliberately none — property supplement, no edge terms
-    status: proposed
+    status: confirmed
+    confirmed_by: chad.wilson
+    confirmed_on: 2026-07-14                # gate SIGNED OFF, 1 SME edit (§B ctlm_id join upgrade)
     gate_spec: config/gate-prompts/controlm-avg-run-supplement.yaml
 
 # Counts the gate reports to the SME each run.
 summary:
   applied: 6          # job-contains, application-contains-folder, doc-describes-product, doc-chunk-part-of, doc-first-chunk, doc-next-chunk (comment-APPLIED entries promoted 2026-07-09, tech-debt F2)
-  confirmed: 17       # recomputed 2026-07-09 after F2 promotion (bmc-docs 4 + application-contains-folder moved to applied)
-  proposed: 8         # job-seal-app-ref, oracle-schema-asset, jobrun-observation, application-as-dataproduct, seal-tom-attribution, seal-doc-source-of-record, job-runtime-stats-supplement, requires-scheduler (merge 2026-07-09)
+  confirmed: 18       # +job-runtime-stats-supplement (gate SIGNED OFF 2026-07-14, §B ctlm_id edit)
+  proposed: 7         # job-seal-app-ref, oracle-schema-asset, jobrun-observation, application-as-dataproduct, seal-tom-attribution, seal-doc-source-of-record, requires-scheduler (merge 2026-07-09)
   rejected: 0

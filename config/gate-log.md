@@ -289,3 +289,30 @@ records the date, the item, confirmed / edited / rejected counts, and reasons fo
   **confirmed** (file-level + all 11 rows); source-registry `autosys-export` → **confirmed: true**
   (source-row status ONLY — no loader exists; a loader must be implemented and separately gated
   before any load runs); backlog **F1 → done**. Epic F crosswalk gates now both signed off.
+
+## 2026-07-14 — CM_AVG_RUN runtime-stats supplement gate — SIGNED OFF (P2)
+
+- **Gate:** `config/gate-prompts/controlm-avg-run-supplement.yaml` (20 confirmations after the §B edit),
+  reviewed via the rendered page; **ACCEPTED with 1 SME edit** (chad.wilson, 2026-07-14).
+- **SME EDIT — §B join policy upgraded (the edit of record):** the internal psgmgr changes derive
+  **ctlm_id = folder_id.job_id** (e.g. `161015.7`) — the `(folder_id, job_id)` node key in composite
+  form. The supplement loader joins on **ctlm_id where the replica exposes it** (split on `.` → the
+  node key directly); the previously-proposed weak key (SCHED_TABLE, JOB_MEM_NAME = JOB_NAME) demotes
+  to **fallback** for rows without a usable ctlm_id. P0 verifies ctlm_id presence/type on CM_AVG_RUN;
+  P4 censuses its coverage; parsed ids must round-trip to the node key exactly (mismatch = census
+  finding). MEMNAME stays NEVER a join key (q1q3 demotion).
+- **§A — CONFIRMED:** property supplement onto existing :ControlMJob (no new labels/edges/vocabulary);
+  MATCH-never-MERGE; property list = mappings n:1–n:3.
+- **§C — CONFIRMED:** >24h clock normalized in Python; FileWatcher rows excluded from blended stats;
+  day-of-week medians from SAMPLES_* arrays; ETA/window math critical-path, never path-sum.
+- **§D — CONFIRMED:** P8 decides refresh strategy; residual probes (P0 types, P2 grain, P2b
+  INSTANCE_NAME, P3b DSN, P7 parseability) remain REQUIRED before the loader ships — they ride
+  backlog **P1** (user-run internal probes), which stays open.
+- **§E — CONFIRMED:** maintenance-window computation (hosts-topology RUNS_ON → job windows → folder
+  rollups + DC-default fallback) and the TDQ-failure ETA framing.
+- **§F — SIGNED OFF.** **Confirmed: A, C, D, E · Edited: 1 (§B ctlm_id join upgrade) · Deferred: 0 ·
+  Rejected: 0.**
+- **Lifecycle (applied in this commit):** map entry `job-runtime-stats-supplement` proposed →
+  **confirmed** (confirmed_by/confirmed_on set; vocab_id stays deliberately none — property
+  supplement); backlog **P2 → done**. The loader is NOT authorized to ship until the P1 probes
+  record their conclusions (§D) — build may start, load may not.

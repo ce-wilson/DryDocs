@@ -26,6 +26,17 @@ Tags help grooming: `idea` · `bug` · `doc` · `source` (new data source) · `q
 
 <!-- add new ideas at the top -->
 
+- 2026-07-14 — [idea] **internal psgmgr now derives `ctlm_id` = `folder_id.job_id`** (e.g.
+  `161015.7`; recorded at the P2 avg-run gate sign-off as the §B join upgrade). Ripple beyond
+  CM_AVG_RUN to check: (1) which other CM_ views/extracts carry it — could replace weak joins
+  elsewhere; (2) K2 manual-CSV template `source_key` could accept `ctlm_id=<id>` as shorthand
+  for the composite (folder_id, job_id) key; (3) company-side port alignment — the derived
+  column lives internal-side, keep producer mechanism generic.
+
+- 2026-07-14 — [chore] **CLAUDE.md session ritual says `python scripts/render_board.py` — fails
+  outside the Poetry venv** on this machine (`No module named 'drydocs'`); needs `poetry run
+  python`. Fix the ritual line (and snapshot.ps1 if it shells the same way).
+
 - 2026-07-13 — [chore] **UI work stalled at 2026-07-07, split across two branches — needs a
   reconcile decision.** Findings from a status review: (1) `feature/ui-dark-landing-myapps`
   local and origin have DIVERGED — same two commits, different hashes (local `d44b916` is a
