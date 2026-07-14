@@ -36,7 +36,16 @@ Tags help grooming: `idea` · `bug` · `doc` · `source` (new data source) · `q
   ~69% of dependency edges were CROSS-FOLDER (the quantitative case that folder-scoped runbooks
   miss most of the dependency surface; a headline stat for the whitepaper/value story).
   Mechanism-only here; real names stay internal (photo evidence 2026-07-14). Groom into O5's
-  endpoint list when it starts, and consider both for controlm-runbook-automation. — generated 2026-06-09, vocabulary has
+  endpoint list when it starts, and consider both for controlm-runbook-automation.
+
+- 2026-07-14 — [doc] **`drydocs-project-review.md` has no canonical outline** — the new
+  whole-project review (docs/design/) renders through the Epic L pipeline but is free-form:
+  `doc_outline.py` only validates `docs/design/*-tdd.md`. When L8 introduces the second doc
+  type (runbook), consider a `review.outline.yaml` third type so the review gets the same
+  completeness validation + traceability treatment; it also needs a refresh cadence (facts
+  pinned to a commit go stale quietly — maybe a Rev bump per epic close).
+
+- 2026-07-14 — [chore] **schema_graph.cypher is stale — generated 2026-06-09, vocabulary has
   moved on** (docs_* edges, m3_runs_on_*, seal_requires_scheduler, and now the ACTIVE
   m3_seal_app_ref are all absent; no drift guard covers it, found during the K2 build).
   Either regenerate it from relationship_vocabulary.yaml + add a guard, or mark it
