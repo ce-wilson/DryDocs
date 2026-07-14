@@ -53,7 +53,7 @@ sources:
     orchestrator: autosys
     adapter: ~                          # TBD
     feeds_taxonomy: [folders, jobs, conditions, dependencies]
-    confirmed: false                    # placeholder — crosswalk not SME-confirmed (stopped at HITL gate)
+    confirmed: true                     # gate autosys-crosswalk SIGNED OFF 2026-07-14 (config/gate-log.md); loader still unbuilt + separately gated
     crosswalk: config/crosswalks/autosys-to-bmc.yaml
     gate_spec: config/gate-prompts/autosys-crosswalk.yaml
     notes: >

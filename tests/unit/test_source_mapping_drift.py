@@ -224,10 +224,12 @@ def test_census_with_uncounted_sweep_fails() -> None:
 # Confirmed sources that predate doc 08 and have no ledger YET — shrink-only.
 # A NEW confirmed source must ship its ledger (or extend this list through a
 # deliberate commit, which is the point: visible, named debt).
-# airflow-mwaa (2026-07-14, gate airflow-crosswalk): crosswalk-only activation —
-# no live export exists, so there are no columns to ledger; the ledger ships
-# with the future loader gate.
-LEDGER_PENDING = frozenset({"seal-extract", "catalog-pat", "software-registry", "bmc-docs", "airflow-mwaa"})
+# airflow-mwaa / autosys-export (2026-07-14, gates airflow-crosswalk /
+# autosys-crosswalk): crosswalk-only activations — no live export exists, so
+# there are no columns to ledger; each ledger ships with its future loader gate.
+LEDGER_PENDING = frozenset(
+    {"seal-extract", "catalog-pat", "software-registry", "bmc-docs", "airflow-mwaa", "autosys-export"}
+)
 
 
 def test_every_confirmed_source_has_a_ledger_or_is_named_pending() -> None:

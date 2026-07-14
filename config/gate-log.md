@@ -262,3 +262,30 @@ records the date, the item, confirmed / edited / rejected counts, and reasons fo
   **confirmed** (file-level + all 14 rows); source-registry `airflow-mwaa` → **confirmed: true**
   (source-row status ONLY — no loader exists; a loader must be implemented and separately gated before
   any load runs); backlog **F2 → done**. AutoSys (F1) unchanged — its gate remains pending.
+
+## 2026-07-14 — AutoSys → BMC baseline crosswalk gate — SIGNED OFF (F1)
+
+- **Gate:** `config/gate-prompts/autosys-crosswalk.yaml` (13 confirmations), reviewed via the rendered
+  page; **ACCEPTED IN FULL** (chad.wilson, 2026-07-14). Same-day pre-sign-off context (commit 9334bf3):
+  row 6 demoted exact → approximate at the SME wording review (machine: polymorphism); Software/§A
+  registry linkage added; registry rows `autosys`/`broadcom` created for it.
+- **§A — CONFIRMED** (crosswalk-only scope; public JIL concepts only; bmc-baseline stays authority 1).
+  **Registration ratified:** SoftwareProduct `autosys` (Broadcom Workload Automation, formerly CA
+  Workload Automation AE) MADE_BY `broadcom` — today's brand, per ADR 0004; the CA lineage is name
+  history, not the vendor.
+- **§B — CONFIRMED.** Rows 1, 3, 7 exact; rows 2, 4, 5, 6, 8, 9, 11 approximate, caveats accepted.
+  **Row 6 polymorphism acknowledged** (demoted from exact 2026-07-14): machine: names a real machine
+  (1-hop `:ExecutionHost`) OR a virtual machine load-balancing a host set — 1-to-many via
+  `:ControlMHostGroup -[:CONTAINS_HOST]-> :ExecutionHost`, mirroring the controlm-hosts-topology
+  group-match-wins resolution. **LIVE-EXPORT FOLLOW-UPS (2, before any loader):** row 6
+  (virtual-vs-real discrimination needs insert_machine definitions), row 9 (authoritative status
+  vocabulary needs a live export). **DEFERRED: 1** — row 4 (does d(file) need its own FileWatcher-job
+  baseline mapping?). All three stay live in the crosswalk's `open_questions`.
+- **§C — CONFIRMED NO-EQUIVALENT:** row 10 (global/box-scoped variables — never modeled via this
+  crosswalk; any variable-graph need routes through ontology-mapper). Nothing silently approximated.
+- **§D — SIGNED OFF.** **Confirmed: A, B, C · Deferred: 1 (§B row 4) · Live-export follow-ups: 2
+  (§B rows 6/9) · Edited: 0 · Rejected: 0.**
+- **Lifecycle (applied in this commit):** `config/crosswalks/autosys-to-bmc.yaml` status proposed →
+  **confirmed** (file-level + all 11 rows); source-registry `autosys-export` → **confirmed: true**
+  (source-row status ONLY — no loader exists; a loader must be implemented and separately gated
+  before any load runs); backlog **F1 → done**. Epic F crosswalk gates now both signed off.

@@ -501,7 +501,7 @@ items:
     agent: pipeline-config
     model: sonnet
     priority: p3
-    status: in_progress
+    status: done          # gate autosys-crosswalk SIGNED OFF 2026-07-14 (gate-log); autosys-export confirmed: true
     depends_on: [C1]
     inputs: [external/orchestration/autosys/README.md, config/source-registry.yaml]
     acceptance: "AutoSys crosswalk fully mapped to baseline; no invented concepts; gate logged; confirmed:true"
@@ -2366,7 +2366,7 @@ items:
 # that these match the items exactly; update them with any status change.
 summary:
   todo: 17                                          # +J10 (ruff cleanup), +L12 (render-fidelity rule) groomed 2026-07-13
-  in_progress: 5                                   # E1, F1, K2, P2 (awaiting HITL), O1 (web design pass)
+  in_progress: 4                                   # E1, K2, P2 (awaiting HITL), O1 (web design pass)
   blocked: 0
-  done: 60                                          # F2 airflow crosswalk gate SIGNED OFF 2026-07-14
+  done: 61                                          # F1+F2 crosswalk gates SIGNED OFF 2026-07-14 (Epic F complete)
   next_ready: [C5, L7, L8, L9, L12, M2, M3, M4, P1, C7, K4, K5, J10]  # J10 dep J5 done; L12 no deps

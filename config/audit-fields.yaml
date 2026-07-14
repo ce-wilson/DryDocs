@@ -97,3 +97,10 @@ sources:
       Confirmed 2026-07-14 (gate airflow-crosswalk) as a crosswalk sign-off only.
       Native audit columns are unknowable until a live MWAA DAG export exists;
       the envelope gate runs with the future loader gate.
+
+  - id: autosys-export
+    status: stub                             # envelope gate not run — crosswalk-only activation, no loader/live export
+    notes: >
+      Confirmed 2026-07-14 (gate autosys-crosswalk) as a crosswalk sign-off only.
+      Native audit columns are unknowable until a live JIL export exists; the
+      envelope gate runs with the future loader gate.
