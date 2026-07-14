@@ -36,7 +36,7 @@
 # =============================================================================
 
 schema: drydocs.backlog.v2
-updated: 2026-07-13
+updated: 2026-07-14
 
 # ── The high-level project plan (rendered as the board's roadmap strip) ───────
 plan:
@@ -112,6 +112,7 @@ modules:
   - drydocs-deepdoc      # future component (G4)
   - drydocs-remediation  # future component (G3)
   - drydocs-web          # JS/TS front-end under web/ (Epic O, phase 12) — console + graph viz; not a Python package, so absent from MODULE_MAP.md/test_module_boundary.py
+  - drydocs-api          # planned thin-API component (ADR 0005; working name — final at O5 scaffold): server-side graph access for the console
   - reference            # reference/ + external/ vendor & standards material
   - taxonomy             # config/taxonomy/ captures
   - ontology             # drydocs_core/schema/, relationship vocabulary, mappings
@@ -2140,6 +2141,118 @@ items:
       publish-boundary grep clean (synthetics only). Live-DB rows check env-gated (Docker
       down) — bolt flow moved verbatim in commit C, wiring proven by connection attempt.
 
+  # (O3–O6 groomed 2026-07-14 from ADR 0005's Action items, at the design-pass merge.)
+  - id: O3
+    epic: web-console
+    title: "Ratify ADR 0005 (browser↔Neo4j access path): SME accept/edit/reject + status flip"
+    type: task
+    module: docs
+    phase: 12
+    agent: main
+    model: sonnet
+    priority: p1
+    status: in_progress
+    depends_on: []
+    inputs: [docs/decisions/0005-browser-neo4j-access-path.md, docs/decisions/README.md, docs/restructure/backlog.yaml]
+    acceptance: >
+      The SME reviews ADR 0005 and its status flips PROPOSED -> ACCEPTED (or the SME's
+      edits land first and then it flips; a rejection instead reopens the O1 crux with the
+      rejection reason recorded in the ADR). The decisions README row drops its PROPOSED
+      marker; O1's "decision recorded" acceptance clause is satisfied and noted in O1
+      progress. No code in this item.
+    notes: >
+      Groomed 2026-07-14 from ADR 0005 Action item 1. in_progress = awaiting the SME
+      (the E1/P2 idiom): the ADR is authored by the SME (rewrite b5235f4) and delivered;
+      only the ratification act remains. Gates O4/O5 — the decision must be ACCEPTED
+      before code implements it.
+
+  - id: O4
+    epic: web-console
+    title: "GraphAccess seam refit in web/src/lib: bolt becomes a dev-mode adapter; raw Cypher gated behind admin + dev flag"
+    type: task
+    module: drydocs-web
+    phase: 12
+    agent: main
+    model: sonnet
+    priority: p2
+    status: todo
+    depends_on: [O3]
+    inputs: [docs/decisions/0005-browser-neo4j-access-path.md, web/src/lib/neo4j.ts, web/src/components/CypherConsole.tsx, web/README.md]
+    acceptance: >
+      Per ADR 0005 Action items 2/4/5: one GraphAccess interface in web/src/lib/ is the
+      only way console code reads the graph — view components never import neo4j-driver
+      directly; neo4j.ts is refitted as the bolt adapter behind it, activating ONLY on an
+      explicit dev flag + admin role; an api adapter stub exists against the O5 endpoint
+      shape (may throw not-implemented until O5 lands, but the seam + a bolt/api
+      conformance test are real); the CypherConsole raw-Cypher panel is gated behind
+      admin + dev flag; a repo check confirms no VITE_NEO4J_PASSWORD in any committed env
+      file and web/README.md documents the dev-mode credential rule (localhost form-entry
+      only, never committed/CI-injected). npm run build + lint green; the CDP drive's
+      login/role checks still pass.
+    notes: >
+      Groomed 2026-07-14 from ADR 0005 Action items 2, 4, 5 (the ADR assigns the refit to
+      O1's code stream; this item carries it so O1 stays the umbrella). The seam
+      conformance test is the ADR's "two adapters kept honest" consequence.
+
+  - id: O5
+    epic: web-console
+    title: "Thin-API component scaffold: read endpoints, per-view DB routing, gated raw-Cypher, session-auth stub"
+    type: requirement
+    module: drydocs-api
+    phase: 12
+    agent: main
+    model: fable
+    priority: p2
+    status: todo
+    depends_on: [O3]
+    inputs: [docs/decisions/0005-browser-neo4j-access-path.md, docs/decisions/0002-component-database-topology.md, agents/common/neo4j_tool.py, drydocs_core/, MODULE_MAP.md]
+    acceptance: >
+      A new monorepo component (working name drydocs-api; final name at scaffold, per the
+      ADR 0002 components-on-core pattern) exists: imports drydocs_core only; its own
+      COMPONENT_GROUP in tests/unit/test_module_boundary.py + MODULE_MAP row; server-side
+      Neo4j driver with credentials from server env (never a browser); READ-ONLY enforced
+      at the endpoint layer (generalizing the agents/common/neo4j_tool.py write-token
+      guard) with per-view database routing (drydocs vs drydocs_all) decided server-side;
+      named query endpoints shaped for the console's views (towers, drill-down, C4/graph
+      payload) + a raw-Cypher endpoint gated to admin; a session-auth stub replaces the
+      browser as role authority for the api path (synthetic personas server-side;
+      enterprise OIDC remains a company-side twin per the ADR Evidence). Offline unit
+      tests (pure handlers + duck-typed graph runner, the graph_verify idiom); build/run
+      documented; full suite green.
+    notes: >
+      Groomed 2026-07-14 from ADR 0005 Action item 3 (the ADR explicitly defers this item
+      to the groom-backlog flow). Model fable per the component-boundary precedent (G3/G4
+      re-tiers): new COMPONENT_GROUP + MODULE_MAP boundary work. NOT an ADK api_server
+      extension — shared guard pattern only. New module drydocs-api registered this groom.
+
+  - id: O6
+    epic: web-console
+    title: "Live C4/graph view against the local EE DB through the GraphAccess seam (api adapter primary)"
+    type: requirement
+    module: drydocs-web
+    phase: 12
+    agent: main
+    model: sonnet
+    priority: p2
+    status: todo
+    depends_on: [O4, O5]
+    inputs: [web/src/, docs/decisions/0005-browser-neo4j-access-path.md, UI-WIP/wf-console-01.html, UI-WIP/design-review.md]
+    acceptance: >
+      The console renders a REAL C4/graph view of the knowledge graph against the local
+      EE DB — data through the GraphAccess seam with the api adapter as the default path
+      (dev-mode bolt allowed for the bench, per ADR 0005) — replacing the synthesized
+      drill-down SVGs as the live surface (the synthesized pages stay as the no-backend
+      demo); the rendering-library decision (NVL vs successor) is made and recorded in
+      the item notes or a design doc; payload shaping is server-side (O5's C4 endpoint),
+      not duplicated in the browser; the wf-console-01 wireframe's graph-before-Cypher
+      ordering finding is honored. Build + lint green; runtime-verified against the live
+      DB with DOM/screenshot evidence.
+    notes: >
+      Groomed 2026-07-14 — the remaining O1 build; O1 closes when O3 (decision recorded)
+      and this item land (wireframes committed 2026-07-14 via UI-WIP; build/run docs ride
+      O5). Library choice is a tech pick, not a boundary decision — record it, escalate
+      only if it grows one.
+
   # ── Epic P — Runtime topology & maintenance windows — Phase 13 ─────────────
   # Born 2026-07-09: CM_HOSTS + CM_AVG_RUN onboarded via the add-source-object
   # walkthrough; gate controlm-hosts-topology SIGNED OFF 18/18 same day
@@ -2388,8 +2501,8 @@ items:
 # Roll-up the dispatcher can glance at. COMPUTED views — test_backlog.py enforces
 # that these match the items exactly; update them with any status change.
 summary:
-  todo: 17                                          # +J10 (ruff cleanup), +L12 (render-fidelity rule) groomed 2026-07-13
-  in_progress: 3                                   # E1 (gate deferred), K2 (loader build — gate SIGNED OFF 2026-07-14), O1 (web design pass)
+  todo: 20                                          # +O4/O5/O6 (ADR 0005 follow-ups) groomed 2026-07-14
+  in_progress: 4                                   # E1 (gate deferred), K2 (loader build — gate SIGNED OFF 2026-07-14), O1 (web design pass), O3 (ADR 0005 ratification — awaiting SME)
   blocked: 0
   done: 62                                          # F1+F2+P2 gates SIGNED OFF 2026-07-14
-  next_ready: [C5, L7, L8, L9, L12, M2, M3, M4, P1, C7, K4, K5, J10]  # J10 dep J5 done; L12 no deps
+  next_ready: [C5, L7, L8, L9, L12, M2, M3, M4, P1, C7, K4, K5, J10]  # O4/O5 wait on O3 (ACCEPTED flip); O6 on O4+O5

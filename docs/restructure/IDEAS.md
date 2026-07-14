@@ -148,6 +148,14 @@ Tags help grooming: `idea` · `bug` · `doc` · `source` (new data source) · `q
 
 <!-- when you promote an idea, move its line here with the resulting backlog id -->
 
+- 2026-07-14 groom run (ADR 0005 Action items → Epic O; not an inbox groom) — 4 promoted:
+  **O3** ratify ADR 0005 (in_progress — awaiting the SME flip, the E1/P2 idiom; gates the
+  rest); **O4** GraphAccess seam refit + dev-flag-gated raw Cypher + credential-rule doc
+  (ADR items 2/4/5); **O5** thin-API component scaffold (ADR item 3 — the ADR explicitly
+  deferred it to this flow; NEW module `drydocs-api`; fable per the component-boundary
+  precedent); **O6** live C4/graph view through the seam (the remaining O1 build; O1
+  closes on O3+O6). Ran at the feat/web-login-mock --no-ff merge (design pass onto main).
+
 - 2026-07-13 groom run (weekly inbox groom) — 2 promoted / 1 merged / 1 re-inboxed:
   - [chore] ruff cleanup → CI lint gate (2026-07-11, found executing J5) → **J10** (Epic J,
     phase 8; ready — J5 done and live on main). The user's timing flag preserved in the item
