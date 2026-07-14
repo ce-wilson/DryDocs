@@ -364,3 +364,10 @@ records the date, the item, confirmed / edited / rejected counts, and reasons fo
   `m3_seal_app_ref` planned → active with its supplement + loader fields filled in, per the K2
   acceptance. Backlog **K2 stays in_progress** — it is the loader item; this gate was its
   precondition and the build is now unblocked.
+- **Build landed (same day, branch feat/k2-seal-attribution-loader):** the authorized flips are
+  now REAL — `m3_seal_app_ref` **active** (supplement `ontology_supplement.cypher`, loader
+  `seal_attribution.cypher`); `stg-app-fact` source row **confirmed: true** per the activation
+  condition that entry has carried since K1 (this gate, logged here) — taken as one unit with
+  its audit-fields stub, LEDGER_PENDING entry, and the registry gate-state test pin; the §B
+  coverage invariant joined graph_verify as `graph-tests/seal-attribution-coverage.yaml`.
+  Backlog **K2 → done** (build scope; the live load is a Track-2 / company-graph concern).
