@@ -12,6 +12,8 @@ export interface Persona {
   displayName: string
   role: Role
   chip: string
+  /** the tower this persona's apps roll up to — users may drill only their own */
+  towerKey?: string
 }
 
 export const PERSONAS: readonly Persona[] = [
@@ -20,6 +22,7 @@ export const PERSONAS: readonly Persona[] = [
     displayName: 'J. Doe',
     role: 'user',
     chip: 'app access derived from ServiceNow',
+    towerKey: 'home',
   },
   {
     id: 'asmith7734',

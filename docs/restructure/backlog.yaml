@@ -2074,6 +2074,27 @@ items:
       AI-default-looks list as the review lens over the UI-WIP/ mockups. RE-TIERED
       opus -> fable on this groom touch (the G3 groom-touch policy; the bolt-vs-thin-API
       call is a boundary decision, the matrix top slot).
+    progress: >
+      2026-07-14 — DESIGN-LANGUAGE PORT LANDED (branch feat/web-login-mock, on top of the
+      O2 mock login): the dd270b2 dark mockup is now the React app — Landing (hero/features/
+      tower cards), TowerDrill (cypher/graph/schema/preview/matrix, all SYNTHESIZED via
+      data/towers.ts), dark token system (index.css, single-theme by design), IBM Plex,
+      GraphSvg renderer, My Apps rollup graph; role-gated tower drilling (user = own tower
+      only). web/ has left its throwaway-test-page state. Verified 27/27 headless-Edge CDP
+      drive + screenshots. REMAINING for O1: the browser<->Neo4j access-path ADR (the crux;
+      forced by any real login — mock deliberately doesn't decide it), a REAL C4/graph view
+      against the live EE DB (NVL or successor) instead of the synthesized SVGs, wireframes
+      committed, build/run docs.
+      2026-07-14 (later) — ADR 0005 on main, status PROPOSED (docs/decisions/0005): the
+      session's sanitized-evidence draft was REWRITTEN by the SME and landed via the other
+      machine (b5235f4) — thin API is the DEPLOYMENT shape; bolt-from-browser survives only
+      as a dev-mode adapter (dev flag + admin) behind ONE GraphAccess seam in web/src/lib/;
+      no VITE_NEO4J_PASSWORD ever committed. Main's version is canonical (branch draft
+      superseded at the 2026-07-14 reconcile merge). The acceptance's "decision recorded"
+      ticks when 0005 flips ACCEPTED; on accept, groom the thin-API component + GraphAccess
+      seam refit + live graph view into Epic O. NOTE: the landed design pass predates the
+      seam — no new bolt usage (pages are synthesized), but the seam refit is the first
+      code consequence of acceptance.
 
   - id: O2
     epic: web-console
