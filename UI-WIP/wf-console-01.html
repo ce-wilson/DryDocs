@@ -32,6 +32,18 @@
   .pill { font-size: 9.5px; border: 1px solid #333; border-radius: 8px; padding: 0 5px; white-space: nowrap; }
   .view { page-break-inside: avoid; }
   .pagebreak { page-break-before: always; }
+  /* Blank sketch sheets — full-page dotted canvas in a browser frame */
+  .tpl { page-break-before: always; }
+  .tplhead { display: flex; gap: 14px; font-size: 11px; margin: 4px 0 6px; align-items: baseline; }
+  .tplhead .blank { border-bottom: 1px solid #333; min-width: 70px; display: inline-block; }
+  .tplframe { border: 2px solid #111; height: 7.9in;
+              background-image: radial-gradient(#c0c0c0 1px, transparent 1px);
+              background-size: 0.2in 0.2in;
+              -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  .tplframe .chrome { border-bottom: 1.5px solid #111; height: 24px; background: #fff;
+                      display: flex; align-items: center; gap: 6px; padding: 0 8px; }
+  .tplframe .dot { width: 9px; height: 9px; border: 1.5px solid #111; border-radius: 50%; }
+  .tplframe .url { border: 1px solid #111; border-radius: 8px; flex: 1; height: 13px; background: #fff; }
   .noteline { border-bottom: 1px dotted #999; height: 20px; }
   @media print { body { padding: 0; } .banner { -webkit-print-color-adjust: exact; } }
 </style>
@@ -76,6 +88,17 @@ flow and comes back as keyed feedback YAML — so keys, not arrows, are what sur
 no longer two clicks deep inside one tower. <span class="key">L8</span> is NEW (proposed): honest coverage numbers over decorative stats.</p>
 </div>
 
+<div class="tpl">
+  <h2>Sketch sheet &middot; relates to V1 — Landing (1 of 2)</h2>
+  <p class="tplhead">New elements: continue keys at <strong>L9+</strong> — circle each key on the sketch, reference it in notes<span class="spacer"></span>date <span class="blank"></span> initials <span class="blank"></span></p>
+  <div class="tplframe"><div class="chrome"><span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="url"></span></div></div>
+</div>
+<div class="tpl">
+  <h2>Sketch sheet &middot; relates to V1 — Landing (2 of 2)</h2>
+  <p class="tplhead">New elements: continue keys at <strong>L9+</strong><span class="spacer"></span>date <span class="blank"></span> initials <span class="blank"></span></p>
+  <div class="tplframe"><div class="chrome"><span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="url"></span></div></div>
+</div>
+
 <!-- ================= V2 SIGN-IN ================= -->
 <div class="view">
 <h2>V2 &middot; Sign-in (implemented as MOCK — replaced at the thin API, ADR 0005)</h2>
@@ -90,6 +113,17 @@ no longer two clicks deep inside one tower. <span class="key">L8</span> is NEW (
       (SSO/OIDC); this whole view is scaffolding until then</div>
   </div>
 </div>
+</div>
+
+<div class="tpl">
+  <h2>Sketch sheet &middot; relates to V2 — Sign-in (1 of 2)</h2>
+  <p class="tplhead">New elements: continue keys at <strong>S4+</strong><span class="spacer"></span>date <span class="blank"></span> initials <span class="blank"></span></p>
+  <div class="tplframe"><div class="chrome"><span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="url"></span></div></div>
+</div>
+<div class="tpl">
+  <h2>Sketch sheet &middot; relates to V2 — Sign-in (2 of 2)</h2>
+  <p class="tplhead">New elements: continue keys at <strong>S4+</strong><span class="spacer"></span>date <span class="blank"></span> initials <span class="blank"></span></p>
+  <div class="tplframe"><div class="chrome"><span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="url"></span></div></div>
 </div>
 
 <!-- ================= V3 DRILL-DOWN ================= -->
@@ -113,6 +147,17 @@ no longer two clicks deep inside one tower. <span class="key">L8</span> is NEW (
 <span class="key">D5</span> is NEW (proposed): the support view of the K2 coverage invariant.</p>
 </div>
 
+<div class="tpl">
+  <h2>Sketch sheet &middot; relates to V3 — Tower drill-down (1 of 2)</h2>
+  <p class="tplhead">New elements: continue keys at <strong>D6+</strong><span class="spacer"></span>date <span class="blank"></span> initials <span class="blank"></span></p>
+  <div class="tplframe"><div class="chrome"><span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="url"></span></div></div>
+</div>
+<div class="tpl">
+  <h2>Sketch sheet &middot; relates to V3 — Tower drill-down (2 of 2)</h2>
+  <p class="tplhead">New elements: continue keys at <strong>D6+</strong><span class="spacer"></span>date <span class="blank"></span> initials <span class="blank"></span></p>
+  <div class="tplframe"><div class="chrome"><span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="url"></span></div></div>
+</div>
+
 <!-- ================= V4 MY APPS ================= -->
 <div class="view">
 <h2>V4 &middot; My Apps (implemented — O2)</h2>
@@ -127,6 +172,17 @@ no longer two clicks deep inside one tower. <span class="key">L8</span> is NEW (
     <div class="cell" style="flex:0.6"><span class="key">M5</span>Governance placeholder panel (admin role only)</div>
   </div>
 </div>
+</div>
+
+<div class="tpl">
+  <h2>Sketch sheet &middot; relates to V4 — My Apps (1 of 2)</h2>
+  <p class="tplhead">New elements: continue keys at <strong>M6+</strong><span class="spacer"></span>date <span class="blank"></span> initials <span class="blank"></span></p>
+  <div class="tplframe"><div class="chrome"><span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="url"></span></div></div>
+</div>
+<div class="tpl">
+  <h2>Sketch sheet &middot; relates to V4 — My Apps (2 of 2)</h2>
+  <p class="tplhead">New elements: continue keys at <strong>M6+</strong><span class="spacer"></span>date <span class="blank"></span> initials <span class="blank"></span></p>
+  <div class="tplframe"><div class="chrome"><span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="url"></span></div></div>
 </div>
 
 <!-- ================= V5 GRAPH EXPLORER ================= -->
@@ -149,6 +205,17 @@ no longer two clicks deep inside one tower. <span class="key">L8</span> is NEW (
     <div class="cell" style="flex:0.6"><span class="key">G6</span>Data access: GraphAccess seam — api adapter default, bolt dev-mode (ADR 0005)</div>
   </div>
 </div>
+</div>
+
+<div class="tpl">
+  <h2>Sketch sheet &middot; relates to V5 — Graph explorer (1 of 2)</h2>
+  <p class="tplhead">New elements: continue keys at <strong>G7+</strong><span class="spacer"></span>date <span class="blank"></span> initials <span class="blank"></span></p>
+  <div class="tplframe"><div class="chrome"><span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="url"></span></div></div>
+</div>
+<div class="tpl">
+  <h2>Sketch sheet &middot; relates to V5 — Graph explorer (2 of 2)</h2>
+  <p class="tplhead">New elements: continue keys at <strong>G7+</strong><span class="spacer"></span>date <span class="blank"></span> initials <span class="blank"></span></p>
+  <div class="tplframe"><div class="chrome"><span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="url"></span></div></div>
 </div>
 
 <!-- ================= KEY TABLES ================= -->
@@ -208,6 +275,17 @@ path to <code>:Application</code> (SEAL, <code>seal_id</code>-keyed) — the con
 <h3>SME notes (also usable for anything without a key)</h3>
 <div class="noteline"></div><div class="noteline"></div><div class="noteline"></div>
 <div class="noteline"></div><div class="noteline"></div><div class="noteline"></div>
+
+<div class="tpl">
+  <h2>Sketch sheet &middot; free — any view or a new one (1 of 2)</h2>
+  <p class="tplhead">Name the view; new views take keys <strong>N1+</strong><span class="spacer"></span>view <span class="blank"></span> date <span class="blank"></span> initials <span class="blank"></span></p>
+  <div class="tplframe"><div class="chrome"><span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="url"></span></div></div>
+</div>
+<div class="tpl">
+  <h2>Sketch sheet &middot; free — any view or a new one (2 of 2)</h2>
+  <p class="tplhead">Name the view; new views take keys <strong>N1+</strong><span class="spacer"></span>view <span class="blank"></span> date <span class="blank"></span> initials <span class="blank"></span></p>
+  <div class="tplframe"><div class="chrome"><span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="url"></span></div></div>
+</div>
 
 <p class="meta">Provenance: labels/types from knowledge/ontology/NODE_QUICK_REFERENCE.md (2026-07-09) + gate-log through 2026-07-14;
 identity keys from drydocs_core/schema constraints; gate-signed keys from their gate specs. Mechanism only — no real names/ids.
