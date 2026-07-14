@@ -35,11 +35,13 @@
 # =============================================================================
 schema: drydocs.port-manifest.v1
 classification: Internal-Public
-updated: 2026-07-10   # Phase B relocate (ADR 0002-a-1): core paths now drydocs_core/*;
+updated: 2026-07-14   # Phase B relocate (ADR 0002-a-1): core paths now drydocs_core/*;
                       # the remainder keeps the drydocs/ name (thin variant). Renamed-path
                       # rows below were the promised "path-column diff, not a prose rewrite".
-                      # Same day, later: drydocs_remediation/** + internal/remediation/**
+                      # 2026-07-10, later: drydocs_remediation/** + internal/remediation/**
                       # rows added (G3 remediation component stream).
+                      # 2026-07-14 (step 31): web/** + UI-WIP/** canonical-producer,
+                      # .github/** evaluate, config/manual-loads/manifest.yaml per-entry.
 direction: "producer -> company (one-way; back-flow only as sanitized reproduction)"
 default: "clean-add when absent on consumer; evaluate when both sides created the path"
 
@@ -65,6 +67,14 @@ rows:
     entry_rule: >
       union of dependencies; KEEP the consumer's version string (per-repo
       release cadence); producer v* release tags never cherry-pick.
+  - path: "config/manual-loads/manifest.yaml"
+    disposition: per-entry
+    entry_rule: >
+      files[] is a UNION keyed by file path: producer ships mechanism + policy
+      text + empty lists; consumer accumulates its own entries (real CSVs live
+      under internal/) — consumer entries NEVER come from, or are removed by, a
+      port. Policy/README/template text is producer-canonical (step 31).
+    note: "tier-5 manual-CSV mechanism (gate seal-attribution-match-policy, 2026-07-14)"
 
   # ---- append-only audit files ----------------------------------------------
   - path: "config/gate-log.md"
@@ -164,6 +174,12 @@ rows:
   - path: ".claude/**"
     disposition: canonical-producer
     note: "agents + skills are producer-maintained tooling; consumer-local skills live under other names"
+  - path: "web/**"
+    disposition: canonical-producer
+    note: "drydocs-web module (JS/TS, Epic O; step 31) — node_modules/dist gitignored; .env.example only, VITE_* values NEVER committed (Vite inlines them into the bundle)"
+  - path: "UI-WIP/**"
+    disposition: canonical-producer
+    note: "web-console design record (wireframes, nav flow, dark landing mock; step 31) — static reference material"
   - path: "config/**"
     disposition: canonical-producer
     note: "configuration layer default — the per-entry/canonical-company/union rows ABOVE override for the map, gate-prompts, review-labels, gate-log (first match wins)"
@@ -172,6 +188,9 @@ rows:
   - path: "drydocs/cli.py"
     disposition: evaluate
     note: "composition root; both sides add commands — merge per collision ledger (keep consumer verbs, add producer verbs)"
+  - path: ".github/**"
+    disposition: evaluate
+    note: "J5 CI (step 31): the publish-boundary guard is producer-remote-specific and GHE Actions runners/policies are consumer-side — keep consumer workflows, adapt rather than adopt"
   - path: "drydocs_core/models/__init__.py"
     disposition: evaluate
     note: "union of row-model exports from both sides (path moved from drydocs/models/ in Phase B)"
