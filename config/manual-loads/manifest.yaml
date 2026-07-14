@@ -34,8 +34,12 @@ files: []                           # none yet — populated as manual CSVs are 
 # replaces_with sources.
 tech_debt:
   policy: >
-    Manual mappings are tier-5 (lowest weight) assertions, tracked node-by-node
-    via manually_created: true and edge-by-edge via source: 'manual-csv'. Each
-    manifest entry names its automated replacement; supersede (not deletion) is
-    the retirement path, preserving the audit trail.
+    Manual mappings are tier-5 in derivation order but PIN once asserted —
+    automation never silently replaces them (a manual row often exists because
+    the automated source data is incorrect; the fix-module scenario). Later
+    automated matches surface as pin-conflicts on the coverage report; a HUMAN
+    retires each pin (status -> superseded, audit-retained) once the source is
+    remediated. Tracked node-by-node via manually_created: true and
+    edge-by-edge via source: 'manual-csv'; each entry names its automated
+    replacement (replaces_with).
   open: []                          # mirror of files with status != superseded

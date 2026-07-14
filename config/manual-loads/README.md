@@ -28,10 +28,14 @@ shrink-ambition):
    `pending-load` entries are the queue of files awaiting manual load; every
    entry must name its automated replacement (`replaces_with`) — a manual load
    with no named automation path is not accepted.
-4. **Automation supersedes.** If a later automated run resolves the same
-   mapping at any higher tier, the automated edge replaces the manual one and
-   the manifest entry flips to `superseded` (file retained for audit). That is
-   the designed debt-retirement path.
+4. **Manual pins; humans retire.** A manual assertion often exists precisely
+   because the automated source data is *incorrect* (the fix-module scenario),
+   so an automated match on a later run NEVER silently replaces a manual edge —
+   it is reported as a **pin-conflict** (agreeing or disagreeing) in the
+   coverage report. A human then either retires the pin (manifest entry →
+   `superseded`, file retained for audit; automation takes over) or keeps it
+   until the source is remediated through the fix workflow. Retirement is
+   always a human act, never a load-time side effect.
 
 **Template:** [`TEMPLATE-node-mapping.csv`](TEMPLATE-node-mapping.csv).
 Composite node keys are `field=value` pairs joined by `;`

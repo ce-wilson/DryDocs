@@ -58,7 +58,7 @@ mapping:
   - n: 7
     element: "Manual CSV mapping (SME-authored from config/manual-loads/TEMPLATE-node-mapping.csv) — the final option when no fact tier resolves"
     target: ":Application {seal_id} (matched; or created with manually_created: true if genuinely absent)"
-    edge: "same WAS_ASSOCIATED_WITH shape, match_method: 'manual', source: 'manual-csv'  [PROPOSED — precedence tier 5, lowest weight; relationship must pre-exist in relationship_vocabulary.yaml; tech-debt tracked in config/manual-loads/manifest.yaml]"
+    edge: "same WAS_ASSOCIATED_WITH shape, match_method: 'manual', source: 'manual-csv'  [PROPOSED — tier 5 in derivation order; once asserted it PINS until a human retires it (data-incorrect / fix-module scenario); relationship must pre-exist in relationship_vocabulary.yaml; tech-debt tracked in config/manual-loads/manifest.yaml]"
 
 provenance:
   - label: "(:ControlMJob)-[:WAS_ASSOCIATED_WITH {role: 'seal_app_ref'}]->(:Application)"
@@ -115,7 +115,8 @@ sections:
   - title: "F. Manual CSV final option (tier 5 — SME-authored mapping, tracked as tech debt)"
     confirmations:
       - "When no fact tier (A) resolves a job — or multi-hit triage (C) cannot — the SME may author a CSV row from config/manual-loads/TEMPLATE-node-mapping.csv: source node key -> PRE-DEFINED relationship -> target node key. The relationship column MUST name an existing relationship_vocabulary.yaml entry; a CSV can never introduce a new relationship type (that is an ontology decision: ontology-mapper + a gate)."
-      - "Manual mappings are precedence tier 5, the lowest weight in the derive-and-weight scheme: edges carry match_method: 'manual' + source: 'manual-csv' + manual_load_file + authored_by, and an automated match at any tier 1-4 on a later run SUPERSEDES the manual edge — the manifest entry then flips to superseded (file retained for audit). That supersede flow IS the designed debt-retirement path."
+      - "Manual mappings are tier 5 in DERIVATION order (authored only when tiers 1-4 fail) but once asserted they PIN the mapping: an automated tier 1-4 match on a later run NEVER silently replaces a manual edge — a manual assertion often exists precisely because the automated source data is INCORRECT (the fix-module scenario), and silent supersede would reintroduce the bad mapping. Edges carry match_method: 'manual' + source: 'manual-csv' + manual_load_file + authored_by."
+      - "When a later automated run derives a match for a manually-pinned source, the run reports it as a PIN-CONFLICT (agreeing or disagreeing) in the coverage report; a HUMAN then either retires the pin (manifest entry -> superseded, automation takes over) or keeps it (source data still wrong — the conflict stays on the report until the source is remediated through the fix workflow). Retirement is always a human act, never a load-time side effect."
       - "If a CSV row names a target node that does not exist, the loader may create it ONLY stamped manually_created: true (+ manual_load_file, authored_by) — and manually-created nodes are reported as their own count in the coverage report (section B), never blended into matched or unmatched."
       - "Every manual CSV is registered in config/manual-loads/manifest.yaml BEFORE load; entries with status pending-load are the queue of files awaiting manual load, and every entry must name its automated replacement (replaces_with) — a manual load with no named automation path is not accepted (visible, named, closable debt: the LEDGER_PENDING precedent). The manifest's tech_debt section is reviewed at each groom."
   - title: "G. Sign-off"
