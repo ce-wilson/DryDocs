@@ -1,0 +1,41 @@
+# =============================================================================
+# config/manual-loads/manifest.yaml — registry of SME-authored manual CSV loads.
+#
+# THE RULE: a manual CSV is loadable ONLY if it is registered here first, and
+# every entry names its automated replacement (replaces_with). Entries with
+# status: pending-load are THE queue of files awaiting manual load. See
+# README.md for the full mechanism (provenance stamps, supersede flow).
+#
+# status: proposed — inert until gate seal-attribution-match-policy (K2) signs
+# off; no loader reads this yet.
+# =============================================================================
+schema: drydocs.manual-loads.v1
+classification: Internal-Public
+updated: 2026-07-14
+status: proposed                    # flips at the K2 gate; loader built after
+gate: config/gate-prompts/seal-attribution-match-policy.yaml
+template: config/manual-loads/TEMPLATE-node-mapping.csv
+
+# Each entry:
+#   file:          repo-relative path (real company CSVs live under internal/)
+#   scope:         what the mappings cover (mechanism description, no real names)
+#   status:        pending-load | loaded | superseded
+#   replaces_with: the automated source/derivation that should retire this file
+#                  (REQUIRED — no entry without a named automation path)
+#   authored_by:   who authored the mappings
+#   notes:         anything the next reviewer needs
+files: []                           # none yet — populated as manual CSVs are authored
+
+# ── Tech-debt view ───────────────────────────────────────────────────────────
+# Every file above with status pending-load or loaded is OPEN tech debt: the
+# graph carries assertions automation cannot yet reproduce. Debt closes only
+# by supersede (automation catches up) — reviewed at each groom alongside the
+# backlog; a growing list with no supersedes is the signal to prioritize the
+# replaces_with sources.
+tech_debt:
+  policy: >
+    Manual mappings are tier-5 (lowest weight) assertions, tracked node-by-node
+    via manually_created: true and edge-by-edge via source: 'manual-csv'. Each
+    manifest entry names its automated replacement; supersede (not deletion) is
+    the retirement path, preserving the audit trail.
+  open: []                          # mirror of files with status != superseded
