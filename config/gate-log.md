@@ -325,3 +325,42 @@ records the date, the item, confirmed / edited / rejected counts, and reasons fo
   map entry stays `status: proposed`, and the supplement stays opt-in/experimental. Re-present at a
   future session; the open design question (ControlMJobRun-as-Observation vs separate Observation
   node, run-history source) remains the gate's crux.
+
+## 2026-07-14 — SEAL attribution match policy gate — SIGNED OFF (K2 gate; loader build unblocked)
+
+- **Gate:** `config/gate-prompts/seal-attribution-match-policy.yaml` (24 confirmations, including the
+  same-day §F manual-CSV additions), reviewed via the rendered page; **ACCEPTED IN FULL**
+  (chad.wilson, 2026-07-14).
+- **§A — CONFIRMED:** precedence SEAL > FID > APP_NAME > ALIAS; SEAL-tier hit attributes alone
+  (lower tiers = corroboration only); one-to-one accept rule at the top available tier.
+- **§B — CONFIRMED:** matched + unmatched counts checked against eligible jobs every run (no silent
+  drops); unmatched surfaces for follow-up, never blocks; the invariant joins graph_verify.
+- **§C — CONFIRMED; open question RESOLVED as the proposed default:** deterministic tie-break
+  (most-recent run_id, then lexicographically lowest seal_id) applies as last resort — multi-hit
+  cases do NOT pause for per-case SME calls at load time; every multi-hit is flagged on the coverage
+  report for after-the-fact audit.
+- **§D + §E — CONFIRMED, with the standing K3 rider:** MERGE edge shape (WAS_ASSOCIATED_WITH
+  {role: seal_app_ref}) with ON CREATE/SET split as specified; loader creates no nodes on the
+  automated path; runs only after jobs + SEAL loads; job.APPLICATION never a SEAL identity
+  substitute; source/match_method explicit per edge. **Rider:** the shape type-checks TODAY
+  (:Application is still prov:SoftwareAgent — the K3 reclass is unapplied, backlog K4); when K4
+  applies the Entity/DataProduct reclass, the edge RE-SHAPES per the K3 §F deferred decision
+  (prov:used vs domain edge — that follow-up gate, not this one). The match policy confirmed here
+  (precedence, coverage, triage, pin semantics, provenance props) is shape-agnostic and carries
+  over to whatever label the re-shape gate picks.
+- **§F — CONFIRMED (manual CSV final option, tier 5, PIN semantics per the 2026-07-14 SME
+  direction):** SME-authored CSV rows (template config/manual-loads/TEMPLATE-node-mapping.csv) map
+  source -> PRE-EXISTING relationship -> target; a CSV can never mint a relationship type. Manual
+  edges pin — automation NEVER silently supersedes (the data-incorrect / fix-module scenario);
+  later automated matches surface as PIN-CONFLICTS; retirement (manifest -> superseded) is always a
+  human act. Nodes a CSV forces into existence are stamped manually_created: true and counted
+  separately. Every CSV registers in config/manual-loads/manifest.yaml BEFORE load with a named
+  replaces_with automation path.
+- **§G — SIGNED OFF.** **Confirmed: A, B, D, E, F · Decided: 1 (§C deterministic default) ·
+  Deferred: 0 · Rejected: 0.**
+- **Lifecycle (applied in this commit):** map entry `job-seal-app-ref` proposed → **confirmed**
+  (confirmed_by/confirmed_on set); `config/manual-loads/manifest.yaml` proposed → **confirmed**.
+  **Authorized, lands with the K2 loader build (the K3 flips-are-follow-ups pattern):**
+  `m3_seal_app_ref` planned → active with its supplement + loader fields filled in, per the K2
+  acceptance. Backlog **K2 stays in_progress** — it is the loader item; this gate was its
+  precondition and the build is now unblocked.

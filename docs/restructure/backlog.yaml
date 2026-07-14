@@ -2368,7 +2368,7 @@ items:
 # that these match the items exactly; update them with any status change.
 summary:
   todo: 17                                          # +J10 (ruff cleanup), +L12 (render-fidelity rule) groomed 2026-07-13
-  in_progress: 3                                   # E1, K2 (awaiting HITL), O1 (web design pass)
+  in_progress: 3                                   # E1 (gate deferred), K2 (loader build — gate SIGNED OFF 2026-07-14), O1 (web design pass)
   blocked: 0
   done: 62                                          # F1+F2+P2 gates SIGNED OFF 2026-07-14
   next_ready: [C5, L7, L8, L9, L12, M2, M3, M4, P1, C7, K4, K5, J10]  # J10 dep J5 done; L12 no deps

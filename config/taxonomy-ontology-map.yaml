@@ -155,12 +155,14 @@ mappings:
     precedence_authority: bmc-baseline
     vocab_id: m3_seal_app_ref
     source_evidence: "STG_APP_FACT semantic facts (fact_type SEAL), fed by the Control-M variable-normalization stream (config/source-registry.yaml); NEVER raw job.APPLICATION — documented unreliable for SEAL identity in both repos' loader comments."
-    status: proposed                        # <-- SME must confirm at the gate (K2)
-    provenance_note: "2026-07-01 company reconciliation; spec-level on both repos; producer registration K1, activation K2."
+    status: confirmed                       # gate seal-attribution-match-policy SIGNED OFF (match policy; edge shape re-opens with K4, see type_conflict_note)
+    confirmed_by: chad.wilson
+    confirmed_on: 2026-07-14
+    provenance_note: "2026-07-01 company reconciliation; spec-level on both repos; producer registration K1, activation K2. Match policy confirmed 2026-07-14 while :Application is still prov:SoftwareAgent (K3 reclass unapplied); the K4 reclass re-opens the edge SHAPE per the K3 §F deferral — the confirmed policy itself is shape-agnostic."
     open_questions:
-      - "Match policy: is a one-to-one job-to-application match accepted as-is?"
-      - "Zero-unmatched jobs — surfaced how, and to whom, before load?"
-      - "Multi-hit matches (a job resolving to more than one candidate application) — deterministic triage/precedence rule, or gate-time SME call per case?"
+      - "ANSWERED 2026-07-14 (gate): one-to-one match accepted at the top available tier without further review."
+      - "ANSWERED 2026-07-14 (gate): unmatched jobs surface as a per-run coverage count (matched + unmatched = eligible), joins graph_verify; never blocks the run."
+      - "ANSWERED 2026-07-14 (gate): deterministic triage accepted as default (most-recent run_id, then lowest seal_id, last resort only); every multi-hit flagged for after-the-fact audit — no per-case load-time SME calls."
     type_conflict_note: >
       2026-07-08 review: this mapping requires :Application to be a prov:Agent (matrix row
       Activity -> Agent = prov:wasAssociatedWith). The proposed SEAL reshape
@@ -748,6 +750,6 @@ mappings:
 # Counts the gate reports to the SME each run.
 summary:
   applied: 6          # job-contains, application-contains-folder, doc-describes-product, doc-chunk-part-of, doc-first-chunk, doc-next-chunk (comment-APPLIED entries promoted 2026-07-09, tech-debt F2)
-  confirmed: 18       # +job-runtime-stats-supplement (gate SIGNED OFF 2026-07-14, §B ctlm_id edit)
-  proposed: 7         # job-seal-app-ref, oracle-schema-asset, jobrun-observation, application-as-dataproduct, seal-tom-attribution, seal-doc-source-of-record, requires-scheduler (merge 2026-07-09)
+  confirmed: 19       # +job-runtime-stats-supplement, +job-seal-app-ref (gates SIGNED OFF 2026-07-14)
+  proposed: 6         # oracle-schema-asset, jobrun-observation, application-as-dataproduct, seal-tom-attribution, seal-doc-source-of-record, requires-scheduler (merge 2026-07-09)
   rejected: 0
