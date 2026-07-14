@@ -1,0 +1,16 @@
+flowchart TD
+    L["#landing<br/>Landing / Overview"]
+    D["#drill<br/>Tower drill-down"]
+    M["#myapps<br/>My Apps user view"]
+    Q{"tower key<br/>== home?"}
+    B["#myAppsBtn visible"]
+    N["#myAppsBtn hidden"]
+
+    L -->|".tower card click / Enter"| D
+    L -->|".btn-primary 'Explore the Graph'"| D
+    D --> Q
+    Q -->|yes| B
+    Q -->|no| N
+    B -->|"click My Apps"| M
+    M -->|".back 'Back to Home Lending'"| D
+    D -->|".back 'Back to Overview'"| L

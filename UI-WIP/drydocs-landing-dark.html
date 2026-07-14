@@ -1,0 +1,622 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DryDocs — A Don't Repeat Yourself Knowledge Graph</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0D1520; --bg2:#0F1B29; --panel:#121E2E; --panel2:#152335;
+    --edge:#203045; --edge-soft:#1A2739;
+    --text:#E8EDF3; --muted:#8A97A8; --faint:#5C6B7E;
+    --blue:#2E6BC4; --blue-br:#4D8BE0; --teal:#2AB3A6; --green:#3AAE6B; --yellow:#D9B831; --red:#C8202E;
+    --mono:'IBM Plex Mono',ui-monospace,monospace;
+    --sans:'IBM Plex Sans',-apple-system,'Segoe UI',sans-serif;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:var(--sans);background:var(--bg);color:var(--text);line-height:1.5}
+  .wrap{max-width:1180px;margin:0 auto;padding:0 30px}
+
+  /* ============ NAV ============ */
+  nav{position:sticky;top:0;background:rgba(13,21,32,.92);backdrop-filter:blur(6px);z-index:10;border-bottom:1px solid var(--edge-soft)}
+  .nav-in{max-width:1180px;margin:0 auto;padding:16px 30px;display:flex;align-items:center;gap:34px}
+  .logo{display:flex;align-items:center;gap:10px;font-weight:700;font-size:21px;letter-spacing:-.01em}
+  .nav-links{display:flex;gap:28px;margin-left:auto;font-size:14px;font-weight:500;color:var(--muted)}
+  .nav-links a{text-decoration:none;color:var(--muted);padding-bottom:5px}
+  .nav-links a:hover{color:var(--text)}
+  .nav-links a.active{color:var(--text);border-bottom:2px solid var(--blue-br)}
+  .signin{font-size:13.5px;font-weight:600;color:var(--blue-br);border:1px solid var(--blue);border-radius:7px;padding:8px 18px;text-decoration:none;background:rgba(46,107,196,.08)}
+  .signin:hover{background:rgba(46,107,196,.18)}
+
+  /* ============ HERO ============ */
+  .hero{display:grid;grid-template-columns:1fr 1.15fr;gap:20px;align-items:center;padding:44px 0 40px}
+  @media(max-width:900px){.hero{grid-template-columns:1fr}}
+  .hero h1{font-size:clamp(46px,6.5vw,74px);font-weight:800;letter-spacing:-.02em;color:#EDF1F6}
+  .hero h2{font-size:clamp(17px,2.2vw,23px);font-weight:500;color:#B9C4D2;margin-top:10px}
+  .hero .desc{font-size:15.5px;color:var(--muted);margin-top:20px;max-width:400px;line-height:1.65}
+  .hero-btns{display:flex;gap:14px;margin-top:30px;flex-wrap:wrap}
+  .btn-primary{background:var(--blue);color:#fff;font-weight:600;font-size:14px;padding:12px 22px;border-radius:8px;text-decoration:none;border:1px solid var(--blue-br)}
+  .btn-primary:hover{background:var(--blue-br)}
+  .btn-ghost{color:#C8D2DE;font-weight:600;font-size:14px;padding:12px 22px;border-radius:8px;text-decoration:none;border:1px solid var(--edge)}
+  .btn-ghost:hover{border-color:var(--faint)}
+  .hero-art{width:100%;height:auto;display:block}
+
+  /* ============ FEATURE STRIP ============ */
+  .features{border-top:1px solid var(--edge-soft);border-bottom:1px solid var(--edge-soft);background:var(--bg2)}
+  .feat-in{max-width:1180px;margin:0 auto;padding:26px 30px;display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:18px}
+  .feat{display:flex;gap:14px;align-items:flex-start;padding:0 8px;border-right:1px solid var(--edge-soft)}
+  .feat:last-child{border-right:none}
+  @media(max-width:900px){.feat{border-right:none}}
+  .feat svg{flex-shrink:0;margin-top:2px}
+  .feat h3{font-size:14.5px;font-weight:700}
+  .feat p{font-size:12.5px;color:var(--muted);margin-top:3px;line-height:1.5}
+
+  /* ============ TOWERS ============ */
+  .explore{padding:36px 0 60px}
+  .explore h2{font-size:21px;font-weight:600;color:#C8D2DE;margin-bottom:20px}
+  .towers{display:grid;grid-template-columns:repeat(auto-fit,minmax(215px,1fr));gap:18px}
+  .tower{background:var(--panel);border:1px solid var(--edge);border-radius:10px;padding:26px 18px 18px;text-align:center;cursor:pointer;transition:transform .15s,border-color .15s,box-shadow .15s}
+  .tower:hover{transform:translateY(-3px);border-color:var(--faint);box-shadow:0 8px 26px rgba(0,0,0,.4)}
+  .tower:focus-visible{outline:2px solid var(--blue-br);outline-offset:3px}
+  .tower .icon{height:44px;display:flex;align-items:center;justify-content:center;margin-bottom:14px}
+  .tower h3{font-size:16px;font-weight:600}
+  .tower .stats{font-size:12.5px;color:var(--muted);margin-top:7px;display:flex;gap:16px;justify-content:center}
+  .tower .stats b{color:#C8D2DE;font-weight:600}
+  .btn-myapps{font:600 13px var(--sans);border:1px solid var(--blue);border-radius:7px;background:rgba(46,107,196,.12);color:#9CC0F0;padding:8px 15px;cursor:pointer;display:none;margin-left:auto}
+  .btn-myapps:hover{background:rgba(46,107,196,.25)}
+  .userchip{font:500 11px var(--mono);color:#8A97A8;border:1px solid var(--edge);border-radius:20px;padding:5px 12px;margin-left:auto}
+
+  /* ============ DRILL-DOWN (dark) ============ */
+  #drill{display:none}
+  .d-bar{display:flex;align-items:center;gap:14px;padding:24px 0 16px;flex-wrap:wrap}
+  .back{font:600 13px var(--sans);border:1px solid var(--edge);border-radius:7px;background:var(--panel);color:#C8D2DE;padding:8px 15px;cursor:pointer}
+  .back:hover{border-color:var(--faint)}
+  .d-bar h2{font-size:21px;font-weight:700}
+  .d-bar .tag{font:500 10.5px var(--mono);color:var(--yellow);border:1px solid rgba(217,184,49,.5);border-radius:4px;padding:4px 9px;background:rgba(217,184,49,.08)}
+  .d-top{display:grid;grid-template-columns:1fr 1.15fr;gap:16px;margin-bottom:16px}
+  @media(max-width:900px){.d-top{grid-template-columns:1fr}}
+  .panel{border:1px solid var(--edge);border-radius:10px;overflow:hidden;background:var(--panel)}
+  .p-head{background:var(--panel2);border-bottom:1px solid var(--edge);padding:10px 14px;font-weight:600;font-size:13.5px;display:flex;justify-content:space-between;align-items:center}
+  .p-head .m{font:400 10.5px var(--mono);color:var(--muted)}
+  pre.cypher{font:400 12.5px/1.7 var(--mono);padding:16px 18px;overflow-x:auto;color:#D7E3F0;min-height:240px;background:#0A111B}
+  pre.cypher .kw{color:#7CC4FF;font-weight:600}
+  pre.cypher .lbl{color:#8CE99A}
+  pre.cypher .rel{color:#FFB86B}
+  pre.cypher .str{color:#F1FA8C}
+  .graphbox{padding:10px}
+  .gnode{font:600 11px var(--sans);fill:#E8EDF3}
+  .gsub{font:400 9px var(--mono);fill:#8A97A8}
+  .gedge{font:500 9px var(--mono);fill:#8A97A8}
+  .d-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px}
+  @media(max-width:900px){.d-grid{grid-template-columns:1fr}}
+  table{width:100%;border-collapse:collapse;font-size:12.5px}
+  th{background:var(--panel2);text-align:left;font-weight:600;padding:8px 12px;border-bottom:1px solid var(--edge);color:#C8D2DE}
+  td{padding:8px 12px;border-bottom:1px solid var(--edge-soft);font-family:var(--mono);font-size:11.5px;color:#B9C4D2}
+  td:first-child{font-family:var(--sans);font-weight:500;font-size:12.5px;color:var(--text)}
+  .matrix td{font-family:var(--sans);font-size:12px}
+  .matrix td:first-child{font-weight:600}
+  .foot{padding:20px 0 46px;font:400 11px var(--mono);color:var(--faint);text-align:center}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-in">
+    <div class="logo">
+      <svg width="26" height="26" viewBox="0 0 26 26"><circle cx="13" cy="13" r="10" fill="none" stroke="#2E6BC4" stroke-width="2.4" stroke-dasharray="18 8"/><circle cx="13" cy="13" r="10" fill="none" stroke="#D9B831" stroke-width="2.4" stroke-dasharray="10 38" stroke-dashoffset="-20"/><circle cx="13" cy="13" r="4" fill="#C8202E"/></svg>
+      DryDocs
+    </div>
+    <div class="nav-links">
+      <a href="#" class="active" onclick="showLanding();return false">Overview</a>
+      <a href="#">Graph Explorer</a><a href="#">Lineage</a><a href="#">Pipelines</a><a href="#">Teams</a><a href="#">About</a>
+    </div>
+    <a class="signin" href="#">Sign In</a>
+  </div>
+</nav>
+
+<!-- ==================================================== LANDING ==================================================== -->
+<main id="landing">
+  <section class="hero wrap">
+    <div>
+      <h1>DryDocs</h1>
+      <h2>A Don't Repeat Yourself Knowledge Graph</h2>
+      <p class="desc">Visualize and understand your DevOps landscape. Connect pipelines, jobs, systems, and data across towers, products, and teams.</p>
+      <div class="hero-btns">
+        <a class="btn-primary" href="#" onclick="showDrill('home');return false">Explore the Graph</a>
+        <a class="btn-ghost" href="#">▶&ensp;Watch Demo</a>
+      </div>
+    </div>
+
+    <!-- hero illustration: red core, colored shell petals, node network -->
+    <svg class="hero-art" viewBox="0 0 640 480" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="A red core sphere wrapped in blue, green and yellow shell segments, surrounded by a network of connected nodes">
+      <defs>
+        <radialGradient id="core" cx="35%" cy="30%" r="80%">
+          <stop offset="0%" stop-color="#F0666F"/><stop offset="50%" stop-color="#C8202E"/><stop offset="100%" stop-color="#5E070E"/>
+        </radialGradient>
+        <linearGradient id="pBlue" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#4D8BE0"/><stop offset="100%" stop-color="#1D4B8F"/></linearGradient>
+        <linearGradient id="pGreen" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#4FC98A"/><stop offset="100%" stop-color="#1E6B42"/></linearGradient>
+        <linearGradient id="pYellow" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#EFD35C"/><stop offset="100%" stop-color="#9C7F12"/></linearGradient>
+        <radialGradient id="nBlue" cx="35%" cy="30%" r="75%"><stop offset="0%" stop-color="#6FA6E8"/><stop offset="100%" stop-color="#173B6E"/></radialGradient>
+        <radialGradient id="nGreen" cx="35%" cy="30%" r="75%"><stop offset="0%" stop-color="#65D49A"/><stop offset="100%" stop-color="#175537"/></radialGradient>
+        <radialGradient id="nTeal" cx="35%" cy="30%" r="75%"><stop offset="0%" stop-color="#57C9C9"/><stop offset="100%" stop-color="#134A4A"/></radialGradient>
+        <radialGradient id="nYellow" cx="35%" cy="30%" r="75%"><stop offset="0%" stop-color="#EFD35C"/><stop offset="100%" stop-color="#6E5A0C"/></radialGradient>
+      </defs>
+
+      <!-- faint web rings -->
+      <g fill="none" stroke="#22354E" stroke-width="1" opacity=".6">
+        <ellipse cx="320" cy="240" rx="270" ry="200"/>
+        <ellipse cx="320" cy="240" rx="215" ry="152" transform="rotate(-12 320 240)"/>
+        <ellipse cx="320" cy="240" rx="165" ry="120" transform="rotate(9 320 240)"/>
+      </g>
+
+      <!-- network edges -->
+      <g id="edges" fill="none" stroke-width="1.3" opacity=".75"></g>
+      <!-- network nodes -->
+      <g id="nodes"></g>
+
+      <!-- shell petals around core -->
+      <g transform="translate(320 235)">
+        <path d="M -18 -118 A 118 118 0 0 1 82 -86 L 58 -60 A 84 84 0 0 0 -12 -83 Z" fill="url(#pYellow)" stroke="#0D1520" stroke-width="2"/>
+        <path d="M 96 -72 A 120 120 0 0 1 116 28 L 82 20 A 86 86 0 0 0 68 -50 Z" fill="url(#pBlue)" stroke="#0D1520" stroke-width="2"/>
+        <path d="M 108 44 A 120 120 0 0 1 30 116 L 22 82 A 86 86 0 0 0 76 32 Z" fill="url(#pGreen)" stroke="#0D1520" stroke-width="2"/>
+        <path d="M 8 120 A 120 120 0 0 1 -90 78 L -64 55 A 86 86 0 0 0 5 85 Z" fill="url(#pYellow)" stroke="#0D1520" stroke-width="2"/>
+        <path d="M -102 62 A 120 120 0 0 1 -117 -32 L -83 -22 A 86 86 0 0 0 -73 44 Z" fill="url(#pBlue)" stroke="#0D1520" stroke-width="2"/>
+        <path d="M -112 -50 A 120 120 0 0 1 -38 -114 L -28 -81 A 86 86 0 0 0 -80 -36 Z" fill="url(#pGreen)" stroke="#0D1520" stroke-width="2"/>
+        <!-- core -->
+        <circle r="62" fill="url(#core)"/>
+        <ellipse cx="-18" cy="-24" rx="22" ry="14" fill="#fff" opacity=".28"/>
+      </g>
+    </svg>
+  </section>
+
+  <!-- ============ FEATURE STRIP ============ -->
+  <section class="features">
+    <div class="feat-in">
+      <div class="feat">
+        <svg width="34" height="34" viewBox="0 0 34 34"><g stroke="#4D8BE0" stroke-width="2" fill="none"><line x1="9" y1="10" x2="24" y2="8"/><line x1="9" y1="10" x2="14" y2="25"/><line x1="24" y1="8" x2="14" y2="25"/><line x1="24" y1="8" x2="28" y2="22"/></g><circle cx="9" cy="10" r="4.5" fill="#2E6BC4"/><circle cx="24" cy="8" r="3.5" fill="#4D8BE0"/><circle cx="14" cy="25" r="4" fill="#2E6BC4"/><circle cx="28" cy="22" r="3" fill="#4D8BE0"/></svg>
+        <div><h3>Knowledge Graph</h3><p>Connect everything, see the big picture.</p></div>
+      </div>
+      <div class="feat">
+        <svg width="34" height="34" viewBox="0 0 34 34"><g stroke="#3AAE6B" stroke-width="2.2" fill="none" stroke-linecap="round"><path d="M8 12 a5 5 0 1 1 5 5"/><path d="M26 22 a5 5 0 1 1 -5 -5"/><line x1="13" y1="17" x2="21" y2="17"/><path d="M18.5 14.5 L21 17 L18.5 19.5"/></g></svg>
+        <div><h3>Pipeline &amp; Job Lineage</h3><p>Trace every step, end to end.</p></div>
+      </div>
+      <div class="feat">
+        <svg width="34" height="34" viewBox="0 0 34 34"><g stroke="#3AAE6B" stroke-width="2" fill="none"><rect x="7" y="7" width="20" height="5.5" rx="1.5"/><rect x="7" y="15" width="20" height="5.5" rx="1.5"/><rect x="7" y="23" width="20" height="5.5" rx="1.5"/></g><circle cx="11" cy="9.8" r="1.3" fill="#3AAE6B"/><circle cx="11" cy="17.8" r="1.3" fill="#3AAE6B"/><circle cx="11" cy="25.8" r="1.3" fill="#3AAE6B"/></svg>
+        <div><h3>Environment Mapping</h3><p>Understand where things run.</p></div>
+      </div>
+      <div class="feat">
+        <svg width="34" height="34" viewBox="0 0 34 34"><path d="M17 5 L28 9 V17 C28 24 23 28.5 17 30 C11 28.5 6 24 6 17 V9 Z" fill="none" stroke="#D9B831" stroke-width="2.2"/><rect x="13.5" y="13.5" width="7" height="7" rx="1.5" fill="#D9B831"/></svg>
+        <div><h3>Team &amp; Access</h3><p>Built for collaboration, designed for scale.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ EXPLORE BY TOWER ============ -->
+  <section class="explore wrap">
+    <h2>Explore by Tower</h2>
+    <div class="towers" id="towerCards"></div>
+  </section>
+</main>
+
+<!-- ==================================================== DRILL-DOWN ==================================================== -->
+<main id="drill" class="wrap">
+  <div class="d-bar">
+    <button class="back" onclick="showLanding()">◀ Back to Overview</button>
+    <h2 id="dTitle">Tower</h2>
+    <span class="tag">EXAMPLE DATA · ILLUSTRATIVE / ANONYMIZED</span>
+    <button class="btn-myapps" id="myAppsBtn" onclick="showMyApps()">◉ My Apps — user view ▸</button>
+  </div>
+
+  <div class="d-top">
+    <div class="panel">
+      <div class="p-head">Cypher — lineage query <span class="m">neo4j browser</span></div>
+      <pre class="cypher" id="dCypher"></pre>
+    </div>
+    <div class="panel">
+      <div class="p-head">Graph result <span class="m" id="dGraphMeta"></span></div>
+      <div class="graphbox"><svg id="dGraph" viewBox="0 0 620 300" width="100%" xmlns="http://www.w3.org/2000/svg"></svg></div>
+    </div>
+  </div>
+
+  <div class="d-grid">
+    <div class="panel">
+      <div class="p-head">Schema Definition <span class="m" id="dSchemaName"></span></div>
+      <table><thead><tr><th>Column Name</th><th>Type</th></tr></thead><tbody id="dSchema"></tbody></table>
+    </div>
+    <div class="panel">
+      <div class="p-head">Row Preview <span class="m" id="dPreviewName"></span></div>
+      <table><thead id="dPrevHead"></thead><tbody id="dPreview"></tbody></table>
+    </div>
+  </div>
+
+  <div class="panel" style="margin-bottom:16px">
+    <div class="p-head">Inter-Tower Dependency Matrix <span class="m">shared S3 buckets · Snowflake</span></div>
+    <table class="matrix">
+      <thead><tr><th>Tower</th><th>Shared Buckets</th><th>Shared S3 Buckets</th><th>Snowflake</th></tr></thead>
+      <tbody>
+        <tr><td>Auto</td><td>N/A</td><td>Depends on S3, Snowflake_DW</td><td>—</td></tr>
+        <tr><td>Credit Cards</td><td>N/A</td><td>Depends on S3 from Cards</td><td>—</td></tr>
+        <tr><td>Credit Cards</td><td>Depends on S3_Cards</td><td>Auto uses data from dealer database</td><td>—</td></tr>
+        <tr><td>Home Lending</td><td>Depends on S3</td><td>Depends on Snowflake_DW</td><td>—</td></tr>
+        <tr><td>Shared Services</td><td>N/A</td><td>Auto uses data from Cards legacy systems</td><td>—</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="foot">All identifiers, row values and metrics on this page are synthesized / anonymized examples · © 2026 DryDocs · UI-WIP</div>
+</main>
+
+<!-- ==================================================== MY APPS (user view) ==================================================== -->
+<main id="myapps" class="wrap" style="display:none">
+  <div class="d-bar">
+    <button class="back" onclick="showDrill('home')">◀ Back to Home Lending</button>
+    <h2>My Apps — Home Lending</h2>
+    <span class="tag">USER VIEW · SYNTHESIZED</span>
+    <span class="userchip">◉ jdoe4821 · app access derived from ServiceNow</span>
+  </div>
+
+  <!-- ============ rollup: CTO tower → my apps → dev teams ============ -->
+  <div class="panel" style="margin-bottom:16px">
+    <div class="p-head">App rollup — CTO Tower &amp; Dev Teams <span class="m">apps: ServiceNow access · teams: PAT</span></div>
+    <div class="graphbox">
+      <svg viewBox="0 0 1000 330" width="100%" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Three applications from the user's ServiceNow access rolling up to the Home Lending Technology CTO tower, each owned by a dev team sourced from PAT">
+        <defs>
+          <marker id="uarr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#8A97A8"/></marker>
+          <g id="ppl" fill="none" stroke="#8A97A8" stroke-width="1.8">
+            <circle cx="17" cy="5" r="4" opacity=".5"/>
+            <path d="M11 20 a6 6 0 0 1 12 0" opacity=".5"/>
+            <circle cx="8" cy="7" r="4.6"/>
+            <path d="M1 22 a7 7 0 0 1 14 0"/>
+          </g>
+        </defs>
+
+        <!-- CTO tower -->
+        <rect x="330" y="14" width="340" height="66" rx="9" fill="#152335" stroke="#4D8BE0" stroke-width="1.6"/>
+        <text x="500" y="43" text-anchor="middle" font-family="IBM Plex Sans" font-size="15" font-weight="600" fill="#E8EDF3">Home Lending Technology</text>
+        <text x="500" y="62" text-anchor="middle" font-family="IBM Plex Mono" font-size="10" fill="#8A97A8">:CTO Tower · ccb-twr-hl</text>
+
+        <!-- rollup edges (app → tower) -->
+        <g fill="none" stroke="#3C4E66" stroke-width="1.6" marker-end="url(#uarr)">
+          <path d="M180 158 C 180 118, 340 110, 372 84"/>
+          <path d="M500 158 L500 86"/>
+          <path d="M820 158 C 820 118, 660 110, 628 84"/>
+        </g>
+        <text x="252" y="112" class="gedge" font-family="IBM Plex Mono" font-size="9" fill="#8A97A8">ROLLS_UP_TO</text>
+        <text x="533" y="122" class="gedge" font-family="IBM Plex Mono" font-size="9" fill="#8A97A8">ROLLS_UP_TO</text>
+        <text x="748" y="112" class="gedge" font-family="IBM Plex Mono" font-size="9" fill="#8A97A8">ROLLS_UP_TO</text>
+
+        <!-- app card 1 -->
+        <g>
+          <rect x="40" y="158" width="280" height="150" rx="9" fill="#121E2E" stroke="#203045"/>
+          <text x="56" y="184" font-family="IBM Plex Mono" font-size="11" fill="#4D8BE0">ccb-hl-app-01</text>
+          <rect x="196" y="168" width="110" height="20" rx="4" fill="rgba(58,174,107,.1)" stroke="#3AAE6B"/>
+          <text x="251" y="182" text-anchor="middle" font-family="IBM Plex Mono" font-size="9" fill="#3AAE6B">SNOW · Contribute</text>
+          <text x="56" y="212" font-family="IBM Plex Sans" font-size="14.5" font-weight="600" fill="#E8EDF3">Origination Workbench</text>
+          <text x="56" y="231" font-family="IBM Plex Sans" font-size="11" fill="#8A97A8">Loan application intake &amp; underwriting</text>
+          <line x1="56" y1="246" x2="304" y2="246" stroke="#1A2739"/>
+          <use href="#ppl" x="56" y="258"/>
+          <text x="90" y="272" font-family="IBM Plex Sans" font-size="13" font-weight="500" fill="#E8EDF3">Team Keystone</text>
+          <text x="90" y="289" font-family="IBM Plex Mono" font-size="10" fill="#8A97A8">8 engineers</text>
+          <rect x="252" y="258" width="54" height="18" rx="4" fill="rgba(217,184,49,.08)" stroke="#D9B831"/>
+          <text x="279" y="271" text-anchor="middle" font-family="IBM Plex Mono" font-size="9" fill="#D9B831">PAT</text>
+        </g>
+
+        <!-- app card 2 -->
+        <g>
+          <rect x="360" y="158" width="280" height="150" rx="9" fill="#121E2E" stroke="#203045"/>
+          <text x="376" y="184" font-family="IBM Plex Mono" font-size="11" fill="#4D8BE0">ccb-hl-app-02</text>
+          <rect x="536" y="168" width="90" height="20" rx="4" fill="rgba(77,139,224,.1)" stroke="#4D8BE0"/>
+          <text x="581" y="182" text-anchor="middle" font-family="IBM Plex Mono" font-size="9" fill="#4D8BE0">SNOW · Read</text>
+          <text x="376" y="212" font-family="IBM Plex Sans" font-size="14.5" font-weight="600" fill="#E8EDF3">Servicing Core</text>
+          <text x="376" y="231" font-family="IBM Plex Sans" font-size="11" fill="#8A97A8">Payments, escrow &amp; loss mitigation</text>
+          <line x1="376" y1="246" x2="624" y2="246" stroke="#1A2739"/>
+          <use href="#ppl" x="376" y="258"/>
+          <text x="410" y="272" font-family="IBM Plex Sans" font-size="13" font-weight="500" fill="#E8EDF3">Team Gable</text>
+          <text x="410" y="289" font-family="IBM Plex Mono" font-size="10" fill="#8A97A8">12 engineers</text>
+          <rect x="572" y="258" width="54" height="18" rx="4" fill="rgba(217,184,49,.08)" stroke="#D9B831"/>
+          <text x="599" y="271" text-anchor="middle" font-family="IBM Plex Mono" font-size="9" fill="#D9B831">PAT</text>
+        </g>
+
+        <!-- app card 3 -->
+        <g>
+          <rect x="680" y="158" width="280" height="150" rx="9" fill="#121E2E" stroke="#203045"/>
+          <text x="696" y="184" font-family="IBM Plex Mono" font-size="11" fill="#4D8BE0">ccb-hl-app-03</text>
+          <rect x="852" y="168" width="94" height="20" rx="4" fill="rgba(200,32,46,.12)" stroke="#C8202E"/>
+          <text x="899" y="182" text-anchor="middle" font-family="IBM Plex Mono" font-size="9" fill="#E4525D">SNOW · Admin</text>
+          <text x="696" y="212" font-family="IBM Plex Sans" font-size="14.5" font-weight="600" fill="#E8EDF3">Portfolio Analytics</text>
+          <text x="696" y="231" font-family="IBM Plex Sans" font-size="11" fill="#8A97A8">Portfolio risk &amp; performance analytics</text>
+          <line x1="696" y1="246" x2="944" y2="246" stroke="#1A2739"/>
+          <use href="#ppl" x="696" y="258"/>
+          <text x="730" y="272" font-family="IBM Plex Sans" font-size="13" font-weight="500" fill="#E8EDF3">Team Ridgeline</text>
+          <text x="730" y="289" font-family="IBM Plex Mono" font-size="10" fill="#8A97A8">6 engineers</text>
+          <rect x="892" y="258" width="54" height="18" rx="4" fill="rgba(217,184,49,.08)" stroke="#D9B831"/>
+          <text x="919" y="271" text-anchor="middle" font-family="IBM Plex Mono" font-size="9" fill="#D9B831">PAT</text>
+        </g>
+      </svg>
+    </div>
+  </div>
+
+  <!-- ============ Control-M: folder & job lineage ============ -->
+  <div class="panel" style="margin-bottom:16px">
+    <div class="p-head">Control-M — folder &amp; job lineage <span class="m">CTLM_DEF_VER_JOB · medianStartTime from Neo4j time()</span></div>
+    <div class="graphbox">
+      <svg viewBox="0 0 1000 320" width="100%" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Control-M scheduler containing daily and monthly folders, each with a sequence of jobs annotated with median start times and owning application">
+        <defs>
+          <marker id="carr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#8A97A8"/></marker>
+        </defs>
+
+        <!-- Control-M node -->
+        <rect x="30" y="122" width="150" height="66" rx="9" fill="rgba(155,107,212,.12)" stroke="#9B6BD4" stroke-width="1.6"/>
+        <text x="105" y="150" text-anchor="middle" font-family="IBM Plex Sans" font-size="14" font-weight="600" fill="#E8EDF3">Control-M</text>
+        <text x="105" y="169" text-anchor="middle" font-family="IBM Plex Mono" font-size="10" fill="#8A97A8">:Scheduler</text>
+
+        <!-- folders -->
+        <g>
+          <path d="M250 52 h34 l8 9 h108 a6 6 0 0 1 6 6 v45 a6 6 0 0 1 -6 6 H250 a6 6 0 0 1 -6 -6 V58 a6 6 0 0 1 6 -6 Z" fill="rgba(77,139,224,.1)" stroke="#4D8BE0" stroke-width="1.5"/>
+          <text x="328" y="90" text-anchor="middle" font-family="IBM Plex Mono" font-size="12.5" font-weight="600" fill="#E8EDF3">HL_DAILY</text>
+          <text x="328" y="107" text-anchor="middle" font-family="IBM Plex Mono" font-size="9.5" fill="#8A97A8">:Folder · order 02:00</text>
+        </g>
+        <g>
+          <path d="M250 207 h34 l8 9 h108 a6 6 0 0 1 6 6 v45 a6 6 0 0 1 -6 6 H250 a6 6 0 0 1 -6 -6 V213 a6 6 0 0 1 6 -6 Z" fill="rgba(77,139,224,.1)" stroke="#4D8BE0" stroke-width="1.5"/>
+          <text x="328" y="245" text-anchor="middle" font-family="IBM Plex Mono" font-size="12.5" font-weight="600" fill="#E8EDF3">HL_MTHLY</text>
+          <text x="328" y="262" text-anchor="middle" font-family="IBM Plex Mono" font-size="9.5" fill="#8A97A8">:Folder · order 01:00 (BOM)</text>
+        </g>
+
+        <!-- daily jobs -->
+        <g>
+          <rect x="470" y="55" width="160" height="60" rx="8" fill="#121E2E" stroke="#203045"/>
+          <text x="550" y="80" text-anchor="middle" font-family="IBM Plex Mono" font-size="11.5" font-weight="600" fill="#E8EDF3">HL_EXTRACT_01</text>
+          <text x="550" y="96" text-anchor="middle" font-family="IBM Plex Mono" font-size="9" fill="#8A97A8">medianStart 02:15 · app-01</text>
+        </g>
+        <g>
+          <rect x="655" y="55" width="160" height="60" rx="8" fill="#121E2E" stroke="#203045"/>
+          <text x="735" y="80" text-anchor="middle" font-family="IBM Plex Mono" font-size="11.5" font-weight="600" fill="#E8EDF3">HL_XFORM_02</text>
+          <text x="735" y="96" text-anchor="middle" font-family="IBM Plex Mono" font-size="9" fill="#8A97A8">medianStart 02:40 · app-01</text>
+        </g>
+        <g>
+          <rect x="838" y="55" width="152" height="60" rx="8" fill="#121E2E" stroke="#203045"/>
+          <text x="914" y="80" text-anchor="middle" font-family="IBM Plex Mono" font-size="11.5" font-weight="600" fill="#E8EDF3">HL_LOAD_03</text>
+          <text x="914" y="96" text-anchor="middle" font-family="IBM Plex Mono" font-size="9" fill="#8A97A8">medianStart 03:05 · app-01</text>
+        </g>
+
+        <!-- monthly jobs -->
+        <g>
+          <rect x="470" y="210" width="160" height="60" rx="8" fill="#121E2E" stroke="#203045"/>
+          <text x="550" y="235" text-anchor="middle" font-family="IBM Plex Mono" font-size="11.5" font-weight="600" fill="#E8EDF3">HL_STMT_01</text>
+          <text x="550" y="251" text-anchor="middle" font-family="IBM Plex Mono" font-size="9" fill="#8A97A8">medianStart 01:30 · app-02</text>
+        </g>
+        <g>
+          <rect x="655" y="210" width="160" height="60" rx="8" fill="#121E2E" stroke="#203045"/>
+          <text x="735" y="235" text-anchor="middle" font-family="IBM Plex Mono" font-size="11.5" font-weight="600" fill="#E8EDF3">HL_RPT_02</text>
+          <text x="735" y="251" text-anchor="middle" font-family="IBM Plex Mono" font-size="9" fill="#8A97A8">medianStart 02:10 · app-02</text>
+        </g>
+
+        <!-- edges -->
+        <g fill="none" stroke="#3C4E66" stroke-width="1.6" marker-end="url(#carr)">
+          <path d="M180 140 C 215 125, 220 105, 244 90"/>
+          <path d="M180 172 C 215 188, 220 220, 244 236"/>
+          <line x1="412" y1="84" x2="464" y2="84"/>
+          <line x1="630" y1="85" x2="649" y2="85"/>
+          <line x1="815" y1="85" x2="832" y2="85"/>
+          <line x1="412" y1="239" x2="464" y2="239"/>
+          <line x1="630" y1="240" x2="649" y2="240"/>
+        </g>
+        <text x="208" y="102" font-family="IBM Plex Mono" font-size="9" fill="#8A97A8">CONTAINS</text>
+        <text x="208" y="222" font-family="IBM Plex Mono" font-size="9" fill="#8A97A8">CONTAINS</text>
+        <text x="438" y="76" text-anchor="middle" font-family="IBM Plex Mono" font-size="9" fill="#8A97A8">CONTAINS</text>
+        <text x="639" y="76" text-anchor="middle" font-family="IBM Plex Mono" font-size="9" fill="#8A97A8">▸</text>
+        <text x="823" y="76" text-anchor="middle" font-family="IBM Plex Mono" font-size="9" fill="#8A97A8">▸</text>
+        <text x="438" y="231" text-anchor="middle" font-family="IBM Plex Mono" font-size="9" fill="#8A97A8">CONTAINS</text>
+        <text x="639" y="231" text-anchor="middle" font-family="IBM Plex Mono" font-size="9" fill="#8A97A8">▸</text>
+
+        <text x="500" y="308" text-anchor="middle" font-family="IBM Plex Mono" font-size="10" fill="#5C6B7E">job chains ordered by in-conditions · ▸ = TRIGGERS · all folder/job names synthesized</text>
+      </svg>
+    </div>
+  </div>
+
+  <div class="foot">User view assembled from: ServiceNow (my app access) · PAT (dev team alignment) · Control-M definitions (folder/job lineage) — all synthesized</div>
+</main>
+
+<script>
+/* ============================================================
+   Synthesized tower data — no real systems, SEALs or org data
+   ============================================================ */
+const TOWERS = {
+  home: {
+    title:"Home Lending", color:"#4D8BE0", stats:[["12","Products"],["42","Teams"]],
+    icon:`<svg width="42" height="42" viewBox="0 0 42 42"><path d="M21 7 L36 20 H31 V34 H24 V25 H18 V34 H11 V20 H6 Z" fill="none" stroke="#4D8BE0" stroke-width="2.4" stroke-linejoin="round"/></svg>`,
+    spark:[10,14,9,16,12,18,13,20,15,17,12,19,14,21],
+    schemaName:"HomeLending_Data_Model",
+    schema:[["Id","int"],["Applicant","string"],["Anonymized_Loan","string"],["Stage","string"],["App_Dt","date"]],
+    previewName:"Anonymized Applications",
+    prevCols:["Id","Applicant","Anonymized_Loan"],
+    preview:[["501","M. Rivera","HL0… ****"],["502","T. Chen","HL0… ****"],["503","A. Osei","illustrative …"]],
+    cypher:
+`<span class="kw">MATCH</span> (t:<span class="lbl">Tower</span> {name: <span class="str">'Home Lending'</span>})
+      -[:<span class="rel">RUNS</span>]-&gt;(j:<span class="lbl">EtlJob</span> {engine: <span class="str">'Informatica'</span>})
+      -[:<span class="rel">WRITES</span>]-&gt;(d:<span class="lbl">Dataset</span>)
+      -[:<span class="rel">LANDS_IN</span>]-&gt;(s:<span class="lbl">S3Stage</span> {name: <span class="str">'stg_mortgage'</span>})
+      -[:<span class="rel">LOADS</span>]-&gt;(w:<span class="lbl">Warehouse</span> {name: <span class="str">'Snowflake_DW'</span>})
+<span class="kw">OPTIONAL MATCH</span> (j)-[:<span class="rel">SCHEDULED_BY</span>]-&gt;(cm:<span class="lbl">ControlMJob</span>)
+<span class="kw">RETURN</span> t, j, d, s, w, cm
+<span class="kw">ORDER BY</span> cm.medianStartTime`,
+    graph:{nodes:[
+      {x:75, y:150, label:"Home Lending", sub:"Tower",       c:"#C8202E"},
+      {x:210,y:70,  label:"m_app_approval",sub:"EtlJob",     c:"#D9B831"},
+      {x:335,y:150, label:"app_pipeline", sub:"Dataset",     c:"#4D8BE0"},
+      {x:460,y:70,  label:"stg_mortgage", sub:"S3Stage",     c:"#3AAE6B"},
+      {x:552,y:150, label:"Snowflake_DW", sub:"Warehouse",   c:"#2AB3A6"},
+      {x:210,y:240, label:"HL_DLY_LOAD",  sub:"ControlMJob", c:"#9B6BD4"}],
+      edges:[[0,1,"RUNS"],[1,2,"WRITES"],[2,3,"LANDS_IN"],[3,4,"LOADS"],[1,5,"SCHEDULED_BY"]]}
+  },
+
+  auto: {
+    title:"Auto", color:"#2AB3A6", stats:[["9","Products"],["31","Teams"]],
+    icon:`<svg width="46" height="42" viewBox="0 0 46 42"><path d="M9 25 L12 15 Q13 12 16 12 H30 Q33 12 34 15 L37 25 M7 25 H39 V31 H35 M11 31 H7 Z" fill="none" stroke="#2AB3A6" stroke-width="2.4" stroke-linejoin="round"/><circle cx="14" cy="30" r="3.4" fill="none" stroke="#2AB3A6" stroke-width="2.4"/><circle cx="32" cy="30" r="3.4" fill="none" stroke="#2AB3A6" stroke-width="2.4"/><line x1="15" y1="19" x2="31" y2="19" stroke="#2AB3A6" stroke-width="2"/></svg>`,
+    spark:[12,10,15,11,17,13,18,14,16,12,19,15,17,20],
+    schemaName:"Auto_Data_Model",
+    schema:[["Id","int"],["Dealer","string"],["Anonymized_VIN","string"],["Inv_Status","string"],["Lot_Dt","date"]],
+    previewName:"Anonymized Inventory",
+    prevCols:["Id","Dealer","Anonymized_VIN"],
+    preview:[["901","Dealer NW-04","V17… ****"],["902","Dealer SE-11","V17… ****"],["903","Dealer MW-02","illustrative …"]],
+    cypher:
+`<span class="kw">MATCH</span> (t:<span class="lbl">Tower</span> {name: <span class="str">'Auto'</span>})
+      -[:<span class="rel">RUNS</span>]-&gt;(j:<span class="lbl">EtlJob</span> {engine: <span class="str">'PySpark'</span>})
+      -[:<span class="rel">WRITES</span>]-&gt;(d:<span class="lbl">Dataset</span>)
+      -[:<span class="rel">LANDS_IN</span>]-&gt;(s:<span class="lbl">S3Stage</span> {name: <span class="str">'stg_auto'</span>})
+      -[:<span class="rel">LOADS</span>]-&gt;(w:<span class="lbl">Warehouse</span> {name: <span class="str">'Snowflake_DW'</span>})
+<span class="kw">OPTIONAL MATCH</span> (d)&lt;-[:<span class="rel">SOURCES</span>]-(lg:<span class="lbl">Dataset</span> {origin: <span class="str">'Cards legacy'</span>})
+<span class="kw">RETURN</span> t, j, d, s, w, lg`,
+    graph:{nodes:[
+      {x:75, y:150, label:"Auto",           sub:"Tower",    c:"#C8202E"},
+      {x:215,y:70,  label:"prod_inventory", sub:"EtlJob",   c:"#D9B831"},
+      {x:340,y:150, label:"inv_feed",       sub:"Dataset",  c:"#4D8BE0"},
+      {x:462,y:70,  label:"stg_auto",       sub:"S3Stage",  c:"#3AAE6B"},
+      {x:552,y:150, label:"Snowflake_DW",   sub:"Warehouse",c:"#2AB3A6"},
+      {x:340,y:245, label:"cards_legacy",   sub:"Dataset",  c:"#4D8BE0"}],
+      edges:[[0,1,"RUNS"],[1,2,"WRITES"],[2,3,"LANDS_IN"],[3,4,"LOADS"],[5,2,"SOURCES"]]}
+  },
+
+  cards: {
+    title:"Credit Cards", color:"#3AAE6B", stats:[["8","Products"],["27","Teams"]],
+    icon:`<svg width="46" height="42" viewBox="0 0 46 42"><rect x="7" y="11" width="32" height="21" rx="3" fill="none" stroke="#3AAE6B" stroke-width="2.4"/><line x1="7" y1="18" x2="39" y2="18" stroke="#3AAE6B" stroke-width="3.4"/><line x1="12" y1="26" x2="22" y2="26" stroke="#3AAE6B" stroke-width="2.2"/></svg>`,
+    spark:[14,11,16,12,15,18,13,17,14,19,15,18,16,21],
+    schemaName:"Cards_Data_Model",
+    schema:[["Id","int"],["Name","string"],["Anonymized_Card","string"],["Account_Status","string"],["Open_Dt","date"]],
+    previewName:"Anonymized Cardholders",
+    prevCols:["Id","Name","Anonymized_Card"],
+    preview:[["123","John S.","S00… ****"],["124","John N.","S00… ****"],["125","Eava R.","illustrative …"]],
+    cypher:
+`<span class="kw">MATCH</span> (t:<span class="lbl">Tower</span> {name: <span class="str">'Credit Cards'</span>})
+      -[:<span class="rel">RUNS</span>]-&gt;(j:<span class="lbl">EtlJob</span> {engine: <span class="str">'AbInitio'</span>})
+      -[:<span class="rel">WRITES</span>]-&gt;(d:<span class="lbl">Dataset</span>)
+      -[:<span class="rel">LANDS_IN</span>]-&gt;(s:<span class="lbl">S3Stage</span> {name: <span class="str">'stg_cards'</span>})
+      -[:<span class="rel">LOADS</span>]-&gt;(w:<span class="lbl">Warehouse</span> {name: <span class="str">'Snowflake_DW'</span>})
+<span class="kw">OPTIONAL MATCH</span> (w)&lt;-[:<span class="rel">READS</span>]-(x:<span class="lbl">Tower</span>)
+<span class="kw">WHERE</span> x.name &lt;&gt; t.name
+<span class="kw">RETURN</span> t, j, d, s, w, x`,
+    graph:{nodes:[
+      {x:75, y:150, label:"Credit Cards", sub:"Tower",     c:"#C8202E"},
+      {x:200,y:70,  label:"Txn_ETL",      sub:"EtlJob",    c:"#D9B831"},
+      {x:325,y:150, label:"txn_daily",    sub:"Dataset",   c:"#4D8BE0"},
+      {x:450,y:70,  label:"stg_cards",    sub:"S3Stage",   c:"#3AAE6B"},
+      {x:548,y:150, label:"Snowflake_DW", sub:"Warehouse", c:"#2AB3A6"},
+      {x:450,y:240, label:"Auto",         sub:"Tower",     c:"#C8202E"}],
+      edges:[[0,1,"RUNS"],[1,2,"WRITES"],[2,3,"LANDS_IN"],[3,4,"LOADS"],[5,4,"READS"]]}
+  },
+
+  shared: {
+    title:"Shared Services", color:"#D9B831", stats:[["6","Platforms"],["19","Teams"]],
+    icon:`<svg width="46" height="42" viewBox="0 0 46 42"><g fill="none" stroke="#D9B831" stroke-width="2.4" stroke-linejoin="round"><path d="M23 8 L37 14 L23 20 L9 14 Z"/><path d="M9 21 L23 27 L37 21"/><path d="M9 28 L23 34 L37 28"/></g></svg>`,
+    spark:[9,12,10,14,11,13,15,12,16,13,15,17,14,18],
+    schemaName:"SharedSvc_Registry_Model",
+    schema:[["Id","int"],["Platform","string"],["Owner_Team","string"],["Consumers","int"],["Onboard_Dt","date"]],
+    previewName:"Platform Registry",
+    prevCols:["Id","Platform","Consumers"],
+    preview:[["71","Batch Scheduling Registry","14"],["72","Vendor Icon Registry","9"],["73","Lending Knowledge Graph","illustrative …"]],
+    cypher:
+`<span class="kw">MATCH</span> (t:<span class="lbl">Tower</span> {name: <span class="str">'Shared Services'</span>})
+      -[:<span class="rel">OWNS</span>]-&gt;(p:<span class="lbl">Platform</span>)
+      &lt;-[:<span class="rel">CONSUMES</span>]-(x:<span class="lbl">Tower</span>)
+<span class="kw">OPTIONAL MATCH</span> (p)-[:<span class="rel">CATALOGS</span>]-&gt;(j:<span class="lbl">ControlMJob</span>)
+<span class="kw">RETURN</span> t, p, x,
+       count(j) <span class="kw">AS</span> jobsCataloged
+<span class="kw">ORDER BY</span> jobsCataloged <span class="kw">DESC</span>`,
+    graph:{nodes:[
+      {x:80, y:150, label:"Shared Services", sub:"Tower",      c:"#C8202E"},
+      {x:250,y:70,  label:"Sched Registry",  sub:"Platform",   c:"#D9B831"},
+      {x:250,y:230, label:"Knowledge Graph", sub:"Platform",   c:"#D9B831"},
+      {x:430,y:70,  label:"Home Lending",    sub:"Tower",      c:"#C8202E"},
+      {x:430,y:230, label:"Auto",            sub:"Tower",      c:"#C8202E"},
+      {x:545,y:150, label:"HL_DLY_LOAD",     sub:"ControlMJob",c:"#9B6BD4"}],
+      edges:[[0,1,"OWNS"],[0,2,"OWNS"],[3,1,"CONSUMES"],[4,2,"CONSUMES"],[1,5,"CATALOGS"]]}
+  }
+};
+
+/* ---------- hero network: nodes + edges ---------- */
+(function heroNet(){
+  const pts=[
+    [320,42,"nBlue",9],[452,66,"nGreen",7],[540,120,"nBlue",8],[598,200,"nTeal",13],
+    [590,300,"nGreen",9],[560,382,"nYellow",12],[470,430,"nTeal",7],[360,446,"nBlue",8],
+    [248,432,"nGreen",7],[152,392,"nBlue",10],[86,318,"nTeal",8],[62,228,"nBlue",12],
+    [92,140,"nGreen",8],[168,78,"nTeal",7],[236,50,"nBlue",6],
+    [500,180,"nYellow",6],[150,250,"nGreen",6],[490,330,"nGreen",6],[190,160,"nBlue",5]
+  ];
+  const links=[[0,1],[1,2],[2,3],[3,4],[4,5],[5,6],[6,7],[7,8],[8,9],[9,10],[10,11],[11,12],[12,13],[13,14],[14,0],
+    [2,15],[15,3],[11,16],[16,10],[5,17],[17,4],[12,18],[18,16],[1,15],[8,17]];
+  const colorOf={nBlue:"#2E6BC4",nGreen:"#3AAE6B",nTeal:"#2AB3A6",nYellow:"#D9B831"};
+  const eg=document.getElementById("edges"), ng=document.getElementById("nodes");
+  eg.innerHTML=links.map(([a,b])=>{
+    const p=pts[a],q=pts[b];
+    return `<line x1="${p[0]}" y1="${p[1]}" x2="${q[0]}" y2="${q[1]}" stroke="${colorOf[p[2]]}" opacity=".45"/>`;
+  }).join("");
+  ng.innerHTML=pts.map(p=>`<circle cx="${p[0]}" cy="${p[1]}" r="${p[3]}" fill="url(#${p[2]})"/>`).join("");
+})();
+
+/* ---------- tower cards ---------- */
+const cardsEl=document.getElementById("towerCards");
+for(const [key,t] of Object.entries(TOWERS)){
+  const el=document.createElement("div");
+  el.className="tower"; el.tabIndex=0; el.setAttribute("role","button");
+  el.setAttribute("aria-label",`Open ${t.title} drill-down`);
+  el.innerHTML=`
+    <div class="icon">${t.icon}</div>
+    <h3>${t.title}</h3>
+    <div class="stats"><span><b>${t.stats[0][0]}</b> ${t.stats[0][1]}</span><span><b>${t.stats[1][0]}</b> ${t.stats[1][1]}</span></div>`;
+  const open=()=>showDrill(key);
+  el.addEventListener("click",open);
+  el.addEventListener("keydown",e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();open();}});
+  cardsEl.appendChild(el);
+}
+
+/* ---------- drill-down ---------- */
+function showDrill(key){
+  const t=TOWERS[key];
+  document.getElementById("dTitle").textContent=t.title+" — Example Data & Dependencies";
+  document.getElementById("dCypher").innerHTML=t.cypher;
+  document.getElementById("dSchemaName").textContent=t.schemaName;
+  document.getElementById("dPreviewName").textContent=t.previewName;
+  document.getElementById("dSchema").innerHTML=t.schema.map(r=>`<tr><td>${r[0]}</td><td>${r[1]}</td></tr>`).join("");
+  document.getElementById("dPrevHead").innerHTML="<tr>"+t.prevCols.map(c=>`<th>${c}</th>`).join("")+"</tr>";
+  document.getElementById("dPreview").innerHTML=t.preview.map(r=>"<tr>"+r.map(c=>`<td>${c}</td>`).join("")+"</tr>").join("");
+  document.getElementById("dGraphMeta").textContent=t.graph.nodes.length+" nodes · "+t.graph.edges.length+" rels";
+  renderGraph(t.graph);
+  document.getElementById("myAppsBtn").style.display = (key==="home") ? "inline-block" : "none";
+  document.getElementById("landing").style.display="none";
+  document.getElementById("myapps").style.display="none";
+  document.getElementById("drill").style.display="block";
+  window.scrollTo({top:0});
+}
+function showLanding(){
+  document.getElementById("drill").style.display="none";
+  document.getElementById("myapps").style.display="none";
+  document.getElementById("landing").style.display="block";
+}
+function showMyApps(){
+  document.getElementById("landing").style.display="none";
+  document.getElementById("drill").style.display="none";
+  document.getElementById("myapps").style.display="block";
+  window.scrollTo({top:0});
+}
+function renderGraph(g){
+  const svg=document.getElementById("dGraph");
+  const R=27;
+  let out=`<defs><marker id="garr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#8A97A8"/></marker></defs>`;
+  for(const [a,b,rel] of g.edges){
+    const n1=g.nodes[a], n2=g.nodes[b];
+    const dx=n2.x-n1.x, dy=n2.y-n1.y, len=Math.hypot(dx,dy);
+    const x1=n1.x+dx/len*R, y1=n1.y+dy/len*R, x2=n2.x-dx/len*(R+4), y2=n2.y-dy/len*(R+4);
+    out+=`<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="#3C4E66" stroke-width="1.6" marker-end="url(#garr)"/>`;
+    out+=`<text x="${(x1+x2)/2}" y="${(y1+y2)/2-6}" text-anchor="middle" class="gedge">${rel}</text>`;
+  }
+  for(const n of g.nodes){
+    out+=`<circle cx="${n.x}" cy="${n.y}" r="${R}" fill="${n.c}" opacity=".16" stroke="${n.c}" stroke-width="2"/>`;
+    out+=`<text x="${n.x}" y="${n.y+1}" text-anchor="middle" class="gnode">${n.label}</text>`;
+    out+=`<text x="${n.x}" y="${n.y+15}" text-anchor="middle" class="gsub">:${n.sub}</text>`;
+  }
+  svg.innerHTML=out;
+}
+</script>
+</body>
+</html>
