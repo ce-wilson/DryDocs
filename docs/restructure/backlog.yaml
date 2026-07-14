@@ -476,6 +476,8 @@ items:
       Declared-Adopted vs Experimental/Early-Adoption. REMAINING for ontology-mapper: take the
       `jobrun-observation` map entry through the HITL gate (resolve ControlMJobRun-as-Observation
       vs separate-Observation-node; run-history source), then planned->confirmed.
+      GATE SESSION DEFERRED 2026-07-14 (SME: not ready yet) — page stays rendered/pending;
+      nothing flips; re-present at a future session (see gate-log 2026-07-14 deferral note).
 
   - id: E2
     epic: context-graph
@@ -501,7 +503,7 @@ items:
     agent: pipeline-config
     model: sonnet
     priority: p3
-    status: in_progress
+    status: done          # gate autosys-crosswalk SIGNED OFF 2026-07-14 (gate-log); autosys-export confirmed: true
     depends_on: [C1]
     inputs: [external/orchestration/autosys/README.md, config/source-registry.yaml]
     acceptance: "AutoSys crosswalk fully mapped to baseline; no invented concepts; gate logged; confirmed:true"
@@ -515,7 +517,7 @@ items:
     agent: pipeline-config
     model: sonnet
     priority: p3
-    status: in_progress
+    status: done          # gate airflow-crosswalk SIGNED OFF 2026-07-14 (gate-log); airflow-mwaa confirmed: true
     depends_on: [C1]
     inputs: [external/orchestration/airflow/README.md, config/source-registry.yaml]
     acceptance: "Airflow/MWAA crosswalk fully mapped to baseline; no invented concepts; gate logged; confirmed:true"
@@ -2083,12 +2085,16 @@ items:
       forced by any real login — mock deliberately doesn't decide it), a REAL C4/graph view
       against the live EE DB (NVL or successor) instead of the synthesized SVGs, wireframes
       committed, build/run docs.
-      2026-07-14 (later) — ADR 0005 DRAFTED, status PROPOSED (docs/decisions/0005): thin API
-      recommended over bolt-from-browser, grounded in sanitized company-side evidence (the
-      enterprise already runs FastAPI-class + OIDC SSO + server-held machine creds; screenshot
-      held out of repo, mechanism-not-instance). Awaiting the SME accept/edit/reject call —
-      the acceptance's "decision recorded" ticks when 0005 flips ACCEPTED. Follow-up items
-      (drydocs-api scaffold, live graph view over the API) groom into Epic O on acceptance.
+      2026-07-14 (later) — ADR 0005 on main, status PROPOSED (docs/decisions/0005): the
+      session's sanitized-evidence draft was REWRITTEN by the SME and landed via the other
+      machine (b5235f4) — thin API is the DEPLOYMENT shape; bolt-from-browser survives only
+      as a dev-mode adapter (dev flag + admin) behind ONE GraphAccess seam in web/src/lib/;
+      no VITE_NEO4J_PASSWORD ever committed. Main's version is canonical (branch draft
+      superseded at the 2026-07-14 reconcile merge). The acceptance's "decision recorded"
+      ticks when 0005 flips ACCEPTED; on accept, groom the thin-API component + GraphAccess
+      seam refit + live graph view into Epic O. NOTE: the landed design pass predates the
+      seam — no new bolt usage (pages are synthesized), but the seam refit is the first
+      code consequence of acceptance.
 
   - id: O2
     epic: web-console
@@ -2167,7 +2173,7 @@ items:
     agent: main
     model: opus
     priority: p1
-    status: in_progress
+    status: done          # SIGNED OFF 2026-07-14, 1 SME edit (§B ctlm_id join upgrade); map entry confirmed; loader still blocked on P1 probes
     depends_on: []
     inputs: [config/gate-prompts/controlm-avg-run-supplement.yaml, config/gate-log.md]
     acceptance: >
@@ -2383,7 +2389,7 @@ items:
 # that these match the items exactly; update them with any status change.
 summary:
   todo: 17                                          # +J10 (ruff cleanup), +L12 (render-fidelity rule) groomed 2026-07-13
-  in_progress: 6                                   # E1, F1, F2, K2, P2 (awaiting HITL), O1 (web design pass)
+  in_progress: 3                                   # E1 (gate deferred), K2 (loader build — gate SIGNED OFF 2026-07-14), O1 (web design pass)
   blocked: 0
-  done: 59                                          # O2 mock sign-in DONE 2026-07-13 (feat/web-login-mock)
+  done: 62                                          # F1+F2+P2 gates SIGNED OFF 2026-07-14
   next_ready: [C5, L7, L8, L9, L12, M2, M3, M4, P1, C7, K4, K5, J10]  # J10 dep J5 done; L12 no deps

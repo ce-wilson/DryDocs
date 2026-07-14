@@ -77,9 +77,11 @@ def test_unknown_source_raises(tmp_path: Path) -> None:
 
 def test_real_registry_gate_state() -> None:
     reg = SourceRegistry.from_yaml(DEFAULT_REGISTRY_PATH)
-    for live in ("controlm-psgmgr", "seal-extract", "catalog-pat"):
+    # airflow-mwaa / autosys-export: crosswalk gates signed off 2026-07-14
+    # (source-row activation only — loading still requires a loader + its own gate).
+    for live in ("controlm-psgmgr", "seal-extract", "catalog-pat", "airflow-mwaa", "autosys-export"):
         assert reg.is_confirmed(live), f"{live} should be confirmed"
-    for placeholder in ("autosys-export", "airflow-mwaa", "oracle-schemas", "snowflake"):
+    for placeholder in ("oracle-schemas", "snowflake"):
         assert not reg.is_confirmed(placeholder), f"{placeholder} should be unconfirmed"
         with pytest.raises(UnconfirmedSourceError):
             reg.require_confirmed(placeholder)

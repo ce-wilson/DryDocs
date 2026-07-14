@@ -534,6 +534,80 @@ PROCEDURE:
       curation.curate is a stub (phased-cadence trigger wiring, G4-scoped future);
       node_target is POLYMORPHIC (gate controlm-hosts-topology) — resolution is Epic P.
 
+31. QUALITY BATCH + DOCS + WEB CONSOLE (O2) + THE 2026-07-14 GATE SESSION (2026-07-11 →
+    2026-07-14; 48 commits, subjects "fix(lineage): restore +x on collect/rua_inventory.sh" →
+    "docs(ui): wf-console-01 — add paired blank sketch sheets after every view"; four streams):
+    - NON-HITL QUALITY BATCH (J-series + G11 + N2, 2026-07-12): J5 adds .github/workflows CI
+      running the CLAUDE.md test gates + a publish-boundary guard (NEW manifest row .github/**
+      = evaluate: the guard is producer-remote-specific and GHE Actions runners/policies are
+      yours — keep consumer workflows, adapt rather than adopt). J9 adds a testcontainers
+      end-to-end load suite (needs Docker; auto-deselected without it — the "3 deselected" in
+      the acceptance numbers). J7 adds tests/unit/test_port_reconcile_guards.py — these test
+      THE PORT ITSELF and skip producer-side; consumer-side they RUN once RECONCILE_BEFORE_DIR
+      is set (your 3 extra passes). J6 drops streamlit + streamlit-agraph from pyproject
+      (per-entry rule: apply the removal only if you never used them — producer-dead deps).
+      J8 skip-guard policy test, N2 column-ledger drift guards, G11 extractor coverage
+      accounting, J2 README edge rename (:DEPENDS_ON → :WAS_INFORMED_BY), J4 run-drydocs
+      skill refresh, and the /tech-debt documentation-audit record.
+    - DOCS/GOVERNANCE STREAM (2026-07-12/13): whitepaper Rev 1 + deterministic HTML renders
+      and project TDD Rev 1→2 (module topology + C4 views, Epic L outline-conformant) — take
+      each .md WITH its renders or re-render (deterministic house renderer). **G10 CLOSED:**
+      the held governance docs are PERMANENTLY out-of-repo by SME gate (2026-07-12); their
+      identities live ONLY in internal/remediation/README.md §HELD — do not reintroduce them
+      from any company-side copy, and keep them out of publishable files (including this one).
+    - WEB CONSOLE STREAM (O2 + the UI reconcile, 2026-07-13/14): web/ leaves its test-page
+      state — persona MOCK auth (localStorage, SYNTHETIC personas; real authn/authz is
+      explicitly deferred to ADR 0005), role-gated shell, My Apps view, CypherConsole; plus
+      the UI-WIP/ design record (wireframe guide/PDF, nav-flow mermaid, design review, dark
+      landing mock; wf-console-01.{html,pdf} — the range's two closing commits — is the
+      printable SME-review wireframe: per-view element keys, Neo4j label key tables, and a
+      paired blank sketch sheet after every view — the Epic-L pen/paper HITL loop pointed at
+      the UI). NEW manifest rows: web/** and UI-WIP/** canonical-producer. web/ ships
+      .env.example ONLY — Vite inlines VITE_* values into the built bundle, so a committed
+      VITE_NEO4J_PASSWORD is a secret in a publishable artifact; your .env.local stays
+      gitignored. .gitattributes gains `*.pdf binary` (take it — guards committed PDFs against
+      autocrlf corruption). ADR 0005 (PROPOSED): thin API is the deployment access path;
+      bolt-from-browser is dev-mode-only behind a GraphAccess seam — read it BEFORE building
+      company deployment on web/'s current direct-bolt lib. Dead branch
+      feature/ui-dark-landing-myapps was deleted producer-side (its TDD copy was obsolete);
+      origin/feat/web-console-design-pass still holds an unmerged design mockup.
+    - GATE-SESSION STREAM (2026-07-14 — the config/ + tests coupling, read carefully):
+      - software-registry.yaml gains vendors apache/broadcom + products airflow/autosys
+        (ADR 0004 shapes; MWAA is deliberately NOT a separate product — stock object model).
+      - config/crosswalks/: ExecutionHost wording fixed against the signed-off host-group
+        model (airflow row 8 split 8a/8b/8c — queue is 1-to-many via ControlMHostGroup;
+        autosys row 6 demoted exact→approximate — machine: is polymorphic), THEN both
+        crosswalk gates SIGNED OFF: files + all rows now status: confirmed.
+      - source-registry.yaml: airflow-mwaa + autosys-export flipped confirmed: true —
+        SOURCE-ROW ONLY, no loaders exist. These flips are a UNIT with: audit-fields.yaml
+        stub entries, test_source_mapping_drift.py LEDGER_PENDING (+airflow-mwaa,
+        +autosys-export), and test_source_registry.py gate-state pins — take config + tests
+        together or Track-1 breaks. Your own gate sessions govern YOUR flips (gate-prompts
+        are canonical-company); producer gate-log entries ride in via union-append.
+      - P2 avg-run gate SIGNED OFF with one SME edit: **ctlm_id (folder_id.job_id, e.g.
+        161015.7) is YOUR internal psgmgr derived column** — the producer records only the
+        mechanism (join prefers ctlm_id, weak (SCHED_TABLE, JOB_MEM_NAME) key demotes to
+        fallback); verify your CM_AVG_RUN extract exposes it (probes P0/P4). Map entry
+        job-runtime-stats-supplement → confirmed.
+      - K2 match-policy gate SIGNED OFF 24/24: map entry job-seal-app-ref → confirmed WITH
+        the K3 type-conflict rider intact (the WAS_ASSOCIATED_WITH shape re-opens when K4
+        applies the :Application reclass — per-entry rule: never downgrade, never drop the
+        rider). m3_seal_app_ref stays planned; it flips active WITH the K2 loader build
+        (back-flow-origin id — consumer-canonical once you promote it).
+      - NEW config/manual-loads/ (manifest row: manifest.yaml = per-entry/union): the tier-5
+        SME-authored CSV mapping mechanism — PIN semantics (automation never silently
+        supersedes a manual edge; retirement is human-only via the manifest), nodes a CSV
+        creates are stamped manually_created: true, every file registers with a REQUIRED
+        replaces_with automation path. Producer ships mechanism + empty lists; YOUR real CSVs
+        live under internal/ and YOUR manifest entries never come from a port.
+      - E1 SOSA gate DEFERRED (nothing flips); gate-log gains five entries (union-append);
+        docs/decisions/README gains the 0005 row; IDEAS union-append (ctlm_id ripple,
+        render_board venv gotcha).
+    - KNOWN-PENDING carried by design (do not "fix" during the port): no airflow/autosys
+      loaders (activation is source-row only, each loader gets its own gate); P2 loader
+      blocked on the P1 probes (company-side run); K2 loader authorized, not built;
+      ADR 0005 awaiting acceptance; E1 deferred.
+
 ACCEPTANCE GATE (behavior is the contract, not a byte-compare):
 - Track 1 (portable, no production sample present):
     poetry run pytest tests/unit/test_variable_classifier.py tests/unit/test_variable_resolver.py \
@@ -552,14 +626,20 @@ ACCEPTANCE GATE (behavior is the contract, not a byte-compare):
   AND the remediation suites (step 29: test_remediation_scaffold / _m0 / _tier1 / _handoff /
   _no_graph_write / _corroborate — synthetic fixtures, no network/DB). All portable: stdlib +
   PyYAML, the committed BMC corpus under external/, no network/DB.
-  test_schema.py expects EXPECTED_CONSTRAINTS = 40 (steps 19 + 22; UNCHANGED by steps 25-29 — the
-  Epic P loaders are not built yet and remediation loads nothing) and a supplement block for the
+  test_schema.py expects EXPECTED_CONSTRAINTS = 40 (steps 19 + 22; UNCHANGED by steps 25-31 — the
+  Epic P loaders are not built yet, remediation loads nothing, and the step-31 gate session flips
+  config statuses only) and a supplement block for the
   4 active `docs_*` edges; test_bmc_docs pins EXPECTED_DOC_COUNT = 27 (step 22). Both CI guards
   must pass: test_schema.py (no `active` relationship without its supplement block) and
   test_classification.py (every source in source-registry.yaml has a valid sensitivity
   classification). New dep: PyYAML.
   Producer-side reference: 483 passed / 3 skipped at the step-28 relocate head;
-  516 passed / 3 skipped at the step-29 remediation head (2026-07-10).
+  516 passed / 3 skipped at the step-29 remediation head (2026-07-10);
+  588 passed / 6 skipped / 3 deselected at the step-31 gate-session head (2026-07-14 — the 3
+  deselected are the J9 testcontainers e2e without Docker; 3 of the 6 skips are the J7 reconcile
+  guards, which RUN consumer-side once RECONCILE_BEFORE_DIR is set). Step-31 coupling reminder:
+  source-registry confirmed flips + audit-fields stubs + LEDGER_PENDING + the test_source_registry
+  gate-state pins move as ONE unit.
 
 BOUNDARIES:
 - One-way only. Never add company main as a remote on the producer; never push back to

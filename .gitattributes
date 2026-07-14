@@ -2,3 +2,6 @@
 # a CRLF in the shebang breaks execution.
 *.sh text eol=lf
 *.ksh text eol=lf
+
+# Binary documents — never eol-normalize (autocrlf=true would corrupt them).
+*.pdf binary

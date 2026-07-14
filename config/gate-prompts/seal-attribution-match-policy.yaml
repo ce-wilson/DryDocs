@@ -13,11 +13,14 @@ summary: >
   Proposes the match policy for attributing a ControlMJob to its SEAL-registered
   Application via STG_APP_FACT semantic facts (fact_type SEAL/FID/APP_NAME/ALIAS),
   per the K1 vocabulary registration (m3_seal_app_ref, status: planned) and the K1
-  taxonomy-ontology-map entry (job-seal-app-ref, status: proposed). Covers fact-type
-  precedence, the one-to-one accept rule, zero-unmatched surfacing, multi-hit triage,
-  the edge write shape, and load sequencing. No graph write happens until every
-  confirmation below is ticked and logged to config/gate-log.md; m3_seal_app_ref stays
-  status: planned until then.
+  taxonomy-ontology-map entry (job-seal-app-ref, status: proposed). The policy is a
+  DERIVE-AND-WEIGHT scheme: each tier derives candidate edges and its precedence is
+  the weight. Covers fact-type precedence, the one-to-one accept rule, zero-unmatched
+  surfacing, multi-hit triage, the edge write shape, load sequencing, and the manual
+  CSV final option (tier 5 — SME-authored source→target mappings, provenance-stamped
+  and tracked as tech debt in config/manual-loads/). No graph write happens until
+  every confirmation below is ticked and logged to config/gate-log.md;
+  m3_seal_app_ref stays status: planned until then.
 meta:
   Module: "drydocs-load"
   Source: "STG_APP_FACT rows (drydocs/staging.py) — fact_type SEAL/FID/APP_NAME/ALIAS, emitted by facts.route_fact from SEMANTIC_FACT variables classified in drydocs_core/controlm/variables.py FACT_REGISTRY"
@@ -52,6 +55,10 @@ mapping:
     element: "ControlMJob whose STG_APP_FACT rows resolve to MORE THAN ONE distinct Application (multi-hit)"
     target: "candidate Application set (>1)"
     edge: "resolved by fact-type precedence first; residual ties go to deterministic conflict triage, never a silent pick  [PROPOSED]"
+  - n: 7
+    element: "Manual CSV mapping (SME-authored from config/manual-loads/TEMPLATE-node-mapping.csv) — the final option when no fact tier resolves"
+    target: ":Application {seal_id} (matched; or created with manually_created: true if genuinely absent)"
+    edge: "same WAS_ASSOCIATED_WITH shape, match_method: 'manual', source: 'manual-csv'  [PROPOSED — tier 5 in derivation order; once asserted it PINS until a human retires it (data-incorrect / fix-module scenario); relationship must pre-exist in relationship_vocabulary.yaml; tech-debt tracked in config/manual-loads/manifest.yaml]"
 
 provenance:
   - label: "(:ControlMJob)-[:WAS_ASSOCIATED_WITH {role: 'seal_app_ref'}]->(:Application)"
@@ -66,6 +73,16 @@ provenance:
       - {name: first_seen_at, origin: derived, from: "ON CREATE SET — current load-run clock", note: "set once, on first MERGE only"}
       - {name: last_seen_at, origin: derived, from: "SET on every load run that re-confirms the match", note: "updated every run, whether created or matched"}
       - {name: last_run_id, origin: derived, from: "SET to the current run_id on every load run", note: "ties the edge to the STG_* run_id lineage"}
+  - label: "(manual CSV path — tier 5) same edge shape + manually-created node stamps"
+    source_object: "config/manual-loads/*.csv (SME-authored; template TEMPLATE-node-mapping.csv; registered in manifest.yaml before load)"
+    key: "same node keys as the automated path; relationship column must name an EXISTING relationship_vocabulary.yaml entry"
+    loader: "manual CSV loader (K2 follow-up, not yet written; inert until this gate signs off)"
+    properties:
+      - {name: match_method, origin: derived, from: "literal 'manual'", note: "the lowest tier of the derive-and-weight scheme"}
+      - {name: source, origin: derived, from: "literal 'manual-csv'", note: "distinguishes manual edges from every loader-derived provenance"}
+      - {name: manual_load_file, origin: source, from: "the authored CSV's repo path", note: "audit pointer to the file (and its manifest entry)"}
+      - {name: authored_by, origin: source, from: "CSV authored_by column", note: "who asserted the mapping"}
+      - {name: manually_created, origin: derived, from: "true — set on any NODE the CSV forces into existence", note: "node-level tech-debt stamp; reported as its own coverage count"}
 
 sections:
   - title: "A. Fact-type precedence order (SEAL-fact precedence)"
@@ -95,7 +112,14 @@ sections:
       - "The attribution loader runs ONLY after both the ControlMJob and Application identities already exist in the graph (controlm-psgmgr folder/job load + seal-extract application load must have completed)."
       - "job.APPLICATION (the raw CM_DEF_VJOB.APPLICATION column / the ControlMApplication grouping) is NEVER used as a substitute or fallback for SEAL identity in this loader — it is a Control-M grouping, not business/SEAL identity (documented unreliable in both repos' loader comments, and kept structurally separate as :ControlMApplication, see application-contains-folder in taxonomy-ontology-map.yaml)."
       - "source and match_method stay explicit per edge (section D) specifically so a future mixed-precedence load (e.g. some jobs matched on SEAL, others on ALIAS) remains auditable rather than opaque."
-  - title: "F. Sign-off"
+  - title: "F. Manual CSV final option (tier 5 — SME-authored mapping, tracked as tech debt)"
     confirmations:
-      - "The precedence order (A), zero-unmatched surfacing (B), multi-hit triage (C), edge write shape (D), and sequencing preconditions (E) above are reviewed and correct, OR amended via explicit SME edits recorded in config/gate-log.md."
-      - "Safe to transcribe this decision into config/gate-log.md, flip drydocs_core/ontology/relationship_vocabulary.yaml#m3_seal_app_ref from status: planned to status: active (with its supplement + loader entries filled in), and build the K2 loader."
+      - "When no fact tier (A) resolves a job — or multi-hit triage (C) cannot — the SME may author a CSV row from config/manual-loads/TEMPLATE-node-mapping.csv: source node key -> PRE-DEFINED relationship -> target node key. The relationship column MUST name an existing relationship_vocabulary.yaml entry; a CSV can never introduce a new relationship type (that is an ontology decision: ontology-mapper + a gate)."
+      - "Manual mappings are tier 5 in DERIVATION order (authored only when tiers 1-4 fail) but once asserted they PIN the mapping: an automated tier 1-4 match on a later run NEVER silently replaces a manual edge — a manual assertion often exists precisely because the automated source data is INCORRECT (the fix-module scenario), and silent supersede would reintroduce the bad mapping. Edges carry match_method: 'manual' + source: 'manual-csv' + manual_load_file + authored_by."
+      - "When a later automated run derives a match for a manually-pinned source, the run reports it as a PIN-CONFLICT (agreeing or disagreeing) in the coverage report; a HUMAN then either retires the pin (manifest entry -> superseded, automation takes over) or keeps it (source data still wrong — the conflict stays on the report until the source is remediated through the fix workflow). Retirement is always a human act, never a load-time side effect."
+      - "If a CSV row names a target node that does not exist, the loader may create it ONLY stamped manually_created: true (+ manual_load_file, authored_by) — and manually-created nodes are reported as their own count in the coverage report (section B), never blended into matched or unmatched."
+      - "Every manual CSV is registered in config/manual-loads/manifest.yaml BEFORE load; entries with status pending-load are the queue of files awaiting manual load, and every entry must name its automated replacement (replaces_with) — a manual load with no named automation path is not accepted (visible, named, closable debt: the LEDGER_PENDING precedent). The manifest's tech_debt section is reviewed at each groom."
+  - title: "G. Sign-off"
+    confirmations:
+      - "The precedence order (A), zero-unmatched surfacing (B), multi-hit triage (C), edge write shape (D), sequencing preconditions (E), and the manual CSV final option (F) above are reviewed and correct, OR amended via explicit SME edits recorded in config/gate-log.md."
+      - "Safe to transcribe this decision into config/gate-log.md, flip drydocs_core/ontology/relationship_vocabulary.yaml#m3_seal_app_ref from status: planned to status: active (with its supplement + loader entries filled in), flip config/manual-loads/manifest.yaml to confirmed, and build the K2 loader (automated tiers + the manual CSV path)."

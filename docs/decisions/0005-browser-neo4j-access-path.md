@@ -1,176 +1,169 @@
-# ADR 0005 — Browser↔Neo4j access path: a thin API, not bolt-from-browser
+# ADR 0005 — Browser ↔ Neo4j access path: thin API is the deployment shape; bolt-from-browser survives only as a dev-mode adapter
 
 ```yaml
-status: PROPOSED        # PROPOSED | ACCEPTED | SUPERSEDED — the SME call that closes O1's crux
+status: PROPOSED        # PROPOSED | ACCEPTED | SUPERSEDED
 date: 2026-07-14
-deciders: [chad.wilson, main]
-layer: graph-infra / drydocs-web boundary
+deciders: [chad.wilson]
+layer: cross-cutting    # architecture; the web console is the layer-3 read surface, and layer-4 projections need a server-side home
 affects:
-  - web/src/lib/neo4j.ts          # today's bolt-from-browser path
-  - web/src/lib/auth.ts           # the O2 mock login this decision eventually replaces
-  - agents/common/neo4j_tool.py   # the read-only-guard precedent the API generalizes
-  - docs/restructure/backlog.yaml # O1 (this IS its acceptance's "decision recorded"); follow-up items on acceptance
-  - MODULE_MAP.md                 # a new Python component if the API is built producer-side
-  - PUBLISH-BOUNDARY.md           # secrets move server-side; SSO wiring is a company-side twin
+  - web/src/lib/neo4j.ts               # today's bolt path — becomes the dev-mode adapter behind the seam
+  - web/src/lib/auth.ts                # mock personas — module header already defers real authn/authz to this ADR
+  - web/src/components/CypherConsole.tsx  # raw-Cypher panel + VITE_NEO4J_* defaults — gated + de-secreted by this ADR
+  - docs/restructure/backlog.yaml      # O1 (this is its crux); spawns the thin-API build item at next groom
 ```
 
 ## Context
 
-The web console needs a decided answer to *how the browser reaches Neo4j*. Today
-`web/` is a sandbox: the bundled `neo4j-driver` opens a bolt/WebSocket connection
-**from the browser**, with the database URI, user, and password typed into form
-fields (`web/src/lib/neo4j.ts`, seeded from `VITE_NEO4J_*`). That was fine for a
-throwaway test page; it cannot carry the console's real requirements:
+The web console (Epic O, `drydocs-web`) is a **read surface** over the knowledge
+graph: towers, drill-downs, My Apps, and O1's real C4/graph rendering. Writes
+never come from a browser — they go through loaders behind the HITL gate
+(ADR 0002; working agreement "ontology edges are not casual"). The open
+question O1 names as its crux: how does the browser reach Neo4j?
 
-- **Real sign-in.** The O2 mock persona login (localStorage, zero security) was
-  built deliberately decision-neutral so the design pass could proceed. Its
-  replacement is *shaped by this decision*: bolt-from-browser implies every
-  console user is a Neo4j user (native auth + EE RBAC); a thin API implies app
-  sessions with the server holding one service credential.
-- **The live graph view.** O1's remaining build (a real C4/graph rendering
-  against the live EE DB) issues live queries; whether they travel over a
-  browser WebSocket or an HTTP endpoint shapes the whole data layer.
-- **Credential hygiene.** Browser-held DB credentials mean the database is
-  network-reachable from, and its secret present in, every client. The publish
-  boundary already forbids secrets in `web/`; bolt-from-browser structurally
-  fights that.
-- **Write protection.** The standing rule — graph writes go through loaders +
-  the HITL gate, never through an interactive surface — is enforced today by
-  `agents/common/neo4j_tool.py`'s write-token guard on the ADK path. The
-  browser bolt path has no equivalent enforcement point short of DB-level roles.
+What exists today (post O2 merge):
 
-Related precedent: the console already has a *second*, server-mediated data path
-— the ADK `api_server` (browser → HTTP → agent → Neo4j, read-only guard
-included). Bolt-from-browser is the outlier path, not the norm, even inside this
-repo.
+- `web/src/lib/neo4j.ts` — `neo4j-driver` **in the browser** (bolt over
+  WebSocket), one driver per page, sessions forced `READ`.
+- `CypherConsole.tsx` — uri/user/password as form fields, defaulted from
+  `VITE_NEO4J_URI` / `VITE_NEO4J_PASSWORD`. **Vite inlines `VITE_*` values into
+  the built bundle** — a committed or CI-provided password becomes a secret
+  inside a publishable artifact.
+- `web/src/lib/auth.ts` — mock personas whose header comment explicitly says
+  real authn/authz "arrives with that ADR and replaces this module."
+- `agents/` — an ADK `api_server` REST tier the UI already calls
+  (`web/src/lib/adk.ts`); a server tier is already part of the architecture.
 
-## Evidence — the company deployment already runs the thin-API pattern
+The forces:
 
-*Sanitized, mechanism-not-instance, per PUBLISH-BOUNDARY / the back-flow rule.
-Source: company-side module documentation reviewed 2026-07-14 (screenshot held
-out of the repo); endpoint names, hostnames, and module identifiers withheld.*
+1. **Two deployment realities.** Producer sandbox: one developer, local Docker
+   EE, an ephemeral `drydocs` DB, localhost creds. Company: bank network
+   zoning (no bolt/7687 from user desktops), corporate SSO, SME/support users
+   who will never hold database credentials, and app-access entitlements
+   sourced from ServiceNow (the persona chip already anticipates this).
+2. **The trust axis is the DB boundary** (ADR 0002 D1): `drydocs` (ground
+   truth) vs `drydocs_context` (uncertain) vs the `drydocs_all` composite.
+   Which database a console view reads is a **routing decision** that must be
+   enforced somewhere, not left to whatever string reaches a session option.
+3. **The publish boundary** (PUBLISH-BOUNDARY.md): no secrets in `web/`;
+   `VITE_*` inlining makes the browser bundle structurally unable to hold them.
+4. **Layer 4 is coming.** Context-graph = task-scoped projections (temporal
+   state, ownership, permissions, health). Something server-side has to
+   compute and scope those; the browser is the wrong altitude.
 
-The company environment operates an interactive web application whose access
-architecture is exactly the thin-API shape:
+## Decision
 
-1. **Interactive user SSO, server-side.** A Python API server (FastAPI-class)
-   fronts browser users via the enterprise OIDC identity provider: login route →
-   IdP redirect → callback → authorization-code-for-token exchange → JWT
-   validated (signature + issuer, with issuer auto-discovery) → the user's
-   corporate SID stored in the **server** session. Role claims are extracted
-   server-side from validated claims.
-2. **Machine-to-machine credentials never reach the browser.** Service-to-service
-   tokens (LLM suite scope) are fetched by a certificate-authenticated service
-   principal, cached and auto-refreshed **in the server process**; key material
-   lives on the server filesystem.
-3. **Host-aware identity dispatch.** A third integration selects its identity
-   mechanism per host (desktop Kerberos vs OAuth2 on servers) — again resolved
-   at the server/process layer, never in a client.
+**The thin API is the access path for any shared or company deployment.
+Bolt-from-browser is retained only as a local dev mode. Both sit behind one
+adapter seam in `web/src/lib/`, and the seam is the guarantee.**
 
-Implications for this decision:
+Concretely:
 
-- A browser holding database credentials would be an **architectural outlier**
-  in the company environment; there is no enterprise SSO path for
-  bolt-from-browser (the IdP speaks OIDC to server apps, not bolt to Neo4j).
-- The thin API is not an invented architecture — the company port would *align*
-  with an in-production pattern, and the eventual SSO wiring is a swap-in
-  (company twin) rather than a redesign.
-- The O2 mock maps 1:1 onto that pattern: mock persona id → session SID; the
-  `views.ts` role registry → roles-from-claims; the sign-in screen → the IdP
-  redirect. The mock was built as a placeholder for exactly this shape.
+1. **One `GraphAccess` interface** in `web/src/lib/` is the only way console
+   code reads the graph. Two adapters implement it: `bolt` (today's
+   `neo4j.ts`, refitted) and `api` (fetch to the thin API). View components
+   never import `neo4j-driver` directly.
+2. **The thin API is a new monorepo component** (per ADR 0002 D3's
+   components-on-core pattern): server-side Neo4j driver, credentials from
+   server env, **read-only enforcement and per-view database routing**
+   (`drydocs` / `drydocs_all`) at the endpoint layer, named queries shaped for
+   the console's views (towers, drill-downs, C4/graph payloads for NVL), plus
+   a raw-Cypher endpoint gated to admin.
+3. **Real authn/authz terminates at the thin API** — SSO/OIDC company-side,
+   mapping identity → role + app entitlements (the ServiceNow derivation).
+   It replaces `auth.ts`, exactly as that module's header promises.
+4. **Dev-mode bolt** activates only behind an explicit dev flag + admin role:
+   form-entered localhost credentials only; **no `VITE_NEO4J_PASSWORD` is ever
+   committed or CI-injected**, keeping secrets out of the bundle by construction.
 
 ## Options considered
 
-### A — Bolt-from-browser (status quo generalized) — REJECTED (proposed)
+### A — Bolt-from-browser everywhere (status quo)
 
-Browser keeps the bundled `neo4j-driver`; real login = Neo4j native users; user
-vs admin = EE RBAC roles; the graph view queries bolt directly.
+| Dimension | Assessment |
+|---|---|
+| Complexity | Low — already running |
+| Cost | None new |
+| Credential shape | Per-user Neo4j accounts, or a shared secret in browser/bundle |
+| Network fit | Requires 7687/WebSocket desktop→DB — not routable in the company |
+| Dev loop | Excellent |
 
-- **For:** zero new infrastructure; real DB-level enforcement (RBAC is not
-  cosmetic); EE already supports it; one less process to run locally.
-- **Against (structural):** every console user must exist as a Neo4j user
-  (provisioning burden, no SSO path — the enterprise IdP cannot authenticate a
-  bolt handshake); DB credentials and network reachability exposed to every
-  browser; no single enforcement point for the read-only rule (DB roles only);
-  CORS/WebSocket posture in a corporate network; contradicts the company's
-  in-production pattern (Evidence) so the port would diverge, not align.
+**Rejected as the deployment shape** — structural, not taste: the browser sits
+on the wrong side of *both* governing boundaries. The credential boundary — a
+publishable bundle plus browser storage cannot hold secrets, and `VITE_*`
+inlining turns configuration into leakage. The trust boundary — nothing
+server-side enforces read-only or `drydocs` vs `drydocs_all` routing; it all
+rides on client strings and RBAC config staying perfect. Company network
+zoning independently kills it.
 
-### B — Thin API (RECOMMENDED)
+### A′ — Neo4j Query API (HTTP) from the browser
 
-A minimal Python API service owns the Neo4j driver: it holds the one service
-credential, exposes scoped **read** endpoints for the console (graph view,
-label counts, drill queries), enforces authn (sessions; enterprise OIDC on the
-company side, local stub on the producer side) and authz (role → endpoint map,
-the server-side twin of `views.ts`), and generalizes the
-`agents/common/neo4j_tool.py` write-token guard as its single write-protection
-point.
+Same trust and credential shape as A, over HTTPS instead of bolt.
+**Rejected: it changes the port, not the boundary.** Credentials still reach
+the browser, routing is still client-decided, and there is still no home for
+layer-4 projections — while giving up the driver's typing and routing without
+gaining any control point.
 
-- **For:** credentials server-side only; SSO-compatible (Evidence — the pattern
-  is in production company-side); one enforcement point for read-only + role
-  gating; the browser needs nothing but HTTP; converges with the ADK path
-  instead of maintaining a parallel bolt path; testable with the existing
-  offline patterns (pure handlers + a duck-typed graph runner, the
-  `graph_verify` precedent).
-- **Against:** a new component to build, run, and port (module boundary, CORS,
-  deploy surface); some duplication with the ADK `api_server` (mitigated below);
-  local dev needs one more process (mitigated: the admin sandbox can keep
-  direct bolt as a dev tool — see Consequences).
+### B — Thin API only (retire bolt everywhere, including local dev)
 
-### C — Hybrid: API for product surfaces, bolt kept as a dev tool — folded into B
+The purest shape. **Rejected for the sandbox**: it inserts a
+build-and-run server between one developer and an ephemeral local database.
+The Cypher console is today's SME/dev instrument for interrogating the graph,
+and O1's remaining work (the real C4/graph render against local EE) is fastest
+against bolt. Local-only, single-user, localhost creds: the deployment forces
+simply don't apply there.
 
-Not a distinct architecture: under B, the existing admin-only Cypher sandbox may
-keep its direct-bolt flow as a **local development tool** (it is already gated
-behind the admin role and labeled as pre-dating this ADR). Product surfaces
-(landing, drill-downs, My Apps, the live graph view) go through the API only.
-Whether the sandbox's bolt flow survives long-term is a later cleanup call, not
-part of this decision.
+### C — Thin API as the deployment shape + dev-mode bolt behind one seam (**chosen**)
 
-## Decision (proposed)
+| Dimension | Assessment |
+|---|---|
+| Complexity | Medium — one new component + one interface refit |
+| Cost | The thin API build (grooms into Epic O) |
+| Credential shape | Server-side only in deployment; localhost form-entry in dev |
+| Network fit | HTTPS/443; SSO-terminable |
+| Dev loop | Preserved via the bolt adapter |
 
-**Option B.** The browser↔Neo4j access path is a thin API:
+The seam is what makes the convenience safe: the `api` adapter is the default;
+the `bolt` adapter activates only on dev flag + admin role, so sandbox habits
+cannot silently become deployment behavior.
 
-1. **New Python component** (working name `drydocs-api`; final name at scaffold
-   time) in the monorepo on `drydocs-core`, per the ADR 0002 component rules:
-   its own `COMPONENT_GROUP` in `tests/unit/test_module_boundary.py` +
-   MODULE_MAP row; imports core only; **read-only against the graph** — it
-   reuses/generalizes the write-token guard so no interactive surface can write
-   (writes remain loaders + HITL gate only).
-2. **Not** an extension of the ADK `api_server`: that process is an agent
-   runtime (LLM keys, sessions, eventing), not a query API; coupling the console
-   to it would drag agent dependencies into every console deploy. The two share
-   the guard pattern and may share a host, nothing more.
-3. **Auth in two stages:** producer-side, the API issues real server sessions
-   with the two synthetic personas replacing the localStorage mock (the browser
-   stops holding role truth); company-side, the session issuer swaps to the
-   enterprise OIDC flow (SID + roles-from-claims) as a gitignored/internal twin,
-   per the Evidence pattern. `web/src/lib/auth.ts` and the `views.ts` registry
-   survive as the client cache of what the server says, not the authority.
-4. **Deliberately not decided here:** endpoint shapes, the graph-view rendering
-   library (NVL vs successor), session transport details (cookie vs bearer),
-   and the sandbox bolt flow's retirement date.
+## Trade-off analysis
+
+The deciding structure: **every force that distinguishes the two deployments —
+credentials, SSO, network zoning, entitlements, layer-4 projections — lands
+server-side; every force favoring bolt is local-dev-only.** So the architecture
+splits exactly along the force line: server shape for deployment, bolt for the
+bench, one interface so the split is enforced by types rather than discipline.
+
+The thin API is also not net-new work invented by this ADR: NVL payload
+shaping, per-view database routing, and eventually task-scoped context
+projections have to be written *somewhere*. Writing them once server-side
+beats duplicating them into a browser client that deployment then can't use.
 
 ## Consequences
 
-- The **O2 mock login is formally transitional** — its replacement path is now
-  named. The mock banner's "pending the O1 access-path ADR" line resolves to
-  this document once accepted.
-- `web/src/lib/neo4j.ts` stops being the product data path; new console features
-  must not extend it (admin sandbox dev-tool use excepted, per Option C note).
-- The local EE container's placeholder password (parked IDEAS chore) becomes
-  **server config** — change it when the API lands; it never ships to a browser
-  again.
-- Company port story: the producer ships the generic API + local-session stub;
-  the OIDC wiring is a company-side supplement (the H4/H5 gitignored-twin
-  convention). PORT-MANIFEST gains the component's rows at scaffold time.
-- Rejected alternative recorded so it is not re-litigated: bolt-from-browser
-  fails on SSO-incompatibility + credential exposure + no single read-only
-  enforcement point — re-proposing it means answering those three, not
-  rediscovering them.
+- **Easier:** SSO/OIDC later (one termination point); read-only + DB routing
+  enforced once; no secrets in `web/` by construction; server-shaped NVL
+  payloads; a natural home for layer-4 projections; agents tier and console
+  converge on one server discipline.
+- **Harder:** one more component to build, run, and document (its build/run
+  doc is already in O1's acceptance); two adapters to keep honest — the seam
+  needs a conformance test so `bolt` and `api` don't drift; an HTTP hop of
+  latency (immaterial at support-console scale).
+- **Revisit if:** company policy ever grants per-user Neo4j accounts *and* an
+  approved gateway exposes the Query API to desktops — reopening A′ then means
+  arguing against the projection/SSO/routing reasons above, not just
+  connectivity.
 
-## Follow-ups (groom into Epic O on acceptance)
+## Action items
 
-1. `drydocs-api` scaffold: component boundary + session auth (synthetic
-   personas server-side) + first read endpoint; web/ login switches to it.
-2. Live C4/graph view over the API against the local EE DB (the remaining O1
-   build), rendering library decision folded in.
-3. Sandbox bolt flow disposition (keep as dev tool vs retire) once 1–2 land.
+1. [ ] SME review of this ADR → `status: ACCEPTED` (satisfies O1's "decision
+       recorded" acceptance clause).
+2. [ ] Refit `web/src/lib/`: extract the `GraphAccess` interface; `neo4j.ts`
+       becomes the bolt adapter behind it (O1, with the C4 render work).
+3. [ ] Groom the thin-API component build into Epic O as a new backlog item
+       (scope: read endpoints + per-view DB routing + gated raw-Cypher +
+       auth stub) via the groom-backlog flow — not added here.
+4. [ ] Gate `CypherConsole` raw-Cypher behind admin + dev flag (pairs with the
+       design-review.md finding that Cypher-before-graph misorders the UI).
+5. [ ] Verify no `VITE_NEO4J_PASSWORD` in any committed env file; document the
+       dev-mode credential rule in `web/README.md`.

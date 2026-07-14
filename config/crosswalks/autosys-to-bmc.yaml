@@ -21,7 +21,7 @@
 # =============================================================================
 
 schema: drydocs.crosswalk.v1
-updated: 2026-07-07
+updated: 2026-07-14                     # row 6 demoted exact -> approximate (machine: polymorphism)
 id: autosys-to-bmc
 orchestrator: autosys
 baseline: bmc-controlm
@@ -29,7 +29,7 @@ classification: External
 source_registry_ref: autosys-export     # config/source-registry.yaml id
 narrative_ref: external/orchestration/autosys/README.md
 gate_spec: config/gate-prompts/autosys-crosswalk.yaml
-status: proposed                        # crosswalk-wide status; flips at the gate
+status: confirmed                       # gate autosys-crosswalk SIGNED OFF 2026-07-14 (config/gate-log.md)
 
 rows:
   - n: 1
@@ -37,7 +37,7 @@ rows:
     baseline: Job
     node: ControlMJob
     fidelity: exact
-    status: proposed
+    status: confirmed
     note: "An AutoSys command/script job is a 1:1 match to a Control-M command/script job."
 
   - n: 2
@@ -45,7 +45,7 @@ rows:
     baseline: "Folder / SMART Table grouping"
     node: "ControlMFolder (Collection)"
     fidelity: approximate
-    status: proposed
+    status: confirmed
     note: >
       A box groups jobs and can itself carry conditions/status like a job (box-in-box
       nesting); the baseline Folder is a pure container (a SMART Table folder can
@@ -57,7 +57,7 @@ rows:
     baseline: "IN condition"
     node: "REQUIRES_IN_CONDITION -> Condition"
     fidelity: exact
-    status: proposed
+    status: confirmed
     note: "Status-predicate dependency maps directly onto Control-M IN-condition semantics."
 
   - n: 4
@@ -65,7 +65,7 @@ rows:
     baseline: "IN condition (file-watch variant)"
     node: "REQUIRES_IN_CONDITION -> Condition"
     fidelity: approximate
-    status: proposed
+    status: confirmed
     note: >
       AutoSys file-trigger jobs are typically a distinct job_type (f/w watcher) rather
       than a plain condition predicate. Baseline equivalent is a Control-M File Watcher
@@ -77,7 +77,7 @@ rows:
     baseline: "OUT condition / producer-consumer dependency"
     node: "EMITS_OUT_CONDITION / WAS_INFORMED_BY"
     fidelity: approximate
-    status: proposed
+    status: confirmed
     note: >
       AutoSys models dependency mostly consumer-side (pull: condition predicates
       reference the upstream job by name), whereas Control-M pairs an explicit OUT
@@ -87,18 +87,26 @@ rows:
 
   - n: 6
     native: "`machine:` attribute"
-    baseline: "execution host / agent"
-    node: ExecutionHost
-    fidelity: exact
-    status: proposed
-    note: "Direct host/agent equivalence."
+    baseline: "execution host / agent — OR virtual machine (load-balanced host set)"
+    node: "ExecutionHost (real machine) / ControlMHostGroup -[:CONTAINS_HOST]-> ExecutionHost (virtual machine)"
+    fidelity: approximate
+    status: confirmed
+    note: >
+      Demoted from exact (2026-07-14, SME wording review): machine: is polymorphic —
+      it names either a real machine (1-hop, ExecutionHost) or an AutoSys virtual
+      machine that load-balances across real machines (1-to-many). That is the same
+      group-vs-host resolution the baseline models as Job -[:RUNS_ON
+      {role: host_group}]-> ControlMHostGroup -[:CONTAINS_HOST]-> ExecutionHost
+      (gate controlm-hosts-topology, signed off 2026-07-09). A live export must
+      discriminate virtual vs real per machine: value — mirror the baseline's
+      group-match-wins resolution.
 
   - n: 7
     native: "`owner:` attribute"
     baseline: "run-as user"
     node: AppUser
     fidelity: exact
-    status: proposed
+    status: confirmed
     note: "Functional/service run-as identity, same semantics as Control-M OWNER."
 
   - n: 8
@@ -106,7 +114,7 @@ rows:
     baseline: "calendar (scheduling)"
     node: "job schedule properties (calendar resolution — see knowledge/standards/)"
     fidelity: approximate
-    status: proposed
+    status: confirmed
     note: >
       Both vendors support named calendars with include/exclude semantics, but holiday
       shift and cyclic-date resolution rules differ per vendor grammar. Needs a
@@ -117,7 +125,7 @@ rows:
     baseline: "job status model (SCHEDULED / EXECUTING / ENDED-OK / ENDED-NOT-OK / ...)"
     node: "ControlMJob status property"
     fidelity: approximate
-    status: proposed
+    status: confirmed
     note: >
       State machines are conceptually parallel (running / success / failure / held)
       but the specific status vocabularies do not line up 1:1 (e.g. AutoSys "OH" on
@@ -129,7 +137,7 @@ rows:
     baseline: "no-equivalent as a single concept"
     node: "n/a"
     fidelity: no-equivalent
-    status: proposed
+    status: confirmed
     note: >
       AutoSys global variables are a box-/instance-scoped substitution mechanism.
       Control-M variables (SETVAR) use a different resolution model entirely
@@ -143,7 +151,7 @@ rows:
     baseline: "job retry / alert properties"
     node: "ControlMJob property (no dedicated node)"
     fidelity: approximate
-    status: proposed
+    status: confirmed
     note: >
       Both vendors expose retry-count and alerting flags as job properties; naming and
       threshold semantics differ and were not verified against a live AutoSys export
@@ -157,5 +165,7 @@ no_equivalent_flags:
 open_questions:
   - row: 4
     question: "Does the file-watch job_type (f/w) need its own baseline mapping (FileWatcher job) instead of folding into Condition?"
+  - row: 6
+    question: "Which machine: values name AutoSys virtual machines (load-balanced host sets, 1-to-many) vs real machines? Needs the live export's insert_machine definitions — JIL docs alone cannot resolve it."
   - row: 9
     question: "What is the authoritative AutoSys status vocabulary to map against Control-M's? (needs a live export, not JIL docs alone)"

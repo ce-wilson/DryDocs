@@ -235,3 +235,132 @@ records the date, the item, confirmed / edited / rejected counts, and reasons fo
   `seal-tom-attribution` / `seal-doc-source-of-record` proposed→confirmed→applied (with `vocab_id` +
   `capture` per F5/C7), and the SEAL/PAT precedence wiring — is **backlog K4**. The Product Cabinet is
   **K5**. K2's edge shape stays deferred.
+
+## 2026-07-14 — Airflow/MWAA → BMC baseline crosswalk gate — SIGNED OFF (F2)
+
+- **Gate:** `config/gate-prompts/airflow-crosswalk.yaml` (17 confirmations), reviewed via the rendered
+  page; **ACCEPTED IN FULL** (chad.wilson, 2026-07-14). Same-day pre-sign-off context (commit 9334bf3):
+  row 8 split 8a/8b/8c at the SME wording review; Software/§A registry linkage added (the vendor/product
+  remediation gap); registry rows `airflow`/`apache` created for it.
+- **§A — CONFIRMED** (crosswalk-only scope; public concepts only; bmc-baseline stays authority 1).
+  **Registration ratified:** SoftwareProduct `airflow` MADE_BY `apache` (ADR 0004, vendor = the brand).
+  **MWAA disposition ratified:** NOT a separate product — stock Airflow object model, AWS-managed
+  deployment.
+- **§B — CONFIRMED.** Rows 2, 3 exact; rows 1, 4, 5, 6, 8a, 8c, 9, 10 approximate, caveats accepted.
+  **Row 8a cardinality confirmed 1-to-many:** queue → `:ControlMHostGroup -[:CONTAINS_HOST]->
+  :ExecutionHost` (the controlm-hosts-topology pattern, signed off 2026-07-09); hard-pinned worker =
+  the 1-hop `RUNS_ON {role: agent_host}` case; never queue → single ExecutionHost.
+  **DEFERRED: 3 open questions, all to loader design** (stay live in the crosswalk's `open_questions`,
+  must be resolved before/with the future loader gate): row 5 (richer Condition property set for
+  datasets), row 6 (per-operator INVOKES crosswalk table), row 8c (Connection target-system landing —
+  DataAsset reference vs job properties).
+- **§C — CONFIRMED NO-EQUIVALENT:** rows 7 (trigger-rule vocabulary), 11 (XCom — never modeled),
+  12 (dynamic task mapping — the flagged drift risk), 8b (Pool → Quantitative Resource, unmodeled —
+  never folded into ExecutionHost). Nothing silently approximated.
+- **§D — SIGNED OFF.** **Confirmed: A, B, C · Deferred: 3 (§B rows 5/6/8c) · Edited: 0 · Rejected: 0.**
+- **Lifecycle (applied in this commit):** `config/crosswalks/airflow-to-bmc.yaml` status proposed →
+  **confirmed** (file-level + all 14 rows); source-registry `airflow-mwaa` → **confirmed: true**
+  (source-row status ONLY — no loader exists; a loader must be implemented and separately gated before
+  any load runs); backlog **F2 → done**. AutoSys (F1) unchanged — its gate remains pending.
+
+## 2026-07-14 — AutoSys → BMC baseline crosswalk gate — SIGNED OFF (F1)
+
+- **Gate:** `config/gate-prompts/autosys-crosswalk.yaml` (13 confirmations), reviewed via the rendered
+  page; **ACCEPTED IN FULL** (chad.wilson, 2026-07-14). Same-day pre-sign-off context (commit 9334bf3):
+  row 6 demoted exact → approximate at the SME wording review (machine: polymorphism); Software/§A
+  registry linkage added; registry rows `autosys`/`broadcom` created for it.
+- **§A — CONFIRMED** (crosswalk-only scope; public JIL concepts only; bmc-baseline stays authority 1).
+  **Registration ratified:** SoftwareProduct `autosys` (Broadcom Workload Automation, formerly CA
+  Workload Automation AE) MADE_BY `broadcom` — today's brand, per ADR 0004; the CA lineage is name
+  history, not the vendor.
+- **§B — CONFIRMED.** Rows 1, 3, 7 exact; rows 2, 4, 5, 6, 8, 9, 11 approximate, caveats accepted.
+  **Row 6 polymorphism acknowledged** (demoted from exact 2026-07-14): machine: names a real machine
+  (1-hop `:ExecutionHost`) OR a virtual machine load-balancing a host set — 1-to-many via
+  `:ControlMHostGroup -[:CONTAINS_HOST]-> :ExecutionHost`, mirroring the controlm-hosts-topology
+  group-match-wins resolution. **LIVE-EXPORT FOLLOW-UPS (2, before any loader):** row 6
+  (virtual-vs-real discrimination needs insert_machine definitions), row 9 (authoritative status
+  vocabulary needs a live export). **DEFERRED: 1** — row 4 (does d(file) need its own FileWatcher-job
+  baseline mapping?). All three stay live in the crosswalk's `open_questions`.
+- **§C — CONFIRMED NO-EQUIVALENT:** row 10 (global/box-scoped variables — never modeled via this
+  crosswalk; any variable-graph need routes through ontology-mapper). Nothing silently approximated.
+- **§D — SIGNED OFF.** **Confirmed: A, B, C · Deferred: 1 (§B row 4) · Live-export follow-ups: 2
+  (§B rows 6/9) · Edited: 0 · Rejected: 0.**
+- **Lifecycle (applied in this commit):** `config/crosswalks/autosys-to-bmc.yaml` status proposed →
+  **confirmed** (file-level + all 11 rows); source-registry `autosys-export` → **confirmed: true**
+  (source-row status ONLY — no loader exists; a loader must be implemented and separately gated
+  before any load runs); backlog **F1 → done**. Epic F crosswalk gates now both signed off.
+
+## 2026-07-14 — CM_AVG_RUN runtime-stats supplement gate — SIGNED OFF (P2)
+
+- **Gate:** `config/gate-prompts/controlm-avg-run-supplement.yaml` (20 confirmations after the §B edit),
+  reviewed via the rendered page; **ACCEPTED with 1 SME edit** (chad.wilson, 2026-07-14).
+- **SME EDIT — §B join policy upgraded (the edit of record):** the internal psgmgr changes derive
+  **ctlm_id = folder_id.job_id** (e.g. `161015.7`) — the `(folder_id, job_id)` node key in composite
+  form. The supplement loader joins on **ctlm_id where the replica exposes it** (split on `.` → the
+  node key directly); the previously-proposed weak key (SCHED_TABLE, JOB_MEM_NAME = JOB_NAME) demotes
+  to **fallback** for rows without a usable ctlm_id. P0 verifies ctlm_id presence/type on CM_AVG_RUN;
+  P4 censuses its coverage; parsed ids must round-trip to the node key exactly (mismatch = census
+  finding). MEMNAME stays NEVER a join key (q1q3 demotion).
+- **§A — CONFIRMED:** property supplement onto existing :ControlMJob (no new labels/edges/vocabulary);
+  MATCH-never-MERGE; property list = mappings n:1–n:3.
+- **§C — CONFIRMED:** >24h clock normalized in Python; FileWatcher rows excluded from blended stats;
+  day-of-week medians from SAMPLES_* arrays; ETA/window math critical-path, never path-sum.
+- **§D — CONFIRMED:** P8 decides refresh strategy; residual probes (P0 types, P2 grain, P2b
+  INSTANCE_NAME, P3b DSN, P7 parseability) remain REQUIRED before the loader ships — they ride
+  backlog **P1** (user-run internal probes), which stays open.
+- **§E — CONFIRMED:** maintenance-window computation (hosts-topology RUNS_ON → job windows → folder
+  rollups + DC-default fallback) and the TDQ-failure ETA framing.
+- **§F — SIGNED OFF.** **Confirmed: A, C, D, E · Edited: 1 (§B ctlm_id join upgrade) · Deferred: 0 ·
+  Rejected: 0.**
+- **Lifecycle (applied in this commit):** map entry `job-runtime-stats-supplement` proposed →
+  **confirmed** (confirmed_by/confirmed_on set; vocab_id stays deliberately none — property
+  supplement); backlog **P2 → done**. The loader is NOT authorized to ship until the P1 probes
+  record their conclusions (§D) — build may start, load may not.
+
+## 2026-07-14 — SOSA JobRun observation gate (E1) — DEFERRED by the SME
+
+- Gate `config/gate-prompts/sosa-jobrun-observation.yaml` was presented alongside the F1/F2/P2
+  sessions; **SME call: defer — not ready yet** (chad.wilson, 2026-07-14). No confirmations recorded,
+  nothing flips: the four sosa_* vocabulary terms stay `status: planned`, the `jobrun-observation`
+  map entry stays `status: proposed`, and the supplement stays opt-in/experimental. Re-present at a
+  future session; the open design question (ControlMJobRun-as-Observation vs separate Observation
+  node, run-history source) remains the gate's crux.
+
+## 2026-07-14 — SEAL attribution match policy gate — SIGNED OFF (K2 gate; loader build unblocked)
+
+- **Gate:** `config/gate-prompts/seal-attribution-match-policy.yaml` (24 confirmations, including the
+  same-day §F manual-CSV additions), reviewed via the rendered page; **ACCEPTED IN FULL**
+  (chad.wilson, 2026-07-14).
+- **§A — CONFIRMED:** precedence SEAL > FID > APP_NAME > ALIAS; SEAL-tier hit attributes alone
+  (lower tiers = corroboration only); one-to-one accept rule at the top available tier.
+- **§B — CONFIRMED:** matched + unmatched counts checked against eligible jobs every run (no silent
+  drops); unmatched surfaces for follow-up, never blocks; the invariant joins graph_verify.
+- **§C — CONFIRMED; open question RESOLVED as the proposed default:** deterministic tie-break
+  (most-recent run_id, then lexicographically lowest seal_id) applies as last resort — multi-hit
+  cases do NOT pause for per-case SME calls at load time; every multi-hit is flagged on the coverage
+  report for after-the-fact audit.
+- **§D + §E — CONFIRMED, with the standing K3 rider:** MERGE edge shape (WAS_ASSOCIATED_WITH
+  {role: seal_app_ref}) with ON CREATE/SET split as specified; loader creates no nodes on the
+  automated path; runs only after jobs + SEAL loads; job.APPLICATION never a SEAL identity
+  substitute; source/match_method explicit per edge. **Rider:** the shape type-checks TODAY
+  (:Application is still prov:SoftwareAgent — the K3 reclass is unapplied, backlog K4); when K4
+  applies the Entity/DataProduct reclass, the edge RE-SHAPES per the K3 §F deferred decision
+  (prov:used vs domain edge — that follow-up gate, not this one). The match policy confirmed here
+  (precedence, coverage, triage, pin semantics, provenance props) is shape-agnostic and carries
+  over to whatever label the re-shape gate picks.
+- **§F — CONFIRMED (manual CSV final option, tier 5, PIN semantics per the 2026-07-14 SME
+  direction):** SME-authored CSV rows (template config/manual-loads/TEMPLATE-node-mapping.csv) map
+  source -> PRE-EXISTING relationship -> target; a CSV can never mint a relationship type. Manual
+  edges pin — automation NEVER silently supersedes (the data-incorrect / fix-module scenario);
+  later automated matches surface as PIN-CONFLICTS; retirement (manifest -> superseded) is always a
+  human act. Nodes a CSV forces into existence are stamped manually_created: true and counted
+  separately. Every CSV registers in config/manual-loads/manifest.yaml BEFORE load with a named
+  replaces_with automation path.
+- **§G — SIGNED OFF.** **Confirmed: A, B, D, E, F · Decided: 1 (§C deterministic default) ·
+  Deferred: 0 · Rejected: 0.**
+- **Lifecycle (applied in this commit):** map entry `job-seal-app-ref` proposed → **confirmed**
+  (confirmed_by/confirmed_on set); `config/manual-loads/manifest.yaml` proposed → **confirmed**.
+  **Authorized, lands with the K2 loader build (the K3 flips-are-follow-ups pattern):**
+  `m3_seal_app_ref` planned → active with its supplement + loader fields filled in, per the K2
+  acceptance. Backlog **K2 stays in_progress** — it is the loader item; this gate was its
+  precondition and the build is now unblocked.

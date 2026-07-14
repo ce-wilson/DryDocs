@@ -26,6 +26,34 @@ Tags help grooming: `idea` · `bug` · `doc` · `source` (new data source) · `q
 
 <!-- add new ideas at the top -->
 
+- 2026-07-14 — [idea] **internal psgmgr now derives `ctlm_id` = `folder_id.job_id`** (e.g.
+  `161015.7`; recorded at the P2 avg-run gate sign-off as the §B join upgrade). Ripple beyond
+  CM_AVG_RUN to check: (1) which other CM_ views/extracts carry it — could replace weak joins
+  elsewhere; (2) K2 manual-CSV template `source_key` could accept `ctlm_id=<id>` as shorthand
+  for the composite (folder_id, job_id) key; (3) company-side port alignment — the derived
+  column lives internal-side, keep producer mechanism generic.
+
+- 2026-07-14 — [chore] **CLAUDE.md session ritual says `python scripts/render_board.py` — fails
+  outside the Poetry venv** on this machine (`No module named 'drydocs'`); needs `poetry run
+  python`. Fix the ritual line (and snapshot.ps1 if it shells the same way).
+
+- 2026-07-13 — [chore] **UI work stalled at 2026-07-07, split across two branches — needs a
+  reconcile decision.** Findings from a status review: (1) `feature/ui-dark-landing-myapps`
+  local and origin have DIVERGED — same two commits, different hashes (local `d44b916` is a
+  rebase of pushed `965445c`); sync needs `--force-with-lease` or delete/re-push. (2) The
+  branch's Control-M ingestion TDD copy is OBSOLETE — main's landed separately and moved on
+  (Rev 2 `2a979f2`, L1 outline refit `79947ba`), so the branch's only unique value is the
+  landing page `UI-WIP/drydocs-landing-dark.html`. (3) Untracked `UI-WIP/` files (design-review.md, wireframe
+  PDF, ui-nav-flow.mermaid, wireframe-guide.md, 2026-07-06) are machine-local only — commit
+  or discard. (4) Decide whether the landing-page branch rebases onto main or folds into
+  `feat/web-console-design-pass` (the branch O1/Epic O tracks; 2 ahead / 138 behind main).
+  **RESOLVED 2026-07-14** (a third strand, `origin/feat/web-login-mock` 2026-07-13, had
+  appeared with verified O2 work): (1)+(4) landing mock extracted to `UI-WIP/` on main,
+  `feature/ui-dark-landing-myapps` deleted local+origin — no rebase/fold needed; (2) obsolete
+  TDD copy dropped with the branch; (3) machine-local UI-WIP files committed (Internal-Public).
+  Plus: `feat/web-login-mock` --no-ff merged to main (O2 done in backlog), branch deleted.
+  `feat/web-console-design-pass` left standing — its Claude-Designer mockup is still unmerged.
+
 - 2026-07-12 — [idea] **dry-docs.com site visual language**: seed from the whitepaper's
   "overnight ledger" identity (greenbar/banner-page/mono-display; canonical source stays
   docs/whitepaper/drydocs-whitepaper.md). Parked until website work starts — the site is

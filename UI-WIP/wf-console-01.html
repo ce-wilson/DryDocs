@@ -1,0 +1,295 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>DryDocs web console — SME review wireframe wf-console-01 (2026-07-14)</title>
+<style>
+  /* Rung-3 line wireframe (wireframe-guide.md): grayscale, boxes + labels, print-first. */
+  * { box-sizing: border-box; }
+  body { font: 13px/1.45 "Segoe UI", system-ui, sans-serif; color: #111; background: #fff;
+         max-width: 7.6in; margin: 0 auto; padding: 24px; }
+  h1 { font-size: 19px; margin: 0 0 2px; }
+  h2 { font-size: 15px; border-bottom: 2px solid #111; padding-bottom: 3px; margin: 26px 0 10px; }
+  h3 { font-size: 13px; margin: 14px 0 6px; }
+  .meta { color: #444; font-size: 11px; margin-bottom: 10px; }
+  .banner { border: 1.5px solid #111; padding: 8px 10px; font-size: 11.5px; background: #f4f4f4; }
+  .key { display: inline-block; min-width: 22px; text-align: center; border: 1.5px solid #111;
+         border-radius: 10px; font: bold 10px/16px monospace; background: #fff; padding: 0 3px;
+         vertical-align: middle; }
+  .wf { border: 2px solid #111; margin: 8px 0 4px; }
+  .wf .bar { border-bottom: 1.5px solid #111; padding: 5px 8px; display: flex; gap: 10px;
+             align-items: center; font-size: 11.5px; background: #eee; }
+  .wf .row { display: flex; }
+  .wf .cell { border: 1px dashed #777; margin: 6px; padding: 8px; flex: 1; min-height: 52px;
+              font-size: 11.5px; position: relative; }
+  .wf .cell .key, .wf .bar .key { position: static; margin-right: 5px; }
+  .cap { font-size: 10.5px; color: #444; margin: 2px 0 0; }
+  .spacer { flex: 1; }
+  table { border-collapse: collapse; width: 100%; font-size: 11px; margin: 6px 0; }
+  th, td { border: 1px solid #555; padding: 3.5px 6px; text-align: left; vertical-align: top; }
+  th { background: #e8e8e8; }
+  code { font: 11px monospace; background: #f0f0f0; padding: 0 2px; }
+  .pill { font-size: 9.5px; border: 1px solid #333; border-radius: 8px; padding: 0 5px; white-space: nowrap; }
+  .view { page-break-inside: avoid; }
+  .pagebreak { page-break-before: always; }
+  /* Blank sketch sheets — full-page dotted canvas in a browser frame */
+  .tpl { page-break-before: always; }
+  .tplhead { display: flex; gap: 14px; font-size: 11px; margin: 4px 0 6px; align-items: baseline; }
+  .tplhead .blank { border-bottom: 1px solid #333; min-width: 70px; display: inline-block; }
+  .tplframe { border: 2px solid #111; height: 7.9in;
+              background-image: radial-gradient(#c0c0c0 1px, transparent 1px);
+              background-size: 0.2in 0.2in;
+              -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  .tplframe .chrome { border-bottom: 1.5px solid #111; height: 24px; background: #fff;
+                      display: flex; align-items: center; gap: 6px; padding: 0 8px; }
+  .tplframe .dot { width: 9px; height: 9px; border: 1.5px solid #111; border-radius: 50%; }
+  .tplframe .url { border: 1px solid #111; border-radius: 8px; flex: 1; height: 13px; background: #fff; }
+  .noteline { border-bottom: 1px dotted #999; height: 20px; }
+  @media print { body { padding: 0; } .banner { -webkit-print-color-adjust: exact; } }
+</style>
+</head>
+<body>
+
+<h1>DryDocs web console — SME review wireframe</h1>
+<p class="meta">wf-console-01 &middot; 2026-07-14 &middot; rung 3 (line wireframe — structure only, no theme)
+&middot; reflects main@f7970e5: O2 shipped (mock sign-in, My Apps), ADR 0005 PROPOSED (thin API), O1 graph view planned
+&middot; supersedes drydocs-wireframe-print.pdf (2026-07-06)</p>
+
+<div class="banner"><strong>How to mark this up:</strong> every element carries a circled key
+(e.g. <span class="key">L4</span>). Write your note anywhere on the page and prefix it with the key
+it concerns (“L4: move this above the fold”). Cross out what should go; draw what's missing and give
+it a new key (L9+, S4+, …). Scanned/photographed markup goes through the transcribe-doc-markup
+flow and comes back as keyed feedback YAML — so keys, not arrows, are what survives digitization.</div>
+
+<!-- ================= V1 LANDING ================= -->
+<div class="view">
+<h2>V1 &middot; Landing / overview (implemented &mdash; with design-review fixes applied)</h2>
+<div class="wf">
+  <div class="bar">
+    <span><span class="key">L1</span><strong>DryDocs</strong> logo</span>
+    <span class="spacer"></span>
+    <span><span class="key">L2</span>Overview &middot; Graph Explorer &middot; Lineage &middot; Pipelines &middot; Teams &middot; About</span>
+    <span><span class="key">L3</span>[persona chip + <u>My Apps</u>] / [Sign In]</span>
+  </div>
+  <div class="row">
+    <div class="cell" style="flex:1.4"><span class="key">L4</span><strong>Hero</strong> — name, one-line purpose
+      (“production-support knowledge graph for D&amp;A batch”), buttons: Explore the Graph &middot; Watch Demo</div>
+    <div class="cell"><span class="key">L5</span>Hero graphic (graph orbit) — decorative only</div>
+  </div>
+  <div class="row">
+    <div class="cell"><span class="key">L6</span>Feature strip: Knowledge Graph &middot; Pipeline &amp; Job Lineage &middot; Environment Mapping &middot; Team &amp; Access</div>
+  </div>
+  <div class="row">
+    <div class="cell"><span class="key">L7</span>Explore by Tower — card per tower (name, product count, team count) → V3 drill-down</div>
+    <div class="cell" style="flex:0.5"><span class="key">L8</span>Coverage stat chips (jobs mapped, apps attributed — from graph counts, not hardcoded)</div>
+  </div>
+</div>
+<p class="cap"><span class="key">L3</span> fixes design-review finding: the signed-in entry point (My Apps) surfaces in the nav —
+no longer two clicks deep inside one tower. <span class="key">L8</span> is NEW (proposed): honest coverage numbers over decorative stats.</p>
+</div>
+
+<div class="tpl">
+  <h2>Sketch sheet &middot; relates to V1 — Landing (1 of 2)</h2>
+  <p class="tplhead">New elements: continue keys at <strong>L9+</strong> — circle each key on the sketch, reference it in notes<span class="spacer"></span>date <span class="blank"></span> initials <span class="blank"></span></p>
+  <div class="tplframe"><div class="chrome"><span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="url"></span></div></div>
+</div>
+<div class="tpl">
+  <h2>Sketch sheet &middot; relates to V1 — Landing (2 of 2)</h2>
+  <p class="tplhead">New elements: continue keys at <strong>L9+</strong><span class="spacer"></span>date <span class="blank"></span> initials <span class="blank"></span></p>
+  <div class="tplframe"><div class="chrome"><span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="url"></span></div></div>
+</div>
+
+<!-- ================= V2 SIGN-IN ================= -->
+<div class="view">
+<h2>V2 &middot; Sign-in (implemented as MOCK — replaced at the thin API, ADR 0005)</h2>
+<div class="wf">
+  <div class="row">
+    <div class="cell"><span class="key">S1</span>Persona picker — synthetic personas, role chip
+      (“user: app access derived from ServiceNow” / “admin: all towers”)</div>
+    <div class="cell"><span class="key">S2</span>Session note — localStorage only, no server; role re-derived on every read (untrusted store)</div>
+  </div>
+  <div class="row">
+    <div class="cell"><span class="key">S3</span>ADR 0005 rider (display to SME, not end users): real authn/authz terminates at the thin API
+      (SSO/OIDC); this whole view is scaffolding until then</div>
+  </div>
+</div>
+</div>
+
+<div class="tpl">
+  <h2>Sketch sheet &middot; relates to V2 — Sign-in (1 of 2)</h2>
+  <p class="tplhead">New elements: continue keys at <strong>S4+</strong><span class="spacer"></span>date <span class="blank"></span> initials <span class="blank"></span></p>
+  <div class="tplframe"><div class="chrome"><span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="url"></span></div></div>
+</div>
+<div class="tpl">
+  <h2>Sketch sheet &middot; relates to V2 — Sign-in (2 of 2)</h2>
+  <p class="tplhead">New elements: continue keys at <strong>S4+</strong><span class="spacer"></span>date <span class="blank"></span> initials <span class="blank"></span></p>
+  <div class="tplframe"><div class="chrome"><span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="url"></span></div></div>
+</div>
+
+<!-- ================= V3 DRILL-DOWN ================= -->
+<div class="view">
+<h2>V3 &middot; Tower drill-down (implemented; layout REVISED per design review — graph first)</h2>
+<div class="wf">
+  <div class="bar"><span><span class="key">D1</span>&larr; Back to Overview &middot; breadcrumb: Tower &rsaquo; Product</span></div>
+  <div class="row">
+    <div class="cell" style="flex:1.6"><span class="key">D2</span><strong>Graph result</strong> (primary, left/top):
+      tower &rarr; products &rarr; apps &rarr; jobs neighborhood; click node &rarr; V5 inspector</div>
+    <div class="cell"><span class="key">D3</span>Products &amp; teams list — product_id-keyed cards; team chips (aligned/flex/dedicated from SUPPORTS edge)</div>
+  </div>
+  <div class="row">
+    <div class="cell"><span class="key">D4</span>Cypher console — <strong>collapsed by default; admin + dev-flag only</strong>
+      (was: code-before-payoff for non-engineer SMEs; also K2 gate: raw-Cypher gated)</div>
+    <div class="cell" style="flex:0.6"><span class="key">D5</span>Unmatched / coverage panel: jobs with no SEAL attribution
+      (the K2 zero-unmatched surfacing — coverage counts, never hidden)</div>
+  </div>
+</div>
+<p class="cap"><span class="key">D2</span>/<span class="key">D4</span> invert the shipped order (design-review finding).
+<span class="key">D5</span> is NEW (proposed): the support view of the K2 coverage invariant.</p>
+</div>
+
+<div class="tpl">
+  <h2>Sketch sheet &middot; relates to V3 — Tower drill-down (1 of 2)</h2>
+  <p class="tplhead">New elements: continue keys at <strong>D6+</strong><span class="spacer"></span>date <span class="blank"></span> initials <span class="blank"></span></p>
+  <div class="tplframe"><div class="chrome"><span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="url"></span></div></div>
+</div>
+<div class="tpl">
+  <h2>Sketch sheet &middot; relates to V3 — Tower drill-down (2 of 2)</h2>
+  <p class="tplhead">New elements: continue keys at <strong>D6+</strong><span class="spacer"></span>date <span class="blank"></span> initials <span class="blank"></span></p>
+  <div class="tplframe"><div class="chrome"><span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="url"></span></div></div>
+</div>
+
+<!-- ================= V4 MY APPS ================= -->
+<div class="view">
+<h2>V4 &middot; My Apps (implemented — O2)</h2>
+<div class="wf">
+  <div class="bar"><span><span class="key">M1</span>&larr; Back &middot; persona chip &middot; role badge</span></div>
+  <div class="row">
+    <div class="cell"><span class="key">M2</span>App card — <strong>keyed by seal_id</strong>; name, tower, health placeholder</div>
+    <div class="cell"><span class="key">M3</span>App card (entitlement chip: “derived from ServiceNow” — source shown, never implied)</div>
+  </div>
+  <div class="row">
+    <div class="cell"><span class="key">M4</span>Per-app quick links: jobs (Control-M), runbook (future), escalation (future)</div>
+    <div class="cell" style="flex:0.6"><span class="key">M5</span>Governance placeholder panel (admin role only)</div>
+  </div>
+</div>
+</div>
+
+<div class="tpl">
+  <h2>Sketch sheet &middot; relates to V4 — My Apps (1 of 2)</h2>
+  <p class="tplhead">New elements: continue keys at <strong>M6+</strong><span class="spacer"></span>date <span class="blank"></span> initials <span class="blank"></span></p>
+  <div class="tplframe"><div class="chrome"><span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="url"></span></div></div>
+</div>
+<div class="tpl">
+  <h2>Sketch sheet &middot; relates to V4 — My Apps (2 of 2)</h2>
+  <p class="tplhead">New elements: continue keys at <strong>M6+</strong><span class="spacer"></span>date <span class="blank"></span> initials <span class="blank"></span></p>
+  <div class="tplframe"><div class="chrome"><span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="url"></span></div></div>
+</div>
+
+<!-- ================= V5 GRAPH EXPLORER ================= -->
+<div class="view">
+<h2>V5 &middot; Graph explorer / C4 view (O1 — PLANNED, not built; the review target)</h2>
+<div class="wf">
+  <div class="bar">
+    <span><span class="key">G1</span>Level: [Landscape] [Tower] [Product] [App] [Job] — C4-style zoom ladder</span>
+    <span class="spacer"></span>
+    <span><span class="key">G2</span>DB scope: [drydocs] [drydocs_all] — trust boundary made visible (ADR 0002)</span>
+  </div>
+  <div class="row">
+    <div class="cell" style="flex:1.7; min-height:110px"><span class="key">G3</span><strong>NVL canvas</strong> — nodes colored by label family
+      (Control-M / SEAL / PAT / registry); edge labels on hover; uncertain (drydocs_context) nodes rendered distinct</div>
+    <div class="cell"><span class="key">G4</span><strong>Node inspector</strong> — label, <strong>identity key</strong> (from the tables below),
+      properties w/ provenance badges (source/derived/manual), “manually_created” flag surfaced, gate/loader lineage</div>
+  </div>
+  <div class="row">
+    <div class="cell"><span class="key">G5</span>Path/impact strip: upstream/downstream along WAS_INFORMED_BY; critical-path ETA hook (P2 timing props)</div>
+    <div class="cell" style="flex:0.6"><span class="key">G6</span>Data access: GraphAccess seam — api adapter default, bolt dev-mode (ADR 0005)</div>
+  </div>
+</div>
+</div>
+
+<div class="tpl">
+  <h2>Sketch sheet &middot; relates to V5 — Graph explorer (1 of 2)</h2>
+  <p class="tplhead">New elements: continue keys at <strong>G7+</strong><span class="spacer"></span>date <span class="blank"></span> initials <span class="blank"></span></p>
+  <div class="tplframe"><div class="chrome"><span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="url"></span></div></div>
+</div>
+<div class="tpl">
+  <h2>Sketch sheet &middot; relates to V5 — Graph explorer (2 of 2)</h2>
+  <p class="tplhead">New elements: continue keys at <strong>G7+</strong><span class="spacer"></span>date <span class="blank"></span> initials <span class="blank"></span></p>
+  <div class="tplframe"><div class="chrome"><span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="url"></span></div></div>
+</div>
+
+<!-- ================= KEY TABLES ================= -->
+<div class="pagebreak"></div>
+<h2>Neo4j label key — what the console renders, per source domain</h2>
+<p class="cap">Identity keys are the schema's enforced constraints (KEY = composite node key, UNIQ = unique property).
+Status: <span class="pill">active</span> loaded/loadable today &middot; <span class="pill">gate-signed</span> policy signed off, loader pending &middot;
+<span class="pill">planned</span> registered, not yet gated &middot; <span class="pill">gate-bound</span> change proposed, awaiting SME.</p>
+
+<h3><span class="key">T1</span> Control-M</h3>
+<table>
+<tr><th>Label</th><th>Identity key</th><th>PROV / W3C type</th><th>Status &amp; notes</th></tr>
+<tr><td><code>:ControlMJob</code></td><td><code>(folder_id, job_id)</code> KEY &mdash; source-side now also <code>ctlm_id</code> = <code>folder_id.job_id</code> (e.g. 161015.7)</td><td>prov:Activity</td><td><span class="pill">active</span> ctlm_id per the P2 gate edit 2026-07-14</td></tr>
+<tr><td><code>:ControlMFolder</code></td><td><code>folder_id</code> UNIQ</td><td>prov:Collection</td><td><span class="pill">active</span> renamed from JobFolder (ADR 0003)</td></tr>
+<tr><td><code>:ControlMApplication</code></td><td><code>name</code> UNIQ</td><td>prov:Collection</td><td><span class="pill">active</span> BMC grouping field — <strong>NOT</strong> the SEAL <code>:Application</code></td></tr>
+<tr><td><code>:ControlMServer</code></td><td><code>name</code> UNIQ</td><td>local platform (not Agent)</td><td><span class="pill">active</span></td></tr>
+<tr><td><code>:Condition</code></td><td><code>(folder_id, name)</code> KEY</td><td>prov:Entity</td><td><span class="pill">active</span></td></tr>
+<tr><td><code>:JobRun</code></td><td><code>run_id</code> UNIQ</td><td>prov:Activity</td><td><span class="pill">active</span> loader provenance — distinct from ControlMJobRun</td></tr>
+<tr><td><code>:ControlMHostGroup</code></td><td><code>(data_center, name)</code> — per gate spec</td><td>prov:Collection</td><td><span class="pill">gate-signed</span> 2026-07-09; loader = Epic P3</td></tr>
+<tr><td><code>:ExecutionHost</code></td><td><code>nodeid</code> — per gate spec</td><td>prov:SoftwareAgent</td><td><span class="pill">gate-signed</span> job&rarr;host is polymorphic: group match wins (2-hop), else direct (1-hop)</td></tr>
+<tr><td><code>:ControlMJobRun</code> / <code>:Script</code> / <code>:ETLProcess</code> / <code>:AppUser</code></td><td>&mdash;</td><td>Activity / Entity / Activity / SoftwareAgent</td><td><span class="pill">planned</span> phase 2</td></tr>
+</table>
+
+<h3><span class="key">T2</span> SEAL</h3>
+<table>
+<tr><th>Label</th><th>Identity key</th><th>PROV / W3C type</th><th>Status &amp; notes</th></tr>
+<tr><td><code>:Application</code></td><td><code>seal_id</code> UNIQ</td><td>prov:SoftwareAgent (today)</td><td><span class="pill">active</span> two gate-bound changes ride K4: label &rarr; <code>:BusinessApplication</code>, class &rarr; prov:Entity / dprod:DataProduct — the K2 attribution edge RE-SHAPES then</td></tr>
+<tr><td><code>:Employee</code></td><td><code>employee_id</code> UNIQ</td><td>prov:Agent</td><td><span class="pill">active</span></td></tr>
+<tr><td><code>:Port</code></td><td><code>(parent_seal_id, kind)</code> KEY</td><td>dprod:Port</td><td><span class="pill">active</span></td></tr>
+<tr><td><code>:Membership</code> / <code>:Role</code></td><td><code>membership_id</code> / <code>role_id</code> UNIQ</td><td>org:Membership / org:Role</td><td><span class="pill">active</span> SEAL use deprecates at K4 (org: stays for PAT); replaced by the pattern below</td></tr>
+<tr><td><code>:Attribution</code> + <code>:TOMRole</code></td><td>&mdash; (TOMRole = skos concept per role)</td><td>prov:Attribution / skos:Concept</td><td><span class="pill">gate-bound</span> K3-decided role families: TOM contacts on the app (App Owner, Primary/Backup Info Owner, CTO, Tech Risk &amp; Controls, Design Authority, Operate Mgr L1/L2); Product Cabinet is K5, on PAT scope</td></tr>
+<tr><td><code>:Document</code></td><td><code>doc_id</code> UNIQ</td><td>prov:Entity</td><td><span class="pill">gate-bound</span> SEAL source-doc provenance (hadPrimarySource)</td></tr>
+</table>
+
+<h3><span class="key">T3</span> PAT / catalog</h3>
+<table>
+<tr><th>Label</th><th>Identity key</th><th>PROV / W3C type</th><th>Status &amp; notes</th></tr>
+<tr><td><code>:BusinessSegment</code></td><td><code>code</code> UNIQ</td><td>org:FormalOrganization</td><td><span class="pill">active</span></td></tr>
+<tr><td><code>:CatalogLOB</code></td><td><code>lob_id</code> UNIQ</td><td>org:OrganizationalUnit</td><td><span class="pill">active</span></td></tr>
+<tr><td><code>:ProductLine</code></td><td><code>product_line_id</code> UNIQ</td><td>dd:ProductLine</td><td><span class="pill">active</span></td></tr>
+<tr><td><code>:Product</code></td><td><code>product_id</code> UNIQ</td><td>dd:Product</td><td><span class="pill">active</span> the console “tower &rsaquo; product” ladder reads this chain</td></tr>
+<tr><td><code>:AreaProduct</code></td><td><code>area_product_id</code> UNIQ</td><td>dd:AreaProduct</td><td><span class="pill">active</span> Product &rarr; AreaProduct &rarr; DevTeam</td></tr>
+<tr><td><code>:DevTeam</code></td><td><code>team_id</code> UNIQ</td><td>org:OrganizationalUnit</td><td><span class="pill">active</span> SUPPORTS {team_type: aligned|flex|dedicated} edges to Product/AreaProduct</td></tr>
+<tr><td><code>:JiraBoard</code></td><td><code>board_id</code> UNIQ</td><td>dd:JiraBoard</td><td><span class="pill">active</span></td></tr>
+</table>
+
+<h3><span class="key">T4</span> How the three domains JOIN (what the console navigates on)</h3>
+<table>
+<tr><th>Edge</th><th>Join keys</th><th>Status</th></tr>
+<tr><td><code>(:ControlMJob)-[:WAS_ASSOCIATED_WITH {role: seal_app_ref}]-&gt;(:Application)</code></td><td><code>(folder_id, job_id)</code> &rarr; <code>seal_id</code>, derived from STG_APP_FACT tiers SEAL&gt;FID&gt;APP_NAME&gt;ALIAS, tier-5 manual CSV pins</td><td><span class="pill">gate-signed</span> K2 2026-07-14; loader = K2 build; shape re-opens at K4</td></tr>
+<tr><td>SEAL &harr; PAT: app sits under Product hierarchy</td><td><code>seal_id</code> &rarr; <code>product_id</code> (PAT alignment)</td><td><span class="pill">active</span></td></tr>
+<tr><td><code>(:ControlMJob)-[:RUNS_ON]-&gt;</code> group or host</td><td><code>NODE_ID</code> &rarr; <code>(data_center, name)</code> group else <code>nodeid</code>; group match wins</td><td><span class="pill">gate-signed</span> hosts-topology; loader = P3</td></tr>
+<tr><td colspan="3"><strong>Standing warning (ADR 0003):</strong> <code>:ControlMApplication</code> (BMC grouping, <code>name</code>-keyed) is never a join
+path to <code>:Application</code> (SEAL, <code>seal_id</code>-keyed) — the console must not visually conflate them.</td></tr>
+</table>
+
+<h3>SME notes (also usable for anything without a key)</h3>
+<div class="noteline"></div><div class="noteline"></div><div class="noteline"></div>
+<div class="noteline"></div><div class="noteline"></div><div class="noteline"></div>
+
+<div class="tpl">
+  <h2>Sketch sheet &middot; free — any view or a new one (1 of 2)</h2>
+  <p class="tplhead">Name the view; new views take keys <strong>N1+</strong><span class="spacer"></span>view <span class="blank"></span> date <span class="blank"></span> initials <span class="blank"></span></p>
+  <div class="tplframe"><div class="chrome"><span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="url"></span></div></div>
+</div>
+<div class="tpl">
+  <h2>Sketch sheet &middot; free — any view or a new one (2 of 2)</h2>
+  <p class="tplhead">Name the view; new views take keys <strong>N1+</strong><span class="spacer"></span>view <span class="blank"></span> date <span class="blank"></span> initials <span class="blank"></span></p>
+  <div class="tplframe"><div class="chrome"><span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="url"></span></div></div>
+</div>
+
+<p class="meta">Provenance: labels/types from knowledge/ontology/NODE_QUICK_REFERENCE.md (2026-07-09) + gate-log through 2026-07-14;
+identity keys from drydocs_core/schema constraints; gate-signed keys from their gate specs. Mechanism only — no real names/ids.
+classification: Internal-Public.</p>
+
+</body>
+</html>
