@@ -1,32 +1,35 @@
 import { useEffect, useState } from 'react'
 import { currentSession, personaFor, signOut, type Session } from './lib/auth'
-import { hashFor, defaultViewFor, viewFromHash, type ViewId } from './lib/views'
+import { defaultViewFor, hashFor, hashForRoute, parseRoute, type Route } from './lib/views'
+import { isTowerKey } from './data/towers'
 import SignIn from './components/SignIn'
 import Shell, { type EnvName } from './components/Shell'
+import Landing from './components/Landing'
 import MyApps from './components/MyApps'
 import CypherConsole from './components/CypherConsole'
 import Governance from './components/Governance'
 import './App.css'
 
-// Orchestrator: mock session (lib/auth.ts) + hash-based view switching gated by
-// the role registry (lib/views.ts). No router by design — revisit post-O1 if the
+// Orchestrator: mock session (lib/auth.ts) + hash-based routing gated by the
+// role registry (lib/views.ts). No router by design — revisit post-O1 if the
 // design pass grows past a handful of views.
 export default function App() {
   const [session, setSession] = useState<Session | null>(() => currentSession())
-  const [view, setView] = useState<ViewId>(() =>
-    session ? viewFromHash(window.location.hash, session.role) : 'my-apps',
+  const [route, setRoute] = useState<Route>(() =>
+    session ? parseRoute(window.location.hash, personaFor(session), isTowerKey) : { view: 'my-apps' },
   )
   const [env, setEnv] = useState<EnvName>('Dev')
 
   useEffect(() => {
     if (!session) return
+    const persona = personaFor(session)
     const sync = () => {
-      const v = viewFromHash(window.location.hash, session.role)
-      // normalize unauthorized/unknown deep links to the role's default view
-      if (window.location.hash !== hashFor(v)) {
-        window.history.replaceState(null, '', hashFor(v))
+      const r = parseRoute(window.location.hash, persona, isTowerKey)
+      // normalize unauthorized/unknown deep links to what the persona may see
+      if (window.location.hash !== hashForRoute(r)) {
+        window.history.replaceState(null, '', hashForRoute(r))
       }
-      setView(v)
+      setRoute(r)
     }
     sync()
     window.addEventListener('hashchange', sync)
@@ -51,14 +54,15 @@ export default function App() {
     <Shell
       session={session}
       persona={persona}
-      activeView={view}
+      activeView={route.view}
       env={env}
       onEnvChange={setEnv}
       onSignOut={handleSignOut}
     >
-      {view === 'my-apps' && <MyApps persona={persona} />}
-      {view === 'console' && <CypherConsole personaId={session.personaId} />}
-      {view === 'governance' && <Governance />}
+      {route.view === 'landing' && <Landing tower={route.tower} persona={persona} />}
+      {route.view === 'my-apps' && <MyApps persona={persona} />}
+      {route.view === 'console' && <CypherConsole personaId={session.personaId} />}
+      {route.view === 'governance' && <Governance />}
     </Shell>
   )
 }

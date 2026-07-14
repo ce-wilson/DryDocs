@@ -15,9 +15,9 @@ interface ShellProps {
   children: ReactNode
 }
 
-// Signed-in layout: mock banner, role-filtered nav (plain hash links — the App
-// hashchange listener does the routing), admin-only env toggle, user chip,
-// sign out. The full sidebar shell from the UI spec is O1 design-pass scope.
+// Signed-in layout in the mockup's shell language: mock banner, sticky nav with
+// the brand mark, role-filtered links (plain hash links — the App hashchange
+// listener does the routing), admin-only env toggle, user chip, sign out.
 export default function Shell({
   session, persona, activeView, env, onEnvChange, onSignOut, children,
 }: ShellProps) {
@@ -27,33 +27,45 @@ export default function Shell({
         ◉ MOCK AUTH · SYNTHESIZED — persona {persona.id} ({session.role}) · no real
         access control · access path pending the O1 ADR
       </div>
-      <header className="shell-head">
-        <span className="brand">DryDocs</span>
-        <nav className="shell-nav">
-          {VIEWS.filter((v) => canSee(v.id, session.role)).map((v) => (
-            <a key={v.id} href={hashFor(v.id)} className={v.id === activeView ? 'active' : undefined}>
-              {v.label}
-            </a>
-          ))}
-        </nav>
-        <span className="spacer" />
-        {session.role === 'admin' && (
-          <div className="env-toggle" title="Environment (cosmetic — mock)">
-            {ENVS.map((name) => (
-              <button
-                key={name}
-                className={name === env ? 'active' : undefined}
-                onClick={() => onEnvChange(name)}
-              >
-                {name}
-              </button>
+      <nav>
+        <div className="nav-in">
+          <div className="logo"><BrandMark /> DryDocs</div>
+          <div className="nav-links">
+            {VIEWS.filter((v) => canSee(v.id, session.role)).map((v) => (
+              <a key={v.id} href={hashFor(v.id)} className={v.id === activeView ? 'active' : undefined}>
+                {v.label}
+              </a>
             ))}
           </div>
-        )}
-        <span className="userchip">◉ {persona.id} · {persona.chip}</span>
-        <button className="signout" onClick={onSignOut}>Sign out</button>
-      </header>
+          {session.role === 'admin' && (
+            <div className="env-toggle" title="Environment (cosmetic — mock)">
+              {ENVS.map((name) => (
+                <button
+                  key={name}
+                  className={name === env ? 'active' : undefined}
+                  onClick={() => onEnvChange(name)}
+                >
+                  {name}
+                </button>
+              ))}
+            </div>
+          )}
+          <span className="userchip">◉ {persona.id} · {persona.chip}</span>
+          <button className="signout" onClick={onSignOut}>Sign out</button>
+        </div>
+      </nav>
       {children}
     </div>
+  )
+}
+
+// The mockup's brand mark: two dashed orbit rings around a red core.
+function BrandMark() {
+  return (
+    <svg width="26" height="26" viewBox="0 0 26 26" aria-hidden="true">
+      <circle cx="13" cy="13" r="10" fill="none" stroke="#2E6BC4" strokeWidth="2.4" strokeDasharray="18 8" />
+      <circle cx="13" cy="13" r="10" fill="none" stroke="#D9B831" strokeWidth="2.4" strokeDasharray="10 38" strokeDashoffset="-20" />
+      <circle cx="13" cy="13" r="4" fill="#C8202E" />
+    </svg>
   )
 }
