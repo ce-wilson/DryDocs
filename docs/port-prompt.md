@@ -656,7 +656,45 @@ PROCEDURE:
       reconciliation tables (wire them into TierReconcilers at the CLI); the LIVE attribution
       load (Track-2 — run after your jobs + SEAL loads; the map entry job-seal-app-ref flips
       confirmed -> applied only when a live run writes edges); real manual CSVs under internal/
-      with YOUR manifest entries (never from a port, step-31 rule).
+      with YOUR manifest entries (never from a port, step-31 rule). Tracked as rows T1–T4 in
+      the COMPANY-SIDE TRACKER below — flip statuses there, in your copy.
+
+COMPANY-SIDE TRACKER — LIVE-LOAD + SUPPLEMENT STATUS (maintained COMPANY-SIDE):
+The steps above name company-side obligations in scattered "COMPANY MUST SUPPLEMENT" /
+Track-2 notes; this table consolidates the trackable ones so you can see at a glance whether
+the live load is done. The Status column is CANONICAL-COMPANY: the producer ships every row
+`pending` (it cannot observe your graph) and NEVER flips one — you flip rows in YOUR copy as
+work lands (`pending` / `in-progress` / `done` / `n-a`, with a date). On a re-port collision
+KEEP YOUR statuses; producer edits only add rows or refine the done-means criteria.
+
+| Row | Item (origin step)                                        | Status  |
+|-----|-----------------------------------------------------------|---------|
+| T1  | K2 LIVE attribution load — Track-2 (step 32)              | pending |
+| T2  | FID -> seal_id reconciliation table wired (step 32)       | pending |
+| T3  | ALIAS reconciliation table wired (step 32)                | pending |
+| T4  | Real tier-5 manual CSVs, as needed (step 32)              | pending |
+| T5  | P1 internal probes P0/P4 — unblocks P2 loader (step 31)   | pending |
+| T6  | Docs Track-2: docs-fetch/docs-load vs real sources (16)   | pending |
+| T7  | Live multi-DB Enterprise Neo4j deploy — G7 half (16)      | pending |
+| T8  | M0 equivalence unblocks: A3 filename + B1 dot rule (29)   | pending |
+
+Done-means (checkable — a row flips `done` only when ALL its checks hold):
+- T1: `drydocs load-seal-attribution` run AFTER your Control-M jobs + SEAL reference loads
+  (the §E sequencing precondition exits 2 otherwise); the printed coverage reconciles —
+  matched + unmatched + pinned = eligible, exit 0 (the command exits 1 on violation);
+  graph-tests/seal-attribution-coverage.yaml all 6 TCs green via graph_verify; THEN flip the
+  map entry job-seal-app-ref confirmed -> applied in config/taxonomy-ontology-map.yaml — that
+  flip is the durable record of T1 (`applied` = a loader has written the graph). Unmatched
+  facts do NOT block done — §B: they are surfaced on the JobRun, never silently dropped.
+- T2/T3: the reconciliation table is sourced and wired into TierReconcilers at the CLI
+  (both tiers ship EMPTY — facts count unresolved, never guessed); done when that tier's
+  facts resolve in coverage. After wiring, RE-RUN T1's load — edges MERGE idempotently and
+  newly resolvable jobs attribute on the re-run.
+- T4: real CSVs under internal/ + YOUR manifest entries (replaces_with REQUIRED, never from
+  a port); `drydocs load-manual-mappings` clean; coverage TC-06 manual-node stamps green.
+  Flip `n-a` if automation coverage suffices and no manual pins are needed.
+- T5–T8: done-means live in their origin steps (31 / 16 / 16 / 29 respectively) — this table
+  only carries their status so one section answers "what is still owed company-side".
 
 ACCEPTANCE GATE (behavior is the contract, not a byte-compare):
 - Track 1 (portable, no production sample present):
