@@ -13,7 +13,7 @@ summary: >
   Confirms the AutoSys -> BMC Control-M baseline crosswalk in
   config/crosswalks/autosys-to-bmc.yaml. Every native AutoSys concept maps to an
   EXISTING baseline concept/DryDocs node (never a new one) per CLAUDE.md's
-  orchestrator-onboarding guardrail. Two rows have no baseline equivalent and are
+  orchestrator-onboarding guardrail. One row has no baseline equivalent and is
   flagged for explicit disposition rather than silent approximation. Confirming this
   gate does NOT activate the source or authorize any graph write — it only allows
   `confirmed: true` to be set in config/source-registry.yaml for `autosys-export`,
@@ -21,6 +21,7 @@ summary: >
 meta:
   Module: "drydocs-core"
   Source: "AutoSys JIL object-model concepts (CA/Broadcom Workload Automation public documentation) — no live export yet"
+  Software: "autosys (Broadcom Workload Automation, formerly CA Workload Automation AE) MADE_BY broadcom — config/taxonomy/software-registry.yaml (registered 2026-07-14; vendor = today's brand per ADR 0004)"
   Registry ref: "autosys-export — NOT YET confirmed (config/source-registry.yaml); orchestrator: autosys, crosswalks to bmc-controlm (baseline)"
   Classification: "External (public vendor concepts only) — this page External"
   Precedence: "bmc-baseline is authority 1 (config/precedence.yaml) — AutoSys concepts map TO it, never redefine it"
@@ -48,9 +49,9 @@ mapping:
     target: "(consumer job)"
     edge: "(consumer)-[:WAS_INFORMED_BY]->(producer)  [PROPOSED — approximate]"
   - n: 6
-    element: "machine:"
-    target: ":ExecutionHost"
-    edge: "—  [PROPOSED]"
+    element: "machine: (polymorphic — real machine OR virtual machine)"
+    target: ":ExecutionHost (real) / :ControlMHostGroup -[:CONTAINS_HOST]-> :ExecutionHost (virtual)"
+    edge: "—  [PROPOSED — approximate, demoted from exact 2026-07-14; virtual machine = 1-to-many host set, the signed-off controlm-hosts-topology group-vs-host resolution]"
   - n: 7
     element: "owner:"
     target: ":AppUser"
@@ -101,10 +102,12 @@ sections:
       - "This gate reviews config/crosswalks/autosys-to-bmc.yaml only — it does not activate the autosys-export source and does not authorize any graph write."
       - "No real AutoSys job/box/machine names are in scope; all rows describe public JIL object-model concepts."
       - "BMC Control-M remains the baseline (config/precedence.yaml authority 1); every row maps AutoSys TO the baseline, none invent a new DryDocs node/edge type."
+      - "The subject software is registered per ADR 0004 (vendor = the brand): SoftwareProduct autosys (Broadcom Workload Automation) MADE_BY broadcom in config/taxonomy/software-registry.yaml (added 2026-07-14 for this gate's Software linkage; Broadcom is today's brand — the CA Technologies lineage is a name history, not the vendor)."
   - title: "B. Row-by-row fidelity review"
     confirmations:
-      - "Rows 1, 3, 6, 7 (Job, status-predicate condition, machine, owner) are exact fidelity and confirmed correct."
-      - "Rows 2, 4, 5, 8, 9, 11 (box job, file predicate, downstream dependency, calendar, status model, retry/alert properties) are approximate fidelity — the SME accepts the approximation and its noted caveat."
+      - "Rows 1, 3, 7 (Job, status-predicate condition, owner) are exact fidelity and confirmed correct."
+      - "Rows 2, 4, 5, 6, 8, 9, 11 (box job, file predicate, downstream dependency, machine, calendar, status model, retry/alert properties) are approximate fidelity — the SME accepts the approximation and its noted caveat."
+      - "Row 6's polymorphism is acknowledged (demoted from exact at the 2026-07-14 SME wording review): machine: names either a real machine (1-hop :ExecutionHost) or an AutoSys virtual machine load-balancing a host set — 1-to-many via :ControlMHostGroup -[:CONTAINS_HOST]-> :ExecutionHost, mirroring the controlm-hosts-topology group-match-wins resolution (signed off 2026-07-09); virtual-vs-real discrimination needs the live export's insert_machine definitions."
       - "Row 4's open question (does d(file) need its own FileWatcher-job baseline mapping instead of folding into Condition?) is resolved or explicitly deferred."
       - "Row 9's open question (authoritative AutoSys status vocabulary needs a live export, not JIL docs alone) is acknowledged as a follow-up before loader implementation."
   - title: "C. No-equivalent concepts"

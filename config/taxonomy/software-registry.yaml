@@ -18,7 +18,7 @@
 
 schema: drydocs.software-registry.v1
 classification: Internal-Public
-updated: 2026-07-07
+updated: 2026-07-14
 adr: docs/decisions/0004-software-registry-vendor-terminology.md
 
 # Reserved Application id for DryDocs itself (no SEAL id producer-side; the
@@ -44,6 +44,12 @@ vendors:
   - id: informatica
     name: Informatica
     publisher_url: https://www.informatica.com/
+  - id: apache
+    name: Apache Software Foundation
+    publisher_url: https://apache.org/
+  - id: broadcom
+    name: Broadcom
+    publisher_url: https://www.broadcom.com/
 
 products:
   - id: neo4j
@@ -108,6 +114,28 @@ products:
     type: commercial
     versions: []                  # unknown — Phase 3 detection target (pmcmd)
     used_by_drydocs: false
+
+  # Crosswalk-onboarding rows (2026-07-14): registered so the F1/F2 crosswalk
+  # gates can carry the standard Software meta linkage (ADR 0004). MWAA is
+  # deliberately NOT a separate product — stock Airflow object model,
+  # AWS-managed deployment.
+  - id: airflow
+    vendor: apache
+    name: Apache Airflow
+    category: Workload Automation
+    role: orchestrator
+    type: open-source
+    versions: ["3.x"]              # 3.3.0 current 2026-07; MWAA lags (3.0 / 2.4.3+)
+    used_by_drydocs: false          # crosswalk placeholder (airflow-mwaa source unconfirmed); flips if the source activates
+
+  - id: autosys
+    vendor: broadcom
+    name: Broadcom Workload Automation  # formerly CA Workload Automation AE / AutoSys (CA Technologies lineage)
+    category: Workload Automation
+    role: orchestrator
+    type: commercial
+    versions: []                   # unknown — Broadcom docs access-restricted; verify on live export
+    used_by_drydocs: false          # crosswalk placeholder (autosys-export source unconfirmed); flips if the source activates
 
 # =============================================================================
 # invocation_patterns — plan-07 Phase 3 (docs/restructure/07-software-registry.md

@@ -21,7 +21,7 @@
 # =============================================================================
 
 schema: drydocs.crosswalk.v1
-updated: 2026-07-07
+updated: 2026-07-14                     # row 6 demoted exact -> approximate (machine: polymorphism)
 id: autosys-to-bmc
 orchestrator: autosys
 baseline: bmc-controlm
@@ -87,11 +87,19 @@ rows:
 
   - n: 6
     native: "`machine:` attribute"
-    baseline: "execution host / agent"
-    node: ExecutionHost
-    fidelity: exact
+    baseline: "execution host / agent — OR virtual machine (load-balanced host set)"
+    node: "ExecutionHost (real machine) / ControlMHostGroup -[:CONTAINS_HOST]-> ExecutionHost (virtual machine)"
+    fidelity: approximate
     status: proposed
-    note: "Direct host/agent equivalence."
+    note: >
+      Demoted from exact (2026-07-14, SME wording review): machine: is polymorphic —
+      it names either a real machine (1-hop, ExecutionHost) or an AutoSys virtual
+      machine that load-balances across real machines (1-to-many). That is the same
+      group-vs-host resolution the baseline models as Job -[:RUNS_ON
+      {role: host_group}]-> ControlMHostGroup -[:CONTAINS_HOST]-> ExecutionHost
+      (gate controlm-hosts-topology, signed off 2026-07-09). A live export must
+      discriminate virtual vs real per machine: value — mirror the baseline's
+      group-match-wins resolution.
 
   - n: 7
     native: "`owner:` attribute"
@@ -157,5 +165,7 @@ no_equivalent_flags:
 open_questions:
   - row: 4
     question: "Does the file-watch job_type (f/w) need its own baseline mapping (FileWatcher job) instead of folding into Condition?"
+  - row: 6
+    question: "Which machine: values name AutoSys virtual machines (load-balanced host sets, 1-to-many) vs real machines? Needs the live export's insert_machine definitions — JIL docs alone cannot resolve it."
   - row: 9
     question: "What is the authoritative AutoSys status vocabulary to map against Control-M's? (needs a live export, not JIL docs alone)"

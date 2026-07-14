@@ -21,7 +21,7 @@
 # =============================================================================
 
 schema: drydocs.crosswalk.v1
-updated: 2026-07-07
+updated: 2026-07-14                     # row 8 -> 8a/8b/8c split (SME wording review)
 id: airflow-to-bmc
 orchestrator: airflow
 baseline: bmc-controlm
@@ -111,17 +111,49 @@ rows:
       condition-set logic; one_failed / none_failed / all_done have no clean baseline
       analog. FLAG for SME before any loader attempts to translate trigger_rule values.
 
-  - n: 8
-    native: "Connection / Pool / Queue (`pool=`, Airflow Connection id)"
-    baseline: "execution host / engine"
-    node: ExecutionHost
+  # Row 8 split 2026-07-14 (SME wording review): the old single row lumped three
+  # concepts with three different baseline analogs onto a flat ExecutionHost —
+  # written 2026-07-07, before gate controlm-hosts-topology (signed off 2026-07-09)
+  # established the 1-to-many host-group pattern the queue case needs.
+  - n: 8a
+    native: "Queue (`queue=` — executor/Celery queue routing to a worker set)"
+    baseline: "host group (load-balanced worker set)"
+    node: "ControlMHostGroup -[:CONTAINS_HOST]-> ExecutionHost"
     fidelity: approximate
     status: proposed
     note: >
-      A Connection often names a target system (DB, API) rather than the execution
-      host running the task (that's the worker/queue), so this is a looser match than
-      AutoSys `machine:` -> ExecutionHost. May need to split into two baseline
-      properties (execution host vs. target system) — flag for SME.
+      1-to-many, never a single host: a queue routes each task to ONE of a set of
+      workers — the Control-M host-group pattern signed off at gate
+      controlm-hosts-topology (2026-07-09): Job -[:RUNS_ON {role: host_group}]->
+      ControlMHostGroup -[:CONTAINS_HOST]-> ExecutionHost, with a hard-pinned
+      single worker as the 1-hop RUNS_ON {role: agent_host} case. Mapping a queue
+      to one ExecutionHost would misrepresent cardinality.
+
+  - n: 8b
+    native: "Pool (`pool=` — named concurrency-slot limiter)"
+    baseline: "quantitative resource (not yet modeled)"
+    node: "n/a"
+    fidelity: no-equivalent
+    status: proposed
+    note: >
+      A pool is a semaphore (N slots shared across tasks), not a host. The baseline
+      analog is the Control-M Quantitative Resource — present in the CM_ physical
+      model but not yet a DryDocs concept. Do NOT fold into ExecutionHost; if
+      quantitative resources are modeled later, this row gets its own mapping via
+      ontology-mapper.
+
+  - n: 8c
+    native: "Connection (Airflow Connection id — target-system endpoint + credentials)"
+    baseline: "target-system reference (split out from execution host)"
+    node: "n/a (target-system data; NOT ExecutionHost)"
+    fidelity: approximate
+    status: proposed
+    note: >
+      A Connection names the system a task talks TO (DB, API), not where it runs.
+      The old row-8 "does Connection need to split?" question is resolved by this
+      split itself; the remaining open question is where target-system data lands
+      (a DataAsset reference vs job properties) — loader-design work for
+      ontology-mapper.
 
   - n: 9
     native: "`owner` (`default_args={'owner': ...}`)"
@@ -183,8 +215,11 @@ no_equivalent_flags:
   - row: 12
     concept: "Dynamic task mapping (.expand())"
     disposition: "Cardinality mismatch vs static Folder/Job definitions — flag as drift risk, route to ontology-mapper if a modeling need emerges."
+  - row: 8b
+    concept: "Pool (concurrency slots)"
+    disposition: "Baseline analog is the Control-M Quantitative Resource — unmodeled; never fold into ExecutionHost; route to ontology-mapper when/if modeled."
 open_questions:
   - row: 6
     question: "Per-operator crosswalk table needed (BashOperator vs PythonOperator vs SparkSubmitOperator, etc.) before a loader can classify INVOKES targets."
-  - row: 8
-    question: "Does Connection need to split into 'target system' vs 'execution host/queue' as two baseline properties?"
+  - row: 8c
+    question: "Where does Connection target-system data land — a DataAsset reference or job properties? (The old row-8 'split target-system vs execution-host' question is resolved by the 8a/8b/8c split, 2026-07-14.)"

@@ -13,7 +13,7 @@ summary: >
   Confirms the Airflow/MWAA -> BMC Control-M baseline crosswalk in
   config/crosswalks/airflow-to-bmc.yaml. Every native Airflow concept maps to an
   EXISTING baseline concept/DryDocs node (never a new one) per CLAUDE.md's
-  orchestrator-onboarding guardrail. Three rows have no baseline equivalent —
+  orchestrator-onboarding guardrail. Four rows have no baseline equivalent —
   including dynamic task mapping, the clearest concept mismatch in this crosswalk —
   and are flagged for explicit disposition rather than silent approximation.
   Confirming this gate does NOT activate the source or authorize any graph write — it
@@ -22,10 +22,11 @@ summary: >
 meta:
   Module: "drydocs-core"
   Source: "Apache Airflow object-model concepts (public Airflow/MWAA documentation) — no live DAG export yet"
+  Software: "airflow (Apache Airflow) MADE_BY apache — config/taxonomy/software-registry.yaml (registered 2026-07-14; MWAA deliberately NOT a separate product — stock object model, AWS-managed deployment)"
   Registry ref: "airflow-mwaa — NOT YET confirmed (config/source-registry.yaml); orchestrator: airflow, crosswalks to bmc-controlm (baseline)"
   Classification: "External (public vendor concepts only) — this page External"
   Precedence: "bmc-baseline is authority 1 (config/precedence.yaml) — Airflow concepts map TO it, never redefine it"
-  Crosswalk file: "config/crosswalks/airflow-to-bmc.yaml (12 rows)"
+  Crosswalk file: "config/crosswalks/airflow-to-bmc.yaml (14 rows — row 8 split 8a/8b/8c, 2026-07-14)"
   Source of record: "external/orchestration/airflow/README.md"
 mapping:
   - n: 1
@@ -56,10 +57,18 @@ mapping:
     element: "Trigger rule (all_success / one_failed / all_done / none_failed)"
     target: "n/a (condition-logic property)"
     edge: "NO-EQUIVALENT — do not translate 1:1"
-  - n: 8
-    element: "Connection / Pool / Queue"
-    target: ":ExecutionHost"
-    edge: "—  [PROPOSED — approximate, open question]"
+  - n: 8a
+    element: "Queue (executor/Celery queue -> worker set)"
+    target: ":ControlMHostGroup -[:CONTAINS_HOST]-> :ExecutionHost"
+    edge: "(:ControlMJob)-[:RUNS_ON {role: host_group}]->(:ControlMHostGroup)  [PROPOSED — approximate; 1-to-many per the signed-off controlm-hosts-topology pattern, never a single host]"
+  - n: 8b
+    element: "Pool (concurrency slots)"
+    target: "n/a (Quantitative Resource — unmodeled)"
+    edge: "NO-EQUIVALENT — do not fold into :ExecutionHost"
+  - n: 8c
+    element: "Connection (target-system endpoint)"
+    target: "n/a (target-system data; NOT :ExecutionHost)"
+    edge: "—  [PROPOSED — approximate, open question: DataAsset reference vs job properties]"
   - n: 9
     element: "owner (default_args)"
     target: ":AppUser"
@@ -106,20 +115,23 @@ sections:
       - "This gate reviews config/crosswalks/airflow-to-bmc.yaml only — it does not activate the airflow-mwaa source and does not authorize any graph write."
       - "No real DAG/task names or MWAA environment identifiers are in scope; all rows describe public Airflow object-model concepts."
       - "BMC Control-M remains the baseline (config/precedence.yaml authority 1); every row maps Airflow TO the baseline, none invent a new DryDocs node/edge type."
+      - "The subject software is registered per ADR 0004 (vendor = the brand): SoftwareProduct airflow MADE_BY apache in config/taxonomy/software-registry.yaml (added 2026-07-14 for this gate's Software linkage). MWAA is deliberately NOT a separate product — stock Airflow object model, AWS-managed deployment — and the SME ratifies or overturns that disposition here."
   - title: "B. Row-by-row fidelity review"
     confirmations:
       - "Rows 2 and 3 (Task, task dependency) are exact fidelity and confirmed correct."
-      - "Rows 1, 4, 5, 6, 8, 9, 10 (DAG, ExternalTaskSensor, dataset scheduling, operator, connection/pool, owner, schedule) are approximate fidelity — the SME accepts the approximation and its noted caveat for each."
+      - "Rows 1, 4, 5, 6, 8a, 8c, 9, 10 (DAG, ExternalTaskSensor, dataset scheduling, operator, queue, connection, owner, schedule) are approximate fidelity — the SME accepts the approximation and its noted caveat for each."
       - "Row 5's open question (does dataset-aware scheduling need a richer Condition property set?) is resolved or explicitly deferred."
       - "Row 6's open question (per-operator crosswalk table for INVOKES targets) is resolved or explicitly deferred."
-      - "Row 8's open question (does Connection need to split into target-system vs execution-host/queue?) is resolved or explicitly deferred."
+      - "Row 8a's cardinality is confirmed 1-to-many: a queue maps to :ControlMHostGroup -[:CONTAINS_HOST]-> member :ExecutionHost nodes (the controlm-hosts-topology pattern, signed off 2026-07-09), with a hard-pinned single worker as the 1-hop RUNS_ON {role: agent_host} case — never a flat queue -> single-ExecutionHost mapping. (Row 8 split 8a/8b/8c at the 2026-07-14 SME wording review.)"
+      - "Row 8c's open question (where Connection target-system data lands — DataAsset reference vs job properties) is resolved or explicitly deferred."
   - title: "C. No-equivalent concepts"
     confirmations:
       - "Row 7 (trigger rule vocabulary) is confirmed NO-EQUIVALENT for a 1:1 translation — it will not be mapped field-for-field; any condition-logic design work routes through ontology-mapper."
       - "Row 11 (XCom) is confirmed NO-EQUIVALENT and will never be modeled as a graph node/edge — it is an execution-time detail, not structural lineage."
       - "Row 12 (dynamic task mapping / .expand()) is confirmed NO-EQUIVALENT and flagged as the clearest AutoSys/Airflow-vs-baseline concept mismatch — a mapped task must never be silently treated as a single Job; any modeling need routes through ontology-mapper."
+      - "Row 8b (Pool) is confirmed NO-EQUIVALENT until a Quantitative Resource concept exists — a concurrency semaphore is never folded into :ExecutionHost; if quantitative resources are modeled (they exist in the CM_ physical model), the mapping routes through ontology-mapper."
       - "No Airflow concept in this crosswalk has been silently approximated into a new node/edge type — every non-exact row is explicitly flagged."
   - title: "D. Sign-off"
     confirmations:
-      - "All 12 rows in config/crosswalks/airflow-to-bmc.yaml were reviewed and are correct as either exact, approximate, or no-equivalent."
+      - "All 14 rows in config/crosswalks/airflow-to-bmc.yaml were reviewed and are correct as either exact, approximate, or no-equivalent."
       - "Safe to transcribe into config/gate-log.md and set confirmed: true (airflow-mwaa source row status only — a loader must still be implemented and separately gated before any load runs)."
