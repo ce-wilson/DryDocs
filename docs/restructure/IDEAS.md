@@ -26,6 +26,17 @@ Tags help grooming: `idea` · `bug` · `doc` · `source` (new data source) · `q
 
 <!-- add new ideas at the top -->
 
+- 2026-07-13 — [chore] **UI work stalled at 2026-07-07, split across two branches — needs a
+  reconcile decision.** Findings from a status review: (1) `feature/ui-dark-landing-myapps`
+  local and origin have DIVERGED — same two commits, different hashes (local `d44b916` is a
+  rebase of pushed `965445c`); sync needs `--force-with-lease` or delete/re-push. (2) The
+  branch's Control-M ingestion TDD copy is OBSOLETE — main's landed separately and moved on
+  (Rev 2 `2a979f2`, L1 outline refit `79947ba`), so the branch's only unique value is the
+  landing page `UI-WIP/drydocs-landing-dark.html`. (3) Untracked `UI-WIP/` files (design-review.md, wireframe
+  PDF, ui-nav-flow.mermaid, wireframe-guide.md, 2026-07-06) are machine-local only — commit
+  or discard. (4) Decide whether the landing-page branch rebases onto main or folds into
+  `feat/web-console-design-pass` (the branch O1/Epic O tracks; 2 ahead / 138 behind main).
+
 - 2026-07-12 — [idea] **dry-docs.com site visual language**: seed from the whitepaper's
   "overnight ledger" identity (greenbar/banner-page/mono-display; canonical source stays
   docs/whitepaper/drydocs-whitepaper.md). Parked until website work starts — the site is
