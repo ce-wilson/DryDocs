@@ -36,6 +36,12 @@ Tags help grooming: `idea` · `bug` · `doc` · `source` (new data source) · `q
   PDF, ui-nav-flow.mermaid, wireframe-guide.md, 2026-07-06) are machine-local only — commit
   or discard. (4) Decide whether the landing-page branch rebases onto main or folds into
   `feat/web-console-design-pass` (the branch O1/Epic O tracks; 2 ahead / 138 behind main).
+  **RESOLVED 2026-07-14** (a third strand, `origin/feat/web-login-mock` 2026-07-13, had
+  appeared with verified O2 work): (1)+(4) landing mock extracted to `UI-WIP/` on main,
+  `feature/ui-dark-landing-myapps` deleted local+origin — no rebase/fold needed; (2) obsolete
+  TDD copy dropped with the branch; (3) machine-local UI-WIP files committed (Internal-Public).
+  Plus: `feat/web-login-mock` --no-ff merged to main (O2 done in backlog), branch deleted.
+  `feat/web-console-design-pass` left standing — its Claude-Designer mockup is still unmerged.
 
 - 2026-07-12 — [idea] **dry-docs.com site visual language**: seed from the whitepaper's
   "overnight ledger" identity (greenbar/banner-page/mono-display; canonical source stays
