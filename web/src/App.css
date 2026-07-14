@@ -50,3 +50,133 @@ pre {
   white-space: pre-wrap;
   word-break: break-word;
 }
+
+/* ── O2 mock sign-in + role-gated shell ─────────────────────────────────────
+   Palette tokens from UI-WIP/icons.md + the dark-landing mockup's badge colors.
+   Deliberately additive — the dark-theme overhaul is O1 design-pass scope. */
+
+:root {
+  --dd-red-0: #e23a54;
+  --dd-teal: #38d6c4;
+  --dd-amber: #eeab4d;
+  --dd-snow-read: #4d8be0;
+  --dd-snow-contribute: #3aae6b;
+  --dd-snow-admin: #c8202e;
+  --dd-snow-admin-text: #e4525d;
+  --dd-pat: #d9b831;
+  --dd-muted: #8a97a8;
+}
+
+.tag {
+  font-family: monospace;
+  font-size: 0.7rem;
+  letter-spacing: 0.04em;
+  padding: 0.15rem 0.5rem;
+  border: 1px solid var(--dd-amber);
+  border-radius: 4px;
+  color: var(--dd-amber);
+  white-space: nowrap;
+}
+
+.userchip {
+  font-family: monospace;
+  font-size: 0.75rem;
+  padding: 0.2rem 0.6rem;
+  border: 1px solid #8886;
+  border-radius: 999px;
+  color: var(--dd-muted);
+  white-space: nowrap;
+}
+
+.mock-banner {
+  font-family: monospace;
+  font-size: 0.75rem;
+  text-align: center;
+  padding: 0.35rem 0.75rem;
+  background: rgba(238, 171, 77, 0.12);
+  border-bottom: 1px solid var(--dd-amber);
+  color: var(--dd-amber);
+}
+
+.shell-head {
+  display: flex;
+  gap: 0.75rem;
+  align-items: center;
+  flex-wrap: wrap;
+  padding: 0.6rem 1.5rem;
+  border-bottom: 1px solid #8884;
+}
+
+.shell-head .brand { font-weight: 700; color: var(--dd-red-0); }
+.shell-head .spacer { flex: 1; }
+
+.shell-nav { display: flex; gap: 0.25rem; }
+.shell-nav a {
+  padding: 0.25rem 0.7rem;
+  border-radius: 6px;
+  text-decoration: none;
+  color: inherit;
+  opacity: 0.75;
+}
+.shell-nav a.active { border: 1px solid #646cff; opacity: 1; }
+
+.env-toggle { display: flex; gap: 0; border: 1px solid #8886; border-radius: 6px; overflow: hidden; }
+.env-toggle button { border: none; border-radius: 0; font-size: 0.75rem; padding: 0.25rem 0.6rem; opacity: 0.6; }
+.env-toggle button.active { opacity: 1; border-bottom: 2px solid var(--dd-teal); }
+
+.signin-page { max-width: 480px; margin: 10vh auto 0; padding: 1.5rem; text-align: left; }
+.signin-panel { border: 1px solid #8884; border-radius: 8px; padding: 1rem; }
+.signin-head { display: flex; gap: 0.75rem; align-items: center; }
+.signin-head h2 { margin: 0; }
+
+.persona-list { display: flex; flex-direction: column; gap: 0.6rem; margin-top: 0.75rem; }
+.persona-card {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 0.15rem 0.75rem;
+  text-align: left;
+  padding: 0.6rem 0.8rem;
+  cursor: pointer;
+}
+.persona-card .persona-name { font-weight: 600; }
+.persona-card .persona-id { font-family: monospace; font-size: 0.8rem; color: var(--dd-snow-read); grid-row: 2; }
+.persona-card .persona-chip { font-size: 0.75rem; color: var(--dd-muted); grid-row: 3; grid-column: 1 / -1; }
+.role-badge {
+  font-family: monospace;
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  padding: 0.1rem 0.45rem;
+  border-radius: 4px;
+  align-self: start;
+}
+.role-badge.role-user { border: 1px solid var(--dd-snow-read); color: var(--dd-snow-read); }
+.role-badge.role-admin { border: 1px solid var(--dd-snow-admin); color: var(--dd-snow-admin-text); }
+
+.view-head { display: flex; gap: 0.75rem; align-items: center; flex-wrap: wrap; }
+.view-head h1 { margin: 0.5rem 0; }
+
+.app-cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 0.75rem; margin: 1rem 0; }
+.app-card { border: 1px solid #8884; border-radius: 9px; padding: 0.8rem; }
+.app-card-row { display: flex; justify-content: space-between; align-items: center; gap: 0.5rem; }
+.app-id { font-family: monospace; font-size: 0.8rem; color: var(--dd-snow-read); }
+.app-name { font-weight: 600; font-size: 1.05rem; margin-top: 0.4rem; }
+.app-desc { font-size: 0.85rem; color: var(--dd-muted); margin: 0.15rem 0 0.6rem; }
+.app-card-foot { border-top: 1px solid #8883; padding-top: 0.5rem; font-size: 0.85rem; }
+
+.badge-snow, .badge-pat {
+  font-family: monospace;
+  font-size: 0.7rem;
+  padding: 0.15rem 0.45rem;
+  border-radius: 4px;
+  white-space: nowrap;
+}
+.badge-snow-read { border: 1px solid var(--dd-snow-read); color: var(--dd-snow-read); background: rgba(77, 139, 224, 0.1); }
+.badge-snow-contribute { border: 1px solid var(--dd-snow-contribute); color: var(--dd-snow-contribute); background: rgba(58, 174, 107, 0.1); }
+.badge-snow-admin { border: 1px solid var(--dd-snow-admin); color: var(--dd-snow-admin-text); background: rgba(200, 32, 46, 0.12); }
+.badge-pat { border: 1px solid var(--dd-pat); color: var(--dd-pat); background: rgba(217, 184, 49, 0.08); }
+
+.gov-tiles { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 0.75rem; margin: 1rem 0; }
+.gov-tile { border: 1px solid #8884; border-radius: 9px; padding: 1rem; }
+.gov-value { font-size: 1.8rem; color: var(--dd-muted); }
+.gov-label { font-weight: 600; margin-top: 0.25rem; }
+.gov-hint { font-size: 0.78rem; color: var(--dd-muted); margin-top: 0.25rem; }
