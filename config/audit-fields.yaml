@@ -104,3 +104,13 @@ sources:
       Confirmed 2026-07-14 (gate autosys-crosswalk) as a crosswalk sign-off only.
       Native audit columns are unknowable until a live JIL export exists; the
       envelope gate runs with the future loader gate.
+
+  - id: stg-app-fact
+    status: stub                             # envelope gate not run — staging table authored by our own normalizer
+    notes: >
+      Confirmed 2026-07-14 (gate seal-attribution-match-policy; K2 loader built
+      the same activation). STG_APP_FACT is the normalizer's OWN staging output —
+      run_id already carries the pull lineage, and the K2 loader writes edges
+      only (the envelope is node-level authorship, which this loader never
+      touches). Whether a source-authorship envelope even applies to a
+      self-authored staging table is a doc-06 Phase 4 gate question.

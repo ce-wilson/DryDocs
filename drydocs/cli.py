@@ -21,6 +21,10 @@ Ingest commands:
                                     config/taxonomy/software-registry.yaml
   drydocs load-bmc-docs           — bmc-docs lexical graph (Document -> Chunk)
                                     from external/orchestration/bmc-controlm/
+  drydocs load-seal-attribution   — K2: STG_APP_FACT facts -> job
+                                    WAS_ASSOCIATED_WITH {role: seal_app_ref} edges
+  drydocs load-manual-mappings    — tier-5 SME-authored mapping CSV
+                                    (config/manual-loads/, PIN semantics)
 """
 from __future__ import annotations
 
@@ -65,6 +69,20 @@ from .loaders.controlm_conditions_out import ControlMConditionsOutLoader
 from .loaders.controlm_dependencies_derived import ControlMDependenciesDerivedLoader
 from .loaders.controlm_folders import ControlMFoldersLoader
 from .loaders.controlm_jobs import ControlMJobsLoader
+from .loaders.manual_loads import (
+    ManualLoadError,
+    ManualMappingAdapter,
+    ManualSealAttributionLoader,
+    parse_mapping_csv,
+)
+from .loaders.seal_attribution import (
+    SealAttributionAdapter,
+    SealAttributionLoader,
+    TierReconcilers,
+    check_sequencing_preconditions,
+    fetch_app_name_reconciler,
+    fetch_pinned_attributions,
+)
 from .loaders.software_registry import (
     DEFAULT_REGISTRY_PATH,
     RegistryYamlAdapter,
@@ -511,6 +529,88 @@ def load_bmc_docs(
     adapter = BmcDocsAdapter(corpus_dir)
     with _client() as cli:
         summary = BmcDocsLoader(cli, adapter).load()
+    console.print(summary.as_dict())
+
+
+@app.command(name="load-seal-attribution")
+def load_seal_attribution(
+    csv_path: Path | None = typer.Option(
+        None,
+        "--csv",
+        help="STG_APP_FACT export CSV; omit to run the Oracle extract "
+             "(controlm_app_facts.sql against DRYDOCS_STG).",
+    ),
+    batch_size: int = typer.Option(1000, "--batch-size"),
+) -> None:
+    """K2: attribute jobs to SEAL applications from STG_APP_FACT facts.
+
+    Match policy SME-confirmed at gate seal-attribution-match-policy
+    (2026-07-14): precedence SEAL > FID > APP_NAME > ALIAS, one-to-one accept
+    at the top available tier, deterministic multi-hit tie-break (flagged for
+    audit), manually-pinned jobs excluded (PIN-CONFLICTs surfaced). Writes
+    ONLY (:ControlMJob)-[:WAS_ASSOCIATED_WITH {role:'seal_app_ref'}]->
+    (:Application) edges — never nodes. Coverage counts (matched + unmatched
+    + pinned = eligible) are stamped on the :JobRun and reconciled by
+    graph-tests/seal-attribution-coverage.yaml.
+    """
+    _gate_source("stg-app-fact")  # confirmed-gate before any DB write
+    if csv_path is not None:
+        inner = _csv_adapter(csv_path)
+    else:
+        sql = (SQL_DIR / "controlm_app_facts.sql").read_text(encoding="utf-8")
+        inner = _oracle_adapter(sql, name="controlm_app_facts.sql")
+    with _client() as cli:
+        # Sequencing preconditions (gate §E): jobs + SEAL reference first.
+        jobs, apps = check_sequencing_preconditions(cli)
+        if not jobs or not apps:
+            console.print(
+                f"[red]Sequencing precondition failed (gate §E): the graph has "
+                f"{jobs} ControlMJob and {apps} Application nodes — run "
+                f"`drydocs ingest-controlm` and `drydocs refresh-reference` "
+                f"(SEAL) before the attribution load.[/]"
+            )
+            raise typer.Exit(2)
+        adapter = SealAttributionAdapter(
+            inner,
+            reconcilers=TierReconcilers(
+                app_name=fetch_app_name_reconciler(cli),
+            ),
+            pinned=fetch_pinned_attributions(cli),
+        )
+        summary = SealAttributionLoader(cli, adapter, batch_size=batch_size).load()
+        console.print(summary.as_dict())
+        if adapter.coverage is not None:
+            console.print({"coverage": adapter.coverage.as_dict()})
+            if not adapter.coverage.reconciles():
+                console.print(
+                    "[red]Coverage invariant violated: matched + unmatched + "
+                    "pinned != eligible_jobs (gate §B).[/]"
+                )
+                raise typer.Exit(1)
+
+
+@app.command(name="load-manual-mappings")
+def load_manual_mappings(
+    csv_path: Path = typer.Argument(
+        ...,
+        help="SME-authored mapping CSV, registered in "
+             "config/manual-loads/manifest.yaml BEFORE load.",
+    ),
+) -> None:
+    """Tier-5 manual mapping load (gate seal-attribution-match-policy §F).
+
+    Manifest-gated: the CSV must be registered with a named replaces_with
+    automation path. Edges written here PIN — the automated attribution
+    loader never silently supersedes them; retirement is a human act
+    (manifest entry -> superseded).
+    """
+    try:
+        rows = parse_mapping_csv(csv_path)
+    except ManualLoadError as exc:
+        console.print(f"[red]{exc}[/]")
+        raise typer.Exit(2) from exc
+    with _client() as cli:
+        summary = ManualSealAttributionLoader(cli, ManualMappingAdapter(rows)).load()
     console.print(summary.as_dict())
 
 

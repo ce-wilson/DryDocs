@@ -165,19 +165,22 @@ sources:
     orchestrator: ~                      # not an orchestration vendor — a staging table fed by the C3/C4 variable-normalization stream
     adapter: oracle
     feeds_taxonomy: [applications]       # semantic facts attribute a ControlMJob to an Application (SEAL)
-    confirmed: false                     # registered per K1 flag — not yet SME-confirmed; no loader exists yet (see K2)
+    confirmed: true                      # gate seal-attribution-match-policy SIGNED OFF 24/24 (2026-07-14, config/gate-log.md) — the entry's own activation condition
+    gate_spec: config/gate-prompts/seal-attribution-match-policy.yaml
+    loader: drydocs/loaders/seal_attribution.py   # built with the flip (K2); cypher seal_attribution.cypher
     notes: >
       Registered per K1's flag (docs/restructure/backlog.yaml Epic K): job.APPLICATION
       (CM_DEF_VJOB) is NOT reliable SEAL identity — the SEAL-attribution feed is this
       table's semantic facts instead. Rows carry fact_type in {SEAL, FID, APP_NAME,
       ALIAS, ...} + fact_value, one row per (run, job, fact_type) — see
       docs/controlm-staging-ingestion-flow.md (STG_APP_FACT ER block) and
-      docs/reviews/sdlc-oracle-ingestion.md §FR-OI-007. Feeds the planned
+      docs/reviews/sdlc-oracle-ingestion.md §FR-OI-007. Feeds the now-ACTIVE
       m3_seal_app_ref mapping (WAS_ASSOCIATED_WITH, role seal_app_ref,
-      drydocs_core/ontology/relationship_vocabulary.yaml, status: planned) and the
-      corresponding taxonomy-ontology-map.yaml entry (status: proposed). Mechanism-only
+      drydocs_core/ontology/relationship_vocabulary.yaml) and the confirmed
+      taxonomy-ontology-map.yaml entry (job-seal-app-ref). Mechanism-only
       here — no real SEAL id / FID / application-name values, column/fact-type names
-      only. Activate (confirmed: true) only after the K2 match-policy gate (SEAL-fact
-      precedence; one-to-one accepted, zero-unmatched surfaced, multi-hit triage) is
-      SME-confirmed via the HITL gate and logged in config/gate-log.md — see
-      docs/restructure/03-hitl-sme-flow.md.
+      only. ACTIVATED 2026-07-14 with the K2 loader build: the match-policy gate
+      (SEAL-fact precedence; one-to-one accepted, zero-unmatched surfaced, multi-hit
+      deterministic triage; manual tier-5 PIN) was SME-confirmed and logged that day —
+      exactly the activation condition this entry carried since K1. Extract:
+      drydocs/loaders/sql/controlm_app_facts.sql (ORDER BY = the tie-break contract).

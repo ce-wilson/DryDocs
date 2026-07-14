@@ -709,14 +709,21 @@ local_relationships:
       variable-normalization stream — NEVER raw job.APPLICATION, which both
       repos' loader comments document as unreliable for SEAL identity.
       Registered 2026-07-01 from the company reconciliation (spec-level on
-      both repos as of this writing: no loader, no supplement, no gate log).
-      Activation requires the HITL gate to confirm the match policy
-      (one-to-one accepted, zero-unmatched surfaced, multi-hit resolved via
-      deterministic triage/precedence) — see backlog K2.
-    supplement:   ~
-    loader:       ~
+      both repos at registration). ACTIVATED with the K2 loader build:
+      match policy SME-confirmed at gate seal-attribution-match-policy
+      (config/gate-log.md, 2026-07-14 — precedence SEAL > FID > APP_NAME >
+      ALIAS; one-to-one accept; zero-unmatched surfaced via the JobRun
+      coverage stamp + graph-tests/seal-attribution-coverage.yaml;
+      deterministic multi-hit tie-break, flagged for audit; manual tier-5
+      PIN semantics per config/manual-loads/). K3 RIDER: this shape
+      type-checks while :Application is still prov:SoftwareAgent — the K4
+      reclass re-opens the edge SHAPE at its own follow-up gate (see the
+      map entry's type_conflict_note); the confirmed match policy itself
+      is shape-agnostic and carries over.
+    supplement:   ontology_supplement.cypher
+    loader:       seal_attribution.cypher
     domain:       controlm
-    status:       planned
+    status:       active
 
   - id:           m3_invokes
     neo4j_label:  INVOKES

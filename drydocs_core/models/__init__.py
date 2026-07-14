@@ -29,6 +29,7 @@ from .controlm import (
 )
 from .registry import SoftwareProductRow
 from .docs import BmcDocChunkRow
+from .attribution import ManualMappingRow, SealAttributionRow, StgAppFactRow
 
 __all__ = [
     # SEAL
@@ -53,4 +54,8 @@ __all__ = [
     "SoftwareProductRow",
     # bmc-docs lexical graph (Document -> Chunk)
     "BmcDocChunkRow",
+    # SEAL attribution (K2 — STG_APP_FACT facts -> WAS_ASSOCIATED_WITH edges)
+    "StgAppFactRow",
+    "SealAttributionRow",
+    "ManualMappingRow",
 ]
