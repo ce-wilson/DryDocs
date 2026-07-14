@@ -26,7 +26,17 @@ Tags help grooming: `idea` · `bug` · `doc` · `source` (new data source) · `q
 
 <!-- add new ideas at the top -->
 
-- 2026-07-14 — [chore] **schema_graph.cypher is stale — generated 2026-06-09, vocabulary has
+- 2026-07-14 — [idea] **Two support queries proven live on the internal graph — candidates for
+  the O5 thin-API named endpoints + the runbook skill.** (1) Dependency-chain finder: bind two
+  jobs by job_name (index seek), undirected `shortestPath((a)-[:WAS_INFORMED_BY*..15]-(b))`,
+  return hop names + per-edge `via_condition` + hop count — answered in single-digit ms on the
+  real estate; the "how are these two jobs connected?" triage question. (2) Folder-scoped
+  dependency census: folder→CONTAINS_JOB→job→WAS_INFORMED_BY with a sched_table filter,
+  returning edges / distinct successors / cross-folder edge count — on one real product stream
+  ~69% of dependency edges were CROSS-FOLDER (the quantitative case that folder-scoped runbooks
+  miss most of the dependency surface; a headline stat for the whitepaper/value story).
+  Mechanism-only here; real names stay internal (photo evidence 2026-07-14). Groom into O5's
+  endpoint list when it starts, and consider both for controlm-runbook-automation. — generated 2026-06-09, vocabulary has
   moved on** (docs_* edges, m3_runs_on_*, seal_requires_scheduler, and now the ACTIVE
   m3_seal_app_ref are all absent; no drift guard covers it, found during the K2 build).
   Either regenerate it from relationship_vocabulary.yaml + add a guard, or mark it
