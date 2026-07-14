@@ -30,7 +30,7 @@ function ResultTable({ result }: { result: CypherResult }) {
   )
 }
 
-export default function CypherConsole() {
+export default function CypherConsole({ personaId }: { personaId: string }) {
   // --- basic flow: browser -> bolt -> Neo4j -----------------------------------
   const [uri, setUri] = useState(env.VITE_NEO4J_URI ?? 'bolt://localhost:7687')
   const [user, setUser] = useState(env.VITE_NEO4J_USER ?? 'neo4j')
@@ -61,7 +61,8 @@ export default function CypherConsole() {
   const [events, setEvents] = useState<AdkEvent[] | null>(null)
   const [agentStatus, setAgentStatus] = useState('')
 
-  const userId = 'local-dev'
+  // ADK sessions are scoped to the signed-in mock persona (was hardcoded 'local-dev')
+  const userId = personaId
 
   async function onListApps() {
     setAgentStatus('listing…')
@@ -95,10 +96,11 @@ export default function CypherConsole() {
 
   return (
     <main>
-      <h1>DryDocs web — sandbox test page</h1>
+      <h1>Console — admin sandbox</h1>
       <p className="note">
-        Throwaway test surface: no design pass yet. Flow 1 talks straight to the local
-        Docker Neo4j over bolt/WebSocket; flow 2 goes through the Google ADK api_server.
+        Direct bolt + ADK test surface (pre-dates the O1 access decision). Flow 1 talks
+        straight to the local Docker Neo4j over bolt/WebSocket; flow 2 goes through the
+        Google ADK api_server as persona <code>{personaId}</code>.
       </p>
 
       <section>
