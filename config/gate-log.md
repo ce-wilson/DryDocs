@@ -235,3 +235,30 @@ records the date, the item, confirmed / edited / rejected counts, and reasons fo
   `seal-tom-attribution` / `seal-doc-source-of-record` proposed→confirmed→applied (with `vocab_id` +
   `capture` per F5/C7), and the SEAL/PAT precedence wiring — is **backlog K4**. The Product Cabinet is
   **K5**. K2's edge shape stays deferred.
+
+## 2026-07-14 — Airflow/MWAA → BMC baseline crosswalk gate — SIGNED OFF (F2)
+
+- **Gate:** `config/gate-prompts/airflow-crosswalk.yaml` (17 confirmations), reviewed via the rendered
+  page; **ACCEPTED IN FULL** (chad.wilson, 2026-07-14). Same-day pre-sign-off context (commit 9334bf3):
+  row 8 split 8a/8b/8c at the SME wording review; Software/§A registry linkage added (the vendor/product
+  remediation gap); registry rows `airflow`/`apache` created for it.
+- **§A — CONFIRMED** (crosswalk-only scope; public concepts only; bmc-baseline stays authority 1).
+  **Registration ratified:** SoftwareProduct `airflow` MADE_BY `apache` (ADR 0004, vendor = the brand).
+  **MWAA disposition ratified:** NOT a separate product — stock Airflow object model, AWS-managed
+  deployment.
+- **§B — CONFIRMED.** Rows 2, 3 exact; rows 1, 4, 5, 6, 8a, 8c, 9, 10 approximate, caveats accepted.
+  **Row 8a cardinality confirmed 1-to-many:** queue → `:ControlMHostGroup -[:CONTAINS_HOST]->
+  :ExecutionHost` (the controlm-hosts-topology pattern, signed off 2026-07-09); hard-pinned worker =
+  the 1-hop `RUNS_ON {role: agent_host}` case; never queue → single ExecutionHost.
+  **DEFERRED: 3 open questions, all to loader design** (stay live in the crosswalk's `open_questions`,
+  must be resolved before/with the future loader gate): row 5 (richer Condition property set for
+  datasets), row 6 (per-operator INVOKES crosswalk table), row 8c (Connection target-system landing —
+  DataAsset reference vs job properties).
+- **§C — CONFIRMED NO-EQUIVALENT:** rows 7 (trigger-rule vocabulary), 11 (XCom — never modeled),
+  12 (dynamic task mapping — the flagged drift risk), 8b (Pool → Quantitative Resource, unmodeled —
+  never folded into ExecutionHost). Nothing silently approximated.
+- **§D — SIGNED OFF.** **Confirmed: A, B, C · Deferred: 3 (§B rows 5/6/8c) · Edited: 0 · Rejected: 0.**
+- **Lifecycle (applied in this commit):** `config/crosswalks/airflow-to-bmc.yaml` status proposed →
+  **confirmed** (file-level + all 14 rows); source-registry `airflow-mwaa` → **confirmed: true**
+  (source-row status ONLY — no loader exists; a loader must be implemented and separately gated before
+  any load runs); backlog **F2 → done**. AutoSys (F1) unchanged — its gate remains pending.

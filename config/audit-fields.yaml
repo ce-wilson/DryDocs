@@ -30,7 +30,7 @@
 # =============================================================================
 schema: drydocs.audit-fields.v1
 classification: Internal-Public
-updated: 2026-07-07
+updated: 2026-07-14
 
 # The four envelope property names, frozen (test-enforced).
 envelope:
@@ -90,3 +90,10 @@ sources:
       replication/capture time, never authorship — same rule as CAPTURE_DATE. A real
       envelope (BMC page authorship) is not exposed by the source; decide whether the
       stub is permanent at a doc-06 Phase 4 gate.
+
+  - id: airflow-mwaa
+    status: stub                             # envelope gate not run — crosswalk-only activation, no loader/live export
+    notes: >
+      Confirmed 2026-07-14 (gate airflow-crosswalk) as a crosswalk sign-off only.
+      Native audit columns are unknowable until a live MWAA DAG export exists;
+      the envelope gate runs with the future loader gate.

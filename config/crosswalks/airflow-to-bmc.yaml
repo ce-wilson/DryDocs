@@ -29,7 +29,7 @@ classification: External
 source_registry_ref: airflow-mwaa       # config/source-registry.yaml id
 narrative_ref: external/orchestration/airflow/README.md
 gate_spec: config/gate-prompts/airflow-crosswalk.yaml
-status: proposed                        # crosswalk-wide status; flips at the gate
+status: confirmed                       # gate airflow-crosswalk SIGNED OFF 2026-07-14 (config/gate-log.md)
 
 rows:
   - n: 1
@@ -37,7 +37,7 @@ rows:
     baseline: Folder
     node: "ControlMFolder (Collection)"
     fidelity: approximate
-    status: proposed
+    status: confirmed
     note: >
       A statically-defined DAG maps cleanly to a Folder. Fidelity drops to approximate
       because Airflow DAGs can be generated dynamically at parse time (a Python loop
@@ -50,7 +50,7 @@ rows:
     baseline: Job
     node: ControlMJob
     fidelity: exact
-    status: proposed
+    status: confirmed
     note: "One Airflow task instance definition = one Control-M job. Direct match."
 
   - n: 3
@@ -58,7 +58,7 @@ rows:
     baseline: "OUT->IN dependency"
     node: WAS_INFORMED_BY
     fidelity: exact
-    status: proposed
+    status: confirmed
     note: "Airflow's explicit bitshift dependency graph is a direct match to Control-M producer->consumer dependency edges."
 
   - n: 4
@@ -66,7 +66,7 @@ rows:
     baseline: "IN condition"
     node: "REQUIRES_IN_CONDITION -> Condition"
     fidelity: approximate
-    status: proposed
+    status: confirmed
     note: >
       Waits on another DAG/task's state — conceptually an IN condition, but the sensor
       polls a task-instance state store rather than consuming a discrete condition
@@ -77,7 +77,7 @@ rows:
     baseline: "IN/OUT condition (data-driven)"
     node: "REQUIRES_IN_CONDITION / EMITS_OUT_CONDITION -> Condition"
     fidelity: approximate
-    status: proposed
+    status: confirmed
     note: >
       Airflow Datasets are closer in spirit to Control-M conditions than
       ExternalTaskSensor is (both are "produced token unlocks consumer"), but Datasets
@@ -90,7 +90,7 @@ rows:
     baseline: "invoked script / ETL process"
     node: "INVOKES -> Script / ETLProcess"
     fidelity: approximate
-    status: proposed
+    status: confirmed
     note: >
       Fidelity depends entirely on operator type: BashOperator/SparkSubmitOperator map
       cleanly to "invokes a script/job"; PythonOperator (arbitrary inline Python
@@ -103,7 +103,7 @@ rows:
     baseline: "no direct baseline equivalent for the full vocabulary"
     node: "n/a (condition-logic property, not a node)"
     fidelity: no-equivalent
-    status: proposed
+    status: confirmed
     note: >
       Control-M expresses dependency success/failure branching through IN-condition
       combinations (AND/OR condition sets) and On-Do statement actions, not a
@@ -120,7 +120,7 @@ rows:
     baseline: "host group (load-balanced worker set)"
     node: "ControlMHostGroup -[:CONTAINS_HOST]-> ExecutionHost"
     fidelity: approximate
-    status: proposed
+    status: confirmed
     note: >
       1-to-many, never a single host: a queue routes each task to ONE of a set of
       workers — the Control-M host-group pattern signed off at gate
@@ -134,7 +134,7 @@ rows:
     baseline: "quantitative resource (not yet modeled)"
     node: "n/a"
     fidelity: no-equivalent
-    status: proposed
+    status: confirmed
     note: >
       A pool is a semaphore (N slots shared across tasks), not a host. The baseline
       analog is the Control-M Quantitative Resource — present in the CM_ physical
@@ -147,7 +147,7 @@ rows:
     baseline: "target-system reference (split out from execution host)"
     node: "n/a (target-system data; NOT ExecutionHost)"
     fidelity: approximate
-    status: proposed
+    status: confirmed
     note: >
       A Connection names the system a task talks TO (DB, API), not where it runs.
       The old row-8 "does Connection need to split?" question is resolved by this
@@ -160,7 +160,7 @@ rows:
     baseline: "run-as user"
     node: AppUser
     fidelity: approximate
-    status: proposed
+    status: confirmed
     note: >
       Airflow `owner` is typically a human/team label shown in the UI, not a run-as
       service identity the way Control-M OWNER is. Same node target, weaker fidelity —
@@ -172,7 +172,7 @@ rows:
     baseline: "scheduling (calendar / cyclic definition)"
     node: "job schedule properties"
     fidelity: approximate
-    status: proposed
+    status: confirmed
     note: >
       A plain cron string maps cleanly to Control-M scheduling. A custom Timetable
       subclass (arbitrary Python logic deciding the next run) has no baseline analog —
@@ -183,7 +183,7 @@ rows:
     baseline: "no-equivalent"
     node: "n/a"
     fidelity: no-equivalent
-    status: proposed
+    status: confirmed
     note: >
       XCom is an in-DAG-run data-passing mechanism (small values between tasks via the
       metadata DB), with no Control-M object counterpart (Control-M jobs communicate
@@ -196,7 +196,7 @@ rows:
     baseline: "no-equivalent (drift risk)"
     node: "n/a"
     fidelity: no-equivalent
-    status: proposed
+    status: confirmed
     note: >
       Generates N task instances at runtime from a mapped input; Control-M has no
       static-definition analog (folders/jobs are defined ahead of run time, not
