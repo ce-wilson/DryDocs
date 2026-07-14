@@ -605,8 +605,96 @@ PROCEDURE:
         render_board venv gotcha).
     - KNOWN-PENDING carried by design (do not "fix" during the port): no airflow/autosys
       loaders (activation is source-row only, each loader gets its own gate); P2 loader
-      blocked on the P1 probes (company-side run); K2 loader authorized, not built;
-      ADR 0005 awaiting acceptance; E1 deferred.
+      blocked on the P1 probes (company-side run); K2 loader authorized, not built
+      (BUILT same day — step 32 supersedes this line); ADR 0005 awaiting acceptance;
+      E1 deferred.
+
+32. K2 SEAL ATTRIBUTION LOADER BUILD — m3_seal_app_ref GOES ACTIVE (2026-07-14, same day as
+    the step-31 gate session; branch feat/k2-seal-attribution-loader merged --no-ff, commit
+    "feat(load): K2 SEAL attribution loader …"). Implements the seal-attribution-match-policy
+    gate exactly; read that gate-log entry (incl. its "Build landed" bullet) before resolving.
+    - Clean-adds (drydocs/loaders/** + tests are canonical-producer rows):
+      drydocs/loaders/seal_attribution.py (pure match-policy resolver — tier precedence
+      SEAL > FID > APP_NAME > ALIAS, SEAL-alone, one-to-one accept, deterministic multi-hit
+      tie-break flagged for audit, PIN-aware; TierReconcilers seam — APP_NAME reconciles from
+      the loaded SEAL reference, FID/ALIAS ship EMPTY awaiting company-side tables, facts stay
+      counted-unresolved, never guessed), seal_attribution.cypher (gate §D shape EXACTLY:
+      MATCH-only endpoints — creates NO nodes; ON CREATE first_seen_at/source/match_method,
+      SET last_seen_at/last_run_id; manual-pin WHERE guard), manual_loads.py +
+      manual_seal_attribution.cypher (§F tier 5: manifest-gated, never mints a relationship
+      type, manually_created stamps), controlm_app_facts.sql (its ORDER BY stg_run.started_at,
+      app_fact_sk IS the tie-break contract — do not drop it), drydocs_core/models/
+      attribution.py (StgAppFactRow/SealAttributionRow/ManualMappingRow), tests/unit/
+      test_seal_attribution.py + test_manual_loads.py + tests/fixtures/attribution/ (SYNTHETIC).
+    - Integration points (collision, ADDITIVE — preserve existing bodies): drydocs/cli.py gains
+      load-seal-attribution (source-gated, §E sequencing precondition, coverage printed +
+      invariant enforced) + load-manual-mappings + the two loader imports;
+      drydocs_core/models/__init__.py adds the three attribution rows (union rule, manifest row).
+    - Canonical-here (step 6) / per-entry (manifest): relationship_vocabulary.yaml
+      m3_seal_app_ref planned -> ACTIVE with supplement ontology_supplement.cypher + loader
+      seal_attribution.cypher recorded — per-entry rule: never downgrade; the K3/K4 rider stays
+      in the note (the K4 reclass re-opens the edge SHAPE at its own gate).
+      ontology_supplement.cypher gains the role-discriminated WAS_ASSOCIATED_WITH block
+      (iri #wasAssociatedWithSealAppRef, MAPS_TO prov:wasAssociatedWith) — test_schema.py
+      requires it for the active entry. EXPECTED_CONSTRAINTS UNCHANGED (40): edges only.
+    - SOURCE-ROW FLIP, ONE UNIT (the step-31 coupling pattern — take config + tests together):
+      source-registry stg-app-fact confirmed: true (per the activation condition that entry has
+      carried since K1 — the now-logged match-policy gate) + gate_spec/loader pointers;
+      audit-fields.yaml stg-app-fact stub; test_source_mapping_drift.py LEDGER_PENDING
+      (+stg-app-fact — ledger belongs to the doc-08 STG census); test_source_registry.py
+      gate-state pin (+stg-app-fact). Your own registry rows follow YOUR gate sessions as ever.
+    - graph-tests/seal-attribution-coverage.yaml: producer-authored verify suite (6 TCs — §D
+      shape props, one-to-one automated attribution, match_method vocabulary, JobRun coverage
+      reconciliation matched+unmatched+pinned=eligible, latest-run edge bookkeeping,
+      manual-node stamps). graph-tests/** is canonical-company ON COLLISION; absent
+      company-side it clean-adds.
+    - config/gate-log.md: the 2026-07-14 K2 entry gains a "Build landed" lifecycle bullet —
+      union-append as ever. Planning stream: backlog K2 -> done (+ phase 9 -> in_progress),
+      board render, IDEAS captures (schema_graph.cypher staleness; FID/ALIAS reconciliation
+      tables = company-side unblocks).
+    - COMPANY MUST SUPPLEMENT (cannot be built producer-side): the FID -> seal_id and alias
+      reconciliation tables (wire them into TierReconcilers at the CLI); the LIVE attribution
+      load (Track-2 — run after your jobs + SEAL loads; the map entry job-seal-app-ref flips
+      confirmed -> applied only when a live run writes edges); real manual CSVs under internal/
+      with YOUR manifest entries (never from a port, step-31 rule). Tracked as rows T1–T4 in
+      the COMPANY-SIDE TRACKER below — flip statuses there, in your copy.
+
+COMPANY-SIDE TRACKER — LIVE-LOAD + SUPPLEMENT STATUS (maintained COMPANY-SIDE):
+The steps above name company-side obligations in scattered "COMPANY MUST SUPPLEMENT" /
+Track-2 notes; this table consolidates the trackable ones so you can see at a glance whether
+the live load is done. The Status column is CANONICAL-COMPANY: the producer ships every row
+`pending` (it cannot observe your graph) and NEVER flips one — you flip rows in YOUR copy as
+work lands (`pending` / `in-progress` / `done` / `n-a`, with a date). On a re-port collision
+KEEP YOUR statuses; producer edits only add rows or refine the done-means criteria.
+
+| Row | Item (origin step)                                        | Status  |
+|-----|-----------------------------------------------------------|---------|
+| T1  | K2 LIVE attribution load — Track-2 (step 32)              | pending |
+| T2  | FID -> seal_id reconciliation table wired (step 32)       | pending |
+| T3  | ALIAS reconciliation table wired (step 32)                | pending |
+| T4  | Real tier-5 manual CSVs, as needed (step 32)              | pending |
+| T5  | P1 internal probes P0/P4 — unblocks P2 loader (step 31)   | pending |
+| T6  | Docs Track-2: docs-fetch/docs-load vs real sources (16)   | pending |
+| T7  | Live multi-DB Enterprise Neo4j deploy — G7 half (16)      | pending |
+| T8  | M0 equivalence unblocks: A3 filename + B1 dot rule (29)   | pending |
+
+Done-means (checkable — a row flips `done` only when ALL its checks hold):
+- T1: `drydocs load-seal-attribution` run AFTER your Control-M jobs + SEAL reference loads
+  (the §E sequencing precondition exits 2 otherwise); the printed coverage reconciles —
+  matched + unmatched + pinned = eligible, exit 0 (the command exits 1 on violation);
+  graph-tests/seal-attribution-coverage.yaml all 6 TCs green via graph_verify; THEN flip the
+  map entry job-seal-app-ref confirmed -> applied in config/taxonomy-ontology-map.yaml — that
+  flip is the durable record of T1 (`applied` = a loader has written the graph). Unmatched
+  facts do NOT block done — §B: they are surfaced on the JobRun, never silently dropped.
+- T2/T3: the reconciliation table is sourced and wired into TierReconcilers at the CLI
+  (both tiers ship EMPTY — facts count unresolved, never guessed); done when that tier's
+  facts resolve in coverage. After wiring, RE-RUN T1's load — edges MERGE idempotently and
+  newly resolvable jobs attribute on the re-run.
+- T4: real CSVs under internal/ + YOUR manifest entries (replaces_with REQUIRED, never from
+  a port); `drydocs load-manual-mappings` clean; coverage TC-06 manual-node stamps green.
+  Flip `n-a` if automation coverage suffices and no manual pins are needed.
+- T5–T8: done-means live in their origin steps (31 / 16 / 16 / 29 respectively) — this table
+  only carries their status so one section answers "what is still owed company-side".
 
 ACCEPTANCE GATE (behavior is the contract, not a byte-compare):
 - Track 1 (portable, no production sample present):
@@ -626,10 +714,11 @@ ACCEPTANCE GATE (behavior is the contract, not a byte-compare):
   AND the remediation suites (step 29: test_remediation_scaffold / _m0 / _tier1 / _handoff /
   _no_graph_write / _corroborate — synthetic fixtures, no network/DB). All portable: stdlib +
   PyYAML, the committed BMC corpus under external/, no network/DB.
-  test_schema.py expects EXPECTED_CONSTRAINTS = 40 (steps 19 + 22; UNCHANGED by steps 25-31 — the
-  Epic P loaders are not built yet, remediation loads nothing, and the step-31 gate session flips
-  config statuses only) and a supplement block for the
-  4 active `docs_*` edges; test_bmc_docs pins EXPECTED_DOC_COUNT = 27 (step 22). Both CI guards
+  test_schema.py expects EXPECTED_CONSTRAINTS = 40 (steps 19 + 22; UNCHANGED by steps 25-32 — the
+  Epic P loaders are not built yet, remediation loads nothing, the step-31 gate session flips
+  config statuses only, and the step-32 K2 loader writes edges only) and a supplement block for the
+  4 active `docs_*` edges + the step-32 m3_seal_app_ref WAS_ASSOCIATED_WITH block;
+  test_bmc_docs pins EXPECTED_DOC_COUNT = 27 (step 22). Both CI guards
   must pass: test_schema.py (no `active` relationship without its supplement block) and
   test_classification.py (every source in source-registry.yaml has a valid sensitivity
   classification). New dep: PyYAML.
@@ -637,9 +726,11 @@ ACCEPTANCE GATE (behavior is the contract, not a byte-compare):
   516 passed / 3 skipped at the step-29 remediation head (2026-07-10);
   588 passed / 6 skipped / 3 deselected at the step-31 gate-session head (2026-07-14 — the 3
   deselected are the J9 testcontainers e2e without Docker; 3 of the 6 skips are the J7 reconcile
-  guards, which RUN consumer-side once RECONCILE_BEFORE_DIR is set). Step-31 coupling reminder:
-  source-registry confirmed flips + audit-fields stubs + LEDGER_PENDING + the test_source_registry
-  gate-state pins move as ONE unit.
+  guards, which RUN consumer-side once RECONCILE_BEFORE_DIR is set);
+  625 passed / 6 skipped at the step-32 K2-loader head (2026-07-14 — +37 attribution/manual-loads
+  tests; same deselect/skip structure). Step-31/32 coupling reminder: source-registry confirmed
+  flips + audit-fields stubs + LEDGER_PENDING + the test_source_registry gate-state pins move as
+  ONE unit.
 
 BOUNDARIES:
 - One-way only. Never add company main as a remote on the producer; never push back to

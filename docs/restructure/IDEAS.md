@@ -26,6 +26,18 @@ Tags help grooming: `idea` · `bug` · `doc` · `source` (new data source) · `q
 
 <!-- add new ideas at the top -->
 
+- 2026-07-14 — [chore] **schema_graph.cypher is stale — generated 2026-06-09, vocabulary has
+  moved on** (docs_* edges, m3_runs_on_*, seal_requires_scheduler, and now the ACTIVE
+  m3_seal_app_ref are all absent; no drift guard covers it, found during the K2 build).
+  Either regenerate it from relationship_vocabulary.yaml + add a guard, or mark it
+  point-in-time and stop implying "regenerate when the vocabulary changes".
+
+- 2026-07-14 — [source] **K2 FID / ALIAS reconciliation tables are company-side unblocks.**
+  The attribution loader's TierReconcilers seam ships empty for FID and ALIAS (facts stay
+  unresolved, counted in coverage) — tier 2 needs a FID -> seal_id source and tier 4 an
+  alias table before those tiers resolve anything. APP_NAME reconciles today from the
+  loaded SEAL reference (exact normalized match; ambiguous names excluded).
+
 - 2026-07-14 — [idea] **internal psgmgr now derives `ctlm_id` = `folder_id.job_id`** (e.g.
   `161015.7`; recorded at the P2 avg-run gate sign-off as the §B join upgrade). Ripple beyond
   CM_AVG_RUN to check: (1) which other CM_ views/extracts carry it — could replace weak joins

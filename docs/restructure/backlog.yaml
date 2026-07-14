@@ -81,7 +81,7 @@ plan:
     - id: 9
       title: Application attribution
       goal: "Jobs attributed to SEAL applications (seal_app_ref) end-to-end — gate-confirmed match policy, loader, verify coverage (Epic K)."
-      status: todo
+      status: in_progress   # K1/K2/K3 done (loader BUILT 2026-07-14); K4 reshape-apply + K5 remain; live load is Track-2
     - id: 10
       title: Documentation infrastructure
       goal: "Every design doc (TDD/Runbook/BRD) conforms to a canonical outline; deterministic md→HTML/PDF render; HITL markup loop (digital + pen/paper) re-attaches to a requirement-traceability spine (Epic L)."
@@ -1379,7 +1379,7 @@ items:
     agent: main
     model: sonnet
     priority: p2
-    status: in_progress
+    status: done
     depends_on: [K1, K3]
     inputs: [drydocs/staging.py, drydocs/loaders/, config/source-registry.yaml, docs/restructure/03-hitl-sme-flow.md]
     acceptance: >
@@ -1409,6 +1409,26 @@ items:
       shape (a: prov:used vs b: local BELONGS_TO_APPLICATION) is DEFERRED to a K2 follow-up gate.
       K2 stays in_progress: still needs (1) that deferred edge-shape decision and (2) its own
       match-policy gate before the loader is built.
+      2026-07-14: match-policy gate SIGNED OFF 24/24 (config/gate-log.md) — the shape question
+      resolved as: current WAS_ASSOCIATED_WITH shape type-checks TODAY, the K4 reclass re-opens
+      it at its own follow-up gate; the confirmed policy is shape-agnostic. Loader build unblocked.
+    progress: >
+      2026-07-14 — BUILT + DONE (branch feat/k2-seal-attribution-loader, same day as the
+      gate): drydocs/loaders/seal_attribution.py (pure resolver — tier precedence, SEAL-alone,
+      one-to-one accept, deterministic tie-break flagged for audit, TierReconcilers seam:
+      APP_NAME from the loaded SEAL reference, FID/ALIAS await company-side tables; PIN-aware)
+      + seal_attribution.cypher (gate §D shape exactly, MATCH-only endpoints, manual-pin guard)
+      + manual_loads.py/manual_seal_attribution.cypher (§F tier 5: manifest-gated,
+      never-mint-a-relationship, manually_created stamps) + controlm_app_facts.sql (ORDER BY =
+      the tie-break contract) + CLI load-seal-attribution/load-manual-mappings (§E sequencing
+      precondition). m3_seal_app_ref planned -> ACTIVE (supplement + loader recorded; K3/K4
+      rider intact); stg-app-fact confirmed: true per its own recorded activation condition,
+      as ONE unit with the audit-fields stub + LEDGER_PENDING + registry-pin test. Coverage
+      invariant joined graph_verify (graph-tests/seal-attribution-coverage.yaml, 6 TCs;
+      JobRun stamps matched+unmatched+pinned=eligible, edges_written/dropped_in_graph).
+      37 offline tests on the synthetic fixture; suite 625/6. Acceptance met at build scope:
+      the LIVE load (edges in the company graph) is Track-2 — map entry job-seal-app-ref
+      stays confirmed (flips applied only when a live run writes it).
 
   - id: K3
     epic: seal-attribution
@@ -2502,7 +2522,7 @@ items:
 # that these match the items exactly; update them with any status change.
 summary:
   todo: 20                                          # +O4/O5/O6 (ADR 0005 follow-ups) groomed 2026-07-14
-  in_progress: 4                                   # E1 (gate deferred), K2 (loader build — gate SIGNED OFF 2026-07-14), O1 (web design pass), O3 (ADR 0005 ratification — awaiting SME)
+  in_progress: 3                                   # E1 (gate deferred), O1 (web design pass), O3 (ADR 0005 ratification — awaiting SME)
   blocked: 0
-  done: 62                                          # F1+F2+P2 gates SIGNED OFF 2026-07-14
-  next_ready: [C5, L7, L8, L9, L12, M2, M3, M4, P1, C7, K4, K5, J10]  # O4/O5 wait on O3 (ACCEPTED flip); O6 on O4+O5
+  done: 63                                          # K2 loader BUILT 2026-07-14 (same day as its gate); F1+F2+P2 gates SIGNED OFF 2026-07-14
+  next_ready: [C5, L7, L8, L9, L12, M2, M3, M4, P1, C7, K4, K5, J10]  # K2 done unblocks nothing; O4/O5 wait on O3 (ACCEPTED flip); O6 on O4+O5

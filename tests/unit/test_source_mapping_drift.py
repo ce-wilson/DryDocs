@@ -227,8 +227,12 @@ def test_census_with_uncounted_sweep_fails() -> None:
 # airflow-mwaa / autosys-export (2026-07-14, gates airflow-crosswalk /
 # autosys-crosswalk): crosswalk-only activations — no live export exists, so
 # there are no columns to ledger; each ledger ships with its future loader gate.
+# stg-app-fact (2026-07-14, gate seal-attribution-match-policy; K2 loader built
+# with the flip): the table is our own normalizer's staging output — its column
+# ledger belongs to the doc-08 STG census (Phase 2), not the K2 slice.
 LEDGER_PENDING = frozenset(
-    {"seal-extract", "catalog-pat", "software-registry", "bmc-docs", "airflow-mwaa", "autosys-export"}
+    {"seal-extract", "catalog-pat", "software-registry", "bmc-docs",
+     "airflow-mwaa", "autosys-export", "stg-app-fact"}
 )
 
 
