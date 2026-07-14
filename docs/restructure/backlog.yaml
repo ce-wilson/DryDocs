@@ -2082,7 +2082,7 @@ items:
     agent: main
     model: sonnet
     priority: p2
-    status: in_progress
+    status: done
     depends_on: []
     inputs: [web/src/, UI-WIP/drydocs-landing-dark.html, UI-WIP/DryDocs_UI_Development_Specs.md, UI-WIP/icons.md]
     acceptance: >
@@ -2106,6 +2106,16 @@ items:
       decision. Hash-based view switching (no react-router) and no vitest (pure-TS auth
       module gated by tsc + runtime drive) — both revisitable post-O1. Model sonnet per the
       matrix (written acceptance; not a boundary decision).
+      DONE 2026-07-13 (same day, branch feat/web-login-mock, commits B-E): lib/auth.ts
+      (localStorage session, role re-derived from PERSONAS — forged/garbage blobs degrade
+      to sign-in) + lib/views.ts (single canSee registry; unauthorized deep links normalize
+      to the role default) + data/myApps.ts (SYNTHESIZED, mirrors the dd270b2 mockup) +
+      SignIn/Shell/MyApps/Governance components + App orchestrator; ADK userId = persona id.
+      Verified: build+lint green; headless-Edge CDP drive 27/27 (sign-in-only fresh state,
+      user hash-guard fallback, reload persistence, sign-out, admin all-views + env toggle,
+      ADK request URL carries asmith7734, bolt wiring fires, corrupt-blob degradation);
+      publish-boundary grep clean (synthetics only). Live-DB rows check env-gated (Docker
+      down) — bolt flow moved verbatim in commit C, wiring proven by connection attempt.
 
   # ── Epic P — Runtime topology & maintenance windows — Phase 13 ─────────────
   # Born 2026-07-09: CM_HOSTS + CM_AVG_RUN onboarded via the add-source-object
@@ -2356,7 +2366,7 @@ items:
 # that these match the items exactly; update them with any status change.
 summary:
   todo: 17                                          # +J10 (ruff cleanup), +L12 (render-fidelity rule) groomed 2026-07-13
-  in_progress: 7                                   # E1, F1, F2, K2, P2 (awaiting HITL), O1 (web design pass), O2 (mock sign-in)
+  in_progress: 6                                   # E1, F1, F2, K2, P2 (awaiting HITL), O1 (web design pass)
   blocked: 0
-  done: 58                                          # G10 held-docs SME gate DONE 2026-07-12 (kept out permanently; README §HELD)
+  done: 59                                          # O2 mock sign-in DONE 2026-07-13 (feat/web-login-mock)
   next_ready: [C5, L7, L8, L9, L12, M2, M3, M4, P1, C7, K4, K5, J10]  # J10 dep J5 done; L12 no deps
