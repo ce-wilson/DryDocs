@@ -14,6 +14,7 @@ session that never opens the ADR body.
 | [0002-c — depgraph lineage re-home](0002-c-depgraph-lineage-rehome.md) | `depgraph@feat/controlm-lineage` absorbed as `drydocs-lineage`; one parser in core (delta fold = backlog G8, done) |
 | [0003 — "Application" naming disambiguation](0003-application-naming-disambiguation.md) | Source terms verbatim on source nodes; `:Application` stays the SEAL-keyed canon; reconcile by relationship; bind renderers substitute in code regions only (comments/strings verbatim); BMC labels take the `ControlM` prefix (`JobFolder` → `ControlMFolder`) |
 | [0004 — "Vendor" means the brand](0004-software-registry-vendor-terminology.md) | Software registry: `:Vendor` (org:Organization) = brand only; `:SoftwareProduct.role` absorbs the Tier-1/Tier-2 split; `MADE_BY` → prov:wasAttributedTo, `USES_SOFTWARE` local; `vendor-bmc` tooling id → `bmc-docs`; icons stay Brands |
+| [0005 — browser↔Neo4j access path](0005-browser-neo4j-access-path.md) | **PROPOSED** — thin API over bolt-from-browser: server-held credentials, session auth (enterprise-OIDC-ready per sanitized company evidence), one read-only enforcement point; the O1 crux |
 
 ## Rejected alternatives worth not re-litigating (ADR 0002, "Options Considered")
 

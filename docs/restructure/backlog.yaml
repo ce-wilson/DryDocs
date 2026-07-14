@@ -2083,6 +2083,12 @@ items:
       forced by any real login — mock deliberately doesn't decide it), a REAL C4/graph view
       against the live EE DB (NVL or successor) instead of the synthesized SVGs, wireframes
       committed, build/run docs.
+      2026-07-14 (later) — ADR 0005 DRAFTED, status PROPOSED (docs/decisions/0005): thin API
+      recommended over bolt-from-browser, grounded in sanitized company-side evidence (the
+      enterprise already runs FastAPI-class + OIDC SSO + server-held machine creds; screenshot
+      held out of repo, mechanism-not-instance). Awaiting the SME accept/edit/reject call —
+      the acceptance's "decision recorded" ticks when 0005 flips ACCEPTED. Follow-up items
+      (drydocs-api scaffold, live graph view over the API) groom into Epic O on acceptance.
 
   - id: O2
     epic: web-console
