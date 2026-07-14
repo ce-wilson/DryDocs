@@ -178,3 +178,22 @@ MERGE (n:OntologyTerm:LocalRelationship {iri: "https://drydocs.local/ontology#wa
 MATCH (local:OntologyTerm:LocalRelationship {iri: "https://drydocs.local/ontology#wasInformedBy"})
 MATCH (prov:OntologyTerm:ProvProperty       {iri: "http://www.w3.org/ns/prov#wasInformedBy"})
 MERGE (local)-[:MAPS_TO]->(prov);
+
+// WAS_ASSOCIATED_WITH {role: seal_app_ref}  —  ControlMJob → Application  (prov:wasAssociatedWith)
+// K2 activation (gate seal-attribution-match-policy, 2026-07-14). IRI is
+// role-discriminated: the label hosts future roles (owner/author) with their
+// own declarations. K3 rider: type-checks while :Application is prov:SoftwareAgent;
+// the K4 reclass re-opens the edge shape at its own gate.
+MERGE (n:OntologyTerm:LocalRelationship {iri: "https://drydocs.local/ontology#wasAssociatedWithSealAppRef"})
+  SET n.label  = "WAS_ASSOCIATED_WITH",
+      n.role   = "seal_app_ref",
+      n.domain = "ControlMJob",
+      n.range  = "Application",
+      n.notes  = "Job attributed to its SEAL-registered application via STG_APP_FACT "
+               + "semantic facts (precedence SEAL > FID > APP_NAME > ALIAS; never raw "
+               + "job.APPLICATION). Matrix row: Activity → Agent = prov:wasAssociatedWith. "
+               + "role=seal_app_ref discriminates from future owner/author roles. "
+               + "Loader: seal_attribution.cypher; manual tier-5 pins via manual_seal_attribution.cypher.";
+MATCH (local:OntologyTerm:LocalRelationship {iri: "https://drydocs.local/ontology#wasAssociatedWithSealAppRef"})
+MATCH (prov:OntologyTerm:ProvProperty       {iri: "http://www.w3.org/ns/prov#wasAssociatedWith"})
+MERGE (local)-[:MAPS_TO]->(prov);

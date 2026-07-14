@@ -79,7 +79,10 @@ def test_real_registry_gate_state() -> None:
     reg = SourceRegistry.from_yaml(DEFAULT_REGISTRY_PATH)
     # airflow-mwaa / autosys-export: crosswalk gates signed off 2026-07-14
     # (source-row activation only — loading still requires a loader + its own gate).
-    for live in ("controlm-psgmgr", "seal-extract", "catalog-pat", "airflow-mwaa", "autosys-export"):
+    # stg-app-fact: match-policy gate signed off 2026-07-14; the K2 loader
+    # (drydocs/loaders/seal_attribution.py) was built with the flip.
+    for live in ("controlm-psgmgr", "seal-extract", "catalog-pat", "airflow-mwaa",
+                 "autosys-export", "stg-app-fact"):
         assert reg.is_confirmed(live), f"{live} should be confirmed"
     for placeholder in ("oracle-schemas", "snowflake"):
         assert not reg.is_confirmed(placeholder), f"{placeholder} should be unconfirmed"
