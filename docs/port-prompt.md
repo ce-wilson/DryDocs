@@ -535,8 +535,8 @@ PROCEDURE:
       node_target is POLYMORPHIC (gate controlm-hosts-topology) — resolution is Epic P.
 
 31. QUALITY BATCH + DOCS + WEB CONSOLE (O2) + THE 2026-07-14 GATE SESSION (2026-07-11 →
-    2026-07-14; 45 commits, subjects "fix(lineage): restore +x on collect/rua_inventory.sh" →
-    "gate(seal-attribution-match-policy): SIGNED OFF 24/24"; four streams):
+    2026-07-14; 48 commits, subjects "fix(lineage): restore +x on collect/rua_inventory.sh" →
+    "docs(ui): wf-console-01 — add paired blank sketch sheets after every view"; four streams):
     - NON-HITL QUALITY BATCH (J-series + G11 + N2, 2026-07-12): J5 adds .github/workflows CI
       running the CLAUDE.md test gates + a publish-boundary guard (NEW manifest row .github/**
       = evaluate: the guard is producer-remote-specific and GHE Actions runners/policies are
@@ -559,7 +559,10 @@ PROCEDURE:
       state — persona MOCK auth (localStorage, SYNTHETIC personas; real authn/authz is
       explicitly deferred to ADR 0005), role-gated shell, My Apps view, CypherConsole; plus
       the UI-WIP/ design record (wireframe guide/PDF, nav-flow mermaid, design review, dark
-      landing mock). NEW manifest rows: web/** and UI-WIP/** canonical-producer. web/ ships
+      landing mock; wf-console-01.{html,pdf} — the range's two closing commits — is the
+      printable SME-review wireframe: per-view element keys, Neo4j label key tables, and a
+      paired blank sketch sheet after every view — the Epic-L pen/paper HITL loop pointed at
+      the UI). NEW manifest rows: web/** and UI-WIP/** canonical-producer. web/ ships
       .env.example ONLY — Vite inlines VITE_* values into the built bundle, so a committed
       VITE_NEO4J_PASSWORD is a secret in a publishable artifact; your .env.local stays
       gitignored. .gitattributes gains `*.pdf binary` (take it — guards committed PDFs against
