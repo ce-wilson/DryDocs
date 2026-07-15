@@ -2240,7 +2240,7 @@ items:
     agent: main
     model: fable
     priority: p2
-    status: todo
+    status: done
     depends_on: [O3]
     inputs: [docs/decisions/0005-browser-neo4j-access-path.md, docs/decisions/0002-component-database-topology.md, agents/common/neo4j_tool.py, drydocs_core/, MODULE_MAP.md]
     acceptance: >
@@ -2261,6 +2261,17 @@ items:
       to the groom-backlog flow). Model fable per the component-boundary precedent (G3/G4
       re-tiers): new COMPONENT_GROUP + MODULE_MAP boundary work. NOT an ADK api_server
       extension — shared guard pattern only. New module drydocs-api registered this groom.
+      DONE 2026-07-14 (same day, branch feat/o5-drydocs-api, d7c21f3): drydocs_api/ —
+      guard (code-regions write-token check; READ routing = 2nd layer), routing
+      (fail-closed per-view DB map), queries (overview-counts, folder-census +
+      dependency-chain from the live-proven IDEAS capture, c4-graph for O6), auth stub
+      (personas drift-guarded against web auth.ts by a TS-parsing test; opaque tokens,
+      role server-side), pure handlers + optional-group FastAPI wiring (poetry
+      --with api; CORS for the console origins). REAL wiring smoke caught + fixed a
+      PEP-563/FastAPI body-detection bug the pure tests couldn't see. 22 offline tests +
+      TestClient smoke; suite 655/3; boundary green with the new `api` group; lock
+      regenerated. LIVE-DB exercise deferred to O6 (Docker down today; LiveRunner is
+      env-config only).
 
   - id: O6
     epic: web-console
@@ -2538,8 +2549,8 @@ items:
 # Roll-up the dispatcher can glance at. COMPUTED views — test_backlog.py enforces
 # that these match the items exactly; update them with any status change.
 summary:
-  todo: 19                                          # O4 done 2026-07-14 (GraphAccess seam)
+  todo: 18                                          # O5 done 2026-07-14 (thin-API scaffold)
   in_progress: 2                                   # E1 (gate deferred), O1 (web design pass — remainder = O6)
   blocked: 0
-  done: 65                                          # O4 seam refit DONE 2026-07-14 (same day as O3)
-  next_ready: [C5, L7, L8, L9, L12, M2, M3, M4, P1, C7, K4, K5, J10, O5]  # O6 waits on O5 now (O4 done)
+  done: 66                                          # O3+O4+O5 all closed 2026-07-14 — the ADR-0005 chain
+  next_ready: [C5, L7, L8, L9, L12, M2, M3, M4, P1, C7, K4, K5, J10, O6]  # O6 unblocked (O4+O5 done) — the live C4 view
