@@ -10,7 +10,7 @@
 # =============================================================================
 
 schema: drydocs.precedence.v1
-updated: 2026-06-20
+updated: 2026-07-15   # K4 clause 7 — seal-pat-source-of-record wired into the live chain
 
 # The ordered authority chain. Lower index = higher authority.
 order:
@@ -32,8 +32,22 @@ order:
       Company conventions that refine the baseline for our environment. They normalize and
       disambiguate baseline values but do not redefine baseline concepts.
 
-  - id: lob-product-team
+  - id: seal-pat-source-of-record
     authority: 3
+    role: internal-source-of-record
+    governs: [internal-product-identity, internal-business-identity, application-fact-provenance]
+    source: "drydocs-docmeta scraped SEAL/PAT corpus (component pending; see knowledge/upgrade-plans/docmeta-component.md)"
+    rationale: >
+      SEAL/PAT scraped documentation is the authoritative source for internal product/business
+      IDENTITY — when a scraped SEAL/PAT fact conflicts with the catalog/PAT taxonomy on what
+      an internal application/product IS (not who owns it), SEAL/PAT wins. Placed ABOVE
+      lob-product-team because its identity claims must beat the catalog's; ownership/
+      business-context stays with lob-product-team (disjoint governs). WIRED at K4 clause 7
+      (2026-07-15; gate 2026-07-10 §D sign-off) from the former proposed_additions block.
+      No feed exists until drydocs-docmeta ships — the authority is live but silent.
+
+  - id: lob-product-team
+    authority: 4
     role: org-taxonomy
     governs: [ownership, business-context, LOB, ProductLine, Product, AreaProduct, DevTeam]
     source: internal/org/        # confidential rosters live here
@@ -53,37 +67,15 @@ conflict_policy:
 active:
   bmc-baseline: true
   internal-standards: true
+  seal-pat-source-of-record: true   # live but silent until the docmeta corpus feeds it
   lob-product-team: true
 
 # =============================================================================
-# PROPOSED addition (GATE-BOUND, 2026-07-08 review) — NOT part of the live chain above.
-# drydocs_core/precedence.py#PrecedenceResolver reads ONLY `order:` / `active:` / `conflict_policy:`
-# above; this block is a separate top-level key and is therefore INERT to the resolver — adding
-# it here does not change is_active()/rank() for bmc-baseline / internal-standards /
-# lob-product-team, and does not affect tests/unit/test_precedence.py. Wiring this into the live
-# `order:`/`active:` chain (with an explicit `authority:` number) is a SEPARATE, later step, done
-# only after the SME confirms at the gate.
+# History: the seal-pat-source-of-record authority above was PROPOSED at the
+# 2026-07-08 review as an inert `proposed_additions:` block, gate-confirmed
+# 2026-07-10 (config/gate-prompts/seal-tom-attribution-reshape.yaml §D), and
+# WIRED into the live `order:`/`active:` chain at K4 clause 7 (2026-07-15).
+# The linked mechanism is prov:hadPrimarySource on every extracted fact —
+# config/taxonomy-ontology-map.yaml#seal-doc-source-of-record (confirmed) and
+# relationship_vocabulary.yaml#seal_had_primary_source (active, edge-only).
 # =============================================================================
-proposed_additions:
-  - id: seal-pat-source-of-record
-    role: internal-source-of-record
-    governs: [internal-product-identity, internal-business-identity, application-fact-provenance]
-    source: "drydocs-docmeta scraped SEAL/PAT corpus (planned component; see knowledge/upgrade-plans/docmeta-component.md)"
-    rationale: >
-      PROPOSED 2026-07-08 review: register SEAL/PAT scraped documentation as the authoritative
-      source for internal product/business IDENTITY — when a scraped SEAL/PAT fact conflicts
-      with the catalog/PAT taxonomy on what an internal application/product IS (not who owns
-      it), SEAL/PAT wins once this is activated. Distinct from, and narrower than,
-      lob-product-team (which governs ownership/business-context, not fact identity). This is
-      one of two linked source-of-record mechanisms — the other is `prov:hadPrimarySource` on
-      every extracted fact (see config/taxonomy-ontology-map.yaml#seal-doc-source-of-record and
-      drydocs_core/ontology/relationship_vocabulary.yaml#seal_had_primary_source, both
-      status: planned/proposed).
-    status: proposed
-    gate_prompt: config/gate-prompts/seal-tom-attribution-reshape.yaml
-    activation_note: >
-      NOT wired into the live `order:`/`active:` chain the resolver reads. Activating this
-      authority is a separate, later change: append an entry to `order:` above with an explicit
-      `authority:` number (placement relative to the existing 3 authorities is itself an open
-      question for the SME) and add it to `active:` — only after gate confirmation, never as a
-      side effect of confirming this proposed_additions block alone.
