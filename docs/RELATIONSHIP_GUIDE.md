@@ -147,8 +147,9 @@ MATCH (prov:OntologyTerm:ProvProperty       {iri: "http://www.w3.org/ns/prov#use
 MERGE (local)-[:MAPS_TO]->(prov);
 ```
 
-If a new node type is introduced, also add a `NODE KEY` constraint to the
-domain constraints file (e.g., `m3_constraints_upgrade.cypher`):
+If a new node type is introduced, also add a `NODE KEY` constraint to
+`drydocs_core/schema/constraints.cypher` (the consolidated constraints file —
+the former `m3_constraints_upgrade.cypher` was absorbed into it):
 
 ```cypher
 CREATE CONSTRAINT yournode_key IF NOT EXISTS
@@ -192,11 +193,16 @@ Run these once per environment, in order, after `drydocs bootstrap`:
 
 ```bash
 drydocs apply-ontology-supplement  # Control-M node types + relationships
-drydocs apply-seal-supplement     # SEAL node types + relationships
-drydocs apply-catalog-supplement  # Catalog node types + relationships
+drydocs apply-seal-supplement      # SEAL node types + relationships
+drydocs apply-catalog-supplement   # Catalog node types + relationships
+drydocs apply-registry-supplement  # software-registry terms (Vendor, SoftwareProduct)
 ```
 
 All commands are idempotent — safe to re-run after any supplement update.
+
+`drydocs apply-sosa-supplement` (SOSA/SSN context-graph terms) is
+**experimental and opt-in** — deliberately not part of the bootstrap
+sequence; every term it seeds carries `adoption: "experimental"`.
 
 ---
 
@@ -274,22 +280,25 @@ the critical one: it fails if you add a vocabulary entry and set it to
 ## File map
 
 ```
-drydocs/
+drydocs_core/
   ontology/
-    relationship_vocabulary.yaml      ← registry (edit this first)
-    namespaces.py                     ← IRI prefix definitions
+    relationship_vocabulary.yaml       ← registry (edit this first)
+    namespaces.py                      ← IRI prefix definitions
   schema/
-    ontology.cypher                   ← PROV-O base terms (do not edit)
-    ontology_supplement.cypher     ← Control-M local terms
-    seal_ontology_supplement.cypher   ← SEAL local terms
-    catalog_ontology_supplement.cypher← Catalog local terms
-    constraints.cypher                ← node key constraints
-    m3_constraints_upgrade.cypher     ← M3-specific constraints
+    ontology.cypher                    ← PROV-O base terms (do not edit)
+    ontology_supplement.cypher         ← Control-M local terms
+    seal_ontology_supplement.cypher    ← SEAL local terms
+    catalog_ontology_supplement.cypher ← Catalog local terms
+    registry_ontology_supplement.cypher← software-registry terms
+    sosa_experimental_supplement.cypher← SOSA/SSN (opt-in, experimental)
+    constraints.cypher                 ← node key constraints (incl. M3)
+drydocs/
+  cli.py                               ← apply-<domain>-supplement commands
   loaders/
-    cypher/                           ← one .cypher per loader
+    cypher/                            ← one .cypher per loader
 tests/
   unit/
-    test_schema.py                    ← includes vocabulary drift guard
+    test_schema.py                     ← includes vocabulary drift guard
 docs/
-  RELATIONSHIP_GUIDE.md               ← this file
+  RELATIONSHIP_GUIDE.md                ← this file
 ```
