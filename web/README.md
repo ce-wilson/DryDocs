@@ -23,6 +23,23 @@ uses the signed-in persona id as its `userId`.
 Run it: `cp .env.example .env.local` (point `VITE_NEO4J_URI` at your local Neo4j,
 e.g. the EE container on `bolt://localhost:7689`), then `npm install && npm run dev`.
 
+## Graph access (ADR 0005) — the GraphAccess seam
+
+Console code reads the graph ONLY through the `GraphAccess` interface
+(`src/lib/graph.ts`); view components never import `neo4j-driver`. Two adapters:
+
+- **`api`** (`src/lib/graphApi.ts`) — the deployment path (the `drydocs-api`
+  thin API); fails loud until that component lands, never silently falls back
+  to bolt.
+- **`bolt`** (`src/lib/neo4j.ts`) — a **dev-mode tool only**: reachable only in
+  dev builds (`import.meta.env.DEV`) AND for the admin role (`boltAllowed()`);
+  production bundles have the path compiled out.
+
+**Dev-mode credential rule:** the Neo4j password is form-entered at runtime,
+localhost targets only. Never define `VITE_NEO4J_PASSWORD` in any env file or
+CI — Vite inlines `VITE_*` values into the built bundle, so a committed or
+injected password becomes a secret inside a publishable artifact.
+
 ---
 
 # React + TypeScript + Vite
