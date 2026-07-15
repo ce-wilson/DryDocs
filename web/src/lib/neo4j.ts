@@ -1,4 +1,11 @@
 import neo4j, { Driver } from 'neo4j-driver'
+import type { GraphAccess, GraphResult } from './graph'
+
+// THE BOLT ADAPTER — a dev-mode tool, not the deployment path (ADR 0005).
+// Only createBoltAccess is exported: console code reaches this module solely
+// through the GraphAccess seam, and callers must gate on graph.boltAllowed()
+// (dev build + admin role). Credentials are form-entered at runtime; never
+// seed them from VITE_* env (Vite inlines those into the built bundle).
 
 // One driver per page — the driver owns a connection pool; recreating it per
 // query leaks WebSocket connections (the classic browser-driver mistake and
@@ -6,7 +13,7 @@ import neo4j, { Driver } from 'neo4j-driver'
 let driver: Driver | null = null
 let driverKey = ''
 
-export function getDriver(uri: string, user: string, password: string): Driver {
+function getDriver(uri: string, user: string, password: string): Driver {
   const key = `${uri}|${user}|${password}`
   if (driver && driverKey === key) return driver
   if (driver) void driver.close() // settings changed: release the old pool
@@ -15,18 +22,13 @@ export function getDriver(uri: string, user: string, password: string): Driver {
   return driver
 }
 
-export interface CypherResult {
-  keys: string[]
-  rows: Record<string, unknown>[]
-}
-
-export async function runCypher(
+async function runCypher(
   uri: string,
   user: string,
   password: string,
   database: string,
   query: string,
-): Promise<CypherResult> {
+): Promise<GraphResult> {
   const session = getDriver(uri, user, password).session({
     database,
     defaultAccessMode: neo4j.session.READ,
@@ -47,4 +49,18 @@ export async function runCypher(
   } finally {
     await session.close() // sessions are per-query; never cache them
   }
+}
+
+export interface BoltSettings {
+  uri: string
+  user: string
+  password: string
+  database: string
+}
+
+export function createBoltAccess(s: BoltSettings): GraphAccess {
+  return {
+    kind: 'bolt',
+    runRead: (query) => runCypher(s.uri, s.user, s.password, s.database, query),
+  } satisfies GraphAccess
 }

@@ -61,7 +61,7 @@ export default function App() {
     >
       {route.view === 'landing' && <Landing tower={route.tower} persona={persona} />}
       {route.view === 'my-apps' && <MyApps persona={persona} />}
-      {route.view === 'console' && <CypherConsole personaId={session.personaId} />}
+      {route.view === 'console' && <CypherConsole personaId={session.personaId} role={session.role} />}
       {route.view === 'governance' && <Governance />}
     </Shell>
   )

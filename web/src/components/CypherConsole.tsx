@@ -1,6 +1,8 @@
 import { useState } from 'react'
-import { runCypher, type CypherResult } from '../lib/neo4j'
+import { boltAllowed, type GraphResult } from '../lib/graph'
+import { createBoltAccess } from '../lib/neo4j'
 import { listApps, createSession, runAgent, type AdkEvent } from '../lib/adk'
+import type { Role } from '../lib/auth'
 
 const env = import.meta.env
 
@@ -10,7 +12,7 @@ const PRESETS: Record<string, string> = {
   'Label counts': 'MATCH (n) RETURN labels(n) AS labels, count(*) AS count ORDER BY count DESC',
 }
 
-function ResultTable({ result }: { result: CypherResult }) {
+function ResultTable({ result }: { result: GraphResult }) {
   if (result.rows.length === 0) return <p>0 rows.</p>
   return (
     <div className="scroll">
@@ -30,21 +32,24 @@ function ResultTable({ result }: { result: CypherResult }) {
   )
 }
 
-export default function CypherConsole({ personaId }: { personaId: string }) {
-  // --- basic flow: browser -> bolt -> Neo4j -----------------------------------
+export default function CypherConsole({ personaId, role }: { personaId: string; role: Role }) {
+  // --- dev-mode flow: browser -> bolt adapter -> Neo4j (GraphAccess seam) -----
+  // Password is form-entered ONLY — never seeded from VITE_* env, which Vite
+  // inlines into the built bundle (ADR 0005 decision 4).
   const [uri, setUri] = useState(env.VITE_NEO4J_URI ?? 'bolt://localhost:7687')
   const [user, setUser] = useState(env.VITE_NEO4J_USER ?? 'neo4j')
-  const [password, setPassword] = useState(env.VITE_NEO4J_PASSWORD ?? '')
+  const [password, setPassword] = useState('')
   const [database, setDatabase] = useState(env.VITE_NEO4J_DATABASE ?? 'neo4j')
   const [query, setQuery] = useState(PRESETS['C4 components (depgraph)'])
-  const [result, setResult] = useState<CypherResult | null>(null)
+  const [result, setResult] = useState<GraphResult | null>(null)
   const [cypherStatus, setCypherStatus] = useState('')
 
   async function onRunCypher() {
     setCypherStatus('running…')
     setResult(null)
     try {
-      const res = await runCypher(uri, user, password, database, query)
+      const access = createBoltAccess({ uri, user, password, database })
+      const res = await access.runRead(query)
       setResult(res)
       setCypherStatus(`${res.rows.length} rows`)
     } catch (e) {
@@ -103,6 +108,17 @@ export default function CypherConsole({ personaId }: { personaId: string }) {
         Google ADK api_server as persona <code>{personaId}</code>.
       </p>
 
+      {!boltAllowed(role) && (
+        <section>
+          <h2>1 · Direct bolt — dev-mode only</h2>
+          <p className="note">
+            The raw-Cypher panel is a development tool: it renders only in dev builds, to
+            admins (ADR 0005 — bolt-from-browser is not the deployment path). Deployment
+            reads go through the drydocs-api adapter.
+          </p>
+        </section>
+      )}
+      {boltAllowed(role) && (
       <section>
         <h2>1 · Basic flow — Cypher → Neo4j → C4-ish rows</h2>
         <div className="row">
@@ -128,6 +144,7 @@ export default function CypherConsole({ personaId }: { personaId: string }) {
         </div>
         {result && <ResultTable result={result} />}
       </section>
+      )}
 
       <section>
         <h2>2 · Agent flows — ADK api_server</h2>
