@@ -26,18 +26,6 @@ Tags help grooming: `idea` · `bug` · `doc` · `source` (new data source) · `q
 
 <!-- add new ideas at the top -->
 
-- 2026-07-14 — [idea] **Two support queries proven live on the internal graph — candidates for
-  the O5 thin-API named endpoints + the runbook skill.** (1) Dependency-chain finder: bind two
-  jobs by job_name (index seek), undirected `shortestPath((a)-[:WAS_INFORMED_BY*..15]-(b))`,
-  return hop names + per-edge `via_condition` + hop count — answered in single-digit ms on the
-  real estate; the "how are these two jobs connected?" triage question. (2) Folder-scoped
-  dependency census: folder→CONTAINS_JOB→job→WAS_INFORMED_BY with a sched_table filter,
-  returning edges / distinct successors / cross-folder edge count — on one real product stream
-  ~69% of dependency edges were CROSS-FOLDER (the quantitative case that folder-scoped runbooks
-  miss most of the dependency surface; a headline stat for the whitepaper/value story).
-  Mechanism-only here; real names stay internal (photo evidence 2026-07-14). Groom into O5's
-  endpoint list when it starts, and consider both for controlm-runbook-automation.
-
 - 2026-07-14 — [doc] **`drydocs-project-review.md` has no canonical outline** — the new
   whole-project review (docs/design/) renders through the Epic L pipeline but is free-form:
   `doc_outline.py` only validates `docs/design/*-tdd.md`. When L8 introduces the second doc
@@ -183,6 +171,14 @@ Tags help grooming: `idea` · `bug` · `doc` · `source` (new data source) · `q
 ## Recently groomed (audit trail)
 
 <!-- when you promote an idea, move its line here with the resulting backlog id -->
+
+- 2026-07-15 — [bug] psgmgr version filter domain is `'Y'` not `'1'` — resolved by the
+  FINALIZED company Control-M ingestion TDD (captured local-only in
+  `internal-local/company-backflow/controlm-ingestion-tdd.md`; their live extracts filter `'Y'`
+  and returned the worked-example population). Closes staging-ingestion-flow preflight 0.3 → **D4**.
+- 2026-07-14 — [idea] Two support queries proven live on the internal graph (dependency-chain
+  finder via undirected `shortestPath` over `WAS_INFORMED_BY`; folder-scoped dependency census,
+  ~69% cross-folder stat) — groomed to drydocs-api named endpoints → **O7**.
 
 - 2026-07-14 groom run (ADR 0005 Action items → Epic O; not an inbox groom) — 4 promoted:
   **O3** ratify ADR 0005 (in_progress — awaiting the SME flip, the E1/P2 idiom; gates the

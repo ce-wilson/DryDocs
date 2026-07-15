@@ -454,6 +454,38 @@ items:
       BEFORE any adapter/Neo4j touch (exit 2). test_source_registry.py (6) incl. a CliRunner
       test proving `drydocs load` fails fast for an unconfirmed source. 180 passed.
 
+  - id: D4
+    epic: config-loaders
+    title: "Fix psgmgr version filter: IS_CURRENT_VERSION = 'Y' (was '1') across extracts, DDL, cypher, and references"
+    type: bug
+    module: drydocs-load
+    phase: 3
+    agent: main
+    model: sonnet
+    priority: p1
+    status: todo
+    depends_on: []
+    inputs: [drydocs/loaders/sql/, drydocs/loaders/cypher/controlm_jobs.cypher, docs/design/controlm-ingestion-tdd.md, docs/controlm-staging-ingestion-flow.md, .claude/skills/controlm-db/SKILL.md]
+    acceptance: >
+      All psgmgr version filters compare IS_CURRENT_VERSION = 'Y': extracts
+      (controlm_folders/jobs/conditions_in/conditions_out/variables/variables_scenarios
+      + adhoc probes), staging DDL views, controlm_jobs.cypher .active derivation,
+      models/controlm.py field description, controlm-db skill (SKILL.md, query-cookbook,
+      schema-crosswalk, ingest), the TDD "two filters" section, and C3/status + port-guide
+      docs; no IS_CURRENT_VERSION = '1' remains outside history/audit prose;
+      test_controlm_cypher asserts 'Y'; staging-ingestion-flow preflight 0.3 marked
+      RESOLVED = 'Y'; the CM_DEF_SETVAR_VW extracts carry a comment flagging the view's
+      own domain for a one-line company preflight (SELECT DISTINCT IS_CURRENT_VERSION)
+      before the production variables run; design-doc renders regenerated; full suite green.
+    notes: >
+      Groomed 2026-07-15 from the finalized company Control-M ingestion TDD (captured
+      LOCAL-ONLY at internal-local/company-backflow/controlm-ingestion-tdd.md — gitignored).
+      Evidence: the company's finalized extracts filter 'Y' on CM_DEF_VJOB (incl. the
+      JOB_ID=1 header join) and CM_DEF_LNKI/LNKO_P_VW, and their worked example returned
+      the real 2-folder/8-job population — 'Y' is live-verified; producer '1' never ran
+      live (the 2026-07-10 live check verified the SETVAR view's name/columns, not the
+      value domain). Closes staging-ingestion-flow open point 0.3.
+
   # ── Epic E — Context graph pilot (ontology-mapper + main) — Phase 4 ────────
   - id: E1
     epic: context-graph
@@ -2301,6 +2333,31 @@ items:
       O5). Library choice is a tech pick, not a boundary decision — record it, escalate
       only if it grows one.
 
+  - id: O7
+    epic: web-console
+    title: "Ship the two live-proven support queries as named drydocs-api endpoints"
+    type: task
+    module: drydocs-api
+    phase: 12
+    agent: main
+    model: sonnet
+    priority: p2
+    status: todo
+    depends_on: [O5]
+    inputs: [drydocs_api/queries.py, docs/restructure/IDEAS.md]
+    acceptance: >
+      Two read endpoints land in drydocs-api with unit tests: (1) dependency-chain finder —
+      two job_names in, undirected shortestPath over WAS_INFORMED_BY (bounded hops), returns
+      hop job names + per-edge via_condition + hop count; (2) folder-scoped dependency
+      census — sched_table filter in, returns dependency-edge count / distinct successors /
+      cross-folder edge count. Mechanism-only fixtures; guarded like the existing read
+      endpoints.
+    notes: >
+      Groomed 2026-07-15 from the 2026-07-14 inbox note (both queries proven single-digit-ms
+      on the internal graph; the ~69% cross-folder-dependency stat is a whitepaper headline
+      candidate). Also candidates for controlm-runbook-automation — reference, don't
+      duplicate.
+
   # ── Epic P — Runtime topology & maintenance windows — Phase 13 ─────────────
   # Born 2026-07-09: CM_HOSTS + CM_AVG_RUN onboarded via the add-source-object
   # walkthrough; gate controlm-hosts-topology SIGNED OFF 18/18 same day
@@ -2549,8 +2606,8 @@ items:
 # Roll-up the dispatcher can glance at. COMPUTED views — test_backlog.py enforces
 # that these match the items exactly; update them with any status change.
 summary:
-  todo: 18                                          # O5 done 2026-07-14 (thin-API scaffold)
+  todo: 20                                          # +D4, O7 groomed 2026-07-15 (company TDD capture + inbox)
   in_progress: 2                                   # E1 (gate deferred), O1 (web design pass — remainder = O6)
   blocked: 0
   done: 66                                          # O3+O4+O5 all closed 2026-07-14 — the ADR-0005 chain
-  next_ready: [C5, L7, L8, L9, L12, M2, M3, M4, P1, C7, K4, K5, J10, O6]  # O6 unblocked (O4+O5 done) — the live C4 view
+  next_ready: [C5, D4, L7, L8, L9, L12, M2, M3, M4, P1, C7, K4, K5, J10, O6, O7]  # D4 (psgmgr 'Y' fix, p1) + O7 (O5 done) added 2026-07-15
