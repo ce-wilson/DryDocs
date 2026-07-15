@@ -439,9 +439,11 @@ def apply_ontology_supplement() -> None:
 def apply_seal_supplement() -> None:
     """Apply the SEAL ontology supplement (idempotent).
 
-    Declares :BusinessApplication, :Port, :Membership, :Role, :Employee node types
-    and their LocalRelationship mappings (HAS_PORT, HAS_MEMBERSHIP, OF_ROLE,
-    HELD_BY). Safe to re-run.
+    Declares :BusinessApplication, :Port, :Membership, :Role, :Employee,
+    :Attribution, :TOMRole node types and their LocalRelationship mappings
+    (HAS_PORT, QUALIFIED_ATTRIBUTION, HAS_AGENT, HAD_ROLE; the deprecated
+    HAS_MEMBERSHIP/OF_ROLE/HELD_BY blocks remain for audit — K4, gate
+    2026-07-10 §C), plus the tom_roles concept scheme. Safe to re-run.
     """
     if not SEAL_SUPPLEMENT_FILE.exists():
         console.print(f"[red]Missing: {SEAL_SUPPLEMENT_FILE}[/]"); raise typer.Exit(1)

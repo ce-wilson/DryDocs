@@ -73,7 +73,9 @@ MERGE (n:OntologyTerm:LocalRelationship {iri: "https://drydocs.local/ontology#ha
       n.notes  = "Application exposes a data port (EventProcessing or BatchProcessing). "
                + "Follows dprod:hasPort pattern.";
 
-// HAS_MEMBERSHIP  —  Application → Membership  (org:hasMembership)
+// DEPRECATED 2026-07-15 (K4, gate 2026-07-10 §C) — SEAL TOM role-holders use the
+// qualified-attribution pattern below; org:Membership stays for PAT only.
+// HAS_MEMBERSHIP  —  BusinessApplication → Membership  (org:hasMembership)
 MERGE (n:OntologyTerm:LocalRelationship {iri: "https://drydocs.local/ontology#hasMembership"})
   SET n.label  = "HAS_MEMBERSHIP",
       n.domain = "BusinessApplication",
@@ -83,6 +85,7 @@ MATCH (local:OntologyTerm:LocalRelationship {iri: "https://drydocs.local/ontolog
 MATCH (org:OntologyTerm:OrgProperty         {iri: "http://www.w3.org/ns/org#hasMembership"})
 MERGE (local)-[:MAPS_TO]->(org);
 
+// DEPRECATED 2026-07-15 (K4, gate 2026-07-10 §C) — replacement: HAD_ROLE → TOMRole.
 // OF_ROLE  —  Membership → Role  (org:role)
 MERGE (n:OntologyTerm:LocalRelationship {iri: "https://drydocs.local/ontology#ofRole"})
   SET n.label  = "OF_ROLE",
@@ -93,6 +96,7 @@ MATCH (local:OntologyTerm:LocalRelationship {iri: "https://drydocs.local/ontolog
 MATCH (org:OntologyTerm:OrgProperty         {iri: "http://www.w3.org/ns/org#role"})
 MERGE (local)-[:MAPS_TO]->(org);
 
+// DEPRECATED 2026-07-15 (K4, gate 2026-07-10 §C) — replacement: HAS_AGENT → Employee.
 // HELD_BY  —  Membership → Employee  (inverse of org:member)
 MERGE (n:OntologyTerm:LocalRelationship {iri: "https://drydocs.local/ontology#heldBy"})
   SET n.label  = "HELD_BY",

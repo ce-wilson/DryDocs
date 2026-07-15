@@ -975,18 +975,20 @@ local_relationships:
       Application has a role-holder membership record. Maps to
       org:hasMembership. Membership nodes carry valid_from/valid_to
       for temporal role tracking.
-    proposed_deprecation: >
-      GATE-BOUND PROPOSAL (2026-07-08 review, NOT applied): deprecate in favor of the SEAL TOM
+    deprecation_note: >
+      DEPRECATED at K4 (2026-07-15; gate 2026-07-10 §C) in favor of the SEAL TOM
       qualified-attribution pattern (seal_qualified_attribution / seal_attribution_has_agent /
-      seal_attribution_had_role, all status: planned). org:Membership/org:Role is the wrong
-      pattern for SEAL's Technical Operating Model role-holders (a governance model DISTINCT
-      from real organizations); org: stays for the PAT product hierarchy only (e.g.
-      catalog_dev_team_has_membership). Status stays `active` here until the SME confirms —
-      see config/gate-prompts/seal-tom-attribution-reshape.yaml.
+      seal_attribution_had_role, now active). org:Membership/org:Role is the wrong pattern
+      for SEAL's Technical Operating Model role-holders (a governance model DISTINCT from
+      real organizations); org: stays for the PAT product hierarchy only (e.g.
+      catalog_dev_team_has_membership — SAME labels, different vocab id, NOT deprecated).
+      Existing graph data kept per RELATIONSHIP_GUIDE; loader replacement lands with the
+      K4 clause-6 map flips.
     supplement:   seal_ontology_supplement.cypher
     loader:       seal_applications.cypher
     domain:       seal
-    status:       active
+    status:       deprecated
+    deprecated_at: 2026-07-15
 
   - id:           seal_of_role
     neo4j_label:  OF_ROLE
@@ -997,15 +999,15 @@ local_relationships:
     note: >
       Membership is for a specific named role. Maps to org:role property
       in the W3C ORG ontology.
-    proposed_deprecation: >
-      GATE-BOUND PROPOSAL (2026-07-08 review, NOT applied): deprecate alongside seal_has_membership
-      / seal_held_by — same TOM-vs-PAT reasoning (see seal_has_membership's proposed_deprecation
-      note). Replacement: Attribution -[:HAD_ROLE]-> TOMRole (seal_attribution_had_role, planned).
-      Status stays `active` here until the SME confirms.
+    deprecation_note: >
+      DEPRECATED at K4 (2026-07-15; gate 2026-07-10 §C) alongside seal_has_membership /
+      seal_held_by — same TOM-vs-PAT reasoning (see seal_has_membership's deprecation_note).
+      Replacement: Attribution -[:HAD_ROLE]-> TOMRole (seal_attribution_had_role, active).
     supplement:   seal_ontology_supplement.cypher
     loader:       seal_applications.cypher
     domain:       seal
-    status:       active
+    status:       deprecated
+    deprecated_at: 2026-07-15
 
   - id:           seal_held_by
     neo4j_label:  HELD_BY
@@ -1017,16 +1019,16 @@ local_relationships:
       Membership is held by an employee. Inverse of org:member /
       org:hasMember. Direction chosen so the membership record is the
       natural starting point for role queries.
-    proposed_deprecation: >
-      GATE-BOUND PROPOSAL (2026-07-08 review, NOT applied): deprecate alongside seal_has_membership
-      / seal_of_role — same TOM-vs-PAT reasoning (see seal_has_membership's proposed_deprecation
-      note). Replacement: Attribution -[:HAS_AGENT]-> Employee (seal_attribution_has_agent,
-      planned), reached via Application -[:QUALIFIED_ATTRIBUTION]-> Attribution. Status stays
-      `active` here until the SME confirms.
+    deprecation_note: >
+      DEPRECATED at K4 (2026-07-15; gate 2026-07-10 §C) alongside seal_has_membership /
+      seal_of_role — same TOM-vs-PAT reasoning (see seal_has_membership's deprecation_note).
+      Replacement: Attribution -[:HAS_AGENT]-> Employee (seal_attribution_has_agent, active),
+      reached via BusinessApplication -[:QUALIFIED_ATTRIBUTION]-> Attribution.
     supplement:   seal_ontology_supplement.cypher
     loader:       seal_applications.cypher
     domain:       seal
-    status:       active
+    status:       deprecated
+    deprecated_at: 2026-07-15
 
   # ── SEAL — PROPOSED reshape (GATE-BOUND, 2026-07-08 review) ────────────────
   # Nothing below is active. The :BusinessApplication node stays classed prov:SoftwareAgent (see
