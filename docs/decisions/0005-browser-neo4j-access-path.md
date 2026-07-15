@@ -1,7 +1,7 @@
 # ADR 0005 — Browser ↔ Neo4j access path: thin API is the deployment shape; bolt-from-browser survives only as a dev-mode adapter
 
 ```yaml
-status: PROPOSED        # PROPOSED | ACCEPTED | SUPERSEDED
+status: ACCEPTED        # PROPOSED | ACCEPTED | SUPERSEDED — accepted 2026-07-14, SME chad.wilson (in-session ratification; O3)
 date: 2026-07-14
 deciders: [chad.wilson]
 layer: cross-cutting    # architecture; the web console is the layer-3 read surface, and layer-4 projections need a server-side home
@@ -156,8 +156,9 @@ beats duplicating them into a browser client that deployment then can't use.
 
 ## Action items
 
-1. [ ] SME review of this ADR → `status: ACCEPTED` (satisfies O1's "decision
-       recorded" acceptance clause).
+1. [x] SME review of this ADR → `status: ACCEPTED` (satisfies O1's "decision
+       recorded" acceptance clause). DONE 2026-07-14 — accepted as written
+       (no edits); backlog O3.
 2. [ ] Refit `web/src/lib/`: extract the `GraphAccess` interface; `neo4j.ts`
        becomes the bolt adapter behind it (O1, with the C4 render work).
 3. [ ] Groom the thin-API component build into Epic O as a new backlog item

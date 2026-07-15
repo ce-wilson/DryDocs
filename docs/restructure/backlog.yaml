@@ -2116,6 +2116,9 @@ items:
       seam refit + live graph view into Epic O. NOTE: the landed design pass predates the
       seam — no new bolt usage (pages are synthesized), but the seam refit is the first
       code consequence of acceptance.
+      2026-07-14 (evening) — ADR 0005 ACCEPTED (O3 done): the "decision recorded"
+      acceptance clause is SATISFIED. O1's remainder = O6 (live C4/graph view through
+      the seam, via O4+O5); wireframes committed (UI-WIP, e5608ff); build/run docs ride O5.
 
   - id: O2
     epic: web-console
@@ -2171,7 +2174,7 @@ items:
     agent: main
     model: sonnet
     priority: p1
-    status: in_progress
+    status: done
     depends_on: []
     inputs: [docs/decisions/0005-browser-neo4j-access-path.md, docs/decisions/README.md, docs/restructure/backlog.yaml]
     acceptance: >
@@ -2185,6 +2188,10 @@ items:
       (the E1/P2 idiom): the ADR is authored by the SME (rewrite b5235f4) and delivered;
       only the ratification act remains. Gates O4/O5 — the decision must be ACCEPTED
       before code implements it.
+      DONE 2026-07-14 (same day): SME (chad.wilson) accepted 0005 AS WRITTEN, in-session;
+      status flipped ACCEPTED (Action item 1 ticked), README row already PROPOSED-free,
+      O1 "decision recorded" clause satisfied (noted in O1 progress). O4 + O5 now
+      next_ready.
 
   - id: O4
     epic: web-console
@@ -2522,7 +2529,7 @@ items:
 # that these match the items exactly; update them with any status change.
 summary:
   todo: 20                                          # +O4/O5/O6 (ADR 0005 follow-ups) groomed 2026-07-14
-  in_progress: 3                                   # E1 (gate deferred), O1 (web design pass), O3 (ADR 0005 ratification — awaiting SME)
+  in_progress: 2                                   # E1 (gate deferred), O1 (web design pass — remainder = O6)
   blocked: 0
-  done: 63                                          # K2 loader BUILT 2026-07-14 (same day as its gate); F1+F2+P2 gates SIGNED OFF 2026-07-14
-  next_ready: [C5, L7, L8, L9, L12, M2, M3, M4, P1, C7, K4, K5, J10]  # K2 done unblocks nothing; O4/O5 wait on O3 (ACCEPTED flip); O6 on O4+O5
+  done: 64                                          # O3 ADR-0005 ACCEPTED 2026-07-14 (in-session SME ratification)
+  next_ready: [C5, L7, L8, L9, L12, M2, M3, M4, P1, C7, K4, K5, J10, O4, O5]  # O4/O5 unblocked by O3; O6 waits on O4+O5
