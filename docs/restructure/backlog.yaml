@@ -2202,7 +2202,7 @@ items:
     agent: main
     model: sonnet
     priority: p2
-    status: todo
+    status: done
     depends_on: [O3]
     inputs: [docs/decisions/0005-browser-neo4j-access-path.md, web/src/lib/neo4j.ts, web/src/components/CypherConsole.tsx, web/README.md]
     acceptance: >
@@ -2220,6 +2220,16 @@ items:
       Groomed 2026-07-14 from ADR 0005 Action items 2, 4, 5 (the ADR assigns the refit to
       O1's code stream; this item carries it so O1 stays the umbrella). The seam
       conformance test is the ADR's "two adapters kept honest" consequence.
+      DONE 2026-07-14 (same day, branch feat/o4-graphaccess-seam, c553a32): graph.ts
+      (interface + boltAllowed = DEV && admin — production bundles compile the bolt path
+      out by construction), neo4j.ts refitted (only createBoltAccess exported; driver
+      internal), graphApi.ts fail-loud stub, CypherConsole panel gated + env password
+      seeding removed, .env.example + README carry the never-commit rule. Conformance =
+      `satisfies GraphAccess` in both adapters (tsc-enforced; no vitest per the O2
+      precedent — noted deviation from the groomed wording, mechanism equivalent) + the
+      runtime drives. VERIFIED: dev build panel PRESENT/password empty, PRODUCTION
+      PREVIEW panel ABSENT + explanation shown (3/3+3/3), 27/27 login/role regression,
+      zero VITE_NEO4J_PASSWORD assignments.
 
   - id: O5
     epic: web-console
@@ -2528,8 +2538,8 @@ items:
 # Roll-up the dispatcher can glance at. COMPUTED views — test_backlog.py enforces
 # that these match the items exactly; update them with any status change.
 summary:
-  todo: 20                                          # +O4/O5/O6 (ADR 0005 follow-ups) groomed 2026-07-14
+  todo: 19                                          # O4 done 2026-07-14 (GraphAccess seam)
   in_progress: 2                                   # E1 (gate deferred), O1 (web design pass — remainder = O6)
   blocked: 0
-  done: 64                                          # O3 ADR-0005 ACCEPTED 2026-07-14 (in-session SME ratification)
-  next_ready: [C5, L7, L8, L9, L12, M2, M3, M4, P1, C7, K4, K5, J10, O4, O5]  # O4/O5 unblocked by O3; O6 waits on O4+O5
+  done: 65                                          # O4 seam refit DONE 2026-07-14 (same day as O3)
+  next_ready: [C5, L7, L8, L9, L12, M2, M3, M4, P1, C7, K4, K5, J10, O5]  # O6 waits on O5 now (O4 done)
