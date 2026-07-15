@@ -659,6 +659,44 @@ PROCEDURE:
       with YOUR manifest entries (never from a port, step-31 rule). Tracked as rows T1–T4 in
       the COMPANY-SIDE TRACKER below — flip statuses there, in your copy.
 
+33. PSGMGR VERSION-FILTER FIX (D4) + JOB-TYPE TABLES PLAN (2026-07-15; commits "docs(controlm):
+    plan job-type detail tables …", "chore(backlog): groom - 2 promoted (D4, O7) …",
+    "fix(loaders): psgmgr version filter IS_CURRENT_VERSION = 'Y' (was '1') — D4",
+    "docs(loaders): SETVAR_VW version domain SME-confirmed 'Y' - D4 residual closed").
+    ORIGIN NOTE: the 'Y' correction came FROM your finalized controlm-ingestion TDD (captured
+    producer-side as a local-only reference) — the producer is CONVERGING to your reality, so
+    most collisions in this range resolve to content you already have.
+    - The fix (canonical-producer rows; on collision the two sides should now AGREE on 'Y' —
+      if any consumer file still carries '1' outside historical prose, take the producer side):
+      controlm_{folders,jobs,conditions_in,conditions_out,variables,variables_scenarios}.sql,
+      adhoc/profile_cm_hosts.sql + profile_cm_avg_run.sql + preflight_open_questions.sql
+      (touches step-26 probe files — probes not yet run per T5, so nothing to re-run),
+      ddl/controlm_staging_ddl.sql + supplement DDL view filters, controlm_jobs.cypher
+      (.active = row.is_current_version = 'Y'), constraints.cypher comment,
+      drydocs_core/models/controlm.py description, drydocs_lineage controlm_inventory.py
+      (current = 'Y'; '1' tolerated for legacy synthetic CSVs), tests
+      (test_controlm_cypher/models/lineage_inventory) + fixture CSVs flipped '1'/'0'→'Y'/'N'
+      (tests/fixtures/lineage/jobs.csv + 3 drydocs/data/samples CSVs — synthetic, canonical-producer).
+    - docs/design/controlm-ingestion-tdd.{md,html,print.html}: NEW MANIFEST ROWS —
+      canonical-company. YOUR finalized TDD is ahead (SPIDERP §7f etc.); KEEP IT. The
+      producer's Rev-3 mirror only gained the 'Y' literals your doc already has.
+    - config/source-mappings/controlm-psgmgr.yaml (canonical-producer per the config/** row):
+      IS_CURRENT_VERSION entry — the gate controlm-q1q3-phase1 §Q2 domain probe is RESOLVED
+      'Y' (2026-07-15); derived_also rule now 'Y'; SETVAR_VW default_disposition note updated.
+    - Skills (canonical-producer): .claude/skills/controlm-db/** ('Y' in SKILL.md,
+      query-cookbook, schema-crosswalk, ingest), reconcile-port SKILL.md divergence-ledger
+      line corrected. git-readme.md 'Y' corrections ride the normal canonical-producer rule.
+    - Clean-adds: docs/controlm-job-type-tables-plan.md (planned STG_JOB_FILEWATCH /
+      STG_JOB_OS_COMMAND_VW / STG_LAUNCH_DETAIL extension of the C3 stream — plan only, no
+      code yet), docs/Product/seal/seal-application-hierarchy.md (describes a SEAL 4-tier
+      hierarchy diagram via a FICTIONAL example; the referenced image-2.md diagram is not in
+      the producer repo — supply/keep yours if you have the real one).
+    - Planning stream (Canonical-here as ever): backlog.yaml D4 done + O7 added (drydocs-api
+      named endpoints for the two live-proven support queries), board render, IDEAS audit
+      trail. Historical docs/reviews (persona-*, superseded sdlc-oracle-ingestion) deliberately
+      KEEP the old '1' literals — do not "fix" history.
+    - EXPECTED_CONSTRAINTS UNCHANGED; no schema/edge changes; Track-1 counts unchanged.
+
 COMPANY-SIDE TRACKER — LIVE-LOAD + SUPPLEMENT STATUS (maintained COMPANY-SIDE):
 The steps above name company-side obligations in scattered "COMPANY MUST SUPPLEMENT" /
 Track-2 notes; this table consolidates the trackable ones so you can see at a glance whether

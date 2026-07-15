@@ -42,6 +42,8 @@ updated: 2026-07-14   # Phase B relocate (ADR 0002-a-1): core paths now drydocs_
                       # rows added (G3 remediation component stream).
                       # 2026-07-14 (step 31): web/** + UI-WIP/** canonical-producer,
                       # .github/** evaluate, config/manual-loads/manifest.yaml per-entry.
+                      # 2026-07-15 (step 33): docs/design/controlm-ingestion-tdd.{md,html,
+                      # print.html} canonical-company — consumer's TDD is finalized/ahead.
 direction: "producer -> company (one-way; back-flow only as sanitized reproduction)"
 default: "clean-add when absent on consumer; evaluate when both sides created the path"
 
@@ -112,6 +114,19 @@ rows:
   - path: "graph-tests/**"
     disposition: canonical-company
     note: "consumer's real acceptance suites win; seed twins follow producer renames as deliberate consumer commits"
+  - path: "docs/design/controlm-ingestion-tdd.md"
+    disposition: canonical-company
+    note: >
+      the consumer's TDD is FINALIZED (2026-07-15) and ahead — carries the SPIDERP §7f
+      audit chain + live-verified content; the producer copy is the mirror. Producer-side
+      corrections that originated FROM the finalized doc (e.g. the D4 IS_CURRENT_VERSION
+      'Y' fix, step 33) are already present consumer-side by construction.
+  - path: "docs/design/controlm-ingestion-tdd.html"
+    disposition: canonical-company
+    note: "render of the above — regenerate consumer-side, never take the producer render"
+  - path: "docs/design/controlm-ingestion-tdd.print.html"
+    disposition: canonical-company
+    note: "render of the above — regenerate consumer-side, never take the producer render"
   - path: "drydocs_core/adapters/oracle_adapter.py"
     disposition: canonical-company
     note: >
