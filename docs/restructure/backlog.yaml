@@ -36,7 +36,7 @@
 # =============================================================================
 
 schema: drydocs.backlog.v2
-updated: 2026-07-14
+updated: 2026-07-15
 
 # ── The high-level project plan (rendered as the board's roadmap strip) ───────
 plan:
@@ -2615,11 +2615,91 @@ items:
       ontology-mapper agent instructions updated to fill both.
     notes: "docs/reviews/tech-debt-taxonomy-ontology-map.md Phase 3."
 
+  # (J11/J12/C8 groomed 2026-07-15 — weekly inbox groom.)
+  - id: J11
+    epic: release-infrastructure
+    title: "Move the resolved controlm-loader-flow baseline doc to docs/history/ and repoint inbound links"
+    type: chore
+    module: docs
+    phase: 8
+    agent: main
+    model: haiku
+    priority: p3
+    status: todo
+    depends_on: []
+    inputs: [docs/controlm-loader-flow.md, README.md, internal/remediation/governance/command-line-and-variables-standard.md]
+    acceptance: >
+      docs/controlm-loader-flow.md is git-mv'd to docs/history/ keeping its 2026-07-15
+      resolution banner (the M1-Fix-README precedent); the two inbound references are
+      repointed (README.md + internal/remediation/governance/command-line-and-variables-
+      standard.md — verified by grep 2026-07-15; the depgraph snapshot JSONs refresh
+      themselves); a repo grep shows no stale docs/controlm-loader-flow.md path outside
+      history/audit prose; full suite green.
+    notes: >
+      Groomed 2026-07-15 from the same-day IDEAS line (captured at the controlm docs
+      status-refresh sweep e3e7bec: all §4 corrections resolved, resolution banner added —
+      the doc carries no live content; the TDD + staging-flow §3a are the current
+      descriptions). Inbound-linker correction during grooming: grep says README.md + the
+      internal governance doc, NOT CHECKPOINT/reviews as the inbox line guessed.
+
+  - id: J12
+    epic: release-infrastructure
+    title: "Fix the session-ritual render invocations: bare python -> poetry run python (CLAUDE.md + snapshot.ps1)"
+    type: chore
+    module: docs
+    phase: 8
+    agent: main
+    model: haiku
+    priority: p3
+    status: todo
+    depends_on: []
+    inputs: [CLAUDE.md, knowledge/depgraph-snapshots/snapshot.ps1]
+    acceptance: >
+      The CLAUDE.md session-ritual step 3 render commands (render_board.py +
+      render_design_doc.py — lines 54-55 today) and snapshot.ps1's two `& python`
+      invocations (lines 28/42) run via `poetry run python` (or an equivalently
+      venv-robust invocation) so they work without an activated venv; snapshot.ps1
+      executes end-to-end on this machine; a grep confirms no bare `python scripts/`
+      ritual invocation remains in either file.
+    notes: >
+      Groomed 2026-07-15 from the 2026-07-14 IDEAS line. Re-verified live this session:
+      bare `python scripts/render_design_doc.py` fails outside the venv
+      (ModuleNotFoundError: drydocs); `poetry run python` succeeds. EXECUTION CAUTION:
+      CLAUDE.md carried uncommitted user edits in the working tree at groom time —
+      coordinate before committing so the fix doesn't sweep unrelated changes.
+
+  - id: C8
+    epic: ontology-mapping
+    title: "Resolve schema_graph.cypher staleness: regenerate from the vocabulary + drift guard, or mark point-in-time"
+    type: chore
+    module: ontology
+    phase: 2
+    agent: main
+    model: sonnet
+    priority: p3
+    status: todo
+    depends_on: []
+    inputs: [drydocs_core/schema/schema_graph.cypher, drydocs_core/ontology/relationship_vocabulary.yaml, git-readme.md, docs/port-prompt.md]
+    acceptance: >
+      EITHER schema_graph.cypher is regenerated from relationship_vocabulary.yaml (the
+      absent docs_* edges, m3_runs_on_*, seal_requires_scheduler, and the ACTIVE
+      m3_seal_app_ref all present) with a test-enforced drift guard so it cannot silently
+      stale again, OR it carries an explicit point-in-time banner (generated 2026-06-09)
+      and every reference implying "regenerate when the vocabulary changes"
+      (git-readme.md, docs/port-prompt.md, the file's own header) is reconciled to the
+      chosen stance; which branch was taken is recorded in these notes. Presentation/
+      hygiene only — no edge meaning changes, no gate needed (the vocabulary is the
+      confirmed source; this file is a derived view). Full suite green.
+    notes: >
+      Groomed 2026-07-15 from the 2026-07-14 IDEAS line (found during the K2 build:
+      generated 2026-06-09, the vocabulary has moved on, no drift guard covers it).
+      The either/or is deliberately in the acceptance — decide at execution.
+
 # Roll-up the dispatcher can glance at. COMPUTED views — test_backlog.py enforces
 # that these match the items exactly; update them with any status change.
 summary:
-  todo: 18                                          # D4 + O7 groomed AND closed 2026-07-15 (O7 = already shipped by O5)
+  todo: 21                                          # +3 groomed 2026-07-15 (J11, J12, C8 — weekly inbox groom)
   in_progress: 2                                   # E1 (gate deferred), O1 (web design pass — remainder = O6)
   blocked: 0
   done: 68                                          # D4 (psgmgr 'Y' fix) + O7 (shipped-by-O5) done 2026-07-15
-  next_ready: [C5, L7, L8, L9, L12, M2, M3, M4, P1, C7, K4, K5, J10, O6]
+  next_ready: [C5, L7, L8, L9, L12, M2, M3, M4, P1, C7, K4, K5, J10, O6, J11, J12, C8]

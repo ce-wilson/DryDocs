@@ -26,25 +26,12 @@ Tags help grooming: `idea` · `bug` · `doc` · `source` (new data source) · `q
 
 <!-- add new ideas at the top -->
 
-- 2026-07-15 — [chore] **Move `docs/controlm-loader-flow.md` to `docs/history/`** — the
-  2026-06-11 review baseline is now fully resolved (all §4 corrections landed: label rename,
-  SCHEDULED_ON, SEAL bridge shipped job-level as K2; statuses flipped in the 2026-07-15
-  docs sweep). It carries no live content — the TDD + staging-flow §3a are the current
-  descriptions — so it's a candidate for `docs/history/` alongside `M1-Fix-README.md`.
-  Check inbound links before moving (CHECKPOINT/reviews reference it).
-
 - 2026-07-14 — [doc] **`drydocs-project-review.md` has no canonical outline** — the new
   whole-project review (docs/design/) renders through the Epic L pipeline but is free-form:
   `doc_outline.py` only validates `docs/design/*-tdd.md`. When L8 introduces the second doc
   type (runbook), consider a `review.outline.yaml` third type so the review gets the same
   completeness validation + traceability treatment; it also needs a refresh cadence (facts
   pinned to a commit go stale quietly — maybe a Rev bump per epic close).
-
-- 2026-07-14 — [chore] **schema_graph.cypher is stale — generated 2026-06-09, vocabulary has
-  moved on** (docs_* edges, m3_runs_on_*, seal_requires_scheduler, and now the ACTIVE
-  m3_seal_app_ref are all absent; no drift guard covers it, found during the K2 build).
-  Either regenerate it from relationship_vocabulary.yaml + add a guard, or mark it
-  point-in-time and stop implying "regenerate when the vocabulary changes".
 
 - 2026-07-14 — [source] **K2 FID / ALIAS reconciliation tables are company-side unblocks.**
   The attribution loader's TierReconcilers seam ships empty for FID and ALIAS (facts stay
@@ -58,32 +45,6 @@ Tags help grooming: `idea` · `bug` · `doc` · `source` (new data source) · `q
   elsewhere; (2) K2 manual-CSV template `source_key` could accept `ctlm_id=<id>` as shorthand
   for the composite (folder_id, job_id) key; (3) company-side port alignment — the derived
   column lives internal-side, keep producer mechanism generic.
-
-- 2026-07-14 — [chore] **CLAUDE.md session ritual says `python scripts/render_board.py` — fails
-  outside the Poetry venv** on this machine (`No module named 'drydocs'`); needs `poetry run
-  python`. Fix the ritual line (and snapshot.ps1 if it shells the same way).
-
-- 2026-07-13 — [chore] **UI work stalled at 2026-07-07, split across two branches — needs a
-  reconcile decision.** Findings from a status review: (1) `feature/ui-dark-landing-myapps`
-  local and origin have DIVERGED — same two commits, different hashes (local `d44b916` is a
-  rebase of pushed `965445c`); sync needs `--force-with-lease` or delete/re-push. (2) The
-  branch's Control-M ingestion TDD copy is OBSOLETE — main's landed separately and moved on
-  (Rev 2 `2a979f2`, L1 outline refit `79947ba`), so the branch's only unique value is the
-  landing page `UI-WIP/drydocs-landing-dark.html`. (3) Untracked `UI-WIP/` files (design-review.md, wireframe
-  PDF, ui-nav-flow.mermaid, wireframe-guide.md, 2026-07-06) are machine-local only — commit
-  or discard. (4) Decide whether the landing-page branch rebases onto main or folds into
-  `feat/web-console-design-pass` (the branch O1/Epic O tracks; 2 ahead / 138 behind main).
-  **RESOLVED 2026-07-14** (a third strand, `origin/feat/web-login-mock` 2026-07-13, had
-  appeared with verified O2 work): (1)+(4) landing mock extracted to `UI-WIP/` on main,
-  `feature/ui-dark-landing-myapps` deleted local+origin — no rebase/fold needed; (2) obsolete
-  TDD copy dropped with the branch; (3) machine-local UI-WIP files committed (Internal-Public).
-  Plus: `feat/web-login-mock` --no-ff merged to main (O2 done in backlog), branch deleted.
-  ~~`feat/web-console-design-pass` left standing — its Claude-Designer mockup is still
-  unmerged.~~ RESOLVED 2026-07-14 (evening): its mockup content was already on main as the
-  root DryDocsConsole.html (cherry-pick of da6547b came back EMPTY — nothing unique left);
-  the file relocated to UI-WIP/drydocs-console-mockup.html beside the rest of the design
-  record (closes the D7 root-stray disposition properly) and the branch deleted from origin.
-  ALL UI branches are now reconciled — the web stream lives entirely on main.
 
 - 2026-07-12 — [idea] **dry-docs.com site visual language**: seed from the whitepaper's
   "overnight ledger" identity (greenbar/banner-page/mono-display; canonical source stays
@@ -178,6 +139,31 @@ Tags help grooming: `idea` · `bug` · `doc` · `source` (new data source) · `q
 ## Recently groomed (audit trail)
 
 <!-- when you promote an idea, move its line here with the resulting backlog id -->
+
+- 2026-07-15 groom run (weekly inbox groom) — 3 promoted / 1 retired (resolved in place):
+  - [chore] `controlm-loader-flow.md` → `docs/history/` move (captured same day at the
+    controlm docs status-refresh sweep, e3e7bec) → **J11**. Inbound-linker correction made
+    during grooming: grep says README.md + the internal governance doc reference it, NOT
+    CHECKPOINT/reviews as the inbox line guessed.
+  - [chore] schema_graph.cypher stale (generated 2026-06-09, no drift guard; found at the
+    K2 build) → **C8** — regenerate-with-guard vs mark-point-in-time deliberately left as
+    an either/or in the acceptance, decided at execution (derived view, no gate needed).
+  - [chore] session-ritual `python scripts/...` fails outside the venv → **J12**
+    (CLAUDE.md ritual lines + snapshot.ps1's two `& python` calls; re-verified live this
+    session — render_design_doc.py failed bare, succeeded under `poetry run`). Execution
+    caution recorded: CLAUDE.md carried uncommitted user edits at groom time.
+  - retired: the 2026-07-13 UI-branch reconcile line — fully RESOLVED in place by its own
+    2026-07-14 updates (all UI branches reconciled; the web stream lives entirely on main);
+    no item needed, the resolution narrative is preserved in this trail's 2026-07-14 entries.
+  - kept parked, unchanged (each on its recorded gate): drydocs-project-review outline
+    (trigger = L8 landing the 2nd doc type), K2 FID/ALIAS reconciliation tables
+    (company-side sources), ctlm_id ripple checks (internal-side investigation),
+    dry-docs.com visual seed (website not started), /documentation whitepaper type
+    (trigger unfired), lineage live-load gate (HITL), remediation next slices (TDD §6/§7
+    tracks), Phase C packaging (plan gate), Workbench (entitlement), SchedulerKind →
+    AisCapability/AiTool (SME class definitions), BRD outline (later phase), docmeta P1–P3
+    (P0 verdict + ADR 0004), EE container password (user deferred), LLM key strategy
+    (open question), common/ in /list-apps (cosmetic), cli.py regroup (v1.0 window).
 
 - 2026-07-15 — [bug] psgmgr version filter domain is `'Y'` not `'1'` — resolved by the
   FINALIZED company Control-M ingestion TDD (captured local-only in
