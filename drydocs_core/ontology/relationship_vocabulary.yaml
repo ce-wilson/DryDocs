@@ -209,11 +209,7 @@ node_classifications:
     prov_type:  Entity
     note:       "Data port (EventProcessing / BatchProcessing). dprod namespace is the EKGF working default pending the corporate IRI."
 
-  # — SEAL reshape (PROPOSED, GATE-BOUND — 2026-07-08 review, no supplement/loader exist) —
-  # These two node classes exist ONLY so the proposed edges below (seal_app_attributed_to_employee /
-  # seal_qualified_attribution / seal_attribution_has_agent / seal_attribution_had_role)
-  # type-check under the PROV matrix once confirmed. Nothing here is active. See
-  # config/taxonomy-ontology-map.yaml and config/gate-prompts/seal-tom-attribution-reshape.yaml.
+  # — SEAL reshape (ACTIVE at K4, 2026-07-15 — gate 2026-07-10 §B) —
   # (seal_had_primary_source targets :Document — declared ONCE in the docs-corpus section
   # below; the duplicate SEAL-reshape Document entry was merged into it 2026-07-09,
   # tech-debt audit F4 — one label, one classification entry.)
@@ -222,22 +218,24 @@ node_classifications:
     class:      "prov:Attribution"
     prov_type:  n/a
     note: >
-      PROPOSED: reified n-ary node for the SEAL Technical Operating Model (TOM)
-      qualified-attribution pattern — Application -[:QUALIFIED_ATTRIBUTION]-> Attribution
+      ACTIVE (K4, 2026-07-15): reified n-ary node for the SEAL Technical Operating Model (TOM)
+      qualified-attribution pattern — BusinessApplication -[:QUALIFIED_ATTRIBUTION]-> Attribution
       -[:HAS_AGENT]-> Employee, Attribution -[:HAD_ROLE]-> TOMRole. Same pattern family as
       org:Membership (n-ary relation node, not itself a PROV participant — prov:Attribution
-      rdfs:subClassOf prov:Influence). No supplement/loader exists yet.
+      rdfs:subClassOf prov:Influence). Supplement: seal_ontology_supplement.cypher. For
+      operate_manager the level (L1|L2) is a property on THIS node.
 
   - label:      TOMRole
     class:      "skos:Concept"
     prov_type:  n/a
     note: >
-      PROPOSED: SEAL Technical Operating Model role vocabulary — a shared skos:Concept scheme
-      (skos:ConceptScheme) with 6 concepts: cto, application_owner, information_owner,
-      data_owner, operate_manager, risk_compliance_officer. DISTINCT from :Role (org:Role,
-      used for the PAT product hierarchy only, e.g. catalog_dev_team_has_membership) — do not
-      conflate the two. Reached via Attribution -[:HAD_ROLE]-> TOMRole (prov:hadRole). No
-      supplement/loader exists yet.
+      ACTIVE (K4, 2026-07-15): SEAL Technical Operating Model role vocabulary — skos:Concept
+      in scheme tom_roles (SkosConceptScheme), the gate §B REVISED fixed 7: application_owner,
+      primary_information_owner, backup_information_owner, cto (shared with the K5 ProductRole
+      scheme), technology_risk_controls, design_authority, operate_manager (L1/L2 = Attribution
+      property). DISTINCT from :Role (org:Role, PAT product hierarchy only, e.g.
+      catalog_dev_team_has_membership) — do not conflate the two. Reached via Attribution
+      -[:HAD_ROLE]-> TOMRole (prov:hadRole). Supplement: seal_ontology_supplement.cypher.
 
   # — Catalog (active) —
   - label:      CatalogLOB
@@ -1084,15 +1082,16 @@ local_relationships:
     to_node:      Attribution
     prov_maps_to: "prov:qualifiedAttribution"
     note: >
-      PROPOSED. Reified/n-ary form of the TOM attribution pattern (same family as
-      org:Membership — Attribution is a PROV Influence node, not itself Activity / Entity /
-      Agent / Collection, so no matrix row applies directly). Entry point to Attribution
-      -[:HAS_AGENT]-> Employee and Attribution -[:HAD_ROLE]-> TOMRole below. Depends on the
-      proposed :BusinessApplication reclass.
-    supplement:   ~
+      ACTIVE (K4, 2026-07-15; gate 2026-07-10 §B). Reified/n-ary form of the TOM attribution
+      pattern (Attribution is a PROV Influence node, not itself Activity / Entity / Agent /
+      Collection, so no matrix row applies directly). Entry point to Attribution
+      -[:HAS_AGENT]-> Employee and Attribution -[:HAD_ROLE]-> TOMRole below. Type-checks
+      under the K4 :BusinessApplication reclass (prov:Entity). Multi-person roles load THIS
+      form; the simple collapsed edge (seal_app_attributed_to_employee) stays optional/derivable.
+    supplement:   seal_ontology_supplement.cypher
     loader:       ~
     domain:       seal
-    status:       planned
+    status:       active
 
   - id:           seal_attribution_has_agent
     neo4j_label:  HAS_AGENT
@@ -1101,13 +1100,13 @@ local_relationships:
     to_node:      Employee
     prov_maps_to: "prov:agent"
     note: >
-      PROPOSED. prov:agent inside the qualified-attribution reification — names which
-      Employee the Attribution is about. No independent matrix row (Attribution is prov_type
-      n/a, same family as seal_held_by's org:member inverse).
-    supplement:   ~
+      ACTIVE (K4, 2026-07-15; gate 2026-07-10 §B). prov:agent inside the qualified-attribution
+      reification — names which Employee the Attribution is about. No independent matrix row
+      (Attribution is prov_type n/a, same family as seal_held_by's org:member inverse).
+    supplement:   seal_ontology_supplement.cypher
     loader:       ~
     domain:       seal
-    status:       planned
+    status:       active
 
   - id:           seal_attribution_had_role
     neo4j_label:  HAD_ROLE
@@ -1116,14 +1115,18 @@ local_relationships:
     to_node:      TOMRole
     prov_maps_to: "prov:hadRole"
     note: >
-      PROPOSED. prov:hadRole inside the qualified-attribution reification — names which TOM
-      role (cto | application_owner | information_owner | data_owner | operate_manager |
-      risk_compliance_officer) the Attribution is about. TOMRole is a skos:Concept, DISTINCT
-      from :Role (org:Role, PAT hierarchy only) — see node_classifications.
-    supplement:   ~
+      ACTIVE (K4, 2026-07-15; gate 2026-07-10 §B REVISED role set). prov:hadRole inside the
+      qualified-attribution reification — names which TOM role the Attribution grants. The
+      fixed 7-concept scheme (tom_roles): application_owner | primary_information_owner |
+      backup_information_owner | cto (shared with K5 ProductRole) | technology_risk_controls |
+      design_authority | operate_manager (L1/L2 = a level property on the Attribution, per
+      the gate's "one or both" wording). Subsumes the old flat 6: data_owner -> Information
+      Owner, risk_compliance_officer -> Technology Risk & Controls; Design Authority is new.
+      TOMRole is a skos:Concept, DISTINCT from :Role (org:Role, PAT hierarchy only).
+    supplement:   seal_ontology_supplement.cypher
     loader:       ~
     domain:       seal
-    status:       planned
+    status:       active
 
   # ── Catalog ──────────────────────────────────────────────────────────────
 
