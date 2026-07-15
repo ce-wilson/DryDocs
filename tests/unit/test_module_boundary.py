@@ -28,6 +28,7 @@ PKG_ROOTS = [
     REPO_ROOT / "drydocs_remediation",
     REPO_ROOT / "drydocs_lineage",
     REPO_ROOT / "drydocs_deepdoc",
+    REPO_ROOT / "drydocs_api",
 ]
 
 # Dotted prefixes that make up drydocs-core (see MODULE_MAP.md). Since the Phase B
@@ -78,6 +79,12 @@ COMPONENT_GROUPS: dict[str, tuple[str, ...]] = {
     # components-don't-import-each-other test IS the D2 separation.
     "deepdoc": (
         "drydocs_deepdoc",
+    ),
+    # drydocs-api — the thin read API over the graph (ADR 0005, O5). Read-only
+    # (endpoint guard + READ routing); imports only drydocs_core; FastAPI is an
+    # optional dependency group so the default install stays framework-free.
+    "api": (
+        "drydocs_api",
     ),
 }
 ALL_COMPONENT_PREFIXES: tuple[str, ...] = tuple(
