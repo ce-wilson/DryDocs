@@ -298,8 +298,8 @@ objects:
         NAME|VALUE) extract are dispositioned here. CM_DEF_SETVAR_VW carries its
         own IS_CURRENT_VERSION/VERSION_SERIAL (confirmed 2026-07-10, like the
         LNKI/LNKO views); the extract now filters V.IS_CURRENT_VERSION = 'Y'
-        (filter-only — used in WHERE, not projected/SET; domain 'Y' inferred from
-        the D4 resolution — spot-check SELECT DISTINCT at the company preflight).
+        (filter-only — used in WHERE, not projected/SET; domain 'Y' SME-confirmed
+        2026-07-15 for this view too — D4 closed with no residual).
         Sweeps the rest pending the full column census (doc 08 Phase 2).
 
   # ---------------------------------------------------------------------------

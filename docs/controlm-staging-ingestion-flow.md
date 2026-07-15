@@ -221,7 +221,7 @@ flowchart TD
 |---|-------|-------------|
 | 0.1 | `TABLE_ID` unique across the 4 data centers? | If collisions: enable the `DATA_CENTER` join predicate in both views (staging already keys defensively on `(data_center, folder_id, job_id)`) |
 | 0.2 | `MEMLIB` / `OVERLIB` / `APPL_TYPE` exist on `CM_DEF_VJOB`? | Drop absent columns from `JOB_DETAILED_VIEW` before compile |
-| ✓ | 0.3 RESOLVED 2026-07-15 (D4) — `IS_CURRENT_VERSION` domain is **`'Y'`** (finalized company ingestion TDD; live-verified on `CM_DEF_VJOB` + LNKI/LNKO). `= 'Y'` is the hard filter in both views; residual: one-line `SELECT DISTINCT` on `CM_DEF_SETVAR_VW` at the company preflight (domain inferred there) | Gate Q2 caveat closed |
+| ✓ | 0.3 RESOLVED 2026-07-15 (D4) — `IS_CURRENT_VERSION` domain is **`'Y'`** (finalized company ingestion TDD; live-verified on `CM_DEF_VJOB` + LNKI/LNKO, and SME-confirmed for `CM_DEF_SETVAR_VW` same day). `= 'Y'` is the hard filter in both views; no residual | Gate Q2 caveat closed |
 | 0.4 | **NEW** — `CREATION_USER` / `CHANGE_USERID` exist on `CM_DEF_VJOB`? | Required by `JOB_DEVELOPER_VIEW`'s CROSS APPLY; drop branches if absent |
 | ✓ | RESOLVED 2026-07-10 — object confirmed as `psgmgr.CM_DEF_SETVAR_VW` (a view carrying its own `IS_CURRENT_VERSION` / `VERSION_SERIAL`); extracts now filter `V.IS_CURRENT_VERSION = 'Y'` (literal corrected `'1'`→`'Y'` 2026-07-15, D4) | Unblocked the variable extract + HWM hash; the `** VERIFY NAME **` flags are removed |
 
