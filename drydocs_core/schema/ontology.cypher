@@ -74,6 +74,7 @@ MERGE (n:OntologyTerm:ProvClass {iri:"http://www.w3.org/ns/prov#Attribution"})  
 MERGE (n:OntologyTerm:ProvProperty {iri:"http://www.w3.org/ns/prov#qualifiedAttribution"}) SET n.label = "qualified attribution";
 MERGE (n:OntologyTerm:ProvProperty {iri:"http://www.w3.org/ns/prov#agent"})              SET n.label = "agent";
 MERGE (n:OntologyTerm:ProvProperty {iri:"http://www.w3.org/ns/prov#hadRole"})            SET n.label = "had role";
+MERGE (n:OntologyTerm:ProvProperty {iri:"http://www.w3.org/ns/prov#hadPrimarySource"})   SET n.label = "had primary source";
 
 
 // ----- DQV (data quality vocabulary) -----------------------------------------

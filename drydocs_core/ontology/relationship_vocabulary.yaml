@@ -1046,17 +1046,18 @@ local_relationships:
     to_node:      Document
     prov_maps_to: "prov:hadPrimarySource"
     note: >
-      PROPOSED. Entity -> Entity, a sub-property of prov:wasDerivedFrom: the Application
-      record (once reclassed prov:Entity/dprod:DataProduct — see node_classifications
-      proposed_reclass) was primarily sourced from a scraped SEAL/PAT Document. Generalizes
-      to any fact/entity extracted from a scraped page, not just Application; Application is
-      the concrete instance in scope for this gate. Requires the future drydocs-docmeta
-      component (Document node, loader) — see knowledge/upgrade-plans/docmeta-component.md.
+      ACTIVE (K4, 2026-07-15; gate 2026-07-10 §D). Entity -> Entity, a sub-property of
+      prov:wasDerivedFrom: the BusinessApplication record (reclassed prov:Entity/
+      dprod:DataProduct at K4) was primarily sourced from a scraped SEAL/PAT Document.
+      Generalizes to any fact/entity extracted from a scraped page; BusinessApplication is
+      the concrete instance in scope. EDGE-ACTIVE ONLY: the Document node + loader wait on
+      the drydocs-docmeta component (the gate promoted docmeta from parked to a REQUIRED
+      dependency of the provenance goal) — see knowledge/upgrade-plans/docmeta-component.md.
       Matrix row: Entity -> Entity = prov:wasDerivedFrom family.
-    supplement:   ~
+    supplement:   seal_ontology_supplement.cypher
     loader:       ~
     domain:       seal
-    status:       planned
+    status:       active
 
   - id:           seal_app_attributed_to_employee
     neo4j_label:  WAS_ATTRIBUTED_TO

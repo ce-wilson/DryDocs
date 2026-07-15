@@ -192,3 +192,17 @@ WITH 1 AS _
 MATCH (s:SkosConceptScheme {id: "tom_roles"})
 MATCH (c:TOMRole)
 MERGE (c)-[:IN_SCHEME]->(s);
+
+// ----- Provenance of the SEAL record itself (gate §D, active at K4) ---------
+
+// HAD_PRIMARY_SOURCE — BusinessApplication → Document (prov:hadPrimarySource)
+// Edge-active only: the Document node + loader arrive with drydocs-docmeta.
+MERGE (n:OntologyTerm:LocalRelationship {iri: "https://drydocs.local/ontology#hadPrimarySource"})
+  SET n.label  = "HAD_PRIMARY_SOURCE",
+      n.domain = "BusinessApplication",
+      n.range  = "Document",
+      n.notes  = "The SEAL record was primarily sourced from a scraped Document. "
+               + "prov:hadPrimarySource (sub-property of wasDerivedFrom).";
+MATCH (local:OntologyTerm:LocalRelationship {iri: "https://drydocs.local/ontology#hadPrimarySource"})
+MATCH (pp:OntologyTerm:ProvProperty         {iri: "http://www.w3.org/ns/prov#hadPrimarySource"})
+MERGE (local)-[:MAPS_TO]->(pp);
