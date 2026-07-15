@@ -29,11 +29,32 @@ Console code reads the graph ONLY through the `GraphAccess` interface
 (`src/lib/graph.ts`); view components never import `neo4j-driver`. Two adapters:
 
 - **`api`** (`src/lib/graphApi.ts`) — the deployment path (the `drydocs-api`
-  thin API); fails loud until that component lands, never silently falls back
-  to bolt.
+  thin API): exchanges the signed-in persona id for a server session token,
+  then runs **named view queries** (`runNamed`) whose Cypher lives server-side
+  in `drydocs_api/queries.py` — payload shaping is never duplicated in the
+  browser. Fails loud when the API is down; never silently falls back to bolt.
 - **`bolt`** (`src/lib/neo4j.ts`) — a **dev-mode tool only**: reachable only in
   dev builds (`import.meta.env.DEV`) AND for the admin role (`boltAllowed()`);
-  production bundles have the path compiled out.
+  production bundles have the path compiled out. It has no named-query
+  registry (`runNamed` throws) — it is the raw-Cypher bench, nothing more.
+
+## Graph view (live, backlog O6)
+
+The **Graph** nav view renders real `WAS_INFORMED_BY` dependency edges from the
+knowledge graph through the api adapter (both roles; read-only). Rendering is
+d3-force layout (deterministic) + the in-repo SVG idiom — the NVL decision is
+recorded on backlog item O6. The synthesized tower drill-downs stay as the
+no-backend demo. To run the full live path:
+
+```powershell
+docker start neo4j-drydocs-ee                 # Neo4j EE (bolt on :7689)
+poetry install --with api                     # once
+poetry run uvicorn drydocs_api.app:create_app --factory --port 8001
+npm run dev                                   # in web/
+```
+
+The graph must be loaded first (repo README "Quick start"). Point
+`VITE_API_URL` at the API if it is not on `http://localhost:8001`.
 
 **Dev-mode credential rule:** the Neo4j password is form-entered at runtime,
 localhost targets only. Never define `VITE_NEO4J_PASSWORD` in any env file or

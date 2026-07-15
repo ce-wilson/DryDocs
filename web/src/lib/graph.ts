@@ -11,10 +11,21 @@ export interface GraphResult {
   rows: Record<string, unknown>[]
 }
 
+/** A named-view result also names the database the server routed it to —
+ *  the trust boundary made visible (ADR 0002: drydocs vs drydocs_all is a
+ *  SERVER routing decision; the client only ever learns it after the fact). */
+export interface NamedResult extends GraphResult {
+  database: string
+}
+
 export interface GraphAccess {
   readonly kind: 'bolt' | 'api'
   /** Read-only query execution. Raw Cypher is a dev/admin affordance only. */
   runRead(query: string): Promise<GraphResult>
+  /** Named view query (ADR 0005 decision 2): payload shaping lives server-side
+   *  in drydocs-api's query registry — never duplicated in the browser. The
+   *  api adapter POSTs /query/{id}; bolt has no registry and fails loud. */
+  runNamed(queryId: string, params?: Record<string, unknown>): Promise<NamedResult>
 }
 
 // The explicit dev flag + role gate for the bolt adapter (ADR 0005 decision 4):

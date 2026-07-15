@@ -6,6 +6,7 @@ import SignIn from './components/SignIn'
 import Shell, { type EnvName } from './components/Shell'
 import Landing from './components/Landing'
 import MyApps from './components/MyApps'
+import GraphExplorer from './components/GraphExplorer'
 import CypherConsole from './components/CypherConsole'
 import Governance from './components/Governance'
 import './App.css'
@@ -61,6 +62,7 @@ export default function App() {
     >
       {route.view === 'landing' && <Landing tower={route.tower} persona={persona} />}
       {route.view === 'my-apps' && <MyApps persona={persona} />}
+      {route.view === 'graph' && <GraphExplorer personaId={session.personaId} />}
       {route.view === 'console' && <CypherConsole personaId={session.personaId} role={session.role} />}
       {route.view === 'governance' && <Governance />}
     </Shell>
