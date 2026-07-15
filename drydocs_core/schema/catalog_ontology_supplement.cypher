@@ -134,7 +134,7 @@ MERGE (n:OntologyTerm:LocalClass {iri: "https://drydocs.local/ontology#AreaProdu
 MERGE (n:OntologyTerm:LocalRelationship {iri: "https://drydocs.local/ontology#hasApplication"})
   SET n.label  = "HAS_APPLICATION",
       n.domain = "Product",
-      n.range  = "Application",
+      n.range  = "BusinessApplication",
       n.notes  = "Product owns a set of SEAL-registered applications. Local alias; "
                + "matrix equivalent is WAS_ATTRIBUTED_TO (Entity→Agent). "
                + "Written by pat_product_mapping loader.";
@@ -167,13 +167,13 @@ MERGE (n:OntologyTerm:LocalRelationship {iri: "https://drydocs.local/ontology#su
                + "Edge carries team_type (aligned|flex|dedicated) and sponsored (bool); 'aligned to' "
                + "= team_type=aligned. Agent→Entity has no PROV-O matrix row; local-only.";
 
-// DEVELOPS  —  DevTeam → BusinessApplication (graph label :Application), joined by SEALID
+// DEVELOPS  —  DevTeam → BusinessApplication (graph label :BusinessApplication), joined by SEALID
 // SME 2026-06-21. Agent→Agent has no PROV matrix fit; local. Cross-source edge (catalog↔SEAL).
 MERGE (n:OntologyTerm:LocalRelationship {iri: "https://drydocs.local/ontology#develops"})
   SET n.label  = "DEVELOPS",
       n.domain = "DevTeam",
-      n.range  = "Application",
-      n.notes  = "DevTeam develops a BusinessApplication (graph label :Application), reconciled by "
+      n.range  = "BusinessApplication",
+      n.notes  = "DevTeam develops a BusinessApplication (graph label :BusinessApplication), reconciled by "
                + "SEALID. Agent→Agent has no PROV-O matrix row (actedOnBehalfOf is delegation, not "
                + "development); local-only. Inverse alt: Application -[:WAS_ATTRIBUTED_TO]-> DevTeam.";
 

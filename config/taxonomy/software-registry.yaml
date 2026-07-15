@@ -146,7 +146,7 @@ products:
 # Purpose: map STG_INVOCATION rows (drydocs_core/controlm/commands.py, the Phase-C
 # command/script parser over RESOLVED CM_DEF_VJOB.CMD_LINE) to a `products:`
 # id above, so a later loader can derive
-#   (:Application)-[:USES_SOFTWARE {source:'controlm-cmdline'}]->(:SoftwareProduct)
+#   (:BusinessApplication)-[:USES_SOFTWARE {source:'controlm-cmdline'}]->(:SoftwareProduct)
 # CM_DEF_VJOB.APPL_TYPE is explicitly NOT the basis (recorded dead-end, doc 07
 # "What already feeds it": Ab Initio/Informatica run as plain OS commands, so
 # job/application types under-represent the real software).

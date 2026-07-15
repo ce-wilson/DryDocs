@@ -76,7 +76,7 @@ node_classifications:
     prov_type:  Collection
     note: >
       Control-M APPLICATION grouping from the folder HEADER ROW in CM_DEF_VJOB
-      (JOB_ID=1) — deliberately NOT the business :Application / SEAL concept.
+      (JOB_ID=1) — deliberately NOT the business :BusinessApplication / SEAL concept.
       prov:Collection of ControlMFolder (see m3_contains_folder). Written in
       the FOLDER pass. SME gate controlm-q1q3-phase1 (2026-07-07); entry added
       2026-07-09 to close the node_classifications gap (the edge was
@@ -171,22 +171,19 @@ node_classifications:
     note:       "Write-side dataset (target zone / bucket / partitions)."
 
   # — SEAL (active) —
-  - label:      Application
-    class:      "prov:SoftwareAgent"
-    prov_type:  Agent
-    note:       "SEAL-registered application. seal_ontology_supplement.cypher."
-    proposed_reclass: >
-      GATE-BOUND PROPOSAL (2026-07-08 review, NOT applied): reclass to class "prov:Entity" /
-      "dprod:DataProduct", prov_type Entity. Rationale: this node currently carries three
-      incompatible PROV types at once — SoftwareAgent (here), dprod:Port children (Entity
-      semantics, seal_has_port), and org:Membership/org:Role role-holders (Organization
-      semantics, seal_has_membership/seal_of_role/seal_held_by — see their own
-      proposed_deprecation notes below). A SEAL application is a data-product/asset record,
-      not an Agent and not an Organization. See config/taxonomy-ontology-map.yaml
-      #application-as-dataproduct and config/gate-prompts/seal-tom-attribution-reshape.yaml.
-      DO NOT flip `class`/`prov_type` above until the SME confirms — active loaders,
-      seal_has_port/seal_has_membership/seal_of_role/seal_held_by (status: active), and the
-      drift guard all depend on the CURRENT SoftwareAgent typing.
+  - label:      BusinessApplication
+    class:      "prov:Entity"
+    dual_class: "dprod:DataProduct"
+    prov_type:  Entity
+    note: >
+      SEAL-registered application (a data-product/asset record). seal_ontology_supplement.cypher.
+      RECLASSED + RENAMED (K4, 2026-07-15) per the BusinessApplication entity-reshape gate
+      §A + label decision (config/gate-log.md 2026-07-10, SME chad.wilson): was label
+      Application, class prov:SoftwareAgent/Agent. The old typing carried three incompatible
+      PROV types at once (SoftwareAgent here; dprod:Port children = Entity semantics;
+      org:Membership role-holders = Organization semantics). Label :Application →
+      :BusinessApplication normalized across vocabulary, schema supplements, loaders,
+      constraints (businessapplication_*), and tests in the same K4 change.
 
   - label:      Employee
     class:      "prov:Agent"
@@ -528,7 +525,7 @@ local_relationships:
     note: >
       ControlMApplication (prov:Collection — the Control-M APPLICATION grouping from
       the folder HEADER ROW in CM_DEF_VJOB (JOB_ID=1), deliberately NOT the business
-      :Application / SEAL concept) contains ControlMFolder (prov:Collection). Matrix
+      :BusinessApplication / SEAL concept) contains ControlMFolder (prov:Collection). Matrix
       row: Collection → any = HAD_MEMBER; symmetric with CONTAINS_JOB one level down.
       SME gate 2026-07-07 (controlm-q1q3-phase1; config/gate-log.md). Loader landed
       in the FOLDER pass, not jobs (load-order definition 2026-07-07): the folders
@@ -698,7 +695,7 @@ local_relationships:
     neo4j_label:  WAS_ASSOCIATED_WITH
     role:         seal_app_ref
     from_node:    ControlMJob
-    to_node:      Application
+    to_node:      BusinessApplication
     prov_maps_to: "prov:wasAssociatedWith"
     note: >
       Job attribution to its SEAL-registered application. Matrix row:
@@ -716,7 +713,7 @@ local_relationships:
       coverage stamp + graph-tests/seal-attribution-coverage.yaml;
       deterministic multi-hit tie-break, flagged for audit; manual tier-5
       PIN semantics per config/manual-loads/). K3 RIDER: this shape
-      type-checks while :Application is still prov:SoftwareAgent — the K4
+      type-checks while :BusinessApplication is still prov:SoftwareAgent — the K4
       reclass re-opens the edge SHAPE at its own follow-up gate (see the
       map entry's type_conflict_note); the confirmed match policy itself
       is shape-agnostic and carries over.
@@ -916,7 +913,7 @@ local_relationships:
   - id:           seal_has_port
     neo4j_label:  HAS_PORT
     role:         ~
-    from_node:    Application
+    from_node:    BusinessApplication
     to_node:      Port
     prov_maps_to: ~
     note: >
@@ -938,7 +935,7 @@ local_relationships:
       GATE-BOUND, status: planned — NOT wired (loader: ~). Registered per backlog C6
       (2026-07-09) to close the drift where REQUIRES_SCHEDULER appears in README.md:263 and
       docs/history/LoadPlanV3.md:82,393 but was absent from this registry. Semantics: the SEAL
-      two-port model is (:Application)-[:HAS_PORT]->(:Port {kind}) with EXACTLY TWO ports per app
+      two-port model is (:BusinessApplication)-[:HAS_PORT]->(:Port {kind}) with EXACTLY TWO ports per app
       — EventProcessing (events/API) and BatchProcessing (batch); the loader creates multi-label
       :Port:EventProcessing / :Port:BatchProcessing nodes (seal_applications.cypher:96-105;
       config/taxonomy/business-application.yaml). REQUIRES_SCHEDULER attaches to the BATCH port
@@ -952,11 +949,11 @@ local_relationships:
       HITL-GATE OPEN QUESTIONS (edge meaning ⇒ the gate; do not auto-decide — route via
       ontology-mapper + docs/restructure/03-hitl-sme-flow.md; mirrored in the map entry
       requires-scheduler):
-        (1) ATTACH POINT — ports are application-level ((:Application)-[:HAS_PORT]->(:Port)),
-            so README.md:263 ("on :Application") and LoadPlanV3.md:82 ("the :BatchProcessing
+        (1) ATTACH POINT — ports are application-level ((:BusinessApplication)-[:HAS_PORT]->(:Port)),
+            so README.md:263 ("on :BusinessApplication") and LoadPlanV3.md:82 ("the :BatchProcessing
             port") describe the SAME app batch port. The remaining SME call is only whether the
             edge sits on the batch :Port (kind=BatchProcessing, as registered here) or is hoisted
-            to :Application with the kind as an edge/context property.
+            to :BusinessApplication with the kind as an edge/context property.
         (2) TARGET NODE — :SchedulerKind is SLATED FOR DEPRECATION in favor of :AisCapability +
             :AiTool (user 2026-07-09; those classes are not yet defined in the ontology), so this
             to_node is PROVISIONAL — re-target / reshape REQUIRES_SCHEDULER onto the replacement
@@ -973,7 +970,7 @@ local_relationships:
   - id:           seal_has_membership
     neo4j_label:  HAS_MEMBERSHIP
     role:         ~
-    from_node:    Application
+    from_node:    BusinessApplication
     to_node:      Membership
     prov_maps_to: ~
     note: >
@@ -1034,7 +1031,7 @@ local_relationships:
     status:       active
 
   # ── SEAL — PROPOSED reshape (GATE-BOUND, 2026-07-08 review) ────────────────
-  # Nothing below is active. The :Application node stays classed prov:SoftwareAgent (see
+  # Nothing below is active. The :BusinessApplication node stays classed prov:SoftwareAgent (see
   # node_classifications) until the SME confirms; these entries exist ONLY so the proposed
   # edges type-check under the PROV matrix once that reclass is confirmed. All carry
   # supplement: ~ / loader: ~ on purpose — no supplement/loader claims for a planned-only
@@ -1045,7 +1042,7 @@ local_relationships:
   - id:           seal_had_primary_source
     neo4j_label:  HAD_PRIMARY_SOURCE
     role:         ~
-    from_node:    Application
+    from_node:    BusinessApplication
     to_node:      Document
     prov_maps_to: "prov:hadPrimarySource"
     note: >
@@ -1064,7 +1061,7 @@ local_relationships:
   - id:           seal_app_attributed_to_employee
     neo4j_label:  WAS_ATTRIBUTED_TO
     role:         tom_role_holder
-    from_node:    Application
+    from_node:    BusinessApplication
     to_node:      Employee
     prov_maps_to: "prov:wasAttributedTo"
     note: >
@@ -1073,7 +1070,7 @@ local_relationships:
       (seal_qualified_attribution / seal_attribution_has_agent / seal_attribution_had_role),
       which carries the specific TOM role. role=tom_role_holder distinguishes this instance
       from arch_owns_code (role=owner) and reg_made_by on the same WAS_ATTRIBUTED_TO label.
-      Depends on the proposed :Application reclass (SoftwareAgent -> Entity) — does NOT
+      Depends on the proposed :BusinessApplication reclass (SoftwareAgent -> Entity) — does NOT
       type-check under the CURRENT active classification.
     supplement:   ~
     loader:       ~
@@ -1083,7 +1080,7 @@ local_relationships:
   - id:           seal_qualified_attribution
     neo4j_label:  QUALIFIED_ATTRIBUTION
     role:         ~
-    from_node:    Application
+    from_node:    BusinessApplication
     to_node:      Attribution
     prov_maps_to: "prov:qualifiedAttribution"
     note: >
@@ -1091,7 +1088,7 @@ local_relationships:
       org:Membership — Attribution is a PROV Influence node, not itself Activity / Entity /
       Agent / Collection, so no matrix row applies directly). Entry point to Attribution
       -[:HAS_AGENT]-> Employee and Attribution -[:HAD_ROLE]-> TOMRole below. Depends on the
-      proposed :Application reclass.
+      proposed :BusinessApplication reclass.
     supplement:   ~
     loader:       ~
     domain:       seal
@@ -1198,7 +1195,7 @@ local_relationships:
     neo4j_label:  HAS_APPLICATION
     role:         ~
     from_node:    Product
-    to_node:      Application
+    to_node:      BusinessApplication
     prov_maps_to: ~
     note: >
       Product owns a set of SEAL-registered applications. Kept as local label
@@ -1292,11 +1289,11 @@ local_relationships:
     neo4j_label:  DEVELOPS
     role:         ~
     from_node:    DevTeam
-    to_node:      Application          # the BusinessApplication concept; key = SEALID
+    to_node:      BusinessApplication          # the BusinessApplication concept; key = SEALID
     join_key:     SEALID
     prov_maps_to: ~
     note: >
-      DevTeam develops a BusinessApplication (graph label :Application), reconciled by SEALID.
+      DevTeam develops a BusinessApplication (graph label :BusinessApplication), reconciled by SEALID.
       Confirmed via HITL gate (C3/C4, SME 2026-06-21). DevTeam (Agent) → Application
       (SoftwareAgent): no PROV matrix row fits Agent→Agent ownership (actedOnBehalfOf is
       delegation, not development), so local-only. Cross-source edge (catalog↔SEAL ownership
@@ -1353,7 +1350,7 @@ local_relationships:
   - id:           arch_contains_batch
     neo4j_label:  CONTAINS_BATCH
     role:         ~
-    from_node:    Application
+    from_node:    BusinessApplication
     to_node:      Batch
     prov_maps_to: ~
     note: >
@@ -1398,7 +1395,7 @@ local_relationships:
   - id:           reg_uses_software
     neo4j_label:  USES_SOFTWARE
     role:         ~
-    from_node:    Application
+    from_node:    BusinessApplication
     to_node:      SoftwareProduct
     prov_maps_to: ~
     note: >

@@ -26,7 +26,7 @@ cases:
   - id: TC-01
     description: every seal_app_ref edge carries the gate-confirmed shape props (§D)
     cypher: >
-      MATCH (:ControlMJob)-[r:WAS_ASSOCIATED_WITH {role: 'seal_app_ref'}]->(:Application)
+      MATCH (:ControlMJob)-[r:WAS_ASSOCIATED_WITH {role: 'seal_app_ref'}]->(:BusinessApplication)
       WHERE r.match_method IS NULL OR r.source IS NULL
          OR r.first_seen_at IS NULL OR r.last_seen_at IS NULL
          OR r.last_run_id IS NULL
@@ -36,7 +36,7 @@ cases:
   - id: TC-02
     description: match_method stays inside the confirmed vocabulary (four tiers + manual)
     cypher: >
-      MATCH (:ControlMJob)-[r:WAS_ASSOCIATED_WITH {role: 'seal_app_ref'}]->(:Application)
+      MATCH (:ControlMJob)-[r:WAS_ASSOCIATED_WITH {role: 'seal_app_ref'}]->(:BusinessApplication)
       WHERE NOT r.match_method IN ['seal', 'fid', 'app_name', 'alias', 'manual']
       RETURN DISTINCT r.match_method AS unknown_method
     assert: empty
@@ -44,7 +44,7 @@ cases:
   - id: TC-03
     description: automated attribution is one-to-one — no job carries two non-manual seal_app_ref edges (§A one-to-one accept)
     cypher: >
-      MATCH (j:ControlMJob)-[r:WAS_ASSOCIATED_WITH {role: 'seal_app_ref'}]->(:Application)
+      MATCH (j:ControlMJob)-[r:WAS_ASSOCIATED_WITH {role: 'seal_app_ref'}]->(:BusinessApplication)
       WHERE r.match_method <> 'manual'
       WITH j, count(r) AS automated_edges
       WHERE automated_edges > 1
@@ -66,7 +66,7 @@ cases:
       MATCH (run:JobRun {loader: 'seal_attribution.v1'})
       WHERE run.status = 'OK' AND run.edges_written IS NOT NULL
       WITH run ORDER BY run.completed_at DESC LIMIT 1
-      OPTIONAL MATCH (:ControlMJob)-[r:WAS_ASSOCIATED_WITH {role: 'seal_app_ref'}]->(:Application)
+      OPTIONAL MATCH (:ControlMJob)-[r:WAS_ASSOCIATED_WITH {role: 'seal_app_ref'}]->(:BusinessApplication)
         WHERE r.last_run_id = run.run_id
       WITH run, count(r) AS live_edges
       WHERE run.edges_written <> live_edges
@@ -77,7 +77,7 @@ cases:
   - id: TC-06
     description: manually-created Application nodes always carry their audit pointers (§F.4 — counted separately, never anonymous)
     cypher: >
-      MATCH (a:Application {manually_created: true})
+      MATCH (a:BusinessApplication {manually_created: true})
       WHERE a.manual_load_file IS NULL OR a.authored_by IS NULL
       RETURN a.seal_id AS unstamped_manual_node
     assert: empty

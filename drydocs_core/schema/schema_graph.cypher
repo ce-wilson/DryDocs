@@ -56,7 +56,7 @@ MERGE (n:SchemaMeta:DataTarget {name: 'DataTarget'})
   SET n.class = 'dcat:Dataset', n.prov_type = 'Entity';
 
 // — SEAL (active) —
-MERGE (n:SchemaMeta:Application {name: 'Application'})
+MERGE (n:SchemaMeta:BusinessApplication {name: 'Application'})
   SET n.class = 'prov:SoftwareAgent', n.prov_type = 'Agent';
 MERGE (n:SchemaMeta:Employee {name: 'Employee'})
   SET n.class = 'prov:Agent', n.prov_type = 'Agent';

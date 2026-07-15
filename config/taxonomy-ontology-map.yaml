@@ -145,7 +145,7 @@ mappings:
       element: "Job is attributed to its SEAL-registered application (fact_type SEAL)"
     ontology:
       from_node: ControlMJob                # prov:Activity
-      to_node: Application                  # prov:SoftwareAgent (SEAL-registered)
+      to_node: BusinessApplication                  # prov:SoftwareAgent (SEAL-registered)
       prov_type_from: Activity
       prov_type_to: Agent
       matrix_row: "Activity → Agent = prov:wasAssociatedWith"
@@ -158,15 +158,15 @@ mappings:
     status: confirmed                       # gate seal-attribution-match-policy SIGNED OFF (match policy; edge shape re-opens with K4, see type_conflict_note)
     confirmed_by: chad.wilson
     confirmed_on: 2026-07-14
-    provenance_note: "2026-07-01 company reconciliation; spec-level on both repos; producer registration K1, activation K2. Match policy confirmed 2026-07-14 while :Application is still prov:SoftwareAgent (K3 reclass unapplied); the K4 reclass re-opens the edge SHAPE per the K3 §F deferral — the confirmed policy itself is shape-agnostic."
+    provenance_note: "2026-07-01 company reconciliation; spec-level on both repos; producer registration K1, activation K2. Match policy confirmed 2026-07-14 while :BusinessApplication is still prov:SoftwareAgent (K3 reclass unapplied); the K4 reclass re-opens the edge SHAPE per the K3 §F deferral — the confirmed policy itself is shape-agnostic."
     open_questions:
       - "ANSWERED 2026-07-14 (gate): one-to-one match accepted at the top available tier without further review."
       - "ANSWERED 2026-07-14 (gate): unmatched jobs surface as a per-run coverage count (matched + unmatched = eligible), joins graph_verify; never blocks the run."
       - "ANSWERED 2026-07-14 (gate): deterministic triage accepted as default (most-recent run_id, then lowest seal_id, last resort only); every multi-hit flagged for after-the-fact audit — no per-case load-time SME calls."
     type_conflict_note: >
-      2026-07-08 review: this mapping requires :Application to be a prov:Agent (matrix row
+      2026-07-08 review: this mapping requires :BusinessApplication to be a prov:Agent (matrix row
       Activity -> Agent = prov:wasAssociatedWith). The proposed SEAL reshape
-      (application-as-dataproduct, this file) reclasses :Application to prov:Entity /
+      (application-as-dataproduct, this file) reclasses :BusinessApplication to prov:Entity /
       dprod:DataProduct, which no longer type-checks against wasAssociatedWith. If the reshape
       is confirmed, this mapping must be RE-SHAPED, not carried forward as-is — see
       proposed_reshape below. Still status: proposed; not resolved by this note.
@@ -186,7 +186,7 @@ mappings:
       source: seal-extract
       element: "A BatchProcessing data port requires a scheduler technology (which orchestrator runs its batch)"
     ontology:
-      from_node: Port                       # the BATCH port: :Port:BatchProcessing {kind:"BatchProcessing"}; app-level (:Application)-[:HAS_PORT]->(:Port), two per app (EventProcessing/API + BatchProcessing)
+      from_node: Port                       # the BATCH port: :Port:BatchProcessing {kind:"BatchProcessing"}; app-level (:BusinessApplication)-[:HAS_PORT]->(:Port), two per app (EventProcessing/API + BatchProcessing)
       to_node: SchedulerKind                # PROVISIONAL — slated for deprecation → :AisCapability + :AiTool (user 2026-07-09; not yet defined). Today: {name: ControlM|Autosys|Airflow}, seeded ontology.cypher
       prov_type_from: Entity                # dprod port (Entity semantics)
       prov_type_to: ~                        # target class unsettled (SchedulerKind deprecating; replacements undefined)
@@ -200,12 +200,12 @@ mappings:
     status: proposed                         # <-- SME must confirm at the gate (backlog C6)
     provenance_note: "Registered per backlog C6 (2026-07-09) to close the README/LoadPlanV3-vs-vocab drift. Edge meaning ⇒ HITL gate; not auto-decided."
     open_questions:
-      - "Attach point: ports are application-level ((:Application)-[:HAS_PORT]->(:Port), kind∈{EventProcessing=events/API, BatchProcessing=batch}), so README.md:263 ('on :Application') and LoadPlanV3.md:82 ('the :BatchProcessing port') describe the SAME app batch port. SME call = keep the edge on the batch :Port (as here) or hoist to :Application. REQUIRES_SCHEDULER is batch-only (the EventProcessing/API port is not scheduler-driven)."
+      - "Attach point: ports are application-level ((:BusinessApplication)-[:HAS_PORT]->(:Port), kind∈{EventProcessing=events/API, BatchProcessing=batch}), so README.md:263 ('on :BusinessApplication') and LoadPlanV3.md:82 ('the :BatchProcessing port') describe the SAME app batch port. SME call = keep the edge on the batch :Port (as here) or hoist to :BusinessApplication. REQUIRES_SCHEDULER is batch-only (the EventProcessing/API port is not scheduler-driven)."
       - "TARGET (to_node): :SchedulerKind is slated for deprecation → :AisCapability + :AiTool (user 2026-07-09; not yet defined in the ontology). The target here is PROVISIONAL — re-target/reshape onto the replacement class(es) at the gate once defined; whether REQUIRES_SCHEDULER becomes one edge or two is itself an SME call. See config/taxonomy/platforms.yaml (reconciliation placeholder) + the IDEAS SchedulerKind-deprecation capture."
       - "Confirm null-PROV/infrastructure is correct, vs a weak prov:used / prov:wasInfluencedBy."
 
   # ---- SEAL ontology reshape — GATE-BOUND (2026-07-08 review) --------------
-  # Nothing in this block is applied. The :Application node stays classed prov:SoftwareAgent
+  # Nothing in this block is applied. The :BusinessApplication node stays classed prov:SoftwareAgent
   # (status: active in relationship_vocabulary.yaml#node_classifications) until the SME
   # confirms; see config/gate-prompts/seal-tom-attribution-reshape.yaml and the review
   # write-ups (knowledge/upgrade-plans/docmeta-component.md, git-readme.md,
@@ -216,7 +216,7 @@ mappings:
       source: seal-extract
       element: "BusinessApplication (SEAL-registered) is a data-product/asset record, not a software agent"
     ontology:
-      from_node: Application               # CURRENT (active): prov:SoftwareAgent — see node_classifications
+      from_node: BusinessApplication               # CURRENT (active): prov:SoftwareAgent — see node_classifications
       to_node: ~                            # node reclassification, not an edge
       current_class: "prov:SoftwareAgent"
       proposed_class: "prov:Entity / dprod:DataProduct"
@@ -224,7 +224,7 @@ mappings:
       proposed_prov_type: Entity
       matrix_row: "n/a — node reclassification, not a matrix edge"
       rationale: >
-        :Application currently carries three incompatible PROV types on one node: SoftwareAgent
+        :BusinessApplication currently carries three incompatible PROV types on one node: SoftwareAgent
         (node_classifications), dprod:Port children (Entity semantics, seal_has_port — active),
         and org:Membership/org:Role role-holders (Organization semantics,
         seal_has_membership/seal_of_role/seal_held_by — active, C2). A SEAL application is a
@@ -237,15 +237,15 @@ mappings:
     status: proposed
     proposed_at: 2026-07-08
     open_questions:
-      - "Reclassing :Application breaks the current Agent-target assumption used by both seal_app_attributed_to_employee's simple form and the K1/K2 job->app edge (m3_seal_app_ref / job-seal-app-ref) — both must be re-shaped in the same gate decision (see the type_conflict_note / proposed_reshape on job-seal-app-ref above)."
-      - "Any other edge that currently assumes :Application is an Agent (e.g. arch_develops DevTeam->Application / dev-team-develops-app, C3 — Agent->Agent local, no PROV row either way) needs a re-check once this reclass is confirmed — flagged for the SME, not resolved here; those edges are NOT expected to break (no PROV matrix row was in use), but the SME should confirm."
+      - "Reclassing :BusinessApplication breaks the current Agent-target assumption used by both seal_app_attributed_to_employee's simple form and the K1/K2 job->app edge (m3_seal_app_ref / job-seal-app-ref) — both must be re-shaped in the same gate decision (see the type_conflict_note / proposed_reshape on job-seal-app-ref above)."
+      - "Any other edge that currently assumes :BusinessApplication is an Agent (e.g. arch_develops DevTeam->Application / dev-team-develops-app, C3 — Agent->Agent local, no PROV row either way) needs a re-check once this reclass is confirmed — flagged for the SME, not resolved here; those edges are NOT expected to break (no PROV matrix row was in use), but the SME should confirm."
 
   - id: seal-tom-attribution
     taxonomy:
       source: seal-extract
       element: "SEAL Technical Operating Model (TOM) role-holders (cto, application_owner, information_owner, data_owner, operate_manager, risk_compliance_officer) attributed to the BusinessApplication asset"
     ontology:
-      from_node: Application                # PROPOSED class: prov:Entity / dprod:DataProduct
+      from_node: BusinessApplication                # PROPOSED class: prov:Entity / dprod:DataProduct
       to_node: Employee                      # prov:Agent
       prov_type_from: Entity                 # after the proposed reclass
       prov_type_to: Agent
@@ -280,7 +280,7 @@ mappings:
       source: seal-pat-scrape           # future drydocs-docmeta component source id — NOT yet registered in config/source-registry.yaml
       element: "SEAL/PAT scraped documentation page is the source of record for an extracted Application fact/record"
     ontology:
-      from_node: Application                # PROPOSED class: prov:Entity / dprod:DataProduct
+      from_node: BusinessApplication                # PROPOSED class: prov:Entity / dprod:DataProduct
       to_node: Document                      # prov:Entity — scraped SEAL/PAT page (drydocs-docmeta, planned)
       prov_type_from: Entity
       prov_type_to: Entity
@@ -423,13 +423,13 @@ mappings:
 
   # ---- C2: BusinessApplication / SEAL edges (reuse ACTIVE vocab — batch) ----
   # Source taxonomy: config/taxonomy/business-application.yaml. Concept =
-  # BusinessApplication (graph label :Application); SEAL = source of record; key = SEALID.
+  # BusinessApplication (graph label :BusinessApplication); SEAL = source of record; key = SEALID.
   # All reuse active seal_* vocabulary terms (DPROD + W3C ORG).
 
   - id: app-has-port
     taxonomy: { source: seal-extract, element: "BusinessApplication exposes a data Port (Event/Batch)" }
     ontology:
-      from_node: BusinessApplication       # prov:SoftwareAgent (label :Application)
+      from_node: BusinessApplication       # prov:SoftwareAgent (label :BusinessApplication)
       to_node: Port                         # dprod:Port (prov:Entity)
       matrix_row: "structural dprod relationship (no PROV row)"
       neo4j_label: HAS_PORT
@@ -568,7 +568,7 @@ mappings:
     taxonomy: { source: catalog-pat, element: "DevTeam develops a BusinessApplication (joined by SEALID)" }
     ontology:
       from_node: DevTeam                     # org:OrganizationalUnit (Agent)
-      to_node: BusinessApplication           # prov:SoftwareAgent (label :Application); key = SEALID
+      to_node: BusinessApplication           # prov:SoftwareAgent (label :BusinessApplication); key = SEALID
       join_key: SEALID                        # reconcile catalog DevTeam <-> SEAL app by SEALID
       matrix_row: "Agent → Agent — no PROV fit (actedOnBehalfOf = delegation, not development); local"
       neo4j_label: DEVELOPS

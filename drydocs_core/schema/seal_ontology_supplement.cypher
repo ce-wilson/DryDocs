@@ -15,8 +15,8 @@
 
 // ----- Local-namespace anchor terms (node types) ----------------------------
 
-MERGE (n:OntologyTerm:LocalClass {iri: "https://drydocs.local/ontology#Application"})
-  SET n.label = "Application",
+MERGE (n:OntologyTerm:LocalClass {iri: "https://drydocs.local/ontology#BusinessApplication"})
+  SET n.label = "BusinessApplication",
       n.notes = "A SEAL-registered software application. Subclass of prov:SoftwareAgent. "
               + "Carries governance metadata (SOX, risk, hosting) from DECO_SEAL_APP_INFO.";
 
@@ -44,7 +44,7 @@ MERGE (n:OntologyTerm:LocalClass {iri: "https://drydocs.local/ontology#Employee"
 
 // ----- :SUBCLASS_OF wiring to PROV-O / W3C anchors -------------------------
 
-MATCH (lc:OntologyTerm:LocalClass {iri: "https://drydocs.local/ontology#Application"})
+MATCH (lc:OntologyTerm:LocalClass {iri: "https://drydocs.local/ontology#BusinessApplication"})
 MATCH (pc:OntologyTerm:ProvClass   {iri: "http://www.w3.org/ns/prov#SoftwareAgent"})
 MERGE (lc)-[r:SUBCLASS_OF]->(pc)
   ON CREATE SET r.source = "drydocs.seal_supplement";
@@ -61,7 +61,7 @@ MERGE (lc)-[r:SUBCLASS_OF]->(pc)
 // Maps to dprod:hasPort pattern; no PROV-O equivalent.
 MERGE (n:OntologyTerm:LocalRelationship {iri: "https://drydocs.local/ontology#hasPort"})
   SET n.label  = "HAS_PORT",
-      n.domain = "Application",
+      n.domain = "BusinessApplication",
       n.range  = "Port",
       n.notes  = "Application exposes a data port (EventProcessing or BatchProcessing). "
                + "Follows dprod:hasPort pattern.";
@@ -69,7 +69,7 @@ MERGE (n:OntologyTerm:LocalRelationship {iri: "https://drydocs.local/ontology#ha
 // HAS_MEMBERSHIP  —  Application → Membership  (org:hasMembership)
 MERGE (n:OntologyTerm:LocalRelationship {iri: "https://drydocs.local/ontology#hasMembership"})
   SET n.label  = "HAS_MEMBERSHIP",
-      n.domain = "Application",
+      n.domain = "BusinessApplication",
       n.range  = "Membership",
       n.notes  = "Application has a timed role-holder membership. Semantics: org:hasMembership.";
 MATCH (local:OntologyTerm:LocalRelationship {iri: "https://drydocs.local/ontology#hasMembership"})

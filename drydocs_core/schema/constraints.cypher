@@ -33,10 +33,10 @@ CREATE CONSTRAINT product_line_id     IF NOT EXISTS FOR (pl:ProductLine)        
 CREATE CONSTRAINT product_id          IF NOT EXISTS FOR (p:Product)             REQUIRE p.product_id IS UNIQUE;
 
 // --- Application + ports -----------------------------------------------------
-CREATE CONSTRAINT application_seal    IF NOT EXISTS FOR (a:Application)         REQUIRE a.seal_id IS UNIQUE;
-CREATE INDEX      application_status  IF NOT EXISTS FOR (a:Application)         ON  (a.status);
-CREATE INDEX      application_risk    IF NOT EXISTS FOR (a:Application)         ON  (a.risk_level);
-CREATE INDEX      application_name    IF NOT EXISTS FOR (a:Application)         ON  (a.name);
+CREATE CONSTRAINT businessapplication_seal    IF NOT EXISTS FOR (a:BusinessApplication)         REQUIRE a.seal_id IS UNIQUE;
+CREATE INDEX      businessapplication_status  IF NOT EXISTS FOR (a:BusinessApplication)         ON  (a.status);
+CREATE INDEX      businessapplication_risk    IF NOT EXISTS FOR (a:BusinessApplication)         ON  (a.risk_level);
+CREATE INDEX      businessapplication_name    IF NOT EXISTS FOR (a:BusinessApplication)         ON  (a.name);
 
 // Two-port pattern: each Application has exactly one EventProcessing and one
 // BatchProcessing child. Composite uniqueness on (parent_seal_id, kind) lets
@@ -64,7 +64,7 @@ CREATE CONSTRAINT scheduler_kind      IF NOT EXISTS FOR (k:SchedulerKind)       
 // entity; version_serial stays as an audit property only.
 CREATE CONSTRAINT controlm_server     IF NOT EXISTS FOR (s:ControlMServer)      REQUIRE s.name IS UNIQUE;
 // Control-M APPLICATION grouping (folder header row; gate controlm-q1q3-phase1).
-// NOT the SEAL business :Application — see ADR 0003 naming rules.
+// NOT the SEAL business :BusinessApplication — see ADR 0003 naming rules.
 CREATE CONSTRAINT controlmapplication_name IF NOT EXISTS FOR (a:ControlMApplication) REQUIRE a.name IS UNIQUE;
 // Drop the JobFolder-era constraint name, then create against the renamed
 // label (ADR 0003: BMC labels take the ControlM prefix). Both idempotent.

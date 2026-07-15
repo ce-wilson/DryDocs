@@ -1,9 +1,9 @@
 """Hash-based snapshot writer.
 
-Per v3 §I: anything at or above :Application versions on update.
-Below :Application (jobs, folders, files) refreshes in place.
+Per v3 §I: anything at or above :BusinessApplication versions on update.
+Below :BusinessApplication (jobs, folders, files) refreshes in place.
 
-For each :Application / :Product / :CatalogLOB, we compute a stable hash
+For each :BusinessApplication / :Product / :CatalogLOB, we compute a stable hash
 over the relationship-state we care about, compare it to the most recent
 snapshot's hash, and emit a new snapshot only when the hash differs.
 
@@ -41,7 +41,7 @@ class SnapshotWriter:
             entity_key="seal_id",
             snapshot_label="ApplicationSnapshot",
             relationship_query="""
-                MATCH (a:Application {seal_id: $entity_key})
+                MATCH (a:BusinessApplication {seal_id: $entity_key})
                 OPTIONAL MATCH (p:Product)-[:HAS_APPLICATION]->(a)
                 OPTIONAL MATCH (a)-[:HAS_DEV_TEAM]->(dt:DevTeam)
                 OPTIONAL MATCH (a)-[:HAS_MEMBERSHIP]->(:Membership)-[:HELD_BY]->(emp:Employee)
@@ -64,7 +64,7 @@ class SnapshotWriter:
             relationship_query="""
                 MATCH (p:Product {product_id: $entity_key})
                 OPTIONAL MATCH (pl:ProductLine)-[:HAS_PRODUCT]->(p)
-                OPTIONAL MATCH (p)-[:HAS_APPLICATION]->(a:Application)
+                OPTIONAL MATCH (p)-[:HAS_APPLICATION]->(a:BusinessApplication)
                 RETURN
                     p.name                     AS name,
                     pl.product_line_id         AS product_line_id,

@@ -1,2 +1,2 @@
 source_label,source_key,relationship,rel_props,target_label,target_key,create_target_if_missing,note,authored_by,authored_on
-ControlMJob,folder_id=<FOLDER>;job_id=<JOB>,WAS_ASSOCIATED_WITH,role=seal_app_ref,Application,seal_id=<SEALID>,false,<why automation cannot derive this mapping yet>,<author-sid>,<yyyy-mm-dd>
+ControlMJob,folder_id=<FOLDER>;job_id=<JOB>,WAS_ASSOCIATED_WITH,role=seal_app_ref,BusinessApplication,seal_id=<SEALID>,false,<why automation cannot derive this mapping yet>,<author-sid>,<yyyy-mm-dd>

@@ -58,7 +58,7 @@ MERGE (local)-[:MAPS_TO]->(prov);
 // USES_SOFTWARE  —  Application → SoftwareProduct  (LOCAL — no PROV row)
 MERGE (n:OntologyTerm:LocalRelationship {iri: "https://drydocs.local/ontology#usesSoftware"})
   SET n.label  = "USES_SOFTWARE",
-      n.domain = "Application",
+      n.domain = "BusinessApplication",
       n.range  = "SoftwareProduct",
       n.notes  = "Application (Agent) uses a software product (Entity). "
                + "LOCAL domain edge — PROV has no Agent → Entity usage row "
