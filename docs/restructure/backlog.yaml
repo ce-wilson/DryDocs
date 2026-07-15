@@ -1587,7 +1587,7 @@ items:
     agent: ontology-mapper
     model: sonnet
     priority: p2
-    status: todo
+    status: in_progress   # picked up 2026-07-15 pm on feat/k4-businessapplication-reshape (the reserved branch)
     depends_on: [K3]
     inputs: [config/gate-log.md, drydocs_core/ontology/relationship_vocabulary.yaml, config/taxonomy-ontology-map.yaml, drydocs_core/schema/, config/precedence.yaml]
     acceptance: >
@@ -2786,8 +2786,8 @@ items:
 # Roll-up the dispatcher can glance at. COMPUTED views — test_backlog.py enforces
 # that these match the items exactly; update them with any status change.
 summary:
-  todo: 22                                          # +2 groomed 2026-07-15 pm (D5, D6 — O6-session findings)
-  in_progress: 1                                   # E1 (gate deferred)
+  todo: 21                                          # K4 picked up 2026-07-15 pm (reserved branch)
+  in_progress: 2                                   # E1 (gate deferred), K4 (reshape apply — feat/k4 branch)
   blocked: 0
   done: 70                                          # O6 landed + O1 umbrella closed 2026-07-15
-  next_ready: [C5, D5, D6, L7, L8, L9, L12, M2, M3, M4, P1, C7, K4, K5, J10, J11, J12, C8]
+  next_ready: [C5, D5, D6, L7, L8, L9, L12, M2, M3, M4, P1, C7, K5, J10, J11, J12, C8]
