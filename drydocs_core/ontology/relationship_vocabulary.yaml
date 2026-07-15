@@ -1292,18 +1292,22 @@ local_relationships:
   # by m3_depends_on_file above.
 
   - id:           arch_develops
-    neo4j_label:  DEVELOPS
-    role:         ~
-    from_node:    DevTeam
-    to_node:      BusinessApplication          # the BusinessApplication concept; key = SEALID
+    neo4j_label:  WAS_ATTRIBUTED_TO
+    role:         developed_by
+    from_node:    BusinessApplication          # the BusinessApplication concept; key = SEALID
+    to_node:      DevTeam
     join_key:     SEALID
-    prov_maps_to: ~
+    prov_maps_to: "prov:wasAttributedTo"
     note: >
-      DevTeam develops a BusinessApplication (graph label :BusinessApplication), reconciled by SEALID.
-      Confirmed via HITL gate (C3/C4, SME 2026-06-21). DevTeam (Agent) → Application
-      (SoftwareAgent): no PROV matrix row fits Agent→Agent ownership (actedOnBehalfOf is
-      delegation, not development), so local-only. Cross-source edge (catalog↔SEAL ownership
-      reconciliation). Inverse alt: Application -[:WAS_ATTRIBUTED_TO {role: developed_by}]-> DevTeam.
+      FLIPPED at K4 (2026-07-15; gate 2026-07-10 §E): was the local
+      (:DevTeam)-[:DEVELOPS]->(:BusinessApplication) with no PROV row (Agent→Agent had no
+      matrix fit). Under the K4 reclass BusinessApplication is prov:Entity, so the PROV-valid
+      inverse applies: Entity → Agent = prov:wasAttributedTo, role=developed_by (distinct on
+      the shared label from arch_owns_code role=owner and seal tom attribution roles).
+      Reconciled by SEALID; cross-source edge (catalog↔SEAL ownership reconciliation).
+      Originally confirmed via HITL gate (C3/C4, SME 2026-06-21); flip decided at the
+      BusinessApplication entity-reshape gate. Live-graph migration:
+      drydocs/loaders/cypher/migrate_develops_to_was_attributed_to.cypher.
     supplement:   catalog_ontology_supplement.cypher
     loader:       ~
     domain:       architecture

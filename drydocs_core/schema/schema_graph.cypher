@@ -56,7 +56,7 @@ MERGE (n:SchemaMeta:DataTarget {name: 'DataTarget'})
   SET n.class = 'dcat:Dataset', n.prov_type = 'Entity';
 
 // — SEAL (active) —
-MERGE (n:SchemaMeta:BusinessApplication {name: 'Application'})
+MERGE (n:SchemaMeta:BusinessApplication {name: 'BusinessApplication'})
   SET n.class = 'prov:SoftwareAgent', n.prov_type = 'Agent';
 MERGE (n:SchemaMeta:Employee {name: 'Employee'})
   SET n.class = 'prov:Agent', n.prov_type = 'Agent';
@@ -177,11 +177,11 @@ MERGE (a)-[r:DELEGATES_TO]->(b)
   SET r.vocab_id = 'm3_delegates_to', r.prov_maps_to = 'prov:actedOnBehalfOf', r.domain = 'controlm', r.status = 'planned';
 
 // — SEAL —
-MATCH (a:SchemaMeta {name: 'Application'}), (b:SchemaMeta {name: 'Port'})
+MATCH (a:SchemaMeta {name: 'BusinessApplication'}), (b:SchemaMeta {name: 'Port'})
 MERGE (a)-[r:HAS_PORT]->(b)
   SET r.vocab_id = 'seal_has_port', r.prov_maps_to = null, r.domain = 'seal', r.status = 'active';
 
-MATCH (a:SchemaMeta {name: 'Application'}), (b:SchemaMeta {name: 'Membership'})
+MATCH (a:SchemaMeta {name: 'BusinessApplication'}), (b:SchemaMeta {name: 'Membership'})
 MERGE (a)-[r:HAS_MEMBERSHIP]->(b)
   SET r.vocab_id = 'seal_has_membership', r.prov_maps_to = null, r.domain = 'seal', r.status = 'active';
 
@@ -214,7 +214,7 @@ MATCH (a:SchemaMeta {name: 'DevTeam'}), (b:SchemaMeta {name: 'JiraBoard'})
 MERGE (a)-[r:HAS_JIRA_BOARD]->(b)
   SET r.vocab_id = 'catalog_has_jira_board', r.prov_maps_to = null, r.domain = 'catalog', r.status = 'active';
 
-MATCH (a:SchemaMeta {name: 'Product'}), (b:SchemaMeta {name: 'Application'})
+MATCH (a:SchemaMeta {name: 'Product'}), (b:SchemaMeta {name: 'BusinessApplication'})
 MERGE (a)-[r:HAS_APPLICATION]->(b)
   SET r.vocab_id = 'catalog_has_application', r.prov_maps_to = null, r.domain = 'catalog', r.status = 'planned';
 
@@ -239,9 +239,9 @@ MERGE (a)-[r:HAS_MEMBERSHIP]->(b)
   SET r.vocab_id = 'catalog_dev_team_has_membership', r.prov_maps_to = null, r.domain = 'catalog', r.status = 'planned';
 
 // — Architecture flow —
-MATCH (a:SchemaMeta {name: 'DevTeam'}), (b:SchemaMeta {name: 'Application'})
-MERGE (a)-[r:DEVELOPS]->(b)
-  SET r.vocab_id = 'arch_develops', r.prov_maps_to = null, r.domain = 'architecture', r.status = 'planned';
+MATCH (a:SchemaMeta {name: 'BusinessApplication'}), (b:SchemaMeta {name: 'DevTeam'})
+MERGE (a)-[r:WAS_ATTRIBUTED_TO]->(b)
+  SET r.vocab_id = 'arch_develops', r.role = 'developed_by', r.prov_maps_to = 'prov:wasAttributedTo', r.domain = 'architecture', r.status = 'planned';
 
 MATCH (a:SchemaMeta {name: 'Code'}), (b:SchemaMeta {name: 'DevTeam'})
 MERGE (a)-[r:WAS_ATTRIBUTED_TO]->(b)
@@ -255,7 +255,7 @@ MATCH (a:SchemaMeta {name: 'Code'}), (b:SchemaMeta {name: 'PipelineService'})
 MERGE (a)-[r:CONTAINS_SERVICE]->(b)
   SET r.vocab_id = 'arch_contains_service', r.prov_maps_to = 'prov:hadMember', r.domain = 'architecture', r.status = 'planned';
 
-MATCH (a:SchemaMeta {name: 'Application'}), (b:SchemaMeta {name: 'Batch'})
+MATCH (a:SchemaMeta {name: 'BusinessApplication'}), (b:SchemaMeta {name: 'Batch'})
 MERGE (a)-[r:CONTAINS_BATCH]->(b)
   SET r.vocab_id = 'arch_contains_batch', r.prov_maps_to = null, r.domain = 'architecture', r.status = 'planned';
 
@@ -271,7 +271,7 @@ MATCH (a:SchemaMeta {name: 'ControlMJob'}), (b:SchemaMeta {name: 'JobRun'})
 MERGE (a)-[r:WAS_GENERATED_BY]->(b)
   SET r.vocab_id = 'prov_was_generated_by', r.prov_maps_to = 'prov:wasGeneratedBy', r.domain = 'all', r.status = 'active';
 
-MATCH (a:SchemaMeta {name: 'Application'}), (b:SchemaMeta {name: 'JobRun'})
+MATCH (a:SchemaMeta {name: 'BusinessApplication'}), (b:SchemaMeta {name: 'JobRun'})
 MERGE (a)-[r:WAS_GENERATED_BY]->(b)
   SET r.vocab_id = 'prov_was_generated_by', r.prov_maps_to = 'prov:wasGeneratedBy', r.domain = 'all', r.status = 'active';
 

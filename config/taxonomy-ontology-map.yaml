@@ -567,21 +567,25 @@ mappings:
   - id: dev-team-develops-app
     taxonomy: { source: catalog-pat, element: "DevTeam develops a BusinessApplication (joined by SEALID)" }
     ontology:
-      from_node: DevTeam                     # org:OrganizationalUnit (Agent)
-      to_node: BusinessApplication           # prov:SoftwareAgent (label :BusinessApplication); key = SEALID
+      from_node: BusinessApplication         # prov:Entity / dprod:DataProduct (K4 reclass); key = SEALID
+      to_node: DevTeam                       # org:OrganizationalUnit (Agent)
       join_key: SEALID                        # reconcile catalog DevTeam <-> SEAL app by SEALID
-      matrix_row: "Agent → Agent — no PROV fit (actedOnBehalfOf = delegation, not development); local"
-      neo4j_label: DEVELOPS
-      prov_maps_to: ~                          # alt inverse: Application WAS_ATTRIBUTED_TO DevTeam (Entity→Agent)
+      matrix_row: "Entity → Agent = prov:wasAttributedTo (role=developed_by)"
+      neo4j_label: WAS_ATTRIBUTED_TO
+      role: developed_by
+      prov_maps_to: "prov:wasAttributedTo"
     precedence_authority: lob-product-team
     vocab_id: arch_develops
     status: confirmed
     confirmed_by: SME
     confirmed_on: 2026-06-21
     note: >
-      SME 2026-06-21: DevTeam DEVELOPS BusinessApplication, reconciled by SEALID. Cross-source
+      SME 2026-06-21: DevTeam develops BusinessApplication, reconciled by SEALID. Cross-source
       edge (lob-product-team taxonomy -> business-application taxonomy); the join (which team
       builds which app) comes from catalog<->SEAL ownership reconciliation.
+      FLIPPED at K4 (2026-07-15; gate 2026-07-10 §E): was DevTeam-[:DEVELOPS]->(Agent→Agent,
+      no PROV row); post-reclass the PROV-valid inverse WAS_ATTRIBUTED_TO {role: developed_by}
+      applies. Migration: migrate_develops_to_was_attributed_to.cypher.
 
   # ---- bmc-docs lexical load (2026-07-08 — GATE PREP, SME not yet run) ------
   # User-directed: only sample Control-M data can reach the local EE DB, so the
