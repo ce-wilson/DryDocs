@@ -659,7 +659,32 @@ PROCEDURE:
       with YOUR manifest entries (never from a port, step-31 rule). Tracked as rows T1–T4 in
       the COMPANY-SIDE TRACKER below — flip statuses there, in your copy.
 
-33. PSGMGR VERSION-FILTER FIX (D4) + JOB-TYPE TABLES PLAN (2026-07-15; commits "docs(controlm):
+33. ADR 0005 ACCEPTED + GRAPHACCESS SEAM (O4) + DRYDOCS-API SCAFFOLD (O5) (2026-07-14, after
+    step 32; commits "docs(adr): 0005 ACCEPTED — browser↔Neo4j access path ratified by the SME
+    (O3 done)", merge "feat/o4-graphaccess-seam …", merge "feat/o5-drydocs-api …", + the two
+    backlog chores "O4 done" / "O5 done"). Step 31's "ADR 0005 awaiting acceptance" is now
+    resolved: thin API is the deployment access path; bolt-from-browser is dev-mode-only.
+    - O3 (clean-add per docs/decisions/**): 0005-browser-neo4j-access-path.md flips
+      PROPOSED → ACCEPTED. Read it before resolving O4/O5 — it is the WHY for both.
+    - O4 (web/** canonical-producer wholesale, step-31 row): the GraphAccess seam —
+      web/src/lib/graph.ts (the seam), graphApi.ts (api-adapter stub), neo4j.ts (dev-mode
+      bolt gating), CypherConsole.tsx (gated raw-Cypher), .env.example + README. The step-31
+      secret caveat stands: your real VITE_NEO4J_* values stay in YOUR .env.local, never ported.
+    - O5 (NEW python component — clean-adds): drydocs_api/** (app.py FastAPI wiring behind the
+      OPTIONAL `api` poetry group; guard.py read-only Cypher guard — comments/strings stripped
+      first, word-boundary clause match; routing.py per-view DB routing drydocs vs drydocs_all,
+      fail-closed; queries.py named view queries incl. the two support queries proven live
+      2026-07-14 — folder-census + dependency-chain — and the c4-graph O6 payload; personas.py
+      + sessions.py auth stub — roles resolved server-side, OIDC is YOUR company-side twin;
+      handlers.py framework-free) + tests/unit/test_drydocs_api.py.
+    - Collisions: MODULE_MAP.md + tests/unit/test_module_boundary.py are canonical-producer
+      (gain the `api` COMPONENT_GROUP row + classification); pyproject.toml is per-entry
+      (union the `api` optional group's deps, KEEP your version string); poetry.lock has no
+      manifest row — REGENERATE consumer-side after the pyproject union, don't hand-merge it.
+    - COMPANY MUST SUPPLEMENT (unchanged from the ADR Evidence): enterprise OIDC twin for the
+      auth stub; the live multi-DB deploy remains T7.
+
+34. PSGMGR VERSION-FILTER FIX (D4) + JOB-TYPE TABLES PLAN (2026-07-15; commits "docs(controlm):
     plan job-type detail tables …", "chore(backlog): groom - 2 promoted (D4, O7) …",
     "fix(loaders): psgmgr version filter IS_CURRENT_VERSION = 'Y' (was '1') — D4",
     "docs(loaders): SETVAR_VW version domain SME-confirmed 'Y' - D4 residual closed").
@@ -691,9 +716,9 @@ PROCEDURE:
       code yet), docs/Product/seal/seal-application-hierarchy.md (describes a SEAL 4-tier
       hierarchy diagram via a FICTIONAL example; the referenced image-2.md diagram is not in
       the producer repo — supply/keep yours if you have the real one).
-    - Planning stream (Canonical-here as ever): backlog.yaml D4 done + O7 added (drydocs-api
-      named endpoints for the two live-proven support queries), board render, IDEAS audit
-      trail. Historical docs/reviews (persona-*, superseded sdlc-oracle-ingestion) deliberately
+    - Planning stream (Canonical-here as ever): backlog.yaml D4 done + O7 added-and-closed
+      (the two live-proven support queries — already shipped by O5's queries.py, step 33;
+      the item records the audit trail, no new code), board render, IDEAS audit trail. Historical docs/reviews (persona-*, superseded sdlc-oracle-ingestion) deliberately
       KEEP the old '1' literals — do not "fix" history.
     - EXPECTED_CONSTRAINTS UNCHANGED; no schema/edge changes; Track-1 counts unchanged.
 

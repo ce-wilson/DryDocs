@@ -178,7 +178,8 @@ Tags help grooming: `idea` · `bug` · `doc` · `source` (new data source) · `q
   and returned the worked-example population). Closes staging-ingestion-flow preflight 0.3 → **D4**.
 - 2026-07-14 — [idea] Two support queries proven live on the internal graph (dependency-chain
   finder via undirected `shortestPath` over `WAS_INFORMED_BY`; folder-scoped dependency census,
-  ~69% cross-folder stat) — groomed to drydocs-api named endpoints → **O7**.
+  ~69% cross-folder stat) — groomed to drydocs-api named endpoints → **O7** (closed same day:
+  already shipped by O5's `queries.py`; the note was stale — O5 built them in directly).
 
 - 2026-07-14 groom run (ADR 0005 Action items → Epic O; not an inbox groom) — 4 promoted:
   **O3** ratify ADR 0005 (in_progress — awaiting the SME flip, the E1/P2 idiom; gates the

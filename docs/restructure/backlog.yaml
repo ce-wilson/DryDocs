@@ -2349,7 +2349,7 @@ items:
     agent: main
     model: sonnet
     priority: p2
-    status: todo
+    status: done          # closed 2026-07-15 — already SHIPPED by O5 (see notes)
     depends_on: [O5]
     inputs: [drydocs_api/queries.py, docs/restructure/IDEAS.md]
     acceptance: >
@@ -2364,6 +2364,11 @@ items:
       on the internal graph; the ~69% cross-folder-dependency stat is a whitepaper headline
       candidate). Also candidates for controlm-runbook-automation — reference, don't
       duplicate.
+      CLOSED same day as groomed: the acceptance was ALREADY MET by the O5 scaffold —
+      drydocs_api/queries.py ships folder-census + dependency-chain as named, param-validated
+      view queries (its module docstring cites the same IDEAS capture), covered by
+      test_drydocs_api.py. The inbox note predated the O5 build by hours and was stale when
+      groomed. Item kept (ids are stable) as the audit-trail record; no new code.
 
   # ── Epic P — Runtime topology & maintenance windows — Phase 13 ─────────────
   # Born 2026-07-09: CM_HOSTS + CM_AVG_RUN onboarded via the add-source-object
@@ -2613,8 +2618,8 @@ items:
 # Roll-up the dispatcher can glance at. COMPUTED views — test_backlog.py enforces
 # that these match the items exactly; update them with any status change.
 summary:
-  todo: 19                                          # O7 groomed 2026-07-15; D4 groomed + closed same day
+  todo: 18                                          # D4 + O7 groomed AND closed 2026-07-15 (O7 = already shipped by O5)
   in_progress: 2                                   # E1 (gate deferred), O1 (web design pass — remainder = O6)
   blocked: 0
-  done: 67                                          # D4 done 2026-07-15 (psgmgr version-filter 'Y' fix)
-  next_ready: [C5, L7, L8, L9, L12, M2, M3, M4, P1, C7, K4, K5, J10, O6, O7]  # O7 (O5 done) added 2026-07-15
+  done: 68                                          # D4 (psgmgr 'Y' fix) + O7 (shipped-by-O5) done 2026-07-15
+  next_ready: [C5, L7, L8, L9, L12, M2, M3, M4, P1, C7, K4, K5, J10, O6]
