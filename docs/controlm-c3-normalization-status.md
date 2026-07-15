@@ -1,6 +1,6 @@
 # Control-M C3/C4 Normalization — Status & Runbook
 
-**Last updated:** 2026-06-11
+**Last updated:** 2026-07-15
 **Goal:** extract C3/C4 technical objects (file ops, ETL launches — Ab Initio /
 Informatica / PySpark, notifications) from Control-M job definitions, one level
 below the existing job-to-job lineage.
@@ -19,7 +19,7 @@ and command parsing happen in **Python, not recursive SQL**.
 | A     | Variable extract + taxonomy classifier + staging output | **Code complete** — pending production run (see below) |
 | B     | Fixed-point variable resolver (offline AutoEdit simulation) | **Complete** |
 | C     | Command parsing: FileWatch / OS launcher registry / PRECMD-POSTCMD shell / AIAWSWLK | **Code complete** — registry grows iteratively (Phase E) |
-| D     | Graph load (staging → Neo4j under `:JobRun`) | Not started |
+| D     | Graph load (staging → Neo4j under `:JobRun`) | **Started** — first slice live: K2 SEAL attribution (`drydocs load-seal-attribution`, STG_APP_FACT → `WAS_ASSOCIATED_WITH {role: seal_app_ref}`, gate-confirmed 2026-07-14); the general staging→graph loader (R4) remains open |
 | E     | TDQ loop (DQV measurements, launcher-registry growth from unparsed backlog) | Not started |
 
 **Extension (2026-07-15):** job-type detail tables — `STG_JOB_FILEWATCH`,
@@ -43,7 +43,7 @@ sub-table) — planned in
 | Row model (accepts raw extract headers) | `drydocs_core/models/controlm.py` → `ControlMVariableRow` |
 | Sample fixture (323 real rows) | `drydocs/data/samples/controlm_variables__sample.csv` |
 | Vendor reference (validated against) | `external/orchestration/bmc-controlm/controlm-{variables,os-job-parameters,file-watcher,api-job-types,file-transfer-job}.md` |
-| Tests (102 across classifier/resolver/staging/commands) | `tests/unit/test_{variable_classifier,variable_resolver,variable_staging,command_parser}.py` |
+| Tests (95 across classifier/resolver/staging/commands) | `tests/unit/test_{variable_classifier,variable_resolver,variable_staging,command_parser}.py` |
 
 CLI (no Neo4j needed):
 
@@ -112,10 +112,11 @@ stg_notification, stg_app_fact**.
 
    or, without Oracle connectivity from Python, export the extract from SQL
    Developer and run `--csv export.txt --delimiter "|"`.
-   Output: `stg_run.csv`, `stg_variable.csv`, `stg_parse_quality.csv` —
-   columns match the DDL exactly.
+   Output: all 8 staging CSVs (`stg_run`, `stg_variable`, `stg_parse_quality`,
+   `stg_invocation`, `stg_file_op`, `stg_file_ref`, `stg_notification`,
+   `stg_app_fact`) — columns match the DDL exactly.
 
-4. **Load the three CSVs into DRYDOCS_STG** (SQL Developer import or
+4. **Load the staging CSVs into DRYDOCS_STG** (SQL Developer import or
    SQL*Loader; `stg_run` first for the FK).
 
 5. **QA in SQL Developer** via `stg_coverage_summary` and ad-hoc queries on
@@ -159,5 +160,5 @@ stg_notification, stg_app_fact**.
   kept verbatim as `external_refs`, never inlined.
 - All staging keys include `DATA_CENTER` (TABLE_ID may collide across the
   4 DCs — DDL Section 0.1 verifies).
-- 6 unit-test failures pre-exist on main (folder_name_parser, schema,
-  controlm_cypher) — unrelated to this work stream.
+- ~~6 unit-test failures pre-exist on main~~ — historical (2026-06-11 draft);
+  all resolved, the full suite is green as of 2026-07-15.

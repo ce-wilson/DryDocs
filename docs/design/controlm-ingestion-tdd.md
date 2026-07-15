@@ -46,9 +46,10 @@ dependencies), the source tables + filters, the field→node/edge mapping, the e
 load-order contract, and the taxonomy→ontology binding each edge traces to.
 
 **Out of scope.** SEAL application attribution (`WAS_ASSOCIATED_WITH {role: seal_app_ref}`)
-— gated and separate, tracked as **K2**, running only after this chain; vector/embedding
-passes; and the live multi-DB deploy (**G7**). These are named where they touch the chain
-but specified elsewhere.
+— separate, tracked as **K2** (now **live**: gate `seal-attribution-match-policy` confirmed
+2026-07-14, loader `drydocs load-seal-attribution`), running only after this chain;
+vector/embedding passes; and the live multi-DB deploy (**G7**). These are named where they
+touch the chain but specified elsewhere.
 
 <!-- anchor: context-frame -->
 ## 1. Where this sits — the four-layer frame
@@ -167,7 +168,7 @@ missing endpoint surfaces instead of creating a ghost node.**
 | **2** | **jobs** | `:ControlMJob` | `CONTAINS_JOB` | `MATCH` folder (from pass 1); job dropped if folder absent |
 | **3** | **conditions in / out** | `:Condition` (shared `(folder_id, name)`) | `REQUIRES_IN_CONDITION`, `EMITS_OUT_CONDITION` | `MATCH` job `(folder_id, job_id)` |
 | **4** | **dependencies (separate, edge-only)** | *none* | `WAS_INFORMED_BY` | `MATCH` **both** endpoint jobs — pure edge pass, never creates nodes |
-| later | SEAL attribution (K2, **gated**) | *none* | `WAS_ASSOCIATED_WITH {role: seal_app_ref}` | only after jobs **and** `:Application` exist |
+| later | SEAL attribution (K2, **live 2026-07-14**) | *none* | `WAS_ASSOCIATED_WITH {role: seal_app_ref}` | only after jobs **and** `:Application` exist |
 
 Passes 3–5 run unless `--skip-part2` is passed (default: all run). Both grouping nodes now
 exist **before** the jobs pass, keeping pass 2 a pure child pass. `m3-verify` gained a
@@ -311,8 +312,10 @@ gate); the loader that lands it is the **folder pass** (`controlm_folders.cypher
 terms seeded by `drydocs_core/schema/ontology.cypher`; the `m3_contains_folder` supplement in
 `ontology_supplement.cypher`.
 
-*Not yet live:* `WAS_ASSOCIATED_WITH` job→SEAL app (`proposed`, K2); `OBSERVES` job-run SOSA
-observation (`proposed`, gate not run).
+*Since gone live:* `WAS_ASSOCIATED_WITH` job→SEAL app (K2 — `confirmed` at gate
+`seal-attribution-match-policy`, 2026-07-14; loader `load-seal-attribution` active; the edge
+*shape* re-opens at the K4 `:Application` reclass gate). *Not yet live:* `OBSERVES` job-run
+SOSA observation (`proposed`, gate not run).
 
 ---
 
@@ -435,7 +438,7 @@ ids are `FR/NFR-CMI-*`, scoped to this chain; the SEAL row is spec-level, gated 
 | FR-CMI-005 | Derive job→job `WAS_INFORMED_BY` from the IN=OUT condition seam, edge-only | design-data-mapping | `controlm_deps.cypher` | `m3-verify` dependency check | done |
 | FR-CMI-006 | Every edge traces to a HITL-confirmed taxonomy→ontology binding | hitl-gate | `config/taxonomy-ontology-map.yaml`, `gate-log.md` | `test_schema.py` drift guard | done |
 | NFR-CMI-001 | No real SIDs/servers committed; Internal classification; SQL injection-safe | classification-security | `config/classification.yaml`, `oracle_adapter.py` | `test_classification.py` | done |
-| FR-CMI-007 | SEAL attribution runs only after jobs + `:Application` exist, gate-confirmed | hitl-gate | K2 loader (planned) | K2 HITL gate | planned |
+| FR-CMI-007 | SEAL attribution runs only after jobs + `:Application` exist, gate-confirmed | hitl-gate | K2 loader (`seal_attribution.cypher`, `load-seal-attribution`) | gate `seal-attribution-match-policy` (2026-07-14); `graph-tests/seal-attribution-coverage.yaml` | done |
 
 <!-- anchor: appendices -->
 ## Appendix — sticky-note gotchas

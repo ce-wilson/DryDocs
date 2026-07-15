@@ -257,7 +257,7 @@ node* (neo4j-skills import/cypher references).
 | 2 | **jobs** | `:ControlMJob` | `CONTAINS_JOB` | `MATCH` folder (exists from pass 1); job silently dropped if folder absent → rerun folders first |
 | 3 | **conditions in / out** | `:Condition` (shared `(folder_id, name)` key) | `REQUIRES_IN_CONDITION`, `EMITS_OUT_CONDITION` | `MATCH` job by `(folder_id, job_id)` |
 | 4 | **dependencies (separate pass)** | none | `WAS_INFORMED_BY` (derived from the recursive LNKO⋈LNKI condition match) | `MATCH` **both** endpoint jobs — pure edge pass, never creates nodes |
-| later | SEAL attribution (K2, gated) | none | `WAS_ASSOCIATED_WITH {role: seal_app_ref}` | runs only after jobs **and** `:Application` reference exist |
+| later | SEAL attribution (K2 — **live 2026-07-14**: gate `seal-attribution-match-policy` confirmed; `drydocs load-seal-attribution`) | none | `WAS_ASSOCIATED_WITH {role: seal_app_ref}` | runs only after jobs **and** `:Application` reference exist |
 
 Why the application grouping moved to the **folder** pass (not jobs, where the
 vocabulary note originally parked it): the folder pass is where field-derived
@@ -340,8 +340,10 @@ grant question.
    vs coarse HWM only.
 3. **`CREATION_USER` / `CHANGE_USERID` existence** on `CM_DEF_VJOB` (pre-flight 0.4).
 4. **Retention cadence** — keep-N runs vs replace-in-place (drives R5).
-5. **View updates from the gate** — `is_folder_header` / `var_scope` to the
-   `JOB_ID = 1` + `TASK_TYPE = 'SMART Table'` rule; `IS_CURRENT_VERSION` filter pending
-   probe 0.3. These are `CREATE OR REPLACE` deltas to the base DDL.
+5. **View updates from the gate** — `is_folder_header` / `var_scope` still use the
+   `JOB_NAME = SCHED_TABLE` heuristic in the base DDL; update to the resolved
+   `JOB_ID = 1` + `TASK_TYPE = 'SMART Table'` rule (`CREATE OR REPLACE` deltas).
+   The `IS_CURRENT_VERSION` half is closed — probe 0.3 resolved 2026-07-15 (D4),
+   `= 'Y'` is the hard filter in both views.
 6. **DBA app folder naming** — confirm the DBA application's appcode and LOB code for
    the folder-name prefix so the folder classifies correctly in our own taxonomy decode.
