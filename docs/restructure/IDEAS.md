@@ -26,6 +26,13 @@ Tags help grooming: `idea` · `bug` · `doc` · `source` (new data source) · `q
 
 <!-- add new ideas at the top -->
 
+- 2026-07-15 — [chore] **Move `docs/controlm-loader-flow.md` to `docs/history/`** — the
+  2026-06-11 review baseline is now fully resolved (all §4 corrections landed: label rename,
+  SCHEDULED_ON, SEAL bridge shipped job-level as K2; statuses flipped in the 2026-07-15
+  docs sweep). It carries no live content — the TDD + staging-flow §3a are the current
+  descriptions — so it's a candidate for `docs/history/` alongside `M1-Fix-README.md`.
+  Check inbound links before moving (CHECKPOINT/reviews reference it).
+
 - 2026-07-14 — [doc] **`drydocs-project-review.md` has no canonical outline** — the new
   whole-project review (docs/design/) renders through the Epic L pipeline but is free-form:
   `doc_outline.py` only validates `docs/design/*-tdd.md`. When L8 introduces the second doc
