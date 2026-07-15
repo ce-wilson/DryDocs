@@ -58,6 +58,7 @@
 | `drydocs_lineage/**` | `drydocs-lineage` (C2) — proactive/curated cmd-line lineage on the shared core parser (G4 scaffold; POPULATED by the depgraph re-home G9/0002-C, DONE 2026-07-11: model/extractor/review/collect/writer) | `drydocs` (curated/CONFIRMED only; `writer.py` is the sole write boundary, gate-bound until the vocab flips active) |
 | `drydocs_deepdoc/**` | `drydocs-deepdoc` (C3) — reactive on-failure deep dive on the shared core parser (scaffolded 2026-07-10, G4) | `drydocs_context` (reliability/trust stamped; proxy-node keys; `writer.py` sole boundary; promotion = HITL gate, never cross-DB edit) |
 | `drydocs_remediation/**` | `drydocs-remediation` (C1) — detect → transform → prove → Jira (ADR 0002-B; scaffolded 2026-07-10, in-monorepo per 0002-A-1) | — (**no graph write**; Jira = SoR; the `jira.py` module is the only side-effect boundary) |
+| `drydocs_api/**` | `drydocs-api` — thin read API over the graph (ADR 0005; scaffolded 2026-07-14, O5) | — (**read-only**: endpoint guard + `RoutingControl.READ`; per-view DB routing server-side; sessions = in-memory stub; FastAPI = optional `api` group) |
 
 > **`drydocs-review` note.** All review modules own a run cadence or do external I/O, so
 > none are core. `review_labels` and `source_mappings` are *pure config accessors* parked in
