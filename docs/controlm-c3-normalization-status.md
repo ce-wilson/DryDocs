@@ -22,6 +22,11 @@ and command parsing happen in **Python, not recursive SQL**.
 | D     | Graph load (staging → Neo4j under `:JobRun`) | Not started |
 | E     | TDQ loop (DQV measurements, launcher-registry growth from unparsed backlog) | Not started |
 
+**Extension (2026-07-15):** job-type detail tables — `STG_JOB_FILEWATCH`,
+`STG_JOB_OS_COMMAND_VW`, `STG_LAUNCH_DETAIL` (Data Pipeline / Ab Initio pset
+sub-table) — planned in
+[`controlm-job-type-tables-plan.md`](controlm-job-type-tables-plan.md).
+
 ## Delivered artifacts
 
 | Artifact | Path |
