@@ -1587,7 +1587,7 @@ items:
     agent: ontology-mapper
     model: sonnet
     priority: p2
-    status: in_progress   # picked up 2026-07-15 pm on feat/k4-businessapplication-reshape (the reserved branch)
+    status: done          # done 2026-07-15 pm — 8 commits on feat/k4-businessapplication-reshape (K4(1)..K4(7) + port narrative), branch pending --no-ff merge
     depends_on: [K3]
     inputs: [config/gate-log.md, drydocs_core/ontology/relationship_vocabulary.yaml, config/taxonomy-ontology-map.yaml, drydocs_core/schema/, config/precedence.yaml]
     acceptance: >
@@ -1618,6 +1618,15 @@ items:
       this item. The remote stub pointed at 40fe038 (73 commits behind, predating K2's
       attribution edges this item re-shapes) with zero commits of its own — re-based onto
       main a683384 at the groom; work starts from there.
+      DONE 2026-07-15 pm (all 7 clauses + port narrative, each its own logged commit;
+      655 tests green throughout). DEVIATIONS/RESIDUALS: (a) seal-doc-source-of-record
+      flipped only to CONFIRMED, not applied — applied = a loader wrote the graph, and the
+      Document loader waits on docmeta (honest-lifecycle rule); (b) contact roles outside
+      the fixed 7 (CBT, Backup App Owner, Risk Manager) load flagged unmapped_role=true —
+      whether any subsume into the scheme is a future SME call; (c) company-side live-graph
+      node-label migration is THEIRS (port-prompt step 35); (d) precedence placement:
+      seal-pat wired at authority 3 above lob-product-team (identity beats catalog) — the
+      open placement question resolved by the governs rationale, flag if SME disagrees.
 
   - id: K5
     epic: seal-attribution
@@ -2786,8 +2795,8 @@ items:
 # Roll-up the dispatcher can glance at. COMPUTED views — test_backlog.py enforces
 # that these match the items exactly; update them with any status change.
 summary:
-  todo: 21                                          # K4 picked up 2026-07-15 pm (reserved branch)
-  in_progress: 2                                   # E1 (gate deferred), K4 (reshape apply — feat/k4 branch)
+  todo: 21                                          # (unchanged)
+  in_progress: 1                                   # E1 (gate deferred)
   blocked: 0
-  done: 70                                          # O6 landed + O1 umbrella closed 2026-07-15
+  done: 71                                          # K4 reshape-apply done 2026-07-15 pm (feat/k4 branch, pending merge)
   next_ready: [C5, D5, D6, L7, L8, L9, L12, M2, M3, M4, P1, C7, K5, J10, J11, J12, C8]
