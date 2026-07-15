@@ -4,7 +4,7 @@
 
 import type { Persona, Role } from './auth'
 
-export type ViewId = 'landing' | 'my-apps' | 'console' | 'governance'
+export type ViewId = 'landing' | 'my-apps' | 'graph' | 'console' | 'governance'
 
 export interface ViewDef {
   id: ViewId
@@ -12,9 +12,14 @@ export interface ViewDef {
   roles: readonly Role[]
 }
 
+// Nav order is meaningful: Graph sits BEFORE Console — the wf-console-01
+// review's graph-before-Cypher finding (payoff before code, for non-engineer
+// SMEs). Graph is the live read-only named-query surface, open to both roles;
+// raw Cypher stays admin-only on the Console bench.
 export const VIEWS: readonly ViewDef[] = [
   { id: 'landing', label: 'Overview', roles: ['user', 'admin'] },
   { id: 'my-apps', label: 'My Apps', roles: ['user', 'admin'] },
+  { id: 'graph', label: 'Graph', roles: ['user', 'admin'] },
   { id: 'console', label: 'Console', roles: ['admin'] },
   { id: 'governance', label: 'Posture & Governance', roles: ['admin'] },
 ]

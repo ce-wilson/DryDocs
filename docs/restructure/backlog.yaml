@@ -2113,7 +2113,7 @@ items:
     agent: main
     model: fable
     priority: p2
-    status: in_progress
+    status: done
     depends_on: []
     inputs: [web/, docs/decisions/]
     acceptance: >
@@ -2158,6 +2158,12 @@ items:
       2026-07-14 (evening) — ADR 0005 ACCEPTED (O3 done): the "decision recorded"
       acceptance clause is SATISFIED. O1's remainder = O6 (live C4/graph view through
       the seam, via O4+O5); wireframes committed (UI-WIP, e5608ff); build/run docs ride O5.
+      DONE 2026-07-15 — O6 landed, closing the umbrella: every acceptance clause now
+      holds — throwaway state left (O1 design pass), wireframes committed (UI-WIP),
+      decision recorded (ADR 0005 ACCEPTED, thin API; O3), REAL C4/graph view against
+      the local EE DB (O6: agraph-successor = d3-force + in-repo SVG in web/, NVL
+      decision recorded on O6), build/run documented (web/README Graph-view section +
+      O5's api run docs), no secrets in web/ (publish-boundary greps clean at O2/O4/O6).
 
   - id: O2
     epic: web-console
@@ -2321,7 +2327,7 @@ items:
     agent: main
     model: sonnet
     priority: p2
-    status: todo
+    status: done
     depends_on: [O4, O5]
     inputs: [web/src/, docs/decisions/0005-browser-neo4j-access-path.md, UI-WIP/wf-console-01.html, UI-WIP/design-review.md]
     acceptance: >
@@ -2339,6 +2345,27 @@ items:
       and this item land (wireframes committed 2026-07-14 via UI-WIP; build/run docs ride
       O5). Library choice is a tech pick, not a boundary decision — record it, escalate
       only if it grows one.
+      RENDERING-LIBRARY DECISION (2026-07-15, recorded per acceptance): d3-force (ISC,
+      ~90KB, layout-only, deterministic — fixed-seed LCG random source) + the in-repo SVG
+      idiom (GraphSvg's visual language, dark tokens, DOM-assertable). NVL deferred, NOT
+      blocked: @neo4j-nvl/react 1.2.0 verified React-19-compatible (peer 18||^19), but it
+      is proprietary-licensed + ~1.25MB WebGL canvas — overkill for the server-capped
+      200-edge payload and opaque to DOM-level CDP assertions. REVISIT TRIGGER: the V5
+      explorer's C4 zoom ladder or >200-node scenes.
+    progress: >
+      DONE 2026-07-15 (branch feat/o6-live-graph-view, 298fc55): Graph nav view (both
+      roles, ordered BEFORE Console — the wf-console-01 graph-before-Cypher finding; NO
+      Cypher affordance in the view) renders real WAS_INFORMED_BY edges from the live EE
+      drydocs db. Seam grew runNamed(queryId) -> NamedResult carrying the server-routed
+      database (shown in the LIVE tag); graphApi.ts is the REAL adapter (persona login ->
+      bearer, 401 retry, fails loud); bolt.runNamed throws (no browser-side query-registry
+      fork — payload shaping stays server-side in drydocs_api/queries.py per acceptance).
+      VERIFIED: build+lint green, pytest 652 passed, headless-Edge CDP drive 16/16 against
+      the full live stack — DOM node/edge counts equal the API payload (9 jobs/8 edges),
+      live job names asserted in the SVG DOM, O2/O4 role regressions green; screenshots
+      captured. Environment notes: first live EE bootstrap exposed the APOC comment-';'
+      landmine (fixed on main, 8478204) and the sample-data m3-verify nit (inboxed);
+      synthesized tower pages remain the no-backend demo.
 
   - id: O7
     epic: web-console
@@ -2698,8 +2725,8 @@ items:
 # Roll-up the dispatcher can glance at. COMPUTED views — test_backlog.py enforces
 # that these match the items exactly; update them with any status change.
 summary:
-  todo: 21                                          # +3 groomed 2026-07-15 (J11, J12, C8 — weekly inbox groom)
-  in_progress: 2                                   # E1 (gate deferred), O1 (web design pass — remainder = O6)
+  todo: 20
+  in_progress: 1                                   # E1 (gate deferred)
   blocked: 0
-  done: 68                                          # D4 (psgmgr 'Y' fix) + O7 (shipped-by-O5) done 2026-07-15
-  next_ready: [C5, L7, L8, L9, L12, M2, M3, M4, P1, C7, K4, K5, J10, O6, J11, J12, C8]
+  done: 70                                          # O6 landed + O1 umbrella closed 2026-07-15
+  next_ready: [C5, L7, L8, L9, L12, M2, M3, M4, P1, C7, K4, K5, J10, J11, J12, C8]

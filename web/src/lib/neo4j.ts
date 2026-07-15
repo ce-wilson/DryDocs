@@ -62,5 +62,14 @@ export function createBoltAccess(s: BoltSettings): GraphAccess {
   return {
     kind: 'bolt',
     runRead: (query) => runCypher(s.uri, s.user, s.password, s.database, query),
+    // Named views are api-path only: their Cypher lives in drydocs-api's
+    // registry (server-side payload shaping, ADR 0005). Falling back to a
+    // browser-side copy here would fork the query definitions — fail loud.
+    runNamed: async () => {
+      throw new Error(
+        'named view queries are api-path only (ADR 0005) — the bolt adapter is the ' +
+          'raw-Cypher dev bench and has no server-side query registry',
+      )
+    },
   } satisfies GraphAccess
 }
