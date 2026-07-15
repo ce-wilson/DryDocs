@@ -83,7 +83,12 @@ Tags help grooming: `idea` · `bug` · `doc` · `source` (new data source) · `q
   `feature/ui-dark-landing-myapps` deleted local+origin — no rebase/fold needed; (2) obsolete
   TDD copy dropped with the branch; (3) machine-local UI-WIP files committed (Internal-Public).
   Plus: `feat/web-login-mock` --no-ff merged to main (O2 done in backlog), branch deleted.
-  `feat/web-console-design-pass` left standing — its Claude-Designer mockup is still unmerged.
+  ~~`feat/web-console-design-pass` left standing — its Claude-Designer mockup is still
+  unmerged.~~ RESOLVED 2026-07-14 (evening): its mockup content was already on main as the
+  root DryDocsConsole.html (cherry-pick of da6547b came back EMPTY — nothing unique left);
+  the file relocated to UI-WIP/drydocs-console-mockup.html beside the rest of the design
+  record (closes the D7 root-stray disposition properly) and the branch deleted from origin.
+  ALL UI branches are now reconciled — the web stream lives entirely on main.
 
 - 2026-07-12 — [idea] **dry-docs.com site visual language**: seed from the whitepaper's
   "overnight ledger" identity (greenbar/banner-page/mono-display; canonical source stays
