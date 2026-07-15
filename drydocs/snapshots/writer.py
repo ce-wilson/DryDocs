@@ -37,14 +37,14 @@ class SnapshotWriter:
 
     def write_application_snapshots(self) -> dict[str, int]:
         return self._write_snapshots(
-            entity_label="Application",
+            entity_label="BusinessApplication",
             entity_key="seal_id",
             snapshot_label="ApplicationSnapshot",
             relationship_query="""
                 MATCH (a:BusinessApplication {seal_id: $entity_key})
                 OPTIONAL MATCH (p:Product)-[:HAS_APPLICATION]->(a)
                 OPTIONAL MATCH (a)-[:HAS_DEV_TEAM]->(dt:DevTeam)
-                OPTIONAL MATCH (a)-[:HAS_MEMBERSHIP]->(:Membership)-[:HELD_BY]->(emp:Employee)
+                OPTIONAL MATCH (a)-[:QUALIFIED_ATTRIBUTION]->(:Attribution)-[:HAS_AGENT]->(emp:Employee)
                 RETURN
                     a.status            AS status,
                     a.risk_level        AS risk_level,

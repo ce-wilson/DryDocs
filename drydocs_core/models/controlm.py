@@ -168,7 +168,7 @@ class ControlMJobRow(BaseModel):
     # --- classification ---
     application: str | None = Field(
         None,
-        description="Business app name from CM_DEF_VJOB.APPLICATION. Used to reconcile to :Application.seal_id.",
+        description="Business app name from CM_DEF_VJOB.APPLICATION. Used to reconcile to :BusinessApplication.seal_id.",
     )
     group_name: str | None = None
     task_type: str | None = Field(None, description="VARCHAR2(21). Job / Smart Folder / etc.")

@@ -21,7 +21,7 @@
 // APPLICATION is the **Control-M app code**, NOT the SEAL business-app
 // name.  Different teams use it differently: some put a Platform name
 // here, others put their 3-char appcode. It does NOT reconcile cleanly to
-// :Application.seal_id — the folder-name 3-char appcode (positions 3-5,
+// :BusinessApplication.seal_id — the folder-name 3-char appcode (positions 3-5,
 // e.g. 'ARA' in 'PRARAG-HLDM-...') is the canonical mechanism for that
 // linkage. See docs/m3_controlm_concept_mapping.md and
 // docs/decisions/0003-application-naming-disambiguation.md (naming rules).

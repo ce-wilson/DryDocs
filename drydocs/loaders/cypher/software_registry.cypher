@@ -3,7 +3,7 @@
 //
 // Creates Vendor (the brand ONLY) and SoftwareProduct nodes, attributes each
 // product to its vendor via MADE_BY (prov:wasAttributedTo), and — for rows
-// where used_by_app_id is set — wires the reserved DryDocs :Application to
+// where used_by_app_id is set — wires the reserved DryDocs :BusinessApplication to
 // the product via USES_SOFTWARE (local domain edge; version/source on the
 // edge). Idempotent; the registry YAML is the source of truth.
 //
@@ -44,7 +44,7 @@ SET m.last_seen_at = datetime($loaded_at),
 // to the real SEAL id at port time).
 WITH row, sp
 WHERE row.used_by_app_id IS NOT NULL
-MERGE (a:Application {seal_id: row.used_by_app_id})
+MERGE (a:BusinessApplication {seal_id: row.used_by_app_id})
   ON CREATE SET a.name       = 'DryDocs',
                 a.created_at = datetime($loaded_at),
                 a.source     = 'registry'
