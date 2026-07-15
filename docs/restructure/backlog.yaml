@@ -493,6 +493,63 @@ items:
       ('Y','1') for legacy synthetic CSVs; SETVAR preflight comment added; superseded
       docs/reviews left as history. 655 tests pass; design renders regenerated.
 
+  # (D5/D6 groomed 2026-07-15 pm — findings from the first live EE bootstrap, O6 session.)
+  - id: D5
+    epic: config-loaders
+    title: "Harden Neo4jClient.run_script against APOC's comment-';' statement split (Cypher 25 rejects the empty fragment)"
+    type: bug
+    module: drydocs-core
+    phase: 3
+    agent: main
+    model: sonnet
+    priority: p2
+    status: todo
+    depends_on: []
+    inputs: [drydocs_core/neo4j_client.py, drydocs/loaders/base.py, drydocs_core/schema/]
+    acceptance: >
+      run_script no longer hands the raw script to apoc.cypher.runMany: it splits
+      statements CLIENT-SIDE with a comment/string-aware scanner (generalize
+      base.py::_code_semicolons into one shared helper — split points, not just a count)
+      and executes per-statement, preserving the DDL+DML-in-one-file behavior the
+      docstring promises. A unit test (duck-typed client, no live DB) proves a script
+      containing an end-of-line ';' inside a // comment plus a trailing ';' yields no
+      empty statement and every real statement exactly once; the loaders' run()/runMany
+      dispatch keeps its existing guard tests. The protective wording added to
+      ontology_supplement.cypher (8478204) may then be relaxed to a plain comment.
+      Full suite green.
+    notes: >
+      Groomed 2026-07-15 pm from the same-day inbox bug. Seen live: the first EE-container
+      bootstrap (Neo4j 2026.05.0 / Cypher 25) failed apply-ontology-supplement because
+      runMany splits on every end-of-line ';' including inside // comments, and the new
+      server rejects the comment-only fragment as an empty statement ("CYPHER 25" +
+      nothing) — 5.x tolerated it. One-line comment reword shipped on main (8478204) as
+      the unblock; THIS item is the class fix so supplement/schema files can't re-trip it.
+
+  - id: D6
+    epic: config-loaders
+    title: "Make the README quick start verify clean: 2 active sample folders have no jobs, failing m3-verify"
+    type: chore
+    module: drydocs-load
+    phase: 3
+    agent: main
+    model: haiku
+    priority: p3
+    status: todo
+    depends_on: []
+    inputs: [drydocs/data/samples/controlm_folders__sample.csv, drydocs/data/samples/controlm_jobs__sample.csv, drydocs/cli.py]
+    acceptance: >
+      EITHER folders 161020 and 160501 each gain at least one sample job row (conditions/
+      dependencies CSVs and any fixture-count tests updated to match) OR m3-verify
+      downgrades the "active folders contain at least one job" invariant to a WARNING for
+      the CSV sample adapter (kept failing for Oracle runs) — either/or decided at
+      execution. Result either way: the README quick-start chain (bootstrap -> supplements
+      -> refresh-reference -> ingest-controlm -> m1-verify -> m3-verify) exits 0 against
+      the bundled samples on a fresh database. Full suite green.
+    notes: >
+      Groomed 2026-07-15 pm from the same-day inbox chore (seen at the first live EE
+      bootstrap: empty=2 total=7, exit 1 — pre-existing sample-data gap, not a loader
+      bug). Sample rows are SYNTHESIZED — keep the publish boundary (no real names).
+
   # ── Epic E — Context graph pilot (ontology-mapper + main) — Phase 4 ────────
   - id: E1
     epic: context-graph
@@ -1557,6 +1614,10 @@ items:
       git-readme.md's SEAL-reshape section (currently instructs the consumer "do NOT take as
       applied" — becomes wrong), add the port-prompt step, and check PORT-MANIFEST per-entry notes
       — the prose-mirror drift class from docs/reviews/tech-debt-port-boundary.md.
+      BRANCH (2026-07-15 pm groom): feat/k4-businessapplication-reshape is reserved for
+      this item. The remote stub pointed at 40fe038 (73 commits behind, predating K2's
+      attribution edges this item re-shapes) with zero commits of its own — re-based onto
+      main a683384 at the groom; work starts from there.
 
   - id: K5
     epic: seal-attribution
@@ -2725,8 +2786,8 @@ items:
 # Roll-up the dispatcher can glance at. COMPUTED views — test_backlog.py enforces
 # that these match the items exactly; update them with any status change.
 summary:
-  todo: 20
+  todo: 22                                          # +2 groomed 2026-07-15 pm (D5, D6 — O6-session findings)
   in_progress: 1                                   # E1 (gate deferred)
   blocked: 0
   done: 70                                          # O6 landed + O1 umbrella closed 2026-07-15
-  next_ready: [C5, L7, L8, L9, L12, M2, M3, M4, P1, C7, K4, K5, J10, J11, J12, C8]
+  next_ready: [C5, D5, D6, L7, L8, L9, L12, M2, M3, M4, P1, C7, K4, K5, J10, J11, J12, C8]
