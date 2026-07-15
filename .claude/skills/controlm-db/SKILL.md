@@ -55,7 +55,7 @@ and the crosswalk. Two structural differences the newer version introduces:
 - **Versioned view layer.** The `CM_DEF_V*` views add `IS_CURRENT_VERSION`,
   `VERSION_SERIAL`, `VERSION_OPCODE`, `VERSION_TIMESTAMP`, `VERSION_USER`,
   `CAPTURE_DATE` — columns absent from the flat 6.4.01 tables. **Always filter
-  `IS_CURRENT_VERSION = '1'`** (VARCHAR2(1) — quote the literal) or you read
+  `IS_CURRENT_VERSION = 'Y'`** (VARCHAR2(1) — quote the literal) or you read
   every historical edit.
 
 Full mapping + column crosswalk: [`references/schema-crosswalk.md`](references/schema-crosswalk.md).
@@ -97,7 +97,7 @@ probe in `ingest.md` before writing a loader against it.
   issues DML/DDL against `psgmgr`. Staging DDL targets the DryDocs staging schema
   (`DRYDOCS_STG`), never `psgmgr`.
 - **Current version only.** Every definition query filters
-  `IS_CURRENT_VERSION = '1'` and actively-scheduled folders `USER_DAILY IS NOT NULL`.
+  `IS_CURRENT_VERSION = 'Y'` and actively-scheduled folders `USER_DAILY IS NOT NULL`.
 - **`CM_HIST_VW` is expensive.** It materializes before applying `ROWNUM`; even
   `ROWNUM <= 1` probes time out (ORA-03156 / DPY-4024). Bound history queries with
   indexed predicates (e.g. `JOB_MEM_NAME`, a date range) and raise `call_timeout`

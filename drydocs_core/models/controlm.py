@@ -197,7 +197,7 @@ class ControlMJobRow(BaseModel):
     # --- versioning + audit ---
     is_current_version: str | None = Field(
         None,
-        description="VARCHAR2(1) — '1' = active version of this job definition.",
+        description="VARCHAR2(1) — 'Y' = current version of this job definition (domain live-verified 2026-07-15, D4).",
     )
     version_opcode: str | None = None
     version_timestamp: str | None = None

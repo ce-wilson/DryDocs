@@ -45,7 +45,7 @@ FROM   psgmgr.CM_DEF_VTAB T
 LEFT JOIN psgmgr.CM_DEF_VJOB H
        ON  H.TABLE_ID = T.TABLE_ID
        AND H.JOB_ID   = 1                   -- folder header row (SMART Table)
-       AND H.IS_CURRENT_VERSION = '1'       -- VARCHAR2(1): string literal
+       AND H.IS_CURRENT_VERSION = 'Y'       -- VARCHAR2(1): string literal; domain 'Y' (company TDD, 2026-07-15)
 WHERE  T.USER_DAILY IS NOT NULL
   -- optional scope (any bind NULL = no filter on that dimension)
   AND  (:folder_filter IS NULL OR T.SCHED_TABLE       LIKE :folder_filter)

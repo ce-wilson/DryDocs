@@ -74,7 +74,7 @@ SET j.version_serial     = row.version_serial,
     j.instance_name      = row.instance_name,
     j.capture_date       = CASE WHEN row.capture_date IS NULL OR row.capture_date = '' THEN null
                                 ELSE datetime(replace(row.capture_date, ' ', 'T')) END,
-    j.active             = row.is_current_version = '1',
+    j.active             = row.is_current_version = 'Y',
 
     // source audit envelope (config/audit-fields.yaml, controlm-psgmgr entry;
     // gate controlm-q1q3-phase1). Datetimes normalized at the boundary.

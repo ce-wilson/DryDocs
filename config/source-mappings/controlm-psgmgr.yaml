@@ -140,9 +140,9 @@ objects:
       - {name: ACTIVE_TILL, disposition: projected, origin: source, target: "ControlMJob.active_till"}
       - {name: END_FOLDER, disposition: projected, origin: source, target: "ControlMJob.end_folder", note: "Y/N — last job in folder"}
       - {name: IS_CURRENT_VERSION, disposition: projected, origin: source, target: "ControlMJob.is_current_version",
-         note: "the WHERE-clause active-version filter (= '1'; VARCHAR2(1), string literal); domain-value probe pending — unreliable across legacy vs. new folders (gate controlm-q1q3-phase1 §Q2)",
+         note: "the WHERE-clause active-version filter (= 'Y'; VARCHAR2(1), string literal); domain RESOLVED 'Y' 2026-07-15 (D4 — finalized company ingestion TDD, live-verified), closing the gate §Q2 probe",
          decided_by: controlm-q1q3-phase1,
-         derived_also: {target: "ControlMJob.active", rule: "IS_CURRENT_VERSION = '1'"}}
+         derived_also: {target: "ControlMJob.active", rule: "IS_CURRENT_VERSION = 'Y'"}}
       - {name: VERSION_OPCODE, disposition: projected, origin: source, target: "ControlMJob.version_opcode"}
       - {name: VERSION_TIMESTAMP, disposition: projected, origin: source, target: "ControlMJob.version_timestamp",
          note: "current-version duplicate of CHANGE_DATE — kept as a plain (non-envelope) audit property, string not datetime (config/audit-fields.yaml, gate §Q2)",
@@ -297,9 +297,10 @@ objects:
         Only the four columns behind the (TABLE_NAME|JOB_NAME|JOB_ID|APPL_TYPE|
         NAME|VALUE) extract are dispositioned here. CM_DEF_SETVAR_VW carries its
         own IS_CURRENT_VERSION/VERSION_SERIAL (confirmed 2026-07-10, like the
-        LNKI/LNKO views); the extract now filters V.IS_CURRENT_VERSION = '1'
-        (filter-only — used in WHERE, not projected/SET). Sweeps the rest pending
-        the full column census (doc 08 Phase 2).
+        LNKI/LNKO views); the extract now filters V.IS_CURRENT_VERSION = 'Y'
+        (filter-only — used in WHERE, not projected/SET; domain 'Y' inferred from
+        the D4 resolution — spot-check SELECT DISTINCT at the company preflight).
+        Sweeps the rest pending the full column census (doc 08 Phase 2).
 
   # ---------------------------------------------------------------------------
   # CM_HOSTS (host-group membership) — replica of the BMC node-group structure

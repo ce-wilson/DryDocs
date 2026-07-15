@@ -26,7 +26,7 @@ manifest + `JOB_DEVELOPER_VIEW`). Ad-hoc probes: `sql/adhoc/`.
 
 1. **Project, don't `SELECT *`.** `CM_DEF_VJOB` has 100+ columns; extract only
    what a model row needs. Add columns behind a stated use case, not speculatively.
-2. **Always filter current + scheduled.** `J.IS_CURRENT_VERSION = '1'`
+2. **Always filter current + scheduled.** `J.IS_CURRENT_VERSION = 'Y'`
    (string literal) and `T.USER_DAILY IS NOT NULL`. Folder-grain files skip the
    version filter (folders aren't versioned).
 3. **Keep the four scope binds** consistent across every extract (NULL = no

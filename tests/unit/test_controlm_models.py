@@ -93,7 +93,7 @@ def test_job_basic_real_columns() -> None:
         "active_from": "",
         "active_till": "",
         "end_folder": "N",
-        "is_current_version": "1",
+        "is_current_version": "Y",
         "version_opcode": "U",
         "version_timestamp": "20260429030000",
         "version_user": "jdoe",
@@ -104,7 +104,7 @@ def test_job_basic_real_columns() -> None:
     assert row.version_serial == 3
     assert row.application == "CCB Auto Risk"
     assert row.parent_table == "CCB_AUTO_DAILY"
-    assert row.is_current_version == "1"
+    assert row.is_current_version == "Y"
     assert row.cmd_line.endswith(".pset")
 
 
@@ -133,7 +133,7 @@ def test_condition_in_has_boolean_expression_columns() -> None:
         "order_": "1",
         "isn": "1",
         "version_opcode": "U",
-        "is_current_version": "1",
+        "is_current_version": "Y",
         "capture_date": "2026-04-29 03:00:00",
     })
     assert row.condition_name == "TRADES_FILE_ARRIVED"
@@ -156,7 +156,7 @@ def test_condition_out_has_sign_no_boolean_expression() -> None:
         "sign": "+",
         "isn": "1",
         "version_opcode": "U",
-        "is_current_version": "1",
+        "is_current_version": "Y",
         "capture_date": "2026-04-29 03:00:00",
     })
     assert row.sign == "+"

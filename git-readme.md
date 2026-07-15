@@ -345,7 +345,7 @@ For these paths, **do not hand-merge** — this repo is authoritative; replace
 |---|---|---|
 | `drydocs/controlm/variables.py` | A | `VariableKind` (9 kinds) + `classify_variable()` / `classify_job_variables()` |
 | `drydocs/controlm/variable_report.py` | A | `VariableCoverage` accumulator |
-| `drydocs/loaders/sql/controlm_variables.sql` | A | Variable extract query (`psgmgr.CM_DEF_SETVAR_VW` — **name VERIFIED live 2026-07-10**; carries its own `IS_CURRENT_VERSION`, filtered `= '1'`) |
+| `drydocs/loaders/sql/controlm_variables.sql` | A | Variable extract query (`psgmgr.CM_DEF_SETVAR_VW` — **name VERIFIED live 2026-07-10**; carries its own `IS_CURRENT_VERSION`, filtered `= 'Y'` — literal corrected 2026-07-15, D4) |
 | `drydocs/loaders/sql/ddl/controlm_staging_ddl.sql` | A | Full staging-layer DDL (8 STG_ tables + views) |
 | `drydocs/controlm/resolver.py` | B | Offline AutoEdit substitution engine |
 | `drydocs/controlm/staging.py` | B (ext. C) | STG_ row builder — `build_staging_bundle` / `collect_jobs` |
@@ -543,7 +543,7 @@ legitimate). All keys carry `DATA_CENTER` (TABLE_ID may collide across the 4 DCs
 
 > **RESOLVED (2026-07-10, live psgmgr check):** the variable source object is the view
 > `psgmgr.CM_DEF_SETVAR_VW`, which carries its own `IS_CURRENT_VERSION`/`VERSION_SERIAL`
-> — the extracts filter `V.IS_CURRENT_VERSION = '1'` so superseded variable rows do not
+> — the extracts filter `V.IS_CURRENT_VERSION = 'Y'` so superseded variable rows do not
 > leak. The old `CM_DEF_SETVAR` name and the DBA-verify TODO are retired.
 
 See `docs/controlm-c3-normalization-status.md` for the full status + operational runbook.
@@ -614,7 +614,7 @@ The company site may have already fixed this differently — review each change 
 ### `constraints.cypher` — Control-M key corrections
 
 The M3 draft used incorrect composite keys (included `version_serial` and `cyclic_type`).
-Corrected to natural keys; loaders filter `IS_CURRENT_VERSION='1'` so one canonical node per logical entity:
+Corrected to natural keys; loaders filter `IS_CURRENT_VERSION='Y'` so one canonical node per logical entity:
 
 ```cypher
 -- OLD (wrong)

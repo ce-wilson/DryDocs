@@ -111,7 +111,7 @@ FROM   psgmgr.CM_AVG_RUN;
 -- LEFT JOIN (SELECT DISTINCT t.SCHED_TABLE, v.JOB_NAME
 --            FROM   psgmgr.CM_DEF_VJOB v
 --            JOIN   psgmgr.CM_DEF_VTAB t ON t.TABLE_ID = v.TABLE_ID
---            WHERE  v.IS_CURRENT_VERSION = '1'
+--            WHERE  v.IS_CURRENT_VERSION = 'Y'
 --              AND  t.USER_DAILY IS NOT NULL
 --              AND  t.SCHED_TABLE LIKE '<FOLDER-PREFIX>%') j
 --        ON  j.SCHED_TABLE = a.SCHED_TABLE
@@ -125,7 +125,7 @@ FROM   psgmgr.CM_AVG_RUN a
 LEFT JOIN (SELECT DISTINCT t.SCHED_TABLE, v.JOB_NAME
            FROM   psgmgr.CM_DEF_VJOB v
            JOIN   psgmgr.CM_DEF_VTAB t ON t.TABLE_ID = v.TABLE_ID
-           WHERE  v.IS_CURRENT_VERSION = '1'
+           WHERE  v.IS_CURRENT_VERSION = 'Y'
              AND  t.USER_DAILY IS NOT NULL) j
        ON  j.SCHED_TABLE = a.SCHED_TABLE
        AND j.JOB_NAME    = a.JOB_MEM_NAME;
@@ -136,7 +136,7 @@ SELECT COUNT(*) AS active_jobs,
 FROM  (SELECT DISTINCT t.SCHED_TABLE, v.JOB_NAME
        FROM   psgmgr.CM_DEF_VJOB v
        JOIN   psgmgr.CM_DEF_VTAB t ON t.TABLE_ID = v.TABLE_ID
-       WHERE  v.IS_CURRENT_VERSION = '1'
+       WHERE  v.IS_CURRENT_VERSION = 'Y'
          AND  t.USER_DAILY IS NOT NULL) j
 LEFT JOIN (SELECT DISTINCT SCHED_TABLE, JOB_MEM_NAME FROM psgmgr.CM_AVG_RUN) a
        ON  a.SCHED_TABLE  = j.SCHED_TABLE

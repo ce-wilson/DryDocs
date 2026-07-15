@@ -18,12 +18,16 @@
 --                variables at all.
 --
 -- Filter rule  :
---   V.IS_CURRENT_VERSION = '1'  — current-version variable rows only
---   J.IS_CURRENT_VERSION = '1'  — current-version jobs only
+--   V.IS_CURRENT_VERSION = 'Y'  — current-version variable rows only
+--   J.IS_CURRENT_VERSION = 'Y'  — current-version jobs only
 --   T.USER_DAILY IS NOT NULL    — actively-scheduled folders only
 --   (CM_DEF_SETVAR_VW carries its own IS_CURRENT_VERSION / VERSION_SERIAL like
 --    the LNKI/LNKO views — confirmed 2026-07-10 — so the V-filter is applied;
 --    without it the extract returns superseded variable rows.)
+--   Domain note (D4, 2026-07-15): 'Y' is live-verified for CM_DEF_VJOB and the
+--   LNKI/LNKO views (finalized company ingestion TDD). The SETVAR view's own
+--   domain is inferred to match — preflight before the production run:
+--     SELECT DISTINCT IS_CURRENT_VERSION FROM psgmgr.CM_DEF_SETVAR_VW;
 --
 -- Scope binds  : optional, NULL = no filter on that dimension. Used for
 --                sampling and targeted re-pulls (pass NULL for the full
@@ -63,8 +67,8 @@ FROM   psgmgr.CM_DEF_SETVAR_VW V
 JOIN   psgmgr.CM_DEF_VJOB  J  ON V.TABLE_ID = J.TABLE_ID
                              AND V.JOB_ID   = J.JOB_ID
 JOIN   psgmgr.CM_DEF_VTAB  T  ON J.TABLE_ID = T.TABLE_ID
-WHERE  V.IS_CURRENT_VERSION = '1'
-  AND  J.IS_CURRENT_VERSION = '1'
+WHERE  V.IS_CURRENT_VERSION = 'Y'
+  AND  J.IS_CURRENT_VERSION = 'Y'
   AND  T.USER_DAILY IS NOT NULL
   -- optional scope (any bind NULL = no filter on that dimension)
   AND  (:folder_filter IS NULL OR T.SCHED_TABLE LIKE :folder_filter)

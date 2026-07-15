@@ -103,14 +103,15 @@ four objects — and, new in Rev 2, reads `CM_DEF_VJOB` a *second* way (the fold
 
 **Two filters apply almost everywhere:**
 
-- `IS_CURRENT_VERSION = '1'` — **string** literal (`VARCHAR2(1)`). On jobs, conditions, and
+- `IS_CURRENT_VERSION = 'Y'` — **string** literal (`VARCHAR2(1)`; domain `'Y'` live-verified
+  2026-07-15 via the finalized company ingestion TDD — was assumed `'1'`, D4). On jobs, conditions, and
   the header-row join. **Not** on folders (`CM_DEF_VTAB` has no version column).
 - `USER_DAILY IS NOT NULL` — the only "actively scheduled" gate on a folder.
 
 **Join keys**
 
 - Job ↔ folder: `CM_DEF_VJOB.TABLE_ID = CM_DEF_VTAB.TABLE_ID`
-- **Header row ↔ folder (new):** `CM_DEF_VJOB.(TABLE_ID, JOB_ID=1, IS_CURRENT_VERSION='1')` — LEFT JOIN
+- **Header row ↔ folder (new):** `CM_DEF_VJOB.(TABLE_ID, JOB_ID=1, IS_CURRENT_VERSION='Y')` — LEFT JOIN
 - Condition ↔ job: `CM_DEF_LNK{I,O}_P_VW.(TABLE_ID, JOB_ID, VERSION_SERIAL)`
 - **Dependency edge is derived, not stored:** B depends on A when `LNKI(B).CONDITION = LNKO(A).CONDITION`.
 
@@ -137,17 +138,17 @@ four objects — and, new in Rev 2, reads `CM_DEF_VJOB` a *second* way (the fold
         │  USER_DAILY, TABLE_STATUS
         │
         │  LEFT JOIN CM_DEF_VJOB H  ON H.TABLE_ID=TABLE_ID AND H.JOB_ID=1
-        │            (SMART-table header row → H.APPLICATION)   IS_CURRENT_VERSION='1'
+        │            (SMART-table header row → H.APPLICATION)   IS_CURRENT_VERSION='Y'
         │
         │  TABLE_ID (1)──────────────(many)
         ▼
         CM_DEF_VJOB  (job)                        PK: (TABLE_ID, JOB_ID, VERSION_SERIAL)
-        │  JOB_NAME, APPLICATION, OWNER,          filter: IS_CURRENT_VERSION='1'
+        │  JOB_NAME, APPLICATION, OWNER,          filter: IS_CURRENT_VERSION='Y'
         │  AUTHOR, NODE_ID, CMD_LINE, CYCLIC
         │
    ┌────┴────┐  (TABLE_ID, JOB_ID, VERSION_SERIAL)
    ▼         ▼
- LNKI_P_VW  LNKO_P_VW                             filter: IS_CURRENT_VERSION='1'
+ LNKI_P_VW  LNKO_P_VW                             filter: IS_CURRENT_VERSION='Y'
  (IN cond)  (OUT cond, SIGN +/-)
 
      └──── derived: LNKI.CONDITION = LNKO.CONDITION (successor consumes predecessor's emit) ────┘
@@ -235,7 +236,7 @@ folder-scoped. `VERSION_SERIAL` is an audit property, not identity.
 | `JOB_NAME`, `APPLICATION`, `GROUP_NAME`, `TASK_TYPE` | `.job_name`, `.application` (**≠ SEAL**), `.group_name`, `.task_type` |
 | `OWNER`, `AUTHOR`, `NODE_ID`, `CMD_LINE` | `.owner` (run-as FID), `.author` (CtM team FID), `.node_id`, `.cmd_line` |
 | `CYCLIC/CYCLIC_TYPE`, `PRIORITY`, `CRITICAL`, `ACTIVE_FROM/TILL`, `END_FOLDER` | corresponding props |
-| `IS_CURRENT_VERSION`, `VERSION_OPCODE/TIMESTAMP/USER`, `CAPTURE_DATE` | version/audit; `.active = IS_CURRENT_VERSION='1'` |
+| `IS_CURRENT_VERSION`, `VERSION_OPCODE/TIMESTAMP/USER`, `CAPTURE_DATE` | version/audit; `.active = IS_CURRENT_VERSION='Y'` |
 
 Edge: `(:ControlMFolder)-[:CONTAINS_JOB]->(:ControlMJob)`.
 
@@ -351,7 +352,7 @@ FROM   psgmgr.CM_DEF_VTAB T
 LEFT JOIN psgmgr.CM_DEF_VJOB H
        ON  H.TABLE_ID = T.TABLE_ID
        AND H.JOB_ID   = 1                 -- SMART-Table header row
-       AND H.IS_CURRENT_VERSION = '1'
+       AND H.IS_CURRENT_VERSION = 'Y'
 WHERE  T.USER_DAILY IS NOT NULL
   AND  T.SCHED_TABLE LIKE :folder_filter;  -- 161015, 161016
 ```
@@ -445,7 +446,7 @@ ids are `FR/NFR-CMI-*`, scoped to this chain; the SEAL row is spec-level, gated 
    `:ControlMApplication` (header-row APPLICATION, `JOB_ID=1`, LEFT JOIN + `WHERE` guard).
 3. Three different "applications": header-row `:ControlMApplication` ≠ SEAL `:Application` ≠
    folder-name `app_code`.
-4. `IS_CURRENT_VERSION = '1'` is a **string** (`VARCHAR2(1)`); folders use `USER_DAILY IS NOT NULL`.
+4. `IS_CURRENT_VERSION = 'Y'` is a **string** (`VARCHAR2(1)`); folders use `USER_DAILY IS NOT NULL`.
 5. Folder name = `SCHED_TABLE` (truth) vs `PARENT_TABLE` (denormalized on job).
 6. `JOB_ID` is **folder-scoped** → job identity is `(folder_id, job_id)`.
 7. Folder *type* = prefix position 6 (`G`), not the `DLY`/`CYC` suffix.

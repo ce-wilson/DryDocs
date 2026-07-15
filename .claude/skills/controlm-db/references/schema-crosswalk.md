@@ -65,7 +65,7 @@ versioning. Same concept, different column:
    (out, 10 cols). Out rows carry `SIGN` (`+` add / `-` remove); in rows carry the
    boolean-expression glue (`AND_OR`, `PARENTHESES`, `ORDER_`).
 2. **Versioned views.** Every definition object is a current-version view. **Always**
-   `WHERE IS_CURRENT_VERSION = '1'` (string literal — the column is VARCHAR2(1)).
+   `WHERE IS_CURRENT_VERSION = 'Y'` (string literal — the column is VARCHAR2(1); domain 'Y' live-verified 2026-07-15).
    Omitting it returns every historical edit of every job.
 3. **Denormalized folder on the job row.** `CM_DEF_VJOB.PARENT_TABLE` carries the
    folder name redundantly; the authoritative folder name is

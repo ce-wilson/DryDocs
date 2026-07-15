@@ -74,7 +74,7 @@
 --
 -- Deliberately NOT filtered on T.USER_DAILY: this view serves analyses beyond
 -- the active-inventory use case. Consumers filter on IS_ACTIVE_FOLDER = 'Y'
--- to reproduce the phase-1 population. IS_CURRENT_VERSION = '1' IS enforced
+-- to reproduce the phase-1 population. IS_CURRENT_VERSION = 'Y' IS enforced
 -- here — historical versions would inflate every count and serve no analysis.
 -- -----------------------------------------------------------------------------
 CREATE OR REPLACE VIEW job_detailed_view AS
@@ -129,7 +129,7 @@ SELECT
 FROM   psgmgr.CM_DEF_VJOB J
 JOIN   psgmgr.CM_DEF_VTAB T  ON J.TABLE_ID = T.TABLE_ID
                             -- AND J.DATA_CENTER = T.DATA_CENTER  -- enable if 0.1 found collisions
-WHERE  J.IS_CURRENT_VERSION = '1'
+WHERE  J.IS_CURRENT_VERSION = 'Y'
 ;
 
 COMMENT ON TABLE job_detailed_view IS
@@ -175,8 +175,8 @@ FROM   psgmgr.CM_DEF_SETVAR_VW V
 JOIN   psgmgr.CM_DEF_VJOB  J  ON V.TABLE_ID = J.TABLE_ID
                              AND V.JOB_ID   = J.JOB_ID
 JOIN   psgmgr.CM_DEF_VTAB  T  ON J.TABLE_ID = T.TABLE_ID
-WHERE  V.IS_CURRENT_VERSION = '1'
-  AND  J.IS_CURRENT_VERSION = '1'
+WHERE  V.IS_CURRENT_VERSION = 'Y'
+  AND  J.IS_CURRENT_VERSION = 'Y'
 ;
 
 COMMENT ON TABLE job_variable_view IS

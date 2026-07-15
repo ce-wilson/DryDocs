@@ -78,7 +78,7 @@ def test_folder_sql_joins_header_row_for_application() -> None:
     assert "LEFT JOIN psgmgr.CM_DEF_VJOB H" in text
     assert "H.JOB_ID   = 1" in text or "H.JOB_ID = 1" in text
     assert "H.APPLICATION" in text
-    assert "H.IS_CURRENT_VERSION = '1'" in text   # string literal, VARCHAR2(1)
+    assert "H.IS_CURRENT_VERSION = 'Y'" in text   # string literal, VARCHAR2(1); domain 'Y' (D4)
 
 
 def test_ingest_chain_order_is_enforced() -> None:
@@ -321,7 +321,7 @@ def test_jobs_sql_projects_the_audit_envelope() -> None:
 def test_jobs_sql_filters_current_version_as_string() -> None:
     text = (SQL_DIR / "controlm_jobs.sql").read_text(encoding="utf-8")
     # IS_CURRENT_VERSION is VARCHAR2(1); literal must be a string.
-    assert "J.IS_CURRENT_VERSION = '1'" in text
+    assert "J.IS_CURRENT_VERSION = 'Y'" in text
 
 
 def test_recursive_sql_has_cycle_guard() -> None:

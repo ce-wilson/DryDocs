@@ -9,8 +9,8 @@ scheduled folders.
 ## §CONV — conventions used below
 - `:folder`, `:sid`, `:run_as` = bind placeholders. `LIKE 'ABC_%'` shown literal
   only as a pattern shape.
-- Bind literals for `IS_CURRENT_VERSION` are **strings** (`'1'`), the column is
-  VARCHAR2(1).
+- Bind literals for `IS_CURRENT_VERSION` are **strings** (`'Y'`), the column is
+  VARCHAR2(1). Domain value `'Y'` live-verified 2026-07-15 (D4; was assumed `'1'`).
 - Prefer indexed predicates; the `CM_DEF_V*` views are moderate, `CM_HIST_VW` is
   expensive (see §HIST).
 
@@ -20,7 +20,7 @@ SELECT J.JOB_ID, J.JOB_NAME, J.APPLICATION, J.TASK_TYPE,
        J.OWNER AS run_as, J.AUTHOR, J.NODE_ID AS target_agent
 FROM   psgmgr.CM_DEF_VJOB J
 JOIN   psgmgr.CM_DEF_VTAB T ON J.TABLE_ID = T.TABLE_ID
-WHERE  J.IS_CURRENT_VERSION = '1'
+WHERE  J.IS_CURRENT_VERSION = 'Y'
   AND  T.USER_DAILY IS NOT NULL
   AND  T.SCHED_TABLE LIKE :folder
 ORDER  BY J.JOB_NAME;
@@ -33,8 +33,8 @@ SELECT CASE WHEN J.JOB_NAME = T.SCHED_TABLE THEN 'FOLDER' ELSE 'JOB' END AS scop
 FROM   psgmgr.CM_DEF_SETVAR_VW V
 JOIN   psgmgr.CM_DEF_VJOB   J ON V.TABLE_ID = J.TABLE_ID AND V.JOB_ID = J.JOB_ID
 JOIN   psgmgr.CM_DEF_VTAB   T ON J.TABLE_ID = T.TABLE_ID
-WHERE  V.IS_CURRENT_VERSION = '1'   -- the view stores version history; filter or you get superseded rows
-  AND  J.IS_CURRENT_VERSION = '1'
+WHERE  V.IS_CURRENT_VERSION = 'Y'   -- the view stores version history; filter or you get superseded rows
+  AND  J.IS_CURRENT_VERSION = 'Y'
   AND  T.USER_DAILY IS NOT NULL
   AND  T.SCHED_TABLE = :folder
 ORDER  BY scope DESC, var_name;   -- FOLDER rows first (inherited), then JOB rows
@@ -49,7 +49,7 @@ uniqueness.
 SELECT I.CONDITION, I.ODATE, I.AND_OR, I.PARENTHESES, I.ORDER_
 FROM   psgmgr.CM_DEF_LNKI_P_VW I
 JOIN   psgmgr.CM_DEF_VTAB T ON I.TABLE_ID = T.TABLE_ID
-WHERE  I.IS_CURRENT_VERSION = '1' AND T.USER_DAILY IS NOT NULL
+WHERE  I.IS_CURRENT_VERSION = 'Y' AND T.USER_DAILY IS NOT NULL
   AND  I.TABLE_ID = :table_id AND I.JOB_ID = :job_id
 ORDER  BY I.ORDER_;
 
@@ -57,7 +57,7 @@ ORDER  BY I.ORDER_;
 SELECT O.CONDITION, O.ODATE, O.SIGN
 FROM   psgmgr.CM_DEF_LNKO_P_VW O
 JOIN   psgmgr.CM_DEF_VTAB T ON O.TABLE_ID = T.TABLE_ID
-WHERE  O.IS_CURRENT_VERSION = '1' AND T.USER_DAILY IS NOT NULL
+WHERE  O.IS_CURRENT_VERSION = 'Y' AND T.USER_DAILY IS NOT NULL
   AND  O.TABLE_ID = :table_id AND O.JOB_ID = :job_id;
 ```
 
@@ -72,7 +72,7 @@ JOIN   psgmgr.CM_DEF_LNKI_P_VW bi                       -- B consumes
        ON  bi.CONDITION = ao.CONDITION
        AND bi.ODATE     = ao.ODATE                      -- same date-reference semantics
       AND (ao.TABLE_ID <> bi.TABLE_ID OR ao.JOB_ID <> bi.JOB_ID)
-WHERE  ao.IS_CURRENT_VERSION = '1' AND bi.IS_CURRENT_VERSION = '1'
+WHERE  ao.IS_CURRENT_VERSION = 'Y' AND bi.IS_CURRENT_VERSION = 'Y'
   AND  ao.SIGN = '+';                                   -- only "add" edges are real deps
 ```
 This is the shape `controlm_dependencies_recursive.sql` generalizes (recursive
@@ -91,7 +91,7 @@ closure for upstream/downstream chains). `SIGN = '-'` rows are cleanup, not deps
 ## §Q6 — scope by tenant (run-as FID) or developer
 ```sql
 -- everything a service FID owns
-... WHERE J.IS_CURRENT_VERSION='1' AND T.USER_DAILY IS NOT NULL
+... WHERE J.IS_CURRENT_VERSION='Y' AND T.USER_DAILY IS NOT NULL
     AND J.OWNER = :run_as;
 -- everything a developer authored or last changed
 ... AND :sid IN (J.AUTHOR, J.CREATION_USER, J.CHANGE_USERID);
@@ -111,7 +111,7 @@ DPY-4024). This is a workload problem, not connectivity.
   `STARTRUN`/`ENDRUN`, `OSCOMPSTAT`) — confirm against the actual view DDL.
 
 ## §PITFALLS
-- Forgetting `IS_CURRENT_VERSION = '1'` → every historical edit returned.
+- Forgetting `IS_CURRENT_VERSION = 'Y'` → every historical edit returned.
 - Filtering the version column as a **number** → no rows (it's VARCHAR2(1)).
 - Trusting `CM_DEF_VJOB.PARENT_TABLE` for the folder name → use
   `CM_DEF_VTAB.SCHED_TABLE` (join on `TABLE_ID`).

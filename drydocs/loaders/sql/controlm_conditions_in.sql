@@ -14,7 +14,7 @@
 --               definition."
 --
 -- Filter:
---   L.IS_CURRENT_VERSION = '1'  — only current versions
+--   L.IS_CURRENT_VERSION = 'Y'  — only current versions
 --   T.USER_DAILY IS NOT NULL    — only actively-scheduled folders
 --
 -- Scope binds (optional, NULL = no filter): :folder_filter (T.SCHED_TABLE
@@ -38,7 +38,7 @@ SELECT
     L.CAPTURE_DATE       AS capture_date
 FROM   psgmgr.CM_DEF_LNKI_P_VW L
 JOIN   psgmgr.CM_DEF_VTAB     T   ON L.TABLE_ID = T.TABLE_ID
-WHERE  L.IS_CURRENT_VERSION = '1'
+WHERE  L.IS_CURRENT_VERSION = 'Y'
   AND  T.USER_DAILY IS NOT NULL
   -- optional scope (any bind NULL = no filter on that dimension)
   AND  (:folder_filter IS NULL OR T.SCHED_TABLE       LIKE :folder_filter)

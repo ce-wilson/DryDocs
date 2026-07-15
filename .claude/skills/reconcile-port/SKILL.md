@@ -174,7 +174,8 @@ present. For a fresh `psgmgr` pull:
   scope options (see the collision ledger).
 - The `psgmgr.CM_DEF_SETVAR_VW` source-view name is **confirmed** (2026-07-10,
   against live `psgmgr` — a view with its own `IS_CURRENT_VERSION` /
-  `VERSION_SERIAL`, so the variable extracts now filter `V.IS_CURRENT_VERSION = '1'`).
+  `VERSION_SERIAL`, so the variable extracts now filter `V.IS_CURRENT_VERSION = 'Y'` —
+  literal corrected `'1'`→`'Y'` 2026-07-15, D4, per the finalized company ingestion TDD).
   If a future port surfaces a different object, re-confirm and report.
 - Judge a fresh pull on *runs clean / no UNKNOWN invocation leakage / plausible
   coverage*, **not** the bundled counts.

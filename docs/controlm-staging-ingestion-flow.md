@@ -221,9 +221,9 @@ flowchart TD
 |---|-------|-------------|
 | 0.1 | `TABLE_ID` unique across the 4 data centers? | If collisions: enable the `DATA_CENTER` join predicate in both views (staging already keys defensively on `(data_center, folder_id, job_id)`) |
 | 0.2 | `MEMLIB` / `OVERLIB` / `APPL_TYPE` exist on `CM_DEF_VJOB`? | Drop absent columns from `JOB_DETAILED_VIEW` before compile |
-| 0.3 | **NEW** — `IS_CURRENT_VERSION` domain values across legacy vs new folders | Decides whether `= '1'` stays a hard filter in both views (gate Q2 caveat) |
+| ✓ | 0.3 RESOLVED 2026-07-15 (D4) — `IS_CURRENT_VERSION` domain is **`'Y'`** (finalized company ingestion TDD; live-verified on `CM_DEF_VJOB` + LNKI/LNKO). `= 'Y'` is the hard filter in both views; residual: one-line `SELECT DISTINCT` on `CM_DEF_SETVAR_VW` at the company preflight (domain inferred there) | Gate Q2 caveat closed |
 | 0.4 | **NEW** — `CREATION_USER` / `CHANGE_USERID` exist on `CM_DEF_VJOB`? | Required by `JOB_DEVELOPER_VIEW`'s CROSS APPLY; drop branches if absent |
-| ✓ | RESOLVED 2026-07-10 — object confirmed as `psgmgr.CM_DEF_SETVAR_VW` (a view carrying its own `IS_CURRENT_VERSION` / `VERSION_SERIAL`); extracts now filter `V.IS_CURRENT_VERSION = '1'` | Unblocked the variable extract + HWM hash; the `** VERIFY NAME **` flags are removed |
+| ✓ | RESOLVED 2026-07-10 — object confirmed as `psgmgr.CM_DEF_SETVAR_VW` (a view carrying its own `IS_CURRENT_VERSION` / `VERSION_SERIAL`); extracts now filter `V.IS_CURRENT_VERSION = 'Y'` (literal corrected `'1'`→`'Y'` 2026-07-15, D4) | Unblocked the variable extract + HWM hash; the `** VERIFY NAME **` flags are removed |
 
 ### Recurring stages (each is one Control-M job)
 
@@ -335,7 +335,7 @@ grant question.
 
 1. **`CM_DEF_SETVAR_VW` real name — RESOLVED 2026-07-10.** Confirmed against live
    `psgmgr` as a view carrying its own `IS_CURRENT_VERSION` / `VERSION_SERIAL`; the
-   extracts filter `V.IS_CURRENT_VERSION = '1'` and the `** VERIFY NAME **` flags are removed.
+   extracts filter `V.IS_CURRENT_VERSION = 'Y'` (literal corrected 2026-07-15, D4) and the `** VERIFY NAME **` flags are removed.
 2. **`CAPTURE_DATE` per-row or per-extract-uniform?** Decides its role as change signal
    vs coarse HWM only.
 3. **`CREATION_USER` / `CHANGE_USERID` existence** on `CM_DEF_VJOB` (pre-flight 0.4).

@@ -463,7 +463,7 @@ items:
     agent: main
     model: sonnet
     priority: p1
-    status: todo
+    status: done          # done 2026-07-15, same session as the groom (main/fable)
     depends_on: []
     inputs: [drydocs/loaders/sql/, drydocs/loaders/cypher/controlm_jobs.cypher, docs/design/controlm-ingestion-tdd.md, docs/controlm-staging-ingestion-flow.md, .claude/skills/controlm-db/SKILL.md]
     acceptance: >
@@ -485,6 +485,13 @@ items:
       the real 2-folder/8-job population — 'Y' is live-verified; producer '1' never ran
       live (the 2026-07-10 live check verified the SETVAR view's name/columns, not the
       value domain). Closes staging-ingestion-flow open point 0.3.
+      Done 2026-07-15: flipped 11 SQL files (extracts + DDL views + adhoc probes incl.
+      profile_cm_avg_run), controlm_jobs.cypher .active derivation, constraints.cypher
+      comment, models description, source-mappings ledger (gate §Q2 probe closed),
+      controlm-db + reconcile-port skill refs, TDD/staging-flow/C3/git-readme docs;
+      fixtures flipped '1'/'0'→'Y'/'N' (36 rows, 4 CSVs); lineage extractor accepts
+      ('Y','1') for legacy synthetic CSVs; SETVAR preflight comment added; superseded
+      docs/reviews left as history. 655 tests pass; design renders regenerated.
 
   # ── Epic E — Context graph pilot (ontology-mapper + main) — Phase 4 ────────
   - id: E1
@@ -2606,8 +2613,8 @@ items:
 # Roll-up the dispatcher can glance at. COMPUTED views — test_backlog.py enforces
 # that these match the items exactly; update them with any status change.
 summary:
-  todo: 20                                          # +D4, O7 groomed 2026-07-15 (company TDD capture + inbox)
+  todo: 19                                          # O7 groomed 2026-07-15; D4 groomed + closed same day
   in_progress: 2                                   # E1 (gate deferred), O1 (web design pass — remainder = O6)
   blocked: 0
-  done: 66                                          # O3+O4+O5 all closed 2026-07-14 — the ADR-0005 chain
-  next_ready: [C5, D4, L7, L8, L9, L12, M2, M3, M4, P1, C7, K4, K5, J10, O6, O7]  # D4 (psgmgr 'Y' fix, p1) + O7 (O5 done) added 2026-07-15
+  done: 67                                          # D4 done 2026-07-15 (psgmgr version-filter 'Y' fix)
+  next_ready: [C5, L7, L8, L9, L12, M2, M3, M4, P1, C7, K4, K5, J10, O6, O7]  # O7 (O5 done) added 2026-07-15

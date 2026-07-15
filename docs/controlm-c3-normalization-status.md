@@ -86,7 +86,9 @@ stg_notification, stg_app_fact**.
    Confirmed against live `psgmgr`: the object is `psgmgr.CM_DEF_SETVAR_VW`, a
    valid view carrying `TABLE_ID/JOB_ID/NAME/VALUE` plus its own
    `IS_CURRENT_VERSION` / `VERSION_SERIAL`. Substituted throughout the DDL and
-   `controlm_variables*.sql`; the extracts now filter `V.IS_CURRENT_VERSION = '1'`
+   `controlm_variables*.sql`; the extracts now filter `V.IS_CURRENT_VERSION = 'Y'`
+   (literal corrected `'1'`→`'Y'` 2026-07-15, D4 — domain live-verified via the
+   finalized company ingestion TDD)
    (the view stores version history — like LNKI/LNKO — so without it superseded
    variable rows leak into the extract).
 

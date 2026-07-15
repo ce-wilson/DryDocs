@@ -78,7 +78,7 @@ FROM (
         SELECT 'CREATION_USER',        J.CREATION_USER         FROM DUAL UNION ALL
         SELECT 'CHANGE_USERID',        J.CHANGE_USERID         FROM DUAL
     ) col
-    WHERE  J.IS_CURRENT_VERSION = '1' AND col.sid IS NOT NULL
+    WHERE  J.IS_CURRENT_VERSION = 'Y' AND col.sid IS NOT NULL
 );
 -- NOTE: pre-flight CREATION_USER / CHANGE_USERID existence on CM_DEF_VJOB
 --       (ALL_TAB_COLUMNS check) before relying on this view — see

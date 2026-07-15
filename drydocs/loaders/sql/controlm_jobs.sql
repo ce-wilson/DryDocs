@@ -11,9 +11,10 @@
 --                from phase 1 — surface them later if a use case demands.
 --
 -- Filter rule:
---   J.IS_CURRENT_VERSION = '1'  — only current-version jobs (column is
+--   J.IS_CURRENT_VERSION = 'Y'  — only current-version jobs (column is
 --                                  VARCHAR2(1) — the literal must be a
---                                  string, not a number)
+--                                  string; domain value 'Y' confirmed by the
+--                                  finalized company ingestion TDD, 2026-07-15)
 --   T.USER_DAILY IS NOT NULL    — only actively-scheduled folders
 --
 -- Scope binds (optional, NULL = no filter; shared across all psgmgr extracts):
@@ -63,7 +64,7 @@ SELECT
     J.CHANGE_DATE         AS change_date
 FROM   psgmgr.CM_DEF_VJOB J
 JOIN   psgmgr.CM_DEF_VTAB T   ON J.TABLE_ID = T.TABLE_ID
-WHERE  J.IS_CURRENT_VERSION = '1'
+WHERE  J.IS_CURRENT_VERSION = 'Y'
   AND  T.USER_DAILY IS NOT NULL
   -- optional scope (any bind NULL = no filter on that dimension)
   AND  (:folder_filter IS NULL OR T.SCHED_TABLE LIKE :folder_filter)

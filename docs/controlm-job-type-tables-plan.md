@@ -150,7 +150,7 @@ queries in SQL Developer read far better against named columns.
 
 | Side | New work |
 |------|----------|
-| **SQL (extract)** | job-population extract adding `APPL_TYPE`, `CMD_LINE`, `MEMNAME/MEMLIB` per current-version job (extend `controlm_variables*.sql` companion or new `controlm_jobs.sql`); `IS_CURRENT_VERSION='1'` filter as established |
+| **SQL (extract)** | job-population extract adding `APPL_TYPE`, `CMD_LINE`, `MEMNAME/MEMLIB` per current-version job (extend `controlm_variables*.sql` companion or new `controlm_jobs.sql`); `IS_CURRENT_VERSION='Y'` filter as established (D4) |
 | **Python (parse)** | `filewatch.py` job-grain builder; `launch_detail.py` arg-spec parsers; registry rows; `staging.py` bundle grows `stg_job_filewatch` + `stg_launch_detail`; `normalize-variables` writes the two new CSVs |
 | **SQL (staging DDL)** | DDL addendum **Section 7**: two tables + the OS view + indexes (`(data_center, folder_id, job_id)`; `framework`) + grant templates |
 | **SQL (QA)** | coverage additions: FileWatch selector-agreement rate; launch-detail fill rate by framework; `-g` split success rate |

@@ -60,7 +60,7 @@ CREATE CONSTRAINT scheduler_kind      IF NOT EXISTS FOR (k:SchedulerKind)       
 
 // --- Control-M / BMC ---------------------------------------------------------
 // Node key uses natural identity (folder_id, job_id) without version_serial —
-// loaders filter to IS_CURRENT_VERSION='1' so one canonical node per logical
+// loaders filter to IS_CURRENT_VERSION='Y' so one canonical node per logical
 // entity; version_serial stays as an audit property only.
 CREATE CONSTRAINT controlm_server     IF NOT EXISTS FOR (s:ControlMServer)      REQUIRE s.name IS UNIQUE;
 // Control-M APPLICATION grouping (folder header row; gate controlm-q1q3-phase1).

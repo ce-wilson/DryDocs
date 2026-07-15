@@ -54,7 +54,7 @@ class ExtractCoverage:
 
     rows_read: int = 0
     jobs_added: int = 0                 # distinct current-version job nodes
-    skipped_stale_version: int = 0      # is_current_version present and != 1
+    skipped_stale_version: int = 0      # is_current_version present and not current ('Y')
     skipped_nameless: int = 0           # row with no job_name
     commands_empty: int = 0             # job kept, but cmd_line blank — no candidate
     commands_unparsed: int = 0          # job kept, cmd_line present but 0 invocations
@@ -118,7 +118,8 @@ class ControlMInventoryExtractor:
     def _row(self, row: dict, into: LineageGraph, coverage: ExtractCoverage) -> None:
         # only current-version definitions (CSV may already be filtered)
         icv = (row.get("is_current_version") or "").strip()
-        if icv and icv != "1":
+        # live domain is 'Y' (D4, 2026-07-15); '1' tolerated for legacy synthetic CSVs
+        if icv and icv not in ("Y", "1"):
             coverage.skipped_stale_version += 1
             return
         job_name = (row.get("job_name") or "").strip()

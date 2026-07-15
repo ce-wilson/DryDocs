@@ -59,7 +59,7 @@ def graph() -> LineageGraph:
 
 def test_counts(graph: LineageGraph) -> None:
     kinds = [p.kind for p in graph.processes.values()]
-    # 4 current jobs (1 stale is_current_version=0 skipped) + 3 children
+    # 4 current jobs (1 stale is_current_version=N skipped) + 3 children
     assert kinds.count("controlm_job") == 4
     assert len(graph.processes) == 7
     assert len(graph.rels) == 4
@@ -67,7 +67,7 @@ def test_counts(graph: LineageGraph) -> None:
 
 def test_stale_version_skipped(graph: LineageGraph) -> None:
     names = {p.name for p in graph.processes.values()}
-    assert "old_fw.ksh" not in names  # is_current_version=0
+    assert "old_fw.ksh" not in names  # is_current_version=N
 
 
 def test_field_mapping(graph: LineageGraph) -> None:
@@ -139,10 +139,10 @@ def test_coverage_reports_nameless_empty_and_unresolved(tmp_path) -> None:
     csv_path = tmp_path / "jobs.csv"
     csv_path.write_text(
         "job_id,folder_id,job_name,parent_table,owner,node_id,cmd_line,is_current_version\n"
-        "1,10,JOB_EMPTY_CMD,F1,svc.x,h1,,1\n"          # kept; empty command
-        "2,10,,F1,svc.x,h1,/opt/x.sh,1\n"              # nameless -> skipped
-        "3,10,JOB_UNKNOWN,F1,svc.x,h1,mystery_bin,1\n"  # UNKNOWN kind -> unresolved
-        "4,10,JOB_STALE,F1,svc.x,h1,/opt/y.sh,0\n",     # stale -> skipped
+        "1,10,JOB_EMPTY_CMD,F1,svc.x,h1,,Y\n"          # kept; empty command
+        "2,10,,F1,svc.x,h1,/opt/x.sh,Y\n"              # nameless -> skipped
+        "3,10,JOB_UNKNOWN,F1,svc.x,h1,mystery_bin,Y\n"  # UNKNOWN kind -> unresolved
+        "4,10,JOB_STALE,F1,svc.x,h1,/opt/y.sh,N\n",     # stale -> skipped
         encoding="utf-8",
     )
     g = LineageGraph()
