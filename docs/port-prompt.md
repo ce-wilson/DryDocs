@@ -722,6 +722,41 @@ PROCEDURE:
       KEEP the old '1' literals — do not "fix" history.
     - EXPECTED_CONSTRAINTS UNCHANGED; no schema/edge changes; Track-1 counts unchanged.
 
+35. K4 — BUSINESSAPPLICATION ENTITY-RESHAPE APPLIED (2026-07-15, branch
+    feat/k4-businessapplication-reshape, 7 gate-disciplined commits "K4(1)".."K4(7)" + this
+    port-narrative commit; gate sign-off 2026-07-10 in config/gate-log.md). SUPERSEDES the
+    step-21 "gate-bound proposal" framing and git-readme's old "do NOT take as applied" —
+    the reshape IS applied now. Resolve in commit order:
+    - (1) LABEL RENAME :Application -> :BusinessApplication + prov:Entity/dprod:DataProduct
+      reclass, EVERYWHERE (vocabulary, constraints businessapplication_*, supplements incl.
+      LocalClass iri, ALL loaders that MERGE the app node — seal_applications, seal_contacts,
+      software_registry, pat_product_mapping — snapshots/writer, cli, tests, graph-tests).
+      Company graphs: run the supplements (idempotent SoftwareAgent-edge cleanup included);
+      relabel live nodes with your own migration (producer has none for node labels — CSV-mode
+      producer graphs rebootstrap; your live multi-DB needs
+      MATCH (a:Application) SET a:BusinessApplication REMOVE a:Application, plus constraint
+      re-create — YOUR change, coordinate with T7).
+    - (2) TOMRole scheme + QUALIFIED_ATTRIBUTION/HAS_AGENT/HAD_ROLE active (new prov anchors
+      in ontology.cypher; tom_roles SkosConceptScheme, fixed 7, operate_manager L1/L2 as a
+      level property).
+    - (3) seal_has_membership/seal_of_role/seal_held_by DEPRECATED — the manifest per-entry
+      rule now carries the gate-authorized-deprecation exception: TAKE these downgrades.
+      PAT (catalog_dev_team_has_membership) untouched.
+    - (4) seal_had_primary_source ACTIVE (edge-only; Document loader waits on docmeta/T6).
+    - (5) arch_develops -> WAS_ATTRIBUTED_TO {role: developed_by} + NEW
+      migrate_develops_to_was_attributed_to.cypher — RUN IT on your live graph (matches the
+      old :Application label too).
+    - (6) SEAL loaders rewritten to the qualified-attribution shape (seal_contacts carries
+      the role-name crosswalk; unmapped names load flagged unmapped_role=true, never guessed).
+      Map entries application-as-dataproduct + seal-tom-attribution -> APPLIED,
+      seal-doc-source-of-record -> CONFIRMED (map summary 8/20/3, updated: 2026-07-15).
+    - (7) precedence.yaml: seal-pat-source-of-record wired at authority 3 (above
+      lob-product-team, now 4) — live but silent until docmeta feeds it.
+    - STILL DEFERRED: the K1/K2 job->app WAS_ASSOCIATED_WITH edge shape (§F rider on
+      m3_seal_app_ref — unchanged, needs its own gate); K5 Product Cabinet.
+    - EXPECTED_CONSTRAINTS count UNCHANGED (names changed: application_* ->
+      businessapplication_*) — reconcile your count per the step-25 rule, keep your number.
+
 COMPANY-SIDE TRACKER — LIVE-LOAD + SUPPLEMENT STATUS (maintained COMPANY-SIDE):
 The steps above name company-side obligations in scattered "COMPANY MUST SUPPLEMENT" /
 Track-2 notes; this table consolidates the trackable ones so you can see at a glance whether
