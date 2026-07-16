@@ -154,14 +154,8 @@ the guided gate before any graph write.
 
 ## 5. Sub-agents (delegate; they run on cheaper models)
 
-Defined in [`.claude/agents/`](.claude/agents/). Dispatch by layer:
-
-| Agent | Use for | Model |
-|-------|---------|-------|
-| `reference-librarian` | look up vendor/standard/platform facts; keep `reference/REGISTRY.yaml` current | haiku |
-| `taxonomy-importer` | import raw hierarchies into `config/taxonomy/` as pure classification | sonnet |
-| `ontology-mapper` | propose taxonomy→ontology rule bindings (PROV matrix), drive the HITL gate | sonnet |
-| `pipeline-config` | maintain `config/` (precedence, source-registry, mappings); never writes graph directly | sonnet |
+Defined in [`.claude/agents/`](.claude/agents/) — each agent's frontmatter carries its
+description, tools, and model; the layer table in §1 names the owner agent. Dispatch by layer.
 
 **Orchestration stays with the main (Opus) session.** Sub-agents do scoped, well-specified
 units from `docs/restructure/02-backlog.md`. Each backlog item names its agent + acceptance test.
