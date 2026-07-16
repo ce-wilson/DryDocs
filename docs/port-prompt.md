@@ -757,6 +757,59 @@ PROCEDURE:
     - EXPECTED_CONSTRAINTS count UNCHANGED (names changed: application_* ->
       businessapplication_*) — reconcile your count per the step-25 rule, keep your number.
 
+36. LINEAGE VOCAB GATE + LIVE-CMDLINE PARSER UPGRADE (2026-07-15 evening + 2026-07-16; commits
+    "chore(gate): lineage rel vocabulary gate - 4 confirmed, reads/writes re-shaped to
+    DataAsset" -> "feat(lineage): live CMDLINE patterns — parser gaps closed +
+    cmdline-lineage-review mini-gate decisions" -> the reconciling merge "Merge
+    feat/k4-businessapplication-reshape: lineage CMDLINE session …". TWO SME sessions, run on
+    different machines and reconciled at that merge — read BOTH gate-log entries (2026-07-15
+    "Lineage rel vocabulary gate" + 2026-07-16 "cmdline-lineage-review", incl. its
+    cross-machine reconcile note) before resolving anything in this range):
+    - VOCABULARY (per-entry rules as ever — never downgrade; all four m3_* lineage entries
+      REMAIN status: planned, flips still land with the curated-load build): m3_reads_from /
+      m3_writes_to re-shaped — from_node `ETLProcess | ControlMJob` (ETL case | file-ops
+      case), to_node `DataAsset` (the D1 proxy); **DataSource / DataTarget RETIRED** in
+      node_classifications (kept for audit; no loader ever shipped), DataAsset added
+      (dcat:Dataset / Entity). m3_invokes / m3_triggers notes now carry BOTH sessions'
+      decisions: CMDLINE is the PRIMARY TRIGGERS feed (ETL metadata = enrichment);
+      ETLProcess identity = kind-scoped stable token (Ab Initio pset/graph BASENAME — mounts
+      vary by env; DPL -pipeline GUID) resolving the 07-15 business-key residual; ETLProcess
+      keeps its label + gains a kind property (etl|utility|notification); Script stays
+      PATH-keyed (multi-mount dupes surface in lineage-review, never auto-merge). If your
+      side promoted any of these entries to active, the per-entry rule applies — keep yours,
+      reconcile the shape edits at your own gate.
+    - PARSER UPGRADE (drydocs_core/controlm/commands.py — canonical-producer core; driven by
+      6 real production captures that stay LOCAL-ONLY in the producer's internal-local/):
+      shell control-keyword stripping (if/then/else/fi — the else-branch MAIN invocation of
+      compound commands previously classified UNKNOWN); the abioncloud runScript.sh wrapper's
+      -g payload now expands (the .pset surfaces as script_path, rule
+      `abioncloud.runscript_wrapper.pset_payload`; nested -run_prog_command_line becomes its
+      own Invocation) + case-insensitive rule fix (the old pattern MISSED `runScript.sh`);
+      NEW rules: `dt-launcher.sh`/`dtlaunch.sh` + `dt-pipelines-launcher*.jar` -> **DPL**
+      (SME 2026-07-16: DPL is NOT Ab Initio — re-types the old abinitio.dtlaunch_accelerator
+      rule; java zilo framework originally, -py routes to spark/pyspark), `java` (script =
+      first .jar, re-classified on the jar basename), `air` (ABINITIO CLI). CONSUMER CAVEAT:
+      any company-side test pinning invocation_type counts must re-baseline dtlaunch
+      ABINITIO->DPL; the DPL-vs-ABINITIO taxonomy row also feeds the still-PENDING plan-07 P3
+      software-usage-patterns gate — record it there when you run that gate.
+    - EXTRACTOR (drydocs_lineage/extractors/controlm_inventory.py — canonical-producer):
+      `_stable_invocation_key` implements the §b identity decision (DPL -pipeline GUID; pset
+      basename; everything else full-target; full paths stay on ProcessNode.path).
+    - Tests (clean-adds): test_command_parser.py +7 sanitized mechanism-twins (compound
+      if/else, wrapper payload, DPL jar/sh, generic java, air), test_lineage_inventory.py +1
+      (stable-key convergence). schema_graph.cypher mirror updated (07-15 side).
+    - gate-log.md: TWO new entries — union-append as ever. IDEAS union-append (launcher
+      registry should become human-configurable — future config-file + admin-screen;
+      ETLProcess writer endpoint class + file-ops resolution = the remaining pre-flip build
+      blockers; FID+SEAL co-located in folder vars = a K2 FID-tier source candidate).
+    - DOC CORRECTION riding along: the docmeta plan's reserved "ADR 0004" collided with
+      0004-software-registry-vendor-terminology (step 17) — knowledge/upgrade-plans/
+      docmeta-component.md now says the docmeta ADR takes the next free number at authoring;
+      read step 16's "ADR 0004" references with that correction. CLAUDE.md §5 sub-agents
+      table trimmed (derivable from .claude/agents/ frontmatter) — canonical-producer as ever.
+    - EXPECTED_CONSTRAINTS UNCHANGED (40); no loaders, no CLI commands, no schema constraints
+      in this range; write_curated still refuses (the flips remain build-coupled).
+
 COMPANY-SIDE TRACKER — LIVE-LOAD + SUPPLEMENT STATUS (maintained COMPANY-SIDE):
 The steps above name company-side obligations in scattered "COMPANY MUST SUPPLEMENT" /
 Track-2 notes; this table consolidates the trackable ones so you can see at a glance whether
@@ -829,6 +882,8 @@ ACCEPTANCE GATE (behavior is the contract, not a byte-compare):
   tests; same deselect/skip structure). Step-31/32 coupling reminder: source-registry confirmed
   flips + audit-fields stubs + LEDGER_PENDING + the test_source_registry gate-state pins move as
   ONE unit.
+  662 passed / 3 skipped / 3 deselected at the step-36 lineage/parser head (2026-07-16; the J7
+  reconcile guards now count in the skips consumer-side once RECONCILE_BEFORE_DIR is set).
 
 BOUNDARIES:
 - One-way only. Never add company main as a remote on the producer; never push back to
