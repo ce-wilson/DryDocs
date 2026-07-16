@@ -127,9 +127,9 @@ behind that decision, not core-path.
 Spike-grade by design: 12 questions, single warm-run latencies, one corpus, and the
 author served as both query generator and judge (the text2cypher and LLM-judge
 stand-ins, per ch.4/ch.8 — the P1 harness should automate both). The benchmark
-script + raw JSON live in the session scratchpad; the queries are reproducible from
-the table and the loaders are committed, so the run can be recreated at P1 to
-baseline the real harness.
+script + raw mechanical-scorer JSON are committed alongside this verdict
+([`p0-benchmark/`](p0-benchmark/)); the loaders are committed, so the run can be
+recreated at P1 to baseline the real harness.
 
 ## Reproduce
 

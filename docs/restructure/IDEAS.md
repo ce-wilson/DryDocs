@@ -26,6 +26,15 @@ Tags help grooming: `idea` · `bug` · `doc` · `source` (new data source) · `q
 
 <!-- add new ideas at the top -->
 
+- 2026-07-16 — [idea] **EE container re-bootstrap loses loaded corpora — fold the
+  demonstrable-content loads into the bootstrap ritual.** Found at Q3: the fresh
+  neo4j-drydocs-ee (O6 bootstrap) had no bmc-docs corpus — the 07-08 live load died with
+  the old container; reload was trivial (2 CLI commands, the loaders' whole point) but
+  nothing PROMPTS it. Candidate: extend the README quick-start / bootstrap sequence (or a
+  make-like script) with load-software-registry + load-bmc-docs (the "demonstrable
+  content" per the 07-08 user direction) + optionally load-essential-graphrag (ddcontext).
+  Touches D6's quick-start-verify item — maybe merge there at next groom.
+
 - 2026-07-16 — [idea] **Launcher registry should be human-configurable** (SME requirement
   captured at the cmdline-lineage-review mini-gate): LAUNCHER_REGISTRY in
   drydocs_core/controlm/commands.py is code-resident; teams add wrappers/variables

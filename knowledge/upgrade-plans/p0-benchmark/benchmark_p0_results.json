@@ -1,0 +1,415 @@
+[
+ {
+  "id": "SA1",
+  "cls": "structure/aggregation",
+  "q": "How many documents are in the corpus, and which has the most content?",
+  "arms": {
+   "traversal": {
+    "rows": 1,
+    "ms": 110.4,
+    "chars": 67,
+    "marker_found": true,
+    "empty": false,
+    "sample": "[{\"docs\": 27, \"largest_doc\": \"controlm-variables\", \"chars\": 20842}]"
+   },
+   "fulltext": {
+    "rows": 3,
+    "ms": 149.4,
+    "chars": 2079,
+    "marker_found": true,
+    "empty": false,
+    "sample": "[{\"doc\": \"controlm-api-job-properties\", \"heading\": \"Documentation Properties\", \"score\": 4.312715530395508, \"text\": \"## Documentation Properties\\n\\n| Property | Purpose | Format |\\n|----------|---------|--------|\\n| **Description** | Object description | String (displayed) |\\n| **Comment** | Developm"
+   },
+   "manifest": {
+    "rows": 1,
+    "ms": 1.1,
+    "chars": 75940,
+    "marker_found": true,
+    "empty": false,
+    "files": [
+     "SOURCE-MANIFEST.md"
+    ]
+   }
+  }
+ },
+ {
+  "id": "SA2",
+  "cls": "structure/aggregation",
+  "q": "How much of the corpus is Claude inference (SYNTHESIZED) vs vendor-grounded?",
+  "arms": {
+   "traversal": {
+    "rows": 3,
+    "ms": 49.2,
+    "chars": 179,
+    "marker_found": true,
+    "empty": false,
+    "sample": "[{\"provenance\": \"GROUNDED\", \"chunks\": 257, \"chars\": 194516}, {\"provenance\": \"SYNTHESIZED\", \"chunks\": 115, \"chars\": 100310}, {\"provenance\": \"VERBATIM\", \"chunks\": 2, \"chars\": 7597}]"
+   },
+   "fulltext": {
+    "rows": 3,
+    "ms": 12.6,
+    "chars": 2700,
+    "marker_found": true,
+    "empty": false,
+    "sample": "[{\"doc\": \"controlm-changes-history\", \"heading\": \"📑 Provenance Classification\", \"score\": 8.44350528717041, \"text\": \"## 📑 Provenance Classification\\n\\nTiers: **[VERBATIM]** BMC quotes · **[GROUNDED]** Claude paraphrase of sourced content · **[SYNTHESIZED]** Claude-authored, not in source (do NOT load "
+   },
+   "manifest": {
+    "rows": 1,
+    "ms": 0.9,
+    "chars": 75940,
+    "marker_found": true,
+    "empty": false,
+    "files": [
+     "SOURCE-MANIFEST.md"
+    ]
+   }
+  }
+ },
+ {
+  "id": "EL1",
+  "cls": "exact lookup",
+  "q": "What is %%LIBMEMSYM?",
+  "arms": {
+   "traversal": {
+    "rows": 3,
+    "ms": 51.7,
+    "chars": 3526,
+    "marker_found": true,
+    "empty": false,
+    "sample": "[{\"doc\": \"controlm-variables\", \"heading\": \"✅ Authoritative Corrections — Classic Parameter Reference (2026-06-11)\", \"tier\": \"VERBATIM\", \"text\": \"## ✅ Authoritative Corrections — Classic Parameter Reference (2026-06-11)\\n\\nTranscribed **[VERBATIM]/[GROUNDED]** from product Help screenshots (`bmc-scre"
+   },
+   "fulltext": {
+    "rows": 3,
+    "ms": 45.9,
+    "chars": 3548,
+    "marker_found": true,
+    "empty": false,
+    "sample": "[{\"doc\": \"controlm-variables\", \"heading\": \"Vendor Attributes\", \"score\": 2.308112382888794, \"text\": \"## Vendor Attributes\\n\\n| Attribute | Value |\\n|-----------|-------|\\n| **Product** | Control-M |\\n| **Feature** | Variable Management & Substitution |\\n| **Variable Types** | **4**: Job Submission, S"
+   },
+   "manifest": {
+    "rows": 1,
+    "ms": 0.6,
+    "chars": 20842,
+    "marker_found": true,
+    "empty": false,
+    "files": [
+     "controlm-variables.md"
+    ]
+   }
+  }
+ },
+ {
+  "id": "EL2",
+  "cls": "exact lookup",
+  "q": "What does the ctmcreate utility do?",
+  "arms": {
+   "traversal": {
+    "rows": 1,
+    "ms": 20.1,
+    "chars": 1312,
+    "marker_found": true,
+    "empty": false,
+    "sample": "[{\"doc\": \"controlm-general-parameters\", \"heading\": \"Job Name\", \"tier\": \"GROUNDED\", \"text\": \"## Job Name\\n\\n> Defines the name of the job processing definition; appears in the job definition and tracking displays; enables you to identify the job and order the job.\\n\\n| Additional information | Descri"
+   },
+   "fulltext": {
+    "rows": 3,
+    "ms": 8.1,
+    "chars": 3125,
+    "marker_found": false,
+    "empty": false,
+    "sample": "[{\"doc\": \"controlm-planning-utils\", \"heading\": \"Core Utility Categories\", \"score\": 5.0922956466674805, \"text\": \"## Core Utility Categories\\n\\n### Job Management Tools\\n\\n| Utility | Purpose | Function |\\n|---------|---------|----------|\\n| **defjob** | Import job definitions | Adds jobs to database "
+   },
+   "manifest": {
+    "rows": 1,
+    "ms": 0.5,
+    "chars": 7850,
+    "marker_found": true,
+    "empty": false,
+    "files": [
+     "controlm-general-parameters.md"
+    ]
+   }
+  }
+ },
+ {
+  "id": "EL3",
+  "cls": "exact lookup",
+  "q": "What does ODAT mean?",
+  "arms": {
+   "traversal": {
+    "rows": 3,
+    "ms": 76.0,
+    "chars": 1750,
+    "marker_found": true,
+    "empty": false,
+    "sample": "[{\"doc\": \"controlm-order-parameters\", \"heading\": \"What \\\"ordering\\\" means\", \"text\": \"## What \\\"ordering\\\" means\\n\\n> The Order parameters describe ordering from the Planning and Monitoring domains.\\n\\n**Ordering** = placing a job or folder into the **Active Jobs database** with an assigned **Order D"
+   },
+   "fulltext": {
+    "rows": 3,
+    "ms": 8.8,
+    "chars": 4042,
+    "marker_found": true,
+    "empty": false,
+    "sample": "[{\"doc\": \"controlm-order-parameters\", \"heading\": \"Order Parameters\", \"score\": 5.851191997528076, \"text\": \"## Order Parameters\\n\\n| Field | Description |\\n|---|---|\\n| **Control-M** | *(Monitoring domain only)* Name of the Control-M/Server (or Control-M for z/OS) that processes the job. |\\n| **Folder"
+   },
+   "manifest": {
+    "rows": 1,
+    "ms": 0.7,
+    "chars": 20842,
+    "marker_found": true,
+    "empty": false,
+    "files": [
+     "controlm-variables.md"
+    ]
+   }
+  }
+ },
+ {
+  "id": "PC1",
+  "cls": "paraphrase/conceptual",
+  "q": "How do I make one job wait for another job to finish before it runs?",
+  "arms": {
+   "traversal_naive": {
+    "rows": 0,
+    "ms": 32.2,
+    "chars": 2,
+    "marker_found": false,
+    "empty": true,
+    "sample": "[]"
+   },
+   "traversal": {
+    "rows": 1,
+    "ms": 48.8,
+    "chars": 1309,
+    "marker_found": true,
+    "empty": false,
+    "sample": "[{\"doc\": \"controlm-events\", \"heading\": \"Constraints and Best Practices\", \"text\": \"## Constraints and Best Practices\\n\\n### Technical Constraints\\n\\n| Constraint | Impact | Workaround |\\n|-----------|--------|-----------|\\n| **Special Characters in Names** | No apostrophes or parentheses in event nam"
+   },
+   "fulltext": {
+    "rows": 3,
+    "ms": 11.6,
+    "chars": 1539,
+    "marker_found": false,
+    "empty": false,
+    "sample": "[{\"doc\": \"controlm-job-actions\", \"heading\": \"Pre-Actions (Before Job Execution)\", \"score\": 5.544041633605957, \"text\": \"## Pre-Actions (Before Job Execution)\\n\\nActions executed before job starts:\\n\\n**Typical Use Cases:**\\n- Set variables before job execution\\n- Add prerequisites dynamically\\n- Crea"
+   },
+   "manifest": {
+    "rows": 1,
+    "ms": 0.8,
+    "chars": 12100,
+    "marker_found": true,
+    "empty": false,
+    "files": [
+     "controlm-events.md"
+    ]
+   }
+  }
+ },
+ {
+  "id": "PC2",
+  "cls": "paraphrase/conceptual",
+  "q": "Can a job start automatically when a file arrives?",
+  "arms": {
+   "traversal_naive": {
+    "rows": 0,
+    "ms": 13.5,
+    "chars": 2,
+    "marker_found": false,
+    "empty": true,
+    "sample": "[]"
+   },
+   "traversal": {
+    "rows": 3,
+    "ms": 74.8,
+    "chars": 2086,
+    "marker_found": true,
+    "empty": false,
+    "sample": "[{\"doc\": \"controlm-file-watcher\", \"heading\": \"File Watcher Limitations and Constraints\", \"text\": \"## File Watcher Limitations and Constraints\\n\\n| Limitation | Impact | Workaround |\\n|-----------|--------|-----------|\\n| **Network Paths** | May have higher latency | Reduce search interval, increase "
+   },
+   "fulltext": {
+    "rows": 3,
+    "ms": 9.4,
+    "chars": 2503,
+    "marker_found": true,
+    "empty": false,
+    "sample": "[{\"doc\": \"controlm-file-watcher\", \"heading\": \"Common File Watcher Scenarios\", \"score\": 4.87863302230835, \"text\": \"## Common File Watcher Scenarios\\n\\n### Scenario 1: Batch File Arrival\\n\\n**Goal:** Trigger batch job when daily file arrives\\n\\n```\\nFile Watcher Configuration:\\n├─ Path: /data/batch/da"
+   },
+   "manifest": {
+    "rows": 1,
+    "ms": 1.0,
+    "chars": 13702,
+    "marker_found": true,
+    "empty": false,
+    "files": [
+     "controlm-file-watcher.md"
+    ]
+   }
+  }
+ },
+ {
+  "id": "PC3",
+  "cls": "paraphrase/conceptual",
+  "q": "How do I keep jobs from running on holidays?",
+  "arms": {
+   "traversal": {
+    "rows": 3,
+    "ms": 75.0,
+    "chars": 2118,
+    "marker_found": true,
+    "empty": false,
+    "sample": "[{\"doc\": \"controlm-job-scheduling\", \"heading\": \"Scheduling Overrides and Exceptions\", \"text\": \"## Scheduling Overrides and Exceptions\\n\\n### Exception Policies\\n\\n**Eight Options:**\\n1. Disable runs entirely\\n2. Shift to next confirmed working day\\n3. Shift to previous confirmed working day\\n4. Igno"
+   },
+   "fulltext": {
+    "rows": 3,
+    "ms": 11.4,
+    "chars": 2029,
+    "marker_found": true,
+    "empty": false,
+    "sample": "[{\"doc\": \"controlm-os-job-parameters\", \"heading\": \"OS Job Definition and Purpose\", \"score\": 3.511366367340088, \"text\": \"## OS Job Definition and Purpose\\n\\nOS jobs execute tasks on distributed systems (Windows, Unix/Linux). They provide the primary mechanism for running operating system commands and"
+   },
+   "manifest": {
+    "rows": 1,
+    "ms": 0.9,
+    "chars": 20271,
+    "marker_found": true,
+    "empty": false,
+    "files": [
+     "controlm-calendars.md"
+    ]
+   }
+  }
+ },
+ {
+  "id": "MD1",
+  "cls": "multi-doc",
+  "q": "Which docs cover pool variables, and how do they relate to %% user variables?",
+  "arms": {
+   "traversal": {
+    "rows": 3,
+    "ms": 108.5,
+    "chars": 446,
+    "marker_found": false,
+    "empty": false,
+    "sample": "[{\"doc\": \"controlm-api-job-properties\", \"headings\": [\"Variable System\", \"Notes for Planning Agents\"], \"chars\": 1836}, {\"doc\": \"controlm-file-transfer-job\", \"headings\": [\"Integration Points\"], \"chars\": 202}, {\"doc\": \"controlm-variables\", \"headings\": [\"✅ Authoritative Corrections — Classic Parameter R"
+   },
+   "fulltext": {
+    "rows": 3,
+    "ms": 7.7,
+    "chars": 3039,
+    "marker_found": true,
+    "empty": false,
+    "sample": "[{\"doc\": \"controlm-variables\", \"heading\": \"Variable Scope and Inheritance\", \"score\": 7.374579429626465, \"text\": \"## Variable Scope and Inheritance\\n\\nVariables operate within four distinct scopes:\\n\\n### Scope Levels and Syntax\\n\\n| Scope | Syntax | Accessibility | Use Case |\\n|-------|--------|----"
+   },
+   "manifest": {
+    "rows": 3,
+    "ms": 2.3,
+    "chars": 43853,
+    "marker_found": true,
+    "empty": false,
+    "files": [
+     "controlm-variables.md",
+     "controlm-api-job-properties.md",
+     "controlm-file-transfer-job.md"
+    ]
+   }
+  }
+ },
+ {
+  "id": "MD2",
+  "cls": "multi-doc + provenance",
+  "q": "Which Control-M version do these docs target, and is the Automation API compatible with it?",
+  "arms": {
+   "traversal": {
+    "rows": 2,
+    "ms": 97.7,
+    "chars": 1506,
+    "marker_found": true,
+    "empty": false,
+    "sample": "[{\"target\": \"9.0.21.300\", \"compat_doc\": \"controlm-api-installation\", \"heading\": \"(preamble)\", \"tier\": \"GROUNDED\", \"text\": \"# Control-M Automation API Installation - Vendor Specifications\\n\\n**Source:** BMC Software - Control-M Automation API **Monthly (on-prem)** Documentation\\n**Document:** API_Ins"
+   },
+   "fulltext": {
+    "rows": 3,
+    "ms": 12.2,
+    "chars": 3080,
+    "marker_found": true,
+    "empty": false,
+    "sample": "[{\"doc\": \"controlm-api-installation\", \"heading\": \"Automation API CLI\", \"score\": 7.565316677093506, \"text\": \"## Automation API CLI\\n\\n[GROUNDED] Prerequisites: **Python 3.8.4+** and **pip 20.1.1+** (the CLI migrated from\\nnode.js to Python; a node-based CLI keeps running where Python is absent, and o"
+   },
+   "manifest": {
+    "rows": 2,
+    "ms": 2.3,
+    "chars": 83270,
+    "marker_found": true,
+    "empty": false,
+    "files": [
+     "SOURCE-MANIFEST.md",
+     "controlm-api-installation.md"
+    ]
+   }
+  }
+ },
+ {
+  "id": "PV1",
+  "cls": "provenance",
+  "q": "Are the JSON job-definition examples in the API docs vendor ground truth?",
+  "arms": {
+   "traversal": {
+    "rows": 5,
+    "ms": 81.1,
+    "chars": 1053,
+    "marker_found": false,
+    "empty": false,
+    "sample": "[{\"doc\": \"controlm-api-connection-profiles\", \"synthesized_chunks\": 6, \"example_headings\": [\"Common Connection Profile Features\", \"Integration with Control-M Jobs\", \"Best Practices\", \"JSON Structure Patterns\", \"Notes for Planning Agents\"]}, {\"doc\": \"controlm-api-folder-reference\", \"synthesized_chunks"
+   },
+   "fulltext": {
+    "rows": 3,
+    "ms": 13.4,
+    "chars": 2833,
+    "marker_found": true,
+    "empty": false,
+    "sample": "[{\"doc\": \"controlm-ctmdeffolder-utility\", \"heading\": \"Practical Example\", \"score\": 4.981076240539551, \"text\": \"## Practical Example\\n\\n### Example: SMART Folder Creation\\n\\n```\\nctmdeffolder -FOLDER job \\\\\\n  -SUBAPPLICATION supply \\\\\\n  -APPLICATION supplies \\\\\\n  -RBC jobRbc \\\\\\n  -DAYS ALL \\\\\\n  "
+   },
+   "manifest": {
+    "rows": 1,
+    "ms": 1.3,
+    "chars": 75940,
+    "marker_found": true,
+    "empty": false,
+    "files": [
+     "SOURCE-MANIFEST.md"
+    ]
+   }
+  }
+ },
+ {
+  "id": "OS1",
+  "cls": "out-of-scope",
+  "q": "How do I define an AutoSys global variable?",
+  "arms": {
+   "traversal": {
+    "rows": 0,
+    "ms": 16.5,
+    "chars": 2,
+    "marker_found": null,
+    "empty": true,
+    "sample": "[]"
+   },
+   "fulltext": {
+    "rows": 3,
+    "ms": 34.2,
+    "chars": 3678,
+    "marker_found": null,
+    "empty": false,
+    "sample": "[{\"doc\": \"controlm-variables\", \"heading\": \"Variable Priority and Override Mechanisms\", \"score\": 4.241083145141602, \"text\": \"## Variable Priority and Override Mechanisms\\n\\n### Variable Resolution Priority (Order of Lookup)\\n1. **Job-Level Variables** — Highest priority; override folder and global\\n2"
+   },
+   "manifest": {
+    "rows": 0,
+    "ms": 0.0,
+    "chars": 0,
+    "marker_found": null,
+    "empty": true,
+    "files": []
+   }
+  }
+ }
+]
