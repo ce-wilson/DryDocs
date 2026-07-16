@@ -67,6 +67,12 @@ libs/oracle_kerberos/oracle_kerberos_connection.txt
 /*.jpg
 /*.jpeg
 
+# Books / reports dropped in the REPO ROOT (e.g. Essential-GraphRAG.pdf — publicly
+# available Manning/Neo4j ebook, cite by URL; annual-report inputs). Publisher PDFs
+# are never committed (copyright + repo size); the registration lives in
+# reference/research/README.md. Tracked PDFs live in purposeful homes (UI-WIP/).
+/*.pdf
+
 # Vendor PDF posters/manuals — copyrighted BMC (and other vendor) binaries kept
 # as LOCAL reference only. This repo is sometimes published; the *.md files in
 # external/orchestration/ are our own summaries and are publishable, the raw

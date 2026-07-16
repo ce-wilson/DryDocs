@@ -16,6 +16,7 @@ matters"; do not paste copyrighted full texts.
 | Org structure | [W3C ORG ontology](https://www.w3.org/TR/vocab-org/) | Membership/Role/OrgUnit for SEAL + LOB→Product→Team |
 | Agent memory on graphs | [Neo4j Agent Memory (POLE+O)](https://neo4j.com/labs/) — see `neo4j-skills:neo4j-agent-memory-skill` | context-graph retrieval pattern for layer 4 |
 | Semantic layer from a warehouse | [Neo4j: Build a Semantic Layer from GCP with NeoCarta](https://neo4j.com/blog/genai/build-a-semantic-layer-from-gcp-with-neocarta/) | Neo4j Labs build of exactly our data-catalog layer — crosswalk below |
+| GraphRAG (book) | [Essential GraphRAG — Knowledge Graph-Enhanced RAG](https://www.manning.com/books/essential-graphrag) (Bratanič & Hane, Manning 2025; Neo4j-sponsored ebook — local PDF gitignored at repo root, cite don't commit; link verified 2026-07-16) | worked lexical-graph + graph-retrieval patterns; input to the docmeta P0 benchmark verdict and the agent-traversal experiment (backlog Q1/Q2) |
 
 Verified 2026-06-21 (A3). Add new rows as research is consulted; cite them in ADRs under `docs/`.
 

@@ -98,6 +98,10 @@ plan:
       title: Runtime topology & maintenance windows
       goal: "Control-M host topology (CM_HOSTS) + runtime-stats supplement (CM_AVG_RUN) loaded per their gates; the maintenance-window question (best patch window for a host/group) answerable from the graph (Epic P)."
       status: in_progress   # PLAN CHANGE groomed 2026-07-09 (autonomous session) -- ratify; hosts gate signed off same day, avg-run gate awaiting SME
+    - id: 14
+      title: Document ingestion & doc-graph benchmarks
+      goal: "Unstructured documents as graph corpora (docmeta): the P0 benchmark verdict (traversal vs manifest-routed md vs vector RAG) with its evidence experiments, and the landing zone for the docmeta component's P1+ phases once the verdict + docmeta ADR gate them (Epic Q)."
+      status: in_progress   # PLAN CHANGE user-approved 2026-07-16 (Essential-GraphRAG groom); bmc-docs lexical load (P0 corpus) shipped + gate-accepted 2026-07-08 pre-groom
 
 # ── Module / work-area registry (item.module must be one of these) ───────────
 # Code components mirror MODULE_MAP.md; the rest are repo work areas so that
@@ -2849,11 +2853,82 @@ items:
       generated 2026-06-09, the vocabulary has moved on, no drift guard covers it).
       The either/or is deliberately in the acceptance — decide at execution.
 
+  # ── Epic Q — Document ingestion & doc-graph benchmarks (docmeta) — Phase 14 ─
+  # Born 2026-07-16: the Essential GraphRAG ebook groomed on user-decided intents,
+  # with the phase-14 plan change user-approved in-session (the phase-12/13 idiom).
+  # The docmeta component plan (knowledge/upgrade-plans/docmeta-component.md) grooms
+  # its P1+ phases HERE once the P0 WRITTEN verdict + the docmeta ADR land.
+  - id: Q1
+    epic: docmeta
+    title: "Mine the Essential GraphRAG ebook for applicable patterns; feed the docmeta P0 benchmark verdict"
+    type: task
+    module: reference
+    phase: 14
+    agent: reference-librarian
+    model: sonnet
+    priority: p2
+    status: todo
+    depends_on: []
+    inputs: ["Essential-GraphRAG.pdf (repo root — local-only, gitignored)", reference/research/README.md, knowledge/upgrade-plans/docmeta-component.md]
+    acceptance: >
+      A notes file under reference/research/ (link-cited, classification External, no
+      copyrighted full text pasted — the research README house rule) inventories the
+      book's applicable patterns at chapter/section level: lexical-graph construction,
+      retrieval strategies (traversal / hybrid / vector), agentic traversal, and
+      evaluation method — each mapped to its DryDocs consumer (which docmeta P0
+      benchmark arm it informs; whether it confirms or corrects the neo4j-skills
+      graphrag approach). The docmeta plan's P0 section gains a pointer to the notes,
+      and the user's open question ("are there more examples of how to do it
+      properly?") gets an explicit answer with the list.
+    notes: >
+      Groomed 2026-07-16 from the same-day Essential-GraphRAG [source] inbox line after
+      the user decided housing + intent. Registration EXECUTED at the groom: research
+      README seed-table row (Manning link verified 2026-07-16) + the root-level /*.pdf
+      gitignore blanket rule (root-images precedent; tracked UI-WIP/*.pdf unaffected).
+      Book: Bratanič & Hane, Manning 2025 (Neo4j-sponsored ebook), 179 pp.
+
+  - id: Q2
+    epic: docmeta
+    title: "Experiment: load the Essential GraphRAG ebook as a Document→Chunk lexical graph; test agent traversal over it"
+    type: task
+    module: drydocs-load
+    phase: 14
+    agent: main
+    model: sonnet
+    priority: p2
+    status: todo
+    depends_on: []
+    inputs: ["Essential-GraphRAG.pdf (repo root — local-only, gitignored)", drydocs/loaders/bmc_docs.py, drydocs/loaders/cypher/bmc_docs.cypher, drydocs_core/ontology/relationship_vocabulary.yaml, config/source-registry.yaml]
+    acceptance: >
+      The ebook is text-extracted (pypdf — the ingest_jpmc_reports.py precedent) and
+      chunked with the DETERMINISTIC lexical pattern the bmc-docs gate accepted
+      (section-based, seq-0 preamble; no LLM/embeddings in the load), then loaded under
+      a NEWLY registered source entry (config/source-registry.yaml, classification
+      External; the confirmed flip cites this groom's user decision or a mini-gate note
+      in config/gate-log.md — decided at execution) REUSING ONLY active docs_*
+      vocabulary (docs_chunk_part_of / docs_first_chunk / docs_next_chunk;
+      docs_describes only if a registry SoftwareProduct target genuinely applies) —
+      zero new relationship types; any new edge meaning aborts to the HITL gate.
+      Target DB decided at execution — drydocs (co-locate, the bmc-docs precedent) vs
+      ddcontext (the user's "our own unstructured context graph" phrasing) — with the
+      choice + rationale recorded in these notes. Then the experiment: an
+      agent-traversal test session answers >=5 retrieval questions by graph traversal
+      over the loaded chunks (MCP read tools or an ADK agent), with transcript +
+      findings recorded as docmeta P0 benchmark evidence (the traversal arm) and
+      pointed to from the docmeta plan. Full suite green.
+    notes: >
+      Groomed 2026-07-16 (same inbox line as Q1; user intent: "an experiment to load
+      into our own unstructured context graph for testing agent traversal").
+      Deliberately vocabulary-reusing — the bmc-docs-lexical-load gate (2026-07-08)
+      activated the lexical model, so no gate is needed unless a new edge meaning
+      appears. The one methodological delta from bmc_docs (which chunked .md by H2) is
+      PDF sectioning — extraction choices belong in the run notes.
+
 # Roll-up the dispatcher can glance at. COMPUTED views — test_backlog.py enforces
 # that these match the items exactly; update them with any status change.
 summary:
-  todo: 23                                          # +G12/G13 (2026-07-16 groom — pre-flip lineage-writer build blockers)
+  todo: 25                                          # +Q1/Q2 (2026-07-16 evening groom — Essential GraphRAG intents; phase-14 plan change)
   in_progress: 1                                   # E1 (gate deferred)
   blocked: 0
   done: 71                                          # K4 branch merged --no-ff to main 2026-07-16 (b3c455f)
-  next_ready: [C5, D5, D6, L7, L8, L9, L12, M2, M3, M4, P1, C7, K5, J10, J11, J12, C8, G12, G13]
+  next_ready: [C5, D5, D6, L7, L8, L9, L12, M2, M3, M4, P1, C7, K5, J10, J11, J12, C8, G12, G13, Q1, Q2]

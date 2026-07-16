@@ -26,15 +26,6 @@ Tags help grooming: `idea` · `bug` · `doc` · `source` (new data source) · `q
 
 <!-- add new ideas at the top -->
 
-- 2026-07-16 — [source] **Essential GraphRAG (Manning, Bratanič & Hane, 179 pp) dropped
-  untracked at repo root** — the Neo4j-sponsored GraphRAG ebook (PDF metadata 2025-07; file
-  dated 07-14). Candidate `reference/` registration via reference-librarian: REGISTRY.yaml
-  entry + source_url citation, classification External — and a housing decision: commit the
-  17 MB book PDF vs cite + gitignore (sometimes-published repo). Obvious consumers: the
-  docmeta P0 benchmark verdict (traversal vs manifest-routed md vs vector RAG) and the
-  neo4j-skills graphrag skill. Intent not stated at capture — groom when the user says
-  what it's for. (Found untracked by the 07-16 evening groom.)
-
 - 2026-07-16 — [idea] **Launcher registry should be human-configurable** (SME requirement
   captured at the cmdline-lineage-review mini-gate): LAUNCHER_REGISTRY in
   drydocs_core/controlm/commands.py is code-resident; teams add wrappers/variables
@@ -141,7 +132,8 @@ Tags help grooming: `idea` · `bug` · `doc` · `source` (new data source) · `q
   Port B git-readme §6 (clean-adds / Canonical-COMPANY connector wiring / company
   supplements: blocked vendor fetches, Graph-API creds, Enterprise multi-DB target).
   Heads-up bullet added to git-readme.md. Groom phases P1–P3 to backlog after the P0
-  benchmark verdict; the docmeta ADR is the P1 gate output — **number correction 2026-07-16**:
+  benchmark verdict (**landing zone since 2026-07-16: phase 14 / Epic Q** — created at the
+  Essential-GraphRAG groom); the docmeta ADR is the P1 gate output — **number correction 2026-07-16**:
   the plan reserved "ADR 0004" (2026-07-06) but 0004 was minted the next day for the
   software-registry terminology ADR (accepted 2026-07-07); the docmeta ADR takes the next
   free number at authoring (plan doc's 3 refs annotated same day). The four T1–T4 tier lines were folded
@@ -163,6 +155,23 @@ Tags help grooming: `idea` · `bug` · `doc` · `source` (new data source) · `q
 ## Recently groomed (audit trail)
 
 <!-- when you promote an idea, move its line here with the resulting backlog id -->
+
+- 2026-07-16 evening groom, part 2 (user decisions on the same-day [source] line) —
+  2 promoted / 1 plan change (user-approved) / housing executed in-session:
+  - PLAN CHANGE: new **phase 14 "Document ingestion & doc-graph benchmarks"** + **Epic Q**
+    — the docmeta landing zone (AskUserQuestion-approved; the phase-12/13 idiom). The
+    docmeta plan's P1+ phases groom here once the P0 verdict + docmeta ADR land.
+  - [source] Essential GraphRAG (Manning / Neo4j-sponsored ebook, Bratanič & Hane,
+    179 pp) → **Q1** (mine for applicable patterns at chapter level → docmeta P0 verdict
+    input; answers "are there more examples of how to do it properly?") + **Q2**
+    (Document→Chunk lexical-graph load + >=5-question agent-traversal experiment —
+    vocabulary-reusing per the 07-08 bmc-docs gate, no new gate; target DB drydocs-vs-
+    ddcontext decided at execution). HOUSING EXECUTED with the groom (user decisions:
+    gitignore, publicly available): root-level `/*.pdf` blanket rule (root-images
+    precedent; tracked UI-WIP/*.pdf unaffected) + reference/research/README.md seed-table
+    row (Manning link verified 2026-07-16).
+  - kept-updated: the docmeta plan line — phase 14 / Epic Q recorded as the landing zone
+    for its P1–P3 promotions.
 
 - 2026-07-16 evening groom (third run today; bare /groom-backlog, no new notes) —
   0 promoted / 1 inboxed / 0 merged; backlog database untouched (todo 23 / done 71 stand
