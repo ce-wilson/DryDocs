@@ -17,7 +17,7 @@
 taxonomy: business-application
 domain: business
 taxonomy_path_root: business/application
-concept: BusinessApplication           # generic node concept (graph label today: :Application)
+concept: BusinessApplication           # generic node concept (graph label :BusinessApplication — normalized at K4, 2026-07-15)
 source: seal-extract                   # config/source-registry.yaml
 source_of_record: SEAL                 # authoritative registry for BusinessApplication
 identifier: SEALID                     # the unique id (= app_id); how every app is keyed

@@ -99,8 +99,16 @@ What diverges, by stream:
   `active`/`confirmed` (or has a live loader), that entry is a back-flow COLLISION — keep your active
   version, do not downgrade it to the producer's `planned` state.** Reconcile that entry per-item, not by
   blindly overwriting the file.
-- **SEAL entity reshape + scraped-docs source-of-record (2026-07-08 review — GATE-BOUND, inert until
-  SME-confirmed; do NOT take as applied).** Two linked decisions the `drydocs-docmeta` scrape drives —
+- **SEAL entity reshape + scraped-docs source-of-record — SIGNED OFF 2026-07-10 (K3), APPLIED at K4
+  2026-07-15 (port-prompt step 35). TAKE AS APPLIED:** the `:Application` → `:BusinessApplication`
+  label + `prov:Entity`/`dprod:DataProduct` reclass, the TOMRole qualified-attribution pattern
+  (revised 7-role scheme), the three `seal_*` membership deprecations (gate-authorized — the
+  vocabulary per-entry never-downgrade rule does NOT apply to them), the `arch_develops` →
+  `WAS_ATTRIBUTED_TO {role: developed_by}` flip (+ migration cypher), `seal_had_primary_source`
+  edge-active, and the `seal-pat-source-of-record` precedence authority. Only
+  `seal-doc-source-of-record` stays confirmed-not-applied (docmeta loader pending) and the K1/K2
+  edge reshape stays deferred (§F rider). The paragraph below is the ORIGINAL 2026-07-08 proposal,
+  kept as history: Two linked decisions the `drydocs-docmeta` scrape drives —
   full write-up in [`knowledge/upgrade-plans/docmeta-component.md`](knowledge/upgrade-plans/docmeta-component.md)
   + IDEAS.md 2026-07-08. **(1) The `:Application` node is mis-typed.** It is `prov:SoftwareAgent` yet also
   carries `dprod` ports (→ Entity), `org:Membership → org:Role` (→ Organization), and the K1/K2

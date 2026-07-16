@@ -69,6 +69,12 @@ MERGE (n:OntologyTerm:ProvProperty {iri:"http://www.w3.org/ns/prov#wasAssociated
 MERGE (n:OntologyTerm:ProvProperty {iri:"http://www.w3.org/ns/prov#wasInformedBy"})     SET n.label = "was informed by";
 MERGE (n:OntologyTerm:ProvProperty {iri:"http://www.w3.org/ns/prov#wasDerivedFrom"})    SET n.label = "was derived from";
 MERGE (n:OntologyTerm:ProvProperty {iri:"http://www.w3.org/ns/prov#actedOnBehalfOf"})   SET n.label = "acted on behalf of";
+// Qualified-attribution family (K4, gate 2026-07-10 §B — the TOM role-holder pattern)
+MERGE (n:OntologyTerm:ProvClass {iri:"http://www.w3.org/ns/prov#Attribution"})           SET n.label = "Attribution";
+MERGE (n:OntologyTerm:ProvProperty {iri:"http://www.w3.org/ns/prov#qualifiedAttribution"}) SET n.label = "qualified attribution";
+MERGE (n:OntologyTerm:ProvProperty {iri:"http://www.w3.org/ns/prov#agent"})              SET n.label = "agent";
+MERGE (n:OntologyTerm:ProvProperty {iri:"http://www.w3.org/ns/prov#hadRole"})            SET n.label = "had role";
+MERGE (n:OntologyTerm:ProvProperty {iri:"http://www.w3.org/ns/prov#hadPrimarySource"})   SET n.label = "had primary source";
 
 
 // ----- DQV (data quality vocabulary) -----------------------------------------

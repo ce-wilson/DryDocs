@@ -114,7 +114,7 @@ objects:
       - {name: PARENT_TABLE, disposition: projected, origin: source, target: "ControlMJob.parent_table",
          note: "denormalized folder name kept for query convenience; NOT a relationship key (CONTAINS_JOB keys on folder_id)"}
       - {name: APPLICATION, disposition: projected, origin: source, target: "ControlMJob.application",
-         note: "the Control-M APPLICATION grouping — NOT the SEAL business :Application; on the folder-header row (JOB_ID=1) the same value ALSO lands as ControlMApplication.name via controlm_folders.sql's LEFT JOIN (gate controlm-q1q3-phase1 §Q3, :ControlMApplication:Collection)",
+         note: "the Control-M APPLICATION grouping — NOT the SEAL business :BusinessApplication; on the folder-header row (JOB_ID=1) the same value ALSO lands as ControlMApplication.name via controlm_folders.sql's LEFT JOIN (gate controlm-q1q3-phase1 §Q3, :ControlMApplication:Collection)",
          decided_by: controlm-q1q3-phase1}
       - {name: GROUP_NAME, disposition: projected, origin: source, target: "ControlMJob.group_name"}
       - {name: TASK_TYPE, disposition: projected, origin: source, target: "ControlMJob.task_type",

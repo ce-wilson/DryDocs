@@ -1,9 +1,9 @@
 // =============================================================================
 // seal_applications.cypher
 //
-// Loads PSGMGR.DECO_SEAL_APP_INFO into :Application + two-port pattern,
+// Loads PSGMGR.DECO_SEAL_APP_INFO into :BusinessApplication + two-port pattern,
 // and splays the three embedded contacts (Application Owner, CTO,
-// Primary Information Owner) directly into Memberships.
+// Primary Information Owner) into qualified Attributions (K4 shape).
 //
 // Additional roles (BIO, DA, CBT, L1/L2 Operate Manager, BAO, Risk
 // Manager) come via the separate SEAL Contact extract loaded by
@@ -16,7 +16,7 @@
 UNWIND $batch AS row
 
 // ---- Application upsert -----------------------------------------------------
-MERGE (a:Application {seal_id: row.app_id})
+MERGE (a:BusinessApplication {seal_id: row.app_id})
   ON CREATE SET a.created_at = datetime($loaded_at),
                 a.source     = 'SEAL'
 SET a.name                          = row.name,
@@ -119,9 +119,9 @@ FOREACH (_ IN CASE WHEN row.app_owner_sid IS NOT NULL THEN [1] ELSE [] END |
   SET e.full_name    = coalesce(row.app_owner_name, e.full_name),
       e.last_seen_at = datetime($loaded_at),
       e.last_run_id  = $run_id
-  MERGE (r1:Role {name: 'Application Owner'})
-  MERGE (a)-[:HAS_MEMBERSHIP]->(m1:Membership {
-      membership_id: row.app_id + '|SEAL|Application Owner|' + row.app_owner_sid
+  // K4 (gate 2026-07-10 §B/§C): qualified-attribution shape replaces Membership/Role
+  MERGE (m1:Attribution {
+      attribution_id: row.app_id + '|SEAL|application_owner|' + row.app_owner_sid
   })
     ON CREATE SET m1.source     = 'SEAL',
                   m1.valid_from = date(),
@@ -129,8 +129,10 @@ FOREACH (_ IN CASE WHEN row.app_owner_sid IS NOT NULL THEN [1] ELSE [] END |
                   m1.created_at = datetime($loaded_at)
   SET m1.last_seen_at = datetime($loaded_at),
       m1.last_run_id  = $run_id
-  MERGE (m1)-[:OF_ROLE]->(r1)
-  MERGE (m1)-[:HELD_BY]->(e)
+  MERGE (r1:TOMRole {id: 'application_owner'})
+  MERGE (a)-[:QUALIFIED_ATTRIBUTION]->(m1)
+  MERGE (m1)-[:HAD_ROLE]->(r1)
+  MERGE (m1)-[:HAS_AGENT]->(e)
 )
 
 // ---- Embedded contact 2: CTO ------------------------------------------------
@@ -141,9 +143,8 @@ FOREACH (_ IN CASE WHEN row.chief_tech_officer_sid IS NOT NULL THEN [1] ELSE [] 
   SET e.full_name    = coalesce(row.chief_tech_officer_name, e.full_name),
       e.last_seen_at = datetime($loaded_at),
       e.last_run_id  = $run_id
-  MERGE (r2:Role {name: 'CTO'})
-  MERGE (a)-[:HAS_MEMBERSHIP]->(m2:Membership {
-      membership_id: row.app_id + '|SEAL|CTO|' + row.chief_tech_officer_sid
+  MERGE (m2:Attribution {
+      attribution_id: row.app_id + '|SEAL|cto|' + row.chief_tech_officer_sid
   })
     ON CREATE SET m2.source     = 'SEAL',
                   m2.valid_from = date(),
@@ -151,8 +152,10 @@ FOREACH (_ IN CASE WHEN row.chief_tech_officer_sid IS NOT NULL THEN [1] ELSE [] 
                   m2.created_at = datetime($loaded_at)
   SET m2.last_seen_at = datetime($loaded_at),
       m2.last_run_id  = $run_id
-  MERGE (m2)-[:OF_ROLE]->(r2)
-  MERGE (m2)-[:HELD_BY]->(e)
+  MERGE (r2:TOMRole {id: 'cto'})
+  MERGE (a)-[:QUALIFIED_ATTRIBUTION]->(m2)
+  MERGE (m2)-[:HAD_ROLE]->(r2)
+  MERGE (m2)-[:HAS_AGENT]->(e)
 )
 
 // ---- Embedded contact 3: Primary Information Owner --------------------------
@@ -163,9 +166,8 @@ FOREACH (_ IN CASE WHEN row.info_owner_sid IS NOT NULL THEN [1] ELSE [] END |
   SET e.full_name    = coalesce(row.info_owner_name, e.full_name),
       e.last_seen_at = datetime($loaded_at),
       e.last_run_id  = $run_id
-  MERGE (r3:Role {name: 'Primary Information Owner'})
-  MERGE (a)-[:HAS_MEMBERSHIP]->(m3:Membership {
-      membership_id: row.app_id + '|SEAL|Primary Information Owner|' + row.info_owner_sid
+  MERGE (m3:Attribution {
+      attribution_id: row.app_id + '|SEAL|primary_information_owner|' + row.info_owner_sid
   })
     ON CREATE SET m3.source     = 'SEAL',
                   m3.valid_from = date(),
@@ -173,6 +175,8 @@ FOREACH (_ IN CASE WHEN row.info_owner_sid IS NOT NULL THEN [1] ELSE [] END |
                   m3.created_at = datetime($loaded_at)
   SET m3.last_seen_at = datetime($loaded_at),
       m3.last_run_id  = $run_id
-  MERGE (m3)-[:OF_ROLE]->(r3)
-  MERGE (m3)-[:HELD_BY]->(e)
+  MERGE (r3:TOMRole {id: 'primary_information_owner'})
+  MERGE (a)-[:QUALIFIED_ATTRIBUTION]->(m3)
+  MERGE (m3)-[:HAD_ROLE]->(r3)
+  MERGE (m3)-[:HAS_AGENT]->(e)
 );

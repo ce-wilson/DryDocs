@@ -79,7 +79,7 @@ def test_render_sql_never_touches_comments_strings_identifiers():
 
 def test_render_sql_recursive_extract_stays_byte_identical_outside_code():
     """The real file from port-prompt item 14: ':depends_on' literal and the
-    :DEPENDS_ON / :Application comment tokens must survive rendering."""
+    :DEPENDS_ON / :BusinessApplication comment tokens must survive rendering."""
     original = RECURSIVE_SQL.read_text(encoding="utf-8")
     rendered = render_sql(original, SCOPE_BINDS)
     assert rendered.count("':depends_on'") == original.count("':depends_on'")

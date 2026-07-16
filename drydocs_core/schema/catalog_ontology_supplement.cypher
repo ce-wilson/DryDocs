@@ -134,7 +134,7 @@ MERGE (n:OntologyTerm:LocalClass {iri: "https://drydocs.local/ontology#AreaProdu
 MERGE (n:OntologyTerm:LocalRelationship {iri: "https://drydocs.local/ontology#hasApplication"})
   SET n.label  = "HAS_APPLICATION",
       n.domain = "Product",
-      n.range  = "Application",
+      n.range  = "BusinessApplication",
       n.notes  = "Product owns a set of SEAL-registered applications. Local alias; "
                + "matrix equivalent is WAS_ATTRIBUTED_TO (Entity→Agent). "
                + "Written by pat_product_mapping loader.";
@@ -167,15 +167,21 @@ MERGE (n:OntologyTerm:LocalRelationship {iri: "https://drydocs.local/ontology#su
                + "Edge carries team_type (aligned|flex|dedicated) and sponsored (bool); 'aligned to' "
                + "= team_type=aligned. Agent→Entity has no PROV-O matrix row; local-only.";
 
-// DEVELOPS  —  DevTeam → BusinessApplication (graph label :Application), joined by SEALID
-// SME 2026-06-21. Agent→Agent has no PROV matrix fit; local. Cross-source edge (catalog↔SEAL).
+// WAS_ATTRIBUTED_TO {role: developed_by}  —  BusinessApplication → DevTeam, joined by SEALID
+// FLIPPED at K4 (2026-07-15; gate 2026-07-10 §E) from DevTeam-[:DEVELOPS]->BusinessApplication:
+// post-reclass, Entity → Agent = prov:wasAttributedTo. Migration:
+// drydocs/loaders/cypher/migrate_develops_to_was_attributed_to.cypher.
 MERGE (n:OntologyTerm:LocalRelationship {iri: "https://drydocs.local/ontology#develops"})
-  SET n.label  = "DEVELOPS",
-      n.domain = "DevTeam",
-      n.range  = "Application",
-      n.notes  = "DevTeam develops a BusinessApplication (graph label :Application), reconciled by "
-               + "SEALID. Agent→Agent has no PROV-O matrix row (actedOnBehalfOf is delegation, not "
-               + "development); local-only. Inverse alt: Application -[:WAS_ATTRIBUTED_TO]-> DevTeam.";
+  SET n.label  = "WAS_ATTRIBUTED_TO",
+      n.role   = "developed_by",
+      n.domain = "BusinessApplication",
+      n.range  = "DevTeam",
+      n.notes  = "BusinessApplication was developed by a DevTeam (role=developed_by on the shared "
+               + "WAS_ATTRIBUTED_TO label), reconciled by SEALID. prov:wasAttributedTo (Entity->Agent). "
+               + "Was DevTeam-[:DEVELOPS]-> pre-K4.";
+MATCH (local:OntologyTerm:LocalRelationship {iri: "https://drydocs.local/ontology#develops"})
+MATCH (pp:OntologyTerm:ProvProperty         {iri: "http://www.w3.org/ns/prov#wasAttributedTo"})
+MERGE (local)-[:MAPS_TO]->(pp);
 
 // HAS_MEMBERSHIP (DevTeam source)  —  DevTeam → Membership
 // Reuses org:Membership n-ary pattern from SEAL. Sourced from PAT team-role data.

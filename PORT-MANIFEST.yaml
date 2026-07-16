@@ -54,7 +54,10 @@ rows:
     entry_rule: >
       id-keyed (local_relationships[].id, node_classifications[].label). NEVER
       downgrade a consumer entry whose status is active (or a node class a live
-      loader depends on) to the producer's planned/deprecated. Back-flow-origin
+      loader depends on) to the producer's planned/deprecated — EXCEPT gate-authorized
+      deprecations carrying a deprecated_at + gate cite (K4 2026-07-15:
+      seal_has_membership / seal_of_role / seal_held_by — take the producer's
+      deprecated status; the gate outcome IS the authority). Back-flow-origin
       ids (m3_seal_app_ref and successors) are consumer-canonical once promoted.
     note: "guarded producer-side by test_schema.py + test_taxonomy_ontology_map.py"
   - path: "config/taxonomy-ontology-map.yaml"

@@ -1,6 +1,6 @@
 // =============================================================================
 // seal_attribution.cypher  —  resolved STG_APP_FACT decisions ->
-//                             (:ControlMJob)-[:WAS_ASSOCIATED_WITH {role:'seal_app_ref'}]->(:Application)
+//                             (:ControlMJob)-[:WAS_ASSOCIATED_WITH {role:'seal_app_ref'}]->(:BusinessApplication)
 //
 // Backlog K2; edge shape SME-confirmed at gate seal-attribution-match-policy
 // (config/gate-log.md, 2026-07-14, §D/§E):
@@ -19,7 +19,7 @@
 //     stays distinct from any future owner/author WAS_ASSOCIATED_WITH role.
 //   - SET every run: last_seen_at / last_run_id (re-confirmation bookkeeping).
 //
-// K3 rider (gate log): this shape type-checks while :Application is still
+// K3 rider (gate log): this shape type-checks while :BusinessApplication is still
 // prov:SoftwareAgent; the K4 reclass re-opens the edge SHAPE at its own gate.
 //
 // Parameters: $batch (validated SealAttributionRow dicts),
@@ -29,9 +29,9 @@
 UNWIND $batch AS row
 
 MATCH (j:ControlMJob {folder_id: row.folder_id, job_id: row.job_id})
-MATCH (a:Application {seal_id: row.seal_id})
+MATCH (a:BusinessApplication {seal_id: row.seal_id})
 WHERE NOT EXISTS {
-  MATCH (j)-[m:WAS_ASSOCIATED_WITH {role: 'seal_app_ref'}]->(:Application)
+  MATCH (j)-[m:WAS_ASSOCIATED_WITH {role: 'seal_app_ref'}]->(:BusinessApplication)
   WHERE m.match_method = 'manual'
 }
 

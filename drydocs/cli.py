@@ -404,7 +404,7 @@ def m1_verify() -> None:
     """Assert M1 invariants on the populated graph."""
     with _client() as cli:
         rows = cli.run("""
-            MATCH (a:Application)
+            MATCH (a:BusinessApplication)
             OPTIONAL MATCH (a)-[:HAS_PORT]->(ep:EventProcessing)
             OPTIONAL MATCH (a)-[:HAS_PORT]->(bp:BatchProcessing)
             RETURN count(a) AS apps, count(ep) AS ep, count(bp) AS bp
@@ -439,9 +439,11 @@ def apply_ontology_supplement() -> None:
 def apply_seal_supplement() -> None:
     """Apply the SEAL ontology supplement (idempotent).
 
-    Declares :Application, :Port, :Membership, :Role, :Employee node types
-    and their LocalRelationship mappings (HAS_PORT, HAS_MEMBERSHIP, OF_ROLE,
-    HELD_BY). Safe to re-run.
+    Declares :BusinessApplication, :Port, :Membership, :Role, :Employee,
+    :Attribution, :TOMRole node types and their LocalRelationship mappings
+    (HAS_PORT, QUALIFIED_ATTRIBUTION, HAS_AGENT, HAD_ROLE; the deprecated
+    HAS_MEMBERSHIP/OF_ROLE/HELD_BY blocks remain for audit — K4, gate
+    2026-07-10 §C), plus the tom_roles concept scheme. Safe to re-run.
     """
     if not SEAL_SUPPLEMENT_FILE.exists():
         console.print(f"[red]Missing: {SEAL_SUPPLEMENT_FILE}[/]"); raise typer.Exit(1)
@@ -494,7 +496,7 @@ def load_software_registry(
 
     MERGEs :Vendor and :SoftwareProduct from
     config/taxonomy/software-registry.yaml, attributes products via MADE_BY,
-    and wires DryDocs' own stack to the reserved :Application node via
+    and wires DryDocs' own stack to the reserved :BusinessApplication node via
     USES_SOFTWARE. Idempotent — the YAML is the source of truth.
     """
     _gate_source("software-registry")  # confirmed-gate before any DB write
@@ -549,7 +551,7 @@ def load_seal_attribution(
     at the top available tier, deterministic multi-hit tie-break (flagged for
     audit), manually-pinned jobs excluded (PIN-CONFLICTs surfaced). Writes
     ONLY (:ControlMJob)-[:WAS_ASSOCIATED_WITH {role:'seal_app_ref'}]->
-    (:Application) edges — never nodes. Coverage counts (matched + unmatched
+    (:BusinessApplication) edges — never nodes. Coverage counts (matched + unmatched
     + pinned = eligible) are stamped on the :JobRun and reconciled by
     graph-tests/seal-attribution-coverage.yaml.
     """

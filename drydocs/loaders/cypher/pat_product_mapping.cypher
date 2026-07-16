@@ -27,7 +27,7 @@ WITH row,
      [id IN split(coalesce(row.seal_ids, ''), ',') WHERE trim(id) <> ''] AS app_ids
 UNWIND CASE WHEN size(app_ids) = 0 THEN [null] ELSE app_ids END AS raw_app_id
 FOREACH (_ IN CASE WHEN raw_app_id IS NOT NULL THEN [1] ELSE [] END |
-  MERGE (a:Application {seal_id: trim(raw_app_id)})
+  MERGE (a:BusinessApplication {seal_id: trim(raw_app_id)})
   MERGE (p:Product {product_id: row.product_id})
   MERGE (p)-[r:HAS_APPLICATION]->(a)
     ON CREATE SET r.first_seen_at = datetime($loaded_at),

@@ -35,7 +35,7 @@ MERGE (n:OntologyTerm:LocalClass {iri: "https://drydocs.local/ontology#ControlMJ
 MERGE (n:OntologyTerm:LocalClass {iri: "https://drydocs.local/ontology#ControlMApplication"})
   SET n.label = "Control-M Application",
       n.notes = "Control-M APPLICATION grouping from the folder header row "
-              + "(CM_DEF_VJOB JOB_ID=1) — NOT the business :Application / SEAL "
+              + "(CM_DEF_VJOB JOB_ID=1) — NOT the business :BusinessApplication / SEAL "
               + "concept. A prov:Collection of folders. "
               + "Gate controlm-q1q3-phase1 (2026-07-07).";
 
@@ -182,7 +182,7 @@ MERGE (local)-[:MAPS_TO]->(prov);
 // WAS_ASSOCIATED_WITH {role: seal_app_ref}  —  ControlMJob → Application  (prov:wasAssociatedWith)
 // K2 activation (gate seal-attribution-match-policy, 2026-07-14). IRI is
 // role-discriminated: the label hosts future roles (owner/author) with their
-// own declarations. K3 rider: type-checks while :Application is prov:SoftwareAgent —
+// own declarations. K3 rider: type-checks while :BusinessApplication is prov:SoftwareAgent —
 // the K4 reclass re-opens the edge shape at its own gate. (No line may end
 // with ';' inside a comment: apoc.cypher.runMany splits there and Cypher 25
 // rejects the empty fragment — see base.py::_code_semicolons.)
@@ -190,7 +190,7 @@ MERGE (n:OntologyTerm:LocalRelationship {iri: "https://drydocs.local/ontology#wa
   SET n.label  = "WAS_ASSOCIATED_WITH",
       n.role   = "seal_app_ref",
       n.domain = "ControlMJob",
-      n.range  = "Application",
+      n.range  = "BusinessApplication",
       n.notes  = "Job attributed to its SEAL-registered application via STG_APP_FACT "
                + "semantic facts (precedence SEAL > FID > APP_NAME > ALIAS; never raw "
                + "job.APPLICATION). Matrix row: Activity → Agent = prov:wasAssociatedWith. "

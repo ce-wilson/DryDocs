@@ -40,21 +40,6 @@ Tags help grooming: `idea` · `bug` · `doc` · `source` (new data source) · `q
   depgraph exports — needs a resolution hop before the curated-load build flips the
   vocabulary active.
 
-- 2026-07-15 — [bug] **`Neo4jClient.run_script` inherits APOC's comment-`;` split.**
-  `apoc.cypher.runMany` splits on every end-of-line `;`, including inside `//` comments;
-  Neo4j 2026.x/Cypher 25 then rejects the comment-only fragment as an empty statement
-  (5.x tolerated it). Seen live 2026-07-15: `apply-ontology-supplement` failed against the
-  EE container until the one comment was reworded. The loaders are already protected
-  (`base.py::_code_semicolons`); harden `run_script` the same way — split client-side with
-  the comment/string-aware scanner and run per-statement — so supplement files can't
-  re-trip this.
-
-- 2026-07-15 — [chore] **`m3-verify` "active folders contain at least one job" fails on the
-  bundled samples** — folders 161020 / 160501 are active (`user_daily=Y`) in
-  `controlm_folders__sample.csv` but have no rows in `controlm_jobs__sample.csv`
-  (empty=2 total=7, exit 1). Either give each a sample job or downgrade that invariant to
-  a warning for the CSV adapter, so the README quick start verifies clean.
-
 - 2026-07-14 — [doc] **`drydocs-project-review.md` has no canonical outline** — the new
   whole-project review (docs/design/) renders through the Epic L pipeline but is free-form:
   `doc_outline.py` only validates `docs/design/*-tdd.md`. When L8 introduces the second doc
@@ -168,6 +153,16 @@ Tags help grooming: `idea` · `bug` · `doc` · `source` (new data source) · `q
 ## Recently groomed (audit trail)
 
 <!-- when you promote an idea, move its line here with the resulting backlog id -->
+
+- 2026-07-15 pm groom (on feat/k4-businessapplication-reshape) — 2 promoted, both
+  same-day findings from the O6 session's first live EE bootstrap:
+  - [bug] `Neo4jClient.run_script` inherits APOC's comment-`;` split (Cypher 25 rejects
+    the empty fragment; loaders already guarded by `base.py::_code_semicolons`) → **D5**.
+  - [chore] m3-verify fails on bundled samples — active folders 161020/160501 have no
+    sample jobs → **D6** (add-jobs vs downgrade-to-warning left either/or, decided at
+    execution).
+  - groom-touch on **K4**: the branch feat/k4-businessapplication-reshape is reserved for
+    it; the remote stub (40fe038, zero own commits, pre-K2) was re-based onto main a683384.
 
 - 2026-07-15 groom run (weekly inbox groom) — 3 promoted / 1 retired (resolved in place):
   - [chore] `controlm-loader-flow.md` → `docs/history/` move (captured same day at the

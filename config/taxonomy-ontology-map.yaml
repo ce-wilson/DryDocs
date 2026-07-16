@@ -15,7 +15,7 @@
 # =============================================================================
 
 schema: drydocs.taxonomy-ontology-map.v1
-updated: 2026-07-14
+updated: 2026-07-15
 
 mappings:
 
@@ -145,7 +145,7 @@ mappings:
       element: "Job is attributed to its SEAL-registered application (fact_type SEAL)"
     ontology:
       from_node: ControlMJob                # prov:Activity
-      to_node: Application                  # prov:SoftwareAgent (SEAL-registered)
+      to_node: BusinessApplication                  # prov:SoftwareAgent (SEAL-registered)
       prov_type_from: Activity
       prov_type_to: Agent
       matrix_row: "Activity → Agent = prov:wasAssociatedWith"
@@ -158,15 +158,15 @@ mappings:
     status: confirmed                       # gate seal-attribution-match-policy SIGNED OFF (match policy; edge shape re-opens with K4, see type_conflict_note)
     confirmed_by: chad.wilson
     confirmed_on: 2026-07-14
-    provenance_note: "2026-07-01 company reconciliation; spec-level on both repos; producer registration K1, activation K2. Match policy confirmed 2026-07-14 while :Application is still prov:SoftwareAgent (K3 reclass unapplied); the K4 reclass re-opens the edge SHAPE per the K3 §F deferral — the confirmed policy itself is shape-agnostic."
+    provenance_note: "2026-07-01 company reconciliation; spec-level on both repos; producer registration K1, activation K2. Match policy confirmed 2026-07-14 while :BusinessApplication is still prov:SoftwareAgent (K3 reclass unapplied); the K4 reclass re-opens the edge SHAPE per the K3 §F deferral — the confirmed policy itself is shape-agnostic."
     open_questions:
       - "ANSWERED 2026-07-14 (gate): one-to-one match accepted at the top available tier without further review."
       - "ANSWERED 2026-07-14 (gate): unmatched jobs surface as a per-run coverage count (matched + unmatched = eligible), joins graph_verify; never blocks the run."
       - "ANSWERED 2026-07-14 (gate): deterministic triage accepted as default (most-recent run_id, then lowest seal_id, last resort only); every multi-hit flagged for after-the-fact audit — no per-case load-time SME calls."
     type_conflict_note: >
-      2026-07-08 review: this mapping requires :Application to be a prov:Agent (matrix row
+      2026-07-08 review: this mapping requires :BusinessApplication to be a prov:Agent (matrix row
       Activity -> Agent = prov:wasAssociatedWith). The proposed SEAL reshape
-      (application-as-dataproduct, this file) reclasses :Application to prov:Entity /
+      (application-as-dataproduct, this file) reclasses :BusinessApplication to prov:Entity /
       dprod:DataProduct, which no longer type-checks against wasAssociatedWith. If the reshape
       is confirmed, this mapping must be RE-SHAPED, not carried forward as-is — see
       proposed_reshape below. Still status: proposed; not resolved by this note.
@@ -186,7 +186,7 @@ mappings:
       source: seal-extract
       element: "A BatchProcessing data port requires a scheduler technology (which orchestrator runs its batch)"
     ontology:
-      from_node: Port                       # the BATCH port: :Port:BatchProcessing {kind:"BatchProcessing"}; app-level (:Application)-[:HAS_PORT]->(:Port), two per app (EventProcessing/API + BatchProcessing)
+      from_node: Port                       # the BATCH port: :Port:BatchProcessing {kind:"BatchProcessing"}; app-level (:BusinessApplication)-[:HAS_PORT]->(:Port), two per app (EventProcessing/API + BatchProcessing)
       to_node: SchedulerKind                # PROVISIONAL — slated for deprecation → :AisCapability + :AiTool (user 2026-07-09; not yet defined). Today: {name: ControlM|Autosys|Airflow}, seeded ontology.cypher
       prov_type_from: Entity                # dprod port (Entity semantics)
       prov_type_to: ~                        # target class unsettled (SchedulerKind deprecating; replacements undefined)
@@ -200,23 +200,23 @@ mappings:
     status: proposed                         # <-- SME must confirm at the gate (backlog C6)
     provenance_note: "Registered per backlog C6 (2026-07-09) to close the README/LoadPlanV3-vs-vocab drift. Edge meaning ⇒ HITL gate; not auto-decided."
     open_questions:
-      - "Attach point: ports are application-level ((:Application)-[:HAS_PORT]->(:Port), kind∈{EventProcessing=events/API, BatchProcessing=batch}), so README.md:263 ('on :Application') and LoadPlanV3.md:82 ('the :BatchProcessing port') describe the SAME app batch port. SME call = keep the edge on the batch :Port (as here) or hoist to :Application. REQUIRES_SCHEDULER is batch-only (the EventProcessing/API port is not scheduler-driven)."
+      - "Attach point: ports are application-level ((:BusinessApplication)-[:HAS_PORT]->(:Port), kind∈{EventProcessing=events/API, BatchProcessing=batch}), so README.md:263 ('on :BusinessApplication') and LoadPlanV3.md:82 ('the :BatchProcessing port') describe the SAME app batch port. SME call = keep the edge on the batch :Port (as here) or hoist to :BusinessApplication. REQUIRES_SCHEDULER is batch-only (the EventProcessing/API port is not scheduler-driven)."
       - "TARGET (to_node): :SchedulerKind is slated for deprecation → :AisCapability + :AiTool (user 2026-07-09; not yet defined in the ontology). The target here is PROVISIONAL — re-target/reshape onto the replacement class(es) at the gate once defined; whether REQUIRES_SCHEDULER becomes one edge or two is itself an SME call. See config/taxonomy/platforms.yaml (reconciliation placeholder) + the IDEAS SchedulerKind-deprecation capture."
       - "Confirm null-PROV/infrastructure is correct, vs a weak prov:used / prov:wasInfluencedBy."
 
-  # ---- SEAL ontology reshape — GATE-BOUND (2026-07-08 review) --------------
-  # Nothing in this block is applied. The :Application node stays classed prov:SoftwareAgent
-  # (status: active in relationship_vocabulary.yaml#node_classifications) until the SME
-  # confirms; see config/gate-prompts/seal-tom-attribution-reshape.yaml and the review
-  # write-ups (knowledge/upgrade-plans/docmeta-component.md, git-readme.md,
-  # docs/restructure/IDEAS.md 2026-07-08 [question] entry).
+  # ---- SEAL ontology reshape — SIGNED OFF 2026-07-10 (K3), APPLIED at K4 ----
+  # Gate config/gate-prompts/seal-tom-attribution-reshape.yaml, sign-off in
+  # config/gate-log.md (2026-07-10). K4 (2026-07-15) applied the reclass + label
+  # normalization (:BusinessApplication), the qualified-attribution loaders, and
+  # the membership deprecations. seal-doc-source-of-record stays confirmed-only
+  # until drydocs-docmeta ships a Document loader.
 
   - id: application-as-dataproduct
     taxonomy:
       source: seal-extract
       element: "BusinessApplication (SEAL-registered) is a data-product/asset record, not a software agent"
     ontology:
-      from_node: Application               # CURRENT (active): prov:SoftwareAgent — see node_classifications
+      from_node: BusinessApplication               # CURRENT (active): prov:SoftwareAgent — see node_classifications
       to_node: ~                            # node reclassification, not an edge
       current_class: "prov:SoftwareAgent"
       proposed_class: "prov:Entity / dprod:DataProduct"
@@ -224,7 +224,7 @@ mappings:
       proposed_prov_type: Entity
       matrix_row: "n/a — node reclassification, not a matrix edge"
       rationale: >
-        :Application currently carries three incompatible PROV types on one node: SoftwareAgent
+        :BusinessApplication currently carries three incompatible PROV types on one node: SoftwareAgent
         (node_classifications), dprod:Port children (Entity semantics, seal_has_port — active),
         and org:Membership/org:Role role-holders (Organization semantics,
         seal_has_membership/seal_of_role/seal_held_by — active, C2). A SEAL application is a
@@ -233,19 +233,23 @@ mappings:
         requires of the source-of-record edge (seal-doc-source-of-record below).
     precedence_authority: lob-product-team
     standards_cited: ["PROV-O (prov:Entity)", "DPROD/EKGF (dprod:DataProduct)"]
-    vocab_id: ~                             # node reclass, not an edge — see relationship_vocabulary.yaml node_classifications#Application proposed_reclass
-    status: proposed
+    vocab_id: ~                             # node reclass, not an edge — see relationship_vocabulary.yaml node_classifications#BusinessApplication (reclass APPLIED)
+    capture: config/taxonomy/business-application.yaml
+    status: applied
     proposed_at: 2026-07-08
-    open_questions:
-      - "Reclassing :Application breaks the current Agent-target assumption used by both seal_app_attributed_to_employee's simple form and the K1/K2 job->app edge (m3_seal_app_ref / job-seal-app-ref) — both must be re-shaped in the same gate decision (see the type_conflict_note / proposed_reshape on job-seal-app-ref above)."
-      - "Any other edge that currently assumes :Application is an Agent (e.g. arch_develops DevTeam->Application / dev-team-develops-app, C3 — Agent->Agent local, no PROV row either way) needs a re-check once this reclass is confirmed — flagged for the SME, not resolved here; those edges are NOT expected to break (no PROV matrix row was in use), but the SME should confirm."
+    confirmed_by: SME
+    confirmed_on: 2026-07-10                # gate §A + label decision (gate-log)
+    applied_on: 2026-07-15                  # K4 clause 1 — reclass + :BusinessApplication label across schema/loaders/tests
+    resolved_questions:
+      - "K1/K2 job->app edge reshape: DEFERRED by the gate (§F) to a K2 follow-up gate — the standing rider on m3_seal_app_ref / job-seal-app-ref, unchanged by K4."
+      - "arch_develops re-check: resolved by gate §E — flipped to (:BusinessApplication)-[:WAS_ATTRIBUTED_TO {role: developed_by}]->(:DevTeam) at K4 clause 5."
 
   - id: seal-tom-attribution
     taxonomy:
       source: seal-extract
-      element: "SEAL Technical Operating Model (TOM) role-holders (cto, application_owner, information_owner, data_owner, operate_manager, risk_compliance_officer) attributed to the BusinessApplication asset"
+      element: "SEAL Technical Operating Model (TOM) role-holders (gate §B revised fixed 7: application_owner, primary_information_owner, backup_information_owner, cto, technology_risk_controls, design_authority, operate_manager L1/L2) attributed to the BusinessApplication asset"
     ontology:
-      from_node: Application                # PROPOSED class: prov:Entity / dprod:DataProduct
+      from_node: BusinessApplication                # PROPOSED class: prov:Entity / dprod:DataProduct
       to_node: Employee                      # prov:Agent
       prov_type_from: Entity                 # after the proposed reclass
       prov_type_to: Agent
@@ -254,33 +258,39 @@ mappings:
       role: tom_role_holder
       prov_maps_to: "prov:wasAttributedTo"
       qualified_form:
-        pattern: "Application -[:QUALIFIED_ATTRIBUTION]-> (:Attribution) -[:HAS_AGENT]-> Employee ; (:Attribution) -[:HAD_ROLE]-> TOMRole"
+        pattern: "BusinessApplication -[:QUALIFIED_ATTRIBUTION]-> (:Attribution) -[:HAS_AGENT]-> Employee ; (:Attribution) -[:HAD_ROLE]-> TOMRole"
         prov_maps_to: ["prov:qualifiedAttribution", "prov:agent", "prov:hadRole"]
-        role_vocabulary: "TOMRole (skos:Concept) — 6 concepts: cto, application_owner, information_owner, data_owner, operate_manager, risk_compliance_officer, in a shared skos:ConceptScheme. DISTINCT from :Role (org:Role, PAT hierarchy only)."
-      vocab_id: [seal_app_attributed_to_employee, seal_qualified_attribution, seal_attribution_has_agent, seal_attribution_had_role]
+        role_vocabulary: "TOMRole (skos:Concept) — the gate §B REVISED fixed 7 in scheme tom_roles: application_owner, primary_information_owner, backup_information_owner, cto (shared with the K5 ProductRole scheme), technology_risk_controls, design_authority, operate_manager (L1/L2 = level property on the Attribution). DISTINCT from :Role (org:Role, PAT hierarchy only)."
+      vocab_id: [seal_qualified_attribution, seal_attribution_has_agent, seal_attribution_had_role]   # seal_app_attributed_to_employee stays planned (simple form optional/derivable, gate §B)
     precedence_authority: lob-product-team
     standards_cited: ["PROV-O (prov:wasAttributedTo, prov:qualifiedAttribution, prov:agent, prov:hadRole)", "SKOS (skos:Concept)"]
-    status: proposed
+    capture: >
+      waived — the role vocabulary is the tom_roles SkosConceptScheme seeded by
+      drydocs_core/schema/seal_ontology_supplement.cypher; its source taxonomy is the gate §B
+      fixed set (config/gate-log.md 2026-07-10), not a config/taxonomy/ capture file.
+    status: applied
     depends_on: application-as-dataproduct
     proposed_at: 2026-07-08
+    confirmed_by: SME
+    confirmed_on: 2026-07-10                # gate §B (role model REVISED into two families) + §C
+    applied_on: 2026-07-15                  # K4 clauses 2+3+6 — scheme/supplement active; loaders seal_applications.cypher + seal_contacts.cypher write the qualified form
     note: >
       Replaces org:Membership/org:Role for SEAL's TOM role-holders ONLY — org: stays for the PAT
-      product hierarchy (DevTeam etc., real organizations; catalog_dev_team_has_membership and the
-      C2 seal_* membership edges are a DIFFERENT governance concept mistakenly sharing the org:
-      pattern). Proposes deprecating seal_has_membership / seal_of_role / seal_held_by (currently
-      status: active — NOT flipped here; see their proposed_deprecation notes in
-      relationship_vocabulary.yaml). seal_has_port is KEPT (dprod:Port structural edge, unrelated
-      to this reshape).
-    open_questions:
-      - "Confirm the 6 TOM roles are exhaustive/stable, or if the SME wants the skos:Concept scheme open-ended for future roles."
-      - "Confirm whether the simple wasAttributedTo edge (role=tom_role_holder) is written alongside the qualified form on every load, or only the qualified form (simple form omitted) — affects loader design once this is confirmed."
+      product hierarchy (DevTeam etc., real organizations; catalog_dev_team_has_membership is a
+      DIFFERENT governance concept sharing the org: pattern). seal_has_membership / seal_of_role /
+      seal_held_by DEPRECATED at K4 clause 3 (deprecated_at 2026-07-15). seal_has_port KEPT
+      (dprod:Port structural edge, unrelated). Contact roles outside the fixed 7 load with
+      unmapped_role=true + role_source_name preserved — surfaced, never guessed (loader comment).
+    resolved_questions:
+      - "Role set: gate §B fixed the REVISED 7 (subsumes the old flat 6; Design Authority new); the scheme is fixed, not open-ended — new roles need a new gate."
+      - "Simple vs qualified form: only the QUALIFIED form is loaded (multi-person roles require it); the simple wasAttributedTo stays optional/derivable — seal_app_attributed_to_employee remains status: planned."
 
   - id: seal-doc-source-of-record
     taxonomy:
       source: seal-pat-scrape           # future drydocs-docmeta component source id — NOT yet registered in config/source-registry.yaml
       element: "SEAL/PAT scraped documentation page is the source of record for an extracted Application fact/record"
     ontology:
-      from_node: Application                # PROPOSED class: prov:Entity / dprod:DataProduct
+      from_node: BusinessApplication                # PROPOSED class: prov:Entity / dprod:DataProduct
       to_node: Document                      # prov:Entity — scraped SEAL/PAT page (drydocs-docmeta, planned)
       prov_type_from: Entity
       prov_type_to: Entity
@@ -288,11 +298,16 @@ mappings:
       neo4j_label: HAD_PRIMARY_SOURCE
       prov_maps_to: "prov:hadPrimarySource"
       vocab_id: seal_had_primary_source
-    precedence_authority: lob-product-team    # SEAL/PAT proposed as the authority for internal product/business identity — see config/precedence.yaml `proposed_additions` block
+    precedence_authority: lob-product-team    # SEAL/PAT precedence wired into the live chain at K4 clause 7 — see config/precedence.yaml
     standards_cited: ["PROV-O (prov:hadPrimarySource, sub-property of prov:wasDerivedFrom)"]
-    status: proposed
+    capture: >
+      waived — the source (seal-pat-scrape) is not yet registered in config/source-registry.yaml;
+      registration + capture arrive with the drydocs-docmeta component gate.
+    status: confirmed                       # gate §D CONFIRMED; applied waits on the docmeta Document loader (applied = a loader wrote the graph)
     depends_on: application-as-dataproduct
     proposed_at: 2026-07-08
+    confirmed_by: SME
+    confirmed_on: 2026-07-10                # §D also promoted drydocs-docmeta from parked to REQUIRED
     source_of_record_mechanism: >
       Two linked mechanisms, both proposed: (1) register SEAL/PAT as the authoritative
       precedence source for internal product/business identity in config/precedence.yaml (a
@@ -423,13 +438,13 @@ mappings:
 
   # ---- C2: BusinessApplication / SEAL edges (reuse ACTIVE vocab — batch) ----
   # Source taxonomy: config/taxonomy/business-application.yaml. Concept =
-  # BusinessApplication (graph label :Application); SEAL = source of record; key = SEALID.
+  # BusinessApplication (graph label :BusinessApplication); SEAL = source of record; key = SEALID.
   # All reuse active seal_* vocabulary terms (DPROD + W3C ORG).
 
   - id: app-has-port
     taxonomy: { source: seal-extract, element: "BusinessApplication exposes a data Port (Event/Batch)" }
     ontology:
-      from_node: BusinessApplication       # prov:SoftwareAgent (label :Application)
+      from_node: BusinessApplication       # prov:SoftwareAgent (label :BusinessApplication)
       to_node: Port                         # dprod:Port (prov:Entity)
       matrix_row: "structural dprod relationship (no PROV row)"
       neo4j_label: HAS_PORT
@@ -567,21 +582,25 @@ mappings:
   - id: dev-team-develops-app
     taxonomy: { source: catalog-pat, element: "DevTeam develops a BusinessApplication (joined by SEALID)" }
     ontology:
-      from_node: DevTeam                     # org:OrganizationalUnit (Agent)
-      to_node: BusinessApplication           # prov:SoftwareAgent (label :Application); key = SEALID
+      from_node: BusinessApplication         # prov:Entity / dprod:DataProduct (K4 reclass); key = SEALID
+      to_node: DevTeam                       # org:OrganizationalUnit (Agent)
       join_key: SEALID                        # reconcile catalog DevTeam <-> SEAL app by SEALID
-      matrix_row: "Agent → Agent — no PROV fit (actedOnBehalfOf = delegation, not development); local"
-      neo4j_label: DEVELOPS
-      prov_maps_to: ~                          # alt inverse: Application WAS_ATTRIBUTED_TO DevTeam (Entity→Agent)
+      matrix_row: "Entity → Agent = prov:wasAttributedTo (role=developed_by)"
+      neo4j_label: WAS_ATTRIBUTED_TO
+      role: developed_by
+      prov_maps_to: "prov:wasAttributedTo"
     precedence_authority: lob-product-team
     vocab_id: arch_develops
     status: confirmed
     confirmed_by: SME
     confirmed_on: 2026-06-21
     note: >
-      SME 2026-06-21: DevTeam DEVELOPS BusinessApplication, reconciled by SEALID. Cross-source
+      SME 2026-06-21: DevTeam develops BusinessApplication, reconciled by SEALID. Cross-source
       edge (lob-product-team taxonomy -> business-application taxonomy); the join (which team
       builds which app) comes from catalog<->SEAL ownership reconciliation.
+      FLIPPED at K4 (2026-07-15; gate 2026-07-10 §E): was DevTeam-[:DEVELOPS]->(Agent→Agent,
+      no PROV row); post-reclass the PROV-valid inverse WAS_ATTRIBUTED_TO {role: developed_by}
+      applies. Migration: migrate_develops_to_was_attributed_to.cypher.
 
   # ---- bmc-docs lexical load (2026-07-08 — GATE PREP, SME not yet run) ------
   # User-directed: only sample Control-M data can reach the local EE DB, so the
@@ -749,7 +768,7 @@ mappings:
 
 # Counts the gate reports to the SME each run.
 summary:
-  applied: 6          # job-contains, application-contains-folder, doc-describes-product, doc-chunk-part-of, doc-first-chunk, doc-next-chunk (comment-APPLIED entries promoted 2026-07-09, tech-debt F2)
-  confirmed: 19       # +job-runtime-stats-supplement, +job-seal-app-ref (gates SIGNED OFF 2026-07-14)
-  proposed: 6         # oracle-schema-asset, jobrun-observation, application-as-dataproduct, seal-tom-attribution, seal-doc-source-of-record, requires-scheduler (merge 2026-07-09)
+  applied: 8          # +application-as-dataproduct, +seal-tom-attribution (K4, 2026-07-15); prior 6 = job-contains, application-contains-folder, doc-describes-product, doc-chunk-part-of, doc-first-chunk, doc-next-chunk
+  confirmed: 20       # +seal-doc-source-of-record (gate §D confirmed 2026-07-10; applied waits on docmeta loader)
+  proposed: 3         # oracle-schema-asset, jobrun-observation, requires-scheduler
   rejected: 0

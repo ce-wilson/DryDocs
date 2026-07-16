@@ -32,7 +32,7 @@ SELECT
     J.TABLE_ID            AS folder_id,
     J.JOB_NAME            AS job_name,
     J.PARENT_TABLE        AS parent_table,    -- denormalized folder name on the job row
-    J.APPLICATION         AS application,     -- business app name; reconcile to :Application.seal_id when possible
+    J.APPLICATION         AS application,     -- business app name; reconcile to :BusinessApplication.seal_id when possible
     J.GROUP_NAME          AS group_name,
     J.TASK_TYPE           AS task_type,
     J.CYCLIC              AS cyclic,          -- Y/N flag

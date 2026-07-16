@@ -54,7 +54,7 @@ SUPPORTED_SHAPE = {
     "source_label": "ControlMJob",
     "relationship": "WAS_ASSOCIATED_WITH",
     "role": "seal_app_ref",
-    "target_label": "Application",
+    "target_label": "BusinessApplication",
 }
 LOADABLE_STATUSES = ("pending-load", "loaded")
 
@@ -268,10 +268,10 @@ class ManualSealAttributionLoader(BaseLoader):
         result = self.client.run(
             """
             MATCH (run:JobRun {run_id: $run_id})
-            OPTIONAL MATCH (:ControlMJob)-[r:WAS_ASSOCIATED_WITH {role: 'seal_app_ref'}]->(:Application)
+            OPTIONAL MATCH (:ControlMJob)-[r:WAS_ASSOCIATED_WITH {role: 'seal_app_ref'}]->(:BusinessApplication)
               WHERE r.last_run_id = $run_id AND r.match_method = 'manual'
             WITH run, count(r) AS edges_written
-            OPTIONAL MATCH (n:Application {manually_created: true})
+            OPTIONAL MATCH (n:BusinessApplication {manually_created: true})
               WHERE n.created_at IS NOT NULL AND n.source = 'manual-csv'
             WITH run, edges_written, count(n) AS manually_created_total
             SET run.edges_written          = edges_written,

@@ -16,7 +16,7 @@ summary: >
   #invocation_patterns) that a future loader will apply over the Phase-C command/script
   parser's STG_INVOCATION output (drydocs_core/controlm/commands.py, parsed from RESOLVED
   CM_DEF_VJOB.CMD_LINE) to derive
-  (:Application)-[:USES_SOFTWARE {source:'controlm-cmdline'}]->(:SoftwareProduct) edges.
+  (:BusinessApplication)-[:USES_SOFTWARE {source:'controlm-cmdline'}]->(:SoftwareProduct) edges.
   CM_DEF_VJOB.APPL_TYPE is explicitly NOT the basis — recorded dead-end (doc 07 "What
   already feeds it": Ab Initio/Informatica workloads run as plain OS commands, so job/
   application types under-represent the real software running). Covers the pattern rows
@@ -36,7 +36,7 @@ mapping:
   - n: 1
     element: "STG_INVOCATION.script_path matching abinitio-graph-or-plan (\\.m$) or abinitio-pset (\\.pset$)"
     target: ":SoftwareProduct {id: 'abinitio'}  [existing node, Phase 1]"
-    edge: "(:Application)-[:USES_SOFTWARE {source:'controlm-cmdline'}]->(:SoftwareProduct)  [PROPOSED — no loader yet]"
+    edge: "(:BusinessApplication)-[:USES_SOFTWARE {source:'controlm-cmdline'}]->(:SoftwareProduct)  [PROPOSED — no loader yet]"
   - n: 2
     element: "STG_INVOCATION.executable_path matching abinitio-dtlaunch-wrapper (^dtlaunch\\.sh$)"
     target: ":SoftwareProduct {id: 'abinitio'}"
@@ -55,7 +55,7 @@ mapping:
     edge: "no edge — surfaced only as a per-load-run coverage metric (count + % unclassified), never a guessed USES_SOFTWARE edge"
 
 provenance:
-  - label: "(:Application)-[:USES_SOFTWARE {source:'controlm-cmdline'}]->(:SoftwareProduct)  [PROPOSED, no loader yet]"
+  - label: "(:BusinessApplication)-[:USES_SOFTWARE {source:'controlm-cmdline'}]->(:SoftwareProduct)  [PROPOSED, no loader yet]"
     source_object: "STG_INVOCATION (drydocs_core/controlm/commands.py output over resolved CM_DEF_VJOB.CMD_LINE)"
     key: "(Application.seal_id, SoftwareProduct.id)"
     loader: "not yet built — this gate authorizes the pattern table only; the derivation loader is a separate later step"
@@ -95,7 +95,7 @@ sections:
       - "The informatica-mapping-prefix rule (^m_\\w+) carries a known false-positive risk — any m_*.sh wrapper matches, not only genuine Informatica mapping wrappers — flagged in the pattern row's note, not silently accepted."
   - title: "D. Derived edge shape"
     confirmations:
-      - "(:Application)-[:USES_SOFTWARE {source:'controlm-cmdline', pattern_id, classifier_rule}]->(:SoftwareProduct) is DERIVED end-to-end — every property traces to the Phase-C parser output or this pattern table, never to CM_DEF_VJOB.APPL_TYPE (confirmed dead-end, doc 07)."
+      - "(:BusinessApplication)-[:USES_SOFTWARE {source:'controlm-cmdline', pattern_id, classifier_rule}]->(:SoftwareProduct) is DERIVED end-to-end — every property traces to the Phase-C parser output or this pattern table, never to CM_DEF_VJOB.APPL_TYPE (confirmed dead-end, doc 07)."
       - "source:'controlm-cmdline' is distinct from the Phase-1 used_by_drydocs static edges already loaded for DryDocs' own stack (python, oracle-db, neo4j, controlm) — the same :SoftwareProduct node can carry both edge provenances, on separate edges, without conflict."
       - "No loader writes this edge yet. This gate authorizes the pattern table only; building the derivation loader is a separate, later backlog item gated on this table reaching status: confirmed."
   - title: "E. Sign-off"

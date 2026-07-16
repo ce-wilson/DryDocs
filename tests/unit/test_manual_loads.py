@@ -1,4 +1,4 @@
-"""Offline tests for the tier-5 manual mapping mechanism (gate
+﻿"""Offline tests for the tier-5 manual mapping mechanism (gate
 seal-attribution-match-policy §F, SME-confirmed 2026-07-14).
 
 Pins the manifest gate (registered BEFORE load, replaces_with required,
@@ -46,7 +46,7 @@ def _repo(tmp_path: Path, *, entry: dict | None = None,
     csv_path.write_text(
         CSV_HEADER + "\n"
         "ControlMJob,folder_id=900001;job_id=3,WAS_ASSOCIATED_WITH,"
-        "role=seal_app_ref,Application,seal_id=SL0001,false,"
+        "role=seal_app_ref,BusinessApplication,seal_id=SL0001,false,"
         "synthetic test row,tester0001,2026-07-14\n",
         encoding="utf-8",
     )
@@ -131,7 +131,7 @@ def test_csv_naming_an_unregistered_relationship_is_refused(tmp_path: Path) -> N
     csv_path.write_text(
         CSV_HEADER + "\n"
         "ControlMJob,folder_id=900001;job_id=3,MADE_UP_REL,role=seal_app_ref,"
-        "Application,seal_id=SL0001,false,x,tester0001,2026-07-14\n",
+        "BusinessApplication,seal_id=SL0001,false,x,tester0001,2026-07-14\n",
         encoding="utf-8",
     )
     with pytest.raises(ManualLoadError, match="never mint a relationship type"):
@@ -159,7 +159,7 @@ def test_source_key_missing_a_node_key_part_is_refused(tmp_path: Path) -> None:
     csv_path.write_text(
         CSV_HEADER + "\n"
         "ControlMJob,folder_id=900001,WAS_ASSOCIATED_WITH,role=seal_app_ref,"
-        "Application,seal_id=SL0001,false,x,tester0001,2026-07-14\n",
+        "BusinessApplication,seal_id=SL0001,false,x,tester0001,2026-07-14\n",
         encoding="utf-8",
     )
     with pytest.raises(ManualLoadError, match="job_id"):
@@ -185,7 +185,7 @@ def test_create_target_flag_parses_truthy_strings(tmp_path: Path) -> None:
     csv_path.write_text(
         CSV_HEADER + "\n"
         "ControlMJob,folder_id=900001;job_id=3,WAS_ASSOCIATED_WITH,"
-        "role=seal_app_ref,Application,seal_id=SL0001,TRUE,x,tester0001,2026-07-14\n",
+        "role=seal_app_ref,BusinessApplication,seal_id=SL0001,TRUE,x,tester0001,2026-07-14\n",
         encoding="utf-8",
     )
     rows = parse_mapping_csv(csv_path, manifest_path=manifest_path)
@@ -202,7 +202,7 @@ def test_shape_constant_is_the_k2_edge() -> None:
         "source_label": "ControlMJob",
         "relationship": "WAS_ASSOCIATED_WITH",
         "role": "seal_app_ref",
-        "target_label": "Application",
+        "target_label": "BusinessApplication",
     }
 
 

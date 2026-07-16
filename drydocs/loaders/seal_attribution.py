@@ -387,7 +387,7 @@ class SealAttributionLoader(BaseLoader):
         result = self.client.run(
             """
             MATCH (run:JobRun {run_id: $run_id})
-            OPTIONAL MATCH (:ControlMJob)-[r:WAS_ASSOCIATED_WITH {role: 'seal_app_ref'}]->(:Application)
+            OPTIONAL MATCH (:ControlMJob)-[r:WAS_ASSOCIATED_WITH {role: 'seal_app_ref'}]->(:BusinessApplication)
               WHERE r.last_run_id = $run_id
             WITH run, count(r) AS edges_written
             SET run.eligible_jobs      = $eligible_jobs,
@@ -429,7 +429,7 @@ def fetch_pinned_attributions(client: "Neo4jClient") -> dict[tuple[str, str], st
     """Jobs carrying a manually-asserted seal_app_ref edge (gate §F: PIN)."""
     rows = client.run(
         """
-        MATCH (j:ControlMJob)-[r:WAS_ASSOCIATED_WITH {role: 'seal_app_ref'}]->(a:Application)
+        MATCH (j:ControlMJob)-[r:WAS_ASSOCIATED_WITH {role: 'seal_app_ref'}]->(a:BusinessApplication)
         WHERE r.match_method = 'manual'
         RETURN j.folder_id AS folder_id, j.job_id AS job_id, a.seal_id AS seal_id
         """
@@ -447,7 +447,7 @@ def fetch_app_name_reconciler(client: "Neo4jClient") -> dict[str, str]:
     stay unresolved (counted in coverage) rather than guessed."""
     rows = client.run(
         """
-        MATCH (a:Application)
+        MATCH (a:BusinessApplication)
         RETURN a.seal_id AS seal_id, a.name AS name, a.app_short_name AS short_name
         """
     )
@@ -481,7 +481,7 @@ def check_sequencing_preconditions(client: "Neo4jClient") -> tuple[int, int]:
     rows = client.run(
         """
         OPTIONAL MATCH (j:ControlMJob) WITH count(j) AS jobs
-        OPTIONAL MATCH (a:Application) RETURN jobs, count(a) AS apps
+        OPTIONAL MATCH (a:BusinessApplication) RETURN jobs, count(a) AS apps
         """
     )
     if not rows:
