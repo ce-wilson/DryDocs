@@ -26,6 +26,35 @@ Tags help grooming: `idea` · `bug` · `doc` · `source` (new data source) · `q
 
 <!-- add new ideas at the top -->
 
+- 2026-07-16 — [idea] **Launcher registry should be human-configurable** (SME requirement
+  captured at the cmdline-lineage-review mini-gate): LAUNCHER_REGISTRY in
+  drydocs_core/controlm/commands.py is code-resident; teams add wrappers/variables
+  faster than code releases. First step = a config-file registry (config/ pattern,
+  test-guarded like source mappings); end state = an admin screen in the web console
+  (Epic O candidate). Groom when the web console picks up admin surfaces or when the
+  UNKNOWN backlog (Phase E) makes config-driven rules urgent.
+
+- 2026-07-16 — [bug] **CMDLINE parser gaps found against 6 live production screenshots**
+  (real captures held local-only in internal-local/screenshots/ — mechanism only here) —
+  **EXECUTED same day** (same session, with the cmdline-lineage-review mini-gate; see
+  gate-log): (1) control-keyword stripping (if/then/else/fi — the else-branch MAIN
+  invocation parsed UNKNOWN); (2) abioncloud runScript.sh -g pset payload expansion +
+  nested -run_prog_command_line (+ case-fix: the rule missed runScript.sh); (3) java/.jar
+  rule with re-classification (DPL dt-pipelines-launcher); (4) air CLI rule. Sanitized
+  twins pinned in test_command_parser.py; extractor stable keys in
+  test_lineage_inventory.py. Remaining ingest gap: none known for these three shapes;
+  Phase-E UNKNOWN backlog continues to reveal new launchers.
+
+- 2026-07-16 — [question] **Lineage gate-agenda additions from the live CMDLINE review** —
+  (a)(b)(c)(d) all DECIDED same day at the in-session cmdline-lineage-review mini-gate
+  (gate-log): (a) ETLProcess identity = kind-scoped stable token (pset basename / DPL
+  pipeline GUID); (b) ETLProcess keeps label + kind property (etl|utility|notification);
+  (c) Script stays path-keyed, dupes surface in review; (d) CMDLINE joins the TRIGGERS
+  feeds. m3_* entries REMAIN planned — the live-load gate itself (flips + first curated
+  write over a real extract) is still the parked HITL blocker above. Side finding for K2:
+  FID + SEAL co-located in folder vars (and SEAL embedded in folder names) — a FID→seal
+  reconciliation source candidate for the K2 FID tier.
+
 - 2026-07-14 — [doc] **`drydocs-project-review.md` has no canonical outline** — the new
   whole-project review (docs/design/) renders through the Epic L pipeline but is free-form:
   `doc_outline.py` only validates `docs/design/*-tdd.md`. When L8 introduces the second doc

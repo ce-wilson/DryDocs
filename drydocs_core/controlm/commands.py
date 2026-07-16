@@ -41,8 +41,15 @@ LAUNCHER_REGISTRY: list[tuple[re.Pattern, str, str]] = [
     (re.compile(r"^pmcmd$", re.I),              "INFORMATICA",    "informatica.pmcmd"),
     (re.compile(r"^run_data_validation\.sh$"),  "VALIDATION_UTIL","validation.run_data_validation"),
     (re.compile(r"^run_calp_temp\.sh$"),        "VALIDATION_UTIL","validation.run_calp_temp"),
-    (re.compile(r"^dtlaunch\.sh$"),             "ABINITIO",       "abinitio.dtlaunch_accelerator"),
-    (re.compile(r"runscript\.sh$"),             "SHELL_SCRIPT",   "abioncloud.runscript_wrapper"),
+    # DPL data-pipeline accelerators. SME 2026-07-16 (gate-log cmdline-lineage-review):
+    # DPL is NOT Ab Initio — java zilo ETL framework originally; a -py flag routes to
+    # a java-spark/pyspark framework. Common path /apps/tenants/dpl_utils/dt-accelerators/;
+    # the launcher spelling observed is dt-launcher.sh (dtlaunch.sh kept as a variant).
+    (re.compile(r"^dt-?launch(er)?\.sh$", re.I), "DPL",           "dpl.dt_launcher_accelerator"),
+    (re.compile(r"^dt-pipelines-launcher.*\.jar$", re.I), "DPL",  "dpl.pipelines_launcher_jar"),
+    (re.compile(r"^air$", re.I),                "ABINITIO",       "abinitio.air_cli"),
+    (re.compile(r"^java$", re.I),               "JAVA",           "java.interpreter"),
+    (re.compile(r"runscript\.sh$", re.I),       "SHELL_SCRIPT",   "abioncloud.runscript_wrapper"),
     (re.compile(r"^(spark-submit|pyspark)$"),   "PYSPARK",        "pyspark.spark_submit"),
     (re.compile(r"python[0-9.]*$"),             "PYTHON",         "python.interpreter"),
     (re.compile(r"\.py$"),                      "PYTHON",         "python.script"),
@@ -61,10 +68,16 @@ _FILE_OP_VERBS: dict[str, str] = {
     "chmod": "OTHER", "chown": "OTHER", "ln": "OTHER", "touch": "OTHER",
 }
 # verbs that are neither invocation nor file-op (control/no-op) — skipped
-_NOOP_VERBS = {"cd", "cc", "echo", "ls", "set", "export", "true", "wait", "TZ="}
+_NOOP_VERBS = {"cd", "cc", "echo", "ls", "set", "export", "true", "wait", "TZ=",
+               "fi", "done", "exit", "[[", "]]", "[", "test", ":"}
 # wrapper verbs whose real target is a later token
 _WRAPPER_VERBS = {"sh", "bash", "ksh", "zsh", "csh", "env", "nohup", "exec", "time"}
 _WRAPPER_FLAGS = {"-c", "-e", "-x", "-eu", "-ex", "-l"}
+# shell control keywords that PREFIX a real statement after `;`-splitting
+# (`if [[ $? > 0 ]]; then exit 1;else sh wrapper.sh …;fi` — without stripping,
+# the `else`-prefixed statement carries the job's MAIN invocation but parses
+# UNKNOWN under verb `else`)
+_CONTROL_PREFIX_VERBS = {"if", "then", "else", "elif", "do"}
 
 
 @dataclass(frozen=True)
@@ -199,6 +212,9 @@ def _strip_wrappers(argv: list[str]) -> list[str]:
                 if is_c and out:
                     out = _tokenize(out[0]) + out[1:]
                 changed = True
+        elif head in _CONTROL_PREFIX_VERBS:
+            out = out[1:]
+            changed = True
     return out
 
 
@@ -255,6 +271,18 @@ def parse_invocation_statement(statement: str) -> Invocation | None:
             next((a for a in args if _looks_script(a)), None)
             or next((a for a in args if not a.startswith("-")), None)
         )
+    elif itype == "JAVA":
+        # the launched artifact is the first .jar token (-D*/-jar flags skipped);
+        # re-classify on the jar basename so registered launchers (the DPL
+        # dt-pipelines-launcher) win over generic JAVA
+        script_path = next((a for a in args if a.lower().endswith(".jar")), None)
+        if script_path:
+            jtype, jrule = classify_executable(script_path)
+            if jtype != "UNKNOWN":
+                itype, rule = jtype, jrule
+    elif rule == "abinitio.air_cli":
+        # `air sandbox run /path/graph.pset …` — the target follows the subcommands
+        script_path = next((a for a in args if _looks_script(a)), None)
     elif re.search(r"\.(sh|ksh|bash|pl|m|py|pset)$", _basename(verb)):
         script_path = verb
     # for Ab Initio launched via a wrapper (run_calp_temp.sh foo.m), surface
@@ -330,6 +358,53 @@ def extract_container_command(value: str) -> str | None:
     return " ".join(e for e in elements if e and e != "/bin/sh") or None
 
 
+# wrapper launchers whose REAL payload rides an argument flag: the abioncloud
+# runScript.sh wrapper carries its Ab Initio pset (plus an optional nested
+# -run_prog_command_line script) inside the quoted -g value. Without expansion
+# every wrapper job collapses onto the same wrapper node — the pset that
+# discriminates the workload never surfaces (SME session 2026-07-16).
+_WRAPPER_PAYLOAD_FLAGS: dict[str, str] = {"abioncloud.runscript_wrapper": "-g"}
+_NESTED_COMMAND_FLAGS = {"-run_prog_command_line"}
+
+
+def _expand_wrapper_payload(inv: Invocation) -> list[Invocation]:
+    """Surface a registered wrapper's payload: the .pset/.m inside the payload
+    flag becomes the invocation's script (type ABINITIO; the wrapper stays
+    executable_path), and a nested -run_prog_command_line target becomes its
+    own Invocation. Non-wrapper invocations pass through unchanged."""
+    flag = _WRAPPER_PAYLOAD_FLAGS.get(inv.classifier_rule or "")
+    if not flag:
+        return [inv]
+    payload = next(
+        (inv.args[i + 1] for i, a in enumerate(inv.args)
+         if a == flag and i + 1 < len(inv.args)),
+        None,
+    )
+    if not payload:
+        return [inv]
+    tokens = _tokenize(payload)
+    out = inv
+    pset = next((t for t in tokens if t.endswith((".pset", ".m"))), None)
+    if pset:
+        out = Invocation(
+            invocation_type="ABINITIO",
+            executable_path=inv.executable_path,
+            script_path=pset[:1000],
+            config_path=inv.config_path,
+            args=inv.args,
+            raw_command=inv.raw_command,
+            is_classified=True,
+            classifier_rule="abioncloud.runscript_wrapper.pset_payload",
+        )
+    expanded = [out]
+    for i, t in enumerate(tokens):
+        if t in _NESTED_COMMAND_FLAGS and i + 1 < len(tokens):
+            nested = parse_invocation_statement(tokens[i + 1])
+            if nested is not None:
+                expanded.append(nested)
+    return expanded
+
+
 def parse_command(command: str) -> ParsedCommand:
     """Parse a full (resolved) command line into invocations + file ops.
     Unclassifiable non-trivial statements are collected in ``unparsed``."""
@@ -342,7 +417,8 @@ def parse_command(command: str) -> ParsedCommand:
         inv = parse_invocation_statement(stmt)
         if inv is None:
             continue
-        result.invocations.append(inv)
-        if not inv.is_classified:
-            result.unparsed.append(stmt)
+        for expanded in _expand_wrapper_payload(inv):
+            result.invocations.append(expanded)
+            if not expanded.is_classified:
+                result.unparsed.append(expanded.raw_command)
     return result

@@ -260,3 +260,89 @@ def test_invocation_target_prefers_script_then_executable() -> None:
     assert spark.target == "/opt/spark/refine_loans.py"      # script wins over exe
     mod = parse_command("python -m mypkg.run").invocations[0]
     assert mod.target == "mypkg.run"
+
+
+# --- live-pattern coverage (SME session 2026-07-16, gate-log cmdline-lineage- --
+# review). Sanitized mechanism-twins of three production command shapes: the
+# abioncloud wrapper, the DPL java launcher, and a compound if/else command.
+
+def test_compound_if_else_surfaces_all_invocations() -> None:
+    """`ksh check; if…else sh wrapper…;fi` — the else-prefixed statement carries
+    the MAIN invocation; control keywords must not swallow it, and the wrapper's
+    -g pset payload (plus its nested -run_prog_command_line script) must surface."""
+    cmd = (
+        "ksh /data/sandboxes/app/bin/etl_ctl_file_check.ksh 20260101 team@example.com ; "
+        "if [[ $? > 0 ]]; then exit 1;"
+        "else sh /apps/wrapper/script/runScript.sh -c /cfg/app-unld-config.json "
+        "-f F000000 -e prod -a img -p TAG "
+        '-g "/home/svc/pset/ctl_script_exec_send_email.pset -KSH_EXEC_FLAG Y '
+        "-run_prog_command_line /home/svc/bin/etl_ctl_file_check.ksh "
+        '-TO_MAIL team@example.com" -s 30 -t 3600 -r large;fi'
+    )
+    parsed = parse_command(cmd)
+    assert parsed.unparsed == []                       # nothing UNKNOWN
+    got = [(i.invocation_type, i.script_path) for i in parsed.invocations]
+    assert got == [
+        ("SHELL_SCRIPT", "/data/sandboxes/app/bin/etl_ctl_file_check.ksh"),
+        ("ABINITIO", "/home/svc/pset/ctl_script_exec_send_email.pset"),
+        ("SHELL_SCRIPT", "/home/svc/bin/etl_ctl_file_check.ksh"),
+    ]
+    # the wrapper stays visible as the executable behind the pset invocation
+    wrapper = parsed.invocations[1]
+    assert wrapper.executable_path.endswith("runScript.sh")
+    assert wrapper.classifier_rule == "abioncloud.runscript_wrapper.pset_payload"
+    assert wrapper.config_path == "/cfg/app-unld-config.json"
+
+
+def test_wrapper_pset_payload_standard_shape() -> None:
+    """The standard team pattern: runScript.sh (case-insensitive match) with the
+    pset in -g. Without payload expansion every wrapper job collapses onto the
+    same wrapper node."""
+    cmd = (
+        "sh /apps/wrapper/script/runScript.sh -c /cfg/app-config.json -f F000000 "
+        '-e prod -a img -p TAG -g "/home/svc/pset/table_ingestion_sf.pset '
+        '-AB_EXPECTED_RECORD_MBYTES 70" -s 30 -t 3600 -r large'
+    )
+    inv, = parse_command(cmd).invocations
+    assert inv.invocation_type == "ABINITIO"
+    assert inv.script_path == "/home/svc/pset/table_ingestion_sf.pset"
+    assert inv.target == "/home/svc/pset/table_ingestion_sf.pset"
+
+
+def test_dpl_pipelines_launcher_jar_classifies_dpl() -> None:
+    """java -jar dt-pipelines-launcher…jar re-classifies from generic JAVA to DPL
+    (DPL is NOT Ab Initio — SME 2026-07-16); config JSON captured."""
+    cmd = (
+        "java -Djava.io.tmpdir=/tmp/svc -jar -Dspring.profiles.active=prod "
+        "/apps/tenants/dpl_utils/dt-accelerators/dt-pipelines-launcher-current.jar "
+        "-pipeline 00000000-0000-0000-0000-000000000000 -appName app-prod "
+        "-dataflow DATASET_NM -conf /cfg/epv-conf.json"
+    )
+    inv, = parse_command(cmd).invocations
+    assert inv.invocation_type == "DPL"
+    assert inv.classifier_rule == "dpl.pipelines_launcher_jar"
+    assert inv.script_path.endswith("dt-pipelines-launcher-current.jar")
+    assert inv.config_path == "/cfg/epv-conf.json"
+
+
+def test_dt_launcher_sh_classifies_dpl_both_spellings() -> None:
+    for launcher in ("dt-launcher.sh", "dtlaunch.sh"):
+        inv, = parse_command(
+            f"sh /apps/tenants/dpl_utils/dt-accelerators/{launcher} -py job_conf"
+        ).invocations
+        assert inv.invocation_type == "DPL", launcher
+        assert inv.classifier_rule == "dpl.dt_launcher_accelerator"
+
+
+def test_generic_java_jar_stays_java() -> None:
+    inv, = parse_command("java -jar /apps/thing/tool.jar -x 1").invocations
+    assert inv.invocation_type == "JAVA"
+    assert inv.script_path == "/apps/thing/tool.jar"
+    assert inv.target == "/apps/thing/tool.jar"
+
+
+def test_air_sandbox_run_classifies_abinitio() -> None:
+    inv, = parse_command("air sandbox run /sandbox/project/mygraph.pset").invocations
+    assert inv.invocation_type == "ABINITIO"
+    assert inv.classifier_rule == "abinitio.air_cli"
+    assert inv.script_path == "/sandbox/project/mygraph.pset"

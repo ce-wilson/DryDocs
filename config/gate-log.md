@@ -371,3 +371,42 @@ records the date, the item, confirmed / edited / rejected counts, and reasons fo
   its audit-fields stub, LEDGER_PENDING entry, and the registry gate-state test pin; the §B
   coverage invariant joined graph_verify as `graph-tests/seal-attribution-coverage.yaml`.
   Backlog **K2 → done** (build scope; the live load is a Track-2 / company-graph concern).
+
+## 2026-07-16 — `cmdline-lineage-review` (in-session SME mini-gate: live CMDLINE patterns vs the planned m3_* lineage chain)
+
+- **Trigger:** SME supplied 6 production folder/job screenshots (held local-only,
+  `internal-local/screenshots/`) covering three invocation shapes: the abioncloud
+  `runScript.sh` wrapper (-g pset), the DPL `dt-pipelines-launcher` jar (java -jar,
+  -pipeline GUID + -dataflow), and a compound `ksh check; if…else sh wrapper…;fi`.
+  Question: does the planned INVOKES → TRIGGERS → READS_FROM/WRITES_TO chain hold?
+- **Verdict: the chain HOLDS — no edge-semantics change.** All four m3_* entries
+  REMAIN `status: planned`; the live-load gate (planned→active flips + first curated
+  write against a real extract) is still pending and unchanged.
+- **§a — DECIDED: ETLProcess keeps its label + gains a `kind` property**
+  (etl | utility | notification). Utility psets exist (script-exec/send-email);
+  label rename (ManagedProcess) deliberately rejected for now — revisit at v1.0.
+- **§b — DECIDED: ETLProcess identity = kind-scoped stable token** — Ab Initio
+  pset/graph basename (sandbox mounts vary by env), DPL pipeline GUID (dataflow
+  name + config JSON as properties). Implemented same day in the inventory
+  extractor's `_stable_invocation_key` (test-pinned).
+- **§c — DECIDED: Script identity stays PATH-keyed; duplicates surface, never
+  auto-merge.** Live case: one logical .ksh at two mounts. Same-basename
+  multi-path Scripts flag in lineage-review for SME merge via the curation ladder.
+- **§d — DECIDED: DPL is its own invocation_type, NOT Ab Initio** (corrects the
+  seeded `abinitio.dtlaunch_accelerator` rule). SME facts recorded: common path
+  /apps/tenants/dpl_utils/dt-accelerators/, launcher spelling `dt-launcher.sh`
+  (dtlaunch.sh kept as variant), originally the java zilo ETL framework, `-py`
+  routes to a java-spark/pyspark framework. Feeds the PENDING plan-07 P3
+  software-usage-patterns gate as a decided row.
+- **§e — NOTE AMENDMENT:** the CMDLINE itself is a first-class TRIGGERS feed
+  (-g pset / -pipeline GUID) alongside Informatica/Ab Initio/DPL metadata.
+- **Requirement captured (not built):** the launcher registry must become
+  human-configurable (SME: admin screen candidate for the web console) — IDEAS.
+- **Code landed same day (no gate needed — parser/staging layer):** control-keyword
+  stripping (if/then/else/fi — the else-branch main invocation was parsing UNKNOWN),
+  abioncloud -g pset payload expansion (+ nested -run_prog_command_line), case-fix
+  on the runScript.sh rule, java/.jar extraction with re-classification, `air` CLI
+  rule, DPL rules, extractor stable keys. Sanitized mechanism-twins pinned in
+  test_command_parser.py + test_lineage_inventory.py.
+- **Side finding for K2:** FID + SEAL co-located in folder variables (SEAL also
+  embedded in folder names) — a FID→seal reconciliation source candidate (IDEAS).

@@ -729,6 +729,11 @@ local_relationships:
     note: >
       Job command line invokes a script/JAR (CMDLINE / MEMNAME; Jar Path +
       Task Json Path). Matrix row: Activity → Entity = USED.
+      2026-07-16 SME session (gate-log cmdline-lineage-review): cardinality is
+      1..n per job (compound if/else commands carry multiple invocations, incl.
+      wrapper payloads); Script identity stays PATH-keyed — same-basename
+      multi-mount duplicates surface in lineage-review for SME merge, never
+      auto-merged.
     supplement:   ontology_supplement.cypher
     loader:       ~
     domain:       controlm
@@ -745,7 +750,15 @@ local_relationships:
       prov:wasStartedBy flows Activity → Entity (ETLProcess wasStartedBy
       Script); the graph edge runs the INVERSE direction for query
       ergonomics. Treat TRIGGERS as inverse-of wasStartedBy.
-      Feed: Informatica / Ab Initio / DPL metadata.
+      Feed: Informatica / Ab Initio / DPL metadata — AND the CMDLINE itself
+      (2026-07-16 SME session, gate-log cmdline-lineage-review: the abioncloud
+      wrapper's -g <pset> and the DPL launcher's -pipeline <GUID> -dataflow
+      name the TRIGGERS target directly). Same session: ETLProcess KEEPS its
+      label and gains a kind property (etl|utility|notification — utility
+      psets exist, e.g. script-exec/send-email); identity = kind-scoped stable
+      token (pset basename / DPL pipeline GUID; mount paths vary by env and
+      stay properties). DPL is NOT Ab Initio (own invocation_type; java zilo
+      framework originally, -py routes to spark/pyspark).
     supplement:   ontology_supplement.cypher
     loader:       ~
     domain:       controlm
