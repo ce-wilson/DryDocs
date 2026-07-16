@@ -187,3 +187,36 @@ def test_no_parse_code_of_its_own() -> None:
             if isinstance(node, ast.Name) and node.id == "LAUNCHER_REGISTRY":
                 offenders.append(f"{path.name}: LAUNCHER_REGISTRY")
     assert not offenders, offenders
+
+
+def test_stable_invocation_keys_dpl_guid_and_pset_basename(tmp_path) -> None:
+    """SME session 2026-07-16 (gate-log cmdline-lineage-review): process identity
+    uses the env-stable token — DPL launches key by -pipeline GUID (the launcher
+    jar is shared tooling), Ab Initio psets key by basename (the same graph sits
+    at different sandbox mounts per env). Plain scripts stay PATH-keyed so
+    multi-mount duplicates surface in review, never auto-merge."""
+    csv_path = tmp_path / "jobs.csv"
+    dpl_cmd = (
+        "java -jar /apps/tenants/dpl_utils/dt-accelerators/dt-pipelines-launcher-current.jar"
+        " -pipeline 00000000-0000-0000-0000-000000000000 -dataflow DS_NM -conf /cfg/c.json"
+    )
+    csv_path.write_text(
+        "job_id,folder_id,job_name,parent_table,owner,node_id,cmd_line,is_current_version\n"
+        f'1,10,JOB_DPL,F1,svc.x,h1,"{dpl_cmd}",Y\n'
+        '2,10,JOB_PSET_DEV,F1,svc.x,h1,"sh /apps/w/runScript.sh -g ""/dev/mnt/ing.pset -F 1""",Y\n'
+        '3,10,JOB_PSET_PRD,F1,svc.x,h1,"sh /apps/w/runScript.sh -g ""/prd/mnt/ing.pset -F 1""",Y\n'
+        "4,10,JOB_SH_A,F1,svc.x,h1,ksh /data/mnt/check.ksh,Y\n"
+        "5,10,JOB_SH_B,F1,svc.x,h1,ksh /home/mnt/check.ksh,Y\n",
+        encoding="utf-8",
+    )
+    g = LineageGraph()
+    ControlMInventoryExtractor().extract(csv_path, g)
+    child_ids = {pid for pid in g.processes if not pid.startswith("proc#controlm_job:")}
+    assert child_ids == {
+        "proc#dpl:00000000-0000-0000-0000-000000000000",  # GUID, not the jar path
+        "proc#abinitio:ing.pset",                          # basename: dev+prod converge
+        "proc#shell_script:/data/mnt/check.ksh",           # scripts stay path-keyed:
+        "proc#shell_script:/home/mnt/check.ksh",           # dupes surface for SME merge
+    }
+    # full paths retained as properties on the converged pset node
+    assert g.processes["proc#abinitio:ing.pset"].path.endswith("ing.pset")

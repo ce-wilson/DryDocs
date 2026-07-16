@@ -1,0 +1,64 @@
+# SME gate-prompt spec — the K2 job→app edge SHAPE reshape (the K3 §F deferral, now DUE
+# after K4 applied the BusinessApplication reclass). Prepared with the SME not present —
+# this page STOPS at the gate: no vocabulary re-shape, no map flip, no loader rename until
+# §D is signed. The K2 match POLICY (signed off 2026-07-14) is shape-agnostic and is NOT
+# re-opened here. Mechanism-only: no real folder/job/SEAL values.
+classification: Internal-Public
+schema: drydocs.gate-prompt.v1
+id: seal-app-ref-edge-reshape
+title: "SME Gate — job→BusinessApplication attribution edge re-shape (K3 §F deferral)"
+step: "Resolves the deferred K2 edge shape now that :BusinessApplication is prov:Entity / dprod:DataProduct (K4, 2026-07-15)"
+summary: >
+  The ACTIVE K2 edge (:ControlMJob)-[:WAS_ASSOCIATED_WITH {role: seal_app_ref}]->
+  (:BusinessApplication) required an Agent target (Activity → Agent =
+  prov:wasAssociatedWith). K4 reclassed the app node to prov:Entity /
+  dprod:DataProduct, so the shape no longer type-checks — the standing rider on
+  m3_seal_app_ref / job-seal-app-ref (gate-log 2026-07-10 §F DEFERRED; 2026-07-14 K2
+  §D/§E confirmed-with-rider). Every candidate keeps the confirmed match policy, the
+  edge properties (first_seen_at / source / match_method / last_seen_at / last_run_id),
+  role=seal_app_ref, and the MATCH-only endpoint discipline. Until sign-off the active
+  shape stands with its documented rider.
+meta:
+  Module: "drydocs-load · seal_attribution loader + manual tier-5 writer (K2 build, 2026-07-14)"
+  Source: "graph-shape decision only — no new source object; edge feeds from STG_APP_FACT (fact_type SEAL) as gated 2026-07-14"
+  Registry ref: "stg-app-fact — confirmed (config/source-registry.yaml, K2 build); unchanged by this gate"
+  Classification: "Internal (source data) · this page Internal-Public (mechanism only)"
+  Vocabulary: "drydocs_core/ontology/relationship_vocabulary.yaml m3_seal_app_ref (active, rider)"
+  Ontology map: "config/taxonomy-ontology-map.yaml job-seal-app-ref (confirmed; type_conflict_note + proposed_reshape carry the two candidates)"
+  Related gates: "seal-tom-attribution-reshape §F (2026-07-10, DEFERRED here); seal-attribution-match-policy (2026-07-14, NOT re-opened)"
+  Company impact: "T1 live load re-run after migration; edges MERGE idempotently"
+mapping:
+  - n: 1
+    element: "Candidate (a) — local domain edge  [AGENT RECOMMENDATION]"
+    target: "(:ControlMJob)-[:BELONGS_TO_APPLICATION {role: seal_app_ref, …props kept}]->(:BusinessApplication)"
+    edge: "prov_maps_to: ~  [PROPOSED — 'job belongs to this business application' is a governance/containment fact; SCHEDULED_ON / arch_contains_batch precedent; keeps the app record OUT of PROV lineage traversals]"
+  - n: 2
+    element: "Candidate (b) — stay inside PROV"
+    target: "(:ControlMJob)-[:USED {role: seal_app_ref}]->(:BusinessApplication)"
+    edge: "prov:used (Activity → Entity)  [PROPOSED — type-checks cleanly, but semantically claims runtime consumption of the app record and mixes it into lineage walks alongside conditions/files]"
+  - n: 3
+    element: "Migration of already-loaded edges"
+    target: "idempotent migrate cypher rewrites type, keeps ALL properties (the migrate_develops precedent)"
+    edge: "—  [follow-up commit with the rename, per §C]"
+provenance:
+  - label: "job→app attribution edge (shape under decision)"
+    source_object: "STG_APP_FACT (fact_type SEAL) — the Control-M variable-normalization stream; unchanged by this gate"
+    key: "job (folder_id, job_id) node key ↔ BusinessApplication seal_id, per the 2026-07-14 match policy"
+    loader: "drydocs/loaders/seal_attribution.py + seal_attribution.cypher (built; renamed on sign-off) · manual tier-5: manual_loads.py"
+    properties:
+      - {name: edge_type, origin: derived, from: "this gate's §A decision — BELONGS_TO_APPLICATION (n:1) or USED (n:2)", note: "the only thing this gate changes"}
+      - {name: role, origin: derived, from: "constant seal_app_ref", note: "kept verbatim across the re-shape"}
+      - {name: match_method, origin: derived, from: "match-policy tier that resolved the fact (gate 2026-07-14)", note: "unchanged"}
+      - {name: seal_id, origin: source, from: "STG_APP_FACT.fact_value (fact_type SEAL)", note: "unchanged; never raw job.APPLICATION"}
+
+sections:
+  - title: "A. Shape decision"
+    confirmations:
+      - "Pick mapping n:1 (local domain edge, agent recommendation) or n:2 (prov:used) — or name a third shape (e.g. an inverse edge from the app side). The decision applies to BOTH the automated loader edge and the manual tier-5 writer (SUPPORTED_SHAPE) — one shape, everywhere."
+      - "The confirmed match policy (one-to-one at top tier / coverage surfacing / deterministic triage) carries over UNCHANGED — this gate touches only the edge type + PROV term."
+  - title: "B. Migration"
+    confirmations:
+      - "Already-loaded WAS_ASSOCIATED_WITH {role: seal_app_ref} edges are migrated by an idempotent cypher that preserves every property; the company re-runs the T1 live load afterwards (edges MERGE idempotently, newly-resolvable jobs attribute on the re-run)."
+  - title: "C. Follow-through on sign-off"
+    confirmations:
+      - "One logged change: m3_seal_app_ref re-shaped in the vocabulary; map entry job-seal-app-ref updated (type_conflict_note/proposed_reshape retired into the decision record); loaders renamed (seal_attribution.cypher, manual_seal_attribution.cypher, manual_loads SUPPORTED_SHAPE + TEMPLATE, graph-tests coverage suite); port-prompt step added; drift guards green."

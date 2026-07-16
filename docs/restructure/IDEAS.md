@@ -26,12 +26,47 @@ Tags help grooming: `idea` · `bug` · `doc` · `source` (new data source) · `q
 
 <!-- add new ideas at the top -->
 
+- 2026-07-16 — [idea] **Launcher registry should be human-configurable** (SME requirement
+  captured at the cmdline-lineage-review mini-gate): LAUNCHER_REGISTRY in
+  drydocs_core/controlm/commands.py is code-resident; teams add wrappers/variables
+  faster than code releases. First step = a config-file registry (config/ pattern,
+  test-guarded like source mappings); end state = an admin screen in the web console
+  (Epic O candidate). Groom when the web console picks up admin surfaces or when the
+  UNKNOWN backlog (Phase E) makes config-driven rules urgent.
+
+- 2026-07-16 — [bug] **CMDLINE parser gaps found against 6 live production screenshots**
+  (real captures held local-only in internal-local/screenshots/ — mechanism only here) —
+  **EXECUTED same day** (same session, with the cmdline-lineage-review mini-gate; see
+  gate-log): (1) control-keyword stripping (if/then/else/fi — the else-branch MAIN
+  invocation parsed UNKNOWN); (2) abioncloud runScript.sh -g pset payload expansion +
+  nested -run_prog_command_line (+ case-fix: the rule missed runScript.sh); (3) java/.jar
+  rule with re-classification (DPL dt-pipelines-launcher); (4) air CLI rule. Sanitized
+  twins pinned in test_command_parser.py; extractor stable keys in
+  test_lineage_inventory.py. Remaining ingest gap: none known for these three shapes;
+  Phase-E UNKNOWN backlog continues to reveal new launchers.
+
+- 2026-07-16 — [question] **Lineage gate-agenda additions from the live CMDLINE review** —
+  (a)(b)(c)(d) all DECIDED same day at the in-session cmdline-lineage-review mini-gate
+  (gate-log): (a) ETLProcess identity = kind-scoped stable token (pset basename / DPL
+  pipeline GUID); (b) ETLProcess keeps label + kind property (etl|utility|notification);
+  (c) Script stays path-keyed, dupes surface in review; (d) CMDLINE joins the TRIGGERS
+  feeds. m3_* entries REMAIN planned — the live-load gate itself (flips + first curated
+  write over a real extract) is still the parked HITL blocker above. Side finding for K2:
+  FID + SEAL co-located in folder vars (and SEAL embedded in folder names) — a FID→seal
+  reconciliation source candidate for the K2 FID tier. RECONCILE at the 07-16 merge: the
+  07-15 lineage vocab gate (other machine) had already CONFIRMED all four shapes and
+  named CMDLINE the primary TRIGGERS feed — the two sessions agree; (a) resolves that
+  gate's ETLProcess business-key residual (see the two 07-15 lines below).
+
 - 2026-07-15 — [idea] **ETLProcess identity + writer endpoint class (m3_triggers loader
   blockers).** The lineage vocab gate (config/gate-log.md 2026-07-15) confirmed
   Script → ETLProcess TRIGGERS, derivable from the .ksh wrapper's CMD_LINE parameters
   (Informatica / Ab Initio / DPL). Before any loader: decide the ETLProcess business key
   (platform + workflow/graph/pipeline name from parameters?) and add an `etl` endpoint
   class to `drydocs_lineage.writer` (today every non-job process maps to :Script).
+  UPDATE 2026-07-16 (cmdline-lineage-review): the business key is DECIDED — kind-scoped
+  stable token (pset basename / DPL pipeline GUID), implemented extractor-side
+  (_stable_invocation_key). REMAINING for this line: the writer's `etl` endpoint class.
 
 - 2026-07-15 — [idea] **Writer file-ops resolution: attribute script-level READS_FROM /
   WRITES_TO to the owning ControlMJob via INVOKES.** Same gate: for wrappers that are pure
@@ -134,12 +169,15 @@ Tags help grooming: `idea` · `bug` · `doc` · `source` (new data source) · `q
   Port B git-readme §6 (clean-adds / Canonical-COMPANY connector wiring / company
   supplements: blocked vendor fetches, Graph-API creds, Enterprise multi-DB target).
   Heads-up bullet added to git-readme.md. Groom phases P1–P3 to backlog after the P0
-  benchmark verdict; ADR 0004 is the P1 gate output. The four T1–T4 tier lines were folded
+  benchmark verdict; the docmeta ADR is the P1 gate output — **number correction 2026-07-16**:
+  the plan reserved "ADR 0004" (2026-07-06) but 0004 was minted the next day for the
+  software-registry terminology ADR (accepted 2026-07-07); the docmeta ADR takes the next
+  free number at authoring (plan doc's 3 refs annotated same day). The four T1–T4 tier lines were folded
   INTO this sequenced plan (P0→P7) and moved to the audit trail (2026-07-09). P0's corpus
   load is already substantially executed: the bmc-docs lexical loader (Document→Chunk,
   llm-graph-builder pattern) shipped and gate `bmc-docs-lexical-load` was ACCEPTED 13/13,
   LOADED LIVE (commits 12423f4/24d6a4b) — the WRITTEN benchmark verdict (traversal vs
-  manifest-routed markdown vs vector RAG) + ADR 0004 still remain before P1–P3 promote.
+  manifest-routed markdown vs vector RAG) + the docmeta ADR still remain before P1–P3 promote.
 - 2026-07-03 — [chore] the local `neo4j-drydocs-ee` Docker container's password is literally the
   string `<password>` (copy-paste artifact at creation). Fine for sandbox; change it before
   anything less throwaway. (Found while wiring web/ + agents/ to it.)- 2026-07-03 — [question] LLM key strategy for the ADK agents (core_ingest, controlm_fix):
@@ -153,6 +191,32 @@ Tags help grooming: `idea` · `bug` · `doc` · `source` (new data source) · `q
 ## Recently groomed (audit trail)
 
 <!-- when you promote an idea, move its line here with the resulting backlog id -->
+
+- 2026-07-16 groom run (weekly inbox groom) — 0 promoted / 0 merged / 1 kept-updated;
+  backlog database untouched (summary/next_ready stand as of 2026-07-15):
+  - kept-updated: the docmeta plan line — **ADR number collision found + corrected**: the
+    plan (2026-07-06) reserved "ADR 0004" for its P1 gate output, but 0004 was minted the
+    next day as `0004-software-registry-vendor-terminology.md` (accepted 2026-07-07). The
+    docmeta ADR now takes the next free number at authoring; the plan doc's 3 stale refs
+    (`knowledge/upgrade-plans/docmeta-component.md` §1.1, P1 phase row, port table)
+    annotated in the same commit.
+  - gate checks run against the repo this pass: L8 still `todo` → project-review outline
+    stays parked; docmeta P0 WRITTEN verdict still absent (only the ADR number changed);
+    ADR 0005 ratified + O1/O3/O6 done ≠ any parked trigger.
+  - kept parked, unchanged (each on its recorded gate): drydocs-project-review outline
+    (L8), K2 FID/ALIAS reconciliation tables (company-side sources), ctlm_id ripple checks
+    (internal-side), dry-docs.com visual seed (website not started), /documentation
+    whitepaper type (trigger unfired), lineage live-load gate (HITL scheduling),
+    remediation next slices (TDD §6/§7), Phase C packaging (plan gate), Workbench
+    (entitlement), SchedulerKind → AisCapability/AiTool (SME class definitions), BRD
+    outline (later phase), docmeta P1–P3 (P0 verdict + the renumbered ADR), EE container
+    password (user deferred), LLM key strategy (open question), common/ in /list-apps
+    (cosmetic), cli.py regroup (v1.0 window).
+  - observation (no action): untracked UI-WIP/ website material (WEBSITE-IDEAS.MD,
+    gemini-wire-frame.md, landing PNGs, icons.md) predates the 07-13 re-inbox of the
+    dry-docs.com line and is its seed corpus when that gate fires; console-side UI-WIP
+    files are O-epic surfaces. Root-level JPMC annual-report PDFs also untracked
+    (data-context-extractor inputs — house them or gitignore at next touch).
 
 - 2026-07-15 pm groom (on feat/k4-businessapplication-reshape) — 2 promoted, both
   same-day findings from the O6 session's first live EE bootstrap:

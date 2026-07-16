@@ -76,6 +76,28 @@ class ExtractCoverage:
         )
 
 
+def _stable_invocation_key(inv, target: str) -> str:
+    """Env-stable identity token for an invoked artifact (SME session
+    2026-07-16, gate-log ``cmdline-lineage-review``): a DPL launch is keyed by
+    its ``-pipeline`` GUID (the jar path is shared tooling, the GUID names the
+    workload); an Ab Initio pset/graph is keyed by basename (sandbox mount
+    paths vary dev/uat/prod for the same graph). Everything else keeps the
+    full target; full paths stay on ProcessNode.path either way. Scripts stay
+    PATH-keyed on purpose — same-basename multi-mount Script duplicates
+    surface in lineage-review for SME merge, never auto-merged."""
+    if inv.invocation_type == "DPL":
+        guid = next(
+            (inv.args[i + 1] for i, a in enumerate(inv.args)
+             if a == "-pipeline" and i + 1 < len(inv.args)),
+            None,
+        )
+        if guid:
+            return guid
+    if inv.invocation_type == "ABINITIO" and target.endswith((".pset", ".m")):
+        return _basename(target)
+    return target
+
+
 def _basename(path: str) -> str:
     return path.replace("\\", "/").rstrip("/").split("/")[-1] or path
 
@@ -161,7 +183,7 @@ class ControlMInventoryExtractor:
                 coverage.invocations_no_target += 1
                 continue
             kind = inv.invocation_type.lower()
-            cid = process_id(kind, target)
+            cid = process_id(kind, _stable_invocation_key(inv, target))
             into.add_process(ProcessNode(
                 node_id=cid,
                 kind=kind,

@@ -757,6 +757,11 @@ local_relationships:
       drydocs_lineage.extractors.controlm_inventory (job → invoked
       artifact via the shared core parser); writer MATCHes ControlMJob on
       the NODE KEY, MERGEs Script on path.
+      2026-07-16 SME session (gate-log cmdline-lineage-review): cardinality is
+      1..n per job (compound if/else commands carry multiple invocations, incl.
+      wrapper payloads); Script identity stays PATH-keyed — same-basename
+      multi-mount duplicates surface in lineage-review for SME merge, never
+      auto-merged.
     supplement:   ontology_supplement.cypher
     loader:       ~
     domain:       controlm
@@ -780,13 +785,20 @@ local_relationships:
       Activity, never a TRIGGERS edge.) DIRECTION NOTE: prov:wasStartedBy
       flows Activity → Entity (ETLProcess wasStartedBy Script); the graph
       edge runs the INVERSE direction for query ergonomics. Treat TRIGGERS
-      as inverse-of wasStartedBy. Loader blocked on the gate-log
-      residuals: the ETLProcess business key (platform + workflow/graph/
-      pipeline name from wrapper parameters — no identity, no loader) and
-      an ETLProcess endpoint class in drydocs_lineage.writer (it currently
-      maps every non-job process to :Script). Feed: CMD_LINE wrapper
-      parameters (primary); Informatica / Ab Initio / DPL metadata
-      (enrichment).
+      as inverse-of wasStartedBy. Feed: CMD_LINE wrapper parameters
+      (primary); Informatica / Ab Initio / DPL metadata (enrichment).
+      2026-07-16 SME session (gate-log cmdline-lineage-review, run against 6
+      live captures): the business-key residual is RESOLVED — ETLProcess
+      identity = kind-scoped stable token (Ab Initio pset/graph BASENAME,
+      mount paths vary by env and stay properties; DPL -pipeline GUID with
+      dataflow + config JSON as properties), implemented extractor-side in
+      controlm_inventory._stable_invocation_key. ETLProcess KEEPS its label
+      and gains a kind property (etl|utility|notification — utility psets
+      exist, e.g. script-exec/send-email). DPL is NOT Ab Initio (own
+      invocation_type; java zilo framework originally, -py routes to
+      spark/pyspark). Remaining loader blocker: the ETLProcess endpoint
+      class in drydocs_lineage.writer (every non-job process still maps
+      to :Script).
     supplement:   ontology_supplement.cypher
     loader:       ~
     domain:       controlm
