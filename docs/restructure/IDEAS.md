@@ -26,6 +26,20 @@ Tags help grooming: `idea` · `bug` · `doc` · `source` (new data source) · `q
 
 <!-- add new ideas at the top -->
 
+- 2026-07-15 — [idea] **ETLProcess identity + writer endpoint class (m3_triggers loader
+  blockers).** The lineage vocab gate (config/gate-log.md 2026-07-15) confirmed
+  Script → ETLProcess TRIGGERS, derivable from the .ksh wrapper's CMD_LINE parameters
+  (Informatica / Ab Initio / DPL). Before any loader: decide the ETLProcess business key
+  (platform + workflow/graph/pipeline name from parameters?) and add an `etl` endpoint
+  class to `drydocs_lineage.writer` (today every non-job process maps to :Script).
+
+- 2026-07-15 — [idea] **Writer file-ops resolution: attribute script-level READS_FROM /
+  WRITES_TO to the owning ControlMJob via INVOKES.** Same gate: for wrappers that are pure
+  unix file ops (move, gzip), the type-correct Activity is the job, not the Script
+  (prov:Entity). `drydocs_lineage.writer` currently plans script→asset edges from imported
+  depgraph exports — needs a resolution hop before the curated-load build flips the
+  vocabulary active.
+
 - 2026-07-15 — [bug] **`Neo4jClient.run_script` inherits APOC's comment-`;` split.**
   `apoc.cypher.runMany` splits on every end-of-line `;`, including inside `//` comments;
   Neo4j 2026.x/Cypher 25 then rejects the comment-only fragment as an empty statement

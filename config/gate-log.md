@@ -371,3 +371,39 @@ records the date, the item, confirmed / edited / rejected counts, and reasons fo
   its audit-fields stub, LEDGER_PENDING entry, and the registry gate-state test pin; the §B
   coverage invariant joined graph_verify as `graph-tests/seal-attribution-coverage.yaml`.
   Backlog **K2 → done** (build scope; the live load is a Track-2 / company-graph concern).
+
+## 2026-07-15 — Lineage rel vocabulary gate (G9 writer set) — CONFIRMED, reads/writes shapes EDITED
+
+- **Scope:** the four gate-bound entries the `drydocs_lineage` curated writer needs —
+  `m3_invokes`, `m3_triggers`, `m3_reads_from`, `m3_writes_to`. In-session review, no
+  `config/gate-prompts/` spec (transcribed per the audit-trail §; chad.wilson, 2026-07-15).
+  All four PAUSED per routing rules (open questions); none batched.
+- **SME caveat (recorded — it drives the shapes):** the common case is one `.ksh` shell
+  wrapper — the INVOKES target — that triggers the Informatica / Ab Initio / DPL process,
+  passing the parameters those jobs need on CMD_LINE; the other case is a wrapper of pure
+  unix file operations (move, gzip) with no ETL engine involved.
+- **m3_invokes — CONFIRMED as registered** (ControlMJob → Script, prov:used). Registry,
+  writer, extractor, and matrix all agree; the only shape the component produces today.
+- **m3_triggers — CONFIRMED as registered** (Script → ETLProcess, inverse-of
+  prov:wasStartedBy). The caveat validates the shape; TRIGGERS candidates are derivable
+  from CMD_LINE wrapper parameters (primary feed) with ETL metadata as enrichment.
+  **Residuals (loader blockers):** the ETLProcess business key (platform + workflow/graph/
+  pipeline name from wrapper parameters) and an ETLProcess endpoint class in
+  `drydocs_lineage.writer` (currently every non-job process maps to :Script).
+- **m3_reads_from / m3_writes_to — CONFIRMED WITH EDIT:** endpoints re-pointed from the
+  pre-G9 `ETLProcess → DataSource/DataTarget` shapes to the two-case reality —
+  `from_node: ETLProcess | ControlMJob` (ETL case | file-ops case; Script is prov:Entity
+  and cannot carry prov:used/generated, so the type-correct Activity for file ops is the
+  job, resolved via its INVOKES edge), `to_node: DataAsset` (the D1 proxy URN carrying the
+  composite-join constraint in all three data DBs). **DataSource / DataTarget RETIRED**
+  (kept in node_classifications for audit; no loader ever shipped); **DataAsset added** to
+  node_classifications (dcat:Dataset / Entity). **Residual:** the writer's file-ops
+  resolution (script-level reads/writes attributed to the owning ControlMJob via INVOKES)
+  is follow-up build work.
+- **Signed off: Confirmed 4 · Edited 2 (the reads/writes shapes) · Deferred 0 · Rejected 0.**
+- **Lifecycle (applied in this commit):** all four entries stay `status: planned` — the
+  planned→active flips + `ontology_supplement.cypher` blocks land with the curated-load
+  build (the K2 flips-are-follow-ups pattern; `writer.write_curated` keeps refusing a live
+  load until then). Registry notes annotated; `schema_graph.cypher` mirror updated
+  (DataAsset SchemaMeta node; two edges per reads/writes label; DataSource/DataTarget
+  MERGEs removed with a retirement comment).

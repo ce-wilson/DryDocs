@@ -50,9 +50,9 @@ MERGE (n:SchemaMeta:ETLProcess {name: 'ETLProcess'})
   SET n.class = 'dd:ETLProcess', n.prov_type = 'Activity';
 MERGE (n:SchemaMeta:ExecutionHost {name: 'ExecutionHost'})
   SET n.class = 'prov:SoftwareAgent', n.prov_type = 'Agent';
-MERGE (n:SchemaMeta:DataSource {name: 'DataSource'})
-  SET n.class = 'dcat:Dataset', n.prov_type = 'Entity';
-MERGE (n:SchemaMeta:DataTarget {name: 'DataTarget'})
+// DataSource / DataTarget RETIRED 2026-07-15 (lineage rel vocabulary gate) —
+// superseded by DataAsset; edge direction encodes source-vs-target.
+MERGE (n:SchemaMeta:DataAsset {name: 'DataAsset'})
   SET n.class = 'dcat:Dataset', n.prov_type = 'Entity';
 
 // — SEAL (active) —
@@ -164,11 +164,21 @@ MATCH (a:SchemaMeta {name: 'ETLProcess'}), (b:SchemaMeta {name: 'ExecutionHost'}
 MERGE (a)-[r:RUNS_ON]->(b)
   SET r.vocab_id = 'm3_runs_on_etl_host', r.role = 'etl_host', r.prov_maps_to = null, r.domain = 'controlm', r.status = 'planned';
 
-MATCH (a:SchemaMeta {name: 'ETLProcess'}), (b:SchemaMeta {name: 'DataSource'})
+// m3_reads_from / m3_writes_to — two from-node cases each (gate 2026-07-15):
+// ETL case (ETLProcess) + file-ops case (ControlMJob, wrapper is pure unix ops).
+MATCH (a:SchemaMeta {name: 'ETLProcess'}), (b:SchemaMeta {name: 'DataAsset'})
 MERGE (a)-[r:READS_FROM]->(b)
   SET r.vocab_id = 'm3_reads_from', r.prov_maps_to = 'prov:used', r.domain = 'controlm', r.status = 'planned';
 
-MATCH (a:SchemaMeta {name: 'ETLProcess'}), (b:SchemaMeta {name: 'DataTarget'})
+MATCH (a:SchemaMeta {name: 'ControlMJob'}), (b:SchemaMeta {name: 'DataAsset'})
+MERGE (a)-[r:READS_FROM]->(b)
+  SET r.vocab_id = 'm3_reads_from', r.prov_maps_to = 'prov:used', r.domain = 'controlm', r.status = 'planned';
+
+MATCH (a:SchemaMeta {name: 'ETLProcess'}), (b:SchemaMeta {name: 'DataAsset'})
+MERGE (a)-[r:WRITES_TO]->(b)
+  SET r.vocab_id = 'm3_writes_to', r.prov_maps_to = 'prov:generated', r.domain = 'controlm', r.status = 'planned';
+
+MATCH (a:SchemaMeta {name: 'ControlMJob'}), (b:SchemaMeta {name: 'DataAsset'})
 MERGE (a)-[r:WRITES_TO]->(b)
   SET r.vocab_id = 'm3_writes_to', r.prov_maps_to = 'prov:generated', r.domain = 'controlm', r.status = 'planned';
 

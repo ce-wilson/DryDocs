@@ -163,12 +163,33 @@ node_classifications:
   - label:      DataSource
     class:      "dcat:Dataset"
     prov_type:  Entity
-    note:       "Read-side dataset (source zone + Glue database)."
+    note: >
+      RETIRED 2026-07-15 (lineage rel vocabulary gate, config/gate-log.md):
+      superseded by DataAsset — the READS_FROM edge direction already
+      encodes the source role. Kept for audit; no loader ever shipped.
+      Was: read-side dataset (source zone + Glue database).
 
   - label:      DataTarget
     class:      "dcat:Dataset"
     prov_type:  Entity
-    note:       "Write-side dataset (target zone / bucket / partitions)."
+    note: >
+      RETIRED 2026-07-15 (lineage rel vocabulary gate, config/gate-log.md):
+      superseded by DataAsset — the WRITES_TO edge direction already
+      encodes the target role. Kept for audit; no loader ever shipped.
+      Was: write-side dataset (target zone / bucket / partitions).
+
+  - label:      DataAsset
+    class:      "dcat:Dataset"
+    prov_type:  Entity
+    note: >
+      Added at the lineage rel vocabulary gate 2026-07-15: the D1 proxy
+      shape — a piece of data a process reads or writes (hdfs / s3 /
+      hive_table / local_file / Glue table, …), keyed on assetId
+      (urn:drydocs:dataasset:{platform}:{namespace}:{name};
+      provisioning/02_proxy_constraints.cypher — constrained in all three
+      data DBs so the ddall composite joins on it). Replaces the retired
+      DataSource / DataTarget pair as the to-node of m3_reads_from /
+      m3_writes_to.
 
   # — SEAL (active) —
   - label:      Application
@@ -732,8 +753,15 @@ local_relationships:
     to_node:      Script
     prov_maps_to: "prov:used"
     note: >
-      Job command line invokes a script/JAR (CMDLINE / MEMNAME; Jar Path +
-      Task Json Path). Matrix row: Activity → Entity = USED.
+      Gate CONFIRMED 2026-07-15 (config/gate-log.md); planned = the flip +
+      supplement block land with the curated-load build (the K2
+      flips-are-follow-ups pattern — drydocs_lineage.writer keeps refusing
+      a live load until then). Job command line invokes a script/JAR
+      (CMDLINE / MEMNAME; Jar Path + Task Json Path). Matrix row:
+      Activity → Entity = USED. Produced today by
+      drydocs_lineage.extractors.controlm_inventory (job → invoked
+      artifact via the shared core parser); writer MATCHes ControlMJob on
+      the NODE KEY, MERGEs Script on path.
     supplement:   ontology_supplement.cypher
     loader:       ~
     domain:       controlm
@@ -746,11 +774,24 @@ local_relationships:
     to_node:      ETLProcess
     prov_maps_to: "prov:wasStartedBy"
     note: >
-      Script launches the AWS-side ingestion workload. DIRECTION NOTE:
-      prov:wasStartedBy flows Activity → Entity (ETLProcess wasStartedBy
-      Script); the graph edge runs the INVERSE direction for query
-      ergonomics. Treat TRIGGERS as inverse-of wasStartedBy.
-      Feed: Informatica / Ab Initio / DPL metadata.
+      Gate CONFIRMED 2026-07-15 (config/gate-log.md) — shape validated by
+      the SME caveat: the common case is one .ksh wrapper script (the
+      INVOKES target) that launches the Informatica / Ab Initio / DPL
+      workload, passing the parameters those jobs need on CMD_LINE — so
+      TRIGGERS candidates are derivable from the already-ingested command
+      line, not only from an ETL metadata feed. (The other wrapper case is
+      pure unix file operations — move, gzip — with no ETLProcess; that
+      case is m3_reads_from / m3_writes_to with ControlMJob as the
+      Activity, never a TRIGGERS edge.) DIRECTION NOTE: prov:wasStartedBy
+      flows Activity → Entity (ETLProcess wasStartedBy Script); the graph
+      edge runs the INVERSE direction for query ergonomics. Treat TRIGGERS
+      as inverse-of wasStartedBy. Loader blocked on the gate-log
+      residuals: the ETLProcess business key (platform + workflow/graph/
+      pipeline name from wrapper parameters — no identity, no loader) and
+      an ETLProcess endpoint class in drydocs_lineage.writer (it currently
+      maps every non-job process to :Script). Feed: CMD_LINE wrapper
+      parameters (primary); Informatica / Ab Initio / DPL metadata
+      (enrichment).
     supplement:   ontology_supplement.cypher
     loader:       ~
     domain:       controlm
@@ -868,12 +909,22 @@ local_relationships:
   - id:           m3_reads_from
     neo4j_label:  READS_FROM
     role:         ~
-    from_node:    ETLProcess
-    to_node:      DataSource
+    from_node:    "ETLProcess | ControlMJob"
+    to_node:      DataAsset
     prov_maps_to: "prov:used"
     note: >
-      ETL reads a source dataset (Source Zone + Source Glue Database).
-      Matrix row: Activity → Entity = USED. Feed: Informatica / Ab Initio.
+      Gate CONFIRMED WITH EDIT 2026-07-15 (config/gate-log.md): endpoints
+      re-pointed from the pre-G9 shape (ETLProcess → DataSource) to the
+      two real cases — (1) ETL case: the ETLProcess reads a source dataset
+      (Source Zone + Source Glue Database; feed: Informatica / Ab Initio);
+      (2) file-ops case: the wrapper script is pure unix file operations
+      (move, gzip, …) and the type-correct Activity is the ControlMJob
+      itself (Script is prov:Entity and cannot carry prov:used) — the
+      writer must resolve the owning job via its INVOKES edge (follow-up,
+      IDEAS/backlog). To-node unified on DataAsset (the D1 proxy URN,
+      provisioning/02_proxy_constraints.cypher) — the edge direction
+      already encodes source-vs-target, so the DataSource label is retired
+      (see node_classifications). Matrix row: Activity → Entity = USED.
     supplement:   ontology_supplement.cypher
     loader:       ~
     domain:       controlm
@@ -882,13 +933,24 @@ local_relationships:
   - id:           m3_writes_to
     neo4j_label:  WRITES_TO
     role:         ~
-    from_node:    ETLProcess
-    to_node:      DataTarget
+    from_node:    "ETLProcess | ControlMJob"
+    to_node:      DataAsset
     prov_maps_to: "prov:generated"
     note: >
-      ETL writes a target dataset (Target Zone + Glue database / bucket /
-      partition keys). Matrix row: Activity → Entity = GENERATED.
-      Feed: Informatica / Ab Initio.
+      Gate CONFIRMED WITH EDIT 2026-07-15 (config/gate-log.md): endpoints
+      re-pointed from the pre-G9 shape (ETLProcess → DataTarget) to the
+      two real cases — (1) ETL case: the ETLProcess writes a target
+      dataset (Target Zone + Glue database / bucket / partition keys;
+      feed: Informatica / Ab Initio); (2) file-ops case: the wrapper
+      script is pure unix file operations (move, gzip, …) and the
+      type-correct Activity is the ControlMJob itself (Script is
+      prov:Entity and cannot carry prov:generated) — the writer must
+      resolve the owning job via its INVOKES edge (follow-up,
+      IDEAS/backlog). To-node unified on DataAsset (the D1 proxy URN,
+      provisioning/02_proxy_constraints.cypher) — the edge direction
+      already encodes source-vs-target, so the DataTarget label is retired
+      (see node_classifications). Matrix row: Activity → Entity =
+      GENERATED.
     supplement:   ontology_supplement.cypher
     loader:       ~
     domain:       controlm
