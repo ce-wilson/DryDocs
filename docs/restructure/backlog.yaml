@@ -2953,11 +2953,46 @@ items:
       Evidence: docs/reviews/essential-graphrag-traversal-experiment.md, pointed
       from the docmeta plan P0 row. Suite 667 passed / 6 skipped.
 
+  - id: Q3
+    epic: docmeta
+    title: "Write the docmeta P0 benchmark verdict: traversal vs manifest-routed markdown vs vector RAG, with a build/shrink recommendation"
+    type: task
+    module: docs
+    phase: 14
+    agent: main
+    model: fable
+    priority: p1
+    status: in_progress   # pulled 2026-07-16 (user: "start the P0 written verdict"); main fable session
+    depends_on: [Q1, Q2]
+    inputs: [knowledge/upgrade-plans/docmeta-component.md, reference/research/essential-graphrag-notes.md, docs/reviews/essential-graphrag-traversal-experiment.md, external/orchestration/bmc-controlm/SOURCE-MANIFEST.md]
+    acceptance: >
+      The docmeta plan's P0 acceptance is met by a WRITTEN comparison document
+      (knowledge/upgrade-plans/docmeta-p0-verdict.md, linked from the plan's P0 row):
+      a FIXED support-question set (>=10 questions spanning the ch.8-style stage
+      classes: structure/aggregation, exact lookup, paraphrase/conceptual, multi-doc,
+      provenance, out-of-scope) is run over the LIVE bmc-docs corpus for every arm
+      that can run in this environment — graph traversal (Cypher over Document→Chunk)
+      and manifest-routed markdown at minimum, plus a full-text-index arm as the
+      no-embedding lexical component of the vector arm; the embedding-proper vector
+      arm may be assessed analytically ONLY with the blocker named (no committed
+      embedding/LLM key — the open LLM-key-strategy inbox question). Per-question
+      per-arm scoring covers context recall (ground-truth marker presence), token
+      cost (retrieved chars), and latency; the document closes with an explicit
+      build / shrink-to-registry-only recommendation and names what the docmeta ADR
+      (P1) should adopt. Any throwaway index created for the benchmark is dropped or
+      its retention recorded. Full suite green.
+    notes: >
+      Groomed 2026-07-16 on the user's "start the P0 written verdict" order — the
+      phase-14 capstone the phase goal names; model fable per the matrix (the
+      build-vs-shrink recommendation is a component-boundary decision, the G3/O5
+      precedent). The verdict + the docmeta ADR are the recorded gate for promoting
+      docmeta P1-P3 to this epic (IDEAS docmeta line + the plan's own instruction).
+
 # Roll-up the dispatcher can glance at. COMPUTED views — test_backlog.py enforces
 # that these match the items exactly; update them with any status change.
 summary:
-  todo: 23                                          # Epic Q complete; phase-14 residue = the P0 WRITTEN verdict (tracked in the docmeta plan)
-  in_progress: 1                                   # E1 (gate deferred)
+  todo: 23                                          # unchanged — Q3 groomed straight to in_progress (user work order)
+  in_progress: 2                                   # E1 (gate deferred), Q3 (P0 verdict, main fable session)
   blocked: 0
   done: 73                                          # +Q2 (2026-07-16 same-day: ebook lexical load + 7/7 traversal session)
   next_ready: [C5, D5, D6, L7, L8, L9, L12, M2, M3, M4, P1, C7, K5, J10, J11, J12, C8, G12, G13]
