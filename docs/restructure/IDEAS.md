@@ -120,12 +120,15 @@ Tags help grooming: `idea` · `bug` · `doc` · `source` (new data source) · `q
   Port B git-readme §6 (clean-adds / Canonical-COMPANY connector wiring / company
   supplements: blocked vendor fetches, Graph-API creds, Enterprise multi-DB target).
   Heads-up bullet added to git-readme.md. Groom phases P1–P3 to backlog after the P0
-  benchmark verdict; ADR 0004 is the P1 gate output. The four T1–T4 tier lines were folded
+  benchmark verdict; the docmeta ADR is the P1 gate output — **number correction 2026-07-16**:
+  the plan reserved "ADR 0004" (2026-07-06) but 0004 was minted the next day for the
+  software-registry terminology ADR (accepted 2026-07-07); the docmeta ADR takes the next
+  free number at authoring (plan doc's 3 refs annotated same day). The four T1–T4 tier lines were folded
   INTO this sequenced plan (P0→P7) and moved to the audit trail (2026-07-09). P0's corpus
   load is already substantially executed: the bmc-docs lexical loader (Document→Chunk,
   llm-graph-builder pattern) shipped and gate `bmc-docs-lexical-load` was ACCEPTED 13/13,
   LOADED LIVE (commits 12423f4/24d6a4b) — the WRITTEN benchmark verdict (traversal vs
-  manifest-routed markdown vs vector RAG) + ADR 0004 still remain before P1–P3 promote.
+  manifest-routed markdown vs vector RAG) + the docmeta ADR still remain before P1–P3 promote.
 - 2026-07-03 — [chore] the local `neo4j-drydocs-ee` Docker container's password is literally the
   string `<password>` (copy-paste artifact at creation). Fine for sandbox; change it before
   anything less throwaway. (Found while wiring web/ + agents/ to it.)- 2026-07-03 — [question] LLM key strategy for the ADK agents (core_ingest, controlm_fix):
@@ -139,6 +142,32 @@ Tags help grooming: `idea` · `bug` · `doc` · `source` (new data source) · `q
 ## Recently groomed (audit trail)
 
 <!-- when you promote an idea, move its line here with the resulting backlog id -->
+
+- 2026-07-16 groom run (weekly inbox groom) — 0 promoted / 0 merged / 1 kept-updated;
+  backlog database untouched (summary/next_ready stand as of 2026-07-15):
+  - kept-updated: the docmeta plan line — **ADR number collision found + corrected**: the
+    plan (2026-07-06) reserved "ADR 0004" for its P1 gate output, but 0004 was minted the
+    next day as `0004-software-registry-vendor-terminology.md` (accepted 2026-07-07). The
+    docmeta ADR now takes the next free number at authoring; the plan doc's 3 stale refs
+    (`knowledge/upgrade-plans/docmeta-component.md` §1.1, P1 phase row, port table)
+    annotated in the same commit.
+  - gate checks run against the repo this pass: L8 still `todo` → project-review outline
+    stays parked; docmeta P0 WRITTEN verdict still absent (only the ADR number changed);
+    ADR 0005 ratified + O1/O3/O6 done ≠ any parked trigger.
+  - kept parked, unchanged (each on its recorded gate): drydocs-project-review outline
+    (L8), K2 FID/ALIAS reconciliation tables (company-side sources), ctlm_id ripple checks
+    (internal-side), dry-docs.com visual seed (website not started), /documentation
+    whitepaper type (trigger unfired), lineage live-load gate (HITL scheduling),
+    remediation next slices (TDD §6/§7), Phase C packaging (plan gate), Workbench
+    (entitlement), SchedulerKind → AisCapability/AiTool (SME class definitions), BRD
+    outline (later phase), docmeta P1–P3 (P0 verdict + the renumbered ADR), EE container
+    password (user deferred), LLM key strategy (open question), common/ in /list-apps
+    (cosmetic), cli.py regroup (v1.0 window).
+  - observation (no action): untracked UI-WIP/ website material (WEBSITE-IDEAS.MD,
+    gemini-wire-frame.md, landing PNGs, icons.md) predates the 07-13 re-inbox of the
+    dry-docs.com line and is its seed corpus when that gate fires; console-side UI-WIP
+    files are O-epic surfaces. Root-level JPMC annual-report PDFs also untracked
+    (data-context-extractor inputs — house them or gitignore at next touch).
 
 - 2026-07-15 pm groom (on feat/k4-businessapplication-reshape) — 2 promoted, both
   same-day findings from the O6 session's first live EE bootstrap:

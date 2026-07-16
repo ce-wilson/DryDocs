@@ -73,7 +73,9 @@ content and `drydocs_context` only for T4; deepdoc writes `drydocs_context` only
 becomes a *consumer* of docmeta's corpus (its deep dives cite Document/Chunk nodes).
 Alternative (fold docmeta into deepdoc) is rejected for the same reason review and load are
 separate: one is a run-cadence pipeline, the other is an on-demand investigator. Confirm at
-the Phase 1 gate; record as **ADR 0004**.
+the Phase 1 gate; record as **the docmeta ADR** (number minted at authoring — 0004, reserved
+here 2026-07-06, was since TAKEN by `0004-software-registry-vendor-terminology.md`, accepted
+2026-07-07; corrected at the 2026-07-16 groom).
 
 ### 1.2 Boundary rules (MODULE_MAP invariants)
 
@@ -170,7 +172,7 @@ boundary + classification + doc-registry tests green.
 | Phase | Work | Acceptance |
 |-------|------|------------|
 | **P0 — Benchmark spike** (IDEAS T1 entry) | Load the BMC corpus into a throwaway local Document→Chunk→Entity graph; benchmark traversal vs manifest-routed markdown vs vector RAG on a fixed support-question set | Written comparison (accuracy/latency/tokens) with a build / shrink-to-registry-only recommendation |
-| **P1 — Gate + ADR 0004** | Gate session: component name (docmeta vs deepdoc fold-in), `drydocs_docs` DB, planned relationship entries (`HAS_DOCUMENT`, `HAS_CHUNK`, `DESCRIBES`, `GOVERNED_BY`), curation-ladder→gate mapping | ADR 0004 accepted; vocab entries `status: planned`; gate-log updated |
+| **P1 — Gate + the docmeta ADR** | Gate session: component name (docmeta vs deepdoc fold-in), `drydocs_docs` DB, planned relationship entries (`HAS_DOCUMENT`, `HAS_CHUNK`, `DESCRIBES`, `GOVERNED_BY`), curation-ladder→gate mapping | docmeta ADR accepted (next free number — orig. 0004, since taken); vocab entries `status: planned`; gate-log updated |
 | **P2 — Registry** | `config/doc-source-registry.yaml` + `test_doc_registry.py`; backfill all current corpora; classify/evict root-level strays | Test enforces classification+connector+tier on every entry; zero unregistered corpora |
 | **P3 — Port A (bkup → producer)** | Port cleaner/tokenizer/manifest/registry-models per §5; `web` + `filedrop` connectors; `docmeta` COMPONENT_GROUP + MODULE_MAP row | Track-1 portable tests for parse/clean/hash (no network); boundary guard green |
 | **P4 — Load path** | chunker + loaders + `drydocs_docs` provisioning delta; embeddings via P0 module; load BMC corpus end-to-end locally | `docs-load` idempotent re-run adds nothing; trust labels queryable; composite smoke reads docs+structural |
@@ -239,7 +241,7 @@ then it is a heads-up, like the ADR 0002 Phase B rename warning.*
 | `config/doc-source-registry.yaml` + `tests/unit/test_doc_registry.py` | registry + guard (Track-1 portable) |
 | `docmeta` group in `tests/unit/test_module_boundary.py` + `MODULE_MAP.md` row | default-deny forces your company-only connector modules to classify |
 | `drydocs_core/schema/provisioning/` delta (`drydocs_docs` + composite update) | target-agnostic scripts, G1 pattern |
-| `knowledge/upgrade-plans/docmeta-component.md`, ADR 0004, review doc | plans/decisions |
+| `knowledge/upgrade-plans/docmeta-component.md`, the docmeta ADR (P1), review doc | plans/decisions |
 | planned entries in `relationship_vocabulary.yaml` / `taxonomy-ontology-map.yaml` | **inert while `planned`** — but if company has already promoted any doc edge to `active`, that entry is a back-flow collision: keep your active version (same rule as `seal_app_ref`) |
 
 **Canonical-COMPANY (keep YOUR version on collision — the `drydocs-review` rule applies):**
