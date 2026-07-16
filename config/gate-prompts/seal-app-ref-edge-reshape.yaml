@@ -40,6 +40,17 @@ mapping:
     element: "Migration of already-loaded edges"
     target: "idempotent migrate cypher rewrites type, keeps ALL properties (the migrate_develops precedent)"
     edge: "—  [follow-up commit with the rename, per §C]"
+provenance:
+  - label: "job→app attribution edge (shape under decision)"
+    source_object: "STG_APP_FACT (fact_type SEAL) — the Control-M variable-normalization stream; unchanged by this gate"
+    key: "job (folder_id, job_id) node key ↔ BusinessApplication seal_id, per the 2026-07-14 match policy"
+    loader: "drydocs/loaders/seal_attribution.py + seal_attribution.cypher (built; renamed on sign-off) · manual tier-5: manual_loads.py"
+    properties:
+      - {name: edge_type, origin: derived, from: "this gate's §A decision — BELONGS_TO_APPLICATION (n:1) or USED (n:2)", note: "the only thing this gate changes"}
+      - {name: role, origin: derived, from: "constant seal_app_ref", note: "kept verbatim across the re-shape"}
+      - {name: match_method, origin: derived, from: "match-policy tier that resolved the fact (gate 2026-07-14)", note: "unchanged"}
+      - {name: seal_id, origin: source, from: "STG_APP_FACT.fact_value (fact_type SEAL)", note: "unchanged; never raw job.APPLICATION"}
+
 sections:
   - title: "A. Shape decision"
     confirmations:
