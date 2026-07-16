@@ -1,0 +1,52 @@
+# SME gate-prompt spec — the K2 job→app edge SHAPE reshape (the K3 §F deferral, now DUE).
+# Pattern: the E1/F1/F2/K2 gate flow (docs/restructure/03-hitl-sme-flow.md). Nothing here
+# is applied until the SME signs §C; the K2 match POLICY (signed off 2026-07-14) is
+# shape-agnostic and is NOT re-opened by this gate.
+gate_id: seal-app-ref-edge-reshape
+status: prepped                      # awaiting SME session
+prepped_on: 2026-07-15
+step: >
+  Resolve the K3 §F deferred decision: after K4 reclassed :BusinessApplication to
+  prov:Entity / dprod:DataProduct, the ACTIVE K2 edge
+  (:ControlMJob)-[:WAS_ASSOCIATED_WITH {role: seal_app_ref}]->(:BusinessApplication)
+  no longer type-checks (prov:wasAssociatedWith requires an Agent target). Pick the
+  replacement shape; the loader/coverage/vocabulary rename is mechanical follow-up.
+context: >
+  Rider trail: taxonomy-ontology-map#job-seal-app-ref type_conflict_note + proposed_reshape;
+  vocabulary m3_seal_app_ref (active, K2 build 2026-07-14); gate-log 2026-07-10 §F
+  (DEFERRED) and 2026-07-14 K2 §D/§E (confirmed with the standing rider). Every candidate
+  keeps the confirmed match policy, the edge properties (first_seen_at/source/match_method/
+  last_seen_at/last_run_id), role=seal_app_ref, and the MATCH-only endpoint discipline.
+
+sections:
+  - id: A
+    element: "Replacement edge shape (pick one)"
+    options:
+      - id: A1
+        label: "LOCAL DOMAIN EDGE — (:ControlMJob)-[:BELONGS_TO_APPLICATION]->(:BusinessApplication), prov_maps_to: ~   [AGENT RECOMMENDATION]"
+        rationale: >
+          'Job belongs to this business application' is a governance/containment fact, not a
+          PROV event. Precedent: SCHEDULED_ON (infra, no PROV row), arch_contains_batch.
+          Keeps the app record OUT of PROV lineage traversals (WAS_INFORMED_BY closures,
+          provenance walks) where it would be noise.
+      - id: A2
+        label: "PROV — (:ControlMJob)-[:USED {role: seal_app_ref}]->(:BusinessApplication), prov:used (Activity → Entity)"
+        rationale: >
+          Stays inside PROV-O and type-checks cleanly. Cost: semantically claims the job
+          CONSUMED the app record at runtime (it did not), and mixes the app into lineage
+          traversals alongside conditions/files.
+      - id: A3
+        label: "Other shape named by the SME (e.g. inverse edge from the app side)"
+  - id: B
+    element: "Migration of already-loaded WAS_ASSOCIATED_WITH {role: seal_app_ref} edges"
+    proposal: >
+      Idempotent migrate cypher (the migrate_develops precedent): rewrite type + keep all
+      properties; company reruns T1 after migration (edges MERGE idempotently).
+  - id: C
+    element: "Sign-off"
+    proposal: >
+      On confirm: m3_seal_app_ref re-shaped (its own logged change), map entry
+      job-seal-app-ref updated + eventually applied at the live load (T1), loaders
+      (seal_attribution.cypher, manual_seal_attribution.cypher, SUPPORTED_SHAPE,
+      graph-tests coverage suite, manual-loads TEMPLATE) renamed in one commit,
+      port-prompt step added. Until then the active shape stands with its documented rider.
