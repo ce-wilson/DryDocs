@@ -2867,7 +2867,7 @@ items:
     agent: reference-librarian
     model: sonnet
     priority: p2
-    status: todo
+    status: in_progress   # pulled 2026-07-16 (user: "start Q1"); dispatched to reference-librarian
     depends_on: []
     inputs: ["Essential-GraphRAG.pdf (repo root — local-only, gitignored)", reference/research/README.md, knowledge/upgrade-plans/docmeta-component.md]
     acceptance: >
@@ -2927,8 +2927,8 @@ items:
 # Roll-up the dispatcher can glance at. COMPUTED views — test_backlog.py enforces
 # that these match the items exactly; update them with any status change.
 summary:
-  todo: 25                                          # +Q1/Q2 (2026-07-16 evening groom — Essential GraphRAG intents; phase-14 plan change)
-  in_progress: 1                                   # E1 (gate deferred)
+  todo: 24                                          # Q1 pulled 2026-07-16 (in_progress)
+  in_progress: 2                                   # E1 (gate deferred), Q1 (reference-librarian dispatch)
   blocked: 0
   done: 71                                          # K4 branch merged --no-ff to main 2026-07-16 (b3c455f)
-  next_ready: [C5, D5, D6, L7, L8, L9, L12, M2, M3, M4, P1, C7, K5, J10, J11, J12, C8, G12, G13, Q1, Q2]
+  next_ready: [C5, D5, D6, L7, L8, L9, L12, M2, M3, M4, P1, C7, K5, J10, J11, J12, C8, G12, G13, Q2]
