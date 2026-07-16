@@ -21,6 +21,8 @@ Ingest commands:
                                     config/taxonomy/software-registry.yaml
   drydocs load-bmc-docs           — bmc-docs lexical graph (Document -> Chunk)
                                     from external/orchestration/bmc-controlm/
+  drydocs load-essential-graphrag — Essential GraphRAG ebook lexical graph
+                                    (Q2 experiment; local gitignored PDF)
   drydocs load-seal-attribution   — K2: STG_APP_FACT facts -> job
                                     WAS_ASSOCIATED_WITH {role: seal_app_ref} edges
   drydocs load-manual-mappings    — tier-5 SME-authored mapping CSV
@@ -53,6 +55,11 @@ from .loaders.bmc_docs import (
     DEFAULT_CORPUS_DIR,
     BmcDocsAdapter,
     BmcDocsLoader,
+)
+from .loaders.essential_graphrag import (
+    DEFAULT_PDF,
+    EssentialGraphragAdapter,
+    EssentialGraphragLoader,
 )
 from .loaders.business_segments import refresh_business_segments
 from .loaders.catalog import (
@@ -135,6 +142,8 @@ LOADER_REGISTRY: dict[str, type] = {
     "controlm_dependencies_derived": ControlMDependenciesDerivedLoader,
     # bmc-docs lexical graph (Document -> Chunk):
     "bmc_docs":           BmcDocsLoader,
+    # Essential GraphRAG ebook lexical graph (Q2 experiment):
+    "essential_graphrag": EssentialGraphragLoader,
 }
 
 SQL_DIR = Path(__file__).resolve().parent / "loaders" / "sql"
@@ -160,6 +169,7 @@ LOADER_SOURCE: dict[str, str] = {
     # (config/source-registry.yaml); until it is SME-confirmed, `_gate_source`
     # fails fast (exit 2) on `load-bmc-docs` — that is correct, not a bug.
     "bmc_docs":                      "bmc-docs",
+    "essential_graphrag":            "essential-graphrag",
 }
 
 
@@ -183,13 +193,15 @@ def _gate_source(source_id: str) -> None:
         console.print(f"[red]{exc}[/]")
         raise typer.Exit(2) from exc
 
-def _client() -> Neo4jClient:
+def _client(database: str | None = None) -> Neo4jClient:
+    """Build the Neo4j client from settings; ``database`` overrides the
+    configured target DB (e.g. ``ddcontext`` for context-graph loads)."""
     cfg, _, _ = load_settings()
     pw = cfg.password.get_secret_value()
     if not pw:
         console.print("[red]NEO4J_PASSWORD is empty.[/]")
         raise typer.Exit(2)
-    return Neo4jClient(cfg.uri, cfg.user, pw, cfg.database)
+    return Neo4jClient(cfg.uri, cfg.user, pw, database or cfg.database)
 
 
 def _csv_adapter(csv_path: Path) -> CsvAdapter:
@@ -531,6 +543,38 @@ def load_bmc_docs(
     adapter = BmcDocsAdapter(corpus_dir)
     with _client() as cli:
         summary = BmcDocsLoader(cli, adapter).load()
+    console.print(summary.as_dict())
+
+
+@app.command(name="load-essential-graphrag")
+def load_essential_graphrag(
+    pdf_path: Path = typer.Option(
+        DEFAULT_PDF,
+        "--pdf",
+        help="The local (gitignored) Essential GraphRAG PDF (defaults to the repo root copy).",
+    ),
+    database: str = typer.Option(
+        "ddcontext",
+        "--database",
+        help="Target database (Q2 decision: ddcontext — experiment content stays "
+             "out of the ground-truth drydocs DB).",
+    ),
+) -> None:
+    """Load the Essential GraphRAG ebook as a Document -> Chunk lexical graph (Q2).
+
+    Deterministic chapter/section chunking of the published Manning ebook
+    (pdf-lexical-v1 — no LLM, no embeddings), reusing the ACTIVE docs_*
+    vocabulary confirmed at the bmc-docs-lexical-load gate. The PDF is
+    local-only (gitignored); the graph cites source_url.
+    """
+    _gate_source("essential-graphrag")  # confirmed-gate before any DB write
+    if not pdf_path.exists():
+        console.print(f"[red]Missing: {pdf_path} (the PDF is local-only/gitignored — "
+                      "obtain it from the source_url in config/source-registry.yaml)[/]")
+        raise typer.Exit(1)
+    adapter = EssentialGraphragAdapter(pdf_path)
+    with _client(database) as cli:
+        summary = EssentialGraphragLoader(cli, adapter).load()
     console.print(summary.as_dict())
 
 

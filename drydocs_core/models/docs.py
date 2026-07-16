@@ -94,3 +94,68 @@ class BmcDocChunkRow(BaseModel):
     @classmethod
     def _opt_str(cls, v: Any) -> str | None:
         return _str_or_none(v)
+
+
+class BookChunkRow(BaseModel):
+    """One chunk of a published-book PDF loaded as a lexical graph (Q2).
+
+    Same one-ROW-=-one-CHUNK contract as :class:`BmcDocChunkRow` (doc fields
+    denormalized onto every row for the idempotent :Document MERGE), tailored
+    to a book: no scraped-page/vendor-version fields, and three navigation
+    properties (``chapter``/``section``/``page_start``) so traversal queries
+    can address the book the way its own citations do.
+    """
+
+    model_config = ConfigDict(
+        populate_by_name=True,
+        str_strip_whitespace=True,
+        extra="ignore",
+    )
+
+    # --- Document fields (denormalized onto every chunk row) ---
+    doc_id: str = Field(..., min_length=1, description="Stable id, e.g. 'essential-graphrag'.")
+    title: str = Field(..., min_length=1, description="Book title (subtitle included).")
+    authors: str = Field(..., min_length=1, description="Comma-separated author names.")
+    publisher: str = Field(..., min_length=1, description="e.g. 'Manning'.")
+    published: str = Field(..., min_length=1, description="Publication year/month, e.g. '2025-07'.")
+    source_url: str = Field(..., min_length=1, description="Citation URL (the PDF itself is local-only).")
+    path: str = Field(..., min_length=1, description="Repo-relative path of the local (gitignored) PDF.")
+    trust_default: str = Field(
+        "GROUNDED",
+        description=(
+            "Doc-level tier: GROUNDED — pypdf text extraction is mechanical "
+            "but lossy (ligature drops, intra-word splits), so chunks are "
+            "faithful-derivation, not byte-VERBATIM."
+        ),
+    )
+    classification: str = "External"
+
+    # --- Chunk fields ---
+    chunk_id: str = Field(..., min_length=1, description="'<doc_id>#<seq>' zero-padded, e.g. 'essential-graphrag#012'.")
+    seq: int = Field(..., ge=0, description="0 = front matter; then chapter/section chunks in book order.")
+    heading: str = Field(..., min_length=1, description="Section heading line, chapter title, '(front matter)' or '(back matter)'.")
+    level: int = Field(..., ge=0, description="0 front/back matter; 1 chapter/appendix preamble; 2 numbered section.")
+    text: str = Field(..., min_length=1, description="Verbatim extracted text of the chunk (heading line included).")
+    char_count: int = Field(..., ge=0, description="len(text); computed by the adapter.")
+    provenance: Literal["VERBATIM", "GROUNDED", "SYNTHESIZED"] = Field(
+        ..., description="Per-chunk tier; constant GROUNDED under pdf-extract-grounded-v1."
+    )
+    tier_rule: str = Field(
+        "pdf-extract-grounded-v1",
+        description="Id of the rule that produced 'provenance' (audit trail).",
+    )
+    prev_chunk_id: str | None = Field(
+        None, description="Previous chunk's chunk_id in book order; None for seq 0."
+    )
+    chapter: int | None = Field(
+        None, ge=1, description="Chapter number for chapter/section chunks; None for front/back matter and appendix."
+    )
+    section: str | None = Field(
+        None, description="Section number as printed, e.g. '3.2' or 'A.1'; None for non-section chunks."
+    )
+    page_start: int = Field(..., ge=1, description="1-based PDF page where the chunk begins.")
+
+    @field_validator("prev_chunk_id", "section", mode="before")
+    @classmethod
+    def _opt_str(cls, v: Any) -> str | None:
+        return _str_or_none(v)

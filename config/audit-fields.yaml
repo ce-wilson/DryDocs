@@ -91,6 +91,15 @@ sources:
       envelope (BMC page authorship) is not exposed by the source; decide whether the
       stub is permanent at a doc-06 Phase 4 gate.
 
+  - id: essential-graphrag
+    status: stub                             # published book: authorship IS the citation (authors/publisher/published on :Document); no source-system envelope exists
+    notes: >
+      Confirmed 2026-07-16 (Q2 groom decision; covering gate bmc-docs-lexical-load —
+      pure docs_* vocabulary reuse). A published ebook exposes no created_by/updated_at
+      audit columns; the bibliographic fields (authors, publisher, published,
+      source_url) live on the :Document node and the local PDF is gitignored. Same
+      permanent-stub rationale as bmc-docs.
+
   - id: airflow-mwaa
     status: stub                             # envelope gate not run — crosswalk-only activation, no loader/live export
     notes: >

@@ -136,6 +136,30 @@ sources:
       9.0.21.300 config SoR). User-directed 2026-07-08: the local EE DB carries
       only sample Control-M data, so this corpus is the demonstrable content.
 
+  - id: essential-graphrag
+    classification: External             # published Manning/Neo4j-sponsored ebook; the PDF is LOCAL-ONLY (gitignored) — cite source_url, never commit
+    source: "Essential-GraphRAG.pdf (repo root, gitignored local copy of the published ebook; Bratanič & Hane, Manning 2025, 179 PDF pages)"
+    source_url: "https://www.manning.com/books/essential-graphrag"
+    captured_at: 2026-07-14
+    kind: docs
+    orchestrator: ~
+    adapter: pdf                         # EssentialGraphragAdapter (pdf-lexical-v1: deterministic chapter/section chunking via pypdf)
+    feeds_taxonomy: [documents, chunks]
+    confirmed: true                      # Q2 groom decision 2026-07-16 (user-directed experiment): pure REUSE of the ACTIVE docs_* lexical vocabulary — no new edge meaning, so the covering gate is bmc-docs-lexical-load (2026-07-08); no new gate session required
+    notes: >
+      The Q2 experiment corpus (backlog Q2, Epic Q / phase 14): the Essential
+      GraphRAG ebook loaded as a Document -> Chunk lexical graph for
+      agent-traversal testing, feeding the docmeta P0 benchmark verdict
+      (traversal arm). Target DB = ddcontext (execution decision recorded in
+      backlog Q2 notes: experiment/reference content stays out of the
+      ground-truth drydocs DB; matches the user's "our own unstructured
+      context graph" phrasing and the jpmc-reports ddcontext precedent).
+      Every chunk is tier GROUNDED (pdf-extract-grounded-v1: pypdf extraction
+      is mechanical but lossy). The bmc_docs DESCRIBES hook is deliberately
+      omitted — the book describes a methodology, not a registry
+      SoftwareProduct, and ddcontext carries no product nodes. Pattern notes
+      mined from the same book: reference/research/essential-graphrag-notes.md (Q1).
+
   # ---- Data platforms (sources of DataAsset/lineage) -----------------------
   - id: oracle-schemas
     classification: Internal-Confidential   # real schema/table/object names

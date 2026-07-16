@@ -230,9 +230,12 @@ def test_census_with_uncounted_sweep_fails() -> None:
 # stg-app-fact (2026-07-14, gate seal-attribution-match-policy; K2 loader built
 # with the flip): the table is our own normalizer's staging output — its column
 # ledger belongs to the doc-08 STG census (Phase 2), not the K2 slice.
+# essential-graphrag (2026-07-16, Q2 experiment): a book PDF has no source
+# COLUMNS to ledger — the adapter's chunk fields are our own derivation, the
+# same non-tabular rationale as bmc-docs.
 LEDGER_PENDING = frozenset(
     {"seal-extract", "catalog-pat", "software-registry", "bmc-docs",
-     "airflow-mwaa", "autosys-export", "stg-app-fact"}
+     "airflow-mwaa", "autosys-export", "stg-app-fact", "essential-graphrag"}
 )
 
 

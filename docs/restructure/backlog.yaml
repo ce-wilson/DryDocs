@@ -2906,7 +2906,7 @@ items:
     agent: main
     model: sonnet
     priority: p2
-    status: in_progress   # pulled 2026-07-16 (user: "start Q2"); main session
+    status: done          # DONE 2026-07-16 same day (main session; loaded live + traversal session run)
     depends_on: []
     inputs: ["Essential-GraphRAG.pdf (repo root — local-only, gitignored)", drydocs/loaders/bmc_docs.py, drydocs/loaders/cypher/bmc_docs.cypher, drydocs_core/ontology/relationship_vocabulary.yaml, config/source-registry.yaml]
     acceptance: >
@@ -2933,12 +2933,31 @@ items:
       activated the lexical model, so no gate is needed unless a new edge meaning
       appears. The one methodological delta from bmc_docs (which chunked .md by H2) is
       PDF sectioning — extraction choices belong in the run notes.
+      DONE 2026-07-16. TARGET DB DECIDED: ddcontext — experiment/reference content
+      stays out of the ground-truth drydocs DB; matches the user's "our own
+      unstructured context graph" phrasing + the jpmc-reports ddcontext precedent
+      (drydocs co-location rejected: the book is not operational ground truth and
+      has no SoftwareProduct DESCRIBES target). CONFIRMED FLIP: registry-note
+      citation of the Q2 groom user decision (covering gate bmc-docs-lexical-load;
+      no gate-log entry — no new edge meaning). Built: EssentialGraphragAdapter/
+      Loader (pdf-lexical-v1: 8 chapter openers via "This chapter covers", monotonic
+      section scan immune to glued running heads, appendix A.1-A.4, front/back
+      matter) + essential_graphrag.cypher (bmc_docs minus DESCRIBES, + chapter/
+      section/page_start) + CLI load-essential-graphrag (--database, default
+      ddcontext) + registry/audit-fields/LEDGER_PENDING entries + 8 unit tests
+      (synthetic pages + skip-guarded real-PDF test). Loaded live: 43 chunks,
+      42-edge NEXT_CHUNK chain, 0 rejects, idempotent re-run rows_changed=0.
+      Traversal session: 7/7 questions via MCP read-cypher with USE ddcontext
+      (structure/sequence/aggregation/provenance exact; content scans bounded at
+      exact-substring — the vector arm's case; front-matter pollution lesson).
+      Evidence: docs/reviews/essential-graphrag-traversal-experiment.md, pointed
+      from the docmeta plan P0 row. Suite 667 passed / 6 skipped.
 
 # Roll-up the dispatcher can glance at. COMPUTED views — test_backlog.py enforces
 # that these match the items exactly; update them with any status change.
 summary:
-  todo: 23                                          # Q2 pulled 2026-07-16 (in_progress)
-  in_progress: 2                                   # E1 (gate deferred), Q2 (main session)
+  todo: 23                                          # Epic Q complete; phase-14 residue = the P0 WRITTEN verdict (tracked in the docmeta plan)
+  in_progress: 1                                   # E1 (gate deferred)
   blocked: 0
-  done: 72                                          # +Q1 (2026-07-16 same-day: Essential GraphRAG pattern notes)
+  done: 73                                          # +Q2 (2026-07-16 same-day: ebook lexical load + 7/7 traversal session)
   next_ready: [C5, D5, D6, L7, L8, L9, L12, M2, M3, M4, P1, C7, K5, J10, J11, J12, C8, G12, G13]
