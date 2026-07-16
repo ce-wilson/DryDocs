@@ -133,7 +133,9 @@ Tags help grooming: `idea` · `bug` · `doc` · `source` (new data source) · `q
   supplements: blocked vendor fetches, Graph-API creds, Enterprise multi-DB target).
   Heads-up bullet added to git-readme.md. Groom phases P1–P3 to backlog after the P0
   benchmark verdict (**landing zone since 2026-07-16: phase 14 / Epic Q** — created at the
-  Essential-GraphRAG groom); the docmeta ADR is the P1 gate output — **number correction 2026-07-16**:
+  Essential-GraphRAG groom). **TRIGGER FIRED 2026-07-16 pm: the P0 WRITTEN verdict landed**
+  (knowledge/upgrade-plans/docmeta-p0-verdict.md, Q3 — recommendation: BUILD) → **P1–P3 are
+  now groomable into Epic Q at the next groom**; the docmeta ADR is the P1 gate output — **number correction 2026-07-16**:
   the plan reserved "ADR 0004" (2026-07-06) but 0004 was minted the next day for the
   software-registry terminology ADR (accepted 2026-07-07); the docmeta ADR takes the next
   free number at authoring (plan doc's 3 refs annotated same day). The four T1–T4 tier lines were folded

@@ -2962,7 +2962,7 @@ items:
     agent: main
     model: fable
     priority: p1
-    status: in_progress   # pulled 2026-07-16 (user: "start the P0 written verdict"); main fable session
+    status: done          # DONE 2026-07-16 same day (main fable session; benchmark run live, verdict = BUILD)
     depends_on: [Q1, Q2]
     inputs: [knowledge/upgrade-plans/docmeta-component.md, reference/research/essential-graphrag-notes.md, docs/reviews/essential-graphrag-traversal-experiment.md, external/orchestration/bmc-controlm/SOURCE-MANIFEST.md]
     acceptance: >
@@ -2987,12 +2987,27 @@ items:
       build-vs-shrink recommendation is a component-boundary decision, the G3/O5
       precedent). The verdict + the docmeta ADR are the recorded gate for promoting
       docmeta P1-P3 to this epic (IDEAS docmeta line + the plan's own instruction).
+      DONE 2026-07-16: knowledge/upgrade-plans/docmeta-p0-verdict.md — VERDICT =
+      BUILD. Benchmark run live: the current EE container was found WITHOUT the
+      docs corpus (fresh O6 bootstrap), so the P0 spike's own load step ran first
+      (software-registry 9 rows, bmc-docs 374 chunks / 0 rejects into drydocs);
+      12 fixed questions x 3 live arms (handwritten-Cypher traversal, throwaway
+      fulltext index — created + DROPPED, DB left as found, manifest-routed file
+      reading), vector-proper assessed analytically (blocker named: the open
+      LLM-key-strategy question). Adjudicated: traversal 12/12 recall (~16.4k
+      chars total, median 75ms; only arm answering aggregation/provenance/version
+      classes; paraphrase needs term-mapping — naive CONTAINS 0-row runs recorded);
+      fulltext 7/12 (ranking dilution, paraphrase gap, confident noise on
+      out-of-scope); manifest 10/12+2-partial at ~449.5k chars (~27x traversal).
+      Two scorer artifacts corrected in adjudication + disclosed. ADR-adoption
+      list + limitations written. Plan P0 row updated; IDEAS docmeta line updated:
+      P1-P3 now groomable. Suite green.
 
 # Roll-up the dispatcher can glance at. COMPUTED views — test_backlog.py enforces
 # that these match the items exactly; update them with any status change.
 summary:
-  todo: 23                                          # unchanged — Q3 groomed straight to in_progress (user work order)
-  in_progress: 2                                   # E1 (gate deferred), Q3 (P0 verdict, main fable session)
+  todo: 23                                          # phase-14 P0 complete; docmeta P1-P3 groomable at the next groom (IDEAS docmeta line)
+  in_progress: 1                                   # E1 (gate deferred)
   blocked: 0
-  done: 73                                          # +Q2 (2026-07-16 same-day: ebook lexical load + 7/7 traversal session)
+  done: 74                                          # +Q3 (2026-07-16 same-day: P0 written verdict = BUILD)
   next_ready: [C5, D5, D6, L7, L8, L9, L12, M2, M3, M4, P1, C7, K5, J10, J11, J12, C8, G12, G13]
