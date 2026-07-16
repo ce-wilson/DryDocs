@@ -26,6 +26,15 @@ Tags help grooming: `idea` · `bug` · `doc` · `source` (new data source) · `q
 
 <!-- add new ideas at the top -->
 
+- 2026-07-16 — [source] **Essential GraphRAG (Manning, Bratanič & Hane, 179 pp) dropped
+  untracked at repo root** — the Neo4j-sponsored GraphRAG ebook (PDF metadata 2025-07; file
+  dated 07-14). Candidate `reference/` registration via reference-librarian: REGISTRY.yaml
+  entry + source_url citation, classification External — and a housing decision: commit the
+  17 MB book PDF vs cite + gitignore (sometimes-published repo). Obvious consumers: the
+  docmeta P0 benchmark verdict (traversal vs manifest-routed md vs vector RAG) and the
+  neo4j-skills graphrag skill. Intent not stated at capture — groom when the user says
+  what it's for. (Found untracked by the 07-16 evening groom.)
+
 - 2026-07-16 — [idea] **Launcher registry should be human-configurable** (SME requirement
   captured at the cmdline-lineage-review mini-gate): LAUNCHER_REGISTRY in
   drydocs_core/controlm/commands.py is code-resident; teams add wrappers/variables
@@ -154,6 +163,16 @@ Tags help grooming: `idea` · `bug` · `doc` · `source` (new data source) · `q
 ## Recently groomed (audit trail)
 
 <!-- when you promote an idea, move its line here with the resulting backlog id -->
+
+- 2026-07-16 evening groom (third run today; bare /groom-backlog, no new notes) —
+  0 promoted / 1 inboxed / 0 merged; backlog database untouched (todo 23 / done 71 stand
+  as of acf0bfe):
+  - inboxed: `Essential-GraphRAG.pdf` found untracked at repo root (Manning / Neo4j-sponsored
+    ebook, 179 pp, file dated 07-14) → new [source] line above — registration + housing
+    (commit vs cite+gitignore) is a user decision; joins the JPMC annual-report PDFs in the
+    untracked-root-PDF class noted at the 07-16 am groom.
+  - all other lines kept parked, unchanged — every recorded gate was checked twice earlier
+    today (am weekly run, pm post-merge run at acf0bfe); nothing has landed on main since.
 
 - 2026-07-16 pm groom (second run today, post cmdline-lineage-review + the K4-branch merge) —
   2 promoted / 2 retired-executed / 1 line-update:
