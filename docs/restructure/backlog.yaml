@@ -2867,7 +2867,7 @@ items:
     agent: reference-librarian
     model: sonnet
     priority: p2
-    status: in_progress   # pulled 2026-07-16 (user: "start Q1"); dispatched to reference-librarian
+    status: done          # DONE 2026-07-16 same day (reference-librarian on sonnet, dispatched by main)
     depends_on: []
     inputs: ["Essential-GraphRAG.pdf (repo root — local-only, gitignored)", reference/research/README.md, knowledge/upgrade-plans/docmeta-component.md]
     acceptance: >
@@ -2886,6 +2886,16 @@ items:
       README seed-table row (Manning link verified 2026-07-16) + the root-level /*.pdf
       gitignore blanket rule (root-images precedent; tracked UI-WIP/*.pdf unaffected).
       Book: Bratanič & Hane, Manning 2025 (Neo4j-sponsored ebook), 179 pp.
+      DONE 2026-07-16: reference/research/essential-graphrag-notes.md written by
+      reference-librarian (full-text pypdf extract read chapter-by-chapter; no
+      copyrighted passages pasted) — 8-chapter pattern inventory with page cites,
+      consumer-mapping table (P0 arm / confirms-corrects / Q2 relevance), and the
+      SME question answered: YES, 8 worked patterns beyond current bmc-docs practice
+      (notes §3). Headline finding: ch.8's RAGAS + Cypher-as-ground-truth design fills
+      the P0 acceptance's previously unnamed accuracy methodology. Pointer added to
+      the docmeta plan's P0 row by main (the plan is outside the librarian's write
+      surface). Chunking + HITL entity-resolution stances independently CONFIRM the
+      bmc-docs deterministic lexical load; communities/GDS stay correctly deferred.
 
   - id: Q2
     epic: docmeta
@@ -2927,8 +2937,8 @@ items:
 # Roll-up the dispatcher can glance at. COMPUTED views — test_backlog.py enforces
 # that these match the items exactly; update them with any status change.
 summary:
-  todo: 24                                          # Q1 pulled 2026-07-16 (in_progress)
-  in_progress: 2                                   # E1 (gate deferred), Q1 (reference-librarian dispatch)
+  todo: 24                                          # Q2 remains the open Epic Q item
+  in_progress: 1                                   # E1 (gate deferred)
   blocked: 0
-  done: 71                                          # K4 branch merged --no-ff to main 2026-07-16 (b3c455f)
+  done: 72                                          # +Q1 (2026-07-16 same-day: Essential GraphRAG pattern notes)
   next_ready: [C5, D5, D6, L7, L8, L9, L12, M2, M3, M4, P1, C7, K5, J10, J11, J12, C8, G12, G13, Q2]
