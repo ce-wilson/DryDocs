@@ -34,47 +34,6 @@ Tags help grooming: `idea` · `bug` · `doc` · `source` (new data source) · `q
   (Epic O candidate). Groom when the web console picks up admin surfaces or when the
   UNKNOWN backlog (Phase E) makes config-driven rules urgent.
 
-- 2026-07-16 — [bug] **CMDLINE parser gaps found against 6 live production screenshots**
-  (real captures held local-only in internal-local/screenshots/ — mechanism only here) —
-  **EXECUTED same day** (same session, with the cmdline-lineage-review mini-gate; see
-  gate-log): (1) control-keyword stripping (if/then/else/fi — the else-branch MAIN
-  invocation parsed UNKNOWN); (2) abioncloud runScript.sh -g pset payload expansion +
-  nested -run_prog_command_line (+ case-fix: the rule missed runScript.sh); (3) java/.jar
-  rule with re-classification (DPL dt-pipelines-launcher); (4) air CLI rule. Sanitized
-  twins pinned in test_command_parser.py; extractor stable keys in
-  test_lineage_inventory.py. Remaining ingest gap: none known for these three shapes;
-  Phase-E UNKNOWN backlog continues to reveal new launchers.
-
-- 2026-07-16 — [question] **Lineage gate-agenda additions from the live CMDLINE review** —
-  (a)(b)(c)(d) all DECIDED same day at the in-session cmdline-lineage-review mini-gate
-  (gate-log): (a) ETLProcess identity = kind-scoped stable token (pset basename / DPL
-  pipeline GUID); (b) ETLProcess keeps label + kind property (etl|utility|notification);
-  (c) Script stays path-keyed, dupes surface in review; (d) CMDLINE joins the TRIGGERS
-  feeds. m3_* entries REMAIN planned — the live-load gate itself (flips + first curated
-  write over a real extract) is still the parked HITL blocker above. Side finding for K2:
-  FID + SEAL co-located in folder vars (and SEAL embedded in folder names) — a FID→seal
-  reconciliation source candidate for the K2 FID tier. RECONCILE at the 07-16 merge: the
-  07-15 lineage vocab gate (other machine) had already CONFIRMED all four shapes and
-  named CMDLINE the primary TRIGGERS feed — the two sessions agree; (a) resolves that
-  gate's ETLProcess business-key residual (see the two 07-15 lines below).
-
-- 2026-07-15 — [idea] **ETLProcess identity + writer endpoint class (m3_triggers loader
-  blockers).** The lineage vocab gate (config/gate-log.md 2026-07-15) confirmed
-  Script → ETLProcess TRIGGERS, derivable from the .ksh wrapper's CMD_LINE parameters
-  (Informatica / Ab Initio / DPL). Before any loader: decide the ETLProcess business key
-  (platform + workflow/graph/pipeline name from parameters?) and add an `etl` endpoint
-  class to `drydocs_lineage.writer` (today every non-job process maps to :Script).
-  UPDATE 2026-07-16 (cmdline-lineage-review): the business key is DECIDED — kind-scoped
-  stable token (pset basename / DPL pipeline GUID), implemented extractor-side
-  (_stable_invocation_key). REMAINING for this line: the writer's `etl` endpoint class.
-
-- 2026-07-15 — [idea] **Writer file-ops resolution: attribute script-level READS_FROM /
-  WRITES_TO to the owning ControlMJob via INVOKES.** Same gate: for wrappers that are pure
-  unix file ops (move, gzip), the type-correct Activity is the job, not the Script
-  (prov:Entity). `drydocs_lineage.writer` currently plans script→asset edges from imported
-  depgraph exports — needs a resolution hop before the curated-load build flips the
-  vocabulary active.
-
 - 2026-07-14 — [doc] **`drydocs-project-review.md` has no canonical outline** — the new
   whole-project review (docs/design/) renders through the Epic L pipeline but is free-form:
   `doc_outline.py` only validates `docs/design/*-tdd.md`. When L8 introduces the second doc
@@ -87,6 +46,10 @@ Tags help grooming: `idea` · `bug` · `doc` · `source` (new data source) · `q
   unresolved, counted in coverage) — tier 2 needs a FID -> seal_id source and tier 4 an
   alias table before those tiers resolve anything. APP_NAME reconciles today from the
   loaded SEAL reference (exact normalized match; ambiguous names excluded).
+  CANDIDATE SOURCE added 2026-07-16 (cmdline-lineage-review side finding): FID + SEAL
+  are co-located in Control-M FOLDER VARIABLES (env-suffixed FID_D/Q/P alongside a SEAL
+  value; the SEAL is also embedded in folder names) — a FID→seal_id pairing may be
+  derivable from the already-ingested variables, not only from company tables.
 
 - 2026-07-14 — [idea] **internal psgmgr now derives `ctlm_id` = `folder_id.job_id`** (e.g.
   `161015.7`; recorded at the P2 avg-run gate sign-off as the §B join upgrade). Ripple beyond
@@ -191,6 +154,26 @@ Tags help grooming: `idea` · `bug` · `doc` · `source` (new data source) · `q
 ## Recently groomed (audit trail)
 
 <!-- when you promote an idea, move its line here with the resulting backlog id -->
+
+- 2026-07-16 pm groom (second run today, post cmdline-lineage-review + the K4-branch merge) —
+  2 promoted / 2 retired-executed / 1 line-update:
+  - [idea] 2026-07-15 ETLProcess writer endpoint class (lineage vocab gate residual; the
+    business-key half decided + implemented extractor-side at cmdline-lineage-review) →
+    **G12**. [idea] 2026-07-15 writer file-ops resolution (same gate's second residual;
+    endpoints per the gate EDIT: ETLProcess|ControlMJob → DataAsset) → **G13**. Both are
+    the pre-flip curated-load-build blockers; shapes gate-confirmed so no HITL surface
+    remains — sonnet items with written acceptance.
+  - retired to this trail (fully executed/decided in-session, gate-log
+    cmdline-lineage-review): the 07-16 [bug] CMDLINE parser gaps line (all four gaps
+    closed same day: control-keyword stripping, runScript.sh -g pset payload expansion +
+    case-fix, java/.jar + DPL rules, air rule; sanitized twins pinned) and the 07-16
+    [question] gate-agenda line ((a)–(d) all decided; cross-machine reconcile with the
+    07-15 vocab gate recorded at the b3c455f merge).
+  - line-update: the K2 FID/ALIAS company-side line gains the folder-variable FID+SEAL
+    co-location as a candidate FID→seal_id source (side finding from the live captures).
+  - kept parked, unchanged: launcher-registry human-configurable (new today — trigger =
+    web-console admin surfaces or Phase-E urgency); all other lines on their recorded
+    gates (verified this morning, unchanged since).
 
 - 2026-07-16 groom run (weekly inbox groom) — 0 promoted / 0 merged / 1 kept-updated;
   backlog database untouched (summary/next_ready stand as of 2026-07-15):

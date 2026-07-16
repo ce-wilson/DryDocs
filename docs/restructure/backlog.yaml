@@ -36,7 +36,7 @@
 # =============================================================================
 
 schema: drydocs.backlog.v2
-updated: 2026-07-15
+updated: 2026-07-16
 
 # ── The high-level project plan (rendered as the board's roadmap strip) ───────
 plan:
@@ -991,6 +991,63 @@ items:
       no-target, plus empty/unparsed command buckets); extract() returns it; CLI prints
       "coverage: ..." after the graph stats; fixture counts pinned (5 rows -> 4 jobs +
       1 stale) + synthetic nameless/empty/unknown case + row-bucket totality check.
+
+  # (G12/G13 groomed 2026-07-16 — the two pre-flip writer build blockers recorded by the
+  #  2026-07-15 lineage vocab gate + resolved/refined by the 2026-07-16 cmdline-lineage-review.)
+  - id: G12
+    epic: component-topology
+    title: "Lineage writer ETLProcess endpoint class — TRIGGERS targets stop collapsing to :Script"
+    type: task
+    module: drydocs-lineage
+    phase: 6
+    agent: main
+    model: sonnet
+    priority: p2
+    status: todo
+    depends_on: []
+    inputs: [drydocs_lineage/writer.py, drydocs_lineage/model.py, tests/unit/test_lineage_writer.py, config/gate-log.md, drydocs_core/ontology/relationship_vocabulary.yaml]
+    acceptance: >
+      drydocs_lineage.writer maps TRIGGERS targets to :ETLProcess endpoints per the two
+      2026-07 gate decisions (gate-log 2026-07-15 "Lineage rel vocabulary gate" +
+      2026-07-16 "cmdline-lineage-review"): identity = the kind-scoped stable token
+      (Ab Initio pset/graph BASENAME; DPL -pipeline GUID) with kind
+      (etl|utility|notification) stamped and full path / dataflow / config JSON kept as
+      properties; every other non-job process still MERGEs as :Script keyed by full path
+      (multi-mount duplicates stay separate for review). The gate-bound refusal is
+      UNCHANGED — m3_* stay planned and write_curated keeps raising
+      GateBoundVocabularyError until the flips land with the curated-load build. Unit
+      tests prove the endpoint mapping on plan_curated output (duck-typed, no live DB);
+      full suite green.
+    notes: >
+      Groomed 2026-07-16 from the 2026-07-15 inbox line (lineage vocab gate residual);
+      the business-key half was decided at cmdline-lineage-review and implemented
+      extractor-side (_stable_invocation_key) — THIS item is the writer half. Shapes are
+      gate-confirmed, so sonnet with a written acceptance; no ontology decision remains.
+
+  - id: G13
+    epic: component-topology
+    title: "Lineage writer file-ops resolution — script-level reads/writes attribute to the owning job"
+    type: task
+    module: drydocs-lineage
+    phase: 6
+    agent: main
+    model: sonnet
+    priority: p2
+    status: todo
+    depends_on: []
+    inputs: [drydocs_lineage/writer.py, tests/unit/test_lineage_writer.py, config/gate-log.md, drydocs_core/ontology/relationship_vocabulary.yaml]
+    acceptance: >
+      Per the 2026-07-15 gate EDIT (m3_reads_from / m3_writes_to endpoints are
+      "ETLProcess | ControlMJob" -> DataAsset): plan_curated resolves script-level
+      READS_FROM / WRITES_TO candidates to the OWNING ControlMJob via its INVOKES edge
+      before write — a :Script (prov:Entity) never carries prov:used/generated; the ETL
+      case keeps its ETLProcess Activity. A unit test proves a script->asset candidate
+      plans as job->asset and an ETL-case candidate stays ETLProcess->asset; refusal
+      semantics unchanged (m3_* planned until the curated-load build). Full suite green.
+    notes: >
+      Groomed 2026-07-16 from the 2026-07-15 inbox line (same gate, second residual).
+      Pure type-correctness resolution on the candidate side — the edge meanings were
+      confirmed at the gate; no new relationship types.
 
   # ── Epic H — drydocs-review back-flow (main, opus) ────────────────────────
   # REVERSE of the normal port: reproduce the company-authored generic SME-review/
@@ -2795,8 +2852,8 @@ items:
 # Roll-up the dispatcher can glance at. COMPUTED views — test_backlog.py enforces
 # that these match the items exactly; update them with any status change.
 summary:
-  todo: 21                                          # (unchanged)
+  todo: 23                                          # +G12/G13 (2026-07-16 groom — pre-flip lineage-writer build blockers)
   in_progress: 1                                   # E1 (gate deferred)
   blocked: 0
-  done: 71                                          # K4 reshape-apply done 2026-07-15 pm (feat/k4 branch, pending merge)
-  next_ready: [C5, D5, D6, L7, L8, L9, L12, M2, M3, M4, P1, C7, K5, J10, J11, J12, C8]
+  done: 71                                          # K4 branch merged --no-ff to main 2026-07-16 (b3c455f)
+  next_ready: [C5, D5, D6, L7, L8, L9, L12, M2, M3, M4, P1, C7, K5, J10, J11, J12, C8, G12, G13]
