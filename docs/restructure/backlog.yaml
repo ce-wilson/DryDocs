@@ -2906,7 +2906,7 @@ items:
     agent: main
     model: sonnet
     priority: p2
-    status: todo
+    status: in_progress   # pulled 2026-07-16 (user: "start Q2"); main session
     depends_on: []
     inputs: ["Essential-GraphRAG.pdf (repo root — local-only, gitignored)", drydocs/loaders/bmc_docs.py, drydocs/loaders/cypher/bmc_docs.cypher, drydocs_core/ontology/relationship_vocabulary.yaml, config/source-registry.yaml]
     acceptance: >
@@ -2937,8 +2937,8 @@ items:
 # Roll-up the dispatcher can glance at. COMPUTED views — test_backlog.py enforces
 # that these match the items exactly; update them with any status change.
 summary:
-  todo: 24                                          # Q2 remains the open Epic Q item
-  in_progress: 1                                   # E1 (gate deferred)
+  todo: 23                                          # Q2 pulled 2026-07-16 (in_progress)
+  in_progress: 2                                   # E1 (gate deferred), Q2 (main session)
   blocked: 0
   done: 72                                          # +Q1 (2026-07-16 same-day: Essential GraphRAG pattern notes)
-  next_ready: [C5, D5, D6, L7, L8, L9, L12, M2, M3, M4, P1, C7, K5, J10, J11, J12, C8, G12, G13, Q2]
+  next_ready: [C5, D5, D6, L7, L8, L9, L12, M2, M3, M4, P1, C7, K5, J10, J11, J12, C8, G12, G13]
