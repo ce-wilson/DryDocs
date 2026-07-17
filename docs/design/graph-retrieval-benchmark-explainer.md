@@ -1,6 +1,6 @@
 # Why We're Betting on Graph Traversal — A Retrieval Benchmark, Explained
 
-**Explainer · Rev 1 · 2026-07-16 · commit `0e036ff` · Classification: Internal-Public
+**Explainer · Rev 2 · 2026-07-17 · commit `0e036ff` · Classification: Internal-Public
 (mechanism only — no customer names, hosts, schedules, SIDs, or real identifiers appear in
 this document).**
 
@@ -118,12 +118,18 @@ about 27 times the ~16,400 characters traversal needed (per question the gap ran
 
 Why the token number is the one to care about:
 
-- **112k tokens is most of an agent's working memory.** Answering 12 questions by
-  file-reading roughly fills a typical context window once — leaving little room for the
-  actual incident context, and burning the same cost again for the next 12 questions.
-- **Cost and latency scale with tokens.** Every character retrieved is paid for on every
-  question, on every shift, forever. A 27× multiplier on the retrieval bill is the
-  difference between an always-on assistant and a tool you ration.
+- **The costs are per question, and they pile up in the conversation.** No single answer
+  fills the window — file-reading averaged ~9.4k tokens per question (worst case ~21k,
+  a version question that read two whole files) versus ~340 for traversal. But in a
+  continuous incident conversation, retrieved text doesn't vanish after each answer: it
+  stays in the agent's history. Twelve file-read answers leave **~112k tokens of
+  documentation riding along in context** — most of a typical window consumed before the
+  incident's own logs and timeline are counted, and re-processed on every later turn.
+  Traversal's residue after the same session: ~4.1k tokens.
+- **Run stateless instead (a fresh call per question) and the window never fills — but
+  the bill recurs.** Retrieval is re-paid on every question, every shift, forever, and
+  the cumulative spend is the same 112k-vs-4.1k comparison. A 27× multiplier on the
+  retrieval bill is the difference between an always-on assistant and a tool you ration.
 - **Dilution is a quality problem, not just a cost problem.** A model handed 80,000
   characters to find one paragraph is measurably more likely to miss it than a model
   handed the right 1,500 characters. Smaller, better-targeted context is *more* accurate,
