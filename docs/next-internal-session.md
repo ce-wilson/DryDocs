@@ -16,18 +16,31 @@
       exposes the derived `ctlm_id` column (P2 gate §B; probes P0/P4).
       → unblocks **P3** (hosts loader), **P4** (avg-run supplement), then **P5**
       (maintenance-window query); twins company tracker **T5**.
+      *Internal readout 2026-07-17 (screenshot):* probes RAN — P1 flipped `done` in the
+      company working tree only, by a concurrent Epic P (CM_AVG_RUN) session holding
+      **uncommitted P1/P2/P3 flips** in `backlog.yaml` (committed main there still `todo`;
+      groom-commits collide until that session lands). DC-scope-call outcome and probe
+      conclusions not yet reported — leave unticked until the flip commits and the
+      conclusions groom back. Item 5 (DC-collision check) should ride the same scope call.
 
 - [ ] **2. E1 re-arm — CM_HIST run-history source** (backlog in_progress, gate deferred 07-14)
       Confirm CM_HIST shape/retention on live psgmgr (JOB_MEM_NAME = JOB_NAME;
       MEMNAME is junk; DTSREMGR retired) as the jobrun-observation run-history source,
       then re-present the `sosa-jobrun-observation` gate.
       → unblocks **E2** (first context-graph query, phase 4).
+      *Internal readout 2026-07-17:* unchanged — `in_progress`, gate-bound (terms stay
+      `planned` until the SME confirms).
 
 - [ ] **3. K2 FID tier — folder-variable candidate probe** (new 2026-07-16)
       Count FID_D/FID_Q/FID_P + SEAL co-location across live folder variables (SEAL is
       also embedded in folder names): is a **FID → seal_id table derivable from
       Control-M itself**, instead of waiting on a company reference table?
       → potentially shortcuts company tracker **T2** (tier-2 reconciler wiring).
+      *Internal readout 2026-07-17:* probe not yet run. Company session confirms the
+      TierReconcilers seam still ships EMPTY for FID (tier-2) + ALIAS (tier-4) — their
+      IDEAS 2026-07-14 line + tracker rows T2/T3 — and flagged it a promote-to-backlog
+      candidate on their side. This probe is what would decide whether T2 needs the
+      company reference table at all.
 
 - [ ] **4. ctlm_id ripple sweep** (parked 07-14)
       One query per CM_ view/extract: which others carry the derived `ctlm_id`
@@ -50,6 +63,7 @@
 - [ ] **6. M2 — WAS_GENERATED_BY edge-diet migration** (backlog, ready)
       Destructive on an existing graph → HITL-confirm, then run the migration on the
       live/sandbox graph; backfill envelope props where recoverable; m3-verify updated.
+      *Internal readout 2026-07-17:* still `todo` company-side (`depends_on: M1`).
 
 - [ ] **7. Lineage live-load gate** (parked IDEAS line; the flips + first curated write)
       PRE-REQ (producer box, no live data): build **G12** (writer ETLProcess endpoint
