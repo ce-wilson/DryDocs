@@ -1,0 +1,231 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>wf-admin-config-01 — admin configuration page (rung 3 line wireframe)</title>
+<style>
+  /* Rung-3 rules: grayscale only, boxes + labels, no theme, print-friendly. */
+  :root { --ink:#333; --line:#8a8a8a; --fill:#f2f2f2; --faint:#bbb; }
+  * { box-sizing:border-box; margin:0; }
+  body { font:13px/1.45 "Segoe UI", Arial, sans-serif; color:var(--ink); background:#fff; padding:16px; }
+  .note { color:#666; margin:0 0 12px; max-width:1000px; }
+  .frame { max-width:1240px; border:2px solid var(--ink); }
+  .zone { border:1px dashed var(--line); position:relative; }
+  .tag { position:absolute; top:2px; right:6px; font-size:10px; color:var(--faint); letter-spacing:.06em; }
+  .box { border:1px solid var(--line); background:var(--fill); padding:4px 10px; display:inline-block; }
+  .ann { display:inline-block; width:16px; height:16px; border:1px solid var(--ink); border-radius:50%;
+         text-align:center; font-size:10px; line-height:14px; background:#fff; }
+
+  header.hd { display:flex; align-items:center; gap:12px; padding:10px 14px; border-bottom:2px solid var(--ink); }
+  .hd .search { flex:1; max-width:380px; border:1px solid var(--line); padding:5px 10px; color:#777; }
+  .hd .spacer { flex:1; }
+
+  .body { display:flex; }
+  aside.aside { width:180px; border-right:2px solid var(--ink); padding:10px; display:flex; flex-direction:column; }
+  .aside nav { flex:1; display:flex; flex-direction:column; gap:4px; margin-top:8px; }
+  .aside nav a { border:1px solid var(--line); padding:4px 8px; color:var(--ink); text-decoration:none; font-size:12px; }
+  .aside nav a.active { background:#ddd; font-weight:600; }
+  .aside .admin { border:1px solid var(--ink); padding:3px 8px; margin-top:8px; text-align:center; font-size:11px; }
+
+  main.main { flex:1; display:flex; flex-direction:column; min-width:0; }
+  .toolbar { border-bottom:1px dashed var(--line); padding:8px 14px; color:#555; display:flex; gap:10px; align-items:center; }
+  .toolbar .spacer { flex:1; }
+
+  .split { display:flex; }
+  .center { flex:1; min-width:0; }
+
+  .chain { padding:8px; }
+  .chain svg { display:block; margin:0 auto; }
+
+  .divider { border-top:2px solid var(--ink); text-align:center; color:var(--faint); font-size:10px; letter-spacing:.2em; }
+
+  .frames { padding:10px 14px; }
+  .tabs { display:flex; gap:6px; margin-bottom:8px; }
+  .tabs .box.on { background:#ddd; font-weight:600; }
+  table.mx { border-collapse:collapse; width:100%; font-size:11.5px; }
+  .mx th, .mx td { border:1px solid var(--line); padding:4px 7px; text-align:left; vertical-align:top; }
+  .mx th { background:var(--fill); }
+  .mx tr.sel td { background:#e4e4e4; }
+  .mx .st { text-align:center; white-space:nowrap; }
+
+  .insp { width:230px; border-left:2px solid var(--ink); padding:10px; font-size:12px; }
+  .insp h4 { font-size:12px; margin:0 0 6px; border-bottom:1px dashed var(--line); padding-bottom:4px; }
+  .insp dl { margin:0 0 10px; }
+  .insp dt { color:#777; font-size:10px; text-transform:uppercase; letter-spacing:.05em; margin-top:6px; }
+  .insp dd { margin:0; }
+  .insp .act { display:block; border:1px solid var(--line); background:var(--fill); padding:4px 8px; margin-top:6px; text-align:center; color:var(--ink); text-decoration:none; }
+
+  .key { max-width:1240px; margin-top:14px; color:#555; }
+  .key li { margin:2px 0 2px 4px; }
+</style>
+</head>
+<body>
+
+<p class="note"><strong>wf-admin-config-01 (rung 3)</strong> — line wireframe of the
+admin configuration page (route <code>/admin/config</code>, admin persona only).
+Instantiates the shared module-subpage template: graph pane = the selected surface's
+traceability chain; data frames = enforcement matrix / surface detail / gate log.
+Spec: <code>wf-admin-config-01.md</code> · backlog <strong>O12</strong>. No edit
+controls anywhere — config-as-code stays behind the gates.</p>
+
+<div class="frame">
+
+  <header class="hd">
+    <span class="box">LOGO · DryDocs</span>
+    <span class="search">search: nodes, servers, jobs…</span>
+    <span class="spacer"></span>
+    <span class="box">Prod | UAT | Dev</span>
+    <span class="box">◐</span>
+    <span class="box">🔔</span>
+    <span class="box">@admin</span>
+  </header>
+
+  <div class="body">
+    <aside class="aside zone">
+      <span class="tag">ASIDE</span>
+      <nav>
+        <a href="#/">Overview</a>
+        <a href="#/explorer">Explorer</a>
+        <a href="#/lineage">Lineage</a>
+        <a href="#/ownership">Ownership</a>
+        <a href="#/runbooks">Runbooks</a>
+        <a href="#/remediation">Remediation</a>
+        <a href="#/docs">Docs</a>
+        <a href="#/gates">Gates</a>
+        <a href="#/loads">Loads</a>
+        <a class="active" href="#/admin/config">⚙ Configuration</a>
+      </nav>
+      <div class="admin">ADMIN persona only <span class="ann">1</span></div>
+    </aside>
+
+    <main class="main">
+      <div class="toolbar zone">
+        Home &gt; Admin &gt; Configuration
+        <span class="spacer"></span>
+        <span class="box">refresh</span>
+        <span class="box">▾ Export <span class="ann">2</span></span>
+      </div>
+
+      <div class="split">
+        <div class="center">
+
+          <div class="chain zone">
+            <span class="tag">GRAPH PANE — traceability chain of selected surface <span class="ann">3</span></span>
+            <svg viewBox="0 0 960 150" width="100%" height="150" role="img"
+                 aria-label="Traceability chain: config file to code consumer to guard tests to gate reference">
+              <g stroke="#8a8a8a" stroke-width="1.4" fill="none">
+                <path d="M 218 75 H 268"/>
+                <path d="M 448 75 H 480 L 508 47"/>
+                <path d="M 480 75 L 508 103"/>
+                <path d="M 700 47 L 728 68"/>
+                <path d="M 700 103 L 728 82"/>
+              </g>
+              <g font-size="11.5" fill="#333" text-anchor="middle">
+                <g><!-- config file -->
+                  <rect x="38" y="48" width="180" height="54" fill="#f2f2f2" stroke="#333" stroke-width="1.6"/>
+                  <text x="128" y="70" font-weight="600">config file</text>
+                  <text x="128" y="88" font-size="10" fill="#666">config/source-registry.yaml</text>
+                </g>
+                <g><!-- consumer -->
+                  <rect x="268" y="48" width="180" height="54" fill="#f2f2f2" stroke="#8a8a8a"/>
+                  <text x="358" y="70" font-weight="600">code consumer</text>
+                  <text x="358" y="88" font-size="10" fill="#666">drydocs/loaders/* (BaseLoader)</text>
+                </g>
+                <g><!-- test 1 -->
+                  <rect x="508" y="18" width="192" height="44" fill="#f2f2f2" stroke="#8a8a8a"/>
+                  <text x="604" y="36" font-weight="600">guard test</text>
+                  <text x="604" y="52" font-size="10" fill="#666">test_source_registry.py</text>
+                </g>
+                <g><!-- test 2 -->
+                  <rect x="508" y="88" width="192" height="44" fill="#f2f2f2" stroke="#8a8a8a"/>
+                  <text x="604" y="106" font-weight="600">guard test</text>
+                  <text x="604" y="122" font-size="10" fill="#666">test_classification.py</text>
+                </g>
+                <g><!-- gate -->
+                  <rect x="728" y="48" width="192" height="54" fill="#fff" stroke="#333" stroke-dasharray="4 3"/>
+                  <text x="824" y="70" font-weight="600">gate reference</text>
+                  <text x="824" y="88" font-size="10" fill="#666">per-source gate · gate-log anchor</text>
+                </g>
+              </g>
+            </svg>
+          </div>
+
+          <div class="divider">= resizable divider — pane may collapse to 0 (table-first page) =</div>
+
+          <div class="frames zone">
+            <span class="tag">DATA FRAMES</span>
+            <div class="tabs">
+              <span class="box on">Enforcement matrix</span>
+              <span class="box">Surface detail (read-only)</span>
+              <span class="box">Gate log</span>
+            </div>
+            <table class="mx">
+              <thead>
+                <tr><th>surface</th><th>file</th><th>consumers</th><th>guard tests</th><th>gate ref</th><th class="st">status <span class="ann">5</span></th></tr>
+              </thead>
+              <tbody>
+                <tr class="sel">
+                  <td>Source registry</td><td>config/source-registry.yaml</td>
+                  <td>loaders/adapters</td><td>test_source_registry.py</td>
+                  <td>per-source gates</td><td class="st">[enforced]</td>
+                </tr>
+                <tr>
+                  <td>Column ledgers</td><td>config/source-mappings/</td>
+                  <td>extract SQL · to_params</td><td>test_source_mappings.py · _drift.py</td>
+                  <td>doc-08</td><td class="st">[enforced]</td>
+                </tr>
+                <tr>
+                  <td>Classification</td><td>config/classification.yaml</td>
+                  <td>publish boundary</td><td>test_classification.py · test_publishing.py</td>
+                  <td>PUBLISH-BOUNDARY</td><td class="st">[enforced]</td>
+                </tr>
+                <tr>
+                  <td>Taxonomy→ontology map</td><td>config/taxonomy-ontology-map.yaml</td>
+                  <td>mapping activation</td><td>test_taxonomy_ontology_map.py</td>
+                  <td>HITL flow</td><td class="st">[gate-pending]</td>
+                </tr>
+                <tr>
+                  <td>Launcher registry</td><td>⚠ code-resident (commands.py)</td>
+                  <td>command parser</td><td>test_command_parser.py</td>
+                  <td>—</td><td class="st">[unguarded-config] <span class="ann">6</span></td>
+                </tr>
+                <tr>
+                  <td colspan="6" style="color:#999">… generated rows (enforcement-matrix.json) — see ④ …</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <aside class="insp zone">
+          <span class="tag">INSPECTOR</span>
+          <h4>Source registry</h4>
+          <dl>
+            <dt>path</dt><dd>config/source-registry.yaml</dd>
+            <dt>schema</dt><dd>(schema key from file header)</dd>
+            <dt>last commit</dt><dd>hash · date · author</dd>
+            <dt>gate ref</dt><dd>per-source (gate-log anchor)</dd>
+            <dt>classification</dt><dd>internal-public</dd>
+          </dl>
+          <a class="act" href="#detail">view file (read-only)</a>
+          <a class="act" href="#copy">copy repo path</a>
+          <a class="act" href="#gate">open gate flow <span class="ann">7</span></a>
+        </aside>
+      </div>
+    </main>
+  </div>
+</div>
+
+<ol class="key">
+  <li><b>①</b> route exists only for the admin persona (O2 gating); users never see the nav entry.</li>
+  <li><b>②</b> Export = the O11 path; the matrix itself exports as CSV + provenance manifest (auditor hand-off).</li>
+  <li><b>③</b> chain re-renders on matrix row select; clicking a chain node highlights that column.</li>
+  <li><b>④</b> matrix rows come from generated <code>enforcement-matrix.json</code> (script scans config/ + tests/unit/); a unit test fails on any unlisted surface or dangling file/test reference — the matrix cannot drift.</li>
+  <li><b>⑤</b> status: enforced · unguarded (the page's red-flag KPI) · gate-pending.</li>
+  <li><b>⑥</b> the launcher-registry row renders as the visible odd-one-out (code-resident config) — the standing argument for its config-file migration (separate inboxed item).</li>
+  <li><b>⑦</b> no editing in the UI — actions are links to the repo path and the gate flow.</li>
+</ol>
+
+</body>
+</html>

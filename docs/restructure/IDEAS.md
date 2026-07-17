@@ -61,8 +61,11 @@ Tags help grooming: `idea` · `bug` · `doc` · `source` (new data source) · `q
   drydocs_core/controlm/commands.py is code-resident; teams add wrappers/variables
   faster than code releases. First step = a config-file registry (config/ pattern,
   test-guarded like source mappings); end state = an admin screen in the web console
-  (Epic O candidate). Groom when the web console picks up admin surfaces or when the
-  UNKNOWN backlog (Phase E) makes config-driven rules urgent.
+  (Epic O candidate). PARTIALLY GROOMED 2026-07-17: the admin-screen end state → **O12**
+  (admin configuration page w/ generated enforcement matrix; wireframes
+  UI-WIP/wf-admin-config-01.*). The config-file registry migration itself REMAINS
+  inboxed (drydocs-core work) — the O12 matrix renders it as the visible
+  unguarded-config example until migrated.
 
 - 2026-07-14 — [doc] **`drydocs-project-review.md` has no canonical outline** — the new
   whole-project review (docs/design/) renders through the Epic L pipeline but is free-form:

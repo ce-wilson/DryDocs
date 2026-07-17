@@ -2633,6 +2633,38 @@ items:
       (O5), so export endpoints land there directly; the ADK agent layer is a later,
       separate concern (site-plan corrected this groom).
 
+  - id: O12
+    epic: web-console
+    title: "Admin configuration page: read-only view of the config layer with a GENERATED enforcement matrix (config file -> code consumer -> guard test -> gate)"
+    type: task
+    module: drydocs-web
+    phase: 12
+    agent: main
+    model: sonnet
+    priority: p2
+    status: todo
+    depends_on: [O8]
+    inputs: [UI-WIP/wf-admin-config-01.md, UI-WIP/wf-admin-config-01.html, config/, tests/unit/, web/src/]
+    acceptance: >
+      /admin/config exists behind the admin persona (O2 gating) and instantiates the
+      shared subpage template: graph pane renders the selected surface's traceability
+      chain (config file -> code consumer(s) -> guard test(s) -> gate reference);
+      data-frame tabs show (a) the enforcement matrix, (b) the selected surface's file
+      content read-only (confidential surfaces send structure/keys only), (c) the gate
+      log. The matrix is GENERATED - a script scans config/ + tests/unit/ and emits
+      enforcement-matrix.json - and a unit test fails when a config surface has no
+      matrix row or a row references a missing file/test (the matrix cannot drift from
+      the repo). Status column distinguishes enforced / unguarded / gate-pending; the
+      code-resident launcher registry renders as the visible unguarded-config example.
+      NO edit controls anywhere - each surface links to its repo path + gate flow
+      (config-as-code stays behind the gates).
+    notes: >
+      Groomed 2026-07-17 from the 2026-07-16 launcher-registry IDEAS line's "admin
+      screen in the web console (Epic O candidate)" end-state - its stated trigger
+      ("groom when the web console picks up admin surfaces") fired with the site-plan
+      build-out. The config-file launcher-registry migration itself stays inboxed
+      (drydocs-core work, separate groom). Wireframes are the item spec.
+
   # ── Epic P — Runtime topology & maintenance windows — Phase 13 ─────────────
   # Born 2026-07-09: CM_HOSTS + CM_AVG_RUN onboarded via the add-source-object
   # walkthrough; gate controlm-hosts-topology SIGNED OFF 18/18 same day
@@ -3111,7 +3143,7 @@ items:
 # Roll-up the dispatcher can glance at. COMPUTED views — test_backlog.py enforces
 # that these match the items exactly; update them with any status change.
 summary:
-  todo: 27                                          # +O8-O11 (2026-07-17 site-plan groom); docmeta P1-P3 still groomable (IDEAS docmeta line)
+  todo: 28                                          # +O8-O12 (2026-07-17 site-plan groom + admin-config page); docmeta P1-P3 still groomable (IDEAS docmeta line)
   in_progress: 1                                   # E1 (gate deferred)
   blocked: 0
   done: 74                                          # +Q3 (2026-07-16 same-day: P0 written verdict = BUILD)
