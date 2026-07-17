@@ -22,7 +22,7 @@
 | Components | **ReUI free** (shadcn-style, copied into repo) | Data Grid, Filters, Tree, Timeline, Resizable, Sheet cover the shell + frames; enable ReUI MCP (`https://mcp.reui.io`) + `@reui/skills-claude` when build starts |
 | Graph canvas | React Flow | lineage + explorer canvases; NVL is the fallback only if Neo4j-native rendering becomes a requirement |
 | Routing | React Router (real routes, not display toggles) | fixes design-review 🔴 #1: every view deep-linkable + back-button safe |
-| Backend | ADK 2.0 agent (`adk api_server`, REST/SSE; AG-UI optional later) → Neo4j MCP → graph | agent owns Cypher; UI never speaks Bolt directly |
+| Backend | **drydocs-api** (shipped, O5 / ADR 0005) via the O4 GraphAccess seam; ADK 2.0 agent layer added later for agent/chat features | UI never speaks Bolt directly (dev-mode bolt adapter only, per ADR 0005) |
 | Fonts | IBM Plex Sans + IBM Plex Mono, **self-hosted woff2** | design-review: no Google Fonts CDN (intranet target) |
 
 ## 2. Theme system — system default, dark-first design
@@ -164,14 +164,16 @@ Rules wired to the repo's classification model (`PUBLISH-BOUNDARY.md`):
 - A "Copy as Cypher" action alongside export (the spec's query + params) — reproduces
   the mockups' Cypher-panel-as-documentation idea and gives SMEs the exact provenance.
 
-### Backend note
+### Backend note (corrected at groom, 2026-07-17)
 
-The export endpoint is the first concrete consumer for the **drydocs-api** seam
-(backlog O5, gated on ADR-0005/O3). Until that gate resolves, the ADK agent's tool
-layer IS the API: `run_query_spec(spec_id, params)` + `export_query_spec(...)` as agent
-tools. No new HITL gate needed for the UI itself — it is read-only against the graph;
-anything write-shaped (annotations, gate actions in module 7) goes through the existing
-gate flow, not the UI directly.
+ADR 0005 is **ratified** and **drydocs-api already exists** (backlog O5 done, with the
+O4 GraphAccess seam in `web/src/lib` and named read endpoints in
+`drydocs_api/queries.py`) — the export endpoints land in drydocs-api directly
+(`run_query_spec` / `export_query_spec`), and data frames consume QuerySpecs through
+the existing seam. The ADK 2.0 agent layer is a LATER, separate addition for
+agent/chat features, not the read path. No new HITL gate needed for the UI itself —
+it is read-only against the graph; anything write-shaped (annotations, gate actions in
+module 7) goes through the existing gate flow, not the UI directly.
 
 ## 5. Phasing
 
@@ -192,7 +194,10 @@ gate flow, not the UI directly.
 
 ## 6. Follow-ups this plan creates
 
-- [ ] Groom P0–P2 into `backlog.yaml` (new module id suggestion: `drydocs-ui`).
+- [x] Groom P0–P2 into `backlog.yaml` — DONE 2026-07-17 as **O8–O11** (Epic O,
+      phase 12, existing modules `drydocs-web`/`drydocs-api`; the `drydocs-ui`
+      module suggestion below is superseded — the registry already names the
+      front-end component).
 - [ ] LFS the 19 MB `start-react-free-reference.fig` before UI-WIP is committed wholesale.
 - [ ] Retire the Salt two-track language from the IDEAS entry at next groom (decision
       note added to IDEAS now).

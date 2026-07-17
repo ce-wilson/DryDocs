@@ -36,7 +36,7 @@
 # =============================================================================
 
 schema: drydocs.backlog.v2
-updated: 2026-07-16
+updated: 2026-07-17
 
 # ── The high-level project plan (rendered as the board's roadmap strip) ───────
 plan:
@@ -2528,6 +2528,111 @@ items:
       test_drydocs_api.py. The inbox note predated the O5 build by hours and was stale when
       groomed. Item kept (ids are stable) as the audit-trail record; no new code.
 
+  # O8–O11: the site-plan build-out (UI-WIP/site-plan.md, groomed 2026-07-17 from
+  # the IDEAS UI DECISION line — single-track ReUI, Salt dropped). Module choice:
+  # the EXISTING drydocs-web / drydocs-api registry entries, not a new drydocs-ui
+  # module (site-plan §6's suggested id superseded by this groom).
+  - id: O8
+    epic: web-console
+    title: "Site shell rebuild on the locked UI stack: ReUI/Tailwind zone shell, system-default theming, 9-module routing skeleton"
+    type: task
+    module: drydocs-web
+    phase: 12
+    agent: main
+    model: sonnet
+    priority: p2
+    status: todo
+    depends_on: [O6]
+    inputs: [UI-WIP/site-plan.md, UI-WIP/layout-anatomy-checklist.md, UI-WIP/design-review.md, web/src/]
+    acceptance: >
+      web/ runs on the locked single-track stack (Vite + React + Tailwind + ReUI free —
+      Salt dropped): the zone shell from layout-anatomy-checklist.md (aside / header /
+      page-owned toolbar / content / right-sidebar slot, one typed layout config driving
+      every zone); theming = dark + light token sheets behind a pre-paint boot script
+      defaulting to the system scheme with a 3-state System/Dark/Light toggle (dark
+      tokens carried from drydocs-landing-dark.html, --faint contrast fix applied);
+      IBM Plex self-hosted; all 9 module routes from site-plan §3 exist as real
+      deep-linkable routes (back-button safe; focus moves to the view h2 on route
+      change); view components still reach the graph only through the O4 GraphAccess
+      seam.
+    notes: >
+      site-plan.md P0. Evolves the existing web/ console (O2/O6 surfaces survive as
+      routes or are consciously retired in the shell PR — no silent deletion).
+
+  - id: O9
+    epic: web-console
+    title: "Radial-hub landing + Explorer module page on the shared subpage template (graph pane over data frames, linked selection)"
+    type: task
+    module: drydocs-web
+    phase: 12
+    agent: main
+    model: sonnet
+    priority: p2
+    status: todo
+    depends_on: [O8]
+    inputs: [UI-WIP/site-plan.md, UI-WIP/Gemini_Generated_Landing-Favorite.png, UI-WIP/Gemini-generated-subpage.png, web/src/]
+    acceptance: >
+      Landing renders the radial hub (red brand core, one spoke per module, spoke = the
+      same route as the aside-nav item; SVG rebuild, not the raster mock) with a generic
+      Explore CTA; the shared module-subpage template exists ONCE and Explorer
+      instantiates it: page-owned toolbar (breadcrumbs + page actions), React Flow graph
+      pane over ReUI data-frame tabs with a resizable divider, right node-inspector
+      panel keyed by node type; graph and grid share one selection store (node click
+      filters rows, row select highlights the node); demo tower content keeps its
+      SYNTHESIZED/illustrative tags; screenshot parity with the mock in BOTH dark and
+      light.
+    notes: "site-plan.md P1. Towers are Explorer demo content, not modules."
+
+  - id: O10
+    epic: web-console
+    title: "Lineage module page: React Flow source-to-target DAG over lineage data frames"
+    type: task
+    module: drydocs-web
+    phase: 12
+    agent: main
+    model: sonnet
+    priority: p2
+    status: todo
+    depends_on: [O9]
+    inputs: [UI-WIP/site-plan.md, UI-WIP/Gemini-generated-subpage-2.png, web/src/]
+    acceptance: >
+      /lineage instantiates the shared template: a React Flow source-to-target DAG
+      (mock subpage-2 pattern) with node/edge styles reading the theme tokens in both
+      schemes; its data frames (hops, data assets, schema definition) served through
+      the GraphAccess seam; /lineage/asset/:assetId deep links resolve; selection
+      linking works as in Explorer.
+    notes: "site-plan.md P2, canvas half."
+
+  - id: O11
+    epic: web-console
+    title: "QuerySpec registry + two-path Neo4j data-frame export (client view export; streamed full export with provenance manifest)"
+    type: task
+    module: drydocs-api
+    phase: 12
+    agent: main
+    model: sonnet
+    priority: p2
+    status: todo
+    depends_on: [O9]
+    inputs: [UI-WIP/site-plan.md, drydocs_api/, web/src/, PUBLISH-BOUNDARY.md, config/classification.yaml]
+    acceptance: >
+      Every data frame binds to a versioned QuerySpec (id, database, parameterized
+      read-only cypher, columns, classification) and the UI renders only registry
+      results; the toolbar/grid [Export] offers (a) client-side CSV/JSON of the current
+      grid state and (b) a drydocs-api export endpoint that re-runs the spec
+      server-side and STREAMS csv/jsonl (driver streaming — not apoc.export, which
+      writes on the DB server) with a provenance manifest (spec id, cypher hash,
+      params, database, executed_at, row_count, classification, trust tiers present);
+      internal / internal-confidential exports carry the banner + filename prefix;
+      anything readable from ddcontext is watermarked SYNTHESIZED; a "Copy as Cypher"
+      action exposes the spec's query + params; unit tests cover manifest content and
+      the classification rules.
+    notes: >
+      site-plan.md P2, export half. The plan §4 "until O3 resolves, the ADK tool layer
+      IS the API" caveat is OBSOLETE — ADR 0005 is ratified and drydocs-api shipped
+      (O5), so export endpoints land there directly; the ADK agent layer is a later,
+      separate concern (site-plan corrected this groom).
+
   # ── Epic P — Runtime topology & maintenance windows — Phase 13 ─────────────
   # Born 2026-07-09: CM_HOSTS + CM_AVG_RUN onboarded via the add-source-object
   # walkthrough; gate controlm-hosts-topology SIGNED OFF 18/18 same day
@@ -3006,8 +3111,8 @@ items:
 # Roll-up the dispatcher can glance at. COMPUTED views — test_backlog.py enforces
 # that these match the items exactly; update them with any status change.
 summary:
-  todo: 23                                          # phase-14 P0 complete; docmeta P1-P3 groomable at the next groom (IDEAS docmeta line)
+  todo: 27                                          # +O8-O11 (2026-07-17 site-plan groom); docmeta P1-P3 still groomable (IDEAS docmeta line)
   in_progress: 1                                   # E1 (gate deferred)
   blocked: 0
   done: 74                                          # +Q3 (2026-07-16 same-day: P0 written verdict = BUILD)
-  next_ready: [C5, D5, D6, L7, L8, L9, L12, M2, M3, M4, P1, C7, K5, J10, J11, J12, C8, G12, G13]
+  next_ready: [C5, D5, D6, L7, L8, L9, L12, M2, M3, M4, P1, C7, K5, J10, J11, J12, C8, G12, G13, O8]

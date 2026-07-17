@@ -26,15 +26,6 @@ Tags help grooming: `idea` · `bug` · `doc` · `source` (new data source) · `q
 
 <!-- add new ideas at the top -->
 
-- 2026-07-17 — [idea] **UI DECISION: single track — ReUI only, Salt DS dropped** (amends the
-  UI-stack entry below; user call). No company-variant skin track; the shell stays
-  library-agnostic as architecture, not as a second-skin plan. Site plan written:
-  `UI-WIP/site-plan.md` — theme = system-default with 3-state toggle (dark designed first),
-  radial-hub landing per the favorite mock, one module-subpage template × 9 modules
-  (Explorer/Lineage/Ownership/Runbooks/Remediation/Docs/Gates/Loads), QuerySpec-registry
-  data frames with a two-path Neo4j export function (client view-export + ADK-streamed full
-  export, provenance manifest + classification banners per PUBLISH-BOUNDARY). Groom P0–P2
-  into backlog (suggested module id: `drydocs-ui`).
 - 2026-07-17 — [question/idea/chore] **GraphAcademy MCP advisor review findings** (full audit
   + confirmations: `knowledge/upgrade-plans/neo4j-advisor-confirmation-2026-07-17.md`; load
   architecture, batch size, checksum diet, and the ADR 0002 composite/proxy pattern all
@@ -56,33 +47,6 @@ Tags help grooming: `idea` · `bug` · `doc` · `source` (new data source) · `q
     on main; docmeta P0 verdict is the authoritative retrieval direction.
   - (done same day: DryDocs data model saved to GraphAcademy course `genai-context-graphs`
     via `save_data_model` — future tutor sessions load our real schema.)
-- 2026-07-17 — [idea] **UI-stack decision (proposed): Vite + React + Tailwind + shadcn/ReUI
-  free tier + React Flow, fronting a Google ADK 2.0 agent backend.** ReUI free tier
-  (1,019 shadcn components + Data Grid/Filters/Tree/Timeline primitives; free forever,
-  unlimited commercial use — cleaner license than Metronic's $49 single-project/no-paying-
-  users tier) covers the shell + data frames; React Flow covers the lineage graph (nothing
-  Keenthemes sells does). **ADK 2.0 compatibility CONFIRMED 2026-07-17:** they occupy
-  different layers — ReUI is presentation-only React components copied into our own app;
-  ADK 2.0 is the backend agent runtime (Python/TS/Go/Java/Kotlin, graph workflow engine,
-  built-in HITL primitive — nice echo of our gate discipline) reached from the frontend via
-  plain REST/SSE from `adk api_server`, or the AG-UI protocol (CopilotKit React SDK, the
-  officially blogged path — its components coexist with shadcn/Tailwind in the same app),
-  or Google's A2UI for agent-rendered UI. No coupling, no conflict; ADK's own `adk web`
-  dev UI is Angular and is a dev tool, not the product UI. Target architecture sketch:
-  React/ReUI shell ↔ REST-or-AG-UI ↔ ADK 2.0 agent ↔ Neo4j MCP server ↔ graph. Free
-  enablers when UI work starts: ReUI MCP (`https://mcp.reui.io`) + `@reui/skills-claude`.
-  Artifacts already in UI-WIP/: layout-anatomy-checklist.md + start-react-free-reference.fig
-  (the 2021 Start React Free code itself = ruled out, EOL stack). **Two-track addendum
-  2026-07-17 (Salt DS assessed):** JPMC's Salt (`@salt-ds/core`, Apache-2.0, active — 1.67.0
-  Jul 2026, 1,200+ internal apps) is the likely company-side choice — sanctioned system,
-  data-dense/density-modes/AG-Grid pairing, WCAG 2.1 — but it's a versioned npm dependency
-  (lab-package churn), not Tailwind, and aesthetically opposite the dark-schematic spec. So:
-  **ReUI/shadcn for public/producer DryDocs; Salt skin for the company variant.** Mitigation
-  = keep the shell ARCHITECTURE library-agnostic (UI-WIP/layout-anatomy-checklist.md zones +
-  typed layout-config + page-owned toolbar), so the company port swaps components, not
-  structure; React Flow sits in the middle untouched either way. Community Salt MCP exists
-  (glama.ai @feesch/salt-mcp). Groom into a UI epic when the wireframes settle.
-
 - 2026-07-16 — [idea] **EE container re-bootstrap loses loaded corpora — fold the
   demonstrable-content loads into the bootstrap ritual.** Found at Q3: the fresh
   neo4j-drydocs-ee (O6 bootstrap) had no bmc-docs corpus — the 07-08 live load died with
@@ -224,6 +188,19 @@ Tags help grooming: `idea` · `bug` · `doc` · `source` (new data source) · `q
 
 <!-- when you promote an idea, move its line here with the resulting backlog id -->
 
+- 2026-07-17 site-plan groom — 4 promoted (O8–O11, Epic O phase 12), 2 inbox lines closed:
+  - [idea] **UI DECISION: single-track ReUI, Salt DROPPED** (user call) + site plan
+    (`UI-WIP/site-plan.md`: system-default 3-state theming dark-first, radial-hub landing,
+    one module-subpage template × 9 modules, QuerySpec registry + two-path Neo4j
+    data-frame export with provenance manifest/classification banners) → **O8** (shell +
+    theme + routes), **O9** (landing + Explorer template), **O10** (Lineage canvas),
+    **O11** (QuerySpec + export, module drydocs-api). Existing modules used — the plan's
+    `drydocs-ui` module suggestion superseded (registry already names drydocs-web).
+  - [idea] UI-stack proposal 2026-07-17 (ReUI free + React Flow + ADK 2.0 compat; Salt
+    two-track addendum) → subsumed: stack table = site-plan §1; Salt track dropped by the
+    same-day decision; ADK enablers (mcp.reui.io, @reui/skills-claude, AG-UI notes)
+    preserved in site-plan §1 + memory. Site-plan §4 backend caveat corrected at groom:
+    ADR 0005 ratified + drydocs-api shipped (O5), export endpoints land there.
 - 2026-07-16 evening groom, part 2 (user decisions on the same-day [source] line) —
   2 promoted / 1 plan change (user-approved) / housing executed in-session:
   - PLAN CHANGE: new **phase 14 "Document ingestion & doc-graph benchmarks"** + **Epic Q**
