@@ -9,19 +9,20 @@
 
 ## The one-login batch (all five run in a single psgmgr session)
 
-- [ ] **1. P1 — profiling probes + DC scope call** (backlog p1, ready)
+- [x] **1. P1 — profiling probes + DC scope call** (backlog p1, ready)
       Run `drydocs/loaders/sql/adhoc/profile_cm_hosts.sql` and `profile_cm_avg_run.sql`
       against live psgmgr. Record conclusions per the P1 acceptance + make the DC scope
       call (all 4 production DCs vs pilot). While in CM_AVG_RUN: verify the extract
       exposes the derived `ctlm_id` column (P2 gate §B; probes P0/P4).
       → unblocks **P3** (hosts loader), **P4** (avg-run supplement), then **P5**
       (maintenance-window query); twins company tracker **T5**.
-      *Internal readout 2026-07-17 (screenshot):* probes RAN — P1 flipped `done` in the
-      company working tree only, by a concurrent Epic P (CM_AVG_RUN) session holding
-      **uncommitted P1/P2/P3 flips** in `backlog.yaml` (committed main there still `todo`;
-      groom-commits collide until that session lands). DC-scope-call outcome and probe
-      conclusions not yet reported — leave unticked until the flip commits and the
-      conclusions groom back. Item 5 (DC-collision check) should ride the same scope call.
+      *LANDED 2026-07-17:* company commit `422534f` (pushed) — a surgical partial commit:
+      P1→`done` + new item K6 only, exactly 3 files (`backlog.yaml`, board, IDEAS);
+      `controlm_avg_run*` loader files and the P4/P2/P3/P5 flips deliberately stay as
+      Epic P working-tree WIP (P4 commits alongside the avg-run loader when it lands).
+      STILL OWED producer-side: the probe conclusions + the **DC scope call outcome**
+      have not been relayed here — grab them next internal session; item 5
+      (DC-collision check) inherits whatever that scope call decided.
 
 - [ ] **2. E1 re-arm — CM_HIST run-history source** (backlog in_progress, gate deferred 07-14)
       Confirm CM_HIST shape/retention on live psgmgr (JOB_MEM_NAME = JOB_NAME;
@@ -36,11 +37,14 @@
       also embedded in folder names): is a **FID → seal_id table derivable from
       Control-M itself**, instead of waiting on a company reference table?
       → potentially shortcuts company tracker **T2** (tier-2 reconciler wiring).
-      *Internal readout 2026-07-17:* probe not yet run. Company session confirms the
-      TierReconcilers seam still ships EMPTY for FID (tier-2) + ALIAS (tier-4) — their
-      IDEAS 2026-07-14 line + tracker rows T2/T3 — and flagged it a promote-to-backlog
-      candidate on their side. This probe is what would decide whether T2 needs the
-      company reference table at all.
+      *Internal readout 2026-07-17:* probe not yet run. Company side PROMOTED the
+      follow-up in `422534f` as backlog **K6** ("SEAL attribution FID + ALIAS
+      reconciliation tiers — source the tables, wire the TierReconcilers"; seal-attribution
+      epic, `depends_on: [K2]`, `next_ready`, **no gate** — the m3_seal_app_ref match
+      policy is already active from K2; tier precedence SEAL > FID > APP_NAME > ALIAS).
+      The folder-variable candidate source moved from their IDEAS inbox into K6's audit
+      trail — so THIS probe is now K6's "source the FID table" candidate path; tracker
+      rows T2/T3 stay open until K6 ships.
 
 - [ ] **4. ctlm_id ripple sweep** (parked 07-14)
       One query per CM_ view/extract: which others carry the derived `ctlm_id`
