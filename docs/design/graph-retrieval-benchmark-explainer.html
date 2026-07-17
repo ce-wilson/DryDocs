@@ -1,0 +1,150 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Why We&#x27;re Betting on Graph Traversal — A Retrieval Benchmark, Explained</title>
+<style>
+:root { color-scheme: light dark; --ink:#1a1a1a; --mid:#555; --line:#d0d0d0; --faint:#f6f6f6; --bg:#fff; --link:#0a58ca; }
+@media (prefers-color-scheme: dark) { :root { --ink:#e6e6e6; --mid:#a0a0a0; --line:#3a3a3a; --faint:#1c1c1c; --bg:#141414; --link:#6ea8fe; } }
+:root[data-theme="dark"] { --ink:#e6e6e6; --mid:#a0a0a0; --line:#3a3a3a; --faint:#1c1c1c; --bg:#141414; --link:#6ea8fe; }
+:root[data-theme="light"] { --ink:#1a1a1a; --mid:#555; --line:#d0d0d0; --faint:#f6f6f6; --bg:#fff; --link:#0a58ca; }
+* { box-sizing: border-box; }
+body { font: 15px/1.6 "Segoe UI", system-ui, Arial, sans-serif; color: var(--ink); background: var(--bg); margin: 0; }
+main { max-width: 900px; margin: 0 auto; padding: 32px 24px 80px; }
+h1 { font-size: 28px; margin: 0 0 6px; letter-spacing:-0.3px; }
+h2 { font-size: 20px; margin: 34px 0 10px; padding-bottom:5px; border-bottom: 2px solid var(--ink); }
+h3 { font-size: 16px; margin: 22px 0 8px; }
+h4,h5,h6 { font-size: 14px; margin: 16px 0 6px; }
+p { margin: 10px 0; } strong { font-weight: 700; }
+a { color: var(--link); } a:hover { text-decoration: underline; }
+code { font-family: "Cascadia Mono","Consolas",monospace; font-size: 0.88em; background: var(--faint); padding: 1px 4px; border-radius: 3px; }
+pre { font-family: "Cascadia Mono","Consolas",monospace; font-size: 12.5px; line-height:1.45; border:1px solid var(--line); background: var(--faint); padding: 12px 14px; border-radius: 6px; overflow-x: auto; }
+pre code { background: none; padding: 0; }
+table { border-collapse: collapse; margin: 14px 0; font-size: 13.5px; display:block; overflow-x:auto; }
+th,td { border:1px solid var(--line); padding: 6px 9px; text-align:left; vertical-align: top; }
+th { background: var(--faint); font-weight:700; }
+blockquote { margin: 14px 0; padding: 2px 16px; border-left: 4px solid var(--line); color: var(--mid); }
+ul,ol { margin: 10px 0; padding-left: 26px; } li { margin: 4px 0; }
+hr { border:none; border-top:1px solid var(--line); margin: 26px 0; }
+:target { scroll-margin-top: 12px; } :target > :first-child, h2:target, h3:target { outline: 2px solid var(--link); outline-offset: 4px; }
+
+.dd-note-btn { border:1px solid var(--line); background:var(--bg); color:var(--mid); cursor:pointer; font-size:12px; line-height:1; padding:2px 6px; border-radius:5px; margin-right:6px; }
+.dd-note-btn:hover { color:var(--link); border-color:var(--link); }
+.dd-note-box { margin:6px 0 10px; }
+.dd-note-box textarea { width:100%; min-height:56px; font:13px/1.4 "Segoe UI",system-ui,sans-serif; color:var(--ink); background:var(--faint); border:1px solid var(--line); border-radius:6px; padding:8px; resize:vertical; }
+.dd-annotated { box-shadow:-3px 0 0 var(--link); padding-left:8px; }
+.dd-fb-bar { position:fixed; right:16px; bottom:16px; display:flex; gap:8px; align-items:center; background:var(--bg); border:1px solid var(--line); border-radius:10px; padding:8px 12px; box-shadow:0 2px 10px rgba(0,0,0,.15); font-size:13px; z-index:50; }
+.dd-fb-bar button { cursor:pointer; border:1px solid var(--link); background:var(--link); color:#fff; border-radius:6px; padding:5px 10px; font-size:13px; }
+.dd-fb-bar .dd-badge { font-weight:700; }
+.dd-toast { position:fixed; right:16px; bottom:64px; background:var(--ink); color:var(--bg); padding:8px 12px; border-radius:8px; font-size:13px; z-index:60; opacity:0; transition:opacity .2s; }
+.dd-toast.show { opacity:1; }
+.dd-sme-feedback ol li { margin: 6px 0; }
+@media print { .dd-note-btn, .dd-note-box, .dd-fb-bar, .dd-toast, .dd-sme-feedback, .dd-sme-divider { display:none !important; } }
+</style>
+</head>
+<body>
+<main>
+<h1>Why We&#x27;re Betting on Graph Traversal — A Retrieval Benchmark, Explained</h1>
+<p><strong>Explainer · Rev 1 · 2026-07-16 · commit <code>0e036ff</code> · Classification: Internal-Public (mechanism only — no customer names, hosts, schedules, SIDs, or real identifiers appear in this document).</strong></p>
+<blockquote><p>On 2026-07-16 we ran a head-to-head benchmark of three ways an AI support agent can retrieve knowledge from our vendor documentation corpus, and the result — <em>&quot;traversal won 12/12 at ~27× manifest token efficiency&quot;</em> — decided that DryDocs will BUILD its document-ingestion component rather than shrink it. This document explains what that sentence means, how the test was run, and why the outcome matters for anyone building or supporting AI-assisted operations. The full scoring record is <a href="../../knowledge/upgrade-plans/docmeta-p0-verdict.md"><code>knowledge/upgrade-plans/docmeta-p0-verdict.md</code></a>; the script and raw results are committed beside it.</p></blockquote>
+<h2 id="the-question">1. The question we needed to answer</h2>
+<p>When a batch job fails at 3 a.m., a support engineer asks questions like <em>&quot;what does the %%LIBMEMSYM variable do?&quot;</em>, <em>&quot;how do I make a job wait for another job?&quot;</em>, or <em>&quot;which documents cover pool variables?&quot;</em>. DryDocs wants an AI agent to answer those questions from the vendor&#x27;s own documentation — in our case, a corpus of 26 Control-M reference documents (about 313,000 characters) that we converted to markdown and govern with per-chunk trust labels.</p>
+<p>There are three fundamentally different ways to hand that corpus to an agent, and they have very different costs. Before investing in a full document-ingestion component (internally: <em>docmeta</em>), we required a written verdict: does querying the documents <strong>as a graph</strong> actually beat the simpler alternatives on our real support questions — or should we shrink the plan to a simple file registry?</p>
+<p>A quick vocabulary note for readers new to this space. A <strong>token</strong> is the unit language models read and bill by (roughly 4 characters of text); everything an agent &quot;reads&quot; for a question must fit in its limited context window, so retrieval cost is measured in tokens. <strong>RAG</strong> (retrieval-augmented generation) is the umbrella term for fetching relevant text and placing it in front of the model instead of hoping it memorized the answer.</p>
+<h2 id="three-strategies">2. Three retrieval strategies</h2>
+<p><strong>Strategy A — manifest-routed reading (today&#x27;s baseline).</strong> The corpus has a human-maintained index file (the source manifest) describing what each document covers. The agent reads the manifest, picks the likely file(s), and reads them whole. This is what a capable AI agent does with a folder of markdown today. It works — but the unit of retrieval is <em>the entire file</em>, and the agent pays for every character it reads.</p>
+<p><strong>Strategy B — full-text search.</strong> Build a keyword index (Lucene, built into Neo4j) over the text and return the top-3 matching chunks. Cheap, fast, no external dependencies — this is classic search-engine retrieval.</p>
+<p><strong>Strategy C — lexical graph traversal.</strong> Load the corpus into the knowledge graph as structured data: each <code>Document</code> node connects to its <code>Chunk</code> nodes (one per section), chained in reading order, each chunk carrying properties — its heading, its size, its <strong>trust tier</strong> (VERBATIM / GROUNDED / SYNTHESIZED — is this the vendor&#x27;s text, grounded restatement, or our inference?), and a <code>DESCRIBES</code> edge to the software product it documents:</p>
+<pre><code>(:Document {name, source_url})-[:FIRST_CHUNK]-&gt;(:Chunk {heading, text, tier, seq})
+        │                                          │
+        │                                     [:NEXT_CHUNK]-&gt;(:Chunk)-&gt; …
+        └-[:DESCRIBES {target_version}]-&gt;(:SoftwareProduct {id: &quot;controlm&quot;})
+   every chunk also: (:Chunk)-[:PART_OF]-&gt;(:Document)</code></pre>
+<p>Retrieval is then a <strong>Cypher query</strong>: fetch exactly the chunks that answer the question, or <em>compute over them</em> — count, group, filter by property. The document set stops being a pile of files and becomes a database.</p>
+<p>The industry name for Strategy C is <strong>GraphRAG</strong>, and our test design deliberately follows the patterns in Neo4j&#x27;s <em>Essential GraphRAG</em> book (which we also loaded into the graph as a second corpus, as both a dry run and a source of evaluation practice).</p>
+<h2 id="the-test">3. The test</h2>
+<p>We wrote <strong>12 fixed support questions</strong> in six classes, chosen to represent what support actually asks — not to flatter any one strategy:</p>
+<table><thead><tr><th>Class</th><th>Count</th><th>Example</th></tr></thead><tbody><tr><td>Structure / aggregation</td><td>2</td><td>&quot;How much of this corpus is SYNTHESIZED (our inference, not vendor text)?&quot;</td></tr><tr><td>Exact lookup</td><td>3</td><td>&quot;What does %%LIBMEMSYM do?&quot;</td></tr><tr><td>Paraphrase / conceptual</td><td>3</td><td>&quot;How do I make a job wait for another job?&quot; (the docs say <em>prerequisite condition</em>, not &quot;wait&quot;)</td></tr><tr><td>Multi-document</td><td>2</td><td>&quot;Which documents cover pool variables?&quot;</td></tr><tr><td>Provenance</td><td>1</td><td>&quot;Are the JSON API examples vendor ground truth?&quot;</td></tr><tr><td>Out-of-scope</td><td>1</td><td>An AutoSys question this corpus cannot answer — the <em>correct</em> response is to say so</td></tr></tbody></table>
+<p>All three strategies ran <strong>live</strong> against the same corpus, freshly loaded into our local Neo4j Enterprise container (374 chunks, zero rejects). Scoring was per question, per strategy: did the retrieved context contain the ground-truth answer (<strong>recall</strong>), how many characters did the agent have to ingest (<strong>token cost</strong>), and how long did retrieval take (<strong>latency</strong>). A fourth strategy — vector embeddings, the other classic RAG technique — could not run because we have no approved embedding key yet; it was assessed analytically and is discussed in §6.</p>
+<p>Honest-methods note, exactly as recorded in the verdict: this was a spike, not a lab study. The author wrote the Cypher queries (standing in for the automated text-to-Cypher layer a production agent would use) and served as the judge, both disclosed; two traversal answers that the mechanical scorer missed (correct answers whose output didn&#x27;t echo the marker string) were adjudicated by hand and recorded as such.</p>
+<h2 id="results">4. What happened</h2>
+<table><thead><tr><th></th><th>Traversal (graph)</th><th>Full-text (top-3)</th><th>Manifest-routed reading</th></tr></thead><tbody><tr><td><strong>Recall</strong></td><td><strong>12/12</strong> — including correctly <em>abstaining</em> on the out-of-scope question</td><td>7/12</td><td>10/12 (2 partial)</td></tr><tr><td><strong>Total context ingested</strong></td><td>≈16,400 chars (<strong>~4.1k tokens</strong>)</td><td>≈31,400 chars (~7.9k tokens)</td><td>≈449,500 chars (<strong>~112k tokens</strong>)</td></tr><tr><td><strong>Median retrieval latency</strong></td><td>75 ms</td><td>12 ms</td><td>~instant to route, then whole files to read</td></tr></tbody></table>
+<p>That is where the headline comes from. <strong>&quot;12/12&quot;</strong>: graph traversal retrieved correct answer context for every question, and was the only strategy with a perfect score. <strong>&quot;~27× manifest token efficiency&quot;</strong>: to answer the same 12 questions, the manifest-routed baseline made the agent ingest ~449,500 characters of documentation — about 27 times the ~16,400 characters traversal needed (per question the gap ranged from 28× to 60×).</p>
+<p>Why the token number is the one to care about:</p>
+<ul><li><strong>112k tokens is most of an agent&#x27;s working memory.</strong> Answering 12 questions by file-reading roughly fills a typical context window once — leaving little room for the actual incident context, and burning the same cost again for the next 12 questions.</li><li><strong>Cost and latency scale with tokens.</strong> Every character retrieved is paid for on every question, on every shift, forever. A 27× multiplier on the retrieval bill is the difference between an always-on assistant and a tool you ration.</li><li><strong>Dilution is a quality problem, not just a cost problem.</strong> A model handed 80,000 characters to find one paragraph is measurably more likely to miss it than a model handed the right 1,500 characters. Smaller, better-targeted context is <em>more</em> accurate, not just cheaper.</li></ul>
+<h2 id="only-the-graph">5. The four questions only the graph could answer</h2>
+<p>The most important finding is not the efficiency ratio — it is that <strong>four of the twelve questions were only answerable at all from the graph</strong>: corpus structure (&quot;largest document?&quot;), aggregation (&quot;what share is SYNTHESIZED?&quot;), the version property (&quot;which product version do these docs target?&quot;), and per-chunk provenance (&quot;is this specific example vendor ground truth?&quot;).</p>
+<p>The reason is structural. In a pile of files, &quot;how much of this corpus is SYNTHESIZED&quot; is not written down anywhere — answering it means opening all 26 files and tallying by hand (the baseline could only reply with <em>the rule</em> for how tiers are assigned, not the numbers). In the graph, the trust tier is a <strong>property on every chunk</strong>, so the answer is one aggregate query returning 179 characters in 49 ms. No amount of file reading competes with that, because file reading would have to <em>rebuild the graph&#x27;s job by hand on every question</em>.</p>
+<p>For a support organization, that class of question is not exotic. &quot;Which of these answers can I trust as vendor-verbatim?&quot; is exactly what you ask before acting on an AI answer at 3 a.m. Governance questions are aggregate questions, and aggregate questions need a database — which is what the graph is.</p>
+<h2 id="honest-limits">6. Where the graph has to be honest</h2>
+<p><strong>The paraphrase gap is real.</strong> Support asks &quot;make a job wait for another job&quot;; the docs say <em>prerequisite condition</em>. Two of the three paraphrase questions failed with naive keyword matching inside Cypher and succeeded only after mapping support vocabulary to document vocabulary — the graph is only as good as the query layer in front of it. Our existing mitigation is that the graph carries its own schema and terminology inventory for the agent to consult; the long-term answer is the next paragraph.</p>
+<p><strong>Vector embeddings are the named missing arm.</strong> Embeddings — the other classic RAG technique, which retrieves by <em>meaning</em> rather than by keyword — are precisely what closes the paraphrase gap. We could not run them (no approved embedding key yet — an open decision, not an oversight), so the plan treats vectors as a <strong>pluggable arm behind that key decision</strong>: expected to improve paraphrase recall, and expected to need a guard-threshold, because vector search <em>always returns nearest neighbors</em> — even for questions the corpus cannot answer.</p>
+<p><strong>Which is the other lesson: abstention is a feature.</strong> On the out-of-scope AutoSys question, traversal returned empty (correct — the graph is scoped, so &quot;no rows&quot; is an honest &quot;not covered here&quot;) and the manifest router also declined. Full-text returned 3,700 characters of <em>confident, irrelevant</em> Control-M text — for a support agent, the single worst failure mode, because confident noise at 3 a.m. becomes a wrong action. Any retrieval component we ship scores abstention as a first-class behavior.</p>
+<p><strong>And the caveats stay attached:</strong> 12 questions, one corpus, single warm-run latencies, author-as-judge. Spike-grade evidence for a build/no-build decision — not a published benchmark. The committed script and loaders make the run repeatable, and the component&#x27;s first milestone includes an automated evaluation harness so future numbers don&#x27;t depend on anyone&#x27;s judgment.</p>
+<h2 id="what-we-build">7. What we&#x27;re building because of this</h2>
+<p>The verdict — <strong>BUILD</strong> — translates into a component design with clear roles rather than a single retriever:</p>
+<ol><li id="what-we-build--the-lexical-graph-is-the-spine"><strong>The lexical graph is the spine.</strong> Document→Chunk with governed trust tiers, proven twice now (the Control-M corpus and the GraphRAG book load).</li><li id="what-we-build--full-text-search-stays-as-standing-infra"><strong>Full-text search stays as standing infrastructure</strong> — keyless, ~10 ms, covers most exact-term lookups — as the keyword half of a future hybrid, never the sole retriever.</li><li id="what-we-build--vector-embeddings-plug-in-when-the"><strong>Vector embeddings plug in when the key decision lands</strong>, with an out-of-scope threshold test in place from day one.</li><li id="what-we-build--an-evaluation-harness-becomes-part-of"><strong>An evaluation harness becomes part of the component itself</strong>: fixed question sets, Cypher-as-ground-truth, recall/faithfulness scoring — so every future retrieval change re-runs this benchmark automatically instead of relying on a one-time spike.</li><li id="what-we-build--the-human-maintained-manifest-remains-th"><strong>The human-maintained manifest remains the provenance source of truth</strong> and the fallback path. The graph doesn&#x27;t replace the governance surface; it makes it queryable.</li></ol>
+<p>For the support workflow, the practical promise is this: the agent answering your 3 a.m. question reads <em>tens of times less</em> text per answer, can tell you <em>how trustworthy</em> each answer is (because trust is data, not vibes), and says <em>&quot;that&#x27;s not in scope&quot;</em> instead of guessing — and each of those three properties was demonstrated live, not asserted.</p>
+<h2 id="read-more">8. Read more / reproduce</h2>
+<table><thead><tr><th>If you want…</th><th>Read / run…</th></tr></thead><tbody><tr><td>The full scoring tables + per-question adjudication</td><td><code>knowledge/upgrade-plans/docmeta-p0-verdict.md</code></td></tr><tr><td>The benchmark script + raw mechanical results</td><td><code>knowledge/upgrade-plans/p0-benchmark/</code></td></tr><tr><td>The GraphRAG pattern inventory behind the test design</td><td><code>reference/research/essential-graphrag-notes.md</code></td></tr><tr><td>The traversal dry-run on the book corpus (7/7)</td><td><code>docs/reviews/essential-graphrag-traversal-experiment.md</code></td></tr><tr><td>The component plan this verdict un-gates</td><td><code>knowledge/upgrade-plans/docmeta-component.md</code></td></tr><tr><td>Reproduce the corpus load</td><td><code>poetry run drydocs load-software-registry</code> then <code>poetry run drydocs load-bmc-docs</code> (374 chunks)</td></tr></tbody></table>
+<hr class="dd-sme-divider">
+<section class="dd-sme-feedback" aria-label="SME - Feedback">
+<h2>SME - Feedback</h2>
+<p>How to return your notes on this document:</p>
+<ol>
+<li>Click the <strong>✎</strong> button beside any section (or numbered step) and type your note — notes save in your browser as you type.</li>
+<li>When finished, click <strong>Copy feedback</strong> in the bottom-right toolbar. Your notes are copied as anchor-keyed YAML.</li>
+<li>Create the feedback file (it is YAML, <em>not</em> markdown) — <strong>Copy To:</strong> <code>docs/design/feedback/</code> · <strong>File Name:</strong> <code>graph-retrieval-benchmark-explainer-rev1.yaml</code></li>
+<li>Paste the copied block into that file, save, and commit (or send the file back to the team).</li>
+</ol>
+</section>
+</main>
+<script>
+
+(function(){
+  var DOC="graph-retrieval-benchmark-explainer", KEY="drydocs-doc-feedback:"+DOC;
+  function load(){ try{return JSON.parse(localStorage.getItem(KEY)||"{}");}catch(e){return {};} }
+  function save(){ localStorage.setItem(KEY, JSON.stringify(state)); }
+  var state=load(), badge;
+  function count(){ return Object.keys(state).filter(function(k){return (state[k]||"").trim();}).length; }
+  function refresh(){ if(badge) badge.textContent=count(); }
+  function toast(msg){ var t=document.createElement("div"); t.className="dd-toast"; t.textContent=msg; document.body.appendChild(t); requestAnimationFrame(function(){t.classList.add("show");}); setTimeout(function(){t.classList.remove("show"); setTimeout(function(){t.remove();},250);},1600); }
+  function exportYaml(){
+    var lines=["# design-doc feedback — paste into docs/design/feedback/"+DOC+"-rev<N>.yaml","doc: "+DOC,"notes:"];
+    Object.keys(state).forEach(function(a){
+      var note=(state[a]||"").replace(/\r/g,""); if(!note.trim()) return;
+      lines.push("  - anchor: "+a); lines.push("    note: |");
+      note.split("\n").forEach(function(l){ lines.push("      "+l); });
+    });
+    return lines.join("\n")+"\n";
+  }
+  function attach(el){
+    var id=el.id;
+    var btn=document.createElement("button"); btn.className="dd-note-btn"; btn.type="button"; btn.textContent="✎"; btn.title="Annotate #"+id;
+    var box=document.createElement("div"); box.className="dd-note-box"; box.style.display=(state[id]||"").trim()?"block":"none";
+    var ta=document.createElement("textarea"); ta.value=state[id]||""; ta.setAttribute("placeholder","note for #"+id+" …");
+    ta.addEventListener("input",function(){ state[id]=ta.value; save(); refresh(); el.classList.toggle("dd-annotated", !!ta.value.trim()); });
+    if((state[id]||"").trim()) el.classList.add("dd-annotated");
+    box.appendChild(ta);
+    btn.addEventListener("click",function(){ box.style.display=box.style.display==="none"?"block":"none"; if(box.style.display==="block") ta.focus(); });
+    if(el.tagName==="LI"){ el.insertAdjacentElement("afterbegin", btn); el.appendChild(box); }
+    else { el.insertAdjacentElement("afterend", box); el.insertAdjacentElement("beforebegin", btn); }
+  }
+  document.addEventListener("DOMContentLoaded",function(){
+    document.querySelectorAll("main [id]").forEach(attach);
+    var bar=document.createElement("div"); bar.className="dd-fb-bar";
+    var lbl=document.createElement("span"); lbl.innerHTML='notes <span class="dd-badge">0</span>'; badge=lbl.querySelector(".dd-badge");
+    var ex=document.createElement("button"); ex.type="button"; ex.textContent="Copy feedback";
+    ex.addEventListener("click",function(){ var y=exportYaml();
+      var done=function(){toast("feedback copied — paste into docs/design/feedback/");};
+      if(navigator.clipboard&&navigator.clipboard.writeText){ navigator.clipboard.writeText(y).then(done,function(){fallback(y);}); } else { fallback(y); }
+    });
+    function fallback(y){ var t=document.createElement("textarea"); t.value=y; document.body.appendChild(t); t.select(); try{document.execCommand("copy"); toast("feedback copied");}catch(e){toast("copy failed — select the box");} t.remove(); }
+    bar.appendChild(lbl); bar.appendChild(ex); document.body.appendChild(bar); refresh();
+  });
+})();
+
+</script>
+</body>
+</html>
