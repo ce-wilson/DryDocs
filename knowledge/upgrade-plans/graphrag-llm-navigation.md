@@ -1,5 +1,15 @@
 # Upgrade plan — GraphRAG / LLM-navigation (benchmarked vs `llm-graph-builder`)
 
+> **Status 2026-07-17 — partially superseded.** `feat/llm-nav-p0-vector` no longer
+> exists and its vector/fulltext work is **not on main** (no vector index, no
+> `:Searchable`, no embeddings loader in the repo). The "already matches the
+> reference" table below describes that branch, not current code. The refinements
+> (§1–§4) remain valid future guidance for when the vector arm unblocks on the open
+> LLM-key-strategy question. Authoritative retrieval direction is now the docmeta P0
+> verdict ([`docmeta-p0-verdict.md`](docmeta-p0-verdict.md)): traversal-first,
+> fulltext supplement, vector deferred. Full audit:
+> [`neo4j-advisor-confirmation-2026-07-17.md`](neo4j-advisor-confirmation-2026-07-17.md).
+
 Compares DryDocs (after the P0 vector + P1 fulltext work on `feat/llm-nav-p0-vector`)
 against Neo4j Labs' production reference **`llm-graph-builder`**, to decide what to
 adopt. Source analysis 2026-06-19.

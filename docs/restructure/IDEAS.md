@@ -26,6 +26,27 @@ Tags help grooming: `idea` · `bug` · `doc` · `source` (new data source) · `q
 
 <!-- add new ideas at the top -->
 
+- 2026-07-17 — [question/idea/chore] **GraphAcademy MCP advisor review findings** (full audit
+  + confirmations: `knowledge/upgrade-plans/neo4j-advisor-confirmation-2026-07-17.md`; load
+  architecture, batch size, checksum diet, and the ADR 0002 composite/proxy pattern all
+  externally CONFIRMED). Actionable deltas, by priority:
+  - [question] **HIGH — DC-collision check before any multi-DC load** (company-side): does any
+    `TABLE_ID` appear under >1 `DATA_CENTER` in `psgmgr.CM_DEF_VTAB`? Staging keys by
+    `(data_center, folder_id, job_id)` but graph identity is `(folder_id, job_id)` / folder by
+    `folder_id` alone — collision ⇒ silent cross-DC node merge; fix = identity change ⇒ HITL gate.
+    P012 single-DC pilot cannot expose this.
+  - [idea] incremental-delete path: full-diff ID set (graph − extract) → soft-delete mark →
+    scheduled hard-delete sweep; today removed-from-source jobs stay `active` forever.
+  - [chore] `BaseLoader` pre-load assertion that target indexes are ONLINE (MERGE against
+    POPULATING = 10–100× collapse).
+  - [idea] `JobRun.started_at`/`status` indexes → fold into the provenance-audit-fields plan
+    (docs 06/06a), not standalone.
+  - [chore] existence constraints on `Document.trust_default` / `Chunk.tier_rule` when docmeta
+    lands (silent null = provenance undercount).
+  - [doc] `graphrag-llm-navigation.md` annotated: `feat/llm-nav-p0-vector` state never landed
+    on main; docmeta P0 verdict is the authoritative retrieval direction.
+  - (done same day: DryDocs data model saved to GraphAcademy course `genai-context-graphs`
+    via `save_data_model` — future tutor sessions load our real schema.)
 - 2026-07-17 — [idea] **UI-stack decision (proposed): Vite + React + Tailwind + shadcn/ReUI
   free tier + React Flow, fronting a Google ADK 2.0 agent backend.** ReUI free tier
   (1,019 shadcn components + Data Grid/Filters/Tree/Timeline primitives; free forever,
