@@ -165,6 +165,7 @@ class BaseLoader:
         *,
         batch_size: int = 1000,
         max_rejects_kept: int = 100,
+        index_wait_seconds: int = 300,
     ) -> None:
         if not self.cypher_path:
             raise NotImplementedError(f"{type(self).__name__} must set cypher_path")
@@ -174,6 +175,7 @@ class BaseLoader:
         self.adapter = adapter
         self.batch_size = batch_size
         self.max_rejects_kept = max_rejects_kept
+        self.index_wait_seconds = index_wait_seconds
         self.run_id = str(uuid.uuid4())
         self.loaded_at = (
             datetime.now(timezone.utc).replace(microsecond=0).isoformat()
@@ -188,6 +190,7 @@ class BaseLoader:
             started_at=self.loaded_at,
         )
 
+        self._preflight_indexes()
         self._open_run()
         cypher = self._read_cypher()
 
@@ -236,6 +239,41 @@ class BaseLoader:
         return model.model_dump(mode="json")
 
     # ---- internals -------------------------------------------------------
+
+    def _preflight_indexes(self) -> None:
+        """Refuse to load against a broken index; wait out a populating one.
+
+        MERGE against a POPULATING index succeeds but degrades 10-100x (the
+        planner can't use it), and a FAILED index silently breaks the NODE KEY
+        guarantees every loader's identity model depends on. Runs before
+        :meth:`_open_run` so a refused load writes nothing — not even the
+        :JobRun. (neo4j-advisor-confirmation-2026-07-17 §2c.)
+        """
+        rows = self.client.run(
+            "SHOW INDEXES YIELD name, state, labelsOrTypes "
+            "WHERE state <> 'ONLINE' "
+            "RETURN name, state, labelsOrTypes"
+        )
+        if not rows:
+            return
+        failed = [r for r in rows if r.get("state") == "FAILED"]
+        if failed:
+            detail = ", ".join(
+                f"{r.get('name')} ({r.get('labelsOrTypes')})" for r in failed
+            )
+            raise RuntimeError(
+                f"Loader {self.name}: refusing to load — FAILED index(es): {detail}. "
+                "Drop and recreate them (see constraints.cypher) before loading."
+            )
+        # Remaining states (POPULATING) resolve on their own — block until they
+        # do rather than racing the population. Raises on timeout.
+        LOGGER.info(
+            "Loader %s: waiting up to %ss for %d index(es) to come ONLINE",
+            self.name, self.index_wait_seconds, len(rows),
+        )
+        self.client.run(
+            "CALL db.awaitIndexes($seconds)", seconds=self.index_wait_seconds
+        )
 
     def _read_cypher(self) -> str:
         path = self.cypher_path

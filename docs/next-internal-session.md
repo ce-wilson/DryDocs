@@ -7,7 +7,7 @@
 > Mechanism-only file: record conclusions, never paste real SIDs/hosts/data values here
 > (real outputs go to `internal/` or `internal-local/`).
 
-## The one-login batch (all four run in a single psgmgr session)
+## The one-login batch (all five run in a single psgmgr session)
 
 - [ ] **1. P1 — profiling probes + DC scope call** (backlog p1, ready)
       Run `drydocs/loaders/sql/adhoc/profile_cm_hosts.sql` and `profile_cm_avg_run.sql`
@@ -34,13 +34,24 @@
       (`folder_id.job_id`) — candidates to replace weak (SCHED_TABLE, JOB_MEM_NAME)
       joins beyond CM_AVG_RUN.
 
+- [ ] **5. DC-collision identity check** (new 2026-07-17; advisor-confirmation §2a — HIGH,
+      blocks any multi-DC load)
+      `SELECT TABLE_ID, COUNT(DISTINCT DATA_CENTER) FROM psgmgr.CM_DEF_VTAB GROUP BY
+      TABLE_ID HAVING COUNT(DISTINCT DATA_CENTER) > 1;` — staging keys by
+      `(data_center, folder_id, job_id)` but graph identity is `(folder_id, job_id)` /
+      folder by `folder_id` alone. Zero rows → document the uniqueness invariant in
+      `controlm_folders.cypher`; any rows → cross-DC nodes would silently merge, and the
+      fix is an identity change (`data_center` into the folder + job keys) → **HITL gate**
+      + constraint migration. The P012 single-DC pilot cannot expose this. Feeds item 1's
+      DC scope call.
+
 ## Live-graph work (needs a running graph, not psgmgr)
 
-- [ ] **5. M2 — WAS_GENERATED_BY edge-diet migration** (backlog, ready)
+- [ ] **6. M2 — WAS_GENERATED_BY edge-diet migration** (backlog, ready)
       Destructive on an existing graph → HITL-confirm, then run the migration on the
       live/sandbox graph; backfill envelope props where recoverable; m3-verify updated.
 
-- [ ] **6. Lineage live-load gate** (parked IDEAS line; the flips + first curated write)
+- [ ] **7. Lineage live-load gate** (parked IDEAS line; the flips + first curated write)
       PRE-REQ (producer box, no live data): build **G12** (writer ETLProcess endpoint
       class) + **G13** (file-ops resolution) — both next_ready.
       THEN with a real extract: review `plan_curated` + the lineage-review page over
@@ -49,12 +60,12 @@
 
 ## Desk work once live evidence is in hand
 
-- [ ] **7. software-usage-patterns gate** (plan-07 P3, awaiting since 07-08)
+- [ ] **8. software-usage-patterns gate** (plan-07 P3, awaiting since 07-08)
       Confirm the 7 proposed invocation-pattern rows against live CMDLINE evidence
       (watch the `^m_` Informatica false-positive risk); fold in the decided
       DPL ≠ Ab Initio row from the 2026-07-16 `cmdline-lineage-review` gate.
 
-- [ ] **8. M3 — SEAL + catalog audit envelopes** (backlog p3)
+- [ ] **9. M3 — SEAL + catalog audit envelopes** (backlog p3)
       Author the confidential source→column mappings internal-side from real extract
       headers; one per-source gate each (doc-06 pattern; public file gets stubs only).
 

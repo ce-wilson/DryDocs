@@ -211,6 +211,65 @@ def test_close_run_rows_changed_defaults_to_zero_with_no_result(smoke_cypher_fil
     assert summary.rows_changed == 0
 
 
+def test_preflight_runs_show_indexes_before_any_write(smoke_cypher_files: None) -> None:
+    """The index preflight (advisor-confirmation §2c) is the FIRST client call
+    — before _open_run — so a refused load leaves the graph untouched."""
+    client = _FakeNeo4jClient()
+    adapter = _FakeAdapter([{"id": "a", "value": 1}])
+
+    _SingleStatementLoader(client, adapter).load()
+
+    first_cypher, _ = client.run_calls[0]
+    assert "SHOW INDEXES" in first_cypher
+
+
+def test_preflight_raises_on_failed_index(smoke_cypher_files: None) -> None:
+    """A FAILED index aborts the load with nothing written — no :JobRun,
+    no batch flush."""
+
+    class _FailedIndexClient(_FakeNeo4jClient):
+        def run(self, cypher: str, params: dict[str, Any] | None = None, **kwargs: Any) -> list[dict]:
+            bind = {**(params or {}), **kwargs}
+            self.run_calls.append((cypher, bind))
+            if "SHOW INDEXES" in cypher:
+                return [{"name": "job_name", "state": "FAILED", "labelsOrTypes": ["ControlMJob"]}]
+            return []
+
+    client = _FailedIndexClient()
+    adapter = _FakeAdapter([{"id": "a", "value": 1}])
+
+    with pytest.raises(RuntimeError, match="FAILED index"):
+        _SingleStatementLoader(client, adapter).load()
+
+    # Only the SHOW INDEXES probe ran — the graph was never written.
+    assert len(client.run_calls) == 1
+    assert client.run_script_calls == []
+
+
+def test_preflight_awaits_populating_index_then_loads(smoke_cypher_files: None) -> None:
+    """A POPULATING index blocks via db.awaitIndexes instead of racing it;
+    the load then proceeds normally."""
+
+    class _PopulatingIndexClient(_FakeNeo4jClient):
+        def run(self, cypher: str, params: dict[str, Any] | None = None, **kwargs: Any) -> list[dict]:
+            bind = {**(params or {}), **kwargs}
+            self.run_calls.append((cypher, bind))
+            if "SHOW INDEXES" in cypher:
+                return [{"name": "job_name", "state": "POPULATING", "labelsOrTypes": ["ControlMJob"]}]
+            return []
+
+    client = _PopulatingIndexClient()
+    adapter = _FakeAdapter([{"id": "a", "value": 1}])
+
+    summary = _SingleStatementLoader(client, adapter, index_wait_seconds=42).load()
+
+    assert summary.status == "OK"
+    await_call = next(
+        (cypher, bind) for cypher, bind in client.run_calls if "db.awaitIndexes" in cypher
+    )
+    assert await_call[1]["seconds"] == 42
+
+
 def test_invalid_rows_are_rejected_not_raised(smoke_cypher_files: None) -> None:
     client = _FakeNeo4jClient()
     adapter = _FakeAdapter([
