@@ -26,6 +26,15 @@ Tags help grooming: `idea` · `bug` · `doc` · `source` (new data source) · `q
 
 <!-- add new ideas at the top -->
 
+- 2026-07-17 — [idea] **UI DECISION: single track — ReUI only, Salt DS dropped** (amends the
+  UI-stack entry below; user call). No company-variant skin track; the shell stays
+  library-agnostic as architecture, not as a second-skin plan. Site plan written:
+  `UI-WIP/site-plan.md` — theme = system-default with 3-state toggle (dark designed first),
+  radial-hub landing per the favorite mock, one module-subpage template × 9 modules
+  (Explorer/Lineage/Ownership/Runbooks/Remediation/Docs/Gates/Loads), QuerySpec-registry
+  data frames with a two-path Neo4j export function (client view-export + ADK-streamed full
+  export, provenance manifest + classification banners per PUBLISH-BOUNDARY). Groom P0–P2
+  into backlog (suggested module id: `drydocs-ui`).
 - 2026-07-17 — [question/idea/chore] **GraphAcademy MCP advisor review findings** (full audit
   + confirmations: `knowledge/upgrade-plans/neo4j-advisor-confirmation-2026-07-17.md`; load
   architecture, batch size, checksum diet, and the ADR 0002 composite/proxy pattern all
