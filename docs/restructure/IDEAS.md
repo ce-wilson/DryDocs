@@ -26,6 +26,33 @@ Tags help grooming: `idea` · `bug` · `doc` · `source` (new data source) · `q
 
 <!-- add new ideas at the top -->
 
+- 2026-07-17 — [idea] **UI-stack decision (proposed): Vite + React + Tailwind + shadcn/ReUI
+  free tier + React Flow, fronting a Google ADK 2.0 agent backend.** ReUI free tier
+  (1,019 shadcn components + Data Grid/Filters/Tree/Timeline primitives; free forever,
+  unlimited commercial use — cleaner license than Metronic's $49 single-project/no-paying-
+  users tier) covers the shell + data frames; React Flow covers the lineage graph (nothing
+  Keenthemes sells does). **ADK 2.0 compatibility CONFIRMED 2026-07-17:** they occupy
+  different layers — ReUI is presentation-only React components copied into our own app;
+  ADK 2.0 is the backend agent runtime (Python/TS/Go/Java/Kotlin, graph workflow engine,
+  built-in HITL primitive — nice echo of our gate discipline) reached from the frontend via
+  plain REST/SSE from `adk api_server`, or the AG-UI protocol (CopilotKit React SDK, the
+  officially blogged path — its components coexist with shadcn/Tailwind in the same app),
+  or Google's A2UI for agent-rendered UI. No coupling, no conflict; ADK's own `adk web`
+  dev UI is Angular and is a dev tool, not the product UI. Target architecture sketch:
+  React/ReUI shell ↔ REST-or-AG-UI ↔ ADK 2.0 agent ↔ Neo4j MCP server ↔ graph. Free
+  enablers when UI work starts: ReUI MCP (`https://mcp.reui.io`) + `@reui/skills-claude`.
+  Artifacts already in UI-WIP/: layout-anatomy-checklist.md + start-react-free-reference.fig
+  (the 2021 Start React Free code itself = ruled out, EOL stack). **Two-track addendum
+  2026-07-17 (Salt DS assessed):** JPMC's Salt (`@salt-ds/core`, Apache-2.0, active — 1.67.0
+  Jul 2026, 1,200+ internal apps) is the likely company-side choice — sanctioned system,
+  data-dense/density-modes/AG-Grid pairing, WCAG 2.1 — but it's a versioned npm dependency
+  (lab-package churn), not Tailwind, and aesthetically opposite the dark-schematic spec. So:
+  **ReUI/shadcn for public/producer DryDocs; Salt skin for the company variant.** Mitigation
+  = keep the shell ARCHITECTURE library-agnostic (UI-WIP/layout-anatomy-checklist.md zones +
+  typed layout-config + page-owned toolbar), so the company port swaps components, not
+  structure; React Flow sits in the middle untouched either way. Community Salt MCP exists
+  (glama.ai @feesch/salt-mcp). Groom into a UI epic when the wireframes settle.
+
 - 2026-07-16 — [idea] **EE container re-bootstrap loses loaded corpora — fold the
   demonstrable-content loads into the bootstrap ritual.** Found at Q3: the fresh
   neo4j-drydocs-ee (O6 bootstrap) had no bmc-docs corpus — the 07-08 live load died with
