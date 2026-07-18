@@ -26,7 +26,9 @@ Tags help grooming: `idea` · `bug` · `doc` · `source` (new data source) · `q
 
 <!-- add new ideas at the top -->
 
-- 2026-07-17 — [idea] **Relational mapping store research (chat)**: verdict = SQLite (WAL mode) as
+- 2026-07-17 — [idea] **Relational mapping store research (chat)** — PLAN SAVED:
+  `knowledge/upgrade-plans/mapping-store-plan-2026-07-17.md` (phases M0–M4, feature branch
+  `feat/mapping-store` not a fork; groom M0–M3 as a new epic when ready): verdict = SQLite (WAL mode) as
   the taxonomy↔ontology mapping store behind drydocs-api — committed per-table CSV dumps remain the
   git/gate source of truth, SQLite is the queryable materialization (rebuildable either direction, so
   HITL diff review survives the move off YAML). Row shape = the mapping quintuple the user described:
