@@ -36,7 +36,7 @@
 # =============================================================================
 
 schema: drydocs.backlog.v2
-updated: 2026-07-17
+updated: 2026-07-18
 
 # ── The high-level project plan (rendered as the board's roadmap strip) ───────
 plan:
@@ -117,6 +117,7 @@ modules:
   - drydocs-remediation  # future component (G3)
   - drydocs-web          # JS/TS front-end under web/ (Epic O, phase 12) — console + graph viz; not a Python package, so absent from MODULE_MAP.md/test_module_boundary.py
   - drydocs-api          # planned thin-API component (ADR 0005; working name — final at O5 scaffold): server-side graph access for the console
+  - drydocs-docmeta      # planned document-INGESTION component (docmeta plan; WORKING NAME — final at the Q4 gate: docmeta vs deepdoc fold-in). Distinct from drydocs-docgen, which renders docs
   - reference            # reference/ + external/ vendor & standards material
   - taxonomy             # config/taxonomy/ captures
   - ontology             # drydocs_core/schema/, relationship vocabulary, mappings
@@ -553,6 +554,42 @@ items:
       Groomed 2026-07-15 pm from the same-day inbox chore (seen at the first live EE
       bootstrap: empty=2 total=7, exit 1 — pre-existing sample-data gap, not a loader
       bug). Sample rows are SYNTHESIZED — keep the publish boundary (no real names).
+      MERGED 2026-07-18 (EE re-bootstrap inbox line, 2026-07-16, its own suggestion):
+      the quick-start/bootstrap sequence this item makes verify clean also gains the
+      demonstrable-content reloads — load-software-registry + load-bmc-docs (+
+      optionally load-essential-graphrag, ddcontext) — so a fresh container PROMPTS
+      their reload instead of silently losing corpora (found at Q3: the fresh O6
+      container had no bmc-docs corpus; the P0 spike re-ran both loads, proving the
+      gap and the two-command fix).
+
+  - id: D7
+    epic: config-loaders
+    title: "Incremental-delete path for removed-from-source jobs: full-diff soft-delete mark + retention-window hard-delete sweep"
+    type: requirement
+    module: drydocs-load
+    phase: 3
+    agent: main
+    model: sonnet
+    priority: p2
+    status: todo
+    depends_on: []
+    inputs: [drydocs/loaders/base.py, drydocs/loaders/, knowledge/upgrade-plans/neo4j-advisor-confirmation-2026-07-17.md]
+    acceptance: >
+      After an ingest run whose extract no longer contains a previously loaded job or
+      folder, the graph node is NOT silently left active: a full-diff ID set (graph
+      minus extract, scoped to what the extract declares — full vs folder-filtered)
+      marks it soft-deleted (property mark + timestamp; no node deletion) in the same
+      run, and a separate sweep command hard-deletes marks older than a configurable
+      retention window. Both paths report counts (marked / re-activated / swept /
+      retained — never silent drops, the STG_PARSE_QUALITY house rule); unit tests
+      cover mark, re-appear (mark cleared), filtered-extract scoping (out-of-scope
+      nodes untouched), and sweep retention. Property-only mechanism — any edge-meaning
+      change aborts to the HITL gate. Full suite green.
+    notes: >
+      Groomed 2026-07-18 from the GraphAcademy advisor findings (2026-07-17 inbox;
+      confirmation doc in knowledge/upgrade-plans/). Today removed-from-source jobs
+      stay `active` forever. Soft-delete property naming is loader mechanics (no new
+      edge types); surface at a gate only if a meaning question appears.
 
   # ── Epic E — Context graph pilot (ontology-mapper + main) — Phase 4 ────────
   - id: E1
@@ -2697,13 +2734,53 @@ items:
       fallback) that travels git + gate review + merge, applied by the NEXT LOAD RUN -
       the UI performs zero graph writes (the loader remains the only writer). Entry
       lifecycle draft/submitted/gated/loaded is visible, with loaded self-verified by
-      the grid's tier flipping to manual after the load.
+      the grid's tier flipping to manual after the load. Dropdowns/options read
+      mapping.db via drydocs-api (the mapping-store plan §6 acceptance rider — M2
+      landed 2026-07-18).
     notes: >
       Groomed 2026-07-17 from chat (power-user mapping screen). "Code->application"
       joins the domain strip when that mapping table exists as a reconciler input -
       same mechanics, registry entry only. Open items in wf-mapping-01.md: draft
       endpoint shape (PR-creating vs artifact download - decide at build per GHE
       posture); conflict-row escalation semantics.
+    progress: >
+      2026-07-18 — the API + store half LANDED pre-O8 (branch feat/mapping-store,
+      807e050; mapping-store plan M0-M4 executed): drydocs_core/mapping_store.py
+      (SQLite materialization, deterministic dumps) + drydocs_api /mappings/*
+      (steward/admin gate, grid/options reads, POST changeset -> CSV+manifest
+      ARTIFACT, zero server writes) + static/mapping_demo.html at /demo (the
+      wf-mapping-01 live-data twin) + test_mapping_store.py / test_mapping_api.py.
+      The draft-endpoint open item resolved conservatively: artifact download, no
+      server-side git. REMAINING for O13: the real /mappings React screen on the
+      O8 shell per the acceptance (coverage grid with tier/evidence, work queues,
+      lifecycle visibility). Documented: docs/runbook-mapping-demo.md +
+      docs/design/drydocs-web-console-tdd.md.
+
+  - id: O14
+    epic: web-console
+    title: "Mapping-store staleness guard: detect source-hash drift in var/mapping.db and rebuild, so /mappings never serves stale grids"
+    type: chore
+    module: drydocs-api
+    phase: 12
+    agent: main
+    model: sonnet
+    priority: p3
+    status: todo
+    depends_on: []
+    inputs: [drydocs_core/mapping_store.py, drydocs_api/mappings.py, tests/unit/test_mapping_store.py, knowledge/upgrade-plans/mapping-store-plan-2026-07-17.md]
+    acceptance: >
+      MappingStore detects that var/mapping.db was built from sources whose hash no
+      longer matches the committed YAML/CSV (the source-hash meta row already stored
+      at build) and EITHER rebuilds automatically on next connect OR refuses with a
+      clear rebuild instruction — either/or decided at execution. A unit test edits
+      a source, hits the store, and proves the served result reflects the edit (or
+      the refusal fires). The plan M2 bullet's "DB rebuilt post-merge (CI/ritual)"
+      is either wired or explicitly recorded as superseded by this guard. Full
+      suite green.
+    notes: >
+      Groomed 2026-07-18 as the mapping-store plan residual: the store auto-builds
+      only when the FILE IS ABSENT — a stale file serves stale grids until deleted
+      (the docs/runbook-mapping-demo.md workaround). Derived artifact, no gate.
 
   # ── Epic P — Runtime topology & maintenance windows — Phase 13 ─────────────
   # Born 2026-07-09: CM_HOSTS + CM_AVG_RUN onboarded via the add-source-object
@@ -3180,11 +3257,92 @@ items:
       list + limitations written. Plan P0 row updated; IDEAS docmeta line updated:
       P1-P3 now groomable. Suite green.
 
+  # (Q4–Q6 groomed 2026-07-18 — the docmeta plan's P1–P3, promoted on the recorded
+  # trigger: Q3's P0 verdict = BUILD. P4–P7 stay plan-tracked until these land.)
+  - id: Q4
+    epic: docmeta
+    title: "Docmeta gate session + the docmeta ADR: component name (docmeta vs deepdoc fold-in), drydocs_docs DB, planned doc-graph vocabulary entries"
+    type: task
+    module: ontology
+    phase: 14
+    agent: main
+    model: fable
+    priority: p2
+    status: todo
+    depends_on: [Q3]
+    inputs: [knowledge/upgrade-plans/docmeta-component.md, knowledge/upgrade-plans/docmeta-p0-verdict.md, drydocs_core/ontology/relationship_vocabulary.yaml, docs/decisions/, config/gate-log.md]
+    acceptance: >
+      The docmeta ADR is authored (next free number — the plan's reserved "0004" was
+      taken by the software-registry ADR) adopting what the P0 verdict names, and is
+      SME-accepted with the status flip recorded; the gate session decides component
+      name (docmeta vs drydocs-deepdoc fold-in), the drydocs_docs DB target, and the
+      curation-ladder->gate mapping; the plan's doc-graph relationship entries
+      (HAS_DOCUMENT, HAS_CHUNK, DESCRIBES, GOVERNED_BY) are reconciled against the
+      already-active docs_* vocabulary (no double registration) and any new entries
+      land status: planned ONLY — nothing flips confirmed outside the gate;
+      config/gate-log.md carries the session record.
+    notes: >
+      Groomed 2026-07-18 — docmeta plan P1. Model fable per the matrix: component
+      boundary + ontology decisions (the G3/O5 precedent). The bmc-docs gate
+      (2026-07-08) already activated docs_chunk_part_of / docs_first_chunk /
+      docs_next_chunk / docs_describes — the gate reconciles, not re-registers.
+
+  - id: Q5
+    epic: docmeta
+    title: "Doc-source registry ledger: config/doc-source-registry.yaml + guard test; backfill every ingested corpus; house or evict root-level stray PDFs"
+    type: task
+    module: config
+    phase: 14
+    agent: main
+    model: sonnet
+    priority: p2
+    status: todo
+    depends_on: [Q4]
+    inputs: [knowledge/upgrade-plans/docmeta-component.md, config/source-registry.yaml, config/classification.yaml, reference/research/README.md]
+    acceptance: >
+      config/doc-source-registry.yaml exists with a tests/unit/test_doc_registry.py
+      guard enforcing classification + connector + curation tier on EVERY entry; all
+      currently ingested doc corpora (bmc-docs, essential-graphrag, jpmc reports)
+      are backfilled; remaining root-level stray PDFs are registered, housed, or
+      gitignored (the Q1 /*.pdf precedent) — zero unregistered corpora. Full suite
+      green.
+    notes: >
+      Groomed 2026-07-18 — docmeta plan P2, the ledger house pattern (machine-
+      readable config + a test that fails on drift). Sequenced after the Q4 gate so
+      the registry schema matches what the ADR adopts.
+
+  - id: Q6
+    epic: docmeta
+    title: "Port A: bkup scrapers -> the producer docmeta component (cleaner/tokenizer/manifest/registry models; web + filedrop connectors; component boundary row)"
+    type: task
+    module: drydocs-docmeta
+    phase: 14
+    agent: main
+    model: fable
+    priority: p2
+    status: todo
+    depends_on: [Q4, Q5]
+    inputs: [knowledge/upgrade-plans/docmeta-component.md, MODULE_MAP.md, tests/unit/test_module_boundary.py, git-readme.md]
+    acceptance: >
+      The docmeta component package exists under the name the Q4 gate decided (the
+      modules-registry comment updated if it differs from the drydocs-docmeta
+      working name): cleaner/tokenizer/manifest/registry-models ported from the bkup
+      scrapers per the plan's §5 port table, with web + filedrop connectors; its own
+      COMPONENT_GROUP in tests/unit/test_module_boundary.py + MODULE_MAP row;
+      imports drydocs_core only (components never import each other); Track-1
+      portable tests cover parse/clean/hash offline (no network); boundary guard +
+      full suite green.
+    notes: >
+      Groomed 2026-07-18 — docmeta plan P3. Module drydocs-docmeta registered at
+      this groom as a WORKING NAME (the drydocs-api precedent) — final at the Q4
+      gate; this item renames the registry entry if the gate folds it into
+      drydocs-deepdoc. Model fable per the component-boundary precedent (O5/G3).
+
 # Roll-up the dispatcher can glance at. COMPUTED views — test_backlog.py enforces
 # that these match the items exactly; update them with any status change.
 summary:
-  todo: 29                                          # +O8-O13 (2026-07-17 site-plan groom + admin-config + mapping-steward pages); docmeta P1-P3 still groomable (IDEAS docmeta line)
+  todo: 34                                          # +D7, O14, Q4-Q6 (2026-07-18 weekly groom: GraphAcademy delete-sweep, mapping-store residual, docmeta P1-P3 promoted)
   in_progress: 1                                   # E1 (gate deferred)
   blocked: 0
   done: 74                                          # +Q3 (2026-07-16 same-day: P0 written verdict = BUILD)
-  next_ready: [C5, D5, D6, L7, L8, L9, L12, M2, M3, M4, P1, C7, K5, J10, J11, J12, C8, G12, G13, O8]
+  next_ready: [C5, D5, D6, D7, L7, L8, L9, L12, M2, M3, M4, P1, C7, K5, J10, J11, J12, C8, G12, G13, O8, O14, Q4]

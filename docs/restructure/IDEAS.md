@@ -26,22 +26,19 @@ Tags help grooming: `idea` · `bug` · `doc` · `source` (new data source) · `q
 
 <!-- add new ideas at the top -->
 
-- 2026-07-17 — [idea] **Relational mapping store research (chat)** — PLAN SAVED:
-  `knowledge/upgrade-plans/mapping-store-plan-2026-07-17.md` (phases M0–M4, feature branch
-  `feat/mapping-store` not a fork; groom M0–M3 as a new epic when ready): verdict = SQLite (WAL mode) as
-  the taxonomy↔ontology mapping store behind drydocs-api — committed per-table CSV dumps remain the
-  git/gate source of truth, SQLite is the queryable materialization (rebuildable either direction, so
-  HITL diff review survives the move off YAML). Row shape = the mapping quintuple the user described:
-  (source_label, source_property) → relationship_type → (target_label, target_property) + status/
-  rationale/gate_ref — i.e., taxonomy-ontology-map.yaml relationalized. Agent story: agents QUERY
-  (text-to-SQL / MCP: DBHub multi-DB, sqlite + motherduck servers) instead of reading wide grids —
-  the "agents don't read column data well" problem is solved by narrow tall tables + views, not by
-  avoiding SQL. DuckDB = dataframe/analytics companion (reads the same sqlite file via its sqlite
-  extension; pandas/Polars/Parquet native). PGlite/DuckDB-WASM rejected — thin-API ADR 0005 means
-  React talks to drydocs-api, never the DB. libSQL/Turso = later multi-user escape hatch (trivial
-  migration from SQLite). Context: internal team adopting DataHub for the catalog (overlaps some of
-  the same ingested metadata; relational-DB-in-the-design validates this direction) — and the
-  **ETL-tooling inventory** is a gap neither they nor anyone covers: DryDocs should own it.
+- 2026-07-18 — [doc] **`docs/runbook-mapping-demo.md` authored FREE-FORM (pre-L8)** — starts the
+  mapping demo site; written this session with no runbook outline in existence yet. Refit to
+  `runbook.outline.yaml` + the validator when L8 lands (candidate second exemplar beside L8's
+  startup/refresh runbook). Same session: `docs/design/drydocs-web-console-tdd.md` (conforms to
+  the TDD outline; covered by the `*-tdd.md` auto-sweep, nothing to do).
+
+- 2026-07-18 — [idea] **ETL-tooling inventory as a DryDocs domain** (re-inboxed slim from the
+  groomed mapping-store line): a gap no catalog covers — DataHub/OpenMetadata inventory data
+  assets, not the tooling estate. DryDocs should own it. Context in the mapping-store plan §5
+  (internal DataHub adoption).
+
+- 2026-07-18 — [idea] JobRun.started_at/status indexes (GraphAcademy advisor residual) — fold
+  into the provenance-audit-fields plan (docs 06/06a) at its next touch, not standalone.
 
 - 2026-07-17 — [idea] **SaaS knowledge-graph scaffold research (chat)**: no drop-in template exists
   for what DryDocs is. Candidates assessed: Neo4j Labs `create-context-graph` (Apache-2.0 scaffolder,
@@ -55,36 +52,6 @@ Tags help grooming: `idea` · `bug` · `doc` · `source` (new data source) · `q
   building; future options = "publish to catalog" export target (OpenMetadata/DataHub ingestion APIs,
   fits QuerySpec export) and DryDocs-as-template play à la create-context-graph ("pick your
   orchestrator, get a scaffolded support graph") for the standalone-generalization goal.
-
-- 2026-07-17 — [question/idea/chore] **GraphAcademy MCP advisor review findings** (full audit
-  + confirmations: `knowledge/upgrade-plans/neo4j-advisor-confirmation-2026-07-17.md`; load
-  architecture, batch size, checksum diet, and the ADR 0002 composite/proxy pattern all
-  externally CONFIRMED). Actionable deltas, by priority:
-  - [question] **HIGH — DC-collision check before any multi-DC load** (company-side): does any
-    `TABLE_ID` appear under >1 `DATA_CENTER` in `psgmgr.CM_DEF_VTAB`? Staging keys by
-    `(data_center, folder_id, job_id)` but graph identity is `(folder_id, job_id)` / folder by
-    `folder_id` alone — collision ⇒ silent cross-DC node merge; fix = identity change ⇒ HITL gate.
-    P012 single-DC pilot cannot expose this.
-  - [idea] incremental-delete path: full-diff ID set (graph − extract) → soft-delete mark →
-    scheduled hard-delete sweep; today removed-from-source jobs stay `active` forever.
-  - [chore] `BaseLoader` pre-load assertion that target indexes are ONLINE (MERGE against
-    POPULATING = 10–100× collapse).
-  - [idea] `JobRun.started_at`/`status` indexes → fold into the provenance-audit-fields plan
-    (docs 06/06a), not standalone.
-  - [chore] existence constraints on `Document.trust_default` / `Chunk.tier_rule` when docmeta
-    lands (silent null = provenance undercount).
-  - [doc] `graphrag-llm-navigation.md` annotated: `feat/llm-nav-p0-vector` state never landed
-    on main; docmeta P0 verdict is the authoritative retrieval direction.
-  - (done same day: DryDocs data model saved to GraphAcademy course `genai-context-graphs`
-    via `save_data_model` — future tutor sessions load our real schema.)
-- 2026-07-16 — [idea] **EE container re-bootstrap loses loaded corpora — fold the
-  demonstrable-content loads into the bootstrap ritual.** Found at Q3: the fresh
-  neo4j-drydocs-ee (O6 bootstrap) had no bmc-docs corpus — the 07-08 live load died with
-  the old container; reload was trivial (2 CLI commands, the loaders' whole point) but
-  nothing PROMPTS it. Candidate: extend the README quick-start / bootstrap sequence (or a
-  make-like script) with load-software-registry + load-bmc-docs (the "demonstrable
-  content" per the 07-08 user direction) + optionally load-essential-graphrag (ddcontext).
-  Touches D6's quick-start-verify item — maybe merge there at next groom.
 
 - 2026-07-16 — [idea] **Launcher registry should be human-configurable** (SME requirement
   captured at the cmdline-lineage-review mini-gate): LAUNCHER_REGISTRY in
@@ -207,6 +174,11 @@ Tags help grooming: `idea` · `bug` · `doc` · `source` (new data source) · `q
   llm-graph-builder pattern) shipped and gate `bmc-docs-lexical-load` was ACCEPTED 13/13,
   LOADED LIVE (commits 12423f4/24d6a4b) — the WRITTEN benchmark verdict (traversal vs
   manifest-routed markdown vs vector RAG) + the docmeta ADR still remain before P1–P3 promote.
+  **GROOMED 2026-07-18: P1–P3 promoted → Q4 (gate + ADR) / Q5 (registry ledger) / Q6 (Port A;
+  module drydocs-docmeta registered as working name — final at the Q4 gate).** P4–P7 stay
+  plan-tracked until Q4–Q6 land. NEW RIDER (GraphAcademy advisor, 2026-07-17): when the docmeta
+  loaders land, add existence constraints on `Document.trust_default` / `Chunk.tier_rule`
+  (silent null = provenance undercount).
 - 2026-07-03 — [chore] the local `neo4j-drydocs-ee` Docker container's password is literally the
   string `<password>` (copy-paste artifact at creation). Fine for sandbox; change it before
   anything less throwaway. (Found while wiring web/ + agents/ to it.)- 2026-07-03 — [question] LLM key strategy for the ADK agents (core_ingest, controlm_fix):
@@ -220,6 +192,44 @@ Tags help grooming: `idea` · `bug` · `doc` · `source` (new data source) · `q
 ## Recently groomed (audit trail)
 
 <!-- when you promote an idea, move its line here with the resulting backlog id -->
+
+- 2026-07-18 groom run (weekly inbox groom, on `feat/mapping-store` — the 07-15 K4-branch
+  precedent) — 5 promoted / 1 merged / 2 retired-executed / 2 re-inboxed slim / 1 kept-updated:
+  - [idea] mapping-store research line → RETIRED EXECUTED-PRE-GROOM (the TechStack plan-07
+    precedent — plan-tracked, not epic-itemized): M0–M4 + the wf-mapping-01 live demo BUILT on
+    `feat/mapping-store` (807e050), deltas recorded in the plan doc header (store moved to
+    drydocs_core; artifact-download submit; no new gates). Groom-touches: **O13** gains a
+    progress record + the plan-§6 acceptance rider ("dropdowns read mapping.db via
+    drydocs-api"); the plan's unwired M2 rebuild residual promoted → **O14** (staleness
+    guard — a stale var/mapping.db serves stale grids until deleted). ETL-tooling inventory
+    re-inboxed as its own slim line.
+  - docmeta plan line (trigger fired 2026-07-16: P0 verdict = BUILD, Q3 done) → P1–P3
+    promoted: **Q4** (gate session + docmeta ADR + planned vocab entries, reconciled against
+    active docs_*; fable), **Q5** (doc-source registry ledger + guard test + stray-PDF
+    sweep), **Q6** (Port A bkup→producer; module `drydocs-docmeta` REGISTERED as working
+    name — final at the Q4 gate, the drydocs-api precedent). Line kept-updated: P4–P7 stay
+    plan-tracked; GraphAcademy existence-constraints rider attached.
+  - [question/idea/chore] GraphAcademy advisor line → dispositioned per sub-item:
+    incremental delete-sweep → **D7**; BaseLoader index preflight EXECUTED PRE-GROOM
+    (66049a0); DC-collision check ALREADY ROUTED to the internal-session checklist
+    (66049a0/d21d4e5) — **P1 deliberately untouched this groom: its status flip is
+    uncommitted in a concurrent Epic P session** (c12ab43 readout); graphrag-llm-navigation
+    annotation + the save_data_model save were already done in-line; JobRun-index fold
+    re-inboxed slim (provenance plan's next touch).
+  - [idea] EE re-bootstrap demonstrable-content loads → MERGED into **D6** (the line's own
+    suggestion): the quick-start/bootstrap sequence gains load-software-registry +
+    load-bmc-docs (+ optional load-essential-graphrag); Q3's P0 spike already re-ran both
+    loads once, proving the gap.
+  - inboxed new: runbook-mapping-demo authored free-form pre-L8 (refit when L8 lands; the
+    web-console TDD from the same session is auto-swept, nothing to do).
+  - kept parked, unchanged (each on its recorded gate): SaaS scaffold research (direction;
+    export-target/template-play triggers unfired), launcher-registry config-file migration,
+    project-review outline (L8), K2 FID/ALIAS tables (company-side; fid-seal/alias-seal
+    mapping domains now visibly registered-but-unavailable in the O13 demo), ctlm_id ripple,
+    dry-docs.com seed, /documentation whitepaper type, lineage live-load gate (HITL),
+    remediation slices (TDD §6/§7), Phase C packaging, Workbench (entitlement),
+    SchedulerKind → AisCapability/AiTool (SME), BRD outline, EE container password,
+    LLM key strategy, common/ cosmetic, cli.py regroup (v1.0 window).
 
 - 2026-07-17 admin/steward surfaces groom — 2 promoted (chat captures + the fired
   launcher-line trigger): admin configuration page w/ generated enforcement matrix →
