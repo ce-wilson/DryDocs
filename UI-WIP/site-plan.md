@@ -73,6 +73,13 @@ tags.)
 Aside footer (pinned): Settings · Profile · Sign out. Header (64px): global search
 ("Search nodes, servers, jobs"), env toggle [Prod|UAT|Dev], theme toggle, avatar.
 
+**Persona-gated routes (NOT module spokes; added 2026-07-17):** `/admin/config` — the
+admin configuration page with the generated enforcement matrix (**O12**,
+`wf-admin-config-01.*`); `/mappings` — manual mapping stewardship for the steward
+(power-user) persona, drafting gate-bound `config/manual-loads/` changesets (**O13**,
+`wf-mapping-01.*`; the UI's only write-shaped surface, and it writes change artifacts,
+never the graph). Persona set extends O2's mock auth: user < steward < admin.
+
 ### Module subpage landing — one template, per the mocks
 
 Every module (1–8) instantiates the SAME template (the mock subpage anatomy mapped

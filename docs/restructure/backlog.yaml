@@ -2650,11 +2650,14 @@ items:
       shared subpage template: graph pane renders the selected surface's traceability
       chain (config file -> code consumer(s) -> guard test(s) -> gate reference);
       data-frame tabs show (a) the enforcement matrix, (b) the selected surface's file
-      content read-only (confidential surfaces send structure/keys only), (c) the gate
-      log. The matrix is GENERATED - a script scans config/ + tests/unit/ and emits
-      enforcement-matrix.json - and a unit test fails when a config surface has no
-      matrix row or a row references a missing file/test (the matrix cannot drift from
-      the repo). Status column distinguishes enforced / unguarded / gate-pending; the
+      content read-only (rendered verbatim - secrets are .env-only so config files
+      carry env-var REFERENCES, never values; the matrix lists each surface's expected
+      env keys by name), (c) the gate log. The matrix is GENERATED - a script scans
+      config/ + tests/unit/ and emits enforcement-matrix.json - and a unit test fails
+      when a config surface has no matrix row or a row references a missing file/test
+      (the matrix cannot drift from the repo). Guard-test freshness shows as
+      LAST-RUN metadata from the most recent CI artifact (no live CI polling).
+      Status column distinguishes enforced / unguarded / gate-pending; the
       code-resident launcher registry renders as the visible unguarded-config example.
       NO edit controls anywhere - each surface links to its repo path + gate flow
       (config-as-code stays behind the gates).
@@ -2664,6 +2667,43 @@ items:
       ("groom when the web console picks up admin surfaces") fired with the site-plan
       build-out. The config-file launcher-registry migration itself stays inboxed
       (drydocs-core work, separate groom). Wireframes are the item spec.
+      2026-07-17 user decisions folded in: CI = last-run metadata; secrets .env-only
+      (redaction question dissolved).
+
+  - id: O13
+    epic: web-console
+    title: "Manual mapping stewardship screen (power-user): draft job->application / FID / ALIAS entries into a gate-bound manual-loads changeset - never a direct graph write"
+    type: task
+    module: drydocs-web
+    phase: 12
+    agent: main
+    model: sonnet
+    priority: p2
+    status: todo
+    depends_on: [O8]
+    inputs: [UI-WIP/wf-mapping-01.md, UI-WIP/wf-mapping-01.html, config/manual-loads/, drydocs/loaders/manual_loads.py, config/gate-prompts/, web/src/]
+    acceptance: >
+      /mappings exists behind a new steward (power-user) persona extending the O2 mock
+      auth (admin also sees it; steward does NOT see /admin/config or the Cypher
+      sandbox). A registry-driven domain strip lists the reconciler-consumed manual
+      tables (K2 tier model: tier-5 manual job->application CSV in config/manual-loads/,
+      FID tier-2, ALIAS tier-4). The attribution-coverage grid shows every job's current
+      resolution (tier + evidence) with unresolved and conflict rows as work queues;
+      assigning a target BusinessApplication (searchable by seal_id/name, rationale
+      REQUIRED) drafts entries (source key, target, rationale, author, timestamp) into
+      a per-user changeset tray; the assign dialog states the precedence honesty rule
+      (manual = tier 5, never overrides SEAL evidence). Submit emits a
+      config/manual-loads/ change ARTIFACT (drydocs-api draft endpoint or file-download
+      fallback) that travels git + gate review + merge, applied by the NEXT LOAD RUN -
+      the UI performs zero graph writes (the loader remains the only writer). Entry
+      lifecycle draft/submitted/gated/loaded is visible, with loaded self-verified by
+      the grid's tier flipping to manual after the load.
+    notes: >
+      Groomed 2026-07-17 from chat (power-user mapping screen). "Code->application"
+      joins the domain strip when that mapping table exists as a reconciler input -
+      same mechanics, registry entry only. Open items in wf-mapping-01.md: draft
+      endpoint shape (PR-creating vs artifact download - decide at build per GHE
+      posture); conflict-row escalation semantics.
 
   # ── Epic P — Runtime topology & maintenance windows — Phase 13 ─────────────
   # Born 2026-07-09: CM_HOSTS + CM_AVG_RUN onboarded via the add-source-object
@@ -3143,7 +3183,7 @@ items:
 # Roll-up the dispatcher can glance at. COMPUTED views — test_backlog.py enforces
 # that these match the items exactly; update them with any status change.
 summary:
-  todo: 28                                          # +O8-O12 (2026-07-17 site-plan groom + admin-config page); docmeta P1-P3 still groomable (IDEAS docmeta line)
+  todo: 29                                          # +O8-O13 (2026-07-17 site-plan groom + admin-config + mapping-steward pages); docmeta P1-P3 still groomable (IDEAS docmeta line)
   in_progress: 1                                   # E1 (gate deferred)
   blocked: 0
   done: 74                                          # +Q3 (2026-07-16 same-day: P0 written verdict = BUILD)

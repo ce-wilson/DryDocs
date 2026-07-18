@@ -191,6 +191,14 @@ Tags help grooming: `idea` · `bug` · `doc` · `source` (new data source) · `q
 
 <!-- when you promote an idea, move its line here with the resulting backlog id -->
 
+- 2026-07-17 admin/steward surfaces groom — 2 promoted (chat captures + the fired
+  launcher-line trigger): admin configuration page w/ generated enforcement matrix →
+  **O12** (user decisions: CI last-run metadata; secrets .env-only so config renders
+  verbatim); power-user manual-mapping stewardship screen (job→application, FID, ALIAS;
+  gate-bound manual-loads changesets, zero graph writes; new steward persona) → **O13**.
+  Wireframes wf-admin-config-01.* + wf-mapping-01.*; launcher-registry config-file
+  migration still inboxed.
+
 - 2026-07-17 site-plan groom — 4 promoted (O8–O11, Epic O phase 12), 2 inbox lines closed:
   - [idea] **UI DECISION: single-track ReUI, Salt DROPPED** (user call) + site plan
     (`UI-WIP/site-plan.md`: system-default 3-state theming dark-first, radial-hub landing,

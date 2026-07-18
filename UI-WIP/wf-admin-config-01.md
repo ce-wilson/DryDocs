@@ -87,9 +87,16 @@ The launcher-registry row demonstrates the page's purpose: it renders with
 `file = code-resident` — visibly the odd one out, which is exactly the argument for
 its config-file migration (still inboxed, separate groom).
 
-## Open items
+## Open items — RESOLVED (user decisions 2026-07-17)
 
-- [ ] Confidential-surface redaction shape (keys-only vs full omit) — decide with the
-      matrix-generator build, not here.
-- [ ] Whether CI test-result freshness (pass/fail per guard test) is shown live or as
-      "last run" metadata only (depends on where CI artifacts land).
+- [x] CI test-result freshness: **"last run" metadata only** — the matrix shows each
+      guard test's result + timestamp from the most recent CI artifact; no live CI
+      polling. Stale-run age renders as plain text (e.g. "last run 3d ago"), not a
+      health color.
+- [x] Confidential redaction: **dissolved — secrets are `.env`-only.** Config files
+      never carry secret values (they carry env-var *references*); therefore the
+      surface-detail tab can render every config file verbatim. The matrix gains an
+      `env-refs` cell listing which env keys a surface expects — names only, values
+      never leave the server.
+- Follow-on surface: manual mapping stewardship (job→application etc.) is NOT this
+  page — it is the power-user screen `wf-mapping-01.md` (**O13**).
