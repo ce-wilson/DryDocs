@@ -26,6 +26,21 @@ Tags help grooming: `idea` · `bug` · `doc` · `source` (new data source) · `q
 
 <!-- add new ideas at the top -->
 
+- 2026-07-17 — [idea] **Relational mapping store research (chat)**: verdict = SQLite (WAL mode) as
+  the taxonomy↔ontology mapping store behind drydocs-api — committed per-table CSV dumps remain the
+  git/gate source of truth, SQLite is the queryable materialization (rebuildable either direction, so
+  HITL diff review survives the move off YAML). Row shape = the mapping quintuple the user described:
+  (source_label, source_property) → relationship_type → (target_label, target_property) + status/
+  rationale/gate_ref — i.e., taxonomy-ontology-map.yaml relationalized. Agent story: agents QUERY
+  (text-to-SQL / MCP: DBHub multi-DB, sqlite + motherduck servers) instead of reading wide grids —
+  the "agents don't read column data well" problem is solved by narrow tall tables + views, not by
+  avoiding SQL. DuckDB = dataframe/analytics companion (reads the same sqlite file via its sqlite
+  extension; pandas/Polars/Parquet native). PGlite/DuckDB-WASM rejected — thin-API ADR 0005 means
+  React talks to drydocs-api, never the DB. libSQL/Turso = later multi-user escape hatch (trivial
+  migration from SQLite). Context: internal team adopting DataHub for the catalog (overlaps some of
+  the same ingested metadata; relational-DB-in-the-design validates this direction) — and the
+  **ETL-tooling inventory** is a gap neither they nor anyone covers: DryDocs should own it.
+
 - 2026-07-17 — [idea] **SaaS knowledge-graph scaffold research (chat)**: no drop-in template exists
   for what DryDocs is. Candidates assessed: Neo4j Labs `create-context-graph` (Apache-2.0 scaffolder,
   FastAPI+Next.js+Chakra — stack mismatch vs ReUI decision, auto-extract-by-default = anti-HITL, no
