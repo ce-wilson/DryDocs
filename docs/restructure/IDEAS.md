@@ -26,6 +26,19 @@ Tags help grooming: `idea` · `bug` · `doc` · `source` (new data source) · `q
 
 <!-- add new ideas at the top -->
 
+- 2026-07-17 — [idea] **SaaS knowledge-graph scaffold research (chat)**: no drop-in template exists
+  for what DryDocs is. Candidates assessed: Neo4j Labs `create-context-graph` (Apache-2.0 scaffolder,
+  FastAPI+Next.js+Chakra — stack mismatch vs ReUI decision, auto-extract-by-default = anti-HITL, no
+  lineage/batch-job domains → pattern quarry only: its "one domain YAML drives the whole generated
+  app" validates our registry-driven module/QuerySpec design); OpenMetadata (real HITL prior art —
+  draft→reviewer→approve glossary/governance workflows — but deliberately NO graph DB, would replace
+  the Neo4j core, no Control-M connector); DataHub (Neo4j-backed graph layer architecturally closest,
+  but Kafka+ES+MySQL+Neo4j footprint, approval flows largely Cloud-tier, no Control-M). Whitespace
+  confirmed: Control-M/batch-orchestration knowledge graph + HITL-gated ontology is uncovered — keep
+  building; future options = "publish to catalog" export target (OpenMetadata/DataHub ingestion APIs,
+  fits QuerySpec export) and DryDocs-as-template play à la create-context-graph ("pick your
+  orchestrator, get a scaffolded support graph") for the standalone-generalization goal.
+
 - 2026-07-17 — [question/idea/chore] **GraphAcademy MCP advisor review findings** (full audit
   + confirmations: `knowledge/upgrade-plans/neo4j-advisor-confirmation-2026-07-17.md`; load
   architecture, batch size, checksum diet, and the ADR 0002 composite/proxy pattern all
