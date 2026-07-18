@@ -80,7 +80,7 @@ from .loaders.manual_loads import (
     ManualLoadError,
     ManualMappingAdapter,
     ManualSealAttributionLoader,
-    parse_mapping_csv,
+    mapping_rows,
 )
 from .loaders.seal_attribution import (
     SealAttributionAdapter,
@@ -651,7 +651,7 @@ def load_manual_mappings(
     (manifest entry -> superseded).
     """
     try:
-        rows = parse_mapping_csv(csv_path)
+        rows = mapping_rows(csv_path)  # M3: reads via the mapping-store materialization
     except ManualLoadError as exc:
         console.print(f"[red]{exc}[/]")
         raise typer.Exit(2) from exc

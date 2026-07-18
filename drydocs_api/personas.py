@@ -11,18 +11,21 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 
-ROLES = ("user", "admin")
+ROLES = ("user", "steward", "admin")
 
 
 @dataclass(frozen=True)
 class Persona:
     id: str
-    role: str  # 'user' | 'admin'
+    role: str  # 'user' | 'steward' | 'admin'
 
 
 PERSONAS: dict[str, Persona] = {
     "jdoe4821": Persona(id="jdoe4821", role="user"),
     "asmith7734": Persona(id="asmith7734", role="admin"),
+    # steward = the O13 power-user tier (user < steward < admin): sees
+    # /mappings, not /admin/config and not raw Cypher.
+    "kchen2190": Persona(id="kchen2190", role="steward"),
 }
 
 

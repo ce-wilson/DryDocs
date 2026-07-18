@@ -15,18 +15,27 @@ drydocs_core.config.Neo4jSettings) — never from a request, never in a browser.
 # annotations at runtime via get_type_hints, and PEP-563 string annotations
 # break body-model detection (a body silently becomes a query param).
 
-from typing import Mapping, Optional
+from collections.abc import Mapping
+from pathlib import Path
 
 import neo4j
 from pydantic import BaseModel
 
-from drydocs_core.config import Neo4jSettings
-
 from drydocs_api.guard import WriteRejected
 from drydocs_api.handlers import Forbidden, login, logout, run_named, run_raw
+from drydocs_api.mappings import (
+    ChangesetValidationError,
+    MappingStore,
+    UnknownDomainError,
+    draft_changeset,
+    list_domains,
+    mapping_grid,
+    mapping_options,
+)
 from drydocs_api.personas import UnknownPersonaError
 from drydocs_api.queries import NAMED_QUERIES, ParamValidationError, UnknownQueryError
 from drydocs_api.sessions import InMemorySessionStore, InvalidTokenError
+from drydocs_core.config import Neo4jSettings
 
 
 class LoginBody(BaseModel):
@@ -41,20 +50,33 @@ class RawBody(BaseModel):
     cypher: str
 
 
+class ChangesetBody(BaseModel):
+    entries: list = []
+
+
 class LiveRunner:
     """The real GraphRunner: one server-side driver, READ routing pinned —
-    the second defense layer behind the endpoint guard."""
+    the second defense layer behind the endpoint guard. The driver is created
+    LAZILY on first graph query so mapping-store-only sessions (O13 demo, no
+    Neo4j configured) can still serve /mappings/*."""
 
-    def __init__(self, settings: Optional[Neo4jSettings] = None) -> None:
-        s = settings or Neo4jSettings()
-        self._driver = neo4j.GraphDatabase.driver(
-            s.uri, auth=(s.user, s.password.get_secret_value())
-        )
+    def __init__(self, settings: Neo4jSettings | None = None) -> None:
+        self._settings = settings
+        self._driver: neo4j.Driver | None = None
+
+    @property
+    def driver(self) -> neo4j.Driver:
+        if self._driver is None:
+            s = self._settings or Neo4jSettings()
+            self._driver = neo4j.GraphDatabase.driver(
+                s.uri, auth=(s.user, s.password.get_secret_value())
+            )
+        return self._driver
 
     def run(
         self, cypher: str, params: Mapping[str, object], database: str
     ) -> tuple[list[str], list[dict[str, object]]]:
-        result = self._driver.execute_query(
+        result = self.driver.execute_query(
             cypher,
             parameters_=dict(params),
             database_=database,
@@ -63,10 +85,11 @@ class LiveRunner:
         return list(result.keys), [r.data() for r in result.records]
 
     def close(self) -> None:
-        self._driver.close()
+        if self._driver is not None:
+            self._driver.close()
 
 
-def create_app(runner=None, store: Optional[InMemorySessionStore] = None):
+def create_app(runner=None, store: InMemorySessionStore | None = None):
     """App factory. ``runner``/``store`` are injectable for tests; the default
     is the live driver + a fresh in-memory session store."""
     from fastapi import FastAPI, Header, HTTPException
@@ -84,7 +107,7 @@ def create_app(runner=None, store: Optional[InMemorySessionStore] = None):
     sessions = store if store is not None else InMemorySessionStore()
     graph = runner if runner is not None else LiveRunner()
 
-    def _token(authorization: Optional[str]) -> str:
+    def _token(authorization: str | None) -> str:
         if not authorization or not authorization.lower().startswith("bearer "):
             raise HTTPException(401, "missing bearer token")
         return authorization.split(" ", 1)[1]
@@ -142,5 +165,54 @@ def create_app(runner=None, store: Optional[InMemorySessionStore] = None):
             raise HTTPException(403, str(exc)) from None
         except WriteRejected as exc:
             raise HTTPException(400, str(exc)) from None
+
+    # ── O13 mapping stewardship (plan M2) — reads from the mapping-store
+    # materialization; the ONLY "write" is a returned change artifact. ──
+    mapping_store = MappingStore()
+
+    def _mapping_call(fn, *args):
+        try:
+            return fn(*args)
+        except InvalidTokenError:
+            raise HTTPException(401, "invalid session") from None
+        except Forbidden as exc:
+            raise HTTPException(403, str(exc)) from None
+        except UnknownDomainError as exc:
+            raise HTTPException(404, f"unknown mapping domain {exc}") from None
+        except ChangesetValidationError as exc:
+            raise HTTPException(422, str(exc)) from None
+
+    @app.get("/mappings/domains")
+    def get_domains(authorization: str | None = Header(default=None)) -> dict[str, object]:
+        return _mapping_call(list_domains, _token(authorization), sessions)
+
+    @app.get("/mappings/grid/{domain_id}")
+    def get_grid(
+        domain_id: str, authorization: str | None = Header(default=None)
+    ) -> dict[str, object]:
+        return _mapping_call(
+            mapping_grid, domain_id, _token(authorization), sessions, mapping_store
+        )
+
+    @app.get("/mappings/options")
+    def get_options(authorization: str | None = Header(default=None)) -> dict[str, object]:
+        return _mapping_call(mapping_options, _token(authorization), sessions, mapping_store)
+
+    @app.post("/mappings/changeset")
+    def post_changeset(
+        body: ChangesetBody, authorization: str | None = Header(default=None)
+    ) -> dict[str, object]:
+        return _mapping_call(
+            draft_changeset, body.entries, _token(authorization), sessions, mapping_store
+        )
+
+    # Dev-mode demo page (same-origin, so no CORS surface): the live-data twin
+    # of UI-WIP/wf-mapping-01.html until the O8 React shell exists.
+    @app.get("/demo")
+    def get_demo():
+        from fastapi.responses import HTMLResponse
+
+        page = Path(__file__).resolve().parent / "static" / "mapping_demo.html"
+        return HTMLResponse(page.read_text(encoding="utf-8"))
 
     return app

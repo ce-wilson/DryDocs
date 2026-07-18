@@ -5,7 +5,7 @@
 // that ADR and replaces this module. Persona ids are synthetic, never real SIDs
 // (publish boundary).
 
-export type Role = 'user' | 'admin'
+export type Role = 'user' | 'steward' | 'admin'
 
 export interface Persona {
   id: string
@@ -29,6 +29,12 @@ export const PERSONAS: readonly Persona[] = [
     displayName: 'A. Smith',
     role: 'admin',
     chip: 'platform admin · all towers',
+  },
+  {
+    id: 'kchen2190',
+    displayName: 'K. Chen',
+    role: 'steward',
+    chip: 'mapping steward · manual tiers (O13)',
   },
 ]
 

@@ -27,6 +27,8 @@
 | `drydocs_core/neo4j_client.py` | driver/session lifecycle; caller passes the DB name |
 | `drydocs_core/config.py`, `precedence.py`, `source_registry.py` | declarative config layer (CLAUDE.md §4) |
 | `drydocs_core/ontology/` | namespace / URN vocab + `relationship_vocabulary.yaml` |
+| `drydocs_core/manual_mappings.py` | pure tier-5 manual-CSV validation/parse (manifest gate, vocab check, K2 shape) — shared by the load component's loader and the mapping store |
+| `drydocs_core/mapping_store.py` | SQLite materialization of the mapping layer (plan M0–M4); derived from committed YAML/CSV, consumed by `load` (read seam) and `api` (/mappings) — core placement is WHY both may use it |
 | `drydocs_core/schema/` | ground-truth DDL/seed `.cypher` resources (constraints, ontology + supplements) |
 | `drydocs_core/controlm/` | **the shared Control-M parser** — `commands.py` (CMD_LINE→invocations/file-ops) + `paths.py` (file-ref canonicalization) are the lineage parser **C2 (`drydocs-lineage`) and C3 (`drydocs-deepdoc`) both wrap** |
 

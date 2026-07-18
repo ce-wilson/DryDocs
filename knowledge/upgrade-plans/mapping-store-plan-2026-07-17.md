@@ -1,7 +1,14 @@
 # Mapping-store plan — relational taxonomy↔ontology mapping (SQLite)
 
 > Saved 2026-07-17 from chat research ("lightweight SQL db that works well with React and
-> agents"). Status: **PLAN — approved direction, not yet groomed to backlog.**
+> agents"). Status: **BUILT 2026-07-18 on `feat/mapping-store` — M0 through M4 plus the
+> wf-mapping-01 live demo (`/demo` on drydocs-api).** Deltas from plan: the store and the
+> pure manual-CSV validation moved to `drydocs_core/` (mapping_store.py, manual_mappings.py)
+> because BOTH the load and api components consume them and components never import each
+> other (MODULE_MAP boundary); M3's flip is the `mapping_rows()` default (`DRYDOCS_MAPPING_READ=yaml`
+> is the fallback); M2's submit is the artifact-download shape (no server-side git — resolves
+> the O13 open item conservatively). No new HITL gates: changesets travel the existing
+> K2-gated config/manual-loads/ mechanism; grid rows enter/leave via the committed sources only.
 > Classification: internal-public (mechanism only, no company data).
 >
 > **Prime directive: do not break the current working model.** YAML/CSV in git stays the

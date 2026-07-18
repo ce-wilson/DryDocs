@@ -99,3 +99,6 @@ docs/design/feedback/scans/*
 # OS
 .DS_Store
 Thumbs.db
+
+# derived mapping-store materialization (plan M0) - rebuild via scripts/build_mapping_db.py
+var/
