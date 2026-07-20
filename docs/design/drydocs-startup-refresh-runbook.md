@@ -1,17 +1,21 @@
 # Runbook — DryDocs local startup & refresh (EE container + sample ingest)
 
 <!-- anchor: front-matter -->
-**Status:** DESCRIPTIVE — documents the working procedure. **Rev 1, 2026-07-20**
-(authored at L8; content reflects commit `0acc0f8`: post-D6 quick-start with step 3b,
-post-D7 sweep, post-K6 supplements) ·
-**Classification:** Internal (operational metadata — local host-port mapping and
-container names, the same class as `internal/helpmeloginlocalneo4j.md`; NO credentials —
-the password lives only in the repo-root `.env`, never here) ·
-**Audience:** anyone bringing a local DryDocs graph up from nothing, or refreshing one
-that exists ·
-**Companion:** `internal/repo-README.md` (the runnable pipeline + CLI reference),
-`internal/helpmeloginlocalneo4j.md` (login/port troubleshooting evidence),
-`.claude/skills/run-drydocs/SKILL.md` (agent-facing run notes).
+- **Status:** DESCRIPTIVE — documents the working procedure. **Rev 2, 2026-07-20**
+  (rev1 SME feedback applied; content reflects commit `a135a6d`: post-D6 quick-start
+  with step 3b, post-D7 sweep, post-K6 supplements)
+- **Classification:** Internal (operational metadata — local host-port mapping and
+  container names, the same class as `internal/helpmeloginlocalneo4j.md`; NO
+  credentials — the password lives only in the repo-root `.env`, never here)
+- **Audience:** anyone bringing a local DryDocs graph up from nothing, or refreshing
+  one that exists
+- **Companion:** `internal/repo-README.md` (the runnable pipeline + CLI reference),
+  `internal/helpmeloginlocalneo4j.md` (login/port troubleshooting evidence),
+  `.claude/skills/run-drydocs/SKILL.md` (agent-facing run notes)
+
+> **What changed in Rev 2 (2026-07-20).** Applied the rev1 SME feedback
+> (`docs/design/feedback/drydocs-startup-refresh-runbook-rev1.yaml`): front-matter items
+> are now one per line, and the out-of-scope list drops the company-side Track-2 item.
 
 This is the Epic L capstone exemplar: the second doc type rendered and validated by the
 same outline system as the TDDs (`docs/design/templates/runbook.outline.yaml`).
@@ -29,9 +33,8 @@ recurring refresh on a graph that already exists.
 chain (no Oracle needed); the Oracle-scoped variant as a pointer; the derived artifacts
 that refresh alongside the graph (board, design renders, depgraph snapshot).
 
-**Out of scope.** Company-side production ingest (Track-2 — the port-prompt and the
-company Control-M ingestion TDD own that), the web console (Epic O), and the multi-DB
-provisioning topology beyond a first-time pointer (G1's `provision.ps1` README owns it).
+**Out of scope.** The web console (Epic O), and the multi-DB provisioning topology
+beyond a first-time pointer (G1's `provision.ps1` README owns it).
 
 <!-- anchor: prerequisites -->
 ## Prerequisites
