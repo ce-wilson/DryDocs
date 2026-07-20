@@ -55,25 +55,6 @@ Tags help grooming: `idea` · `bug` · `doc` · `source` (new data source) · `q
   property (gate discipline). Related: [[SaaS scaffold research line — the
   template-play/whitespace finding, 2026-07-17]].
 
-- 2026-07-19 — [chore] **USER MANUAL STEP: email the port bundle parts + delete the local
-  transfer files** (kept-updated at the 07-19 groom — the CREATE half is DONE: the user ran
-  the bundle command in a regular terminal; main @ 3ae9b08, 447 commits, complete history;
-  base64-encoded + split into 3 part files in `C:\coding\projects\sandbox\`, SHA-256 provided
-  in the email-body block in chat). REMAINING: email the 3 parts to the company mailbox,
-  far side rejoins/decodes/verifies hash + `git bundle verify`, THEN delete all five local
-  transfer files (bundle, .b64.txt, 3 parts — they hold the full private history
-  unencrypted). Full recipe: `docs/ruff-format-convergence.md` §"Transfer without visibility
-  change". (Replaces the make-repo-public idea — rejected: internal/** is tracked +
-  pre-rewrite history retains the seal twins; gates in config/classification.yaml.)
-  **RESOLVED 2026-07-20 pm — THE PORT LANDED.** The squash-rider decision went (a): the
-  3ae9b08 full-history parts were sent; the company side rejoined, verified, and ran the
-  full bundle-port reconciliation (their PORT-REPORT-bd7952f.md; backlog guard 7/7;
-  reversible tag pre-bundle-port-20260720; 4 commits pending their review+push).
-  SOLE REMAINING STEP: delete the LOCAL transfer files — 2 of 5 still exist in
-  C:\coding\projects\sandbox\ (`drydocs-20260719.bundle`, `.b64.txt`; the 3 part files
-  are already gone). They hold the full private history unencrypted — delete now that
-  the far side has verified.
-
 - 2026-07-19 — [question] **m3_invokes `to_node: Script` may need broadening to
   `Script | ETLProcess`** in relationship_vocabulary.yaml: the abioncloud wrapper-payload
   expansion (`runScript.sh -g <pset>` → the ABINITIO invocation replaces the wrapper's)
@@ -263,6 +244,16 @@ Tags help grooming: `idea` · `bug` · `doc` · `source` (new data source) · `q
 ## Recently groomed (audit trail)
 
 <!-- when you promote an idea, move its line here with the resulting backlog id -->
+
+- 2026-07-20 — [chore] USER MANUAL STEP: port-bundle transfer → **RETIRED, FULLY COMPLETE**
+  (the 07-19 line, end to end): bundle created @ 3ae9b08 (447 commits, full pre-squash
+  history) → base64 3-way split → emailed → company side rejoined, hash-verified,
+  `git bundle verify` passed, full bundle-port reconciliation ran (their
+  PORT-REPORT-bd7952f.md, 2026-07-20) → ALL FIVE local transfer files deleted
+  (3 parts post-email; the bundle + .b64.txt deleted 2026-07-20 pm after far-side verify,
+  user-directed). Full private history now exists only in local `archive/full-history` +
+  the company repo. Recipe reference: `docs/ruff-format-convergence.md` §"Transfer
+  without visibility change".
 
 - 2026-07-20 — [question] cross-repo backlog id collision → **DECIDED SAME-DAY (user):
   the DD-series** (`DD1`, `DD2`, …) is reserved for company-side-only items; the producer
