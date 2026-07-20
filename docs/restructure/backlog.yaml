@@ -3066,7 +3066,7 @@ items:
     agent: main
     model: haiku
     priority: p1
-    status: todo
+    status: done          # DONE COMPANY-SIDE — learned from the 2026-07-20 bundle-port readout (company PORT-REPORT-bd7952f.md: "Restored P1 + P4 to done ... company's completion status + notes win"); resolves the 07-18 "concurrent Epic P session" observation — it was the company machine. Producer never runs these probes (internal-only by design); status mirrors the company SoR.
     depends_on: []
     inputs: [drydocs/loaders/sql/adhoc/profile_cm_hosts.sql, drydocs/loaders/sql/adhoc/profile_cm_avg_run.sql]
     acceptance: >
@@ -3126,7 +3126,7 @@ items:
     agent: main
     model: sonnet
     priority: p1
-    status: todo
+    status: done          # DONE COMPANY-SIDE (same 2026-07-20 bundle-port readout as P1 — their probes + supplement loader shipped). Producer mechanism back-port, if ever wanted, is a reconcile-port/backflow concern, not a re-open.
     depends_on: [P1, P2]
     inputs: [drydocs/loaders/sql/controlm_avg_run.sql, config/gate-prompts/controlm-avg-run-supplement.yaml]
     acceptance: >
@@ -3810,8 +3810,8 @@ items:
 # Roll-up the dispatcher can glance at. COMPUTED views — test_backlog.py enforces
 # that these match the items exactly; update them with any status change.
 summary:
-  todo: 20                                          # C10 pulled + done same session (2026-07-20)
-  in_progress: 1                                   # E1 (gate deferred)
+  todo: 18                                          # P1+P4 mirrored done from the company bundle-port readout (2026-07-20)
+  in_progress: 1                                   # E1 (gate deferred — now deferred company-side too, per the same readout)
   blocked: 0
-  done: 94                                         # +K5 +K6 +L8 +C10 (2026-07-20)
-  next_ready: [L7, L9, L12, M2, M3, M4, P1, J10, Q6, O9, O12, O13, G14, J13]
+  done: 96                                         # +K5 +K6 +L8 +C10 +P1 +P4 (2026-07-20)
+  next_ready: [L7, L9, L12, M2, M3, M4, P3, J10, Q6, O9, O12, O13, G14, J13]
