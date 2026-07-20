@@ -33,7 +33,7 @@ as `- [tag] one line. (why/where seen)` with tag ∈ idea | bug | doc | source |
 
 | Field | How to choose |
 |---|---|
-| `id` | Next free number in the matching epic's letter; new theme → next free letter with an epic comment header. |
+| `id` | Next free number in the matching epic's letter; new theme → next free letter with an epic comment header. NEVER allocate the DD-series (`DD1`, `DD2`, …) — reserved for company-side-only items (cross-repo convention 2026-07-20, git-readme.md). |
 | `title` | Plain English, understandable in 6 months with zero context. Never rely on codenames. |
 | `type` | `requirement` (future capability ask) / `task` (concrete work) / `chore` (hygiene, docs, renames) / `bug` (defect). |
 | `module` | From the `modules:` registry in backlog.yaml. Code work → the MODULE_MAP component; non-code → a work area (taxonomy/ontology/config/reference/graph-infra/docs). |

@@ -26,16 +26,6 @@ Tags help grooming: `idea` · `bug` · `doc` · `source` (new data source) · `q
 
 <!-- add new ideas at the top -->
 
-- 2026-07-20 — [question] **Backlog id-allocation collision between the two repos** (seen
-  in the company bundle-port readout, same day): the company reconciliation re-added 3
-  company-only items under ids **C10 / K6 / N3** — but producer C10 (ServiceNow doc
-  mining) and K6 (Product Cabinet supplement) already exist and SHIPPED in this very
-  bundle's follow-on range. Ids are stable references (audit trail, gate log, commits) —
-  a cross-repo collision poisons them. Needs a convention before the NEXT port: e.g.
-  company-only items take a reserved prefix/series (the producer never allocates it), or
-  the port report carries an id-remap table. USER DECISION + both-sides adoption; flag
-  to the company session at its next reconcile.
-
 - 2026-07-20 — [doc] **Apply the runbook rev1 SME feedback** (transcribed 5fbe5e2, NOT yet
   applied — the user hasn't said go): front-matter bullets one-per-line; purpose-scope
   out-of-scope trimmed (drop the company-side Track-2 item). Apply = edit the .md, bump
@@ -273,6 +263,13 @@ Tags help grooming: `idea` · `bug` · `doc` · `source` (new data source) · `q
 ## Recently groomed (audit trail)
 
 <!-- when you promote an idea, move its line here with the resulting backlog id -->
+
+- 2026-07-20 — [question] cross-repo backlog id collision → **DECIDED SAME-DAY (user):
+  the DD-series** (`DD1`, `DD2`, …) is reserved for company-side-only items; the producer
+  never allocates it, the company never allocates epic-letter ids. Recorded in
+  git-readme.md (§backlog id allocation), the backlog.yaml header, and the groom-backlog
+  skill id rule. REMAINING (company-side, next session there): renumber their colliding
+  C10/K6/N3 → DD1–DD3 before the next port range applies.
 
 - 2026-07-20 pm — bundle-port readout review (company-side photo; their
   PORT-REPORT-bd7952f.md) — 2 mirrored done / 1 line resolved / 1 question inboxed:

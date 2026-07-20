@@ -192,6 +192,13 @@ delete+add). Doc/code references to the old path were repointed in the same comm
 - `tests/unit/test_backlog.py` (NEW — Epic I) — fails CI if `docs/restructure/backlog.yaml` violates
   **schema v2**: missing `title/type/module/phase`, duplicate/cyclic/unresolved ids, unknown module or
   phase, or a `summary:`/`next_ready:` roll-up that drifts from the items (both are computed views).
+- **Backlog id allocation — the cross-repo convention (user decision 2026-07-20, after the first
+  bundle-port reconcile):** company-side-only items take the reserved **DD-series** (`DD1`, `DD2`, …).
+  The producer NEVER allocates DD ids; the company side NEVER allocates producer-style epic-letter
+  ids. (Motivating incident: the 2026-07-20 reconcile re-added company-only items as `C10`/`K6`/`N3`,
+  colliding with producer `C10`/`K6` shipped in the very next range — renumber those three to
+  `DD1`–`DD3` at the next company session.) Ids are stable references: on any future collision the
+  DD-series is the escape hatch — producer ids are never renumbered.
 
 **Post-push code-structure snapshot (drift comparison):** after each push, generate a
 timestamped dependency-graph snapshot with the `depgraph` tool (a stdlib-only sibling repo) and

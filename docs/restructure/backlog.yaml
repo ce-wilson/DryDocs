@@ -16,7 +16,10 @@
 #   todo | in_progress | blocked | done
 #
 # FIELDS (v2 — validated by tests/unit/test_backlog.py):
-#   id          stable short id (matches 02-backlog.md)
+#   id          stable short id (matches 02-backlog.md). Epic-letter series = PRODUCER-
+#               allocated; the DD-series (DD1, DD2, …) is RESERVED for company-side-only
+#               items and is never allocated here (user decision 2026-07-20, first
+#               bundle-port reconcile — see git-readme.md §backlog id allocation)
 #   title       REQUIRED plain-English one-liner — never rely on the id/codename alone
 #   type        requirement (future capability ask) | task | chore | bug
 #   module      which module/work area it lands in — must be in `modules:` below
