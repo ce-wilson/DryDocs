@@ -1,0 +1,97 @@
+# =============================================================================
+# reference/REGISTRY.yaml — the single index of external source platforms.
+#
+# Tier 1 = "platforms you build WITH" (graph platform, ontology standards, research).
+# Orchestration vendors you "ingest FROM" are Tier 2 — see
+# external/orchestration/README.md (kept separate on purpose).
+#
+# Agents: consult the relevant entry BEFORE writing code that touches a platform.
+# `reference-librarian` keeps this file current. Every entry is PUBLIC knowledge
+# (safe when the repo is published).
+# =============================================================================
+
+schema: drydocs.reference-registry.v1
+updated: 2026-06-20
+classification: External       # ALL reference material is External (public) — see config/classification.yaml
+verified: 2026-06-21           # A1: local mirrors (../llm-graph-builder, ../sdw-sosa-ssn) + all platform/standard docs resolve; no stale entries
+
+platforms:
+  - id: neo4j
+    role: graph-platform
+    summary: >
+      The graph database DryDocs is built on. Primary reference is the neo4j-skills
+      plugin (cypher, modeling, import, document-import, graphrag, vector-index,
+      gds, aura-*, security, query-tuning, kafka, spark). Use those skills first.
+    skills_prefix: "neo4j-skills:"
+    repos:
+      - https://github.com/neo4j/neo4j
+      - https://github.com/neo4j/neo4j-graphrag-python
+      - https://github.com/neo4j/graph-data-science
+      - https://github.com/neo4j-labs/llm-graph-builder   # mirrored locally: ../llm-graph-builder
+    local_mirror: ../llm-graph-builder
+    docs: reference/platforms/neo4j/README.md
+
+  - id: oracle
+    role: data-platform-source
+    summary: >
+      Source system of record for Control-M metadata (psgmgr replicated views) and
+      DRYDOCS_STG staging. Reference is the Oracle `db` skill (SQL/PLSQL/SQLcl/ORDS).
+    skills_prefix: "db:"
+    docs: reference/platforms/README.md
+
+  - id: snowflake
+    role: data-platform-source
+    status: placeholder            # expansion target
+    summary: >
+      Future data platform. Neo4j graph-analytics-on-Snowflake reference available via
+      neo4j-skills:neo4j-snowflake-graph-analytics-skill when activated.
+    docs: reference/platforms/README.md
+
+  - id: git
+    role: source-control-platform
+    summary: >
+      Repos as reference sources: code provenance (authorship → :Developer), and the
+      external repos mirrored under the sandbox root used as modeling references.
+    repos:
+      - https://github.com/ce-wilson/DryDocs     # this project (target)
+
+standards:
+  - id: prov-o
+    iri: http://www.w3.org/ns/prov#
+    role: provenance-ontology
+    why: "Core ontology — every node carries provenance; the 9-row decision matrix is PROV-O."
+    docs: reference/standards/prov-o/README.md
+  - id: w3c-org
+    iri: http://www.w3.org/ns/org#
+    role: organization-ontology
+    why: "Membership / Role / OrganizationalUnit — SEAL + PAT (LOB→Product→Team)."
+    docs: reference/standards/w3c-org/README.md
+  - id: dprod-ekgf
+    iri: https://ekgf.github.io/dprod/
+    role: data-product-ontology
+    why: "Data product Ports (EventProcessing / BatchProcessing)."
+    docs: reference/standards/dprod-ekgf/README.md
+  - id: sosa-ssn
+    iri: http://www.w3.org/ns/sosa/
+    role: observation-temporal-ontology
+    adoption: experimental        # W3C standard, NOT a declared company standard; opt-in supplement only, pending HITL gate (Epic E)
+    why: >
+      Spatio-Temporal Data on the Web (SOSA/SSN). Feeds the CONTEXT-graph layer:
+      Observation / Sensor / Result / phenomenonTime patterns for "what matters right
+      now" (job-run health, freshness, temporal state).
+    local_mirror: ../sdw-sosa-ssn
+    docs: reference/standards/sosa-ssn/README.md
+  - id: dcat
+    iri: http://www.w3.org/ns/dcat#
+    role: dataset-catalog-ontology
+    why: "DataSource / DataTarget datasets; data-catalog crosswalk."
+    docs: reference/standards/dcat/README.md
+  - id: skos
+    iri: http://www.w3.org/2004/02/skos/core#
+    role: concept-scheme-ontology
+    why: "closeMatch / broader / narrower for taxonomy reconciliation (e.g. LOB→segment)."
+    docs: reference/standards/README.md
+
+research:
+  docs: reference/research/README.md
+  note: "Academic papers backing modeling decisions; cite in ADRs under docs/."

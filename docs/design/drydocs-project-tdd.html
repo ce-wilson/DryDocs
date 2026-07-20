@@ -1,0 +1,266 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Technical Design — DryDocs (the platform: layers, components, governance, and the graph)</title>
+<style>
+:root { color-scheme: light dark; --ink:#1a1a1a; --mid:#555; --line:#d0d0d0; --faint:#f6f6f6; --bg:#fff; --link:#0a58ca; }
+@media (prefers-color-scheme: dark) { :root { --ink:#e6e6e6; --mid:#a0a0a0; --line:#3a3a3a; --faint:#1c1c1c; --bg:#141414; --link:#6ea8fe; } }
+:root[data-theme="dark"] { --ink:#e6e6e6; --mid:#a0a0a0; --line:#3a3a3a; --faint:#1c1c1c; --bg:#141414; --link:#6ea8fe; }
+:root[data-theme="light"] { --ink:#1a1a1a; --mid:#555; --line:#d0d0d0; --faint:#f6f6f6; --bg:#fff; --link:#0a58ca; }
+* { box-sizing: border-box; }
+body { font: 15px/1.6 "Segoe UI", system-ui, Arial, sans-serif; color: var(--ink); background: var(--bg); margin: 0; }
+main { max-width: 900px; margin: 0 auto; padding: 32px 24px 80px; }
+h1 { font-size: 28px; margin: 0 0 6px; letter-spacing:-0.3px; }
+h2 { font-size: 20px; margin: 34px 0 10px; padding-bottom:5px; border-bottom: 2px solid var(--ink); }
+h3 { font-size: 16px; margin: 22px 0 8px; }
+h4,h5,h6 { font-size: 14px; margin: 16px 0 6px; }
+p { margin: 10px 0; } strong { font-weight: 700; }
+a { color: var(--link); } a:hover { text-decoration: underline; }
+code { font-family: "Cascadia Mono","Consolas",monospace; font-size: 0.88em; background: var(--faint); padding: 1px 4px; border-radius: 3px; }
+pre { font-family: "Cascadia Mono","Consolas",monospace; font-size: 12.5px; line-height:1.45; border:1px solid var(--line); background: var(--faint); padding: 12px 14px; border-radius: 6px; overflow-x: auto; }
+pre code { background: none; padding: 0; }
+table { border-collapse: collapse; margin: 14px 0; font-size: 13.5px; display:block; overflow-x:auto; }
+th,td { border:1px solid var(--line); padding: 6px 9px; text-align:left; vertical-align: top; }
+th { background: var(--faint); font-weight:700; }
+blockquote { margin: 14px 0; padding: 2px 16px; border-left: 4px solid var(--line); color: var(--mid); }
+ul,ol { margin: 10px 0; padding-left: 26px; } li { margin: 4px 0; }
+hr { border:none; border-top:1px solid var(--line); margin: 26px 0; }
+:target { scroll-margin-top: 12px; } :target > :first-child, h2:target, h3:target { outline: 2px solid var(--link); outline-offset: 4px; }
+.dd-margin-tag, .dd-print-footer { display: none; }
+
+.dd-note-btn { border:1px solid var(--line); background:var(--bg); color:var(--mid); cursor:pointer; font-size:12px; line-height:1; padding:2px 6px; border-radius:5px; margin-right:6px; }
+.dd-note-btn:hover { color:var(--link); border-color:var(--link); }
+.dd-note-box { margin:6px 0 10px; }
+.dd-note-box textarea { width:100%; min-height:56px; font:13px/1.4 "Segoe UI",system-ui,sans-serif; color:var(--ink); background:var(--faint); border:1px solid var(--line); border-radius:6px; padding:8px; resize:vertical; }
+.dd-annotated { box-shadow:-3px 0 0 var(--link); padding-left:8px; }
+.dd-fb-bar { position:fixed; right:16px; bottom:16px; display:flex; gap:8px; align-items:center; background:var(--bg); border:1px solid var(--line); border-radius:10px; padding:8px 12px; box-shadow:0 2px 10px rgba(0,0,0,.15); font-size:13px; z-index:50; }
+.dd-fb-bar button { cursor:pointer; border:1px solid var(--link); background:var(--link); color:#fff; border-radius:6px; padding:5px 10px; font-size:13px; }
+.dd-fb-bar .dd-badge { font-weight:700; }
+.dd-toast { position:fixed; right:16px; bottom:64px; background:var(--ink); color:var(--bg); padding:8px 12px; border-radius:8px; font-size:13px; z-index:60; opacity:0; transition:opacity .2s; }
+.dd-toast.show { opacity:1; }
+.dd-sme-feedback ol li { margin: 6px 0; }
+@media print { .dd-note-btn, .dd-note-box, .dd-fb-bar, .dd-toast, .dd-sme-feedback, .dd-sme-divider { display:none !important; } }
+@page { size: Letter; margin: 0.6in 0.62in 0.55in 0.62in; }
+@media print {
+:root, :root[data-theme="dark"], :root[data-theme="light"] { color-scheme: light; --ink:#1a1a1a; --mid:#555; --line:#bdbdbd; --fill:#eee; --faint:#f6f6f6; --bg:#fff; --link:#0a58ca; }
+html { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+body { font: 10.5px/1.45 "Segoe UI", system-ui, Arial, sans-serif; }
+main { max-width: 7.2in; margin: 0 auto; padding: 0 0 0 0.62in; position: relative; }
+h1 { font-size: 21px; margin: 0 0 2px; letter-spacing:-0.2px; }
+h2 { font-size: 14px; margin: 16px 0 8px; padding-bottom:4px; border-bottom: 2px solid var(--ink); text-transform: uppercase; letter-spacing: 0.6px; }
+h3 { font-size: 11.5px; margin: 13px 0 5px; padding-bottom:2px; border-bottom:1px solid var(--line); }
+h4,h5,h6 { font-size: 10.5px; margin: 9px 0 4px; }
+p { margin: 6px 0; }
+a { color: inherit; text-decoration: underline; }
+code { font-size: 9.2px; padding: 0 2px; border-radius: 2px; }
+table { display: table; width:100%; margin: 7px 0; font-size: 9.1px; overflow-x: visible; }
+th, td { padding: 3px 5px; }
+th { background: var(--fill); }
+td code, th code { background: transparent; padding: 0; }
+pre { font-size: 8.4px; line-height: 1.35; padding: 7px 9px; margin: 7px 0; white-space: pre; overflow: hidden; border-radius: 3px; }
+pre.sql { background:#fbfbfb; }
+blockquote { margin: 7px 0; padding: 2px 10px; border-left: 3px solid var(--line); break-inside: avoid; }
+ul,ol { margin: 6px 0 6px 16px; padding: 0; } li { margin: 3px 0; }
+hr { margin: 10px 0; }
+h2, h3, table, pre { break-inside: avoid; }
+
+/* L6 paper HITL: each anchored block sits in the left gutter (main's own padding-left,
+   reserved above) so a printed page carries the anchor id beside its section — no @page
+   margin-box support required, so headless Chromium print-to-pdf renders it reliably. */
+h1, h2, h3, h4, h5, h6, p, table, pre, ul, ol, blockquote { position: relative; }
+.dd-margin-tag {
+  display: block; position: absolute; left: -0.6in; top: 0.1em; width: 0.54in;
+  font: 6.2px/1.15 "Cascadia Mono","Consolas",monospace; text-align: right;
+  color: var(--mid); letter-spacing: 0.1px; word-break: break-word;
+}
+/* Rev/commit footer: `position: fixed` repeats on every printed page in Chromium's
+   headless print-to-pdf (the standard running-footer technique) without needing CSS
+   Paged-Media margin-box content(), which Chromium supports only partially. */
+.dd-print-footer {
+  display: block; position: fixed; left: 0.62in; right: 0.62in; bottom: 0.12in;
+  font-size: 8px; color: var(--mid); text-align: center;
+  border-top: 1px solid var(--line); padding-top: 3px;
+}
+}
+</style>
+</head>
+<body>
+<main>
+<h1>Technical Design — DryDocs (the platform: layers, components, governance, and the graph)</h1>
+<p id="front-matter"><span class="dd-margin-tag" aria-hidden="true">front-matter</span><strong>Status:</strong> DESCRIPTIVE — documents the built system as of <strong>Rev 2, 2026-07-12</strong> (Rev 1 + expanded module topology + C4-model views), authored at commit <code>ac2ea2e</code> (post G2 core extraction, G3 remediation component, G4 scaffolds, G9 lineage re-home). · <strong>Classification:</strong> Internal-Public — mechanism only; real folder/job/host/SEAL values live company-side or in gitignored twins. · <strong>Audience:</strong> engineers joining the project (any surface), and the company-side maintainer reconciling ports. · <strong>Companion:</strong> <code>CLAUDE.md</code> (the operating guide this design formalizes); <code>docs/design/controlm-ingestion-tdd.md</code> (the ingestion pipeline in depth); <code>docs/design/drydocs-remediation-tdd.md</code> (the C1 component); <code>MODULE_MAP.md</code> + ADR 0002 family (component topology); <code>docs/whitepaper/drydocs-whitepaper.md</code> (the external framing).</p>
+<p>Worked example throughout (the sanitized sample family already committed in <code>config/taxonomy/controlm.yaml</code>): folders <code>PRARAG-HLDM-85025-PEX-TRUST-{DLY,CYC}</code> on server <code>P32</code>, their jobs, conditions, and the <code>ARA</code> application grouping.</p>
+<blockquote><p><strong>Read-me-first.</strong> DryDocs is a <em>governance machine that happens to load a graph</em>, not a graph with governance bolted on. Every section below reduces to one pattern: a machine-readable ledger, a test that fails on drift, and a human gate wherever meaning is assigned. When extending the system, find the ledger first.</p></blockquote>
+<hr>
+<h2 id="purpose-scope"><span class="dd-margin-tag" aria-hidden="true">purpose-scope</span>Purpose &amp; scope</h2>
+<p><strong>Purpose.</strong> Specify the DryDocs platform end-to-end: the four-layer model, the configuration ledgers, the HITL gate, the loader/provenance contract, the component topology, verification, and the two-repository operating model — the design a new contributor must hold to work on any part safely.</p>
+<p><strong>In scope.</strong></p>
+<ul><li>The four layers and their enforced separation (taxonomy → ontology → graph → context).</li><li>The config layer as the system of record: registries, classifications, dispositions, precedence, crosswalks, the port manifest.</li><li>The ontology contract: vocabulary, PROV decision matrix, mapping lifecycle, gates.</li><li>The load contract: BaseLoader provenance (delta diet), audit envelope, verify suites.</li><li>Component topology (post ADR 0002 Phase B) and its boundary guard.</li><li>The producer→consumer port model.</li></ul>
+<p><strong>Out of scope</strong> (delegated): column-level Control-M ingestion detail (<code>controlm-ingestion-tdd.md</code>); the remediation loop (<code>drydocs-remediation-tdd.md</code>); the web console (Epic O, design in flight); company-side wiring (Confluence, Kerberos config, real gate specs — consumer-canonical by the port manifest).</p>
+<h2 id="context-frame"><span class="dd-margin-tag" aria-hidden="true">context-frame</span>Where this sits — the four-layer frame</h2>
+<p>This TDD covers the <em>whole frame</em> rather than one layer:</p>
+<table><thead><tr><th>Layer</th><th>Answers</th><th>System of record</th><th>Guard</th></tr></thead><tbody><tr><td>1 Taxonomy</td><td>what category</td><td><code>config/taxonomy/*.yaml</code></td><td>importers classify only — no meaning edges</td></tr><tr><td>2 Ontology</td><td>what edges mean</td><td><code>drydocs_core/ontology/relationship_vocabulary.yaml</code> + <code>config/taxonomy-ontology-map.yaml</code></td><td><code>test_schema.py</code>, <code>test_taxonomy_ontology_map.py</code>, the HITL gate</td></tr><tr><td>3 Knowledge graph</td><td>what is connected &amp; what it means</td><td>Neo4j (<code>drydocs</code> DB; EE container)</td><td><code>graph-tests/*.yaml</code> acceptance, <code>m3-verify</code></td></tr><tr><td>4 Context graph</td><td>what matters now</td><td>planned projections (SOSA runs, timing, windows)</td><td>gate E1 pending; phase 13</td></tr></tbody></table>
+<p>Upstream neighbours: the orchestrator replica (read-only <code>CM_</code> schema), org/app registries (SEAL, PAT), vendor/standards corpora. Downstream consumers: review &amp; verify toolkit, generated documents (docgen), lineage/deepdoc passes, the remediation component, the future web console.</p>
+<h2 id="definitions"><span class="dd-margin-tag" aria-hidden="true">definitions</span>Definitions, acronyms &amp; references</h2>
+<ul><li><strong>CM_ replica</strong> — read-only copy of the orchestrator&#x27;s runtime DB in an Oracle schema; the canonical structural source. <strong>Baseline</strong> = the vendor&#x27;s own physical model semantics.</li><li><strong>HITL gate</strong> — the SME sign-off step (<code>docs/restructure/03-hitl-sme-flow.md</code>): rendered gate page → recorded decision in <code>config/gate-log.md</code> (append-only) → statuses flip.</li><li><strong>Ledger</strong> — a machine-readable config file with a guarding test (the house pattern).</li><li><strong>SEAL / PAT</strong> — internal application registry / product-and-team catalog (values confidential; mechanism public).</li><li><strong>Trust tiers</strong> — VERBATIM / GROUNDED / SYNTHESIZED epistemic provenance per corpus (<code>SOURCE-MANIFEST</code> convention); orthogonal to sensitivity.</li><li><strong>Standards</strong> — PROV-O (provenance), W3C ORG (organizations), DPROD/DCAT (data products), SKOS (concept schemes), SOSA/SSN (observations; experimental adoption). Index: <code>reference/standards/</code>.</li><li><strong>ADRs</strong> — 0001 ontology base scope; 0002(+a/b/c) component &amp; database topology, core extraction, remediation rebase, lineage re-home; 0003 label rename; 0004 software registry. <code>docs/decisions/</code>.</li><li><strong>Port</strong> — producer→company apply across disjoint git histories; dispositions in <code>PORT-MANIFEST.yaml</code>.</li></ul>
+<h2 id="design-summary"><span class="dd-margin-tag" aria-hidden="true">design-summary</span>Design summary</h2>
+<pre><code> sources ──► config ledgers ──► taxonomy ──► ontology map ──► HITL GATE
+ (replica,    (registry,         (capture)    (vocabulary +     (SME; gate-log)
+  registries,  classification,                 PROV matrix)          │ confirmed
+  corpora)     dispositions)                                         ▼
+                                                            loaders (MATCH/MERGE,
+                                                            delta provenance,
+                                                            audit envelope)
+                                                                     ▼
+                                                            Neo4j knowledge graph
+                                                                     ▼
+                              review/verify · docgen · plan · lineage · remediation</code></pre>
+<p>A source becomes graph content only by traversing every stage left-to-right; each stage has a ledger and a test, and the one stage that assigns <em>meaning</em> has a human. Components surround the graph and import a slim core; only loaders write ground truth, only the lineage writer will write curated lineage (gate-bound), and remediation writes nothing.</p>
+<h2 id="detailed-design"><span class="dd-margin-tag" aria-hidden="true">detailed-design</span>Detailed design</h2>
+<p><strong>1. Config layer — the system of record.</strong> <code>config/source-registry.yaml</code> declares every source (kind, orchestrator, adapter, <code>confirmed:</code> gate, structured <code>locator:</code> — application → platform → service → schema → mapping); loads fail closed on unconfirmed sources. <code>config/classification.yaml</code> defines the four sensitivity tiers; every source must carry one. <code>config/source-mappings/&lt;source&gt;.yaml</code> is the column ledger: one disposition per profiled column (projected / filter-only / excluded+reason / deferred) with staging-vs-graph targets. <code>config/precedence.yaml</code> resolves inter-source disagreement (baseline → internal standards → org catalog). <code>config/crosswalks/</code> normalizes future orchestrators to the baseline. <code>PORT-MANIFEST.yaml</code> (root) carries cross-repo dispositions. Each file: schema id + guard test.</p>
+<p><strong>2. Taxonomy capture.</strong> Importers write pure classification into <code>config/taxonomy/</code> (servers/folders/jobs/conditions, business apps, LOB→Product→Team, software registry, platforms). Rule: no relationship types at import time — a capture that needs an edge is an ontology question and stops.</p>
+<p><strong>3. Ontology contract.</strong> <code>relationship_vocabulary.yaml</code> holds node classifications (each label → a standards CURIE + PROV behavioural type) and the relationship registry (lifecycle planned → active → deprecated; every active entry must have its supplement block — drift-guarded). New edges are chosen via the 9-row PROV decision matrix, then proposed in <code>config/taxonomy-ontology-map.yaml</code> (lifecycle proposed → confirmed → applied, computed summary, <code>vocab_id</code> referential check, map↔vocabulary label agreement — all test-enforced). Confirmation happens only at a gate; the gate log is append-only audit.</p>
+<p><strong>4. Load contract.</strong> Loaders (component <code>drydocs-load</code>) read extracts (scope-bound, read-only SQL against the replica), map rows through pydantic models, and MERGE per the confirmed mapping. Provenance: every run is a <code>:JobRun</code> activity; <code>WAS_GENERATED_BY</code> edges are <strong>delta-only</strong> (per-row <code>row_checksum</code>; edge on create/content-change only — the supernode diet), while pull provenance stays node properties (<code>last_seen_at</code>, <code>last_run_id</code>) and run totals live on the <code>:JobRun</code>. Source authorship rides the gate-approved audit envelope (<code>source_created_by/_at</code>, <code>source_updated_by/_at</code> per <code>config/audit-fields.yaml</code>). Supplements (software registry, SOSA experimental, future timing stats) are opt-in passes that MATCH existing nodes and never MERGE identity.</p>
+<h3 id="design-data-mapping"><span class="dd-margin-tag" aria-hidden="true">design-data-mapping</span>Source → column-level field mapping</h3>
+<p>N/A at this altitude — the per-column dispositions are the ledgers themselves (<code>config/source-mappings/controlm-psgmgr.yaml</code>) and the pipeline TDD (<code>controlm-ingestion-tdd.md</code> §4) renders the field→node/edge map; duplicating either here would create a third copy to drift.</p>
+<p><strong>5. Component topology (ADR 0002, executed).</strong> One slim core, eight components, one enforced rule set: <em>core imports no component; components import only core; every module classifies into exactly one bucket or the build fails</em> (default-deny, <code>test_module_boundary.py</code>); <code>cli.py</code> is the exempted composition root. Note the codename collision up front: the project&#x27;s component codenames <strong>C1–C3</strong> (remediation, lineage, deepdoc) are unrelated to the <strong>C4 model&#x27;s</strong> levels 1–4 used in the appendix diagrams.</p>
+<table><thead><tr><th>Package / module</th><th>Codename</th><th>Role</th><th>Writes</th><th>Notes / guards</th></tr></thead><tbody><tr><td><code>drydocs_core</code></td><td>—</td><td>typed row models; adapters (csv, oracle); Neo4j client; config accessors (registry, precedence, classification); ontology vocabulary + namespaces; the <strong>shared Control-M parser</strong> (<code>commands</code>/<code>paths</code>/<code>variables</code>/<code>resolver</code>/<code>staging</code>)</td><td>nothing</td><td>imports no component; lineage and deepdoc wrap its parser (an AST guard proves lineage carries no parse code of its own)</td></tr><tr><td><code>drydocs-load</code> (<code>drydocs/loaders/**</code> + <code>cli.py</code>)</td><td>main</td><td>SQL extracts → models → MERGE per confirmed mappings; delta provenance; the CLI</td><td><code>drydocs</code> DB (sole ground-truth writer)</td><td>J9 testcontainers e2e; graph-tests acceptance</td></tr><tr><td><code>drydocs-review</code></td><td>—</td><td><code>graph_review</code>/<code>graph_verify</code>, <code>review_labels</code>, <code>source_mappings</code> accessor, <code>gate_pages</code>, <code>sme_notes</code>, <code>publishing/</code></td><td>HTML / Confluence artifacts</td><td>consumer-canonical wiring (port manifest); gate-page format test-enforced</td></tr><tr><td><code>drydocs-plan</code></td><td>—</td><td><code>plan_board</code> — backlog.yaml → board render</td><td><code>docs/plan/board.html</code></td><td>pure/offline; own boundary bucket</td></tr><tr><td><code>drydocs-docgen</code></td><td>—</td><td><code>doc_outline</code> validator, <code>design_doc</code> deterministic renderer, <code>doc_pdf</code>, markup transcription</td><td><code>docs/design/*</code> renders, PDFs</td><td>outline auto-discovery test covers every committed TDD</td></tr><tr><td><code>drydocs_lineage</code></td><td><strong>C2</strong></td><td>extractors (Control-M inventory) → <code>LineageGraph</code> candidates; curated-write boundary</td><td>curated lineage only — <strong>gate-bound</strong> (writer refuses until the rel vocabulary confirms)</td><td>G9 re-home; candidates never ground truth</td></tr><tr><td><code>drydocs_deepdoc</code></td><td><strong>C3</strong></td><td>on-demand deep-dive passes (scaffold)</td><td><code>drydocs_context</code> (future)</td><td>G4 scaffold</td></tr><tr><td><code>drydocs_remediation</code></td><td><strong>C1</strong></td><td>detect → classify → transform → prove → package</td><td><strong>Jira packages only</strong> — no graph, no production</td><td>separation of duties is structural (ADR 0002-B)</td></tr><tr><td><code>drydocs-web</code></td><td>—</td><td>JS/TS console + graph viz (design in flight, Epic O)</td><td>—</td><td>not a Python package; outside the boundary guard by design</td></tr></tbody></table>
+<p>The import direction is the architecture (this is also the C4 Level-3 view):</p>
+<pre><code>                        ┌────────────────────────────┐
+                        │        drydocs_core        │
+                        │ models · adapters · config │
+                        │ ontology · Control-M parser│
+                        └──────────────▲─────────────┘
+          imports core only ──────────┤ (core imports NO component)
+   ┌──────────┬──────────┬────────────┼───────────┬──────────┬─────────────┐
+   │          │          │            │           │          │             │
+ load      review      plan        docgen     lineage(C2) deepdoc(C3) remediation(C1)
+   │                                                                       │
+   └── cli.py = composition root (ENTRYPOINT exemption: may wire any) ─────┘
+        components NEVER import each other · default-deny classification</code></pre>
+<p><strong>6. Two-repository operating model.</strong> Producer (public, sanitized mechanism) → company (private, wired) across disjoint histories; applies are cherry-picks/checkouts driven by <code>PORT-MANIFEST.yaml</code> dispositions (clean-add / canonical-producer / canonical-company / union-append / per-entry / evaluate / never-port), with <code>git-readme.md</code> and <code>docs/port-prompt.md</code> as narrative. Back-flow is re-derived mechanism only, never values.</p>
+<h2 id="classification-security"><span class="dd-margin-tag" aria-hidden="true">classification-security</span>Classification &amp; security</h2>
+<p>The repo is private-but-sometimes-published. Tiers: External / Internal-Public (publishable) vs Internal / Internal-Confidential (excluded; <code>internal/</code> twins + gitignored <code>internal-local/</code>). Enforced by <code>test_classification.py</code> (every source classified), <code>test_publishing.py</code> (publish pipeline validation), root-image/<code>internal-local/</code> gitignore safety nets, and CI (J5) running the guards on every push. Mechanism-not-instance is the writing rule: object/column names are public vocabulary; SIDs, hosts, folder names, service names, and rosters never leave the internal side. Secrets: architecture-level only; external auth (Kerberos) config lives in the consumer&#x27;s environment, never in git.</p>
+<h2 id="qa-tests"><span class="dd-margin-tag" aria-hidden="true">qa-tests</span>QA &amp; tests</h2>
+<ul><li><strong>Unit suite</strong> (~590 tests, CI-gated): model/parser behavior, every config ledger&#x27;s guard, renderer determinism, boundary default-deny.</li><li><strong>End-to-end</strong> (J9): testcontainers Neo4j load proving the CSV→graph path (found 2 real bugs on introduction).</li><li><strong>Graph acceptance</strong>: <code>graph-tests/*.yaml</code> invariant suites (<code>graph-verify</code> runner) — e.g. the provenance-diet invariants (a zero-change refresh writes zero provenance edges).</li><li><strong>CLI smoke</strong>: <code>import drydocs.cli</code> + <code>drydocs --help</code> + <code>m3-verify</code> against the sample.</li><li><strong>Renders</strong>: board/design HTML are deterministic; the session ritual&#x27;s stale-render check (<code>git diff --quiet</code> after re-render) catches uncommitted drift.</li><li><strong>Port acceptance</strong>: Track-1 portable suite (no data files; skips, never fails, without samples) + Track-2 with the bundled sample&#x27;s exact counts.</li></ul>
+<h2 id="hitl-gate"><span class="dd-margin-tag" aria-hidden="true">hitl-gate</span>HITL gate &amp; open questions</h2>
+<p>Every edge-meaning, reclass, or match-policy decision routes through the gate; prepared pages carry numbered confirmations, provenance blocks, and options with a recommendation; outcomes transcribe to <code>config/gate-log.md</code>; only then do lifecycle statuses flip (vocabulary stays <code>planned</code> until a loader exists — <code>active</code> requires the supplement block). Signed to date: Control-M Q1–Q3, software registry, bmc-docs lexical load, CM_HOSTS host topology, K3 BusinessApplication entity reshape (apply = K4). Awaiting SME: E1 SOSA jobrun-observation, F1/F2 orchestrator crosswalks, K2 SEAL match policy, plan-07 invocation patterns, CM_AVG_RUN timing supplement (P2). Open questions live in the gate specs and the backlog — never resolved silently.</p>
+<h2 id="traceability-matrix"><span class="dd-margin-tag" aria-hidden="true">traceability-matrix</span>Requirements traceability matrix</h2>
+<table><thead><tr><th>Requirement / capability</th><th>Design section</th><th>Component / ledger</th><th>Test / verify</th><th>Status</th></tr></thead><tbody><tr><td>Four-layer separation; no meaning at import</td><td>context-frame</td><td><code>config/taxonomy/</code> + importer rule</td><td>tests/unit/test_schema.py (vocab↔supplement drift)</td><td>active</td></tr><tr><td>Loads fail closed on unregistered/unconfirmed sources</td><td>detailed-design</td><td><code>config/source-registry.yaml</code></td><td>tests/unit/test_source_registry.py</td><td>active</td></tr><tr><td>Every source carries a sensitivity classification</td><td>classification-security</td><td><code>config/classification.yaml</code></td><td>tests/unit/test_classification.py</td><td>active</td></tr><tr><td>No edge loads before SME confirmation</td><td>hitl-gate</td><td><code>config/taxonomy-ontology-map.yaml</code></td><td>tests/unit/test_taxonomy_ontology_map.py</td><td>active</td></tr><tr><td>Per-column source dispositions</td><td>detailed-design</td><td><code>config/source-mappings/</code></td><td>tests/unit/test_source_mappings.py</td><td>active</td></tr><tr><td>Delta-only run provenance (no <code>:JobRun</code> supernode)</td><td>detailed-design</td><td>loaders <code>base.py</code> (<code>row_checksum</code>)</td><td>tests/unit/test_row_checksum.py + graph-tests/provenance-diet.yaml</td><td>active</td></tr><tr><td>Source audit envelope (authorship properties)</td><td>detailed-design</td><td><code>config/audit-fields.yaml</code></td><td>tests/unit/test_audit_fields.py</td><td>active</td></tr><tr><td>Component boundary, default-deny</td><td>detailed-design</td><td><code>MODULE_MAP.md</code></td><td>tests/unit/test_module_boundary.py</td><td>active</td></tr><tr><td>Cross-repo port dispositions machine-readable</td><td>detailed-design</td><td><code>PORT-MANIFEST.yaml</code></td><td>tests/unit/test_port_manifest.py</td><td>active</td></tr><tr><td>Backlog roll-ups are computed views</td><td>qa-tests</td><td><code>docs/restructure/backlog.yaml</code></td><td>tests/unit/test_backlog.py</td><td>active</td></tr><tr><td>CSV→graph load proven end-to-end</td><td>qa-tests</td><td><code>drydocs-load</code></td><td>tests/unit (J9 testcontainers e2e)</td><td>active</td></tr><tr><td>Design docs conform to canonical outlines</td><td>design-summary</td><td><code>drydocs-docgen</code> outlines</td><td>tests/unit/test_doc_outline.py</td><td>active</td></tr></tbody></table>
+<h2 id="decisions-discussions"><span class="dd-margin-tag" aria-hidden="true">decisions-discussions</span>Decisions &amp; discussions</h2>
+<p>ADR 0001 (PROV spine as ontology base) · ADR 0002 + a/b/c (component/database topology; core extraction — executed; remediation rebase — executed; lineage re-home — in flight, G9) · ADR 0003 (<code>JobFolder</code>→<code>ControlMFolder</code>) · ADR 0004 (software registry, vendor = brand only). Live discussions ride the backlog and gate specs; the recurring architectural theme — guarded surfaces stay clean, unguarded surfaces cause incidents — is documented in <code>docs/reviews/tech-debt-*.md</code>.</p>
+<h2 id="appendices"><span class="dd-margin-tag" aria-hidden="true">appendices</span>Appendices</h2>
+<h3>Appendix A — C4-model views (Levels 1–4)</h3>
+<p><em>(C4 model = Context / Container / Component / Code — unrelated to the component codenames C1–C3 above. ASCII on purpose: the renderer is deterministic and JS-free, so these render identically in repo, print/PDF, and hosted views.)</em></p>
+<p><strong>Level 1 — System context.</strong> Who uses DryDocs and what it touches.</p>
+<pre><code>  Production-support SME            Source-app dev teams
+  (gate sign-off, queries,          (receive fix packages;
+   doc annotation)                   hold deploy rights)
+        │                                  ▲
+        ▼                                  │ Jira handoff
+ ┌───────────────────────────────────────────────────────┐
+ │                       DryDocs                         │
+ │   governed knowledge graph for batch production       │
+ │   support: ingest → gate → load → answer → repair     │
+ └───────────────────────────────────────────────────────┘
+    │ read-only        │ read           │ publish        │ port (one-way)
+    ▼                  ▼                ▼                ▼
+ Orchestrator DB    Org/app         Confluence /     Company repo
+ replica (CM_       registries      generated docs   (consumer; real
+ schema, Oracle)    (SEAL, PAT)                      wiring + data)</code></pre>
+<p><strong>Level 2 — Containers.</strong> Runnable things and stores.</p>
+<pre><code> ┌─ Python monorepo (this repo) ───────────────────────────────┐
+ │  drydocs_core + 8 components (§5) · pytest + CI gates (J5)  │
+ └───────────────┬─────────────────────────────┬───────────────┘
+                 │ bolt                        │ writes files
+                 ▼                             ▼
+ ┌─ Neo4j EE container ─────────┐   ┌─ Repo doc surfaces ───────┐
+ │  drydocs         (ground     │   │  docs/design/* renders    │
+ │                   truth)     │   │  docs/plan/board.html     │
+ │  drydocs_docs    (lexical    │   │  gate pages (rendered to  │
+ │                   corpus)    │   │  internal-local/)         │
+ │  drydocs_context (future)    │   └───────────────────────────┘
+ └──────────────────────────────┘
+ ┌─ Config ledgers (git) ──────────────────────────────────────┐
+ │  source-registry · classification · source-mappings ·       │
+ │  taxonomy-ontology-map · precedence · PORT-MANIFEST         │
+ └──────────────────────────────────────────────────────────────┘</code></pre>
+<p><strong>Level 3 — Components.</strong> The import-direction diagram in §5 <em>is</em> the L3 view.</p>
+<p><strong>Level 4 — Code (exemplar: the load/provenance path).</strong> The pattern every loader follows — chosen because it carries the two hardest guarantees (fail-closed config, delta provenance):</p>
+<pre><code> cli.py: ingest-controlm
+   └► FoldersLoader(BaseLoader).run()
+        ├─ source_registry.require_confirmed(source)      # fail closed
+        ├─ adapter.fetch(sql, scope_binds)                # read-only extract
+        ├─ Model.model_validate(row)  → to_params()
+        │     └─ compute_row_checksum(row, exclude=volatile)   # sha256
+        ├─ cypher template per row:
+        │     MERGE (n:Label {key…}) SET n += props
+        │     FOREACH (CASE row_checksum changed-or-new →
+        │        MERGE (n)-[:WAS_GENERATED_BY]-&gt;(run))    # delta diet
+        │     SET n.row_checksum, n.last_seen_at, n.last_run_id
+        └─ _close_run(): (:JobRun) rows_processed / rows_rejected;
+              rows_changed = count(WAS_GENERATED_BY to this run)   # exact</code></pre>
+<h3>Appendix B — Component ↔ write-target summary</h3>
+<p><code>drydocs-load</code> → <code>drydocs</code> DB (sole ground-truth writer); <code>drydocs_lineage</code> → curated lineage only, gate-bound (writer stubbed until the vocabulary gate); <code>drydocs-review</code> → HTML/Confluence artifacts; <code>drydocs-docgen</code> → <code>docs/design/*</code> renders; <code>drydocs-plan</code> → <code>docs/plan/board.html</code>; <code>drydocs_remediation</code> → Jira packages only; <code>drydocs_deepdoc</code> → (future) <code>drydocs_context</code>.</p>
+<hr class="dd-sme-divider">
+<section class="dd-sme-feedback" aria-label="SME - Feedback">
+<h2>SME - Feedback</h2>
+<p>How to return your notes on this document:</p>
+<ol>
+<li>Click the <strong>✎</strong> button beside any section (or numbered step) and type your note — notes save in your browser as you type.</li>
+<li>When finished, click <strong>Copy feedback</strong> in the bottom-right toolbar. Your notes are copied as anchor-keyed YAML.</li>
+<li>Create the feedback file (it is YAML, <em>not</em> markdown) — <strong>Copy To:</strong> <code>docs/design/feedback/</code> · <strong>File Name:</strong> <code>drydocs-project-tdd-rev2.yaml</code></li>
+<li>Paste the copied block into that file, save, and commit (or send the file back to the team).</li>
+</ol>
+</section>
+</main>
+<footer class="dd-print-footer">Rev 2 · commit ac2ea2e</footer>
+<script>
+
+(function(){
+  var DOC="drydocs-project-tdd", KEY="drydocs-doc-feedback:"+DOC;
+  function load(){ try{return JSON.parse(localStorage.getItem(KEY)||"{}");}catch(e){return {};} }
+  function save(){ localStorage.setItem(KEY, JSON.stringify(state)); }
+  var state=load(), badge;
+  function count(){ return Object.keys(state).filter(function(k){return (state[k]||"").trim();}).length; }
+  function refresh(){ if(badge) badge.textContent=count(); }
+  function toast(msg){ var t=document.createElement("div"); t.className="dd-toast"; t.textContent=msg; document.body.appendChild(t); requestAnimationFrame(function(){t.classList.add("show");}); setTimeout(function(){t.classList.remove("show"); setTimeout(function(){t.remove();},250);},1600); }
+  function exportYaml(){
+    var lines=["# design-doc feedback — paste into docs/design/feedback/"+DOC+"-rev<N>.yaml","doc: "+DOC,"notes:"];
+    Object.keys(state).forEach(function(a){
+      var note=(state[a]||"").replace(/\r/g,""); if(!note.trim()) return;
+      lines.push("  - anchor: "+a); lines.push("    note: |");
+      note.split("\n").forEach(function(l){ lines.push("      "+l); });
+    });
+    return lines.join("\n")+"\n";
+  }
+  function attach(el){
+    var id=el.id;
+    var btn=document.createElement("button"); btn.className="dd-note-btn"; btn.type="button"; btn.textContent="✎"; btn.title="Annotate #"+id;
+    var box=document.createElement("div"); box.className="dd-note-box"; box.style.display=(state[id]||"").trim()?"block":"none";
+    var ta=document.createElement("textarea"); ta.value=state[id]||""; ta.setAttribute("placeholder","note for #"+id+" …");
+    ta.addEventListener("input",function(){ state[id]=ta.value; save(); refresh(); el.classList.toggle("dd-annotated", !!ta.value.trim()); });
+    if((state[id]||"").trim()) el.classList.add("dd-annotated");
+    box.appendChild(ta);
+    btn.addEventListener("click",function(){ box.style.display=box.style.display==="none"?"block":"none"; if(box.style.display==="block") ta.focus(); });
+    if(el.tagName==="LI"){ el.insertAdjacentElement("afterbegin", btn); el.appendChild(box); }
+    else { el.insertAdjacentElement("afterend", box); el.insertAdjacentElement("beforebegin", btn); }
+  }
+  document.addEventListener("DOMContentLoaded",function(){
+    document.querySelectorAll("main [id]").forEach(attach);
+    var bar=document.createElement("div"); bar.className="dd-fb-bar";
+    var lbl=document.createElement("span"); lbl.innerHTML='notes <span class="dd-badge">0</span>'; badge=lbl.querySelector(".dd-badge");
+    var ex=document.createElement("button"); ex.type="button"; ex.textContent="Copy feedback";
+    ex.addEventListener("click",function(){ var y=exportYaml();
+      var done=function(){toast("feedback copied — paste into docs/design/feedback/");};
+      if(navigator.clipboard&&navigator.clipboard.writeText){ navigator.clipboard.writeText(y).then(done,function(){fallback(y);}); } else { fallback(y); }
+    });
+    function fallback(y){ var t=document.createElement("textarea"); t.value=y; document.body.appendChild(t); t.select(); try{document.execCommand("copy"); toast("feedback copied");}catch(e){toast("copy failed — select the box");} t.remove(); }
+    bar.appendChild(lbl); bar.appendChild(ex); document.body.appendChild(bar); refresh();
+  });
+})();
+
+</script>
+</body>
+</html>

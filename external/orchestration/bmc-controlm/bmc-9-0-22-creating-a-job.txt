@@ -1,0 +1,305 @@
+https://documents.bmc.com/supportu/9.0.22/en-US/Documentation/Creating_a_Job.htm
+Creating a Job
+This procedure describes how to create a job inside a folder, SMART folder, or sub-folder in your workspace.
+
+Begin
+
+From the center pane toolbar, click Add Job and from the drop-down list, drag and drop the job type into a workspace folder.
+
+For job-specific information, see Job Types.
+
+From the job definitions pane, click on one or more of the following tabs to define the job:
+
+General: Defines job attributes, as described in Job General Attributes.
+
+Scheduling: Defines job scheduling attributes, as described in Job Scheduling Attributes.
+
+Prerequisites: Defines the prerequisites required to run the job, as described in Prerequisites.
+
+Actions: Defines the actions that Control-M performs after job execution, as described in Actions.
+
+Job General AttributesLink copied to clipboard
+The following table describes the General attributes for a job.
+
+Attribute
+
+Description
+
+Job Type
+
+Determines the job type that is selected from the Add Job drop-down list.
+
+Job Name
+
+Defines the job name.
+
+Rules:
+
+Characters: 1–64
+
+Case Sensitive: Yes
+
+Invalid Characters: ' $ / * ?
+
+Variable Name: %%JOBNAME
+
+The job name must be unique in each folder, and it cannot share the same name with a parent folder or sub-folder.
+
+To write a ) or ( (parenthesis), precede it with a / (forward slash), as follows:
+
+/( or /)
+
+IBM i (AS/400) Only
+
+Name the job according to IBM i (AS/400) conventions and verify that it matches the actual job name used by IBM i (AS/400).
+
+The Job Name value is considered part of the job submission command.
+
+Description
+
+Defines a description of the job using free text.
+
+Rules:
+
+Characters: 1–4,000
+
+Case Sensitive: Yes
+
+Run as Dummy
+
+Determines whether the job runs as a dummy job—not as a Dummy job type. This job is not submitted by the Control-M/Server and only performs post-processing actions.
+
+(z/OS only) Determines whether the override path is set to Dummy, as described in z/OS Job.
+
+Server
+
+Defines the Control-M/Server or Control-M for z/OS name that processes the job.
+
+Host/Host Group
+
+Defines the Agent hostname, Agentless Host name, empty hostname, or host group where the job executes.
+
+Rules:
+
+Characters: 1–85
+Valid Characters: A–Z, a–z, 0–9, and - . _ :
+Invalid Characters: Latin-1 special characters.
+
+Parent Folder
+
+Defines the name of the parent folder or parent folder and sub-folder.
+
+Application
+
+Defines a descriptive name for related job groups. These jobs do not have to run at the same time.
+
+Rules:
+
+Case Sensitive: Yes
+
+Invalid Characters: Blank spaces and '.
+
+Variable Name: %%APPLIC
+
+For more information, see Application and Sub-application Variables.
+
+Sub-application
+
+Defines a descriptive name for jobs that are more specifically related than in an application.
+
+Rules:
+
+Characters: 1–64
+
+Case Sensitive: Yes
+
+Invalid Characters: Blank spaces and '.
+
+Variable Name: %%APPLGROUP
+
+For more information, see Application and Sub-application Variables.
+
+Application: Finance
+
+Sub-application: Payroll
+
+Variables
+
+Determines variable types, names, and values, as described in Variables.
+
+Rules:
+
+Characters: 1–40; z/OS: 1–66
+
+Value: 1–4,000; z/OS: 1–66
+
+Invalid Characters: Latin-1 special characters.
+
+Control-M recognizes fields that you define with %% as variables.
+
+Advanced
+
+Override Path
+
+Defines a temporarily-modified job script file without changing the original script file in the File Path or Member Library field and without changing when the folder is scheduled to run.
+
+You can browse and select the required file on the Agent defined in the Host/Host Group attribute. You must first define the Host/Host Group and Run as User attributes.
+
+Rules:
+
+Characters: 1–255
+
+iSeries (AS/400): 1–10
+
+Case Sensitive: Yes
+
+Invalid Characters:
+
+Blank spaces.
+
+All Versions of Microsoft Windows 2000: \, /, *, ?, <, >, and |.
+
+Variable Name: %%OVERLIB
+
+Pre-execution Command
+
+Defines a command that executes immediately before job execution. The return code is ignored.
+
+Characters: 1–4,000
+
+Variable Name: %%PRECMD
+
+Post-execution Command
+
+Defines a command that executes immediately after job execution. The return code is ignored.
+
+Characters: 1–4,000
+
+Variable Name: %%POSTCMD
+
+Run Job on All Hosts in Group
+
+Determines whether Control-M runs the same job on all Agents in the host group—each job has a unique run ID.
+
+On: The job runs on all Agents within the host group.
+
+Off: The job runs only on the current Agent.
+
+Run as Detached
+
+Determines whether the job runs as detached, which enables the Agent host to execute the job in an isolated process that is separate from the Agent process, where all other jobs execute. Control-M still captures the job output and monitors its completion status. This ensures the detached job completes execution even if the Agent process terminates unexpectedly, and enables you to monitor the job status and output during execution.
+
+End Folder on Job Completion
+
+Determines whether Control-M stops executing jobs and sub-folders in the folder.
+
+To enable this option, you must have full User Views set in User and Role Authorizations.
+
+Created By
+
+Defines the Control-M user who creates the job.
+
+Rules:
+
+Characters: 1–64
+
+Case Sensitive: Yes
+
+Invalid Characters: Blank spaces and '.
+
+Type
+
+Determines where to save the folder documentation, as follows:
+
+File
+
+URL
+
+Doc Path
+
+Defines the directory where the folder documentation is saved.
+
+Valid Values:
+
+Characters: 1–255; (iSeries, AS/400 only): 1–21
+Case Sensitive: Yes
+
+Doc File
+
+Defines the filename of the saved folder documentation.
+
+You can browse and select the required file on the Agent defined in the Host/Host Group attribute. You must first define the Host/Host Group and Run as User attributes.
+
+Valid Values:
+
+Characters: 1–64
+Case Sensitive: Yes
+
+Invalid Characters: Blank spaces
+
+URL
+
+Defines the URL where the folder documentation is saved, in one of the following formats:
+
+http://
+
+https://
+
+ftp://
+
+file://
+
+Priority
+
+Determines the order that Control-M processes jobs, based on one of the following priority levels:
+
+Custom
+
+Very High
+
+High
+
+Medium
+
+Low
+
+Very Low
+
+A higher priority forces Control-M to reserve resources from the resource pool to ensure that the job is submitted as soon as possible.
+
+Critical
+
+Determines whether the job is a critical-path job in Control-M, which ensures a resource allocation order.
+
+Critical jobs take precedence over Priority jobs.
+
+If you mark two or more jobs as Critical, the job with higher Priority receives resources first.
+
+Critical jobs take precedence for lock resources that have Exclusive status, not Shared status.
+
+You cannot mark a job as Critical when the job is executing.
+
+Critical jobs ignore Agent restrictions, as described in Agent (Host) Restrictions.
+
+(z/OS only) The parameter is called Emergency. If you create a job using a Control-M/EM utility and set the Critical parameter to 1, the job is marked as Emergency.
+
+Creating Multiple JobsLink copied to clipboard
+This procedure describes how to create multiple jobs inside a folder, SMART folder, or sub-folder in your workspace. The jobs are created based on existing jobs types and templates. To create a job template, see Templates.
+
+Begin
+
+From a workspace, click the folder, SMART folder, or sub-folder where you want to create the jobs.
+
+From the center pane toolbar, click More and then select Mass Create.
+
+The Mass Create dialog box appears.
+
+In the Number of Jobs field, type the number of jobs you want to create.
+
+You can create up to 250 jobs.
+
+From the Job Type or Template drop-down list, select the job type or template.
+
+Click Create.
+
+The jobs appear with unique names in the folder.

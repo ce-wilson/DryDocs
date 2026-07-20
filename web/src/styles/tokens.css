@@ -1,0 +1,99 @@
+/* DryDocs design tokens — dark + light token sheets (O8 acceptance).
+
+   Dark is canonical (carried over verbatim from UI-WIP/drydocs-landing-dark.html,
+   commit dd270b2) with one deliberate change: `--faint` is lightened from the
+   mockup's #5C6B7E (design-review: 3.37:1 on --bg, WCAG AA fail) to ~#71809A
+   per design-review.md rec #4 / site-plan.md §2. Light is derived second, same
+   token names, accent hues taken one step darker for contrast on a light bg
+   (site-plan §2) — it is a working derivation, not yet its own design pass
+   (site-plan §6 follow-up).
+
+   Mechanism: class strategy (shadcn convention). `:root` holds light (the
+   no-class default); `.dark` on <html> (stamped by the pre-paint boot script,
+   see index.html + src/lib/theme.ts) overrides with the dark set. Every
+   consumer — plain CSS, Tailwind utilities via the @theme mapping below, and
+   React Flow node/edge styles (CSS vars work inside SVG) — reads these
+   variables; nothing downstream hardcodes a hex value. */
+
+:root {
+  --bg: #f4f6f9;
+  --bg2: #eaeef4;
+  --panel: #ffffff;
+  --panel2: #eef2f7;
+  --edge: #d3dce6;
+  --edge-soft: #e3e9f0;
+
+  --text: #111a26;
+  --muted: #48566c;
+  --faint: #64728a;
+
+  --blue: #2e6bc4;
+  --blue-br: #1d4f93;
+  --teal: #167f73;
+  --green: #1f7a46;
+  --yellow: #8a6a0c;
+  --red: #c8202e; /* brand core — same hue both themes (brand rule, site-plan §2) */
+  --red-soft: #a81824;
+
+  --mono: 'IBM Plex Mono', ui-monospace, Consolas, monospace;
+  --sans: 'IBM Plex Sans', -apple-system, 'Segoe UI', sans-serif;
+
+  color-scheme: light;
+}
+
+:root.dark {
+  --bg: #0d1520;
+  --bg2: #0f1b29;
+  --panel: #121e2e;
+  --panel2: #152335;
+  --edge: #203045;
+  --edge-soft: #1a2739;
+
+  --text: #e8edf3;
+  --muted: #8a97a8;
+  --faint: #71809a; /* was #5c6b7e (3.37:1, WCAG fail) — design-review fix applied */
+
+  --blue: #2e6bc4;
+  --blue-br: #4d8be0;
+  --teal: #2ab3a6;
+  --green: #3aae6b;
+  --yellow: #d9b831;
+  --red: #c8202e;
+  --red-soft: #e4525d;
+
+  color-scheme: dark;
+}
+
+/* Tailwind v4 theme mapping: alias design tokens into Tailwind's utility
+   namespace (bg-bg, bg-panel, text-muted, border-edge, font-sans, ...) so
+   components can use ordinary Tailwind classes while the underlying value
+   still resolves through the live CSS custom property above — swapping
+   `.dark` on <html> re-themes every utility with no re-render needed. */
+@theme inline {
+  --color-bg: var(--bg);
+  --color-bg-2: var(--bg2);
+  --color-panel: var(--panel);
+  --color-panel-2: var(--panel2);
+  --color-edge: var(--edge);
+  --color-edge-soft: var(--edge-soft);
+
+  --color-text: var(--text);
+  --color-muted: var(--muted);
+  --color-faint: var(--faint);
+
+  --color-blue: var(--blue);
+  --color-blue-bright: var(--blue-br);
+  --color-teal: var(--teal);
+  --color-green: var(--green);
+  --color-yellow: var(--yellow);
+  --color-brand: var(--red);
+  --color-brand-soft: var(--red-soft);
+
+  --font-sans: var(--sans);
+  --font-mono: var(--mono);
+}
+
+/* Class-based dark variant (Tailwind v4 requires this opt-in explicitly —
+   default v4 behavior is the `prefers-color-scheme` media query, which would
+   ignore the boot script's explicit System/Dark/Light override). */
+@custom-variant dark (&:where(.dark, .dark *));

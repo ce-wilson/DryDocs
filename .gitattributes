@@ -1,0 +1,7 @@
+# Shell scripts must use LF — they run on Linux schedulers (Control-M / cron);
+# a CRLF in the shebang breaks execution.
+*.sh text eol=lf
+*.ksh text eol=lf
+
+# Binary documents — never eol-normalize (autocrlf=true would corrupt them).
+*.pdf binary

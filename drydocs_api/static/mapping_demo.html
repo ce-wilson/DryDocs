@@ -1,0 +1,247 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>DryDocs /mappings — live demo (wf-mapping-01 twin)</title>
+<style>
+  /* Rung-3 grayscale wireframe styling on purpose: this is the LIVE-DATA twin
+     of UI-WIP/wf-mapping-01.html, not the O8 ReUI shell. */
+  :root { --ink:#333; --line:#8a8a8a; --fill:#f2f2f2; --faint:#bbb; }
+  * { box-sizing:border-box; margin:0; }
+  body { font:13px/1.45 "Segoe UI", Arial, sans-serif; color:var(--ink); background:#fff; padding:16px; }
+  .note { color:#666; margin:0 0 12px; max-width:1100px; }
+  .frame { max-width:1280px; border:2px solid var(--ink); }
+  .box { border:1px solid var(--line); background:var(--fill); padding:4px 10px; display:inline-block; cursor:default; }
+  button.box { cursor:pointer; font:inherit; }
+  header.hd { display:flex; align-items:center; gap:12px; padding:10px 14px; border-bottom:2px solid var(--ink); }
+  .hd .spacer { flex:1; }
+  .domains { padding:8px 14px; border-bottom:1px dashed var(--line); display:flex; gap:6px; align-items:center; flex-wrap:wrap; }
+  .domains .box.on { background:#ddd; font-weight:600; }
+  .domains .box.off { color:#999; }
+  .split { display:flex; }
+  .center { flex:1; min-width:0; padding:10px 14px; overflow-x:auto; }
+  table.grid { border-collapse:collapse; width:100%; font-size:11.5px; }
+  .grid th, .grid td { border:1px solid var(--line); padding:3px 6px; text-align:left; white-space:nowrap; }
+  .grid th { background:var(--fill); position:sticky; top:0; }
+  .grid td.null { color:#bbb; }
+  .assign { margin-top:10px; border:1px solid var(--ink); padding:10px; max-width:620px; }
+  .assign h4 { font-size:12px; margin-bottom:6px; }
+  .assign .row { margin:6px 0; display:flex; gap:6px; }
+  .assign input, .assign textarea, .assign select { flex:1; border:1px solid var(--line); padding:4px 8px; font:inherit; }
+  .assign .warn { border:1px dashed var(--ink); padding:5px 8px; font-size:11px; color:#555; margin-top:6px; }
+  .tray { width:290px; border-left:2px solid var(--ink); padding:10px; font-size:12px; display:flex; flex-direction:column; }
+  .tray h4 { font-size:12px; border-bottom:1px dashed var(--line); padding-bottom:4px; margin-bottom:8px; }
+  .draft { border:1px solid var(--line); background:var(--fill); padding:6px 8px; margin-bottom:6px; font-size:11px; }
+  .tray .submit { margin-top:auto; border:2px solid var(--ink); background:var(--fill); padding:8px; text-align:center; font-weight:600; width:100%; }
+  .status { padding:6px 14px; border-top:1px dashed var(--line); color:#555; font-size:11px; min-height:26px; }
+  .artifact { margin-top:10px; border:1px solid var(--ink); padding:10px; display:none; }
+  .artifact pre { background:var(--fill); border:1px solid var(--line); padding:8px; overflow-x:auto; font-size:11px; }
+  .err { color:#a00; }
+</style>
+</head>
+<body>
+
+<p class="note"><strong>Live /mappings demo</strong> — the wf-mapping-01 wireframe wired to
+<code>drydocs-api</code> (plan M2). Grid + dropdowns read the mapping-store materialization
+(<code>var/mapping.db</code>, derived from the committed YAML/CSV). Submitting the changeset
+returns a <code>config/manual-loads/</code> change <em>artifact</em> — the server writes
+nothing; git + gate + loader remain the authority chain.</p>
+
+<div class="frame">
+  <header class="hd">
+    <span class="box">LOGO · DryDocs</span>
+    <span class="spacer"></span>
+    <label>persona:
+      <select id="persona">
+        <option value="kchen2190" selected>kchen2190 (steward)</option>
+        <option value="asmith7734">asmith7734 (admin)</option>
+        <option value="jdoe4821">jdoe4821 (user — expect 403)</option>
+      </select>
+    </label>
+    <button class="box" id="loginBtn">sign in</button>
+    <span class="box" id="who">signed out</span>
+  </header>
+
+  <div class="domains" id="domains"><span style="color:#999">sign in to load domains…</span></div>
+
+  <div class="split">
+    <div class="center">
+      <div id="gridWrap"><em style="color:#999">grid loads after sign-in</em></div>
+
+      <div class="assign" id="assign" style="display:none">
+        <h4>Assign job → application (drafts a tier-5 manual row)</h4>
+        <div class="row">
+          <input id="f_folder" placeholder="folder_id (ControlMJob key part 1)">
+          <input id="f_job" placeholder="job_id (key part 2)">
+        </div>
+        <div class="row">
+          <input id="f_seal" placeholder="seal_id (BusinessApplication key)">
+          <label style="font-size:11px"><input type="checkbox" id="f_create" style="width:auto"> create target if missing</label>
+        </div>
+        <div class="row">
+          <textarea id="f_rationale" rows="2" placeholder="rationale (REQUIRED — CSV provenance column + gate context)"></textarea>
+        </div>
+        <div class="warn">tier notice: manual = tier 5 (lowest). If this job later gains SEAL
+        evidence, that evidence WINS — a manual entry never overrides it.</div>
+        <div class="row">
+          <button class="box" id="addBtn">add to changeset →</button>
+          <span style="font-size:11px;color:#777">vocabulary check: <span id="vocabOk">…</span></span>
+        </div>
+      </div>
+
+      <div class="artifact" id="artifact">
+        <h4>Change artifact returned (nothing was written server-side)</h4>
+        <p style="font-size:11px;color:#555;margin:4px 0">lifecycle: <span id="lifecycle"></span></p>
+        <pre id="artifactCsv"></pre>
+        <h4 style="font-size:11px">manifest.yaml snippet (fill replaces_with):</h4>
+        <pre id="artifactManifest"></pre>
+        <button class="box" id="dlBtn">download CSV</button>
+      </div>
+    </div>
+
+    <aside class="tray">
+      <h4>Draft changeset (<span id="draftCount">0</span>)</h4>
+      <div id="drafts"></div>
+      <button class="submit" id="submitBtn" disabled>submit changeset</button>
+      <div style="font-size:10px;color:#777;margin-top:8px;text-align:center">
+        → manual-loads CSV diff → PR / gate review → merge → next load run applies</div>
+    </aside>
+  </div>
+
+  <div class="status" id="status">ready.</div>
+</div>
+
+<script>
+(() => {
+  let token = null, drafts = [], lastArtifact = null, currentDomain = 'ontology-map';
+  const $ = (id) => document.getElementById(id);
+  const status = (msg, err) => { $('status').textContent = msg; $('status').className = 'status' + (err ? ' err' : ''); };
+
+  async function api(path, opts = {}) {
+    const headers = Object.assign({'Content-Type': 'application/json'}, opts.headers || {});
+    if (token) headers['Authorization'] = 'Bearer ' + token;
+    const res = await fetch(path, Object.assign({}, opts, {headers}));
+    if (!res.ok) {
+      const body = await res.json().catch(() => ({}));
+      throw new Error(res.status + ': ' + (body.detail || res.statusText));
+    }
+    return res.json();
+  }
+
+  async function login() {
+    drafts = []; renderDrafts();
+    const persona = $('persona').value;
+    try {
+      const out = await api('/login', {method: 'POST', body: JSON.stringify({persona_id: persona})});
+      token = out.token;
+      $('who').textContent = out.persona_id + ' · ' + out.role;
+      status('signed in as ' + out.persona_id + ' (' + out.role + ')');
+      await loadDomains();
+    } catch (e) { token = null; $('who').textContent = 'signed out'; status(e.message, true); }
+  }
+
+  async function loadDomains() {
+    try {
+      const out = await api('/mappings/domains');
+      const el = $('domains'); el.innerHTML = '';
+      out.domains.forEach(d => {
+        const b = document.createElement('button');
+        b.className = 'box ' + (d.available ? (d.id === currentDomain ? 'on' : '') : 'off');
+        b.textContent = d.title + (d.tier ? ' · tier ' + d.tier : '');
+        b.title = d.source;
+        if (d.available) b.onclick = () => { currentDomain = d.id; loadDomains(); loadGrid(); };
+        el.appendChild(b);
+      });
+      await loadGrid();
+      await loadOptions();
+    } catch (e) {
+      $('domains').innerHTML = '<span class="err">' + e.message + '</span>';
+      $('gridWrap').innerHTML = ''; $('assign').style.display = 'none';
+      status(e.message + ' — the mappings surface is steward/admin only', true);
+    }
+  }
+
+  async function loadGrid() {
+    try {
+      const out = await api('/mappings/grid/' + currentDomain);
+      const rows = out.rows;
+      if (!rows.length) {
+        $('gridWrap').innerHTML = '<em style="color:#999">no rows in domain "' + currentDomain +
+          '" yet — drafts you submit become the first config/manual-loads/ file</em>';
+      } else {
+        const cols = out.keys;
+        let html = '<table class="grid"><thead><tr>' + cols.map(c => '<th>' + c + '</th>').join('') + '</tr></thead><tbody>';
+        rows.forEach(r => {
+          html += '<tr>' + cols.map(c => r[c] === null || r[c] === undefined
+            ? '<td class="null">∅</td>' : '<td>' + String(r[c]) + '</td>').join('') + '</tr>';
+        });
+        $('gridWrap').innerHTML = html + '</tbody></table>';
+      }
+      $('assign').style.display = currentDomain === 'job-application' ? 'block' : 'none';
+      status('domain "' + currentDomain + '": ' + rows.length + ' row(s) from the materialization');
+    } catch (e) { $('gridWrap').innerHTML = ''; status(e.message, true); }
+  }
+
+  async function loadOptions() {
+    try {
+      const out = await api('/mappings/options');
+      const ok = out.relationships.some(r => r.neo4j_label === 'WAS_ASSOCIATED_WITH' && r.role === 'seal_app_ref');
+      $('vocabOk').textContent = ok
+        ? 'WAS_ASSOCIATED_WITH{seal_app_ref} registered ✓ (' + out.relationships.length + ' active terms, '
+          + out.labels.length + ' labels)'
+        : 'K2 term missing ✗';
+    } catch (e) { $('vocabOk').textContent = e.message; }
+  }
+
+  function renderDrafts() {
+    $('draftCount').textContent = drafts.length;
+    $('submitBtn').disabled = drafts.length === 0;
+    $('drafts').innerHTML = drafts.map((d, i) =>
+      '<div class="draft"><b>' + d.folder_id + '/' + d.job_id + ' → ' + d.seal_id + '</b><br>' +
+      '<span style="color:#666">"' + d.rationale + '"</span> ' +
+      '<a href="#" data-i="' + i + '" class="rm">✕</a></div>').join('');
+    document.querySelectorAll('.rm').forEach(a => a.onclick = (ev) => {
+      ev.preventDefault(); drafts.splice(Number(a.dataset.i), 1); renderDrafts();
+    });
+  }
+
+  $('loginBtn').onclick = login;
+  $('addBtn').onclick = () => {
+    const d = {
+      folder_id: $('f_folder').value.trim(), job_id: $('f_job').value.trim(),
+      seal_id: $('f_seal').value.trim(), rationale: $('f_rationale').value.trim(),
+      create_target_if_missing: $('f_create').checked,
+    };
+    if (!d.folder_id || !d.job_id || !d.seal_id) { status('folder_id, job_id and seal_id are required', true); return; }
+    if (!d.rationale) { status('rationale is REQUIRED — it becomes the CSV provenance column', true); return; }
+    drafts.push(d); renderDrafts();
+    ['f_folder','f_job','f_seal','f_rationale'].forEach(id => $(id).value = '');
+    $('f_create').checked = false;
+    status('drafted ' + drafts.length + ' entr' + (drafts.length === 1 ? 'y' : 'ies') + ' — nothing sent yet');
+  };
+  $('submitBtn').onclick = async () => {
+    try {
+      const out = await api('/mappings/changeset', {method: 'POST', body: JSON.stringify({entries: drafts})});
+      lastArtifact = out;
+      $('artifact').style.display = 'block';
+      $('artifactCsv').textContent = out.csv;
+      $('artifactManifest').textContent = out.manifest_snippet;
+      $('lifecycle').textContent = out.lifecycle;
+      status('artifact "' + out.filename + '" returned (' + out.entries + ' entries) — ' + out.note);
+      drafts = []; renderDrafts();
+    } catch (e) { status(e.message, true); }
+  };
+  $('dlBtn').onclick = () => {
+    if (!lastArtifact) return;
+    const blob = new Blob([lastArtifact.csv], {type: 'text/csv'});
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob); a.download = lastArtifact.filename; a.click();
+    URL.revokeObjectURL(a.href);
+  };
+
+  login(); // auto sign-in as the steward on load
+})();
+</script>
+</body>
+</html>

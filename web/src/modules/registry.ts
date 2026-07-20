@@ -1,0 +1,108 @@
+// The module registry — ONE array driving both the aside nav and the Overview
+// radial-hub spokes (wf-landing-01 annotation 1: "spoke click and nav click are
+// the same route... adding a module = one registry entry, zero layout edits").
+// Order here is nav top-to-bottom (site-plan §3 table) and also the spoke order
+// used by OverviewRoute (wf-landing-01 annotation 2: clockwise from 12 o'clock).
+
+export type ModuleId =
+  | 'explorer'
+  | 'lineage'
+  | 'ownership'
+  | 'runbooks'
+  | 'remediation'
+  | 'docs'
+  | 'gates'
+  | 'loads'
+
+export interface ModuleDef {
+  id: ModuleId
+  label: string
+  path: string
+  /** graph pane one-liner shown on the Overview spoke + the module template's empty state */
+  tagline: string
+  /** which database/system this module backs onto (site-plan §3 "Backs onto" column) */
+  backsOnto: string
+  /** data-frame tab labels, in order (site-plan §3 "Data frames" column) */
+  tabs: readonly string[]
+  /** P0/P1/P2/P3 build phase (site-plan §3 "Phase" column) */
+  phase: 1 | 2 | 3
+}
+
+export const MODULES: readonly ModuleDef[] = [
+  {
+    id: 'explorer',
+    label: 'Explorer',
+    path: '/explorer',
+    tagline: 'Tower / app drill-down graph',
+    backsOnto: 'drydocs',
+    tabs: ['Applications', 'Jobs', 'Conditions', 'Servers'],
+    phase: 1,
+  },
+  {
+    id: 'lineage',
+    label: 'Lineage',
+    path: '/lineage',
+    tagline: 'Source → target DAG',
+    backsOnto: 'ddlineage',
+    tabs: ['Hops', 'Data assets', 'Schema definition', 'Row-level preview'],
+    phase: 1,
+  },
+  {
+    id: 'ownership',
+    label: 'Ownership',
+    path: '/ownership',
+    tagline: 'SEAL → PAT → team rollup',
+    backsOnto: 'seal-attribution',
+    tabs: ['Teams', 'Memberships', 'Escalation routing'],
+    phase: 2,
+  },
+  {
+    id: 'runbooks',
+    label: 'Runbooks',
+    path: '/runbooks',
+    tagline: 'Data-series provisioning chain',
+    backsOnto: 'runbook-automation',
+    tabs: ['Series', 'Generated runbooks', 'Metadata completeness'],
+    phase: 2,
+  },
+  {
+    id: 'remediation',
+    label: 'Remediation',
+    path: '/remediation',
+    tagline: 'Finding → fix-batch flow',
+    backsOnto: 'drydocs_remediation',
+    tabs: ['Findings', 'Fix batches', 'Jira handoffs'],
+    phase: 2,
+  },
+  {
+    id: 'docs',
+    label: 'Docs',
+    path: '/docs',
+    tagline: 'Document → Chunk corpus map',
+    backsOnto: 'docmeta',
+    tabs: ['Documents', 'Chunks', 'Trust/provenance audit'],
+    phase: 3,
+  },
+  {
+    id: 'gates',
+    label: 'Gates',
+    path: '/gates',
+    tagline: 'Gate dependency graph',
+    backsOnto: 'HITL/review',
+    tabs: ['Open gates', 'Signed off', 'Gate log'],
+    phase: 3,
+  },
+  {
+    id: 'loads',
+    label: 'Loads',
+    path: '/loads',
+    tagline: 'Loader → JobRun timeline',
+    backsOnto: "BaseLoader :JobRuns",
+    tabs: ['Runs', 'Rejects', 'Drift/coverage'],
+    phase: 2,
+  },
+]
+
+export function moduleByPath(pathname: string): ModuleDef | undefined {
+  return MODULES.find((m) => pathname === m.path || pathname.startsWith(`${m.path}/`))
+}

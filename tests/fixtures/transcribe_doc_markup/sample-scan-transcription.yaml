@@ -1,0 +1,19 @@
+# fixture: synthetic transcription of a FAKE scanned/annotated printout (Epic L / L6).
+# Unit-test fixture only — there is no real scan or real annotation behind this file.
+# Represents STEP 1 of the transcribe-doc-markup skill: the pen annotations transcribed
+# FAITHFULLY (verbatim, before any anchor-keying judgment) off a fictitious printed page
+# of docs/design/controlm-ingestion-tdd.md. `margin_tag_seen` is the text a reviewer would
+# read off the print-margin gutter tag design_doc.py renders next to each section
+# (drydocs/design_doc.py:_inject_margin_anchors) — the same id namespace as the doc's
+# `<!-- anchor: ... -->` comments.
+#
+# classification: Internal-Public (wholly synthetic; no real doc content, no real
+# handwriting, no real reviewer identity).
+schema: drydocs.transcribe-doc-markup-fixture.v1
+doc: controlm-ingestion-tdd
+rev_on_scan: 3
+faithful_transcription:
+  - margin_tag_seen: "traceability-matrix"
+    pen_note: "FR-CMI-003 row cites the wrong design section -- should be design-data-mapping"
+  - margin_tag_seen: "hitl-gate"
+    pen_note: "need the SEAL gate ticket number here"

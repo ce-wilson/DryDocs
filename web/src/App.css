@@ -1,0 +1,205 @@
+/* DryDocs Console component styles — the mockup's visual language (dd270b2).
+   Class names deliberately mirror the mockup so the two surfaces stay
+   comparable while the design pass converges. */
+
+.wrap { max-width: 1180px; margin: 0 auto; padding: 0 30px; }
+
+/* ── legacy chip (My Apps, O2) ──────────────────────────────────────────
+   The old O2 Shell's mock-banner/nav/nav-links/logo/signout/env-toggle rules
+   (including a bare `nav { position: sticky; ... }` element selector) were
+   retired with components/Shell.tsx (O8) — that selector would otherwise leak
+   onto the new layout/Aside.tsx <nav>. `.userchip` survives: MyApps.tsx still
+   uses it and it doesn't target a bare element. */
+.userchip {
+  font: 500 11px var(--mono);
+  color: var(--muted);
+  border: 1px solid var(--edge);
+  border-radius: 20px;
+  padding: 5px 12px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 300px;
+}
+
+.tag {
+  font: 500 10.5px var(--mono);
+  color: var(--yellow);
+  border: 1px solid rgba(217, 184, 49, 0.5);
+  border-radius: 4px;
+  padding: 4px 9px;
+  background: rgba(217, 184, 49, 0.08);
+  white-space: nowrap;
+}
+
+/* ── sign-in ───────────────────────────────────────────────────────────── */
+.signin-page { max-width: 520px; margin: 0 auto; padding: 12vh 30px 0; }
+.signin-page h1 { font-size: 34px; font-weight: 800; letter-spacing: -0.02em; margin-bottom: 18px; }
+.signin-panel { background: var(--panel); border: 1px solid var(--edge); border-radius: 10px; padding: 18px; }
+.signin-head { display: flex; gap: 12px; align-items: center; }
+.signin-head h2 { font-size: 18px; font-weight: 600; }
+.note { color: var(--muted); font-size: 13px; margin-top: 8px; line-height: 1.55; }
+
+.persona-list { display: flex; flex-direction: column; gap: 10px; margin-top: 14px; }
+.persona-card {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 2px 12px;
+  text-align: left;
+  padding: 12px 14px;
+  background: var(--bg2);
+  border: 1px solid var(--edge);
+  border-radius: 9px;
+  transition: border-color 0.15s;
+}
+.persona-card:hover { border-color: var(--faint); }
+.persona-card .persona-name { font-weight: 600; }
+.persona-card .persona-id { font-family: var(--mono); font-size: 12px; color: var(--blue-br); grid-row: 2; }
+.persona-card .persona-chip { font-size: 12px; color: var(--muted); grid-row: 3; grid-column: 1 / -1; }
+.role-badge { font: 600 10.5px var(--mono); text-transform: uppercase; padding: 3px 8px; border-radius: 4px; align-self: start; }
+.role-badge.role-user { border: 1px solid var(--blue-br); color: var(--blue-br); background: rgba(77, 139, 224, 0.1); }
+.role-badge.role-admin { border: 1px solid var(--red); color: var(--red-soft); background: rgba(200, 32, 46, 0.12); }
+
+/* ── landing: hero / features / towers ─────────────────────────────────── */
+.hero { display: grid; grid-template-columns: 1fr 1.15fr; gap: 20px; align-items: center; padding: 44px 0 40px; }
+@media (max-width: 900px) { .hero { grid-template-columns: 1fr; } }
+.hero h1 { font-size: clamp(46px, 6.5vw, 74px); font-weight: 800; letter-spacing: -0.02em; color: #edf1f6; }
+.hero h2 { font-size: clamp(17px, 2.2vw, 23px); font-weight: 500; color: #b9c4d2; margin-top: 10px; }
+.hero .desc { font-size: 15.5px; color: var(--muted); margin-top: 20px; max-width: 400px; line-height: 1.65; }
+.hero-btns { display: flex; gap: 14px; margin-top: 30px; flex-wrap: wrap; }
+.btn-primary { background: var(--blue); color: #fff; font-weight: 600; font-size: 14px; padding: 12px 22px; border-radius: 8px; text-decoration: none; border: 1px solid var(--blue-br); }
+.btn-primary:hover { background: var(--blue-br); }
+.btn-ghost { color: #c8d2de; font-weight: 600; font-size: 14px; padding: 12px 22px; border-radius: 8px; text-decoration: none; border: 1px solid var(--edge); }
+.btn-ghost:hover { border-color: var(--faint); }
+.hero-art { width: 100%; height: auto; display: block; }
+
+.features { border-top: 1px solid var(--edge-soft); border-bottom: 1px solid var(--edge-soft); background: var(--bg2); }
+.feat-in { max-width: 1180px; margin: 0 auto; padding: 26px 30px; display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 18px; }
+.feat { display: flex; gap: 14px; align-items: flex-start; padding: 0 8px; border-right: 1px solid var(--edge-soft); }
+.feat:last-child { border-right: none; }
+@media (max-width: 900px) { .feat { border-right: none; } }
+.feat svg { flex-shrink: 0; margin-top: 2px; }
+.feat h3 { font-size: 14.5px; font-weight: 700; }
+.feat p { font-size: 12.5px; color: var(--muted); margin-top: 3px; line-height: 1.5; }
+
+.explore { padding: 36px 0 60px; }
+.explore h2 { font-size: 21px; font-weight: 600; color: #c8d2de; margin-bottom: 20px; }
+.towers { display: grid; grid-template-columns: repeat(auto-fit, minmax(215px, 1fr)); gap: 18px; }
+.tower {
+  display: block;
+  background: var(--panel);
+  border: 1px solid var(--edge);
+  border-radius: 10px;
+  padding: 26px 18px 18px;
+  text-align: center;
+  text-decoration: none;
+  color: inherit;
+  transition: transform 0.15s, border-color 0.15s, box-shadow 0.15s;
+}
+.tower:hover { transform: translateY(-3px); border-color: var(--faint); box-shadow: 0 8px 26px rgba(0, 0, 0, 0.4); }
+.tower.tower-locked { opacity: 0.45; cursor: not-allowed; }
+.tower.tower-locked:hover { transform: none; border-color: var(--edge); box-shadow: none; }
+.tower .icon { height: 44px; display: flex; align-items: center; justify-content: center; margin-bottom: 14px; }
+.tower h3 { font-size: 16px; font-weight: 600; }
+.tower .stats { font-size: 12.5px; color: var(--muted); margin-top: 7px; display: flex; gap: 16px; justify-content: center; }
+.tower .stats b { color: #c8d2de; font-weight: 600; }
+
+.foot { padding: 20px 0 46px; font: 400 11px var(--mono); color: var(--faint); text-align: center; }
+
+/* ── drill-down / panels / tables (shared surface language) ────────────── */
+.d-bar { display: flex; align-items: center; gap: 14px; padding: 24px 0 16px; flex-wrap: wrap; }
+.d-bar h2 { font-size: 21px; font-weight: 700; }
+.back { font: 600 13px var(--sans); border: 1px solid var(--edge); border-radius: 7px; background: var(--panel); color: #c8d2de; padding: 8px 15px; text-decoration: none; }
+.back:hover { border-color: var(--faint); }
+.btn-myapps { font: 600 13px var(--sans); border: 1px solid var(--blue); border-radius: 7px; background: rgba(46, 107, 196, 0.12); color: #9cc0f0; padding: 8px 15px; margin-left: auto; text-decoration: none; }
+.btn-myapps:hover { background: rgba(46, 107, 196, 0.25); }
+
+.d-top { display: grid; grid-template-columns: 1fr 1.15fr; gap: 16px; margin-bottom: 16px; }
+@media (max-width: 900px) { .d-top { grid-template-columns: 1fr; } }
+.d-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px; }
+@media (max-width: 900px) { .d-grid { grid-template-columns: 1fr; } }
+.matrix-panel { margin-bottom: 16px; }
+.rollup-panel { margin-bottom: 16px; }
+.rollup-panel .graphbox { max-width: 720px; margin: 0 auto; }
+
+.panel { border: 1px solid var(--edge); border-radius: 10px; overflow: hidden; background: var(--panel); }
+.p-head { background: var(--panel2); border-bottom: 1px solid var(--edge); padding: 10px 14px; font-weight: 600; font-size: 13.5px; display: flex; justify-content: space-between; align-items: center; gap: 10px; }
+.p-head .m { font: 400 10.5px var(--mono); color: var(--muted); }
+
+pre.cypher { font: 400 12.5px/1.7 var(--mono); padding: 16px 18px; overflow-x: auto; color: #d7e3f0; min-height: 240px; background: #0a111b; }
+pre.cypher .kw { color: #7cc4ff; font-weight: 600; }
+pre.cypher .lbl { color: #8ce99a; }
+pre.cypher .rel { color: #ffb86b; }
+pre.cypher .str { color: #f1fa8c; }
+
+.graphbox { padding: 10px; }
+.gnode { font: 600 11px var(--sans); fill: #e8edf3; }
+.gsub { font: 400 9px var(--mono); fill: #8a97a8; }
+.gedge { font: 500 9px var(--mono); fill: #8a97a8; }
+
+table { width: 100%; border-collapse: collapse; font-size: 12.5px; }
+th { background: var(--panel2); text-align: left; font-weight: 600; padding: 8px 12px; border-bottom: 1px solid var(--edge); color: #c8d2de; }
+td { padding: 8px 12px; border-bottom: 1px solid var(--edge-soft); font-family: var(--mono); font-size: 11.5px; color: #b9c4d2; }
+td:first-child { font-family: var(--sans); font-weight: 500; font-size: 12.5px; color: var(--text); }
+.matrix td { font-family: var(--sans); font-size: 12px; }
+.matrix td:first-child { font-weight: 600; }
+
+/* ── my apps ───────────────────────────────────────────────────────────── */
+.app-cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px; margin-bottom: 16px; }
+.app-card { padding: 14px 16px; }
+.app-card-row { display: flex; justify-content: space-between; align-items: center; gap: 10px; }
+.app-id { font-family: var(--mono); font-size: 11px; color: var(--blue-br); }
+.app-name { font-weight: 600; font-size: 14.5px; margin-top: 10px; }
+.app-desc { font-size: 11.5px; color: var(--muted); margin: 3px 0 12px; }
+.app-card-foot { border-top: 1px solid var(--edge-soft); padding-top: 10px; font-size: 13px; }
+
+.badge-snow, .badge-pat { font: 500 9.5px var(--mono); padding: 3px 8px; border-radius: 4px; white-space: nowrap; }
+.badge-snow-read { border: 1px solid var(--blue-br); color: var(--blue-br); background: rgba(77, 139, 224, 0.1); }
+.badge-snow-contribute { border: 1px solid var(--green); color: var(--green); background: rgba(58, 174, 107, 0.1); }
+.badge-snow-admin { border: 1px solid var(--red); color: var(--red-soft); background: rgba(200, 32, 46, 0.12); }
+.badge-pat { border: 1px solid var(--yellow); color: var(--yellow); background: rgba(217, 184, 49, 0.08); }
+
+/* ── graph explorer (live view, O6) ────────────────────────────────────── */
+.tag-live { color: var(--green); border-color: rgba(58, 174, 107, 0.5); background: rgba(58, 174, 107, 0.08); }
+.gx-grid { display: grid; grid-template-columns: 1.7fr 1fr; gap: 16px; margin: 16px 0; }
+@media (max-width: 900px) { .gx-grid { grid-template-columns: 1fr; } }
+.gx-node { cursor: pointer; }
+.gx-node:focus-visible circle { stroke: var(--blue-br); stroke-width: 3; }
+.gx-msg { padding: 0 14px 12px; }
+.gx-msg .p-head { margin: 0 -14px 8px; }
+.gx-inspector p.note { padding: 12px 14px; }
+.gx-inspect-body { padding: 12px 14px; font-size: 13px; }
+.gx-jobname { font: 600 14px var(--mono); color: var(--blue-br); margin-bottom: 10px; word-break: break-all; }
+.gx-inspect-body h3 { font-size: 12px; font-weight: 600; color: #c8d2de; margin: 10px 0 4px; text-transform: uppercase; letter-spacing: 0.04em; }
+.gx-inspect-body ul { list-style: none; }
+.gx-inspect-body li { padding: 3px 0; border-bottom: 1px solid var(--edge-soft); }
+.gx-inspect-body li:last-child { border-bottom: none; }
+.gx-inspect-body code { font-size: 12px; color: var(--text); }
+.gx-inspect-body .note { padding: 0; }
+.gx-via { font: 400 10.5px var(--mono); color: var(--muted); }
+
+/* ── view header (GraphExplorer's h1 row) ──────────────────────────────── */
+.view-head { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; padding: 24px 0 4px; }
+.view-head h1 { font-size: 21px; font-weight: 700; }
+
+/* ── console sandbox (CypherConsole) ────────────────────────────────────
+   Padding/max-width used to come from the old Shell's ".shell > main"
+   selector (O2); that class no longer exists post-O8 — ConsoleRoute.tsx's
+   wrapper div owns that spacing now. */
+main { display: block; }
+main.wrap { padding-bottom: 24px; }
+
+main > section { border: 1px solid var(--edge); border-radius: 10px; padding: 1rem; margin: 1rem 0; background: var(--panel); }
+main > section h2 { font-size: 15px; font-weight: 600; margin-bottom: 6px; }
+
+.row { display: flex; gap: 0.5rem; align-items: center; flex-wrap: wrap; margin: 0.5rem 0; }
+textarea { width: 100%; font-family: var(--mono); }
+button.primary { border: 1px solid var(--blue-br); background: var(--blue); color: #fff; border-radius: 6px; padding: 0.35rem 0.9rem; font-weight: 600; }
+button.primary:hover { background: var(--blue-br); }
+section button:not(.primary) { background: var(--bg2); border: 1px solid var(--edge); border-radius: 6px; padding: 0.35rem 0.7rem; }
+section button:not(.primary):hover { border-color: var(--faint); }
+
+.status { font-size: 0.85rem; color: var(--muted); word-break: break-all; }
+.scroll { overflow-x: auto; max-height: 420px; overflow-y: auto; }
+
+pre { background: #0a111b; border: 1px solid var(--edge-soft); padding: 0.75rem; border-radius: 6px; font-size: 0.8rem; font-family: var(--mono); white-space: pre-wrap; word-break: break-word; }

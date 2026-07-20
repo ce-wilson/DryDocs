@@ -1,0 +1,164 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>DryDocs — A Governed Knowledge Graph for Batch Production Support</title>
+<style>
+:root { color-scheme: light dark; --ink:#1a1a1a; --mid:#555; --line:#d0d0d0; --faint:#f6f6f6; --bg:#fff; --link:#0a58ca; }
+@media (prefers-color-scheme: dark) { :root { --ink:#e6e6e6; --mid:#a0a0a0; --line:#3a3a3a; --faint:#1c1c1c; --bg:#141414; --link:#6ea8fe; } }
+:root[data-theme="dark"] { --ink:#e6e6e6; --mid:#a0a0a0; --line:#3a3a3a; --faint:#1c1c1c; --bg:#141414; --link:#6ea8fe; }
+:root[data-theme="light"] { --ink:#1a1a1a; --mid:#555; --line:#d0d0d0; --faint:#f6f6f6; --bg:#fff; --link:#0a58ca; }
+* { box-sizing: border-box; }
+body { font: 15px/1.6 "Segoe UI", system-ui, Arial, sans-serif; color: var(--ink); background: var(--bg); margin: 0; }
+main { max-width: 900px; margin: 0 auto; padding: 32px 24px 80px; }
+h1 { font-size: 28px; margin: 0 0 6px; letter-spacing:-0.3px; }
+h2 { font-size: 20px; margin: 34px 0 10px; padding-bottom:5px; border-bottom: 2px solid var(--ink); }
+h3 { font-size: 16px; margin: 22px 0 8px; }
+h4,h5,h6 { font-size: 14px; margin: 16px 0 6px; }
+p { margin: 10px 0; } strong { font-weight: 700; }
+a { color: var(--link); } a:hover { text-decoration: underline; }
+code { font-family: "Cascadia Mono","Consolas",monospace; font-size: 0.88em; background: var(--faint); padding: 1px 4px; border-radius: 3px; }
+pre { font-family: "Cascadia Mono","Consolas",monospace; font-size: 12.5px; line-height:1.45; border:1px solid var(--line); background: var(--faint); padding: 12px 14px; border-radius: 6px; overflow-x: auto; }
+pre code { background: none; padding: 0; }
+table { border-collapse: collapse; margin: 14px 0; font-size: 13.5px; display:block; overflow-x:auto; }
+th,td { border:1px solid var(--line); padding: 6px 9px; text-align:left; vertical-align: top; }
+th { background: var(--faint); font-weight:700; }
+blockquote { margin: 14px 0; padding: 2px 16px; border-left: 4px solid var(--line); color: var(--mid); }
+ul,ol { margin: 10px 0; padding-left: 26px; } li { margin: 4px 0; }
+hr { border:none; border-top:1px solid var(--line); margin: 26px 0; }
+:target { scroll-margin-top: 12px; } :target > :first-child, h2:target, h3:target { outline: 2px solid var(--link); outline-offset: 4px; }
+
+.dd-note-btn { border:1px solid var(--line); background:var(--bg); color:var(--mid); cursor:pointer; font-size:12px; line-height:1; padding:2px 6px; border-radius:5px; margin-right:6px; }
+.dd-note-btn:hover { color:var(--link); border-color:var(--link); }
+.dd-note-box { margin:6px 0 10px; }
+.dd-note-box textarea { width:100%; min-height:56px; font:13px/1.4 "Segoe UI",system-ui,sans-serif; color:var(--ink); background:var(--faint); border:1px solid var(--line); border-radius:6px; padding:8px; resize:vertical; }
+.dd-annotated { box-shadow:-3px 0 0 var(--link); padding-left:8px; }
+.dd-fb-bar { position:fixed; right:16px; bottom:16px; display:flex; gap:8px; align-items:center; background:var(--bg); border:1px solid var(--line); border-radius:10px; padding:8px 12px; box-shadow:0 2px 10px rgba(0,0,0,.15); font-size:13px; z-index:50; }
+.dd-fb-bar button { cursor:pointer; border:1px solid var(--link); background:var(--link); color:#fff; border-radius:6px; padding:5px 10px; font-size:13px; }
+.dd-fb-bar .dd-badge { font-weight:700; }
+.dd-toast { position:fixed; right:16px; bottom:64px; background:var(--ink); color:var(--bg); padding:8px 12px; border-radius:8px; font-size:13px; z-index:60; opacity:0; transition:opacity .2s; }
+.dd-toast.show { opacity:1; }
+.dd-sme-feedback ol li { margin: 6px 0; }
+@media print { .dd-note-btn, .dd-note-box, .dd-fb-bar, .dd-toast, .dd-sme-feedback, .dd-sme-divider { display:none !important; } }
+</style>
+</head>
+<body>
+<main>
+<h1>DryDocs — A Governed Knowledge Graph for Batch Production Support</h1>
+<p><strong>White paper · Rev 1 · 2026-07-12 · Classification: Internal-Public (mechanism only — no customer names, hosts, schedules, or identifiers appear in this document).</strong></p>
+<hr>
+<h2>Executive summary</h2>
+<p>Large enterprises run their overnight business on batch estates: hundreds of thousands of scheduled jobs, millions of configuration variables, spread across multiple data centers and owned by dozens of teams. When a job fails at 3 a.m., the questions are always the same — <em>what does this job do, what depends on it, who owns it, and when will the data be late?</em> — and the answers are always scattered: in the scheduler&#x27;s database, in a wiki that trailed off two years ago, in a spreadsheet, and in the head of the one engineer who remembers.</p>
+<p><strong>DryDocs turns the scheduler&#x27;s own metadata into a governed knowledge graph that answers those questions on demand</strong> — and, where the metadata itself is wrong or missing, turns the failures into fix packages routed to the owning team. It is built on three commitments that distinguish it from both wiki-style documentation and generic CMDB tooling:</p>
+<ol><li><strong>The graph is derived, not authored.</strong> Runbooks and dependency maps generated from the orchestrator&#x27;s live definitions cannot rot the way hand-written pages do.</li><li><strong>No meaning enters the graph without a human decision.</strong> Every relationship type is proposed against public ontology standards and confirmed by a subject-matter expert through a recorded gate before a single edge loads.</li><li><strong>Every governance rule is a machine-readable ledger with a test.</strong> Classification tiers, source registries, column dispositions, ontology mappings, even the cross-repo porting rules — each is a config file guarded by CI, not a convention in prose.</li></ol>
+<p>The first customer is the application-support team; the architecture is deliberately shaped so the same graph later serves data-governance and lineage programs without rework.</p>
+<h2>The problem</h2>
+<p>Batch production support fails in a specific, repeatable way:</p>
+<ul><li><strong>Documentation debt.</strong> Runbooks are written once, at go-live, by people who then move on. The scheduler&#x27;s definitions keep changing; the pages do not.</li><li><strong>Tribal ownership.</strong> Job-naming conventions encode team, application, and schedule — but only veterans can read them, and the conventions drift.</li><li><strong>Invisible blast radius.</strong> Job-to-job dependencies exist as prerequisite conditions inside the scheduler, legible to it but not to the human deciding whether a 3 a.m. failure can wait until 9.</li><li><strong>Metadata rot compounds.</strong> Escalation routing keyed to stale ownership, description fields left empty, hard-coded hosts nobody remembers — each defect makes the next incident slower, and there is no loop that repairs them.</li></ul>
+<p>Conventional responses — more wiki pages, a CMDB import, a one-off lineage project — share a flaw: they create a <em>second</em> copy of the truth that immediately begins to diverge from the scheduler that actually runs the business.</p>
+<h2>The approach: four layers, standards-grounded</h2>
+<p>DryDocs models the estate in four deliberately separated layers:</p>
+<table><thead><tr><th>Layer</th><th>Question it answers</th><th>What lives there</th></tr></thead><tbody><tr><td><strong>1 — Taxonomy</strong></td><td><em>What category is this?</em></td><td>Pure classification imported from sources: servers, folders, jobs, applications, org hierarchy. No meaning-bearing edges.</td></tr><tr><td><strong>2 — Ontology</strong></td><td><em>What do connections mean?</em></td><td>A relationship vocabulary bound to public standards — W3C PROV-O for provenance and activity, W3C ORG for organizations, DPROD/DCAT for data products, SKOS for concept schemes, SOSA/SSN (experimental) for runtime observations.</td></tr><tr><td><strong>3 — Knowledge graph</strong></td><td><em>What is connected, and what does it mean?</em></td><td>The populated property graph: folders contain jobs; jobs require and emit conditions; derived job-to-job dependency edges; jobs attributed to registered applications and owning teams.</td></tr><tr><td><strong>4 — Context graph</strong></td><td><em>What matters right now?</em></td><td>Task-scoped projections under design: runtime health observations, timing statistics, maintenance windows.</td></tr></tbody></table>
+<p>The separation is enforced, not aspirational: importers may only classify; a relationship type must exist in the vocabulary, map to a decision-matrix row, and pass the human gate before any loader may write it. Standards-grounding is what keeps the graph legible to future consumers — a provenance edge means what PROV-O says it means, so a governance tool written years from now can read the graph without archaeology.</p>
+<h2>Architecture</h2>
+<pre><code> orchestrator DB      org / app        vendor &amp; standards
+ (read-only replica)  registries       documentation
+        │                 │                  │
+        ▼                 ▼                  ▼
+ ┌─────────────────────────────────────────────────┐
+ │ CONFIG LAYER (ledgers + tests)                  │
+ │  source registry · sensitivity classification  │
+ │  column dispositions · precedence · crosswalks │
+ └────────────────────┬────────────────────────────┘
+                      ▼
+        taxonomy capture ──► ontology mapping ──► HITL GATE (SME sign-off,
+                      │        (PROV/ORG/DPROD)      append-only gate log)
+                      ▼
+              loaders (delta provenance, audit envelope)
+                      ▼
+              Neo4j knowledge graph
+                      ▼
+ ┌──────────┬───────────┬──────────┬──────────────┐
+ │ review &amp; │ generated │ lineage  │ remediation  │
+ │ verify   │ documents │ &amp; deep-  │ (fix packages│
+ │ (SME     │ (runbooks,│ doc      │  → ticketing;│
+ │ toolkit) │ TDDs)     │ passes   │  no writes)  │
+ └──────────┴───────────┴──────────┴──────────────┘</code></pre>
+<p>Key design decisions, and why:</p>
+<ul><li><strong>Read-only ingestion from a replica.</strong> DryDocs never touches the production scheduler; it reads a governed replica of the orchestrator&#x27;s database. Vendor semantics are pinned to a baseline (the orchestrator&#x27;s own physical model), with crosswalks planned for additional orchestrators so concepts normalize to one vocabulary.</li><li><strong>Config-gated loads.</strong> A source that is not registered, classified, and confirmed does not load — the pipeline fails closed. Each source carries a structured locator (owning application → platform → service → schema → object) whose sensitive halves live only in a private twin repository.</li><li><strong>Provenance without supernodes.</strong> Every load run is itself a graph activity; nodes link to the run that generated them <strong>only when created or actually changed</strong> (a per-row checksum diet), so provenance stays queryable at estate scale. Source authorship (who created/last changed each definition) rides a separate, gate-approved audit envelope.</li><li><strong>Human-in-the-loop as an architectural element, not a review habit.</strong> The gate is a rendered page with numbered confirmations; the decision is transcribed to an append-only log; statuses flip only then. AI agents prepare gates and apply outcomes — the SME decision itself is never automated.</li><li><strong>Component topology with an enforced boundary.</strong> A slim core (models, parsers, config, driver) is imported by independent components — loading, review, lineage, documentation generation, remediation — and a default-deny test fails the build if any module goes unclassified or components entangle.</li></ul>
+<h2>What the graph does on day one</h2>
+<ul><li><strong>Generated runbooks.</strong> For a data series or application: the jobs involved, their schedule windows, upstream/downstream dependencies, ownership and escalation — assembled from live definitions, re-generated as they change.</li><li><strong>Blast-radius and ETA questions.</strong> <em>If this job fails, what is downstream?</em> is a graph traversal; <em>when will the data actually land?</em> is a critical-path computation over observed run statistics — deliberately not a naive path sum.</li><li><strong>Maintenance-window planning.</strong> Host and host-group topology plus normalized job timing yields the quiet window for patching a given server — with definition-time claims cross-validated against observed runtime placement, so disagreements surface as metadata findings instead of surprises.</li><li><strong>Failure-driven metadata repair.</strong> Where the graph exposes defects (empty descriptions, stale routing, hard-coded hosts), a remediation component builds corrected greenfield definitions, proves equivalence offline, and hands a package to the owning development team via ticketing. Separation of duties is structural: support authors, developers deploy, and the next ingest confirms closure. The component writes neither production nor the graph.</li></ul>
+<h2>Governance and trust model</h2>
+<p>Two independent axes govern every artifact:</p>
+<ul><li><strong>Sensitivity</strong> (publish boundary): External / Internal-Public / Internal / Internal-Confidential. The public repository carries <em>mechanism</em> — schemas, rules, code, sanitized examples; real identifiers exist only in internal twins. The boundary is enforced by tests and CI, not etiquette.</li><li><strong>Trust</strong> (epistemic provenance): every ingested corpus is tiered VERBATIM / GROUNDED / SYNTHESIZED, so AI-assisted inference is never silently promoted to vendor or source ground truth.</li></ul>
+<p>The same ledger-plus-test pattern governs process itself: the ontology mapping file, the backlog, the column dispositions, and the cross-repository porting rules are each machine-readable and each guarded by a test that fails on drift. The operating experience of the project is that the guarded surfaces stay clean and the unguarded ones are where incidents happen — so surfaces get guards.</p>
+<h2>Operating model</h2>
+<p>DryDocs is developed in a two-repository pattern: a public <strong>producer</strong> carrying the sanitized, generalizable platform, and a private <strong>consumer</strong> carrying real wiring and data. Work ports one way through a machine-readable disposition manifest (which paths apply wholesale, which are consumer-canonical, which merge entry-by-entry); the consumer&#x27;s enhancements return only as re-derived, sanitized mechanism. The end-state goal is a standalone template another organization can adopt: bring your orchestrator replica and org registries, keep your identifiers private, inherit the governance machinery intact.</p>
+<p>AI agents (with scoped skills for the orchestrator&#x27;s schema, the graph platform, ontology standards, and document generation) do the preparation, porting, and drafting; humans make the calls that change meaning. The gate log is the audit trail that the division held.</p>
+<h2>Roadmap</h2>
+<p>Near-term: runtime-statistics supplement and the maintenance-window query; application attribution end-to-end; document-ingestion (vendor + internal guidance corpora) behind the same trust tiers; a web console over the graph. Forward positioning: the ontology&#x27;s standards-grounding (DPROD data products, qualified attributions, primary-source provenance) is the bridge to enterprise data-governance alignment — optionality that costs nothing now and avoids a remodel later.</p>
+<h2>Conclusion</h2>
+<p>The scheduler already knows what runs, what depends on what, and who owns it. DryDocs makes that knowledge legible, governed, and self-repairing: derived instead of authored, gated instead of guessed, tested instead of trusted. Support teams get answers at incident speed; the organization gets a graph it can defend.</p>
+<hr>
+<p><em>Prepared from the DryDocs producer repository at rev <code>40fe038</code> (2026-07-12). Structure follows the project documentation skill&#x27;s architecture-doc principles; a dedicated white-paper guideline is a noted gap in that skill.</em></p>
+<hr class="dd-sme-divider">
+<section class="dd-sme-feedback" aria-label="SME - Feedback">
+<h2>SME - Feedback</h2>
+<p>How to return your notes on this document:</p>
+<ol>
+<li>Click the <strong>✎</strong> button beside any section (or numbered step) and type your note — notes save in your browser as you type.</li>
+<li>When finished, click <strong>Copy feedback</strong> in the bottom-right toolbar. Your notes are copied as anchor-keyed YAML.</li>
+<li>Create the feedback file (it is YAML, <em>not</em> markdown) — <strong>Copy To:</strong> <code>docs/design/feedback/</code> · <strong>File Name:</strong> <code>drydocs-whitepaper-rev1.yaml</code></li>
+<li>Paste the copied block into that file, save, and commit (or send the file back to the team).</li>
+</ol>
+</section>
+</main>
+<script>
+
+(function(){
+  var DOC="drydocs-whitepaper", KEY="drydocs-doc-feedback:"+DOC;
+  function load(){ try{return JSON.parse(localStorage.getItem(KEY)||"{}");}catch(e){return {};} }
+  function save(){ localStorage.setItem(KEY, JSON.stringify(state)); }
+  var state=load(), badge;
+  function count(){ return Object.keys(state).filter(function(k){return (state[k]||"").trim();}).length; }
+  function refresh(){ if(badge) badge.textContent=count(); }
+  function toast(msg){ var t=document.createElement("div"); t.className="dd-toast"; t.textContent=msg; document.body.appendChild(t); requestAnimationFrame(function(){t.classList.add("show");}); setTimeout(function(){t.classList.remove("show"); setTimeout(function(){t.remove();},250);},1600); }
+  function exportYaml(){
+    var lines=["# design-doc feedback — paste into docs/design/feedback/"+DOC+"-rev<N>.yaml","doc: "+DOC,"notes:"];
+    Object.keys(state).forEach(function(a){
+      var note=(state[a]||"").replace(/\r/g,""); if(!note.trim()) return;
+      lines.push("  - anchor: "+a); lines.push("    note: |");
+      note.split("\n").forEach(function(l){ lines.push("      "+l); });
+    });
+    return lines.join("\n")+"\n";
+  }
+  function attach(el){
+    var id=el.id;
+    var btn=document.createElement("button"); btn.className="dd-note-btn"; btn.type="button"; btn.textContent="✎"; btn.title="Annotate #"+id;
+    var box=document.createElement("div"); box.className="dd-note-box"; box.style.display=(state[id]||"").trim()?"block":"none";
+    var ta=document.createElement("textarea"); ta.value=state[id]||""; ta.setAttribute("placeholder","note for #"+id+" …");
+    ta.addEventListener("input",function(){ state[id]=ta.value; save(); refresh(); el.classList.toggle("dd-annotated", !!ta.value.trim()); });
+    if((state[id]||"").trim()) el.classList.add("dd-annotated");
+    box.appendChild(ta);
+    btn.addEventListener("click",function(){ box.style.display=box.style.display==="none"?"block":"none"; if(box.style.display==="block") ta.focus(); });
+    if(el.tagName==="LI"){ el.insertAdjacentElement("afterbegin", btn); el.appendChild(box); }
+    else { el.insertAdjacentElement("afterend", box); el.insertAdjacentElement("beforebegin", btn); }
+  }
+  document.addEventListener("DOMContentLoaded",function(){
+    document.querySelectorAll("main [id]").forEach(attach);
+    var bar=document.createElement("div"); bar.className="dd-fb-bar";
+    var lbl=document.createElement("span"); lbl.innerHTML='notes <span class="dd-badge">0</span>'; badge=lbl.querySelector(".dd-badge");
+    var ex=document.createElement("button"); ex.type="button"; ex.textContent="Copy feedback";
+    ex.addEventListener("click",function(){ var y=exportYaml();
+      var done=function(){toast("feedback copied — paste into docs/design/feedback/");};
+      if(navigator.clipboard&&navigator.clipboard.writeText){ navigator.clipboard.writeText(y).then(done,function(){fallback(y);}); } else { fallback(y); }
+    });
+    function fallback(y){ var t=document.createElement("textarea"); t.value=y; document.body.appendChild(t); t.select(); try{document.execCommand("copy"); toast("feedback copied");}catch(e){toast("copy failed — select the box");} t.remove(); }
+    bar.appendChild(lbl); bar.appendChild(ex); document.body.appendChild(bar); refresh();
+  });
+})();
+
+</script>
+</body>
+</html>

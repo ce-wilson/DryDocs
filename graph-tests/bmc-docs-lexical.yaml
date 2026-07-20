@@ -1,0 +1,60 @@
+# bmc-docs-lexical suite — Document/Chunk lexical-graph invariants (manual
+# chunking + MERGE, Neo4j llm-graph-builder pattern; chunk-only, no LLM
+# extraction, no embeddings). Distinct from bmc-docs-smoke.yaml, which covers
+# the older ControlMFolder/ControlMJob structural pass.
+# classification: Internal-Public (shape/consistency only — no counts/IDs).
+classification: Internal-Public
+schema: drydocs.graph-tests.v1
+suite: bmc-docs-lexical
+description: >
+  Live invariants for the bmc-docs lexical-graph loader: every chunk belongs
+  to exactly one document, every document has exactly one FIRST_CHUNK, the
+  NEXT_CHUNK chain never branches (out-degree <= 1), every document DESCRIBES
+  at least one SoftwareProduct, and every chunk's provenance tier is one of
+  the three contract values (VERBATIM / GROUNDED / SYNTHESIZED).
+targets: [Document, Chunk]
+cases:
+  - id: TC-01
+    description: every Chunk is PART_OF exactly one Document
+    cypher: >
+      MATCH (c:Chunk)
+      OPTIONAL MATCH (c)-[:PART_OF]->(d:Document)
+      WITH c, count(d) AS n
+      WHERE n <> 1
+      RETURN c.chunk_id AS bad_chunk
+    assert: empty
+
+  - id: TC-02
+    description: every Document has exactly one FIRST_CHUNK
+    cypher: >
+      MATCH (d:Document)
+      OPTIONAL MATCH (d)-[:FIRST_CHUNK]->(c:Chunk)
+      WITH d, count(c) AS n
+      WHERE n <> 1
+      RETURN d.doc_id AS bad_doc
+    assert: empty
+
+  - id: TC-03
+    description: NEXT_CHUNK never branches (out-degree <= 1 per chunk)
+    cypher: >
+      MATCH (c:Chunk)-[:NEXT_CHUNK]->(n)
+      WITH c, count(n) AS out_degree
+      WHERE out_degree > 1
+      RETURN c.chunk_id AS branching_chunk
+    assert: empty
+
+  - id: TC-04
+    description: every Document DESCRIBES at least one SoftwareProduct
+    cypher: >
+      MATCH (d:Document)
+      WHERE NOT (d)-[:DESCRIBES]->(:SoftwareProduct)
+      RETURN d.doc_id AS undescribed_doc
+    assert: empty
+
+  - id: TC-05
+    description: every Chunk's provenance is one of the three contract tiers
+    cypher: >
+      MATCH (c:Chunk)
+      WHERE NOT c.provenance IN ['VERBATIM', 'GROUNDED', 'SYNTHESIZED']
+      RETURN c.chunk_id AS bad_tier_chunk
+    assert: empty

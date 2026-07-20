@@ -1,0 +1,88 @@
+# =============================================================================
+# config/doc-source-registry.yaml — every DOCUMENT corpus, declared once (Q5).
+#
+# The docmeta ledger (ADR 0006; knowledge/upgrade-plans/docmeta-component.md §1.4):
+# where the pipeline registry (config/source-registry.yaml) declares DATA FEEDS,
+# this file declares DOC CORPORA — content ingested as Document → Chunk lexical
+# graphs (or queued to be). Ids match the pipeline registry where a corpus
+# appears in both (bmc-docs, essential-graphrag); the pipeline entry stays the
+# feed/adapter/gate record, THIS entry is the doc-governance record.
+#
+# REQUIRED on every entry (enforced by tests/unit/test_doc_registry.py):
+#   classification — config/classification.yaml level (External ⇒ source_url + captured_at)
+#   source         — the system/path the corpus comes from
+#   connector      — web | filedrop | confluence | sharepoint | teams | email
+#   tier           — T1 vendor | T2 internal-platform | T3 product/process | T4 SME-context
+#   curation       — the ADR 0006 §4 ladder, FIXED per tier:
+#                      T1 → none · T2/T3 → sme-confirm · T4 → sme-confirm+confidential
+#   target_db      — dddocs | ddcontext (ADR 0006 §2; never any other DB)
+#   refresh        — manual | on-demand | scheduled(<cron>)
+#   trust_default  — VERBATIM | GROUNDED | SYNTHESIZED (per-chunk overrides live in
+#                    the corpus SOURCE-MANIFEST where one exists)
+#
+# Freshness is gate-preserving (ADR 0006 §4): a sha256 change on refetch
+# RE-QUEUES curation — a changed page never silently overwrites confirmed content.
+# =============================================================================
+
+schema: drydocs.doc-source-registry.v1
+updated: 2026-07-18
+
+sources:
+  # ---- Currently ingested corpora (backfill, Q5) ----------------------------
+  - id: bmc-docs
+    classification: External            # public BMC documentation; per-doc URLs in each file header
+    source: "external/orchestration/bmc-controlm/controlm-*.md (26 converted BMC pages)"
+    source_url: "https://documents.bmc.com/ (per-doc URLs in each file header)"
+    captured_at: 2026-06-11
+    connector: web
+    manifest: external/orchestration/bmc-controlm/SOURCE-MANIFEST.md
+    trust_default: GROUNDED             # conversion is mechanical but lossy; per-chunk tier per the manifest rule
+    tier: T1
+    curation: none
+    target_db: dddocs                   # ADR 0006 §2 — demonstrated in `drydocs` today; RE-TARGETS to dddocs at the P4 loader build (idempotent reload, not a migration)
+    refresh: manual
+    taxonomy_path: technology/orchestration/control-m
+    notes: >
+      The canonical T1 vendor corpus (gate bmc-docs-lexical-load, 2026-07-08 —
+      recorded on the pipeline-registry twin entry). Loaded as the ACTIVE
+      lexical shape: (:Chunk)-[:PART_OF]->(:Document) + FIRST_CHUNK/NEXT_CHUNK,
+      (:Document)-[:DESCRIBES]->(:SoftwareProduct).
+
+  - id: essential-graphrag
+    classification: External            # published Manning/Neo4j-sponsored ebook; PDF is LOCAL-ONLY (root /*.pdf gitignore) — cite source_url, never commit
+    source: "Essential-GraphRAG.pdf (repo root, gitignored local copy; Bratanič & Hane, Manning 2025)"
+    source_url: "https://www.manning.com/books/essential-graphrag"
+    captured_at: 2026-07-14
+    connector: filedrop
+    manifest: ~                         # no SOURCE-MANIFEST — provenance recorded on the pipeline-registry twin + docs/reviews/essential-graphrag-traversal-experiment.md
+    trust_default: GROUNDED             # pdf-extract-grounded-v1: pypdf extraction is mechanical but lossy
+    tier: T1
+    curation: none
+    target_db: ddcontext                # experiment/reference content stays out of ground truth (Q2 decision; ADR 0006 §2 keeps it here)
+    refresh: manual
+    taxonomy_path: ~                    # a methodology book — deliberately no DESCRIBES / product taxonomy hook
+    notes: >
+      The Q2 agent-traversal experiment corpus; fed the docmeta P0 benchmark
+      verdict (traversal arm). Pattern notes mined from the same book:
+      reference/research/essential-graphrag-notes.md (Q1).
+
+  - id: jpmc-reports
+    classification: External            # public SEC filings / investor-relations PDFs
+    source: "scripts/ingest_jpmc_reports.py (2 local-only PDFs: annualreport-2024 + mda10k-2024; never committed — the root /*.pdf gitignore precedent)"
+    source_url: "https://www.jpmorganchase.com/ir/annual-report (per-doc URLs in the ingest script)"
+    captured_at: 2026-06-30             # ingest pipeline committed e419ec7; PDFs fetched for that run
+    connector: filedrop
+    manifest: ~                         # pre-restructure ingest; provenance lives in the script header (classification/trust declared there)
+    trust_default: VERBATIM             # direct text extraction; derived segment metrics are GROUNDED (per the script's own tiering)
+    tier: T1
+    curation: none
+    target_db: ddcontext                # the original ddcontext precedent the Q2 book load cited
+    refresh: manual
+    taxonomy_path: ~
+    notes: >
+      The FIRST ddcontext doc ingestion (pre-dates the docmeta plan): JPMC
+      annual-report sections as :DataAsset slices seeding the effective-dated
+      BusinessSegment context — NOT the lexical Document→Chunk shape. Backfilled
+      here (Q5) so every live corpus traces to a registry entry; reshaping it
+      onto the lexical spine is a P4+ decision. The script still carries the
+      pre-restructure repo path for its PDFs — update on next run.

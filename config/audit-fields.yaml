@@ -1,0 +1,125 @@
+# =============================================================================
+# config/audit-fields.yaml — per-source SOURCE AUDIT ENVELOPE mapping (doc 06).
+#
+# THE ENVELOPE: four frozen node-property names that carry source authorship —
+#   source_created_by / source_created_at / source_updated_by / source_updated_at
+# — mapped per source from that source's NATIVE audit columns. This answers
+# "who created / last changed this thing IN THE SOURCE, and when" — distinct
+# from pull tracking (first_seen_at / last_seen_at / last_run_id = when WE saw
+# it) and from PROV load provenance (:JobRun edges).
+#
+# HITL RULE (doc 06 Phase 0): every entry's column→envelope mapping is decided
+# at an SME gate before a loader may SET the properties — `status: confirmed`
+# + `decided_by` (gate id in config/gate-log.md). `status: stub` marks a
+# registered source whose envelope gate has not run; loaders must not write
+# envelope properties for stub sources.
+#
+# Ontology note: the envelope properties are property-level provenance —
+# standard terms dct:creator / dct:created / dct:modified (Dublin Core) or
+# PROV qualified attribution. Property-term binding is NOT yet registered
+# (relationship_vocabulary.yaml covers edges only) — tracked in IDEAS.
+#
+# classification: Internal-Public — mechanism only (column names + rules; the
+# column names below are vendor-schema mechanism). Confidential sources keep
+# their real column mappings in the internal twin (same split as the planned
+# source-mappings ledger, doc 08); their entries here stay `stub`.
+#
+# Guarded by tests/unit/test_audit_fields.py: schema, frozen envelope prop
+# names, every confirmed:true source in config/source-registry.yaml has an
+# entry, confirmed entries map only envelope properties.
+# =============================================================================
+schema: drydocs.audit-fields.v1
+classification: Internal-Public
+updated: 2026-07-14
+
+# The four envelope property names, frozen (test-enforced).
+envelope:
+  - source_created_by
+  - source_created_at
+  - source_updated_by
+  - source_updated_at
+
+sources:
+  - id: controlm-psgmgr                      # config/source-registry.yaml id
+    status: confirmed
+    decided_by: controlm-q1q3-phase1         # SME gate 2026-07-07 (config/gate-log.md)
+    objects:
+      - object: CM_DEF_VJOB                  # -> :ControlMJob
+        mapping:
+          source_created_by: CREATION_USER
+          source_created_at: CREATION_DATE
+          source_updated_by: CHANGE_USERID
+          source_updated_at: CHANGE_DATE
+        excluded:
+          - {column: VERSION_USER,      reason: "current-version duplicate of CHANGE_USERID (gate Q2)"}
+          - {column: VERSION_TIMESTAMP, reason: "current-version duplicate of CHANGE_DATE (gate Q2)"}
+          - {column: CAPTURE_DATE,      reason: "replication time — never authorship"}
+        notes: >
+          AUTHOR is the Control-M team's Functional ID, not an individual editor
+          (SME 2026-07-06) — stays a plain property, not envelope. Derived
+          employee_sid (strip trailing 'p' from *_USER) approved at the gate but
+          built separately. Loader: controlm_jobs.cypher.
+      - object: CM_DEF_VTAB                  # -> :ControlMFolder
+        mapping:                             # no creation columns on folders
+          source_updated_by: LAST_UPDATED_USER
+          source_updated_at: LAST_UPDATED
+        excluded:
+          - {column: CAPTURE_DATE, reason: "replication time — never authorship"}
+        notes: >
+          Updated-side only; raw-named last_updated/last_updated_user props are
+          kept until the doc-06 Phase 3 migration retires them. Loader:
+          controlm_folders.cypher.
+
+  - id: seal-extract
+    status: stub                             # envelope gate not run (doc 06 Phase 4)
+    notes: "Internal-Confidential — real column mapping goes to the internal twin when gated."
+
+  - id: catalog-pat
+    status: stub                             # envelope gate not run (doc 06 Phase 4)
+    notes: "Internal-Confidential — real column mapping goes to the internal twin when gated."
+
+  - id: software-registry
+    status: stub                             # repo-committed ledger: git history IS the audit trail
+    notes: "Envelope likely unnecessary (git blame answers who/when); decide at a Phase 4 gate."
+
+  - id: bmc-docs
+    status: stub                             # docs corpus: BMC is the author; scraped_on = capture, not authorship
+    notes: >
+      Confirmed 2026-07-08 (gate bmc-docs-lexical-load). The corpus files are
+      repo-committed (git history = our copy's audit trail); per-doc scraped_on is
+      replication/capture time, never authorship — same rule as CAPTURE_DATE. A real
+      envelope (BMC page authorship) is not exposed by the source; decide whether the
+      stub is permanent at a doc-06 Phase 4 gate.
+
+  - id: essential-graphrag
+    status: stub                             # published book: authorship IS the citation (authors/publisher/published on :Document); no source-system envelope exists
+    notes: >
+      Confirmed 2026-07-16 (Q2 groom decision; covering gate bmc-docs-lexical-load —
+      pure docs_* vocabulary reuse). A published ebook exposes no created_by/updated_at
+      audit columns; the bibliographic fields (authors, publisher, published,
+      source_url) live on the :Document node and the local PDF is gitignored. Same
+      permanent-stub rationale as bmc-docs.
+
+  - id: airflow-mwaa
+    status: stub                             # envelope gate not run — crosswalk-only activation, no loader/live export
+    notes: >
+      Confirmed 2026-07-14 (gate airflow-crosswalk) as a crosswalk sign-off only.
+      Native audit columns are unknowable until a live MWAA DAG export exists;
+      the envelope gate runs with the future loader gate.
+
+  - id: autosys-export
+    status: stub                             # envelope gate not run — crosswalk-only activation, no loader/live export
+    notes: >
+      Confirmed 2026-07-14 (gate autosys-crosswalk) as a crosswalk sign-off only.
+      Native audit columns are unknowable until a live JIL export exists; the
+      envelope gate runs with the future loader gate.
+
+  - id: stg-app-fact
+    status: stub                             # envelope gate not run — staging table authored by our own normalizer
+    notes: >
+      Confirmed 2026-07-14 (gate seal-attribution-match-policy; K2 loader built
+      the same activation). STG_APP_FACT is the normalizer's OWN staging output —
+      run_id already carries the pull lineage, and the K2 loader writes edges
+      only (the envelope is node-level authorship, which this loader never
+      touches). Whether a source-authorship envelope even applies to a
+      self-authored staging table is a doc-06 Phase 4 gate question.

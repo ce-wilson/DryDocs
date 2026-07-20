@@ -1,0 +1,43 @@
+/* DryDocs Console — Tailwind + design tokens + base (O8 rebuild).
+   Token sheets (dark canonical + light derived, dual `:root`/`.dark` sets,
+   the --faint WCAG fix, and the Tailwind @theme alias) live in
+   styles/tokens.css — this file layers Tailwind itself plus the base
+   element resets that apply regardless of theme. */
+
+@import 'tailwindcss';
+@import './styles/tokens.css';
+
+:root {
+  font-family: var(--sans);
+  font-size: 15px;
+  line-height: 1.5;
+  color: var(--text);
+  background: var(--bg);
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body { min-height: 100svh; }
+
+a { color: var(--blue-br); }
+
+code { font-family: var(--mono); }
+
+button { font: inherit; color: inherit; cursor: pointer; }
+
+input, select, textarea {
+  font: inherit;
+  color: inherit;
+  background: var(--bg2);
+  border: 1px solid var(--edge);
+  border-radius: 6px;
+  padding: 0.35rem 0.5rem;
+}
+
+:focus-visible { outline: 2px solid var(--blue-br); outline-offset: 2px; }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { transition: none !important; animation: none !important; }
+}

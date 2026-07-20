@@ -1,0 +1,13 @@
+# INTERNAL — the dev team's existing modern rewrite (the M0 greenfield reference),
+# transcribed from production screenshots 2026-06-11. Never publish.
+schema: drydocs.remediation.transcript.v1
+source: production screenshots 2026-06-11 (worked-example Gate 3 reference)
+folder:
+  name: PRARAG-HLDM-89211-MLCM-ORIG-CRM-TRUST-DLY
+  variables: []
+jobs:
+  - name: PARAD0011b_MLCM_ORIG_DAILY_CRM_INDICATOR_TOK_ONPM_FW
+    type: FileWatcher
+    watch_template: "%%DROPBOX_DIR.Originations_Daily_CRM_Indicator_.%%$ODATE.tok"
+    variables:
+      - {name: "%%DROPBOX_DIR", value: "/data/uds/mlc/dropbox/MLCM/"}

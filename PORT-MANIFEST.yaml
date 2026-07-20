@@ -1,0 +1,243 @@
+# =============================================================================
+# PORT-MANIFEST.yaml — machine-readable port dispositions
+# (producer ce-wilson/DryDocs → company <org>/DryDocs; disjoint histories)
+#
+# THE AUTHORITY for how each path resolves during a port. The narrative around
+# these rules lives in git-readme.md + docs/port-prompt.md + the reconcile-port
+# skill — those documents explain WHY; this file is WHAT, and it is what the
+# consumer-side reconcile run should read mechanically. Rows are id-free and
+# ordinal-free on purpose (the port-prompt step-number coupling is retired as
+# the authority; steps remain as narrative).
+#
+# Matching: first row whose glob matches the path wins (top-down). Paths not
+# matching any row take the DEFAULT: clean-add if absent on the consumer,
+# evaluate if both sides created it (the disjoint-history rule — git cannot
+# auto-merge without a merge-base).
+#
+# dispositions:
+#   clean-add          path absent on consumer — applies untouched
+#   canonical-producer collision: take the PRODUCER version wholesale, no hand-merge
+#   canonical-company  collision: KEEP THE CONSUMER version; producer copy is a
+#                      sanitized public template or the consumer is simply ahead/wired
+#   union-append       collision: merge additively (append-only audit files) — never
+#                      drop either side's entries
+#   per-entry          collision resolves INSIDE the file, entry by entry — the
+#                      entry_rule is mandatory and path-level checkout is FORBIDDEN
+#   evaluate           collision: hand-merge per the reconcile-port collision ledger
+#   never-port         must not cross the boundary in either direction (values,
+#                      credentials, gitignored data)
+#
+# Guarded by tests/unit/test_port_manifest.py. Born from
+# docs/reviews/tech-debt-port-boundary.md (2026-07-09, remediation Phase 1);
+# sequencing rule recorded there: this manifest lands BEFORE the ADR 0002
+# Phase B package split, so the rename wave is a path-column diff here, not a
+# prose rewrite.
+# =============================================================================
+schema: drydocs.port-manifest.v1
+classification: Internal-Public
+updated: 2026-07-14   # Phase B relocate (ADR 0002-a-1): core paths now drydocs_core/*;
+                      # the remainder keeps the drydocs/ name (thin variant). Renamed-path
+                      # rows below were the promised "path-column diff, not a prose rewrite".
+                      # 2026-07-10, later: drydocs_remediation/** + internal/remediation/**
+                      # rows added (G3 remediation component stream).
+                      # 2026-07-14 (step 31): web/** + UI-WIP/** canonical-producer,
+                      # .github/** evaluate, config/manual-loads/manifest.yaml per-entry.
+                      # 2026-07-15 (step 34): docs/design/controlm-ingestion-tdd.{md,html,
+                      # print.html} canonical-company — consumer's TDD is finalized/ahead.
+direction: "producer -> company (one-way; back-flow only as sanitized reproduction)"
+default: "clean-add when absent on consumer; evaluate when both sides created the path"
+
+rows:
+  # ---- per-entry files (checkout of the whole file is FORBIDDEN) ------------
+  - path: "drydocs_core/ontology/relationship_vocabulary.yaml"
+    disposition: per-entry
+    entry_rule: >
+      id-keyed (local_relationships[].id, node_classifications[].label). NEVER
+      downgrade a consumer entry whose status is active (or a node class a live
+      loader depends on) to the producer's planned/deprecated — EXCEPT gate-authorized
+      deprecations carrying a deprecated_at + gate cite (K4 2026-07-15:
+      seal_has_membership / seal_of_role / seal_held_by — take the producer's
+      deprecated status; the gate outcome IS the authority). Back-flow-origin
+      ids (m3_seal_app_ref and successors) are consumer-canonical once promoted.
+    note: "guarded producer-side by test_schema.py + test_taxonomy_ontology_map.py"
+  - path: "config/taxonomy-ontology-map.yaml"
+    disposition: per-entry
+    entry_rule: >
+      id-keyed (mappings[].id). NEVER downgrade confirmed/applied ->
+      proposed; summary block is COMPUTED (recount after any merge —
+      test_taxonomy_ontology_map.py enforces); union new entries from both sides.
+    note: "the central HITL contract; gate decisions must never regress via a port"
+  - path: "pyproject.toml"
+    disposition: per-entry
+    entry_rule: >
+      union of dependencies; KEEP the consumer's version string (per-repo
+      release cadence); producer v* release tags never cherry-pick.
+  - path: "config/manual-loads/manifest.yaml"
+    disposition: per-entry
+    entry_rule: >
+      files[] is a UNION keyed by file path: producer ships mechanism + policy
+      text + empty lists; consumer accumulates its own entries (real CSVs live
+      under internal/) — consumer entries NEVER come from, or are removed by, a
+      port. Policy/README/template text is producer-canonical (step 31).
+    note: "tier-5 manual-CSV mechanism (gate seal-attribution-match-policy, 2026-07-14)"
+
+  # ---- append-only audit files ----------------------------------------------
+  - path: "config/gate-log.md"
+    disposition: union-append
+    note: "chronological union of both sides' gate records; dropping either side's entries is an audit violation"
+  - path: "docs/restructure/IDEAS.md"
+    disposition: union-append
+    note: "inbox + audit trail; both sides append — merge is the union (proven conflict site, 3x on 2026-07-09)"
+
+  # ---- consumer-canonical (drydocs-review back-flow stream + wiring) --------
+  - path: "drydocs/graph_review.py"
+    disposition: canonical-company
+    note: "producer copy = sanitized public template; consumer's carries real wiring"
+  - path: "drydocs/graph_verify.py"
+    disposition: canonical-company
+    note: "same back-flow rule"
+  - path: "drydocs/review_labels.py"
+    disposition: canonical-company
+    note: "same back-flow rule"
+  - path: "drydocs/sme_notes.py"
+    disposition: canonical-company
+    note: "same back-flow rule"
+  - path: "drydocs/gate_pages.py"
+    disposition: canonical-company
+    note: "back-flow rule; generic mechanism deltas (meta-card/provenance standard) fold in WITH their tests, or decline both together — logged"
+  - path: "drydocs/publishing/**"
+    disposition: canonical-company
+    note: "consumer's carries the real Confluence connector; producer's is the abstracted template"
+  - path: "config/review-labels.yaml"
+    disposition: canonical-company
+    note: "real labels consumer-side"
+  - path: "config/gate-prompts/**"
+    disposition: canonical-company
+    note: "consumer's real gate specs win; producer specs are prep/templates — new producer specs that don't collide are clean-adds"
+  - path: "graph-tests/**"
+    disposition: canonical-company
+    note: "consumer's real acceptance suites win; seed twins follow producer renames as deliberate consumer commits"
+  - path: "docs/design/controlm-ingestion-tdd.md"
+    disposition: canonical-company
+    note: >
+      the consumer's TDD is FINALIZED (2026-07-15) and ahead — carries the SPIDERP §7f
+      audit chain + live-verified content; the producer copy is the mirror. Producer-side
+      corrections that originated FROM the finalized doc (e.g. the D4 IS_CURRENT_VERSION
+      'Y' fix, step 34) are already present consumer-side by construction.
+  - path: "docs/design/controlm-ingestion-tdd.html"
+    disposition: canonical-company
+    note: "render of the above — regenerate consumer-side, never take the producer render"
+  - path: "docs/design/controlm-ingestion-tdd.print.html"
+    disposition: canonical-company
+    note: >
+      RETIRED producer-side (L13, 2026-07-18): the render series collapsed to the single
+      .html (screen + @media print). At the next port, DELETE the consumer-side twin and
+      regenerate the single .html consumer-side — never take a producer render.
+  - path: "drydocs_core/adapters/oracle_adapter.py"
+    disposition: canonical-company
+    note: >
+      PORT-FROZEN: consumer is Kerberos/thick with real connection config; producer is
+      thin-only. Phase B relocate interaction: APPLY the rename (drydocs/adapters/ ->
+      drydocs_core/adapters/) but keep the CONSUMER's file content at the new path.
+
+  # ---- producer-canonical (take wholesale on collision) ---------------------
+  - path: "drydocs_core/controlm/**"
+    disposition: canonical-producer
+    note: "the normalization package (Phases A/B/C) is authored producer-side"
+  - path: "drydocs/staging.py"
+    disposition: canonical-producer
+    note: "the load-cadence staging bundle builder — relocated OUT of controlm/ in Phase B (0002-a §6 borderline); stays in the drydocs remainder"
+  - path: "drydocs_remediation/**"
+    disposition: canonical-producer
+    note: "the remediation component (G3/0002-B): producer-authored mechanism; rule VALUES + Jira REST + live corroboration queries stay company-side and never flow back"
+  - path: "internal/remediation/**"
+    disposition: canonical-producer
+    note: >
+      spinoff doc port + real M0 artifacts (Internal — never in any PUBLIC mirror; fine on
+      the private company remote). Producer-authored files take producer on collision;
+      company-side ADDITIONS here (e.g. the G10 landings per the README §HELD) are
+      company-only files — they never collide and never flow back.
+  - path: "knowledge/standards/**"
+    disposition: canonical-producer
+  - path: "drydocs/loaders/**"
+    disposition: canonical-producer
+    note: "Control-M loaders/SQL/DDL/cypher incl. base.py (provenance diet) — producer-authored"
+  - path: "drydocs_core/schema/**"
+    disposition: canonical-producer
+    note: "supplements + constraints; consumer evaluates constraint-count deltas via its own test_schema expectations"
+  - path: "tests/unit/test_variable_*.py"
+    disposition: canonical-producer
+    note: "carry the sample skipif guards — re-deriving them caused divergence in a prior port"
+  - path: "tests/unit/test_module_boundary.py"
+    disposition: canonical-producer
+    note: "carries ENTRYPOINT_MODULES exemption + default-deny — the settled boundary resolution"
+  - path: "tests/unit/test_taxonomy_ontology_map.py"
+    disposition: canonical-producer
+    note: "the map guard (2026-07-09); consumer's map content differs, the guard is content-agnostic"
+  - path: "tests/unit/test_port_manifest.py"
+    disposition: canonical-producer
+  - path: "PORT-MANIFEST.yaml"
+    disposition: canonical-producer
+    note: "this file — the producer maintains the dispositions; consumer proposes changes via back-flow notes"
+  - path: "MODULE_MAP.md"
+    disposition: canonical-producer
+  - path: "CLAUDE.md"
+    disposition: canonical-producer
+  - path: "PUBLISH-BOUNDARY.md"
+    disposition: canonical-producer
+  - path: "reference/**"
+    disposition: canonical-producer
+  - path: "external/orchestration/**"
+    disposition: canonical-producer
+  - path: "docs/restructure/0*.md"
+    disposition: canonical-producer
+    note: "conceptual model / plan / HITL flow docs"
+  - path: ".claude/**"
+    disposition: canonical-producer
+    note: "agents + skills are producer-maintained tooling; consumer-local skills live under other names"
+  - path: "web/**"
+    disposition: canonical-producer
+    note: "drydocs-web module (JS/TS, Epic O; step 31) — node_modules/dist gitignored; .env.example only, VITE_* values NEVER committed (Vite inlines them into the bundle)"
+  - path: "UI-WIP/**"
+    disposition: canonical-producer
+    note: "web-console design record (wireframes, nav flow, dark landing mock; step 31) — static reference material"
+  - path: "config/**"
+    disposition: canonical-producer
+    note: "configuration layer default — the per-entry/canonical-company/union rows ABOVE override for the map, gate-prompts, review-labels, gate-log (first match wins)"
+
+  # ---- integration points (hand-merge per the reconcile-port ledger) --------
+  - path: "drydocs/cli.py"
+    disposition: evaluate
+    note: "composition root; both sides add commands — merge per collision ledger (keep consumer verbs, add producer verbs)"
+  - path: ".github/**"
+    disposition: evaluate
+    note: "J5 CI (step 31): the publish-boundary guard is producer-remote-specific and GHE Actions runners/policies are consumer-side — keep consumer workflows, adapt rather than adopt"
+  - path: "drydocs_core/models/__init__.py"
+    disposition: evaluate
+    note: "union of row-model exports from both sides (path moved from drydocs/models/ in Phase B)"
+  - path: "drydocs_core/models/controlm.py"
+    disposition: evaluate
+    note: "keep consumer-only rows (e.g. ControlMQuantitativeRow), add producer rows (path moved in Phase B)"
+  - path: "tests/unit/test_schema.py"
+    disposition: evaluate
+    note: "consumer EXPECTED_CONSTRAINTS is ahead (44 vs 35) — keep consumer count, take producer drift-guard logic"
+  - path: "tests/unit/test_controlm_cypher.py"
+    disposition: evaluate
+    note: "consumer scope_key condition-key variant wins"
+
+  # ---- never cross the boundary ---------------------------------------------
+  - path: "drydocs/locations.py"
+    disposition: never-port
+    note: "consumer-only DSN/server values — at most a bare schema may cross, never the values"
+  - path: "drydocs/seal_deployments.py"
+    disposition: never-port
+    note: "real SEAL IDs — consumer-only"
+  - path: "drydocs/controlm_app_codes.py"
+    disposition: never-port
+    note: "real app-code values — consumer-only"
+  - path: "drydocs/data/**"
+    disposition: never-port
+    note: "gitignored samples; Track-1 tests skip without them by design"
+  - path: "internal-local/**"
+    disposition: never-port
+    note: "gitignored; travels by hand only, never by git"

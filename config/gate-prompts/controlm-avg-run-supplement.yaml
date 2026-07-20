@@ -1,0 +1,106 @@
+# SME gate-prompt spec — CM_AVG_RUN temporal runtime supplement.
+# Prepared with the SME NOT present — this page STOPS at the gate. Nothing here is confirmed:
+# no taxonomy-ontology-map.yaml status flips to confirmed, no graph write, and the CM_AVG_RUN
+# extract stays staging-only. Mechanism-only: column names, rules, and counts — no real
+# folder/job/group names or timing values.
+classification: Internal-Public
+schema: drydocs.gate-prompt.v1
+id: controlm-avg-run-supplement
+title: "SME Gate — CM_AVG_RUN runtime-stats property supplement onto ControlMJob"
+step: "Resolves the timing-property landing before the supplement loader is written (temporal runtime supplement, phase 1)"
+summary: >
+  psgmgr.CM_AVG_RUN (name verified live) carries per-job runtime statistics — avg/min/max
+  start+run times PLUS raw per-run sample arrays (~20 runs, start samples carry :odate), so
+  day-of-week medians are computable without a CM_HIST scan. Proposed landing (SME direction
+  2026-07-07, formalized here): a PROPERTY SUPPLEMENT onto existing :ControlMJob nodes — no
+  new labels, no new edges; the loader MATCHes jobs — preferring ctlm_id (SME edit
+  2026-07-14: the internal psgmgr changes now derive folder_id.job_id as a single
+  ctlm_id, e.g. 161015.7 — the (folder_id, job_id) node key in composite form) where
+  the replica exposes it, falling back to the weak key (SCHED_TABLE, JOB_MEM_NAME =
+  JOB_NAME) — and never MERGEs. Derived folder-level windows (min job start ..
+  max job end) are the maintenance-window primitive. This is the timing half of the
+  maintenance-window use case signed off at gate controlm-hosts-topology (2026-07-09), and
+  the runtime input to the TDQ-failure ETA (critical-path, never path-sum). Bonus:
+  NODE_GROUP on each row cross-validates the definition-side RUNS_ON resolution.
+meta:
+  Module: "drydocs-core · temporal runtime supplement (M3 extension, opt-in supplement pattern)"
+  Source: "oracle:psgmgr.CM_AVG_RUN — runtime statistics (14 columns; DDL/types pending probe P0)"
+  Software: "controlm (Control-M) MADE_BY bmc — config/taxonomy/software-registry.yaml"
+  Registry ref: "controlm-psgmgr — confirmed (config/source-registry.yaml); CM_AVG_RUN object added 2026-07-09, staging-only"
+  Classification: "Internal (source data) · this page Internal-Public (mechanism only)"
+  Ledger: "config/source-mappings/controlm-psgmgr.yaml CM_AVG_RUN (all 14 columns projected → staging:*)"
+  Ontology map: "config/taxonomy-ontology-map.yaml job-runtime-stats-supplement (status: proposed; property supplement — deliberately NO relationship_vocabulary.yaml terms)"
+  Probes: "drydocs/loaders/sql/adhoc/profile_cm_avg_run.sql (P0 types, P2 grain, P3 domains, P4 join coverage, P5 NODE_GROUP cross-validation, P7 sample parseability, P8 snapshot-vs-history)"
+  Related gates: "controlm-hosts-topology (signed off 2026-07-09 — topology half); controlm-q1q3-phase1 (MEMNAME demotion)"
+mapping:
+  - n: 1
+    element: "Aggregate timing → job properties"
+    target: "ControlMJob.avg_start_time (+ start_next_day flag), avg_run_time, min_run_time, max_run_time, run_time_std_dev"
+    edge: "—  [PROPOSED — property supplement; loader MATCHes via ctlm_id (folder_id.job_id) where present, else (SCHED_TABLE, JOB_NAME); never MERGEs; unmatched rows = coverage metric]"
+  - n: 2
+    element: ">24h post-midnight clock normalization"
+    target: "derived: HHMISS with HH up to ~30+ (e.g. 293502 ≈ 05:35:02 next day) → time-of-day + start_next_day"
+    edge: "—  [PROPOSED — normalized in Python (the 'Python owns computation' precedent), never in SQL]"
+  - n: 3
+    element: "Raw sample arrays → day-of-week medians"
+    target: "derived: ControlMJob.dow_median_start_time / dow_median_run_time (from SAMPLES_RUN_TIME + SAMPLES_START_TIME <ts>:<odate> pairs)"
+    edge: "—  [PROPOSED — SME 2026-07-07 caveat honored: medians per day-of-week, considered for support-critical paths; estate-wide medians optional]"
+  - n: 4
+    element: "Folder-level window rollup (the maintenance-window primitive)"
+    target: "derived: ControlMFolder.window_start / window_end = min member-job start .. max member-job end"
+    edge: "—  [PROPOSED — folder fallback: a folder with no declared time inherits the DC default per knowledge/standards/technology/data-center-naming-convention.md]"
+  - n: 5
+    element: "FileWatcher rows (watch/wait ~240s cycles, not processing time)"
+    target: "flagged via the job's APPL_TYPE, kept OUT of blended run-time stats"
+    edge: "—  [PROPOSED — separate treatment in ETA/window math]"
+  - n: 6
+    element: "NODE_GROUP runtime placement (bonus, non-blocking)"
+    target: "cross-validation report: CM_AVG_RUN.NODE_GROUP vs the RUNS_ON resolution from CM_DEF_VJOB.NODE_ID"
+    edge: "—  [PROPOSED — disagreement = metadata finding feeding the remediation workflow, not a graph write]"
+provenance:
+  - label: ":ControlMJob timing properties (supplement)"
+    source_object: "psgmgr CM_AVG_RUN"
+    key: "(DATA_CENTER, SCHED_TABLE, JOB_MEM_NAME) — assumed grain, dup probe P2 pending; -CYC/-DLY twin folders each carry rows"
+    loader: "~ (none yet — supplement pass, written only after this gate resolves; runs AFTER the jobs pass)"
+    properties:
+      - {name: join_rule, origin: derived, from: "ctlm_id (folder_id.job_id) preferred; fallback SCHED_TABLE + JOB_MEM_NAME = CM_DEF_VJOB.JOB_NAME", note: "SME 2026-07-14: internal psgmgr derives ctlm_id = folder_id.job_id (e.g. 161015.7) — split on '.' IS the (folder_id, job_id) node key; probes P0/P4 verify its presence + coverage on CM_AVG_RUN. SME 2026-07-07 stands: MEMNAME is NEVER a join key"}
+      - {name: ctlm_id, origin: source, from: "ctlm_id (internal psgmgr derived column, folder_id.job_id composite)", note: "strong join key where present; parsed folder_id/job_id must round-trip to the node key exactly — mismatches are a P4 census finding"}
+      - {name: avg_start_time, origin: source, from: AVG_START_TIME, note: ">24h clock; normalization rule = mapping n:2"}
+      - {name: avg/min/max_run_time, origin: source, from: "AVG_RUN_TIME / MIN_RUN_TIME / MAX_RUN_TIME", note: "seconds"}
+      - {name: run_time_std_dev, origin: source, from: STD_DEV, note: "large spread flags unstable-runtime jobs for window planning"}
+      - {name: dow_medians, origin: derived, from: "SAMPLES_RUN_TIME + SAMPLES_START_TIME", note: "parsed in Python; P7 checks array parseability + matched lengths"}
+      - {name: instance_name, origin: source, from: INSTANCE_NAME, note: "relation to DATA_CENTER unclear (sampled instance code disagreed with the DC number) — probe P2b; staging-only until understood"}
+      - {name: dsn, origin: source, from: DSN, note: "null in all sampled rows — P3b; flip disposition to excluded if always null"}
+sections:
+  - title: "A. Landing shape — property supplement, no new graph vocabulary"
+    confirmations:
+      - "Timing lands as PROPERTIES on existing :ControlMJob nodes (opt-in supplement pattern — software-registry/SOSA precedent); no new node labels, no new relationship types, no relationship_vocabulary.yaml entries."
+      - "The supplement loader MATCHes job nodes and never MERGEs them (the DESCRIBES load-order precedent) — stats rows that match no active current-version job are reported as a coverage metric, never node-creating."
+      - "Property list per mapping n:1–n:3 confirmed (aggregates + normalized start + day-of-week medians); anything beyond it needs a new gate item."
+  - title: "B. Join policy — ctlm_id preferred, weak key fallback"
+    confirmations:
+      - "SME EDIT 2026-07-14 (recorded at sign-off): the internal psgmgr changes derive ctlm_id = folder_id.job_id (e.g. 161015.7) — the (folder_id, job_id) node key in composite form. The loader joins on ctlm_id wherever the replica exposes it (split on '.' → the node key directly); P0 confirms its presence/type on CM_AVG_RUN and P4 censuses its coverage."
+      - "Fallback join = (SCHED_TABLE, JOB_MEM_NAME = JOB_NAME) for rows without a usable ctlm_id, acknowledged WEAKER than the node key; -CYC/-DLY twin folders each carry stats rows and land on their own job nodes."
+      - "P4 coverage census (both directions: stats rows matched to jobs; active jobs having stats) sets the expected coverage baseline before the loader ships."
+      - "MEMNAME is never used for identity/joins — consistent with its controlm-q1q3-phase1 demotion."
+      - "Performance: the ONLY Oracle join in this package is the one-off P4 coverage probe (run the scoped P4s smoke test first; plan-check + bounded call timeout before estate-wide; per-DC fallback). The production extract is a plain projection; the loader's job match runs GRAPH-side and requires an index on ControlMJob(parent_table, job_name) before the estate-wide supplement pass."
+  - title: "C. Normalization + statistics rules"
+    confirmations:
+      - ">24h post-midnight clock normalized in Python to time-of-day + start_next_day (never in SQL); P3a confirms the value range first."
+      - "Run times are seconds; FileWatcher rows (watch/wait ~240s cycles) are flagged via APPL_TYPE and excluded from blended stats."
+      - "Day-of-week medians computed from the raw SAMPLES_* arrays (no CM_HIST scan); per the SME caveat, weekend-volume effects are why averages alone are not trusted."
+      - "ETA/window math is critical-path (CPM), never a path sum — standing SME rule."
+  - title: "D. Refresh + residual probes"
+    confirmations:
+      - "P8 decides refresh strategy: CAPTURE_DATE uniform snapshot → full-replace supplement pass; history retained → windowed."
+      - "Residual probes before the loader ships: P0 real column types (SAMPLES_* may need CLOB staging), P2 grain dup check, P2b INSTANCE_NAME meaning, P3b DSN population, P7 sample-array parseability."
+      - "P5 NODE_GROUP cross-validation vs CM_HOSTS/RUNS_ON is a bonus report feeding remediation — non-blocking for this supplement."
+  - title: "E. Use case tie-in"
+    confirmations:
+      - "Maintenance-window planning: host/group → jobs (RUNS_ON, gate controlm-hosts-topology) → normalized job windows → folder rollups (mapping n:4) = the quiet-window computation."
+      - "Folder with no declared time inherits the DC-name default time (knowledge/standards/technology/data-center-naming-convention.md) — the fallback applies in window math."
+      - "TDQ-failure ETA consumes the same properties via critical-path propagation (Python-side CPM over the graph)."
+  - title: "F. Sign-off"
+    confirmations:
+      - "This page was prepared with the SME NOT present — nothing here is confirmed. No map status flips, no loader, no graph write happen from this page alone."
+      - "Safe to transcribe into config/gate-log.md once an SME has reviewed this page and recorded the calls (A landing shape, B join policy, C normalization rules, D refresh, E use-case framing)."

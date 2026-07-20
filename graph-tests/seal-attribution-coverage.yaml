@@ -1,0 +1,83 @@
+# seal-attribution-coverage suite — the K2 coverage invariant (gate
+# seal-attribution-match-policy §B, SME-confirmed 2026-07-14: "matched +
+# unmatched counts checked against eligible jobs every run — no silent drops;
+# the invariant joins graph_verify").
+#
+# The attribution loader (seal_attribution.v1) stamps its per-run coverage
+# counts on its :JobRun (eligible_jobs / matched / unmatched / pinned /
+# edges_written / dropped_in_graph); these cases reconcile the stamps against
+# the live edges. Unmatched jobs are surfaced by the counts, never a failure
+# (§B: unmatched never blocks) — what FAILS here is bookkeeping drift or a
+# policy violation (shape props missing, two automated attributions on one
+# job, an unknown match_method).
+# classification: Internal-Public (shape/consistency only — no counts/IDs).
+classification: Internal-Public
+schema: drydocs.graph-tests.v1
+suite: seal-attribution-coverage
+description: >
+  Coverage + shape invariants for the K2 SEAL attribution load:
+  WAS_ASSOCIATED_WITH {role: seal_app_ref} edges carry the gate-confirmed
+  property shape; automated attribution stays one-to-one per job; every
+  seal_attribution.v1 run's coverage stamps reconcile (matched + unmatched +
+  pinned = eligible; matched = edges written + dropped_in_graph, with drops
+  surfaced, never silent).
+targets: [ControlMJob, Application, JobRun]
+cases:
+  - id: TC-01
+    description: every seal_app_ref edge carries the gate-confirmed shape props (§D)
+    cypher: >
+      MATCH (:ControlMJob)-[r:WAS_ASSOCIATED_WITH {role: 'seal_app_ref'}]->(:BusinessApplication)
+      WHERE r.match_method IS NULL OR r.source IS NULL
+         OR r.first_seen_at IS NULL OR r.last_seen_at IS NULL
+         OR r.last_run_id IS NULL
+      RETURN r.match_method AS match_method, r.source AS source
+    assert: empty
+
+  - id: TC-02
+    description: match_method stays inside the confirmed vocabulary (four tiers + manual)
+    cypher: >
+      MATCH (:ControlMJob)-[r:WAS_ASSOCIATED_WITH {role: 'seal_app_ref'}]->(:BusinessApplication)
+      WHERE NOT r.match_method IN ['seal', 'fid', 'app_name', 'alias', 'manual']
+      RETURN DISTINCT r.match_method AS unknown_method
+    assert: empty
+
+  - id: TC-03
+    description: automated attribution is one-to-one — no job carries two non-manual seal_app_ref edges (§A one-to-one accept)
+    cypher: >
+      MATCH (j:ControlMJob)-[r:WAS_ASSOCIATED_WITH {role: 'seal_app_ref'}]->(:BusinessApplication)
+      WHERE r.match_method <> 'manual'
+      WITH j, count(r) AS automated_edges
+      WHERE automated_edges > 1
+      RETURN j.folder_id AS folder_id, j.job_id AS job_id, automated_edges
+    assert: empty
+
+  - id: TC-04
+    description: every attribution run's coverage stamps reconcile — matched + unmatched + pinned = eligible (§B)
+    cypher: >
+      MATCH (run:JobRun {loader: 'seal_attribution.v1'})
+      WHERE run.status = 'OK' AND run.eligible_jobs IS NOT NULL
+        AND run.matched + run.unmatched + run.pinned <> run.eligible_jobs
+      RETURN run.run_id AS unreconciled_run
+    assert: empty
+
+  - id: TC-05
+    description: the latest attribution run's edge bookkeeping matches the live graph — matched = edges_written + dropped_in_graph, and edges_written equals the edges the run actually touched (no silent drops, §B)
+    cypher: >
+      MATCH (run:JobRun {loader: 'seal_attribution.v1'})
+      WHERE run.status = 'OK' AND run.edges_written IS NOT NULL
+      WITH run ORDER BY run.completed_at DESC LIMIT 1
+      OPTIONAL MATCH (:ControlMJob)-[r:WAS_ASSOCIATED_WITH {role: 'seal_app_ref'}]->(:BusinessApplication)
+        WHERE r.last_run_id = run.run_id
+      WITH run, count(r) AS live_edges
+      WHERE run.edges_written <> live_edges
+         OR run.matched <> run.edges_written + run.dropped_in_graph
+      RETURN run.run_id AS drifted_run, live_edges, run.edges_written AS stamped
+    assert: empty
+
+  - id: TC-06
+    description: manually-created Application nodes always carry their audit pointers (§F.4 — counted separately, never anonymous)
+    cypher: >
+      MATCH (a:BusinessApplication {manually_created: true})
+      WHERE a.manual_load_file IS NULL OR a.authored_by IS NULL
+      RETURN a.seal_id AS unstamped_manual_node
+    assert: empty

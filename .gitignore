@@ -1,0 +1,104 @@
+# Credentials — never commit these
+# .env, .env.local, ".env copy.example" — any variant may hold real secrets;
+# the committed template (.env.example) is re-included below.
+.env*
+!.env.example
+Neo4j-*.txt
+
+# Local Claude settings (machine-local paths / personal permission rules)
+.claude/settings.local.json
+
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.venv/
+dist/
+build/
+*.egg-info/
+
+# Node (web/)
+node_modules/
+
+# ADK local runtime state (agents/ — session DBs the api_server writes)
+.adk/
+
+# Test / type / lint caches
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# Sample / local data — may contain sensitive source data
+drydocs/data/
+# Staging / extract output (real data — keep local, never commit)
+stg_out/
+/stg_*/
+
+# SDLC-Docs — Fidelity-internal source corpus: keep LOCAL for reference, never commit/publish.
+# Internal-Confidential per PUBLISH-BOUNDARY.md (real org name "Fidelity/FMR", internal fmr.com
+# URLs, internal tool/standard code names). Ignore the WHOLE corpus (docx/doc/pdf/xls/txt/json,
+# any type) and keep only the clean design artifacts SDLC-Docs/extracted/*.md tracked.
+/SDLC-Docs/*
+!/SDLC-Docs/extracted/
+/SDLC-Docs/extracted/*
+!/SDLC-Docs/extracted/*.md
+
+# Local doc-extraction helper scripts (temporary; generated the SDLC-Docs corpus)
+/.tmp_*
+
+# Oracle Kerberos connection — the FILLED config holds a real SID/hosts/alias.
+# Only the .sample.txt is committed.
+libs/oracle_kerberos/oracle_kerberos_connection.txt
+
+# Local real-data working area (Internal-Confidential): consolidated
+# troubleshooting notes, screenshots with live values, filled configs.
+# Never committed; travels to the company side by hand, not by git.
+/internal-local/
+
+# Raw screenshots/images dropped in the REPO ROOT during troubleshooting/porting —
+# they routinely contain live SIDs, hostnames, EPV objects, ADFS client IDs.
+# Blanket rule: no root-level images are ever committed (verified: none tracked).
+# Committed images live in purposeful homes (drydocs-icons/, docs/). Move drops
+# into internal-local/ when done; this is the safety net.
+/*.png
+/*.webp
+/*.svg
+/*.jpg
+/*.jpeg
+
+# Books / reports dropped in the REPO ROOT (e.g. Essential-GraphRAG.pdf — publicly
+# available Manning/Neo4j ebook, cite by URL; annual-report inputs). Publisher PDFs
+# are never committed (copyright + repo size); the registration lives in
+# reference/research/README.md. Tracked PDFs live in purposeful homes (UI-WIP/).
+/*.pdf
+
+# Vendor PDF posters/manuals — copyrighted BMC (and other vendor) binaries kept
+# as LOCAL reference only. This repo is sometimes published; the *.md files in
+# external/orchestration/ are our own summaries and are publishable, the raw
+# vendor PDFs are not. Facts from the poster are transcribed in the controlm-db
+# skill (references/er-model.md).
+external/orchestration/**/*.pdf
+
+# Design-doc PDFs (Epic L / L4) — BUILD-ON-DEMAND from the .md via scripts/doc_to_pdf.py.
+# The .md is the source of truth and the single .html render is committed (L13); the PDF is a
+# regenerable binary (not byte-identical run-to-run — trailer /ID varies), so it is not tracked.
+# Regenerate before printing for the pen/paper loop.
+docs/design/*.pdf
+
+# Paper-HITL scans (Epic L / L6) — raw scanned/photographed annotated printouts. Internal
+# by default (see docs/design/feedback/scans/README.md + config/classification.yaml
+# excluded_paths): never published unless a human deliberately reclassifies. Keep the
+# README (the classification note) tracked; the raw scans are not.
+docs/design/feedback/scans/*
+!docs/design/feedback/scans/README.md
+
+# Editor workspace settings (machine-local)
+/.vscode/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# derived mapping-store materialization (plan M0) - rebuild via scripts/build_mapping_db.py
+var/

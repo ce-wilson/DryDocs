@@ -1,0 +1,171 @@
+# =============================================================================
+# tdd.outline.yaml — the CANONICAL outline every DryDocs Technical Design Document
+# conforms to. This is the "deterministic and repeatable" contract in its STRUCTURAL
+# sense: not byte-identical renders, but *identical tracking + completeness* — every
+# TDD carries the same sections, so nothing important is silently omitted and every
+# design decision is traceable.
+#
+# WHY THIS FILE IS THE LINCHPIN
+#   Each section has a STABLE, AUTHORED `anchor`. That anchor is the single id namespace
+#   that (a) the completeness validator checks for, (b) the deterministic renderer emits
+#   as the HTML/PDF element id, (c) the traceability matrix keys on, and (d) HITL markup
+#   — a digital save-button comment OR a scanned pen note — re-attaches to. Anchors are
+#   authored here, never positionally computed, so inserting a section never renumbers
+#   another and never breaks a prior annotation.
+#
+# NUMBERING is deferred (decision, 2026-07-08). Section ORDER is settled; canonical
+# numbering waits until the outline has stabilised over a few reviews. Headings here
+# carry names, not numbers — an individual doc may number its own headings provisionally.
+#
+# PROVENANCE — modernized from the SDLC-Docs frozen corpus (2017–2019), MERGING the two
+# TDD shapes found there and adapting them to DryDocs reality (the four-layer model,
+# the sensitivity/publish boundary, the graph, the HITL gate):
+#   • enterprise/IDA  "Technical Design Doc Template.doc" — kept: Purpose/Scope,
+#       Definitions, System Overview (→ Design summary), Component Description
+#       (→ Detailed design), §6 SOFTWARE REQUIREMENTS TRACEABILITY MATRIX (the spine).
+#   • agile/story     "Technical Design.docx" — kept: Design Summary, Component Changes
+#       (→ Detailed design), Configuration (→ folded into Detailed design), QA / Unit /
+#       SIT-UAT (→ QA & tests), Discussions.
+#
+# DELIBERATELY DROPPED (decision, 2026-07-08 — too much per-doc overhead; they are
+# org-wide STANDARDS or agile CEREMONY, not per-design content): enterprise Preface /
+# Reference Architecture / Design Method & Standards / Documentation & Programming
+# Standards / Naming Conventions / Dev Tools; agile Story Details / Team / Definition of
+# Ready-Done. Where any intent survives it lives in `docs/restructure/*.md` (process) or
+# the INTERNAL corpus — e.g. naming conventions are captured internally, NOT published.
+#
+# VALIDATION: drydocs/doc_outline.py (test: tests/unit/test_doc_outline.py) asserts a
+# TDD contains every `required: true` anchor and honours the traceability contract below.
+# A required section may be satisfied by an explicit "N/A — <reason>"; the anchor must
+# still be present, so completeness is a real check, not busywork.
+# =============================================================================
+
+schema: drydocs.doc-outline.v1
+doc_type: TDD
+title: Technical Design Document
+classification: Internal-Public          # this template carries no real data
+updated: 2026-07-08
+
+source_templates:
+  - "SDLC-Docs/Technical Design Doc Template.doc  (enterprise/IDA — traceability-matrix spine)"
+  - "SDLC-Docs/Technical Design.docx  (agile/story — component changes + tests)"
+
+# ── The outline. `anchor` is stable + authored; heading is the rendered text; ────
+#    `required` gates completeness; `guidance` says what belongs there.
+sections:
+  - anchor: front-matter
+    heading: "Front matter"
+    required: true
+    guidance: >
+      Status (DESCRIPTIVE = documents built code / PRESCRIPTIVE = specifies unbuilt) +
+      Rev + date + the commit it reflects; Classification (per config/classification.yaml);
+      Audience; Companion docs; the worked example the doc uses throughout.
+
+  - anchor: purpose-scope
+    heading: "Purpose & scope"
+    required: true
+    guidance: >
+      What this design covers and why; explicitly in-scope vs out-of-scope. Keep scope
+      falsifiable so the traceability matrix can be checked complete.
+
+  - anchor: context-frame
+    heading: "Where this sits — the four-layer frame"
+    required: true
+    guidance: >
+      DryDocs-specific: which of the four layers (taxonomy / ontology / knowledge graph /
+      context graph) this touches, and its upstream/downstream neighbours.
+
+  - anchor: definitions
+    heading: "Definitions, acronyms & references"
+    required: true
+    guidance: "Terms, acronyms, and links to standards/ADRs/companion docs."
+
+  - anchor: design-summary
+    heading: "Design summary"
+    required: true
+    guidance: >
+      The high-level flow — one diagram + a paragraph. What the reader must grasp before
+      the detail.
+
+  - anchor: detailed-design
+    heading: "Detailed design"
+    required: true
+    guidance: >
+      The mechanism, stage by stage — what the system does and how. ABSORBS the old
+      separate "Data & configuration" section: cover the sources consumed and the
+      config/precedence that drives behaviour HERE. For an INGESTION pipeline, the
+      column-level source→node/edge mapping (the actual SQL/columns that load the graph)
+      is its own subsection below — this is the data-pipeline view the project keeps
+      returning to; see the per-source column-ledger idea (docs/restructure,
+      source-column-mappings).
+    subsections:
+      - anchor: design-data-mapping
+        heading: "Source → column-level field mapping"
+        required: false
+        guidance: >
+          Source columns → node/edge properties: the literal SQL SELECT-list and how each
+          column lands (or is filtered / excluded). The data-pipeline ingestion-layer view;
+          a purely project-design-level TDD may mark this "N/A — no ingestion".
+
+  - anchor: classification-security
+    heading: "Classification & security"
+    required: true
+    guidance: >
+      DryDocs-specific: the sensitivity classification of what this design handles and how
+      the publish boundary is honoured (PUBLISH-BOUNDARY.md). Use "N/A — <reason>" if none.
+
+  - anchor: qa-tests
+    heading: "QA & tests"
+    required: true
+    guidance: >
+      How this is proven: unit tests, SIT/UAT, and the graph verify invariants
+      (m1/m3-verify) that gate it.
+
+  - anchor: hitl-gate
+    heading: "HITL gate & open questions"
+    required: true
+    guidance: >
+      DryDocs-specific: any ontology/edge-meaning decision routed through the SME gate
+      (03-hitl-sme-flow.md), its gate-log reference, and open questions. "N/A" if none.
+
+  - anchor: traceability-matrix
+    heading: "Requirements traceability matrix"
+    required: true
+    guidance: >
+      THE SPINE (enterprise §6). One row per requirement/capability; columns:
+      requirement | design-section anchor | component/module | test/verify | status.
+      This is what makes a scanned pen note or a save-button comment land at "a trackable
+      place within the requirements". See the traceability contract below for how strict
+      this is right now.
+
+  - anchor: decisions-discussions
+    heading: "Decisions & discussions"
+    required: false
+    guidance: "Open discussions, alternatives weighed, links to ADRs."
+
+  - anchor: appendices
+    heading: "Appendices"
+    required: false
+    guidance: "Supporting detail, long tables, sample payloads."
+
+# ── The traceability contract the validator enforces (the tracking half of ───────
+#    "deterministic"). LOOSE now, tighten later — a deliberate decision (2026-07-08).
+traceability:
+  # mode: loose  — matrix present with a table; every row cites a design-section anchor
+  #                + a test/verify. Requirement ids are OPTIONAL / free-form and NOT
+  #                format-checked; no body-orphan check.
+  # mode: strict — additionally: every requirement id matches requirement_id_pattern and
+  #                appears exactly once (no duplicate rows, no body-orphan ids).
+  #
+  # WHY loose now: the project's real requirements live in the author's head + scattered
+  # notes — surfacing and formalising them is exactly what the ingestion loop is FOR. Keep
+  # this loose while the data pipeline is built out; flip to `strict` once the loop has
+  # captured the requirements and the FR/UC/NFR ids are real.
+  mode: loose
+  requirement_id_pattern: '^(FR|UC|NFR)-[A-Z0-9]+-\d+$'   # applied only in strict mode
+  matrix_section: traceability-matrix
+  rules:
+    - "loose + strict: the matrix section is present and holds a markdown table"
+    - "loose + strict: every row cites a design-section anchor that exists in this outline"
+    - "loose + strict: every row cites a non-empty test/verify"
+    - "strict only: every requirement id matches requirement_id_pattern, appears exactly once, and no id is used in the body without a matrix row"

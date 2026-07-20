@@ -1,0 +1,21 @@
+classifier_name,namespace,scope,full_tag,notes
+Confidentiality Classification,<OrgCatalog>,Element,<OrgCatalog>: Confidentiality Classification,Data sensitivity level
+Personal Information Indicator,<OrgCatalog>,Element,<OrgCatalog>: Personal Information Indicator,PII flag
+Direct Identifier Indicator,<OrgCatalog>,Element,<OrgCatalog>: Direct Identifier Indicator,Direct PII (name/SSN/etc)
+Protection Enhancement,<OrgCatalog>,Element,<OrgCatalog>: Protection Enhancement,Additional protection required
+Protection Group Code,<OrgCatalog>,Element,<OrgCatalog>: Protection Group Code,Protection grouping code
+Data Protection Driver,<OrgCatalog>,Element,<OrgCatalog>: Data Protection Driver,Regulatory driver for protection
+Sub Line of Business,<OrgCatalog>,Element,<OrgCatalog>: Sub Line of Business,LOB subdivision (also on Dataset)
+Payment Card Industry Indicator,<OrgCatalog>,Element,<OrgCatalog>: Payment Card Industry Indicator,PCI-DSS flag
+Sensitive Classifier,<OrgCatalog>,Element,<OrgCatalog>: Sensitive Classifier,General sensitive data flag
+Other Restricted Classifier,<OrgCatalog>,Element,<OrgCatalog>: Other Restricted Classifier,Non-enumerated restriction
+Third Party Classifier,<OrgCatalog>,Element,<OrgCatalog>: Third Party Classifier,Third-party data flag
+Credit Bureau Or Consumer Report Classifier,<OrgCatalog>,Element,<OrgCatalog>: Credit Bureau Or Consumer Report Classifier,FCRA-regulated data
+Digital Wallet Classifier,<OrgCatalog>,Element,<OrgCatalog>: Digital Wallet Classifier,Digital wallet/payments data
+HR Workforce Data Classifier,<OrgCatalog>,Element,<OrgCatalog>: HR Workforce Data Classifier,Employee data
+MNPi Classifier,<OrgCatalog>,Element,<OrgCatalog>: MNPi Classifier,Material Non-Public Information (SEC/FINRA)
+Data Aggregator Classifier,<OrgCatalog>,Element,<OrgCatalog>: Data Aggregator Classifier,Third-party aggregator data
+Models Classifier,<OrgCatalog>,Element,<OrgCatalog>: Models Classifier,ML model input/output data
+Privacy Classifier,<OrgCatalog>,Element,<OrgCatalog>: Privacy Classifier,Privacy-regulated data (CCPA/GDPR)
+Data Use Classifier,<OrgCatalog>,Dataset,<OrgCatalog>: Data Use Classifier,Allowed use cases for the dataset
+Sub Line of Business,<OrgCatalog>,Dataset,<OrgCatalog>: Sub Line of Business,LOB subdivision (also on Element)

@@ -1,0 +1,7 @@
+team_id,name,jira_board_id,parent_product_id
+T0042,CCB Auto Risk Pod,JIRA-AUTO,PROD_AUTO_05
+T0099,CCB Auto Onboarding,JIRA-ONBOARD,PROD_AUTO_07
+T0100,CCB Card Risk,JIRA-CARDRISK,PROD_CARD_03
+T0117,CCB Home Lending Servicing,JIRA-HLSERVICE,PROD_HL_12
+T0250,DAT Account Core,JIRA-DAT-AC,PROD_DAT_01
+T0299,Risk Published Data,JIRA-RPD,PROD_RISK_01

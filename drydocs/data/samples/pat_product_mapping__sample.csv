@@ -1,0 +1,5 @@
+team_id,product_id,area_product_id,seal_ids,team_type,sponsored,sponsored_product_id,sponsored_area_product_id
+T0042,PROD_AUTO_05,AP_AUTO_PUB,900101; 900102,dedicated,false,,
+T0099,PROD_AUTO_07,,900201,aligned,false,,
+T0100,PROD_CARD_03,AP_CARD_PUB,,flex,false,PROD_AUTO_05,AP_AUTO_PUB2
+T0117,PROD_HL_12,,,aligned,false,,

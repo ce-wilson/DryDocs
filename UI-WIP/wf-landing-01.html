@@ -1,0 +1,198 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>wf-landing-01 — radial-hub landing (rung 3 line wireframe)</title>
+<style>
+  /* Rung-3 rules: grayscale only, boxes + labels, no theme, print-friendly. */
+  :root { --ink:#333; --line:#8a8a8a; --fill:#f2f2f2; --faint:#bbb; }
+  * { box-sizing:border-box; margin:0; }
+  body { font:13px/1.45 "Segoe UI", Arial, sans-serif; color:var(--ink); background:#fff; padding:16px; }
+  .note { color:#666; margin:0 0 12px; max-width:960px; }
+  .frame { max-width:1180px; border:2px solid var(--ink); }
+  .zone { border:1px dashed var(--line); position:relative; }
+  .tag { position:absolute; top:2px; right:6px; font-size:10px; color:var(--faint); letter-spacing:.06em; }
+  .box { border:1px solid var(--line); background:var(--fill); padding:4px 10px; display:inline-block; }
+  .ann { display:inline-block; width:16px; height:16px; border:1px solid var(--ink); border-radius:50%;
+         text-align:center; font-size:10px; line-height:14px; background:#fff; }
+
+  header.hd { display:flex; align-items:center; gap:12px; padding:10px 14px; border-bottom:2px solid var(--ink); }
+  .hd .search { flex:1; max-width:420px; border:1px solid var(--line); padding:5px 10px; color:#777; }
+  .hd .spacer { flex:1; }
+
+  .body { display:flex; }
+  aside.aside { width:190px; border-right:2px solid var(--ink); padding:10px; display:flex; flex-direction:column; min-height:760px; }
+  .aside nav { flex:1; display:flex; flex-direction:column; gap:4px; margin-top:8px; }
+  .aside nav a { border:1px solid var(--line); padding:5px 8px; color:var(--ink); text-decoration:none; }
+  .aside nav a.active { background:#ddd; font-weight:600; }
+  .aside .foot { border-top:1px dashed var(--line); padding-top:8px; color:#666; }
+
+  main.main { flex:1; display:flex; flex-direction:column; }
+  .toolbar { border-bottom:1px dashed var(--line); padding:8px 14px; color:#555; }
+
+  .hub { padding:6px 0 2px; }
+  .hub svg { display:block; margin:0 auto; }
+  .cta { text-align:center; padding:8px 0 14px; }
+  .cta .box { font-weight:600; }
+
+  .cards { display:grid; grid-template-columns:repeat(4,1fr); gap:10px; padding:12px 14px; border-top:1px dashed var(--line); }
+  .card { border:1px solid var(--line); background:var(--fill); padding:10px; min-height:74px; }
+  .card b { display:block; margin-bottom:4px; }
+  .onboard { margin:0 14px 12px; border:1px dashed var(--line); padding:8px 12px; color:#666; }
+  footer.ft { border-top:2px solid var(--ink); padding:8px 14px; color:#777; display:flex; justify-content:space-between; }
+
+  .key { max-width:1180px; margin-top:14px; color:#555; }
+  .key li { margin:2px 0 2px 4px; }
+</style>
+</head>
+<body>
+
+<p class="note"><strong>wf-landing-01 (rung 3)</strong> — line wireframe of the radial-hub
+landing. Structure and geometry only: grayscale, no theme, placeholder copy. Spec:
+<code>site-plan.md §3</code> · text wireframe: <code>wf-landing-01.md</code> · backlog <strong>O9</strong>.</p>
+
+<div class="frame">
+
+  <header class="hd">
+    <span class="box">LOGO · DryDocs</span>
+    <span class="search">search: nodes, servers, jobs…</span>
+    <span class="spacer"></span>
+    <span class="box">Prod | UAT | Dev</span>
+    <span class="box" title="3-state theme toggle">◐ sys/dark/light <span class="ann">6</span></span>
+    <span class="box">🔔</span>
+    <span class="box">@</span>
+    <span class="tag">HEADER 64px</span>
+  </header>
+
+  <div class="body">
+    <aside class="aside zone">
+      <span class="tag">ASIDE 250px</span>
+      <span class="box">☰ modules <span class="ann">1</span></span>
+      <nav>
+        <a class="active" href="#/">Overview <span class="ann">3</span></a>
+        <a href="#/explorer">Explorer</a>
+        <a href="#/lineage">Lineage</a>
+        <a href="#/ownership">Ownership</a>
+        <a href="#/runbooks">Runbooks</a>
+        <a href="#/remediation">Remediation</a>
+        <a href="#/docs">Docs</a>
+        <a href="#/gates">Gates</a>
+        <a href="#/loads">Loads</a>
+      </nav>
+      <div class="foot">Settings<br>Profile<br>Sign out</div>
+    </aside>
+
+    <main class="main">
+      <div class="toolbar zone">Home <span class="tag">TOOLBAR (page-owned; no actions on Overview)</span></div>
+
+      <div class="hub zone">
+        <span class="tag">RADIAL HUB — SVG, ~55–60% viewport <span class="ann">2</span></span>
+        <svg viewBox="0 0 1000 560" width="100%" height="470" role="img"
+             aria-label="Radial hub: core sphere with eight module spokes at 45-degree intervals">
+          <defs>
+            <marker id="dot" viewBox="0 0 4 4" refX="2" refY="2" markerWidth="4" markerHeight="4">
+              <circle cx="2" cy="2" r="1.6" fill="#8a8a8a"/>
+            </marker>
+          </defs>
+          <!-- spokes: lines core -> node, 8 x 45deg, clockwise from 12 o'clock -->
+          <g stroke="#8a8a8a" stroke-width="1.4">
+            <line x1="500" y1="215" x2="500" y2="118"  marker-end="url(#dot)"/> <!-- N  Explorer -->
+            <line x1="546" y1="234" x2="672" y2="146"  marker-end="url(#dot)"/> <!-- NE Lineage -->
+            <line x1="565" y1="280" x2="738" y2="280"  marker-end="url(#dot)"/> <!-- E  Docs -->
+            <line x1="546" y1="326" x2="672" y2="414"  marker-end="url(#dot)"/> <!-- SE Gates -->
+            <line x1="500" y1="345" x2="500" y2="442"  marker-end="url(#dot)"/> <!-- S  Loads -->
+            <line x1="454" y1="326" x2="328" y2="414"  marker-end="url(#dot)"/> <!-- SW Remediation -->
+            <line x1="435" y1="280" x2="262" y2="280"  marker-end="url(#dot)"/> <!-- W  Runbooks -->
+            <line x1="454" y1="234" x2="328" y2="146"  marker-end="url(#dot)"/> <!-- NW Ownership -->
+          </g>
+
+          <!-- core -->
+          <circle cx="500" cy="280" r="65" fill="#e6e6e6" stroke="#333" stroke-width="2"/>
+          <text x="500" y="276" text-anchor="middle" font-size="14" font-weight="600" fill="#333">CORE</text>
+          <text x="500" y="294" text-anchor="middle" font-size="10" fill="#666">brand sphere (SVG)</text>
+
+          <!-- module nodes: box + name + one-liner + health dot placeholder -->
+          <!-- template: g > rect + texts + health circle -->
+          <g font-size="12" fill="#333" text-anchor="middle">
+            <g><!-- N Explorer -->
+              <rect x="435" y="62" width="130" height="52" fill="#f2f2f2" stroke="#8a8a8a"/>
+              <circle cx="447" cy="74" r="4" fill="#fff" stroke="#8a8a8a"/>
+              <text x="500" y="84" font-weight="600">Explorer</text>
+              <text x="500" y="100" font-size="10" fill="#666">towers · apps · jobs</text>
+            </g>
+            <g><!-- NE Lineage -->
+              <rect x="620" y="96" width="130" height="52" fill="#f2f2f2" stroke="#8a8a8a"/>
+              <circle cx="632" cy="108" r="4" fill="#fff" stroke="#8a8a8a"/>
+              <text x="685" y="118" font-weight="600">Lineage</text>
+              <text x="685" y="134" font-size="10" fill="#666">source → target</text>
+            </g>
+            <g><!-- E Docs -->
+              <rect x="742" y="254" width="130" height="52" fill="#f2f2f2" stroke="#8a8a8a"/>
+              <circle cx="754" cy="266" r="4" fill="#fff" stroke="#8a8a8a"/>
+              <text x="807" y="276" font-weight="600">Docs</text>
+              <text x="807" y="292" font-size="10" fill="#666">corpus · provenance</text>
+            </g>
+            <g><!-- SE Gates -->
+              <rect x="620" y="412" width="130" height="52" fill="#f2f2f2" stroke="#8a8a8a"/>
+              <circle cx="632" cy="424" r="4" fill="#fff" stroke="#8a8a8a"/>
+              <text x="685" y="434" font-weight="600">Gates</text>
+              <text x="685" y="450" font-size="10" fill="#666">HITL review queue</text>
+            </g>
+            <g><!-- S Loads -->
+              <rect x="435" y="446" width="130" height="52" fill="#f2f2f2" stroke="#8a8a8a"/>
+              <circle cx="447" cy="458" r="4" fill="#fff" stroke="#8a8a8a"/>
+              <text x="500" y="468" font-weight="600">Loads</text>
+              <text x="500" y="484" font-size="10" fill="#666">runs · health <tspan font-size="9">④</tspan></text>
+            </g>
+            <g><!-- SW Remediation -->
+              <rect x="250" y="412" width="130" height="52" fill="#f2f2f2" stroke="#8a8a8a"/>
+              <circle cx="262" cy="424" r="4" fill="#fff" stroke="#8a8a8a"/>
+              <text x="315" y="434" font-weight="600">Remediation</text>
+              <text x="315" y="450" font-size="10" fill="#666">findings · fixes</text>
+            </g>
+            <g><!-- W Runbooks -->
+              <rect x="128" y="254" width="130" height="52" fill="#f2f2f2" stroke="#8a8a8a"/>
+              <circle cx="140" cy="266" r="4" fill="#fff" stroke="#8a8a8a"/>
+              <text x="193" y="276" font-weight="600">Runbooks</text>
+              <text x="193" y="292" font-size="10" fill="#666">series · generation</text>
+            </g>
+            <g><!-- NW Ownership -->
+              <rect x="250" y="96" width="130" height="52" fill="#f2f2f2" stroke="#8a8a8a"/>
+              <circle cx="262" cy="108" r="4" fill="#fff" stroke="#8a8a8a"/>
+              <text x="315" y="118" font-weight="600">Ownership</text>
+              <text x="315" y="134" font-size="10" fill="#666">SEAL · PAT · teams</text>
+            </g>
+          </g>
+        </svg>
+      </div>
+
+      <div class="cta"><span class="box">CTA: Explore the graph → /explorer <span class="ann">5</span></span></div>
+
+      <div class="cards zone">
+        <span class="tag">BENEFIT CARDS ×4 <span class="ann">7</span></span>
+        <div class="card"><b>Automated Discovery</b>placeholder copy</div>
+        <div class="card"><b>Impact Analysis</b>placeholder copy</div>
+        <div class="card"><b>Governance &amp; Posture</b>placeholder copy</div>
+        <div class="card"><b>Change Management</b>placeholder copy</div>
+      </div>
+
+      <div class="onboard zone">☐ onboarding checklist (first-run, dismissible) — contents TBD (open item)</div>
+
+      <footer class="ft"><span>© DryDocs</span><span>Docs | API | GitHub | Support</span></footer>
+    </main>
+  </div>
+</div>
+
+<ol class="key">
+  <li><b>①</b> one module-registry array drives nav AND spokes — same routes.</li>
+  <li><b>②</b> hub is desktop sugar: narrow screens degrade to a module card grid; aside → off-canvas drawer.</li>
+  <li><b>③</b> Overview = this page; nav-active, no spoke (the core represents it).</li>
+  <li><b>④</b> health dots stay neutral until wired to the Loads QuerySpec (no fake green).</li>
+  <li><b>⑤</b> CTA is generic → /explorer (design-review fix).</li>
+  <li><b>⑥</b> 3-state theme toggle (System default / Dark / Light) lives in the header.</li>
+  <li><b>⑦</b> benefit-card copy is placeholder; copywriting pass is a later, separate rung.</li>
+</ol>
+
+</body>
+</html>

@@ -1,0 +1,120 @@
+# SME gate-prompt spec — Q1–Q3 resolutions + phase-1 load scope (controlm-psgmgr).
+# Ratifies the 2026-07-07 SME review of docs/restructure/06a (ER review): joins,
+# audit envelope, labels, identity, and the active-only initial-load scope.
+# Mechanism-only: column names and rules, no data values. classification: Internal-Public.
+classification: Internal-Public
+schema: drydocs.gate-prompt.v1
+id: controlm-q1q3-phase1
+title: "SME Gate — Control-M Q1–Q3 resolutions + phase-1 load scope"
+step: "Ratifies the 06a ER-review answers before loader changes (feeds doc 06 Phase 0)"
+summary: >
+  Confirms the SME answers to 06a Q1–Q3 (extract joins, audit envelope, labels) plus the
+  phase-1 scope decisions: active-only initial load, the ControlMApplication grouping,
+  the CTLM_ID identity proposal, and MEMNAME demotion. Every derived property below is
+  marked DERIVED so it is visible what came from the source and what DryDocs inferred.
+meta:
+  Module: "drydocs-core"
+  Source: "oracle:psgmgr.CM_DEF_* views — live extract, no CSV"
+  Software: "controlm (Control-M) MADE_BY bmc — config/taxonomy/software-registry.yaml"
+  Registry ref: "controlm-psgmgr — confirmed (config/source-registry.yaml); orchestrator: bmc-controlm (baseline)"
+  Classification: "Internal (source data) · this page Internal-Public (mechanism only)"
+  Taxonomy: "config/taxonomy/ — folders, jobs, conditions, dependencies, variables"
+  Ontology map: "config/taxonomy-ontology-map.yaml + drydocs_core/ontology/relationship_vocabulary.yaml"
+  Source of record: "docs/restructure/06a-controlm-source-er-review.md (+ SME answers 2026-07-07)"
+mapping:
+  - n: 1
+    element: "CM_DEF_VTAB row (folder)"
+    target: ":ControlMFolder:Collection {folder_id}"
+    edge: "(:ControlMApplication)-[:CONTAINS_FOLDER]->(:ControlMFolder)  [PROPOSED]"
+  - n: 2
+    element: "CM_DEF_VTAB.DATA_CENTER (unique values)"
+    target: ":ControlMServer:Platform {name}"
+    edge: "(:ControlMFolder)-[:SCHEDULED_ON]->(:ControlMServer)"
+  - n: 3
+    element: "CM_DEF_VJOB.APPLICATION (unique values — Control-M app, NOT business app)"
+    target: ":ControlMApplication:Collection {name}  [PROPOSED]"
+    edge: "-[:CONTAINS_FOLDER]->  [PROPOSED — register status: planned]"
+  - n: 4
+    element: "CM_DEF_VJOB row (job; header row JOB_ID=1 / task type SMART Table = the folder itself)"
+    target: ":ControlMJob:Activity {folder_id, job_id}"
+    edge: "(:ControlMFolder)-[:CONTAINS_JOB]->(:ControlMJob)"
+  - n: 5
+    element: "CM_DEF_LNKI_P_VW / CM_DEF_LNKO_P_VW rows"
+    target: ":Condition:Entity"
+    edge: "(:ControlMJob)-[:REQUIRES_IN_CONDITION|EMITS_OUT_CONDITION]->(:Condition)"
+  - n: 6
+    element: "LNKO ⋈ LNKI on CONDITION (pass 2 — recursive dependency query)"
+    target: "no node — matches existing jobs"
+    edge: "(consumer)-[:WAS_INFORMED_BY {via_condition}]->(producer)"
+provenance:
+  - label: ":ControlMFolder"
+    source_object: "CM_DEF_VTAB"
+    key: "folder_id"
+    loader: "controlm_folders"
+    properties:
+      - {name: folder_id, origin: source, from: TABLE_ID}
+      - {name: name, origin: source, from: SCHED_TABLE}
+      - {name: user_daily, origin: source, from: USER_DAILY, note: "scheduling MODE (cycles manual↔scheduled), not an active flag"}
+      - {name: table_status, origin: source, from: TABLE_STATUS, note: "BMC definition still to confirm"}
+      - {name: instance_name, origin: source, from: INSTANCE_NAME}
+      - {name: last_updated, origin: source, from: LAST_UPDATED, note: "audit: source-updated-at"}
+      - {name: last_updated_user, origin: source, from: LAST_UPDATED_USER, note: "audit: source-updated-by"}
+      - {name: capture_date, origin: source, from: CAPTURE_DATE, note: "replication time — never authorship"}
+      - {name: active, origin: derived, from: "USER_DAILY IS NOT NULL", note: "PHASE-1 SCOPE FILTER — readability choice, not semantic truth"}
+      - {name: environment / environment_code, origin: derived, from: "name pos 1 (PRAOCG)", note: "naming-convention parse"}
+      - {name: lob / lob_code, origin: derived, from: "name pos 2 (PRAOCG)"}
+      - {name: app_code, origin: derived, from: "name pos 3–5 (PRAOCG)", note: "CAVEAT: usually a PLATFORM code, not the application"}
+      - {name: folder_type / folder_type_code, origin: derived, from: "name pos 6 (PRAOCG)", note: "legacy names carry frequency codes here"}
+      - {name: employee_sid, origin: derived, from: "LAST_UPDATED_USER minus trailing 'p'", note: "PROPOSED normalization"}
+  - label: ":ControlMServer"
+    source_object: "CM_DEF_VTAB"
+    key: "name"
+    loader: "controlm_folders"
+    properties:
+      - {name: name, origin: source, from: DATA_CENTER, note: "one node per unique value (confirmed pattern)"}
+  - label: ":ControlMApplication (PROPOSED)"
+    source_object: "CM_DEF_VJOB"
+    key: "name"
+    loader: "controlm_jobs (extend)"
+    properties:
+      - {name: name, origin: source, from: APPLICATION, note: "Control-M grouping — unrelated to business/software :Application (SEAL)"}
+  - label: ":ControlMJob"
+    source_object: "CM_DEF_VJOB ⋈ CM_DEF_VTAB"
+    key: "(folder_id, job_id)"
+    loader: "controlm_jobs"
+    properties:
+      - {name: job_id, origin: source, from: JOB_ID, note: "JOB_ID=1 = the folder header row"}
+      - {name: name, origin: source, from: JOB_NAME, note: "= JOB_MEM_NAME in cm_avg_run (runtime-supplement join key)"}
+      - {name: owner, origin: source, from: OWNER, note: "run-as functional ID — service identity, not a person"}
+      - {name: author, origin: source, from: AUTHOR, note: "authoring SID"}
+      - {name: node_id, origin: source, from: NODE_ID, note: "host/agent the job runs on"}
+      - {name: cmd_line, origin: source, from: CMD_LINE, note: "the lineage signal (dataset/pipeline GUIDs)"}
+      - {name: task_type / cyclic / description, origin: source, from: "TASK_TYPE / CYCLIC / DESCRIPTION"}
+      - {name: memname, origin: source, from: MEMNAME, note: "DEMOTED — informational only; may be junk; never a key/join"}
+      - {name: created_by / created_at, origin: source, from: "CREATION_USER / CREATION_DATE", note: "PROPOSED audit envelope — currently not extracted"}
+      - {name: changed_by / changed_at, origin: source, from: "CHANGE_USERID / CHANGE_DATE", note: "PROPOSED — VERSION_USER/TIMESTAMP duplicate these; excluded"}
+      - {name: ctlm_id, origin: derived, from: "TABLE_ID || '.' || JOB_ID", note: "PROPOSED single-property identity (identity decision — this gate)"}
+sections:
+  - title: "A. Q1 — extract joins"
+    confirmations:
+      - "Conditions extracts (LNKI/LNKO) join CM_DEF_VJOB in SQL, guaranteeing current-version jobs in the same extract (not resolved later at graph load)."
+      - "SETVAR joins VJOB on (TABLE_ID, JOB_ID); folder-scope rows are the JOB_ID=1 / SMART-Table header rows."
+      - "Two-pass load confirmed: pass 1 = folder + job nodes (one extract); pass 2 = dependencies from the recursive in/out-condition query."
+  - title: "B. Q2 — audit envelope"
+    confirmations:
+      - "Envelope = CREATION_USER/CREATION_DATE (created) + CHANGE_USERID/CHANGE_DATE (changed); VERSION_USER/VERSION_TIMESTAMP duplicate the CHANGE pair and are excluded."
+      - "USER and USER_ID name variants are the same data field."
+      - "Trailing-'p' strip on *_USER SIDs (to employee SID) is approved as a derived property, kept distinct from the raw column."
+      - "IS_CURRENT_VERSION is unreliable across legacy vs new folders — a domain-value probe is required before it stays a hard filter."
+  - title: "C. Q3 — labels"
+    confirmations:
+      - "Two-labels-per-folder-row confirmed: :ControlMFolder + :ControlMServer (one server node per unique DATA_CENTER)."
+      - ":ControlMApplication:Collection is approved as a new label (Control-M app grouping; name avoids collision with business :Application)."
+      - "CONTAINS_FOLDER is registered in relationship_vocabulary.yaml as status: planned before any load writes it."
+      - "Variables stay staging-only for now (node-vs-property decision deferred, not implied)."
+  - title: "D. Phase-1 load scope"
+    confirmations:
+      - "Initial load = active folders only (USER_DAILY IS NOT NULL) — recorded as a readability choice, NOT a claim that NULL folders are inactive (manual-order/-PRPL folders run in production)."
+      - "The review module decides later whether manual-order folders are kept; support ownership comes from the escalation-DB rule, never from naming or USER_DAILY."
+      - "CTLM_ID (TABLE_ID || '.' || JOB_ID) is approved as a derived identity property alongside the (folder_id, job_id) node key."
+      - "Safe to transcribe these decisions into config/gate-log.md and update 06a + the ontology map."

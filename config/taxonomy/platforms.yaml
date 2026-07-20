@@ -1,0 +1,70 @@
+# =============================================================================
+# config/taxonomy/platforms.yaml — platform / execution-technology taxonomy.
+#
+# PLACEHOLDER (status: placeholder, confirmed: false). Created 2026-07-09 as the
+# reconciliation surface for the "platform" layer — the *what runs it* technology
+# taxonomy that today is split across three half-models:
+#   1. :SchedulerKind — placeholder vocab {ControlM, Autosys, Airflow}, seeded in
+#      drydocs_core/schema/ontology.cypher + the scheduler_kind constraint. SLATED FOR
+#      DEPRECATION -> :AisCapability + :AiTool (user 2026-07-09).
+#   2. :Scheduler {kind, instance} — a *deployed* scheduler instance
+#      (docs/history/LoadPlanV3.md; not yet built), vs the SchedulerKind classifier.
+#   3. config/taxonomy/software-registry.yaml — third-party :Vendor /
+#      :SoftwareProduct ledger (plan-07 / ADR 0004); orchestrators live there too.
+#
+# This file does NOT decide the model — it HOLDS the reconciliation until the SME
+# defines :AisCapability + :AiTool at the HITL gate (docs/restructure/
+# 03-hitl-sme-flow.md). Nothing here is loaded; no vocabulary is activated;
+# ontology/node-meaning => the gate, never auto-decided.
+#
+# Related: config/taxonomy-ontology-map.yaml#requires-scheduler (to_node
+# provisional), drydocs_core/ontology/relationship_vocabulary.yaml#seal_requires_scheduler
+# (planned), backlog C6, docs/restructure/IDEAS.md (SchedulerKind-deprecation capture).
+# =============================================================================
+
+schema: drydocs.platforms.v1          # DRAFT — shape not yet finalized
+classification: Internal-Public       # design/mechanism only; real platform INSTANCES/values -> internal/
+status: placeholder
+confirmed: false
+updated: 2026-07-09
+
+# ── What this taxonomy must reconcile (all OPEN — SME / HITL gate) ────────────
+reconciliation:
+  target: "Replace :SchedulerKind with :AisCapability + :AiTool (user 2026-07-09)."
+  open_questions:
+    - "What does :AisCapability represent (a capability, e.g. 'batch scheduling') and :AiTool (the concrete tool, e.g. Control-M / Autosys / Airflow)?"
+    - "How does the app batch port's REQUIRES_SCHEDULER re-target — one edge (:Port -> :AiTool) or two (:Port -> :AisCapability and :AiTool -[:PROVIDES]-> :AisCapability)?"
+    - "Does :Scheduler {kind, instance} (a deployed instance, LoadPlanV3) fold into :AiTool, or stay a separate instance layer beneath it?"
+    - "Relation to software-registry.yaml: is an :AiTool the SAME node as a :SoftwareProduct (e.g. BMC Control-M), or a distinct platform view over it?"
+    - "Classification: are 'AIS' / :AisCapability / :AiTool internal code-names? If so, real instances/values stay in internal/ (PUBLISH-BOUNDARY.md)."
+
+# ── Seed: what is known today (the current :SchedulerKind placeholder vocab) ──
+# Public orchestrator tool names, already seeded in ontology.cypher as
+# :SchedulerKind. Carried here as the migration seed. The ais_capability /
+# ai_tool / software_registry_ref mappings are TBD — do NOT invent them; they
+# are resolved at the gate once :AisCapability + :AiTool are defined.
+platforms:
+  - id: controlm
+    label: "BMC Control-M"
+    current_class: SchedulerKind        # today
+    scheduler_kind: ControlM
+    phase_supported: 1
+    software_registry_ref: ~            # TBD — reconcile to the real vendor/product id at the gate
+    ais_capability: ~                   # TBD (gate)
+    ai_tool: ~                          # TBD (gate)
+  - id: autosys
+    label: "CA Autosys"
+    current_class: SchedulerKind
+    scheduler_kind: Autosys
+    phase_supported: 2
+    software_registry_ref: ~
+    ais_capability: ~
+    ai_tool: ~
+  - id: airflow
+    label: "Apache Airflow"
+    current_class: SchedulerKind
+    scheduler_kind: Airflow
+    phase_supported: 2
+    software_registry_ref: ~
+    ais_capability: ~
+    ai_tool: ~

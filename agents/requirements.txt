@@ -1,0 +1,5 @@
+# drydocs-agents — ADK agent service (own venv, NOT part of the poetry env).
+# python -m venv .venv && .venv\Scripts\pip install -r requirements.txt
+google-adk
+neo4j
+python-dotenv

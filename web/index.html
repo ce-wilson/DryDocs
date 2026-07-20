@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <!--
+      Pre-paint theme boot (O8 acceptance): reads localStorage override, else the
+      visitor's system scheme, and stamps `dark` on <html> BEFORE the stylesheet
+      paints — no flash of the wrong theme. Kept intentionally tiny/inline (not a
+      bundled module) so it runs synchronously ahead of the React bundle. The
+      React-side theme logic in src/lib/theme.ts mirrors this exactly; if you
+      change one, change both. Fonts are self-hosted via @fontsource, imported in
+      src/main.tsx — no Google Fonts CDN (intranet target, design-review finding).
+    -->
+    <script>
+      (function () {
+        try {
+          var KEY = 'drydocs.theme.v1';
+          var stored = localStorage.getItem(KEY);
+          var mode = stored === 'dark' || stored === 'light' ? stored : 'system';
+          var systemDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+          var isDark = mode === 'dark' || (mode === 'system' && systemDark);
+          var root = document.documentElement;
+          root.classList.toggle('dark', isDark);
+          root.setAttribute('data-theme-mode', mode);
+          root.style.colorScheme = isDark ? 'dark' : 'light';
+        } catch (e) {
+          /* localStorage unavailable (privacy mode, etc.) — system scheme via CSS media query still applies */
+        }
+      })();
+    </script>
+    <title>DryDocs Console</title>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>

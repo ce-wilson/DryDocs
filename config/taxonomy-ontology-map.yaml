@@ -1,0 +1,784 @@
+# =============================================================================
+# config/taxonomy-ontology-map.yaml — the HITL-confirmed bridge.
+#
+# THE central artifact of the configuration layer. Each entry says:
+#   "this imported TAXONOMY element  →  apply THIS ONTOLOGY rule."
+#
+# Lifecycle of every entry:
+#   proposed   → ontology-mapper drafted it from the PROV matrix
+#   confirmed  → SME approved via the guided gate (docs/restructure/03-hitl-sme-flow.md)
+#   applied    → a loader has written it to the graph
+#   rejected   → SME declined; kept for audit, never loaded
+#
+# A taxonomy NEVER becomes graph edges until its mapping is `confirmed`.
+# This is the fix for the POC drift (relationships that ignored taxonomy/ontology).
+# =============================================================================
+
+schema: drydocs.taxonomy-ontology-map.v1
+updated: 2026-07-19                        # C7: structured vocab_id/capture fields backfilled on post-2026-07-10 entries
+
+mappings:
+
+  # ---- Example: a confirmed orchestration mapping (already live) -----------
+  - id: job-contains
+    taxonomy:
+      source: controlm-psgmgr
+      element: "Folder contains Job"      # raw classification from the import
+    ontology:
+      from_node: ControlMFolder                 # prov:Collection
+      to_node: ControlMJob                 # prov:Activity
+      prov_type_from: Collection
+      prov_type_to: Activity
+      matrix_row: "Collection → any = prov:hadMember"
+      neo4j_label: CONTAINS_JOB            # domain alias mapping to hadMember
+      prov_maps_to: "prov:hadMember"
+    precedence_authority: bmc-baseline
+    status: applied
+    applied_on: 2026-06-09
+    confirmed_by: "(seed)"
+    confirmed_on: 2026-06-09
+
+  # ---- 2026-07-07 gate: Q1–Q3 resolutions (controlm-q1q3-phase1) ------------
+  - id: application-contains-folder
+    taxonomy:
+      source: controlm-psgmgr
+      element: "Control-M APPLICATION groups folders (CM_DEF_VJOB.APPLICATION — NOT the business application)"
+    ontology:
+      from_node: ControlMApplication            # prov:Collection (new label, this gate)
+      to_node: ControlMFolder                   # prov:Collection
+      prov_type_from: Collection
+      prov_type_to: Collection
+      matrix_row: "Collection → any = prov:hadMember"
+      neo4j_label: CONTAINS_FOLDER
+      prov_maps_to: "prov:hadMember"
+    precedence_authority: bmc-baseline
+    vocab_id: m3_contains_folder
+    status: applied                             # loader: controlm_folders.cypher (folder-pass header-row join)
+    applied_on: 2026-07-07
+    confirmed_by: SME
+    confirmed_on: 2026-07-07
+
+  # ---- C1: Control-M edges (reuse ACTIVE vocabulary terms — batch-confirm) --
+  # Source taxonomy: config/taxonomy/controlm.yaml. Each reuses an existing
+  # `status: active` entry in relationship_vocabulary.yaml (the mature M3 model),
+  # so the matrix row + node classifications are already confirmed — no new terms.
+
+  - id: folder-scheduled-on
+    taxonomy:
+      source: controlm-psgmgr
+      element: "Folder is scheduled on a Control-M server (data center)"
+    ontology:
+      from_node: ControlMFolder                 # prov:Collection
+      to_node: ControlMServer              # local Platform — NOT an Agent
+      prov_type_from: Collection
+      prov_type_to: "n/a (infrastructure)"
+      matrix_row: "no PROV row — infrastructure placement"
+      neo4j_label: SCHEDULED_ON
+      prov_maps_to: ~                       # null on purpose: ControlMServer is not an Agent
+    precedence_authority: bmc-baseline
+    vocab_id: m3_scheduled_on
+    status: confirmed
+    confirmed_by: SME
+    confirmed_on: 2026-06-21
+
+  - id: job-requires-in-condition
+    taxonomy:
+      source: controlm-psgmgr
+      element: "Job requires a named IN condition before it runs"
+    ontology:
+      from_node: ControlMJob               # prov:Activity
+      to_node: Condition                   # prov:Entity
+      prov_type_from: Activity
+      prov_type_to: Entity
+      matrix_row: "Activity → Entity = prov:used"
+      neo4j_label: REQUIRES_IN_CONDITION   # domain alias mapping to prov:used
+      prov_maps_to: "prov:used"
+    precedence_authority: bmc-baseline
+    vocab_id: m3_requires_in_condition
+    status: confirmed
+    confirmed_by: SME
+    confirmed_on: 2026-06-21
+
+  - id: job-emits-out-condition
+    taxonomy:
+      source: controlm-psgmgr
+      element: "Job emits a named OUT condition on completion (SIGN +/-)"
+    ontology:
+      from_node: ControlMJob               # prov:Activity
+      to_node: Condition                   # prov:Entity
+      prov_type_from: Activity
+      prov_type_to: Entity
+      matrix_row: "Activity → Entity = prov:generated"
+      neo4j_label: EMITS_OUT_CONDITION     # domain alias mapping to prov:generated
+      prov_maps_to: "prov:generated"
+    precedence_authority: bmc-baseline
+    vocab_id: m3_emits_out_condition
+    status: confirmed
+    confirmed_by: SME
+    confirmed_on: 2026-06-21
+
+  - id: job-was-informed-by
+    taxonomy:
+      source: controlm-psgmgr
+      element: "Successor job depends on predecessor via shared OUT→IN condition (derived)"
+    ontology:
+      from_node: ControlMJob               # prov:Activity (successor)
+      to_node: ControlMJob                 # prov:Activity (predecessor)
+      prov_type_from: Activity
+      prov_type_to: Activity
+      matrix_row: "Activity → Activity = prov:wasInformedBy"
+      neo4j_label: WAS_INFORMED_BY         # replaces the retired DEPENDS_ON
+      prov_maps_to: "prov:wasInformedBy"
+    precedence_authority: bmc-baseline
+    vocab_id: m3_was_informed_by
+    status: confirmed
+    confirmed_by: SME
+    confirmed_on: 2026-06-21
+
+  # ---- K1: SEAL application attribution (PROPOSED — registration before the gate) --
+  # Source: 2026-07-01 company reconciliation (SME-reviewed at source; spec-level on
+  # both repos here — no loader, no supplement, no gate log yet). Activation is K2.
+
+  - id: job-seal-app-ref
+    taxonomy:
+      source: controlm-variable-normalization
+      element: "Job is attributed to its SEAL-registered application (fact_type SEAL)"
+    ontology:
+      from_node: ControlMJob                # prov:Activity
+      to_node: BusinessApplication                  # prov:SoftwareAgent (SEAL-registered)
+      prov_type_from: Activity
+      prov_type_to: Agent
+      matrix_row: "Activity → Agent = prov:wasAssociatedWith"
+      neo4j_label: WAS_ASSOCIATED_WITH
+      role: seal_app_ref
+      prov_maps_to: "prov:wasAssociatedWith"
+    precedence_authority: bmc-baseline
+    vocab_id: m3_seal_app_ref
+    source_evidence: "STG_APP_FACT semantic facts (fact_type SEAL), fed by the Control-M variable-normalization stream (config/source-registry.yaml); NEVER raw job.APPLICATION — documented unreliable for SEAL identity in both repos' loader comments."
+    capture: >
+      waived — no config/taxonomy/ capture file exists for the controlm-variable-normalization
+      stream (the F5 taxonomy-first gap, docs/reviews/tech-debt-taxonomy-ontology-map.md); its
+      registration lives in config/source-registry.yaml. Retrofitting a capture is a
+      taxonomy-importer task — recorded here, not guessed.
+    status: confirmed                       # gate seal-attribution-match-policy SIGNED OFF (match policy; edge shape re-opens with K4, see type_conflict_note)
+    confirmed_by: chad.wilson
+    confirmed_on: 2026-07-14
+    provenance_note: "2026-07-01 company reconciliation; spec-level on both repos; producer registration K1, activation K2. Match policy confirmed 2026-07-14 while :BusinessApplication is still prov:SoftwareAgent (K3 reclass unapplied); the K4 reclass re-opens the edge SHAPE per the K3 §F deferral — the confirmed policy itself is shape-agnostic."
+    open_questions:
+      - "ANSWERED 2026-07-14 (gate): one-to-one match accepted at the top available tier without further review."
+      - "ANSWERED 2026-07-14 (gate): unmatched jobs surface as a per-run coverage count (matched + unmatched = eligible), joins graph_verify; never blocks the run."
+      - "ANSWERED 2026-07-14 (gate): deterministic triage accepted as default (most-recent run_id, then lowest seal_id, last resort only); every multi-hit flagged for after-the-fact audit — no per-case load-time SME calls."
+    type_conflict_note: >
+      2026-07-08 review: this mapping requires :BusinessApplication to be a prov:Agent (matrix row
+      Activity -> Agent = prov:wasAssociatedWith). The proposed SEAL reshape
+      (application-as-dataproduct, this file) reclasses :BusinessApplication to prov:Entity /
+      dprod:DataProduct, which no longer type-checks against wasAssociatedWith. If the reshape
+      is confirmed, this mapping must be RE-SHAPED, not carried forward as-is — see
+      proposed_reshape below. Still status: proposed; not resolved by this note.
+    proposed_reshape: >
+      Re-shape the job<->app link as an attribution/domain edge to the app-as-Entity instead of
+      wasAssociatedWith. Two candidates, NOT decided: (a) ControlMJob -[:USED]-> Application
+      (matrix row Activity -> Entity = prov:used, role=seal_app_ref) if the job is read as
+      consuming/referencing the app record; (b) a local domain edge (prov_maps_to: ~) analogous
+      to arch_contains_batch / dev-team-develops-app, since "job belongs to this business
+      application" reads closer to a containment/ownership fact than a used/consumed fact.
+      Flagged for the SME at the same gate that confirms application-as-dataproduct — see
+      config/gate-prompts/seal-tom-attribution-reshape.yaml section F (K2 re-shape).
+
+  # ---- REQUIRES_SCHEDULER (backlog C6, 2026-07-09) — documented but unregistered ----
+  - id: requires-scheduler
+    taxonomy:
+      source: seal-extract
+      element: "A BatchProcessing data port requires a scheduler technology (which orchestrator runs its batch)"
+    ontology:
+      from_node: Port                       # the BATCH port: :Port:BatchProcessing {kind:"BatchProcessing"}; app-level (:BusinessApplication)-[:HAS_PORT]->(:Port), two per app (EventProcessing/API + BatchProcessing)
+      to_node: SchedulerKind                # PROVISIONAL — slated for deprecation → :AisCapability + :AiTool (user 2026-07-09; not yet defined). Today: {name: ControlM|Autosys|Airflow}, seeded ontology.cypher
+      prov_type_from: Entity                # dprod port (Entity semantics)
+      prov_type_to: ~                        # target class unsettled (SchedulerKind deprecating; replacements undefined)
+      matrix_row: "n/a — infrastructure/capability placement, no PROV row (same family as SCHEDULED_ON)"
+      neo4j_label: REQUIRES_SCHEDULER
+      role: ~
+      prov_maps_to: ~
+    precedence_authority: bmc-baseline
+    vocab_id: seal_requires_scheduler
+    source_evidence: "README.md:263 + docs/history/LoadPlanV3.md:82,393 (documented as a post-load edge); no loader/extract yet — status: planned in relationship_vocabulary.yaml, not wired."
+    status: proposed                         # <-- SME must confirm at the gate (backlog C6)
+    provenance_note: "Registered per backlog C6 (2026-07-09) to close the README/LoadPlanV3-vs-vocab drift. Edge meaning ⇒ HITL gate; not auto-decided."
+    open_questions:
+      - "Attach point: ports are application-level ((:BusinessApplication)-[:HAS_PORT]->(:Port), kind∈{EventProcessing=events/API, BatchProcessing=batch}), so README.md:263 ('on :BusinessApplication') and LoadPlanV3.md:82 ('the :BatchProcessing port') describe the SAME app batch port. SME call = keep the edge on the batch :Port (as here) or hoist to :BusinessApplication. REQUIRES_SCHEDULER is batch-only (the EventProcessing/API port is not scheduler-driven)."
+      - "TARGET (to_node): :SchedulerKind is slated for deprecation → :AisCapability + :AiTool (user 2026-07-09; not yet defined in the ontology). The target here is PROVISIONAL — re-target/reshape onto the replacement class(es) at the gate once defined; whether REQUIRES_SCHEDULER becomes one edge or two is itself an SME call. See config/taxonomy/platforms.yaml (reconciliation placeholder) + the IDEAS SchedulerKind-deprecation capture."
+      - "Confirm null-PROV/infrastructure is correct, vs a weak prov:used / prov:wasInfluencedBy."
+
+  # ---- SEAL ontology reshape — SIGNED OFF 2026-07-10 (K3), APPLIED at K4 ----
+  # Gate config/gate-prompts/seal-tom-attribution-reshape.yaml, sign-off in
+  # config/gate-log.md (2026-07-10). K4 (2026-07-15) applied the reclass + label
+  # normalization (:BusinessApplication), the qualified-attribution loaders, and
+  # the membership deprecations. seal-doc-source-of-record stays confirmed-only
+  # until drydocs-docmeta ships a Document loader.
+
+  - id: application-as-dataproduct
+    taxonomy:
+      source: seal-extract
+      element: "BusinessApplication (SEAL-registered) is a data-product/asset record, not a software agent"
+    ontology:
+      from_node: BusinessApplication               # CURRENT (active): prov:SoftwareAgent — see node_classifications
+      to_node: ~                            # node reclassification, not an edge
+      current_class: "prov:SoftwareAgent"
+      proposed_class: "prov:Entity / dprod:DataProduct"
+      prov_type_from: Agent
+      proposed_prov_type: Entity
+      matrix_row: "n/a — node reclassification, not a matrix edge"
+      rationale: >
+        :BusinessApplication currently carries three incompatible PROV types on one node: SoftwareAgent
+        (node_classifications), dprod:Port children (Entity semantics, seal_has_port — active),
+        and org:Membership/org:Role role-holders (Organization semantics,
+        seal_has_membership/seal_of_role/seal_held_by — active, C2). A SEAL application is a
+        data-product/asset, not an Agent and not an Organization — prov:Entity / dprod:DataProduct
+        is the precise fit, and it is also the type prov:hadPrimarySource (Entity -> Entity)
+        requires of the source-of-record edge (seal-doc-source-of-record below).
+    precedence_authority: lob-product-team
+    standards_cited: ["PROV-O (prov:Entity)", "DPROD/EKGF (dprod:DataProduct)"]
+    vocab_id: ~                             # node reclass, not an edge — see relationship_vocabulary.yaml node_classifications#BusinessApplication (reclass APPLIED)
+    capture: config/taxonomy/business-application.yaml
+    status: applied
+    proposed_at: 2026-07-08
+    confirmed_by: SME
+    confirmed_on: 2026-07-10                # gate §A + label decision (gate-log)
+    applied_on: 2026-07-15                  # K4 clause 1 — reclass + :BusinessApplication label across schema/loaders/tests
+    resolved_questions:
+      - "K1/K2 job->app edge reshape: DEFERRED by the gate (§F) to a K2 follow-up gate — the standing rider on m3_seal_app_ref / job-seal-app-ref, unchanged by K4."
+      - "arch_develops re-check: resolved by gate §E — flipped to (:BusinessApplication)-[:WAS_ATTRIBUTED_TO {role: developed_by}]->(:DevTeam) at K4 clause 5."
+
+  - id: seal-tom-attribution
+    taxonomy:
+      source: seal-extract
+      element: "SEAL Technical Operating Model (TOM) role-holders (gate §B revised fixed 7: application_owner, primary_information_owner, backup_information_owner, cto, technology_risk_controls, design_authority, operate_manager L1/L2) attributed to the BusinessApplication asset"
+    ontology:
+      from_node: BusinessApplication                # PROPOSED class: prov:Entity / dprod:DataProduct
+      to_node: Employee                      # prov:Agent
+      prov_type_from: Entity                 # after the proposed reclass
+      prov_type_to: Agent
+      matrix_row: "Entity -> Agent = prov:wasAttributedTo (simple form)"
+      neo4j_label: WAS_ATTRIBUTED_TO
+      role: tom_role_holder
+      prov_maps_to: "prov:wasAttributedTo"
+      qualified_form:
+        pattern: "BusinessApplication -[:QUALIFIED_ATTRIBUTION]-> (:Attribution) -[:HAS_AGENT]-> Employee ; (:Attribution) -[:HAD_ROLE]-> TOMRole"
+        prov_maps_to: ["prov:qualifiedAttribution", "prov:agent", "prov:hadRole"]
+        role_vocabulary: "TOMRole (skos:Concept) — the gate §B REVISED fixed 7 in scheme tom_roles: application_owner, primary_information_owner, backup_information_owner, cto (shared with the K5 ProductRole scheme), technology_risk_controls, design_authority, operate_manager (L1/L2 = level property on the Attribution). DISTINCT from :Role (org:Role, PAT hierarchy only)."
+      vocab_id: [seal_qualified_attribution, seal_attribution_has_agent, seal_attribution_had_role]   # seal_app_attributed_to_employee stays planned (simple form optional/derivable, gate §B)
+    precedence_authority: lob-product-team
+    standards_cited: ["PROV-O (prov:wasAttributedTo, prov:qualifiedAttribution, prov:agent, prov:hadRole)", "SKOS (skos:Concept)"]
+    capture: >
+      waived — the role vocabulary is the tom_roles SkosConceptScheme seeded by
+      drydocs_core/schema/seal_ontology_supplement.cypher; its source taxonomy is the gate §B
+      fixed set (config/gate-log.md 2026-07-10), not a config/taxonomy/ capture file.
+    status: applied
+    depends_on: application-as-dataproduct
+    proposed_at: 2026-07-08
+    confirmed_by: SME
+    confirmed_on: 2026-07-10                # gate §B (role model REVISED into two families) + §C
+    applied_on: 2026-07-15                  # K4 clauses 2+3+6 — scheme/supplement active; loaders seal_applications.cypher + seal_contacts.cypher write the qualified form
+    note: >
+      Replaces org:Membership/org:Role for SEAL's TOM role-holders ONLY — org: stays for the PAT
+      product hierarchy (DevTeam etc., real organizations; catalog_dev_team_has_membership is a
+      DIFFERENT governance concept sharing the org: pattern). seal_has_membership / seal_of_role /
+      seal_held_by DEPRECATED at K4 clause 3 (deprecated_at 2026-07-15). seal_has_port KEPT
+      (dprod:Port structural edge, unrelated). Contact roles outside the fixed 7 load with
+      unmapped_role=true + role_source_name preserved — surfaced, never guessed (loader comment).
+    resolved_questions:
+      - "Role set: gate §B fixed the REVISED 7 (subsumes the old flat 6; Design Authority new); the scheme is fixed, not open-ended — new roles need a new gate."
+      - "Simple vs qualified form: only the QUALIFIED form is loaded (multi-person roles require it); the simple wasAttributedTo stays optional/derivable — seal_app_attributed_to_employee remains status: planned."
+
+  - id: seal-doc-source-of-record
+    taxonomy:
+      source: seal-pat-scrape           # future drydocs-docmeta component source id — NOT yet registered in config/source-registry.yaml
+      element: "SEAL/PAT scraped documentation page is the source of record for an extracted Application fact/record"
+    ontology:
+      from_node: BusinessApplication                # PROPOSED class: prov:Entity / dprod:DataProduct
+      to_node: Document                      # prov:Entity — scraped SEAL/PAT page (drydocs-docmeta, planned)
+      prov_type_from: Entity
+      prov_type_to: Entity
+      matrix_row: "Entity -> Entity = prov:wasDerivedFrom family (prov:hadPrimarySource is a sub-property)"
+      neo4j_label: HAD_PRIMARY_SOURCE
+      prov_maps_to: "prov:hadPrimarySource"
+      vocab_id: seal_had_primary_source
+    precedence_authority: lob-product-team    # SEAL/PAT precedence wired into the live chain at K4 clause 7 — see config/precedence.yaml
+    standards_cited: ["PROV-O (prov:hadPrimarySource, sub-property of prov:wasDerivedFrom)"]
+    capture: >
+      waived — the source (seal-pat-scrape) is not yet registered in config/source-registry.yaml;
+      registration + capture arrive with the drydocs-docmeta component gate.
+    status: confirmed                       # gate §D CONFIRMED; applied waits on the docmeta Document loader (applied = a loader wrote the graph)
+    depends_on: application-as-dataproduct
+    proposed_at: 2026-07-08
+    confirmed_by: SME
+    confirmed_on: 2026-07-10                # §D also promoted drydocs-docmeta from parked to REQUIRED
+    source_of_record_mechanism: >
+      Two linked mechanisms, both proposed: (1) register SEAL/PAT as the authoritative
+      precedence source for internal product/business identity in config/precedence.yaml (a
+      documented proposed_additions entry, NOT wired into the live order:/active: chain — see
+      that file); (2) every fact/record extracted from a scraped page carries this
+      hadPrimarySource edge back to the Document it was extracted from. Trust axis
+      (VERBATIM/GROUNDED/SYNTHESIZED) and classification (Internal / Internal-Confidential) are
+      carried on the Document/Chunk nodes themselves, per
+      knowledge/upgrade-plans/docmeta-component.md — out of scope for this entry.
+    open_questions:
+      - "The drydocs-docmeta component (Document/Chunk nodes, scraper, loader) does not exist yet — this mapping type-checks against the PROPOSED node_classifications entries only (Application reclass + the new Document classification); it cannot be loaded until docmeta itself is built and separately gated."
+      - "Does every extracted Application fact get its own hadPrimarySource edge (fact-level granularity), or one edge per Application node against its primary source page (node-level granularity)? Affects loader design once docmeta lands."
+
+  # ---- Example: a PROPOSED mapping awaiting the SME gate -------------------
+  - id: oracle-schema-asset
+    taxonomy:
+      source: oracle-schemas
+      element: "Schema contains Table (script reads/writes Table)"
+    ontology:
+      from_node: ControlMJob               # or Script (prov:Entity/Plan)
+      to_node: DataAsset                   # prov:Entity (dcat:Dataset)
+      prov_type_from: Activity
+      prov_type_to: Entity
+      matrix_row: "Activity → Entity = prov:used / prov:generated"
+      neo4j_label: USED                    # GENERATED for outputs
+      prov_maps_to: "prov:used"
+    precedence_authority: internal-standards   # naming normalized by knowledge/standards
+    status: proposed                       # <-- SME must confirm before load
+    open_questions:
+      - "Is the script the Activity, or the ControlMJob? (affects from_node)"
+      - "Real schema/table names are confidential → resolve in internal/, not here."
+
+  # ---- E1: SOSA/SSN jobrun-observation — GATE PREP (SME NOT present) --------
+  # SOSA registration (E1 registration step) is already done: sosa/ssn prefixes in
+  # drydocs_core/ontology/namespaces.py, terms seeded in sosa_experimental_supplement.cypher
+  # (opt-in, experimental), and the 4 context relationships below registered
+  # status: planned in relationship_vocabulary.yaml. This entry stops at status: proposed —
+  # it PREPARES the open modelling decision for the HITL gate (config/gate-prompts/
+  # sosa-jobrun-observation.yaml); nothing here is confirmed, no vocabulary status changes,
+  # no graph write.
+  - id: jobrun-observation
+    taxonomy:
+      source: controlm-psgmgr
+      element: "Job execution produced a run with a status at a time (run-history source: psgmgr CM_HIST_VW)"
+    ontology:
+      from_node: ControlMJobRun            # planned execution node (prov:Activity)
+      to_node: ControlMJob                 # the feature of interest (prov:Activity / sosa:FeatureOfInterest)
+      pattern: "SOSA observation"
+      sosa_mapping:
+        feature_of_interest: ControlMJob
+        observed_property: "run-status | run-duration | freshness"
+        result_time: "resultTime"
+      neo4j_label: OBSERVES                 # registered: sosa_observes (status planned)
+      sosa_maps_to: "sosa:hasFeatureOfInterest"
+      prov_maps_to: ~                       # SOSA, not PROV — record separately
+    precedence_authority: bmc-baseline
+    adoption: experimental                  # SOSA/SSN is W3C but NOT a declared company standard
+    status: proposed                        # <-- gate not yet run; SME was absent when this was drafted
+    source_mechanism: >
+      Run-history source = psgmgr CM_HIST_VW (see .claude/skills/controlm-db/references/
+      query-cookbook.md §HIST — expensive, materializes before ROWNUM; every extract must
+      bind an indexed predicate). Join identity: CM_HIST_VW.JOB_MEM_NAME = CM_DEF_VJOB.JOB_NAME
+      — the only reliable link from a run row back to its job definition. MEMNAME is a
+      separate CM_DEF_VJOB column, already demoted to informational-only in the q1q3 gate
+      (":ControlMJob.memname — may be junk; never a key/join") — it is NEVER used as a join
+      key here either.
+    resolved:
+      - "sosa:* terms now registered in relationship_vocabulary.yaml + sosa_experimental_supplement.cypher (sosa_observes/has_result/made_by_sensor/observed_property), all status planned / adoption experimental. (E1 registration step — done.)"
+    decision_for_gate:
+      question: >
+        Is a Control-M job run itself the sosa:Observation (ControlMJobRun node dual-typed
+        with Observation semantics), or is a separate Observation node attached to the run
+        (ControlMJobRun stays a pure prov:Activity; a distinct :Observation node points at it)?
+      option_a:
+        name: "ControlMJobRun IS the Observation (dual-typed node)"
+        shape: "(:ControlMJobRun:Observation {…}) -[:OBSERVES]-> (:ControlMJob) ; (:ControlMJobRun:Observation) -[:HAS_RESULT]-> (:Result)"
+        prov_reading: >
+          ControlMJobRun is already classified prov:Activity (node_classifications; phase-2
+          execution-lineage entries p2_instance_of / m3_executed_by depend on it). PROV has no
+          rule against an Activity also carrying sosa:Observation semantics — W3C guidance
+          commonly aligns sosa:Observation with prov:Activity (an observation IS an activity
+          that generates a Result), so dual-typing does not conflict with prov_type: Activity.
+        sosa_reading: >
+          Matches the SSN pattern most literally — one run row = one observation event. No
+          extra node or extra edge between the run and its Observation; cheapest to load and
+          query (single hop OBSERVES/HAS_RESULT off the run node the E2 loader already creates).
+        tradeoffs: >
+          Couples the experimental, opt-in vocabulary onto a node the CORE (non-experimental)
+          execution-lineage stream depends on (p2_instance_of, m3_executed_by, EXECUTED_BY). If
+          SOSA/SSN adoption is later reversed, the Observation label/edges must be stripped from
+          a core-lineage node instead of being dropped as an isolated subgraph.
+      option_b:
+        name: "Separate :Observation node references the run"
+        shape: "(:Observation) -[:OBSERVES]-> (:ControlMJob) ; (:Observation) -[:HAS_RESULT]-> (:Result) ; link Observation → ControlMJobRun NOT YET a registered relationship"
+        prov_reading: >
+          Keeps ControlMJobRun a clean prov:Activity with zero dependency on the experimental
+          vocabulary. The edge from Observation to the specific run it is about does not exist
+          in relationship_vocabulary.yaml yet — a 5th term (e.g. local OF_RUN) would need to be
+          registered status: planned before this option is loadable.
+        sosa_reading: >
+          Also SSN-valid — SOSA explicitly allows Observations to exist without a strict
+          one-to-one binding to a single Activity notion; a Sensor can emit repeated
+          Observations about the same FeatureOfInterest independent of execution-lineage nodes.
+        tradeoffs: >
+          Fully isolates the experimental subgraph (clean rollback: delete all :Observation
+          nodes/edges, core lineage untouched) but requires a 5th vocabulary term AND doubles
+          node count per run for no added source information — CM_HIST_VW is already
+          one-row-per-run, so a separate node duplicates identity rather than adding meaning.
+      recommendation:
+        option: A
+        rationale: >
+          CM_HIST_VW is inherently one-row-per-run; that row already carries everything an
+          Observation needs (status, timing, result) and everything a JobRun needs (which job,
+          which odate). Splitting it into two nodes recreates one identity as two without new
+          information, and adds a join every loader/query would repeat. Option A's rollback
+          safety is not materially worse than Option B's: a dual-typed node's experimental
+          labels/edges (Observation, OBSERVES, HAS_RESULT, MADE_BY_SENSOR,
+          OF_OBSERVABLE_PROPERTY) can be dropped with `REMOVE r:Observation` + edge deletes,
+          same effort as deleting Option B's separate node, without touching the underlying
+          ControlMJobRun / prov:Activity data. NOT a decision — recommendation only; the SME
+          must confirm, edit, or reject at the gate.
+    open_questions:
+      - "Confirm the modelling choice above (Option A recommended) before the E2 loader is written."
+      - "Result cardinality: does CM_HIST_VW emit exactly one row per (job, odate, run attempt), or can retries/reruns produce multiple rows needing a run-attempt discriminator on the node key?"
+      - "ObservableProperty scope for the pilot: is 'run-status' alone sufficient for E2, or should duration/freshness load in the same pass?"
+      - "Does confirming this mapping imply promoting SOSA/SSN's adoption status generally, or stay scoped to this one pilot edge (adoption: experimental persists either way until a separate company-standard decision)?"
+    gate_status: "NOT RUN — SME absent when this entry was prepared. Do not set status: confirmed, do not flip any relationship_vocabulary.yaml status from planned, do not write to Neo4j. See config/gate-prompts/sosa-jobrun-observation.yaml."
+
+  # ---- C2: BusinessApplication / SEAL edges (reuse ACTIVE vocab — batch) ----
+  # Source taxonomy: config/taxonomy/business-application.yaml. Concept =
+  # BusinessApplication (graph label :BusinessApplication); SEAL = source of record; key = SEALID.
+  # All reuse active seal_* vocabulary terms (DPROD + W3C ORG).
+
+  - id: app-has-port
+    taxonomy: { source: seal-extract, element: "BusinessApplication exposes a data Port (Event/Batch)" }
+    ontology:
+      from_node: BusinessApplication       # prov:SoftwareAgent (label :BusinessApplication)
+      to_node: Port                         # dprod:Port (prov:Entity)
+      matrix_row: "structural dprod relationship (no PROV row)"
+      neo4j_label: HAS_PORT
+      prov_maps_to: ~                        # dprod:hasPort pattern, not PROV
+    precedence_authority: lob-product-team
+    vocab_id: seal_has_port
+    status: confirmed
+    confirmed_by: SME
+    confirmed_on: 2026-06-21
+
+  - id: app-has-membership
+    taxonomy: { source: seal-extract, element: "BusinessApplication has a role-holder membership" }
+    ontology:
+      from_node: BusinessApplication
+      to_node: Membership                   # org:Membership (n-ary)
+      matrix_row: "org:hasMembership (no PROV row)"
+      neo4j_label: HAS_MEMBERSHIP
+      prov_maps_to: ~
+    precedence_authority: lob-product-team
+    vocab_id: seal_has_membership
+    status: confirmed
+    confirmed_by: SME
+    confirmed_on: 2026-06-21
+
+  - id: membership-of-role
+    taxonomy: { source: seal-extract, element: "Membership is for a named Role" }
+    ontology:
+      from_node: Membership
+      to_node: Role                          # org:Role
+      matrix_row: "org:role (no PROV row)"
+      neo4j_label: OF_ROLE
+      prov_maps_to: ~
+    precedence_authority: lob-product-team
+    vocab_id: seal_of_role
+    status: confirmed
+    confirmed_by: SME
+    confirmed_on: 2026-06-21
+
+  - id: membership-held-by
+    taxonomy: { source: seal-extract, element: "Membership is held by an Employee (by SID)" }
+    ontology:
+      from_node: Membership
+      to_node: Employee                      # prov:Agent; referenced by SID
+      matrix_row: "inverse org:member (no PROV row)"
+      neo4j_label: HELD_BY
+      prov_maps_to: ~
+    precedence_authority: lob-product-team
+    vocab_id: seal_held_by
+    status: confirmed
+    confirmed_by: SME
+    confirmed_on: 2026-06-21
+
+  # ---- C3: LOB→Product→Team edges (reuse ACTIVE vocab — batch) --------------
+  # Source taxonomy: config/taxonomy/lob-product-team.yaml.
+
+  - id: lob-has-product-line
+    taxonomy: { source: catalog-pat, element: "LOB contains ProductLine" }
+    ontology:
+      from_node: CatalogLOB
+      to_node: ProductLine
+      matrix_row: "local catalog hierarchy (no PROV row)"
+      neo4j_label: HAS_PRODUCT_LINE
+      prov_maps_to: ~
+    precedence_authority: lob-product-team
+    vocab_id: catalog_has_product_line
+    status: confirmed
+    confirmed_by: SME
+    confirmed_on: 2026-06-21
+
+  - id: product-line-has-product
+    taxonomy: { source: catalog-pat, element: "ProductLine contains Product" }
+    ontology:
+      from_node: ProductLine
+      to_node: Product
+      matrix_row: "local catalog hierarchy (no PROV row)"
+      neo4j_label: HAS_PRODUCT
+      prov_maps_to: ~
+    precedence_authority: lob-product-team
+    vocab_id: catalog_has_product
+    status: confirmed
+    confirmed_by: SME
+    confirmed_on: 2026-06-21
+
+  - id: product-has-dev-team
+    taxonomy: { source: catalog-pat, element: "Product has owning DevTeam" }
+    ontology:
+      from_node: Product
+      to_node: DevTeam
+      matrix_row: "local organizational linkage (no PROV row)"
+      neo4j_label: HAS_DEV_TEAM
+      prov_maps_to: ~
+    precedence_authority: lob-product-team
+    vocab_id: catalog_has_dev_team
+    status: confirmed
+    confirmed_by: SME
+    confirmed_on: 2026-06-21
+
+  - id: lob-reconciles-to-segment
+    taxonomy: { source: catalog-pat, element: "LOB reconciles to a corporate BusinessSegment (confidence)" }
+    ontology:
+      from_node: CatalogLOB
+      to_node: BusinessSegment
+      matrix_row: "skos:closeMatch (approximate; no PROV row)"
+      neo4j_label: RECONCILES_TO
+      prov_maps_to: ~                        # carries confidence 0.0–1.0; not 1:1 (AWMCIB=0.5)
+    precedence_authority: lob-product-team
+    vocab_id: catalog_reconciles_to
+    status: confirmed
+    confirmed_by: SME
+    confirmed_on: 2026-06-21
+
+  # ---- C3 DECISION: resolve the SUPPORTS range ambiguity -------------------
+  # NOT in the current sample (no AreaProduct / SUPPORTS rows), but the vocabulary has
+  # SUPPORTS with range "Product OR AreaProduct" (free-text union) — consolidated-plan E.2.
+  - id: dev-team-supports
+    taxonomy: { source: catalog-pat, element: "DevTeam is aligned to / supports an AreaProduct (team_type, sponsored)" }
+    ontology:
+      from_node: DevTeam                     # org:OrganizationalUnit (Agent)
+      to_node: AreaProduct                   # RESOLVED: range = AreaProduct (Team-of-Teams)
+      matrix_row: "Agent → Entity — no PROV row; local"
+      neo4j_label: SUPPORTS
+      prov_maps_to: ~
+      edge_properties: { team_type: "aligned | flex | dedicated", sponsored: bool }   # 'aligned to' = team_type aligned
+    precedence_authority: lob-product-team
+    vocab_id: catalog_supports_area_product
+    status: confirmed
+    confirmed_by: SME
+    confirmed_on: 2026-06-21
+    decision_resolved: >
+      SME 2026-06-21: SUPPORTS targets AreaProduct (not Product). Product is reached via the
+      hierarchy (Product ▸ AreaProduct ▸ DevTeam), so a DevTeam→Product SUPPORTS edge is dropped
+      in favor of DevTeam→AreaProduct. "aligned to" is captured by team_type=aligned on the edge.
+      C4: set catalog_supports_area_product active; deprecate catalog_supports (DevTeam→Product).
+
+  - id: dev-team-develops-app
+    taxonomy: { source: catalog-pat, element: "DevTeam develops a BusinessApplication (joined by SEALID)" }
+    ontology:
+      from_node: BusinessApplication         # prov:Entity / dprod:DataProduct (K4 reclass); key = SEALID
+      to_node: DevTeam                       # org:OrganizationalUnit (Agent)
+      join_key: SEALID                        # reconcile catalog DevTeam <-> SEAL app by SEALID
+      matrix_row: "Entity → Agent = prov:wasAttributedTo (role=developed_by)"
+      neo4j_label: WAS_ATTRIBUTED_TO
+      role: developed_by
+      prov_maps_to: "prov:wasAttributedTo"
+    precedence_authority: lob-product-team
+    vocab_id: arch_develops
+    status: confirmed
+    confirmed_by: SME
+    confirmed_on: 2026-06-21
+    note: >
+      SME 2026-06-21: DevTeam develops BusinessApplication, reconciled by SEALID. Cross-source
+      edge (lob-product-team taxonomy -> business-application taxonomy); the join (which team
+      builds which app) comes from catalog<->SEAL ownership reconciliation.
+      FLIPPED at K4 (2026-07-15; gate 2026-07-10 §E): was DevTeam-[:DEVELOPS]->(Agent→Agent,
+      no PROV row); post-reclass the PROV-valid inverse WAS_ATTRIBUTED_TO {role: developed_by}
+      applies. Migration: migrate_develops_to_was_attributed_to.cypher.
+
+  # ---- bmc-docs lexical load (2026-07-08 — GATE PREP, SME not yet run) ------
+  # User-directed: only sample Control-M data can reach the local EE DB, so the
+  # converted BMC docs corpus (external/orchestration/bmc-controlm/, 26 docs)
+  # becomes the demonstrable content — loaded as the llm-graph-builder lexical
+  # graph (Document→Chunk) and hooked to the software ontology (DESCRIBES →
+  # SoftwareProduct controlm, MADE_BY → bmc already active). Gate spec:
+  # config/gate-prompts/bmc-docs-lexical-load.yaml. All four stop at proposed.
+
+  - id: doc-describes-product
+    taxonomy: { source: bmc-docs, element: "A converted BMC doc is ABOUT the Control-M product" }
+    ontology:
+      from_node: Document                    # prov:Entity
+      to_node: SoftwareProduct               # dd:SoftwareProduct (Entity)
+      matrix_row: "Entity → Entity aboutness — no PROV row (NOT wasDerivedFrom); dcterms:subject / foaf:primaryTopic pattern"
+      neo4j_label: DESCRIBES
+      prov_maps_to: ~
+      edge_properties: { target_version: "9.0.21.300 (corpus version notice)" }
+    precedence_authority: bmc-baseline
+    vocab_id: docs_describes
+    status: applied                              # loader: bmc_docs.cypher (load-bmc-docs, live 2026-07-08)
+    applied_on: 2026-07-08
+    confirmed_by: SME
+    confirmed_on: 2026-07-08
+
+  - id: doc-chunk-part-of
+    taxonomy: { source: bmc-docs, element: "A section chunk belongs to its document (H2 chunking)" }
+    ontology:
+      from_node: Chunk                       # prov:Entity
+      to_node: Document                      # prov:Entity
+      matrix_row: "structural containment — dcterms:isPartOf pattern (lexical graph, kept off prov:hadMember to stay distinct from domain Collections)"
+      neo4j_label: PART_OF
+      prov_maps_to: ~
+    precedence_authority: bmc-baseline
+    vocab_id: docs_chunk_part_of
+    status: applied                              # loader: bmc_docs.cypher (load-bmc-docs, live 2026-07-08)
+    applied_on: 2026-07-08
+    confirmed_by: SME
+    confirmed_on: 2026-07-08
+
+  - id: doc-first-chunk
+    taxonomy: { source: bmc-docs, element: "Document's chunk chain entry point" }
+    ontology:
+      from_node: Document
+      to_node: Chunk
+      matrix_row: "no standard term — sequence anchor (SCHEDULED_ON null-mapping precedent)"
+      neo4j_label: FIRST_CHUNK
+      prov_maps_to: ~
+    precedence_authority: bmc-baseline
+    vocab_id: docs_first_chunk
+    status: applied                              # loader: bmc_docs.cypher (load-bmc-docs, live 2026-07-08)
+    applied_on: 2026-07-08
+    confirmed_by: SME
+    confirmed_on: 2026-07-08
+
+  - id: doc-next-chunk
+    taxonomy: { source: bmc-docs, element: "Reading order between adjacent chunks of one document" }
+    ontology:
+      from_node: Chunk
+      to_node: Chunk
+      matrix_row: "no standard term — singly-linked sequence (out-degree <= 1)"
+      neo4j_label: NEXT_CHUNK
+      prov_maps_to: ~
+    precedence_authority: bmc-baseline
+    vocab_id: docs_next_chunk
+    status: applied                              # loader: bmc_docs.cypher (load-bmc-docs, live 2026-07-08)
+    applied_on: 2026-07-08
+    confirmed_by: SME
+    confirmed_on: 2026-07-08
+
+  # ---- CM_HOSTS host topology (PROPOSED 2026-07-09 — gate controlm-hosts-topology) ----
+  # psgmgr CM_HOSTS = the BMC CMS_NODGRP host-group membership replica.
+  # Internal profile 2026-07-09: 22 DCs / 5,396 groups / 8,161 nodeids.
+  # Use case: server-patching / maintenance-window planning. Nothing loads
+  # until the gate (config/gate-prompts/controlm-hosts-topology.yaml) confirms.
+
+  - id: job-runs-on-host-group
+    taxonomy:
+      source: controlm-psgmgr
+      element: "Job's NODE_ID names a host group (CM_HOSTS.GRPNAME) — Control-M load-balances across its member hosts (2-hop)"
+    ontology:
+      from_node: ControlMJob                    # prov:Activity
+      to_node: ControlMHostGroup                # prov:Collection (new label, this gate)
+      prov_type_from: Activity
+      prov_type_to: Collection
+      matrix_row: "no PROV row — infrastructure placement (SCHEDULED_ON precedent)"
+      neo4j_label: RUNS_ON
+      edge_properties: { role: host_group, derived: true }
+      prov_maps_to: ~
+    precedence_authority: bmc-baseline
+    vocab_id: m3_runs_on_host_group
+    status: confirmed                           # gate controlm-hosts-topology 2026-07-09 (config/gate-log.md)
+    confirmed_by: SME
+    confirmed_on: 2026-07-09
+    gate_spec: config/gate-prompts/controlm-hosts-topology.yaml
+
+  - id: host-group-contains-host
+    taxonomy:
+      source: controlm-psgmgr
+      element: "Host group contains a member agent host (one CM_HOSTS row per DATA_CENTER/GRPNAME/NODEID)"
+    ontology:
+      from_node: ControlMHostGroup              # prov:Collection
+      to_node: ExecutionHost                    # prov:SoftwareAgent (existing label, reused)
+      prov_type_from: Collection
+      prov_type_to: Agent
+      matrix_row: "Collection → any = prov:hadMember"
+      neo4j_label: CONTAINS_HOST
+      edge_properties: { participation_type: "VARCHAR2(1), domain probe pending" }
+      prov_maps_to: "prov:hadMember"
+    precedence_authority: bmc-baseline
+    vocab_id: m3_host_group_contains_host
+    status: confirmed                           # gate controlm-hosts-topology 2026-07-09 (config/gate-log.md)
+    confirmed_by: SME
+    confirmed_on: 2026-07-09
+    gate_spec: config/gate-prompts/controlm-hosts-topology.yaml
+
+  - id: host-group-defined-on
+    taxonomy:
+      source: controlm-psgmgr
+      element: "Host group is defined per data center (CM_HOSTS.DATA_CENTER, long-form names — normalization open question)"
+    ontology:
+      from_node: ControlMHostGroup              # prov:Collection
+      to_node: ControlMServer                   # local Platform — NOT an Agent
+      prov_type_from: Collection
+      prov_type_to: "n/a (infrastructure)"
+      matrix_row: "no PROV row — infrastructure placement"
+      neo4j_label: DEFINED_ON
+      prov_maps_to: ~
+    precedence_authority: bmc-baseline
+    vocab_id: m3_host_group_defined_on
+    status: confirmed                           # gate 2026-07-09; DC key rule = exact long-form name per knowledge/standards/technology/data-center-naming-convention.md; loader blocked on P3 value-domain verification + the 22-DC-vs-production scope call (gate-log residuals)
+    confirmed_by: SME
+    confirmed_on: 2026-07-09
+    gate_spec: config/gate-prompts/controlm-hosts-topology.yaml
+
+  # ---- CM_AVG_RUN runtime-stats supplement (PROPOSED 2026-07-09 — gate controlm-avg-run-supplement) ----
+  # NOT an edge mapping: a PROPERTY SUPPLEMENT onto existing :ControlMJob nodes
+  # (opt-in supplement pattern — software registry / SOSA precedent), per the
+  # SME direction of 2026-07-07. No relationship_vocabulary.yaml terms are
+  # created; the loader MATCHes job nodes, never MERGEs them.
+
+  - id: job-runtime-stats-supplement
+    taxonomy:
+      source: controlm-psgmgr
+      element: "CM_AVG_RUN row supplies avg/median start+run timing for a job (join ctlm_id = folder_id.job_id where present — SME edit 2026-07-14; fallback SCHED_TABLE + JOB_MEM_NAME = JOB_NAME)"
+    ontology:
+      from_node: ControlMJob                    # prov:Activity — properties land here
+      to_node: ~                                # no target node — property supplement, not an edge
+      prov_type_from: Activity
+      prov_type_to: "n/a (no edge)"
+      matrix_row: "no matrix row — node-property supplement (opt-in supplement pattern)"
+      neo4j_label: ~
+      property_targets:
+        - "ControlMJob.avg_start_time (normalized from the >24h clock; + start_next_day flag)"
+        - "ControlMJob.avg_run_time / min_run_time / max_run_time / run_time_std_dev (seconds)"
+        - "ControlMJob.dow_median_start_time / dow_median_run_time (derived in Python from SAMPLES_*)"
+        - "ControlMFolder.window_start / window_end (derived folder rollup — min job start .. max job end; the maintenance-window primitive)"
+      prov_maps_to: ~
+    precedence_authority: bmc-baseline
+    vocab_id: ~                             # deliberately none — property supplement, no edge terms
+    vocab_id_reason: "property supplement, not an edge — no relationship_vocabulary.yaml term exists or is needed (opt-in supplement pattern; the loader MATCHes :ControlMJob nodes, never MERGEs)"
+    capture: >
+      waived — property supplement onto already-classified :ControlMJob/:ControlMFolder nodes;
+      CM_AVG_RUN adds timing properties, no new classification hierarchy to capture, and no
+      config/taxonomy/ file covers it (the F5 gap this field now records instead of hiding).
+    status: confirmed
+    confirmed_by: chad.wilson
+    confirmed_on: 2026-07-14                # gate SIGNED OFF, 1 SME edit (§B ctlm_id join upgrade)
+    gate_spec: config/gate-prompts/controlm-avg-run-supplement.yaml
+
+# Counts the gate reports to the SME each run.
+summary:
+  applied: 8          # +application-as-dataproduct, +seal-tom-attribution (K4, 2026-07-15); prior 6 = job-contains, application-contains-folder, doc-describes-product, doc-chunk-part-of, doc-first-chunk, doc-next-chunk
+  confirmed: 20       # +seal-doc-source-of-record (gate §D confirmed 2026-07-10; applied waits on docmeta loader)
+  proposed: 3         # oracle-schema-asset, jobrun-observation, requires-scheduler
+  rejected: 0

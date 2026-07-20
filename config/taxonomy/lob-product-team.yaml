@@ -1,0 +1,78 @@
+# =============================================================================
+# config/taxonomy/lob-product-team.yaml  —  org taxonomy (B3)
+#
+# PURE CLASSIFICATION ONLY: CatalogLOB ▸ ProductLine ▸ Product ▸ DevTeam.
+# No meaning edges — RECONCILES_TO (LOB→segment), SUPPORTS, ownership are ontology (C3).
+#
+# Built from the SYNTHETIC sample (publishable shape). SOURCE (catalog-pat) is
+# Internal-Confidential: real team names/rosters are NOT authoritative here — keyed by id;
+# production confidential values live in internal/. Captured 2026-06-20.
+#
+# This is the lowest precedence authority for object *meaning* but the SOLE authority for
+# *ownership/business context* (config/precedence.yaml: lob-product-team).
+# =============================================================================
+
+taxonomy: lob-product-team
+domain: business
+taxonomy_path_root: business/lob
+source: catalog-pat
+authority: lob-product-team
+classification: Internal-Confidential
+classification_only: true
+
+nodes:
+
+  # CatalogLOB — top of the org hierarchy. reconciles_to_segment is a meaning edge (deferred).
+  lobs:
+    - { id: LOB001, code: CCB,    name: Consumer & Community Banking, reconciles_to_segment: CCB, confidence: 1.0 }
+    - { id: LOB002, code: AWMCIB, name: "Asset & Wealth Management + Commercial & Investment Bank (legacy)", reconciles_to_segment: AWM, confidence: 0.5 }
+    - { id: LOB003, code: CT,     name: Corporate Technology, reconciles_to_segment: Corp, confidence: 1.0 }
+    - { id: LOB004, code: HR,     name: Human Resources (Other Corporate), reconciles_to_segment: Corp, confidence: 1.0 }
+    - { id: LOB005, code: ET,     name: Enterprise Technology, reconciles_to_segment: Corp, confidence: 1.0 }
+
+  # ProductLine — child of a LOB.
+  product_lines:
+    - { id: PL_AUTO, name: Auto,                parent_lob: LOB001 }
+    - { id: PL_HL,   name: Home Lending,        parent_lob: LOB001 }
+    - { id: PL_CARD, name: Card,                parent_lob: LOB001 }
+    - { id: PL_RISK, name: Risk Published Data, parent_lob: LOB001 }
+    - { id: PL_DAT,  name: Data & Analytics,    parent_lob: LOB001 }
+
+  # Product — child of a ProductLine.
+  products:
+    - { id: PROD_AUTO_05, name: Auto Risk,              parent_product_line: PL_AUTO }
+    - { id: PROD_AUTO_07, name: Auto Onboarding,        parent_product_line: PL_AUTO }
+    - { id: PROD_HL_12,   name: Home Lending Servicing, parent_product_line: PL_HL }
+    - { id: PROD_CARD_03, name: Card Risk,              parent_product_line: PL_CARD }
+    - { id: PROD_DAT_01,  name: Account Core,           parent_product_line: PL_DAT }
+    - { id: PROD_RISK_01, name: Risk Published Data,    parent_product_line: PL_RISK }
+
+  # DevTeam — child of a Product (+ jira board). Names synthetic; real rosters -> internal/.
+  dev_teams:
+    - { id: T0042, name: CCB Auto Risk Pod,           jira_board: JIRA-AUTO,      parent_product: PROD_AUTO_05 }
+    - { id: T0099, name: CCB Auto Onboarding,         jira_board: JIRA-ONBOARD,   parent_product: PROD_AUTO_07 }
+    - { id: T0100, name: CCB Card Risk,               jira_board: JIRA-CARDRISK,  parent_product: PROD_CARD_03 }
+    - { id: T0117, name: CCB Home Lending Servicing,  jira_board: JIRA-HLSERVICE, parent_product: PROD_HL_12 }
+    - { id: T0250, name: DAT Account Core,            jira_board: JIRA-DAT-AC,    parent_product: PROD_DAT_01 }
+    - { id: T0299, name: Risk Published Data,         jira_board: JIRA-RPD,       parent_product: PROD_RISK_01 }
+
+counts:
+  lobs: 5
+  product_lines: 5      # all under LOB001 (CCB) in this sample
+  products: 6
+  dev_teams: 6
+  area_products: 0      # not in sample (see OQ)
+
+open_questions:
+  - id: area-product-missing
+    note: >
+      The ontology has Product ▸ AreaProduct ▸ DevTeam, but this sample is Product ▸ DevTeam
+      direct (no AreaProduct rows). SME: confirm whether the AreaProduct (Team-of-Teams) layer
+      applies here or only in production PAT data.
+  - id: business-segment
+    note: >
+      reconciles_to_segment (CCB/AWM/Corp) references BusinessSegment with a confidence, but no
+      segment nodes are sampled. RECONCILES_TO is a meaning edge (skos:closeMatch) -> ontology (C3).
+      Note LOB002 confidence 0.5 (AWMCIB splits across segments).
+  - id: confidential-rosters
+    note: "Team names here are synthetic. Production rosters/people are confidential -> internal/."

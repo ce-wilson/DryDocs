@@ -1,0 +1,297 @@
+# =============================================================================
+# config/taxonomy/software-registry.yaml — third-party software registry.
+#
+# The LEDGER for plan 07 / ADR 0004: Vendor = the brand/company ONLY;
+# SoftwareProduct = what a vendor ships, with role absorbing the Tier-1/Tier-2
+# split. The graph is the lookup (loader: drydocs/loaders/software_registry.py
+# MERGEs :Vendor, :SoftwareProduct, MADE_BY, and DryDocs' own USES_SOFTWARE
+# edges); this file is the source of truth.
+#
+# Field set (SME-gated 2026-07-07): product name, publisher, publisherURL,
+# category, version-if-known. Company governance columns (owner SIDs, gspcId,
+# sealId, support/EOL dates) are Phase-4 material — internal/-side only, never
+# here. Drivers/utilities/etc. (the catalog long tail) stay out by design.
+#
+# Vendor ids match drydocs-icons/manifest.json where an icon exists.
+# Guarded by tests/unit/test_software_registry.py.
+# =============================================================================
+
+schema: drydocs.software-registry.v1
+classification: Internal-Public
+updated: 2026-07-14
+adr: docs/decisions/0004-software-registry-vendor-terminology.md
+
+# Reserved Application id for DryDocs itself (no SEAL id producer-side; the
+# company copy reconciles this to the real SEAL id at port time).
+drydocs_application_id: DRYDOCS-SELF
+
+vendors:
+  - id: neo4j
+    name: Neo4j
+    publisher_url: https://neo4j.com/
+  - id: bmc
+    name: BMC Software
+    publisher_url: https://www.bmc.com/
+  - id: oracle
+    name: Oracle
+    publisher_url: https://www.oracle.com/
+  - id: psf
+    name: Python Software Foundation
+    publisher_url: https://www.python.org/
+  - id: abinitio
+    name: Ab Initio Software
+    publisher_url: https://www.abinitio.com/
+  - id: informatica
+    name: Informatica
+    publisher_url: https://www.informatica.com/
+  - id: apache
+    name: Apache Software Foundation
+    publisher_url: https://apache.org/
+  - id: broadcom
+    name: Broadcom
+    publisher_url: https://www.broadcom.com/
+
+products:
+  - id: neo4j
+    vendor: neo4j
+    name: Neo4j
+    category: DBMS - Graph Database
+    role: graph-platform
+    type: commercial              # EE via local Docker; community edition open-source
+    versions: ["5.x"]             # catalog window 5.19-5.26; pin when container verifiable
+    used_by_drydocs: true
+
+  - id: neo4j-bloom
+    vendor: neo4j
+    name: Neo4j Bloom
+    category: BI - Graph Analytics/Visualization
+    role: tool
+    type: commercial
+    versions: ["2.x"]
+    used_by_drydocs: false        # separate catalog product; company-side usage TBD
+
+  - id: controlm
+    vendor: bmc
+    name: Control-M
+    category: Workload Automation
+    role: orchestrator
+    type: commercial
+    versions: ["9.0.21.300"]      # company runtime — known
+    used_by_drydocs: true         # the baseline orchestration source we ingest
+
+  - id: oracle-db
+    vendor: oracle
+    name: Oracle Database
+    category: DBMS - Relational
+    role: data-platform
+    type: commercial
+    versions: ["19c"]             # company psgmgr host — VERIFY on connection
+    used_by_drydocs: true
+
+  - id: python
+    vendor: psf
+    name: Python
+    category: Language Runtime
+    role: tool
+    type: open-source
+    versions: ["3.11+"]           # pyproject floor; 3.13 in local use
+    used_by_drydocs: true
+
+  - id: abinitio
+    vendor: abinitio
+    name: Ab Initio (Co>Operating System)
+    category: Data Integration (ETL)
+    role: tool
+    type: commercial
+    versions: []                  # unknown — plan-07 Phase 3 CMD_LINE detection target
+    used_by_drydocs: false        # application-side product; row pre-created for Phase 3
+
+  - id: informatica-powercenter
+    vendor: informatica
+    name: PowerCenter
+    category: Data Integration (ETL)
+    role: tool
+    type: commercial
+    versions: []                  # unknown — Phase 3 detection target (pmcmd)
+    used_by_drydocs: false
+
+  # Crosswalk-onboarding rows (2026-07-14): registered so the F1/F2 crosswalk
+  # gates can carry the standard Software meta linkage (ADR 0004). MWAA is
+  # deliberately NOT a separate product — stock Airflow object model,
+  # AWS-managed deployment.
+  - id: airflow
+    vendor: apache
+    name: Apache Airflow
+    category: Workload Automation
+    role: orchestrator
+    type: open-source
+    versions: ["3.x"]              # 3.3.0 current 2026-07; MWAA lags (3.0 / 2.4.3+)
+    used_by_drydocs: false          # crosswalk placeholder (airflow-mwaa source unconfirmed); flips if the source activates
+
+  - id: autosys
+    vendor: broadcom
+    name: Broadcom Workload Automation  # formerly CA Workload Automation AE / AutoSys (CA Technologies lineage)
+    category: Workload Automation
+    role: orchestrator
+    type: commercial
+    versions: []                   # unknown — Broadcom docs access-restricted; verify on live export
+    used_by_drydocs: false          # crosswalk placeholder (autosys-export source unconfirmed); flips if the source activates
+
+# =============================================================================
+# invocation_patterns — plan-07 Phase 3 (docs/restructure/07-software-registry.md
+# §Phase 3). HITL-GATED PROPOSAL ONLY — the SME has not been convened.
+#
+# schema: drydocs.software-registry.invocation-patterns.v1
+#
+# Purpose: map STG_INVOCATION rows (drydocs_core/controlm/commands.py, the Phase-C
+# command/script parser over RESOLVED CM_DEF_VJOB.CMD_LINE) to a `products:`
+# id above, so a later loader can derive
+#   (:BusinessApplication)-[:USES_SOFTWARE {source:'controlm-cmdline'}]->(:SoftwareProduct)
+# CM_DEF_VJOB.APPL_TYPE is explicitly NOT the basis (recorded dead-end, doc 07
+# "What already feeds it": Ab Initio/Informatica run as plain OS commands, so
+# job/application types under-represent the real software).
+#
+# Nothing reads this section yet: RegistryYamlAdapter
+# (drydocs/loaders/software_registry.py) only flattens `vendors:`/`products:`;
+# this key is inert to the Phase-1 loader by construction. It becomes live
+# only after the HITL gate (config/gate-prompts/software-usage-patterns.yaml)
+# is confirmed, logged to config/gate-log.md, and every row below flips
+# status: proposed -> confirmed.
+#
+# Field glossary — each row's `field` names the STG_INVOCATION column the
+# match rule reads (see Invocation dataclass, drydocs_core/controlm/commands.py):
+#   - executable_path = the LAUNCHER token: argv[0] after wrapper-stripping
+#     (sh/bash/ksh/env/nohup/exec unwrapped) — e.g. `pmcmd`, `dtlaunch.sh`,
+#     `python3.11`. This is also the token classify_executable() matches
+#     against internally.
+#   - script_path      = the RESOLVED script/graph/mapping target — populated
+#     whether the file is invoked directly (verb itself ends .m/.pset/.py/...)
+#     or surfaced from a later argument (e.g. `dtlaunch.sh daily_extract.m`
+#     -> script_path = daily_extract.m). Never the launcher token itself when
+#     the two differ.
+# No pattern row matches on `invocation_type` or `classifier_rule` directly —
+# `classifier_rule` is carried on each row purely as a TRACEABILITY PIN back
+# to the LAUNCHER_REGISTRY rule id in commands.py that already produces this
+# discrimination. The regex here is a human-readable restatement for gate
+# review, not an independent copy the loader would evaluate; if the parser
+# rule changes, the classifier_rule ref goes stale and the row must be
+# re-reviewed at the next gate, never trusted silently.
+#
+# Only patterns for products already present in `products:` above — no
+# speculative product rows. Publishable, vendor-public launcher names only
+# (no company path fragments, no real job/CMD_LINE values).
+# =============================================================================
+invocation_patterns:
+  status: proposed
+  gate: config/gate-prompts/software-usage-patterns.yaml
+
+  # coverage_policy (doc 07 §Risks: "wrapper scripts hide the real launcher
+  # ... expect a long tail the pattern table can't classify; report
+  # unclassified invocations as a coverage metric rather than guessing"):
+  # every STG_INVOCATION row either matches exactly one pattern row below, or
+  # is counted as unclassified in the per-load-run coverage report. Never
+  # assign a nearest/best-guess product. A pattern row is added only once a
+  # real registry product id exists to point at (see open questions in the
+  # gate spec for candidates without a product yet: PySpark, generic file
+  # transfer, internal validation utilities).
+  coverage_policy: >
+    Unclassified invocations (STG_INVOCATION.is_classified = false, or
+    classified into an invocation_type with no pattern row here) are reported
+    as a coverage percentage per load run, never guessed at. Opaque wrapper
+    scripts (e.g. a site-local run_all.sh, or the parser's own
+    abioncloud.runscript_wrapper rule which types as generic SHELL_SCRIPT,
+    not ABINITIO) are the expected long tail and stay unclassified until a
+    specific wrapper is reviewed and added as its own row.
+
+  patterns:
+    - id: abinitio-graph-or-plan
+      product: abinitio
+      field: script_path
+      match_type: regex
+      pattern: '\.m$'
+      classifier_rule: abinitio.graph_or_plan   # commands.py LAUNCHER_REGISTRY
+      example_matches:
+        - "daily_extract.m"                     # direct invocation
+        - "dtlaunch.sh daily_extract.m"          # wrapper-resolved argument
+      note: >
+        Ab Initio graph or plan file — matches whether invoked directly
+        (verb itself ends .m) or resolved from a wrapper argument
+        (dtlaunch.sh, run_calp_temp.sh). script_path carries both cases.
+      status: proposed
+
+    - id: abinitio-pset
+      product: abinitio
+      field: script_path
+      match_type: regex
+      pattern: '\.pset$'
+      classifier_rule: abinitio.pset
+      example_matches:
+        - "daily_extract.pset"
+      note: "Ab Initio parameter-set file."
+      status: proposed
+
+    - id: abinitio-dtlaunch-wrapper
+      product: abinitio
+      field: executable_path
+      match_type: regex
+      pattern: '^dtlaunch\.sh$'
+      classifier_rule: abinitio.dtlaunch_accelerator
+      example_matches:
+        - "dtlaunch.sh"
+      note: >
+        Ab Initio Co>Operating System accelerator launch wrapper — the
+        launcher name itself signals the product even when the graph
+        argument is opaque or absent from this row's script_path.
+      status: proposed
+
+    - id: informatica-mapping-prefix
+      product: informatica-powercenter
+      field: executable_path
+      match_type: regex
+      pattern: '^m_\w+'
+      classifier_rule: informatica.mapping_prefix
+      example_matches:
+        - "m_load_customer_dim.sh"
+      note: >
+        Site naming convention for Informatica PowerCenter mapping-wrapper
+        scripts (m_<mapping name>). OPEN QUESTION FOR SME: this prefix is
+        broad enough to match an unrelated m_*.sh wrapper that has nothing
+        to do with Informatica — false-positive risk, not yet bounded by a
+        second confirming signal.
+      status: proposed
+
+    - id: informatica-pmcmd
+      product: informatica-powercenter
+      field: executable_path
+      match_type: exact
+      pattern: "pmcmd"
+      classifier_rule: informatica.pmcmd
+      example_matches:
+        - "pmcmd"
+      note: "Informatica PowerCenter command-line workflow client — direct invocation, unambiguous."
+      status: proposed
+
+    - id: python-interpreter
+      product: python
+      field: executable_path
+      match_type: regex
+      pattern: 'python[0-9.]*$'
+      classifier_rule: python.interpreter
+      example_matches:
+        - "python3"
+        - "python3.11"
+      note: "Direct interpreter invocation."
+      status: proposed
+
+    - id: python-script
+      product: python
+      field: script_path
+      match_type: regex
+      pattern: '\.py$'
+      classifier_rule: python.script
+      example_matches:
+        - "load_daily.py"
+      note: >
+        Python script resolved as the invocation target, whether run
+        directly or as an interpreter argument (python3 load_daily.py).
+      status: proposed

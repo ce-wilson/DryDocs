@@ -1,0 +1,197 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>wf-mapping-01 — manual mapping stewardship (rung 3 line wireframe)</title>
+<style>
+  /* Rung-3 rules: grayscale only, boxes + labels, no theme, print-friendly. */
+  :root { --ink:#333; --line:#8a8a8a; --fill:#f2f2f2; --faint:#bbb; }
+  * { box-sizing:border-box; margin:0; }
+  body { font:13px/1.45 "Segoe UI", Arial, sans-serif; color:var(--ink); background:#fff; padding:16px; }
+  .note { color:#666; margin:0 0 12px; max-width:1000px; }
+  .frame { max-width:1240px; border:2px solid var(--ink); }
+  .zone { border:1px dashed var(--line); position:relative; }
+  .tag { position:absolute; top:2px; right:6px; font-size:10px; color:var(--faint); letter-spacing:.06em; }
+  .box { border:1px solid var(--line); background:var(--fill); padding:4px 10px; display:inline-block; }
+  .ann { display:inline-block; width:16px; height:16px; border:1px solid var(--ink); border-radius:50%;
+         text-align:center; font-size:10px; line-height:14px; background:#fff; }
+
+  header.hd { display:flex; align-items:center; gap:12px; padding:10px 14px; border-bottom:2px solid var(--ink); }
+  .hd .search { flex:1; max-width:380px; border:1px solid var(--line); padding:5px 10px; color:#777; }
+  .hd .spacer { flex:1; }
+
+  .body { display:flex; }
+  aside.aside { width:180px; border-right:2px solid var(--ink); padding:10px; display:flex; flex-direction:column; }
+  .aside nav { flex:1; display:flex; flex-direction:column; gap:4px; margin-top:8px; }
+  .aside nav a { border:1px solid var(--line); padding:4px 8px; color:var(--ink); text-decoration:none; font-size:12px; }
+  .aside nav a.active { background:#ddd; font-weight:600; }
+  .aside .role { border:1px solid var(--ink); padding:3px 8px; margin-top:8px; text-align:center; font-size:11px; }
+
+  main.main { flex:1; display:flex; flex-direction:column; min-width:0; }
+  .toolbar { border-bottom:1px dashed var(--line); padding:8px 14px; color:#555; display:flex; gap:10px; align-items:center; }
+  .toolbar .spacer { flex:1; }
+  .domains { padding:8px 14px; border-bottom:1px dashed var(--line); display:flex; gap:6px; align-items:center; }
+  .domains .box.on { background:#ddd; font-weight:600; }
+
+  .split { display:flex; }
+  .center { flex:1; min-width:0; padding:10px 14px; }
+
+  .filters { margin-bottom:8px; color:#666; }
+  .filters .box { font-size:11px; padding:2px 8px; }
+
+  table.grid { border-collapse:collapse; width:100%; font-size:11.5px; }
+  .grid th, .grid td { border:1px solid var(--line); padding:4px 7px; text-align:left; }
+  .grid th { background:var(--fill); }
+  .grid tr.unres td { background:#eee; font-style:italic; }
+  .grid tr.sel td { background:#e0e0e0; }
+  .grid .c { text-align:center; }
+
+  .assign { margin-top:10px; border:1px solid var(--ink); padding:10px; max-width:560px; }
+  .assign h4 { font-size:12px; margin-bottom:6px; }
+  .assign .row { margin:6px 0; }
+  .assign input, .assign textarea { width:100%; border:1px solid var(--line); padding:4px 8px; font:inherit; color:#777; background:#fff; }
+  .assign .warn { border:1px dashed var(--ink); padding:5px 8px; font-size:11px; color:#555; margin-top:6px; }
+
+  .tray { width:250px; border-left:2px solid var(--ink); padding:10px; font-size:12px; display:flex; flex-direction:column; }
+  .tray h4 { font-size:12px; border-bottom:1px dashed var(--line); padding-bottom:4px; margin-bottom:8px; }
+  .draft { border:1px solid var(--line); background:var(--fill); padding:6px 8px; margin-bottom:6px; }
+  .draft .k { font-weight:600; }
+  .draft .chip { display:inline-block; border:1px solid var(--line); border-radius:8px; padding:0 8px; font-size:10px; margin-top:4px; background:#fff; }
+  .tray .submit { margin-top:auto; border:2px solid var(--ink); background:var(--fill); padding:8px; text-align:center; font-weight:600; }
+  .tray .life { font-size:10px; color:#777; margin-top:8px; text-align:center; }
+
+  .key { max-width:1240px; margin-top:14px; color:#555; }
+  .key li { margin:2px 0 2px 4px; }
+</style>
+</head>
+<body>
+
+<p class="note"><strong>wf-mapping-01 (rung 3)</strong> — line wireframe of the manual
+mapping stewardship screen (route <code>/mappings</code>, steward/power-user persona).
+Drafts entries for the reconciler-consumed manual tables (K2 tier model); submit
+produces a <code>config/manual-loads/</code> change artifact for the gate flow —
+<strong>never a direct graph write</strong>. Spec: <code>wf-mapping-01.md</code> ·
+backlog <strong>O13</strong>.</p>
+
+<div class="frame">
+
+  <header class="hd">
+    <span class="box">LOGO · DryDocs</span>
+    <span class="search">search: nodes, servers, jobs…</span>
+    <span class="spacer"></span>
+    <span class="box">Prod | UAT | Dev</span>
+    <span class="box">◐</span>
+    <span class="box">🔔</span>
+    <span class="box">@steward</span>
+  </header>
+
+  <div class="body">
+    <aside class="aside zone">
+      <span class="tag">ASIDE</span>
+      <nav>
+        <a href="#/">Overview</a>
+        <a href="#/explorer">Explorer</a>
+        <a href="#/lineage">Lineage</a>
+        <a href="#/ownership">Ownership</a>
+        <a href="#/runbooks">Runbooks</a>
+        <a href="#/remediation">Remediation</a>
+        <a href="#/docs">Docs</a>
+        <a href="#/gates">Gates</a>
+        <a href="#/loads">Loads</a>
+        <a class="active" href="#/mappings">⇄ Mappings</a>
+      </nav>
+      <div class="role">STEWARD persona <span class="ann">8</span></div>
+    </aside>
+
+    <main class="main">
+      <div class="toolbar zone">
+        Home &gt; Mappings &gt; Job→Application
+        <span class="spacer"></span>
+        <span class="box">refresh</span>
+        <span class="box">▾ Export</span>
+      </div>
+
+      <div class="domains zone">
+        <span class="tag">DOMAIN STRIP <span class="ann">1</span></span>
+        <span class="box on">Job → Application (tier-5 CSV)</span>
+        <span class="box">FID → seal_id (tier 2)</span>
+        <span class="box">ALIAS → seal_id (tier 4)</span>
+        <span style="color:#999;font-size:11px">registry-driven — "code → application" joins here when its table exists</span>
+      </div>
+
+      <div class="split">
+        <div class="center zone">
+          <span class="tag">ATTRIBUTION COVERAGE GRID <span class="ann">2</span></span>
+          <div class="filters">
+            filter: <span class="box">unresolved ⤒</span> <span class="box">conflicts !</span>
+            <span class="box">tier ▾</span> <span class="box">folder ▾</span> <span class="box">application ▾</span>
+          </div>
+          <table class="grid">
+            <thead>
+              <tr><th>job (folder / job key)</th><th>current application</th><th class="c">tier</th><th>evidence (via)</th><th class="c"></th></tr>
+            </thead>
+            <tbody>
+              <tr class="unres sel">
+                <td>PRBCDE-…/JOB_C</td><td>(none)</td><td class="c">—</td><td>—</td><td class="c">[assign…]</td>
+              </tr>
+              <tr class="unres">
+                <td>PRBCDE-…/JOB_E</td><td>(none)</td><td class="c">—</td><td>—</td><td class="c">[assign…]</td>
+              </tr>
+              <tr>
+                <td>PRBCDE-…/JOB_D</td><td>APP-2222 <b>!</b></td><td class="c">ALIAS</td><td>alias table row</td><td class="c">[review…]</td>
+              </tr>
+              <tr>
+                <td>PRARAG-…/JOB_A</td><td>APP-1234</td><td class="c">SEAL</td><td>folder variable</td><td class="c"></td>
+              </tr>
+              <tr>
+                <td>PRARAG-…/JOB_B</td><td>APP-1234</td><td class="c">APP_NAME</td><td>name reconcile</td><td class="c"></td>
+              </tr>
+              <tr><td colspan="5" style="color:#999">… unresolved float to top; multi-select for bulk assign …</td></tr>
+            </tbody>
+          </table>
+
+          <div class="assign">
+            <h4>Assign to application <span class="ann">3</span> — 1 job selected</h4>
+            <div class="row"><input value="app picker: search BusinessApplication by seal_id / name…"></div>
+            <div class="row"><textarea rows="2">rationale (REQUIRED — becomes the CSV provenance column + gate context)</textarea></div>
+            <div class="warn">tier notice: manual = tier 5 (lowest). If this job later gains SEAL
+            evidence, that evidence WINS — a manual entry never overrides it. <span class="ann">7</span></div>
+            <div class="row"><span class="box">add to changeset →</span> <span class="box">cancel</span></div>
+          </div>
+        </div>
+
+        <aside class="tray zone">
+          <span class="tag">CHANGESET TRAY <span class="ann">4</span></span>
+          <h4>Draft changeset (2)</h4>
+          <div class="draft">
+            <span class="k">JOB_C → APP-9876</span><br>
+            <span style="font-size:10px;color:#666">"support team confirmed owner…"</span><br>
+            <span class="chip">draft</span>
+          </div>
+          <div class="draft">
+            <span class="k">JOB_E → APP-9876</span><br>
+            <span style="font-size:10px;color:#666">"same series as JOB_C"</span><br>
+            <span class="chip">draft</span>
+          </div>
+          <div class="submit">submit changeset <span class="ann">5</span></div>
+          <div class="life">→ manual-loads CSV diff → PR / gate review → merge → <b>next load run applies</b> <span class="ann">6</span></div>
+        </aside>
+      </div>
+    </main>
+  </div>
+</div>
+
+<ol class="key">
+  <li><b>①</b> domains = the reconciler-consumed manual tables only (K2 tier model); the strip is registry-driven.</li>
+  <li><b>②</b> the grid is the coverage/work-queue view: current resolution tier + evidence per job; unresolved and conflict rows are the steward's queues.</li>
+  <li><b>③</b> assigning drafts a row (source key, target, REQUIRED rationale, author, timestamp) — no graph write.</li>
+  <li><b>④</b> tray persists per-user; accumulates across domains.</li>
+  <li><b>⑤</b> submit emits a config/manual-loads/ change artifact (api draft endpoint or file download) — git + gate + loader remain the authority chain.</li>
+  <li><b>⑥</b> lifecycle: draft → submitted → gated → loaded; "loaded" is self-verified when the grid's tier flips to manual after the next load.</li>
+  <li><b>⑦</b> precedence honesty in the dialog: manual is tier 5 and never overrides SEAL evidence.</li>
+  <li><b>⑧</b> steward persona (new, extends O2 mock auth): sees Mappings; no /admin/config, no Cypher sandbox.</li>
+</ol>
+
+</body>
+</html>

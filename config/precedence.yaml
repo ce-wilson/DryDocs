@@ -1,0 +1,81 @@
+# =============================================================================
+# config/precedence.yaml — source-of-truth ordering for the configuration layer.
+#
+# When sources disagree about what something IS, resolve top-down. The first
+# authority that has an opinion wins; lower authorities become aliases
+# (skos:closeMatch / recorded note), never silent overrides.
+#
+# Edit `order:` to change which authority is consulted first. The HITL gate
+# surfaces every conflict this file resolves so the SME can confirm.
+# =============================================================================
+
+schema: drydocs.precedence.v1
+updated: 2026-07-15   # K4 clause 7 — seal-pat-source-of-record wired into the live chain
+
+# The ordered authority chain. Lower index = higher authority.
+order:
+  - id: bmc-baseline
+    authority: 1
+    role: orchestration-vendor-baseline
+    governs: [Folder, Job, Condition, dependency, calendar, execution-host, run-as-user]
+    source: external/orchestration/bmc-controlm/
+    rationale: >
+      BMC Control-M is the canonical orchestrator. Its object semantics are ground truth;
+      other orchestrators (AutoSys, Airflow) crosswalk TO these concepts.
+
+  - id: internal-standards
+    authority: 2
+    role: company-convention
+    governs: [naming, data-center-codes, folder-naming, calendar-resolution, description-fields]
+    source: knowledge/standards/
+    rationale: >
+      Company conventions that refine the baseline for our environment. They normalize and
+      disambiguate baseline values but do not redefine baseline concepts.
+
+  - id: seal-pat-source-of-record
+    authority: 3
+    role: internal-source-of-record
+    governs: [internal-product-identity, internal-business-identity, application-fact-provenance]
+    source: "drydocs-docmeta scraped SEAL/PAT corpus (component pending; see knowledge/upgrade-plans/docmeta-component.md)"
+    rationale: >
+      SEAL/PAT scraped documentation is the authoritative source for internal product/business
+      IDENTITY — when a scraped SEAL/PAT fact conflicts with the catalog/PAT taxonomy on what
+      an internal application/product IS (not who owns it), SEAL/PAT wins. Placed ABOVE
+      lob-product-team because its identity claims must beat the catalog's; ownership/
+      business-context stays with lob-product-team (disjoint governs). WIRED at K4 clause 7
+      (2026-07-15; gate 2026-07-10 §D sign-off) from the former proposed_additions block.
+      No feed exists until drydocs-docmeta ships — the authority is live but silent.
+
+  - id: lob-product-team
+    authority: 4
+    role: org-taxonomy
+    governs: [ownership, business-context, LOB, ProductLine, Product, AreaProduct, DevTeam]
+    source: internal/org/        # confidential rosters live here
+    rationale: >
+      The org taxonomy assigns ownership and business context. Lowest authority for object
+      *meaning*, but the sole authority for *who owns it* — used to attach context, not to
+      redefine orchestration objects.
+
+# How conflicts are recorded when a lower authority disagrees with a higher one.
+conflict_policy:
+  winner: highest-authority
+  loser_disposition: alias        # record as skos:closeMatch / note on the edge or node
+  require_sme_confirmation: true  # the guided gate shows every conflict before it is applied
+  never: silent-drop
+
+# Toggle which authorities are active (e.g. disable a feed during onboarding).
+active:
+  bmc-baseline: true
+  internal-standards: true
+  seal-pat-source-of-record: true   # live but silent until the docmeta corpus feeds it
+  lob-product-team: true
+
+# =============================================================================
+# History: the seal-pat-source-of-record authority above was PROPOSED at the
+# 2026-07-08 review as an inert `proposed_additions:` block, gate-confirmed
+# 2026-07-10 (config/gate-prompts/seal-tom-attribution-reshape.yaml §D), and
+# WIRED into the live `order:`/`active:` chain at K4 clause 7 (2026-07-15).
+# The linked mechanism is prov:hadPrimarySource on every extracted fact —
+# config/taxonomy-ontology-map.yaml#seal-doc-source-of-record (confirmed) and
+# relationship_vocabulary.yaml#seal_had_primary_source (active, edge-only).
+# =============================================================================

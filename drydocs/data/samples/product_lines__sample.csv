@@ -1,0 +1,6 @@
+product_line_id,name,parent_lob_id
+PL_AUTO,Auto,LOB001
+PL_HL,Home Lending,LOB001
+PL_CARD,Card,LOB001
+PL_RISK,Risk Published Data,LOB001
+PL_DAT,Data & Analytics,LOB001

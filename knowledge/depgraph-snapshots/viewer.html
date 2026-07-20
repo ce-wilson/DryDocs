@@ -1,0 +1,323 @@
+<!doctype html>
+<meta charset="utf-8">
+<title>DryDocs depgraph snapshot viewer</title>
+<!--
+  Standalone viewer for depgraph snapshots (config/knowledge/depgraph-snapshots/*.json).
+  Load one snapshot to view; load a SECOND to compare (added = green, removed = red,
+  unchanged = grey). Compares by project-relative path, so e.g. drydocs-original vs
+  drydocs align. No build step — cytoscape.js (MIT) via CDN.
+
+  Two data sources:
+    1. Snapshot JSON  — load a file (A), add a second (B) to diff. Offline, no DB.
+    2. Live Neo4j     — the "Live Neo4j" button fetches CodeFile/DEPENDS_ON straight
+       from an Aura/Neo4j Query API v2 endpoint and renders it as A. Credentials are
+       typed at runtime and held in memory only (never written to this file or disk).
+       If the browser blocks the request with a CORS error, serve this file over http
+       (e.g. `python -m http.server` in this folder) instead of opening it as file://.
+
+  Note on Neo4j: NVL is the Neo4j-native viz library but is licensed for Neo4j-backed
+  apps and needs a build; depgraph also emits load.cypher for the Neo4j Browser/Bloom
+  path (and the Aura Console's own Query tab visualizes it natively). This file is the
+  zero-friction "just open it" option, now with an optional live connection.
+-->
+<script src="https://unpkg.com/cytoscape@3.30.2/dist/cytoscape.min.js"></script>
+<style>
+  :root { --bg:#0f1419; --panel:#1a212b; --ink:#e6edf3; --muted:#8b97a6;
+          --add:#3fb950; --del:#f85149; --same:#6e7b8b; --line:#30363d; --accent:#58a6ff; }
+  * { box-sizing:border-box; }
+  html,body { margin:0; height:100%; background:var(--bg); color:var(--ink);
+              font:13px/1.5 ui-sans-serif,system-ui,Segoe UI,Roboto,sans-serif; }
+  #app { display:grid; grid-template-rows:auto 1fr; height:100%; }
+  header { display:flex; gap:14px; align-items:center; flex-wrap:wrap;
+           padding:10px 14px; background:var(--panel); border-bottom:1px solid var(--line); }
+  header h1 { font-size:14px; margin:0 8px 0 0; font-weight:600; }
+  .grp { display:flex; gap:6px; align-items:center; }
+  label.file { cursor:pointer; padding:5px 10px; border:1px solid var(--line); border-radius:6px;
+               background:#222b36; color:var(--ink); }
+  label.file input { display:none; }
+  button, select { background:#222b36; color:var(--ink); border:1px solid var(--line);
+                   border-radius:6px; padding:5px 10px; cursor:pointer; font:inherit; }
+  button:hover { border-color:var(--accent); }
+  input[type=search] { background:#0d1117; color:var(--ink); border:1px solid var(--line);
+                       border-radius:6px; padding:5px 8px; width:160px; }
+  .muted { color:var(--muted); }
+  main { position:relative; }
+  #cy { position:absolute; inset:0; }
+  #stats { position:absolute; top:10px; left:10px; background:rgba(26,33,43,.92);
+           border:1px solid var(--line); border-radius:8px; padding:10px 12px; max-width:280px; }
+  #stats b { color:var(--accent); }
+  .chip { display:inline-block; padding:1px 7px; border-radius:10px; font-size:11px; margin-right:4px; }
+  .c-add{ background:rgba(63,185,80,.18); color:var(--add);} .c-del{ background:rgba(248,81,73,.18); color:var(--del);}
+  .c-same{ background:rgba(110,123,139,.18); color:var(--same);}
+  #legend{ position:absolute; bottom:10px; left:10px; background:rgba(26,33,43,.92);
+           border:1px solid var(--line); border-radius:8px; padding:8px 10px; font-size:11px; }
+  #legend .sw{ display:inline-block; width:10px; height:10px; border-radius:50%; margin-right:5px; vertical-align:middle;}
+  #tip{ position:absolute; padding:6px 8px; background:#000a; border:1px solid var(--line);
+        border-radius:6px; font-size:11px; pointer-events:none; display:none; max-width:340px; }
+  .hint{ color:var(--muted); font-size:12px; }
+  #conn{ position:absolute; top:10px; right:10px; width:340px; z-index:5;
+         background:rgba(26,33,43,.97); border:1px solid var(--line); border-radius:10px;
+         padding:12px 14px; display:flex; flex-direction:column; gap:8px; }
+  #conn label{ display:flex; flex-direction:column; gap:3px; font-size:11px; color:var(--muted); }
+  #conn label.conn-check{ flex-direction:row; align-items:center; gap:6px; }
+  #conn input[type=text], #conn input[type=password]{ background:#0d1117; color:var(--ink);
+         border:1px solid var(--line); border-radius:6px; padding:5px 7px; font:inherit; width:100%; }
+  #conn .conn-row{ display:flex; gap:8px; align-items:center; }
+  #conn #c-go{ border-color:var(--accent); }
+</style>
+
+<div id="app">
+  <header>
+    <h1>DryDocs · depgraph viewer</h1>
+    <div class="grp">
+      <label class="file">A (this version)<input type="file" id="fileA" accept=".json"></label>
+      <label class="file">B (compare)<input type="file" id="fileB" accept=".json"></label>
+    </div>
+    <div class="grp">
+      <span class="muted">View</span>
+      <select id="view">
+        <option value="structure">Structure (dirs)</option>
+        <option value="structure-files">Structure + files</option>
+        <option value="deps">Dependencies (imports)</option>
+      </select>
+    </div>
+    <div class="grp">
+      <button id="fit">Fit</button>
+      <button id="swap" title="swap A and B">Swap A/B</button>
+      <input type="search" id="search" placeholder="filter path…">
+    </div>
+    <div class="grp">
+      <button id="live" title="Fetch the live graph from a Neo4j Query API v2 endpoint">🔌 Live Neo4j</button>
+    </div>
+    <span class="hint" id="hint">Load a snapshot JSON to start. Add a second to compare.</span>
+  </header>
+  <main>
+    <div id="cy"></div>
+    <div id="stats"></div>
+    <div id="legend" hidden>
+      <div><span class="sw" style="background:var(--add)"></span>added (only B)</div>
+      <div><span class="sw" style="background:var(--del)"></span>removed (only A)</div>
+      <div><span class="sw" style="background:var(--same)"></span>unchanged</div>
+    </div>
+    <div id="tip"></div>
+    <div id="conn" hidden>
+      <div class="conn-row"><b>Connect to Neo4j</b> <span class="muted">(Query API v2)</span></div>
+      <label>Query API URL<input id="c-url" type="text" placeholder="https://<id>.databases.neo4j.io/db/<db>/query/v2"></label>
+      <label>User<input id="c-user" type="text" placeholder="neo4j or instance id" autocomplete="off"></label>
+      <label>Password<input id="c-pass" type="password" autocomplete="off"></label>
+      <label class="conn-check"><input id="c-remember" type="checkbox"> remember URL + user (this browser)</label>
+      <div class="conn-row">
+        <button id="c-go">Fetch graph</button>
+        <button id="c-cancel">Cancel</button>
+      </div>
+      <div id="c-msg" class="muted"></div>
+      <div class="muted" style="font-size:11px;margin-top:4px">
+        Credentials stay in memory. Password is never stored. CORS-blocked from file://? Serve over http.
+      </div>
+    </div>
+  </main>
+</div>
+
+<script>
+const state = { A:null, B:null, view:'structure' };
+
+function parse(raw, fallbackName){
+  const d = JSON.parse(raw);
+  const nodes = d.nodes || [];
+  const byId = new Map(nodes.map(n => [n.file_id, n]));
+  const contains = (d.rels && d.rels.CONTAINS) || [];
+  const deps = d.edges || [];
+  return {
+    name: (d.projects && d.projects.join('+')) || fallbackName,
+    meta: d.meta || null,
+    nodes, byId, contains, deps,
+    stats: { files: nodes.filter(n=>n.kind==='file').length,
+             dirs:  nodes.filter(n=>n.kind==='dir').length,
+             deps:  deps.length, contains: contains.length },
+  };
+}
+// project-relative key so original vs v1 align (strip differing project prefix)
+const keyOf = (snap,id) => { const n = snap.byId.get(id); return n ? (n.rel_path || n.name) : id; };
+
+function buildElements(){
+  const A = state.A, B = state.B, view = state.view;
+  if(!A) return [];
+  const wantFiles = view !== 'structure';        // structure = dirs only
+  const useDeps   = view === 'deps';
+  // node set from A (+B) keyed by rel_path
+  const nodeKeys = new Map();  // key -> {node, inA, inB}
+  const addNodes = (snap, flag) => {
+    if(!snap) return;
+    for(const n of snap.nodes){
+      if(useDeps && n.kind!=='file') continue;
+      if(!useDeps && !wantFiles && n.kind!=='dir') continue;
+      const k = n.rel_path || n.name;
+      const e = nodeKeys.get(k) || { node:n, inA:false, inB:false };
+      e[flag] = true; if(!e.node) e.node=n; nodeKeys.set(k, e);
+    }
+  };
+  addNodes(A,'inA'); addNodes(B,'inB');
+  const cmp = !!B;
+  const els = [];
+  for(const [k,e] of nodeKeys){
+    const cls = !cmp ? 'same' : (e.inA&&e.inB?'same':(e.inB?'add':'del'));
+    els.push({ data:{ id:k, label:e.node.name, kind:e.node.kind, rel:k, diff:cls }, classes:`${e.node.kind} ${cls}` });
+  }
+  const have = k => nodeKeys.has(k);
+  const edgeKeys = new Map();
+  const addEdges = (snap, flag) => {
+    if(!snap) return;
+    const list = useDeps ? snap.deps : snap.contains;
+    for(const [f,t] of list){
+      const kf = keyOf(snap,f), kt = keyOf(snap,t);
+      if(!have(kf)||!have(kt)) continue;
+      const id = kf+'->'+kt;
+      const e = edgeKeys.get(id) || { f:kf, t:kt, inA:false, inB:false };
+      e[flag]=true; edgeKeys.set(id,e);
+    }
+  };
+  addEdges(A,'inA'); addEdges(B,'inB');
+  for(const [id,e] of edgeKeys){
+    const cls = !cmp ? 'same' : (e.inA&&e.inB?'same':(e.inB?'add':'del'));
+    els.push({ data:{ id, source:e.f, target:e.t, diff:cls }, classes:`edge ${cls}` });
+  }
+  return els;
+}
+
+let cy;
+function render(){
+  const els = buildElements();
+  const layout = state.view==='deps'
+    ? { name:'cose', animate:false, nodeRepulsion:8000, idealEdgeLength:60, padding:30 }
+    : { name:'breadthfirst', directed:true, spacingFactor:1.1, padding:30 };
+  if(cy) cy.destroy();
+  cy = cytoscape({
+    container: document.getElementById('cy'),
+    elements: els,
+    layout,
+    style: [
+      { selector:'node', style:{ 'label':'data(label)','font-size':9,'color':'#cdd9e5',
+        'text-valign':'center','text-halign':'center','text-margin-y':-2,'width':14,'height':14,
+        'background-color':'#6e7b8b','border-width':0,'text-wrap':'none','min-zoomed-font-size':6 } },
+      { selector:'node.dir', style:{ 'shape':'round-rectangle','width':18,'height':12,'background-color':'#3a4d6b' } },
+      { selector:'node.add', style:{ 'background-color':'#3fb950' } },
+      { selector:'node.del', style:{ 'background-color':'#f85149' } },
+      { selector:'edge', style:{ 'width':1,'line-color':'#30363d','target-arrow-color':'#30363d',
+        'target-arrow-shape':'triangle','arrow-scale':.6,'curve-style':'straight' } },
+      { selector:'edge.add', style:{ 'line-color':'#3fb950','target-arrow-color':'#3fb950','width':1.4 } },
+      { selector:'edge.del', style:{ 'line-color':'#f85149','target-arrow-color':'#f85149','width':1.4 } },
+      { selector:'.dim', style:{ 'opacity':.12 } },
+      { selector:'.hi', style:{ 'background-color':'#58a6ff','line-color':'#58a6ff' } },
+    ],
+  });
+  const tip = document.getElementById('tip');
+  cy.on('tap','node', e=>{ const d=e.target.data();
+    tip.style.display='block'; tip.style.left=(e.renderedPosition.x+14)+'px';
+    tip.style.top=(e.renderedPosition.y+8)+'px';
+    tip.innerHTML = `<b>${d.label}</b><br><span class="muted">${d.rel}</span><br>${d.kind} · ${d.diff}`; });
+  cy.on('tap', e=>{ if(e.target===cy) tip.style.display='none'; });
+  drawStats();
+}
+
+function drawStats(){
+  const s=document.getElementById('stats'), A=state.A, B=state.B;
+  if(!A){ s.innerHTML='<span class="hint">No snapshot loaded.</span>'; return; }
+  const ver = m => m && m.git && m.git.commit ? ` <span class="muted">@${m.git.commit}${m.git.branch?' ('+m.git.branch+')':''}${m.git.pr?' PR#'+m.git.pr:''}</span>` : '';
+  let html = `<div><b>A</b> ${A.name}${ver(A.meta)} <span class="muted">· ${A.stats.files} files / ${A.stats.dirs} dirs / ${A.stats.deps} imports</span></div>`;
+  document.getElementById('legend').hidden = !B;
+  if(B){
+    html += `<div><b>B</b> ${B.name}${ver(B.meta)} <span class="muted">· ${B.stats.files} files / ${B.stats.dirs} dirs / ${B.stats.deps} imports</span></div>`;
+    const add = cy.nodes('.add').length, del = cy.nodes('.del').length, same = cy.nodes('.same').length;
+    html += `<div style="margin-top:6px"><span class="chip c-add">+${add} added</span><span class="chip c-del">−${del} removed</span><span class="chip c-same">${same} unchanged</span></div>`;
+    const addD = cy.nodes('.add').filter('.dir').map(n=>n.data('rel'));
+    const delD = cy.nodes('.del').filter('.dir').map(n=>n.data('rel'));
+    if(addD.length) html += `<div style="margin-top:6px" class="muted">+ dirs: ${addD.slice(0,12).join(', ')}${addD.length>12?'…':''}</div>`;
+    if(delD.length) html += `<div class="muted">− dirs: ${delD.slice(0,12).join(', ')}${delD.length>12?'…':''}</div>`;
+  }
+  s.innerHTML = html;
+}
+
+function loadFile(input, slot){
+  const f = input.files[0]; if(!f) return;
+  const r = new FileReader();
+  r.onload = () => { try{ state[slot]=parse(r.result, f.name); render();
+      document.getElementById('hint').textContent = state.B ? 'Compare mode: green=added in B, red=removed (only A).' : 'Loaded A. Add B to compare.';
+    }catch(err){ alert('Could not parse '+f.name+': '+err.message); } };
+  r.readAsText(f);
+}
+document.getElementById('fileA').addEventListener('change', e=>loadFile(e.target,'A'));
+document.getElementById('fileB').addEventListener('change', e=>loadFile(e.target,'B'));
+document.getElementById('view').addEventListener('change', e=>{ state.view=e.target.value; if(state.A) render(); });
+document.getElementById('fit').addEventListener('click', ()=>cy&&cy.fit(null,30));
+document.getElementById('swap').addEventListener('click', ()=>{ [state.A,state.B]=[state.B,state.A]; if(state.A) render(); });
+// ---- Live Neo4j (Query API v2) ------------------------------------------------
+// Builds a snapshot object in the same shape parse() returns, from CodeFile nodes
+// and DEPENDS_ON edges, then renders it as slot A in the Dependencies view.
+const conn = document.getElementById('conn');
+const cmsg = document.getElementById('c-msg');
+const LS = 'depgraph-viewer-conn';
+function openConn(){
+  try{ const s = JSON.parse(localStorage.getItem(LS)||'{}');
+    if(s.url) document.getElementById('c-url').value = s.url;
+    if(s.user) document.getElementById('c-user').value = s.user;
+    if(s.url||s.user) document.getElementById('c-remember').checked = true;
+  }catch(e){}
+  conn.hidden = false; cmsg.textContent=''; document.getElementById('c-pass').focus();
+}
+document.getElementById('live').addEventListener('click', openConn);
+document.getElementById('c-cancel').addEventListener('click', ()=>{ conn.hidden = true; });
+
+async function queryApi(url, auth, statement){
+  const res = await fetch(url, { method:'POST',
+    headers:{ 'Content-Type':'application/json', 'Accept':'application/json', 'Authorization':'Basic '+auth },
+    body: JSON.stringify({ statement }) });
+  const j = await res.json().catch(()=>({}));
+  if(!res.ok || (j.errors && j.errors.length))
+    throw new Error((j.errors && j.errors[0] && (j.errors[0].message||j.errors[0].error)) || ('HTTP '+res.status));
+  return j.data ? j.data.values : [];
+}
+document.getElementById('c-go').addEventListener('click', async ()=>{
+  const url = document.getElementById('c-url').value.trim();
+  const user = document.getElementById('c-user').value.trim();
+  const pass = document.getElementById('c-pass').value;
+  if(!url || !user){ cmsg.textContent='URL and user are required.'; return; }
+  const auth = btoa(user+':'+pass);
+  cmsg.textContent = 'Connecting…';
+  try{
+    const nodeRows = await queryApi(url, auth,
+      'MATCH (f:CodeFile) RETURN f.fileId, coalesce(f.name, f.fileId), coalesce(f.relPath, f.fileId), coalesce(f.project,"") ORDER BY f.fileId');
+    const edgeRows = await queryApi(url, auth,
+      'MATCH (a:CodeFile)-[:DEPENDS_ON]->(b:CodeFile) RETURN a.fileId, b.fileId');
+    if(!nodeRows.length){ cmsg.textContent='Connected, but no :CodeFile nodes found. Run load.cypher first.'; return; }
+    const nodes = nodeRows.map(([file_id,name,rel_path,project])=>({ file_id, name, rel_path, project, kind:'file' }));
+    const snap = {
+      name: (nodes[0].project || 'neo4j') + ' (live)',
+      meta: { git:{ commit:'live', branch:new URL(url).hostname.split('.')[0] } },
+      nodes, byId:new Map(nodes.map(n=>[n.file_id,n])),
+      contains: [], deps: edgeRows.map(([f,t])=>[f,t]),
+      stats:{ files:nodes.length, dirs:0, deps:edgeRows.length, contains:0 },
+    };
+    state.A = snap; state.B = null;
+    state.view = 'deps'; document.getElementById('view').value = 'deps';
+    render();
+    document.getElementById('hint').textContent = `Live: ${snap.stats.files} files / ${snap.stats.deps} imports from Neo4j.`;
+    if(document.getElementById('c-remember').checked)
+      localStorage.setItem(LS, JSON.stringify({ url, user }));
+    else localStorage.removeItem(LS);
+    conn.hidden = true;
+  }catch(err){
+    const cors = /Failed to fetch|NetworkError|CORS/i.test(err.message);
+    cmsg.textContent = cors
+      ? 'Request blocked (likely CORS on file://). Serve this folder over http and retry.'
+      : 'Error: '+err.message;
+  }
+});
+
+document.getElementById('search').addEventListener('input', e=>{
+  const q=e.target.value.trim().toLowerCase(); if(!cy) return;
+  if(!q){ cy.elements().removeClass('dim hi'); return; }
+  cy.batch(()=>{ cy.elements().addClass('dim').removeClass('hi');
+    const hit=cy.nodes().filter(n=>(n.data('rel')||'').toLowerCase().includes(q));
+    hit.removeClass('dim').addClass('hi'); hit.connectedEdges().removeClass('dim'); hit.neighborhood().removeClass('dim'); });
+});
+</script>

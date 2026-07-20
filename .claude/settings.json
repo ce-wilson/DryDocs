@@ -1,0 +1,24 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(poetry --version)",
+      "Bash(py --version)",
+      "Bash(poetry run *)",
+      "Bash(poetry update *)",
+      "Bash(poetry config *)",
+      "Bash(git log *)",
+      "Bash(git status)",
+      "Bash(git diff *)",
+      "Bash(git add *)",
+      "Bash(git commit *)",
+      "Bash(ls *)",
+      "Bash(mkdir *)",
+      "Bash(cat *)",
+      "PowerShell($env:NEO4J_URI; $env:NEO4J_USER; $env:NEO4J_DATABASE)",
+      "PowerShell($env:NEO4J_URI)",
+      "PowerShell($env:NEO4J_USER)",
+      "PowerShell($env:NEO4J_DATABASE)",
+      "PowerShell(.claude/skills/run-drydocs/smoke.ps1)"
+    ]
+  }
+}

@@ -1,0 +1,68 @@
+# =============================================================================
+# CI — the CLAUDE.md §6 gates as an enforced push guard (backlog J5).
+#
+# Unit-test scope ONLY: no Neo4j, no Oracle, no network-dependent steps — the
+# suite's own skip guards handle the gitignored sample data (test_skip_guard_policy
+# enforces that they skip, never fail). The classification test is the automated
+# half of the publish boundary (PUBLISH-BOUNDARY.md).
+#
+# ruff is ADVISORY (continue-on-error): the repo has never gated on lint and
+# carries ~757 pre-existing findings — gating it needs its own cleanup item
+# first (see backlog J5 notes). Everything else is blocking.
+# =============================================================================
+name: ci
+
+on:
+  push:
+    branches: ["**"]
+  pull_request:
+
+jobs:
+  gates:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.11", "3.12"]
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Install Poetry
+        run: pipx install poetry
+
+      - name: Cache Poetry virtualenv
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/pypoetry
+          key: poetry-${{ runner.os }}-py${{ matrix.python-version }}-${{ hashFiles('poetry.lock') }}
+          restore-keys: poetry-${{ runner.os }}-py${{ matrix.python-version }}-
+
+      - name: Install dependencies
+        run: poetry install --no-interaction
+
+      # --- the CLAUDE.md §6 gates (blocking) --------------------------------
+      - name: Unit test suite
+        run: poetry run pytest -q
+
+      - name: CLI imports
+        run: poetry run python -c "import drydocs.cli"
+
+      - name: CLI help
+        run: poetry run drydocs --help
+
+      # --- named guards (blocking; subsets of the suite, surfaced explicitly)
+      - name: Publish-boundary guard (classification)
+        run: poetry run pytest tests/unit/test_classification.py -q
+
+      - name: Schema / vocabulary guard
+        run: poetry run pytest tests/unit/test_schema.py -q
+
+      # --- advisory (non-blocking): pre-existing findings, not yet gated ----
+      - name: ruff check (advisory)
+        continue-on-error: true
+        run: poetry run ruff check .

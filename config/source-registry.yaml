@@ -1,0 +1,223 @@
+# =============================================================================
+# config/source-registry.yaml — every data-pipeline source, declared once.
+#
+# Each entry binds a SOURCE to: its orchestrator (Tier-2 vendor), its adapter,
+# the taxonomy it feeds, and its crosswalk-confirmation state. Loaders and the
+# `pipeline-config` agent read this; nothing loads until `confirmed: true`.
+#
+# REQUIRED on every entry (enforced by tests/unit/test_classification.py):
+#   classification — one of config/classification.yaml levels (sensitivity / publish tier)
+#   source         — the system/path the data comes from
+#   (External sources additionally need source_url + captured_at)
+# =============================================================================
+
+schema: drydocs.source-registry.v1
+updated: 2026-07-09
+
+sources:
+  # ---- Orchestration metadata (Tier-2 vendors) -----------------------------
+  - id: controlm-psgmgr
+    classification: Internal            # operational scheduling metadata; not for public GitHub
+    source: "oracle:psgmgr.CM_* objects"
+    kind: orchestration
+    orchestrator: bmc-controlm          # baseline — no crosswalk needed
+    adapter: oracle                     # OracleAdapter over psgmgr.* views
+    # locator — granular source coordinates (SEAL app → platform → service →
+    # schema → objects). Mechanism committed here; REAL values (SEAL id, DB
+    # service/TNS name) are Internal-Confidential and live only in the
+    # internal/ twin + connection env (internal-local/) — the publish
+    # boundary is why a public "test Oracle container" is never needed.
+    locator:
+      application: ~                    # SEAL id of the owning application — internal/ twin only
+      source_product: controlm          # what the data IS  — config/taxonomy/software-registry.yaml product id
+      platform: oracle-db               # what CARRIES it   — software-registry product id (the replica's DB)
+      service: ~                        # DB service/TNS — connection env (internal-local/), never committed
+      schema: psgmgr                    # established public vocabulary
+      mapping: config/source-mappings/controlm-psgmgr.yaml   # object/column ledger
+    feeds_taxonomy: [folders, jobs, conditions, dependencies, variables, hosts, runtime_stats]
+    confirmed: true
+    notes: >
+      Live. The canonical structural-lineage feed. See README §Control-M
+      lineage. CM_HOSTS (host-group membership) added 2026-07-09 via the
+      add-source-object walkthrough; gate controlm-hosts-topology SME-confirmed
+      same day (config/gate-log.md) — staging-only until the hosts loader +
+      RUNS_ON resolution pass ship (P3/P4 residual verifications first).
+      CM_AVG_RUN (runtime stats) added 2026-07-09 same walkthrough — gate
+      controlm-avg-run-supplement AWAITING SME; property supplement onto
+      :ControlMJob, no new vocabulary.
+
+  - id: autosys-export
+    classification: Internal
+    source: "autosys export (TBD)"
+    kind: orchestration
+    orchestrator: autosys
+    adapter: ~                          # TBD
+    feeds_taxonomy: [folders, jobs, conditions, dependencies]
+    confirmed: true                     # gate autosys-crosswalk SIGNED OFF 2026-07-14 (config/gate-log.md); loader still unbuilt + separately gated
+    crosswalk: config/crosswalks/autosys-to-bmc.yaml
+    gate_spec: config/gate-prompts/autosys-crosswalk.yaml
+    notes: >
+      Placeholder. 11-row draft crosswalk to bmc-controlm (config/crosswalks/autosys-to-bmc.yaml)
+      is status: proposed, stopped at the HITL gate — SME not yet run. See
+      external/orchestration/autosys/README.md for the narrative summary. Activate
+      (confirmed: true) only after the gate spec above is SME-confirmed and logged in
+      config/gate-log.md.
+
+  - id: airflow-mwaa
+    classification: Internal
+    source: "MWAA DAG export (TBD)"
+    kind: orchestration
+    orchestrator: airflow
+    adapter: ~
+    feeds_taxonomy: [folders, jobs, conditions, dependencies]
+    confirmed: true                     # gate airflow-crosswalk SIGNED OFF 2026-07-14 (config/gate-log.md); loader still unbuilt + separately gated
+    crosswalk: config/crosswalks/airflow-to-bmc.yaml
+    gate_spec: config/gate-prompts/airflow-crosswalk.yaml
+    notes: >
+      Placeholder. 12-row draft crosswalk to bmc-controlm (config/crosswalks/airflow-to-bmc.yaml)
+      is status: proposed, stopped at the HITL gate — SME not yet run. See
+      external/orchestration/airflow/README.md for the narrative summary. Activate
+      (confirmed: true) only after the gate spec above is SME-confirmed and logged in
+      config/gate-log.md.
+
+  # ---- Internal reference data (Tier-3 confidential) -----------------------
+  - id: seal-extract
+    classification: Internal-Confidential   # real applications, ownership, employees, SEAL ids
+    source: "SEAL extract (internal)"
+    kind: internal
+    orchestrator: ~
+    adapter: csv                        # CsvAdapter (samples) / internal extract in prod
+    feeds_taxonomy: [applications, ports, memberships, roles, employees]
+    confirmed: true
+    notes: "Live. SEAL applications + ownership."
+
+  - id: catalog-pat
+    classification: Internal-Confidential   # real LOB→Product→Team rosters, team names, SEAL ids
+    source: "PAT/Catalog extract (internal): catalog hierarchy + the PAT team report"
+    kind: internal
+    orchestrator: ~
+    adapter: csv
+    locator:
+      source_product: pat                 # the Product Agility Tool (internal catalog UI)
+      extract: ~                          # real report path/export coordinates — internal/ twin only
+      mapping: ~                          # team report: team_id, lob, seal_ids (1..n), jira board,
+                                          # team_type/relationship, status, agile framework — REAL
+                                          # rows (SEAL ids, team names, rosters) never committed here
+    feeds_taxonomy: [lob, product_lines, products, area_products, dev_teams, team_applications]
+    confirmed: true
+    notes: >
+      Live. LOB→Product→Team catalog (lowest precedence authority). C9 gate
+      (2026-07-18): the PAT team report added as the team_applications feed —
+      team-scoped seal_ids populate the ACTIVE arch_develops edge; alignment
+      (supporting area product, else product) is VOLATILE and relationship-typed
+      (dedicated|aligned|flex), swept per team on each load; sponsoring product/
+      area-product are distinct sponsored:true edges. SME evidence held
+      in-session (screenshots, Internal-Confidential — not committed).
+
+  # ---- Reference ledgers (repo-committed, publishable) ----------------------
+  - id: software-registry
+    classification: Internal-Public     # DryDocs' own stack only; no company catalog rows
+    source: "config/taxonomy/software-registry.yaml"
+    kind: reference
+    orchestrator: ~
+    adapter: yaml                       # RegistryYamlAdapter (flattens vendors/products)
+    feeds_taxonomy: [vendors, software_products]
+    confirmed: true                     # SME gate 2026-07-07 (ADR 0004; config/gate-log.md)
+    notes: "Third-party software registry (plan 07). Vendor = brand only; graph is the lookup."
+
+  # ---- Docs corpora (converted documentation → lexical graph) ---------------
+  - id: bmc-docs
+    classification: External             # public BMC documentation, converted; cite source_url per doc
+    source: "external/orchestration/bmc-controlm/controlm-*.md (26 converted BMC pages; SOURCE-MANIFEST.md = provenance model)"
+    source_url: "https://documents.bmc.com/ (per-doc URLs in each file header)"
+    captured_at: 2026-06-11
+    kind: docs
+    orchestrator: ~
+    adapter: markdown                    # BmcDocsAdapter (H2 chunking, manifest tier rule)
+    feeds_taxonomy: [documents, chunks]
+    confirmed: true                      # gate bmc-docs-lexical-load SME-accepted 2026-07-08 (config/gate-log.md)
+    gate_spec: config/gate-prompts/bmc-docs-lexical-load.yaml
+    notes: >
+      The converted BMC docs corpus loaded as the llm-graph-builder LEXICAL graph
+      (Document -> Chunk chains) with per-chunk provenance tier
+      VERBATIM|GROUNDED|SYNTHESIZED per the SOURCE-MANIFEST default rule —
+      SYNTHESIZED chunks are Claude inference, never vendor ground truth (the
+      two-corpus rule). Software-ontology hook: (Document)-[:DESCRIBES
+      {target_version}]->(SoftwareProduct controlm); load ORDER: the software
+      registry loads first (DESCRIBES MATCHes the product, never MERGEs it).
+      NOT a source-of-record (the XML-format acquisition stub tracks the real
+      9.0.21.300 config SoR). User-directed 2026-07-08: the local EE DB carries
+      only sample Control-M data, so this corpus is the demonstrable content.
+
+  - id: essential-graphrag
+    classification: External             # published Manning/Neo4j-sponsored ebook; the PDF is LOCAL-ONLY (gitignored) — cite source_url, never commit
+    source: "Essential-GraphRAG.pdf (repo root, gitignored local copy of the published ebook; Bratanič & Hane, Manning 2025, 179 PDF pages)"
+    source_url: "https://www.manning.com/books/essential-graphrag"
+    captured_at: 2026-07-14
+    kind: docs
+    orchestrator: ~
+    adapter: pdf                         # EssentialGraphragAdapter (pdf-lexical-v1: deterministic chapter/section chunking via pypdf)
+    feeds_taxonomy: [documents, chunks]
+    confirmed: true                      # Q2 groom decision 2026-07-16 (user-directed experiment): pure REUSE of the ACTIVE docs_* lexical vocabulary — no new edge meaning, so the covering gate is bmc-docs-lexical-load (2026-07-08); no new gate session required
+    notes: >
+      The Q2 experiment corpus (backlog Q2, Epic Q / phase 14): the Essential
+      GraphRAG ebook loaded as a Document -> Chunk lexical graph for
+      agent-traversal testing, feeding the docmeta P0 benchmark verdict
+      (traversal arm). Target DB = ddcontext (execution decision recorded in
+      backlog Q2 notes: experiment/reference content stays out of the
+      ground-truth drydocs DB; matches the user's "our own unstructured
+      context graph" phrasing and the jpmc-reports ddcontext precedent).
+      Every chunk is tier GROUNDED (pdf-extract-grounded-v1: pypdf extraction
+      is mechanical but lossy). The bmc_docs DESCRIBES hook is deliberately
+      omitted — the book describes a methodology, not a registry
+      SoftwareProduct, and ddcontext carries no product nodes. Pattern notes
+      mined from the same book: reference/research/essential-graphrag-notes.md (Q1).
+
+  # ---- Data platforms (sources of DataAsset/lineage) -----------------------
+  - id: oracle-schemas
+    classification: Internal-Confidential   # real schema/table/object names
+    source: "oracle:<schema> (internal)"
+    kind: data-platform
+    orchestrator: ~
+    adapter: oracle
+    feeds_taxonomy: [schemas, tables, scripts]
+    confirmed: false                    # ingestion pipeline planned (see backlog)
+    notes: "Oracle DB schemas/scripts as taxonomy → DataAsset. Real names are confidential."
+
+  - id: snowflake
+    classification: Internal-Confidential
+    source: "snowflake (TBD)"
+    kind: data-platform
+    orchestrator: ~
+    adapter: ~
+    feeds_taxonomy: [schemas, tables]
+    confirmed: false
+    notes: "Expansion placeholder."
+
+  # ---- Staging semantic-fact streams (C3/C4 variable normalization) --------
+  - id: stg-app-fact
+    classification: Internal             # mechanism-only entry; no real SEAL/FID/app-name values here
+    source: "oracle:DRYDOCS_STG.STG_APP_FACT (Python normalizer output over CM_DEF_SETVAR_VW)"
+    kind: staging
+    orchestrator: ~                      # not an orchestration vendor — a staging table fed by the C3/C4 variable-normalization stream
+    adapter: oracle
+    feeds_taxonomy: [applications]       # semantic facts attribute a ControlMJob to an Application (SEAL)
+    confirmed: true                      # gate seal-attribution-match-policy SIGNED OFF 24/24 (2026-07-14, config/gate-log.md) — the entry's own activation condition
+    gate_spec: config/gate-prompts/seal-attribution-match-policy.yaml
+    loader: drydocs/loaders/seal_attribution.py   # built with the flip (K2); cypher seal_attribution.cypher
+    notes: >
+      Registered per K1's flag (docs/restructure/backlog.yaml Epic K): job.APPLICATION
+      (CM_DEF_VJOB) is NOT reliable SEAL identity — the SEAL-attribution feed is this
+      table's semantic facts instead. Rows carry fact_type in {SEAL, FID, APP_NAME,
+      ALIAS, ...} + fact_value, one row per (run, job, fact_type) — see
+      docs/controlm-staging-ingestion-flow.md (STG_APP_FACT ER block) and
+      docs/reviews/sdlc-oracle-ingestion.md §FR-OI-007. Feeds the now-ACTIVE
+      m3_seal_app_ref mapping (WAS_ASSOCIATED_WITH, role seal_app_ref,
+      drydocs_core/ontology/relationship_vocabulary.yaml) and the confirmed
+      taxonomy-ontology-map.yaml entry (job-seal-app-ref). Mechanism-only
+      here — no real SEAL id / FID / application-name values, column/fact-type names
+      only. ACTIVATED 2026-07-14 with the K2 loader build: the match-policy gate
+      (SEAL-fact precedence; one-to-one accepted, zero-unmatched surfaced, multi-hit
+      deterministic triage; manual tier-5 PIN) was SME-confirmed and logged that day —
+      exactly the activation condition this entry carried since K1. Extract:
+      drydocs/loaders/sql/controlm_app_facts.sql (ORDER BY = the tie-break contract).

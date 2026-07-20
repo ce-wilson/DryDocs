@@ -1,0 +1,17 @@
+# INTERNAL — real M0 unit, transcribed from production screenshots 2026-06-11
+# (gate-1 fallback; see m0-poc-worked-example.md Gate 1). Never publish.
+schema: drydocs.remediation.transcript.v1
+source: production screenshots 2026-06-11 (worked-example Gate 1)
+folder:
+  name: PRARAG-HLDM-89211-MLCM-ORIG-CRM-TRUST-DLY
+  variables: []
+jobs:
+  - name: PARAD00010_MLCM_ORIGINATIONS_DAILY_CRM_INDICATOR_TOK_ONPM_FW
+    type: FileWatcher
+    watch_template: "%%DRPBX_DIR.%%FILE_NM_PREFIX.%%BUS_DATE.%%FILE_NM_SUFFIX.%%EXTENSION"
+    variables:
+      - {name: "%%DRPBX_DIR", value: "/data/uds/mlc/dropbox/MLCM/"}
+      - {name: "%%FILE_NM_PREFIX", value: "Originations_Daily_CRM_Indicator_"}
+      - {name: "%%BUS_DATE", value: "%%$ODATE"}
+      - {name: "%%FILE_NM_SUFFIX", value: "."}
+      - {name: "%%EXTENSION", value: "tok"}

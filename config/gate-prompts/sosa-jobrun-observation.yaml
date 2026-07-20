@@ -1,0 +1,95 @@
+# SME gate-prompt spec — SOSA/SSN jobrun-observation modelling decision (context-graph, E1).
+# Prepared with the SME NOT present — this page STOPS at the gate. Nothing here is confirmed:
+# no relationship_vocabulary.yaml status flips from planned, no config/taxonomy-ontology-map.yaml
+# status flips to confirmed, no graph write. Mechanism-only: column names and rules, no data
+# values. classification: Internal-Public.
+classification: Internal-Public
+schema: drydocs.gate-prompt.v1
+id: sosa-jobrun-observation
+title: "SME Gate — SOSA/SSN jobrun-observation modelling decision (context-graph pilot)"
+step: "Resolves the open Observation-shape question before the E2 loader is written (backlog E1 remainder)"
+summary: >
+  The SOSA/SSN registration step (namespaces, sosa_experimental_supplement.cypher, the 4 planned
+  vocabulary terms) is already done. What remains is one modelling fork: is a Control-M job run
+  itself the sosa:Observation (a dual-typed ControlMJobRun node), or does a separate Observation
+  node attach to the run? Both options are presented below with PROV/SOSA readings; the
+  ontology-mapper's recommendation is Option A, but this is a proposal, not a decision — an SME
+  must actually review this page and record the call (Option A / Option B / other) in
+  config/gate-log.md before anything here can become confirmed or active.
+meta:
+  Module: "drydocs-core · context graph (SOSA/SSN, experimental)"
+  Source: "oracle:psgmgr.CM_HIST_VW — run-history view (live extract, not the Control-M history API)"
+  Software: "controlm (Control-M) MADE_BY bmc — config/taxonomy/software-registry.yaml"
+  Registry ref: "controlm-psgmgr — confirmed (config/source-registry.yaml); orchestrator: bmc-controlm (baseline)"
+  Classification: "Internal (source data) · this page Internal-Public (mechanism only)"
+  Taxonomy: "config/taxonomy/controlm.yaml (job/run elements); no dedicated run-history taxonomy file yet"
+  Ontology map: "config/taxonomy-ontology-map.yaml `jobrun-observation` (status: proposed) + drydocs_core/ontology/relationship_vocabulary.yaml (sosa_observes / sosa_has_result / sosa_made_by_sensor / sosa_observed_property, all status: planned, adoption: experimental)"
+  Source of record: "reference/standards/sosa-ssn/README.md + drydocs_core/schema/sosa_experimental_supplement.cypher"
+mapping:
+  - n: 1
+    element: "OPTION A (recommended): ControlMJobRun dual-typed as the sosa:Observation"
+    target: ":ControlMJobRun:Observation {…}"
+    edge: "(:ControlMJobRun:Observation)-[:OBSERVES]->(:ControlMJob)  [PROPOSED — RECOMMENDED]"
+  - n: 2
+    element: "OPTION B (alternative): a separate Observation node attached to the run"
+    target: ":Observation (new node)"
+    edge: "(:Observation)-[:OBSERVES]->(:ControlMJob); Observation→ControlMJobRun link NOT YET REGISTERED  [PROPOSED — ALTERNATIVE]"
+  - n: 3
+    element: "sosa_has_result — CM_HIST_VW row's result (status, timing)"
+    target: ":Result {resultTime, …}"
+    edge: "(:Observation)-[:HAS_RESULT]->(:Result)  [PROPOSED]"
+  - n: 4
+    element: "sosa_made_by_sensor — the monitoring source that produced the run row"
+    target: ":Sensor"
+    edge: "(:Observation)-[:MADE_BY_SENSOR]->(:Sensor)  [PROPOSED — Sensor = the psgmgr CM_HIST_VW extract itself for this pilot, not a physical device]"
+  - n: 5
+    element: "sosa_observed_property — run-status | run-duration | freshness"
+    target: ":ObservableProperty"
+    edge: "(:Observation)-[:OF_OBSERVABLE_PROPERTY]->(:ObservableProperty)  [PROPOSED]"
+provenance:
+  - label: ":ControlMJobRun / candidate :Observation"
+    source_object: "psgmgr CM_HIST_VW"
+    key: "JOB_MEM_NAME + ODATE (+ run-attempt discriminator — TBD, open question)"
+    loader: "~ (none yet — E2 pilot, not written until this gate resolves)"
+    properties:
+      - {name: job_mem_name, origin: source, from: JOB_MEM_NAME, note: "run-side name column"}
+      - {name: run_definition_join, origin: derived, from: "CM_HIST_VW.JOB_MEM_NAME = CM_DEF_VJOB.JOB_NAME", note: "the reliable run<->definition identity join. MEMNAME is a SEPARATE CM_DEF_VJOB column, already demoted in the q1q3 gate (informational only, may be junk) — it is NEVER used as a join key, here or there."}
+      - {name: odate, origin: source, from: ODATE, note: "order date / run cycle date"}
+      - {name: jobno, origin: source, from: JOBNO, note: "Control-M internal order number — not confirmed stable across reruns; feeds the run-attempt-discriminator open question"}
+      - {name: status, origin: source, from: STATUS, note: "raw run status code; mapping to ObservableProperty run-status is TBD"}
+      - {name: startrun / endrun, origin: source, from: "STARTRUN / ENDRUN", note: "run timing — feeds sosa:resultTime / run-duration"}
+      - {name: oscompstat, origin: source, from: OSCOMPSTAT, note: "OS-level completion status"}
+      - {name: dual_type_merge, origin: derived, from: "MERGE (:ControlMJobRun:Observation)", note: "loader shape choice — applies ONLY if the gate confirms Option A"}
+  - label: "SOSA term bindings (relationship_vocabulary.yaml, status: planned)"
+    source_object: "drydocs_core/ontology/relationship_vocabulary.yaml local_relationships"
+    key: "sosa_maps_to"
+    loader: "~"
+    properties:
+      - {name: sosa_observes, origin: derived, from: "sosa_observes -> sosa:hasFeatureOfInterest", note: "(:Observation)-[:OBSERVES]->(:ControlMJob)"}
+      - {name: sosa_has_result, origin: derived, from: "sosa_has_result -> sosa:hasResult", note: "(:Observation)-[:HAS_RESULT]->(:Result)"}
+      - {name: sosa_made_by_sensor, origin: derived, from: "sosa_made_by_sensor -> sosa:madeBySensor", note: "(:Observation)-[:MADE_BY_SENSOR]->(:Sensor)"}
+      - {name: sosa_observed_property, origin: derived, from: "sosa_observed_property -> sosa:observedProperty", note: "(:Observation)-[:OF_OBSERVABLE_PROPERTY]->(:ObservableProperty)"}
+sections:
+  - title: "A. Modelling decision — Option A vs Option B"
+    confirmations:
+      - "Option A reviewed: ControlMJobRun is dual-typed as the sosa:Observation (one node carries both prov:Activity and sosa:Observation semantics; single-hop OBSERVES/HAS_RESULT off the existing execution-lineage node)."
+      - "Option B reviewed: a separate :Observation node references the run instead; noted that its edge back to ControlMJobRun is NOT YET a registered relationship (would need a 5th vocabulary term before this option is loadable)."
+      - "ontology-mapper's recommendation (Option A) is understood as PROPOSED ONLY — CM_HIST_VW is one-row-per-run so splitting it into two nodes duplicates identity without adding information; this is not yet an accepted decision."
+      - "SME selects Option A, Option B, or a third alternative and records the choice + rationale in config/gate-log.md before any status here flips to confirmed."
+  - title: "B. SOSA term bindings (the 4 planned vocabulary entries)"
+    confirmations:
+      - "sosa_observes — (:Observation)-[:OBSERVES]->(:ControlMJob), maps to sosa:hasFeatureOfInterest — applies to this pilot edge."
+      - "sosa_has_result — (:Observation)-[:HAS_RESULT]->(:Result), maps to sosa:hasResult — applies; Result carries resultTime derived from STARTRUN/ENDRUN."
+      - "sosa_made_by_sensor — (:Observation)-[:MADE_BY_SENSOR]->(:Sensor), maps to sosa:madeBySensor — applies; Sensor = the psgmgr CM_HIST_VW extract itself for this pilot, not a physical device."
+      - "sosa_observed_property — (:Observation)-[:OF_OBSERVABLE_PROPERTY]->(:ObservableProperty), maps to sosa:observedProperty — applies; pilot scope is narrowed to run-status pending the open question on duration/freshness."
+      - "All four terms stay status: planned / adoption: experimental in relationship_vocabulary.yaml until this gate is actually run by an SME — none flip to active from this page."
+  - title: "C. Run-history source identity rule"
+    confirmations:
+      - "Run-history source is psgmgr CM_HIST_VW (an Oracle view), not the Control-M history API — confirmed mechanism, not a data value."
+      - "Join identity: CM_HIST_VW.JOB_MEM_NAME = CM_DEF_VJOB.JOB_NAME is the only reliable link from a run row back to its job definition."
+      - "MEMNAME (a separate CM_DEF_VJOB column) is unreliable and is NEVER used as a join key here, consistent with its demotion in the controlm-q1q3-phase1 gate."
+      - "CM_HIST_VW materializes before ROWNUM is applied — expensive; every extract must bind an indexed predicate (JOB_MEM_NAME plus a bounded ODATE/ORDER_DATE range), never a bare SELECT *."
+  - title: "D. Sign-off"
+    confirmations:
+      - "This page was prepared by the ontology-mapper with the SME NOT present — nothing on this page is confirmed. No relationship_vocabulary.yaml status changes, no taxonomy-ontology-map.yaml status changes to confirmed, and no graph write happen from this page alone."
+      - "Safe to transcribe into config/gate-log.md once an SME has actually reviewed this page in person and made the Option A / Option B / other call."

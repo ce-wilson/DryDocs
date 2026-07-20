@@ -1,0 +1,560 @@
+{
+  "module": "DryDocs",
+  "branch": "refactor/vendor-internal-separation",
+  "package_root": "drydocs",
+  "internal_modules": [
+    "drydocs",
+    "drydocs.adapters",
+    "drydocs.adapters.base",
+    "drydocs.adapters.csv_adapter",
+    "drydocs.adapters.oracle_adapter",
+    "drydocs.cli",
+    "drydocs.config",
+    "drydocs.controlm",
+    "drydocs.controlm.commands",
+    "drydocs.controlm.facts",
+    "drydocs.controlm.folder_name",
+    "drydocs.controlm.paths",
+    "drydocs.controlm.resolver",
+    "drydocs.controlm.staging",
+    "drydocs.controlm.variable_report",
+    "drydocs.controlm.variables",
+    "drydocs.loaders",
+    "drydocs.loaders.base",
+    "drydocs.loaders.business_segments",
+    "drydocs.loaders.catalog",
+    "drydocs.loaders.controlm",
+    "drydocs.loaders.controlm_conditions_in",
+    "drydocs.loaders.controlm_conditions_out",
+    "drydocs.loaders.controlm_dependencies_derived",
+    "drydocs.loaders.controlm_folders",
+    "drydocs.loaders.controlm_jobs",
+    "drydocs.loaders.seal_applications",
+    "drydocs.loaders.seal_contacts",
+    "drydocs.models",
+    "drydocs.models.catalog",
+    "drydocs.models.controlm",
+    "drydocs.models.seal",
+    "drydocs.neo4j_client",
+    "drydocs.ontology",
+    "drydocs.ontology.namespaces",
+    "drydocs.snapshots",
+    "drydocs.snapshots.writer",
+    "tests.unit",
+    "tests.unit.test_base_loader_smoke",
+    "tests.unit.test_command_parser",
+    "tests.unit.test_controlm_cypher",
+    "tests.unit.test_controlm_models",
+    "tests.unit.test_folder_name_parser",
+    "tests.unit.test_namespaces",
+    "tests.unit.test_schema",
+    "tests.unit.test_variable_classifier",
+    "tests.unit.test_variable_resolver",
+    "tests.unit.test_variable_staging"
+  ],
+  "edges": [
+    [
+      "drydocs.adapters",
+      "drydocs.adapters.base"
+    ],
+    [
+      "drydocs.adapters",
+      "drydocs.adapters.csv_adapter"
+    ],
+    [
+      "drydocs.adapters",
+      "drydocs.adapters.oracle_adapter"
+    ],
+    [
+      "drydocs.cli",
+      "drydocs.adapters"
+    ],
+    [
+      "drydocs.cli",
+      "drydocs.config"
+    ],
+    [
+      "drydocs.cli",
+      "drydocs.controlm"
+    ],
+    [
+      "drydocs.cli",
+      "drydocs.controlm.staging"
+    ],
+    [
+      "drydocs.cli",
+      "drydocs.loaders"
+    ],
+    [
+      "drydocs.cli",
+      "drydocs.loaders.base"
+    ],
+    [
+      "drydocs.cli",
+      "drydocs.loaders.business_segments"
+    ],
+    [
+      "drydocs.cli",
+      "drydocs.loaders.catalog"
+    ],
+    [
+      "drydocs.cli",
+      "drydocs.loaders.controlm_conditions_in"
+    ],
+    [
+      "drydocs.cli",
+      "drydocs.loaders.controlm_conditions_out"
+    ],
+    [
+      "drydocs.cli",
+      "drydocs.loaders.controlm_dependencies_derived"
+    ],
+    [
+      "drydocs.cli",
+      "drydocs.loaders.controlm_folders"
+    ],
+    [
+      "drydocs.cli",
+      "drydocs.loaders.controlm_jobs"
+    ],
+    [
+      "drydocs.cli",
+      "drydocs.loaders.seal_applications"
+    ],
+    [
+      "drydocs.cli",
+      "drydocs.loaders.seal_contacts"
+    ],
+    [
+      "drydocs.cli",
+      "drydocs.models"
+    ],
+    [
+      "drydocs.cli",
+      "drydocs.neo4j_client"
+    ],
+    [
+      "drydocs.cli",
+      "drydocs.snapshots"
+    ],
+    [
+      "drydocs.controlm",
+      "drydocs.controlm.commands"
+    ],
+    [
+      "drydocs.controlm",
+      "drydocs.controlm.facts"
+    ],
+    [
+      "drydocs.controlm",
+      "drydocs.controlm.folder_name"
+    ],
+    [
+      "drydocs.controlm",
+      "drydocs.controlm.paths"
+    ],
+    [
+      "drydocs.controlm",
+      "drydocs.controlm.resolver"
+    ],
+    [
+      "drydocs.controlm",
+      "drydocs.controlm.staging"
+    ],
+    [
+      "drydocs.controlm",
+      "drydocs.controlm.variable_report"
+    ],
+    [
+      "drydocs.controlm",
+      "drydocs.controlm.variables"
+    ],
+    [
+      "drydocs.controlm.facts",
+      "drydocs.controlm.variables"
+    ],
+    [
+      "drydocs.controlm.resolver",
+      "drydocs.controlm.variables"
+    ],
+    [
+      "drydocs.controlm.staging",
+      "drydocs.controlm.commands"
+    ],
+    [
+      "drydocs.controlm.staging",
+      "drydocs.controlm.facts"
+    ],
+    [
+      "drydocs.controlm.staging",
+      "drydocs.controlm.paths"
+    ],
+    [
+      "drydocs.controlm.staging",
+      "drydocs.controlm.resolver"
+    ],
+    [
+      "drydocs.controlm.staging",
+      "drydocs.controlm.variables"
+    ],
+    [
+      "drydocs.controlm.staging",
+      "drydocs.models"
+    ],
+    [
+      "drydocs.controlm.variable_report",
+      "drydocs.controlm.variables"
+    ],
+    [
+      "drydocs.loaders",
+      "drydocs.loaders.base"
+    ],
+    [
+      "drydocs.loaders",
+      "drydocs.loaders.catalog"
+    ],
+    [
+      "drydocs.loaders",
+      "drydocs.loaders.controlm"
+    ],
+    [
+      "drydocs.loaders",
+      "drydocs.loaders.seal_applications"
+    ],
+    [
+      "drydocs.loaders",
+      "drydocs.loaders.seal_contacts"
+    ],
+    [
+      "drydocs.loaders.base",
+      "drydocs.adapters"
+    ],
+    [
+      "drydocs.loaders.base",
+      "drydocs.neo4j_client"
+    ],
+    [
+      "drydocs.loaders.business_segments",
+      "drydocs.neo4j_client"
+    ],
+    [
+      "drydocs.loaders.catalog",
+      "drydocs.loaders.base"
+    ],
+    [
+      "drydocs.loaders.controlm",
+      "drydocs.loaders.controlm_conditions_in"
+    ],
+    [
+      "drydocs.loaders.controlm",
+      "drydocs.loaders.controlm_conditions_out"
+    ],
+    [
+      "drydocs.loaders.controlm",
+      "drydocs.loaders.controlm_dependencies_derived"
+    ],
+    [
+      "drydocs.loaders.controlm",
+      "drydocs.loaders.controlm_folders"
+    ],
+    [
+      "drydocs.loaders.controlm",
+      "drydocs.loaders.controlm_jobs"
+    ],
+    [
+      "drydocs.loaders.controlm_conditions_in",
+      "drydocs.loaders.base"
+    ],
+    [
+      "drydocs.loaders.controlm_conditions_in",
+      "drydocs.models"
+    ],
+    [
+      "drydocs.loaders.controlm_conditions_out",
+      "drydocs.loaders.base"
+    ],
+    [
+      "drydocs.loaders.controlm_conditions_out",
+      "drydocs.models"
+    ],
+    [
+      "drydocs.loaders.controlm_dependencies_derived",
+      "drydocs.loaders.base"
+    ],
+    [
+      "drydocs.loaders.controlm_dependencies_derived",
+      "drydocs.models"
+    ],
+    [
+      "drydocs.loaders.controlm_folders",
+      "drydocs.controlm"
+    ],
+    [
+      "drydocs.loaders.controlm_folders",
+      "drydocs.loaders.base"
+    ],
+    [
+      "drydocs.loaders.controlm_folders",
+      "drydocs.models"
+    ],
+    [
+      "drydocs.loaders.controlm_jobs",
+      "drydocs.loaders.base"
+    ],
+    [
+      "drydocs.loaders.controlm_jobs",
+      "drydocs.models"
+    ],
+    [
+      "drydocs.loaders.seal_applications",
+      "drydocs.loaders.base"
+    ],
+    [
+      "drydocs.loaders.seal_applications",
+      "drydocs.models"
+    ],
+    [
+      "drydocs.loaders.seal_contacts",
+      "drydocs.loaders.base"
+    ],
+    [
+      "drydocs.loaders.seal_contacts",
+      "drydocs.models"
+    ],
+    [
+      "drydocs.models",
+      "drydocs.models.catalog"
+    ],
+    [
+      "drydocs.models",
+      "drydocs.models.controlm"
+    ],
+    [
+      "drydocs.models",
+      "drydocs.models.seal"
+    ],
+    [
+      "drydocs.snapshots",
+      "drydocs.snapshots.writer"
+    ],
+    [
+      "drydocs.snapshots.writer",
+      "drydocs.neo4j_client"
+    ],
+    [
+      "tests.unit.test_base_loader_smoke",
+      "drydocs.loaders.base"
+    ],
+    [
+      "tests.unit.test_base_loader_smoke",
+      "drydocs.neo4j_client"
+    ],
+    [
+      "tests.unit.test_command_parser",
+      "drydocs.controlm.commands"
+    ],
+    [
+      "tests.unit.test_command_parser",
+      "drydocs.controlm.facts"
+    ],
+    [
+      "tests.unit.test_command_parser",
+      "drydocs.controlm.paths"
+    ],
+    [
+      "tests.unit.test_command_parser",
+      "drydocs.controlm.variables"
+    ],
+    [
+      "tests.unit.test_controlm_models",
+      "drydocs.models"
+    ],
+    [
+      "tests.unit.test_folder_name_parser",
+      "drydocs.controlm"
+    ],
+    [
+      "tests.unit.test_namespaces",
+      "drydocs.ontology.namespaces"
+    ],
+    [
+      "tests.unit.test_variable_classifier",
+      "drydocs.adapters.csv_adapter"
+    ],
+    [
+      "tests.unit.test_variable_classifier",
+      "drydocs.controlm"
+    ],
+    [
+      "tests.unit.test_variable_classifier",
+      "drydocs.models"
+    ],
+    [
+      "tests.unit.test_variable_resolver",
+      "drydocs.controlm.resolver"
+    ],
+    [
+      "tests.unit.test_variable_staging",
+      "drydocs.adapters.csv_adapter"
+    ],
+    [
+      "tests.unit.test_variable_staging",
+      "drydocs.controlm.staging"
+    ],
+    [
+      "tests.unit.test_variable_staging",
+      "drydocs.models"
+    ]
+  ],
+  "external_deps_by_module": {
+    "drydocs.adapters.oracle_adapter": [
+      "oracledb"
+    ],
+    "drydocs.cli": [
+      "rich",
+      "typer"
+    ],
+    "drydocs.config": [
+      "pydantic",
+      "pydantic_settings"
+    ],
+    "drydocs.loaders.base": [
+      "pydantic"
+    ],
+    "drydocs.loaders.catalog": [
+      "pydantic"
+    ],
+    "drydocs.loaders.controlm_folders": [
+      "pydantic"
+    ],
+    "drydocs.models.catalog": [
+      "pydantic"
+    ],
+    "drydocs.models.controlm": [
+      "pydantic"
+    ],
+    "drydocs.models.seal": [
+      "pydantic"
+    ],
+    "drydocs.neo4j_client": [
+      "neo4j"
+    ],
+    "tests.unit.test_base_loader_smoke": [
+      "pydantic",
+      "pytest"
+    ],
+    "tests.unit.test_controlm_cypher": [
+      "pytest"
+    ],
+    "tests.unit.test_controlm_models": [
+      "pydantic",
+      "pytest"
+    ],
+    "tests.unit.test_namespaces": [
+      "pytest"
+    ],
+    "tests.unit.test_schema": [
+      "pytest",
+      "yaml"
+    ],
+    "tests.unit.test_variable_classifier": [
+      "pytest"
+    ],
+    "tests.unit.test_variable_staging": [
+      "pytest"
+    ]
+  },
+  "fan_in": {
+    "drydocs.adapters": 2,
+    "drydocs.adapters.base": 1,
+    "drydocs.adapters.csv_adapter": 3,
+    "drydocs.adapters.oracle_adapter": 1,
+    "drydocs.config": 1,
+    "drydocs.controlm": 4,
+    "drydocs.controlm.commands": 3,
+    "drydocs.controlm.facts": 3,
+    "drydocs.controlm.folder_name": 1,
+    "drydocs.controlm.paths": 3,
+    "drydocs.controlm.resolver": 3,
+    "drydocs.controlm.staging": 3,
+    "drydocs.controlm.variable_report": 1,
+    "drydocs.controlm.variables": 6,
+    "drydocs.loaders": 1,
+    "drydocs.loaders.base": 11,
+    "drydocs.loaders.business_segments": 1,
+    "drydocs.loaders.catalog": 2,
+    "drydocs.loaders.controlm": 1,
+    "drydocs.loaders.controlm_conditions_in": 2,
+    "drydocs.loaders.controlm_conditions_out": 2,
+    "drydocs.loaders.controlm_dependencies_derived": 2,
+    "drydocs.loaders.controlm_folders": 2,
+    "drydocs.loaders.controlm_jobs": 2,
+    "drydocs.loaders.seal_applications": 2,
+    "drydocs.loaders.seal_contacts": 2,
+    "drydocs.models": 12,
+    "drydocs.models.catalog": 1,
+    "drydocs.models.controlm": 1,
+    "drydocs.models.seal": 1,
+    "drydocs.neo4j_client": 5,
+    "drydocs.ontology.namespaces": 1,
+    "drydocs.snapshots": 1,
+    "drydocs.snapshots.writer": 1
+  },
+  "fan_out": {
+    "drydocs.adapters": 3,
+    "drydocs.cli": 18,
+    "drydocs.controlm": 8,
+    "drydocs.controlm.facts": 1,
+    "drydocs.controlm.resolver": 1,
+    "drydocs.controlm.staging": 6,
+    "drydocs.controlm.variable_report": 1,
+    "drydocs.loaders": 5,
+    "drydocs.loaders.base": 2,
+    "drydocs.loaders.business_segments": 1,
+    "drydocs.loaders.catalog": 1,
+    "drydocs.loaders.controlm": 5,
+    "drydocs.loaders.controlm_conditions_in": 2,
+    "drydocs.loaders.controlm_conditions_out": 2,
+    "drydocs.loaders.controlm_dependencies_derived": 2,
+    "drydocs.loaders.controlm_folders": 3,
+    "drydocs.loaders.controlm_jobs": 2,
+    "drydocs.loaders.seal_applications": 2,
+    "drydocs.loaders.seal_contacts": 2,
+    "drydocs.models": 3,
+    "drydocs.snapshots": 1,
+    "drydocs.snapshots.writer": 1,
+    "tests.unit.test_base_loader_smoke": 2,
+    "tests.unit.test_command_parser": 4,
+    "tests.unit.test_controlm_models": 1,
+    "tests.unit.test_folder_name_parser": 1,
+    "tests.unit.test_namespaces": 1,
+    "tests.unit.test_variable_classifier": 3,
+    "tests.unit.test_variable_resolver": 1,
+    "tests.unit.test_variable_staging": 3
+  },
+  "subpackage_edges": {
+    "drydocs(root)": [
+      "drydocs.adapters",
+      "drydocs.controlm",
+      "drydocs.loaders",
+      "drydocs.models",
+      "drydocs.snapshots"
+    ],
+    "drydocs.controlm": [
+      "drydocs(root)"
+    ],
+    "drydocs.loaders": [
+      "drydocs(root)"
+    ],
+    "drydocs.snapshots": [
+      "drydocs(root)"
+    ],
+    "tests": [
+      "drydocs(root)",
+      "drydocs.adapters",
+      "drydocs.controlm",
+      "drydocs.loaders",
+      "drydocs.ontology"
+    ]
+  }
+}

@@ -1,0 +1,7 @@
+product_id,name,parent_product_line_id
+PROD_AUTO_05,Auto Risk,PL_AUTO
+PROD_AUTO_07,Auto Onboarding,PL_AUTO
+PROD_HL_12,Home Lending Servicing,PL_HL
+PROD_CARD_03,Card Risk,PL_CARD
+PROD_DAT_01,Account Core,PL_DAT
+PROD_RISK_01,Risk Published Data,PL_RISK
