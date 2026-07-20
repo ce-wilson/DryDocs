@@ -2073,7 +2073,7 @@ items:
     agent: main
     model: sonnet
     priority: p1
-    status: todo
+    status: in_progress   # pulled 2026-07-20 (user-directed, post-K6)
     depends_on: [L1, L5, L6]
     inputs: [docs/design/templates/tdd.outline.yaml, internal/helpmeloginlocalneo4j.md, scripts/ingest.sh, knowledge/depgraph-snapshots/snapshot.ps1, README.md]
     acceptance: >
@@ -3737,8 +3737,8 @@ items:
 # Roll-up the dispatcher can glance at. COMPUTED views — test_backlog.py enforces
 # that these match the items exactly; update them with any status change.
 summary:
-  todo: 21                                          # K6 pulled + done same session (2026-07-20)
-  in_progress: 1                                   # E1 (gate deferred)
+  todo: 20                                          # L8 pulled (2026-07-20)
+  in_progress: 2                                   # E1 (gate deferred), L8 (pulled 2026-07-20)
   blocked: 0
   done: 92                                         # +K5 +K6 (2026-07-20)
-  next_ready: [L7, L8, L9, L12, M2, M3, M4, P1, J10, Q6, O9, O12, O13, G14, J13]
+  next_ready: [L7, L9, L12, M2, M3, M4, P1, J10, Q6, O9, O12, O13, G14, J13]
