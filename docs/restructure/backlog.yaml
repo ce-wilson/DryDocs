@@ -2073,7 +2073,7 @@ items:
     agent: main
     model: sonnet
     priority: p1
-    status: in_progress   # pulled 2026-07-20 (user-directed, post-K6)
+    status: done          # DONE 2026-07-20 (e6bcb24) — the capstone: 2nd doc type through the outline system
     depends_on: [L1, L5, L6]
     inputs: [docs/design/templates/tdd.outline.yaml, internal/helpmeloginlocalneo4j.md, scripts/ingest.sh, knowledge/depgraph-snapshots/snapshot.ps1, README.md]
     acceptance: >
@@ -2090,6 +2090,18 @@ items:
       second doc type end-to-end. depends_on covers the outline (L1) + both feedback loops
       (L5→L3 renderer, L6→L4 pdf); intentionally NOT gated on L7 (context ingest), which
       the runbook doesn't need — say the word to make it strictly last.
+      DONE 2026-07-20 (e6bcb24): runbook.outline.yaml = front-matter + the 8 acceptance
+      anchors + optional appendices; decisions recorded in its header — front-matter
+      carried from the TDD outline (the L6 footer derives from it), NO traceability block
+      (procedures, not requirements; verify is the runbook's proof surface — add the
+      block later rather than invent a per-doc format). Exemplar
+      docs/design/drydocs-startup-refresh-runbook.md (classification Internal, the
+      helpmeloginlocalneo4j class; secrets .env-only) rendered via L3; both loops
+      verified IN the emitted html (annotate/Copy feedback; dd-margin-tag +
+      dd-print-footer "Rev 1 · commit 0acc0f8"). test_doc_outline.py sweeps
+      *-runbook.md (3 new tests). Suite 738. LANDING FIRES two parked inbox triggers
+      for the next groom: the runbook-mapping-demo refit and the review.outline.yaml
+      consideration (both lines cite "when L8 lands").
 
   - id: L9
     epic: doc-infrastructure
@@ -3737,8 +3749,8 @@ items:
 # Roll-up the dispatcher can glance at. COMPUTED views — test_backlog.py enforces
 # that these match the items exactly; update them with any status change.
 summary:
-  todo: 20                                          # L8 pulled (2026-07-20)
-  in_progress: 2                                   # E1 (gate deferred), L8 (pulled 2026-07-20)
+  todo: 20                                          # L8 pulled + done same session (2026-07-20)
+  in_progress: 1                                   # E1 (gate deferred)
   blocked: 0
-  done: 92                                         # +K5 +K6 (2026-07-20)
+  done: 93                                         # +K5 +K6 +L8 (2026-07-20)
   next_ready: [L7, L9, L12, M2, M3, M4, P1, J10, Q6, O9, O12, O13, G14, J13]
