@@ -810,6 +810,68 @@ PROCEDURE:
     - EXPECTED_CONSTRAINTS UNCHANGED (40); no loaders, no CLI commands, no schema constraints
       in this range; write_curated still refuses (the flips remain build-coupled).
 
+37. HISTORY SQUASH + THE NEW PORT BASELINE (2026-07-19/20). The producer history was
+    squashed to a single commit c5a84c3 "Initial import" AFTER the 3ae9b08 bundle was cut;
+    the bundle you already applied (your PORT-REPORT-bd7952f.md, 2026-07-20) carried the
+    COMPLETE pre-squash history, so your main already contains everything through step 36.
+    - ALL FUTURE PORT RANGES are cherry-picks of c5a84c3..<producer-tip>. c5a84c3 itself is
+      NEVER ported — its tree is identical to 3ae9b08's (the squash preserved the tree).
+    - PRECONDITION for the first post-bundle range (this one): renumber your company-only
+      backlog items C10/K6/N3 -> DD1-DD3 FIRST — producer C10 (ServiceNow mining) and K6
+      (Product Cabinet supplement) arrive in this range and would hard-collide. The
+      standing convention is git-readme.md §backlog id allocation (DD-series = yours,
+      epic-letter = producer's; ids never renumbered after this one-time fix).
+
+38. K5 PRODUCT CABINET GATE SIGNED OFF + K6 SUPPLEMENT (2026-07-20; commits 6aab11b,
+    13f0488, 202175e + backlog closes). SUPERSEDES step 35's "STILL DEFERRED: K5" line.
+    - Gate product-cabinet-attribution SIGNED OFF (gate-log 2026-07-20, 24/0/0, 5 open
+      questions resolved in-session): the TOMRole and ProductRole families are INDEPENDENT
+      — the shared-cto concept is DROPPED (supersedes the 2026-07-10 §B "CTO in both
+      families" record; rename history: the area-product Tech Partner was formerly named
+      "CTO" in SEAL, SEAL's CTO is now the product-level role — carried as a changeNote on
+      tech_partner); scheme FIXED (the 7, no cto); area_product_owner AND tech_partner
+      :AreaProduct-only; BOTH attribution forms (reified chain + collapsed
+      catalog_cabinet_attributed_to — deviation from the K4 qualified-only resolution);
+      reporting edges DEFERRED (option b — YOUR side populates when a person-level cabinet
+      extract exists); DevTeam<->BusinessApplication M:N confirmed (multiple developed_by
+      teams on one app = VALID data; no verify rule may flag it).
+    - VOCABULARY: 3 catalog_cabinet_* entries + the ProductRole classification ACTIVE via
+      catalog_ontology_supplement.cypher (product_roles SkosConceptScheme, fixed=true);
+      the HAS_AGENT hop REUSES seal_attribution_has_agent (rescoped family-agnostic).
+      SEAL-side corrections: TOMRole notes drop the shared-cto claim; the seal supplement
+      now REMOVEs c4.shared_with. **RE-APPLY BOTH supplements on your live graph**
+      (idempotent; the REMOVE clears the stale stamp your K4 apply wrote). Map entry
+      product-cabinet-attribution CONFIRMED (summary 8/21/3); schema_graph re-rendered.
+    - NO Cabinet loader exists — blocked on a person-level PAT cabinet extract, which is
+      YOUR unblock opportunity (you hold the real PAT; the producer never will).
+
+39. L8 RUNBOOK SYSTEM — the 2nd doc type through the Epic L outline contract (e6bcb24).
+    - Clean-adds: docs/design/templates/runbook.outline.yaml (front-matter + 8 anchors, NO
+      traceability block by design — verify is the runbook's proof surface) +
+      test_doc_outline.py's *-runbook.md auto-sweep (3 new tests).
+    - The exemplar drydocs-startup-refresh-runbook.{md,html} is PRODUCER-LOCAL ops content
+      (classification Internal; producer container names/ports). Take the outline + tests;
+      author your OWN company runbook twin against the outline rather than editing the
+      exemplar. Its rev1 feedback yaml (docs/design/feedback/) is producer-loop history.
+
+40. C10 SERVICENOW DOC SET — housed, extracted, analyzed (54ccf63). Clean-adds:
+    external/ServiceNow/README.md (the SOURCE-MANIFEST — Now Create asset numbers;
+    classification External), knowledge/upgrade-plans/servicenow-cmdb-analysis.md +
+    generic-terminology-research.md, scripts/extract_office_text.py. The vendor binaries
+    AND their verbatim text twins are gitignored PRODUCER-LOCAL (the BMC-poster rule) —
+    re-download from Now Create by asset number if you want local twins. The analysis
+    feeds the SEAL/PAT -> industry-standard-naming idea (3 user decisions still parked
+    producer-side); its 5 candidates are listed gate-bound — nothing was adopted.
+
+41. SNYK CI + RIDERS (44523ab..4f4b50d). ci.yml gains a token-gated snyk job (SCA blocking
+    at high severity + advisory snyk code; every step SKIPS until a SNYK_TOKEN secret
+    exists) — evaluate against YOUR CI reality (GHE runners/proxy/security tooling);
+    adopting, re-pointing at your Snyk org, or dropping the job are all fine — record the
+    choice in your port report. Riders: P1/P4 flipped done in the producer backlog
+    MIRRORING YOUR completion (your reconcile already had them done — a no-op collision,
+    keep yours); the DD-series id rule lands in git-readme.md/backlog header/groom skill
+    (step 37 precondition); IDEAS/audit-trail union-append as ever.
+
 COMPANY-SIDE TRACKER — LIVE-LOAD + SUPPLEMENT STATUS (maintained COMPANY-SIDE):
 The steps above name company-side obligations in scattered "COMPANY MUST SUPPLEMENT" /
 Track-2 notes; this table consolidates the trackable ones so you can see at a glance whether

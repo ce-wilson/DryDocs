@@ -199,6 +199,13 @@ delete+add). Doc/code references to the old path were repointed in the same comm
   colliding with producer `C10`/`K6` shipped in the very next range — renumber those three to
   `DD1`–`DD3` at the next company session.) Ids are stable references: on any future collision the
   DD-series is the escape hatch — producer ids are never renumbered.
+- **Port baseline after the 2026-07-20 history squash + bundle:** the producer squashed its history
+  to `c5a84c3` "Initial import" AFTER cutting the `3ae9b08` bundle you already applied
+  (your PORT-REPORT-bd7952f.md) — your main holds the complete pre-squash history. Every future
+  port range is a cherry-pick of `c5a84c3..<producer-tip>`; `c5a84c3` itself is never ported (its
+  tree equals `3ae9b08`'s). The step-by-step apply instructions for each range live in
+  `docs/port-prompt.md` — the first post-bundle range starts at its step 37, whose precondition is
+  the `DD1`–`DD3` renumber above.
 
 **Post-push code-structure snapshot (drift comparison):** after each push, generate a
 timestamped dependency-graph snapshot with the `depgraph` tool (a stdlib-only sibling repo) and
