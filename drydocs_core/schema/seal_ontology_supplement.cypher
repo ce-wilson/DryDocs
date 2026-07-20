@@ -136,8 +136,10 @@ MERGE (lc)-[r:SUBCLASS_OF]->(pc)
 MERGE (n:OntologyTerm:LocalClass {iri: "https://drydocs.local/ontology#TOMRole"})
   SET n.label = "TOMRole",
       n.notes = "SEAL Technical Operational role concept (skos:Concept semantics). "
-              + "DISTINCT from :Role (org:Role — PAT product hierarchy only). "
-              + "Fixed 7-concept scheme below; CTO is shared with the K5 ProductRole scheme.";
+              + "DISTINCT from :Role (org:Role — PAT product hierarchy only) and from "
+              + ":ProductRole. Fixed 7-concept scheme below; cto is NOT shared with the "
+              + "K5 ProductRole scheme (K5 gate 2026-07-20: families independent; rename "
+              + "history in config/gate-log.md).";
 
 // ----- Qualified-attribution relationships (planned -> active at K4) --------
 
@@ -182,8 +184,10 @@ MERGE (s:SkosConceptScheme {id: "tom_roles"})
 MERGE (c1:TOMRole {id: "application_owner"})          SET c1.pref_label = "Application Owner";
 MERGE (c2:TOMRole {id: "primary_information_owner"})  SET c2.pref_label = "Primary Information Owner";
 MERGE (c3:TOMRole {id: "backup_information_owner"})   SET c3.pref_label = "Backup Information Owner";
-MERGE (c4:TOMRole {id: "cto"})                        SET c4.pref_label = "CTO",
-                                                          c4.shared_with = "product_roles";
+// K5 gate 2026-07-20: cto is NOT shared with product_roles (families independent) —
+// REMOVE clears the stale shared_with stamp on already-loaded graphs (idempotent).
+MERGE (c4:TOMRole {id: "cto"})                        SET c4.pref_label = "CTO"
+                                                      REMOVE c4.shared_with;
 MERGE (c5:TOMRole {id: "technology_risk_controls"})   SET c5.pref_label = "Technology Risk & Controls";
 MERGE (c6:TOMRole {id: "design_authority"})           SET c6.pref_label = "Design Authority";
 MERGE (c7:TOMRole {id: "operate_manager"})            SET c7.pref_label = "Operate Manager",

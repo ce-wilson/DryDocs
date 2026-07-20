@@ -252,11 +252,15 @@ node_classifications:
     note: >
       ACTIVE (K4, 2026-07-15): SEAL Technical Operating Model role vocabulary — skos:Concept
       in scheme tom_roles (SkosConceptScheme), the gate §B REVISED fixed 7: application_owner,
-      primary_information_owner, backup_information_owner, cto (shared with the K5 ProductRole
-      scheme), technology_risk_controls, design_authority, operate_manager (L1/L2 = Attribution
-      property). DISTINCT from :Role (org:Role, PAT product hierarchy only, e.g.
-      catalog_dev_team_has_membership) — do not conflate the two. Reached via Attribution
-      -[:HAD_ROLE]-> TOMRole (prov:hadRole). Supplement: seal_ontology_supplement.cypher.
+      primary_information_owner, backup_information_owner, cto, technology_risk_controls,
+      design_authority, operate_manager (L1/L2 = Attribution property). cto is NOT shared
+      with the K5 ProductRole scheme — the K5 gate (signed off 2026-07-20) decided the two
+      families are INDEPENDENT, superseding the 2026-07-10 §B "CTO in both families" record
+      (rename history in the gate log: the area-product Tech Partner was formerly named
+      "CTO" in SEAL; SEAL's CTO now denotes the product-level role). DISTINCT from :Role
+      (org:Role, PAT product hierarchy only, e.g. catalog_dev_team_has_membership) AND from
+      :ProductRole — do not conflate. Reached via Attribution -[:HAD_ROLE]-> TOMRole
+      (prov:hadRole). Supplement: seal_ontology_supplement.cypher.
 
   # — Product Cabinet (K5, PLANNED — gate product-cabinet-attribution) —
   - label:      ProductRole
@@ -1212,6 +1216,11 @@ local_relationships:
       ACTIVE (K4, 2026-07-15; gate 2026-07-10 §B). prov:agent inside the qualified-attribution
       reification — names which Employee the Attribution is about. No independent matrix row
       (Attribution is prov_type n/a, same family as seal_held_by's org:member inverse).
+      RESCOPED at the K5 sign-off (2026-07-20): serves BOTH attribution families as
+      family-agnostic infrastructure — the SEAL TOM chain (seal_qualified_attribution) and
+      the Product Cabinet chain (catalog_cabinet_qualified_attribution, planned) — because
+      the (Attribution, HAS_AGENT, Employee) triple is registered exactly once (the C8
+      schema meta-graph refuses ambiguous duplicate triples).
     supplement:   seal_ontology_supplement.cypher
     loader:       ~
     domain:       seal
@@ -1227,10 +1236,11 @@ local_relationships:
       ACTIVE (K4, 2026-07-15; gate 2026-07-10 §B REVISED role set). prov:hadRole inside the
       qualified-attribution reification — names which TOM role the Attribution grants. The
       fixed 7-concept scheme (tom_roles): application_owner | primary_information_owner |
-      backup_information_owner | cto (shared with K5 ProductRole) | technology_risk_controls |
+      backup_information_owner | cto | technology_risk_controls |
       design_authority | operate_manager (L1/L2 = a level property on the Attribution, per
       the gate's "one or both" wording). Subsumes the old flat 6: data_owner -> Information
       Owner, risk_compliance_officer -> Technology Risk & Controls; Design Authority is new.
+      cto NOT shared with K5 ProductRole (K5 gate 2026-07-20: families independent).
       TOMRole is a skos:Concept, DISTINCT from :Role (org:Role, PAT hierarchy only).
     supplement:   seal_ontology_supplement.cypher
     loader:       ~
