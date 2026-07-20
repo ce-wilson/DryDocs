@@ -26,6 +26,19 @@ Tags help grooming: `idea` · `bug` · `doc` · `source` (new data source) · `q
 
 <!-- add new ideas at the top -->
 
+- 2026-07-20 — [doc] **Apply the runbook rev1 SME feedback** (transcribed 5fbe5e2, NOT yet
+  applied — the user hasn't said go): front-matter bullets one-per-line; purpose-scope
+  out-of-scope trimmed (drop the company-side Track-2 item). Apply = edit the .md, bump
+  Rev 1→2, re-render, mark the rev1.yaml notes addressed. Small; next session or on ask.
+  The stray `feedback/drydocs-startup-refresh-runbook-sme.html` (untracked working copy,
+  content now canonical in rev1.yaml) can be deleted by the user.
+
+- 2026-07-20 — [chore] **USER MANUAL STEP: add the SNYK_TOKEN repo secret** so the new CI
+  snyk job (44523ab) runs for real — token from app.snyk.io (Account settings → API
+  token) → repo Settings → Secrets and variables → Actions. Until then every scan step
+  skips cleanly by design. After the first green scan: triage `snyk code` advisory
+  findings and decide whether to gate it (the ruff-idiom follow-up).
+
 - 2026-07-20 — [idea] **Replace SEAL/PAT naming with industry-standard, SaaS-configurable
   terminology** (user request; web research DONE same day →
   `knowledge/upgrade-plans/generic-terminology-research.md`). Candidates validated:
