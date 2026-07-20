@@ -396,6 +396,96 @@ node_classifications:
       Registered PLANNED at the Q4 docmeta gate (ADR 0006, 2026-07-18); built
       by the docmeta component (plan P4+), nothing loads it today.
 
+  # — Design docs: traceability matrix + anchor-keyed feedback (PROPOSED, backlog L7) —
+  # Registered for the doc-traceability-feedback gate
+  # (config/gate-prompts/doc-traceability-feedback.yaml). Deliberately a SEPARATE family
+  # from the "Docs corpus" block above (Document/Chunk/DocSource, the llm-graph-builder
+  # scraped-page lexical graph): design docs are AUTHORED, rev-tracked DryDocs artifacts
+  # (docs/design/*.md) conforming to docs/design/templates/*.outline.yaml (schema
+  # drydocs.doc-outline.v1), not deterministically H2-chunked scraped pages. Whether to
+  # eventually reconcile DesignDoc with :Document / DocSection with :Chunk is an open
+  # question — see the gate prompt section D. All entries below stay status: planned.
+
+  - label:      DesignDoc
+    class:      "dd:DesignDoc"
+    prov_type:  Entity
+    note: >
+      PROPOSED (backlog L7, doc-traceability-feedback gate). One authored DryDocs design
+      doc (docs/design/<doc_id>.md), doc_id = the filename stem (e.g.
+      controlm-ingestion-tdd), conforming to a canonical outline
+      (docs/design/templates/tdd.outline.yaml, schema drydocs.doc-outline.v1). Carries
+      doc_id, doc_type (TDD, ...), rev, status (DESCRIPTIVE|PRESCRIPTIVE), commit.
+      Deliberately DISTINCT from :Document (the scraped-corpus/lexical-graph label —
+      bmc-docs / SEAL-PAT pattern, node_classifications above): DesignDoc is internally
+      authored and rev-tracked with its own outline/traceability contract, not H2-chunked
+      scraped content. Gate open question: reconcile the two labels later, or keep them
+      permanently distinct (config/gate-prompts/doc-traceability-feedback.yaml section D).
+
+  - label:      DocSection
+    class:      "dd:DocSection"
+    prov_type:  Entity
+    note: >
+      PROPOSED (backlog L7). One AUTHORED section (or L11 content-derived subsection,
+      `<authored-anchor>--<subsection-slug>`) of a DesignDoc, keyed on its stable
+      `<!-- anchor: id -->` id (drydocs/doc_outline.py ANCHOR_RE; docs/design/templates/
+      tdd.outline.yaml sections/subsections). Carries anchor, heading, required. Distinct
+      from :Chunk (docs-corpus lexical graph, deterministic H2 chunking of scraped pages)
+      — DocSection is the AUTHORED outline structure and is the shared target of both the
+      traceability matrix (Requirement -[:SPECIFIED_IN]->) and the anchor-keyed feedback
+      loop (FeedbackNote -[:ANNOTATES]->).
+
+  - label:      Requirement
+    class:      "dd:Requirement"
+    prov_type:  Entity
+    note: >
+      PROPOSED (backlog L7). One traceability-matrix row's requirement/capability id (e.g.
+      FR-CMI-003; docs/design/templates/tdd.outline.yaml traceability.requirement_id_pattern
+      `^(FR|UC|NFR)-[A-Z0-9]+-\d+$`, currently `mode: loose` — ids are optional/free-form
+      and not format-checked until `strict` mode is flipped, per the outline's own note).
+      Carries requirement_id, description, matrix_status (done|open|...).
+
+  - label:      Component
+    class:      "dd:Component"
+    prov_type:  Entity
+    note: >
+      PROPOSED (backlog L7). A source-code artifact (loader file, Python module, CLI
+      command) cited in a traceability-matrix row's Component/module column as the
+      concrete implementation of a Requirement (e.g. controlm_folders.cypher,
+      oracle_adapter.py, cli.ingest_controlm). NO existing node class fit this — grepped
+      relationship_vocabulary.yaml + drydocs_core/schema/*.cypher for Module/Component/
+      Test: none exist. Nearest existing Entity classes are :Script (Control-M
+      job-invoked artifact, m3_invokes/m3_triggers lineage — job-invocation semantics,
+      not requirement-implementation) and :PipelineService (deployable service definition
+      inside a :Code codebase — service granularity, not arbitrary file/module/CLI-command
+      citations); neither generically fits, so Component is its own class. A future gate
+      may fold Script/PipelineService under Component or vice versa — flagged, not
+      decided, here.
+
+  - label:      TestCase
+    class:      "dd:TestCase"
+    prov_type:  Entity
+    note: >
+      PROPOSED (backlog L7). One Test/verify citation from a traceability-matrix row —
+      spans pytest test names, `m3-verify`/`m1-verify` invariant checks,
+      `graph-tests/*.yaml` checks, and HITL gate names cited as proof (e.g.
+      `seal-attribution-match-policy`). No existing test/verify node class was found (same
+      grep as :Component, above). Carries kind (unit|verify|gate|graph-test) + ref (the
+      literal matrix cite string) to disambiguate the heterogeneous citation styles
+      observed in docs/design/controlm-ingestion-tdd.md's matrix.
+
+  - label:      FeedbackNote
+    class:      "dd:FeedbackNote"
+    prov_type:  Entity
+    note: >
+      PROPOSED (backlog L7). One anchor-keyed SME annotation from a design-doc feedback
+      file (docs/design/feedback/<doc_id>-rev<N>.yaml, schema
+      drydocs.design_doc.feedback_yaml — docs/design/feedback/README.md). Carries anchor,
+      note (text), doc_id, doc_rev (the <N> parsed from the filename — the rev the note
+      was taken AGAINST, which may trail the DesignDoc's current rev; see the gate prompt
+      section C for why this stays a property rather than a separate Revision node).
+      prov:Entity per the docs_describes "aboutness" precedent (an annotation is not a
+      derivation of its target).
+
   # — Context graph (SOSA/SSN, EXPERIMENTAL / early adoption) ————————————————
   # SOSA/SSN is a W3C standard but NOT a declared *company* standard. These
   # classes are seeded only by the opt-in sosa_experimental_supplement.cypher
@@ -1729,6 +1819,134 @@ local_relationships:
     loader:       ~
     domain:       docs
     status:       planned   # Q4 docmeta gate 2026-07-18 (ADR 0006, config/gate-log.md)
+
+  # ── Design docs: traceability matrix + anchor-keyed feedback (PROPOSED, backlog L7) ──
+  # GATE-BOUND — config/gate-prompts/doc-traceability-feedback.yaml. ALL ENTRIES BELOW
+  # status: planned; supplement: ~ / loader: ~ on purpose (no supplement/loader claims for
+  # a planned-only proposal — same convention as the SEAL reshape block above). Node
+  # classes (DesignDoc/DocSection/Requirement/Component/TestCase/FeedbackNote) registered
+  # above in node_classifications, same gate.
+
+  - id:           doc_section_part_of
+    neo4j_label:  PART_OF
+    role:         ~
+    from_node:    DocSection
+    to_node:      DesignDoc
+    prov_maps_to: ~
+    note: >
+      PROPOSED. DocSection belongs to its DesignDoc — structural containment, kept off the
+      PROV matrix (Entity → Entity structure/aboutness is not derivation) exactly as
+      docs_chunk_part_of (Chunk → Document) does. SAME neo4j_label PART_OF; NOT the same
+      triple (from/to differ: DocSection/DesignDoc vs Chunk/Document — C8-clean, a new
+      entry per the RELATIONSHIP_GUIDE precedent). ALTERNATIVE CONSIDERED, not registered:
+      the m3-folder-family CONTAINS_SECTION shape (DesignDoc reclassed prov:Collection,
+      matrix row Collection → any = prov:hadMember, mirroring CONTAINS_JOB/
+      CONTAINS_FOLDER) — rejected as the primary proposal because DesignDoc's outline
+      sections are AUTHORED/ordered (FIRST_CHUNK/NEXT_CHUNK-style sequence per
+      tdd.outline.yaml) rather than an open collection of members; the closer analog is
+      Document/Chunk, not Folder/Job. Gate section B asks the SME to confirm PART_OF over
+      CONTAINS_SECTION.
+    supplement:   ~
+    loader:       ~
+    domain:       docs
+    status:       planned
+
+  - id:           doc_requirement_specified_in
+    neo4j_label:  SPECIFIED_IN
+    role:         ~
+    from_node:    Requirement
+    to_node:      DocSection
+    prov_maps_to: "prov:hadPrimarySource"
+    note: >
+      PROPOSED. Requirement's traceability-matrix "design-section anchor" column — its
+      specification's primary source is this DocSection's text. Matrix row: Entity →
+      Entity = prov:wasDerivedFrom family; prov:hadPrimarySource is the precise
+      sub-property (same reuse pattern as seal_had_primary_source: BusinessApplication →
+      Document). SPECIFIED_IN kept as the domain label for query clarity
+      (RELATIONSHIP_GUIDE domain-alias rule), mapping recorded here.
+    supplement:   ~
+    loader:       ~
+    domain:       docs
+    status:       planned
+
+  - id:           doc_requirement_implemented_by
+    neo4j_label:  IMPLEMENTED_BY
+    role:         ~
+    from_node:    Requirement
+    to_node:      Component
+    prov_maps_to: ~
+    note: >
+      PROPOSED. Requirement's traceability-matrix "Component/module" column. No PROV row
+      fits a requirements-realization relation (PROV models data provenance, not
+      requirement-satisfies-artifact semantics); no ORG/DPROD/SOSA/DCAT/SKOS term fits
+      either — local per the RELATIONSHIP_GUIDE local-term rule, same family as
+      FIRST_CHUNK/NEXT_CHUNK (structural edges with no standard mapping).
+    supplement:   ~
+    loader:       ~
+    domain:       docs
+    status:       planned
+
+  - id:           doc_requirement_verified_by
+    neo4j_label:  VERIFIED_BY
+    role:         ~
+    from_node:    Requirement
+    to_node:      TestCase
+    prov_maps_to: ~
+    note: >
+      PROPOSED. Requirement's traceability-matrix "Test/verify" column. Same local-term
+      reasoning as doc_requirement_implemented_by — no PROV/standards term fits
+      requirement-verification; local. Candidate future standard: none of
+      PROV-O/ORG/DPROD/SOSA/DCAT/SKOS models a test-verifies-requirement relation.
+    supplement:   ~
+    loader:       ~
+    domain:       docs
+    status:       planned
+
+  - id:           doc_feedback_annotates
+    neo4j_label:  ANNOTATES
+    role:         ~
+    from_node:    FeedbackNote
+    to_node:      DocSection
+    prov_maps_to: ~
+    note: >
+      PROPOSED. FeedbackNote's anchor-keyed target (docs/design/feedback/README.md format
+      — `anchor` must match a `<!-- anchor: id -->` or an L11 derived subsection anchor,
+      drydocs/doc_outline.py feedback_anchor_valid). Entity → Entity "aboutness", not
+      derivation — same reasoning as docs_describes (Document → SoftwareProduct,
+      deliberately NOT wasDerivedFrom). The W3C Web Annotation model (oa:hasTarget) is the
+      standards-precise analog but is NOT a declared company standard (absent from
+      drydocs_core/ontology/namespaces.py) — local ANNOTATES for now; flagged in the gate
+      as a candidate future standard adoption. FeedbackNote.doc_rev (node property, parsed
+      from the `<doc-id>-rev<N>.yaml` filename) records which DesignDoc rev the note was
+      taken against — see the gate prompt section C for why this stays a property rather
+      than a separate Revision node.
+    supplement:   ~
+    loader:       ~
+    domain:       docs
+    status:       planned
+
+  - id:           doc_feedback_authored_by
+    neo4j_label:  WAS_ATTRIBUTED_TO
+    role:         feedback_author
+    from_node:    FeedbackNote
+    to_node:      Employee
+    prov_maps_to: "prov:wasAttributedTo"
+    note: >
+      PROPOSED. FeedbackNote authored by the SME reviewer. Matrix row: Entity → Agent =
+      wasAttributedTo — SIMPLE/COLLAPSED form, same precedent as p2_authored_by
+      (ControlMFolder → Developer) rather than the K4/K5 qualified/reified Attribution
+      pattern (seal_qualified_attribution / catalog_cabinet_qualified_attribution): a
+      FeedbackNote has exactly one author and no role vocabulary to qualify (unlike
+      TOMRole/ProductRole, "SME feedback author" is not a multi-valued concept scheme), so
+      reification would add a hop with no disambiguating payload. role=feedback_author
+      distinguishes this instance on the shared WAS_ATTRIBUTED_TO label (the
+      tom_role_holder / developed_by / owner idiom). Gate section C asks the SME to
+      confirm collapsed-only is sufficient (vs also registering a reified form for future
+      multi-reviewer notes, mirroring the K6 "both forms load" precedent).
+    supplement:   ~
+    loader:       ~
+    domain:       docs
+    status:       planned
 
   # ── Cross-domain provenance ───────────────────────────────────────────────
 

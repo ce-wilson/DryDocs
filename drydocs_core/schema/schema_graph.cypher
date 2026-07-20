@@ -114,6 +114,18 @@ MERGE (n:SchemaMeta:Chunk {name: 'Chunk'})
   SET n.class = 'prov:Entity', n.prov_type = 'Entity';
 MERGE (n:SchemaMeta:DocSource {name: 'DocSource'})
   SET n.class = 'prov:Entity', n.prov_type = 'Entity';
+MERGE (n:SchemaMeta:DesignDoc {name: 'DesignDoc'})
+  SET n.class = 'dd:DesignDoc', n.prov_type = 'Entity';
+MERGE (n:SchemaMeta:DocSection {name: 'DocSection'})
+  SET n.class = 'dd:DocSection', n.prov_type = 'Entity';
+MERGE (n:SchemaMeta:Requirement {name: 'Requirement'})
+  SET n.class = 'dd:Requirement', n.prov_type = 'Entity';
+MERGE (n:SchemaMeta:Component {name: 'Component'})
+  SET n.class = 'dd:Component', n.prov_type = 'Entity';
+MERGE (n:SchemaMeta:TestCase {name: 'TestCase'})
+  SET n.class = 'dd:TestCase', n.prov_type = 'Entity';
+MERGE (n:SchemaMeta:FeedbackNote {name: 'FeedbackNote'})
+  SET n.class = 'dd:FeedbackNote', n.prov_type = 'Entity';
 MERGE (n:SchemaMeta:Observation {name: 'Observation'})
   SET n.class = 'sosa:Observation', n.prov_type = 'Activity';
 MERGE (n:SchemaMeta:Sensor {name: 'Sensor'})
@@ -392,6 +404,30 @@ MERGE (a)-[r:HAS_DOCUMENT]->(b)
 MATCH (a:SchemaMeta {name: 'Document'}), (b:SchemaMeta {name: 'OntologyTerm'})
 MERGE (a)-[r:GOVERNED_BY]->(b)
   SET r.vocab_id = 'docs_governed_by', r.prov_maps_to = null, r.domain = 'docs', r.status = 'planned';
+
+MATCH (a:SchemaMeta {name: 'DocSection'}), (b:SchemaMeta {name: 'DesignDoc'})
+MERGE (a)-[r:PART_OF]->(b)
+  SET r.vocab_id = 'doc_section_part_of', r.prov_maps_to = null, r.domain = 'docs', r.status = 'planned';
+
+MATCH (a:SchemaMeta {name: 'Requirement'}), (b:SchemaMeta {name: 'DocSection'})
+MERGE (a)-[r:SPECIFIED_IN]->(b)
+  SET r.vocab_id = 'doc_requirement_specified_in', r.prov_maps_to = 'prov:hadPrimarySource', r.domain = 'docs', r.status = 'planned';
+
+MATCH (a:SchemaMeta {name: 'Requirement'}), (b:SchemaMeta {name: 'Component'})
+MERGE (a)-[r:IMPLEMENTED_BY]->(b)
+  SET r.vocab_id = 'doc_requirement_implemented_by', r.prov_maps_to = null, r.domain = 'docs', r.status = 'planned';
+
+MATCH (a:SchemaMeta {name: 'Requirement'}), (b:SchemaMeta {name: 'TestCase'})
+MERGE (a)-[r:VERIFIED_BY]->(b)
+  SET r.vocab_id = 'doc_requirement_verified_by', r.prov_maps_to = null, r.domain = 'docs', r.status = 'planned';
+
+MATCH (a:SchemaMeta {name: 'FeedbackNote'}), (b:SchemaMeta {name: 'DocSection'})
+MERGE (a)-[r:ANNOTATES]->(b)
+  SET r.vocab_id = 'doc_feedback_annotates', r.prov_maps_to = null, r.domain = 'docs', r.status = 'planned';
+
+MATCH (a:SchemaMeta {name: 'FeedbackNote'}), (b:SchemaMeta {name: 'Employee'})
+MERGE (a)-[r:WAS_ATTRIBUTED_TO]->(b)
+  SET r.vocab_id = 'doc_feedback_authored_by', r.role = 'feedback_author', r.prov_maps_to = 'prov:wasAttributedTo', r.domain = 'docs', r.status = 'planned';
 
 // ── domain: all ─────────────────────────────────────────────────────────────
 

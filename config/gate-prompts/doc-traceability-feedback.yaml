@@ -1,0 +1,118 @@
+# SME gate-prompt spec — Design-doc traceability matrix + anchor-keyed feedback model
+# (backlog L7). Drafted by the ontology-mapper 2026-07-20. FRESH DRAFT — NOT run, NOT
+# signed off. Nothing here is applied by reading this page: the six new node_classifications
+# entries (DesignDoc, DocSection, Requirement, Component, TestCase, FeedbackNote) and the six
+# new relationship_vocabulary.yaml entries (doc_section_part_of,
+# doc_requirement_specified_in, doc_requirement_implemented_by, doc_requirement_verified_by,
+# doc_feedback_annotates, doc_feedback_authored_by) stay status: planned; the
+# doc-traceability-feedback map entry (config/taxonomy-ontology-map.yaml) stays
+# status: proposed. No supplement block, no loader, no graph write until this gate is run and
+# signed off, and a separate K-numbered follow-up lands the supplement + loader (same
+# lifecycle as every prior gate in this file). Mechanism-only: the worked examples below cite
+# only already-committed sample content (docs/design/controlm-ingestion-tdd.md,
+# docs/design/feedback/drydocs-startup-refresh-runbook-rev1.yaml) — no confidential data.
+classification: Internal-Public
+schema: drydocs.gate-prompt.v1
+id: doc-traceability-feedback
+title: "SME Gate — Design-doc traceability matrix + anchor-keyed feedback model (DesignDoc / DocSection / Requirement / Component / TestCase / FeedbackNote)"
+step: "Pre-activation gate for backlog L7 — models the TDD requirements traceability matrix (docs/design/templates/tdd.outline.yaml) and the anchor-keyed SME feedback loop (docs/design/feedback/README.md) as DryDocs graph edges"
+summary: >
+  Backlog L7 asks DryDocs to ingest its own design-doc traceability matrix and SME feedback as
+  graph content — "what specifies what, what implements it, what proves it, and what did the
+  SME say about it." This page proposes: (a) six new node classes — DesignDoc (the doc),
+  DocSection (an authored anchor within it), Requirement (a matrix row's FR/UC/NFR id),
+  Component (the code artifact that implements it), TestCase (the test/verify that proves
+  it), and FeedbackNote (one anchor-keyed SME annotation) — none of which had an existing
+  equivalent anywhere in relationship_vocabulary.yaml or drydocs_core/schema/*.cypher
+  (grepped for Module/Component/Test: nothing found; see section A); (b) a structural
+  containment edge (DocSection -[:PART_OF]-> DesignDoc, section B); (c) three traceability
+  edges radiating off Requirement — SPECIFIED_IN (design-section), IMPLEMENTED_BY
+  (component/module), VERIFIED_BY (test/verify) — one PROV-grounded (hadPrimarySource),
+  two local (section B); (d) the feedback loop — FeedbackNote -[:ANNOTATES]-> DocSection plus
+  FeedbackNote's authorship attribution to the reviewing Employee, and how a note ties back to
+  the doc Rev it was taken against (section C); (e) five open items that need an SME call but
+  are not proposed one way or the other here (section D). No graph write happens until every
+  confirmation below is ticked and logged to config/gate-log.md.
+meta:
+  Module: "drydocs-core (ontology)"
+  Source: "docs/design/templates/tdd.outline.yaml (schema drydocs.doc-outline.v1, the traceability-matrix block definition) + docs/design/feedback/README.md (schema drydocs.design_doc.feedback_yaml) + the worked examples docs/design/controlm-ingestion-tdd.md and docs/design/feedback/drydocs-startup-refresh-runbook-rev1.yaml"
+  Registry ref: "No config/source-registry.yaml entry — design docs are repo-native content (docs/design/), not an external/ingested source; see capture disposition below"
+  Classification: "Internal-Public (this page, mechanism only, and the tdd.outline.yaml template itself) · an individual design doc or feedback file inherits its OWN classification per docs/design/feedback/README.md ('keep confidential notes in internal/') — never assumed Internal-Public by default"
+  Taxonomy: "None — no config/taxonomy/ capture file exists for design-doc structure (the classification source is the outline/feedback schema files themselves, not a config/taxonomy/ import). See capture disposition in the map entry."
+  Ontology map: "config/taxonomy-ontology-map.yaml #doc-traceability-feedback (status: proposed) + drydocs_core/ontology/relationship_vocabulary.yaml (6 new node_classifications entries + 6 new local_relationships entries, all status: planned)"
+  Source of record: "docs/restructure/backlog.yaml L7 · docs/design/templates/tdd.outline.yaml traceability: block · docs/design/feedback/README.md"
+
+mapping:
+  - n: 1
+    element: "Six new node classes — DesignDoc, DocSection, Requirement, Component, TestCase, FeedbackNote"
+    target: "node_classifications entries in relationship_vocabulary.yaml, all prov:Entity, all status: planned (registration only, not an edge)"
+    edge: "node_classifications registration, not an edge  [PROPOSED — not a matrix row]"
+  - n: 2
+    element: "DocSection structural containment — recommended shape"
+    target: "(:DocSection)-[:PART_OF]->(:DesignDoc)"
+    edge: "structural containment, no PROV row (docs_chunk_part_of precedent)  [PROPOSED — doc_section_part_of]"
+  - n: 3
+    element: "Requirement -> design-section anchor (traceability-matrix column 2)"
+    target: "(:Requirement)-[:SPECIFIED_IN]->(:DocSection)"
+    edge: "prov:hadPrimarySource (prov:wasDerivedFrom family)  [PROPOSED — doc_requirement_specified_in]"
+  - n: 4
+    element: "Requirement -> component/module (traceability-matrix column 3)"
+    target: "(:Requirement)-[:IMPLEMENTED_BY]->(:Component)"
+    edge: "no PROV/standards row — local  [PROPOSED — doc_requirement_implemented_by]"
+  - n: 5
+    element: "Requirement -> test/verify (traceability-matrix column 4)"
+    target: "(:Requirement)-[:VERIFIED_BY]->(:TestCase)"
+    edge: "no PROV/standards row — local  [PROPOSED — doc_requirement_verified_by]"
+  - n: 6
+    element: "FeedbackNote -> the DocSection it annotates"
+    target: "(:FeedbackNote)-[:ANNOTATES]->(:DocSection)"
+    edge: "Entity -> Entity aboutness, no PROV row (docs_describes precedent)  [PROPOSED — doc_feedback_annotates]"
+  - n: 7
+    element: "FeedbackNote authorship — SME attribution, collapsed form"
+    target: "(:FeedbackNote)-[:WAS_ATTRIBUTED_TO {role: feedback_author}]->(:Employee)"
+    edge: "prov:wasAttributedTo (p2_authored_by precedent, NOT the K4/K5 reified pattern)  [PROPOSED — doc_feedback_authored_by]"
+
+provenance:
+  - label: "node_classifications#DesignDoc / #DocSection / #Requirement / #Component / #TestCase / #FeedbackNote (relationship_vocabulary.yaml)"
+    source_object: "docs/design/templates/tdd.outline.yaml (sections/subsections, traceability: block) + docs/design/feedback/README.md (feedback_yaml format) + drydocs/doc_outline.py (ANCHOR_RE, feedback_anchor_valid)"
+    key: "DesignDoc.doc_id (filename stem) ; DocSection.anchor (unique within one DesignDoc) ; Requirement.requirement_id ; Component/TestCase have no stable business key yet — see section D ; FeedbackNote has no independent key (one per anchor per feedback-file row)"
+    loader: "~ (none yet — proposal only, no loader exists)"
+    properties:
+      - {name: doc_id / doc_type / rev / status / commit, origin: source, from: "the doc's own front-matter anchor (docs/design/templates/tdd.outline.yaml anchor: front-matter)", note: "DesignDoc node properties"}
+      - {name: anchor / heading / required, origin: source, from: "tdd.outline.yaml sections[].anchor/heading/required, or an L11 derived subsection anchor", note: "DocSection node properties"}
+      - {name: requirement_id / description / matrix_status, origin: source, from: "one traceability-matrix table row (docs/design/controlm-ingestion-tdd.md anchor: traceability-matrix)", note: "Requirement node properties; requirement_id format is UNENFORCED today (tdd.outline.yaml traceability.mode: loose) — see section D"}
+      - {name: anchor / note / doc_id / doc_rev, origin: source, from: "docs/design/feedback/<doc-id>-rev<N>.yaml, one row of `notes:`", note: "FeedbackNote node properties; doc_rev parsed from the filename's <N> — see section C"}
+  - label: "(:Requirement)-[:SPECIFIED_IN|IMPLEMENTED_BY|VERIFIED_BY]->(...) — the traceability-matrix row, fanned out"
+    source_object: "One markdown table row under the traceability-matrix anchor (docs/design/templates/tdd.outline.yaml traceability: block; worked example docs/design/controlm-ingestion-tdd.md rows FR-CMI-001..007, NFR-CMI-001)"
+    key: "the row's requirement id (loose format today) + the design-section / component / test cell text"
+    loader: "~ (none yet — proposal only, no loader exists)"
+    properties:
+      - {name: design_section_cell, origin: source, from: "matrix column 'design-section anchor' — must cite a known outline anchor (drydocs/doc_outline.py check())", note: "resolves to the SPECIFIED_IN target DocSection"}
+      - {name: component_cell, origin: source, from: "matrix column 'component/module' — free-text file/module/CLI-command citation", note: "resolves to the IMPLEMENTED_BY target Component; Component identity keying is an open question, section D"}
+      - {name: test_cell, origin: source, from: "matrix column 'test/verify' — free-text pytest id / m3-verify check / gate name / graph-tests file", note: "resolves to the VERIFIED_BY target TestCase; heterogeneous citation kinds, section D"}
+
+sections:
+  - title: "A. Node classes — DesignDoc, DocSection, Requirement, Component, TestCase, FeedbackNote"
+    confirmations:
+      - "All six are new node classes (prov:Entity). NO existing Module/Component/Test/TestCase node class was found anywhere in relationship_vocabulary.yaml or drydocs_core/schema/*.cypher (grepped both) — confirm this is still true at gate time (a component build elsewhere in the meantime would change the recommendation for Component/TestCase specifically)."
+      - "Component was considered against two existing near-miss Entity classes and REJECTED as a reuse target: :Script (Control-M job-invoked artifact — CMDLINE/MEMNAME/Jar-Path lineage, m3_invokes/m3_triggers; a different domain, job-invocation not requirement-implementation) and :PipelineService (deployable pipeline service definition inside a :Code codebase — service granularity, not an arbitrary file/module/CLI-command citation like `oracle_adapter.py` or `cli.ingest_controlm`). Confirm Component as its own class, or direct a reuse/fold instead."
+      - "DesignDoc and DocSection are deliberately kept SEPARATE from the existing docs-corpus :Document / :Chunk labels (the llm-graph-builder bmc-docs lexical graph) — same surface shape ('a document has structured content') but a different provenance model: :Document/:Chunk are deterministically H2-chunked SCRAPED pages (VERBATIM/GROUNDED/SYNTHESIZED trust tiers, corpus SOURCE-MANIFEST rules); :DesignDoc/:DocSection are AUTHORED, rev-tracked, outline-conformant DryDocs artifacts with no chunking/trust-tier model. RECOMMENDATION: keep them distinct labels for now — reconciling risks importing corpus-specific semantics (chunking, trust tiers) onto design docs that don't have them. Revisit only if a real query need for cross-label traversal emerges."
+      - "TestCase's Test/verify citations are HETEROGENEOUS in the one worked example alone: a pytest test id, an `m3-verify` invariant name, an HITL gate name (`seal-attribution-match-policy`), and a `graph-tests/*.yaml` file reference — all in docs/design/controlm-ingestion-tdd.md's single table. Confirm a `kind` property (unit|verify|gate|graph-test) is the right way to carry this, vs a differently-shaped node per kind (open in section D)."
+  - title: "B. Structural + traceability edges — the containment shape and the standards grounding"
+    confirmations:
+      - "DocSection containment — RECOMMENDATION: (:DocSection)-[:PART_OF]->(:DesignDoc), the SAME label as docs_chunk_part_of (Chunk -> Document) but a NEW vocabulary entry (from/to differ — C8-clean). ALTERNATIVE, not registered: reclass DesignDoc as prov:Collection and use a CONTAINS_SECTION label (matrix row Collection -> any = prov:hadMember), mirroring the m3 folder/job family (CONTAINS_JOB / CONTAINS_FOLDER). RATIONALE for the recommendation: a design doc's outline sections are AUTHORED and ORDERED (the tdd.outline.yaml sections list, plus the FIRST_CHUNK/NEXT_CHUNK-style reading-order precedent already established for the docs corpus), not an open unordered collection of members the way a Control-M folder holds an arbitrary set of jobs — the Document/Chunk analogy is closer than the Folder/Job analogy. Confirm PART_OF, or direct the CONTAINS_SECTION/Collection shape instead."
+      - "Requirement -[:SPECIFIED_IN]-> DocSection — RECOMMENDATION: ground it in prov:hadPrimarySource (a sub-property of prov:wasDerivedFrom), reusing the EXACT pattern already active for seal_had_primary_source (BusinessApplication -> Document — 'this record's specification is sourced from that document'). Confirm this reading of 'specified in' as a primary-sourcing relation, or direct a different PROV term / a local-only mapping instead."
+      - "Requirement -[:IMPLEMENTED_BY]-> Component and Requirement -[:VERIFIED_BY]-> TestCase — RECOMMENDATION: local (prov_maps_to: ~), same disposition as docs_first_chunk / docs_next_chunk (structural/local edges with no standard-term fit). PROV-O has no requirement-realization or requirement-verification property, and none of ORG/DPROD/SOSA/DCAT/SKOS models this relation either. Confirm no standards term is being missed here."
+      - "All three Requirement-outbound edges are modeled as a STAR off Requirement (Requirement -> DocSection, Requirement -> Component, Requirement -> TestCase), mirroring the traceability-matrix table's own shape (one row = one requirement with three correlated cells), rather than a linear chain (DocSection -> Component -> TestCase). Confirm the star shape is the right read of the matrix semantics."
+  - title: "C. Feedback attribution shape — qualified vs collapsed, and rev correlation"
+    confirmations:
+      - "FeedbackNote authorship — RECOMMENDATION: the SIMPLE/COLLAPSED form, (:FeedbackNote)-[:WAS_ATTRIBUTED_TO {role: feedback_author}]->(:Employee), the SAME shape as p2_authored_by (ControlMFolder -> Developer), NOT the K4/K5 qualified/reified Attribution pattern (BusinessApplication/Product -[:QUALIFIED_ATTRIBUTION]-> Attribution -[:HAS_AGENT]-> Employee, -[:HAD_ROLE]-> a role concept scheme). RATIONALE: the K4/K5 reified pattern exists to carry a NAMED ROLE from a fixed concept scheme (TOMRole / ProductRole) alongside the agent, because the same application/product can have several role-holders in DIFFERENT named roles simultaneously. A FeedbackNote has exactly one author and no role to qualify — 'SME feedback author' is not a multi-valued concept scheme — so reification would add a hop with no disambiguating payload. Confirm the collapsed form is sufficient, or direct registering a reified form now for a future multi-reviewer-per-note case (not observed in either worked example)."
+      - "Rev correlation — RECOMMENDATION: doc_rev as a plain property on FeedbackNote (and, by extension, comparable against DesignDoc.rev at query time to detect a note that has gone stale against a newer doc rev), parsed straight from the feedback-file name's `<N>` in `<doc-id>-rev<N>.yaml`. ALTERNATIVE, not proposed: a separate `:DesignDocRevision` node per rev, with a PROV-style wasRevisionOf chain and FeedbackNote pointing at the specific revision node instead of a property. RATIONALE for the recommendation: the outline/feedback format tracks Rev as a front-matter field on the CURRENT doc, not as first-class per-rev nodes (no prior rev's markdown is retained in the repo once superseded — Rev 1/2 content for controlm-ingestion-tdd.md is git-history only, not a separate committed artifact), so a property-based staleness check costs nothing extra to load and matches how the doc itself already tracks Rev. Confirm the property approach, or direct the Revision-node shape if per-rev graph history turns out to matter for a real use case."
+      - "Confirm the FeedbackNote -> DocSection -> Requirement correlation path is acceptable as a MIXED-DIRECTION traversal — (:FeedbackNote)-[:ANNOTATES]->(:DocSection)<-[:SPECIFIED_IN]-(:Requirement) — rather than requiring a directly-stored FeedbackNote -> Requirement edge. The reverse-direction read on SPECIFIED_IN already has a documented precedent (m3_was_informed_by / m3_triggers both note a 'logical vs stored direction' distinction) — but a direct FeedbackNote -[:ABOUT_REQUIREMENT]-> Requirement shortcut edge was NOT proposed here (it would restate the ANNOTATES + SPECIFIED_IN chain, close to a same-row join-restatement even though the two edges don't share one source row — flagged for the SME to weigh in either way)."
+  - title: "D. Open items — flagged, not decided here"
+    confirmations:
+      - "Component identity/keying: is a Component keyed on its literal path string (e.g. `controlm_folders.cypher`) alone, or does it need a repo-relative root + a distinguishing property when two loaders share a basename (the same ambiguity m3_invokes already documents for :Script — 'same-basename multi-mount duplicates surface in lineage-review for SME merge, never auto-merged')? Not resolved here; no loader exists yet to force the decision."
+      - "TestCase.kind enum (unit|verify|gate|graph-test) — proposed as a free property, not gated to a fixed list the way TOMRole/ProductRole are fixed skos:Concept schemes. Confirm free-text is fine for now, or direct a fixed enum (and if fixed, whether it needs its own skos:ConceptScheme like the role families)."
+      - "precedence_authority for this whole family: config/precedence.yaml's four declared authorities (bmc-baseline, internal-standards, seal-pat-source-of-record, lob-product-team) don't explicitly `govern` design docs, requirements, or feedback. `internal-standards` was used as the closest fit in the map entry, but this is NOT a proposal to add a new authority — flagged only, mirroring how seal-pat-source-of-record itself started as a flagged gap before becoming a registered authority."
+      - "ANNOTATES as a local label: the W3C Web Annotation model (`oa:hasTarget`) is the standards-precise term for 'a note targets a section of a document', but `oa:` is not in drydocs_core/ontology/namespaces.py and is not a declared company standard. Not proposed for adoption here — flagged as a candidate for a future namespaces.py addition if annotation modeling grows beyond this one use."
+      - "Requirement id enforcement: docs/design/templates/tdd.outline.yaml's traceability.mode is `loose` today (ids free-form, unformat-checked, no orphan/duplicate check) and is explicitly planned to flip to `strict` later. Should the GRAPH load enforce requirement_id_pattern even before the doc-conformance validator itself goes strict, or should graph ingestion mirror whatever mode the outline is in at load time? Not decided here."

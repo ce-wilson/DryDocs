@@ -15,7 +15,7 @@
 # =============================================================================
 
 schema: drydocs.taxonomy-ontology-map.v1
-updated: 2026-07-20                        # K5 gate signed off: product-cabinet-attribution proposed -> confirmed
+updated: 2026-07-20                        # K5 gate signed off: product-cabinet-attribution proposed -> confirmed; +L7 doc-traceability-feedback drafted (proposed)
 
 mappings:
 
@@ -385,6 +385,87 @@ mappings:
       - "AreaProduct layer absent from the lob-product-team sample (open_questions#area-product-missing, counts.area_products: 0, config/taxonomy/lob-product-team.yaml) — the ProductRole SCHEME is confirmable now; the AreaProduct loader (catalog_has_area_product / catalog_area_product_has_dev_team, both status: planned) remains a separate, unbuilt dependency."
       - "The three cross-family reporting relations (tech_partner MANAGES application_owner; information_owner MAY REPORT TO data_owner; data_certifier RELATES TO information_owner, config/gate-log.md 2026-07-10 §B) — gate §D DECIDED 2026-07-20 (SME in-session): RECORDED AS DEFERRED (option b); person-level population is an internal/company-side concern once a person-level PAT cabinet extract exists (SME: \"that can be done internally\"). Semantics preserved verbatim here until then; nothing registered."
       - "DevTeam<->BusinessApplication M:N — gate §E CONFIRMED 2026-07-20 (SME in-session): M:N in both directions on the EXISTING applied arch_develops edge ((:BusinessApplication)-[:WAS_ATTRIBUTED_TO {role: developed_by}]->(:DevTeam)); semantics confirmation only, no new edge, no cardinality constraint; multiple developed_by teams on one application is valid data for verify rules."
+
+  # ---- L7: Design-doc traceability matrix + anchor-keyed feedback (PROPOSED, 2026-07-20) ----
+  # Gate config/gate-prompts/doc-traceability-feedback.yaml (fresh draft, NOT run). Models
+  # docs/design/templates/tdd.outline.yaml's requirements traceability matrix (requirement ->
+  # design-section anchor -> component/module -> test) and the anchor-keyed SME feedback
+  # format (docs/design/feedback/README.md) as graph edges. Six new node classes + six new
+  # relationship terms, all status: planned in relationship_vocabulary.yaml. Worked example:
+  # docs/design/controlm-ingestion-tdd.md's matrix (FR-CMI-001..007, NFR-CMI-001) and
+  # docs/design/feedback/drydocs-startup-refresh-runbook-rev1.yaml.
+
+  - id: doc-traceability-feedback
+    taxonomy:
+      source: design-doc-outline
+      element: "Design-doc traceability matrix (requirement -> design-section anchor -> component/module -> test) and anchor-keyed SME feedback notes (docs/design/feedback/*.yaml) modeled as DryDocs graph edges (backlog L7)"
+    ontology:
+      from_node: DesignDoc                  # dd:DesignDoc (new, prov:Entity)
+      to_node: "DocSection | Requirement | Component | TestCase | FeedbackNote | Employee"
+      prov_type_from: Entity
+      prov_type_to: "Entity (DocSection/Requirement/Component/TestCase/FeedbackNote) | Agent (Employee)"
+      matrix_row: "several — one row per edge; see edge_shapes"
+      edge_shapes:
+        - edge: "DocSection -[:PART_OF]-> DesignDoc"
+          matrix_row: "structural containment, no PROV row (docs_chunk_part_of precedent)"
+          vocab_id: doc_section_part_of
+        - edge: "Requirement -[:SPECIFIED_IN]-> DocSection"
+          matrix_row: "Entity -> Entity = prov:wasDerivedFrom family (prov:hadPrimarySource sub-property, seal_had_primary_source precedent)"
+          vocab_id: doc_requirement_specified_in
+        - edge: "Requirement -[:IMPLEMENTED_BY]-> Component"
+          matrix_row: "no PROV/standards row — local (FIRST_CHUNK/NEXT_CHUNK precedent)"
+          vocab_id: doc_requirement_implemented_by
+        - edge: "Requirement -[:VERIFIED_BY]-> TestCase"
+          matrix_row: "no PROV/standards row — local (same reasoning as IMPLEMENTED_BY)"
+          vocab_id: doc_requirement_verified_by
+        - edge: "FeedbackNote -[:ANNOTATES]-> DocSection"
+          matrix_row: "Entity -> Entity aboutness, no PROV row (docs_describes precedent)"
+          vocab_id: doc_feedback_annotates
+        - edge: "FeedbackNote -[:WAS_ATTRIBUTED_TO {role: feedback_author}]-> Employee"
+          matrix_row: "Entity -> Agent = prov:wasAttributedTo, collapsed form (p2_authored_by precedent)"
+          vocab_id: doc_feedback_authored_by
+      node_classifications_added: [DesignDoc, DocSection, Requirement, Component, TestCase, FeedbackNote]
+      traversal_note: >
+        The acceptance path FeedbackNote -> DocSection -> Requirement is a MIXED-DIRECTION
+        traversal, not one directed chain: (fn:FeedbackNote)-[:ANNOTATES]->(ds:DocSection)
+        <-[:SPECIFIED_IN]-(req:Requirement) — SPECIFIED_IN points Requirement -> DocSection
+        (the hadPrimarySource reading), so correlating a note to the requirement it comments
+        on means walking that edge in reverse; same idiom as m3_was_informed_by / m3_triggers
+        documenting a "logical" vs "stored" edge direction.
+    precedence_authority: internal-standards   # best fit of the 4 declared authorities (an internal process/documentation artifact, closest to knowledge/standards-governed conventions); NONE of config/precedence.yaml's 4 `governs` lists names design docs/requirements/feedback explicitly — flagged in open_questions, same "authority gap" pattern that seal-pat-source-of-record closed for docmeta.
+    standards_cited: ["PROV-O (prov:hadPrimarySource, prov:wasAttributedTo)", "W3C Web Annotation (oa:hasTarget — cited as the not-yet-declared standard analog for ANNOTATES, section D)"]
+    vocab_id: [doc_section_part_of, doc_requirement_specified_in, doc_requirement_implemented_by, doc_requirement_verified_by, doc_feedback_annotates, doc_feedback_authored_by]
+    capture: >
+      waived — the classification source is docs/design/templates/tdd.outline.yaml (schema
+      drydocs.doc-outline.v1, the traceability-matrix block definition) and
+      docs/design/feedback/README.md (schema drydocs.design_doc.feedback_yaml); neither is a
+      config/taxonomy/ import, so no capture file exists in that directory for design-doc
+      structure — the taxonomy-first gap this field records rather than hides (same
+      disposition as job-seal-app-ref / seal-tom-attribution).
+    status: proposed
+    proposed_at: 2026-07-20
+    gate_spec: config/gate-prompts/doc-traceability-feedback.yaml
+    note: >
+      Drafted by the ontology-mapper per backlog L7. Everything here stays status: planned
+      (relationship_vocabulary.yaml) / status: proposed (this entry) until the SME runs the
+      gate (config/gate-prompts/doc-traceability-feedback.yaml) — no supplement block, no
+      loader, no graph write. Worked example: docs/design/controlm-ingestion-tdd.md's
+      traceability matrix (anchor traceability-matrix, FR-CMI-001..007 + NFR-CMI-001) and
+      docs/design/feedback/drydocs-startup-refresh-runbook-rev1.yaml. Six new node classes
+      (DesignDoc, DocSection, Requirement, Component, TestCase, FeedbackNote) had no
+      pre-existing equivalent anywhere in relationship_vocabulary.yaml or
+      drydocs_core/schema/*.cypher (grepped for Module/Component/Test — none found); the two
+      existing near-miss Entity classes (:Script, :PipelineService) were considered and
+      rejected as too domain-specific (Control-M job-invocation lineage / deployable-service
+      granularity) — see the Component node_classifications note.
+    open_questions:
+      - "Reconcile :DesignDoc/:DocSection with the existing docs-corpus :Document/:Chunk labels (same 'a document has structured content' shape, different provenance/authoring model), or keep the two families permanently distinct? Not decided here — see the DesignDoc node_classifications note."
+      - "Containment shape for DocSection: PART_OF (registered, recommended — Document/Chunk precedent) vs CONTAINS_SECTION (DesignDoc reclassed prov:Collection, hadMember, Folder/Job precedent) — gate section B."
+      - "FeedbackNote attribution shape: collapsed WAS_ATTRIBUTED_TO (registered, recommended — no role vocabulary needed) vs a future reified Attribution chain for multi-reviewer notes — gate section C."
+      - "FeedbackNote-to-rev correlation: doc_rev as a plain node property (proposed) vs a separate DesignDocRevision node + a PROV wasRevisionOf-style chain — gate section C; the property approach is recommended as the simpler shape until real multi-rev drift data exists."
+      - "precedence_authority: none of config/precedence.yaml's 4 declared authorities explicitly governs design docs/requirements/feedback; internal-standards is the closest fit here but a dedicated authority (mirroring how seal-pat-source-of-record was added for docmeta) may be warranted — not proposed here, flagged only."
+      - "TestCase.kind (unit|verify|gate|graph-test): controlled enum from day one, or free-text until real matrix data across more TDDs is surveyed? The one worked example (controlm-ingestion-tdd.md) already spans all four kinds in one table."
+      - "Requirement id format: tdd.outline.yaml's traceability.mode is `loose` (ids free-form, unenforced) — should the graph load NOW under loose rules and re-validate later when `strict` flips, or should graph ingestion require strict-pattern ids from the start (a stricter bar than the doc-conformance validator itself currently enforces)?"
 
   # ---- Example: a PROPOSED mapping awaiting the SME gate -------------------
   - id: oracle-schema-asset
@@ -840,5 +921,5 @@ mappings:
 summary:
   applied: 8          # +application-as-dataproduct, +seal-tom-attribution (K4, 2026-07-15); prior 6 = job-contains, application-contains-folder, doc-describes-product, doc-chunk-part-of, doc-first-chunk, doc-next-chunk
   confirmed: 21       # +product-cabinet-attribution (K5 gate signed off 2026-07-20; applied waits on the K6 supplement + a person-level cabinet extract); prior +seal-doc-source-of-record (gate §D confirmed 2026-07-10; applied waits on docmeta loader)
-  proposed: 3         # oracle-schema-asset, jobrun-observation, requires-scheduler
+  proposed: 4         # oracle-schema-asset, jobrun-observation, requires-scheduler, doc-traceability-feedback
   rejected: 0
