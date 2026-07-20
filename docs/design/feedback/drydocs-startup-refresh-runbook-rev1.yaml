@@ -1,0 +1,9 @@
+# design-doc feedback — paste into docs/design/feedback/drydocs-startup-refresh-runbook-rev<N>.yaml
+doc: drydocs-startup-refresh-runbook
+notes:
+  - anchor: front-matter
+    note: |
+      For each bullet point, start on a new line. i.e. Classification, Classification, Companion
+  - anchor: purpose-scope
+    note: |
+      Remove: "Company-side production ingest (Track-2 — the port-prompt and the company Control-M ingestion TDD own that)"  Out of scope: UI or web console (Epic O)  and multi-DB provisioning topology beyond a first-time pointer.
