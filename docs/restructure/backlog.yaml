@@ -411,7 +411,7 @@ items:
     agent: main
     model: sonnet
     priority: p2
-    status: todo
+    status: in_progress   # pulled 2026-07-20 (user-directed, same session as the groom)
     depends_on: []
     inputs: ["external/ServiceNow/ (6 files, downloaded 2026-07-20: CMDB - Process Guide.docx, CMDB - Product Architecture.pptx, CMDB Data Manager.pptx, CMDB Governance Workshop.pptx, ITAM - SAM - Product Integration Options - Yokohama.pptx, What are services and service offerings.pdf)", knowledge/upgrade-plans/generic-terminology-research.md, external/orchestration/bmc-controlm/SOURCE-MANIFEST.md, config/classification.yaml, reference/REGISTRY.yaml]
     acceptance: >
@@ -3795,8 +3795,8 @@ items:
 # Roll-up the dispatcher can glance at. COMPUTED views — test_backlog.py enforces
 # that these match the items exactly; update them with any status change.
 summary:
-  todo: 21                                          # +C10 (ServiceNow doc-set mining, 2026-07-20)
-  in_progress: 1                                   # E1 (gate deferred)
+  todo: 20                                          # C10 pulled (2026-07-20)
+  in_progress: 2                                   # E1 (gate deferred), C10 (pulled 2026-07-20)
   blocked: 0
   done: 93                                         # +K5 +K6 +L8 (2026-07-20)
-  next_ready: [C10, L7, L9, L12, M2, M3, M4, P1, J10, Q6, O9, O12, O13, G14, J13]
+  next_ready: [L7, L9, L12, M2, M3, M4, P1, J10, Q6, O9, O12, O13, G14, J13]
