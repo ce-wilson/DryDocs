@@ -2115,7 +2115,7 @@ items:
     agent: ontology-mapper
     model: sonnet
     priority: p3
-    status: in_progress   # pulled 2026-07-20 — ontology proposal drafted, gate pending
+    status: done          # DONE 2026-07-20 — gate doc-traceability-feedback SIGNED OFF (21/21, SaaS product-plane reframe); vocab active + supplement + 3-pass loader load-doc-traceability; live-loaded + verified (95 sections / 41 requirements / 44 SPECIFIED_IN, 0 unlinked)
     depends_on: [L1, L5]
     inputs: [docs/design/templates/tdd.outline.yaml, drydocs_core/ontology/relationship_vocabulary.yaml, docs/restructure/03-hitl-sme-flow.md]
     acceptance: >
@@ -3824,8 +3824,8 @@ items:
 # Roll-up the dispatcher can glance at. COMPUTED views — test_backlog.py enforces
 # that these match the items exactly; update them with any status change.
 summary:
-  todo: 17                                          # L7 pulled 2026-07-20
-  in_progress: 2                                   # E1 (gate deferred — now deferred company-side too, per the same readout) + L7
+  todo: 17
+  in_progress: 1                                   # E1 (gate deferred — now deferred company-side too, per the same readout)
   blocked: 0
-  done: 96                                         # +K5 +K6 +L8 +C10 +P1 +P4 (2026-07-20)
+  done: 97                                         # +K5 +K6 +L8 +C10 +P1 +P4 +L7 (2026-07-20)
   next_ready: [L9, L12, M2, M3, M4, P3, J10, Q6, O9, O12, O13, G14, J13]

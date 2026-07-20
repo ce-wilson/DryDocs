@@ -1842,8 +1842,8 @@ local_relationships:
   # Gate doc-traceability-feedback SIGNED OFF 2026-07-20 (config/gate-log.md — all 21
   # confirmations A1-A7/B1-B4/C1-C4/D1-D7; the SaaS-reframe product-plane definitions).
   # Supplement terms live in ontology_supplement.cypher (the docs-domain home, alongside
-  # the Document/Chunk corpus terms). loader: ~ until the connector-#1 loader lands
-  # (load-doc-traceability — same L7 item). Node classes (DesignDoc/DocSection/
+  # the Document/Chunk corpus terms). Loaders: the load-doc-traceability three-pass chain
+  # (doc_sections / doc_traceability / doc_feedback .cypher). Node classes (DesignDoc/DocSection/
   # Requirement/Component/TestCase/FeedbackNote) registered above in
   # node_classifications, same gate.
 
@@ -1867,7 +1867,7 @@ local_relationships:
       Document/Chunk, not Folder/Job. Gate section B asks the SME to confirm PART_OF over
       CONTAINS_SECTION.
     supplement:   ontology_supplement.cypher
-    loader:       ~
+    loader:       doc_sections.cypher
     domain:       docs
     status:       active   # gate doc-traceability-feedback signed off 2026-07-20 (config/gate-log.md)
 
@@ -1885,7 +1885,7 @@ local_relationships:
       Document). SPECIFIED_IN kept as the domain label for query clarity
       (RELATIONSHIP_GUIDE domain-alias rule), mapping recorded here.
     supplement:   ontology_supplement.cypher
-    loader:       ~
+    loader:       doc_traceability.cypher
     domain:       docs
     status:       active   # gate doc-traceability-feedback signed off 2026-07-20 (config/gate-log.md)
 
@@ -1902,7 +1902,7 @@ local_relationships:
       either — local per the RELATIONSHIP_GUIDE local-term rule, same family as
       FIRST_CHUNK/NEXT_CHUNK (structural edges with no standard mapping).
     supplement:   ontology_supplement.cypher
-    loader:       ~
+    loader:       doc_traceability.cypher
     domain:       docs
     status:       active   # gate doc-traceability-feedback signed off 2026-07-20 (config/gate-log.md)
 
@@ -1918,7 +1918,7 @@ local_relationships:
       requirement-verification; local. Candidate future standard: none of
       PROV-O/ORG/DPROD/SOSA/DCAT/SKOS models a test-verifies-requirement relation.
     supplement:   ontology_supplement.cypher
-    loader:       ~
+    loader:       doc_traceability.cypher
     domain:       docs
     status:       active   # gate doc-traceability-feedback signed off 2026-07-20 (config/gate-log.md)
 
@@ -1941,7 +1941,7 @@ local_relationships:
       taken against — see the gate prompt section C for why this stays a property rather
       than a separate Revision node.
     supplement:   ontology_supplement.cypher
-    loader:       ~
+    loader:       doc_feedback.cypher
     domain:       docs
     status:       active   # gate doc-traceability-feedback signed off 2026-07-20 (config/gate-log.md)
 
@@ -1964,7 +1964,7 @@ local_relationships:
       confirm collapsed-only is sufficient (vs also registering a reified form for future
       multi-reviewer notes, mirroring the K6 "both forms load" precedent).
     supplement:   ontology_supplement.cypher
-    loader:       ~
+    loader:       doc_feedback.cypher
     domain:       docs
     status:       active   # gate doc-traceability-feedback signed off 2026-07-20 (config/gate-log.md)
 

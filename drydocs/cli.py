@@ -56,6 +56,16 @@ from .loaders.bmc_docs import (
     BmcDocsAdapter,
     BmcDocsLoader,
 )
+from .loaders.doc_traceability import (
+    DEFAULT_DESIGN_DIR,
+    DEFAULT_FEEDBACK_DIR,
+    DesignDocFeedbackAdapter,
+    DesignDocSectionsAdapter,
+    DesignDocSectionsLoader,
+    DocFeedbackLoader,
+    DocTraceabilityLoader,
+    TraceabilityMatrixAdapter,
+)
 from .loaders.essential_graphrag import (
     DEFAULT_PDF,
     EssentialGraphragAdapter,
@@ -144,6 +154,10 @@ LOADER_REGISTRY: dict[str, type] = {
     "bmc_docs":           BmcDocsLoader,
     # Essential GraphRAG ebook lexical graph (Q2 experiment):
     "essential_graphrag": EssentialGraphragLoader,
+    # Doc traceability + review feedback (L7 connector #1):
+    "doc_sections":       DesignDocSectionsLoader,
+    "doc_traceability":   DocTraceabilityLoader,
+    "doc_feedback":       DocFeedbackLoader,
 }
 
 SQL_DIR = Path(__file__).resolve().parent / "loaders" / "sql"
@@ -170,6 +184,9 @@ LOADER_SOURCE: dict[str, str] = {
     # fails fast (exit 2) on `load-bmc-docs` — that is correct, not a bug.
     "bmc_docs":                      "bmc-docs",
     "essential_graphrag":            "essential-graphrag",
+    "doc_sections":                  "design-docs",
+    "doc_traceability":              "design-docs",
+    "doc_feedback":                  "design-docs",
 }
 
 
@@ -610,6 +627,43 @@ def load_bmc_docs(
     with _client() as cli:
         summary = BmcDocsLoader(cli, adapter).load()
     console.print(summary.as_dict())
+
+
+@app.command(name="load-doc-traceability")
+def load_doc_traceability(
+    design_dir: Path = typer.Option(
+        DEFAULT_DESIGN_DIR,
+        "--design-dir",
+        help="Directory of design-doc .md files (defaults to docs/design).",
+    ),
+    feedback_dir: Path = typer.Option(
+        DEFAULT_FEEDBACK_DIR,
+        "--feedback-dir",
+        help="Directory of <doc-id>-rev<N>.yaml feedback files (defaults to docs/design/feedback).",
+    ),
+) -> None:
+    """Load the doc-traceability graph — DryDocs documenting itself (L7).
+
+    Connector #1 of the product-plane documentation ontology (gate
+    doc-traceability-feedback, signed off 2026-07-20): three passes in a
+    fixed order — (1) docs/design/*.md -> :DesignDoc + :DocSection + PART_OF;
+    (2) traceability-matrix rows -> :Requirement + :Component + :TestCase +
+    SPECIFIED_IN / IMPLEMENTED_BY / VERIFIED_BY (sections MATCHed, never
+    MERGEd); (3) feedback yamls -> :FeedbackNote + ANNOTATES (+ attribution
+    when the author resolves to a real :Employee). Idempotent; fully
+    deterministic parsing (no LLM).
+    """
+    _gate_source("design-docs")  # confirmed-gate before any DB write
+    if not design_dir.exists():
+        console.print(f"[red]Missing: {design_dir}[/]"); raise typer.Exit(1)
+    with _client() as cli:
+        for loader_cls, adapter in (
+            (DesignDocSectionsLoader, DesignDocSectionsAdapter(design_dir)),
+            (DocTraceabilityLoader, TraceabilityMatrixAdapter(design_dir)),
+            (DocFeedbackLoader, DesignDocFeedbackAdapter(feedback_dir)),
+        ):
+            summary = loader_cls(cli, adapter).load()
+            console.print(summary.as_dict())
 
 
 @app.command(name="load-essential-graphrag")

@@ -100,6 +100,17 @@ sources:
       source_url) live on the :Document node and the local PDF is gitignored. Same
       permanent-stub rationale as bmc-docs.
 
+  - id: design-docs
+    status: stub                             # repo-native markdown/yaml: git history IS the audit envelope; no source-system created_by/updated_at columns exist
+    notes: >
+      Confirmed 2026-07-20 (gate doc-traceability-feedback). The source is the
+      repo's own committed artifacts (docs/design/*.md + feedback yamls) — the
+      authorship/change envelope is git (commit author/date), already carried
+      doc-level as the front-matter Rev + commit citation that lands on
+      :DesignDoc, and review authorship is explicit data (the feedback files'
+      optional author field). Same permanent-stub rationale as bmc-docs /
+      essential-graphrag: no source-system audit columns exist to map.
+
   - id: airflow-mwaa
     status: stub                             # envelope gate not run — crosswalk-only activation, no loader/live export
     notes: >

@@ -97,3 +97,13 @@ CREATE CONSTRAINT channel_id          IF NOT EXISTS FOR (ch:Channel)            
 CREATE CONSTRAINT app_snapshot_id     IF NOT EXISTS FOR (s:ApplicationSnapshot) REQUIRE s.snapshot_id IS UNIQUE;
 CREATE CONSTRAINT product_snapshot_id IF NOT EXISTS FOR (s:ProductSnapshot)     REQUIRE s.snapshot_id IS UNIQUE;
 CREATE CONSTRAINT lob_snapshot_id     IF NOT EXISTS FOR (s:CatalogLOBSnapshot)  REQUIRE s.snapshot_id IS UNIQUE;
+
+// --- Documentation traceability + review feedback (L7; gate
+// doc-traceability-feedback signed off 2026-07-20). SOURCE-NAMESPACED keys
+// (gate A2) — origin is part of every identity, never a bare stem/path. -----
+CREATE CONSTRAINT design_doc_key      IF NOT EXISTS FOR (d:DesignDoc)           REQUIRE (d.origin, d.doc_id) IS NODE KEY;
+CREATE CONSTRAINT doc_section_key     IF NOT EXISTS FOR (s:DocSection)          REQUIRE (s.origin, s.doc_id, s.anchor) IS NODE KEY;
+CREATE CONSTRAINT requirement_key     IF NOT EXISTS FOR (r:Requirement)         REQUIRE (r.origin, r.requirement_id) IS NODE KEY;
+CREATE CONSTRAINT component_key       IF NOT EXISTS FOR (c:Component)           REQUIRE (c.origin, c.ref) IS NODE KEY;
+CREATE CONSTRAINT test_case_key       IF NOT EXISTS FOR (t:TestCase)            REQUIRE (t.origin, t.ref) IS NODE KEY;
+CREATE CONSTRAINT feedback_note_key   IF NOT EXISTS FOR (f:FeedbackNote)        REQUIRE (f.origin, f.doc_id, f.doc_rev, f.anchor) IS NODE KEY;

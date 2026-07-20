@@ -1,0 +1,82 @@
+# =============================================================================
+# config/source-mappings/design-docs.yaml — the field ledger for source
+# `design-docs` (config/source-registry.yaml id; L7 connector #1, gate
+# doc-traceability-feedback signed off 2026-07-20).
+#
+# Markdown/YAML source, not a DB table — "objects" here are the three parse
+# streams of drydocs/loaders/doc_traceability.py and "columns" are the fields
+# each stream projects. Everything is TRANSCRIBED from the gate page + the
+# adapter code; census: pending (a field census is meaningless for an
+# open-prose markdown source — recorded as pending, not faked). Field names
+# are mechanism (no data values) — classification: Internal-Public.
+# =============================================================================
+schema: drydocs.source-mapping.v1
+source: design-docs
+classification: Internal-Public
+updated: 2026-07-20
+
+objects:
+  - name: design-doc-md
+    kind: markdown
+    profile:
+      profiled_on: ~
+      via: "docs/design/*.md front-matter + <!-- anchor: id --> markers (drydocs_core/doc_anchors.py)"
+      column_count: ~
+      census: pending
+    note: >
+      One object = one authored design doc. DesignDoc fields parse from
+      front-matter (the same regex family the render pipeline keys on);
+      DocSection rows are the authored anchors in file order.
+    columns:
+      - {name: doc_id,     disposition: projected, origin: derived, target: DesignDoc.doc_id,   note: "filename stem; key is (origin, doc_id) — gate A2"}
+      - {name: title,      disposition: projected, origin: source,  target: DesignDoc.title}
+      - {name: doc_type,   disposition: projected, origin: derived, target: DesignDoc.doc_type, note: "stem-suffix rule (TDD|Runbook|Review|Explainer|DesignDoc)"}
+      - {name: rev,        disposition: projected, origin: source,  target: DesignDoc.rev,      note: "front-matter Rev N (design_doc._REV_RE rule); null if undeclared"}
+      - {name: doc_status, disposition: projected, origin: source,  target: DesignDoc.doc_status, note: "DESCRIPTIVE|PRESCRIPTIVE"}
+      - {name: commit,     disposition: projected, origin: source,  target: DesignDoc.commit}
+      - {name: path,       disposition: projected, origin: derived, target: DesignDoc.path,     note: "repo-relative, posix"}
+      - {name: anchor,     disposition: projected, origin: source,  target: DocSection.anchor,  note: "authored <!-- anchor: id -->; key is (origin, doc_id, anchor)"}
+      - {name: heading,    disposition: projected, origin: source,  target: DocSection.heading}
+      - {name: seq,        disposition: projected, origin: derived, target: DocSection.seq,     note: "anchor order in file"}
+
+  - name: traceability-matrix-row
+    kind: markdown-table
+    profile:
+      profiled_on: ~
+      via: "the traceability-matrix anchor's table (tdd.outline.yaml traceability block)"
+      column_count: ~
+      census: pending
+    note: >
+      One object = one matrix table row, fanned out to the star off
+      :Requirement (gate B4). Cell contract: Requirement | Description |
+      Design section | Component / module | Test / verify | Status; components
+      split on ',', tests on ';' (kind-rule-v1 classifies each citation).
+    columns:
+      - {name: requirement_id,  disposition: projected, origin: source,  target: Requirement.requirement_id, note: "per-source id format, mode: loose today — gate D5"}
+      - {name: kind,            disposition: projected, origin: derived, target: Requirement.kind, note: "id prefix FR|UC|NFR|other — gate A3"}
+      - {name: description,     disposition: projected, origin: source,  target: Requirement.description}
+      - {name: matrix_status,   disposition: projected, origin: source,  target: Requirement.matrix_status}
+      - {name: section_anchors, disposition: projected, origin: source,  target: "edge:SPECIFIED_IN", note: "MATCH-only targets (sections pass runs first)"}
+      - {name: components,      disposition: projected, origin: source,  target: "Component.ref + edge:IMPLEMENTED_BY", note: "key (origin, ref) — gate A2/D1"}
+      - {name: tests,           disposition: projected, origin: source,  target: "TestCase.ref/.kind + edge:VERIFIED_BY", note: "kind is the OPEN enum — gate A7/D2"}
+
+  - name: feedback-note-yaml
+    kind: yaml
+    profile:
+      profiled_on: ~
+      via: "docs/design/feedback/<doc-id>-rev<N>.yaml (drydocs.design_doc.feedback_yaml + the optional review-outcome fields, README §L7)"
+      column_count: ~
+      census: pending
+    note: >
+      One object = one anchor-keyed note row. doc_rev parses from the filename
+      <N> (gate C2); status defaults open (gate C3); ANNOTATES targets the
+      BASE authored anchor (L11 derived ids degrade); the attribution edge is
+      written only when author MATCHes a real :Employee (gate C1).
+    columns:
+      - {name: doc,         disposition: projected,  origin: source,  target: FeedbackNote.doc_id}
+      - {name: doc_rev,     disposition: projected,  origin: derived, target: FeedbackNote.doc_rev, note: "filename -rev<N>"}
+      - {name: anchor,      disposition: projected,  origin: source,  target: FeedbackNote.anchor,  note: "as written (may be an L11 derived id)"}
+      - {name: base_anchor, disposition: projected,  origin: derived, target: "FeedbackNote.base_anchor + edge:ANNOTATES", note: "split on the reserved '--'"}
+      - {name: note,        disposition: projected,  origin: source,  target: FeedbackNote.note}
+      - {name: status,      disposition: projected,  origin: source,  target: FeedbackNote.status,  note: "open|applied|rejected|superseded; default open"}
+      - {name: author,      disposition: projected,  origin: source,  target: "edge:WAS_ATTRIBUTED_TO {role: feedback_author}", note: "MATCH :Employee only — never fabricated"}

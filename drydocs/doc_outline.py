@@ -41,13 +41,12 @@ from pathlib import Path
 
 import yaml
 
-#: ``<!-- anchor: some-id -->`` — the section marker.
-ANCHOR_RE = re.compile(r"<!--\s*anchor:\s*([a-z0-9][a-z0-9-]*)\s*-->", re.IGNORECASE)
-
-#: L11 — the screen render derives per-subsection feedback anchors as
-#: ``<authored-anchor>--<subsection-slug>`` (design_doc._inject_subsection_anchors), so
-#: ``--`` is RESERVED: never use a double hyphen inside an authored anchor id.
-DERIVED_ANCHOR_SEP = "--"
+#: The anchor contract lives in core (shared with the L7 loaders — ADR 0002-a);
+#: re-exported here under the established names: ANCHOR_RE is the
+#: ``<!-- anchor: some-id -->`` section marker, and DERIVED_ANCHOR_SEP is the
+#: L11 ``--`` separator (design_doc._inject_subsection_anchors) — RESERVED,
+#: never use a double hyphen inside an authored anchor id.
+from drydocs_core.doc_anchors import ANCHOR_RE, DERIVED_ANCHOR_SEP  # noqa: E402
 
 
 def feedback_anchor_valid(anchor: str, md: str) -> bool:

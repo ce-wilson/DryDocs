@@ -24,9 +24,11 @@ VOCAB_FILE       = ONTOLOGY_DIR / "relationship_vocabulary.yaml"
 # 38 after controlmapplication_name (folder-pass grouping label; gate
 # controlm-q1q3-phase1, load-order definition 2026-07-07).
 # 40 after document_id + chunk_id (bmc-docs lexical graph, gate
-# bmc-docs-lexical-load 2026-07-08).
+# bmc-docs-lexical-load 2026-07-08). 46 after the six L7 doc-traceability
+# NODE KEYs (DesignDoc/DocSection/Requirement/Component/TestCase/FeedbackNote,
+# gate doc-traceability-feedback 2026-07-20 — source-namespaced keys, gate A2).
 # Bump this when you intentionally add/remove a CREATE CONSTRAINT.
-EXPECTED_CONSTRAINTS = 40
+EXPECTED_CONSTRAINTS = 46
 
 EXPECTED_ONTOLOGY_LABELS = [
     "DprodClass",

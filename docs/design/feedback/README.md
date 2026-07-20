@@ -38,6 +38,18 @@ notes:
 Rev the feedback was taken against. Groomed feedback becomes edits to the `.md` (the single
 source) and/or backlog items — never hand-edits to the derived `.html`/`.pdf`.
 
+### Optional review-outcome fields (L7 graph load)
+
+Beyond the exported format, a feedback file may carry two OPTIONAL fields the graph loader
+(`drydocs load-doc-traceability`, gate `doc-traceability-feedback` 2026-07-20) reads — data
+entry recording review outcomes, never produced by the Copy-feedback export:
+
+- **file-level `author:`** (or per-note `author:`) — the reviewer's Employee id; the
+  attribution edge is written only when it MATCHes a real `:Employee` (never fabricated).
+- **per-note `status:`** — the review lifecycle: `open` (default when absent) | `applied` |
+  `rejected` | `superseded`. Set it when the rev that addresses the note lands (e.g. the
+  runbook rev1 notes were applied in Rev 2).
+
 ### Derived subsection anchors (L11)
 
 When a section has **more than two** subsections (sub-headings, or a numbered step list with

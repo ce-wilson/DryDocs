@@ -1,9 +1,12 @@
 # design-doc feedback — paste into docs/design/feedback/drydocs-startup-refresh-runbook-rev<N>.yaml
 doc: drydocs-startup-refresh-runbook
+author: chad.wilson          # optional review-outcome field (README §L7) — the SME reviewer
 notes:
   - anchor: front-matter
+    status: applied          # applied in Rev 2 (2026-07-20; the doc's "What changed in Rev 2" block)
     note: |
       For each bullet point, start on a new line. i.e. Classification, Classification, Companion
   - anchor: purpose-scope
+    status: applied          # applied in Rev 2 (2026-07-20)
     note: |
       Remove: "Company-side production ingest (Track-2 — the port-prompt and the company Control-M ingestion TDD own that)"  Out of scope: UI or web console (Epic O)  and multi-DB provisioning topology beyond a first-time pointer.

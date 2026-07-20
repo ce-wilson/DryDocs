@@ -173,6 +173,29 @@ sources:
       SoftwareProduct, and ddcontext carries no product nodes. Pattern notes
       mined from the same book: reference/research/essential-graphrag-notes.md (Q1).
 
+  - id: design-docs
+    classification: Internal-Public      # repo-native authored design docs; an individual doc self-declares its own class (the startup runbook says Internal in its front-matter) — the graph carries structure + text as committed, nothing beyond what the repo already holds
+    source: "docs/design/*.md (drydocs.doc-outline.v1 anchors + traceability matrices) + docs/design/feedback/<doc-id>-rev<N>.yaml (drydocs.design_doc.feedback_yaml)"
+    kind: docs
+    orchestrator: ~
+    adapter: markdown                    # DesignDocSectionsAdapter / TraceabilityMatrixAdapter / DesignDocFeedbackAdapter (drydocs/loaders/doc_traceability.py)
+    locator:
+      mapping: config/source-mappings/design-docs.yaml   # field ledger (three parse streams)
+    feeds_taxonomy: [design_docs, doc_sections, requirements, components, test_cases, feedback_notes]
+    confirmed: true                      # gate doc-traceability-feedback signed off 2026-07-20 (config/gate-log.md; all 21 confirmations)
+    gate_spec: config/gate-prompts/doc-traceability-feedback.yaml
+    notes: >
+      L7 connector #1 ("tenant 0" — the SaaS app documenting itself): the
+      PRODUCT-PLANE documentation ontology validated on DryDocs' own Epic L
+      artifacts. Three-pass load (`drydocs load-doc-traceability`): sections ->
+      matrix star (SPECIFIED_IN / IMPLEMENTED_BY / VERIFIED_BY off
+      :Requirement) -> feedback notes (ANNOTATES + lifecycle status +
+      attribution only when the author resolves to a real :Employee). Keys are
+      source-namespaced (origin = drydocs-design-docs). Future connectors
+      (Jira, Gherkin/BDD, BRD — the incremental-context-loop plan) register as
+      their OWN source entries feeding the same classes, each through its own
+      gate.
+
   # ---- Data platforms (sources of DataAsset/lineage) -----------------------
   - id: oracle-schemas
     classification: Internal-Confidential   # real schema/table/object names

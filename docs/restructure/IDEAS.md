@@ -26,6 +26,9 @@ Tags help grooming: `idea` · `bug` · `doc` · `source` (new data source) · `q
 
 <!-- add new ideas at the top -->
 
+- 2026-07-20 — [doc] Runbook Rev 3 candidate: mention `drydocs load-doc-traceability` in the
+  Refresh/ingest demonstrable-content step (L7 shipped the loader after Rev 2 was signed —
+  ride the next feedback loop rather than bumping a fresh Rev for one line).
 - 2026-07-20 — [chore] **USER MANUAL STEP: add the SNYK_TOKEN repo secret** so the new CI
   snyk job (44523ab) runs for real — token from app.snyk.io (Account settings → API
   token) → repo Settings → Secrets and variables → Actions. Until then every scan step
