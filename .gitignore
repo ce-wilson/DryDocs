@@ -80,6 +80,15 @@ libs/oracle_kerberos/oracle_kerberos_connection.txt
 # skill (references/er-model.md).
 external/orchestration/**/*.pdf
 
+# ServiceNow doc set (C10, 2026-07-20) — same rule: vendor binaries AND their
+# verbatim extracted-text twins stay LOCAL (a full-text dump is the vendor's
+# words, not our summary). The committed record is external/ServiceNow/README.md
+# (the SOURCE-MANIFEST) + knowledge/upgrade-plans/servicenow-cmdb-analysis.md.
+external/ServiceNow/*.pdf
+external/ServiceNow/*.pptx
+external/ServiceNow/*.docx
+external/ServiceNow/extracted/
+
 # Design-doc PDFs (Epic L / L4) — BUILD-ON-DEMAND from the .md via scripts/doc_to_pdf.py.
 # The .md is the source of truth and the single .html render is committed (L13); the PDF is a
 # regenerable binary (not byte-identical run-to-run — trailer /ID varies), so it is not tracked.
