@@ -570,3 +570,46 @@ SME-supplied PAT screenshots held OUT of the repo — Internal-Confidential).
   alignment with NO home-product edge; product fallback only where no area
   product; both sponsored forms; HAS_APPLICATION count 0); m1-verify +
   m3-verify green; suite 718.
+
+## 2026-07-20 — K5 · Product Cabinet attribution model (product-cabinet-attribution)
+- **Presented:** 24 confirmations across 6 sections (gate page
+  `config/gate-prompts/product-cabinet-attribution.yaml`, gate_pages.py render; split from
+  the 2026-07-10 BusinessApplication entity-reshape gate §B). SME session ran in-chat
+  2026-07-20 — sections answered individually, **§F signed off** (chad.wilson).
+- **Confirmed: 24 · Edited: 0 · Rejected: 0** — 5 open questions resolved in-session:
+  - **§A — product_roles scheme FIXED + families INDEPENDENT.** EXACTLY the fixed 7
+    (area_product_owner, product_owner, product_architect, tech_partner, data_owner,
+    data_certifier, analytics_lead); new roles require a new gate (the tom_roles precedent).
+    The 2026-07-10 §B "CTO is in BOTH families" record is **SUPERSEDED**: the shared-cto
+    concept is dropped for now; SEAL's cto stays a TOM role on :BusinessApplication.
+    Rename history (skos:changeNote on tech_partner): in PAT the mapping changed slightly —
+    the area-product Tech Partner was formerly named "CTO" in SEAL, and SEAL's CTO now
+    denotes the product-level role.
+  - **§B — scope:** attribution attaches to :Product / :AreaProduct only, never
+    :BusinessApplication; area_product_owner AND tech_partner attach ONLY to :AreaProduct.
+    AreaProduct data gap noted, not resolved (loader entries stay planned; independent
+    lifecycles).
+  - **§C — BOTH attribution forms load:** the reified chain
+    (catalog_cabinet_qualified_attribution / seal_attribution_has_agent REUSED /
+    catalog_cabinet_attribution_had_role) AND the collapsed simple form
+    catalog_cabinet_attributed_to ((:Product|:AreaProduct)-[:WAS_ATTRIBUTED_TO
+    {role: product_cabinet_role_holder}]->(:Employee), twin of
+    seal_app_attributed_to_employee) — a deliberate deviation from the K4 TOM
+    qualified-only resolution; the reified form remains the multi-person carrier.
+  - **§D — cross-family reporting edges DEFERRED (option b):** tech_partner MANAGES
+    application_owner; information_owner MAY REPORT TO data_owner; data_certifier RELATES
+    TO information_owner — preserved verbatim, nothing registered. SME: "that can be done
+    internally" — person-level population is internal/company-side once a person-level PAT
+    cabinet extract exists.
+  - **§E — DevTeam↔BusinessApplication M:N CONFIRMED** in both directions on the existing
+    applied arch_develops edge (C9 PAT team-report evidence corroborating); no new edge, no
+    cardinality constraint; multiple developed_by teams on one application is VALID data —
+    verify rules must not flag it.
+- **Effect:** map entry `product-cabinet-attribution` proposed → **confirmed** (summary
+  proposed 3 / confirmed 21); the three catalog_cabinet_* vocabulary entries + the
+  ProductRole classification stay **planned** until the supplement lands (honest-lifecycle)
+  — supplement groomed as **K6**; any Product Cabinet loader stays blocked company-side
+  (no person-level cabinet extract exists). Sign-off note corrections applied as their own
+  logged change: seal_attribution_has_agent rescoped family-agnostic; TOMRole notes + the
+  seal supplement's shared-cto references corrected (c4.shared_with REMOVEd — a supplement
+  re-apply refreshes already-loaded graphs).

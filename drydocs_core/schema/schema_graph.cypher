@@ -78,6 +78,8 @@ MERGE (n:SchemaMeta:Attribution {name: 'Attribution'})
   SET n.class = 'prov:Attribution', n.prov_type = 'n/a';
 MERGE (n:SchemaMeta:TOMRole {name: 'TOMRole'})
   SET n.class = 'skos:Concept', n.prov_type = 'n/a';
+MERGE (n:SchemaMeta:ProductRole {name: 'ProductRole'})
+  SET n.class = 'skos:Concept', n.prov_type = 'n/a';
 MERGE (n:SchemaMeta:CatalogLOB {name: 'CatalogLOB'})
   SET n.class = 'org:OrganizationalUnit', n.prov_type = 'Agent';
 MERGE (n:SchemaMeta:BusinessSegment {name: 'BusinessSegment'})
@@ -296,6 +298,26 @@ MERGE (a)-[r:HAS_AREA_PRODUCT]->(b)
 MATCH (a:SchemaMeta {name: 'AreaProduct'}), (b:SchemaMeta {name: 'DevTeam'})
 MERGE (a)-[r:HAS_DEV_TEAM]->(b)
   SET r.vocab_id = 'catalog_area_product_has_dev_team', r.prov_maps_to = null, r.domain = 'catalog', r.status = 'planned';
+
+MATCH (a:SchemaMeta {name: 'Product'}), (b:SchemaMeta {name: 'Attribution'})
+MERGE (a)-[r:QUALIFIED_ATTRIBUTION]->(b)
+  SET r.vocab_id = 'catalog_cabinet_qualified_attribution', r.prov_maps_to = 'prov:qualifiedAttribution', r.domain = 'catalog', r.status = 'planned';
+
+MATCH (a:SchemaMeta {name: 'AreaProduct'}), (b:SchemaMeta {name: 'Attribution'})
+MERGE (a)-[r:QUALIFIED_ATTRIBUTION]->(b)
+  SET r.vocab_id = 'catalog_cabinet_qualified_attribution', r.prov_maps_to = 'prov:qualifiedAttribution', r.domain = 'catalog', r.status = 'planned';
+
+MATCH (a:SchemaMeta {name: 'Attribution'}), (b:SchemaMeta {name: 'ProductRole'})
+MERGE (a)-[r:HAD_ROLE]->(b)
+  SET r.vocab_id = 'catalog_cabinet_attribution_had_role', r.prov_maps_to = 'prov:hadRole', r.domain = 'catalog', r.status = 'planned';
+
+MATCH (a:SchemaMeta {name: 'Product'}), (b:SchemaMeta {name: 'Employee'})
+MERGE (a)-[r:WAS_ATTRIBUTED_TO]->(b)
+  SET r.vocab_id = 'catalog_cabinet_attributed_to', r.role = 'product_cabinet_role_holder', r.prov_maps_to = 'prov:wasAttributedTo', r.domain = 'catalog', r.status = 'planned';
+
+MATCH (a:SchemaMeta {name: 'AreaProduct'}), (b:SchemaMeta {name: 'Employee'})
+MERGE (a)-[r:WAS_ATTRIBUTED_TO]->(b)
+  SET r.vocab_id = 'catalog_cabinet_attributed_to', r.role = 'product_cabinet_role_holder', r.prov_maps_to = 'prov:wasAttributedTo', r.domain = 'catalog', r.status = 'planned';
 
 MATCH (a:SchemaMeta {name: 'DevTeam'}), (b:SchemaMeta {name: 'Product'})
 MERGE (a)-[r:SUPPORTS]->(b)

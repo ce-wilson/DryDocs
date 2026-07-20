@@ -1,0 +1,142 @@
+# SME gate-prompt spec — Product Cabinet attribution model (backlog K5, split from the
+# 2026-07-10 BusinessApplication entity-reshape gate §B — config/gate-log.md).
+# GATE-BOUND: this page proposed five linked confirmations. NOTHING here is applied — the
+# ProductRole node_classifications entry and the catalog_cabinet_qualified_attribution /
+# catalog_cabinet_attribution_had_role / catalog_cabinet_attributed_to vocabulary entries
+# stay status: planned (relationship_vocabulary.yaml; the Attribution->Employee HAS_AGENT
+# hop REUSES the active seal_attribution_has_agent — see section C); the
+# product-cabinet-attribution map entry is status: confirmed as of the 2026-07-20 sign-off
+# (config/taxonomy-ontology-map.yaml); the gate-log entry is written (config/gate-log.md
+# 2026-07-20); no supplement block, no loader, no graph write until K6. Mechanism-only: no
+# real team names, SEAL ids, employee names, or server codes anywhere on this page.
+# AMENDED 2026-07-20 — in-session SME answers (chat): scheme FIXED; shared-cto DROPPED
+# (families independent; rename history recorded); tech_partner :AreaProduct-only;
+# collapsed simple form ADDED (section C); reporting edges DEFERRED (section D);
+# DevTeam<->BusinessApplication M:N confirmed (section E).
+# SIGNED OFF 2026-07-20 (SME in-session, §F) — transcribed to config/gate-log.md same day;
+# map entry product-cabinet-attribution proposed -> confirmed. The three catalog_cabinet_*
+# vocab entries stay planned until the K6 supplement lands (honest-lifecycle).
+classification: Internal-Public
+schema: drydocs.gate-prompt.v1
+id: product-cabinet-attribution
+title: "SME Gate — Product Cabinet attribution model (Area Product Owner, Product Owner, Product Architect, Tech Partner, Data Owner, Data Certifier, Analytics Lead)"
+step: "Pre-activation gate for backlog K5 — resolves the Product Cabinet role-holder attribution family split out of the 2026-07-10 BusinessApplication entity-reshape gate (§B)"
+summary: >
+  The 2026-07-10 gate (config/gate-log.md, K3) revised the TOM role model into TWO families at
+  TWO node scopes. The SEAL Technical Operational Contacts family (application_owner,
+  primary_information_owner, backup_information_owner, cto, technology_risk_controls,
+  design_authority, operate_manager) attaches to :BusinessApplication and was APPLIED at K4.
+  The Product Cabinet family — this page — is a SEPARATE set of roles on the PAT :Product /
+  :AreaProduct scope, explicitly NOT on :BusinessApplication. This page proposes: (a) register
+  a ProductRole skos:Concept vocabulary (scheme product_roles) for EXACTLY the fixed 7 Product
+  Cabinet roles (area_product_owner, product_owner, product_architect, tech_partner,
+  data_owner, data_certifier, analytics_lead) — scheme FIXED, NO shared cto (SME 2026-07-20
+  in-session: the two families are INDEPENDENT; the 2026-07-10 §B "CTO in both families"
+  record is superseded — rename history: the area-product Tech Partner was formerly named
+  "CTO" in SEAL, and SEAL's CTO now denotes the product-level role); (b) confirm attribution
+  attaches to :Product / :AreaProduct only, with area_product_owner AND tech_partner attaching
+  ONLY to :AreaProduct (area_product_owner does not tie to a business application); (c) reuse
+  the K4 reified qualifiedAttribution pattern via two new catalog-domain twin vocabulary terms
+  (entry-point and role hops, whose triples differ from the seal_* family — the HAS_DEV_TEAM
+  dual-registration precedent) while the Attribution->Employee HAS_AGENT hop REUSES the
+  active seal_attribution_has_agent (an exact-duplicate triple is refused by the C8 schema
+  meta-graph — shared infrastructure, not a twin), PLUS the collapsed simple form
+  catalog_cabinet_attributed_to (SME-decided 2026-07-20: both forms load — a deliberate
+  deviation from the K4 qualified-only resolution); (d) record the three cross-family reporting
+  relations from the 2026-07-10 gate (tech_partner MANAGES application_owner;
+  information_owner MAY REPORT TO data_owner; data_certifier RELATES TO information_owner) as
+  DEFERRED — DECIDED 2026-07-20 (SME in-session): deferral accepted, person-level population
+  is internal/company-side once a person-level PAT cabinet extract exists;
+  (e) DevTeam<->BusinessApplication M:N CONFIRMED 2026-07-20 (SME in-session) — a semantics
+  confirmation on the EXISTING applied arch_develops edge, both directions many, no new edge
+  and no cardinality constraint. No graph write happens until every confirmation below is
+  ticked and logged to config/gate-log.md.
+meta:
+  Module: "drydocs-core (ontology)"
+  Source: "2026-07-10 BusinessApplication entity-reshape gate §B (Product Cabinet split, config/gate-log.md) + the existing catalog-pat extract (config/taxonomy/lob-product-team.yaml)"
+  Registry ref: "config/source-registry.yaml — catalog-pat (existing, confirmed); no new source is registered by this page"
+  Classification: "Internal-Public (this page, mechanism only) · the underlying PAT/catalog-pat extract is Internal-Confidential (real team names, rosters, employee names never appear here)"
+  Taxonomy: "config/taxonomy/lob-product-team.yaml (Product, AreaProduct — note: AreaProduct has NO rows in the current sample, open_questions#area-product-missing)"
+  Ontology map: "config/taxonomy-ontology-map.yaml #product-cabinet-attribution (status: proposed) + drydocs_core/ontology/relationship_vocabulary.yaml (ProductRole node_classifications entry; catalog_cabinet_qualified_attribution / catalog_cabinet_attribution_had_role / catalog_cabinet_attributed_to, all status: planned; the HAS_AGENT hop reuses the active seal_attribution_has_agent)"
+  Source of record: "config/gate-log.md 2026-07-10 entry (§B Product Cabinet split, 'DECISION (SME ok to split)') · docs/restructure/backlog.yaml K5"
+
+mapping:
+  - n: 1
+    element: "ProductRole skos:Concept vocabulary — ConceptScheme registration"
+    target: ":ProductRole {skos:Concept} in a new skos:ConceptScheme, id product_roles — sibling scheme to the K4 tom_roles scheme"
+    edge: "node_classifications registration, not an edge  [PROPOSED — not a matrix row]"
+  - n: 2
+    element: "Product Cabinet qualified attribution (reified form) — catalog-domain twin of the K4 SEAL pattern"
+    target: "(:Product|:AreaProduct)-[:QUALIFIED_ATTRIBUTION]->(:Attribution)-[:HAS_AGENT]->(:Employee) ; (:Attribution)-[:HAD_ROLE]->(:ProductRole)"
+    edge: "prov:qualifiedAttribution / prov:agent / prov:hadRole  [PROPOSED]"
+  - n: 3
+    element: "Product Cabinet role vocabulary — EXACTLY the fixed 7, scheme FIXED, no cto (SME 2026-07-20: families independent); scope Product/AreaProduct only"
+    target: "area_product_owner, product_owner, product_architect, tech_partner, data_owner, data_certifier, analytics_lead — no other members; SEAL's cto stays a TOM role on :BusinessApplication. Attribution attaches to :Product / :AreaProduct ONLY, NEVER :BusinessApplication; area_product_owner AND tech_partner attach ONLY to :AreaProduct; area_product_owner does not tie to a business application."
+    edge: "reached via (:Attribution)-[:HAD_ROLE]->(:ProductRole)  [PROPOSED]"
+  - n: 6
+    element: "Collapsed simple form — gate section C open question DECIDED 2026-07-20 (SME in-session): also load the direct edge"
+    target: "(:Product|:AreaProduct)-[:WAS_ATTRIBUTED_TO {role: product_cabinet_role_holder}]->(:Employee) — catalog-domain twin of seal_app_attributed_to_employee; loads ALONGSIDE the reified form (deviation from the K4 qualified-only resolution); same :AreaProduct-only scope rules"
+    edge: "prov:wasAttributedTo  [PROPOSED — catalog_cabinet_attributed_to]"
+  - n: 4
+    element: "Cross-family reporting edges — tech_partner MANAGES application_owner; information_owner MAY REPORT TO data_owner; data_certifier RELATES TO information_owner"
+    target: "DECIDED 2026-07-20 (SME in-session): option (b) — RECORD AS DEFERRED; the person-level reporting edges are an internal/company-side concern once a person-level PAT cabinet extract exists (SME: \"that can be done internally\"). Semantics preserved verbatim in the gate record + map entry; nothing registered now."
+    edge: "reporting-edges-deferred  [DECIDED — deferred, see section D]"
+  - n: 5
+    element: "DevTeam <-> BusinessApplication cardinality — CURRENT: (:BusinessApplication)-[:WAS_ATTRIBUTED_TO {role: developed_by}]->(:DevTeam) (arch_develops, applied K4)"
+    target: "M:N semantics CONFIRMED 2026-07-20 (SME in-session) on the EXISTING applied edge — both directions many; no new edge, no cardinality constraint added"
+    edge: "matrix confirmation only  [not a new matrix row — arch_develops stays status: applied, untouched]"
+
+provenance:
+  - label: "node_classifications#ProductRole (relationship_vocabulary.yaml)"
+    source_object: "2026-07-10 gate §B Product Cabinet role enumeration + the K4 tom_roles scheme (shared cto concept)"
+    key: "label: ProductRole"
+    loader: "~ (node classification metadata, not a loader)"
+    properties:
+      - {name: scheme, origin: source, from: "config/gate-log.md 2026-07-10 §B Product Cabinet enumeration", note: "product_roles — EXACTLY the fixed 7: area_product_owner, product_owner, product_architect, tech_partner, data_owner, data_certifier, analytics_lead. Scheme FIXED (SME 2026-07-20 — the tom_roles precedent, new roles require a new gate)"}
+      - {name: rename_history, origin: source, from: "SME gate session 2026-07-20 (chat) — supersedes the 2026-07-10 §B 'CTO is in BOTH families' record", note: "PAT mapping changed slightly: the area-product Tech Partner was formerly named 'CTO' in SEAL; SEAL's CTO now denotes the product-level role. Carried as a skos:changeNote on tech_partner. NO shared cto concept — the families are independent (shared-cto dropped for now); SEAL's cto stays a TOM role on :BusinessApplication"}
+  - label: "(:Product|:AreaProduct)-[:QUALIFIED_ATTRIBUTION]->(:Attribution)"
+    source_object: "catalog-pat extract (config/taxonomy/lob-product-team.yaml) — mechanism only, no real role-holder data in scope here"
+    key: "Product.id / AreaProduct.id (existing keys) ; Attribution has no independent business key, one per (scope-node, ProductRole) pair"
+    loader: "~ (none yet — proposal only, no loader exists)"
+    properties:
+      - {name: agent, origin: derived, from: "prov:agent — Attribution -[:HAS_AGENT]-> Employee", note: "which Employee the attribution names"}
+      - {name: had_role, origin: derived, from: "prov:hadRole — Attribution -[:HAD_ROLE]-> ProductRole", note: "which of the 7 Product Cabinet roles (or the shared cto)"}
+      - {name: product_cabinet_scope, origin: source, from: "config/gate-log.md 2026-07-10 §B: Area Product Owner (:AreaProduct only), Product Owner, Product Architect, Tech Partner, Data Owner, Data Certifier, Analytics Lead", note: "exactly the fixed 7, no cto (SME 2026-07-20); area_product_owner AND tech_partner attach only to :AreaProduct"}
+
+sections:
+  - title: "A. ProductRole skos ConceptScheme — Product Cabinet role vocabulary"
+    confirmations:
+      - "The product_roles scheme is EXACTLY the fixed 7 (area_product_owner, product_owner, product_architect, tech_partner, data_owner, data_certifier, analytics_lead) — NO cto member. SME ANSWERED 2026-07-20 (in-session): the two role families are INDEPENDENT and the shared-cto mapping concept is DROPPED for now — Product Cabinet roles attribute to the product side; SEAL's cto is a different role, attributed to :BusinessApplication (K4, untouched)."
+      - "SME ANSWERED 2026-07-20 (in-session): the product_roles scheme is FIXED — the tom_roles precedent; new Product Cabinet roles require a new gate."
+      - "Rename history recorded verbatim, superseding the 2026-07-10 §B 'CTO is in BOTH families' record: in PAT the mapping changed slightly — the area-product 'Tech Partner' was formerly called 'cto' in SEAL, and in SEAL, CTO is now the product-level role. Carried as a skos:changeNote on the tech_partner concept; transcribed to config/gate-log.md at sign-off."
+      - "ProductRole (skos:Concept, scheme product_roles) is DISTINCT from :Role (org:Role, PAT product hierarchy membership — e.g. catalog_dev_team_has_membership) AND from :TOMRole (SEAL Technical Operating Model, scheme tom_roles) — with NO shared concepts between the schemes."
+      - "SIGN-OFF RIDER: TOM-side surfaces still describing the shared cto (the TOMRole node_classifications note and tom_roles concept list in relationship_vocabulary.yaml; the c4.shared_with = 'product_roles' seed in drydocs_core/schema/seal_ontology_supplement.cypher) are ACTIVE/applied and stay untouched until this gate signs off — their corrections land with the gate-log transcription, each its own logged change."
+  - title: "B. Scope rules — Product/AreaProduct, never BusinessApplication"
+    confirmations:
+      - "Product Cabinet attribution attaches to :Product / :AreaProduct (the PAT hierarchy nodes), NEVER to :BusinessApplication — this is the node-scope split that separates this family from the K4 SEAL Technical Operational Contacts family (which attaches to :BusinessApplication)."
+      - "area_product_owner attaches ONLY to :AreaProduct and explicitly does NOT tie to a business application (config/gate-log.md 2026-07-10 §B, verbatim: \"Area Product Owner (:AreaProduct, does not tie to an app)\")."
+      - "tech_partner ALSO attaches ONLY to :AreaProduct — SME ANSWERED 2026-07-20 (in-session, with the rename history naming it the area-product role); the remaining five roles keep the general :Product / :AreaProduct scope."
+      - "The AreaProduct data gap is noted, not resolved, here: the lob-product-team sample (config/taxonomy/lob-product-team.yaml) has NO AreaProduct rows (open_questions#area-product-missing, counts.area_products: 0), and catalog_has_area_product / catalog_area_product_has_dev_team both stay status: planned. The ProductRole SCHEME can be confirmed at this gate while the AreaProduct loader remains unbuilt — the vocabulary and the loader are independent lifecycles."
+  - title: "C. Attribution machinery — reified pattern, catalog-domain twins"
+    confirmations:
+      - "The Product Cabinet reuses the K4 reified qualifiedAttribution pattern verbatim: (:Product|:AreaProduct)-[:QUALIFIED_ATTRIBUTION]->(:Attribution)-[:HAS_AGENT]->(:Employee), (:Attribution)-[:HAD_ROLE]->(:ProductRole). One Attribution node per (scope-node, ProductRole) pair; multi-person roles load the qualified form (same rule as the K4 SEAL family)."
+      - "TWO new planned reified-pattern entries (catalog_cabinet_qualified_attribution / catalog_cabinet_attribution_had_role) are CATALOG-DOMAIN twins of seal_qualified_attribution / seal_attribution_had_role — same pattern, but their (from, label, to) triples DIFFER from the seal family's — following the HAS_DEV_TEAM dual-registration precedent (catalog_has_dev_team Product->DevTeam and catalog_area_product_has_dev_team AreaProduct->DevTeam share one label, registered as two independent vocabulary entries). A THIRD planned entry (catalog_cabinet_attributed_to) carries the collapsed simple form decided below."
+      - "The Attribution -[:HAS_AGENT]-> (:Employee) hop is NOT twinned: its triple (Attribution, HAS_AGENT, Employee) would exactly duplicate the active seal_attribution_has_agent, and the C8 schema meta-graph REFUSES ambiguous duplicate triples (two entries would MERGE into one edge and silently overwrite vocab_id). The Product Cabinet therefore REUSES seal_attribution_has_agent as family-agnostic qualified-attribution infrastructure — on sign-off, that entry's note is rescoped (a note edit, not a status change) to say it serves BOTH the SEAL TOM and Product Cabinet families. The seal_* entries are otherwise UNTOUCHED by this page."
+      - "DECIDED 2026-07-20 (SME in-session: \"product attributed to employee should be fine\"): the simple collapsed form IS wanted — (:Product|:AreaProduct)-[:WAS_ATTRIBUTED_TO {role: product_cabinet_role_holder}]->(:Employee), registered as planned catalog_cabinet_attributed_to (catalog-domain twin of seal_app_attributed_to_employee; triples differ, the dual-registration precedent). BOTH forms load — a deliberate deviation from the K4 TOM qualified-only resolution; the reified form remains the carrier for multi-person roles, and the collapsed edge follows the same :AreaProduct-only scope rules."
+  - title: "D. Cross-family reporting edges — tech_partner / data_owner / data_certifier relations"
+    confirmations:
+      - "The three 2026-07-10 §B cross-family relations are presented verbatim, NEITHER decided here: tech_partner MANAGES the (TOM) application_owner; the (TOM) information_owner MAY REPORT TO data_owner; data_certifier RELATES TO the app (TOM) information_owner."
+      - "Option (a): register concept-level local edges now — ProductRole/TOMRole -> ProductRole/TOMRole, prov_maps_to: ~ (local; no PROV row applies to a concept-to-concept reporting relation), citing org:reportsTo as the instance-level Agent-to-Agent pattern to adopt later once real person-level attributions exist."
+      - "Option (b) — RECOMMENDED in this draft: RECORD AS DEFERRED. org:reportsTo is an instance-level Agent relation (Employee reports to Employee), not a concept-level one; no person-level Product Cabinet source exists yet to populate it; and \"relates to\" (data_certifier) is under-specified in the source gate record. The semantics are preserved VERBATIM in config/gate-log.md and the product-cabinet-attribution map entry until a PAT cabinet extract lands — nothing is lost by deferring, and nothing is registered prematurely."
+      - "DECIDED 2026-07-20 (SME in-session): option (b) ACCEPTED — the three relations are RECORDED AS DEFERRED. SME note: \"that can be done internally\" — populating person-level reporting edges is an internal/company-side concern once a person-level PAT cabinet extract exists; the semantics stay preserved verbatim here and in config/gate-log.md until then, and nothing is registered now."
+  - title: "E. DevTeam <-> BusinessApplication matrix — M:N confirmation on the existing applied edge"
+    confirmations:
+      - "SME CONFIRMED 2026-07-20 (in-session): (:BusinessApplication)-[:WAS_ATTRIBUTED_TO {role: developed_by}]->(:DevTeam) (vocab_id arch_develops, flipped at K4 clause 5 per the 2026-07-10 gate §E) is M:N in BOTH directions — a DevTeam can develop more than one BusinessApplication (corroborated by the C9 PAT team-report evidence), and a BusinessApplication can be developed by more than one DevTeam (per the gate-log record \"DevTeam→BusinessApplication is a matrix (M:N)\", ratified as written). Consequence for verify rules: multiple developed_by teams on one application is VALID data, not a data-quality error."
+      - "No cardinality constraint exists on this edge today, and NONE is proposed by this page — this is a semantics confirmation only, not a new edge and not a schema change."
+      - "The 2026-07-18 C9 gate evidence (PAT team report: teams map to 1..n business applications) is cited as supporting evidence for the M:N read — reviewed and understood as corroborating, not itself the confirmation."
+  - title: "F. Sign-off"
+    confirmations:
+      - "Sections A-E above are reviewed and the direction is correct, OR amended via explicit SME edits recorded in config/gate-log.md."
+      - "Nothing on this page is applied by ticking boxes here: the ProductRole node_classifications entry and the catalog_cabinet_qualified_attribution / catalog_cabinet_attribution_had_role / catalog_cabinet_attributed_to vocabulary entries stay status: planned (relationship_vocabulary.yaml); seal_attribution_has_agent stays active and untouched until its note rescope lands with the sign-off transcription (as do the TOM-side shared-cto note corrections — section A rider); config/taxonomy-ontology-map.yaml keeps product-cabinet-attribution as status: proposed; no supplement block or loader exists for any of it."
+      - "The ProductRole supplement block (a future drydocs_core/schema/*.cypher addition) and any loader are SEPARATE gated follow-ups, done only after this gate is signed off and transcribed — same lifecycle as the K3->K4 SEAL pattern (gate signed off, then a separate applied change)."
+      - "Safe to transcribe this decision into config/gate-log.md, and — only once transcribed — begin the separate follow-up work items (ProductRole supplement + loader activation, any AreaProduct loader work landing first if needed, the reporting-edge registration if section D chooses option (a)) each as their own logged change."

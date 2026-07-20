@@ -258,6 +258,28 @@ node_classifications:
       catalog_dev_team_has_membership) — do not conflate the two. Reached via Attribution
       -[:HAD_ROLE]-> TOMRole (prov:hadRole). Supplement: seal_ontology_supplement.cypher.
 
+  # — Product Cabinet (K5, PLANNED — gate product-cabinet-attribution) —
+  - label:      ProductRole
+    class:      "skos:Concept"
+    prov_type:  n/a
+    note: >
+      PLANNED (K5 gate product-cabinet-attribution, proposed 2026-07-19; amended 2026-07-20
+      with in-session SME answers) — Product Cabinet role vocabulary, skos:Concept in scheme
+      product_roles; EXACTLY the fixed 7 (area_product_owner, product_owner, product_architect,
+      tech_partner, data_owner, data_certifier, analytics_lead), scheme FIXED (the tom_roles
+      precedent — new roles require a new gate). NO cto member: the two role families are
+      INDEPENDENT (SME 2026-07-20 — the shared-cto concept from the 2026-07-10 gate §B record
+      is dropped for now; SEAL's cto stays a TOM role attributed to :BusinessApplication).
+      Rename history, carried as a skos:changeNote on tech_partner: in PAT the mapping changed
+      slightly — the area-product Tech Partner was formerly named "CTO" in SEAL, and SEAL's
+      CTO now denotes the product-level role. Scope: :Product / :AreaProduct only, never
+      :BusinessApplication; area_product_owner AND tech_partner attach ONLY to :AreaProduct.
+      DISTINCT from :Role (org:Role, PAT product hierarchy membership) and from :TOMRole —
+      no shared concepts, do not conflate. TOM-side surfaces still describing the shared cto
+      (TOMRole notes, seal supplement c4.shared_with) are ACTIVE and correct themselves at
+      sign-off transcription, not before. Becomes active only when the supplement block lands
+      after the gate signs off (config/gate-prompts/product-cabinet-attribution.yaml).
+
   # — Catalog (active) —
   - label:      CatalogLOB
     class:      "org:OrganizationalUnit"
@@ -1322,6 +1344,74 @@ local_relationships:
     note:         "Area Product Group contains DevTeams. Same label as Product→DevTeam; from_node type distinguishes context in queries."
     supplement:   catalog_ontology_supplement.cypher
     loader:       area_products.cypher
+    domain:       catalog
+    status:       planned
+
+  # — Product Cabinet (K5, PLANNED — gate product-cabinet-attribution; catalog-domain
+  #   siblings of the seal_qualified_attribution / seal_attribution_had_role entries where
+  #   the triples differ (the HAS_DEV_TEAM dual-registration precedent). The Attribution
+  #   -[:HAS_AGENT]-> Employee hop is NOT twinned: its triple would duplicate
+  #   seal_attribution_has_agent exactly (the C8 schema meta-graph refuses ambiguous
+  #   duplicate (from, label, to) triples), so the Cabinet REUSES that entry as shared
+  #   qualified-attribution infrastructure — its note gets rescoped at gate sign-off) —
+  - id:           catalog_cabinet_qualified_attribution
+    neo4j_label:  QUALIFIED_ATTRIBUTION
+    role:         ~
+    from_node:    "Product | AreaProduct"
+    to_node:      Attribution
+    prov_maps_to: "prov:qualifiedAttribution"
+    note: >
+      PLANNED (K5 gate product-cabinet-attribution, proposed 2026-07-19; amended 2026-07-20).
+      Product Cabinet twin of seal_qualified_attribution — same reified PROV pattern, PAT
+      scope; Attribution reused as the n-ary node; one per (scope-node, ProductRole) pair;
+      area_product_owner AND tech_partner attributions attach only to :AreaProduct (SME
+      2026-07-20). The downstream Attribution -[:HAS_AGENT]-> Employee hop REUSES
+      seal_attribution_has_agent (see the section comment — duplicate triple, family-agnostic
+      infrastructure). Coexists with the collapsed catalog_cabinet_attributed_to simple form
+      (gate section C, SME-decided 2026-07-20: both forms load).
+    supplement:   ~
+    loader:       ~
+    domain:       catalog
+    status:       planned
+
+  - id:           catalog_cabinet_attribution_had_role
+    neo4j_label:  HAD_ROLE
+    role:         ~
+    from_node:    Attribution
+    to_node:      ProductRole
+    prov_maps_to: "prov:hadRole"
+    note: >
+      PLANNED (K5 gate product-cabinet-attribution, proposed 2026-07-19; amended 2026-07-20).
+      Names which of the product_roles concepts the Attribution grants — EXACTLY the fixed 7,
+      NO cto concept (SME 2026-07-20: the two role families are independent; the shared-cto
+      mechanics question from the 2026-07-10 §B record is resolved by dropping the sharing
+      for now).
+    supplement:   ~
+    loader:       ~
+    domain:       catalog
+    status:       planned
+
+  - id:           catalog_cabinet_attributed_to
+    neo4j_label:  WAS_ATTRIBUTED_TO
+    role:         product_cabinet_role_holder
+    from_node:    "Product | AreaProduct"
+    to_node:      Employee
+    prov_maps_to: "prov:wasAttributedTo"
+    note: >
+      PLANNED (K5 gate product-cabinet-attribution; SME-decided 2026-07-20 in-session, gate
+      section C: "product attributed to employee should be fine"). Simple/collapsed form of
+      the Product Cabinet attribution (matrix row Entity -> Agent = wasAttributedTo) —
+      catalog-domain twin of seal_app_attributed_to_employee (triples differ: from-node
+      Product|AreaProduct vs BusinessApplication — the HAS_DEV_TEAM dual-registration
+      precedent). Loads ALONGSIDE the reified catalog_cabinet_qualified_attribution chain,
+      a deliberate deviation from the K4 TOM resolution (qualified-only); multi-person roles
+      still load the reified form as the carrier. role=product_cabinet_role_holder
+      distinguishes this instance on the shared WAS_ATTRIBUTED_TO label (the
+      tom_role_holder idiom); the edge names its ProductRole concept as a property. Same
+      scope rules as the reified form: area_product_owner and tech_partner rows attach only
+      to :AreaProduct.
+    supplement:   ~
+    loader:       ~
     domain:       catalog
     status:       planned
 
