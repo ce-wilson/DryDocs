@@ -36,6 +36,14 @@ Tags help grooming: `idea` · `bug` · `doc` · `source` (new data source) · `q
   unencrypted). Full recipe: `docs/ruff-format-convergence.md` §"Transfer without visibility
   change". (Replaces the make-repo-public idea — rejected: internal/** is tracked +
   pre-rewrite history retains the seal twins; gates in config/classification.yaml.)
+  **SQUASH RIDER (2026-07-20 groom): USER DECISION now precedes the email step.** The
+  history squash landed today — `main` is the single commit c5a84c3 "Initial import"; full
+  history survives ONLY in local `archive/full-history` (+ these five transfer files).
+  Decide before emailing: (a) send the existing 3ae9b08 full-history parts as planned (the
+  complete private history crosses the mail boundary), or (b) re-cut the bundle from the
+  squashed `main` (no pre-squash history crosses; cross-repo port ranges then come from
+  `archive/full-history` per the git model). Either way the five existing transfer files
+  still get deleted at the end.
 
 - 2026-07-19 — [question] **m3_invokes `to_node: Script` may need broadening to
   `Script | ETLProcess`** in relationship_vocabulary.yaml: the abioncloud wrapper-payload
@@ -226,6 +234,34 @@ Tags help grooming: `idea` · `bug` · `doc` · `source` (new data source) · `q
 ## Recently groomed (audit trail)
 
 <!-- when you promote an idea, move its line here with the resulting backlog id -->
+
+- 2026-07-20 groom run (bare /groom-backlog, day after the weekly run; post history-squash) —
+  0 promoted / 0 merged / 1 kept-updated; backlog database untouched (todo 22 / in_progress 1 /
+  done 90 stand as of the 07-19 groom):
+  - kept-updated: the USER MANUAL STEP port-bundle line gains the SQUASH RIDER — today's
+    history squash (main = single commit c5a84c3; full history only in local
+    archive/full-history) makes "email the existing 3ae9b08 full-history parts vs re-cut
+    from the squashed main" a user decision that must precede the email step.
+  - noted closed by the squash: the 07-19 seal-sample residual ("git HISTORY retains both
+    seal twins until a rewrite, user-gated") is CLOSED on main/origin — pre-squash history
+    survives only in local archive/full-history + the five transfer files (whose deletion
+    is the port-bundle line's remaining step).
+  - observation (no groom action): **K5 gate-prep is IN FLIGHT, UNCOMMITTED** in the working
+    tree — config/gate-prompts/product-cabinet-attribution.yaml (new) + map/vocab/
+    schema_graph edits, proposed_at 2026-07-19, all correctly gate-bound (everything
+    planned/proposed, nothing applied). Left untouched per the 07-18 P1 precedent: the
+    owning session commits and flips K5 todo→in_progress itself; this groom's commit
+    excludes those files.
+  - observation (user decision, destructive): stash@{0} "On feat/k4-businessapplication-
+    reshape: gate-review IDEAS entries" is STALE — its two 2026-07-15 lines reached the
+    inbox via another path and were groomed to G12/G13 at the 07-16 pm run (G12 since
+    executed). Candidate `git stash drop`; not dropped by the groom.
+  - trigger checks this pass: Q4/Q5 done but Q6 still todo → docmeta P4–P7 stay
+    plan-tracked; L8 todo → runbook-mapping-demo refit + project-review outline stay;
+    O12 todo → launcher-registry config-file migration stays; no other recorded gate moved
+    since yesterday's run. All other lines kept parked, unchanged (m3_invokes to_node
+    broadening noted as a candidate agenda rider for whichever gate session runs next —
+    the in-flight K5 gate is Product-Cabinet-scoped, so adding it is the SME's call).
 
 - 2026-07-19 groom run (weekly inbox groom) — 2 promoted / 2 merged-or-folded / 1 kept-updated:
   - [bug] publish-ceiling drift (real identifiers in publishable-tier files; found by the
