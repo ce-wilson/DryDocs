@@ -2970,6 +2970,17 @@ items:
       (drydocs-core work, separate groom). Wireframes are the item spec.
       2026-07-17 user decisions folded in: CI = last-run metadata; secrets .env-only
       (redaction question dissolved).
+      2026-07-20 (L7 SaaS reframe, user direction) - this page is ALSO the home of the
+      SME/tenant configuration surfaces that reframe planned: (a) per-source doc-connector
+      config (origin registration + per-source requirement_id pattern, replacing the
+      global loose/strict mode); (b) display-label/terminology config (the
+      generic-terminology-research Salesforce pattern - stable internal labels,
+      per-tenant display names); (c) the Jira-board mapping - each BusinessApplication
+      or DevTeam MAY have a Jira board, keyed off the Jira PROJECT NAME (the join key
+      the future Jira connector uses against the ownership graph; gate
+      doc-traceability-feedback section D). When those config files land in config/,
+      the generated enforcement matrix picks them up as surfaces automatically -
+      read-only here like everything else, edits stay gate-bound.
 
   - id: O13
     epic: web-console

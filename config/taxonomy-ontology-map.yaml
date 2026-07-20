@@ -446,7 +446,14 @@ mappings:
     proposed_at: 2026-07-20
     gate_spec: config/gate-prompts/doc-traceability-feedback.yaml
     note: >
-      Drafted by the ontology-mapper per backlog L7. Everything here stays status: planned
+      Drafted by the ontology-mapper per backlog L7; AMENDED 2026-07-20 per SME direction
+      (the SaaS reframe): class definitions are PRODUCT-PLANE / source-agnostic with an
+      `origin` discriminator and source-namespaced keys — the DryDocs outline system is
+      source connector #1 ("tenant 0"), the incremental-context-loop connectors (Jira,
+      Gherkin/BDD, BRD) feed the same classes later; Requirement gains kind (FR|UC|NFR),
+      FeedbackNote gains review-lifecycle status (open|applied|rejected|superseded);
+      per-source id config + the Jira-board caveat live in backlog O12's admin-config
+      scope. Everything here stays status: planned
       (relationship_vocabulary.yaml) / status: proposed (this entry) until the SME runs the
       gate (config/gate-prompts/doc-traceability-feedback.yaml) — no supplement block, no
       loader, no graph write. Worked example: docs/design/controlm-ingestion-tdd.md's
@@ -459,13 +466,14 @@ mappings:
       rejected as too domain-specific (Control-M job-invocation lineage / deployable-service
       granularity) — see the Component node_classifications note.
     open_questions:
-      - "Reconcile :DesignDoc/:DocSection with the existing docs-corpus :Document/:Chunk labels (same 'a document has structured content' shape, different provenance/authoring model), or keep the two families permanently distinct? Not decided here — see the DesignDoc node_classifications note."
+      - "MANAGED vs INGESTED planes (upgraded from 'reconcile later?' at the 2026-07-20 SaaS reframe): :DesignDoc/:DocSection (authored, rev-tracked, outline-validated, annotatable) vs :Document/:Chunk (scraped, H2-chunked, trust-tiered) is a deliberate PRODUCT boundary — a customer estate has both planes. Recommendation is now permanently-distinct planes (shared supertype only if a real cross-plane query need emerges) — gate section A."
       - "Containment shape for DocSection: PART_OF (registered, recommended — Document/Chunk precedent) vs CONTAINS_SECTION (DesignDoc reclassed prov:Collection, hadMember, Folder/Job precedent) — gate section B."
       - "FeedbackNote attribution shape: collapsed WAS_ATTRIBUTED_TO (registered, recommended — no role vocabulary needed) vs a future reified Attribution chain for multi-reviewer notes — gate section C."
       - "FeedbackNote-to-rev correlation: doc_rev as a plain node property (proposed) vs a separate DesignDocRevision node + a PROV wasRevisionOf-style chain — gate section C; the property approach is recommended as the simpler shape until real multi-rev drift data exists."
       - "precedence_authority: none of config/precedence.yaml's 4 declared authorities explicitly governs design docs/requirements/feedback; internal-standards is the closest fit here but a dedicated authority (mirroring how seal-pat-source-of-record was added for docmeta) may be warranted — not proposed here, flagged only."
       - "TestCase.kind (unit|verify|gate|graph-test): controlled enum from day one, or free-text until real matrix data across more TDDs is surveyed? The one worked example (controlm-ingestion-tdd.md) already spans all four kinds in one table."
-      - "Requirement id format: tdd.outline.yaml's traceability.mode is `loose` (ids free-form, unenforced) — should the graph load NOW under loose rules and re-validate later when `strict` flips, or should graph ingestion require strict-pattern ids from the start (a stricter bar than the doc-conformance validator itself currently enforces)?"
+      - "Requirement id format, PER-SOURCE (reframed 2026-07-20, replaces the global loose/strict timing question): each source/tenant has its own id convention, so the pattern + enforcement mode are per-source connector CONFIG (connector #1 = tdd.outline.yaml's requirement_id_pattern + mode) and graph ingestion mirrors the source's configured mode; the config surface is backlog O12's admin page — gate section D."
+      - "Jira-board configuration caveat (SME direction 2026-07-20): each BusinessApplication or DevTeam MAY have a Jira board, keyed off the Jira PROJECT NAME — the join key the future Jira connector uses to attach Jira-sourced Requirements to the ownership graph. Board-to-owner mapping = per-tenant config (backlog O12) captured BEFORE that connector's gate; the JiraBoard node class + association edge belong to that future gate, not this one — gate section D."
 
   # ---- Example: a PROPOSED mapping awaiting the SME gate -------------------
   - id: oracle-schema-asset
