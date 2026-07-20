@@ -81,7 +81,7 @@ plan:
     - id: 9
       title: Application attribution
       goal: "Jobs attributed to SEAL applications (seal_app_ref) end-to-end — gate-confirmed match policy, loader, verify coverage (Epic K)."
-      status: in_progress   # K1-K5 done (K5 gate signed off 2026-07-20); K6 (Cabinet supplement) remains; live load is Track-2
+      status: in_progress   # K1-K6 done (K5 gate signed off + K6 supplement 2026-07-20); live load is Track-2; Cabinet loader blocked company-side
     - id: 10
       title: Documentation infrastructure
       goal: "Every design doc (TDD/Runbook/BRD) conforms to a canonical outline; deterministic md→HTML/PDF render; HITL markup loop (digital + pen/paper) re-attaches to a requirement-traceability spine (Epic L)."
@@ -1838,7 +1838,7 @@ items:
     agent: ontology-mapper
     model: sonnet
     priority: p3
-    status: in_progress   # pulled 2026-07-20 (same session as the K5 sign-off — the pull rule)
+    status: done          # DONE 2026-07-20 (same session as the K5 sign-off; commit 202175e)
     depends_on: []
     inputs: [config/gate-log.md, config/gate-prompts/product-cabinet-attribution.yaml, drydocs_core/ontology/relationship_vocabulary.yaml, drydocs_core/schema/seal_ontology_supplement.cypher, config/taxonomy-ontology-map.yaml]
     acceptance: >
@@ -1861,6 +1861,16 @@ items:
       scheme seed — vocabulary and loader are independent lifecycles (gate §B). The
       cross-family reporting edges stay DEFERRED (gate §D, internal-side later); nothing
       in this item touches them.
+      DONE 2026-07-20 (202175e): Product Cabinet section appended to
+      catalog_ontology_supplement.cypher (ProductRole LocalClass; #cabinetQualifiedAttribution
+      / #cabinetHadRole / #cabinetAttributedTo LocalRelationship terms MAPS_TO their PROV
+      properties; product_roles SkosConceptScheme fixed=true + exactly 7 concepts, scope
+      property on area_product_owner + tech_partner, tech_partner change_note verbatim;
+      HAS_AGENT deliberately not re-declared — reuses the seal #hasAgent term). Three
+      catalog_cabinet_* entries active with supplement refs; ProductRole classification
+      ACTIVE; schema_graph re-rendered; map entry stays confirmed (loader blocked
+      company-side). Drift guards + suite green (735). Live EE re-apply of the catalog
+      supplement refreshes the container whenever it next runs (idempotent).
 
   # ── Epic L — Documentation infrastructure (main) — Phase 10 ───────────────
   # Groomed 2026-07-08 from the deterministic-documentation design conversation.
@@ -3727,8 +3737,8 @@ items:
 # Roll-up the dispatcher can glance at. COMPUTED views — test_backlog.py enforces
 # that these match the items exactly; update them with any status change.
 summary:
-  todo: 21                                          # K6 pulled (2026-07-20)
-  in_progress: 2                                   # E1 (gate deferred), K6 (pulled 2026-07-20)
+  todo: 21                                          # K6 pulled + done same session (2026-07-20)
+  in_progress: 1                                   # E1 (gate deferred)
   blocked: 0
-  done: 91                                         # +K5 (gate signed off 2026-07-20)
+  done: 92                                         # +K5 +K6 (2026-07-20)
   next_ready: [L7, L8, L9, L12, M2, M3, M4, P1, J10, Q6, O9, O12, O13, G14, J13]
