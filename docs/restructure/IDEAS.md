@@ -251,6 +251,13 @@ Tags help grooming: `idea` · `bug` · `doc` · `source` (new data source) · `q
 
 <!-- when you promote an idea, move its line here with the resulting backlog id -->
 
+- 2026-07-20 — [chore] Snyk scanning in CI → EXECUTED SAME-DAY (no backlog id, direct user
+  request — the PAT-semicolon precedent): ci.yml gains a `snyk` job — SCA over the Poetry
+  manifest (blocking at high severity) + advisory `snyk code` SAST (the ruff idiom).
+  Token-gated: every scan step skips cleanly until the SNYK_TOKEN repo secret exists.
+  REMAINING USER MANUAL STEP: add SNYK_TOKEN (Settings → Secrets → Actions; token from
+  app.snyk.io) — first green scan confirms; consider gating `snyk code` after triage.
+
 - 2026-07-20 — [source] **external/ServiceNow doc set** (6 files downloaded same day: CMDB
   Process Guide .docx, CMDB Product Architecture / Data Manager / Governance Workshop
   .pptx, ITAM-SAM Integration Options .pptx, "What are services and service offerings"
