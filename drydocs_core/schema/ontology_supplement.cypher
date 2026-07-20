@@ -198,3 +198,96 @@ MERGE (n:OntologyTerm:LocalRelationship {iri: "https://drydocs.local/ontology#wa
 MATCH (local:OntologyTerm:LocalRelationship {iri: "https://drydocs.local/ontology#wasAssociatedWithSealAppRef"})
 MATCH (prov:OntologyTerm:ProvProperty       {iri: "http://www.w3.org/ns/prov#wasAssociatedWith"})
 MERGE (local)-[:MAPS_TO]->(prov);
+
+
+// =============================================================================
+// Documentation traceability + review feedback (backlog L7; gate
+// doc-traceability-feedback SIGNED OFF 2026-07-20 — config/gate-log.md).
+// PRODUCT-PLANE family: source-agnostic classes with an `origin` discriminator;
+// DryDocs' own outline system is source connector #1 ("tenant 0"). Managed
+// (authored/rev-tracked/annotatable) vs ingested (Document/Chunk above) is a
+// product boundary — gate A6. Keys are source-namespaced — gate A2.
+// =============================================================================
+
+MERGE (n:OntologyTerm:LocalClass {iri: "https://drydocs.local/ontology#DesignDoc"})
+  SET n.label = "DesignDoc",
+      n.notes = "MANAGED authored document (rev-tracked, outline-validated). prov:Entity. "
+              + "Key (origin, doc_id). Connector #1: docs/design/*.md (drydocs.doc-outline.v1).";
+MERGE (n:OntologyTerm:LocalClass {iri: "https://drydocs.local/ontology#DocSection"})
+  SET n.label = "DocSection",
+      n.notes = "Authored section of a DesignDoc, key (origin, doc_id, anchor). prov:Entity. "
+              + "Shared target of traceability (SPECIFIED_IN) and review feedback (ANNOTATES).";
+MERGE (n:OntologyTerm:LocalClass {iri: "https://drydocs.local/ontology#Requirement"})
+  SET n.label = "Requirement",
+      n.notes = "Requirement/capability proposition from any registered source. prov:Entity. "
+              + "Key (origin, requirement_id); kind FR|UC|NFR (gate A3 — Scenario deferred "
+              + "to a future BDD-connector gate); id format is per-source config (gate D5).";
+MERGE (n:OntologyTerm:LocalClass {iri: "https://drydocs.local/ontology#Component"})
+  SET n.label = "Component",
+      n.notes = "Implementation artifact cited as a Requirement's realization. prov:Entity. "
+              + "Key (origin, ref); same-basename within one origin = SME-merge case (gate D1).";
+MERGE (n:OntologyTerm:LocalClass {iri: "https://drydocs.local/ontology#TestCase"})
+  SET n.label = "TestCase",
+      n.notes = "Test/verification citation proving a Requirement. prov:Entity. Key (origin, ref); "
+              + "kind is an OPEN enum: unit|verify|gate|graph-test today (gate A7/D2).";
+MERGE (n:OntologyTerm:LocalClass {iri: "https://drydocs.local/ontology#FeedbackNote"})
+  SET n.label = "FeedbackNote",
+      n.notes = "Anchor-keyed review annotation. prov:Entity (aboutness, not derivation). "
+              + "Carries doc_rev + lifecycle status open|applied|rejected|superseded (gate C2/C3).";
+
+// PART_OF  —  DocSection → DesignDoc  (structural containment; Document/Chunk precedent — gate B1)
+MERGE (n:OntologyTerm:LocalRelationship {iri: "https://drydocs.local/ontology#docSectionPartOf"})
+  SET n.label  = "PART_OF",
+      n.domain = "DocSection",
+      n.range  = "DesignDoc",
+      n.notes  = "DocSection belongs to its DesignDoc — authored/ordered outline containment; "
+               + "C8-clean twin of the Chunk→Document PART_OF (from/to differ). Gate B1.";
+
+// SPECIFIED_IN  —  Requirement → DocSection  (prov:hadPrimarySource — gate B2)
+MERGE (n:OntologyTerm:LocalRelationship {iri: "https://drydocs.local/ontology#specifiedIn"})
+  SET n.label  = "SPECIFIED_IN",
+      n.domain = "Requirement",
+      n.range  = "DocSection",
+      n.notes  = "Requirement's specification is primary-sourced from this section's text "
+               + "(seal_had_primary_source reuse pattern). Gate B2.";
+MATCH (local:OntologyTerm:LocalRelationship {iri: "https://drydocs.local/ontology#specifiedIn"})
+MATCH (prov:OntologyTerm:ProvProperty       {iri: "http://www.w3.org/ns/prov#hadPrimarySource"})
+MERGE (local)-[:MAPS_TO]->(prov);
+
+// IMPLEMENTED_BY  —  Requirement → Component  (research-grounded local — gate B3)
+MERGE (n:OntologyTerm:LocalRelationship {iri: "https://drydocs.local/ontology#implementedBy"})
+  SET n.label  = "IMPLEMENTED_BY",
+      n.domain = "Requirement",
+      n.range  = "Component",
+      n.notes  = "Requirement realized by an implementation artifact. No declared-standard term; "
+               + "research-grounded local (Ramesh & Jarke Satisfies/Allocated-to). Gate B3.";
+
+// VERIFIED_BY  —  Requirement → TestCase  (research-grounded local — gate B3)
+MERGE (n:OntologyTerm:LocalRelationship {iri: "https://drydocs.local/ontology#verifiedBy"})
+  SET n.label  = "VERIFIED_BY",
+      n.domain = "Requirement",
+      n.range  = "TestCase",
+      n.notes  = "Requirement proven by a test/verification citation. No declared-standard term; "
+               + "research-grounded local (Ramesh & Jarke Verifies). Gate B3.";
+
+// ANNOTATES  —  FeedbackNote → DocSection  (local aboutness; oa:hasTarget analog deferred — gate D4)
+MERGE (n:OntologyTerm:LocalRelationship {iri: "https://drydocs.local/ontology#annotates"})
+  SET n.label  = "ANNOTATES",
+      n.domain = "FeedbackNote",
+      n.range  = "DocSection",
+      n.notes  = "Review note targets a section — aboutness, not derivation (docs_describes "
+               + "reasoning). W3C oa:hasTarget is the undeclared-standard analog (gate D4). "
+               + "Correlation to Requirement rides ANNOTATES + reverse SPECIFIED_IN (gate C4).";
+
+// WAS_ATTRIBUTED_TO {role: feedback_author}  —  FeedbackNote → Employee  (prov:wasAttributedTo — gate C1)
+MERGE (n:OntologyTerm:LocalRelationship {iri: "https://drydocs.local/ontology#feedbackAuthoredBy"})
+  SET n.label  = "WAS_ATTRIBUTED_TO",
+      n.role   = "feedback_author",
+      n.domain = "FeedbackNote",
+      n.range  = "Employee",
+      n.notes  = "Note authored by the reviewing Employee — collapsed form (one author, no role "
+               + "scheme; p2_authored_by precedent). role=feedback_author discriminates on the "
+               + "shared label. Gate C1.";
+MATCH (local:OntologyTerm:LocalRelationship {iri: "https://drydocs.local/ontology#feedbackAuthoredBy"})
+MATCH (prov:OntologyTerm:ProvProperty       {iri: "http://www.w3.org/ns/prov#wasAttributedTo"})
+MERGE (local)-[:MAPS_TO]->(prov);

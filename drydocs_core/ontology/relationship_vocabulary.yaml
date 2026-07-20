@@ -411,13 +411,16 @@ node_classifications:
   # authored, rev-tracked, outline-validated, annotatable (lifecycle the platform
   # enforces); Document/Chunk are scraped/uploaded, H2-chunked, trust-tiered (witnessed,
   # not governed). That split is a product boundary, not a temporary convenience — see
-  # the gate prompt section A. All entries below stay status: planned.
+  # the gate prompt section A. Gate doc-traceability-feedback SIGNED OFF 2026-07-20 —
+  # all six classes ACTIVE; supplement terms in ontology_supplement.cypher (K6-style
+  # same-day landing; config/gate-log.md).
 
   - label:      DesignDoc
     class:      "dd:DesignDoc"
     prov_type:  Entity
     note: >
-      PROPOSED (backlog L7, doc-traceability-feedback gate). One MANAGED (authored,
+      ACTIVE (L7, gate doc-traceability-feedback signed off 2026-07-20, config/gate-log.md,
+      all 21 confirmations A1-A7/B1-B4/C1-C4/D1-D7). One MANAGED (authored,
       rev-tracked, outline-validated) document from any registered source — the
       product-plane counterpart of the ingested :Document. Carries doc_id, doc_type,
       rev, status, commit, origin (which source connector produced it). Keying is
@@ -434,7 +437,7 @@ node_classifications:
     class:      "dd:DocSection"
     prov_type:  Entity
     note: >
-      PROPOSED (backlog L7). One AUTHORED section of a DesignDoc, keyed
+      ACTIVE (L7, gate doc-traceability-feedback signed off 2026-07-20, config/gate-log.md). One AUTHORED section of a DesignDoc, keyed
       (origin, doc_id, anchor) — the stable anchor id namespace the source connector
       guarantees. Carries anchor, heading, required. Connector #1: the
       `<!-- anchor: id -->` ids (drydocs/doc_outline.py ANCHOR_RE) plus L11
@@ -447,7 +450,7 @@ node_classifications:
     class:      "dd:Requirement"
     prov_type:  Entity
     note: >
-      PROPOSED (backlog L7). One requirement/capability PROPOSITION from any registered
+      ACTIVE (L7, gate doc-traceability-feedback signed off 2026-07-20, config/gate-log.md). One requirement/capability PROPOSITION from any registered
       source — the graph-side anchor of the traceability star (SPECIFIED_IN /
       IMPLEMENTED_BY / VERIFIED_BY). Carries requirement_id, kind (FR|UC|NFR today —
       use cases fold in as kind=UC until a future BDD gate decides whether Scenario
@@ -462,7 +465,7 @@ node_classifications:
     class:      "dd:Component"
     prov_type:  Entity
     note: >
-      PROPOSED (backlog L7). An implementation artifact (file, module, CLI command,
+      ACTIVE (L7, gate doc-traceability-feedback signed off 2026-07-20, config/gate-log.md). An implementation artifact (file, module, CLI command,
       proc/table) cited by a requirement source as the concrete realization of a
       Requirement. Keying is SOURCE/REPO-NAMESPACED — a bare path string collides the
       moment there are two repos or tenants, so the key is (origin, ref); same-basename
@@ -477,7 +480,7 @@ node_classifications:
     class:      "dd:TestCase"
     prov_type:  Entity
     note: >
-      PROPOSED (backlog L7). One test/verification citation proving a Requirement.
+      ACTIVE (L7, gate doc-traceability-feedback signed off 2026-07-20, config/gate-log.md). One test/verification citation proving a Requirement.
       Carries kind — an OPEN enum (unit|verify|gate|graph-test observed in connector
       #1's matrices; gherkin-scenario, jira-acceptance anticipated from the
       context-loop connectors — deliberately NOT a fixed skos scheme while sources are
@@ -489,7 +492,7 @@ node_classifications:
     class:      "dd:FeedbackNote"
     prov_type:  Entity
     note: >
-      PROPOSED (backlog L7). One anchor-keyed annotation from a REVIEW WORKFLOW — a
+      ACTIVE (L7, gate doc-traceability-feedback signed off 2026-07-20, config/gate-log.md). One anchor-keyed annotation from a REVIEW WORKFLOW — a
       product feature, not a vendor-internal convenience (the HITL loop is tenant 0).
       Carries anchor, note (text), doc_id, doc_rev (the rev the note was taken AGAINST,
       which may trail the DesignDoc's current rev), origin, and lifecycle status
@@ -1835,12 +1838,14 @@ local_relationships:
     domain:       docs
     status:       planned   # Q4 docmeta gate 2026-07-18 (ADR 0006, config/gate-log.md)
 
-  # ── Design docs: traceability matrix + anchor-keyed feedback (PROPOSED, backlog L7) ──
-  # GATE-BOUND — config/gate-prompts/doc-traceability-feedback.yaml. ALL ENTRIES BELOW
-  # status: planned; supplement: ~ / loader: ~ on purpose (no supplement/loader claims for
-  # a planned-only proposal — same convention as the SEAL reshape block above). Node
-  # classes (DesignDoc/DocSection/Requirement/Component/TestCase/FeedbackNote) registered
-  # above in node_classifications, same gate.
+  # ── Documentation traceability + review feedback (ACTIVE, backlog L7) ────────
+  # Gate doc-traceability-feedback SIGNED OFF 2026-07-20 (config/gate-log.md — all 21
+  # confirmations A1-A7/B1-B4/C1-C4/D1-D7; the SaaS-reframe product-plane definitions).
+  # Supplement terms live in ontology_supplement.cypher (the docs-domain home, alongside
+  # the Document/Chunk corpus terms). loader: ~ until the connector-#1 loader lands
+  # (load-doc-traceability — same L7 item). Node classes (DesignDoc/DocSection/
+  # Requirement/Component/TestCase/FeedbackNote) registered above in
+  # node_classifications, same gate.
 
   - id:           doc_section_part_of
     neo4j_label:  PART_OF
@@ -1849,7 +1854,7 @@ local_relationships:
     to_node:      DesignDoc
     prov_maps_to: ~
     note: >
-      PROPOSED. DocSection belongs to its DesignDoc — structural containment, kept off the
+      ACTIVE (gate doc-traceability-feedback signed off 2026-07-20, B1). DocSection belongs to its DesignDoc — structural containment, kept off the
       PROV matrix (Entity → Entity structure/aboutness is not derivation) exactly as
       docs_chunk_part_of (Chunk → Document) does. SAME neo4j_label PART_OF; NOT the same
       triple (from/to differ: DocSection/DesignDoc vs Chunk/Document — C8-clean, a new
@@ -1861,10 +1866,10 @@ local_relationships:
       tdd.outline.yaml) rather than an open collection of members; the closer analog is
       Document/Chunk, not Folder/Job. Gate section B asks the SME to confirm PART_OF over
       CONTAINS_SECTION.
-    supplement:   ~
+    supplement:   ontology_supplement.cypher
     loader:       ~
     domain:       docs
-    status:       planned
+    status:       active   # gate doc-traceability-feedback signed off 2026-07-20 (config/gate-log.md)
 
   - id:           doc_requirement_specified_in
     neo4j_label:  SPECIFIED_IN
@@ -1873,16 +1878,16 @@ local_relationships:
     to_node:      DocSection
     prov_maps_to: "prov:hadPrimarySource"
     note: >
-      PROPOSED. Requirement's traceability-matrix "design-section anchor" column — its
+      ACTIVE (gate doc-traceability-feedback signed off 2026-07-20, B2). Requirement's traceability-matrix "design-section anchor" column — its
       specification's primary source is this DocSection's text. Matrix row: Entity →
       Entity = prov:wasDerivedFrom family; prov:hadPrimarySource is the precise
       sub-property (same reuse pattern as seal_had_primary_source: BusinessApplication →
       Document). SPECIFIED_IN kept as the domain label for query clarity
       (RELATIONSHIP_GUIDE domain-alias rule), mapping recorded here.
-    supplement:   ~
+    supplement:   ontology_supplement.cypher
     loader:       ~
     domain:       docs
-    status:       planned
+    status:       active   # gate doc-traceability-feedback signed off 2026-07-20 (config/gate-log.md)
 
   - id:           doc_requirement_implemented_by
     neo4j_label:  IMPLEMENTED_BY
@@ -1891,15 +1896,15 @@ local_relationships:
     to_node:      Component
     prov_maps_to: ~
     note: >
-      PROPOSED. Requirement's traceability-matrix "Component/module" column. No PROV row
+      ACTIVE (gate doc-traceability-feedback signed off 2026-07-20, B3 — research-grounded local, Ramesh & Jarke Satisfies/Allocated-to). Requirement's traceability-matrix "Component/module" column. No PROV row
       fits a requirements-realization relation (PROV models data provenance, not
       requirement-satisfies-artifact semantics); no ORG/DPROD/SOSA/DCAT/SKOS term fits
       either — local per the RELATIONSHIP_GUIDE local-term rule, same family as
       FIRST_CHUNK/NEXT_CHUNK (structural edges with no standard mapping).
-    supplement:   ~
+    supplement:   ontology_supplement.cypher
     loader:       ~
     domain:       docs
-    status:       planned
+    status:       active   # gate doc-traceability-feedback signed off 2026-07-20 (config/gate-log.md)
 
   - id:           doc_requirement_verified_by
     neo4j_label:  VERIFIED_BY
@@ -1908,14 +1913,14 @@ local_relationships:
     to_node:      TestCase
     prov_maps_to: ~
     note: >
-      PROPOSED. Requirement's traceability-matrix "Test/verify" column. Same local-term
+      ACTIVE (gate doc-traceability-feedback signed off 2026-07-20, B3 — research-grounded local, Ramesh & Jarke Verifies). Requirement's traceability-matrix "Test/verify" column. Same local-term
       reasoning as doc_requirement_implemented_by — no PROV/standards term fits
       requirement-verification; local. Candidate future standard: none of
       PROV-O/ORG/DPROD/SOSA/DCAT/SKOS models a test-verifies-requirement relation.
-    supplement:   ~
+    supplement:   ontology_supplement.cypher
     loader:       ~
     domain:       docs
-    status:       planned
+    status:       active   # gate doc-traceability-feedback signed off 2026-07-20 (config/gate-log.md)
 
   - id:           doc_feedback_annotates
     neo4j_label:  ANNOTATES
@@ -1924,7 +1929,7 @@ local_relationships:
     to_node:      DocSection
     prov_maps_to: ~
     note: >
-      PROPOSED. FeedbackNote's anchor-keyed target (docs/design/feedback/README.md format
+      ACTIVE (gate doc-traceability-feedback signed off 2026-07-20, C4 — mixed-direction correlation path confirmed, no ABOUT_REQUIREMENT shortcut). FeedbackNote's anchor-keyed target (docs/design/feedback/README.md format
       — `anchor` must match a `<!-- anchor: id -->` or an L11 derived subsection anchor,
       drydocs/doc_outline.py feedback_anchor_valid). Entity → Entity "aboutness", not
       derivation — same reasoning as docs_describes (Document → SoftwareProduct,
@@ -1935,10 +1940,10 @@ local_relationships:
       from the `<doc-id>-rev<N>.yaml` filename) records which DesignDoc rev the note was
       taken against — see the gate prompt section C for why this stays a property rather
       than a separate Revision node.
-    supplement:   ~
+    supplement:   ontology_supplement.cypher
     loader:       ~
     domain:       docs
-    status:       planned
+    status:       active   # gate doc-traceability-feedback signed off 2026-07-20 (config/gate-log.md)
 
   - id:           doc_feedback_authored_by
     neo4j_label:  WAS_ATTRIBUTED_TO
@@ -1947,7 +1952,7 @@ local_relationships:
     to_node:      Employee
     prov_maps_to: "prov:wasAttributedTo"
     note: >
-      PROPOSED. FeedbackNote authored by the SME reviewer. Matrix row: Entity → Agent =
+      ACTIVE (gate doc-traceability-feedback signed off 2026-07-20, C1 — collapsed-only confirmed). FeedbackNote authored by the SME reviewer. Matrix row: Entity → Agent =
       wasAttributedTo — SIMPLE/COLLAPSED form, same precedent as p2_authored_by
       (ControlMFolder → Developer) rather than the K4/K5 qualified/reified Attribution
       pattern (seal_qualified_attribution / catalog_cabinet_qualified_attribution): a
@@ -1958,10 +1963,10 @@ local_relationships:
       tom_role_holder / developed_by / owner idiom). Gate section C asks the SME to
       confirm collapsed-only is sufficient (vs also registering a reified form for future
       multi-reviewer notes, mirroring the K6 "both forms load" precedent).
-    supplement:   ~
+    supplement:   ontology_supplement.cypher
     loader:       ~
     domain:       docs
-    status:       planned
+    status:       active   # gate doc-traceability-feedback signed off 2026-07-20 (config/gate-log.md)
 
   # ── Cross-domain provenance ───────────────────────────────────────────────
 

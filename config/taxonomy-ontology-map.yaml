@@ -442,8 +442,10 @@ mappings:
       config/taxonomy/ import, so no capture file exists in that directory for design-doc
       structure — the taxonomy-first gap this field records rather than hides (same
       disposition as job-seal-app-ref / seal-tom-attribution).
-    status: proposed
+    status: confirmed
     proposed_at: 2026-07-20
+    confirmed_by: chad.wilson
+    confirmed_on: 2026-07-20   # in-chat gate session — all 21 confirmations (A1-A7, B1-B4, C1-C4, D1-D7)
     gate_spec: config/gate-prompts/doc-traceability-feedback.yaml
     note: >
       Drafted by the ontology-mapper per backlog L7; AMENDED 2026-07-20 per SME direction
@@ -928,6 +930,6 @@ mappings:
 # Counts the gate reports to the SME each run.
 summary:
   applied: 8          # +application-as-dataproduct, +seal-tom-attribution (K4, 2026-07-15); prior 6 = job-contains, application-contains-folder, doc-describes-product, doc-chunk-part-of, doc-first-chunk, doc-next-chunk
-  confirmed: 21       # +product-cabinet-attribution (K5 gate signed off 2026-07-20; applied waits on the K6 supplement + a person-level cabinet extract); prior +seal-doc-source-of-record (gate §D confirmed 2026-07-10; applied waits on docmeta loader)
-  proposed: 4         # oracle-schema-asset, jobrun-observation, requires-scheduler, doc-traceability-feedback
+  confirmed: 22       # +doc-traceability-feedback (L7 gate signed off 2026-07-20, 21/21 confirmations; supplement landed same day, loader load-doc-traceability follows); +product-cabinet-attribution (K5 gate signed off 2026-07-20; applied waits on the K6 supplement + a person-level cabinet extract)
+  proposed: 3         # oracle-schema-asset, jobrun-observation, requires-scheduler
   rejected: 0

@@ -613,3 +613,49 @@ SME-supplied PAT screenshots held OUT of the repo — Internal-Confidential).
   logged change: seal_attribution_has_agent rescoped family-agnostic; TOMRole notes + the
   seal supplement's shared-cto references corrected (c4.shared_with REMOVEd — a supplement
   re-apply refreshes already-loaded graphs).
+
+## 2026-07-20 — L7 · Documentation traceability + review feedback (doc-traceability-feedback) — SIGNED OFF
+
+- **Scope:** the PRODUCT-PLANE documentation ontology — six source-agnostic node classes
+  (DesignDoc, DocSection, Requirement, Component, TestCase, FeedbackNote) + six `doc_`
+  relationship entries (PART_OF, SPECIFIED_IN, IMPLEMENTED_BY, VERIFIED_BY, ANNOTATES,
+  WAS_ATTRIBUTED_TO {role: feedback_author}), validated on DryDocs' own outline system as
+  source connector #1 ("tenant 0"). Gate spec:
+  `config/gate-prompts/doc-traceability-feedback.yaml` (ontology-mapper draft, then the
+  same-day SaaS-reframe amendments at SME direction). SME session ran in-chat 2026-07-20.
+- **Confirmed: 21 · Edited: 0 · Rejected: 0** — A1-A7, B1-B4, C1-C4, D1-D7 all confirmed
+  as recommended (chad.wilson). Key decisions:
+  - **§A — product-plane, source-agnostic classes** with an `origin` discriminator and
+    SOURCE-NAMESPACED keys (no single-repo assumption); use cases fold into Requirement
+    as kind FR|UC|NFR (Scenario deferred to a future BDD-connector gate); DesignDoc/
+    DocSection vs Document/Chunk confirmed as a permanent MANAGED-vs-INGESTED product
+    boundary; Component/TestCase are new classes (:Script/:PipelineService folds rejected);
+    TestCase.kind is an OPEN enum.
+  - **§B — PART_OF** containment (Document/Chunk precedent, C8-clean twin);
+    **SPECIFIED_IN = prov:hadPrimarySource** (seal_had_primary_source reuse);
+    IMPLEMENTED_BY / VERIFIED_BY stay LOCAL with Ramesh & Jarke reference-model backing
+    (Satisfies/Allocated-to, Verifies); star shape off Requirement confirmed.
+  - **§C — collapsed attribution** (FeedbackNote -[:WAS_ATTRIBUTED_TO {role:
+    feedback_author}]-> Employee; no reified form — one author, no role scheme);
+    doc_rev stays a PROPERTY (no Revision node); NEW lifecycle status on FeedbackNote
+    (open|applied|rejected|superseded — the runbook rev1→Rev 2 loop is the precedent);
+    correlation to Requirement rides the mixed-direction path (no ABOUT_REQUIREMENT
+    shortcut edge).
+  - **§D — dispositions:** same-basename-within-origin Components stay SME-merge (m3
+    idiom); TestCase.kind free property; precedence_authority = internal-standards
+    closest-fit (gap flagged, no new authority); oa: adoption deferred (heavier under the
+    SaaS lens, still not declared); requirement-id pattern + loose/strict mode are
+    PER-SOURCE connector config mirrored at load time (config surface = backlog O12's
+    admin page); **Jira-board caveat recorded** — each BusinessApplication or DevTeam MAY
+    have a Jira board, keyed off the JIRA PROJECT NAME (the future Jira connector's join
+    key; board-to-owner mapping = per-tenant config in O12, captured before that
+    connector's gate — the JiraBoard node class + edge belong to that future gate);
+    linkage on the record (context-loop plan, generic-terminology research, O12) —
+    whether the product-ontology weight re-tiers L7 or seeds a productization epic stays
+    the SME's parked plan decision.
+- **Effect:** map entry `doc-traceability-feedback` proposed → **confirmed** (summary
+  confirmed 22 / proposed 3); all six classes + six `doc_` vocabulary entries planned →
+  **active**; supplement terms landed same day in `ontology_supplement.cypher` (the
+  docs-domain home — K6-style same-day landing); connector-#1 loader
+  (`load-doc-traceability`: docs/design/*.md matrices + docs/design/feedback/*.yaml)
+  follows under the same L7 item — no graph content exists until it runs.

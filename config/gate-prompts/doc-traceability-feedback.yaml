@@ -8,8 +8,14 @@
 # later. Amendments: source-agnostic class definitions + origin discriminator;
 # managed-vs-ingested content boundary as the Document/Chunk-split rationale;
 # source-namespaced keying; FeedbackNote lifecycle status; per-source requirement-id
-# config; Jira-board configuration caveat (section D). NOT run, NOT signed off.
-# Nothing here is applied by reading this page: the six new node_classifications
+# config; Jira-board configuration caveat (section D).
+# SIGNED OFF 2026-07-20 (SME in-chat session, chad.wilson) — ALL 21 confirmations
+# (A1-A7, B1-B4, C1-C4, D1-D7) confirmed as recommended, 0 edited, 0 rejected;
+# transcribed to config/gate-log.md same day. Effect: map entry confirmed; the six
+# node classes + six relationship entries ACTIVE; supplement terms landed in
+# ontology_supplement.cypher same day; connector-#1 loader (load-doc-traceability)
+# follows under the same L7 item.
+# Historical note — the pre-sign-off framing of this page read: the six new node_classifications
 # entries (DesignDoc, DocSection, Requirement, Component, TestCase, FeedbackNote) and the six
 # new relationship_vocabulary.yaml entries (doc_section_part_of,
 # doc_requirement_specified_in, doc_requirement_implemented_by, doc_requirement_verified_by,

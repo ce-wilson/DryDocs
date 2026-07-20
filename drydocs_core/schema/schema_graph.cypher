@@ -407,27 +407,27 @@ MERGE (a)-[r:GOVERNED_BY]->(b)
 
 MATCH (a:SchemaMeta {name: 'DocSection'}), (b:SchemaMeta {name: 'DesignDoc'})
 MERGE (a)-[r:PART_OF]->(b)
-  SET r.vocab_id = 'doc_section_part_of', r.prov_maps_to = null, r.domain = 'docs', r.status = 'planned';
+  SET r.vocab_id = 'doc_section_part_of', r.prov_maps_to = null, r.domain = 'docs', r.status = 'active';
 
 MATCH (a:SchemaMeta {name: 'Requirement'}), (b:SchemaMeta {name: 'DocSection'})
 MERGE (a)-[r:SPECIFIED_IN]->(b)
-  SET r.vocab_id = 'doc_requirement_specified_in', r.prov_maps_to = 'prov:hadPrimarySource', r.domain = 'docs', r.status = 'planned';
+  SET r.vocab_id = 'doc_requirement_specified_in', r.prov_maps_to = 'prov:hadPrimarySource', r.domain = 'docs', r.status = 'active';
 
 MATCH (a:SchemaMeta {name: 'Requirement'}), (b:SchemaMeta {name: 'Component'})
 MERGE (a)-[r:IMPLEMENTED_BY]->(b)
-  SET r.vocab_id = 'doc_requirement_implemented_by', r.prov_maps_to = null, r.domain = 'docs', r.status = 'planned';
+  SET r.vocab_id = 'doc_requirement_implemented_by', r.prov_maps_to = null, r.domain = 'docs', r.status = 'active';
 
 MATCH (a:SchemaMeta {name: 'Requirement'}), (b:SchemaMeta {name: 'TestCase'})
 MERGE (a)-[r:VERIFIED_BY]->(b)
-  SET r.vocab_id = 'doc_requirement_verified_by', r.prov_maps_to = null, r.domain = 'docs', r.status = 'planned';
+  SET r.vocab_id = 'doc_requirement_verified_by', r.prov_maps_to = null, r.domain = 'docs', r.status = 'active';
 
 MATCH (a:SchemaMeta {name: 'FeedbackNote'}), (b:SchemaMeta {name: 'DocSection'})
 MERGE (a)-[r:ANNOTATES]->(b)
-  SET r.vocab_id = 'doc_feedback_annotates', r.prov_maps_to = null, r.domain = 'docs', r.status = 'planned';
+  SET r.vocab_id = 'doc_feedback_annotates', r.prov_maps_to = null, r.domain = 'docs', r.status = 'active';
 
 MATCH (a:SchemaMeta {name: 'FeedbackNote'}), (b:SchemaMeta {name: 'Employee'})
 MERGE (a)-[r:WAS_ATTRIBUTED_TO]->(b)
-  SET r.vocab_id = 'doc_feedback_authored_by', r.role = 'feedback_author', r.prov_maps_to = 'prov:wasAttributedTo', r.domain = 'docs', r.status = 'planned';
+  SET r.vocab_id = 'doc_feedback_authored_by', r.role = 'feedback_author', r.prov_maps_to = 'prov:wasAttributedTo', r.domain = 'docs', r.status = 'active';
 
 // ── domain: all ─────────────────────────────────────────────────────────────
 
