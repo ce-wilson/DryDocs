@@ -278,3 +278,103 @@ MERGE (n:Role {name: 'Operations Delivery Project Manager'})
   SET n.role_id = 'odpm';
 MERGE (n:Role {name: 'Agile Employee Readiness Manager'})
   SET n.role_id = 'erm';
+
+
+// =============================================================================
+// Product Cabinet additions (K6; gate product-cabinet-attribution SIGNED OFF
+// 2026-07-20 — config/gate-log.md). Applied after the PAT additions; idempotent.
+// Registration only — NO attribution loader exists (blocked company-side until a
+// person-level PAT cabinet extract lands). The reified pattern reuses the seal
+// supplement's Attribution LocalClass and its #hasAgent term as family-agnostic
+// infrastructure (the C8 duplicate-triple guard — the (Attribution, HAS_AGENT,
+// Employee) triple is registered exactly once).
+// =============================================================================
+
+
+// ----- Local-namespace anchor terms ------------------------------------------
+
+MERGE (n:OntologyTerm:LocalClass {iri: "https://drydocs.local/ontology#ProductRole"})
+  SET n.label = "ProductRole",
+      n.notes = "Product Cabinet role concept (skos:Concept semantics), scheme product_roles. "
+              + "EXACTLY the fixed 7 — no cto: the K5 gate (2026-07-20) decided the "
+              + "ProductRole and TOMRole families are INDEPENDENT (supersedes the 2026-07-10 "
+              + "§B shared-cto record; rename history on the tech_partner concept). DISTINCT "
+              + "from :Role (org:Role — PAT hierarchy membership) and from :TOMRole. Scope: "
+              + ":Product / :AreaProduct only, never :BusinessApplication.";
+
+
+// ----- :LocalRelationship declarations — Product Cabinet attribution ---------
+// Catalog-domain twins of the seal qualified-attribution terms (their triples
+// differ — the HAS_DEV_TEAM dual-registration precedent). The Attribution
+// -[:HAS_AGENT]-> Employee hop is NOT re-declared here: it reuses the seal
+// supplement's #hasAgent term (rescoped family-agnostic at the K5 sign-off).
+
+// QUALIFIED_ATTRIBUTION — Product|AreaProduct → Attribution (prov:qualifiedAttribution)
+MERGE (n:OntologyTerm:LocalRelationship {iri: "https://drydocs.local/ontology#cabinetQualifiedAttribution"})
+  SET n.label  = "QUALIFIED_ATTRIBUTION",
+      n.domain = "Product|AreaProduct",
+      n.range  = "Attribution",
+      n.notes  = "Entry point to the reified Product Cabinet role-holder record. One "
+               + "Attribution per (scope-node, ProductRole) pair; area_product_owner and "
+               + "tech_partner attributions attach only to :AreaProduct. "
+               + "prov:qualifiedAttribution.";
+MATCH (local:OntologyTerm:LocalRelationship {iri: "https://drydocs.local/ontology#cabinetQualifiedAttribution"})
+MATCH (pp:OntologyTerm:ProvProperty         {iri: "http://www.w3.org/ns/prov#qualifiedAttribution"})
+MERGE (local)-[:MAPS_TO]->(pp);
+
+// HAD_ROLE — Attribution → ProductRole (prov:hadRole)
+MERGE (n:OntologyTerm:LocalRelationship {iri: "https://drydocs.local/ontology#cabinetHadRole"})
+  SET n.label  = "HAD_ROLE",
+      n.domain = "Attribution",
+      n.range  = "ProductRole",
+      n.notes  = "Names which Product Cabinet role the Attribution grants (the fixed 7, "
+               + "no cto). prov:hadRole.";
+MATCH (local:OntologyTerm:LocalRelationship {iri: "https://drydocs.local/ontology#cabinetHadRole"})
+MATCH (pp:OntologyTerm:ProvProperty         {iri: "http://www.w3.org/ns/prov#hadRole"})
+MERGE (local)-[:MAPS_TO]->(pp);
+
+// WAS_ATTRIBUTED_TO {role: product_cabinet_role_holder} — Product|AreaProduct → Employee
+// The collapsed simple form (gate §C: BOTH forms load — a deliberate deviation from
+// the K4 TOM qualified-only resolution; the reified form remains the multi-person
+// carrier). role distinguishes this instance on the shared WAS_ATTRIBUTED_TO label.
+MERGE (n:OntologyTerm:LocalRelationship {iri: "https://drydocs.local/ontology#cabinetAttributedTo"})
+  SET n.label  = "WAS_ATTRIBUTED_TO",
+      n.role   = "product_cabinet_role_holder",
+      n.domain = "Product|AreaProduct",
+      n.range  = "Employee",
+      n.notes  = "Collapsed Product Cabinet attribution (catalog twin of the seal simple "
+               + "form; same :AreaProduct-only scope rules as the reified chain). "
+               + "prov:wasAttributedTo (Entity->Agent).";
+MATCH (local:OntologyTerm:LocalRelationship {iri: "https://drydocs.local/ontology#cabinetAttributedTo"})
+MATCH (pp:OntologyTerm:ProvProperty         {iri: "http://www.w3.org/ns/prov#wasAttributedTo"})
+MERGE (local)-[:MAPS_TO]->(pp);
+
+
+// ----- ProductRole concept scheme (the fixed 7 — K5 gate; scheme FIXED) -------
+// New Product Cabinet roles require a new gate (the tom_roles precedent).
+// area_product_owner and tech_partner attach ONLY to :AreaProduct (scope
+// property); the other five attach to :Product or :AreaProduct.
+
+MERGE (s:SkosConceptScheme {id: "product_roles"})
+  SET s.label = "Product Cabinet Roles",
+      s.source = "gate product-cabinet-attribution (signed off 2026-07-20, config/gate-log.md)",
+      s.fixed = true;
+MERGE (p1:ProductRole {id: "area_product_owner"})  SET p1.pref_label = "Area Product Owner",
+                                                       p1.scope = "AreaProduct";
+MERGE (p2:ProductRole {id: "product_owner"})       SET p2.pref_label = "Product Owner";
+MERGE (p3:ProductRole {id: "product_architect"})   SET p3.pref_label = "Product Architect";
+MERGE (p4:ProductRole {id: "tech_partner"})        SET p4.pref_label = "Tech Partner",
+                                                       p4.scope = "AreaProduct",
+                                                       p4.change_note = "skos:changeNote — in PAT the mapping "
+                                                         + "changed slightly: this area-product role was formerly "
+                                                         + "named 'CTO' in SEAL; SEAL's CTO now denotes the "
+                                                         + "product-level role. Recorded at the K5 gate "
+                                                         + "(2026-07-20); supersedes the 2026-07-10 §B "
+                                                         + "'CTO in both families' record.";
+MERGE (p5:ProductRole {id: "data_owner"})          SET p5.pref_label = "Data Owner";
+MERGE (p6:ProductRole {id: "data_certifier"})      SET p6.pref_label = "Data Certifier";
+MERGE (p7:ProductRole {id: "analytics_lead"})      SET p7.pref_label = "Analytics Lead";
+WITH 1 AS _
+MATCH (s:SkosConceptScheme {id: "product_roles"})
+MATCH (c:ProductRole)
+MERGE (c)-[:IN_SCHEME]->(s);
