@@ -36,7 +36,7 @@
 # =============================================================================
 
 schema: drydocs.backlog.v2
-updated: 2026-07-18
+updated: 2026-07-20
 
 # ── The high-level project plan (rendered as the board's roadmap strip) ───────
 plan:
@@ -81,7 +81,7 @@ plan:
     - id: 9
       title: Application attribution
       goal: "Jobs attributed to SEAL applications (seal_app_ref) end-to-end — gate-confirmed match policy, loader, verify coverage (Epic K)."
-      status: in_progress   # K1/K2/K3 done (loader BUILT 2026-07-14); K4 reshape-apply + K5 remain; live load is Track-2
+      status: in_progress   # K1-K5 done (K5 gate signed off 2026-07-20); K6 (Cabinet supplement) remains; live load is Track-2
     - id: 10
       title: Documentation infrastructure
       goal: "Every design doc (TDD/Runbook/BRD) conforms to a canonical outline; deterministic md→HTML/PDF render; HITL markup loop (digital + pen/paper) re-attaches to a requirement-traceability spine (Epic L)."
@@ -1798,7 +1798,7 @@ items:
     agent: ontology-mapper
     model: sonnet
     priority: p3
-    status: todo
+    status: done          # DONE 2026-07-20 — gate product-cabinet-attribution §F SIGNED OFF (in-session chat gate; gate-log 2026-07-20)
     depends_on: []
     inputs: [config/gate-log.md, config/taxonomy/lob-product-team.yaml, drydocs_core/ontology/relationship_vocabulary.yaml, config/taxonomy-ontology-map.yaml]
     acceptance: >
@@ -1816,6 +1816,51 @@ items:
       distinct from the SEAL app reshape (K3/K4). CTO is the shared concept between the TOMRole and
       ProductRole schemes. Related to Epic C (catalog hierarchy) — the :Product/:AreaProduct nodes come
       from config/taxonomy/lob-product-team.yaml.
+      DONE 2026-07-20 (in-session chat gate, run off the 2026-07-19 gate-prep; page rendered
+      via gate_pages.py; 24 confirmed / 0 edited / 0 rejected — gate-log 2026-07-20). SME
+      AMENDMENTS vs this item's original wording: (a) CTO is NOT shared — the families are
+      INDEPENDENT (shared-cto dropped for now; rename history: area-product Tech Partner
+      formerly named "CTO" in SEAL, SEAL's CTO now the product-level role — supersedes the
+      2026-07-10 §B record); (b) scheme FIXED; tech_partner joins area_product_owner as
+      :AreaProduct-only; (c) BOTH attribution forms confirmed (reified chain + collapsed
+      catalog_cabinet_attributed_to — deviation from the K4 qualified-only resolution);
+      (d) reporting edges recorded DEFERRED (option b — internal-side once a person-level
+      cabinet extract exists); (e) DevTeam<->BusinessApplication M:N confirmed. Map entry
+      confirmed; 3 vocab entries + ProductRole classification stay planned -> K6 supplement
+      follow-up; no graph write; suite 735.
+
+  - id: K6
+    epic: seal-attribution
+    title: "Product Cabinet supplement: seed the ProductRole scheme (fixed 7, no cto, tech_partner changeNote) and flip the catalog_cabinet_* entries planned -> active"
+    type: task
+    module: ontology
+    phase: 9
+    agent: ontology-mapper
+    model: sonnet
+    priority: p3
+    status: todo
+    depends_on: []
+    inputs: [config/gate-log.md, config/gate-prompts/product-cabinet-attribution.yaml, drydocs_core/ontology/relationship_vocabulary.yaml, drydocs_core/schema/seal_ontology_supplement.cypher, config/taxonomy-ontology-map.yaml]
+    acceptance: >
+      Per the 2026-07-20 K5 gate sign-off (config/gate-log.md), a supplement block
+      (catalog-side, the K4 seal_ontology_supplement idiom) idempotently seeds: the
+      product_roles SkosConceptScheme + EXACTLY the 7 ProductRole concepts (no cto —
+      scheme FIXED, new roles require a new gate); the tech_partner skos:changeNote
+      carrying the rename history verbatim; the :AreaProduct-only scope notes for
+      area_product_owner + tech_partner; and the LocalRelationship terms for the two
+      reified hops + the collapsed form. The three catalog_cabinet_* vocabulary entries
+      flip planned -> active WITH their supplement refs (registration, not data — the K4
+      idiom); the ProductRole node_classifications entry drops its PLANNED marker;
+      schema_graph re-rendered; drift guards + full suite green. NO attribution loader
+      and NO map flip to applied — the loader stays blocked company-side until a
+      person-level PAT cabinet extract exists (honest-lifecycle rule).
+    notes: >
+      Groomed 2026-07-20 directly from the K5 gate sign-off (section F follow-up list;
+      the C9 direct-promotion precedent). The AreaProduct data gap (no rows in the
+      lob-product-team sample; catalog_has_area_product still planned) does NOT block the
+      scheme seed — vocabulary and loader are independent lifecycles (gate §B). The
+      cross-family reporting edges stay DEFERRED (gate §D, internal-side later); nothing
+      in this item touches them.
 
   # ── Epic L — Documentation infrastructure (main) — Phase 10 ───────────────
   # Groomed 2026-07-08 from the deterministic-documentation design conversation.
@@ -3682,8 +3727,8 @@ items:
 # Roll-up the dispatcher can glance at. COMPUTED views — test_backlog.py enforces
 # that these match the items exactly; update them with any status change.
 summary:
-  todo: 22                                          # +G14 +J13 (2026-07-19 groom)
+  todo: 22                                          # K5 -> done, +K6 (2026-07-20 gate sign-off)
   in_progress: 1                                   # E1 (gate deferred)
   blocked: 0
-  done: 90
-  next_ready: [L7, L8, L9, L12, M2, M3, M4, P1, K5, J10, Q6, O9, O12, O13, G14, J13]
+  done: 91                                         # +K5 (gate signed off 2026-07-20)
+  next_ready: [L7, L8, L9, L12, M2, M3, M4, P1, K6, J10, Q6, O9, O12, O13, G14, J13]

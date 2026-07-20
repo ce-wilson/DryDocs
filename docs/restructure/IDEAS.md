@@ -235,6 +235,19 @@ Tags help grooming: `idea` · `bug` · `doc` · `source` (new data source) · `q
 
 <!-- when you promote an idea, move its line here with the resulting backlog id -->
 
+- 2026-07-20 — [task] **K5 Product Cabinet gate RUN + SIGNED OFF in-chat** (same session as
+  the groom below, later in the day; page rendered via gate_pages.py from the in-flight
+  2026-07-19 gate-prep, sections A–E answered in-session, §F signed off — gate-log
+  2026-07-20): map entry confirmed; families INDEPENDENT (shared-cto dropped, rename
+  history recorded — supersedes 2026-07-10 §B); tech_partner :AreaProduct-only; BOTH
+  attribution forms (collapsed catalog_cabinet_attributed_to added); reporting edges
+  DEFERRED (internal-side); DevTeam↔BusinessApplication M:N confirmed. Supplement
+  follow-up promoted directly → **K6** (the C9 direct-promotion precedent); K5 done
+  (todo 22 / done 91). The 07-20 groom entry's "K5 in flight uncommitted" observation is
+  RESOLVED — this session took ownership, committed the stream (K5(1)/K5(2) + this
+  close-out), and the m3_invokes to_node rider stays parked (this gate was
+  Product-Cabinet-scoped; next lineage-vocab gate remains its trigger).
+
 - 2026-07-20 groom run (bare /groom-backlog, day after the weekly run; post history-squash) —
   0 promoted / 0 merged / 1 kept-updated; backlog database untouched (todo 22 / in_progress 1 /
   done 90 stand as of the 07-19 groom):
