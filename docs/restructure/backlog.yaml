@@ -402,6 +402,52 @@ items:
       deprecation → :AisCapability + :AiTool (not yet defined), so the to_node target is provisional
       and re-targets at the gate — SchedulerKind-deprecation captured as its own IDEAS item.
 
+  - id: C10
+    epic: ontology-mapping
+    title: "Convert the external/ServiceNow doc set to readable text and mine each file for CMDB/CSDM concepts DryDocs should adopt"
+    type: task
+    module: reference
+    phase: 2
+    agent: main
+    model: sonnet
+    priority: p2
+    status: todo
+    depends_on: []
+    inputs: ["external/ServiceNow/ (6 files, downloaded 2026-07-20: CMDB - Process Guide.docx, CMDB - Product Architecture.pptx, CMDB Data Manager.pptx, CMDB Governance Workshop.pptx, ITAM - SAM - Product Integration Options - Yokohama.pptx, What are services and service offerings.pdf)", knowledge/upgrade-plans/generic-terminology-research.md, external/orchestration/bmc-controlm/SOURCE-MANIFEST.md, config/classification.yaml, reference/REGISTRY.yaml]
+    acceptance: >
+      (1) HOUSING: external/ServiceNow/ is a registered source — a README/SOURCE-MANIFEST
+      per the bmc-controlm pattern records per-file provenance (source_url where known,
+      download date 2026-07-20, vendor = ServiceNow), the trust axis, and a sensitivity
+      classification SET at execution (External expected — vendor material — but the
+      PDF/PPTX redistribution question is decided and recorded, not assumed);
+      classification guards green. (2) CONVERSION: every file has a readable-text twin
+      (extracted/*.txt or .md — the SDLC-Docs/extracted idiom; pdf via the pypdf
+      precedent, docx/pptx extractor chosen at execution) so agents can grep and read it
+      without binary parsing. (3) ANALYSIS: a per-file detailed analysis note exists
+      (knowledge/upgrade-plans/servicenow-cmdb-analysis.md or similar) — for EACH file
+      the key concepts it defines (service vs service offering, CMDB CI classes, CSDM
+      domains, data-manager/governance practices, ITAM/SAM integration shapes), each
+      dispositioned incorporate/park/reject with its DryDocs target (taxonomy capture,
+      ontology term, terminology-research cross-ref, or ops/console practice); the CSDM
+      service/service-offering model explicitly cross-referenced against the
+      generic-terminology research note (Business Application / Application Portfolio)
+      and our existing labels. (4) THE HARD RULE: nothing is adopted by this item — any
+      concept implying node/edge meaning lands as status: planned/proposed and routes to
+      the HITL gate; the analysis note lists those candidates. Full suite green.
+    notes: >
+      Groomed 2026-07-20 directly from chat (the C9 direct-promotion precedent). User
+      context: during full-circle-docs planning the user considered shipping DryDocs as
+      a ServiceNow Marketplace app (research only — no plan existed) and referenced the
+      CMDB for the taxonomy to create a corresponding ontology; this doc set is that
+      reference material, downloaded 2026-07-20. Feeds the parked generic-terminology
+      idea (SEAL -> Application Portfolio / PAT -> Product Taxonomy) — the CSDM
+      service/service-offering layer is the missing piece of that research. Files stay
+      UNTRACKED until this item's housing step decides classification (no binaries
+      committed before the redistribution question is answered; the extracted text
+      twins may become the committed form if the binaries stay local). Epic/phase call:
+      ontology-mapping / phase 2 because the mining target is ontology correspondence —
+      a future productization epic may adopt the follow-on work.
+
   # ── Epic D — Config-driven loaders (pipeline-config + main) — Phase 3 ──────
   - id: D1
     epic: config-loaders
@@ -3749,8 +3795,8 @@ items:
 # Roll-up the dispatcher can glance at. COMPUTED views — test_backlog.py enforces
 # that these match the items exactly; update them with any status change.
 summary:
-  todo: 20                                          # L8 pulled + done same session (2026-07-20)
+  todo: 21                                          # +C10 (ServiceNow doc-set mining, 2026-07-20)
   in_progress: 1                                   # E1 (gate deferred)
   blocked: 0
   done: 93                                         # +K5 +K6 +L8 (2026-07-20)
-  next_ready: [L7, L9, L12, M2, M3, M4, P1, J10, Q6, O9, O12, O13, G14, J13]
+  next_ready: [C10, L7, L9, L12, M2, M3, M4, P1, J10, Q6, O9, O12, O13, G14, J13]

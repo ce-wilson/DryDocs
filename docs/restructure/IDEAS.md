@@ -251,6 +251,17 @@ Tags help grooming: `idea` · `bug` · `doc` · `source` (new data source) · `q
 
 <!-- when you promote an idea, move its line here with the resulting backlog id -->
 
+- 2026-07-20 — [source] **external/ServiceNow doc set** (6 files downloaded same day: CMDB
+  Process Guide .docx, CMDB Product Architecture / Data Manager / Governance Workshop
+  .pptx, ITAM-SAM Integration Options .pptx, "What are services and service offerings"
+  .pdf) → **C10** (promoted directly from chat, the C9 precedent): housing + SOURCE-MANIFEST
+  + classification decision, readable-text conversion (the SDLC-Docs/extracted idiom),
+  and per-file concept mining dispositioned incorporate/park/reject — feeds the parked
+  generic-terminology idea (the CSDM service/service-offering layer is its missing
+  piece). User context in the item notes: the full-circle-docs-era ServiceNow Marketplace
+  consideration (research only) and the CMDB-for-taxonomy→ontology reference. Files stay
+  untracked until C10's classification step.
+
 - 2026-07-20 — [task] **K5 Product Cabinet gate RUN + SIGNED OFF in-chat** (same session as
   the groom below, later in the day; page rendered via gate_pages.py from the in-flight
   2026-07-19 gate-prep, sections A–E answered in-session, §F signed off — gate-log
