@@ -561,9 +561,13 @@ _FEEDBACK_CSS = """
 .dd-note-box { margin:6px 0 10px; }
 .dd-note-box textarea { width:100%; min-height:56px; font:13px/1.4 "Segoe UI",system-ui,sans-serif; color:var(--ink); background:var(--faint); border:1px solid var(--line); border-radius:6px; padding:8px; resize:vertical; }
 .dd-annotated { box-shadow:-3px 0 0 var(--link); padding-left:8px; }
-.dd-fb-bar { position:fixed; right:16px; bottom:16px; display:flex; gap:8px; align-items:center; background:var(--bg); border:1px solid var(--line); border-radius:10px; padding:8px 12px; box-shadow:0 2px 10px rgba(0,0,0,.15); font-size:13px; z-index:50; }
+.dd-fb-bar { position:fixed; right:16px; bottom:16px; display:flex; flex-direction:column; gap:6px; align-items:stretch; background:var(--bg); border:1px solid var(--line); border-radius:10px; padding:8px 12px; box-shadow:0 2px 10px rgba(0,0,0,.15); font-size:13px; z-index:50; }
+.dd-fb-row { display:flex; gap:8px; align-items:center; justify-content:space-between; }
 .dd-fb-bar button { cursor:pointer; border:1px solid var(--link); background:var(--link); color:#fff; border-radius:6px; padding:5px 10px; font-size:13px; }
 .dd-fb-bar .dd-badge { font-weight:700; }
+.dd-fb-file { cursor:pointer; font-size:11px; color:var(--mid); white-space:nowrap; }
+.dd-fb-file code { font-size:11px; }
+.dd-fb-file:hover code { color:var(--link); }
 .dd-toast { position:fixed; right:16px; bottom:64px; background:var(--ink); color:var(--bg); padding:8px 12px; border-radius:8px; font-size:13px; z-index:60; opacity:0; transition:opacity .2s; }
 .dd-toast.show { opacity:1; }
 .dd-sme-feedback ol li { margin: 6px 0; }
@@ -572,7 +576,7 @@ _FEEDBACK_CSS = """
 
 _FEEDBACK_JS = r"""
 (function(){
-  var DOC="__DOCID__", KEY="drydocs-doc-feedback:"+DOC;
+  var DOC="__DOCID__", FILE="__FBFILE__", DIR="docs/design/feedback/", KEY="drydocs-doc-feedback:"+DOC;
   function load(){ try{return JSON.parse(localStorage.getItem(KEY)||"{}");}catch(e){return {};} }
   function save(){ localStorage.setItem(KEY, JSON.stringify(state)); }
   var state=load(), badge;
@@ -600,24 +604,41 @@ _FEEDBACK_JS = r"""
     if(el.tagName==="LI"){ el.insertAdjacentElement("afterbegin", btn); el.appendChild(box); }
     else { el.insertAdjacentElement("afterend", box); el.insertAdjacentElement("beforebegin", btn); }
   }
+  function copyText(txt, ok){
+    var done=function(){toast(ok);};
+    var fallback=function(){ var t=document.createElement("textarea"); t.value=txt; document.body.appendChild(t); t.select(); try{document.execCommand("copy"); toast(ok);}catch(e){toast("copy failed — select the box");} t.remove(); };
+    if(navigator.clipboard&&navigator.clipboard.writeText){ navigator.clipboard.writeText(txt).then(done,fallback); } else { fallback(); }
+  }
+  function fileLine(label, value){
+    var d=document.createElement("div"); d.className="dd-fb-file"; d.title="click to copy";
+    var c=document.createElement("code"); c.textContent=value;
+    d.appendChild(document.createTextNode(label+" ")); d.appendChild(c);
+    d.addEventListener("click",function(){ copyText(value, label.replace(":","")+" copied"); });
+    return d;
+  }
   document.addEventListener("DOMContentLoaded",function(){
     document.querySelectorAll("main [id]").forEach(attach);
     var bar=document.createElement("div"); bar.className="dd-fb-bar";
+    var row=document.createElement("div"); row.className="dd-fb-row";
     var lbl=document.createElement("span"); lbl.innerHTML='notes <span class="dd-badge">0</span>'; badge=lbl.querySelector(".dd-badge");
     var ex=document.createElement("button"); ex.type="button"; ex.textContent="Copy feedback";
-    ex.addEventListener("click",function(){ var y=exportYaml();
-      var done=function(){toast("feedback copied — paste into docs/design/feedback/");};
-      if(navigator.clipboard&&navigator.clipboard.writeText){ navigator.clipboard.writeText(y).then(done,function(){fallback(y);}); } else { fallback(y); }
-    });
-    function fallback(y){ var t=document.createElement("textarea"); t.value=y; document.body.appendChild(t); t.select(); try{document.execCommand("copy"); toast("feedback copied");}catch(e){toast("copy failed — select the box");} t.remove(); }
-    bar.appendChild(lbl); bar.appendChild(ex); document.body.appendChild(bar); refresh();
+    ex.addEventListener("click",function(){ copyText(exportYaml(), "feedback copied — create "+DIR+FILE); });
+    row.appendChild(lbl); row.appendChild(ex);
+    bar.appendChild(row);
+    bar.appendChild(fileLine("file:", FILE));
+    bar.appendChild(fileLine("path:", DIR+FILE));
+    document.body.appendChild(bar); refresh();
   });
 })();
 """
 
 
-def _feedback_html(doc_id: str) -> str:
-    return f"<script>\n{_FEEDBACK_JS.replace('__DOCID__', doc_id)}\n</script>"
+def _feedback_html(doc_id: str, feedback_fname: str) -> str:
+    # feedback_fname is slug-derived (sme_feedback_filename) but the replace-escape keeps
+    # the JS string literal well-formed for any caller-supplied doc_id.
+    safe = feedback_fname.replace("\\", "\\\\").replace('"', '\\"')
+    js = _FEEDBACK_JS.replace("__DOCID__", doc_id).replace("__FBFILE__", safe)
+    return f"<script>\n{js}\n</script>"
 
 
 def render_doc(md: str, doc_id: str | None = None) -> str:
@@ -638,7 +659,7 @@ def render_doc(md: str, doc_id: str | None = None) -> str:
     body = f"{body}\n{_sme_feedback_panel(doc_id, md)}"
     footer = f'<footer class="dd-print-footer">{html.escape(doc_rev_footer(md))}</footer>\n'
     did = html.escape(doc_id, quote=True)
-    feedback = _feedback_html(did)
+    feedback = _feedback_html(did, sme_feedback_filename(doc_id, md))
     return (
         "<!doctype html>\n<html lang=\"en\">\n<head>\n<meta charset=\"utf-8\">\n"
         '<meta name="viewport" content="width=device-width, initial-scale=1">\n'

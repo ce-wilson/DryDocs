@@ -116,6 +116,21 @@ def test_feedback_layer_present_and_hidden_in_print() -> None:
     ) in html
 
 
+def test_fb_bar_carries_prewritten_feedback_file_and_path() -> None:
+    # The bottom-right toolbar bakes in the exact per-doc feedback filename (declared Rev
+    # included) plus its docs/design/feedback/ path as click-to-copy lines, so the SME can
+    # paste them straight into a create-file dialog.
+    md = (
+        "# Doc\n\n<!-- anchor: front-matter -->\n- **Status:** DRAFT **Rev 3, 2026-07-20**\n\n"
+        "<!-- anchor: purpose-scope -->\n## Purpose\ntext"
+    )
+    html = render_doc(md)
+    assert "__FBFILE__" not in html, "filename placeholder was not substituted"
+    assert 'FILE="doc-rev3.yaml"' in html
+    assert 'DIR="docs/design/feedback/"' in html
+    assert "dd-fb-file" in html  # the two toolbar lines render from these constants
+
+
 def test_feedback_yaml_format() -> None:
     out = feedback_yaml("controlm-ingestion-tdd", {"traceability-matrix": "row FR-CMI-003 is wrong\ncheck stage 1", "hitl-gate": ""})
     assert out == (
