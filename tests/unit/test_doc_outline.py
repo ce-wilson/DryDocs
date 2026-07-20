@@ -13,6 +13,8 @@ from drydocs.doc_outline import Outline, check, feedback_anchor_valid, load_outl
 REPO_ROOT = Path(__file__).resolve().parents[2]
 TDD_OUTLINE = REPO_ROOT / "docs" / "design" / "templates" / "tdd.outline.yaml"
 CONTROLM_TDD = REPO_ROOT / "docs" / "design" / "controlm-ingestion-tdd.md"
+RUNBOOK_OUTLINE = REPO_ROOT / "docs" / "design" / "templates" / "runbook.outline.yaml"
+STARTUP_RUNBOOK = REPO_ROOT / "docs" / "design" / "drydocs-startup-refresh-runbook.md"
 
 
 def _outline(mode: str = "strict") -> Outline:
@@ -136,6 +138,33 @@ def test_every_committed_tdd_conforms_to_outline() -> None:
     for tdd in tdds:
         problems = validate_paths(TDD_OUTLINE, tdd)
         assert problems == [], f"{tdd.name} drifted from tdd.outline.yaml:\n  " + "\n  ".join(problems)
+
+
+# ── L8: the Runbook — the second doc type through the same contract ───────────
+def test_real_runbook_outline_loads() -> None:
+    outline = load_outline(RUNBOOK_OUTLINE)
+    assert outline.doc_type == "Runbook"
+    # the runbook's proof surface is its verify section, not a traceability matrix
+    assert "verify" in outline.required_anchors()
+    assert not outline.traceability.get("matrix_section")
+
+
+def test_startup_refresh_runbook_conforms_to_outline() -> None:
+    problems = validate_paths(RUNBOOK_OUTLINE, STARTUP_RUNBOOK)
+    assert problems == [], (
+        "startup/refresh runbook drifted from runbook.outline.yaml:\n  " + "\n  ".join(problems)
+    )
+
+
+def test_every_committed_runbook_conforms_to_outline() -> None:
+    """Every docs/design/*-runbook.md validates — new runbooks are auto-covered."""
+    runbooks = sorted((REPO_ROOT / "docs" / "design").glob("*-runbook.md"))
+    assert runbooks, "no committed runbooks found"
+    for rb in runbooks:
+        problems = validate_paths(RUNBOOK_OUTLINE, rb)
+        assert problems == [], (
+            f"{rb.name} drifted from runbook.outline.yaml:\n  " + "\n  ".join(problems)
+        )
 
 
 # ── L11: derived subsection anchors in the feedback namespace ─────────────────

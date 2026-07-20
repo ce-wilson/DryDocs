@@ -1,0 +1,115 @@
+# =============================================================================
+# runbook.outline.yaml — the CANONICAL outline every DryDocs Runbook conforms to.
+# The SECOND doc type in the Epic L system (L8, the capstone), proving the
+# doc-outline contract generalizes beyond the TDD (tdd.outline.yaml, L1).
+#
+# Same linchpin rule as the TDD outline: each section has a STABLE, AUTHORED
+# `anchor` — the id namespace the completeness validator checks, the deterministic
+# renderer emits as element ids, and HITL markup (L5 digital save-button / L6
+# scanned pen note) re-attaches to. Anchors are authored, never positional; never
+# use `--` inside an anchor id (L11 reserves it for derived subsection anchors).
+#
+# SECTION SET (decision at L8 grooming, backlog acceptance verbatim): purpose/scope,
+# prerequisites, startup, refresh/ingest, verify, rollback, troubleshooting,
+# contacts/escalation — plus front-matter, carried over from the TDD outline because
+# the L6 Rev/commit print footer derives from it and every doc type needs the
+# classification declared there.
+#
+# NO TRACEABILITY BLOCK (decision, 2026-07-20 — L8): the requirements traceability
+# matrix is the TDD's spine; a runbook has procedures, not requirements. The verify
+# section IS the runbook's proof surface — each procedure states its check inline.
+# If a runbook ever needs requirement-level tracking, add the `traceability:` block
+# here (the validator already supports it) rather than inventing a per-doc format.
+#
+# VALIDATION: drydocs/doc_outline.py; tests/unit/test_doc_outline.py sweeps every
+# docs/design/*-runbook.md against this outline (the *-tdd.md auto-sweep idiom).
+# A required section may be satisfied by an explicit "N/A — <reason>"; the anchor
+# must still be present.
+# =============================================================================
+
+schema: drydocs.doc-outline.v1
+doc_type: Runbook
+title: Operational Runbook
+classification: Internal-Public          # this template carries no real data
+updated: 2026-07-20
+
+source_templates:
+  - "tdd.outline.yaml (L1 — the doc-outline schema + front-matter/anchor conventions)"
+  - "backlog L8 acceptance (the eight-section runbook shape, groomed 2026-07-08)"
+
+sections:
+  - anchor: front-matter
+    heading: "Front matter"
+    required: true
+    guidance: >
+      Status + Rev + date + the commit the procedure reflects (the L6 print footer
+      derives "Rev N · commit <hash>" from this text); Classification (per
+      config/classification.yaml); Audience; Companion docs.
+
+  - anchor: purpose-scope
+    heading: "Purpose & scope"
+    required: true
+    guidance: >
+      What operation this runbook covers and when to reach for it; explicitly
+      in-scope vs out-of-scope (environments, data tiers, who runs it).
+
+  - anchor: prerequisites
+    heading: "Prerequisites"
+    required: true
+    guidance: >
+      Everything that must already be true before step 1: tooling, containers,
+      credentials/.env (NAMES only — secrets never appear in a runbook),
+      permissions, reference docs.
+
+  - anchor: startup
+    heading: "Startup"
+    required: true
+    guidance: >
+      Bring the system from OFF to READY, numbered steps with the exact commands.
+      Each step says what success looks like before the next step runs.
+
+  - anchor: refresh-ingest
+    heading: "Refresh / ingest"
+    required: true
+    guidance: >
+      The recurring data-load procedure on a READY system: the ingest chain, its
+      variants (sample vs live source), and the derived artifacts that must be
+      regenerated with it (renders, snapshots).
+
+  - anchor: verify
+    heading: "Verify"
+    required: true
+    guidance: >
+      The pass/fail checks that prove startup/refresh worked — commands, their
+      expected output shape, and where the canonical expected values live. A
+      runbook without a verify section is a hope, not a procedure.
+
+  - anchor: rollback
+    heading: "Rollback"
+    required: true
+    guidance: >
+      How to get back to a known-good state when a step fails: idempotent re-run
+      guidance, soft-delete/sweep mechanics, and the destructive last resort with
+      its blast radius stated. Mark "N/A — <reason>" only if truly nothing is
+      reversible.
+
+  - anchor: troubleshooting
+    heading: "Troubleshooting"
+    required: true
+    guidance: >
+      Known failure modes as symptom → diagnosis → fix, each grounded in a real
+      incident or test where possible. Link the deeper internal notes rather than
+      duplicating them.
+
+  - anchor: contacts-escalation
+    heading: "Contacts & escalation"
+    required: true
+    guidance: >
+      Who owns this procedure, who decides when it's ambiguous (the HITL gate for
+      anything touching edge meaning), and where escalation routes. Role-based —
+      no personal data beyond what the repo already records.
+
+  - anchor: appendices
+    heading: "Appendices"
+    required: false
+    guidance: "Expected-output listings, long command references, environment tables."

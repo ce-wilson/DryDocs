@@ -1,0 +1,193 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Runbook — DryDocs local startup &amp; refresh (EE container + sample ingest)</title>
+<style>
+:root { color-scheme: light dark; --ink:#1a1a1a; --mid:#555; --line:#d0d0d0; --faint:#f6f6f6; --bg:#fff; --link:#0a58ca; }
+@media (prefers-color-scheme: dark) { :root { --ink:#e6e6e6; --mid:#a0a0a0; --line:#3a3a3a; --faint:#1c1c1c; --bg:#141414; --link:#6ea8fe; } }
+:root[data-theme="dark"] { --ink:#e6e6e6; --mid:#a0a0a0; --line:#3a3a3a; --faint:#1c1c1c; --bg:#141414; --link:#6ea8fe; }
+:root[data-theme="light"] { --ink:#1a1a1a; --mid:#555; --line:#d0d0d0; --faint:#f6f6f6; --bg:#fff; --link:#0a58ca; }
+* { box-sizing: border-box; }
+body { font: 15px/1.6 "Segoe UI", system-ui, Arial, sans-serif; color: var(--ink); background: var(--bg); margin: 0; }
+main { max-width: 900px; margin: 0 auto; padding: 32px 24px 80px; }
+h1 { font-size: 28px; margin: 0 0 6px; letter-spacing:-0.3px; }
+h2 { font-size: 20px; margin: 34px 0 10px; padding-bottom:5px; border-bottom: 2px solid var(--ink); }
+h3 { font-size: 16px; margin: 22px 0 8px; }
+h4,h5,h6 { font-size: 14px; margin: 16px 0 6px; }
+p { margin: 10px 0; } strong { font-weight: 700; }
+a { color: var(--link); } a:hover { text-decoration: underline; }
+code { font-family: "Cascadia Mono","Consolas",monospace; font-size: 0.88em; background: var(--faint); padding: 1px 4px; border-radius: 3px; }
+pre { font-family: "Cascadia Mono","Consolas",monospace; font-size: 12.5px; line-height:1.45; border:1px solid var(--line); background: var(--faint); padding: 12px 14px; border-radius: 6px; overflow-x: auto; }
+pre code { background: none; padding: 0; }
+table { border-collapse: collapse; margin: 14px 0; font-size: 13.5px; display:block; overflow-x:auto; }
+th,td { border:1px solid var(--line); padding: 6px 9px; text-align:left; vertical-align: top; }
+th { background: var(--faint); font-weight:700; }
+blockquote { margin: 14px 0; padding: 2px 16px; border-left: 4px solid var(--line); color: var(--mid); }
+ul,ol { margin: 10px 0; padding-left: 26px; } li { margin: 4px 0; }
+hr { border:none; border-top:1px solid var(--line); margin: 26px 0; }
+:target { scroll-margin-top: 12px; } :target > :first-child, h2:target, h3:target { outline: 2px solid var(--link); outline-offset: 4px; }
+.dd-margin-tag, .dd-print-footer { display: none; }
+
+.dd-note-btn { border:1px solid var(--line); background:var(--bg); color:var(--mid); cursor:pointer; font-size:12px; line-height:1; padding:2px 6px; border-radius:5px; margin-right:6px; }
+.dd-note-btn:hover { color:var(--link); border-color:var(--link); }
+.dd-note-box { margin:6px 0 10px; }
+.dd-note-box textarea { width:100%; min-height:56px; font:13px/1.4 "Segoe UI",system-ui,sans-serif; color:var(--ink); background:var(--faint); border:1px solid var(--line); border-radius:6px; padding:8px; resize:vertical; }
+.dd-annotated { box-shadow:-3px 0 0 var(--link); padding-left:8px; }
+.dd-fb-bar { position:fixed; right:16px; bottom:16px; display:flex; gap:8px; align-items:center; background:var(--bg); border:1px solid var(--line); border-radius:10px; padding:8px 12px; box-shadow:0 2px 10px rgba(0,0,0,.15); font-size:13px; z-index:50; }
+.dd-fb-bar button { cursor:pointer; border:1px solid var(--link); background:var(--link); color:#fff; border-radius:6px; padding:5px 10px; font-size:13px; }
+.dd-fb-bar .dd-badge { font-weight:700; }
+.dd-toast { position:fixed; right:16px; bottom:64px; background:var(--ink); color:var(--bg); padding:8px 12px; border-radius:8px; font-size:13px; z-index:60; opacity:0; transition:opacity .2s; }
+.dd-toast.show { opacity:1; }
+.dd-sme-feedback ol li { margin: 6px 0; }
+@media print { .dd-note-btn, .dd-note-box, .dd-fb-bar, .dd-toast, .dd-sme-feedback, .dd-sme-divider { display:none !important; } }
+@page { size: Letter; margin: 0.6in 0.62in 0.55in 0.62in; }
+@media print {
+:root, :root[data-theme="dark"], :root[data-theme="light"] { color-scheme: light; --ink:#1a1a1a; --mid:#555; --line:#bdbdbd; --fill:#eee; --faint:#f6f6f6; --bg:#fff; --link:#0a58ca; }
+html { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+body { font: 10.5px/1.45 "Segoe UI", system-ui, Arial, sans-serif; }
+main { max-width: 7.2in; margin: 0 auto; padding: 0 0 0 0.62in; position: relative; }
+h1 { font-size: 21px; margin: 0 0 2px; letter-spacing:-0.2px; }
+h2 { font-size: 14px; margin: 16px 0 8px; padding-bottom:4px; border-bottom: 2px solid var(--ink); text-transform: uppercase; letter-spacing: 0.6px; }
+h3 { font-size: 11.5px; margin: 13px 0 5px; padding-bottom:2px; border-bottom:1px solid var(--line); }
+h4,h5,h6 { font-size: 10.5px; margin: 9px 0 4px; }
+p { margin: 6px 0; }
+a { color: inherit; text-decoration: underline; }
+code { font-size: 9.2px; padding: 0 2px; border-radius: 2px; }
+table { display: table; width:100%; margin: 7px 0; font-size: 9.1px; overflow-x: visible; }
+th, td { padding: 3px 5px; }
+th { background: var(--fill); }
+td code, th code { background: transparent; padding: 0; }
+pre { font-size: 8.4px; line-height: 1.35; padding: 7px 9px; margin: 7px 0; white-space: pre; overflow: hidden; border-radius: 3px; }
+pre.sql { background:#fbfbfb; }
+blockquote { margin: 7px 0; padding: 2px 10px; border-left: 3px solid var(--line); break-inside: avoid; }
+ul,ol { margin: 6px 0 6px 16px; padding: 0; } li { margin: 3px 0; }
+hr { margin: 10px 0; }
+h2, h3, table, pre { break-inside: avoid; }
+
+/* L6 paper HITL: each anchored block sits in the left gutter (main's own padding-left,
+   reserved above) so a printed page carries the anchor id beside its section — no @page
+   margin-box support required, so headless Chromium print-to-pdf renders it reliably. */
+h1, h2, h3, h4, h5, h6, p, table, pre, ul, ol, blockquote { position: relative; }
+.dd-margin-tag {
+  display: block; position: absolute; left: -0.6in; top: 0.1em; width: 0.54in;
+  font: 6.2px/1.15 "Cascadia Mono","Consolas",monospace; text-align: right;
+  color: var(--mid); letter-spacing: 0.1px; word-break: break-word;
+}
+/* Rev/commit footer: `position: fixed` repeats on every printed page in Chromium's
+   headless print-to-pdf (the standard running-footer technique) without needing CSS
+   Paged-Media margin-box content(), which Chromium supports only partially. */
+.dd-print-footer {
+  display: block; position: fixed; left: 0.62in; right: 0.62in; bottom: 0.12in;
+  font-size: 8px; color: var(--mid); text-align: center;
+  border-top: 1px solid var(--line); padding-top: 3px;
+}
+}
+</style>
+</head>
+<body>
+<main>
+<h1>Runbook — DryDocs local startup &amp; refresh (EE container + sample ingest)</h1>
+<p id="front-matter"><span class="dd-margin-tag" aria-hidden="true">front-matter</span><strong>Status:</strong> DESCRIPTIVE — documents the working procedure. <strong>Rev 1, 2026-07-20</strong> (authored at L8; content reflects commit <code>0acc0f8</code>: post-D6 quick-start with step 3b, post-D7 sweep, post-K6 supplements) · <strong>Classification:</strong> Internal (operational metadata — local host-port mapping and container names, the same class as <code>internal/helpmeloginlocalneo4j.md</code>; NO credentials — the password lives only in the repo-root <code>.env</code>, never here) · <strong>Audience:</strong> anyone bringing a local DryDocs graph up from nothing, or refreshing one that exists · <strong>Companion:</strong> <code>internal/repo-README.md</code> (the runnable pipeline + CLI reference), <code>internal/helpmeloginlocalneo4j.md</code> (login/port troubleshooting evidence), <code>.claude/skills/run-drydocs/SKILL.md</code> (agent-facing run notes).</p>
+<p>This is the Epic L capstone exemplar: the second doc type rendered and validated by the same outline system as the TDDs (<code>docs/design/templates/runbook.outline.yaml</code>).</p>
+<hr>
+<h2 id="purpose-scope"><span class="dd-margin-tag" aria-hidden="true">purpose-scope</span>Purpose &amp; scope</h2>
+<p><strong>Purpose.</strong> Bring a local DryDocs knowledge graph from OFF to VERIFIED — Docker container up, schema bootstrapped, sample data ingested, invariants green — and run the recurring refresh on a graph that already exists.</p>
+<p><strong>In scope.</strong> The local Neo4j Enterprise Docker container; the bundled-sample ingest chain (no Oracle needed); the Oracle-scoped variant as a pointer; the derived artifacts that refresh alongside the graph (board, design renders, depgraph snapshot).</p>
+<p><strong>Out of scope.</strong> Company-side production ingest (Track-2 — the port-prompt and the company Control-M ingestion TDD own that), the web console (Epic O), and the multi-DB provisioning topology beyond a first-time pointer (G1&#x27;s <code>provision.ps1</code> README owns it).</p>
+<h2 id="prerequisites"><span class="dd-margin-tag" aria-hidden="true">prerequisites</span>Prerequisites</h2>
+<ol><li id="prerequisites--docker-desktop-running-with-the-neo4j"><strong>Docker Desktop</strong> running, with the Neo4j <strong>Enterprise</strong> container present — locally <code>neo4j-drydocs-ee</code> (Neo4j 2026.05.0 EE, host ports <strong>7476</strong> HTTP / <strong>7689</strong> Bolt as of 2026-07-03). Any EE container works; the <em>actual</em> host ports are whatever <code>docker port &lt;container&gt;</code> says — never assume the 7474/7687 defaults.</li><li id="prerequisites--toolchain-pipx-installed-poetry-with-the"><strong>Toolchain:</strong> pipx-installed Poetry with the in-project <code>.venv</code> synced (<code>poetry install</code>). Run everything through <code>poetry run</code> — the bare <code>drydocs.cmd</code> Store-venv wrapper mis-reports exit codes (a known wrapper artifact, not a CLI bug).</li><li id="prerequisites--env-at-the-repo-root-with"><strong><code>.env</code> at the repo root</strong> with the connection settings the CLI and <code>scripts/ingest.sh</code> read: <code>NEO4J_URI</code> (e.g. <code>bolt://localhost:7689</code>), <code>NEO4J_USER</code>, <code>NEO4J_PASSWORD</code>. Secrets live ONLY here — <code>.env</code> is gitignored; nothing in this runbook or any committed file carries the password.</li><li id="prerequisites--reference-docs-at-hand-internal-repo-rea"><strong>Reference docs at hand:</strong> <code>internal/repo-README.md</code> §Quick start (the canonical command chain this runbook operationalizes) and <code>internal/helpmeloginlocalneo4j.md</code> (if login misbehaves).</li></ol>
+<h2 id="startup"><span class="dd-margin-tag" aria-hidden="true">startup</span>Startup</h2>
+<p>From OFF to READY. Each step states its success check — do not proceed past a failed check; go to Troubleshooting.</p>
+<ol><li id="startup--start-the-container-powershell-docker-st"><strong>Start the container:</strong> ``<code>powershell docker start neo4j-drydocs-ee docker port neo4j-drydocs-ee        # confirm the real host ports </code>`<code> *Success:* </code>docker ps<code> shows the container up; </code>docker logs<code> ends with </code>INFO  Started.<code>; the port mapping matches what </code>.env<code>&#x27;s </code>NEO4J_URI` expects.</li><li id="startup--connectivity-apoc-powershell-poetry-run"><strong>Connectivity + APOC:</strong> ``<code>powershell poetry run drydocs check </code>`` <em>Success:</em> exit 0 — server version and APOC reported.</li><li id="startup--schema-backbone-then-the-three-domain"><strong>Schema backbone, then the three domain supplements</strong> (order matters — <code>catalog_ontology_supplement.cypher</code> owns the canonical <code>:Role</code> seeds the SEAL/PAT loaders MATCH at runtime, and since K6 also the <code>product_roles</code> ProductRole scheme): ``<code>powershell poetry run drydocs bootstrap                   # constraints.cypher + ontology.cypher poetry run drydocs apply-ontology-supplement   # Control-M anchor terms poetry run drydocs apply-seal-supplement       # SEAL domain terms (TOM scheme) poetry run drydocs apply-catalog-supplement    # Catalog/PAT terms + Role seeds + Product Cabinet </code>`` <em>Success:</em> each command exits 0; all four are idempotent — re-running is safe.</li><li id="startup--first-time-only-multi-db-topology-drydoc"><strong>First-time only — multi-DB topology</strong> (drydocs + ddlineage + ddcontext + the ddall composite): run the G1 provisioning per <code>drydocs_core/schema/provisioning/README.md</code> (<code>provision.ps1</code>). Skip on an already-provisioned container.</li></ol>
+<h2 id="refresh-ingest"><span class="dd-margin-tag" aria-hidden="true">refresh-ingest</span>Refresh / ingest</h2>
+<p>The recurring load on a READY system. Everything below runs against the bundled CSV samples; the Oracle variant is the same chain with scope binds.</p>
+<ol><li id="refresh-ingest--reference-data-m1-chain-powershell-poetr"><strong>Reference data (M1 chain):</strong> ``<code>powershell poetry run drydocs refresh-reference           # catalog + SEAL + dev teams (+ snapshots) </code>``</li><li id="refresh-ingest--control-m-m3-chain-powershell-poetry-run"><strong>Control-M (M3 chain):</strong> ``<code>powershell poetry run drydocs ingest-controlm             # folders -&gt; jobs -&gt; conditions -&gt; derived deps </code>`<code> Oracle-scoped variant: </code>poetry run drydocs ingest-controlm --use-oracle --folder &#x27;&lt;pattern&gt;%&#x27;<code> (the </code>--folder` value is a bind variable, injection-safe).</li><li id="refresh-ingest--demonstrable-content-after-any-container"><strong>Demonstrable content — after ANY container rebuild</strong> (a fresh container has none of these corpora; the loaders are idempotent, re-running on a live container is safe): ``<code>powershell poetry run drydocs load-software-registry poetry run drydocs load-bmc-docs poetry run drydocs load-essential-graphrag     # optional (-&gt; ddcontext) </code>``</li><li id="refresh-ingest--one-shot-alternative-scripts-ingest-sh-a"><strong>One-shot alternative:</strong> <code>scripts/ingest.sh [args…]</code> runs check → bootstrap → supplements → ingest-controlm → m1/m3-verify in order and fails fast; arguments are forwarded to the <code>ingest-controlm</code> step.</li><li id="refresh-ingest--derived-artifacts-the-session-ritual"><strong>Derived artifacts</strong> (the session ritual — renders are deterministic, so a clean tree stays clean): ``<code>powershell knowledge\depgraph-snapshots\snapshot.ps1      # board + design-doc renders + dated depgraph JSON </code>``</li></ol>
+<h2 id="verify"><span class="dd-margin-tag" aria-hidden="true">verify</span>Verify</h2>
+<ol><li id="verify--graph-invariants-powershell-poetry-run-d"><strong>Graph invariants:</strong> ``<code>powershell poetry run drydocs m1-verify poetry run drydocs m3-verify </code>`<code> *Success:* both exit 0, every invariant </code>yes<code> — including &quot;active folders contain at least one job&quot; (</code>empty=0<code> since D6). The canonical expected </code>m3-verify<code> output for the bundled samples (17 jobs, 8 distinct </code>WAS_INFORMED_BY<code> edges, </code>apps=0<code> sample-mode note) lives in </code>internal/repo-README.md` — reconcile there, not from memory.</li><li id="verify--unit-suite-no-neo4j-needed-powershell"><strong>Unit suite</strong> (no Neo4j needed): ``<code>powershell poetry run pytest -q </code>`` <em>Success:</em> 0 failures (skips for gitignored production CSVs are expected).</li><li id="verify--stale-render-check-after-snapshot-ps1-gi"><strong>Stale-render check:</strong> after <code>snapshot.ps1</code>, <code>git diff --quiet docs/plan/board.html docs/design/*.html</code> — any diff means a committed render didn&#x27;t match its source; commit the refresh.</li></ol>
+<h2 id="rollback"><span class="dd-margin-tag" aria-hidden="true">rollback</span>Rollback</h2>
+<p>Known-good is cheap here because every loader MERGEs idempotently.</p>
+<ol><li id="rollback--a-failed-or-partial-ingest-just"><strong>A failed or partial ingest:</strong> just re-run the chain — loaders converge on source state; no manual cleanup of duplicates is ever needed.</li><li id="rollback--jobs-folders-that-vanished-from-the-sour"><strong>Jobs/folders that vanished from the source:</strong> the load only soft-MARKS them (<code>removed_from_source_at</code>, D7). Inspect before deleting: ``<code>powershell poetry run drydocs sweep-removed --days 30 --dry-run poetry run drydocs sweep-removed --days 30 --yes    # hard-delete past retention </code>``</li><li id="rollback--container-level-docker-stop-is-always-sa"><strong>Container-level:</strong> <code>docker stop</code> is always safe — graph data lives in the named volume and survives restarts. Recreating the <em>container</em> can remap host ports (re-check <code>docker port</code>, update <code>.env</code>); deleting the <em>volume</em> loses the graph — the recovery is this runbook from Startup step 3, including Refresh step 3 (the document corpora live only in the DB).</li><li id="rollback--destructive-last-resort-poetry-run-drydo"><strong>Destructive last resort:</strong> <code>poetry run drydocs reset --yes</code> DETACH-DELETEs every node and relationship in the default DB. Blast radius: the whole graph, including gate-accepted corpora loads. Recovery: Startup steps 3–4 + the full Refresh section.</li></ol>
+<h2 id="troubleshooting"><span class="dd-margin-tag" aria-hidden="true">troubleshooting</span>Troubleshooting</h2>
+<p>Symptom → diagnosis → fix. Deep evidence lives in <code>internal/helpmeloginlocalneo4j.md</code>; don&#x27;t duplicate it here.</p>
+<table><thead><tr><th>Symptom</th><th>Diagnosis</th><th>Fix</th></tr></thead><tbody><tr><td>Browser URL returns raw JSON (<code>{&quot;auth_config&quot;:…}</code>)</td><td>You browsed to the <strong>Bolt</strong> host port</td><td><code>docker port &lt;container&gt;</code> → use the 7474-mapped port for the Browser, the 7687-mapped one in <code>NEO4J_URI</code> (2026-07-02 incident)</td></tr><tr><td>Login fails, container log clean</td><td>Wrong host port or stale password</td><td><code>docker inspect &lt;container&gt; --format &#x27;{{.Config.Env}}&#x27;</code> → compare <code>NEO4J_AUTH</code> with <code>.env</code></td></tr><tr><td><code>drydocs check</code> fails</td><td>Container down, or <code>.env</code> points at old ports</td><td><code>docker ps</code> / <code>docker port</code>; update <code>.env</code></td></tr><tr><td><code>m1-verify</code>/<code>m3-verify</code> errors immediately</td><td>They need a LIVE Neo4j + APOC</td><td>Run Startup steps 1–3 first; the unit suite is the no-DB check</td></tr><tr><td>A supplement fails on a comment <code>;</code></td><td>Pre-D5 splitter on an old checkout</td><td>Update — <code>run_script</code> splits client-side since D5 (<code>drydocs_core/cypher_split.py</code>); comment semicolons can&#x27;t shear</td></tr><tr><td>Corpus queries return nothing after a rebuild</td><td>Fresh container: document corpora live only in the DB</td><td>Refresh step 3 (the D6 step-3b reloads)</td></tr><tr><td><code>drydocs</code> exits −1 outside <code>poetry run</code></td><td>Store-venv <code>drydocs.cmd</code> wrapper artifact</td><td>Always <code>poetry run drydocs …</code> (G2 finding)</td></tr></tbody></table>
+<h2 id="contacts-escalation"><span class="dd-margin-tag" aria-hidden="true">contacts-escalation</span>Contacts &amp; escalation</h2>
+<ul><li><strong>Owner / SME:</strong> the repo owner (sign-offs recorded in <code>config/gate-log.md</code>); this is a single-operator sandbox — there is no on-call rotation to page.</li><li><strong>Ambiguity rule:</strong> anything touching relationship/edge meaning is NEVER decided from a runbook — it routes through the HITL gate (<code>docs/restructure/03-hitl-sme-flow.md</code>); everything else ambiguous goes to <code>docs/restructure/IDEAS.md</code> for the next groom.</li><li><strong>Company-side escalation:</strong> N/A here — SCIM/escalation-queue routing belongs to the company runbook-automation workflow (<code>.claude/skills/controlm-runbook-automation</code>), not to this local procedure.</li></ul>
+<h2 id="appendices"><span class="dd-margin-tag" aria-hidden="true">appendices</span>Appendices</h2>
+<p><strong>A. Current local environment (2026-07-20; verify with <code>docker port</code>, never assume):</strong></p>
+<table><thead><tr><th>Item</th><th>Value</th></tr></thead><tbody><tr><td>Container</td><td><code>neo4j-drydocs-ee</code> (Neo4j 2026.05.0 Enterprise)</td></tr><tr><td>HTTP / Browser</td><td>container 7474 → host <strong>7476</strong> (<code>http://localhost:7476/browser/</code>)</td></tr><tr><td>Bolt</td><td>container 7687 → host <strong>7689</strong> (<code>bolt://localhost:7689</code>)</td></tr><tr><td>Databases</td><td><code>drydocs</code>, <code>ddlineage</code>, <code>ddcontext</code> + composite <code>ddall</code> (G1/G7)</td></tr><tr><td>Credentials</td><td><code>.env</code> only (<code>NEO4J_URI</code> / <code>NEO4J_USER</code> / <code>NEO4J_PASSWORD</code>)</td></tr></tbody></table>
+<p><strong>B. The full cold-start command sequence,</strong> in one block (each step&#x27;s success check is in the sections above):</p>
+<pre class="powershell"><code>docker start neo4j-drydocs-ee
+poetry run drydocs check
+poetry run drydocs bootstrap
+poetry run drydocs apply-ontology-supplement
+poetry run drydocs apply-seal-supplement
+poetry run drydocs apply-catalog-supplement
+poetry run drydocs refresh-reference
+poetry run drydocs ingest-controlm
+poetry run drydocs load-software-registry
+poetry run drydocs load-bmc-docs
+poetry run drydocs m1-verify
+poetry run drydocs m3-verify</code></pre>
+<hr class="dd-sme-divider">
+<section class="dd-sme-feedback" aria-label="SME - Feedback">
+<h2>SME - Feedback</h2>
+<p>How to return your notes on this document:</p>
+<ol>
+<li>Click the <strong>✎</strong> button beside any section (or numbered step) and type your note — notes save in your browser as you type.</li>
+<li>When finished, click <strong>Copy feedback</strong> in the bottom-right toolbar. Your notes are copied as anchor-keyed YAML.</li>
+<li>Create the feedback file (it is YAML, <em>not</em> markdown) — <strong>Copy To:</strong> <code>docs/design/feedback/</code> · <strong>File Name:</strong> <code>drydocs-startup-refresh-runbook-rev1.yaml</code></li>
+<li>Paste the copied block into that file, save, and commit (or send the file back to the team).</li>
+</ol>
+</section>
+</main>
+<footer class="dd-print-footer">Rev 1 · commit 0acc0f8</footer>
+<script>
+
+(function(){
+  var DOC="drydocs-startup-refresh-runbook", KEY="drydocs-doc-feedback:"+DOC;
+  function load(){ try{return JSON.parse(localStorage.getItem(KEY)||"{}");}catch(e){return {};} }
+  function save(){ localStorage.setItem(KEY, JSON.stringify(state)); }
+  var state=load(), badge;
+  function count(){ return Object.keys(state).filter(function(k){return (state[k]||"").trim();}).length; }
+  function refresh(){ if(badge) badge.textContent=count(); }
+  function toast(msg){ var t=document.createElement("div"); t.className="dd-toast"; t.textContent=msg; document.body.appendChild(t); requestAnimationFrame(function(){t.classList.add("show");}); setTimeout(function(){t.classList.remove("show"); setTimeout(function(){t.remove();},250);},1600); }
+  function exportYaml(){
+    var lines=["# design-doc feedback — paste into docs/design/feedback/"+DOC+"-rev<N>.yaml","doc: "+DOC,"notes:"];
+    Object.keys(state).forEach(function(a){
+      var note=(state[a]||"").replace(/\r/g,""); if(!note.trim()) return;
+      lines.push("  - anchor: "+a); lines.push("    note: |");
+      note.split("\n").forEach(function(l){ lines.push("      "+l); });
+    });
+    return lines.join("\n")+"\n";
+  }
+  function attach(el){
+    var id=el.id;
+    var btn=document.createElement("button"); btn.className="dd-note-btn"; btn.type="button"; btn.textContent="✎"; btn.title="Annotate #"+id;
+    var box=document.createElement("div"); box.className="dd-note-box"; box.style.display=(state[id]||"").trim()?"block":"none";
+    var ta=document.createElement("textarea"); ta.value=state[id]||""; ta.setAttribute("placeholder","note for #"+id+" …");
+    ta.addEventListener("input",function(){ state[id]=ta.value; save(); refresh(); el.classList.toggle("dd-annotated", !!ta.value.trim()); });
+    if((state[id]||"").trim()) el.classList.add("dd-annotated");
+    box.appendChild(ta);
+    btn.addEventListener("click",function(){ box.style.display=box.style.display==="none"?"block":"none"; if(box.style.display==="block") ta.focus(); });
+    if(el.tagName==="LI"){ el.insertAdjacentElement("afterbegin", btn); el.appendChild(box); }
+    else { el.insertAdjacentElement("afterend", box); el.insertAdjacentElement("beforebegin", btn); }
+  }
+  document.addEventListener("DOMContentLoaded",function(){
+    document.querySelectorAll("main [id]").forEach(attach);
+    var bar=document.createElement("div"); bar.className="dd-fb-bar";
+    var lbl=document.createElement("span"); lbl.innerHTML='notes <span class="dd-badge">0</span>'; badge=lbl.querySelector(".dd-badge");
+    var ex=document.createElement("button"); ex.type="button"; ex.textContent="Copy feedback";
+    ex.addEventListener("click",function(){ var y=exportYaml();
+      var done=function(){toast("feedback copied — paste into docs/design/feedback/");};
+      if(navigator.clipboard&&navigator.clipboard.writeText){ navigator.clipboard.writeText(y).then(done,function(){fallback(y);}); } else { fallback(y); }
+    });
+    function fallback(y){ var t=document.createElement("textarea"); t.value=y; document.body.appendChild(t); t.select(); try{document.execCommand("copy"); toast("feedback copied");}catch(e){toast("copy failed — select the box");} t.remove(); }
+    bar.appendChild(lbl); bar.appendChild(ex); document.body.appendChild(bar); refresh();
+  });
+})();
+
+</script>
+</body>
+</html>
