@@ -26,6 +26,22 @@ Tags help grooming: `idea` · `bug` · `doc` · `source` (new data source) · `q
 
 <!-- add new ideas at the top -->
 
+- 2026-07-20 — [idea] **Replace SEAL/PAT naming with industry-standard, SaaS-configurable
+  terminology** (user request; web research DONE same day →
+  `knowledge/upgrade-plans/generic-terminology-research.md`). Candidates validated:
+  SEAL → **Application Portfolio** holding **Business Application**s (ServiceNow
+  CSDM/APM — our K4 node label independently confirmed); PAT → **Product Taxonomy** /
+  **Product Portfolio** (product-operating-model literature; AreaProduct is the least
+  standard term). Mechanism = the Salesforce "Rename Tabs and Labels" pattern: canonical
+  concept ids stay generic and stable, tenant display/source names become config
+  (source-registry `display_name` fields; O12/O13 console surfaces render them).
+  PARKED pending user decisions recorded in the note's §Decision surface: (1) scope —
+  display-label config only vs also renaming `seal_*` vocab ids/domains (ADR-scale, the
+  ADR 0004 precedent); (2) placement — productization has NO epic/phase, so promoting
+  this is a PLAN CHANGE (new epic proposal → user); (3) `SEALID` → generic identity
+  property (gate discipline). Related: [[SaaS scaffold research line — the
+  template-play/whitespace finding, 2026-07-17]].
+
 - 2026-07-19 — [chore] **USER MANUAL STEP: email the port bundle parts + delete the local
   transfer files** (kept-updated at the 07-19 groom — the CREATE half is DONE: the user ran
   the bundle command in a regular terminal; main @ 3ae9b08, 447 commits, complete history;
