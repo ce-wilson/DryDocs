@@ -38,6 +38,13 @@ input, select, textarea {
 
 :focus-visible { outline: 2px solid var(--blue-br); outline-offset: 2px; }
 
+/* O22 hub glyphs (components/icons/HubGlyphs.tsx): the icons.md glow lives on
+   the accent layer ONLY, and only in dark mode — light mode is the solid-outline
+   equivalent (site-plan §2 "no glow" rule). Accent layers paint with
+   currentColor and bind their token via `color`, so the shadow matches each
+   accent's own hue with a single rule. */
+.dark .glyph-accent { filter: drop-shadow(0 0 3px currentColor); }
+
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { transition: none !important; animation: none !important; }
 }

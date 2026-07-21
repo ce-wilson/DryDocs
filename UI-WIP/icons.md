@@ -33,5 +33,14 @@ Conventions: 120×120 viewBox, ~2.2px stroke, `feGaussianBlur` glow filter on th
 ## Status
 
 - [x] Icon set drawn and matched to hub composition
-- [ ] Export as standalone `.svg` files per icon (if needed for a component library)
-- [ ] Swap in real Inter / Fira Code webfonts once app build has font pipeline
+- [x] Export as standalone components — DONE 2026-07-21 (O22) as
+      `web/src/components/icons/HubGlyphs.tsx`: inline-SVG React components
+      (recolorable beats static `.svg` files — everything routes through the O8
+      token sheet, no hard-coded hex; palette mapping in the file header).
+      `TowerIcon`/`BrandMark` now consume them; glow = `.glyph-accent`
+      drop-shadow, dark mode only (light = solid outline per site-plan §2).
+      Both themes verified via computed styles (accents resolve to their theme's
+      token values; light filter: none).
+- [ ] ~~Swap in real Inter / Fira Code webfonts~~ SUPERSEDED: the locked stack
+      self-hosts IBM Plex Sans/Mono (site-plan §1, shipped in O8) — this line
+      predated the font decision.

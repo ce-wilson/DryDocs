@@ -3320,7 +3320,7 @@ items:
     agent: main
     model: sonnet
     priority: p3
-    status: todo
+    status: done          # DONE 2026-07-21 same session groomed
     depends_on: [O8]
     inputs: [UI-WIP/icons.md, web/src/]
     acceptance: >
@@ -3335,6 +3335,18 @@ items:
       Groomed from icons.md's open checklist. Coordinate with O9: whichever lands
       first, the other consumes the shared assets (dep is O8 so icon work can run
       in parallel with the landing build).
+      DONE 2026-07-21: web/src/components/icons/HubGlyphs.tsx — 7 glyphs as
+      inline-SVG components (120x120, ~2.2 stroke per icons.md), token-only
+      (palette mapping icons.md->tokens.css in the header; zero hex in rendered
+      SVGs, JS-verified); accent layers use currentColor so the dark-only
+      .glyph-accent drop-shadow glows each accent's own hue; light = filter:none
+      solid outline (site-plan §2). TowerIcon + BrandMark rewired to consume
+      (their old hard-coded hex removed; 'shared' tower -> Infrastructure glyph
+      per the icons.md reuse rule); HUB_GLYPHS export = the 7-slot hub
+      composition ready for O9. icons.md checklist updated (fonts line
+      superseded by the IBM Plex decision). Verified: npm build green; both
+      themes checked via computed styles in the live preview (screenshot capture
+      timed out in the pane — DOM/style verification instead, disclosed).
 
   # ── Epic P — Runtime topology & maintenance windows — Phase 13 ─────────────
   # Born 2026-07-09: CM_HOSTS + CM_AVG_RUN onboarded via the add-source-object
@@ -4205,8 +4217,8 @@ items:
 # Roll-up the dispatcher can glance at. COMPUTED views — test_backlog.py enforces
 # that these match the items exactly; update them with any status change.
 summary:
-  todo: 26                                         # -G15 done (2026-07-21 DPL launcher argument contract built)
+  todo: 25                                         # -O22 done (2026-07-21 hub glyph set shipped)
   in_progress: 1                                   # E1 (gate deferred both sides)
   blocked: 0
-  done: 100                                        # +G15 (2026-07-21)
-  next_ready: [G16, L9, L12, L14, L15, M2, M3, M4, P3, J10, Q6, O9, O12, O13, O22, J13]
+  done: 101                                        # +G15 +O21 +O22 (2026-07-21)
+  next_ready: [G16, L9, L12, L14, L15, M2, M3, M4, P3, J10, Q6, O9, O12, O13, J13]
