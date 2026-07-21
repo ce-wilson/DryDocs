@@ -308,7 +308,7 @@ CREATE TABLE stg_file_op (
     job_id              NUMBER(12)          NOT NULL,
     seq                 NUMBER(4)           NOT NULL,
     op_type             VARCHAR2(20 CHAR)   NOT NULL,
-                        -- COPY | MOVE | DELETE | MKDIR | TRANSFORM | OTHER
+                        -- COPY | MOVE | DELETE | MKDIR | TRANSFORM | COMPRESS | OTHER
     src_pattern         VARCHAR2(2000 CHAR),
     tgt_pattern         VARCHAR2(2000 CHAR),
     source_field        VARCHAR2(60 CHAR)   NOT NULL,    -- PRECMD | POSTCMD | CMDLINE

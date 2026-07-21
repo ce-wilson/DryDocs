@@ -13,9 +13,11 @@ Design (vendor: controlm-os-job-parameters.md, controlm-api-job-types.md):
     verb. Wrapper verbs (sh/bash/ksh/sh -c) are unwrapped to the real
     target. Interpreter is inferred by extension (.sh/.py/.pl/.m) per the
     job-types doc.
-  * File-op verbs (mkdir/cp/mv/rm/rmdir/chmod/rename/ln/sed) -> STG_FILE_OP.
+  * File-op verbs (mkdir/cp/mv/rm/rmdir/chmod/rename/ln/sed/gzip) -> STG_FILE_OP.
     The set matches the vendor's pre/post-transfer command list
-    (controlm-file-transfer-job.md: chmod, mkdir, rename, rm, rmdir).
+    (controlm-file-transfer-job.md: chmod, mkdir, rename, rm, rmdir); gzip/gunzip
+    added for the pure-file-ops wrapper case the 2026-07-15 lineage gate caveat
+    names ("unix file operations (move, gzip) with no ETL engine involved"; G14).
   * Everything else dispatches through LAUNCHER_REGISTRY to an
     invocation_type; unmatched executables -> UNKNOWN (the Phase-E backlog).
 
@@ -65,6 +67,7 @@ _FILE_OP_VERBS: dict[str, str] = {
     "rm": "DELETE", "rmdir": "DELETE",
     "mkdir": "MKDIR",
     "sed": "TRANSFORM", "awk": "TRANSFORM", "tr": "TRANSFORM",
+    "gzip": "COMPRESS", "gunzip": "COMPRESS",
     "chmod": "OTHER", "chown": "OTHER", "ln": "OTHER", "touch": "OTHER",
 }
 # verbs that are neither invocation nor file-op (control/no-op) — skipped
@@ -323,6 +326,14 @@ def parse_file_op_statement(statement: str) -> FileOp | None:
     tgt = operands[-1] if len(operands) >= 2 else None
     if op in {"DELETE", "MKDIR"}:  # single-target ops
         src, tgt = (operands[0] if operands else None), None
+    if op == "COMPRESS":
+        # gzip/gunzip rewrite IN PLACE on a deterministic name contract
+        # (file <-> file.gz) — derive the twin as tgt so lineage sees both
+        # sides of the flow. Stream forms (-c to stdout) have no derivable
+        # target and keep tgt None.
+        tgt = None
+        if src and "-c" not in argv:
+            tgt = src[:-3] if src.endswith(".gz") else src + ".gz"
     return FileOp(
         op_type=op,
         src_pattern=(src or "")[:2000] or None,

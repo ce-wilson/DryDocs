@@ -107,7 +107,7 @@ erDiagram
     }
     STG_FILE_OP {
         number  file_op_sk PK
-        varchar op_type "COPY | MOVE | DELETE | MKDIR | TRANSFORM"
+        varchar op_type "COPY | MOVE | DELETE | MKDIR | TRANSFORM | COMPRESS | OTHER"
         varchar src_tgt_patterns
     }
     STG_NOTIFICATION {

@@ -89,6 +89,38 @@ def test_sed_pipeline_is_transform() -> None:
     assert any(o.op_type == "MOVE" for o in parsed.file_ops)
 
 
+def test_gzip_is_compress_with_derived_twin() -> None:
+    # the 2026-07-15 gate-caveat form: pure unix file ops (move, gzip), no ETL
+    # engine involved (G14)
+    parsed = parse_command(
+        "mv /data/out/loans.dat /data/arch/loans.dat; gzip /data/arch/loans.dat"
+    )
+    mv = next(o for o in parsed.file_ops if o.op_type == "MOVE")
+    assert (mv.src_pattern, mv.tgt_pattern) == (
+        "/data/out/loans.dat", "/data/arch/loans.dat",
+    )
+    gz = next(o for o in parsed.file_ops if o.op_type == "COMPRESS")
+    assert gz.src_pattern == "/data/arch/loans.dat"
+    # gzip rewrites in place on a deterministic name contract — the .gz twin
+    # is derived so lineage sees both sides of the flow
+    assert gz.tgt_pattern == "/data/arch/loans.dat.gz"
+
+
+def test_gunzip_strips_the_gz_twin() -> None:
+    gz = parse_command("gunzip /data/in/feed.csv.gz").file_ops[0]
+    assert gz.op_type == "COMPRESS"
+    assert gz.src_pattern == "/data/in/feed.csv.gz"
+    assert gz.tgt_pattern == "/data/in/feed.csv"
+
+
+def test_gzip_to_stdout_has_no_derived_target() -> None:
+    # -c streams to stdout — no in-place twin exists, so no target is invented
+    gz = parse_command("gzip -c /data/x.dat").file_ops[0]
+    assert gz.op_type == "COMPRESS"
+    assert gz.src_pattern == "/data/x.dat"
+    assert gz.tgt_pattern is None
+
+
 def test_assignment_and_noop_skipped() -> None:
     parsed = parse_command("ft_nm= ls -1rt FIRM_*.dat; cd /tmp; echo done")
     # ls after an assignment, cd, echo -> all no-ops, no invocations/ops

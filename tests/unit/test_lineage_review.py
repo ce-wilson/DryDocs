@@ -12,7 +12,13 @@ from pathlib import Path
 import pytest
 
 from drydocs_lineage.extractors import ControlMInventoryExtractor
-from drydocs_lineage.model import LineageGraph, ProcessNode, process_id
+from drydocs_lineage.model import (
+    DataAssetNode,
+    LineageGraph,
+    ProcessNode,
+    asset_id,
+    process_id,
+)
 from drydocs_lineage.review import to_html
 
 FIXTURE = Path(__file__).resolve().parents[1] / "fixtures" / "lineage" / "jobs.csv"
@@ -87,6 +93,43 @@ def test_unresolved_dependency_flags_review_needed() -> None:
     html = to_html(g, doc_id="warn")
     assert "review needed" in html
     assert "1 unresolved" in html
+
+
+def test_unresolved_file_op_candidate_flags_review_needed() -> None:
+    """G14: the writer's would-be drop (WritePlan.unresolved_file_ops) must not
+    sit unread — a script-src file-op candidate with no owning job flips the
+    assertion panel BEFORE any plan is cut."""
+    g = LineageGraph()
+    sid = process_id("shell_script", "/opt/orphan.ksh")
+    aid = asset_id("local_file", "/data/x.dat")
+    g.add_process(ProcessNode(node_id=sid, kind="shell_script", name="orphan.ksh",
+                              path="/opt/orphan.ksh"))
+    g.add_data_asset(DataAssetNode(node_id=aid, kind="local_file", location="/data/x.dat"))
+    g.add_rel(sid, "READS_FROM", aid)  # no job INVOKES sid anywhere
+    html = to_html(g, doc_id="fops")
+    assert "review needed" in html
+    assert "unresolved_file_ops" in html
+
+
+def test_file_op_candidates_render_on_the_job_card() -> None:
+    """A job-src file-op candidate (the G14 extractor feed) renders on the job
+    card with the registered spelling and the asset location; the assertion
+    panel stays green (a job src IS its own Activity)."""
+    g = LineageGraph()
+    jid = process_id("controlm_job", "161015.22")
+    aid = asset_id("local_file", "/data/arch/loans.dat.gz")
+    g.add_process(ProcessNode(node_id=jid, kind="controlm_job", name="JOB_ARCHIVE",
+                              node_target="h", run_as="svc.x", folder="F",
+                              command="gzip /data/arch/loans.dat"))
+    g.add_data_asset(DataAssetNode(
+        node_id=aid, kind="local_file", location="/data/arch/loans.dat.gz",
+    ))
+    g.add_rel(jid, "WRITES_TO", aid)
+    html = to_html(g, doc_id="fop-card")
+    assert "all checks passed" in html
+    assert "WRITES_TO" in html
+    assert "local_file" in html
+    assert "/data/arch/loans.dat.gz" in html
 
 
 def test_prototype_rel_spellings_render_as_registered(page_graph=None) -> None:

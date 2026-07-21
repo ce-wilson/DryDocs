@@ -10,6 +10,15 @@ job launches, and links it with an ``INVOKES`` rel (m3_invokes, prov:used). Shar
 scripts invoked from multiple folders collapse to one child node with multiple
 INVOKES — exactly the lineage we want.
 
+CMD_LINE **file operations** (G14; the pure unix move/copy/gzip wrapper forms the
+2026-07-15 gate caveat names) become ``READS_FROM``/``WRITES_TO`` candidates with
+the JOB itself as the Activity — a CMD_LINE file op is performed by the job, no
+Script hop exists, which is exactly the gate EDIT's file-ops case (``from_node:
+ETLProcess | ControlMJob``), so the writer's G13 resolution passes them through
+unchanged. Operand patterns become ``local_file`` DataAssets verbatim ({ODATE}
+tokens and wildcards are curation material, not noise). Non-data-flow ops
+(DELETE/MKDIR/TRANSFORM/OTHER — job mechanics) are skipped AND counted.
+
 Division of labor preserved (0002-C §4): the Oracle pull + pydantic row models stay
 in core/load; lineage consumes the CSV projection.
 
@@ -30,10 +39,18 @@ from pathlib import Path
 
 from drydocs_core.controlm import parse_command
 
-from ..model import LineageGraph, ProcessNode, process_id
+from ..model import DataAssetNode, LineageGraph, ProcessNode, asset_id, process_id
 
 # header tokens that identify a Control-M jobs CSV when searching a directory
 _JOBS_CSV_HINTS = ("job_name", "cmd_line", "node_id")
+
+#: file-op types that carry data flow (src read, tgt written) — the unix
+#: move/copy/gzip wrapper forms named in the 2026-07-15 gate caveat (G14).
+#: DELETE/MKDIR/TRANSFORM/OTHER are job mechanics, not lineage flow — skipped
+#: and counted, never silent.
+_DATAFLOW_FILE_OPS = {"MOVE", "COPY", "COMPRESS"}
+#: DataAsset kind for unix file-op operands (the D1 proxy shape)
+_FILE_OP_ASSET_KIND = "local_file"
 
 #: every CSV header this extractor consumes (the column contract). Guarded by
 #: tests/unit/test_source_mapping_drift.py (N2): each name must remain an alias
@@ -57,10 +74,13 @@ class ExtractCoverage:
     skipped_stale_version: int = 0      # is_current_version present and not current ('Y')
     skipped_nameless: int = 0           # row with no job_name
     commands_empty: int = 0             # job kept, but cmd_line blank — no candidate
-    commands_unparsed: int = 0          # job kept, cmd_line present but 0 invocations
+    commands_unparsed: int = 0          # job kept, cmd_line present but 0 invocations AND 0 file ops
     invocations_added: int = 0          # INVOKES candidates linked
     invocations_unresolved: int = 0     # added but kind UNKNOWN (review page warns)
     invocations_no_target: int = 0      # parsed invocation without a resolvable target
+    file_ops_added: int = 0             # READS_FROM/WRITES_TO candidates linked (G14)
+    file_ops_skipped_non_dataflow: int = 0  # op parsed, but not a data-flow op (DELETE/MKDIR/...)
+    file_ops_no_operand: int = 0        # data-flow op missing a usable src/tgt
 
     def as_dict(self) -> dict[str, int]:
         return asdict(self)
@@ -72,7 +92,10 @@ class ExtractCoverage:
             f"(unresolved={self.invocations_unresolved}) | skipped: "
             f"stale={self.skipped_stale_version} nameless={self.skipped_nameless} "
             f"no_target={self.invocations_no_target} | commands: "
-            f"empty={self.commands_empty} unparsed={self.commands_unparsed}"
+            f"empty={self.commands_empty} unparsed={self.commands_unparsed} | "
+            f"file-ops: added={self.file_ops_added} "
+            f"non_dataflow={self.file_ops_skipped_non_dataflow} "
+            f"no_operand={self.file_ops_no_operand}"
         )
 
 
@@ -173,9 +196,13 @@ class ControlMInventoryExtractor:
         if not cmd:
             coverage.commands_empty += 1
             return
-        invocations = parse_command(cmd).invocations
+        parsed = parse_command(cmd)
+        for fop in parsed.file_ops:
+            self._file_op(jid, fop, into, coverage)
+        invocations = parsed.invocations
         if not invocations:
-            coverage.commands_unparsed += 1
+            if not parsed.file_ops:
+                coverage.commands_unparsed += 1
             return
         for inv in invocations:
             target = inv.target
@@ -194,3 +221,28 @@ class ControlMInventoryExtractor:
             coverage.invocations_added += 1
             if kind == "unknown":
                 coverage.invocations_unresolved += 1
+
+    def _file_op(
+        self, jid: str, fop, into: LineageGraph, coverage: ExtractCoverage
+    ) -> None:
+        """One parsed CMD_LINE file op → READS_FROM/WRITES_TO candidates (G14).
+
+        The src endpoint is the JOB itself — a CMD_LINE file op is performed by
+        the job with no Script hop, the gate EDIT's file-ops case (from_node:
+        ControlMJob), so the writer's G13 resolution passes these through
+        unchanged. Every skip is counted by reason (the house rule).
+        """
+        if fop.op_type not in _DATAFLOW_FILE_OPS:
+            coverage.file_ops_skipped_non_dataflow += 1
+            return
+        src, tgt = fop.src_pattern, fop.tgt_pattern
+        if not src or not tgt:
+            coverage.file_ops_no_operand += 1
+            return
+        for location, rel_type in ((src, "READS_FROM"), (tgt, "WRITES_TO")):
+            aid = asset_id(_FILE_OP_ASSET_KIND, location)
+            into.add_data_asset(DataAssetNode(
+                node_id=aid, kind=_FILE_OP_ASSET_KIND, location=location,
+            ))
+            into.add_rel(jid, rel_type, aid)
+            coverage.file_ops_added += 1

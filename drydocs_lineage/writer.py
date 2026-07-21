@@ -282,6 +282,31 @@ def _owning_jobs(graph: LineageGraph, script_id: str) -> list[str]:
     return sorted(owners)
 
 
+def unresolved_file_op_candidates(
+    graph: LineageGraph,
+) -> list[tuple[str, str, str]]:
+    """Script-src READS_FROM/WRITES_TO candidates with NO owning job (sorted).
+
+    Exactly the rels :func:`_resolve_file_ops` would DROP (and count in
+    ``WritePlan.unresolved_file_ops``) at plan time — exposed as a function so
+    the lineage-review page can show the would-be loss to the SME *before* any
+    plan is cut (G14: the drop count must not sit unread). Src endpoints that
+    are already a job or an ETLProcess resolve trivially and are not listed;
+    a data-asset src is a curation error :func:`plan_curated` flags, not this
+    function's concern.
+    """
+    out: list[tuple[str, str, str]] = []
+    for src, rel_type, dst in sorted(graph.rels):
+        if rel_type not in _FILE_OPS_TYPES:
+            continue
+        node = graph.processes.get(src)
+        if node is None or node.kind == _JOB_KIND or node.kind in _ETL_PROCESS_KINDS:
+            continue
+        if not _owning_jobs(graph, src):
+            out.append((src, rel_type, dst))
+    return out
+
+
 def _resolve_file_ops(
     graph: LineageGraph, confirmed: set[tuple[str, str, str]]
 ) -> tuple[set[tuple[str, str, str]], int]:

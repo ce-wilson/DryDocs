@@ -430,6 +430,69 @@ def test_file_ops_dst_must_be_a_data_asset() -> None:
         plan_curated(g, {(sid, "READS_FROM", other)})
 
 
+def test_cmdline_file_op_feed_plans_job_to_asset_edges(tmp_path: Path) -> None:
+    """G14 acceptance: a job whose CMD_LINE moves a file plans job->asset
+    edges in plan_curated output. The extractor's file-ops feed arrives with
+    the job itself as the Activity (the gate EDIT's file-ops case — no Script
+    hop), so G13's resolution passes it straight through to the ControlMJob
+    MATCH shape; refusal semantics stay untouched (m3_reads_from/m3_writes_to
+    remain planned — this is plan material, not a write)."""
+    csv_path = tmp_path / "jobs.csv"
+    csv_path.write_text(
+        "job_id,folder_id,job_name,parent_table,owner,node_id,cmd_line,is_current_version\n"
+        '22,161015,JOB_ARCHIVE,F1,svc.x,h1,"mv /data/out/loans.dat /data/arch/loans.dat",Y\n',
+        encoding="utf-8",
+    )
+    g = LineageGraph()
+    ControlMInventoryExtractor().extract(csv_path, g)
+    confirmed = {r for r in g.rels if r[1] in ("READS_FROM", "WRITES_TO")}
+    assert confirmed  # the feed exists — G13's logic is no longer dormant
+
+    plan = plan_curated(g, confirmed)
+    assert plan.unresolved_file_ops == 0
+    assert plan.rel_types == ("READS_FROM", "WRITES_TO")
+    assert plan.assets == 2
+
+    cyphers = [c for c, _ in plan.statements]
+    reads = next(c for c in cyphers if "MERGE (src)-[r:READS_FROM]->(dst)" in c)
+    assert "MATCH (src:ControlMJob {folder_id: row.src_folder_id, job_id: row.src_job_id})" in reads
+    assert "MATCH (dst:DataAsset {assetId: row.dst_key})" in reads
+    assert "r.vocab_id      = 'm3_reads_from'" in reads
+    rows = next(
+        p for c, p in plan.statements if "MERGE (src)-[r:READS_FROM]->(dst)" in c
+    )["rows"]
+    assert rows == [{
+        "src_folder_id": "161015", "src_job_id": "22",
+        "dst_key": "urn:drydocs:dataasset:local_file:/data/out:loans.dat",
+    }]
+    writes = next(c for c in cyphers if "MERGE (src)-[r:WRITES_TO]->(dst)" in c)
+    assert "r.vocab_id      = 'm3_writes_to'" in writes
+
+
+def test_unresolved_file_op_candidates_mirrors_the_plan_drop() -> None:
+    """G14: the review-surface helper lists exactly what plan_curated would
+    drop — a script-src candidate with no owning job — and nothing else."""
+    from drydocs_lineage.writer import unresolved_file_op_candidates
+
+    g = LineageGraph()
+    jid = process_id("controlm_job", "161015.22")
+    owned = process_id("shell_script", "/opt/owned.ksh")
+    orphan = process_id("shell_script", "/opt/orphan.ksh")
+    aid = asset_id("local_file", "/data/x.dat")
+    g.add_process(ProcessNode(node_id=jid, kind="controlm_job", name="J"))
+    g.add_process(ProcessNode(node_id=owned, kind="shell_script", name="owned.ksh"))
+    g.add_process(ProcessNode(node_id=orphan, kind="shell_script", name="orphan.ksh"))
+    g.add_data_asset(DataAssetNode(node_id=aid, kind="local_file", location="/data/x.dat"))
+    g.add_rel(jid, "INVOKES", owned)
+    g.add_rel(owned, "READS_FROM", aid)    # resolves via the owning job
+    g.add_rel(orphan, "WRITES_TO", aid)    # no owner — the would-be drop
+    g.add_rel(jid, "READS_FROM", aid)      # already a job src — trivial
+
+    assert unresolved_file_op_candidates(g) == [(orphan, "WRITES_TO", aid)]
+    plan = plan_curated(g, {r for r in g.rels if r[1] != "INVOKES"})
+    assert plan.unresolved_file_ops == 1   # the helper and the plan agree
+
+
 def test_write_executes_when_gate_is_open(tmp_path: Path) -> None:
     registry = tmp_path / "vocab.yaml"
     registry.write_text(ACTIVE_REGISTRY, encoding="utf-8")

@@ -3,8 +3,9 @@
 Renders a :class:`~drydocs_lineage.model.LineageGraph` as ONE self-contained HTML
 file (no server, no Neo4j, no external resources) a subject-matter expert opens in
 a browser: one section per Control-M folder, a card per job showing
-job/node-target/run-as/application/command and the dependencies it INVOKES (and
-TRIGGERS / READS_FROM / WRITES_TO once those exist), an assertion panel at the top
+job/node-target/run-as/application/command and the dependencies it INVOKES (plus
+TRIGGERS, and the READS_FROM / WRITES_TO file-op candidates the G14 extractor
+pass emits), an assertion panel at the top
 (the FR/TC discipline without Cypher), and a per-folder comment box persisted to
 localStorage with one-click export of all notes as JSON.
 
@@ -28,6 +29,7 @@ import json
 from datetime import datetime, timezone
 
 from .model import LineageGraph
+from .writer import unresolved_file_op_candidates
 
 #: kinds we consider "resolved" dependencies; anything else (notably "unknown")
 #: means a cmd_line the core parser could not classify — surfaced as a warning.
@@ -55,6 +57,18 @@ def _assertions(graph: LineageGraph) -> list[dict]:
         a for a in graph.data_assets.values()
         if not any(r[0] == a.node_id or r[2] == a.node_id for r in graph.rels)
     ]
+    # script-src file-op candidates with no owning job — exactly what the
+    # writer would drop at plan time (WritePlan.unresolved_file_ops, G14);
+    # surfaced here so the loss is reviewed BEFORE a plan is cut.
+    file_ops = [r for r in graph.rels if r[1] in ("READS_FROM", "WRITES_TO")]
+    unresolved_fops = unresolved_file_op_candidates(graph)
+    if unresolved_fops:
+        fop_detail = (
+            f"{len(unresolved_fops)} of {len(file_ops)} would drop at plan "
+            "(unresolved_file_ops)"
+        )
+    else:
+        fop_detail = f"{len(file_ops)} candidate(s)" if file_ops else "n/a"
     return [
         {"label": "Every job has a node target (host or host group)",
          "ok": not missing_target,
@@ -68,6 +82,9 @@ def _assertions(graph: LineageGraph) -> list[dict]:
         {"label": "No orphan data assets",
          "ok": not orphan_assets,
          "detail": f"{len(orphan_assets)} orphan" if orphan_assets else "n/a"},
+        {"label": "Every file-op candidate has an owning Activity (job or ETL process)",
+         "ok": not unresolved_fops,
+         "detail": fop_detail},
     ]
 
 
@@ -101,10 +118,12 @@ def _job_card(graph: LineageGraph, job) -> str:
             kind = getattr(node, "kind", "")
             path = getattr(node, "path", "") or getattr(node, "location", "")
             warn = " warn" if kind == _UNRESOLVED else ""
+            # data assets have no name — show the location's last segment (G14)
+            name = getattr(node, "name", "") or (path.rstrip("/").rsplit("/", 1)[-1] if path else "")
             items.append(
                 f'<li class="dep{warn}"><span class="rel">{_e(rel)}</span> '
                 f'<span class="kind k-{_e(kind)}">{_e(kind)}</span> '
-                f'<span class="dname">{_e(getattr(node, "name", ""))}</span>'
+                f'<span class="dname">{_e(name)}</span>'
                 f'{f"<span class=path>{_e(path)}</span>" if path else ""}</li>'
             )
         dep_html = '<ul class="deps">' + "".join(items) + "</ul>"

@@ -172,6 +172,59 @@ def test_coverage_missing_source_is_all_zero(tmp_path) -> None:
     assert cov.rows_read == 0 and cov.jobs_added == 0
 
 
+# -- file-ops candidates (G14 — the feed that activates G13's dormant resolution) --
+
+def test_cmdline_move_gzip_emits_reads_writes_candidates(tmp_path) -> None:
+    """The gate-caveat wrapper case (unix move/gzip, no ETL engine): CMD_LINE
+    file ops become READS_FROM/WRITES_TO candidates with the JOB itself as the
+    Activity (gate EDIT from_node: ControlMJob — no Script hop exists), and
+    operand patterns become local_file DataAssets."""
+    csv_path = tmp_path / "jobs.csv"
+    csv_path.write_text(
+        "job_id,folder_id,job_name,parent_table,owner,node_id,cmd_line,is_current_version\n"
+        '22,161015,JOB_ARCHIVE,F1,svc.x,h1,"mv /data/out/loans.dat /data/arch/loans.dat; '
+        'gzip /data/arch/loans.dat",Y\n',
+        encoding="utf-8",
+    )
+    g = LineageGraph()
+    cov = ControlMInventoryExtractor().extract(csv_path, g)
+    jid = "proc#controlm_job:161015.22"
+    # mv reads its src and writes its tgt; gzip reads the moved file and
+    # writes the derived .gz twin
+    assert (jid, "READS_FROM", "data#local_file:/data/out/loans.dat") in g.rels
+    assert (jid, "WRITES_TO", "data#local_file:/data/arch/loans.dat") in g.rels
+    assert (jid, "READS_FROM", "data#local_file:/data/arch/loans.dat") in g.rels
+    assert (jid, "WRITES_TO", "data#local_file:/data/arch/loans.dat.gz") in g.rels
+    assert cov.file_ops_added == 4
+    # a pure file-op command line is PARSED, not "unparsed"
+    assert cov.commands_unparsed == 0
+    assert {a.location for a in g.data_assets.values()} == {
+        "/data/out/loans.dat", "/data/arch/loans.dat", "/data/arch/loans.dat.gz",
+    }
+    assert all(a.kind == "local_file" for a in g.data_assets.values())
+
+
+def test_non_dataflow_and_operandless_file_ops_are_counted_never_silent(tmp_path) -> None:
+    """The coverage house rule on the file-ops pass: job mechanics (mkdir/rm)
+    and malformed data-flow ops are skipped BY COUNTED REASON, never dropped
+    silently — and none of them fabricate assets or rels."""
+    csv_path = tmp_path / "jobs.csv"
+    csv_path.write_text(
+        "job_id,folder_id,job_name,parent_table,owner,node_id,cmd_line,is_current_version\n"
+        '1,10,JOB_MECHANICS,F1,svc.x,h1,"mkdir -p /tmp/w; rm -f /tmp/w/x.log; '
+        'mv /data/only_src.dat",Y\n',
+        encoding="utf-8",
+    )
+    g = LineageGraph()
+    cov = ControlMInventoryExtractor().extract(csv_path, g)
+    assert cov.file_ops_added == 0
+    assert cov.file_ops_skipped_non_dataflow == 2  # mkdir + rm: not lineage flow
+    assert cov.file_ops_no_operand == 1            # mv with no target operand
+    assert not g.data_assets
+    assert not g.rels
+    assert "file-ops: added=0 non_dataflow=2 no_operand=1" in cov.summary()
+
+
 def test_no_parse_code_of_its_own() -> None:
     # 0002-C §5: lineage contains NO Control-M parse code (no LAUNCHER_REGISTRY,
     # no parse_command definition) — the parser is core's, full stop.
