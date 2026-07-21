@@ -697,3 +697,43 @@ SME-supplied PAT screenshots held OUT of the repo — Internal-Confidential).
   dpl_spark_processor (G15), ICDW ksh (G16), ecosystem_execution_engine.sh + the
   template ingestion jar (await samples). COMPANY runs its own gate on the draft NFR —
   this sign-off is producer-side only.
+
+## 2026-07-21 — UI write-surface boundary, whole web console (ui-write-surface) — SIGNED OFF (O20)
+
+- **Scope:** the write-surface boundary for the ENTIRE web console (all nine module
+  pages + /mappings + /admin/config + drydocs-api), NOT just the /gates page — the SME
+  scope clarification and the same-day direction amendments (gate-prompt header) are
+  part of this record. Session ran in-chat 2026-07-21 pm, guided walk-through over the
+  rendered page (var/gate-ui-write-surface.html, 11 confirmations); four calls, all
+  ruled as recommended (chad.wilson).
+- **Confirmed: 4 · Edited: 0 · Rejected: 0**
+  - **SME-1 — doctrine + C4 + C5 confirmed as written:** the loader remains the ONLY
+    graph writer; M3 (direct graph write from any console action) is REFUSED as a
+    standing rule — any future exception is its own gate; drydocs-api stays
+    read + artifact + derived-non-graph-store only; declining extensions is always a
+    valid outcome. C4: admin config edits NEVER (the wf-admin-config-01 traceability-
+    lens doctrine). C5: an admin/SUPER-USER page in the SaaS idiom is EXPECTED for
+    UI-WEB — expectation recorded; scoping is follow-on backlog; any write it carries
+    follows the tiers ruled here.
+  - **SME-2 — C1 = M1 artifact-drafting:** gate pages are NECESSARY for building and
+    confirming (no upfront spec — the model emerges through confirmation, the SME's
+    own framing), and gain an M1 affordance: the rendered page assembles the gate-log
+    entry snippet from ticked confirmations for the SME to review + commit. Zero
+    server surface; ticks stay browser-local; upgradeable to M2 only by its own
+    decision. Groomed as **O25**.
+  - **SME-3 — C2 = M2 non-graph store:** SME annotations/user mappings persist in the
+    mapping-store DATABASE TABLE (the file→table enhancement) with the ORIGIN FLAG
+    (source vs user mapping) always visible, exported as artifacts/reports. First
+    instance = the SEAL-contacts override list (**O24**, promoted same day). If notes
+    ever become graph content, that shape routes through its own ontology gate first.
+  - **SME-4 — C3 = defer server-side git:** overrides/mappings exit as downloads +
+    SOURCE-CORRECTIONS REPORTS for the system owners (the fix-the-source doctrine —
+    e.g. SEAL L1/L2 operate-manager fixes need the AO privilege in SEAL itself);
+    server-side branch/PR creation waits on the company GHE posture + its own
+    security review.
+- **Effect:** O20 done — the Epic O phase-12 chain is complete end to end. The
+  console-wide boundary is now a recorded decision: M1 gate-page drafting (O25) +
+  M2 origin-flagged store with report exits (O24 first) + M3 refused standing +
+  admin edits never + super-user page expected (scoping follow-on). gates.json
+  regenerates with this entry (the O19 drift guard enforces it). No vocabulary or
+  map changes — this gate ruled console affordances, not graph semantics.

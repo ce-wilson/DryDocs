@@ -272,6 +272,21 @@
       "unblocks": []
     },
     {
+      "kind": "log-entry",
+      "date": "2026-07-21",
+      "title": "UI write-surface boundary, whole web console (ui-write-surface) — SIGNED OFF (O20)",
+      "status": "signed-off",
+      "prompt_files": [
+        "config/gate-prompts/ui-write-surface.yaml"
+      ],
+      "log_ref": "config/gate-log.md:701",
+      "unblocks": [
+        "O20",
+        "O24",
+        "O25"
+      ]
+    },
+    {
       "kind": "prompt-only",
       "date": null,
       "title": "bmc-docs-example (gate page rendered — session not yet run)",
@@ -292,20 +307,6 @@
       ],
       "log_ref": null,
       "unblocks": []
-    },
-    {
-      "kind": "prompt-only",
-      "date": null,
-      "title": "ui-write-surface (gate page rendered — session not yet run)",
-      "status": "open",
-      "prompt_files": [
-        "config/gate-prompts/ui-write-surface.yaml"
-      ],
-      "log_ref": null,
-      "unblocks": [
-        "O20",
-        "O24"
-      ]
     }
   ]
 }

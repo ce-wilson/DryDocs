@@ -24,6 +24,12 @@
 # deltas for source correction (promoted as backlog O24). This ratifies the
 # M2 tier (server-persisted non-graph store) as the standing pattern for
 # mapping/override drafting; M3 direct graph write remains refused.
+# SIGNED OFF 2026-07-21 pm (SME in-chat guided walk-through; 4/4 as
+# recommended) — transcribed to config/gate-log.md same day: doctrine+C4+C5
+# confirmed as written; C1 = M1 artifact-drafting (groomed O25); C2 = M2
+# origin-flagged non-graph store (first instance O24); C3 = defer server-side
+# git (M2 + source-corrections report is the path). O20 done — the Epic O
+# phase-12 chain is complete.
 classification: Internal-Public
 schema: drydocs.gate-prompt.v1
 id: ui-write-surface

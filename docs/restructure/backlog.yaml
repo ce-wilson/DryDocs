@@ -3444,7 +3444,7 @@ items:
     agent: main
     model: fable
     priority: p3
-    status: todo          # PREPPED 2026-07-21: gate prompt authored + page rendered — awaiting the SME session (see progress)
+    status: done          # SIGNED OFF 2026-07-21 pm (in-chat guided session, 4/4 as recommended) — gate-log transcribed
     depends_on: [O13, O19]
     progress: >
       2026-07-21 (Epic-O finish session) — GATE-PREPPED, awaiting the SME:
@@ -3458,6 +3458,19 @@ items:
       appears as `open` on /gates (the O19 auto-pickup proving itself).
       Declining every extension is a valid sign-off; the item completes when
       the session runs and transcribes to config/gate-log.md.
+      SME REVIEW SAME DAY (pre-session): scope clarified console-wide (title
+      + summary now explicit — NOT just the /gates page); file-identity
+      footer added to the gate-page renderer (path + copy button, +test);
+      then AMENDED with in-session direction (gate pages necessary; SaaS
+      super-user page expected = new C5; M2 origin-flagged store ratified;
+      override lists -> source-corrections reports; O24 promoted).
+      DONE 2026-07-21 pm — SIGNED OFF via the in-chat guided walk-through
+      (AskUserQuestion, 4/4 as recommended; transcribed to config/gate-log.md
+      same day): SME-1 doctrine + C4-never + C5-expectation confirmed as
+      written; SME-2 C1 = M1 artifact-drafting (groomed O25); SME-3 C2 = M2
+      origin-flagged non-graph store (first instance O24); SME-4 C3 = defer
+      server-side git (M2 + report is the path). M3 direct graph write
+      REFUSED standing. The Epic O phase-12 chain is COMPLETE end to end.
     inputs: [docs/restructure/03-hitl-sme-flow.md, config/gate-log.md, UI-WIP/site-plan.md, docs/restructure/backlog.yaml]
     acceptance: >
       A HITL gate session (docs/restructure/03-hitl-sme-flow.md) decides the UI
@@ -4769,9 +4782,39 @@ items:
       + report endpoint); the /mappings screen half rides the existing O13
       surface.
 
+  - id: O25
+    epic: web-console
+    title: "Gate-page M1 drafting affordance: a Draft-gate-log-entry button on rendered gate pages assembling the sign-off snippet from ticked confirmations"
+    type: task
+    module: drydocs-review
+    phase: 12
+    agent: main
+    model: sonnet
+    priority: p2
+    status: todo
+    depends_on: [O20]
+    inputs: [drydocs/gate_pages.py, tests/unit/test_gate_pages.py, config/gate-log.md, config/gate-prompts/ui-write-surface.yaml]
+    acceptance: >
+      Rendered gate pages (render_gate_page) gain the M1 affordance the O20
+      gate signed off (SME-2, 2026-07-21): a Draft-gate-log-entry control that
+      assembles a config/gate-log.md entry SNIPPET client-side from the page's
+      ticked confirmations (heading in the house format, per-section
+      ticked/unticked summary, date placeholder) and offers copy-to-clipboard
+      and/or file download — the SME reviews, edits, and commits it; the page
+      writes NOTHING server-side (ticks stay browser-local; M1 exactly, per
+      the gate ruling — an M2 upgrade would be its own decision). Unit tests
+      cover the snippet content (all-ticked and partially-ticked shapes);
+      existing checkbox-count and format guards stay green. Full suite green.
+    notes: >
+      Groomed 2026-07-21 pm at the O20 sign-off (gate-log SME-2): gate pages
+      are NECESSARY for building and confirming (no upfront spec), so the
+      drafting affordance is first-class. Pure renderer work in
+      drydocs/gate_pages.py (module drydocs-review — the H4 gate-page
+      generator's home); zero api surface.
+
 summary:
-  todo: 24                                         # +O24 seal-contacts; +G18..G23 rua-ingest phase (2026-07-21 groom)
+  todo: 24                                         # +O25 (O20 sign-off follow-up), -O20 done; +G18..G23 rua-ingest phase (2026-07-21)
   in_progress: 1                                   # E1 (gate deferred both sides)
   blocked: 0
-  done: 112                                        # +O13 +O10 +O12 +O15 +O16 +O17 +O18 +O19 (2026-07-21 Epic-O finish session)
-  next_ready: [L9, L12, L14, L15, M2, M3, M4, P3, J10, Q6, O20, O23, O24, J13, G17, G18, G19, C11]
+  done: 113                                        # +O20 SIGNED OFF 2026-07-21 pm — the Epic O phase-12 chain is COMPLETE
+  next_ready: [L9, L12, L14, L15, M2, M3, M4, P3, J10, Q6, O23, O24, O25, J13, G17, G18, G19, C11]
