@@ -6,6 +6,7 @@ import pytest
 from drydocs.gate_pages import (
     DEFAULT_GATE_PROMPTS_DIR,
     GateSpecError,
+    draft_gate_log_entry,
     load_gate_spec,
     render_gate_page,
     spec_from_dict,
@@ -121,6 +122,60 @@ def test_committed_q1q3_spec_loads_and_renders() -> None:
     assert out.count('type="checkbox"') == spec.total_confirmations
     assert "origin-derived" in out                    # provenance split rendered
     assert "CONTAINS_FOLDER" in out                   # proposed edge visible
+
+
+# ---------------------------------------------------------------------------
+# O25 — the M1 drafting affordance (ui-write-surface gate SME-2, 2026-07-21):
+# draft_gate_log_entry is the pure reference implementation of the page's
+# client-side assembly (the payload embeds prebuilt lines, JS only selects).
+# ---------------------------------------------------------------------------
+
+def test_draft_entry_all_ticked_proposes_signed_off() -> None:
+    spec = spec_from_dict(_DOC)
+    all_ids = {f"c{si}_{ci}" for si, s in enumerate(spec.sections)
+               for ci in range(len(s.confirmations))}
+    entry = draft_gate_log_entry(spec, ticked=all_ids, date="2026-07-21")
+    assert entry.startswith("## 2026-07-21 — Demo gate (demo) — SIGNED OFF\n")
+    assert "- **Ticked: 3/3**" in entry
+    assert "  - **A. Scope — 2/2**" in entry
+    assert "  - **B. Sign-off — 1/1**" in entry
+    assert "    - [x] safe to confirm" in entry
+    assert "[ ]" not in entry
+    assert "- **Scope:** Step 1 — DRAFT assembled client-side" in entry
+    assert "the page wrote NOTHING server-side" in entry
+    assert entry.rstrip().endswith("nothing is applied by this draft>")
+
+
+def test_draft_entry_partially_ticked_is_pending() -> None:
+    spec = spec_from_dict(_DOC)
+    entry = draft_gate_log_entry(spec, ticked={"c0_0"})
+    # date defaults to a placeholder; anything short of all ticks drafts PENDING
+    assert entry.startswith("## YYYY-MM-DD — Demo gate (demo) — PENDING\n")
+    assert "- **Ticked: 1/3**" in entry
+    assert "  - **A. Scope — 1/2**" in entry
+    assert "    - [x] source is authoritative" in entry
+    assert "    - [ ] no PII in scope" in entry
+    assert "    - [ ] safe to confirm" in entry
+
+
+def test_draft_entry_unticked_and_empty_spec_are_pending() -> None:
+    assert "— PENDING" in draft_gate_log_entry(spec_from_dict(_DOC))
+    empty = spec_from_dict({"id": "e", "title": "Empty gate", "sections": []})
+    assert "— PENDING" in draft_gate_log_entry(empty)  # 0/0 never claims sign-off
+
+
+def test_render_embeds_the_draft_affordance() -> None:
+    """The page carries the drafting control + the prebuilt payload lines the
+    JS selects from (so browser output cannot drift from the Python
+    reference), and adds NO extra checkboxes (the count guard's invariant)."""
+    out = render_gate_page(spec_from_dict(_DOC))
+    assert "Draft gate-log entry" in out
+    assert "Copy snippet" in out and "Download .md" in out
+    assert '"    - [x] safe to confirm"' in out    # prebuilt ticked line, JSON-embedded
+    assert '"    - [ ] safe to confirm"' in out    # ... and its unticked twin
+    assert "gate-log-entry-demo-draft.md" in out
+    assert "this page writes nothing" in out
+    assert out.count('type="checkbox"') == 3       # affordance adds no checkboxes
 
 
 def test_render_page_footer_carries_paths() -> None:

@@ -164,6 +164,120 @@ def _checkbox(cid: str, text: str) -> str:
     return f'    <label><input type="checkbox" id="{cid}"> {html.escape(text)}</label>'
 
 
+# ---------------------------------------------------------------------------
+# O25 — the M1 drafting affordance (ui-write-surface gate SME-2, 2026-07-21):
+# the rendered page assembles the config/gate-log.md entry SNIPPET from its
+# ticks, client-side only. Python builds every line the browser can emit
+# (the payload embeds prebuilt ticked/unticked variants), so the JS merely
+# selects and joins — draft_gate_log_entry() below is the same assembly and
+# is what the unit tests pin. Zero server writes; ticks stay browser-local;
+# an M2 upgrade would be its own gate decision.
+# ---------------------------------------------------------------------------
+
+def _draft_payload(spec: GateSpec) -> dict[str, Any]:
+    """Everything the client-side draft needs, with per-confirmation lines
+    PREBUILT here so browser output and draft_gate_log_entry() cannot drift."""
+    sections = []
+    for si, s in enumerate(spec.sections):
+        confs = []
+        for ci, text in enumerate(s.confirmations):
+            confs.append({
+                "id": f"c{si}_{ci}",
+                "ticked": f"    - [x] {text}",
+                "unticked": f"    - [ ] {text}",
+            })
+        sections.append({"title": s.title, "confs": confs})
+    return {
+        "heading": f"## {{date}} — {spec.title} ({spec.id}) — {{status}}",
+        "scope": (
+            "- **Scope:** "
+            + (f"{spec.step} — " if spec.step else "")
+            + "DRAFT assembled client-side from the rendered gate page's ticks "
+            "(the O20 SME-2 M1 affordance) — review, edit, and commit to "
+            "config/gate-log.md; the page wrote NOTHING server-side."
+        ),
+        "effect": (
+            "- **Effect:** <fill in at sign-off: status flips, vocabulary/map "
+            "changes, backlog updates — nothing is applied by this draft>"
+        ),
+        "filename": f"gate-log-entry-{spec.id}-draft.md",
+        "sections": sections,
+    }
+
+
+def draft_gate_log_entry(
+    spec: GateSpec, ticked: frozenset[str] | set[str] = frozenset(), date: str = "YYYY-MM-DD"
+) -> str:
+    """The gate-log entry snippet for a given tick state — the pure reference
+    implementation of the page's client-side assembly (same payload, same
+    lines). ``ticked`` holds checkbox ids (``c<section>_<confirmation>``);
+    ``date`` defaults to a placeholder (the browser substitutes today).
+    All boxes ticked proposes SIGNED OFF; anything less drafts PENDING —
+    the SME's edit remains the authority either way."""
+    p = _draft_payload(spec)
+    ticked = set(ticked)
+    total = n = 0
+    body: list[str] = []
+    for s in p["sections"]:
+        k = sum(1 for c in s["confs"] if c["id"] in ticked)
+        total += len(s["confs"])
+        n += k
+        body.append(f"  - **{s['title']} — {k}/{len(s['confs'])}**")
+        body.extend(c["ticked"] if c["id"] in ticked else c["unticked"] for c in s["confs"])
+    status = "SIGNED OFF" if total and n == total else "PENDING"
+    lines = [
+        p["heading"].replace("{date}", date).replace("{status}", status),
+        "",
+        p["scope"],
+        f"- **Ticked: {n}/{total}**",
+        *body,
+        p["effect"],
+    ]
+    return "\n".join(lines) + "\n"
+
+
+_DRAFT_JS = """
+const DRAFT = __DRAFT_PAYLOAD__;
+function draftEntry() {
+  let total = 0, n = 0; const body = [];
+  DRAFT.sections.forEach(s => {
+    const k = s.confs.filter(c => document.getElementById(c.id).checked).length;
+    total += s.confs.length; n += k;
+    body.push('  - **' + s.title + ' — ' + k + '/' + s.confs.length + '**');
+    s.confs.forEach(c => body.push(document.getElementById(c.id).checked ? c.ticked : c.unticked));
+  });
+  const status = (total && n === total) ? 'SIGNED OFF' : 'PENDING';
+  const today = new Date().toISOString().slice(0, 10);
+  const lines = [
+    DRAFT.heading.replace('{date}', today).replace('{status}', status),
+    '',
+    DRAFT.scope,
+    '- **Ticked: ' + n + '/' + total + '**',
+    ...body,
+    DRAFT.effect,
+  ];
+  return lines.join('\\n') + '\\n';
+}
+document.addEventListener('DOMContentLoaded', () => {
+  const area = document.getElementById('draftarea');
+  const copyb = document.getElementById('copydraft');
+  const dlb = document.getElementById('dldraft');
+  document.getElementById('draftbtn').addEventListener('click', () => {
+    area.value = draftEntry(); area.style.display = 'block';
+    copyb.disabled = false; dlb.disabled = false;
+  });
+  copyb.addEventListener('click', () =>
+    navigator.clipboard.writeText(area.value).then(() => { copyb.textContent = 'copied \\u2713'; }));
+  dlb.addEventListener('click', () => {
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(new Blob([area.value], { type: 'text/markdown' }));
+    a.download = DRAFT.filename;
+    a.click(); URL.revokeObjectURL(a.href);
+  });
+});
+""".strip()
+
+
 def render_gate_page(spec: GateSpec, page_path: str | None = None) -> str:
     """Render a self-contained interactive gate page. Pure — no graph access.
 
@@ -223,6 +337,21 @@ def render_gate_page(spec: GateSpec, page_path: str | None = None) -> str:
         )
         parts.append(f'<h2>{html.escape(section.title)}</h2>\n{boxes}')
 
+    # O25 — the M1 drafting affordance (client-side only; see draft_gate_log_entry)
+    parts.append(
+        "<h2>Draft gate-log entry</h2>\n"
+        "<p style='font-size:.9em'>Assembles the <code>config/gate-log.md</code> entry snippet "
+        "from the ticks above (house-format heading, per-section ticked/unticked, counts) — "
+        "<strong>client-side only</strong>, the O20 SME-2 M1 ruling: review, edit, and commit; "
+        "this page writes nothing.</p>\n"
+        "<button type='button' id='draftbtn'>Draft gate-log entry</button>\n"
+        "<button type='button' id='copydraft' disabled>Copy snippet</button>\n"
+        "<button type='button' id='dldraft' disabled>Download .md</button>\n"
+        "<textarea id='draftarea' spellcheck='false' aria-label='Drafted gate-log entry' "
+        "style='display:none;width:100%;height:16rem;font-family:ui-monospace,monospace;"
+        "font-size:.8rem;margin-top:.5rem'></textarea>"
+    )
+
     js = f"""
 const KEY = "drydocs-gate:" + {json.dumps(spec.id)};
 function boxes() {{ return document.querySelectorAll('input[type=checkbox]'); }}
@@ -243,6 +372,11 @@ document.addEventListener('DOMContentLoaded', () => {{
   boxes().forEach(c => c.addEventListener('change', save)); restore();
 }});
 """.strip()
+
+    # </ never appears in JSON output unescaped this way — keeps the payload
+    # safe inside the <script> element regardless of confirmation text.
+    payload = json.dumps(_draft_payload(spec), ensure_ascii=False).replace("</", "<\\/")
+    js += "\n" + _DRAFT_JS.replace("__DRAFT_PAYLOAD__", payload)
 
     return (
         "<!doctype html>\n<html><head><meta charset='utf-8'>\n"
