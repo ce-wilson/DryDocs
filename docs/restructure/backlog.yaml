@@ -4811,7 +4811,7 @@ items:
     agent: main
     model: sonnet
     priority: p2
-    status: in_progress                              # claimed 2026-07-21 pm (VS Code session) — the O20 SME-3 follow-up build
+    status: done                                     # 2026-07-21 pm (`b241661`): committed override list config/overrides/seal-contact-overrides.csv → seal_contact_override table in mapping.db (fail-closed ingestion, source-hash tracked); v_seal_contact_grid = origin-flagged ADJACENT rows (source first, never merged); domain seal-contact-override live on /mappings (SealOverridePane + ?domain= deep-link, DEMO fallback); POST /mappings/overrides/draft returns the COMPLETE updated file (commit-by-replace, authored_by server-stamped); GET /mappings/overrides/report = AO-facing source-corrections markdown; spec mappings.seal-contact-roles.v1 pairs LIVE K4 attributions as source rows; enforcement-matrix surface 15; +13 tests, suite 815 green, endpoints + pane live-smoked. Graph-precedence stayed OUT (open gate question, as ruled).
     depends_on: [O13]
     inputs: [drydocs_api/mappings.py, drydocs_core/mapping_store.py, web/src/routes/MappingsRoute.tsx, drydocs/loaders/cypher/seal_contacts.cypher, drydocs_api/query_specs.py, config/gate-log.md]
     acceptance: >
@@ -4878,8 +4878,8 @@ items:
       generator's home); zero api surface.
 
 summary:
-  todo: 24                                         # -O24 in_progress (claimed 2026-07-21 pm); +G18..G24 rua-ingest phase incl. repo-source seam (2026-07-21)
-  in_progress: 2                                   # E1 (gate deferred both sides) + O24 (SEAL-contacts override list, VS Code session)
+  todo: 24                                         # +O25 (O20 sign-off follow-up); +G18..G24 rua-ingest phase incl. repo-source seam (2026-07-21)
+  in_progress: 1                                   # E1 (gate deferred both sides)
   blocked: 0
-  done: 113                                        # +O20 SIGNED OFF 2026-07-21 pm — the Epic O phase-12 chain is COMPLETE
+  done: 114                                        # +O24 SEAL-contacts override list BUILT 2026-07-21 pm (the ui-write-surface M2 first instance)
   next_ready: [L9, L12, L14, L15, M2, M3, M4, P3, J10, Q6, O23, O25, J13, G17, G18, G19, C11]
