@@ -13,6 +13,7 @@ import ConsoleRoute from './routes/ConsoleRoute'
 import MappingsRoute from './routes/MappingsRoute'
 import LineageRoute from './routes/LineageRoute'
 import AdminConfigRoute from './routes/AdminConfigRoute'
+import LoadsRoute from './routes/LoadsRoute'
 import './App.css'
 
 // O8 rebuild: real react-router routes (deep-linkable, back-button safe —
@@ -64,7 +65,8 @@ export default function App() {
         <Route path="remediation" element={<SkeletonModuleRoute id="remediation" />} />
         <Route path="docs" element={<SkeletonModuleRoute id="docs" />} />
         <Route path="gates" element={<SkeletonModuleRoute id="gates" />} />
-        <Route path="loads" element={<SkeletonModuleRoute id="loads" />} />
+        <Route path="loads" element={<LoadsRoute persona={persona} />} />
+        <Route path="loads/run/:runId" element={<LoadsRoute persona={persona} />} />
 
         {/* O13: steward + admin only — the server enforces the same boundary
             on /mappings/*; steward still has NO /console (Cypher sandbox). */}

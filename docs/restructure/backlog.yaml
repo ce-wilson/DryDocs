@@ -3298,7 +3298,7 @@ items:
     agent: main
     model: sonnet
     priority: p2
-    status: todo
+    status: done          # DONE 2026-07-21 (Epic-O finish session) — see notes
     depends_on: [O9, O11]
     inputs: [UI-WIP/site-plan.md, web/src/, drydocs/loaders/]
     acceptance: >
@@ -3307,7 +3307,21 @@ items:
       as a run timeline; data-frame tabs (Runs / Rejects / Drift-coverage) bind
       to QuerySpecs over the BaseLoader :JobRun envelope; /loads/run/:runId deep
       links resolve; empty states honest on databases with no runs; both themes.
-    notes: "site-plan.md P3 wave 1 (module 8)."
+    notes: >
+      site-plan.md P3 wave 1 (module 8).
+      DONE 2026-07-21 (Epic-O finish session): LoadsRoute on the shared
+      template — LoadsTimeline (dot-and-rail vertical timeline in the ReUI
+      idiom, status theme-tokened, per-run counts incl. rejected/
+      marked-removed/reactivated) fed by NEW spec loads.runs.v1; sibling specs
+      loads.rejects.v1 (rows_rejected > 0 — never silent drops) and
+      loads.drift-coverage.v1 (the D7 mark counters). /loads/run/:runId
+      preselects the run (crumb + item highlight). LIVE-VERIFIED beyond the
+      demo path: the local drydocs DB carries real :JobRun envelopes (bmc_docs
+      + software_registry loads, 2026-07-09) and the smoke screenshot shows
+      the timeline + Runs grid rendering them with the LIVE badge and full
+      export toolbar — the first module page verified against real graph rows.
+      Demo runs remain the honest fallback for empty DBs. Build+lint+spec
+      tests green.
 
   - id: O17
     epic: web-console
@@ -4424,8 +4438,8 @@ items:
 # Roll-up the dispatcher can glance at. COMPUTED views — test_backlog.py enforces
 # that these match the items exactly; update them with any status change.
 summary:
-  todo: 20                                         # -O15 done (2026-07-21 Epic-O finish session)
+  todo: 19                                         # -O16 done (2026-07-21 Epic-O finish session)
   in_progress: 1                                   # E1 (gate deferred both sides)
   blocked: 0
-  done: 108                                        # +O13 +O10 +O12 +O15 (2026-07-21 Epic-O finish session)
-  next_ready: [L9, L12, L14, L15, M2, M3, M4, P3, J10, Q6, O16, O17, O18, O19, J13, G17, C11]
+  done: 109                                        # +O13 +O10 +O12 +O15 +O16 (2026-07-21 Epic-O finish session)
+  next_ready: [L9, L12, L14, L15, M2, M3, M4, P3, J10, Q6, O17, O18, O19, J13, G17, C11]

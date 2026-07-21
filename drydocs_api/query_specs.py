@@ -313,6 +313,78 @@ QUERY_SPECS: dict[str, QuerySpec] = {
             classification="internal",
             params=_LIMIT,
         ),
+        # O16 loads frames — the BaseLoader :JobRun envelope.
+        QuerySpec(
+            id="loads.runs.v1",
+            database="drydocs",
+            description="Loader :JobRun envelope, newest first — the /loads timeline feed.",
+            cypher=(
+                "MATCH (r:JobRun) WHERE r.kind = 'load' "
+                "RETURN r.run_id AS run_id, r.loader AS loader, r.source AS source, "
+                "toString(r.started_at) AS started_at, toString(r.completed_at) AS completed_at, "
+                "r.status AS status, r.rows_processed AS rows_processed, "
+                "r.rows_changed AS rows_changed "
+                "ORDER BY r.started_at DESC LIMIT $limit"
+            ),
+            columns=(
+                ColumnDef("run_id", "string", "Run id"),
+                ColumnDef("loader", "string", "Loader"),
+                ColumnDef("source", "string", "Source"),
+                ColumnDef("started_at", "string", "Started"),
+                ColumnDef("completed_at", "string", "Completed"),
+                ColumnDef("status", "string", "Status"),
+                ColumnDef("rows_processed", "int", "Rows"),
+                ColumnDef("rows_changed", "int", "Changed"),
+            ),
+            classification="internal",
+            params=_LIMIT,
+        ),
+        QuerySpec(
+            id="loads.rejects.v1",
+            database="drydocs",
+            description="Runs that rejected rows (rows_rejected > 0) — never silent drops.",
+            cypher=(
+                "MATCH (r:JobRun) WHERE r.kind = 'load' AND coalesce(r.rows_rejected, 0) > 0 "
+                "RETURN r.run_id AS run_id, r.loader AS loader, "
+                "toString(r.started_at) AS started_at, r.rows_rejected AS rows_rejected, "
+                "r.rows_processed AS rows_processed "
+                "ORDER BY r.started_at DESC LIMIT $limit"
+            ),
+            columns=(
+                ColumnDef("run_id", "string", "Run id"),
+                ColumnDef("loader", "string", "Loader"),
+                ColumnDef("started_at", "string", "Started"),
+                ColumnDef("rows_rejected", "int", "Rejected"),
+                ColumnDef("rows_processed", "int", "Rows"),
+            ),
+            classification="internal",
+            params=_LIMIT,
+        ),
+        QuerySpec(
+            id="loads.drift-coverage.v1",
+            database="drydocs",
+            description=(
+                "Removed-from-source drift per run (the D7 mark pass): runs whose "
+                "full-diff marked or reactivated nodes."
+            ),
+            cypher=(
+                "MATCH (r:JobRun) WHERE r.kind = 'load' AND "
+                "(coalesce(r.nodes_marked_removed, 0) > 0 OR coalesce(r.nodes_reactivated, 0) > 0) "
+                "RETURN r.run_id AS run_id, r.loader AS loader, "
+                "toString(r.started_at) AS started_at, "
+                "r.nodes_marked_removed AS marked_removed, r.nodes_reactivated AS reactivated "
+                "ORDER BY r.started_at DESC LIMIT $limit"
+            ),
+            columns=(
+                ColumnDef("run_id", "string", "Run id"),
+                ColumnDef("loader", "string", "Loader"),
+                ColumnDef("started_at", "string", "Started"),
+                ColumnDef("marked_removed", "int", "Marked removed"),
+                ColumnDef("reactivated", "int", "Reactivated"),
+            ),
+            classification="internal",
+            params=_LIMIT,
+        ),
         # O10 lineage frames — ddlineage is REAL but empty until the lineage
         # live-load gate flips the four m3_* entries; these specs return zero
         # rows until then and the UI shows its SYNTHESIZED demo honestly.
