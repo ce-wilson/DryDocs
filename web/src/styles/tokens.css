@@ -35,6 +35,11 @@
   --red: #c8202e; /* brand core — same hue both themes (brand rule, site-plan §2) */
   --red-soft: #a81824;
 
+  /* Kept Orbit brand constants (UI-WIP/kept-orbit-philosophy.md): like --red,
+     the mark's stave colors are identity, not theme — same values both sheets. */
+  --brand-navy: #1e3a5c;
+  --brand-green: #2bb673;
+
   --mono: 'IBM Plex Mono', ui-monospace, Consolas, monospace;
   --sans: 'IBM Plex Sans', -apple-system, 'Segoe UI', sans-serif;
 
@@ -60,6 +65,9 @@
   --yellow: #d9b831;
   --red: #c8202e;
   --red-soft: #e4525d;
+
+  --brand-navy: #1e3a5c;
+  --brand-green: #2bb673;
 
   color-scheme: dark;
 }

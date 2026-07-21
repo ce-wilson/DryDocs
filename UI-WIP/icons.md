@@ -44,3 +44,8 @@ Conventions: 120×120 viewBox, ~2.2px stroke, `feGaussianBlur` glow filter on th
 - [ ] ~~Swap in real Inter / Fira Code webfonts~~ SUPERSEDED: the locked stack
       self-hosts IBM Plex Sans/Mono (site-plan §1, shipped in O8) — this line
       predated the font decision.
+- [x] Brand mark UPGRADED 2026-07-21 to the **Kept Orbit** geometry
+      (`kept-orbit-philosophy.md`, `drydocs-mark*.svg` — logo-5/logo-8 rebuilt
+      as exact ellipse-arc staves): console `BrandMarkGlyph` + `favicon.svg` +
+      the alt landing all share it. The original glyph-1 description ("red
+      sphere + revolving rectangles") is superseded by the stave construction.

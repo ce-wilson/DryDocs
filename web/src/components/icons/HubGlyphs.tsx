@@ -41,25 +41,22 @@ function accent(token: string) {
   return { className: 'glyph-accent', stroke: 'currentColor', style: { color: `var(${token})` } }
 }
 
-/** 1. Brand mark — red sphere + revolving translucent rectangles (header lockup / hub core). */
+/** 1. Brand mark — the Kept Orbit mark, small-size (3-stave) variant: red core
+ *  wrapped by keel-navy and community-green staves (generated geometry from
+ *  UI-WIP/drydocs-mark-mini.svg; philosophy UI-WIP/kept-orbit-philosophy.md —
+ *  palette after the community graph, a tribute, not a copy). Brand-constant
+ *  tokens (--brand-navy/--brand-green, same both themes, like --red); the core
+ *  is flat token fill + token highlight, no gradient — the one-ink test. */
 export function BrandMarkGlyph(props: GlyphProps) {
   return (
     <svg {...svgProps(props)}>
       {props.title && <title>{props.title}</title>}
-      {/* orbit track */}
-      <ellipse cx="60" cy="60" rx="46" ry="20" {...stroke} stroke="var(--faint)" strokeDasharray="5 7" transform="rotate(-18 60 60)" />
-      {/* core sphere: flat token fill + token highlight (no gradient → no hex stops) */}
-      <circle cx="60" cy="60" r="21" fill="var(--red)" />
-      <ellipse cx="53" cy="52" rx="8" ry="5.5" fill="var(--red-soft)" opacity="0.55" />
-      {/* revolving translucent panels — each its own accent color */}
-      <g {...accent('--teal')} fill="currentColor" strokeWidth="2.2">
-        <rect x="8" y="48" width="15" height="21" rx="2.5" fillOpacity="0.28" transform="rotate(-14 15.5 58.5)" />
-      </g>
-      <g {...accent('--blue-br')} fill="currentColor" strokeWidth="2.2">
-        <rect x="96" y="52" width="15" height="21" rx="2.5" fillOpacity="0.28" transform="rotate(12 103.5 62.5)" />
-      </g>
-      <g {...accent('--yellow')} fill="currentColor" strokeWidth="2.2">
-        <rect x="52" y="8" width="16" height="12" rx="2.5" fillOpacity="0.28" transform="rotate(-6 60 14)" />
+      <g transform="scale(0.5)">
+        <path d="M 63.04 59.30 A 82.0 26.0 0 0 1 184.62 61.99 L 184.62 113.99 A 82.0 26.0 0 0 0 63.04 111.30 Z" fill="var(--brand-navy)" />
+        <circle cx="120" cy="118" r="44" fill="var(--red)" />
+        <ellipse cx="104" cy="100" rx="14" ry="10" fill="var(--red-soft)" opacity="0.6" />
+        <path d="M 117.14 125.98 A 82.0 26.0 0 0 1 38.00 100.00 L 38.00 152.00 A 82.0 26.0 0 0 0 117.14 177.98 Z" fill="var(--brand-green)" />
+        <path d="M 200.21 91.41 A 82.0 26.0 0 0 1 134.24 111.61 L 134.24 163.61 A 82.0 26.0 0 0 0 200.21 143.41 Z" fill="var(--brand-navy)" />
       </g>
     </svg>
   )
