@@ -4523,10 +4523,13 @@ items:
       2026-07-20 company-side run (screenshots -> reproduce generically, the
       drydocs-review back-flow discipline): a -n <glob> flag (repeatable or
       space-separated) captures FILES matching the name glob under the scan
-      roots into scripts.tsv (path, owner, group, perms, size, mtime) plus
-      copies under scripts/ in the bundle (copy behavior config-gated like
-      COPY_PROFILES; size cap configurable so a stray large file never bloats
-      the bundle); the run summary prints a "scripts: N captured" line;
+      roots into scripts.tsv (path, owner, group, perms, size, mtime, sha256)
+      plus copies under scripts/ in the bundle (copy behavior config-gated
+      like COPY_PROFILES; size cap configurable so a stray large file never
+      bloats the bundle); profiles.tsv gains the same sha256 column (content
+      hash = the version discriminator and the anchor for G24's all-refs
+      repo blob sweep; v1 captures no hashes — verified 2026-07-21); the run
+      summary prints a "scripts: N captured" line;
       COLLECTOR_VERSION bumps to rua-inventory/v2 with v1 bundles explicitly
       still ingestible (the extractor treats scripts.tsv as optional);
       README documents the flag and the bundle addition. POSIX sh / ksh
@@ -4647,7 +4650,7 @@ items:
     model: fable
     priority: p2
     status: todo
-    depends_on: [G21, G24]
+    depends_on: [G21, G24, G25]
     inputs: [docs/restructure/03-hitl-sme-flow.md, config/gate-log.md, drydocs_core/schema/schema_graph.cypher, docs/RELATIONSHIP_GUIDE.md, config/precedence.yaml, drydocs_core/schema/provisioning/02_proxy_constraints.cypher]
     acceptance: >
       A HITL gate session rules the graph shape for rua data before ANY
@@ -4681,8 +4684,20 @@ items:
       with no references is FLAGGED unreferenced, never auto-judged
       unused; (e) classification handling on load — which properties are
       internal-confidential and must never reach a publishable export
-      (ties to the O11 spec classification vocabulary). Decisions in
-      config/gate-log.md; anything declined stays candidate-only.
+      (ties to the O11 spec classification vocabulary); (f) GUID-vs-URN
+      identity for registry-known pipelines/datasets (G25): where an
+      asset is DPL-managed the registry GUID IS the business key per
+      ADR 0001 and the gate rules where it sits (URN segment vs
+      property), with the urn:drydocs:dataasset pattern as the fallback
+      for everything else — and the CONTENT HASH rides on
+      source-occurrence records as the version discriminator (same URN +
+      different hashes = drift, queryable); versions do NOT become their
+      own nodes unless this gate rules otherwise; (g) the THREE-SIGNAL
+      usage ruling: referenced (G21/G16 facts), registry-active (G25
+      flag), and present-on-server (G20) stay SEPARATE axes,
+      corroborated never conflated — active=false-but-referenced and
+      active=true-but-unreferenced are findings, not errors. Decisions
+      in config/gate-log.md; anything declined stays candidate-only.
     notes: >
       THE TERMINUS of this groom — G18-G21 + G24 are all candidate-side
       and buildable ungated; nothing writes the graph before this session.
@@ -4746,15 +4761,22 @@ items:
       listing/manifest and job-definition XML carrying script paths via
       folder VARIABLEs — mechanism-only; real Bitbucket access stays
       company-side behind this seam). A corroboration report joins the two
-      origins on the candidate script identity (path-tail matching until
-      the G22 URN is ruled) into three buckets — server-only, repo-only,
-      both (with content/mtime-vs-commit drift when comparable) — because
-      server-only IS the observed failure mode (production code absent
-      from the repo) and the both-bucket drift is the "clean branch"
-      signal per team. The per-team/per-repo clean-branch trust flag has a
-      config home (source-registry entry field), set by humans, never
-      inferred. NO graph writes, no new relationship types; unmatched
-      records counted, never dropped. Full suite green.
+      origins on CONTENT HASH (compute the git blob hash of each server
+      file and sweep ALL refs in one pass — git rev-list --all --objects —
+      never branch guesswork; path-tail matching only as fallback until
+      the G22 URN is ruled) into verdict buckets — found-at-refs (WITH
+      the matching refs + commit dates: names the de-facto current
+      branch mechanically), behind (only older commits match = running
+      code ahead of everything committed), never-committed (the observed
+      failure mode: production code absent from the repo), and repo-only
+      — per-team hash drift IS the "clean branch" signal. The trust flag
+      is a nullable per-repo trusted_ref field on the source-registry
+      entry (the human-blessed intent line; null = server-extract-only
+      truth — covers the stale-main case: main exists but dead, real
+      code scattered across feature branches; the sweep names the
+      candidate ref, a human blesses it), never inferred. NO graph
+      writes, no new relationship types; unmatched records counted,
+      never dropped. Full suite green.
     notes: >
       Groomed 2026-07-21 from the SME-chat evidence (mechanism-only): a
       script running in production was not findable in the code repo —
@@ -4762,9 +4784,54 @@ items:
       lacks. The repo is a valid source ONLY where the team keeps a clean
       branch (the trust flag); production servers always have the latest
       RUNNING code — but "what calls it / is it used" stays the reference
-      graph's question (G21/G16 facts), never this seam's. Feeds the G22
-      gate (identity/dedup + precedence rulings). Candidate-side, hence
-      sonnet.
+      graph's question (G21/G16 facts), never this seam's. Amended same
+      day from the stale-repo use case (team migrated to GitHub in sync,
+      then the manager + best-practice devs left; main untouched >1yr,
+      latest likely scattered in feature branches): content-hash blob
+      sweep replaces path-only matching, trusted_ref replaces the
+      boolean flag. Feeds the G22 gate (identity/dedup + precedence
+      rulings). Candidate-side, hence sonnet.
+
+  - id: G25
+    epic: component-topology
+    title: "DPL registry ingestion source: per-SEAL Swagger JSON (pipeline/dataset GUID, version, active flag) + GUID cross-check"
+    type: task
+    module: drydocs-lineage
+    phase: 6
+    agent: main
+    model: sonnet
+    priority: p2
+    status: todo
+    depends_on: [G19]
+    inputs: [config/source-registry.yaml, config/classification.yaml, drydocs_lineage/, drydocs_core/controlm/commands.py, tests/unit/test_lineage_inventory.py]
+    acceptance: >
+      The DPL taxonomy registry becomes a registered ingestion source:
+      per-SEAL Swagger JSON exports of the registry DB (pipeline GUID /
+      dataset GUID, version, active|inactive flag, keyed by SEAL) are
+      ingested TAXONOMY-FIRST (pure classification, no meaning edges)
+      into staging records (guid, kind=pipeline|dataset, version,
+      active, seal, provenance envelope). Downloads land in the G19
+      out-of-tree zone (dpl-registry/ subfolder); the source-registry
+      entry carries classification internal-confidential (real SEALs +
+      GUIDs + lifecycle state) and records that data never enters the
+      repo; fixtures are SYNTHETIC. A cross-check report joins registry
+      GUIDs against the GUIDs G15 observes in launcher CMD_LINEs:
+      observed-not-registered and registered-not-observed are each
+      counted and listed, never dropped — the registry is also the truth
+      table for which job families carry pipeline ids at all (the
+      code-fetch tooling gap from the SME chat). The active flag is
+      staged as a THIRD usage signal (beside referenced and
+      present-on-server) — staged only; any conflation with "used" is a
+      G22 ruling. NO graph writes. Full suite green.
+    notes: >
+      Groomed 2026-07-21 from the user's registry disclosure: the DPL
+      taxonomy lives in a database showing version + active/inactive
+      flag by SEAL, exportable per-SEAL as Swagger JSON. Independent of
+      the collector track (only needs the G19 landing zone), so it can
+      run in parallel. Complements G17 — G17 reads each pipeline's own
+      MAC JSON set, G25 reads the registry ABOVE the pipelines; the
+      shared join key is the same GUID G15 extracts. Feeds G22 clauses
+      (f)/(g). Candidate-side, hence sonnet.
 
   - id: C11
     epic: ontology-mapping
@@ -4878,7 +4945,7 @@ items:
       generator's home); zero api surface.
 
 summary:
-  todo: 24                                         # +O25 (O20 sign-off follow-up); +G18..G24 rua-ingest phase incl. repo-source seam (2026-07-21)
+  todo: 25                                         # +O25 (O20 sign-off follow-up); +G18..G25 rua-ingest phase incl. repo-source seam + DPL registry source (2026-07-21)
   in_progress: 1                                   # E1 (gate deferred both sides)
   blocked: 0
   done: 114                                        # +O24 SEAL-contacts override list BUILT 2026-07-21 pm (the ui-write-surface M2 first instance)
