@@ -61,7 +61,9 @@ export const MODULES: readonly ModuleDef[] = [
     path: '/ownership',
     tagline: 'SEAL → PAT → team rollup',
     backsOnto: 'seal-attribution',
-    tabs: ['Teams', 'Memberships', 'Escalation routing'],
+    // 'Memberships' -> 'Attributions' at O15: K4 replaced the membership
+    // scheme with qualified Attribution nodes (the tab tracks the model).
+    tabs: ['Teams', 'Attributions', 'Escalation routing'],
     phase: 2,
   },
   {

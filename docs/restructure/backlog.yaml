@@ -3257,7 +3257,7 @@ items:
     agent: main
     model: sonnet
     priority: p2
-    status: todo
+    status: done          # DONE 2026-07-21 (Epic-O finish session) — see notes
     depends_on: [O9, O11]
     inputs: [UI-WIP/site-plan.md, web/src/, drydocs/loaders/cypher/seal_applications.cypher, drydocs/loaders/cypher/seal_contacts.cypher, drydocs_core/schema/seal_ontology_supplement.cypher]
     acceptance: >
@@ -3274,6 +3274,20 @@ items:
       constraint fix (4abe1aa) — the page reads the exact MERGE keys the
       constraints now back. MyApps at /ownership survived O8; this is its
       template-instantiation upgrade, not a new surface.
+      DONE 2026-07-21 (Epic-O finish session): OwnershipRoute on the shared
+      template — OwnershipGraphPane renders the acceptance rollup chain
+      (CatalogLOB -> Product -> AreaProduct -> DevTeam -> BusinessApplication)
+      in the K4 qualified-attribution shape: Attribution nodes keyed
+      attribution_id, HAD_ROLE -> TOMRole, and an unmapped_role=true example
+      VISIBLY red-flagged (never hidden); MyApps kept as the pane's toggled
+      alternate view (evolution, not teardown). Three NEW QuerySpecs:
+      ownership.teams.v1 (DEVELOPS counts), ownership.attributions.v1
+      (internal-confidential; holder by SID only, unmapped rows float to top),
+      ownership.escalation-routing.v1 (ServiceNowGroup — zero rows is the
+      honest producer state, company-side source). Registry tab renamed
+      Memberships -> Attributions (tracks the K4 model). Selection links
+      graph <-> frames as in Explorer. Verified: spec tests green, build+lint
+      green, headless-Edge smoke (rollup + unmapped flag + live spec fallback).
 
   - id: O16
     epic: web-console
@@ -4410,8 +4424,8 @@ items:
 # Roll-up the dispatcher can glance at. COMPUTED views — test_backlog.py enforces
 # that these match the items exactly; update them with any status change.
 summary:
-  todo: 21                                         # -O12 done (2026-07-21 Epic-O finish session)
+  todo: 20                                         # -O15 done (2026-07-21 Epic-O finish session)
   in_progress: 1                                   # E1 (gate deferred both sides)
   blocked: 0
-  done: 107                                        # +O13 +O10 +O12 (2026-07-21 Epic-O finish session)
-  next_ready: [L9, L12, L14, L15, M2, M3, M4, P3, J10, Q6, O15, O16, O17, O18, O19, J13, G17, C11]
+  done: 108                                        # +O13 +O10 +O12 +O15 (2026-07-21 Epic-O finish session)
+  next_ready: [L9, L12, L14, L15, M2, M3, M4, P3, J10, Q6, O16, O17, O18, O19, J13, G17, C11]

@@ -243,6 +243,76 @@ QUERY_SPECS: dict[str, QuerySpec] = {
             columns=(ColumnDef("name", "string", "Server"),),
             classification="internal",
         ),
+        # O15 ownership frames — the K4 qualified-attribution shape.
+        QuerySpec(
+            id="ownership.teams.v1",
+            database="drydocs",
+            description="Dev teams with their DEVELOPS application count (arch_develops, C3 gate).",
+            cypher=(
+                "MATCH (dt:DevTeam) "
+                "OPTIONAL MATCH (dt)-[:DEVELOPS]->(a:BusinessApplication) "
+                "RETURN dt.team_id AS team_id, dt.name AS team, "
+                "count(DISTINCT a) AS applications "
+                "ORDER BY team LIMIT $limit"
+            ),
+            columns=(
+                ColumnDef("team_id", "string", "Team id"),
+                ColumnDef("team", "string", "Team"),
+                ColumnDef("applications", "int", "Applications"),
+            ),
+            classification="internal-confidential",
+            params=_LIMIT,
+        ),
+        QuerySpec(
+            id="ownership.attributions.v1",
+            database="drydocs",
+            description=(
+                "K4 qualified attributions: Attribution nodes keyed attribution_id with "
+                "their TOMRole crosswalk — unmapped_role=true rows float to the top, "
+                "visibly flagged, never hidden (the K4 rule). Holder by SID only "
+                "(names are confidential)."
+            ),
+            cypher=(
+                "MATCH (a:BusinessApplication)-[:QUALIFIED_ATTRIBUTION]->(m:Attribution) "
+                "OPTIONAL MATCH (m)-[:HAD_ROLE]->(tr:TOMRole) "
+                "OPTIONAL MATCH (m)-[:HAS_AGENT]->(e) "
+                "RETURN a.seal_id AS seal_id, m.attribution_id AS attribution_id, "
+                "m.role_source_name AS source_role, tr.id AS tom_role, m.level AS level, "
+                "m.unmapped_role AS unmapped_role, e.sid AS holder_sid "
+                "ORDER BY m.unmapped_role DESC, seal_id LIMIT $limit"
+            ),
+            columns=(
+                ColumnDef("seal_id", "string", "SEAL id"),
+                ColumnDef("attribution_id", "string", "Attribution id"),
+                ColumnDef("source_role", "string", "Source role"),
+                ColumnDef("tom_role", "string", "TOM role"),
+                ColumnDef("level", "string", "Level"),
+                ColumnDef("unmapped_role", "string", "Unmapped?"),
+                ColumnDef("holder_sid", "string", "Holder SID"),
+            ),
+            classification="internal-confidential",
+            params=_LIMIT,
+        ),
+        QuerySpec(
+            id="ownership.escalation-routing.v1",
+            database="drydocs",
+            description=(
+                "Escalation routing groups (ServiceNowGroup). The escalation source "
+                "(CM_ESCALATION_DB / SCIM) is company-side — zero rows here is the "
+                "honest producer state until that source loads."
+            ),
+            cypher=(
+                "MATCH (g:ServiceNowGroup) "
+                "RETURN g.group_id AS group_id, coalesce(g.name, g.group_id) AS group_name "
+                "ORDER BY group_id LIMIT $limit"
+            ),
+            columns=(
+                ColumnDef("group_id", "string", "Group id"),
+                ColumnDef("group_name", "string", "Group"),
+            ),
+            classification="internal",
+            params=_LIMIT,
+        ),
         # O10 lineage frames — ddlineage is REAL but empty until the lineage
         # live-load gate flips the four m3_* entries; these specs return zero
         # rows until then and the UI shows its SYNTHESIZED demo honestly.
