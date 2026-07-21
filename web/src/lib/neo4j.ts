@@ -71,5 +71,13 @@ export function createBoltAccess(s: BoltSettings): GraphAccess {
           'raw-Cypher dev bench and has no server-side query registry',
       )
     },
+    // QuerySpecs and exports are api-path only for the same reason: the spec
+    // registry, classification rules, and manifest ledger live server-side.
+    runSpec: async () => {
+      throw new Error('QuerySpecs are api-path only (O11) — start drydocs-api')
+    },
+    exportSpec: async () => {
+      throw new Error('spec export is api-path only (O11) — start drydocs-api')
+    },
   } satisfies GraphAccess
 }

@@ -1,4 +1,4 @@
-import type { GraphAccess, GraphResult, NamedResult } from './graph'
+import type { GraphAccess, GraphResult, NamedResult, SpecExport, SpecResult } from './graph'
 
 // The deployment adapter (ADR 0005): HTTP to the drydocs-api thin API.
 // Sessions are server-side — the adapter exchanges the signed-in persona id
@@ -63,6 +63,14 @@ export function createApiAccess(baseUrl: string, personaId: string): GraphAccess
     return (await res.json()) as ApiEnvelope
   }
 
+  async function authedGet(path: string): Promise<Response> {
+    const get = (bearer: string) =>
+      fetch(`${baseUrl}${path}`, { headers: { Authorization: `Bearer ${bearer}` } })
+    let res = await get(token ?? (await login()))
+    if (res.status === 401) res = await get(await login())
+    return res
+  }
+
   return {
     kind: 'api',
     async runRead(query: string): Promise<GraphResult> {
@@ -72,6 +80,26 @@ export function createApiAccess(baseUrl: string, personaId: string): GraphAccess
     async runNamed(queryId: string, params = {}): Promise<NamedResult> {
       const { keys, rows, database } = await envelope(`/query/${queryId}`, { params })
       return { keys, rows, database }
+    },
+    async runSpec(specId: string, params = {}): Promise<SpecResult> {
+      const res = await authedPost(`/specs/${specId}/run`, { params })
+      if (!res.ok) throw new Error(`spec ${specId} failed (${res.status}): ${await readDetail(res)}`)
+      return (await res.json()) as SpecResult
+    },
+    async exportSpec(specId, params, format): Promise<SpecExport> {
+      const res = await authedPost(`/specs/${specId}/export?format=${format}`, { params })
+      if (!res.ok) throw new Error(`export ${specId} failed (${res.status}): ${await readDetail(res)}`)
+      const blob = await res.blob() // stream fully consumed → manifest registered
+      const manifestPath = res.headers.get('X-DryDocs-Manifest-Path')
+      const disposition = res.headers.get('Content-Disposition') ?? ''
+      const filename = /filename="([^"]+)"/.exec(disposition)?.[1] ?? `${specId}.${format}`
+      if (!manifestPath) throw new Error('export missing manifest path header')
+      const manifestRes = await authedGet(manifestPath)
+      if (!manifestRes.ok) {
+        throw new Error(`manifest fetch failed (${manifestRes.status}): ${await readDetail(manifestRes)}`)
+      }
+      const manifest = (await manifestRes.json()) as Record<string, unknown>
+      return { filename, blob, manifest }
     },
   } satisfies GraphAccess
 }

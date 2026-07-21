@@ -21,8 +21,17 @@ from pathlib import Path
 import neo4j
 from pydantic import BaseModel
 
+from drydocs_api.exports import (
+    ExportLedger,
+    UnknownExportError,
+    export_manifest,
+    export_spec,
+    list_specs,
+    run_spec,
+)
 from drydocs_api.guard import WriteRejected
 from drydocs_api.handlers import Forbidden, login, logout, run_named, run_raw
+from drydocs_api.query_specs import UnknownSpecError
 from drydocs_api.mappings import (
     ChangesetValidationError,
     MappingStore,
@@ -83,6 +92,28 @@ class LiveRunner:
             routing_=neo4j.RoutingControl.READ,
         )
         return list(result.keys), [r.data() for r in result.records]
+
+    def stream(self, cypher: str, params: Mapping[str, object], database: str):
+        """Driver streaming for exports (O11): rows are yielded as the driver
+        fetches them — NOT apoc.export (which writes on the DB server) and NOT
+        a buffered execute_query. READ access is pinned at the session, which
+        stays open for the generator's lifetime and closes when it finishes."""
+        session = self.driver.session(database=database, default_access_mode=neo4j.READ_ACCESS)
+        try:
+            result = session.run(cypher, dict(params))
+            keys = list(result.keys())
+        except Exception:
+            session.close()
+            raise
+
+        def rows():
+            try:
+                for record in result:
+                    yield record.data()
+            finally:
+                session.close()
+
+        return keys, rows()
 
     def close(self) -> None:
         if self._driver is not None:
@@ -165,6 +196,72 @@ def create_app(runner=None, store: InMemorySessionStore | None = None):
             raise HTTPException(403, str(exc)) from None
         except WriteRejected as exc:
             raise HTTPException(400, str(exc)) from None
+
+    # ── O11 QuerySpec registry + two-path export (site-plan §4) ──────────────
+    export_ledger = ExportLedger()
+
+    @app.get("/specs")
+    def get_specs() -> list[dict[str, object]]:
+        return list_specs()
+
+    @app.post("/specs/{spec_id}/run")
+    def post_spec_run(
+        spec_id: str, body: QueryBody, authorization: str | None = Header(default=None)
+    ) -> dict[str, object]:
+        try:
+            return run_spec(spec_id, body.params, _token(authorization), sessions, graph)
+        except InvalidTokenError:
+            raise HTTPException(401, "invalid session") from None
+        except UnknownSpecError:
+            raise HTTPException(404, f"unknown spec '{spec_id}'") from None
+        except ParamValidationError as exc:
+            raise HTTPException(422, str(exc)) from None
+
+    @app.post("/specs/{spec_id}/export")
+    def post_spec_export(
+        spec_id: str,
+        body: QueryBody,
+        format: str = "csv",
+        authorization: str | None = Header(default=None),
+    ):
+        from fastapi.responses import StreamingResponse
+
+        try:
+            job = export_spec(
+                spec_id, body.params, format, _token(authorization), sessions, graph, export_ledger
+            )
+        except InvalidTokenError:
+            raise HTTPException(401, "invalid session") from None
+        except UnknownSpecError:
+            raise HTTPException(404, f"unknown spec '{spec_id}'") from None
+        except ParamValidationError as exc:
+            raise HTTPException(422, str(exc)) from None
+        except ValueError as exc:
+            raise HTTPException(422, str(exc)) from None
+        return StreamingResponse(
+            job.chunks,
+            media_type=job.media_type,
+            headers={
+                "Content-Disposition": f'attachment; filename="{job.filename}"',
+                "X-DryDocs-Export-Id": job.export_id,
+                "X-DryDocs-Manifest-Path": f"/exports/{job.export_id}/manifest",
+                # the browser needs these readable cross-origin for the sidecar flow
+                "Access-Control-Expose-Headers": "X-DryDocs-Export-Id, X-DryDocs-Manifest-Path, Content-Disposition",
+            },
+        )
+
+    @app.get("/exports/{export_id}/manifest")
+    def get_export_manifest(
+        export_id: str, authorization: str | None = Header(default=None)
+    ) -> dict[str, object]:
+        try:
+            return export_manifest(export_id, _token(authorization), sessions, export_ledger)
+        except InvalidTokenError:
+            raise HTTPException(401, "invalid session") from None
+        except UnknownExportError:
+            raise HTTPException(
+                404, "unknown export id (manifests register when the download completes)"
+            ) from None
 
     # ── O13 mapping stewardship (plan M2) — reads from the mapping-store
     # materialization; the ONLY "write" is a returned change artifact. ──

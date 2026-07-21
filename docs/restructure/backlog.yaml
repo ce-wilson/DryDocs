@@ -2989,7 +2989,7 @@ items:
     agent: main
     model: sonnet
     priority: p2
-    status: todo
+    status: done          # DONE 2026-07-21 (launchable-site session, follows O9) — see notes
     depends_on: [O9]
     inputs: [UI-WIP/site-plan.md, drydocs_api/, web/src/, PUBLISH-BOUNDARY.md, config/classification.yaml]
     acceptance: >
@@ -3009,6 +3009,30 @@ items:
       IS the API" caveat is OBSOLETE — ADR 0005 is ratified and drydocs-api shipped
       (O5), so export endpoints land there directly; the ADK agent layer is a later,
       separate concern (site-plan corrected this groom).
+      DONE 2026-07-21: drydocs_api/query_specs.py (registry — versioned ids,
+      spec-owned database from the reviewed set, read-only-guard-validated
+      cypher, classification vocabulary; invariants asserted at import) +
+      drydocs_api/exports.py (run_spec with the ddcontext/ddall grid-visible
+      trust_watermark column; export_spec streaming csv/jsonl generators;
+      ExportLedger registers the manifest only when the stream COMPLETES —
+      served at GET /exports/{id}/manifest as the sidecar; banner row +
+      INTERNAL__/INTERNAL-CONFIDENTIAL__ filename prefixes) + LiveRunner.stream
+      (session.run driver streaming, READ pinned, session owned by the
+      generator — NOT apoc.export, NOT buffered execute_query). Web:
+      GraphAccess seam gains runSpec/exportSpec (bolt adapter fails loud);
+      SpecGrid binds all four Explorer tabs to their specs with both export
+      paths + client-built view manifest + Copy-as-Cypher + classification
+      banner; O9 demo frames survive as the VISIBLE fallback when the api is
+      down or the spec returns zero rows (empty local graph) — never silent.
+      Tests: test_query_specs.py (15 — registry invariants, watermark, banner/
+      prefix rules, csv/jsonl stream content, manifest fields incl. cypher
+      sha256 + exported_by, ledger bounds); suite 787 passed. Live-verified:
+      uvicorn against neo4jtest — INTERNAL__ csv with banner + manifest,
+      ddcontext jsonl with SYNTHESIZED tier; browser end-to-end (auth → spec
+      run → zero-row fallback notice). Local DBs are empty so the LIVE grid
+      path is covered by tests + the server round-trip, not yet by eyeballed
+      populated frames. Toolbar [Export] stays disabled — grid-level export
+      per frame is the shipped surface (acceptance's "toolbar/grid" either/or).
 
   - id: O12
     epic: web-console
@@ -4235,8 +4259,8 @@ items:
 # Roll-up the dispatcher can glance at. COMPUTED views — test_backlog.py enforces
 # that these match the items exactly; update them with any status change.
 summary:
-  todo: 23                                         # -O9 done (2026-07-21 launchable-site session: landing + Explorer template instantiation)
+  todo: 22                                         # -O11 done (2026-07-21: QuerySpec registry + two-path export; unblocks the O15–O18 module pages)
   in_progress: 1                                   # E1 (gate deferred both sides)
   blocked: 0
-  done: 103                                        # +G15 +G16 +O21 +O22 +O9 (2026-07-21)
-  next_ready: [L9, L12, L14, L15, M2, M3, M4, P3, J10, Q6, O10, O11, O12, O13, O19, J13]
+  done: 104                                        # +G15 +G16 +O21 +O22 +O9 +O11 (2026-07-21)
+  next_ready: [L9, L12, L14, L15, M2, M3, M4, P3, J10, Q6, O10, O12, O13, O15, O16, O17, O18, O19, J13]
