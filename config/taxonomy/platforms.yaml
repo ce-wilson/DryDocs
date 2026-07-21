@@ -35,7 +35,7 @@ reconciliation:
     - "What does :AisCapability represent (a capability, e.g. 'batch scheduling') and :AiTool (the concrete tool, e.g. Control-M / Autosys / Airflow)?"
     - "How does the app batch port's REQUIRES_SCHEDULER re-target — one edge (:Port -> :AiTool) or two (:Port -> :AisCapability and :AiTool -[:PROVIDES]-> :AisCapability)? SME DIRECTION 2026-07-21 (in-chat, pre-gate): ONE edge, and it attaches at :BusinessApplication (hoisted from the batch :Port) — README.md:263's reading wins. Recorded as the proposed seed answer; the gate session formally confirms + re-shapes the registered entries."
     - "Does :Scheduler {kind, instance} (a deployed instance, LoadPlanV3) fold into :AiTool, or stay a separate instance layer beneath it?"
-    - "Relation to software-registry.yaml: is an :AiTool the SAME node as a :SoftwareProduct (e.g. BMC Control-M), or a distinct platform view over it?"
+    - "Relation to software-registry.yaml: is an :AiTool the SAME node as a :SoftwareProduct (e.g. BMC Control-M), or a distinct platform view over it? SME DIRECTION 2026-07-21 (in-chat, pre-gate): a DISTINCT platform view — :AiTool is NOT the same node as :SoftwareProduct; software_registry_ref stays the cross-reference between the two. How the view relates structurally (edge vs property ref) is decided at the gate."
     - "Classification: are 'AIS' / :AisCapability / :AiTool internal code-names? If so, real instances/values stay in internal/ (PUBLISH-BOUNDARY.md)."
 
 # ── Seed: what is known today (the current :SchedulerKind placeholder vocab) ──
