@@ -295,6 +295,11 @@ Tags help grooming: `idea` · `bug` · `doc` · `source` (new data source) · `q
 
 <!-- when you promote an idea, move its line here with the resulting backlog id -->
 
+- 2026-07-21 — [chat] DPL launcher key-parameter capture (--pipeline-id spelling +
+  shell-launcher variants + -py route + dataset-id/aws/jar/queue params as properties)
+  → **G15**. The sibling 2026-07-21 inbox line (MAC dataset-flow enrichment feed +
+  G12 kind discriminator) stays in the inbox — G15's explicit non-goal.
+
 - 2026-07-20 groom run (evening; second machine re-based post-squash, then /groom-backlog) —
   2 promoted / 1 inboxed / 1 kept-updated (todo 17 → 19):
   - session preamble (recorded here — ref state, not backlog): this machine adopted the

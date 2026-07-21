@@ -3851,6 +3851,45 @@ items:
       lineage-review smoke rendered 4 candidates + 3 assets. Vocab untouched
       (all four m3_* stay planned); suite 761 green.
 
+  - id: G15
+    epic: component-topology
+    title: "Lineage extractor: capture the DPL launcher argument contract (key params as properties; --pipeline-id spelling + launcher-shell variants)"
+    type: task
+    module: drydocs-lineage
+    phase: 6
+    agent: main
+    model: sonnet
+    priority: p2
+    status: todo
+    depends_on: [G14]
+    inputs: [drydocs_core/controlm/commands.py, drydocs_lineage/extractors/controlm_inventory.py, drydocs_lineage/model.py, tests/unit/test_lineage_inventory.py]
+    acceptance: >
+      The DPL invocation parse captures the launcher's key parameters, verified by
+      unit tests on synthetic CMD_LINEs: (a) the on-prem shell launcher spellings
+      (dpl_spark_processor and its _dynamic variant) classify as DPL alongside the
+      registered dt-launcher.sh / dt-pipelines-launcher jar; (b) BOTH GUID
+      spellings key ETLProcess identity — the observed `-pipeline` form and the
+      argument-contract `--pipeline-id` form (hardcoded on the CMD_LINE for ~99%
+      of jobs per SME 2026-07-21); (c) a `-py`-flagged launch STAYS kind=dpl
+      (same launcher, pyspark route) with the engine route captured as a
+      property, never a separate invocation_type; (d) the remaining key params
+      land as ETLProcess/Invocation PROPERTIES — dataset id, aws-routing flag,
+      user jar path, hdfs location, token-file path, manifest-file path, queue
+      name — properties never identity (the standing G12 rule). No new
+      relationship types; m3_* statuses untouched. Full suite green.
+    notes: >
+      From the 2026-07-21 DPL runtime-trace session (chat groom; mechanism-only —
+      the trace doc itself is company-internal). The launcher argument contract
+      names the params; --odate / --business-date are runtime partition values
+      (%%ODATE variables at definition time) so they are NOT captured as
+      definition-level properties. SME plan: company-side the pipeline id is also
+      extracted from the job-definition table as a job_detail VIEW — this item
+      keeps producer CMD_LINE parsing in agreement with that view's extraction
+      rule. Explicit NON-goal: deriving DataAsset edges from the dataset-id /
+      MAC dataset-flow metadata — that is the separate DPL-metadata enrichment
+      feed still sitting in the IDEAS inbox (rides the confirmed m3 shapes when
+      groomed). Pure candidate-side parsing, no ontology decision, hence sonnet.
+
   - id: J13
     epic: release-infrastructure
     title: "Publish-ceiling drift: sanitize or re-classify the real identifiers found in publishable-tier files (2026-07-19 mirror grep)"
@@ -3890,8 +3929,8 @@ items:
 # Roll-up the dispatcher can glance at. COMPUTED views — test_backlog.py enforces
 # that these match the items exactly; update them with any status change.
 summary:
-  todo: 18                                         # +L14 +L15 (2026-07-20 groom); G14 pulled + done same day
+  todo: 19                                         # +G15 (2026-07-21 chat groom — DPL launcher arg contract)
   in_progress: 1                                   # E1 (gate deferred both sides)
   blocked: 0
   done: 98                                         # +K5 +K6 +L8 +C10 +P1 +P4 +L7 +G14 (2026-07-20)
-  next_ready: [L9, L12, L14, L15, M2, M3, M4, P3, J10, Q6, O9, O12, O13, J13]
+  next_ready: [G15, L9, L12, L14, L15, M2, M3, M4, P3, J10, Q6, O9, O12, O13, J13]
