@@ -4106,6 +4106,53 @@ items:
       file-op surface (G14-shaped, separate inbox entry). Pure candidate-side
       parsing, no ontology decision, hence sonnet.
 
+  - id: G16
+    epic: component-topology
+    title: "Variable-standard engine alignment: ETL_* canonical facts + alias rollups with value contracts; ICDW Informatica launcher rule"
+    type: task
+    module: drydocs-core
+    phase: 6
+    agent: main
+    model: sonnet
+    priority: p2
+    status: todo
+    depends_on: []
+    inputs: [drydocs_core/controlm/variables.py, drydocs_core/controlm/commands.py, internal/remediation/governance/command-line-and-variables-standard.md, config/gate-log.md, tests/unit/test_variable_classifier.py, tests/unit/test_command_parser.py]
+    acceptance: >
+      Per the 2026-07-21 cmdline-nfr-vetting gate (SME-4, all 7 deltas adopted):
+      (a) FACT_REGISTRY gains the ETL_* canonical names (LAUNCHER_SCRIPT_PATH,
+      ETL_PLATFORM, ETL_ARTIFACT_URI, ETL_ARTIFACT_KIND, ETL_PLATFORM_FLAGS,
+      ETL_ARTIFACT_SHA) plus the production alias rollups from the 2,384-var gap
+      analysis (JAR_PATH, USER_JAR, PY_LAUNCH, SCRIPT_PATH, JAR_LOC, JAR_NAME,
+      MULTI_FILE_JAR, CONTAINER_IMAGE, IMAGE_NAME, ACCELERATOR_PATH and kin);
+      (b) the IMAGE -> ARTIFACT_URI clean break lands (IMAGE -> IMAGE removed)
+      per the v2 decision log; (c) aliases suggest, VALUES decide — each
+      artifact/launcher canonical carries a value contract (launcher-registry
+      hit / URI shape / SHA-digest shape), a name-value mismatch classifies by
+      VALUE and surfaces a WARN, and a variable whose value hits the launcher
+      registry is a launcher ref regardless of its name (the JAR_PATH ->
+      dt-launcher.sh case is a test); (d) SHA digests classify as ETL_ARTIFACT_SHA,
+      never ARTIFACT_URI; (e) LAUNCHER_REGISTRY gains the ICDW_etl_run_interface.ksh
+      Informatica rule (v2 templates 6.4/6.5) with a test; (f) legacy behavior is
+      non-destructive — aliased legacy names still materialize facts (WARN), only
+      canonical names are WARN-free. Full suite green.
+    notes: >
+      Groomed 2026-07-21 at the cmdline-nfr-vetting gate sign-off (SME-4) — the
+      engine-alignment half of the adopted variable-standard deltas; the vocab half
+      (m7_uses_artifact registration + m3 note amendments) landed with the gate
+      itself. The digested v2 standard (internal/remediation/governance/
+      command-line-and-variables-standard.md) is the ratification source; ETL_*
+      wins over the gap-analysis CTM_* spelling. Platform-axis note: %%ETL_PLATFORM
+      = execution technology (enum extended with emr, snowflake reserved);
+      ETLProcess.kind stays a separate launcher-derived axis — do NOT map one onto
+      the other. Mode flags stay CMD_LINE literals (only -py rides
+      ETL_PLATFORM_FLAGS) — the launch-mode property itself is G15's.
+      ecosystem_execution_engine.sh and the template ingestion-launcher jar stay
+      OUT (await CMD_LINE samples — inbox). No new relationship types; the m7
+      build (payload migration to USES_ARTIFACT, script_role stamping) is its own
+      follow-up item once the writer endpoint work lands. Deterministic
+      registry/parser work with a written acceptance test, hence sonnet.
+
   - id: J13
     epic: release-infrastructure
     title: "Publish-ceiling drift: sanitize or re-classify the real identifiers found in publishable-tier files (2026-07-19 mirror grep)"
@@ -4145,8 +4192,8 @@ items:
 # Roll-up the dispatcher can glance at. COMPUTED views — test_backlog.py enforces
 # that these match the items exactly; update them with any status change.
 summary:
-  todo: 27                                         # +O15–O22 (2026-07-21 UI extension groom — site-plan P3 through the O20 write-surface gate)
+  todo: 28                                         # +G16 (2026-07-21 cmdline-nfr-vetting gate groom — engine alignment)
   in_progress: 1                                   # E1 (gate deferred both sides)
   blocked: 0
   done: 98                                         # +K5 +K6 +L8 +C10 +P1 +P4 +L7 +G14 (2026-07-20)
-  next_ready: [G15, L9, L12, L14, L15, M2, M3, M4, P3, J10, Q6, O9, O12, O13, O21, O22, J13]
+  next_ready: [G15, G16, L9, L12, L14, L15, M2, M3, M4, P3, J10, Q6, O9, O12, O13, O21, O22, J13]

@@ -34,17 +34,6 @@ Tags help grooming: `idea` · `bug` · `doc` · `source` (new data source) · `q
   Epic O extension groom. Groom when the public site starts; the icon/logo direction
   should stay consistent with the O22 console glyph set.
 
-- 2026-07-21 — [question] **Company draft CMD_LINE/variable NFR ontology vetted vs m3 vocab**
-  (mechanism-only; full comparison in the session flow-doc §5). Same node spine and the same
-  Job→Script→ETLProcess shape, but three deltas that are all HITL-gate decisions before any
-  adoption: (1) a NEW `USES_ARTIFACT` edge Job→payload-Script (producer folds payloads into
-  `m3_invokes` 1..n); (2) TRIGGERS from-node = the **payload** in the draft vs the invoked
-  **wrapper/launcher** in `m3_triggers` (observed grammar argues launcher — the `-pipeline`
-  literal sits on the launcher line); (3) `script_role` {launcher,payload} + artifact_*
-  properties on :Script (additive but schema-touching). Its canonical-variable half is
-  greenfield-only and complements G15 (the legacy-inference parser); the platform enums also
-  disagree, and the variable gap analysis already shows the draft enum too small (EMR live,
-  Snowflake hinted via pset paths, no DBT/Databricks).
 - 2026-07-21 — [source] **Variable gap analysis: 2,384 unique names vs the proposed alias
   map** (company-side, mechanism-only). Variable NAMES lie about values — jar/python/py-path
   style names all resolving to the shell *launcher* — so classification must key on the
@@ -351,6 +340,15 @@ Tags help grooming: `idea` · `bug` · `doc` · `source` (new data source) · `q
 ## Recently groomed (audit trail)
 
 <!-- when you promote an idea, move its line here with the resulting backlog id -->
+
+- 2026-07-21 — [question] Company draft CMD_LINE/variable NFR ontology vetted vs m3 vocab →
+  **RULED same day at gate `cmdline-nfr-vetting`** (config/gate-log.md; guided SME session,
+  4/4 as recommended): TRIGGERS from-node stays the LAUNCHER (payload variant rejected);
+  `USES_ARTIFACT` registered as vocab entry `m7_uses_artifact` (status: planned); :Script
+  refinements adopted (script_role + artifact_* props); all 7 variable-standard deltas
+  adopted (ETL_* prefix, ETL_ARTIFACT_SHA, aliases-suggest-values-decide, alias-map
+  completion, two platform axes, FACT_REGISTRY migration, mode flags stay literals) →
+  engine-alignment work groomed as **G16**.
 
 - 2026-07-21 — [chat] UI extension groom ("extend the UI open items until HITL"): the new
   UI-WIP corpus (DryDocs_UI_Development_Specs.md, gemini-wire-frame.md, icons.md,

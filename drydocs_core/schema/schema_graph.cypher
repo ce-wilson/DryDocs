@@ -207,6 +207,10 @@ MATCH (a:SchemaMeta {name: 'Script'}), (b:SchemaMeta {name: 'ETLProcess'})
 MERGE (a)-[r:TRIGGERS]->(b)
   SET r.vocab_id = 'm3_triggers', r.prov_maps_to = 'prov:wasStartedBy', r.domain = 'controlm', r.status = 'planned';
 
+MATCH (a:SchemaMeta {name: 'ControlMJob'}), (b:SchemaMeta {name: 'Script'})
+MERGE (a)-[r:USES_ARTIFACT]->(b)
+  SET r.vocab_id = 'm7_uses_artifact', r.prov_maps_to = 'prov:used', r.domain = 'controlm', r.status = 'planned';
+
 MATCH (a:SchemaMeta {name: 'ControlMJob'}), (b:SchemaMeta {name: 'ExecutionHost'})
 MERGE (a)-[r:RUNS_ON]->(b)
   SET r.vocab_id = 'm3_runs_on_agent_host', r.role = 'agent_host', r.prov_maps_to = null, r.domain = 'controlm', r.status = 'planned';

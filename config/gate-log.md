@@ -659,3 +659,41 @@ SME-supplied PAT screenshots held OUT of the repo — Internal-Confidential).
   docs-domain home — K6-style same-day landing); connector-#1 loader
   (`load-doc-traceability`: docs/design/*.md matrices + docs/design/feedback/*.yaml)
   follows under the same L7 item — no graph content exists until it runs.
+
+## 2026-07-21 — CMD_LINE NFR ontology + variable standard (cmdline-nfr-vetting) — SIGNED OFF
+
+- **Scope:** the company-side draft standards NFR (canonical Control-M variables +
+  command-line structure, with its own ontology section) vetted against the producer m3
+  vocabulary; the 2,384-variable gap analysis; the launcher-inventory review. Session ran
+  in-chat 2026-07-21 (flow-doc §5–§6 hold the comparison + proposal); four calls, all
+  ruled as recommended (chad.wilson).
+- **Confirmed: 4 · Edited: 0 · Rejected: 0**
+  - **SME-1 — TRIGGERS from-node = the invoked wrapper/LAUNCHER Script** (m3_triggers
+    unchanged); the draft NFR's payload-sourced variant REJECTED — the `-pipeline` GUID
+    literal rides the launcher's CMD_LINE (the extractor's parse surface) and payloads
+    are often variable-held/unresolvable.
+  - **SME-2 — USES_ARTIFACT registered** as new vocab entry `m7_uses_artifact`
+    (ControlMJob→Script{payload}, prov:used, `status: planned`) — distinct label per the
+    documented RUNS_ON-overload risk; the digested v2 standard's tooling table (its
+    m7_etl_artifact_supplement target) already assumes it. Payload invocations migrate
+    out of the m3_invokes 1..n fold at the m7 build.
+  - **SME-3 — :Script refinements adopted** (with m7): script_role {launcher, payload} +
+    platform / artifact_uri / artifact_kind / platform_flags / script_path properties
+    (+ the 4 Informatica identifiers); Script identity stays PATH-keyed.
+  - **SME-4 — variable-standard deltas adopted, all 7** (flow-doc §6.3): ETL_* prefix
+    wins over the gap-analysis CTM_* spelling; NEW ETL_ARTIFACT_SHA canonical (digests
+    are not URIs); the aliases-suggest-VALUES-DECIDE contract (a variable holding a
+    registered launcher is a launcher ref regardless of name); alias-map completion from
+    the 2,384-var evidence; TWO platform axes (%%ETL_PLATFORM = execution tech, extended
+    with emr + reserved snowflake; ETLProcess.kind stays a separate launcher-derived
+    graph axis — the perceived enum mismatch dissolves); FACT_REGISTRY migration incl.
+    the IMAGE → ARTIFACT_URI clean break; mode flags stay CMD_LINE literals (only -py
+    rides ETL_PLATFORM_FLAGS).
+- **Effect:** vocab — m3_triggers + m3_invokes notes amended, `m7_uses_artifact` added
+  `status: planned` (honest-lifecycle: no supplement block, no loader until its build);
+  engine alignment groomed as **G16** (FACT_REGISTRY ETL_* canonicals + alias rollups +
+  value contracts + ICDW_etl_run_interface.ksh launcher rule). Launcher-registry review
+  verdict on record: value-based classification design CONFIRMED correct; open gaps =
+  dpl_spark_processor (G15), ICDW ksh (G16), ecosystem_execution_engine.sh + the
+  template ingestion jar (await samples). COMPANY runs its own gate on the draft NFR —
+  this sign-off is producer-side only.

@@ -903,7 +903,10 @@ local_relationships:
       1..n per job (compound if/else commands carry multiple invocations, incl.
       wrapper payloads); Script identity stays PATH-keyed — same-basename
       multi-mount duplicates surface in lineage-review for SME merge, never
-      auto-merged.
+      auto-merged. 2026-07-21 (gate-log cmdline-nfr-vetting): payload
+      invocations MIGRATE to the distinct m7_uses_artifact label at its
+      build — until then this entry keeps the 1..n fold; :Script gains
+      script_role {launcher, payload} at the same build (SME-3).
     supplement:   ontology_supplement.cypher
     loader:       ~
     domain:       controlm
@@ -941,6 +944,41 @@ local_relationships:
       spark/pyspark). Remaining loader blocker: the ETLProcess endpoint
       class in drydocs_lineage.writer (every non-job process still maps
       to :Script).
+      2026-07-21 SME session (gate-log cmdline-nfr-vetting, SME-1): from-node
+      = the invoked wrapper/LAUNCHER Script re-CONFIRMED against the company
+      draft NFR's payload-sourced variant (REJECTED: the -pipeline GUID
+      literal rides the launcher's CMD_LINE — the surface the extractor
+      parses; payloads are often variable-held and unresolvable). Treat any
+      payload-sourced TRIGGERS in company data as a shape to reconcile at
+      their gate, not a producer emission.
+    supplement:   ontology_supplement.cypher
+    loader:       ~
+    domain:       controlm
+    status:       planned
+
+  - id:           m7_uses_artifact
+    neo4j_label:  USES_ARTIFACT
+    role:         ~
+    from_node:    ControlMJob
+    to_node:      Script
+    prov_maps_to: "prov:used"
+    note: >
+      Gate CONFIRMED 2026-07-21 (config/gate-log.md cmdline-nfr-vetting,
+      SME-2): job uses a PAYLOAD artifact (jar/wheel/pset/container-image
+      ref) — the Script the launcher dispatches, discriminated from the
+      launcher itself, which stays the m3_invokes target. Matrix row:
+      Activity → Entity = USED; distinct label (not single-label-with-role)
+      per the documented RUNS_ON-overload risk — the company v2
+      command-line/variables standard's tooling table already assumes this
+      edge (its m7_etl_artifact_supplement target). Adopted WITH the :Script
+      refinements (same gate, SME-3): script_role {launcher, payload} +
+      platform / artifact_uri / artifact_kind / platform_flags / script_path
+      properties (+ the 4 Informatica identifiers); Script identity stays
+      PATH-keyed. At this entry's build, payload invocations MIGRATE out of
+      the m3_invokes 1..n fold onto this label. Feed: canonical/aliased
+      artifact variables (FACT_REGISTRY migration — backlog G16) with the
+      aliases-suggest-values-decide contract; never the variable NAME alone
+      (2,384-var gap analysis: names lie).
     supplement:   ontology_supplement.cypher
     loader:       ~
     domain:       controlm
