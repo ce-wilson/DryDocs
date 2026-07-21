@@ -26,6 +26,15 @@ Tags help grooming: `idea` · `bug` · `doc` · `source` (new data source) · `q
 
 <!-- add new ideas at the top -->
 
+- 2026-07-20 — [chore] **Post-squash ref cleanup (user decision, destructive)**: origin still
+  carries two pre-squash-history branches — `feat/mapping-store` (SUPERSEDED: the Initial-import
+  squash absorbed its content and main then evolved past it; its only unique file was the
+  regenerable web-console `.print.html`, since retired by L13) and
+  `feature/provenance-audit-fields-plan` (status unreviewed). Local relics on the producer
+  machine: branch `backup/ui-dark-local-3`, the stale stash noted at the 07-20 groom, and the
+  new safety tag `archive/old-history-2026-07-20` (this machine's pre-squash history; the other
+  machine has `archive/full-history`). Deleting the remote branches is the user's call.
+
 - 2026-07-20 — [doc] Runbook Rev 3 candidate: mention `drydocs load-doc-traceability` in the
   Refresh/ingest demonstrable-content step (L7 shipped the loader after Rev 2 was signed —
   ride the next feedback loop rather than bumping a fresh Rev for one line).
@@ -50,6 +59,10 @@ Tags help grooming: `idea` · `bug` · `doc` · `source` (new data source) · `q
   this is a PLAN CHANGE (new epic proposal → user); (3) `SEALID` → generic identity
   property (gate discipline). Related: [[SaaS scaffold research line — the
   template-play/whitespace finding, 2026-07-17]].
+  KEPT-UPDATED 2026-07-20 groom: **C10 landed same day** (ServiceNow CMDB/CSDM doc-set
+  mined, 54ccf63) — the CSDM service/service-offering layer this line called its missing
+  piece is now in reference/. The decision surface is fully fed; still PARKED on the three
+  §Decision user calls above (scope / placement-as-plan-change / SEALID property).
 
 - 2026-07-19 — [question] **m3_invokes `to_node: Script` may need broadening to
   `Script | ETLProcess`** in relationship_vocabulary.yaml: the abioncloud wrapper-payload
@@ -73,12 +86,6 @@ Tags help grooming: `idea` · `bug` · `doc` · `source` (new data source) · `q
   our existing time series). Deep-dive verdict 2026-07-19: codeflow itself REJECTED as a
   ritual component (browser-only app, regex-heuristic edges vs our ast, Node-vm headless
   hack, no Neo4j path) — take the ideas only.
-
-- 2026-07-18 — [doc] **`docs/runbook-mapping-demo.md` authored FREE-FORM (pre-L8)** — starts the
-  mapping demo site; written this session with no runbook outline in existence yet. Refit to
-  `runbook.outline.yaml` + the validator when L8 lands (candidate second exemplar beside L8's
-  startup/refresh runbook). Same session: `docs/design/drydocs-web-console-tdd.md` (conforms to
-  the TDD outline; covered by the `*-tdd.md` auto-sweep, nothing to do).
 
 - 2026-07-18 — [idea] **ETL-tooling inventory as a DryDocs domain** (re-inboxed slim from the
   groomed mapping-store line): a gap no catalog covers — DataHub/OpenMetadata inventory data
@@ -111,13 +118,6 @@ Tags help grooming: `idea` · `bug` · `doc` · `source` (new data source) · `q
   UI-WIP/wf-admin-config-01.*). The config-file registry migration itself REMAINS
   inboxed (drydocs-core work) — the O12 matrix renders it as the visible
   unguarded-config example until migrated.
-
-- 2026-07-14 — [doc] **`drydocs-project-review.md` has no canonical outline** — the new
-  whole-project review (docs/design/) renders through the Epic L pipeline but is free-form:
-  `doc_outline.py` only validates `docs/design/*-tdd.md`. When L8 introduces the second doc
-  type (runbook), consider a `review.outline.yaml` third type so the review gets the same
-  completeness validation + traceability treatment; it also needs a refresh cadence (facts
-  pinned to a commit go stale quietly — maybe a Rev bump per epic close).
 
 - 2026-07-14 — [source] **K2 FID / ALIAS reconciliation tables are company-side unblocks.**
   The attribution loader's TierReconcilers seam ships empty for FID and ALIAS (facts stay
@@ -240,6 +240,27 @@ Tags help grooming: `idea` · `bug` · `doc` · `source` (new data source) · `q
 ## Recently groomed (audit trail)
 
 <!-- when you promote an idea, move its line here with the resulting backlog id -->
+
+- 2026-07-20 groom run (evening; second machine re-based post-squash, then /groom-backlog) —
+  2 promoted / 1 inboxed / 1 kept-updated (todo 17 → 19):
+  - session preamble (recorded here — ref state, not backlog): this machine adopted the
+    squashed main (reset to 4540bbc), local `feat/mapping-store` DELETED as superseded
+    (its content was inside the Initial-import squash and main evolved past it; old
+    history kept at local tag `archive/old-history-2026-07-20`).
+  - [doc] runbook-mapping-demo free-form pre-L8 (2026-07-18) → **L14** (refit to
+    runbook.outline.yaml, 2nd runbook exemplar; trigger = L8 done, e6bcb24).
+  - [doc] project-review canonical outline (2026-07-14) → **L15** (review.outline.yaml
+    3rd doc type + recorded refresh cadence; same L8 trigger; p3).
+  - inboxed: post-squash ref cleanup (stale origin branches feat/mapping-store +
+    feature/provenance-audit-fields-plan; local backup branch/stash/tags) — destructive,
+    user-gated.
+  - kept-updated: SEAL/PAT generic-terminology line — C10's CSDM mining landed (its
+    named missing piece); decision surface fully fed, still parked on the three
+    §Decision user calls (scope / new-epic plan change / SEALID property).
+  - trigger checks this pass: Q6 todo → docmeta P4–P7 stay plan-tracked; O12 todo →
+    launcher-registry config-file migration stays; E1 deferred both sides; Runbook Rev 3
+    rider + SNYK_TOKEN manual step stay inboxed (new today, correctly parked). All other
+    lines kept parked, unchanged on their recorded gates.
 
 - 2026-07-20 — [doc] apply the runbook rev1 SME feedback → EXECUTED SAME-DAY (user-directed,
   no backlog id): both notes applied to the .md (front-matter one item per line; out-of-scope

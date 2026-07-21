@@ -2343,6 +2343,58 @@ items:
       paginate far past 8 — the print sheet drove it). 6 committed .print.html
       git-rm'd; renders regenerated; ritual/skill/README/MODULE_MAP/PORT-MANIFEST
       wording moved to one-file world; suite 708 green. L9 remains open.
+  - id: L14
+    epic: doc-infrastructure
+    title: "Refit docs/runbook-mapping-demo.md to the runbook outline (2nd runbook exemplar)"
+    type: chore
+    module: drydocs-docgen
+    phase: 10
+    agent: main
+    model: sonnet
+    priority: p2
+    status: todo
+    depends_on: [L8]
+    inputs: [docs/runbook-mapping-demo.md, docs/design/templates/runbook.outline.yaml, docs/design/drydocs-startup-refresh-runbook.md, drydocs/doc_outline.py, scripts/render_design_doc.py]
+    acceptance: >
+      The mapping-demo runbook conforms to runbook.outline.yaml — python -m
+      drydocs.doc_outline --outline docs/design/templates/runbook.outline.yaml
+      --doc <the doc> passes — carrying the outline's front-matter + required
+      anchors with the existing content (demo steps, steward flow) preserved
+      under them. Whether it relocates to docs/design/ and renders through the
+      Epic L pipeline is decided at execution (the D6 either/or idiom) and
+      recorded in the doc header; classification set; doc tests + full suite
+      green.
+    notes: >
+      Groomed 2026-07-20 from the 2026-07-18 inbox line (runbook authored
+      FREE-FORM in the mapping-store session, pre-L8 by design). Trigger =
+      L8 landing the runbook outline, fired 2026-07-20 (e6bcb24). Second
+      exemplar beside the startup/refresh runbook — proves the outline
+      generalizes beyond its authoring doc.
+  - id: L15
+    epic: doc-infrastructure
+    title: "Canonical outline for the whole-project review doc (review.outline.yaml, 3rd doc type) + a recorded refresh cadence"
+    type: task
+    module: drydocs-docgen
+    phase: 10
+    agent: main
+    model: sonnet
+    priority: p3
+    status: todo
+    depends_on: [L8]
+    inputs: [docs/design/drydocs-project-review.md, docs/design/templates/tdd.outline.yaml, docs/design/templates/runbook.outline.yaml, drydocs/doc_outline.py]
+    acceptance: >
+      docs/design/templates/review.outline.yaml exists (schema
+      drydocs.doc-outline.v1; stable anchors derived from the current review's
+      sections); drydocs-project-review.md conforms (doc_outline validation
+      passes) and re-renders deterministically; a refresh cadence is decided
+      and recorded in the outline header (candidate: Rev bump per epic close —
+      facts pinned to a commit go stale quietly); full suite green.
+    notes: >
+      Groomed 2026-07-20 from the 2026-07-14 inbox line; trigger = L8
+      introducing the second doc type, fired 2026-07-20. Third canonical type
+      after TDD (L1) and Runbook (L8); the BRD outline stays parked (upstream
+      WIP, user call). p3 — completeness/traceability hygiene, nothing
+      downstream blocks on it.
   # Groomed 2026-07-08 from the 2026-07-05 IDEAS line + the 2026-07-07 property-terms
   # line. Doc 06 Phases 0-1 (Control-M envelope: audit-fields.yaml + jobs/folders
   # extraction) shipped 2026-07-07 PRE-groom (gate controlm-q1q3-phase1) — recorded
@@ -3824,8 +3876,8 @@ items:
 # Roll-up the dispatcher can glance at. COMPUTED views — test_backlog.py enforces
 # that these match the items exactly; update them with any status change.
 summary:
-  todo: 17
+  todo: 19                                         # +L14 +L15 (2026-07-20 groom — L8's landing fired both)
   in_progress: 1                                   # E1 (gate deferred — now deferred company-side too, per the same readout)
   blocked: 0
   done: 97                                         # +K5 +K6 +L8 +C10 +P1 +P4 +L7 (2026-07-20)
-  next_ready: [L9, L12, M2, M3, M4, P3, J10, Q6, O9, O12, O13, G14, J13]
+  next_ready: [L9, L12, L14, L15, M2, M3, M4, P3, J10, Q6, O9, O12, O13, G14, J13]
