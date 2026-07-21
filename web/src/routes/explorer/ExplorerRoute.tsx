@@ -11,6 +11,7 @@ import NodeInspector from '../../explorer/NodeInspector'
 import {
   APPLICATIONS_FRAME,
   CONDITIONS_FRAME,
+  FOLDERS_FRAME,
   JOBS_FRAME,
   SERVERS_FRAME,
   type Selection,
@@ -75,17 +76,24 @@ export default function ExplorerRoute({ persona }: { persona: Persona }) {
             fallback={<DataFrame cols={APPLICATIONS_FRAME.cols} rows={APPLICATIONS_FRAME.rows} {...frameProps} />}
           />
         ),
+        Folders: (
+          <SpecGrid
+            access={access}
+            specId="explorer.folder-applications.v1"
+            fallback={<DataFrame cols={FOLDERS_FRAME.cols} rows={FOLDERS_FRAME.rows} {...frameProps} />}
+          />
+        ),
         Jobs: (
           <SpecGrid
             access={access}
-            specId="explorer.jobs.v1"
+            specId="explorer.jobs.v2"
             fallback={<DataFrame cols={JOBS_FRAME.cols} rows={JOBS_FRAME.rows} {...frameProps} />}
           />
         ),
         Conditions: (
           <SpecGrid
             access={access}
-            specId="explorer.conditions.v1"
+            specId="explorer.conditions.v2"
             fallback={<DataFrame cols={CONDITIONS_FRAME.cols} rows={CONDITIONS_FRAME.rows} {...frameProps} />}
           />
         ),

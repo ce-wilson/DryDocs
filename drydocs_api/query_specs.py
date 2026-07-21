@@ -79,34 +79,75 @@ QUERY_SPECS: dict[str, QuerySpec] = {
             params=_LIMIT,
         ),
         QuerySpec(
-            id="explorer.jobs.v1",
+            id="explorer.jobs.v2",
             database="drydocs",
-            description="Control-M jobs with their folder identity for the Explorer Jobs frame.",
+            description=(
+                "Control-M jobs joined through their :ControlMFolder (real folder name, "
+                "not the raw join key) and the folder's :ControlMServer — the DATA_CENTER "
+                "field the folders loader reifies as a server node (SCHEDULED_ON). "
+                "v2 SME correction 2026-07-21: v1 read the job's denormalized folder_id "
+                "and had no data_center."
+            ),
             cypher=(
-                "MATCH (j:ControlMJob) "
-                "RETURN j.job_name AS job_name, j.folder_id AS folder_id, j.job_id AS job_id "
+                "MATCH (f:ControlMFolder)-[:CONTAINS_JOB]->(j:ControlMJob) "
+                "OPTIONAL MATCH (f)-[:SCHEDULED_ON]->(s:ControlMServer) "
+                "RETURN j.job_name AS job_name, f.sched_table AS folder, "
+                "s.name AS data_center, j.job_id AS job_id "
                 "ORDER BY job_name LIMIT $limit"
             ),
             columns=(
                 ColumnDef("job_name", "string", "Job"),
-                ColumnDef("folder_id", "string", "Folder"),
+                ColumnDef("folder", "string", "Folder"),
+                ColumnDef("data_center", "string", "Data center"),
                 ColumnDef("job_id", "string", "Job id"),
             ),
             classification="internal",
             params=_LIMIT,
         ),
         QuerySpec(
-            id="explorer.conditions.v1",
+            id="explorer.conditions.v2",
             database="drydocs",
-            description="Control-M conditions (folder-scoped) for the Explorer Conditions frame.",
+            description=(
+                "Control-M conditions with their folder resolved to the :ControlMFolder "
+                "node's real name (v2 SME correction 2026-07-21 — v1 showed the raw "
+                "folder_id join key)."
+            ),
             cypher=(
                 "MATCH (c:Condition) "
-                "RETURN c.name AS name, c.folder_id AS folder_id "
+                "OPTIONAL MATCH (f:ControlMFolder {folder_id: c.folder_id}) "
+                "RETURN c.name AS name, coalesce(f.sched_table, c.folder_id) AS folder "
                 "ORDER BY name LIMIT $limit"
             ),
             columns=(
                 ColumnDef("name", "string", "Condition"),
-                ColumnDef("folder_id", "string", "Folder"),
+                ColumnDef("folder", "string", "Folder"),
+            ),
+            classification="internal",
+            params=_LIMIT,
+        ),
+        QuerySpec(
+            id="explorer.folder-applications.v1",
+            database="drydocs",
+            description=(
+                "ControlMFolder -> BusinessApplication crosswalk: which SEAL application "
+                "each folder's jobs are attributed to, via the gated edges "
+                "CONTAINS_JOB + WAS_ASSOCIATED_WITH {role:'seal_app_ref'} (K1/K2), with "
+                "the folder's data center (SCHEDULED_ON server) and job count."
+            ),
+            cypher=(
+                "MATCH (f:ControlMFolder)-[:CONTAINS_JOB]->(j:ControlMJob)"
+                "-[:WAS_ASSOCIATED_WITH {role: 'seal_app_ref'}]->(a:BusinessApplication) "
+                "OPTIONAL MATCH (f)-[:SCHEDULED_ON]->(s:ControlMServer) "
+                "RETURN f.sched_table AS folder, s.name AS data_center, "
+                "a.seal_id AS seal_id, a.name AS application, count(DISTINCT j) AS jobs "
+                "ORDER BY folder LIMIT $limit"
+            ),
+            columns=(
+                ColumnDef("folder", "string", "Folder"),
+                ColumnDef("data_center", "string", "Data center"),
+                ColumnDef("seal_id", "string", "SEAL id"),
+                ColumnDef("application", "string", "Application"),
+                ColumnDef("jobs", "int", "Jobs"),
             ),
             classification="internal",
             params=_LIMIT,

@@ -35,7 +35,11 @@ export const MODULES: readonly ModuleDef[] = [
     path: '/explorer',
     tagline: 'Tower / app drill-down graph',
     backsOnto: 'drydocs',
-    tabs: ['Applications', 'Jobs', 'Conditions', 'Servers'],
+    // Folders added 2026-07-21 (SME correction): the ControlMFolder ->
+    // BusinessApplication crosswalk (explorer.folder-applications.v1) needs
+    // its own frame — site-plan §3 listed four tabs; this is the reviewed
+    // fifth.
+    tabs: ['Applications', 'Folders', 'Jobs', 'Conditions', 'Servers'],
     phase: 1,
   },
   {

@@ -3033,6 +3033,14 @@ items:
       path is covered by tests + the server round-trip, not yet by eyeballed
       populated frames. Toolbar [Export] stays disabled — grid-level export
       per frame is the shipped surface (acceptance's "toolbar/grid" either/or).
+      SME CORRECTION same day (user review of the field mapping): jobs +
+      conditions bumped v2 — folder resolved through the :ControlMFolder node
+      (f.sched_table, not the denormalized folder_id join key), jobs gains
+      data_center via the folder's SCHEDULED_ON :ControlMServer (the reified
+      DATA_CENTER field); NEW explorer.folder-applications.v1 = the
+      ControlMFolder -> BusinessApplication crosswalk over the gated edges
+      (CONTAINS_JOB + WAS_ASSOCIATED_WITH {seal_app_ref}), bound to a new
+      Folders tab (reviewed fifth Explorer tab — site-plan §3 listed four).
 
   - id: O12
     epic: web-console

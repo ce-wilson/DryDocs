@@ -1,4 +1,4 @@
-"""O11 QuerySpec registry + export tests — pure handlers over a duck-typed
+﻿"""O11 QuerySpec registry + export tests — pure handlers over a duck-typed
 runner (the drydocs-api offline idiom): no server, no driver, no FastAPI."""
 
 from __future__ import annotations
@@ -74,9 +74,35 @@ def test_every_spec_is_versioned_read_only_and_classified():
 
 
 def test_explorer_frames_have_specs():
-    """The four Explorer tabs bind to versioned specs (O11 acceptance)."""
-    for frame in ("applications", "jobs", "conditions", "servers"):
-        assert f"explorer.{frame}.v1" in QUERY_SPECS
+    """The Explorer tabs bind to versioned specs (O11 acceptance; jobs/
+    conditions bumped v2 at the 2026-07-21 SME correction — folder resolved
+    through :ControlMFolder, data_center via SCHEDULED_ON)."""
+    for spec_id in (
+        "explorer.applications.v1",
+        "explorer.folder-applications.v1",
+        "explorer.jobs.v2",
+        "explorer.conditions.v2",
+        "explorer.servers.v1",
+    ):
+        assert spec_id in QUERY_SPECS
+
+
+def test_jobs_spec_resolves_folder_node_and_data_center():
+    """The SME correction itself: the Jobs frame reads the :ControlMFolder
+    node's real name and the DATA_CENTER server via SCHEDULED_ON — not the
+    job's denormalized folder_id."""
+    spec = QUERY_SPECS["explorer.jobs.v2"]
+    assert ":ControlMFolder" in spec.cypher and "CONTAINS_JOB" in spec.cypher
+    assert "SCHEDULED_ON" in spec.cypher and ":ControlMServer" in spec.cypher
+    assert "data_center" in [c.name for c in spec.columns]
+
+
+def test_folder_applications_spec_uses_gated_edges():
+    """Folder -> BusinessApplication rides the gated attribution edges only."""
+    spec = QUERY_SPECS["explorer.folder-applications.v1"]
+    assert "WAS_ASSOCIATED_WITH {role: 'seal_app_ref'}" in spec.cypher
+    assert "CONTAINS_JOB" in spec.cypher
+    assert ":BusinessApplication" in spec.cypher
 
 
 def test_unknown_spec_fails_closed():
@@ -86,7 +112,7 @@ def test_unknown_spec_fails_closed():
 
 def test_list_specs_exposes_cypher_and_classification():
     listed = {s["id"]: s for s in list_specs()}
-    spec = QUERY_SPECS["explorer.jobs.v1"]
+    spec = QUERY_SPECS["explorer.jobs.v2"]
     assert listed[spec.id]["cypher"] == spec.cypher  # "Copy as Cypher" source
     assert listed[spec.id]["classification"] == spec.classification
     assert listed["context.label-census.v1"]["watermarked"] is True
@@ -98,19 +124,19 @@ def test_list_specs_exposes_cypher_and_classification():
 def test_run_spec_routes_to_spec_database_and_requires_auth():
     store = InMemorySessionStore()
     runner = FakeRunner()
-    out = run_spec("explorer.jobs.v1", {}, _token(store), store, runner)
+    out = run_spec("explorer.jobs.v2", {}, _token(store), store, runner)
     assert runner.calls[0][2] == "drydocs"
     assert runner.calls[0][1] == {"limit": 500}  # default applied
     assert out["classification"] == "internal"
     assert out["watermarked"] is False
     with pytest.raises(InvalidTokenError):
-        run_spec("explorer.jobs.v1", {}, "bogus", store, runner)
+        run_spec("explorer.jobs.v2", {}, "bogus", store, runner)
 
 
 def test_run_spec_rejects_unknown_params():
     store = InMemorySessionStore()
     with pytest.raises(ParamValidationError):
-        run_spec("explorer.jobs.v1", {"evil": 1}, _token(store), store, FakeRunner())
+        run_spec("explorer.jobs.v2", {"evil": 1}, _token(store), store, FakeRunner())
 
 
 def test_ddcontext_results_carry_grid_visible_watermark():
@@ -126,14 +152,14 @@ def test_ddcontext_results_carry_grid_visible_watermark():
 
 
 def test_filename_prefix_rule():
-    internal = QUERY_SPECS["explorer.jobs.v1"]
-    assert filename_for(internal, "csv") == "INTERNAL__explorer.jobs.v1.csv"
+    internal = QUERY_SPECS["explorer.jobs.v2"]
+    assert filename_for(internal, "csv") == "INTERNAL__explorer.jobs.v2.csv"
     public = QUERY_SPECS["context.label-census.v1"]
     assert filename_for(public, "jsonl") == "context.label-census.v1.jsonl"
 
 
 def test_banner_only_for_internal_tiers():
-    assert banner_text(QUERY_SPECS["explorer.jobs.v1"]) is not None
+    assert banner_text(QUERY_SPECS["explorer.jobs.v2"]) is not None
     assert banner_text(QUERY_SPECS["context.label-census.v1"]) is None
 
 
@@ -144,14 +170,14 @@ def test_csv_export_streams_banner_header_rows_and_registers_manifest():
     store = InMemorySessionStore()
     ledger = ExportLedger()
     runner = FakeStreamingRunner(
-        keys=["job_name", "folder_id", "job_id"],
+        keys=["job_name", "folder", "data_center", "job_id"],
         rows=[
-            {"job_name": "J1", "folder_id": "F1", "job_id": "1"},
-            {"job_name": "J2", "folder_id": "F1", "job_id": "2"},
+            {"job_name": "J1", "folder": "DEMO-HL-DAILY", "data_center": "DC-E", "job_id": "1"},
+            {"job_name": "J2", "folder": "DEMO-HL-DAILY", "data_center": "DC-E", "job_id": "2"},
         ],
     )
     token = _token(store)
-    job = export_spec("explorer.jobs.v1", {}, "csv", token, store, runner, ledger)
+    job = export_spec("explorer.jobs.v2", {}, "csv", token, store, runner, ledger)
 
     # manifest must NOT exist until the stream completes
     with pytest.raises(UnknownExportError):
@@ -160,11 +186,11 @@ def test_csv_export_streams_banner_header_rows_and_registers_manifest():
     lines = "".join(job.chunks).splitlines()
     assert runner.streamed, "export must use the streaming runner path"
     assert lines[0].startswith("# CLASSIFICATION: INTERNAL")  # banner row
-    assert lines[1] == "job_name,folder_id,job_id"  # header
+    assert lines[1] == "job_name,folder,data_center,job_id"  # header
     assert lines[2].startswith("J1,") and len(lines) == 4
 
     manifest = export_manifest(job.export_id, token, store, ledger)
-    spec = QUERY_SPECS["explorer.jobs.v1"]
+    spec = QUERY_SPECS["explorer.jobs.v2"]
     assert manifest["query_spec"] == spec.id
     assert manifest["cypher_sha256"] == hashlib.sha256(spec.cypher.encode()).hexdigest()
     assert manifest["params"] == {"limit": 500}
@@ -182,7 +208,7 @@ def test_jsonl_export_watermarks_ddcontext_and_reports_trust_tier():
     token = _token(store)
     job = export_spec("context.label-census.v1", {}, "jsonl", token, store, runner, ledger)
     lines = "".join(job.chunks).splitlines()
-    assert len(lines) == 1  # internal-public → no banner object
+    assert len(lines) == 1  # internal-public â†’ no banner object
     row = json.loads(lines[0])
     assert row[WATERMARK_COLUMN].startswith("SYNTHESIZED")
 
@@ -195,9 +221,9 @@ def test_export_rejects_unknown_format_and_requires_auth():
     store = InMemorySessionStore()
     ledger = ExportLedger()
     with pytest.raises(ValueError):
-        export_spec("explorer.jobs.v1", {}, "parquet", _token(store), store, FakeRunner(), ledger)
+        export_spec("explorer.jobs.v2", {}, "parquet", _token(store), store, FakeRunner(), ledger)
     with pytest.raises(InvalidTokenError):
-        export_spec("explorer.jobs.v1", {}, "csv", "bogus", store, FakeRunner(), ledger)
+        export_spec("explorer.jobs.v2", {}, "csv", "bogus", store, FakeRunner(), ledger)
 
 
 def test_ledger_is_bounded():

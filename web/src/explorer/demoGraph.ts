@@ -162,6 +162,20 @@ export const CONDITIONS_FRAME = {
   ] as FrameRow[],
 }
 
+// Fictional folder -> application crosswalk rows (mechanism only): the demo
+// twin of explorer.folder-applications.v1 (ControlMFolder -> CONTAINS_JOB ->
+// WAS_ASSOCIATED_WITH {seal_app_ref} -> BusinessApplication, with the
+// SCHEDULED_ON data center).
+export const FOLDERS_FRAME = {
+  cols: ['Folder', 'Data center', 'SEAL id', 'Application', 'Jobs'],
+  rows: [
+    { cells: ['DEMO-HL-DAILY', 'CTM-DEMO-EAST', 'ccb-hl-app-02', 'Servicing Core', '2'], tower: 'home' as TowerKey, nodeId: 'home:5' },
+    { cells: ['DEMO-AUTO-INV', 'CTM-DEMO-WEST', 'ccb-hl-app-03', 'Portfolio Analytics', '1'], tower: 'auto' as TowerKey, nodeId: 'auto:1' },
+    { cells: ['DEMO-CARDS-TXN', 'CTM-DEMO-WEST', 'ccb-hl-app-01', 'Origination Workbench', '1'], tower: 'cards' as TowerKey, nodeId: 'cards:1' },
+    { cells: ['DEMO-SHR-CATALOG', 'CTM-DEMO-EAST', '—', '(unattributed — work queue)', '1'], tower: 'shared' as TowerKey, nodeId: 'shared:1' },
+  ] as FrameRow[],
+}
+
 // Fictional scheduler hosts (mechanism only — no real server names).
 export const SERVERS_FRAME = {
   cols: ['Server', 'Data center', 'Serves', 'Jobs'],
