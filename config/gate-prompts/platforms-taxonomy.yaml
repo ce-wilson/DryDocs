@@ -1,0 +1,99 @@
+# SME gate-prompt spec — the platforms taxonomy adoption (backlog C6 + the C11
+# capture; the gate the SchedulerKind-deprecation IDEAS line has waited on since
+# 2026-07-09). GATE-BOUND: this page PROPOSES; nothing is built, flipped, or
+# loaded by rendering it. DRAFTED 2026-07-21 by the producer session that ran
+# the C11 capture, immediately after the same-day SME pre-gate rulings (Q1
+# withdrawal + role: orchestrator). The agenda is deliberately SHORT: four of
+# five original open questions carry corroborated pre-gate directions; the one
+# substantive design decision left is the software-registry reconciliation (B3).
+# Mechanism-only: public vendor names only; internal tool values and deployed
+# instances stay company-side (PUBLISH-BOUNDARY.md).
+classification: Internal-Public
+schema: drydocs.gate-prompt.v1
+id: platforms-taxonomy
+title: "SME Gate — adopt the platforms taxonomy (:AisCapability / :AisTool): retire :SchedulerKind, retarget REQUIRES_SCHEDULER, reconcile with the software registry"
+step: "Decision gate for the platforms/SchedulerKind reconciliation — decides FROM the captured company-confirmed shape (config/taxonomy/platforms.yaml#company_confirmed, C11 2026-07-21) instead of re-deriving it"
+summary: >
+  The company repo confirmed and BUILT this taxonomy at its own 2026-06-29 AIS
+  gate (:AisCapability skos:Concept / :AisTool prov:SoftwareAgent — spelled with
+  the s; (:BusinessApplication)-[:USES_TOOL]->(:AisTool) app edge;
+  (:AisTool)-[:IN_CAPABILITY]->(:AisCapability) roll-up; :SchedulerKind
+  deprecated there the same day). The producer captured that shape sanitized at
+  C11 (2026-07-21) and the SME issued five pre-gate directions in-chat the same
+  week — Q2 (one edge, hoisted to :BusinessApplication), Q3 (:Scheduler retired
+  unbuilt; :ControlMServer stays the deployed layer), Q5 (publishability
+  refined), Q1 (batch/event capability seed WITHDRAWN as a super-node-avoidance
+  device; producer rows carry role: orchestrator only). Section A confirms those
+  as written. Section B holds the remaining rulings: B1 the USES_TOOL rename,
+  B2 whether the producer adopts the :AisCapability layer at all (the area
+  'orchestration' duplicates the registry role 'orchestrator'), B3 the ONE
+  substantive open design decision — :AisTool vs the software registry's
+  :SoftwareProduct (unreconciled on BOTH sides; two overlapping app-uses-
+  orchestrator edges), B4 edge typing, B5 the airflow row's fate. Company
+  sign-off is PROVENANCE here, never producer adoption — company gates and
+  producer gates are separate universes. Nothing below is applied until ticked
+  and transcribed to config/gate-log.md.
+meta:
+  Module: "taxonomy + ontology (config/taxonomy/platforms.yaml · drydocs_core/ontology/ · ontology.cypher SchedulerKind seeds)"
+  Source: "config/taxonomy/platforms.yaml#company_confirmed (C11 capture 2026-07-21 of the company 2026-06-29 AIS gate, screenshot/describe channel) + config/taxonomy-ontology-map.yaml#requires-scheduler (C6)"
+  Registry ref: "config/taxonomy/software-registry.yaml orchestrator rows (role: orchestrator) are the B2/B3 reconciliation input — no source-registry change from this gate"
+  Classification: "Internal-Public (mechanism + public vendors; internal tool values + deployed-instance data stay company-side)"
+  Taxonomy: "config/taxonomy/platforms.yaml — status: captured, confirmed: false; flips confirmed at THIS gate"
+  Ontology map: "requires-scheduler entry (status: proposed) reshapes per B1/B4; vocab seal_requires_scheduler stays planned until the build (flips-are-follow-ups, the K2 pattern)"
+  Source of record: "backlog C6 + C11 · config/gate-log.md (transcription target) · docs/restructure/03-hitl-sme-flow.md"
+
+mapping:
+  - n: 1
+    element: "App -> tool (the REQUIRES_SCHEDULER retarget)"
+    target: "(:BusinessApplication)-[:USES_TOOL]->(:AisTool) — one app-level edge (Q2 direction, corroborated by the company build)"
+    edge: "USES_TOOL  [OPEN — B1 rules the rename; B4 rules the typing]"
+  - n: 2
+    element: ":AisTool (the concrete product)"
+    target: "prov:SoftwareAgent (swo:Software), key tool_id — deliberately NOT :Platform (:ControlMServer keeps the deployed layer, Q3)"
+    edge: "class adoption  [PROPOSED from the company shape]"
+  - n: 3
+    element: ":AisCapability (the capability AREA)"
+    target: "skos:Concept, key capability_id; (:AisTool)-[:IN_CAPABILITY]->(:AisCapability) as skos:broader"
+    edge: "IN_CAPABILITY  [OPEN — B2 rules whether the producer adopts the layer at all]"
+  - n: 4
+    element: ":AisTool <-> software registry (:SoftwareProduct / :Vendor)"
+    target: "UNRECONCILED both sides — company carries a vendor STRING only; the registry models the same tools with MADE_BY + a parallel USES_SOFTWARE app edge"
+    edge: "cross-reference  [OPEN — B3, the substantive decision]"
+  - n: 5
+    element: ":SchedulerKind (today's placeholder vocab)"
+    target: "DEPRECATED, audit-kept (company did this 2026-06-29; producer seeds retire as build follow-ups)"
+    edge: "deprecation  [PROPOSED]"
+
+provenance:
+  - label: "The captured company shape (every 'company built X' claim on this page)"
+    source_object: "config/taxonomy/platforms.yaml#company_confirmed"
+    key: "C11 capture, 2026-07-21"
+    loader: "~ (no loader — capture came through the screenshot/describe channel, mechanism-only)"
+    properties:
+      - {name: classes_edges_vocab, origin: source, from: "company platforms_supplement.cypher + ontology-map C2c, confirmed at the company 2026-06-29 AIS gate", note: "AisCapability/AisTool classes, USES_TOOL + IN_CAPABILITY edges, 3 capability areas, 7 tools, SchedulerKind deprecation"}
+      - {name: company_audit_gaps, origin: source, from: "the capture session report verbatim", note: "their 06-29 gate has no company gate-log entry; their own platforms.yaml headers are stale — company-side chores, recorded as provenance only"}
+      - {name: pre_gate_directions, origin: source, from: "SME in-chat rulings 2026-07-21 (Q1 withdrawal + role: orchestrator; Q2/Q3/Q5 directions 2026-07-21)", note: "recorded in platforms.yaml open_questions; section A confirms them formally"}
+      - {name: recommendations, origin: derived, from: "this draft (producer session 2026-07-21)", note: "B1 adopt-rename, B3 distinct-view + explicit cross-reference — recommendations only, every one an open SME ruling"}
+
+sections:
+  - title: "A. Corroborated pre-gate directions — confirm as written"
+    confirmations:
+      - "Q2: REQUIRES_SCHEDULER re-targets as ONE app-level edge at :BusinessApplication (hoisted from the batch :Port) targeting :AisTool — corroborated by the company build; the two-edge capability split is not wanted."
+      - "Q3: :Scheduler (the LoadPlanV3 deployed-instance node) is retired UNBUILT — :ControlMServer is the deployed layer (SCHEDULED_ON); corroborated by the company's deliberate AisTool-is-not-:Platform choice."
+      - "Q5: the class model and public-vendor values are publishable; internally-built tool VALUES and all deployed-instance data stay internal/ (the ccb-twin convention)."
+      - "Q1 closure: the 'batch scheduling'/'event scheduling' capability seed is WITHDRAWN — it was the SME's super-node-avoidance sub-node design under :BusinessApplication, not capability semantics; the batch-vs-event split lives on the SEAL port kind; producer rows carry role: orchestrator (the registry vocabulary) only."
+  - title: "B. Rulings — the remaining calls"
+    confirmations:
+      - "B1 edge name: ADOPT the company's USES_TOOL rename (RECOMMENDED — avoids a producer/company edge-name divergence at every future port) or KEEP REQUIRES_SCHEDULER producer-side with a crosswalk note. Either way the C6 map entry and the seal_requires_scheduler vocab entry reshape accordingly (status stays planned until the build)."
+      - "B2 capability layer: ADOPT :AisCapability producer-side (skos:Concept + IN_CAPABILITY roll-up, company parity) or COLLAPSE it into the software-registry role (the area 'orchestration' duplicates role: orchestrator — one fewer node type; company parity breaks). This ruling feeds B3."
+      - "B3 THE design decision — :AisTool vs :SoftwareProduct: (a) DISTINCT VIEW + explicit cross-reference (RECOMMENDED, per the SME Q4 direction — pick edge vs software_registry_ref property at the session), (b) MERGE (one node carries both views), or (c) company status quo (vendor string only, no reconciliation — recording that divergence is itself a valid outcome). Include the app-edge overlap: USES_TOOL (:AisTool) vs USES_SOFTWARE (:SoftwareProduct) — one survives, or both stay with distinguished semantics."
+      - "B4 typing: USES_TOOL carries NO PROV row (infrastructure/capability family, Agent->Agent — same family as SCHEDULED_ON) vs a weak prov:used. IN_CAPABILITY = skos:broader (only if B2 adopts the layer)."
+      - "B5 the airflow row: KEEP as the F2 crosswalk placeholder (RECOMMENDED — Apache Airflow is not in the company tool list; their AWS leg is EventBridge Scheduler + Glue) or DROP the row."
+  - title: "C. Consequences recorded at sign-off"
+    confirmations:
+      - "config/taxonomy/platforms.yaml flips confirmed: true; the :SchedulerKind deprecation (ontology.cypher seeds + the scheduler_kind constraint) and any reshapes/renames become groomed build follow-ups — vocabulary statuses stay planned until those builds land (the K2 flips-are-follow-ups pattern)."
+      - "The C6 requires-scheduler map entry reshapes per A/B (from_node :BusinessApplication, to_node :AisTool, label per B1, typing per B4); F1/F2 orchestrator crosswalks gain the AisTool mapping column when their next edit lands."
+      - "The decision is transcribed to config/gate-log.md; gates.json regenerates (the O19 drift guard enforces the new row)."
+  - title: "D. Sign-off"
+    confirmations:
+      - "SME sign-off recorded here and transcribed to config/gate-log.md with the date and the per-ruling outcomes (A confirmations + B1–B5)."

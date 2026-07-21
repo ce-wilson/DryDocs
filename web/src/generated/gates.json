@@ -300,6 +300,17 @@
     {
       "kind": "prompt-only",
       "date": null,
+      "title": "platforms-taxonomy (gate page rendered — session not yet run)",
+      "status": "open",
+      "prompt_files": [
+        "config/gate-prompts/platforms-taxonomy.yaml"
+      ],
+      "log_ref": null,
+      "unblocks": []
+    },
+    {
+      "kind": "prompt-only",
+      "date": null,
       "title": "seal-app-ref-edge-reshape (gate page rendered — session not yet run)",
       "status": "open",
       "prompt_files": [
