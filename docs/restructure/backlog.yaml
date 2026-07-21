@@ -4647,8 +4647,8 @@ items:
     model: fable
     priority: p2
     status: todo
-    depends_on: [G21]
-    inputs: [docs/restructure/03-hitl-sme-flow.md, config/gate-log.md, drydocs_core/schema/schema_graph.cypher, docs/RELATIONSHIP_GUIDE.md]
+    depends_on: [G21, G24]
+    inputs: [docs/restructure/03-hitl-sme-flow.md, config/gate-log.md, drydocs_core/schema/schema_graph.cypher, docs/RELATIONSHIP_GUIDE.md, config/precedence.yaml, drydocs_core/schema/provisioning/02_proxy_constraints.cypher]
     acceptance: >
       A HITL gate session rules the graph shape for rua data before ANY
       load: (a) which existing planned vocabulary the load may activate
@@ -4660,18 +4660,38 @@ items:
       arch_owns_code precedent, or a new type), and profile
       sources/invokes script (G21's flagged dependency candidates) —
       proposed via ontology-mapper as status: planned first, per the
-      RELATIONSHIP_GUIDE registry flow; (c) the node identity keys
-      (ExecutionHost by fqdn?, AppUser by (user, uid)?, Script by
-      (host, path)?) and how the meta.txt provenance envelope lands
-      (properties vs the provenance-audit-fields envelope plan);
-      (d) classification handling on load — which properties are
+      RELATIONSHIP_GUIDE registry flow; (c) the SCRIPT IDENTITY + DEDUP
+      contract: a DryDocs URN for the logical script (extending the D1
+      urn:drydocs:dataasset pattern — the gate rules the URN segments,
+      e.g. urn:drydocs:script:{...}) so the SAME file arriving from the
+      server extract (G20), the code repo (G24), and CMD_LINE/variable
+      references (G21/G16 SCRIPT_PATH facts) MERGES to ONE node — never
+      duplicate labels/nodes — while every source occurrence is recorded
+      WITH its origin (server-extract | code-repo) and full path
+      (host+path vs repo+branch+commit+path); plus identity keys for the
+      other nodes (ExecutionHost by fqdn?, AppUser by (user, uid)?) and
+      how the meta.txt provenance envelope lands (properties vs the
+      provenance-audit-fields envelope plan); (d) the SOURCE-PRECEDENCE
+      ruling recorded in config/precedence.yaml terms: the server extract
+      is the truth for "latest code that actually runs"; the code repo is
+      the truth for intent/history ONLY where the team maintains a clean
+      branch (a per-team/per-repo trust flag, not a global assumption) —
+      and the usage axis stays SEPARATE: present-on-server does not mean
+      used, and G21/G16 reference facts decide "what calls it"; a script
+      with no references is FLAGGED unreferenced, never auto-judged
+      unused; (e) classification handling on load — which properties are
       internal-confidential and must never reach a publishable export
       (ties to the O11 spec classification vocabulary). Decisions in
       config/gate-log.md; anything declined stays candidate-only.
     notes: >
-      THE TERMINUS of this groom — G18-G21 are all candidate-side and
-      buildable ungated; nothing writes the graph before this session.
-      fable per the matrix (ontology decisions).
+      THE TERMINUS of this groom — G18-G21 + G24 are all candidate-side
+      and buildable ungated; nothing writes the graph before this session.
+      fable per the matrix (ontology decisions). The 2026-07-21 SME-chat
+      evidence motivating (c)/(d), mechanism-only: a production script
+      referenced by a job-definition folder VARIABLE was not findable in
+      the code repo — the team's code-fetch tooling keys on pipeline-id,
+      which this job family lacks — so repo completeness can never be
+      assumed and the server extract is the reliable "what runs" source.
 
   - id: G23
     epic: component-topology
@@ -4692,14 +4712,59 @@ items:
       keys and constraints, the ruled edges only (activated or newly
       planned->active per the gate — nothing beyond it), and the meta.txt
       provenance envelope attached in the ruled form. Idempotent re-load of
-      the same bundle (MERGE on identity keys); a testcontainers e2e proves
-      a synthetic v2 bundle round-trips collector-shape -> extractor ->
-      load -> cypher readback. Coverage counters from G20/G21 surface in
-      the load report. Full suite green.
+      the same bundle (MERGE on identity keys); a two-source fixture — the
+      SAME logical script arriving as a server-extract occurrence AND a
+      code-repo occurrence — proves single-node merge on the G22 script
+      URN with BOTH source records (origin + path) retained; a
+      testcontainers e2e proves a synthetic v2 bundle round-trips
+      collector-shape -> extractor -> load -> cypher readback. Coverage
+      counters from G20/G21/G24 surface in the load report. Full suite
+      green.
     notes: >
       Sequenced after the gate on purpose (K2 -> K4 loader precedent:
       gate first, build same day after sign-off). Synthetic fixtures only
       in-repo; real bundles stay in the G19 landing zone.
+
+  - id: G24
+    epic: component-topology
+    title: "Code-repo source seam + server/repo corroboration: same staging shape, origin=code-repo, drift report"
+    type: task
+    module: drydocs-lineage
+    phase: 6
+    agent: main
+    model: sonnet
+    priority: p2
+    status: todo
+    depends_on: [G20]
+    inputs: [drydocs_lineage/extractors/rua_inventory.py, drydocs_lineage/model.py, config/source-registry.yaml, tests/unit/test_lineage_inventory.py]
+    acceptance: >
+      A code-repo source seam emits script-artifact staging records in the
+      SAME shape as G20's server-extract records, differing only in the
+      provenance origin: origin=code-repo with repo + branch + commit +
+      path (vs origin=server-extract with host + path + mtime). Driven by
+      SYNTHETIC fixtures modeled on the observed shapes (a repo file
+      listing/manifest and job-definition XML carrying script paths via
+      folder VARIABLEs — mechanism-only; real Bitbucket access stays
+      company-side behind this seam). A corroboration report joins the two
+      origins on the candidate script identity (path-tail matching until
+      the G22 URN is ruled) into three buckets — server-only, repo-only,
+      both (with content/mtime-vs-commit drift when comparable) — because
+      server-only IS the observed failure mode (production code absent
+      from the repo) and the both-bucket drift is the "clean branch"
+      signal per team. The per-team/per-repo clean-branch trust flag has a
+      config home (source-registry entry field), set by humans, never
+      inferred. NO graph writes, no new relationship types; unmatched
+      records counted, never dropped. Full suite green.
+    notes: >
+      Groomed 2026-07-21 from the SME-chat evidence (mechanism-only): a
+      script running in production was not findable in the code repo —
+      code-fetch tooling keys on pipeline-id, which that job family
+      lacks. The repo is a valid source ONLY where the team keeps a clean
+      branch (the trust flag); production servers always have the latest
+      RUNNING code — but "what calls it / is it used" stays the reference
+      graph's question (G21/G16 facts), never this seam's. Feeds the G22
+      gate (identity/dedup + precedence rulings). Candidate-side, hence
+      sonnet.
 
   - id: C11
     epic: ontology-mapping
@@ -4813,7 +4878,7 @@ items:
       generator's home); zero api surface.
 
 summary:
-  todo: 24                                         # +O25 (O20 sign-off follow-up), -O20 done; +G18..G23 rua-ingest phase (2026-07-21)
+  todo: 25                                         # +O25 (O20 sign-off follow-up), -O20 done; +G18..G24 rua-ingest phase incl. repo-source seam (2026-07-21)
   in_progress: 1                                   # E1 (gate deferred both sides)
   blocked: 0
   done: 113                                        # +O20 SIGNED OFF 2026-07-21 pm — the Epic O phase-12 chain is COMPLETE
