@@ -303,7 +303,8 @@
       ],
       "log_ref": null,
       "unblocks": [
-        "O20"
+        "O20",
+        "O24"
       ]
     }
   ]

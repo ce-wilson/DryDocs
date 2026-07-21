@@ -4526,9 +4526,54 @@ items:
 
 # Roll-up the dispatcher can glance at. COMPUTED views — test_backlog.py enforces
 # that these match the items exactly; update them with any status change.
+  - id: O24
+    epic: web-console
+    title: "SEAL-contacts override list: steward mapping domain for operate-manager (L1/L2) corrections — DB-table store with a source-vs-user origin flag + a source-corrections report for the AOs"
+    type: task
+    module: drydocs-api
+    phase: 12
+    agent: main
+    model: sonnet
+    priority: p2
+    status: todo
+    depends_on: [O13]
+    inputs: [drydocs_api/mappings.py, drydocs_core/mapping_store.py, web/src/routes/MappingsRoute.tsx, drydocs/loaders/cypher/seal_contacts.cypher, drydocs_api/query_specs.py, config/gate-log.md]
+    acceptance: >
+      A new steward mapping domain (seal-contact-override) joins the /mappings
+      domain strip via the registry (the O13 mechanics): its grid shows the
+      current SEAL operate-manager attributions (L1/L2) with an ORIGIN flag on
+      every row — source (SEAL) vs user override — always visible, never
+      hidden; stewards draft override entries (app seal_id + role/level +
+      corrected holder SID + REQUIRED rationale) that persist in the
+      mapping-store DATABASE TABLE (the file-to-table enhancement: the
+      committed override list is the source the derived var/mapping.db
+      materializes from, so it stays rebuildable); overrides NEVER write the
+      graph and NEVER silently replace the SEAL value — where both exist the
+      surfaces show them side by side; a SOURCE-CORRECTIONS REPORT export
+      (artifact + manifest) lists every override with the SEAL current value,
+      the corrected value, author and rationale, formatted for the
+      application owners who hold the AO privilege to fix SEAL itself.
+      Whether overrides ever influence graph-side attribution (a precedence
+      tier) is explicitly OUT of scope — recorded as a gate question for the
+      ui-write-surface / K-family gates, not decided here. Tests cover the
+      origin flag, the override-store round-trip, and the report content.
+      Full suite green.
+    notes: >
+      Promoted 2026-07-21 pm directly from SME direction in the O20 review
+      chat (the C9 direct-promotion precedent): SEAL Contacts L1/L2 Operate
+      Manager data is known-inaccurate; fixing SEAL requires the application
+      owner (AO privilege) to update it manually, so DryDocs carries the
+      mapping FROM SEAL plus a user override list, flagged by origin, feeding
+      a corrections report — fix-the-source doctrine, not a graph write. The
+      same direction is amended into config/gate-prompts/ui-write-surface.yaml
+      (M2 non-graph-store ratified as the standing pattern; formal sign-off
+      still at the O20 session). Module drydocs-api (domain registry + store
+      + report endpoint); the /mappings screen half rides the existing O13
+      surface.
+
 summary:
-  todo: 17                                         # +O23 rollup-shape gate (2026-07-21 user request)
+  todo: 18                                         # +O24 seal-contacts override list (2026-07-21 pm SME direction)
   in_progress: 1                                   # E1 (gate deferred both sides)
   blocked: 0
   done: 112                                        # +O13 +O10 +O12 +O15 +O16 +O17 +O18 +O19 (2026-07-21 Epic-O finish session)
-  next_ready: [L9, L12, L14, L15, M2, M3, M4, P3, J10, Q6, O20, O23, J13, G17, C11]
+  next_ready: [L9, L12, L14, L15, M2, M3, M4, P3, J10, Q6, O20, O23, O24, J13, G17, C11]

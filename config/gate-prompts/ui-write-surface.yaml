@@ -6,6 +6,24 @@
 # sign-off. Drafted 2026-07-21 by the Epic-O finish session (O10/O12/O13/O15-O19
 # shipped same day; O20 became next_ready at their close). Mechanism-only: no
 # real ids or company values anywhere on this page.
+# AMENDED 2026-07-21 pm — in-session SME DIRECTION (chat, pre-sign-off; the
+# formal ticks still happen at the session): (1) UI gate pages are NECESSARY
+# — DryDocs builds without upfront specs/requirements, so the console's
+# confirm-as-you-build flow is a first-class mechanism, not an optional
+# affordance (reframes C1 from "at most M1" toward YES, tier decided at the
+# session); (2) an admin/SUPER-USER page in the SaaS idiom is expected for
+# UI-WEB (beyond the read-only /admin/config lens) — scoped as its own items
+# when defined, recorded here as direction (new C5); (3) node relationships
+# are NOT pre-determined: the mapping plan (placeholder file, since ENHANCED
+# to a mapping-store DATABASE TABLE) carries an ORIGIN FLAG — source vs user
+# mapping — so users always see which is which; (4) user mappings/overrides
+# feed a SOURCE-CORRECTIONS REPORT (artifact for the system owners), never a
+# graph write — worked example: SEAL Contacts L1/L2 Operate Manager data is
+# inaccurate and only the application owner (AO privilege) can fix SEAL, so
+# DryDocs keeps the SEAL mapping PLUS a user override list and reports the
+# deltas for source correction (promoted as backlog O24). This ratifies the
+# M2 tier (server-persisted non-graph store) as the standing pattern for
+# mapping/override drafting; M3 direct graph write remains refused.
 classification: Internal-Public
 schema: drydocs.gate-prompt.v1
 id: ui-write-surface
@@ -87,10 +105,11 @@ sections:
       - "Declining every candidate below is a valid sign-off — the console is complete and useful as shipped; extensions are opt-in, never assumed."
   - title: "B. Candidate write-shaped affordances — rule each"
     confirmations:
-      - "C1 gate sign-off from /gates: choose M1 (artifact-drafting affordance — the page can assemble a gate-log entry snippet for the SME to review and commit) or NEVER (the /gates page stays a pure record; sessions happen entirely in the HITL flow). Either way the page gains no status-flipping control."
-      - "C2 SME annotations/notes: choose M1 (client-side notes + artifact export, the L5 save-button precedent), M2 (server-persisted drafts in a non-graph store, exported as artifacts), or NEVER. If notes should ever land as graph content, that node/edge shape routes through its own ontology gate before any build."
-      - "C3 steward drafting beyond artifact download: choose DEFER (recommended — revisit against the company GHE posture; artifact download stands) or M2-with-git (server-side branch/PR creation, which imports a credential surface and needs its own security review)."
+      - "C1 gate sign-off from /gates: choose M1 (artifact-drafting affordance — the page can assemble a gate-log entry snippet for the SME to review and commit) or NEVER (the /gates page stays a pure record; sessions happen entirely in the HITL flow). Either way the page gains no status-flipping control. SME DIRECTION 2026-07-21 pm (pre-sign-off): UI gate pages are NECESSARY for building and confirming — there is no upfront spec, the model emerges through confirmation — so C1 leans YES; the mechanism tier (M1 vs M2) is the session's remaining call."
+      - "C2 SME annotations/notes: choose M1 (client-side notes + artifact export, the L5 save-button precedent), M2 (server-persisted drafts in a non-graph store, exported as artifacts), or NEVER. If notes should ever land as graph content, that node/edge shape routes through its own ontology gate before any build. SME DIRECTION 2026-07-21 pm: M2 is the ratified pattern — the mapping plan's placeholder FILE was enhanced to a mapping-store DATABASE TABLE with an origin flag (source vs user mapping) so users always know which is which."
+      - "C3 steward drafting beyond artifact download: choose DEFER (recommended — revisit against the company GHE posture; artifact download stands) or M2-with-git (server-side branch/PR creation, which imports a credential surface and needs its own security review). SME DIRECTION 2026-07-21 pm: user mappings/overrides persist server-side (M2) and feed a SOURCE-CORRECTIONS REPORT for the system owners — e.g. the SEAL L1/L2 operate-manager override list (backlog O24), whose fixes only the application owner (AO privilege) can apply in SEAL itself. The report is the write path; the graph is not."
       - "C4 admin config edits: confirm NEVER (the wf-admin-config-01 doctrine — edits travel repo + gate flow; the page links, it never edits)."
+      - "C5 (ADDED at the 2026-07-21 pm amendment) admin/SUPER-USER page in the SaaS idiom for UI-WEB: recorded as SME-expected direction — a real administration surface beyond the read-only /admin/config lens. This gate records the EXPECTATION and its boundary (any write it carries follows the tiers above); scoping the page itself is follow-on backlog work, not this gate."
   - title: "C. Consequences recorded at sign-off"
     confirmations:
       - "Permitted affordances (if any) become backlog items with their own acceptance tests; nothing is built from this page directly."
