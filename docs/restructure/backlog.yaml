@@ -39,7 +39,7 @@
 # =============================================================================
 
 schema: drydocs.backlog.v2
-updated: 2026-07-20
+updated: 2026-07-21
 
 # ── The high-level project plan (rendered as the board's roadmap strip) ───────
 plan:
@@ -2916,7 +2916,7 @@ items:
     priority: p2
     status: todo
     depends_on: [O8]
-    inputs: [UI-WIP/site-plan.md, UI-WIP/Gemini_Generated_Landing-Favorite.png, UI-WIP/Gemini-generated-subpage.png, UI-WIP/codeflow-ui-reference.png, web/src/]
+    inputs: [UI-WIP/site-plan.md, UI-WIP/Gemini_Generated_Landing-Favorite.png, UI-WIP/Gemini-generated-subpage.png, UI-WIP/codeflow-ui-reference.png, UI-WIP/DryDocs_UI_Development_Specs.md, UI-WIP/gemini-wire-frame.md, UI-WIP/icons.md, web/src/]
     acceptance: >
       Landing renders the radial hub (red brand core, one spoke per module, spoke = the
       same route as the aside-nav item; SVG rebuild, not the raster mock) with a generic
@@ -2935,6 +2935,12 @@ items:
       left explorer+stats rail, center graph pane with view-mode tabs, right
       per-selection detail panel with a blast-radius card, linked selection, dark
       tokens. Cite, don't imitate branding.
+      2026-07-21 groom merge (UI extension): DryDocs_UI_Development_Specs.md = the
+      demo tower CONTENT spec (4 SYNTHESIZED pages — Global Enterprise / Cards /
+      Home Lending / Auto — with table shapes + node palettes for the Explorer
+      demo data); gemini-wire-frame.md = expanded-landing options (4 benefit
+      cards, onboarding checklist, posture panel -> feeds the spoke health
+      glyphs); icons.md glyphs are their own item (O22).
 
   - id: O10
     epic: web-console
@@ -3118,6 +3124,204 @@ items:
       meta and proves a read rebuilds + restores current hashes. Plan M2's
       CI/ritual rebuild bullet recorded SUPERSEDED in the plan header; runbook
       troubleshooting updated. Suite 693 passed / 6 expected skips.
+
+  # O15–O22: the site-plan P3 extension (groomed 2026-07-21 from chat + the new
+  # UI-WIP corpus: DryDocs_UI_Development_Specs.md, gemini-wire-frame.md, icons.md,
+  # layout-anatomy-checklist.md now on disk). Covers every remaining console
+  # surface buildable WITHOUT a gate; the chain terminates at O20 — the HITL gate
+  # deciding the UI write-surface boundary. Until O20 signs off, every console
+  # surface is read-only / artifact-only (the O13 doctrine).
+  - id: O15
+    epic: web-console
+    title: "Ownership module page: SEAL->PAT rollup graph rendering the K4 qualified-attribution shape over team/attribution data frames"
+    type: task
+    module: drydocs-web
+    phase: 12
+    agent: main
+    model: sonnet
+    priority: p2
+    status: todo
+    depends_on: [O9, O11]
+    inputs: [UI-WIP/site-plan.md, web/src/, drydocs/loaders/cypher/seal_applications.cypher, drydocs/loaders/cypher/seal_contacts.cypher, drydocs_core/schema/seal_ontology_supplement.cypher]
+    acceptance: >
+      /ownership evolves the kept MyApps view into the shared subpage template:
+      graph pane renders the ownership rollup (CatalogLOB -> Product -> AreaProduct ->
+      DevTeam -> BusinessApplication) using the K4 qualified-attribution shape —
+      Attribution nodes keyed attribution_id with their TOMRole, and
+      unmapped_role=true attributions visibly flagged, never hidden; data-frame
+      tabs (Teams / Attributions / Escalation routing) bind to QuerySpecs, with
+      honest empty states when a source (e.g. escalation routing) isn't loaded in
+      the target DB; selection linking works as in Explorer; both themes pass.
+    notes: >
+      site-plan.md P3 wave 1 (module 3). Deliberately sequenced after the K4
+      constraint fix (4abe1aa) — the page reads the exact MERGE keys the
+      constraints now back. MyApps at /ownership survived O8; this is its
+      template-instantiation upgrade, not a new surface.
+
+  - id: O16
+    epic: web-console
+    title: "Loads module page: loader->JobRun timeline over run/reject/coverage data frames"
+    type: task
+    module: drydocs-web
+    phase: 12
+    agent: main
+    model: sonnet
+    priority: p2
+    status: todo
+    depends_on: [O9, O11]
+    inputs: [UI-WIP/site-plan.md, web/src/, drydocs/loaders/]
+    acceptance: >
+      /loads instantiates the shared template with the ReUI Timeline as this
+      module's canvas (site-plan §3 row 8): loader -> :JobRun provenance rendered
+      as a run timeline; data-frame tabs (Runs / Rejects / Drift-coverage) bind
+      to QuerySpecs over the BaseLoader :JobRun envelope; /loads/run/:runId deep
+      links resolve; empty states honest on databases with no runs; both themes.
+    notes: "site-plan.md P3 wave 1 (module 8)."
+
+  - id: O17
+    epic: web-console
+    title: "Runbooks + Remediation module pages: provisioning-chain and finding->fix-batch flows on the shared template"
+    type: task
+    module: drydocs-web
+    phase: 12
+    agent: main
+    model: sonnet
+    priority: p2
+    status: todo
+    depends_on: [O9, O11]
+    inputs: [UI-WIP/site-plan.md, web/src/, drydocs_remediation/, .claude/skills/controlm-runbook-automation/SKILL.md]
+    acceptance: >
+      /runbooks and /remediation both instantiate the shared template. Runbooks:
+      graph pane = the data-series provisioning chain (FileWatcher -> RAW -> ING ->
+      LD), frames Series / Generated runbooks / Metadata completeness. Remediation:
+      graph pane = finding -> fix-batch flow, frames Findings / Fix batches / Jira
+      handoffs, reading drydocs_remediation outputs through drydocs-api QuerySpecs.
+      Mechanism-only fixtures where the live data is company-side, tagged
+      SYNTHESIZED/illustrative like the Explorer towers; both themes.
+    notes: >
+      site-plan.md P3 wave 1 (modules 4+5), combined: both back onto the
+      remediation/runbook pipeline domain and are pure template instantiations.
+
+  - id: O18
+    epic: web-console
+    title: "Docs module page: Document->Chunk corpus map with trust/provenance tiers visible per row"
+    type: task
+    module: drydocs-web
+    phase: 12
+    agent: main
+    model: sonnet
+    priority: p3
+    status: todo
+    depends_on: [O9, O11]
+    inputs: [UI-WIP/site-plan.md, web/src/, drydocs/loaders/cypher/bmc_docs.cypher, drydocs/loaders/cypher/essential_graphrag.cypher]
+    acceptance: >
+      /docs instantiates the shared template over the bmc-docs lexical corpus:
+      Document -> Chunk map in the graph pane; data-frame tabs (Documents / Chunks /
+      Trust-provenance) with the trust tier (VERBATIM / GROUNDED / SYNTHESIZED)
+      visible as a column, never hidden; QuerySpecs against the docs corpus
+      database; /docs/document/:docId deep links resolve; both themes.
+    notes: "site-plan.md P3 wave 2 (module 6). Corpus exists (document_id/chunk_id constraints, bmc-docs load gate-accepted 2026-07-08)."
+
+  - id: O19
+    epic: web-console
+    title: "Gates module page (READ-ONLY): gate dependency graph + gate-log frames from a generated gates.json — zero action controls"
+    type: task
+    module: drydocs-web
+    phase: 12
+    agent: main
+    model: sonnet
+    priority: p3
+    status: todo
+    depends_on: [O9]
+    inputs: [UI-WIP/site-plan.md, web/src/, config/gate-log.md, config/gate-prompts/, docs/restructure/backlog.yaml]
+    acceptance: >
+      /gates instantiates the shared template READ-ONLY: graph pane renders the
+      gate dependency graph (gates -> the backlog items / vocabulary entries they
+      unblock); data-frame tabs Open gates / Signed off / Gate log. Data is a
+      GENERATED gates.json (a script scans config/gate-log.md + config/gate-prompts/
+      + backlog.yaml — the O12 enforcement-matrix pattern) with a unit test that
+      fails when a gate-log entry or gate-prompt file has no row (no drift). ZERO
+      action controls — no sign-off, no edits; each gate links to its repo
+      artifacts. Write-shaped gate actions are explicitly out of scope: they
+      belong to the O20 gate decision.
+    notes: "site-plan.md P3 wave 2 (module 7). The read-only render is ungated; acting on gates from the UI is exactly what O20 decides."
+
+  - id: O20
+    epic: web-console
+    title: "HITL gate session: the UI write-surface boundary — which console actions may ever write, and through what mechanism"
+    type: requirement
+    module: drydocs-web
+    phase: 12
+    agent: main
+    model: fable
+    priority: p3
+    status: todo
+    depends_on: [O13, O19]
+    inputs: [docs/restructure/03-hitl-sme-flow.md, config/gate-log.md, UI-WIP/site-plan.md, docs/restructure/backlog.yaml]
+    acceptance: >
+      A HITL gate session (docs/restructure/03-hitl-sme-flow.md) decides the UI
+      write-surface boundary and records it in config/gate-log.md: which
+      write-shaped console actions, if any, are ever permitted (gate sign-off from
+      /gates, SME annotations/notes, steward drafting beyond the O13
+      artifact-download) and the mechanism each must use (gate-bound change
+      artifact per the O13 doctrine vs a direct API write). The standing rule
+      "the UI performs zero graph writes" is the default the gate either
+      re-affirms or consciously amends PER SURFACE. Until signed off, every
+      console surface stays read-only / artifact-only, and any future UI item
+      proposing a write must cite this gate id.
+    notes: >
+      THE TERMINUS of the 2026-07-21 UI extension groom — everything before it is
+      buildable ungated; nothing write-shaped proceeds past it. Also the home for
+      the O12-noted L7 SaaS-reframe config surfaces IF any of them ever grows an
+      edit control (today they are read-only by design).
+
+  - id: O21
+    epic: web-console
+    title: "Commit the UI-WIP design corpus: LFS the 19 MB .fig first, classify each file against the publish boundary"
+    type: chore
+    module: docs
+    phase: 12
+    agent: main
+    model: haiku
+    priority: p3
+    status: todo
+    depends_on: []
+    inputs: [UI-WIP/, PUBLISH-BOUNDARY.md, config/classification.yaml, .gitattributes]
+    acceptance: >
+      start-react-free-reference.fig (19 MB) is tracked via git-lfs BEFORE add;
+      every untracked UI-WIP file is checked against PUBLISH-BOUNDARY.md and
+      committed with a sensible classification (AI-generated mocks + design prose
+      = internal-public ceiling; codeflow-ui-reference.png stays External with
+      its citation; anything that turns out to show internal data — check
+      dd-verify-top.png — moves to internal/ instead of committing here);
+      layout-anatomy-checklist.md lands (closing the O8 "named input never
+      committed" note); git status is clean for UI-WIP afterward.
+    notes: "site-plan.md §6 LFS follow-up, now actionable since the corpus feeds O15+ inputs."
+
+  - id: O22
+    epic: web-console
+    title: "Icon set: export the 7 hub glyphs from icons.md as recolorable SVG components consumed by the radial hub + aside nav"
+    type: task
+    module: drydocs-web
+    phase: 12
+    agent: main
+    model: sonnet
+    priority: p3
+    status: todo
+    depends_on: [O8]
+    inputs: [UI-WIP/icons.md, web/src/]
+    acceptance: >
+      The 7 glyphs in icons.md (brand mark, Tower Auto, Infrastructure, Home
+      Lending, Data Lineage, Credit Cards + the reused infrastructure variant)
+      exist as standalone recolorable SVG assets/components under web/src —
+      stroke + palette via the O8 theme tokens, no hard-coded hex — and the
+      aside-nav module items (and the radial hub, once O9 lands) consume them;
+      the icons.md status checklist is updated; both themes verified (glow layer
+      gets the light-mode solid-outline equivalent per site-plan §2).
+    notes: >
+      Groomed from icons.md's open checklist. Coordinate with O9: whichever lands
+      first, the other consumes the shared assets (dep is O8 so icon work can run
+      in parallel with the landing build).
 
   # ── Epic P — Runtime topology & maintenance windows — Phase 13 ─────────────
   # Born 2026-07-09: CM_HOSTS + CM_AVG_RUN onboarded via the add-source-object
@@ -3941,8 +4145,8 @@ items:
 # Roll-up the dispatcher can glance at. COMPUTED views — test_backlog.py enforces
 # that these match the items exactly; update them with any status change.
 summary:
-  todo: 19                                         # +G15 (2026-07-21 chat groom — DPL launcher arg contract)
+  todo: 27                                         # +O15–O22 (2026-07-21 UI extension groom — site-plan P3 through the O20 write-surface gate)
   in_progress: 1                                   # E1 (gate deferred both sides)
   blocked: 0
   done: 98                                         # +K5 +K6 +L8 +C10 +P1 +P4 +L7 +G14 (2026-07-20)
-  next_ready: [G15, L9, L12, L14, L15, M2, M3, M4, P3, J10, Q6, O9, O12, O13, J13]
+  next_ready: [G15, L9, L12, L14, L15, M2, M3, M4, P3, J10, Q6, O9, O12, O13, O21, O22, J13]

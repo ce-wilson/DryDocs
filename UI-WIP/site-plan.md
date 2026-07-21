@@ -205,8 +205,16 @@ module 7) goes through the existing gate flow, not the UI directly.
       phase 12, existing modules `drydocs-web`/`drydocs-api`; the `drydocs-ui`
       module suggestion below is superseded — the registry already names the
       front-end component).
-- [ ] LFS the 19 MB `start-react-free-reference.fig` before UI-WIP is committed wholesale.
+- [ ] LFS the 19 MB `start-react-free-reference.fig` before UI-WIP is committed wholesale
+      — groomed 2026-07-21 as **O21** (whole-corpus commit chore, per-file publish-boundary check).
 - [ ] Retire the Salt two-track language from the IDEAS entry at next groom (decision
       note added to IDEAS now).
 - [ ] Light-mode token sheet needs a design pass (dark is designed; light is derived).
 - [ ] Landing radial hub needs a rung-3 wireframe (the mock is raster; rebuild as SVG).
+- [x] Groom P3 + the write-surface HITL boundary — DONE 2026-07-21 as **O15–O22**:
+      Ownership (O15, K4 qualified-attribution shape), Loads (O16), Runbooks+Remediation
+      (O17), Docs (O18), Gates read-only (O19), icon SVG export (O22); **O20 = the HITL
+      gate deciding which console actions may ever write** — §4's "no new HITL gate needed
+      for the UI itself" stays true for everything read-only, and O20 is the single gate
+      any write-shaped surface must cite. The console stays read-only/artifact-only until
+      it signs off.

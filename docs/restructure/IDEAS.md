@@ -26,6 +26,14 @@ Tags help grooming: `idea` · `bug` · `doc` · `source` (new data source) · `q
 
 <!-- add new ideas at the top -->
 
+- 2026-07-21 — [idea] **Public marketing-site brand kit** captured in
+  `UI-WIP/WEBSITE-IDEAS.MD` (3 logo directions incl. the core+orbit modernization, secondary
+  palette, hero/feature/architecture landing structure). This is the PUBLIC SITE
+  (website-and-backstory workstream, 'overnight ledger' editorial identity — site not
+  started, domain unresolved), NOT the console — deliberately left out of the 2026-07-21
+  Epic O extension groom. Groom when the public site starts; the icon/logo direction
+  should stay consistent with the O22 console glyph set.
+
 - 2026-07-21 — [question] **Company draft CMD_LINE/variable NFR ontology vetted vs m3 vocab**
   (mechanism-only; full comparison in the session flow-doc §5). Same node spine and the same
   Job→Script→ETLProcess shape, but three deltas that are all HITL-gate decisions before any
@@ -343,6 +351,14 @@ Tags help grooming: `idea` · `bug` · `doc` · `source` (new data source) · `q
 ## Recently groomed (audit trail)
 
 <!-- when you promote an idea, move its line here with the resulting backlog id -->
+
+- 2026-07-21 — [chat] UI extension groom ("extend the UI open items until HITL"): the new
+  UI-WIP corpus (DryDocs_UI_Development_Specs.md, gemini-wire-frame.md, icons.md,
+  layout-anatomy-checklist.md, new mocks) + site-plan §5 P3 → **O15–O22** (Ownership /
+  Loads / Runbooks+Remediation / Docs / Gates-read-only pages, the O20 write-surface HITL
+  gate as the chain terminus, UI-WIP commit chore w/ LFS, icon SVG export); demo-content +
+  expanded-landing specs **merged into O9** inputs/notes; WEBSITE-IDEAS.MD parked to Inbox
+  (public site, separate workstream).
 
 - 2026-07-21 — [source] Real prod DPL CMD_LINE samples (folder/job screenshots +
   variables-simulation views) → **merged into G15** (acceptance upgraded from
