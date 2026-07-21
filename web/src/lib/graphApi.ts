@@ -14,7 +14,7 @@ interface ApiEnvelope {
   database: string
 }
 
-async function readDetail(res: Response): Promise<string> {
+export async function readDetail(res: Response): Promise<string> {
   try {
     const body = (await res.json()) as { detail?: unknown }
     return typeof body.detail === 'string' ? body.detail : JSON.stringify(body)
@@ -23,7 +23,16 @@ async function readDetail(res: Response): Promise<string> {
   }
 }
 
-export function createApiAccess(baseUrl: string, personaId: string): GraphAccess {
+/** The shared token-holding HTTP client behind every drydocs-api surface
+ *  (GraphAccess here; the O13 mappings client in mappingsApi.ts). One
+ *  login/refresh policy — persona exchange + a single retry on 401 — so no
+ *  surface can drift its own auth behavior. */
+export interface ApiClient {
+  authedPost(path: string, body: unknown): Promise<Response>
+  authedGet(path: string): Promise<Response>
+}
+
+export function createApiClient(baseUrl: string, personaId: string): ApiClient {
   let token: string | null = null
 
   async function post(path: string, body: unknown, bearer?: string): Promise<Response> {
@@ -51,24 +60,29 @@ export function createApiAccess(baseUrl: string, personaId: string): GraphAccess
     return token
   }
 
-  async function authedPost(path: string, body: unknown): Promise<Response> {
-    let res = await post(path, body, token ?? (await login()))
-    if (res.status === 401) res = await post(path, body, await login()) // stale session: one retry
-    return res
+  return {
+    async authedPost(path: string, body: unknown): Promise<Response> {
+      let res = await post(path, body, token ?? (await login()))
+      if (res.status === 401) res = await post(path, body, await login()) // stale session: one retry
+      return res
+    },
+    async authedGet(path: string): Promise<Response> {
+      const get = (bearer: string) =>
+        fetch(`${baseUrl}${path}`, { headers: { Authorization: `Bearer ${bearer}` } })
+      let res = await get(token ?? (await login()))
+      if (res.status === 401) res = await get(await login())
+      return res
+    },
   }
+}
+
+export function createApiAccess(baseUrl: string, personaId: string): GraphAccess {
+  const { authedPost, authedGet } = createApiClient(baseUrl, personaId)
 
   async function envelope(path: string, body: unknown): Promise<ApiEnvelope> {
     const res = await authedPost(path, body)
     if (!res.ok) throw new Error(`api ${path} failed (${res.status}): ${await readDetail(res)}`)
     return (await res.json()) as ApiEnvelope
-  }
-
-  async function authedGet(path: string): Promise<Response> {
-    const get = (bearer: string) =>
-      fetch(`${baseUrl}${path}`, { headers: { Authorization: `Bearer ${bearer}` } })
-    let res = await get(token ?? (await login()))
-    if (res.status === 401) res = await get(await login())
-    return res
   }
 
   return {

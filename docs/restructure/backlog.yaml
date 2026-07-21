@@ -3106,7 +3106,7 @@ items:
     agent: main
     model: sonnet
     priority: p2
-    status: todo
+    status: done          # DONE 2026-07-21 (Epic-O finish session) — see notes
     depends_on: [O8]
     inputs: [UI-WIP/wf-mapping-01.md, UI-WIP/wf-mapping-01.html, config/manual-loads/, drydocs/loaders/manual_loads.py, config/gate-prompts/, web/src/]
     acceptance: >
@@ -3145,6 +3145,29 @@ items:
       O8 shell per the acceptance (coverage grid with tier/evidence, work queues,
       lifecycle visibility). Documented: docs/runbook-mapping-demo.md +
       docs/design/drydocs-web-console-tdd.md.
+      DONE 2026-07-21 (Epic-O finish session): /mappings React screen on the O8
+      shell — steward+admin route guard (steward still has NO /console; the
+      server enforces 403 below steward anyway); registry-driven domain strip
+      from GET /mappings/domains (available rows + not-built tier-2/4
+      placeholders); coverage grid binds the NEW spec
+      mappings.attribution-coverage.v1 (status resolved/unresolved/conflict +
+      match_method tier evidence over the gated K2 edge; unresolved/conflict as
+      one-click work queues); assign dialog searches explorer.applications.v1
+      (free-text seal_id fallback when the list is unavailable), rationale
+      REQUIRED, the K2 precedence-honesty rule stated up front + an
+      already-resolves-at-higher-tier warning; per-user localStorage changeset
+      tray; submit POSTs /mappings/changeset and downloads the CSV +
+      manifest-snippet ARTIFACT (zero graph writes — the loader stays the only
+      writer); lifecycle chips draft/submitted/gated(bookkeeping)/loaded, with
+      loaded DERIVED live from the coverage grid flipping the job's tier to
+      manual. graphApi refactor: shared createApiClient token client (ONE auth
+      policy for GraphAccess + the mappings client). DEV-only ?as=<personaId>
+      sign-in affordance for headless verification (the boltAllowed
+      construction — baked out of prod bundles). Verified: suite 791 green;
+      web build + lint green; headless-Edge smoke against the live api
+      (mapping.db vocabulary footer live: applied 8 / confirmed 22 /
+      proposed 3; SYNTHESIZED demo coverage fallback shows honestly on the
+      empty graph; screenshots captured steward persona).
 
   - id: O14
     epic: web-console
@@ -4350,8 +4373,8 @@ items:
 # Roll-up the dispatcher can glance at. COMPUTED views — test_backlog.py enforces
 # that these match the items exactly; update them with any status change.
 summary:
-  todo: 24                                         # +G17 +C11 (2026-07-21 groom)
+  todo: 23                                         # -O13 done (2026-07-21 Epic-O finish session)
   in_progress: 1                                   # E1 (gate deferred both sides)
   blocked: 0
-  done: 104                                        # +G15 +G16 +O21 +O22 +O9 +O11 (2026-07-21)
-  next_ready: [L9, L12, L14, L15, M2, M3, M4, P3, J10, Q6, O10, O12, O13, O15, O16, O17, O18, O19, J13, G17, C11]
+  done: 105                                        # +O13 (2026-07-21: /mappings steward screen live-smoked)
+  next_ready: [L9, L12, L14, L15, M2, M3, M4, P3, J10, Q6, O10, O12, O15, O16, O17, O18, O19, J13, G17, C11]

@@ -56,6 +56,16 @@ export default function Aside({
         ))}
       </ul>
 
+      {(persona.role === 'steward' || persona.role === 'admin') && (
+        <NavLink to="/mappings" className={({ isActive }) => navItemClass(isActive)} title={collapsed ? 'Mappings' : undefined}>
+          <span className="flex h-5 w-5 shrink-0 items-center justify-center" aria-hidden="true">⇄</span>
+          {!collapsed && <span className="truncate">Mappings</span>}
+          {!collapsed && persona.role === 'steward' && (
+            <span className="ml-auto rounded border border-edge px-1 font-mono text-[9px] text-faint">stew</span>
+          )}
+        </NavLink>
+      )}
+
       {persona.role === 'admin' && (
         <NavLink to="/console" className={({ isActive }) => navItemClass(isActive)} title={collapsed ? 'Console (dev)' : undefined}>
           <span className="flex h-5 w-5 shrink-0 items-center justify-center font-mono text-xs" aria-hidden="true">{'>_'}</span>

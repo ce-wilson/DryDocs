@@ -195,6 +195,47 @@ QUERY_SPECS: dict[str, QuerySpec] = {
             params=_LIMIT,
         ),
         QuerySpec(
+            id="mappings.attribution-coverage.v1",
+            database="drydocs",
+            description=(
+                "O13 stewardship coverage grid: every Control-M job with its CURRENT "
+                "application resolution over the gated WAS_ASSOCIATED_WITH "
+                "{role:'seal_app_ref'} edge (K2) — match_method is the tier evidence. "
+                "No edge = 'unresolved' (the steward's first work queue); more than "
+                "one attributed application = 'conflict' (second queue). Keyed by "
+                "folder_id/job_id so the assign dialog drafts against the exact "
+                "manual-loads composite key."
+            ),
+            cypher=(
+                "MATCH (f:ControlMFolder)-[:CONTAINS_JOB]->(j:ControlMJob) "
+                "OPTIONAL MATCH (j)-[r:WAS_ASSOCIATED_WITH {role: 'seal_app_ref'}]"
+                "->(a:BusinessApplication) "
+                "WITH f, j, [h IN collect({seal_id: a.seal_id, name: a.name, "
+                "method: r.match_method}) WHERE h.seal_id IS NOT NULL] AS res "
+                "RETURN f.sched_table AS folder, j.job_name AS job, "
+                "f.folder_id AS folder_id, j.job_id AS job_id, "
+                "CASE WHEN size(res) = 0 THEN null ELSE res[0].seal_id END AS seal_id, "
+                "CASE WHEN size(res) = 0 THEN null ELSE res[0].name END AS application, "
+                "CASE WHEN size(res) = 0 THEN null ELSE res[0].method END AS match_method, "
+                "CASE WHEN size(res) = 0 THEN 'unresolved' "
+                "WHEN size(res) > 1 THEN 'conflict' ELSE 'resolved' END AS status "
+                "ORDER BY CASE WHEN size(res) = 0 THEN 0 WHEN size(res) > 1 THEN 1 "
+                "ELSE 2 END, folder, job LIMIT $limit"
+            ),
+            columns=(
+                ColumnDef("folder", "string", "Folder"),
+                ColumnDef("job", "string", "Job"),
+                ColumnDef("folder_id", "string", "Folder id"),
+                ColumnDef("job_id", "string", "Job id"),
+                ColumnDef("seal_id", "string", "SEAL id"),
+                ColumnDef("application", "string", "Application"),
+                ColumnDef("match_method", "string", "Tier/evidence"),
+                ColumnDef("status", "string", "Status"),
+            ),
+            classification="internal",
+            params=_LIMIT,
+        ),
+        QuerySpec(
             id="explorer.servers.v1",
             database="drydocs",
             description="Control-M servers for the Explorer Servers frame.",

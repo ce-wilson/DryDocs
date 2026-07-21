@@ -73,6 +73,16 @@ def test_every_spec_is_versioned_read_only_and_classified():
         assert is_write_cypher(spec.cypher) is None
 
 
+def test_mappings_coverage_spec_registered():
+    """O13: the stewardship coverage grid binds to its versioned spec — status
+    (resolved/unresolved/conflict) and match_method (the K2 tier evidence) are
+    grid-visible columns, keyed folder_id/job_id for the assign dialog."""
+    spec = query_spec("mappings.attribution-coverage.v1")
+    assert spec.database == "drydocs"
+    names = {c.name for c in spec.columns}
+    assert {"status", "match_method", "folder_id", "job_id", "seal_id"} <= names
+
+
 def test_explorer_frames_have_specs():
     """The Explorer tabs bind to versioned specs (O11 acceptance; jobs/
     conditions bumped v2 at the 2026-07-21 SME correction — folder resolved
