@@ -12,6 +12,7 @@ import SkeletonModuleRoute from './routes/SkeletonModuleRoute'
 import ConsoleRoute from './routes/ConsoleRoute'
 import MappingsRoute from './routes/MappingsRoute'
 import LineageRoute from './routes/LineageRoute'
+import AdminConfigRoute from './routes/AdminConfigRoute'
 import './App.css'
 
 // O8 rebuild: real react-router routes (deep-linkable, back-button safe —
@@ -76,6 +77,12 @@ export default function App() {
               <Navigate to="/" replace />
             )
           }
+        />
+
+        {/* O12: admin persona only (O2 gating) — the traceability lens. */}
+        <Route
+          path="admin/config"
+          element={persona.role === 'admin' ? <AdminConfigRoute /> : <Navigate to="/" replace />}
         />
 
         <Route

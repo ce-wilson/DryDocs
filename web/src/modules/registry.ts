@@ -13,6 +13,9 @@ export type ModuleId =
   | 'docs'
   | 'gates'
   | 'loads'
+  // admin surfaces reuse the shared template (ModuleDef shape) but are NOT
+  // nav modules/spokes — deliberately absent from MODULES below (O12).
+  | 'admin-config'
 
 export interface ModuleDef {
   id: ModuleId

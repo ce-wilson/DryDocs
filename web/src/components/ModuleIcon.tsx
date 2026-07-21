@@ -63,5 +63,12 @@ export default function ModuleIcon({ id, className }: { id: ModuleId; className?
           <path d="M4 18h16M6 18V9l3-3 3 3v9M12 18v-5l3-3 3 3v5" />
         </svg>
       )
+    case 'admin-config':
+      return (
+        <svg viewBox="0 0 24 24" aria-hidden="true" {...common}>
+          <circle cx="12" cy="12" r="3" />
+          <path d="M12 2.5v3M12 18.5v3M2.5 12h3M18.5 12h3M5 5l2.1 2.1M16.9 16.9 19 19M19 5l-2.1 2.1M7.1 16.9 5 19" />
+        </svg>
+      )
   }
 }

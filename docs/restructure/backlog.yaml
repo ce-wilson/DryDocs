@@ -3073,7 +3073,7 @@ items:
     agent: main
     model: sonnet
     priority: p2
-    status: todo
+    status: done          # DONE 2026-07-21 (Epic-O finish session) — see notes
     depends_on: [O8]
     inputs: [UI-WIP/wf-admin-config-01.md, UI-WIP/wf-admin-config-01.html, config/, tests/unit/, web/src/]
     acceptance: >
@@ -3111,6 +3111,28 @@ items:
       doc-traceability-feedback section D). When those config files land in config/,
       the generated enforcement matrix picks them up as surfaces automatically -
       read-only here like everything else, edits stay gate-bound.
+      DONE 2026-07-21 (Epic-O finish session): scripts/render_enforcement_matrix.py
+      scans a 14-surface registry against the repo (missing file/consumer/test =
+      generation fails closed; every top-level config/ entry must be covered)
+      and emits web/src/generated/enforcement-matrix.json with per-surface
+      status (enforced / unguarded / gate-pending w/ pending-entry count from
+      status: proposed|planned|placeholder markers), env-var references
+      (explicit ${VAR} / os.environ / env: forms only), embedded verbatim file
+      content (single-file surfaces; dirs list files), and the gate log.
+      tests/unit/test_enforcement_matrix.py (4 tests) = the drift guard:
+      regeneration equality, config/ completeness, referenced-path existence,
+      and launcher-registry-is-the-unguarded-example. /admin/config renders the
+      artifact on the shared template: React Flow traceability chain (config
+      file -> consumers -> guard tests -> gate; a red NO-GUARD-TEST node for
+      unguarded surfaces), matrix tab with the honest no-CI-artifact note
+      (last-run metadata only — never polls), verbatim surface-detail tab,
+      gate-log tab, right-sidebar inspector with copy-repo-path + gate-flow
+      links, zero edit controls. Crosswalks surface honestly renders unguarded
+      too (gate-signed, no drift test). Verified: suite 796 green; build+lint
+      green; headless-Edge smoke as admin (screenshot) + steward-redirect
+      proof. The L7 SaaS-reframe surfaces (doc-connector config, display-label
+      config, Jira-board mapping) auto-join the matrix when their files land
+      in config/ — the completeness test forces a registry row then.
 
   - id: O13
     epic: web-console
@@ -4388,8 +4410,8 @@ items:
 # Roll-up the dispatcher can glance at. COMPUTED views — test_backlog.py enforces
 # that these match the items exactly; update them with any status change.
 summary:
-  todo: 22                                         # -O10 done (2026-07-21 Epic-O finish session)
+  todo: 21                                         # -O12 done (2026-07-21 Epic-O finish session)
   in_progress: 1                                   # E1 (gate deferred both sides)
   blocked: 0
-  done: 106                                        # +O13 +O10 (2026-07-21: mappings screen + lineage page live-smoked)
-  next_ready: [L9, L12, L14, L15, M2, M3, M4, P3, J10, Q6, O12, O15, O16, O17, O18, O19, J13, G17, C11]
+  done: 107                                        # +O13 +O10 +O12 (2026-07-21 Epic-O finish session)
+  next_ready: [L9, L12, L14, L15, M2, M3, M4, P3, J10, Q6, O15, O16, O17, O18, O19, J13, G17, C11]

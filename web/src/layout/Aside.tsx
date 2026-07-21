@@ -67,6 +67,13 @@ export default function Aside({
       )}
 
       {persona.role === 'admin' && (
+        <NavLink to="/admin/config" className={({ isActive }) => navItemClass(isActive)} title={collapsed ? 'Configuration' : undefined}>
+          <ModuleIcon id="admin-config" className="h-5 w-5 shrink-0" />
+          {!collapsed && <span className="truncate">Configuration</span>}
+        </NavLink>
+      )}
+
+      {persona.role === 'admin' && (
         <NavLink to="/console" className={({ isActive }) => navItemClass(isActive)} title={collapsed ? 'Console (dev)' : undefined}>
           <span className="flex h-5 w-5 shrink-0 items-center justify-center font-mono text-xs" aria-hidden="true">{'>_'}</span>
           {!collapsed && <span>Console (dev)</span>}
