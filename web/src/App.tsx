@@ -8,12 +8,15 @@ import ExplorerRoute from './routes/explorer/ExplorerRoute'
 import ExplorerLiveRoute from './routes/explorer/ExplorerLiveRoute'
 import ExplorerTowerRoute from './routes/explorer/ExplorerTowerRoute'
 import OwnershipRoute from './routes/OwnershipRoute'
+import AssetPathRoute from './routes/AssetPathRoute'
 import SkeletonModuleRoute from './routes/SkeletonModuleRoute'
 import ConsoleRoute from './routes/ConsoleRoute'
 import MappingsRoute from './routes/MappingsRoute'
 import LineageRoute from './routes/LineageRoute'
 import AdminConfigRoute from './routes/AdminConfigRoute'
 import LoadsRoute from './routes/LoadsRoute'
+import RunbooksRoute from './routes/RunbooksRoute'
+import RemediationRoute from './routes/RemediationRoute'
 import './App.css'
 
 // O8 rebuild: real react-router routes (deep-linkable, back-button safe —
@@ -61,8 +64,9 @@ export default function App() {
         <Route path="lineage" element={<LineageRoute persona={persona} />} />
         <Route path="lineage/asset/:assetId" element={<LineageRoute persona={persona} />} />
         <Route path="ownership" element={<OwnershipRoute persona={persona} />} />
-        <Route path="runbooks" element={<SkeletonModuleRoute id="runbooks" />} />
-        <Route path="remediation" element={<SkeletonModuleRoute id="remediation" />} />
+        <Route path="ownership/asset/:assetId" element={<AssetPathRoute />} />
+        <Route path="runbooks" element={<RunbooksRoute persona={persona} />} />
+        <Route path="remediation" element={<RemediationRoute />} />
         <Route path="docs" element={<SkeletonModuleRoute id="docs" />} />
         <Route path="gates" element={<SkeletonModuleRoute id="gates" />} />
         <Route path="loads" element={<LoadsRoute persona={persona} />} />

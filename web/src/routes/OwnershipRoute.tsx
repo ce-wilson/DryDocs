@@ -5,6 +5,7 @@ import { MODULES } from '../modules/registry'
 import ModuleTemplate from './ModuleTemplate'
 import SpecGrid from '../explorer/SpecGrid'
 import OwnershipGraphPane from '../ownership/OwnershipGraphPane'
+import AssetSearchPanel from '../ownership/AssetSearchPanel'
 import {
   ATTRIBUTIONS_FRAME,
   ESCALATION_FRAME,
@@ -32,7 +33,17 @@ export default function OwnershipRoute({ persona }: { persona: Persona }) {
     <ModuleTemplate
       module={ownershipModule}
       selection={selection?.label}
-      graphPane={<OwnershipGraphPane persona={persona} selection={selection} onSelect={setSelection} />}
+      graphPane={
+        // support-user search strip (2026-07-21 chat) rides ABOVE the O15
+        // rollup pane: narrow (Product → Application → file/table) then
+        // partial-name; a result deep-links /ownership/asset/:assetId.
+        <div className="flex h-full min-h-0 flex-col">
+          <AssetSearchPanel />
+          <div className="min-h-0 flex-1">
+            <OwnershipGraphPane persona={persona} selection={selection} onSelect={setSelection} />
+          </div>
+        </div>
+      }
       tabContent={{
         Teams: (
           <SpecGrid
