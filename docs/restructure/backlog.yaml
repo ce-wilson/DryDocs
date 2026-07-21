@@ -4842,7 +4842,7 @@ items:
     agent: main
     model: sonnet
     priority: p3
-    status: todo
+    status: done                                     # 2026-07-21 pm — see the DONE paragraph in acceptance; VS Code session
     depends_on: []
     inputs: [config/taxonomy/platforms.yaml, drydocs_core/ontology/relationship_vocabulary.yaml, config/taxonomy-ontology-map.yaml, docs/restructure/03-hitl-sme-flow.md]
     acceptance: >
@@ -4857,6 +4857,18 @@ items:
       flips active, no vocabulary status changes, no graph writes; the
       platforms/SchedulerKind HITL gate decides. Sensitivity classification set
       on the source; drift guards + full suite green.
+      DONE 2026-07-21 pm: user supplied the company session report (screenshot
+      channel) — richer than expected: company CONFIRMED + BUILT the taxonomy
+      at its 2026-06-29 AIS gate (platforms_supplement.cypher; real labels
+      AisCapability skos:Concept / AisTool prov:SoftwareAgent — with the s;
+      capability areas orchestration/etl/file-transfer; 7 tools incl. 2
+      internal MFT products, names held company-side; USES_TOOL app edge +
+      IN_CAPABILITY roll-up; SchedulerKind deprecated there same day).
+      Captured sanitized in platforms.yaml#company_confirmed (status:
+      captured, confirmed: false); Q1-Q5 open questions updated (Q2/Q3
+      corroborated, Q1 granularity conflict + Q4 software-registry overlap =
+      the remaining gate questions); C6 map entry + IDEAS line re-pointed.
+      Nothing flipped active.
     notes: >
       Groomed 2026-07-21 from the AIS-taxonomy back-flow inbox line (flagged in
       the 66acea8 port report 2026-07-10, unactioned since). The company's
@@ -4945,8 +4957,8 @@ items:
       generator's home); zero api surface.
 
 summary:
-  todo: 23                                         # -O25 done; -G17 claimed; +G18..G25 rua-ingest phase incl. repo-source seam + DPL registry source (2026-07-21)
+  todo: 22                                         # -C11 done (company shape captured); +G18..G25 rua-ingest phase incl. repo-source seam + DPL registry source (2026-07-21)
   in_progress: 1                                   # E1 (gate deferred both sides)
   blocked: 0
-  done: 116                                        # +G17 MAC ingest seam BUILT 2026-07-21 pm (dpl_mac extractor; kind rider inboxed); +O25 gate-page drafting BUILT same day
-  next_ready: [L9, L12, L14, L15, M2, M3, M4, P3, J10, Q6, O23, J13, G18, G19, C11]
+  done: 117                                        # +C11 company-confirmed platforms taxonomy CAPTURED 2026-07-21 pm (06-29 AIS gate shape; producer gate decides from it); +G17, +O25 same day
+  next_ready: [L9, L12, L14, L15, M2, M3, M4, P3, J10, Q6, O23, J13, G18, G19]

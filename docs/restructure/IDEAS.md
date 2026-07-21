@@ -305,6 +305,11 @@ Tags help grooming: `idea` · `bug` · `doc` · `source` (new data source) · `q
   orchestrator crosswalks, `ontology.cypher` seeds + the `scheduler_kind` constraint, README.
   Ontology/node-meaning ⇒ HITL gate; groom into an item once the two classes are defined.
   Reconciliation placeholder created: `config/taxonomy/platforms.yaml` (status: placeholder).
+  **C11 CAPTURE 2026-07-21: the two classes ARE now defined** — company-confirmed 2026-06-29
+  AIS gate (`:AisCapability` skos:Concept / `:AisTool` prov:SoftwareAgent; SchedulerKind
+  deprecated there same day), captured mechanism-only in `platforms.yaml#company_confirmed`.
+  This line's groom-condition is met: the producer platforms gate decides FROM the captured
+  shape (open: USES_TOOL rename, Q1 capability granularity, Q4 software-registry reconcile).
 
 - 2026-07-08 — [doc] **BRD outline (Epic L, deferred)** — the third canonical doc type after
   TDD (L1) and Runbook (L8). Parked, not promoted: the BRD is a work-in-progress upstream and
