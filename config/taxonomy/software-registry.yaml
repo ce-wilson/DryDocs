@@ -18,8 +18,18 @@
 
 schema: drydocs.software-registry.v1
 classification: Internal-Public
-updated: 2026-07-14
+updated: 2026-07-21
 adr: docs/decisions/0004-software-registry-vendor-terminology.md
+
+# Historical company acronyms — preserved HERE ONLY (SME ruling 2026-07-21 pm):
+# the 'Ais*' class family (:AisCapability / :AisTool, company 06-29 gate) is
+# being REMOVED on both sides (company-side note in flight via a parallel
+# session); the Ais spelling goes away everywhere else. The expansion lives on
+# THIS registry because it is the file that carries the vendor/publisher URLs —
+# the durable home for "what did that name mean". Note 'Streaming' was itself a
+# misnomer: the AIS folder also carried ETL and managed file transfer.
+acronyms:
+  AIS: "Application Integration Streaming"
 
 # Reserved Application id for DryDocs itself (no SEAL id producer-side; the
 # company copy reconciles this to the real SEAL id at port time).

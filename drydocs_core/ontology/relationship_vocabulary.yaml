@@ -1181,7 +1181,7 @@ local_relationships:
     neo4j_label:  REQUIRES_SCHEDULER
     role:         ~
     from_node:    Port                       # the BATCH port specifically — :Port:BatchProcessing {kind: "BatchProcessing"}; NOT the EventProcessing/API port
-    to_node:      SchedulerKind              # PROVISIONAL — slated for deprecation → :AisCapability + :AiTool (user 2026-07-09; not yet defined). See OQ (2).
+    to_node:      SchedulerKind              # PROVISIONAL — deprecation target CHANGED 2026-07-21 pm: retires INTO the registry model (:SoftwareProduct {role: orchestrator} via the ACTIVE reg_uses_software edge; the interim Ais* target was removed). This entry RETIRES at the platforms gate rather than reshaping. See OQ (2).
     prov_maps_to: ~
     note: >
       GATE-BOUND, status: planned — NOT wired (loader: ~). Registered per backlog C6
@@ -1206,10 +1206,12 @@ local_relationships:
             port") describe the SAME app batch port. The remaining SME call is only whether the
             edge sits on the batch :Port (kind=BatchProcessing, as registered here) or is hoisted
             to :BusinessApplication with the kind as an edge/context property.
-        (2) TARGET NODE — :SchedulerKind is SLATED FOR DEPRECATION in favor of :AisCapability +
-            :AiTool (user 2026-07-09; those classes are not yet defined in the ontology), so this
-            to_node is PROVISIONAL — re-target / reshape REQUIRES_SCHEDULER onto the replacement
-            class(es) at the gate once they are defined (one edge or two is itself an SME call).
+        (2) TARGET NODE — :SchedulerKind is SLATED FOR DEPRECATION. SME DIRECTION 2026-07-21 pm
+            (supersedes the 07-09 Ais* interim target, which was removed unbuilt): the fact lands
+            on the ACTIVE registry edge (:BusinessApplication)-[:USES_SOFTWARE {source:
+            'batch-port'}]->(:SoftwareProduct {role: orchestrator}) — reg_uses_software — so THIS
+            entry RETIRES at the platforms gate (config/gate-prompts/platforms-taxonomy.yaml B1)
+            instead of reshaping; zero new edge or node types.
             (SchedulerKind also lacks a node_classifications entry today — moot if it is deprecated.)
         (3) Confirm null-PROV/infra is correct vs a weak prov:used / prov:wasInfluencedBy.
       No supplement block and no loader land until the gate confirms — planned entries are
@@ -1761,7 +1763,11 @@ local_relationships:
       precedent as arch_contains. Edge properties: version, source, status.
       Phase 1 loads only DryDocs' own stack (reserved app id DRYDOCS-SELF);
       derived candidates come from CMD_LINE invocation patterns (plan-07
-      Phase 3), never base ingest.
+      Phase 3), never base ingest. SME DIRECTION 2026-07-21 pm (gate-bound,
+      platforms-taxonomy B1): this edge also becomes the landing for the SEAL
+      batch-port orchestrator fact — source: 'batch-port' distinguishes it
+      from the 'controlm-cmdline' detections — retiring the planned
+      seal_requires_scheduler entry; build lands only after that gate signs.
     supplement:   registry_ontology_supplement.cypher
     loader:       software_registry.py
     domain:       registry
