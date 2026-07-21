@@ -24,6 +24,7 @@ from .commands import (
     FileOp,
     extract_container_command,
     parse_command,
+    pipeline_guid,
 )
 from .facts import route_fact
 from .folder_name import ParsedFolderName, parse_folder_name
@@ -52,6 +53,7 @@ __all__ = [
     "Invocation",
     "FileOp",
     "parse_command",
+    "pipeline_guid",
     "extract_container_command",
     "FileRef",
     "build_file_ref",

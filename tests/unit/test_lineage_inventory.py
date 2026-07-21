@@ -273,3 +273,119 @@ def test_stable_invocation_keys_dpl_guid_and_pset_basename(tmp_path) -> None:
     }
     # full paths retained as properties on the converged pset node
     assert g.processes["proc#abinitio:ing.pset"].path.endswith("ing.pset")
+
+
+# -- DPL launcher argument contract (G15; gate cmdline-nfr-vetting evidence) -------
+
+_GUID = "11111111-2222-3333-4444-555555555555"
+_CSV_HEADER = (
+    "job_id,folder_id,job_name,parent_table,owner,node_id,cmd_line,is_current_version\n"
+)
+
+
+def _extract(tmp_path, *rows: str):
+    csv_path = tmp_path / "jobs.csv"
+    csv_path.write_text(_CSV_HEADER + "".join(rows), encoding="utf-8")
+    g = LineageGraph()
+    cov = ControlMInventoryExtractor().extract(csv_path, g)
+    return g, cov
+
+
+def test_onprem_launcher_and_both_guid_spellings_converge(tmp_path) -> None:
+    """(a)+(b): the on-prem dpl_spark_processor spellings classify DPL alongside
+    dt-launcher.sh, and BOTH pipeline-id flag spellings key the SAME ETLProcess
+    identity — one workload node however it is launched."""
+    g, _ = _extract(
+        tmp_path,
+        f'1,10,JOB_AWS,F1,svc.x,h1,"/apps/t/dt-accelerators/dt-launcher.sh -env D '
+        f'-pipeline {_GUID} -i -conf /cfg/c.json",Y\n',
+        f'2,10,JOB_ONPM,F1,svc.x,h1,"/apps/dpl/dpl_processor/bin/dpl_spark_processor '
+        f'--pipeline-id {_GUID} --aws --queue-name q1",Y\n',
+        f'3,10,JOB_ONPM_DYN,F1,svc.x,h1,"/apps/dpl/dpl_processor/bin/dpl_spark_processor_dynamic '
+        f'--pipeline-id {_GUID} --spark-params x=y",Y\n',
+    )
+    children = {pid for pid in g.processes if not pid.startswith("proc#controlm_job:")}
+    assert children == {f"proc#dpl:{_GUID}"}
+    into_child = [r for r in g.rels if r[2] == f"proc#dpl:{_GUID}"]
+    assert len(into_child) == 3
+    assert g.processes[f"proc#dpl:{_GUID}"].kind == "dpl"
+
+
+def test_unresolved_variable_launcher_still_yields_dpl_identity(tmp_path) -> None:
+    """(c): an UNRESOLVED original whose executable is a folder variable
+    (%%PY_LAUNCH / %%SCRIPT_PATH) still classifies DPL and keys on the
+    -pipeline GUID — the only literal on the line — without crashing on the
+    %%VAR tokens."""
+    g, cov = _extract(
+        tmp_path,
+        f'1,10,JOB_UNRES,F1,svc.x,h1,"%%PY_LAUNCH -env %%ENV -pipeline {_GUID} '
+        f'-appName %%APP_NAME -seal %%SEAL -i -conf %%CONF_PATH",Y\n',
+    )
+    node = g.processes[f"proc#dpl:{_GUID}"]
+    assert node.kind == "dpl"
+    assert cov.invocations_added == 1
+    assert cov.invocations_unresolved == 0  # classified DPL, not UNKNOWN
+    # unresolved %%VAR values are kept verbatim as candidate properties
+    assert node.properties["app_name"] == "%%APP_NAME"
+    assert node.properties["seal"] == "%%SEAL"
+
+
+def test_mode_flags_are_a_property_never_a_kind(tmp_path) -> None:
+    """(d): -i / -t / -py land as the launch_mode PROPERTY and all three stay
+    kind=dpl — never a separate invocation_type."""
+    guids = [f"00000000-0000-0000-0000-00000000000{n}" for n in (1, 2, 3)]
+    g, _ = _extract(
+        tmp_path,
+        f'1,10,JOB_I,F1,svc.x,h1,"sh /a/dt-launcher.sh -pipeline {guids[0]} -i",Y\n',
+        f'2,10,JOB_T,F1,svc.x,h1,"sh /a/dt-launcher.sh -pipeline {guids[1]} -t",Y\n',
+        f'3,10,JOB_PY,F1,svc.x,h1,"sh /a/dt-launcher.sh -pipeline {guids[2]} -py",Y\n',
+    )
+    modes = {
+        g.processes[f"proc#dpl:{guid}"].properties["launch_mode"] for guid in guids
+    }
+    assert modes == {"-i", "-t", "-py"}
+    assert all(g.processes[f"proc#dpl:{guid}"].kind == "dpl" for guid in guids)
+
+
+def test_definition_properties_captured_runtime_values_excluded(tmp_path) -> None:
+    """(e): the observed definition-level params land as PROPERTIES (never
+    identity — the node still keys on the GUID); runtime values (-bd/-od
+    partition values, -proId per-run GUID, -timeout/-sleep tuning) are
+    deliberately excluded."""
+    g, _ = _extract(
+        tmp_path,
+        f'1,10,JOB_FULL,F1,svc.x,h1,"/a/dt-launcher.sh -env D -pipeline {_GUID} '
+        f"-appName APP1 -alias AL1 -seal 99999 -dataflow DF1 -img img-repo/ing:1 "
+        f"-bd 20260101 -od 20260101 -fid FID1 -proId RUN-GUID -timeout 60 -sleep 30 "
+        f'-i -conf /cfg/c.json -compute /cfg/compute_small.json",Y\n',
+    )
+    node = g.processes[f"proc#dpl:{_GUID}"]
+    assert node.dataflow == "DF1"           # dedicated G12 field
+    assert node.config_path == "/cfg/c.json"
+    assert node.properties == {
+        "env": "D", "app_name": "APP1", "alias": "AL1", "seal": "99999",
+        "fid": "FID1", "image": "img-repo/ing:1",
+        "compute": "/cfg/compute_small.json", "launch_mode": "-i",
+    }
+    # identity is the GUID, properties never leak into the key
+    assert node.node_id == f"proc#dpl:{_GUID}"
+
+
+def test_onprem_argument_contract_properties(tmp_path) -> None:
+    """(e) on-prem half: the dpl_spark_processor argument-contract params land
+    as properties (dataset id, aws flag, jar path, hdfs location, token/manifest
+    paths, queue name)."""
+    g, _ = _extract(
+        tmp_path,
+        f'1,10,JOB_ONPM,F1,svc.x,h1,"/bin/dpl_spark_processor --pipeline-id {_GUID} '
+        f"--aws --dataset-id DS-1 --user-jar-path /jars/u.jar --hdfs-location /hdfs/z "
+        f'--token-file-path /tok/t.tok --manifest-file-path /m/m.json --queue-name q1",Y\n',
+    )
+    props = g.processes[f"proc#dpl:{_GUID}"].properties
+    assert props["aws"] == "true"
+    assert props["dataset_id"] == "DS-1"
+    assert props["user_jar_path"] == "/jars/u.jar"
+    assert props["hdfs_location"] == "/hdfs/z"
+    assert props["token_file_path"] == "/tok/t.tok"
+    assert props["manifest_file_path"] == "/m/m.json"
+    assert props["queue_name"] == "q1"

@@ -37,7 +37,7 @@ import csv
 from dataclasses import asdict, dataclass
 from pathlib import Path
 
-from drydocs_core.controlm import parse_command
+from drydocs_core.controlm import parse_command, pipeline_guid
 
 from ..model import DataAssetNode, LineageGraph, ProcessNode, asset_id, process_id
 
@@ -102,23 +102,64 @@ class ExtractCoverage:
 def _stable_invocation_key(inv, target: str) -> str:
     """Env-stable identity token for an invoked artifact (SME session
     2026-07-16, gate-log ``cmdline-lineage-review``): a DPL launch is keyed by
-    its ``-pipeline`` GUID (the jar path is shared tooling, the GUID names the
-    workload); an Ab Initio pset/graph is keyed by basename (sandbox mount
-    paths vary dev/uat/prod for the same graph). Everything else keeps the
-    full target; full paths stay on ProcessNode.path either way. Scripts stay
-    PATH-keyed on purpose — same-basename multi-mount Script duplicates
-    surface in lineage-review for SME merge, never auto-merged."""
+    its pipeline GUID — BOTH observed spellings, single-dash ``-pipeline``
+    (launcher grammar) and ``--pipeline-id`` (on-prem argument contract; G15)
+    — the jar path is shared tooling, the GUID names the workload. An
+    Ab Initio pset/graph is keyed by basename (sandbox mount paths vary
+    dev/uat/prod for the same graph). Everything else keeps the full target;
+    full paths stay on ProcessNode.path either way. Scripts stay PATH-keyed
+    on purpose — same-basename multi-mount Script duplicates surface in
+    lineage-review for SME merge, never auto-merged."""
     if inv.invocation_type == "DPL":
-        guid = next(
-            (inv.args[i + 1] for i, a in enumerate(inv.args)
-             if a == "-pipeline" and i + 1 < len(inv.args)),
-            None,
-        )
+        guid = pipeline_guid(inv.args)
         if guid:
             return guid
     if inv.invocation_type == "ABINITIO" and target.endswith((".pset", ".m")):
         return _basename(target)
     return target
+
+
+#: DPL launcher argument contract → ProcessNode PROPERTIES (G15). Definition-
+#: level params only; properties NEVER identity (the G12 rule). Runtime values
+#: are deliberately EXCLUDED: -bd/-od (partition values), -proId (per-run GUID
+#: threaded via cross-job %%\\JOB\\VAR refs), -timeout/-sleep (tuning).
+_DPL_PROPERTY_FLAGS: dict[str, str] = {
+    "-env": "env",
+    "-appName": "app_name",
+    "-alias": "alias",
+    "-seal": "seal",           # direct SEAL-attribution source (gate cmdline-nfr-vetting)
+    "-fid": "fid",
+    "-img": "image",
+    "-dataflow": "dataflow",
+    "-conf": "config_path",
+    "-compute": "compute",
+    # on-prem shell-launcher (dpl_spark_processor) argument contract
+    "--dataset-id": "dataset_id",
+    "--user-jar-path": "user_jar_path",
+    "--hdfs-location": "hdfs_location",
+    "--token-file-path": "token_file_path",
+    "--manifest-file-path": "manifest_file_path",
+    "--queue-name": "queue_name",
+}
+#: launch-mode flags stay a PROPERTY — all three are kind=dpl, never a
+#: separate invocation_type (G15 acceptance d; -i/-t semantics still open)
+_DPL_MODE_FLAGS = ("-i", "-t", "-py")
+_DPL_BOOL_FLAGS = {"--aws": "aws"}
+
+
+def _dpl_properties(args: tuple[str, ...]) -> dict[str, str]:
+    """Definition-level properties from a DPL launcher arg list. Values may be
+    unresolved ``%%VAR`` references — kept verbatim (candidates for curation)."""
+    props: dict[str, str] = {}
+    for i, a in enumerate(args):
+        name = _DPL_PROPERTY_FLAGS.get(a)
+        if name and i + 1 < len(args) and not args[i + 1].startswith("-"):
+            props[name] = args[i + 1]
+        elif a in _DPL_BOOL_FLAGS:
+            props[_DPL_BOOL_FLAGS[a]] = "true"
+        elif a in _DPL_MODE_FLAGS:
+            props["launch_mode"] = a
+    return props
 
 
 def _basename(path: str) -> str:
@@ -211,11 +252,15 @@ class ControlMInventoryExtractor:
                 continue
             kind = inv.invocation_type.lower()
             cid = process_id(kind, _stable_invocation_key(inv, target))
+            props = _dpl_properties(inv.args) if kind == "dpl" else {}
             into.add_process(ProcessNode(
                 node_id=cid,
                 kind=kind,
                 name=_basename(target),
                 path=inv.script_path or inv.executable_path or "",
+                dataflow=props.pop("dataflow", ""),
+                config_path=props.pop("config_path", "") or (inv.config_path or ""),
+                properties=props,
             ))
             into.add_rel(jid, "INVOKES", cid)
             coverage.invocations_added += 1

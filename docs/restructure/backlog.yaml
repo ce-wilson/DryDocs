@@ -4077,7 +4077,7 @@ items:
     agent: main
     model: sonnet
     priority: p2
-    status: todo
+    status: done          # DONE 2026-07-21 — all 5 acceptance points tested, suite 766 green
     depends_on: [G14]
     inputs: [drydocs_core/controlm/commands.py, drydocs_lineage/extractors/controlm_inventory.py, drydocs_lineage/model.py, tests/unit/test_lineage_inventory.py]
     acceptance: >
@@ -4205,8 +4205,8 @@ items:
 # Roll-up the dispatcher can glance at. COMPUTED views — test_backlog.py enforces
 # that these match the items exactly; update them with any status change.
 summary:
-  todo: 27                                         # -O21 done (2026-07-21 UI-WIP corpus committed)
+  todo: 26                                         # -G15 done (2026-07-21 DPL launcher argument contract built)
   in_progress: 1                                   # E1 (gate deferred both sides)
   blocked: 0
-  done: 99                                         # +O21 (2026-07-21)
-  next_ready: [G15, G16, L9, L12, L14, L15, M2, M3, M4, P3, J10, Q6, O9, O12, O13, O22, J13]
+  done: 100                                        # +G15 (2026-07-21)
+  next_ready: [G16, L9, L12, L14, L15, M2, M3, M4, P3, J10, Q6, O9, O12, O13, O22, J13]

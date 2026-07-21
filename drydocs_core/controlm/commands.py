@@ -49,6 +49,10 @@ LAUNCHER_REGISTRY: list[tuple[re.Pattern, str, str]] = [
     # the launcher spelling observed is dt-launcher.sh (dtlaunch.sh kept as a variant).
     (re.compile(r"^dt-?launch(er)?\.sh$", re.I), "DPL",           "dpl.dt_launcher_accelerator"),
     (re.compile(r"^dt-pipelines-launcher.*\.jar$", re.I), "DPL",  "dpl.pipelines_launcher_jar"),
+    # on-prem shell launcher spelling (dpl_processor/bin; extensionless; the
+    # _dynamic variant adds spark-params passthrough) — same DPL kind (G15,
+    # 2026-07-21 prod samples + variable gap analysis: live folder vars carry it)
+    (re.compile(r"^dpl_spark_processor(_dynamic)?$", re.I), "DPL", "dpl.spark_processor_onprem"),
     (re.compile(r"^air$", re.I),                "ABINITIO",       "abinitio.air_cli"),
     (re.compile(r"^java$", re.I),               "JAVA",           "java.interpreter"),
     (re.compile(r"runscript\.sh$", re.I),       "SHELL_SCRIPT",   "abioncloud.runscript_wrapper"),
@@ -247,6 +251,21 @@ def classify_executable(executable: str) -> tuple[str, str | None]:
     return "UNKNOWN", None
 
 
+# DPL pipeline-id flag spellings: single-dash `-pipeline` (observed launcher
+# grammar) and `--pipeline-id` (on-prem argument contract). The GUID value is
+# the ONLY literal on otherwise fully-variable CMD_LINEs (G15).
+_PIPELINE_ID_FLAGS = ("-pipeline", "--pipeline-id")
+_GUID_RE = re.compile(r"^[0-9a-fA-F]{8}(-[0-9a-fA-F]{4}){3}-[0-9a-fA-F]{12}$")
+
+
+def pipeline_guid(args: tuple[str, ...] | list[str]) -> str | None:
+    """The DPL pipeline GUID literal from an arg list, if present."""
+    for i, a in enumerate(args):
+        if a in _PIPELINE_ID_FLAGS and i + 1 < len(args) and _GUID_RE.match(args[i + 1]):
+            return args[i + 1]
+    return None
+
+
 def parse_invocation_statement(statement: str) -> Invocation | None:
     """Parse one already-split statement into an Invocation, or None if it
     is a no-op / pure assignment."""
@@ -262,6 +281,11 @@ def parse_invocation_statement(statement: str) -> Invocation | None:
 
     itype, rule = classify_executable(verb)
     args = tuple(argv[1:])
+    if itype == "UNKNOWN" and pipeline_guid(args):
+        # an UNRESOLVED original may hold the launcher in a folder variable
+        # (%%PY_LAUNCH / %%SCRIPT_PATH prefix) — the -pipeline GUID literal
+        # still identifies a DPL launch (G15 acceptance c)
+        itype, rule = "DPL", "dpl.pipeline_guid_literal"
 
     # for interpreter launches (python, sh-wrapped), the script is the first
     # non-flag argument; for direct script execution the verb IS the script
