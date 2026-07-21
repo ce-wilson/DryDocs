@@ -4923,7 +4923,7 @@ items:
     agent: main
     model: sonnet
     priority: p2
-    status: todo
+    status: done                                     # 2026-07-21 pm (`632def3`): Draft-gate-log-entry + Copy-snippet + Download-.md on every rendered gate page; client-side ONLY (M1 exactly — ticks browser-local, zero server writes); house-format heading with in-browser date, per-section [x]/[ ] lines + counts, all-ticked→SIGNED OFF else PENDING; drift-proofed — Python prebuilds every emittable line (JS selects/joins only) and draft_gate_log_entry() is the pinned reference (+4 tests: all-ticked, partial, empty-spec, page-embedding); count guards hold; suite 819 green; O20 page re-rendered + smoked.
     depends_on: [O20]
     inputs: [drydocs/gate_pages.py, tests/unit/test_gate_pages.py, config/gate-log.md, config/gate-prompts/ui-write-surface.yaml]
     acceptance: >
@@ -4945,8 +4945,8 @@ items:
       generator's home); zero api surface.
 
 summary:
-  todo: 25                                         # +O25 (O20 sign-off follow-up); +G18..G25 rua-ingest phase incl. repo-source seam + DPL registry source (2026-07-21)
+  todo: 24                                         # -O25 done; +G18..G25 rua-ingest phase incl. repo-source seam + DPL registry source (2026-07-21)
   in_progress: 1                                   # E1 (gate deferred both sides)
   blocked: 0
-  done: 114                                        # +O24 SEAL-contacts override list BUILT 2026-07-21 pm (the ui-write-surface M2 first instance)
-  next_ready: [L9, L12, L14, L15, M2, M3, M4, P3, J10, Q6, O23, O25, J13, G17, G18, G19, C11]
+  done: 115                                        # +O25 gate-page drafting BUILT 2026-07-21 pm — BOTH O20 follow-ups (O24 M2 + O25 M1) now closed same day
+  next_ready: [L9, L12, L14, L15, M2, M3, M4, P3, J10, Q6, O23, J13, G17, G18, G19, C11]
