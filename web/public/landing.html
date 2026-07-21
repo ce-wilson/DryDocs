@@ -1,0 +1,289 @@
+<!doctype html>
+<!-- =========================================================================
+  DryDocs — ALTERNATE static landing (Copilot_20260703_231838.png style).
+  SWAP MECHANIC: whatever file sits at web/public/landing.html is served
+  verbatim at http://localhost:5173/landing.html (Vite public/ passthrough —
+  no build step). To try a different landing style, drag this file out and
+  drop another self-contained .html in under the SAME name. The React
+  console landing at "/" is untouched; every link below routes into the SPA.
+  Self-contained: inline CSS + inline SVG, no CDN (intranet rule). Dark-only
+  by design (the mock is dark). All content SYNTHESIZED / illustrative.
+========================================================================== -->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>DryDocs — Your DevOps Knowledge Graph</title>
+<style>
+  :root{
+    --bg:#0d1520; --bg2:#0f1b29; --panel:#121e2e; --panel2:#152335;
+    --edge:#203045; --edge-soft:#1a2739; --text:#e8edf3; --muted:#8a97a8;
+    --faint:#71809a; --blue:#2e6bc4; --blue-br:#4d8be0; --teal:#2ab3a6;
+    --green:#3aae6b; --yellow:#d9b831; --red:#c8202e; --red-soft:#e4525d;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{
+    background:
+      radial-gradient(1200px 600px at 70% -10%, #14243a 0%, transparent 60%),
+      var(--bg);
+    color:var(--text);
+    font-family:'IBM Plex Sans','Segoe UI',system-ui,sans-serif;
+    line-height:1.5; min-height:100svh;
+  }
+  a{color:var(--blue-br);text-decoration:none}
+  .wrap{max-width:1080px;margin:0 auto;padding:0 24px}
+
+  /* top bar */
+  header{border-bottom:1px solid var(--edge-soft);background:rgba(13,21,32,.85);backdrop-filter:blur(6px)}
+  .bar{display:flex;align-items:center;gap:28px;height:60px}
+  .brand{display:flex;align-items:center;gap:10px;font-weight:700;font-size:1.05rem;color:var(--text)}
+  nav{display:flex;gap:22px;font-size:.85rem;flex:1}
+  nav a{color:var(--muted);padding:4px 0;border-bottom:2px solid transparent}
+  nav a:hover{color:var(--text)}
+  nav a.active{color:var(--text);border-bottom-color:var(--blue-br)}
+  .signin{border:1px solid var(--blue-br);border-radius:8px;padding:7px 16px;font-size:.85rem;font-weight:600}
+  .signin:hover{background:rgba(46,107,196,.15)}
+
+  /* hero */
+  .hero{display:grid;grid-template-columns:1fr 1fr;gap:32px;align-items:center;padding:56px 0 40px}
+  h1{font-size:3.2rem;letter-spacing:-.5px}
+  .tagline{font-size:1.15rem;color:var(--text);margin-top:6px}
+  .lede{color:var(--muted);font-size:.95rem;margin-top:14px;max-width:40ch}
+  .ctas{display:flex;gap:12px;margin-top:26px}
+  .btn{border-radius:8px;padding:10px 20px;font-size:.9rem;font-weight:600}
+  .btn.primary{background:var(--blue);color:#fff;border:1px solid var(--blue-br)}
+  .btn.primary:hover{background:var(--blue-br)}
+  .btn.ghost{border:1px solid var(--edge);color:var(--muted)}
+  .btn.ghost:hover{border-color:var(--faint);color:var(--text)}
+  .hub{width:100%;height:auto;display:block}
+  .hub a{cursor:pointer}
+  .hub a:hover .spoke-dot{stroke:var(--blue-br);stroke-width:3}
+  .hub a:hover .spoke-label{fill:var(--text)}
+
+  /* benefit strip */
+  .benefits{display:grid;grid-template-columns:repeat(4,1fr);gap:0;border-top:1px solid var(--edge-soft);border-bottom:1px solid var(--edge-soft);padding:22px 0;margin-top:8px}
+  .benefit{display:flex;gap:12px;align-items:flex-start;padding:0 18px;border-left:1px solid var(--edge-soft)}
+  .benefit:first-child{border-left:none;padding-left:0}
+  .benefit svg{flex:none;margin-top:2px}
+  .benefit b{display:block;font-size:.9rem;color:var(--text)}
+  .benefit span{font-size:.78rem;color:var(--muted)}
+  .benefit a{display:contents;color:inherit}
+
+  /* towers */
+  .towers{padding:34px 0 48px}
+  .towers h2{font-size:1.15rem;color:var(--muted);font-weight:600;margin-bottom:4px}
+  .tag{display:inline-block;border:1px solid rgba(217,184,49,.5);background:rgba(217,184,49,.1);color:var(--yellow);font-family:'IBM Plex Mono',Consolas,monospace;font-size:.62rem;border-radius:4px;padding:2px 8px;vertical-align:2px;margin-left:10px}
+  .cards{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-top:18px}
+  .card{background:linear-gradient(180deg,var(--panel) 0%,var(--bg2) 100%);border:1px solid var(--edge);border-radius:12px;padding:20px 16px 14px;text-align:center;transition:border-color .15s, transform .15s}
+  .card:hover{border-color:var(--faint);transform:translateY(-2px)}
+  .card b{display:block;color:var(--text);font-size:.95rem;margin-top:10px}
+  .card .stats{color:var(--muted);font-size:.78rem;margin-top:4px}
+  .card .stats em{font-style:normal;color:var(--text);font-weight:600}
+  .card svg.spark{display:block;width:100%;height:26px;margin-top:12px}
+
+  footer{border-top:1px solid var(--edge-soft);padding:18px 0 26px;display:flex;justify-content:space-between;color:var(--faint);font-size:.78rem}
+  footer nav{gap:14px;flex:none}
+  footer nav a{color:var(--faint);border:none}
+  footer nav a:hover{color:var(--text)}
+
+  @media (max-width:860px){
+    .hero{grid-template-columns:1fr}
+    .benefits{grid-template-columns:repeat(2,1fr);row-gap:18px}
+    .benefit:nth-child(3){border-left:none;padding-left:0}
+    .cards{grid-template-columns:repeat(2,1fr)}
+    nav{display:none}
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wrap bar">
+    <a class="brand" href="/">
+      <svg width="26" height="26" viewBox="0 0 26 26" aria-hidden="true">
+        <ellipse cx="13" cy="13" rx="11" ry="5" fill="none" stroke="#2ab3a6" stroke-width="1.6" transform="rotate(-24 13 13)"/>
+        <ellipse cx="13" cy="13" rx="11" ry="5" fill="none" stroke="#d9b831" stroke-width="1.6" transform="rotate(28 13 13)"/>
+        <circle cx="13" cy="13" r="5" fill="#c8202e"/>
+      </svg>
+      DryDocs
+    </a>
+    <nav aria-label="Primary">
+      <a class="active" href="/landing.html">Overview</a>
+      <a href="/explorer">Graph Explorer</a>
+      <a href="/lineage">Lineage</a>
+      <a href="/loads">Pipelines</a>
+      <a href="/ownership">Teams</a>
+      <a href="/docs">About</a>
+    </nav>
+    <a class="signin" href="/">Sign In</a>
+  </div>
+</header>
+
+<main class="wrap">
+  <!-- hero -->
+  <section class="hero">
+    <div>
+      <h1>DryDocs</h1>
+      <p class="tagline">A Don&rsquo;t Repeat Yourself Knowledge Graph</p>
+      <p class="lede">Visualize and understand your DevOps landscape. Connect
+        pipelines, jobs, systems, and data across towers, products, and teams.</p>
+      <div class="ctas">
+        <a class="btn primary" href="/explorer">Explore the Graph</a>
+        <a class="btn ghost" href="/explorer/live">&#9654;&nbsp; Live Demo</a>
+      </div>
+    </div>
+
+    <!-- hub graphic: red core + orbit shells + 8 module spokes (same links as
+         the console landing — spoke click = module route) -->
+    <svg class="hub" viewBox="0 0 520 420" role="img" aria-label="Module hub">
+      <defs>
+        <radialGradient id="core" cx="38%" cy="32%">
+          <stop offset="0%" stop-color="#e4525d"/>
+          <stop offset="55%" stop-color="#c8202e"/>
+          <stop offset="100%" stop-color="#7d1220"/>
+        </radialGradient>
+      </defs>
+      <!-- faint mesh -->
+      <g stroke="#203045" stroke-width="1" opacity=".7">
+        <ellipse cx="260" cy="210" rx="215" ry="150" fill="none"/>
+        <ellipse cx="260" cy="210" rx="150" ry="105" fill="none"/>
+      </g>
+      <!-- orbit shells around the core -->
+      <g fill="none" stroke-width="7" stroke-linecap="round" opacity=".9">
+        <path d="M 200 165 A 78 62 0 0 1 300 148" stroke="#d9b831"/>
+        <path d="M 328 178 A 74 66 0 0 1 330 250" stroke="#3aae6b"/>
+        <path d="M 302 272 A 80 60 0 0 1 205 262" stroke="#2ab3a6"/>
+        <path d="M 186 240 A 72 66 0 0 1 184 182" stroke="#2e6bc4"/>
+      </g>
+      <circle cx="260" cy="210" r="46" fill="url(#core)"/>
+      <!-- spokes: one per console module, clockwise from 12 o'clock -->
+      <g font-family="'IBM Plex Sans','Segoe UI',sans-serif" font-size="13" text-anchor="middle">
+        <!-- lines first -->
+        <g stroke="#203045" stroke-width="1.5">
+          <line x1="260" y1="162" x2="260" y2="72"/>
+          <line x1="296" y1="176" x2="398" y2="112"/>
+          <line x1="308" y1="210" x2="452" y2="210"/>
+          <line x1="296" y1="244" x2="398" y2="308"/>
+          <line x1="260" y1="258" x2="260" y2="348"/>
+          <line x1="224" y1="244" x2="122" y2="308"/>
+          <line x1="212" y1="210" x2="68"  y2="210"/>
+          <line x1="224" y1="176" x2="122" y2="112"/>
+        </g>
+        <a href="/explorer"><g>
+          <circle class="spoke-dot" cx="260" cy="62" r="7" fill="#121e2e" stroke="#4d8be0" stroke-width="2"/>
+          <text class="spoke-label" x="260" y="44" fill="#8a97a8">Explorer</text></g></a>
+        <a href="/lineage"><g>
+          <circle class="spoke-dot" cx="406" cy="106" r="7" fill="#121e2e" stroke="#d9b831" stroke-width="2"/>
+          <text class="spoke-label" x="428" y="88" fill="#8a97a8">Lineage</text></g></a>
+        <a href="/ownership"><g>
+          <circle class="spoke-dot" cx="462" cy="210" r="7" fill="#121e2e" stroke="#2ab3a6" stroke-width="2"/>
+          <text class="spoke-label" x="462" y="238" fill="#8a97a8">Ownership</text></g></a>
+        <a href="/runbooks"><g>
+          <circle class="spoke-dot" cx="406" cy="314" r="7" fill="#121e2e" stroke="#3aae6b" stroke-width="2"/>
+          <text class="spoke-label" x="428" y="342" fill="#8a97a8">Runbooks</text></g></a>
+        <a href="/remediation"><g>
+          <circle class="spoke-dot" cx="260" cy="358" r="7" fill="#121e2e" stroke="#e4525d" stroke-width="2"/>
+          <text class="spoke-label" x="260" y="386" fill="#8a97a8">Remediation</text></g></a>
+        <a href="/docs"><g>
+          <circle class="spoke-dot" cx="114" cy="314" r="7" fill="#121e2e" stroke="#4d8be0" stroke-width="2"/>
+          <text class="spoke-label" x="92" y="342" fill="#8a97a8">Docs</text></g></a>
+        <a href="/gates"><g>
+          <circle class="spoke-dot" cx="58" cy="210" r="7" fill="#121e2e" stroke="#d9b831" stroke-width="2"/>
+          <text class="spoke-label" x="58" y="238" fill="#8a97a8">Gates</text></g></a>
+        <a href="/loads"><g>
+          <circle class="spoke-dot" cx="114" cy="106" r="7" fill="#121e2e" stroke="#2ab3a6" stroke-width="2"/>
+          <text class="spoke-label" x="92" y="88" fill="#8a97a8">Loads</text></g></a>
+      </g>
+    </svg>
+  </section>
+
+  <!-- benefit strip (mock row, each linking its console module) -->
+  <section class="benefits" aria-label="Benefits">
+    <div class="benefit"><a href="/explorer">
+      <svg width="30" height="30" viewBox="0 0 30 30" fill="none" stroke="#4d8be0" stroke-width="1.8">
+        <circle cx="9" cy="8" r="3.2"/><circle cx="22" cy="12" r="3.2"/><circle cx="13" cy="22" r="3.2"/>
+        <path d="M11.8 9.5 19.2 11M12 19.2 10 11M15.8 20.6 19.6 14.6"/></svg>
+      <div><b>Knowledge Graph</b><span>Connect everything, see the big picture.</span></div></a>
+    </div>
+    <div class="benefit"><a href="/lineage">
+      <svg width="30" height="30" viewBox="0 0 30 30" fill="none" stroke="#2ab3a6" stroke-width="1.8">
+        <rect x="4" y="5" width="8" height="7" rx="2"/><rect x="18" y="18" width="8" height="7" rx="2"/>
+        <path d="M12 8.5h6a3 3 0 0 1 3 3V18M18 21.5h-6a3 3 0 0 1-3-3V12"/></svg>
+      <div><b>Pipeline &amp; Job Lineage</b><span>Trace every step, end to end.</span></div></a>
+    </div>
+    <div class="benefit"><a href="/loads">
+      <svg width="30" height="30" viewBox="0 0 30 30" fill="none" stroke="#3aae6b" stroke-width="1.8">
+        <rect x="5" y="5" width="20" height="6" rx="1.5"/><rect x="5" y="13" width="20" height="6" rx="1.5"/>
+        <rect x="5" y="21" width="20" height="6" rx="1.5"/><path d="M8.5 8h.01M8.5 16h.01M8.5 24h.01"/></svg>
+      <div><b>Environment Mapping</b><span>Understand where things run.</span></div></a>
+    </div>
+    <div class="benefit"><a href="/ownership">
+      <svg width="30" height="30" viewBox="0 0 30 30" fill="none" stroke="#d9b831" stroke-width="1.8">
+        <path d="M15 4 25 8v6c0 6.5-4.5 10.5-10 12C9.5 24.5 5 20.5 5 14V8Z"/>
+        <path d="M11.5 14.5 14 17l4.8-5"/></svg>
+      <div><b>Team &amp; Access</b><span>Built for collaboration, designed for scale.</span></div></a>
+    </div>
+  </section>
+
+  <!-- towers -->
+  <section class="towers">
+    <h2>Explore by Tower
+      <span class="tag">EXAMPLE DATA &middot; ILLUSTRATIVE / ANONYMIZED</span>
+    </h2>
+    <div class="cards">
+      <a class="card" href="/explorer/tower/home">
+        <svg width="40" height="36" viewBox="0 0 42 42" aria-hidden="true">
+          <path d="M21 6 37 20h-5v15h-8v-9h-6v9h-8V20H5Z" fill="none" stroke="#4d8be0" stroke-width="2.4" stroke-linejoin="round"/></svg>
+        <b>Home Lending</b>
+        <span class="stats"><em>12</em> Products &nbsp; <em>42</em> Teams</span>
+        <svg class="spark" viewBox="0 0 120 26" preserveAspectRatio="none">
+          <polyline points="0,17 12,13 24,16 36,10 48,14 60,8 72,12 84,7 96,11 108,6 120,9"
+            fill="none" stroke="#4d8be0" stroke-width="1.6"/></svg>
+      </a>
+      <a class="card" href="/explorer/tower/auto">
+        <svg width="44" height="36" viewBox="0 0 46 42" aria-hidden="true">
+          <g fill="none" stroke="#2ab3a6" stroke-width="2.4" stroke-linejoin="round">
+            <path d="M9 25 12 15q1-3 4-3h14q3 0 4 3l3 10M7 25h32v6h-4M11 31H7Z"/>
+            <circle cx="14" cy="30" r="3.4"/><circle cx="32" cy="30" r="3.4"/></g></svg>
+        <b>Auto</b>
+        <span class="stats"><em>9</em> Products &nbsp; <em>31</em> Teams</span>
+        <svg class="spark" viewBox="0 0 120 26" preserveAspectRatio="none">
+          <polyline points="0,14 12,16 24,11 36,15 48,9 60,13 72,8 84,12 96,9 108,13 120,7"
+            fill="none" stroke="#2ab3a6" stroke-width="1.6"/></svg>
+      </a>
+      <a class="card" href="/explorer/tower/cards">
+        <svg width="44" height="36" viewBox="0 0 46 42" aria-hidden="true">
+          <g fill="none" stroke="#3aae6b" stroke-width="2.4">
+            <rect x="7" y="11" width="32" height="21" rx="3"/>
+            <path d="M7 18h32" stroke-width="3.4"/><path d="M12 26h10" stroke-width="2.2"/></g></svg>
+        <b>Credit Cards</b>
+        <span class="stats"><em>8</em> Products &nbsp; <em>27</em> Teams</span>
+        <svg class="spark" viewBox="0 0 120 26" preserveAspectRatio="none">
+          <polyline points="0,12 12,15 24,10 36,13 48,16 60,11 72,14 84,9 96,13 108,10 120,12"
+            fill="none" stroke="#3aae6b" stroke-width="1.6"/></svg>
+      </a>
+      <a class="card" href="/explorer/tower/shared">
+        <svg width="44" height="36" viewBox="0 0 46 42" aria-hidden="true">
+          <g fill="none" stroke="#d9b831" stroke-width="2.4" stroke-linejoin="round">
+            <path d="M23 7 37 13 23 19 9 13Z"/><path d="M9 20l14 6 14-6"/><path d="M9 27l14 6 14-6"/></g></svg>
+        <b>Shared Services</b>
+        <span class="stats"><em>6</em> Platforms &nbsp; <em>19</em> Teams</span>
+        <svg class="spark" viewBox="0 0 120 26" preserveAspectRatio="none">
+          <polyline points="0,15 12,12 24,14 36,10 48,13 60,9 72,13 84,11 96,14 108,8 120,11"
+            fill="none" stroke="#d9b831" stroke-width="1.6"/></svg>
+      </a>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap" style="display:flex;justify-content:space-between;width:100%">
+    <span>DryDocs &copy; 2026 &middot; demo/synthetic content is tagged EXAMPLE DATA</span>
+    <nav aria-label="Footer">
+      <a href="/docs">Docs</a><a href="/gates">Gates</a><a href="/remediation">Remediation</a><a href="/console">Console</a>
+    </nav>
+  </div>
+</footer>
+
+</body>
+</html>
