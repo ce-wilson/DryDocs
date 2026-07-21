@@ -333,6 +333,15 @@ Tags help grooming: `idea` · `bug` · `doc` · `source` (new data source) · `q
 
 <!-- when you promote an idea, move its line here with the resulting backlog id -->
 
+- 2026-07-21 pm — [task] **C12 platforms-taxonomy gate RUN + SIGNED OFF in-chat** (same
+  session, ~an hour after C12 was groomed; the K5 precedent): rendered page presented,
+  3/3 as recommended — A+B1–B3 confirmed as written (registry model; Ais* removed;
+  USES_SOFTWARE {source: 'batch-port'} landing), B4 existing local no-PROV typing covers
+  the migrated fact, B5 airflow row stays as the F2 crosswalk placeholder. Gate-log
+  entry appended; platforms.yaml confirmed: true; build follow-ups groomed → **C13**
+  (SchedulerKind retirement + vocab/map closure + Ais* straggler sweep) and **C14**
+  (batch-port USES_SOFTWARE loader migration). C12 done (todo 22 / done 122).
+
 - 2026-07-21 pm groom run (bare /groom-backlog, same session as the platforms-taxonomy
   pre-rulings) — 3 promoted / 0 inboxed / 1 kept-updated (todo 18 → 21):
   - [idea] SchedulerKind → AisCapability/AiTool deprecation (parked since 2026-07-09;

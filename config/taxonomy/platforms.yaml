@@ -33,7 +33,7 @@
 schema: drydocs.platforms.v1          # DRAFT — shape finalizes at the gate
 classification: Internal-Public       # mechanism + public-vendor values only; internal tool names + deployed instances -> internal/
 status: captured                      # was: placeholder (2026-07-09 .. 2026-07-21)
-confirmed: false                      # producer gate pending — company confirmation is provenance, not adoption
+confirmed: true                       # platforms-taxonomy gate SIGNED OFF 2026-07-21 pm (C12; config/gate-log.md) — 3/3 as recommended; build follow-ups = C13/C14
 updated: 2026-07-21                   # C11 capture (am) + SME rulings (pm): Ais* removed, registry model wins — see reconciliation
 
 # ── The company-confirmed model (2026-06-29 AIS gate; captured 2026-07-21) ───
@@ -122,18 +122,18 @@ platforms:
     scheduler_kind: ControlM
     phase_supported: 1
     role: orchestrator                  # software-registry role vocabulary — the SME-ruled producer designation
-    software_registry_ref: controlm     # PROPOSED 2026-07-21 pm (Q4 merge direction); gate confirms
+    software_registry_ref: controlm     # CONFIRMED at the C12 gate (2026-07-21 pm)
   - id: autosys
     label: "CA Autosys"
     current_class: SchedulerKind
     scheduler_kind: Autosys
     phase_supported: 2
     role: orchestrator
-    software_registry_ref: autosys      # PROPOSED 2026-07-21 pm (registry row 'Broadcom Workload Automation' — CA label drift settles at the gate)
+    software_registry_ref: autosys      # CONFIRMED at the C12 gate (2026-07-21 pm; registry row 'Broadcom Workload Automation' carries the vendor-label truth)
   - id: airflow
     label: "Apache Airflow"
     current_class: SchedulerKind
     scheduler_kind: Airflow
     phase_supported: 2
     role: orchestrator
-    software_registry_ref: airflow      # PROPOSED 2026-07-21 pm; NOT in the company tool list (their AWS leg = EventBridge Scheduler + Glue) — kept as the F2 crosswalk placeholder, gate decides whether the row stays (B5)
+    software_registry_ref: airflow      # B5 RULED at the C12 gate (2026-07-21 pm): row STAYS as the F2 crosswalk placeholder; NOT in the company tool list (their AWS leg = EventBridge Scheduler + Glue)

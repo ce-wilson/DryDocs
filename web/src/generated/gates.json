@@ -287,23 +287,25 @@
       ]
     },
     {
+      "kind": "log-entry",
+      "date": "2026-07-21",
+      "title": "Platforms taxonomy: SchedulerKind retires into the software-registry model (platforms-taxonomy) — SIGNED OFF (C12)",
+      "status": "signed-off",
+      "prompt_files": [
+        "config/gate-prompts/platforms-taxonomy.yaml"
+      ],
+      "log_ref": "config/gate-log.md:741",
+      "unblocks": [
+        "C12"
+      ]
+    },
+    {
       "kind": "prompt-only",
       "date": null,
       "title": "bmc-docs-example (gate page rendered — session not yet run)",
       "status": "open",
       "prompt_files": [
         "config/gate-prompts/bmc-docs-example.yaml"
-      ],
-      "log_ref": null,
-      "unblocks": []
-    },
-    {
-      "kind": "prompt-only",
-      "date": null,
-      "title": "platforms-taxonomy (gate page rendered — session not yet run)",
-      "status": "open",
-      "prompt_files": [
-        "config/gate-prompts/platforms-taxonomy.yaml"
       ],
       "log_ref": null,
       "unblocks": []

@@ -737,3 +737,41 @@ SME-supplied PAT screenshots held OUT of the repo — Internal-Confidential).
   admin edits never + super-user page expected (scoping follow-on). gates.json
   regenerates with this entry (the O19 drift guard enforces it). No vocabulary or
   map changes — this gate ruled console affordances, not graph semantics.
+
+## 2026-07-21 — Platforms taxonomy: SchedulerKind retires into the software-registry model (platforms-taxonomy) — SIGNED OFF (C12)
+
+- **Scope:** the C6+C11 terminus — the platforms/SchedulerKind reconciliation, decided
+  FROM the C11-captured company shape (their 2026-06-29 AIS gate) plus the same-day SME
+  in-chat rulings (2026-07-21 pm). Guided in-chat session (chad.wilson); rendered page
+  presented; 3 calls, all as recommended.
+- **Confirmed: 3 · Edited: 0 · Rejected: 0**
+  - **A + B1–B3 confirmed as written** (ratifies the 2026-07-21 pm pre-gate rulings):
+    B1 USES_TOOL retired with the Ais* family — the app→orchestrator fact lands on the
+    ACTIVE reg_uses_software edge (:BusinessApplication)-[:USES_SOFTWARE {source:
+    ''batch-port''}]->(:SoftwareProduct {role: orchestrator}); seal_requires_scheduler
+    (planned, never wired) RETIRES instead of reshaping — zero new edge or node types.
+    B2 the capability node layer is NOT adopted — the registry role vocabulary carries
+    the classification (''Orchestration'' = the intended highest level). B3 the tool
+    class MERGES into :SoftwareProduct (supersedes the earlier distinct-view Q4
+    direction). Q6 the Ais* spelling is removed both sides; AIS = ''Application
+    Integration Streaming'' (a misnomer — the folder also carried ETL + file transfer)
+    survives ONLY as software-registry.yaml#acronyms; the Integration* rename
+    counter-proposal stays REJECTED. A: Q2 one app-level edge (hoisted to
+    :BusinessApplication); Q3 :Scheduler retired unbuilt (:ControlMServer = the
+    deployed layer); Q5 publishability split (class model + public vendors public;
+    internal tool values + instances internal/); Q1 the batch/event capability seed
+    stays withdrawn.
+  - **B4 — existing typing covers the migrated fact:** reg_uses_software stays a LOCAL
+    Agent→Entity edge with NO PROV row (PROV has no Agent→Entity usage term; the same
+    null-PROV infrastructure family as SCHEDULED_ON / the arch_contains precedent).
+    Only the source: ''batch-port'' property convention is new. IN_CAPABILITY moot (B2).
+  - **B5 — the airflow row STAYS** as the F2 crosswalk placeholder (Apache Airflow is
+    not in the company tool list; their AWS leg = EventBridge Scheduler + Glue).
+- **Effect:** platforms.yaml flips confirmed: true (status: captured). Build follow-ups
+  GROOMED, not built (the K2 flips-are-follow-ups pattern): **C13** (retire the
+  SchedulerKind ontology.cypher seeds + scheduler_kind constraint; retire
+  seal_requires_scheduler + the requires-scheduler map entry as superseded-by
+  reg_uses_software; sweep the Ais* stragglers in README / NODE_QUICK_REFERENCE /
+  LoadPlanV3 refs) and **C14** (the batch-port USES_SOFTWARE loader migration,
+  source: ''batch-port''). Vocabulary statuses untouched at the gate itself. Company
+  sign-off remains provenance only — company gates ≠ producer gates. C12 done.
