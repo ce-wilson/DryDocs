@@ -26,6 +26,16 @@ Tags help grooming: `idea` · `bug` · `doc` · `source` (new data source) · `q
 
 <!-- add new ideas at the top -->
 
+- 2026-07-21 — [idea] **App-to-app path runbook view (two-layer) — wireframed**
+  (`UI-WIP/wf-runbook-path-01.md` + `.html`, from chat): source/target
+  BusinessApplication pickers → `SHORTEST 1` path → TECHNICAL + DATA lanes →
+  a GENERATED runbook grid (each step cites its path node). Mechanism-only twin
+  of the internal search-for-file-name use case (root screenshot, never
+  committed; also supports the file-name-contains anchor). Groom into Epic O:
+  likely an O17 Runbooks-page tab + QuerySpec `runbooks.app-path.v1`; open
+  ontology question flagged in the wf: `layer`/`c4_level` node properties need
+  a vocabulary gate (until then, lane partition derives from label sets).
+
 - 2026-07-21 — [idea] **ControlMApplication code → BusinessApplication mapping: the
   two-pattern model (SME, chat)**. SME states the code layer maps two ways: (1) some
   BusinessApplications own a DEDICATED Control-M app code → can map DIRECTLY

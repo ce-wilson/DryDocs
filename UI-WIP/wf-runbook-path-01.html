@@ -1,0 +1,253 @@
+<!doctype html>
+<!-- wf-runbook-path-01 (rung 3) — app-to-app path runbook mockup, two layers.
+     Companion spec: wf-runbook-path-01.md. SYNTHESIZED demo data throughout
+     (the internal search-for-file-name screenshot this twins is NEVER
+     committed). Self-contained; dark token values from the console sheet. -->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<title>wf-runbook-path-01 — DryDocs path runbook mockup</title>
+<style>
+  :root{--bg:#0d1520;--bg2:#0f1b29;--panel:#121e2e;--panel2:#152335;--edge:#203045;
+    --edge-soft:#1a2739;--text:#e8edf3;--muted:#8a97a8;--faint:#71809a;
+    --blue:#2e6bc4;--blue-br:#4d8be0;--teal:#2ab3a6;--green:#3aae6b;
+    --yellow:#d9b831;--red:#c8202e;--mono:'IBM Plex Mono',Consolas,monospace;}
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:var(--bg);color:var(--text);font-family:'IBM Plex Sans','Segoe UI',sans-serif;
+    font-size:14px;line-height:1.45;padding:18px;max-width:1180px;margin:0 auto}
+  .chrome{border:1px solid var(--edge);border-radius:10px;background:var(--panel);overflow:hidden}
+  .toolbar{display:flex;flex-wrap:wrap;align-items:center;gap:10px;padding:10px 14px;
+    border-bottom:1px solid var(--edge-soft);background:var(--panel2)}
+  .crumb{font-size:12px;color:var(--faint)}
+  .picker{display:flex;align-items:center;gap:6px;border:1px solid var(--edge);border-radius:8px;
+    background:var(--bg2);padding:5px 10px;font-size:12.5px}
+  .picker b{color:var(--blue-br);font-family:var(--mono);font-weight:600}
+  .picker span{color:var(--muted)}
+  .arrow{color:var(--faint);font-size:16px}
+  .anchor{border:1px dashed var(--edge);border-radius:8px;background:transparent;
+    padding:5px 10px;font-size:12px;color:var(--faint);font-family:var(--mono)}
+  .btn{border:1px solid var(--blue-br);background:var(--blue);color:#fff;border-radius:8px;
+    padding:6px 14px;font-size:12.5px;font-weight:600}
+  .tag{margin-left:auto;border:1px solid rgba(217,184,49,.5);background:rgba(217,184,49,.1);
+    color:var(--yellow);font-family:var(--mono);font-size:10px;border-radius:4px;padding:2px 8px}
+  .stats{font-family:var(--mono);font-size:11px;color:var(--faint)}
+  .graph{background:var(--bg2);border-bottom:1px solid var(--edge-soft)}
+  .cols{display:grid;grid-template-columns:1.35fr 1fr;gap:0}
+  .cy{padding:14px;border-right:1px solid var(--edge-soft)}
+  .cy h3,.insp h3,.rb h3{font-size:11px;letter-spacing:.14em;color:var(--faint);margin-bottom:8px}
+  pre{font-family:var(--mono);font-size:11.5px;color:var(--muted);background:var(--bg);
+    border:1px solid var(--edge-soft);border-radius:8px;padding:10px 12px;overflow-x:auto;line-height:1.6}
+  pre b{color:#7fb0f0;font-weight:600} pre i{color:var(--teal);font-style:normal}
+  pre em{color:var(--yellow);font-style:normal}
+  .insp{padding:14px;display:flex;flex-direction:column;gap:10px}
+  .card{border:1px solid var(--edge);border-radius:8px;background:var(--panel2);font-size:12px}
+  .card h4{font-size:10.5px;font-family:var(--mono);padding:6px 10px;border-bottom:1px solid var(--edge-soft)}
+  .card table{width:100%;border-collapse:collapse}
+  .card td{padding:4px 10px;border-bottom:1px solid var(--edge-soft);color:var(--text)}
+  .card td:first-child{color:var(--faint);font-family:var(--mono);font-size:10.5px;width:42%}
+  .card tr:last-child td{border-bottom:none}
+  .legend{display:flex;flex-wrap:wrap;gap:6px}
+  .chip{border-radius:99px;padding:2px 10px;font-family:var(--mono);font-size:10px;color:#0d1520;font-weight:600}
+  .rb{padding:14px;border-top:1px solid var(--edge-soft)}
+  .rb table{width:100%;border-collapse:collapse;font-size:12.5px}
+  .rb th{font-size:10.5px;letter-spacing:.1em;color:var(--faint);text-align:left;
+    border-bottom:1px solid var(--edge);padding:6px 10px 6px 0;font-weight:600}
+  .rb td{border-bottom:1px solid var(--edge-soft);padding:7px 10px 7px 0;color:var(--text)}
+  .rb td.mono{font-family:var(--mono);font-size:11px;color:var(--muted)}
+  .lane-t{color:var(--blue-br)} .lane-d{color:var(--green)}
+  .foot{padding:10px 14px;font-family:var(--mono);font-size:10.5px;color:var(--faint)}
+</style>
+</head>
+<body>
+<p class="crumb" style="margin-bottom:10px">wf-runbook-path-01 · rung-3 mockup — Home &gt; Runbooks &gt; Path runbook
+  · the Explorer pane strip ("Home Lending · EXAMPLE DATA · Open drill-down → live graph") re-anchored to two applications</p>
+
+<div class="chrome">
+  <!-- toolbar: the two anchors + optional file-name anchor (annotation 1) -->
+  <div class="toolbar">
+    <span class="picker">Source&nbsp;<b>HL-1</b><span>· Origination Workbench ▾</span></span>
+    <span class="arrow">→</span>
+    <span class="picker">Target&nbsp;<b>HL-2</b><span>· Servicing Core ▾</span></span>
+    <span class="anchor">anchor: file name contains "pricing_approval"…</span>
+    <button class="btn" type="button">Find path</button>
+    <span class="tag">EXAMPLE DATA · ILLUSTRATIVE</span>
+    <span class="stats">path 1 of 1 · 10 nodes · 2 layers</span>
+  </div>
+
+  <!-- the two-lane path graph (annotations 2–5) -->
+  <svg class="graph" viewBox="0 0 1150 470" role="img" aria-label="Two-layer path from HL-1 to HL-2">
+    <defs>
+      <marker id="m" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+        <path d="M0 0 L10 5 L0 10 z" fill="#71809a"/></marker>
+    </defs>
+    <!-- lane labels + divider (annotation 3) -->
+    <text x="18" y="34" font-size="11" letter-spacing="3" fill="#4d8be0" font-family="monospace">TECHNICAL LAYER · c4 low</text>
+    <line x1="14" y1="252" x2="1136" y2="252" stroke="#2ab3a6" stroke-width="1.6" stroke-dasharray="8 7" opacity=".65"/>
+    <text x="18" y="282" font-size="11" letter-spacing="3" fill="#3aae6b" font-family="monospace">DATA LAYER</text>
+
+    <g font-family="'IBM Plex Sans',sans-serif" font-size="12" fill="#e8edf3" text-anchor="middle">
+      <!-- edges: technical lane -->
+      <g stroke="#71809a" stroke-width="1.3" fill="none" marker-end="url(#m)">
+        <line x1="118" y1="150" x2="196" y2="150"/>
+        <line x1="352" y1="150" x2="416" y2="150"/>
+        <line x1="580" y1="150" x2="672" y2="150"/>
+        <line x1="912" y1="150" x2="836" y2="150"/>
+        <line x1="1054" y1="150" x2="990" y2="150"/>
+        <line x1="498" y1="84" x2="498" y2="118"/>            <!-- repo -> job -->
+        <line x1="498" y1="182" x2="498" y2="292"/>           <!-- WRITES cross-lane -->
+        <line x1="962" y1="322" x2="1076" y2="182"/>          <!-- READ_BY cross-lane -->
+        <line x1="252" y1="322" x2="336" y2="322"/>
+        <line x1="560" y1="322" x2="620" y2="322"/>
+        <line x1="772" y1="322" x2="828" y2="322"/>
+      </g>
+      <!-- edge labels -->
+      <g font-size="9.5" fill="#71809a" font-family="monospace">
+        <text x="157" y="142">OWNS</text>
+        <text x="384" y="142">CONTAINS_JOB</text>
+        <text x="626" y="126" fill="#71809a" font-size="8.5">condition</text>
+        <text x="626" y="139" fill="#d9b831">HL-EXTRACT-OK</text>
+        <text x="874" y="142">CONTAINS_JOB</text>
+        <text x="1022" y="142">OWNS</text>
+        <text x="536" y="104">CODE_SOURCED</text>
+        <text x="530" y="244" fill="#3aae6b">WRITES</text>
+        <text x="1042" y="262" fill="#3aae6b">READ_BY</text>
+        <text x="294" y="314">ROUTES</text>
+        <text x="590" y="314">LOADS</text>
+        <text x="800" y="314">FEEDS</text>
+        <text x="496" y="363" fill="#71809a">LANDS_IN</text>
+      </g>
+
+      <!-- technical nodes -->
+      <g>
+        <circle cx="76" cy="150" r="42" fill="#152335" stroke="#c8202e" stroke-width="2.4"/>
+        <text x="76" y="146" font-weight="600">HL-1</text>
+        <text x="76" y="162" font-size="9.5" fill="#8a97a8">BusinessApplication</text>
+
+        <rect x="198" y="122" width="154" height="56" rx="8" fill="#152335" stroke="#4d8be0" stroke-width="2"/>
+        <text x="275" y="146">DEMO-HL-EXTRACT</text>
+        <text x="275" y="162" font-size="9.5" fill="#8a97a8">ControlMFolder</text>
+
+        <rect x="418" y="118" width="162" height="64" rx="8" fill="#152335" stroke="#d9b831" stroke-width="2"/>
+        <text x="499" y="144">hl_daily_extract</text>
+        <text x="499" y="162" font-size="9.5" fill="#8a97a8">ControlMJob</text>
+
+        <rect x="674" y="118" width="162" height="64" rx="8" fill="#152335" stroke="#d9b831" stroke-width="2"/>
+        <text x="755" y="144">hl_core_load</text>
+        <text x="755" y="162" font-size="9.5" fill="#8a97a8">ControlMJob</text>
+
+        <rect x="914" y="122" width="76" height="56" rx="8" fill="#152335" stroke="#4d8be0" stroke-width="2"/>
+        <text x="952" y="143" font-size="10.5">DEMO-</text>
+        <text x="952" y="156" font-size="10.5">HL-CORE</text>
+        <text x="952" y="170" font-size="8.5" fill="#8a97a8">CtlmFolder</text>
+
+        <circle cx="1096" cy="150" r="42" fill="#152335" stroke="#c8202e" stroke-width="2.4"/>
+        <text x="1096" y="146" font-weight="600">HL-2</text>
+        <text x="1096" y="162" font-size="9.5" fill="#8a97a8">BusinessApplication</text>
+
+        <rect x="432" y="30" width="134" height="54" rx="8" fill="#152335" stroke="#2ab3a6" stroke-width="2"/>
+        <text x="499" y="52" font-size="11">hl-extract-etl</text>
+        <text x="499" y="68" font-size="9.5" fill="#8a97a8">GitRepo · DEMO-HL</text>
+      </g>
+
+      <!-- data nodes -->
+      <g>
+        <rect x="112" y="294" width="140" height="56" rx="8" fill="#152335" stroke="#2ab3a6" stroke-width="2"/>
+        <text x="182" y="316" font-size="10.5">NEP-DEMO-rt</text>
+        <text x="182" y="332" font-size="9.5" fill="#8a97a8">TransferRoute</text>
+
+        <rect x="338" y="292" width="222" height="60" rx="8" fill="#152335" stroke="#3aae6b" stroke-width="2"/>
+        <text x="449" y="314" font-size="10.5" font-family="monospace">pricing_approval_$DATE.dat</text>
+        <text x="449" y="332" font-size="9.5" fill="#8a97a8">File · provenance 0.2</text>
+
+        <rect x="380" y="368" width="138" height="52" rx="8" fill="#152335" stroke="#3aae6b" stroke-width="1.6"/>
+        <text x="449" y="389" font-size="10.5">stg_mortgage</text>
+        <text x="449" y="405" font-size="9.5" fill="#8a97a8">S3Stage</text>
+        <line x1="449" y1="352" x2="449" y2="366" stroke="#71809a" stroke-width="1.3" marker-end="url(#m)"/>
+
+        <rect x="622" y="294" width="150" height="56" rx="8" fill="#152335" stroke="#4d8be0" stroke-width="2"/>
+        <text x="697" y="316">app_pipeline</text>
+        <text x="697" y="332" font-size="9.5" fill="#8a97a8">Dataset</text>
+
+        <rect x="830" y="294" width="132" height="56" rx="8" fill="#152335" stroke="#2ab3a6" stroke-width="2"/>
+        <text x="896" y="313" font-size="10">SERVICING_</text>
+        <text x="896" y="326" font-size="10">CORE_VW</text>
+        <text x="896" y="341" font-size="9.5" fill="#8a97a8">View</text>
+      </g>
+    </g>
+  </svg>
+
+  <div class="cols">
+    <!-- the assumed path cypher (annotation 6) -->
+    <div class="cy">
+      <h3>PATH QUERY — the assumed contract (QuerySpec <span style="color:#7fb0f0">runbooks.app-path.v1</span>)</h3>
+      <pre><b>MATCH</b> p = <em>SHORTEST 1</em>
+  (a:<i>BusinessApplication</i> {seal_id: <em>$source</em>})
+  -[]-+
+  (b:<i>BusinessApplication</i> {seal_id: <em>$target</em>})
+<b>RETURN</b> p</pre>
+      <pre>-- file-anchored variant (the search-for-file-name flow):
+<b>MATCH</b> p = <em>SHORTEST 1</em> (a:<i>BusinessApplication</i> {seal_id: <em>$source</em>})
+  -[]-+(fn:<i>File</i>) <b>WHERE</b> fn.file_name <b>CONTAINS</b> <em>$needle</em>
+<b>RETURN</b> p
+-- classic fallback: shortestPath((a)-[*..12]-(b))</pre>
+      <p style="font-size:11px;color:var(--faint);margin-top:8px">
+        Lane partition: each path node's <code style="font-family:var(--mono)">layer</code>
+        (technology | data) + <code style="font-family:var(--mono)">c4_level</code> —
+        pending its vocabulary gate, derived from label sets until then.</p>
+    </div>
+
+    <!-- inspector cards + legend (annotation 7) — all values fictional -->
+    <div class="insp">
+      <div class="card"><h4 style="color:#3aae6b">File</h4><table>
+        <tr><td>file_name</td><td>pricing_approval_$BUSINESS_DATE.dat</td></tr>
+        <tr><td>provenance_stage</td><td>0.2</td></tr>
+        <tr><td>route_id</td><td>NEP-DEMO-rt</td></tr></table></div>
+      <div class="card"><h4 style="color:#2ab3a6">TransferRoute</h4><table>
+        <tr><td>receiver_host</td><td>wh-demo.svr.internal.example</td></tr>
+        <tr><td>receiver_path</td><td>/data/demo/dropbox/HL_DATA/</td></tr>
+        <tr><td>sftp_user</td><td>hl_p</td></tr></table></div>
+      <div class="card"><h4 style="color:#2ab3a6">GitRepo</h4><table>
+        <tr><td>project</td><td>DEMO-HL</td></tr>
+        <tr><td>url</td><td>git.internal.example/DEMO-HL/hl-extract-etl</td></tr></table></div>
+      <div>
+        <h3 style="margin:4px 0 6px">NODE LABELS</h3>
+        <div class="legend">
+          <span class="chip" style="background:#e4525d">BusinessApplication (2)</span>
+          <span class="chip" style="background:#4d8be0">ControlMFolder (2)</span>
+          <span class="chip" style="background:#d9b831">ControlMJob (2)</span>
+          <span class="chip" style="background:#2ab3a6">GitRepo (1)</span>
+          <span class="chip" style="background:#3aae6b">File (1)</span>
+          <span class="chip" style="background:#3aae6b">S3Stage (1)</span>
+          <span class="chip" style="background:#4d8be0">Dataset (1)</span>
+          <span class="chip" style="background:#2ab3a6">View (1)</span>
+          <span class="chip" style="background:#2ab3a6">TransferRoute (1)</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- the deliverable: generated runbook (annotation 8) -->
+  <div class="rb">
+    <h3>PROPOSED RUNBOOK — generated from the path (each step cites its node; click → node pulses)</h3>
+    <table>
+      <tr><th>#</th><th>LAYER</th><th>PATH NODE</th><th>ACTION</th><th>VERIFY</th></tr>
+      <tr><td>1</td><td class="lane-d">data</td><td class="mono">File pricing_approval_$DATE.dat</td>
+          <td>Confirm arrival in the managed-transfer drop (route NEP-DEMO-rt)</td><td class="mono">file watcher OK</td></tr>
+      <tr><td>2</td><td class="lane-t">tech</td><td class="mono">Job hl_daily_extract</td>
+          <td>Check status; rerun from DEMO-HL-EXTRACT if failed (code: hl-extract-etl)</td><td class="mono">ended OK</td></tr>
+      <tr><td>3</td><td class="lane-t">tech</td><td class="mono">cond HL-EXTRACT-OK</td>
+          <td>Confirm the out-condition posted (the job→job handoff)</td><td class="mono">condition present</td></tr>
+      <tr><td>4</td><td class="lane-t">tech</td><td class="mono">Job hl_core_load</td>
+          <td>Check downstream load in DEMO-HL-CORE</td><td class="mono">ended OK</td></tr>
+      <tr><td>5</td><td class="lane-d">data</td><td class="mono">View SERVICING_CORE_VW</td>
+          <td>Freshness check before HL-2 business hours</td><td class="mono">refreshed today</td></tr>
+    </table>
+  </div>
+
+  <div class="foot">SYNTHESIZED · twins the internal search-for-file-name use case (never committed) ·
+    export rides the O11 spec export + provenance manifest once QuerySpec-backed</div>
+</div>
+</body>
+</html>
