@@ -4471,7 +4471,7 @@ items:
     agent: main
     model: sonnet
     priority: p2
-    status: todo
+    status: in_progress
     depends_on: [G15]
     inputs: [drydocs_lineage/, drydocs_core/controlm/commands.py, tests/unit/test_lineage_inventory.py, config/gate-log.md]
     acceptance: >
@@ -4945,8 +4945,8 @@ items:
       generator's home); zero api surface.
 
 summary:
-  todo: 24                                         # -O25 done; +G18..G25 rua-ingest phase incl. repo-source seam + DPL registry source (2026-07-21)
-  in_progress: 1                                   # E1 (gate deferred both sides)
+  todo: 23                                         # -O25 done; -G17 claimed; +G18..G25 rua-ingest phase incl. repo-source seam + DPL registry source (2026-07-21)
+  in_progress: 2                                   # E1 (gate deferred both sides); G17 (MAC ingest seam, claimed 2026-07-21 pm)
   blocked: 0
   done: 115                                        # +O25 gate-page drafting BUILT 2026-07-21 pm — BOTH O20 follow-ups (O24 M2 + O25 M1) now closed same day
-  next_ready: [L9, L12, L14, L15, M2, M3, M4, P3, J10, Q6, O23, J13, G17, G18, G19, C11]
+  next_ready: [L9, L12, L14, L15, M2, M3, M4, P3, J10, Q6, O23, J13, G18, G19, C11]
