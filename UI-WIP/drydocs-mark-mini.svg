@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 240" role="img" aria-label="DryDocs mark">
+<defs><radialGradient id="core" cx="36%" cy="30%" r="75%"><stop offset="0%" stop-color="#F0737E"/><stop offset="52%" stop-color="#C8202E"/><stop offset="100%" stop-color="#701020"/></radialGradient></defs>
+<path d="M 63.04 59.30 A 82.0 26.0 0 0 1 184.62 61.99 L 184.62 113.99 A 82.0 26.0 0 0 0 63.04 111.30 Z" fill="#1E3A5C"/>
+<circle cx="120.0" cy="118.0" r="44.0" fill="url(#core)"/>
+<path d="M 117.14 125.98 A 82.0 26.0 0 0 1 38.00 100.00 L 38.00 152.00 A 82.0 26.0 0 0 0 117.14 177.98 Z" fill="#2BB673"/>
+<path d="M 200.21 91.41 A 82.0 26.0 0 0 1 134.24 111.61 L 134.24 163.61 A 82.0 26.0 0 0 0 200.21 143.41 Z" fill="#1E3A5C"/>
+</svg>

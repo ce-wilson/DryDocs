@@ -100,10 +100,15 @@
 <header>
   <div class="wrap bar">
     <a class="brand" href="/">
-      <svg width="26" height="26" viewBox="0 0 26 26" aria-hidden="true">
-        <ellipse cx="13" cy="13" rx="11" ry="5" fill="none" stroke="#2ab3a6" stroke-width="1.6" transform="rotate(-24 13 13)"/>
-        <ellipse cx="13" cy="13" rx="11" ry="5" fill="none" stroke="#d9b831" stroke-width="1.6" transform="rotate(28 13 13)"/>
-        <circle cx="13" cy="13" r="5" fill="#c8202e"/>
+      <!-- Kept Orbit mark, small-size variant (UI-WIP/drydocs-mark-mini.svg;
+           philosophy UI-WIP/kept-orbit-philosophy.md — palette after the
+           community graph, a tribute, not a copy) -->
+      <svg width="28" height="28" viewBox="0 0 240 240" aria-hidden="true">
+        <defs><radialGradient id="core-h" cx="36%" cy="30%" r="75%"><stop offset="0%" stop-color="#F0737E"/><stop offset="52%" stop-color="#C8202E"/><stop offset="100%" stop-color="#701020"/></radialGradient></defs>
+        <path d="M 63.04 59.30 A 82.0 26.0 0 0 1 184.62 61.99 L 184.62 113.99 A 82.0 26.0 0 0 0 63.04 111.30 Z" fill="#1E3A5C"/>
+        <circle cx="120.0" cy="118.0" r="44.0" fill="url(#core-h)"/>
+        <path d="M 117.14 125.98 A 82.0 26.0 0 0 1 38.00 100.00 L 38.00 152.00 A 82.0 26.0 0 0 0 117.14 177.98 Z" fill="#2BB673"/>
+        <path d="M 200.21 91.41 A 82.0 26.0 0 0 1 134.24 111.61 L 134.24 163.61 A 82.0 26.0 0 0 0 200.21 143.41 Z" fill="#1E3A5C"/>
       </svg>
       DryDocs
     </a>
@@ -136,26 +141,27 @@
     <!-- hub graphic: red core + orbit shells + 8 module spokes (same links as
          the console landing — spoke click = module route) -->
     <svg class="hub" viewBox="0 0 520 420" role="img" aria-label="Module hub">
-      <defs>
-        <radialGradient id="core" cx="38%" cy="32%">
-          <stop offset="0%" stop-color="#e4525d"/>
-          <stop offset="55%" stop-color="#c8202e"/>
-          <stop offset="100%" stop-color="#7d1220"/>
-        </radialGradient>
-      </defs>
       <!-- faint mesh -->
       <g stroke="#203045" stroke-width="1" opacity=".7">
         <ellipse cx="260" cy="210" rx="215" ry="150" fill="none"/>
         <ellipse cx="260" cy="210" rx="150" ry="105" fill="none"/>
       </g>
-      <!-- orbit shells around the core -->
-      <g fill="none" stroke-width="7" stroke-linecap="round" opacity=".9">
-        <path d="M 200 165 A 78 62 0 0 1 300 148" stroke="#d9b831"/>
-        <path d="M 328 178 A 74 66 0 0 1 330 250" stroke="#3aae6b"/>
-        <path d="M 302 272 A 80 60 0 0 1 205 262" stroke="#2ab3a6"/>
-        <path d="M 186 240 A 72 66 0 0 1 184 182" stroke="#2e6bc4"/>
+      <!-- Kept Orbit mark, full variant (generated geometry — UI-WIP/drydocs-mark.svg) -->
+      <g transform="translate(260 210) scale(0.82) translate(-120 -118)">
+        <defs><radialGradient id="core" cx="36%" cy="30%" r="75%"><stop offset="0%" stop-color="#F0737E"/><stop offset="52%" stop-color="#C8202E"/><stop offset="100%" stop-color="#701020"/></radialGradient><linearGradient id="g-yellow-back" x1="0" y1="0" x2="0.35" y2="1"><stop offset="0%" stop-color="#E8C63F"/><stop offset="100%" stop-color="#B8952A"/></linearGradient><linearGradient id="g-navy-back" x1="0" y1="0" x2="0.35" y2="1"><stop offset="0%" stop-color="#1E3A5C"/><stop offset="100%" stop-color="#0F2138"/></linearGradient><linearGradient id="g-blue-back" x1="0" y1="0" x2="0.35" y2="1"><stop offset="0%" stop-color="#4D8BE0"/><stop offset="100%" stop-color="#2B5CA8"/></linearGradient><linearGradient id="g-green-front" x1="0" y1="0" x2="0.35" y2="1"><stop offset="0%" stop-color="#2BB673"/><stop offset="100%" stop-color="#177A4B"/></linearGradient><linearGradient id="g-navy-front" x1="0" y1="0" x2="0.35" y2="1"><stop offset="0%" stop-color="#1E3A5C"/><stop offset="100%" stop-color="#0F2138"/></linearGradient></defs>
+        <path d="M 41.18 76.83 A 82.0 26.0 0 0 1 63.04 65.30 L 63.04 105.30 A 82.0 26.0 0 0 0 41.18 116.83 Z" fill="url(#g-yellow-back)"/>
+        <path d="M 41.80 76.18 A 82.0 26.0 0 0 1 61.51 65.78 L 61.51 68.78 A 82.0 26.0 0 0 0 41.80 79.18 Z" fill="#fff" opacity="0.14"/>
+        <path d="M 70.65 53.24 A 82.0 26.0 0 0 1 143.97 49.14 L 143.97 107.14 A 82.0 26.0 0 0 0 70.65 111.24 Z" fill="url(#g-navy-back)"/>
+        <path d="M 72.38 52.83 A 82.0 26.0 0 0 1 141.91 48.95 L 141.91 51.95 A 82.0 26.0 0 0 0 72.38 55.83 Z" fill="#fff" opacity="0.14"/>
+        <path d="M 153.35 64.25 A 82.0 26.0 0 0 1 197.99 79.97 L 197.99 119.97 A 82.0 26.0 0 0 0 153.35 104.25 Z" fill="url(#g-blue-back)"/>
+        <path d="M 155.30 64.53 A 82.0 26.0 0 0 1 197.30 79.32 L 197.30 82.32 A 82.0 26.0 0 0 0 155.30 67.53 Z" fill="#fff" opacity="0.14"/>
+        <circle cx="120.0" cy="118.0" r="40.0" fill="url(#core)"/>
+        <ellipse cx="107.0" cy="102.0" rx="12" ry="8" fill="#fff" opacity="0.28"/>
+        <path d="M 112.85 123.90 A 82.0 26.0 0 0 1 38.05 98.91 L 38.05 154.91 A 82.0 26.0 0 0 0 112.85 179.90 Z" fill="url(#g-green-front)"/>
+        <path d="M 110.72 123.83 A 82.0 26.0 0 0 1 38.15 99.59 L 38.15 102.59 A 82.0 26.0 0 0 0 110.72 126.83 Z" fill="#fff" opacity="0.16"/>
+        <path d="M 200.99 88.07 A 82.0 26.0 0 0 1 137.05 109.43 L 137.05 165.43 A 82.0 26.0 0 0 0 200.99 144.07 Z" fill="url(#g-navy-front)"/>
+        <path d="M 200.63 88.74 A 82.0 26.0 0 0 1 139.14 109.28 L 139.14 112.28 A 82.0 26.0 0 0 0 200.63 91.74 Z" fill="#fff" opacity="0.16"/>
       </g>
-      <circle cx="260" cy="210" r="46" fill="url(#core)"/>
       <!-- spokes: one per console module, clockwise from 12 o'clock -->
       <g font-family="'IBM Plex Sans','Segoe UI',sans-serif" font-size="13" text-anchor="middle">
         <!-- lines first -->
