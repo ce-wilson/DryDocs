@@ -2352,7 +2352,7 @@ items:
     agent: main
     model: sonnet
     priority: p2
-    status: todo
+    status: done                                     # 2026-07-21 pm — D6 either/or DECIDED: RELOCATED to docs/design/drydocs-mapping-demo-runbook.md (joins the *-runbook.md validation sweep + the Epic L render pipeline; decision recorded in the doc's front-matter). Conforms to runbook.outline.yaml (doc_outline passes); all 8 required anchors authored; content preserved + refreshed (5-domain verify incl. the O24 seal-contact-override, stale feat/mapping-store branch ref dropped, rollback section = derived-file story); classification Internal-Public; the 2 referencing docs re-pointed + re-rendered; outline sweep 17 green.
     depends_on: [L8]
     inputs: [docs/runbook-mapping-demo.md, docs/design/templates/runbook.outline.yaml, docs/design/drydocs-startup-refresh-runbook.md, drydocs/doc_outline.py, scripts/render_design_doc.py]
     acceptance: >
@@ -4957,8 +4957,8 @@ items:
       generator's home); zero api surface.
 
 summary:
-  todo: 21                                         # -L12 done (governed-render-fidelity rule in CLAUDE.md); -C11 done; +G18..G25 rua-ingest phase (2026-07-21)
+  todo: 20                                         # -L14 done (mapping-demo runbook refit + relocated); -L12, -C11 done; +G18..G25 rua-ingest phase (2026-07-21)
   in_progress: 1                                   # E1 (gate deferred both sides)
   blocked: 0
-  done: 118                                        # +L12 governed-render-fidelity rule documented 2026-07-21 pm; +C11, +G17, +O25 same day
-  next_ready: [L9, L14, L15, M2, M3, M4, P3, J10, Q6, O23, J13, G18, G19]
+  done: 119                                        # +L14 2nd runbook exemplar conforms + relocated 2026-07-21 pm; +L12, +C11, +G17, +O25 same day
+  next_ready: [L9, L15, M2, M3, M4, P3, J10, Q6, O23, J13, G18, G19]

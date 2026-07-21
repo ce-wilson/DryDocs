@@ -11,7 +11,7 @@ shown by the console is SYNTHESIZED; real SIDs/schemas live company-side. ·
 and the SME reviewing the console's access-path and stewardship mechanics. ·
 **Companion:** `docs/decisions/0005-browser-neo4j-access-path.md` (the governing ADR);
 `docs/design/drydocs-project-tdd.md` (the platform frame); `UI-WIP/site-plan.md` (the
-successor design); `docs/runbook-mapping-demo.md` (start the demo);
+successor design); `docs/design/drydocs-mapping-demo-runbook.md` (start the demo);
 `knowledge/upgrade-plans/mapping-store-plan-2026-07-17.md` (the M0–M4 store plan).
 
 Worked example throughout: the admin persona `asmith7734` signs in and opens the Graph

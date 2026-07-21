@@ -14,7 +14,7 @@
 - **Companion:** `docs/design/drydocs-startup-refresh-runbook.md` (the graph itself —
   container, schema, ingest; explicitly out of scope here),
   `docs/design/drydocs-web-console-tdd.md` (architecture), `drydocs_api/README.md`,
-  `docs/runbook-mapping-demo.md` (the O13 `/demo` mapping page)
+  `docs/design/drydocs-mapping-demo-runbook.md` (the O13 `/demo` mapping page)
 
 ---
 
