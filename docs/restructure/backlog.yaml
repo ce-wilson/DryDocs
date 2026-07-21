@@ -4811,7 +4811,7 @@ items:
     agent: main
     model: sonnet
     priority: p2
-    status: todo
+    status: in_progress                              # claimed 2026-07-21 pm (VS Code session) — the O20 SME-3 follow-up build
     depends_on: [O13]
     inputs: [drydocs_api/mappings.py, drydocs_core/mapping_store.py, web/src/routes/MappingsRoute.tsx, drydocs/loaders/cypher/seal_contacts.cypher, drydocs_api/query_specs.py, config/gate-log.md]
     acceptance: >
@@ -4878,8 +4878,8 @@ items:
       generator's home); zero api surface.
 
 summary:
-  todo: 25                                         # +O25 (O20 sign-off follow-up), -O20 done; +G18..G24 rua-ingest phase incl. repo-source seam (2026-07-21)
-  in_progress: 1                                   # E1 (gate deferred both sides)
+  todo: 24                                         # -O24 in_progress (claimed 2026-07-21 pm); +G18..G24 rua-ingest phase incl. repo-source seam (2026-07-21)
+  in_progress: 2                                   # E1 (gate deferred both sides) + O24 (SEAL-contacts override list, VS Code session)
   blocked: 0
   done: 113                                        # +O20 SIGNED OFF 2026-07-21 pm — the Epic O phase-12 chain is COMPLETE
-  next_ready: [L9, L12, L14, L15, M2, M3, M4, P3, J10, Q6, O23, O24, O25, J13, G17, G18, G19, C11]
+  next_ready: [L9, L12, L14, L15, M2, M3, M4, P3, J10, Q6, O23, O25, J13, G17, G18, G19, C11]
