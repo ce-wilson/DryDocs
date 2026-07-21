@@ -26,6 +26,13 @@ Tags help grooming: `idea` · `bug` · `doc` · `source` (new data source) · `q
 
 <!-- add new ideas at the top -->
 
+- 2026-07-21 — [idea] **m7 build follow-up** (from gate `cmdline-nfr-vetting`): migrate
+  payload invocations out of the m3_invokes 1..n fold onto the registered `USES_ARTIFACT`
+  edge + stamp `script_role` {launcher, payload} and the artifact_* properties on :Script.
+  Feed now EXISTS (G16 value-contract facts + G15 launcher properties); groom once the
+  writer's ETLProcess endpoint work makes the edge landable — the vocab entry
+  `m7_uses_artifact` stays `planned` until that build's own flip.
+
 - 2026-07-21 — [idea] **Public marketing-site brand kit** captured in
   `UI-WIP/WEBSITE-IDEAS.MD` (3 logo directions incl. the core+orbit modernization, secondary
   palette, hero/feature/architecture landing structure). This is the PUBLIC SITE
