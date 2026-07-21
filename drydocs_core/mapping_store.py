@@ -19,6 +19,10 @@ Sources materialized (all read-only here):
                                              -> relationship_vocabulary,
                                                 node_classification
 - config/manual-loads/manifest.yaml + CSVs   -> manual_load_file, manual_mapping
+- config/overrides/seal-contact-overrides.csv
+                                             -> seal_contact_override (O24 —
+                                                the ui-write-surface gate's M2
+                                                origin-flagged store)
 
 Manual CSV ingestion reuses the SAME validation chain as the tier-5 loader
 (drydocs_core.manual_mappings — manifest gate, vocabulary check, supported
@@ -56,6 +60,11 @@ from drydocs_core.models import ManualMappingRow
 REPO_ROOT = Path(drydocs_core.__file__).resolve().parent.parent
 DEFAULT_DB_PATH = REPO_ROOT / "var" / "mapping.db"
 ONTOLOGY_MAP_PATH = REPO_ROOT / "config" / "taxonomy-ontology-map.yaml"
+SEAL_CONTACT_OVERRIDES_PATH = (
+    REPO_ROOT / "config" / "overrides" / "seal-contact-overrides.csv"
+)
+_OVERRIDES_META_KEY = "source:config/overrides/seal-contact-overrides.csv"
+_OVERRIDE_STATUSES = ("active", "corrected-in-seal")
 
 SCHEMA_VERSION = "drydocs.mapping-store.v1"
 
@@ -155,6 +164,52 @@ CREATE VIEW v_manual_conflicts AS
   SELECT folder_id, job_id, count(DISTINCT seal_id) AS targets
   FROM manual_mapping GROUP BY folder_id, job_id
   HAVING count(DISTINCT seal_id) > 1;
+
+-- ── O24 SEAL-contact override list (ui-write-surface gate SME-3: the M2
+-- origin-flagged store). Overrides NEVER write the graph and NEVER silently
+-- replace the SEAL value — the captured seal_holder_sid keeps the source
+-- value side by side with the correction.
+CREATE TABLE seal_contact_override (
+  line_no              INTEGER PRIMARY KEY,
+  app_seal_id          TEXT NOT NULL,
+  role_name            TEXT NOT NULL,
+  seal_holder_sid      TEXT,
+  override_holder_sid  TEXT NOT NULL,
+  override_holder_name TEXT,
+  rationale            TEXT NOT NULL,
+  authored_by          TEXT NOT NULL,
+  authored_on          TEXT,
+  status               TEXT NOT NULL
+      CHECK (status IN ('active','corrected-in-seal'))
+);
+
+-- The /mappings grid: every attribution ROW carries an origin flag — the
+-- SEAL source value (as captured at authoring) and the user override render
+-- as adjacent rows, source first, never merged into one.
+CREATE VIEW v_seal_contact_grid AS
+  SELECT app_seal_id, role_name, origin, holder_sid, holder_name,
+         rationale, authored_by, authored_on, status
+  FROM (
+    SELECT app_seal_id, role_name, 'source' AS origin,
+           seal_holder_sid AS holder_sid, NULL AS holder_name,
+           NULL AS rationale, NULL AS authored_by, NULL AS authored_on,
+           status, line_no
+    FROM seal_contact_override WHERE seal_holder_sid IS NOT NULL
+    UNION ALL
+    SELECT app_seal_id, role_name, 'override' AS origin,
+           override_holder_sid, override_holder_name,
+           rationale, authored_by, authored_on, status, line_no
+    FROM seal_contact_override
+  )
+  ORDER BY app_seal_id, role_name, line_no, origin DESC;
+
+-- The source-corrections report feed: outstanding corrections only,
+-- addressed to the application owners (AO privilege fixes SEAL itself).
+CREATE VIEW v_source_corrections AS
+  SELECT app_seal_id, role_name, seal_holder_sid, override_holder_sid,
+         override_holder_name, rationale, authored_by, authored_on
+  FROM seal_contact_override WHERE status = 'active'
+  ORDER BY app_seal_id, role_name, line_no;
 """
 
 _DUMP_ORDER = {
@@ -164,6 +219,7 @@ _DUMP_ORDER = {
     "ontology_mapping": "seq",
     "manual_load_file": "file",
     "manual_mapping": "file, line_no",
+    "seal_contact_override": "line_no",
 }
 
 
@@ -196,6 +252,7 @@ def build(
     ontology_map_path: str | Path = ONTOLOGY_MAP_PATH,
     vocabulary_path: str | Path = VOCABULARY_PATH,
     manifest_path: str | Path = MANIFEST_PATH,
+    overrides_path: str | Path | None = None,
 ) -> sqlite3.Connection:
     """Build the materialization from the committed sources. Existing file at
     ``db_path`` is replaced (it is derived; the sources are the truth)."""
@@ -210,16 +267,21 @@ def build(
     ontology_map_path = Path(ontology_map_path)
     vocabulary_path = Path(vocabulary_path)
     manifest_path = Path(manifest_path)
+    # None resolves at CALL time (not def time) so tests can monkeypatch the
+    # module constant to point the whole read chain at a fixture list.
+    overrides_path = Path(overrides_path or SEAL_CONTACT_OVERRIDES_PATH)
 
     _ingest_vocabulary(conn, vocabulary_path)
     _ingest_ontology_map(conn, ontology_map_path)
     csv_hashes = _ingest_manual_loads(conn, manifest_path, vocabulary_path)
+    _ingest_seal_overrides(conn, overrides_path)
 
     meta = {
         "schema_version": SCHEMA_VERSION,
         "source:taxonomy-ontology-map.yaml": _sha256(ontology_map_path),
         "source:relationship_vocabulary.yaml": _sha256(vocabulary_path),
         "source:manual-loads/manifest.yaml": _sha256(manifest_path),
+        _OVERRIDES_META_KEY: _sha256(overrides_path),
         **csv_hashes,
     }
     conn.executemany("INSERT INTO meta (key, value) VALUES (?, ?)", sorted(meta.items()))
@@ -238,6 +300,7 @@ def source_hashes(
     ontology_map_path: str | Path = ONTOLOGY_MAP_PATH,
     vocabulary_path: str | Path = VOCABULARY_PATH,
     manifest_path: str | Path = MANIFEST_PATH,
+    overrides_path: str | Path | None = None,
 ) -> dict[str, str]:
     """The meta rows a build() from these sources WOULD store, computed without
     building — staleness detection is then one dict comparison (is_current).
@@ -245,11 +308,13 @@ def source_hashes(
     ontology_map_path = Path(ontology_map_path)
     vocabulary_path = Path(vocabulary_path)
     manifest_path = Path(manifest_path)
+    overrides_path = Path(overrides_path or SEAL_CONTACT_OVERRIDES_PATH)
     expected = {
         "schema_version": SCHEMA_VERSION,
         "source:taxonomy-ontology-map.yaml": _hash_source(ontology_map_path),
         "source:relationship_vocabulary.yaml": _hash_source(vocabulary_path),
         "source:manual-loads/manifest.yaml": _hash_source(manifest_path),
+        _OVERRIDES_META_KEY: _hash_source(overrides_path),
     }
     manifest = _load_yaml(manifest_path)
     repo_root = manifest_path.resolve().parents[2]
@@ -267,6 +332,7 @@ def is_current(
     ontology_map_path: str | Path = ONTOLOGY_MAP_PATH,
     vocabulary_path: str | Path = VOCABULARY_PATH,
     manifest_path: str | Path = MANIFEST_PATH,
+    overrides_path: str | Path | None = None,
 ) -> bool:
     """Whether the materialization at ``db_path`` matches the committed sources
     EXACTLY: same schema version, same source set (added/removed manifest files
@@ -288,6 +354,7 @@ def is_current(
         ontology_map_path=ontology_map_path,
         vocabulary_path=vocabulary_path,
         manifest_path=manifest_path,
+        overrides_path=overrides_path,
     )
 
 
@@ -373,6 +440,61 @@ def _ingest_manual_loads(
                  row.authored_on, row.note),
             )
     return hashes
+
+
+def _ingest_seal_overrides(conn: sqlite3.Connection, path: Path) -> None:
+    """Ingest the committed SEAL-contact override list (O24). Validation fails
+    loudly per row: the file is steward-authored, so a bad row is a mistake to
+    fix at the source, never something to guess around. Role names must
+    canonicalize to the SEAL role vocabulary; an override that EQUALS the
+    captured SEAL value is refused (it is not a correction)."""
+    from drydocs_core.models.seal import canonicalize_role
+
+    if not path.exists():
+        raise MappingStoreError(f"mapping-store source not found: {path}")
+    with path.open(encoding="utf-8", newline="") as fh:
+        reader = csv.DictReader(fh)
+        for line_no, raw in enumerate(reader, start=2):
+            where = f"{path.name} line {line_no}"
+            app = _text(raw.get("app_seal_id"))
+            role = canonicalize_role(raw.get("role_name"))
+            seal_sid = _text(raw.get("seal_holder_sid"))
+            override_sid = _text(raw.get("override_holder_sid"))
+            rationale = _text(raw.get("rationale"))
+            authored_by = _text(raw.get("authored_by"))
+            status = _text(raw.get("status")) or "active"
+            if not app:
+                raise MappingStoreError(f"{where}: app_seal_id is required")
+            if role is None:
+                raise MappingStoreError(
+                    f"{where}: role_name {raw.get('role_name')!r} does not "
+                    "canonicalize to a SEAL role"
+                )
+            if not override_sid:
+                raise MappingStoreError(f"{where}: override_holder_sid is required")
+            if seal_sid == override_sid:
+                raise MappingStoreError(
+                    f"{where}: override equals the captured SEAL value — not a correction"
+                )
+            if not rationale:
+                raise MappingStoreError(
+                    f"{where}: rationale is REQUIRED — it is the source-corrections "
+                    "report's justification column"
+                )
+            if not authored_by:
+                raise MappingStoreError(f"{where}: authored_by is required")
+            if status not in _OVERRIDE_STATUSES:
+                raise MappingStoreError(
+                    f"{where}: status {status!r} not in {_OVERRIDE_STATUSES}"
+                )
+            conn.execute(
+                "INSERT INTO seal_contact_override (line_no, app_seal_id, role_name, "
+                "seal_holder_sid, override_holder_sid, override_holder_name, rationale, "
+                "authored_by, authored_on, status) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+                (line_no, app, role, seal_sid, override_sid,
+                 _text(raw.get("override_holder_name")), rationale, authored_by,
+                 _text(raw.get("authored_on")), status),
+            )
 
 
 # ---------------------------------------------------------------------------

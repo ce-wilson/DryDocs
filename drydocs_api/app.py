@@ -37,9 +37,11 @@ from drydocs_api.mappings import (
     MappingStore,
     UnknownDomainError,
     draft_changeset,
+    draft_override,
     list_domains,
     mapping_grid,
     mapping_options,
+    source_corrections_report,
 )
 from drydocs_api.personas import UnknownPersonaError
 from drydocs_api.queries import NAMED_QUERIES, ParamValidationError, UnknownQueryError
@@ -301,6 +303,25 @@ def create_app(runner=None, store: InMemorySessionStore | None = None):
     ) -> dict[str, object]:
         return _mapping_call(
             draft_changeset, body.entries, _token(authorization), sessions, mapping_store
+        )
+
+    # ── O24 SEAL-contact overrides (ui-write-surface gate SME-3, M2 tier):
+    # drafting returns the UPDATED committed file; the report is the AO-facing
+    # source-corrections artifact. The server still writes nothing. ──
+    @app.post("/mappings/overrides/draft")
+    def post_override_draft(
+        body: ChangesetBody, authorization: str | None = Header(default=None)
+    ) -> dict[str, object]:
+        return _mapping_call(
+            draft_override, body.entries, _token(authorization), sessions, mapping_store
+        )
+
+    @app.get("/mappings/overrides/report")
+    def get_override_report(
+        authorization: str | None = Header(default=None)
+    ) -> dict[str, object]:
+        return _mapping_call(
+            source_corrections_report, _token(authorization), sessions, mapping_store
         )
 
     # Dev-mode demo page (same-origin, so no CORS surface): the live-data twin

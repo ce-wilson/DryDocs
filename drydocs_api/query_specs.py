@@ -236,6 +236,38 @@ QUERY_SPECS: dict[str, QuerySpec] = {
             params=_LIMIT,
         ),
         QuerySpec(
+            id="mappings.seal-contact-roles.v1",
+            database="drydocs",
+            description=(
+                "O24 override-list source rows: the LIVE SEAL operate-manager "
+                "attributions (L1/L2) as loaded by seal_contacts.v1 — the K4 "
+                "qualified-attribution shape (Attribution + HAD_ROLE -> TOMRole, "
+                "HAS_AGENT -> Employee). These are the origin='source' rows the "
+                "/mappings seal-contact-override grid pairs with the committed "
+                "user overrides; the graph is never written by an override."
+            ),
+            cypher=(
+                "MATCH (a:BusinessApplication)-[:QUALIFIED_ATTRIBUTION]->(m:Attribution) "
+                "WHERE m.role_source_name IN ['L1 Operate Manager', 'L2 Operate Manager'] "
+                "AND m.valid_to IS NULL "
+                "OPTIONAL MATCH (m)-[:HAS_AGENT]->(e:Employee) "
+                "RETURN a.seal_id AS app_seal_id, a.name AS application, "
+                "m.role_source_name AS role_name, m.level AS level, "
+                "e.employee_id AS holder_sid, e.full_name AS holder_name "
+                "ORDER BY app_seal_id, role_name LIMIT $limit"
+            ),
+            columns=(
+                ColumnDef("app_seal_id", "string", "SEAL id"),
+                ColumnDef("application", "string", "Application"),
+                ColumnDef("role_name", "string", "Role"),
+                ColumnDef("level", "string", "Level"),
+                ColumnDef("holder_sid", "string", "Holder SID"),
+                ColumnDef("holder_name", "string", "Holder"),
+            ),
+            classification="internal",
+            params=_LIMIT,
+        ),
+        QuerySpec(
             id="explorer.servers.v1",
             database="drydocs",
             description="Control-M servers for the Explorer Servers frame.",

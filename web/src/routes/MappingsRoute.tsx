@@ -7,9 +7,11 @@ import {
   type MappingDomain,
   type MappingGrid,
   type MappingOptions,
+  type MappingsApi,
+  type OverrideEntry,
 } from '../lib/mappingsApi'
 import type { SpecResult } from '../lib/graph'
-import { DEMO_COVERAGE, type CoverageRow } from '../data/mappingsDemo'
+import { DEMO_COVERAGE, DEMO_OVERRIDE_GRID, type CoverageRow, type OverrideGridRow } from '../data/mappingsDemo'
 import ModuleToolbar from '../layout/ModuleToolbar'
 import EmptyState from '../components/ui/EmptyState'
 
@@ -46,6 +48,7 @@ const FALLBACK_DOMAINS: MappingDomain[] = [
   { id: 'job-application', title: 'Job → Application (tier-5 manual CSV)', kind: 'manual', source: 'config/manual-loads/', tier: 5, available: true },
   { id: 'fid-seal', title: 'FID → seal_id (tier 2)', kind: 'manual', source: '(K6/T2 — reconciler table not built yet)', tier: 2, available: false },
   { id: 'alias-seal', title: 'ALIAS → seal_id (tier 4)', kind: 'manual', source: '(T3 — reconciler table not built yet)', tier: 4, available: false },
+  { id: 'seal-contact-override', title: 'SEAL contacts — operate-manager override list (L1/L2)', kind: 'override', source: 'config/overrides/seal-contact-overrides.csv', tier: null, available: true },
 ]
 
 function trayStorageKey(personaId: string): string {
@@ -79,7 +82,11 @@ export default function MappingsRoute({ persona }: { persona: Persona }) {
 
   const [apiDown, setApiDown] = useState<string | null>(null)
   const [domains, setDomains] = useState<MappingDomain[]>(FALLBACK_DOMAINS)
-  const [activeDomain, setActiveDomain] = useState('job-application')
+  // ?domain= deep-links a specific strip tab (e.g. /mappings?domain=seal-contact-override)
+  const [activeDomain, setActiveDomain] = useState(() => {
+    const wanted = new URLSearchParams(window.location.search).get('domain')
+    return FALLBACK_DOMAINS.some((d) => d.id === wanted && d.available) ? wanted! : 'job-application'
+  })
   const [options, setOptions] = useState<MappingOptions | null>(null)
 
   // coverage grid (job-application domain)
@@ -432,6 +439,13 @@ export default function MappingsRoute({ persona }: { persona: Persona }) {
                 <DomainGridTable grid={domainGrid} apiDown={apiDown} />
               </details>
             </>
+          ) : activeDomain === 'seal-contact-override' ? (
+            <SealOverridePane
+              mappings={mappings}
+              access={access}
+              grid={domainGrid}
+              apiDown={apiDown}
+            />
           ) : (
             <>
               <p className="shrink-0 text-[11px] text-muted">
@@ -588,6 +602,347 @@ function DomainGridTable({ grid, apiDown }: { grid: MappingGrid | null; apiDown:
           ))}
         </tbody>
       </table>
+    </div>
+  )
+}
+
+// ── O24 SEAL-contact override pane (ui-write-surface gate SME-3, M2 tier) ──
+// SEAL says one thing, the support team knows another, and only the
+// application owner (AO privilege) can fix SEAL. Every row carries an ORIGIN
+// flag; source and override render side by side, never merged. Drafting
+// returns the COMPLETE updated committed file (commit-by-replace); the
+// source-corrections report is the artifact that carries the fix request to
+// the AOs. Zero graph writes, zero server writes.
+
+const SEAL_ROLES_SPEC = 'mappings.seal-contact-roles.v1'
+
+interface SealRoleRow {
+  app_seal_id: string
+  application: string | null
+  role_name: string
+  level: string | null
+  holder_sid: string | null
+  holder_name: string | null
+}
+
+function SealOverridePane({
+  mappings,
+  access,
+  grid,
+  apiDown,
+}: {
+  mappings: MappingsApi
+  access: ReturnType<typeof createApiAccess>
+  grid: MappingGrid | null
+  apiDown: string | null
+}) {
+  // live SEAL attributions from the graph (the origin='source' rows the
+  // committed list may not have captured yet)
+  const [liveSource, setLiveSource] = useState<SealRoleRow[] | null>(null)
+  const [drafts, setDrafts] = useState<OverrideEntry[]>([])
+  const [dialogSeed, setDialogSeed] = useState<Partial<OverrideEntry> | null>(null)
+  const [status, setStatus] = useState('')
+
+  useEffect(() => {
+    let cancelled = false
+    access
+      .runSpec(SEAL_ROLES_SPEC)
+      .then((r: SpecResult) => {
+        if (!cancelled) setLiveSource(r.rows as unknown as SealRoleRow[])
+      })
+      .catch(() => {
+        if (!cancelled) setLiveSource([])
+      })
+    return () => {
+      cancelled = true
+    }
+  }, [access])
+
+  // one origin-flagged row list: committed grid rows (store) + live graph
+  // attributions not already captured as a source row for that (app, role)
+  const rows: OverrideGridRow[] = useMemo(() => {
+    const isDemo = apiDown !== null && grid === null
+    const stored: OverrideGridRow[] = isDemo
+      ? [...DEMO_OVERRIDE_GRID]
+      : ((grid?.rows ?? []) as unknown as OverrideGridRow[])
+    const covered = new Set(
+      stored.filter((r) => r.origin === 'source').map((r) => `${r.app_seal_id}|${r.role_name}`),
+    )
+    const live: OverrideGridRow[] = (liveSource ?? [])
+      .filter((s) => !covered.has(`${s.app_seal_id}|${s.role_name}`))
+      .map((s) => ({
+        app_seal_id: s.app_seal_id,
+        role_name: s.role_name,
+        origin: 'source' as const,
+        holder_sid: s.holder_sid,
+        holder_name: s.holder_name,
+        rationale: null,
+        authored_by: null,
+        authored_on: null,
+        status: 'active' as const,
+      }))
+    return [...stored, ...live].sort(
+      (a, b) =>
+        a.app_seal_id.localeCompare(b.app_seal_id) ||
+        a.role_name.localeCompare(b.role_name) ||
+        (a.origin === b.origin ? 0 : a.origin === 'source' ? -1 : 1),
+    )
+  }, [grid, apiDown, liveSource])
+
+  const demo = apiDown !== null && grid === null
+
+  async function downloadUpdatedList() {
+    if (drafts.length === 0) return
+    setStatus('drafting…')
+    try {
+      const art = await mappings.draftOverride(drafts)
+      download(art.filename, art.csv, 'text/csv')
+      setDrafts([])
+      setStatus(
+        `updated override list downloaded (${art.entries} new, ${art.total_rows} total) — replace ${'config/overrides/seal-contact-overrides.csv'} and commit; the server wrote NOTHING`,
+      )
+    } catch (e) {
+      setStatus(`draft failed: ${(e as Error).message}`)
+    }
+  }
+
+  async function downloadReport() {
+    setStatus('generating report…')
+    try {
+      const rep = await mappings.correctionsReport()
+      download(rep.filename, rep.markdown, 'text/markdown')
+      setStatus(`source-corrections report downloaded (${rep.count} outstanding) — for the application owners (AO privilege fixes SEAL)`)
+    } catch (e) {
+      setStatus(`report failed: ${(e as Error).message}`)
+    }
+  }
+
+  return (
+    <>
+      <p className="shrink-0 rounded border border-red/60 bg-red/10 px-2 py-1 font-mono text-[10px] text-brand-soft">
+        INTERNAL — contact attributions (PUBLISH-BOUNDARY.md)
+      </p>
+      <div className="flex shrink-0 flex-wrap items-center gap-1.5">
+        <span className="font-mono text-[10px] text-faint">
+          {rows.length} rows · {demo ? 'SYNTHESIZED demo' : 'mapping.db + live graph'}
+        </span>
+        <span className="text-[10px] text-faint">
+          origin-flagged: SEAL source and user override side by side — an override never replaces the SEAL value
+        </span>
+        <button
+          type="button"
+          onClick={() => setDialogSeed({})}
+          className="ml-auto rounded-md border border-brand bg-panel-2 px-2.5 py-1 text-xs font-medium text-text"
+        >
+          New override…
+        </button>
+        <button
+          type="button"
+          onClick={downloadReport}
+          disabled={demo}
+          title="Markdown artifact for the application owners — only the AO privilege can fix SEAL itself"
+          className="rounded-md border border-edge bg-bg-2 px-2.5 py-1 text-xs font-medium text-muted hover:text-text disabled:cursor-not-allowed disabled:text-faint"
+        >
+          Source-corrections report
+        </button>
+      </div>
+
+      {rows.length === 0 ? (
+        <EmptyState
+          title="No attributions or overrides yet"
+          hint="Live SEAL operate-manager attributions and committed overrides both appear here, origin-flagged."
+        />
+      ) : (
+        <div className="min-h-0 flex-1 overflow-auto rounded-md border border-edge">
+          <table className="w-full border-collapse text-left text-xs">
+            <thead className="sticky top-0 bg-panel-2">
+              <tr>
+                {['Application', 'Role', 'Origin', 'Holder', 'Rationale', 'Authored', 'Status', ''].map((h, i) => (
+                  <th key={i} className="border-b border-edge px-2.5 py-1.5 font-semibold text-muted">
+                    {h}
+                  </th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {rows.map((r, i) => (
+                <tr key={i} className={i % 2 ? 'bg-bg-2/40' : ''}>
+                  <td className="border-b border-edge-soft px-2.5 py-1.5 font-mono text-[11px] text-text">{r.app_seal_id}</td>
+                  <td className="border-b border-edge-soft px-2.5 py-1.5 text-text">{r.role_name}</td>
+                  <td className="border-b border-edge-soft px-2.5 py-1.5">
+                    <OriginChip origin={r.origin} />
+                  </td>
+                  <td className="border-b border-edge-soft px-2.5 py-1.5 font-mono text-[11px] text-text">
+                    {r.holder_sid ?? '—'}
+                    {r.holder_name ? ` · ${r.holder_name}` : ''}
+                  </td>
+                  <td className="border-b border-edge-soft px-2.5 py-1.5 text-[11px] text-muted">{r.rationale ?? ''}</td>
+                  <td className="border-b border-edge-soft px-2.5 py-1.5 font-mono text-[10px] text-faint">
+                    {[r.authored_by, r.authored_on].filter(Boolean).join(' ')}
+                  </td>
+                  <td className="border-b border-edge-soft px-2.5 py-1.5 font-mono text-[10px] text-faint">
+                    {r.origin === 'override' ? r.status : ''}
+                  </td>
+                  <td className="border-b border-edge-soft px-2 py-1.5">
+                    {r.origin === 'source' && (
+                      <button
+                        type="button"
+                        title="Draft a correction for this SEAL value"
+                        onClick={() =>
+                          setDialogSeed({
+                            app_seal_id: r.app_seal_id,
+                            role_name: r.role_name,
+                            seal_holder_sid: r.holder_sid ?? '',
+                          })
+                        }
+                        className="rounded border border-edge px-1.5 py-0.5 text-[10px] text-muted hover:text-text"
+                      >
+                        override…
+                      </button>
+                    )}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
+
+      {drafts.length > 0 && (
+        <div className="flex shrink-0 items-center gap-2 rounded-md border border-edge-soft bg-bg-2/40 p-2">
+          <span className="text-[11px] text-muted">
+            {drafts.length} draft override{drafts.length === 1 ? '' : 's'}:{' '}
+            <span className="font-mono text-[10px]">
+              {drafts.map((d) => `${d.app_seal_id}/${d.role_name}→${d.override_holder_sid}`).join(', ')}
+            </span>
+          </span>
+          <button
+            type="button"
+            onClick={downloadUpdatedList}
+            disabled={demo}
+            title="Downloads the COMPLETE updated override list — replace the committed file and commit"
+            className="ml-auto rounded-md border border-brand bg-panel-2 px-2.5 py-1 text-xs font-semibold text-text disabled:cursor-not-allowed disabled:border-edge disabled:text-faint"
+          >
+            Download updated override list
+          </button>
+          <button
+            type="button"
+            onClick={() => setDrafts([])}
+            className="rounded border border-edge px-1.5 py-0.5 text-[10px] text-muted hover:text-text"
+          >
+            clear
+          </button>
+        </div>
+      )}
+      {status && <p className="shrink-0 font-mono text-[10px] text-muted">{status}</p>}
+
+      {dialogSeed && (
+        <OverrideDialog
+          seed={dialogSeed}
+          onCancel={() => setDialogSeed(null)}
+          onDraft={(entry) => {
+            setDrafts((prev) => [...prev, entry])
+            setDialogSeed(null)
+            setStatus(`override drafted for ${entry.app_seal_id} / ${entry.role_name}`)
+          }}
+        />
+      )}
+    </>
+  )
+}
+
+function OriginChip({ origin }: { origin: OverrideGridRow['origin'] }) {
+  return origin === 'source' ? (
+    <span className="rounded border border-edge px-1.5 py-0.5 font-mono text-[10px] text-muted">source (SEAL)</span>
+  ) : (
+    <span className="rounded border border-brand px-1.5 py-0.5 font-mono text-[10px] text-text">user override</span>
+  )
+}
+
+function OverrideDialog({
+  seed,
+  onCancel,
+  onDraft,
+}: {
+  seed: Partial<OverrideEntry>
+  onCancel: () => void
+  onDraft: (entry: OverrideEntry) => void
+}) {
+  const [app, setApp] = useState(seed.app_seal_id ?? '')
+  const [role, setRole] = useState(seed.role_name ?? 'L2 Operate Manager')
+  const [sealSid, setSealSid] = useState(seed.seal_holder_sid ?? '')
+  const [sid, setSid] = useState('')
+  const [name, setName] = useState('')
+  const [rationale, setRationale] = useState('')
+
+  const notACorrection = sealSid.trim() !== '' && sealSid.trim() === sid.trim()
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50" role="dialog" aria-modal="true" aria-label="Draft SEAL-contact override">
+      <div className="w-[28rem] max-w-[90vw] rounded-lg border border-edge bg-panel p-4 shadow-xl">
+        <h3 className="text-sm font-semibold text-text">Draft a SEAL-contact override</h3>
+        <p className="mt-1 rounded border border-edge-soft bg-bg-2/40 p-2 text-[11px] text-muted">
+          The override is kept <strong>side by side</strong> with the SEAL value — it never replaces it and never
+          writes the graph. Only the application owner (<strong>AO privilege</strong>) can fix SEAL; the
+          source-corrections report carries this request to them.
+        </p>
+
+        <label className="mt-3 block text-xs font-medium text-muted">
+          Application seal_id
+          <input type="text" value={app} onChange={(e) => setApp(e.target.value)} placeholder="APP-…" className="mt-1 w-full font-mono text-xs" />
+        </label>
+        <label className="mt-2 block text-xs font-medium text-muted">
+          Role
+          <select value={role} onChange={(e) => setRole(e.target.value)} className="mt-1 w-full rounded-md border border-edge bg-bg-2 p-1.5 text-xs text-text">
+            <option>L1 Operate Manager</option>
+            <option>L2 Operate Manager</option>
+          </select>
+        </label>
+        <label className="mt-2 block text-xs font-medium text-muted">
+          SEAL currently shows (holder SID — leave empty if nobody is assigned)
+          <input type="text" value={sealSid} onChange={(e) => setSealSid(e.target.value)} className="mt-1 w-full font-mono text-xs" />
+        </label>
+        <label className="mt-2 block text-xs font-medium text-muted">
+          Correct holder SID
+          <input type="text" value={sid} onChange={(e) => setSid(e.target.value)} className="mt-1 w-full font-mono text-xs" />
+        </label>
+        <label className="mt-2 block text-xs font-medium text-muted">
+          Correct holder name (optional)
+          <input type="text" value={name} onChange={(e) => setName(e.target.value)} className="mt-1 w-full text-xs" />
+        </label>
+        <label className="mt-2 block text-xs font-medium text-muted">
+          Rationale <span className="text-brand-soft">(required — becomes the report's justification column)</span>
+          <textarea value={rationale} onChange={(e) => setRationale(e.target.value)} rows={2} className="mt-1 w-full rounded-md border border-edge bg-bg-2 p-1.5 text-xs text-text" />
+        </label>
+        {notACorrection && (
+          <p className="mt-1.5 rounded border border-yellow/50 bg-yellow/10 p-2 text-[11px] text-yellow">
+            The override equals the SEAL value — that is not a correction.
+          </p>
+        )}
+
+        <div className="mt-3 flex justify-end gap-2">
+          <button type="button" onClick={onCancel} className="rounded-md border border-edge bg-bg-2 px-2.5 py-1 text-xs font-medium text-muted hover:text-text">
+            Cancel
+          </button>
+          <button
+            type="button"
+            disabled={!app.trim() || !sid.trim() || !rationale.trim() || notACorrection}
+            onClick={() =>
+              onDraft({
+                app_seal_id: app.trim(),
+                role_name: role,
+                seal_holder_sid: sealSid.trim() || undefined,
+                override_holder_sid: sid.trim(),
+                override_holder_name: name.trim() || undefined,
+                rationale: rationale.trim(),
+              })
+            }
+            className="rounded-md border border-brand bg-panel-2 px-2.5 py-1 text-xs font-semibold text-text disabled:cursor-not-allowed disabled:border-edge disabled:text-faint"
+          >
+            Draft override
+          </button>
+        </div>
+      </div>
     </div>
   )
 }

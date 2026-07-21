@@ -15,6 +15,27 @@ export interface CoverageRow {
   status: 'resolved' | 'unresolved' | 'conflict'
 }
 
+// O24 seal-contact-override grid rows (mirror of v_seal_contact_grid: the
+// SEAL source value and the user override arrive as ADJACENT origin-flagged
+// rows, source first). Synthetic values only.
+export interface OverrideGridRow {
+  app_seal_id: string
+  role_name: string
+  origin: 'source' | 'override'
+  holder_sid: string | null
+  holder_name: string | null
+  rationale: string | null
+  authored_by: string | null
+  authored_on: string | null
+  status: 'active' | 'corrected-in-seal'
+}
+
+export const DEMO_OVERRIDE_GRID: readonly OverrideGridRow[] = [
+  { app_seal_id: 'APP-1234', role_name: 'L2 Operate Manager', origin: 'source', holder_sid: 'U111111', holder_name: null, rationale: null, authored_by: null, authored_on: null, status: 'active' },
+  { app_seal_id: 'APP-1234', role_name: 'L2 Operate Manager', origin: 'override', holder_sid: 'U222222', holder_name: 'Sam Steward', rationale: 'person left the team', authored_by: 'kchen2190', authored_on: '2026-07-21', status: 'active' },
+  { app_seal_id: 'APP-2222', role_name: 'L1 Operate Manager', origin: 'override', holder_sid: 'U333333', holder_name: null, rationale: 'role unassigned in SEAL', authored_by: 'kchen2190', authored_on: '2026-07-21', status: 'active' },
+]
+
 export const DEMO_COVERAGE: readonly CoverageRow[] = [
   {
     folder: 'PRARAG-DAILY',

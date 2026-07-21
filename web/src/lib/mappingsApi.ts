@@ -10,7 +10,7 @@ import { createApiClient, readDetail, type ApiClient } from './graphApi'
 export interface MappingDomain {
   id: string
   title: string
-  kind: 'quintuple' | 'manual'
+  kind: 'quintuple' | 'manual' | 'override'
   source: string
   tier: number | null
   available: boolean
@@ -45,11 +45,42 @@ export interface ChangesetArtifact {
   note: string
 }
 
+// O24 — SEAL-contact overrides (ui-write-surface gate SME-3, M2 tier).
+// Drafting returns the COMPLETE updated committed file (commit-by-replace);
+// the report is the AO-facing source-corrections artifact. Server writes
+// nothing; the graph is never touched by an override.
+export interface OverrideEntry {
+  app_seal_id: string
+  role_name: string
+  seal_holder_sid?: string
+  override_holder_sid: string
+  override_holder_name?: string
+  rationale: string
+}
+
+export interface OverrideArtifact {
+  filename: string
+  csv: string
+  entries: number
+  total_rows: number
+  note: string
+}
+
+export interface CorrectionsReport {
+  filename: string
+  markdown: string
+  count: number
+  generated_on: string
+  generated_by: string
+}
+
 export interface MappingsApi {
   domains(): Promise<MappingDomain[]>
   grid(domainId: string): Promise<MappingGrid>
   options(): Promise<MappingOptions>
   draftChangeset(entries: DraftEntry[]): Promise<ChangesetArtifact>
+  draftOverride(entries: OverrideEntry[]): Promise<OverrideArtifact>
+  correctionsReport(): Promise<CorrectionsReport>
 }
 
 async function json<T>(res: Response, what: string): Promise<T> {
@@ -80,6 +111,18 @@ export function createMappingsApi(baseUrl: string, personaId: string): MappingsA
       return json<ChangesetArtifact>(
         await client.authedPost('/mappings/changeset', { entries }),
         'mappings/changeset',
+      )
+    },
+    async draftOverride(entries) {
+      return json<OverrideArtifact>(
+        await client.authedPost('/mappings/overrides/draft', { entries }),
+        'mappings/overrides/draft',
+      )
+    },
+    async correctionsReport() {
+      return json<CorrectionsReport>(
+        await client.authedGet('/mappings/overrides/report'),
+        'mappings/overrides/report',
       )
     },
   }

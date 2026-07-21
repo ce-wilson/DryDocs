@@ -68,6 +68,26 @@ DOMAINS: tuple[dict, ...] = (
         "tier": 4,
         "available": False,
     },
+    # O24 — the ui-write-surface gate's M2 origin-flagged store (SME-3,
+    # 2026-07-21): SEAL says one thing, the support team knows another, and
+    # only the application owner (AO privilege) can fix SEAL. Overrides are
+    # kept SIDE BY SIDE with the source value (origin flag on every row),
+    # never write the graph, and feed the source-corrections report.
+    {
+        "id": "seal-contact-override",
+        "title": "SEAL contacts — operate-manager override list (L1/L2)",
+        "kind": "override",
+        "source": "config/overrides/seal-contact-overrides.csv",
+        "tier": None,
+        "available": True,
+    },
+)
+
+# The committed override-list column order — the draft artifact reproduces the
+# WHOLE file (existing rows + drafts) so committing it is a plain replace.
+OVERRIDE_HEADER = (
+    "app_seal_id", "role_name", "seal_holder_sid", "override_holder_sid",
+    "override_holder_name", "rationale", "authored_by", "authored_on", "status",
 )
 
 
@@ -135,7 +155,24 @@ class MappingStore:
                 "authored_by, authored_on, note "
                 "FROM manual_mapping ORDER BY file, line_no"
             )
+        if domain_id == "seal-contact-override":
+            return self._select(
+                "SELECT app_seal_id, role_name, origin, holder_sid, holder_name, "
+                "rationale, authored_by, authored_on, status "
+                "FROM v_seal_contact_grid"
+            )
         raise UnknownDomainError(domain_id)
+
+    def override_rows(self) -> list[dict]:
+        """The committed override list in file column order (for the full-file
+        draft artifact)."""
+        cols = ", ".join(OVERRIDE_HEADER)
+        return self._select(
+            f"SELECT {cols} FROM seal_contact_override ORDER BY line_no"
+        ).rows
+
+    def source_corrections(self) -> list[dict]:
+        return self._select("SELECT * FROM v_source_corrections").rows
 
     def options(self) -> dict[str, list]:
         labels = self._select("SELECT label, class, prov_type FROM v_label_options")
@@ -253,4 +290,133 @@ def draft_changeset(
             "the existing K2 gate; `drydocs load-manual-mappings` applies it on the "
             "next load run. Manual = tier 5 — it never overrides SEAL evidence."
         ),
+    }
+
+
+# ---------------------------------------------------------------------------
+# O24 — SEAL-contact overrides (ui-write-surface gate SME-3: M2 tier).
+# The server still writes NOTHING: drafting returns the UPDATED committed
+# file as an artifact; the mapping-store table persists it once committed
+# (the file-to-table loop that keeps var/mapping.db rebuildable).
+# ---------------------------------------------------------------------------
+
+def draft_override(
+    entries: list[dict], token: str, sessions: InMemorySessionStore, store: MappingStore
+) -> dict:
+    """Validate drafted override entries and return the complete updated
+    config/overrides/seal-contact-overrides.csv content (existing committed
+    rows + the drafts). Fail-closed mirror of the store's own ingestion rules
+    so a returned artifact can never be refused at materialization."""
+    from drydocs_core.models.seal import canonicalize_role
+
+    session = _authorize(token, sessions)
+    if not entries:
+        raise ChangesetValidationError("no override entries drafted")
+
+    today = date.today().isoformat()
+    existing = store.override_rows()
+    new_rows: list[dict] = []
+    for i, entry in enumerate(entries, start=1):
+        app = str(entry.get("app_seal_id") or "").strip()
+        role = canonicalize_role(entry.get("role_name"))
+        seal_sid = str(entry.get("seal_holder_sid") or "").strip()
+        override_sid = str(entry.get("override_holder_sid") or "").strip()
+        rationale = str(entry.get("rationale") or "").strip()
+        if not app:
+            raise ChangesetValidationError(f"entry {i}: app_seal_id is required")
+        if role is None:
+            raise ChangesetValidationError(
+                f"entry {i}: role_name {entry.get('role_name')!r} does not "
+                "canonicalize to a SEAL role"
+            )
+        if not override_sid:
+            raise ChangesetValidationError(f"entry {i}: override_holder_sid is required")
+        if seal_sid and seal_sid == override_sid:
+            raise ChangesetValidationError(
+                f"entry {i}: override equals the SEAL value — not a correction"
+            )
+        if not rationale:
+            raise ChangesetValidationError(
+                f"entry {i}: rationale is REQUIRED — it becomes the "
+                "source-corrections report's justification column"
+            )
+        new_rows.append({
+            "app_seal_id": app,
+            "role_name": role,
+            "seal_holder_sid": seal_sid,
+            "override_holder_sid": override_sid,
+            "override_holder_name": str(entry.get("override_holder_name") or "").strip(),
+            "rationale": rationale,
+            "authored_by": session.persona_id,  # server-stamped, never client-supplied
+            "authored_on": today,
+            "status": "active",
+        })
+
+    out = io.StringIO()
+    writer = csv.writer(out, lineterminator="\n")
+    writer.writerow(OVERRIDE_HEADER)
+    for row in [*existing, *new_rows]:
+        writer.writerow(["" if row.get(c) is None else row.get(c) for c in OVERRIDE_HEADER])
+    return {
+        "filename": "seal-contact-overrides.csv",
+        "csv": out.getvalue(),
+        "entries": len(new_rows),
+        "total_rows": len(existing) + len(new_rows),
+        "note": (
+            "The server wrote NOTHING. This is the complete updated override list — "
+            "replace config/overrides/seal-contact-overrides.csv with it and commit "
+            "(git review is the review); var/mapping.db rematerializes it on the next "
+            "read. Overrides NEVER write the graph and NEVER replace the SEAL value — "
+            "the surfaces keep both, origin-flagged, and the source-corrections report "
+            "carries the fix request to the application owners (AO privilege)."
+        ),
+    }
+
+
+def source_corrections_report(
+    token: str, sessions: InMemorySessionStore, store: MappingStore
+) -> dict:
+    """The AO-facing artifact: every ACTIVE override with the SEAL current
+    value, the corrected value, author and rationale — formatted for the
+    application owners, who alone hold the AO privilege to fix SEAL."""
+    session = _authorize(token, sessions)
+    rows = store.source_corrections()
+    today = date.today().isoformat()
+
+    lines = [
+        "# SEAL source-corrections report — contact roles",
+        "",
+        f"Generated {today} by {session.persona_id} from "
+        "config/overrides/seal-contact-overrides.csv (via the mapping-store "
+        "materialization). DryDocs does NOT write SEAL or the graph: each row "
+        "below is a correction request for the application owner, who holds "
+        "the AO privilege required to update SEAL itself. Once SEAL is fixed, "
+        "flip the row's status to corrected-in-seal in the committed list.",
+        "",
+        f"Outstanding corrections: {len(rows)}",
+        "",
+        "| Application (seal_id) | Role | SEAL currently shows | Correct to | Authored | Rationale |",
+        "|---|---|---|---|---|---|",
+    ]
+    for r in rows:
+        holder = r.get("override_holder_sid") or ""
+        if r.get("override_holder_name"):
+            holder = f"{holder} ({r['override_holder_name']})"
+        authored = " ".join(
+            p for p in (r.get("authored_by"), r.get("authored_on")) if p
+        )
+        lines.append(
+            f"| {r['app_seal_id']} | {r['role_name']} "
+            f"| {r.get('seal_holder_sid') or '(nobody assigned)'} "
+            f"| {holder} | {authored} | {r['rationale']} |"
+        )
+    if not rows:
+        lines.append("| — | — | — | — | — | (no active overrides) |")
+
+    return {
+        "filename": f"seal-contact-source-corrections-{today}.md",
+        "markdown": "\n".join(lines) + "\n",
+        "count": len(rows),
+        "generated_on": today,
+        "generated_by": session.persona_id,
     }

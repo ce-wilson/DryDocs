@@ -15,13 +15,16 @@ import pytest
 from drydocs_api.handlers import Forbidden
 from drydocs_api.mappings import (
     DOMAINS,
+    OVERRIDE_HEADER,
     ChangesetValidationError,
     MappingStore,
     UnknownDomainError,
     draft_changeset,
+    draft_override,
     list_domains,
     mapping_grid,
     mapping_options,
+    source_corrections_report,
 )
 from drydocs_api.personas import PERSONAS
 from drydocs_api.sessions import InMemorySessionStore
@@ -163,3 +166,118 @@ def test_changeset_fails_closed(sessions, store, bad, reason):
     token = _token(sessions, "kchen2190")
     with pytest.raises(ChangesetValidationError):
         draft_changeset(bad, token, sessions, store)
+
+
+# ---------------------------------------------------------------------------
+# O24 — SEAL-contact override domain (ui-write-surface gate SME-3, M2 tier).
+# Synthetic values only (publish boundary).
+# ---------------------------------------------------------------------------
+
+@pytest.fixture()
+def override_store(tmp_path, monkeypatch) -> MappingStore:
+    """A store whose committed override list is a two-row fixture — the module
+    constant is monkeypatched so the WHOLE read chain (is_current -> build)
+    resolves to it, exactly how the endpoint would see a committed list."""
+    fix = tmp_path / "seal-contact-overrides.csv"
+    fix.write_text(
+        ",".join(OVERRIDE_HEADER) + "\n"
+        "APP-1234,L2 Operate Manager,U111111,U222222,Sam Steward,"
+        "person left the team,kchen2190,2026-07-21,active\n"
+        "APP-5678,L1 Operate Manager,,U333333,,role unassigned in SEAL,"
+        "kchen2190,2026-07-21,active\n",
+        encoding="utf-8",
+    )
+    monkeypatch.setattr(
+        "drydocs_core.mapping_store.SEAL_CONTACT_OVERRIDES_PATH", fix
+    )
+    return MappingStore(tmp_path / "mapping.db")
+
+
+def test_override_domain_registered():
+    dom = next(d for d in DOMAINS if d["id"] == "seal-contact-override")
+    assert dom["available"] and dom["kind"] == "override"
+    assert dom["source"] == "config/overrides/seal-contact-overrides.csv"
+
+
+def test_override_grid_carries_origin_flag(sessions, override_store):
+    """Every grid row is origin-flagged; the SEAL source value and the user
+    override arrive as adjacent rows (source first) — never merged, never
+    silently replaced."""
+    token = _token(sessions, "kchen2190")
+    out = mapping_grid("seal-contact-override", token, sessions, override_store)
+    assert "origin" in out["keys"]
+    flags = [(r["app_seal_id"], r["origin"], r["holder_sid"]) for r in out["rows"]]
+    assert flags == [
+        ("APP-1234", "source", "U111111"),
+        ("APP-1234", "override", "U222222"),
+        ("APP-5678", "override", "U333333"),
+    ]
+    assert all(r["origin"] in ("source", "override") for r in out["rows"])
+
+
+def test_draft_override_returns_full_updated_file(sessions, override_store):
+    """The artifact is the COMPLETE updated committed file (existing rows +
+    drafts) — commit-by-replace; authored_by is server-stamped; the server
+    wrote nothing."""
+    token = _token(sessions, "asmith7734")
+    out = draft_override(
+        [{"app_seal_id": "APP-9012", "role_name": "l1 ops manager",
+          "seal_holder_sid": "U444444", "override_holder_sid": "U555555",
+          "override_holder_name": "Ada Admin",
+          "rationale": "SEAL points at the retired rota owner"}],
+        token, sessions, override_store,
+    )
+    rows = list(csv.DictReader(io.StringIO(out["csv"])))
+    assert out["filename"] == "seal-contact-overrides.csv"
+    assert out["entries"] == 1 and out["total_rows"] == 3
+    assert [r["app_seal_id"] for r in rows] == ["APP-1234", "APP-5678", "APP-9012"]
+    new = rows[-1]
+    assert new["role_name"] == "L1 Operate Manager"  # canonicalized
+    assert new["authored_by"] == "asmith7734"  # session persona, never client-supplied
+    assert new["status"] == "active"
+    # committed rows survive byte-faithfully through the store round-trip
+    assert rows[0]["override_holder_name"] == "Sam Steward"
+    assert "wrote NOTHING" in out["note"]
+
+
+@pytest.mark.parametrize("bad", [
+    [],
+    [{"app_seal_id": "A", "role_name": "Head Chef", "override_holder_sid": "U2",
+      "rationale": "r"}],  # unknown role
+    [{"app_seal_id": "A", "role_name": "L2 Operate Manager",
+      "override_holder_sid": "U2", "rationale": " "}],  # rationale required
+    [{"app_seal_id": "A", "role_name": "L2 Operate Manager",
+      "seal_holder_sid": "U2", "override_holder_sid": "U2",
+      "rationale": "r"}],  # not a correction
+])
+def test_draft_override_fails_closed(sessions, override_store, bad):
+    token = _token(sessions, "kchen2190")
+    with pytest.raises(ChangesetValidationError):
+        draft_override(bad, token, sessions, override_store)
+
+
+def test_override_endpoints_refuse_user_role(sessions, override_store):
+    token = _token(sessions, "jdoe4821")
+    with pytest.raises(Forbidden):
+        draft_override(
+            [{"app_seal_id": "A", "role_name": "L2 Operate Manager",
+              "override_holder_sid": "U2", "rationale": "r"}],
+            token, sessions, override_store,
+        )
+    with pytest.raises(Forbidden):
+        source_corrections_report(token, sessions, override_store)
+
+
+def test_source_corrections_report_content(sessions, override_store):
+    """The report is the AO-facing artifact: SEAL current value, corrected
+    value, author and rationale per outstanding override, with the AO-privilege
+    framing spelled out."""
+    token = _token(sessions, "kchen2190")
+    out = source_corrections_report(token, sessions, override_store)
+    assert out["count"] == 2
+    md = out["markdown"]
+    assert "AO privilege" in md and "does NOT write SEAL" in md
+    assert "| APP-1234 | L2 Operate Manager | U111111 | U222222 (Sam Steward) |" in md
+    assert "person left the team" in md
+    assert "(nobody assigned)" in md  # the empty-SEAL-value row is explicit
+    assert out["filename"].startswith("seal-contact-source-corrections-")

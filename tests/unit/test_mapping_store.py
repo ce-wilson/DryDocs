@@ -17,6 +17,7 @@ import yaml
 from drydocs.loaders.manual_loads import ManualLoadError, mapping_rows, parse_mapping_csv
 from drydocs_core.mapping_store import (
     ONTOLOGY_MAP_PATH,
+    MappingStoreError,
     build,
     dump_csv,
     is_current,
@@ -31,6 +32,7 @@ EXPECTED_TABLES = [
     "node_classification",
     "ontology_mapping",
     "relationship_vocabulary",
+    "seal_contact_override",
 ]
 
 
@@ -209,6 +211,97 @@ def test_build_ingests_registered_manual_rows(manual_fixture):
         assert conflicts == 0  # both rows agree on the target
     finally:
         conn.close()
+
+
+# ---------------------------------------------------------------------------
+# O24 — SEAL-contact override list (ui-write-surface gate SME-3: the M2
+# origin-flagged store). All values below are synthetic (publish boundary).
+# ---------------------------------------------------------------------------
+
+OVERRIDE_HEADER = (
+    "app_seal_id,role_name,seal_holder_sid,override_holder_sid,"
+    "override_holder_name,rationale,authored_by,authored_on,status"
+)
+
+
+def _override_csv(tmp_path: Path, *rows: str) -> Path:
+    path = tmp_path / "seal-contact-overrides.csv"
+    path.write_text("\n".join([OVERRIDE_HEADER, *rows, ""]), encoding="utf-8")
+    return path
+
+
+def test_override_round_trip_and_origin_flag(tmp_path: Path):
+    """The committed list materializes into the table; the grid view emits the
+    SEAL source value and the user override as ADJACENT origin-flagged rows
+    (source first — never merged, never hidden); the corrections view carries
+    only outstanding (active) rows."""
+    fix = _override_csv(
+        tmp_path,
+        # L2 Manager exercises role canonicalization -> 'L2 Operate Manager'
+        "APP-1234,L2 Manager,U111111,U222222,Sam Steward,person left the team,kchen2190,2026-07-21,active",
+        # no SEAL value captured (nobody assigned) -> only the override row
+        "APP-5678,L1 Operate Manager,,U333333,,role unassigned in SEAL,kchen2190,2026-07-21,active",
+        # already fixed in SEAL -> kept for audit, out of the report
+        "APP-9012,L2 Operate Manager,U444444,U555555,,fixed last sprint,kchen2190,2026-07-01,corrected-in-seal",
+    )
+    conn = build(":memory:", overrides_path=fix)
+    try:
+        stored = conn.execute(
+            "SELECT app_seal_id, role_name, seal_holder_sid, override_holder_sid, status "
+            "FROM seal_contact_override ORDER BY line_no"
+        ).fetchall()
+        assert stored == [
+            ("APP-1234", "L2 Operate Manager", "U111111", "U222222", "active"),
+            ("APP-5678", "L1 Operate Manager", None, "U333333", "active"),
+            ("APP-9012", "L2 Operate Manager", "U444444", "U555555", "corrected-in-seal"),
+        ]
+        grid = conn.execute(
+            "SELECT app_seal_id, origin, holder_sid FROM v_seal_contact_grid"
+        ).fetchall()
+        assert grid == [
+            ("APP-1234", "source", "U111111"),    # side-by-side pair,
+            ("APP-1234", "override", "U222222"),  # source first
+            ("APP-5678", "override", "U333333"),  # no captured SEAL value
+            ("APP-9012", "source", "U444444"),
+            ("APP-9012", "override", "U555555"),
+        ]
+        report = conn.execute(
+            "SELECT app_seal_id, seal_holder_sid, override_holder_sid, rationale "
+            "FROM v_source_corrections"
+        ).fetchall()
+        assert report == [
+            ("APP-1234", "U111111", "U222222", "person left the team"),
+            ("APP-5678", None, "U333333", "role unassigned in SEAL"),
+        ]  # corrected-in-seal is audit-only, not an outstanding correction
+    finally:
+        conn.close()
+
+
+@pytest.mark.parametrize("row,reason", [
+    ("APP-1,Head Chef,U1,U2,,r,kchen2190,2026-07-21,active", "unknown role"),
+    ("APP-1,L2 Operate Manager,U1,U2,,,kchen2190,2026-07-21,active", "missing rationale"),
+    ("APP-1,L2 Operate Manager,U1,U1,,r,kchen2190,2026-07-21,active", "override == SEAL value"),
+    ("APP-1,L2 Operate Manager,U1,U2,,r,kchen2190,2026-07-21,maybe", "bad status"),
+    (",L2 Operate Manager,U1,U2,,r,kchen2190,2026-07-21,active", "missing app"),
+])
+def test_override_ingestion_fails_closed(tmp_path: Path, row: str, reason: str):
+    with pytest.raises(MappingStoreError):
+        build(":memory:", overrides_path=_override_csv(tmp_path, row)).close()
+
+
+def test_override_edit_flips_is_current(manual_fixture, tmp_path: Path):
+    """The override list is a tracked source: editing it makes the built file
+    stale, so a committed override is always served on the next read (O14)."""
+    fix = _override_csv(tmp_path)
+    db = tmp_path / "store" / "mapping.db"
+    build(db, manifest_path=manual_fixture["manifest"], overrides_path=fix).close()
+    assert is_current(db, manifest_path=manual_fixture["manifest"], overrides_path=fix)
+    with fix.open("a", encoding="utf-8", newline="") as fh:
+        fh.write(
+            "APP-1234,L2 Operate Manager,U111111,U222222,,added after build,"
+            "kchen2190,2026-07-21,active\n"
+        )
+    assert not is_current(db, manifest_path=manual_fixture["manifest"], overrides_path=fix)
 
 
 # ---------------------------------------------------------------------------

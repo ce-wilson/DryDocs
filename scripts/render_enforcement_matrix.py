@@ -118,6 +118,14 @@ SURFACES: list[dict] = [
         "gate_ref": "K2 match-policy gate (24/24, 2026-07-14)",
     },
     {
+        "id": "seal-contact-overrides",
+        "title": "User override lists (M2 store)",
+        "file": "config/overrides/",
+        "consumers": ["drydocs_core/mapping_store.py", "drydocs_api/mappings.py"],
+        "guard_tests": ["test_mapping_store.py", "test_mapping_api.py"],
+        "gate_ref": "ui-write-surface gate SME-3 — M2 origin-flagged store (2026-07-21)",
+    },
+    {
         "id": "review-labels",
         "title": "Review labels",
         "file": "config/review-labels.yaml",
