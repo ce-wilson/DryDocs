@@ -80,6 +80,7 @@ def test_explorer_frames_have_specs():
     for spec_id in (
         "explorer.applications.v1",
         "explorer.folder-applications.v1",
+        "explorer.controlm-app-codes.v1",
         "explorer.jobs.v2",
         "explorer.conditions.v2",
         "explorer.servers.v1",
@@ -103,6 +104,20 @@ def test_folder_applications_spec_uses_gated_edges():
     assert "WAS_ASSOCIATED_WITH {role: 'seal_app_ref'}" in spec.cypher
     assert "CONTAINS_JOB" in spec.cypher
     assert ":BusinessApplication" in spec.cypher
+
+
+def test_app_codes_spec_classifies_both_mapping_patterns():
+    """The SME two-pattern model (2026-07-21): dedicated codes map direct,
+    shared platform codes fan out to many applications — the spec derives the
+    pattern from observed cardinality over the GATED edges, and does not
+    invent a code->application ontology edge (that is a gate decision)."""
+    spec = QUERY_SPECS["explorer.controlm-app-codes.v1"]
+    assert ":ControlMApplication" in spec.cypher and "CONTAINS_FOLDER" in spec.cypher
+    assert "WAS_ASSOCIATED_WITH {role: 'seal_app_ref'}" in spec.cypher
+    assert "direct (dedicated code)" in spec.cypher
+    assert "shared platform code" in spec.cypher
+    assert "unmapped" in spec.cypher
+    assert "mapping_pattern" in [c.name for c in spec.columns]
 
 
 def test_unknown_spec_fails_closed():

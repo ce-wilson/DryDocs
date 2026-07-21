@@ -26,6 +26,23 @@ Tags help grooming: `idea` · `bug` · `doc` · `source` (new data source) · `q
 
 <!-- add new ideas at the top -->
 
+- 2026-07-21 — [idea] **ControlMApplication code → BusinessApplication mapping: the
+  two-pattern model (SME, chat)**. SME states the code layer maps two ways: (1) some
+  BusinessApplications own a DEDICATED Control-M app code → can map DIRECTLY
+  (code→app 1:1); (2) some share a PLATFORM code (e.g. the DPL pipeline-launcher
+  spine; cloud-ETL platform codes) → one code carries many apps, resolvable only
+  per-folder/job or via the manual mapping table. Shipped today READ-ONLY as
+  `explorer.controlm-app-codes.v1` (pattern DERIVED from observed cardinality over the
+  gated seal_app_ref edges — no new edge invented). The GATE DECISION still open: an
+  authoritative `(:ControlMApplication)-[:?]->(:BusinessApplication)` mapping edge for
+  the dedicated-code pattern + a platform-code marker for shared codes — routes through
+  relationship_vocabulary + HITL; feeds and is fed by the K2 tier model (a confirmed
+  dedicated code is evidence ABOVE manual tier 5) and the O13 "code->application joins
+  the domain strip when that mapping table exists as a reconciler input" hook (this is
+  that table). Also touches plan-07 P3 invocation-pattern rows (AT GATE). SME also
+  flagged: the Folders/App-codes frames are the power-user/SME mapping surface needed
+  SOONEST → prioritize O13's /mappings React screen accordingly.
+
 - 2026-07-21 — [idea] **m7 build follow-up** (from gate `cmdline-nfr-vetting`): migrate
   payload invocations out of the m3_invokes 1..n fold onto the registered `USES_ARTIFACT`
   edge + stamp `script_role` {launcher, payload} and the artifact_* properties on :Script.

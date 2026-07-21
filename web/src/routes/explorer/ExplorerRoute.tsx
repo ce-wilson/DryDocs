@@ -9,6 +9,7 @@ import DataFrame from '../../explorer/DataFrame'
 import SpecGrid from '../../explorer/SpecGrid'
 import NodeInspector from '../../explorer/NodeInspector'
 import {
+  APP_CODES_FRAME,
   APPLICATIONS_FRAME,
   CONDITIONS_FRAME,
   FOLDERS_FRAME,
@@ -81,6 +82,13 @@ export default function ExplorerRoute({ persona }: { persona: Persona }) {
             access={access}
             specId="explorer.folder-applications.v1"
             fallback={<DataFrame cols={FOLDERS_FRAME.cols} rows={FOLDERS_FRAME.rows} {...frameProps} />}
+          />
+        ),
+        'App codes': (
+          <SpecGrid
+            access={access}
+            specId="explorer.controlm-app-codes.v1"
+            fallback={<DataFrame cols={APP_CODES_FRAME.cols} rows={APP_CODES_FRAME.rows} {...frameProps} />}
           />
         ),
         Jobs: (

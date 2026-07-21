@@ -176,6 +176,21 @@ export const FOLDERS_FRAME = {
   ] as FrameRow[],
 }
 
+// Fictional Control-M APPLICATION codes (mechanism only) illustrating the SME
+// two-pattern model: a DEDICATED code maps 1:1 to a BusinessApplication; a
+// SHARED PLATFORM code (cloud-ETL style) carries many applications and needs
+// the gate-bound code->application mapping table to resolve.
+export const APP_CODES_FRAME = {
+  cols: ['App code', 'Mapping pattern', 'Apps', 'Folders', 'Jobs', 'Mapped to'],
+  rows: [
+    { cells: ['SVC', 'direct (dedicated code)', '1', '1', '2', 'Servicing Core'], tower: 'home' as TowerKey, nodeId: 'home:1' },
+    { cells: ['PAN', 'direct (dedicated code)', '1', '1', '1', 'Portfolio Analytics'], tower: 'auto' as TowerKey, nodeId: 'auto:1' },
+    { cells: ['DPL', 'shared platform code', '3', '4', '9', '3 applications'], tower: 'shared' as TowerKey, nodeId: 'shared:1' },
+    { cells: ['CLD', 'shared platform code', '2', '2', '5', '2 applications'], tower: 'cards' as TowerKey, nodeId: 'cards:1' },
+    { cells: ['ORW', 'unmapped — SME queue', '0', '1', '3', ''], tower: 'home' as TowerKey, nodeId: 'home:5' },
+  ] as FrameRow[],
+}
+
 // Fictional scheduler hosts (mechanism only — no real server names).
 export const SERVERS_FRAME = {
   cols: ['Server', 'Data center', 'Serves', 'Jobs'],

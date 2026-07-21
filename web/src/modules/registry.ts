@@ -35,11 +35,12 @@ export const MODULES: readonly ModuleDef[] = [
     path: '/explorer',
     tagline: 'Tower / app drill-down graph',
     backsOnto: 'drydocs',
-    // Folders added 2026-07-21 (SME correction): the ControlMFolder ->
-    // BusinessApplication crosswalk (explorer.folder-applications.v1) needs
-    // its own frame — site-plan §3 listed four tabs; this is the reviewed
-    // fifth.
-    tabs: ['Applications', 'Folders', 'Jobs', 'Conditions', 'Servers'],
+    // Folders + App codes added 2026-07-21 (SME corrections): the
+    // ControlMFolder -> BusinessApplication crosswalk and the Control-M
+    // APPLICATION-code mapping-pattern view (dedicated code vs shared
+    // platform code) — the SME mapping surface needed soonest. Site-plan §3
+    // listed four tabs; these are the reviewed additions.
+    tabs: ['Applications', 'Folders', 'App codes', 'Jobs', 'Conditions', 'Servers'],
     phase: 1,
   },
   {

@@ -153,6 +153,48 @@ QUERY_SPECS: dict[str, QuerySpec] = {
             params=_LIMIT,
         ),
         QuerySpec(
+            id="explorer.controlm-app-codes.v1",
+            database="drydocs",
+            description=(
+                "Control-M APPLICATION codes classified by their OBSERVED mapping "
+                "pattern to :BusinessApplication (SME review 2026-07-21): a code whose "
+                "folders' jobs all attribute to ONE application is a 'direct "
+                "(dedicated code)' candidate; a code spanning several applications is "
+                "a 'shared platform code' (e.g. a cloud-ETL platform code carrying "
+                "many apps); no attribution = the SME work queue. DERIVED from the "
+                "gated job-level edges only — the authoritative code->application "
+                "mapping table is a gate-bound O13 mapping domain, not this view."
+            ),
+            cypher=(
+                "MATCH (ca:ControlMApplication) "
+                "OPTIONAL MATCH (ca)-[:CONTAINS_FOLDER]->(f:ControlMFolder) "
+                "OPTIONAL MATCH (f)-[:CONTAINS_JOB]->(j:ControlMJob) "
+                "OPTIONAL MATCH (j)-[:WAS_ASSOCIATED_WITH {role: 'seal_app_ref'}]"
+                "->(a:BusinessApplication) "
+                "WITH ca, count(DISTINCT f) AS folders, count(DISTINCT j) AS jobs, "
+                "collect(DISTINCT a.seal_id) AS seal_ids "
+                "RETURN ca.name AS app_code, "
+                "CASE WHEN size(seal_ids) = 0 THEN 'unmapped — SME queue' "
+                "WHEN size(seal_ids) = 1 THEN 'direct (dedicated code)' "
+                "ELSE 'shared platform code' END AS mapping_pattern, "
+                "size(seal_ids) AS applications, folders, jobs, "
+                "CASE WHEN size(seal_ids) = 1 THEN seal_ids[0] "
+                "WHEN size(seal_ids) = 0 THEN null "
+                "ELSE toString(size(seal_ids)) + ' applications' END AS mapped_to "
+                "ORDER BY app_code LIMIT $limit"
+            ),
+            columns=(
+                ColumnDef("app_code", "string", "App code"),
+                ColumnDef("mapping_pattern", "string", "Mapping pattern"),
+                ColumnDef("applications", "int", "Apps"),
+                ColumnDef("folders", "int", "Folders"),
+                ColumnDef("jobs", "int", "Jobs"),
+                ColumnDef("mapped_to", "string", "Mapped to"),
+            ),
+            classification="internal",
+            params=_LIMIT,
+        ),
+        QuerySpec(
             id="explorer.servers.v1",
             database="drydocs",
             description="Control-M servers for the Explorer Servers frame.",

@@ -3041,6 +3041,13 @@ items:
       ControlMFolder -> BusinessApplication crosswalk over the gated edges
       (CONTAINS_JOB + WAS_ASSOCIATED_WITH {seal_app_ref}), bound to a new
       Folders tab (reviewed fifth Explorer tab — site-plan §3 listed four).
+      SECOND SME CORRECTION same day: explorer.controlm-app-codes.v1 + App
+      codes tab — the two-pattern code model (dedicated code = direct 1:1 vs
+      shared platform code = many apps), pattern DERIVED from observed
+      cardinality over gated edges only; the authoritative code->application
+      edge is inboxed as a gate candidate (IDEAS 2026-07-21, feeds K2 tiers +
+      the O13 code->application mapping-domain hook). SME: these frames = the
+      power-user/SME mapping surface needed soonest -> O13 screen next.
 
   - id: O12
     epic: web-console
