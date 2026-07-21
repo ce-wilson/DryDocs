@@ -26,6 +26,13 @@ Tags help grooming: `idea` · `bug` · `doc` · `source` (new data source) · `q
 
 <!-- add new ideas at the top -->
 
+- 2026-07-21 — [chore] **Next cross-repo port: carry the AIS acronym expansion across
+  files.** Producer's authoritative home is `software-registry.yaml#acronyms`; the company's
+  PROVISIONAL gloss sits on their `source-registry.yaml` docs-source entry with a
+  PORT-MANIFEST canonical-producer row expecting the producer expansion at next cherrypick —
+  different files, so the port must transplant the value, not same-file overwrite. Also
+  still open company-side: no 06-29 gate-log entry (their audit gap; backfill offered).
+
 - 2026-07-21 — [question] **Gate rider (from G17 build): MAC subType → kind-enum
   semantics.** pipeline.json `subType=provisioning` (DB load, no transform — runtime
   trace) is wrong-by-signal as `kind='etl'`, but the fix is an enum decision the

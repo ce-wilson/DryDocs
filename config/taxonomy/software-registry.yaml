@@ -21,13 +21,21 @@ classification: Internal-Public
 updated: 2026-07-21
 adr: docs/decisions/0004-software-registry-vendor-terminology.md
 
-# Historical company acronyms — preserved HERE ONLY (SME ruling 2026-07-21 pm):
-# the 'Ais*' class family (:AisCapability / :AisTool, company 06-29 gate) is
-# being REMOVED on both sides (company-side note in flight via a parallel
-# session); the Ais spelling goes away everywhere else. The expansion lives on
-# THIS registry because it is the file that carries the vendor/publisher URLs —
-# the durable home for "what did that name mean". Note 'Streaming' was itself a
-# misnomer: the AIS folder also carried ETL and managed file transfer.
+# Historical company acronyms — THE AUTHORITATIVE HOME (SME ruling 2026-07-21
+# pm): the 'Ais*' class family (:AisCapability / :AisTool, company 06-29 gate)
+# is REMOVED on both sides; the Ais spelling goes away everywhere else. The
+# expansion lives on THIS registry because it is the file that carries the
+# vendor/publisher URLs — the durable home for "what did that name mean".
+# Note 'Streaming' was itself a misnomer: the AIS folder also carried ETL and
+# managed file transfer. Company-side status (screenshot channel, 2026-07-21
+# pm): their copy is an explicitly PROVISIONAL gloss on the source-registry
+# entry for their internal AIS engineering-docs portal (root path
+# /docs/ais/{orchestration,etl,file-transfer}/ — corroborates the 3 capability
+# areas), with a PORT-MANIFEST canonical-producer row directing "overwrite
+# with the producer's authoritative expansion at next cherrypick" — i.e. THIS
+# field. CAVEAT for the next port: their gloss sits in source-registry.yaml,
+# ours here — the expansion must be carried across files, not same-file
+# overwritten (inboxed in IDEAS.md).
 acronyms:
   AIS: "Application Integration Streaming"
 
