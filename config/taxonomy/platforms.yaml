@@ -84,18 +84,22 @@ company_confirmed:
 reconciliation:
   target: "Replace :SchedulerKind with :AisCapability + :AisTool (user 2026-07-09; company built it 2026-06-29)."
   open_questions:
-    - "Q1 What do the classes represent? ANSWERED BY THE COMPANY SHAPE (captured above): :AisCapability = the capability AREA (skos:Concept; orchestration/etl/file-transfer), :AisTool = the concrete product (prov:SoftwareAgent). Granularity conflict RESOLVED pre-gate — SME RULING 2026-07-21 (in-chat, same day as the capture): the producer 'batch scheduling'/'event scheduling' seed is WITHDRAWN — it was the SME's original SUB-NODE design under :BusinessApplication to avoid super-nodes (a graph-shape device, not capability semantics) and is not needed here; the batch-vs-event split already lives on the SEAL port kind (BatchProcessing/EventProcessing). The company areas stand as the proposed capability vocabulary; the gate formally confirms."
+    - "Q1 What do the classes represent? ANSWERED BY THE COMPANY SHAPE (captured above): :AisCapability = the capability AREA (skos:Concept; orchestration/etl/file-transfer), :AisTool = the concrete product (prov:SoftwareAgent). Granularity conflict RESOLVED pre-gate — SME RULING 2026-07-21 (in-chat, same day as the capture): the producer 'batch scheduling'/'event scheduling' seed is WITHDRAWN — it was the SME's original SUB-NODE design under :BusinessApplication to avoid super-nodes (a graph-shape device, not capability semantics) and is not needed here; the batch-vs-event split already lives on the SEAL port kind (BatchProcessing/EventProcessing). The company areas stand as the proposed capability vocabulary; the gate formally confirms. FOLLOW-UP RULING same day: producer rows carry NO capability value — plain role: orchestrator (the software-registry vocabulary) suffices; whether the producer adopts the :AisCapability node layer at all folds into Q4."
     - "Q2 REQUIRES_SCHEDULER retarget — one edge or two? SME DIRECTION 2026-07-21 (ONE edge, hoisted to :BusinessApplication) NOW CORROBORATED by the company shape: (:BusinessApplication)-[:USES_TOOL]->(:AisTool), one app-level edge, with the tool classified separately via IN_CAPABILITY (skos:broader). Remaining gate calls: adopt the USES_TOOL rename (vs keep REQUIRES_SCHEDULER) and confirm the no-PROV Agent->Agent typing."
     - "Q3 Deployed-instance layer? SME DIRECTION 2026-07-21 (RETIRE :Scheduler unbuilt — :ControlMServer is the deployed layer) CORROBORATED by built practice: company AisTool is deliberately NOT :Platform. Gate formally confirms."
-    - "Q4 Relation to software-registry.yaml — THE remaining open question, unresolved on BOTH sides: producer direction says distinct view + software_registry_ref cross-reference; company built NO cross-reference at all (vendor string only) and has the same question open. Gate must pick: edge (:AisTool)-[?]->(:SoftwareProduct), property ref, or merge; and resolve the USES_TOOL vs USES_SOFTWARE app-edge overlap."
+    - "Q4 Relation to software-registry.yaml — THE remaining open question, unresolved on BOTH sides: producer direction says distinct view + software_registry_ref cross-reference; company built NO cross-reference at all (vendor string only) and has the same question open. Gate must pick: edge (:AisTool)-[?]->(:SoftwareProduct), property ref, or merge; resolve the USES_TOOL vs USES_SOFTWARE app-edge overlap; AND (SME ruling 2026-07-21) decide whether the producer adopts the :AisCapability node layer at all — the capability area 'orchestration' duplicates the registry role 'orchestrator', so the layer may collapse into the registry role producer-side."
     - "Q5 Publishability? SME DIRECTION 2026-07-21 (external public vendors -> publishable) REFINED by the capture: the company taxonomy also contains internally-built tools (2 managed-file-transfer products) — those VALUES stay internal/ (ccb-twin convention); the class model and public-vendor values remain publishable; deployed-instance data stays internal/ regardless."
 
 # ── Producer seed rows (the :SchedulerKind migration seed) ────────────────────
-# company_capability = the company-confirmed IN_CAPABILITY value (coarse area),
-# now THE standing proposal. The earlier producer ais_capability partial seed
-# ('batch scheduling'/'event scheduling') was WITHDRAWN by the SME 2026-07-21
-# (Q1 ruling above): it was a super-node-avoidance sub-node design under
-# :BusinessApplication, not capability semantics — not carried on the rows.
+# SME RULING 2026-07-21 (in-chat, after the Q1 withdrawal): producer rows carry
+# NO capability value at all — plain `role: orchestrator` (the software-registry
+# role vocabulary these tools already carry there) suffices. The earlier
+# 'batch scheduling'/'event scheduling' seed was withdrawn (super-node-avoidance
+# device, Q1); the company's coarse-area value is recorded ONLY in the
+# company_confirmed capture above. Whether the producer adopts the
+# :AisCapability node layer AT ALL is a gate call folded into Q4 — the
+# capability area 'orchestration' and the registry role 'orchestrator' carry
+# the same information, one more overlap the reconciliation must collapse.
 # ai_tool/software_registry_ref stay TBD pending Q4.
 platforms:
   - id: controlm
@@ -103,22 +107,22 @@ platforms:
     current_class: SchedulerKind        # producer today (company: deprecated 06-29)
     scheduler_kind: ControlM
     phase_supported: 1
+    role: orchestrator                  # software-registry role vocabulary — the SME-ruled producer designation
     software_registry_ref: ~            # TBD — Q4 (unresolved both sides)
-    company_capability: orchestration   # company-confirmed (06-29 AIS gate)
     ai_tool: "AisTool{ControlM}"        # PROPOSED from the company tool list; gate confirms
   - id: autosys
     label: "CA Autosys"
     current_class: SchedulerKind
     scheduler_kind: Autosys
     phase_supported: 2
-    software_registry_ref: ~
-    company_capability: orchestration   # company-confirmed (06-29 AIS gate; vendor Broadcom there, CA here — label drift to settle at the gate)
+    role: orchestrator
+    software_registry_ref: ~            # (vendor Broadcom company-side, CA here — label drift to settle at the gate)
     ai_tool: "AisTool{AutoSys}"         # PROPOSED from the company tool list; gate confirms
   - id: airflow
     label: "Apache Airflow"
     current_class: SchedulerKind
     scheduler_kind: Airflow
     phase_supported: 2
+    role: orchestrator
     software_registry_ref: ~
-    company_capability: ~               # NOT in the company tool list (their AWS leg = EventBridge Scheduler + Glue); kept as the F2 crosswalk placeholder
-    ai_tool: ~                          # no company counterpart — gate decides whether the row stays
+    ai_tool: ~                          # NOT in the company tool list (their AWS leg = EventBridge Scheduler + Glue); kept as the F2 crosswalk placeholder — gate decides whether the row stays
