@@ -2379,7 +2379,7 @@ items:
     agent: main
     model: sonnet
     priority: p3
-    status: todo
+    status: done                                     # 2026-07-21 pm — review.outline.yaml exists (drydocs.doc-outline.v1; 16 sections + 9 subsections, anchors derived from Rev 1's authored set — retrofit-free except ONE added front-matter anchor marker); drydocs-project-review.md conforms (doc_outline passes) and re-renders deterministically (1-line html delta = the anchor). CADENCE RECORDED in the outline header: Rev bump per EPIC CLOSE (epic completion is what changes the review's story — status/roadmap refresh minimum; no hot-editing facts between Revs). Exemplar-pin tests added (the third doc type through the same contract).
     depends_on: [L8]
     inputs: [docs/design/drydocs-project-review.md, docs/design/templates/tdd.outline.yaml, docs/design/templates/runbook.outline.yaml, drydocs/doc_outline.py]
     acceptance: >
@@ -4957,8 +4957,8 @@ items:
       generator's home); zero api surface.
 
 summary:
-  todo: 20                                         # -L14 done (mapping-demo runbook refit + relocated); -L12, -C11 done; +G18..G25 rua-ingest phase (2026-07-21)
+  todo: 19                                         # -L15 done (review outline, 3rd doc type); -L14, -L12, -C11 done; +G18..G25 rua-ingest phase (2026-07-21)
   in_progress: 1                                   # E1 (gate deferred both sides)
   blocked: 0
-  done: 119                                        # +L14 2nd runbook exemplar conforms + relocated 2026-07-21 pm; +L12, +C11, +G17, +O25 same day
-  next_ready: [L9, L15, M2, M3, M4, P3, J10, Q6, O23, J13, G18, G19]
+  done: 120                                        # +L15 review.outline.yaml + Rev-per-epic-close cadence 2026-07-21 pm; +L14, +L12, +C11, +G17, +O25 same day
+  next_ready: [L9, M2, M3, M4, P3, J10, Q6, O23, J13, G18, G19]

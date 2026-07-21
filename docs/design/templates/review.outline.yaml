@@ -1,0 +1,169 @@
+# =============================================================================
+# review.outline.yaml — the CANONICAL outline for the whole-project Review doc.
+# The THIRD doc type in the Epic L system (L15), after the TDD (tdd.outline.yaml,
+# L1) and the Runbook (runbook.outline.yaml, L8). One instance today:
+# docs/design/drydocs-project-review.md — the anchors below are DERIVED from that
+# doc's existing authored sections (Rev 1), so conformance was retrofit-free by
+# construction; the outline now pins them stable for L5/L6 feedback re-attachment.
+#
+# Same linchpin rule as the other two: every section has a STABLE, AUTHORED `anchor`;
+# never use `--` inside an authored anchor id (L11 reserves it for derived
+# subsection anchors).
+#
+# REFRESH CADENCE (decision, L15 2026-07-21): **Rev bump per epic close** — the
+# review pins facts to a commit (front-matter carries `Rev N · date · commit`),
+# and those facts go stale quietly; an epic closing is the event that changes
+# the story the review tells (status table, roadmap, component shape). Ritual:
+# when an epic flips complete in backlog.yaml, groom a chore to bump the review
+# Rev — refresh §11 status + §12 roadmap minimum, re-validate, re-render. Do NOT
+# hot-edit facts between Revs; the Rev/commit line is the doc's honesty contract.
+#
+# NO TRACEABILITY BLOCK: like the runbook, the review has no requirements to
+# trace — it narrates; the TDDs carry the spine. If that ever changes, add the
+# `traceability:` block here (the validator already supports it).
+#
+# VALIDATION: drydocs/doc_outline.py; tests/unit/test_doc_outline.py pins the
+# real doc against this outline (the exemplar-can-never-drift idiom).
+# =============================================================================
+
+schema: drydocs.doc-outline.v1
+doc_type: Review
+title: Whole-Project Review
+classification: Internal-Public          # this template carries no real data
+updated: 2026-07-21
+
+source_templates:
+  - "docs/design/drydocs-project-review.md Rev 1 (2026-07-14) — the authoring instance; anchors derived from its sections"
+  - "tdd.outline.yaml (L1 — the doc-outline schema + front-matter/anchor conventions)"
+
+sections:
+  - anchor: front-matter
+    heading: "Front matter"
+    required: true
+    guidance: >
+      One bold line: doc type + Rev + date + the commit the facts are pinned to +
+      Classification (the L6 print footer derives from this). The refresh-cadence
+      rule lives in this template's header: Rev bump per epic close.
+
+  - anchor: how-this-fits
+    heading: "How this document fits"
+    required: true
+    guidance: >
+      Where the review sits in the doc system — between the white paper (pitch)
+      and the TDDs (specification); who should read it and when.
+
+  - anchor: how-to-read
+    heading: "How to read (and mark up) this document"
+    required: true
+    guidance: >
+      The reading paths and the HITL markup contract (L5 digital / L6 paper
+      feedback re-attachment keys on the section anchors).
+
+  - anchor: the-problem
+    heading: "The 3 a.m. problem"
+    required: true
+    guidance: "The motivating support scenario — why the graph exists at all."
+
+  - anchor: big-idea
+    heading: "The big idea"
+    required: true
+    guidance: "The one-paragraph thesis: what runs, what it depends on, who owns it."
+
+  - anchor: four-layers
+    heading: "Four layers, kept apart"
+    required: true
+    guidance: >
+      Taxonomy / ontology / knowledge graph / context graph — the conceptual
+      frame every other DryDocs doc leans on (CLAUDE.md §1).
+
+  - anchor: graph-tour
+    heading: "A guided tour of the graph"
+    required: true
+    guidance: "What is actually IN the graph, domain by domain, with example shapes."
+    subsections:
+      - anchor: tour-controlm
+        heading: "Control-M"
+        required: true
+        guidance: "Folders, jobs, conditions, servers — the orchestration backbone."
+      - anchor: tour-seal
+        heading: "SEAL applications"
+        required: true
+        guidance: "BusinessApplication, ports, the app-of-record axis."
+      - anchor: tour-attribution
+        heading: "Ownership & attribution"
+        required: true
+        guidance: "The qualified-attribution shape (Attribution/TOMRole/Employee)."
+      - anchor: tour-other
+        heading: "The rest of the estate"
+        required: true
+        guidance: "Products, teams, docs, software registry — the supporting cast."
+
+  - anchor: pipeline
+    heading: "How data gets in"
+    required: true
+    guidance: "The ingest chain end to end; where validation and staging happen."
+    subsections:
+      - anchor: pipeline-variables
+        heading: "Variable resolution"
+        required: true
+        guidance: "The Control-M variable story (Python owns resolution)."
+
+  - anchor: ontology
+    heading: "The ontology: borrowed meaning"
+    required: true
+    guidance: "PROV-O / ORG / DPROD / SKOS bindings — why edges mean things."
+
+  - anchor: governance
+    heading: "Governance: three axes and one gate"
+    required: true
+    guidance: "How decisions are made and recorded."
+    subsections:
+      - anchor: governance-axes
+        heading: "The three axes"
+        required: true
+        guidance: "Sensitivity, trust, and lifecycle-status classification."
+      - anchor: governance-gate
+        heading: "The HITL gate"
+        required: true
+        guidance: "The SME flow every edge-meaning decision routes through."
+
+  - anchor: architecture
+    heading: "The shape of the code: components and databases"
+    required: true
+    guidance: "MODULE_MAP components and the multi-DB topology."
+    subsections:
+      - anchor: architecture-components
+        heading: "Components"
+        required: true
+        guidance: "The component boundary map and who imports whom."
+      - anchor: architecture-databases
+        heading: "Databases"
+        required: true
+        guidance: "drydocs / ddlineage / ddcontext / ddall and what lives where."
+
+  - anchor: beyond-loading
+    heading: "Beyond loading: what the other components do"
+    required: true
+    guidance: "Remediation, review, docmeta, api/web — the non-loader estate."
+
+  - anchor: operating-model
+    heading: "How the project runs itself"
+    required: true
+    guidance: "Backlog, session ritual, sub-agents, the idea inbox."
+
+  - anchor: status
+    heading: "Where the project stands"
+    required: true
+    guidance: >
+      The epic-by-epic status table AS OF the front-matter commit — this section
+      is the primary reason for the Rev-per-epic-close refresh cadence.
+
+  - anchor: roadmap
+    heading: "The road ahead"
+    required: true
+    guidance: "What is next and what is deliberately deferred."
+
+  - anchor: glossary
+    heading: "Glossary"
+    required: true
+    guidance: "Terms a new reader needs; keep aligned with the TDD definitions."

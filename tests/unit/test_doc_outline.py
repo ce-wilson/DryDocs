@@ -167,6 +167,27 @@ def test_every_committed_runbook_conforms_to_outline() -> None:
         )
 
 
+# ── L15: the Review — the third doc type through the same contract ────────────
+REVIEW_OUTLINE = REPO_ROOT / "docs" / "design" / "templates" / "review.outline.yaml"
+PROJECT_REVIEW = REPO_ROOT / "docs" / "design" / "drydocs-project-review.md"
+
+
+def test_real_review_outline_loads() -> None:
+    outline = load_outline(REVIEW_OUTLINE)
+    assert outline.doc_type == "Review"
+    # the review narrates — no traceability spine (that's the TDDs' job)
+    assert not outline.traceability.get("matrix_section")
+    # the status section is the reason the Rev-per-epic-close cadence exists
+    assert "status" in outline.required_anchors()
+
+
+def test_project_review_conforms_to_outline() -> None:
+    problems = validate_paths(REVIEW_OUTLINE, PROJECT_REVIEW)
+    assert problems == [], (
+        "project review drifted from review.outline.yaml:\n  " + "\n  ".join(problems)
+    )
+
+
 # ── L11: derived subsection anchors in the feedback namespace ─────────────────
 FB_DOC = "<!-- anchor: purpose -->\n## Purpose\n\n<!-- anchor: detailed-design -->\n## Design\n"
 

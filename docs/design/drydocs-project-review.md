@@ -1,5 +1,6 @@
 # DryDocs — The Whole-Project Review
 
+<!-- anchor: front-matter -->
 **Project review · Rev 1 · 2026-07-14 · commit `97ee81c` · Classification: Internal-Public
 (mechanism only — no customer names, hosts, schedules, SIDs, or real identifiers appear in
 this document).**
