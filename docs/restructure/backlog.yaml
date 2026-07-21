@@ -4490,6 +4490,204 @@ items:
       zone/glue-table shapes for the enrichment feed) rides this item.
       Candidate-side parsing on gate-confirmed endpoint shapes, hence sonnet.
 
+  # ── rua-extract ingest phase (groomed 2026-07-21 from the company-side
+  #    collector run + PuTTY readout; mechanism-only — real host/user values
+  #    stay company-side / internal-local) ──────────────────────────────────
+  - id: G18
+    epic: component-topology
+    title: "rua collector v2 parity: script-file capture (-n name glob) back-ported from the observed company-side run"
+    type: task
+    module: drydocs-lineage
+    phase: 6
+    agent: main
+    model: sonnet
+    priority: p2
+    status: todo
+    depends_on: []
+    inputs: [drydocs_lineage/collect/rua_inventory.sh, drydocs_lineage/collect/rua_inventory.conf, drydocs_lineage/collect/README.md]
+    acceptance: >
+      rua_inventory.sh gains the script-capture feature observed in the
+      2026-07-20 company-side run (screenshots -> reproduce generically, the
+      drydocs-review back-flow discipline): a -n <glob> flag (repeatable or
+      space-separated) captures FILES matching the name glob under the scan
+      roots into scripts.tsv (path, owner, group, perms, size, mtime) plus
+      copies under scripts/ in the bundle (copy behavior config-gated like
+      COPY_PROFILES; size cap configurable so a stray large file never bloats
+      the bundle); the run summary prints a "scripts: N captured" line;
+      COLLECTOR_VERSION bumps to rua-inventory/v2 with v1 bundles explicitly
+      still ingestible (the extractor treats scripts.tsv as optional);
+      README documents the flag and the bundle addition. POSIX sh / ksh
+      compatible, still strictly read-only outside -o.
+    notes: >
+      The company copy already runs this (observed: -n '*.py' -> 35 scripts
+      captured beside 17 directories); producer v1 lacks it. Script CONTENT
+      is what feeds G21's code-operations pass, so this lands first. Exact
+      company implementation unseen — reproduce from observed CLI + summary
+      behavior, don't guess internals.
+
+  - id: G19
+    epic: component-topology
+    title: "Out-of-repo landing zone for rua bundles: DRYDOCS_DATA_ROOT + source registration"
+    type: task
+    module: config
+    phase: 6
+    agent: main
+    model: sonnet
+    priority: p2
+    status: todo
+    depends_on: []
+    inputs: [drydocs_core/adapters/sql_run_log.py, config/source-registry.yaml, config/classification.yaml, drydocs_lineage/collect/README.md, PUBLISH-BOUNDARY.md]
+    acceptance: >
+      A data-root convention exists mirroring the sql_run_log logs idiom
+      (DEFAULT_LOGDIR = ~/logs/DryDocs, env-overridable): default
+      ~/data/DryDocs, override via DRYDOCS_DATA_ROOT, resolved by ONE shared
+      helper in drydocs_core (unit-tested), with per-source subfolders —
+      rua/incoming/ for tarballs, rua/extracted/<bundle>/ for unpacked
+      bundles. The rua source is registered in config/source-registry.yaml
+      with classification internal-confidential (bundles hold real
+      hostnames, uids, home paths, profile + script copies) and the
+      registration records that DATA NEVER ENTERS THE REPO — only the
+      pointer does (the internal-local hand-carry note covers transport).
+      collect/README gains a "where bundles live" section; a guard test
+      asserts the repo tree contains no rua_*.tar.gz / extracted bundle
+      (publish-boundary safety net, same spirit as the root-image rule).
+    notes: >
+      User call 2026-07-21: bundle output is not the structured seal/pat
+      csv shape, can be big, and belongs outside the project like the logs.
+      ~/data/DryDocs (not internal-local/) because internal-local is the
+      hand-carry WORKING area inside the tree — big binary bundles get a
+      real out-of-tree home; internal-local keeps only pointers/notes.
+
+  - id: G20
+    epic: component-topology
+    title: "rua_inventory extractor: bundle -> staging records with the meta.txt provenance envelope"
+    type: task
+    module: drydocs-lineage
+    phase: 6
+    agent: main
+    model: sonnet
+    priority: p2
+    status: todo
+    depends_on: [G18, G19]
+    inputs: [drydocs_lineage/extractors/controlm_inventory.py, drydocs_lineage/model.py, drydocs_lineage/writer.py, tests/unit/test_lineage_inventory.py]
+    acceptance: >
+      drydocs_lineage/extractors/rua_inventory.py reads a bundle (tarball or
+      extracted dir) from the G19 landing zone and emits staging records in
+      the controlm_inventory idiom: meta.txt parsed into a provenance
+      envelope carried on every record (schema version, collected_at/by,
+      user, uid, groups, shell, host, fqdn, os/kernel, scan roots — the
+      "metadata as nodes" raw material); directories.tsv -> DataAsset
+      candidates; profiles.tsv + profiles/ -> profile artifacts;
+      scripts.tsv + scripts/ -> script artifacts (optional, v1 bundles
+      accepted); ownership_dirs.tsv consumed when present. v1 AND v2
+      bundles both parse (fixture per version, synthetic values only);
+      malformed/missing sections are counted, never silently dropped (the
+      coverage house rule). NO graph writes and NO new relationship types —
+      candidates only, refusal semantics unchanged. Full suite green.
+    notes: >
+      The extractor the collect/README has promised since the ADR 0002-C
+      re-home. Join keys downstream: (host, user) -> ControlMJob run_as +
+      node_target (Epic P hosts-topology), script path -> CMD_LINE /
+      launcher references. Pure candidate-side parsing, hence sonnet.
+
+  - id: G21
+    epic: component-topology
+    title: "rua code-operations pass: captured scripts + profiles through the software-ontology mappers (launcher registry, ETL_* facts, file-ops)"
+    type: task
+    module: drydocs-lineage
+    phase: 6
+    agent: main
+    model: sonnet
+    priority: p2
+    status: todo
+    depends_on: [G20]
+    inputs: [drydocs_core/controlm/commands.py, drydocs_core/controlm/variables.py, drydocs_lineage/extractors/rua_inventory.py, config/gate-log.md]
+    acceptance: >
+      A code-operations pass runs over the bundle's captured script and
+      profile CONTENT and maps what it finds onto the existing software
+      ontology surfaces — reusing, not duplicating, the G14/G15/G16
+      machinery: (a) launcher/interpreter invocations found inside scripts
+      classify via LAUNCHER_REGISTRY (DPL GUID identity per G15 where
+      present); (b) variable assignments classify via FACT_REGISTRY ETL_*
+      canonicals with G16 value contracts (values decide, WARN stream);
+      (c) file operations (move/copy/gzip and kin) emit READS_FROM /
+      WRITES_TO candidates with endpoints exactly per the 2026-07-15 gate
+      EDIT — no new relationship types, all m3_*/m7 statuses untouched;
+      (d) profile parsing captures PATH mutations and sourced/invoked
+      scripts as script-to-script DEPENDENCY CANDIDATES (flagged
+      needs-vocabulary — the edge meaning is G22's, never auto-decided);
+      (e) every skipped/unparseable construct is counted by reason.
+      Unit tests on synthetic script/profile fixtures; full suite green.
+    notes: >
+      "Extract the code operations as they map to the software ontology"
+      (user, 2026-07-21). Static analysis of shell/python text is
+      best-effort by design — coverage counters make the miss rate visible
+      instead of implying completeness. Candidate-side only, hence sonnet.
+
+  - id: G22
+    epic: component-topology
+    title: "HITL gate session: rua load shapes — ownership + profile-dependency edge meanings, planned-tier activation scope"
+    type: requirement
+    module: drydocs-lineage
+    phase: 6
+    agent: main
+    model: fable
+    priority: p2
+    status: todo
+    depends_on: [G21]
+    inputs: [docs/restructure/03-hitl-sme-flow.md, config/gate-log.md, drydocs_core/schema/schema_graph.cypher, docs/RELATIONSHIP_GUIDE.md]
+    acceptance: >
+      A HITL gate session rules the graph shape for rua data before ANY
+      load: (a) which existing planned vocabulary the load may activate
+      for these facts (candidates: AppUser -DELEGATES_TO-> ExecutionHost,
+      ControlMJob -RUNS_ON-> ExecutionHost, ControlMJob -INVOKES-> Script,
+      m7 USES_ARTIFACT, m3 READS_FROM/WRITES_TO); (b) the NEW edge
+      meanings the bundle implies and the vocabulary lacks — run-as user
+      owns home/directory DataAssets (WAS_ATTRIBUTED_TO {role} per the
+      arch_owns_code precedent, or a new type), and profile
+      sources/invokes script (G21's flagged dependency candidates) —
+      proposed via ontology-mapper as status: planned first, per the
+      RELATIONSHIP_GUIDE registry flow; (c) the node identity keys
+      (ExecutionHost by fqdn?, AppUser by (user, uid)?, Script by
+      (host, path)?) and how the meta.txt provenance envelope lands
+      (properties vs the provenance-audit-fields envelope plan);
+      (d) classification handling on load — which properties are
+      internal-confidential and must never reach a publishable export
+      (ties to the O11 spec classification vocabulary). Decisions in
+      config/gate-log.md; anything declined stays candidate-only.
+    notes: >
+      THE TERMINUS of this groom — G18-G21 are all candidate-side and
+      buildable ungated; nothing writes the graph before this session.
+      fable per the matrix (ontology decisions).
+
+  - id: G23
+    epic: component-topology
+    title: "rua curated load: bundle facts + provenance metadata land as nodes per the G22 rulings"
+    type: task
+    module: drydocs-lineage
+    phase: 6
+    agent: main
+    model: sonnet
+    priority: p2
+    status: todo
+    depends_on: [G22]
+    inputs: [drydocs_lineage/writer.py, drydocs_core/schema/constraints.cypher, config/gate-log.md, tests/]
+    acceptance: >
+      The lineage writer loads a rua bundle into the graph EXACTLY per the
+      G22 gate rulings: the ruled node set (server / run-as user / script +
+      profile artifacts / directory DataAssets) with the ruled identity
+      keys and constraints, the ruled edges only (activated or newly
+      planned->active per the gate — nothing beyond it), and the meta.txt
+      provenance envelope attached in the ruled form. Idempotent re-load of
+      the same bundle (MERGE on identity keys); a testcontainers e2e proves
+      a synthetic v2 bundle round-trips collector-shape -> extractor ->
+      load -> cypher readback. Coverage counters from G20/G21 surface in
+      the load report. Full suite green.
+    notes: >
+      Sequenced after the gate on purpose (K2 -> K4 loader precedent:
+      gate first, build same day after sign-off). Synthetic fixtures only
+      in-repo; real bundles stay in the G19 landing zone.
+
   - id: C11
     epic: ontology-mapping
     title: "Capture the company-confirmed AisCapability/AiTool platform taxonomy as the seed answer for the platforms gate"
@@ -4572,8 +4770,8 @@ items:
       surface.
 
 summary:
-  todo: 18                                         # +O24 seal-contacts override list (2026-07-21 pm SME direction)
+  todo: 24                                         # +O24 seal-contacts; +G18..G23 rua-ingest phase (2026-07-21 groom)
   in_progress: 1                                   # E1 (gate deferred both sides)
   blocked: 0
   done: 112                                        # +O13 +O10 +O12 +O15 +O16 +O17 +O18 +O19 (2026-07-21 Epic-O finish session)
-  next_ready: [L9, L12, L14, L15, M2, M3, M4, P3, J10, Q6, O20, O23, O24, J13, G17, C11]
+  next_ready: [L9, L12, L14, L15, M2, M3, M4, P3, J10, Q6, O20, O23, O24, J13, G17, G18, G19, C11]
