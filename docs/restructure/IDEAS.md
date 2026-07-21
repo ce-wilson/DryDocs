@@ -26,6 +26,35 @@ Tags help grooming: `idea` · `bug` · `doc` · `source` (new data source) · `q
 
 <!-- add new ideas at the top -->
 
+- 2026-07-21 — [question] **Company draft CMD_LINE/variable NFR ontology vetted vs m3 vocab**
+  (mechanism-only; full comparison in the session flow-doc §5). Same node spine and the same
+  Job→Script→ETLProcess shape, but three deltas that are all HITL-gate decisions before any
+  adoption: (1) a NEW `USES_ARTIFACT` edge Job→payload-Script (producer folds payloads into
+  `m3_invokes` 1..n); (2) TRIGGERS from-node = the **payload** in the draft vs the invoked
+  **wrapper/launcher** in `m3_triggers` (observed grammar argues launcher — the `-pipeline`
+  literal sits on the launcher line); (3) `script_role` {launcher,payload} + artifact_*
+  properties on :Script (additive but schema-touching). Its canonical-variable half is
+  greenfield-only and complements G15 (the legacy-inference parser); the platform enums also
+  disagree, and the variable gap analysis already shows the draft enum too small (EMR live,
+  Snowflake hinted via pset paths, no DBT/Databricks).
+- 2026-07-21 — [source] **Variable gap analysis: 2,384 unique names vs the proposed alias
+  map** (company-side, mechanism-only). Variable NAMES lie about values — jar/python/py-path
+  style names all resolving to the shell *launcher* — so classification must key on the
+  VALUE or the `-pipeline` literal, never the name (direct evidence for G15 acceptance
+  (a)+(c); the on-prem `dpl_spark_processor` spellings appear in real folder vars). SHA-digest
+  variables need an artifact-**sha** canonical distinct from artifact-**uri**; the alias map
+  has large coverage holes vs production names → alias maps need value-based fallback.
+- 2026-07-21 — [idea] **FW-really-API confirmed live** — the greenfield-provenance use case
+  for the fix module: a file-watcher-shaped job's `.tok` is produced by an UPSTREAM API-call
+  job writing the file locally, no external push exists — the name/type lies. Already
+  codified as the `_FW`-really-API anti-pattern + design principle 8 (intent from resolved
+  flow, flag name-token disagreement) in
+  `internal/remediation/governance/nfr-consistency-and-greenfield.md`; the description-field
+  metadata plan is the declared-provenance carrier. Two NEW provenance gap classes from the
+  live case: (a) payload script deployed on the exec host but ABSENT from SCM (code search
+  finds only the XML variable reference) → *artifact-not-in-SCM* flag on :Script; (b)
+  pipeline-id-keyed code discovery has NO key for non-DPL python jobs → PATH-keyed Script
+  identity is the fallback, and the GUID-vs-path boundary is the kind discriminator.
 - 2026-07-21 — [source] **DPL ingestion leg + AWS zone model traced** (company ingestion
   template; mechanism-only — values stay company-side). Upstream of the launcher spine:
   FM drop of a `.dat` + `.tok` landing pair → Control-M file-watcher condition grammar
