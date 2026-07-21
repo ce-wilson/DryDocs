@@ -40,7 +40,11 @@ function OwnNode({ data }: NodeProps<OwnRFNode>) {
           : undefined,
       }}
     >
-      <Handle type="target" position={Position.Left} className="!h-1.5 !w-1.5 !border-0 !bg-transparent" />
+      {/* handles on BOTH sides: vocabulary edges run in both directions along
+          the chain layout (e.g. DevTeam -SUPPORTS-> AreaProduct), so rtl edges
+          attach left-source → right-target instead of wrapping around */}
+      <Handle id="tl" type="target" position={Position.Left} className="!h-1.5 !w-1.5 !border-0 !bg-transparent" />
+      <Handle id="tr" type="target" position={Position.Right} className="!h-1.5 !w-1.5 !border-0 !bg-transparent" />
       <div className="break-all text-[11px] font-semibold text-text">{data.label}</div>
       <div className="font-mono text-[10px]" style={{ color: `var(${data.token})` }}>
         {data.kind}
@@ -50,7 +54,8 @@ function OwnNode({ data }: NodeProps<OwnRFNode>) {
           unmapped_role=true — needs crosswalk
         </div>
       )}
-      <Handle type="source" position={Position.Right} className="!h-1.5 !w-1.5 !border-0 !bg-transparent" />
+      <Handle id="sr" type="source" position={Position.Right} className="!h-1.5 !w-1.5 !border-0 !bg-transparent" />
+      <Handle id="sl" type="source" position={Position.Left} className="!h-1.5 !w-1.5 !border-0 !bg-transparent" />
     </div>
   )
 }
@@ -91,6 +96,8 @@ export default function OwnershipGraphPane({
         id: e.id,
         source: e.source,
         target: e.target,
+        sourceHandle: e.dir === 'rtl' ? 'sl' : 'sr',
+        targetHandle: e.dir === 'rtl' ? 'tr' : 'tl',
         label: e.rel,
         style: { stroke: 'var(--faint)', strokeWidth: 1.4 },
         labelStyle: { fill: 'var(--muted)', fontSize: 10, fontFamily: 'var(--mono)' },

@@ -3549,6 +3549,39 @@ items:
       themes checked via computed styles in the live preview (screenshot capture
       timed out in the pane — DOM/style verification instead, disclosed).
 
+  - id: O23
+    epic: web-console
+    title: "HITL gate session: rollup-shape review — define the canonical rollup shape per UI scenario against the vocabulary"
+    type: requirement
+    module: drydocs-web
+    phase: 12
+    agent: main
+    model: fable
+    priority: p2
+    status: todo
+    depends_on: [O15]
+    inputs: [drydocs_core/schema/schema_graph.cypher, web/src/ownership/demoOwnership.ts, web/src/ownership/assetSearch.ts, docs/restructure/03-hitl-sme-flow.md, config/gate-log.md]
+    acceptance: >
+      A HITL gate session defines THE rollup shape for each UI scenario that
+      renders one (ownership K4 rollup, asset-path source→target, mappings
+      attribution views, lineage rollups as they land): for each scenario the
+      gate records the exact node kinds, relationship types, directions, and
+      qualifier properties (role, status active/planned) drawn from the
+      schema_graph vocabulary — no UI may render a relationship type or
+      direction that is not in the vocabulary, and planned-status edges must
+      be visibly marked as planned. Decisions land in config/gate-log.md; every
+      demo/mock dataset in web/src is then reconciled to the ruled shapes (the
+      2026-07-21 drift found in demoOwnership.ts — HAS_PRODUCT skipping
+      ProductLine, ALIGNED/DEVELOPS invented types, SUPPORTS direction — is
+      the motivating example; a hotfix aligned the mock same day, but the
+      per-scenario ruling is the gate's job, not the hotfix's).
+    notes: >
+      User-requested 2026-07-21: "Rollup Shape review, it needs to be defined
+      for each scenario with HITL gate." The standing rule this gate encodes:
+      mock data may invent VALUES, never RELATIONSHIP SEMANTICS — labels,
+      node kinds, edge types, and directions always reflect current schema
+      state so the demo teaches the true shape.
+
   # ── Epic P — Runtime topology & maintenance windows — Phase 13 ─────────────
   # Born 2026-07-09: CM_HOSTS + CM_AVG_RUN onboarded via the add-source-object
   # walkthrough; gate controlm-hosts-topology SIGNED OFF 18/18 same day
@@ -4494,8 +4527,8 @@ items:
 # Roll-up the dispatcher can glance at. COMPUTED views — test_backlog.py enforces
 # that these match the items exactly; update them with any status change.
 summary:
-  todo: 16                                         # -O17 -O18 -O19 done (2026-07-21 Epic-O finish session)
+  todo: 17                                         # +O23 rollup-shape gate (2026-07-21 user request)
   in_progress: 1                                   # E1 (gate deferred both sides)
   blocked: 0
   done: 112                                        # +O13 +O10 +O12 +O15 +O16 +O17 +O18 +O19 (2026-07-21 Epic-O finish session)
-  next_ready: [L9, L12, L14, L15, M2, M3, M4, P3, J10, Q6, O20, J13, G17, C11]
+  next_ready: [L9, L12, L14, L15, M2, M3, M4, P3, J10, Q6, O20, O23, J13, G17, C11]

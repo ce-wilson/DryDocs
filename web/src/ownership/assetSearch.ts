@@ -180,6 +180,9 @@ export interface PathEdge {
   source: string
   target: string
   label: string
+  /** rendering hint: edge points AGAINST the left→right layout (real
+   *  vocabulary direction, e.g. ControlMJob -REQUIRES_IN_CONDITION-> Condition) */
+  dir?: 'rtl'
 }
 
 export const PATH_NODES: readonly PathNode[] = [
@@ -213,22 +216,27 @@ export const PATH_NODES: readonly PathNode[] = [
   },
 ]
 
+// Edge-label rule (2026-07-21 SME correction; per-scenario ruling = O23):
+// UPPERCASE = a real schema_graph.cypher vocabulary type in its real
+// direction (status qualifier shown when planned/derived); lowercase +
+// "unruled" = an illustrative hop the ontology has NOT ruled yet — never
+// dressed up as a vocabulary type.
 export const PATH_EDGES: readonly PathEdge[] = [
-  { id: 'e1', source: 'hl1', target: 'f1', label: 'OWNS' },
+  { id: 'e1', source: 'f1', target: 'hl1', label: 'WAS_ASSOCIATED_WITH (derived via jobs)', dir: 'rtl' },
   { id: 'e2', source: 'f1', target: 'j1', label: 'CONTAINS_JOB' },
   { id: 'e3', source: 'j1', target: 'j2', label: 'cond HL-EXTRACT-OK' },
-  { id: 'e3a', source: 'j1', target: 'cond', label: 'POSTS' },
-  { id: 'e3b', source: 'cond', target: 'j2', label: 'RELEASES' },
+  { id: 'e3a', source: 'j1', target: 'cond', label: 'EMITS_OUT_CONDITION' },
+  { id: 'e3b', source: 'j2', target: 'cond', label: 'REQUIRES_IN_CONDITION', dir: 'rtl' },
   { id: 'e4', source: 'f2', target: 'j2', label: 'CONTAINS_JOB' },
-  { id: 'e5', source: 'hl2', target: 'f2', label: 'OWNS' },
-  { id: 'e6', source: 'repo', target: 'j1', label: 'CODE_SOURCED' },
-  { id: 'e7', source: 'j1', target: 'file', label: 'WRITES' },
-  { id: 'e8', source: 'route', target: 'file', label: 'ROUTES' },
-  { id: 'e9', source: 'file', target: 'stg', label: 'LANDS_IN' },
-  { id: 'e10', source: 'stg', target: 'ds', label: 'LOADS' },
-  { id: 'e11', source: 'file', target: 'ds', label: 'LOADS (via stage)' },
-  { id: 'e12', source: 'ds', target: 'vw', label: 'FEEDS' },
-  { id: 'e13', source: 'vw', target: 'hl2', label: 'READ_BY' },
+  { id: 'e5', source: 'f2', target: 'hl2', label: 'WAS_ASSOCIATED_WITH (derived via jobs)' },
+  { id: 'e6', source: 'repo', target: 'j1', label: 'code source (unruled — O23)' },
+  { id: 'e7', source: 'j1', target: 'file', label: 'WRITES_TO (planned)' },
+  { id: 'e8', source: 'route', target: 'file', label: 'routes (unruled — O23)' },
+  { id: 'e9', source: 'file', target: 'stg', label: 'lands in (unruled — O23)' },
+  { id: 'e10', source: 'stg', target: 'ds', label: 'loads (unruled — O23)' },
+  { id: 'e11', source: 'file', target: 'ds', label: 'loads via stage (unruled — O23)' },
+  { id: 'e12', source: 'ds', target: 'vw', label: 'feeds (unruled — O23)' },
+  { id: 'e13', source: 'vw', target: 'hl2', label: 'read by (unruled — O23)' },
 ]
 
 /** ids visible on first render (the SHORTEST-path spine; hidden = expandable context) */

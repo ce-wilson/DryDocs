@@ -38,24 +38,28 @@ export default function ModuleTemplate({ module, selection, graphPane, tabConten
 
   return (
     <div className="flex h-full min-h-0 flex-col">
+      {/* breadcrumb layer stays breadcrumbs-only (2026-07-21 user call);
+          page actions live on the heading row below */}
       <ModuleToolbar
         crumbs={[{ label: 'Home', to: '/' }, { label: module.label }, ...(selection ? [{ label: selection }] : [])]}
-        actions={
-          toolbarActions ?? (
+      />
+      <div className="flex flex-wrap items-end gap-2 px-4 pt-3">
+        <div className="min-w-0 flex-1">
+          <h2 tabIndex={-1} data-view-heading className="text-lg font-semibold text-text outline-none">
+            {module.label}
+          </h2>
+          <p className="mt-0.5 text-xs text-faint">{module.tagline} · backs onto {module.backsOnto}</p>
+        </div>
+        <div className="flex shrink-0 items-center gap-2">
+          {toolbarActions ?? (
             <>
               <ToolbarButton label="Layout" disabled />
               <ToolbarButton label="Fit" disabled />
               <ToolbarButton label="Refresh" disabled />
               <ToolbarButton label="Export ▾" disabled />
             </>
-          )
-        }
-      />
-      <div className="px-4 pt-3">
-        <h2 tabIndex={-1} data-view-heading className="text-lg font-semibold text-text outline-none">
-          {module.label}
-        </h2>
-        <p className="mt-0.5 text-xs text-faint">{module.tagline} · backs onto {module.backsOnto}</p>
+          )}
+        </div>
       </div>
       <div className="min-h-0 flex-1 p-4">
         <div className="h-full min-h-[420px] overflow-hidden rounded-lg border border-edge bg-panel">

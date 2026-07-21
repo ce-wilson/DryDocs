@@ -3,10 +3,10 @@ import { Link } from 'react-router-dom'
 import { APPS, PRODUCTS, searchAssets } from './assetSearch'
 
 // The support-user search strip on /ownership (2026-07-21 chat): answers
-// "who supports this file/table" and routes "why hasn't it loaded" to the
+// "who supports this file/table" and routes load-status questions to the
 // asset path sub-page. Narrowing dropdowns FIRST (Product → Application →
 // file/table), partial-name search LAST — never a name search across all
-// assets.
+// assets. (Use-case wording kept out of the UI per the same-day user call.)
 export default function AssetSearchPanel() {
   const [productId, setProductId] = useState('')
   const [appId, setAppId] = useState('')
@@ -24,7 +24,7 @@ export default function AssetSearchPanel() {
     <div className="shrink-0 border-b border-edge-soft bg-panel-2/60 px-3 py-2">
       <div className="flex flex-wrap items-center gap-2">
         <span className="text-[11px] font-semibold uppercase tracking-wide text-faint">
-          Who supports / why hasn&rsquo;t it loaded
+          Asset search
         </span>
         <select
           aria-label="Product"

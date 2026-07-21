@@ -50,13 +50,17 @@ function PathNodeView({ data }: NodeProps<PathRFNode>) {
             : undefined,
       }}
     >
-      <Handle type="target" position={Position.Left} className="!h-1.5 !w-1.5 !border-0 !bg-transparent" />
+      {/* handles on BOTH sides so rtl vocabulary edges (REQUIRES_IN_CONDITION,
+          derived WAS_ASSOCIATED_WITH) attach cleanly instead of wrapping */}
+      <Handle id="tl" type="target" position={Position.Left} className="!h-1.5 !w-1.5 !border-0 !bg-transparent" />
+      <Handle id="tr" type="target" position={Position.Right} className="!h-1.5 !w-1.5 !border-0 !bg-transparent" />
       <div className="max-w-44 truncate font-mono text-[11px] font-semibold text-text">{data.label}</div>
       <div className="text-[9.5px]" style={{ color: `var(${data.token})` }}>
         {data.sub}
         {data.expandableCount > 0 && <span className="ml-1 text-faint">(+{data.expandableCount})</span>}
       </div>
-      <Handle type="source" position={Position.Right} className="!h-1.5 !w-1.5 !border-0 !bg-transparent" />
+      <Handle id="sr" type="source" position={Position.Right} className="!h-1.5 !w-1.5 !border-0 !bg-transparent" />
+      <Handle id="sl" type="source" position={Position.Left} className="!h-1.5 !w-1.5 !border-0 !bg-transparent" />
     </div>
   )
 }
@@ -99,6 +103,8 @@ export default function AssetPathRoute() {
           id: e.id,
           source: e.source,
           target: e.target,
+          sourceHandle: e.dir === 'rtl' ? 'sl' : 'sr',
+          targetHandle: e.dir === 'rtl' ? 'tr' : 'tl',
           label: e.label,
           style: { stroke: 'var(--faint)', strokeWidth: 1.3 },
           labelStyle: { fill: 'var(--muted)', fontSize: 9.5, fontFamily: 'var(--mono)' },
@@ -153,7 +159,7 @@ export default function AssetPathRoute() {
             <p className="mt-1 text-faint">{app?.label}</p>
           </div>
           <div className="rounded-lg border border-edge bg-panel p-3 text-xs">
-            <h3 className="mb-1 text-[10.5px] font-semibold uppercase tracking-wide text-faint">Why hasn&rsquo;t it loaded</h3>
+            <h3 className="mb-1 text-[10.5px] font-semibold uppercase tracking-wide text-faint">Load status</h3>
             <p className={'font-mono text-[11px] ' + (asset.load.state === 'LATE' ? 'text-brand-soft' : 'text-green')}>
               {asset.load.state} · expected by {asset.load.expectedBy}
             </p>
