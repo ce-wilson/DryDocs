@@ -313,6 +313,55 @@ QUERY_SPECS: dict[str, QuerySpec] = {
             classification="internal",
             params=_LIMIT,
         ),
+        # O17 runbooks frames.
+        QuerySpec(
+            id="runbooks.series.v1",
+            database="ddlineage",
+            description=(
+                "Data-series chains: FileWatcher-triggered ETL processes and the "
+                "assets they land (curated post-gate; zero rows is the honest state "
+                "until the lineage live-load gate flips)."
+            ),
+            cypher=(
+                "MATCH (j:ControlMJob)-[:TRIGGERS]->(e:ETLProcess) "
+                "OPTIONAL MATCH (e)-[:WRITES_TO]->(d:DataAsset) "
+                "RETURN j.job_name AS trigger_job, e.token AS process, e.kind AS kind, "
+                "collect(DISTINCT d.assetId) AS lands "
+                "ORDER BY trigger_job LIMIT $limit"
+            ),
+            columns=(
+                ColumnDef("trigger_job", "string", "Trigger job"),
+                ColumnDef("process", "string", "ETL process"),
+                ColumnDef("kind", "string", "Kind"),
+                ColumnDef("lands", "string", "Lands (assets)"),
+            ),
+            classification="internal",
+            params=_LIMIT,
+        ),
+        QuerySpec(
+            id="runbooks.metadata-completeness.v1",
+            database="drydocs",
+            description=(
+                "Runbook metadata completeness per job: whether the Description "
+                "field carries anything for the runbook generator to work with "
+                "(the description-field metadata plan's coverage view). Missing "
+                "rows float to the top — the fix-in-batches work queue."
+            ),
+            cypher=(
+                "MATCH (f:ControlMFolder)-[:CONTAINS_JOB]->(j:ControlMJob) "
+                "WITH f, j, (j.description IS NULL OR j.description = '') AS missing "
+                "RETURN f.sched_table AS folder, j.job_name AS job, "
+                "CASE WHEN missing THEN 'missing' ELSE 'present' END AS description_metadata "
+                "ORDER BY missing DESC, folder, job LIMIT $limit"
+            ),
+            columns=(
+                ColumnDef("folder", "string", "Folder"),
+                ColumnDef("job", "string", "Job"),
+                ColumnDef("description_metadata", "string", "Description metadata"),
+            ),
+            classification="internal",
+            params=_LIMIT,
+        ),
         # O16 loads frames — the BaseLoader :JobRun envelope.
         QuerySpec(
             id="loads.runs.v1",
