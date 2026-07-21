@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import type { Persona } from '../lib/auth'
 import { MODULES } from '../modules/registry'
@@ -107,6 +108,8 @@ export default function OverviewRoute({ persona }: { persona: Persona }) {
             <BenefitCard title="Change Management" text="Findings, fix batches, and gates stay linked to their source." />
           </div>
 
+          <OnboardingChecklist />
+
           <p className="mt-8 text-center font-mono text-[11px] text-faint">
             Signed in as {persona.displayName} ({persona.role}) · demo/synthetic content is tagged EXAMPLE
             DATA · ILLUSTRATIVE
@@ -122,6 +125,73 @@ function BenefitCard({ title, text }: { title: string; text: string }) {
     <div className="rounded-lg border border-edge bg-panel p-4">
       <h3 className="text-sm font-semibold text-text">{title}</h3>
       <p className="mt-1 text-xs text-muted">{text}</p>
+    </div>
+  )
+}
+
+// Onboarding checklist (site-plan §3 row 0: "benefit cards + onboarding
+// checklist instead" of data frames; gemini-wire-frame.md's
+// UserOnboardingChecklist). Checked state persists locally — it's a personal
+// tour tracker, not server state.
+const ONBOARDING_KEY = 'drydocs.onboarding.v1'
+const ONBOARDING_STEPS = [
+  { id: 'explore', label: 'Explore a tower pipeline in the Explorer graph', to: '/explorer' },
+  { id: 'inspect', label: 'Click a graph node — the inspector opens, the data frames filter', to: '/explorer' },
+  { id: 'theme', label: 'Try the System / Dark / Light theme toggle in the header', to: null },
+  { id: 'live', label: 'Open the live dependency graph (real WAS_INFORMED_BY edges)', to: '/explorer/live' },
+  { id: 'console', label: 'Run a read-only query in the Cypher console', to: '/console' },
+] as const
+
+function OnboardingChecklist() {
+  const [done, setDone] = useState<readonly string[]>(() => {
+    try {
+      return JSON.parse(localStorage.getItem(ONBOARDING_KEY) ?? '[]') as string[]
+    } catch {
+      return []
+    }
+  })
+
+  function toggle(id: string) {
+    setDone((prev) => {
+      const next = prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]
+      try {
+        localStorage.setItem(ONBOARDING_KEY, JSON.stringify(next))
+      } catch {
+        /* ignore */
+      }
+      return next
+    })
+  }
+
+  return (
+    <div className="mt-6 rounded-lg border border-edge bg-panel p-4">
+      <div className="flex items-baseline justify-between">
+        <h3 className="text-sm font-semibold text-text">Getting started</h3>
+        <span className="font-mono text-[11px] text-faint">
+          {done.length}/{ONBOARDING_STEPS.length}
+        </span>
+      </div>
+      <ul className="mt-2 flex flex-col gap-1.5">
+        {ONBOARDING_STEPS.map((s) => (
+          <li key={s.id} className="flex items-center gap-2 text-xs">
+            <input
+              id={`onboard-${s.id}`}
+              type="checkbox"
+              checked={done.includes(s.id)}
+              onChange={() => toggle(s.id)}
+              className="h-3.5 w-3.5 accent-(--blue-br)"
+            />
+            <label htmlFor={`onboard-${s.id}`} className={done.includes(s.id) ? 'text-faint line-through' : 'text-muted'}>
+              {s.label}
+            </label>
+            {s.to && (
+              <Link to={s.to} className="text-blue-bright no-underline hover:underline">
+                go →
+              </Link>
+            )}
+          </li>
+        ))}
+      </ul>
     </div>
   )
 }

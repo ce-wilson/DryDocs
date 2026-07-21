@@ -45,6 +45,20 @@ input, select, textarea {
    accent's own hue with a single rule. */
 .dark .glyph-accent { filter: drop-shadow(0 0 3px currentColor); }
 
+/* React Flow (O9 Explorer graph pane): chrome routed through the theme tokens —
+   site-plan §2 "graph canvases theme too" (CSS vars work inside SVG). */
+.react-flow { background: var(--bg2); }
+.react-flow__controls { box-shadow: none; border: 1px solid var(--edge); border-radius: 6px; overflow: hidden; }
+.react-flow__controls-button {
+  background: var(--panel);
+  color: var(--muted);
+  border-bottom: 1px solid var(--edge-soft);
+}
+.react-flow__controls-button:hover { background: var(--panel2); color: var(--text); }
+.react-flow__controls-button svg { fill: currentColor; }
+.react-flow__attribution { background: transparent; }
+.react-flow__attribution a { color: var(--faint); }
+
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { transition: none !important; animation: none !important; }
 }

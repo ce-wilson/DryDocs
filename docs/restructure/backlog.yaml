@@ -2914,7 +2914,7 @@ items:
     agent: main
     model: sonnet
     priority: p2
-    status: todo
+    status: done          # DONE 2026-07-21 ("create a launchable site" session) — see notes for the two disclosed deviations
     depends_on: [O8]
     inputs: [UI-WIP/site-plan.md, UI-WIP/Gemini_Generated_Landing-Favorite.png, UI-WIP/Gemini-generated-subpage.png, UI-WIP/codeflow-ui-reference.png, UI-WIP/DryDocs_UI_Development_Specs.md, UI-WIP/gemini-wire-frame.md, UI-WIP/icons.md, web/src/]
     acceptance: >
@@ -2941,6 +2941,24 @@ items:
       demo data); gemini-wire-frame.md = expanded-landing options (4 benefit
       cards, onboarding checklist, posture panel -> feeds the spoke health
       glyphs); icons.md glyphs are their own item (O22).
+      DONE 2026-07-21: landing already had the SVG radial hub + generic CTA from
+      O8; this pass added the onboarding checklist (5 steps, localStorage) and
+      the 4 gemini-wire-frame benefit cards. Explorer now truly instantiates the
+      template: React Flow (@xyflow/react) tower graph with tower chips, custom
+      token-styled nodes (KIND_TOKEN map — kind->token, NOT the stored demo
+      hex), edges labeled with rel names; four data frames (Applications/Jobs/
+      Conditions/Servers) from the SYNTHESIZED tower set; ONE lifted selection
+      store — node click filters rows (explicit clear chip) + breadcrumb gains
+      the selection, row click highlights/re-frames the node (cross-tower jump
+      verified), right inspector keyed by node kind with a connections list.
+      TowerDemoGrid placeholder consciously retired (chips + drill/live links
+      replace it). All verified live in the preview, both themes (RF pane bg +
+      node borders flip token values; JS-verified). DEVIATIONS: (1) data grid is
+      the hand-authored ReUI-pattern stand-in, consistent with the O8 Tabs/
+      ResizableSplit convention (real ReUI copy-in still open); (2) acceptance's
+      "screenshot parity" verified structurally + via computed styles because
+      the Browser pane's screenshot capture times out this session — dark AND
+      light checked, pixels not captured. QuerySpec binding is O11 by design.
 
   - id: O10
     epic: web-console
@@ -4217,8 +4235,8 @@ items:
 # Roll-up the dispatcher can glance at. COMPUTED views — test_backlog.py enforces
 # that these match the items exactly; update them with any status change.
 summary:
-  todo: 24                                         # -G16 done (2026-07-21 variable-standard engine alignment built)
+  todo: 23                                         # -O9 done (2026-07-21 launchable-site session: landing + Explorer template instantiation)
   in_progress: 1                                   # E1 (gate deferred both sides)
   blocked: 0
-  done: 102                                        # +G15 +G16 +O21 +O22 (2026-07-21)
-  next_ready: [L9, L12, L14, L15, M2, M3, M4, P3, J10, Q6, O9, O12, O13, J13]
+  done: 103                                        # +G15 +G16 +O21 +O22 +O9 (2026-07-21)
+  next_ready: [L9, L12, L14, L15, M2, M3, M4, P3, J10, Q6, O10, O11, O12, O13, O19, J13]
