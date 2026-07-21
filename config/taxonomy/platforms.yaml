@@ -44,8 +44,8 @@ reconciliation:
 # software_registry_ref mappings are TBD — do NOT invent them; they are
 # resolved at the gate once :AisCapability + :AiTool are defined.
 # ais_capability: user-supplied PROPOSED seed (SME, 2026-07-21 — C11 partial
-# capture): controlm + autosys = "batch scheduling"; airflow deliberately left
-# TBD (not named by the SME). Proposed only — the platforms gate confirms.
+# capture): controlm + autosys = "batch scheduling"; airflow = "event
+# scheduling" (SME-TENTATIVE). Proposed only — the platforms gate confirms.
 platforms:
   - id: controlm
     label: "BMC Control-M"
@@ -69,5 +69,5 @@ platforms:
     scheduler_kind: Airflow
     phase_supported: 2
     software_registry_ref: ~
-    ais_capability: ~
+    ais_capability: "event scheduling" # PROPOSED, SME-TENTATIVE 2026-07-21 ("mostly event scheduled, as far as I know") — verify at the gate; note the batch-vs-event capability split mirrors the SEAL two-port model (BatchProcessing vs EventProcessing)
     ai_tool: ~
