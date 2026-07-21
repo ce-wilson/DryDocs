@@ -44,9 +44,18 @@ Tags help grooming: `idea` · `bug` · `doc` · `source` (new data source) · `q
   skill ledger note (re-add only after their doc-vocab gate); (b) confirm
   `docs/restructure/internal-backlog.yaml` was deleted after the DD-series merge
   (bd7952f follow-up 2 — 388a30d shows the merge happened, not the deletion); (c) the
-  company is ~11 producer commits behind (`7e8df54..1eef6f4`: L7 gate sign-off +
-  live loader, G14 lineage file-ops pass, and the hermetic oracle-kerberos test fix
-  that retires the standing known-failure note in every port report's acceptance).
+  company is producer commits behind past `7e8df54` (L7 gate sign-off + live loader,
+  G14 lineage file-ops pass, the hermetic oracle-kerberos test fix that retires the
+  standing known-failure note, DPL inbox, port-gap fixes) — **and their tooling can't
+  see it**: the 07-21 company-side "identify unported commits" search concluded "fully
+  ported, nothing outstanding" from a FROZEN `cewilson/main` ref (`git fetch cewilson`
+  404s company-side; likely the stale pre-rename remote URL — the live repo is
+  `https://github.com/ce-wilson/DryDocs.git`, pushed 07-21). First company action:
+  `git remote set-url` + re-auth, re-fetch, then re-run their own re-verify
+  (`git log <last-ported>..cewilson/main`). Silver lining from that search: the L7
+  port branch IS merged to company main (`373e993`→`c8cf9f0`), closing the
+  "NOT merged" state in 5eba0c3, and the historical port reports (0eb1a8d, aa049d3,
+  e6f8cca, e418258, eeaffa2, f7970e5) all exist as files company-side.
 
 - 2026-07-21 — [idea] **AIS taxonomy back-flow input for the platforms gate** (flagged
   in the 66acea8 port report, 2026-07-10, still unactioned): the company's
