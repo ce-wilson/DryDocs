@@ -36,9 +36,15 @@ Tags help grooming: `idea` · `bug` · `doc` · `source` (new data source) · `q
   DB-load lands the consumption target (Provisioned ≠ an S3 prefix). One bucket with
   zone prefixes; per-zone Glue databases + tables (partition keys at onboarding,
   `--odate` = partition value). Legacy `dataset_flow.json` FILE→CONFORMED ≈ the
-  RAW→TRUSTED hop. Groom candidates: `ingestion-launcher*.jar` classifier entry (G15
-  sibling — different jar, ingestion not transform), DataAsset zone/glue-table shapes
-  for the MAC enrichment feed (rides the sibling dataset-flow inbox entry below).
+  RAW→TRUSTED hop. UPDATE same day (prod CMD_LINE samples): the ingestion TRIGGER jobs
+  use the SAME dt-launcher.sh (`-i` mode) — that grammar merged into G15. Still open
+  here: (a) the template's `ingestion-launcher*.jar` was NOT observed in any sampled
+  CMD_LINE (placement jobs?) — classifier entry waits on a real sample; (b) DataAsset
+  zone/glue-table shapes for the MAC enrichment feed (rides the sibling dataset-flow
+  inbox entry below); (c) Pre/Post-execution command fields carry mv/backup file ops
+  (parquet + .tok → backup) — a G14-shaped surface G14 doesn't read (it parses
+  CMD_LINE only); (d) cross-job `%%\\JOB\VAR` runtime threading (run GUIDs, record
+  counts passed between jobs) — context-graph flavored, definition-level no-op.
 
 - 2026-07-21 — [idea] **Back-flow the company's un-back-flowed advances (bd7952f follow-up 3).**
   The 2026-07-20 bundle port went bidirectional (+288 producer / +148 company) precisely
@@ -308,6 +314,14 @@ Tags help grooming: `idea` · `bug` · `doc` · `source` (new data source) · `q
 ## Recently groomed (audit trail)
 
 <!-- when you promote an idea, move its line here with the resulting backlog id -->
+
+- 2026-07-21 — [source] Real prod DPL CMD_LINE samples (folder/job screenshots +
+  variables-simulation views) → **merged into G15** (acceptance upgraded from
+  placeholders to observed grammar: single-dash `-pipeline` GUID as the only literal,
+  variable-held launcher fallback, -i/-t/-py mode flags, -seal/-fid/-img/-conf/-compute
+  property set; one dt-launcher.sh spine across ingest/transform/provision). Remainder
+  re-inboxed on the ingestion-leg line: template ingestion-launcher jar unobserved,
+  Pre/Post-exec file-op surface, zone/glue DataAsset shapes, cross-job %%\\JOB\VAR.
 
 - 2026-07-21 — [chat] DPL launcher key-parameter capture (--pipeline-id spelling +
   shell-launcher variants + -py route + dataset-id/aws/jar/queue params as properties)

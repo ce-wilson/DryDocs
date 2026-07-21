@@ -3865,30 +3865,42 @@ items:
     inputs: [drydocs_core/controlm/commands.py, drydocs_lineage/extractors/controlm_inventory.py, drydocs_lineage/model.py, tests/unit/test_lineage_inventory.py]
     acceptance: >
       The DPL invocation parse captures the launcher's key parameters, verified by
-      unit tests on synthetic CMD_LINEs: (a) the on-prem shell launcher spellings
+      unit tests on synthetic CMD_LINEs modeled on the observed prod grammar
+      (SME screenshots 2026-07-21): (a) the on-prem shell launcher spellings
       (dpl_spark_processor and its _dynamic variant) classify as DPL alongside the
       registered dt-launcher.sh / dt-pipelines-launcher jar; (b) BOTH GUID
-      spellings key ETLProcess identity — the observed `-pipeline` form and the
-      argument-contract `--pipeline-id` form (hardcoded on the CMD_LINE for ~99%
-      of jobs per SME 2026-07-21); (c) a `-py`-flagged launch STAYS kind=dpl
-      (same launcher, pyspark route) with the engine route captured as a
-      property, never a separate invocation_type; (d) the remaining key params
-      land as ETLProcess/Invocation PROPERTIES — dataset id, aws-routing flag,
-      user jar path, hdfs location, token-file path, manifest-file path, queue
-      name — properties never identity (the standing G12 rule). No new
-      relationship types; m3_* statuses untouched. Full suite green.
+      spellings key ETLProcess identity — the observed single-dash `-pipeline`
+      form and the argument-contract `--pipeline-id` form (the GUID is the ONLY
+      literal on otherwise fully-variable CMD_LINEs, hardcoded for ~99% of jobs);
+      (c) an UNRESOLVED original whose executable is a folder variable
+      (%%PY_LAUNCH / %%SCRIPT_PATH prefix) still yields DPL classification +
+      GUID identity via the -pipeline literal, without crashing on the %%VAR
+      tokens; (d) the mode flags -i / -t / -py are captured as a launch-mode
+      PROPERTY and all three STAY kind=dpl — never a separate invocation_type;
+      (e) the remaining observed params land as ETLProcess/Invocation PROPERTIES
+      — -env, -appName, -alias, -seal, -fid, -img, -dataflow, -conf, -compute,
+      plus the argument-contract set (dataset id, aws flag, user jar path, hdfs
+      location, token/manifest paths, queue name) — properties never identity
+      (the standing G12 rule), with -seal noted as a direct SEAL-attribution
+      source. No new relationship types; m3_* statuses untouched. Full suite green.
     notes: >
-      From the 2026-07-21 DPL runtime-trace session (chat groom; mechanism-only —
-      the trace doc itself is company-internal). The launcher argument contract
-      names the params; --odate / --business-date are runtime partition values
-      (%%ODATE variables at definition time) so they are NOT captured as
-      definition-level properties. SME plan: company-side the pipeline id is also
-      extracted from the job-definition table as a job_detail VIEW — this item
-      keeps producer CMD_LINE parsing in agreement with that view's extraction
-      rule. Explicit NON-goal: deriving DataAsset edges from the dataset-id /
-      MAC dataset-flow metadata — that is the separate DPL-metadata enrichment
-      feed still sitting in the IDEAS inbox (rides the confirmed m3 shapes when
-      groomed). Pure candidate-side parsing, no ontology decision, hence sonnet.
+      From the 2026-07-21 DPL runtime-trace session, upgraded same day with real
+      prod CMD_LINE samples (mechanism-only — values stay company-side). Observed:
+      ingestion trigger, AWS transformation, and Teradata provisioning all use the
+      SAME dt-launcher.sh (modes -i/-t; -img container image is a secondary phase
+      discriminator); the template's separate ingestion-launcher jar was NOT
+      observed in any sampled CMD_LINE and stays an open inbox question. Excluded
+      as runtime values, never definition-level properties: -bd/-od (%%ODATE
+      partition values), -proId (per-run GUID threaded via cross-job
+      %%\\JOB\VAR references), -timeout/-sleep. Classifier normally runs on
+      RESOLVED lines (C3: Python owns var resolution) — acceptance (c) is the
+      fallback. SME plan: company-side the pipeline id is also extracted from the
+      job-definition table as a job_detail VIEW — this item keeps producer
+      CMD_LINE parsing in agreement with that view's extraction rule. Explicit
+      NON-goals: DataAsset edges from dataset-id / MAC dataset-flow metadata
+      (separate enrichment-feed inbox entry), and the Pre/Post-execution-command
+      file-op surface (G14-shaped, separate inbox entry). Pure candidate-side
+      parsing, no ontology decision, hence sonnet.
 
   - id: J13
     epic: release-infrastructure
