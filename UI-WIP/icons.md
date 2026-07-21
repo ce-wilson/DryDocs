@@ -1,0 +1,37 @@
+# DryDocs Icon Set
+
+Derived from the landing-page hub visual (`Gemini_Generated_Image_oob4hpoob4hpoob4.png`) and
+the dark-schematic visual language in `DryDocs_UI_Development_Specs.md`. Replicated as inline
+SVG (not raster) so the set is reusable, recolorable, and crisp at any size.
+
+Live reference: https://claude.ai/code/artifact/a05cff17-317a-439a-ac1c-a7f99dc7fc64
+
+## Palette tokens
+
+| Token | Hex | Use |
+|---|---|---|
+| `--red-0` / `--red-1` | `#e23a54` / `#8c1230` | Brand sphere gradient |
+| `--teal` | `#38d6c4` | Healthy / left-column connectors |
+| `--amber` | `#eeab4d` | Warning / right-column connectors |
+| `--bg-0` | `#070d18` | App background |
+| `--panel-border` | `rgba(148,177,209,0.14)` | Glass panel edges |
+
+Conventions: 120×120 viewBox, ~2.2px stroke, `feGaussianBlur` glow filter on the accent layer only.
+
+## Glyphs (7)
+
+1. **Brand Mark** — red sphere + revolving translucent rectangles (per spec: "Red sphere with
+   revolving rectangular shapes"). Header lockup / favicon.
+2. **Tower Auto** — isometric city block + car badge. Auto Finance tower node.
+3. **Infrastructure** — server rack (3 rows, status LEDs) + orchestration gear + Linux host badge.
+   Reused for both "Core Infrastructure" nodes in the hub.
+4. **Home Lending** — isometric house, roof + door + window. Mortgage tower node.
+5. **Data Lineage** — two data frames joined by directional elbow connectors. Pipeline node.
+6. **Credit Cards** — three fanned rounded-rect cards, each a different accent stripe. Cards
+   tower node.
+
+## Status
+
+- [x] Icon set drawn and matched to hub composition
+- [ ] Export as standalone `.svg` files per icon (if needed for a component library)
+- [ ] Swap in real Inter / Fira Code webfonts once app build has font pipeline

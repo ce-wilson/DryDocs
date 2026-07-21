@@ -73,6 +73,13 @@ libs/oracle_kerberos/oracle_kerberos_connection.txt
 # reference/research/README.md. Tracked PDFs live in purposeful homes (UI-WIP/).
 /*.pdf
 
+# Third-party design template source (O21, 2026-07-21) — the Keenthemes
+# "Start React Free" Figma file is a VENDOR ASSET (19 MB); committing it here
+# would redistribute it on a sometimes-published repo (license unverifiable
+# offline — same rule as the vendor PDFs below). Our own extraction from it
+# (layout-anatomy-checklist.md, structure only, no code copied) IS committed.
+UI-WIP/start-react-free-reference.fig
+
 # Vendor PDF posters/manuals — copyrighted BMC (and other vendor) binaries kept
 # as LOCAL reference only. This repo is sometimes published; the *.md files in
 # external/orchestration/ are our own summaries and are publishable, the raw

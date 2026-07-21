@@ -3284,7 +3284,7 @@ items:
     agent: main
     model: haiku
     priority: p3
-    status: todo
+    status: done          # DONE 2026-07-21 same session groomed — one conscious deviation, see notes
     depends_on: []
     inputs: [UI-WIP/, PUBLISH-BOUNDARY.md, config/classification.yaml, .gitattributes]
     acceptance: >
@@ -3296,7 +3296,20 @@ items:
       dd-verify-top.png — moves to internal/ instead of committing here);
       layout-anatomy-checklist.md lands (closing the O8 "named input never
       committed" note); git status is clean for UI-WIP afterward.
-    notes: "site-plan.md §6 LFS follow-up, now actionable since the corpus feeds O15+ inputs."
+    notes: >
+      site-plan.md §6 LFS follow-up, now actionable since the corpus feeds O15+
+      inputs. DONE 2026-07-21: all 17 files individually reviewed. 12 PNGs = AI
+      mocks with explicitly illustrative/anonymized data (some carry AI-invented
+      "Trusted by" real-company logo strips — reference material, never publish
+      as marketing) + dd-verify-top.png = a screenshot of the already-committed
+      controlm-ingestion-tdd render (PRARAG fixture name already public); 5 md
+      files = clean design prose. All committed at the internal-public ceiling.
+      DEVIATION from the acceptance letter: the .fig was NOT LFS-committed — it
+      is the Keenthemes vendor template's own Figma source; committing would
+      REDISTRIBUTE a third-party asset on a sometimes-published repo (license
+      unverifiable offline), so it is gitignored with rationale (the vendor-PDF
+      rule) per the original either/or in the UI-workstream memory note. Our own
+      structure-only extraction (layout-anatomy-checklist.md) IS committed.
 
   - id: O22
     epic: web-console
@@ -4192,8 +4205,8 @@ items:
 # Roll-up the dispatcher can glance at. COMPUTED views — test_backlog.py enforces
 # that these match the items exactly; update them with any status change.
 summary:
-  todo: 28                                         # +G16 (2026-07-21 cmdline-nfr-vetting gate groom — engine alignment)
+  todo: 27                                         # -O21 done (2026-07-21 UI-WIP corpus committed)
   in_progress: 1                                   # E1 (gate deferred both sides)
   blocked: 0
-  done: 98                                         # +K5 +K6 +L8 +C10 +P1 +P4 +L7 +G14 (2026-07-20)
-  next_ready: [G15, G16, L9, L12, L14, L15, M2, M3, M4, P3, J10, Q6, O9, O12, O13, O21, O22, J13]
+  done: 99                                         # +O21 (2026-07-21)
+  next_ready: [G15, G16, L9, L12, L14, L15, M2, M3, M4, P3, J10, Q6, O9, O12, O13, O22, J13]
