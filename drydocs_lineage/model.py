@@ -87,6 +87,11 @@ class DataAssetNode:
     kind: str             # "hdfs" | "s3" | "hive_table" | "local_file" | ...
     location: str         # the actual path / URI / table name
     fmt: str = ""         # "avro" | "parquet" | "csv" | "ebcdic" | ...
+    properties: dict[str, str] = field(default_factory=dict)
+                          # definition-level facts beside the key (G17: the MAC
+                          # dataset version + zone — PROPERTIES, never identity;
+                          # the G12 rule, mirrored from ProcessNode.properties.
+                          # Version-as-identity is a G22 clause-f gate question.)
 
 
 # -- stable id helpers (one id scheme, used by every extractor) -----------------

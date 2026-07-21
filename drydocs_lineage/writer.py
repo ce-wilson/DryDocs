@@ -83,11 +83,13 @@ _JOB_KIND = "controlm_job"
 _ETL_PROCESS_KINDS = {"abinitio", "dpl"}
 
 #: the ETLProcess ``kind`` property (etl | utility | notification — gate-log §a).
-#: AMBIGUITY CALL (G12, guardrail 5): today's signal (invocation engine only)
-#: cannot distinguish a real ETL pset/pipeline from a utility one (e.g. the
-#: script-exec / send-email psets the gate log names) — every ETLProcess node
-#: stamps 'etl' until that discriminating signal exists upstream. Flagged in
-#: the G12 report; not a scope expansion to invent one here.
+#: AMBIGUITY CALL (G12, guardrail 5): the invocation engine alone cannot
+#: distinguish a real ETL pset/pipeline from a utility one (e.g. the
+#: script-exec / send-email psets the gate log names) — a node with no better
+#: signal stamps 'etl'. The discriminating signal now EXISTS where DPL MAC
+#: metadata was ingested (G17): the dpl_mac extractor derives
+#: ``properties["mac_kind"]`` from pipeline.json subType, and the row build
+#: below consults it first — only non-MAC nodes still take the blind default.
 _DEFAULT_ETL_KIND = "etl"
 
 #: rel labels whose from_node is "ETLProcess | ControlMJob", never Script
@@ -387,7 +389,10 @@ def plan_curated(
             node = graph.processes[nid]
             etl_process_rows.append({
                 "token": _node_key(nid),
-                "kind": _DEFAULT_ETL_KIND,
+                # MAC-derived kind wins over the blind default (G17 acceptance c);
+                # a rider-path node (mac_kind_rider set, no mac_kind) deliberately
+                # keeps the default until the gate rules the enum question
+                "kind": node.properties.get("mac_kind") or _DEFAULT_ETL_KIND,
                 "engine": node.kind,
                 "name": node.name,
                 "path": node.path,

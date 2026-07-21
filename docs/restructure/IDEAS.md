@@ -26,6 +26,17 @@ Tags help grooming: `idea` · `bug` · `doc` · `source` (new data source) · `q
 
 <!-- add new ideas at the top -->
 
+- 2026-07-21 — [question] **Gate rider (from G17 build): MAC subType → kind-enum
+  semantics.** pipeline.json `subType=provisioning` (DB load, no transform — runtime
+  trace) is wrong-by-signal as `kind='etl'`, but the fix is an enum decision the
+  build must not make: EXTEND the gate-log 2026-07-16 §a enum
+  (etl|utility|notification → +provisioning?) or MAP provisioning to `utility`?
+  Until ruled, the dpl_mac extractor takes the rider path (no `mac_kind`; stamps
+  `mac_kind_rider`, counts `kind_riders`; writer default stands). Any OTHER
+  unmapped subType value rides the same path — the derivation table
+  (`dpl_mac._KIND_BY_SUBTYPE`) only carries enum-safe entries. Decide at the next
+  lineage gate session (the live-load flips / G22 sits closest).
+
 - 2026-07-21 — [idea] **App-to-app path runbook view (two-layer) — wireframed**
   (`UI-WIP/wf-runbook-path-01.md` + `.html`, from chat): source/target
   BusinessApplication pickers → `SHORTEST 1` path → TECHNICAL + DATA lanes →
@@ -92,9 +103,11 @@ Tags help grooming: `idea` · `bug` · `doc` · `source` (new data source) · `q
   RAW→TRUSTED hop. UPDATE same day (prod CMD_LINE samples): the ingestion TRIGGER jobs
   use the SAME dt-launcher.sh (`-i` mode) — that grammar merged into G15. Still open
   here: (a) the template's `ingestion-launcher*.jar` was NOT observed in any sampled
-  CMD_LINE (placement jobs?) — classifier entry waits on a real sample; (b) DataAsset
-  zone/glue-table shapes for the MAC enrichment feed (rides **G17**, the promoted MAC
-  ingest seam — 2026-07-21 groom); (c) Pre/Post-execution command fields carry mv/backup file ops
+  CMD_LINE (placement jobs?) — classifier entry waits on a real sample; (b) ~~DataAsset
+  zone/glue-table shapes for the MAC enrichment feed~~ RESOLVED at the G17 build
+  (same day): candidate shape = `dpl_dataset` DataAsset keyed by dataset GUID
+  alone, version/zone/name as PROPERTIES (glue db/table can join later as more
+  properties); version-as-identity deferred to G22 clause f; (c) Pre/Post-execution command fields carry mv/backup file ops
   (parquet + .tok → backup) — a G14-shaped surface G14 doesn't read (it parses
   CMD_LINE only); (d) cross-job `%%\\JOB\VAR` runtime threading (run GUIDs, record
   counts passed between jobs) — context-graph flavored, definition-level no-op.
