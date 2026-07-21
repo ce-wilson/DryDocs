@@ -2276,7 +2276,7 @@ items:
     agent: main
     model: haiku
     priority: p2
-    status: todo
+    status: done                                     # 2026-07-21 pm — PLACEMENT: CLAUDE.md §6 Working agreements (new bullet 'Governed renders publish VERBATIM', right after verify-before-asserting — the spot every session reads); names both surface classes (governed = docs/design/* renders + gate pages + board.html, verbatim because L5/L6 feedback re-attachment keys anchors on them; non-governed outward-facing = whitepaper/website, the only editorial-treatment surfaces). No renderer code change.
     depends_on: []
     inputs: [CLAUDE.md, docs/design/, docs/plan/board.html, docs/whitepaper/drydocs-whitepaper.md]
     acceptance: >
@@ -4957,8 +4957,8 @@ items:
       generator's home); zero api surface.
 
 summary:
-  todo: 22                                         # -C11 done (company shape captured); +G18..G25 rua-ingest phase incl. repo-source seam + DPL registry source (2026-07-21)
+  todo: 21                                         # -L12 done (governed-render-fidelity rule in CLAUDE.md); -C11 done; +G18..G25 rua-ingest phase (2026-07-21)
   in_progress: 1                                   # E1 (gate deferred both sides)
   blocked: 0
-  done: 117                                        # +C11 company-confirmed platforms taxonomy CAPTURED 2026-07-21 pm (06-29 AIS gate shape; producer gate decides from it); +G17, +O25 same day
-  next_ready: [L9, L12, L14, L15, M2, M3, M4, P3, J10, Q6, O23, J13, G18, G19]
+  done: 118                                        # +L12 governed-render-fidelity rule documented 2026-07-21 pm; +C11, +G17, +O25 same day
+  next_ready: [L9, L14, L15, M2, M3, M4, P3, J10, Q6, O23, J13, G18, G19]

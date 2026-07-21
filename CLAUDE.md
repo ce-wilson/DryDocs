@@ -166,6 +166,13 @@ units from `docs/restructure/02-backlog.md`. Each backlog item names its agent +
 
 - **Verify before asserting.** A recalled fact or stale doc that names a file/flag/column may
   be wrong — confirm it exists before relying on it.
+- **Governed renders publish VERBATIM.** Two surface classes, two rules. *Governed surfaces*
+  — `docs/design/*` renders, gate pages, `docs/plan/board.html` — are deterministic renderer
+  output that the HITL loop keys anchors on (L5 digital / L6 paper feedback re-attachment):
+  share them exactly as rendered, never restyled, summarized, or editorially reworked (a
+  "prettier" copy silently breaks feedback re-attachment). *Non-governed outward-facing docs*
+  — the whitepaper, the website — are the ONLY place editorial/design treatment
+  (artifact-design pass, visual identity) applies.
 - **Taxonomy imports are reversible; ontology edges are not casual.** New relationship types
   go through `docs/RELATIONSHIP_GUIDE.md` + the `relationship_vocabulary.yaml` registry +
   the HITL gate. Set `status: planned` first.
