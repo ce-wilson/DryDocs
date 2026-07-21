@@ -26,6 +26,21 @@ Tags help grooming: `idea` · `bug` · `doc` · `source` (new data source) · `q
 
 <!-- add new ideas at the top -->
 
+- 2026-07-21 — [source] **DPL runtime traced end-to-end** (company-side agent doc, lives in
+  their `internal/controlm-config/reference/`; mechanism only here): the launcher's
+  `--pipeline-id` GUID — already our ETLProcess identity — keys the pipeline's entire
+  Metadata-As-Code set (6 JSONs per pipeline). Two lineage-grade enrichment feeds fall out:
+  (a) the dataset-flow JSON names **input + output datasets with GUIDs, versions, and zones**
+  → dataset-level READS_FROM/WRITES_TO for the ETLProcess (the vocab's anticipated "DPL
+  metadata (enrichment)" feed, far richer than CMD_LINE file-ops); (b) the pipeline JSON
+  carries **owner SEAL id + pipelineType/subType** → both a SEAL attribution source AND the
+  missing discriminator for the G12 ETLProcess `kind` ambiguity (provisioning subtype = DB
+  load with NO transform). Runtime shape: shell launcher → spark-submit Launcher → processor
+  spine (Reader → declarative-JSON transform engine → Writer → TDQ compliance event) → exit
+  status back to the Control-M job; an `--aws` flag routes legacy on-prem Spark vs the AWS
+  Glue PySpark variant (same spine conceptually). Groom candidates: DPL-metadata extractor
+  (feeds M3 lineage) + kind-discriminator wiring.
+
 - 2026-07-20 — [chore] **Post-squash ref cleanup (user decision, destructive)**: origin still
   carries two pre-squash-history branches — `feat/mapping-store` (SUPERSEDED: the Initial-import
   squash absorbed its content and main then evolved past it; its only unique file was the
