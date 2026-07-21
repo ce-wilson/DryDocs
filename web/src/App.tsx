@@ -11,6 +11,7 @@ import OwnershipRoute from './routes/OwnershipRoute'
 import SkeletonModuleRoute from './routes/SkeletonModuleRoute'
 import ConsoleRoute from './routes/ConsoleRoute'
 import MappingsRoute from './routes/MappingsRoute'
+import LineageRoute from './routes/LineageRoute'
 import './App.css'
 
 // O8 rebuild: real react-router routes (deep-linkable, back-button safe —
@@ -55,7 +56,8 @@ export default function App() {
         <Route path="explorer/live" element={<ExplorerLiveRoute personaId={session.personaId} />} />
         <Route path="explorer/tower/:towerKey" element={<ExplorerTowerRoute persona={persona} />} />
 
-        <Route path="lineage" element={<SkeletonModuleRoute id="lineage" />} />
+        <Route path="lineage" element={<LineageRoute persona={persona} />} />
+        <Route path="lineage/asset/:assetId" element={<LineageRoute persona={persona} />} />
         <Route path="ownership" element={<OwnershipRoute persona={persona} />} />
         <Route path="runbooks" element={<SkeletonModuleRoute id="runbooks" />} />
         <Route path="remediation" element={<SkeletonModuleRoute id="remediation" />} />

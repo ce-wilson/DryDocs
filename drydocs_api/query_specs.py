@@ -243,6 +243,83 @@ QUERY_SPECS: dict[str, QuerySpec] = {
             columns=(ColumnDef("name", "string", "Server"),),
             classification="internal",
         ),
+        # O10 lineage frames — ddlineage is REAL but empty until the lineage
+        # live-load gate flips the four m3_* entries; these specs return zero
+        # rows until then and the UI shows its SYNTHESIZED demo honestly.
+        QuerySpec(
+            id="lineage.hops.v1",
+            database="ddlineage",
+            description=(
+                "Source-to-target hops: every READS_FROM / WRITES_TO edge the Fork-3 "
+                "writer landed (curated post-gate), with the activity endpoint "
+                "(ETLProcess token / Script path / ControlMJob name) and the DataAsset."
+            ),
+            cypher=(
+                "MATCH (x)-[r:READS_FROM|WRITES_TO]->(d:DataAsset) "
+                "RETURN coalesce(x.token, x.path, x.job_name) AS activity, "
+                "labels(x)[0] AS activity_type, type(r) AS hop, "
+                "d.assetId AS asset_id, d.kind AS asset_kind "
+                "ORDER BY activity, hop LIMIT $limit"
+            ),
+            columns=(
+                ColumnDef("activity", "string", "Activity"),
+                ColumnDef("activity_type", "string", "Type"),
+                ColumnDef("hop", "string", "Hop"),
+                ColumnDef("asset_id", "string", "Data asset"),
+                ColumnDef("asset_kind", "string", "Asset kind"),
+            ),
+            classification="internal",
+            params=_LIMIT,
+        ),
+        QuerySpec(
+            id="lineage.data-assets.v1",
+            database="ddlineage",
+            description=(
+                "DataAsset inventory with writer/reader degree — which activities "
+                "produce and consume each asset."
+            ),
+            cypher=(
+                "MATCH (d:DataAsset) "
+                "OPTIONAL MATCH (w)-[:WRITES_TO]->(d) "
+                "OPTIONAL MATCH (rd)-[:READS_FROM]->(d) "
+                "RETURN d.assetId AS asset_id, d.kind AS kind, "
+                "count(DISTINCT w) AS writers, count(DISTINCT rd) AS readers "
+                "ORDER BY asset_id LIMIT $limit"
+            ),
+            columns=(
+                ColumnDef("asset_id", "string", "Data asset"),
+                ColumnDef("kind", "string", "Kind"),
+                ColumnDef("writers", "int", "Writers"),
+                ColumnDef("readers", "int", "Readers"),
+            ),
+            classification="internal",
+            params=_LIMIT,
+        ),
+        QuerySpec(
+            id="lineage.schema-definition.v1",
+            database="ddlineage",
+            description=(
+                "Definition-level schema of each DataAsset node: identity, kind, and "
+                "the property set present. Column-level schema arrives with the DPL "
+                "Metadata-As-Code enrichment feed (G17) — this spec is honest about "
+                "carrying node-schema only until that feed lands."
+            ),
+            cypher=(
+                "MATCH (d:DataAsset) "
+                "RETURN d.assetId AS asset_id, d.kind AS kind, "
+                "[k IN keys(d) WHERE NOT k IN ['assetId', 'kind']] AS properties, "
+                "toString(d.created_at) AS created_at "
+                "ORDER BY asset_id LIMIT $limit"
+            ),
+            columns=(
+                ColumnDef("asset_id", "string", "Data asset"),
+                ColumnDef("kind", "string", "Kind"),
+                ColumnDef("properties", "string", "Properties present"),
+                ColumnDef("created_at", "string", "First seen"),
+            ),
+            classification="internal",
+            params=_LIMIT,
+        ),
         QuerySpec(
             id="context.label-census.v1",
             database="ddcontext",

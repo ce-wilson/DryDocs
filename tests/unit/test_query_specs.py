@@ -83,6 +83,13 @@ def test_mappings_coverage_spec_registered():
     assert {"status", "match_method", "folder_id", "job_id", "seal_id"} <= names
 
 
+def test_lineage_frames_have_specs():
+    """O10: the Lineage tabs bind to ddlineage specs (empty until the lineage
+    live-load gate flips the m3_* entries — zero rows is the honest state)."""
+    for spec_id in ("lineage.hops.v1", "lineage.data-assets.v1", "lineage.schema-definition.v1"):
+        assert query_spec(spec_id).database == "ddlineage"
+
+
 def test_explorer_frames_have_specs():
     """The Explorer tabs bind to versioned specs (O11 acceptance; jobs/
     conditions bumped v2 at the 2026-07-21 SME correction — folder resolved
