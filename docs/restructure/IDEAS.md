@@ -41,13 +41,6 @@ Tags help grooming: `idea` · `bug` · `doc` · `source` (new data source) · `q
   Epic O extension groom. Groom when the public site starts; the icon/logo direction
   should stay consistent with the O22 console glyph set.
 
-- 2026-07-21 — [source] **Variable gap analysis: 2,384 unique names vs the proposed alias
-  map** (company-side, mechanism-only). Variable NAMES lie about values — jar/python/py-path
-  style names all resolving to the shell *launcher* — so classification must key on the
-  VALUE or the `-pipeline` literal, never the name (direct evidence for G15 acceptance
-  (a)+(c); the on-prem `dpl_spark_processor` spellings appear in real folder vars). SHA-digest
-  variables need an artifact-**sha** canonical distinct from artifact-**uri**; the alias map
-  has large coverage holes vs production names → alias maps need value-based fallback.
 - 2026-07-21 — [idea] **FW-really-API confirmed live** — the greenfield-provenance use case
   for the fix module: a file-watcher-shaped job's `.tok` is produced by an UPSTREAM API-call
   job writing the file locally, no external push exists — the name/type lies. Already
@@ -73,8 +66,8 @@ Tags help grooming: `idea` · `bug` · `doc` · `source` (new data source) · `q
   use the SAME dt-launcher.sh (`-i` mode) — that grammar merged into G15. Still open
   here: (a) the template's `ingestion-launcher*.jar` was NOT observed in any sampled
   CMD_LINE (placement jobs?) — classifier entry waits on a real sample; (b) DataAsset
-  zone/glue-table shapes for the MAC enrichment feed (rides the sibling dataset-flow
-  inbox entry below); (c) Pre/Post-execution command fields carry mv/backup file ops
+  zone/glue-table shapes for the MAC enrichment feed (rides **G17**, the promoted MAC
+  ingest seam — 2026-07-21 groom); (c) Pre/Post-execution command fields carry mv/backup file ops
   (parquet + .tok → backup) — a G14-shaped surface G14 doesn't read (it parses
   CMD_LINE only); (d) cross-job `%%\\JOB\VAR` runtime threading (run GUIDs, record
   counts passed between jobs) — context-graph flavored, definition-level no-op.
@@ -109,29 +102,6 @@ Tags help grooming: `idea` · `bug` · `doc` · `source` (new data source) · `q
   port branch IS merged to company main (`373e993`→`c8cf9f0`), closing the
   "NOT merged" state in 5eba0c3, and the historical port reports (0eb1a8d, aa049d3,
   e6f8cca, e418258, eeaffa2, f7970e5) all exist as files company-side.
-
-- 2026-07-21 — [idea] **AIS taxonomy back-flow input for the platforms gate** (flagged
-  in the 66acea8 port report, 2026-07-10, still unactioned): the company's
-  `platforms.yaml` is AHEAD with a *confirmed* AisCapability/AiTool taxonomy while the
-  producer still holds the deprecated `:SchedulerKind` placeholder at the C6/platforms
-  HITL gate. Bring the company's confirmed shape across (mechanism/screenshot channel)
-  as the seed answer to the open questions in `config/taxonomy/platforms.yaml`, so the
-  gate session decides from the evolved model instead of re-deriving it.
-
-- 2026-07-21 — [source] **DPL runtime traced end-to-end** (company-side agent doc, lives in
-  their `internal/controlm-config/reference/`; mechanism only here): the launcher's
-  `--pipeline-id` GUID — already our ETLProcess identity — keys the pipeline's entire
-  Metadata-As-Code set (6 JSONs per pipeline). Two lineage-grade enrichment feeds fall out:
-  (a) the dataset-flow JSON names **input + output datasets with GUIDs, versions, and zones**
-  → dataset-level READS_FROM/WRITES_TO for the ETLProcess (the vocab's anticipated "DPL
-  metadata (enrichment)" feed, far richer than CMD_LINE file-ops); (b) the pipeline JSON
-  carries **owner SEAL id + pipelineType/subType** → both a SEAL attribution source AND the
-  missing discriminator for the G12 ETLProcess `kind` ambiguity (provisioning subtype = DB
-  load with NO transform). Runtime shape: shell launcher → spark-submit Launcher → processor
-  spine (Reader → declarative-JSON transform engine → Writer → TDQ compliance event) → exit
-  status back to the Control-M job; an `--aws` flag routes legacy on-prem Spark vs the AWS
-  Glue PySpark variant (same spine conceptually). Groom candidates: DPL-metadata extractor
-  (feeds M3 lineage) + kind-discriminator wiring.
 
 - 2026-07-20 — [chore] **Post-squash ref cleanup (user decision, destructive)**: origin still
   carries two pre-squash-history branches — `feat/mapping-store` (SUPERSEDED: the Initial-import
@@ -177,11 +147,6 @@ Tags help grooming: `idea` · `bug` · `doc` · `source` (new data source) · `q
   means INVOKES sometimes lands directly on an :ETLProcess endpoint with no Script hop —
   G12 implements exactly that (fixture job 25 → trust.pset). Vocabulary-shape decision →
   next gate session, not an auto-edit. (G12 subagent finding.)
-- 2026-07-19 — [idea] **ETLProcess `kind` discriminator needs a real signal**: G12 stamps
-  every :ETLProcess `kind='etl'` (constant) because the invocation engine alone can't tell
-  an ETL pset from a utility/notification one (gate log's own script-exec / send-email
-  examples). Backlog-worthy once pset naming conventions or upstream metadata can
-  discriminate etl|utility|notification. (G12 ambiguity call #1.)
 - 2026-07-19 — [idea] **depgraph metric extensions (codeflow takeaways — ideas, not code)**:
   compute codeflow's three genuinely useful metrics ON TOP of our existing ast-accurate
   graph, in the depgraph sibling repo (stdlib, deterministic, rides the snapshot JSON,
@@ -347,6 +312,49 @@ Tags help grooming: `idea` · `bug` · `doc` · `source` (new data source) · `q
 ## Recently groomed (audit trail)
 
 <!-- when you promote an idea, move its line here with the resulting backlog id -->
+
+- 2026-07-21 groom run (bare /groom-backlog, same day as cmdline-nfr-vetting/G15/G16 and the
+  Epic O landings) — 2 promoted / 1 retired-merged / 1 kept-updated (todo 22 → 24):
+  - [source] DPL runtime traced end-to-end (2026-07-21) + [idea] ETLProcess kind
+    discriminator (2026-07-19; its trigger FIRED — pipeline.json subType is exactly the
+    discriminating signal G12 lacked) → **G17** (MAC ingest seam: dataset-flow
+    READS_FROM/WRITES_TO candidates + kind-derivation rule + SEAL attribution facts;
+    synthetic fixtures, gate-confirmed endpoints, all m3_* statuses untouched;
+    depends_on G15 — ready now).
+  - [idea] AIS taxonomy back-flow for the platforms gate (flagged 2026-07-10 in the
+    66acea8 port report, unactioned since) → **C11** (USER-GATED START: capture the
+    company-confirmed AisCapability/AiTool shape into config/taxonomy/platforms.yaml
+    as the gate's PROPOSED seed; pull loop skips it until the user supplies the
+    screenshot/describe material; the sibling SchedulerKind-deprecation line stays
+    parked on that same gate).
+  - [source] variable gap analysis (2,384 names vs the alias map) → RETIRED MERGED —
+    fully consumed at build time: G15's acceptance (a)/(c) cites it as evidence and
+    G16 built its alias rollups, value contracts, and the ETL_ARTIFACT_SHA canonical
+    from it. Nothing left to carry.
+  - kept-updated: the DPL ingestion-leg line — its open item (b) (DataAsset
+    zone/glue-table shapes for the MAC enrichment feed) now rides G17 instead of the
+    retired sibling line; its other open items (ingestion-launcher jar sample,
+    Pre/Post-exec file-op surface, cross-job %%\\JOB\VAR threading) stay inboxed.
+  - kept parked, unchanged (each on its recorded trigger): m7 build follow-up
+    (deliberately inboxed at the gate — lands at the lineage live-load / m7 flip),
+    public marketing-site brand kit (site not started), FW-really-API provenance gap
+    classes (:Script property proposals = gate rider for the next Script-refinement/
+    lineage gate session), back-flow of un-back-flowed company advances (needs the
+    screenshot/describe channel; spans six modules — batch shape decided when the
+    material arrives), company-side heads-ups (their tracker; relay next company
+    session), post-squash ref cleanup (user, destructive), Runbook Rev 3 rider,
+    SNYK_TOKEN manual step, SEAL/PAT generic terminology (three §Decision user calls),
+    m3_invokes to_node broadening (next vocab gate), depgraph metric extensions
+    (sibling repo), ETL-tooling inventory domain, JobRun indexes (provenance plan's
+    next touch), SaaS scaffold research (triggers unfired), launcher-registry
+    config-file migration (O12 todo), K2 FID/ALIAS tables (company-side), ctlm_id
+    ripple (internal-side), dry-docs.com seed (website not started), /documentation
+    whitepaper type (trigger unfired), lineage live-load gate (HITL scheduling —
+    unchanged by G15/G16), remediation slices (TDD §6/§7), Phase C packaging (plan
+    gate), Workbench (entitlement), SchedulerKind → AisCapability/AiTool (gate; C11
+    now feeds it), BRD outline (later phase), docmeta P4–P7 (plan-tracked while Q6
+    todo), EE container password (user deferred), LLM key strategy (open question),
+    common/ in /list-apps (cosmetic), cli.py regroup (v1.0 window).
 
 - 2026-07-21 — [question] Company draft CMD_LINE/variable NFR ontology vetted vs m3 vocab →
   **RULED same day at gate `cmdline-nfr-vetting`** (config/gate-log.md; guided SME session,

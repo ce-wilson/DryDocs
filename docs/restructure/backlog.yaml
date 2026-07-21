@@ -4256,11 +4256,87 @@ items:
       item until the user supplies the term-list confirmation (the J10
       confirm-at-start idiom).
 
+  # ── appended at the 2026-07-21 groom run (weekly-style inbox groom) ───────
+  - id: G17
+    epic: component-topology
+    title: "DPL Metadata-As-Code ingest seam: dataset-flow READS/WRITES enrichment, pipeline-JSON kind discriminator, SEAL attribution facts"
+    type: task
+    module: drydocs-lineage
+    phase: 6
+    agent: main
+    model: sonnet
+    priority: p2
+    status: todo
+    depends_on: [G15]
+    inputs: [drydocs_lineage/, drydocs_core/controlm/commands.py, tests/unit/test_lineage_inventory.py, config/gate-log.md]
+    acceptance: >
+      A MAC (Metadata-As-Code) ingest seam exists in the lineage component, driven
+      by SYNTHETIC fixtures modeled on the traced 6-JSON-per-pipeline shape
+      (mechanism-only — real values stay company-side; publish boundary clean):
+      (a) the JSON set is keyed by the launcher --pipeline-id GUID and joins to the
+      ETLProcess identity G15 captures — an unmatched GUID is counted, never
+      silently dropped; (b) dataset_flow.json input/output datasets (GUID + version
+      + zone) become dataset-level READS_FROM / WRITES_TO CANDIDATES for that
+      ETLProcess, endpoints exactly per the 2026-07-15 gate EDIT (ETLProcess |
+      ControlMJob -> DataAsset), no new relationship types, all m3_* vocabulary
+      statuses untouched (refusal semantics unchanged until the curated-load gate);
+      (c) pipeline.json pipelineType/subType land as ETLProcess PROPERTIES and
+      drive a recorded kind-derivation rule where MAC metadata exists (provisioning
+      subtype = DB load with no transform — the G12 constant kind='etl' stops being
+      stamped blind there; jobs without MAC keep today's default), with any
+      enum-semantics question surfaced as a gate rider, never auto-decided;
+      (d) the pipeline.json owner SEAL id is captured as an attribution
+      FACT/property beside G15's -seal note — never an attribution edge (Epic K
+      owns those). Full suite green.
+    notes: >
+      Groomed 2026-07-21 from two inbox lines merged: the same-day DPL
+      runtime-trace [source] line (company-side agent doc, mechanism only here;
+      its own "groom candidates" named this extractor + the kind wiring) and the
+      2026-07-19 "ETLProcess kind discriminator needs a real signal" [idea],
+      whose trigger FIRED — pipeline.json subType is the discriminating signal
+      G12 lacked. The DPL ingestion-leg inbox line's open item (b) (DataAsset
+      zone/glue-table shapes for the enrichment feed) rides this item.
+      Candidate-side parsing on gate-confirmed endpoint shapes, hence sonnet.
+
+  - id: C11
+    epic: ontology-mapping
+    title: "Capture the company-confirmed AisCapability/AiTool platform taxonomy as the seed answer for the platforms gate"
+    type: task
+    module: taxonomy
+    phase: 2
+    agent: main
+    model: sonnet
+    priority: p3
+    status: todo
+    depends_on: []
+    inputs: [config/taxonomy/platforms.yaml, drydocs_core/ontology/relationship_vocabulary.yaml, config/taxonomy-ontology-map.yaml, docs/restructure/03-hitl-sme-flow.md]
+    acceptance: >
+      USER-GATED START — the user supplies the company-side confirmed
+      platforms.yaml shape via the screenshot/describe channel (mechanism-only;
+      no company values committed). Then config/taxonomy/platforms.yaml is
+      upgraded from status: placeholder to a captured taxonomy carrying the
+      confirmed AisCapability/AiTool classes as the PROPOSED seed answer to its
+      recorded open questions; the C6 requires-scheduler map entry's provisional
+      to_node and the SchedulerKind-deprecation inbox line reference the captured
+      shape as their gate input. THE HARD RULE: pure classification — nothing
+      flips active, no vocabulary status changes, no graph writes; the
+      platforms/SchedulerKind HITL gate decides. Sensitivity classification set
+      on the source; drift guards + full suite green.
+    notes: >
+      Groomed 2026-07-21 from the AIS-taxonomy back-flow inbox line (flagged in
+      the 66acea8 port report 2026-07-10, unactioned since). The company's
+      platforms.yaml is AHEAD with a confirmed AisCapability/AiTool taxonomy
+      while the producer still holds the deprecated :SchedulerKind placeholder —
+      bring the evolved model across so the gate session decides from it instead
+      of re-deriving. The backlog pull loop SKIPS this item until the user
+      supplies the material (the J13/J10 confirm-at-start idiom). The sibling
+      SchedulerKind-deprecation inbox line stays parked on that same gate.
+
 # Roll-up the dispatcher can glance at. COMPUTED views — test_backlog.py enforces
 # that these match the items exactly; update them with any status change.
 summary:
-  todo: 22                                         # -O11 done (2026-07-21: QuerySpec registry + two-path export; unblocks the O15–O18 module pages)
+  todo: 24                                         # +G17 +C11 (2026-07-21 groom)
   in_progress: 1                                   # E1 (gate deferred both sides)
   blocked: 0
   done: 104                                        # +G15 +G16 +O21 +O22 +O9 +O11 (2026-07-21)
-  next_ready: [L9, L12, L14, L15, M2, M3, M4, P3, J10, Q6, O10, O12, O13, O15, O16, O17, O18, O19, J13]
+  next_ready: [L9, L12, L14, L15, M2, M3, M4, P3, J10, Q6, O10, O12, O13, O15, O16, O17, O18, O19, J13, G17, C11]
