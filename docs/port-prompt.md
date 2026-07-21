@@ -872,6 +872,77 @@ PROCEDURE:
     keep yours); the DD-series id rule lands in git-readme.md/backlog header/groom skill
     (step 37 precondition); IDEAS/audit-trail union-append as ever.
 
+42. THE 2026-07-20/21 SUPER-RANGE — L7 TRACEABILITY LOAD, LINEAGE G14–G17, EPIC O CONSOLE
+    COMPLETE, PLATFORMS TAXONOMY, RUA PHASE PLANNED (~95 commits, "feat(ontology): L7
+    proposal…" → the commit carrying this step; six streams — REMOTE REFRESH FIRST: your
+    port-search caveat commit ("frozen cewilson remote masks post-7e8df54 range") applies to
+    THIS range — `git fetch cewilson main` again before cutting it):
+    - (a) L7 DOC-TRACEABILITY — GATE SIGNED OFF + LOADER SHIPPED + CONSTRAINTS BUMP: gate
+      doc-traceability-feedback (2026-07-20, gate-log union-append) activates the
+      doc-traceability vocab (DesignDoc/DocSection/Requirement/Component/TestCase/
+      FeedbackNote, source-namespaced NODE KEYs) with its supplement blocks;
+      drydocs/loaders/doc_traceability.py + cypher + the `load-doc-traceability` CLI command
+      (cli.py collision — ADDITIVE, preserve your bodies) ship and are live-loaded
+      PRODUCER-side (DryDocs documenting itself — rerun on YOUR graph or skip the live load,
+      but take the code). PLUS "add missing K4 Attribution/TOMRole uniqueness constraints":
+      **EXPECTED_CONSTRAINTS 40 → 48** (+6 traceability NODE KEYs, +2 K4 fixes) — reconcile
+      with any company-side constraint edits per the step-25 rule.
+    - (b) LINEAGE/CORE G14–G17 (canonical-producer: drydocs_lineage/**, drydocs_core
+      controlm/variables engines; all m3_* entries REMAIN planned, write_curated still
+      refuses — the D2 contract): G14 CMD_LINE file-ops pass (job-level READS_FROM/WRITES_TO
+      candidates, DELETE/MKDIR skipped-and-counted); G15 DPL launcher argument contract
+      (both --pipeline-id spellings, %%VAR-launcher fallback, launch_mode + definition-level
+      props incl. `-seal`; ingestion `-i` mode merged in); G16 variable-standard engine
+      alignment (FACT_REGISTRY ETL_* canonicals, value contracts — values decide, WARN
+      stream — ICDW launcher rule); gate cmdline-nfr-vetting SIGNED OFF 4/4 (m7_uses_artifact
+      REGISTERED planned — do not activate; TRIGGERS stays launcher-sourced); G17 DPL
+      Metadata-As-Code ingest seam (NEW extractors/dpl_mac.py: pipeline.json/dataset_flow.json
+      per-GUID join onto the G15 ETLProcess identity, dataset-level READS_FROM/WRITES_TO
+      candidates onto `dpl_dataset` DataAssets keyed by GUID alone, writer consults MAC-derived
+      `mac_kind` before the blind G12 'etl' default, subType=provisioning takes a RIDER path —
+      the kind-enum question is inboxed, NOT decided; DataAssetNode gains a properties dict).
+      The MAC field contract is ASSUMED (documented in-module) — validate against YOUR real
+      MAC exports and amend contract+fixtures together (tracker T10). Real MAC/rua data is
+      internal-confidential and NEVER ports — mechanism only, as ever.
+    - (c) EPIC O — WEB CONSOLE BUILD-OUT COMPLETE (web/** + UI-WIP/** canonical-producer
+      wholesale, step-31 rows; drydocs_api/** step-33 rows): O9 launchable site + Explorer;
+      O11 QuerySpec registry + two-path export with provenance manifests; module pages
+      /ownership (K4 qualified-attribution rollup + support-user asset search + asset-path
+      sub-page whose cypher panel mirrors schema_graph.cypher), /lineage, /loads (:JobRun
+      envelope), /runbooks, /remediation, /docs corpus map, /gates READ-ONLY record,
+      /mappings stewardship + /admin/config traceability lens; O22 glyph set; Kept Orbit
+      brand mark + alternate landing; O21 commits the UI-WIP design corpus (per-file
+      boundary-reviewed; the Keenthemes .fig stays gitignored — vendor redistribution). The
+      console performs ZERO graph writes. GATES: ui-write-surface (O20) SIGNED OFF
+      PRODUCER-side — YOUR company gates are still yours (T-tracker rule); O24 SEAL-contacts
+      override list (drydocs_api origin-flagged store — cli/api collisions additive); O25
+      gate-pages now DRAFT their own gate-log entry — gate_pages.py is a step-10
+      canonical-COMPANY path: FOLD this mechanism delta per the step-18 renderer rule.
+      gates.json is a GENERATED artifact with a drift test — regenerate, don't hand-merge.
+    - (d) PLATFORMS TAXONOMY (C11 done + gate DRAFTED, not held): config/taxonomy/
+      platforms.yaml upgrades placeholder → captured company-confirmed AIS shape (ORIGIN =
+      YOUR side, step-34 convergence note applies — collisions should agree; keep yours where
+      ahead); five open questions carry PRE-GATE rulings (Q1 producer capability seed
+      WITHDRAWN, Q3 retire :Scheduler unbuilt — Option B); the platforms-taxonomy gate prompt
+      (C6+C11 terminus) is authored via the O25 affordance, gate NOT yet held — nothing flips.
+    - (e) DOCGEN / L-SERIES CLOSES (canonical-producer): L12 governed-render-fidelity rule
+      (CLAUDE.md working agreements); L14 mapping-demo runbook refit onto runbook.outline.yaml;
+      L15 review.outline.yaml (3rd doc type) + exemplar-pin tests; L8 web-console runbook; L9
+      closed (Chrome partial-render no longer reproduces); NEW
+      docs/design/drydocs-lineage-mac-runbook.{md,html} — the (b) pipeline end-to-end incl.
+      the DELIBERATE gate refusal at the load step (take .md + render together; deterministic).
+    - (f) PLANNING / RUA PHASE (backlog-only, no rua code yet): G18–G25 groomed — collector
+      v2 (sha256), out-of-tree landing zone (DRYDOCS_DATA_ROOT), extractor, code-ops pass,
+      G22 HITL gate terminus (identity URN, source precedence server-vs-repo w/ per-repo
+      trusted_ref, three-signal usage), curated load, repo-source seam, DPL registry source.
+      backlog.yaml/board/IDEAS/gate-log follow their standing rows (union-append; DD-series
+      ids are yours). Port-docs riders: "close producer-side gaps from company port-report
+      review" + the frozen-remote caveat (applied at the top of this step).
+    - Acceptance at this range head: **831 passed / 4 skipped / 3 deselected**; the 4th skip
+      is the gitignored essential-graphrag PDF fixture (absent both sides is fine).
+      test_schema.py EXPECTED_CONSTRAINTS = 48. Track-1 stays portable (stdlib + PyYAML +
+      committed corpus; no network/DB).
+
 COMPANY-SIDE TRACKER — LIVE-LOAD + SUPPLEMENT STATUS (maintained COMPANY-SIDE):
 The steps above name company-side obligations in scattered "COMPANY MUST SUPPLEMENT" /
 Track-2 notes; this table consolidates the trackable ones so you can see at a glance whether
@@ -890,6 +961,8 @@ KEEP YOUR statuses; producer edits only add rows or refine the done-means criter
 | T6  | Docs Track-2: docs-fetch/docs-load vs real sources (16)   | pending |
 | T7  | Live multi-DB Enterprise Neo4j deploy — G7 half (16)      | pending |
 | T8  | M0 equivalence unblocks: A3 filename + B1 dot rule (29)   | pending |
+| T9  | Lineage curated live load — YOUR vocab gate + m3_* flips, then write_curated on your graph (42b) | pending |
+| T10 | MAC field contract validated vs a REAL DPL export — amend dpl_mac.py contract + fixtures together (42b) | pending |
 
 Done-means (checkable — a row flips `done` only when ALL its checks hold):
 - T1: `drydocs load-seal-attribution` run AFTER your Control-M jobs + SEAL reference loads
@@ -908,6 +981,13 @@ Done-means (checkable — a row flips `done` only when ALL its checks hold):
   Flip `n-a` if automation coverage suffices and no manual pins are needed.
 - T5–T8: done-means live in their origin steps (31 / 16 / 16 / 29 respectively) — this table
   only carries their status so one section answers "what is still owed company-side".
+- T9: your own lineage gate session flips the four m3_* entries active (+ supplement blocks,
+  test_schema green), then `write_curated` exits clean against YOUR `drydocs` DB and the
+  written counts reconcile with the plan (the drydocs-lineage-mac-runbook Verify section is
+  the checklist). Producer sign-off never substitutes for yours.
+- T10: a real per-pipeline MAC export parsed with zero contract mismatches (or the contract
+  amended + fixtures updated in the same commit); until then treat pipeline.json/dataset_flow
+  field names as ASSUMED.
 
 ACCEPTANCE GATE (behavior is the contract, not a byte-compare):
 - Track 1 (portable, no production sample present):
@@ -946,6 +1026,8 @@ ACCEPTANCE GATE (behavior is the contract, not a byte-compare):
   ONE unit.
   662 passed / 3 skipped / 3 deselected at the step-36 lineage/parser head (2026-07-16; the J7
   reconcile guards now count in the skips consumer-side once RECONCILE_BEFORE_DIR is set).
+  831 passed / 4 skipped / 3 deselected at the step-42 head (2026-07-21; EXPECTED_CONSTRAINTS
+  = 48 — steps 19 + 22 + 42a; the 4th skip is the gitignored essential-graphrag PDF fixture).
 
 BOUNDARIES:
 - One-way only. Never add company main as a remote on the producer; never push back to

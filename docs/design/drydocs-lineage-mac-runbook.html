@@ -1,0 +1,222 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Runbook — DryDocs lineage ingest (jobs CSV + DPL MAC) → curated graph load</title>
+<style>
+:root { color-scheme: light dark; --ink:#1a1a1a; --mid:#555; --line:#d0d0d0; --faint:#f6f6f6; --bg:#fff; --link:#0a58ca; }
+@media (prefers-color-scheme: dark) { :root { --ink:#e6e6e6; --mid:#a0a0a0; --line:#3a3a3a; --faint:#1c1c1c; --bg:#141414; --link:#6ea8fe; } }
+:root[data-theme="dark"] { --ink:#e6e6e6; --mid:#a0a0a0; --line:#3a3a3a; --faint:#1c1c1c; --bg:#141414; --link:#6ea8fe; }
+:root[data-theme="light"] { --ink:#1a1a1a; --mid:#555; --line:#d0d0d0; --faint:#f6f6f6; --bg:#fff; --link:#0a58ca; }
+* { box-sizing: border-box; }
+body { font: 15px/1.6 "Segoe UI", system-ui, Arial, sans-serif; color: var(--ink); background: var(--bg); margin: 0; }
+main { max-width: 900px; margin: 0 auto; padding: 32px 24px 80px; }
+h1 { font-size: 28px; margin: 0 0 6px; letter-spacing:-0.3px; }
+h2 { font-size: 20px; margin: 34px 0 10px; padding-bottom:5px; border-bottom: 2px solid var(--ink); }
+h3 { font-size: 16px; margin: 22px 0 8px; }
+h4,h5,h6 { font-size: 14px; margin: 16px 0 6px; }
+p { margin: 10px 0; } strong { font-weight: 700; }
+a { color: var(--link); } a:hover { text-decoration: underline; }
+code { font-family: "Cascadia Mono","Consolas",monospace; font-size: 0.88em; background: var(--faint); padding: 1px 4px; border-radius: 3px; }
+pre { font-family: "Cascadia Mono","Consolas",monospace; font-size: 12.5px; line-height:1.45; border:1px solid var(--line); background: var(--faint); padding: 12px 14px; border-radius: 6px; overflow-x: auto; }
+pre code { background: none; padding: 0; }
+table { border-collapse: collapse; margin: 14px 0; font-size: 13.5px; display:block; overflow-x:auto; }
+th,td { border:1px solid var(--line); padding: 6px 9px; text-align:left; vertical-align: top; }
+th { background: var(--faint); font-weight:700; }
+blockquote { margin: 14px 0; padding: 2px 16px; border-left: 4px solid var(--line); color: var(--mid); }
+ul,ol { margin: 10px 0; padding-left: 26px; } li { margin: 4px 0; }
+hr { border:none; border-top:1px solid var(--line); margin: 26px 0; }
+:target { scroll-margin-top: 12px; } :target > :first-child, h2:target, h3:target { outline: 2px solid var(--link); outline-offset: 4px; }
+.dd-margin-tag, .dd-print-footer { display: none; }
+
+.dd-note-btn { border:1px solid var(--line); background:var(--bg); color:var(--mid); cursor:pointer; font-size:12px; line-height:1; padding:2px 6px; border-radius:5px; margin-right:6px; }
+.dd-note-btn:hover { color:var(--link); border-color:var(--link); }
+.dd-note-box { margin:6px 0 10px; }
+.dd-note-box textarea { width:100%; min-height:56px; font:13px/1.4 "Segoe UI",system-ui,sans-serif; color:var(--ink); background:var(--faint); border:1px solid var(--line); border-radius:6px; padding:8px; resize:vertical; }
+.dd-annotated { box-shadow:-3px 0 0 var(--link); padding-left:8px; }
+.dd-fb-bar { position:fixed; right:16px; bottom:16px; display:flex; flex-direction:column; gap:6px; align-items:stretch; background:var(--bg); border:1px solid var(--line); border-radius:10px; padding:8px 12px; box-shadow:0 2px 10px rgba(0,0,0,.15); font-size:13px; z-index:50; }
+.dd-fb-row { display:flex; gap:8px; align-items:center; justify-content:space-between; }
+.dd-fb-bar button { cursor:pointer; border:1px solid var(--link); background:var(--link); color:#fff; border-radius:6px; padding:5px 10px; font-size:13px; }
+.dd-fb-bar .dd-badge { font-weight:700; }
+.dd-fb-file { cursor:pointer; font-size:11px; color:var(--mid); white-space:nowrap; }
+.dd-fb-file code { font-size:11px; }
+.dd-fb-file:hover code { color:var(--link); }
+.dd-toast { position:fixed; right:16px; bottom:64px; background:var(--ink); color:var(--bg); padding:8px 12px; border-radius:8px; font-size:13px; z-index:60; opacity:0; transition:opacity .2s; }
+.dd-toast.show { opacity:1; }
+.dd-sme-feedback ol li { margin: 6px 0; }
+@media print { .dd-note-btn, .dd-note-box, .dd-fb-bar, .dd-toast, .dd-sme-feedback, .dd-sme-divider { display:none !important; } }
+@page { size: Letter; margin: 0.6in 0.62in 0.55in 0.62in; }
+@media print {
+:root, :root[data-theme="dark"], :root[data-theme="light"] { color-scheme: light; --ink:#1a1a1a; --mid:#555; --line:#bdbdbd; --fill:#eee; --faint:#f6f6f6; --bg:#fff; --link:#0a58ca; }
+html { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+body { font: 10.5px/1.45 "Segoe UI", system-ui, Arial, sans-serif; }
+main { max-width: 7.2in; margin: 0 auto; padding: 0 0 0 0.62in; position: relative; }
+h1 { font-size: 21px; margin: 0 0 2px; letter-spacing:-0.2px; }
+h2 { font-size: 14px; margin: 16px 0 8px; padding-bottom:4px; border-bottom: 2px solid var(--ink); text-transform: uppercase; letter-spacing: 0.6px; }
+h3 { font-size: 11.5px; margin: 13px 0 5px; padding-bottom:2px; border-bottom:1px solid var(--line); }
+h4,h5,h6 { font-size: 10.5px; margin: 9px 0 4px; }
+p { margin: 6px 0; }
+a { color: inherit; text-decoration: underline; }
+code { font-size: 9.2px; padding: 0 2px; border-radius: 2px; }
+table { display: table; width:100%; margin: 7px 0; font-size: 9.1px; overflow-x: visible; }
+th, td { padding: 3px 5px; }
+th { background: var(--fill); }
+td code, th code { background: transparent; padding: 0; }
+pre { font-size: 8.4px; line-height: 1.35; padding: 7px 9px; margin: 7px 0; white-space: pre; overflow: hidden; border-radius: 3px; }
+pre.sql { background:#fbfbfb; }
+blockquote { margin: 7px 0; padding: 2px 10px; border-left: 3px solid var(--line); break-inside: avoid; }
+ul,ol { margin: 6px 0 6px 16px; padding: 0; } li { margin: 3px 0; }
+hr { margin: 10px 0; }
+h2, h3, table, pre { break-inside: avoid; }
+
+/* L6 paper HITL: each anchored block sits in the left gutter (main's own padding-left,
+   reserved above) so a printed page carries the anchor id beside its section — no @page
+   margin-box support required, so headless Chromium print-to-pdf renders it reliably. */
+h1, h2, h3, h4, h5, h6, p, table, pre, ul, ol, blockquote { position: relative; }
+.dd-margin-tag {
+  display: block; position: absolute; left: -0.6in; top: 0.1em; width: 0.54in;
+  font: 6.2px/1.15 "Cascadia Mono","Consolas",monospace; text-align: right;
+  color: var(--mid); letter-spacing: 0.1px; word-break: break-word;
+}
+/* Rev/commit footer: `position: fixed` repeats on every printed page in Chromium's
+   headless print-to-pdf (the standard running-footer technique) without needing CSS
+   Paged-Media margin-box content(), which Chromium supports only partially. */
+.dd-print-footer {
+  display: block; position: fixed; left: 0.62in; right: 0.62in; bottom: 0.12in;
+  font-size: 8px; color: var(--mid); text-align: center;
+  border-top: 1px solid var(--line); padding-top: 3px;
+}
+}
+</style>
+</head>
+<body>
+<main>
+<h1>Runbook — DryDocs lineage ingest (jobs CSV + DPL MAC) → curated graph load</h1>
+<ul id="front-matter"><span class="dd-margin-tag" aria-hidden="true">front-matter</span><li><strong>Status:</strong> DESCRIPTIVE — documents the working procedure end-to-end, INCLUDING the deliberate gate refusal at the load step. <strong>Rev 1, 2026-07-21</strong> (content reflects commit <code>297167e</code>: post-G14 file-ops pass, post-G15 launcher contract, post-G17 MAC ingest seam; the m3_* lineage vocabulary is <code>status: planned</code> — the live load REFUSES by design until the HITL gate flips it)</li><li><strong>Classification:</strong> Internal-Public (mechanism only — every example value is synthetic; real jobs CSVs and MAC JSON exports are internal-confidential and live OUT of the repo tree, never in this doc)</li><li><strong>Audience:</strong> whoever runs the lineage ingest — producer-side against synthetic fixtures, company-side against real psgmgr extracts and DPL Metadata-As-Code sets</li><li><strong>Companion:</strong> <code>docs/design/drydocs-startup-refresh-runbook.md</code> (container, schema bootstrap — prerequisite for the load step only), <code>docs/restructure/03-hitl-sme-flow.md</code> (the gate that unlocks the load), <code>drydocs_lineage/extractors/dpl_mac.py</code> (the assumed MAC field contract), <code>config/gate-log.md</code> 2026-07-15 &quot;Lineage rel vocabulary gate&quot; + 2026-07-16 &quot;cmdline-lineage-review&quot; (the shapes this pipeline implements)</li></ul>
+<hr>
+<h2 id="purpose-scope"><span class="dd-margin-tag" aria-hidden="true">purpose-scope</span>Purpose &amp; scope</h2>
+<p><strong>Purpose.</strong> Take Control-M job definitions from a <code>psgmgr</code> CSV projection, enrich them with DPL Metadata-As-Code (MAC) JSON sets, and drive the result through the candidate → SME review → curated → (gated) graph-load chain. &quot;The script&quot; at the front of this chain is the SQL extract that produces the jobs CSV; &quot;the load script&quot; at the end is <code>drydocs_lineage.writer.write_curated</code>, which populates :Script / :ETLProcess / :DataAsset nodes and INVOKES / TRIGGERS / READS_FROM / WRITES_TO edges — <strong>only after</strong> the lineage vocabulary gate flips those entries active.</p>
+<p><strong>In scope.</strong> Producing/staging the two inputs; running both extractors into one candidate graph; the SME review page; assembling the confirmed set; <code>plan_curated</code> (the exact write batches, reviewable before anything runs); the gated live load and its unlock path.</p>
+<p><strong>Out of scope.</strong> Container startup and schema bootstrap (companion startup-refresh runbook); the rua server-extract phase (G18–G25 — its own pipeline, its own G22 gate); Epic P host resolution (<code>node_target</code> stays polymorphic here); attribution edges (Epic K owns those — this pipeline records SEAL <em>facts</em> only).</p>
+<h2 id="prerequisites"><span class="dd-margin-tag" aria-hidden="true">prerequisites</span>Prerequisites</h2>
+<ol><li id="prerequisites--toolchain-pipx-installed-poetry-with-the"><strong>Toolchain:</strong> pipx-installed Poetry with the in-project <code>.venv</code> synced (<code>poetry install</code>). No network or Neo4j needed until the load step.</li><li id="prerequisites--the-jobs-csv-a-projection"><strong>The jobs CSV</strong> — a projection of <code>psgmgr.CM_DEF_VJOB</code> whose header matches the <code>controlm_jobs.sql</code> SELECT aliases (<code>job_id, version_serial, folder_id, job_name, parent_table, application, owner, node_id, cmd_line, is_current_version, …</code> — the column contract is pinned by <code>tests/unit/test_source_mapping_drift.py</code>). Company-side: run <code>drydocs_core/loaders/sql/controlm_jobs.sql</code> through your JDBC path. Producer-side: the synthetic twin <code>tests/fixtures/lineage/jobs.csv</code>.</li><li id="prerequisites--the-mac-root-optional-skip"><strong>The MAC root (optional — skip and the pipeline still runs, un-enriched):</strong> a directory of per-pipeline JSON sets, each subdirectory holding <code>pipeline.json</code> + <code>dataset_flow.json</code> (+ the rest of the traced 6-set, which is counted and ignored). Field contract documented at the top of <code>drydocs_lineage/extractors/dpl_mac.py</code> — ASSUMED until a real sample validates it. <strong>Real exports are internal-confidential: keep them out of the repo tree</strong> (out-of-tree home <code>~/data/DryDocs/</code> per the G19 convention; until G19 lands the location is manual discipline, not tooling).</li><li id="prerequisites--for-the-load-step-only-the"><strong>For the load step only:</strong> the <code>neo4jtest</code> EE container READY per the companion runbook, <code>.env</code> at repo root with <code>NEO4J_*</code> (names only — never in this doc), and the target database <code>drydocs</code> (the writer hard-refuses any other DB).</li><li id="prerequisites--reference-reading-before-a-first-run"><strong>Reference reading before a first run:</strong> the two gate-log entries named in Companion — they are the WHY for every endpoint shape below.</li></ol>
+<h2 id="startup"><span class="dd-margin-tag" aria-hidden="true">startup</span>Startup</h2>
+<p>From nothing to READY-to-ingest. Run from the repo root.</p>
+<ol><li id="startup--sync-the-venv-poetry-install-success"><strong>Sync the venv:</strong> <code>poetry install</code>. <em>Success:</em> <code>poetry run drydocs --help</code> prints the command list.</li><li id="startup--stage-the-jobs-csv-somewhere-readable"><strong>Stage the jobs CSV</strong> somewhere readable (synthetic: <code>tests/fixtures/lineage/jobs.csv</code> works as-is). <em>Success:</em> the header line contains <code>job_name</code>, <code>cmd_line</code>, <code>node_id</code>.</li><li id="startup--stage-the-mac-root-optional-one"><strong>Stage the MAC root</strong> (optional): one subdirectory per pipeline, each with at least <code>pipeline.json</code>. <em>Success:</em> <code>Get-ChildItem &lt;mac-root&gt; -Recurse -Filter pipeline.json</code> lists one file per pipeline set.</li></ol>
+<h2 id="refresh-ingest"><span class="dd-margin-tag" aria-hidden="true">refresh-ingest</span>Refresh / ingest</h2>
+<p>The recurring procedure on a READY setup. Steps 1–4 are pure candidate-side (no graph, rerun freely); step 5 is the gated write.</p>
+<ol><li><strong>Extract candidates</strong> — both extractors feed ONE <code>LineageGraph</code>:</li></ol>
+<pre class="powershell"><code>   poetry run python -c @&quot;
+   from drydocs_lineage.extractors import ControlMInventoryExtractor, DplMacExtractor
+   from drydocs_lineage.model import LineageGraph
+   g = LineageGraph()
+   inv = ControlMInventoryExtractor().extract(r&#x27;tests/fixtures/lineage/jobs.csv&#x27;, g)
+   print(&#x27;inventory |&#x27;, inv.summary())
+   mac = DplMacExtractor().extract(r&#x27;&lt;mac-root&gt;&#x27;, g)   # skip these 2 lines if no MAC
+   print(&#x27;mac       |&#x27;, mac.summary())
+   print(&#x27;graph     |&#x27;, g.stats())
+   &quot;@</code></pre>
+<p><em>Success:</em> both <code>summary()</code> lines print, and every skip shows up as a COUNT (<code>unresolved=</code>, <code>unmatched=</code>, <code>riders=</code>…) — the house rule is counted-never- silent, so a zero-warning run and a warning-heavy run are both &quot;working&quot;; what matters is that the numbers reconcile with what you fed in. The MAC join is by <code>--pipeline-id</code> GUID (both launcher spellings) onto the <code>proc#dpl:{GUID}</code> identity the inventory pass created; <code>matched</code> + <code>unmatched</code> should equal <code>sets_read - sets_no_guid - sets_invalid</code>.</p>
+<ol><li><strong>Render the SME review page</strong> (no Neo4j):</li></ol>
+<pre class="powershell"><code>   poetry run drydocs lineage-review &lt;jobs.csv&gt; -o lineage-review.html</code></pre>
+<p><em>Success:</em> the HTML opens; same-basename multi-mount Script duplicates and <code>kind UNKNOWN</code> invocations are flagged for the SME — they are NEVER auto-merged/auto-typed.</p>
+<ol><li><strong>Curate.</strong> The SME confirms a subset of candidate rels (today: assemble the confirmed <code>(src, TYPE, dst)</code> set from the review pass — <code>curation.curate</code> is a stub by design). Anything ambiguous goes to the HITL gate, not a guess.</li></ol>
+<ol><li><strong>Plan the write</strong> — pure function, produces the EXACT batches for review:</li></ol>
+<pre class="python"><code>   from drydocs_lineage.writer import plan_curated
+   plan = plan_curated(g, confirmed)
+   print(plan.scripts, plan.etl_processes, plan.assets, plan.rels)</code></pre>
+<p><em>Success:</em> no <code>ValueError</code> (a raise means the confirmed set drifted from the graph, or a job lacks its <code>folder_id.job_id</code> NODE-KEY composite — fix the input, don&#x27;t hand-edit the plan). ETLProcess rows take their <code>kind</code> from the MAC-derived <code>mac_kind</code> where present; rider-path nodes (e.g. <code>subType=provisioning</code>) keep the default <code>&#x27;etl&#x27;</code> <strong>on purpose</strong> until the enum gate ruling.</p>
+<ol><li><strong>Load — currently REFUSES, and that is the contract:</strong></li></ol>
+<pre class="python"><code>   from drydocs_lineage.writer import write_curated
+   write_curated(g, confirmed, client)   # raises GateBoundVocabularyError today</code></pre>
+<p>The four <code>m3_*</code> registry entries are <code>status: planned</code>; <code>write_curated</code> reads the registry and refuses a live load until they are <code>active</code> (D2: curated-only writes). <strong>The unlock is a HITL gate session, not a code edit:</strong> the lineage live-load gate flips the entries active WITH their <code>ontology_supplement.cypher</code> blocks (the K2 flips-are-follow-ups pattern; <code>test_schema.py</code> enforces block-per-active-edge). After the flip, rerun this step — MERGE semantics make it idempotent.</p>
+<h2 id="verify"><span class="dd-margin-tag" aria-hidden="true">verify</span>Verify</h2>
+<ul><li><strong>Candidate side (every run):</strong> <code>poetry run pytest tests/unit/test_lineage_inventory.py tests/unit/test_lineage_mac.py tests/unit/test_lineage_writer.py -q</code> → all green (fully synthetic, no network). Coverage numbers from step 1 reconcile: MAC <code>matched + unmatched = sets_read - sets_no_guid - sets_invalid</code>; inventory <code>jobs_added + skipped_* = rows_read</code>.</li><li><strong>Plan side:</strong> <code>plan.rels == len(confirmed)</code>; every statement in <code>plan.statements</code> is a MERGE/MATCH batch you can eyeball — nothing is hidden.</li><li><strong>Post-flip load (once the gate opens):</strong> rerun step 5, then in the graph: node counts match <code>plan.scripts / .etl_processes / .assets</code>; every written rel carries <code>vocab_id</code> + <code>source=&#x27;drydocs-lineage&#x27;</code>; ETLProcess <code>kind</code> is MAC-derived where a MAC set covered the pipeline and <code>&#x27;etl&#x27;</code> elsewhere.</li><li><strong>Full suite before any commit that touched this component:</strong> <code>poetry run pytest -q</code> green + <code>python -c &quot;import drydocs.cli&quot;</code> + <code>drydocs --help</code> (the CLAUDE.md §6 gates).</li></ul>
+<h2 id="rollback"><span class="dd-margin-tag" aria-hidden="true">rollback</span>Rollback</h2>
+<ul><li><strong>Steps 1–4 persist nothing</strong> — the candidate graph is process memory (or a JSON export you chose to write). Re-run at will; that IS the rollback.</li><li><strong>A failed/partial live load:</strong> rerun step 5 — every node/rel statement is a keyed MERGE (<code>Script.path</code>, <code>ETLProcess.token</code>, <code>DataAsset.assetId</code>, NODE-KEY jobs), so re-running converges rather than duplicating.</li><li><strong>Last resort (destructive — blast radius: everything this component ever wrote, and ONLY that):</strong> delete by provenance stamp, <code>MATCH ()-[r {source:&#x27;drydocs-lineage&#x27;}]-() DELETE r</code> then the orphaned <code>{source:&#x27;drydocs-lineage&#x27;}</code> nodes. Job nodes are never created by this writer (MATCH-only), so the Control-M load is untouched.</li></ul>
+<h2 id="troubleshooting"><span class="dd-margin-tag" aria-hidden="true">troubleshooting</span>Troubleshooting</h2>
+<ul><li><strong><code>GateBoundVocabularyError</code> at step 5</strong> → not a bug; the vocabulary is still <code>planned</code>. See the unlock path in step 5. If it raises AFTER the gate flipped, the registry edit didn&#x27;t land — check <code>relationship_vocabulary.yaml</code> statuses.</li><li><strong><code>TrustBoundaryError</code></strong> → the client points at a database other than <code>drydocs</code>. Fix the connection; the writer will not follow you.</li><li><strong>MAC <code>unmatched</code> unexpectedly high</strong> → the jobs CSV and MAC export cover different scopes (unmatched sets are still staged, flagged <code>mac_only=true</code>), or the GUID never appeared on a CMD_LINE (the code-fetch gap family — real finding, not noise).</li><li><strong><code>kind_riders</code> &gt; 0</strong> → expected for <code>provisioning</code> and any unmapped subType; the enum question is inboxed (IDEAS 2026-07-21 gate-rider entry). Do NOT add mappings to <code>_KIND_BY_SUBTYPE</code> without a gate ruling.</li><li><strong><code>ValueError: … lacks the ControlMJob NODE-KEY composite</code></strong> → the CSV came from a hand-made source without <code>folder_id</code>/<code>job_id</code>. Re-extract from the real projection; curated writes refuse degraded identity by design.</li><li><strong>Column-contract drift</strong> (<code>row.get</code> misses) → <code>test_source_mapping_drift.py</code> is the guard; reconcile the SQL alias, never patch around it in the extractor.</li><li><strong><code>%%VAR</code> values in properties</strong> → unresolved Control-M variables are kept VERBATIM as curation material — resolution belongs to the variable pipeline, not this extractor.</li></ul>
+<h2 id="contacts-escalation"><span class="dd-margin-tag" aria-hidden="true">contacts-escalation</span>Contacts &amp; escalation</h2>
+<ul><li><strong>Procedure owner:</strong> the DryDocs producer (repo owner). Company-side runs are owned by whoever operates the psgmgr extract + MAC export there.</li><li><strong>Anything touching edge MEANING</strong> (new relationship types, endpoint reshapes, the kind-enum question, planned→active flips) escalates to the SME through the HITL gate (<code>docs/restructure/03-hitl-sme-flow.md</code>) via the ontology-mapper flow — never decided in-pipeline. Decisions land in <code>config/gate-log.md</code>.</li><li><strong>Field-contract corrections</strong> (real MAC samples disagreeing with the assumed contract): update <code>dpl_mac.py</code>&#x27;s header + fixtures together, cite the sample&#x27;s provenance in the commit.</li></ul>
+<h2 id="appendices"><span class="dd-margin-tag" aria-hidden="true">appendices</span>Appendices</h2>
+<p><strong>A. The candidate chain at a glance</strong></p>
+<pre><code>controlm_jobs.sql ─▶ jobs CSV ─▶ ControlMInventoryExtractor ─┐
+                                                             ├─▶ LineageGraph ─▶ review ─▶ confirmed ─▶ plan_curated ─▶ write_curated ─▶ Neo4j
+MAC JSON sets (per-pipeline) ─▶ DplMacExtractor ─────────────┘                                              (refuses until gate flip)</code></pre>
+<p><strong>B. What each extractor contributes</strong></p>
+<table><thead><tr><th>Source</th><th>Nodes</th><th>Rels (all <code>status: planned</code> vocab)</th><th>Properties</th></tr></thead><tbody><tr><td>jobs CSV</td><td>ControlMJob, Script, ETLProcess</td><td>INVOKES; job-level READS_FROM/WRITES_TO (G14 file ops)</td><td>G15 launcher args incl. <code>seal</code></td></tr><tr><td>MAC sets</td><td>ETLProcess (join/enrich), <code>dpl_dataset</code> DataAssets</td><td>dataset-level READS_FROM/WRITES_TO</td><td><code>mac_pipeline_type</code>, <code>mac_sub_type</code>, <code>mac_kind</code> / <code>mac_kind_rider</code>, <code>mac_owner_seal</code></td></tr></tbody></table>
+<hr class="dd-sme-divider">
+<section class="dd-sme-feedback" aria-label="SME - Feedback">
+<h2>SME - Feedback</h2>
+<p>How to return your notes on this document:</p>
+<ol>
+<li>Click the <strong>✎</strong> button beside any section (or numbered step) and type your note — notes save in your browser as you type.</li>
+<li>When finished, click <strong>Copy feedback</strong> in the bottom-right toolbar. Your notes are copied as anchor-keyed YAML.</li>
+<li>Create the feedback file (it is YAML, <em>not</em> markdown) — <strong>Copy To:</strong> <code>docs/design/feedback/</code> · <strong>File Name:</strong> <code>drydocs-lineage-mac-runbook-rev1.yaml</code></li>
+<li>Paste the copied block into that file, save, and commit (or send the file back to the team).</li>
+</ol>
+</section>
+</main>
+<footer class="dd-print-footer">Rev 1 · commit 297167e</footer>
+<script>
+
+(function(){
+  var DOC="drydocs-lineage-mac-runbook", FILE="drydocs-lineage-mac-runbook-rev1.yaml", DIR="docs/design/feedback/", KEY="drydocs-doc-feedback:"+DOC;
+  function load(){ try{return JSON.parse(localStorage.getItem(KEY)||"{}");}catch(e){return {};} }
+  function save(){ localStorage.setItem(KEY, JSON.stringify(state)); }
+  var state=load(), badge;
+  function count(){ return Object.keys(state).filter(function(k){return (state[k]||"").trim();}).length; }
+  function refresh(){ if(badge) badge.textContent=count(); }
+  function toast(msg){ var t=document.createElement("div"); t.className="dd-toast"; t.textContent=msg; document.body.appendChild(t); requestAnimationFrame(function(){t.classList.add("show");}); setTimeout(function(){t.classList.remove("show"); setTimeout(function(){t.remove();},250);},1600); }
+  function exportYaml(){
+    var lines=["# design-doc feedback — paste into docs/design/feedback/"+DOC+"-rev<N>.yaml","doc: "+DOC,"notes:"];
+    Object.keys(state).forEach(function(a){
+      var note=(state[a]||"").replace(/\r/g,""); if(!note.trim()) return;
+      lines.push("  - anchor: "+a); lines.push("    note: |");
+      note.split("\n").forEach(function(l){ lines.push("      "+l); });
+    });
+    return lines.join("\n")+"\n";
+  }
+  function attach(el){
+    var id=el.id;
+    var btn=document.createElement("button"); btn.className="dd-note-btn"; btn.type="button"; btn.textContent="✎"; btn.title="Annotate #"+id;
+    var box=document.createElement("div"); box.className="dd-note-box"; box.style.display=(state[id]||"").trim()?"block":"none";
+    var ta=document.createElement("textarea"); ta.value=state[id]||""; ta.setAttribute("placeholder","note for #"+id+" …");
+    ta.addEventListener("input",function(){ state[id]=ta.value; save(); refresh(); el.classList.toggle("dd-annotated", !!ta.value.trim()); });
+    if((state[id]||"").trim()) el.classList.add("dd-annotated");
+    box.appendChild(ta);
+    btn.addEventListener("click",function(){ box.style.display=box.style.display==="none"?"block":"none"; if(box.style.display==="block") ta.focus(); });
+    if(el.tagName==="LI"){ el.insertAdjacentElement("afterbegin", btn); el.appendChild(box); }
+    else { el.insertAdjacentElement("afterend", box); el.insertAdjacentElement("beforebegin", btn); }
+  }
+  function copyText(txt, ok){
+    var done=function(){toast(ok);};
+    var fallback=function(){ var t=document.createElement("textarea"); t.value=txt; document.body.appendChild(t); t.select(); try{document.execCommand("copy"); toast(ok);}catch(e){toast("copy failed — select the box");} t.remove(); };
+    if(navigator.clipboard&&navigator.clipboard.writeText){ navigator.clipboard.writeText(txt).then(done,fallback); } else { fallback(); }
+  }
+  function fileLine(label, value){
+    var d=document.createElement("div"); d.className="dd-fb-file"; d.title="click to copy";
+    var c=document.createElement("code"); c.textContent=value;
+    d.appendChild(document.createTextNode(label+" ")); d.appendChild(c);
+    d.addEventListener("click",function(){ copyText(value, label.replace(":","")+" copied"); });
+    return d;
+  }
+  document.addEventListener("DOMContentLoaded",function(){
+    document.querySelectorAll("main [id]").forEach(attach);
+    var bar=document.createElement("div"); bar.className="dd-fb-bar";
+    var row=document.createElement("div"); row.className="dd-fb-row";
+    var lbl=document.createElement("span"); lbl.innerHTML='notes <span class="dd-badge">0</span>'; badge=lbl.querySelector(".dd-badge");
+    var ex=document.createElement("button"); ex.type="button"; ex.textContent="Copy feedback";
+    ex.addEventListener("click",function(){ copyText(exportYaml(), "feedback copied — create "+DIR+FILE); });
+    row.appendChild(lbl); row.appendChild(ex);
+    bar.appendChild(row);
+    bar.appendChild(fileLine("file:", FILE));
+    bar.appendChild(fileLine("path:", DIR+FILE));
+    document.body.appendChild(bar); refresh();
+  });
+})();
+
+</script>
+</body>
+</html>
