@@ -302,7 +302,9 @@
         "config/gate-prompts/ui-write-surface.yaml"
       ],
       "log_ref": null,
-      "unblocks": []
+      "unblocks": [
+        "O20"
+      ]
     }
   ]
 }
