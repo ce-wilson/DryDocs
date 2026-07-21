@@ -54,6 +54,11 @@ from pathlib import Path
 CONFIG_FILENAME = "oracle_kerberos_connection.txt"
 CONFIG_ENV_VAR = "ORACLE_KERBEROS_CONFIG"
 
+# Last-resort search location: a real (gitignored) config next to this module.
+# A module-level name so tests can point it elsewhere — the discovery tests
+# must not see a developer's real config.
+_MODULE_DIR = Path(__file__).resolve().parent
+
 # Keys understood in the config file (superset of the team's sample).
 _KNOWN_KEYS = {
     "sid",
@@ -84,7 +89,7 @@ def find_config(explicit: str | os.PathLike | None = None) -> Path:
     if env:
         candidates.append(Path(env))
     candidates.append(Path.cwd() / CONFIG_FILENAME)
-    candidates.append(Path(__file__).resolve().parent / CONFIG_FILENAME)
+    candidates.append(_MODULE_DIR / CONFIG_FILENAME)
     for cand in candidates:
         if cand.is_file():
             return cand

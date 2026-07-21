@@ -145,8 +145,12 @@ class TestConfigDiscovery:
         assert cfg["sid"] == "D999999"
 
     def test_missing_raises_with_search_list(self, tmp_path, monkeypatch):
+        # a real gitignored config next to the module would otherwise be
+        # discovered — repoint the module-dir fallback at the empty tmp_path
+        # so this passes on machines that have one
         monkeypatch.delenv(sl.CONFIG_ENV_VAR, raising=False)
         monkeypatch.chdir(tmp_path)
+        monkeypatch.setattr(sl, "_MODULE_DIR", tmp_path)
         with pytest.raises(FileNotFoundError, match="Searched"):
             sl.load_config(None)
 
