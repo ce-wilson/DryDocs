@@ -4956,9 +4956,110 @@ items:
       drydocs/gate_pages.py (module drydocs-review — the H4 gate-page
       generator's home); zero api surface.
 
+  - id: C12
+    epic: ontology-mapping
+    title: "Run the platforms-taxonomy HITL gate: retire SchedulerKind into the software-registry model (confirm the 2026-07-21 rulings; B4/B5 residual), then groom the build follow-ups"
+    type: task
+    module: ontology
+    phase: 2
+    agent: main
+    model: fable
+    priority: p2
+    status: todo
+    depends_on: [C6, C11]
+    inputs: [config/gate-prompts/platforms-taxonomy.yaml, config/taxonomy/platforms.yaml, config/taxonomy/software-registry.yaml, drydocs_core/ontology/relationship_vocabulary.yaml, config/taxonomy-ontology-map.yaml, config/gate-log.md]
+    acceptance: >
+      USER-GATED START — the SME convenes the gate session (the pull loop
+      skips this item until then; the J13/C11 idiom). The rendered
+      platforms-taxonomy gate page is walked in-session: section A plus the
+      2026-07-21 pm rulings (B1 USES_TOOL retired -> the ACTIVE USES_SOFTWARE
+      edge with source: 'batch-port'; B2 no capability node layer — role:
+      orchestrator carries the classification; B3 merge into :SoftwareProduct;
+      Q6 Ais* removed both sides, acronym preserved only in
+      software-registry.yaml#acronyms) are confirmed AS WRITTEN or amended;
+      B4 (typing note) and B5 (airflow row) are ruled. Sign-off transcribed to
+      config/gate-log.md; gates.json + enforcement matrix regenerated;
+      platforms.yaml flips confirmed: true. The build follow-ups are GROOMED
+      as items, not built here: SchedulerKind seed/constraint retirement, the
+      USES_SOFTWARE batch-port loader migration, seal_requires_scheduler +
+      requires-scheduler map-entry retirement, and the Ais* straggler sweep
+      (README / NODE_QUICK_REFERENCE / LoadPlanV3 refs). Nothing flips active
+      inside this item; full suite green.
+    notes: >
+      Groomed 2026-07-21 pm from the SchedulerKind-deprecation inbox line
+      (parked since 2026-07-09; its groom-condition fully fired same day: C11
+      captured the company shape in the morning, the SME ruled the reshape
+      in-chat in the afternoon — Ais* removed both sides, registry model wins,
+      gate prompt reshaped to confirm-as-written). Model fable per the matrix:
+      the session ratifies ontology/class decisions. The K5 gate-RUN item is
+      the precedent for itemizing a gate session.
+
+  - id: O26
+    epic: web-console
+    title: "App-to-app path runbook view: Runbooks-page tab with source/target application pickers, shortest-path TECHNICAL/DATA lanes, and a generated runbook grid citing path nodes"
+    type: task
+    module: drydocs-web
+    phase: 12
+    agent: main
+    model: sonnet
+    priority: p2
+    status: todo
+    depends_on: [O11, O17]
+    inputs: [UI-WIP/wf-runbook-path-01.md, UI-WIP/wf-runbook-path-01.html, web/src/routes/RunbooksRoute.tsx, drydocs_api/query_specs.py, web/src/runbooks/demoRunbooks.ts]
+    acceptance: >
+      The /runbooks page gains an App-path tab implementing the
+      wf-runbook-path-01 wireframe: source/target BusinessApplication pickers
+      -> a shortest-path query registered as QuerySpec runbooks.app-path.v1
+      (the O11 registry, provenance manifest included) -> the path rendered in
+      two lanes (TECHNICAL and DATA) -> a GENERATED runbook grid in which
+      every step cites the path node it derives from. Lane partition derives
+      from LABEL SETS ONLY — the layer/c4_level node-property idea stays a
+      flagged open gate question (no new node properties, no ontology writes,
+      no new edge types). Works against the demo dataset without Neo4j (the
+      O9 pattern); tests cover the spec registration and the lane partition;
+      full suite green.
+    notes: >
+      Groomed 2026-07-21 pm from the wireframe inbox line (wireframe committed
+      with the Epic O landings, dc89191). Mechanism-only twin of the internal
+      search-for-file-name use case — the root screenshot stays uncommitted;
+      the file-name-contains anchor rides the same tab. O17 (/runbooks) and
+      O11 (QuerySpec registry) are done, so the seat exists.
+
+  - id: G26
+    epic: component-topology
+    title: "Launcher registry becomes a config file: move LAUNCHER_REGISTRY out of commands.py into a schema-guarded config so teams add wrappers without a code release"
+    type: task
+    module: drydocs-core
+    phase: 6
+    agent: main
+    model: sonnet
+    priority: p2
+    status: todo
+    depends_on: []
+    inputs: [drydocs_core/controlm/commands.py, config/taxonomy/software-registry.yaml, scripts/render_enforcement_matrix.py, tests/unit/test_command_parser.py]
+    acceptance: >
+      LAUNCHER_REGISTRY rules live in a config file (the config/ pattern, e.g.
+      config/launcher-registry.yaml) with a schema-guard unit test; commands.py
+      LOADS the registry instead of defining it, with no behavior change (the
+      existing parser/classifier suite stays green untouched); every
+      classifier_rule id referenced by software-registry.yaml
+      invocation_patterns rows still resolves (a test asserts the id set —
+      those rows pin rule ids for gate review and must not silently break);
+      the O12 enforcement matrix flips the launcher-registry surface from the
+      code-resident unguarded-config example to a guarded config surface
+      (matrix regenerated, drift test green). End state: adding a wrapper rule
+      is a config edit plus a test run, no Python change.
+    notes: >
+      Groomed 2026-07-21 pm from the 2026-07-16 SME requirement line (captured
+      at the cmdline-lineage-review mini-gate); its admin-screen end state
+      landed as O12 (done, cd76c91), which renders this registry as the
+      visible unguarded-config example — this item is the migration that
+      retires that example. Epic G / phase 6 per the G15/G16 precedent (the
+      same drydocs_core/controlm engine).
+
 summary:
-  todo: 18                                         # -L9 closed (no longer reproduces post-L13 CSS rework); -L15, -L14, -L12, -C11 done; +G18..G25 rua-ingest phase (2026-07-21)
+  todo: 21                                         # +C12 (platforms gate, USER-GATED), +O26 (app-path runbook tab), +G26 (launcher-registry config migration) — groomed 2026-07-21 pm
   in_progress: 1                                   # E1 (gate deferred both sides)
   blocked: 0
   done: 121                                        # +L9 Chrome partial-render closed (Chrome 150 full-height verified) 2026-07-21 pm; +L15, +L14, +L12, +C11, +G17, +O25 same day
-  next_ready: [M2, M3, M4, P3, J10, Q6, O23, J13, G18, G19]
+  next_ready: [M2, M3, M4, P3, J10, Q6, O23, J13, G18, G19, C12, O26, G26]

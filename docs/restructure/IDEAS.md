@@ -44,16 +44,6 @@ Tags help grooming: `idea` · `bug` · `doc` · `source` (new data source) · `q
   (`dpl_mac._KIND_BY_SUBTYPE`) only carries enum-safe entries. Decide at the next
   lineage gate session (the live-load flips / G22 sits closest).
 
-- 2026-07-21 — [idea] **App-to-app path runbook view (two-layer) — wireframed**
-  (`UI-WIP/wf-runbook-path-01.md` + `.html`, from chat): source/target
-  BusinessApplication pickers → `SHORTEST 1` path → TECHNICAL + DATA lanes →
-  a GENERATED runbook grid (each step cites its path node). Mechanism-only twin
-  of the internal search-for-file-name use case (root screenshot, never
-  committed; also supports the file-name-contains anchor). Groom into Epic O:
-  likely an O17 Runbooks-page tab + QuerySpec `runbooks.app-path.v1`; open
-  ontology question flagged in the wf: `layer`/`c4_level` node properties need
-  a vocabulary gate (until then, lane partition derives from label sets).
-
 - 2026-07-21 — [idea] **ControlMApplication code → BusinessApplication mapping: the
   two-pattern model (SME, chat)**. SME states the code layer maps two ways: (1) some
   BusinessApplications own a DEDICATED Control-M app code → can map DIRECTLY
@@ -69,7 +59,11 @@ Tags help grooming: `idea` · `bug` · `doc` · `source` (new data source) · `q
   the domain strip when that mapping table exists as a reconciler input" hook (this is
   that table). Also touches plan-07 P3 invocation-pattern rows (AT GATE). SME also
   flagged: the Folders/App-codes frames are the power-user/SME mapping surface needed
-  SOONEST → prioritize O13's /mappings React screen accordingly.
+  SOONEST → prioritize O13's /mappings React screen accordingly. KEPT-UPDATED at the
+  2026-07-21 pm groom: O13 shipped same day (0dc2831) — the prioritization ask is
+  satisfied; what stays parked here is the GATE DECISION core (the authoritative
+  code→app mapping edge + platform-code marker), trigger = the SME convening that
+  mapping gate / the K2 tier model's next touch.
 
 - 2026-07-21 — [idea] **m7 build follow-up** (from gate `cmdline-nfr-vetting`): migrate
   payload invocations out of the m3_invokes 1..n fold onto the registered `USES_ARTIFACT`
@@ -227,17 +221,6 @@ Tags help grooming: `idea` · `bug` · `doc` · `source` (new data source) · `q
   fits QuerySpec export) and DryDocs-as-template play à la create-context-graph ("pick your
   orchestrator, get a scaffolded support graph") for the standalone-generalization goal.
 
-- 2026-07-16 — [idea] **Launcher registry should be human-configurable** (SME requirement
-  captured at the cmdline-lineage-review mini-gate): LAUNCHER_REGISTRY in
-  drydocs_core/controlm/commands.py is code-resident; teams add wrappers/variables
-  faster than code releases. First step = a config-file registry (config/ pattern,
-  test-guarded like source mappings); end state = an admin screen in the web console
-  (Epic O candidate). PARTIALLY GROOMED 2026-07-17: the admin-screen end state → **O12**
-  (admin configuration page w/ generated enforcement matrix; wireframes
-  UI-WIP/wf-admin-config-01.*). The config-file registry migration itself REMAINS
-  inboxed (drydocs-core work) — the O12 matrix renders it as the visible
-  unguarded-config example until migrated.
-
 - 2026-07-14 — [source] **K2 FID / ALIAS reconciliation tables are company-side unblocks.**
   The attribution loader's TierReconcilers seam ships empty for FID and ALIAS (facts stay
   unresolved, counted in coverage) — tier 2 needs a FID -> seal_id source and tier 4 an
@@ -303,21 +286,6 @@ Tags help grooming: `idea` · `bug` · `doc` · `source` (new data source) · `q
   §Workbench + SYNTHESIZED notes), `drydocs-remediation-tdd.md` §HITL OQ-1. (Control-M for
   Kubernetes / Helm-chart offering deliberately SKIPPED — different product, agents-in-K8s,
   no current use case.)
-- 2026-07-09 — [idea] `:SchedulerKind` slated for **DEPRECATION → `:AisCapability` + `:AiTool`**
-  (user 2026-07-09). Today SchedulerKind is a small placeholder vocab (ControlM/Autosys/Airflow,
-  seeded `ontology.cypher` + the `scheduler_kind` constraint) with no `node_classifications` entry.
-  The replacement classes are **not yet defined** — needs the SME to specify what `:AisCapability`
-  and `:AiTool` represent and how the app batch port's `REQUIRES_SCHEDULER` re-targets them (one
-  edge or two). Touches: the C6 `requires-scheduler` map entry (target provisional), F1/F2
-  orchestrator crosswalks, `ontology.cypher` seeds + the `scheduler_kind` constraint, README.
-  Ontology/node-meaning ⇒ HITL gate; groom into an item once the two classes are defined.
-  Reconciliation placeholder created: `config/taxonomy/platforms.yaml` (status: placeholder).
-  **C11 CAPTURE 2026-07-21: the two classes ARE now defined** — company-confirmed 2026-06-29
-  AIS gate (`:AisCapability` skos:Concept / `:AisTool` prov:SoftwareAgent; SchedulerKind
-  deprecated there same day), captured mechanism-only in `platforms.yaml#company_confirmed`.
-  This line's groom-condition is met: the producer platforms gate decides FROM the captured
-  shape (open: USES_TOOL rename, Q1 capability granularity, Q4 software-registry reconcile).
-
 - 2026-07-08 — [doc] **BRD outline (Epic L, deferred)** — the third canonical doc type after
   TDD (L1) and Runbook (L8). Parked, not promoted: the BRD is a work-in-progress upstream and
   the user flagged it as "definitely a later phase", so there is no stable outline to write an
@@ -364,6 +332,38 @@ Tags help grooming: `idea` · `bug` · `doc` · `source` (new data source) · `q
 ## Recently groomed (audit trail)
 
 <!-- when you promote an idea, move its line here with the resulting backlog id -->
+
+- 2026-07-21 pm groom run (bare /groom-backlog, same session as the platforms-taxonomy
+  pre-rulings) — 3 promoted / 0 inboxed / 1 kept-updated (todo 18 → 21):
+  - [idea] SchedulerKind → AisCapability/AiTool deprecation (parked since 2026-07-09;
+    groom-condition FULLY FIRED today — C11 captured the company shape am, the SME ruled
+    the reshape in-chat pm: Ais* removed both sides, registry model wins, gate prompt
+    reshaped to confirm-as-written) → **C12** (run the platforms gate, USER-GATED START;
+    build follow-ups groom at sign-off — the K5 gate-RUN precedent).
+  - [idea] app-to-app path runbook view wireframe (2026-07-21) → **O26** (Runbooks-page
+    App-path tab + QuerySpec runbooks.app-path.v1; lane partition from label sets only —
+    the layer/c4_level vocabulary stays a gate question; trigger fired: O17 + O11 done).
+  - [idea] launcher-registry config-file migration (2026-07-16, the remaining inboxed
+    half) → **G26** (config/ pattern + schema guard; classifier_rule ids pinned by
+    invocation_patterns must keep resolving; trigger fired: O12 done — its matrix renders
+    this registry as the unguarded-config example G26 retires).
+  - kept-updated: the ControlMApplication two-pattern mapping line — O13 shipped same
+    day (0dc2831), satisfying its prioritization flag; the gate-decision core stays
+    parked on the SME convening the mapping gate / K2's next touch.
+  - kept parked, unchanged (trigger checks this pass): AIS acronym port-carry (next
+    cross-repo port), MAC subType kind-enum rider (next lineage gate; G22 closest), m7
+    build follow-up (lineage live-load / m7 flip), marketing-site brand kit (site not
+    started), FW-really-API gap classes (next Script-refinement gate), DPL ingestion-leg
+    residuals, company back-flow batch (needs screenshot channel), company-side heads-ups
+    (relay next company session), post-squash ref cleanup (user, destructive), Runbook
+    Rev 3 rider, SNYK_TOKEN manual step, SEAL/PAT terminology (three §Decision calls),
+    m3_invokes to_node broadening (next vocab gate), depgraph metrics (sibling repo),
+    ETL-tooling inventory, JobRun indexes, SaaS scaffold research, K2 FID/ALIAS
+    (company-side), ctlm_id ripple (internal-side), dry-docs.com seed, /documentation
+    whitepaper type, lineage live-load gate (HITL scheduling), remediation slices (TDD
+    §6/§7), Phase C packaging, Workbench (entitlement), BRD outline (later phase),
+    docmeta P4–P7 (Q6 still todo), EE container password, LLM key strategy, common/
+    cosmetic, cli.py regroup (v1.0 window).
 
 - 2026-07-21 groom run (bare /groom-backlog, same day as cmdline-nfr-vetting/G15/G16 and the
   Epic O landings) — 2 promoted / 1 retired-merged / 1 kept-updated (todo 22 → 24):
