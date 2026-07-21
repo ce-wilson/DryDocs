@@ -313,6 +313,72 @@ QUERY_SPECS: dict[str, QuerySpec] = {
             classification="internal",
             params=_LIMIT,
         ),
+        # O18 docs frames — the lexical corpus (Document -> Chunk, PART_OF).
+        QuerySpec(
+            id="docs.documents.v1",
+            database="drydocs",
+            description=(
+                "Corpus documents with chunk counts — trust_default (VERBATIM / "
+                "GROUNDED / SYNTHESIZED) visible as a column, never hidden."
+            ),
+            cypher=(
+                "MATCH (d:Document) "
+                "OPTIONAL MATCH (c:Chunk)-[:PART_OF]->(d) "
+                "RETURN d.doc_id AS doc_id, d.title AS title, "
+                "d.trust_default AS trust_default, d.classification AS classification, "
+                "count(c) AS chunks "
+                "ORDER BY doc_id LIMIT $limit"
+            ),
+            columns=(
+                ColumnDef("doc_id", "string", "Document"),
+                ColumnDef("title", "string", "Title"),
+                ColumnDef("trust_default", "string", "Trust tier"),
+                ColumnDef("classification", "string", "Classification"),
+                ColumnDef("chunks", "int", "Chunks"),
+            ),
+            classification="internal-public",
+            params=_LIMIT,
+        ),
+        QuerySpec(
+            id="docs.chunks.v1",
+            database="drydocs",
+            description=(
+                "Corpus chunks with their parent document and effective trust tier "
+                "(chunk override, else the document default)."
+            ),
+            cypher=(
+                "MATCH (c:Chunk)-[:PART_OF]->(d:Document) "
+                "RETURN c.chunk_id AS chunk_id, d.doc_id AS doc_id, c.seq AS seq, "
+                "c.heading AS heading, coalesce(c.trust, d.trust_default) AS trust "
+                "ORDER BY doc_id, seq LIMIT $limit"
+            ),
+            columns=(
+                ColumnDef("chunk_id", "string", "Chunk"),
+                ColumnDef("doc_id", "string", "Document"),
+                ColumnDef("seq", "int", "Seq"),
+                ColumnDef("heading", "string", "Heading"),
+                ColumnDef("trust", "string", "Trust tier"),
+            ),
+            classification="internal-public",
+            params=_LIMIT,
+        ),
+        QuerySpec(
+            id="docs.trust-provenance.v1",
+            database="drydocs",
+            description="Trust-tier census over the corpus — the provenance audit frame.",
+            cypher=(
+                "MATCH (c:Chunk)-[:PART_OF]->(d:Document) "
+                "RETURN coalesce(c.trust, d.trust_default) AS trust, "
+                "count(*) AS chunks, count(DISTINCT d) AS documents "
+                "ORDER BY trust"
+            ),
+            columns=(
+                ColumnDef("trust", "string", "Trust tier"),
+                ColumnDef("chunks", "int", "Chunks"),
+                ColumnDef("documents", "int", "Documents"),
+            ),
+            classification="internal-public",
+        ),
         # O17 runbooks frames.
         QuerySpec(
             id="runbooks.series.v1",
