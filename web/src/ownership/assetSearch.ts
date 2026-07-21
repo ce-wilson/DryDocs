@@ -251,13 +251,27 @@ export function expandable(id: string, visible: Set<string>): string[] {
     .filter((n) => !visible.has(n))
 }
 
-/** the assumed path-spec cypher, needle-bound like SpecGrid's Copy-as-Cypher */
+/** the assumed path-spec cypher, needle-bound like SpecGrid's Copy-as-Cypher.
+ *  Labels + relationship allow-list mirror the CURRENT state of
+ *  drydocs_core/schema/schema_graph.cypher (2026-07-21) — active types plus
+ *  the planned lineage tier (WRITES_TO / READS_FROM / USED); asset anchor =
+ *  the only data-plane labels in the vocabulary (:File / :DataAsset).
+ *  Property names on the anchor are still assumed — that ruling is O23. */
 export function pathCypher(needle: string): string {
   return (
     `// QuerySpec runbooks.app-path.v1 (assumed contract — read-only)\n` +
-    `MATCH p = SHORTEST 1 (a:BusinessApplication {seal_id: $source})\n` +
-    `  -[]-+(fn) WHERE fn.file_name CONTAINS $needle OR fn.table_name CONTAINS $needle\n` +
+    `// rel allow-list = schema_graph.cypher current state:\n` +
+    `//   active:  WAS_ASSOCIATED_WITH · CONTAINS_JOB · CONTAINS_FOLDER\n` +
+    `//            EMITS_OUT_CONDITION · REQUIRES_IN_CONDITION · WAS_INFORMED_BY\n` +
+    `//   planned: WRITES_TO · READS_FROM · USED\n` +
+    `MATCH p = SHORTEST 1\n` +
+    `  (a:BusinessApplication {seal_id: $source})\n` +
+    `  -[:WAS_ASSOCIATED_WITH|CONTAINS_JOB|CONTAINS_FOLDER|EMITS_OUT_CONDITION|\n` +
+    `     REQUIRES_IN_CONDITION|WAS_INFORMED_BY|WRITES_TO|READS_FROM|USED]-{1,12}\n` +
+    `  (fn WHERE (fn:File OR fn:DataAsset)\n` +
+    `        AND (fn.file_name CONTAINS $needle OR fn.table_name CONTAINS $needle))\n` +
     `RETURN p\n` +
-    `// $needle = '${needle}'  · classic fallback: shortestPath((a)-[*..12]-(b))`
+    `// $needle = '${needle}'\n` +
+    `// classic fallback: shortestPath((a)-[*..12]-(fn)) + post-WHERE`
   )
 }
