@@ -41,6 +41,9 @@ LAUNCHER_REGISTRY: list[tuple[re.Pattern, str, str]] = [
     (re.compile(r"\.pset$"),                    "ABINITIO",       "abinitio.pset"),
     (re.compile(r"^m_\w+", re.I),               "INFORMATICA",    "informatica.mapping_prefix"),
     (re.compile(r"^pmcmd$", re.I),              "INFORMATICA",    "informatica.pmcmd"),
+    # the canonical Informatica wrapper launcher (v2 standard templates 6.4/6.5;
+    # G16 — previously fell through to the generic .ksh shell rule)
+    (re.compile(r"^ICDW_etl_run_interface\.ksh$", re.I), "INFORMATICA", "informatica.icdw_run_interface"),
     (re.compile(r"^run_data_validation\.sh$"),  "VALIDATION_UTIL","validation.run_data_validation"),
     (re.compile(r"^run_calp_temp\.sh$"),        "VALIDATION_UTIL","validation.run_calp_temp"),
     # DPL data-pipeline accelerators. SME 2026-07-16 (gate-log cmdline-lineage-review):
@@ -249,6 +252,30 @@ def classify_executable(executable: str) -> tuple[str, str | None]:
         if pattern.search(base):
             return itype, rule
     return "UNKNOWN", None
+
+
+#: classifier rules that name a REGISTERED LAUNCHER entrypoint — the G16 value
+#: contract ("aliases suggest, values decide"): a variable whose VALUE hits one
+#: of these is a launcher reference regardless of the variable's NAME (the
+#: JAR_PATH -> dt-launcher.sh gap-analysis gotcha). Generic interpreter /
+#: extension rules (shell.script, python.*, java.*) are excluded on purpose —
+#: an arbitrary .sh value is not evidence of a launcher.
+NAMED_LAUNCHER_RULES = frozenset({
+    "dpl.dt_launcher_accelerator",
+    "dpl.pipelines_launcher_jar",
+    "dpl.spark_processor_onprem",
+    "abioncloud.runscript_wrapper",
+    "informatica.icdw_run_interface",
+    "informatica.pmcmd",
+    "validation.run_data_validation",
+    "validation.run_calp_temp",
+})
+
+
+def is_registered_launcher(value: str) -> bool:
+    """True when the token's basename matches a NAMED launcher registry rule."""
+    _, rule = classify_executable(value)
+    return rule in NAMED_LAUNCHER_RULES
 
 
 # DPL pipeline-id flag spellings: single-dash `-pipeline` (observed launcher

@@ -23,6 +23,9 @@ class VariableCoverage:
     by_dc_kind: dict[str, Counter] = field(default_factory=dict)
     plugin_namespaces: Counter = field(default_factory=Counter)
     fact_types: Counter = field(default_factory=Counter)
+    fact_warns: Counter = field(default_factory=Counter)  # G16 conformance signal:
+                                       # name_value_mismatch / alias_rename —
+                                       # canonical names are WARN-free
     system_funcs: Counter = field(default_factory=Counter)
     system_vars: Counter = field(default_factory=Counter)
     referenced_names: Counter = field(default_factory=Counter)
@@ -47,6 +50,10 @@ class VariableCoverage:
             self.plugin_namespaces[cv.plugin_namespace] += 1
         if cv.fact_type:
             self.fact_types[cv.fact_type] += 1
+            if cv.fact_name_mismatch:
+                self.fact_warns["name_value_mismatch"] += 1
+            elif cv.fact_alias_of:
+                self.fact_warns["alias_rename"] += 1
         for fn in cv.system_funcs:
             self.system_funcs[fn] += 1
         for sv in cv.system_vars:

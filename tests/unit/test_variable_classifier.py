@@ -243,3 +243,99 @@ def test_sample_classifies_end_to_end() -> None:
     assert "JOBNAME" not in cov.referenced_names
     # the unclassifiable junk rows land in MALFORMED, not in a crash
     assert cov.by_kind["MALFORMED"] >= 1
+
+
+# -- G16: artifact/launcher canonicals + value contracts (gate cmdline-nfr-vetting,
+# SME-4, 2026-07-21 — aliases suggest, VALUES decide; canonical names WARN-free) --
+
+def test_image_rolls_up_to_artifact_uri_clean_break() -> None:
+    # v2 decision log: IMAGE -> IMAGE is removed; IMAGE now suggests ARTIFACT_URI
+    cv = classify_variable("%%IMAGE", "registry/app/ingest-img:1.0")
+    assert cv.fact_type == "ARTIFACT_URI"
+    assert cv.kind is VariableKind.SEMANTIC_FACT
+    # legacy alias stays materialized (non-destructive) but flags the rename
+    assert cv.fact_alias_of == "ETL_ARTIFACT_URI"
+    assert cv.fact_name_mismatch is False
+
+
+def test_launcher_valued_variable_is_launcher_regardless_of_name() -> None:
+    # the JAR_PATH -> dt-launcher.sh gotcha: name says jar, value IS the
+    # registered launcher — the VALUE decides, and the mismatch is a WARN
+    cv = classify_variable(
+        "%%JAR_PATH", "/apps/tenants/dpl_utils/dt-accelerators/dt-launcher.sh"
+    )
+    assert cv.fact_type == "LAUNCHER_SCRIPT_PATH"
+    assert cv.fact_name_mismatch is True
+    # even an UNREGISTERED name is corrected by the value contract
+    cv2 = classify_variable("%%SOME_TEAM_VAR", "/x/y/dpl_spark_processor")
+    assert cv2.fact_type == "LAUNCHER_SCRIPT_PATH"
+    assert cv2.kind is VariableKind.SEMANTIC_FACT
+    assert cv2.fact_name_mismatch is False  # nothing was suggested, nothing lied
+
+
+def test_sha_digest_is_artifact_sha_never_uri() -> None:
+    sha256 = "934fe87c0cae8b9983a3a21b5a4a70fb408faf487a3d48af73ada3b8320a27a7"
+    cv = classify_variable("%%IMAGE_SHA", sha256)
+    assert cv.fact_type == "ARTIFACT_SHA"
+    assert cv.fact_name_mismatch is False  # name and value agree
+    # a URI-named variable holding a digest is corrected + flagged
+    cv2 = classify_variable("%%ETL_ARTIFACT_URI", sha256)
+    assert cv2.fact_type == "ARTIFACT_SHA"
+    assert cv2.fact_name_mismatch is True
+
+
+def test_canonical_names_are_warn_free() -> None:
+    cv = classify_variable(
+        "%%ETL_ARTIFACT_URI", "https://artifactory/maven/app/bar-1.4.0.jar"
+    )
+    assert cv.fact_type == "ARTIFACT_URI"
+    assert cv.fact_alias_of is None
+    assert cv.fact_name_mismatch is False
+    cv2 = classify_variable("%%LAUNCHER_SCRIPT_PATH", "/apps/x/dt-launcher.sh")
+    assert cv2.fact_type == "LAUNCHER_SCRIPT_PATH"
+    assert cv2.fact_alias_of is None and cv2.fact_name_mismatch is False
+
+
+def test_production_alias_rollups_materialize_with_rename_warn() -> None:
+    for name in ("%%USER_JAR", "%%CONTAINER_IMAGE", "%%JAR_LOC", "%%MULTI_FILE_JAR"):
+        cv = classify_variable(name, "/apps/uds/tenants/x/jars/thing-1.0.jar")
+        assert cv.fact_type == "ARTIFACT_URI", name
+        assert cv.fact_alias_of == "ETL_ARTIFACT_URI", name
+    for name in ("%%PY_LAUNCH", "%%SCRIPT_PATH", "%%ACCELERATOR_PATH"):
+        cv = classify_variable(name, "/apps/x/dt-accelerators/dt-launcher.sh")
+        assert cv.fact_type == "LAUNCHER_SCRIPT_PATH", name
+        # aliases OF the canonical LAUNCHER_SCRIPT_PATH spelling — rename WARN
+        assert cv.fact_alias_of == "LAUNCHER_SCRIPT_PATH", name
+
+
+def test_value_contract_skips_unresolved_and_multitoken_values() -> None:
+    # %%VAR-bearing values cannot be judged by value — no override, no warn
+    cv = classify_variable("%%JAR_PATH", "%%JAR_DIR/dt-launcher.sh")
+    assert cv.kind is VariableKind.VAR_REF
+    assert cv.fact_name_mismatch is False
+    # a full command string is not a single artifact token
+    cv2 = classify_variable("%%SOME_CMD", "sh /apps/x/dt-launcher.sh -i")
+    assert cv2.fact_type is None
+
+
+def test_icdw_run_interface_classifies_informatica() -> None:
+    from drydocs_core.controlm.commands import classify_executable
+
+    itype, rule = classify_executable("/etlapps/icdw/prod/ops/Scripts/ICDW_etl_run_interface.ksh")
+    assert itype == "INFORMATICA"
+    assert rule == "informatica.icdw_run_interface"
+    # generic shell scripts still classify SHELL_SCRIPT, not launcher
+    from drydocs_core.controlm.commands import is_registered_launcher
+
+    assert is_registered_launcher("/apps/x/dt-launcher.sh")
+    assert not is_registered_launcher("/opt/scripts/hldm/onpm_fw.ksh")
+
+
+def test_fact_warns_counted_in_coverage() -> None:
+    cov = VariableCoverage()
+    cov.add(classify_variable("%%JAR_PATH", "/a/dt-launcher.sh"))          # mismatch
+    cov.add(classify_variable("%%IMAGE", "registry/app/img:1"))            # alias
+    cov.add(classify_variable("%%ETL_ARTIFACT_URI", "https://r/a.jar"))    # canonical
+    assert cov.fact_warns["name_value_mismatch"] == 1
+    assert cov.fact_warns["alias_rename"] == 1
+    assert sum(cov.fact_warns.values()) == 2

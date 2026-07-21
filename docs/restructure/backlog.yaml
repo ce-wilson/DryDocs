@@ -4140,7 +4140,7 @@ items:
     agent: main
     model: sonnet
     priority: p2
-    status: todo
+    status: done          # DONE 2026-07-21 — all 6 acceptance points tested, suite 774 green
     depends_on: []
     inputs: [drydocs_core/controlm/variables.py, drydocs_core/controlm/commands.py, internal/remediation/governance/command-line-and-variables-standard.md, config/gate-log.md, tests/unit/test_variable_classifier.py, tests/unit/test_command_parser.py]
     acceptance: >
@@ -4217,8 +4217,8 @@ items:
 # Roll-up the dispatcher can glance at. COMPUTED views — test_backlog.py enforces
 # that these match the items exactly; update them with any status change.
 summary:
-  todo: 25                                         # -O22 done (2026-07-21 hub glyph set shipped)
+  todo: 24                                         # -G16 done (2026-07-21 variable-standard engine alignment built)
   in_progress: 1                                   # E1 (gate deferred both sides)
   blocked: 0
-  done: 101                                        # +G15 +O21 +O22 (2026-07-21)
-  next_ready: [G16, L9, L12, L14, L15, M2, M3, M4, P3, J10, Q6, O9, O12, O13, J13]
+  done: 102                                        # +G15 +G16 +O21 +O22 (2026-07-21)
+  next_ready: [L9, L12, L14, L15, M2, M3, M4, P3, J10, Q6, O9, O12, O13, J13]

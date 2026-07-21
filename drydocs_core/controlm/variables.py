@@ -47,6 +47,8 @@ import re
 from dataclasses import dataclass, field
 from enum import Enum
 
+from .commands import is_registered_launcher
+
 
 class VariableKind(str, Enum):
     MALFORMED      = "MALFORMED"
@@ -149,8 +151,35 @@ FACT_REGISTRY: dict[str, str] = {
     "DS_NAME":         "DS_NAME",
     "PID":             "DS_ID",
     "DATAFLOW":        "DATAFLOW",
-    "IMAGE":           "IMAGE",
-    "IMAGE_NAME":      "IMAGE",
+    # -- artifact / launcher canonicals (G16; gate cmdline-nfr-vetting SME-4;
+    # ratification source = the digested v2 command-line/variables standard).
+    # A NAME here is a SUGGESTION only — _value_fact() decides by VALUE
+    # (aliases suggest, values decide). IMAGE -> ARTIFACT_URI is the v2
+    # decision-log clean break (the old IMAGE -> IMAGE mapping is removed).
+    "ETL_ARTIFACT_URI":     "ARTIFACT_URI",
+    "IMAGE":                "ARTIFACT_URI",
+    "IMAGE_NAME":           "ARTIFACT_URI",
+    "IMG_PATH":             "ARTIFACT_URI",
+    "CONTAINER_IMAGE":      "ARTIFACT_URI",
+    "JAR_PATH":             "ARTIFACT_URI",
+    "USER_JAR":             "ARTIFACT_URI",
+    "JAR_LOC":              "ARTIFACT_URI",
+    "JAR_NAME":             "ARTIFACT_URI",
+    "MULTI_FILE_JAR":       "ARTIFACT_URI",
+    "PYTHON_SCRIPT":        "ARTIFACT_URI",   # gap-analysis gotcha: often holds the launcher
+    "PY_PATH":              "ARTIFACT_URI",   # ditto — the value contract corrects it
+    "ETL_ARTIFACT_KIND":    "ARTIFACT_KIND",
+    "ETL_ARTIFACT_SHA":     "ARTIFACT_SHA",
+    "IMAGE_SHA":            "ARTIFACT_SHA",
+    "PRE_MR_IMAGE_SHA":     "ARTIFACT_SHA",
+    "ETL_PLATFORM":         "ETL_PLATFORM",
+    "ETL_PLATFORM_FLAGS":   "PLATFORM_FLAGS",
+    "LAUNCHER_SCRIPT_PATH": "LAUNCHER_SCRIPT_PATH",
+    "PY_LAUNCH":            "LAUNCHER_SCRIPT_PATH",
+    "PY_LAUNCHER":          "LAUNCHER_SCRIPT_PATH",
+    "SCRIPT_PATH":          "LAUNCHER_SCRIPT_PATH",
+    "ACCELERATOR_PATH":     "LAUNCHER_SCRIPT_PATH",
+    "MULTI_SCRIPT_PATH":    "LAUNCHER_SCRIPT_PATH",
     "TGT_TABLE":       "TGT_TABLE",
     "TGT_TABLE_PQU":   "TGT_TABLE",
     "TGT_DB_NM":       "TGT_DB",
@@ -161,6 +190,41 @@ FACT_REGISTRY: dict[str, str] = {
     "EMAIL_GRP":       "NOTIFICATION",
     "EMAIL_LIST":      "NOTIFICATION",
 }
+
+# --- G16: value contracts (aliases suggest, VALUES decide) ---------------------
+
+# a bare hex digest (sha1 40 / sha256 64) is a content hash, never a URI —
+# without this, IMAGE_SHA-style values pollute ARTIFACT_URI (gap analysis)
+_SHA_DIGEST_RE = re.compile(r"^([0-9a-f]{40}|[0-9a-f]{64})$", re.IGNORECASE)
+
+#: fact_type -> the canonical (WARN-free) variable name; any other name that
+#: rolls up here is an ALIAS — still materialized (non-destructive on legacy),
+#: but flagged for rename via ClassifiedVariable.fact_alias_of
+CANONICAL_FACT_NAMES: dict[str, str] = {
+    "ARTIFACT_URI":         "ETL_ARTIFACT_URI",
+    "ARTIFACT_KIND":        "ETL_ARTIFACT_KIND",
+    "ARTIFACT_SHA":         "ETL_ARTIFACT_SHA",
+    "ETL_PLATFORM":         "ETL_PLATFORM",
+    "PLATFORM_FLAGS":       "ETL_PLATFORM_FLAGS",
+    "LAUNCHER_SCRIPT_PATH": "LAUNCHER_SCRIPT_PATH",
+}
+
+
+def _value_fact(text: str) -> str | None:
+    """Classify a plain literal VALUE into the artifact/launcher family.
+
+    The load-bearing G16 rule: a value that IS a registered named launcher is
+    LAUNCHER_SCRIPT_PATH regardless of the variable's name (the JAR_PATH ->
+    dt-launcher.sh gotcha); a bare SHA digest is ARTIFACT_SHA, never a URI.
+    Returns None when the value carries no contract evidence."""
+    stripped = text.strip()
+    if not stripped or any(ch.isspace() for ch in stripped):
+        return None  # multi-token values are commands, not single artifacts
+    if _SHA_DIGEST_RE.match(stripped):
+        return "ARTIFACT_SHA"
+    if is_registered_launcher(stripped):
+        return "LAUNCHER_SCRIPT_PATH"
+    return None
 
 
 @dataclass(frozen=True)
@@ -185,6 +249,10 @@ class ClassifiedVariable:
     global_refs: tuple[str, ...] = ()          # %%\VAR single-segment global refs
     has_adjacent_refs: bool = False            # dynamic-name composition hazard
     value_is_delimiter: bool = False           # value is pure punctuation (dot-smuggling)
+    fact_name_mismatch: bool = False           # G16 WARN: name suggested one fact family,
+                                               # the VALUE decided another (values win)
+    fact_alias_of: str | None = None           # G16 WARN: canonical name to rename to;
+                                               # None == canonical spelling (WARN-free)
 
     @property
     def all_var_refs(self) -> tuple[str, ...]:
@@ -254,6 +322,29 @@ def classify_variable(name: str, value: str | None) -> ClassifiedVariable:
 
     any_user_refs = bool(plain_refs or dollar_refs)
     any_system_tokens = bool(system_funcs or system_vars)
+
+    # G16 value contract: on a plain literal value, the VALUE decides the
+    # artifact/launcher fact family — the name is only a suggestion. Applies
+    # to any valid name, registered or not (a launcher-valued %%FOO is still
+    # a launcher reference). A correction over an existing name-suggested
+    # family is the name-value-mismatch WARN.
+    fact_name_mismatch = False
+    if (
+        is_valid_name and text
+        and not any_user_refs and not any_system_tokens
+        and not flow_refs and not global_refs and not has_adjacent
+    ):
+        value_fact = _value_fact(text)
+        if value_fact is not None and value_fact != fact_type:
+            fact_name_mismatch = fact_type is not None
+            fact_type = value_fact
+    # alias-rename WARN: the name rolls up to a G16 canonical but is not the
+    # canonical spelling itself (legacy stays materialized — non-destructive)
+    canonical = CANONICAL_FACT_NAMES.get(fact_type or "")
+    fact_alias_of = (
+        canonical if canonical and bare != canonical and fact_base != canonical
+        else None
+    )
     # Dot-smuggling detector (metadata-plan Phase 2): a value that is wholly
     # punctuation — '.', '_', '-', '/' — is a literal delimiter parked in a
     # variable so it survives concatenation-delimiter stripping (e.g.
@@ -276,6 +367,8 @@ def classify_variable(name: str, value: str | None) -> ClassifiedVariable:
         global_refs=global_refs,
         has_adjacent_refs=has_adjacent,
         value_is_delimiter=value_is_delimiter,
+        fact_name_mismatch=fact_name_mismatch,
+        fact_alias_of=fact_alias_of,
     )
 
     # precedence chain — see module docstring for the rationale
