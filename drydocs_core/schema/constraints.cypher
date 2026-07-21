@@ -50,10 +50,17 @@ CREATE CONSTRAINT employee_id         IF NOT EXISTS FOR (e:Employee)            
 CREATE CONSTRAINT sn_group_id         IF NOT EXISTS FOR (g:ServiceNowGroup)     REQUIRE g.group_id IS UNIQUE;
 CREATE CONSTRAINT jira_board_id       IF NOT EXISTS FOR (b:JiraBoard)           REQUIRE b.board_id IS UNIQUE;
 
-// Reified Membership pattern (W3C ORG)
+// Reified Membership pattern (W3C ORG) — deprecated by K4; kept for old graphs
 CREATE CONSTRAINT role_name           IF NOT EXISTS FOR (r:Role)                REQUIRE r.name IS UNIQUE;
 CREATE CONSTRAINT role_id             IF NOT EXISTS FOR (r:Role)                REQUIRE r.role_id IS UNIQUE;
 CREATE CONSTRAINT membership_id       IF NOT EXISTS FOR (m:Membership)          REQUIRE m.membership_id IS UNIQUE;
+
+// K4 (gate 2026-07-10 §B/§C): qualified-attribution replaces Membership/Role in
+// the SEAL loaders. These MERGE keys MUST be indexed — without them every
+// MERGE (:Attribution {attribution_id}) / (:TOMRole {id}) is a full label scan,
+// O(n²) over the growing set (company live-DB: 826s → 29s on seal_applications).
+CREATE CONSTRAINT attribution_id      IF NOT EXISTS FOR (m:Attribution)         REQUIRE m.attribution_id IS UNIQUE;
+CREATE CONSTRAINT tomrole_id          IF NOT EXISTS FOR (t:TOMRole)             REQUIRE t.id IS UNIQUE;
 
 // --- Schedulers --------------------------------------------------------------
 CREATE CONSTRAINT scheduler_kind      IF NOT EXISTS FOR (k:SchedulerKind)       REQUIRE k.name IS UNIQUE;

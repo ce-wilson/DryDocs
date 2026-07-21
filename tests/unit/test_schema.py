@@ -28,7 +28,7 @@ VOCAB_FILE       = ONTOLOGY_DIR / "relationship_vocabulary.yaml"
 # NODE KEYs (DesignDoc/DocSection/Requirement/Component/TestCase/FeedbackNote,
 # gate doc-traceability-feedback 2026-07-20 — source-namespaced keys, gate A2).
 # Bump this when you intentionally add/remove a CREATE CONSTRAINT.
-EXPECTED_CONSTRAINTS = 46
+EXPECTED_CONSTRAINTS = 48
 
 EXPECTED_ONTOLOGY_LABELS = [
     "DprodClass",
