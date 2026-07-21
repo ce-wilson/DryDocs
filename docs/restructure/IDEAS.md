@@ -26,6 +26,20 @@ Tags help grooming: `idea` · `bug` · `doc` · `source` (new data source) · `q
 
 <!-- add new ideas at the top -->
 
+- 2026-07-21 — [source] **DPL ingestion leg + AWS zone model traced** (company ingestion
+  template; mechanism-only — values stay company-side). Upstream of the launcher spine:
+  FM drop of a `.dat` + `.tok` landing pair → Control-M file-watcher condition grammar
+  (`TOK-IN-COND…` / `FW_DAT#DAT-IN-COND…`, FW-OK-on-FAIL) → a **separate
+  `ingestion-launcher` jar** publishes to S3 RAW via HTTP-PUT publish API (dataset
+  identity = GUID + version, zone-scoped publish role) → **each zone hop
+  RAW→TRUSTED→REFINED is its own DPL pipeline** (own `--pipeline-id`) → PROVISIONING
+  DB-load lands the consumption target (Provisioned ≠ an S3 prefix). One bucket with
+  zone prefixes; per-zone Glue databases + tables (partition keys at onboarding,
+  `--odate` = partition value). Legacy `dataset_flow.json` FILE→CONFORMED ≈ the
+  RAW→TRUSTED hop. Groom candidates: `ingestion-launcher*.jar` classifier entry (G15
+  sibling — different jar, ingestion not transform), DataAsset zone/glue-table shapes
+  for the MAC enrichment feed (rides the sibling dataset-flow inbox entry below).
+
 - 2026-07-21 — [idea] **Back-flow the company's un-back-flowed advances (bd7952f follow-up 3).**
   The 2026-07-20 bundle port went bidirectional (+288 producer / +148 company) precisely
   because these never came back; reproduce mechanism-only via the screenshot/describe
