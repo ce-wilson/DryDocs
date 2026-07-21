@@ -26,6 +26,36 @@ Tags help grooming: `idea` · `bug` · `doc` · `source` (new data source) · `q
 
 <!-- add new ideas at the top -->
 
+- 2026-07-21 — [idea] **Back-flow the company's un-back-flowed advances (bd7952f follow-up 3).**
+  The 2026-07-20 bundle port went bidirectional (+288 producer / +148 company) precisely
+  because these never came back; reproduce mechanism-only via the screenshot/describe
+  channel: snow-support schema supplements (`hpsm_queue_key`/`sn_group_name` constraint
+  pair + a `snow-snowflake-itsm` source stub), the `drydocs_remediation` DPL-watch-drift
+  rule + tests (pairs with the DPL runtime-trace inbox entry below), the `graph_verify`
+  Assertion refactor, the docgen deviations vs the finalized company TDD, the
+  `CONFLUENCE_BASE_URL` config seam (mechanism: base-URL as config; the value stays
+  company-side), and the `controlm_folders.sql` `J` table alias. Ties into the
+  drydocs-review back-flow epic. Until these land, every future port repeats the
+  squash-reconcile instead of a clean linear apply.
+
+- 2026-07-21 — [chore] **Company-side heads-ups from the port-report gap review** (their
+  tracker — recorded here so they aren't lost; relay next company session): (a) the
+  `test_schema_graph.py` drift-guard sequencing conflict — see the new reconcile-port
+  skill ledger note (re-add only after their doc-vocab gate); (b) confirm
+  `docs/restructure/internal-backlog.yaml` was deleted after the DD-series merge
+  (bd7952f follow-up 2 — 388a30d shows the merge happened, not the deletion); (c) the
+  company is ~11 producer commits behind (`7e8df54..1eef6f4`: L7 gate sign-off +
+  live loader, G14 lineage file-ops pass, and the hermetic oracle-kerberos test fix
+  that retires the standing known-failure note in every port report's acceptance).
+
+- 2026-07-21 — [idea] **AIS taxonomy back-flow input for the platforms gate** (flagged
+  in the 66acea8 port report, 2026-07-10, still unactioned): the company's
+  `platforms.yaml` is AHEAD with a *confirmed* AisCapability/AiTool taxonomy while the
+  producer still holds the deprecated `:SchedulerKind` placeholder at the C6/platforms
+  HITL gate. Bring the company's confirmed shape across (mechanism/screenshot channel)
+  as the seed answer to the open questions in `config/taxonomy/platforms.yaml`, so the
+  gate session decides from the evolved model instead of re-deriving it.
+
 - 2026-07-21 — [source] **DPL runtime traced end-to-end** (company-side agent doc, lives in
   their `internal/controlm-config/reference/`; mechanism only here): the launcher's
   `--pipeline-id` GUID — already our ETLProcess identity — keys the pipeline's entire

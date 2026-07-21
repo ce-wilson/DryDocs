@@ -220,7 +220,7 @@ rows:
     note: "keep consumer-only rows (e.g. ControlMQuantitativeRow), add producer rows (path moved in Phase B)"
   - path: "tests/unit/test_schema.py"
     disposition: evaluate
-    note: "consumer EXPECTED_CONSTRAINTS is ahead (44 vs 35) — keep consumer count, take producer drift-guard logic"
+    note: "consumer EXPECTED_CONSTRAINTS is ahead (superset: base + snow-support supplements; 45 ⊇ 40 at the 2026-07-20 bundle port) — counts drift every port, trust the live test files over this note (66acea8 lesson); keep consumer count, take producer drift-guard logic"
   - path: "tests/unit/test_controlm_cypher.py"
     disposition: evaluate
     note: "consumer scope_key condition-key variant wins"

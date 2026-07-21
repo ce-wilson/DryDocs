@@ -58,10 +58,24 @@ stay skipped — confirm with the operator if a new one appears.
 ## Divergence ledger (company is ahead — keep company)
 
 - Verify command: company `m6-verify` vs producer `m3-verify`.
-- `EXPECTED_CONSTRAINTS = 44` vs producer 35 (local consolidation).
+- `EXPECTED_CONSTRAINTS`: company is ahead as a **superset** (base + snow-support
+  supplements; 45 ⊇ 40 at the 2026-07-20 bundle port). Counts drift every port —
+  trust the live `test_schema.py` / `constraints.cypher` on each side, not any
+  recorded number (66acea8 lesson: "trust the file, not the ledger").
 - Condition key: `scope_key` vs producer `folder_id`.
 - Suite size: company suite is much larger (scrapers/Confluence). **Do not chase
   the producer's `186 passed` full-suite number** — only zero *new* failures matters.
+- **Permanently-diverged tests (bd7952f bundle port, 2026-07-20) — removed
+  company-side; do NOT re-add them as clean-adds and do NOT count them in
+  acceptance:** `tests/unit/test_publishing.py` (producer publishing template;
+  company ships the real Confluence connector), `tests/unit/test_sql_run_log.py`
+  (producer adapter-level `run_log`; company uses cli-level `_load_run_log`), and
+  `tests/unit/test_schema_graph.py` (expects the producer `docs_*` vocab /
+  regenerated schema_graph — company defers that ontology). **Sequencing trap:**
+  the 388a30d follow-up "commit the drift guard" conflicts with the bundle-port
+  removal — re-add `test_schema_graph.py` ONLY after the company's own
+  doc-traceability-feedback gate activates the doc vocab; until then it fails by
+  design.
 - `drydocs_core/adapters/oracle_adapter.py`: company version is **Kerberos-aware**
   (thick via `_init_thick_client` / `externalauth` when `ORACLE_KERBEROS=True`);
   the producer version is thin-only. **Keep company's** — it carries the JPMC
