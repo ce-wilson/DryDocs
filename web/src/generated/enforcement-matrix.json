@@ -279,6 +279,7 @@
         "config/gate-prompts/seal-tom-attribution-reshape.yaml",
         "config/gate-prompts/software-usage-patterns.yaml",
         "config/gate-prompts/sosa-jobrun-observation.yaml",
+        "config/gate-prompts/ui-write-surface.yaml",
         "config/gate-log.md"
       ],
       "content": null,

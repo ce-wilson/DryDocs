@@ -3444,8 +3444,20 @@ items:
     agent: main
     model: fable
     priority: p3
-    status: todo
+    status: todo          # PREPPED 2026-07-21: gate prompt authored + page rendered — awaiting the SME session (see progress)
     depends_on: [O13, O19]
+    progress: >
+      2026-07-21 (Epic-O finish session) — GATE-PREPPED, awaiting the SME:
+      config/gate-prompts/ui-write-surface.yaml authored (doctrine
+      reaffirmation + four candidate affordances C1 gate-sign-off-drafting /
+      C2 SME notes / C3 steward PR-creation / C4 admin edits, each against
+      the mechanism tiers M1 artifact-only / M2 non-graph drafts / M3 direct
+      write-NEVER; conservative recommendations recorded as recommendations,
+      every ruling open). Page rendered to var/gate-ui-write-surface.html
+      (10 confirmations). gates.json regenerated — the new gate correctly
+      appears as `open` on /gates (the O19 auto-pickup proving itself).
+      Declining every extension is a valid sign-off; the item completes when
+      the session runs and transcribes to config/gate-log.md.
     inputs: [docs/restructure/03-hitl-sme-flow.md, config/gate-log.md, UI-WIP/site-plan.md, docs/restructure/backlog.yaml]
     acceptance: >
       A HITL gate session (docs/restructure/03-hitl-sme-flow.md) decides the UI

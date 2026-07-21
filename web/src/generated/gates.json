@@ -292,6 +292,17 @@
       ],
       "log_ref": null,
       "unblocks": []
+    },
+    {
+      "kind": "prompt-only",
+      "date": null,
+      "title": "ui-write-surface (gate page rendered — session not yet run)",
+      "status": "open",
+      "prompt_files": [
+        "config/gate-prompts/ui-write-surface.yaml"
+      ],
+      "log_ref": null,
+      "unblocks": []
     }
   ]
 }

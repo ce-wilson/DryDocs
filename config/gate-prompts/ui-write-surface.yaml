@@ -1,0 +1,94 @@
+# SME gate-prompt spec — the UI write-surface boundary (backlog O20, the Epic O
+# phase-12 chain terminus). GATE-BOUND: this page PROPOSES a boundary; nothing is
+# built or changed by rendering it. Until this gate signs off, every console
+# surface remains read-only / artifact-only (the O13 doctrine) — that standing
+# state is itself confirmation A below, so declining every extension is a valid
+# sign-off. Drafted 2026-07-21 by the Epic-O finish session (O10/O12/O13/O15-O19
+# shipped same day; O20 became next_ready at their close). Mechanism-only: no
+# real ids or company values anywhere on this page.
+classification: Internal-Public
+schema: drydocs.gate-prompt.v1
+id: ui-write-surface
+title: "SME Gate — the UI write-surface boundary: which console actions may ever write, and through what mechanism"
+step: "Pre-decision gate for backlog O20 — the terminus of the Epic O read-only chain (O13 mappings artifact flow + O19 read-only gates page are its dependencies, both done 2026-07-21)"
+summary: >
+  Every console surface shipped through Epic O is read-only or artifact-only by
+  construction: QuerySpec frames render registry results; the O13 /mappings screen
+  drafts a config/manual-loads/ change ARTIFACT (git -> K2 gate -> loader applies);
+  /admin/config has zero edit controls (config-as-code stays behind the gates);
+  /gates renders the gate record with zero action controls. This page asks the SME
+  to RULE on the boundary: (a) reaffirm the standing doctrine — the loader remains
+  the ONLY graph writer and the UI NEVER writes the graph directly; (b) decide,
+  per candidate action, whether any write-shaped console affordance is ever
+  permitted and through which mechanism tier: M1 artifact-only (status quo — the
+  UI produces a reviewable artifact that travels git + gate + loader), M2
+  server-persisted DRAFTS in a non-graph store (the mapping.db/derived-file
+  pattern — server keeps working state, still zero graph writes, artifact remains
+  the promotion path), M3 direct graph write from a console action (RECOMMENDED:
+  never — listed only so the refusal is a recorded decision, not an assumption).
+  Candidates: C1 gate sign-off from /gates; C2 SME annotations/notes on console
+  pages; C3 steward drafting beyond the O13 artifact download (e.g. server-side
+  branch/PR creation); C4 admin config edits (recommended: never — reaffirm the
+  wf-admin-config-01 doctrine). Nothing below is applied until ticked and
+  transcribed to config/gate-log.md.
+meta:
+  Module: "drydocs-web + drydocs-api (the console surfaces and their thin API)"
+  Source: "UI-WIP/site-plan.md §5 (P3 chain, O20 terminus) + UI-WIP/wf-mapping-01.md (the one rule: loader stays the only graph writer) + UI-WIP/wf-admin-config-01.md (no edit controls by design)"
+  Registry ref: "no source-registry change — this gate rules on console affordances, not data sources"
+  Classification: "Internal-Public (this page, mechanism only)"
+  Taxonomy: "n/a — no taxonomy capture is touched by this gate"
+  Ontology map: "n/a — no vocabulary entries are proposed; if a permitted action later needs a graph shape (e.g. persisted SME notes as nodes), THAT shape gets its own gate"
+  Source of record: "docs/restructure/backlog.yaml O20 · config/gate-log.md (transcription target) · docs/restructure/03-hitl-sme-flow.md (the flow this gate follows)"
+
+mapping:
+  - n: 1
+    element: "The standing doctrine — reaffirmation, not a change"
+    target: "The loader is the ONLY graph writer; console surfaces are read-only or artifact-only; drydocs-api serves reads (QuerySpec registry) and returns artifacts, writing nothing"
+    edge: "doctrine reaffirmation  [PROPOSED — the default that survives if every extension below is declined]"
+  - n: 2
+    element: "C1 — gate sign-off from /gates"
+    target: "RECOMMENDED: M1 at most — a /gates action could DRAFT a gate-log entry artifact (markdown snippet the SME commits), never flip vocabulary statuses or write the log server-side; the HITL flow (render page -> SME session -> transcribe) stays the authority"
+    edge: "candidate affordance  [OPEN — SME rules M1 / never]"
+  - n: 3
+    element: "C2 — SME annotations/notes on console pages"
+    target: "RECOMMENDED: M1/M2 — the L5 design-doc feedback precedent (save-button export producing feedback YAML) generalizes: notes accumulate client-side or in a server-side non-graph store and EXPORT as an artifact; if notes should ever become graph nodes, that shape routes through its own ontology gate first"
+    edge: "candidate affordance  [OPEN — SME rules M1 / M2 / never]"
+  - n: 4
+    element: "C3 — steward drafting beyond the O13 artifact download"
+    target: "RECOMMENDED: defer — server-side branch/PR creation needs git credentials server-side (the wf-mapping-01 open item resolved conservatively at build); revisit only against the company GHE posture; the artifact-download path is complete and gate-clean today"
+    edge: "candidate affordance  [OPEN — SME rules M2-with-git / defer]"
+  - n: 5
+    element: "C4 — admin config edits from /admin/config"
+    target: "RECOMMENDED: NEVER — config-as-code stays behind the gates; the page is a traceability lens by design (wf-admin-config-01); recording the refusal makes it a decision, not an omission"
+    edge: "candidate affordance  [PROPOSED NEVER]"
+
+provenance:
+  - label: "The read-only/artifact-only doctrine (mapping row 1)"
+    source_object: "UI-WIP/wf-mapping-01.md (the one rule) + UI-WIP/wf-admin-config-01.md (no edit controls) + UI-WIP/site-plan.md §5 (O20 terminus)"
+    key: "doctrine — not a data object; provenance here tracks WHERE each claim on this page comes from"
+    loader: "~ (no loader — this gate rules on console affordances, not data)"
+    properties:
+      - {name: loader_is_only_writer, origin: source, from: "UI-WIP/wf-mapping-01.md — 'the loader stays the ONLY graph writer'", note: "verbatim standing rule; reaffirmed as confirmation A"}
+      - {name: no_edit_controls, origin: source, from: "UI-WIP/wf-admin-config-01.md — 'the page therefore has no edit controls'", note: "the admin-page doctrine C4 reaffirms as NEVER"}
+      - {name: mechanism_tiers, origin: derived, from: "this page's framing (M1 artifact-only / M2 non-graph drafts / M3 direct write)", note: "drafted by the Epic-O finish session as the decision vocabulary — the SME may reshape the tiers themselves"}
+      - {name: candidate_recommendations, origin: derived, from: "the O13 artifact-download build + the L5 feedback-export precedent + the wf-mapping-01 GHE-posture open item", note: "C1 M1-at-most, C2 M1/M2, C3 defer, C4 never — recommendations only, every one an open SME ruling"}
+
+sections:
+  - title: "A. Doctrine reaffirmation — the read-only/artifact-only default"
+    confirmations:
+      - "The loader remains the ONLY graph writer. No console action, on any page, ever writes the Neo4j graph directly (mechanism tier M3 is REFUSED as a standing rule; any future exception would be its own gate)."
+      - "drydocs-api remains read + artifact only: QuerySpec runs, exports with provenance manifests, and returned change artifacts. Its only persisted state is derived, non-graph, rebuildable (the mapping.db pattern)."
+      - "Declining every candidate below is a valid sign-off — the console is complete and useful as shipped; extensions are opt-in, never assumed."
+  - title: "B. Candidate write-shaped affordances — rule each"
+    confirmations:
+      - "C1 gate sign-off from /gates: choose M1 (artifact-drafting affordance — the page can assemble a gate-log entry snippet for the SME to review and commit) or NEVER (the /gates page stays a pure record; sessions happen entirely in the HITL flow). Either way the page gains no status-flipping control."
+      - "C2 SME annotations/notes: choose M1 (client-side notes + artifact export, the L5 save-button precedent), M2 (server-persisted drafts in a non-graph store, exported as artifacts), or NEVER. If notes should ever land as graph content, that node/edge shape routes through its own ontology gate before any build."
+      - "C3 steward drafting beyond artifact download: choose DEFER (recommended — revisit against the company GHE posture; artifact download stands) or M2-with-git (server-side branch/PR creation, which imports a credential surface and needs its own security review)."
+      - "C4 admin config edits: confirm NEVER (the wf-admin-config-01 doctrine — edits travel repo + gate flow; the page links, it never edits)."
+  - title: "C. Consequences recorded at sign-off"
+    confirmations:
+      - "Permitted affordances (if any) become backlog items with their own acceptance tests; nothing is built from this page directly."
+      - "The decision is transcribed to config/gate-log.md; gates.json regenerates (the O19 drift guard enforces the new row); O20 flips done."
+  - title: "D. Sign-off"
+    confirmations:
+      - "SME sign-off recorded here and transcribed to config/gate-log.md with the date and the per-candidate rulings."
