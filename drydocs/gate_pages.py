@@ -164,8 +164,14 @@ def _checkbox(cid: str, text: str) -> str:
     return f'    <label><input type="checkbox" id="{cid}"> {html.escape(text)}</label>'
 
 
-def render_gate_page(spec: GateSpec) -> str:
-    """Render a self-contained interactive gate page. Pure — no graph access."""
+def render_gate_page(spec: GateSpec, page_path: str | None = None) -> str:
+    """Render a self-contained interactive gate page. Pure — no graph access.
+
+    ``page_path`` (optional): where THIS rendered file lives — shown in a
+    footer with a copy button (SME request 2026-07-21: gate pages carry their
+    own path/name like the design-doc renders do), beside the durable spec
+    path in config/gate-prompts/.
+    """
     parts: list[str] = []
 
     if spec.meta:
@@ -252,5 +258,29 @@ document.addEventListener('DOMContentLoaded', () => {{
         "<div class='progress'><div id='bar'></div></div>\n"
         + (f"<p>{html.escape(spec.summary)}</p>\n" if spec.summary else "")
         + "\n".join(parts)
+        + _page_footer(spec, page_path)
         + f"\n<script>\n{js}\n</script>\n</body></html>\n"
+    )
+
+
+def _page_footer(spec: GateSpec, page_path: str | None) -> str:
+    """File-identity footer: rendered-page path (with a copy button) + the
+    durable spec path. The rendered file is ephemeral working state; the spec
+    + gate-log stay the system of record — the footer says where both live."""
+    spec_path = f"config/gate-prompts/{spec.id}.yaml"
+    rendered = (
+        f"<code id='pagepath'>{html.escape(page_path)}</code>\n"
+        "<button type='button' style='margin-left:.5em;font:inherit;font-size:.85em;cursor:pointer' "
+        "onclick=\"navigator.clipboard.writeText(document.getElementById('pagepath').textContent)"
+        ".then(()=>{this.textContent='copied ✓'})\">Copy path</button><br>\n"
+        if page_path
+        else ""
+    )
+    return (
+        "\n<hr style='margin-top:2em;border:none;border-top:1px solid #ccc'>\n"
+        "<footer style='font-size:.85em;opacity:.8'>\n"
+        f"{rendered}"
+        f"spec (system of record): <code>{html.escape(spec_path)}</code> &middot; "
+        "sign-off transcribes to <code>config/gate-log.md</code>\n"
+        "</footer>"
     )

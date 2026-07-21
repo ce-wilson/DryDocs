@@ -9,9 +9,15 @@
 classification: Internal-Public
 schema: drydocs.gate-prompt.v1
 id: ui-write-surface
-title: "SME Gate — the UI write-surface boundary: which console actions may ever write, and through what mechanism"
+title: "SME Gate — the write-surface boundary for the WHOLE web console (every drydocs-web page + drydocs-api): which console actions may ever write, and through what mechanism"
 step: "Pre-decision gate for backlog O20 — the terminus of the Epic O read-only chain (O13 mappings artifact flow + O19 read-only gates page are its dependencies, both done 2026-07-21)"
 summary: >
+  SCOPE (SME clarification 2026-07-21): this gate rules the ENTIRE web console —
+  all nine module pages plus /mappings and /admin/config, and the drydocs-api
+  behind them — NOT just the /gates page. The /gates page is merely candidate C1
+  below; C2 concerns notes on ANY page, C3 the /mappings steward flow, C4 the
+  /admin/config page. One boundary decision covers the whole UI-WEB surface.
+
   Every console surface shipped through Epic O is read-only or artifact-only by
   construction: QuerySpec frames render registry results; the O13 /mappings screen
   drafts a config/manual-loads/ change ARTIFACT (git -> K2 gate -> loader applies);

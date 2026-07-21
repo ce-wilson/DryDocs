@@ -121,3 +121,17 @@ def test_committed_q1q3_spec_loads_and_renders() -> None:
     assert out.count('type="checkbox"') == spec.total_confirmations
     assert "origin-derived" in out                    # provenance split rendered
     assert "CONTAINS_FOLDER" in out                   # proposed edge visible
+
+
+def test_render_page_footer_carries_paths() -> None:
+    """SME request 2026-07-21: gate pages show their own rendered-file path
+    (with a copy button) plus the durable spec path, like design-doc renders."""
+    spec = load_gate_spec(DEFAULT_GATE_PROMPTS_DIR / "ui-write-surface.yaml")
+    out = render_gate_page(spec, page_path="C:/coding/projects/DryDocs/var/gate-ui-write-surface.html")
+    assert "C:/coding/projects/DryDocs/var/gate-ui-write-surface.html" in out
+    assert "Copy path" in out
+    assert "config/gate-prompts/ui-write-surface.yaml" in out
+    # without a page_path the footer still names the spec (system of record)
+    bare = render_gate_page(spec)
+    assert "Copy path" not in bare
+    assert "config/gate-prompts/ui-write-surface.yaml" in bare
