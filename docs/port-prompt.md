@@ -6,7 +6,10 @@ steps 1–42 (everything through producer head `6fd3270`) are frozen in
 [`port-prompt-archive-steps-1-42.md`](port-prompt-archive-steps-1-42.md) — any external
 reference to "port-prompt step N" for N ≤ 42 resolves there; numbering continues here
 at 43. When a port completes company-side: update **Last completed port**, fold any new
-standing divergences into the ledger, prune the applied steps into the archive.
+standing divergences into the ledger, and collapse the applied steps into a one-line
+entry under **Last completed port** (pointer to the PORT-REPORT). The steps-1-42
+archive is FROZEN — applied steps ≥43 are summarized here, never appended there; their
+full text survives in git history and the company PORT-REPORT.
 
 Authorities are unchanged: [`PORT-MANIFEST.yaml`](../PORT-MANIFEST.yaml) is the WHAT
 (per-path disposition, first-matching-glob-row wins); [`git-readme.md`](../git-readme.md)
