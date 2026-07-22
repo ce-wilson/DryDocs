@@ -10,6 +10,15 @@ holds database credentials or picks a database; this component does.
   (`drydocs` vs `drydocs_all`) is a server-side row, never a client string.
 - **Named queries** (`queries.py`): overview-counts, folder-census,
   dependency-chain, c4-graph — params declared + validated, fail closed.
+- **QuerySpec registry** (O11, `query_specs.py`): versioned module specs behind
+  `GET /specs` + `POST /specs/{id}/run`, with two-path export
+  (`POST /specs/{id}/export` → artifact + `GET /exports/{id}/manifest`
+  provenance manifest).
+- **Mappings surface** (O13/O24, read + draft only, zero graph writes):
+  `/mappings/domains|grid/{domain}|options`, changeset drafting
+  (`POST /mappings/changeset`), and the override-list draft/report pair
+  (`POST /mappings/overrides/draft`, `GET /mappings/overrides/report`) over the
+  origin-flagged mapping store. `GET /demo` serves the O13 demo page.
 - **Auth stub** (`personas.py` + `sessions.py`): synthetic personas, opaque
   bearer tokens, role resolved server-side per request. Enterprise OIDC
   replaces the stub company-side (gitignored twin) per the ADR's Evidence.
@@ -20,7 +29,7 @@ holds database credentials or picks a database; this component does.
 
 ```powershell
 poetry install --with api          # fastapi + uvicorn (optional group)
-$env:NEO4J_URI = "bolt://localhost:7689"   # or .env — drydocs_core.config Neo4jSettings
+$env:NEO4J_URI = "bolt://localhost:7687"   # config/dev-environment.yaml is the authority
 $env:NEO4J_PASSWORD = "<server-side only>"
 poetry run uvicorn drydocs_api.app:create_app --factory --port 8001
 ```
