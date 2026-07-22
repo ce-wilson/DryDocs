@@ -1,0 +1,39 @@
+# =============================================================================
+# config/dev-environment.yaml — canonical local dev/test infrastructure names
+# =============================================================================
+# Single source of truth for the names and ports the local dev/test stack uses.
+# The .env.example templates (root, agents/, web/) and the run-drydocs skill all
+# defer to this file — when the container or ports change, change them HERE and
+# refresh the templates, not the other way around.
+#
+# Contains NO company data and NO secrets (names/ports only; passwords live in
+# gitignored .env files, never in a committed file).
+schema: drydocs.dev-environment.v1
+
+neo4j:
+  # Local Neo4j Enterprise container (EE required — ADR 0002 multi-DB + composite;
+  # Aura ruled out 2026-07-06). Provision the topology once after first start:
+  # drydocs_core/schema/provisioning/provision.ps1
+  container: neo4jtest
+  image: neo4j:5.26-enterprise-ubi10
+  volume: neo4j-testdata
+  ports:
+    http: 7474            # browser UI  -> http://localhost:7474
+    bolt: 7687            # drivers     -> bolt://localhost:7687
+  # Docker can remap host ports (an earlier container, neo4j-drydocs-ee, landed on
+  # 7476/7689 — retired). If a connection is refused, trust `docker port <container>`
+  # over any template value.
+  databases:              # ADR 0002 topology — provisioned, not implicit
+    ground_truth: drydocs      # main load + lineage writers; default load target
+    lineage: ddlineage         # cross-platform lineage (drydocs_lineage)
+    uncertain_context: ddcontext  # SYNTHESIZED/unverified only (drydocs_deepdoc)
+    composite: ddall           # read-only federation of all three
+  home_db_warning: >
+    The EE home database `neo4j` is NOT part of the topology — loading into it
+    puts data where no query surface looks. Set NEO4J_DATABASE to a topology
+    database (normally `drydocs`).
+
+services:
+  # Local dev servers the web UI expects (see web/.env.example).
+  adk_api: 8000           # agents ADK server (VITE_ADK_URL)
+  drydocs_api: 8001       # thin read API, ADR 0005 (VITE_API_URL)

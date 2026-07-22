@@ -159,6 +159,14 @@ SURFACES: list[dict] = [
         "gate_ref": "Q4 docmeta gate (ADR 0006)",
     },
     {
+        "id": "dev-environment",
+        "title": "Dev/test environment names",
+        "file": "config/dev-environment.yaml",
+        "consumers": [".env.example", "agents/.env.example", "web/.env.example"],
+        "guard_tests": ["test_dev_environment.py"],
+        "gate_ref": None,
+    },
+    {
         "id": "launcher-registry",
         "title": "Launcher registry",
         "file": "drydocs_core/controlm/commands.py",

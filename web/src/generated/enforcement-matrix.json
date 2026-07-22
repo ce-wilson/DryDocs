@@ -334,6 +334,29 @@
       "extra_contents": {}
     },
     {
+      "id": "dev-environment",
+      "title": "Dev/test environment names",
+      "file": "config/dev-environment.yaml",
+      "code_resident": false,
+      "consumers": [
+        ".env.example",
+        "agents/.env.example",
+        "web/.env.example"
+      ],
+      "guard_tests": [
+        "test_dev_environment.py"
+      ],
+      "gate_ref": null,
+      "status": "enforced",
+      "pending_entries": 0,
+      "env_refs": [],
+      "files": [
+        "config/dev-environment.yaml"
+      ],
+      "content": "# =============================================================================\n# config/dev-environment.yaml — canonical local dev/test infrastructure names\n# =============================================================================\n# Single source of truth for the names and ports the local dev/test stack uses.\n# The .env.example templates (root, agents/, web/) and the run-drydocs skill all\n# defer to this file — when the container or ports change, change them HERE and\n# refresh the templates, not the other way around.\n#\n# Contains NO company data and NO secrets (names/ports only; passwords live in\n# gitignored .env files, never in a committed file).\nschema: drydocs.dev-environment.v1\n\nneo4j:\n  # Local Neo4j Enterprise container (EE required — ADR 0002 multi-DB + composite;\n  # Aura ruled out 2026-07-06). Provision the topology once after first start:\n  # drydocs_core/schema/provisioning/provision.ps1\n  container: neo4jtest\n  image: neo4j:5.26-enterprise-ubi10\n  volume: neo4j-testdata\n  ports:\n    http: 7474            # browser UI  -> http://localhost:7474\n    bolt: 7687            # drivers     -> bolt://localhost:7687\n  # Docker can remap host ports (an earlier container, neo4j-drydocs-ee, landed on\n  # 7476/7689 — retired). If a connection is refused, trust `docker port <container>`\n  # over any template value.\n  databases:              # ADR 0002 topology — provisioned, not implicit\n    ground_truth: drydocs      # main load + lineage writers; default load target\n    lineage: ddlineage         # cross-platform lineage (drydocs_lineage)\n    uncertain_context: ddcontext  # SYNTHESIZED/unverified only (drydocs_deepdoc)\n    composite: ddall           # read-only federation of all three\n  home_db_warning: >\n    The EE home database `neo4j` is NOT part of the topology — loading into it\n    puts data where no query surface looks. Set NEO4J_DATABASE to a topology\n    database (normally `drydocs`).\n\nservices:\n  # Local dev servers the web UI expects (see web/.env.example).\n  adk_api: 8000           # agents ADK server (VITE_ADK_URL)\n  drydocs_api: 8001       # thin read API, ADR 0005 (VITE_API_URL)\n",
+      "extra_contents": {}
+    },
+    {
       "id": "launcher-registry",
       "title": "Launcher registry",
       "file": "drydocs_core/controlm/commands.py",

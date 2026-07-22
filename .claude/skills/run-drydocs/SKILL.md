@@ -49,14 +49,15 @@ CsvAdapter is a context manager — `with` is required; direct iteration is not 
 
 ## Full integration chain (requires Neo4j)
 
-The target is the **local Docker EE container** (`neo4j:5.26-enterprise`; Aura was ruled
-out 2026-07-06). Configure `.env` at repo root — note Docker may remap the host ports
+The target is the **local Docker EE container** — canonical container name, ports,
+and database names live in `config/dev-environment.yaml` (Aura was ruled out
+2026-07-06). Configure `.env` at repo root — note Docker may remap the host ports
 (see `internal/helpmeloginlocalneo4j.md`; check with `docker port <container>`):
 ```
-NEO4J_URI=bolt://localhost:7689     # host-mapped Bolt port — verify, defaults may be remapped
+NEO4J_URI=bolt://localhost:7687     # host-mapped Bolt port — verify, defaults may be remapped
 NEO4J_USER=neo4j
 NEO4J_PASSWORD=<password>           # local secret, never committed
-NEO4J_DATABASE=<database>
+NEO4J_DATABASE=drydocs              # topology db (ADR 0002), not the EE home db
 ```
 
 Then:
