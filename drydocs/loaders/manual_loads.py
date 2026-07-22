@@ -111,7 +111,7 @@ class ManualSealAttributionLoader(BaseLoader):
               WHERE r.last_run_id = $run_id AND r.match_method = 'manual'
             WITH run, count(r) AS edges_written
             OPTIONAL MATCH (n:BusinessApplication {manually_created: true})
-              WHERE n.created_at IS NOT NULL AND n.source = 'manual-csv'
+              WHERE n.first_seen_at IS NOT NULL AND n.source = 'manual-csv'
             WITH run, edges_written, count(n) AS manually_created_total
             SET run.edges_written          = edges_written,
                 run.dropped_in_graph       = $rows - edges_written,

@@ -33,7 +33,7 @@ FOREACH (_ IN CASE WHEN row.create_target_if_missing THEN [1] ELSE [] END |
     ON CREATE SET n.manually_created  = true,
                   n.manual_load_file  = row.manual_load_file,
                   n.authored_by       = row.authored_by,
-                  n.created_at        = datetime($loaded_at),
+                  n.first_seen_at        = datetime($loaded_at),
                   n.source            = 'manual-csv'
 )
 

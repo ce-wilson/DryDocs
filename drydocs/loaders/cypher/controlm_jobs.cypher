@@ -42,7 +42,7 @@ MERGE (j:ControlMJob:Activity {
     folder_id: row.folder_id,
     job_id: row.job_id
 })
-  ON CREATE SET j.created_at = datetime($loaded_at),
+  ON CREATE SET j.first_seen_at = datetime($loaded_at),
                 j.source     = 'psgmgr.CM_DEF_VJOB'
 SET j.version_serial     = row.version_serial,
     j.job_name           = row.job_name,

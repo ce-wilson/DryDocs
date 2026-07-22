@@ -6,7 +6,7 @@
 
 UNWIND $batch AS row
 MERGE (pl:ProductLine {product_line_id: row.product_line_id})
-  ON CREATE SET pl.created_at = datetime($loaded_at),
+  ON CREATE SET pl.first_seen_at = datetime($loaded_at),
                 pl.source     = 'catalog'
 SET pl.name         = row.name,
     pl.last_seen_at = datetime($loaded_at),

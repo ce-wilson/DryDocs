@@ -27,7 +27,7 @@ UNWIND $batch AS row
 MATCH (a:BusinessApplication {seal_id: row.app_id})
 
 MERGE (e:Employee {employee_id: row.employee_sid})
-  ON CREATE SET e.created_at = datetime($loaded_at),
+  ON CREATE SET e.first_seen_at = datetime($loaded_at),
                 e.source     = 'SEAL'
 SET e.full_name    = coalesce(row.employee_name, e.full_name),
     e.email        = coalesce(row.employee_email, e.email),
@@ -55,7 +55,7 @@ MERGE (m:Attribution {
   ON CREATE SET m.source     = 'SEAL',
                 m.valid_from = date(),
                 m.valid_to   = null,
-                m.created_at = datetime($loaded_at)
+                m.first_seen_at = datetime($loaded_at)
 SET m.last_seen_at     = datetime($loaded_at),
     m.last_run_id      = $run_id,
     m.role_source_name = row.role_name,

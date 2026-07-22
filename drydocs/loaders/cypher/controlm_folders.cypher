@@ -36,7 +36,7 @@ UNWIND $batch AS row
 
 // Control-M server upsert (one node per unique DATA_CENTER value).
 MERGE (srv:ControlMServer:Platform {name: row.data_center})
-  ON CREATE SET srv.created_at = datetime($loaded_at),
+  ON CREATE SET srv.first_seen_at = datetime($loaded_at),
                 srv.source     = 'psgmgr.CM_DEF_VTAB'
 SET srv.last_seen_at = datetime($loaded_at),
     srv.last_run_id  = $run_id
@@ -47,19 +47,17 @@ SET srv.last_seen_at = datetime($loaded_at),
 // drydocs.controlm.folder_name.parse_folder_name before sending the
 // batch — those parsed properties arrive as row fields.
 MERGE (f:ControlMFolder:Collection {folder_id: row.folder_id})
-  ON CREATE SET f.created_at = datetime($loaded_at),
+  ON CREATE SET f.first_seen_at = datetime($loaded_at),
                 f.source     = 'psgmgr.CM_DEF_VTAB'
 SET f.sched_table       = row.sched_table,
     f.user_daily        = row.user_daily,
     f.table_status      = row.table_status,
     f.table_type        = row.table_type,
     f.instance_name     = row.instance_name,
-    f.last_updated      = CASE WHEN row.last_updated IS NULL OR row.last_updated = '' THEN null
-                               ELSE datetime(replace(row.last_updated, ' ', 'T')) END,
-    f.last_updated_user = row.last_updated_user,
     // source audit envelope (audit-fields.yaml): CM_DEF_VTAB has no creation
-    // columns — updated-side only. Kept alongside the raw-named props above;
-    // the raw pair retires in the doc-06 Phase 3 migration.
+    // columns — updated-side only. The raw-named props (last_updated /
+    // last_updated_user) RETIRED here at doc-06 Phase 3 (M2, 2026-07-21);
+    // the migration removes them from existing graphs.
     f.source_updated_by = row.last_updated_user,
     f.source_updated_at = CASE WHEN row.last_updated IS NULL OR row.last_updated = '' THEN null
                                ELSE datetime(replace(row.last_updated, ' ', 'T')) END,
@@ -110,7 +108,7 @@ SET f.row_checksum = row.row_checksum
 WITH f, row
 WHERE row.application IS NOT NULL AND row.application <> ''
 MERGE (app:ControlMApplication:Collection {name: row.application})
-  ON CREATE SET app.created_at = datetime($loaded_at),
+  ON CREATE SET app.first_seen_at = datetime($loaded_at),
                 app.source     = 'psgmgr.CM_DEF_VJOB (folder header row)'
 SET app.last_seen_at = datetime($loaded_at),
     app.last_run_id  = $run_id

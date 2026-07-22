@@ -2436,7 +2436,7 @@ items:
     agent: main
     model: sonnet
     priority: p3
-    status: todo
+    status: in_progress   # picked up 2026-07-21 pm (pull rule; destructive run holds for HITL confirm per acceptance)
     depends_on: [M1]
     inputs: [drydocs/migrations/, docs/restructure/06-provenance-source-audit-fields.md]
     acceptance: >
@@ -5120,8 +5120,8 @@ items:
       work); ontology epic keeps the gate lineage visible.
 
 summary:
-  todo: 20                                         # C13+C14 pulled and completed 2026-07-21 pm
-  in_progress: 1                                   # E1 (gate deferred both sides)
+  todo: 19                                         # -M2 (picked up 2026-07-21 pm)
+  in_progress: 2                                   # E1 (gate deferred both sides), M2 (WGB migration build)
   blocked: 0
   done: 124                                        # +C13 SchedulerKind retirement build, +C14 batch-port USES_SOFTWARE migration (2026-07-21 pm)
-  next_ready: [M2, M3, M4, P3, J10, Q6, O23, J13, G18, G19, O26, G26]
+  next_ready: [M3, M4, P3, J10, Q6, O23, J13, G18, G19, O26, G26]

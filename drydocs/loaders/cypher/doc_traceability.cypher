@@ -21,7 +21,7 @@
 UNWIND $batch AS row
 
 MERGE (req:Requirement:Entity {origin: row.origin, requirement_id: row.requirement_id})
-  ON CREATE SET req.created_at = datetime($loaded_at),
+  ON CREATE SET req.first_seen_at = datetime($loaded_at),
                 req.source     = $source_label
 SET req.kind          = row.kind,
     req.description   = row.description,
@@ -33,7 +33,7 @@ SET req.kind          = row.kind,
 // Components — MERGEd here (source of record), edge in the same FOREACH.
 FOREACH (ref IN row.components |
     MERGE (comp:Component:Entity {origin: row.origin, ref: ref})
-      ON CREATE SET comp.created_at = datetime($loaded_at),
+      ON CREATE SET comp.first_seen_at = datetime($loaded_at),
                     comp.source     = $source_label
     SET comp.last_seen_at = datetime($loaded_at),
         comp.last_run_id  = $run_id
@@ -48,7 +48,7 @@ FOREACH (ref IN row.components |
 // Test/verify citations — MERGEd here, kind is the OPEN enum (gate A7/D2).
 FOREACH (t IN row.tests |
     MERGE (tc:TestCase:Entity {origin: row.origin, ref: t.ref})
-      ON CREATE SET tc.created_at = datetime($loaded_at),
+      ON CREATE SET tc.first_seen_at = datetime($loaded_at),
                     tc.source     = $source_label
     SET tc.kind         = t.kind,
         tc.last_seen_at = datetime($loaded_at),

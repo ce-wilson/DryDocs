@@ -23,7 +23,7 @@
 UNWIND $batch AS row
 
 MERGE (l:CatalogLOB {lob_id: row.lob_id})
-  ON CREATE SET l.created_at = datetime($loaded_at),
+  ON CREATE SET l.first_seen_at = datetime($loaded_at),
                 l.source     = 'catalog'
 SET l.code         = row.code,
     l.name         = row.name,

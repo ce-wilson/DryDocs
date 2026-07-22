@@ -1063,6 +1063,50 @@ def m3_verify() -> None:
         # harmless. The orchestrator fact is verified via the software registry
         # (USES_SOFTWARE {source:'batch-port'} — loader migration C14).
 
+        # ---- doc-06 Phase 3 invariants (M2, 2026-07-21) ------------------
+        # Post-migration shape: no blanket provenance from pre-diet runs, the
+        # raw-named folder audit props retired, and node pull-provenance uses
+        # first_seen_at (created_at survives ONLY on the snapshot version
+        # labels — the snapshot writer's own vocabulary).
+        rows = cli.run("""
+            MATCH (run:JobRun {kind:'load', status:'OK'})
+            WHERE run.rows_changed IS NULL
+            OPTIONAL MATCH ()-[r:WAS_GENERATED_BY]->(run)
+            RETURN count(r) AS blanket
+        """)
+        if rows:
+            checks.append((
+                "no blanket WAS_GENERATED_BY from pre-diet runs",
+                rows[0]["blanket"] == 0,
+                f"blanket={rows[0]['blanket']} (run the 20260721 migration)",
+            ))
+
+        rows = cli.run("""
+            MATCH (f:ControlMFolder)
+            WHERE f.last_updated IS NOT NULL OR f.last_updated_user IS NOT NULL
+            RETURN count(f) AS raw_props
+        """)
+        if rows:
+            checks.append((
+                "raw-named folder audit props retired",
+                rows[0]["raw_props"] == 0,
+                f"raw_props={rows[0]['raw_props']} (envelope pair is the record)",
+            ))
+
+        rows = cli.run("""
+            MATCH (n)
+            WHERE n.created_at IS NOT NULL
+              AND NOT n:ApplicationSnapshot AND NOT n:ProductSnapshot
+              AND NOT n:CatalogLOBSnapshot
+            RETURN count(n) AS legacy_created_at
+        """)
+        if rows:
+            checks.append((
+                "loader nodes use first_seen_at (created_at renamed)",
+                rows[0]["legacy_created_at"] == 0,
+                f"legacy_created_at={rows[0]['legacy_created_at']}",
+            ))
+
         # Local-namespace anchor terms present (post supplement).
         # Parentheses around the OR group — without them, AND binds tighter
         # and the IRI-prefix filter only constrains the ControlMFolder branch.

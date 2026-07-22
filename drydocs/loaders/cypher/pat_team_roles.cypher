@@ -22,7 +22,7 @@ MATCH (r:Role      {role_id:   row.role_id})
 MATCH (e:Employee  {employee_id: row.employee_sid})
 
 MERGE (m:Membership {membership_id: row.team_id + '_' + row.employee_sid + '_' + row.role_id})
-  ON CREATE SET m.created_at = datetime($loaded_at),
+  ON CREATE SET m.first_seen_at = datetime($loaded_at),
                 m.source     = 'pat'
 SET m.valid_from   = row.valid_from,
     m.valid_to     = row.valid_to,

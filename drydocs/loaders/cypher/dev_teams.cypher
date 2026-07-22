@@ -11,7 +11,7 @@
 
 UNWIND $batch AS row
 MERGE (dt:DevTeam {team_id: row.team_id})
-  ON CREATE SET dt.created_at = datetime($loaded_at),
+  ON CREATE SET dt.first_seen_at = datetime($loaded_at),
                 dt.source     = 'catalog'
 SET dt.name         = row.name,
     dt.last_seen_at = datetime($loaded_at),
@@ -23,7 +23,7 @@ FOREACH (_ IN CASE
                 WHEN row.jira_board_id IS NOT NULL AND trim(row.jira_board_id) <> ''
                 THEN [1] ELSE [] END |
   MERGE (jb:JiraBoard {board_id: row.jira_board_id})
-    ON CREATE SET jb.created_at = datetime($loaded_at)
+    ON CREATE SET jb.first_seen_at = datetime($loaded_at)
   MERGE (dt)-[:HAS_JIRA_BOARD]->(jb)
 )
 

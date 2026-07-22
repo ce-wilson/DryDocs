@@ -14,7 +14,7 @@
 
 UNWIND $batch AS row
 MERGE (v:Vendor {vendor_id: row.vendor_id})
-  ON CREATE SET v.created_at = datetime($loaded_at),
+  ON CREATE SET v.first_seen_at = datetime($loaded_at),
                 v.source     = 'registry'
 SET v.name          = row.vendor_name,
     v.publisher_url = row.publisher_url,
@@ -22,7 +22,7 @@ SET v.name          = row.vendor_name,
     v.last_run_id   = $run_id
 
 MERGE (sp:SoftwareProduct {product_id: row.product_id})
-  ON CREATE SET sp.created_at = datetime($loaded_at),
+  ON CREATE SET sp.first_seen_at = datetime($loaded_at),
                 sp.source     = 'registry'
 SET sp.name         = row.name,
     sp.category     = row.category,
@@ -51,7 +51,7 @@ WITH row, sp
 WHERE row.used_by_app_id IS NOT NULL
 MERGE (a:BusinessApplication {seal_id: row.used_by_app_id})
   ON CREATE SET a.name       = 'DryDocs',
-                a.created_at = datetime($loaded_at),
+                a.first_seen_at = datetime($loaded_at),
                 a.source     = 'registry'
 MERGE (a)-[u:USES_SOFTWARE {source: 'registry'}]->(sp)
   ON CREATE SET u.first_seen_at = datetime($loaded_at),

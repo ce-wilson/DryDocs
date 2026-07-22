@@ -35,7 +35,7 @@ UNWIND $batch AS row
 
 // Document upsert — idempotent per row (every row of the doc agrees on these).
 MERGE (doc:Document:Entity {doc_id: row.doc_id})
-  ON CREATE SET doc.created_at = datetime($loaded_at),
+  ON CREATE SET doc.first_seen_at = datetime($loaded_at),
                 doc.source     = 'pdf'
 SET doc.title          = row.title,
     doc.authors        = row.authors,
@@ -50,7 +50,7 @@ SET doc.title          = row.title,
 
 // Chunk upsert.
 MERGE (c:Chunk:Entity {chunk_id: row.chunk_id})
-  ON CREATE SET c.created_at = datetime($loaded_at),
+  ON CREATE SET c.first_seen_at = datetime($loaded_at),
                 c.source     = 'pdf'
 SET c.seq          = row.seq,
     c.heading      = row.heading,

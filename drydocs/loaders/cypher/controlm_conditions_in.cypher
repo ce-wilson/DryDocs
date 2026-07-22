@@ -29,7 +29,7 @@ MERGE (c:Condition:Entity {
     folder_id: row.folder_id,
     name: row.condition_name
 })
-  ON CREATE SET c.created_at = datetime($loaded_at),
+  ON CREATE SET c.first_seen_at = datetime($loaded_at),
                 c.source     = 'psgmgr.CM_DEF_LNKI_P_VW'
 SET c.version_serial    = row.version_serial,
     c.last_seen_at      = datetime($loaded_at),

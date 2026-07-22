@@ -52,7 +52,7 @@ WITH row, dt,
      [id IN split(coalesce(row.seal_ids, ''), ',') WHERE trim(id) <> ''] AS app_ids
 FOREACH (raw_app_id IN app_ids |
   MERGE (a:BusinessApplication {seal_id: trim(raw_app_id)})
-    ON CREATE SET a.created_at = datetime($loaded_at),
+    ON CREATE SET a.first_seen_at = datetime($loaded_at),
                   a.source     = 'pat'
   MERGE (a)-[r:WAS_ATTRIBUTED_TO {role: 'developed_by'}]->(dt)
     ON CREATE SET r.first_seen_at = datetime($loaded_at),

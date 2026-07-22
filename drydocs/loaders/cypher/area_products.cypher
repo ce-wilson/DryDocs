@@ -12,7 +12,7 @@
 
 UNWIND $batch AS row
 MERGE (ap:AreaProduct {area_product_id: row.area_product_id})
-  ON CREATE SET ap.created_at = datetime($loaded_at),
+  ON CREATE SET ap.first_seen_at = datetime($loaded_at),
                 ap.source     = 'catalog'
 SET ap.name         = row.name,
     ap.last_seen_at = datetime($loaded_at),

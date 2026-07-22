@@ -24,7 +24,7 @@ UNWIND $batch AS row
 
 MERGE (fn:FeedbackNote:Entity {origin: row.origin, doc_id: row.doc_id,
                                doc_rev: row.doc_rev, anchor: row.anchor})
-  ON CREATE SET fn.created_at = datetime($loaded_at),
+  ON CREATE SET fn.first_seen_at = datetime($loaded_at),
                 fn.source     = $source_label
 SET fn.note         = row.note,
     fn.status       = row.status,

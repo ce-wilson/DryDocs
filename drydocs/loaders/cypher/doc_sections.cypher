@@ -22,7 +22,7 @@
 UNWIND $batch AS row
 
 MERGE (doc:DesignDoc:Entity {origin: row.origin, doc_id: row.doc_id})
-  ON CREATE SET doc.created_at = datetime($loaded_at),
+  ON CREATE SET doc.first_seen_at = datetime($loaded_at),
                 doc.source     = $source_label
 SET doc.title        = row.title,
     doc.doc_type     = row.doc_type,
@@ -34,7 +34,7 @@ SET doc.title        = row.title,
     doc.last_run_id  = $run_id
 
 MERGE (s:DocSection:Entity {origin: row.origin, doc_id: row.doc_id, anchor: row.anchor})
-  ON CREATE SET s.created_at = datetime($loaded_at),
+  ON CREATE SET s.first_seen_at = datetime($loaded_at),
                 s.source     = $source_label
 SET s.heading      = row.heading,
     s.seq          = row.seq,

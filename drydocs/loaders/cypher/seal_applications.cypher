@@ -17,7 +17,7 @@ UNWIND $batch AS row
 
 // ---- Application upsert -----------------------------------------------------
 MERGE (a:BusinessApplication {seal_id: row.app_id})
-  ON CREATE SET a.created_at = datetime($loaded_at),
+  ON CREATE SET a.first_seen_at = datetime($loaded_at),
                 a.source     = 'SEAL'
 SET a.name                          = row.name,
     a.app_short_name                = row.app_short_name,
@@ -94,11 +94,11 @@ SET a.name                          = row.name,
 
 // ---- Two ports (v3 §C) ------------------------------------------------------
 MERGE (ep:Port:EventProcessing {parent_seal_id: row.app_id, kind: 'EventProcessing'})
-  ON CREATE SET ep.created_at = datetime($loaded_at), ep.active = false
+  ON CREATE SET ep.first_seen_at = datetime($loaded_at), ep.active = false
 SET ep.last_seen_at = datetime($loaded_at)
 
 MERGE (bp:Port:BatchProcessing {parent_seal_id: row.app_id, kind: 'BatchProcessing'})
-  ON CREATE SET bp.created_at = datetime($loaded_at), bp.active = false
+  ON CREATE SET bp.first_seen_at = datetime($loaded_at), bp.active = false
 SET bp.last_seen_at = datetime($loaded_at)
 
 MERGE (a)-[:HAS_PORT]->(ep)
@@ -115,7 +115,7 @@ SET r.last_seen_at = datetime($loaded_at)
 WITH a, row
 FOREACH (_ IN CASE WHEN row.app_owner_sid IS NOT NULL THEN [1] ELSE [] END |
   MERGE (e:Employee {employee_id: row.app_owner_sid})
-    ON CREATE SET e.created_at = datetime($loaded_at), e.source = 'SEAL'
+    ON CREATE SET e.first_seen_at = datetime($loaded_at), e.source = 'SEAL'
   SET e.full_name    = coalesce(row.app_owner_name, e.full_name),
       e.last_seen_at = datetime($loaded_at),
       e.last_run_id  = $run_id
@@ -126,7 +126,7 @@ FOREACH (_ IN CASE WHEN row.app_owner_sid IS NOT NULL THEN [1] ELSE [] END |
     ON CREATE SET m1.source     = 'SEAL',
                   m1.valid_from = date(),
                   m1.valid_to   = null,
-                  m1.created_at = datetime($loaded_at)
+                  m1.first_seen_at = datetime($loaded_at)
   SET m1.last_seen_at = datetime($loaded_at),
       m1.last_run_id  = $run_id
   MERGE (r1:TOMRole {id: 'application_owner'})
@@ -139,7 +139,7 @@ FOREACH (_ IN CASE WHEN row.app_owner_sid IS NOT NULL THEN [1] ELSE [] END |
 WITH a, row
 FOREACH (_ IN CASE WHEN row.chief_tech_officer_sid IS NOT NULL THEN [1] ELSE [] END |
   MERGE (e:Employee {employee_id: row.chief_tech_officer_sid})
-    ON CREATE SET e.created_at = datetime($loaded_at), e.source = 'SEAL'
+    ON CREATE SET e.first_seen_at = datetime($loaded_at), e.source = 'SEAL'
   SET e.full_name    = coalesce(row.chief_tech_officer_name, e.full_name),
       e.last_seen_at = datetime($loaded_at),
       e.last_run_id  = $run_id
@@ -149,7 +149,7 @@ FOREACH (_ IN CASE WHEN row.chief_tech_officer_sid IS NOT NULL THEN [1] ELSE [] 
     ON CREATE SET m2.source     = 'SEAL',
                   m2.valid_from = date(),
                   m2.valid_to   = null,
-                  m2.created_at = datetime($loaded_at)
+                  m2.first_seen_at = datetime($loaded_at)
   SET m2.last_seen_at = datetime($loaded_at),
       m2.last_run_id  = $run_id
   MERGE (r2:TOMRole {id: 'cto'})
@@ -162,7 +162,7 @@ FOREACH (_ IN CASE WHEN row.chief_tech_officer_sid IS NOT NULL THEN [1] ELSE [] 
 WITH a, row
 FOREACH (_ IN CASE WHEN row.info_owner_sid IS NOT NULL THEN [1] ELSE [] END |
   MERGE (e:Employee {employee_id: row.info_owner_sid})
-    ON CREATE SET e.created_at = datetime($loaded_at), e.source = 'SEAL'
+    ON CREATE SET e.first_seen_at = datetime($loaded_at), e.source = 'SEAL'
   SET e.full_name    = coalesce(row.info_owner_name, e.full_name),
       e.last_seen_at = datetime($loaded_at),
       e.last_run_id  = $run_id
@@ -172,7 +172,7 @@ FOREACH (_ IN CASE WHEN row.info_owner_sid IS NOT NULL THEN [1] ELSE [] END |
     ON CREATE SET m3.source     = 'SEAL',
                   m3.valid_from = date(),
                   m3.valid_to   = null,
-                  m3.created_at = datetime($loaded_at)
+                  m3.first_seen_at = datetime($loaded_at)
   SET m3.last_seen_at = datetime($loaded_at),
       m3.last_run_id  = $run_id
   MERGE (r3:TOMRole {id: 'primary_information_owner'})
