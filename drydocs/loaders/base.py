@@ -35,6 +35,7 @@ from pydantic import BaseModel, ValidationError
 # client's run_script and this module's dispatch share ONE implementation; the
 # private alias is kept — it is part of this module's tested surface.
 from drydocs_core.cypher_split import code_semicolons as _code_semicolons
+from drydocs_core.run_log import LoaderRunLog
 
 if TYPE_CHECKING:
     from drydocs_core.adapters import Adapter
@@ -157,6 +158,7 @@ class BaseLoader:
         max_rejects_kept: int = 100,
         index_wait_seconds: int = 300,
         full_extract: bool = False,
+        run_log: bool = True,
     ) -> None:
         if not self.cypher_path:
             raise NotImplementedError(f"{type(self).__name__} must set cypher_path")
@@ -172,6 +174,7 @@ class BaseLoader:
             datetime.now(timezone.utc).replace(microsecond=0).isoformat()
         )
         self.full_extract = full_extract
+        self.run_log = run_log
         self._scope_values: set = set()  # distinct sweep_scope_property values seen
 
     # ---- entrypoint ------------------------------------------------------
@@ -182,7 +185,18 @@ class BaseLoader:
             run_id=self.run_id,
             started_at=self.loaded_at,
         )
+        run_log = self._open_run_log()
+        error: BaseException | None = None
+        try:
+            return self._load(summary, run_log)
+        except BaseException as exc:
+            error = exc
+            raise
+        finally:
+            if run_log is not None:
+                run_log.close(summary.as_dict(), error=error)
 
+    def _load(self, summary: LoadSummary, run_log: LoaderRunLog | None) -> LoadSummary:
         self._preflight_indexes()
         self._open_run()
         cypher = self._read_cypher()
@@ -195,6 +209,8 @@ class BaseLoader:
                         model = self.row_model.model_validate(raw)  # type: ignore[union-attr]
                     except ValidationError as exc:
                         summary.rows_rejected += 1
+                        if run_log is not None:
+                            run_log.reject(idx, exc.errors())
                         if len(summary.rejects) < self.max_rejects_kept:
                             summary.rejects.append(
                                 {"row_index": idx, "errors": exc.errors(), "raw": raw}
@@ -230,6 +246,38 @@ class BaseLoader:
         self._close_run(status="OK", summary=summary)
         LOGGER.info("Loader %s done: %s", self.name, summary.as_dict())
         return summary
+
+    def _open_run_log(self) -> LoaderRunLog | None:
+        """Open the per-run log (header/meta + WARN-stream capture + rejects).
+
+        Best-effort by contract: an unwritable log directory downgrades to a
+        WARNING and the load proceeds without a log — the audit trail is never
+        the reason a load fails.
+        """
+        if not self.run_log:
+            return None
+        source_detail = getattr(self.adapter, "path", None)
+        source = f"{self.source_label} ({source_detail or type(self.adapter).__name__})"
+        uri = getattr(self.client, "_uri", "") or ""
+        database = getattr(self.client, "_database", "") or ""
+        log = LoaderRunLog(
+            self.name,
+            self.run_id,
+            source=source,
+            target=f"{uri} db={database}".strip(),
+            meta={"batch size": self.batch_size, "full extract": self.full_extract},
+        )
+        try:
+            path = log.open()
+        except OSError as exc:
+            LOGGER.warning(
+                "Loader %s: run log unavailable (%s) — continuing without",
+                self.name, exc,
+            )
+            return None
+        log.attach()
+        LOGGER.info("[run-log] %s", path)
+        return log
 
     # ---- hooks loaders may override -------------------------------------
 

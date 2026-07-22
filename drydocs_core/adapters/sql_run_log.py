@@ -22,12 +22,16 @@ Two deliberate differences from the company path, both safety-positive:
   ``':depends_on'`` literal in ``controlm_dependencies_recursive.sql`` stay
   byte-identical.
 
-Environment (names match the company repo so inspection snippets work in both):
+Environment (names match the company repo so inspection snippets work in both;
+resolution is shared with :mod:`drydocs_core.run_log` — the loader-run logs —
+so ONE knob configures the whole log family):
 
-    SPIDERP_LOGDIR   log directory; default ``~/logs/DryDocs`` — deliberately
-                     outside the repo (code and logs in separate paths).
-                     Created automatically if missing.
-    SPIDERP_CALLER   the ``script:`` stamp; defaults to ``drydocs <argv>``.
+    DRYDOCS_LOGDIR   log directory (generic name, wins when set);
+    SPIDERP_LOGDIR   honored fallback; default ``~/logs/DryDocs`` —
+                     deliberately outside the repo (code and logs in separate
+                     paths). Created automatically if missing.
+    DRYDOCS_CALLER / SPIDERP_CALLER   the ``script:`` stamp; defaults to
+                     ``drydocs <argv>``.
 
 A log may contain real DSNs and extracted data values — logs live outside the
 repo and are never committed. This module is mechanism only.
@@ -35,17 +39,13 @@ repo and are never committed. This module is mechanism only.
 from __future__ import annotations
 
 import csv
-import os
 import re
-import sys
 import time
 from datetime import datetime
 from pathlib import Path
 from typing import Any, Mapping, Sequence
 
-DEFAULT_LOGDIR = Path.home() / "logs" / "DryDocs"
-LOGDIR_ENV = "SPIDERP_LOGDIR"
-CALLER_ENV = "SPIDERP_CALLER"
+from drydocs_core.run_log import caller_stamp, claim_log_path
 
 _RULE = "=" * 66
 _THIN_RULE = "-" * 66
@@ -122,16 +122,7 @@ def render_sql(query: str, binds: Mapping[str, Any] | None) -> str:
     return "".join(out)
 
 
-def _caller() -> str:
-    stamp = os.environ.get(CALLER_ENV, "").strip()
-    if stamp:
-        return stamp
-    return "drydocs " + " ".join(sys.argv[1:])
-
-
-def _log_dir() -> Path:
-    raw = os.environ.get(LOGDIR_ENV, "").strip()
-    return Path(raw) if raw else DEFAULT_LOGDIR
+_caller = caller_stamp  # shared with run_log; kept as the module's tested name
 
 
 class SqlRunLog:
@@ -156,14 +147,7 @@ class SqlRunLog:
 
     def open(self) -> Path:
         """Create the log dir if missing, claim a timestamped file, write the header."""
-        log_dir = _log_dir()
-        log_dir.mkdir(parents=True, exist_ok=True)
-        stamp = datetime.now().strftime("%Y%m%d-%H%M%S")
-        path = log_dir / f"{self.base_name}.{stamp}.log"
-        seq = 1
-        while path.exists():  # same base within one second (tests, retries)
-            seq += 1
-            path = log_dir / f"{self.base_name}.{stamp}-{seq}.log"
+        path = claim_log_path(self.base_name)
         self._fh = path.open("w", encoding="utf-8", newline="")
         self.path = path
         self._started = time.monotonic()

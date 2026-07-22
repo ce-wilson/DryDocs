@@ -4,6 +4,14 @@
 **Scope:** what gets logged, where, how, and how to trace a logged query back to its run.
 **Classification:** Internal-Public (mechanism only — no real SIDs, servers, or data values).
 
+> **The log family is bigger than SQL now (2026-07-22).** Every loader ALSO writes a
+> per-run log with the same anatomy — `load.<loader>.<stamp>.log`: header/meta from the
+> process → captured `drydocs*` WARN stream + full reject detail → summary footer
+> (`drydocs_core/run_log.py`, wired in `BaseLoader`; `run_log=False` opts out). One knob
+> configures the whole family: `DRYDOCS_LOGDIR` (generic, wins) → `SPIDERP_LOGDIR`
+> (company-compat fallback) → `~/logs/DryDocs`. The rest of this guide covers the SQL
+> extract logs specifically.
+
 ## TL;DR
 
 Only the `--use-oracle` path touches Oracle, and **every SQL statement it runs is written

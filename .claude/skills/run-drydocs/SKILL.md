@@ -89,11 +89,13 @@ Oracle mode:
 poetry run drydocs ingest-controlm --use-oracle --folder-filter "CCB_AUTO_%"
 ```
 
-**SQL logging (HITL trail):** every `--use-oracle` extract writes a per-run log —
+**Run logging (HITL trail):** every `--use-oracle` extract writes a per-run SQL log —
 run metadata → handshake → the exact SQL (binds rendered for review; execution stays
-parameterized) → the CSV result — to `SPIDERP_LOGDIR` (default `~/logs/DryDocs`,
-outside the repo, never committed). One log per ingest stage; the console echoes
-`[sql-log] log: <path>`. Full guide: `docs/oracle-sql-logging.md`.
+parameterized) → the CSV result — and every LOADER run writes a companion
+`load.<loader>.<stamp>.log` (header/meta → captured WARN stream + reject detail →
+summary footer). Both go to `DRYDOCS_LOGDIR` (fallback `SPIDERP_LOGDIR`, default
+`~/logs/DryDocs`, outside the repo, never committed). The console echoes
+`[sql-log]`/`[run-log]` paths. Full guide: `docs/oracle-sql-logging.md`.
 
 ## Run (human path)
 

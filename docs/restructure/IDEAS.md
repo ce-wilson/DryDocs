@@ -26,6 +26,18 @@ Tags help grooming: `idea` · `bug` · `doc` · `source` (new data source) · `q
 
 <!-- add new ideas at the top -->
 
+- 2026-07-22 — [chore] **Company adoption: route the XML run's WARN flood through the new
+  loader run logs (next port).** Producer BUILT the generalized run-log family same day
+  (user directive after the first company XML run flooded the console with per-row
+  `description_tokens` WARNINGs): `drydocs_core/run_log.py` + `BaseLoader` wiring —
+  configurable path (`DRYDOCS_LOGDIR` → `SPIDERP_LOGDIR` fallback → `~/logs/DryDocs`),
+  shared naming (`load.<loader>.<stamp>.log`), header/meta from the process, WARN-stream
+  tee + uncapped reject detail, summary footer, best-effort contract. When ported,
+  company-side should ALSO (a) attach the tee in the XML *extractor* stage (the
+  description_tokens flood happens pre-loader, in the adapter), and (b) consider raising
+  the console handler to WARNING-summary-only once the stream lands in the file — the
+  file is the review surface, the console shows counts.
+
 - 2026-07-22 — [idea] **Control-M compact-timestamp normalization (mechanism, from the
   company XML-loader's second timestamp bug).** Control-M XML exports carry compact
   timestamps `yyyyMMddHHmmss` + literal `UTC` suffix (invented example: `20250101093000UTC`);
