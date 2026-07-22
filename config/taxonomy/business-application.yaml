@@ -59,7 +59,7 @@ nodes:
       lob: CCB
       info_classification: Highly Confidential
       ports: [EventProcessing, BatchProcessing]
-      batch_orchestrator: Autosys
+      batch_orchestrator: ControlM
 
   # Port — the two-port classification (DPROD). Structural: every BusinessApplication has both.
   ports:
