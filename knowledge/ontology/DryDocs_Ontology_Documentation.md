@@ -65,7 +65,7 @@ gate** before any edge is written. This is the join between layer 1 (taxonomy) a
 | CatalogLOB / DevTeam | org:OrganizationalUnit | CatalogLOB / DevTeam | lob-product-team | active |
 | ProductLine / Product | local (dd:) | ProductLine / Product | lob-product-team | active |
 | AreaProduct | dd:AreaProduct ⊑ prov:Entity | AreaProduct | lob-product-team | planned |
-| Application | prov:SoftwareAgent | Application | lob-product-team | active |
+| BusinessApplication | prov:Entity / dprod:DataProduct (K4 reshape 2026-07-15; was Application / prov:SoftwareAgent) | BusinessApplication | lob-product-team | active |
 | Port | dprod:Port | Port | lob-product-team | active |
 | Membership / Role | org:Membership / org:Role | Membership / Role | lob-product-team | active |
 | Schema / Table | dcat:Dataset (prov:Entity) | DataAsset | internal-standards | planned |
@@ -102,7 +102,7 @@ DryDocs classifies every relationship by PROV-O source / target type, then picks
 | ControlMServer  | local Platform         | ontology_supplement.cypher      |
 | Condition       | prov:Entity            | ontology_supplement.cypher      |
 | JobRun          | prov:Activity          | base ontology                      |
-| Application     | prov:SoftwareAgent     | seal_ontology_supplement.cypher    |
+| BusinessApplication | prov:Entity / dprod:DataProduct | seal_ontology_supplement.cypher    |
 | Employee        | prov:Agent             | seal_ontology_supplement.cypher    |
 | Membership      | org:Membership         | seal_ontology_supplement.cypher    |
 | Role            | org:Role               | seal_ontology_supplement.cypher    |
@@ -140,7 +140,7 @@ This diagram outlines the refined application hierarchy:
 
 ```mermaid
 graph TD
-    DevTeam((DevTeam)) -- develops --> App((Application))
+    App((BusinessApplication)) -- "WAS_ATTRIBUTED_TO {role: developed_by} (K4)" --> DevTeam((DevTeam))
     DevTeam -- owns --> Code((Code))
     Code -- stored_in --> Bitbucket((Bitbucket))
     Code -- contains --> PS((PipelineService))

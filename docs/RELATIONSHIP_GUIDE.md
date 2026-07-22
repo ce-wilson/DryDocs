@@ -46,7 +46,7 @@ registry/docs-corpus/SOSA labels) is
 | `ControlMServer` | local Platform | `ontology_supplement.cypher` |
 | `Condition` | `prov:Entity` | `ontology_supplement.cypher` |
 | `JobRun` | `prov:Activity` | *(base ontology)* |
-| `Application` | `prov:SoftwareAgent` | `seal_ontology_supplement.cypher` |
+| `BusinessApplication` | `prov:Entity` / `dprod:DataProduct` (K4 reshape 2026-07-15) | `seal_ontology_supplement.cypher` |
 | `Employee` | `prov:Agent` | `seal_ontology_supplement.cypher` |
 | `Membership` | `org:Membership` | `seal_ontology_supplement.cypher` |
 | `Role` | `org:Role` | `seal_ontology_supplement.cypher` |

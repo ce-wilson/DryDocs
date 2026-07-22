@@ -1,8 +1,9 @@
 # DryDocs Node Quick Reference
 
 Generated from `drydocs_core/ontology/relationship_vocabulary.yaml` (node_classifications).
-Created 2026-06-09; updated 2026-07-09 (software registry, docs corpus, ControlMApplication,
-SEAL TOM reshape proposals, SOSA context graph). Companion to
+Created 2026-06-09; updated 2026-07-22 (K4 BusinessApplication reshape APPLIED, TOM
+attribution + ProductRole active, DataAsset replaces DataSource/DataTarget,
+ControlMHostGroup, doc-graph L7 family). Companion to
 [`docs/RELATIONSHIP_GUIDE.md`](../../docs/RELATIONSHIP_GUIDE.md); lives beside
 [`DryDocs_Ontology_Documentation.md`](DryDocs_Ontology_Documentation.md) as layer-2
 (ontology) reference.
@@ -24,6 +25,7 @@ How to use: when writing a new relationship, find your **source node's Source ty
 | ControlMServer | — | — | dd:ControlMServer (local platform)³ |
 | Condition | Entity | Entity | dd:Condition (prov:Entity) |
 | JobRun | Activity | Activity | dd:JobRun (prov:Activity)⁴ |
+| ControlMHostGroup | Collection | Entity | dd:ControlMHostGroup (prov:Collection)¹⁵ |
 
 ## Control-M phase 2 (planned)
 
@@ -36,30 +38,31 @@ How to use: when writing a new relationship, find your **source node's Source ty
 | Script | Entity | Entity | dd:Script (prov:Entity / prov:Plan) |
 | ETLProcess | Activity | Activity | dd:ETLProcess (prov:Activity) |
 | ExecutionHost | Agent | Agent | prov:SoftwareAgent⁵ |
-| DataSource | Entity | Entity | dcat:Dataset |
-| DataTarget | Entity | Entity | dcat:Dataset |
+| DataAsset | Entity | Entity | dcat:Dataset¹⁶ |
 
 ## SEAL (active)
 
 | Node label | Source type | Target type | PROV-O / W3C type |
 |:---|:---|:---|:---|
-| Application | Agent | Agent | prov:SoftwareAgent⁶ |
+| BusinessApplication | Entity | Entity | prov:Entity / dprod:DataProduct⁶ |
 | Employee | Agent | Agent | prov:Agent |
 | Membership | — | — | org:Membership⁷ ⁸ |
 | Role | — | — | org:Role⁸ |
 | Port | Entity | Entity | dprod:Port |
 
-## SEAL TOM reshape (PROPOSED, gate-bound 2026-07-08)
+## SEAL TOM attribution + Product Cabinet (ACTIVE — K4 2026-07-15, K6 2026-07-20)
 
-Nothing here is active — these classes exist only so the proposed qualified-attribution
-edges type-check under the PROV matrix once the SME confirms. See
-`config/gate-prompts/seal-tom-attribution-reshape.yaml`.
+The qualified-attribution pattern applied at K4 (gate signed 2026-07-10):
+`BusinessApplication -[:QUALIFIED_ATTRIBUTION]-> Attribution -[:HAS_AGENT]-> Employee`,
+`Attribution -[:HAD_ROLE]-> TOMRole`. ProductRole is the independent Product Cabinet
+role scheme (K5 gate + K6 supplement; scope :Product / :AreaProduct only).
 
 | Node label | Source type | Target type | PROV-O / W3C type |
 |:---|:---|:---|:---|
 | Document | Entity | Entity | prov:Entity⁹ |
 | Attribution | — | — | prov:Attribution (n-ary influence node) |
 | TOMRole | — | — | skos:Concept¹⁰ |
+| ProductRole | — | — | skos:Concept¹⁰ |
 
 ## Catalog (active)
 
@@ -97,6 +100,18 @@ edges type-check under the PROV matrix once the SME confirms. See
 | Document | Entity | Entity | prov:Entity⁹ |
 | Chunk | Entity | Entity | prov:Entity |
 
+## Doc graph — traceability spine (ACTIVE, gate `doc-traceability-feedback` signed off 2026-07-20; L7 / ADR 0006)
+
+| Node label | Source type | Target type | PROV-O / W3C type |
+|:---|:---|:---|:---|
+| DocSource | Entity | Entity | prov:Entity (DCAT-catalog-shaped registry node) |
+| DesignDoc | Entity | Entity | dd:DesignDoc (managed, rev-tracked, outline-validated) |
+| DocSection | Entity | Entity | dd:DocSection (keyed origin/doc_id/anchor) |
+| Requirement | Entity | Entity | dd:Requirement (proposition from any registered source) |
+| Component | Entity | Entity | dd:Component (implementation artifact cited by a requirement) |
+| TestCase | Entity | Entity | dd:TestCase (verification citation; open `kind` enum) |
+| FeedbackNote | Entity | Entity | dd:FeedbackNote (anchor-keyed review annotation) |
+
 ## Context graph — SOSA/SSN (EXPERIMENTAL, planned)
 
 W3C standard but **not** a declared company standard; seeded only by the opt-in
@@ -132,19 +147,19 @@ in the folder pass so grouping labels exist before the jobs pass. SME gate
 
 ⁵ Classified as SoftwareAgent (not pure infrastructure) so `AppUser -[:DELEGATES_TO]-> ExecutionHost` legally maps to `prov:actedOnBehalfOf` (Agent → Agent).
 
-⁶ GATE-BOUND PROPOSAL (2026-07-08 review, NOT applied): reclass to prov:Entity /
-dprod:DataProduct — the node currently carries three incompatible PROV readings
-(SoftwareAgent, dprod:Port children, org role-holders). Active loaders and the drift
-guard depend on the current SoftwareAgent typing; do not flip until the SME confirms.
-See `config/gate-prompts/seal-tom-attribution-reshape.yaml`.
+⁶ APPLIED at K4 (2026-07-15; gate signed 2026-07-10): was label `Application`, class
+prov:SoftwareAgent — the old typing carried three incompatible PROV readings
+(SoftwareAgent, dprod:Port children, org role-holders). Reclassed prov:Entity /
+dprod:DataProduct and renamed `:Application` → `:BusinessApplication` across vocabulary,
+schema supplements, loaders, constraints, and tests in the same K4 change. Distinct from
+`:ControlMApplication` (footnote ²) — never conflate.
 
 ⁷ Corrected from "prov:Membership" (no such class in PROV-O). N-ary relation node from the W3C ORG ontology; HAS_MEMBERSHIP / OF_ROLE / HELD_BY edges are local-only.
 
-⁸ GATE-BOUND PROPOSAL (2026-07-08, NOT applied): deprecate the SEAL use of
-Membership/Role (HAS_MEMBERSHIP / OF_ROLE / HELD_BY) in favor of the TOM
-qualified-attribution pattern (`QUALIFIED_ATTRIBUTION` → Attribution → Employee /
-TOMRole). `org:` stays for the PAT product hierarchy (e.g. DevTeam→Membership).
-Status stays active until the SME confirms.
+⁸ APPLIED at K4 (2026-07-15): the SEAL use of Membership/Role (HAS_MEMBERSHIP /
+OF_ROLE / HELD_BY) is deprecated in favor of the TOM qualified-attribution pattern
+(`QUALIFIED_ATTRIBUTION` → Attribution → Employee / TOMRole). `org:Membership` /
+`org:Role` remain active for the PAT product hierarchy (e.g. DevTeam→Membership).
 
 ⁹ Two registry entries share the `Document` label and class (`prov:Entity`): the
 **docs-corpus** Document (active — the bmc-docs lexical graph, `DESCRIBES` →
@@ -152,9 +167,15 @@ SoftwareProduct) and the **SEAL-reshape / docmeta** Document (proposed — targe
 `prov:hadPrimarySource`). Distinct entries in `node_classifications`; do not merge
 their notes.
 
-¹⁰ SEAL Technical Operating Model role vocabulary (skos:ConceptScheme, 6 concepts:
-cto, application_owner, information_owner, data_owner, operate_manager,
-risk_compliance_officer). DISTINCT from `:Role` (org:Role, PAT hierarchy only).
+¹⁰ Two INDEPENDENT skos:ConceptScheme role vocabularies — do not conflate with each
+other or with `:Role` (org:Role, PAT hierarchy only). **TOMRole** (scheme `tom_roles`,
+ACTIVE at K4, the gate-REVISED fixed 7): application_owner, primary_information_owner,
+backup_information_owner, cto, technology_risk_controls, design_authority,
+operate_manager (L1/L2 lives on the Attribution node). **ProductRole** (scheme
+`product_roles`, ACTIVE at K6 2026-07-20, fixed 7): area_product_owner, product_owner,
+product_architect, tech_partner, data_owner, data_certifier, analytics_lead — no shared
+`cto` concept (K5 ruling supersedes the 2026-07-10 §B record); area_product_owner and
+tech_partner attach only to :AreaProduct.
 
 ¹¹ Doc said org:FormalOrganization; catalog supplement comment says org:Organization. FormalOrganization adopted as the more precise valid term.
 
@@ -164,3 +185,14 @@ risk_compliance_officer). DISTINCT from `:Role` (org:Role, PAT hierarchy only).
 
 ¹⁴ Third-party software company/brand ONLY (ADR 0004); ids shared with the
 drydocs-icons manifest. What a vendor ships is a `SoftwareProduct` (`MADE_BY` → Vendor).
+Since the C12 platforms gate (2026-07-21) the registry model also carries the scheduler
+role: `SoftwareProduct {role: orchestrator}` + `USES_SOFTWARE` (SchedulerKind retired).
+
+¹⁵ Gate `controlm-hosts-topology` CONFIRMED 2026-07-09: host/node group from psgmgr
+CM_HOSTS (vendor CMS_NODGRP). NOT `ControlMGroup` — the CM_DEF_VJOB GROUP_NAME
+application-group concept is different. Loader pending (P3; definition-side probes owed).
+
+¹⁶ Added at the lineage rel-vocabulary gate 2026-07-15: the D1 proxy shape — a piece of
+data a process reads/writes (hdfs / s3 / hive_table / local_file / Glue table …), keyed
+on assetId, constrained in all three data DBs so the `ddall` composite joins on it.
+Replaces the RETIRED DataSource / DataTarget pair (edge direction encodes the role).
