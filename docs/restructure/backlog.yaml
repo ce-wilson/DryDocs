@@ -5125,3 +5125,8 @@ summary:
   blocked: 0
   done: 125                                        # +M2 provenance diet cleanup migration, run live (2026-07-21 pm)
   next_ready: [M3, M4, P3, J10, Q6, O23, J13, G18, G19, O26, G26]
+  # HITL-free groom (2026-07-21 pm): P3, J10, Q6, J13, G18, G19, O26, G26 are workable
+  # with NO gate session — P3/G21 implement already-signed rulings (CM_HOSTS 07-09,
+  # cmd-line 07-15); G18..G21+G24+G25 are staging-only pre-G22 (no graph writes by
+  # design). HITL-required from next_ready: M3, M4 (per-source gates), O23 (IS a gate).
+  # Chain after G18+G19 land: G20 -> G21, G24; G25 after G19. Q6 = external-work-in -> branch.
