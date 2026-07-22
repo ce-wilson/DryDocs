@@ -1,0 +1,218 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Technical Design — the mapping-store SQLite materialization (var/mapping.db)</title>
+<style>
+:root { color-scheme: light dark; --ink:#1a1a1a; --mid:#555; --line:#d0d0d0; --faint:#f6f6f6; --bg:#fff; --link:#0a58ca; }
+@media (prefers-color-scheme: dark) { :root { --ink:#e6e6e6; --mid:#a0a0a0; --line:#3a3a3a; --faint:#1c1c1c; --bg:#141414; --link:#6ea8fe; } }
+:root[data-theme="dark"] { --ink:#e6e6e6; --mid:#a0a0a0; --line:#3a3a3a; --faint:#1c1c1c; --bg:#141414; --link:#6ea8fe; }
+:root[data-theme="light"] { --ink:#1a1a1a; --mid:#555; --line:#d0d0d0; --faint:#f6f6f6; --bg:#fff; --link:#0a58ca; }
+* { box-sizing: border-box; }
+body { font: 15px/1.6 "Segoe UI", system-ui, Arial, sans-serif; color: var(--ink); background: var(--bg); margin: 0; }
+main { max-width: 900px; margin: 0 auto; padding: 32px 24px 80px; }
+h1 { font-size: 28px; margin: 0 0 6px; letter-spacing:-0.3px; }
+h2 { font-size: 20px; margin: 34px 0 10px; padding-bottom:5px; border-bottom: 2px solid var(--ink); }
+h3 { font-size: 16px; margin: 22px 0 8px; }
+h4,h5,h6 { font-size: 14px; margin: 16px 0 6px; }
+p { margin: 10px 0; } strong { font-weight: 700; }
+a { color: var(--link); } a:hover { text-decoration: underline; }
+code { font-family: "Cascadia Mono","Consolas",monospace; font-size: 0.88em; background: var(--faint); padding: 1px 4px; border-radius: 3px; }
+pre { font-family: "Cascadia Mono","Consolas",monospace; font-size: 12.5px; line-height:1.45; border:1px solid var(--line); background: var(--faint); padding: 12px 14px; border-radius: 6px; overflow-x: auto; }
+pre code { background: none; padding: 0; }
+table { border-collapse: collapse; margin: 14px 0; font-size: 13.5px; display:block; overflow-x:auto; }
+th,td { border:1px solid var(--line); padding: 6px 9px; text-align:left; vertical-align: top; }
+th { background: var(--faint); font-weight:700; }
+blockquote { margin: 14px 0; padding: 2px 16px; border-left: 4px solid var(--line); color: var(--mid); }
+ul,ol { margin: 10px 0; padding-left: 26px; } li { margin: 4px 0; }
+hr { border:none; border-top:1px solid var(--line); margin: 26px 0; }
+:target { scroll-margin-top: 12px; } :target > :first-child, h2:target, h3:target { outline: 2px solid var(--link); outline-offset: 4px; }
+.dd-margin-tag, .dd-print-footer { display: none; }
+
+.dd-note-btn { border:1px solid var(--line); background:var(--bg); color:var(--mid); cursor:pointer; font-size:12px; line-height:1; padding:2px 6px; border-radius:5px; margin-right:6px; }
+.dd-note-btn:hover { color:var(--link); border-color:var(--link); }
+.dd-note-box { margin:6px 0 10px; }
+.dd-note-box textarea { width:100%; min-height:56px; font:13px/1.4 "Segoe UI",system-ui,sans-serif; color:var(--ink); background:var(--faint); border:1px solid var(--line); border-radius:6px; padding:8px; resize:vertical; }
+.dd-annotated { box-shadow:-3px 0 0 var(--link); padding-left:8px; }
+.dd-fb-bar { position:fixed; right:16px; bottom:16px; display:flex; flex-direction:column; gap:6px; align-items:stretch; background:var(--bg); border:1px solid var(--line); border-radius:10px; padding:8px 12px; box-shadow:0 2px 10px rgba(0,0,0,.15); font-size:13px; z-index:50; }
+.dd-fb-row { display:flex; gap:8px; align-items:center; justify-content:space-between; }
+.dd-fb-bar button { cursor:pointer; border:1px solid var(--link); background:var(--link); color:#fff; border-radius:6px; padding:5px 10px; font-size:13px; }
+.dd-fb-bar .dd-badge { font-weight:700; }
+.dd-fb-file { cursor:pointer; font-size:11px; color:var(--mid); white-space:nowrap; }
+.dd-fb-file code { font-size:11px; }
+.dd-fb-file:hover code { color:var(--link); }
+.dd-toast { position:fixed; right:16px; bottom:64px; background:var(--ink); color:var(--bg); padding:8px 12px; border-radius:8px; font-size:13px; z-index:60; opacity:0; transition:opacity .2s; }
+.dd-toast.show { opacity:1; }
+.dd-sme-feedback ol li { margin: 6px 0; }
+@media print { .dd-note-btn, .dd-note-box, .dd-fb-bar, .dd-toast, .dd-sme-feedback, .dd-sme-divider { display:none !important; } }
+@page { size: Letter; margin: 0.6in 0.62in 0.55in 0.62in; }
+@media print {
+:root, :root[data-theme="dark"], :root[data-theme="light"] { color-scheme: light; --ink:#1a1a1a; --mid:#555; --line:#bdbdbd; --fill:#eee; --faint:#f6f6f6; --bg:#fff; --link:#0a58ca; }
+html { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+body { font: 10.5px/1.45 "Segoe UI", system-ui, Arial, sans-serif; }
+main { max-width: 7.2in; margin: 0 auto; padding: 0 0 0 0.62in; position: relative; }
+h1 { font-size: 21px; margin: 0 0 2px; letter-spacing:-0.2px; }
+h2 { font-size: 14px; margin: 16px 0 8px; padding-bottom:4px; border-bottom: 2px solid var(--ink); text-transform: uppercase; letter-spacing: 0.6px; }
+h3 { font-size: 11.5px; margin: 13px 0 5px; padding-bottom:2px; border-bottom:1px solid var(--line); }
+h4,h5,h6 { font-size: 10.5px; margin: 9px 0 4px; }
+p { margin: 6px 0; }
+a { color: inherit; text-decoration: underline; }
+code { font-size: 9.2px; padding: 0 2px; border-radius: 2px; }
+table { display: table; width:100%; margin: 7px 0; font-size: 9.1px; overflow-x: visible; }
+th, td { padding: 3px 5px; }
+th { background: var(--fill); }
+td code, th code { background: transparent; padding: 0; }
+pre { font-size: 8.4px; line-height: 1.35; padding: 7px 9px; margin: 7px 0; white-space: pre; overflow: hidden; border-radius: 3px; }
+pre.sql { background:#fbfbfb; }
+blockquote { margin: 7px 0; padding: 2px 10px; border-left: 3px solid var(--line); break-inside: avoid; }
+ul,ol { margin: 6px 0 6px 16px; padding: 0; } li { margin: 3px 0; }
+hr { margin: 10px 0; }
+h2, h3, table, pre { break-inside: avoid; }
+
+/* L6 paper HITL: each anchored block sits in the left gutter (main's own padding-left,
+   reserved above) so a printed page carries the anchor id beside its section — no @page
+   margin-box support required, so headless Chromium print-to-pdf renders it reliably. */
+h1, h2, h3, h4, h5, h6, p, table, pre, ul, ol, blockquote { position: relative; }
+.dd-margin-tag {
+  display: block; position: absolute; left: -0.6in; top: 0.1em; width: 0.54in;
+  font: 6.2px/1.15 "Cascadia Mono","Consolas",monospace; text-align: right;
+  color: var(--mid); letter-spacing: 0.1px; word-break: break-word;
+}
+/* Rev/commit footer: `position: fixed` repeats on every printed page in Chromium's
+   headless print-to-pdf (the standard running-footer technique) without needing CSS
+   Paged-Media margin-box content(), which Chromium supports only partially. */
+.dd-print-footer {
+  display: block; position: fixed; left: 0.62in; right: 0.62in; bottom: 0.12in;
+  font-size: 8px; color: var(--mid); text-align: center;
+  border-top: 1px solid var(--line); padding-top: 3px;
+}
+}
+</style>
+</head>
+<body>
+<main>
+<h1>Technical Design — the mapping-store SQLite materialization (<code>var/mapping.db</code>)</h1>
+<p id="front-matter"><span class="dd-margin-tag" aria-hidden="true">front-matter</span><strong>Status:</strong> DESCRIPTIVE — documents the built store as of <strong>Rev 1, 2026-07-22</strong>, authored at commit <code>22d1a39</code> (plan M0–M4 built; O24 override table landed <code>b241661</code>, 2026-07-21). · <strong>Classification:</strong> Internal-Public — mechanism only; every SID, role holder, and mapping row named here is SYNTHESIZED or empty; real values live company-side under <code>internal/</code>. · <strong>Audience:</strong> engineers touching <code>drydocs_core/mapping_store.py</code>, <code>drydocs_api/mappings.py</code>, or the analytics path; the SME reviewing why the UI can query mappings without the YAML ever ceasing to be the truth. · <strong>Companion:</strong> <code>knowledge/upgrade-plans/mapping-store-plan-2026-07-17.md</code> (the M0–M4 plan); <code>docs/design/drydocs-web-console-tdd.md</code> (the console that consumes it); <code>docs/design/drydocs-mapping-store-runbook.md</code> (operate it); <code>docs/design/drydocs-mapping-demo-runbook.md</code> (the <code>/demo</code> page it backs).</p>
+<p>Worked example throughout: an SME edits <code>config/taxonomy-ontology-map.yaml</code>, flipping one entry from <code>proposed</code> to <code>rejected</code>. Nothing rebuilds the store explicitly — the next <code>/mappings</code> request notices the source-hash drift (<code>is_current()</code> → False), rebuilds <code>var/mapping.db</code> in place, and <code>v_status_summary</code> answers <code>applied 8 · confirmed 22 · proposed 2 · rejected 1</code>. The YAML was the decision; the SQLite file just caught up.</p>
+<blockquote><p><strong>Read-me-first.</strong> The store is a <em>derived, rebuildable materialization</em> — deletable at any moment without data loss, never the artifact a gate reviews. The committed YAML/CSV in git remain the single source of truth. Every anomaly in the file means &quot;rebuild&quot;, never &quot;investigate&quot;; every consumer treats <code>is_current() == False</code> as exactly that.</p></blockquote>
+<hr>
+<h2 id="purpose-scope"><span class="dd-margin-tag" aria-hidden="true">purpose-scope</span>Purpose &amp; scope</h2>
+<p><strong>Purpose.</strong> Specify the SQLite materialization of the mapping layer: what it ingests, the tables and views it exposes, the determinism and staleness contracts, and the three consumer paths (API/UI, loader read seam, analytics) that query it instead of parsing YAML.</p>
+<p><strong>In scope.</strong></p>
+<ul><li><code>drydocs_core/mapping_store.py</code> — DDL, build, staleness (<code>source_hashes</code>/<code>is_current</code>), deterministic CSV dumps, the M1/M3 read seam.</li><li><code>scripts/build_mapping_db.py</code> and <code>scripts/mapping_analytics.py</code> — the CLI entry points.</li><li>The consumption contract of <code>drydocs_api/mappings.py</code> (the O14 rebuild-on-read guard).</li></ul>
+<p><strong>Out of scope</strong> (delegated): the mapping-stewardship UI itself and the changeset-artifact flow (<code>drydocs-web-console-tdd.md</code>); the tier-5 manual loader that writes the graph (<code>config/manual-loads/README.md</code> + K2 gate); the FID/ALIAS reconciler tables (planned, not built — their domains render greyed-out in <code>/demo</code>); Oracle/Neo4j entirely — this store touches neither.</p>
+<h2 id="context-frame"><span class="dd-margin-tag" aria-hidden="true">context-frame</span>Where this sits — the four-layer frame</h2>
+<p>The store is <strong>layer-2 support machinery</strong>: it materializes the <em>ontology</em> decision ledgers (the taxonomy→ontology map, the relationship vocabulary, the manual mapping assertions) into a queryable form. It holds no layer-3 knowledge-graph content and never writes the graph — the loader remains the only graph writer, and the store&#x27;s own writes are confined to the derived file under <code>var/</code>.</p>
+<p>Upstream: the committed config ledgers (<code>config/taxonomy-ontology-map.yaml</code>, <code>drydocs_core/ontology/relationship_vocabulary.yaml</code>, <code>config/manual-loads/</code>, <code>config/overrides/seal-contact-overrides.csv</code>). Downstream: <code>drydocs_api</code> <code>/mappings/*</code> (the O13 stewardship surface and O24 override grid), the tier-5 loader&#x27;s read seam, and the M4 DuckDB analytics path. It lives in <code>drydocs_core</code> because both the load component and the api component consume it, and components never import each other (the MODULE_MAP boundary).</p>
+<h2 id="definitions"><span class="dd-margin-tag" aria-hidden="true">definitions</span>Definitions, acronyms &amp; references</h2>
+<ul><li><strong>Materialization</strong> — a derived database built entirely from committed sources; the inverse of a system of record. Deleting it loses nothing.</li><li><strong>The quintuple</strong> — one <code>ontology_mapping</code> row: (source label, relationship type, role, target label, PROV term) plus the HITL lifecycle (<code>proposed → confirmed → applied</code>, or <code>rejected</code>).</li><li><strong>M0–M4</strong> — the plan phases (<code>knowledge/upgrade-plans/mapping-store-plan-2026-07-17.md</code>): M0 build, M1/M3 loader read seam, M2 origin-flagged override store, M4 analytics views.</li><li><strong>O13 / O14 / O24</strong> — Epic O items: the <code>/mappings</code> API surface; the staleness guard (rebuild-on-read); the SEAL-contact override table (ui-write-surface gate SME-3).</li><li><strong>K2</strong> — gate <code>seal-attribution-match-policy</code> (signed off 24/24, 2026-07-14), governing the manual-loads tier the store ingests.</li><li><strong>Origin flag</strong> — the O24 rule that a SEAL source value and its user override render as adjacent rows (<code>origin: source</code> / <code>origin: override</code>), never merged.</li></ul>
+<h2 id="design-summary"><span class="dd-margin-tag" aria-hidden="true">design-summary</span>Design summary</h2>
+<pre><code>committed sources (git = truth)                 var/mapping.db (derived)
+────────────────────────────────                ─────────────────────────
+config/taxonomy-ontology-map.yaml ──┐           7 tables + 7 views
+ontology/relationship_vocabulary ───┤  build()  ┌──────────────────────┐
+config/manual-loads/ (manifest+CSV) ├─────────► │ meta (source hashes) │
+config/overrides/seal-contact-…csv ─┘           └──────────┬───────────┘
+                                                 is_current() compares
+consumers (all read-only):                       hashes → False = rebuild
+  drydocs_api /mappings/*  (O14 rebuild-on-read)
+  drydocs.loaders read seam (M1/M3 parity)
+  DuckDB / sqlite3 analytics (M4 views)
+  dump_csv() → gate-reviewable text twin</code></pre>
+<p><code>build()</code> replaces the file wholesale from the four committed sources, stamping <code>meta</code> with the schema version and a sha256 per source. <code>is_current()</code> recomputes those hashes and compares — one dict equality is the entire staleness protocol. Consumers open the file read-only (<code>mode=ro</code>); the only writer is <code>build()</code> itself.</p>
+<h2 id="detailed-design"><span class="dd-margin-tag" aria-hidden="true">detailed-design</span>Detailed design</h2>
+<p><strong>Build.</strong> <code>build(db_path)</code> deletes any existing file (it is derived), creates the schema from a single DDL script, then ingests the four sources in fixed order: vocabulary → ontology map → manual loads → SEAL overrides. Insertion order is file order (<code>seq</code>, <code>line_no</code>), so identical sources always produce identical row order.</p>
+<p><strong>Validation is the loader&#x27;s, reused.</strong> Manual CSVs pass through <code>parse_mapping_csv</code> — the <em>same</em> chain the tier-5 loader uses (manifest registration gate, vocabulary check, supported shape) — so the store can never accept a row the loader would refuse. Override rows fail loudly per row at build time: the role must canonicalize to the SEAL role vocabulary, <code>rationale</code> and <code>authored_by</code> are required, <code>status</code> is enum-checked, and an override equal to the captured SEAL value is refused (it is not a correction). A bad row is a mistake to fix at the committed source, never something to guess around.</p>
+<p><strong>Staleness (O14).</strong> <code>source_hashes()</code> computes the meta rows a build <em>would</em> store — including per-CSV hashes for every loadable manifest entry, so an added or removed file counts as drift. <code>is_current()</code> returns False for a missing, unreadable, foreign, or drifted file; <code>drydocs_api</code>&#x27;s connection helper calls <code>build()</code> whenever it does, which is why config edits are picked up on the next request without a restart.</p>
+<p><strong>Determinism.</strong> No wall-clock values are stored (meta carries content hashes, not timestamps); <code>dump_csv()</code> writes one CSV per table ordered by primary key with <code>\n</code> terminators. Byte-identical dumps for identical sources is an asserted invariant, and the dumps are the gate-reviewable text twin of the binary file.</p>
+<p><strong>The M1/M3 read seam.</strong> <code>manual_mapping_rows_from_store()</code> builds an in-memory store and reads one registered CSV back across the SQL boundary as <code>ManualMappingRow</code> objects. Validation is identical to the legacy path by construction; what the seam adds is the DB round-trip, guarded by the parity test.</p>
+<p><strong>Views (the query surface).</strong> <code>v_mapping_quintuple</code> and <code>v_status_summary</code> serve the lifecycle; <code>v_vocab_active</code> / <code>v_label_options</code> serve the vocabulary pickers; <code>v_manual_conflicts</code> is the steward conflict queue (same job key → more than one SEAL); <code>v_seal_contact_grid</code> implements the origin flag (source row first, override adjacent, never merged); <code>v_source_corrections</code> feeds the AO-facing corrections report (outstanding <code>active</code> rows only). DuckDB reads the same views through its sqlite extension — one store, two engines, identical answers.</p>
+<h3 id="design-data-mapping"><span class="dd-margin-tag" aria-hidden="true">design-data-mapping</span>Source → column-level field mapping</h3>
+<table><thead><tr><th>Source (committed)</th><th>Table</th><th>Column handling</th></tr></thead><tbody><tr><td><code>taxonomy-ontology-map.yaml</code> <code>mappings[]</code></td><td><code>ontology_mapping</code></td><td><code>id</code>; <code>seq</code> = file order; <code>taxonomy.source/element</code>; <code>ontology.from_node/to_node/neo4j_label/role/prov_maps_to/matrix_row</code>; <code>precedence_authority</code>; <code>vocab_id</code>; <code>status</code> (CHECK enum) + <code>confirmed_by/on</code>, <code>applied_on</code>. Nullable columns mirror the YAML&#x27;s reality (property supplements have no target, infrastructure edges no PROV term).</td></tr><tr><td><code>relationship_vocabulary.yaml</code> <code>local_relationships[]</code></td><td><code>relationship_vocabulary</code></td><td><code>id</code>, <code>neo4j_label</code>, <code>role</code>, <code>from_node</code>, <code>to_node</code>, <code>prov_maps_to</code>, <code>sosa_maps_to</code>, <code>domain</code>, <code>status</code>, <code>note</code> — verbatim.</td></tr><tr><td><code>relationship_vocabulary.yaml</code> <code>node_classifications[]</code></td><td><code>node_classification</code></td><td><code>label</code> (PK), <code>class</code>, <code>prov_type</code>, <code>note</code>.</td></tr><tr><td><code>manual-loads/manifest.yaml</code> <code>files[]</code></td><td><code>manual_load_file</code></td><td>every entry registered (audit); only <code>pending-load</code>/<code>loaded</code> materialize rows.</td></tr><tr><td>each loadable manual CSV</td><td><code>manual_mapping</code></td><td>via <code>parse_mapping_csv</code>: <code>folder_id</code>, <code>job_id</code>, <code>seal_id</code>, <code>create_target_if_missing</code> (0/1), <code>authored_by/on</code>, <code>note</code>; PK <code>(file, line_no)</code>, FK → <code>manual_load_file</code>.</td></tr><tr><td><code>overrides/seal-contact-overrides.csv</code></td><td><code>seal_contact_override</code></td><td><code>line_no</code> (PK), <code>app_seal_id</code>, <code>role_name</code> (canonicalized), <code>seal_holder_sid</code> (captured source value), <code>override_holder_sid/name</code>, <code>rationale</code>, <code>authored_by/on</code>, <code>status</code> (CHECK enum).</td></tr><tr><td>(computed)</td><td><code>meta</code></td><td><code>schema_version</code> = <code>drydocs.mapping-store.v1</code>; one <code>source:&lt;path&gt;</code> = sha256 row per source file.</td></tr></tbody></table>
+<h2 id="classification-security"><span class="dd-margin-tag" aria-hidden="true">classification-security</span>Classification &amp; security</h2>
+<p>Internal-Public, mechanism only. The producer-side sources are synthesized or empty (the overrides CSV is header-only; the manifest registers no files); real SIDs, SEAL ids, and rosters exist only company-side under <code>internal/</code>. <code>var/</code> is gitignored, so the binary DB — which company-side <em>would</em> contain Internal-Confidential values once sources are populated — can never be committed by construction. No secrets: the store holds no credentials and connects to nothing. The enforcement matrix carries the <code>config/overrides/</code> surface row (guard tests <code>test_mapping_store.py</code>, <code>test_mapping_api.py</code>) per <code>scripts/render_enforcement_matrix.py</code>.</p>
+<h2 id="qa-tests"><span class="dd-margin-tag" aria-hidden="true">qa-tests</span>QA &amp; tests</h2>
+<ul><li><code>tests/unit/test_mapping_store.py</code> — the parity test (legacy YAML path vs the SQL round-trip, row-for-row), determinism (byte-identical dumps), staleness semantics, and per-row override validation failures.</li><li><code>tests/unit/test_mapping_api.py</code> — the <code>/mappings/*</code> handlers over a fixture store, including the O24 origin-flagged grid and drafted-artifact (no-write) contract.</li><li><code>tests/unit/test_manual_loads.py</code> — the shared validation chain the store reuses.</li><li>Graph verify (m1/m3-verify) does not apply: the store never writes the graph.</li></ul>
+<h2 id="hitl-gate"><span class="dd-margin-tag" aria-hidden="true">hitl-gate</span>HITL gate &amp; open questions</h2>
+<p>The store itself is deliberately <strong>not</strong> a gated artifact — gates review the committed sources it derives from. The governing gates are upstream: K2 <code>seal-attribution-match-policy</code> (24/24, 2026-07-14) for the manual-loads tier, and <code>ui-write-surface</code> SME-3 (O20, signed off 2026-07-21) for the O24 override store, whose M2 follow-up built <code>seal_contact_override</code>. Open: the FID/ALIAS reconciler tables (domains exist in the API registry, tables unbuilt — company-side K2 tiers unblock); whether the deterministic CSV dumps get adopted as the gate-reviewable artifact of record (plan M-open; today gates read the YAML/CSV sources directly).</p>
+<h2 id="traceability-matrix"><span class="dd-margin-tag" aria-hidden="true">traceability-matrix</span>Requirements traceability matrix</h2>
+<table><thead><tr><th>Requirement / capability</th><th>Design section</th><th>Component</th><th>Test / verify</th><th>Status</th></tr></thead><tbody><tr><td>Committed YAML/CSV remain truth; DB derived + rebuildable</td><td>purpose-scope</td><td><code>mapping_store.build</code></td><td><code>test_mapping_store.py</code> (rebuild replaces file)</td><td>built</td></tr><tr><td>Byte-deterministic builds and dumps</td><td>detailed-design</td><td><code>dump_csv</code>, <code>_DUMP_ORDER</code></td><td><code>test_mapping_store.py</code> determinism assert</td><td>built</td></tr><tr><td>Staleness = one hash comparison; drift → rebuild</td><td>detailed-design</td><td><code>source_hashes</code> / <code>is_current</code></td><td><code>test_mapping_store.py</code>; O14 guard in <code>test_mapping_api.py</code></td><td>built</td></tr><tr><td>Store can never accept a row the loader refuses</td><td>detailed-design</td><td><code>parse_mapping_csv</code> reuse</td><td><code>test_manual_loads.py</code> + parity test</td><td>built</td></tr><tr><td>M1/M3 read seam serves loader rows across SQL boundary</td><td>detailed-design</td><td><code>manual_mapping_rows_from_store</code></td><td>parity test in <code>test_mapping_store.py</code></td><td>built</td></tr><tr><td>O24 origin flag: source + override adjacent, never merged</td><td>design-data-mapping</td><td><code>v_seal_contact_grid</code></td><td><code>test_mapping_api.py</code> grid assertions</td><td>built</td></tr><tr><td>Override ≠ captured SEAL value, rationale required</td><td>detailed-design</td><td><code>_ingest_seal_overrides</code></td><td><code>test_mapping_store.py</code> validation cases</td><td>built</td></tr><tr><td>No graph writes anywhere in the store/API path</td><td>context-frame</td><td><code>drydocs_api/mappings.py</code></td><td><code>test_mapping_api.py</code> artifact-only contract</td><td>built</td></tr><tr><td>FID/ALIAS reconciler tables</td><td>hitl-gate</td><td>(planned)</td><td>n/a — domains greyed out in <code>/demo</code></td><td>planned</td></tr></tbody></table>
+<h2 id="decisions-discussions"><span class="dd-margin-tag" aria-hidden="true">decisions-discussions</span>Decisions &amp; discussions</h2>
+<p>Placement in <code>drydocs_core</code> (not <code>drydocs.loaders</code> or <code>drydocs_api</code>) follows the MODULE_MAP no-cross-import rule — both components consume it, so it sits below both. DuckDB was chosen as the analytics engine <em>over</em> adding a second store: it attaches the same SQLite file, so analytics can never drift from the API&#x27;s answers. Timestamps were deliberately excluded from <code>meta</code> in favour of content hashes to keep builds byte-deterministic (the same decision pattern as the board/design renders).</p>
+<h2 id="appendices"><span class="dd-margin-tag" aria-hidden="true">appendices</span>Appendices</h2>
+<p>Current producer-side row counts (rebuilt 2026-07-22, all sources committed): <code>ontology_mapping</code> 33 · <code>relationship_vocabulary</code> 75 · <code>node_classification</code> 52 · <code>manual_load_file</code> 0 · <code>manual_mapping</code> 0 · <code>seal_contact_override</code> 0 · <code>meta</code> 5. Lifecycle: applied 8, confirmed 22, proposed 2, rejected 1. Empty tables are faithful: the manifest registers no files and the overrides CSV is header-only.</p>
+<hr class="dd-sme-divider">
+<section class="dd-sme-feedback" aria-label="SME - Feedback">
+<h2>SME - Feedback</h2>
+<p>How to return your notes on this document:</p>
+<ol>
+<li>Click the <strong>✎</strong> button beside any section (or numbered step) and type your note — notes save in your browser as you type.</li>
+<li>When finished, click <strong>Copy feedback</strong> in the bottom-right toolbar. Your notes are copied as anchor-keyed YAML.</li>
+<li>Create the feedback file (it is YAML, <em>not</em> markdown) — <strong>Copy To:</strong> <code>docs/design/feedback/</code> · <strong>File Name:</strong> <code>drydocs-mapping-store-tdd-rev1.yaml</code></li>
+<li>Paste the copied block into that file, save, and commit (or send the file back to the team).</li>
+</ol>
+</section>
+</main>
+<footer class="dd-print-footer">Rev 1 · commit 22d1a39</footer>
+<script>
+
+(function(){
+  var DOC="drydocs-mapping-store-tdd", FILE="drydocs-mapping-store-tdd-rev1.yaml", DIR="docs/design/feedback/", KEY="drydocs-doc-feedback:"+DOC;
+  function load(){ try{return JSON.parse(localStorage.getItem(KEY)||"{}");}catch(e){return {};} }
+  function save(){ localStorage.setItem(KEY, JSON.stringify(state)); }
+  var state=load(), badge;
+  function count(){ return Object.keys(state).filter(function(k){return (state[k]||"").trim();}).length; }
+  function refresh(){ if(badge) badge.textContent=count(); }
+  function toast(msg){ var t=document.createElement("div"); t.className="dd-toast"; t.textContent=msg; document.body.appendChild(t); requestAnimationFrame(function(){t.classList.add("show");}); setTimeout(function(){t.classList.remove("show"); setTimeout(function(){t.remove();},250);},1600); }
+  function exportYaml(){
+    var lines=["# design-doc feedback — paste into docs/design/feedback/"+DOC+"-rev<N>.yaml","doc: "+DOC,"notes:"];
+    Object.keys(state).forEach(function(a){
+      var note=(state[a]||"").replace(/\r/g,""); if(!note.trim()) return;
+      lines.push("  - anchor: "+a); lines.push("    note: |");
+      note.split("\n").forEach(function(l){ lines.push("      "+l); });
+    });
+    return lines.join("\n")+"\n";
+  }
+  function attach(el){
+    var id=el.id;
+    var btn=document.createElement("button"); btn.className="dd-note-btn"; btn.type="button"; btn.textContent="✎"; btn.title="Annotate #"+id;
+    var box=document.createElement("div"); box.className="dd-note-box"; box.style.display=(state[id]||"").trim()?"block":"none";
+    var ta=document.createElement("textarea"); ta.value=state[id]||""; ta.setAttribute("placeholder","note for #"+id+" …");
+    ta.addEventListener("input",function(){ state[id]=ta.value; save(); refresh(); el.classList.toggle("dd-annotated", !!ta.value.trim()); });
+    if((state[id]||"").trim()) el.classList.add("dd-annotated");
+    box.appendChild(ta);
+    btn.addEventListener("click",function(){ box.style.display=box.style.display==="none"?"block":"none"; if(box.style.display==="block") ta.focus(); });
+    if(el.tagName==="LI"){ el.insertAdjacentElement("afterbegin", btn); el.appendChild(box); }
+    else { el.insertAdjacentElement("afterend", box); el.insertAdjacentElement("beforebegin", btn); }
+  }
+  function copyText(txt, ok){
+    var done=function(){toast(ok);};
+    var fallback=function(){ var t=document.createElement("textarea"); t.value=txt; document.body.appendChild(t); t.select(); try{document.execCommand("copy"); toast(ok);}catch(e){toast("copy failed — select the box");} t.remove(); };
+    if(navigator.clipboard&&navigator.clipboard.writeText){ navigator.clipboard.writeText(txt).then(done,fallback); } else { fallback(); }
+  }
+  function fileLine(label, value){
+    var d=document.createElement("div"); d.className="dd-fb-file"; d.title="click to copy";
+    var c=document.createElement("code"); c.textContent=value;
+    d.appendChild(document.createTextNode(label+" ")); d.appendChild(c);
+    d.addEventListener("click",function(){ copyText(value, label.replace(":","")+" copied"); });
+    return d;
+  }
+  document.addEventListener("DOMContentLoaded",function(){
+    document.querySelectorAll("main [id]").forEach(attach);
+    var bar=document.createElement("div"); bar.className="dd-fb-bar";
+    var row=document.createElement("div"); row.className="dd-fb-row";
+    var lbl=document.createElement("span"); lbl.innerHTML='notes <span class="dd-badge">0</span>'; badge=lbl.querySelector(".dd-badge");
+    var ex=document.createElement("button"); ex.type="button"; ex.textContent="Copy feedback";
+    ex.addEventListener("click",function(){ copyText(exportYaml(), "feedback copied — create "+DIR+FILE); });
+    row.appendChild(lbl); row.appendChild(ex);
+    bar.appendChild(row);
+    bar.appendChild(fileLine("file:", FILE));
+    bar.appendChild(fileLine("path:", DIR+FILE));
+    document.body.appendChild(bar); refresh();
+  });
+})();
+
+</script>
+</body>
+</html>

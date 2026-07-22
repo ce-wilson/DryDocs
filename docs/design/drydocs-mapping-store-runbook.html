@@ -1,0 +1,212 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Runbook — build, inspect &amp; maintain the mapping store (var/mapping.db)</title>
+<style>
+:root { color-scheme: light dark; --ink:#1a1a1a; --mid:#555; --line:#d0d0d0; --faint:#f6f6f6; --bg:#fff; --link:#0a58ca; }
+@media (prefers-color-scheme: dark) { :root { --ink:#e6e6e6; --mid:#a0a0a0; --line:#3a3a3a; --faint:#1c1c1c; --bg:#141414; --link:#6ea8fe; } }
+:root[data-theme="dark"] { --ink:#e6e6e6; --mid:#a0a0a0; --line:#3a3a3a; --faint:#1c1c1c; --bg:#141414; --link:#6ea8fe; }
+:root[data-theme="light"] { --ink:#1a1a1a; --mid:#555; --line:#d0d0d0; --faint:#f6f6f6; --bg:#fff; --link:#0a58ca; }
+* { box-sizing: border-box; }
+body { font: 15px/1.6 "Segoe UI", system-ui, Arial, sans-serif; color: var(--ink); background: var(--bg); margin: 0; }
+main { max-width: 900px; margin: 0 auto; padding: 32px 24px 80px; }
+h1 { font-size: 28px; margin: 0 0 6px; letter-spacing:-0.3px; }
+h2 { font-size: 20px; margin: 34px 0 10px; padding-bottom:5px; border-bottom: 2px solid var(--ink); }
+h3 { font-size: 16px; margin: 22px 0 8px; }
+h4,h5,h6 { font-size: 14px; margin: 16px 0 6px; }
+p { margin: 10px 0; } strong { font-weight: 700; }
+a { color: var(--link); } a:hover { text-decoration: underline; }
+code { font-family: "Cascadia Mono","Consolas",monospace; font-size: 0.88em; background: var(--faint); padding: 1px 4px; border-radius: 3px; }
+pre { font-family: "Cascadia Mono","Consolas",monospace; font-size: 12.5px; line-height:1.45; border:1px solid var(--line); background: var(--faint); padding: 12px 14px; border-radius: 6px; overflow-x: auto; }
+pre code { background: none; padding: 0; }
+table { border-collapse: collapse; margin: 14px 0; font-size: 13.5px; display:block; overflow-x:auto; }
+th,td { border:1px solid var(--line); padding: 6px 9px; text-align:left; vertical-align: top; }
+th { background: var(--faint); font-weight:700; }
+blockquote { margin: 14px 0; padding: 2px 16px; border-left: 4px solid var(--line); color: var(--mid); }
+ul,ol { margin: 10px 0; padding-left: 26px; } li { margin: 4px 0; }
+hr { border:none; border-top:1px solid var(--line); margin: 26px 0; }
+:target { scroll-margin-top: 12px; } :target > :first-child, h2:target, h3:target { outline: 2px solid var(--link); outline-offset: 4px; }
+.dd-margin-tag, .dd-print-footer { display: none; }
+
+.dd-note-btn { border:1px solid var(--line); background:var(--bg); color:var(--mid); cursor:pointer; font-size:12px; line-height:1; padding:2px 6px; border-radius:5px; margin-right:6px; }
+.dd-note-btn:hover { color:var(--link); border-color:var(--link); }
+.dd-note-box { margin:6px 0 10px; }
+.dd-note-box textarea { width:100%; min-height:56px; font:13px/1.4 "Segoe UI",system-ui,sans-serif; color:var(--ink); background:var(--faint); border:1px solid var(--line); border-radius:6px; padding:8px; resize:vertical; }
+.dd-annotated { box-shadow:-3px 0 0 var(--link); padding-left:8px; }
+.dd-fb-bar { position:fixed; right:16px; bottom:16px; display:flex; flex-direction:column; gap:6px; align-items:stretch; background:var(--bg); border:1px solid var(--line); border-radius:10px; padding:8px 12px; box-shadow:0 2px 10px rgba(0,0,0,.15); font-size:13px; z-index:50; }
+.dd-fb-row { display:flex; gap:8px; align-items:center; justify-content:space-between; }
+.dd-fb-bar button { cursor:pointer; border:1px solid var(--link); background:var(--link); color:#fff; border-radius:6px; padding:5px 10px; font-size:13px; }
+.dd-fb-bar .dd-badge { font-weight:700; }
+.dd-fb-file { cursor:pointer; font-size:11px; color:var(--mid); white-space:nowrap; }
+.dd-fb-file code { font-size:11px; }
+.dd-fb-file:hover code { color:var(--link); }
+.dd-toast { position:fixed; right:16px; bottom:64px; background:var(--ink); color:var(--bg); padding:8px 12px; border-radius:8px; font-size:13px; z-index:60; opacity:0; transition:opacity .2s; }
+.dd-toast.show { opacity:1; }
+.dd-sme-feedback ol li { margin: 6px 0; }
+@media print { .dd-note-btn, .dd-note-box, .dd-fb-bar, .dd-toast, .dd-sme-feedback, .dd-sme-divider { display:none !important; } }
+@page { size: Letter; margin: 0.6in 0.62in 0.55in 0.62in; }
+@media print {
+:root, :root[data-theme="dark"], :root[data-theme="light"] { color-scheme: light; --ink:#1a1a1a; --mid:#555; --line:#bdbdbd; --fill:#eee; --faint:#f6f6f6; --bg:#fff; --link:#0a58ca; }
+html { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+body { font: 10.5px/1.45 "Segoe UI", system-ui, Arial, sans-serif; }
+main { max-width: 7.2in; margin: 0 auto; padding: 0 0 0 0.62in; position: relative; }
+h1 { font-size: 21px; margin: 0 0 2px; letter-spacing:-0.2px; }
+h2 { font-size: 14px; margin: 16px 0 8px; padding-bottom:4px; border-bottom: 2px solid var(--ink); text-transform: uppercase; letter-spacing: 0.6px; }
+h3 { font-size: 11.5px; margin: 13px 0 5px; padding-bottom:2px; border-bottom:1px solid var(--line); }
+h4,h5,h6 { font-size: 10.5px; margin: 9px 0 4px; }
+p { margin: 6px 0; }
+a { color: inherit; text-decoration: underline; }
+code { font-size: 9.2px; padding: 0 2px; border-radius: 2px; }
+table { display: table; width:100%; margin: 7px 0; font-size: 9.1px; overflow-x: visible; }
+th, td { padding: 3px 5px; }
+th { background: var(--fill); }
+td code, th code { background: transparent; padding: 0; }
+pre { font-size: 8.4px; line-height: 1.35; padding: 7px 9px; margin: 7px 0; white-space: pre; overflow: hidden; border-radius: 3px; }
+pre.sql { background:#fbfbfb; }
+blockquote { margin: 7px 0; padding: 2px 10px; border-left: 3px solid var(--line); break-inside: avoid; }
+ul,ol { margin: 6px 0 6px 16px; padding: 0; } li { margin: 3px 0; }
+hr { margin: 10px 0; }
+h2, h3, table, pre { break-inside: avoid; }
+
+/* L6 paper HITL: each anchored block sits in the left gutter (main's own padding-left,
+   reserved above) so a printed page carries the anchor id beside its section — no @page
+   margin-box support required, so headless Chromium print-to-pdf renders it reliably. */
+h1, h2, h3, h4, h5, h6, p, table, pre, ul, ol, blockquote { position: relative; }
+.dd-margin-tag {
+  display: block; position: absolute; left: -0.6in; top: 0.1em; width: 0.54in;
+  font: 6.2px/1.15 "Cascadia Mono","Consolas",monospace; text-align: right;
+  color: var(--mid); letter-spacing: 0.1px; word-break: break-word;
+}
+/* Rev/commit footer: `position: fixed` repeats on every printed page in Chromium's
+   headless print-to-pdf (the standard running-footer technique) without needing CSS
+   Paged-Media margin-box content(), which Chromium supports only partially. */
+.dd-print-footer {
+  display: block; position: fixed; left: 0.62in; right: 0.62in; bottom: 0.12in;
+  font-size: 8px; color: var(--mid); text-align: center;
+  border-top: 1px solid var(--line); padding-top: 3px;
+}
+}
+</style>
+</head>
+<body>
+<main>
+<h1>Runbook — build, inspect &amp; maintain the mapping store (<code>var/mapping.db</code>)</h1>
+<ul id="front-matter"><span class="dd-margin-tag" aria-hidden="true">front-matter</span><li><strong>Status:</strong> DESCRIPTIVE — documents the working procedure. <strong>Rev 1, 2026-07-22</strong>, authored at commit <code>22d1a39</code> (store per plan M0–M4; O24 override table included).</li><li><strong>Classification:</strong> Internal-Public (mechanism only — commands and synthetic/empty producer-side data; no credentials, no company values)</li><li><strong>Audience:</strong> anyone operating the mapping-store materialization directly — building, inspecting, dumping, or diagnosing it — outside the demo/console surfaces</li><li><strong>Companion:</strong> <code>docs/design/drydocs-mapping-store-tdd.md</code> (the design this operates); <code>docs/design/drydocs-mapping-demo-runbook.md</code> (the <code>/demo</code> site backed by this store); <code>knowledge/upgrade-plans/mapping-store-plan-2026-07-17.md</code> (the M0–M4 plan)</li></ul>
+<h2 id="purpose-scope"><span class="dd-margin-tag" aria-hidden="true">purpose-scope</span>Purpose &amp; scope</h2>
+<p><strong>Purpose.</strong> Operate the SQLite materialization of the mapping layer: build or rebuild <code>var/mapping.db</code> from the committed YAML/CSV sources, inspect its tables and views, produce the deterministic CSV dumps, and run the analytics queries.</p>
+<p><strong>The one rule that shapes every step:</strong> the file is DERIVED. The committed sources are truth; every anomaly means &quot;rebuild&quot;, never &quot;investigate the DB&quot;. Nothing in this runbook can lose data, because the store holds none of its own.</p>
+<p><strong>In scope.</strong> <code>scripts/build_mapping_db.py</code>, <code>scripts/mapping_analytics.py</code>, direct sqlite3/DuckDB inspection, and the staleness check.</p>
+<p><strong>Out of scope.</strong> Serving the store over HTTP (<code>drydocs-mapping-demo-runbook.md</code>); editing the committed sources themselves (mapping <em>semantics</em> — HITL-gated, see Contacts); Neo4j and the graph loaders (the store touches neither).</p>
+<h2 id="prerequisites"><span class="dd-margin-tag" aria-hidden="true">prerequisites</span>Prerequisites</h2>
+<pre class="powershell"><code># From the repo root, on main
+poetry install            # core deps only; no api group, no container, no .env needed</code></pre>
+<p>Optional: <code>duckdb</code> (pip/poetry extra) for the analytics path — the script falls back to stdlib sqlite3 with identical answers when it&#x27;s absent. No credentials of any kind: the store connects to nothing.</p>
+<h2 id="startup"><span class="dd-margin-tag" aria-hidden="true">startup</span>Startup</h2>
+<p>&quot;Startup&quot; here is a build — the store is a file, not a service.</p>
+<ol><li><strong>Build it:</strong> ``<code>powershell poetry run python scripts/build_mapping_db.py </code>`<code> *Success:* </code>built C:\...\var\mapping.db` followed by a per-table row-count listing (producer-side currently: ontology_mapping 33, relationship_vocabulary 75, node_classification 52, manual/override tables 0, meta 5).</li><li><strong>Confirm freshness:</strong> ``<code>powershell poetry run python -c &quot;from drydocs_core.mapping_store import DEFAULT_DB_PATH, is_current; print(is_current(DEFAULT_DB_PATH))&quot; </code>`<code> *Success:* </code>True<code>. (</code>False` immediately after a build means a source changed mid-build — just rebuild.)</li></ol>
+<h2 id="refresh-ingest"><span class="dd-margin-tag" aria-hidden="true">refresh-ingest</span>Refresh / ingest</h2>
+<p>Two refresh paths exist; both are safe to run at any time.</p>
+<ul><li><strong>Implicit (O14, the normal path):</strong> every <code>drydocs_api</code> <code>/mappings/*</code> read checks <code>is_current()</code> and rebuilds on drift — edits to <code>config/taxonomy-ontology-map.yaml</code>, <code>drydocs_core/ontology/relationship_vocabulary.yaml</code>, <code>config/manual-loads/</code>, or <code>config/overrides/seal-contact-overrides.csv</code> are picked up on the next request with no restart and no manual step.</li><li><strong>Explicit (this runbook&#x27;s path):</strong> rerun the build, optionally with the deterministic per-table CSV dumps (the gate-reviewable text twin of the binary file): ``<code>powershell poetry run python scripts/build_mapping_db.py                       # rebuild in place poetry run python scripts/build_mapping_db.py --dump-dir var/dumps  # + CSV dumps poetry run python scripts/build_mapping_db.py --db &lt;path&gt;           # build elsewhere </code>``</li></ul>
+<p>Never commit <code>var/mapping.db</code> or the dumps under <code>var/</code> — the directory is gitignored and the file is derived by construction.</p>
+<h2 id="verify"><span class="dd-margin-tag" aria-hidden="true">verify</span>Verify</h2>
+<pre class="powershell"><code># Freshness — the whole staleness protocol is this one boolean
+poetry run python -c &quot;from drydocs_core.mapping_store import DEFAULT_DB_PATH, is_current; print(is_current(DEFAULT_DB_PATH))&quot;
+# -&gt; True
+
+# Lifecycle summary — canonical expected values live in config/taxonomy-ontology-map.yaml
+poetry run python -m sqlite3 var/mapping.db &quot;SELECT * FROM v_status_summary&quot;
+# -&gt; (&#x27;applied&#x27;, 8) (&#x27;confirmed&#x27;, 22) (&#x27;proposed&#x27;, 2) (&#x27;rejected&#x27;, 1)   [as of Rev 1]
+
+# Schema browse — the SQL-Developer equivalents
+poetry run python -m sqlite3 var/mapping.db &quot;SELECT name FROM sqlite_master WHERE type=&#x27;table&#x27; ORDER BY name&quot;
+poetry run python -m sqlite3 var/mapping.db &quot;PRAGMA table_info(ontology_mapping)&quot;
+
+# Analytics sweep (DuckDB if installed, sqlite3 fallback — answers identical)
+poetry run python scripts/mapping_analytics.py</code></pre>
+<p>Determinism spot-check: two consecutive builds followed by <code>--dump-dir</code> into different directories produce byte-identical CSVs (<code>fc.exe</code> / <code>git diff --no-index</code> shows nothing). The unit suite asserts this too: <code>poetry run pytest tests/unit/test_mapping_store.py -q</code>.</p>
+<h2 id="rollback"><span class="dd-margin-tag" aria-hidden="true">rollback</span>Rollback</h2>
+<p>Rollback is deletion — safe by construction:</p>
+<pre class="powershell"><code>Remove-Item var\mapping.db</code></pre>
+<p>The next explicit build or API read recreates it from the committed sources. If a bad <em>source</em> edit is the problem, roll back the source in git (<code>git checkout -- &lt;file&gt;</code>) and rebuild; the store follows the sources, always. There is no destructive step in this runbook — nothing here writes git, graph, or committed config.</p>
+<h2 id="troubleshooting"><span class="dd-margin-tag" aria-hidden="true">troubleshooting</span>Troubleshooting</h2>
+<ul><li><strong><code>MappingStoreError: mapping-store source not found: &lt;path&gt;</code></strong> → a committed source file is missing (usually a wrong repo root or a deleted overrides CSV). Restore the file in git; the build refuses loudly rather than building a partial store.</li><li><strong><code>MappingStoreError: ... role_name ... does not canonicalize to a SEAL role</code></strong> (or missing <code>rationale</code> / <code>authored_by</code>, bad <code>status</code>) → a bad row in <code>config/overrides/seal-contact-overrides.csv</code>. Fix it at the source; the store never guesses around steward-authored data.</li><li><strong><code>MappingStoreError: override equals the captured SEAL value — not a correction</code></strong> → the override row duplicates the SEAL source value; delete the row or capture the real correction.</li><li><strong>API error <code>relationship WAS_ASSOCIATED_WITH{role=seal_app_ref} is not registered in the vocabulary materialization — rebuild var/mapping.db</code></strong> → the store predates a vocabulary edit; rebuild (or just re-request — the O14 guard should have done it; if it recurs, delete the file, which is always safe).</li><li><strong><code>is_current()</code> stays <code>False</code> after rebuilding</strong> → a source is changing between hash and build (concurrent session editing config) — coordinate per the parallel-session discipline, then rebuild once the tree is quiet.</li><li><strong>Query results look wrong</strong> → do not debug the DB. Rebuild, re-query; if still wrong, the committed source says what the store says — the discussion belongs at the source (and possibly the HITL gate), not in SQLite.</li></ul>
+<h2 id="contacts-escalation"><span class="dd-margin-tag" aria-hidden="true">contacts-escalation</span>Contacts &amp; escalation</h2>
+<p>Role-based, per the repo&#x27;s standing flow: the repo owner/SME owns this procedure. The store itself is never the decision surface — anything touching <strong>mapping semantics</strong> (quintuple entries, vocabulary terms, manual rows, overrides) routes to the HITL gate (<code>docs/restructure/03-hitl-sme-flow.md</code>); the governing sign-offs are K2 <code>seal-attribution-match-policy</code> (2026-07-14) and <code>ui-write-surface</code> SME-3 (2026-07-21). Escalation beyond the repo is not applicable (local derived file, no shared infrastructure).</p>
+<h2 id="appendices"><span class="dd-margin-tag" aria-hidden="true">appendices</span>Appendices</h2>
+<p>Table/view inventory (schema <code>drydocs.mapping-store.v1</code>): tables <code>meta</code>, <code>node_classification</code>, <code>relationship_vocabulary</code>, <code>ontology_mapping</code>, <code>manual_load_file</code>, <code>manual_mapping</code>, <code>seal_contact_override</code>; views <code>v_mapping_quintuple</code>, <code>v_status_summary</code>, <code>v_vocab_active</code>, <code>v_label_options</code>, <code>v_manual_conflicts</code>, <code>v_seal_contact_grid</code>, <code>v_source_corrections</code>. Full DDL and column-level source mapping: the TDD&#x27;s &quot;Source → column-level field mapping&quot; section.</p>
+<hr class="dd-sme-divider">
+<section class="dd-sme-feedback" aria-label="SME - Feedback">
+<h2>SME - Feedback</h2>
+<p>How to return your notes on this document:</p>
+<ol>
+<li>Click the <strong>✎</strong> button beside any section (or numbered step) and type your note — notes save in your browser as you type.</li>
+<li>When finished, click <strong>Copy feedback</strong> in the bottom-right toolbar. Your notes are copied as anchor-keyed YAML.</li>
+<li>Create the feedback file (it is YAML, <em>not</em> markdown) — <strong>Copy To:</strong> <code>docs/design/feedback/</code> · <strong>File Name:</strong> <code>drydocs-mapping-store-runbook-rev1.yaml</code></li>
+<li>Paste the copied block into that file, save, and commit (or send the file back to the team).</li>
+</ol>
+</section>
+</main>
+<footer class="dd-print-footer">Rev 1 · commit 22d1a39</footer>
+<script>
+
+(function(){
+  var DOC="drydocs-mapping-store-runbook", FILE="drydocs-mapping-store-runbook-rev1.yaml", DIR="docs/design/feedback/", KEY="drydocs-doc-feedback:"+DOC;
+  function load(){ try{return JSON.parse(localStorage.getItem(KEY)||"{}");}catch(e){return {};} }
+  function save(){ localStorage.setItem(KEY, JSON.stringify(state)); }
+  var state=load(), badge;
+  function count(){ return Object.keys(state).filter(function(k){return (state[k]||"").trim();}).length; }
+  function refresh(){ if(badge) badge.textContent=count(); }
+  function toast(msg){ var t=document.createElement("div"); t.className="dd-toast"; t.textContent=msg; document.body.appendChild(t); requestAnimationFrame(function(){t.classList.add("show");}); setTimeout(function(){t.classList.remove("show"); setTimeout(function(){t.remove();},250);},1600); }
+  function exportYaml(){
+    var lines=["# design-doc feedback — paste into docs/design/feedback/"+DOC+"-rev<N>.yaml","doc: "+DOC,"notes:"];
+    Object.keys(state).forEach(function(a){
+      var note=(state[a]||"").replace(/\r/g,""); if(!note.trim()) return;
+      lines.push("  - anchor: "+a); lines.push("    note: |");
+      note.split("\n").forEach(function(l){ lines.push("      "+l); });
+    });
+    return lines.join("\n")+"\n";
+  }
+  function attach(el){
+    var id=el.id;
+    var btn=document.createElement("button"); btn.className="dd-note-btn"; btn.type="button"; btn.textContent="✎"; btn.title="Annotate #"+id;
+    var box=document.createElement("div"); box.className="dd-note-box"; box.style.display=(state[id]||"").trim()?"block":"none";
+    var ta=document.createElement("textarea"); ta.value=state[id]||""; ta.setAttribute("placeholder","note for #"+id+" …");
+    ta.addEventListener("input",function(){ state[id]=ta.value; save(); refresh(); el.classList.toggle("dd-annotated", !!ta.value.trim()); });
+    if((state[id]||"").trim()) el.classList.add("dd-annotated");
+    box.appendChild(ta);
+    btn.addEventListener("click",function(){ box.style.display=box.style.display==="none"?"block":"none"; if(box.style.display==="block") ta.focus(); });
+    if(el.tagName==="LI"){ el.insertAdjacentElement("afterbegin", btn); el.appendChild(box); }
+    else { el.insertAdjacentElement("afterend", box); el.insertAdjacentElement("beforebegin", btn); }
+  }
+  function copyText(txt, ok){
+    var done=function(){toast(ok);};
+    var fallback=function(){ var t=document.createElement("textarea"); t.value=txt; document.body.appendChild(t); t.select(); try{document.execCommand("copy"); toast(ok);}catch(e){toast("copy failed — select the box");} t.remove(); };
+    if(navigator.clipboard&&navigator.clipboard.writeText){ navigator.clipboard.writeText(txt).then(done,fallback); } else { fallback(); }
+  }
+  function fileLine(label, value){
+    var d=document.createElement("div"); d.className="dd-fb-file"; d.title="click to copy";
+    var c=document.createElement("code"); c.textContent=value;
+    d.appendChild(document.createTextNode(label+" ")); d.appendChild(c);
+    d.addEventListener("click",function(){ copyText(value, label.replace(":","")+" copied"); });
+    return d;
+  }
+  document.addEventListener("DOMContentLoaded",function(){
+    document.querySelectorAll("main [id]").forEach(attach);
+    var bar=document.createElement("div"); bar.className="dd-fb-bar";
+    var row=document.createElement("div"); row.className="dd-fb-row";
+    var lbl=document.createElement("span"); lbl.innerHTML='notes <span class="dd-badge">0</span>'; badge=lbl.querySelector(".dd-badge");
+    var ex=document.createElement("button"); ex.type="button"; ex.textContent="Copy feedback";
+    ex.addEventListener("click",function(){ copyText(exportYaml(), "feedback copied — create "+DIR+FILE); });
+    row.appendChild(lbl); row.appendChild(ex);
+    bar.appendChild(row);
+    bar.appendChild(fileLine("file:", FILE));
+    bar.appendChild(fileLine("path:", DIR+FILE));
+    document.body.appendChild(bar); refresh();
+  });
+})();
+
+</script>
+</body>
+</html>
