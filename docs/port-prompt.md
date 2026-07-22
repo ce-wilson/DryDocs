@@ -989,6 +989,27 @@ Done-means (checkable — a row flips `done` only when ALL its checks hold):
   amended + fixtures updated in the same commit); until then treat pipeline.json/dataset_flow
   field names as ASSUMED.
 
+GATE ADOPTION DOCTRINE (two-tier — SME-ruled in-chat 2026-07-21, prompted by
+PORT-REPORT-6fd3270 adopting the producer L7 doc-traceability gate; this section IS the
+written rule the prior "company runs its own gates" doctrine lacked):
+- Tier A — the company holds NO signed position on the subject: a port MAY adopt a
+  producer-signed gate outcome (config status flips, vocab activations) provided ALL of:
+  (1) the same SME signed the producer gate; (2) the port verifies company-context
+  compatibility (reconcile guards + full suite green, checks documented in the PORT-REPORT);
+  (3) a short RATIFICATION ENTRY lands in the COMPANY gate-log — subject, producer gate
+  reference, checks performed, sign-off. A port report is evidence, not a gate ledger;
+  the ratification entry is what turns "a port did this" into "the company decided this".
+  Precedent: the L7 adoption in PORT-REPORT-6fd3270 (SME judged the producer stream
+  authoritative for that range; ratification entry owed retroactively).
+- Tier B — the company holds ITS OWN signed position on the subject: adoption is
+  PROHIBITED; a full company gate session must supersede-or-reconcile before (or instead
+  of) the flip. Known Tier B pending: producer C12 platforms-taxonomy sign-off (`603acba`,
+  registry model wins / SchedulerKind retires) vs the company's own 2026-06-29 AIS gate
+  (AisCapability/AisTool) — the NEXT port range carries this collision; hold those flips
+  until the company gate rules.
+- Graph WRITES are always yours regardless of tier (see T9): adoption can flip config
+  status, never substitute for load verification against the company graph.
+
 ACCEPTANCE GATE (behavior is the contract, not a byte-compare):
 - Track 1 (portable, no production sample present):
     poetry run pytest tests/unit/test_variable_classifier.py tests/unit/test_variable_resolver.py \
