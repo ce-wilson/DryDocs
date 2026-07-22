@@ -26,6 +26,62 @@ Tags help grooming: `idea` · `bug` · `doc` · `source` (new data source) · `q
 
 <!-- add new ideas at the top -->
 
+- 2026-07-22 — [idea] **The tie we need now: Control-M → SEAL batch :Port attribution as a
+  DEFINED mapping, keyed by the Control-M APP CODE (:ControlMApplication), persisted via
+  the mapping store (steward persona — NOT new UI).** SME model (2026-07-22, refined in
+  session):
+  (a) Grain correction — attribution was NEVER meant to be job-level; the graph grain is
+  **folder → batch :Port** (jobs inherit via CONTAINS_JOB). Corrects the active
+  `m3_seal_app_ref` (ControlMJob → :BusinessApplication, seal_attribution.py live).
+  (b) The mapping should have been DEFINED, not matched: the authoring key is the
+  **Control-M app code** — the :ControlMApplication folder-header grouping (which
+  CONTAINS_FOLDER already ties to folders, so folder edges derive from the app-code row).
+  Two tiers:
+  **Tier 1 — seal-born app code (1:1):** the code was created FOR a SEAL → direct
+  app-code→SEAL mapping. Declared examples: ARA=111027 (CMH Advice R&A), SRV=110865
+  (HL Servicing R&A). Easy to define; enumerate these first.
+  **Tier 2 — platform app code (1:many):** the code is a shared platform, mapping to
+  MANY AreaProducts, not one SEAL — e.g. DPL= ?? (enumeration OPEN, SME to supply).
+  Note: AreaProduct has ZERO rows in the sample taxonomy (lob-product-team.yaml OQ
+  `area-product-missing`) — tier 2 makes that layer load-bearing; the OQs converge.
+  Gate impact: the still-open K4 edge-shape follow-up gate owns target (app node vs
+  BatchProcessing :Port), from_node (job → folder, derived from app-code), the
+  defined-mapping tiers (seal-born vs platform), and migration of K2-written job edges.
+  The K2 fuzzy match policy (SEAL > FID > APP_NAME > ALIAS) demotes to fallback for
+  codes with no defined row; tier-5 manual pins unchanged. Conflict rule: a folder whose
+  app code is tier-2/unresolved surfaces to the steward — never auto-picked.
+  Mechanism after the gate: register the app-code→SEAL(:Port) and app-code→AreaProduct
+  edges (matrix rows for Collection→Entity — Activity→Agent WAS_ASSOCIATED_WITH no
+  longer fits), new mapping-store domain (app-code-keyed table replacing/demoting
+  `job-application`; update K2_SHAPE in drydocs_api/mappings.py), rekey the
+  manual-loads template, migrate live edges. Bonus once this + `batch_orchestrator`
+  (C14) both exist: folder-mapped-to-ControlM vs app-declared Autosys becomes a
+  conformance check.
+  **Property-diet rider (SME, same session):** the naming-convention decode must come
+  OFF :ControlMFolder node properties. Convention (folder_name.py, confirmed):
+  pos1=env, pos2=lob, pos3-5=app_code, pos6=folder_type — so job application=PRSRV =
+  P(rod)+R(etail)+SRV, the prefixed form of the folder's bare app_code=SRV. SME:
+  `lob=Retail` / `lob_code=R` are artifacts of the Control-M app-code naming convention
+  and as node properties they CONFUSE users — f.lob='Retail' collides with the org-
+  taxonomy LOB (business-application.yaml `lob: CCB`), same word, different taxonomy.
+  Today controlm_folders.cypher:66-72 stamps environment*/lob*/app_code/folder_type* on
+  every folder. SME 2026-07-22: the docstring rationale "filter by environment, LOB, or
+  appcode without re-parsing" was likely UNINTENTIONAL, not a decision — and it fails on
+  all three counts: (1) ENV truth is the **data_center prefix** (:ControlMServer name),
+  NOT folder-name pos-1 — this rule is in NO document yet (verified: all data_center doc
+  hits are staging-key mechanics) → gate must land it in the concept-mapping doc;
+  (2) LOB decode has ONE real value (LOB_CODE_MAP: R=Retail; Y/K/B are provisional
+  placeholders per the code comments) — a name wildcard gives the same filter, and users
+  don't know the codes anyway; (3) the real access pattern is a **ROLLUP** (inventory
+  aggregated up folder → app-code → SEAL/AreaProduct via containment + defined mapping),
+  not a property filter. Direction: decode lives ONCE in the app-code registry /
+  defined-mapping rows; the node keeps sched_table raw (+ likely app_code as the join
+  key — confirm at gate; with the filter rationale dead, environment/folder_type decode
+  props presumably go too, env prop being actively misleading vs the data_center rule).
+  Mechanics: loader + cypher edit, property-retirement migration per the M2 doc-06
+  Phase 3 raw-prop pattern; parsed fields are inside row_checksum, so expect a one-time
+  delta-churn on the next run (M2 precedent handled the same).
+
 - 2026-07-22 — [chore] **Company adoption: route the XML run's WARN flood through the new
   loader run logs (next port).** Producer BUILT the generalized run-log family same day
   (user directive after the first company XML run flooded the console with per-row
