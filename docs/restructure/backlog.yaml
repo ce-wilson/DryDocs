@@ -5003,7 +5003,7 @@ items:
     agent: main
     model: sonnet
     priority: p2
-    status: todo
+    status: todo         # SME HOLD 2026-07-22: runbook template shape goes through a HITL template session BEFORE this view is built — deps are done but do NOT pull this item until that session rules (see summary groom note)
     depends_on: [O11, O17]
     inputs: [UI-WIP/wf-runbook-path-01.md, UI-WIP/wf-runbook-path-01.html, web/src/routes/RunbooksRoute.tsx, drydocs_api/query_specs.py, web/src/runbooks/demoRunbooks.ts]
     acceptance: >
@@ -5125,8 +5125,10 @@ summary:
   blocked: 0
   done: 125                                        # +M2 provenance diet cleanup migration, run live (2026-07-21 pm)
   next_ready: [M3, M4, P3, J10, Q6, O23, J13, G18, G19, O26, G26]
-  # HITL-free groom (2026-07-21 pm): P3, J10, Q6, J13, G18, G19, O26, G26 are workable
-  # with NO gate session — P3/G21 implement already-signed rulings (CM_HOSTS 07-09,
-  # cmd-line 07-15); G18..G21+G24+G25 are staging-only pre-G22 (no graph writes by
-  # design). HITL-required from next_ready: M3, M4 (per-source gates), O23 (IS a gate).
+  # HITL-free groom (2026-07-21 pm; O26 pulled 07-22): P3, J10, Q6, J13, G18, G19, G26
+  # are workable with NO gate session — P3/G21 implement already-signed rulings
+  # (CM_HOSTS 07-09, cmd-line 07-15); G18..G21+G24+G25 are staging-only pre-G22 (no
+  # graph writes by design). HITL-required from next_ready: M3, M4 (per-source gates),
+  # O23 (IS a gate), O26 (SME hold 2026-07-22: runbook template shape goes through a
+  # HITL template session first — do not build the view ahead of it).
   # Chain after G18+G19 land: G20 -> G21, G24; G25 after G19. Q6 = external-work-in -> branch.
