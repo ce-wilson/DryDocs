@@ -28,7 +28,7 @@ Tags help grooming: `idea` · `bug` · `doc` · `source` (new data source) · `q
 
 - 2026-07-22 — [idea] **Control-M compact-timestamp normalization (mechanism, from the
   company XML-loader's second timestamp bug).** Control-M XML exports carry compact
-  timestamps `yyyyMMddHHmmss` + literal `UTC` suffix (e.g. shape `20250715172540UTC`);
+  timestamps `yyyyMMddHHmmss` + literal `UTC` suffix (invented example: `20250101093000UTC`);
   fed raw into Cypher `datetime()` they throw `CypherSyntaxError` — not ISO 8601, and
   `UTC` is not a valid zone designator (`Z`/`+00:00`). Fix mechanism when the XML loader
   back-flows (and for any future producer temporal field): (1) normalize in PYTHON at the
