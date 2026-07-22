@@ -141,7 +141,7 @@ OWED COMPANY-SIDE (from the 6fd3270 review):
 | T9  | Lineage curated live load — YOUR vocab gate + m3_* flips, then write_curated on your graph | pending |
 | T10 | MAC field contract validated vs a REAL DPL export — amend dpl_mac.py contract + fixtures together | pending |
 | T11 | L7 ratification entry in company gate-log (Tier A record; see above) | pending |
-| T12 | Company platforms gate: 06-29 AIS position vs producer C12 — supersede-or-reconcile (Tier B, gates step 43's flips) | pending |
+| T12 | Company platforms gate: 06-29 AIS position vs producer C12 — supersede-or-reconcile (Tier B, gates step 43's flips) | pending — session pack ready: [`port-T12-company-gate-pack.md`](port-T12-company-gate-pack.md) (2026-07-21) |
 
   Done-means for T1–T10 are unchanged — they live verbatim in the archive's tracker
   section. T9 reminder: producer sign-off never substitutes for load verification on
@@ -159,7 +159,16 @@ STEP LEDGER — delta since `6fd3270` (numbering continues from the archive):
                gate-log, backlog, gates.json, enforcement-matrix.json)
       bea7159  chore(ritual): snapshot (EXCLUDED class — guardrail 4)
       74716cf  docs(port): gate-adoption doctrine
-      + the port-prompt v2 rolling restructure and any later commits.
+      27102d6  feat(ontology): C13 DONE — SchedulerKind retirement build (seeds retired
+               audit-kept; seal_requires_scheduler deprecated/superseded; map entry
+               closed rejected/superseded; Ais* straggler sweep) — Tier B-gated by T12
+      2adec42  feat(load): C14 DONE — batch_port_orchestrator loader, live-verified
+               producer-side (edge MERGE keyed {source:'batch-port'}; software_registry
+               .cypher hardened to key {source:'registry'}) — code ports normally;
+               RUNNING it company-side is T12-gated + T9 (your graph, your verify)
+      fb8ac23  chore(ritual): snapshot (EXCLUDED class — guardrail 4)
+      + the port-prompt v2 rolling restructure, docs/port-T12-company-gate-pack.md
+        (T12 session materials — clean-add), and any later commits.
     *** TIER B HOLD ***: the company holds its OWN signed position on platforms — the
     2026-06-29 AIS gate (AisCapability skos:Concept / AisTool prov:SoftwareAgent,
     USES_TOOL + IN_CAPABILITY) — which C12's registry-model ruling contradicts.
@@ -177,7 +186,8 @@ STEP LEDGER — delta since `6fd3270` (numbering continues from the archive):
     - C13/C14 build commits (SchedulerKind retirement, USES_SOFTWARE migration) are
       producer-side follow-ups that will land in this range — they are Tier B-gated
       company-side by the same T12 ruling.
-    Producer-side reference at 74716cf: 833 passed / 4 skipped (tests/unit).
+    Producer-side reference at 74716cf: 833 passed / 4 skipped (tests/unit);
+    at 2adec42 (C13+C14 landed): 840 passed / 6 skipped.
 
 ACCEPTANCE GATE (behavior is the contract, not a byte-compare):
 - Track 1 (portable, no production sample present):
@@ -190,7 +200,7 @@ ACCEPTANCE GATE (behavior is the contract, not a byte-compare):
 - Full `pytest tests/unit/` — ZERO failures is the contract; skips are
   environment/fixture-absence by design (production CSVs, XML fixtures, fastapi
   optional dep, essential-graphrag PDF, J7 guards without RECONCILE_BEFORE_DIR).
-  Producer reference at the current step-43 head: 833 passed / 4 skipped.
+  Producer reference at the current step-43 head (2adec42): 840 passed / 6 skipped.
   Company reference at the last port: 1174 passed / 21 skipped / 0 failed.
 - CI guards green: test_schema.py (EXPECTED_CONSTRAINTS company-based — see ledger;
   every active edge has its supplement block), test_classification.py,
