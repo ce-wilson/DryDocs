@@ -21,11 +21,15 @@ authoritative.
 - `knowledge/` — Internal-Public design prose: ontology docs, naming standards (no secrets)
 - `config/` — pipeline configuration **by id, not by value** (no real names/secrets)
 - `config/taxonomy/` — hierarchy *shape* (no confidential rosters)
-- `drydocs/`, `tests/`, `docs/`, `scripts/` — code & process docs (no embedded secrets)
+- `drydocs/`, `drydocs_core/`, `drydocs_api/`, `drydocs_lineage/`, `drydocs_deepdoc/`,
+  `drydocs_remediation/`, `web/`, `tests/`, `docs/`, `scripts/` — code & process docs
+  (no embedded secrets)
 - `CLAUDE.md`, `README.md`
 
 ## Excluded before any public push (classification: Internal or Internal-Confidential)
 - `internal/**` — real rosters, schemas, SIDs, server addresses, GHE org names
+- `internal-local/**` — gitignored entirely (never committed to ANY remote): real configs,
+  raw extracts, screenshot evidence, Confluence sandbox output
 - `.env`, `*.env`, credentials, `Neo4j-credentials-*.txt`
 - `drydocs/data/samples/**` if it ever contains real (non-synthetic) rows
 - Any file whose source is registered `Internal` / `Internal-Confidential` in

@@ -17,6 +17,11 @@ Rough map of what's in here:
   the specs.
 - **Job-scheduler metadata parsing** — `external/orchestration/` mirrors public
   vendor docs that I use as test input for hierarchy-import experiments.
+- **A small web console** — a React front end (`web/`) over a thin read-only API
+  (`drydocs_api/`), mostly an excuse to see whether the graph is actually
+  navigable by someone who isn't me.
+- **Design docs that render themselves** — markdown under `docs/design/` with a
+  deterministic HTML renderer, so the docs and the code drift less.
 - **A CLI** that glues the experiments together: `poetry run drydocs --help`.
 
 ## Running it

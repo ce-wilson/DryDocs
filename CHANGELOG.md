@@ -7,7 +7,54 @@ Bracketed ids reference `docs/restructure/backlog.yaml`.
 
 ## [Unreleased]
 
-_Nothing yet._
+Everything since `v0.3.0` (2026-07-09). Not yet cut as a release; the version in
+`pyproject.toml` still reads `0.3.0` until the release ritual runs.
+
+### Added
+
+- **Web console + thin read API (Epic O, phases 1–12 complete; O20 gate signed off).**
+  Launchable React site (`web/`) on a shared module template — Explorer, lineage DAG,
+  mappings stewardship, ownership rollup, loads timeline, runbooks/remediation, docs corpus
+  map, gates record, and an admin config-traceability lens with a generated enforcement
+  matrix. QuerySpec registry with two-path export + provenance manifests [O11]; persona
+  sign-in with role-gated views [O2]; GraphAccess seam — API adapter primary, bolt dev-only
+  per ADR 0005 [O4–O6]; `drydocs_api` read-only FastAPI component [O5]. Write-shaped
+  surfaces stay HITL: SEAL-contacts override list as an origin-flagged store [O24] and gate
+  pages that draft their own gate-log entry client-side [O25].
+- **Mapping store** — SQLite materialization of the mapping layer (M0–M4 of the 07-17 plan),
+  steward endpoints, changeset artifacts, and the O13 live demo.
+- **Component split executed** — `drydocs_core` physical extraction [G2]; scaffolds for
+  `drydocs_lineage` + `drydocs_deepdoc` [G4]; `drydocs_remediation` built in-monorepo
+  (M0 PoC, R1 detector, Tier-1 transform engine, Jira handoff, corroboration) [G3, ADR 0002-B];
+  depgraph lineage re-home [G9, ADR 0002-C] with extractor coverage accounting [G11].
+- **Lineage seams** — live CMDLINE pattern closure, DPL launcher argument contract [G15],
+  FACT_REGISTRY ETL canonicals + value contracts [G16], DPL MAC ingest seam (dataset-flow
+  candidates, kind discriminator, SEAL facts) [G17]; rua-extract ingest phase groomed behind
+  a gate [G18–G25].
+- **SEAL attribution live** — K2 match-policy gate + loader (`m3_seal_app_ref` ACTIVE,
+  `WAS_ASSOCIATED_WITH` edges); BusinessApplication entity reshape executed via K3/K4
+  (qualified attribution, TOMRole scheme, `:Application` → `:BusinessApplication`);
+  K5 Product Cabinet attribution; manual-CSV tier-5 final option.
+- **Platforms taxonomy resolved** — C11 company-confirmed capture, C12 gate signed off
+  (SchedulerKind retires into the software-registry model), C13/C14 builds executed.
+- **Provenance diet executed** — M2 migration HITL-confirmed and run live (blanket-edge
+  cleanup, raw-prop retirements, renames; m3-verify green) [doc 06 Phase 3].
+- **Source gates + probes** — CM_HOSTS host-topology and CM_AVG_RUN runtime-supplement gates
+  signed; `add-source-object` skill; P1 probe readout transcribed (preflight + CM_AVG_RUN
+  answered end to end; CM_HOSTS definition probes + DC scope call still owed).
+- **Doc system completed (Epic L)** — SME-feedback panels + per-subsection annotation
+  [L10–L11], single screen+print render surface [L13], review outline as the third doc type
+  with exemplar-pin tests [L15]; runbooks for startup/refresh, web console, mapping demo,
+  and lineage MAC ingest.
+- **Infrastructure** — CI [J5] + testcontainers e2e [J9]; `config/dev-environment.yaml`
+  drift-guarded dev topology; PORT-MANIFEST.yaml as the machine-readable port authority;
+  Essential GraphRAG lexical load + traversal experiment [Q1–Q2].
+
+### Changed
+
+- Main history squashed to a fresh "Initial import" root (2026-07-20); pre-squash history
+  preserved locally under the `archive/old-history-2026-07-20` tag.
+- Port prompt rolled to the v2 rolling format (steps 1–42 frozen in the archive doc).
 
 ## [0.3.0] - 2026-07-09
 
