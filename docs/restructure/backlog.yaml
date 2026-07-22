@@ -4550,7 +4550,7 @@ items:
     agent: main
     model: sonnet
     priority: p2
-    status: todo
+    status: done                        # 2026-07-22: drydocs_core/data_root.py (one shared resolver + rua subfolders), rua-inventory registered internal-confidential confirmed:false (G22 = activation), collect/README "Where bundles live", test_data_root.py guard sweep
     depends_on: []
     inputs: [drydocs_core/adapters/sql_run_log.py, config/source-registry.yaml, config/classification.yaml, drydocs_lineage/collect/README.md, PUBLISH-BOUNDARY.md]
     acceptance: >
@@ -5120,11 +5120,11 @@ items:
       work); ontology epic keeps the gate lineage visible.
 
 summary:
-  todo: 19                                         # M2 pulled and completed 2026-07-21 pm
+  todo: 18                                         # G19 pulled 2026-07-22
   in_progress: 1                                   # E1 (gate deferred both sides)
   blocked: 0
-  done: 125                                        # +M2 provenance diet cleanup migration, run live (2026-07-21 pm)
-  next_ready: [M3, M4, P3, J10, Q6, O23, J13, G18, G19, O26, G26]
+  done: 126                                        # +G19 out-of-repo data root (2026-07-22)
+  next_ready: [M3, M4, P3, J10, Q6, O23, J13, G18, G25, O26, G26]
   # HITL-free groom (2026-07-21 pm; O26 pulled 07-22): P3, J10, Q6, J13, G18, G19, G26
   # are workable with NO gate session — P3/G21 implement already-signed rulings
   # (CM_HOSTS 07-09, cmd-line 07-15); G18..G21+G24+G25 are staging-only pre-G22 (no

@@ -93,6 +93,26 @@ All record files are tab-separated with a header row — the same machine-first
 shape the lineage component already ingests (see the CSV-driven
 `controlm_inventory` extractor).
 
+## Where bundles live (G19 — the landing zone)
+
+**Bundles NEVER enter the repo tree.** They hold real hostnames, uids, home
+paths, and profile/script copies (Internal-Confidential), so they land
+out-of-tree — the same idiom as the run logs (`~/logs/DryDocs`):
+
+```
+DRYDOCS_DATA_ROOT            env override; default ~/data/DryDocs
+  rua/incoming/              carried-back rua_*.tar.gz bundles, as collected
+  rua/extracted/<bundle>/    one directory per unpacked bundle
+```
+
+Resolution lives in ONE shared helper — `drydocs_core/data_root.py`
+(`rua_incoming_dir()` / `rua_extracted_dir(bundle)`); the G20 extractor reads
+from there. The source is registered as `rua-inventory` in
+`config/source-registry.yaml` (`confirmed: false` until the G22 gate — nothing
+writes the graph before it), and `tests/unit/test_data_root.py` sweeps the
+repo tree to enforce that only the pointer, never a bundle, is committed.
+Transport from the server stays per the internal-local hand-carry note.
+
 ## How it connects back to the lineage graph
 
 The bundle is the **server-side half** of the inventory. A future lineage

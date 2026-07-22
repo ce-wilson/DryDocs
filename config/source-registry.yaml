@@ -12,7 +12,7 @@
 # =============================================================================
 
 schema: drydocs.source-registry.v1
-updated: 2026-07-09
+updated: 2026-07-22
 
 sources:
   # ---- Orchestration metadata (Tier-2 vendors) -----------------------------
@@ -195,6 +195,29 @@ sources:
       (Jira, Gherkin/BDD, BRD — the incremental-context-loop plan) register as
       their OWN source entries feeding the same classes, each through its own
       gate.
+
+  # ---- Server inventory (rua collector bundles) -----------------------------
+  - id: rua-inventory
+    classification: Internal-Confidential   # bundles hold real hostnames, uids, home paths, profile + script copies
+    source: "rua_*.tar.gz bundles under DRYDOCS_DATA_ROOT (~/data/DryDocs/rua/) — collected on Control-M execution hosts by drydocs_lineage/collect/rua_inventory.sh"
+    kind: server-inventory
+    orchestrator: bmc-controlm            # inventories the orchestrator's execution hosts
+    adapter: ~                            # G20 extractor (drydocs_lineage/extractors/rua_inventory.py) pending
+    locator:
+      data_root: "DRYDOCS_DATA_ROOT (default ~/data/DryDocs); rua/incoming/ = tarballs, rua/extracted/<bundle>/ = unpacked"
+      resolver: drydocs_core/data_root.py # the ONE shared helper (G19)
+    feeds_taxonomy: [scripts, hosts]
+    confirmed: false                      # G22 rua-load gate pending (clauses a-g); NOTHING writes the graph before it
+    notes: >
+      G19 registration — THE POINTER, NEVER THE DATA: bundle payloads are
+      Internal-Confidential and NEVER enter the repo tree (guard:
+      tests/unit/test_data_root.py sweeps for rua_*.tar.gz / extracted
+      bundles; transport is the internal-local hand-carry note). Bundles land
+      out-of-tree beside the run logs (~/data like ~/logs — user call
+      2026-07-21: unstructured, can be big, belongs outside the project).
+      Chain: G18 collector parity -> G20 extractor (staging records with the
+      meta.txt provenance envelope) -> G21 code-operations pass -> G22 HITL
+      gate, which is this entry's activation condition.
 
   # ---- Data platforms (sources of DataAsset/lineage) -----------------------
   - id: oracle-schemas
