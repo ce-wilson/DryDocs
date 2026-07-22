@@ -1,10 +1,10 @@
 // =============================================================================
-// provisioning/smoke_ddall.cypher  —  G1 acceptance smoke (read-only)
+// provisioning/smoke_drydocs_all.cypher  —  G1 acceptance smoke (read-only)
 //
-//   cypher-shell -d ddall -f smoke_ddall.cypher
+//   cypher-shell -d ddall -f smoke_drydocs_all.cypher
 //
-// Reads BOTH constituents through the composite and writes NEITHER. On a freshly
-// provisioned (empty) topology this returns 0 / 0 — success is that the federated
+// Reads ALL THREE constituents through the composite and writes NONE. On a freshly
+// provisioned (empty) topology this returns 0 / 0 / 0 — success is that the federated
 // query RUNS AT ALL: both aliases resolve and no write occurs. While `drydocs` is
 // mid-rebuild a constituent may be temporarily absent; treat that as "target not
 // currently present", not a failure (ADR 0002 rollout state).

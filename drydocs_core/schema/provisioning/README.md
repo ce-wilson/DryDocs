@@ -1,15 +1,16 @@
 # schema/provisioning — multi-DB topology (Epic G1 · ADR 0002 D1)
 
-Provisions the three-database topology from
-[ADR 0002](../../../docs/decisions/0002-component-database-topology.md) on a **Neo4j
-Enterprise** DBMS. Authoring + structure only — **no data load** here.
+Provisions the multi-database topology from
+[ADR 0002](../../../docs/decisions/0002-component-database-topology.md) — three data
+databases plus one composite — on a **Neo4j Enterprise** DBMS. Authoring + structure
+only — **no data load** here.
 
 | File | Run against | Purpose |
 |---|---|---|
-| `01_databases.cypher` | `system` | `CREATE DATABASE drydocs`, `ddcontext`, `CREATE COMPOSITE DATABASE ddall` + aliases |
-| `02_proxy_constraints.cypher` | **each** of `drydocs`, `ddcontext` | proxy-node business keys: `DataAsset.assetId` UNIQUE, `ControlMJob (folder_id, job_id)` NODE KEY |
-| `smoke_ddall.cypher` | `ddall` | read-only federated query — reads both constituents, writes neither |
-| `provision.ps1` | — | runner: applies 01 → 02 (×2) → smoke via `cypher-shell` |
+| `01_databases.cypher` | `system` | `CREATE DATABASE drydocs`, `ddlineage`, `ddcontext`, `CREATE COMPOSITE DATABASE ddall` + aliases |
+| `02_proxy_constraints.cypher` | **each** of `drydocs`, `ddlineage`, `ddcontext` | proxy-node business keys: `DataAsset.assetId` UNIQUE, `ControlMJob (folder_id, job_id)` NODE KEY |
+| `smoke_drydocs_all.cypher` | `ddall` | read-only federated query — reads all three constituents, writes none |
+| `provision.ps1` | — | runner: applies 01 → 02 (×3) → smoke via `cypher-shell` |
 
 ## Run
 
@@ -18,7 +19,7 @@ Enterprise** DBMS. Authoring + structure only — **no data load** here.
 .\provision.ps1 -Uri bolt://localhost:7687 -User neo4j -Password password
 ```
 
-Idempotent (`IF NOT EXISTS` throughout). On a fresh topology the smoke returns `0 / 0`;
+Idempotent (`IF NOT EXISTS` throughout). On a fresh topology the smoke returns `0 / 0 / 0`;
 success is that the federated query **runs** (both aliases resolve, no write).
 
 ## Why these keys (no identity invented)

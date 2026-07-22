@@ -16,8 +16,8 @@
   Then:
     .\provision.ps1 -Uri bolt://localhost:7687 -User neo4j -Password password
 
-  Target-agnostic: the same scripts run unchanged against any multi-DB-capable DBMS
-  (self-managed Enterprise or an Aura tier that supports multiple databases).
+  Target-agnostic: the same scripts run unchanged against any multi-DB-capable
+  self-managed Enterprise DBMS (Aura was ruled out 2026-07-06).
 #>
 [CmdletBinding()]
 param(
