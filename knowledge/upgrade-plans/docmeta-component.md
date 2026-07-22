@@ -187,9 +187,10 @@ boundary + classification + doc-registry tests green.
 | **P6 — T2/T3 ingestion** | `knowledge/standards/**`, `docs/Product/`, SDLC docs through the gate into `drydocs_docs` | Every loaded doc traces to a confirmed registry entry + curation record |
 | **P7 — T4 connectors (company-side)** | Confluence impl, SharePoint/Teams (Graph API), email → `drydocs_context` | §6 Track-2; raw content never leaves `internal/`/gitignored paths |
 
-P4's live deploy inherits the **G7 blocker** (single-DB Aura can't host `drydocs_docs` +
-composite) — everything runs local-Enterprise until the multi-DB target exists, same as
-deepdoc.
+P4's live deploy formerly inherited the **G7 blocker** (single-DB Aura couldn't host
+`drydocs_docs` + composite) — **resolved**: Aura was dropped (2026-07-06) and the local EE
+container (`config/dev-environment.yaml`) hosts the multi-DB topology, so P4 needs only a
+`drydocs_docs` provisioning delta, same as deepdoc.
 
 ---
 

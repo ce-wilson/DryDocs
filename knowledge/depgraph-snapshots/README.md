@@ -54,12 +54,14 @@ Each snapshot's summary line reports `files`, `edges`, `circular_files`. To see 
 ### Live Neo4j connection (viewer.html)
 The viewer's **🔌 Live Neo4j** button fetches the graph straight from a Neo4j **Query API v2**
 endpoint and renders it as **A** (Dependencies view) — no file load, no build.
-- Enter the **Query API URL** (`https://<id>.databases.neo4j.io/db/<db>/query/v2`), **user**, and
-  **password**. "Remember" persists only the URL + user in `localStorage`; the **password is never
-  stored** and creds are held in memory for the session.
+- Enter the **Query API URL** — local EE container:
+  `http://localhost:7474/db/<db>/query/v2` (canonical names/ports in
+  `config/dev-environment.yaml`; hosted instances use their own
+  `/db/<db>/query/v2` URL) — plus **user** and **password**. "Remember" persists
+  only the URL + user in `localStorage`; the **password is never stored** and
+  creds are held in memory for the session.
 - It runs `MATCH (f:CodeFile) …` + `MATCH (a:CodeFile)-[:DEPENDS_ON]->(b) …`, so the graph must be
-  loaded first (below). Aura's Query API sends `access-control-allow-origin: *`, so this works even
-  from `file://`; if a different endpoint blocks CORS, serve the folder over http
+  loaded first (below). If the endpoint blocks CORS from `file://`, serve the folder over http
   (`python -m http.server`) and reopen.
 
 ### Loading the graph into Neo4j
@@ -67,10 +69,11 @@ endpoint and renders it as **A** (Dependencies view) — no file load, no build.
 depgraph cypher <project-root> --project drydocs --profile base -o load.cypher
 # then run load.cypher's 3 statements (constraint, nodes, edges) against the DB.
 ```
-On **Aura single-instance** you can't `CREATE DATABASE depgraph` — load into the default db
-(the instance id) and the `CodeFile`/`DEPENDS_ON` meta-graph coexists with the domain graph
-(distinct labels, no overlap). You can also visualize natively in the **Aura Console → Query**
-tab: `MATCH p=(:CodeFile)-[:DEPENDS_ON]->(:CodeFile) RETURN p`.
+On the local **EE container** (`neo4jtest` — Aura was ruled out 2026-07-06) you can
+`CREATE DATABASE depgraph` so the `CodeFile`/`DEPENDS_ON` meta-graph gets its own DB; on any
+single-database instance, load into the default db instead — the meta-graph coexists with the
+domain graph (distinct labels, no overlap). Native visualization:
+`MATCH p=(:CodeFile)-[:DEPENDS_ON]->(:CodeFile) RETURN p` in Browser/Query.
 
 > NVL (`@neo4j-nvl/base`) is the native lib but needs a build and is licensed for Neo4j-backed
 > apps — `viewer.html` (cytoscape, MIT) stays the zero-friction option, now with a live mode.
