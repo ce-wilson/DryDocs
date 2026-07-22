@@ -221,7 +221,7 @@ def split_book(
 
 
 def extract_pages(pdf_path: Path) -> list[str]:
-    """Per-page text via pypdf (the ingest_jpmc_reports.py precedent)."""
+    """Per-page text via pypdf (an existing project dependency)."""
     from pypdf import PdfReader
 
     reader = PdfReader(str(pdf_path))

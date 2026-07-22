@@ -2,8 +2,7 @@
 
 Converts .pdf / .docx / .pptx files to plain .txt so agents can grep and read
 them without binary parsing. Deterministic and offline: docx/pptx are zip+XML
-(stdlib only); pdf goes through pypdf (already a project dependency — the
-ingest_jpmc_reports.py precedent).
+(stdlib only); pdf goes through pypdf (already a project dependency).
 
 The OUTPUT sits beside the binaries (default: an extracted/ sibling directory)
 and inherits their classification — for gitignored vendor corpora the text

@@ -68,7 +68,7 @@ sources:
 
   - id: jpmc-reports
     classification: External            # public SEC filings / investor-relations PDFs
-    source: "scripts/ingest_jpmc_reports.py (2 local-only PDFs: annualreport-2024 + mda10k-2024; never committed — the root /*.pdf gitignore precedent)"
+    source: "scripts/ingest_jpmc_reports.py (REMOVED 2026-07-22 — one-off script with hardcoded connection, superseded by module loaders; recover via git history if needed. 2 local-only PDFs: annualreport-2024 + mda10k-2024; never committed — the root /*.pdf gitignore precedent)"
     source_url: "https://www.jpmorganchase.com/ir/annual-report (per-doc URLs in the ingest script)"
     captured_at: 2026-06-30             # ingest pipeline committed e419ec7; PDFs fetched for that run
     connector: filedrop
