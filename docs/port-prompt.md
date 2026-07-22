@@ -64,10 +64,11 @@ GUARDRAILS (durable — apply to every port):
    `web/src/generated/gates.json` + `enforcement-matrix.json` (their render scripts),
    `docs/plan/board.html` (from the reconciled backlog), `docs/design/*.html` +
    `*.print.html` (YOUR canonical-company renderer, both variants tracked).
-   Run render scripts from the PROJECT VENV and verify the output path lands inside
-   the workspace checkout before trusting any regen — a non-venv python can resolve
-   the `drydocs` package from a different checkout and silently write artifacts there
-   (observed company-side 2026-07-21: enforcement-matrix written to a scratch clone).
+   Run render scripts from the PROJECT VENV with PYTHONPATH=repo root and verify the
+   output path resolves into the workspace repo before trusting any regen. Beware
+   NTFS junctions: the company workspace path is a junction and Path.resolve()
+   follows it, so correct outputs can REPORT a foreign-looking path (2026-07-21
+   incident — first misdiagnosed as a second checkout; same repo, two path spellings).
 
 6. GATE ADOPTION DOCTRINE (two-tier — SME-ruled in-chat 2026-07-21, prompted by
    PORT-REPORT-6fd3270 adopting the producer L7 doc-traceability gate):
@@ -90,6 +91,10 @@ GUARDRAILS (durable — apply to every port):
    per-entry rows, gate-log append-only). Per-entry files (relationship_vocabulary,
    taxonomy-ontology-map, backlog) are resolved BY ID, never whole-file checkout;
    summaries recomputed exactly as their guard tests do.
+   GUARD SCOPE: the no-downgrade guards are PORT-scoped — run them across port
+   commits only, never across a GATE commit (a gate legitimately deprecates/rejects;
+   the guards false-positive on those authorized downgrades — the gate-log entry is
+   the authority there). Established at the T12 enactment, 2026-07-21.
 
 8. WRITE A PORT-REPORT-<head>.md in the PORT-REPORT-6fd3270 pattern (source &
    mechanism, clean-applies, collisions + resolutions, company-side adaptations,
