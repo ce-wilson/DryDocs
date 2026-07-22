@@ -37,8 +37,16 @@ Tags help grooming: `idea` · `bug` · `doc` · `source` (new data source) · `q
   converts natively, `datetime()` string-parsing never appears in Cypher; (2) two bugs in
   the same family = scattered parsing, consolidate + unit-test the compact-UTC, date-only,
   and empty forms; (3) unparseable value → row to `rows_rejected` + WARN (G16
-  values-decide pattern), never a batch abort at `_flush`. Company-side fix owned by the
-  internal agent; this entry is the sanitized mechanism for back-flow parity.
+  values-decide pattern), never a batch abort at `_flush`. **FIXED company-side same day
+  (as-built mechanism, supersedes the proposal above for back-flow):** a `_ts()`
+  normalizer in the XML extractor emits the ISO *string* the loaders' existing Cypher
+  `datetime(replace(x, ' ', 'T'))` contract expects (one temporal contract shared with
+  the Oracle path — better than forking to native datetimes); zone token `UTC`/`Z` → `Z`,
+  numeric offsets kept; 8-digit date-only → midnight; empty/None → None so the null-guard
+  drops the row (fixes the batch abort). Residual gaps flagged to the company agent:
+  unknown non-compact forms pass through to `datetime()` (docstring claims None) and 14
+  valid digits aren't validated as a real date (`strptime` beats `isdigit`+len) — carry
+  both hardenings into the back-flowed version.
 
 - 2026-07-21 — [chore] **Next cross-repo port: carry the AIS acronym expansion across
   files.** Producer's authoritative home is `software-registry.yaml#acronyms`; the company's
