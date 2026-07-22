@@ -26,6 +26,20 @@ Tags help grooming: `idea` · `bug` · `doc` · `source` (new data source) · `q
 
 <!-- add new ideas at the top -->
 
+- 2026-07-22 — [idea] **Control-M compact-timestamp normalization (mechanism, from the
+  company XML-loader's second timestamp bug).** Control-M XML exports carry compact
+  timestamps `yyyyMMddHHmmss` + literal `UTC` suffix (e.g. shape `20250715172540UTC`);
+  fed raw into Cypher `datetime()` they throw `CypherSyntaxError` — not ISO 8601, and
+  `UTC` is not a valid zone designator (`Z`/`+00:00`). Fix mechanism when the XML loader
+  back-flows (and for any future producer temporal field): (1) normalize in PYTHON at the
+  row-model layer (the C3 "Python owns normalization" precedent) — one canonical
+  `parse_controlm_timestamp()` pydantic validator emitting tz-aware `datetime`, driver
+  converts natively, `datetime()` string-parsing never appears in Cypher; (2) two bugs in
+  the same family = scattered parsing, consolidate + unit-test the compact-UTC, date-only,
+  and empty forms; (3) unparseable value → row to `rows_rejected` + WARN (G16
+  values-decide pattern), never a batch abort at `_flush`. Company-side fix owned by the
+  internal agent; this entry is the sanitized mechanism for back-flow parity.
+
 - 2026-07-21 — [chore] **Next cross-repo port: carry the AIS acronym expansion across
   files.** Producer's authoritative home is `software-registry.yaml#acronyms`; the company's
   PROVISIONAL gloss sits on their `source-registry.yaml` docs-source entry with a
