@@ -25,3 +25,17 @@ class SoftwareProductRow(BaseModel):
     vendor_name: str
     publisher_url: str = ""
     used_by_app_id: str | None = None
+
+
+class BatchPortOrchestratorRow(BaseModel):
+    """One app's declared batch-port orchestrator (backlog C14, gate C12).
+
+    ``orchestrator_raw`` is the SEAL-declared string exactly as captured;
+    ``product_id`` is the registry ref resolved through the platforms.yaml
+    seed-row crosswalk, or None when the string is unmapped — the Cypher then
+    flags the app instead of writing an edge (reported, never guessed).
+    """
+
+    seal_id: str
+    orchestrator_raw: str
+    product_id: str | None = None

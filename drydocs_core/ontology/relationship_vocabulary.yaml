@@ -1763,7 +1763,7 @@ local_relationships:
       LOCAL no-PROV Agent→Entity typing covers the migrated fact unchanged.
       Loader migration = backlog C14.
     supplement:   registry_ontology_supplement.cypher
-    loader:       software_registry.py
+    loader:       software_registry.py + batch_port_orchestrator.py   # source: 'registry' stack rows / source: 'batch-port' declared orchestrators (C14)
     domain:       registry
     status:       active
 

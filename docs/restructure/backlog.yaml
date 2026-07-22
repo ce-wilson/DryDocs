@@ -5098,7 +5098,7 @@ items:
     agent: main
     model: sonnet
     priority: p2
-    status: todo
+    status: done          # DONE 2026-07-21 pm — batch_port_orchestrator loader + cypher (MATCH-only endpoints, MERGE keyed {source:'batch-port'}); crosswalk from platforms.yaml seed rows; unmapped = flagged + reported, never guessed; registry cypher hardened to key {source:'registry'} (live shared pair DRYDOCS-SELF->controlm); live-verified on the EE container (3 batch-port + 4 registry edges, idempotent re-runs both writers); 9 new tests; suite 840 green
     depends_on: [C12]
     inputs: [drydocs/loaders/software_registry.py, drydocs/loaders/cypher/software_registry.cypher, config/taxonomy/platforms.yaml, config/taxonomy/business-application.yaml, drydocs_core/ontology/relationship_vocabulary.yaml]
     acceptance: >
@@ -5120,8 +5120,8 @@ items:
       work); ontology epic keeps the gate lineage visible.
 
 summary:
-  todo: 21                                         # -C13 (picked up + completed 2026-07-21 pm)
+  todo: 20                                         # C13+C14 pulled and completed 2026-07-21 pm
   in_progress: 1                                   # E1 (gate deferred both sides)
   blocked: 0
-  done: 123                                        # +C13 SchedulerKind retirement build (2026-07-21 pm)
-  next_ready: [M2, M3, M4, P3, J10, Q6, O23, J13, G18, G19, O26, G26, C14]
+  done: 124                                        # +C13 SchedulerKind retirement build, +C14 batch-port USES_SOFTWARE migration (2026-07-21 pm)
+  next_ready: [M2, M3, M4, P3, J10, Q6, O23, J13, G18, G19, O26, G26]

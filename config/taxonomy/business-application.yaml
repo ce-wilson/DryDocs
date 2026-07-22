@@ -29,6 +29,12 @@ nodes:
 
   # BusinessApplication — keyed by SEALID. Each exposes the SEAL two-port model.
   # info_classification is SEAL's OWN sensitivity label (correlates with our axis — see OQ).
+  # batch_orchestrator (added 2026-07-21, backlog C14) is the SEAL-declared batch-port
+  # orchestrator STRING (synthetic values here, matching the sample) — pure classification;
+  # the MEANING edge it migrates to (USES_SOFTWARE {source: 'batch-port'} -> the registry
+  # :SoftwareProduct) was gated at C12 (platforms-taxonomy, config/gate-log.md 2026-07-21)
+  # and is written only by the batch_port_orchestrator loader via the platforms.yaml
+  # seed-row crosswalk (software_registry_ref). Absent field = no declaration (skipped).
   business_applications:
     - sealid: 82507
       name: Database Scanning Tools
@@ -37,6 +43,7 @@ nodes:
       lob: CCB
       info_classification: Internal
       ports: [EventProcessing, BatchProcessing]
+      batch_orchestrator: ControlM
     - sealid: 111027
       name: Chase MyHome Advice Reporting & Analytics
       short_name: CMH-ADV-R&A
@@ -44,6 +51,7 @@ nodes:
       lob: CCB
       info_classification: Highly Confidential
       ports: [EventProcessing, BatchProcessing]
+      batch_orchestrator: ControlM
     - sealid: 110865
       name: Home Loan Servicing Reporting & Analytics
       short_name: HL-SERV-R&A
@@ -51,6 +59,7 @@ nodes:
       lob: CCB
       info_classification: Highly Confidential
       ports: [EventProcessing, BatchProcessing]
+      batch_orchestrator: Autosys
 
   # Port — the two-port classification (DPROD). Structural: every BusinessApplication has both.
   ports:

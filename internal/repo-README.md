@@ -278,8 +278,9 @@ and loaders don't change.
 
 - Per-execution `:JobRun {kind:'controlm_execution'}` history with `start_time` / `end_time` / `duration_sec`, and rolled-up datetime metrics on `:ControlMJob`.
 - Folder → `:BatchProcessing` linkage (needs a folder-naming resolver + reliable PAT data).
-- `(:BusinessApplication)-[:USES_SOFTWARE {source:"batch-port"}]->(:SoftwareProduct {role:"orchestrator"})` edges from the SEAL batch-port orchestrator strings (backlog C14; replaces the retired `REQUIRES_SCHEDULER → :SchedulerKind` design — C12 gate, 2026-07-21).
 - Graph load of the variable/command normalization output (Phase D — see below).
+
+(WIRED 2026-07-21, backlog C14: `(:BusinessApplication)-[:USES_SOFTWARE {source:"batch-port"}]->(:SoftwareProduct {role:"orchestrator"})` edges from the SEAL-declared batch-port orchestrator strings — `drydocs load-batch-orchestrators`, replacing the retired `REQUIRES_SCHEDULER → :SchedulerKind` design from the C12 gate.)
 
 ---
 

@@ -42,15 +42,19 @@ SET m.last_seen_at = datetime($loaded_at),
 // USES_SOFTWARE only for DryDocs' own stack (used_by_app_id set by the
 // adapter from drydocs_application_id — reserved id, company side reconciles
 // to the real SEAL id at port time).
+// The edge MERGE is KEYED on {source: 'registry'} (C14, 2026-07-21): the
+// same app/product pair may also carry a declared-orchestrator edge
+// (source: 'batch-port', batch_port_orchestrator.cypher) — an unkeyed MERGE
+// would match it and silently reuse it. Existing edges already carry the
+// property, so this stays idempotent against pre-C14 graphs.
 WITH row, sp
 WHERE row.used_by_app_id IS NOT NULL
 MERGE (a:BusinessApplication {seal_id: row.used_by_app_id})
   ON CREATE SET a.name       = 'DryDocs',
                 a.created_at = datetime($loaded_at),
                 a.source     = 'registry'
-MERGE (a)-[u:USES_SOFTWARE]->(sp)
+MERGE (a)-[u:USES_SOFTWARE {source: 'registry'}]->(sp)
   ON CREATE SET u.first_seen_at = datetime($loaded_at),
-                u.source        = 'registry',
                 u.status        = 'active'
 SET u.version      = row.primary_version,
     u.last_seen_at = datetime($loaded_at),

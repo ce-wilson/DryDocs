@@ -19,6 +19,8 @@ Ingest commands:
   drydocs load <name> --csv       — single loader against a CSV file
   drydocs load-software-registry  — third-party software registry from
                                     config/taxonomy/software-registry.yaml
+  drydocs load-batch-orchestrators — C14: declared batch-port orchestrator
+                                    strings -> USES_SOFTWARE {source:'batch-port'}
   drydocs load-bmc-docs           — bmc-docs lexical graph (Document -> Chunk)
                                     from external/orchestration/bmc-controlm/
   drydocs load-essential-graphrag — Essential GraphRAG ebook lexical graph
@@ -104,6 +106,12 @@ from .loaders.software_registry import (
     DEFAULT_REGISTRY_PATH,
     RegistryYamlAdapter,
     SoftwareRegistryLoader,
+)
+from .loaders.batch_port_orchestrator import (
+    DEFAULT_APPS_PATH,
+    DEFAULT_PLATFORMS_PATH,
+    BatchOrchestratorYamlAdapter,
+    BatchPortOrchestratorLoader,
 )
 from drydocs_core.neo4j_client import Neo4jClient
 from drydocs_core.source_registry import (
@@ -601,6 +609,51 @@ def load_software_registry(
     with _client() as cli:
         summary = SoftwareRegistryLoader(cli, adapter).load()
     console.print(summary.as_dict())
+
+
+@app.command(name="load-batch-orchestrators")
+def load_batch_orchestrators(
+    apps_path: Path = typer.Option(
+        DEFAULT_APPS_PATH,
+        "--apps",
+        help="Path to business-application.yaml (the SEAL taxonomy capture).",
+    ),
+    platforms_path: Path = typer.Option(
+        DEFAULT_PLATFORMS_PATH,
+        "--platforms",
+        help="Path to platforms.yaml (the seed-row crosswalk to the registry).",
+    ),
+) -> None:
+    """Load declared batch-port orchestrator edges (backlog C14, gate C12).
+
+    Migrates each app's SEAL-declared batch-port orchestrator string to
+    (:BusinessApplication)-[:USES_SOFTWARE {source: 'batch-port'}]->
+    (:SoftwareProduct) via the platforms.yaml software_registry_ref crosswalk.
+    MATCH-only on both endpoints — run the SEAL chain and
+    `drydocs load-software-registry` first. Unmapped strings are REPORTED
+    (flagged on the app node + listed below), never guessed.
+    """
+    _gate_source("seal-extract")  # confirmed-gate before any DB write
+    for path in (apps_path, platforms_path):
+        if not path.exists():
+            console.print(f"[red]Missing: {path}[/]"); raise typer.Exit(1)
+    adapter = BatchOrchestratorYamlAdapter(apps_path, platforms_path)
+    with _client() as cli:
+        summary = BatchPortOrchestratorLoader(cli, adapter).load()
+    console.print(summary.as_dict())
+    # Coverage report (the invocation-patterns coverage-policy rule: counts
+    # always reported, never silent).
+    mapped = summary.rows_processed - len(adapter.unmapped)
+    console.print(
+        f"coverage: {mapped}/{summary.rows_processed} declared strings mapped; "
+        f"{adapter.apps_without_declaration} app(s) with no declaration (skipped)"
+    )
+    for miss in adapter.unmapped:
+        console.print(
+            f"[yellow]UNMAPPED[/]: app {miss['seal_id']} declares "
+            f"'{miss['orchestrator_raw']}' — no software_registry_ref in "
+            "platforms.yaml (flagged batch_orchestrator_unmapped; no edge written)"
+        )
 
 
 @app.command(name="load-bmc-docs")
