@@ -1,5 +1,10 @@
 # SME checklist + sequential load plan
 
+> **POINT-IN-TIME SNAPSHOT (2026-06-21) — retained as a record.** The A-list items (D2, D3,
+> E1 draft, F1/F2 drafts) have all since shipped or reached their gates; current work state
+> lives in [`backlog.yaml`](backlog.yaml) + [`config/gate-log.md`](../../config/gate-log.md),
+> and the load order in §C is superseded by the loaders' actual sequencing. Do not update.
+
 **Date:** 2026-06-21. Written after D1 (P0 graph fixes). The D1 caveat: `m3-verify` and any
 real load need a **live Neo4j + APOC** (and production ingest needs **Oracle**), which aren't
 available to the autonomous agent. This doc separates **what can proceed without you/data** from

@@ -86,7 +86,7 @@
 | 01-project-plan.md | 2026-06-20 | 2026-07-05 | living | The phased project plan |
 | 02-backlog.md | 2026-06-20 | 2026-07-07 | record | Legacy text backlog view (superseded by backlog.yaml + board) |
 | 03-hitl-sme-flow.md | 2026-06-20 | 2026-07-07 | living | The guided per-decision HITL SME gate flow |
-| 04-sme-checklist-and-load-plan.md | 2026-06-21 | 2026-06-21 | living | SME checklist + sequential load plan |
+| 04-sme-checklist-and-load-plan.md | 2026-06-21 | 2026-07-22 | record | SME checklist + sequential load plan (snapshot; supersession banner added in pass 2) |
 | 05-drydocs-review-backflow.md | 2026-07-01 | 2026-07-07 | living | Company→producer back-flow plan (drydocs-review) |
 | 06-provenance-source-audit-fields.md | 2026-07-06 | 2026-07-07 | living | Provenance diet + per-source audit envelope plan |
 | 06a-controlm-source-er-review.md | 2026-07-06 | 2026-07-07 | living | Control-M source ER review for the audit-fields gate |

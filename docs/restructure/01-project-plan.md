@@ -4,6 +4,14 @@
 **Viewpoint:** production support / development support throughout.
 **Date:** 2026-06-20
 
+> **Phase authority note (2026-07-22).** This doc is the founding narrative for phases 0–5.
+> The **authoritative, current phase list** is `plan.phases` in
+> [`backlog.yaml`](backlog.yaml) (rendered on [`docs/plan/board.html`](../plan/board.html)),
+> which has since grown through phase 13+ (component topology, review back-flow, release
+> infra, attribution, doc infra, governance ledgers, web console, runtime topology).
+> Phases 0/1/3 are done; 2 re-opened for C5; 4–5 pending. New phases are proposed through
+> the groom loop, never added here.
+
 ## Goal
 
 Re-found DryDocs on the four-layer model (taxonomy → ontology → knowledge graph → context

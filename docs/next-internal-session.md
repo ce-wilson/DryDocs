@@ -79,10 +79,13 @@
 
 ## Live-graph work (needs a running graph, not psgmgr)
 
-- [ ] **6. M2 — WAS_GENERATED_BY edge-diet migration** (backlog, ready)
+- [x] **6. M2 — WAS_GENERATED_BY edge-diet migration** (backlog, ready)
       Destructive on an existing graph → HITL-confirm, then run the migration on the
       live/sandbox graph; backfill envelope props where recoverable; m3-verify updated.
       *Internal readout 2026-07-17:* still `todo` company-side (`depends_on: M1`).
+      *DONE producer-side 2026-07-21:* migration HITL-confirmed + run live (0 blanket
+      edges, 8 raw-prop retirements, 816 renames; m3-verify all green; idempotent
+      re-run verified). Company-side twin remains open on their tracker.
 
 - [ ] **7. Lineage live-load gate** (parked IDEAS line; the flips + first curated write)
       PRE-REQ (producer box, no live data): build **G12** (writer ETLProcess endpoint
