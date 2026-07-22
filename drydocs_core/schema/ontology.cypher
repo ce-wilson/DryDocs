@@ -2,8 +2,9 @@
 // ontology.cypher  —  ontology backbone seed
 //
 // Seeds W3C anchor terms (:OntologyTerm + :<Source>Class | :<Source>Property),
-// SchedulerKind nodes, effective-dated BusinessSegments under :Company JPMC,
-// and a baseline DQV catalog (5 dimensions × 10 metrics).
+// effective-dated BusinessSegments under :Company JPMC, and a baseline DQV
+// catalog (5 dimensions × 10 metrics). (SchedulerKind seeds DEPRECATED
+// 2026-07-21 — see the retired block below.)
 //
 // Role seeds have been removed from this file. The full role vocabulary
 // (SEAL + PAT + D&A + CCB Operations) is owned exclusively by
@@ -129,12 +130,17 @@ MERGE (n:OntologyTerm:OlClass {iri:"https://openlineage.io/spec/Job"})     SET n
 MERGE (n:OntologyTerm:OlClass {iri:"https://openlineage.io/spec/Dataset"}) SET n.label = "OL Dataset";
 
 
-// ----- SchedulerKind --------------------------------------------------------
-//   Phase 1 only ingests Control-M, but the kinds vocabulary lets Applications
-//   declare which orchestrators they require even when unused.
-MERGE (k:SchedulerKind {name:"ControlM"}) SET k.kind_label = "BMC Control-M",  k.phase_supported = 1;
-MERGE (k:SchedulerKind {name:"Autosys"})  SET k.kind_label = "CA Autosys",     k.phase_supported = 2;
-MERGE (k:SchedulerKind {name:"Airflow"})  SET k.kind_label = "Apache Airflow", k.phase_supported = 2;
+// ----- SchedulerKind — DEPRECATED 2026-07-21 (C12 platforms-taxonomy gate) --
+//   RETIRED into the software-registry model: an orchestrator is a
+//   :SoftwareProduct {role:"orchestrator"} row (config/taxonomy/
+//   software-registry.yaml) reached via USES_SOFTWARE {source:"batch-port"}
+//   (vocab reg_uses_software) — role over class, no kind/capability node layer.
+//   Seeds kept commented for audit (the company 06-29 precedent, per the K4
+//   Membership pattern); graphs bootstrapped earlier may still hold these
+//   nodes — the scheduler_kind constraint stays in constraints.cypher for them.
+// MERGE (k:SchedulerKind {name:"ControlM"}) SET k.kind_label = "BMC Control-M",  k.phase_supported = 1;
+// MERGE (k:SchedulerKind {name:"Autosys"})  SET k.kind_label = "CA Autosys",     k.phase_supported = 2;
+// MERGE (k:SchedulerKind {name:"Airflow"})  SET k.kind_label = "Apache Airflow", k.phase_supported = 2;
 
 
 // ----- Corporate hierarchy: Company + BusinessSegments ----------------------

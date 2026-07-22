@@ -57,13 +57,13 @@ def test_render_carries_no_timestamps() -> None:
 
 def test_acceptance_edges_present() -> None:
     """The C8 acceptance set: edges the stale 2026-06-09 render was missing
-    (docs_*, m3_runs_on_*, seal_requires_scheduler) plus the ACTIVE
-    m3_seal_app_ref must all render.
+    (docs_*, m3_runs_on_*) plus the ACTIVE m3_seal_app_ref must all render.
+    (seal_requires_scheduler left this set 2026-07-21 — deprecated at the C12
+    platforms-taxonomy gate, now pinned on the exclusion side below.)
     """
     out = render_schema_graph()
     for vocab_id in (
         "m3_seal_app_ref",
-        "seal_requires_scheduler",
         "m3_runs_on_agent_host",
         "m3_runs_on_etl_host",
         "m3_runs_on_host_group",
@@ -81,11 +81,12 @@ def test_deprecated_and_removed_entries_excluded() -> None:
     """Only active/planned entries render; withdrawn meaning stays out."""
     assert set(RENDERED_STATUSES) == {"active", "planned"}
     out = render_schema_graph()
-    for vocab_id in ("m3_runs_on", "seal_has_membership", "seal_of_role", "seal_held_by"):
+    for vocab_id in ("m3_runs_on", "seal_has_membership", "seal_of_role", "seal_held_by",
+                     "seal_requires_scheduler"):
         assert f"r.vocab_id = '{vocab_id}'" not in out, (
             f"deprecated entry {vocab_id} must not render"
         )
-    for retired_label in ("DataSource", "DataTarget"):
+    for retired_label in ("DataSource", "DataTarget", "SchedulerKind"):
         assert f":SchemaMeta:{retired_label} " not in out, (
             f"retired label {retired_label} must not render (unreferenced by any edge)"
         )

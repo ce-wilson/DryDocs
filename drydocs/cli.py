@@ -1004,14 +1004,11 @@ def m3_verify() -> None:
                 f"dupes={rows[0]['dupes']}",
             ))
 
-        # SchedulerKind ControlM exists.
-        rows = cli.run("MATCH (k:SchedulerKind {name:'ControlM'}) RETURN count(k) AS n")
-        if rows:
-            checks.append((
-                "ControlM SchedulerKind seeded",
-                rows[0]["n"] == 1,
-                f"n={rows[0]['n']}",
-            ))
+        # The "ControlM SchedulerKind seeded" check retired with the seeds
+        # (C12 platforms-taxonomy gate 2026-07-21): fresh bootstraps no longer
+        # create :SchedulerKind nodes, and old graphs that still hold them are
+        # harmless. The orchestrator fact is verified via the software registry
+        # (USES_SOFTWARE {source:'batch-port'} — loader migration C14).
 
         # Local-namespace anchor terms present (post supplement).
         # Parentheses around the OR group — without them, AND binds tighter

@@ -30,6 +30,8 @@ VOCAB_FILE       = ONTOLOGY_DIR / "relationship_vocabulary.yaml"
 # Bump this when you intentionally add/remove a CREATE CONSTRAINT.
 EXPECTED_CONSTRAINTS = 48
 
+# SchedulerKind removed 2026-07-21 (C12 platforms-taxonomy gate): its seeds are
+# retired (commented, audit-kept) in ontology.cypher — no longer a seeded label.
 EXPECTED_ONTOLOGY_LABELS = [
     "DprodClass",
     "DcatClass",
@@ -39,7 +41,6 @@ EXPECTED_ONTOLOGY_LABELS = [
     "SwoClass",
     "OlClass",
     "Role",
-    "SchedulerKind",
     "BusinessSegment",
     "Dimension",
     "Metric",

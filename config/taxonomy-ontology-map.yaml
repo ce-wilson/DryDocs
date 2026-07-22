@@ -15,7 +15,7 @@
 # =============================================================================
 
 schema: drydocs.taxonomy-ontology-map.v1
-updated: 2026-07-20                        # K5 gate signed off: product-cabinet-attribution proposed -> confirmed; +L7 doc-traceability-feedback drafted (proposed)
+updated: 2026-07-21                        # C12/C13: requires-scheduler proposed -> rejected (superseded by reg_uses_software at the platforms-taxonomy gate); prior: K5 product-cabinet-attribution confirmed, +L7 doc-traceability-feedback (proposed)
 
 mappings:
 
@@ -185,29 +185,33 @@ mappings:
       Flagged for the SME at the same gate that confirms application-as-dataproduct — see
       config/gate-prompts/seal-tom-attribution-reshape.yaml section F (K2 re-shape).
 
-  # ---- REQUIRES_SCHEDULER (backlog C6, 2026-07-09) — documented but unregistered ----
+  # ---- REQUIRES_SCHEDULER (backlog C6, 2026-07-09) — REJECTED/superseded at C12 ----
   - id: requires-scheduler
     taxonomy:
       source: seal-extract
       element: "A BatchProcessing data port requires a scheduler technology (which orchestrator runs its batch)"
     ontology:
-      from_node: Port                       # the BATCH port: :Port:BatchProcessing {kind:"BatchProcessing"}; app-level (:BusinessApplication)-[:HAS_PORT]->(:Port), two per app (EventProcessing/API + BatchProcessing)
-      to_node: SchedulerKind                # PROVISIONAL — slated for deprecation. SME RULINGS 2026-07-21 pm (supersede the C11-capture Ais* retarget, which was removed unbuilt): the fact lands on the ACTIVE registry edge (:BusinessApplication)-[:USES_SOFTWARE {source: 'batch-port'}]->(:SoftwareProduct {role: orchestrator}) — this map entry + seal_requires_scheduler RETIRE at the producer gate (platforms-taxonomy B1) rather than reshaping. Today: {name: ControlM|Autosys|Airflow}, seeded ontology.cypher
+      from_node: Port                       # as registered; the pre-gate HOIST direction was absorbed by the reg_uses_software landing (that edge is app-level already), so no reshape ever applied
+      to_node: SchedulerKind                # RETIRED TARGET — deprecated at C12 (seeds retired in ontology.cypher; constraint kept for old graphs). The fact lands on the ACTIVE registry edge (:BusinessApplication)-[:USES_SOFTWARE {source: 'batch-port'}]->(:SoftwareProduct {role: orchestrator}) — reg_uses_software
       prov_type_from: Entity                # dprod port (Entity semantics)
-      prov_type_to: ~                        # target class unsettled (SchedulerKind deprecating; replacements undefined)
+      prov_type_to: ~                        # moot — the entry retired before a target class was ever settled
       matrix_row: "n/a — infrastructure/capability placement, no PROV row (same family as SCHEDULED_ON)"
       neo4j_label: REQUIRES_SCHEDULER
       role: ~
       prov_maps_to: ~
     precedence_authority: bmc-baseline
     vocab_id: seal_requires_scheduler
-    source_evidence: "README.md:263 + docs/history/LoadPlanV3.md:82,393 (documented as a post-load edge); no loader/extract yet — status: planned in relationship_vocabulary.yaml, not wired."
-    status: proposed                         # <-- SME must confirm at the gate (backlog C6)
-    provenance_note: "Registered per backlog C6 (2026-07-09) to close the README/LoadPlanV3-vs-vocab drift. Edge meaning ⇒ HITL gate; not auto-decided."
-    open_questions:
-      - "Attach point: ports are application-level ((:BusinessApplication)-[:HAS_PORT]->(:Port), kind∈{EventProcessing=events/API, BatchProcessing=batch}), so README.md:263 ('on :BusinessApplication') and LoadPlanV3.md:82 ('the :BatchProcessing port') describe the SAME app batch port. SME call = keep the edge on the batch :Port (as here) or hoist to :BusinessApplication. REQUIRES_SCHEDULER is batch-only (the EventProcessing/API port is not scheduler-driven). SME DIRECTION 2026-07-21 (in-chat, pre-gate): HOIST to :BusinessApplication — recorded as the proposed answer; from_node reshapes at the gate, not before."
-      - "TARGET (to_node): :SchedulerKind is slated for deprecation. SME DIRECTION 2026-07-21 (in-chat, pre-gate): ONE edge, hoisted to :BusinessApplication. RULED 2026-07-21 pm (supersedes the C11-capture USES_TOOL/:AisTool retarget — the Ais* family was removed on both sides, acronym preserved only in software-registry.yaml#acronyms): the landing is the ACTIVE registry edge (:BusinessApplication)-[:USES_SOFTWARE {source: 'batch-port'}]->(:SoftwareProduct {role: orchestrator}) — meaning carried by the target's role (SME: role over class; 'Orchestration' = the intended highest classification level; capability node layer NOT adopted). This entry RETIRES at the gate; zero new edge or node types. (The Q1 capability-granularity conflict was RESOLVED pre-gate 2026-07-21 — producer batch/event seed withdrawn as a super-node-avoidance device; see platforms.yaml Q1/Q2/Q4/Q6.)"
-      - "Confirm null-PROV/infrastructure is correct, vs a weak prov:used / prov:wasInfluencedBy."
+    source_evidence: "README.md:263 + docs/history/LoadPlanV3.md:82,393 (documented as a post-load edge); never wired — the vocab entry stayed planned until its 2026-07-21 deprecation."
+    status: rejected                         # SUPERSEDED, not repudiated: C12 platforms-taxonomy gate (SIGNED OFF 2026-07-21 pm, B1; config/gate-log.md) ruled the orchestrator fact lands on reg_uses_software {source: 'batch-port'} — this proposed edge is never loaded; kept for audit (the rejected lifecycle). Loader migration = backlog C14.
+    confirmed_by: chad.wilson                # who/when the closure was ruled (the gate sign-off)
+    confirmed_on: 2026-07-21
+    capture: "waived — retirement closure, no new taxonomy to capture: the orchestrator fact is already captured by config/taxonomy/platforms.yaml seed rows (software_registry_ref) + config/taxonomy/software-registry.yaml"
+    gate_spec: config/gate-prompts/platforms-taxonomy.yaml
+    provenance_note: "Registered per backlog C6 (2026-07-09) to close the README/LoadPlanV3-vs-vocab drift. Edge meaning ⇒ HITL gate; not auto-decided. CLOSED at C12 (2026-07-21): superseded by reg_uses_software; resolutions below."
+    open_questions:                          # ALL CLOSED at C12 (2026-07-21) — kept as the question-by-question audit record
+      - "RESOLVED (1) Attach point: the reg_uses_software landing is app-level ((:BusinessApplication)-[:USES_SOFTWARE]->) — the pre-gate HOIST direction is satisfied by the landing edge itself; no :Port reshape ever applied. Batch-only survives as the source value: source: 'batch-port' names the batch port as where the fact comes from."
+      - "RESOLVED (2) Target: the ACTIVE registry edge (:BusinessApplication)-[:USES_SOFTWARE {source: 'batch-port'}]->(:SoftwareProduct {role: orchestrator}) — meaning carried by the target's role (SME: role over class; 'Orchestration' = the intended highest classification level; capability node layer NOT adopted; supersedes the C11-capture USES_TOOL/:AisTool retarget — Ais* removed both sides, acronym only in software-registry.yaml#acronyms). Zero new edge or node types."
+      - "RESOLVED (3) Null-PROV: B4 confirmed reg_uses_software's existing LOCAL no-PROV Agent→Entity typing covers the migrated fact unchanged (the SCHEDULED_ON null-PROV family) — no weak prov:used / prov:wasInfluencedBy adopted."
 
   # ---- SEAL ontology reshape — SIGNED OFF 2026-07-10 (K3), APPLIED at K4 ----
   # Gate config/gate-prompts/seal-tom-attribution-reshape.yaml, sign-off in
@@ -931,5 +935,5 @@ mappings:
 summary:
   applied: 8          # +application-as-dataproduct, +seal-tom-attribution (K4, 2026-07-15); prior 6 = job-contains, application-contains-folder, doc-describes-product, doc-chunk-part-of, doc-first-chunk, doc-next-chunk
   confirmed: 22       # +doc-traceability-feedback (L7 gate signed off 2026-07-20, 21/21 confirmations; supplement landed same day, loader load-doc-traceability follows); +product-cabinet-attribution (K5 gate signed off 2026-07-20; applied waits on the K6 supplement + a person-level cabinet extract)
-  proposed: 3         # oracle-schema-asset, jobrun-observation, requires-scheduler
-  rejected: 0
+  proposed: 2         # oracle-schema-asset, jobrun-observation
+  rejected: 1         # requires-scheduler (C12 platforms-taxonomy gate 2026-07-21 — SUPERSEDED by reg_uses_software {source: 'batch-port'}, not repudiated)

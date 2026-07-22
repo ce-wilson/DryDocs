@@ -5066,7 +5066,7 @@ items:
     agent: main
     model: sonnet
     priority: p2
-    status: todo
+    status: done          # DONE 2026-07-21 pm — seeds retired audit-kept (commented; constraint stays for old graphs); seal_requires_scheduler deprecated + superseded_by: reg_uses_software; map entry rejected/superseded with all 3 OQs resolved; sweep: config/taxonomy/README, internal/repo-README, LoadPlanV3 banner, cli verify check retired; schema_graph regenerated (REQUIRES_SCHEDULER excluded); suite 831 green
     depends_on: [C12]
     inputs: [drydocs_core/schema/ontology.cypher, drydocs_core/schema/constraints.cypher, drydocs_core/ontology/relationship_vocabulary.yaml, config/taxonomy-ontology-map.yaml, config/gate-log.md, knowledge/ontology/NODE_QUICK_REFERENCE.md]
     acceptance: >
@@ -5120,8 +5120,8 @@ items:
       work); ontology epic keeps the gate lineage visible.
 
 summary:
-  todo: 22                                         # -C12 (gate RUN + signed same day it was groomed); +C13 (SchedulerKind retirement build), +C14 (batch-port USES_SOFTWARE migration) — 2026-07-21 pm
+  todo: 21                                         # -C13 (picked up + completed 2026-07-21 pm)
   in_progress: 1                                   # E1 (gate deferred both sides)
   blocked: 0
-  done: 122                                        # +C12 platforms-taxonomy gate SIGNED OFF 2026-07-21 pm (3/3 as recommended)
-  next_ready: [M2, M3, M4, P3, J10, Q6, O23, J13, G18, G19, O26, G26, C13, C14]
+  done: 123                                        # +C13 SchedulerKind retirement build (2026-07-21 pm)
+  next_ready: [M2, M3, M4, P3, J10, Q6, O23, J13, G18, G19, O26, G26, C14]

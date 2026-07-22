@@ -243,7 +243,6 @@ exits 0. (Earlier docs said 13 jobs with an `empty=2` sample gap, and before tha
 | every ControlMApplication contains a folder      | yes | apps=0 with_folder=0            |
 | every job has a folder                            | yes | jobs=17 with_folder=17          |
 | no duplicate (folder_id, job_id)                 | yes | dupes=0                         |
-| ControlM SchedulerKind seeded                     | yes | n=1                             |
 | M3 local anchor terms seeded                      | yes | n=3 (expect >= 3 ...)           |
 | active folders contain at least one job          | yes | empty=0 total=7                 |
 | no orphan conditions                              | yes | orphan=0 total=15               |
@@ -279,7 +278,7 @@ and loaders don't change.
 
 - Per-execution `:JobRun {kind:'controlm_execution'}` history with `start_time` / `end_time` / `duration_sec`, and rolled-up datetime metrics on `:ControlMJob`.
 - Folder → `:BatchProcessing` linkage (needs a folder-naming resolver + reliable PAT data).
-- `:REQUIRES_SCHEDULER → :SchedulerKind {name:"ControlM"}` edges on `:Application` (post-load step).
+- `(:BusinessApplication)-[:USES_SOFTWARE {source:"batch-port"}]->(:SoftwareProduct {role:"orchestrator"})` edges from the SEAL batch-port orchestrator strings (backlog C14; replaces the retired `REQUIRES_SCHEDULER → :SchedulerKind` design — C12 gate, 2026-07-21).
 - Graph load of the variable/command normalization output (Phase D — see below).
 
 ---

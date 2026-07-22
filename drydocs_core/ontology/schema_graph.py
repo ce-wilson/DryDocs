@@ -34,10 +34,11 @@ Inclusion rule (the deterministic vocabulary→Cypher mapping, backlog C8)
   single bound node.
 * Nodes: one exemplar per label referenced by a rendered relationship, in
   ``node_classifications`` order; ``class`` / ``dual_class`` / ``prov_type``
-  come from the classification entry. Referenced-but-unclassified labels (e.g.
-  the provisional ``SchedulerKind``, or infra labels like ``OntologyTerm``)
-  follow, name-only, in first-reference order. Labels never referenced by a
-  rendered edge (e.g. the retired ``DataSource``/``DataTarget``) are omitted.
+  come from the classification entry. Referenced-but-unclassified labels (infra
+  labels like ``OntologyTerm``) follow, name-only, in first-reference order.
+  Labels never referenced by a rendered edge (e.g. the retired
+  ``DataSource``/``DataTarget``, or ``SchedulerKind`` since its C12
+  deprecation) are omitted.
 * Edge properties: ``vocab_id``, ``role`` (when set), ``prov_maps_to``
   (explicit ``null`` when unmapped), ``sosa_maps_to`` (when set), ``domain``,
   ``status``. Entry prose (``note``) stays in the vocabulary — the render

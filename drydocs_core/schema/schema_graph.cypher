@@ -135,8 +135,6 @@ MERGE (n:SchemaMeta:Result {name: 'Result'})
 MERGE (n:SchemaMeta:ObservableProperty {name: 'ObservableProperty'})
   SET n.class = 'sosa:ObservableProperty', n.prov_type = 'Entity';
 // (no node_classifications entry)
-MERGE (n:SchemaMeta:SchedulerKind {name: 'SchedulerKind'});
-// (no node_classifications entry)
 MERGE (n:SchemaMeta:OntologyTerm {name: 'OntologyTerm'});
 
 // ── Relationships (one exemplar edge per vocabulary entry) ──────────────────
@@ -256,10 +254,6 @@ MERGE (a)-[r:DELEGATES_TO]->(b)
 MATCH (a:SchemaMeta {name: 'BusinessApplication'}), (b:SchemaMeta {name: 'Port'})
 MERGE (a)-[r:HAS_PORT]->(b)
   SET r.vocab_id = 'seal_has_port', r.prov_maps_to = null, r.domain = 'seal', r.status = 'active';
-
-MATCH (a:SchemaMeta {name: 'Port'}), (b:SchemaMeta {name: 'SchedulerKind'})
-MERGE (a)-[r:REQUIRES_SCHEDULER]->(b)
-  SET r.vocab_id = 'seal_requires_scheduler', r.prov_maps_to = null, r.domain = 'seal', r.status = 'planned';
 
 MATCH (a:SchemaMeta {name: 'BusinessApplication'}), (b:SchemaMeta {name: 'Document'})
 MERGE (a)-[r:HAD_PRIMARY_SOURCE]->(b)

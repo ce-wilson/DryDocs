@@ -1180,46 +1180,37 @@ local_relationships:
   - id:           seal_requires_scheduler
     neo4j_label:  REQUIRES_SCHEDULER
     role:         ~
-    from_node:    Port                       # the BATCH port specifically — :Port:BatchProcessing {kind: "BatchProcessing"}; NOT the EventProcessing/API port
-    to_node:      SchedulerKind              # PROVISIONAL — deprecation target CHANGED 2026-07-21 pm: retires INTO the registry model (:SoftwareProduct {role: orchestrator} via the ACTIVE reg_uses_software edge; the interim Ais* target was removed). This entry RETIRES at the platforms gate rather than reshaping. See OQ (2).
+    from_node:    Port                       # as registered; the pre-gate HOIST direction (to :BusinessApplication) was absorbed by the reg_uses_software landing, so no reshape ever applied here
+    to_node:      SchedulerKind              # RETIRED TARGET — :SchedulerKind deprecated at C12 (seeds retired in ontology.cypher; constraint kept for old graphs)
     prov_maps_to: ~
     note: >
-      GATE-BOUND, status: planned — NOT wired (loader: ~). Registered per backlog C6
-      (2026-07-09) to close the drift where REQUIRES_SCHEDULER appears in README.md:263 and
-      docs/history/LoadPlanV3.md:82,393 but was absent from this registry. Semantics: the SEAL
-      two-port model is (:BusinessApplication)-[:HAS_PORT]->(:Port {kind}) with EXACTLY TWO ports per app
-      — EventProcessing (events/API) and BatchProcessing (batch); the loader creates multi-label
-      :Port:EventProcessing / :Port:BatchProcessing nodes (seal_applications.cypher:96-105;
-      config/taxonomy/business-application.yaml). REQUIRES_SCHEDULER attaches to the BATCH port
-      ONLY — batch is what an orchestrator schedules; the EventProcessing/API port is not
-      scheduler-driven — pointing at a scheduler technology, SchedulerKind {name: ControlM|
-      Autosys|Airflow} seeded in ontology.cypher. from_node is the canonical :Port class
-      (kind-discriminated, matching seal_has_port); the batch-only constraint is the kind filter.
-      prov_maps_to is NULL: infrastructure/capability placement (which orchestrator runs the
-      batch port), the SAME FAMILY as SCHEDULED_ON (m3_scheduled_on) — not a provenance/
-      derivation edge; SchedulerKind is a local platform classifier, not a prov Agent/Entity.
-      HITL-GATE OPEN QUESTIONS (edge meaning ⇒ the gate; do not auto-decide — route via
-      ontology-mapper + docs/restructure/03-hitl-sme-flow.md; mirrored in the map entry
-      requires-scheduler):
-        (1) ATTACH POINT — ports are application-level ((:BusinessApplication)-[:HAS_PORT]->(:Port)),
-            so README.md:263 ("on :BusinessApplication") and LoadPlanV3.md:82 ("the :BatchProcessing
-            port") describe the SAME app batch port. The remaining SME call is only whether the
-            edge sits on the batch :Port (kind=BatchProcessing, as registered here) or is hoisted
-            to :BusinessApplication with the kind as an edge/context property.
-        (2) TARGET NODE — :SchedulerKind is SLATED FOR DEPRECATION. SME DIRECTION 2026-07-21 pm
-            (supersedes the 07-09 Ais* interim target, which was removed unbuilt): the fact lands
-            on the ACTIVE registry edge (:BusinessApplication)-[:USES_SOFTWARE {source:
-            'batch-port'}]->(:SoftwareProduct {role: orchestrator}) — reg_uses_software — so THIS
-            entry RETIRES at the platforms gate (config/gate-prompts/platforms-taxonomy.yaml B1)
-            instead of reshaping; zero new edge or node types.
-            (SchedulerKind also lacks a node_classifications entry today — moot if it is deprecated.)
-        (3) Confirm null-PROV/infra is correct vs a weak prov:used / prov:wasInfluencedBy.
-      No supplement block and no loader land until the gate confirms — planned entries are
-      inert and test_schema.py skips them.
-    supplement:   seal_ontology_supplement.cypher
+      Registered per backlog C6 (2026-07-09) to close the drift where
+      REQUIRES_SCHEDULER appeared in README.md:263 and docs/history/LoadPlanV3.md:82,393
+      but was absent from this registry. Original semantics: the SEAL batch
+      :Port (kind=BatchProcessing) points at a scheduler technology,
+      :SchedulerKind {name: ControlM|Autosys|Airflow}, then seeded in
+      ontology.cypher; null-PROV infrastructure placement (the SCHEDULED_ON
+      family). The three C6 open questions (attach point, target node,
+      null-PROV) were all CLOSED by the deprecation below — the
+      requires-scheduler map entry keeps the question-by-question record.
+    deprecation_note: >
+      DEPRECATED at C12 (platforms-taxonomy gate, SIGNED OFF 2026-07-21 pm;
+      config/gate-log.md) — retired UN-WIRED: status was planned throughout,
+      no loader ever ran and no graph data exists (nothing to migrate; the
+      'data kept in graph' clause of the deprecated lifecycle is vacuous
+      here). The fact lands on the ACTIVE registry edge (:BusinessApplication)
+      -[:USES_SOFTWARE {source: 'batch-port'}]->(:SoftwareProduct
+      {role: orchestrator}) — reg_uses_software — meaning carried by the
+      target's role (SME: role over class; capability node layer NOT
+      adopted); zero new edge or node types. Supersedes the 07-09 Ais*
+      interim retarget, which was removed unbuilt. Loader migration =
+      backlog C14.
+    superseded_by: reg_uses_software
+    supplement:   ~                          # never declared — retired before any supplement block landed
     loader:       ~
     domain:       seal
-    status:       planned
+    status:       deprecated
+    deprecated_at: 2026-07-21
 
   - id:           seal_has_membership
     neo4j_label:  HAS_MEMBERSHIP
@@ -1763,11 +1754,14 @@ local_relationships:
       precedent as arch_contains. Edge properties: version, source, status.
       Phase 1 loads only DryDocs' own stack (reserved app id DRYDOCS-SELF);
       derived candidates come from CMD_LINE invocation patterns (plan-07
-      Phase 3), never base ingest. SME DIRECTION 2026-07-21 pm (gate-bound,
-      platforms-taxonomy B1): this edge also becomes the landing for the SEAL
-      batch-port orchestrator fact — source: 'batch-port' distinguishes it
-      from the 'controlm-cmdline' detections — retiring the planned
-      seal_requires_scheduler entry; build lands only after that gate signs.
+      Phase 3), never base ingest. RULED at C12 (platforms-taxonomy gate,
+      SIGNED OFF 2026-07-21 pm, B1/B4; config/gate-log.md): this edge is ALSO
+      the landing for the SEAL batch-port orchestrator fact — source:
+      'batch-port' distinguishes those declared-orchestrator edges from the
+      DRYDOCS-SELF stack rows and the future 'controlm-cmdline' detections —
+      superseding seal_requires_scheduler (now deprecated). B4: the existing
+      LOCAL no-PROV Agent→Entity typing covers the migrated fact unchanged.
+      Loader migration = backlog C14.
     supplement:   registry_ontology_supplement.cypher
     loader:       software_registry.py
     domain:       registry

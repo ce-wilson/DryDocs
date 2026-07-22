@@ -4,6 +4,13 @@ This is a **delta** on `drydocs_plan.md` (v2). v2 still applies as the base — 
 
 Read v2 first; v3 sections below either **add to**, **amend**, or **resolve open questions in** specific v2 sections.
 
+> **Historical note (2026-07-21):** the scheduler-as-requirement model in this plan
+> (`REQUIRES_SCHEDULER → :SchedulerKind`, §C and the M3 milestone) was retired at the C12
+> platforms-taxonomy gate before it was ever wired. The orchestrator fact now lands on
+> `(:BusinessApplication)-[:USES_SOFTWARE {source:"batch-port"}]->(:SoftwareProduct {role:"orchestrator"})`
+> via the software registry (`config/taxonomy/software-registry.yaml`); `:SchedulerKind` seeds are
+> deprecated in `ontology.cypher`. This document is kept unedited as the design of record for its era.
+
 ---
 
 ## §A. Goal — restated (amends v2 §1)
