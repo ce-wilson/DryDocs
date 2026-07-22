@@ -365,26 +365,43 @@ objects:
   - name: CM_AVG_RUN
     kind: table
     profile:
-      profiled_on: ~
+      profiled_on: 2026-07-22
       via: >
-        SME result-grid review 2026-07-07 (14 columns; semantics: >24h
-        start-time clock, seconds run times, JOB_MEM_NAME = JOB_NAME,
-        FileWatcher watch/wait caveat); data TYPES unknown — probe P0 in
-        sql/adhoc/profile_cm_avg_run.sql; formal census doc 08 Phase 2
-      column_count: ~
-      census: pending
+        P0 probe census, live psgmgr (internal SQL Developer run 2026-07-22,
+        conclusions transcribed — sql/adhoc/profile_cm_avg_run.sql carries
+        the per-probe record). Real TABLE, 26 columns, ALL nullable: the 14
+        projected below PLUS 12 UNPROJECTED discovered by the census —
+        STAT_CAL_CTM VARCHAR2(20), STAT_CAL VARCHAR2(30), STAT_PERIOD
+        VARCHAR2(1) (the leading grain-discriminator candidate), LAST_UPDATED
+        DATE, AVG_CPU_TIME NUMBER, SAMPLES_JOB_ID/SAMPLES_CPU_TIME/
+        SAMPLES_AGENT_ELAPSED_TIME/SAMPLES_FIRST_START_TIME VARCHAR2(4000),
+        AVG_AGENT_ELAPSED_TIME NUMBER, STD_DEV_START_TIME NUMBER,
+        AVG_ALL_START_TIME VARCHAR2(6). AVG_START_TIME is VARCHAR2(6) — a
+        STRING (safe TO_NUMBER conversion required; the P3a probe was fixed
+        for exactly this). SAMPLES_* are VARCHAR2(4000), not CLOB. NO ctlm_id
+        column exists on this table. Whether any unprojected column joins the
+        extract (STAT_PERIOD for dedupe especially) = the supplement-loader
+        build decision (HITL residual).
+      column_count: 26
+      census: complete
     note: >
       Graph landing is PROPOSED ONLY pending gate controlm-avg-run-supplement
       (config/gate-prompts/controlm-avg-run-supplement.yaml) — every column
       lands staging-only until then. Join to jobs is the WEAK key
       (SCHED_TABLE, JOB_MEM_NAME = JOB_NAME), never MEMNAME, never
       TABLE_ID/JOB_ID; -CYC/-DLY twin folders each carry rows; supplement
-      pass MATCHes existing job nodes, never MERGEs.
+      pass MATCHes existing job nodes, never MERGEs. PROBE FINDINGS
+      2026-07-22: 169,639 rows / 14 DCs; grain (DC, SCHED_TABLE,
+      JOB_MEM_NAME) NOT unique (dups 2–49 — dedupe rule = HITL residual);
+      join coverage stats→jobs 85.7%, jobs→stats 29.6% (partial enrichment
+      by construction); run-time outliers to ~2.65 y (sanity cap = HITL
+      residual); each folder carries a SELF row (JOB_MEM_NAME = folder,
+      NODE_GROUP null) the loader must separate.
     columns:
       - {name: DATA_CENTER, disposition: projected, origin: source, target: "staging:data_center",
          note: "long-form DC name — same domain as CM_HOSTS (probe P6 confirms vs CM_DEF_VTAB)"}
       - {name: INSTANCE_NAME, disposition: projected, origin: source, target: "staging:instance_name",
-         note: "relation to DATA_CENTER unclear (sampled instance code disagreed with the DC number) — probe P2b"}
+         note: "P2b ANSWERED 2026-07-22: exactly ONE value across all 14 DCs — identifies the reporting EM/CTM instance, never the DC; constant, so never a key part"}
       - {name: SCHED_TABLE, disposition: projected, origin: source, target: "staging:sched_table",
          note: "folder name; join-key part; also the :folder_filter scope-bind target"}
       - {name: JOB_MEM_NAME, disposition: projected, origin: source, target: "staging:job_mem_name",
@@ -392,7 +409,7 @@ objects:
       - {name: NODE_GROUP, disposition: projected, origin: source, target: "staging:node_group",
          note: "runtime host-group placement — cross-validates the definition-side RUNS_ON resolution (gate controlm-hosts-topology); probe P5 classifies GROUP/DIRECT_HOST/UNMATCHED"}
       - {name: DSN, disposition: projected, origin: source, target: "staging:dsn",
-         note: "null in every sampled row — probe P3b; flip to excluded if always null"}
+         note: "P3b ANSWERED 2026-07-22: always null (0/169,639) — disposition flips to excluded WITH the supplement-loader build (extract + ledger change together, one coherent commit), not before"}
       - {name: AVG_START_TIME, disposition: projected, origin: source, target: "staging:avg_start_time",
          note: "Control-M >24h post-midnight clock (293502 ≈ 05:35:02 next day) — normalized in Python to time-of-day + next_day flag; proposed ControlMJob.avg_start_time"}
       - {name: AVG_RUN_TIME, disposition: projected, origin: source, target: "staging:avg_run_time",
@@ -406,11 +423,18 @@ objects:
       - {name: SAMPLES_START_TIME, disposition: projected, origin: source, target: "staging:samples_start_time",
          note: "raw comma array of <ts>:<odate> pairs — start-time medians per day-of-week; probe P7"}
       - {name: CAPTURE_DATE, disposition: projected, origin: source, target: "staging:capture_date",
-         note: "replication timestamp — never authorship; snapshot-vs-history probe P8 decides refresh strategy"}
+         note: "replication timestamp — never authorship; P8 ANSWERED 2026-07-22: single snapshot date, no history → refresh = FULL-REPLACE"}
     default_disposition:
       disposition: excluded
       reason: scope
+      count: 12
       note: >
-        The result grid showed exactly these fourteen columns; this sweep is
-        defensive only, in case the live table carries columns the grid
-        scroll hid or that were added since.
+        The defensive sweep turned out to be LOAD-BEARING: the 2026-07-22 P0
+        census found 26 columns — the grid had hidden 12 (enumerated by name
+        in profile.via above: the STAT_CAL*/STAT_PERIOD trio, LAST_UPDATED,
+        CPU/agent-elapsed aggregates + sample arrays, STD_DEV_START_TIME,
+        AVG_ALL_START_TIME, SAMPLES_FIRST_START_TIME, SAMPLES_JOB_ID). All 12
+        swept excluded/scope AT census time (14 explicit + 12 swept = 26).
+        Promoting any of them (STAT_PERIOD for the grain dedupe especially)
+        = a BY-NAME disposition row at the supplement-loader build — never a
+        silent widening of this sweep (doc 08 §Risks).

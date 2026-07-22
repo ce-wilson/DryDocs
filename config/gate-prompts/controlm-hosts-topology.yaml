@@ -3,6 +3,16 @@
 # no relationship_vocabulary.yaml status flips from planned, no taxonomy-ontology-map.yaml
 # status flips to confirmed, no graph write, and the CM_HOSTS extract stays staging-only.
 # Mechanism-only: column names, counts, and rules — no real group/host/DC values.
+# SIGNED OFF 2026-07-09 (18/18, gate-log) with probe residuals. PARTIAL PROBE
+# READOUT 2026-07-22 (via the CM_AVG_RUN run): the RUNTIME-side census landed —
+# CM_AVG_RUN.NODE_GROUP resolves GROUP 131,960 (77.8%) · UNMATCHED 25,150
+# (14.8%) · NULL 11,048 (6.5%) · DIRECT_HOST 1,481 (0.9%) — consistent with the
+# signed group-wins rule; direct-host is real-but-rare; ~15% UNMATCHED is the
+# coverage number the P3 loader must report. STILL OWED (profile_cm_hosts.sql,
+# definition side): P1 grain/dup, P2a PARTICIPATION_TYPE domain, P2b alias
+# census, P2c multi-group membership, P3 DC-domain match vs CM_DEF_VTAB,
+# P4 BOTH-match collisions + P4c case-fold, P5 capture uniformity — plus the
+# 22-DC-vs-production SCOPE CALL (HITL; gate-log residual).
 classification: Internal-Public
 schema: drydocs.gate-prompt.v1
 id: controlm-hosts-topology

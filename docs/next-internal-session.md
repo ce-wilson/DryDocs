@@ -20,9 +20,24 @@
       P1→`done` + new item K6 only, exactly 3 files (`backlog.yaml`, board, IDEAS);
       `controlm_avg_run*` loader files and the P4/P2/P3/P5 flips deliberately stay as
       Epic P working-tree WIP (P4 commits alongside the avg-run loader when it lands).
-      STILL OWED producer-side: the probe conclusions + the **DC scope call outcome**
+      ~~STILL OWED producer-side: the probe conclusions + the **DC scope call outcome**
       have not been relayed here — grab them next internal session; item 5
-      (DC-collision check) inherits whatever that scope call decided.
+      (DC-collision check) inherits whatever that scope call decided.~~
+      *RELAYED 2026-07-22 (screenshot channel, 26 captures — PARTIAL):* the
+      **preflight open questions** (Q0.1/Q0.2/Q2/Q3/Q4 — all answered, annotated in
+      `preflight_open_questions.sql`) and the **CM_AVG_RUN set end to end**
+      (pilot Q0–Q5 + estate P0–P8, incl. an ORA-01722 fix to P3a now back-ported)
+      — conclusions transcribed into `profile_cm_avg_run.sql`, the avg-run gate
+      spec's additive provenance block, and the CM_AVG_RUN ledger census
+      (26 columns; **no ctlm_id column on CM_AVG_RUN** — the P2-gate §B verify
+      came back NEGATIVE for this table). STILL OWED: the **CM_HOSTS
+      definition-side probes** (`profile_cm_hosts.sql` P1–P5 — only the runtime
+      census landed, via avg-run P5) **+ the DC scope call** (now three
+      datapoints: 22 DCs in CM_HOSTS, 14 in CM_AVG_RUN, 4 production) — both
+      remain HITL/next-internal items; item 5 still inherits the scope call.
+      NEW HITL residuals for the P4-loader build: grain dedupe rule (dups 2–49;
+      STAT_PERIOD candidate), run-time sanity cap (outliers to ~2.65 y),
+      ctlm_id-absence join consequence.
 
 - [ ] **2. E1 re-arm — CM_HIST run-history source** (backlog in_progress, gate deferred 07-14)
       Confirm CM_HIST shape/retention on live psgmgr (JOB_MEM_NAME = JOB_NAME;

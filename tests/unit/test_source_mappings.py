@@ -208,16 +208,24 @@ def test_committed_ledger_loads(controlm: SourceMapping) -> None:
 
 
 def test_every_object_has_a_profile_and_default_sweep(controlm: SourceMapping) -> None:
-    """Phase 0 contract: no column census has run yet — every object's profile
-    is a `census: pending` placeholder, and every object sweeps its long tail."""
+    """Every object carries a profile and sweeps its long tail. The census is
+    either the Phase-0 `pending` placeholder (no count recorded) or `complete`
+    with a real column_count — the first completed census landed 2026-07-22
+    (CM_AVG_RUN P0 probe); count reconciliation is census_failures()' job."""
+    censused = set()
     for oname in _EXPECTED_OBJECTS:
         obj = controlm.get(oname)
         assert obj.profile is not None, oname
-        assert obj.profile.census == "pending", oname
-        assert obj.profile.column_count is None, oname
+        assert obj.profile.census in ("pending", "complete"), oname
+        if obj.profile.census == "pending":
+            assert obj.profile.column_count is None, oname
+        else:
+            assert obj.profile.column_count is not None, oname
+            censused.add(oname)
         assert obj.default_disposition is not None, oname
         assert obj.default_disposition["disposition"] == "excluded"
         assert obj.default_disposition["reason"] == "scope"
+    assert censused == {"CM_AVG_RUN"}  # extend as further P0 censuses land
 
 
 def test_vjob_projected_includes_the_audit_envelope(controlm: SourceMapping) -> None:

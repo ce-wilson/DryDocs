@@ -3,6 +3,19 @@
 # no taxonomy-ontology-map.yaml status flips to confirmed, no graph write, and the CM_AVG_RUN
 # extract stays staging-only. Mechanism-only: column names, rules, and counts — no real
 # folder/job/group names or timing values.
+# SIGNED OFF 2026-07-14 (gate-log; one SME edit: ctlm_id join preference).
+# PROBE RESULTS LANDED 2026-07-22 (internal SQL Developer run, transcribed
+# from the screenshot channel — full per-probe conclusions annotated in
+# drydocs/loaders/sql/adhoc/profile_cm_avg_run.sql; recorded here as the
+# ADDITIVE provenance block "P1 probe results" below, original blocks kept
+# verbatim). Headline: 169,639 rows / 14 DCs; 26 columns (NOT 14) —
+# AVG_START_TIME is VARCHAR2(6) (P3a probe SQL fixed: ORA-01722) and there
+# is NO ctlm_id column on CM_AVG_RUN, so the signed join preference cannot
+# come from this table directly; grain is NOT unique (dedupe rule needed);
+# run-time outliers to ~2.65 years (sanity cap needed). THE THREE NEW
+# RESIDUALS (HITL, at the P4-loader build): dedupe rule, sanity cap,
+# ctlm_id-absence join consequence. Coverage baseline per P4: stats→jobs
+# 85.7%, jobs→stats 29.6% (partial enrichment by construction).
 classification: Internal-Public
 schema: drydocs.gate-prompt.v1
 id: controlm-avg-run-supplement
@@ -71,6 +84,20 @@ provenance:
       - {name: dow_medians, origin: derived, from: "SAMPLES_RUN_TIME + SAMPLES_START_TIME", note: "parsed in Python; P7 checks array parseability + matched lengths"}
       - {name: instance_name, origin: source, from: INSTANCE_NAME, note: "relation to DATA_CENTER unclear (sampled instance code disagreed with the DC number) — probe P2b; staging-only until understood"}
       - {name: dsn, origin: source, from: DSN, note: "null in all sampled rows — P3b; flip disposition to excluded if always null"}
+  - label: "P1 probe results (RAN 2026-07-22 — additive record; conclusions only, per-probe detail in profile_cm_avg_run.sql)"
+    source_object: "psgmgr CM_AVG_RUN (live), internal SQL Developer session 2026-07-22"
+    key: "transcribed from the screenshot channel; counts/domains/match rates only — no result rows"
+    loader: "~ (still none — the P4 supplement loader build consumes these results)"
+    properties:
+      - {name: volume, origin: source, from: "P1", note: "169,639 rows · 14 DATA_CENTERs · 1 INSTANCE_NAME · 12,639 folders · 779 node groups"}
+      - {name: column_census, origin: source, from: "P0", note: "real TABLE, 26 columns ALL nullable (12 beyond the observed 14: STAT_CAL_CTM/STAT_CAL/STAT_PERIOD, LAST_UPDATED, AVG_CPU_TIME + samples, AVG_AGENT_ELAPSED_TIME + samples, STD_DEV_START_TIME, AVG_ALL_START_TIME, SAMPLES_FIRST_START_TIME, SAMPLES_JOB_ID); SAMPLES_* are VARCHAR2(4000) not CLOB; AVG_START_TIME is VARCHAR2(6) — a STRING; NO ctlm_id column exists on CM_AVG_RUN"}
+      - {name: grain, origin: source, from: "P2 + P2b + P8", note: "(DC, SCHED_TABLE, JOB_MEM_NAME) NOT unique — dups 2..49 in the first-20 sample; INSTANCE_NAME constant (identifies the reporting EM instance, all 14 DCs) and CAPTURE_DATE single-snapshot, so neither discriminates; STAT_PERIOD/STAT_CAL(_CTM) = leading candidate. HITL RESIDUAL: dedupe/aggregation rule before job props are written"}
+      - {name: start_clock, origin: source, from: "P3a (SQL fixed 2026-07-22: TO_NUMBER DEFAULT NULL ON CONVERSION ERROR — the VARCHAR2 column made the bare >= 240000 raise ORA-01722)", note: "numeric min −99561 (NEGATIVE start values exist — normalization must handle a sign), max 995959, post-midnight 113,849/169,639 (67%), non-numeric rows: 1 (tolerate-and-report)"}
+      - {name: run_time_range, origin: source, from: "P3c", note: "min 0 · median 108 s · max 83,804,487 s (~2.65 years — junk outliers). HITL RESIDUAL: sanity cap / outlier flag before blending"}
+      - {name: join_coverage, origin: source, from: "P4a/P4b (weak key — ctlm_id absent per P0)", note: "stats→jobs 145,454/169,639 = 85.7% (ran ~1 s; no perf problem); jobs→stats 144,827/489,096 = 29.6% — the supplement is PARTIAL enrichment by construction; coverage expectation ≈30%, not 100%"}
+      - {name: node_group_census, origin: source, from: "P5", note: "GROUP 131,960 (77.8%) · UNMATCHED 25,150 (14.8%) · NULL 11,048 (6.5%) · DIRECT_HOST 1,481 (0.9%) — runtime side consistent with the hosts gate's group-wins rule; definition-side CM_HOSTS probes still owed"}
+      - {name: samples_dsn_refresh, origin: source, from: "P7 + P3b + P8 + P6", note: "sample arrays 1..20, run/start aligned on every row (0 mismatches — dow medians safe); DSN 0/169,639 → EXCLUDED; single CAPTURE_DATE → FULL-REPLACE refresh; DC domain ⊆ CM_DEF_VTAB (long-form key rule holds; 14 DCs = a scope-call datapoint)"}
+      - {name: pilot_validation, origin: derived, from: "internal pilot Q0–Q5 series (one folder family: 76 rows · 6 folders · 46 jobs)", note: "landing shape verified end to end — >24h normalization + next-day flags, folder window primitive; folders carry a SELF row (JOB_MEM_NAME = folder, NODE_GROUP null) the loader must separate from job rows"}
 sections:
   - title: "A. Landing shape — property supplement, no new graph vocabulary"
     confirmations:
