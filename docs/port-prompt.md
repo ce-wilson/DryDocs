@@ -64,6 +64,10 @@ GUARDRAILS (durable — apply to every port):
    `web/src/generated/gates.json` + `enforcement-matrix.json` (their render scripts),
    `docs/plan/board.html` (from the reconciled backlog), `docs/design/*.html` +
    `*.print.html` (YOUR canonical-company renderer, both variants tracked).
+   Run render scripts from the PROJECT VENV and verify the output path lands inside
+   the workspace checkout before trusting any regen — a non-venv python can resolve
+   the `drydocs` package from a different checkout and silently write artifacts there
+   (observed company-side 2026-07-21: enforcement-matrix written to a scratch clone).
 
 6. GATE ADOPTION DOCTRINE (two-tier — SME-ruled in-chat 2026-07-21, prompted by
    PORT-REPORT-6fd3270 adopting the producer L7 doc-traceability gate):
