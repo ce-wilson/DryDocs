@@ -980,19 +980,30 @@ mappings:
       prov_type_from: "Entity (BusinessApplication) | Agent (DevTeam)"
       prov_type_to: Entity
       matrix_row: "no PROV row — contact-point placement; dcat:contactPoint pattern (range vcard:Kind), the reg_uses_software no-PROV precedent"
-      neo4j_label: HAS_CONTACT_POINT           # candidate label; plus optional future (:ControlMJob)-[:NOTIFIES]-> from DO-MAIL destinations (gate section B2)
+      neo4j_label: HAS_CONTACT_POINT           # candidate label; plus (:ControlMJob|:ControlMFolder)-[:NOTIFIES {origin}]-> for INTENDED routing (gate sections B2/C)
       prov_maps_to: ~
-      edge_properties: { purpose: "escalation | notification | approval | general (open-but-governed)", origin: "defined | extracted-runbook | extracted-email" }
-    precedence_authority: internal-standards   # steward-defined rows ARE the source of record (no feed to defer to); real rows Internal-Confidential company-side
-    source_evidence: "operational reality: runbooks + email threads carry DL addresses; Outlook holds the definition; no extract exists. Extraction (runbook corpus, email headers) produces CANDIDATE store rows only — steward confirms, loader loads (gate section C)."
+      edge_properties: { purpose: "escalation | notification | approval | general (open-but-governed)", origin: "defined | escalation-db | extracted-runbook | extracted-jira | extracted-email" }
+    precedence_authority: internal-standards   # DL contact rows: steward-defined = source of record (no feed); NOTIFIES rows: escalation-db special-instructions is the candidate authoritative source (gate C2) — store demotes to override-until-fixed there
+    source_evidence: >
+      operational reality: runbooks + email threads carry DL addresses; Outlook holds the
+      definition; no extract exists. SME landscape (2026-07-22 amendment): downstream
+      notification config has NO authoritative surface today — greenfield intent was the
+      Control-M job Description field; better candidate = CM_ESCALATION_DB
+      special-instructions VARCHAR2(4000) in psgmgr (EJOBNAME join, SEAL via ECOMPONENT —
+      support-team editable, DB-ingestible, i.e. a FIXABLE source); de facto truth =
+      runbooks, Jira sign-offs, email threads. Extraction (runbook corpus, Jira, email
+      headers) + wired evidence (DO-MAIL/SHOUT, notification-kind send-email psets)
+      produce CANDIDATE store rows only — steward confirms, loader loads (gate sections C/D).
     status: proposed
     proposed_at: 2026-07-22
     gate_spec: config/gate-prompts/email-dl-contact-point.yaml
     open_questions:
       - "Class: vcard:Group-aligned Entity (recommended — a channel record, not an accountable party) vs prov:Agent (only if NOTIFIES must be PROV-mapped) — gate section A."
-      - "NOTIFIES (job → DL from DO-MAIL/SHOUT extraction): register planned now or defer entirely — gate section B2."
-      - "Membership + email-observed usage = layer-4 context only (SOSA experimental family or store metadata), never ontology-core — gate section D; inherits sosa adoption: experimental."
-      - "Local-db posture: synthetic fixture DLs only in neo4jtest; real rows company-side, Internal-Confidential."
+      - "NOTIFIES authoring surface (gate section C, the 2026-07-22 SME amendment): escalation-db special-instructions keyed convention [recommended — shares the description-metadata plan's template discipline so the two 4000-char conventions don't fork] vs job Description field [demoted to per-job exception carrier] vs extraction-only [rejected as end state]; grain follows the attribution close-out (folder preferred, per-job exceptions)."
+      - "Intended-vs-wired split: NOTIFIES is authored from the C surface; DO-MAIL/SHOUT + notification-pset extraction is corroboration — mismatches surface to the steward, never auto-resolve (gate B2)."
+      - "Store posture differs per leg: HAS_CONTACT_POINT = store-as-source (no feed exists, the seal-app-ref-edge-reshape §E2 scoping); NOTIFIES = ordinary O24 override-until-fixed once the escalation-db convention lands (gate D1/D2)."
+      - "Membership + email-observed usage = layer-4 context only (SOSA experimental family or store metadata), never ontology-core — gate section E; inherits sosa adoption: experimental."
+      - "Local-db posture: synthetic fixture DLs only in neo4jtest; real rows company-side, Internal-Confidential (escalation-db rows Internal)."
 
 # Counts the gate reports to the SME each run.
 summary:

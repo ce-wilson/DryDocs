@@ -34,7 +34,15 @@ Tags help grooming: `idea` · `bug` · `doc` · `source` (new data source) · `q
   prov:Agent; HAS_CONTACT_POINT dcat:contactPoint edge; store-as-source per the O24
   pattern; extraction-proposes-steward-disposes; layer-4 membership boundary) + map
   entry `dl-contact-point` (proposed). Grooming disposition: tracked at the gate —
-  build items groomed on sign-off (§E1); nothing further parked here.
+  build items groomed on sign-off; nothing further parked here.
+  AMENDED same day (SME follow-up, chat): the downstream-notification AUTHORING
+  landscape added as gate section C — greenfield intent was the job Description
+  field; better candidate = escalation DB special-instructions VARCHAR2(4000) in
+  psgmgr (EJOBNAME/ECOMPONENT joins, support-editable = fixable source →
+  override-until-fixed, not store-as-source, for the NOTIFIES leg); de facto truth =
+  runbooks / Jira sign-offs / email threads (brownfield bootstrap, rejected as end
+  state). C2 keyed convention must SHARE the description-metadata plan's template
+  phase (two 4000-char conventions must not fork).
 
 - 2026-07-22 — [idea] **The tie we need now: Control-M → SEAL batch :Port attribution as a
   DEFINED mapping, keyed by the Control-M APP CODE (:ControlMApplication), persisted via
