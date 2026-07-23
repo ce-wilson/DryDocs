@@ -1,64 +1,111 @@
-# SME gate-prompt spec — the K2 job→app edge SHAPE reshape (the K3 §F deferral, now DUE
-# after K4 applied the BusinessApplication reclass). Prepared with the SME not present —
-# this page STOPS at the gate: no vocabulary re-shape, no map flip, no loader rename until
-# §D is signed. The K2 match POLICY (signed off 2026-07-14) is shape-agnostic and is NOT
-# re-opened here. Mechanism-only: no real folder/job/SEAL values.
+# SME gate-prompt spec — the Application ↔ Control-M attribution CLOSE-OUT gate.
+# REVISED v2 2026-07-22 (user direction: "close out the mapping for any relationships
+# that need to be defined or manually overwritten until fixed — the application to
+# Control-M folders"). v1 (prepped 2026-07-15) framed only the K3 §F job-edge SHAPE
+# question; the 2026-07-22 SME grain-correction (docs/restructure/IDEAS.md, top inbox
+# item) superseded that framing: attribution grain is FOLDER-level, authored by the
+# Control-M APP CODE as a DEFINED mapping with steward overrides — the shape question
+# survives as section D. GATE-BOUND: this page PROPOSES; no vocabulary re-shape, no
+# map flip, no loader change, no graph write until §G is signed. The K2 match POLICY
+# (signed off 2026-07-14) is NOT re-opened — it demotes to fallback tier, unchanged
+# internally. Mechanism-only: no real folder/job/SEAL values (the two declared tier-1
+# code examples live in the IDEAS.md inbox note, cited — not restated — here).
 classification: Internal-Public
 schema: drydocs.gate-prompt.v1
 id: seal-app-ref-edge-reshape
-title: "SME Gate — job→BusinessApplication attribution edge re-shape (K3 §F deferral)"
-step: "Resolves the deferred K2 edge shape now that :BusinessApplication is prov:Entity / dprod:DataProduct (K4, 2026-07-15)"
+title: "SME Gate — Application↔Control-M attribution close-out: folder grain, app-code defined mapping (tier 1/2), edge shape, steward overrides until source-fixed"
+step: "Closes out the K3 §F deferral + the 2026-07-22 grain correction in one ruling: what the authoritative application↔folder mapping IS, who authors it, and how wrong source values are overridden until fixed"
 summary: >
-  The ACTIVE K2 edge (:ControlMJob)-[:WAS_ASSOCIATED_WITH {role: seal_app_ref}]->
-  (:BusinessApplication) required an Agent target (Activity → Agent =
-  prov:wasAssociatedWith). K4 reclassed the app node to prov:Entity /
-  dprod:DataProduct, so the shape no longer type-checks — the standing rider on
-  m3_seal_app_ref / job-seal-app-ref (gate-log 2026-07-10 §F DEFERRED; 2026-07-14 K2
-  §D/§E confirmed-with-rider). Every candidate keeps the confirmed match policy, the
-  edge properties (first_seen_at / source / match_method / last_seen_at / last_run_id),
-  role=seal_app_ref, and the MATCH-only endpoint discipline. Until sign-off the active
-  shape stands with its documented rider.
+  Today the only application attribution is the ACTIVE job-level K2 edge
+  (:ControlMJob)-[:WAS_ASSOCIATED_WITH {role: seal_app_ref}]->(:BusinessApplication),
+  written by fuzzy MATCHING (SEAL > FID > APP_NAME > ALIAS) — and it carries two
+  standing defects. (1) SHAPE: K4 reclassed :BusinessApplication to prov:Entity /
+  dprod:DataProduct, so Activity→Agent wasAssociatedWith no longer type-checks
+  (the K3 §F rider). (2) GRAIN + AUTHORSHIP (SME 2026-07-22): attribution was
+  never meant to be job-level or matched — the graph grain is FOLDER-level
+  (jobs inherit via CONTAINS_JOB), and the mapping should be DEFINED, keyed by
+  the Control-M APP CODE (:ControlMApplication, already tied to folders via
+  CONTAINS_FOLDER), in two tiers: seal-born codes map 1:1 to a BusinessApplication;
+  shared platform codes map 1:many to AreaProducts. Where the defined value is
+  missing or the source value is wrong, a STEWARD OVERRIDE row (the O24
+  origin-flagged pattern) carries the correction until it is fixed in the source
+  system — and because the defined mapping has NO machine feed, this gate must
+  also rule the standing open question of whether steward rows may feed the
+  graph (they are the only possible source here). Until §G signs, the active
+  K2 shape stands with its documented rider and the UI keeps deriving the
+  folder→app crosswalk through job edges (explorer.folder-applications.v1).
 meta:
-  Module: "drydocs-load · seal_attribution loader + manual tier-5 writer (K2 build, 2026-07-14)"
-  Source: "graph-shape decision only — no new source object; edge feeds from STG_APP_FACT (fact_type SEAL) as gated 2026-07-14"
-  Registry ref: "stg-app-fact — confirmed (config/source-registry.yaml, K2 build); unchanged by this gate"
-  Classification: "Internal (source data) · this page Internal-Public (mechanism only)"
-  Vocabulary: "drydocs_core/ontology/relationship_vocabulary.yaml m3_seal_app_ref (active, rider)"
-  Ontology map: "config/taxonomy-ontology-map.yaml job-seal-app-ref (confirmed; type_conflict_note + proposed_reshape carry the two candidates)"
-  Related gates: "seal-tom-attribution-reshape §F (2026-07-10, DEFERRED here); seal-attribution-match-policy (2026-07-14, NOT re-opened)"
-  Company impact: "T1 live load re-run after migration; edges MERGE idempotently"
+  Module: "drydocs-load · seal_attribution loader + manual tier-5 writer (K2) · mapping store (O13/O24) · drydocs_api/mappings.py"
+  Source: "STG_APP_FACT (fact_type SEAL) demotes to fallback; NEW authoring source = the steward-defined app-code mapping (config/overrides/ CSV → mapping.db domain — no source system exists for it)"
+  Registry ref: "stg-app-fact — confirmed, unchanged; the defined-mapping store needs its own source-registry entry at build (classification Internal-Confidential company-side, mechanism-only here)"
+  Classification: "Internal (real code→SEAL rows) · this page Internal-Public (mechanism only)"
+  Vocabulary: "m3_seal_app_ref (active, rider) · m3_contains_folder (active — the app-code→folder tie) · arch_contains_batch/arch_contains_folder (planned :Batch bridge — candidate for retirement at this gate, section D)"
+  Ontology map: "config/taxonomy-ontology-map.yaml job-seal-app-ref (confirmed, type_conflict_note) + app-code-defined-mapping (proposed 2026-07-22, this gate's entry)"
+  Related gates: "seal-tom-attribution-reshape §F (2026-07-10, deferred here) · seal-attribution-match-policy (2026-07-14, NOT re-opened — demoted to fallback) · ui-write-surface (2026-07-21 — O24 override store ratified; its open override-vs-precedence question is scoped HERE, section E)"
+  Company impact: "T1 live load re-run after migration; company enumerates its real tier-1/tier-2 code rows at its own gate"
 mapping:
   - n: 1
-    element: "Candidate (a) — local domain edge  [AGENT RECOMMENDATION]"
-    target: "(:ControlMJob)-[:BELONGS_TO_APPLICATION {role: seal_app_ref, …props kept}]->(:BusinessApplication)"
-    edge: "prov_maps_to: ~  [PROPOSED — 'job belongs to this business application' is a governance/containment fact; SCHEDULED_ON / arch_contains_batch precedent; keeps the app record OUT of PROV lineage traversals]"
+    element: "Attribution GRAIN"
+    target: "folder-level: (:ControlMFolder)-[edge §D]->(application target §C); jobs INHERIT via CONTAINS_JOB — the K2 job edge migrates (n:6)"
+    edge: "grain correction  [PROPOSED — SME model 2026-07-22]"
   - n: 2
-    element: "Candidate (b) — stay inside PROV"
-    target: "(:ControlMJob)-[:USED {role: seal_app_ref}]->(:BusinessApplication)"
-    edge: "prov:used (Activity → Entity)  [PROPOSED — type-checks cleanly, but semantically claims runtime consumption of the app record and mixes it into lineage walks alongside conditions/files]"
+    element: "Authoring KEY"
+    target: ":ControlMApplication app code (folder-header grouping; CONTAINS_FOLDER already ties codes to folders, so folder edges DERIVE from one app-code row)"
+    edge: "defined mapping, not matching  [PROPOSED]"
   - n: 3
-    element: "Migration of already-loaded edges"
-    target: "idempotent migrate cypher rewrites type, keeps ALL properties (the migrate_develops precedent)"
-    edge: "—  [follow-up commit with the rename, per §C]"
+    element: "Tier 1 — seal-born app code"
+    target: "code created FOR one SEAL → direct code→BusinessApplication row (1:1); enumerate these first (two declared examples in the IDEAS.md inbox note)"
+    edge: "defined-mapping tier  [PROPOSED]"
+  - n: 4
+    element: "Tier 2 — shared platform code"
+    target: "code is a platform (e.g. the DPL launcher spine) → code→AreaProduct rows (1:many); per-folder resolution stays open and surfaces to the steward — NEVER auto-picked. Makes the empty AreaProduct layer load-bearing (lob-product-team.yaml OQ area-product-missing)"
+    edge: "defined-mapping tier  [PROPOSED]"
+  - n: 5
+    element: "K2 fuzzy match policy (SEAL > FID > APP_NAME > ALIAS)"
+    target: "DEMOTED to fallback for codes with no defined row; internal policy unchanged (2026-07-14 sign-off not re-opened); manual tier-5 pins unchanged"
+    edge: "precedence within attribution  [PROPOSED]"
+  - n: 6
+    element: "Migration of live K2 job edges"
+    target: "idempotent migrate cypher (migrate_develops precedent): job edges re-derive from folder edges or are re-written at the new grain; ALL properties kept; company re-runs T1 after"
+    edge: "—  [follow-up commit, §F]"
 provenance:
-  - label: "job→app attribution edge (shape under decision)"
-    source_object: "STG_APP_FACT (fact_type SEAL) — the Control-M variable-normalization stream; unchanged by this gate"
-    key: "job (folder_id, job_id) node key ↔ BusinessApplication seal_id, per the 2026-07-14 match policy"
-    loader: "drydocs/loaders/seal_attribution.py + seal_attribution.cypher (built; renamed on sign-off) · manual tier-5: manual_loads.py"
+  - label: "application↔folder attribution (grain + shape under decision)"
+    source_object: "NEW: steward-defined app-code mapping rows (no source system — the store IS the source of record until Control-M folder variables carry the value); FALLBACK: STG_APP_FACT (fact_type SEAL) via the K2 stream"
+    key: "app_code (:ControlMApplication, per data center) → seal_id (tier 1) | area_product id (tier 2); folder edges derived via CONTAINS_FOLDER"
+    loader: "drydocs/loaders/seal_attribution.py + .cypher (re-targeted at build) · mapping store ingest (O24 file-to-table pattern)"
     properties:
-      - {name: edge_type, origin: derived, from: "this gate's §A decision — BELONGS_TO_APPLICATION (n:1) or USED (n:2)", note: "the only thing this gate changes"}
-      - {name: role, origin: derived, from: "constant seal_app_ref", note: "kept verbatim across the re-shape"}
-      - {name: match_method, origin: derived, from: "match-policy tier that resolved the fact (gate 2026-07-14)", note: "unchanged"}
-      - {name: seal_id, origin: source, from: "STG_APP_FACT.fact_value (fact_type SEAL)", note: "unchanged; never raw job.APPLICATION"}
+      - {name: grain, origin: derived, from: "SME 2026-07-22 (IDEAS.md top inbox item)", note: "folder→app; jobs inherit — corrects the K2 job-level grain"}
+      - {name: authoring_key, origin: source, from: "CM_DEF_VJOB folder-header APPLICATION (:ControlMApplication)", note: "pos3-5 of the folder name is the bare app_code (folder_name.py); the property-diet rider on folder nodes is a SEPARATE decision, not this gate"}
+      - {name: tier, origin: derived, from: "defined-mapping row kind: seal-born (1:1) | platform (1:many)", note: "explorer.controlm-app-codes.v1 already DERIVES the two patterns read-only from observed cardinality — this gate makes the authoritative rows"}
+      - {name: origin_flag, origin: derived, from: "O24 pattern: every surfaced value flags defined | matched-fallback | override | manual-pin", note: "no silent replacement — side-by-side with the source value where one exists"}
 
 sections:
-  - title: "A. Shape decision"
+  - title: "A. Grain — folder, not job"
     confirmations:
-      - "Pick mapping n:1 (local domain edge, agent recommendation) or n:2 (prov:used) — or name a third shape (e.g. an inverse edge from the app side). The decision applies to BOTH the automated loader edge and the manual tier-5 writer (SUPPORTED_SHAPE) — one shape, everywhere."
-      - "The confirmed match policy (one-to-one at top tier / coverage surfacing / deterministic triage) carries over UNCHANGED — this gate touches only the edge type + PROV term."
-  - title: "B. Migration"
+      - "A1: the attribution grain is FOLDER-level — (:ControlMFolder) carries the application edge; jobs inherit through CONTAINS_JOB and no per-job application edge is authored going forward (mapping n:1). The K2 job-level model is corrected, not extended."
+      - "A2: the UI crosswalk (explorer.folder-applications.v1, currently derived through job edges) re-binds to the gated folder edge at build; until then it keeps deriving and says so."
+  - title: "B. Authoring — the app-code DEFINED mapping replaces matching as primary"
     confirmations:
-      - "Already-loaded WAS_ASSOCIATED_WITH {role: seal_app_ref} edges are migrated by an idempotent cypher that preserves every property; the company re-runs the T1 live load afterwards (edges MERGE idempotently, newly-resolvable jobs attribute on the re-run)."
-  - title: "C. Follow-through on sign-off"
+      - "B1: the authoring key is the Control-M APP CODE (:ControlMApplication). One defined row attributes every folder under that code via CONTAINS_FOLDER (mapping n:2)."
+      - "B2: tier 1 (seal-born, 1:1 code→BusinessApplication) and tier 2 (platform, 1:many code→AreaProduct) are the two row kinds (mapping n:3–4). A folder under a tier-2/unresolved code SURFACES to the steward — never auto-picked."
+      - "B3: the confirmed K2 match policy demotes to FALLBACK for codes with no defined row; its internals (one-to-one accept, coverage stamp, deterministic triage, tier-5 manual pins) are NOT re-opened (mapping n:5)."
+  - title: "C. Target — what a tier-1 row points at"
     confirmations:
-      - "One logged change: m3_seal_app_ref re-shaped in the vocabulary; map entry job-seal-app-ref updated (type_conflict_note/proposed_reshape retired into the decision record); loaders renamed (seal_attribution.cypher, manual_seal_attribution.cypher, manual_loads SUPPORTED_SHAPE + TEMPLATE, graph-tests coverage suite); port-prompt step added; drift guards green."
+      - "C1 [pick one]: (a) the :BusinessApplication node directly [simplest; the app IS the attribution target] — or (b) the application's Batch :Port (dprod:Port, kind=BatchProcessing) [the SME phrase 'folder → batch :Port'; keeps batch attribution on the batch-facing port and leaves the app node to SEAL-record semantics; requires ports loaded for every attributed app]. Tier-2 rows target :AreaProduct either way."
+      - "C2: the never-gated :Batch bridge from the pre-ontology architecture diagram (arch_contains_batch / arch_contains_folder, both planned, no loader) is RETIRED at this gate unless the SME names a live use for a distinct :Batch node — the defined mapping supersedes its role."
+  - title: "D. Edge shape + PROV term (the surviving K3 §F question)"
+    confirmations:
+      - "D1 [pick one]: (a) LOCAL domain edge, prov_maps_to: ~ [AGENT RECOMMENDATION — 'folder belongs to this application' is a governance/containment fact; ControlMFolder (Collection⊑Entity) → app-as-Entity has no natural PROV verb; SCHEDULED_ON / reg_uses_software precedent; keeps app records out of PROV lineage walks]. Candidate label: ATTRIBUTED_TO_APPLICATION (or BELONGS_TO_APPLICATION — name at the gate). (b) prov:used — type-checks (Entity is a legal used target only from an Activity, so this forces keeping some job-side edge; disfavored). Role/props kept: role=seal_app_ref, first_seen_at, source, match_method(=defined|fallback-tier), last_seen_at."
+      - "D2: whichever shape signs applies EVERYWHERE — loader edge, manual tier-5 writer (SUPPORTED_SHAPE), migration target. One shape."
+  - title: "E. Steward overrides — 'manually overwritten until fixed'"
+    confirmations:
+      - "E1: mechanics reuse the O24 origin-flagged store verbatim: committed CSV in config/overrides/ (mechanism-only here; real rows company-side) → mapping.db table → /mappings console domain (steward persona); every surface shows ORIGIN; corrections feed the source-corrections report addressed to whoever owns the source fix (folder naming/variable in Control-M, or the SEAL record)."
+      - "E2 [the precedence ruling — the ui-write-surface open question, scoped to THIS domain only]: DEFINED-mapping rows are graph-loadable source of record (there is no machine feed to defer to — refusing store-to-graph here means the mapping cannot exist). OVERRIDE rows (a per-folder exception where the code-derived value is wrong) load ONLY while status=active and carry origin=override on the edge; when the source system is fixed the row flips to corrected-in-source (kept for audit) and the derived value resumes. Confirm, edit, or reject this scoping — the GENERAL override-vs-precedence question for other domains (e.g. seal-contact-override) stays OPEN and is not decided here."
+      - "E3: store rows never write the graph directly — the loader remains the only graph writer, ingesting confirmed store state (the 'loader stays the only graph writer' invariant from O20 is unchanged)."
+  - title: "F. Migration + follow-through"
+    confirmations:
+      - "F1: live K2 job edges migrate idempotently to the ruled grain/shape, preserving every property; the company re-runs its T1 load after (edges MERGE idempotently)."
+      - "F2: one logged change on sign-off: vocabulary entries registered/re-shaped (folder edge, tier-2 edge, :Batch retirement per C2); map entries app-code-defined-mapping + job-seal-app-ref updated; new mapping-store domain + K2_SHAPE update in drydocs_api/mappings.py; manual-loads template rekeyed to app_code; explorer specs re-bound; drift guards green; transcription to config/gate-log.md; gates.json regenerated."
+  - title: "G. Sign-off"
+    confirmations:
+      - "SME sign-off recorded here and transcribed to config/gate-log.md with per-item outcomes (A1–A2, B1–B3, C1–C2, D1–D2, E1–E3, F1–F2)."

@@ -1,0 +1,92 @@
+# SME gate-prompt spec — email Distribution Lists as first-class contact points.
+# DRAFTED 2026-07-22 (user direction, same session as the attribution close-out):
+# "email DL needs an ontology mapping and is only configured in Outlook, but is in
+# the runbooks and can be extracted from emails and loaded into the context graph —
+# consider options for ontology including this in the local db." GATE-BOUND: this
+# page PROPOSES; no node class, no edge, no loader, no graph write until §E signs.
+# Mechanism-only: no real DL addresses, member names, or company domains anywhere
+# in this repo — real rows live company-side; the local EE db gets synthetic
+# fixtures only (the standing sample-data-only rule for neo4jtest).
+classification: Internal-Public
+schema: drydocs.gate-prompt.v1
+id: email-dl-contact-point
+title: "SME Gate — email Distribution Lists: ontology class, contact-point edges, the Outlook-only source problem, and the context-graph membership leg"
+step: "Decides how a DL enters the graph at all four layers: taxonomy (what is it), ontology (what do its edges mean), knowledge graph (what loads), context graph (what is observed)"
+summary: >
+  Support reality: every application/team has one or more email DLs that
+  escalations, job-failure notifications, and approvals flow through. They
+  appear throughout runbooks and in every operational email thread — but their
+  DEFINITION (address, display name, membership) exists only in Outlook/
+  Exchange, a system DryDocs has no feed from and cannot fix. That makes the DL
+  the purest case yet of the O24 problem shape: a value users know and need,
+  with no ingestible source of record — so the steward-defined store is not an
+  override of a source, it IS the source. This gate rules: (A) the node class
+  and standards alignment; (B) the edge vocabulary (owner→DL contact-point;
+  the future job→DL notification edge); (C) where the rows come from (defined
+  store + extraction candidates) and what may load into the knowledge graph;
+  (D) the layer-4 boundary — membership and email-observed usage are volatile,
+  Internal-Confidential context, never ontology-core edges. Nothing below is
+  applied until ticked and transcribed to config/gate-log.md.
+meta:
+  Module: "drydocs_core/ontology (new class + edges) · mapping store (O24 pattern) · future extractors (runbook corpus, email headers) · context graph (layer 4)"
+  Source: "NEW, unregistered: outlook-dl — no machine feed exists; steward-defined rows are the source of record (source-registry entry required at build, the seal-pat-scrape 'register-at-component-gate' precedent)"
+  Registry ref: "no existing source-registry entry — registration is a §E follow-through, classification Internal-Confidential for real rows (addresses + members are PII-adjacent), mechanism-only in this repo"
+  Classification: "Internal-Confidential (real DL rows, membership) · Internal (runbook mentions) · this page Internal-Public (mechanism only)"
+  Vocabulary: "no existing term fits (grepped: no contact/notification/channel class or edge in relationship_vocabulary.yaml); everything here registers status: planned on sign-off, per section B"
+  Ontology map: "config/taxonomy-ontology-map.yaml dl-contact-point (proposed 2026-07-22, this gate's entry)"
+  Related gates: "ui-write-surface (O24 store ratified 2026-07-21; the store-as-source scoping precedent is section E2 of the revised seal-app-ref-edge-reshape gate — cite, don't re-decide) · sosa-jobrun-observation (the layer-4 experimental family the membership leg would join, section D)"
+  Company impact: "company enumerates real DL rows at its own gate; runbook generation (the PRIMARY use case) gains a resolvable escalation/notification target per folder/app"
+mapping:
+  - n: 1
+    element: "The DL itself"
+    target: ":DistributionList — keyed by lower-cased SMTP address; props: display_name, purpose, origin, status(active|retired)"
+    edge: "new node class  [PROPOSED — class options section A]"
+  - n: 2
+    element: "Who the DL speaks for"
+    target: "(:BusinessApplication | :DevTeam | :AreaProduct)-[:HAS_CONTACT_POINT {purpose, origin}]->(:DistributionList)"
+    edge: "dcat:contactPoint pattern — local, prov_maps_to: ~  [PROPOSED — section B]"
+  - n: 3
+    element: "What notifies the DL (future)"
+    target: "(:ControlMJob)-[:NOTIFIES]->(:DistributionList) — from DO-MAIL/SHOUT destinations in job definitions when that extraction lands"
+    edge: "registered planned only if confirmed; NOT built by this gate  [OPTION — section B]"
+  - n: 4
+    element: "Where the DL is WITNESSED"
+    target: "runbook/doc mentions stay in the docs plane (Document/Chunk); email observations stay layer-4 — both produce CANDIDATE store rows, never direct edges"
+    edge: "extraction feeds the store, the store feeds the loader  [PROPOSED — sections C/D]"
+provenance:
+  - label: ":DistributionList (class under decision)"
+    source_object: "steward-defined DL rows (config/overrides/-style CSV → mapping.db domain) — no source system feed; candidates harvested from runbook corpus + email headers"
+    key: "smtp address, lower-cased (display names drift; the address is the stable handle users actually paste)"
+    loader: "~ (none until this gate + a build item; loader remains the only graph writer)"
+    properties:
+      - {name: address, origin: source, from: "steward row (or extraction candidate confirmed by steward)", note: "the node key"}
+      - {name: purpose, origin: source, from: "steward row", note: "escalation | notification | approval | general — small governed value set, the kind-enum discipline (no catch-all)"}
+      - {name: origin, origin: derived, from: "row provenance: defined | extracted-runbook | extracted-email", note: "O24 origin-flag discipline on every surface"}
+      - {name: membership, origin: derived, from: "NOT a graph property — layer-4 observation only (section D)", note: "volatile, Outlook-held, PII; never loaded as ontology-core data"}
+
+sections:
+  - title: "A. Node class + standards alignment (pick one)"
+    confirmations:
+      - "A1 [RECOMMENDED — vcard:Group via the dcat:contactPoint pattern]: class the node dd:DistributionList with standards alignment vcard:Group (W3C vCard: a group addressable as a unit), prov_type Entity. DCAT is already in the stack (:DataAsset/:DocSource are dcat:Dataset-shaped) and dcat:contactPoint's declared range is vcard:Kind — so the owner edge in B1 rides an existing, already-adopted standard family instead of inventing one. A DL is a CHANNEL RECORD, not an accountable party: accountability stays with the K4/K5 attribution chains (Employee/TOMRole/ProductRole); the DL is how you REACH whoever holds the role."
+      - "A2 [alternative — prov:Agent]: class the DL an Agent so it can legally sit in PROV participation edges (a notification wasAssociatedWith the DL). Cost: it puts a mailbox alias into the same behavioural class as people, teams, and service accounts, inviting exactly the accountability confusion the O24 contact work exists to prevent. Only pick this if the NOTIFIES leg (B2) must be PROV-mapped rather than local."
+      - "A3 [both options]: key = lower-cased SMTP address; display_name is a property (Outlook display names drift, addresses are what runbooks and users actually carry); status active|retired so a decommissioned DL is kept for audit, flagged on every surface, never silently deleted."
+  - title: "B. Edge vocabulary"
+    confirmations:
+      - "B1: (:BusinessApplication | :DevTeam | :AreaProduct)-[:HAS_CONTACT_POINT {purpose, origin}]->(:DistributionList) — LOCAL edge, prov_maps_to: ~, standards note dcat:contactPoint (the reg_uses_software no-PROV precedent: Agent/Entity → Entity capability/contact placement has no PROV row). One edge per (owner, DL, purpose). The purpose value set (escalation | notification | approval | general) is open-but-governed: additions are cheap gate riders, never a catch-all (the etlprocess-kind-enum / Backstage discipline)."
+      - "B2 [option — confirm or defer]: (:ControlMJob)-[:NOTIFIES]->(:DistributionList) for DO-MAIL/SHOUT destinations, registered status: planned now so runbook generation can name its target shape, built only when the job-definition extraction for mail destinations lands. If A2 (Agent) was picked, this maps prov:wasAssociatedWith; under A1 it stays local (~)."
+      - "B3: runbook MENTIONS are NOT a new edge type — a DL string found in a runbook/Document stays docs-plane evidence (Chunk text + extraction candidate row, origin=extracted-runbook). The docs plane already models aboutness (docs_describes); a mention is weaker than aboutness and earns no ontology edge."
+  - title: "C. Source model — the Outlook-only problem ('including this in the local db')"
+    confirmations:
+      - "C1 [the store is the source]: rows live as a committed mechanism-only CSV (config/overrides/ family) materialized into a mapping.db domain (dl-contact-point) with a /mappings console surface (steward persona). Because NO ingestible source of record exists, these defined rows are graph-loadable source data — the same scoping just ruled for the app-code defined mapping (seal-app-ref-edge-reshape §E2): store-as-source where no feed exists, loader remains the only graph writer, origin flagged on every edge."
+      - "C2 [extraction feeds candidates, never edges]: runbook-corpus scans and email-header harvesting produce CANDIDATE rows (address + where-seen provenance) into the store for steward confirmation — extraction NEVER writes the graph directly, and unconfirmed candidates never load. This is how 'can be extracted from emails' becomes safe: extraction proposes, the steward disposes."
+      - "C3 [future feed supersedes]: if an Exchange/GAL extract ever becomes available, it registers as a real source and the precedence question (feed vs steward rows) comes back to a gate — the defined rows do not silently lose to it (the O24 side-by-side rule)."
+      - "C4 [local db]: the producer-side neo4jtest EE container loads SYNTHETIC fixture DLs only (the standing sample-data-only rule); real addresses/rows are company-side, classification Internal-Confidential."
+  - title: "D. The context-graph boundary (layer 4)"
+    confirmations:
+      - "D1: DL MEMBERSHIP (who is on it) is volatile, Outlook-held, and PII — it is NEVER an ontology-core edge. If membership is ever captured (from email headers or a GAL probe), it lands as layer-4 observations in the experimental SOSA family (an :Observation about the DL, observed_at, source sensor = the extraction run) or as last_seen_* candidate metadata in the store — queryable as 'what matters right now', deletable as a unit, never part of the durable knowledge graph."
+      - "D2: email-observed USAGE (this DL received job-failure mail for folder X on date Y) is the same layer-4 shape — evidence that strengthens a candidate HAS_CONTACT_POINT row, surfaced with provenance in the console, never auto-promoted."
+      - "D3: everything in this section inherits the sosa-jobrun-observation gate's adoption: experimental status — a company-standard promotion for SOSA is a separate decision this gate does not make."
+  - title: "E. Sign-off + follow-through"
+    confirmations:
+      - "E1: on sign-off, one logged change: :DistributionList node classification + has_contact_point (and notifies, if B2 confirmed) registered status: planned in relationship_vocabulary.yaml; map entry dl-contact-point updated; source-registry entry outlook-dl added; store domain + CSV schema drafted (O24 template); build items groomed to the backlog; transcription to config/gate-log.md; gates.json regenerated."
+      - "E2: SME sign-off recorded here and transcribed with per-item outcomes (A1-or-A2, A3, B1–B3, C1–C4, D1–D3)."

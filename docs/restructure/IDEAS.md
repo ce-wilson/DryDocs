@@ -26,6 +26,16 @@ Tags help grooming: `idea` · `bug` · `doc` · `source` (new data source) · `q
 
 <!-- add new ideas at the top -->
 
+- 2026-07-22 — [idea] **Email DLs need an ontology mapping (user, chat pm).** DL = the
+  contact/notification channel for an app/team; only configured in Outlook (no feed,
+  can't fix), witnessed in runbooks, extractable from emails; membership/usage are
+  context-graph (layer 4) material. DRAFTED STRAIGHT TO GATE same session: gate prompt
+  `config/gate-prompts/email-dl-contact-point.yaml` (class options vcard:Group vs
+  prov:Agent; HAS_CONTACT_POINT dcat:contactPoint edge; store-as-source per the O24
+  pattern; extraction-proposes-steward-disposes; layer-4 membership boundary) + map
+  entry `dl-contact-point` (proposed). Grooming disposition: tracked at the gate —
+  build items groomed on sign-off (§E1); nothing further parked here.
+
 - 2026-07-22 — [idea] **The tie we need now: Control-M → SEAL batch :Port attribution as a
   DEFINED mapping, keyed by the Control-M APP CODE (:ControlMApplication), persisted via
   the mapping store (steward persona — NOT new UI).** SME model (2026-07-22, refined in
@@ -81,6 +91,13 @@ Tags help grooming: `idea` · `bug` · `doc` · `source` (new data source) · `q
   Mechanics: loader + cypher edit, property-retirement migration per the M2 doc-06
   Phase 3 raw-prop pattern; parsed fields are inside row_checksum, so expect a one-time
   delta-churn on the next run (M2 precedent handled the same).
+  KEPT-UPDATED 2026-07-22 pm (user: "close out the mapping"): the gate this item names
+  is now REVISED to carry it — `config/gate-prompts/seal-app-ref-edge-reshape.yaml` v2
+  (sections A grain / B app-code tiers / C target incl. :Batch-bridge retirement /
+  D shape / E steward-override-until-fixed / F migration) + map entry
+  `app-code-defined-mapping` (proposed, taxonomy-ontology-map.yaml). What stays parked
+  HERE: only the property-diet rider above (folder node prop retirement — gate names it
+  a separate decision) and the tier-2 platform-code enumeration (SME to supply).
 
 - 2026-07-22 — [idea] **Env toggle = one canonical node identity, never per-env node
   identities.** When the header env toggle [Prod|UAT|Dev] gets built, it must re-scope
