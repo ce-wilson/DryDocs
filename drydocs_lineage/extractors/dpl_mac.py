@@ -43,6 +43,28 @@ Join accounting (acceptance a): a MAC set whose GUID matches no extracted
 DPL process is STAGED anyway (``mac_only=true`` — candidates are working
 memory, curation decides) and counted + listed; DPL processes with no MAC
 set are counted too. Nothing drops silently.
+
+DISCOVERY — two staging layouts, one consumption path (2026-07-23):
+
+- **Hand-staged root** (the original layout): subdirectories each holding one
+  pipeline's JSON set; discovery = every ``pipeline.json`` under the root.
+- **Promotion-repo clone** (Bitbucket): dataset and pipeline live as SIBLING
+  folders under ``src/main/resources/promotion/pipelines/``, one folder per
+  object, named ``<name>#<guid>``. Pipeline folders are lowercase
+  (``accounts_conform_aws_ingest#<guid>``); dataset folders are UPPERCASE
+  (``ACCOUNTS_RAW#<guid>``); mixed casing is counted ambiguous, never guessed.
+  The folder name is parsed (:func:`parse_clone_folder`): the pipeline-folder
+  GUID keys the join exactly like ``pipelineId``, and dataset folder names
+  supply ``dataset_name`` where a flow entry lacks one. The swagger export
+  tool serves ``dataset_flow.json`` only per-pipeline (bulk ``pipeline_id`` /
+  ``dataset_id`` downloads by SEAL exist, but no bulk dataflow) — so a fresh
+  clone has pipeline folders with NO JSON set yet: counted
+  (``clone_sets_missing``) and listed (``clone_missing_set_guids``) — that
+  list IS the per-pipeline fetch work list; drop each fetched set into its
+  folder and re-run. When ``pipeline.json`` IS present it stays the set's key:
+  a folder-GUID mismatch is counted (``clone_guid_mismatch``), never resolved
+  silently. ``extract()`` accepts the clone root, its ``pipelines/`` dir, or a
+  SINGLE ``<name>#<guid>`` folder (per-folder scope).
 """
 from __future__ import annotations
 
@@ -55,6 +77,39 @@ from ..model import DataAssetNode, LineageGraph, ProcessNode, asset_id, process_
 #: the two consumed members of the traced per-pipeline JSON set
 PIPELINE_JSON = "pipeline.json"
 DATASET_FLOW_JSON = "dataset_flow.json"
+
+#: promotion-clone folder-name separator: ``<name>#<guid>``
+CLONE_NAME_SEP = "#"
+
+
+@dataclass(frozen=True)
+class CloneFolder:
+    """One parsed ``<name>#<guid>`` promotion-clone folder name."""
+
+    name: str
+    guid: str
+    kind: str  # "pipeline" (lowercase) | "dataset" (UPPERCASE) | "ambiguous"
+
+
+def parse_clone_folder(dirname: str) -> CloneFolder | None:
+    """Parse a promotion-clone folder name; ``None`` when not clone-encoded.
+
+    The casing convention IS the object-kind discriminator (observed clone
+    layout, 2026-07-23): pipeline folders are all-lowercase, dataset folders
+    all-UPPERCASE. Anything mixed is ``ambiguous`` — counted for review,
+    never guessed into either kind.
+    """
+    name, sep, guid = dirname.partition(CLONE_NAME_SEP)
+    if not sep or not name or not guid:
+        return None
+    letters = [c for c in name if c.isalpha()]
+    if letters and all(c.islower() for c in letters):
+        kind = "pipeline"
+    elif letters and all(c.isupper() for c in letters):
+        kind = "dataset"
+    else:
+        kind = "ambiguous"
+    return CloneFolder(name=name, guid=guid, kind=kind)
 
 #: DPL invocation kind — MUST match controlm_inventory's ``inv.invocation_type.lower()``
 _DPL_KIND = "dpl"
@@ -100,6 +155,15 @@ class MacCoverage:
     flow_missing: int = 0               # set without a dataset_flow.json
     flow_guid_mismatch: int = 0         # dataset_flow pipelineId != pipeline.json's
     files_ignored: int = 0              # other *.json in the set (the rest of the 6)
+    # -- promotion-clone layout (all zero on a hand-staged root) --
+    clone_pipeline_folders: int = 0     # lowercase name#guid dirs seen
+    clone_dataset_folders: int = 0      # UPPERCASE name#guid dirs seen
+    clone_ambiguous_folders: int = 0    # mixed-casing name#guid dirs — review, not guessed
+    clone_sets_missing: int = 0         # pipeline folders with no pipeline.json yet
+    clone_missing_set_guids: list[str] = field(default_factory=list)  # the fetch work list
+    clone_guid_mismatch: int = 0        # folder GUID != pipeline.json pipelineId (json wins)
+    clone_names_applied: int = 0        # mac_clone_name stamped from a folder name
+    dataset_names_from_clone: int = 0   # dataset_name filled from a dataset folder name
 
     def as_dict(self) -> dict:
         return asdict(self)
@@ -112,6 +176,10 @@ class MacCoverage:
             f"seal: facts={self.seal_facts} disagree={self.seal_disagreements} | "
             f"flow: reads={self.reads_added} writes={self.writes_added} "
             f"datasets={self.datasets_added} missing={self.flow_missing} | "
+            f"clone: pipes={self.clone_pipeline_folders} "
+            f"datasets={self.clone_dataset_folders} "
+            f"missing_sets={self.clone_sets_missing} "
+            f"mismatch={self.clone_guid_mismatch} | "
             f"skipped: invalid={self.sets_invalid} no_guid={self.sets_no_guid} "
             f"ds_no_guid={self.dataset_no_guid} "
             f"version_conflicts={self.dataset_version_conflicts} "
@@ -134,17 +202,58 @@ class DplMacExtractor:
     name = "dpl-mac"
 
     def extract(self, source: str | Path, into: LineageGraph) -> MacCoverage:
-        """``source`` is a MAC root: a directory whose subdirectories each hold
-        one pipeline's JSON set (or itself holds one set — a lone
-        ``pipeline.json`` beside its siblings). Returns the run's
-        :class:`MacCoverage`; callers report it — nothing drops silently."""
+        """``source`` is a MAC root: a hand-staged directory of per-pipeline
+        JSON sets, a promotion-repo clone (any level: the clone root, its
+        ``pipelines/`` dir, or one ``<name>#<guid>`` folder — the per-folder
+        scope), or itself one set (a lone ``pipeline.json`` beside its
+        siblings). Returns the run's :class:`MacCoverage`; callers report it —
+        nothing drops silently."""
         root = Path(source)
         coverage = MacCoverage()
+
+        # clone inventory first: dataset names must be known before sets stage
+        # their flow endpoints. rglob never yields the root itself, so the
+        # per-folder scope (root IS one clone folder) is added explicitly.
+        clone_dirs = [p for p in root.rglob(f"*{CLONE_NAME_SEP}*") if p.is_dir()]
+        if parse_clone_folder(root.name) is not None:
+            clone_dirs.append(root)
+        dataset_names: dict[str, str] = {}
+        pipeline_dirs: dict[Path, CloneFolder] = {}
+        for clone_dir in sorted(clone_dirs):
+            parsed = parse_clone_folder(clone_dir.name)
+            if parsed is None:
+                continue
+            if parsed.kind == "pipeline":
+                coverage.clone_pipeline_folders += 1
+                pipeline_dirs[clone_dir] = parsed
+            elif parsed.kind == "dataset":
+                coverage.clone_dataset_folders += 1
+                dataset_names.setdefault(parsed.guid, parsed.name)
+            else:
+                coverage.clone_ambiguous_folders += 1
+
         set_dirs = sorted(
             {p.parent for p in root.rglob(PIPELINE_JSON)},
         )
         for set_dir in set_dirs:
-            self._extract_set(set_dir, into, coverage)
+            self._extract_set(
+                set_dir, into, coverage, dataset_names, pipeline_dirs.get(set_dir)
+            )
+
+        # pipeline folders with no JSON set yet: the swagger tool serves
+        # dataflow only per-pipeline, so a fresh clone lands here — the GUID
+        # list is the fetch work list. The folder name is still a fact worth
+        # joining onto an already-extracted process.
+        staged = set(set_dirs)
+        for clone_dir, parsed in sorted(pipeline_dirs.items()):
+            if clone_dir in staged:
+                continue
+            coverage.clone_sets_missing += 1
+            coverage.clone_missing_set_guids.append(parsed.guid)
+            node = into.processes.get(process_id(_DPL_KIND, parsed.guid))
+            if node is not None:
+                node.properties.setdefault("mac_clone_name", parsed.name)
+                coverage.clone_names_applied += 1
 
         # the reverse join: extracted DPL processes no MAC set covered keep the
         # writer's default kind (acceptance c) — counted so the gap is visible
@@ -161,7 +270,12 @@ class DplMacExtractor:
 
     # -- one pipeline set ---------------------------------------------------
     def _extract_set(
-        self, set_dir: Path, graph: LineageGraph, coverage: MacCoverage
+        self,
+        set_dir: Path,
+        graph: LineageGraph,
+        coverage: MacCoverage,
+        dataset_names: dict[str, str] | None = None,
+        clone: CloneFolder | None = None,
     ) -> None:
         pipeline = _load_json(set_dir / PIPELINE_JSON)
         if pipeline is None:
@@ -174,12 +288,20 @@ class DplMacExtractor:
             coverage.sets_no_guid += 1
             return
 
+        if clone is not None and clone.guid != guid:
+            # pipeline.json wins (it IS the set's key); a stale clone or a
+            # misplaced set is review material, never silently resolved
+            coverage.clone_guid_mismatch += 1
+
         # the rest of the traced 6-JSON set: present, not consumed — counted
         for extra in set_dir.glob("*.json"):
             if extra.name not in (PIPELINE_JSON, DATASET_FLOW_JSON):
                 coverage.files_ignored += 1
 
         node = self._join_process(guid, pipeline, graph, coverage)
+        if clone is not None:
+            node.properties.setdefault("mac_clone_name", clone.name)
+            coverage.clone_names_applied += 1
         self._apply_pipeline_facts(node, pipeline, coverage)
 
         flow = _load_json(set_dir / DATASET_FLOW_JSON)
@@ -193,7 +315,7 @@ class DplMacExtractor:
         if flow_guid and flow_guid != guid:
             # pipeline.json wins (it IS the set's key); mismatch is review material
             coverage.flow_guid_mismatch += 1
-        self._apply_dataset_flow(node.node_id, flow, graph, coverage)
+        self._apply_dataset_flow(node.node_id, flow, graph, coverage, dataset_names)
 
     def _join_process(
         self, guid: str, pipeline: dict, graph: LineageGraph, coverage: MacCoverage
@@ -242,7 +364,12 @@ class DplMacExtractor:
                 coverage.seal_disagreements += 1
 
     def _apply_dataset_flow(
-        self, pid: str, flow: dict, graph: LineageGraph, coverage: MacCoverage
+        self,
+        pid: str,
+        flow: dict,
+        graph: LineageGraph,
+        coverage: MacCoverage,
+        dataset_names: dict[str, str] | None = None,
     ) -> None:
         for list_key, rel_type in (
             ("inputDatasets", "READS_FROM"),
@@ -259,7 +386,9 @@ class DplMacExtractor:
                 if not ds_guid:
                     coverage.dataset_no_guid += 1
                     continue
-                aid = self._stage_dataset(ds_guid, entry, graph, coverage)
+                aid = self._stage_dataset(
+                    ds_guid, entry, graph, coverage, dataset_names
+                )
                 graph.add_rel(pid, rel_type, aid)
                 if rel_type == "READS_FROM":
                     coverage.reads_added += 1
@@ -267,7 +396,12 @@ class DplMacExtractor:
                     coverage.writes_added += 1
 
     def _stage_dataset(
-        self, ds_guid: str, entry: dict, graph: LineageGraph, coverage: MacCoverage
+        self,
+        ds_guid: str,
+        entry: dict,
+        graph: LineageGraph,
+        coverage: MacCoverage,
+        dataset_names: dict[str, str] | None = None,
     ) -> str:
         aid = asset_id(MAC_DATASET_KIND, ds_guid)
         props: dict[str, str] = {}
@@ -277,6 +411,13 @@ class DplMacExtractor:
                 props[prop] = value
         existing = graph.data_assets.get(aid)
         if existing is None:
+            # a dataset folder name is a name FACT: fill the gap, never override
+            # what the flow entry itself said
+            if "dataset_name" not in props and dataset_names:
+                clone_name = dataset_names.get(ds_guid)
+                if clone_name:
+                    props["dataset_name"] = clone_name
+                    coverage.dataset_names_from_clone += 1
             graph.add_data_asset(
                 DataAssetNode(
                     node_id=aid, kind=MAC_DATASET_KIND, location=ds_guid,

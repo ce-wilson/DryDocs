@@ -14,7 +14,11 @@ from pathlib import Path
 
 import pytest
 
-from drydocs_lineage.extractors import DplMacExtractor, MacCoverage
+from drydocs_lineage.extractors import (
+    DplMacExtractor,
+    MacCoverage,
+    parse_clone_folder,
+)
 from drydocs_lineage.model import LineageGraph, ProcessNode, process_id
 from drydocs_lineage.writer import plan_curated
 
@@ -224,3 +228,125 @@ def test_coverage_summary_mentions_riders(run) -> None:
     _, cov = run
     assert "riders=1" in cov.summary()
     assert "unmatched=1" in cov.summary()
+
+
+def test_hand_staged_root_has_zero_clone_counters(run) -> None:
+    _, cov = run
+    assert cov.clone_pipeline_folders == 0
+    assert cov.clone_dataset_folders == 0
+    assert cov.clone_sets_missing == 0
+    assert cov.clone_missing_set_guids == []
+
+
+# -- promotion-clone layout (name#guid sibling folders; per-folder scope) ----------
+
+GUID_D = "44444444-aaaa-4bbb-8ccc-000000000004"   # clone folder, set staged
+GUID_E = "55555555-aaaa-4bbb-8ccc-000000000005"   # clone folder, NO set yet
+
+
+def test_parse_clone_folder_casing_is_the_discriminator() -> None:
+    pipe = parse_clone_folder(f"accounts_conform_aws_ingest#{GUID_D}")
+    assert pipe is not None
+    assert (pipe.kind, pipe.name, pipe.guid) == (
+        "pipeline", "accounts_conform_aws_ingest", GUID_D)
+    ds = parse_clone_folder(f"ACCOUNTS_RAW#{DS_IN}")
+    assert ds is not None and ds.kind == "dataset" and ds.guid == DS_IN
+    mixed = parse_clone_folder(f"Accounts_Raw#{DS_IN}")
+    assert mixed is not None and mixed.kind == "ambiguous"
+    assert parse_clone_folder("no-separator-here") is None
+    assert parse_clone_folder(f"#{GUID_D}") is None
+
+
+@pytest.fixture()
+def clone_root(tmp_path: Path) -> Path:
+    """A shape-faithful promotion-repo checkout: dataset and pipeline folders
+    as SIBLINGS under src/main/resources/promotion/pipelines/."""
+    pipelines = tmp_path / "clone" / "src" / "main" / "resources" / "promotion" / "pipelines"
+    (pipelines / f"ACCOUNTS_RAW#{DS_IN}").mkdir(parents=True)
+    (pipelines / f"ACCOUNTS_TRUSTED#{DS_OUT}").mkdir()
+    staged = pipelines / f"accounts_conform_aws_ingest#{GUID_A}"
+    staged.mkdir()
+    (staged / "pipeline.json").write_text(json.dumps(
+        {"pipelineId": GUID_A, "pipelineType": "batch",
+         "subType": "transformation", "ownerSealId": "88888"},
+    ), encoding="utf-8")
+    (staged / "dataset_flow.json").write_text(json.dumps(
+        {"pipelineId": GUID_A,
+         "inputDatasets": [{"guid": DS_IN, "version": "3", "zone": "RAW"}],
+         "outputDatasets": [{"guid": DS_OUT, "zone": "TRUSTED",
+                             "name": "flow_says_trusted"}]},
+    ), encoding="utf-8")
+    (pipelines / f"accounts_provision_aws_ingest#{GUID_E}").mkdir()  # fresh clone: no set
+    return tmp_path / "clone"
+
+
+def test_clone_discovery_and_missing_set_worklist(clone_root: Path) -> None:
+    g = _seed_graph()
+    cov = DplMacExtractor().extract(clone_root, g)
+    assert cov.clone_pipeline_folders == 2
+    assert cov.clone_dataset_folders == 2
+    assert cov.sets_read == 1                      # only the staged folder consumed
+    assert cov.clone_sets_missing == 1             # the swagger per-pipeline fetch list
+    assert cov.clone_missing_set_guids == [GUID_E]
+    assert cov.clone_guid_mismatch == 0
+    assert "missing_sets=1" in cov.summary()
+
+
+def test_clone_folder_name_is_a_fact_on_the_joined_process(clone_root: Path) -> None:
+    g = _seed_graph()
+    g.add_process(ProcessNode(
+        node_id=process_id("dpl", GUID_E), kind="dpl", name="dt-launcher.sh",
+    ))
+    cov = DplMacExtractor().extract(clone_root, g)
+    staged = g.processes[process_id("dpl", GUID_A)]
+    assert staged.properties["mac_clone_name"] == "accounts_conform_aws_ingest"
+    # no set yet, but the folder name still joined the extracted process
+    unstaged = g.processes[process_id("dpl", GUID_E)]
+    assert unstaged.properties["mac_clone_name"] == "accounts_provision_aws_ingest"
+    assert "mac_covered" not in unstaged.properties   # a name is NOT MAC coverage
+    assert cov.clone_names_applied == 2
+
+
+def test_dataset_folder_names_fill_gaps_never_override(clone_root: Path) -> None:
+    g = _seed_graph()
+    cov = DplMacExtractor().extract(clone_root, g)
+    ds_in = g.data_assets[f"data#dpl_dataset:{DS_IN}"]
+    assert ds_in.properties["dataset_name"] == "ACCOUNTS_RAW"   # gap filled
+    ds_out = g.data_assets[f"data#dpl_dataset:{DS_OUT}"]
+    assert ds_out.properties["dataset_name"] == "flow_says_trusted"  # flow entry wins
+    assert cov.dataset_names_from_clone == 1
+
+
+def test_clone_guid_mismatch_counted_json_wins(clone_root: Path) -> None:
+    pipelines = clone_root / "src" / "main" / "resources" / "promotion" / "pipelines"
+    misplaced = pipelines / f"accounts_stale_aws_ingest#{GUID_D}"
+    misplaced.mkdir()
+    (misplaced / "pipeline.json").write_text(json.dumps(
+        {"pipelineId": GUID_B, "subType": "transformation"},
+    ), encoding="utf-8")
+    g = _seed_graph()
+    cov = DplMacExtractor().extract(clone_root, g)
+    assert cov.clone_guid_mismatch == 1
+    assert process_id("dpl", GUID_B) in g.processes   # json's GUID keyed the join
+    assert process_id("dpl", GUID_D) not in g.processes
+
+
+def test_single_clone_folder_root_is_the_per_folder_scope(clone_root: Path) -> None:
+    one = (clone_root / "src" / "main" / "resources" / "promotion" / "pipelines"
+           / f"accounts_conform_aws_ingest#{GUID_A}")
+    g = _seed_graph()
+    cov = DplMacExtractor().extract(one, g)
+    assert cov.clone_pipeline_folders == 1
+    assert cov.sets_read == 1 and cov.matched == 1
+    node = g.processes[process_id("dpl", GUID_A)]
+    assert node.properties["mac_clone_name"] == "accounts_conform_aws_ingest"
+
+
+def test_ambiguous_casing_counted_never_guessed(tmp_path: Path) -> None:
+    root = tmp_path / "clone"
+    (root / f"Accounts_Mixed#{GUID_D}").mkdir(parents=True)
+    g = _seed_graph()
+    cov = DplMacExtractor().extract(root, g)
+    assert cov.clone_ambiguous_folders == 1
+    assert cov.clone_pipeline_folders == 0
+    assert cov.clone_dataset_folders == 0
