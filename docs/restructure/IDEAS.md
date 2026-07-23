@@ -26,7 +26,29 @@ Tags help grooming: `idea` · `bug` · `doc` · `source` (new data source) · `q
 
 <!-- add new ideas at the top -->
 
-- 2026-07-23 — [doc] **Runbook Rev 3 rider (goes with the 2026-07-20 Rev 3 candidate below):
+- 2026-07-23 — [idea] **Oracle connection for the lineage/remediation path (user note,
+  chat pm).** The lineage jobs step still stages a CSV by hand through a JDBC client;
+  the Oracle connection is planned — and the user's note ties it to the REMEDIATION
+  context ("switch to the remediation since this last update was related"). Candidate
+  shape: a direct pull of the `controlm_jobs.sql` projection (the same file
+  `ingest-controlm --use-oracle` runs — runbook Rev 2 records the equivalence) plus
+  the remediation-side staging reads (STG_APP_FACT-family fact tables per the
+  company-side greenfield docs). Clarify scope with the SME before building.
+- 2026-07-23 — [source] **Company-side greenfield remediation standards not yet
+  producer-modeled.** Two docs live in the company `drydocs_remediation` path (seen in
+  review 2026-07-23): (1) the Control-M file-name component standard — FileName
+  decomposed into FilePrefix / FileBusinessDate / FileSequence / FileExtension /
+  FileCompression / FileSuffix + the FilePattern FileWatcher glob, DistributionRole
+  derived from extension, a `CM_JOB_FILE_NAME_STANDARD` Oracle column standard, and
+  dcat:Distribution ontology mappings; (2) the cmd-job ontology variable mapping
+  (`%%ETL_PLATFORM`, `%%LAUNCHER_SCRIPT_PATH`, `%%ETL_ARTIFACT_URI`… →
+  STG_APP_FACT fact_type → :Script nodes / INVOKES / USES_ARTIFACT). Producer-side
+  `drydocs_remediation` models FileWatcher (`job_type`, `watch_template`, resolved-watch
+  equivalence) and job variables (ordered defs, scope chain, canonical rename,
+  dot-smuggling detect, corroborate) GENERICALLY — but has no filename-component
+  standard and `transform.py` still notes the canonical variable map is "a company-side
+  ratified value". Candidate: bring both docs in as the ratified maps when the
+  remediation M2 generalization opens (FR-REM-5's schedule/command/conditions slice).
   local Neo4j container recreated to match config/dev-environment.yaml** — data migrated
   from `neo4j-drydocs-ee` (anonymous volume, host ports 7476/7689) into named volume
   `neo4j-testdata`; canonical container `neo4jtest` now runs on default ports 7474/7687
