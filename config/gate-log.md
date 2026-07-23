@@ -800,3 +800,27 @@ SME-supplied PAT screenshots held OUT of the repo — Internal-Confidential).
 - **Effect:** R1 done; R2 (graph_qa Tier-0/1) becomes next_ready. Build follow-ups stay
   groomed as R2–R8 — nothing built at the gate itself. O20 (UI zero graph writes)
   reconfirmed standing for the whole epic.
+
+## 2026-07-23 — Folder property diet · naming-convention decode OFF nodes — RULED (in-session)
+
+- **Scope:** :ControlMFolder node properties only (the property-diet rider parked in
+  IDEAS 2026-07-22 — named a SEPARATE decision by gate-prompt
+  `seal-app-ref-edge-reshape.yaml` §B, which keeps owning the app-code → SEAL/AreaProduct
+  mapping tiers). Session: in-session ruling, SME chad.wilson.
+- **Decision:** the folder-name convention (pos1=env, pos2=lob, pos3-5=app_code,
+  pos6=folder_type) is the **internal Control-M app-code definition** — do NOT expand it
+  onto nodes. `environment_code/environment/lob_code/lob/folder_type_code/folder_type`
+  retired from the loader + cypher; **`app_code` KEPT** as the join key for the app-code
+  → BusinessApplication defined mapping ("we can do that without adding P production
+  R retail"). Rationale confirmed: `f.lob='Retail'` collides with the org-taxonomy LOB
+  (same word, different taxonomy); env truth is the `data_center` prefix on
+  :ControlMServer, not folder-name pos 1; the real access pattern is the rollup via
+  containment + defined mapping, not property filters.
+- **Mechanism:** decode lives ONCE in `folder_name.py` (parser unchanged — validation +
+  app_code extraction still use it); node keeps `sched_table` raw + `app_code`.
+  No property-retirement migration: pre-diet graphs are wiped and rebuilt from bootstrap
+  (wipe-and-rebuild doctrine, 2026-07-23). Checksum inputs slim to app_code +
+  prefix_recognized — moot under rebuild.
+- **Effect:** loader + cypher + tests edited this commit; TDD Rev 5 follows. The tier-2
+  platform-code enumeration stays parked in IDEAS (SME to supply). Staging DDL
+  `fn_lob_code` (analysis staging, not graph) untouched.

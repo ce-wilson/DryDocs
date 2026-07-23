@@ -152,8 +152,14 @@ Tags help grooming: `idea` · `bug` · `doc` · `source` (new data source) · `q
   (sections A grain / B app-code tiers / C target incl. :Batch-bridge retirement /
   D shape / E steward-override-until-fixed / F migration) + map entry
   `app-code-defined-mapping` (proposed, taxonomy-ontology-map.yaml). What stays parked
-  HERE: only the property-diet rider above (folder node prop retirement — gate names it
-  a separate decision) and the tier-2 platform-code enumeration (SME to supply).
+  HERE: only the tier-2 platform-code enumeration (SME to supply).
+  **RESOLVED 2026-07-23 (property-diet rider):** SME ruled in-session — the naming
+  convention is the internal Control-M app-code definition; do NOT expand it onto nodes.
+  environment*/lob*/folder_type* retired from controlm_folders loader+cypher; app_code
+  KEPT (join key for app-code → BusinessApplication mapping). No migration —
+  wipe-and-rebuild. Ruling recorded in config/gate-log.md (2026-07-23 folder property
+  diet); the app-code → SEAL mapping itself still belongs to the open
+  seal-app-ref-edge-reshape v2 gate.
 
 - 2026-07-22 — [idea] **Env toggle = one canonical node identity, never per-env node
   identities.** When the header env toggle [Prod|UAT|Dev] gets built, it must re-scope

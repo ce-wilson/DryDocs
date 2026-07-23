@@ -117,7 +117,12 @@ def test_folders_to_params_adds_row_checksum_alongside_parsed_fields() -> None:
     loader = ControlMFoldersLoader.__new__(ControlMFoldersLoader)
     params = loader.to_params(ControlMFolderRow.model_validate(_FOLDER_ROW))
     assert "row_checksum" in params
-    assert "environment_code" in params  # parse_folder_name fields present too
+    assert "app_code" in params  # the one surviving parsed field (join key)
+    # folder property diet (SME ruling 2026-07-23): the expanded
+    # naming-convention decode never reaches the batch params
+    for retired in ("environment_code", "environment", "lob_code", "lob",
+                    "folder_type_code", "folder_type"):
+        assert retired not in params
 
 
 def test_folders_to_params_checksum_stable_ignoring_capture_date() -> None:

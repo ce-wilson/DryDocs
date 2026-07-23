@@ -4,11 +4,16 @@ Source: ``psgmgr.CM_DEF_VTAB`` (replicated copy of ``dtsremgr.DEF_VTAB``)
 via OracleAdapter; CSV via CsvAdapter for samples / dev. Produces
 :ControlMFolder nodes and the :ControlMServer mesh (deduped on DATA_CENTER).
 
-The loader parses the ``SCHED_TABLE`` folder name into structured
-properties (environment / lob / app_code / folder_type) using
-:func:`drydocs.controlm.folder_name.parse_folder_name`. The Cypher
-template writes those properties onto the :ControlMFolder node so downstream
-queries can filter by environment, LOB, or appcode without re-parsing.
+The loader parses the ``SCHED_TABLE`` folder name with
+:func:`drydocs.controlm.folder_name.parse_folder_name` and forwards ONLY
+``app_code`` — the join key for the app-code → BusinessApplication
+defined mapping (seal-app-ref gate). SME ruling 2026-07-23 (folder
+property diet): the expanded naming-convention decode (environment /
+lob / folder_type) stays OFF the node. The convention is the internal
+Control-M app-code definition; as node properties it confused users
+(``f.lob='Retail'`` collided with the org-taxonomy LOB, and env truth
+is the ``data_center`` prefix on :ControlMServer, not folder-name
+pos 1). The decode lives in ``folder_name.py``, once.
 
 Active filter (``USER_DAILY IS NOT NULL``) lives in the SQL projection.
 There is NO ``IS_CURRENT_VERSION`` filter on folders — that column
@@ -39,19 +44,15 @@ class ControlMFoldersLoader(BaseLoader):
     sweep_label: ClassVar[str | None] = "ControlMFolder"
 
     def to_params(self, model: BaseModel) -> dict:
-        """Add parsed-folder-name fields to the row params, then the delta
-        checksum (doc 06 Phase 2) computed over the FULL row including the
-        parsed fields — they are a deterministic function of sched_table so
-        including them doesn't destabilize the hash."""
+        """Add the app_code join key parsed from the folder name, then the
+        delta checksum (doc 06 Phase 2). Only app_code survives the folder
+        property diet (SME ruling 2026-07-23) — see the module docstring.
+        prefix_recognized rides for the checksum only (parse-quality
+        signal; never a node property). Both are deterministic functions
+        of sched_table, so including them doesn't destabilize the hash."""
         params = model.model_dump(mode="json")
         parsed = parse_folder_name(params.get("sched_table") or "")
-        params["environment_code"] = parsed.environment_code
-        params["environment"] = parsed.environment
-        params["lob_code"] = parsed.lob_code
-        params["lob"] = parsed.lob
         params["app_code"] = parsed.app_code
-        params["folder_type_code"] = parsed.folder_type_code
-        params["folder_type"] = parsed.folder_type
         params["prefix_recognized"] = parsed.prefix_recognized
         params["row_checksum"] = compute_row_checksum(params)
         return params

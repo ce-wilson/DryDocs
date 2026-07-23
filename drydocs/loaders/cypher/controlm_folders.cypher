@@ -42,10 +42,16 @@ SET srv.last_seen_at = datetime($loaded_at),
     srv.last_run_id  = $run_id
 
 // Folder upsert — name from SCHED_TABLE per the real DDL.
-// The loader pre-parses SCHED_TABLE into structured properties
-// (environment, lob_code, app_code, folder_type_code) via
-// drydocs.controlm.folder_name.parse_folder_name before sending the
-// batch — those parsed properties arrive as row fields.
+// The loader parses SCHED_TABLE via folder_name.parse_folder_name and
+// sends ONLY app_code forward — the join key for the app-code →
+// BusinessApplication defined mapping (seal-app-ref gate). SME ruling
+// 2026-07-23 (folder property diet): the expanded naming-convention
+// decode (environment / lob / folder_type) stays OFF the node — the
+// convention is the internal Control-M app-code definition, and as node
+// properties it confused users (f.lob='Retail' collided with the
+// org-taxonomy LOB; env truth is the data_center prefix on
+// :ControlMServer, not folder-name pos 1). Decode lives in
+// folder_name.py / the app-code definition, not on nodes.
 MERGE (f:ControlMFolder:Collection {folder_id: row.folder_id})
   ON CREATE SET f.first_seen_at = datetime($loaded_at),
                 f.source     = 'psgmgr.CM_DEF_VTAB'
@@ -63,13 +69,7 @@ SET f.sched_table       = row.sched_table,
                                ELSE datetime(replace(row.last_updated, ' ', 'T')) END,
     f.capture_date      = CASE WHEN row.capture_date IS NULL OR row.capture_date = '' THEN null
                                ELSE datetime(replace(row.capture_date, ' ', 'T')) END,
-    f.environment_code  = row.environment_code,
-    f.environment       = row.environment,
-    f.lob_code          = row.lob_code,
-    f.lob               = row.lob,
     f.app_code          = row.app_code,
-    f.folder_type_code  = row.folder_type_code,
-    f.folder_type       = row.folder_type,
     f.active            = (row.user_daily IS NOT NULL AND row.user_daily <> ''),
     f.last_seen_at      = datetime($loaded_at),
     f.last_run_id       = $run_id
