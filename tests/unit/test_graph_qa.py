@@ -223,3 +223,55 @@ def test_schema_prompt_truncates_at_cap() -> None:
     ]
     prompt = build_schema_prompt(rows, LIVE_SCHEMA, [("s.v1", "d", "MATCH (n) RETURN n")])
     assert len(prompt) <= MAX_PROMPT_CHARS
+
+
+def test_tier0_zero_rows_falls_through_to_tier1() -> None:
+    """A routed spec returning 0 rows is insufficient context — Tier 1 must engage."""
+    provider = FakeProvider(replies=[
+        '{"spec_id": "%s", "params": {}}' % SPEC_ID,                       # router
+        '{"cypher": "MATCH (f:ControlMFolder) RETURN count(f) AS n"}',     # text2cypher
+        "5 folders.",                                                       # answer
+    ])
+    calls: list[str] = []
+
+    def run_read(cypher, params=None, database=None, row_cap=100, timeout_s=15.0):
+        calls.append(cypher)
+        if cypher == SPEC.cypher:  # the spec run comes back empty
+            return FakeResult(records=[], keys=[], row_count=0)
+        return FakeResult(records=[{"n": 5}], keys=["n"], row_count=1)
+
+    env = _pipeline(provider, run_read).answer("count folders", run_id="qa-test-6")
+    assert env.tier == "text2cypher"                       # what actually answered
+    kinds = [s.kind for s in env.steps]
+    assert "spec" in kinds and "text2cypher" in kinds      # both attempts recorded
+    assert [s for s in env.steps if s.kind == "spec"][0].rows == 0
+    assert env.metrics.context["rows"] == 1
+    assert env.answer == "5 folders."
+
+
+def test_schema_prompt_renders_per_label_properties() -> None:
+    schema = dict(LIVE_SCHEMA)
+    schema["propertiesByLabel"] = {"ControlMFolder": ["folder_id", "sched_table"]}
+    prompt = build_schema_prompt(VOCAB, schema, [("s.v1", "d", "MATCH (n) RETURN n")])
+    assert "ControlMFolder: folder_id, sched_table" in prompt
+    assert "Properties by label" in prompt
+
+
+def test_schema_prompt_sections_survive_oversized_vocabulary() -> None:
+    """Regression (live, 2026-07-23): whole-prompt tail truncation dropped the live
+    schema, per-label properties, and ALL examples once the vocabulary outgrew the
+    cap. Per-section budgets must keep every section present."""
+    huge_vocab = [
+        {"neo4j_label": f"REL_{i}", "from_node": "A", "to_node": "B",
+         "note": "x" * 300, "status": "active"}
+        for i in range(500)
+    ]
+    schema = dict(LIVE_SCHEMA)
+    schema["propertiesByLabel"] = {"ControlMFolder": ["folder_id", "sched_table"]}
+    prompt = build_schema_prompt(
+        huge_vocab, schema, [("spec.a.v1", "desc", "MATCH (n) RETURN n LIMIT 1")]
+    )
+    assert len(prompt) <= MAX_PROMPT_CHARS
+    assert "Properties by label" in prompt
+    assert "sched_table" in prompt
+    assert "Example queries" in prompt and "spec.a.v1" in prompt

@@ -25,7 +25,14 @@ VOCABULARY_PATH = _REPO_ROOT / "drydocs_core" / "ontology" / "relationship_vocab
 
 MAX_VOCAB_ROWS = 80
 MAX_EXAMPLES = 6
+MAX_NOTE_CHARS = 90
 MAX_PROMPT_CHARS = 12_000
+
+# Per-section character budgets. Tail-truncating the WHOLE prompt silently
+# dropped the live schema, per-label properties, and every example the first
+# time the vocabulary outgrew the cap (live finding, 2026-07-23) — each
+# section now survives on its own budget; sums stay under MAX_PROMPT_CHARS.
+SECTION_BUDGETS = {"vocab": 4_800, "live": 1_400, "by_label": 2_800, "examples": 2_800}
 
 
 def load_vocabulary(path: Path | None = None) -> list[dict]:
@@ -35,13 +42,27 @@ def load_vocabulary(path: Path | None = None) -> list[dict]:
     return [r for r in rows if r.get("status") == "active"]
 
 
+def _clip(lines: list[str], budget: int) -> list[str]:
+    """Whole-line clipping with an explicit truncation marker — never mid-line."""
+    out: list[str] = []
+    used = 0
+    for line in lines:
+        if used + len(line) + 1 > budget:
+            out.append("… (section truncated)")
+            break
+        out.append(line)
+        used += len(line) + 1
+    return out
+
+
 def _vocab_lines(rows: list[dict]) -> list[str]:
     lines = []
     for r in rows[:MAX_VOCAB_ROWS]:
         role = f" role={r['role']}" if r.get("role") else ""
+        note = (r.get("note") or "")[:MAX_NOTE_CHARS]
         lines.append(
             f"(:{r.get('from_node')})-[:{r.get('neo4j_label')}{role}]->(:{r.get('to_node')})"
-            + (f"  // {r['note']}" if r.get("note") else "")
+            + (f"  // {note}" if note else "")
         )
     return lines
 
@@ -56,18 +77,36 @@ def build_schema_prompt(
         "You write read-only Cypher for the DryDocs knowledge graph.",
         "",
         "## Relationship vocabulary (curated — the ONLY edge semantics that exist)",
-        *_vocab_lines(vocab_rows),
+        *_clip(_vocab_lines(vocab_rows), SECTION_BUDGETS["vocab"]),
         "",
         "## Live schema of the routed database",
-        f"labels: {', '.join(live_schema.get('labels', []))}",
-        f"relationship types: {', '.join(live_schema.get('relationshipTypes', []))}",
-        f"property keys: {', '.join(live_schema.get('propertyKeys', []))}",
+        *_clip(
+            [
+                f"labels: {', '.join(live_schema.get('labels', []))}",
+                f"relationship types: {', '.join(live_schema.get('relationshipTypes', []))}",
+                f"property keys: {', '.join(live_schema.get('propertyKeys', []))}",
+            ],
+            SECTION_BUDGETS["live"],
+        ),
+    ]
+    if live_schema.get("propertiesByLabel"):
+        parts += [
+            "",
+            "## Properties by label (use ONLY these per label)",
+            *_clip(
+                [
+                    f"{label}: {', '.join(props)}"
+                    for label, props in live_schema["propertiesByLabel"].items()
+                ],
+                SECTION_BUDGETS["by_label"],
+            ),
+        ]
+    example_lines: list[str] = []
+    for spec_id, description, cypher in examples[:MAX_EXAMPLES]:
+        example_lines += [f"-- {spec_id}: {description}", cypher, ""]
+    parts += [
         "",
         "## Example queries (registered specs — follow this idiom)",
+        *_clip(example_lines, SECTION_BUDGETS["examples"]),
     ]
-    for spec_id, description, cypher in examples[:MAX_EXAMPLES]:
-        parts.append(f"-- {spec_id}: {description}")
-        parts.append(cypher)
-        parts.append("")
-    prompt = "\n".join(parts)
-    return prompt[:max_chars]
+    return "\n".join(parts)[:max_chars]

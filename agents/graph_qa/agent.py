@@ -20,7 +20,7 @@ from google.adk.events import Event
 from google.genai import types
 
 from common.graph_read import run_read
-from common.neo4j_tool import graph_schema
+from common.neo4j_tool import graph_schema_detailed
 from graph_qa.envelope import sha256_text
 from graph_qa.pipeline import GraphQaPipeline
 from graph_qa.providers import ProviderConfigError, provider_from_env
@@ -34,7 +34,7 @@ def _get_pipeline() -> GraphQaPipeline:
         _pipeline = GraphQaPipeline(
             provider=provider_from_env(),
             run_read=run_read,
-            graph_schema=graph_schema,
+            graph_schema=graph_schema_detailed,
         )
     return _pipeline
 

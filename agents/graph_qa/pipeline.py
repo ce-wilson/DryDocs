@@ -46,7 +46,10 @@ TEXT2CYPHER_USER = (
     "Question: {question}\n\n"
     "Write ONE read-only Cypher query that answers it. Rules: no write "
     "clauses or write procedures of any kind; alias every returned value; "
-    "add LIMIT {row_cap} unless the query aggregates to a few rows.\n"
+    "add LIMIT {row_cap} unless the query aggregates to a few rows. The "
+    "property keys list is graph-wide, not per-label — when an example query "
+    "reads a property off a label, prefer the example's property over a "
+    "plausible-sounding one.\n"
     'Reply with JSON only: {{"cypher": "..."}}'
 )
 
@@ -226,9 +229,14 @@ class GraphQaPipeline:
         result = self._run_spec(envelope, spec_id, params, timings) if spec_id else None
         if result is not None:
             envelope.tier = "spec"
-        else:
-            result = self._run_text2cypher(envelope, question, timings)
-            if result is not None:
+        if result is None or result.row_count == 0:
+            # Zero rows from a routed spec is "insufficient context" (ADR 0007
+            # tiering) — a mis-routed or not-yet-loaded spec must not become an
+            # empty answer when text2cypher can ground one. The spec step stays
+            # in the envelope either way; tier reports what actually answered.
+            t2c_result = self._run_text2cypher(envelope, question, timings)
+            if t2c_result is not None and (result is None or t2c_result.row_count > 0):
+                result = t2c_result
                 envelope.tier = "text2cypher"
 
         if result is not None:

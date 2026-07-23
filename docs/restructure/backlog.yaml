@@ -5315,7 +5315,7 @@ items:
     agent: main
     model: sonnet
     priority: p1
-    status: in_progress   # build landed 2026-07-23; remaining: live-key smoke (see notes)
+    status: done          # live-verified 2026-07-23 (real model + real graph + api_server transport)
     depends_on: [R1]
     inputs: [agents/, drydocs_api/query_specs.py, drydocs_core/ontology/relationship_vocabulary.yaml, docs/decisions/0007-agentic-qa-architecture.md]
     notes: >
@@ -5327,11 +5327,17 @@ items:
       verbatim, prompt grounding+bounds, fix cap 2, pre-flight, contract,
       usage extractor) + 3 live integration tests (server rejects CREATE(x)
       and CALL db.createLabel probes that evade the token guards) + agents-venv
-      structural smoke over live drydocs rows. REMAINING for done: fill
-      GRAPHQA_PROVIDER/GRAPHQA_MODEL/ANTHROPIC_API_KEY in agents/.env (no key
-      available this session) and run one real-model end-to-end smoke through
-      adk api_server. litellm gotcha: install wheels only (--only-binary),
-      sdist needs Rust on Windows.
+      structural smoke over live drydocs rows. DONE 2026-07-23 after the
+      user keyed agents/.env: live two-question smoke (Tier-0 spec verbatim,
+      7 rows; Tier-1 text2cypher after a 0-row spec fall-through, correct
+      sched_table aggregation) + full transport smoke through adk api_server
+      (/run returned the envelope; session memory events counted). Live
+      findings fixed in-item: (1) 0-row spec now falls through to Tier-1
+      (insufficient-context rule); (2) per-label properties added to the
+      schema prompt (graph_schema_detailed); (3) prompt section budgets —
+      whole-prompt truncation had silently dropped schema+examples (regression
+      test added). Router force-fit tuning -> R8 ledger work. litellm gotcha:
+      install wheels only (--only-binary), sdist needs Rust on Windows.
     acceptance: >
       The envelope contract is documented and returned per question: answer +
       steps[] (each with cypher, database, rows, ms, fix_retries) + sources
@@ -5481,11 +5487,11 @@ items:
       possible.
 
 summary:
-  todo: 28                                         # R2 pulled 2026-07-23 (post-R1 gate)
-  in_progress: 2                                   # E1 (gate deferred both sides) + R2 (graph_qa build)
+  todo: 28                                         # R3..R8 queued behind the Epic R chain
+  in_progress: 1                                   # E1 (gate deferred both sides)
   blocked: 0
-  done: 128                                        # +R1 ADR 0007 gate signed off 2026-07-23 (rulings in config/gate-log.md)
-  next_ready: [M3, M4, P3, J10, Q6, O23, J13, G18, G25, O26, G26, O27, C15, C16, O28]
+  done: 129                                        # +R2 graph_qa Tier-0/1 live-verified 2026-07-23 (model+graph+api_server)
+  next_ready: [M3, M4, P3, J10, Q6, O23, J13, G18, G25, O26, G26, O27, C15, C16, O28, R3, R4]
   # HITL-free groom (2026-07-21 pm; O26 pulled 07-22): P3, J10, Q6, J13, G18, G19, G26
   # are workable with NO gate session — P3/G21 implement already-signed rulings
   # (CM_HOSTS 07-09, cmd-line 07-15); G18..G21+G24+G25 are staging-only pre-G22 (no

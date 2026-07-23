@@ -76,3 +76,25 @@ def graph_schema() -> dict:
         return {"status": "success", "labels": labels, "relationshipTypes": rels, "propertyKeys": props}
     except Exception as exc:
         return {"status": "error", "error": f"{type(exc).__name__}: {exc}"}
+
+
+def graph_schema_detailed() -> dict:
+    """graph_schema() plus per-label property keys — text2cypher grounding needs to
+    know WHICH label owns a property (the flat propertyKeys list made the model
+    guess ControlMFolder.name where the real key is sched_table)."""
+    base = graph_schema()
+    try:
+        records = _get_driver().execute_query(
+            "CALL db.schema.nodeTypeProperties() "
+            "YIELD nodeLabels, propertyName RETURN nodeLabels, propertyName",
+            database_=os.getenv("NEO4J_DATABASE", "neo4j"),
+        ).records
+        by_label: dict[str, set] = {}
+        for r in records:
+            for label in r["nodeLabels"]:
+                if r["propertyName"]:
+                    by_label.setdefault(label, set()).add(r["propertyName"])
+        base["propertiesByLabel"] = {k: sorted(v) for k, v in sorted(by_label.items())}
+    except Exception:
+        pass  # older servers without the procedure — flat propertyKeys still present
+    return base
