@@ -1078,7 +1078,7 @@ def m3_verify() -> None:
             checks.append((
                 "no blanket WAS_GENERATED_BY from pre-diet runs",
                 rows[0]["blanket"] == 0,
-                f"blanket={rows[0]['blanket']} (run the 20260721 migration)",
+                f"blanket={rows[0]['blanket']} (pre-diet load detected — rebuild from bootstrap; the one-time 20260721 migration was removed 2026-07-23)",
             ))
 
         rows = cli.run("""

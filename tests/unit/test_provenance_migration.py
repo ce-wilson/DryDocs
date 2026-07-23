@@ -1,11 +1,11 @@
-"""Guards for the doc-06 Phase 3 provenance cleanup (backlog M2, 2026-07-21).
+"""Guards for the doc-06 Phase 3 provenance diet (backlog M2, 2026-07-21).
 
-Static file checks only — the migration's graph effects are verified live by
-`drydocs m3-verify` (its three Phase-3 invariants) after the HITL-confirmed
-run. These tests pin the non-graph half: loaders write the post-diet shape
-(first_seen_at bookkeeping, no raw-named folder audit props) and the migration
-file keeps its safety rails (pre-diet run filter, snapshot-label exclusions,
-batched destructive steps).
+Static file checks only — the graph-side invariants are verified live by
+`drydocs m3-verify` (its three Phase-3 invariants). These tests pin the
+non-graph half: loaders write the post-diet shape (first_seen_at bookkeeping,
+no raw-named folder audit props). The one-time cleanup migration
+(20260721_provenance_diet_cleanup.cypher) was removed 2026-07-23 after its
+producer-side run — pre-diet graphs are rebuilt from bootstrap instead.
 """
 from __future__ import annotations
 
@@ -13,9 +13,6 @@ from pathlib import Path
 
 REPO = Path(__file__).resolve().parents[2]
 CYPHER_DIR = REPO / "drydocs" / "loaders" / "cypher"
-MIGRATION_FILE = (
-    REPO / "drydocs" / "migrations" / "20260721_provenance_diet_cleanup.cypher"
-)
 FOLDERS_CYPHER = CYPHER_DIR / "controlm_folders.cypher"
 
 
@@ -46,22 +43,6 @@ def test_folders_cypher_writes_envelope_not_raw_names() -> None:
     assert "f.last_updated_user" not in text, (
         "folders cypher still writes the raw-named last_updated_user node prop"
     )
-
-
-def test_migration_file_safety_rails() -> None:
-    text = MIGRATION_FILE.read_text(encoding="utf-8")
-    # Deletion is scoped to pre-diet COMPLETED runs only — never a bare
-    # WAS_GENERATED_BY sweep; ambiguous runs are surfaced, not deleted.
-    assert "run.rows_changed IS NULL" in text
-    assert "{kind: 'load', status: 'OK'}" in text
-    # The snapshot writer's own created_at vocabulary is excluded from the
-    # rename.
-    for label in ("ApplicationSnapshot", "ProductSnapshot", "CatalogLOBSnapshot"):
-        assert f"NOT n:{label}" in text, f"rename must exclude :{label}"
-    # Destructive steps run batched.
-    assert "IN TRANSACTIONS" in text
-    # Backfill only fills gaps (idempotent re-run).
-    assert "f.source_updated_at IS NULL" in text
 
 
 def test_manual_loads_reads_first_seen_at() -> None:
