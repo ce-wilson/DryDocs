@@ -5315,7 +5315,7 @@ items:
     agent: main
     model: sonnet
     priority: p1
-    status: todo
+    status: in_progress   # pulled 2026-07-23 (post-R1 gate, same session)
     depends_on: [R1]
     inputs: [agents/, drydocs_api/query_specs.py, drydocs_core/ontology/relationship_vocabulary.yaml, docs/decisions/0007-agentic-qa-architecture.md]
     acceptance: >
@@ -5467,11 +5467,11 @@ items:
       possible.
 
 summary:
-  todo: 29                                         # R2 unblocked by R1 (2026-07-23 gate)
-  in_progress: 1                                   # E1 (gate deferred both sides)
+  todo: 28                                         # R2 pulled 2026-07-23 (post-R1 gate)
+  in_progress: 2                                   # E1 (gate deferred both sides) + R2 (graph_qa build)
   blocked: 0
   done: 128                                        # +R1 ADR 0007 gate signed off 2026-07-23 (rulings in config/gate-log.md)
-  next_ready: [M3, M4, P3, J10, Q6, O23, J13, G18, G25, O26, G26, O27, C15, C16, O28, R2]
+  next_ready: [M3, M4, P3, J10, Q6, O23, J13, G18, G25, O26, G26, O27, C15, C16, O28]
   # HITL-free groom (2026-07-21 pm; O26 pulled 07-22): P3, J10, Q6, J13, G18, G19, G26
   # are workable with NO gate session — P3/G21 implement already-signed rulings
   # (CM_HOSTS 07-09, cmd-line 07-15); G18..G21+G24+G25 are staging-only pre-G22 (no
