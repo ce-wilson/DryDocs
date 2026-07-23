@@ -5131,7 +5131,7 @@ items:
     agent: main
     model: fable
     priority: p2
-    status: in_progress
+    status: done          # DONE 2026-07-22 same session — config/gate-prompts/etlprocess-kind-enum.yaml drafted (A context / B1 admit-the-value RECOMMENDED vs B2 hold-the-3-set / C consequences / D sign-off); gates.json + enforcement-matrix.json regenerated (28 gates); suite 864 green. The GATE SESSION itself is still awaiting the SME.
     depends_on: []
     inputs: [UI-WIP/backstage-catalog-assessment.md, config/gate-prompts/, drydocs_lineage/writer.py, drydocs_core/ontology/relationship_vocabulary.yaml, config/gate-log.md, docs/restructure/03-hitl-sme-flow.md]
     acceptance: >
@@ -5265,9 +5265,9 @@ items:
 
 summary:
   todo: 22                                         # +O27/C15/C16/O28 (2026-07-22 Backstage-assessment groom)
-  in_progress: 2                                   # E1 (gate deferred both sides) + G27 (kind-enum gate brief, pulled at groom)
+  in_progress: 1                                   # E1 (gate deferred both sides)
   blocked: 0
-  done: 126                                        # +G19 out-of-repo data root (2026-07-22)
+  done: 127                                        # +G27 kind-enum gate brief drafted (2026-07-22; gate session itself awaits the SME)
   next_ready: [M3, M4, P3, J10, Q6, O23, J13, G18, G25, O26, G26, O27, C15, C16, O28]
   # HITL-free groom (2026-07-21 pm; O26 pulled 07-22): P3, J10, Q6, J13, G18, G19, G26
   # are workable with NO gate session — P3/G21 implement already-signed rulings

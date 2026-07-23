@@ -313,6 +313,19 @@
     {
       "kind": "prompt-only",
       "date": null,
+      "title": "etlprocess-kind-enum (gate page rendered — session not yet run)",
+      "status": "open",
+      "prompt_files": [
+        "config/gate-prompts/etlprocess-kind-enum.yaml"
+      ],
+      "log_ref": null,
+      "unblocks": [
+        "G27"
+      ]
+    },
+    {
+      "kind": "prompt-only",
+      "date": null,
       "title": "seal-app-ref-edge-reshape (gate page rendered — session not yet run)",
       "status": "open",
       "prompt_files": [

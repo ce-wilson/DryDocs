@@ -1,0 +1,93 @@
+# SME gate-prompt spec — the ETLProcess kind-enum rider (backlog G27; the rider
+# G17(c) surfaced: "any enum-semantics question surfaced as a gate rider, never
+# auto-decided"). GATE-BOUND: this page PROPOSES; nothing is built, flipped, or
+# stamped differently by rendering it. DRAFTED 2026-07-22 with the Backstage
+# catalog-model survey (UI-WIP/backstage-catalog-assessment.md, T1) as external
+# prior art — the clone was verified and deleted the same day; the assessment
+# doc is the durable citation.
+# Mechanism-only: subType spellings here are the SYNTHETIC-contract values the
+# G17 fixtures use; real pipeline/registry values stay company-side
+# (PUBLISH-BOUNDARY.md).
+classification: Internal-Public
+schema: drydocs.gate-prompt.v1
+id: etlprocess-kind-enum
+title: "SME Gate — the ETLProcess kind vocabulary: admit MAC subType values (provisioning) as governed kind values, or hold the closed 3-set and add a second discriminator property"
+step: "Decision rider from G17(c) — decides what the lineage writer stamps for MAC rider-path nodes (a pipeline.json subType with no enum mapping; the known live case is provisioning = a DB load with no transform)"
+summary: >
+  The 2026-07-16 cmdline-lineage-review §a gave :ETLProcess a kind property
+  with three launcher-derived values (etl | utility | notification) and G12
+  implemented it with a deliberate AMBIGUITY CALL: a node with no better
+  signal stamps the blind default 'etl'. G17 then delivered the missing
+  signal where DPL MAC metadata exists — pipeline.json subType — but only
+  enum-safe mappings were wired (transformation -> etl); any other subType
+  takes the RIDER path (a mac_kind_rider property plus a coverage count, the
+  writer default standing) precisely so this gate could rule instead of the
+  extractor guessing. The known rider is subType 'provisioning' (a DB load
+  with no transform). The question: does 'provisioning' (and future vetted
+  subTypes) become a first-class kind value, or does kind stay the closed
+  3-set with the finer discrimination carried in a second property? External
+  prior art (Backstage catalog, surveyed 2026-07-22): keep the CLASS layer
+  small and closed, carry variety in ONE open-but-governed type field whose
+  values stay specific — never a catch-all — because views and behavior key
+  off specific values. In that frame our :ETLProcess LABEL is their closed
+  "kind" and our kind PROPERTY is their governed "spec.type" — which argues
+  for admitting provisioning as a governed value (B1, RECOMMENDED) rather
+  than stacking a third discriminator axis beside kind and engine. Nothing
+  below is applied until ticked and transcribed to config/gate-log.md.
+meta:
+  Module: "ontology + lineage writer (drydocs_core/ontology/ · drydocs_lineage/writer.py · drydocs_lineage/extractors/dpl_mac.py)"
+  Source: "G17 MAC seam (synthetic fixtures on the traced 6-JSON shape; _KIND_BY_SUBTYPE + the rider path) + gate-log 2026-07-16 cmdline-lineage-review §a (the 3-value ruling) + G12 (the blind-default ambiguity call)"
+  Precedent: "UI-WIP/backstage-catalog-assessment.md T1 — Backstage closed kinds / open-but-governed spec.type; anti-catch-all guidance; Spotify's types grew (data pipelines, ML models…) while kinds stayed fixed"
+  Registry ref: "no source-registry change from this gate — kind values live at the writer/extractor contract (_KIND_BY_SUBTYPE); when G26 moves the launcher registry into config, the ruled value set rides that file"
+  Classification: "Internal-Public (mechanism + synthetic subType spellings; real pipeline values company-side)"
+  Vocabulary: "kind is a node PROPERTY value set, not a relationship — no relationship_vocabulary.yaml entry changes at this gate; the value set is recorded at the writer/extractor contract and in the gate log"
+  Source of record: "backlog G27 · config/gate-log.md (transcription target) · docs/restructure/03-hitl-sme-flow.md"
+
+mapping:
+  - n: 1
+    element: "MAC subType 'transformation' (synthetic-contract spelling)"
+    target: "kind = 'etl' — already wired enum-safe in _KIND_BY_SUBTYPE (G17 acceptance c)"
+    edge: "kind derivation  [BUILT — confirm as-is]"
+  - n: 2
+    element: "MAC subType 'provisioning' (DB load, no transform — the known rider)"
+    target: "PROPOSED: kind = 'provisioning', a fourth governed value (B1); ALTERNATIVE: kind = one of the existing 3 + a second subtype property (B2)"
+    edge: "kind derivation  [THE DECISION]"
+  - n: 3
+    element: "Any FUTURE unmapped subType"
+    target: "stays on the rider path (mac_kind_rider + coverage count, default stands) until its own cheap gate rider admits or maps it — never auto-added, never a catch-all value"
+    edge: "rider policy  [PROPOSED]"
+  - n: 4
+    element: "The raw subType string"
+    target: "kept VERBATIM as an ETLProcess property regardless of B1/B2 (provenance for every derivation above)"
+    edge: "property retention  [PROPOSED]"
+
+provenance:
+  - label: "How kind is produced today (every mechanism claim on this page)"
+    source_object: "drydocs_lineage/writer.py + drydocs_lineage/extractors/dpl_mac.py"
+    key: "G12 (2026-07-19) + G17 (2026-07-21) builds, both test-pinned"
+    loader: "~ (no loader — writer-side stamping; m3_* vocabulary untouched and still gate-bound)"
+    properties:
+      - {name: enum_3set, origin: source, from: "gate-log 2026-07-16 cmdline-lineage-review §a", note: "etl | utility | notification; utility psets exist (script-exec/send-email); ManagedProcess rename rejected until v1.0"}
+      - {name: blind_default, origin: source, from: "G12 guardrail-5 ambiguity call (writer _DEFAULT_ETL_KIND)", note: "no-signal nodes stamp 'etl'; the engine alone cannot distinguish ETL from utility"}
+      - {name: mac_signal, origin: source, from: "G17 dpl_mac extractor", note: "subType -> mac_kind via _KIND_BY_SUBTYPE (enum-safe rows only); unmapped subType -> mac_kind_rider + kind_riders count; writer consults mac_kind first"}
+      - {name: axes_already_ruled, origin: source, from: "gate-log 2026-07-21 cmdline-nfr-vetting SME-4", note: "%%ETL_PLATFORM = execution-tech axis; ETLProcess.kind stays a separate launcher-derived graph axis — the perceived enum mismatch dissolved"}
+      - {name: backstage_precedent, origin: derived, from: "UI-WIP/backstage-catalog-assessment.md (clone survey 2026-07-22)", note: "closed kind layer + one open-but-governed type field; specific values over catch-alls because behavior/views key off them; label:=their-kind, kind-property:=their-spec.type is the correct analogy"}
+
+sections:
+  - title: "A. Context — confirm the as-built mechanism this decision sits on"
+    confirmations:
+      - "A1: the 3-value kind set (etl | utility | notification) from cmdline-lineage-review §a, the G12 blind default 'etl', and the G17 rider path (mac_kind_rider + coverage count, default stands) are correctly described above — the rider path exists exactly so THIS gate rules instead of the extractor guessing."
+      - "A2: subType -> kind derivation applies ONLY where MAC metadata was ingested; non-MAC nodes keep the blind default and are OUT of scope here (their discriminating signal, if any, is a future question — nothing at this gate changes non-MAC stamping)."
+  - title: "B. The decision — two options, one recommendation"
+    confirmations:
+      - "B1 [RECOMMENDED — admit the value]: kind becomes an OPEN-BUT-GOVERNED value set (the Backstage spec.type discipline): 'provisioning' is admitted as a fourth value mapped from subType provisioning; additions stay cheap (a gate rider each), values stay SPECIFIC (no 'other'/'misc' ever); the closed layer is the :ETLProcess LABEL, which this gate does not touch. Behavioral justification: the lineage and runbook modules already treat provisioning chains (FileWatcher -> RAW -> ING -> LD) distinctly — a support engineer's conceptual model says 'provisioning job', and per the precedent, views should be able to key off that value directly rather than unpacking a side property."
+      - "B2 [alternative — hold the 3-set]: kind stays closed (provisioning maps to 'etl' — a load IS data movement — or to 'utility'); the finer discrimination lands in a NEW governed subtype property fed from subType. Cost: a third discriminator axis beside kind and engine (abinitio|dpl), and every consumer that cares about provisioning must read two fields; the precedent's catch-all warning applies to 'etl' absorbing a behaviorally distinct family."
+      - "B3 [both options]: the raw subType string is kept verbatim as an ETLProcess property (provenance for the derivation; mapping row 4)."
+      - "B4 [both options]: future unmapped subTypes keep the rider path — surfaced with a coverage count, never auto-admitted, each one its own cheap rider (mapping row 3). The kind_riders count reaching zero is the health signal that the vocabulary is current."
+  - title: "C. Consequences recorded at sign-off"
+    confirmations:
+      - "C1: the ruled option becomes a groomed build follow-up (the K2 flips-are-follow-ups pattern): _KIND_BY_SUBTYPE gains the provisioning row (B1) or the new subtype property lands (B2); the writer rider comment and dpl_mac module docs update to cite this gate; tests pin the ruled mapping; the G27 backlog item closes."
+      - "C2: the decision is transcribed to config/gate-log.md; gates.json regenerates (the O19 drift guard enforces the new row); the kind value set as ruled is recorded there as the governed vocabulary of record."
+  - title: "D. Sign-off"
+    confirmations:
+      - "SME sign-off recorded here and transcribed to config/gate-log.md with the date and the per-item outcomes (A1–A2, B1-or-B2, B3–B4)."

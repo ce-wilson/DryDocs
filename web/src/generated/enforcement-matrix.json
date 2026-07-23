@@ -297,6 +297,7 @@
         "config/gate-prompts/controlm-hosts-topology.yaml",
         "config/gate-prompts/controlm-q1q3-phase1.yaml",
         "config/gate-prompts/doc-traceability-feedback.yaml",
+        "config/gate-prompts/etlprocess-kind-enum.yaml",
         "config/gate-prompts/platforms-taxonomy.yaml",
         "config/gate-prompts/product-cabinet-attribution.yaml",
         "config/gate-prompts/seal-app-ref-edge-reshape.yaml",
