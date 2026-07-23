@@ -62,13 +62,6 @@ CREATE CONSTRAINT membership_id       IF NOT EXISTS FOR (m:Membership)          
 CREATE CONSTRAINT attribution_id      IF NOT EXISTS FOR (m:Attribution)         REQUIRE m.attribution_id IS UNIQUE;
 CREATE CONSTRAINT tomrole_id          IF NOT EXISTS FOR (t:TOMRole)             REQUIRE t.id IS UNIQUE;
 
-// --- Schedulers --------------------------------------------------------------
-// :SchedulerKind deprecated by C12 (platforms-taxonomy gate 2026-07-21) — the
-// orchestrator fact lives on USES_SOFTWARE {source:"batch-port"} → the
-// software registry. Constraint kept for old graphs (the K4 Role/Membership
-// precedent above); seeds are retired in ontology.cypher.
-CREATE CONSTRAINT scheduler_kind      IF NOT EXISTS FOR (k:SchedulerKind)       REQUIRE k.name IS UNIQUE;
-
 // --- Control-M / BMC ---------------------------------------------------------
 // Node key uses natural identity (folder_id, job_id) without version_serial —
 // loaders filter to IS_CURRENT_VERSION='Y' so one canonical node per logical

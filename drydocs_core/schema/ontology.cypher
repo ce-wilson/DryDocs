@@ -136,8 +136,9 @@ MERGE (n:OntologyTerm:OlClass {iri:"https://openlineage.io/spec/Dataset"}) SET n
 //   software-registry.yaml) reached via USES_SOFTWARE {source:"batch-port"}
 //   (vocab reg_uses_software) — role over class, no kind/capability node layer.
 //   Seeds kept commented for audit (the company 06-29 precedent, per the K4
-//   Membership pattern); graphs bootstrapped earlier may still hold these
-//   nodes — the scheduler_kind constraint stays in constraints.cypher for them.
+//   Membership pattern). The scheduler_kind constraint and the supplement's
+//   double-check MERGE were removed 2026-07-23: pre-C13 graphs are wiped and
+//   rebuilt from bootstrap, so no graph creates or holds these nodes anymore.
 // MERGE (k:SchedulerKind {name:"ControlM"}) SET k.kind_label = "BMC Control-M",  k.phase_supported = 1;
 // MERGE (k:SchedulerKind {name:"Autosys"})  SET k.kind_label = "CA Autosys",     k.phase_supported = 2;
 // MERGE (k:SchedulerKind {name:"Airflow"})  SET k.kind_label = "Apache Airflow", k.phase_supported = 2;

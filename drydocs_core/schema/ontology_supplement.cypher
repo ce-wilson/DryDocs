@@ -58,13 +58,6 @@ MERGE (lc)-[r:SUBCLASS_OF]->(pc)
   ON CREATE SET r.source = "drydocs.ontology_supplement";
 
 
-// ----- SchedulerKind: ControlM (double-check; seeded by ontology.cypher) ----
-
-MERGE (k:SchedulerKind {name: "ControlM"})
-  ON CREATE SET k.kind_label      = "BMC Control-M",
-                k.phase_supported = 1;
-
-
 // =============================================================================
 // :LocalRelationship declarations — Control-M relationship → PROV-O mapping
 // =============================================================================

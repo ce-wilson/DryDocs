@@ -27,8 +27,11 @@ VOCAB_FILE       = ONTOLOGY_DIR / "relationship_vocabulary.yaml"
 # bmc-docs-lexical-load 2026-07-08). 46 after the six L7 doc-traceability
 # NODE KEYs (DesignDoc/DocSection/Requirement/Component/TestCase/FeedbackNote,
 # gate doc-traceability-feedback 2026-07-20 — source-namespaced keys, gate A2).
+# 47 after scheduler_kind removed (2026-07-23, C13 leftover sweep — pre-C13
+# graphs are wiped and rebuilt from bootstrap, the kept-for-old-graphs
+# rationale no longer applies).
 # Bump this when you intentionally add/remove a CREATE CONSTRAINT.
-EXPECTED_CONSTRAINTS = 48
+EXPECTED_CONSTRAINTS = 47
 
 # SchedulerKind removed 2026-07-21 (C12 platforms-taxonomy gate): its seeds are
 # retired (commented, audit-kept) in ontology.cypher — no longer a seeded label.
