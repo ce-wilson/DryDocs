@@ -16,6 +16,7 @@ session that never opens the ADR body.
 | [0004 — "Vendor" means the brand](0004-software-registry-vendor-terminology.md) | Software registry: `:Vendor` (org:Organization) = brand only; `:SoftwareProduct.role` absorbs the Tier-1/Tier-2 split; `MADE_BY` → prov:wasAttributedTo, `USES_SOFTWARE` local; `vendor-bmc` tooling id → `bmc-docs`; icons stay Brands |
 | [0005 — browser ↔ Neo4j access path](0005-browser-neo4j-access-path.md) | Thin API is the deployment shape (server-side creds, read-only + DB routing, SSO home, layer-4 projections); bolt-from-browser survives only as a dev-mode adapter behind one `GraphAccess` seam in `web/src/lib/` |
 | [0006 — docmeta component & doc-graph](0006-docmeta-component-and-doc-graph.md) | docmeta is its own component (deepdoc consumes, never folds in); new `dddocs` DB (live `dd*` convention); vocabulary reconciled — `HAS_CHUNK` superseded by the active lexical shape, `HAS_DOCUMENT`/`GOVERNED_BY` planned, chunk-DESCRIBES gate-deferred; curation ladder → HITL gate; P0-verdict adoptions |
+| [0007 — agentic Q&A architecture](0007-agentic-qa-architecture.md) | PROPOSED (R1 gate). Tiered read-only agent (QuerySpec router → schema-grounded text2cypher → bounded graph-of-thoughts loop) in `agents/`; every executed Cypher exposed via ephemeral session specs; per-run question/context/memory/token telemetry (`:AgentRun` + JSONL ledger); stale-source rescrape queue; enhance branch writes task-scoped context only — O20 stands |
 
 ## Rejected alternatives worth not re-litigating (ADR 0002, "Options Considered")
 
