@@ -3,3 +3,5 @@
 google-adk
 neo4j
 python-dotenv
+litellm       # graph_qa provider adapter (R1 ruling: anthropic local / azure company)
+pyyaml        # graph_qa schema grounding reads relationship_vocabulary.yaml

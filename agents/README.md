@@ -11,11 +11,20 @@ runtime can be profiled/leak-tested in isolation.
 | App | Kind | Purpose |
 |---|---|---|
 | `graph_query` | custom `BaseAgent`, **no LLM/key needed** | user message = read-only Cypher (empty = default C4 component query); returns rows as JSON. Deterministic smoke/leak-test target for React → ADK → Neo4j. |
-| `core_ingest` | `LlmAgent` (Gemini) | core-module ingestion flow: inspects the graph, advises taxonomy-first ingestion. Read-only. |
-| `controlm_fix` | `LlmAgent` (Gemini) | "fix Control-M" flow: walks job/dependency/owner subgraph, proposes remediation plan. Read-only. |
+| `graph_qa` | custom `BaseAgent` + provider adapter | **the Epic R / ADR 0007 Q&A agent**: free-text question → tiered answer envelope (QuerySpec router, then schema-grounded text2cypher; per-step Cypher + metrics). Provider is env-split per the R1 ruling (local=anthropic, company=azure). See [`graph_qa/README.md`](graph_qa/README.md). |
+| `core_ingest` | `LlmAgent` (Gemini, legacy demo) | core-module ingestion flow: inspects the graph, advises taxonomy-first ingestion. Read-only. |
+| `controlm_fix` | `LlmAgent` (Gemini, legacy demo) | "fix Control-M" flow: walks job/dependency/owner subgraph, proposes remediation plan. Read-only. |
 
 `common/neo4j_tool.py` holds the shared singleton Neo4j driver + `read_cypher` /
-`graph_schema` tools (write clauses rejected — graph writes stay with the loaders + HITL gate).
+`graph_schema` tools (write-token pre-flight). `common/graph_read.py` is the graph_qa
+executor — READ-access-mode transactions make the **server** the write boundary (row cap +
+tx timeout; proven by `tests/integration/test_graph_qa_read_mode.py`).
+`common/specs_catalog.py` imports the `drydocs_api` QuerySpec registry by path — one
+Cypher source of truth, no HTTP dependency.
+
+> **Install gotcha (2026-07-23):** recent `litellm` sdists need a Rust toolchain on
+> Windows; install wheels only — `pip install --only-binary :all: litellm` (1.91.4 known
+> good in this venv).
 
 ## Run
 

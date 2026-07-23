@@ -5315,9 +5315,23 @@ items:
     agent: main
     model: sonnet
     priority: p1
-    status: in_progress   # pulled 2026-07-23 (post-R1 gate, same session)
+    status: in_progress   # build landed 2026-07-23; remaining: live-key smoke (see notes)
     depends_on: [R1]
     inputs: [agents/, drydocs_api/query_specs.py, drydocs_core/ontology/relationship_vocabulary.yaml, docs/decisions/0007-agentic-qa-architecture.md]
+    notes: >
+      2026-07-23 build landed: agents/graph_qa (pipeline, envelope, providers,
+      schema_context, ADK agent, README=envelope contract), common/graph_read
+      (READ-access-mode executor = the server-side write boundary; row cap 100,
+      tx timeout 15s), common/specs_catalog (imports the drydocs_api registry —
+      zero agent-owned named Cypher). Verified: 8 unit tests (fakes; Tier-0
+      verbatim, prompt grounding+bounds, fix cap 2, pre-flight, contract,
+      usage extractor) + 3 live integration tests (server rejects CREATE(x)
+      and CALL db.createLabel probes that evade the token guards) + agents-venv
+      structural smoke over live drydocs rows. REMAINING for done: fill
+      GRAPHQA_PROVIDER/GRAPHQA_MODEL/ANTHROPIC_API_KEY in agents/.env (no key
+      available this session) and run one real-model end-to-end smoke through
+      adk api_server. litellm gotcha: install wheels only (--only-binary),
+      sdist needs Rust on Windows.
     acceptance: >
       The envelope contract is documented and returned per question: answer +
       steps[] (each with cypher, database, rows, ms, fix_retries) + sources

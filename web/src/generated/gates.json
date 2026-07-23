@@ -300,6 +300,15 @@
       ]
     },
     {
+      "kind": "log-entry",
+      "date": "2026-07-23",
+      "title": "ADR 0007 · agentic Q&A architecture — SIGNED OFF (R1)",
+      "status": "signed-off",
+      "prompt_files": [],
+      "log_ref": "config/gate-log.md:779",
+      "unblocks": []
+    },
+    {
       "kind": "prompt-only",
       "date": null,
       "title": "bmc-docs-example (gate page rendered — session not yet run)",

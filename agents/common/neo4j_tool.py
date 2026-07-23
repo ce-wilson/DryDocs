@@ -31,6 +31,11 @@ def _get_driver() -> neo4j.Driver:
     return _driver
 
 
+def get_driver() -> neo4j.Driver:
+    """Public accessor for the shared driver (graph_read.py; one pool per process)."""
+    return _get_driver()
+
+
 def read_cypher(query: str) -> dict:
     """Run a read-only Cypher query against the DryDocs knowledge graph.
 
