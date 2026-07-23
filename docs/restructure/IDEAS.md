@@ -490,9 +490,7 @@ Tags help grooming: `idea` · `bug` · `doc` · `source` (new data source) · `q
   (silent null = provenance undercount).
 - 2026-07-03 — [chore] the local `neo4j-drydocs-ee` Docker container's password is literally the
   string `<password>` (copy-paste artifact at creation). Fine for sandbox; change it before
-  anything less throwaway. (Found while wiring web/ + agents/ to it.)- 2026-07-03 — [question] LLM key strategy for the ADK agents (core_ingest, controlm_fix):
-  GOOGLE_API_KEY (Gemini) vs routing to Anthropic via LiteLLM; company side is Fusion SmartSDK
-  on ADK, so Gemini-shaped is the safer default.
+  anything less throwaway. (Found while wiring web/ + agents/ to it.)
 - 2026-07-03 — [chore] `common/` shows up in ADK `/list-apps` (it's a shared-tools package, not
   an app). Cosmetic; hide or restructure later.- [idea] cli.py regroup: split the 937-line flat command list into domain subcommand groups
   (schema/ingest/verify/variables) — NOT milestone names; rename m1-verify/m3-verify →
@@ -502,6 +500,13 @@ Tags help grooming: `idea` · `bug` · `doc` · `source` (new data source) · `q
 
 <!-- when you promote an idea, move its line here with the resulting backlog id -->
 
+- 2026-07-23 groom run (agentic-Q&A architecture session) — **new phase 15 "Agentic Q&A
+  console" + Epic R (R1–R8)** from the llm-graph-builder vs knowledge-graph-of-thoughts
+  comparative analysis; **ADR 0007 drafted (PROPOSED)** — SME gate = R1, which also rules
+  context-graph escalation residency, :AgentRun target DB, and the LLM key strategy.
+  Moved from inbox: the 2026-07-03 [question] LLM key strategy (Gemini vs Anthropic via
+  LiteLLM) → decided at **R1**. New module registered: drydocs-agents (agents/ ADK
+  service). Analysis dossier (both workflow diagrams) linked from ADR 0007's footnote.
 - 2026-07-22 — [source] **Backstage catalog-model assessment T1–T8 groomed**
   (UI-WIP/backstage-catalog-assessment.md; shallow clone surveyed + deleted same day):
   T1 kind-enum gate precedent brief → **G27** (in_progress, pulled at groom); T2+T3

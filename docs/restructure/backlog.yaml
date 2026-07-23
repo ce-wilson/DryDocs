@@ -39,7 +39,7 @@
 # =============================================================================
 
 schema: drydocs.backlog.v2
-updated: 2026-07-21
+updated: 2026-07-23
 
 # ── The high-level project plan (rendered as the board's roadmap strip) ───────
 plan:
@@ -105,6 +105,10 @@ plan:
       title: Document ingestion & doc-graph benchmarks
       goal: "Unstructured documents as graph corpora (docmeta): the P0 benchmark verdict (traversal vs manifest-routed md vs vector RAG) with its evidence experiments, and the landing zone for the docmeta component's P1+ phases once the verdict + docmeta ADR gate them (Epic Q)."
       status: in_progress   # PLAN CHANGE user-approved 2026-07-16 (Essential-GraphRAG groom); bmc-docs lexical load (P0 corpus) shipped + gate-accepted 2026-07-08 pre-groom
+    - id: 15
+      title: Agentic Q&A console
+      goal: "Free-text questions answered by a tiered read-only agent (QuerySpec router → schema-grounded text2cypher → bounded graph-of-thoughts loop) with every executed Cypher exposed via ephemeral specs, per-run question/context/memory/token telemetry, and stale-source rescrape (Epic R; ADR 0007)."
+      status: todo          # PLAN CHANGE user-directed 2026-07-23 (llm-graph-builder vs KGoT analysis session); ADR 0007 PROPOSED, gate = R1
 
 # ── Module / work-area registry (item.module must be one of these) ───────────
 # Code components mirror MODULE_MAP.md; the rest are repo work areas so that
@@ -120,6 +124,7 @@ modules:
   - drydocs-remediation  # future component (G3)
   - drydocs-web          # JS/TS front-end under web/ (Epic O, phase 12) — console + graph viz; not a Python package, so absent from MODULE_MAP.md/test_module_boundary.py
   - drydocs-api          # planned thin-API component (ADR 0005; working name — final at O5 scaffold): server-side graph access for the console
+  - drydocs-agents       # Google ADK agent service under agents/ (graph_qa, core_ingest, controlm_fix; Epic R, phase 15) — own venv, not a Python package, so absent from MODULE_MAP.md
   - drydocs-docmeta      # planned document-INGESTION component (docmeta plan; WORKING NAME — final at the Q4 gate: docmeta vs deepdoc fold-in). Distinct from drydocs-docgen, which renders docs
   - reference            # reference/ + external/ vendor & standards material
   - taxonomy             # config/taxonomy/ captures
@@ -5263,12 +5268,204 @@ items:
       the layer-4 context-graph surface in the UI; p3 until a module needs
       live health.
 
+  # ── Epic R — Agentic Q&A console (ADR 0007; phase 15) ──────────────────────
+  # Groomed 2026-07-23 from the llm-graph-builder vs knowledge-graph-of-thoughts
+  # comparative analysis (dossier linked in ADR 0007). Tiered read-only agent:
+  # QuerySpec router → schema-grounded text2cypher → bounded graph-of-thoughts
+  # loop. O20 (UI zero graph writes) stands throughout the epic.
+
+  - id: R1
+    epic: agentic-qa
+    title: "SME gate session: review ADR 0007 (agentic Q&A architecture) and rule the three open axes — context-graph escalation residency, :AgentRun target DB, LLM key strategy"
+    type: task
+    module: docs
+    phase: 15
+    agent: main
+    model: fable
+    priority: p1
+    status: todo
+    depends_on: []
+    inputs: [docs/decisions/0007-agentic-qa-architecture.md, docs/restructure/IDEAS.md, docs/restructure/03-hitl-sme-flow.md]
+    acceptance: >
+      ADR 0007 status flipped to ACCEPTED (or SME edits recorded and the ADR
+      re-drafted) in a gate session; the three axes it leaves open are ruled
+      and recorded in the ADR body — (a) context-graph escalation residency
+      (in-process only vs ddcontext SYNTHESIZED envelope with session tag +
+      TTL sweep), (b) :AgentRun envelope target DB (proposal ddcontext; never
+      drydocs), (c) LLM key strategy for the ADK agents (Gemini vs Anthropic
+      via LiteLLM) — closing the 2026-07-03 IDEAS.md key question into the
+      ruling.
+    notes: >
+      Decision item → fable per the model matrix (residency + key strategy
+      change component boundaries). Reference clones live in the sandbox
+      beside this repo (llm-graph-builder, knowledge-graph-of-thoughts).
+
+  - id: R2
+    epic: agentic-qa
+    title: "graph_qa ADK app: Tier-0 QuerySpec router + Tier-1 schema-grounded text2cypher with server-enforced READ mode, fix loop, and the response envelope"
+    type: requirement
+    module: drydocs-agents
+    phase: 15
+    agent: main
+    model: sonnet
+    priority: p1
+    status: todo
+    depends_on: [R1]
+    inputs: [agents/, drydocs_api/query_specs.py, drydocs_core/ontology/relationship_vocabulary.yaml, docs/decisions/0007-agentic-qa-architecture.md]
+    acceptance: >
+      The envelope contract is documented and returned per question: answer +
+      steps[] (each with cypher, database, rows, ms, fix_retries) + sources
+      (trust tier) + metrics (tokens prompt/completion/total, context size in
+      tokens + chunks/rows, memory size in session events + tokens, timing
+      breakdown). A question matching a registered spec routes to it and shows
+      the spec Cypher verbatim (Tier 0). Tier-1 prompts are assembled from the
+      ontology vocabulary + live graph_schema + few-shot spec examples — never
+      whole-graph state. A write-shaped query is rejected server-side by READ
+      access mode (a test proves the token guard alone is NOT the boundary);
+      fix loop capped at 2; row caps + query timeout applied. The agent
+      consumes the QuerySpec registry — it defines no named Cypher of its own.
+
+  - id: R3
+    epic: agentic-qa
+    title: "Agent run telemetry: per-LLM-call JSONL ledger in DRYDOCS_LOGDIR + :AgentRun envelope node + console.agent-runs.v1 QuerySpec"
+    type: requirement
+    module: drydocs-agents
+    phase: 15
+    agent: main
+    model: sonnet
+    priority: p1
+    status: todo
+    depends_on: [R2]
+    inputs: [drydocs_core/run_log.py, drydocs_api/query_specs.py, docs/decisions/0007-agentic-qa-architecture.md]
+    acceptance: >
+      Every LLM call appends one JSONL line (run_id, step, model,
+      prompt_tokens, completion_tokens, cost_est, duration_ms, iteration) to
+      DRYDOCS_LOGDIR — never the repo. One :AgentRun node per question
+      (kind 'qa', mirroring :JobRun) carries question sha256 + length ONLY
+      (full text solely in the local ledger), tier, iterations, llm_calls,
+      token totals, context/memory sizes, cypher count, fix retries, specs
+      used, dbs touched, timings, staleness flags — written to the DB the R1
+      ruling names (never drydocs) via a dedicated writer boundary. A
+      console.agent-runs.v1 QuerySpec returns runs for the admin view.
+
+  - id: R4
+    epic: agentic-qa
+    title: "Ephemeral session-scoped QuerySpecs in drydocs_api: agent-executed Cypher becomes re-runnable/exportable through the existing /specs paths"
+    type: requirement
+    module: drydocs-api
+    phase: 15
+    agent: main
+    model: sonnet
+    priority: p1
+    status: todo
+    depends_on: [R2]
+    inputs: [drydocs_api/query_specs.py, drydocs_api/app.py, drydocs_api/exports.py, drydocs_api/sessions.py]
+    acceptance: >
+      The agent registers each executed Cypher server-side and receives a
+      hash-addressed explore_ref; /specs/{ref}/run and /specs/{ref}/export
+      work for the owning session only, re-validated read-only, TTL-bounded;
+      the export manifest carries cypher_sha256 + provenance exactly like
+      permanent specs; the browser never submits raw Cypher and the
+      /raw-cypher admin+dev gate is byte-for-byte unchanged (ADR 0005).
+
+  - id: R5
+    epic: agentic-qa
+    title: "Ask spoke in the web console: chat panel with streamed agent steps, answer with citations + trust watermark, per-step Cypher panel, metrics chip"
+    type: requirement
+    module: drydocs-web
+    phase: 15
+    agent: main
+    model: sonnet
+    priority: p1
+    status: todo
+    depends_on: [R2, R4]
+    inputs: [web/src/, web/src/lib/adk.ts, web/src/lib/graphApi.ts, docs/decisions/0007-agentic-qa-architecture.md]
+    acceptance: >
+      A non-admin persona asks a free-text question and sees: streamed agent
+      steps while it runs; the answer with source citations carrying trust
+      tier + classification; a "How I got this" panel showing every executed
+      Cypher with database, rows, ms (and fix history when repaired);
+      Open-in-Explorer / Export per step via the ephemeral explore_ref through
+      the GraphAccess api adapter; a metrics chip (time, tokens, iterations).
+      Zero graph writes from the UI path (cites O20). The admin console bench
+      panel remains as-is for dev use.
+
+  - id: R6
+    epic: agentic-qa
+    title: "Tier-2 bounded graph-of-thoughts loop: enhance/solve controller with hard caps and the task-scoped context graph per the R1 residency ruling"
+    type: requirement
+    module: drydocs-agents
+    phase: 15
+    agent: main
+    model: sonnet
+    priority: p2
+    status: todo
+    depends_on: [R2, R3]
+    inputs: [docs/decisions/0007-agentic-qa-architecture.md, agents/graph_qa/]
+    acceptance: >
+      The loop engages only when Tier-1 context is insufficient; hard caps
+      enforced (iterations <=2, next-step vote x3, fix loop <=2, per-question
+      token budget) with a forced-solve fallback so every run terminates with
+      an answer or an explicit "cannot answer"; the enhance branch writes ONLY
+      the task-scoped context graph named by the R1 ruling (never drydocs /
+      ddlineage — a test proves it); per-iteration snapshots are captured and
+      renderable in the existing d3 graph pane; the R3 ledger records
+      per-iteration cost so caps are tunable from data.
+
+  - id: R7
+    epic: agentic-qa
+    title: "Stale-source detection + rescrape queue: freshness fields on :Document, staleness check at answer time, queued full re-chunk refresh, rescrape-and-re-answer in the Ask spoke"
+    type: requirement
+    module: drydocs-docmeta
+    phase: 15
+    agent: main
+    model: sonnet
+    priority: p2
+    status: todo
+    depends_on: [R5]
+    inputs: [config/doc-source-registry.yaml, drydocs/loaders/bmc_docs.py, drydocs/loaders/essential_graphrag.py, docs/decisions/0006-docmeta-component-and-doc-graph.md]
+    acceptance: >
+      :Document nodes carry source_url, source_sha256, fetched_at, refresh
+      policy, and a status lifecycle; answers flag citations whose source is
+      stale per policy; rescrape is a QUEUED refresh artifact — auto-runnable
+      for SYNTHESIZED corpora, re-queues HITL curation for CONFIRMED (the
+      doc-source-registry sha256 rule, now code-enforced, never a silent
+      overwrite); a changed sha triggers FULL re-chunk (a test proves
+      position-resume is not used when content changed); "rescrape &
+      re-answer" round-trips in the Ask spoke with both envelopes kept for
+      comparison.
+
+  - id: R8
+    epic: agentic-qa
+    title: "Answer evaluation + cap tuning: on-demand answer metrics over stored question/context/answer, agent-runs admin view, promotion feed of recurring Tier-1 Cypher into gate-reviewed permanent specs"
+    type: requirement
+    module: drydocs-agents
+    phase: 15
+    agent: main
+    model: sonnet
+    priority: p3
+    status: todo
+    depends_on: [R3, R5]
+    inputs: [drydocs_api/query_specs.py, docs/design/graph-retrieval-benchmark-explainer.md]
+    acceptance: >
+      Evaluation (faithfulness / answer-relevancy style) runs on demand from
+      the stored question/context/answer triple — never inline in the answer
+      path; an admin view lists runs from console.agent-runs.v1 with cost and
+      latency; the promotion feed ranks recurring Tier-1 Cypher by frequency
+      and emits spec CANDIDATES for review — gate-bound, never auto-registered
+      as permanent specs; loop caps re-tuned from ledger data with the change
+      recorded in notes.
+    notes: >
+      Ties into the /under-the-hood retrieval-benchmark narrative (Q3
+      verdict) — the evaluation harness should reuse its question set where
+      possible.
+
 summary:
-  todo: 22                                         # +O27/C15/C16/O28 (2026-07-22 Backstage-assessment groom)
+  todo: 30                                         # +R1..R8 (2026-07-23 agentic-Q&A groom, Epic R / phase 15 / ADR 0007)
   in_progress: 1                                   # E1 (gate deferred both sides)
   blocked: 0
   done: 127                                        # +G27 kind-enum gate brief drafted (2026-07-22; gate session itself awaits the SME)
-  next_ready: [M3, M4, P3, J10, Q6, O23, J13, G18, G25, O26, G26, O27, C15, C16, O28]
+  next_ready: [M3, M4, P3, J10, Q6, O23, J13, G18, G25, O26, G26, O27, C15, C16, O28, R1]
   # HITL-free groom (2026-07-21 pm; O26 pulled 07-22): P3, J10, Q6, J13, G18, G19, G26
   # are workable with NO gate session — P3/G21 implement already-signed rulings
   # (CM_HOSTS 07-09, cmd-line 07-15); G18..G21+G24+G25 are staging-only pre-G22 (no
@@ -5279,3 +5476,6 @@ summary:
   # 2026-07-22 Backstage groom: O27/C15/C16/O28 are HITL-free (C15 display-only by
   # design; nothing touches edge semantics); G27 DRAFTS the kind-enum gate prompt —
   # the sign-off itself is an SME session, never auto-decided.
+  # 2026-07-23 agentic-Q&A groom: R1 IS a gate (ADR 0007 review + three axis rulings)
+  # — HITL-required; R2..R8 are build items behind it, all read-only by construction
+  # (O20 cited in R5/R6 acceptance).
