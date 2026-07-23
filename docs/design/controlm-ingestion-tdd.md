@@ -1,9 +1,10 @@
 # Technical Design — Control-M Ingestion (the `ingest-controlm` M3 chain)
 
 <!-- anchor: front-matter -->
-**Status:** DESCRIPTIVE — **Rev 3, 2026-07-08** (restructured to the canonical TDD outline
-— `docs/design/templates/tdd.outline.yaml`, Epic L; content still reflects commit `107581d`:
-enforced load order + `:ControlMApplication` in the folder pass) ·
+**Status:** DESCRIPTIVE — **Rev 4, 2026-07-23** (two-phase loader: `--phase
+nodes|relationships|all` + direct-only dependency pass; ported from the company repo, where
+this change shipped as its Rev 6 — company Revs 4–5 are company-local; reflects commit
+`1b7744f`) ·
 **Classification:** Internal (mirrors `config/taxonomy/controlm.yaml`; uses only the
 committed sample fixtures — no real SIDs/servers) ·
 **Audience:** production-support / development-support engineers reading the graph. ·
@@ -15,6 +16,20 @@ Worked example throughout:
 poetry run drydocs ingest-controlm --use-oracle --folder 'PRARAG-HLDM-85025-PEX%'
 ```
 
+> **What changed in Rev 4 (2026-07-23) — ported from the company repo.** Cross-folder
+> dependency edges were dropping when folders loaded one at a time: the `WAS_INFORMED_BY`
+> edge links jobs across *different* folders, so a per-folder scoped ingest MATCHed a
+> second endpoint that wasn't loaded yet and the edge silently never got created. The fix
+> splits the ingest into two passes — `--phase nodes` (labels/nodes + intra-folder edges;
+> self-contained rows, safe to run scoped, folder by folder) and `--phase relationships`
+> (the deferred `WAS_INFORMED_BY` pass ONLY: run once, UNSCOPED, after all nodes exist);
+> `--phase all` (default) preserves prior behavior. In the same change the dependency SQL
+> + cypher emit **DIRECT edges only**, keyed by ctlm_id composites (`folder_id.job_id`):
+> the recursive CTE is gone — transitive reach is a graph traversal, not a stored closure
+> — and `recursion_level` / `dependency_path` are no longer stored on the edge.
+> `ControlMDependencyRow` slims to `(in_table_job_id, out_condition, out_table_job_id)`;
+> `m3-verify` now checks `via_condition` on each edge.
+>
 > **What changed in Rev 3 (2026-07-08).** Restructured to the canonical TDD outline
 > (`docs/design/templates/tdd.outline.yaml`, Epic L): added Purpose & scope, Definitions,
 > Classification & security, QA & tests, and a **requirements traceability matrix**, and
@@ -167,11 +182,13 @@ missing endpoint surfaces instead of creating a ghost node.**
 | **1** | **folders** | `:ControlMFolder` + **two field-derived grouping labels** — `DATA_CENTER → :ControlMServer`, header `APPLICATION → :ControlMApplication` | `SCHEDULED_ON`, `CONTAINS_FOLDER` | self-contained — every endpoint created here |
 | **2** | **jobs** | `:ControlMJob` | `CONTAINS_JOB` | `MATCH` folder (from pass 1); job dropped if folder absent |
 | **3** | **conditions in / out** | `:Condition` (shared `(folder_id, name)`) | `REQUIRES_IN_CONDITION`, `EMITS_OUT_CONDITION` | `MATCH` job `(folder_id, job_id)` |
-| **4** | **dependencies (separate, edge-only)** | *none* | `WAS_INFORMED_BY` | `MATCH` **both** endpoint jobs — pure edge pass, never creates nodes |
+| **4** | **dependencies (DEFERRED `--phase relationships`, edge-only)** | *none* | `WAS_INFORMED_BY` | `MATCH` **both** endpoint jobs — pure edge pass, never creates nodes; **run once, UNSCOPED, after all nodes exist** |
 | later | SEAL attribution (K2, **live 2026-07-14**) | *none* | `WAS_ASSOCIATED_WITH {role: seal_app_ref}` | only after jobs **and** `:Application` exist |
 
-Passes 3–5 run unless `--skip-part2` is passed (default: all run). Both grouping nodes now
-exist **before** the jobs pass, keeping pass 2 a pure child pass. `m3-verify` gained a
+Passes 1–3 are the `--phase nodes` set (self-contained rows — safe to repeat per folder);
+pass 4 is the `--phase relationships` set (Rev 4). `--phase all` (default) runs both;
+`--skip-part2` still stops after folders + jobs. Both grouping nodes exist **before** the
+jobs pass, keeping pass 2 a pure child pass. `m3-verify` gained a
 no-orphan-`:ControlMApplication` check. (Contract detailed in
 `docs/controlm-staging-ingestion-flow.md` §3a.)
 
@@ -193,8 +210,8 @@ no-orphan-`:ControlMApplication` check. (Contract detailed in
         ▼
  (:Condition:Entity {folder_id, name, version_serial})
 
- (:ControlMJob) ──WAS_INFORMED_BY {via_condition, recursion_level, dependency_path}──▶ (:ControlMJob)
-                                                                       (prov:wasInformedBy, derived)
+ (:ControlMJob) ──WAS_INFORMED_BY {via_condition, derived:true}──▶ (:ControlMJob)
+                                     (prov:wasInformedBy; direct pairs only — Rev 4)
  every node ──WAS_GENERATED_BY {source:'BMC'}──▶ (:JobRun {run_id, kind:'load'})   (prov:wasGeneratedBy)
 ```
 
@@ -251,12 +268,15 @@ dependency walk exploits. Node key **`(folder_id, name)`**.
 | 3 IN | `CM_DEF_LNKI_P_VW` | `[:REQUIRES_IN_CONDITION {odate, and_or, parentheses, order_, isn}]` |
 | 4 OUT | `CM_DEF_LNKO_P_VW` | `[:EMITS_OUT_CONDITION {odate, sign(+/-), isn}]` |
 
-### Stage 4 (pass 4) — derived dependencies → `:WAS_INFORMED_BY` (edge-only)
+### Stage 4 (pass 4) — derived dependencies → `:WAS_INFORMED_BY` (edge-only, deferred)
 
-A **pure edge pass**: MERGEs no nodes, `MATCH`es both endpoint jobs by `(folder_id, job_id)`.
-Direction **successor → predecessor**. Shortest path wins (`recursion_level`/`dependency_path`
-written ON CREATE only; SQL `ORDER BY … recursion_level`). Edge key `via_condition` de-dupes
-parallel paths.
+A **pure edge pass**: MERGEs no nodes. Rows are pure ctlm_id composites
+(`in_table_job_id`, `out_condition`, `out_table_job_id`); the cypher splits each composite
+on `'.'` to recover the `(folder_id, job_id)` NODE KEY and `MATCH`es both endpoint jobs.
+Direction **successor → predecessor**. **Direct pairs only (Rev 4)** — the recursive CTE,
+`recursion_level`, and `dependency_path` are gone; transitive reach is a graph traversal.
+Edge key `via_condition` de-dupes parallel condition seams. Runs in the deferred
+`--phase relationships` pass: once, unscoped, after all nodes exist.
 
 ### Identity & provenance
 
@@ -360,10 +380,12 @@ WHERE  T.USER_DAILY IS NOT NULL
   AND  T.SCHED_TABLE LIKE :folder_filter;  -- 161015, 161016
 ```
 
-**Step 2 — jobs**, **Step 3 — IN-conditions**, **Step 4 — OUT-conditions**, **Step 5 —
-recursive dependencies**: unchanged from Rev 1 (only the folder SQL changed this commit). Each
-joins `CM_DEF_VTAB` and filters `SCHED_TABLE LIKE :folder_filter` (step 5 anchors on
-`PARENT_TABLE` then walks predecessors across folders).
+**Step 2 — jobs**, **Step 3 — IN-conditions**, **Step 4 — OUT-conditions**: each joins
+`CM_DEF_VTAB` and filters `SCHED_TABLE LIKE :folder_filter`. **Step 5 — direct
+dependencies (Rev 4):** one IN=OUT condition join, no recursion; the scope binds filter
+the SUCCESSOR side only, and the predecessor side is always unscoped — which is exactly
+why its loader belongs to the deferred `--phase relationships` pass (a scoped Pass-1-style
+run would MATCH-miss predecessors in folders not yet loaded).
 
 ### 7d. What lands in the graph (from the sample)
 - **2 folders** (`161015`,`161016`) → `SCHEDULED_ON` P12, P14; both parse env=Production,
@@ -381,15 +403,21 @@ joins `CM_DEF_VTAB` and filters `SCHED_TABLE LIKE :folder_filter` (step 5 anchor
 
 ### 7e. Execution path (code)
 ```
-cli.ingest_controlm(use_oracle=True, folder='PRARAG-HLDM-85025-PEX%')
+cli.ingest_controlm(use_oracle=True, folder='PRARAG-HLDM-85025-PEX%', phase='nodes')
+  → validate phase in (nodes | relationships | all)      # exit 2 on a bad value
   → _gate_source("controlm-psgmgr")                     # D3 confirmed-gate
   → scope = _scope_binds(folder, None, None, None)
-  → stages = [folders, jobs, cond_in, cond_out, deps]   # order is the contract
+  → node_stages = [folders, jobs, cond_in, cond_out]     # Pass 1 — safe to scope
+    rel_stages  = [deps]                                 # deferred — once, unscoped
+    stages = node_stages | rel_stages | both, by phase   # order is the contract
   → for stage in stages:
         sql     = (SQL_DIR / stage.sql).read_text()      # static file, verbatim
         adapter = OracleAdapter(query=sql, bind_params=scope)
         cursor.execute(sql, scope)                        # ← BIND, not string-format
         rows → Loader.load() → UNWIND $batch … MERGE      # the .cypher for that stage
+
+# then, after every folder scope has run its nodes pass:
+cli.ingest_controlm(use_oracle=True, phase='relationships')   # once, no --folder
 ```
 
 ---
@@ -435,10 +463,11 @@ ids are `FR/NFR-CMI-*`, scoped to this chain; the SEAL row is spec-level, gated 
 | FR-CMI-002 | Enforce the load order (constraints → folders → jobs → conditions → deps) | design-summary | `cli.ingest_controlm`, loaders | `test_ingest_chain_order_is_enforced` | done |
 | FR-CMI-003 | Folder pass derives two grouping nodes: `:ControlMServer` + `:ControlMApplication` | design-data-mapping | `controlm_folders.cypher`, `folder_name.py` | `m3-verify` no-orphan-`:ControlMApplication` | done |
 | FR-CMI-004 | Job identity is folder-scoped `(folder_id, job_id)`; child pass MATCHes its folder | design-data-mapping | `controlm_jobs.cypher`, `constraints.cypher` | `m3-verify`; NODE KEY constraint | done |
-| FR-CMI-005 | Derive job→job `WAS_INFORMED_BY` from the IN=OUT condition seam, edge-only | design-data-mapping | `controlm_deps.cypher` | `m3-verify` dependency check | done |
+| FR-CMI-005 | Derive job→job `WAS_INFORMED_BY` from the IN=OUT condition seam, edge-only | design-data-mapping | `controlm_dependencies_derived.cypher` | `m3-verify` `via_condition` check | done |
 | FR-CMI-006 | Every edge traces to a HITL-confirmed taxonomy→ontology binding | hitl-gate | `config/taxonomy-ontology-map.yaml`, `gate-log.md` | `test_schema.py` drift guard | done |
 | NFR-CMI-001 | No real SIDs/servers committed; Internal classification; SQL injection-safe | classification-security | `config/classification.yaml`, `oracle_adapter.py` | `test_classification.py` | done |
 | FR-CMI-007 | SEAL attribution runs only after jobs + `:Application` exist, gate-confirmed | hitl-gate | K2 loader (`seal_attribution.cypher`, `load-seal-attribution`) | gate `seal-attribution-match-policy` (2026-07-14); `graph-tests/seal-attribution-coverage.yaml` | done |
+| FR-CMI-008 | Cross-folder dependency edges load in a deferred, unscoped `--phase relationships` pass (direct pairs only; ctlm_id-keyed) | design-summary | `cli.ingest_controlm --phase`, `controlm_dependencies_recursive.sql` | `test_dependencies_sql_is_direct_only`, `test_dependencies_match_on_the_composite_node_key` | done |
 
 <!-- anchor: appendices -->
 ## Appendix — sticky-note gotchas
@@ -455,3 +484,6 @@ ids are `FR/NFR-CMI-*`, scoped to this chain; the SEAL row is spec-level, gated 
 7. Folder *type* = prefix position 6 (`G`), not the `DLY`/`CYC` suffix.
 8. `--folder` is a **bind**, prefix `LIKE`; `%` matches DLY *and* CYC of one series.
 9. Dependencies pass **creates no nodes** — MATCHes both jobs; a missing endpoint surfaces, no ghost node.
+10. **Two-phase contract (Rev 4):** `--phase nodes` per folder as needed; `--phase relationships`
+    once, UNSCOPED, after all nodes — a scoped dependency run silently drops cross-folder edges.
+    Direct pairs only; transitive reach is a traversal, not a stored closure.

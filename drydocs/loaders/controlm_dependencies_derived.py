@@ -1,16 +1,18 @@
 """Control-M derived :WAS_INFORMED_BY edges (M3 part 2).
 
-Consumes the output of the recursive predecessor SQL
+Consumes the output of the dependency SQL
 (``drydocs/loaders/sql/controlm_dependencies_recursive.sql``) and
 materializes ``:WAS_INFORMED_BY`` edges between :ControlMJob nodes.
 
-Cycle detection happens **in the SQL** via path-INSTR + recursion-level
-cap; this loader writes the result without any further filtering.
+DIRECT pairs only (phased-loader change, ported from the company repo
+2026-07-23): each row is pure ctlm_id composites + the linking condition.
+Transitive reach is a graph traversal, not a stored closure — no cycle
+guard needed because nothing recurses anymore.
 
-Run order: folders -> jobs -> conditions in/out -> dependencies derived.
-The derivation depends on having the jobs and (for queryability) the
-:Condition graph in place; technically only :ControlMJob is required for
-the edge MERGE itself.
+Run order: this is the DEFERRED ``--phase relationships`` pass — run once,
+UNSCOPED, after ALL nodes are loaded. The edge links jobs across DIFFERENT
+folders, so a per-folder scoped run silently dropped it (the second
+endpoint's MATCH missed because that job wasn't loaded yet).
 """
 from __future__ import annotations
 

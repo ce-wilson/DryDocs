@@ -738,7 +738,9 @@ local_relationships:
       Derived dependency edge. Successor job was informed by predecessor
       via a shared OUT→IN condition pair. Direction: (successor)→(predecessor).
       Matrix row: Activity → Activity = WAS_INFORMED_BY. Carries via_condition,
-      recursion_level, dependency_path, derived=true. Replaces DEPENDS_ON.
+      derived=true. Replaces DEPENDS_ON. DIRECT pairs only since the
+      phased-loader port (2026-07-23): transitive reach is a graph traversal,
+      not a stored closure — the level/path properties are retired.
     supplement:   ontology_supplement.cypher
     loader:       controlm_dependencies_derived.cypher
     domain:       controlm

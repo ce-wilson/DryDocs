@@ -167,8 +167,8 @@ execution history.
 **Conditions + derived dependencies**
 - **`controlm_conditions_in.py`** — loads `psgmgr.CM_DEF_LNKI_P_VW`. Creates `:Condition:Entity` nodes (key `(folder_id, name)`) and `:REQUIRES_IN_CONDITION` edges with boolean-expression metadata (`AND_OR`, `PARENTHESES`, `ORDER_`).
 - **`controlm_conditions_out.py`** — loads `psgmgr.CM_DEF_LNKO_P_VW`. Reuses the same `:Condition` nodes; creates `:EMITS_OUT_CONDITION` edges with the `SIGN` operator (`+`/`-`).
-- **`controlm_dependencies_derived.py`** — materializes `:WAS_INFORMED_BY` edges from the recursive predecessor SQL. Each edge carries `via_condition`, `recursion_level`, and `dependency_path`. Cycle-safe by construction (path-`INSTR` guard in the SQL).
-- **`controlm_dependencies_recursive.sql`** — the canonical Oracle recursive CTE. Walks backwards from a successor through condition matching; cyclic-type matching intentionally disabled; recursion cap of 10 with full-path cycle detection.
+- **`controlm_dependencies_derived.py`** — materializes `:WAS_INFORMED_BY` edges from the dependency SQL. DIRECT pairs only since the phased-loader port (2026-07-23): each edge carries `via_condition` and `derived=true`; the stored level/path properties are retired — transitive reach is a graph traversal. Runs in the deferred `--phase relationships` pass (once, unscoped, after all nodes).
+- **`controlm_dependencies_recursive.sql`** — direct predecessor pairs via one IN=OUT condition join (the recursive CTE is gone; file name kept for continuity). Rows are pure ctlm_id composites (`folder_id.job_id`) + the linking condition; cyclic-type matching intentionally disabled.
 
 ### File map
 
@@ -246,7 +246,7 @@ exits 0. (Earlier docs said 13 jobs with an `empty=2` sample gap, and before tha
 | M3 local anchor terms seeded                      | yes | n=3 (expect >= 3 ...)           |
 | active folders contain at least one job          | yes | empty=0 total=7                 |
 | no orphan conditions                              | yes | orphan=0 total=15               |
-| WAS_INFORMED_BY edges have recursion_level + path | yes | total=8 missing_level=0 ...     |
+| WAS_INFORMED_BY edges carry via_condition        | yes | total=8 missing_condition=0     |
 +--------------------------------------------------+-----+---------------------------------+
 ```
 
@@ -263,12 +263,13 @@ Three things in the real schema that didn't match the BMC canonical references:
 
 ### Cyclic-type handling
 
-The canonical recursive SQL **intentionally disables** cyclic-type matching
+The canonical SQL **intentionally disables** cyclic-type matching
 (`-- AND J_SUB.JOB_CYCLIC_IN = D_SUB.JOB_CYCLIC_OUT`). The commented line is preserved in
 `controlm_dependencies_recursive.sql` so the design intent travels with the code.
 Cross-cyclic-type dependencies are real (e.g., a 15-minute cyclic FW job feeds a daily
-ETL job), and cycle-safety comes from the `INSTR(dependency_path, ...)` guard, not from
-cyclic-type filtering.
+ETL job). Cycle safety needs no guard anymore — the SQL emits direct pairs only
+(phased-loader port 2026-07-23), so nothing recurses; cycles in the graph are legitimate
+data and traversals handle them with standard Cypher semantics.
 
 The SQL files in `drydocs/loaders/sql/` are the source of truth — edit there if the
 corporate `psgmgr` schema diverges from the locked DDL. Row models, Cypher templates,

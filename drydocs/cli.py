@@ -875,6 +875,17 @@ def ingest_controlm(
         "--skip-part2",
         help="Stop after folders + jobs (M3 part 1 only).",
     ),
+    phase: str = typer.Option(
+        "all",
+        "--phase",
+        help=(
+            "nodes = Pass 1 only (labels/nodes + intra-folder edges — "
+            "self-contained rows, safe to run scoped, folder by folder); "
+            "relationships = the deferred cross-folder WAS_INFORMED_BY "
+            "dependency pass ONLY (run once, UNSCOPED, after all nodes "
+            "exist); all = both (prior behavior)."
+        ),
+    ),
     folder: str | None = _folder_opt(),
     run_as: str | None = _run_as_opt(),
     developer_sid: str | None = _developer_sid_opt(),
@@ -886,30 +897,59 @@ def ingest_controlm(
     conditions MATCH their parent job by (folder_id, job_id); derived
     dependencies MATCH both endpoint jobs by the same composite key.
 
+    TWO-PHASE CONTRACT (ported from the company repo 2026-07-23): the
+    cross-folder WAS_INFORMED_BY edge links jobs across DIFFERENT folders,
+    so a per-folder scoped run silently dropped it — the second endpoint's
+    MATCH missed because that job wasn't loaded yet. --phase nodes runs
+    Pass 1 (repeat per folder as needed); --phase relationships runs the
+    deferred dependency pass once, unscoped, after all nodes exist.
+
     Run nightly in production; ad-hoc against samples in dev. With
     --use-oracle, --folder / --run-as / --developer-sid / --row-cap scope every
     extract in the chain (folder/developer-sid/row-cap apply to all; run-as
     applies to the job, variable, and dependency-anchor extracts).
     """
+    if phase not in ("nodes", "relationships", "all"):
+        console.print(
+            f"[red]--phase must be nodes | relationships | all (got {phase!r}).[/]"
+        )
+        raise typer.Exit(2)
     # Confirmed-gate (D3): the Control-M source must be SME-confirmed before any write.
     _gate_source("controlm-psgmgr")
     scope = _scope_binds(folder, run_as, developer_sid, row_cap)
-    stages: list[tuple[str, type[BaseLoader], str, str]] = [
+    node_stages: list[tuple[str, type[BaseLoader], str, str]] = [
         ("controlm_folders",     ControlMFoldersLoader,
          "controlm_folders__sample.csv",      "controlm_folders.sql"),
         ("controlm_jobs",        ControlMJobsLoader,
          "controlm_jobs__sample.csv",         "controlm_jobs.sql"),
     ]
     if not skip_part2:
-        stages.extend([
+        node_stages.extend([
             ("controlm_conditions_in",  ControlMConditionsInLoader,
              "controlm_conditions_in__sample.csv",  "controlm_conditions_in.sql"),
             ("controlm_conditions_out", ControlMConditionsOutLoader,
              "controlm_conditions_out__sample.csv", "controlm_conditions_out.sql"),
+        ])
+    # The deferred dependency pass: its rows are pure ctlm_id references
+    # between independently-loaded jobs, so it runs AFTER all nodes exist.
+    rel_stages: list[tuple[str, type[BaseLoader], str, str]] = []
+    if not skip_part2:
+        rel_stages.append(
             ("controlm_dependencies_derived", ControlMDependenciesDerivedLoader,
              "controlm_dependencies__sample.csv",
              "controlm_dependencies_recursive.sql"),
-        ])
+        )
+    stages = (
+        node_stages if phase == "nodes"
+        else rel_stages if phase == "relationships"
+        else node_stages + rel_stages
+    )
+    if not stages:
+        console.print(
+            "[yellow]Nothing to run: --phase relationships with --skip-part2 "
+            "selects no stages.[/]"
+        )
+        return
 
     with _client() as cli:
         for stage_name, cls, sample_csv, sql_file in stages:
@@ -1159,25 +1199,23 @@ def m3_verify() -> None:
                 f"orphan={r['orphan']} total={r['total']}",
             ))
 
-        # Every derived :WAS_INFORMED_BY edge must carry recursion_level and
-        # dependency_path — those are the cycle-safety and shortest-path
-        # provenance fields written by the recursive SQL.
+        # Every derived :WAS_INFORMED_BY edge must carry via_condition — the
+        # linking condition is the edge's identity discriminator. The old
+        # level/path checks went with the stored closure (phased-loader
+        # change 2026-07-23: direct edges only; transitive reach is a
+        # graph traversal).
         rows = cli.run("""
             MATCH ()-[r:WAS_INFORMED_BY]->()
             WHERE r.derived = true
             RETURN count(r) AS total,
-                   sum(CASE WHEN r.recursion_level IS NULL THEN 1 ELSE 0 END) AS missing_level,
-                   sum(CASE WHEN r.dependency_path IS NULL THEN 1 ELSE 0 END) AS missing_path
+                   sum(CASE WHEN r.via_condition IS NULL THEN 1 ELSE 0 END) AS missing_condition
         """)
         if rows:
             r = rows[0]
             checks.append((
-                "WAS_INFORMED_BY edges have recursion_level + path",
-                r["missing_level"] == 0 and r["missing_path"] == 0,
-                (
-                    f"total={r['total']} missing_level={r['missing_level']} "
-                    f"missing_path={r['missing_path']}"
-                ),
+                "WAS_INFORMED_BY edges carry via_condition",
+                r["missing_condition"] == 0,
+                f"total={r['total']} missing_condition={r['missing_condition']}",
             ))
 
     t = Table(title="M3 (part 1 + part 2) invariants")
