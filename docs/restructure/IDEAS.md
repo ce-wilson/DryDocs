@@ -82,6 +82,12 @@ Tags help grooming: `idea` · `bug` · `doc` · `source` (new data source) · `q
   Phase 3 raw-prop pattern; parsed fields are inside row_checksum, so expect a one-time
   delta-churn on the next run (M2 precedent handled the same).
 
+- 2026-07-22 — [idea] **Env toggle = one canonical node identity, never per-env node
+  identities.** When the header env toggle [Prod|UAT|Dev] gets built, it must re-scope
+  DATA under one canonical node, not split identities (`job-dev`/`job-prod`
+  anti-pattern). (Backstage assessment T8, UI-WIP/backstage-catalog-assessment.md §3;
+  design constraint for the shell — attach to the env-toggle item when one exists.)
+
 - 2026-07-22 — [chore] **Company adoption: route the XML run's WARN flood through the new
   loader run logs (next port).** Producer BUILT the generalized run-log family same day
   (user directive after the first company XML run flooded the console with per-row
@@ -422,6 +428,16 @@ Tags help grooming: `idea` · `bug` · `doc` · `source` (new data source) · `q
 ## Recently groomed (audit trail)
 
 <!-- when you promote an idea, move its line here with the resulting backlog id -->
+
+- 2026-07-22 — [source] **Backstage catalog-model assessment T1–T8 groomed**
+  (UI-WIP/backstage-catalog-assessment.md; shallow clone surveyed + deleted same day):
+  T1 kind-enum gate precedent brief → **G27** (in_progress, pulled at groom); T2+T3
+  QuerySpec conventions (derived-edge rule + external ref grammar + no element ids) →
+  **O27**; T4 inverse_label display field → **C15**; T5 status.items node-status
+  envelope → **O28**; T7 metadata key-prefix governance → **C16**; T8 env-toggle
+  canonical-identity constraint → inboxed above (no env-toggle item exists yet); T6
+  schema-as-contract on DataAsset = design CONFIRMATION only — already covered by the
+  O10 schema-definition frame + the G17 MAC dataset feed chain, no new item.
 
 - 2026-07-21 pm — [task] **C12 platforms-taxonomy gate RUN + SIGNED OFF in-chat** (same
   session, ~an hour after C12 was groomed; the K5 precedent): rendered page presented,

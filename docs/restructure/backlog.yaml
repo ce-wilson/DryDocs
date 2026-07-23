@@ -5119,12 +5119,156 @@ items:
       a new source value on an existing edge. Module drydocs-load (loader
       work); ontology epic keeps the gate lineage visible.
 
+  # ── appended at the 2026-07-22 groom (Backstage catalog assessment T1–T8;
+  #    source = UI-WIP/backstage-catalog-assessment.md — the shallow clone was
+  #    deleted the same day, the assessment doc is the durable record) ────────
+  - id: G27
+    epic: component-topology
+    title: "ETLProcess kind-enum rider gate brief: extend the kind enum vs keep it closed with a governed discriminator (Backstage closed-kind/open-type precedent)"
+    type: task
+    module: ontology
+    phase: 6
+    agent: main
+    model: fable
+    priority: p2
+    status: in_progress
+    depends_on: []
+    inputs: [UI-WIP/backstage-catalog-assessment.md, config/gate-prompts/, drydocs_lineage/writer.py, drydocs_core/ontology/relationship_vocabulary.yaml, config/gate-log.md, docs/restructure/03-hitl-sme-flow.md]
+    acceptance: >
+      A drydocs.gate-prompt.v1 spec exists
+      (config/gate-prompts/etlprocess-kind-enum.yaml) for the kind-enum rider
+      G17(c) surfaced: whether the :ETLProcess kind value set
+      (etl|utility|notification) EXTENDS per MAC pipeline.json subType values
+      (provisioning = DB load with no transform) or stays a small closed set
+      with subtype carried as a separately governed property. The brief frames
+      both options with a recommendation and cites the Backstage precedent
+      verified 2026-07-22 (kinds few and closed + spec.type open-but-governed;
+      explicit anti-catch-all-"Other" guidance) as external prior art, plus the
+      G12/G17 history. The DECISION stays gate-bound: no enum, vocabulary, or
+      writer change lands from this item — build follow-ups are groomed at
+      sign-off (the K2 flips-are-follow-ups pattern).
+    notes: >
+      Groomed 2026-07-22 from assessment T1; started the same session (user
+      pull). Fable per the matrix — the brief frames an ontology/schema
+      decision. The rider originates from G17(c) acceptance ("any
+      enum-semantics question surfaced as a gate rider, never auto-decided").
+
+  - id: O27
+    epic: web-console
+    title: "QuerySpec authoring conventions: consume gated edges not raw staging columns; canonical external ref grammar; no graph element ids on external surfaces"
+    type: chore
+    module: drydocs-api
+    phase: 12
+    agent: main
+    model: sonnet
+    priority: p3
+    status: todo
+    depends_on: []
+    inputs: [drydocs_api/query_specs.py, UI-WIP/backstage-catalog-assessment.md, web/src/]
+    acceptance: >
+      A conventions section (drydocs_api/ docstring or a sibling doc,
+      discoverable from query_specs.py) records three rules with rationale:
+      (a) specs read gate-confirmed materialized edges and properties, never
+      re-derive meaning from raw staged columns (precedence resolution lives in
+      the loaders — the Backstage consume-the-relation-not-the-spec-field
+      rule); (b) a canonical external ref grammar kind:namespace/name
+      (namespace = data center where names collide across the 4 DCs) is
+      defined for deep links and export manifests; (c) graph-internal element
+      ids / uids never appear in URLs, manifests, or exports (documented as
+      unstable). Existing registry specs are audited against (a) with
+      violations fixed or flagged; a registry invariant or unit test enforces
+      (c) where mechanical.
+    notes: >
+      Groomed 2026-07-22 from assessment T2+T3 (one conventions home: two
+      consumption rules + the ref grammar). p3 — largely codifies what O11
+      already does.
+
+  - id: C15
+    epic: ontology-mapping
+    title: "relationship_vocabulary.yaml gains a display-only inverse_label per entry (SUPPORTS -> 'supported by') for endpoint-correct edge phrasing"
+    type: task
+    module: ontology
+    phase: 2
+    agent: main
+    model: sonnet
+    priority: p3
+    status: todo
+    depends_on: []
+    inputs: [drydocs_core/ontology/relationship_vocabulary.yaml, tests/unit/test_schema.py, docs/RELATIONSHIP_GUIDE.md, UI-WIP/backstage-catalog-assessment.md]
+    acceptance: >
+      Every relationship_vocabulary.yaml entry carries inverse_label — the
+      target-side display phrasing (e.g. SUPPORTS -> "supported by") — with
+      presence enforced by the vocabulary schema test; RELATIONSHIP_GUIDE.md
+      documents the field as PRESENTATIONAL ONLY (no direction, type, status,
+      or semantics change; storage stays one directed edge; explicitly not a
+      gate matter, recorded as such); full suite green. Consumption (the node
+      inspector phrasing incoming edges from the target side) rides the next
+      inspector touch in Epic O, not this item.
+    notes: >
+      Groomed 2026-07-22 from assessment T4 (Backstage inverse-pair naming,
+      ownedBy/ownerOf). Labels-not-semantics, hence sonnet and no gate.
+
+  - id: C16
+    epic: ontology-mapping
+    title: "Description-field metadata standard gains key-prefix governance (reserved core prefix; system-owned prefixes; unprefixed = team-local)"
+    type: chore
+    module: docs
+    phase: 2
+    agent: main
+    model: sonnet
+    priority: p3
+    status: todo
+    depends_on: []
+    inputs: [knowledge/standards/technology/description-field-metadata-plan.md, UI-WIP/backstage-catalog-assessment.md]
+    acceptance: >
+      The description-field metadata plan's template phase includes a
+      key-governance section modeled on annotation-naming governance: a
+      reserved drydocs prefix for keys the template/graph owns; keys owned by
+      external systems carry that system's prefix (the scim / jira / seal
+      families); a bare unprefixed key is team-local and never load-bearing
+      for ingestion; the plan's validation phase states it will enforce these
+      rules. Doc-only — no loader or template build lands from this item.
+    notes: >
+      Groomed 2026-07-22 from assessment T7 (Backstage annotation/label key
+      governance). Chore on the standards doc; the 3-phase plan itself stays
+      PLANNED and un-groomed until activated. Epic ontology-mapping = closest
+      governance home (naming-standard vocabulary), module docs — recorded
+      here per the ask-only-when-ambiguous rule.
+
+  - id: O28
+    epic: web-console
+    title: "Node status envelope for the inspector + hub health glyphs: per-source namespaced status items, derived never hand-authored (status.items pattern)"
+    type: requirement
+    module: drydocs-web
+    phase: 12
+    agent: main
+    model: sonnet
+    priority: p3
+    status: todo
+    depends_on: []
+    inputs: [UI-WIP/backstage-catalog-assessment.md, UI-WIP/site-plan.md, web/src/, drydocs_api/]
+    acceptance: >
+      A documented node-status envelope — a list of per-source items
+      {type (source-namespaced), level (info|warning|error), message, error?},
+      always DERIVED by a producing system, never hand-authored — is adopted
+      as the contract for the inspector sidebar's status section and the
+      landing hub's spoke health glyphs; at least ONE real producer is wired
+      end-to-end (first candidate: the loader per-run WARN/reject stream
+      attaching to its :JobRun / loaded nodes) through a QuerySpec returning
+      that shape; the envelope doc records the Backstage status.items
+      precedent and the rule that new sources add namespaced types, never new
+      shapes.
+    notes: >
+      Groomed 2026-07-22 from assessment T5. Requirement (future capability) —
+      the layer-4 context-graph surface in the UI; p3 until a module needs
+      live health.
+
 summary:
-  todo: 18                                         # G19 pulled 2026-07-22
-  in_progress: 1                                   # E1 (gate deferred both sides)
+  todo: 22                                         # +O27/C15/C16/O28 (2026-07-22 Backstage-assessment groom)
+  in_progress: 2                                   # E1 (gate deferred both sides) + G27 (kind-enum gate brief, pulled at groom)
   blocked: 0
   done: 126                                        # +G19 out-of-repo data root (2026-07-22)
-  next_ready: [M3, M4, P3, J10, Q6, O23, J13, G18, G25, O26, G26]
+  next_ready: [M3, M4, P3, J10, Q6, O23, J13, G18, G25, O26, G26, O27, C15, C16, O28]
   # HITL-free groom (2026-07-21 pm; O26 pulled 07-22): P3, J10, Q6, J13, G18, G19, G26
   # are workable with NO gate session — P3/G21 implement already-signed rulings
   # (CM_HOSTS 07-09, cmd-line 07-15); G18..G21+G24+G25 are staging-only pre-G22 (no
@@ -5132,3 +5276,6 @@ summary:
   # O23 (IS a gate), O26 (SME hold 2026-07-22: runbook template shape goes through a
   # HITL template session first — do not build the view ahead of it).
   # Chain after G18+G19 land: G20 -> G21, G24; G25 after G19. Q6 = external-work-in -> branch.
+  # 2026-07-22 Backstage groom: O27/C15/C16/O28 are HITL-free (C15 display-only by
+  # design; nothing touches edge semantics); G27 DRAFTS the kind-enum gate prompt —
+  # the sign-off itself is an SME session, never auto-decided.
