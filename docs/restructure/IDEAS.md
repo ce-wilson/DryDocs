@@ -26,6 +26,19 @@ Tags help grooming: `idea` · `bug` · `doc` · `source` (new data source) · `q
 
 <!-- add new ideas at the top -->
 
+- 2026-07-23 — [doc] **Runbook Rev 3 rider (goes with the 2026-07-20 Rev 3 candidate below):
+  local Neo4j container recreated to match config/dev-environment.yaml** — data migrated
+  from `neo4j-drydocs-ee` (anonymous volume, host ports 7476/7689) into named volume
+  `neo4j-testdata`; canonical container `neo4jtest` now runs on default ports 7474/7687
+  (image stays neo4j:2026.05.0-enterprise — store can't downgrade to 5.26, config image
+  line corrected). Runbook Rev 2 §container table + start commands still say
+  neo4j-drydocs-ee/7476/7689 → update via the governed doc pipeline. Local .env / agents/.env /
+  web/.env.local / MCP `neo4j-drydocs` re-pointed 7689→7687 (agents+web also home-db→drydocs).
+- 2026-07-23 — [chore] **Delete the rollback container** `neo4j-drydocs-ee` (stopped,
+  restart=no) + its two anonymous volumes once `neo4jtest` has survived a week of normal
+  use; also prune orphan volumes neo4j_data/neo4j_logs/neo4j2_data/neo4j2_logs (attached
+  to nothing; likely relics of pre-2026-07-02 containers — verify before pruning). The
+  first-attempt community container `DryDocs` was deleted 2026-07-23 (user-confirmed).
 - 2026-07-22 — [idea] **PDN trigger design: milestone/SLA grain + graph-computed slack,
   not per-job failure mail (SME, chat pm).** Current state: dev teams default ON/DO-MAIL
   + SHOUT to L2-on-failure → hundreds of ignored mails daily (alert fatigue — the
@@ -79,7 +92,6 @@ Tags help grooming: `idea` · `bug` · `doc` · `source` (new data source) · `q
   runbooks / Jira sign-offs / email threads (brownfield bootstrap, rejected as end
   state). C2 keyed convention must SHARE the description-metadata plan's template
   phase (two 4000-char conventions must not fork).
-
 - 2026-07-22 — [idea] **The tie we need now: Control-M → SEAL batch :Port attribution as a
   DEFINED mapping, keyed by the Control-M APP CODE (:ControlMApplication), persisted via
   the mapping store (steward persona — NOT new UI).** SME model (2026-07-22, refined in

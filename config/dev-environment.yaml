@@ -15,14 +15,16 @@ neo4j:
   # Aura ruled out 2026-07-06). Provision the topology once after first start:
   # drydocs_core/schema/provisioning/provision.ps1
   container: neo4jtest
-  image: neo4j:5.26-enterprise-ubi10
+  image: neo4j:2026.05.0-enterprise   # store written by 2026.05.0 — cannot downgrade to 5.26
   volume: neo4j-testdata
   ports:
     http: 7474            # browser UI  -> http://localhost:7474
     bolt: 7687            # drivers     -> bolt://localhost:7687
   # Docker can remap host ports (an earlier container, neo4j-drydocs-ee, landed on
-  # 7476/7689 — retired). If a connection is refused, trust `docker port <container>`
-  # over any template value.
+  # 7476/7689 — retired 2026-07-23: data migrated into the neo4j-testdata volume and
+  # this canonical container recreated on 7474/7687; the old container is kept stopped
+  # (restart=no) as a rollback copy). If a connection is refused, trust
+  # `docker port <container>` over any template value.
   databases:              # ADR 0002 topology — provisioned, not implicit
     ground_truth: drydocs      # main load + lineage writers; default load target
     lineage: ddlineage         # cross-platform lineage (drydocs_lineage)

@@ -13,16 +13,22 @@ them to different host ports depending on how the container was started
 (e.g. if the defaults were already taken). Always check the actual mapping
 with `docker port <container_id>` rather than assuming the Neo4j defaults.
 
-## Current local mapping (as of 2026-07-03)
+## Current local mapping (as of 2026-07-23 — container `neo4jtest`)
 
 | Service              | Container port | Host port |
 |----------------------|-----------------|-----------|
-| HTTP (Neo4j Browser)  | 7474            | 7476      |
-| Bolt (driver/queries) | 7687            | 7689      |
+| HTTP (Neo4j Browser)  | 7474            | 7474      |
+| Bolt (driver/queries) | 7687            | 7687      |
 
-- **Browser UI:** http://localhost:7476/browser/
-- **Bolt connection string:** bolt://localhost:7689
+- **Browser UI:** http://localhost:7474/browser/
+- **Bolt connection string:** bolt://localhost:7687
 - **Login:** username `neo4j`, password — see local secrets/`.env` (not committed here)
+
+> History: the earlier container `neo4j-drydocs-ee` sat on remapped host ports
+> 7476/7689 (the 2026-07-02 troubleshooting below is from that era). On 2026-07-23
+> its data was migrated into the named volume `neo4j-testdata` and the canonical
+> container `neo4jtest` (config/dev-environment.yaml) was recreated on the default
+> ports. The old container is kept stopped as a rollback copy.
 
 > These host ports can change if the container is recreated. Re-check with
 > `docker port <container_id>` if login stops working.
