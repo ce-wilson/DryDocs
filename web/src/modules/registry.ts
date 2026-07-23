@@ -13,6 +13,7 @@ export type ModuleId =
   | 'docs'
   | 'gates'
   | 'loads'
+  | 'underhood'
   // admin surfaces reuse the shared template (ModuleDef shape) but are NOT
   // nav modules/spokes — deliberately absent from MODULES below (O12).
   | 'admin-config'
@@ -110,6 +111,19 @@ export const MODULES: readonly ModuleDef[] = [
     backsOnto: "BaseLoader :JobRuns",
     tabs: ['Runs', 'Rejects', 'Drift/coverage'],
     phase: 2,
+  },
+  {
+    id: 'underhood',
+    label: 'Under the Hood',
+    path: '/under-the-hood',
+    tagline: '12/12 traversal vs manifest/full-text — the retrieval benchmark',
+    backsOnto: 'docmeta P0 benchmark (fixture)',
+    // bespoke page (UnderTheHoodRoute), not a ModuleTemplate instantiation —
+    // tabs/backsOnto kept for ModuleDef shape consistency (Aside nav, spoke
+    // registry) even though this route renders its own layout, per its own
+    // ModuleToolbar breadcrumb (like AssetPathRoute).
+    tabs: ['Scoreboard', 'Strategies', 'Token tracker'],
+    phase: 1,
   },
 ]
 
