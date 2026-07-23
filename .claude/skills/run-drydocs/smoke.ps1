@@ -42,7 +42,7 @@ checks = [
     ("controlm_folders__sample.csv",        ControlMFolderRow,      8),
     ("controlm_jobs__sample.csv",           ControlMJobRow,        17),
     ("controlm_conditions_in__sample.csv",  ControlMConditionInRow, 10),
-    ("controlm_dependencies__sample.csv",   ControlMDependencyRow, 10),
+    ("controlm_dependencies__sample.csv",   ControlMDependencyRow,  8),
 ]
 for fname, Model, expected_min in checks:
     with CsvAdapter(samples / fname) as a:

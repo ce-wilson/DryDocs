@@ -165,42 +165,29 @@ def test_condition_out_has_sign_no_boolean_expression() -> None:
 
 # ---- ControlMDependencyRow ------------------------------------------------
 
-def test_dependency_row_carries_path_and_level() -> None:
-    """Output rows of the recursive predecessor SQL."""
+def test_dependency_row_is_pure_ctlm_id_references() -> None:
+    """Phased-loader contract (ported 2026-07-23): a row is exactly
+    (successor composite, linking condition, predecessor composite) —
+    direct pairs only, no stored level/path."""
     row = ControlMDependencyRow.model_validate({
-        "in_parent_table": "CCB_AUTO_DAILY",
-        "in_job_name": "AUTO_TDQ_TRADES",
-        "in_parent_table_id": "100",
-        "in_job_id": "100003",
         "in_table_job_id": "100.100003",
         "out_condition": "TRADES_LOAD_OK",
-        "dependent_table": "CCB_AUTO_DAILY",
-        "dependent_job": "AUTO_LOAD_TRADES",
-        "dependent_table_id": "100",
-        "dependent_job_id": "100002",
         "out_table_job_id": "100.100002",
-        "recursion_level": "1",
-        "dependency_path": "AUTO_TDQ_TRADES -> AUTO_LOAD_TRADES",
     })
-    assert row.recursion_level == 1
-    assert " -> " in row.dependency_path
     assert row.in_table_job_id == "100.100003"
+    assert row.out_table_job_id == "100.100002"
+    assert not hasattr(row, "recursion_level")
+    assert not hasattr(row, "dependency_path")
 
 
-def test_dependency_recursion_level_min() -> None:
-    with pytest.raises(ValidationError):
-        ControlMDependencyRow.model_validate({
-            "in_parent_table": "F",
-            "in_job_name": "X",
-            "in_parent_table_id": "1",
-            "in_job_id": "1",
-            "in_table_job_id": "1.1",
-            "out_condition": "C",
-            "dependent_table": "F",
-            "dependent_job": "Y",
-            "dependent_table_id": "1",
-            "dependent_job_id": "2",
-            "out_table_job_id": "1.2",
-            "recursion_level": "0",  # invalid — recursion levels start at 1
-            "dependency_path": "X -> Y",
-        })
+def test_dependency_row_refuses_degraded_composite() -> None:
+    """The loader splits on '.' to recover the (folder_id, job_id) NODE
+    KEY — a composite missing either side is degraded identity and must
+    fail validation, not silently drop a MATCH later."""
+    for bad in ("100003", "100.", ".100003", ""):
+        with pytest.raises(ValidationError):
+            ControlMDependencyRow.model_validate({
+                "in_table_job_id": bad,
+                "out_condition": "C",
+                "out_table_job_id": "1.2",
+            })

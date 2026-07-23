@@ -138,11 +138,12 @@ def test_m3_core_invariants(loaded_graph) -> None:
         r = cli.run(
             "MATCH ()-[d:WAS_INFORMED_BY]->() "
             "RETURN count(d) AS total, "
-            "sum(CASE WHEN d.recursion_level IS NULL THEN 1 ELSE 0 END) AS missing_level, "
-            "sum(CASE WHEN d.dependency_path IS NULL THEN 1 ELSE 0 END) AS missing_path"
+            "sum(CASE WHEN d.via_condition IS NULL THEN 1 ELSE 0 END) AS missing_condition"
         )[0]
         assert r["total"] > 0, "derived WAS_INFORMED_BY edges exist"
-        assert r["missing_level"] == 0 and r["missing_path"] == 0
+        # direct pairs only since the phased-loader port (2026-07-23) — the
+        # edge carries via_condition; level/path went with the stored closure
+        assert r["missing_condition"] == 0
 
 
 def test_m3_verify_smoke(loaded_graph) -> None:

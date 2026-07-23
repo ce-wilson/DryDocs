@@ -406,10 +406,14 @@ class ControlMVariableRow(BaseModel):
 
 
 class ControlMDependencyRow(BaseModel):
-    """One row of the recursive-predecessor SQL output.
+    """One DIRECT predecessor pair from the dependency SQL output.
 
-    Each row is a (successor job, matching condition, predecessor job)
-    triple plus the recursion level and the full dependency path.
+    Phased-loader change (company-side, ported 2026-07-23): the SQL emits
+    direct pairs only, each row a pure ctlm_id reference between
+    independently-loaded jobs — ``'<folder_id>.<job_id>'`` composites (the
+    ``(folder_id, job_id)`` NODE KEY in composite form; P2 gate §B) plus the
+    linking condition. Transitive reach is a graph traversal, not a stored
+    closure, so the old level/path columns are gone.
 
     Matches the SELECT in
     ``drydocs/loaders/sql/controlm_dependencies_recursive.sql``.
@@ -421,29 +425,25 @@ class ControlMDependencyRow(BaseModel):
         extra="ignore",
     )
 
-    in_parent_table: str = Field(..., description="Successor folder name.")
-    in_job_name: str = Field(..., min_length=1, description="Successor job name.")
-    in_parent_table_id: str = Field(..., description="Successor folder id.")
-    in_job_id: str = Field(..., description="Successor job id.")
     in_table_job_id: str = Field(
-        ..., description="Composite '<folder_id>.<job_id>' for the successor."
+        ..., description="Successor composite '<folder_id>.<job_id>' (ctlm_id form)."
     )
     out_condition: str = Field(
-        ..., description="The condition name that links them."
+        ..., min_length=1, description="The condition name that links them."
     )
-    dependent_table: str = Field(..., description="Predecessor folder name.")
-    dependent_job: str = Field(..., min_length=1, description="Predecessor job name.")
-    dependent_table_id: str = Field(..., description="Predecessor folder id.")
-    dependent_job_id: str = Field(..., description="Predecessor job id.")
     out_table_job_id: str = Field(
-        ..., description="Composite '<folder_id>.<job_id>' for the predecessor."
-    )
-    recursion_level: int = Field(..., ge=1)
-    dependency_path: str = Field(
-        ..., description="Full ' -> '-joined chain from successor back to this predecessor."
+        ..., description="Predecessor composite '<folder_id>.<job_id>' (ctlm_id form)."
     )
 
-    @field_validator("recursion_level", mode="before")
+    @field_validator("in_table_job_id", "out_table_job_id", mode="before")
     @classmethod
-    def _rl(cls, v: Any) -> int:
-        return int(str(v).strip())
+    def _composite(cls, v: Any) -> str:
+        """The loader splits on '.' to recover the NODE KEY — refuse rows
+        that could not resolve to both key parts (degraded identity)."""
+        s = str(v).strip()
+        head, sep, tail = s.partition(".")
+        if not head or not sep or not tail:
+            raise ValueError(
+                f"not a '<folder_id>.<job_id>' composite: {s!r}"
+            )
+        return s

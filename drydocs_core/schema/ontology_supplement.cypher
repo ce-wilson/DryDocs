@@ -167,7 +167,9 @@ MERGE (n:OntologyTerm:LocalRelationship {iri: "https://drydocs.local/ontology#wa
       n.range  = "ControlMJob",
       n.notes  = "Derived dependency. Successor job was informed by predecessor via "
                + "shared OUT→IN condition. Direction: (successor)→(predecessor). "
-               + "Carries via_condition, recursion_level, dependency_path, derived=true.";
+               + "Carries via_condition, derived=true. DIRECT pairs only since the "
+               + "phased-loader port (2026-07-23): transitive reach is a graph "
+               + "traversal, not a stored closure.";
 MATCH (local:OntologyTerm:LocalRelationship {iri: "https://drydocs.local/ontology#wasInformedBy"})
 MATCH (prov:OntologyTerm:ProvProperty       {iri: "http://www.w3.org/ns/prov#wasInformedBy"})
 MERGE (local)-[:MAPS_TO]->(prov);

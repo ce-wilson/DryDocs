@@ -171,14 +171,15 @@ def test_conditions_node_key_is_folder_id_name_only() -> None:
         assert "c.version_serial" in text
 
 
-def test_dependencies_match_on_folder_plus_job() -> None:
+def test_dependencies_match_on_the_composite_node_key() -> None:
+    """Endpoints resolve by splitting the ctlm_id composite on '.' — the
+    (folder_id, job_id) NODE KEY in composite form (P2 gate §B; phased
+    loader, ported 2026-07-23)."""
     text = (CYPHER_DIR / "controlm_dependencies_derived.cypher").read_text(encoding="utf-8")
-    # Successor: matches both folder_id and job_id
-    assert "folder_id: row.in_parent_table_id" in text
-    assert "job_id:    row.in_job_id" in text or "job_id: row.in_job_id" in text
-    # Predecessor: same pattern
-    assert "folder_id: row.dependent_table_id" in text
-    assert "job_id:    row.dependent_job_id" in text or "job_id: row.dependent_job_id" in text
+    assert "split(row.in_table_job_id, '.')[0]" in text
+    assert "split(row.in_table_job_id, '.')[1]" in text
+    assert "split(row.out_table_job_id, '.')[0]" in text
+    assert "split(row.out_table_job_id, '.')[1]" in text
 
 
 def test_conditions_in_carries_boolean_expr_props() -> None:
@@ -283,8 +284,10 @@ def test_dependencies_materializes_derived_edge() -> None:
     assert ":WAS_INFORMED_BY" in text
     assert "derived" in text
     assert "via_condition" in text
-    assert "recursion_level" in text
-    assert "dependency_path" in text
+    # the stored-closure properties went with the recursive CTE (phased
+    # loader, ported 2026-07-23) — transitive reach is a graph traversal
+    assert "recursion_level" not in text
+    assert "dependency_path" not in text
 
 
 # ---- SQL projections ------------------------------------------------------
@@ -324,11 +327,15 @@ def test_jobs_sql_filters_current_version_as_string() -> None:
     assert "J.IS_CURRENT_VERSION = 'Y'" in text
 
 
-def test_recursive_sql_has_cycle_guard() -> None:
+def test_dependencies_sql_is_direct_only() -> None:
+    """Phased-loader change (ported 2026-07-23): the SQL emits DIRECT
+    predecessor pairs only — no recursive CTE, no stored closure, no cycle
+    guard needed (nothing recurses). Transitive reach is a Neo4j traversal."""
     text = (SQL_DIR / "controlm_dependencies_recursive.sql").read_text(encoding="utf-8")
-    assert "INSTR(PREV_DEP.dependency_path" in text
-    assert "PREV_DEP.recursion_level < 10" in text
-    assert "WITH RecursiveJobDependencies" in text
+    assert "RecursiveJobDependencies" not in text
+    assert "UNION ALL" not in text
+    for alias in ("AS in_table_job_id", "AS out_condition", "AS out_table_job_id"):
+        assert alias in text, f"missing projection {alias}"
 
 
 def test_recursive_sql_cyclic_type_disabled() -> None:

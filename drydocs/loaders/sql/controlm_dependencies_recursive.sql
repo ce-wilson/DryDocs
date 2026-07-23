@@ -1,194 +1,91 @@
 -- =============================================================================
 -- controlm_dependencies_recursive.sql
 --
--- BMC Control-M recursive predecessor search.  **Walks BACKWARDS** —
--- starting from a job, finds its predecessors by matching IN conditions
--- to upstream OUT conditions, then recursing.
+-- BMC Control-M DIRECT predecessor pairs.  **Walks BACKWARDS one level** —
+-- for each job, finds its immediate predecessors by matching its IN
+-- conditions to upstream OUT conditions.
+--
+-- DIRECT EDGES ONLY (phased-loader change, ported from the company repo
+-- 2026-07-23; file name kept for loader/porting continuity): the recursive
+-- CTE is gone. Transitive reach is a graph TRAVERSAL in Neo4j
+-- (variable-length :WAS_INFORMED_BY patterns), not a stored closure —
+-- the old level/path columns duplicated what the graph already answers.
 --
 -- Source views (all psgmgr):
 --   CM_DEF_VJOB, CM_DEF_VTAB, CM_DEF_LNKI_P_VW, CM_DEF_LNKO_P_VW
 --
--- Design notes from the canonical version:
---   1. Anchor member scopes to a specific folder (PARENT_TABLE) via
---      :folder_filter; recursion walks across folder boundaries from
---      there.
---   2. Cyclic-type matching (CYCLIC_IN = CYCLIC_OUT) is intentionally
---      DISABLED — kept commented to preserve the canonical intent.
---   3. Cycle detection is by full-path INSTR check, not by visited-set
---      label. Sufficient because dependency_path is deterministic at
---      each level.
---   4. Recursion limit: 10 inside the CTE (anchor + recursion levels);
---      30 in the final SELECT (safety belt for the consumer).
---   5. Each output row has TABLE_JOB_ID composites (folder_id.job_id)
---      that the Neo4j loader uses as a stable key for the derived
---      :DEPENDS_ON edges.
+-- Output rows are pure ctlm_id composites (folder_id.job_id — the
+-- (folder_id, job_id) NODE KEY in composite form; P2 gate §B, 2026-07-14)
+-- plus the linking condition. The Neo4j loader resolves both endpoints by
+-- splitting on '.'.
 --
--- Scope binds (optional, NULL = no filter; scope the ANCHOR set only —
--- recursion then walks predecessors across folder boundaries):
---   :folder_filter  anchor folder-name LIKE pattern (e.g.
---                   'PRARAG-HLDM-111027-PEX-RFND-DLY' or 'CCB_AUTO_%');
---                   NULL anchors on the whole estate.
---   :run_as         anchor job tenant FID (service) user — JOB_DEF.OWNER, exact
---   :developer_sid  anchor authoring developer SID — JOB_DEF.AUTHOR /
---                   CREATION_USER / CHANGE_USERID (lowercase-initial; trailing
---                   'p' = automation release process)
+-- Design notes preserved from the canonical version:
+--   1. Cyclic-type matching (CYCLIC_IN = CYCLIC_OUT) is intentionally
+--      DISABLED — kept commented to preserve the canonical intent.
+--   2. Self-references (a job feeding itself across DLY/CYC twins with the
+--      same JOB_NAME) are excluded, as in the canonical anchor member.
+--
+-- Scope binds (optional, NULL = no filter; they scope the SUCCESSOR side
+-- only — the predecessor side is ALWAYS unscoped, so rows can reference
+-- jobs in OTHER folders):
+--   :folder_filter  successor folder-name LIKE pattern (e.g.
+--                   'PRARAG-HLDM-111027-PEX-RFND-DLY' or 'CCB_AUTO_%')
+--   :run_as         successor job tenant FID (service) user — OWNER, exact
+--   :developer_sid  successor authoring developer SID — AUTHOR /
+--                   CREATION_USER / CHANGE_USERID (lowercase-initial;
+--                   trailing 'p' = automation release process)
 --   :row_cap        unordered sample cap (ROWNUM) on the final result
--- NOTE: :folder_filter is now a scalar LIKE pattern, not an IN-list.
+--
+-- BECAUSE the predecessor side is unscoped, this extract's loader runs in
+-- the deferred `ingest-controlm --phase relationships` pass: once,
+-- UNSCOPED, after ALL nodes are loaded. Running it per-folder is what
+-- silently dropped cross-folder edges (the second endpoint's MATCH missed)
+-- — the reason --phase exists.
 -- (Operational who-ran-it identity is separate — psgmgr.CM_AUD_ACTS, later.)
 -- =============================================================================
 
-WITH RecursiveJobDependencies (
-    SUCCESSOR_PARENT_TABLE,
-    SUCCESSOR_JOB_NAME,
-    SUCCESSOR_PARENT_TABLE_ID,
-    SUCCESSOR_JOB_ID,
-    depends_on_literal,
-    MATCHING_CONDITION,
-    PREDECESSOR_PARENT_TABLE,
-    PREDECESSOR_JOB_NAME,
-    PREDECESSOR_PARENT_TABLE_ID,
-    PREDECESSOR_JOB_ID_INTERNAL,
-    recursion_level,
-    dependency_path
-) AS (
-    -- =========================================================================
-    -- ANCHOR MEMBER
-    -- =========================================================================
-    SELECT
-        J_SUB.IN_PARENT_TABLE,
-        J_SUB.IN_JOB_NAME,
-        J_SUB.IN_PARENT_TABLE_ID,
-        J_SUB.IN_JOB_ID_STR,
-        ':depends_on'                              AS depends_on_literal,
-        J_SUB.IN_CONDITION                         AS MATCHING_CONDITION,
-        D_SUB.PREDECESSOR_TABLE                    AS PREDECESSOR_PARENT_TABLE,
-        D_SUB.PREDECESSOR_JOB_NAME                 AS PREDECESSOR_JOB_NAME,
-        D_SUB.PREDECESSOR_TABLE_ID                 AS PREDECESSOR_PARENT_TABLE_ID,
-        D_SUB.PREDECESSOR_JOB_ID_STR               AS PREDECESSOR_JOB_ID_INTERNAL,
-        1                                          AS recursion_level,
-        J_SUB.IN_JOB_NAME || ' -> ' || D_SUB.PREDECESSOR_JOB_NAME  AS dependency_path
-    FROM (
-        SELECT DISTINCT
-            LNKI.CONDITION         AS IN_CONDITION,
-            JOB_DEF.PARENT_TABLE   AS IN_PARENT_TABLE,
-            JOB_DEF.TABLE_ID       AS IN_PARENT_TABLE_ID,
-            JOB_DEF.JOB_NAME       AS IN_JOB_NAME,
-            JOB_DEF.JOB_ID         AS IN_JOB_ID_STR,
-            JOB_DEF.CYCLIC_TYPE    AS JOB_CYCLIC_IN,
-            JOB_DEF.VERSION_SERIAL AS JOB_VERSION_SERIAL
-        FROM   psgmgr.CM_DEF_VJOB JOB_DEF
-        JOIN   psgmgr.CM_DEF_VTAB TAB_DEF
-                 ON JOB_DEF.TABLE_ID = TAB_DEF.TABLE_ID
-        JOIN   psgmgr.CM_DEF_LNKI_P_VW LNKI
-                 ON  JOB_DEF.TABLE_ID       = LNKI.TABLE_ID
-                 AND JOB_DEF.JOB_ID         = LNKI.JOB_ID
-                 AND JOB_DEF.VERSION_SERIAL = LNKI.VERSION_SERIAL
-        WHERE  TAB_DEF.USER_DAILY IS NOT NULL
-          -- optional scope on the anchor set (NULL bind = no filter)
-          AND  (:folder_filter IS NULL OR JOB_DEF.PARENT_TABLE LIKE :folder_filter)
-          AND  (:run_as        IS NULL OR JOB_DEF.OWNER        =  :run_as)   -- tenant FID user
-          AND  (:developer_sid IS NULL OR :developer_sid IN (JOB_DEF.AUTHOR, JOB_DEF.CREATION_USER, JOB_DEF.CHANGE_USERID))
-    ) J_SUB
-    JOIN (
-        SELECT DISTINCT
-            LNKO.CONDITION         AS OUT_CONDITION,
-            JOB_DEF.PARENT_TABLE   AS PREDECESSOR_TABLE,
-            JOB_DEF.TABLE_ID       AS PREDECESSOR_TABLE_ID,
-            JOB_DEF.JOB_NAME       AS PREDECESSOR_JOB_NAME,
-            JOB_DEF.JOB_ID         AS PREDECESSOR_JOB_ID_STR,
-            JOB_DEF.CYCLIC_TYPE    AS JOB_CYCLIC_OUT,
-            JOB_DEF.VERSION_SERIAL AS JOB_VERSION_SERIAL
-        FROM   psgmgr.CM_DEF_VJOB JOB_DEF
-        JOIN   psgmgr.CM_DEF_VTAB TAB_DEF
-                 ON JOB_DEF.TABLE_ID = TAB_DEF.TABLE_ID
-        JOIN   psgmgr.CM_DEF_LNKO_P_VW LNKO
-                 ON  JOB_DEF.TABLE_ID       = LNKO.TABLE_ID
-                 AND JOB_DEF.JOB_ID         = LNKO.JOB_ID
-                 AND JOB_DEF.VERSION_SERIAL = LNKO.VERSION_SERIAL
-        WHERE  TAB_DEF.USER_DAILY IS NOT NULL
-    ) D_SUB
-      ON  J_SUB.IN_CONDITION = D_SUB.OUT_CONDITION
-      -- AND J_SUB.JOB_CYCLIC_IN = D_SUB.JOB_CYCLIC_OUT  -- intentionally disabled
-    WHERE J_SUB.IN_JOB_NAME <> D_SUB.PREDECESSOR_JOB_NAME
-
-    UNION ALL
-
-    -- =========================================================================
-    -- RECURSIVE MEMBER
-    -- =========================================================================
-    SELECT
-        PREV_DEP.SUCCESSOR_PARENT_TABLE,
-        PREV_DEP.SUCCESSOR_JOB_NAME,
-        PREV_DEP.SUCCESSOR_PARENT_TABLE_ID,
-        PREV_DEP.SUCCESSOR_JOB_ID,
-        ':depends_on'                              AS depends_on_literal,
-        J_REC.IN_CONDITION                         AS MATCHING_CONDITION,
-        D_REC.PREDECESSOR_TABLE                    AS PREDECESSOR_PARENT_TABLE,
-        D_REC.PREDECESSOR_JOB_NAME                 AS PREDECESSOR_JOB_NAME,
-        D_REC.PREDECESSOR_TABLE_ID                 AS PREDECESSOR_PARENT_TABLE_ID,
-        D_REC.PREDECESSOR_JOB_ID_STR               AS PREDECESSOR_JOB_ID_INTERNAL,
-        PREV_DEP.recursion_level + 1,
-        PREV_DEP.dependency_path || ' -> ' || D_REC.PREDECESSOR_JOB_NAME  AS dependency_path
-    FROM   RecursiveJobDependencies PREV_DEP
-    JOIN (
-        SELECT DISTINCT
-            LNKI.CONDITION         AS IN_CONDITION,
-            JOB_DEF.PARENT_TABLE   AS IN_PARENT_TABLE,
-            JOB_DEF.TABLE_ID       AS IN_PARENT_TABLE_ID,
-            JOB_DEF.JOB_NAME       AS IN_JOB_NAME,
-            JOB_DEF.JOB_ID         AS IN_JOB_ID_STR,
-            JOB_DEF.CYCLIC_TYPE    AS JOB_CYCLIC_IN,
-            JOB_DEF.VERSION_SERIAL AS JOB_VERSION_SERIAL
-        FROM   psgmgr.CM_DEF_VJOB JOB_DEF
-        JOIN   psgmgr.CM_DEF_VTAB TAB_DEF
-                 ON JOB_DEF.TABLE_ID = TAB_DEF.TABLE_ID
-        JOIN   psgmgr.CM_DEF_LNKI_P_VW LNKI
-                 ON  JOB_DEF.TABLE_ID       = LNKI.TABLE_ID
-                 AND JOB_DEF.JOB_ID         = LNKI.JOB_ID
-                 AND JOB_DEF.VERSION_SERIAL = LNKI.VERSION_SERIAL
-        WHERE  TAB_DEF.USER_DAILY IS NOT NULL
-    ) J_REC
-      ON J_REC.IN_JOB_NAME = PREV_DEP.PREDECESSOR_JOB_NAME
-    JOIN (
-        SELECT DISTINCT
-            LNKO.CONDITION         AS OUT_CONDITION,
-            JOB_DEF.PARENT_TABLE   AS PREDECESSOR_TABLE,
-            JOB_DEF.TABLE_ID       AS PREDECESSOR_TABLE_ID,
-            JOB_DEF.JOB_NAME       AS PREDECESSOR_JOB_NAME,
-            JOB_DEF.JOB_ID         AS PREDECESSOR_JOB_ID_STR,
-            JOB_DEF.CYCLIC_TYPE    AS JOB_CYCLIC_OUT,
-            JOB_DEF.VERSION_SERIAL AS JOB_VERSION_SERIAL
-        FROM   psgmgr.CM_DEF_VJOB JOB_DEF
-        JOIN   psgmgr.CM_DEF_VTAB TAB_DEF
-                 ON JOB_DEF.TABLE_ID = TAB_DEF.TABLE_ID
-        JOIN   psgmgr.CM_DEF_LNKO_P_VW LNKO
-                 ON  JOB_DEF.TABLE_ID       = LNKO.TABLE_ID
-                 AND JOB_DEF.JOB_ID         = LNKO.JOB_ID
-                 AND JOB_DEF.VERSION_SERIAL = LNKO.VERSION_SERIAL
-        WHERE  TAB_DEF.USER_DAILY IS NOT NULL
-    ) D_REC
-      ON J_REC.IN_CONDITION = D_REC.OUT_CONDITION
-      -- AND J_REC.JOB_CYCLIC_IN = D_REC.JOB_CYCLIC_OUT  -- intentionally disabled
-    WHERE J_REC.IN_JOB_NAME <> D_REC.PREDECESSOR_JOB_NAME
-      AND PREV_DEP.recursion_level < 10
-      AND INSTR(PREV_DEP.dependency_path, D_REC.PREDECESSOR_JOB_NAME) = 0   -- cycle guard
-)
 SELECT
-    SUCCESSOR_PARENT_TABLE                                       AS in_parent_table,
-    SUCCESSOR_JOB_NAME                                           AS in_job_name,
-    SUCCESSOR_PARENT_TABLE_ID                                    AS in_parent_table_id,
-    SUCCESSOR_JOB_ID                                             AS in_job_id,
-    SUCCESSOR_PARENT_TABLE_ID || '.' || SUCCESSOR_JOB_ID          AS in_table_job_id,
-    MATCHING_CONDITION                                           AS out_condition,
-    PREDECESSOR_PARENT_TABLE                                     AS dependent_table,
-    PREDECESSOR_JOB_NAME                                         AS dependent_job,
-    PREDECESSOR_PARENT_TABLE_ID                                  AS dependent_table_id,
-    PREDECESSOR_JOB_ID_INTERNAL                                  AS dependent_job_id,
-    PREDECESSOR_PARENT_TABLE_ID || '.' || PREDECESSOR_JOB_ID_INTERNAL  AS out_table_job_id,
-    recursion_level,
-    dependency_path
-FROM   RecursiveJobDependencies
-WHERE  recursion_level < 30
-  AND  (:row_cap IS NULL OR ROWNUM <= :row_cap)   -- optional unordered sample cap
-ORDER BY in_job_name, recursion_level
+    J_SUB.IN_PARENT_TABLE_ID || '.' || J_SUB.IN_JOB_ID_STR             AS in_table_job_id,
+    J_SUB.IN_CONDITION                                                 AS out_condition,
+    D_SUB.PREDECESSOR_TABLE_ID || '.' || D_SUB.PREDECESSOR_JOB_ID_STR  AS out_table_job_id
+FROM (
+    SELECT DISTINCT
+        LNKI.CONDITION         AS IN_CONDITION,
+        JOB_DEF.TABLE_ID       AS IN_PARENT_TABLE_ID,
+        JOB_DEF.JOB_NAME       AS IN_JOB_NAME,
+        JOB_DEF.JOB_ID         AS IN_JOB_ID_STR,
+        JOB_DEF.CYCLIC_TYPE    AS JOB_CYCLIC_IN
+    FROM   psgmgr.CM_DEF_VJOB JOB_DEF
+    JOIN   psgmgr.CM_DEF_VTAB TAB_DEF
+             ON JOB_DEF.TABLE_ID = TAB_DEF.TABLE_ID
+    JOIN   psgmgr.CM_DEF_LNKI_P_VW LNKI
+             ON  JOB_DEF.TABLE_ID       = LNKI.TABLE_ID
+             AND JOB_DEF.JOB_ID         = LNKI.JOB_ID
+             AND JOB_DEF.VERSION_SERIAL = LNKI.VERSION_SERIAL
+    WHERE  TAB_DEF.USER_DAILY IS NOT NULL
+      -- optional scope on the successor set (NULL bind = no filter)
+      AND  (:folder_filter IS NULL OR JOB_DEF.PARENT_TABLE LIKE :folder_filter)
+      AND  (:run_as        IS NULL OR JOB_DEF.OWNER        =  :run_as)   -- tenant FID user
+      AND  (:developer_sid IS NULL OR :developer_sid IN (JOB_DEF.AUTHOR, JOB_DEF.CREATION_USER, JOB_DEF.CHANGE_USERID))
+) J_SUB
+JOIN (
+    SELECT DISTINCT
+        LNKO.CONDITION         AS OUT_CONDITION,
+        JOB_DEF.TABLE_ID       AS PREDECESSOR_TABLE_ID,
+        JOB_DEF.JOB_NAME       AS PREDECESSOR_JOB_NAME,
+        JOB_DEF.JOB_ID         AS PREDECESSOR_JOB_ID_STR,
+        JOB_DEF.CYCLIC_TYPE    AS JOB_CYCLIC_OUT
+    FROM   psgmgr.CM_DEF_VJOB JOB_DEF
+    JOIN   psgmgr.CM_DEF_VTAB TAB_DEF
+             ON JOB_DEF.TABLE_ID = TAB_DEF.TABLE_ID
+    JOIN   psgmgr.CM_DEF_LNKO_P_VW LNKO
+             ON  JOB_DEF.TABLE_ID       = LNKO.TABLE_ID
+             AND JOB_DEF.JOB_ID         = LNKO.JOB_ID
+             AND JOB_DEF.VERSION_SERIAL = LNKO.VERSION_SERIAL
+    WHERE  TAB_DEF.USER_DAILY IS NOT NULL
+) D_SUB
+  ON  J_SUB.IN_CONDITION = D_SUB.OUT_CONDITION
+  -- AND J_SUB.JOB_CYCLIC_IN = D_SUB.JOB_CYCLIC_OUT  -- intentionally disabled
+WHERE J_SUB.IN_JOB_NAME <> D_SUB.PREDECESSOR_JOB_NAME
+  AND (:row_cap IS NULL OR ROWNUM <= :row_cap)   -- optional unordered sample cap
 ;
