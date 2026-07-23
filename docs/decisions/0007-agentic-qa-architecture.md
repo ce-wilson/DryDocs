@@ -1,7 +1,7 @@
 # ADR 0007 — Agentic Q&A: a tiered read-only agent over the knowledge graph; deterministic QuerySpecs stay the data path; agent Cypher surfaces through ephemeral specs
 
 ```yaml
-status: PROPOSED        # PROPOSED | ACCEPTED | SUPERSEDED — SME gate session = backlog R1
+status: ACCEPTED        # PROPOSED | ACCEPTED | SUPERSEDED — accepted 2026-07-23, SME chad.wilson (in-session ratification; R1)
 date: 2026-07-23
 deciders: [chad.wilson]
 layer: cross-cutting    # agents/ service + thin API + web console + docmeta; and the first real occupant of layer 4 (context graph)
@@ -93,11 +93,12 @@ ledger.** Concretely:
    remains only as a fast pre-flight — it is not a security boundary; it
    misses `CALL apoc.*` writes). Row caps and query timeouts apply. O20
    stands: nothing in this path writes ground truth.
-3. **The enhance branch writes only the task-scoped context graph.** Default
-   residency proposal: **in-process task graph** (KGoT's NetworkX shape) —
-   zero persistence risk, dies with the run. Escalation residency — persisting
-   task graphs to `ddcontext` as SYNTHESIZED, session-tagged, TTL-swept — is a
-   **gate decision at R1**, not a default.
+3. **The enhance branch writes only the task-scoped context graph.**
+   Residency **ruled at the R1 gate (2026-07-23): in-process only** (KGoT's
+   NetworkX shape) — zero persistence risk, the task graph dies with the run
+   and UI snapshots are ephemeral. Persisting task graphs to `ddcontext`
+   (SYNTHESIZED, session-tagged, TTL-swept) was considered and deferred —
+   proposing it later is a NEW gate, never a default.
 4. **Cypher exposure via ephemeral specs.** Every executed query (all tiers)
    is registered server-side as an ephemeral, session-scoped spec
    (hash-addressed id, read-only re-validated, TTL-bounded). The response
@@ -117,9 +118,11 @@ ledger.** Concretely:
      ledger), tier reached, iterations, LLM calls, token totals, context size
      (tokens + chunks/rows), memory size (session events + tokens), Cypher
      count, fix retries, specs used, DBs touched, timing breakdown,
-     staleness flags. Residency: **never `drydocs`** — target DB is part of
-     the R1 gate (proposal: `ddcontext`), written through a dedicated writer
-     boundary in the agent service, not from the UI;
+     staleness flags. Residency **ruled at the R1 gate: `ddcontext`** (never
+     `drydocs`), written through a dedicated writer boundary in the agent
+     service, not from the UI. Revisit trigger: telemetry volume or retention
+     policy diverging from `ddcontext`'s — split to a dedicated `dd*` DB then
+     (an ADR 0002 topology amendment);
    - *the UI info payload* — the same envelope rendered as a "How I got
      this" panel (answer, steps with Cypher/database/rows/ms, sources with
      trust tier, metrics chip).
@@ -134,13 +137,19 @@ ledger.** Concretely:
    for changed content (it reuses chunk nodes by position and corrupts
    context). The Ask spoke offers "rescrape & re-answer", keeping both
    envelopes for comparison.
-7. **Left open for the R1 gate** (with the ADR review): context-graph
-   escalation residency (3), `:AgentRun` target DB (5), and the **LLM key
-   strategy** — Gemini (`GOOGLE_API_KEY`, the Fusion-SmartSDK-shaped default)
-   vs Anthropic via LiteLLM; either way one usage-extractor seam normalizes
-   provider token metadata (llm-graph-builder's `get_total_tokens` is the
-   template), and every model id stays in config (KGoT hardcodes a tool
-   model in code — a known trap in their repo).
+7. **R1 gate rulings (2026-07-23, SME chad.wilson).** Residency (3) and
+   `:AgentRun` DB (5) as recorded above. **LLM key strategy:
+   environment-split providers** — the producer/local runtime uses the
+   **Anthropic API key** (root `.env`); the company runtime uses **Azure
+   OpenAI**. Gemini is NOT the runtime default — this supersedes the
+   2026-07-03 IDEAS assumption that Fusion-SmartSDK-on-ADK implied
+   Gemini-shaped (`GOOGLE_API_KEY` remains only for the pre-existing demo
+   agents until R2 rewires them). Consequences: the ADK model binding goes
+   through a provider adapter (LiteLLM-style) in BOTH environments; the
+   usage-extractor seam must normalize Anthropic AND Azure OpenAI token
+   metadata from day one (llm-graph-builder's `get_total_tokens` is the
+   template); and every model id / endpoint stays in config — never code
+   (KGoT hardcodes a tool model in code — a known trap in their repo).
 
 ## Options considered
 
@@ -224,9 +233,12 @@ would re-open the boundary ADR 0005 closed.
 
 ## Action items
 
-1. [ ] SME gate session (backlog **R1**): review this ADR → ACCEPTED; rule the
+1. [x] SME gate session (backlog **R1**): review this ADR → ACCEPTED; rule the
        three open axes (context-graph escalation residency, `:AgentRun` target
        DB, LLM key strategy); close the 2026-07-03 IDEAS.md key question.
+       DONE 2026-07-23 — accepted as written; rulings: in-process residency,
+       `ddcontext` for `:AgentRun`, env-split providers (local Anthropic /
+       company Azure OpenAI). Logged in `config/gate-log.md`.
 2. [ ] **R2** graph_qa app: Tier-0 router + Tier-1 text2cypher + envelope.
 3. [ ] **R3** telemetry: JSONL ledger + `:AgentRun` + `console.agent-runs.v1`.
 4. [ ] **R4** ephemeral session specs in `drydocs_api`.

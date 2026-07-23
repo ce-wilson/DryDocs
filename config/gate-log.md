@@ -775,3 +775,28 @@ SME-supplied PAT screenshots held OUT of the repo — Internal-Confidential).
   LoadPlanV3 refs) and **C14** (the batch-port USES_SOFTWARE loader migration,
   source: ''batch-port''). Vocabulary statuses untouched at the gate itself. Company
   sign-off remains provenance only — company gates ≠ producer gates. C12 done.
+
+## 2026-07-23 — ADR 0007 · agentic Q&A architecture — SIGNED OFF (R1)
+
+- **Scope:** architecture acceptance (like the ADR 0002 entry) — no taxonomy/ontology
+  mappings; no graph writes ruled in. Session: in-session ratification, SME chad.wilson.
+- **Decision:** ADR 0007 **ACCEPTED as written** with the three open axes ruled:
+  - **A — Tier-2 context-graph residency: in-process only.** The enhance branch's task
+    graph is agent working memory (KGoT NetworkX shape); dies with the run; UI snapshots
+    ephemeral. Persisting to `ddcontext` (SYNTHESIZED envelope, session tag, TTL sweep)
+    considered and DEFERRED — re-proposing it is a new gate, never a default.
+  - **B — `:AgentRun` telemetry envelope → `ddcontext`** (never `drydocs`), via a
+    dedicated writer boundary in the agent service. Question text: sha256 + length only
+    in-graph; full text solely in the DRYDOCS_LOGDIR ledger. Revisit trigger: telemetry
+    volume/retention diverging from ddcontext policy → dedicated dd* DB (ADR 0002
+    amendment).
+  - **C — LLM key strategy: environment-split providers.** Producer/local runtime =
+    **Anthropic API key** (root .env); company runtime = **Azure OpenAI**. Gemini is NOT
+    the runtime default — supersedes the 2026-07-03 IDEAS assumption (Fusion-SmartSDK-
+    on-ADK implied Gemini-shaped); GOOGLE_API_KEY survives only for the pre-existing
+    demo agents until R2 rewires them. Both environments bind models through a provider
+    adapter (LiteLLM-style); the usage-extractor seam normalizes Anthropic + Azure
+    OpenAI token metadata from day one; model ids/endpoints live in config, never code.
+- **Effect:** R1 done; R2 (graph_qa Tier-0/1) becomes next_ready. Build follow-ups stay
+  groomed as R2–R8 — nothing built at the gate itself. O20 (UI zero graph writes)
+  reconfirmed standing for the whole epic.

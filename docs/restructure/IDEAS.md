@@ -500,6 +500,13 @@ Tags help grooming: `idea` · `bug` · `doc` · `source` (new data source) · `q
 
 <!-- when you promote an idea, move its line here with the resulting backlog id -->
 
+- 2026-07-23 R1 gate SIGNED OFF (same session as the groom below) — **ADR 0007 ACCEPTED
+  as written**; rulings (full text in config/gate-log.md): (a) Tier-2 task-graph residency
+  = in-process only (ddcontext persistence deferred; new gate if ever proposed);
+  (b) :AgentRun envelope → ddcontext, dedicated writer boundary, question sha256+length
+  only in-graph; (c) LLM keys = **environment-split: local/producer Anthropic API key,
+  company Azure OpenAI** — Gemini NOT the runtime default, closing the 2026-07-03
+  question with a ruling that supersedes its Gemini-shaped assumption. R2 next_ready.
 - 2026-07-23 groom run (agentic-Q&A architecture session) — **new phase 15 "Agentic Q&A
   console" + Epic R (R1–R8)** from the llm-graph-builder vs knowledge-graph-of-thoughts
   comparative analysis; **ADR 0007 drafted (PROPOSED)** — SME gate = R1, which also rules
