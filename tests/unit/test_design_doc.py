@@ -203,7 +203,7 @@ def test_rev_footer_placeholder_when_undeclared() -> None:
 
 def test_rev_footer_matches_real_tdd() -> None:
     md = CONTROLM_TDD.read_text(encoding="utf-8")
-    assert doc_rev_footer(md) == "Rev 4 · commit 1b7744f"
+    assert doc_rev_footer(md) == "Rev 5 · commit c1c3a0a"
 
 
 def test_render_is_still_deterministic_with_margins_and_footer() -> None:

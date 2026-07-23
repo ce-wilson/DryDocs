@@ -1,10 +1,9 @@
 # Technical Design — Control-M Ingestion (the `ingest-controlm` M3 chain)
 
 <!-- anchor: front-matter -->
-**Status:** DESCRIPTIVE — **Rev 4, 2026-07-23** (two-phase loader: `--phase
-nodes|relationships|all` + direct-only dependency pass; ported from the company repo, where
-this change shipped as its Rev 6 — company Revs 4–5 are company-local; reflects commit
-`1b7744f`) ·
+**Status:** DESCRIPTIVE — **Rev 5, 2026-07-23** (folder property diet: naming-convention
+decode off the node, `app_code` kept as the join key — SME ruling 2026-07-23; on top of
+Rev 4's two-phase loader, same day; reflects commit `c1c3a0a`) ·
 **Classification:** Internal (mirrors `config/taxonomy/controlm.yaml`; uses only the
 committed sample fixtures — no real SIDs/servers) ·
 **Audience:** production-support / development-support engineers reading the graph. ·
@@ -16,6 +15,17 @@ Worked example throughout:
 poetry run drydocs ingest-controlm --use-oracle --folder 'PRARAG-HLDM-85025-PEX%'
 ```
 
+> **What changed in Rev 5 (2026-07-23) — folder property diet (SME ruling).** The
+> folder-name convention (pos1=env, pos2=lob, pos3–5=app_code, pos6=folder_type) is the
+> internal Control-M app-code *definition* — expanding it onto nodes confused users:
+> `f.lob='Retail'` collided with the org-taxonomy LOB (same word, different taxonomy),
+> and env truth is the `data_center` prefix on `:ControlMServer`, not folder-name pos 1.
+> The loader now forwards **`app_code` only** (the join key for the app-code →
+> BusinessApplication defined mapping — the open seal-app-ref v2 gate);
+> `environment*/lob*/folder_type*` are retired from the node. The decode lives once in
+> `folder_name.py`. No migration — pre-diet graphs are wiped and rebuilt from bootstrap.
+> Ruling recorded in `config/gate-log.md` (2026-07-23 folder property diet).
+>
 > **What changed in Rev 4 (2026-07-23) — ported from the company repo.** Cross-folder
 > dependency edges were dropping when folders loaded one at a time: the `WAS_INFORMED_BY`
 > edge links jobs across *different* folders, so a per-folder scoped ingest MATCHed a
@@ -201,7 +211,7 @@ no-orphan-`:ControlMApplication` check. (Contract detailed in
  (:ControlMServer:Platform {name})
         ▲ SCHEDULED_ON {since}                        (no PROV — infra placement)
         │
- (:ControlMFolder:Collection {folder_id, sched_table, env, lob, app_code, folder_type, active})
+ (:ControlMFolder:Collection {folder_id, sched_table, app_code, active})   ← decode diet, Rev 5
         │ CONTAINS_JOB                                (prov:hadMember)
         ▼
  (:ControlMJob:Activity {folder_id, job_id, job_name, application, owner, author, node_id, cmd_line, …})
@@ -234,7 +244,7 @@ Source `CM_DEF_VTAB` **LEFT JOIN** `CM_DEF_VJOB` header row. `SCHED_TABLE` is pr
 | `T.USER_DAILY` | `.user_daily`, `.active` | `active = USER_DAILY not null/empty` |
 | `T.TABLE_STATUS/TABLE_TYPE/INSTANCE_NAME` | `.table_status`,`.table_type`,`.instance_name` | |
 | `T.LAST_UPDATED/LAST_UPDATED_USER/CAPTURE_DATE` | `.last_updated`(dt),`.last_updated_user`,`.capture_date`(dt) | |
-| *(parsed `SCHED_TABLE`)* | `.environment`,`.lob`,`.app_code`,`.folder_type` (+codes) | via `folder_name.py` (§7b) |
+| *(parsed `SCHED_TABLE`)* | `.app_code` **only** | via `folder_name.py` (§7b); the rest of the decode stays OFF the node — Rev 5 property diet |
 
 Edges from this pass:
 - `(:ControlMFolder)-[:SCHEDULED_ON {since}]->(:ControlMServer)`
@@ -346,7 +356,7 @@ SOSA observation (`proposed`, gate not run).
 folders: `161015` (…-DLY, P12) and `161016` (…-CYC, P14). It does **not** match `161014`
 (…-**111027**-…). Drop the `%` for a single exact folder.
 
-### 7b. Folder-name parse (enrichment on the folder node)
+### 7b. Folder-name parse (app_code join key; decode stays off the node)
 `folder_name.py` decodes `PRARAG-HLDM-85025-PEX-TRUST-DLY` from its first segment `PRARAG`:
 
 | Position | Char | Meaning |
@@ -356,9 +366,16 @@ folders: `161015` (…-DLY, P12) and `161016` (…-CYC, P14). It does **not** ma
 | 3–5 | `ARA` | app_code = **ARA** |
 | 6 | `G` | folder_type = **Group Table / Smart folder** |
 
+**Only `app_code` lands on the node** (Rev 5, SME ruling 2026-07-23): the convention is the
+internal Control-M app-code *definition*, and expanding it onto nodes confused users —
+`f.lob='Retail'` collided with the org-taxonomy LOB, and env truth is the `data_center`
+prefix on `:ControlMServer`, not folder-name pos 1. `app_code` stays as the join key for
+the app-code → BusinessApplication defined mapping (the open seal-app-ref v2 gate).
+
 **Trap:** folder *type* comes from prefix position 6 (`G`), **not** the `DLY`/`CYC` suffix — so
-both example folders parse to `folder_type = Smart folder`. (This parsed `app_code = ARA` is a
-*third*, separate thing from the header-row `:ControlMApplication` in §7d.)
+both example folders parse to `folder_type = Smart folder` (parser-level; not a node
+property). (This parsed `app_code = ARA` is a *third*, separate thing from the header-row
+`:ControlMApplication` in §7d.)
 
 ### 7c. The five SQL steps (one shared bind dict)
 
@@ -388,8 +405,8 @@ why its loader belongs to the deferred `--phase relationships` pass (a scoped Pa
 run would MATCH-miss predecessors in folders not yet loaded).
 
 ### 7d. What lands in the graph (from the sample)
-- **2 folders** (`161015`,`161016`) → `SCHEDULED_ON` P12, P14; both parse env=Production,
-  lob=Retail, app_code=ARA.
+- **2 folders** (`161015`,`161016`) → `SCHEDULED_ON` P12, P14; both carry `app_code=ARA`
+  (the env/lob/folder_type decode stays off the node — Rev 5 property diet).
 - **`:ControlMApplication` (Rev 2):** in `--use-oracle` mode, each folder's header row
   (`JOB_ID=1`) supplies `APPLICATION`; where present, a `:ControlMApplication {name}` node is
   merged and `CONTAINS_FOLDER` links it to the folder. *(In CSV sample mode without header

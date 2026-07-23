@@ -309,6 +309,17 @@
       "unblocks": []
     },
     {
+      "kind": "log-entry",
+      "date": "2026-07-23",
+      "title": "Folder property diet · naming-convention decode OFF nodes — RULED (in-session)",
+      "status": "recorded",
+      "prompt_files": [
+        "config/gate-prompts/seal-app-ref-edge-reshape.yaml"
+      ],
+      "log_ref": "config/gate-log.md:804",
+      "unblocks": []
+    },
+    {
       "kind": "prompt-only",
       "date": null,
       "title": "bmc-docs-example (gate page rendered — session not yet run)",
@@ -342,17 +353,6 @@
       "unblocks": [
         "G27"
       ]
-    },
-    {
-      "kind": "prompt-only",
-      "date": null,
-      "title": "seal-app-ref-edge-reshape (gate page rendered — session not yet run)",
-      "status": "open",
-      "prompt_files": [
-        "config/gate-prompts/seal-app-ref-edge-reshape.yaml"
-      ],
-      "log_ref": null,
-      "unblocks": []
     }
   ]
 }
