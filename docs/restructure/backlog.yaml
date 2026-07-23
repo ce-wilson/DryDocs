@@ -5283,7 +5283,7 @@ items:
     agent: main
     model: fable
     priority: p1
-    status: todo
+    status: in_progress   # gate session opened 2026-07-23 (this session)
     depends_on: []
     inputs: [docs/decisions/0007-agentic-qa-architecture.md, docs/restructure/IDEAS.md, docs/restructure/03-hitl-sme-flow.md]
     acceptance: >
@@ -5461,11 +5461,11 @@ items:
       possible.
 
 summary:
-  todo: 30                                         # +R1..R8 (2026-07-23 agentic-Q&A groom, Epic R / phase 15 / ADR 0007)
-  in_progress: 1                                   # E1 (gate deferred both sides)
+  todo: 29                                         # R1 pulled 2026-07-23 (gate session in flight)
+  in_progress: 2                                   # E1 (gate deferred both sides) + R1 (ADR 0007 gate session)
   blocked: 0
   done: 127                                        # +G27 kind-enum gate brief drafted (2026-07-22; gate session itself awaits the SME)
-  next_ready: [M3, M4, P3, J10, Q6, O23, J13, G18, G25, O26, G26, O27, C15, C16, O28, R1]
+  next_ready: [M3, M4, P3, J10, Q6, O23, J13, G18, G25, O26, G26, O27, C15, C16, O28]
   # HITL-free groom (2026-07-21 pm; O26 pulled 07-22): P3, J10, Q6, J13, G18, G19, G26
   # are workable with NO gate session — P3/G21 implement already-signed rulings
   # (CM_HOSTS 07-09, cmd-line 07-15); G18..G21+G24+G25 are staging-only pre-G22 (no
