@@ -59,6 +59,30 @@ input, select, textarea {
 .react-flow__attribution { background: transparent; }
 .react-flow__attribution a { color: var(--faint); }
 
+/* Theme-pass additions (UI-WIP/drydocs-landing-dark.html parity) ---------- */
+
+/* Card hover-lift (mockup `.tower:hover`): benefit/module cards share the same
+   translateY + shadow lift via one class instead of repeating the rule per
+   component. `.tower` in App.css already carries its own copy (pre-dates this
+   pass) — left as-is rather than churned. */
+.hover-lift { transition: transform 0.15s, border-color 0.15s, box-shadow 0.15s; }
+.hover-lift:hover { transform: translateY(-3px); border-color: var(--faint); box-shadow: 0 8px 26px rgba(0, 0, 0, 0.4); }
+
+/* Overview hero background network (components/HeroArt.tsx): a slow opacity
+   pulse, dark mode only — purely decorative, neutralized for everyone by the
+   prefers-reduced-motion rule below. */
+@keyframes hero-net-pulse { 0%, 100% { opacity: 0.85; } 50% { opacity: 1; } }
+.dark .hero-net { animation: hero-net-pulse 6s ease-in-out infinite; }
+
+/* React Flow / MiniDag custom node glow (site-plan §2 "graph canvases theme
+   too"): every custom node wrapper carries `.rf-node` plus a `--rf-glow`
+   custom property bound to its own border token (set inline, per node, next
+   to the existing `borderColor`). Dark mode adds a token-colored drop-shadow
+   — the same mechanism as HubGlyphs' `.glyph-accent` — centrally, once, for
+   every graph pane at once; light mode keeps the plain 2px solid border
+   already set inline (site-plan §2 "no glow" rule) with no extra rule needed. */
+.dark .rf-node { filter: drop-shadow(0 0 5px var(--rf-glow, transparent)); }
+
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { transition: none !important; animation: none !important; }
 }

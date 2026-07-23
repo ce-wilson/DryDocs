@@ -20,7 +20,7 @@ interface HeaderProps {
 // job (wf-landing-01 annotation 6 / wf-module-subpage-01 zone rule).
 export default function Header({ persona, env, onEnvChange, onSignOut }: HeaderProps) {
   return (
-    <header className="flex h-full items-center gap-4 border-b border-edge-soft bg-panel/90 px-4 backdrop-blur">
+    <header className="sticky top-0 z-20 flex h-full items-center gap-4 border-b border-edge-soft bg-panel/80 px-4 backdrop-blur-md">
       <Link to="/" className="flex shrink-0 items-center gap-2 text-lg font-bold tracking-tight text-text no-underline">
         <BrandMark />
         <span className="hidden sm:inline">DryDocs</span>
@@ -69,7 +69,7 @@ export default function Header({ persona, env, onEnvChange, onSignOut }: HeaderP
         <button
           type="button"
           onClick={onSignOut}
-          className="rounded-md border border-blue bg-blue/10 px-3 py-1.5 text-sm font-semibold text-blue-bright hover:bg-blue/20"
+          className="rounded-full border border-blue bg-blue/10 px-3.5 py-1.5 text-sm font-semibold text-blue-bright transition-colors hover:bg-blue/20"
         >
           Sign out
         </button>

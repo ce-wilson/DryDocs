@@ -1,4 +1,4 @@
-import { useMemo } from 'react'
+import { useMemo, type CSSProperties } from 'react'
 import {
   Background,
   Controls,
@@ -44,11 +44,14 @@ function MiniDagNode({ data }: NodeProps<MiniDagRFNode>) {
   const { def, selected } = data
   return (
     <div
-      className="max-w-56 rounded-md border-2 bg-panel px-2.5 py-1.5 text-center shadow-sm"
-      style={{
-        borderColor: def.flag ? 'var(--red)' : `var(${def.token})`,
-        boxShadow: selected ? `0 0 0 3px color-mix(in srgb, var(${def.token}) 35%, transparent)` : undefined,
-      }}
+      className="rf-node max-w-56 rounded-md border-2 bg-panel px-2.5 py-1.5 text-center shadow-sm"
+      style={
+        {
+          borderColor: def.flag ? 'var(--red)' : `var(${def.token})`,
+          '--rf-glow': def.flag ? 'var(--red)' : `var(${def.token})`,
+          boxShadow: selected ? `0 0 0 3px color-mix(in srgb, var(${def.token}) 35%, transparent)` : undefined,
+        } as CSSProperties
+      }
     >
       <Handle type="target" position={Position.Left} className="!h-1.5 !w-1.5 !border-0 !bg-transparent" />
       <div className="break-all text-[11px] font-semibold text-text">{def.label}</div>
