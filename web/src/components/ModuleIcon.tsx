@@ -63,6 +63,16 @@ export default function ModuleIcon({ id, className }: { id: ModuleId; className?
           <path d="M4 18h16M6 18V9l3-3 3 3v9M12 18v-5l3-3 3 3v5" />
         </svg>
       )
+    case 'underhood':
+      // gauge/speedometer — the benchmark's efficiency framing (needle biased
+      // toward the low-cost side, the traversal win)
+      return (
+        <svg viewBox="0 0 24 24" aria-hidden="true" {...common}>
+          <path d="M4 16a8 8 0 1 1 16 0" />
+          <path d="M12 16 8.5 11" />
+          <path d="M4 16h1M19 16h1M12 5.5v1M6.5 7.5l.7.7M17.5 7.5l-.7.7" />
+        </svg>
+      )
     case 'admin-config':
       return (
         <svg viewBox="0 0 24 24" aria-hidden="true" {...common}>

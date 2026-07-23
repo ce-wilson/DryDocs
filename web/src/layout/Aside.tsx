@@ -102,9 +102,14 @@ export default function Aside({
   )
 }
 
+// Active-state treatment adapted from the mock's nav-links (drydocs-landing-dark.html
+// `.nav-links a.active { border-bottom: 2px solid var(--blue-br) }`): this IA
+// runs its module nav down the aside, not across a top bar, so the underline
+// becomes a left accent bar — same "active = blue-bright accent line" idea,
+// same axis as the rail itself.
 function navItemClass(isActive: boolean): string {
   return (
-    'flex items-center gap-2.5 rounded-md px-2.5 py-2 text-sm font-medium no-underline transition-colors ' +
-    (isActive ? 'bg-panel-2 text-text' : 'text-muted hover:bg-bg-2 hover:text-text')
+    'flex items-center gap-2.5 rounded-md border-l-2 px-2.5 py-2 text-sm font-medium no-underline transition-colors ' +
+    (isActive ? 'border-blue-bright bg-panel-2 text-text' : 'border-transparent text-muted hover:bg-bg-2 hover:text-text')
   )
 }

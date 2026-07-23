@@ -18,6 +18,7 @@ import RunbooksRoute from './routes/RunbooksRoute'
 import RemediationRoute from './routes/RemediationRoute'
 import DocsRoute from './routes/DocsRoute'
 import GatesRoute from './routes/GatesRoute'
+import UnderTheHoodRoute from './routes/UnderTheHoodRoute'
 import './App.css'
 
 // O8 rebuild: real react-router routes (deep-linkable, back-button safe —
@@ -73,6 +74,7 @@ export default function App() {
         <Route path="gates" element={<GatesRoute />} />
         <Route path="loads" element={<LoadsRoute persona={persona} />} />
         <Route path="loads/run/:runId" element={<LoadsRoute persona={persona} />} />
+        <Route path="under-the-hood" element={<UnderTheHoodRoute />} />
 
         {/* O13: steward + admin only — the server enforces the same boundary
             on /mappings/*; steward still has NO /console (Cypher sandbox). */}

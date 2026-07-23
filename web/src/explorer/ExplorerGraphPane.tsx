@@ -1,4 +1,4 @@
-import { useMemo } from 'react'
+import { useMemo, type CSSProperties } from 'react'
 import { Link } from 'react-router-dom'
 import {
   Background,
@@ -29,11 +29,14 @@ function DemoNode({ data }: NodeProps<DemoRFNode>) {
   const token = KIND_TOKEN[data.kind]
   return (
     <div
-      className="rounded-md border-2 bg-panel px-2.5 py-1.5 text-center shadow-sm"
-      style={{
-        borderColor: `var(${token})`,
-        boxShadow: data.selected ? `0 0 0 3px color-mix(in srgb, var(${token}) 35%, transparent)` : undefined,
-      }}
+      className="rf-node rounded-md border-2 bg-panel px-2.5 py-1.5 text-center shadow-sm"
+      style={
+        {
+          borderColor: `var(${token})`,
+          '--rf-glow': `var(${token})`,
+          boxShadow: data.selected ? `0 0 0 3px color-mix(in srgb, var(${token}) 35%, transparent)` : undefined,
+        } as CSSProperties
+      }
     >
       <Handle type="target" position={Position.Left} className="!h-1.5 !w-1.5 !border-0 !bg-transparent" />
       <div className="text-xs font-semibold text-text">{data.label}</div>

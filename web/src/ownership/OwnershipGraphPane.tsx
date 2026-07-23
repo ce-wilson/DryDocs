@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { useMemo, useState, type CSSProperties } from 'react'
 import {
   Background,
   Controls,
@@ -32,13 +32,16 @@ type OwnRFNode = Node<OwnNodeData, 'own'>
 function OwnNode({ data }: NodeProps<OwnRFNode>) {
   return (
     <div
-      className="max-w-56 rounded-md border-2 bg-panel px-2.5 py-1.5 text-center shadow-sm"
-      style={{
-        borderColor: data.unmapped ? 'var(--red)' : `var(${data.token})`,
-        boxShadow: data.selected
-          ? `0 0 0 3px color-mix(in srgb, var(${data.token}) 35%, transparent)`
-          : undefined,
-      }}
+      className="rf-node max-w-56 rounded-md border-2 bg-panel px-2.5 py-1.5 text-center shadow-sm"
+      style={
+        {
+          borderColor: data.unmapped ? 'var(--red)' : `var(${data.token})`,
+          '--rf-glow': data.unmapped ? 'var(--red)' : `var(${data.token})`,
+          boxShadow: data.selected
+            ? `0 0 0 3px color-mix(in srgb, var(${data.token}) 35%, transparent)`
+            : undefined,
+        } as CSSProperties
+      }
     >
       {/* handles on BOTH sides: vocabulary edges run in both directions along
           the chain layout (e.g. DevTeam -SUPPORTS-> AreaProduct), so rtl edges

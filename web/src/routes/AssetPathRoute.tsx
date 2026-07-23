@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { useMemo, useState, type CSSProperties } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import {
   Background,
@@ -40,15 +40,18 @@ type PathRFNode = Node<PathNodeData, 'path'>
 function PathNodeView({ data }: NodeProps<PathRFNode>) {
   return (
     <div
-      className="rounded-md border-2 bg-panel px-2.5 py-1.5 text-center"
-      style={{
-        borderColor: `var(${data.token})`,
-        boxShadow: data.selected
-          ? `0 0 0 3px color-mix(in srgb, var(${data.token}) 40%, transparent)`
-          : data.searched
-            ? `0 0 0 3px color-mix(in srgb, var(--yellow) 45%, transparent)`
-            : undefined,
-      }}
+      className="rf-node rounded-md border-2 bg-panel px-2.5 py-1.5 text-center"
+      style={
+        {
+          borderColor: `var(${data.token})`,
+          '--rf-glow': `var(${data.token})`,
+          boxShadow: data.selected
+            ? `0 0 0 3px color-mix(in srgb, var(${data.token}) 40%, transparent)`
+            : data.searched
+              ? `0 0 0 3px color-mix(in srgb, var(--yellow) 45%, transparent)`
+              : undefined,
+        } as CSSProperties
+      }
     >
       {/* handles on BOTH sides so rtl vocabulary edges (REQUIRES_IN_CONDITION,
           derived WAS_ASSOCIATED_WITH) attach cleanly instead of wrapping */}

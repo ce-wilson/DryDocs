@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useState, type CSSProperties } from 'react'
 import {
   Background,
   Controls,
@@ -61,8 +61,8 @@ type ChainRFNode = Node<ChainNodeData, 'chain'>
 function ChainNode({ data }: NodeProps<ChainRFNode>) {
   return (
     <div
-      className="max-w-52 rounded-md border-2 bg-panel px-2.5 py-1.5 text-center shadow-sm"
-      style={{ borderColor: `var(${data.token})` }}
+      className="rf-node max-w-52 rounded-md border-2 bg-panel px-2.5 py-1.5 text-center shadow-sm"
+      style={{ borderColor: `var(${data.token})`, '--rf-glow': `var(${data.token})` } as CSSProperties}
     >
       <Handle type="target" position={Position.Left} className="!h-1.5 !w-1.5 !border-0 !bg-transparent" />
       <div className="break-all text-[11px] font-semibold text-text">{data.label}</div>
