@@ -26,6 +26,26 @@ Tags help grooming: `idea` · `bug` · `doc` · `source` (new data source) · `q
 
 <!-- add new ideas at the top -->
 
+- 2026-07-22 — [idea] **PDN trigger design: milestone/SLA grain + graph-computed slack,
+  not per-job failure mail (SME, chat pm).** Current state: dev teams default ON/DO-MAIL
+  + SHOUT to L2-on-failure → hundreds of ignored mails daily (alert fatigue — the
+  motivating stat for the notification model). SME ruling direction: a failure must NOT
+  trigger a PDN (potential delay notification) by itself; the trigger belongs at the END
+  of the work stream with remaining recovery time calculated. Options mapped: (1)
+  vendor-native = Control-M SLA Management / BIM job type at stream end — deadline-aware,
+  projects completion from averages, alerts only on projected breach [MODEL KNOWLEDGE,
+  not in corpus; licensed add-on — add "is BIM installed?" to the OQ-1-style company
+  probe list]; (2) no-license fallback = terminal Dummy milestone job + time-based SHOUT
+  WHEN-lateness variants instead of ON-NOTOK [SHOUT corpus-grounded via ctmdefine; the
+  WHEN variants need verification]; (3) Confirm attribute = manual-approval GATE
+  (corpus-grounded), not a notifier — usable as a HITL pause at recovery-decision
+  points, wrong tool at stream end; (4) fatigue fix independent of all: demote
+  failure-mail to MAXRERUN-exhausted only. DryDocs' role: the TRUE trigger condition is
+  deadline − (now + remaining critical-path runtime) < 0 — the CPM-not-path-sum ruling
+  from the cm_avg_run gate + calendar-projection plan; graph decides, milestone job
+  delivers, DL from the email-dl-contact-point NOTIFIES mapping receives. Feeds: the DL
+  gate B2 grain question (stream/milestone grain confirms folder-preference), the
+  runbook module ETA logic, and the company-side probe list.
 - 2026-07-22 — [idea] **Email DLs need an ontology mapping (user, chat pm).** DL = the
   contact/notification channel for an app/team; only configured in Outlook (no feed,
   can't fix), witnessed in runbooks, extractable from emails; membership/usage are
