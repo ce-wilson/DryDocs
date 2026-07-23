@@ -1158,3 +1158,25 @@ Tags help grooming: `idea` · `bug` · `doc` · `source` (new data source) · `q
   - Taxonomy-ontology-map audit (docs/reviews/tech-debt-taxonomy-ontology-map.md) → **C7**
     (vocab_id + capture fields at the next gate); F1–F4 fixes EXECUTED pre-groom
     (c396d75, ede0b94).
+
+## 2026-07-23 — UI acceleration session (context-graph analysis + underhood build)
+
+- **Intended-bypass build landed on main** (merge af03aef): landing-dark theme pass
+  (HeroArt gradient core/petals/glow network, glass header/aside, dark-mode graph glow)
+  + `/under-the-hood` benchmark showcase (12-question scoreboard, token-memory chart,
+  hallucination spotlight, naive-vs-informed Cypher). Read-only; O20 untouched. Retro
+  wireframe/groom items if any of it needs formal acceptance: see
+  `UI-WIP/two-track-ui-plan.md` (Track 1 table = the groom source).
+- Groom candidates from that plan: **T1-5** trust-tier/edge-provenance legend live in-UI
+  (adopt from context-graph's declared/observed legend — analysis at
+  `internal/context-graph-analysis/ui-architecture-analysis.md`); **T1-7** retire App.css
+  legacy mockup classes into token idiom; **T1-8** regenerate
+  `web/src/underhood/benchmarkData.ts` from the docmeta eval harness once it exists
+  (fixture is hand-carried from the P0 verdict today).
+- context-graph adopt/avoid headlines: adopt stat-tile At-a-Glance row (now built as
+  `StatTiles`), Repo360-style dossier for the node inspector, empty-state honesty naming
+  the enrichment that fills the gap; avoid their two-parallel-ingestion drift and
+  aspirational-docs drift; their unauthenticated `/api/**` is the anti-example for our O1
+  access-path ADR.
+- Site-plan follow-up still open: light-mode design pass (light verified functional today,
+  but derived, not designed).
