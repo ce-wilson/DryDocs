@@ -2,10 +2,14 @@
 
 <!-- anchor: front-matter -->
 - **Status:** DESCRIPTIVE — documents the working procedure end-to-end, INCLUDING the
-  deliberate gate refusal at the load step. **Rev 1, 2026-07-21** (content reflects
-  commit `297167e`: post-G14 file-ops pass, post-G15 launcher contract, post-G17 MAC
-  ingest seam; the m3_* lineage vocabulary is `status: planned` — the live load
-  REFUSES by design until the HITL gate flips it)
+  deliberate gate refusal at the load step. **Rev 2, 2026-07-23** (clone-layout
+  discovery: the MAC root may now be a Bitbucket promotion-repo checkout —
+  `<name>#<guid>` folder parsing, per-folder scope, the swagger per-pipeline
+  dataflow work list; `controlm_jobs.sql` path corrected; curated-load graph-shape
+  pin added; reflects commit `4e77c1c`. Rev 1, 2026-07-21: commit `297167e` —
+  post-G14 file-ops pass, post-G15 launcher contract, post-G17 MAC ingest seam.
+  The m3_* lineage vocabulary is `status: planned` — the live load REFUSES by
+  design until the HITL gate flips it)
 - **Classification:** Internal-Public (mechanism only — every example value is
   synthetic; real jobs CSVs and MAC JSON exports are internal-confidential and live
   OUT of the repo tree, never in this doc)
@@ -50,19 +54,42 @@ edges (Epic K owns those — this pipeline records SEAL *facts* only).
    `controlm_jobs.sql` SELECT aliases (`job_id, version_serial, folder_id, job_name,
    parent_table, application, owner, node_id, cmd_line, is_current_version, …` —
    the column contract is pinned by `tests/unit/test_source_mapping_drift.py`).
-   Company-side: run `drydocs_core/loaders/sql/controlm_jobs.sql` through your JDBC
-   path. Producer-side: the synthetic twin `tests/fixtures/lineage/jobs.csv`.
-3. **The MAC root (optional — skip and the pipeline still runs, un-enriched):** a
-   directory of per-pipeline JSON sets, each subdirectory holding `pipeline.json` +
-   `dataset_flow.json` (+ the rest of the traced 6-set, which is counted and
-   ignored). Field contract documented at the top of
+   Company-side: run `drydocs/loaders/sql/controlm_jobs.sql` through your JDBC
+   path — the SAME file `ingest-controlm --use-oracle` executes, so this CSV and an
+   `ingest-controlm --use-oracle --phase nodes` initial load come from one
+   projection. Producer-side: the synthetic twin `tests/fixtures/lineage/jobs.csv`.
+3. **The MAC root (optional — skip and the pipeline still runs, un-enriched):**
+   either staging layout works; consumption is identical:
+   - **Hand-staged sets** — a directory of per-pipeline JSON sets, each
+     subdirectory holding `pipeline.json` + `dataset_flow.json` (+ the rest of the
+     traced 6-set, which is counted and ignored).
+   - **Promotion-repo clone (Bitbucket)** — dataset and pipeline folders sit as
+     SIBLINGS under `src/main/resources/promotion/pipelines/`, one folder per
+     object, named `<name>#<guid>`: pipeline folders lowercase
+     (`accounts_conform_aws_ingest#<guid>`), dataset folders UPPERCASE
+     (`ACCOUNTS_RAW#<guid>`). The extractor parses the folder names: pipeline
+     GUIDs join exactly like `pipelineId`, folder names land as `mac_clone_name`
+     facts, dataset folder names fill `dataset_name` where a flow entry lacks
+     one. The swagger export tool serves `dataset_flow.json` only per-pipeline
+     (bulk `pipeline_id.json` / `dataset_id.json` by SEAL exist, but no bulk
+     dataflow) — a fresh clone therefore has pipeline folders with NO JSON set
+     yet: `clone: missing_sets=` counts them and `clone_missing_set_guids` IS the
+     per-pipeline fetch work list. Drop each fetched set into its `name#guid`
+     folder and re-run.
+
+   Field contract documented at the top of
    `drydocs_lineage/extractors/dpl_mac.py` — ASSUMED until a real sample validates
-   it. **Real exports are internal-confidential: keep them out of the repo tree**
-   (out-of-tree home `~/data/DryDocs/` per the G19 convention; until G19 lands the
-   location is manual discipline, not tooling).
+   it. **Real exports and clones are internal-confidential: keep them out of the
+   repo tree** (out-of-tree home `~/data/DryDocs/` per the G19 convention; until
+   G19 lands the location is manual discipline, not tooling).
 4. **For the load step only:** the `neo4jtest` EE container READY per the companion
    runbook, `.env` at repo root with `NEO4J_*` (names only — never in this doc), and
-   the target database `drydocs` (the writer hard-refuses any other DB).
+   the target database `drydocs` (the writer hard-refuses any other DB). The writer
+   MATCHes ControlMJob by the `(folder_id, job_id)` NODE KEY — the psgmgr-shaped
+   graph an `ingest-controlm` load produces (`job_id` is folder-scoped there; the
+   `ctlm_id` composite is its `folder_id.job_id` single-string form). A graph
+   loaded from the XML definition path carries differently-shaped job identity and
+   is NOT the target of this runbook's load step.
 5. **Reference reading before a first run:** the two gate-log entries named in
    Companion — they are the WHY for every endpoint shape below.
 
@@ -76,9 +103,12 @@ From nothing to READY-to-ingest. Run from the repo root.
 2. **Stage the jobs CSV** somewhere readable (synthetic:
    `tests/fixtures/lineage/jobs.csv` works as-is). *Success:* the header line
    contains `job_name`, `cmd_line`, `node_id`.
-3. **Stage the MAC root** (optional): one subdirectory per pipeline, each with at
-   least `pipeline.json`. *Success:* `Get-ChildItem <mac-root> -Recurse -Filter
-   pipeline.json` lists one file per pipeline set.
+3. **Stage the MAC root** (optional): hand-staged — one subdirectory per pipeline,
+   each with at least `pipeline.json`; clone — `git clone` the promotion repo (out
+   of the repo tree). *Success:* hand-staged: `Get-ChildItem <mac-root> -Recurse
+   -Filter pipeline.json` lists one file per pipeline set; clone: the
+   `promotion/pipelines/` listing shows `name#guid` siblings — pipelines
+   lowercase, datasets UPPERCASE.
 
 <!-- anchor: refresh-ingest -->
 ## Refresh / ingest
@@ -101,13 +131,19 @@ graph, rerun freely); step 5 is the gated write.
    "@
    ```
 
+   `<mac-root>` may be the hand-staged root, the clone root (or its
+   `promotion/pipelines/` dir), or a SINGLE `name#guid` pipeline folder — the
+   per-folder scope for one-pipeline reruns.
+
    *Success:* both `summary()` lines print, and every skip shows up as a COUNT
    (`unresolved=`, `unmatched=`, `riders=`…) — the house rule is counted-never-
    silent, so a zero-warning run and a warning-heavy run are both "working";
    what matters is that the numbers reconcile with what you fed in.
    The MAC join is by `--pipeline-id` GUID (both launcher spellings) onto the
    `proc#dpl:{GUID}` identity the inventory pass created; `matched` +
-   `unmatched` should equal `sets_read - sets_no_guid - sets_invalid`.
+   `unmatched` should equal `sets_read - sets_no_guid - sets_invalid`. On a
+   clone, `clone: pipes=` should equal sets consumed plus `missing_sets=` (the
+   still-to-fetch list).
 
 2. **Render the SME review page** (no Neo4j):
 
@@ -198,6 +234,13 @@ graph, rerun freely); step 5 is the gated write.
   different scopes (unmatched sets are still staged, flagged `mac_only=true`), or
   the GUID never appeared on a CMD_LINE (the code-fetch gap family — real
   finding, not noise).
+- **`clone: missing_sets` > 0** → expected on a fresh clone: the swagger tool
+  serves dataflow only per-pipeline. Fetch per GUID in
+  `clone_missing_set_guids`, drop the JSONs into the matching `name#guid`
+  folder, re-run. Not an error.
+- **`clone: mismatch` > 0** → a folder-name GUID differs from its
+  `pipeline.json` `pipelineId`; the json wins (it IS the set's key). Review
+  material — a stale clone or a set dropped into the wrong folder.
 - **`kind_riders` > 0** → expected for `provisioning` and any unmapped subType;
   the enum question is inboxed (IDEAS 2026-07-21 gate-rider entry). Do NOT add
   mappings to `_KIND_BY_SUBTYPE` without a gate ruling.
@@ -231,7 +274,8 @@ graph, rerun freely); step 5 is the gated write.
 ```
 controlm_jobs.sql ─▶ jobs CSV ─▶ ControlMInventoryExtractor ─┐
                                                              ├─▶ LineageGraph ─▶ review ─▶ confirmed ─▶ plan_curated ─▶ write_curated ─▶ Neo4j
-MAC JSON sets (per-pipeline) ─▶ DplMacExtractor ─────────────┘                                              (refuses until gate flip)
+MAC root (hand-staged sets OR ─▶ DplMacExtractor ────────────┘                                              (refuses until gate flip)
+ promotion-repo clone, name#guid)
 ```
 
 **B. What each extractor contributes**
@@ -239,4 +283,4 @@ MAC JSON sets (per-pipeline) ─▶ DplMacExtractor ─────────�
 | Source | Nodes | Rels (all `status: planned` vocab) | Properties |
 |---|---|---|---|
 | jobs CSV | ControlMJob, Script, ETLProcess | INVOKES; job-level READS_FROM/WRITES_TO (G14 file ops) | G15 launcher args incl. `seal` |
-| MAC sets | ETLProcess (join/enrich), `dpl_dataset` DataAssets | dataset-level READS_FROM/WRITES_TO | `mac_pipeline_type`, `mac_sub_type`, `mac_kind` / `mac_kind_rider`, `mac_owner_seal` |
+| MAC sets | ETLProcess (join/enrich), `dpl_dataset` DataAssets | dataset-level READS_FROM/WRITES_TO | `mac_pipeline_type`, `mac_sub_type`, `mac_kind` / `mac_kind_rider`, `mac_owner_seal`, `mac_clone_name` (clone layout) |
