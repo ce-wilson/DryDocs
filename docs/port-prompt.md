@@ -201,6 +201,31 @@ STEP LEDGER — delta since `6fd3270` (numbering continues from the archive):
     Producer-side reference at 74716cf: 833 passed / 4 skipped (tests/unit);
     at 2adec42 (C13+C14 landed): 840 passed / 6 skipped.
 
+44. UI ACCELERATION STREAM (2026-07-23, producer head `e6733d5` + prompt/manifest
+    commit after it). Merge `af03aef` (--no-ff, 3 commits: `9584ee3` theme pass,
+    `ce73538` /under-the-hood route, `79d4e51` dead-route cleanup) + `65de7ae` docs +
+    `e6733d5` IDEAS capture. All web/** + UI-WIP/** = canonical-producer (step 31 rows):
+    clean-apply, NO Tier B interaction, no gate adoption involved (read-only console,
+    O20 untouched — the build was a producer-side intended bypass, recorded in IDEAS).
+    Mechanics/notes:
+    - web/: additive components (HeroArt, StatTiles, underhood/*) + edits to
+      Overview/Header/Aside/graph panes + DELETES web/src/routes/SkeletonModuleRoute.tsx
+      (dead code). Zero new npm deps — package.json/lock unchanged; company `npm ci &&
+      npm run build --prefix web` is the acceptance check (producer: tsc+vite clean,
+      oxlint no new warnings). web/src/generated/* untouched by this range.
+    - web/src/underhood/benchmarkData.ts: fixture HAND-CARRIED from the committed P0
+      verdict (knowledge/upgrade-plans/docmeta-p0-verdict.md). Port as-is; re-running
+      the benchmark against the COMPANY corpus is Track-2 work (see
+      UI-WIP/two-track-ui-plan.md), not a port step.
+    - internal/context-graph-analysis/** : NEW manifest row (canonical-producer,
+      private-remote-only). Content is analysis OF the company's own incubator repos —
+      fine on GHE, never public.
+    - UI-WIP/two-track-ui-plan.md: clean-add; it defines the producer/company UI seam
+      (producer owns components+fixtures; company owns QuerySpec data + env) — read it
+      before planning any company-side UI work so surfaces don't collide.
+    Interleaved docs/ontology commits since fb8ac23 (`a4e7e15`, `9343d9b`, `1cc627b`,
+    `c1ee13f`) remain part of step 43's live-computed range and its Tier B hold rules.
+
 ACCEPTANCE GATE (behavior is the contract, not a byte-compare):
 - Track 1 (portable, no production sample present):
     poetry run pytest tests/unit/test_variable_classifier.py tests/unit/test_variable_resolver.py \

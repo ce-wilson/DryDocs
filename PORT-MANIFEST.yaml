@@ -157,6 +157,12 @@ rows:
       the private company remote). Producer-authored files take producer on collision;
       company-side ADDITIONS here (e.g. the G10 landings per the README §HELD) are
       company-only files — they never collide and never flow back.
+  - path: "internal/context-graph-analysis/**"
+    disposition: canonical-producer
+    note: >
+      producer-authored analysis of the company incubator's context-graph (2026-07-23) —
+      Internal: fine on the private company remote, NEVER in any PUBLIC mirror. Source
+      screenshots stay producer-local (gitignored); company has the real repos anyway.
   - path: "knowledge/standards/**"
     disposition: canonical-producer
   - path: "drydocs/loaders/**"
