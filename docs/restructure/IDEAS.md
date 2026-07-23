@@ -46,6 +46,22 @@ Tags help grooming: `idea` · `bug` · `doc` · `source` (new data source) · `q
   delivers, DL from the email-dl-contact-point NOTIFIES mapping receives. Feeds: the DL
   gate B2 grain question (stream/milestone grain confirms folder-preference), the
   runbook module ETA logic, and the company-side probe list.
+  KEPT-UPDATED 2026-07-23 (SME, chat): the BIM install probe is ANSWERED — one
+  production SLA/BIM job exists (SEAL 90489) — but it fires near-DAILY and is ignored:
+  mechanism right, calibration wrong. Cause candidates (distinguishable): (1) deadline
+  tighter than the stream's actual completion distribution [most common]; (2) stale/
+  unrepresentative averages after the chain changed shape; (3) alert scope includes
+  per-job failures, re-inheriting the noise it was meant to replace; (4) stream is
+  genuinely chronically at-risk but the alert carries no slack/recovery content, so
+  it's untriageable. DryDocs diagnostic play (once cm_avg_run + calendar projection
+  land): take the 90489 BIM service's job membership, compute observed critical-path
+  completion distribution, compare to the configured deadline → move deadline /
+  refresh scope / re-engineer. Same slack computation that gates a PDN also VALIDATES
+  whether a deadline is honest — deadline-calibration audit = a runbook/notification
+  module feature, and the worked example for it. Principle for the notification model
+  (gate-worthy): an alert channel earns attention only with a low base rate AND
+  actionable content (remaining slack + recovery action) — any mechanism without
+  calibrated thresholds degrades to ignored noise.
 - 2026-07-22 — [idea] **Email DLs need an ontology mapping (user, chat pm).** DL = the
   contact/notification channel for an app/team; only configured in Outlook (no feed,
   can't fix), witnessed in runbooks, extractable from emails; membership/usage are
