@@ -201,10 +201,10 @@ STEP LEDGER — delta since `6fd3270` (numbering continues from the archive):
     Producer-side reference at 74716cf: 833 passed / 4 skipped (tests/unit);
     at 2adec42 (C13+C14 landed): 840 passed / 6 skipped.
 
-44. UI ACCELERATION STREAM (2026-07-23, producer head `e6733d5` + prompt/manifest
-    commit after it). Merge `af03aef` (--no-ff, 3 commits: `9584ee3` theme pass,
-    `ce73538` /under-the-hood route, `79d4e51` dead-route cleanup) + `65de7ae` docs +
-    `e6733d5` IDEAS capture. All web/** + UI-WIP/** = canonical-producer (step 31 rows):
+44. UI ACCELERATION STREAM (2026-07-23; hashes are post-rebase onto `b6296ae`, as
+    pushed). Merge `e185241` (--no-ff, 3 commits: `4d3ceba` theme pass, `4b7b490`
+    /under-the-hood route, `e3b3663` dead-route cleanup) + `955df1f` docs +
+    `53ff1e5` IDEAS capture + `4ca8878` (this step + manifest row). All web/** + UI-WIP/** = canonical-producer (step 31 rows):
     clean-apply, NO Tier B interaction, no gate adoption involved (read-only console,
     O20 untouched — the build was a producer-side intended bypass, recorded in IDEAS).
     Mechanics/notes:
