@@ -75,7 +75,7 @@ def test_sections_adapter_covers_every_committed_doc() -> None:
 def test_controlm_matrix_parses_all_rows() -> None:
     rows = parse_matrix_rows(CONTROLM_TDD.read_text(encoding="utf-8"), "controlm-ingestion-tdd")
     ids = [r["requirement_id"] for r in rows]
-    assert len(ids) == 8, f"expected the 8 committed matrix rows, got {ids}"
+    assert len(ids) == 9, f"expected the 9 committed matrix rows, got {ids}"
     assert "FR-CMI-003" in ids and "NFR-CMI-001" in ids
     by_id = {r["requirement_id"]: r for r in rows}
     # kind from the id prefix (gate A3)
