@@ -44,6 +44,9 @@ sh ./rua_inventory.sh                 # uses ./rua_inventory.conf, output in .
 #   or:
 sh ./rua_inventory.sh -c myteam.conf -o /var/tmp/inv   # custom config + outdir
 sh ./rua_inventory.sh -u svc.hldm     # inventory another user (needs perms/root)
+sh ./rua_inventory.sh -n '*.py'       # v2: also capture script files by name glob
+sh ./rua_inventory.sh -n '*.py *.sh'  #     one -n, space-separated globs
+sh ./rua_inventory.sh -n '*.py' -n '*.sh'   # ...or repeat the flag
 
 # 3) bring the bundle back
 scp 'you@vsi-host:/tmp/inv/rua_<host>_<user>_<ts>.tar.gz'  ./
@@ -56,6 +59,7 @@ scp 'you@vsi-host:/tmp/inv/rua_<host>_<user>_<ts>.tar.gz'  ./
 | `-c` | config file | `./rua_inventory.conf` (built-in defaults if absent) |
 | `-o` | parent dir for the output bundle | current directory |
 | `-u` | user to inventory | the user running the script |
+| `-n` | script name glob(s) to capture (v2) — repeatable, or space-separated in one flag | none (no script capture) |
 | `-h` | help | |
 
 ## Configuration (`rua_inventory.conf`)
@@ -65,6 +69,9 @@ SCAN_ROOTS=/opt/app /data/landing   # extra roots beyond $HOME (space-separated)
 MAX_DEPTH=4                         # directory-walk depth; 0 = unlimited
 FOLLOW_SYMLINKS=no
 COPY_PROFILES=yes
+COPY_SCRIPTS=yes                    # v2: copy -n-matched files into scripts/
+SCRIPT_COPY_MAX_BYTES=1048576       # v2: per-file copy cap — bigger files are
+                                    #   listed in scripts.tsv but not copied
 OWNERSHIP_SWEEP=no                  # yes = heavy `find / -xdev -user <user>` sweep
 
 IGNORE=*/logs/*                     # one glob per line; matched on the FULL path
@@ -80,10 +87,14 @@ Ignore globs use shell `case` semantics: `*` matches any run of characters
 ```
 rua_<host>_<user>_<ts>/
   meta.txt                 # key=value: user, uid, groups, shell, home, server,
-                           #   os/kernel, scan roots, profile_files, counts
+                           #   os/kernel, scan roots, name_globs, counts
   profiles/                # copies of .profile, .kshrc, .bash_profile, ...
-  profiles.tsv             # name, path, size, mtime, perms, owner
+  profiles.tsv             # name, path, size, mtime, perms, owner, sha256 (v2)
   directories.tsv          # path, type, owner, group, perms, size, mtime
+  scripts.tsv              # (v2, only with -n) path, owner, group, perms,
+                           #   size, mtime, sha256
+  scripts/                 # (v2, only with -n + COPY_SCRIPTS=yes) copies of
+                           #   matched files, tree-mirrored: scripts/<abs path>
   ownership_dirs.tsv       # (only if OWNERSHIP_SWEEP=yes)
   rua_inventory.conf.used  # the exact config used (provenance)
 rua_<host>_<user>_<ts>.tar.gz
@@ -92,6 +103,12 @@ rua_<host>_<user>_<ts>.tar.gz
 All record files are tab-separated with a header row — the same machine-first
 shape the lineage component already ingests (see the CSV-driven
 `controlm_inventory` extractor).
+
+**Bundle schema versions.** `meta.txt` `schema=` stamps the collector version.
+`rua-inventory/v2` (G18) added `scripts.tsv` + the `sha256` columns — the
+content hash is the version discriminator and the anchor for the G24 code-repo
+blob sweep. v1 bundles STAY ingestible: the (G20) extractor must treat
+`scripts.tsv` and the `sha256` columns as optional.
 
 ## Where bundles live (G19 — the landing zone)
 

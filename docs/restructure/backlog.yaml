@@ -4520,7 +4520,7 @@ items:
     agent: main
     model: sonnet
     priority: p2
-    status: todo
+    status: done                        # 2026-07-23: -n glob capture -> scripts.tsv (+sha256) + tree-mirrored copies (COPY_SCRIPTS gate, SCRIPT_COPY_MAX_BYTES cap), profiles.tsv sha256, COLLECTOR_VERSION v2 (v1 stays ingestible), summary line, README; smoke-tested in Git Bash (globs/ignores/cap/repeatable -n/no -n/v1 mode)
     depends_on: []
     inputs: [drydocs_lineage/collect/rua_inventory.sh, drydocs_lineage/collect/rua_inventory.conf, drydocs_lineage/collect/README.md]
     acceptance: >
@@ -5487,11 +5487,11 @@ items:
       possible.
 
 summary:
-  todo: 28                                         # R3..R8 queued behind the Epic R chain
+  todo: 27                                         # R3..R8 queued behind the Epic R chain
   in_progress: 1                                   # E1 (gate deferred both sides)
   blocked: 0
-  done: 129                                        # +R2 graph_qa Tier-0/1 live-verified 2026-07-23 (model+graph+api_server)
-  next_ready: [M3, M4, P3, J10, Q6, O23, J13, G18, G25, O26, G26, O27, C15, C16, O28, R3, R4]
+  done: 130                                        # +G18 rua collector v2 (script capture) 2026-07-23
+  next_ready: [M3, M4, P3, J10, Q6, O23, J13, G20, G25, O26, G26, O27, C15, C16, O28, R3, R4]
   # HITL-free groom (2026-07-21 pm; O26 pulled 07-22): P3, J10, Q6, J13, G18, G19, G26
   # are workable with NO gate session — P3/G21 implement already-signed rulings
   # (CM_HOSTS 07-09, cmd-line 07-15); G18..G21+G24+G25 are staging-only pre-G22 (no
