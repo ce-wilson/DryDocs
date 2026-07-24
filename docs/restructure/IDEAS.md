@@ -26,14 +26,15 @@ Tags help grooming: `idea` · `bug` · `doc` · `source` (new data source) · `q
 
 <!-- add new ideas at the top -->
 
-- 2026-07-23 — [source] **By-SEAL bulk MAC inventory as a discovery source (SME, chat pm).**
-  The promotion-repo clone's main may LAG (feature branches pushed, not reliably
-  merged) — so the `name#guid` folder listing is a floor, not the authority. Backup:
-  bulk `pipeline_id.json` / `dataset_id.json` downloads by SEAL (all pipelines/
-  datasets; dataflow is still per-pipeline swagger only). Field contract UNACQUIRED —
-  acquire a real sample (assumed-contract discipline), then teach `dpl_mac.py`
-  discovery to consume it and cross-check the clone against it (a lagging clone
-  currently surfaces as `dpl_without_mac`; runbook Rev 3 records the caveat).
+- 2026-07-23 — [source] **By-SEAL bulk MAC inventory as backup discovery → this IS G25
+  (todo, READY — depends only on G19, done).** New motivation from the SME (chat pm):
+  the promotion-repo clone's main may LAG (feature branches pushed, not reliably
+  merged) — the `name#guid` folder listing is a floor, not the authority, so the
+  per-SEAL registry export is the discovery BACKUP (dataflow stays per-pipeline
+  swagger either way). Rider for the G25 implementer: extend its GUID cross-check
+  (registry vs G15 CMD_LINE observations) with a third column — clone folder GUIDs
+  via `parse_clone_folder` — so clone lag is measured, not guessed (a lagging clone
+  currently surfaces only as `dpl_without_mac`; runbook Rev 3 records the caveat).
 - 2026-07-23 — [idea] **Oracle connection for the lineage/remediation path (user note,
   chat pm).** The lineage jobs step still stages a CSV by hand through a JDBC client;
   the Oracle connection is planned — and the user's note ties it to the REMEDIATION
