@@ -12,7 +12,7 @@
 # =============================================================================
 
 schema: drydocs.source-registry.v1
-updated: 2026-07-22
+updated: 2026-07-23
 
 sources:
   # ---- Orchestration metadata (Tier-2 vendors) -----------------------------
@@ -202,7 +202,7 @@ sources:
     source: "rua_*.tar.gz bundles under DRYDOCS_DATA_ROOT (~/data/DryDocs/rua/) — collected on Control-M execution hosts by drydocs_lineage/collect/rua_inventory.sh"
     kind: server-inventory
     orchestrator: bmc-controlm            # inventories the orchestrator's execution hosts
-    adapter: ~                            # G20 extractor (drydocs_lineage/extractors/rua_inventory.py) pending
+    adapter: ~                            # G20 extractor (drydocs_lineage/extractors/rua_inventory.py) built 2026-07-23 — staging only; no loader before G22
     locator:
       data_root: "DRYDOCS_DATA_ROOT (default ~/data/DryDocs); rua/incoming/ = tarballs, rua/extracted/<bundle>/ = unpacked"
       resolver: drydocs_core/data_root.py # the ONE shared helper (G19)
@@ -218,6 +218,33 @@ sources:
       Chain: G18 collector parity -> G20 extractor (staging records with the
       meta.txt provenance envelope) -> G21 code-operations pass -> G22 HITL
       gate, which is this entry's activation condition.
+
+  # ---- DPL taxonomy registry (per-SEAL Swagger exports) ---------------------
+  - id: dpl-registry
+    classification: Internal-Confidential   # real SEAL ids + pipeline/dataset GUIDs + lifecycle state
+    source: "per-SEAL Swagger JSON exports of the DPL taxonomy registry (pipeline_id.json / dataset_id.json) under DRYDOCS_DATA_ROOT (~/data/DryDocs/dpl-registry/<seal>/)"
+    kind: registry
+    orchestrator: ~
+    adapter: ~                            # G25 extractor (drydocs_lineage/extractors/dpl_registry.py) — taxonomy-first staging, no loader
+    locator:
+      data_root: "DRYDOCS_DATA_ROOT (default ~/data/DryDocs); dpl-registry/<seal>/ = per-SEAL exports"
+      resolver: drydocs_core/data_root.py # dpl_registry_dir() (the G19 shared helper)
+    feeds_taxonomy: [pipelines, datasets]
+    confirmed: false                      # G22 clauses (f)/(g) own the rulings this feeds; NOTHING writes the graph before it
+    notes: >
+      G25 registration — THE POINTER, NEVER THE DATA: exports carry real SEAL
+      ids, pipeline/dataset GUIDs, and lifecycle state (Internal-Confidential)
+      and never enter the repo tree; fixtures are SYNTHETIC. The registry sits
+      ABOVE the pipelines (G17 reads each pipeline's own MAC set; the shared
+      join key is the same GUID G15 extracts from CMD_LINE). Ingested
+      taxonomy-first into staging records (guid, kind, version, active, seal +
+      provenance); the extractor also emits the GUID cross-check report —
+      observed-not-registered / registered-not-observed, plus the clone-lag
+      column (SME caveat 2026-07-23: the promotion clone's main lags; this
+      bulk export is the backup discovery source; dataflow stays per-pipeline
+      swagger). The active flag is a THIRD usage signal (beside referenced and
+      present-on-server) — staged only; any conflation with "used" is a G22
+      ruling.
 
   # ---- Data platforms (sources of DataAsset/lineage) -----------------------
   - id: oracle-schemas

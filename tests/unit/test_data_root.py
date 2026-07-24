@@ -11,6 +11,7 @@ from pathlib import Path
 
 from drydocs_core import data_root as dr
 from drydocs_core.data_root import (
+    dpl_registry_dir,
     resolve_data_root,
     rua_extracted_dir,
     rua_incoming_dir,
@@ -38,6 +39,12 @@ def test_rua_subfolder_convention(tmp_path, monkeypatch):
         rua_extracted_dir("rua_host_20260722.tar.gz")
         == tmp_path / "rua" / "extracted" / "rua_host_20260722.tar.gz"
     )
+
+
+def test_dpl_registry_subfolder_convention(tmp_path, monkeypatch):
+    monkeypatch.setenv(dr.DATA_ROOT_ENV, str(tmp_path))
+    assert dpl_registry_dir() == tmp_path / "dpl-registry"
+    assert dpl_registry_dir("88888") == tmp_path / "dpl-registry" / "88888"
 
 
 def test_create_on_demand_only(tmp_path, monkeypatch):

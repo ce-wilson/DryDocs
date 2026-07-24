@@ -26,15 +26,14 @@ Tags help grooming: `idea` · `bug` · `doc` · `source` (new data source) · `q
 
 <!-- add new ideas at the top -->
 
-- 2026-07-23 — [source] **By-SEAL bulk MAC inventory as backup discovery → this IS G25
-  (todo, READY — depends only on G19, done).** New motivation from the SME (chat pm):
-  the promotion-repo clone's main may LAG (feature branches pushed, not reliably
-  merged) — the `name#guid` folder listing is a floor, not the authority, so the
-  per-SEAL registry export is the discovery BACKUP (dataflow stays per-pipeline
-  swagger either way). Rider for the G25 implementer: extend its GUID cross-check
-  (registry vs G15 CMD_LINE observations) with a third column — clone folder GUIDs
-  via `parse_clone_folder` — so clone lag is measured, not guessed (a lagging clone
-  currently surfaces only as `dpl_without_mac`; runbook Rev 3 records the caveat).
+- 2026-07-23 — [source] **By-SEAL bulk MAC inventory as backup discovery → G25 —
+  RESOLVED same day (G25 done 2026-07-23).** The SME clone-lag motivation (main
+  lags — feature branches pushed, not reliably merged) and the rider both landed in
+  the build: `drydocs_lineage/extractors/dpl_registry.py` stages the per-SEAL
+  exports taxonomy-first AND `cross_check()` carries the clone-lag third column
+  (clone folder GUIDs via `parse_clone_folder` → `registered_not_in_clone` = the
+  lag, measured). Assumed field contract still awaits a real sample (the dpl_mac
+  discipline — amend header + fixtures together, cite provenance).
 - 2026-07-23 — [idea] **Oracle connection for the lineage/remediation path (user note,
   chat pm).** The lineage jobs step still stages a CSV by hand through a JDBC client;
   the Oracle connection is planned — and the user's note ties it to the REMEDIATION

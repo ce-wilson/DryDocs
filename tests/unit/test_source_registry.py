@@ -85,7 +85,8 @@ def test_real_registry_gate_state() -> None:
                  "autosys-export", "stg-app-fact"):
         assert reg.is_confirmed(live), f"{live} should be confirmed"
     # rua-inventory: G19 registration; activation condition = the G22 rua-load gate
-    for placeholder in ("oracle-schemas", "snowflake", "rua-inventory"):
+    # dpl-registry: G25 registration; G22 clauses (f)/(g) own its rulings
+    for placeholder in ("oracle-schemas", "snowflake", "rua-inventory", "dpl-registry"):
         assert not reg.is_confirmed(placeholder), f"{placeholder} should be unconfirmed"
         with pytest.raises(UnconfirmedSourceError):
             reg.require_confirmed(placeholder)

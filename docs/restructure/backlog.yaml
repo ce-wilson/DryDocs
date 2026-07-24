@@ -4806,7 +4806,7 @@ items:
     agent: main
     model: sonnet
     priority: p2
-    status: todo
+    status: done                        # 2026-07-23: extractors/dpl_registry.py (assumed contract: <seal>/pipeline_id.json + dataset_id.json, bare or wrapped lists; seal from field else folder; active normalized, unknown counted) + cross_check report (observed-not-registered / registered-not-observed / clone-lag third column per the SME caveat) + dpl_registry_dir() + dpl-registry source registration (internal-confidential, confirmed:false, G22 f/g); synthetic fixtures; NO graph writes
     depends_on: [G19]
     inputs: [config/source-registry.yaml, config/classification.yaml, drydocs_lineage/, drydocs_core/controlm/commands.py, tests/unit/test_lineage_inventory.py]
     acceptance: >
@@ -5487,11 +5487,11 @@ items:
       possible.
 
 summary:
-  todo: 26                                         # R3..R8 queued behind the Epic R chain
+  todo: 25                                         # R3..R8 queued behind the Epic R chain
   in_progress: 1                                   # E1 (gate deferred both sides)
   blocked: 0
-  done: 131                                        # +G20 rua bundle extractor 2026-07-23 (G18 same day)
-  next_ready: [M3, M4, P3, J10, Q6, O23, J13, G21, G24, G25, O26, G26, O27, C15, C16, O28, R3, R4]
+  done: 132                                        # +G25 dpl-registry ingestion 2026-07-23 (G18+G20 same day)
+  next_ready: [M3, M4, P3, J10, Q6, O23, J13, G21, G24, O26, G26, O27, C15, C16, O28, R3, R4]
   # HITL-free groom (2026-07-21 pm; O26 pulled 07-22): P3, J10, Q6, J13, G18, G19, G26
   # are workable with NO gate session — P3/G21 implement already-signed rulings
   # (CM_HOSTS 07-09, cmd-line 07-15); G18..G21+G24+G25 are staging-only pre-G22 (no

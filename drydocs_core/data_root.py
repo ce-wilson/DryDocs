@@ -16,6 +16,11 @@ the logs, not in the tree):
     <root>/rua/incoming/            collected rua_*.tar.gz bundles, as carried
     <root>/rua/extracted/<bundle>/  one dir per unpacked bundle
 
+and the DPL registry landing zone (G25 — per-SEAL Swagger exports of the
+taxonomy registry; real SEALs + GUIDs + lifecycle state):
+
+    <root>/dpl-registry/<seal>/     pipeline_id.json / dataset_id.json per SEAL
+
 Payloads under the root may hold real hostnames, uids, home paths, and
 profile/script copies (Internal-Confidential) — DATA NEVER ENTERS THE REPO;
 ``tests/unit/test_data_root.py`` sweeps the tree to enforce it.
@@ -51,4 +56,10 @@ def rua_incoming_dir(*, create: bool = False) -> Path:
 def rua_extracted_dir(bundle_name: str | None = None, *, create: bool = False) -> Path:
     """Unpack area — one directory per bundle when ``bundle_name`` is given."""
     parts = ("rua", "extracted") + ((bundle_name,) if bundle_name else ())
+    return source_dir(*parts, create=create)
+
+
+def dpl_registry_dir(seal: str | None = None, *, create: bool = False) -> Path:
+    """Landing zone for per-SEAL DPL registry Swagger exports (G25)."""
+    parts = ("dpl-registry",) + ((seal,) if seal else ())
     return source_dir(*parts, create=create)
