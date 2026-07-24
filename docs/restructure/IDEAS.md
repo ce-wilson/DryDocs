@@ -26,6 +26,28 @@ Tags help grooming: `idea` · `bug` · `doc` · `source` (new data source) · `q
 
 <!-- add new ideas at the top -->
 
+- 2026-07-24 — [idea] **Supplement consolidation shape A — designed, user-reviewed, awaiting
+  go (chat).** Single `apply-supplements` verb over a data-driven ordered list (base → seal →
+  catalog → registry; SOSA stays opt-in), legacy verbs kept as delegating aliases. Riders
+  agreed in review: post-apply OntologyTerm count assertion, a `load.supplement.<stamp>.log`
+  run-log envelope (today NO supplement/bootstrap verb writes a log file — `execute_file` is
+  debug+console only), run-drydocs skill + repo-README chain update, e2e test switch. Parked
+  sibling: shape C (registration-vs-instance-seed re-slice) is gate-worthy, not a refactor.
+  Groundwork already landed 2026-07-24 (9f5ebe1: stale refs, supplement header charter,
+  missing `org#member` anchor; 76be07c: catalog docstring).
+- 2026-07-24 — [bug] **Unlocated user-reported typo: "apply-catalog … at the bottom says
+  apply ontology" (chat).** Searched cli.py docstrings/messages, runbook .md/.html both revs,
+  run-drydocs skill, RELATIONSHIP_GUIDE, repo-README, feedback html, gate docs — no such
+  string exists. Best guess: startup-refresh runbook step 3 says "the three domain
+  supplements" and Appendix B omits `apply-registry-supplement` while running
+  `load-software-registry` — a genuine Rev 3 gap that should ride the L5/L6 SME feedback
+  loop (doc is mid-review; do not hot-edit). Re-check with the user for the exact spot.
+- 2026-07-24 — [doc] **reconcile-port skill stale Track-1 floor.** Skill says "expect 90
+  passed, 3 skipped" — actual is 113/3 on both sides since the suite grew (verified during
+  the PORT-REPORT-73ee97a confirmation). One-line skill update; company copy has the same
+  number.
+- 2026-07-24 — [chore] **T11 L7-ratification paste-ready snippet still owed producer-side**
+  (noted while confirming PORT-REPORT-73ee97a; the company gate pack references it).
 - 2026-07-23 — [idea] **Oracle connection for the lineage/remediation path (user note,
   chat pm).** The lineage jobs step still stages a CSV by hand through a JDBC client;
   the Oracle connection is planned — and the user's note ties it to the REMEDIATION
