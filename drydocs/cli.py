@@ -561,8 +561,9 @@ def apply_catalog_supplement() -> None:
 
     Declares :CatalogLOB, :BusinessSegment, :ProductLine, :Product,
     :DevTeam, :JiraBoard, :AreaProduct node types, PAT relationship
-    mappings (HAS_APPLICATION, HAS_AREA_PRODUCT, SUPPORTS), and seeds all
-    19 canonical Role nodes (PAT + SEAL).  Safe to re-run.
+    mappings (HAS_APPLICATION, HAS_AREA_PRODUCT, SUPPORTS), the K6 Product
+    Cabinet terms + product_roles scheme, and seeds all 31 canonical Role
+    nodes (SEAL + PAT + D&A + CCB Ops).  Safe to re-run.
     """
     if not CATALOG_SUPPLEMENT_FILE.exists():
         console.print(f"[red]Missing: {CATALOG_SUPPLEMENT_FILE}[/]"); raise typer.Exit(1)
