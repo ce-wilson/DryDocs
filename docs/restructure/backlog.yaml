@@ -2400,6 +2400,35 @@ items:
       after TDD (L1) and Runbook (L8); the BRD outline stays parked (upstream
       WIP, user call). p3 — completeness/traceability hygiene, nothing
       downstream blocks on it.
+
+  - id: L16
+    epic: doc-infrastructure
+    title: "Refresh the startup/refresh runbook's container name + ports to match the neo4jtest recreation (neo4j-drydocs-ee/7476/7689 -> neo4jtest/7474/7687)"
+    type: chore
+    module: drydocs-docgen
+    phase: 10
+    agent: main
+    model: sonnet
+    priority: p3
+    status: todo
+    depends_on: []
+    inputs: [docs/design/drydocs-startup-refresh-runbook.md, scripts/render_design_doc.py]
+    acceptance: >
+      docs/design/drydocs-startup-refresh-runbook.md's container table and
+      start commands reference container `neo4jtest` on ports 7474/7687 (not
+      `neo4j-drydocs-ee`/7476/7689); the doc's Rev is bumped with a change
+      note per its own cadence; re-rendered via scripts/render_design_doc.py
+      (deterministic — git diff clean after regen); doc_outline validation +
+      full suite green.
+    notes: >
+      Groomed 2026-07-23 from the IDEAS.md Neo4j-container-recreation entry
+      (2026-07-23): the container migration itself is already done (data
+      moved to named volume neo4j-testdata, canonical container `neo4jtest`
+      on default ports; local .env/agents/.env/web/.env.local/MCP config
+      re-pointed 7689->7687) — this item is documentation-only catch-up
+      through the governed doc pipeline (CLAUDE.md L13 idiom: one .html,
+      deterministic render, no hand-restyling).
+
   # Groomed 2026-07-08 from the 2026-07-05 IDEAS line + the 2026-07-07 property-terms
   # line. Doc 06 Phases 0-1 (Control-M envelope: audit-fields.yaml + jobs/folders
   # extraction) shipped 2026-07-07 PRE-groom (gate controlm-q1q3-phase1) — recorded
@@ -5268,6 +5297,113 @@ items:
       the layer-4 context-graph surface in the UI; p3 until a module needs
       live health.
 
+  # Groomed 2026-07-23 from UI-WIP/two-track-ui-plan.md Track 1 (T1-5/T1-6/T1-7/
+  # T1-8) — the "UI acceleration session" groom candidates, misfiled below the
+  # audit trail in IDEAS.md and folded back into the inbox groom.
+  - id: O29
+    epic: web-console
+    title: "Trust-tier / edge-provenance legend surfaced live in-UI on the lineage and docs graph canvases"
+    type: task
+    module: drydocs-web
+    phase: 12
+    agent: main
+    model: sonnet
+    priority: p3
+    status: todo
+    depends_on: [O10, O18]
+    inputs: [web/src/, UI-WIP/two-track-ui-plan.md, internal/context-graph-analysis/ui-architecture-analysis.md]
+    acceptance: >
+      A legend component (declared vs observed / trust-tier color key) renders
+      on both the /lineage and /docs graph-pane canvases, reusing the existing
+      tier vocabulary (VERBATIM/GROUNDED/SYNTHESIZED, the KIND_TOKEN palette)
+      rather than inventing new colors; tokens read the theme CSS variables so
+      it renders correctly in both dark and light mode; visible on the canvas
+      itself, not only in the export manifest; suite + build + lint green.
+    notes: >
+      Groomed 2026-07-23 from UI-WIP/two-track-ui-plan.md T1-5 (adopt of
+      context-graph's declared/observed legend pattern, per
+      internal/context-graph-analysis/ui-architecture-analysis.md). Sonnet-
+      able — reuses existing tier vocab and canvases (O10/O18 both done), no
+      new ontology or edge semantics.
+
+  - id: O30
+    epic: web-console
+    title: "Retire App.css legacy mockup classes into the Tailwind/token idiom (SignIn, MyApps, GraphExplorer, TowerDrill, CypherConsole)"
+    type: chore
+    module: drydocs-web
+    phase: 12
+    agent: main
+    model: sonnet
+    priority: p3
+    status: todo
+    depends_on: []
+    inputs: [web/src/App.css, web/src/components/SignIn.tsx, web/src/components/MyApps.tsx, web/src/components/GraphExplorer.tsx, web/src/components/TowerDrill.tsx, web/src/components/CypherConsole.tsx]
+    acceptance: >
+      web/src/App.css is deleted (or reduced to a comment-only stub recording
+      the migration) and the five named surfaces (SignIn / MyApps /
+      GraphExplorer / TowerDrill / CypherConsole) style entirely through the
+      Tailwind/token classes already used elsewhere in web/src/; no visual
+      regression on any of the five (before/after screenshot or headless-Edge
+      smoke in both themes); build + lint green.
+    notes: >
+      Groomed 2026-07-23 from UI-WIP/two-track-ui-plan.md T1-7. Pure
+      hygiene/consistency chore — no new component behavior.
+
+  - id: O31
+    epic: web-console
+    title: "Regenerate web/src/underhood/benchmarkData.ts from the docmeta evaluation-harness output instead of the hand-carried P0-verdict record"
+    type: chore
+    module: drydocs-web
+    phase: 12
+    agent: main
+    model: sonnet
+    priority: p3
+    status: todo
+    depends_on: []
+    inputs: [web/src/underhood/benchmarkData.ts, knowledge/upgrade-plans/docmeta-p0-verdict.md, UI-WIP/two-track-ui-plan.md]
+    acceptance: >
+      benchmarkData.ts is produced by a documented regeneration step (a
+      script, or a recorded manual procedure in the file header/a sibling
+      README) that reads a real evaluation-harness run rather than the
+      hand-carried P0-verdict numbers; the /under-the-hood scoreboard renders
+      unchanged in shape from the regenerated data; build + lint green.
+    notes: >
+      Groomed 2026-07-23 from UI-WIP/two-track-ui-plan.md T1-8. No standalone
+      "docmeta evaluation harness" backlog item exists yet (checked: R8
+      "Answer evaluation + cap tuning" evaluates the Q&A console's OWN runs,
+      not a reusable docmeta benchmark harness — a different surface) — per
+      the groom instruction the dependency is recorded here as prose rather
+      than a fabricated id; depends_on is left [] and this item is in
+      practice blocked on that harness existing until one is groomed and this
+      item's depends_on is updated to point at it.
+
+  - id: O32
+    epic: web-console
+    title: "Light-mode design pass across the console (dark stays canonical; light is currently derived, not designed)"
+    type: task
+    module: drydocs-web
+    phase: 12
+    agent: main
+    model: sonnet
+    priority: p3
+    status: todo
+    depends_on: []
+    inputs: [web/src/, UI-WIP/site-plan.md, UI-WIP/two-track-ui-plan.md]
+    acceptance: >
+      Every themed surface in web/src/ (shell/header, landing hub, the shared
+      module template, the lineage/docs graph canvases, /under-the-hood) gets
+      an intentional light-mode design pass rather than the automatic
+      dark-token inversion in place today; verified via a light-mode
+      headless-Edge smoke across at least the shell, one module page, and the
+      lineage/docs canvases; dark mode remains the default/canonical theme
+      and is visually unchanged; build + lint green in both themes.
+    notes: >
+      Groomed 2026-07-23 from UI-WIP/two-track-ui-plan.md T1-6 and the
+      2026-07-23 UI-acceleration session's open follow-up ("light verified
+      functional today, but derived, not designed"). Not previously tracked
+      as its own item (checked backlog.yaml — only a passing site-plan §2
+      mention of the equivalent solid-outline treatment).
+
   # ── Epic R — Agentic Q&A console (ADR 0007; phase 15) ──────────────────────
   # Groomed 2026-07-23 from the llm-graph-builder vs knowledge-graph-of-thoughts
   # comparative analysis (dossier linked in ADR 0007). Tiered read-only agent:
@@ -5487,11 +5623,16 @@ items:
       possible.
 
 summary:
-  todo: 25                                         # R3..R8 queued behind the Epic R chain
+  todo: 30                                         # R3..R8 queued behind the Epic R chain; +L16/O29-O32 2026-07-23 groom
   in_progress: 1                                   # E1 (gate deferred both sides)
   blocked: 0
   done: 132                                        # +G25 dpl-registry ingestion 2026-07-23 (G18+G20 same day)
-  next_ready: [M3, M4, P3, J10, Q6, O23, J13, G21, G24, O26, G26, O27, C15, C16, O28, R3, R4]
+  next_ready: [M3, M4, P3, J10, Q6, O23, J13, G21, G24, O26, G26, O27, C15, C16, O28, R3, R4, L16, O29, O30, O31, O32]
+  # 2026-07-23 groom (full inbox sweep): L16 (doc-only, no deps), O29 (deps O10/O18
+  # both done), O30/O31/O32 (no deps) all land HITL-free — none touch edge semantics
+  # or ontology; O31 is workable now but genuinely blocked on the docmeta eval
+  # harness existing in practice (dependency recorded as prose in its notes, not a
+  # depends_on id, per the groom instruction).
   # HITL-free groom (2026-07-21 pm; O26 pulled 07-22): P3, J10, Q6, J13, G18, G19, G26
   # are workable with NO gate session — P3/G21 implement already-signed rulings
   # (CM_HOSTS 07-09, cmd-line 07-15); G18..G21+G24+G25 are staging-only pre-G22 (no

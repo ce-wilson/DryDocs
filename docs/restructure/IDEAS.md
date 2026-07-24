@@ -26,14 +26,6 @@ Tags help grooming: `idea` · `bug` · `doc` · `source` (new data source) · `q
 
 <!-- add new ideas at the top -->
 
-- 2026-07-23 — [source] **By-SEAL bulk MAC inventory as backup discovery → G25 —
-  RESOLVED same day (G25 done 2026-07-23).** The SME clone-lag motivation (main
-  lags — feature branches pushed, not reliably merged) and the rider both landed in
-  the build: `drydocs_lineage/extractors/dpl_registry.py` stages the per-SEAL
-  exports taxonomy-first AND `cross_check()` carries the clone-lag third column
-  (clone folder GUIDs via `parse_clone_folder` → `registered_not_in_clone` = the
-  lag, measured). Assumed field contract still awaits a real sample (the dpl_mac
-  discipline — amend header + fixtures together, cite provenance).
 - 2026-07-23 — [idea] **Oracle connection for the lineage/remediation path (user note,
   chat pm).** The lineage jobs step still stages a CSV by hand through a JDBC client;
   the Oracle connection is planned — and the user's note ties it to the REMEDIATION
@@ -57,13 +49,6 @@ Tags help grooming: `idea` · `bug` · `doc` · `source` (new data source) · `q
   standard and `transform.py` still notes the canonical variable map is "a company-side
   ratified value". Candidate: bring both docs in as the ratified maps when the
   remediation M2 generalization opens (FR-REM-5's schedule/command/conditions slice).
-  local Neo4j container recreated to match config/dev-environment.yaml** — data migrated
-  from `neo4j-drydocs-ee` (anonymous volume, host ports 7476/7689) into named volume
-  `neo4j-testdata`; canonical container `neo4jtest` now runs on default ports 7474/7687
-  (image stays neo4j:2026.05.0-enterprise — store can't downgrade to 5.26, config image
-  line corrected). Runbook Rev 2 §container table + start commands still say
-  neo4j-drydocs-ee/7476/7689 → update via the governed doc pipeline. Local .env / agents/.env /
-  web/.env.local / MCP `neo4j-drydocs` re-pointed 7689→7687 (agents+web also home-db→drydocs).
 - 2026-07-23 — [chore] **Delete the rollback container** `neo4j-drydocs-ee` (stopped,
   restart=no) + its two anonymous volumes once `neo4jtest` has survived a week of normal
   use; also prune orphan volumes neo4j_data/neo4j_logs/neo4j2_data/neo4j2_logs (attached
@@ -237,17 +222,6 @@ Tags help grooming: `idea` · `bug` · `doc` · `source` (new data source) · `q
   PORT-MANIFEST canonical-producer row expecting the producer expansion at next cherrypick —
   different files, so the port must transplant the value, not same-file overwrite. Also
   still open company-side: no 06-29 gate-log entry (their audit gap; backfill offered).
-
-- 2026-07-21 — [question] **Gate rider (from G17 build): MAC subType → kind-enum
-  semantics.** pipeline.json `subType=provisioning` (DB load, no transform — runtime
-  trace) is wrong-by-signal as `kind='etl'`, but the fix is an enum decision the
-  build must not make: EXTEND the gate-log 2026-07-16 §a enum
-  (etl|utility|notification → +provisioning?) or MAP provisioning to `utility`?
-  Until ruled, the dpl_mac extractor takes the rider path (no `mac_kind`; stamps
-  `mac_kind_rider`, counts `kind_riders`; writer default stands). Any OTHER
-  unmapped subType value rides the same path — the derivation table
-  (`dpl_mac._KIND_BY_SUBTYPE`) only carries enum-safe entries. Decide at the next
-  lineage gate session (the live-load flips / G22 sits closest).
 
 - 2026-07-21 — [idea] **ControlMApplication code → BusinessApplication mapping: the
   two-pattern model (SME, chat)**. SME states the code layer maps two ways: (1) some
@@ -535,6 +509,74 @@ Tags help grooming: `idea` · `bug` · `doc` · `source` (new data source) · `q
 ## Recently groomed (audit trail)
 
 <!-- when you promote an idea, move its line here with the resulting backlog id -->
+
+- 2026-07-23 groom run (full inbox sweep + the misfiled "UI acceleration session"
+  block folded in from the bottom of this file) — 5 promoted / 2 resolved-in-build
+  (no promotion) / rest kept parked (todo 25 → 30):
+  - [chore] Neo4j-container-recreation residual (the container migration itself
+    — `neo4jtest` on named volume `neo4j-testdata`, default ports 7474/7687 — is
+    already done; only the doc is stale) → **L16**: refresh
+    `docs/design/drydocs-startup-refresh-runbook.md`'s container table + start
+    commands (still say `neo4j-drydocs-ee`/7476/7689) via the governed render
+    pipeline. The sibling "delete the rollback container after a week + prune
+    orphan volumes" chore stays INBOXED (time-gated manual Docker op with no
+    repo-testable acceptance — the SNYK_TOKEN / post-squash-cleanup precedent:
+    manual user steps don't get a backlog.yaml pull id).
+  - Misfiled "## 2026-07-23 — UI acceleration session" block (context-graph
+    analysis + underhood build) folded into this trail entry — its groom
+    candidates from `UI-WIP/two-track-ui-plan.md` (Track 1 table) promoted:
+    **O29** (T1-5 trust-tier/edge-provenance legend live on the /lineage and
+    /docs graph-pane canvases, adopting context-graph's declared/observed
+    legend pattern); **O30** (T1-7 retire `App.css` legacy-mockup classes into
+    the token idiom across SignIn/MyApps/GraphExplorer/TowerDrill/
+    CypherConsole); **O31** (T1-8 regenerate `web/src/underhood/
+    benchmarkData.ts` from the docmeta evaluation-harness output — no
+    standalone eval-harness backlog item exists yet, so the dependency is
+    recorded as prose in the item's notes per the groom instruction and
+    `depends_on` is left `[]`); **O32** (T1-6 light-mode design pass — not
+    previously tracked; dark stays canonical). The "intended-bypass build
+    landed on main" record and the context-graph adopt/avoid headlines are
+    DONE-work notes only, not backlog-actionable — no item, preserved here and
+    in `UI-WIP/two-track-ui-plan.md` / `internal/context-graph-analysis/
+    ui-architecture-analysis.md`.
+  - [source] By-SEAL bulk MAC inventory line → RESOLVED IN BUILD, no
+    promotion: G25 (done 2026-07-23) already carries both the taxonomy-first
+    per-SEAL staging and the clone-lag `cross_check()` column the line asked
+    for; the assumed-field-contract residual rides the dpl_mac discipline, not
+    a separate item.
+  - [question] Gate rider (G17 build): MAC subType → kind-enum semantics →
+    MERGED into **G27** (done 2026-07-22): the gate BRIEF
+    (`config/gate-prompts/etlprocess-kind-enum.yaml`) already carries this
+    exact question with a recommendation; the SME sign-off itself stays a
+    HITL session, not a fresh backlog item.
+  - kept parked, unchanged (checked against backlog.yaml this pass — no
+    matching item to merge into, or the recorded trigger/gate hasn't fired):
+    Oracle connection for the lineage/remediation path (needs SME scope
+    clarification first — a question, not yet scoped work), company-side
+    greenfield remediation standards (no FR-REM-5/M2 item exists yet),
+    PDN trigger/BIM-90489 milestone-grain design, email-DL contact-point
+    ontology mapping (already gate-tracked, nothing further to promote), the
+    Control-M app-code → SEAL :Port attribution block (owned by gate
+    `seal-app-ref-edge-reshape` v2; the property-diet rider sub-part already
+    resolved in-line 2026-07-23), env-toggle canonical-identity constraint,
+    XML-run WARN-flood next-port note, compact-timestamp normalization
+    back-flow note, AIS acronym port-carry, ControlMApplication two-pattern
+    mapping (gate-decision core), m7 build follow-up (lineage live-load
+    gate), public marketing-site brand kit, FW-really-API provenance gap
+    classes, DPL ingestion-leg residuals, back-flow of un-back-flowed company
+    advances, company-side heads-ups (their tracker), post-squash ref cleanup
+    (destructive, user-gated), Runbook Rev 3 rider, SNYK_TOKEN manual step,
+    SEAL/PAT generic terminology (three §Decision user calls), m3_invokes
+    to_node broadening (next vocab gate), depgraph metric extensions
+    (sibling repo), ETL-tooling inventory domain, JobRun indexes (provenance
+    plan's next touch), SaaS scaffold research (triggers unfired), K2
+    FID/ALIAS tables (company-side), ctlm_id ripple (internal-side),
+    dry-docs.com seed (website not started), /documentation whitepaper type
+    (trigger unfired), lineage live-load gate (HITL scheduling), remediation
+    slices (TDD §6/§7), Phase C packaging (plan gate), Control-M Workbench
+    (entitlement), BRD outline (later phase), docmeta plan P4–P7 (Q6 still
+    todo), EE container password (user deferred), common/ in /list-apps
+    (cosmetic), cli.py regroup (v1.0 window).
 
 - 2026-07-23 R1 gate SIGNED OFF (same session as the groom below) — **ADR 0007 ACCEPTED
   as written**; rulings (full text in config/gate-log.md): (a) Tier-2 task-graph residency
@@ -1206,25 +1248,3 @@ Tags help grooming: `idea` · `bug` · `doc` · `source` (new data source) · `q
   - Taxonomy-ontology-map audit (docs/reviews/tech-debt-taxonomy-ontology-map.md) → **C7**
     (vocab_id + capture fields at the next gate); F1–F4 fixes EXECUTED pre-groom
     (c396d75, ede0b94).
-
-## 2026-07-23 — UI acceleration session (context-graph analysis + underhood build)
-
-- **Intended-bypass build landed on main** (merge af03aef): landing-dark theme pass
-  (HeroArt gradient core/petals/glow network, glass header/aside, dark-mode graph glow)
-  + `/under-the-hood` benchmark showcase (12-question scoreboard, token-memory chart,
-  hallucination spotlight, naive-vs-informed Cypher). Read-only; O20 untouched. Retro
-  wireframe/groom items if any of it needs formal acceptance: see
-  `UI-WIP/two-track-ui-plan.md` (Track 1 table = the groom source).
-- Groom candidates from that plan: **T1-5** trust-tier/edge-provenance legend live in-UI
-  (adopt from context-graph's declared/observed legend — analysis at
-  `internal/context-graph-analysis/ui-architecture-analysis.md`); **T1-7** retire App.css
-  legacy mockup classes into token idiom; **T1-8** regenerate
-  `web/src/underhood/benchmarkData.ts` from the docmeta eval harness once it exists
-  (fixture is hand-carried from the P0 verdict today).
-- context-graph adopt/avoid headlines: adopt stat-tile At-a-Glance row (now built as
-  `StatTiles`), Repo360-style dossier for the node inspector, empty-state honesty naming
-  the enrichment that fills the gap; avoid their two-parallel-ingestion drift and
-  aspirational-docs drift; their unauthenticated `/api/**` is the anti-example for our O1
-  access-path ADR.
-- Site-plan follow-up still open: light-mode design pass (light verified functional today,
-  but derived, not designed).
