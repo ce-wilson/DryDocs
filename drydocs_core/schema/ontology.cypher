@@ -99,6 +99,7 @@ MERGE (n:OntologyTerm:OrgClass {iri:"http://www.w3.org/ns/org#Membership"})     
 MERGE (n:OntologyTerm:OrgClass {iri:"http://www.w3.org/ns/org#Role"})               SET n.label = "Role";
 MERGE (n:OntologyTerm:OrgProperty {iri:"http://www.w3.org/ns/org#hasUnit"})       SET n.label = "has unit";
 MERGE (n:OntologyTerm:OrgProperty {iri:"http://www.w3.org/ns/org#hasMember"})     SET n.label = "has member";
+MERGE (n:OntologyTerm:OrgProperty {iri:"http://www.w3.org/ns/org#member"})        SET n.label = "member";
 MERGE (n:OntologyTerm:OrgProperty {iri:"http://www.w3.org/ns/org#memberOf"})      SET n.label = "member of";
 MERGE (n:OntologyTerm:OrgProperty {iri:"http://www.w3.org/ns/org#role"})          SET n.label = "role";
 MERGE (n:OntologyTerm:OrgProperty {iri:"http://www.w3.org/ns/org#hasMembership"}) SET n.label = "has membership";

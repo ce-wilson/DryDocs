@@ -1162,7 +1162,7 @@ def m3_verify() -> None:
             checks.append((
                 "M3 local anchor terms seeded",
                 rows[0]["n"] >= 3,
-                f"n={rows[0]['n']} (expect >= 3 after apply-m3-supplement)",
+                f"n={rows[0]['n']} (expect >= 3 after apply-ontology-supplement)",
             ))
 
         # Every active folder has at least one active job (sample-friendly bound).

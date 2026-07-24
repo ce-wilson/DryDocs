@@ -5,13 +5,22 @@
 // by ontology.cypher. Idempotent. Apply once after bootstrap; no-op on re-run.
 //
 // Covers:
-//   Control-M structural lineage (M3): ControlMServer, ControlMFolder, ControlMJob,
-//                                      ControlMApplication (gate controlm-q1q3-phase1)
+//   Control-M structural lineage (M3):  ControlMServer, ControlMFolder, ControlMJob,
+//                                       ControlMApplication (gate controlm-q1q3-phase1)
+//   Docs-corpus lexical graph:          Document, Chunk (gate bmc-docs-lexical-load)
+//   Doc traceability + review feedback: DesignDoc, DocSection, Requirement, Component,
+//                                       TestCase, FeedbackNote (gate doc-traceability-feedback / L7)
 //
-// Domain-specific supplements (apply separately after this file):
-//   seal_ontology_supplement.cypher    — Application, Port, Membership, Role, Employee
-//   catalog_ontology_supplement.cypher — CatalogLOB, Product, AreaProduct, DevTeam,
-//                                        all Role seeds (SEAL + PAT + D&A + CCB Ops)
+// Domain-specific supplements (apply separately after this file; seal before
+// catalog — catalog reuses seal's Attribution class + #hasAgent term):
+//   seal_ontology_supplement.cypher     — BusinessApplication, Port, Employee,
+//                                         TOM qualified attribution + tom_roles seeds
+//   catalog_ontology_supplement.cypher  — CatalogLOB, Product, AreaProduct, DevTeam,
+//                                         all Role seeds (SEAL + PAT + D&A + CCB Ops),
+//                                         K6 Product Cabinet + product_roles seeds
+//   registry_ontology_supplement.cypher — Vendor, SoftwareProduct (ADR 0004)
+//   sosa_experimental_supplement.cypher — SOSA/SSN observation terms (opt-in via
+//                                         apply-sosa-supplement; NOT in the standard chain)
 // =============================================================================
 
 
