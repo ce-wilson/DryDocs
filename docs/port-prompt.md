@@ -154,6 +154,8 @@ OWED COMPANY-SIDE (from the 6fd3270 review):
 | T10 | MAC field contract validated vs a REAL DPL export — amend dpl_mac.py contract + fixtures together | pending |
 | T11 | L7 ratification entry in company gate-log (Tier A record; see above) | pending |
 | T12 | Company platforms gate: 06-29 AIS position vs producer C12 — supersede-or-reconcile (Tier B, gates step 43's flips) | pending — session pack ready: [`port-T12-company-gate-pack.md`](port-T12-company-gate-pack.md) (2026-07-21) |
+| T13 | DPL registry field contract validated vs a REAL per-SEAL export (pipeline_id.json/dataset_id.json) — amend dpl_registry.py header + fixtures together, cite provenance (the T10 discipline) | pending |
+| T14 | rua collector convergence: company's own -n implementation (observed 2026-07-20, internals unseen) vs producer G18 v2 — reconcile to ONE v2 (flags, scripts.tsv columns incl. sha256, size cap, COLLECTOR_VERSION stamp) so bundles stay cross-ingestible | pending |
 
   Done-means for T1–T10 are unchanged — they live verbatim in the archive's tracker
   section. T9 reminder: producer sign-off never substitutes for load verification on
@@ -226,6 +228,57 @@ STEP LEDGER — delta since `6fd3270` (numbering continues from the archive):
     Interleaved docs/ontology commits since fb8ac23 (`a4e7e15`, `9343d9b`, `1cc627b`,
     `c1ee13f`) remain part of step 43's live-computed range and its Tier B hold rules.
 
+45. LINEAGE + RUA/DPL CHAIN + EPIC R STREAM (2026-07-23; `4ca8878..bf33c8a`, 27
+    commits, pushed). Six distinct sub-streams — they port DIFFERENTLY:
+    a. EPIC R / AGENTIC Q&A (`1a89047` ADR 0007 draft, `6f3164e` groom 8 promoted,
+       `b4d1188`, `bfa0240` R1 gate SIGNED OFF — ADR 0007 ACCEPTED, `8c5deb8`,
+       `00ee729` + `a739d3a` R2 graph_qa Tier-0/1 live-verified): clean-apply.
+       Gate adoption: Tier A (no company position on agentic Q&A) — ratification
+       entry per guardrail 6; the R2 live smoke is YOURS to re-run against the
+       company graph + api_server env (T9 spirit — producer live-verify never
+       substitutes).
+    b. C13 COMPLETION SWEEPS (`575269a` one-time migration dropped, `9d9aef2`
+       SchedulerKind leftover sweep; wipe-and-rebuild doctrine): *** Tier B-gated
+       by T12 *** — same hold as step 43's C13/C14. Union-append the log trail;
+       do not enact platforms semantics before the T12 ruling.
+    c. PHASED-LOADER REVERSE PORT (`1b7744f`, `12bc94e` TDD Rev 4, `df31354`
+       --no-ff merge): this stream came FROM your Rev 6 — the first
+       company→producer reverse port. RECONCILE/SKIP: expect near-no-op on
+       drydocs/loaders/** + cli; controlm-ingestion-tdd.md is canonical-company
+       (drop incoming per the standing ledger). Producer-only residue: sample
+       CSV slimmed (stays local per guardrail 9), smoke.ps1 count, vocab/
+       supplement prose (per-entry as always).
+    d. FOLDER PROPERTY DIET (`c1c3a0a` loader change, `0b6c9b5` TDD Rev 5): NEW
+       for you — the 2026-07-23 SME ruling (naming-convention decode OFF folder
+       nodes; app_code KEPT as the join key; f.lob='Retail' collided with the
+       org-taxonomy LOB). Code ports normally; gate-log union-append carries the
+       ruling + Tier A ratification entry; your canonical-company TDD needs its
+       OWN rev documenting the diet (producer Rev 5 content is the source);
+       no migration — your rebuild goes wipe-and-rebuild via bootstrap
+       (per-folder `--phase nodes`, then one unscoped `--phase relationships`).
+    e. MAC CLONE LAYOUT + RUNBOOK Rev 2/3 (`4e77c1c` name#guid discovery /
+       per-folder scope / swagger work list, `2cc7692`, `41c4879` + `bed3ee0`
+       clone-authority caveat — main lags, by-SEAL bulk = backup discovery,
+       `bfac053` + `793fc5d` IDEAS): clean-apply; runbook .md ports, .html
+       regenerates (guardrail 5). Fixes the runbook's wrong SQL path
+       (drydocs_core/... → drydocs/loaders/sql/controlm_jobs.sql) and pins the
+       curated-load step to the psgmgr-shaped graph.
+    f. RUA/DPL CHAIN G18+G20+G25 (`78651f3` collector v2 -n script capture,
+       `db3ca3f` bundle extractor, `bf33c8a` dpl-registry ingestion +
+       cross-check): G20/G25 clean-add (staging-only, NO graph writes; G22 is
+       the activation gate). G18 is RECONCILE-DON'T-CLOBBER: you already run
+       your own -n implementation (tracker T14) — converge before mixing
+       bundles. source-registry.yaml gains dpl-registry (confirmed:false, G22
+       f/g) — per-entry apply + regenerate the enforcement matrix YOUR side.
+       dpl_registry.py's field contract is ASSUMED until a real per-SEAL export
+       validates it (tracker T13; the cross_check clone-lag column is where
+       your stale-main measurement comes from).
+    Snapshots in the range (`46f83ba`, `b5c5332`, `be5dd87`) are EXCLUDED class
+    (guardrail 4). backlog.yaml per-entry: Epic R items arrive (R1/R2 done),
+    G18/G20/G25 arrive done; re-insert company DD-series, recompute the summary
+    exactly as test_backlog does. Producer reference at `bf33c8a`:
+    900 passed / 6 skipped.
+
 ACCEPTANCE GATE (behavior is the contract, not a byte-compare):
 - Track 1 (portable, no production sample present):
     poetry run pytest tests/unit/test_variable_classifier.py tests/unit/test_variable_resolver.py \
@@ -237,7 +290,8 @@ ACCEPTANCE GATE (behavior is the contract, not a byte-compare):
 - Full `pytest tests/unit/` — ZERO failures is the contract; skips are
   environment/fixture-absence by design (production CSVs, XML fixtures, fastapi
   optional dep, essential-graphrag PDF, J7 guards without RECONCILE_BEFORE_DIR).
-  Producer reference at the current step-43 head (2adec42): 840 passed / 6 skipped.
+  Producer reference at the current head (step 45, `bf33c8a`): 900 passed /
+  6 skipped (step-43 head 2adec42 was 840 / 6).
   Company reference at the last port: 1174 passed / 21 skipped / 0 failed.
 - CI guards green: test_schema.py (EXPECTED_CONSTRAINTS company-based — see ledger;
   every active edge has its supplement block), test_classification.py,
