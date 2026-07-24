@@ -132,9 +132,13 @@ Transport from the server stays per the internal-local hand-carry note.
 
 ## How it connects back to the lineage graph
 
-The bundle is the **server-side half** of the inventory. A future lineage
-extractor (`drydocs_lineage/extractors/rua_inventory.py`) will read a bundle
-and add:
+The bundle is the **server-side half** of the inventory. The G20 extractor
+(`drydocs_lineage/extractors/rua_inventory.py`) reads a bundle — tarball or
+extracted dir — and stages provenance-stamped CANDIDATES (`rua_path` assets,
+`rua_profile`/`rua_script` artifacts; the meta.txt envelope rides on every
+record). Nodes only, deliberately: the code-operations pass over captured
+content is G21, and every edge meaning (ownership, profile dependencies,
+cross-source script identity) is the G22 gate's. Downstream it will add:
 
 - the server as context (node/agent placement is the Epic P hosts-topology
   work — `node_target` is polymorphic, per gate controlm-hosts-topology),
