@@ -26,6 +26,14 @@ Tags help grooming: `idea` · `bug` · `doc` · `source` (new data source) · `q
 
 <!-- add new ideas at the top -->
 
+- 2026-07-23 — [source] **By-SEAL bulk MAC inventory as a discovery source (SME, chat pm).**
+  The promotion-repo clone's main may LAG (feature branches pushed, not reliably
+  merged) — so the `name#guid` folder listing is a floor, not the authority. Backup:
+  bulk `pipeline_id.json` / `dataset_id.json` downloads by SEAL (all pipelines/
+  datasets; dataflow is still per-pipeline swagger only). Field contract UNACQUIRED —
+  acquire a real sample (assumed-contract discipline), then teach `dpl_mac.py`
+  discovery to consume it and cross-check the clone against it (a lagging clone
+  currently surfaces as `dpl_without_mac`; runbook Rev 3 records the caveat).
 - 2026-07-23 — [idea] **Oracle connection for the lineage/remediation path (user note,
   chat pm).** The lineage jobs step still stages a CSV by hand through a JDBC client;
   the Oracle connection is planned — and the user's note ties it to the REMEDIATION

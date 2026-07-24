@@ -2,11 +2,16 @@
 
 <!-- anchor: front-matter -->
 - **Status:** DESCRIPTIVE — documents the working procedure end-to-end, INCLUDING the
-  deliberate gate refusal at the load step. **Rev 2, 2026-07-23** (clone-layout
-  discovery: the MAC root may now be a Bitbucket promotion-repo checkout —
+  deliberate gate refusal at the load step. **Rev 3, 2026-07-23** (clone authority
+  caveat: the clone's main may lag — feature branches pushed, not reliably merged —
+  so the folder listing is a floor, not the authority; by-SEAL bulk
+  `pipeline_id.json`/`dataset_id.json` downloads are the backup discovery source,
+  dataflow stays per-pipeline swagger regardless; reflects commit `41c4879`.
+  Rev 2, 2026-07-23: commit `4e77c1c` — clone-layout
+  discovery: the MAC root may be a Bitbucket promotion-repo checkout —
   `<name>#<guid>` folder parsing, per-folder scope, the swagger per-pipeline
   dataflow work list; `controlm_jobs.sql` path corrected; curated-load graph-shape
-  pin added; reflects commit `4e77c1c`. Rev 1, 2026-07-21: commit `297167e` —
+  pin added. Rev 1, 2026-07-21: commit `297167e` —
   post-G14 file-ops pass, post-G15 launcher contract, post-G17 MAC ingest seam.
   The m3_* lineage vocabulary is `status: planned` — the live load REFUSES by
   design until the HITL gate flips it)
@@ -76,6 +81,14 @@ edges (Epic K owns those — this pipeline records SEAL *facts* only).
      yet: `clone: missing_sets=` counts them and `clone_missing_set_guids` IS the
      per-pipeline fetch work list. Drop each fetched set into its `name#guid`
      folder and re-run.
+
+     **Authority caveat (SME, 2026-07-23):** the clone's main may LAG — the dev
+     team pushes feature branches and does not reliably merge — so the folder
+     listing is a floor on the inventory, never the authority. Backup discovery:
+     pull ALL pipelines/datasets for the SEAL as bulk `pipeline_id.json` /
+     `dataset_id.json` (field contract unacquired — not yet consumed by the
+     extractor; hand-reconcile until a sample lands). Dataflow is per-pipeline
+     swagger regardless of which source discovered the pipeline.
 
    Field contract documented at the top of
    `drydocs_lineage/extractors/dpl_mac.py` — ASSUMED until a real sample validates
@@ -241,6 +254,10 @@ graph, rerun freely); step 5 is the gated write.
 - **`clone: mismatch` > 0** → a folder-name GUID differs from its
   `pipeline.json` `pipelineId`; the json wins (it IS the set's key). Review
   material — a stale clone or a set dropped into the wrong folder.
+- **`dpl_without_mac` > 0 on a clone run** → pipelines running in Control-M
+  with no clone folder — the clone-main lag showing up (prereq 3 authority
+  caveat). Cross-check against the by-SEAL bulk `pipeline_id.json` before
+  concluding the pipeline is undocumented.
 - **`kind_riders` > 0** → expected for `provisioning` and any unmapped subType;
   the enum question is inboxed (IDEAS 2026-07-21 gate-rider entry). Do NOT add
   mappings to `_KIND_BY_SUBTYPE` without a gate ruling.
