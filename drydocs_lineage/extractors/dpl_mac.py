@@ -65,6 +65,17 @@ DISCOVERY — two staging layouts, one consumption path (2026-07-23):
   a folder-GUID mismatch is counted (``clone_guid_mismatch``), never resolved
   silently. ``extract()`` accepts the clone root, its ``pipelines/`` dir, or a
   SINGLE ``<name>#<guid>`` folder (per-folder scope).
+
+CLONE AUTHORITY CAVEAT (SME, 2026-07-23): the clone's main may LAG — the dev
+team pushes feature branches and does not reliably merge, so the folder
+listing is a FLOOR on the pipeline/dataset inventory, never the authority.
+The by-SEAL bulk downloads (``pipeline_id.json`` / ``dataset_id.json`` — all
+pipelines/datasets for a SEAL) are the backup discovery source; their field
+contract is UNACQUIRED and they are not consumed here yet (assumed-contract
+discipline — acquire a real sample first; inboxed 2026-07-23). Dataflow is
+per-pipeline swagger REGARDLESS of which source discovered the pipeline. A
+lagging clone surfaces in the existing accounting: extracted DPL processes
+with no clone folder and no set land in ``dpl_without_mac``.
 """
 from __future__ import annotations
 
