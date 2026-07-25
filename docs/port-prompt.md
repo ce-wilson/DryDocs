@@ -153,7 +153,7 @@ OWED COMPANY-SIDE (from the 6fd3270 review):
 | T9  | Lineage curated live load — YOUR vocab gate + m3_* flips, then write_curated on your graph | pending |
 | T10 | MAC field contract validated vs a REAL DPL export — amend dpl_mac.py contract + fixtures together | pending |
 | T11 | L7 ratification entry in company gate-log (Tier A record; see above) | pending |
-| T12 | Company platforms gate: 06-29 AIS position vs producer C12 — supersede-or-reconcile (Tier B, gates step 43's flips) | pending — session pack ready: [`port-T12-company-gate-pack.md`](port-T12-company-gate-pack.md) (2026-07-21) |
+| T12 | Company platforms gate: 06-29 AIS position vs producer C12 — supersede-or-reconcile (Tier B, gates step 43's flips) | pending — session pack ready: [`port-T12-company-gate-pack.md`](port-T12-company-gate-pack.md) (2026-07-21); post-sign-off sweep prompt: [`port-T12-ais-excision-company-prompt.md`](port-T12-ais-excision-company-prompt.md) (2026-07-25). **Observed company-side 2026-07-24:** `Ais*` live in `drydocs/controlm_app_codes.py` / `load controlm_app_codes` — a loader referencing `USES_TOOL` may falsify the pack's "declared only, zero edges" premise; count edges before ruling deprecate-vs-remove |
 | T13 | DPL registry field contract validated vs a REAL per-SEAL export (pipeline_id.json/dataset_id.json) — amend dpl_registry.py header + fixtures together, cite provenance (the T10 discipline) | pending |
 | T14 | rua collector convergence: company's own -n implementation (observed 2026-07-20, internals unseen) vs producer G18 v2 — reconcile to ONE v2 (flags, scripts.tsv columns incl. sha256, size cap, COLLECTOR_VERSION stamp) so bundles stay cross-ingestible | pending |
 
