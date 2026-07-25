@@ -20,8 +20,12 @@ import ast
 from pathlib import Path
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
-# Packages scanned for the boundary: the component remainder, physical core, and the
-# remediation component (G3 scaffold, 2026-07-10).
+# Packages scanned for the boundary: the component remainder, physical core, the
+# remediation component (G3 scaffold, 2026-07-10), and — added 2026-07-25 — the two
+# first-party trees that were previously OUTSIDE the guard entirely (`agents/`, the
+# ADK apps of ADR 0007; `libs/`, the standalone connection helper). Neither is a
+# poetry package, so both were invisible to default-deny while `drydocs-agents` was a
+# live backlog module. See MODULE_MAP.md.
 PKG_ROOTS = [
     REPO_ROOT / "drydocs",
     REPO_ROOT / "drydocs_core",
@@ -29,7 +33,13 @@ PKG_ROOTS = [
     REPO_ROOT / "drydocs_lineage",
     REPO_ROOT / "drydocs_deepdoc",
     REPO_ROOT / "drydocs_api",
+    REPO_ROOT / "agents",
+    REPO_ROOT / "libs",
 ]
+
+# Directory names never scanned (vendored / virtualenv trees inside a scanned root —
+# `agents/.venv` holds its own interpreter and would otherwise be swept in).
+SKIP_DIRS: frozenset[str] = frozenset({".venv", "venv", "node_modules", "__pycache__", ".adk"})
 
 # Dotted prefixes that make up drydocs-core (see MODULE_MAP.md). Since the Phase B
 # relocate the physical package is the whole of core (ADR 0002-a-1).
@@ -86,6 +96,18 @@ COMPONENT_GROUPS: dict[str, tuple[str, ...]] = {
     "api": (
         "drydocs_api",
     ),
+    # drydocs-agents — the tiered read-only Q&A apps (ADR 0007, R2). Not a poetry
+    # package: each ADK app puts REPO_ROOT on sys.path and imports the first-party
+    # tree directly. Classified here so default-deny covers it.
+    "agents": (
+        "agents",
+    ),
+    # libs — standalone helpers that depend on NOTHING first-party (today: the Oracle
+    # Kerberos connection helper). Leaf infrastructure: its own bucket so a future
+    # lib that starts importing a component fails the guard instead of sliding in.
+    "libs": (
+        "libs",
+    ),
 }
 ALL_COMPONENT_PREFIXES: tuple[str, ...] = tuple(
     p for prefixes in COMPONENT_GROUPS.values() for p in prefixes
@@ -98,6 +120,20 @@ ALL_COMPONENT_PREFIXES: tuple[str, ...] = tuple(
 # This resolves the ADR 0002-a entrypoint TODO (see MODULE_MAP.md): a port whose cli.py
 # owns review/plan commands and imports those components passes the guard unchanged.
 ENTRYPOINT_MODULES: frozenset[str] = frozenset({"drydocs.cli", "drydocs_core.cli"})
+
+# Declared cross-component allowances — module -> component prefixes it may import.
+# DISTINCT from ENTRYPOINT_MODULES: these are NOT composition roots, they are the places
+# where one component legitimately consumes another's PUBLISHED CONTRACT. Every entry is
+# a reviewed exception, not a default; the guard still fails on anything not listed.
+DECLARED_COMPONENT_IMPORTS: dict[str, tuple[str, ...]] = {
+    # The agent tier's Tier-0 router dispatches to QuerySpecs, so the spec catalog and
+    # the read-only guard ARE the agent contract (ADR 0007). `agents/` consumes the same
+    # read surface the web console consumes over HTTP — just in-process.
+    # FOLLOW-UP (not decided here): the structurally cleaner resolution is promoting
+    # query_specs + guard into drydocs_core, per MODULE_MAP's "Future, land in core"
+    # list. This entry records today's reality until that ruling is made.
+    "agents.common.specs_catalog": ("drydocs_api",),
+}
 
 
 def _matches(module: str, prefixes: tuple[str, ...]) -> bool:
@@ -142,14 +178,41 @@ def _imported_drydocs_modules(path: Path) -> set[str]:
                 mods.add(root)
                 for alias in node.names:
                     mods.add(f"{root}.{alias.name}")
-    return {m for m in mods if m == "drydocs" or m.startswith(("drydocs.", "drydocs_core"))}
+    return {m for m in mods if _is_first_party(m)}
+
+
+# Every first-party top-level name. The pre-2026-07-25 filter was
+# ``m == "drydocs" or m.startswith(("drydocs.", "drydocs_core"))`` — note the DOT: it
+# matched `drydocs.x` and `drydocs_core*` but NOT `drydocs_api`, `drydocs_lineage`,
+# `drydocs_deepdoc`, or `drydocs_remediation`. Imports between the standalone component
+# packages were therefore invisible to the guard, so `test_components_do_not_import_each_other`
+# could never have caught one. Verified at the fix: 32 first-party imports were unseen,
+# incl. drydocs.cli -> drydocs_lineage.* and agents -> drydocs_api.*.
+FIRST_PARTY_ROOTS: tuple[str, ...] = (
+    "drydocs",
+    "drydocs_core",
+    "drydocs_api",
+    "drydocs_lineage",
+    "drydocs_deepdoc",
+    "drydocs_remediation",
+    "agents",
+    "libs",
+)
+
+
+def _is_first_party(module: str) -> bool:
+    return any(module == r or module.startswith(r + ".") for r in FIRST_PARTY_ROOTS)
 
 
 def _iter_py_files():
     files: list[Path] = []
     for root in PKG_ROOTS:
-        if root.exists():
-            files.extend(root.rglob("*.py"))
+        if not root.exists():
+            continue
+        files.extend(
+            p for p in root.rglob("*.py")
+            if not SKIP_DIRS.intersection(p.relative_to(root).parts)
+        )
     return sorted(files)
 
 
@@ -181,7 +244,10 @@ def test_components_do_not_import_each_other():
         other_prefixes = tuple(
             p for g, prefixes in COMPONENT_GROUPS.items() if g != group for p in prefixes
         )
+        allowed = DECLARED_COMPONENT_IMPORTS.get(module, ())
         for imported in sorted(_imported_drydocs_modules(path)):
+            if _matches(imported, allowed):
+                continue  # reviewed exception (see DECLARED_COMPONENT_IMPORTS)
             if _matches(imported, other_prefixes):
                 violations.append(f"[{group}] {module}  ->  {imported}")
     assert not violations, (
@@ -202,6 +268,29 @@ def test_entrypoint_is_exempt_but_still_classified():
         assert len(owning) <= 1, f"{entry} classified into multiple groups: {owning}"
     # the concrete, present entrypoint is in `load`
     assert _matches("drydocs.cli", COMPONENT_GROUPS["load"])
+
+
+def test_declared_component_imports_are_load_bearing():
+    """Every ``DECLARED_COMPONENT_IMPORTS`` entry must still be doing real work.
+
+    A *stale* exception is worse than no exception: it silently widens the boundary for a
+    module that no longer needs it, and nothing fails to say so. An entry is stale when the
+    module is gone, or when it no longer imports anything under the prefixes it was granted
+    — either way, delete it rather than carrying it.
+    """
+    by_module = {_module_name(p): p for p in _iter_py_files()}
+    stale: list[str] = []
+    for module, allowed in DECLARED_COMPONENT_IMPORTS.items():
+        path = by_module.get(module)
+        if path is None:
+            stale.append(f"{module}  (module no longer exists)")
+            continue
+        if not any(_matches(i, allowed) for i in _imported_drydocs_modules(path)):
+            stale.append(f"{module}  (imports nothing under {allowed})")
+    assert not stale, (
+        "Stale DECLARED_COMPONENT_IMPORTS entries — remove them so the boundary stays tight:\n  "
+        + "\n  ".join(stale)
+    )
 
 
 def test_every_module_is_classified():
@@ -237,5 +326,7 @@ def test_every_module_is_classified():
             + "\n  ".join(unclassified)
         )
     if ambiguous:
-        problems.append("AMBIGUOUS — classified into more than one bucket:\n  " + "\n  ".join(ambiguous))
+        problems.append(
+            "AMBIGUOUS — classified into more than one bucket:\n  " + "\n  ".join(ambiguous)
+        )
     assert not problems, "\n".join(problems)

@@ -61,6 +61,8 @@
 | `drydocs_deepdoc/**` | `drydocs-deepdoc` (C3) — reactive on-failure deep dive on the shared core parser (scaffolded 2026-07-10, G4) | `drydocs_context` (reliability/trust stamped; proxy-node keys; `writer.py` sole boundary; promotion = HITL gate, never cross-DB edit) |
 | `drydocs_remediation/**` | `drydocs-remediation` (C1) — detect → transform → prove → Jira (ADR 0002-B; scaffolded 2026-07-10, in-monorepo per 0002-A-1) | — (**no graph write**; Jira = SoR; the `jira.py` module is the only side-effect boundary) |
 | `drydocs_api/**` | `drydocs-api` — thin read API over the graph (ADR 0005; scaffolded 2026-07-14, O5) | — (**read-only**: endpoint guard + `RoutingControl.READ`; per-view DB routing server-side; sessions = in-memory stub; FastAPI = optional `api` group) |
+| `agents/**` | `drydocs-agents` (ADR 0007, R2) — tiered read-only Q&A: QuerySpec router → schema-grounded text2cypher → bounded loop. **Not a poetry package**: each ADK app puts `REPO_ROOT` on `sys.path`. Brought under the boundary guard 2026-07-25 | — (**read-only**; `agents/.venv` is its own interpreter and is skipped by the guard) |
+| `libs/**` | `libs` — standalone helpers with **no first-party imports at all** (today: `oracle_kerberos`, the Kerberos connection helper). Leaf infrastructure, own bucket so a future lib that starts importing a component fails the guard. Brought under the guard 2026-07-25 | — |
 
 > **`drydocs-review` note.** All review modules own a run cadence or do external I/O, so
 > none are core. `review_labels` and `source_mappings` are *pure config accessors* parked in
@@ -89,6 +91,28 @@
 > the canonical resolution — a company port whose `cli.py` already owns the review commands passes the
 > guard **unchanged**; do NOT extract a separate `review_cli.py` sub-app (that creates a company-only
 > structure the producer lacks and re-collides on every future port).
+
+> **`drydocs-agents` / `libs` note (2026-07-25).** Both trees sat OUTSIDE the guard entirely —
+> neither is a poetry package, so `PKG_ROOTS` never saw them while `drydocs-agents` was a live
+> backlog module. They are now scanned and classified. Fixing that surfaced a **hole in the guard
+> itself**: the first-party import filter was
+> `m == "drydocs" or m.startswith(("drydocs.", "drydocs_core"))` — note the dot, which matched
+> `drydocs.x` and `drydocs_core*` but **not** `drydocs_api`, `drydocs_lineage`, `drydocs_deepdoc`,
+> or `drydocs_remediation`. Imports *between the standalone component packages were invisible*, so
+> `test_components_do_not_import_each_other` could never have caught one (32 first-party imports
+> were unseen, incl. `drydocs.cli → drydocs_lineage.*`). The filter now enumerates every
+> first-party root.
+>
+> **`DECLARED_COMPONENT_IMPORTS` — new, and deliberately not an entrypoint exemption.**
+> `agents.common.specs_catalog` imports `drydocs_api.query_specs` + `guard`, which is a genuine
+> component→component edge. It is *not* a composition root, so stretching `ENTRYPOINT_MODULES` to
+> cover it would have blurred what that constant means. Instead it is a **named, reviewed
+> exception**: the agent tier's Tier-0 router dispatches to QuerySpecs, so the spec catalog IS the
+> agent contract (ADR 0007) — `agents/` consumes in-process the same read surface the console
+> consumes over HTTP. **Follow-up, undecided:** the structurally cleaner fix is promoting
+> `query_specs` + `guard` into `drydocs_core` (see the list below); the exception records today's
+> reality until that is ruled on. A test asserts the exception is load-bearing — remove it and the
+> guard fails.
 
 ## Future, land in core when first written
 - `§`-format I/O (`§META …§OQ §SUPPLEMENTS §DOC §LEDGER`) → `drydocs_core.sigfmt`.
