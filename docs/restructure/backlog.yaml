@@ -39,7 +39,7 @@
 # =============================================================================
 
 schema: drydocs.backlog.v2
-updated: 2026-07-23
+updated: 2026-07-25
 
 # ── The high-level project plan (rendered as the board's roadmap strip) ───────
 plan:
@@ -5622,12 +5622,381 @@ items:
       verdict) — the evaluation harness should reuse its question set where
       possible.
 
+  # ── Epic S — Pre-UI structure remediation (main; ADRs 0008/0009/0010) ──────
+  # Source: docs/reviews/architecture-structure-review-2026-07-25.md — a scored
+  # /architecture + /tech-debt pass over the tree, run because the console is being
+  # built and the API contract + graph property names harden once routes and
+  # fixtures depend on them.
+  #
+  # Grouped as its own epic rather than folded into G (component-topology) because
+  # these share ONE review document, ONE phased plan (its §5), and THREE ADRs whose
+  # acceptance gates the build items — the board should show that sequencing as a
+  # unit. Each item still carries its correct existing plan phase, so the roadmap
+  # strip is unaffected.
+  #
+  # Findings deliberately WITHOUT an item:
+  #   F4  / F9 / F10-part  DONE 2026-07-25 (432ea43 boundary-guard fix, bbf29cf gitignore)
+  #   F5  drydocs/ 4-component flat namespace — deferred to Phase C by ADR 0002-a-1;
+  #       the review's §6 "what NOT to do" says explicitly not to reopen it mid-UI-build
+  #   F15 two test roots — tests/ (pytest) and graph-tests/ (YAML acceptance runner)
+  #       are two different mechanisms, not duplication; scored lowest, recorded only
+  #   F11 depgraph-snapshot retention — a user call about audit history, re-inboxed
+  - id: S1
+    epic: structure-remediation
+    title: "Rule on ADRs 0008 (orchestration parent) / 0009 (config substrate) / 0010 (app_id + id_authority)"
+    type: task
+    module: docs
+    phase: 6
+    agent: main
+    model: fable
+    priority: p1
+    status: todo
+    depends_on: []
+    inputs: [docs/reviews/architecture-structure-review-2026-07-25.md, docs/decisions/0008-orchestration-module-boundary.md, docs/decisions/0009-configuration-substrate.md, docs/decisions/0010-internal-source-term-abstraction.md, docs/decisions/README.md]
+    acceptance: >
+      Each of the three ADRs carries a Status other than Proposed — Accepted,
+      Accepted-with-amendments, or Rejected — with the deciding session and date
+      recorded in the ADR itself and in docs/decisions/README.md; an amended ADR is
+      EDITED to the ruling, not annotated around it. ADR 0010 additionally names the
+      HITL gate that owns its property-term binding (S3 runs it): this item authorizes
+      the SHAPE, the gate authorizes the graph write. No code moves here — a rejection
+      is a valid outcome and closes S2/S4/S5/S6/S7 with it.
+    notes: >
+      Created 2026-07-25 groom from the pre-UI structure review. The R1 precedent:
+      a decision item ahead of its build items, so nothing gets groomed into a done
+      deal. The review's own recommendations are: 0008 no rename, add a parent;
+      0009 keep git YAML as source of truth, widen the derived SQLite read model;
+      0010 app_id + id_authority instead of seal_id. S8/S9 deliberately do NOT depend
+      on this item — neither needs an ADR ruling to start.
+
+  - id: S2
+    epic: structure-remediation
+    title: "Create drydocs_core/orchestration/ as the parent of controlm/, with the vendor-neutral shell/paths/crosswalk surface beside it (ADR 0008, F1)"
+    type: task
+    module: drydocs-core
+    phase: 6
+    agent: main
+    model: fable
+    priority: p1
+    status: todo
+    depends_on: [S1]
+    inputs: [drydocs_core/controlm/, docs/decisions/0008-orchestration-module-boundary.md, config/crosswalks/, MODULE_MAP.md, tests/unit/test_module_boundary.py]
+    acceptance: >
+      drydocs_core/orchestration/ exists holding __init__.py, shell.py, paths.py and
+      crosswalk.py, with controlm/ moved beneath it by git mv and its content otherwise
+      unchanged — except the two mixed modules split along the line the ADR draws:
+      commands.py into shell.py (argv/statement parsing, launcher registry) plus
+      controlm/fields.py (PRECMD/POSTCMD/CMD_LINE routing), and paths.py into the
+      neutral canonicalization half and the Control-M {ODATE}/FileWatcher token half.
+      crosswalk.py reads config/crosswalks/*.yaml as the gate-confirmed native→baseline
+      map. Every importer updated, MODULE_MAP.md carries the new core rows,
+      test_module_boundary.py green (core still imports no component), full suite green.
+      NOTHING in the graph changes — no label, no relationship vocabulary entry, no
+      Cypher; :ControlMJob/:ControlMFolder/:ControlMServer stay exactly as they are
+      (ADR 0003 rule 4).
+    notes: >
+      The review measured this before recommending it: ~1,100 of controlm/'s 1,725 lines
+      are irreducibly Control-M (AutoEdit %%NAME|VALUE syntax, variable simulation,
+      folder-name convention), so RENAMING the directory to orchestration/ would put a
+      neutral name on the most vendor-coupled code in the repo — the exact failure ADR
+      0004 exists to prevent. The real gap is that controlm/ has no parent and no
+      sibling slot, so an AutoSys or Airflow module has nowhere to land. Additive:
+      one git mv, one new package, two file splits. Do the CORE move before the console
+      ships (the API's query specs are where an orchestrator assumption would first
+      become a public contract); the drydocs/loaders/controlm_* + sql/ + cypher/
+      reshuffle is internal and follows in S5's phase (review §5 Phase 3, F1b).
+
+  - id: S3
+    epic: structure-remediation
+    title: "Carry BusinessApplication identity as app_id + id_authority instead of the vendor-named seal_id key (ADR 0010, F2) — via the HITL gate"
+    type: task
+    module: ontology
+    phase: 9
+    agent: ontology-mapper
+    model: fable
+    priority: p1
+    status: todo
+    depends_on: [S1]
+    inputs: [docs/decisions/0010-internal-source-term-abstraction.md, config/taxonomy/business-application.yaml, drydocs_core/schema/, config/taxonomy-ontology-map.yaml, drydocs_api/query_specs.py, "web/src/data/mappingsDemo.ts"]
+    acceptance: >
+      VIA THE GATE (docs/restructure/03-hitl-sme-flow.md) — a gate prompt confirms the
+      qualified-reference shape on :BusinessApplication before anything writes it, and
+      the taxonomy-ontology-map entry stays `proposed` until sign-off. On sign-off, and
+      only then: the SEAL loader writes app_id + id_authority ALONGSIDE seal_id
+      (additive — nothing is removed in this item); drydocs_api and web emit only the
+      neutral pair, so web/src/data/mappingsDemo.ts loses app_seal_id and query_specs
+      stops projecting a vendor-named field; app_urn is either populated or explicitly
+      deferred with a reason. Retiring seal_id is NOT in scope (review §5 Phase 4).
+      Full suite green; graph-verify coverage unchanged.
+    notes: >
+      Why this one is urgent despite scoring 7th on the review's formula: effort is
+      high today and rises every week the console adds a route that reads seal_id.
+      It has already crossed into drydocs_api/query_specs.py and the console demo
+      fixture. The formula measures the fix, not the cost of delay.
+      The argument is the repo's own rule turned on itself: ADR 0003 rule 1 says
+      source-system fields stay verbatim on SOURCE-LABELED nodes, and
+      :BusinessApplication is the canonical node, not a source-labeled one — so a
+      vendor-named key on it is precisely the case that rule excludes.
+      config/taxonomy/business-application.yaml already gets this right at the taxonomy
+      layer (concept: BusinessApplication, source_of_record: SEAL, identifier: SEALID);
+      the graph and API layers did not inherit it. PAT needs NO equivalent work — it
+      never leaked into code (review §4.2, and §6 rule 4 says don't touch it).
+      Sequencing note: the still-open seal-app-ref-edge-reshape v2 gate also touches
+      :BusinessApplication — run these two in the same SME session if their timing
+      allows, or the second one re-opens the first one's node.
+
+  - id: S4
+    epic: structure-remediation
+    title: "Give the console a durable draft substrate: a draft table in mapping.db as write-ahead buffer, promoted by emitting a YAML/CSV diff (ADR 0009, F3)"
+    type: task
+    module: drydocs-core
+    phase: 12
+    agent: main
+    model: sonnet
+    priority: p1
+    status: todo
+    depends_on: [S1]
+    inputs: [drydocs_core/mapping_store.py, scripts/build_mapping_db.py, drydocs_api/mappings.py, docs/decisions/0009-configuration-substrate.md]
+    acceptance: >
+      mapping.db carries a `draft` table built and rebuilt by scripts/build_mapping_db.py
+      with the rest of the derived database (still gitignored, still deletable);
+      the override-draft endpoint writes a ROW instead of returning a whole replacement
+      file; a promote path emits the YAML/CSV diff for a branch, and a test proves the
+      emitted diff applies cleanly to the committed file and round-trips to the same
+      parsed content. Git remains the only commit target — a test asserts no endpoint
+      writes a tracked file directly. Concurrent drafts from two sessions both survive
+      (the property commit-by-replace cannot offer).
+    notes: >
+      The review found the config/DB architecture already CORRECT for the read path —
+      mapping_store.py materializes committed YAML/CSV into var/mapping.db as a derived,
+      rebuildable read model with a round-trip parity test. That is a materialized view
+      over a git source of truth, which is the right answer. The unsolved half is the
+      WRITE path: POST /mappings/overrides/draft today returns the complete updated file,
+      which is correct for a small override list and does not survive a second concurrent
+      editor. This is the one piece to design BEFORE the console grows write surfaces.
+      ADR 0009 §"propose in the DB, land in git".
+
+  - id: S5
+    epic: structure-remediation
+    title: "Split the two monolith config YAMLs by domain behind a deterministic concatenating loader (F7/F8)"
+    type: chore
+    module: ontology
+    phase: 6
+    agent: main
+    model: sonnet
+    priority: p2
+    status: todo
+    depends_on: [S1]
+    inputs: [config/taxonomy-ontology-map.yaml, drydocs_core/ontology/relationship_vocabulary.yaml, PORT-MANIFEST.yaml]
+    acceptance: >
+      config/taxonomy-ontology-map.yaml (1,013 lines) and
+      drydocs_core/ontology/relationship_vocabulary.yaml (2,111 lines) each become a
+      directory of per-domain files (controlm / catalog / seal / registry / docs, or the
+      domains that actually exist), read by ONE loader that concatenates in deterministic
+      sorted-filename order and fails loudly on a duplicate key. A test proves the
+      concatenated result parses equal to the pre-split file's content. Every existing
+      consumer and test passes unchanged. PORT-MANIFEST.yaml records the split so the
+      company side applies the same shape rather than resolving it as a conflict.
+    notes: >
+      The problem is granularity, not size or format: one file serving many domains means
+      two concurrent sessions collide, and a cross-repo port conflict lands as one big
+      hunk instead of one small one. Splitting shrinks the conflict to the domain that
+      changed. Module recorded as `ontology` (not `config`) because the registry defines
+      that work area as "drydocs_core/schema/, relationship vocabulary, mappings" — which
+      names both files — even though one of them lives under config/.
+
+  - id: S6
+    epic: structure-remediation
+    title: "JSON Schema for each config family, so a malformed entry fails in the editor rather than in pytest (F14)"
+    type: task
+    module: config
+    phase: 6
+    agent: pipeline-config
+    model: sonnet
+    priority: p2
+    status: todo
+    depends_on: [S1]
+    inputs: [config/source-registry.yaml, config/precedence.yaml, config/classification.yaml, config/source-mappings/, config/taxonomy-ontology-map.yaml, drydocs_core/ontology/relationship_vocabulary.yaml]
+    acceptance: >
+      Each config family has a JSON Schema under config/schemas/; the existing Python
+      guards VALIDATE AGAINST IT rather than re-implementing shape checks in assertions;
+      a deliberately malformed fixture fails with a path-precise message naming the
+      offending key. A test proves the schemas are usable without importing
+      drydocs_core, so the console's admin surface and the agent tier can validate
+      without a Python dependency on the package.
+    notes: >
+      Complements rather than replaces the test guards: the tests own semantics
+      (classification present, vocab id resolves, precedence order valid), the schema
+      owns shape. Easier after S5 splits the monoliths, but not dependent on it.
+
+  - id: S7
+    epic: structure-remediation
+    title: "Record the folder-name vs module-name rule once in MODULE_MAP.md (F12)"
+    type: chore
+    module: docs
+    phase: 6
+    agent: main
+    model: haiku
+    priority: p2
+    status: todo
+    depends_on: [S1]
+    inputs: [MODULE_MAP.md, docs/restructure/backlog.yaml, docs/decisions/0008-orchestration-module-boundary.md]
+    acceptance: >
+      MODULE_MAP.md states the rule once — why web/ is the module drydocs-web and
+      agents/ is drydocs-agents, and under what condition a directory must instead match
+      its module name — and the backlog `modules:` comments point at that rule instead of
+      re-explaining it. No directory is renamed by this item.
+    notes: >
+      Cosmetic but pre-UI: a new contributor reading the root listing cannot currently
+      tell which of UI-WIP/ and web/ is the real console (S9 fixes the other half of
+      that confusion). Cheapest item in the epic; grouped here because ADR 0008 is where
+      the naming question was raised.
+
+  - id: S8
+    epic: structure-remediation
+    title: "Split cli.py into a thin composition root plus per-domain command modules, with non-milestone verb names (F6 + the parked cli.py regroup note)"
+    type: chore
+    module: drydocs-load
+    phase: 6
+    agent: main
+    model: sonnet
+    priority: p3
+    status: todo
+    depends_on: []
+    inputs: [drydocs/cli.py, tests/unit/test_module_boundary.py, internal/repo-README.md]
+    acceptance: >
+      drydocs/cli.py is a thin root registering per-domain Typer sub-apps
+      (schema / ingest / verify / variables / docs / plan), each in its own module;
+      `drydocs --help` lists the same commands under the same names as before;
+      the milestone-named verbs m1-verify / m3-verify gain verify-reference /
+      verify-controlm aliases with the old names deprecated but still working;
+      `python -c "import drydocs.cli"` clean; cli.py remains the composition root and
+      remains exempt under ENTRYPOINT_MODULES (not a new exemption); full suite green.
+    notes: >
+      MERGE at the 2026-07-25 groom: the review's F6 (cli.py, 1,519 lines, 27 commands)
+      and the long-parked IDEAS line "cli.py regroup: split the 937-line flat command
+      list into domain subcommand groups — NOT milestone names" are the same work. The
+      file has grown 582 lines since that note was written, which is the argument for
+      doing it. Deliberately NOT dependent on S1 — no ADR ruling is needed to reorganize
+      a CLI. Deprecation aliases were the original note's condition; keep them.
+
+  - id: S9
+    epic: structure-remediation
+    title: "Repo-root docs hygiene: UI-WIP/ into docs/design/ui-exploration/ and the loose docs/*.md into their subdirectory homes (F10/F13)"
+    type: chore
+    module: docs
+    phase: 10
+    agent: main
+    model: sonnet
+    priority: p3
+    status: todo
+    depends_on: []
+    inputs: ["UI-WIP/", "docs/", PORT-MANIFEST.yaml, docs/port-prompt.md, docs/plan/board.html]
+    acceptance: >
+      UI-WIP/ lives at docs/design/ui-exploration/ and the loose docs/controlm-*.md /
+      docs/port-*.md files are grouped into subdirectory homes. All 31 tracked references
+      updated — including PORT-MANIFEST.yaml, the two gate-prompt specs, drydocs_api/app.py,
+      backlog.yaml (45 hits) and the governed docs/design/* renders, which are REGENERATED
+      from their .md sources, never hand-edited. board.html regenerated.
+      `git grep -l "UI-WIP"` returns only deliberate historical mentions (the port archive
+      and the IDEAS audit trail). Full suite green. Done on a branch with a port-prompt
+      step added — never directly on main.
+    notes: >
+      Scored Effort=1 in the review and CORRECTED to 3-4 the same day when the attempt
+      measured the reference sweep: the score had priced the git mv and ignored the 31
+      tracked files. Because the sweep crosses governed renders and the cross-repo port
+      machinery, this is branch work under docs/port-prompt.md, not a tidy-up commit —
+      which is exactly why it is p3 and carries no dependency: it can wait, and it can
+      start whenever someone has a clean branch. The root-level scratch-screenshot half
+      of F10 was already closed 2026-07-25 (bbf29cf).
+
+  - id: G28
+    epic: component-topology
+    title: "Close the multi-database naming drift: code and docs still name drydocs_context / drydocs_all, which provisioning never creates"
+    type: bug
+    module: graph-infra
+    phase: 6
+    agent: main
+    model: sonnet
+    priority: p2
+    status: todo
+    depends_on: []
+    inputs: [drydocs_core/schema/provisioning/01_databases.cypher, drydocs_deepdoc/__init__.py, drydocs_api/routing.py, drydocs_lineage/writer.py, drydocs_api/query_specs.py, MODULE_MAP.md, docs/decisions/0002-component-database-topology.md]
+    acceptance: >
+      One naming ruling recorded (recommended: provisioning/01_databases.cypher is the
+      truth — drydocs / ddlineage / ddcontext / ddall, plus dddocs per ADR 0006). Every
+      database name in code, tests and docs then matches it: drydocs_deepdoc.DATABASE,
+      the drydocs_api/routing.py and drydocs_core/__init__.py docstrings, MODULE_MAP.md,
+      CHANGELOG.md and ADR 0002-a. A new test asserts the set of database names
+      referenced anywhere in the packages is a SUBSET of the names provisioning creates,
+      so this cannot drift back. Separately answered in writing: whether
+      drydocs_lineage.writer targets ddlineage or the four query_specs rows that read
+      ddlineage are repointed — today the writer pins DATABASE = "drydocs", so those
+      specs read a provisioned but never-written database.
+    notes: >
+      Found 2026-07-25 while writing the executive overview against the live gated
+      convention. Measured, not recalled - drydocs_deepdoc.DATABASE = "drydocs_context"
+      and tests/unit/test_lineage_deepdoc_scaffold.py PINS that value, so the suite
+      currently protects a database name provisioning never creates; deepdoc would fail
+      or silently create a stray DB on its first live write. NOT a trust-boundary hole:
+      drydocs_lineage.writer refuses on an allowlist (database != "drydocs" raises
+      TrustBoundaryError), so the stale name in its test fixture is harmless — any wrong
+      name triggers the guard. The ruling itself is a one-line user call, not a HITL
+      gate: no edge semantics are involved.
+
+  - id: G29
+    epic: component-topology
+    title: "Consolidate the supplement verbs into one data-driven apply-supplements, with the legacy verbs kept as delegating aliases"
+    type: task
+    module: drydocs-load
+    phase: 6
+    agent: main
+    model: sonnet
+    priority: p2
+    status: todo
+    depends_on: []
+    inputs: [drydocs/cli.py, drydocs_core/run_log.py, drydocs_core/schema/, .claude/skills/run-drydocs/SKILL.md, internal/repo-README.md]
+    acceptance: >
+      One `apply-supplements` verb applies a data-driven ordered list (base → seal →
+      catalog → registry, with SOSA staying opt-in behind a flag); every legacy verb
+      still works as a delegating alias; the run asserts the post-apply OntologyTerm
+      count and fails if it does not move as expected; the run writes a
+      load.supplement.<stamp>.log envelope through drydocs_core/run_log.py — today NO
+      supplement or bootstrap verb writes a log file at all (execute_file is
+      debug-and-console only); the run-drydocs skill and internal/repo-README.md command
+      chains are updated; the e2e test switches to the new verb.
+    notes: >
+      Shape A, designed and user-reviewed 2026-07-24 with the riders agreed in that
+      review (count assertion, run-log envelope, skill + README chain update, e2e
+      switch); groundwork already landed the same day (9f5ebe1 stale refs + supplement
+      header charter + the missing org#member anchor; 76be07c catalog docstring).
+      Shape C — the registration-vs-instance-seed re-slice — is deliberately NOT here:
+      it is gate-worthy, not a refactor, and stays in IDEAS.
+      Rider: this rewrites the verb set the startup-refresh runbook's Appendix B lists,
+      which is where the unlocated "apply-catalog says apply ontology" typo report most
+      likely points — fold that check into the runbook update rather than hot-editing a
+      doc that is mid-SME-review.
+
 summary:
-  todo: 30                                         # R3..R8 queued behind the Epic R chain; +L16/O29-O32 2026-07-23 groom
+  todo: 41                                         # +11 at the 2026-07-25 groom (Epic S x9, G28, G29)
   in_progress: 1                                   # E1 (gate deferred both sides)
   blocked: 0
   done: 132                                        # +G25 dpl-registry ingestion 2026-07-23 (G18+G20 same day)
-  next_ready: [M3, M4, P3, J10, Q6, O23, J13, G21, G24, O26, G26, O27, C15, C16, O28, R3, R4, L16, O29, O30, O31, O32]
+  next_ready: [M3, M4, P3, J10, Q6, O23, J13, G21, G24, O26, G26, O27, C15, C16, O28, R3, R4, L16, O29, O30, O31, O32, S1, S8, S9, G28, G29]
+  # 2026-07-25 groom (pre-UI structure review + the 07-24/07-25 inbox): new Epic S
+  # (S1-S9) from docs/reviews/architecture-structure-review-2026-07-25.md, plus G28
+  # (multi-DB naming drift) and G29 (supplement-verb consolidation).
+  # HITL status: S1 is a DECISION item (rule on ADRs 0008/0009/0010) but NOT a gate —
+  # no edge semantics; S3 IS gate-bound (a property-term binding on the canonical
+  # :BusinessApplication node) and stays `proposed` in the ontology map until sign-off.
+  # S2/S4/S5/S6/S7 wait on S1's ruling. S8 (cli.py), S9 (docs tree), G28 (DB names)
+  # and G29 (supplements) need no ruling and are ready now — S9 is branch + port-
+  # sequenced work by construction, never a direct-to-main commit.
+  # Pre-UI ordering inside the epic, per the review's §5: S3 (app_id/id_authority)
+  # first despite scoring 7th — its cost rises with every console route that reads
+  # seal_id — then S2 (orchestration parent, before query specs harden an
+  # orchestrator assumption into a public contract), then S4 (draft table, before the
+  # console grows write surfaces).
   # 2026-07-23 groom (full inbox sweep): L16 (doc-only, no deps), O29 (deps O10/O18
   # both done), O30/O31/O32 (no deps) all land HITL-free — none touch edge semantics
   # or ontology; O31 is workable now but genuinely blocked on the docmeta eval

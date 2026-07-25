@@ -317,7 +317,9 @@
         "config/gate-prompts/seal-app-ref-edge-reshape.yaml"
       ],
       "log_ref": "config/gate-log.md:804",
-      "unblocks": []
+      "unblocks": [
+        "S3"
+      ]
     },
     {
       "kind": "prompt-only",

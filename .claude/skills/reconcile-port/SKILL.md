@@ -127,14 +127,17 @@ poetry run pytest tests/unit/test_variable_classifier.py tests/unit/test_variabl
 ```
 
 (If `poetry` is not on PATH, use `python -m pytest <same files> -q`.) Expect
-**90 passed, 3 skipped, 0 failed**. The 3 skips are the sample-backed
-tests (`test_sample_classifies_end_to_end`, `test_sample_bundle_smoke`,
+**114 passed, 3 skipped, 0 failed** (measured 2026-07-25; was 90/3 when this skill
+was written — the suite grows, so treat the number as a FLOOR and re-measure on the
+producer side before calling a company-side count a regression). The 3 skips are the
+sample-backed tests (`test_sample_classifies_end_to_end`, `test_sample_bundle_smoke`,
 `test_sample_end_to_end_counts`) — the production CSV is gitignored and never
 transfers, so they skip, not fail. A `FileNotFoundError` instead of a skip means
 the skip guard was lost in the port (re-apply the Canonical-here test files).
-`test_module_boundary.py` is pure stdlib (no sample needed) — **4 tests** (Epic H6
+`test_module_boundary.py` is pure stdlib (no sample needed) — **5 tests** (Epic H6
 added the default-deny `test_every_module_is_classified` and the entrypoint-exemption
-test `test_entrypoint_is_exempt_but_still_classified`), always pass; it guards the
+test `test_entrypoint_is_exempt_but_still_classified`; the 2026-07-25 guard fix added
+`test_declared_component_imports_are_load_bearing`), always pass; it guards the
 `drydocs-core` ↔ component boundary (ADR 0002 D3). **Entrypoint rule:** `cli.py` is the
 composition root and may import any component (`ENTRYPOINT_MODULES`) — a company `cli.py`
 that owns the review commands passes as-is; do NOT extract a `review_cli.py` sub-app.

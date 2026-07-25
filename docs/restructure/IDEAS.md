@@ -26,6 +26,24 @@ Tags help grooming: `idea` · `bug` · `doc` · `source` (new data source) · `q
 
 <!-- add new ideas at the top -->
 
+- 2026-07-25 — [question] **How much depgraph audit history do we keep?** (review finding
+  F11, `docs/reviews/architecture-structure-review-2026-07-25.md`). `knowledge/depgraph-snapshots/`
+  holds 66 JSON files / 4.2 MB, several per day, unbounded — some 2026-07-20/21 timestamps are
+  minutes apart. The review proposed "run `drydocs prune-snapshots`" and that was **wrong**:
+  that command prunes snapshot nodes INSIDE Neo4j via `SnapshotWriter` and needs a live
+  connection; it never touches these files. So there is no existing mechanism, and the real
+  question is a retention POLICY: the files are a deliberate per-push structural-drift record
+  with a documented A/B compare workflow (`knowledge/depgraph-snapshots/README.md`), so thinning
+  them trades audit history for repo size. Candidate rules if we want one: keep one per day
+  beyond N days; keep every snapshot whose `meta.commit` is a tagged release; keep all, and
+  stop worrying (4.2 MB is not a problem yet). **User call — not groomed until it is made**;
+  the ritual keeps writing one per session meanwhile.
+- 2026-07-25 — [idea] **Supplement shape C — registration-vs-instance-seed re-slice** (the
+  parked sibling of shape A, now groomed as **G29**). Re-sliced so that registering an
+  ontology term and seeding an instance of it are separate operations rather than two halves
+  of one supplement file. Explicitly **gate-worthy, not a refactor** — it changes what a
+  supplement MEANS, so it routes through the HITL gate rather than a build item. Groom when
+  the SME convenes it; G29 deliberately does not touch it.
 - 2026-07-25 — [source] **Databricks Unity Catalog researched — full notes at
   [`reference/research/databricks-unity-catalog.md`](../../reference/research/databricks-unity-catalog.md)
   (SME saw "Unity Catalog works so well in Databricks" and asked what it captures).** Public
@@ -48,6 +66,12 @@ Tags help grooming: `idea` · `bug` · `doc` · `source` (new data source) · `q
   future ingest source, necessarily Internal-classified. Groom: probably no backlog item of its
   own; fold the citations into the acronym-catalog item and any data-catalog ADR that revisits
   glossary/tag enforcement.
+  KEPT-UPDATED 2026-07-25 groom — **the first citation has been consumed**: ADR 0010 §4.2
+  (`app_id` + `id_authority`, groomed as **S3**) applies the governed-namespace lesson inward —
+  the value of a governed namespace is that *the identifier itself carries its authority*, which
+  is exactly what `id_authority: "SEAL"` encodes. Still parked: the *tag-policy-as-enforcement*
+  and *glossary-as-concept-scheme* citations, which wait on the acronym-catalog line below and
+  on a data-catalog ADR that neither exists nor is scheduled. No item of its own — confirmed.
 - 2026-07-25 — [idea] **Acronym catalog scoped by domain — so agents and humans stop colliding
   on the same three letters (SME, chat).** Direct fallout of the Q6 reopen below: `Ais` cost
   real time because two readings are both plausible — "as-is" (the standard architecture
@@ -70,7 +94,15 @@ Tags help grooming: `idea` · `bug` · `doc` · `source` (new data source) · `q
   **Consumers:** agents reading CLAUDE.md and gate prompts; L5/L6 SME review, where an
   unglossed acronym stalls a page; a whitepaper/website glossary. Groom **after** the Q6
   ruling — Q6 decides whether `#acronyms` survives at all, and this is the shape it would grow
-  into if it does.
+  into if it does. (Note: "Q6" here is the **gate-log** question, not the backlog item Q6,
+  which is the unrelated docmeta Port A.)
+  KEPT-UPDATED 2026-07-25 groom — **independent corroboration from the pre-UI structure
+  review**: its §4.2 arrives at the same home from a different direction, ruling that where
+  "SEAL", "PAT" and "AIS" need to be *defined* rather than *encoded*, the carrier is a
+  `CatalogBusinessTerm`-shaped glossary (`docs/patterns/data-catalog/enterprise-data-catalog-ontology.md`)
+  — not a property, not a label. That is this line's shape, reached by the identity question
+  instead of the collision question. Still parked on the same trigger (the gate-log Q6 ruling);
+  what changed is that two threads now converge on it, so it is likelier to be worth building.
 - 2026-07-25 — [question] **Q6 REOPENED: is the AIS acronym entry worth keeping at all?**
   (SME, chat). C12/Q6 ruled the expansion "Application Integration Streaming" survives as
   `config/taxonomy/software-registry.yaml#acronyms` — the durable "what did that name mean"
@@ -93,15 +125,6 @@ Tags help grooming: `idea` · `bug` · `doc` · `source` (new data source) · `q
   disambiguation. **Held meanwhile:** `docs/port-T12-ais-excision-company-prompt.md` step 2b
   defers the acronym instead of sweeping it, so no company session hardens a ruling under
   review. Groom when the SME rules — a Q6 amendment entry in `gate-log.md`, not a new gate.
-- 2026-07-24 — [idea] **Supplement consolidation shape A — designed, user-reviewed, awaiting
-  go (chat).** Single `apply-supplements` verb over a data-driven ordered list (base → seal →
-  catalog → registry; SOSA stays opt-in), legacy verbs kept as delegating aliases. Riders
-  agreed in review: post-apply OntologyTerm count assertion, a `load.supplement.<stamp>.log`
-  run-log envelope (today NO supplement/bootstrap verb writes a log file — `execute_file` is
-  debug+console only), run-drydocs skill + repo-README chain update, e2e test switch. Parked
-  sibling: shape C (registration-vs-instance-seed re-slice) is gate-worthy, not a refactor.
-  Groundwork already landed 2026-07-24 (9f5ebe1: stale refs, supplement header charter,
-  missing `org#member` anchor; 76be07c: catalog docstring).
 - 2026-07-24 — [bug] **Unlocated user-reported typo: "apply-catalog … at the bottom says
   apply ontology" (chat).** Searched cli.py docstrings/messages, runbook .md/.html both revs,
   run-drydocs skill, RELATIONSHIP_GUIDE, repo-README, feedback html, gate docs — no such
@@ -109,10 +132,10 @@ Tags help grooming: `idea` · `bug` · `doc` · `source` (new data source) · `q
   supplements" and Appendix B omits `apply-registry-supplement` while running
   `load-software-registry` — a genuine Rev 3 gap that should ride the L5/L6 SME feedback
   loop (doc is mid-review; do not hot-edit). Re-check with the user for the exact spot.
-- 2026-07-24 — [doc] **reconcile-port skill stale Track-1 floor.** Skill says "expect 90
-  passed, 3 skipped" — actual is 113/3 on both sides since the suite grew (verified during
-  the PORT-REPORT-73ee97a confirmation). One-line skill update; company copy has the same
-  number.
+  KEPT-UPDATED 2026-07-25 groom: **G29** (the `apply-supplements` consolidation) rewrites the
+  exact verb set Appendix B lists, so its acceptance carries a rider to fold this check into
+  the runbook update — which resolves the best-guess half without hot-editing a doc that is
+  mid-SME-review. The *unlocated* half still needs the user to point at the exact spot.
 - 2026-07-24 — [chore] **T11 L7-ratification paste-ready snippet still owed producer-side**
   (noted while confirming PORT-REPORT-73ee97a; the company gate pack references it).
 - 2026-07-23 — [idea] **Oracle connection for the lineage/remediation path (user note,
@@ -591,13 +614,92 @@ Tags help grooming: `idea` · `bug` · `doc` · `source` (new data source) · `q
   string `<password>` (copy-paste artifact at creation). Fine for sandbox; change it before
   anything less throwaway. (Found while wiring web/ + agents/ to it.)
 - 2026-07-03 — [chore] `common/` shows up in ADK `/list-apps` (it's a shared-tools package, not
-  an app). Cosmetic; hide or restructure later.- [idea] cli.py regroup: split the 937-line flat command list into domain subcommand groups
-  (schema/ingest/verify/variables) — NOT milestone names; rename m1-verify/m3-verify →
-  verify-reference/verify-controlm with deprecation aliases at the v1.0 window. (same review)
+  an app). Cosmetic; hide or restructure later.
 
 ## Recently groomed (audit trail)
 
 <!-- when you promote an idea, move its line here with the resulting backlog id -->
+
+- 2026-07-25 groom run (bare `/groom-backlog`, same session as the pre-UI structure review)
+  — **11 promoted / 2 inboxed / 1 merged / 1 resolved-in-groom** (todo 30 → 41):
+  - **New Epic S — `structure-remediation` (S1–S9)** from
+    `docs/reviews/architecture-structure-review-2026-07-25.md` (15 findings, scored
+    `(Impact+Risk)×(6−Effort)` plus a pre-UI cost-of-delay flag the formula cannot encode).
+    Given its own epic rather than folded into G because the items share one review
+    document, one phased plan, and three ADRs whose acceptance gates them — the board
+    should show that sequencing as a unit. Each item keeps its correct existing plan
+    phase, so the roadmap strip is unchanged.
+    - **S1** — rule on ADRs 0008 / 0009 / 0010 (the decision item; the R1 precedent, so
+      nothing is groomed into a done deal). Not a HITL gate: no edge semantics.
+    - **S2** — ADR 0008: `drydocs_core/orchestration/` parent over `controlm/`, with the
+      neutral `shell.py` / `paths.py` / `crosswalk.py` surface beside it. The review
+      measured before recommending: ~1,100 of `controlm/`'s 1,725 lines are irreducibly
+      Control-M, so the answer to *"should controlm/ become orchestration/"* is **no
+      rename — add a parent**. Graph labels untouched (ADR 0003 rule 4).
+    - **S3** — ADR 0010: `app_id` + `id_authority` beside `seal_id`, API and web emitting
+      only the neutral pair. **GATE-BOUND** — a property-term binding on the canonical
+      `:BusinessApplication` node; the map entry stays `proposed` until sign-off.
+    - **S4** — ADR 0009: a `draft` table in `mapping.db` as the console's write-ahead
+      buffer, promoted by emitting a YAML/CSV diff. Git stays the commit target.
+    - **S5** (split the two monolith YAMLs by domain) · **S6** (JSON Schema per config
+      family) · **S7** (record the folder-vs-module naming rule once).
+    - **S8** — cli.py regroup. **MERGE**: the review's F6 and the long-parked
+      `[idea] cli.py regroup` inbox line are the same work; that line's file was 937 lines
+      when written and is 1,519 now, which is the argument for doing it. Its deprecation-alias
+      condition carried into the acceptance. No dependency on S1 — reorganizing a CLI needs
+      no ADR.
+    - **S9** — `UI-WIP/` → `docs/design/ui-exploration/` + loose `docs/*.md` grouped.
+      Effort was scored 1 and **corrected to 3–4 the same day** when the attempt measured
+      31 tracked references (backlog.yaml 45 hits, the generated board, `PORT-MANIFEST.yaml`,
+      two gate prompts, two governed renders, `drydocs_api/app.py`) — branch + port-sequenced,
+      never a tidy-up commit.
+  - **G28** — the multi-database naming drift, found while writing the executive overview
+    against the live gated convention. `drydocs_deepdoc.DATABASE = "drydocs_context"`, a
+    database `provisioning/01_databases.cypher` never creates (it creates `ddcontext`), and
+    `test_lineage_deepdoc_scaffold.py` **pins that value** — so the suite currently protects
+    the wrong name. Also unanswered: `ddlineage` is provisioned and read by four query specs,
+    but `drydocs_lineage/writer.py` pins `DATABASE = "drydocs"`, so those specs read an empty
+    database. Not a trust-boundary hole — the writer refuses on an allowlist.
+  - **G29** — [idea] supplement consolidation shape A (2026-07-24, designed + user-reviewed)
+    → the single `apply-supplements` verb with legacy verbs as delegating aliases, all four
+    agreed riders in the acceptance. Its sibling **shape C** re-inboxed slim above: it changes
+    what a supplement *means*, so it is gate-worthy, not a refactor.
+  - **inboxed:** F11 depgraph-snapshot retention (a user call about audit history — and the
+    review's proposed mechanism was wrong: `drydocs prune-snapshots` prunes snapshots inside
+    Neo4j, not the JSON files); supplement shape C (above).
+  - **resolved in the groom, no promotion:** [doc] reconcile-port skill's stale Track-1 floor
+    — measured this session at **114 passed / 3 skipped** (the line said 90/3; the inbox note's
+    own 113/3 was already stale, since the 2026-07-25 boundary-guard fix added a fifth
+    `test_module_boundary.py` test). Skill updated in place, with the number reframed as a
+    FLOOR to re-measure rather than a constant, since this is the second time it has drifted.
+  - **kept-updated:** the Databricks Unity Catalog line (its governed-namespace citation was
+    consumed by ADR 0010 / S3; the tag-policy and glossary-as-concept-scheme citations stay
+    parked) · the acronym-catalog line (the review's §4.2 independently reaches the same
+    `CatalogBusinessTerm` home from the identity question rather than the collision question;
+    still parked on the gate-log Q6 ruling) · the unlocated-typo bug (G29 rewrites the very
+    verb list Appendix B carries, so its rider resolves the best-guess half).
+  - **findings deliberately given NO item**, recorded so a future reviewer does not rediscover
+    them: F4 / F9 / F10-part (done same day — `432ea43` boundary-guard fix, `bbf29cf` gitignore);
+    F5 (the `drydocs/` 4-component flat namespace — deferred to Phase C by ADR 0002-a-1, and
+    the review's §6 says explicitly not to reopen it mid-UI-build); F15 (two test roots — `tests/`
+    pytest and `graph-tests/` YAML acceptance are two mechanisms, not duplication).
+  - **kept parked, unchanged** (trigger checked this pass): gate-log Q6 reopen (SME ruling),
+    T11 L7-ratification snippet (owed at the next company session), Oracle connection for
+    lineage/remediation, company-side greenfield remediation standards, rollback-container
+    deletion, PDN/BIM milestone-grain design, email-DL contact point (gate-tracked), the
+    Control-M app-code → SEAL `:Port` block (gate `seal-app-ref-edge-reshape` v2 — note S3
+    touches the same node, so run them together if timing allows), env-toggle canonical
+    identity, XML WARN-flood port note, compact-timestamp back-flow, AIS acronym port-carry,
+    ControlMApplication two-pattern mapping, m7 build follow-up, marketing-site brand kit,
+    FW-really-API gap classes, DPL ingestion-leg residuals, company back-flow batch,
+    company-side heads-ups, post-squash ref cleanup, Runbook Rev 3 rider, SNYK_TOKEN,
+    SEAL/PAT generic terminology (three §Decision calls — **note S3 now overlaps its
+    `SEALID`→generic-identity-property call and may close it**), m3_invokes `to_node`
+    broadening, depgraph metric extensions, ETL-tooling inventory, JobRun indexes, SaaS
+    scaffold research, K2 FID/ALIAS tables, `ctlm_id` ripple, dry-docs.com seed,
+    /documentation whitepaper type, lineage live-load gate, remediation slices, Phase C
+    packaging, Control-M Workbench, BRD outline, docmeta P4–P7, EE container password,
+    `common/` in /list-apps.
 
 - 2026-07-23 groom run (full inbox sweep + the misfiled "UI acceleration session"
   block folded in from the bottom of this file) — 5 promoted / 2 resolved-in-build
