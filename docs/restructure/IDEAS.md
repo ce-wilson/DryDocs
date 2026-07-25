@@ -26,6 +26,29 @@ Tags help grooming: `idea` · `bug` · `doc` · `source` (new data source) · `q
 
 <!-- add new ideas at the top -->
 
+- 2026-07-25 — [question] **BusinessApplication identity gate — DEFERRED mid-review, resume
+  with a leaner decision surface.** Spec is committed and PROPOSED
+  (`config/gate-prompts/business-application-identity.yaml` v2, backlog **S3**); nothing was
+  written, no map entry created, so there is no half-finished state to unwind. **One SME
+  premise was ruled and is already banked in the spec (B0): a second authority issuing app
+  ids will not happen** — SEAL is and remains the single issuing registry. That withdrew
+  `id_authority` and left `app_urn` deferred as v1's B3 already had it.
+  **Why it stalled — record this, it is the lesson:** the spec grew to 25 confirmations when
+  only about FOUR need SME judgment. The rest is build-time mechanics that should have been
+  recorded as notes, not asked as questions. **On resume, present only:** (1) **B0/B1** — the
+  shape: `app_id` alone, or keep `seal_id`? (2) **C2** — the atomic four-site MERGE flip
+  (`seal_applications` / `manual_seal_attribution` / `pat_product_mapping` /
+  `software_registry`), because a Neo4j uniqueness constraint ignores nulls, so a partial
+  cutover silently DOUBLES the canonical node instead of failing. (3) **D1** — does
+  `:Port`'s NODE KEY `(parent_seal_id, kind)` follow now or later? (recommend later — internal
+  FK, no console exposure). (4) **E1** — do the API and console emit the neutral name
+  regardless of what the graph stores? Everything else (D2 `attribution_id`, F1 the three
+  surviving homes of the string 'SEAL', G1–G4 phasing) demotes to build notes on S3.
+  **Also owed at resume:** ADR 0010 needs AMENDING, not just accepting — its Option C and
+  rules 2/3 assume the withdrawn `id_authority` shape. That is S1's job.
+  **Timing pressure is real but not urgent-today:** the argument for doing it before the
+  console hardens is E1, which stays cheap only while few routes read the key.
+
 - 2026-07-25 — [question] **How much depgraph audit history do we keep?** (review finding
   F11, `docs/reviews/architecture-structure-review-2026-07-25.md`). `knowledge/depgraph-snapshots/`
   holds 66 JSON files / 4.2 MB, several per day, unbounded — some 2026-07-20/21 timestamps are
