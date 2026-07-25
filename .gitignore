@@ -112,6 +112,15 @@ docs/design/feedback/scans/*
 # Editor workspace settings (machine-local)
 /.vscode/
 
+# Scratch screenshots dropped at the repo ROOT (review finding F10, 2026-07-25).
+# Working screenshots — Neo4j browser captures, SQL logs, UI states — accumulate here
+# during a session and are never referenced by anything. Root only: deliberate image
+# assets live in UI-WIP/, drydocs-icons/, internal/pat-evidence/ and stay tracked.
+# Nothing tracked matches this (verified at the time it was added).
+/*.png
+/*.jpg
+/*.jpeg
+
 # OS
 .DS_Store
 Thumbs.db

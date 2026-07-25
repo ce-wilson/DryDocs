@@ -54,12 +54,12 @@ formula deliberately does not encode cost-of-delay, so read the two columns toge
 
 | # | Finding | Category | I | R | E | **P** | Pre-UI |
 |---|---|---|---|---|---|---|---|
-| **F4** | `agents/` and `libs/` are outside `pyproject` packages **and** outside the boundary test | Architecture | 3 | 4 | 2 | **28** | — |
+| **F4** | `agents/` and `libs/` are outside `pyproject` packages **and** outside the boundary test — *and the guard's own import filter could not see the standalone packages* | Architecture | 3 | **5** | 2 | **32** | — |
 | **F1** | No `orchestration/` parent — `controlm/` sits directly in core with no sibling slot | Architecture | 4 | 4 | 3 | **24** | ✅ |
 | **F3** | UI write path has no durable draft substrate (commit-by-replace only) | Architecture | 4 | 4 | 3 | **24** | ✅ |
 | **F7** | `config/taxonomy-ontology-map.yaml` — 1,013 lines, one file, all domains | Code | 3 | 3 | 2 | **24** | — |
 | **F8** | `drydocs_core/ontology/relationship_vocabulary.yaml` — 2,111 lines, same shape | Code | 3 | 3 | 2 | **24** | — |
-| **F9** | Stale git worktree `.claude/worktrees/hardcore-gauss-7c5f11` — 47 MB shadow repo | Infrastructure | 2 | 2 | 1 | **20** | — |
+| **F9** | ~~Stale git worktree — 47 MB shadow repo~~ **CLOSED same day** (auto-removed) | Infrastructure | 2 | 2 | 1 | **20** | — |
 | **F2** | `seal_id` is the canonical node key — 47 occurrences across schema/loaders/API/UI | Architecture | 4 | 5 | 4 | **18** | ✅✅ |
 | **F14** | Config YAML has test guards but no JSON Schema — errors surface late, only in Python | Test | 3 | 3 | 3 | **18** | — |
 | **F12** | Folder names disagree with module names (`web/` ≠ `drydocs-web`, `agents/` ≠ `drydocs-agents`) | Documentation | 2 | 2 | 2 | **16** | ✅ |
@@ -260,12 +260,46 @@ big-bang refactor.
 
 ### Phase 1 — free wins, this week (no gate needed)
 
-| Item | Action |
-|---|---|
-| F9 | `git worktree remove .claude/worktrees/hardcore-gauss-7c5f11` — 47 MB, stops polluting every search |
-| F4 | Add `agents/` and `libs/` to `tests/unit/test_module_boundary.py` (or record an explicit exemption in `MODULE_MAP.md` with the reason). A component with no boundary guard is what default-deny exists to prevent |
-| F10/F13 | Move `UI-WIP/` → `docs/design/ui-exploration/`; group loose `docs/*.md` into `docs/controlm/` and `docs/port/`; gitignore root `*.png` scratch |
-| F11 | Run `drydocs prune-snapshots`; adopt one snapshot per day |
+**Execution note, 2026-07-25 (same day).** Phase 1 was attempted immediately. Two items
+were mis-assessed in the table above and are corrected here — the corrections are kept
+visible rather than silently edited, because both were effort estimates that did not
+survive contact.
+
+| Item | Action | Outcome |
+|---|---|---|
+| F9 | Remove the stale worktree | ✅ **Already closed** — auto-removed by the harness between the audit and the attempt. Nothing to do |
+| F4 | Add `agents/` and `libs/` to `tests/unit/test_module_boundary.py` | ✅ **Done** (`432ea43`) — and it was **bigger than scored**. See below |
+| F10/F13 | Move `UI-WIP/`, group loose `docs/*.md` | ❌ **Not a free win — effort mis-scored (1, should be 3–4).** Deferred |
+| F11 | "Run `drydocs prune-snapshots`" | ❌ **Wrong mechanism.** Deferred |
+| F10 (part) | Gitignore root `*.png` scratch | ✅ **Done** — 20 untracked screenshots, zero references, nothing tracked affected |
+
+**F4 was larger than the finding described.** Bringing `agents/` and `libs/` under the guard
+surfaced a hole *in the guard itself*: the first-party import filter was
+`m == "drydocs" or m.startswith(("drydocs.", "drydocs_core"))` — the dot means it matched
+`drydocs.x` and `drydocs_core*` but **not** `drydocs_api`, `drydocs_lineage`,
+`drydocs_deepdoc`, or `drydocs_remediation`. Imports *between the standalone component
+packages were invisible*, so `test_components_do_not_import_each_other` could never have
+caught one. Measured before the fix: **32 first-party imports unseen**, including
+`drydocs.cli → drydocs_lineage.*` — meaning the `ENTRYPOINT_MODULES` exemption written to
+permit that import had been doing nothing, because the import was never visible in the first
+place. A new `DECLARED_COMPONENT_IMPORTS` table records the one genuine
+component→component edge (`agents.common.specs_catalog → drydocs_api`), with a test that
+fails if an entry goes stale.
+
+**Why F10/F13 are not free.** `UI-WIP` is referenced by **31 tracked files** — including
+`backlog.yaml` (45 hits), the *generated* `docs/plan/board.html`, `PORT-MANIFEST.yaml`, two
+gate-prompt specs, two governed `docs/design/*` renders, and `drydocs_api/app.py`. The loose
+`docs/*.md` files carry 3–10 references each. That is a wide mechanical rename touching
+governed renders and port machinery, so it belongs on a **branch, port-sequenced through
+`docs/port-prompt.md`** — not in a tidy-up commit. The original Effort=1 scored the `git mv`
+and ignored the reference sweep.
+
+**Why F11 was wrong.** `drydocs prune-snapshots` prunes `:ApplicationSnapshot`-style
+snapshots **inside Neo4j** (via `SnapshotWriter`), and needs a live connection. It has
+nothing to do with `knowledge/depgraph-snapshots/*.json`, which is what the finding was
+about. Those JSON files are a deliberate per-push structural-drift record with a documented
+A/B compare workflow in their README — thinning them is a call about how much audit history
+to keep, not a cleanup. **Left for the user to decide.**
 
 ### Phase 2 — before the console grows write surfaces (**pre-UI**)
 
