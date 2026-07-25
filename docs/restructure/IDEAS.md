@@ -26,6 +26,29 @@ Tags help grooming: `idea` · `bug` · `doc` · `source` (new data source) · `q
 
 <!-- add new ideas at the top -->
 
+- 2026-07-25 — [idea] **Acronym catalog scoped by domain — so agents and humans stop colliding
+  on the same three letters (SME, chat).** Direct fallout of the Q6 reopen below: `Ais` cost
+  real time because two readings are both plausible — "as-is" (the standard architecture
+  modeling idiom) and "Application Integration Streaming" (an org platform family) — and
+  nothing in the repo adjudicated between them. Today
+  `config/taxonomy/software-registry.yaml#acronyms` is a one-key section with no scope
+  dimension, so it can record *expansions* but not **collisions**, and collisions are the
+  failure mode that actually bites. **Shape:** key by acronym, carry *many* senses, tag each
+  sense with its domain scope — `area` (which part of the org/platform), `business-domain`,
+  `technical-domain`, `industry` (what an outsider would assume it means) — plus, wherever a
+  misreading is known to have happened, an explicit **does-NOT-mean** note. AIS is the worked
+  example: industry/modeling sense "as-is", org sense "Application Integration Streaming", and
+  the note that our `:AisTool` label meant neither. **Modeling hook:** this is a SKOS job
+  (`prefLabel` / `altLabel` / `definition` / `scopeNote`, senses as concepts in a scheme) —
+  SKOS is already registered in `reference/standards/README.md` (namespace + "concept
+  reconciliation") but has **no fetched local copy** yet, unlike prov-o/w3c-org/dprod-ekgf/
+  sosa-ssn; fetching it would be part of this. **Boundary caveat (decide at grooming):**
+  industry acronyms are External and publishable, org-internal ones are not automatically —
+  needs per-entry `classification` or an `internal/` split, same rule as any other source.
+  **Consumers:** agents reading CLAUDE.md and gate prompts; L5/L6 SME review, where an
+  unglossed acronym stalls a page; a whitepaper/website glossary. Groom **after** the Q6
+  ruling — Q6 decides whether `#acronyms` survives at all, and this is the shape it would grow
+  into if it does.
 - 2026-07-25 — [question] **Q6 REOPENED: is the AIS acronym entry worth keeping at all?**
   (SME, chat). C12/Q6 ruled the expansion "Application Integration Streaming" survives as
   `config/taxonomy/software-registry.yaml#acronyms` — the durable "what did that name mean"
