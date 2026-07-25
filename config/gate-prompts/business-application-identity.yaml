@@ -1,9 +1,29 @@
 # SME gate-prompt spec — BusinessApplication IDENTITY: does the canonical node's key
-# carry the registry's name, or the value plus the authority that issued it?
+# carry the registry's name, or a neutral one?
+#
+# REVISED v2 2026-07-25 — SME PREMISE CORRECTION, same session, before the gate ran:
+# "a second authority issuing app ids should not happen." That single fact removes the
+# ONLY argument for the qualified-reference shape. v1 proposed app_id + id_authority
+# (+ conditionally app_urn); with the dual-registry case ruled out, `id_authority` is a
+# constant column on every node. It is WITHDRAWN in v2 — kept visible below rather than
+# deleted, because the reasoning is the audit trail.
+#
+# `app_urn` is NOT withdrawn: v1's §B3 already deferred it to "when a second authority
+# actually appears", so B0 only confirms that trigger will not fire. The distinction is
+# deliberate and the SME made it explicitly — id_authority was to be written on EVERY
+# node in phase 1; app_urn was always conditional. A deferral with a named trigger is a
+# more honest record than "impossible", because "should not happen" is org intent.
+#
+# The revision makes the change SMALLER and, under the case that CAN still happen,
+# strictly better: if the registry is renamed, a neutral `app_id` needs no data change
+# at all (the property name is already generic and `source_of_record` is recorded once
+# in config/taxonomy/business-application.yaml), whereas `id_authority` on every node
+# would have needed migrating across all of them. Record the authority ONCE, in config.
 #
 # Raised by ADR 0010 (docs/decisions/0010-internal-source-term-abstraction.md), itself
 # from the pre-UI structure review (docs/reviews/architecture-structure-review-2026-07-25.md
-# §4.2, finding F2). Groomed as backlog S3, gated by S1.
+# §4.2, finding F2). Groomed as backlog S3, gated by S1. ADR 0010 must be AMENDED at S1
+# to match this ruling — its Option C and rules 2/3 assume the withdrawn shape.
 #
 # GATE-BOUND: this page PROPOSES. No property is written, no constraint is created, no
 # loader or QuerySpec changes, and the taxonomy-ontology-map entry stays `proposed`
@@ -22,7 +42,7 @@
 classification: Internal-Public
 schema: drydocs.gate-prompt.v1
 id: business-application-identity
-title: "SME Gate — BusinessApplication identity: app_id + id_authority, or keep seal_id as the canonical key?"
+title: "SME Gate — BusinessApplication identity: rename the canonical key seal_id -> app_id, or keep it?"
 step: "Rules the property contract for the canonical :BusinessApplication node before the console hardens against it — and the MERGE-key cutover that four loaders share"
 summary: >
   :BusinessApplication is the CANONICAL node — deliberately named for the concept, not
@@ -34,11 +54,16 @@ summary: >
   this right at the taxonomy layer (concept: BusinessApplication, source_of_record:
   SEAL, identifier: SEALID "= app_id"); the graph did not inherit it. The row model did:
   SealApplicationRow.app_id is ALREADY the field name, and seal_applications.cypher
-  writes `MERGE (a:BusinessApplication {seal_id: row.app_id})` — the registry name is
-  introduced AT THE GRAPH LAYER ONLY, by one Cypher clause. The proposal is to carry
-  identity as a qualified reference (app_id + id_authority) so a registry rename or a
-  dual-registry transition becomes a data migration rather than a 47-site refactor.
-  Timing is the whole argument: the console is being built against this key right now.
+  writes `MERGE (a:BusinessApplication {seal_id: row.app_id})` — so the registry name is
+  introduced AT THE GRAPH LAYER ONLY, by one Cypher clause, over a value that is already
+  neutral everywhere else.
+  v2 PROPOSAL (post SME premise correction): rename the property to `app_id` and stop
+  there. The authority stays recorded ONCE, where it already is — `source_of_record:
+  SEAL` in the taxonomy file — rather than on every node. Two drivers survive the
+  correction and neither depends on a second registry: consistency with the repo's own
+  ADR 0003 rule, and the console contract, which is being built against this key right
+  now and should not leak an internal tool name to every viewer. Timing is the argument
+  for doing it now; the shape is deliberately the smallest one that answers the ask.
 meta:
   Module: "drydocs-core/schema (constraints + seal supplement) · drydocs/loaders (4 MERGE sites) · drydocs_api/query_specs.py · web/src"
   Source: "seal-extract — the internal registry of record for business applications; issues the SEALID. Concept/label already decoupled per ADR 0003 + K4"
@@ -55,13 +80,13 @@ mapping:
     target: ":BusinessApplication.app_id — the id itself, neutral property name (today: seal_id)"
     edge: "node property  [PROPOSED — §B]"
   - n: 2
-    element: "BusinessApplication identity AUTHORITY"
-    target: ":BusinessApplication.id_authority — WHICH registry issued the value (today: encoded in the property NAME, so unqueryable)"
-    edge: "node property  [PROPOSED — §B]"
+    element: "BusinessApplication identity AUTHORITY  [WITHDRAWN v2]"
+    target: "was :BusinessApplication.id_authority — WITHDRAWN: the SME ruled a second issuing authority will not happen, so this is a constant on every node. The authority stays in config/taxonomy/business-application.yaml (source_of_record: SEAL), recorded once"
+    edge: "withdrawn  [SME premise correction 2026-07-25]"
   - n: 3
-    element: "Canonical URN form"
-    target: ":BusinessApplication.app_urn = urn:dd:businessapplication:<authority>:<value> — the join key if a second authority ever issues app ids"
-    edge: "node property, OPTIONAL in phase 1  [PROPOSED — §B3]"
+    element: "Canonical URN form  [DEFERRED — unchanged by v2]"
+    target: ":BusinessApplication.app_urn = urn:dd:businessapplication:<authority>:<value> — NOT written; v1's §B3 already deferred it to the phase where a second authority actually appears, and B0 says that trigger will not fire. Deliberately DEFERRED-with-a-trigger, not declared impossible"
+    edge: "not written  [deferred, trigger named in §B3]"
   - n: 4
     element: "MERGE key shared by FOUR loaders"
     target: "seal_applications · manual_seal_attribution · pat_product_mapping · software_registry all MERGE :BusinessApplication on seal_id today"
@@ -90,12 +115,12 @@ provenance:
         note: "the value does not change and no new plumbing is needed; only the property name the Cypher writes it under. This is the single strongest argument that the change is cheap TODAY"
       - name: id_authority
         origin: derived
-        from: "constant 'SEAL' in phase 1, from the taxonomy's source_of_record"
-        note: "HONEST CAVEAT for the SME: with one registry this is a constant column, and storing a constant is normally a smell. Its value is entirely in case 3 (§B) — a dual-registry transition, where a bare app_id silently merges two id spaces. Reject §B if you judge that case unrealistic"
+        from: "WITHDRAWN v2 — was: constant 'SEAL', from the taxonomy's source_of_record"
+        note: "v1 flagged the honest caveat that with one registry this is a constant column, and that its entire value lay in a dual-registry transition. The SME ruled that case out on 2026-07-25, so the caveat decided it: WITHDRAWN. The authority is recorded once in config, not per node — which is also cheaper under a registry RENAME, the case that can still happen"
       - name: app_urn
         origin: derived
-        from: "urn:dd:businessapplication:<lower(id_authority)>:<app_id>, per the URN section of docs/patterns/data-catalog/enterprise-data-catalog-ontology.md"
-        note: "pure restatement of the other two — derivable, so storing it is a convenience. Optional in phase 1; §B3 asks whether to write it at all"
+        from: "urn:dd:businessapplication:<lower(authority)>:<app_id> — NOT WRITTEN; deferred in v1 §B3 and still deferred in v2"
+        note: "v2 leaves this exactly as v1 had it. The distinction from id_authority is deliberate: id_authority was to be written on EVERY node in phase 1, which B0 kills; app_urn was already gated behind 'when a second authority actually appears', so B0 only confirms the trigger will not fire. Deferred-with-a-trigger is the honest record — 'should not happen' is org intent, not a guarantee. The URN form stays documented in docs/patterns/data-catalog/enterprise-data-catalog-ontology.md"
       - name: seal_id
         origin: source
         from: "the same row value, under today's name"
@@ -116,11 +141,13 @@ sections:
       - "A2: PAT terminology is OUT OF SCOPE and stays untouched — audited at ADR 0010 and found essentially absent from code, labels, and property names (it landed as :Product/:AreaProduct/:ProductLine/:CatalogLOB). NOTE the one crossover §C names: the PAT LOADER writes the SEAL-keyed node, so PAT is affected by the cutover even though PAT's own terms are not."
       - "A3: Employee.seal_sid / seal_holder_sid are OUT OF SCOPE. They name a PERSON identifier that happens to be sourced from SEAL — arguably a different call, and deliberately deferred rather than swept in."
       - "A4: the open seal-app-ref-edge-reshape v2 gate also touches :BusinessApplication (attribution grain, app-code defined mapping). If both are ruled in one session, say so here; otherwise the later one re-opens the earlier one's node."
-  - title: "B. The identity shape — the core ruling"
+  - title: "B. The identity shape — the core ruling (RESHAPED v2)"
     confirmations:
-      - "B1 [pick one]: (a) app_id + id_authority — the value plus the authority that issued it [AGENT RECOMMENDATION: the only option that survives a DUAL-REGISTRY transition, which is the realistic shape of a corporate registry migration; marginal cost over (b) is one extra property written by the same loader]. (b) app_id alone — drop the vendor name, keep a single scalar [strictly better than (c), materially cheaper than (a), but a bare app_id cannot say which registry issued it, so two id spaces silently collide in a migration]. (c) keep seal_id — do nothing [zero work today; the blast radius grows every week the console adds a route, and it leaves a vendor name on the node ADR 0003 says must not carry one]."
+      - "B0 [premise, SME-ruled 2026-07-25]: a SECOND AUTHORITY ISSUING APP IDS WILL NOT HAPPEN. SEAL is and remains the single issuing registry for BusinessApplication identity. Everything below follows from this; confirm it explicitly, because it is the load-bearing fact and v1 of this spec assumed the opposite."
+      - "B1 [pick one — RESHAPED by B0]: (a) app_id alone — rename the property, drop the vendor name, add nothing [AGENT RECOMMENDATION under B0: it answers the original ask (internal abbreviations should convert cleanly to generic catalog terms), satisfies ADR 0003 rule 1, and is the SMALLEST change that does so]. (b) keep seal_id — do nothing [zero work today; leaves a registry name on the canonical node that ADR 0003 says must not carry one, and the blast radius grows every week the console adds a route]. NOTE: v1's option app_id + id_authority is WITHDRAWN, not rejected on merit — B0 removed its only justification."
       - "B2: whichever wins, the RULE generalizes: canonical nodes take neutral property names; registry-named properties are permitted only on source-labeled nodes (ADR 0003 rule 1). Confirm the rule, not just this instance — otherwise the next canonical node repeats it."
-      - "B3 [pick one]: app_urn is (a) written in phase 1, (b) deferred to the phase where a second authority actually appears [AGENT RECOMMENDATION — it is derivable from the other two properties, so writing it now stores a restatement and adds a third thing to keep consistent], or (c) never written."
+      - "B3 [UNCHANGED from v1 — confirm as written]: app_urn is NOT written now; it stays deferred to the phase where a second authority actually appears. v1 already said this, and B0 only confirms the trigger will not fire — so this is a deferral with a named trigger, NOT a declaration that it can never happen. Kept deliberately separate from the withdrawn id_authority: that one was to be written on every node in phase 1, this one was always conditional. The URN form stays documented in the data-catalog pattern."
+      - "B4 [the check B0 makes necessary]: with the authority no longer on the node, WHERE is it recorded? Confirm: exactly once, in config/taxonomy/business-application.yaml (source_of_record: SEAL, identifier: SEALID), which already says it today. A registry RENAME — the case that CAN still happen — then costs one config edit and NO data migration, which is strictly cheaper than the withdrawn shape would have been."
   - title: "C. The MERGE-key cutover — the hazard that makes this a gate"
     confirmations:
       - "C1: the SME is shown, and acknowledges, that FOUR loaders MERGE :BusinessApplication on seal_id today — seal_applications.cypher:19 (primary), manual_seal_attribution.cypher:32 (manual tier-5), pat_product_mapping.cypher:54 (PAT), software_registry.cypher:52 (registry). Three MATCH sites follow (batch_port_orchestrator, seal_attribution, seal_contacts)."
@@ -136,10 +163,10 @@ sections:
       - "E1: drydocs_api and web/ expose the NEUTRAL PAIR ONLY — no seal_id in a route, a QuerySpec, a column header, or a demo fixture. web/src/data/mappingsDemo.ts loses app_seal_id; match_method: 'seal_var' is reworded. This is the rule that costs nothing today and is unaffordable once routes and fixtures depend on it."
       - "E2: E1 stands EVEN IF §B rules (c) keep-seal_id — in that case the API maps seal_id to a neutral app_id in its projection layer. The console contract should not leak an internal registry name to every viewer regardless of what the graph stores. Confirm or reject this separability."
       - "E3: 22 seal_id references live in drydocs_api/query_specs.py and 14 in drydocs_api/mappings.py — the API is already the second-largest holder after the attribution loader. E1 is therefore a real diff, not a formality."
-  - title: "F. id_authority as a controlled value"
+  - title: "F. Where the registry name still lives (RESHAPED v2)"
     confirmations:
-      - "F1: id_authority values are a CONTROLLED VOCABULARY, not free strings — today exactly one value, 'SEAL'. A test pins the permitted set so a typo cannot invent a second authority."
-      - "F2: the durable home for what 'SEAL' MEANS is a CatalogBusinessTerm-shaped glossary (docs/patterns/data-catalog/enterprise-data-catalog-ontology.md), not this property — the same conclusion the reopened gate-log Q6 acronym question is circling, and the Unity Catalog note's takeaway 2 (a controlled vocabulary needs an enforcement point or it rots). Recorded as DIRECTION here; the glossary is not built, is not gated, and this gate does NOT depend on it."
+      - "F1 [replaces the withdrawn id_authority vocabulary]: after this gate the string 'SEAL' survives in the repo in exactly three legitimate places — config/taxonomy/business-application.yaml (source_of_record, the single record of authority), config/source-registry.yaml (the seal-extract source entry), and module/file names (seal_applications.py and kin, whose rename is phase 3+ and lowest value per §G2). Confirm that list is complete and intended; anything ELSE naming the registry after this gate is drift."
+      - "F2: the durable home for what 'SEAL' MEANS is a CatalogBusinessTerm-shaped glossary (docs/patterns/data-catalog/enterprise-data-catalog-ontology.md) — the same conclusion the reopened gate-log Q6 acronym question is circling, and the Unity Catalog note's takeaway 2 (a controlled vocabulary needs an enforcement point or it rots). Recorded as DIRECTION only; the glossary is not built, is not gated, and this gate does NOT depend on it. B0 makes it LESS urgent, not more — with one permanent authority there is no id space to disambiguate, only a term to define."
   - title: "G. Migration, sequencing, and what is NOT decided"
     confirmations:
       - "G1: phases are additive and independently revertible — (1) loaders write both, constraint added on app_id, both constraints live; (2) API + console read/emit the neutral pair; (3) loader Cypher, graph-tests/ and gate pages move to app_id, seal_id becomes a deprecated alias still written. Phase 2 is the one with a deadline (before more console routes land)."
