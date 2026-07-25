@@ -1,0 +1,151 @@
+# SME gate-prompt spec — BusinessApplication IDENTITY: does the canonical node's key
+# carry the registry's name, or the value plus the authority that issued it?
+#
+# Raised by ADR 0010 (docs/decisions/0010-internal-source-term-abstraction.md), itself
+# from the pre-UI structure review (docs/reviews/architecture-structure-review-2026-07-25.md
+# §4.2, finding F2). Groomed as backlog S3, gated by S1.
+#
+# GATE-BOUND: this page PROPOSES. No property is written, no constraint is created, no
+# loader or QuerySpec changes, and the taxonomy-ontology-map entry stays `proposed`
+# until §H is signed.
+#
+# WHY A GATE AT ALL, when this is "just a property rename": (1) it changes the MERGE
+# KEY of a canonical node written by FOUR independent loaders — get that wrong and the
+# graph silently doubles (§C); (2) it changes the NODE KEY of :Port (§D); (3) it changes
+# the API/console contract (§E). Property-term bindings route through the gate per
+# CLAUDE.md phase 11. It is NOT an edge decision — no relationship_vocabulary.yaml term
+# is created, and the map entry takes the property-supplement shape (to_node: ~,
+# vocab_id: ~) precedented by job-runtime-stats-supplement (2026-07-14).
+#
+# Mechanism-only. The one id shown (82507) is the SYNTHETIC sample value already
+# committed in config/taxonomy/business-application.yaml — not a real SEALID.
+classification: Internal-Public
+schema: drydocs.gate-prompt.v1
+id: business-application-identity
+title: "SME Gate — BusinessApplication identity: app_id + id_authority, or keep seal_id as the canonical key?"
+step: "Rules the property contract for the canonical :BusinessApplication node before the console hardens against it — and the MERGE-key cutover that four loaders share"
+summary: >
+  :BusinessApplication is the CANONICAL node — deliberately named for the concept, not
+  for the registry (K4 normalized :Application -> :BusinessApplication, 2026-07-15). Its
+  key is nonetheless `seal_id`, the name of the internal registry of record. ADR 0003
+  rule 1 says source-system fields stay verbatim on SOURCE-LABELED nodes, which is why
+  :ControlMJob may carry Control-M's own field names — the canonical node is precisely
+  the case that rule excludes. config/taxonomy/business-application.yaml already got
+  this right at the taxonomy layer (concept: BusinessApplication, source_of_record:
+  SEAL, identifier: SEALID "= app_id"); the graph did not inherit it. The row model did:
+  SealApplicationRow.app_id is ALREADY the field name, and seal_applications.cypher
+  writes `MERGE (a:BusinessApplication {seal_id: row.app_id})` — the registry name is
+  introduced AT THE GRAPH LAYER ONLY, by one Cypher clause. The proposal is to carry
+  identity as a qualified reference (app_id + id_authority) so a registry rename or a
+  dual-registry transition becomes a data migration rather than a 47-site refactor.
+  Timing is the whole argument: the console is being built against this key right now.
+meta:
+  Module: "drydocs-core/schema (constraints + seal supplement) · drydocs/loaders (4 MERGE sites) · drydocs_api/query_specs.py · web/src"
+  Source: "seal-extract — the internal registry of record for business applications; issues the SEALID. Concept/label already decoupled per ADR 0003 + K4"
+  Registry ref: "seal-extract — confirmed (config/source-registry.yaml); this gate changes NO source, only the property name the loader writes"
+  Classification: "Internal-Confidential (real SEALIDs + rosters, internal/) · this page Internal-Public (mechanism only; the one id shown is the committed synthetic sample)"
+  Taxonomy: "config/taxonomy/business-application.yaml — concept: BusinessApplication, source_of_record: SEAL, identifier: SEALID (= app_id), classification_only: true"
+  Ontology map: "NEW entry business-application-identity (proposed at this gate) — property-supplement shape, no edge; precedent job-runtime-stats-supplement (confirmed 2026-07-14)"
+  Vocabulary: "NONE — no relationship_vocabulary.yaml term is created or changed. This is a node-property binding, not an edge"
+  Related gates: "seal-app-ref-edge-reshape v2 (OPEN — also touches :BusinessApplication; run together or the second re-opens the first) · seal-attribution-match-policy (2026-07-14, NOT re-opened) · seal-tom-attribution-reshape (2026-07-10)"
+  Company impact: "seal_id almost certainly appears in company-side code the producer cannot see; port-sequenced through docs/port-prompt.md before any other wide structural port"
+mapping:
+  - n: 1
+    element: "BusinessApplication identity VALUE"
+    target: ":BusinessApplication.app_id — the id itself, neutral property name (today: seal_id)"
+    edge: "node property  [PROPOSED — §B]"
+  - n: 2
+    element: "BusinessApplication identity AUTHORITY"
+    target: ":BusinessApplication.id_authority — WHICH registry issued the value (today: encoded in the property NAME, so unqueryable)"
+    edge: "node property  [PROPOSED — §B]"
+  - n: 3
+    element: "Canonical URN form"
+    target: ":BusinessApplication.app_urn = urn:dd:businessapplication:<authority>:<value> — the join key if a second authority ever issues app ids"
+    edge: "node property, OPTIONAL in phase 1  [PROPOSED — §B3]"
+  - n: 4
+    element: "MERGE key shared by FOUR loaders"
+    target: "seal_applications · manual_seal_attribution · pat_product_mapping · software_registry all MERGE :BusinessApplication on seal_id today"
+    edge: "cutover discipline  [DECISION — §C]"
+  - n: 5
+    element: ":Port foreign key"
+    target: ":Port NODE KEY is (parent_seal_id, kind) — a registry-named FK to the app, on a canonical child node"
+    edge: "dependent key  [DECISION — §D1]"
+  - n: 6
+    element: "Attribution composite id"
+    target: "attribution_id = app_id + '|SEAL|' + role + '|' + sid — the authority is embedded in a STRING key"
+    edge: "dependent key  [DECISION — §D2]"
+  - n: 7
+    element: "External contract (API + console)"
+    target: "drydocs_api/query_specs.py and web/ emit app_id + id_authority only; mappingsDemo.ts app_seal_id renamed; match_method 'seal_var' reworded"
+    edge: "surface contract  [PROPOSED — §E]"
+provenance:
+  - label: "BusinessApplication (canonical node — identity properties under decision)"
+    source_object: "seal-extract application rows (Internal-Confidential; synthetic publishable shape in config/taxonomy/business-application.yaml)"
+    key: "TODAY: seal_id, UNIQUE constraint businessapplication_seal (constraints.cypher:36). PROPOSED: app_id, with id_authority alongside"
+    loader: "drydocs/loaders/cypher/seal_applications.cypher:19 (primary) + 3 further MERGE sites, see §C"
+    properties:
+      - name: app_id
+        origin: source
+        from: "SealApplicationRow.app_id — the row model field is ALREADY named app_id (drydocs_core/models/seal.py:192)"
+        note: "the value does not change and no new plumbing is needed; only the property name the Cypher writes it under. This is the single strongest argument that the change is cheap TODAY"
+      - name: id_authority
+        origin: derived
+        from: "constant 'SEAL' in phase 1, from the taxonomy's source_of_record"
+        note: "HONEST CAVEAT for the SME: with one registry this is a constant column, and storing a constant is normally a smell. Its value is entirely in case 3 (§B) — a dual-registry transition, where a bare app_id silently merges two id spaces. Reject §B if you judge that case unrealistic"
+      - name: app_urn
+        origin: derived
+        from: "urn:dd:businessapplication:<lower(id_authority)>:<app_id>, per the URN section of docs/patterns/data-catalog/enterprise-data-catalog-ontology.md"
+        note: "pure restatement of the other two — derivable, so storing it is a convenience. Optional in phase 1; §B3 asks whether to write it at all"
+      - name: seal_id
+        origin: source
+        from: "the same row value, under today's name"
+        note: "RETAINED throughout phases 1-3 as a deprecated alias; its retirement is explicitly NOT this gate (§G3)"
+  - label: "Port (canonical child — dependent key)"
+    source_object: "derived from the same seal-extract row: every app exposes the two-port model"
+    key: "NODE KEY (parent_seal_id, kind) — constraints.cypher:44"
+    loader: "drydocs/loaders/cypher/seal_applications.cypher:96,100"
+    properties:
+      - name: parent_seal_id
+        origin: source
+        from: "row.app_id — again, the row field is already neutral; the Cypher renames it on write"
+        note: "a NODE KEY cannot be changed additively the way a plain property can: both keys exist during any transition window, and the constraint must be created then dropped. §D1 decides whether it follows app_id now, later, or never"
+sections:
+  - title: "A. Scope — what this gate does and does NOT re-open"
+    confirmations:
+      - "A1: this gate rules the IDENTITY PROPERTY CONTRACT of :BusinessApplication and nothing else. It creates no relationship-vocabulary term, changes no edge, and re-opens no signed attribution ruling (seal-attribution-match-policy 2026-07-14 and seal-tom-attribution-reshape 2026-07-10 both stand unchanged)."
+      - "A2: PAT terminology is OUT OF SCOPE and stays untouched — audited at ADR 0010 and found essentially absent from code, labels, and property names (it landed as :Product/:AreaProduct/:ProductLine/:CatalogLOB). NOTE the one crossover §C names: the PAT LOADER writes the SEAL-keyed node, so PAT is affected by the cutover even though PAT's own terms are not."
+      - "A3: Employee.seal_sid / seal_holder_sid are OUT OF SCOPE. They name a PERSON identifier that happens to be sourced from SEAL — arguably a different call, and deliberately deferred rather than swept in."
+      - "A4: the open seal-app-ref-edge-reshape v2 gate also touches :BusinessApplication (attribution grain, app-code defined mapping). If both are ruled in one session, say so here; otherwise the later one re-opens the earlier one's node."
+  - title: "B. The identity shape — the core ruling"
+    confirmations:
+      - "B1 [pick one]: (a) app_id + id_authority — the value plus the authority that issued it [AGENT RECOMMENDATION: the only option that survives a DUAL-REGISTRY transition, which is the realistic shape of a corporate registry migration; marginal cost over (b) is one extra property written by the same loader]. (b) app_id alone — drop the vendor name, keep a single scalar [strictly better than (c), materially cheaper than (a), but a bare app_id cannot say which registry issued it, so two id spaces silently collide in a migration]. (c) keep seal_id — do nothing [zero work today; the blast radius grows every week the console adds a route, and it leaves a vendor name on the node ADR 0003 says must not carry one]."
+      - "B2: whichever wins, the RULE generalizes: canonical nodes take neutral property names; registry-named properties are permitted only on source-labeled nodes (ADR 0003 rule 1). Confirm the rule, not just this instance — otherwise the next canonical node repeats it."
+      - "B3 [pick one]: app_urn is (a) written in phase 1, (b) deferred to the phase where a second authority actually appears [AGENT RECOMMENDATION — it is derivable from the other two properties, so writing it now stores a restatement and adds a third thing to keep consistent], or (c) never written."
+  - title: "C. The MERGE-key cutover — the hazard that makes this a gate"
+    confirmations:
+      - "C1: the SME is shown, and acknowledges, that FOUR loaders MERGE :BusinessApplication on seal_id today — seal_applications.cypher:19 (primary), manual_seal_attribution.cypher:32 (manual tier-5), pat_product_mapping.cypher:54 (PAT), software_registry.cypher:52 (registry). Three MATCH sites follow (batch_port_orchestrator, seal_attribution, seal_contacts)."
+      - "C2 [the ruling]: the MERGE key flips in ONE atomic change across all four sites, never loader-by-loader. RATIONALE — a Neo4j uniqueness constraint IGNORES NULLS, so the existing businessapplication_seal constraint would NOT stop a loader that MERGEs on app_id from creating a SECOND node for an app that already exists keyed by seal_id. A partial cutover silently doubles the canonical node instead of failing. Confirm, or name the alternative discipline you want."
+      - "C3: during phases 1-3 both properties are written by the same loader from the same row value, and a graph-tests/ rule asserts app_id = seal_id on every :BusinessApplication. A drift between them fails the acceptance run rather than being discovered in the console."
+      - "C4: existing loaded graphs are handled by REBUILD, not migration — the wipe-and-rebuild doctrine ruled 2026-07-23 (folder property diet). Confirm that applies here too, or name the backfill."
+  - title: "D. Dependent keys — what else carries the registry name"
+    confirmations:
+      - "D1 [pick one]: :Port NODE KEY (parent_seal_id, kind) — (a) follows to parent_app_id in the same change [consistent; but a NODE KEY cannot be added additively, so this needs create-then-drop and is the one genuinely awkward step], (b) follows in a later phase [AGENT RECOMMENDATION — it is an internal FK with no API or console exposure, so it carries none of the timing pressure that argues for §B; splitting it keeps the risky constraint work out of the phase that has to land before the console], (c) stays as-is permanently [then the neutral-name rule has a visible exception on a canonical child node]."
+      - "D2: attribution_id embeds the authority in a STRING key — app_id + '|SEAL|' + role + '|' + sid (seal_applications.cypher:124,147,170). Rule: (a) leave it — it is an opaque composite, not a queried property; or (b) re-form it from id_authority so the literal disappears. AGENT RECOMMENDATION: (a), and record WHY, so the next reviewer does not read it as an oversight."
+  - title: "E. External surface contract — the part that is free today"
+    confirmations:
+      - "E1: drydocs_api and web/ expose the NEUTRAL PAIR ONLY — no seal_id in a route, a QuerySpec, a column header, or a demo fixture. web/src/data/mappingsDemo.ts loses app_seal_id; match_method: 'seal_var' is reworded. This is the rule that costs nothing today and is unaffordable once routes and fixtures depend on it."
+      - "E2: E1 stands EVEN IF §B rules (c) keep-seal_id — in that case the API maps seal_id to a neutral app_id in its projection layer. The console contract should not leak an internal registry name to every viewer regardless of what the graph stores. Confirm or reject this separability."
+      - "E3: 22 seal_id references live in drydocs_api/query_specs.py and 14 in drydocs_api/mappings.py — the API is already the second-largest holder after the attribution loader. E1 is therefore a real diff, not a formality."
+  - title: "F. id_authority as a controlled value"
+    confirmations:
+      - "F1: id_authority values are a CONTROLLED VOCABULARY, not free strings — today exactly one value, 'SEAL'. A test pins the permitted set so a typo cannot invent a second authority."
+      - "F2: the durable home for what 'SEAL' MEANS is a CatalogBusinessTerm-shaped glossary (docs/patterns/data-catalog/enterprise-data-catalog-ontology.md), not this property — the same conclusion the reopened gate-log Q6 acronym question is circling, and the Unity Catalog note's takeaway 2 (a controlled vocabulary needs an enforcement point or it rots). Recorded as DIRECTION here; the glossary is not built, is not gated, and this gate does NOT depend on it."
+  - title: "G. Migration, sequencing, and what is NOT decided"
+    confirmations:
+      - "G1: phases are additive and independently revertible — (1) loaders write both, constraint added on app_id, both constraints live; (2) API + console read/emit the neutral pair; (3) loader Cypher, graph-tests/ and gate pages move to app_id, seal_id becomes a deprecated alias still written. Phase 2 is the one with a deadline (before more console routes land)."
+      - "G2: module and file renames (seal_applications.py -> business_applications.py, seal_ontology_supplement.cypher -> ...) are phase 3+ and LOWEST value — cosmetic next to the property key, and they collide hard with the company port. Do them last, or not at all."
+      - "G3: RETIRING seal_id is NOT decided here. It is a separate later gate, after the company side has ported and confirmed nothing reads it."
+      - "G4: port sequencing — this lands before any other wide structural port (docs/port-prompt.md), because the company side has seal_id in code the producer cannot see and every additional structural port compounds the conflict."
+  - title: "H. Sign-off"
+    confirmations:
+      - "SME sign-off recorded here and transcribed to config/gate-log.md with per-item outcomes (A1-A4, B1-B3, C1-C4, D1-D2, E1-E3, F1-F2, G1-G4). On sign-off: the taxonomy-ontology-map entry business-application-identity flips proposed -> confirmed, backlog S3 unblocks, and gates.json is regenerated. Nothing is written to the graph at the gate itself."
