@@ -26,6 +26,28 @@ Tags help grooming: `idea` · `bug` · `doc` · `source` (new data source) · `q
 
 <!-- add new ideas at the top -->
 
+- 2026-07-25 — [question] **Q6 REOPENED: is the AIS acronym entry worth keeping at all?**
+  (SME, chat). C12/Q6 ruled the expansion "Application Integration Streaming" survives as
+  `config/taxonomy/software-registry.yaml#acronyms` — the durable "what did that name mean"
+  home. The SME now reports the premise was wrong: they read `Ais` as **"as-is"**, never as
+  an acronym, so the label was never a considered modeling choice on our side. The record
+  corroborates — `761a201` (2026-07-09) introduced it as `:AiTool` (**no "s"**), attributed
+  to in-chat direction and flagged "not yet defined in the ontology"; it stayed spelled two
+  ways for twelve days across backlog/IDEAS/port-archive; the 2026-07-21 "correction" to
+  `AisTool` matched the C11 screenshot rather than decoding it; the expansion landed only at
+  Q6 that afternoon. **Counterweight (don't skip it):** their docs portal root
+  `/docs/ais/{orchestration,etl,file-transfer}/` is independent corroboration that AIS is a
+  real org term — two separate questions (is the acronym real? = yes / was `:AisTool` a
+  considered choice? = no), and Q6 answered the first as if it settled the second.
+  **Options:** (a) drop `#acronyms` entirely — `config/gate-log.md` already carries the
+  expansion verbatim, append-only, so nothing is lost and a one-key config section created
+  to hold a dead string goes away; (b) keep it but rewrite as a **disambiguation** —
+  "does NOT mean 'as-is'" is the protective sentence, not the expansion, since as-is/to-be
+  is a standard modeling idiom and that misreading imports a false meaning (and "Streaming"
+  was already ruled a misnomer at Q6). Producer-side recommendation: (b), worded as
+  disambiguation. **Held meanwhile:** `docs/port-T12-ais-excision-company-prompt.md` step 2b
+  defers the acronym instead of sweeping it, so no company session hardens a ruling under
+  review. Groom when the SME rules — a Q6 amendment entry in `gate-log.md`, not a new gate.
 - 2026-07-24 — [idea] **Supplement consolidation shape A — designed, user-reviewed, awaiting
   go (chat).** Single `apply-supplements` verb over a data-driven ordered list (base → seal →
   catalog → registry; SOSA stays opt-in), legacy verbs kept as delegating aliases. Riders

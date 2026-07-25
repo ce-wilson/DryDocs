@@ -13,6 +13,14 @@ seeded* (from the C11 capture). A loader referencing it means the "verify zero e
 line in pack §3 may be **false**. Establish the real edge count before ruling
 deprecate-vs-remove.
 
+**Amended 2026-07-25 — the acronym entry is REOPENED, not a survivor.** The first
+revision of this prompt listed `software-registry.yaml#acronyms` as an untouchable
+Class C audit record. The SME has since supplied evidence that the Q6 premise did not
+hold — the `Ais` string was read as *"as-is"*, not as an acronym, and entered the
+producer record as `:AiTool` (no "s") twelve days before anyone decoded it. **Step 2b**
+now routes this back as an open question and the sweep defers it. Do not let a
+company-side session harden a ruling that is under producer review.
+
 Everything below is mechanism-only: no internal tool names, app-code values, SIDs, or
 org values appear here, and none should be added when the prompt is pasted.
 
@@ -103,11 +111,56 @@ org values appear here, and none should be added when the prompt is pasted.
 > - Map and vocabulary entries closed as `rejected` / `deprecated` **with their
 >   superseded-by notes** — a closed entry that names the retired thing is *doing its
 >   job*. `superseded_by`, `deprecated_at`, and the RESOLVED notes stay.
-> - **The acronym expansion.** "Application Integration Streaming" survives — the
->   producer's `config/taxonomy/software-registry.yaml#acronyms` is authoritative, and
->   the company's own source-registry gloss stays as a PROVISIONAL entry deferring to
->   it. Carry the expansion across; **never same-file overwrite** (the two sides keep it
->   in different files). This is the one place the retired spelling is allowed to live.
+>
+> #### Step 2b — The acronym entry is NOT a Class C survivor: it is REOPENED
+>
+> An earlier revision of this prompt listed the acronym expansion as an untouchable
+> Class C survivor. **That was wrong and is withdrawn.** Treat this as its own item.
+>
+> **Status:** the Q6 ruling (2026-07-21) made
+> `config/taxonomy/software-registry.yaml#acronyms` the durable home for "Application
+> Integration Streaming", with the company's own source-registry gloss as a PROVISIONAL
+> entry deferring to it. **That ruling is REOPENED producer-side as of 2026-07-25** on
+> SME information that was not on the table at Q6 — see the evidence note below.
+>
+> **What you do about it: nothing.** Do not delete the entry, do not harden it, do not
+> carry the expansion across into any new file, and do not cite it as authoritative
+> anywhere. Leave the company's PROVISIONAL gloss exactly where it sits. In the step-6
+> residual grep, list every acronym hit as **"REOPENED producer-side — deferred, not
+> swept"**, distinct from the sanctioned survivors. If a company ruling on the acronym is
+> wanted in the same session, that is a fresh gate call with the evidence below as input
+> — not something this sweep decides.
+>
+> **The evidence, so the reopen is reviewable rather than a bare instruction.** Two
+> questions were conflated at Q6 and they have opposite answers:
+>
+> 1. *Is AIS a genuine company term?* Evidence says **yes**, independent of us: the
+>    internal engineering-docs portal is rooted at `/docs/ais/{orchestration,etl,
+>    file-transfer}/` and independently corroborated the three capability areas. That
+>    path predates the modeling work and is not ours to rename.
+> 2. *Was `:AisTool` a considered modeling choice in our taxonomy?* Evidence says **no**.
+>    The string entered the producer record 2026-07-09 (commit `761a201`) as `:AiTool` —
+>    **no "s"** — attributed to in-chat direction and flagged "not yet defined in the
+>    ontology". It stayed inconsistently spelled for twelve days across `backlog.yaml`,
+>    `IDEAS.md`, and the port-prompt archive, and was "corrected" to `AisTool` on
+>    2026-07-21 by **matching the C11 screenshot, not by decoding it**. The expansion was
+>    not established until Q6 that same afternoon. The SME reports having read the string
+>    as **"as-is"** throughout, never as an acronym.
+>
+> Q6 answered (1) and was applied as though it had settled (2). It had not.
+>
+> **If a note survives the reopen, the protective sentence is not the expansion.** It is
+> **"this does not mean 'as-is'"**. As-is/to-be is a standard architecture-modeling
+> idiom, so a reader meeting `:AisTool` cold is likelier to read a current-state-vs-
+> target-state marker than to wonder about an acronym — and that misreading imports a
+> whole false meaning. Forgetting an acronym is the milder failure. Note also that the
+> expansion was already ruled partly inaccurate at Q6 ("Streaming" is a misnomer — the
+> folder also carried ETL and managed file transfer).
+>
+> **Nothing is at risk either way.** `config/gate-log.md` carries the expansion verbatim
+> and is append-only, so the audit record survives regardless of what the registry entry
+> does. That is precisely why this can be deferred instead of decided under time
+> pressure by a sweep.
 >
 > #### Step 3 — The landing shape (what replaces what)
 >
@@ -162,9 +215,10 @@ org values appear here, and none should be added when the prompt is pasted.
 >    exclusion side.
 > 2. `python -c "import drydocs.cli"` and `drydocs --help` still work (the
 >    `apply-platforms-supplement` verb may have changed shape — say so).
-> 3. Re-run the step-1 grep. Every remaining hit must be a **named Class C survivor**.
->    List them explicitly in the report as "sanctioned survivors, deliberately
->    untouched" — an unexplained residual hit means the sweep is not done.
+> 3. Re-run the step-1 grep. Every remaining hit must be either a **named Class C
+>    survivor** or a **step-2b deferred acronym hit** — list the two groups separately
+>    ("sanctioned survivors, deliberately untouched" vs "REOPENED producer-side,
+>    deferred"). An unexplained residual hit means the sweep is not done.
 > 4. If any graph write happened: edge/node counts before and after, plus an idempotent
 >    re-run showing no drift.
 >
@@ -200,7 +254,8 @@ The commit that closed it named its **sanctioned survivors** explicitly —
 `software-registry.yaml#acronyms`, the `requires-scheduler` map entry's RESOLVED note,
 and the signed gate pack `config/gate-prompts/platforms-taxonomy.yaml`. Copy that habit:
 naming what you deliberately left behind is what makes the residual grep hits readable
-six months later.
+six months later. (The first of those three is **no longer a survivor** — see step 2b;
+the other two stand. The habit is what transfers, not that particular list.)
 
 **The ruling being executed**, for citation (producer `config/gate-log.md`,
 2026-07-21, C12, 3/3 as recommended): *the capability node layer is NOT adopted — the
@@ -208,3 +263,6 @@ registry `role` vocabulary carries the classification; the tool class MERGES int
 `:SoftwareProduct`; `USES_TOOL` retires with the family; the spelling is removed on both
 sides, with the acronym expansion surviving only in `software-registry.yaml#acronyms`;
 the `Integration*` rename counter-proposal stays REJECTED.*
+
+That quote is the ruling as signed and stays verbatim — but the acronym clause within it
+is the one **reopened 2026-07-25** (step 2b). Everything else in it stands.
