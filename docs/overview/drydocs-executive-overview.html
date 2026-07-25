@@ -1,0 +1,1075 @@
+<title>DryDocs — Executive Overview</title>
+
+<!-- ═══════════════════════════════════════════════════════════════════════
+     docs/overview/drydocs-executive-overview.html
+     SINGLE SOURCE for this document. Hand-authored, NOT renderer output —
+     it is a non-governed outward-facing doc (CLAUDE.md §6), so editorial
+     treatment applies here and nowhere in docs/design/.
+
+     REVISIONS
+       rev 1  2026-07-25  initial — five planes, modules, config, the loop
+       rev 2  2026-07-25  SME pass: DRY-DOCS / Full Circle Docs origin restored;
+                          production-support framing rewritten (impact + RCA +
+                          precedence); ontology-standards section added;
+                          people/escalation sources added to the module map;
+                          audience widened; tracking metadata moved to footer
+       rev 3  2026-07-25  SME pass 2: standfirst reframed to DevOps + components-and-flows;
+                          masthead metadata reordered (audience/classification first);
+                          orchestrator status corrected — Control-M is the PRIMARY D&A
+                          orchestrator, AutoSys a later phase, Airflow a placeholder with
+                          reduced visibility under tenant guardrails; agent question
+                          broadened to "what does this process do / who do I contact"
+       rev 4  2026-07-25  origin corrected: the original proposal was a Neo4j graph of the
+                          batch process + code linked to requirements and test cases in a
+                          document database (not "waterfall-grade SDLC documentation")
+       rev 5  2026-07-25  "one graph" -> the three trust-tier graphs (drydocs / ddcontext /
+                          dddocs) + the ddall composite; §06 now states that the original
+                          proposal survives as ACTIVE vocabulary (SPECIFIED_IN / VERIFIED_BY
+                          / IMPLEMENTED_BY).
+                          FIX: database names were stale in rev 1-4 — the gated live
+                          convention is dd* (ddcontext/ddlineage/ddall, gate-log 2026-07-xx),
+                          NOT drydocs_context/drydocs_all. Note the drift is still live in
+                          code: drydocs_deepdoc/writer.py + drydocs_api/routing.py +
+                          MODULE_MAP.md + CHANGELOG.md still say drydocs_context /
+                          drydocs_all, while provisioning/01_databases.cypher creates
+                          ddcontext/ddlineage/ddall. Not fixed here — see the note to the
+                          reviewer; this doc uses the gated names.
+       rev 6  2026-07-25  production-support framing sharpened: names the actual decay —
+                          overview + business context + process flow down to an Excel
+                          sheet of folder/job details
+
+     CONVENTION: dashed borders = proposed or planned. As each dotted line
+     closes, flip it to solid, add a revision line above, and republish the
+     same file path to keep the artifact URL stable.
+     ═══════════════════════════════════════════════════════════════════ -->
+
+<style>
+  /* ── Tokens lifted verbatim from web/src/styles/tokens.css ──────────────
+     The console treats :root as light and .dark as the override. Here the
+     same token names are re-bound for the artifact viewer, which stamps
+     data-theme on the root element and must win over the OS media query. */
+  :root {
+    --bg:#f4f6f9; --bg2:#eaeef4; --panel:#ffffff; --panel2:#eef2f7;
+    --edge:#d3dce6; --edge-soft:#e3e9f0;
+    --text:#111a26; --muted:#48566c; --faint:#64728a;
+    --blue:#2e6bc4; --blue-br:#1d4f93; --teal:#167f73; --green:#1f7a46;
+    --yellow:#8a6a0c; --red:#c8202e; --red-soft:#a81824;
+    --brand-navy:#1e3a5c; --brand-green:#2bb673;
+    --mono:'IBM Plex Mono', ui-monospace, Consolas, 'Cascadia Mono', monospace;
+    --sans:'IBM Plex Sans', -apple-system, 'Segoe UI', Roboto, sans-serif;
+    color-scheme: light;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg:#0d1520; --bg2:#0f1b29; --panel:#121e2e; --panel2:#152335;
+      --edge:#203045; --edge-soft:#1a2739;
+      --text:#e8edf3; --muted:#8a97a8; --faint:#71809a;
+      --blue:#4d8be0; --blue-br:#4d8be0; --teal:#2ab3a6; --green:#3aae6b;
+      --yellow:#d9b831; --red:#c8202e; --red-soft:#e4525d;
+      color-scheme: dark;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg:#0d1520; --bg2:#0f1b29; --panel:#121e2e; --panel2:#152335;
+    --edge:#203045; --edge-soft:#1a2739;
+    --text:#e8edf3; --muted:#8a97a8; --faint:#71809a;
+    --blue:#4d8be0; --blue-br:#4d8be0; --teal:#2ab3a6; --green:#3aae6b;
+    --yellow:#d9b831; --red:#c8202e; --red-soft:#e4525d;
+    color-scheme: dark;
+  }
+  :root[data-theme="light"] {
+    --bg:#f4f6f9; --bg2:#eaeef4; --panel:#ffffff; --panel2:#eef2f7;
+    --edge:#d3dce6; --edge-soft:#e3e9f0;
+    --text:#111a26; --muted:#48566c; --faint:#64728a;
+    --blue:#2e6bc4; --blue-br:#1d4f93; --teal:#167f73; --green:#1f7a46;
+    --yellow:#8a6a0c; --red:#c8202e; --red-soft:#a81824;
+    color-scheme: light;
+  }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--sans);
+    font-size: 16.5px;
+    line-height: 1.62;
+    margin: 0;
+    padding: 0 1.5rem 7rem;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .wrap { max-width: 60rem; margin: 0 auto; display: flex; flex-direction: column; gap: 3.25rem; }
+  .prose { max-width: 41rem; display: flex; flex-direction: column; gap: 1.15rem; }
+
+  /* ── Masthead: Kept Orbit — the core, then a whispered annotation ─────── */
+  header.masthead {
+    display: flex; flex-direction: column; gap: 1.4rem;
+    padding: 4.5rem 0 2.75rem;
+    border-bottom: 1px solid var(--edge);
+  }
+  .orbit-row { display: flex; align-items: center; gap: 1.15rem; }
+  .core {
+    width: 13px; height: 13px; border-radius: 50%;
+    background: var(--red); flex: none;
+    box-shadow: 0 0 0 5px color-mix(in srgb, var(--red) 13%, transparent);
+  }
+  .staves { display: flex; align-items: flex-end; gap: 5px; height: 22px; }
+  .staves i { display: block; width: 3px; border-radius: 2px; }
+  .staves i:nth-child(1){ height: 13px; background: var(--brand-navy); }
+  .staves i:nth-child(2){ height: 22px; background: var(--brand-green); }
+  .staves i:nth-child(3){ height: 9px;  background: var(--yellow); }
+  .staves i:nth-child(4){ height: 17px; background: var(--blue); }
+
+  h1 {
+    font-size: clamp(2.1rem, 5.2vw, 3.05rem);
+    line-height: 1.06; letter-spacing: -0.028em; font-weight: 600;
+    margin: 0; text-wrap: balance;
+  }
+  h1 .expand {
+    display: block; font-family: var(--mono); font-size: 0.83rem;
+    letter-spacing: 0.13em; text-transform: uppercase; font-weight: 400;
+    color: var(--faint); margin-top: 0.75rem;
+  }
+  .standfirst {
+    font-size: 1.16rem; line-height: 1.55; color: var(--muted);
+    max-width: 40rem; margin: 0; text-wrap: pretty;
+  }
+
+  /* Observatory-log metadata strip */
+  .log {
+    font-family: var(--mono); font-size: 0.72rem; letter-spacing: 0.055em;
+    text-transform: uppercase; color: var(--faint);
+    display: flex; flex-wrap: wrap; gap: 0.55rem 1.6rem; margin: 0;
+  }
+  .log b { font-weight: 500; color: var(--muted); }
+
+  /* ── Sections ─────────────────────────────────────────────────────────── */
+  section { display: flex; flex-direction: column; gap: 1.5rem; }
+  .eyebrow {
+    font-family: var(--mono); font-size: 0.715rem; letter-spacing: 0.14em;
+    text-transform: uppercase; color: var(--faint);
+    display: flex; align-items: baseline; gap: 0.7rem; margin: 0;
+  }
+  .eyebrow span { color: var(--teal); font-weight: 500; }
+  h2 {
+    font-size: clamp(1.5rem, 3.1vw, 1.9rem); line-height: 1.16;
+    letter-spacing: -0.018em; font-weight: 600; margin: 0; text-wrap: balance;
+  }
+  h3 {
+    font-size: 1.03rem; font-weight: 600; margin: 0.55rem 0 0;
+    letter-spacing: -0.005em;
+  }
+  p { margin: 0; text-wrap: pretty; }
+  strong { font-weight: 600; }
+  em { color: var(--muted); }
+  a { color: var(--blue); text-decoration-thickness: 1px; text-underline-offset: 2px; }
+  a:focus-visible { outline: 2px solid var(--teal); outline-offset: 3px; border-radius: 3px; }
+  code {
+    font-family: var(--mono); font-size: 0.855em;
+    background: var(--panel2); border: 1px solid var(--edge-soft);
+    padding: 0.09em 0.36em; border-radius: 4px; white-space: nowrap;
+  }
+
+  /* ── The thesis pull — the loud moments, used sparingly ────────────────── */
+  .thesis {
+    border-left: 3px solid var(--red);
+    padding: 0.15rem 0 0.15rem 1.5rem;
+    font-size: 1.24rem; line-height: 1.42; font-weight: 500;
+    letter-spacing: -0.012em; max-width: 38rem; text-wrap: pretty;
+  }
+
+  /* ── Origin note — quieter than the thesis, warmer than body ───────────── */
+  .origin {
+    background: var(--panel); border: 1px solid var(--edge);
+    border-radius: 10px; padding: 1.5rem 1.65rem;
+    max-width: 42rem; display: flex; flex-direction: column; gap: 1rem;
+  }
+  .origin .tag {
+    font-family: var(--mono); font-size: 0.7rem; letter-spacing: 0.13em;
+    text-transform: uppercase; color: var(--teal); margin: 0;
+  }
+  .origin .close {
+    font-size: 1.06rem; font-weight: 600; letter-spacing: -0.01em;
+    color: var(--text); margin: 0;
+  }
+
+  /* ── Definition rows ──────────────────────────────────────────────────── */
+  .defs { display: flex; flex-direction: column; gap: 1.15rem; max-width: 42rem; }
+  .def { display: grid; grid-template-columns: 9.5rem 1fr; gap: 0.25rem 1.4rem; align-items: baseline; }
+  .def dt {
+    font-family: var(--mono); font-size: 0.775rem; letter-spacing: 0.06em;
+    text-transform: uppercase; color: var(--teal); padding-top: 0.24em;
+  }
+  .def dd { margin: 0; }
+  @media (max-width: 34rem) { .def { grid-template-columns: 1fr; } }
+
+  /* ── Diagram frame ────────────────────────────────────────────────────── */
+  figure { margin: 0; display: flex; flex-direction: column; gap: 0.85rem; }
+  .canvas {
+    background: var(--panel);
+    border: 1px solid var(--edge);
+    border-radius: 10px;
+    padding: 1.6rem 1.2rem;
+    overflow-x: auto;
+  }
+  .canvas pre.mermaid { margin: 0; background: transparent; text-align: center; }
+  figcaption {
+    font-family: var(--mono); font-size: 0.735rem; line-height: 1.55;
+    color: var(--faint); letter-spacing: 0.015em; max-width: 44rem;
+  }
+  figcaption b { color: var(--muted); font-weight: 500; }
+
+  /* ── Tables ───────────────────────────────────────────────────────────── */
+  .tablewrap { overflow-x: auto; border: 1px solid var(--edge); border-radius: 10px; background: var(--panel); }
+  table { border-collapse: collapse; width: 100%; font-size: 0.905rem; }
+  th, td { text-align: left; padding: 0.68rem 1rem; border-bottom: 1px solid var(--edge-soft); vertical-align: top; }
+  thead th {
+    font-family: var(--mono); font-size: 0.7rem; letter-spacing: 0.09em;
+    text-transform: uppercase; color: var(--faint); font-weight: 500;
+    background: var(--panel2); border-bottom: 1px solid var(--edge); white-space: nowrap;
+  }
+  tbody tr:last-child td { border-bottom: none; }
+  td:first-child { font-weight: 600; }
+  table.tight td:first-child { white-space: nowrap; }
+  .num { font-variant-numeric: tabular-nums; }
+
+  /* Status chips — semantic, deliberately not the accent hue */
+  .chip {
+    font-family: var(--mono); font-size: 0.68rem; letter-spacing: 0.05em;
+    text-transform: uppercase; padding: 0.13em 0.5em; border-radius: 999px;
+    border: 1px solid currentColor; white-space: nowrap; font-weight: 500;
+    display: inline-block;
+  }
+  .chip.live { color: var(--green); }
+  .chip.build { color: var(--yellow); }
+  .chip.plan { color: var(--faint); }
+  .chip.exp { color: var(--blue); }
+
+  /* ── Numbered cycle notes ─────────────────────────────────────────────── */
+  .cycles { display: flex; flex-direction: column; gap: 1.35rem; max-width: 42rem; }
+  .cycle { display: flex; flex-direction: column; gap: 0.4rem; }
+  .cycle .hd { display: flex; align-items: baseline; gap: 0.7rem; flex-wrap: wrap; }
+  .cycle .hd b { font-size: 1.01rem; font-weight: 600; }
+  .cycle .hd .path {
+    font-family: var(--mono); font-size: 0.73rem; color: var(--faint);
+    letter-spacing: 0.04em; white-space: nowrap;
+  }
+
+  hr.rule { border: none; border-top: 1px solid var(--edge); margin: 0.5rem 0; }
+
+  footer {
+    border-top: 1px solid var(--edge); padding-top: 1.6rem;
+    font-family: var(--mono); font-size: 0.72rem; line-height: 1.8;
+    color: var(--faint); letter-spacing: 0.02em;
+    display: flex; flex-direction: column; gap: 1rem;
+  }
+  footer b { color: var(--muted); font-weight: 500; }
+  footer .revs { display: flex; flex-direction: column; gap: 0.15rem; }
+
+  @media (prefers-reduced-motion: reduce) {
+    * { animation: none !important; transition: none !important; }
+  }
+</style>
+
+<div class="wrap">
+
+  <header class="masthead">
+    <div class="orbit-row">
+      <span class="core" aria-hidden="true"></span>
+      <span class="staves" aria-hidden="true"><i></i><i></i><i></i><i></i></span>
+    </div>
+    <h1>
+      DryDocs
+      <span class="expand">Don&rsquo;t Repeat Yourself &mdash; Documentation</span>
+    </h1>
+    <p class="standfirst">
+      A governed knowledge graph for DevOps — built around the orchestration record, because
+      that is the only layer that identifies which technical components are actually in use,
+      and the upstream and downstream flows they sit between.
+    </p>
+    <p class="log">
+      <span><b>Audience:</b> Leadership · Production Support · Engineering · SME</span>
+      <span><b>Classification</b> Internal-Public</span>
+      <span><b>Date</b> 2026-07-25</span>
+      <span><b>Revision</b> 6</span>
+    </p>
+  </header>
+
+  <!-- ══ 00 · FRAMING ═════════════════════════════════════════════════════ -->
+  <section>
+    <p class="eyebrow"><span>00</span> The framing</p>
+    <h2>The name is the thesis, and it has come full circle</h2>
+
+    <div class="origin">
+      <p class="tag">Origin — &ldquo;Full Circle Docs&rdquo;</p>
+      <p>
+        DryDocs began as the Python principle applied to documentation: <strong>Don&rsquo;t Repeat
+        Yourself</strong>. The working name for the idea was <em>Full Circle Docs</em>, and the problem
+        it was built for is a mismatch of retention.
+      </p>
+      <p>
+        Agile&rsquo;s <em>&ldquo;just enough documentation&rdquo;</em> produces exactly enough context for the
+        sprint that writes the code, and no more. But a data warehouse retains data for
+        <strong>15 to 30 years</strong>. Documentation retention never came close. A decade on, the data
+        is still queried, still regulated, still depended on — and the record of what it is and
+        why it was built that way is gone, along with the people who knew.
+      </p>
+      <p>
+        The original proposal was a Neo4j graph containing the batch process and the code, linking
+        to the requirements and test cases held in a document database.
+      </p>
+      <p>
+        Then large language models changed who the reader is. Agents need precisely the thing that
+        was missing: <strong>what something is, and why it was done</strong>. Documentation written for the
+        auditor turns out to be the context layer the agent needs.
+      </p>
+      <p class="close">
+        That is the full circle — documentation written once, tied to the code, regenerated on
+        demand, for a reader nobody anticipated.
+      </p>
+    </div>
+
+    <div class="prose">
+      <p>
+        What that idea became is not one graph but <strong>three</strong>, separated by how far you can
+        trust what is in them — and separated by the <em>database boundary</em>, not by a confidence
+        field, because a property filter is one forgotten clause away from failing.
+      </p>
+    </div>
+
+    <div class="tablewrap">
+      <table class="tight">
+        <thead>
+          <tr><th scope="col">Graph</th><th scope="col">What lives there</th><th scope="col">Trust</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><code>drydocs</code><br /><span class="chip live">live</span></td>
+            <td><strong>Ground truth — structured.</strong> Derived from the scheduler, catalog, and registry records, plus curated cross-platform lineage</td>
+            <td>Verbatim / grounded</td>
+          </tr>
+          <tr>
+            <td><code>ddcontext</code><br /><span class="chip build">live, in build</span></td>
+            <td><strong>Context — uncertain.</strong> What the system inferred on a failure but cannot stand behind. Its own transaction domain, so it can never leak into ground truth by accident</td>
+            <td>Synthesized / unverified</td>
+          </tr>
+          <tr>
+            <td><code>dddocs</code><br /><span class="chip plan">planned</span></td>
+            <td><strong>Documents — unstructured.</strong> The prose corpus: scraped registry pages, design docs, runbooks, vendor documentation, chunked and linked back to what they describe</td>
+            <td>Verbatim, with a curation ladder</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="prose">
+      <p>
+        A read-only composite (<code>ddall</code>) federates them, so a support question can read
+        across all three while any single write still lands in exactly one. Three words carry the
+        definition of what they add up to:
+      </p>
+    </div>
+
+    <dl class="defs">
+      <div class="def">
+        <dt>Graph</dt>
+        <dd>The questions are traversals. <em>What breaks if this job fails? Who owns the
+          application behind it? Which product does that roll up to?</em> Those are hops, not joins.</dd>
+      </div>
+      <div class="def">
+        <dt>Governed</dt>
+        <dd>Every edge means something a human ratified. A relationship type cannot enter the
+          graph without clearing a controlled vocabulary and an SME gate. That is the difference
+          between a knowledge graph and a diagram.</dd>
+      </div>
+      <div class="def">
+        <dt>Production&nbsp;support</dt>
+        <dd>
+          Cross-product application data flows are not something a runbook captures. Support
+          documentation has slid from robust explanation — an overview, the business context, the
+          process flow — down to the lowest level a developer can deliver: an Excel spreadsheet of
+          Control-M folder and job details. <strong>Neither development nor production-support SMEs can do impact
+          analysis or root-cause analysis, on a technical failure or a data defect, without the big
+          picture.</strong> The graph supplies it: which failures take precedence, what they touch
+          downstream, and who to notify and engage.
+        </dd>
+      </div>
+    </dl>
+
+    <div class="prose">
+      <p>
+        Today it runs self-hosted and single-tenant — a Neo4j graph, a Python pipeline, a
+        read-only API, and a React console, all inside the estate. The shape is deliberately
+        portable: another group could stand up its own graph against its own orchestrator and its
+        own catalog, and those graphs would <em>compose</em> — an ecosystem of graphs rather than one
+        central catalog everyone has to agree on. That is a design property worth protecting, and
+        it is one of the reasons identity and vendor boundaries are being made explicit now.
+      </p>
+    </div>
+  </section>
+
+  <hr class="rule" />
+
+  <!-- ══ 01 · THE SPINE ═══════════════════════════════════════════════════ -->
+  <section>
+    <p class="eyebrow"><span>01</span> The central design choice</p>
+    <h2>Why orchestration is the spine</h2>
+
+    <div class="prose">
+      <p>
+        The instinct is to model the business first — segments, products, applications — and hang
+        the technical detail off it. DryDocs does the opposite.
+      </p>
+    </div>
+
+    <p class="thesis">
+      An org chart tells you who is <em>supposed</em> to own an application. The scheduler record
+      tells you what <em>executed</em> — on which server, reading which file, signalling what
+      downstream. One decays the moment someone changes teams. The other is re-derived on every
+      ingest.
+    </p>
+
+    <div class="prose">
+      <p>So the orchestration record is the spine, and every other plane attaches to it: <strong>data</strong>
+        because jobs read and write files; <strong>applications</strong> because jobs are associated with
+        one; <strong>products and business lines</strong> because applications roll up a catalog hierarchy;
+        <strong>people</strong> because applications carry attributed roles; <strong>documents</strong> because
+        facts cite the page they came from.</p>
+      <p>
+        This is the conclusion Databricks Unity Catalog reached independently, for the same reason:
+        lineage derived from what ran stays true, lineage declared by a human rots. DryDocs derives
+        from Control-M definitions what Unity Catalog derives from Spark execution plans.
+      </p>
+      <p>
+        Which is exactly why the vendor boundary has to be explicit in the code. Control-M is the
+        primary Data &amp; Analytics orchestrator today, and its parser sits in the shared core with
+        no parent and no sibling — while AutoSys is in a later phase, and AWS Airflow is a
+        placeholder with less visibility owing to tenant guardrails. Both crosswalks are already
+        gate-confirmed on paper, and neither has anywhere to land in code.
+      </p>
+    </div>
+  </section>
+
+  <!-- ══ 02 · PLANES ══════════════════════════════════════════════════════ -->
+  <section>
+    <p class="eyebrow"><span>02</span> What it captures</p>
+    <h2>Five planes, one spine</h2>
+
+    <figure>
+      <div class="canvas">
+<pre class="mermaid">
+flowchart TB
+  subgraph HUMAN["◆ PEOPLE &amp; TEAMS — who is accountable"]
+    Employee[":Employee"]
+    DevTeam[":DevTeam"]
+    TOMRole[":TOMRole / :ProductRole"]
+    Attribution[":Attribution<br/>qualified, role-carrying"]
+    SNGroup[":ServiceNowGroup<br/>escalation routing"]
+  end
+
+  subgraph BUSINESS["◆ BUSINESS &amp; PRODUCT — what it rolls up to"]
+    Segment[":BusinessSegment"]
+    LOB[":CatalogLOB"]
+    PLine[":ProductLine"]
+    Product[":Product / :AreaProduct"]
+  end
+
+  subgraph APP["◆ APPLICATION — the pivot between business and technical"]
+    BApp[":BusinessApplication<br/>app_id + id_authority"]
+    Port[":Port — Batch / Event"]
+    SwProduct[":SoftwareProduct → :Vendor"]
+  end
+
+  subgraph ORCH["◆ ORCHESTRATION — THE SPINE: what actually ran"]
+    CMApp[":ControlMApplication"]
+    Folder[":ControlMFolder"]
+    Job[":ControlMJob"]
+    Cond[":Condition"]
+    Server[":ControlMServer"]
+    JobRun[":JobRun — observed execution"]
+  end
+
+  subgraph DATA["◆ DATA &amp; DOCUMENTS — what it touches, what it cites"]
+    FileRef[":File / :Dataset"]
+    Doc[":Document → :Chunk"]
+    DesignDoc[":DesignDoc → :DocSection"]
+  end
+
+  LOB -->|RECONCILES_TO| Segment
+  LOB -->|HAS_PRODUCT_LINE| PLine
+  PLine -->|HAS_PRODUCT| Product
+  Product -->|HAS_DEV_TEAM| DevTeam
+  DevTeam -->|SUPPORTS| Product
+  Product -.->|HAS_BUSINESS_APPLICATION · planned| BApp
+
+  BApp -->|WAS_ATTRIBUTED_TO| DevTeam
+  BApp -->|QUALIFIED_ATTRIBUTION| Attribution
+  Attribution -->|HAS_AGENT| Employee
+  Attribution -->|HAD_ROLE| TOMRole
+  BApp -->|HAS_PORT| Port
+  BApp -->|USES_SOFTWARE| SwProduct
+  BApp -->|HAD_PRIMARY_SOURCE| Doc
+  BApp -.->|escalation routing · planned| SNGroup
+  Employee -.->|REPORTS_TO · HR gate| Employee
+
+  CMApp -->|CONTAINS_FOLDER| Folder
+  Folder -->|CONTAINS_JOB| Job
+  Folder -->|SCHEDULED_ON| Server
+  Job -->|REQUIRES_IN_CONDITION| Cond
+  Job -->|EMITS_OUT_CONDITION| Cond
+  Job -->|WAS_INFORMED_BY| Job
+  Job ==>|WAS_ASSOCIATED_WITH| BApp
+  Job -.->|file lineage| FileRef
+  Job -->|WAS_GENERATED_BY| JobRun
+  DesignDoc -.-> Doc
+
+  classDef spine stroke-width:2.5px
+  class CMApp,Folder,Job,Cond,Server,JobRun spine
+</pre>
+      </div>
+      <figcaption>
+        <b>Solid</b> = active in the relationship vocabulary today. <b>Dashed</b> = registered
+        <code>planned</code> or gate-bound. <b>Thick</b> = the orchestration spine.
+      </figcaption>
+    </figure>
+
+    <div class="prose">
+      <p>
+        The heavy edge — <code>WAS_ASSOCIATED_WITH</code> — is the load-bearing join in the whole
+        graph: where the technical record meets the business record. Its <em>grain</em> (whether
+        attribution attaches at job level or at the folder→batch-port level) is under an open SME
+        gate, and everything downstream of <em>“who owns this failure”</em> depends on how it resolves.
+      </p>
+    </div>
+  </section>
+
+  <!-- ══ 03 · ONTOLOGY STANDARDS ══════════════════════════════════════════ -->
+  <section>
+    <p class="eyebrow"><span>03</span> What makes the planes joinable</p>
+    <h2>Ontology standards: data, software, organization</h2>
+
+    <div class="prose">
+      <p>
+        A <strong>taxonomy</strong> tells you what category something is. An <strong>ontology</strong> tells you
+        what a connection <em>means</em>. Five planes only compose into one graph if the edges between
+        them are drawn from a shared, defined vocabulary — otherwise each source arrives with its
+        own private notion of &ldquo;owns&rdquo;, &ldquo;uses&rdquo;, and &ldquo;depends on&rdquo;, and the graph becomes a picture
+        rather than something you can reason over.
+      </p>
+      <p>
+        DryDocs does not invent that vocabulary. It maps to W3C and community standards, records
+        every mapping in a controlled registry, and puts the ones that are not yet company-blessed
+        behind a fence.
+      </p>
+    </div>
+
+    <div class="tablewrap">
+      <table>
+        <thead>
+          <tr><th scope="col">Standard</th><th scope="col">Family</th><th scope="col">What it gives DryDocs</th><th scope="col">Status</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>PROV-O</td><td>Provenance</td>
+            <td>The core. Every node is an <em>Entity</em>, <em>Activity</em>, or <em>Agent</em>, and a nine-row decision matrix says which edge label a given pair is allowed to take — <code>WAS_ATTRIBUTED_TO</code>, <code>WAS_GENERATED_BY</code>, <code>USED</code>, and so on</td>
+            <td><span class="chip live">adopted</span></td>
+          </tr>
+          <tr>
+            <td>W3C ORG</td><td>Organization</td>
+            <td>People and teams as first-class structure: <em>Membership</em>, <em>Role</em>, <em>OrganizationalUnit</em>, <em>FormalOrganization</em> — so &ldquo;who owns this&rdquo; is a modelled relation, not a text field</td>
+            <td><span class="chip live">adopted</span></td>
+          </tr>
+          <tr>
+            <td>DPROD / EKGF</td><td>Data products</td>
+            <td><em>Ports</em> — the batch and event interfaces an application exposes. This is what lets a business application be reasoned about as a product rather than a name</td>
+            <td><span class="chip live">adopted</span></td>
+          </tr>
+          <tr>
+            <td>DCAT</td><td>Dataset catalog</td>
+            <td>Datasets, distributions, and sources/targets — the vocabulary the data plane attaches with</td>
+            <td><span class="chip live">adopted</span></td>
+          </tr>
+          <tr>
+            <td>SKOS</td><td>Concept reconciliation</td>
+            <td><strong>The cross-taxonomy joint.</strong> Concept schemes and <code>closeMatch</code> let two taxonomies that name the same thing differently be reconciled explicitly instead of by string matching</td>
+            <td><span class="chip live">adopted</span></td>
+          </tr>
+          <tr>
+            <td>DQV</td><td>Data quality</td>
+            <td>Quality dimensions and metrics as modelled objects</td>
+            <td><span class="chip live">adopted</span></td>
+          </tr>
+          <tr>
+            <td>SOSA / SSN</td><td>Observation &amp; time</td>
+            <td>The bridge to the context layer — <em>Observation</em>, <em>Sensor</em>, <em>Result</em>, <em>phenomenonTime</em>. Job-run freshness, last-success, current health. Layers <em>on top of</em> PROV without changing it</td>
+            <td><span class="chip exp">experimental</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="prose">
+      <h3>Honest about the gaps</h3>
+      <p>
+        Roughly half the relationship vocabulary maps cleanly onto a standard term. The rest are
+        local domain edges — <code>CONTAINS_JOB</code>, <code>REQUIRES_IN_CONDITION</code>,
+        <code>USES_SOFTWARE</code> — where no standard has a matching row. Those carry an explicit
+        <em>no mapping</em> marker rather than a forced one. Inventing a plausible-looking standard
+        term is worse than declaring the gap, because a wrong mapping is invisible and a declared
+        gap is reviewable.
+      </p>
+      <p>
+        The same discipline gates promotion. SOSA/SSN is a real W3C standard but not yet a declared
+        <em>company</em> standard, so it is opt-in only, stamped <code>adoption:"experimental"</code> in
+        the graph, and never seeded by the default bootstrap.
+      </p>
+    </div>
+
+    <figure>
+      <div class="canvas">
+<pre class="mermaid">
+flowchart LR
+  subgraph STRUCT["STRUCTURED INTAKE"]
+    direction TB
+    Sched["Scheduler definitions<br/>folders · jobs · conditions"]
+    Cat["Catalog &amp; registry extracts<br/>products · applications · teams"]
+    Ops["Operational feeds<br/>escalation routing · run history"]
+  end
+
+  subgraph UNSTRUCT["UNSTRUCTURED INTAKE"]
+    direction TB
+    Pages["Scraped registry pages"]
+    Design["Design docs &amp; runbooks"]
+    VendorD["Vendor &amp; standards documentation"]
+  end
+
+  subgraph ONT["THE SHARED ONTOLOGY — where they become comparable"]
+    direction TB
+    Matrix["PROV-O decision matrix<br/>Entity · Activity · Agent"]
+    Org["W3C ORG · DPROD · DCAT<br/>people · ports · datasets"]
+    Skos["SKOS closeMatch<br/>reconciles competing taxonomies"]
+    Vocab["relationship_vocabulary<br/>every edge declared, gated, or marked unmapped"]
+  end
+
+  Answer{{"Agent answer<br/>with citations and a trust tier"}}
+
+  Sched --> Matrix
+  Cat --> Org
+  Ops --> Org
+  Pages --> Skos
+  Design --> Skos
+  VendorD --> Skos
+  Matrix --> Vocab
+  Org --> Vocab
+  Skos --> Vocab
+  Vocab --> Answer
+</pre>
+      </div>
+      <figcaption>
+        The ontology is the only place a scraped paragraph and a scheduler row become the
+        <b>same kind of fact</b>.
+      </figcaption>
+    </figure>
+
+    <div class="prose">
+      <h3>Why this is the agent story, not the modelling story</h3>
+      <p>
+        An agent answering <em>&ldquo;what does this process do, and who do I contact when there is an
+        issue?&rdquo;</em> has to cross two kinds of evidence: a structured extract that says a job is
+        associated with an application, and prose written somewhere else that explains what that
+        application is for. Nothing joins those but a
+        vocabulary both were mapped into. Where the vocabulary is defined, the agent
+        <strong>traverses</strong>. Where it is missing, the agent <strong>guesses</strong> — and guessing is
+        precisely where hallucination enters a support answer.
+      </p>
+      <p>
+        This is the same conclusion Databricks reached out loud: <em>&ldquo;agents are only as good as the
+        context they have — without a shared definition of what the business actually means, even a
+        capable agent will guess.&rdquo;</em> Defining the ontology properly across the taxonomies is not
+        modelling hygiene. It is the difference between an agent that can cite a path and one that
+        produces a confident sentence nobody can verify.
+      </p>
+    </div>
+  </section>
+
+  <!-- ══ 04 · MODULES ═════════════════════════════════════════════════════ -->
+  <section>
+    <p class="eyebrow"><span>04</span> How the code is arranged</p>
+    <h2>Modules: who does what</h2>
+
+    <figure>
+      <div class="canvas">
+<pre class="mermaid">
+flowchart LR
+  subgraph SOURCES["SOURCES"]
+    direction TB
+    Oracle[("Orchestration replica<br/>scheduler definition views")]
+    Catalog[("Catalog / product extract<br/>+ team report")]
+    AppReg[("Application registry extract<br/>apps · ports · TOM roles")]
+    Escal[("Escalation routing<br/>ServiceNow groups")]
+    HR[("HR hierarchy extract<br/>employee spine · REPORTS_TO")]
+    VendorDocs[("Vendor docs<br/>standards · research")]
+  end
+
+  subgraph CORE["drydocs_core — shared · imports no component"]
+    direction TB
+    Adapters["adapters/<br/>csv · oracle · run-log"]
+    Models["models/<br/>typed rows"]
+    OrchP["orchestration/ — ADR 0008<br/>shell · paths · crosswalk"]
+    CtlM["orchestration/controlm/<br/>variables · resolver · facts"]
+    Ont["ontology/<br/>relationship vocabulary"]
+    Store["mapping_store<br/>SQLite read model"]
+  end
+
+  subgraph COMPONENTS["COMPONENTS — import core only, never each other"]
+    direction TB
+    Load["drydocs-load<br/>loaders → ground truth"]
+    Lineage["drydocs-lineage<br/>proactive curated lineage"]
+    DeepDoc["drydocs-deepdoc<br/>reactive on-failure dive"]
+    Review["drydocs-review<br/>gate pages · verify · publish"]
+    DocGen["drydocs-docgen<br/>md → deterministic html/pdf"]
+    Plan["drydocs-plan<br/>backlog → board"]
+    Remed["drydocs-remediation<br/>detect → prove → Jira"]
+    DocMeta["drydocs-docmeta<br/>scraped doc graph"]
+  end
+
+  subgraph GRAPH["NEO4J — the trust boundary is structural"]
+    direction TB
+    DBmain[("drydocs<br/>GROUND TRUTH")]
+    DBctx[("ddcontext<br/>uncertain · candidate")]
+    DBdocs[("dddocs<br/>document corpus")]
+    DBall[("ddall<br/>read-only composite")]
+  end
+
+  subgraph SURFACES["SURFACES"]
+    direction TB
+    API["drydocs-api<br/>read-only · DB routing"]
+    Web["web console<br/>explorer · mappings · gates"]
+    Agents["agents<br/>QuerySpec → text2cypher"]
+    JiraS["Jira<br/>system of record for fixes"]
+  end
+
+  Oracle --> Adapters
+  Catalog --> Adapters
+  AppReg --> Adapters
+  Escal -.-> Adapters
+  HR -.-> Adapters
+  VendorDocs --> DocMeta
+  Adapters --> Models --> Load
+  OrchP --> CtlM
+  CtlM --> Load
+  CtlM --> Lineage
+  CtlM --> DeepDoc
+  Ont --> Load
+  Load --> DBmain
+  Lineage --> DBmain
+  DeepDoc --> DBctx
+  DocMeta -.-> DBdocs
+  DBmain --> Review
+  DBmain --> DBall
+  DBctx --> DBall
+  DBdocs -.-> DBall
+  DBmain --> API
+  DBall --> API
+  Store --> API
+  API --> Web
+  API --> Agents
+  DBmain --> Remed
+  Remed --> JiraS
+  Review --> DocGen
+
+  classDef proposed stroke-dasharray:5 3
+  class OrchP,DocMeta,DBdocs,Escal,HR proposed
+</pre>
+      </div>
+      <figcaption>
+        Dashed = proposed, planned, or gate-pending. Note what is <b>absent</b>: no component
+        writes to another component&rsquo;s database, and remediation writes to no database at all.
+        The API routes each view explicitly — ground truth alone, or the composite when a view
+        deliberately surfaces uncertain context. There is no default.
+      </figcaption>
+    </figure>
+
+    <div class="prose">
+      <h3>Where people come from</h3>
+      <p>
+        Three feeds populate the human plane, and they are deliberately separate because they
+        answer different questions. The <strong>catalog extract</strong> supplies teams and the products they
+        support. The <strong>application registry extract</strong> supplies the operating-model roles attached
+        to each application — who owns it, who informs it, who operates it at each level. The
+        <strong>escalation routing</strong> feed supplies the group you actually page, which is frequently not
+        the same as the person listed as owner. An <strong>HR hierarchy</strong> extract — currently at the
+        gate — would add the reporting spine, so an unanswered page can escalate upward rather than
+        sideways.
+      </p>
+    </div>
+
+    <div class="tablewrap">
+      <table class="tight">
+        <thead>
+          <tr><th scope="col">Module</th><th scope="col">Job in one line</th><th scope="col">Writes to</th><th scope="col">Status</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>drydocs_core</td><td>Parse, model, resolve config. Imports no component — an invariant a default-deny test enforces</td><td>—</td><td><span class="chip live">live</span></td></tr>
+          <tr><td>drydocs-load</td><td>Turns source extracts into ground-truth graph writes; owns the CLI</td><td><code>drydocs</code></td><td><span class="chip live">live</span></td></tr>
+          <tr><td>drydocs-lineage</td><td><em>Proactive</em> — derives curated command-line lineage; writes only confirmed facts</td><td><code>drydocs</code></td><td><span class="chip live">live</span></td></tr>
+          <tr><td>drydocs-deepdoc</td><td><em>Reactive</em> — on a failure, dives deeper and records what it is unsure of</td><td><code>ddcontext</code></td><td><span class="chip build">scaffolded</span></td></tr>
+          <tr><td>drydocs-review</td><td>Renders SME gate pages, runs Cypher acceptance checks, publishes docs</td><td>gate pages</td><td><span class="chip live">live</span></td></tr>
+          <tr><td>drydocs-docgen</td><td>Markdown → deterministic HTML/PDF; the anchors the paper feedback loop keys on</td><td><code>docs/design/*</code></td><td><span class="chip live">live</span></td></tr>
+          <tr><td>drydocs-plan</td><td>Backlog → the project board</td><td><code>board.html</code></td><td><span class="chip live">live</span></td></tr>
+          <tr><td>drydocs-remediation</td><td>Detect a defect → transform → prove equivalence offline → file a Jira. <strong>Writes no graph</strong></td><td>Jira only</td><td><span class="chip build">scaffolded</span></td></tr>
+          <tr><td>drydocs-docmeta</td><td>Scraped registry and product pages as a document graph</td><td><code>dddocs</code></td><td><span class="chip plan">planned</span></td></tr>
+          <tr><td>drydocs-api</td><td>Read-only projection; server-side credentials, per-view DB routing</td><td>—</td><td><span class="chip live">live</span></td></tr>
+          <tr><td>web console</td><td>Explorer, mappings, gates, lineage, runbooks</td><td>drafts only</td><td><span class="chip build">in build</span></td></tr>
+          <tr><td>agents</td><td>Tiered read-only Q&amp;A: QuerySpec router → schema-grounded text2cypher</td><td>—</td><td><span class="chip live">live</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="prose">
+      <h3>The trust boundary is structural, not a property</h3>
+      <p>
+        Curated facts and uncertain candidates live in <em>different databases</em>, not behind a
+        confidence field — because one bad query on a shared database promotes noise into ground
+        truth, and a property filter is one forgotten <code>WHERE</code> clause away from failing.
+        Promotion from context to ground truth is a human gate, never a cross-database edit.
+      </p>
+    </div>
+  </section>
+
+  <!-- ══ 05 · CONFIGURATION ═══════════════════════════════════════════════ -->
+  <section>
+    <p class="eyebrow"><span>05</span> The configuration layer</p>
+    <h2>Git is the ledger. SQL is the index.</h2>
+
+    <div class="prose">
+      <p>
+        The question behind ADR 0009 was <em>&ldquo;are these config files getting too big — should this
+        be a database?&rdquo;</em> The answer is that it already is one, in the half where a database helps.
+      </p>
+    </div>
+
+    <figure>
+      <div class="canvas">
+<pre class="mermaid">
+flowchart LR
+  subgraph SOT["SOURCE OF TRUTH — committed git text"]
+    direction TB
+    Reg["source-registry.yaml<br/>every source, declared once"]
+    Tax["taxonomy/<br/>pure classification"]
+    Map["ontology-map/<br/>the gated quintuple"]
+    Vocab["relationship_vocabulary.yaml<br/>what edges may mean"]
+    Prec["precedence.yaml<br/>who wins on conflict"]
+    Cls["classification.yaml<br/>the publish boundary"]
+  end
+
+  subgraph DERIVED["DERIVED — rebuildable · gitignored · never reviewed"]
+    Db[("var/mapping.db<br/>SQLite read model")]
+  end
+
+  subgraph WRITE["EDITING SESSION"]
+    Console["web console"]
+    Draft[["draft table — ADR 0009<br/>durable · multi-session"]]
+  end
+
+  subgraph GATE["GOVERNANCE"]
+    Diff["YAML/CSV diff<br/>on a branch"]
+    Gate{{"HITL SME gate<br/>a human reads the diff"}}
+    Main["main"]
+  end
+
+  Reg --> Db
+  Tax --> Db
+  Map --> Db
+  Vocab --> Db
+  Prec --> Db
+  Cls --> Db
+  Db -->|SQL| Console
+  Console -->|edit| Draft
+  Draft -.->|promote| Diff
+  Diff --> Gate
+  Gate -->|sign-off| Main
+  Main --> Reg
+
+  classDef proposed stroke-dasharray:5 3
+  class Draft,Diff proposed
+</pre>
+      </div>
+      <figcaption>
+        The loop is closed on purpose: config governs what may be written to the graph, so it can
+        never be generated <b>from</b> the graph.
+      </figcaption>
+    </figure>
+
+    <div class="prose">
+      <p>Four mechanisms make git — not a database — the right ledger, and all four break if the
+        source of truth moves:</p>
+      <p>
+        <strong>1.</strong> The SME gate reviews a <em>diff</em>; a domain expert signs off on a readable
+        hunk, not a row delta. &nbsp;<strong>2.</strong> The cross-repo port is a <em>commit range</em>, and
+        database state cannot be cherry-picked. &nbsp;<strong>3.</strong> Classification is enforced
+        <em>per file</em> — every source declares its sensitivity, which is what keeps internal data out
+        of a published push. &nbsp;<strong>4.</strong> Renders are <em>deterministic from committed text</em>,
+        so a stale render is detectable by re-rendering and diffing.
+      </p>
+      <p>
+        What a database <em>does</em> give — fast, joinable, ad-hoc query — is already delivered by the
+        derived SQLite model, deletable at any moment without data loss. The genuine gap is the
+        arrow marked <em>promote</em>: a console that edits governed configuration needs somewhere
+        durable to keep an unfinished edit. That is the piece to build before the console grows
+        more write surfaces.
+      </p>
+    </div>
+  </section>
+
+  <!-- ══ 06 · THE LOOP ════════════════════════════════════════════════════ -->
+  <section>
+    <p class="eyebrow"><span>06</span> Capture → document → feedback → remediation</p>
+    <h2>The loop that makes it a system, not an inventory</h2>
+
+    <figure>
+      <div class="canvas">
+<pre class="mermaid">
+flowchart TB
+  Ingest["1 · CAPTURE<br/>Re-derive from the scheduler record.<br/>Never hand-declared."]
+  Graph[("2 · GRAPH<br/>ground truth")]
+  Detect["3 · DETECT<br/>Conformance rules over the graph:<br/>naming · escalation routing ·<br/>missing description metadata"]
+  Dive["3b · DEEP DIVE<br/>On failure, investigate and record<br/>what the system is unsure of"]
+  Ctx[("uncertain<br/>candidates")]
+  Doc["4 · DOCUMENT<br/>Generate the runbook / gate page<br/>from graph data, deterministically"]
+  Human{{"5 · HUMAN REVIEW<br/>Digital: save-button export<br/>Paper: print, pen, scan back<br/>both key on the same anchors"}}
+  Feedback["6 · FEEDBACK<br/>anchor-keyed YAML re-attaches<br/>to the exact section"]
+  Transform["7 · TRANSFORM<br/>Author the corrected<br/>definition offline"]
+  Prove["8 · PROVE<br/>Offline equivalence — does the fix<br/>re-derive the same resolved behavior?"]
+  JiraN["9 · HAND OFF<br/>Jira with before/after,<br/>change doc, flow diagram"]
+  Dev["Dev team deploys<br/>separation of duties:<br/>we author, they deploy"]
+
+  Ingest --> Graph
+  Graph --> Detect
+  Graph --> Doc
+  Detect --> Dive
+  Dive --> Ctx
+  Ctx -.->|promotion is a gate,<br/>never an edit| Graph
+  Doc --> Human
+  Human --> Feedback
+  Feedback --> Doc
+  Feedback -.->|corrections that are<br/>really data defects| Detect
+  Detect --> Transform
+  Transform --> Prove
+  Prove -->|equivalent| JiraN
+  Prove -->|not equivalent| Transform
+  JiraN --> Dev
+  Dev -->|next ingest re-derives<br/>and confirms the fix| Ingest
+
+  classDef gate stroke-width:2.5px
+  class Human,Prove gate
+</pre>
+      </div>
+      <figcaption>
+        Thick borders mark the two points where the system refuses to proceed on its own
+        judgement: <b>human review</b> and <b>offline proof</b>.
+      </figcaption>
+    </figure>
+
+    <div class="cycles">
+      <div class="cycle">
+        <div class="hd"><b>The documentation cycle</b><span class="path">4 → 5 → 6 → 4</span></div>
+        <p>Markdown is the source; the HTML render is deterministic; the printed sheet and the
+          browser page carry <em>the same anchors</em>. An SME can mark up paper with a pen, scan it,
+          and the transcription lands as anchor-keyed YAML that re-attaches to the exact section it
+          annotated. This is why governed renders must be shared exactly as rendered — a
+          &ldquo;prettier&rdquo; copy silently breaks re-attachment. It is also Full Circle Docs in its
+          literal form: the document is regenerated from the graph, corrected by a human, and the
+          correction goes back to the source rather than into a side file.</p>
+        <p><strong>The original proposal is not backstory here — it is live vocabulary.</strong> The batch
+          process and the code are in the graph; <code>SPECIFIED_IN</code> links a requirement to the
+          document section that states it, <code>VERIFIED_BY</code> links it to the test case that
+          proves it, and <code>IMPLEMENTED_BY</code> links it to the component that satisfies it. All
+          three are active edges today. The document-database half — the corpus those sections live
+          in — is <code>dddocs</code>, decided and pending build; it is the last dotted line in this
+          particular circle. The design drawn for a fifteen-year audit trail and the design an agent
+          needs to answer a question turned out to be the same design.</p>
+      </div>
+      <div class="cycle">
+        <div class="hd"><b>The remediation cycle</b><span class="path">3 → 7 → 8 → 9 → 1</span></div>
+        <p>Defects are detected against the graph, a corrected definition is authored offline, and
+          — the critical step — <strong>proved equivalent before anyone sees it</strong>: does the fixed
+          definition re-derive the same resolved behavior? Only then does it become a Jira.
+          Remediation writes no graph and deploys nothing; Jira is the system of record and the dev
+          team holds deploy rights. The proof closes when the next ingest re-derives reality and
+          confirms the fix landed.</p>
+      </div>
+      <div class="cycle">
+        <div class="hd"><b>The trust cycle</b><span class="path">3b → context → gate → graph</span></div>
+        <p>Anything the system inferred but cannot stand behind goes to a separate database and
+          stays there until a human promotes it.</p>
+      </div>
+    </div>
+
+    <div class="prose">
+      <p>
+        The property that makes all three work is the one from the top of this page:
+        <strong>capture is a byproduct of what ran, not a documentation chore.</strong> Every loop
+        re-grounds on the next ingest, so the graph corrects itself rather than drifting.
+      </p>
+    </div>
+  </section>
+
+  <!-- ══ 07 · WHAT CHANGES ════════════════════════════════════════════════ -->
+  <section>
+    <p class="eyebrow"><span>07</span> The decision on the table</p>
+    <h2>What changes if the three ADRs are accepted</h2>
+
+    <div class="tablewrap">
+      <table>
+        <thead>
+          <tr><th scope="col">Area</th><th scope="col">Today</th><th scope="col">After</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Orchestration<br /><span class="chip plan">ADR 0008</span></td>
+            <td>The Control-M parser sits in core with no parent; AutoSys and Airflow crosswalks have no runtime consumer</td>
+            <td>An <code>orchestration/</code> parent with neutral shell and path parsers, plus a crosswalk module that <em>raises</em> on an unmapped concept instead of letting one be invented</td>
+          </tr>
+          <tr>
+            <td>Configuration<br /><span class="chip plan">ADR 0009</span></td>
+            <td>YAML is the ledger, SQLite is the index, and UI writes return whole files</td>
+            <td>Same ledger, wider index, and a durable draft buffer so the console can edit governed config safely</td>
+          </tr>
+          <tr>
+            <td>Identity<br /><span class="chip plan">ADR 0010</span></td>
+            <td>The canonical application node is keyed by a property named after the internal registry</td>
+            <td>Keyed by <code>app_id</code> + <code>id_authority</code>, so a registry rename becomes a data migration, a dual-registry transition is representable, and a second group&rsquo;s graph can compose with this one</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="prose">
+      <p>
+        None of the three changes the model. All three change what the model costs to extend —
+        which is why the time to decide them is before the console hardens around today&rsquo;s shape.
+      </p>
+    </div>
+  </section>
+
+  <footer>
+    <div class="revs">
+      <span><b>Revisions</b></span>
+      <span>rev 6 · 2026-07-25 — production-support framing sharpened: names the actual decay, from overview + business context + process flow down to an Excel sheet of folder and job details</span>
+      <span>rev 5 · 2026-07-25 — three trust-tier graphs named explicitly (<code>drydocs</code> / <code>ddcontext</code> / <code>dddocs</code>, federated by <code>ddall</code>); §06 states that the original proposal survives as active vocabulary; stale database names corrected to the gated <code>dd*</code> convention</span>
+      <span>rev 4 · 2026-07-25 — origin corrected: the original proposal was a Neo4j graph of the batch process and code, linked to requirements and test cases in a document database</span>
+      <span>rev 3 · 2026-07-25 — SME pass 2: DevOps framing, masthead metadata reordered, orchestrator status corrected (Control-M primary for D&amp;A; AutoSys a later phase; Airflow a placeholder with reduced visibility under tenant guardrails)</span>
+      <span>rev 2 · 2026-07-25 — SME pass: origin restored, production-support framing rewritten, ontology-standards section added, people and escalation sources added to the module map</span>
+      <span>rev 1 · 2026-07-25 — initial: five planes, modules, configuration, the loop</span>
+    </div>
+    <div class="revs">
+      <span><b>Tracking</b></span>
+      <span>Structure shown reflects the current repository plus ADR 0008 (orchestration boundary), ADR 0009 (configuration substrate), and ADR 0010 (source-term abstraction). Dashed borders mark what is proposed, planned, or gate-pending; as each closes, it flips to solid and a revision line is added above.</span>
+      <span>Source of truth: <code>docs/overview/drydocs-executive-overview.html</code> — hand-authored, not renderer output.</span>
+    </div>
+    <div class="revs">
+      <span>Mechanism only — no SIDs, application codes, org values, folder names, or real names appear on this page.</span>
+    </div>
+  </footer>
+
+</div>
