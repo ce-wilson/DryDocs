@@ -26,6 +26,28 @@ Tags help grooming: `idea` · `bug` · `doc` · `source` (new data source) · `q
 
 <!-- add new ideas at the top -->
 
+- 2026-07-25 — [source] **Databricks Unity Catalog researched — full notes at
+  [`reference/research/databricks-unity-catalog.md`](../../reference/research/databricks-unity-catalog.md)
+  (SME saw "Unity Catalog works so well in Databricks" and asked what it captures).** Public
+  vendor build of the layer `docs/patterns/data-catalog/` models. Headline: its four semantic
+  features land almost exactly on node types we already define — Domains → `CatalogDataDomain`,
+  Glossary → `CatalogBusinessTerm`, governed tags → `CatalogTag` / `CatalogClassifier`, data
+  classification → `config/classification.yaml`. Independent convergence, worth citing rather
+  than re-deriving. **Three things to actually use:** (1) *lineage derived from Spark execution
+  plans, never declared* — a clean public demonstration of the GROUNDED-over-SYNTHESIZED
+  principle, and the argument for deriving Control-M dependencies from definitions rather than
+  documentation; (2) *a controlled vocabulary needs an enforcement point or it rots* — their
+  governed tags only work because a **tag policy** is attached, which is our classification-test
+  rule generalized to any glossary we build; (3) their glossary ships "terms that link to each
+  other," i.e. a concept scheme, which is external evidence for the acronym-catalog idea below.
+  **Don't over-borrow:** "Genie Ontology" is a learned context layer, **not** an ontology in the
+  PROV-O/ORG sense — cite as *catalog* precedent only, same tool-pattern-not-standard verdict as
+  NeoCarta. It also has no orchestration model, so it answers a different question than we do.
+  **Latent option (not proposed):** if the company runs Databricks, `system.access.table_lineage`
+  and per-catalog `information_schema` are privilege-filtered and SQL-queryable — a legitimate
+  future ingest source, necessarily Internal-classified. Groom: probably no backlog item of its
+  own; fold the citations into the acronym-catalog item and any data-catalog ADR that revisits
+  glossary/tag enforcement.
 - 2026-07-25 — [idea] **Acronym catalog scoped by domain — so agents and humans stop colliding
   on the same three letters (SME, chat).** Direct fallout of the Q6 reopen below: `Ais` cost
   real time because two readings are both plausible — "as-is" (the standard architecture

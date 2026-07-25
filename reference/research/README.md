@@ -17,6 +17,7 @@ matters"; do not paste copyrighted full texts.
 | Agent memory on graphs | [Neo4j Agent Memory (POLE+O)](https://neo4j.com/labs/) — see `neo4j-skills:neo4j-agent-memory-skill` | context-graph retrieval pattern for layer 4 |
 | Semantic layer from a warehouse | [Neo4j: Build a Semantic Layer from GCP with NeoCarta](https://neo4j.com/blog/genai/build-a-semantic-layer-from-gcp-with-neocarta/) | Neo4j Labs build of exactly our data-catalog layer — crosswalk below |
 | GraphRAG (book) | [Essential GraphRAG — Knowledge Graph-Enhanced RAG](https://www.manning.com/books/essential-graphrag) (Bratanič & Hane, Manning 2025; Neo4j-sponsored ebook — local PDF gitignored at repo root, cite don't commit; link verified 2026-07-16) | worked lexical-graph + graph-retrieval patterns; input to the docmeta P0 benchmark verdict and the agent-traversal experiment (backlog Q1/Q2) |
+| Catalog + glossary as one governed object model | [Databricks Unity Catalog](https://docs.databricks.com/aws/en/data-governance/unity-catalog/) — full notes: [`databricks-unity-catalog.md`](databricks-unity-catalog.md) (links verified 2026-07-25) | vendor build of the layer in `docs/patterns/data-catalog/`; its Domains / Glossary / governed tags / classification land on our `CatalogDataDomain` / `CatalogBusinessTerm` / `CatalogTag` / `classification.yaml` — plus lineage derived from execution plans, never declared |
 
 Verified 2026-06-21 (A3). Add new rows as research is consulted; cite them in ADRs under `docs/`.
 
@@ -51,3 +52,9 @@ Oracle/Snowflake SQL, complementing orchestration-derived lineage; (3) it leans 
 **embeddings/hybrid search, not formal RDF/OWL** — consistent with ADR 0001's LPG-first,
 cite-don't-seed stance. It uses **no formal ontology** (no PROV/DCAT), so it is a *tool
 pattern* to borrow from, not a *standard* to seed.
+
+**Companion:** [`databricks-unity-catalog.md`](databricks-unity-catalog.md) covers the other
+public build of this layer. NeoCarta is the closer *architectural* parallel (a graph, built
+from a warehouse); Unity Catalog is the closer *governance* parallel (glossary, domains, and
+policy-enforced tags in one object model, with lineage derived from execution plans). Same
+verdict on both: tool pattern to borrow, not a standard to seed.
