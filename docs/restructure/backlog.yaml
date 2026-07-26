@@ -5919,30 +5919,78 @@ items:
     agent: main
     model: sonnet
     priority: p2
-    status: todo
+    status: done          # DONE 2026-07-26 — naming drift closed + guard added; the ddlineage residency clause SPLIT OUT to G30
     depends_on: []
     inputs: [drydocs_core/schema/provisioning/01_databases.cypher, drydocs_deepdoc/__init__.py, drydocs_api/routing.py, drydocs_lineage/writer.py, drydocs_api/query_specs.py, MODULE_MAP.md, docs/decisions/0002-component-database-topology.md]
     acceptance: >
-      One naming ruling recorded (recommended: provisioning/01_databases.cypher is the
-      truth — drydocs / ddlineage / ddcontext / ddall, plus dddocs per ADR 0006). Every
-      database name in code, tests and docs then matches it: drydocs_deepdoc.DATABASE,
-      the drydocs_api/routing.py and drydocs_core/__init__.py docstrings, MODULE_MAP.md,
-      CHANGELOG.md and ADR 0002-a. A new test asserts the set of database names
-      referenced anywhere in the packages is a SUBSET of the names provisioning creates,
-      so this cannot drift back. Separately answered in writing: whether
-      drydocs_lineage.writer targets ddlineage or the four query_specs rows that read
-      ddlineage are repointed — today the writer pins DATABASE = "drydocs", so those
-      specs read a provisioned but never-written database.
+      Every database name in code, tests and docs matches the DEPLOYED topology —
+      drydocs / ddlineage / ddcontext / ddall, created by
+      provisioning/01_databases.cypher (plus dddocs, planned per ADR 0006). A new test
+      asserts no source file names a superseded database and no module-level DATABASE
+      constant points at one provisioning does not create, so this cannot drift back.
+      NOTE (2026-07-26): the clause about whether drydocs_lineage.writer should target
+      ddlineage was SPLIT OUT to G30 — see notes.
     notes: >
       Found 2026-07-25 while writing the executive overview against the live gated
       convention. Measured, not recalled - drydocs_deepdoc.DATABASE = "drydocs_context"
       and tests/unit/test_lineage_deepdoc_scaffold.py PINS that value, so the suite
-      currently protects a database name provisioning never creates; deepdoc would fail
-      or silently create a stray DB on its first live write. NOT a trust-boundary hole:
+      PROTECTED a database name provisioning never creates; deepdoc would fail or
+      silently create a stray DB on its first live write. NOT a trust-boundary hole:
       drydocs_lineage.writer refuses on an allowlist (database != "drydocs" raises
-      TrustBoundaryError), so the stale name in its test fixture is harmless — any wrong
-      name triggers the guard. The ruling itself is a one-line user call, not a HITL
-      gate: no edge semantics are involved.
+      TrustBoundaryError), so the stale name in its test fixture was harmless — any
+      wrong name triggers the guard.
+      DONE 2026-07-26. The "one naming ruling" the original acceptance asked for turned
+      out NOT to be needed: the dd* convention was already RULED and recorded — ADR 0006
+      §1 states the deployed topology outright ("the plan's working name predates the
+      deploy") and the gate-log carries the rename. So this was pure drift cleanup
+      against an existing decision, not a decision. ADR 0002 keeps its original names in
+      the body (an accepted decision record is not rewritten) with a superseded-names
+      banner added at the top pointing at ADR 0006 and the provisioning DDL.
+      SCOPE SPLIT, recorded honestly: the acceptance ALSO bundled "does
+      drydocs_lineage.writer target ddlineage" — that is a data-RESIDENCY decision, not
+      a naming fix, and bundling them was an error in my own grooming. Split to G30
+      rather than quietly satisfied or quietly dropped.
+      Guard: tests/unit/test_database_names.py (4 tests) — verified load-bearing by
+      restoring the old constant and watching two of them fail. Its first draft used a
+      generic drydocs_*|dd* regex and flagged the CSS colour #ddd and the column
+      drydocs_application_id; the shipped version hunts the three explicitly-named
+      superseded databases instead, with an escape hatch only for lines that SAY the
+      name is superseded. Also fixed two pre-existing ruff errors in
+      drydocs_deepdoc/investigate.py (import sort, en-dash) while in the file.
+
+  - id: G30
+    epic: component-topology
+    title: "Decide where curated lineage lands: the writer pins drydocs while four query specs read the provisioned-but-never-written ddlineage"
+    type: task
+    module: graph-infra
+    phase: 6
+    agent: main
+    model: sonnet
+    priority: p2
+    status: todo
+    depends_on: []
+    inputs: [drydocs_lineage/writer.py, drydocs_api/query_specs.py, drydocs_core/schema/provisioning/01_databases.cypher, docs/decisions/0002-component-database-topology.md, docs/decisions/0002-c-depgraph-lineage-rehome.md]
+    acceptance: >
+      One ruling recorded in writing, then made true in code: either (a)
+      drydocs_lineage.writer targets ddlineage — which means its TrustBoundaryError
+      allowlist, DATABASE constant and the 0002-C §5 ground-truth-only tests all move
+      with it — or (b) the four query_specs rows that declare database="ddlineage" are
+      repointed at drydocs, and ddlineage is documented as provisioned-for-later rather
+      than live. Whichever wins, a test asserts the writer's target and the specs' target
+      AGREE, so a spec can never again read a database nothing writes.
+    notes: >
+      Split out of G28 at its close (2026-07-26) — G28 bundled this with the naming
+      cleanup and they are different kinds of decision: G28 was mechanical drift against
+      an already-ruled convention, this one changes WHERE curated lineage data lives.
+      Measured: drydocs_lineage/writer.py line 70 pins DATABASE = "drydocs" and refuses
+      any other database (TrustBoundaryError, an allowlist — so this is a correctness
+      and emptiness problem, not a safety one); drydocs_api/query_specs.py declares
+      database="ddlineage" on four specs (lines 417, 540, 565, 589). Those four specs
+      therefore query a database that is provisioned by 01_databases.cypher and written
+      by nothing. Not urgent — the lineage writer is gate-bound anyway (its vocabulary
+      is status: planned, so write_curated refuses a live load until the HITL gate flips
+      it), so nothing is silently producing wrong answers today; it would bite on the
+      first live curated write. Ties to the lineage live-load gate parked in IDEAS.
 
   - id: G29
     epic: component-topology
@@ -5978,11 +6026,11 @@ items:
       doc that is mid-SME-review.
 
 summary:
-  todo: 41                                         # +11 at the 2026-07-25 groom (Epic S x9, G28, G29)
+  todo: 41                                         # +11 at the 2026-07-25 groom (Epic S x9, G28, G29); G28 done 07-26, G30 split out of it
   in_progress: 1                                   # E1 (gate deferred both sides)
   blocked: 0
-  done: 132                                        # +G25 dpl-registry ingestion 2026-07-23 (G18+G20 same day)
-  next_ready: [M3, M4, P3, J10, Q6, O23, J13, G21, G24, O26, G26, O27, C15, C16, O28, R3, R4, L16, O29, O30, O31, O32, S1, S8, S9, G28, G29]
+  done: 133                                        # +G28 multi-DB naming drift 2026-07-26
+  next_ready: [M3, M4, P3, J10, Q6, O23, J13, G21, G24, O26, G26, O27, C15, C16, O28, R3, R4, L16, O29, O30, O31, O32, S1, S8, S9, G29, G30]
   # 2026-07-25 groom (pre-UI structure review + the 07-24/07-25 inbox): new Epic S
   # (S1-S9) from docs/reviews/architecture-structure-review-2026-07-25.md, plus G28
   # (multi-DB naming drift) and G29 (supplement-verb consolidation).

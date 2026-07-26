@@ -4,8 +4,12 @@ Pins, in order of importance:
 
 1. **Ground-truth-only (the remaining §5 gate, structural + runtime):** the
    component's ONLY database-writing module is writer.py; the string
-   ``drydocs_context`` appears nowhere in the package; a client bound to any
+   ``ddcontext`` appears nowhere in the package; a client bound to any
    database other than ``drydocs`` is refused (TrustBoundaryError).
+   The scanned name is the DEPLOYED one (``ddcontext``) — it was
+   ``drydocs_context`` until 2026-07-26, i.e. the guard had been scanning for a
+   database name that no longer exists and would not have caught a constant
+   naming the real one. Same class of bug as the one it guards against.
 2. **Gate-bound vocabulary:** the four rel labels are ``status: planned`` in
    relationship_vocabulary.yaml — a live load against the REAL registry raises
    GateBoundVocabularyError today, by design. Execution mechanics are testable
@@ -99,10 +103,10 @@ def test_only_writer_touches_a_database_and_context_is_unnameable() -> None:
             if (
                 isinstance(node, ast.Constant)
                 and isinstance(node.value, str)
-                and "drydocs_context" in node.value
+                and "ddcontext" in node.value
                 and node.value not in docstrings
             ):
-                offenders.append(f"{path.name}: string constant names drydocs_context")
+                offenders.append(f"{path.name}: string constant names ddcontext")
         if path.name == "writer.py":
             continue  # the one sanctioned writer; everything below is for the rest
         for node in ast.walk(tree):
@@ -125,7 +129,7 @@ def test_write_target_is_ground_truth_and_single_sourced() -> None:
 def test_trust_boundary_refuses_other_databases() -> None:
     g = _fixture_graph()
     with pytest.raises(TrustBoundaryError, match="drydocs"):
-        write_curated(g, set(g.rels), client=_FakeClient(database="drydocs_context"))
+        write_curated(g, set(g.rels), client=_FakeClient(database="ddcontext"))
 
 
 # --- 2. the vocabulary gate ---------------------------------------------------------

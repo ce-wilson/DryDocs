@@ -21,7 +21,7 @@ Refusals (each is a contract, not a warning):
   composite (``folder_id.job_id``); the hand-made-CSV fallback identity
   (``folder/job_name``) is refused — canonical keys, not invented ids.
 - **Trust boundary** (D2): the client must be bound to ``drydocs`` —
-  :class:`TrustBoundaryError` otherwise. Never ``drydocs_context``.
+  :class:`TrustBoundaryError` otherwise. Never ``ddcontext``.
 - **Gate-bound vocabulary**: the four rel labels are registered ``status:
   planned`` (``model.VOCAB_IDS``); a live load raises
   :class:`GateBoundVocabularyError` until the HITL gate flips them ``active``

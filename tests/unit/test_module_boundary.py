@@ -84,7 +84,7 @@ COMPONENT_GROUPS: dict[str, tuple[str, ...]] = {
     "lineage": (
         "drydocs_lineage",
     ),
-    # drydocs-deepdoc — reactive on-failure deep dive → drydocs_context with
+    # drydocs-deepdoc — reactive on-failure deep dive → ddcontext with
     # reliability/trust stamps (ADR 0002 D2 C3, G4). Never imports lineage — the
     # components-don't-import-each-other test IS the D2 separation.
     "deepdoc": (

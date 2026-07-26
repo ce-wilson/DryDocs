@@ -1,7 +1,7 @@
 """Per-view database routing — the trust axis enforced server-side.
 
 Which database a console view reads (``drydocs`` ground truth vs the
-``drydocs_all`` composite that includes uncertain ``drydocs_context`` content)
+``ddall`` composite that includes uncertain ``ddcontext`` content)
 is a ROUTING DECISION made here, never by whatever string reaches a client
 session option (ADR 0005 force 2 / ADR 0002 D1). Every named query and the
 raw-Cypher endpoint resolve their database through this map.
@@ -11,7 +11,7 @@ from __future__ import annotations
 
 # View id -> database. All current views read ground truth only; a view that
 # deliberately surfaces uncertain context (e.g. a deepdoc findings panel)
-# gets an explicit 'drydocs_all' row HERE, through review — never a default.
+# gets an explicit 'ddall' row HERE, through review — never a default.
 VIEW_DATABASES: dict[str, str] = {
     "overview-counts": "drydocs",
     "folder-census": "drydocs",

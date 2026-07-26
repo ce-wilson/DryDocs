@@ -72,7 +72,7 @@ project-init stub and `0.2.0` was skipped, so this entry covers all work to date
   catalog hierarchy, and a reconciled relationship vocabulary with a drift guard. [C1–C4]
 - Config-driven loaders: `precedence.yaml`-resolved reconciliation and a fail-fast gate that
   refuses unconfirmed sources. [D1–D3]
-- Multi-database Neo4j topology (`drydocs` + `drydocs_context` + a composite) with proxy-node
+- Multi-database Neo4j topology (`drydocs` + `ddcontext` + a composite) with proxy-node
   constraints, deployed live on the Docker Enterprise container; core-package extraction behind a
   boundary shim; the depgraph Control-M parser deltas folded into the core parser (including a
   `spark-submit` script-resolution fix). [G1, G2, G5–G8]

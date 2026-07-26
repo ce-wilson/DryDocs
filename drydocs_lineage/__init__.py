@@ -6,7 +6,7 @@ Deepens job lineage starting from the **job command line**: the shared parser in
 derives dataset/file lineage candidates from them, runs them through **phased HITL
 curation**, and writes ONLY the curated result to the **ground-truth** database
 (``drydocs``) — that write is what distinguishes it from ``drydocs_deepdoc``
-(reactive, uncertain, ``drydocs_context``). Per D2 the two are deliberately separate
+(reactive, uncertain, ``ddcontext``). Per D2 the two are deliberately separate
 components: each owns only its trigger, write target, and trust handling, and they
 never import each other (boundary test enforces).
 

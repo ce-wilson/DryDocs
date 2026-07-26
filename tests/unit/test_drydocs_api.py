@@ -125,7 +125,7 @@ def test_every_named_query_has_a_routing_row():
 
 def test_unknown_view_fails_closed():
     with pytest.raises(UnknownViewError):
-        database_for("context-findings")  # future drydocs_all view: explicit row required
+        database_for("context-findings")  # future ddall view: explicit row required
 
 
 def test_named_queries_are_read_only():

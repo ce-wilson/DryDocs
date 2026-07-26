@@ -1,5 +1,18 @@
 # ADR 0002 — Component & database topology: modular components over isolated graphs
 
+> **Database names below are the ORIGINAL ones and are superseded — the decision stands,
+> only the identifiers changed.** This ADR says `drydocs_context` and `drydocs_all`; the
+> topology actually deployed at G6/G7 uses the `dd*` convention — **`drydocs`,
+> `ddlineage`, `ddcontext`, `ddall`** — as created by
+> [`drydocs_core/schema/provisioning/01_databases.cypher`](../../drydocs_core/schema/provisioning/01_databases.cypher).
+> The rename is on the record in [ADR 0006 §1](0006-docmeta-component-and-doc-graph.md)
+> ("the plan's working name predates the deploy") and the `config/gate-log.md` dd*-convention
+> entry, which also adds the planned `dddocs`. The body text is left as written — an accepted
+> decision record is not rewritten after the fact — but nothing should be COPIED from it as a
+> live name. `tests/unit/test_database_names.py` enforces the deployed set in code
+> (added 2026-07-26, backlog G28, after `drydocs_deepdoc.DATABASE` was found still pointing at
+> a database provisioning never creates).
+
 ```yaml
 status: ACCEPTED        # PROPOSED | ACCEPTED | SUPERSEDED
 date: 2026-06-26

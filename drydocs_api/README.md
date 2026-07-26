@@ -7,7 +7,7 @@ holds database credentials or picks a database; this component does.
   Cypher at the endpoint layer (comments/strings stripped first), and the live
   runner pins `RoutingControl.READ` behind it.
 - **Per-view database routing** (`routing.py`): which database a view reads
-  (`drydocs` vs `drydocs_all`) is a server-side row, never a client string.
+  (`drydocs` vs `ddall`) is a server-side row, never a client string.
 - **Named queries** (`queries.py`): overview-counts, folder-census,
   dependency-chain, c4-graph — params declared + validated, fail closed.
 - **QuerySpec registry** (O11, `query_specs.py`): versioned module specs behind

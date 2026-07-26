@@ -293,6 +293,7 @@
         "config/gate-prompts/autosys-crosswalk.yaml",
         "config/gate-prompts/bmc-docs-example.yaml",
         "config/gate-prompts/bmc-docs-lexical-load.yaml",
+        "config/gate-prompts/business-application-identity.yaml",
         "config/gate-prompts/controlm-avg-run-supplement.yaml",
         "config/gate-prompts/controlm-hosts-topology.yaml",
         "config/gate-prompts/controlm-q1q3-phase1.yaml",

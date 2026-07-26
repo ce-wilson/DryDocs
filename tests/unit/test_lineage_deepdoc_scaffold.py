@@ -28,7 +28,7 @@ def test_package_surfaces() -> None:
 
 def test_write_targets_sit_on_opposite_sides_of_the_trust_boundary() -> None:
     assert drydocs_lineage.DATABASE == "drydocs"           # ground truth (curated)
-    assert drydocs_deepdoc.DATABASE == "drydocs_context"   # isolated uncertain
+    assert drydocs_deepdoc.DATABASE == "ddcontext"   # isolated uncertain
     assert drydocs_lineage.DATABASE != drydocs_deepdoc.DATABASE
 
 

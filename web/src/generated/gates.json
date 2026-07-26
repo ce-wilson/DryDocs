@@ -335,6 +335,17 @@
     {
       "kind": "prompt-only",
       "date": null,
+      "title": "business-application-identity (gate page rendered — session not yet run)",
+      "status": "open",
+      "prompt_files": [
+        "config/gate-prompts/business-application-identity.yaml"
+      ],
+      "log_ref": null,
+      "unblocks": []
+    },
+    {
+      "kind": "prompt-only",
+      "date": null,
       "title": "email-dl-contact-point (gate page rendered — session not yet run)",
       "status": "open",
       "prompt_files": [

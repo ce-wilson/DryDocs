@@ -1,4 +1,4 @@
-"""The deepdoc write boundary — stamped findings → ``drydocs_context`` only.
+"""The deepdoc write boundary — stamped findings → ``ddcontext`` only.
 
 This is the ONLY module in the component that writes a database, and it writes only
 :data:`drydocs_deepdoc.DATABASE`. Every written node/edge carries ``reliability`` and
