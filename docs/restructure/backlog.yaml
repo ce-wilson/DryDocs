@@ -109,6 +109,10 @@ plan:
       title: Agentic Q&A console
       goal: "Free-text questions answered by a tiered read-only agent (QuerySpec router → schema-grounded text2cypher → bounded graph-of-thoughts loop) with every executed Cypher exposed via ephemeral specs, per-run question/context/memory/token telemetry, and stale-source rescrape (Epic R; ADR 0007)."
       status: todo          # PLAN CHANGE user-directed 2026-07-23 (llm-graph-builder vs KGoT analysis session); ADR 0007 PROPOSED, gate = R1
+    - id: 16
+      title: Self-documentation — DryDocs' own code in the graph
+      goal: "DryDocs documents ITSELF the way it documents Control-M: the project's code-dependency snapshot enters the knowledge graph under the software ontology (SWO), under an explicit :Project root, so 'which module loads this job' is a query rather than a JSON file a human reads (Epic U)."
+      status: todo          # PLAN CHANGE user-ratified 2026-07-26 — groomed into phase 6 the same day, then re-phased on the user's call: this is a NEW CAPABILITY, "similar to a major version change of the snapshot ritual", not an ADR 0002 component-topology follow-up
 
 # ── Module / work-area registry (item.module must be one of these) ───────────
 # Code components mirror MODULE_MAP.md; the rest are repo work areas so that
@@ -6355,11 +6359,11 @@ items:
       through it Q9/Q10/Q11.
 
   - id: G33
-    epic: component-topology
+    epic: self-documentation
     title: "Load the DryDocs code-dependency snapshot into the graph under a Project root, using the seeded-but-unused software ontology"
     type: requirement
     module: drydocs-load
-    phase: 6
+    phase: 16
     agent: main
     model: fable
     priority: p2
@@ -6398,10 +6402,21 @@ items:
       one, deterministically derived from source we control with no authority
       ambiguity. Same character as folders and jobs. The Project root is what keeps
       it from polluting product metadata.
-      PHASE FIT IS MARGINAL — filed phase 6 / component-topology because it is
-      about the components themselves, but "the system documents its own code" is
-      arguably a new capability rather than an ADR 0002 follow-up. Flagged for the
-      user to ratify or re-phase; not invented as a new phase silently.
+      RE-PHASED 2026-07-26, same day, on the user's call. Groomed into phase 6 /
+      component-topology with the marginal fit flagged rather than hidden; the user
+      ratified it as a NEW CAPABILITY — "similar to a major version change of the
+      snapshot ritual" — so it moved to the new phase 16 (self-documentation) and
+      the new epic of the same name. The framing that earned the phase: the
+      depgraph ritual's output stops being a JSON file a human reads and becomes a
+      queryable :Project subgraph, which is a different KIND of thing, not a bigger
+      version of the same thing.
+      ID KEPT AS G33 DELIBERATELY. It no longer matches its epic letter, which is
+      the lesser of two evils: ids are stable references (groom rule, git-readme
+      §backlog id allocation) and G33 is already named in commit a37043a, which
+      cannot be amended. Epic U is therefore the first epic whose opening item
+      carries another letter's id — historical, not a pattern to copy. New items in
+      this epic take U1, U2, … (T is NOT free: it is the port-turn series, e.g.
+      docs/port-T12-*.md).
       Load only the LATEST snapshot as current state; the ~20 dated files are a
       time series available later if code evolution is ever wanted. Do not build it.
 

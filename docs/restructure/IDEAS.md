@@ -716,7 +716,16 @@ Tags help grooming: `idea` · `bug` · `doc` · `source` (new data source) · `q
     docs; **Q10** the failure/activity email corpus; **Q11** document supersession/currency.
   - **Epic G (component-topology):** **G32** the document/content topology ruling +
     ddcontext charter (the decision everything waits on); **G31** the proxy-spine extension
-    (prerequisite for every corpus move); **G33** the code snapshot under a Project root.
+    (prerequisite for every corpus move).
+  - **New phase 16 + Epic U — `self-documentation`:** **G33** the code snapshot under a
+    Project root. Groomed into phase 6 with the marginal fit flagged, then **re-phased the
+    same day on the user's ratification** — *"similar to a major version change of the
+    snapshot ritual"*, i.e. a new capability rather than an ADR 0002 follow-up. The framing
+    that earned the phase: the depgraph ritual's output stops being a JSON file a human
+    reads and becomes a queryable `:Project` subgraph — a different KIND of thing, not a
+    bigger version of the same one. Id kept as G33 (ids are stable references and it is
+    already named in commit a37043a); new items here take U1, U2, … — **T is not free**, it
+    is the port-turn series (`docs/port-T12-*.md`).
   - **The session's through-line, worth keeping:** ONE failure pattern found three times —
     *succeeds loudly, does nothing*. G29 (a supplement that runs and seeds no terms), G30
     (a spec that reads a database nothing writes), Q8 (an `OPTIONAL MATCH` whose target
