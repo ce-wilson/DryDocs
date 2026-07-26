@@ -28,21 +28,37 @@ Tags help grooming: `idea` · `bug` · `doc` · `source` (new data source) · `q
 
 - 2026-07-25 — [question] **BusinessApplication identity gate — DEFERRED mid-review, resume
   with a leaner decision surface.** Spec is committed and PROPOSED
-  (`config/gate-prompts/business-application-identity.yaml` v2, backlog **S3**); nothing was
-  written, no map entry created, so there is no half-finished state to unwind. **One SME
-  premise was ruled and is already banked in the spec (B0): a second authority issuing app
-  ids will not happen** — SEAL is and remains the single issuing registry. That withdrew
-  `id_authority` and left `app_urn` deferred as v1's B3 already had it.
-  **Why it stalled — record this, it is the lesson:** the spec grew to 25 confirmations when
+  (`config/gate-prompts/business-application-identity.yaml` **v3**, backlog **S3**); nothing
+  was written, no map entry created, so there is no half-finished state to unwind. **Two SME
+  inputs were ruled and are banked in the spec.** (B0) *A second authority issuing app ids
+  will not happen* — SEAL is and remains the single issuing registry; that withdrew
+  `id_authority` and left `app_urn` deferred as v1's B3 already had it. (B5, v3) *Another
+  system may call the same thing by a different field name; `app_id` is generic enough for
+  any organization, `seal_id` is company-specific; in a SaaS we would map `app_id` to
+  `xyz_id`* — a THIRD axis, distinct from both withdrawn properties: not *which registry
+  issued the value* (per-node data, dead) but *what each source CALLS the field* (per-source
+  config, alive). **That mechanism already exists and is test-guarded** —
+  `config/source-mappings/<source>.yaml` rows carry `target: Label.property`
+  (`controlm-psgmgr.yaml` declares `TABLE_ID -> ControlMFolder.folder_id`, reconciled by
+  `tests/unit/test_source_mapping_drift.py`) — but **there is no `seal-extract.yaml` ledger**,
+  which is exactly why `SEALID -> seal_id` was hardcoded in Cypher. B1(c) writes it.
+  **Honest limit (B6):** that ledger is declarative and guard-reconciled today, NOT a runtime
+  mapping — verified, nothing outside tests and `render_enforcement_matrix.py` imports
+  `drydocs/source_mappings.py`. Making it load-bearing is a real build, scoped out of the
+  gate, and it is the natural first step of the parked SEAL/PAT terminology line below
+  (`knowledge/upgrade-plans/generic-terminology-research.md`, whose §Decision item 3 IS this
+  identity-property question — the two lines have converged).
+  **Why it stalled — record this, it is the lesson:** the spec grew to 27 confirmations when
   only about FOUR need SME judgment. The rest is build-time mechanics that should have been
   recorded as notes, not asked as questions. **On resume, present only:** (1) **B0/B1** — the
-  shape: `app_id` alone, or keep `seal_id`? (2) **C2** — the atomic four-site MERGE flip
+  shape: `app_id` alone, `app_id` + the declared source-field ledger (B1c — the
+  recommendation since v3), or keep `seal_id`? (2) **C2** — the atomic four-site MERGE flip
   (`seal_applications` / `manual_seal_attribution` / `pat_product_mapping` /
   `software_registry`), because a Neo4j uniqueness constraint ignores nulls, so a partial
   cutover silently DOUBLES the canonical node instead of failing. (3) **D1** — does
   `:Port`'s NODE KEY `(parent_seal_id, kind)` follow now or later? (recommend later — internal
   FK, no console exposure). (4) **E1** — do the API and console emit the neutral name
-  regardless of what the graph stores? Everything else (D2 `attribution_id`, F1 the three
+  regardless of what the graph stores? Everything else (D2 `attribution_id`, F1 the four
   surviving homes of the string 'SEAL', G1–G4 phasing) demotes to build notes on S3.
   **Also owed at resume:** ADR 0010 needs AMENDING, not just accepting — its Option C and
   rules 2/3 assume the withdrawn `id_authority` shape. That is S1's job.
