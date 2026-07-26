@@ -4,8 +4,9 @@
 // STATUS: EXPERIMENTAL / EARLY ADOPTION.
 //   SOSA/SSN is a W3C standard but NOT a declared *company* standard, so it is
 //   fenced off from the confirmed production model:
-//     * NOT applied by `drydocs bootstrap`. Opt-in only:
-//         drydocs apply-sosa-supplement
+//     * NOT applied by `drydocs bootstrap`, and `opt_in: True` in the chain
+//       registry (supplements.py) so `apply-supplements` skips it. Opt-in only:
+//         drydocs apply-supplements --with-sosa
 //     * Every term carries  adoption:"experimental"  so it is queryable but
 //       visibly distinct from the declared/adopted backbone (PROV/ORG/DPROD/
 //       DCAT/SKOS/DQV) seeded by ontology.cypher.

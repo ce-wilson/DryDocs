@@ -14,6 +14,9 @@ Consumers:
   coexist in one file).
 - ``drydocs.loaders.base`` — counts code semicolons to choose the run()/
   run_script() dispatch for cypher templates.
+- ``drydocs_core.schema.supplements.declared_terms`` — reads the :OntologyTerm
+  IRIs a supplement MERGEs, via :func:`strip_comments`, so a commented-out
+  MERGE is not mistaken for a term the graph must hold (G29).
 """
 from __future__ import annotations
 
@@ -71,6 +74,44 @@ def has_code(fragment: str) -> bool:
         else:
             i += 1
     return False
+
+
+def strip_comments(cypher: str) -> str:
+    """*cypher* with ``//`` and ``/* */`` comments removed, code untouched.
+
+    String literals are copied verbatim — a ``//`` inside a quoted IRI is data,
+    not a comment. Newlines that ended a line comment are kept so line-oriented
+    reading of the result still lines up with the source.
+    """
+    out: list[str] = []
+    i, n = 0, len(cypher)
+    while i < n:
+        two = cypher[i : i + 2]
+        ch = cypher[i]
+        if two == "//":
+            j = cypher.find("\n", i)
+            i = n if j == -1 else j
+        elif two == "/*":
+            j = cypher.find("*/", i + 2)
+            i = n if j == -1 else j + 2
+        elif ch in ("'", '"'):
+            quote = ch
+            out.append(ch)
+            i += 1
+            while i < n:
+                if cypher[i] == "\\":
+                    out.append(cypher[i : i + 2])
+                    i += 2
+                    continue
+                out.append(cypher[i])
+                if cypher[i] == quote:
+                    i += 1
+                    break
+                i += 1
+        else:
+            out.append(ch)
+            i += 1
+    return "".join(out)
 
 
 def split_statements(script: str) -> list[str]:

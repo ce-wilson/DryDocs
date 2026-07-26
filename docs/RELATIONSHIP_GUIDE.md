@@ -279,20 +279,24 @@ Then:
 
 ## Applying supplements to the database
 
-Run these once per environment, in order, after `drydocs bootstrap`:
+Run this once per environment, after `drydocs bootstrap`:
 
 ```bash
-drydocs apply-ontology-supplement  # Control-M node types + relationships
-drydocs apply-seal-supplement      # SEAL node types + relationships
-drydocs apply-catalog-supplement   # Catalog node types + relationships
-drydocs apply-registry-supplement  # software-registry terms (Vendor, SoftwareProduct)
+drydocs apply-supplements          # base -> seal -> catalog -> registry
 ```
 
-All commands are idempotent — safe to re-run after any supplement update.
+One verb applies the whole chain in the order declared by
+`drydocs_core/schema/supplements.py`, then verifies each file landed — every
+`:OntologyTerm` IRI the `.cypher` declares must be present in the graph
+afterwards. Idempotent — safe to re-run after any supplement update. The
+per-file verbs (`apply-ontology-supplement`, `apply-seal-supplement`,
+`apply-catalog-supplement`, `apply-registry-supplement`) still work as aliases;
+`--only NAME` is the equivalent on the chain verb.
 
-`drydocs apply-sosa-supplement` (SOSA/SSN context-graph terms) is
-**experimental and opt-in** — deliberately not part of the bootstrap
-sequence; every term it seeds carries `adoption: "experimental"`.
+The SOSA/SSN context-graph terms are **experimental and opt-in** — deliberately
+not in the default chain; every term they seed carries
+`adoption: "experimental"`. Add them with `drydocs apply-supplements --with-sosa`
+(or the `apply-sosa-supplement` alias).
 
 ---
 

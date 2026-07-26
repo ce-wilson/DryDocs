@@ -30,6 +30,7 @@
 | `drydocs_core/manual_mappings.py` | pure tier-5 manual-CSV validation/parse (manifest gate, vocab check, K2 shape) — shared by the load component's loader and the mapping store |
 | `drydocs_core/mapping_store.py` | SQLite materialization of the mapping layer (plan M0–M4); derived from committed YAML/CSV, consumed by `load` (read seam) and `api` (/mappings) — core placement is WHY both may use it |
 | `drydocs_core/schema/` | ground-truth DDL/seed `.cypher` resources (constraints, ontology + supplements) |
+| `drydocs_core/schema/supplements.py` | the supplement **chain as data** (G29) — the one ordered registry (base → seal → catalog → registry, SOSA opt-in) plus `declared_terms()`, which parses the `:OntologyTerm` IRIs a `.cypher` MERGEs so the apply can verify it landed. Core, not CLI: the order is a schema fact, the verb is a caller |
 | `drydocs_core/controlm/` | **the shared Control-M parser** — `commands.py` (CMD_LINE→invocations/file-ops) + `paths.py` (file-ref canonicalization) are the lineage parser **C2 (`drydocs-lineage`) and C3 (`drydocs-deepdoc`) both wrap** |
 
 **Borderline — RESOLVED at the Phase B move (0002-a §6):**

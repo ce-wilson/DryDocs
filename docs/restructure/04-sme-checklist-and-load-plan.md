@@ -74,11 +74,14 @@ Phase 0 · Prereqs
 Phase 1 · Bootstrap (schema backbone)
   poetry run drydocs bootstrap                  # constraints.cypher + ontology.cypher
 
-Phase 2 · Ontology supplements (order matters)
-  poetry run drydocs apply-ontology-supplement  # Control-M anchor terms
-  poetry run drydocs apply-seal-supplement      # SEAL / BusinessApplication terms
-  poetry run drydocs apply-catalog-supplement   # Catalog/PAT terms + all Role seeds
-                                                #   (now includes SUPPORTS→AreaProduct + DEVELOPS, C4)
+Phase 2 · Ontology supplements (order matters — it is enforced, not typed)
+  poetry run drydocs apply-supplements          # base → seal → catalog → registry
+                                                #   base:     Control-M anchor terms
+                                                #   seal:     SEAL / BusinessApplication terms
+                                                #   catalog:  Catalog/PAT terms + all Role seeds
+                                                #             (incl. SUPPORTS→AreaProduct + DEVELOPS, C4)
+                                                #   registry: Vendor / SoftwareProduct terms
+                                                # each file verified against the IRIs it declares (G29)
 
 Phase 3 · Migration (EXISTING graphs only — skip on a fresh DB)
   run migrate_runs_on_to_scheduled_on.cypher    # one-time, idempotent (D1/B.1)

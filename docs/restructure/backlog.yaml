@@ -39,7 +39,7 @@
 # =============================================================================
 
 schema: drydocs.backlog.v2
-updated: 2026-07-25
+updated: 2026-07-26
 
 # ── The high-level project plan (rendered as the board's roadmap strip) ───────
 plan:
@@ -6001,7 +6001,7 @@ items:
     agent: main
     model: sonnet
     priority: p2
-    status: todo
+    status: done
     depends_on: []
     inputs: [drydocs/cli.py, drydocs_core/run_log.py, drydocs_core/schema/, .claude/skills/run-drydocs/SKILL.md, internal/repo-README.md]
     acceptance: >
@@ -6024,13 +6024,35 @@ items:
       which is where the unlocated "apply-catalog says apply ontology" typo report most
       likely points — fold that check into the runbook update rather than hot-editing a
       doc that is mid-SME-review.
+      DONE 2026-07-26. The registry is drydocs_core/schema/supplements.py (core, not CLI:
+      the order is a schema fact, the verb is a caller); `apply-supplements` walks it with
+      --only NAME (repeatable, registry order wins over flag order) and --with-sosa; all
+      five legacy verbs are generated as delegating aliases from the same registry, so
+      they inherit the verification and the log rather than duplicating four lines each.
+      The acceptance said "asserts the post-apply OntologyTerm count and fails if it does
+      not move as expected" — implemented as PRESENCE, not delta, and that is the honest
+      reading: supplements are idempotent, so a re-run legitimately moves the total by
+      zero and a delta assertion would fail every second run. Instead declared_terms()
+      parses the :OntologyTerm IRIs each .cypher MERGEs and the run asserts every one is
+      present afterwards; the total is still reported before/after per file. The parser
+      reads code only — drydocs_core.cypher_split gained strip_comments() so a
+      commented-out MERGE (how a term is retired) is not turned into a term the graph is
+      then required to hold forever.
+      Found while doing it: the run-drydocs skill listed the chain in the WRONG ORDER
+      (catalog before seal, which breaks catalog's reuse of seal's :Attribution class +
+      #hasAgent term) — the order living in prose in four places is exactly why it is now
+      data. New tests: tests/unit/test_supplements.py (19) + 4 strip_comments cases in
+      test_cypher_split.py; suite 905 -> 928. Verified load-bearing: neutering the
+      presence check fails test_a_supplement_that_seeds_nothing_fails_the_command.
+      Runbook NOT touched — it is mid-SME-review (L5/L6 anchors); the three things it now
+      needs are parked in IDEAS for the post-review revision.
 
 summary:
-  todo: 41                                         # +11 at the 2026-07-25 groom (Epic S x9, G28, G29); G28 done 07-26, G30 split out of it
+  todo: 40                                         # +11 at the 2026-07-25 groom (Epic S x9, G28, G29); G28+G29 done 07-26, G30 split out of G28
   in_progress: 1                                   # E1 (gate deferred both sides)
   blocked: 0
-  done: 133                                        # +G28 multi-DB naming drift 2026-07-26
-  next_ready: [M3, M4, P3, J10, Q6, O23, J13, G21, G24, O26, G26, O27, C15, C16, O28, R3, R4, L16, O29, O30, O31, O32, S1, S8, S9, G29, G30]
+  done: 134                                        # +G28 multi-DB naming drift, +G29 supplement chain — both 2026-07-26
+  next_ready: [M3, M4, P3, J10, Q6, O23, J13, G21, G24, O26, G26, O27, C15, C16, O28, R3, R4, L16, O29, O30, O31, O32, S1, S8, S9, G30]
   # 2026-07-25 groom (pre-UI structure review + the 07-24/07-25 inbox): new Epic S
   # (S1-S9) from docs/reviews/architecture-structure-review-2026-07-25.md, plus G28
   # (multi-DB naming drift) and G29 (supplement-verb consolidation).

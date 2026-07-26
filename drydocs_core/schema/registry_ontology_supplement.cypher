@@ -2,8 +2,8 @@
 // registry_ontology_supplement.cypher  —  software-registry domain supplement
 //
 // Anchor terms for the third-party software registry (plan 07 / ADR 0004,
-// gate-confirmed 2026-07-07 — config/gate-log.md). Idempotent; apply after
-// the base ontology supplement:  drydocs apply-registry-supplement
+// gate-confirmed 2026-07-07 — config/gate-log.md). Idempotent; applied by
+// `drydocs apply-supplements` as chain step 4 (see supplements.py).
 //
 // Declares:  Vendor (org:Organization), SoftwareProduct (dd:SoftwareProduct),
 //            MADE_BY (prov:wasAttributedTo), USES_SOFTWARE (local edge).

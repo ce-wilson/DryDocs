@@ -64,13 +64,25 @@ Then:
 ```powershell
 poetry run drydocs check                       # verify Neo4j + APOC
 poetry run drydocs bootstrap                   # apply constraints + ontology seed
-poetry run drydocs apply-ontology-supplement   # base + ControlM anchor terms (idempotent)
-poetry run drydocs apply-catalog-supplement    # Catalog ontology (idempotent)
-poetry run drydocs apply-seal-supplement       # SEAL ontology (idempotent)
-poetry run drydocs apply-registry-supplement   # software-registry ontology (idempotent)
+poetry run drydocs apply-supplements           # base -> seal -> catalog -> registry, verified
 poetry run drydocs ingest-controlm             # full M3 chain: folders -> jobs -> conditions -> deps
 poetry run drydocs m1-verify                   # assert M1 invariants
 poetry run drydocs m3-verify                   # assert M3 invariants; all should be "yes"
+```
+
+`apply-supplements` (G29) replaces the four per-supplement verbs with one
+data-driven chain — the order lives in `drydocs_core/schema/supplements.py` and
+is load-bearing (**seal before catalog**: catalog reuses seal's `:Attribution`
+class and `#hasAgent` term; this block used to list them the wrong way round).
+After each file it asserts every `:OntologyTerm` IRI the `.cypher` declares is
+present, so a supplement that runs but seeds nothing fails here instead of
+surfacing later as a loader MATCH that quietly matches zero `:Role` nodes.
+All of it is idempotent — safe to re-run.
+
+```powershell
+poetry run drydocs apply-supplements --with-sosa        # + EXPERIMENTAL SOSA/SSN (opt-in)
+poetry run drydocs apply-supplements --only seal        # one file, same verification
+poetry run drydocs apply-ontology-supplement            # legacy verbs still work (aliases)
 ```
 
 Offline (no Neo4j):
@@ -93,9 +105,12 @@ poetry run drydocs ingest-controlm --use-oracle --folder-filter "CCB_AUTO_%"
 run metadata → handshake → the exact SQL (binds rendered for review; execution stays
 parameterized) → the CSV result — and every LOADER run writes a companion
 `load.<loader>.<stamp>.log` (header/meta → captured WARN stream + reject detail →
-summary footer). Both go to `DRYDOCS_LOGDIR` (fallback `SPIDERP_LOGDIR`, default
-`~/logs/DryDocs`, outside the repo, never committed). The console echoes
-`[sql-log]`/`[run-log]` paths. Full guide: `docs/oracle-sql-logging.md`.
+summary footer). Since G29 `apply-supplements` writes one too —
+`load.supplement.<stamp>.log`, carrying the chain, the per-file declared/verified
+term counts, and the OntologyTerm total before and after. Both go to
+`DRYDOCS_LOGDIR` (fallback `SPIDERP_LOGDIR`, default `~/logs/DryDocs`, outside the
+repo, never committed). The console echoes `[sql-log]`/`[run-log]` paths. Full
+guide: `docs/oracle-sql-logging.md`.
 
 ## Run (human path)
 

@@ -52,6 +52,20 @@ Everything since `v0.3.0` (2026-07-09). Not yet cut as a release; the version in
 
 ### Changed
 
+- **One verified `apply-supplements` verb replaces the five per-file supplement verbs
+  [G29].** The chain is now data — `drydocs_core/schema/supplements.py` holds the single
+  ordered registry (base → seal → catalog → registry, SOSA opt-in behind `--with-sosa`) —
+  so the load-bearing order (**seal before catalog**: catalog reuses seal's `:Attribution`
+  class and `#hasAgent` term) can no longer be typed wrong; the `run-drydocs` skill had in
+  fact listed it backwards. Each file is applied *and verified*: every `:OntologyTerm` IRI
+  the `.cypher` declares must be present afterwards, so a truncated or renamed supplement
+  fails at the apply instead of surfacing later as a loader MATCH quietly matching zero
+  `:Role` nodes. The run writes a `load.supplement.<stamp>.log` envelope — the first
+  supplement/bootstrap verb to write a run log at all. All five legacy verbs remain as
+  delegating aliases and inherit both the verification and the log.
+- `drydocs_core.cypher_split` gained `strip_comments()`, so the supplement IRI parser reads
+  code only — a commented-out MERGE (how a term is retired) is not mistaken for a term the
+  graph is then required to hold.
 - Main history squashed to a fresh "Initial import" root (2026-07-20); pre-squash history
   preserved locally under the `archive/old-history-2026-07-20` tag.
 - Port prompt rolled to the v2 rolling format (steps 1–42 frozen in the archive doc).

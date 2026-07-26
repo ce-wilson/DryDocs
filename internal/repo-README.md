@@ -45,11 +45,9 @@ Everything below runs against the package-bundled CSV samples — no Oracle need
 # 1. Connectivity + APOC check
 poetry run drydocs check
 
-# 2. Schema backbone (constraints + ontology), then the three domain supplements
+# 2. Schema backbone (constraints + ontology), then the whole supplement chain
 poetry run drydocs bootstrap
-poetry run drydocs apply-ontology-supplement   # Control-M anchor terms
-poetry run drydocs apply-seal-supplement       # SEAL domain terms
-poetry run drydocs apply-catalog-supplement    # Catalog/PAT terms + all Role seeds
+poetry run drydocs apply-supplements           # base → seal → catalog → registry, verified
 
 # 3. Load sample data
 poetry run drydocs refresh-reference           # catalog + SEAL + dev teams (M1 chain)
@@ -68,9 +66,19 @@ poetry run drydocs m3-verify
 ```
 
 The supplement order matters — `catalog_ontology_supplement.cypher` owns all canonical
-`:Role` seeds that the SEAL/PAT loaders MATCH at runtime. The authoritative bootstrap
-order is: `constraints` → `ontology` → `ontology_supplement` → `seal_ontology_supplement`
-→ `catalog_ontology_supplement` (the first two are applied by `bootstrap`).
+`:Role` seeds that the SEAL/PAT loaders MATCH at runtime, and it reuses the
+`:Attribution` class + `#hasAgent` term that the SEAL supplement declares. The
+authoritative bootstrap order is: `constraints` → `ontology` → `ontology_supplement` →
+`seal_ontology_supplement` → `catalog_ontology_supplement` → `registry_ontology_supplement`
+(the first two are applied by `bootstrap`).
+
+Since G29 that order is **data, not prose** — `drydocs_core/schema/supplements.py` holds
+the one ordered registry and `apply-supplements` walks it, so the chain cannot be typed
+out of order. Each file is applied and then *verified*: every `:OntologyTerm` IRI the
+`.cypher` declares must be present in the graph afterwards, or the command exits 1. A
+truncated or renamed supplement used to run "successfully" and seed nothing, surfacing
+hundreds of rows later as a loader MATCH that quietly matched zero `:Role` nodes. The run
+writes a `load.supplement.<stamp>.log` envelope to `DRYDOCS_LOGDIR`.
 
 ## CLI reference
 
@@ -80,7 +88,8 @@ for its options.
 **Bootstrap & schema**
 - `check` — verify Neo4j connectivity, server version, APOC.
 - `bootstrap` — apply `constraints.cypher` + `ontology.cypher`.
-- `apply-ontology-supplement` / `apply-seal-supplement` / `apply-catalog-supplement` — idempotent domain ontology supplements.
+- `apply-supplements` — the ordered, verified supplement chain (base → seal → catalog → registry). `--only NAME` (repeatable) scopes it; `--with-sosa` appends the experimental SOSA/SSN terms. Idempotent.
+- `apply-ontology-supplement` / `apply-seal-supplement` / `apply-catalog-supplement` / `apply-registry-supplement` / `apply-sosa-supplement` — the pre-G29 per-file verbs, kept as delegating aliases (they inherit the verification and the run log).
 - `verify` — report ontology-term counts by source label.
 - `reset --yes` — **destructive**: `DETACH DELETE` every node + relationship.
 

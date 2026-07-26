@@ -4,8 +4,8 @@ The one path the unit suite never executes: real Cypher against a real Neo4j —
 ``Neo4jClient.run`` / ``run_script`` (APOC), the loader cypher files, and the
 CLI composition root, driven exactly as an operator would:
 
-    bootstrap → apply-ontology-supplement → ingest-controlm (bundled samples)
-    → invariant assertions (the m3-verify core set) → m3-verify smoke
+    bootstrap → apply-supplements --only base → ingest-controlm (bundled
+    samples) → invariant assertions (the m3-verify core set) → m3-verify smoke
 
 Opt-in and Docker-gated:
 
@@ -87,7 +87,11 @@ def loaded_graph(neo4j_env):
     """Run the operator chain once; every test below asserts against the result."""
     _invoke(neo4j_env, "check")
     _invoke(neo4j_env, "bootstrap")                    # constraints + ontology (APOC path)
-    _invoke(neo4j_env, "apply-ontology-supplement")    # M3 anchor terms
+    # G29: the chain verb, scoped to the one supplement M3 needs. The verb also
+    # asserts every :OntologyTerm IRI the .cypher declares is present after the
+    # apply — so this step now proves the supplement LANDED against real Neo4j,
+    # not merely that its Cypher parsed.
+    _invoke(neo4j_env, "apply-supplements", "--only", "base")
     _invoke(neo4j_env, "ingest-controlm")              # bundled-sample M3 chain
     return neo4j_env
 

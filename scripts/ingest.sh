@@ -29,10 +29,8 @@ echo "[ingest] 1/5 check — verify Neo4j + APOC reachable"
 echo "[ingest] 2/5 bootstrap — constraints + ontology seed"
 "${DRYDOCS[@]}" bootstrap
 
-echo "[ingest] 3/5 ontology supplements (idempotent)"
-"${DRYDOCS[@]}" apply-ontology-supplement
-"${DRYDOCS[@]}" apply-seal-supplement
-"${DRYDOCS[@]}" apply-catalog-supplement
+echo "[ingest] 3/5 ontology supplements (ordered chain, verified, idempotent)"
+"${DRYDOCS[@]}" apply-supplements
 
 echo "[ingest] 4/5 ingest-controlm ${*:-(sample mode)}"
 "${DRYDOCS[@]}" ingest-controlm "$@"

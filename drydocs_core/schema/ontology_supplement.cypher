@@ -11,8 +11,10 @@
 //   Doc traceability + review feedback: DesignDoc, DocSection, Requirement, Component,
 //                                       TestCase, FeedbackNote (gate doc-traceability-feedback / L7)
 //
-// Domain-specific supplements (apply separately after this file; seal before
-// catalog — catalog reuses seal's Attribution class + #hasAgent term):
+// Applied by `drydocs apply-supplements` as chain step 1. The chain and its
+// order are declared once, in supplements.py beside this file — not here, and
+// not in prose. Domain-specific supplements follow (seal before catalog —
+// catalog reuses seal's Attribution class + #hasAgent term):
 //   seal_ontology_supplement.cypher     — BusinessApplication, Port, Employee,
 //                                         TOM qualified attribution + tom_roles seeds
 //   catalog_ontology_supplement.cypher  — CatalogLOB, Product, AreaProduct, DevTeam,

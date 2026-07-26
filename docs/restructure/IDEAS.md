@@ -26,6 +26,17 @@ Tags help grooming: `idea` · `bug` · `doc` · `source` (new data source) · `q
 
 <!-- add new ideas at the top -->
 
+- 2026-07-26 — [doc] **Startup-refresh runbook owes three edits, HELD until the SME review
+  closes** (found doing G29; the doc is mid-L5/L6 review — `docs/design/feedback/
+  drydocs-startup-refresh-runbook-sme.html` is in the tree — so nothing was hot-edited,
+  which would break feedback re-attachment). (1) Step 3 and Appendix B now name a verb set
+  that G29 replaced: the whole block collapses to `poetry run drydocs apply-supplements`.
+  (2) Appendix B has always been MISSING `apply-registry-supplement` while it runs
+  `load-software-registry` — a genuine Rev 3 gap, now moot if (1) lands but a real bug if
+  the per-file verbs are kept. (3) `docker start neo4j-drydocs-ee` is stale: the live
+  container has been `neo4jtest` (7474/7687) since 2026-07-23 and `neo4j-drydocs-ee` was
+  stopped as the rollback. Do all three in one revision after the review closes, then
+  re-render.
 - 2026-07-25 — [question] **BusinessApplication identity gate — DEFERRED mid-review, resume
   with a leaner decision surface.** Spec is committed and PROPOSED
   (`config/gate-prompts/business-application-identity.yaml` **v3**, backlog **S3**); nothing
@@ -175,6 +186,14 @@ Tags help grooming: `idea` · `bug` · `doc` · `source` (new data source) · `q
   exact verb set Appendix B lists, so its acceptance carries a rider to fold this check into
   the runbook update — which resolves the best-guess half without hot-editing a doc that is
   mid-SME-review. The *unlocated* half still needs the user to point at the exact spot.
+  KEPT-UPDATED 2026-07-26 (G29 done): the rider was executed and turned up a NEW, closer
+  candidate — not in the runbook at all, but in `.claude/skills/run-drydocs/SKILL.md`, whose
+  chain block annotated `apply-catalog-supplement` with `# Catalog **ontology**` (and listed
+  catalog BEFORE seal, which is the wrong order). "apply-catalog … says … ontology" is a
+  fair description of that line. Both are now fixed — the block is one `apply-supplements`
+  call and the order is enforced in code. Offered as the likely origin, NOT declared closed:
+  if the user meant somewhere else, the report is still open. The runbook itself stays
+  untouched and its three owed edits are the separate 2026-07-26 [doc] entry above.
 - 2026-07-24 — [chore] **T11 L7-ratification paste-ready snippet still owed producer-side**
   (noted while confirming PORT-REPORT-73ee97a; the company gate pack references it).
 - 2026-07-23 — [idea] **Oracle connection for the lineage/remediation path (user note,

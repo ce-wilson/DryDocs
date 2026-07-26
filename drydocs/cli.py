@@ -1,17 +1,23 @@
 """drydocs CLI — entry point for all bootstrap, supplement, and ingest commands.
 
 Bootstrap order (first run):
-  1. drydocs bootstrap                  — constraints + ontology backbone
-  2. drydocs apply-ontology-supplement  — Control-M local anchor terms
-  3. drydocs apply-seal-supplement      — SEAL domain terms
-  4. drydocs apply-catalog-supplement   — Catalog/PAT domain terms + all Role seeds
-  5. drydocs apply-registry-supplement  — software-registry terms (Vendor,
-                                          SoftwareProduct, MADE_BY, USES_SOFTWARE)
+  1. drydocs bootstrap           — constraints + ontology backbone
+  2. drydocs apply-supplements   — the whole ordered supplement chain
+                                   (base -> seal -> catalog -> registry), each
+                                   one verified against the terms its .cypher
+                                   declares. The chain is DATA:
+                                   drydocs_core.schema.supplements.SUPPLEMENTS.
 
 Optional / experimental:
-  drydocs apply-sosa-supplement — EARLY ADOPTION: SOSA/SSN observation+temporal
-                                  terms for the layer-4 context graph. NOT a
-                                  declared company standard; not in bootstrap.
+  drydocs apply-supplements --with-sosa — EARLY ADOPTION: also apply the
+                                  SOSA/SSN observation+temporal terms for the
+                                  layer-4 context graph. NOT a declared company
+                                  standard; never in the default chain.
+
+The per-supplement verbs (apply-ontology-supplement, apply-seal-supplement,
+apply-catalog-supplement, apply-registry-supplement, apply-sosa-supplement)
+still work — since G29 they are thin aliases that delegate into the same
+chain runner, so they too verify and write a run log.
 
 Ingest commands:
   drydocs refresh-reference       — catalog + SEAL weekly refresh chain
@@ -33,6 +39,7 @@ Ingest commands:
 from __future__ import annotations
 
 import logging
+import uuid
 from pathlib import Path
 
 import typer
@@ -48,6 +55,16 @@ from drydocs_core.controlm import (
     resolve_job,
 )
 from drydocs_core.models import ControlMVariableRow
+from drydocs_core.run_log import LoaderRunLog
+from drydocs_core.schema.supplements import (
+    BY_NAME as SUPPLEMENTS_BY_NAME,
+)
+from drydocs_core.schema.supplements import (
+    SUPPLEMENTS,
+    Supplement,
+    declared_terms,
+    default_chain,
+)
 
 from .staging import build_staging_bundle, collect_jobs
 from .loaders import seal_applications as seal_apps_mod
@@ -129,11 +146,9 @@ LOGGER = logging.getLogger("drydocs.cli")
 SCHEMA_DIR = Path(drydocs_core.__file__).resolve().parent / "schema"
 CONSTRAINTS_FILE        = SCHEMA_DIR / "constraints.cypher"
 ONTOLOGY_FILE           = SCHEMA_DIR / "ontology.cypher"
-ONTOLOGY_SUPPLEMENT_FILE = SCHEMA_DIR / "ontology_supplement.cypher"
-SEAL_SUPPLEMENT_FILE    = SCHEMA_DIR / "seal_ontology_supplement.cypher"
-CATALOG_SUPPLEMENT_FILE = SCHEMA_DIR / "catalog_ontology_supplement.cypher"
-SOSA_SUPPLEMENT_FILE    = SCHEMA_DIR / "sosa_experimental_supplement.cypher"
-REGISTRY_SUPPLEMENT_FILE = SCHEMA_DIR / "registry_ontology_supplement.cypher"
+# The supplement .cypher paths are NOT constants here — they live in the
+# registry (drydocs_core.schema.supplements), so the chain and its order have
+# exactly one home. G29.
 
 # Bundled CSV samples ship inside the package so dev-mode commands work
 # from any cwd — including from an installed wheel where there is no repo
@@ -519,73 +534,186 @@ def m1_verify() -> None:
         raise typer.Exit(1)
 
 
-# --- M3 commands -------------------------------------------------------------
+# --- ontology supplements (G29: one data-driven chain) ------------------------
 
-@app.command(name="apply-ontology-supplement")
-def apply_ontology_supplement() -> None:
-    """Apply the base ontology supplement (idempotent).
+_TERM_TOTAL = "MATCH (n:OntologyTerm) RETURN count(n) AS n"
+_TERMS_PRESENT = (
+    "MATCH (n:OntologyTerm) WHERE n.iri IN $iris RETURN count(DISTINCT n.iri) AS n"
+)
 
-    Adds local-namespace anchor terms (:ControlMServer, :ControlMFolder,
-    :ControlMJob) and wires them via :SUBCLASS_OF to the PROV anchors
-    seeded by ontology.cypher. Also declares Control-M LocalRelationship
-    mappings (SCHEDULED_ON, CONTAINS_JOB, REQUIRES_IN_CONDITION,
-    EMITS_OUT_CONDITION, WAS_INFORMED_BY). Safe to re-run.
+
+def _apply_supplement_chain(chain: tuple[Supplement, ...]) -> None:
+    """Apply *chain* in order, verifying each file landed; write a run log.
+
+    Verification is the point. ``execute_file`` raises on a Cypher error, but
+    a supplement that is truncated, renamed, or comment-only runs "fine" and
+    seeds nothing — which then surfaces hundreds of rows later as a loader
+    MATCH that silently matches zero canonical :Role nodes. So after each file
+    we assert that every :OntologyTerm IRI the .cypher DECLARES is present in
+    the graph, and fail the command if any is missing.
+
+    The total :OntologyTerm count is reported before and after each step. It is
+    NOT asserted to increase — supplements are idempotent, so a re-run
+    legitimately moves it by zero; the per-file presence check is what carries
+    the guarantee.
     """
-    if not ONTOLOGY_SUPPLEMENT_FILE.exists():
-        console.print(f"[red]Missing: {ONTOLOGY_SUPPLEMENT_FILE}[/]"); raise typer.Exit(1)
-    with _client() as cli:
-        cli.execute_file(ONTOLOGY_SUPPLEMENT_FILE)
-        console.print("[green]Ontology supplement applied.[/]")
+    missing_paths = [s for s in chain if not s.path.exists()]
+    if missing_paths:
+        for s in missing_paths:
+            console.print(f"[red]Missing: {s.path}[/]")
+        raise typer.Exit(1)
+
+    run_id = str(uuid.uuid4())
+    results: list[tuple[Supplement, int, int, int, list[str]]] = []
+    error: BaseException | None = None
+    run_log = LoaderRunLog(
+        "supplement",
+        run_id,
+        source="drydocs_core/schema (" + ", ".join(s.filename for s in chain) + ")",
+        target="",
+        meta={"chain": " -> ".join(s.name for s in chain)},
+    )
+    try:
+        with _client() as cli:
+            run_log.target = f"{cli.connection_info()['uri']} db={cli.connection_info()['database']}"
+            try:
+                run_log.open()
+                run_log.attach()
+                LOGGER.info("[run-log] %s", run_log.path)
+            except OSError as exc:  # audit trail is never why an apply fails
+                LOGGER.warning("supplement run log unavailable (%s) — continuing", exc)
+
+            for supplement in chain:
+                before = cli.run(_TERM_TOTAL)[0]["n"]
+                cli.execute_file(supplement.path)
+                iris = sorted(declared_terms(supplement.path))
+                present = cli.run(_TERMS_PRESENT, {"iris": iris})[0]["n"]
+                after = cli.run(_TERM_TOTAL)[0]["n"]
+                absent = []
+                if present != len(iris):
+                    found = {
+                        r["iri"]
+                        for r in cli.run(
+                            "MATCH (n:OntologyTerm) WHERE n.iri IN $iris RETURN n.iri AS iri",
+                            {"iris": iris},
+                        )
+                    }
+                    absent = [i for i in iris if i not in found]
+                    LOGGER.error(
+                        "supplement %s: %d of %d declared terms absent after apply",
+                        supplement.name, len(absent), len(iris),
+                    )
+                results.append((supplement, before, after, len(iris), absent))
+    except BaseException as exc:
+        error = exc
+        raise
+    finally:
+        run_log.close(
+            {
+                "chain": " -> ".join(s.name for s in chain),
+                "supplements applied": len(results),
+                "terms verified": sum(r[3] for r in results),
+                "terms missing": sum(len(r[4]) for r in results),
+                "status": "FAILED" if (error or any(r[4] for r in results)) else "OK",
+                **{
+                    f"{s.name}: terms/total": f"{declared}/{after} (was {before})"
+                    for s, before, after, declared, _ in results
+                },
+            },
+            error=error,
+        )
+
+    t = Table(title="apply-supplements")
+    t.add_column("Supplement"); t.add_column("Declared terms", justify="right")
+    t.add_column("Verified", justify="right")
+    t.add_column("OntologyTerm total", justify="right"); t.add_column("OK", justify="center")
+    failed = 0
+    for supplement, before, after, declared, absent in results:
+        t.add_row(
+            supplement.name,
+            str(declared),
+            str(declared - len(absent)),
+            f"{before} -> {after}",
+            "yes" if not absent else "NO",
+        )
+        failed += bool(absent)
+    console.print(t)
+    if failed:
+        for supplement, _, _, _, absent in results:
+            for iri in absent[:10]:
+                console.print(f"[red]{supplement.name}: term not in graph after apply — {iri}[/]")
+            if len(absent) > 10:
+                console.print(f"[red]{supplement.name}: … and {len(absent) - 10} more[/]")
+        console.print(f"[red]{failed} supplement(s) did not land.[/]")
+        raise typer.Exit(1)
+    console.print(f"[green]{len(results)} supplement(s) applied and verified.[/]")
 
 
-@app.command(name="apply-seal-supplement")
-def apply_seal_supplement() -> None:
-    """Apply the SEAL ontology supplement (idempotent).
+@app.command(name="apply-supplements")
+def apply_supplements(
+    only: list[str] = typer.Option(
+        [],
+        "--only",
+        help=(
+            "Apply just these supplements (repeatable), in the registry's order: "
+            + ", ".join(s.name for s in SUPPLEMENTS)
+        ),
+    ),
+    with_sosa: bool = typer.Option(
+        False,
+        "--with-sosa",
+        help="Also apply the EXPERIMENTAL SOSA/SSN supplement (opt-in, not a company standard).",
+    ),
+) -> None:
+    """Apply the ontology supplement chain in order, verified (idempotent).
 
-    Declares :BusinessApplication, :Port, :Membership, :Role, :Employee,
-    :Attribution, :TOMRole node types and their LocalRelationship mappings
-    (HAS_PORT, QUALIFIED_ATTRIBUTION, HAS_AGENT, HAD_ROLE; the deprecated
-    HAS_MEMBERSHIP/OF_ROLE/HELD_BY blocks remain for audit — K4, gate
-    2026-07-10 §C), plus the tom_roles concept scheme. Safe to re-run.
+    Default chain: base -> seal -> catalog -> registry. The order is
+    load-bearing — catalog reuses the :Attribution class and #hasAgent term
+    that seal declares — and it lives in ONE place,
+    ``drydocs_core.schema.supplements.SUPPLEMENTS``.
+
+    Each file is applied, then every :OntologyTerm IRI it declares is checked
+    for presence in the graph; a supplement that runs but seeds nothing fails
+    the command instead of surfacing later as an empty loader MATCH. The run
+    writes a ``load.supplement.<stamp>.log`` envelope to DRYDOCS_LOGDIR.
+
+    Safe to re-run: every supplement is idempotent.
     """
-    if not SEAL_SUPPLEMENT_FILE.exists():
-        console.print(f"[red]Missing: {SEAL_SUPPLEMENT_FILE}[/]"); raise typer.Exit(1)
-    with _client() as cli:
-        cli.execute_file(SEAL_SUPPLEMENT_FILE)
-        console.print("[green]SEAL ontology supplement applied.[/]")
+    if only:
+        unknown = [n for n in only if n not in SUPPLEMENTS_BY_NAME]
+        if unknown:
+            console.print(
+                f"[red]Unknown supplement(s): {', '.join(unknown)}. "
+                f"Known: {', '.join(s.name for s in SUPPLEMENTS)}[/]"
+            )
+            raise typer.Exit(2)
+        # Registry order wins over the order the flags were typed in — the
+        # chain's dependencies are why the order exists.
+        chain = tuple(s for s in SUPPLEMENTS if s.name in set(only))
+    else:
+        chain = default_chain()
+        if with_sosa:
+            chain = (*chain, SUPPLEMENTS_BY_NAME["sosa"])
+    _apply_supplement_chain(chain)
 
 
-@app.command(name="apply-catalog-supplement")
-def apply_catalog_supplement() -> None:
-    """Apply the Catalog ontology supplement (idempotent).
+def _alias(name: str) -> None:
+    """Register the pre-G29 per-supplement verb as a delegating alias."""
+    supplement = SUPPLEMENTS_BY_NAME[name]
 
-    Declares :CatalogLOB, :BusinessSegment, :ProductLine, :Product,
-    :DevTeam, :JiraBoard, :AreaProduct node types, PAT relationship
-    mappings (HAS_APPLICATION, HAS_AREA_PRODUCT, SUPPORTS), the K6 Product
-    Cabinet terms + product_roles scheme, and seeds all 31 canonical Role
-    nodes (SEAL + PAT + D&A + CCB Ops).  Safe to re-run.
-    """
-    if not CATALOG_SUPPLEMENT_FILE.exists():
-        console.print(f"[red]Missing: {CATALOG_SUPPLEMENT_FILE}[/]"); raise typer.Exit(1)
-    with _client() as cli:
-        cli.execute_file(CATALOG_SUPPLEMENT_FILE)
-        console.print("[green]Catalog ontology supplement applied.[/]")
+    def _run() -> None:
+        _apply_supplement_chain((supplement,))
+
+    _run.__doc__ = (
+        f"{supplement.summary} (idempotent).\n\n"
+        f"    Alias for `drydocs apply-supplements --only {name}` — the chain "
+        f"    and its order live in drydocs_core.schema.supplements (G29)."
+    )
+    app.command(name=supplement.legacy_verb)(_run)
 
 
-@app.command(name="apply-registry-supplement")
-def apply_registry_supplement() -> None:
-    """Apply the software-registry ontology supplement (idempotent).
-
-    Declares :Vendor (org:Organization) and :SoftwareProduct
-    (dd:SoftwareProduct) node types plus the MADE_BY (prov:wasAttributedTo)
-    and USES_SOFTWARE (local) relationship mappings — plan 07 / ADR 0004,
-    gate-confirmed 2026-07-07. Safe to re-run.
-    """
-    if not REGISTRY_SUPPLEMENT_FILE.exists():
-        console.print(f"[red]Missing: {REGISTRY_SUPPLEMENT_FILE}[/]"); raise typer.Exit(1)
-    with _client() as cli:
-        cli.execute_file(REGISTRY_SUPPLEMENT_FILE)
-        console.print("[green]Registry ontology supplement applied.[/]")
+for _name in SUPPLEMENTS_BY_NAME:
+    _alias(_name)
 
 
 @app.command(name="load-software-registry")
@@ -832,28 +960,6 @@ def load_manual_mappings(
     with _client() as cli:
         summary = ManualSealAttributionLoader(cli, ManualMappingAdapter(rows)).load()
     console.print(summary.as_dict())
-
-
-@app.command(name="apply-sosa-supplement")
-def apply_sosa_supplement() -> None:
-    """Apply the EXPERIMENTAL SOSA/SSN supplement (opt-in; idempotent).
-
-    Seeds the observation/temporal vocabulary for the layer-4 context graph:
-    sosa:Observation / Sensor / FeatureOfInterest / ObservableProperty / Result
-    terms, the :CAN_ACT_AS role wiring (ControlMJob/ControlMFolder ALSO act as
-    sosa:FeatureOfInterest), and candidate LocalRelationships (OBSERVES,
-    HAS_RESULT, MADE_BY_SENSOR, OF_OBSERVABLE_PROPERTY) mapping to sosa:* props.
-
-    EARLY ADOPTION: SOSA/SSN is a W3C standard but NOT a declared *company*
-    standard. This is intentionally NOT part of `drydocs bootstrap` — every
-    term is tagged adoption:"experimental". No instance data is loaded (that is
-    the gated context-graph pilot). Safe to re-run.
-    """
-    if not SOSA_SUPPLEMENT_FILE.exists():
-        console.print(f"[red]Missing: {SOSA_SUPPLEMENT_FILE}[/]"); raise typer.Exit(1)
-    with _client() as cli:
-        cli.execute_file(SOSA_SUPPLEMENT_FILE)
-        console.print("[yellow]Experimental SOSA/SSN supplement applied (early adoption).[/]")
 
 
 @app.command(name="ingest-controlm")

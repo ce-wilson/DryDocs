@@ -13,6 +13,7 @@ from drydocs_core.cypher_split import (
     code_semicolons,
     has_code,
     split_statements,
+    strip_comments,
 )
 from drydocs_core.neo4j_client import Neo4jClient
 
@@ -70,7 +71,7 @@ class _FakeSession:
     def __init__(self, log: list) -> None:
         self._log = log
 
-    def __enter__(self) -> "_FakeSession":
+    def __enter__(self) -> _FakeSession:
         return self
 
     def __exit__(self, *_: object) -> bool:
@@ -102,3 +103,33 @@ def test_run_script_sends_each_statement_once_with_params():
     assert sum("MERGE (n:Thing" in s for s in sent) == 1
     assert all(params == {"x": 1} for _, params in log)
     assert all(has_code(s) for s in sent)
+
+
+# ---- strip_comments (added G29 — the supplement IRI parser reads code only) ---
+
+def test_strip_comments_removes_line_and_block_comments():
+    src = (
+        "// a leading note\n"
+        "MERGE (n:Thing {id: 1})  // trailing note\n"
+        "/* a block\n   over two lines */\n"
+        "SET n.ok = true;\n"
+    )
+    out = strip_comments(src)
+    assert "note" not in out and "block" not in out
+    assert "MERGE (n:Thing {id: 1})" in out
+    assert "SET n.ok = true;" in out
+
+
+def test_strip_comments_keeps_string_literals_verbatim():
+    # '//' inside an IRI is data; a '/*' inside a string must not open a comment.
+    src = 'MERGE (n {iri: "http://www.w3.org/ns/prov#Entity", note: "a /* b"});'
+    assert strip_comments(src) == src
+
+
+def test_strip_comments_handles_escaped_quotes():
+    src = r'MERGE (n {label: "say \" then // not a comment"});'
+    assert strip_comments(src) == src
+
+
+def test_strip_comments_leaves_a_comment_only_script_empty_of_code():
+    assert not has_code(strip_comments("// only a comment\n/* and a block */\n"))
