@@ -13,7 +13,14 @@
 // Ground truth — structured KG (main load + drydocs-lineage). Trust: VERBATIM/GROUNDED.
 CREATE DATABASE drydocs IF NOT EXISTS;
 
-// Cross-platform lineage (drydocs-lineage). Trust: VERBATIM/GROUNDED.
+// PROVISIONED FOR LATER — nothing writes here today (backlog G30 ruling, 2026-07-26).
+// Created at G1 as a home for cross-platform lineage, but ADR 0002 D1/D2 (accepted,
+// never amended) puts drydocs-lineage's curated writes in `drydocs`, and 0002-C §5
+// asserts that structurally. The blocking fact: the curated writer MATCHes
+// :ControlMJob nodes the M3 load owns in `drydocs` and deliberately never MERGEs them
+// — a transaction cannot span databases, so writing lineage here would silently drop
+// every job-endpoint edge. Kept provisioned + composite-aliased so the choice stays
+// cheap: it is empty, so moving lineage here later costs a design, not a migration.
 CREATE DATABASE ddlineage IF NOT EXISTS;
 
 // Isolated uncertain context (drydocs-deepdoc, on-demand). Trust: SYNTHESIZED/unverified.

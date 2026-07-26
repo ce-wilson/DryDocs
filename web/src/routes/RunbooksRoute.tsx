@@ -16,7 +16,7 @@ import {
 
 // /runbooks (O17): the shared template — graph pane = the data-series
 // provisioning chain (FileWatcher -> RAW -> ING -> LD). Series binds
-// runbooks.series.v1 (ddlineage; zero rows honest pre-gate); Metadata
+// runbooks.series.v1 (drydocs since the G30 ruling; zero rows honest pre-gate); Metadata
 // completeness binds runbooks.metadata-completeness.v1 (drydocs — live where
 // jobs are loaded); Generated runbooks lists the repo's real runbook
 // artifacts (file artifacts, not graph rows — no spec by design).

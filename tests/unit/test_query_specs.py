@@ -84,10 +84,13 @@ def test_mappings_coverage_spec_registered():
 
 
 def test_lineage_frames_have_specs():
-    """O10: the Lineage tabs bind to ddlineage specs (empty until the lineage
-    live-load gate flips the m3_* entries — zero rows is the honest state)."""
+    """O10: the Lineage tabs bind to specs on `drydocs` — where the curated
+    lineage writer lands (G30 ruling 2026-07-26; ADR 0002 "Residency
+    clarification"). They were pointed at `ddlineage`, which is provisioned but
+    written by nothing. They still return zero rows until the lineage live-load
+    gate flips the m3_* entries — that gate, not the database, is why."""
     for spec_id in ("lineage.hops.v1", "lineage.data-assets.v1", "lineage.schema-definition.v1"):
-        assert query_spec(spec_id).database == "ddlineage"
+        assert query_spec(spec_id).database == "drydocs"
 
 
 def test_explorer_frames_have_specs():

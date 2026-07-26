@@ -718,6 +718,11 @@ Tags help grooming: `idea` · `bug` · `doc` · `source` (new data source) · `q
     the wrong name. Also unanswered: `ddlineage` is provisioned and read by four query specs,
     but `drydocs_lineage/writer.py` pins `DATABASE = "drydocs"`, so those specs read an empty
     database. Not a trust-boundary hole — the writer refuses on an allowlist.
+    RESOLVED 2026-07-26: that second half was split out of G28 as **G30** (a data-residency
+    decision, not a naming fix — bundling them was a grooming error) and is now DONE. Ruled
+    for ADR 0002 D1/D2: curated lineage lands in `drydocs`; the four specs repoint there and
+    `ddlineage` is documented as provisioned-for-later. Ruling written up as ADR 0002's
+    "Residency clarification", with the named trigger to revisit through the gate.
   - **G29** — [idea] supplement consolidation shape A (2026-07-24, designed + user-reviewed)
     → the single `apply-supplements` verb with legacy verbs as delegating aliases, all four
     agreed riders in the acceptance. Its sibling **shape C** re-inboxed slim above: it changes

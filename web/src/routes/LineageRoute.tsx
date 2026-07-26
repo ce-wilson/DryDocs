@@ -17,7 +17,8 @@ import {
 } from '../lineage/demoLineage'
 
 // /lineage (O10): the shared module template instantiated with the React Flow
-// source→target DAG and the three ddlineage QuerySpec frames. Deep links
+// source→target DAG and the three lineage QuerySpec frames (on `drydocs`,
+// where the curated writer lands — G30 ruling 2026-07-26). Deep links
 // resolve at /lineage/asset/:assetId (the demo asset ids; live assetIds once
 // the gate flips and curated rows exist). Selection links graph ↔ frames as
 // in Explorer (one lifted selection store).
@@ -65,7 +66,7 @@ export default function LineageRoute({ persona }: { persona: Persona }) {
         ),
         /* 'Row-level preview' stays the template's honest empty state — its
            QuerySpec is deliberately unbuilt (data preview needs the source
-           platforms, not ddlineage). */
+           platforms, not the lineage graph). */
       }}
     />
   )
@@ -86,7 +87,7 @@ function LineageDemoFrame({
   return (
     <div className="flex h-full min-h-0 flex-col gap-1.5">
       <p className="shrink-0 rounded border border-yellow/50 bg-yellow/10 px-2 py-1 font-mono text-[10px] text-yellow">
-        SYNTHESIZED · ILLUSTRATIVE — ddlineage carries no curated rows until the lineage live-load gate flips m3_*
+        SYNTHESIZED · ILLUSTRATIVE — no curated rows exist until the lineage live-load gate flips m3_*
       </p>
       <div className="min-h-0 flex-1 overflow-auto rounded-md border border-edge">
         <table className="w-full border-collapse text-left text-xs">

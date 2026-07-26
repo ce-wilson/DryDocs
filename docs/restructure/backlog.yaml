@@ -5967,7 +5967,7 @@ items:
     agent: main
     model: sonnet
     priority: p2
-    status: todo
+    status: done
     depends_on: []
     inputs: [drydocs_lineage/writer.py, drydocs_api/query_specs.py, drydocs_core/schema/provisioning/01_databases.cypher, docs/decisions/0002-component-database-topology.md, docs/decisions/0002-c-depgraph-lineage-rehome.md]
     acceptance: >
@@ -5991,6 +5991,34 @@ items:
       is status: planned, so write_curated refuses a live load until the HITL gate flips
       it), so nothing is silently producing wrong answers today; it would bite on the
       first live curated write. Ties to the lineage live-load gate parked in IDEAS.
+      DONE 2026-07-26 — RULED (b): the four specs repoint to `drydocs`; ddlineage stays
+      provisioned + composite-aliased but documented as provisioned-for-later. The ruling
+      is written up in ADR 0002 as a "Residency clarification" — NOT an amendment, because
+      D1/D2 already say drydocs-lineage writes ground truth to `drydocs` and were never
+      amended when G1 provisioning added a fourth database two days later. Each half of
+      the codebase had followed a different source and both cited one, which is why
+      neither looked wrong alone. Three grounds: (1) the stated reason for the DB boundary
+      is the TRUST axis, and curated lineage is VERBATIM/GROUNDED — the same tier as the
+      main load, so splitting it serves nothing; (2) 0002-C §5 already carries a ticked,
+      tested "writes ground truth only" gate; (3) decisive — write_curated MATCHes
+      :ControlMJob nodes the M3 load owns in `drydocs` and deliberately never MERGEs them
+      (a lineage-created stub would break m3-verify's "every job has a folder"). A
+      transaction cannot span databases, so from ddlineage those MATCHes would match
+      nothing and every job-endpoint edge would vanish SILENTLY — an unmatched MATCH
+      yields zero rows, not an error. Option (a) is therefore a design (a :ControlMJob
+      proxy spine in ddlineage), not a constant flip. Deferring is also the cheap
+      direction: ddlineage is empty, so choosing it later costs a design, not a migration.
+      Named trigger to revisit, as an ADR amendment through the gate: the docmeta gate
+      (ADR 0006 §b) adopted `dddocs` on the same component-per-database pattern and
+      re-targets the bmc-docs corpus out of `drydocs` — if that proves out and lineage
+      grows its own proxy spine, reopen. Guard: two tests in test_database_names.py —
+      no query spec may read a database nothing writes (SPEC_DATABASES also dropped
+      ddlineage, so pointing a spec there is now a deliberate edit), and the writer's
+      target must equal the four specs' target. Verified load-bearing: restoring one spec
+      to ddlineage fails 3 tests. Also corrected the user-visible UI copy that named
+      ddlineage (module registry `backsOnto`, the Lineage SYNTHESIZED banner, route
+      comments) — the honest reason those frames are empty is the vocabulary gate, not
+      the database. Suite 928 -> 930.
 
   - id: G29
     epic: component-topology
@@ -6048,11 +6076,11 @@ items:
       needs are parked in IDEAS for the post-review revision.
 
 summary:
-  todo: 40                                         # +11 at the 2026-07-25 groom (Epic S x9, G28, G29); G28+G29 done 07-26, G30 split out of G28
+  todo: 39                                         # +11 at the 2026-07-25 groom (Epic S x9, G28, G29); G28+G29+G30 all done 07-26 (G30 was split out of G28)
   in_progress: 1                                   # E1 (gate deferred both sides)
   blocked: 0
-  done: 134                                        # +G28 multi-DB naming drift, +G29 supplement chain — both 2026-07-26
-  next_ready: [M3, M4, P3, J10, Q6, O23, J13, G21, G24, O26, G26, O27, C15, C16, O28, R3, R4, L16, O29, O30, O31, O32, S1, S8, S9, G30]
+  done: 135                                        # +G28 multi-DB naming drift, +G29 supplement chain, +G30 lineage residency — all 2026-07-26
+  next_ready: [M3, M4, P3, J10, Q6, O23, J13, G21, G24, O26, G26, O27, C15, C16, O28, R3, R4, L16, O29, O30, O31, O32, S1, S8, S9]
   # 2026-07-25 groom (pre-UI structure review + the 07-24/07-25 inbox): new Epic S
   # (S1-S9) from docs/reviews/architecture-structure-review-2026-07-25.md, plus G28
   # (multi-DB naming drift) and G29 (supplement-verb consolidation).

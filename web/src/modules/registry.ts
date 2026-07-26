@@ -52,7 +52,9 @@ export const MODULES: readonly ModuleDef[] = [
     label: 'Lineage',
     path: '/lineage',
     tagline: 'Source → target DAG',
-    backsOnto: 'ddlineage',
+    // G30 ruling 2026-07-26: curated lineage lands in `drydocs` (ADR 0002 D1/D2).
+    // Was 'ddlineage' — provisioned, but written by nothing.
+    backsOnto: 'drydocs',
     tabs: ['Hops', 'Data assets', 'Schema definition', 'Row-level preview'],
     phase: 1,
   },

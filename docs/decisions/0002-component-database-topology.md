@@ -169,6 +169,52 @@ repeatedly**, not production. `drydocs_context` **can be written now** precisely
   don't write ground truth into a DB you are still destroying. Capture context freely now; gate
   promotion later.
 
+## Residency clarification (2026-07-26, backlog G30) — where curated lineage lands
+
+**Not an amendment. D1 and D2 stand as written: `drydocs-lineage` writes curated ground
+truth to `drydocs`.** Recorded because the codebase had drifted into believing both answers
+at once, and the drift was invisible while the lineage writer stayed gate-bound.
+
+**What drifted.** G1 provisioning (2026-06-28, two days after this ADR was accepted) created
+a *fourth* database, `ddlineage`, commented "cross-platform lineage (drydocs-lineage)" — a
+name D1's three-row table never contemplated. The ADR was never amended to match. Each half
+of the codebase then followed a different source: `drydocs_lineage/writer.py` followed the
+ADR (`DATABASE = "drydocs"`, enforced by `TrustBoundaryError`), while four `drydocs_api`
+query specs followed provisioning (`database="ddlineage"`). Those four specs read a database
+nothing writes. Nothing produced wrong answers — the writer is gate-bound until the four
+`m3_*` vocabulary ids flip `active`, and the specs honestly return zero rows — so it would
+first have bitten on the first live curated write.
+
+**Why D1/D2 win, rather than the ADR being amended to match provisioning:**
+
+1. **The reason the boundary exists is the trust axis** — "the trust axis IS the DB
+   boundary." Curated lineage is VERBATIM/GROUNDED, the same tier as the main load.
+   Separating it serves no part of the rationale that justified paying for multi-DB.
+2. **0002-C §5 already asserts it, ticked and tested** — *"Writes ground truth only:
+   `drydocs-lineage` opens write transactions only against `drydocs` — the D2 trust
+   boundary, asserted structurally."*
+3. **It is not a constant flip.** `write_curated` **MATCHes** `:ControlMJob {folder_id,
+   job_id}` and deliberately never MERGEs them — the M3 load owns those nodes, and a
+   lineage-created job stub would violate the `m3-verify` "every job has a folder"
+   invariant. A Neo4j transaction cannot span databases, so from `ddlineage` those MATCHes
+   would match nothing and **every job-endpoint edge would vanish silently** (an unmatched
+   MATCH yields zero rows, not an error). Moving lineage would first require a
+   `:ControlMJob` proxy-node spine in `ddlineage` and a redefinition of what "the M3 load
+   owns them" means. That is a design, not a rename.
+
+**What changes:** the four specs (`lineage.hops.v1`, `lineage.data-assets.v1`,
+`lineage.schema-definition.v1`, `runbooks.series.v1`) repoint to `drydocs`. `ddlineage`
+stays provisioned and aliased into `ddall`, documented as provisioned-for-later.
+`tests/unit/test_database_names.py` now asserts read targets and write targets agree, so a
+spec can never again read a database nothing writes.
+
+**Named trigger to revisit** (as an amendment, through the SME gate — not by drift): the
+docmeta gate (2026-07-18, ADR 0006 §b) adopted a `dddocs` component database on the G1
+pattern and *re-targets* the bmc-docs corpus out of `drydocs`. If component-per-database
+proves out there, and lineage grows a proxy-node spine of its own, reopen this. Deferring
+is the cheap direction: `ddlineage` is empty, so choosing it later costs a design, not a
+data migration.
+
 ## Follow-up (small, bounded)
 
 1. **Provision now:** `drydocs_context` (writable) and the `drydocs_all` composite with constraints/

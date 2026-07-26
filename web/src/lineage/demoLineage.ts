@@ -1,6 +1,6 @@
 // SYNTHESIZED lineage demo — the O9/O11 fallback idiom: a source→target DAG
 // shown with a visible ILLUSTRATIVE badge until the lineage live-load gate
-// flips the m3_* vocabulary and ddlineage carries curated rows. The shape is
+// flips the m3_* vocabulary and curated rows exist. The shape is
 // the mechanism-only data-series chain (file watcher → landing pair → zone
 // hops → provisioned target); every name is synthetic (publish boundary).
 

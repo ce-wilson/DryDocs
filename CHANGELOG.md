@@ -66,6 +66,17 @@ Everything since `v0.3.0` (2026-07-09). Not yet cut as a release; the version in
 - `drydocs_core.cypher_split` gained `strip_comments()`, so the supplement IRI parser reads
   code only — a commented-out MERGE (how a term is retired) is not mistaken for a term the
   graph is then required to hold.
+- **Curated lineage residency ruled: it lands in `drydocs` [G30].** Four `drydocs_api` query
+  specs read `ddlineage` while `drydocs_lineage.writer` pinned `drydocs` and refused anything
+  else — the specs had followed G1 provisioning, the writer had followed ADR 0002 D1/D2, and
+  the ADR was never amended when G1 added a fourth database two days after it was accepted.
+  Ruled for the ADR (written up as its "Residency clarification"; not an amendment): the
+  curated writer MATCHes `:ControlMJob` nodes the M3 load owns in `drydocs` and deliberately
+  never MERGEs them, and a transaction cannot span databases — so writing lineage into
+  `ddlineage` would silently drop every job-endpoint edge. The specs repoint to `drydocs`;
+  `ddlineage` stays provisioned and composite-aliased, documented as provisioned-for-later,
+  with a named trigger to revisit through the gate. `tests/unit/test_database_names.py` now
+  asserts no spec reads a database nothing writes.
 - Main history squashed to a fresh "Initial import" root (2026-07-20); pre-squash history
   preserved locally under the `archive/old-history-2026-07-20` tag.
 - Port prompt rolled to the v2 rolling format (steps 1–42 frozen in the archive doc).

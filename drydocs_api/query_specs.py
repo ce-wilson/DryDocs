@@ -24,7 +24,12 @@ from dataclasses import dataclass, field
 from drydocs_api.guard import ensure_read_only
 from drydocs_api.queries import ParamSpec
 
-SPEC_DATABASES: frozenset[str] = frozenset({"drydocs", "ddlineage", "ddcontext", "ddall"})
+# Databases a spec may read. Deliberately NOT the whole provisioned topology:
+# `ddlineage` is provisioned but written by nothing (G30 ruling 2026-07-26 — curated
+# lineage lands in `drydocs` per ADR 0002 D1/D2), so a spec pointed there would read
+# an empty database forever. Leaving it out makes that a deliberate edit rather than
+# a typo; `tests/unit/test_database_names.py` proves the read set has a writer.
+SPEC_DATABASES: frozenset[str] = frozenset({"drydocs", "ddcontext", "ddall"})
 # Databases whose content is synthesized/uncertain — results carry the
 # SYNTHESIZED watermark in the manifest AND as a grid-visible column.
 WATERMARKED_DATABASES: frozenset[str] = frozenset({"ddcontext", "ddall"})
@@ -414,7 +419,9 @@ QUERY_SPECS: dict[str, QuerySpec] = {
         # O17 runbooks frames.
         QuerySpec(
             id="runbooks.series.v1",
-            database="ddlineage",
+            # G30 ruling (2026-07-26): curated lineage lands in `drydocs`, per ADR
+            # 0002 D1/D2. Was `ddlineage` — a database nothing writes.
+            database="drydocs",
             description=(
                 "Data-series chains: FileWatcher-triggered ETL processes and the "
                 "assets they land (curated post-gate; zero rows is the honest state "
@@ -532,12 +539,16 @@ QUERY_SPECS: dict[str, QuerySpec] = {
             classification="internal",
             params=_LIMIT,
         ),
-        # O10 lineage frames — ddlineage is REAL but empty until the lineage
-        # live-load gate flips the four m3_* entries; these specs return zero
-        # rows until then and the UI shows its SYNTHESIZED demo honestly.
+        # O10 lineage frames — target `drydocs`, where the curated writer lands
+        # (G30 ruling 2026-07-26; ADR 0002 "Residency clarification"). They were
+        # pointed at `ddlineage`, which is provisioned but written by nothing, so
+        # they read an empty database for the wrong reason. They still return zero
+        # rows until the lineage live-load gate flips the four m3_* vocabulary
+        # entries — that gate, not the database, is what keeps them empty, and the
+        # UI shows its SYNTHESIZED demo honestly meanwhile.
         QuerySpec(
             id="lineage.hops.v1",
-            database="ddlineage",
+            database="drydocs",
             description=(
                 "Source-to-target hops: every READS_FROM / WRITES_TO edge the Fork-3 "
                 "writer landed (curated post-gate), with the activity endpoint "
@@ -562,7 +573,7 @@ QUERY_SPECS: dict[str, QuerySpec] = {
         ),
         QuerySpec(
             id="lineage.data-assets.v1",
-            database="ddlineage",
+            database="drydocs",   # G30: was ddlineage — see the block comment above
             description=(
                 "DataAsset inventory with writer/reader degree — which activities "
                 "produce and consume each asset."
@@ -586,7 +597,7 @@ QUERY_SPECS: dict[str, QuerySpec] = {
         ),
         QuerySpec(
             id="lineage.schema-definition.v1",
-            database="ddlineage",
+            database="drydocs",   # G30: was ddlineage — see the block comment above
             description=(
                 "Definition-level schema of each DataAsset node: identity, kind, and "
                 "the property set present. Column-level schema arrives with the DPL "

@@ -8,6 +8,13 @@ only — **no data load** here.
 | File | Run against | Purpose |
 |---|---|---|
 | `01_databases.cypher` | `system` | `CREATE DATABASE drydocs`, `ddlineage`, `ddcontext`, `CREATE COMPOSITE DATABASE ddall` + aliases |
+
+> **`ddlineage` is provisioned but not live** (G30 ruling, 2026-07-26 — see ADR 0002
+> "Residency clarification"). Curated lineage writes land in `drydocs` per ADR 0002 D1/D2;
+> nothing writes `ddlineage` today and no query spec reads it. It stays created and
+> composite-aliased so the decision stays cheap to revisit — it is empty, so moving
+> lineage into it later is a design change, not a data migration.
+
 | `02_proxy_constraints.cypher` | **each** of `drydocs`, `ddlineage`, `ddcontext` | proxy-node business keys: `DataAsset.assetId` UNIQUE, `ControlMJob (folder_id, job_id)` NODE KEY |
 | `smoke_drydocs_all.cypher` | `ddall` | read-only federated query — reads all three constituents, writes none |
 | `provision.ps1` | — | runner: applies 01 → 02 (×3) → smoke via `cypher-shell` |

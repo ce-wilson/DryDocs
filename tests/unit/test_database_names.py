@@ -124,6 +124,85 @@ def test_no_source_file_names_a_superseded_database() -> None:
     )
 
 
+def test_read_targets_and_write_targets_agree() -> None:
+    """No query spec may read a database that nothing writes (backlog G30).
+
+    The drift this closes: four ``drydocs_api`` specs declared
+    ``database="ddlineage"`` while ``drydocs_lineage.writer`` pinned ``"drydocs"``
+    and refused anything else. Both sides were internally consistent and cited a
+    source — the specs followed G1 provisioning, the writer followed ADR 0002
+    D1/D2 — so neither looked wrong on its own. It stayed invisible because the
+    writer is gate-bound, so the specs returned zero rows for a *plausible*
+    reason. G30 ruled for ADR 0002 (see its "Residency clarification"); this test
+    is what makes the two halves impossible to separate again.
+
+    ``ddlineage`` remains provisioned and composite-aliased on purpose — it is the
+    cheap option to revisit, being empty — so "provisioned" is deliberately NOT
+    the test. Having a writer is.
+    """
+    from drydocs_api.query_specs import QUERY_SPECS, SPEC_DATABASES
+
+    written = _write_targets()
+    # The composite stores no data of its own; it federates constituents that DO
+    # have writers, so it is a legitimate read target with no writer.
+    composite = {"ddall"}
+
+    unwritten = SPEC_DATABASES - written - composite
+    assert not unwritten, (
+        f"SPEC_DATABASES allows {sorted(unwritten)}, which no module writes — a spec "
+        f"pointed there reads an empty database forever. Written: {sorted(written)}"
+    )
+
+    offenders = [
+        f"{s.id}: reads {s.database!r}, which nothing writes"
+        for s in QUERY_SPECS.values()
+        if s.database not in written | composite
+    ]
+    assert not offenders, "query spec reads a database nothing writes:\n" + "\n".join(offenders)
+
+
+def _write_targets() -> set[str]:
+    """Every database some module declares itself the writer of.
+
+    ``drydocs`` is included unconditionally: it is the main load's target, and the
+    load reads it from configuration (``NEO4J_DATABASE``) rather than a module
+    constant, so the AST scan below cannot see it.
+    """
+    targets = {"drydocs"}
+    for path in _python_files():
+        tree = ast.parse(path.read_text(encoding="utf-8"), filename=str(path))
+        for node in tree.body:
+            if not isinstance(node, ast.Assign):
+                continue
+            if not any(isinstance(t, ast.Name) and t.id == "DATABASE" for t in node.targets):
+                continue
+            if isinstance(node.value, ast.Constant) and isinstance(node.value.value, str):
+                targets.add(node.value.value)
+    return targets
+
+
+def test_the_lineage_writer_still_targets_the_ruled_database() -> None:
+    """G30's ruling, pinned at the writer end as well as the reader end.
+
+    Flipping this constant is a legitimate future decision — the ADR names the
+    trigger — but it is an ADR amendment through the SME gate, not an edit. If it
+    moves, the specs and this test move with it, together.
+    """
+    from drydocs_api.query_specs import query_spec
+    from drydocs_lineage.writer import DATABASE as LINEAGE_DATABASE
+
+    assert LINEAGE_DATABASE == "drydocs"
+    for spec_id in (
+        "lineage.hops.v1",
+        "lineage.data-assets.v1",
+        "lineage.schema-definition.v1",
+        "runbooks.series.v1",
+    ):
+        assert query_spec(spec_id).database == LINEAGE_DATABASE, (
+            f"{spec_id} reads a different database than drydocs-lineage writes"
+        )
+
+
 def test_superseded_names_are_really_superseded() -> None:
     """A name may only be called superseded while provisioning does NOT create it.
 
