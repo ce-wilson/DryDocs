@@ -26,6 +26,32 @@ Tags help grooming: `idea` · `bug` · `doc` · `source` (new data source) · `q
 
 <!-- add new ideas at the top -->
 
+- 2026-07-26 — [question] **drydocs-deepdoc's SCOPE has drifted between two ADRs and needs
+  one ruling** (raised by the user in the docs-residency session; NOT covered by G32, which
+  rules the databases, not deepdoc's job). ADR 0002 (accepted 06-26) defines deepdoc as
+  reactive **command-line dependency analysis** — which is what the scaffold implements:
+  `investigate_failure(job_name, folder_name)` on the shared Control-M parser, no documents
+  anywhere in it. ADR 0006 §1 (signed 07-18) then redefined it: *"Deepdoc becomes a consumer
+  of docmeta's corpus (its deep dives cite Document/Chunk nodes)."* The user's stated intent
+  is a third thing and closer to 0006: **profile a Confluence space, then search it seeded
+  from what the grounded graph already knows**, pulling back only what is relevant to the
+  current process and creating no relationship unless the subject is already in the DryDocs
+  graph. That last rule is already the ADR 0002 D1 proxy-node pattern, so the mechanism
+  exists. Two things to settle: (a) is deepdoc a parser-driven investigator, a corpus-driven
+  retriever, or both; (b) the graph-seeded-retrieval shape is now the SECOND application of
+  the same idea (first: the 2026-07-23 HR-hierarchy "graph-seeded resolution" direction) —
+  worth naming as a reusable pattern instead of re-deriving it each time. Probably folds
+  into the G32 gate run as a §; do not let the scaffold be built against the stale charter
+  meanwhile.
+- 2026-07-26 — [bug] **Nothing reads `ddall`.** Measured at the G30 close: 22 of 23
+  QuerySpecs read `drydocs`, 1 reads `ddcontext`, **zero read the composite**. The federated
+  watermark machinery is fully built and tested — `WATERMARKED_DATABASES`, the grid-visible
+  `trust_watermark` column, the export banner — against a surface no spec uses. The
+  federated support query that `ddall` was provisioned for has never been written. Not
+  urgent and not wrong, but it is the same shape as the G30 finding (infrastructure with no
+  consumer) and it gets MORE expensive to leave alone if G32 adds a third data database.
+  Cheapest resolution is probably one real cross-database spec that proves the pattern end
+  to end, which would also be the honest test of the G32 traversal cost.
 - 2026-07-26 — [doc] **Startup-refresh runbook owes three edits, HELD until the SME review
   closes** (found doing G29; the doc is mid-L5/L6 review — `docs/design/feedback/
   drydocs-startup-refresh-runbook-sme.html` is in the tree — so nothing was hot-edited,
@@ -260,7 +286,9 @@ Tags help grooming: `idea` · `bug` · `doc` · `source` (new data source) · `q
   (gate-worthy): an alert channel earns attention only with a low base rate AND
   actionable content (remaining slack + recovery action) — any mechanism without
   calibrated thresholds degrades to ignored noise.
-- 2026-07-22 — [idea] **Email DLs need an ontology mapping (user, chat pm).** DL = the
+- 2026-07-22 — [idea] *(KEPT-UPDATED 2026-07-26: distinct from **Q10**, the email BODY as a
+  document corpus. This entry is about DL MEMBERSHIP as an ontology mapping — the two touch
+  the same source and must not be merged.)* **Email DLs need an ontology mapping (user, chat pm).** DL = the
   contact/notification channel for an app/team; only configured in Outlook (no feed,
   can't fix), witnessed in runbooks, extractable from emails; membership/usage are
   context-graph (layer 4) material. DRAFTED STRAIGHT TO GATE same session: gate prompt
@@ -677,6 +705,41 @@ Tags help grooming: `idea` · `bug` · `doc` · `source` (new data source) · `q
 ## Recently groomed (audit trail)
 
 <!-- when you promote an idea, move its line here with the resulting backlog id -->
+
+- 2026-07-26 groom run (docs-residency design session, straight after G28/G29/G30)
+  — **8 promoted / 2 inboxed** (todo 39 → 47). Source was a chat, not inbox lines, so
+  nothing was moved out of the inbox except the notes below.
+  - **Epic Q (docmeta):** **Q7** registry-vs-loaded reconciliation (user-requested — the
+    registry declares corpora and `test_doc_registry.py` enforces the declaration's shape,
+    but nothing checks a corpus was ever loaded or landed in the database it declared);
+    **Q8** the DESCRIBES silent-drop bug; **Q9** re-file Essential GraphRAG as Neo4j vendor
+    docs; **Q10** the failure/activity email corpus; **Q11** document supersession/currency.
+  - **Epic G (component-topology):** **G32** the document/content topology ruling +
+    ddcontext charter (the decision everything waits on); **G31** the proxy-spine extension
+    (prerequisite for every corpus move); **G33** the code snapshot under a Project root.
+  - **The session's through-line, worth keeping:** ONE failure pattern found three times —
+    *succeeds loudly, does nothing*. G29 (a supplement that runs and seeds no terms), G30
+    (a spec that reads a database nothing writes), Q8 (an `OPTIONAL MATCH` whose target
+    class is in another database). All three pass their loads green. Worth treating as a
+    review lens rather than three unrelated fixes: **any MATCH that can legitimately find
+    nothing needs to distinguish "this row missed" from "the whole class is absent".**
+  - **Two decisions recorded that overturn signed-off records**, both routed through the
+    gate rather than edited (the discipline G30 set): Q9 amends ADR 0006 §2 (the Q2 book's
+    `ddcontext` placement) and G32 amends ADR 0002 D1 + ADR 0006 §2.
+  - **One assumption I got wrong and corrected in-session:** I proposed *capture fidelity*
+    as the database boundary (faithfully-captured vs inferred) and the user rejected it —
+    a faithfully-captured stale Confluence page is MORE dangerous than a lossy capture of a
+    good page, because it looks authoritative. The property that earns a boundary is
+    **content authority**, not capture fidelity. Recorded because the wrong version is the
+    intuitive one and will be re-proposed otherwise.
+  - **A prediction that did not survive contact:** I named email retention as the fact that
+    would decide 2 databases vs 3. It did not — the extracts are deliberately preserved past
+    Outlook's 6–18 months until process/project retirement, so purge is property-scoped, not
+    a database drop. The 3-DB decision rests on load separation and wipe blast-radius
+    instead. Kept here so the retention argument is not re-run.
+  - **Inboxed, not promoted:** the deepdoc scope drift (ADR 0002 vs ADR 0006 vs stated
+    intent — a ruling, likely a G32 §) and "nothing reads `ddall`" (both at the top of the
+    inbox).
 
 - 2026-07-25 groom run (bare `/groom-backlog`, same session as the pre-UI structure review)
   — **11 promoted / 2 inboxed / 1 merged / 1 resolved-in-groom** (todo 30 → 41):

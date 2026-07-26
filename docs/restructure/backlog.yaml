@@ -4312,6 +4312,200 @@ items:
       gate; this item renames the registry entry if the gate folds it into
       drydocs-deepdoc. Model fable per the component-boundary precedent (O5/G3).
 
+  # ── appended at the 2026-07-26 groom run (docs-residency design session) ───
+  # Eight items from the 2026-07-26 chat that followed G28/G29/G30. The session
+  # theme was ONE failure pattern found three times — "succeeds loudly, does
+  # nothing": G29 (a supplement that runs and seeds no terms), G30 (a spec that
+  # reads a database nothing writes), and Q8 below (an OPTIONAL MATCH whose
+  # target class is in another database). Q8 is the ready-now bug; G32 is the
+  # decision everything else waits on.
+
+  - id: Q7
+    epic: docmeta
+    title: "Reconcile the doc-source registry against what is actually loaded: per-corpus declared / loaded / stale / missing status"
+    type: task
+    module: drydocs-load
+    phase: 14
+    agent: main
+    model: sonnet
+    priority: p2
+    status: todo
+    depends_on: []
+    inputs: [config/doc-source-registry.yaml, drydocs/cli.py, drydocs_core/schema/provisioning/01_databases.cypher, tests/unit/test_doc_registry.py]
+    acceptance: >
+      A `drydocs docs-verify` (name at implementer's discretion) reports one row per
+      config/doc-source-registry.yaml entry: the declared target_db, whether that
+      corpus is present in that database, its loaded Document/Chunk counts, and a
+      status of loaded | missing | stale | wrong-db. `stale` = the registry's
+      recorded sha256/captured_at no longer matches what the graph carries (the
+      ADR 0006 §4 gate-preserving freshness rule); `wrong-db` = the corpus is
+      present in a database OTHER than its declared target_db. Exits non-zero on
+      any wrong-db row. Covers every corpus kind the registry admits — scraped web
+      pages, filedrop PDFs, .msg/email extracts — because the check is registry-
+      driven, not per-loader. A unit test drives it against a fake client.
+    notes: >
+      User-requested 2026-07-26 ("we'll need to have a registry comparison or
+      status to check if it's loaded into the db... scraped pages - pdf - etc").
+      The gap is real: doc-source-registry.yaml DECLARES corpora and
+      test_doc_registry.py enforces the declaration's shape, but nothing anywhere
+      checks that a declared corpus was ever actually loaded, or that it landed in
+      the database it declared. The `wrong-db` case is the one worth the non-zero
+      exit — it is the G30 failure class at corpus granularity.
+      MODULE CHOICE: drydocs-load, not drydocs-docmeta, because the verb lives in
+      cli.py beside m1-verify/m3-verify and must work BEFORE the docmeta component
+      exists (Q6). Re-home it to docmeta if that component takes over corpus state.
+      Startable now against the corpora that exist today (bmc-docs, essential-
+      graphrag, jpmc-reports); the multi-DB cases arrive with G32.
+
+  - id: Q8
+    epic: docmeta
+    title: "BUG: the bmc-docs DESCRIBES edge is silently dropped when SoftwareProduct is absent — a whole-corpus miss is indistinguishable from success"
+    type: bug
+    module: drydocs-load
+    phase: 14
+    agent: main
+    model: sonnet
+    priority: p1
+    status: todo
+    depends_on: []
+    inputs: [drydocs/loaders/cypher/bmc_docs.cypher, drydocs/loaders/bmc_docs.py, tests/unit/test_bmc_docs.py]
+    acceptance: >
+      A bmc-docs load in which ZERO :SoftwareProduct nodes are reachable fails
+      loudly instead of reporting success with no DESCRIBES edges — either a hard
+      error or a summary count the caller asserts on. Per-ROW misses (a single
+      misspelled subject_product_id) must still be tolerated as they are today,
+      so the fix distinguishes "this one row found no product" from "the product
+      registry is not in this database at all". A test proves both halves: one row
+      with a bad product id still loads its Document/Chunks and reports the miss;
+      an empty-registry graph fails.
+    notes: >
+      MEASURED 2026-07-26, drydocs/loaders/cypher/bmc_docs.cypher:97 —
+      `OPTIONAL MATCH (sp:SoftwareProduct {product_id: row.subject_product_id})`
+      guarded by `FOREACH (_ IN CASE WHEN sp IS NOT NULL ...)`. The template's own
+      header already warns that a misspelled id silently drops the edge for that
+      row; the same mechanism fires for an entire absent database and nobody
+      noticed. Harmless TODAY (both the corpus and the software registry live in
+      `drydocs`), which is exactly why it is worth fixing before anything moves:
+      ADR 0006 already plans to re-target bmc-docs to `dddocs` at the P4 loader
+      build while load-software-registry keeps writing `drydocs`, and a
+      relationship cannot span databases — so that move would silently drop EVERY
+      DESCRIBES edge and take the vendor→product routing spine with it. Third
+      instance this session of "succeeds loudly, does nothing" (see G29, G30).
+      Ready now and independent of the G32 topology ruling.
+
+  - id: Q9
+    epic: docmeta
+    title: "Re-file the Essential GraphRAG corpus as VENDOR documentation for Neo4j: dddocs + a DESCRIBES product hook, amending ADR 0006 §2"
+    type: task
+    module: config
+    phase: 14
+    agent: pipeline-config
+    model: sonnet
+    priority: p2
+    status: todo
+    depends_on: [G31]
+    inputs: [config/doc-source-registry.yaml, docs/decisions/0006-docmeta-component-and-doc-graph.md, config/gate-log.md, drydocs/loaders/cypher/essential_graphrag.cypher]
+    acceptance: >
+      config/doc-source-registry.yaml#essential-graphrag carries target_db: dddocs,
+      a taxonomy_path under the graph-platform/neo4j branch, and its
+      `taxonomy_path: ~` + "deliberately no DESCRIBES / product taxonomy hook" note
+      replaced with the vendor rationale; the loader template's DELIBERATELY-NO-
+      DESCRIBES block is replaced with the bmc-docs product hook (which requires Q8
+      to be done first, or the hook drops silently); a config/gate-log.md entry
+      records the ADR 0006 §2 amendment with the SME's reasoning; ADR 0006 gains a
+      short amendment note rather than a body rewrite (the ADR 0002 banner
+      precedent). test_doc_registry.py stays green.
+    notes: >
+      SME decision in session 2026-07-26, reasoning recorded verbatim in intent:
+      the book is Neo4j-SPONSORED and teaches implementation ON their graph — "it's
+      not written to load into a competitor like TigerGraph" — so it is vendor
+      documentation wearing a book jacket, tier T1, same as bmc-docs. The existing
+      registry entry already agrees on every OTHER axis (tier: T1, curation: none,
+      trust_default: GROUNDED) and differs only in target_db, which it inherited
+      from the jpmc-reports ddcontext precedent rather than from the tier model.
+      The filing error was by FORMAT (a PDF book) rather than by SUBJECT (Neo4j the
+      product) — the same class of error as the ddcontext placement itself.
+      This OVERTURNS a signed-off decision (ADR 0006 §2, SME 2026-07-18), so it
+      goes through the gate as an amendment, never by edit — the discipline G30
+      established. depends_on G31 because dddocs must exist and carry a
+      SoftwareProduct proxy before the hook can bind.
+
+  - id: Q10
+    epic: docmeta
+    title: "Ingest the failure/activity email corpus (.msg + Copilot JSON) with an SME surface for assigning an email to a folder or process"
+    type: requirement
+    module: drydocs-docmeta
+    phase: 14
+    agent: main
+    model: fable
+    priority: p2
+    status: todo
+    depends_on: [G31]
+    inputs: [config/doc-source-registry.yaml, docs/restructure/03-hitl-sme-flow.md, config/gate-prompts/, drydocs_core/ontology/relationship_vocabulary.yaml]
+    acceptance: >
+      A doc-source-registry entry declares the email corpus with its classification,
+      connector: email, tier, curation ladder, target_db and retention note; the
+      corpus loads as the ACTIVE lexical shape (Document → Chunk) with the source
+      .msg/JSON pair referenced by path, never copied into the repo; and an email
+      whose folder/process is NOT extractable is loadable WITHOUT an assignment,
+      landing unassigned rather than being rejected or guessed. The assignment edge
+      (email Document → ControlMFolder / process) is NEW relationship semantics and
+      goes through the HITL gate: registered `status: planned` in
+      relationship_vocabulary.yaml with a gate-prompt spec, and no loader writes it
+      until the gate confirms. The SME assignment surface itself may be a later
+      slice — this item's floor is "ingested, unassigned, and gate-registered".
+    notes: >
+      User source 2026-07-26: "we get emails that reference a failure or activity
+      and I've extracted those as json files and save the original msg format...
+      it may require an SME assigning it to a particular folder or process if it's
+      not extractable from the email."
+      RETENTION, and it is the reason the source pair matters: Outlook purges at
+      6-18 months, but the extracts are deliberately preserved on a file server
+      until the PROCESS OR PROJECT retires — so after ~18 months the file server
+      holds the only copy and becomes a system of record with a backup obligation,
+      not a cache. Purge is therefore project/process-scoped (a property-scoped
+      delete), NOT a database drop — which is why retention did NOT end up being an
+      argument for a separate database, contrary to the initial guess in that
+      session. Same instinct as the "always keep the original requirement" rule.
+      CLASSIFICATION: production-failure email almost certainly Internal-
+      Confidential (real names, real folder names, incident detail). The .msg/JSON
+      originals live OUTSIDE the repo — the gitignored-PDF precedent — and only
+      mechanism-level references are committed.
+      Distinct from the 2026-07-22 email-DL contact-point idea already in IDEAS:
+      that one is about DL membership as an ontology mapping; this is the email
+      BODY as a document corpus.
+
+  - id: Q11
+    epic: docmeta
+    title: "Model document supersession and currency so 2-3 stale versions of the same internal process page are distinguishable by more than a date"
+    type: requirement
+    module: ontology
+    phase: 14
+    agent: ontology-mapper
+    model: fable
+    priority: p3
+    status: todo
+    depends_on: [G31]
+    inputs: [docs/RELATIONSHIP_GUIDE.md, drydocs_core/ontology/relationship_vocabulary.yaml, config/doc-source-registry.yaml]
+    acceptance: >
+      A SUPERSEDES (or gate-chosen spelling) Document→Document relationship plus a
+      currency signal on :Document is registered `status: planned` in
+      relationship_vocabulary.yaml with a decision-matrix entry and a gate-prompt
+      spec; a retrieval over a multi-version corpus can return ONLY the current
+      version without relying on captured_at ordering alone. No loader writes the
+      edge until the HITL gate confirms it.
+    notes: >
+      User problem statement 2026-07-26: "internally i've seen 2 or 3 different
+      versions with the same referenced person/team/process, but is stale and the
+      only indication is date."
+      The point that decided this is its own item rather than a rider on the
+      database question: QUARANTINING DOES NOT DISAMBIGUATE. Putting all three
+      versions in an unstructured-content database leaves all three versions
+      sitting together, still ambiguous — the separation protects OTHER corpora
+      from them, it does not tell you which one is current. That is a modeling
+      problem and needs modeling, whatever the topology ends up being. Hence
+      depends_on G31 only for where the nodes live, not for the semantics.
+
   # ── appended at the 2026-07-19 groom run ──────────────────────────────────
   - id: G14
     epic: component-topology
@@ -6075,12 +6269,148 @@ items:
       Runbook NOT touched — it is mid-SME-review (L5/L6 anchors); the three things it now
       needs are parked in IDEAS for the post-review revision.
 
+  # ── appended at the 2026-07-26 groom run (docs-residency design session) ───
+  # The topology half of that session. G32 is the ruling; G31 is the prerequisite
+  # every corpus move depends on; G33 is independent and startable now.
+
+  - id: G31
+    epic: component-topology
+    title: "Extend the proxy-node spine beyond DataAsset + ControlMJob before any corpus moves database"
+    type: task
+    module: graph-infra
+    phase: 6
+    agent: main
+    model: sonnet
+    priority: p1
+    status: todo
+    depends_on: [G32]
+    inputs: [drydocs_core/schema/provisioning/02_proxy_constraints.cypher, drydocs_core/schema/provisioning/README.md, drydocs_core/schema/constraints.cypher, docs/decisions/0002-component-database-topology.md, tests/unit/test_database_names.py]
+    acceptance: >
+      02_proxy_constraints.cypher declares a constrained business key for every class
+      that must be joinable ACROSS the database boundaries G32 rules — at minimum
+      SoftwareProduct.product_id, Vendor.vendor_id, Document.doc_id and
+      ControlMFolder.folder_id alongside the existing DataAsset.assetId and
+      ControlMJob(folder_id, job_id) — its header names every database it must be run
+      against (it currently names only drydocs and ddcontext, omitting ddlineage), and
+      provision.ps1 runs it against each. A test asserts the proxy set covers every
+      class that appears on BOTH sides of a cross-database relationship in the
+      shipped loaders, so adding such a relationship without a proxy key fails.
+    notes: >
+      MEASURED 2026-07-26: 02_proxy_constraints.cypher — the file whose entire job is
+      making cross-database joins possible — declares exactly TWO keys
+      (DataAsset.assetId, ControlMJob NODE KEY) and its header names only drydocs and
+      ddcontext. No SoftwareProduct, no Vendor, no Document, no ControlMFolder,
+      no Employee. ADR 0006's existing plan to re-target the bmc-docs corpus to dddocs
+      already depends on a SoftwareProduct proxy that nobody wrote down; see Q8 for
+      what that omission does at runtime (silently drops every DESCRIBES edge).
+      BUILD ORDER IS THE POINT: spine first, corpora second. The reverse order is how
+      you get a green load that wrote nothing — the pattern this session hit three
+      times. Q9/Q10/Q11 all depend on this item for exactly that reason.
+
+  - id: G32
+    epic: component-topology
+    title: "Rule the document/content database topology and restate the ddcontext charter: reference vs unstructured content vs derived findings"
+    type: task
+    module: graph-infra
+    phase: 6
+    agent: main
+    model: fable
+    priority: p1
+    status: todo
+    depends_on: []
+    inputs: [docs/decisions/0002-component-database-topology.md, docs/decisions/0006-docmeta-component-and-doc-graph.md, config/doc-source-registry.yaml, config/gate-prompts/, drydocs_api/exports.py, drydocs_core/schema/provisioning/01_databases.cypher]
+    acceptance: >
+      One ruling through the HITL gate, recorded as an amendment to ADR 0002 and
+      ADR 0006 (amendment notes, not body rewrites — the ADR 0002 banner precedent),
+      fixing: (a) how many document/content databases exist and what each holds;
+      (b) the ddcontext charter, which today says "isolated uncertain / SYNTHESIZED"
+      and cannot honestly describe a VERBATIM-captured email — if unconfirmed content
+      lands there the charter restates to UNCONFIRMED (authority not established,
+      whether captured verbatim or inferred) and drydocs_api/exports.py's
+      WATERMARK_VALUE follows, since it stamps "SYNTHESIZED — unverified" keyed on
+      database name; (c) the target_db column of every doc-source-registry entry;
+      (d) an explicit, recorded acceptance of what a boundary COSTS — see notes.
+      01_databases.cypher and provisioning/README.md then match the ruling, and
+      tests/unit/test_database_names.py's read-vs-write guard covers the new set.
+    notes: >
+      Design session 2026-07-26 (after G30). SME direction: THREE databases —
+      structured / unstructured-content / derived — for separation of loads and
+      wipe blast-radius during testing, both of which hold independently of
+      retention. Retention turned out NOT to be an argument either way (see Q10).
+      THE COST, to be accepted explicitly rather than discovered later. `ddall`
+      federates reads but a relationship can NEVER span databases — a composite
+      query is a join on returned values, not an edge walk (see the shape in
+      provisioning/smoke_drydocs_all.cypher: chained `CALL { USE ddall.x }` blocks).
+      So known-shape questions still work, restated as explicit joins, and every
+      QuerySpec is fine. What is lost across the boundary: shortestPath and
+      variable-length paths, all GDS (centrality, community, similarity), and a
+      single vector index over reference AND content chunks — which becomes two
+      index queries plus a client-side rerank, notable because the Essential
+      GraphRAG corpus was ingested to do exactly that kind of retrieval. Also
+      harder: text2cypher (Epic R / ADR 0007) must generate correct USE clauses and
+      business-key joins rather than a plain MATCH. If those matter, the mitigation
+      is a single-database analytical projection, and that should be decided here
+      rather than improvised later.
+      Blocks G31 (the spine cannot be sized until the database set is known) and
+      through it Q9/Q10/Q11.
+
+  - id: G33
+    epic: component-topology
+    title: "Load the DryDocs code-dependency snapshot into the graph under a Project root, using the seeded-but-unused software ontology"
+    type: requirement
+    module: drydocs-load
+    phase: 6
+    agent: main
+    model: fable
+    priority: p2
+    status: todo
+    depends_on: []
+    inputs: [knowledge/depgraph-snapshots/, knowledge/depgraph-snapshots/snapshot.ps1, drydocs_core/schema/ontology.cypher, drydocs_core/ontology/relationship_vocabulary.yaml, docs/RELATIONSHIP_GUIDE.md]
+    acceptance: >
+      A `drydocs load-code-snapshot` verb reads the newest
+      knowledge/depgraph-snapshots/*.json (schema depgraph-machine-first/v1) and
+      MERGEs it idempotently into `drydocs`, so it survives the wipe-and-rebuild
+      cycle like every other loader and is re-runnable from committed files with
+      zero data loss (the ADR 0002 D3 stateless test). Everything hangs off an
+      explicit (:Project {project_id:'drydocs'}) root so "is this our own code?" is
+      one hop, and modules carry a label that CANNOT collide with the software
+      registry's :SoftwareProduct nodes. The new node classes and relationships
+      (Project, CodeModule, HAS_MODULE, IMPORTS) plus their binding to the SWO
+      terms are registered `status: planned` and go through the HITL gate; no
+      loader writes them until it confirms. snapshot.ps1 stays DECOUPLED — the
+      session ritual must keep working with no database running.
+    notes: >
+      User source 2026-07-26: load the DryDocs project code snapshot under the
+      software ontology, "which may prevent missing code fixes", plus "a way to
+      distinguish it's for drydocs project and not the products metadata".
+      Cheap because both halves already exist and neither is used: ontology.cypher
+      seeds 7 SwoClass + 6 SwoProperty terms (Python, Shell, SQL, "is encoded in",
+      "implements", "has specified data input/output", "uses platform") with ZERO
+      consumers anywhere in the tree, and snapshot.ps1 already writes a code
+      dependency graph every session (664 nodes / 86 edges at the latest) that
+      never enters Neo4j — it is JSON plus a viewer.html. The depgraph schema
+      already carries a `projects` key (=1), so the Project root matches the
+      producer's own shape rather than inventing one.
+      TARGET IS `drydocs`, NOT dddocs, and the stated purpose is what decides it:
+      "prevent missing code fixes" means traversing from a DryDocs module to the
+      loader to the Control-M job it loads. That is a path query, so they must
+      share a database — and code is not reference material ABOUT a system, it IS
+      one, deterministically derived from source we control with no authority
+      ambiguity. Same character as folders and jobs. The Project root is what keeps
+      it from polluting product metadata.
+      PHASE FIT IS MARGINAL — filed phase 6 / component-topology because it is
+      about the components themselves, but "the system documents its own code" is
+      arguably a new capability rather than an ADR 0002 follow-up. Flagged for the
+      user to ratify or re-phase; not invented as a new phase silently.
+      Load only the LATEST snapshot as current state; the ~20 dated files are a
+      time series available later if code evolution is ever wanted. Do not build it.
+
 summary:
-  todo: 39                                         # +11 at the 2026-07-25 groom (Epic S x9, G28, G29); G28+G29+G30 all done 07-26 (G30 was split out of G28)
+  todo: 47                                         # 39 after the G28/G29/G30 closes, +8 at the 2026-07-26 docs-residency groom (Q7-Q11, G31-G33)
   in_progress: 1                                   # E1 (gate deferred both sides)
   blocked: 0
   done: 135                                        # +G28 multi-DB naming drift, +G29 supplement chain, +G30 lineage residency — all 2026-07-26
-  next_ready: [M3, M4, P3, J10, Q6, O23, J13, G21, G24, O26, G26, O27, C15, C16, O28, R3, R4, L16, O29, O30, O31, O32, S1, S8, S9]
+  next_ready: [M3, M4, P3, J10, Q6, O23, J13, G21, G24, O26, G26, O27, C15, C16, O28, R3, R4, L16, O29, O30, O31, O32, S1, S8, S9, Q7, Q8, G32, G33]
   # 2026-07-25 groom (pre-UI structure review + the 07-24/07-25 inbox): new Epic S
   # (S1-S9) from docs/reviews/architecture-structure-review-2026-07-25.md, plus G28
   # (multi-DB naming drift) and G29 (supplement-verb consolidation).
