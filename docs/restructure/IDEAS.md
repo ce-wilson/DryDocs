@@ -46,100 +46,24 @@ Tags help grooming: `idea` · `bug` · `doc` · `source` (new data source) · `q
   CIB + AWM appear as SEPARATE LoBs with 1.0 exact matches → resolves the LOB002 AWMCIB (legacy,
   0.5) open question in `lob-product-team.yaml`. If the company gate signs off: mechanism-only
   back-port (vocab entries as `planned`, map entries, 5-field taxonomy capture, LOB-vs-CatalogLOB
-  label ruling) or an explicit port-prompt divergence-ledger entry. COORDINATE FIRST: a laptop
+  label ruling) or an explicit port-prompt divergence-ledger entry. ~~COORDINATE FIRST: a laptop
   session (unpushed as of 2026-07-27) is re-working BusinessApplication mapping — don't touch
-  catalog/SEAL map entries until it lands.
+  catalog/SEAL map entries until it lands.~~
+  KEPT-UPDATED 2026-07-27 groom: the laptop session LANDED same day (business-application-identity
+  gate SIGNED OFF `fc15191`; the build = S3, `seal_id` → `app_id` on the canonical node) — the
+  coordinate-first constraint is lifted. New wrinkle for the eventual back-port: the comparison
+  now also crosses the app_id rename (the company page pre-dates it), so the label ruling
+  (LOB vs CatalogLOB) and the key ruling (app_id) should be settled in the same pass. Still
+  parked on its original trigger: the COMPANY gate's own sign-off.
 
-- 2026-07-27 — [p0/boundary] **`knowledge/standards/technology/` carries real SEALIDs, real
-  application names, and a real Oracle table/column — and it is `Internal-Public`, i.e.
-  publishable.** Found while sweeping the SEALID publish-boundary breach (the other 13 files
-  were sanitized in the same session; these two were deliberately left because sanitizing
-  them destroys their content). `description-field-metadata-plan.md` and
-  `folder-naming-convention.md` hold the app-code→SEAL registry (`PRSRV` → an app, `PRARA` →
-  an app), real application names, the SEAL-ID *format* disclosure (digit widths, older
-  short ids), and the escalation-table join (`psgmgr.cm_escalation_db`, column `ECOMPONENT`,
-  value stored with a `.00` suffix). **The real mappings ARE the knowledge** — replacing them
-  with synthetic values leaves a document that no longer says anything true, so this is a
-  RELOCATE-vs-SANITIZE decision, not a find-and-replace. Options: (a) move both to
-  `internal/` and leave a mechanism-only stub in `knowledge/`; (b) split each file —
-  mechanism (the naming grammar, the join shape) stays public, the registry table and real
-  values move to `internal/`; (c) reclassify `knowledge/standards/technology/` as `Internal`.
-  (b) is the shape the repo already uses elsewhere. **Also unresolved and adjacent:** the
-  sample corpus still carries real-looking internal platform vocabulary (`HLDM`, `PRARAG`,
-  `svc.hldm`, `/opt/scripts/hldm/`, `host-hldm-01`, datacenter codes) — a different class
-  from SEALIDs, not ruled on, and deliberately left untouched by the 2026-07-27 sweep.
-  → needs a backlog item; blocks any public push.
+- 2026-07-27 — [question] **Internal platform vocabulary in the sample corpus — ruling
+  needed.** Residual from the groomed J14/J15 publish-boundary pair: the samples still carry
+  real-looking internal platform tokens (`HLDM`, `PRARAG`, `svc.hldm`, `/opt/scripts/hldm/`,
+  `host-hldm-01`, datacenter codes) — a different value class from SEALIDs, deliberately left
+  untouched by the 2026-07-27 sweep and not ruled on. Is platform vocabulary publishable
+  mechanism (like the naming grammar) or a value class to synthesize? User/SME call; once
+  ruled, J15's value-shape guard test can grow a rule for it.
 
-- 2026-07-27 — [lesson] **The 2026-07-27 SEALID sweep and the earlier one (9d59f53) failed the
-  same way: they searched for the FIELD, not the VALUE.** `9d59f53` deleted a sample CSV for
-  "real seal_ids" and concluded "samples now synthetic-only" — but real SEALIDs survived for
-  months *embedded inside Control-M folder-name strings* (`PRARAG-HLDM-<sealid>-…`), where no
-  grep for `seal_id` could see them. Same failure class as the session through-line
-  *"succeeds loudly, does nothing"* (G29 / G30 / Q8 / the `CREATE CONSTRAINT … IF NOT EXISTS`
-  name-match trap). **Proposal: a boundary guard test** that greps the publishable tree for
-  the shapes real ids take — bare 5-6 digit ids in taxonomy/sample files, and the numeric
-  segment of a parsed folder name — and fails if one is outside the reserved synthetic block
-  (`70001-70099`). A convention that has now been violated twice needs an enforcement point,
-  which is the same conclusion as the gate's own §F2 (a controlled vocabulary without an
-  enforcement point rots).
-
-- 2026-07-26 — [chore] **Three `:BusinessApplication` indexes are never used as predicates;
-  the one property that IS a predicate has none.** Spotted by the user while reading
-  `constraints.cypher` during the business-application-identity gate review. `businessapplication_risk`
-  (`risk_level`), `businessapplication_status` (`status`) and `businessapplication_name` (`name`)
-  — lines 37-39 — index properties that appear ONLY in loader `SET` clauses and `RETURN`
-  projections. Every bind on `:BusinessApplication` in the repo goes through `seal_id`, already
-  covered by the UNIQUE constraint's backing index (line 36); an index cannot help a projection,
-  because the node is bound before the property is read. `explorer.applications.v1` is an
-  unfiltered `MATCH (a:BusinessApplication) ... ORDER BY seal_id LIMIT $limit` label scan, which
-  a `name`/`status` index cannot accelerate either. `risk_level` is the starkest: not in a single
-  QuerySpec, zero hits in `web/src/`. THE INVERSION: `manual_loads.py:113` does
-  `OPTIONAL MATCH (n:BusinessApplication {manually_created: true})` — a real predicate, no index.
-  Not rescued by "we might query it later": at registry cardinality a label scan is
-  sub-millisecond, and a declared index READS AS A CLAIM that the property is queried, so it
-  mis-maps the access patterns for the next reader. Original intent is unrecoverable —
-  `git log -L` on those lines returns only `c5a84c3 Initial import` (the 2026-07-20 squash).
-  Proposed: drop all three, add `manually_created` if the predicate is worth covering.
-  Touches bootstrap schema, so it needs a re-run, not a drive-by edit. Same family as the
-  session through-line — declared, maintained on every write, never consulted.
-- 2026-07-26 — [bug] **Applying the schema meta-graph contaminates the Applications frame.**
-  Found alongside the index note above. `schema_graph.cypher:69` MERGEs
-  `(n:SchemaMeta:BusinessApplication {name: 'BusinessApplication'})` — an exemplar node carrying
-  the REAL label with no `seal_id`. `explorer.applications.v1` scans `MATCH (a:BusinessApplication)`
-  unfiltered, so the exemplar would surface in the console as an application with a null id.
-  The UNIQUE constraint on `seal_id` does not stop it — Neo4j uniqueness ignores nulls (the same
-  property behind the G30-family cutover hazard in the identity gate §C2). LATENT, not live:
-  the file is `Applied MANUALLY only — never part of drydocs bootstrap` and is removable with
-  `MATCH (n:SchemaMeta) DETACH DELETE n`. Fix is a one-line predicate on the affected specs
-  (`WHERE NOT a:SchemaMeta`, or require `seal_id IS NOT NULL`) rather than dropping the very
-  useful meta-graph. Check whether other `:SchemaMeta:<RealLabel>` exemplars hit other
-  unfiltered specs the same way — there are ~20 of them.
-- 2026-07-26 — [question] **drydocs-deepdoc's SCOPE has drifted between two ADRs and needs
-  one ruling** (raised by the user in the docs-residency session; NOT covered by G32, which
-  rules the databases, not deepdoc's job). ADR 0002 (accepted 06-26) defines deepdoc as
-  reactive **command-line dependency analysis** — which is what the scaffold implements:
-  `investigate_failure(job_name, folder_name)` on the shared Control-M parser, no documents
-  anywhere in it. ADR 0006 §1 (signed 07-18) then redefined it: *"Deepdoc becomes a consumer
-  of docmeta's corpus (its deep dives cite Document/Chunk nodes)."* The user's stated intent
-  is a third thing and closer to 0006: **profile a Confluence space, then search it seeded
-  from what the grounded graph already knows**, pulling back only what is relevant to the
-  current process and creating no relationship unless the subject is already in the DryDocs
-  graph. That last rule is already the ADR 0002 D1 proxy-node pattern, so the mechanism
-  exists. Two things to settle: (a) is deepdoc a parser-driven investigator, a corpus-driven
-  retriever, or both; (b) the graph-seeded-retrieval shape is now the SECOND application of
-  the same idea (first: the 2026-07-23 HR-hierarchy "graph-seeded resolution" direction) —
-  worth naming as a reusable pattern instead of re-deriving it each time. Probably folds
-  into the G32 gate run as a §; do not let the scaffold be built against the stale charter
-  meanwhile.
-- 2026-07-26 — [bug] **Nothing reads `ddall`.** Measured at the G30 close: 22 of 23
-  QuerySpecs read `drydocs`, 1 reads `ddcontext`, **zero read the composite**. The federated
-  watermark machinery is fully built and tested — `WATERMARKED_DATABASES`, the grid-visible
-  `trust_watermark` column, the export banner — against a surface no spec uses. The
-  federated support query that `ddall` was provisioned for has never been written. Not
-  urgent and not wrong, but it is the same shape as the G30 finding (infrastructure with no
-  consumer) and it gets MORE expensive to leave alone if G32 adds a third data database.
-  Cheapest resolution is probably one real cross-database spec that proves the pattern end
-  to end, which would also be the honest test of the G32 traversal cost.
 - 2026-07-26 — [doc] **Startup-refresh runbook owes three edits, HELD until the SME review
   closes** (found doing G29; the doc is mid-L5/L6 review — `docs/design/feedback/
   drydocs-startup-refresh-runbook-sme.html` is in the tree — so nothing was hot-edited,
@@ -151,45 +75,6 @@ Tags help grooming: `idea` · `bug` · `doc` · `source` (new data source) · `q
   container has been `neo4jtest` (7474/7687) since 2026-07-23 and `neo4j-drydocs-ee` was
   stopped as the rollback. Do all three in one revision after the review closes, then
   re-render.
-- 2026-07-25 — [question] **BusinessApplication identity gate — DEFERRED mid-review, resume
-  with a leaner decision surface.** Spec is committed and PROPOSED
-  (`config/gate-prompts/business-application-identity.yaml` **v3**, backlog **S3**); nothing
-  was written, no map entry created, so there is no half-finished state to unwind. **Two SME
-  inputs were ruled and are banked in the spec.** (B0) *A second authority issuing app ids
-  will not happen* — SEAL is and remains the single issuing registry; that withdrew
-  `id_authority` and left `app_urn` deferred as v1's B3 already had it. (B5, v3) *Another
-  system may call the same thing by a different field name; `app_id` is generic enough for
-  any organization, `seal_id` is company-specific; in a SaaS we would map `app_id` to
-  `xyz_id`* — a THIRD axis, distinct from both withdrawn properties: not *which registry
-  issued the value* (per-node data, dead) but *what each source CALLS the field* (per-source
-  config, alive). **That mechanism already exists and is test-guarded** —
-  `config/source-mappings/<source>.yaml` rows carry `target: Label.property`
-  (`controlm-psgmgr.yaml` declares `TABLE_ID -> ControlMFolder.folder_id`, reconciled by
-  `tests/unit/test_source_mapping_drift.py`) — but **there is no `seal-extract.yaml` ledger**,
-  which is exactly why `SEALID -> seal_id` was hardcoded in Cypher. B1(c) writes it.
-  **Honest limit (B6):** that ledger is declarative and guard-reconciled today, NOT a runtime
-  mapping — verified, nothing outside tests and `render_enforcement_matrix.py` imports
-  `drydocs/source_mappings.py`. Making it load-bearing is a real build, scoped out of the
-  gate, and it is the natural first step of the parked SEAL/PAT terminology line below
-  (`knowledge/upgrade-plans/generic-terminology-research.md`, whose §Decision item 3 IS this
-  identity-property question — the two lines have converged).
-  **Why it stalled — record this, it is the lesson:** the spec grew to 27 confirmations when
-  only about FOUR need SME judgment. The rest is build-time mechanics that should have been
-  recorded as notes, not asked as questions. **On resume, present only:** (1) **B0/B1** — the
-  shape: `app_id` alone, `app_id` + the declared source-field ledger (B1c — the
-  recommendation since v3), or keep `seal_id`? (2) **C2** — the atomic four-site MERGE flip
-  (`seal_applications` / `manual_seal_attribution` / `pat_product_mapping` /
-  `software_registry`), because a Neo4j uniqueness constraint ignores nulls, so a partial
-  cutover silently DOUBLES the canonical node instead of failing. (3) **D1** — does
-  `:Port`'s NODE KEY `(parent_seal_id, kind)` follow now or later? (recommend later — internal
-  FK, no console exposure). (4) **E1** — do the API and console emit the neutral name
-  regardless of what the graph stores? Everything else (D2 `attribution_id`, F1 the four
-  surviving homes of the string 'SEAL', G1–G4 phasing) demotes to build notes on S3.
-  **Also owed at resume:** ADR 0010 needs AMENDING, not just accepting — its Option C and
-  rules 2/3 assume the withdrawn `id_authority` shape. That is S1's job.
-  **Timing pressure is real but not urgent-today:** the argument for doing it before the
-  console hardens is E1, which stays cheap only while few routes read the key.
-
 - 2026-07-25 — [question] **How much depgraph audit history do we keep?** (review finding
   F11, `docs/reviews/architecture-structure-review-2026-07-25.md`). `knowledge/depgraph-snapshots/`
   holds 66 JSON files / 4.2 MB, several per day, unbounded — some 2026-07-20/21 timestamps are
@@ -236,6 +121,10 @@ Tags help grooming: `idea` · `bug` · `doc` · `source` (new data source) · `q
   is exactly what `id_authority: "SEAL"` encodes. Still parked: the *tag-policy-as-enforcement*
   and *glossary-as-concept-scheme* citations, which wait on the acronym-catalog line below and
   on a data-catalog ADR that neither exists nor is scheduled. No item of its own — confirmed.
+  (Correction 2026-07-27: `id_authority` was WITHDRAWN at the identity gate's §B0 sign-off —
+  SEAL stays the single issuing registry, so the property encoded a fact that cannot vary. The
+  governed-namespace citation stands; its worked example moved to the source-field ledger shape
+  instead.)
 - 2026-07-25 — [idea] **Acronym catalog scoped by domain — so agents and humans stop colliding
   on the same three letters (SME, chat).** Direct fallout of the Q6 reopen below: `Ais` cost
   real time because two readings are both plausible — "as-is" (the standard architecture
@@ -267,6 +156,11 @@ Tags help grooming: `idea` · `bug` · `doc` · `source` (new data source) · `q
   — not a property, not a label. That is this line's shape, reached by the identity question
   instead of the collision question. Still parked on the same trigger (the gate-log Q6 ruling);
   what changed is that two threads now converge on it, so it is likelier to be worth building.
+  KEPT-UPDATED 2026-07-27 groom: the landing zone now EXISTS as a backlog item — **G34**
+  (raised at the identity-gate sign-off) reserves `CatalogBusinessTerm` + its three edges as
+  `planned`, schema public / definitions internal, deliberately defining NO terms. When Q6 is
+  ruled and this line grooms, it becomes content INSIDE G34's scaffold (senses, scopes,
+  does-NOT-mean notes as SKOS), not a new home.
 - 2026-07-25 — [question] **Q6 REOPENED: is the AIS acronym entry worth keeping at all?**
   (SME, chat). C12/Q6 ruled the expansion "Application Integration Streaming" survives as
   `config/taxonomy/software-registry.yaml#acronyms` — the durable "what did that name mean"
@@ -646,6 +540,11 @@ Tags help grooming: `idea` · `bug` · `doc` · `source` (new data source) · `q
   mined, 54ccf63) — the CSDM service/service-offering layer this line called its missing
   piece is now in reference/. The decision surface is fully fed; still PARKED on the three
   §Decision user calls above (scope / placement-as-plan-change / SEALID property).
+  KEPT-UPDATED 2026-07-27 groom: **§Decision item 3 is RESOLVED** — the
+  business-application-identity gate (SIGNED OFF 2026-07-27) ruled `SEALID` → generic
+  `app_id` on the canonical node, with the per-source field-name ledger
+  (`config/source-mappings/seal-extract.yaml`) carrying what each source CALLS it; build = S3.
+  Decisions 1 (display-label scope) and 2 (placement/plan-change) remain the parked user calls.
 
 - 2026-07-19 — [question] **m3_invokes `to_node: Script` may need broadening to
   `Script | ETLProcess`** in relationship_vocabulary.yaml: the abioncloud wrapper-payload
@@ -791,6 +690,19 @@ Tags help grooming: `idea` · `bug` · `doc` · `source` (new data source) · `q
   an app). Cosmetic; hide or restructure later.
 
 ## Recently groomed (audit trail)
+
+- 2026-07-27 — [p0/boundary] knowledge/standards real-SEALID relocate-vs-sanitize → **J14**
+  (option-b split, mechanism public / values internal); [lesson] field-vs-VALUE sweep failure
+  → **J15** (value-shape boundary guard test, 70001-70099 block). Residual platform-vocabulary
+  question re-inboxed as its own line.
+- 2026-07-27 — [chore] :BusinessApplication index diet → **G36** (rides S3's bootstrap
+  re-run); [bug] SchemaMeta exemplar contamination → **O33**; [bug] nothing-reads-ddall →
+  **G38** (after G32's ruling); [question] deepdoc charter drift → **MERGED into G32** as
+  acceptance clause (e).
+- 2026-07-27 — [question] "BusinessApplication identity gate — deferred, resume leaner"
+  RESOLVED without an item: the gate resumed on exactly the four-question surface and SIGNED
+  OFF 2026-07-27 (22/22, `fc15191`). Build = S3 (acceptance rewritten at sign-off); ADR 0010
+  amendment = S1; TOM-roles reopen = G35; glossary reservation = G34.
 
 <!-- when you promote an idea, move its line here with the resulting backlog id -->
 

@@ -39,7 +39,7 @@
 # =============================================================================
 
 schema: drydocs.backlog.v2
-updated: 2026-07-26
+updated: 2026-07-27
 
 # ── The high-level project plan (rendered as the board's roadmap strip) ───────
 plan:
@@ -6361,7 +6361,16 @@ items:
       whether captured verbatim or inferred) and drydocs_api/exports.py's
       WATERMARK_VALUE follows, since it stamps "SYNTHESIZED — unverified" keyed on
       database name; (c) the target_db column of every doc-source-registry entry;
-      (d) an explicit, recorded acceptance of what a boundary COSTS — see notes.
+      (d) an explicit, recorded acceptance of what a boundary COSTS — see notes;
+      (e) MERGED 2026-07-27: the drydocs-deepdoc CHARTER, which has drifted
+      between ADR 0002 (reactive command-line dependency analysis — what the
+      scaffold implements) and ADR 0006 §1 (a consumer of docmeta's corpus,
+      citing Document/Chunk nodes) — rule whether deepdoc is a parser-driven
+      investigator, a corpus-driven retriever, or both, against the user's
+      stated intent: profile a Confluence space, then search it SEEDED from
+      what the grounded graph already knows, creating no relationship unless
+      the subject is already in the DryDocs graph (the ADR 0002 D1 proxy-node
+      pattern, so the mechanism exists).
       01_databases.cypher and provisioning/README.md then match the ruling, and
       tests/unit/test_database_names.py's read-vs-write guard covers the new set.
     notes: >
@@ -6385,6 +6394,13 @@ items:
       rather than improvised later.
       Blocks G31 (the spine cannot be sized until the database set is known) and
       through it Q9/Q10/Q11.
+      Clause (e) merged at the 2026-07-27 groom from the 2026-07-26 deepdoc-scope
+      inbox entry (user question; NOT covered by the database ruling alone).
+      Rider: the graph-seeded-retrieval shape is the SECOND application of the
+      same idea (first: the 2026-07-23 HR-hierarchy graph-seeded resolution) —
+      name it as a reusable pattern in the ruling instead of re-deriving it.
+      Until (e) is ruled, do not build the deepdoc scaffold against either
+      stale charter.
 
   - id: G33
     epic: self-documentation
@@ -6545,12 +6561,192 @@ items:
       four people in one role class collide if the sid is dropped. Whatever this
       gate rules about role classes must keep that key shape valid.
 
+  # ── appended at the 2026-07-27 groom run (weekly inbox groom) ──────────────
+  # Sources: the two 2026-07-27 publish-boundary inbox entries (→ J14/J15), the
+  # 2026-07-26 schema/spec findings from the identity-gate review session
+  # (→ G36/O33/G38), plus one merge (deepdoc charter drift → G32 clause e).
+  # The catalog-gate drift entry stays inboxed on its company-sign-off trigger
+  # (its coordinate-first constraint lifted — the laptop session landed 07-27).
+  - id: J14
+    epic: release-infrastructure
+    title: "Split the two knowledge/standards/technology docs that carry real SEALIDs — mechanism stays public, registry tables and real values move to internal/ (blocks any public push)"
+    type: task
+    module: docs
+    phase: 8
+    agent: main
+    model: fable
+    priority: p0
+    status: todo
+    depends_on: []
+    inputs: [knowledge/standards/technology/description-field-metadata-plan.md, knowledge/standards/technology/folder-naming-convention.md, PUBLISH-BOUNDARY.md, config/classification.yaml]
+    acceptance: >
+      Both files are split per option (b) of the 2026-07-27 inbox entry: the
+      MECHANISM halves (the naming grammar, the positional-code semantics, the
+      escalation-table join SHAPE) stay under knowledge/ as Internal-Public; the
+      app-code -> SEAL registry rows, real application names, the SEALID
+      format/width disclosure, and the real Oracle table/column/value details
+      move to internal/ twins, each half cross-referencing the other (the
+      established `ccb-` twin convention). After the split, a grep of the
+      publishable tree for each moved value returns hits ONLY under internal/;
+      neither public half claims anything no longer true once the values are
+      gone (the "document that no longer says anything true" failure is the
+      reason sanitize-in-place was rejected). Suite green, including
+      tests/unit/test_classification.py.
+    notes: >
+      Found 2026-07-27 while sweeping the SEALID publish-boundary breach — the
+      other 13 files were sanitized in that sweep; these two were deliberately
+      left because the real mappings ARE the knowledge, making this a
+      RELOCATE-vs-SANITIZE decision, not a find-and-replace. Options considered:
+      (a) move both files wholesale with a stub left behind, (c) reclassify the
+      whole knowledge/standards/technology/ directory as Internal. (b) chosen
+      because it is the shape the repo already uses elsewhere; the diff is the
+      user's review surface if they prefer (a) or (c).
+      DELIBERATELY OUT OF SCOPE: the adjacent internal-platform-vocabulary
+      question (HLDM/PRARAG tokens etc. in the sample corpus) — a different
+      value class, not ruled on, re-inboxed as its own IDEAS question.
+      Model fable per the matrix: this changes what the publish boundary
+      contains, a boundary decision, even though the mechanics are file moves.
+  - id: J15
+    epic: release-infrastructure
+    title: "Boundary guard test — grep the publishable tree for the VALUE shapes real ids take and fail on any id outside the reserved synthetic block (70001-70099)"
+    type: task
+    module: config
+    phase: 8
+    agent: main
+    model: sonnet
+    priority: p1
+    status: todo
+    depends_on: [J14]
+    inputs: [tests/unit/test_classification.py, config/classification.yaml, PUBLISH-BOUNDARY.md, drydocs/data/samples/, config/taxonomy/, drydocs_core/controlm/folder_name.py]
+    acceptance: >
+      A unit test in the classification/boundary family scans the publishable
+      tree (everything outside internal/ and gitignored paths) for the shapes
+      real identifiers take — bare 5-6 digit ids in taxonomy/sample/knowledge
+      files, and the numeric segment of any string the folder-name parser
+      decomposes — and FAILS when a value falls outside the reserved synthetic
+      block (70001-70099), unless the specific file+value is allowlisted with a
+      recorded reason. It must catch the historical miss: a SEALID embedded
+      inside a Control-M folder-name string (PRARAG-HLDM-<id>-...) that no grep
+      for the field name `seal_id` can see. Runs in the default suite with no
+      live services; green on the tree as left by J14.
+    notes: >
+      Lesson entry 2026-07-27: two sweeps (9d59f53 and the 2026-07-27 one)
+      failed the same way — they searched for the FIELD, not the VALUE, so real
+      ids survived for months inside folder-name strings. Same failure family
+      as the "succeeds loudly, does nothing" session through-line, and the same
+      conclusion as the identity gate's §F2 / the Unity Catalog takeaway: a
+      convention violated twice needs an enforcement point or it rots.
+      depends_on J14 because the test is red today on the two files J14
+      relocates — landing it first would just document the breach in CI.
+  - id: G36
+    epic: component-topology
+    title: "Drop the three never-consulted :BusinessApplication indexes (risk_level/status/name) and decide coverage for the one property that IS a predicate, manually_created"
+    type: chore
+    module: ontology
+    phase: 6
+    agent: main
+    model: sonnet
+    priority: p2
+    status: todo
+    depends_on: [S3]
+    inputs: [drydocs_core/schema/constraints.cypher, drydocs/loaders/manual_loads.py, drydocs_api/query_specs.py]
+    acceptance: >
+      constraints.cypher no longer declares businessapplication_risk,
+      businessapplication_status, or businessapplication_name (lines 37-39
+      today); a grep confirms no QuerySpec, loader, or web/src read binds on
+      those properties (today zero do — they appear only in SET clauses and
+      RETURN projections, where an index cannot help). A recorded decision (in
+      the commit body) rules whether manual_loads.py:113's
+      `{manually_created: true}` predicate — the one real predicate with no
+      index — gets one; if yes it exists under a NEW name (the
+      CREATE-IF-NOT-EXISTS name-match trap). Bootstrap schema re-run against
+      the live container succeeds; suite green.
+    notes: >
+      User finding 2026-07-26 reading constraints.cypher during the
+      business-application-identity gate review: every bind on
+      :BusinessApplication goes through the key property, already covered by
+      the UNIQUE constraint's backing index, and explorer.applications.v1 is an
+      unfiltered label scan no name/status index can accelerate. A declared
+      index READS AS A CLAIM the property is queried, so it mis-maps access
+      patterns for the next reader; at registry cardinality a label scan is
+      sub-millisecond. Original intent unrecoverable — git log -L reaches only
+      the 2026-07-20 squash root.
+      depends_on S3 because S3 rewrites the SAME file (key flip seal_id ->
+      app_id + new uniqueness constraint + :Port NODE KEY): one bootstrap
+      re-run instead of two, and no drive-by edit racing the atomic cutover.
+  - id: G38
+    epic: component-topology
+    title: "Prove the ddall federated read path with one real cross-database QuerySpec — or record that the composite is unnecessary and retire the unused watermark machinery"
+    type: task
+    module: drydocs-api
+    phase: 6
+    agent: main
+    model: sonnet
+    priority: p2
+    status: todo
+    depends_on: [G32]
+    inputs: [drydocs_api/query_specs.py, drydocs_api/exports.py, drydocs_core/schema/provisioning/smoke_drydocs_all.cypher, tests/unit/test_database_names.py]
+    acceptance: >
+      Either: one QuerySpec answers a real support question by reading `ddall`
+      across at least two member databases (chained `CALL { USE ddall.x }`
+      value-join per the smoke-file shape), carries the trust_watermark column
+      end to end, and is covered by a test — OR, if G32's ruling makes the
+      composite unnecessary, that is recorded and the consumer-less machinery
+      (WATERMARKED_DATABASES, the export banner path for ddall) is retired.
+      Either outcome closes the item; leaving the machinery built-but-unread
+      does not.
+    notes: >
+      Measured at the G30 close: 22 of 23 QuerySpecs read drydocs, 1 reads
+      ddcontext, ZERO read the composite — the federated watermark machinery is
+      fully built and tested against a surface no spec uses. Same shape as the
+      G30 finding (infrastructure with no consumer), and it gets more expensive
+      to leave alone if G32 adds a third data database. Written AFTER G32 so it
+      targets the ruled database set; it is also the honest end-to-end test of
+      G32's acceptance clause (d), the recorded cost of the database boundary.
+  - id: O33
+    epic: web-console
+    title: "SchemaMeta exemplar nodes contaminate unfiltered QuerySpecs — the applications frame would list the :BusinessApplication exemplar as an app with a null id; add exclusion predicates and audit all ~20 exemplars"
+    type: bug
+    module: drydocs-api
+    phase: 12
+    agent: main
+    model: sonnet
+    priority: p2
+    status: todo
+    depends_on: []
+    inputs: [drydocs_core/schema/schema_graph.cypher, drydocs_api/query_specs.py]
+    acceptance: >
+      Every QuerySpec whose MATCH binds a label that schema_graph.cypher also
+      stamps on a :SchemaMeta exemplar (schema_graph.cypher:39+ MERGEs
+      `:SchemaMeta:<RealLabel>` pairs — ~20 of them) excludes the exemplar,
+      preferring the rename-proof label predicate (`WHERE NOT n:SchemaMeta`)
+      over a non-null-key predicate. The audit covers ALL exemplar labels
+      against ALL specs, not just explorer.applications.v1. A test proves it:
+      with the meta-graph applied to a test database, no spec returns a
+      :SchemaMeta node. The meta-graph itself is KEPT — it is applied manually
+      by design and removable with `MATCH (n:SchemaMeta) DETACH DELETE n`.
+    notes: >
+      Found 2026-07-26 alongside the G36 index note. LATENT, not live: the file
+      header says "Applied MANUALLY only — never part of drydocs bootstrap",
+      but whenever it IS applied, the exemplar carries the real label with no
+      key property, and the UNIQUE constraint does not stop it because Neo4j
+      uniqueness ignores nulls (the same null-blindness behind the identity
+      gate's §C2 partial-cutover hazard). Key-predicate wording would change
+      under S3's seal_id -> app_id flip — another reason the label predicate is
+      the primary fix.
+
 summary:
-  todo: 49                                         # 39 after the G28/G29/G30 closes, +8 at the 2026-07-26 docs-residency groom (Q7-Q11, G31-G33), +2 raised at the 2026-07-27 business-application-identity sign-off (G34 glossary scaffolding, G35 TOM-roles gate)
+  todo: 54                                         # +2 raised at the 2026-07-27 identity sign-off (G34 glossary scaffolding, G35 TOM-roles gate), +5 at the 2026-07-27 groom (J14/J15 publish-boundary pair, G36 index diet, O33 SchemaMeta contamination, G38 ddall proof)
   in_progress: 1                                   # E1 (gate deferred both sides)
   blocked: 0
   done: 135                                        # +G28 multi-DB naming drift, +G29 supplement chain, +G30 lineage residency — all 2026-07-26
-  next_ready: [M3, M4, P3, J10, Q6, O23, J13, G21, G24, O26, G26, O27, C15, C16, O28, R3, R4, L16, O29, O30, O31, O32, S1, S8, S9, Q7, Q8, G32, G33, G34, G35]
+  next_ready: [M3, M4, P3, J10, Q6, O23, J13, G21, G24, O26, G26, O27, C15, C16, O28, R3, R4, L16, O29, O30, O31, O32, S1, S8, S9, Q7, Q8, G32, G33, G34, G35, J14, O33]
+  # 2026-07-27 groom (weekly inbox): 5 promoted, 1 merged, 1 resolved. None of
+  # the five touch edge semantics — no gate needed: J14 is a publish-boundary
+  # file split (fable because the boundary decision rides in it), J15/G36/G38/O33
+  # have written pass/fail tests. The deepdoc charter ruling rides G32's gate as
+  # its clause (e). J14 + O33 are dependency-free → next_ready; J15 waits on J14,
+  # G36 rides S3's bootstrap re-run, G38 waits on G32's ruling.
   # 2026-07-25 groom (pre-UI structure review + the 07-24/07-25 inbox): new Epic S
   # (S1-S9) from docs/reviews/architecture-structure-review-2026-07-25.md, plus G28
   # (multi-DB naming drift) and G29 (supplement-verb consolidation).
