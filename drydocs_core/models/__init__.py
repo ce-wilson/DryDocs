@@ -11,14 +11,17 @@ When real CSVs / table columns land, only the ``alias`` arguments / SELECT
 columns need to change — adapters and Cypher do not.
 """
 
+# NOTE: the catalog row models are NOT re-exported here. They live with their
+# loaders in drydocs/loaders/catalog.py, which is the ONLY definition — a stale
+# shadow copy of all eight lived in this package until 2026-07-27 (backlog C18)
+# and had already drifted past the C9 gate (missing sponsored_area_product_id
+# and the ';'->',' seal_ids normalizer). Because its model_config is
+# extra="ignore", importing the shadow would have dropped that column SILENTLY
+# at validation. Deleted rather than re-synced: two definitions is the defect,
+# not which one is stale. tests/unit/test_no_shadow_definitions.py keeps a
+# second copy from reappearing. Phase C (ADR 0002-A-1) may move the live models
+# here — one definition, MOVED.
 from .seal import SealApplicationRow, SealContactRow
-from .catalog import (
-    BusinessSegmentRow,
-    CatalogLOBRow,
-    DevTeamRow,
-    ProductLineRow,
-    ProductRow,
-)
 from .controlm import (
     ControlMConditionInRow,
     ControlMConditionOutRow,
@@ -36,12 +39,7 @@ __all__ = [
     # SEAL
     "SealApplicationRow",
     "SealContactRow",
-    # Catalog
-    "BusinessSegmentRow",
-    "CatalogLOBRow",
-    "ProductLineRow",
-    "ProductRow",
-    "DevTeamRow",
+    # Catalog — see the note above: defined in drydocs/loaders/catalog.py only.
     # Control-M (M3 part 1 — folders + jobs)
     "ControlMFolderRow",
     "ControlMJobRow",
