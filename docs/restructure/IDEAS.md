@@ -26,6 +26,33 @@ Tags help grooming: `idea` · `bug` · `doc` · `source` (new data source) · `q
 
 <!-- add new ideas at the top -->
 
+- 2026-07-27 — [bug] **`PORT-MANIFEST.yaml`'s `default:` is `clean-add`, so a MISSING row means
+  "port it" — absence is not exclusion, and two whole classes of producer-only file were sitting
+  in that gap.** Found while reviewing the company-side step-46 port plan: the plan listed
+  "all depgraph snapshots" under Excluded, correctly, but **no row said so**. Same for
+  `docs/port-prompt.md`, its step archive and the hand-off packs. On its face the manifest was
+  instructing the consumer to commit the producer's port *instructions* into their tree as
+  payload. This is not hypothetical — it is exactly why step 43 carried a prose *"do NOT
+  clean-add the T12 session materials"* instruction that had to be hand-rewritten this week when
+  the packs were retired. **A prose workaround was standing in for a missing row.** Both fixed
+  (`378f4ba`, `bf3fd34`): `knowledge/depgraph-snapshots/*.json` never-port with the tooling split
+  out as canonical-producer, and `docs/port-*.md` never-port.
+  **THE FOLLOW-UP IS THE REAL ITEM — these two were found by accident, one at a time, while
+  looking at something else. Nobody has ever asked the inverse question: which paths in the tree
+  match NO row?** That set is silently on `clean-add`. Wanted: a guard in
+  `tests/unit/test_port_reconcile_guards.py` that walks the tracked tree, resolves each path
+  first-match, and fails on anything falling through to `default:` unless it is on a written
+  allowlist — the `test_no_shadow_definitions` shape (C18), applied to port dispositions instead
+  of class names. Until then every port re-derives the same judgment calls from scratch and the
+  manifest keeps disagreeing with practice. Related: `git-readme.md` is also uncovered — left
+  deliberately (it is the WHY guide for the cross-repo model, not a control doc for one run, and
+  both sides benefit) but it is a *decision*, and it is not written down anywhere but here.
+- 2026-07-27 — [chore] **`web/` carries 3 high-severity npm advisories and a 1,485 kB main bundle
+  (390 kB gzipped), past Vite's 500 kB warning.** Both surfaced incidentally while removing the
+  `check` / `no-op` junk deps (those are gone — they were never committed, so `git restore` +
+  `npm prune` reverted them exactly; build still passes). Neither is touched: `npm audit fix`
+  moves versions and wants its own verification pass, and the bundle wants code-splitting, which
+  is a design call. Sibling to the existing J1 "unused deps" line.
 - 2026-07-27 — [bug] **The PAT team extract keys Products but NOT Product Lines — the cascade's
   first dropdown has no stable key.** From an SME review of the source report headers (structure
   only; the captures are Internal-Confidential and nothing from them is transcribed). The
