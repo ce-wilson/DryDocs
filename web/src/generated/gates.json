@@ -380,6 +380,17 @@
       "unblocks": [
         "G27"
       ]
+    },
+    {
+      "kind": "prompt-only",
+      "date": null,
+      "title": "self-documentation-code-graph (gate page rendered — session not yet run)",
+      "status": "open",
+      "prompt_files": [
+        "config/gate-prompts/self-documentation-code-graph.yaml"
+      ],
+      "log_ref": null,
+      "unblocks": []
     }
   ]
 }

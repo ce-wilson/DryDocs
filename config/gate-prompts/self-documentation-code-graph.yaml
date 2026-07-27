@@ -1,0 +1,218 @@
+# SME gate-prompt spec — SELF-DOCUMENTATION: load DryDocs' own code-dependency
+# snapshot into the graph under the software ontology.
+#
+# Backlog G33 (phase 16, Epic U — self-documentation). ID KEPT AS G33 deliberately;
+# see commit 6af87eb for why an Epic U item carries a G letter.
+#
+# GATE-BOUND: this page PROPOSES. No node is written, no constraint is created, no
+# loader is built, and the four new vocabulary terms stay `status: planned` until §I
+# is signed. The backlog item's own notes end "Do not build it" — this spec is the
+# step that comes first, not a change of that instruction.
+#
+# WHY A GATE AT ALL, when "it is just loading a JSON file we already generate":
+#   (1) it creates FOUR new graph classes/edges (:Project, :CodeModule, HAS_MODULE,
+#       IMPORTS) — new relationship types route through docs/RELATIONSHIP_GUIDE.md +
+#       the vocabulary registry + this gate, per CLAUDE.md §6. That alone is decisive.
+#   (2) it binds them to SWO terms that have been seeded but NEVER used — 13 terms
+#       with zero consumers anywhere in the tree. First use sets the precedent for
+#       every later binding.
+#   (3) it puts a SECOND KIND of thing in the `drydocs` database — our own source
+#       code, alongside the Control-M/SEAL operational graph. The collision surface
+#       is real and §F is where it is ruled.
+#
+# *** THE PART THE SME SHOULD READ FIRST ***
+# Three of the backlog item's stated premises DO NOT MATCH the artifact it proposes
+# to load. All three were found by opening the newest snapshot while drafting this
+# page (drydocs-20260727-1732.json, commit 4417d02). They are not fatal — but §B and
+# §G exist because of them, and the item's acceptance text should be corrected at
+# sign-off rather than built against:
+#
+#   (i)  "The depgraph schema already carries a `projects` key (=1), so the Project
+#        root matches the producer's own shape rather than inventing one."
+#        IT IS 6, NOT 1: drydocs, drydocs_core, drydocs_deepdoc, drydocs_lineage,
+#        drydocs_remediation, tests. `drydocs` is ONE OF SIX SIBLING SCAN ROOTS, not
+#        the umbrella. So `(:Project {project_id:'drydocs'})` as THE single root does
+#        not read off the data — it is a modelling choice, and §B has to make it.
+#
+#   (ii) "snapshot.ps1 already writes a code dependency graph every session (664
+#        nodes / 86 edges at the latest)."
+#        THAT FIGURE IS FROM A DIFFERENT ARTIFACT. 664 = 540 files + 124 dirs from
+#        `tree-this-version.json`, a one-off TREE-mode capture with projects:
+#        ['drydocs1'] and a CONTAINS relationship (663 of them). The rolling dated
+#        dependency snapshots are 183 files / 98 edges, all .py, no CONTAINS, no dirs.
+#
+#   (iii) BOTH shapes declare `schema: depgraph-machine-first/v1`. Same schema id,
+#        materially different content. A loader that keys on the schema string alone
+#        will mis-read one of them. §G rules this.
+#
+# Mechanism-only, and unusually so: every value on this page is our OWN source-tree
+# path (drydocs/cli.py and kin). There is no company data in a code snapshot — which
+# is itself part of why this item is cheap, and is stated here so the classification
+# is not re-derived later.
+classification: Internal-Public
+schema: drydocs.gate-prompt.v1
+id: self-documentation-code-graph
+title: "SME Gate — Self-documentation: load the DryDocs code-dependency snapshot into `drydocs` under a Project root, binding the unused SWO terms"
+step: "Rules the node/edge contract for DryDocs' own code in the graph BEFORE a loader exists — the Project root shape, the file-vs-module grain, and the collision rule against the software registry"
+summary: >
+  The depgraph ritual runs every session and its output never enters Neo4j — it is a
+  JSON file plus a viewer.html. Separately, drydocs_core/schema/ontology.cypher seeds
+  13 SWO terms (7 :SwoClass, 6 :SwoProperty) that have ZERO consumers anywhere in the
+  tree. G33 proposes joining the two: load the newest snapshot into `drydocs` under an
+  explicit :Project root, so the ritual's output stops being a file a human reads and
+  becomes a queryable subgraph — DryDocs documenting ITSELF the way it documents
+  Control-M.
+  THE TARGET DATABASE IS ALREADY RULED and this gate does not re-open it. G33's notes
+  settle it on the stated purpose: "prevent missing code fixes" means traversing from
+  a DryDocs module to the loader to the Control-M job it loads. That is a PATH QUERY,
+  and a Neo4j transaction cannot span databases — so code and operational graph must
+  share one. `drydocs`, not ddlineage, not a new database. This is the same principle
+  G30 applied to curated lineage the same week (a99ed86): the DB boundary is the TRUST
+  axis, and deterministically-derived code from source we control is VERBATIM, the
+  same tier as the main load. Code is not reference material ABOUT a system; it IS
+  one.
+  WHAT IS ACTUALLY UNDECIDED is the shape, and the snapshot contradicts the item on
+  three counts (see the header). The root is not obvious (§B — six projects, not one),
+  the grain is not obvious (§C — the data is FILES; :CodeModule is a choice), the edge
+  carries no type (§D — bare pairs), and the SWO binding is a first-use precedent
+  (§E). §F rules the collision guard against :SoftwareProduct. §G rules the two
+  snapshot modes that share one schema string.
+meta:
+  Module: "drydocs-load (new verb) · drydocs_core/schema (ontology.cypher SWO seeds, constraints) · drydocs_core/ontology/relationship_vocabulary.yaml · knowledge/depgraph-snapshots/ (the source artifact + snapshot.ps1)"
+  Source: "knowledge/depgraph-snapshots/*.json — produced by snapshot.ps1 every session ritual. Deterministically derived from our own source tree; no external system, no company data, no authority ambiguity"
+  Registry ref: "NONE — this source is not in config/source-registry.yaml. Registering it (with a classification) is part of §H, not an assumption; CLAUDE.md §3 says there is no unlabeled default"
+  Classification: "Internal-Public — the artifact contains only our own repo-relative paths. ONE CAVEAT ruled in §H4: every node also carries `abs_path`, a producer-local absolute path (C:/coding/projects/sandbox/DryDocs/...), which is machine state, not code structure"
+  Taxonomy: "NONE — this is not an imported hierarchy. It is a derived structural capture, which is why it lands as ontology + loader rather than config/taxonomy/"
+  Ontology map: "NEW entry self-documentation-code-graph (proposed at this gate). Unlike the property-supplement precedent, this one DOES create edges — so it needs vocab_ids, not a to_node: ~ shape"
+  Vocabulary: "FOUR NEW TERMS, all `status: planned` until §I signs — u1_has_module (HAS_MODULE), u1_imports (IMPORTS), plus the :Project and :CodeModule node classifications. Precedent for the planned-then-gated flow: the SOSA/SSN context terms and m3_depends_on_file, both sitting at status: planned in relationship_vocabulary.yaml today (75 local_relationships total)"
+  Related gates: "software-usage-patterns (the :SoftwareProduct registry this must NOT collide with — §F1) · NONE of the SEAL/Control-M gates are touched: this adds a disjoint subgraph and re-opens nothing"
+  Company impact: "NIL on data — the company's code tree differs from ours and this loads OUR snapshot. But the LOADER and the vocabulary port, and if the company ever runs snapshot.ps1 against their tree they get a second :Project root. §B3 asks whether that is designed-for or accidental"
+mapping:
+  - n: 1
+    element: "Project root"
+    target: "(:Project {project_id: ?}) — the anchor that makes \"is this our own code?\" one hop. SHAPE UNDECIDED: the snapshot names SIX projects, not one"
+    edge: "new node class  [DECISION — §B1]"
+  - n: 2
+    element: "Code unit"
+    target: ":CodeModule — proposed name. The snapshot's unit is a FILE (kind: 'file', file_id = repo-relative path, 183 of them, all .py)"
+    edge: "new node class  [DECISION — §C1]"
+  - n: 3
+    element: "Project → code containment"
+    target: "(:Project)-[:HAS_MODULE]->(:CodeModule) — vocabulary id u1_has_module"
+    edge: "new edge  [PROPOSED — §B2, planned until §I]"
+  - n: 4
+    element: "Code → code dependency"
+    target: "(:CodeModule)-[:IMPORTS]->(:CodeModule) — vocabulary id u1_imports. The snapshot's 98 edges are BARE 2-ELEMENT ARRAYS with no type or properties"
+    edge: "new edge  [PROPOSED — §D1, planned until §I]"
+  - n: 5
+    element: "SWO binding"
+    target: "13 seeded terms with zero consumers. Candidates: SWO_0000118 Python (language), SWO_0000741 'is encoded in' (module→language), SWO_0000740 'implements'"
+    edge: "first use of the SWO layer  [DECISION — §E]"
+  - n: 6
+    element: "Collision guard vs the software registry"
+    target: ":CodeModule must not be confusable with :SoftwareProduct — the registry's vendor/product ledger (role: orchestrator etc.). Both describe 'software'"
+    edge: "safety rule  [DECISION — §F1]"
+  - n: 7
+    element: "Snapshot mode discriminator"
+    target: "TWO artifact shapes share `schema: depgraph-machine-first/v1` — dependency mode (183 files, .py only, untyped edges) and tree mode (664 nodes incl. 124 dirs, all extensions, CONTAINS)"
+    edge: "schema defect  [DECISION — §G1]"
+  - n: 8
+    element: "Cross-domain path — the whole point"
+    target: "(:CodeModule {file_id:'drydocs/loaders/controlm_jobs.py'})-[?]->(:ControlMJob) — the 'prevent missing code fixes' query. NOT proposed here; §H5 records that it is NOT delivered by this gate"
+    edge: "out of scope, named  [§H5]"
+provenance:
+  - label: "Project (new root node)"
+    source_object: "knowledge/depgraph-snapshots/<newest>.json — the `projects` array and `meta` block"
+    key: "PROPOSED project_id. Value undecided — §B1"
+    loader: "NONE YET — `drydocs load-code-snapshot`, built only after this gate signs"
+    properties:
+      - name: project_id
+        origin: source
+        from: "the `projects` array — BUT it holds SIX entries in the newest snapshot (drydocs, drydocs_core, drydocs_deepdoc, drydocs_lineage, drydocs_remediation, tests), and the two tree-mode files hold a seventh and eighth ('drydocs1', 'drydocs-original'). G33's premise of one was wrong"
+        note: "this is the single most consequential undecided value on the page. If project_id = 'drydocs' AND the six scan roots also become :Project nodes, the word means two things at two levels"
+      - name: captured_at
+        origin: source
+        from: "meta.captured_at — ISO timestamp, e.g. 2026-07-27T17:33:00"
+        note: "the snapshot is a point-in-time capture; the load is current-state only (§H2), so this records WHEN current state was true"
+      - name: git_commit
+        origin: source
+        from: "meta.git.commit / .full / .branch / .describe / .subject"
+        note: "the artifact already carries full git provenance — this is why it is honest to call the load VERBATIM. The graph can state exactly which commit it describes"
+  - label: "CodeModule (new node)"
+    source_object: "the `nodes` array — 183 entries in the newest dependency snapshot"
+    key: "PROPOSED file_id (repo-relative path, e.g. 'drydocs/loaders/base.py') — globally unique across projects, already the edge endpoint format"
+    loader: "NONE YET"
+    properties:
+      - name: file_id
+        origin: source
+        from: "node.file_id — 'drydocs/gate_pages.py'. Already the join key the edges use, so it needs no derivation"
+        note: "STRONGEST argument for file-grain over module-grain (§C1): the edges already speak this key. Any module-grain model has to invent a mapping the artifact does not carry"
+      - name: project
+        origin: source
+        from: "node.project — one of the six scan roots"
+        note: "this is what makes §B1 unavoidable: every node ALREADY declares a project, and it is not 'drydocs' for 142 of the 183"
+      - name: extension
+        origin: source
+        from: "node.extension — '.py' for all 183 in dependency mode; 6+ distinct values in tree mode"
+        note: "the natural carrier of the SWO 'is encoded in' → Python binding (§E2). Note the seeded SWO set has Python/Shell/Java/SQL but the dependency scan only ever emits .py"
+      - name: circular
+        origin: source
+        from: "node.circular — boolean; stats.circular_files is 0 today"
+        note: "a real signal the graph could surface, currently only visible in the viewer. §C3 asks whether it loads as a property or is left derivable"
+      - name: abs_path
+        origin: source
+        from: "node.abs_path — 'C:/coding/projects/sandbox/DryDocs/drydocs/gate_pages.py'"
+        note: "PRODUCER-LOCAL MACHINE PATH. §H4 rules whether it loads at all; recommendation is that it does not"
+sections:
+  - title: "A. Scope — what this gate does and does NOT decide"
+    confirmations:
+      - "A1: this gate rules the NODE AND EDGE CONTRACT for DryDocs' own code in the graph, and nothing else. It re-opens no signed gate. The subgraph it proposes is DISJOINT from the Control-M/SEAL operational graph — it touches no existing label, no existing edge, and no existing loader."
+      - "A2 [ALREADY RULED — confirm, do not re-litigate]: the TARGET DATABASE is `drydocs`. G33's notes decided it on the stated purpose, and G30 (a99ed86, 2026-07-26) applied the identical reasoning to curated lineage two days earlier. The rule both share: the DB boundary is the TRUST axis (ADR 0002 D1/D2), and a Neo4j transaction CANNOT SPAN DATABASES — so anything that must be path-queried against the main load has to live in it. Confirm you still hold this; everything in §H assumes it."
+      - "A3: this gate does NOT build anything. It does not write the loader, does not create constraints, and does not flip the four vocabulary terms past `status: planned`. G33's notes end 'Do not build it' — this page is the prerequisite that instruction implies, not a reversal of it."
+      - "A4: the SWO SDLC reference set (~250 terms, ontology/reference/swo_sdlc_ontology.cypher, per ontology.cypher:109) is OUT OF SCOPE. This gate binds only to the 13 anchor terms already seeded in the base schema. If the wider set is wanted, that is its own decision about loading a public ontology into the operational database."
+      - "A5: the TIME SERIES is out of scope. ~70 dated snapshots exist; §H2 loads only the newest as current state. Code evolution over time is a later capability and is deliberately not designed for here."
+  - title: "B. The Project root — where G33's premise broke"
+    confirmations:
+      - "B0 [premise correction — read before B1]: G33's notes say 'The depgraph schema already carries a `projects` key (=1), so the Project root matches the producer's own shape rather than inventing one.' THE NEWEST SNAPSHOT CARRIES SIX: drydocs, drydocs_core, drydocs_deepdoc, drydocs_lineage, drydocs_remediation, tests — and every one of the 183 nodes declares which one it belongs to. 142 of them are NOT 'drydocs'. So the shape does not read off the data; it has to be chosen. Confirm the correction, because B1 is a real decision rather than a formality only once you accept it."
+      - "B1 [pick one — the core ruling]: (a) ONE root, (:Project {project_id:'drydocs'}), with the six scan roots becoming a `project` PROPERTY on each :CodeModule [AGENT RECOMMENDATION — it matches G33's stated intent exactly ('a way to distinguish it's for drydocs project and not the products metadata'), keeps 'is this our own code?' at one hop, and treats the six for what they are: Python packages inside one repository, not six projects]. (b) SIX roots, one per scan entry, with no umbrella [truthful to the artifact, but then there is no single node meaning 'our code', and the one-hop test fails]. (c) TWO LEVELS — one :Project umbrella plus six :CodePackage children [most faithful; costs a fifth new class this gate has not scoped, and §F's collision surface grows with it]. NOTE (a) and (c) differ only in whether the six are nodes or a property — decide that, and the rest follows."
+      - "B2: the containment edge is (:Project)-[:HAS_MODULE]->(:CodeModule), vocabulary id u1_has_module, registered `status: planned` here. Under B1(c) it would need a second edge for the middle layer. Confirm the name — HAS_MODULE reads oddly if §C1 rules the grain is FILES rather than modules, and renaming an edge after it is written is a migration."
+      - "B3 [the company question, cheap to answer now]: the loader and vocabulary PORT to the company repo even though the data does not. If they ever run snapshot.ps1 against their tree, they get a second :Project root in their graph. Is that (a) intended and fine — project_id disambiguates and the model already supports it, or (b) something the loader should refuse? Answering now costs nothing; discovering it after the port costs a gate."
+  - title: "C. Node grain — the artifact says FILE, the proposal says MODULE"
+    confirmations:
+      - "C1 [pick one]: the snapshot's unit is a FILE — `kind: 'file'` on all 183 nodes, keyed by `file_id` = repo-relative path, all `.py`. G33 proposes the label `:CodeModule`. (a) Keep :CodeModule as the label but key it on file_id and accept that one file = one module [AGENT RECOMMENDATION — in Python the mapping is essentially 1:1, the edges ALREADY use file_id as their endpoint key so no derivation is invented, and the label reads better in queries than :CodeFile]. (b) Name it :CodeFile, matching the artifact exactly [most honest; loses the ontological framing that motivated the SWO binding]. (c) Derive true module identity (dotted path, packages collapsed) [the artifact does not carry it, __init__.py makes it lossy, and it invents a mapping the gate would then own]."
+      - "C2: whichever wins, the KEY is `file_id` — the repo-relative path. Confirm, and note WHY it is safe: it is already globally unique across the six projects and is already the format both endpoints of every edge use. A different key would require rewriting the edge join."
+      - "C3: `circular` (boolean, per node; stats.circular_files = 0 today) — load it as a property, or leave it derivable from the graph? It is the one genuinely ANALYTIC field the snapshot carries, and it is currently visible only in viewer.html. AGENT RECOMMENDATION: load it, because it records what the SCANNER concluded at capture time, and a later graph query answering differently is itself a useful signal."
+      - "C4: __init__.py files are 1:1 with packages, not modules, and appear as ordinary nodes (drydocs/loaders/__init__.py is a real edge endpoint). Confirm they load as ordinary :CodeModule nodes with no special treatment — or name the treatment."
+  - title: "D. The dependency edge — untyped pairs"
+    confirmations:
+      - "D1: the 98 edges are BARE TWO-ELEMENT ARRAYS — [\"drydocs/cli.py\", \"drydocs/loaders/base.py\"]. No type, no properties, no direction marker beyond position. So :IMPORTS carries everything the artifact knows, and there is nothing to disambiguate. Confirm (:CodeModule)-[:IMPORTS]->(:CodeModule), vocabulary id u1_imports, `status: planned`, direction = importer → imported."
+      - "D2 [the honest limit — do not let this be oversold]: the snapshot CANNOT distinguish `import x` from `from x import y`, a runtime import from a TYPE_CHECKING-only import, or a conditional import from an unconditional one. The batch_port_orchestrator work this week added exactly such a TYPE_CHECKING import (LoaderRunLog), and in the graph it will be indistinguishable from a hard runtime dependency. Confirm the limit is ACCEPTED and recorded, rather than discovered later by someone trusting an IMPORTS edge to mean 'breaks if removed'."
+      - "D3: no edge properties are proposed — no first_seen_at, no last_run_id. This DIVERGES from every other loader in the repo (the M2 pull-provenance convention: first_seen_at / last_seen_at / last_run_id everywhere). Confirm the divergence is intended because the whole subgraph is replaced from one artifact per load, OR rule that the convention applies here too. AGENT RECOMMENDATION: apply the convention — the wipe-and-rebuild doctrine does not remove the value of knowing which run wrote a node, and diverging from a repo-wide convention needs a stronger reason than 'this loader is different'."
+  - title: "E. The SWO binding — first use of a layer seeded 6 weeks ago"
+    confirmations:
+      - "E0: drydocs_core/schema/ontology.cypher:112-124 seeds 13 terms — 7 :SwoClass (software, programming language, Python, Shell, Java, SQL, data transformation) and 6 :SwoProperty (is executed in, is encoded in, implements, has specified data input, has specified data output, uses platform). VERIFIED: they have ZERO consumers anywhere in the tree. This gate is their first use, so it sets the pattern for every later binding. Confirm you want that precedent set HERE, on our own code, rather than on a company-facing subgraph — the agent view is that this is the ideal low-stakes place for it."
+      - "E1 [pick the binding depth]: (a) BIND MINIMALLY — :CodeModule carries a property naming its language and nothing links to the SWO nodes [cheapest; leaves the seeded terms still unused, which is the status quo this item exists to change]. (b) BIND ONE EDGE — (:CodeModule)-[:IS_ENCODED_IN]->(:OntologyTerm:SwoClass {label:'Python'}), using the seeded SWO_0000741 'is encoded in' [AGENT RECOMMENDATION — it is exactly what that term means, it uses the layer without inventing terms, and with `extension` on every node it is derivable with no new data]. (c) BIND BROADLY — also 'implements', 'uses platform', 'has specified data input/output' [these describe SOFTWARE FUNCTION, and nothing in a dependency snapshot knows what a module implements or what data it consumes. Choosing this means committing to derive facts the artifact does not carry]."
+      - "E2: under E1(b), the language value comes from `extension` ('.py' → Python). Note the seeded set includes Shell, Java and SQL, but the dependency scan emits ONLY .py — so three of the four language terms stay unused, and the tree-mode artifact (§G) is the only thing that has ever seen .md/.xsd/.ttf. Confirm that partial use is fine, or say the scan should widen first."
+      - "E3: any SWO edge created here needs a vocabulary id and `status: planned` alongside u1_has_module and u1_imports. Confirm the count the gate is registering — 2 terms under E1(a), 3 under E1(b), 6+ under E1(c). This is the number §I flips."
+  - title: "F. Collision safety — two kinds of 'software' in one database"
+    confirmations:
+      - "F1 [the guard G33 asks for explicitly]: :CodeModule must NOT be confusable with :SoftwareProduct — the software registry's vendor/product ledger (config/taxonomy/software-registry.yaml, role: orchestrator etc., the C12/C14 stream). Both are legitimately 'software' and they will sit in one database. Confirm the rule: no node ever carries BOTH labels, and the two are keyed differently (file_id, a path, vs the registry's product id). AGENT RECOMMENDATION: state it as a graph-test rather than a constraint — Neo4j cannot express 'these two labels are mutually exclusive' declaratively, the same limitation the TOM-roles gate hit on singleton cardinality (G35 §c)."
+      - "F2: the :Project root is what keeps this subgraph from polluting product metadata — G33's second stated requirement, in the user's words 'a way to distinguish it's for drydocs project and not the products metadata'. Confirm that a single hop from :Project is the ACCEPTED test for 'this is our own code', and that nothing else in the graph will hang off :Project."
+      - "F3: :Project is a generic word and the graph already has :Product, :AreaProduct, :ProductLine, :CatalogLOB from the PAT taxonomy. Confirm :Project reads unambiguously against those — or name a more specific label now, while renaming is free. This is the same class of question ADR 0003 answers for properties, applied to a label."
+  - title: "G. Two artifact shapes, one schema string"
+    confirmations:
+      - "G1 [a real defect, found while drafting this page]: `knowledge/depgraph-snapshots/` holds TWO materially different artifacts that BOTH declare `schema: depgraph-machine-first/v1` — (i) DEPENDENCY mode, ~70 dated files, meta.tree = false, nodes are files only, all .py, edges are import pairs, projects = the six scan roots; (ii) TREE mode, 2 files (tree-original.json, tree-this-version.json), nodes include DIRECTORIES (kind: 'dir'), every extension (.md, .xsd, .ttf, .txt), a CONTAINS relationship in stats.rels, and projects = ['drydocs1'] / ['drydocs-original']. A loader keying on the schema string alone WILL mis-read one. Confirm the fix: (a) the loader discriminates on meta.tree and refuses tree-mode files [cheapest, and matches §H2's newest-file rule which never selects them anyway], (b) the schema string is versioned apart (…/v1-deps vs …/v1-tree) [correct, but edits ~70 committed files], (c) tree-mode files move out of the directory [cleanest separation; they are historical one-offs]. AGENT RECOMMENDATION: (a) now, and log (b)/(c) — the loader must be safe regardless, and the other two are tidying."
+      - "G2: the '664 nodes / 86 edges' figure in G33's notes is from tree-this-version.json (540 files + 124 dirs), NOT from the dependency snapshots it proposes to load (183 files / 98 edges). Confirm the correction so the built item is not sized against the wrong artifact — and note the direction of the error: the real load is roughly a QUARTER the size the item implies."
+      - "G3: tree-mode files carry a CONTAINS relationship (663 of them) that dependency mode does not. If directory structure is ever wanted in the graph, that is a SECOND capability with a second edge type — explicitly NOT proposed here. Confirm it stays out."
+  - title: "H. Ingestion mechanics"
+    confirmations:
+      - "H1: the verb is `drydocs load-code-snapshot`, and it MERGEs idempotently so it survives the wipe-and-rebuild cycle like every other loader — the ADR 0002 D3 stateless test, re-runnable from committed files with zero data loss. Confirm."
+      - "H2: it reads the NEWEST `knowledge/depgraph-snapshots/*.json` as current state. Under §G1(a) it discriminates on meta.tree and refuses tree-mode input. Confirm 'newest' means by filename timestamp, and that a refusal is LOUD — the 'succeeds loudly, does nothing' family (Q8, G29, G30, the batch-port orchestrator) is this repo's most-repeated defect, and a self-documentation loader silently loading nothing would be a poor joke."
+      - "H3: snapshot.ps1 stays DECOUPLED — the session ritual must keep working with no database running. Confirm this is a hard requirement, not a preference: the ritual ran twice today with no Neo4j involvement, and coupling it would make every session depend on a container."
+      - "H4 [the one publish-boundary question]: every node carries `abs_path` — 'C:/coding/projects/sandbox/DryDocs/drydocs/gate_pages.py'. That is PRODUCER-LOCAL MACHINE STATE, not code structure. It is also why the *.json files were ruled never-port on 2026-07-27 (PORT-MANIFEST.yaml). Confirm the loader DROPS abs_path and loads only rel_path/file_id. AGENT RECOMMENDATION: drop it — it is worthless in a graph queried from another machine and actively misleading in a ported one."
+      - "H5 [what this gate does NOT deliver — state it plainly]: the motivating query, 'traverse from a DryDocs module to the loader to the Control-M job it loads', is NOT delivered by this gate. It needs an edge from :CodeModule to the operational graph, and NOTHING in the depgraph snapshot knows that drydocs/loaders/controlm_jobs.py produces :ControlMJob nodes — that mapping lives in the loaders' Cypher, not in their imports. Confirm the honest position: this gate lands the code subgraph and the SHARED DATABASE that makes the join POSSIBLE; the join itself is a second item. Recording this now prevents the item being judged against a promise it never made."
+      - "H6: the source needs a config/source-registry.yaml entry WITH a classification — CLAUDE.md §3 says there is no unlabeled default. Proposed: Internal-Public (our own repo-relative paths, no company data), with H4's abs_path drop as the reason it stays that way. Confirm."
+  - title: "I. Sign-off"
+    confirmations:
+      - "SME sign-off recorded here and transcribed to config/gate-log.md with per-item outcomes (A1-A5, B0-B3, C1-C4, D1-D3, E0-E3, F1-F3, G1-G3, H1-H6). ON SIGN-OFF: the four (or more, per §E3) vocabulary terms are registered in drydocs_core/ontology/relationship_vocabulary.yaml at `status: planned`; the taxonomy-ontology-map entry self-documentation-code-graph flips proposed -> confirmed; backlog G33 unblocks and the loader may be built; gates.json and the enforcement matrix are regenerated. NOTHING IS WRITTEN TO THE GRAPH AT THE GATE ITSELF."
+      - "ALSO AT SIGN-OFF — correct the backlog item. G33's acceptance and notes carry the three premise errors this page documents: `projects` (=1) is really 6 (§B0), '664 nodes / 86 edges' is the wrong artifact (§G2), and the single (:Project {project_id:'drydocs'}) root is presented as reading off the data when it is a choice (§B1). Leaving them would mean building against a description of an artifact that does not exist."
