@@ -44,28 +44,37 @@ Tags help grooming: `idea` · `bug` · `doc` · `source` (new data source) · `q
      exactly — *the loader stays the ONLY graph writer*: the screen drafts a mapping-table row,
      which travels change artifact → gate → merge → next load run. The approval/notes/user/date
      fields ARE that screen's mandatory-rationale + lifecycle chips, already specified.
-  2. **The open gate that should own it:** `config/gate-prompts/seal-app-ref-edge-reshape.yaml`
-     (v2, prepped 2026-07-22, unsigned) already rules folder-grain attribution and WHO AUTHORS
-     it (§A grain, §B defined mapping, §E steward overrides). Two things here are NOT in it:
-     the **orchestrator decision point** (the gate is Control-M-only; this makes the mapping act
-     orchestrator-FIRST, then filters that orchestrator's entities), and the **port-activation
-     consequence**. Fold both in — or add a companion section — before that gate is run.
+  2. **DONE 2026-07-27 — folded into the open gate as a companion section.**
+     `config/gate-prompts/seal-app-ref-edge-reshape.yaml` **v3** now carries **§G** (7
+     confirmations: orchestrator-first authorship, the C14 prefill demotion, 1:N cardinality,
+     port activation, the §G5 consistency tie to §C1, the cascade, the unchanged write path);
+     sign-off moved G→H, every existing id A1–F2 is unchanged so the external citations of
+     §B/§C1/§E2 still resolve. SME rulings recorded as direction-to-confirm, not as decided.
   3. **What it re-frames in C14:** `batch_port_orchestrator` today writes the USES_SOFTWARE edge
      straight from the SEAL-declared string via the platforms.yaml crosswalk, with no SME
      confirmation anywhere in the path. Under this direction that declared string is a
      **prefill/proposal** and the confirmed folder mapping is the authority. Gate question, not
-     a build decision — the loader was left as-is.
-  4. **Missing edge behind dropdown 3:** ProductLine→Product is `catalog_has_product` [active],
-     but **Product→BusinessApplication (`catalog_has_application`) is still `planned`** — the
-     third picker has no edge to traverse yet. Concrete build dependency for the screen.
+     a build decision — the loader was left as-is (§G2).
+  4. ~~Missing edge behind dropdown 3.~~ **CORRECTED 2026-07-27 by the company-side review** —
+     it is a **back-flow, not a build**. Producer-side `catalog_has_application` is `planned`
+     with `loader: ~`, held there by the C9 note *"stays planned until a product-scoped extract
+     is onboarded"*. **Company-side that precondition is already met**: a product-scoped extract
+     feeds a dedicated loader (`pat_app_links.cypher`) and the edge is ACTIVE in the schema
+     graph. Two riders now in §G6: the two sides **word the semantics differently** — producer
+     "Product owns a set of SEAL-registered applications" vs company "a structural SUPPORT link,
+     a Product is supported by 2+ apps (front-end/back-end)", which makes the picker mean
+     different things — and the edge is **1:many by design** on both sides (the source extract's
+     application-id column is multi-valued), so the picker returns a LIST.
 
-  Open questions for the gate: (a) is `Port.active` **SME-declared** at approval, or **derived**
-  from evidence (a confirmed folder ⇒ batch port active), and what is the Event port's
-  equivalent evidence? (b) does the planned `:Batch` intermediate (`arch_contains_batch`
-  BusinessApplication→Batch, `arch_contains_folder` Batch→ControlMFolder, both `planned`)
-  **collapse into the BatchProcessing `:Port`**, given the 2026-07-22 grain correction routes
-  attribution folder→batch-port? Two nodes for one concept otherwise. (c) what makes a folder
-  "available" in the filter — unmapped only, naming-pattern match, or both?
+  Also confirmed by that review: the company flagged its OWN stale artifact — a gate page still
+  listing `catalog_has_application` as `planned` while its schema graph says `active`. Same
+  root as the producer's staleness, opposite direction. **Divergence-ledger candidate**, and a
+  reminder that "which surface is authoritative" needs an answer per repo, not once.
+
+  Open questions carried into §G: the Event port's confirming evidence (no Control-M analogue —
+  declared-only until an event source exists?); whether the planned `:Batch` intermediate
+  collapses into the BatchProcessing `:Port` (§C2 already proposes retiring it); and what makes
+  a folder "available" in the filter — unmapped only, naming-pattern match, or both.
 
 - ~~2026-07-27 — [bug] `batch_port_orchestrator.cypher:26` carries the exact defect Q8 closed in
   `bmc_docs.cypher`.~~ **FIXED 2026-07-27** — and it was worse than logged: MATCH-only on BOTH

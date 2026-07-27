@@ -6,10 +6,22 @@
 # item) superseded that framing: attribution grain is FOLDER-level, authored by the
 # Control-M APP CODE as a DEFINED mapping with steward overrides — the shape question
 # survives as section D. GATE-BOUND: this page PROPOSES; no vocabulary re-shape, no
-# map flip, no loader change, no graph write until §G is signed. The K2 match POLICY
+# map flip, no loader change, no graph write until §H is signed. The K2 match POLICY
 # (signed off 2026-07-14) is NOT re-opened — it demotes to fallback tier, unchanged
 # internally. Mechanism-only: no real folder/job/SEAL values (the two declared tier-1
 # code examples live in the IDEAS.md inbox note, cited — not restated — here).
+#
+# REVISED v3 2026-07-27 — COMPANION section G added (sign-off moves G→H; every existing
+# confirmation id A1–F2 is unchanged, and the external citations of §B / §C1 / §E2 still
+# resolve). Folds in the SME orchestrator-mapping direction of the same date: the
+# app→orchestrator USES_SOFTWARE edge is AUTHORED by a confirmed folder/entity mapping
+# rather than derived from the SEAL declaration, Port.active is SME-declared then
+# confirmed by that mapping, orchestrator cardinality is 1:N, and the mapping act is a
+# steward UI cascade. Evidence basis for §G6 is a company-side session reviewed
+# 2026-07-27 (screenshots) plus the source system's own report headers — STRUCTURE ONLY:
+# those captures carry real application ids, SIDs, names and team/LoB values and are
+# Internal-Confidential, so nothing from them is transcribed here or anywhere in the
+# publishable tree (PUBLISH-BOUNDARY.md; the sealid-in-strings lesson).
 classification: Internal-Public
 schema: drydocs.gate-prompt.v1
 id: seal-app-ref-edge-reshape
@@ -31,15 +43,21 @@ summary: >
   origin-flagged pattern) carries the correction until it is fixed in the source
   system — and because the defined mapping has NO machine feed, this gate must
   also rule the standing open question of whether steward rows may feed the
-  graph (they are the only possible source here). Until §G signs, the active
+  graph (they are the only possible source here). Until §H signs, the active
   K2 shape stands with its documented rider and the UI keeps deriving the
   folder→app crosswalk through job edges (explorer.folder-applications.v1).
+  COMPANION §G (v3, 2026-07-27) attaches the ACT that performs the mapping:
+  the steward picks the orchestrator FIRST — that choice authors the
+  app→orchestrator USES_SOFTWARE edge — then filters that orchestrator's
+  folders/entities, and the approved mapping is what CONFIRMS an SME-declared
+  Port.active. §G shares §A–§F's grain and §E3's write path; it is not a
+  second gate, and it cannot sign without §C1 (the two must agree, §G5).
 meta:
   Module: "drydocs-load · seal_attribution loader + manual tier-5 writer (K2) · mapping store (O13/O24) · drydocs_api/mappings.py"
   Source: "STG_APP_FACT (fact_type SEAL) demotes to fallback; NEW authoring source = the steward-defined app-code mapping (config/overrides/ CSV → mapping.db domain — no source system exists for it)"
   Registry ref: "stg-app-fact — confirmed, unchanged; the defined-mapping store needs its own source-registry entry at build (classification Internal-Confidential company-side, mechanism-only here)"
   Classification: "Internal (real code→SEAL rows) · this page Internal-Public (mechanism only)"
-  Vocabulary: "m3_seal_app_ref (active, rider) · m3_contains_folder (active — the app-code→folder tie) · arch_contains_batch/arch_contains_folder (planned :Batch bridge — candidate for retirement at this gate, section D)"
+  Vocabulary: "m3_seal_app_ref (active, rider) · m3_contains_folder (active — the app-code→folder tie) · arch_contains_batch/arch_contains_folder (planned :Batch bridge — candidate for retirement at this gate, section D) · §G adds: reg_uses_software (active — the orchestrator edge, authorship under decision G1/G2) · seal_has_port (active — Port.active activation semantics, G4) · catalog_has_application (PLANNED producer-side with no loader, ACTIVE company-side with one — the §G6 back-flow)"
   Ontology map: "config/taxonomy-ontology-map.yaml job-seal-app-ref (confirmed, type_conflict_note) + app-code-defined-mapping (proposed 2026-07-22, this gate's entry)"
   Related gates: "seal-tom-attribution-reshape §F (2026-07-10, deferred here) · seal-attribution-match-policy (2026-07-14, NOT re-opened — demoted to fallback) · ui-write-surface (2026-07-21 — O24 override store ratified; its open override-vs-precedence question is scoped HERE, section E)"
   Company impact: "T1 live load re-run after migration; company enumerates its real tier-1/tier-2 code rows at its own gate"
@@ -68,6 +86,14 @@ mapping:
     element: "Migration of live K2 job edges"
     target: "idempotent migrate cypher (migrate_develops precedent): job edges re-derive from folder edges or are re-written at the new grain; ALL properties kept; company re-runs T1 after"
     edge: "—  [follow-up commit, §F]"
+  - n: 7
+    element: "Orchestrator AUTHORSHIP (companion §G)"
+    target: "the confirmed mapping act authors (:BusinessApplication)-[:USES_SOFTWARE]->(:SoftwareProduct {role: orchestrator}); the SEAL-declared batch_orchestrator string demotes to prefill; cardinality 1:N (modernization), so no uniqueness constraint"
+    edge: "reg_uses_software — authorship + cardinality  [PROPOSED — SME direction 2026-07-27]"
+  - n: 8
+    element: "Port ACTIVATION (companion §G)"
+    target: "Port.active is SME-DECLARED then CONFIRMED by the folder relationship — two states, not a boolean; today created false by seal_applications.cypher and never written true or read anywhere, so this act is its first writer"
+    edge: "seal_has_port — activation semantics  [PROPOSED — SME direction 2026-07-27]"
 provenance:
   - label: "application↔folder attribution (grain + shape under decision)"
     source_object: "NEW: steward-defined app-code mapping rows (no source system — the store IS the source of record until Control-M folder variables carry the value); FALLBACK: STG_APP_FACT (fact_type SEAL) via the K2 stream"
@@ -106,6 +132,15 @@ sections:
     confirmations:
       - "F1: live K2 job edges migrate idempotently to the ruled grain/shape, preserving every property; the company re-runs its T1 load after (edges MERGE idempotently)."
       - "F2: one logged change on sign-off: vocabulary entries registered/re-shaped (folder edge, tier-2 edge, :Batch retirement per C2); map entries app-code-defined-mapping + job-seal-app-ref updated; new mapping-store domain + K2_SHAPE update in drydocs_api/mappings.py; manual-loads template rekeyed to app_code; explorer specs re-bound; drift guards green; transcription to config/gate-log.md; gates.json regenerated."
-  - title: "G. Sign-off"
+  - title: "G. COMPANION (v3, 2026-07-27) — the mapping ACT: orchestrator authorship, port activation, and the Product→Application cascade"
     confirmations:
-      - "SME sign-off recorded here and transcribed to config/gate-log.md with per-item outcomes (A1–A2, B1–B3, C1–C2, D1–D2, E1–E3, F1–F2)."
+      - "G1 [the act is ORCHESTRATOR-FIRST]: the steward picks the orchestrator (Control-M | AutoSys | future) BEFORE the folder/entity filter, and THAT choice is what authors (:BusinessApplication)-[:USES_SOFTWARE]->(:SoftwareProduct {role: orchestrator}) — the edge is created BY the confirmed mapping, never derived from a declaration (mapping n:7). Sections A–F above are Control-M-shaped; this generalizes the ACT so AutoSys drops in as a sibling domain without re-opening the grain ruling. Confirm that the orchestrator edge is authored here, and that the entity filter is scoped to the picked orchestrator."
+      - "G2 [the SEAL-declared string demotes to PREFILL]: batch_port_orchestrator (C14) today writes USES_SOFTWARE {source: 'batch-port'} straight from the SEAL batch_orchestrator string via the platforms.yaml crosswalk, with NO SME confirmation anywhere in the path. Under G1 that string PREFILLS the picker and the confirmed mapping is the authority — the same demotion B3 applies to K2 matching, and the same correction already made when HAS_APPLICATION stopped being written from the PAT team row's application ids (mis-attribution, cleaned by migrate_pat_alignment_c9.cypher — the precedent to copy). RULE the existing edges: re-sourced on confirmation, or kept with origin=declared until a confirmation supersedes them?"
+      - "G3 [orchestrator cardinality is 1:N — SME direction 2026-07-27]: an application may use MORE THAN ONE orchestrator — 1:1 today, 1:2 / 1:3 as platforms are modernized and workloads move off the incumbent. Three consequences: (a) NEVER a uniqueness constraint on the orchestrator edge — the TOM-roles lesson, a cardinality rule is a graph-TEST not a constraint; (b) the DECLARED side is structurally 1:1 today (batch_orchestrator_raw is a scalar property and the adapter yields one row per app from one taxonomy field) and must become multi-valued before G2 can prefill honestly; (c) mid-migration is a NORMAL state, not a conflict — the UI and every coverage report must show N orchestrators without flagging drift."
+      - "G4 [port activation — SME direction 2026-07-27]: Port.active is SME-DECLARED, then CONFIRMED when the relationship to the folders is created. That is TWO states, not a boolean flip. Standing fact: both ports are created active=false (seal_applications.cypher, ON CREATE SET) and NOTHING in the repo ever writes true or reads the flag — this act is its first writer, so there is no legacy state to migrate. Confirm the property shape (active + active_state declared|confirmed + declared_by/at + confirmed_by/at/run_id, or a separate state property) and confirm that a declared-but-unconfirmed port is visibly distinct from a confirmed one on every surface."
+      - "G5 [G4 and C1 must sign CONSISTENTLY]: if C1 signs (b) — the folder attaches to the BatchProcessing :Port — then 'the relationship to the folders is created' IS that edge, and confirmation is derivable with no separate trigger. If C1 signs (a) — the folder attaches to the app node — then NOTHING touches the port and the confirmation trigger must be named explicitly. Also rule the EVENT port: it has no Control-M analogue, so name its confirming evidence or rule it declared-only until an event source is onboarded."
+      - "G6 [the cascade's third picker is a BACK-FLOW, not a build]: the act is Product Line → Product → Business Application → [orchestrator, G1] → filter of available folders → folder (matched on the internal folder naming-convention pattern) → SME check/approval + notes capturing SME user and date. The third picker traverses (:Product)-[:HAS_APPLICATION]->(:BusinessApplication) [SME-named 2026-07-27]. PRODUCER-SIDE that is catalog_has_application — status: planned, loader: ~ — held there by the C9 note 'stays planned until a product-scoped extract is onboarded'. COMPANY-SIDE that precondition is ALREADY MET: a product-scoped extract feeds a dedicated loader and the edge is ACTIVE in the schema graph (reviewed 2026-07-27). So this is a divergence/back-flow item, not new build. Two riders: (i) the two sides word the SEMANTICS differently — producer 'Product owns a set of SEAL-registered applications' vs company 'a structural SUPPORT link: a Product is supported by 2+ applications, front-end/back-end' — rule ONE reading, because the picker means a different thing under each; (ii) the edge is 1:many BY DESIGN on both sides (the source extract's application-id column is multi-valued), so the picker returns a LIST, never a single application."
+      - "G7 [write path unchanged]: E3 applies verbatim — the screen drafts a mapping-store row and the LOADER stays the only graph writer. The SME check/approval + notes/user/date ARE the O13 mandatory-rationale and lifecycle chips (draft → submitted → gated → loaded); they become the confirmed edge's provenance (origin, confirmed_by, confirmed_at), which is also what satisfies G4's confirmation stamp. Define 'available folders' for the filter: unmapped only, naming-pattern match, or both."
+  - title: "H. Sign-off"
+    confirmations:
+      - "SME sign-off recorded here and transcribed to config/gate-log.md with per-item outcomes (A1–A2, B1–B3, C1–C2, D1–D2, E1–E3, F1–F2, G1–G7)."
