@@ -447,3 +447,52 @@ class ControlMDependencyRow(BaseModel):
                 f"not a '<folder_id>.<job_id>' composite: {s!r}"
             )
         return s
+
+
+class ControlMHostRow(BaseModel):
+    """One row of ``psgmgr.CM_HOSTS`` — host-group membership (replica of the
+    BMC node-group structure; vendor 6.4.01 poster: CMS_NODGRP).
+
+    Key schema findings (2026-07-09 profile + column view):
+      * NOT versioned — no ``IS_CURRENT_VERSION`` / ``VERSION_SERIAL``; no
+        ``USER_DAILY`` either (grain is independent of folders/jobs).
+      * Grain assumed ``(DATA_CENTER, GRPNAME, NODEID)`` pending the dup probe.
+      * ``DATA_CENTER`` carries LONG-FORM names (``<Pnnn>-E<hhmm>-<suffix>``)
+        — the value-domain match against ``CM_DEF_VTAB.DATA_CENTER`` is an
+        open gate residual, which is why DEFINED_ON does NOT load yet.
+
+    Expected projection (matches ``drydocs/loaders/sql/controlm_hosts.sql``):
+        data_center, grpname, nodeid, participation_type, capture_date
+
+    Gate: ``controlm-hosts-topology`` SIGNED OFF 2026-07-09 (config/gate-log.md).
+    """
+
+    model_config = ConfigDict(
+        populate_by_name=True,
+        str_strip_whitespace=True,
+        extra="ignore",
+    )
+
+    data_center: str = Field(
+        ...,
+        min_length=1,
+        description="Long-form DC name (<Pnnn>-E<hhmm>-<suffix>); ControlMHostGroup key part.",
+    )
+    grpname: str = Field(
+        ...,
+        min_length=1,
+        description="Host-group name (may itself be a DNS/LB alias); ControlMHostGroup.name key part.",
+    )
+    nodeid: str = Field(
+        ...,
+        min_length=1,
+        description="Member agent host FQDN; ExecutionHost node key.",
+    )
+    participation_type: str | None = Field(
+        None,
+        description="VARCHAR2(1); observed 'P' only — domain probe P2a pending.",
+    )
+    capture_date: str | None = Field(
+        None,
+        description="Replication timestamp — never authorship.",
+    )

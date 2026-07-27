@@ -24,6 +24,7 @@ from .controlm import (
     ControlMConditionOutRow,
     ControlMDependencyRow,
     ControlMFolderRow,
+    ControlMHostRow,
     ControlMJobRow,
     ControlMVariableRow,
 )
@@ -48,6 +49,8 @@ __all__ = [
     "ControlMConditionInRow",
     "ControlMConditionOutRow",
     "ControlMDependencyRow",
+    # Control-M (P3 — host topology)
+    "ControlMHostRow",
     # Control-M (C3/C4 normalization — variables)
     "ControlMVariableRow",
     # Software registry (plan 07 / ADR 0004)

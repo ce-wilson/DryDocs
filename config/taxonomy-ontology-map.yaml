@@ -852,7 +852,8 @@ mappings:
       prov_maps_to: ~
     precedence_authority: bmc-baseline
     vocab_id: m3_runs_on_host_group
-    status: confirmed                           # gate controlm-hosts-topology 2026-07-09 (config/gate-log.md)
+    status: applied                             # P3 build 2026-07-27: derived pass runs_on_resolution.cypher (group wins; UNMATCHED = coverage)
+    applied_on: 2026-07-27
     confirmed_by: SME
     confirmed_on: 2026-07-09
     gate_spec: config/gate-prompts/controlm-hosts-topology.yaml
@@ -872,7 +873,8 @@ mappings:
       prov_maps_to: "prov:hadMember"
     precedence_authority: bmc-baseline
     vocab_id: m3_host_group_contains_host
-    status: confirmed                           # gate controlm-hosts-topology 2026-07-09 (config/gate-log.md)
+    status: applied                             # P3 build 2026-07-27: loader controlm_hosts.cypher
+    applied_on: 2026-07-27
     confirmed_by: SME
     confirmed_on: 2026-07-09
     gate_spec: config/gate-prompts/controlm-hosts-topology.yaml
@@ -1060,7 +1062,7 @@ mappings:
 
 # Counts the gate reports to the SME each run.
 summary:
-  applied: 8          # +application-as-dataproduct, +seal-tom-attribution (K4, 2026-07-15); prior 6 = job-contains, application-contains-folder, doc-describes-product, doc-chunk-part-of, doc-first-chunk, doc-next-chunk
-  confirmed: 23       # +business-application-identity (S3 gate signed off 2026-07-27, 22/22 confirmations, 0 edits — property binding, no edge; implementation follows at backlog S3); +doc-traceability-feedback (L7 gate signed off 2026-07-20, 21/21 confirmations; supplement landed same day, loader load-doc-traceability follows); +product-cabinet-attribution (K5 gate signed off 2026-07-20; applied waits on the K6 supplement + a person-level cabinet extract)
+  applied: 10         # +job-runs-on-host-group, +host-group-contains-host (P3 build 2026-07-27); prior 8 = +application-as-dataproduct, +seal-tom-attribution (K4, 2026-07-15), job-contains, application-contains-folder, doc-describes-product, doc-chunk-part-of, doc-first-chunk, doc-next-chunk
+  confirmed: 21       # -2 to applied at the P3 build (host topology); +business-application-identity (S3 gate signed off 2026-07-27, 22/22 confirmations, 0 edits — property binding, no edge; implementation follows at backlog S3); +doc-traceability-feedback (L7 gate signed off 2026-07-20, 21/21 confirmations; supplement landed same day, loader load-doc-traceability follows); +product-cabinet-attribution (K5 gate signed off 2026-07-20; applied waits on the K6 supplement + a person-level cabinet extract)
   proposed: 4         # oracle-schema-asset, jobrun-observation, +app-code-defined-mapping, +dl-contact-point (both 2026-07-22 — the attribution close-out + email-DL gates)
   rejected: 1         # requires-scheduler (C12 platforms-taxonomy gate 2026-07-21 — SUPERSEDED by reg_uses_software {source: 'batch-port'}, not repudiated)

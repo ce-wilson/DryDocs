@@ -307,11 +307,13 @@ objects:
   # (vendor 6.4.01 poster: CMS_NODGRP; agent identity CMS_NODID/CMR_NODES is
   # NOT replicated). Added 2026-07-09 via the add-source-object walkthrough.
   # Extract: sql/controlm_hosts.sql; probes: sql/adhoc/profile_cm_hosts.sql.
-  # STAGING-ONLY until the controlm-hosts-topology gate confirms the graph
-  # landing (ControlMHostGroup / ExecutionHost / CONTAINS_HOST / the RUNS_ON
-  # {role: host_group | agent_host} NODE_ID resolution pass) — the
-  # CM_DEF_SETVAR_VW staging-only precedent. Use case: server-patching /
-  # maintenance-window planning.
+  # LOADED as of the P3 build (2026-07-27): loader controlm_hosts.v1 →
+  # :ControlMHostGroup / :ExecutionHost / CONTAINS_HOST, then the derived
+  # RUNS_ON {role: host_group | agent_host} resolution pass
+  # (runs_on_resolution.v1 — group match wins, UNMATCHED = coverage).
+  # DEFINED_ON still does NOT load: the DC value-domain verification (probe
+  # P3) + the 22-DC-vs-production scope call are open gate-log residuals.
+  # Use case: server-patching / maintenance-window planning.
   # ---------------------------------------------------------------------------
   - name: CM_HOSTS
     kind: table
@@ -327,23 +329,24 @@ objects:
       census: pending
     note: >
       Gate controlm-hosts-topology CONFIRMED 2026-07-09 (config/gate-log.md;
-      spec config/gate-prompts/controlm-hosts-topology.yaml) — columns stay
-      staging-only until the hosts loader + RUNS_ON resolution pass are
-      built (gate-log residuals: P3 DC value-domain check, P4 resolution
-      census, DC scope call). Object is NOT versioned (no
-      IS_CURRENT_VERSION/VERSION_SERIAL) and has no USER_DAILY; grain assumed
-      (DATA_CENTER, GRPNAME, NODEID) pending the dup probe.
+      spec config/gate-prompts/controlm-hosts-topology.yaml); hosts loader +
+      RUNS_ON resolution pass BUILT 2026-07-27 (backlog P3). Still open
+      (gate-log residuals): P3 DC value-domain check (gates DEFINED_ON), P4
+      resolution census transcription, P2a participation domain, DC scope
+      call. Object is NOT versioned (no IS_CURRENT_VERSION/VERSION_SERIAL)
+      and has no USER_DAILY; grain assumed (DATA_CENTER, GRPNAME, NODEID)
+      pending the dup probe.
     columns:
-      - {name: DATA_CENTER, disposition: projected, origin: source, target: "staging:data_center",
-         note: "long-form DC name (<Pnnn>-E<hhmm>-<suffix>, default-time encoding); 22 distinct incl. non-production; proposed ControlMHostGroup key part + DEFINED_ON join — ControlMServer key normalization is a gate open question"}
-      - {name: GRPNAME, disposition: projected, origin: source, target: "staging:grpname",
-         note: "host-group name (5,396 distinct); may itself be a DNS/LB alias (contains dots); proposed ControlMHostGroup.name key part; NOT the CM_DEF_VJOB.GROUP_NAME application-group concept"}
-      - {name: NODEID, disposition: projected, origin: source, target: "staging:nodeid",
-         note: "member agent host FQDN (8,161 distinct); proposed ExecutionHost.nodeid node key; also the direct-match target for hard-coded CM_DEF_VJOB.NODE_ID values (1-hop RUNS_ON {role: agent_host})"}
-      - {name: PARTICIPATION_TYPE, disposition: projected, origin: source, target: "staging:participation_type",
-         note: "VARCHAR2(1); observed 'P' only so far — full value domain + BMC semantics pending probe P2a; proposed CONTAINS_HOST edge property"}
-      - {name: CAPTURE_DATE, disposition: projected, origin: source, target: "staging:capture_date",
-         note: "replication timestamp — never authorship; snapshot-uniformity probe pending (P5); proposed to land as last_capture_date on the membership edge"}
+      - {name: DATA_CENTER, disposition: projected, origin: source, target: ControlMHostGroup.data_center,
+         note: "long-form DC name (<Pnnn>-E<hhmm>-<suffix>, default-time encoding); 22 distinct incl. non-production; ControlMHostGroup key part — the DEFINED_ON join to ControlMServer stays unloaded pending the DC value-domain probe + scope call"}
+      - {name: GRPNAME, disposition: projected, origin: source, target: ControlMHostGroup.name,
+         note: "host-group name (5,396 distinct); may itself be a DNS/LB alias (contains dots); ControlMHostGroup key part; NOT the CM_DEF_VJOB.GROUP_NAME application-group concept; also the group-wins match target for CM_DEF_VJOB.NODE_ID (2-hop RUNS_ON {role: host_group})"}
+      - {name: NODEID, disposition: projected, origin: source, target: ExecutionHost.nodeid,
+         note: "member agent host FQDN (8,161 distinct); ExecutionHost node key (constraint executionhost_nodeid); also the direct-match target for hard-coded CM_DEF_VJOB.NODE_ID values (1-hop RUNS_ON {role: agent_host})"}
+      - {name: PARTICIPATION_TYPE, disposition: projected, origin: source, target: CONTAINS_HOST.participation_type,
+         note: "VARCHAR2(1); observed 'P' only so far — full value domain + BMC semantics pending probe P2a; rides the membership edge"}
+      - {name: CAPTURE_DATE, disposition: projected, origin: source, target: CONTAINS_HOST.last_capture_date,
+         note: "replication timestamp — never authorship; snapshot-uniformity probe pending (P5); lands as last_capture_date on the membership edge"}
     default_disposition:
       disposition: excluded
       reason: scope

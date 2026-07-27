@@ -289,18 +289,26 @@ def test_setvar_object_name_is_confirmed(controlm: SourceMapping) -> None:
     assert setvar.projected() == ["TABLE_ID", "JOB_ID", "NAME", "VALUE"]
 
 
-def test_cm_hosts_is_staging_only_pending_the_topology_gate(controlm: SourceMapping) -> None:
-    """CM_HOSTS (host-group membership) landed 2026-07-09 via add-source-object:
-    all five columns projected, but staging-only — the graph landing
-    (ControlMHostGroup/ExecutionHost/CONTAINS_HOST/RUNS_ON resolution) is
-    gate-bound (controlm-hosts-topology), the CM_DEF_SETVAR_VW precedent."""
+def test_cm_hosts_targets_the_gated_topology(controlm: SourceMapping) -> None:
+    """CM_HOSTS landed 2026-07-09 staging-only; the P3 build (2026-07-27)
+    landed the gated graph targets — ControlMHostGroup (data_center, name),
+    ExecutionHost.nodeid, and the CONTAINS_HOST edge properties. DEFINED_ON
+    is deliberately absent (DC value-domain probe + scope call still open)."""
     hosts = controlm.get("CM_HOSTS")
     assert hosts.projected() == [
         "DATA_CENTER", "GRPNAME", "NODEID", "PARTICIPATION_TYPE", "CAPTURE_DATE",
     ]
-    for col in hosts.columns:
-        assert col.target is not None and col.target.startswith("staging:"), col.name
+    targets = {col.name: col.target for col in hosts.columns}
+    assert targets == {
+        "DATA_CENTER": "ControlMHostGroup.data_center",
+        "GRPNAME": "ControlMHostGroup.name",
+        "NODEID": "ExecutionHost.nodeid",
+        "PARTICIPATION_TYPE": "CONTAINS_HOST.participation_type",
+        "CAPTURE_DATE": "CONTAINS_HOST.last_capture_date",
+    }
     assert "controlm-hosts-topology" in (hosts.note or "")
+    # The DEFINED_ON hold is a recorded residual, not an omission.
+    assert "DEFINED_ON" in (hosts.note or "") or "DC value-domain" in (hosts.note or "")
 
 
 def test_cm_avg_run_is_staging_only_with_the_weak_join_key_documented(controlm: SourceMapping) -> None:

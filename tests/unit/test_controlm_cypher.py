@@ -17,6 +17,7 @@ ALL_CYPHERS = [
     "controlm_conditions_in.cypher",
     "controlm_conditions_out.cypher",
     "controlm_dependencies_derived.cypher",
+    "controlm_hosts.cypher",
 ]
 
 ALL_SQL = [
@@ -25,6 +26,7 @@ ALL_SQL = [
     "controlm_conditions_in.sql",
     "controlm_conditions_out.sql",
     "controlm_dependencies_recursive.sql",
+    "controlm_hosts.sql",
 ]
 
 
@@ -94,10 +96,14 @@ def test_ingest_chain_order_is_enforced() -> None:
             "controlm_jobs",
             "controlm_conditions_in",
             "controlm_conditions_out",
+            "controlm_hosts",
             "controlm_dependencies_derived",
         )
     ]
     assert positions == sorted(positions), "ingest-controlm stage order drifted"
+    # The derived RUNS_ON resolution pass runs after ALL staged loads —
+    # it reads the graph, not staging, so it sits after the stage loop.
+    assert ingest.index("runs_on_resolution") > positions[-1]
 
 
 def test_constraints_cover_folder_pass_labels() -> None:
@@ -205,6 +211,72 @@ def test_conditions_share_composite_key() -> None:
         text = (CYPHER_DIR / name).read_text(encoding="utf-8")
         assert "folder_id: row.folder_id" in text
         assert "name: row.condition_name" in text
+
+
+# ---- host topology (P3; gate controlm-hosts-topology 2026-07-09) ----------
+
+def test_hosts_cypher_merges_the_gated_topology() -> None:
+    """The hosts pass MERGEs exactly the three gated elements — group (keyed
+    per DC), member host (keyed on nodeid alone), CONTAINS_HOST — and does
+    NOT write DEFINED_ON (blocked on the DC value-domain probe + scope call)
+    or RUNS_ON (the separate derived pass)."""
+    text = (CYPHER_DIR / "controlm_hosts.cypher").read_text(encoding="utf-8")
+    assert (
+        "MERGE (g:ControlMHostGroup:Collection "
+        "{data_center: row.data_center, name: row.grpname})" in text
+    )
+    assert "MERGE (h:ExecutionHost:Agent {nodeid: row.nodeid})" in text
+    assert "CONTAINS_HOST" in text
+    assert "m.participation_type = row.participation_type" in text
+    assert "last_capture_date" in text
+    body = "\n".join(
+        l for l in text.splitlines()
+        if l.strip() and not l.strip().startswith("//")
+    )
+    assert "DEFINED_ON" not in body
+    assert "RUNS_ON" not in body
+
+
+def test_runs_on_resolution_implements_group_wins() -> None:
+    """The derived pass writes both roles, guards the 1-hop case on the
+    ABSENCE of a same-named group (the signed §B group-wins precedence),
+    marks edges derived, and MERGEs edges only — endpoints are MATCHed,
+    never created (the WAS_INFORMED_BY derived-pass contract)."""
+    text = (CYPHER_DIR / "runs_on_resolution.cypher").read_text(encoding="utf-8")
+    assert "MERGE (j)-[r:RUNS_ON {role: 'host_group'}]->(g)" in text
+    assert "MERGE (j)-[r:RUNS_ON {role: 'agent_host'}]->(h)" in text
+    assert "NOT EXISTS { MATCH (:ControlMHostGroup {name: j.node_id}) }" in text
+    # the guard must precede the agent_host MERGE (it scopes that statement)
+    assert "NOT EXISTS" in text[: text.index("role: 'agent_host'")]
+    assert "r.derived" in text
+    assert "j.node_id IS NOT NULL AND j.node_id <> ''" in text
+    # edges only: no node-creating MERGE (label after the opening paren)
+    assert not re.findall(r"MERGE\s*\(\w+:\w+", text), (
+        "resolution pass must MATCH endpoints, never MERGE them"
+    )
+
+
+def test_constraints_cover_host_topology_labels() -> None:
+    text = (SCHEMA_DIR / "constraints.cypher").read_text(encoding="utf-8")
+    assert "controlmhostgroup_key" in text
+    assert "executionhost_nodeid" in text
+
+
+def test_hosts_sql_uses_its_own_scope_binds() -> None:
+    """CM_HOSTS has no folder/owner/author grain — the extract binds
+    :grpname_filter and :row_cap only, and the CLI binds grpname_filter NULL
+    (see ingest_controlm's stage_scope special case)."""
+    text = (SQL_DIR / "controlm_hosts.sql").read_text(encoding="utf-8")
+    code = "\n".join(
+        l for l in text.splitlines() if not l.strip().startswith("--")
+    )
+    assert ":grpname_filter" in code
+    assert ":row_cap" in code
+    # the folder-grained quartet does not apply at this grain (header comment
+    # explains why — only code lines count here)
+    assert ":folder_filter" not in code
+    cli_src = (ROOT / "drydocs" / "cli.py").read_text(encoding="utf-8")
+    assert '"grpname_filter": None' in cli_src
 
 
 # ---- provenance-edge diet (doc 06 Phase 2, SME sign-off 2026-07-06) ------

@@ -104,7 +104,9 @@ from .loaders.controlm_conditions_in import ControlMConditionsInLoader
 from .loaders.controlm_conditions_out import ControlMConditionsOutLoader
 from .loaders.controlm_dependencies_derived import ControlMDependenciesDerivedLoader
 from .loaders.controlm_folders import ControlMFoldersLoader
+from .loaders.controlm_hosts import ControlMHostsLoader
 from .loaders.controlm_jobs import ControlMJobsLoader
+from .loaders.runs_on_resolution import RunsOnResolutionPass
 from .loaders.manual_loads import (
     ManualLoadError,
     ManualMappingAdapter,
@@ -173,6 +175,8 @@ LOADER_REGISTRY: dict[str, type] = {
     "controlm_conditions_in":       ControlMConditionsInLoader,
     "controlm_conditions_out":      ControlMConditionsOutLoader,
     "controlm_dependencies_derived": ControlMDependenciesDerivedLoader,
+    # P3 (host topology; gate controlm-hosts-topology):
+    "controlm_hosts":               ControlMHostsLoader,
     # bmc-docs lexical graph (Document -> Chunk):
     "bmc_docs":           BmcDocsLoader,
     # Essential GraphRAG ebook lexical graph (Q2 experiment):
@@ -202,6 +206,7 @@ LOADER_SOURCE: dict[str, str] = {
     "controlm_conditions_in":        "controlm-psgmgr",
     "controlm_conditions_out":       "controlm-psgmgr",
     "controlm_dependencies_derived": "controlm-psgmgr",
+    "controlm_hosts":                "controlm-psgmgr",
     # This source id is registered by the dispatcher in parallel
     # (config/source-registry.yaml); until it is SME-confirmed, `_gate_source`
     # fails fast (exit 2) on `load-bmc-docs` — that is correct, not a bug.
@@ -1036,6 +1041,11 @@ def ingest_controlm(
              "controlm_conditions_in__sample.csv",  "controlm_conditions_in.sql"),
             ("controlm_conditions_out", ControlMConditionsOutLoader,
              "controlm_conditions_out__sample.csv", "controlm_conditions_out.sql"),
+            # P3 host topology (gate controlm-hosts-topology): independent of
+            # folders/jobs — CM_HOSTS has no folder/owner/author grain, so the
+            # scope binds don't apply and the extract is always a full snapshot.
+            ("controlm_hosts",          ControlMHostsLoader,
+             "controlm_hosts__sample.csv",          "controlm_hosts.sql"),
         ])
     # The deferred dependency pass: its rows are pure ctlm_id references
     # between independently-loaded jobs, so it runs AFTER all nodes exist.
@@ -1062,7 +1072,14 @@ def ingest_controlm(
         for stage_name, cls, sample_csv, sql_file in stages:
             if use_oracle:
                 sql = (SQL_DIR / sql_file).read_text(encoding="utf-8")
-                adapter = _oracle_adapter(sql, scope, name=sql_file)
+                # controlm_hosts.sql binds :grpname_filter instead of the
+                # folder-grained quartet (no folder/owner/author on CM_HOSTS);
+                # bind it NULL so the statement is fully bound, unfiltered.
+                stage_scope = (
+                    {**scope, "grpname_filter": None}
+                    if stage_name == "controlm_hosts" else scope
+                )
+                adapter = _oracle_adapter(sql, stage_scope, name=sql_file)
             else:
                 sample = samples_dir / sample_csv
                 adapter = _csv_adapter(sample)
@@ -1078,6 +1095,15 @@ def ingest_controlm(
                     f" reactivated={summary.nodes_reactivated}"
                 )
             console.print(line)
+
+        # P3: the derived RUNS_ON resolution pass (gate controlm-hosts-topology
+        # §B). Reads nothing from staging — both inputs are already in the
+        # graph — so it rides the relationships phase, after all nodes exist.
+        # Group match wins; UNMATCHED/NULL are coverage, never guessed.
+        if phase in ("relationships", "all") and not skip_part2:
+            console.print("[cyan]>> runs_on_resolution[/]")
+            coverage = RunsOnResolutionPass(cli).run()
+            console.print({"runs_on_coverage": coverage.as_dict()})
 
 
 @app.command(name="lineage-review")

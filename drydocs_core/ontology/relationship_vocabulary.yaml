@@ -1001,10 +1001,11 @@ local_relationships:
       (job's NODE_ID matches a member NODEID, not a GRPNAME). Group match
       wins when both match (mirrors Control-M's own resolution) — see
       m3_runs_on_host_group and config/gate-prompts/controlm-hosts-topology.yaml.
+      ACTIVE 2026-07-27 (P3): written by the derived resolution pass.
     supplement:   ontology_supplement.cypher
-    loader:       ~
+    loader:       runs_on_resolution.v1
     domain:       controlm
-    status:       planned
+    status:       active
 
   - id:           m3_runs_on_etl_host
     neo4j_label:  RUNS_ON
@@ -1036,8 +1037,9 @@ local_relationships:
     to_node:      ControlMHostGroup
     prov_maps_to: ~
     note: >
-      Gate CONFIRMED 2026-07-09 (config/gate-log.md); planned = loader not
-      yet built. Definition-time placement, the
+      Gate CONFIRMED 2026-07-09 (config/gate-log.md); ACTIVE 2026-07-27 —
+      the P3 build (hosts loader + derived resolution pass, backlog P3).
+      Definition-time placement, the
       2-HOP case: the job's NODE_ID names a host group (matches a
       CM_HOSTS.GRPNAME) and Control-M load-balances the run across the
       group's member hosts (reach hosts via CONTAINS_HOST). Derived
@@ -1049,10 +1051,10 @@ local_relationships:
       precedent). Runtime rerun-affinity (a rerun sticks to the host of the
       first attempt) is per-run state — phase-2 ControlMJobRun/SOSA, NOT this
       definition edge.
-    supplement:   ~
-    loader:       ~
+    supplement:   ontology_supplement.cypher
+    loader:       runs_on_resolution.v1
     domain:       controlm
-    status:       planned
+    status:       active
 
   - id:           m3_host_group_contains_host
     neo4j_label:  CONTAINS_HOST
@@ -1061,18 +1063,18 @@ local_relationships:
     to_node:      ExecutionHost
     prov_maps_to: "prov:hadMember"
     note: >
-      Gate CONFIRMED 2026-07-09 (config/gate-log.md); planned = loader not
-      yet built. Host-group membership from psgmgr
+      Gate CONFIRMED 2026-07-09 (config/gate-log.md); ACTIVE 2026-07-27 —
+      the P3 build. Host-group membership from psgmgr
       CM_HOSTS: one edge per (DATA_CENTER, GRPNAME, NODEID) row; each
       distinct NODEID MERGEs one ExecutionHost (keyed on nodeid alone,
       pending the multi-group probe P2c). Matrix row: Collection → any =
       HAD_MEMBER; domain label kept (CONTAINS_JOB / CONTAINS_FOLDER family).
       Edge carries participation_type (VARCHAR2(1) — value domain + BMC
       semantics pending probe P2a) and last_capture_date.
-    supplement:   ~
-    loader:       ~
+    supplement:   ontology_supplement.cypher
+    loader:       controlm_hosts.v1
     domain:       controlm
-    status:       planned
+    status:       active
 
   - id:           m3_host_group_defined_on
     neo4j_label:  DEFINED_ON

@@ -30,8 +30,10 @@ VOCAB_FILE       = ONTOLOGY_DIR / "relationship_vocabulary.yaml"
 # 47 after scheduler_kind removed (2026-07-23, C13 leftover sweep — pre-C13
 # graphs are wiped and rebuilt from bootstrap, the kept-for-old-graphs
 # rationale no longer applies).
+# 49 after the P3 host topology (gate controlm-hosts-topology 2026-07-09):
+# controlmhostgroup_key (data_center, name) NODE KEY + executionhost_nodeid.
 # Bump this when you intentionally add/remove a CREATE CONSTRAINT.
-EXPECTED_CONSTRAINTS = 47
+EXPECTED_CONSTRAINTS = 49
 
 # SchedulerKind removed 2026-07-21 (C12 platforms-taxonomy gate): its seeds are
 # retired (commented, audit-kept) in ontology.cypher — no longer a seeded label.

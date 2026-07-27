@@ -20,6 +20,7 @@ from .controlm_conditions_in import ControlMConditionsInLoader
 from .controlm_conditions_out import ControlMConditionsOutLoader
 from .controlm_dependencies_derived import ControlMDependenciesDerivedLoader
 from .controlm_folders import ControlMFoldersLoader
+from .controlm_hosts import ControlMHostsLoader
 from .controlm_jobs import ControlMJobsLoader
 
 __all__ = [
@@ -28,4 +29,5 @@ __all__ = [
     "ControlMConditionsInLoader",
     "ControlMConditionsOutLoader",
     "ControlMDependenciesDerivedLoader",
+    "ControlMHostsLoader",
 ]

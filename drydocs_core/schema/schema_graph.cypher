@@ -211,7 +211,7 @@ MERGE (a)-[r:USES_ARTIFACT]->(b)
 
 MATCH (a:SchemaMeta {name: 'ControlMJob'}), (b:SchemaMeta {name: 'ExecutionHost'})
 MERGE (a)-[r:RUNS_ON]->(b)
-  SET r.vocab_id = 'm3_runs_on_agent_host', r.role = 'agent_host', r.prov_maps_to = null, r.domain = 'controlm', r.status = 'planned';
+  SET r.vocab_id = 'm3_runs_on_agent_host', r.role = 'agent_host', r.prov_maps_to = null, r.domain = 'controlm', r.status = 'active';
 
 MATCH (a:SchemaMeta {name: 'ETLProcess'}), (b:SchemaMeta {name: 'ExecutionHost'})
 MERGE (a)-[r:RUNS_ON]->(b)
@@ -219,11 +219,11 @@ MERGE (a)-[r:RUNS_ON]->(b)
 
 MATCH (a:SchemaMeta {name: 'ControlMJob'}), (b:SchemaMeta {name: 'ControlMHostGroup'})
 MERGE (a)-[r:RUNS_ON]->(b)
-  SET r.vocab_id = 'm3_runs_on_host_group', r.role = 'host_group', r.prov_maps_to = null, r.domain = 'controlm', r.status = 'planned';
+  SET r.vocab_id = 'm3_runs_on_host_group', r.role = 'host_group', r.prov_maps_to = null, r.domain = 'controlm', r.status = 'active';
 
 MATCH (a:SchemaMeta {name: 'ControlMHostGroup'}), (b:SchemaMeta {name: 'ExecutionHost'})
 MERGE (a)-[r:CONTAINS_HOST]->(b)
-  SET r.vocab_id = 'm3_host_group_contains_host', r.prov_maps_to = 'prov:hadMember', r.domain = 'controlm', r.status = 'planned';
+  SET r.vocab_id = 'm3_host_group_contains_host', r.prov_maps_to = 'prov:hadMember', r.domain = 'controlm', r.status = 'active';
 
 MATCH (a:SchemaMeta {name: 'ControlMHostGroup'}), (b:SchemaMeta {name: 'ControlMServer'})
 MERGE (a)-[r:DEFINED_ON]->(b)

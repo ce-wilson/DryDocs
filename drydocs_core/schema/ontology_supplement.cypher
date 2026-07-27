@@ -94,6 +94,58 @@ MATCH (local:OntologyTerm:LocalRelationship {iri: "https://drydocs.local/ontolog
 MATCH (prov:OntologyTerm:ProvProperty       {iri: "http://www.w3.org/ns/prov#hadMember"})
 MERGE (local)-[:MAPS_TO]->(prov);
 
+// --- Host topology (P3; gate controlm-hosts-topology 2026-07-09) ------------
+
+// Class anchors: the host-group Collection and the reused ExecutionHost agent.
+MERGE (n:OntologyTerm:LocalClass {iri: "https://drydocs.local/ontology#ControlMHostGroup"})
+  SET n.label = "Control-M Host Group",
+      n.notes = "CM_HOSTS.GRPNAME per data center (vendor 6.4.01 poster: CMS_NODGRP; "
+              + "9.0.x term 'host group'). A prov:Collection of member ExecutionHosts; "
+              + "may itself front a load-balancer DNS alias. NOT the CM_DEF_VJOB.GROUP_NAME "
+              + "application-group concept.";
+MERGE (n:OntologyTerm:LocalClass {iri: "https://drydocs.local/ontology#ExecutionHost"})
+  SET n.label = "Execution Host",
+      n.notes = "Agent host a job/ETL workload executes on (prov:SoftwareAgent), keyed on "
+              + "nodeid alone — one node per distinct CM_HOSTS.NODEID; multi-group membership expected.";
+
+MATCH (lc:OntologyTerm:LocalClass {iri: "https://drydocs.local/ontology#ControlMHostGroup"})
+MATCH (pc:OntologyTerm:ProvClass   {iri: "http://www.w3.org/ns/prov#Collection"})
+MERGE (lc)-[r:SUBCLASS_OF]->(pc)
+  ON CREATE SET r.source = "drydocs.ontology_supplement";
+
+MATCH (lc:OntologyTerm:LocalClass {iri: "https://drydocs.local/ontology#ExecutionHost"})
+MATCH (pc:OntologyTerm:ProvClass   {iri: "http://www.w3.org/ns/prov#SoftwareAgent"})
+MERGE (lc)-[r:SUBCLASS_OF]->(pc)
+  ON CREATE SET r.source = "drydocs.ontology_supplement";
+
+// RUNS_ON  —  ControlMJob | ETLProcess → ControlMHostGroup | ExecutionHost
+// Infrastructure placement; no PROV-O equivalent (SCHEDULED_ON precedent).
+// One label, role-disambiguated: host_group (2-hop, NODE_ID names a group —
+// group match WINS, mirroring Control-M's own resolution), agent_host (1-hop
+// hard-coded member host), etl_host (planned). Written by the derived
+// resolution pass (runs_on_resolution.cypher) — UNMATCHED reported as
+// coverage, never guessed.
+MERGE (n:OntologyTerm:LocalRelationship {iri: "https://drydocs.local/ontology#runsOn"})
+  SET n.label  = "RUNS_ON",
+      n.domain = "ControlMJob | ETLProcess",
+      n.range  = "ControlMHostGroup | ExecutionHost",
+      n.notes  = "Definition-time execution placement, role-disambiguated "
+               + "(host_group | agent_host | etl_host). Derived from CM_DEF_VJOB.NODE_ID "
+               + "x CM_HOSTS; group match wins (gate controlm-hosts-topology §B). "
+               + "Rerun host affinity is runtime state — phase-2, never this edge.";
+
+// CONTAINS_HOST  —  ControlMHostGroup → ExecutionHost  (prov:hadMember)
+MERGE (n:OntologyTerm:LocalRelationship {iri: "https://drydocs.local/ontology#containsHost"})
+  SET n.label  = "CONTAINS_HOST",
+      n.domain = "ControlMHostGroup",
+      n.range  = "ExecutionHost",
+      n.notes  = "Host-group membership from psgmgr.CM_HOSTS (one edge per DATA_CENTER/"
+               + "GRPNAME/NODEID row); carries participation_type + last_capture_date. "
+               + "Semantics: prov:hadMember (CONTAINS_JOB / CONTAINS_FOLDER family).";
+MATCH (local:OntologyTerm:LocalRelationship {iri: "https://drydocs.local/ontology#containsHost"})
+MATCH (prov:OntologyTerm:ProvProperty       {iri: "http://www.w3.org/ns/prov#hadMember"})
+MERGE (local)-[:MAPS_TO]->(prov);
+
 // --- Docs corpus lexical graph (gate bmc-docs-lexical-load, 2026-07-08) -----
 
 // Document + Chunk local class anchors (both prov:Entity).

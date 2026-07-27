@@ -37,6 +37,7 @@ from .controlm import (
     ControlMConditionsOutLoader,
     ControlMDependenciesDerivedLoader,
     ControlMFoldersLoader,
+    ControlMHostsLoader,
     ControlMJobsLoader,
 )
 
@@ -57,4 +58,5 @@ __all__ = [
     "ControlMConditionsInLoader",
     "ControlMConditionsOutLoader",
     "ControlMDependenciesDerivedLoader",
+    "ControlMHostsLoader",
 ]
