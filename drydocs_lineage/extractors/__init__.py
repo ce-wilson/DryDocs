@@ -9,6 +9,7 @@ from .dpl_registry import (
     RegistryRecord,
     cross_check,
 )
+from .rua_code_ops import RuaCodeOps, RuaCodeOpsCoverage, RuaCodeOpsExtractor
 from .rua_inventory import RuaCoverage, RuaInventoryExtractor
 
 __all__ = [
@@ -22,6 +23,9 @@ __all__ = [
     "RegistryCrossCheck",
     "RegistryExtract",
     "RegistryRecord",
+    "RuaCodeOps",
+    "RuaCodeOpsCoverage",
+    "RuaCodeOpsExtractor",
     "RuaCoverage",
     "RuaInventoryExtractor",
     "cross_check",

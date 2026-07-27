@@ -4865,7 +4865,7 @@ items:
     agent: main
     model: sonnet
     priority: p2
-    status: todo
+    status: done
     depends_on: [G20]
     inputs: [drydocs_core/controlm/commands.py, drydocs_core/controlm/variables.py, drydocs_lineage/extractors/rua_inventory.py, config/gate-log.md]
     acceptance: >
@@ -4889,6 +4889,20 @@ items:
       (user, 2026-07-21). Static analysis of shell/python text is
       best-effort by design — coverage counters make the miss rate visible
       instead of implying completeness. Candidate-side only, hence sonnet.
+      CLOSED 2026-07-27: drydocs_lineage/extractors/rua_code_ops.py —
+      RuaCodeOpsExtractor runs on the SAME LineageGraph after the G20
+      inventory pass, reading each staged artifact's rua_copy content.
+      Scripts: INVOKES candidates via the shared parse_command /
+      LAUNCHER_REGISTRY (DPL keeps GUID identity + G15 property flags,
+      reusing controlm_inventory's _stable_invocation_key/_dpl_properties);
+      assignments via classify_variable (FACT_REGISTRY + G16 value
+      contracts — mismatch/alias WARN counters + a facts candidate list);
+      dataflow file ops → READS_FROM/WRITES_TO from the script node (G14
+      idiom, gate-EDIT endpoints). Profiles stage NO rels: PATH mutations +
+      sourced/invoked scripts land as dependency_candidates flagged
+      needs_vocabulary (G22's edge meaning). Coverage counts every skip by
+      reason (no-copy, unreadable, comment/blank/continuation, non-dataflow,
+      profile-op-skipped, unparsed). 5 fixture tests; suite 949 green.
 
   - id: G22
     epic: component-topology
@@ -6770,11 +6784,11 @@ items:
       the primary fix.
 
 summary:
-  todo: 52                                         # +5 at the 2026-07-27 groom (J14/J15/G36/O33/G38); J14 + P3 closed same day
+  todo: 51                                         # +5 at the 2026-07-27 groom (J14/J15/G36/O33/G38); J14 + P3 + G21 closed same day
   in_progress: 1                                   # E1 (gate deferred both sides)
   blocked: 0
-  done: 137                                        # +J14 knowledge/standards SEALID split, +P3 hosts loader + RUNS_ON pass (2026-07-27)
-  next_ready: [M3, M4, J10, Q6, O23, J13, G21, G24, O26, G26, O27, C15, C16, O28, R3, R4, L16, O29, O30, O31, O32, S1, S8, S9, Q7, Q8, G32, G33, G34, G35, O33, J15, P5]
+  done: 138                                        # +J14 SEALID split, +P3 hosts loader + RUNS_ON pass, +G21 rua code-ops pass (2026-07-27)
+  next_ready: [M3, M4, J10, Q6, O23, J13, G24, O26, G26, O27, C15, C16, O28, R3, R4, L16, O29, O30, O31, O32, S1, S8, S9, Q7, Q8, G32, G33, G34, G35, O33, J15, P5]
   # 2026-07-27 groom (weekly inbox): 5 promoted, 1 merged, 1 resolved. None of
   # the five touch edge semantics — no gate needed: J14 is a publish-boundary
   # file split (fable because the boundary decision rides in it), J15/G36/G38/O33
