@@ -26,6 +26,29 @@ Tags help grooming: `idea` · `bug` · `doc` · `source` (new data source) · `q
 
 <!-- add new ideas at the top -->
 
+- 2026-07-27 — [idea] **Company catalog gate (`internal/org/catalog/`, page dated 2026-06-25) has
+  drifted ahead of the producer catalog ontology — back-flow / divergence-ledger candidate.**
+  Screenshot review of `_catalog_gate_page.html` ("SME Gate Prompt — PAT Catalog Loader", step 1
+  of 3; sibling `_product_application_gate_page.html` likely steps 2–3): introduces `:SubLOB` +
+  `HAS_SUB_LOB` (LOB→SubLOB, "only CIB and AWM have them"), widens HAS_PRODUCT_LINE to
+  `(:SubLOB|:LOB)`, uses label `:LOB {lob_id, name}` vs our `:CatalogLOB {lob_id, code, name}`,
+  expects map ids `sub-lob-org-unit` + `catalog-lob-reconciles-segment` (ours:
+  `lob-has-product-line` / `lob-reconciles-to-segment`, confirmed 2026-06-21), and ingests a
+  5-field `pat_lob_sublob_productline.csv` (164 rows; Sub-LoB Name column our
+  `lob-product-team.yaml` capture lacks). None of it exists here, even as `status: planned`.
+  Gate MECHANICS all match the gate_pages.py design (localStorage ticks, no-write-until-confirmed,
+  `{confidence, authority, aliases}` on RECONCILES_TO, skos:closeMatch aliases, precedence winner
+  `lob-product-team`) — content drifted, mechanism didn't. Page date 2026-06-25 PRE-DATES the G2
+  Phase-B relocate (2026-07-10), so its `drydocs/schema/ontology.cypher` path was period-correct,
+  not a bug — refresh it if the prompt is revised. Real page bug to fix before signoff:
+  functional-org target "Corporate" is ambiguous vs our seeded `:BusinessSegment {code:"Corp",
+  name:"Corporate"}` — written as a code it MERGEs a phantom segment. Useful real-data signal:
+  CIB + AWM appear as SEPARATE LoBs with 1.0 exact matches → resolves the LOB002 AWMCIB (legacy,
+  0.5) open question in `lob-product-team.yaml`. If the company gate signs off: mechanism-only
+  back-port (vocab entries as `planned`, map entries, 5-field taxonomy capture, LOB-vs-CatalogLOB
+  label ruling) or an explicit port-prompt divergence-ledger entry. COORDINATE FIRST: a laptop
+  session (unpushed as of 2026-07-27) is re-working BusinessApplication mapping — don't touch
+  catalog/SEAL map entries until it lands.
 - 2026-07-26 — [chore] **Three `:BusinessApplication` indexes are never used as predicates;
   the one property that IS a predicate has none.** Spotted by the user while reading
   `constraints.cypher` during the business-application-identity gate review. `businessapplication_risk`
