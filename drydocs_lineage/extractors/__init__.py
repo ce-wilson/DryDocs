@@ -9,12 +9,24 @@ from .dpl_registry import (
     RegistryRecord,
     cross_check,
 )
+from .code_repo import (
+    CodeRepoExtractor,
+    CorroborationReport,
+    RepoManifestCoverage,
+    corroborate,
+    git_blob_sha1,
+)
 from .rua_code_ops import RuaCodeOps, RuaCodeOpsCoverage, RuaCodeOpsExtractor
 from .rua_inventory import RuaCoverage, RuaInventoryExtractor
 
 __all__ = [
     "CloneFolder",
+    "CodeRepoExtractor",
     "ControlMInventoryExtractor",
+    "CorroborationReport",
+    "RepoManifestCoverage",
+    "corroborate",
+    "git_blob_sha1",
     "DplMacExtractor",
     "DplRegistryExtractor",
     "ExtractCoverage",

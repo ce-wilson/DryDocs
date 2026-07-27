@@ -246,6 +246,27 @@ sources:
       present-on-server) — staged only; any conflation with "used" is a G22
       ruling.
 
+  - id: code-repo
+    classification: Internal            # real repo/branch names + script paths; content stays company-side
+    source: "per-repo object-sweep manifest (repo_objects.tsv: git rev-list --all --objects + ref tips) under company tooling — the G24 seam input; producer fixtures are SYNTHETIC"
+    kind: code-repo
+    orchestrator: ~
+    adapter: ~                          # G24 extractor (drydocs_lineage/extractors/code_repo.py) — staging + corroboration report, no loader
+    feeds_taxonomy: [scripts]
+    confirmed: false                    # G22 owns identity/dedup + precedence between origins; NOTHING writes the graph before it
+    trusted_ref: ~                      # HUMAN-BLESSED intent line (G24): the one ref this repo's team keeps clean.
+                                        # null = server-extract-only truth (the stale-main case — main exists but
+                                        # dead, real code scattered in feature branches). The corroboration sweep
+                                        # NAMES a candidate ref mechanically; only a human sets this field.
+    notes: >
+      G24 registration — the code-repo origin seam. A repo is a valid truth
+      source ONLY where a team keeps a clean branch (trusted_ref); production
+      servers always run the latest RUNNING code. The corroboration report
+      joins origins on git blob content hash into found-at-refs / behind /
+      never-committed / repo-only buckets; per-team hash drift is the
+      clean-branch signal. Real Bitbucket/GitHub access stays company-side
+      behind the manifest contract.
+
   # ---- Data platforms (sources of DataAsset/lineage) -----------------------
   - id: oracle-schemas
     classification: Internal-Confidential   # real schema/table/object names

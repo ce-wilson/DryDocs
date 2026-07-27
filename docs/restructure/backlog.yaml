@@ -5013,7 +5013,7 @@ items:
     agent: main
     model: sonnet
     priority: p2
-    status: todo
+    status: done
     depends_on: [G20]
     inputs: [drydocs_lineage/extractors/rua_inventory.py, drydocs_lineage/model.py, config/source-registry.yaml, tests/unit/test_lineage_inventory.py]
     acceptance: >
@@ -5055,6 +5055,21 @@ items:
       sweep replaces path-only matching, trusted_ref replaces the
       boolean flag. Feeds the G22 gate (identity/dedup + precedence
       rulings). Candidate-side, hence sonnet.
+      CLOSED 2026-07-27: drydocs_lineage/extractors/code_repo.py —
+      CodeRepoExtractor stages repo_script records from the repo_objects.tsv
+      manifest contract (rev-list --all sweep + ref tips; live-tip rows vs
+      empty-ref historical rows), same LineageGraph shape as G20 with
+      origin=code-repo (G20 artifacts now stamp origin=server-extract);
+      corroborate() joins on git blob sha1 of the carried-back copies into
+      found_at_refs (refs + commit dates; candidate_ref = most recent tip,
+      mechanical) / behind (history-only match) / never_committed (with
+      path-tail hints as the weak fallback) / repo_only; uncomputable and
+      malformed counted. trusted_ref added as a nullable HUMAN-BLESSED field
+      on the new code-repo source-registry entry (Internal, confirmed:false)
+      and only checked, never inferred. Honest limit recorded: content
+      hashing cannot tell edited-after-checkout from never-committed — both
+      bucket to never_committed with hints. No rels, no graph writes.
+      6 fixture tests; suite 955 green. G22 (gate) now unblocked.
 
   - id: G25
     epic: component-topology
@@ -6784,11 +6799,11 @@ items:
       the primary fix.
 
 summary:
-  todo: 51                                         # +5 at the 2026-07-27 groom (J14/J15/G36/O33/G38); J14 + P3 + G21 closed same day
+  todo: 50                                         # +5 at the 2026-07-27 groom (J14/J15/G36/O33/G38); J14 + P3 + G21 + G24 closed same day
   in_progress: 1                                   # E1 (gate deferred both sides)
   blocked: 0
-  done: 138                                        # +J14 SEALID split, +P3 hosts loader + RUNS_ON pass, +G21 rua code-ops pass (2026-07-27)
-  next_ready: [M3, M4, J10, Q6, O23, J13, G24, O26, G26, O27, C15, C16, O28, R3, R4, L16, O29, O30, O31, O32, S1, S8, S9, Q7, Q8, G32, G33, G34, G35, O33, J15, P5]
+  done: 139                                        # +J14 SEALID split, +P3 hosts loader + RUNS_ON pass, +G21 rua code-ops, +G24 code-repo seam (2026-07-27)
+  next_ready: [M3, M4, J10, Q6, O23, J13, O26, G26, O27, C15, C16, O28, R3, R4, L16, O29, O30, O31, O32, S1, S8, S9, Q7, Q8, G32, G33, G34, G35, O33, J15, P5, G22]
   # 2026-07-27 groom (weekly inbox): 5 promoted, 1 merged, 1 resolved. None of
   # the five touch edge semantics — no gate needed: J14 is a publish-boundary
   # file split (fable because the boundary decision rides in it), J15/G36/G38/O33

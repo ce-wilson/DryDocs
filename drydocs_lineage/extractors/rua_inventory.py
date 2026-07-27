@@ -357,6 +357,10 @@ class RuaInventoryExtractor:
         env_props: dict[str, str],
     ) -> None:
         props = dict(env_props)
+        # the provenance-origin discriminator (G24): this record says what is
+        # ON THE SERVER; the code-repo seam stages origin=code-repo twins and
+        # the corroboration report joins them on content hash — never by id.
+        props["origin"] = "server-extract"
         for col in ("owner", "group", "perms", "size", "mtime"):
             if row.get(col):
                 props[col] = row[col]
