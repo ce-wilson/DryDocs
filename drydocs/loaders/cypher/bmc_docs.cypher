@@ -24,8 +24,18 @@
 // PREREQ: `drydocs load-software-registry` must have already loaded
 // :SoftwareProduct. This template MATCHes (NEVER MERGEs) the product — same
 // convention as controlm_jobs.cypher's folder prereq — so a missing or
-// misspelled subject_product_id silently drops the DESCRIBES edge for that
-// row instead of creating a stub SoftwareProduct node.
+// misspelled subject_product_id drops the DESCRIBES edge for that row
+// instead of creating a stub SoftwareProduct node.
+//
+// That per-row tolerance is deliberate and stays. What does NOT: the same
+// FOREACH guard used to swallow an ENTIRELY absent registry, dropping every
+// DESCRIBES edge in the corpus while the run still reported OK. The prereq is
+// now enforced in the loader (BmcDocsLoader._assert_product_registry_present)
+// rather than here, because a template that runs per BATCH cannot tell "this
+// row's id is wrong" from "the registry is not in this database" — only a
+// pre-load check can. The template is unchanged; read that method before
+// re-pointing this loader at another database (ADR 0006's dddocs move is
+// exactly the scenario: a relationship cannot span databases).
 //
 // Parameters: $batch (doc_id, title, source_url, source_page, scraped_on,
 //   purpose, path, trust_default, target_version, classification,

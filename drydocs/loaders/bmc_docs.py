@@ -22,6 +22,7 @@ LLM pass — which this loader deliberately does not use.
 """
 from __future__ import annotations
 
+import logging
 import re
 from dataclasses import dataclass
 from pathlib import Path
@@ -30,10 +31,14 @@ from typing import TYPE_CHECKING, ClassVar, Iterator
 from pydantic import BaseModel
 
 from drydocs_core.models.docs import BmcDocChunkRow
-from .base import BaseLoader, compute_row_checksum
+from .base import BaseLoader, LoadSummary, compute_row_checksum
 
 if TYPE_CHECKING:  # pragma: no cover
     from types import TracebackType
+
+    from drydocs_core.run_log import LoaderRunLog
+
+LOGGER = logging.getLogger(__name__)
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
 CYPHER_DIR = Path(__file__).resolve().parent / "cypher"
@@ -252,10 +257,27 @@ class BmcDocsAdapter:
 
 
 class BmcDocsLoader(BaseLoader):
+    """Loads the chunked corpus and joins each :Document to its :SoftwareProduct.
+
+    The DESCRIBES join is an OPTIONAL MATCH inside a FOREACH guard (see
+    ``bmc_docs.cypher``), which tolerates a per-row miss by design — a single
+    misspelled ``subject_product_id`` drops that row's edge and nothing else.
+    That same mechanism used to swallow the far bigger failure of the product
+    registry being absent from the database ENTIRELY: every DESCRIBES edge
+    silently missing, reported as a clean success. The two are distinguished
+    here — the whole-registry case is a refusal, the per-row case is a warning.
+    """
+
     name: ClassVar[str] = "bmc_docs.v1"
     cypher_path: ClassVar[Path] = CYPHER_DIR / "bmc_docs.cypher"
     row_model: ClassVar[type] = BmcDocChunkRow
     source_label: ClassVar[str] = "markdown"
+
+    def __init__(self, *args, **kwargs) -> None:
+        super().__init__(*args, **kwargs)
+        # Documents this run wrote that ended up with no DESCRIBES edge —
+        # [{doc_id, subject_product_id}], populated post-load.
+        self.documents_without_product: list[dict] = []
 
     def to_params(self, model: BaseModel) -> dict:
         """Add the delta checksum (doc 06 Phase 2) over the full chunk row —
@@ -265,3 +287,87 @@ class BmcDocsLoader(BaseLoader):
         params = model.model_dump(mode="json")
         params["row_checksum"] = compute_row_checksum(params)
         return params
+
+    # ---- prereq enforcement ------------------------------------------------
+
+    def _load(self, summary: LoadSummary, run_log: LoaderRunLog | None) -> LoadSummary:
+        """Refuse an absent product registry, then report per-row misses.
+
+        The refusal runs BEFORE ``super()._load`` — which is what reaches
+        ``_preflight_indexes`` and ``_open_run`` — so a refused load writes
+        nothing at all, not even the :JobRun (the ``_preflight_indexes``
+        convention).
+        """
+        self._assert_product_registry_present()
+        result = super()._load(summary, run_log)
+        self._report_documents_without_product()
+        return result
+
+    def _assert_product_registry_present(self) -> None:
+        """Fail loudly when NO real :SoftwareProduct is reachable.
+
+        The predicate deliberately excludes :SchemaMeta. ``schema_graph.cypher``
+        MERGEs a ``:SchemaMeta:SoftwareProduct {name: 'SoftwareProduct'}``
+        exemplar carrying the real label with NO product_id, so a bare
+        ``count(:SoftwareProduct)`` would count the exemplar and wave an empty
+        registry straight through — the whole failure this check exists to
+        catch. ``NOT sp:SchemaMeta`` is the rename-proof form; the
+        product_id-not-null clause additionally rejects any other keyless stub.
+        """
+        rows = self.client.run(
+            "MATCH (sp:SoftwareProduct) "
+            "WHERE NOT sp:SchemaMeta AND sp.product_id IS NOT NULL "
+            "RETURN count(sp) AS products"
+        )
+        products = rows[0].get("products", 0) if rows else 0
+        if products:
+            LOGGER.info(
+                "Loader %s: product registry present (%d :SoftwareProduct)",
+                self.name, products,
+            )
+            return
+        raise RuntimeError(
+            f"Loader {self.name}: refusing to load — no :SoftwareProduct nodes are "
+            "reachable in this database, so every DESCRIBES edge would be silently "
+            "dropped and the load would still report success. Run "
+            "`drydocs load-software-registry` against this database first "
+            "(a relationship cannot span databases — check you are pointed at the "
+            "database that holds the registry)."
+        )
+
+    def _report_documents_without_product(self) -> None:
+        """Warn (never fail) about the per-row misses the FOREACH guard drops.
+
+        Asks the graph what actually happened rather than re-deriving it from
+        the rows: any :Document this run touched that has no DESCRIBES edge is
+        a miss, whatever caused it. Tolerated by design — one bad
+        subject_product_id must not cost the corpus its Documents and Chunks —
+        but never silent (the counts-are-always-reported house rule).
+        """
+        rows = self.client.run(
+            "MATCH (doc:Document {last_run_id: $run_id}) "
+            "WHERE NOT (doc)-[:DESCRIBES]->(:SoftwareProduct) "
+            "RETURN doc.doc_id AS doc_id, "
+            "       doc.subject_product_id AS subject_product_id "
+            "ORDER BY doc_id",
+            run_id=self.run_id,
+        )
+        self.documents_without_product = [dict(r) for r in rows]
+        if not self.documents_without_product:
+            return
+        unresolved = sorted(
+            {
+                r.get("subject_product_id")
+                for r in self.documents_without_product
+                if r.get("subject_product_id") is not None
+            }
+        )
+        LOGGER.warning(
+            "Loader %s: %d document(s) loaded WITHOUT a DESCRIBES edge — their "
+            "subject_product_id did not resolve to a :SoftwareProduct "
+            "(unresolved id(s): %s; documents: %s)",
+            self.name,
+            len(self.documents_without_product),
+            ", ".join(unresolved) or "<none set>",
+            ", ".join(r["doc_id"] for r in self.documents_without_product),
+        )

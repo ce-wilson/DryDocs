@@ -3,8 +3,11 @@ committed, deterministic controlm-*.md files) + static Cypher checks in the
 test_controlm_cypher.py style."""
 from __future__ import annotations
 
+import logging
 import re
+from collections.abc import Iterator
 from pathlib import Path
+from typing import Any
 
 import pytest
 
@@ -273,6 +276,186 @@ def test_first_chunk_block_survives_the_provenance_guard() -> None:
     where_idx = text.index("WHERE row.seq = 0", provenance_idx)
     first_chunk_idx = text.index("MERGE (doc)-[fc:FIRST_CHUNK]->(c)", provenance_idx)
     assert provenance_idx < where_idx < first_chunk_idx
+
+
+def test_cypher_header_documents_where_the_prereq_is_enforced() -> None:
+    """The template cannot tell a bad row from an absent registry (it runs per
+    batch) — its header must point at the loader-side check that can, so the
+    next person re-pointing this loader at another database finds it."""
+    text = CYPHER_PATH.read_text(encoding="utf-8")
+    assert "_assert_product_registry_present" in text
+
+
+# ---- Q8: absent product registry vs per-row miss ----------------------------
+#
+# Duck-typed client (the test_incremental_delete.py idiom, no live DB): the
+# behaviour under test is which queries the loader issues before and after the
+# load, and what it does with the answers.
+
+
+class _FakeAdapter:
+    def __init__(self, rows: list[dict]) -> None:
+        self._rows = rows
+
+    def __enter__(self) -> _FakeAdapter:
+        return self
+
+    def __exit__(self, *_: Any) -> None:
+        return None
+
+    def rows(self) -> Iterator[dict]:
+        yield from self._rows
+
+
+class _FakeClient:
+    """Answers the registry-count and unresolved-product probes.
+
+    ``registry`` is the set of product_ids a real (non-SchemaMeta)
+    :SoftwareProduct exists for; ``schema_meta_only`` simulates a database
+    where the ONLY :SoftwareProduct is schema_graph.cypher's keyless
+    :SchemaMeta exemplar — the case a bare count(:SoftwareProduct) would pass.
+    """
+
+    def __init__(self, registry: set[str], *, schema_meta_only: bool = False) -> None:
+        self.registry = registry
+        self.schema_meta_only = schema_meta_only
+        self.run_calls: list[tuple[str, dict]] = []
+        self.run_script_calls: list[tuple[str, dict]] = []
+
+    def run(self, cypher: str, params: dict[str, Any] | None = None,
+            **kwargs: Any) -> list[dict]:
+        bind = {**(params or {}), **kwargs}
+        self.run_calls.append((cypher, bind))
+        if "AS products" in cypher:
+            # The exemplar is excluded by the query's own NOT sp:SchemaMeta
+            # predicate, so it never contributes to this count.
+            return [{"products": len(self.registry)}]
+        if "WHERE NOT (doc)-[:DESCRIBES]->(:SoftwareProduct)" in cypher:
+            # Stand in for the graph: the template's FOREACH guard writes the
+            # edge only when the row's product id resolves, so the documents
+            # left without one are exactly those whose id is off-registry.
+            seen: dict[str, str | None] = {}
+            for row in self.flushed_rows():
+                seen.setdefault(row["doc_id"], row.get("subject_product_id"))
+            return [
+                {"doc_id": doc_id, "subject_product_id": product_id}
+                for doc_id, product_id in sorted(seen.items())
+                if product_id not in self.registry
+            ]
+        if "SHOW INDEXES" in cypher:
+            return []
+        if "AS rows_changed" in cypher:
+            return [{"rows_changed": 0}]
+        return []
+
+    def run_script(self, script: str, params: dict[str, Any] | None = None) -> None:
+        self.run_script_calls.append((script, dict(params or {})))
+
+    def flushed_rows(self) -> list[dict]:
+        rows: list[dict] = []
+        for _, bind in self.run_calls:
+            rows.extend(bind.get("batch", []))
+        for _, params in self.run_script_calls:
+            rows.extend(params.get("batch", []))
+        return rows
+
+
+def _chunk_row(**overrides: Any) -> dict:
+    row = dict(_all_rows()[0])
+    row.update(overrides)
+    return row
+
+
+def _loader(client: _FakeClient, rows: list[dict]) -> BmcDocsLoader:
+    return BmcDocsLoader(client, _FakeAdapter(rows), run_log=False)
+
+
+def test_empty_product_registry_fails_loudly() -> None:
+    """The whole-corpus miss: ZERO reachable :SoftwareProduct must refuse the
+    load instead of reporting success with no DESCRIBES edges."""
+    client = _FakeClient(registry=set())
+    with pytest.raises(RuntimeError, match="no :SoftwareProduct nodes are reachable"):
+        _loader(client, [_chunk_row()]).load()
+
+
+def test_empty_registry_refusal_writes_nothing_not_even_the_job_run() -> None:
+    """Refusal follows the _preflight_indexes convention — it lands before
+    _open_run, so a refused load leaves no :JobRun behind to look successful."""
+    client = _FakeClient(registry=set())
+    with pytest.raises(RuntimeError):
+        _loader(client, [_chunk_row()]).load()
+    assert not client.flushed_rows()
+    assert not [c for c, _ in client.run_calls if "MERGE (run:JobRun" in c]
+
+
+def test_schema_meta_exemplar_alone_does_not_satisfy_the_prereq() -> None:
+    """schema_graph.cypher MERGEs :SchemaMeta:SoftwareProduct with NO
+    product_id. A bare count(:SoftwareProduct) would see 1 and wave an empty
+    registry through — the guard's predicate must exclude it."""
+    client = _FakeClient(registry=set(), schema_meta_only=True)
+    with pytest.raises(RuntimeError, match="no :SoftwareProduct nodes are reachable"):
+        _loader(client, [_chunk_row()]).load()
+
+    probe = [c for c, _ in client.run_calls if "AS products" in c]
+    assert probe, "no registry-presence probe was issued"
+    assert "NOT sp:SchemaMeta" in probe[0], (
+        "the registry probe must use the rename-proof label predicate"
+    )
+
+
+def test_populated_registry_loads_and_reports_no_missing_edges() -> None:
+    client = _FakeClient(registry={"controlm"})
+    loader = _loader(client, [_chunk_row()])
+    summary = loader.load()
+    assert summary.status == "OK"
+    assert summary.rows_processed == 1
+    assert loader.documents_without_product == []
+    assert len(client.flushed_rows()) == 1
+
+
+def test_per_row_product_miss_still_loads_the_chunk_and_reports_the_miss(
+    caplog: pytest.LogCaptureFixture,
+) -> None:
+    """The other half: one row with a bad product id keeps its Document and
+    Chunk (the FOREACH guard drops only that edge) but the miss is reported,
+    never silent."""
+    client = _FakeClient(registry={"controlm"})
+    rows = [
+        _chunk_row(doc_id="good-doc", chunk_id="good-doc#000"),
+        _chunk_row(  # misspelled product id
+            doc_id="bad-doc", chunk_id="bad-doc#000", subject_product_id="contorlm"
+        ),
+    ]
+    loader = _loader(client, rows)
+    with caplog.at_level(logging.WARNING, logger="drydocs.loaders.bmc_docs"):
+        summary = loader.load()
+
+    assert summary.status == "OK"
+    assert summary.rows_processed == 2
+    # both rows reached the graph — a bad product id costs the edge, not the chunk
+    flushed = {r["chunk_id"] for r in client.flushed_rows()}
+    assert flushed == {"good-doc#000", "bad-doc#000"}
+    # ...and the miss is reported, naming the document AND the unresolved id
+    assert loader.documents_without_product == [
+        {"doc_id": "bad-doc", "subject_product_id": "contorlm"}
+    ]
+    assert "contorlm" in caplog.text
+    assert "bad-doc" in caplog.text
+
+
+def test_missing_edge_probe_is_scoped_to_this_run() -> None:
+    """The probe must not report documents an earlier run left behind."""
+    client = _FakeClient(registry={"controlm"})
+    loader = _loader(client, [_chunk_row()])
+    loader.load()
+    probes = [
+        (c, b) for c, b in client.run_calls
+        if "WHERE NOT (doc)-[:DESCRIBES]->(:SoftwareProduct)" in c
+    ]
+    assert len(probes) == 1
+    cypher, bind = probes[0]
+    assert "last_run_id: $run_id" in cypher
+    assert bind["run_id"] == loader.run_id
 
 
 def test_no_merge_on_nullable_keys() -> None:

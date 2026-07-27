@@ -26,6 +26,28 @@ Tags help grooming: `idea` · `bug` · `doc` · `source` (new data source) · `q
 
 <!-- add new ideas at the top -->
 
+- 2026-07-27 — [bug] **`batch_port_orchestrator.cypher:26` carries the exact defect Q8 just
+  closed in `bmc_docs.cypher` — same `OPTIONAL MATCH (sp:SoftwareProduct {product_id:
+  row.product_id})` inside a FOREACH guard, so an absent product registry drops every edge and
+  still reports success.** Found while fixing Q8 (which was scoped to bmc-docs only, so this
+  was deliberately left alone). The fix is the same shape and now has a precedent to copy:
+  `BmcDocsLoader._assert_product_registry_present` (refuse pre-`_open_run`, so nothing is
+  written) plus the post-load "rows this run wrote that ended up with no edge" probe. Worth
+  checking whether any OTHER loader joins a prereq node through the same
+  `OPTIONAL MATCH` + `FOREACH` idiom — `grep -l "FOREACH (_ IN CASE WHEN"` over
+  `drydocs/loaders/cypher/` is the sweep. Fourth-plus instance of the
+  "succeeds loudly, does nothing" through-line (G29, G30, Q8).
+- 2026-07-27 — [bug] **The SchemaMeta contamination O33 describes is not only a read-surface
+  problem — it defeats WRITE-side guards too.** Q8's registry-presence check would have been
+  useless as a bare `count(:SoftwareProduct)`: `schema_graph.cypher:109` MERGEs
+  `:SchemaMeta:SoftwareProduct {name: 'SoftwareProduct'}` with NO `product_id`, so the exemplar
+  alone would satisfy the guard and wave an empty registry straight through. Q8 shipped with
+  `WHERE NOT sp:SchemaMeta AND sp.product_id IS NOT NULL` and a test pinning it. Two
+  consequences for O33's scope: its audit should cover prereq/guard queries in LOADERS, not
+  just QuerySpecs, and the exemplars' missing key properties are arguably the root fix
+  (a keyless exemplar is indistinguishable from a real node with an unset key — the same
+  null-blindness as the identity gate's §C2).
+
 - 2026-07-27 — [idea] **Company catalog gate (`internal/org/catalog/`, page dated 2026-06-25) has
   drifted ahead of the producer catalog ontology — back-flow / divergence-ledger candidate.**
   Screenshot review of `_catalog_gate_page.html` ("SME Gate Prompt — PAT Catalog Loader", step 1
