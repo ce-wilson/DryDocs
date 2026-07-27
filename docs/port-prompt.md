@@ -289,8 +289,22 @@ STEP LEDGER — delta since `6fd3270` (numbering continues from the archive):
     900 passed / 6 skipped.
 
 46. IDENTITY GATE + BOUNDARY HARDENING + LOADER REFUSALS (2026-07-23 → 2026-07-27;
-    `bf33c8a..0ce7333`, 56 commits, pushed). Ten sub-streams; APPLY IN THE ORDER
-    BELOW — (b) is deliberately first and is not optional.
+    `bf33c8a..78ba7fd`, 58 commits, pushed). Ten sub-streams; APPLY IN THE ORDER
+    BELOW — **(a) is deliberately first and is not optional.**
+    COMPANION: `docs/port-step46-company-prompt.md` is the hand-off prompt for the
+    executing company session — it carries the three corrections below in one place.
+    Producer-side hand-off material like the retired T12 packs: PASTE it, do not
+    clean-add it; retire it once the PORT-REPORT is written.
+    HEAD NOTE (corrected 2026-07-27): this entry first declared the range end as
+    `0ce7333`; the true end is `78ba7fd`. The tail matters — `5bb606f` (this ledger
+    entry) ALSO repointed `config/taxonomy/platforms.yaml`, which is
+    canonical-producer and carries the T12 provenance pointer, so stopping at
+    `0ce7333` silently drops the T12 follow-through step 43 describes. Prefer taking
+    `ce-wilson/main` at port-run time and recording the exact hash in the report; if
+    you must pin, pin `78ba7fd`. The only other tail content is `IDEAS.md`
+    (union-append), one struck row in `docs/reviews/doc-inventory-2026-07-22.md`,
+    this document (producer instruction doc, never ported), the two deleted
+    `docs/port-T12-*.md` (see step 43 — do NOT re-add), and one snapshot (EXCLUDED).
     a. *** APPLY FIRST — PUBLISH-BOUNDARY HARDENING *** (`105aa9c` p0 sweep,
        `4d0f375` J14 split, `36ae382` J14 follow-up relocate, `68acf7d` J15
        value-shape guard + 14-value resweep): real SEALIDs found INSIDE prose and
@@ -308,14 +322,26 @@ STEP LEDGER — delta since `6fd3270` (numbering continues from the archive):
        22/22). Ruling: **`seal_id` → `app_id` on the canonical node**, plus the
        TWO-PART naming rule (identity is source-neutral; EVIDENCE keeps the source's
        own term) and the finding that SEALID was never a source field name.
-       *** TIER B CANDIDATE — assess before applying ***: your live graph keys
-       :Application / :BusinessApplication on seal_id, and your initial-load runbook's
-       app-code link step (step 10) parses seal_id out of each Control-M app code and
-       MATCHes on it. A key rename touches that path directly. The gate ALSO warns
-       about two traps that bite on the rename itself: constraint NAMES do not follow
-       property renames, and Neo4j uniqueness constraints IGNORE nulls (so a
-       half-renamed population passes its constraint silently). Producer ships the
-       ruling; the company decides its own migration timing and re-runs T1.
+       *** SCOPE — READ THIS BEFORE TREATING IT AS TIER B *** (narrowed 2026-07-27
+       after a file-level check): the S3 series touches **ZERO loader files and ZERO
+       `.cypher` files**. `fc15191` is gate-log + taxonomy-ontology-map +
+       business-application.yaml + ADR 0010 + backlog.yaml + the two generated
+       surfaces, and the commit says so outright — *"Nothing is written to the graph
+       at the gate itself — S3 is now build work."* `seal_id` is still live in ten
+       producer cypher files. So this sub-stream ports **the ruling and the build
+       backlog**; there is no key rename in the range, and your live graph and
+       app-code link path are untouched by applying it. Apply it as an ordinary
+       canonical-producer sub-stream.
+       THE TIER B RISK IS REAL BUT DEFERRED — it belongs to the BUILD, not this port.
+       When the flip is eventually built, it touches your initial-load runbook's
+       app-code link step (step 10), which parses seal_id out of each Control-M app
+       code and MATCHes on it. The gate warns of two traps that bite on the rename
+       itself: constraint NAMES do not follow property renames, and Neo4j uniqueness
+       constraints IGNORE nulls, so a half-renamed population passes its constraint
+       silently. §C already rules the path: **rebuild, not migrate** — dual-write plus
+       a graph-test through phases 1–3, because a partial cutover SILENTLY DOUBLES the
+       canonical node rather than failing. Company decides its own build timing and
+       re-runs T1 then.
     c. GRAPH-INFRA G28/G29/G30 (`a34a52e` multi-database naming drift closed + guarded,
        `84d0480` ONE verified apply-supplements chain with the legacy verbs kept as
        aliases, `a99ed86` curated lineage lands in `drydocs`, not `ddlineage`).
@@ -380,12 +406,15 @@ STEP LEDGER — delta since `6fd3270` (numbering continues from the archive):
        Epic U self-documentation, grooms `f9167a5` / `eeabf2b` / `a37043a` / `791a278`,
        IDEAS captures `220954e` / `39e1258` / `974ecb5` / `323a2f5`).
     Snapshots in the range (`b7111d9`, `64fa3e9`, `3ece9d7`, `01132e7`, `a3ac887`,
-    `ff1be3b`, `abd67f6`, `9b7d83e`, `c0008df`, `c69a482`) are EXCLUDED class
-    (guardrail 4). `7164ff5` is the step-45 ledger entry itself — this document.
+    `ff1be3b`, `abd67f6`, `9b7d83e`, `c0008df`, `c69a482`, `78ba7fd`) are EXCLUDED
+    class (guardrail 4; now also a never-port manifest row). `7164ff5` is the step-45
+    ledger entry and `5bb606f` the step-46 one — this document — but note that
+    `5bb606f` is NOT docs-only: see the HEAD NOTE above.
     backlog.yaml per-entry: P3/G21/G24/G26/Q8/J14/J15/C18 arrive done, C17 arrives todo,
     new Epic U + phase 16, ids C17/C18 newly allocated; re-insert company DD-series and
-    recompute the summary exactly as test_backlog does. Producer reference at `0ce7333`:
-    982 passed / 6 skipped.
+    recompute the summary exactly as test_backlog does. Producer reference at `78ba7fd`
+    (unchanged from `0ce7333` — the tail commits are docs/config only): 982 passed /
+    6 skipped.
 
 ACCEPTANCE GATE (behavior is the contract, not a byte-compare):
 - Track 1 (portable, no production sample present):
@@ -398,7 +427,7 @@ ACCEPTANCE GATE (behavior is the contract, not a byte-compare):
 - Full `pytest tests/unit/` — ZERO failures is the contract; skips are
   environment/fixture-absence by design (production CSVs, XML fixtures, fastapi
   optional dep, essential-graphrag PDF, J7 guards without RECONCILE_BEFORE_DIR).
-  Producer reference at the current head (step 46, `0ce7333`): 982 passed /
+  Producer reference at the current head (step 46, `78ba7fd`): 982 passed /
   6 skipped (step-45 head bf33c8a was 900 / 6; step-43 head 2adec42 was 840 / 6).
   Company reference at the last port: 1174 passed / 21 skipped / 0 failed.
 - CI guards green: test_schema.py (EXPECTED_CONSTRAINTS company-based — see ledger;

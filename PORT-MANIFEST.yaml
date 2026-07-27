@@ -35,7 +35,12 @@
 # =============================================================================
 schema: drydocs.port-manifest.v1
 classification: Internal-Public
-updated: 2026-07-14   # Phase B relocate (ADR 0002-a-1): core paths now drydocs_core/*;
+updated: 2026-07-27   # 2026-07-27 (step 46): knowledge/depgraph-snapshots/*.json is now an
+                      # EXPLICIT never-port row with the tooling split out as canonical-producer.
+                      # It had NO row and therefore fell to `default:` = clean-add — i.e. the
+                      # manifest said PORT THEM while every port excluded them by planner
+                      # judgment. Also refreshed the stale test_schema.py count note.
+                      # 2026-07-14   # Phase B relocate (ADR 0002-a-1): core paths now drydocs_core/*;
                       # the remainder keeps the drydocs/ name (thin variant). Renamed-path
                       # rows below were the promised "path-column diff, not a prose rewrite".
                       # 2026-07-10, later: drydocs_remediation/** + internal/remediation/**
@@ -226,7 +231,7 @@ rows:
     note: "keep consumer-only rows (e.g. ControlMQuantitativeRow), add producer rows (path moved in Phase B)"
   - path: "tests/unit/test_schema.py"
     disposition: evaluate
-    note: "consumer EXPECTED_CONSTRAINTS is ahead (superset: base + snow-support supplements; 45 ⊇ 40 at the 2026-07-20 bundle port) — counts drift every port, trust the live test files over this note (66acea8 lesson); keep consumer count, take producer drift-guard logic"
+    note: "consumer EXPECTED_CONSTRAINTS is ahead (superset: base + snow-support supplements). Producer was 47 at the step-45 head and is 49 at 78ba7fd (+2 from the P3 hosts loader, step 46e). Counts drift EVERY port — trust the live test files over this note (66acea8 lesson); keep consumer count, take producer drift-guard logic, and raise the consumer number only for genuinely new active edges that ship their own supplement block"
   - path: "tests/unit/test_controlm_cypher.py"
     disposition: evaluate
     note: "consumer scope_key condition-key variant wins"
@@ -247,3 +252,17 @@ rows:
   - path: "internal-local/**"
     disposition: never-port
     note: "gitignored; travels by hand only, never by git"
+  # depgraph snapshots: the OUTPUTS never cross, the TOOLING does. Order matters —
+  # the *.json row must stay ABOVE the directory row (first match wins).
+  - path: "knowledge/depgraph-snapshots/*.json"
+    disposition: never-port
+    note: "per-repo drift artifacts — each carries a git-commit `meta` header that is
+      meaningless across the two disjoint mains, and the two sides' graphs differ by
+      design. Also catches tree-original.json / tree-this-version.json, which embed a
+      producer-local abs_path. Every port had been excluding these by planner judgment
+      with NO row to point at; added 2026-07-27 after the step-46 port re-derived the
+      same call from scratch."
+  - path: "knowledge/depgraph-snapshots/**"
+    disposition: canonical-producer
+    note: "README.md + snapshot.ps1 + viewer.html — the snapshot tooling and its
+      documentation DO port; only the *.json outputs above are held back"
