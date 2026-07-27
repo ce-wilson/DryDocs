@@ -49,8 +49,10 @@ Everything else in the tail is safe to lose: `IDEAS.md` (union-append), one stru
 instruction doc, never ported), the two deleted `docs/port-T12-*.md` (step 43 says do NOT
 re-add them), and one snapshot (never-port).
 
-**Do this:** take `ce-wilson/main` at port-run time and record the exact hash in the
-PORT-REPORT. If you must pin, pin `78ba7fd`. Either is fine; `0ce7333` is not.
+**Do this:** take whatever `ce-wilson/main` is at port-run time and record that exact hash
+in the PORT-REPORT. **Do not pin a hash quoted from any document** — this one included.
+It already went stale once inside this review: `378f4ba` landed after `78ba7fd` and carries
+manifest rows you need (§3 below). `0ce7333` in particular is wrong.
 
 ---
 
@@ -108,8 +110,17 @@ Now fixed producer-side, as two ordered rows (first match wins):
 The `*.json` row also catches `tree-original.json` / `tree-this-version.json`, which embed a
 producer-local absolute path. `README.md`, `snapshot.ps1` and `viewer.html` **do** port.
 
-**Do this:** take the manifest change with the rest of the port, then re-check your
-exclusion list against the rows rather than against the plan.
+**The same gap turned out to cover the port-control docs themselves.** `docs/port-prompt.md`,
+its step archive, and the hand-off packs (including this file) also had no row and also fell
+to `clean-add` — which is exactly why step 43 carried a prose *"do NOT re-add the T12 session
+materials"* instruction. That workaround is now a manifest row: `docs/port-*.md` →
+**never-port**. Your own `PORT-REPORT-<date>.md` is a company artifact and is not producer
+content either.
+
+**Do this:** take the manifest change with the rest of the port (`PORT-MANIFEST.yaml` is
+`canonical-producer`), then re-check your exclusion list against the rows rather than against
+the plan. If your tree already contains any `docs/port-*.md` from an earlier port, that is
+the old gap showing — remove them; they are producer control docs, not shared content.
 
 ---
 

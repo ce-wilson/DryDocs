@@ -299,9 +299,11 @@ STEP LEDGER — delta since `6fd3270` (numbering continues from the archive):
     `0ce7333`; the true end is `78ba7fd`. The tail matters — `5bb606f` (this ledger
     entry) ALSO repointed `config/taxonomy/platforms.yaml`, which is
     canonical-producer and carries the T12 provenance pointer, so stopping at
-    `0ce7333` silently drops the T12 follow-through step 43 describes. Prefer taking
-    `ce-wilson/main` at port-run time and recording the exact hash in the report; if
-    you must pin, pin `78ba7fd`. The only other tail content is `IDEAS.md`
+    `0ce7333` silently drops the T12 follow-through step 43 describes. **Do not pin a
+    hash from this document at all** — it goes stale the moment the producer commits
+    again (it already did once: `378f4ba` carries the manifest's new never-port rows,
+    which the company NEEDS). Take whatever `ce-wilson/main` is at port-run time and
+    record that exact hash in the PORT-REPORT. The only other tail content is `IDEAS.md`
     (union-append), one struck row in `docs/reviews/doc-inventory-2026-07-22.md`,
     this document (producer instruction doc, never ported), the two deleted
     `docs/port-T12-*.md` (see step 43 — do NOT re-add), and one snapshot (EXCLUDED).

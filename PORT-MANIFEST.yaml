@@ -252,6 +252,16 @@ rows:
   - path: "internal-local/**"
     disposition: never-port
     note: "gitignored; travels by hand only, never by git"
+  - path: "docs/port-*.md"
+    disposition: never-port
+    note: "PRODUCER-SIDE PORT CONTROL DOCS — the rolling port prompt, its step archive,
+      and the per-stream hand-off packs (port-T12-*, port-step46-*). These direct the
+      port; they are not its payload. They fell to `default:` = clean-add until
+      2026-07-27, which is why step 43 needed a prose 'do NOT re-add the T12 session
+      materials' workaround — that instruction is now a manifest row. Hand-off packs are
+      PASTED into the executing session, never committed company-side. The company's own
+      PORT-REPORT-<date>.md is a company artifact and is likewise not producer content."
+
   # depgraph snapshots: the OUTPUTS never cross, the TOOLING does. Order matters —
   # the *.json row must stay ABOVE the directory row (first match wins).
   - path: "knowledge/depgraph-snapshots/*.json"
