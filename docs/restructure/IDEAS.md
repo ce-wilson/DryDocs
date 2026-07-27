@@ -26,6 +26,20 @@ Tags help grooming: `idea` · `bug` · `doc` · `source` (new data source) · `q
 
 <!-- add new ideas at the top -->
 
+- 2026-07-27 — [bug] **`ontology.cypher:109` points at a file that was never created —
+  `ontology/reference/swo_sdlc_ontology.cypher` does not exist anywhere in the tree.** The
+  comment reads: *"Full SDLC subset (~250 terms) loads from ontology/reference/swo_sdlc_ontology.cypher
+  in the M0 follow-up step"*, immediately above the 13 SWO anchor terms it says are the
+  high-frequency subset of it. Found while drafting the `self-documentation-code-graph` gate
+  spec (G33), whose §A4 scopes the wider set out — the finding retroactively justifies that
+  exclusion, because **"the wider set" is not something that can be loaded, it is something
+  that would have to be built.** Two things to decide, neither urgent: (1) does the ~250-term
+  SDLC subset still want building at all, or was it superseded by the decision to seed only
+  anchors? (2) either way the comment must stop describing a load step that cannot run —
+  a reader following it hits nothing. Related to the same gate's §E0 finding that all 13
+  seeded terms have **zero consumers anywhere in the tree**: the SWO layer as a whole is
+  seeded-but-unused, and G33 is its first proposed use. Note the M0 framing dates the
+  reference to the earliest phase, so this has been dangling a long time.
 - 2026-07-27 — [bug] **`PORT-MANIFEST.yaml`'s `default:` is `clean-add`, so a MISSING row means
   "port it" — absence is not exclusion, and two whole classes of producer-only file were sitting
   in that gap.** Found while reviewing the company-side step-46 port plan: the plan listed
