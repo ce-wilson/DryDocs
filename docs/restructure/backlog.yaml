@@ -4082,6 +4082,82 @@ items:
       Synthetic 4-row sample covers every ladder branch; refresh-reference
       chain now exercises the loader; live shape verified exact. Suite 718.
 
+  - id: C17
+    epic: ontology-mapping
+    title: "PAT grain keying: the Product LINE grain is name-only at source while :ProductLine is id-keyed — decide picker-1 resolution, and reconcile the unqualified area_product_id + the third (name-only) sponsoring form"
+    type: task
+    module: drydocs-load
+    phase: 2
+    agent: main
+    model: fable
+    priority: p2
+    status: todo
+    depends_on: [C9]
+    inputs: [drydocs/loaders/catalog.py, drydocs/loaders/cypher/pat_product_mapping.cypher, drydocs/loaders/cypher/products.cypher, config/gate-prompts/seal-app-ref-edge-reshape.yaml, config/source-registry.yaml, config/gate-log.md]
+    acceptance: >
+      The keying asymmetry is resolved in writing, not assumed. (a) Picker-1
+      resolution is ruled at the seal-app-ref-edge-reshape §G6-RIDER: either a
+      product-line-scoped extract supplies product_line_id, or the resolver maps
+      name -> id against the loaded :ProductLine set and REPORTS ambiguity
+      (counts always reported, never silent) — a name must not become the
+      de-facto key. (b) It is recorded which source column feeds
+      area_product_id (Supporting vs Sponsoring), given the team report splits
+      them and the member report does not — qualification is report-specific.
+      (c) The third sponsoring form (Sponsoring Product Line, name-only) is
+      either modeled or explicitly ruled out of scope, closing C9 §d's two-form
+      coverage. (d) Whatever is decided lands in the row model + cypher + a test,
+      and the gate-log carries the outcome. Full suite green.
+    notes: >
+      Filed 2026-07-27 from an SME review of the source report structure
+      (captures Internal-Confidential — held OUT of the repo; structure only).
+      The Team Details Report carries ID+Name for Product, Supporting Area
+      Product, Sponsoring Area Product and Sponsoring Product, but Product Line
+      and Sponsoring Product Line are NAME-ONLY. :ProductLine is keyed on
+      product_line_id (required, min_length=1) and products.cypher MATCHes
+      parent_product_line_id — so this extract cannot join product lines by key.
+      That is precisely the FIRST dropdown of the §G6 mapping cascade, which
+      makes it a build dependency for the steward screen, not a modeling nicety.
+      The two sponsoring ID columns appear CO-POPULATED rather than exclusive —
+      cypher §3a/§3b already fire independently, so the loader is right; confirm
+      the model intends both. Depends on C9 because it re-opens that gate's §d
+      coverage question with the source structure now visible.
+
+  - id: C18
+    epic: ontology-mapping
+    title: "Delete the stale shadow catalog row models in drydocs_core/models/catalog.py (unused, already drifted past C9 §d) — one definition, imported like every other loader"
+    type: chore
+    module: drydocs-core
+    phase: 2
+    agent: main
+    model: sonnet
+    priority: p2
+    status: todo
+    depends_on: []
+    inputs: [drydocs_core/models/catalog.py, drydocs/loaders/catalog.py, tests/unit/test_pat_product_mapping.py, docs/adr/]
+    acceptance: >
+      Exactly ONE definition of each catalog row model survives, and the loaders
+      import it the way every other loader does (from drydocs_core.models) or the
+      shadow is deleted outright — no duplicate class names across the two
+      modules. A test pins that pat_product_mapping's row model carries
+      sponsored_area_product_id (the C9 §d field) and the ';' -> ',' seal_ids
+      normalizer, so a future move cannot silently lose either. Full suite green;
+      import drydocs.cli and drydocs --help both OK.
+    notes: >
+      Filed 2026-07-27. All 8 catalog row classes exist twice — in
+      drydocs_core/models/catalog.py and again in drydocs/loaders/catalog.py —
+      and NOTHING imports the drydocs_core copies. The shadow has already
+      drifted past a signed gate: its PatProductMappingRow is missing
+      sponsored_area_product_id (C9 §d, 2026-07-18) and lacks the ';' -> ','
+      seal_ids normalizer the real PAT report needs. Because model_config is
+      extra="ignore", switching to it would drop that column SILENTLY at
+      validation and leave pat_product_mapping.cypher §3b permanently dead with
+      no error — the "succeeds loudly, does nothing" family again, this time
+      pre-armed rather than live. p2 not p3 because the ADR 0002-A-1 migration
+      direction is TOWARD drydocs_core, so a Phase-C move makes the stale copy
+      win by default. Every other loader (controlm_*, seal_*, manual_loads, cli)
+      already imports from drydocs_core.models — the catalog loaders are the only
+      ones defining models locally.
+
   # ── Epic Q — Document ingestion & doc-graph benchmarks (docmeta) — Phase 14 ─
   # Born 2026-07-16: the Essential GraphRAG ebook groomed on user-decided intents,
   # with the phase-14 plan change user-approved in-session (the phase-12/13 idiom).
@@ -6813,11 +6889,11 @@ items:
       the primary fix.
 
 summary:
-  todo: 48                                         # +5 at the 2026-07-27 groom (J14/J15/G36/O33/G38); J14 + P3 + G21 + G24 + G26 + Q8 closed same day
+  todo: 50                                         # +5 at the 2026-07-27 groom (J14/J15/G36/O33/G38), +2 from the same day's PAT-structure review (C17/C18); J14 + P3 + G21 + G24 + G26 + Q8 closed same day
   in_progress: 1                                   # E1 (gate deferred both sides)
   blocked: 0
   done: 141                                        # 2026-07-27 closes: J14 SEALID split, P3 hosts+RUNS_ON, G21 rua code-ops, G24 code-repo seam, G26 launcher-registry config, Q8 bmc-docs prereq
-  next_ready: [M3, M4, J10, Q6, O23, J13, O26, O27, C15, C16, O28, R3, R4, L16, O29, O30, O31, O32, S1, S8, S9, Q7, G32, G33, G34, G35, O33, J15, P5, G22]
+  next_ready: [M3, M4, J10, Q6, O23, J13, O26, O27, C15, C16, C17, C18, O28, R3, R4, L16, O29, O30, O31, O32, S1, S8, S9, Q7, G32, G33, G34, G35, O33, J15, P5, G22]
   # 2026-07-27 groom (weekly inbox): 5 promoted, 1 merged, 1 resolved. None of
   # the five touch edge semantics — no gate needed: J14 is a publish-boundary
   # file split (fable because the boundary decision rides in it), J15/G36/G38/O33

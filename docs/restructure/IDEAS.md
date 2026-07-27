@@ -26,6 +26,47 @@ Tags help grooming: `idea` · `bug` · `doc` · `source` (new data source) · `q
 
 <!-- add new ideas at the top -->
 
+- 2026-07-27 — [bug] **The PAT team extract keys Products but NOT Product Lines — the cascade's
+  first dropdown has no stable key.** From an SME review of the source report headers (structure
+  only; the captures are Internal-Confidential and nothing from them is transcribed). The
+  Team Details Report carries an ID **and** a Name for `Product`, `Supporting Area Product`,
+  `Sponsoring Area Product` and `Sponsoring Product` — but **`Product Line` and
+  `Sponsoring Product Line` are NAME-ONLY, no ID column at either**. Our `:ProductLine` node key
+  is `product_line_id`, **required**, `min_length=1` (`drydocs/loaders/catalog.py` ProductLineRow;
+  `products.cypher:17` MATCHes `parent_product_line_id`), so this extract can only join product
+  lines **by name** — renames and near-duplicates silently re-point a mapping. Groomed as **C17**.
+  Four sub-findings:
+  1. **Product-line keying** (above) — the direct consequence for the §G6 cascade: the FIRST
+     picker is the one without a key. Either a product-line-scoped extract supplies the id, or
+     the picker resolves name→id against the already-loaded `:ProductLine` set and reports
+     ambiguity rather than guessing (the coverage-policy rule).
+  2. **`area_product_id` is UNQUALIFIED in the live row model** while the Team Details Report
+     splits *Supporting* Area Product from *Sponsoring* Area Product as two separate ID columns.
+     Confirm which column feeds it. Likely why unqualified looked right: the **Team Member
+     Details Report** carries a plain unqualified `Area Product ID` / `Area Product Name` — the
+     qualification is REPORT-SPECIFIC, not universal.
+  3. **`Sponsoring Product Line` is a THIRD sponsoring form and is unmodeled.** C9 §d extended
+     sponsoring to two forms (product + area product, both ID-bearing, both wired —
+     `pat_product_mapping.cypher` §3a/§3b). This third one is name-only and has no field.
+  4. **The two sponsoring ID columns appear CO-POPULATED on the same row**, not exclusive. §3a
+     and §3b already fire independently, so the loader is right — worth confirming the model
+     intends both rather than one-or-the-other.
+
+- 2026-07-27 — [bug] **`drydocs_core/models/catalog.py` is a STALE SHADOW of the live catalog row
+  models, and it has already drifted past a gate ruling.** All 8 catalog row classes exist twice —
+  in `drydocs_core/models/catalog.py` and again in `drydocs/loaders/catalog.py`. **Nothing imports
+  the `drydocs_core` copies**; the loaders use their local definitions. The shadow copy's
+  `PatProductMappingRow` is **missing `sponsored_area_product_id`** — the field C9 §d ruled in on
+  2026-07-18 — and its `model_config` is `extra="ignore"`, so a switch to it would drop that
+  column **silently at validation**, leaving `pat_product_mapping.cypher` §3b permanently dead
+  with no error. It also lacks the `;`→`,` `seal_ids` normalizer the real PAT report needs.
+  **Why this is a live landmine, not cosmetics:** every OTHER loader imports its row model from
+  `drydocs_core.models` (controlm_*, seal_*, manual_loads, cli) — the catalog loaders are the ONLY
+  ones defining models locally, and the ADR 0002-A-1 migration direction is *toward* `drydocs_core`,
+  so a Phase-C move would make **the stale copy win**. Delete the shadow or make it the single
+  source; do not leave two. Groomed as **C18**. (Also the reason a spot-check of "did C9 §d land?"
+  can answer NO from one file and YES from the other — it landed; the shadow is what's wrong.)
+
 - 2026-07-27 — [idea] **The SME orchestrator-mapping act: what actually flips a batch port on.**
   SME direction, this session. CONFIRMED first, since the design rests on it: both ports are
   created `active = false` (`seal_applications.cypher:97,101`, `ON CREATE SET`) — and the

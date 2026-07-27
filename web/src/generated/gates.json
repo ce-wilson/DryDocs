@@ -322,6 +322,7 @@
       ],
       "log_ref": "config/gate-log.md:804",
       "unblocks": [
+        "C17",
         "S3"
       ]
     },
@@ -338,6 +339,7 @@
       "log_ref": "config/gate-log.md:828",
       "unblocks": [
         "K2",
+        "C17",
         "S3",
         "G34",
         "G35",
