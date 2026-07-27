@@ -11,6 +11,7 @@ Provenance is internal AND the content is sensitive (real identifiers, rosters, 
 |--------|----------|
 | `org/` | Real LOB→Product→Team rosters, team names, people, SEAL ownership records |
 | `schemas/` | Real Oracle schema/table/object names, SIDs, connection details |
+| `standards/` | VALUE halves of split `knowledge/standards/` twins (J14): real registries, real production examples, real↔synthetic id keys — the mechanism halves stay publishable in `knowledge/` |
 | `secrets/` | Never commit real secrets even here — use `.env`; this is for references/notes only |
 
 ## Publish discipline

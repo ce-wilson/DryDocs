@@ -18,6 +18,16 @@ trust_tier: internal / SME-asserted / planned
 
 > ⚠️ **Trust tier:** internal / planned / SME-asserted. The "modern" examples below are the *target pattern* observed in early adopters — not yet validated estate-wide.
 
+> 🔒 **Split twin (J14, 2026-07-27):** this file is the publishable MECHANISM half.
+> The REAL production examples (folder/job names, SIDs, contact DLs, ServiceNow
+> queues, MFT route ids), the real SEAL ids and application names, the SEAL-ID
+> format disclosure, and the escalation-table schema identifiers live in the
+> Internal-Confidential VALUES twin,
+> `internal/standards/technology/description-field-metadata-plan.md`. Examples
+> below are SANITIZED to the shapes the sample corpus already uses (synthetic SEAL
+> block **70001–70099**, sample folder names from `config/taxonomy/controlm.yaml`);
+> the twin holds the real↔synthetic key.
+
 ---
 
 ## 1. Why the Description field
@@ -32,57 +42,57 @@ trust_tier: internal / SME-asserted / planned
 
 ---
 
-## 2. Observed legacy vs modern (production examples, P032-E0700-DMA)
+## 2. Observed legacy vs modern (SANITIZED examples — real ones in the values twin)
 
-### Folder `PRARAG-HLDM-89211-MLCM-ORIG-CRM-TRUST-DLY` (SMART)
+### Folder — sample shape `PRARAG-HLDM-70002-PEX-RFND-DLY` (SMART)
 
 | | Legacy | Modern (target pattern) |
 |---|---|---|
-| **Description** | `Generated Control-M Folder` *(autogen boilerplate, zero info)* | `datasetSeriesName: MLCM CRM \|SeriesSLA: 17:00 EST` *(pipe-delimited key:value)* |
-| **Variables** | `NOTIFY` (email), `DRPBX_DIR`, `DROPBOX_BKP_DIR`, `FILEDATE=%%$ODATE`, `YARN_QUEUE` | adds **`SEAL=111027`**, `EMAIL_DL_L3`, `EMAIL_DL_L2`; renames `DRPBX_DIR`→`DROPBOX_DIR` |
-| **Documentation** | File type, **empty** Doc Path/File | **URL** → SharePoint (INFOPROD docs) |
-| **Created By** | o288926 | i738092 |
+| **Description** | `Generated Control-M Folder` *(autogen boilerplate, zero info)* | `datasetSeriesName: PEX RFND \|SeriesSLA: 17:00 EST` *(pipe-delimited key:value)* |
+| **Variables** | `NOTIFY` (email), `DRPBX_DIR`, `DROPBOX_BKP_DIR`, `FILEDATE=%%$ODATE`, `YARN_QUEUE` | adds **`SEAL=70002`**, `EMAIL_DL_L3`, `EMAIL_DL_L2`; renames `DRPBX_DIR`→`DROPBOX_DIR` |
+| **Documentation** | File type, **empty** Doc Path/File | **URL** → internal docs site |
+| **Created By** | *(personal SID — legacy pattern)* | *(modern id pattern; twin has the real pair)* |
 
-### Job `PARAD00010_MLCM_ORIGINATIONS_DAILY_CRM_INDICATOR_TOK_ONPM_FW` (FileWatcher)
+### Job — sample shape `PARAD00010_PEX_DAILY_RFND_INDICATOR_TOK_FW` (FileWatcher)
 
-| | Legacy | Modern (`PARAD0011b_…_FW`) |
+| | Legacy | Modern |
 |---|---|---|
-| **Description** | `Contol-M File Watcher for TOK` *(human attempt, typo, low info)* | `FileDeliveryMechanism: MFTS_AGENT \| USER: ftsi37291 \| ENV: FTS2 \| ROUTE_ID: 372399 \| SourceOrigin: I \|SourceContact: DATA_ECO_SQLSRV_L2_SUPPORT@restricted.chase.com \| SourceSnowQueue: CCB_HLT_ASUP_SQLSRV` |
-| **Watch Path** | `%%DRPBX_DIR.%%FILE_NM_PREFIX.%%BUS_DATE.%%FILE_NM_SUFFIX.%%EXTENSION` *(5-variable indirection chain)* | `%%DROPBOX_DIR.Originations_Daily_CRM_Indicator_.%%$ODATE.tok` *(direct, 1 variable + literals)* |
-| **Local variables** | `FILE_NM_PREFIX=Originations_Daily_CRM_Indicator_`, `DRPBX_DIR=…`, `BUS_DATE=%%$ODATE`, **`FILE_NM_SUFFIX=.`**, `EXTENSION=tok` | **none** (eliminated) |
+| **Description** | `Contol-M File Watcher for TOK` *(human attempt, typo, low info — typo verbatim from production)* | `FileDeliveryMechanism: MFTS_AGENT \| USER: <mft-service-account> \| ENV: <transfer-env> \| ROUTE_ID: <route-id> \| SourceOrigin: I \|SourceContact: <L2-support-DL>@<company-domain> \| SourceSnowQueue: <snow-assignment-queue>` |
+| **Watch Path** | `%%DRPBX_DIR.%%FILE_NM_PREFIX.%%BUS_DATE.%%FILE_NM_SUFFIX.%%EXTENSION` *(5-variable indirection chain)* | `%%DROPBOX_DIR.Rfnd_Daily_Indicator_.%%$ODATE.tok` *(direct, 1 variable + literals)* |
+| **Local variables** | `FILE_NM_PREFIX=Rfnd_Daily_Indicator_`, `DRPBX_DIR=…`, `BUS_DATE=%%$ODATE`, **`FILE_NM_SUFFIX=.`**, `EXTENSION=tok` | **none** (eliminated) |
 
 ### Observed metadata keys (initial inventory — extend as adopted)
 
-| Scope | Key | Example | Graph relationship it enables |
+| Scope | Key | Example (sanitized) | Graph relationship it enables |
 |---|---|---|---|
-| Folder | `datasetSeriesName` | MLCM CRM | folder → dataset series node |
+| Folder | `datasetSeriesName` | PEX RFND | folder → dataset series node |
 | Folder | `SeriesSLA` | 17:00 EST | SLA property/edge (note: EST, consistent with [data-center convention](data-center-naming-convention.md)) |
 | Job | `FileDeliveryMechanism` | MFTS_AGENT | job → delivery-mechanism |
-| Job | `USER` | ftsi37291 | job → service/functional account |
-| Job | `ENV` | FTS2 | job → transfer environment |
-| Job | `ROUTE_ID` | 372399 | job → MFT route node |
+| Job | `USER` | *(MFT service/functional account)* | job → service/functional account |
+| Job | `ENV` | *(transfer environment)* | job → transfer environment |
+| Job | `ROUTE_ID` | *(numeric MFT route)* | job → MFT route node |
 | Job | `SourceOrigin` | I | **`I` = Internal** (company data) vs external/vendor-supplied data — *code set open to change* |
-| Job | `SourceContact` | DATA_ECO_SQLSRV_L2_SUPPORT@… | job → support contact/DL |
-| Job | `SourceSnowQueue` | CCB_HLT_ASUP_SQLSRV | job → ServiceNow assignment queue |
-| Folder var | `SEAL` | 111027 | **direct join: folder → SEAL `:Application`** ⭐ |
+| Job | `SourceContact` | *(support DL address)* | job → support contact/DL |
+| Job | `SourceSnowQueue` | *(ServiceNow assignment queue)* | job → ServiceNow assignment queue |
+| Folder var | `SEAL` | 70002 *(sanitized)* | **direct join: folder → SEAL `:Application`** ⭐ |
 | Folder vars | `EMAIL_DL_L2` / `EMAIL_DL_L3` | support DLs | folder → escalation contacts by tier |
 
 ### ⭐ SEAL semantics & resolution hierarchy (SME-confirmed 2026-06-11)
 
 The `SEAL` folder variable is the highest-value addition — a *declared* key for the structured↔unstructured cross-graph join ([[project-drydocs-scrape-two-corpus]] intent #3).
 
-**Original naming intent (confirmed):** the numeric segment in folder names **is a SEAL ID** (`89211` above). The design was: **File Watchers carry the *source* SEAL** (the application that produced the file), and **processing folders carry the *processing application's* SEAL** — in the worked example, folder variable `SEAL=111027` = **Home Lending Advice and Reporting** (SME-confirmed 2026-06-11). So one flow legitimately touches **two SEALs**: source app and processing app — model them as distinct edges, e.g. `(job)-[:WATCHES_FILE_FROM]->(:Application {source seal})` vs `(folder)-[:PROCESSED_BY]->(:Application {processing seal})`.
+**Original naming intent (confirmed):** the numeric segment in folder names **is a SEAL ID**. The design was: **File Watchers carry the *source* SEAL** (the application that produced the file), and **processing folders carry the *processing application's* SEAL** — in the sanitized worked example, folder variable `SEAL=70002` = the *processing* application (Retail Advice Reporting & Analytics, sample id), while the name-embedded id is the *source* application's. So one flow legitimately touches **two SEALs**: source app and processing app — model them as distinct edges, e.g. `(job)-[:WATCHES_FILE_FROM]->(:Application {source seal})` vs `(folder)-[:PROCESSED_BY]->(:Application {processing seal})`.
 
-**Why name-embedded SEAL is NOT valid estate-wide:** the majority of folders carry a **platform** name rather than an application / area-application name (SME example: `PRAOC` vs `PRSRV`). Because the name identifies the platform, the SEAL/application association implied by the folder name can't be trusted.
+**Why name-embedded SEAL is NOT valid estate-wide:** the majority of folders carry a **platform** name rather than an application / area-application name (platform vs application codes — see the [folder-naming registry](folder-naming-convention.md#application-code-registry-shape--sanitized-rows-real-registry-in-the-values-twin)). Because the name identifies the platform, the SEAL/application association implied by the folder name can't be trusted.
 
 **Resolution hierarchy for determining a job's SEAL:**
 1. **Folder variable `SEAL`** — primary; if present, it wins.
 2. **(Planned)** derive the SEAL from the **data pipeline / dataset** the job touches — the future per-*job* SEAL source, independent of folder naming.
 3. **Name-embedded SEAL** — legacy intent only; unreliable (platform-named folders), use as a weak hint, never as ground truth.
 
-**Additional planned source — Control-M escalation/alerting table (`psgmgr.cm_escalation_db`):** join `EJOBNAME VARCHAR2(64 BYTE)` = `JOB_NAME`; the SEAL is **`ECOMPONENT VARCHAR2(40 BYTE)`**, stored with a decimal suffix — e.g. **`111027.00`**. ⚠️ Normalize on join: strip the trailing `.00` (or cast to integer) before matching against SEAL keys. This gives a *per-job, declared* SEAL from escalation config — slots between tier 1 and tier 2 when present.
+**Additional planned source — the Control-M escalation/alerting table** (in the scheduler metadata schema; real schema/table/column names in the values twin): join its job-name column to `JOB_NAME`; the SEAL lives in a component column **stored with a decimal suffix** (e.g. `<seal>.00`). ⚠️ Normalize on join: strip the trailing `.00` (or cast to integer) before matching against SEAL keys. This gives a *per-job, declared* SEAL from escalation config — slots between tier 1 and tier 2 when present.
 
-**SEAL ID format:** sequential numbering, **currently 6 digits** (110865, 111027); older applications have shorter IDs (`89211` = 5 digits). **Do not assume fixed width**; store/compare as integer or normalized string.
+**SEAL ID format:** variable width — **do not assume fixed width**; store/compare as integer or normalized string. (Actual digit widths and the sequential-numbering detail are an internal disclosure — values twin.)
 
 ⚠️ **Coverage caveat:** the Control-M team only started tracking to SEAL **in the last couple of years** — declared SEALs (tier 1) exist mostly on recent/modernized objects; the bulk of the estate needs tiers 2–3 plus derivation.
 
@@ -90,8 +100,7 @@ The `SEAL` folder variable is the highest-value addition — a *declared* key fo
 
 - **`SealId` is the primary node for the business application.** Organizational relationships attach there: dev team supports SealId, application contacts, etc.
 - **Density buffer:** technical objects do *not* attach to the Application node directly. Every application gets a corresponding **child label — `:BatchProcess` or `:EventProcess` — keyed by `sealId`**, and all tech objects (Control-M folders/jobs, etc.) join through that child node. This keeps the Application node clean while every tech object remains reachable via the sealId key.
-- **Pre-population strategy:** `Application → SealID` can be pre-populated **when known**; otherwise `Application → Platform` (e.g. PRAOC, PRDCL). **Which of the two applies cannot be determined from the Control-M data alone.** A later phase links to SEAL with what we know and **derives** the rest — derivations are "not always intuitive" (expect manual/SME adjudication for a tail).
-- Platform-coded estates (PRAOC = Ab Initio ETL, PRDCL = Java/PySpark→AWS) have **no direct SEAL**; application-coded ones do (PRSRV = SEAL **110865**, Home Lending Servicing — code created by our team since the data-lake SRE org doesn't support us). Registry: [folder-naming-convention](folder-naming-convention.md#known-application-code-registry-seed--extend-as-confirmed).
+- **Pre-population strategy:** `Application → SealID` can be pre-populated **when known**; otherwise `Application → Platform` (platform-coded estates have **no direct SEAL**; application-coded ones do). **Which of the two applies cannot be determined from the Control-M data alone.** A later phase links to SEAL with what we know and **derives** the rest — derivations are "not always intuitive" (expect manual/SME adjudication for a tail). Registry: [folder-naming-convention](folder-naming-convention.md#application-code-registry-shape--sanitized-rows-real-registry-in-the-values-twin).
 
 **Parsing format (as observed):** `key: value` pairs delimited by `|` (pipe). Spacing is inconsistent in the wild (`|SeriesSLA`, `| USER`) — parser must be whitespace-tolerant. No escaping convention defined yet for values containing `|` or `:` (e.g. `SeriesSLA: 17:00 EST` — value itself contains `:`; **split on first `:` only**).
 
@@ -128,21 +137,21 @@ Map each job/folder's variables + description metadata onto the **DryDocs ontolo
 
 **Resolved 2026-06-11 (SME):**
 - ~~`SourceOrigin` meaning~~ → `I` = Internal vs external/vendor data (code set open to change).
-- ~~Is `89211` a SEAL ID?~~ → Yes; name-embedded SEAL was the original intent (source SEAL on File Watchers, processing SEAL on processing folders) but is **not valid estate-wide** — folder variable is primary. See SEAL section above.
+- ~~Is the name-embedded numeric segment a SEAL ID?~~ → Yes; name-embedded SEAL was the original intent (source SEAL on File Watchers, processing SEAL on processing folders) but is **not valid estate-wide** — folder variable is primary. See SEAL section above.
 - ~~Guidelines documentation status~~ → not documented/communicated anywhere yet; **this doc is the emerging draft**.
 
 **Resolved 2026-06-11 (SME background):**
-- ~~PRAOC vs PRSRV~~ → **PRAOC = platform** (Ab Initio ETL, SRE-dictated, no direct SEAL); **PRSRV = application-tied** (created by our team, SEAL 110865 Home Lending Servicing). Also PRDCL = platform (Java/PySpark→AWS). Registry seeded in [folder-naming-convention](folder-naming-convention.md).
+- ~~Platform vs application codes~~ → platform codes are SRE-dictated with **no direct SEAL**; application-tied codes carry one (real registry: values twin). Registry shape seeded in [folder-naming-convention](folder-naming-convention.md).
 - Graph model defined: SealId primary node + `:BatchProcess`/`:EventProcess` child labels keyed by sealId for all tech objects (see Target Neo4j model above).
 
 **Still open:**
 1. Full approved **metadata key list** (the table above is observed, not ratified).
 2. **Escaping/format rules** for `|` and `:` inside values; required vs optional keys per object type.
 3. Whether `SEAL` as a folder variable becomes **mandatory** in the Phase-1 template (recommended ⭐ — SME: "if it's in the folder variable it should be primary"; note SEAL tracking only began ~2 years ago, so mandatory-for-new is realistic, retrofit is the long tail).
-4. ~~Exact processing SEAL for the worked example~~ → **RESOLVED 2026-06-11: `SEAL=111027` = Home Lending Advice and Reporting** (earlier "111071" was a typo). This also ties `PRARA` (the folder's Application code) to SEAL 111027 via the declared folder variable.
+4. ~~Exact processing SEAL for the worked example~~ → **RESOLVED 2026-06-11** (SME; an earlier reading was a typo). Real ids: values twin. This also ties the folder's Application code to its SEAL via the declared folder variable.
 5. Naming: does the modern pattern formalize the long auto-generated folder/job names, and how does it reconcile with [PRAOCG](folder-naming-convention.md) (observed: `PRARAG-…` = PRAOCG-style 6-char prefix + generated suffix, `-DLY` frequency suffix at the end)?
 6. Catalog of the **variable-name aliases** used for the dot-smuggling practice (Phase-2 inventory output).
-7. `PRARA`: now tied to SEAL 111027 via folder variable — confirm whether the *code itself* is application-tied estate-wide (like PRSRV) or platform-style (`ARA` ≈ Advice & Reporting App? — plausible mnemonic, unconfirmed).
-8. LOB letter decode: P021 hosts `PC…` codes vs `PR…` elsewhere — confirm `C` LOB (Card?).
+7. The advice-R&A code (`PRARA`): tied to its SEAL via folder variable — confirm whether the *code itself* is application-tied estate-wide (like the servicing code) or platform-style (`ARA` ≈ Advice & Reporting App? — plausible mnemonic, unconfirmed).
+8. LOB letter decode: one DC hosts `PC…` codes vs `PR…` elsewhere — confirm the `C` LOB (Card?).
 
 Related: [[project-drydocs-scrape-two-corpus]], [[project_controlm_c3_normalization]], [[project-folder-naming-praocg]], [[project-datacenter-naming-time]]

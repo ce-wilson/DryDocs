@@ -6576,7 +6576,7 @@ items:
     agent: main
     model: fable
     priority: p0
-    status: todo
+    status: done
     depends_on: []
     inputs: [knowledge/standards/technology/description-field-metadata-plan.md, knowledge/standards/technology/folder-naming-convention.md, PUBLISH-BOUNDARY.md, config/classification.yaml]
     acceptance: >
@@ -6606,6 +6606,22 @@ items:
       value class, not ruled on, re-inboxed as its own IDEAS question.
       Model fable per the matrix: this changes what the publish boundary
       contains, a boundary decision, even though the mechanics are file moves.
+      CLOSED 2026-07-27 (same-day build). Twins at
+      internal/standards/technology/ (Internal-Confidential, incl. the
+      real<->synthetic id key); public halves keep the grammar/plan with
+      sanitized examples drawn from the sample corpus's own conventions
+      (70001-70099 block, PRARAG-HLDM-70002-... shapes). Moved-value grep clean
+      outside internal/ with two recorded exceptions, both left for the
+      residual identifier-class ruling, not silently: (1) the escalation-table
+      schema identifiers were GENERALIZED out of these two files but remain in
+      6+ other tracked files (skills, gate prompts, taxonomy-ontology map,
+      remediation TDD) — an identifier class, not a data value, same residual
+      class as the platform vocabulary; (2) the phrase "Home Lending Servicing"
+      persists in the declared-synthetic sample taxonomy paired ONLY with
+      synthetic ids (a product-name class, predates J14). New out-of-scope
+      finds re-inboxed 2026-07-27: real person name + internal DLs in
+      docs/Product/product-overview.md and two test fixtures; two sample
+      folder ids outside the synthetic block in config/taxonomy/controlm.yaml.
   - id: J15
     epic: release-infrastructure
     title: "Boundary guard test — grep the publishable tree for the VALUE shapes real ids take and fail on any id outside the reserved synthetic block (70001-70099)"
@@ -6736,11 +6752,11 @@ items:
       the primary fix.
 
 summary:
-  todo: 54                                         # +2 raised at the 2026-07-27 identity sign-off (G34 glossary scaffolding, G35 TOM-roles gate), +5 at the 2026-07-27 groom (J14/J15 publish-boundary pair, G36 index diet, O33 SchemaMeta contamination, G38 ddall proof)
+  todo: 53                                         # +5 at the 2026-07-27 groom (J14/J15/G36/O33/G38); J14 closed same day
   in_progress: 1                                   # E1 (gate deferred both sides)
   blocked: 0
-  done: 135                                        # +G28 multi-DB naming drift, +G29 supplement chain, +G30 lineage residency — all 2026-07-26
-  next_ready: [M3, M4, P3, J10, Q6, O23, J13, G21, G24, O26, G26, O27, C15, C16, O28, R3, R4, L16, O29, O30, O31, O32, S1, S8, S9, Q7, Q8, G32, G33, G34, G35, J14, O33]
+  done: 136                                        # +J14 knowledge/standards SEALID split (2026-07-27, same-day close)
+  next_ready: [M3, M4, P3, J10, Q6, O23, J13, G21, G24, O26, G26, O27, C15, C16, O28, R3, R4, L16, O29, O30, O31, O32, S1, S8, S9, Q7, Q8, G32, G33, G34, G35, O33, J15]
   # 2026-07-27 groom (weekly inbox): 5 promoted, 1 merged, 1 resolved. None of
   # the five touch edge semantics — no gate needed: J14 is a publish-boundary
   # file split (fable because the boundary decision rides in it), J15/G36/G38/O33

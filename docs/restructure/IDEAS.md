@@ -63,6 +63,29 @@ Tags help grooming: `idea` · `bug` · `doc` · `source` (new data source) · `q
   untouched by the 2026-07-27 sweep and not ruled on. Is platform vocabulary publishable
   mechanism (like the naming grammar) or a value class to synthesize? User/SME call; once
   ruled, J15's value-shape guard test can grow a rule for it.
+  KEPT-UPDATED 2026-07-27 (J14 close): two more members of the same identifier class found at
+  the build — (a) the escalation-table schema identifiers (`psgmgr` / `cm_escalation_db` /
+  `EJOBNAME` / `ECOMPONENT`) generalized out of the two J14 files but still present in 6+
+  tracked files (controlm-db skill, gate prompts, taxonomy-ontology map, remediation TDD);
+  (b) `knowledge/standards/technology/data-center-naming-convention.md` carries real DC codes
+  and a real app code — same class, same sibling directory, untouched by J14 by scope. The
+  ruling should cover: platform tokens, DC codes, schema/table/column identifiers, and
+  synthetic-sample product NAMES that echo real ones ("Home Lending Servicing" in
+  lob-product-team.yaml, paired only with synthetic ids).
+
+- 2026-07-27 — [p0/boundary] **Out-of-J14-scope real values still in the publishable tree**
+  (found running J14's moved-value greps, same day). (1) `docs/Product/product-overview.md:313`
+  carries a REAL PERSON'S NAME + a real internal DL (`OCPS_Full_Org@restricted.chase.com`) —
+  a scraped-source artifact that should never render publishable; (2) two test fixtures
+  (`tests/unit/test_command_parser.py:208`, `test_variable_classifier.py:85`) embed real
+  support DLs (`CDW_L2_Production_Support@…`, `Team_Data_Pirates@…`) in sample CMD_LINEs —
+  fixtures assert on these strings, so the fix is synthetic DLs + updated assertions, not a
+  bare grep-replace; (3) `config/taxonomy/controlm.yaml:38-40` sample folder names carry ids
+  `85025` / `94028` — OUTSIDE the reserved 70001-70099 block (line 37 was resweeped to 70002;
+  these were not) — realness unknown, exactly the case J15's allowlist will force a ruling on.
+  (`jpmorganchase.com` in `config/doc-source-registry.yaml` is FINE — public IR URLs on an
+  External-classified source.) → groom: fold (3) into J15's build; (1)+(2) need their own
+  sweep item or a J15 rider.
 
 - 2026-07-26 — [doc] **Startup-refresh runbook owes three edits, HELD until the SME review
   closes** (found doing G29; the doc is mid-L5/L6 review — `docs/design/feedback/

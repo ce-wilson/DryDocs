@@ -18,6 +18,13 @@ trust_tier: internal / SME-asserted / mutable
 
 > ⚠️ **Trust tier:** internal / mutable / SME-asserted. "The **majority** follow" this convention — it is a strong norm, not a guaranteed invariant. Items marked *(to confirm)* are gaps the SME did not fully enumerate; do **not** invent values for them.
 
+> 🔒 **Split twin (J14, 2026-07-27):** this file is the publishable MECHANISM half.
+> The real application-code registry, real SEAL ids/application names, and the real
+> production job inventory live in the Internal-Confidential VALUES twin,
+> `internal/standards/technology/folder-naming-convention.md`. Examples below use
+> the sanitized sample ids (reserved synthetic SEAL block **70001–70099**,
+> `config/taxonomy/business-application.yaml`); the twin holds the real↔synthetic key.
+
 ---
 
 ## The convention
@@ -56,30 +63,32 @@ The 6th character was **originally a frequency indicator**, not a folder-type ma
 
 **The majority of folders carry a *platform* code in positions 3–5, not an application or area-application code.**
 
-**Organizational background (why):** as the company (one of the largest in the country) grew, SDLC roles consolidated — QA teams phased out, support now split between developer-supported small apps and a **centralized batch team** for data warehousing, with silos between support and other groups. **Data-lake SRE teams dictated platform Control-M app codes** and hardcoded naming standards for data products on the data lake. Teams not supported by that SRE org (like ours) created their own application-tied codes following similar standards (e.g. for hardcoded Grafana dashboards).
+**Organizational background (why):** as the company grew, SDLC roles consolidated — QA teams phased out, support now split between developer-supported small apps and a **centralized batch team** for data warehousing, with silos between support and other groups. **Data-lake SRE teams dictated platform Control-M app codes** and hardcoded naming standards for data products on the data lake. Teams not supported by that SRE org created their own application-tied codes following similar standards.
 
-### Known application-code registry (seed — extend as confirmed)
+### Application-code registry (SHAPE — sanitized rows; real registry in the values twin)
 
 | Code | Type | Meaning | SEAL tie |
 |---|---|---|---|
 | `PRAOC` | **Platform** | Ab Initio ETL platform (data lake, SRE-dictated) | **No direct SEAL** |
 | `PRDCL` | **Platform** | Java/PySpark jobs loading to AWS cloud (SRE-dictated) | No direct SEAL |
-| `PRSRV` | **Application** | Home Lending **Servicing** — created by our team (same platform, similar standards for Grafana dashboards) | **SEAL 110865** |
-| `PRARA` | *(observed)* | Application field of the worked example folder (`PRARAG-…`); `ARA` ≈ Advice & Reporting? *(mnemonic unconfirmed)* | **SEAL 111027** Home Lending Advice and Reporting (via declared folder variable; code-type to confirm) |
+| `PRSRV` | **Application** | Servicing reporting & analytics — team-created, application-tied | direct SEAL — sanitized sample id **70003** (Consumer Servicing Reporting & Analytics) |
+| `PRARA` | *(observed)* | Advice reporting & analytics (`ARA` mnemonic unconfirmed) | SEAL via declared folder variable — sanitized sample id **70002** (Retail Advice Reporting & Analytics); code-type to confirm |
 
-### Observed job inventory (2026-06-11 query, 60 (DC, APPLICATION) rows)
+### Observed job inventory (2026-06-11 query — conclusions only; full real counts in the values twin)
 
-Top counts: `PRDCL` **8,850** (P032) + 43 (P012) · `PRICD` 6,288 (P012) + 523 (P014) + 18 (P032) · `PRIOS` 3,618 (P014) + 708 (P032) · `PCS4G` 1,378 (P021) · `PRSOP` 798 · `PRAOC` **634** · `PRSRV` **557** · `PRDDC` 389 · `PRARA` 236 …
-
-What it shows:
-- **The same app code spans multiple data centers** (PRICD in 3 DCs; PRDCL, PRIOS in 2) — code→DC is many-to-many.
-- The four DCs observed: `P012-E0700-IB`, `P014-E0700-ANY`, `P021-E0800-ANY`, `P032-E0700-DMA` — note **E0800** on P021 (DC default times do vary).
-- `P021` hosts `PC…` codes (PCS4I/PCS4C/PCS4G, PCOFTG-RESOFT) vs `PR…` elsewhere — consistent with position 2 = LOB (R=Retail, C=*to confirm*).
-- **JOBS_WITH_VARS ≈ JOB_TOTAL** almost everywhere — nearly every job carries variables, which sizes the variable-modernization effort at effectively the whole estate.
+- **The same app code spans multiple data centers** — code→DC is many-to-many
+  (several codes observed in 2–3 DCs each).
+- Four production DCs observed; one runs a different default-time code than the
+  others (DC default times do vary — see [data-center convention](data-center-naming-convention.md)).
+- One DC hosts `PC…` codes vs `PR…` elsewhere — consistent with position 2 = LOB
+  (`R` = Retail; the second letter's decode *to confirm*).
+- **JOBS_WITH_VARS ≈ JOB_TOTAL** almost everywhere — nearly every job carries
+  variables, which sizes the variable-modernization effort at effectively the
+  whole estate.
 
 Consequences:
 - A folder name does **not** reliably identify the business application. Do not derive folder→`:Application` joins from the name code alone.
-- The original intent of embedding a **SEAL ID** in auto-generated folder names (e.g. `PRARAG-HLDM-89211-…`: File Watchers carry the *source* SEAL, processing folders the *processing app's* SEAL) is **not valid estate-wide** for the same reason.
+- The original intent of embedding a **SEAL ID** in auto-generated folder names (sample shape: `PRARAG-HLDM-70002-…` — File Watchers carry the *source* SEAL, processing folders the *processing app's* SEAL) is **not valid estate-wide** for the same reason.
 - **SEAL resolution hierarchy:** folder variable `SEAL` (primary) → *(planned)* SEAL derived from the data pipeline/dataset the job touches → name-embedded SEAL (weak hint only). Full detail: [description-field-metadata-plan](description-field-metadata-plan.md).
 
 ## Why this matters for the knowledge graph
