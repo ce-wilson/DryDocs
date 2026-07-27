@@ -347,6 +347,19 @@
       ]
     },
     {
+      "kind": "log-entry",
+      "date": "2026-07-27",
+      "title": "Self-documentation: DryDocs' own code in the graph (self-documentation-code-graph) — SIGNED OFF (G33 / Epic U)",
+      "status": "signed-off",
+      "prompt_files": [
+        "config/gate-prompts/self-documentation-code-graph.yaml"
+      ],
+      "log_ref": "config/gate-log.md:948",
+      "unblocks": [
+        "G33"
+      ]
+    },
+    {
       "kind": "prompt-only",
       "date": null,
       "title": "bmc-docs-example (gate page rendered — session not yet run)",
@@ -380,17 +393,6 @@
       "unblocks": [
         "G27"
       ]
-    },
-    {
-      "kind": "prompt-only",
-      "date": null,
-      "title": "self-documentation-code-graph (gate page rendered — session not yet run)",
-      "status": "open",
-      "prompt_files": [
-        "config/gate-prompts/self-documentation-code-graph.yaml"
-      ],
-      "log_ref": null,
-      "unblocks": []
     }
   ]
 }

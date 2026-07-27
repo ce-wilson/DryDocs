@@ -944,3 +944,78 @@ SME-supplied PAT screenshots held OUT of the repo — Internal-Confidential).
   **TOM-roles gate** (the SME's live registry shows 9 distinct role classes against the signed
   7, with L1/L2/Operate Manager as three concepts — cannot fold into S3, because A1 declares
   the 2026-07-10 §B enumeration unchanged). Nothing written to the graph at the gate itself.
+
+## 2026-07-27 — Self-documentation: DryDocs' own code in the graph (self-documentation-code-graph) — SIGNED OFF (G33 / Epic U)
+- **Presented:** 36 confirmations across 9 sections (§A scope, §B Project root, §C node grain,
+  §D dependency edge, §E SWO binding, §F collision safety, §G artifact shapes, §H ingestion, §I sign-off)
+- **Confirmed:** 36 · **Edited:** 0 · **Rejected:** 0. SME took the agent recommendation on all
+  eight decisions (B3, C3, D3, E1, F1, F3, G1, H4).
+- **Ruling, in one line:** the code snapshot loads into `drydocs` under ONE `(:Project {project_id:'drydocs'})`
+  root, as `:CodeModule` nodes keyed on `file_id`, with the six scan roots demoted to a property.
+
+**THE GATE'S MAIN VALUE WAS CATCHING THAT G33 DESCRIBED AN ARTIFACT NOBODY HAD OPENED.** Three
+stated premises did not survive reading the newest snapshot:
+1. *"the `projects` key (=1)"* — it is **SIX** (drydocs, drydocs_core, drydocs_deepdoc,
+   drydocs_lineage, drydocs_remediation, tests), and **142 of 183 nodes declare a project that is
+   not `drydocs`**. The single root was therefore a modelling CHOICE presented as a read-off. §B1
+   made it a choice and ruled (a).
+2. *"664 nodes / 86 edges at the latest"* — that figure is from `tree-this-version.json`, a
+   one-off **TREE-mode** capture (540 files + 124 dirs, `projects: ['drydocs1']`, a `CONTAINS`
+   relationship). The rolling dependency snapshots are **183 files / 98 edges**. The real load is
+   about a quarter the size the item implied.
+3. Both shapes declare **the same schema string** `depgraph-machine-first/v1`. §G1 ruled the
+   loader discriminates on `meta.tree` and refuses tree-mode, rather than trusting the string.
+
+**Decisions and why:**
+- **B1 (a)** — one `:Project`; the six are a `project` property. `HAS_MODULE` runs from the single
+  root to all 183; "which of the six" is never answered by the edge.
+- **B3 (a)** — a second `:Project` root from a company `snapshot.ps1` run is intended and fine.
+  This makes §C5's deferral trigger LIVE; ruling (b) would have meant it could never fire.
+- **C1 (a)** — `:CodeModule` keyed on `file_id`, one file = one module. **Decided by the SME's own
+  question** — *"does the code carry a project-file-urn, so that `__init__.py` is attributed to the
+  correct folder?"* Answering it killed dotted-module grain: there are **fifteen** `__init__.py`
+  files, and `drydocs/loaders/__init__.py` **is** the package `drydocs.loaders`, which is also the
+  directory name — so module-grain collapses file identity into package identity fifteen times over.
+- **C4 evidence, from the same question** — the fifteen ARE correctly attributed today, but *only*
+  by `file_id`. `name` collides fifteen ways; `rel_path` collides across the two roots. Folder
+  attribution is a property of the key choice, not a separate mechanism.
+- **C5 (NEW, DEFERRED)** — no URN exists in the artifact. `urn:dd:codemodule:<project>:<file_id>`
+  deferred with a **named trigger**: when a second project tree enters the graph. Deliberately
+  mirrors the `app_urn` precedent from the S3 gate — a deferral with a trigger is a more honest
+  record than "not needed".
+- **D2 (accepted limit)** — the snapshot cannot distinguish `import x` from `from x import y`, nor
+  a `TYPE_CHECKING`-only import from a runtime one. **An `IMPORTS` edge must not be read as
+  "breaks if removed".**
+- **D3** — the M2 pull-provenance convention DOES apply; the no-edge-properties divergence rejected.
+- **E1 (b)** — **first use of the SWO layer in the repo's history.** All 13 seeded terms had zero
+  consumers. One edge, `IS_ENCODED_IN` → the seeded `SWO_0000118 Python`, realising the seeded
+  `SWO_0000741 "is encoded in"`. Precedent set: bind to a seeded term that already means the thing,
+  derive the value from data the artifact carries, invent nothing. Function-level binding rejected —
+  a dependency snapshot does not know what a module implements.
+- **F1** — `:CodeModule` and `:SoftwareProduct` are mutually exclusive, enforced as a **graph-test,
+  not a constraint**: Neo4j cannot declare label mutual-exclusion. Second time this week a real
+  invariant had to leave the constraint layer (cf. G35 §c singleton cardinality).
+- **H4** — `abs_path` is **dropped**; producer-local machine state, and the same fact that made
+  these files never-port in `PORT-MANIFEST.yaml` the same day.
+- **H5 (scope honesty)** — the motivating query (module → loader → `:ControlMJob`) is **NOT
+  delivered here.** Nothing in a dependency snapshot knows that `drydocs/loaders/controlm_jobs.py`
+  produces `:ControlMJob` — that mapping lives in the loaders' Cypher, not their imports. The gate
+  lands the subgraph and the shared database that make the join possible; the join is a second item.
+
+**Two SME questions answered in the record rather than in chat:**
+- *"do you have the Anthropic key needed for the software ontology API call during the load?"* —
+  **There is no API call and no key is needed.** The 13 SWO terms are static `MERGE` statements;
+  the IRIs are identifiers, not endpoints. Verified: `requests` / `httpx` / `urllib.request` /
+  `aiohttp` appear **nowhere** in `drydocs/` or `drydocs_core/` — the load path has zero network
+  egress. `ANTHROPIC_API_KEY` exists only for the **agents** module, which loaders never touch.
+  Load-bearing, not trivia: offline + deterministic + re-runnable-from-committed-files is exactly
+  what §H1's ADR 0002 D3 stateless test asserts, and a live lookup would break all three.
+- **Dangling reference found while checking:** `ontology.cypher:109` says the ~250-term SDLC subset
+  *"loads from `ontology/reference/swo_sdlc_ontology.cypher`"*. **That file does not exist.** Logged
+  to IDEAS; it retroactively justifies §A4's exclusion — the wider set is not loadable, it is buildable.
+
+**Enacted at sign-off (nothing written to the graph):** 2 node classifications (`:Project`,
+`:CodeModule`) + 3 edge terms (`u1_has_module`, `u1_imports`, `u1_is_encoded_in`) registered
+`status: planned`; `self-documentation-code-graph` map entry → `confirmed` (map now 22 confirmed);
+`schema_graph.cypher`, `gates.json` and the enforcement matrix regenerated; backlog **G33 cleared to
+build** with its three premise errors corrected.

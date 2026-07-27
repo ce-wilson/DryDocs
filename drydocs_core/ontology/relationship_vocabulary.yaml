@@ -537,6 +537,33 @@ node_classifications:
   # via :CAN_ACT_AS in the supplement. Their primary classification is unchanged.
 
 
+  # ── Epic U / self-documentation (gate self-documentation-code-graph, SIGNED 2026-07-27)
+  - label: Project
+    class: "dd:Project"
+    prov_type: Collection
+    note: >
+      A source-code repository loaded into the graph as itself. ONE root per repo
+      (gate §B1(a)): (:Project {project_id:'drydocs'}). The snapshot's six scan roots
+      (drydocs, drydocs_core, drydocs_deepdoc, drydocs_lineage, drydocs_remediation,
+      tests) are a `project` PROPERTY on :CodeModule, NOT sibling Project nodes.
+      prov:Collection because it collects its modules. This is the anchor that makes
+      "is this our own code?" one hop, and §F2 ruled nothing else may hang off it.
+      Reads unambiguously against the PAT :Product/:AreaProduct/:ProductLine labels
+      (§F3): those name a BUSINESS product hierarchy, this names a SOFTWARE repo.
+  - label: CodeModule
+    class: "dd:CodeModule"
+    prov_type: Entity
+    note: >
+      One source FILE, keyed on file_id (repo-relative path, e.g.
+      'drydocs_core/models/seal.py'). Gate §C1(a): one file = one module. True
+      dotted-module grain was REJECTED — drydocs/loaders/__init__.py IS the package
+      `drydocs.loaders`, which is also the directory name, so module-grain collapses
+      file identity into package identity across all 15 __init__.py files.
+      file_id is the ONLY non-colliding key: `name` collides 15 ways on '__init__.py'
+      and `rel_path` collides across the drydocs / drydocs_core roots (§C4).
+      MUST NEVER also carry :SoftwareProduct — §F1, enforced as a graph-test because
+      Neo4j cannot declare label mutual-exclusion.
+
 # ── SECTION 1: Decision matrix ────────────────────────────────────────────────
 # Step 1: classify your source node (Activity / Entity / Agent / Collection).
 # Step 2: classify your target node.
@@ -2110,4 +2137,63 @@ local_relationships:
     supplement:   sosa_experimental_supplement.cypher
     loader:       ~
     domain:       context
+    status:       planned
+
+  # ── Epic U / self-documentation (gate self-documentation-code-graph, SIGNED 2026-07-27)
+  #    All three are `planned`: the gate registers them, the loader is not built yet
+  #    (gate §A3 — this gate builds nothing). G33 is the build item.
+  - id:           u1_has_module
+    neo4j_label:  HAS_MODULE
+    role:         ~
+    from_node:    Project
+    to_node:      CodeModule
+    prov_maps_to: "prov:hadMember"
+    sosa_maps_to: ~
+    note: >
+      The repository contains this source file. Runs from the SINGLE :Project root to
+      ALL modules (183 at the 2026-07-27 snapshot); "which of the six scan roots" is
+      answered by the CodeModule.project property, never by this edge (gate §B1(a)).
+      prov:hadMember follows the Collection -> any matrix row.
+    supplement:   ~
+    loader:       ~
+    domain:       architecture
+    status:       planned
+  - id:           u1_imports
+    neo4j_label:  IMPORTS
+    role:         ~
+    from_node:    CodeModule
+    to_node:      CodeModule
+    prov_maps_to: "prov:wasDerivedFrom"
+    sosa_maps_to: ~
+    note: >
+      Source-level import dependency, direction importer -> imported. KNOWN LIMIT,
+      ruled and ACCEPTED at gate §D2: the snapshot's edges are bare 2-element arrays,
+      so this CANNOT distinguish `import x` from `from x import y`, nor a
+      TYPE_CHECKING-only import from a runtime one. Do NOT read an IMPORTS edge as
+      "breaks if removed". Carries the M2 pull-provenance properties like every other
+      edge (§D3 — the no-properties divergence was rejected).
+    supplement:   ~
+    loader:       ~
+    domain:       architecture
+    status:       planned
+  - id:           u1_is_encoded_in
+    neo4j_label:  IS_ENCODED_IN
+    role:         ~
+    from_node:    CodeModule
+    to_node:      SwoClass
+    prov_maps_to: ~
+    sosa_maps_to: ~
+    note: >
+      Binds a module to the programming language it is written in, targeting the
+      ALREADY-SEEDED SwoClass term (ontology.cypher:114, SWO_0000118 "Python").
+      Named for SWO_0000741 "is encoded in", the seeded SwoProperty it realises.
+      THE FIRST USE OF THE SWO LAYER IN THIS REPO — all 13 seeded terms had zero
+      consumers before this gate. Precedent it sets (§E1(b)): bind to a seeded term
+      that already means the thing, derive the value from data the artifact already
+      carries (node.extension), and invent nothing. Broader function-level binding
+      ("implements", "uses platform") was REJECTED — a dependency snapshot does not
+      know what a module implements. Value is .py-only today (§E2).
+    supplement:   ~
+    loader:       ~
+    domain:       architecture
     status:       planned

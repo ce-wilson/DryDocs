@@ -6577,10 +6577,28 @@ items:
       explicit (:Project {project_id:'drydocs'}) root so "is this our own code?" is
       one hop, and modules carry a label that CANNOT collide with the software
       registry's :SoftwareProduct nodes. The new node classes and relationships
-      (Project, CodeModule, HAS_MODULE, IMPORTS) plus their binding to the SWO
-      terms are registered `status: planned` and go through the HITL gate; no
-      loader writes them until it confirms. snapshot.ps1 stays DECOUPLED — the
-      session ritual must keep working with no database running.
+      plus their binding to the SWO terms are registered `status: planned` and go
+      through the HITL gate; no loader writes them until it confirms. snapshot.ps1
+      stays DECOUPLED — the session ritual must keep working with no database running.
+      GATE SIGNED OFF 2026-07-27 (config/gate-prompts/self-documentation-code-graph.yaml,
+      36/36, 0 edits) — THIS ITEM IS NOW CLEARED TO BUILD and the acceptance is
+      tightened to what was ruled. FIVE registrations already exist at
+      `status: planned`, not the four this text originally named: node classes
+      :Project and :CodeModule, edges HAS_MODULE, IMPORTS and IS_ENCODED_IN (the
+      third added by the §E1(b) SWO ruling). Build to these rulings:
+      (1) ONE :Project root; the snapshot's SIX scan roots are a `project` PROPERTY
+      on :CodeModule, never sibling nodes (§B1a). (2) :CodeModule is keyed on
+      `file_id`, the repo-relative path — the only non-colliding key (§C1a/§C4).
+      (3) `circular` loads as a property (§C3). (4) edges carry the M2
+      pull-provenance fields first_seen_at / last_seen_at / last_run_id like every
+      other loader (§D3). (5) IS_ENCODED_IN targets the already-seeded SwoClass
+      Python, value derived from node.extension (§E1b). (6) the :CodeModule /
+      :SoftwareProduct exclusion is a GRAPH-TEST, not a constraint — Neo4j cannot
+      declare label mutual-exclusion (§F1). (7) the loader DISCRIMINATES ON
+      meta.tree and REFUSES tree-mode input (§G1a). (8) `abs_path` is DROPPED;
+      load rel_path / file_id only (§H4). (9) a refusal must be LOUD — see the
+      "succeeds loudly, does nothing" family. (10) register the source in
+      config/source-registry.yaml with classification Internal-Public (§H6).
     notes: >
       User source 2026-07-26: load the DryDocs project code snapshot under the
       software ontology, "which may prevent missing code fixes", plus "a way to
@@ -6589,10 +6607,25 @@ items:
       seeds 7 SwoClass + 6 SwoProperty terms (Python, Shell, SQL, "is encoded in",
       "implements", "has specified data input/output", "uses platform") with ZERO
       consumers anywhere in the tree, and snapshot.ps1 already writes a code
-      dependency graph every session (664 nodes / 86 edges at the latest) that
-      never enters Neo4j — it is JSON plus a viewer.html. The depgraph schema
-      already carries a `projects` key (=1), so the Project root matches the
-      producer's own shape rather than inventing one.
+      dependency graph every session that never enters Neo4j — it is JSON plus a
+      viewer.html.
+      *** THREE PREMISES IN THIS NOTE WERE WRONG AND ARE CORRECTED HERE (gate
+      self-documentation-code-graph, 2026-07-27). All three came from describing
+      the artifact without opening it, and finding them was the gate's main value:
+      (i) it said the depgraph schema "already carries a `projects` key (=1), so
+      the Project root matches the producer's own shape rather than inventing one".
+      IT CARRIES SIX — drydocs, drydocs_core, drydocs_deepdoc, drydocs_lineage,
+      drydocs_remediation, tests — and 142 of the 183 nodes declare a project that
+      is NOT 'drydocs'. The single root was a modelling CHOICE presented as a
+      read-off; §B1 made it a choice and ruled (a).
+      (ii) it said "664 nodes / 86 edges at the latest". That figure belongs to
+      tree-this-version.json, a one-off TREE-mode capture (540 files + 124 dirs,
+      projects: ['drydocs1'], a CONTAINS relationship). The rolling dependency
+      snapshots are 183 files / 98 edges — the real load is about a QUARTER the
+      size this note implied.
+      (iii) both shapes declare the SAME schema string depgraph-machine-first/v1,
+      so a loader keying on it alone mis-reads one; §G1 ruled discrimination on
+      meta.tree. ***
       TARGET IS `drydocs`, NOT dddocs, and the stated purpose is what decides it:
       "prevent missing code fixes" means traversing from a DryDocs module to the
       loader to the Control-M job it loads. That is a path query, so they must
@@ -6615,8 +6648,17 @@ items:
       carries another letter's id — historical, not a pattern to copy. New items in
       this epic take U1, U2, … (T is NOT free: it is the port-turn series, e.g.
       docs/port-T12-*.md).
-      Load only the LATEST snapshot as current state; the ~20 dated files are a
-      time series available later if code evolution is ever wanted. Do not build it.
+      Load only the LATEST snapshot as current state; the ~70 dated files (not ~20)
+      are a time series available later if code evolution is ever wanted — §A5
+      scoped that out.
+      "Do not build it" is DISCHARGED as of 2026-07-27: it meant "not before the
+      gate", and the gate is signed. Build to the ten rulings in `acceptance`.
+      WHAT THIS ITEM STILL DOES NOT DELIVER, stated so it is not judged against a
+      promise it never made (§H5): the motivating query — traverse from a DryDocs
+      module to the loader to the Control-M job it loads — needs an edge NOTHING in
+      a dependency snapshot knows, because that mapping lives in the loaders' Cypher,
+      not in their imports. This item lands the code subgraph and the shared database
+      that make the join possible; the join itself is a separate Epic U item.
 
   - id: G34
     epic: ontology-mapping
