@@ -109,7 +109,8 @@ MERGE (n:OntologyTerm:LocalRelationship {iri: "https://drydocs.local/ontology#ha
 // =============================================================================
 // PAT ontology additions: AreaProduct, team support relationships, human roles
 // Applied after the base catalog supplement; idempotent.
-// Source: PAT Product Catalog / product-overview.md / pat.md (2026-06-09)
+// Source: PAT Product Catalog / internal/org/product-overview.md / pat.md (2026-06-09;
+// the capture relocated from docs/Product/ at the J14 follow-up, 2026-07-27 — stub remains)
 // =============================================================================
 
 
@@ -227,7 +228,7 @@ MERGE (n:Role {name: 'Backup Application Owner'})
 MERGE (n:Role {name: 'Risk Manager'})
   SET n.role_id = 'risk_manager';
 
-// — PAT Technology roles (team-level; sourced from product-overview.md) —
+// — PAT Technology roles (team-level; sourced from internal/org/product-overview.md) —
 MERGE (n:Role {name: 'Tech Partner'})
   SET n.role_id = 'tech_partner';
 MERGE (n:Role {name: 'Area Tech Partner'})
@@ -269,7 +270,7 @@ MERGE (n:Role {name: 'Analytic Lead'})
 MERGE (n:Role {name: 'Information Owner'})
   SET n.role_id = 'information_owner';
 
-// — CCB Operations roles (product-overview.md §CCB Operations) —
+// — CCB Operations roles (internal/org/product-overview.md §CCB Operations) —
 // These roles govern cross-product readiness, change management, and employee
 // readiness. They are not in SEAL — will be loaded via PAT contacts.
 MERGE (n:Role {name: 'CCB Operations Strategy Lead'})

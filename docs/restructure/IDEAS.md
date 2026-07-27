@@ -74,17 +74,23 @@ Tags help grooming: `idea` · `bug` · `doc` · `source` (new data source) · `q
   lob-product-team.yaml, paired only with synthetic ids).
 
 - 2026-07-27 — [p0/boundary] **Out-of-J14-scope real values still in the publishable tree**
-  (found running J14's moved-value greps, same day). (1) `docs/Product/product-overview.md:313`
-  carries a REAL PERSON'S NAME + a real internal DL (`OCPS_Full_Org@restricted.chase.com`) —
-  a scraped-source artifact that should never render publishable; (2) two test fixtures
-  (`tests/unit/test_command_parser.py:208`, `test_variable_classifier.py:85`) embed real
-  support DLs (`CDW_L2_Production_Support@…`, `Team_Data_Pirates@…`) in sample CMD_LINEs —
+  (found running J14's moved-value greps, same day; entry REDACTED at the (1) fix — value
+  strings live internal/-side only now). ~~(1) `docs/Product/product-overview.md` carried real
+  rosters — the Operations Strategy Cabinet + ODPM/ERM tables (~25 named people), two real
+  SIDs, and a real internal contact DL~~ **RESOLVED same day (J14 follow-up (1), "J14:a"):
+  the whole 2026-06-09 capture relocated VERBATIM to `internal/org/product-overview.md`
+  (the internal/org charter home), a mechanism-only stub kept at the old path so the
+  doc-inventory row, git-readme table, and PAT/catalog ontology citations keep resolving
+  (`catalog_ontology_supplement.cypher` comments repointed). The cabinet tables double as
+  the candidate person-level cabinet extract the K5 gate left as K6's missing feed.**
+  (2) two test fixtures (`tests/unit/test_command_parser.py:208`,
+  `test_variable_classifier.py:85`) embed two real support-DL names in sample CMD_LINEs —
   fixtures assert on these strings, so the fix is synthetic DLs + updated assertions, not a
   bare grep-replace; (3) `config/taxonomy/controlm.yaml:38-40` sample folder names carry ids
   `85025` / `94028` — OUTSIDE the reserved 70001-70099 block (line 37 was resweeped to 70002;
   these were not) — realness unknown, exactly the case J15's allowlist will force a ruling on.
   (`jpmorganchase.com` in `config/doc-source-registry.yaml` is FINE — public IR URLs on an
-  External-classified source.) → groom: fold (3) into J15's build; (1)+(2) need their own
+  External-classified source.) → groom: fold (3) into J15's build; (2) needs a
   sweep item or a J15 rider.
 
 - 2026-07-26 — [doc] **Startup-refresh runbook owes three edits, HELD until the SME review
