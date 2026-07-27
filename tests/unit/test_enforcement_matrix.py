@@ -65,10 +65,14 @@ def test_referenced_paths_exist():
             assert (REPO / "tests" / "unit" / t).exists(), f"{s['id']}: missing guard test {t}"
 
 
-def test_launcher_registry_is_the_unguarded_example():
-    """The code-resident launcher registry renders unguarded — the page's
-    visible migration argument (acceptance clause)."""
+def test_launcher_registry_migrated_to_a_guarded_config_surface():
+    """G26 (2026-07-27) retired the code-resident unguarded example: the
+    registry now lives at config/launcher-registry.yaml behind a schema
+    guard, and the matrix must render it that way. (Until G26 this test
+    asserted the INVERSE — the page's visible migration argument.)"""
     committed = json.loads(COMMITTED.read_text(encoding="utf-8"))
     row = next(s for s in committed["surfaces"] if s["id"] == "launcher-registry")
-    assert row["code_resident"] is True
-    assert row["status"] == "unguarded"
+    assert row["code_resident"] is False
+    assert row["file"] == "config/launcher-registry.yaml"
+    assert "test_launcher_registry.py" in row["guard_tests"]
+    assert row["status"] == "enforced"

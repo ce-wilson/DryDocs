@@ -248,19 +248,16 @@ invocation_patterns:
       note: "Ab Initio parameter-set file."
       status: proposed
 
-    - id: abinitio-dtlaunch-wrapper
-      product: abinitio
-      field: executable_path
-      match_type: regex
-      pattern: '^dtlaunch\.sh$'
-      classifier_rule: abinitio.dtlaunch_accelerator
-      example_matches:
-        - "dtlaunch.sh"
-      note: >
-        Ab Initio Co>Operating System accelerator launch wrapper — the
-        launcher name itself signals the product even when the graph
-        argument is opaque or absent from this row's script_path.
-      status: proposed
+    # ROW REMOVED 2026-07-27 (G26 guard catch): `abinitio-dtlaunch-wrapper`
+    # claimed dtlaunch.sh = Ab Initio via classifier_rule
+    # `abinitio.dtlaunch_accelerator` — a rule id that no longer exists. The
+    # 2026-07-16 SME ruling (gate-log cmdline-lineage-review, echoed in
+    # config/launcher-registry.yaml) is that dt-launcher.sh/dtlaunch.sh is
+    # the DPL accelerator spine and DPL is NOT Ab Initio. DPL has no
+    # `products:` row yet, and the coverage_policy forbids pattern rows
+    # without a real product id — so DPL joins the gate spec's
+    # candidates-without-a-product open question instead of carrying a
+    # false mapping into the gate review.
 
     - id: informatica-mapping-prefix
       product: informatica-powercenter

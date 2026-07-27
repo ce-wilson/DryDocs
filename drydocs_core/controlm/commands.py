@@ -29,43 +29,57 @@ from __future__ import annotations
 import re
 import shlex
 from dataclasses import dataclass, field
+from pathlib import Path
+
+import yaml
 
 # --- launcher registry --------------------------------------------------------
 
 # Each rule: (compiled pattern on the executable BASENAME, invocation_type,
-# rule-id for STG_INVOCATION.classifier_rule). First match wins. Seeded from
-# observed production commands; extend here as the unparsed backlog reveals
-# new launchers (Phase E).
-LAUNCHER_REGISTRY: list[tuple[re.Pattern, str, str]] = [
-    (re.compile(r"\.m$"),                       "ABINITIO",       "abinitio.graph_or_plan"),
-    (re.compile(r"\.pset$"),                    "ABINITIO",       "abinitio.pset"),
-    (re.compile(r"^m_\w+", re.I),               "INFORMATICA",    "informatica.mapping_prefix"),
-    (re.compile(r"^pmcmd$", re.I),              "INFORMATICA",    "informatica.pmcmd"),
-    # the canonical Informatica wrapper launcher (v2 standard templates 6.4/6.5;
-    # G16 — previously fell through to the generic .ksh shell rule)
-    (re.compile(r"^ICDW_etl_run_interface\.ksh$", re.I), "INFORMATICA", "informatica.icdw_run_interface"),
-    (re.compile(r"^run_data_validation\.sh$"),  "VALIDATION_UTIL","validation.run_data_validation"),
-    (re.compile(r"^run_calp_temp\.sh$"),        "VALIDATION_UTIL","validation.run_calp_temp"),
-    # DPL data-pipeline accelerators. SME 2026-07-16 (gate-log cmdline-lineage-review):
-    # DPL is NOT Ab Initio — java zilo ETL framework originally; a -py flag routes to
-    # a java-spark/pyspark framework. Common path /apps/tenants/dpl_utils/dt-accelerators/;
-    # the launcher spelling observed is dt-launcher.sh (dtlaunch.sh kept as a variant).
-    (re.compile(r"^dt-?launch(er)?\.sh$", re.I), "DPL",           "dpl.dt_launcher_accelerator"),
-    (re.compile(r"^dt-pipelines-launcher.*\.jar$", re.I), "DPL",  "dpl.pipelines_launcher_jar"),
-    # on-prem shell launcher spelling (dpl_processor/bin; extensionless; the
-    # _dynamic variant adds spark-params passthrough) — same DPL kind (G15,
-    # 2026-07-21 prod samples + variable gap analysis: live folder vars carry it)
-    (re.compile(r"^dpl_spark_processor(_dynamic)?$", re.I), "DPL", "dpl.spark_processor_onprem"),
-    (re.compile(r"^air$", re.I),                "ABINITIO",       "abinitio.air_cli"),
-    (re.compile(r"^java$", re.I),               "JAVA",           "java.interpreter"),
-    (re.compile(r"runscript\.sh$", re.I),       "SHELL_SCRIPT",   "abioncloud.runscript_wrapper"),
-    (re.compile(r"^(spark-submit|pyspark)$"),   "PYSPARK",        "pyspark.spark_submit"),
-    (re.compile(r"python[0-9.]*$"),             "PYTHON",         "python.interpreter"),
-    (re.compile(r"\.py$"),                      "PYTHON",         "python.script"),
-    (re.compile(r"\.(sh|ksh|bash)$"),           "SHELL_SCRIPT",   "shell.script"),
-    (re.compile(r"\.(pl)$"),                    "SHELL_SCRIPT",   "perl.script"),
-    (re.compile(r"^(sftp|ftp|scp|aft)$", re.I), "FILE_TRANSFER",  "transfer.client"),
-]
+# rule-id for STG_INVOCATION.classifier_rule). First match wins.
+#
+# MOVED TO CONFIG (G26, 2026-07-27 — the 2026-07-16 SME requirement): the
+# rules live in config/launcher-registry.yaml so teams add wrappers without
+# a code release; this module LOADS them at import, behavior unchanged.
+# Schema + rule-id stability are guarded by tests/unit/test_launcher_registry.py.
+_REPO_ROOT = Path(__file__).resolve().parents[2]
+DEFAULT_LAUNCHER_REGISTRY_PATH = _REPO_ROOT / "config" / "launcher-registry.yaml"
+
+LAUNCHER_REGISTRY_SCHEMA = "drydocs.launcher-registry.v1"
+
+
+def load_launcher_registry(
+    path: Path = DEFAULT_LAUNCHER_REGISTRY_PATH,
+) -> tuple[list[tuple[re.Pattern, str, str]], frozenset[str]]:
+    """Load (LAUNCHER_REGISTRY, NAMED_LAUNCHER_RULES) from the config file.
+
+    Returns the ordered compiled rule list and the named-launcher rule-id
+    set (the ``named_launcher: true`` rows — the G16 value-contract subset).
+    Raises on a schema mismatch: a silently-empty registry would classify
+    every command UNKNOWN, which is exactly the failure the guard test and
+    this check exist to make loud.
+    """
+    data = yaml.safe_load(path.read_text(encoding="utf-8"))
+    if not isinstance(data, dict) or data.get("schema") != LAUNCHER_REGISTRY_SCHEMA:
+        raise ValueError(
+            f"{path}: expected schema {LAUNCHER_REGISTRY_SCHEMA!r}, "
+            f"got {data.get('schema') if isinstance(data, dict) else type(data).__name__!r}"
+        )
+    rules: list[tuple[re.Pattern, str, str]] = []
+    named: set[str] = set()
+    for row in data.get("rules") or []:
+        flags = re.IGNORECASE if row.get("ignore_case") else 0
+        rules.append(
+            (re.compile(row["pattern"], flags), row["invocation_type"], row["rule"])
+        )
+        if row.get("named_launcher"):
+            named.add(row["rule"])
+    if not rules:
+        raise ValueError(f"{path}: registry has no rules")
+    return rules, frozenset(named)
+
+
+LAUNCHER_REGISTRY, NAMED_LAUNCHER_RULES = load_launcher_registry()
 
 # shell verbs that ARE file operations -> STG_FILE_OP (not invocations)
 _FILE_OP_VERBS: dict[str, str] = {
@@ -254,22 +268,13 @@ def classify_executable(executable: str) -> tuple[str, str | None]:
     return "UNKNOWN", None
 
 
-#: classifier rules that name a REGISTERED LAUNCHER entrypoint — the G16 value
-#: contract ("aliases suggest, values decide"): a variable whose VALUE hits one
-#: of these is a launcher reference regardless of the variable's NAME (the
-#: JAR_PATH -> dt-launcher.sh gap-analysis gotcha). Generic interpreter /
-#: extension rules (shell.script, python.*, java.*) are excluded on purpose —
-#: an arbitrary .sh value is not evidence of a launcher.
-NAMED_LAUNCHER_RULES = frozenset({
-    "dpl.dt_launcher_accelerator",
-    "dpl.pipelines_launcher_jar",
-    "dpl.spark_processor_onprem",
-    "abioncloud.runscript_wrapper",
-    "informatica.icdw_run_interface",
-    "informatica.pmcmd",
-    "validation.run_data_validation",
-    "validation.run_calp_temp",
-})
+# NAMED_LAUNCHER_RULES — the G16 value-contract subset ("aliases suggest,
+# values decide") — now comes from the config's `named_launcher: true` rows
+# (loaded above): a variable whose VALUE hits one of these is a launcher
+# reference regardless of the variable's NAME (the JAR_PATH ->
+# dt-launcher.sh gap-analysis gotcha). Generic interpreter/extension rules
+# (shell.script, python.*, java.*) stay unmarked on purpose — an arbitrary
+# .sh value is not evidence of a launcher.
 
 
 def is_registered_launcher(value: str) -> bool:

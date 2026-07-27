@@ -8,9 +8,9 @@ a build-time artifact (the board-render pattern: registry = truth, render =
 artifact, ``tests/unit/test_enforcement_matrix.py`` = the drift guard).
 
 Status vocabulary (wf-admin-config-01 (6)):
-- ``unguarded``    -- no guard test, or the config is code-resident (the
-                     launcher-registry row: the page's visible migration
-                     argument).
+- ``unguarded``    -- no guard test, or the config is code-resident (was the
+                     launcher-registry row until its G26 migration to
+                     config/launcher-registry.yaml, 2026-07-27).
 - ``gate-pending`` -- the surface carries entries awaiting HITL
                      (``status: proposed`` / ``planned`` / ``placeholder``).
 - ``enforced``     -- guarded and nothing pending.
@@ -169,11 +169,10 @@ SURFACES: list[dict] = [
     {
         "id": "launcher-registry",
         "title": "Launcher registry",
-        "file": "drydocs_core/controlm/commands.py",
-        "code_resident": True,
+        "file": "config/launcher-registry.yaml",
         "consumers": ["drydocs_core/controlm/commands.py", "drydocs_lineage/"],
-        "guard_tests": ["test_command_parser.py"],
-        "gate_ref": "config-file migration still inboxed (IDEAS 2026-07-16)",
+        "guard_tests": ["test_launcher_registry.py", "test_command_parser.py"],
+        "gate_ref": None,
     },
 ]
 

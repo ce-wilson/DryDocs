@@ -1,0 +1,62 @@
+# =============================================================================
+# config/launcher-registry.yaml — the Phase-C launcher/classifier registry (G26)
+#
+# schema: drydocs.launcher-registry.v1
+#
+# MOVED OUT OF drydocs_core/controlm/commands.py (2026-07-27, backlog G26 —
+# the 2026-07-16 SME requirement from the cmdline-lineage-review mini-gate):
+# adding a wrapper rule is now a CONFIG EDIT plus a test run, no Python
+# change. commands.py LOADS this file at import; behavior is unchanged.
+#
+# Contract (guarded by tests/unit/test_launcher_registry.py):
+#   - rules are ORDERED — first match on the executable BASENAME wins;
+#   - `pattern` is a Python regex (re.search semantics against the basename);
+#     `ignore_case: true` adds re.IGNORECASE;
+#   - `rule` is the classifier_rule id STG_INVOCATION records — the
+#     software-registry invocation_patterns rows pin these ids for gate
+#     review, so renaming one is a BREAKING change the guard test catches;
+#   - `named_launcher: true` marks a REGISTERED LAUNCHER entrypoint — the
+#     G16 value contract ("aliases suggest, values decide"): a variable whose
+#     VALUE hits one of these is a launcher reference regardless of the
+#     variable's NAME (the JAR_PATH -> dt-launcher.sh gotcha). Generic
+#     interpreter/extension rules (shell.script, python.*, java.*) stay
+#     unmarked on purpose — an arbitrary .sh value is not launcher evidence.
+#
+# The dpl.pipeline_guid_literal fallback (an UNKNOWN verb whose args carry a
+# -pipeline GUID) is parser LOGIC, not a basename rule — it stays in
+# commands.py (G15 acceptance c).
+# =============================================================================
+
+schema: drydocs.launcher-registry.v1
+updated: 2026-07-27
+
+rules:
+  - { pattern: '\.m$',                          invocation_type: ABINITIO,        rule: abinitio.graph_or_plan }
+  - { pattern: '\.pset$',                       invocation_type: ABINITIO,        rule: abinitio.pset }
+  - { pattern: '^m_\w+',        ignore_case: true, invocation_type: INFORMATICA,  rule: informatica.mapping_prefix }
+  - { pattern: '^pmcmd$',       ignore_case: true, invocation_type: INFORMATICA,  rule: informatica.pmcmd, named_launcher: true }
+  # the canonical Informatica wrapper launcher (v2 standard templates 6.4/6.5;
+  # G16 — previously fell through to the generic .ksh shell rule)
+  - { pattern: '^ICDW_etl_run_interface\.ksh$', ignore_case: true, invocation_type: INFORMATICA, rule: informatica.icdw_run_interface, named_launcher: true }
+  - { pattern: '^run_data_validation\.sh$',     invocation_type: VALIDATION_UTIL, rule: validation.run_data_validation, named_launcher: true }
+  - { pattern: '^run_calp_temp\.sh$',           invocation_type: VALIDATION_UTIL, rule: validation.run_calp_temp, named_launcher: true }
+  # DPL data-pipeline accelerators. SME 2026-07-16 (gate-log
+  # cmdline-lineage-review): DPL is NOT Ab Initio — java zilo ETL framework
+  # originally; a -py flag routes to a java-spark/pyspark framework. Common
+  # path /apps/tenants/dpl_utils/dt-accelerators/; the launcher spelling
+  # observed is dt-launcher.sh (dtlaunch.sh kept as a variant).
+  - { pattern: '^dt-?launch(er)?\.sh$',         ignore_case: true, invocation_type: DPL, rule: dpl.dt_launcher_accelerator, named_launcher: true }
+  - { pattern: '^dt-pipelines-launcher.*\.jar$', ignore_case: true, invocation_type: DPL, rule: dpl.pipelines_launcher_jar, named_launcher: true }
+  # on-prem shell launcher spelling (dpl_processor/bin; extensionless; the
+  # _dynamic variant adds spark-params passthrough) — same DPL kind (G15,
+  # 2026-07-21 prod samples + variable gap analysis: live folder vars carry it)
+  - { pattern: '^dpl_spark_processor(_dynamic)?$', ignore_case: true, invocation_type: DPL, rule: dpl.spark_processor_onprem, named_launcher: true }
+  - { pattern: '^air$',         ignore_case: true, invocation_type: ABINITIO,     rule: abinitio.air_cli }
+  - { pattern: '^java$',        ignore_case: true, invocation_type: JAVA,         rule: java.interpreter }
+  - { pattern: 'runscript\.sh$', ignore_case: true, invocation_type: SHELL_SCRIPT, rule: abioncloud.runscript_wrapper, named_launcher: true }
+  - { pattern: '^(spark-submit|pyspark)$',      invocation_type: PYSPARK,         rule: pyspark.spark_submit }
+  - { pattern: 'python[0-9.]*$',                invocation_type: PYTHON,          rule: python.interpreter }
+  - { pattern: '\.py$',                         invocation_type: PYTHON,          rule: python.script }
+  - { pattern: '\.(sh|ksh|bash)$',              invocation_type: SHELL_SCRIPT,    rule: shell.script }
+  - { pattern: '\.(pl)$',                       invocation_type: SHELL_SCRIPT,    rule: perl.script }
+  - { pattern: '^(sftp|ftp|scp|aft)$',          ignore_case: true, invocation_type: FILE_TRANSFER, rule: transfer.client }
