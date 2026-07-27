@@ -340,9 +340,13 @@ Tags help grooming: `idea` · `bug` · `doc` · `source` (new data source) · `q
   "does NOT mean 'as-is'" is the protective sentence, not the expansion, since as-is/to-be
   is a standard modeling idiom and that misreading imports a false meaning (and "Streaming"
   was already ruled a misnomer at Q6). Producer-side recommendation: (b), worded as
-  disambiguation. **Held meanwhile:** `docs/port-T12-ais-excision-company-prompt.md` step 2b
-  defers the acronym instead of sweeping it, so no company session hardens a ruling under
-  review. Groom when the SME rules — a Q6 amendment entry in `gate-log.md`, not a new gate.
+  disambiguation. **Hold DISCHARGED 2026-07-27:** the hold was that
+  `docs/port-T12-ais-excision-company-prompt.md` step 2b deferred the acronym rather than
+  sweeping it, so no company session could harden a ruling still under review. T12 has since
+  ruled (SUPERSEDE, 2026-07-21) and the excision is applied company-side, so that prompt is
+  spent and was retired from the tree — the acronym question is now free-standing and no
+  longer gated by a pending session. Still open, still the SME's: groom when they rule — a
+  Q6 amendment entry in `gate-log.md`, not a new gate.
 - 2026-07-24 — [bug] **Unlocated user-reported typo: "apply-catalog … at the bottom says
   apply ontology" (chat).** Searched cli.py docstrings/messages, runbook .md/.html both revs,
   run-drydocs skill, RELATIONSHIP_GUIDE, repo-README, feedback html, gate docs — no such

@@ -10,7 +10,10 @@
 # list, company build mechanics) was excised 2026-07-24 per the Q6 ruling
 # ("the retired spelling goes away everywhere; the acronym expansion survives
 # ONLY in software-registry.yaml#acronyms"). Full capture: this file's git
-# history (rev 2026-07-21) + docs/port-T12-company-gate-pack.md.
+# history (rev 2026-07-21). The companion T12 session pack that also held it was
+# retired from the tree 2026-07-27 once the company gate ruled SUPERSEDE
+# (2026-07-21) and the excision was applied company-side — see the T12 tracker
+# row in docs/port-prompt.md; the pack itself survives in git history.
 #
 # THE HARD RULE still holds: this file is pure classification. Nothing here is
 # loaded directly; the seed rows below feed the batch-port orchestrator

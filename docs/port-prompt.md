@@ -153,7 +153,7 @@ OWED COMPANY-SIDE (from the 6fd3270 review):
 | T9  | Lineage curated live load — YOUR vocab gate + m3_* flips, then write_curated on your graph | pending |
 | T10 | MAC field contract validated vs a REAL DPL export — amend dpl_mac.py contract + fixtures together | pending |
 | T11 | L7 ratification entry in company gate-log (Tier A record; see above) | pending |
-| T12 | Company platforms gate: 06-29 AIS position vs producer C12 — supersede-or-reconcile (Tier B, gates step 43's flips) | pending — session pack ready: [`port-T12-company-gate-pack.md`](port-T12-company-gate-pack.md) (2026-07-21); post-sign-off sweep prompt: [`port-T12-ais-excision-company-prompt.md`](port-T12-ais-excision-company-prompt.md) (2026-07-25). **Observed company-side 2026-07-24:** `Ais*` live in `drydocs/controlm_app_codes.py` / `load controlm_app_codes` — a loader referencing `USES_TOOL` may falsify the pack's "declared only, zero edges" premise; count edges before ruling deprecate-vs-remove |
+| T12 | Company platforms gate: 06-29 AIS position vs producer C12 — supersede-or-reconcile (Tier B, gated step 43's flips) | **RULED — SUPERSEDE, 2026-07-21, company `config/gate-log.md`.** Evidence (producer review 2026-07-27, company Control-M Initial-Load Runbook): step 7b reads "AIS platform catalog — RETIRED (T12 company platforms gate, SUPERSEDE, 2026-07-21)" — the `:AisCapability` / `:AisTool` class layer is superseded by the software-registry model (role over class), the seeds are commented-out audit tags, `apply-platforms-supplement` is a NO-OP on a fresh graph and no longer a prerequisite. Excision APPLIED: step 10 confirms `USES_TOOL` → `:AisTool` retired from the app-code link, the edge landing on `USES_SOFTWARE {source:'batch-port'}` via C14. **This also closes the 2026-07-24 open question** ("`Ais*` live in the app-code loader may falsify the pack's declared-only premise — count edges first"): the retirement is applied, so the premise no longer matters. **Tier B holds in steps 43 and 45b are DISCHARGED.** Session materials (`port-T12-company-gate-pack.md`, `port-T12-ais-excision-company-prompt.md`) retired from the tree 2026-07-27 — spent; recoverable from git history if the ruling is ever re-litigated |
 | T13 | DPL registry field contract validated vs a REAL per-SEAL export (pipeline_id.json/dataset_id.json) — amend dpl_registry.py header + fixtures together, cite provenance (the T10 discipline) | pending |
 | T14 | rua collector convergence: company's own -n implementation (observed 2026-07-20, internals unseen) vs producer G18 v2 — reconcile to ONE v2 (flags, scripts.tsv columns incl. sha256, size cap, COLLECTOR_VERSION stamp) so bundles stay cross-ingestible | pending |
 
@@ -181,25 +181,34 @@ STEP LEDGER — delta since `6fd3270` (numbering continues from the archive):
                .cypher hardened to key {source:'registry'}) — code ports normally;
                RUNNING it company-side is T12-gated + T9 (your graph, your verify)
       fb8ac23  chore(ritual): snapshot (EXCLUDED class — guardrail 4)
-      + the port-prompt v2 rolling restructure, docs/port-T12-company-gate-pack.md
-        (T12 session materials — clean-add), and any later commits.
-    *** TIER B HOLD ***: the company holds its OWN signed position on platforms — the
-    2026-06-29 AIS gate (AisCapability skos:Concept / AisTool prov:SoftwareAgent,
-    USES_TOOL + IN_CAPABILITY) — which C12's registry-model ruling contradicts.
-    Per guardrail 6 Tier B: DO NOT flip platforms semantics via this port. Hold a
-    company gate session FIRST (tracker T12) to supersede-or-reconcile, then apply.
-    Mechanics:
-    - config/gate-log.md: union-append producer's C12 entry as usual — append-only is
-      safe; it RECORDS the producer decision without enacting it company-side.
-    - config/taxonomy/platforms.yaml + any C12-driven vocab/registry status effects:
-      HOLD until T12 rules. If the tree-reconcile needs the file to move, land the
-      producer content on the port branch but keep company semantics authoritative
-      until the gate — state the hold explicitly in the PORT-REPORT.
+      + the port-prompt v2 rolling restructure, and any later commits.
+        (The T12 session materials that were a clean-add here have since been
+        RETIRED producer-side — step 46i / the T12 tracker row. Do NOT clean-add
+        them: they were spent by the company's own 2026-07-21 ruling, and a range
+        computed live at port time will show them added then deleted. Net: absent.)
+    *** TIER B HOLD — DISCHARGED 2026-07-27 ***: the hold existed because the company
+    held its OWN signed position on platforms — the 2026-06-29 AIS gate (AisCapability
+    skos:Concept / AisTool prov:SoftwareAgent, USES_TOOL + IN_CAPABILITY) — which C12's
+    registry-model ruling contradicts. **T12 has since RULED: SUPERSEDE, 2026-07-21**
+    (company gate-log; see the tracker row). The company's own position now MATCHES
+    C12's registry model, and the excision is already applied company-side. Apply this
+    stream NORMALLY — no gate session to convene, nothing to hold. Historical record of
+    the hold kept here deliberately: the PORT-REPORT for this range should say the hold
+    was discharged by a company ruling, not silently dropped.
+    Mechanics (post-discharge):
+    - config/gate-log.md: union-append producer's C12 entry as usual (append-only).
+      The company's T12 entry already stands alongside it — both records, no conflict.
+    - config/taxonomy/platforms.yaml + C12-driven vocab/registry status effects: apply
+      normally. NOTE the producer has since excised the Ais* capture entirely
+      (`15c9d3f`, step 46i) — reconcile against a company file that has already had its
+      own excision applied; expect near-no-op rather than a large diff.
     - backlog.yaml: per-entry as always; C12 arrives done, C13/C14 arrive todo —
       re-insert company DD-series, recompute the summary exactly as test_backlog does.
-    - C13/C14 build commits (SchedulerKind retirement, USES_SOFTWARE migration) are
-      producer-side follow-ups that will land in this range — they are Tier B-gated
-      company-side by the same T12 ruling.
+    - C13/C14 build commits (SchedulerKind retirement, USES_SOFTWARE migration) are no
+      longer Tier B-gated. C14's loader has also been HARDENED since (step 46d): it now
+      REFUSES when either endpoint registry is absent, so a company run against a graph
+      missing :SoftwareProduct or :BusinessApplication fails loudly instead of writing
+      nothing and reporting OK. Read that before scheduling the first company run.
     Producer-side reference at 74716cf: 833 passed / 4 skipped (tests/unit);
     at 2adec42 (C13+C14 landed): 840 passed / 6 skipped.
 
@@ -238,9 +247,9 @@ STEP LEDGER — delta since `6fd3270` (numbering continues from the archive):
        company graph + api_server env (T9 spirit — producer live-verify never
        substitutes).
     b. C13 COMPLETION SWEEPS (`575269a` one-time migration dropped, `9d9aef2`
-       SchedulerKind leftover sweep; wipe-and-rebuild doctrine): *** Tier B-gated
-       by T12 *** — same hold as step 43's C13/C14. Union-append the log trail;
-       do not enact platforms semantics before the T12 ruling.
+       SchedulerKind leftover sweep; wipe-and-rebuild doctrine): *** Tier B hold
+       DISCHARGED 2026-07-27 *** — T12 ruled SUPERSEDE 2026-07-21 (tracker row +
+       step 43). Apply normally; union-append the log trail as usual.
     c. PHASED-LOADER REVERSE PORT (`1b7744f`, `12bc94e` TDD Rev 4, `df31354`
        --no-ff merge): this stream came FROM your Rev 6 — the first
        company→producer reverse port. RECONCILE/SKIP: expect near-no-op on
@@ -279,6 +288,105 @@ STEP LEDGER — delta since `6fd3270` (numbering continues from the archive):
     exactly as test_backlog does. Producer reference at `bf33c8a`:
     900 passed / 6 skipped.
 
+46. IDENTITY GATE + BOUNDARY HARDENING + LOADER REFUSALS (2026-07-23 → 2026-07-27;
+    `bf33c8a..0ce7333`, 56 commits, pushed). Ten sub-streams; APPLY IN THE ORDER
+    BELOW — (b) is deliberately first and is not optional.
+    a. *** APPLY FIRST — PUBLISH-BOUNDARY HARDENING *** (`105aa9c` p0 sweep,
+       `4d0f375` J14 split, `36ae382` J14 follow-up relocate, `68acf7d` J15
+       value-shape guard + 14-value resweep): real SEALIDs found INSIDE prose and
+       folder-name strings in the publishable tree, moved to internal/, and a new
+       guard that matches on the VALUE SHAPE rather than the field name (a prior
+       cleanup missed them because it swept field names). Reserved synthetic block
+       70001-70099 is the substitute range. Apply before ANY other sub-stream: these
+       commits change what is ALLOWED to cross the boundary, and landing later
+       content first risks re-importing exactly what the guard exists to catch.
+       Company-side the guard is additive — run it against your tree and expect it to
+       find things; that is the point, not a port failure.
+    b. S3 — BUSINESSAPPLICATION IDENTITY GATE, SIGNED OFF (`a3dd2fe` draft, `bbe29fb`
+       v2 premise correction, `9e459c1` park, `d4940b2` v3 source-field-name axis,
+       `b1d1b8d` v3.2 two-part naming rule, `57a094e` v3.3, `fc15191` SIGNED OFF,
+       22/22). Ruling: **`seal_id` → `app_id` on the canonical node**, plus the
+       TWO-PART naming rule (identity is source-neutral; EVIDENCE keeps the source's
+       own term) and the finding that SEALID was never a source field name.
+       *** TIER B CANDIDATE — assess before applying ***: your live graph keys
+       :Application / :BusinessApplication on seal_id, and your initial-load runbook's
+       app-code link step (step 10) parses seal_id out of each Control-M app code and
+       MATCHes on it. A key rename touches that path directly. The gate ALSO warns
+       about two traps that bite on the rename itself: constraint NAMES do not follow
+       property renames, and Neo4j uniqueness constraints IGNORE nulls (so a
+       half-renamed population passes its constraint silently). Producer ships the
+       ruling; the company decides its own migration timing and re-runs T1.
+    c. GRAPH-INFRA G28/G29/G30 (`a34a52e` multi-database naming drift closed + guarded,
+       `84d0480` ONE verified apply-supplements chain with the legacy verbs kept as
+       aliases, `a99ed86` curated lineage lands in `drydocs`, not `ddlineage`).
+       G29 TOUCHES YOUR RUNBOOK: the initial-load runbook calls the individual
+       `apply-ontology-supplement` / `apply-seal-supplement` / `apply-catalog-supplement`
+       / `apply-registry-supplement` / `apply-resource-pools-supplement` verbs. They
+       SURVIVE as aliases so the runbook keeps working unchanged — but the single
+       verified chain is the new canonical form and the runbook should be revised to it
+       (your doc, your rev). G30 pins where curated lineage writes; reconcile against
+       your own multi-DB topology before applying.
+    d. LOADER REFUSALS — the "succeeds loudly, does nothing" family (`b7f4cae` Q8
+       bmc-docs, `069312f` batch-port orchestrator). Loaders that joined a prereq node
+       through OPTIONAL MATCH + FOREACH used to report status OK with rows processed
+       while writing ZERO edges when the prereq registry was absent from the database
+       entirely. Both now REFUSE before `_open_run`, so a refused load writes nothing —
+       not even the :JobRun — and per-row misses are reported instead of dropped.
+       DIRECTLY RELEVANT TO YOUR RUNBOOK: its own "Order matters / out-of-order rows
+       silently drop on the MATCH" note documents this failure as accepted behaviour
+       managed by operator discipline. These two loaders now guard it instead. The
+       batch-port loader additionally had a flag-correctness bug fixed
+       (`batch_orchestrator_unmapped` was keyed on the node lookup rather than the
+       crosswalk result, so a missing registry wrote the WRONG diagnosis onto
+       correctly-mapped apps while the CLI coverage report said they mapped fine).
+       Producer-side sweep found the same idiom unguarded in `doc_traceability` and
+       `doc_feedback` — NOT fixed, logged in IDEAS; check yours.
+    e. P3 — HOSTS + DERIVED RUNS_ON (`9e51e8d`, gate controlm-hosts-topology): new
+       `controlm_hosts` stage inside `ingest-controlm` plus a derived `runs_on_resolution`
+       pass in the relationships phase (group match wins; UNMATCHED/NULL surfaced as
+       coverage, never guessed). Your runbook's step 9 says "full M3 chain incl.
+       derived deps" — after this, that chain is wider than the runbook describes.
+    f. EPIC G LINEAGE G21/G24/G26 (`50c98d2` rua code-operations through the
+       software-ontology mappers, `ac84ea0` code-repo source seam + server/repo
+       corroboration on content hash, `9319c0f` launcher registry moves from
+       code-resident to a schema-guarded config file). G26 flips the enforcement-matrix
+       row from `unguarded` to guarded — regenerate the matrix YOUR side after applying.
+    g. SEAL-APP-REF GATE v3 + COMPANION §G (`79b7213` companion section G, `356b373`
+       PAT grain-keying §G6-RIDER + backlog C17/C18, `0ce7333` §G4-RIDER). GATE SPEC
+       ONLY — it PROPOSES; nothing is enacted and no vocabulary or loader changes.
+       Sign-off moved G→H; every existing id A1–F2 is unchanged so the external
+       citations of §B / §C1 / §E2 still resolve. §G4-RIDER already encodes YOUR
+       behaviour (the app-code step marks the BatchProcessing port active; activation is
+       currently DERIVED, not declared), so it should read correctly on arrival — if it
+       does not, that is a divergence worth reporting back.
+    h. C17/C18 + THE NO-SHADOW GUARD (`99e38cb`): deleted `drydocs_core/models/catalog.py`
+       — a stale shadow of all 8 catalog row models that had drifted past the C9 §d
+       ruling — and added `tests/unit/test_no_shadow_definitions.py`, which fails on any
+       public top-level class defined in two production modules.
+       *** CHECK BEFORE APPLYING ***: producer-side NOTHING imported the shadow, so the
+       delete was a no-op. If your tree imports `drydocs_core.models.catalog`, this is
+       NOT a clean-apply — reconcile to one definition your own way, then let the guard
+       enforce it. The guard itself may fail on arrival if you carry legitimate
+       duplicates; add them to its ALLOWLIST with a written reason (it rejects
+       reason-less entries).
+    i. Q6 REOPENED + Ais* EXCISION (`806e5c3` acronym entry withdrawn from Class C and
+       routed back as an open question, `15c9d3f` superseded Ais* capture excised from
+       platforms.yaml). Ties to T12, now ruled — see step 43's discharged hold.
+    j. DOCS / ADRs / GUARDS (`ac80132` pre-UI structure review + ADRs 0008/0009/0010,
+       `698c367` executive overview rev 6, `aa11fb5` Databricks Unity Catalog research
+       note, `73ee97a` internal companion note, `432ea43` two holes closed in the
+       module-boundary guard, `9f5ebe1` + `76be07c` supplement review pass and the stale
+       catalog-supplement docstring — 31 Role seeds, was "19", `6af87eb` new phase 16 +
+       Epic U self-documentation, grooms `f9167a5` / `eeabf2b` / `a37043a` / `791a278`,
+       IDEAS captures `220954e` / `39e1258` / `974ecb5` / `323a2f5`).
+    Snapshots in the range (`b7111d9`, `64fa3e9`, `3ece9d7`, `01132e7`, `a3ac887`,
+    `ff1be3b`, `abd67f6`, `9b7d83e`, `c0008df`, `c69a482`) are EXCLUDED class
+    (guardrail 4). `7164ff5` is the step-45 ledger entry itself — this document.
+    backlog.yaml per-entry: P3/G21/G24/G26/Q8/J14/J15/C18 arrive done, C17 arrives todo,
+    new Epic U + phase 16, ids C17/C18 newly allocated; re-insert company DD-series and
+    recompute the summary exactly as test_backlog does. Producer reference at `0ce7333`:
+    982 passed / 6 skipped.
+
 ACCEPTANCE GATE (behavior is the contract, not a byte-compare):
 - Track 1 (portable, no production sample present):
     poetry run pytest tests/unit/test_variable_classifier.py tests/unit/test_variable_resolver.py \
@@ -290,8 +398,8 @@ ACCEPTANCE GATE (behavior is the contract, not a byte-compare):
 - Full `pytest tests/unit/` — ZERO failures is the contract; skips are
   environment/fixture-absence by design (production CSVs, XML fixtures, fastapi
   optional dep, essential-graphrag PDF, J7 guards without RECONCILE_BEFORE_DIR).
-  Producer reference at the current head (step 45, `bf33c8a`): 900 passed /
-  6 skipped (step-43 head 2adec42 was 840 / 6).
+  Producer reference at the current head (step 46, `0ce7333`): 982 passed /
+  6 skipped (step-45 head bf33c8a was 900 / 6; step-43 head 2adec42 was 840 / 6).
   Company reference at the last port: 1174 passed / 21 skipped / 0 failed.
 - CI guards green: test_schema.py (EXPECTED_CONSTRAINTS company-based — see ledger;
   every active edge has its supplement block), test_classification.py,

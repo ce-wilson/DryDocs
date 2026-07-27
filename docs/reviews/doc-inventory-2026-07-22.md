@@ -41,7 +41,7 @@
 | docs/oracle-sql-logging.md | 2026-07-11 | 2026-07-11 | living | Guide: per-run SQL evidence logging on `ingest-controlm --use-oracle` |
 | docs/port-prompt.md | 2026-06-22 | 2026-07-22 | living | Rolling producer→company port prompt (v2, steps 43+) |
 | docs/port-prompt-archive-steps-1-42.md | 2026-07-21 | 2026-07-21 | historical | Frozen port steps 1–42 (applied via PORT-REPORT) |
-| docs/port-T12-company-gate-pack.md | 2026-07-21 | 2026-07-21 | record | T12 company platforms gate session pack (supersede-or-reconcile) |
+| ~~docs/port-T12-company-gate-pack.md~~ | 2026-07-21 | 2026-07-27 | RETIRED | T12 company platforms gate session pack (supersede-or-reconcile). Spent: T12 ruled SUPERSEDE 2026-07-21 and the excision was applied company-side; removed from the tree 2026-07-27, recoverable from git history. See the T12 tracker row in docs/port-prompt.md |
 | docs/ruff-format-convergence.md | 2026-07-20 | 2026-07-20 | living | Two-sided ruff-format adoption plan (J10 amended scope) |
 | docs/RELATIONSHIP_GUIDE.md | 2026-05-20 | 2026-07-15 | living | Relationship-type governance guide + vocabulary registry pointer |
 
