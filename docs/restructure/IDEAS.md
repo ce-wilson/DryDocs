@@ -26,17 +26,68 @@ Tags help grooming: `idea` · `bug` · `doc` · `source` (new data source) · `q
 
 <!-- add new ideas at the top -->
 
-- 2026-07-27 — [bug] **`batch_port_orchestrator.cypher:26` carries the exact defect Q8 just
-  closed in `bmc_docs.cypher` — same `OPTIONAL MATCH (sp:SoftwareProduct {product_id:
-  row.product_id})` inside a FOREACH guard, so an absent product registry drops every edge and
-  still reports success.** Found while fixing Q8 (which was scoped to bmc-docs only, so this
-  was deliberately left alone). The fix is the same shape and now has a precedent to copy:
-  `BmcDocsLoader._assert_product_registry_present` (refuse pre-`_open_run`, so nothing is
-  written) plus the post-load "rows this run wrote that ended up with no edge" probe. Worth
-  checking whether any OTHER loader joins a prereq node through the same
-  `OPTIONAL MATCH` + `FOREACH` idiom — `grep -l "FOREACH (_ IN CASE WHEN"` over
-  `drydocs/loaders/cypher/` is the sweep. Fourth-plus instance of the
-  "succeeds loudly, does nothing" through-line (G29, G30, Q8).
+- 2026-07-27 — [idea] **The SME orchestrator-mapping act: what actually flips a batch port on.**
+  SME direction, this session. CONFIRMED first, since the design rests on it: both ports are
+  created `active = false` (`seal_applications.cypher:97,101`, `ON CREATE SET`) — and the
+  stronger finding is that **nothing in the repo ever sets a Port's `active` to true, and
+  nothing reads it.** It is a write-once dead flag today; the mapping act below is its missing
+  writer. The direction: `(:BusinessApplication)-[:USES_SOFTWARE]->(:SoftwareProduct)` for
+  ORCHESTRATION is **SME-mapped, established when the folder/entity mapping is confirmed** —
+  not derived. The mapping table is a UI screen: cascading pickers **Product Line → Product →
+  Business Application → [decision point: Control-M | AutoSys (once built)]** — that choice is
+  what creates the orchestrator relationship — then a **filter of available folders** → the
+  Control-M folder (matched on the internal folder naming-convention pattern) → an **SME
+  check/approval + notes field capturing SME user, date** — and that completes the mapping.
+  Four things this needs, all verified against what exists:
+  1. **Home:** a new domain on the existing steward screen (`UI-WIP/wf-mapping-01.md`, backlog
+     O13 done; O24 is the precedent for adding a domain). Its governing rule already fits this
+     exactly — *the loader stays the ONLY graph writer*: the screen drafts a mapping-table row,
+     which travels change artifact → gate → merge → next load run. The approval/notes/user/date
+     fields ARE that screen's mandatory-rationale + lifecycle chips, already specified.
+  2. **The open gate that should own it:** `config/gate-prompts/seal-app-ref-edge-reshape.yaml`
+     (v2, prepped 2026-07-22, unsigned) already rules folder-grain attribution and WHO AUTHORS
+     it (§A grain, §B defined mapping, §E steward overrides). Two things here are NOT in it:
+     the **orchestrator decision point** (the gate is Control-M-only; this makes the mapping act
+     orchestrator-FIRST, then filters that orchestrator's entities), and the **port-activation
+     consequence**. Fold both in — or add a companion section — before that gate is run.
+  3. **What it re-frames in C14:** `batch_port_orchestrator` today writes the USES_SOFTWARE edge
+     straight from the SEAL-declared string via the platforms.yaml crosswalk, with no SME
+     confirmation anywhere in the path. Under this direction that declared string is a
+     **prefill/proposal** and the confirmed folder mapping is the authority. Gate question, not
+     a build decision — the loader was left as-is.
+  4. **Missing edge behind dropdown 3:** ProductLine→Product is `catalog_has_product` [active],
+     but **Product→BusinessApplication (`catalog_has_application`) is still `planned`** — the
+     third picker has no edge to traverse yet. Concrete build dependency for the screen.
+
+  Open questions for the gate: (a) is `Port.active` **SME-declared** at approval, or **derived**
+  from evidence (a confirmed folder ⇒ batch port active), and what is the Event port's
+  equivalent evidence? (b) does the planned `:Batch` intermediate (`arch_contains_batch`
+  BusinessApplication→Batch, `arch_contains_folder` Batch→ControlMFolder, both `planned`)
+  **collapse into the BatchProcessing `:Port`**, given the 2026-07-22 grain correction routes
+  attribution folder→batch-port? Two nodes for one concept otherwise. (c) what makes a folder
+  "available" in the filter — unmapped only, naming-pattern match, or both?
+
+- ~~2026-07-27 — [bug] `batch_port_orchestrator.cypher:26` carries the exact defect Q8 closed in
+  `bmc_docs.cypher`.~~ **FIXED 2026-07-27** — and it was worse than logged: MATCH-only on BOTH
+  endpoints means two silent-success paths (absent app registry → every row's hard MATCH fails,
+  writing nothing at all, not even the raw string; absent product registry → the FOREACH guard
+  drops every edge). Both now refused pre-`_open_run`; per-row survivors reported after the
+  load. Also fixed a third defect found on the way: `batch_orchestrator_unmapped` was keyed on
+  `sp IS NULL` (the node lookup) rather than `row.product_id IS NULL` (the crosswalk result),
+  so a missing registry wrote the WRONG DIAGNOSIS onto correctly-mapped apps — "unmapped in
+  platforms.yaml" — while the CLI coverage report on the same run said they mapped fine.
+  **Sweep done — two more carry it, both unguarded** (`DocTraceabilityLoader` /
+  `DocFeedbackLoader` in `doc_traceability.py:376,383` are bare class bodies, no prereq check):
+  `doc_traceability.cypher:69` and `doc_feedback.cypher:37` both `OPTIONAL MATCH (ds:DocSection
+  ...)` written by a DIFFERENT loader (`doc_sections.v1`), so an absent DocSection set drops
+  every anchor link and still reports OK — and `doc_feedback.cypher:49` does the same for
+  `:Employee`. That one matters more than the others: **doc_feedback IS the L5/L6 re-attachment
+  loop**, so the failure mode is SME feedback loading "successfully" while silently detached
+  from the doc it annotates. Cleared as NOT the defect: the `prev:Chunk` lookups
+  (`bmc_docs.cypher:94`, `essential_graphrag.cypher:80`) are same-loader/same-run
+  self-references, and `pat_product_mapping.cypher:129,133` are stale-edge cleanup, not prereq
+  joins. Fifth-through-seventh instances of the "succeeds loudly, does nothing" through-line
+  (G29, G30, Q8, both halves of this one, plus the two doc loaders).
 - 2026-07-27 — [bug] **The SchemaMeta contamination O33 describes is not only a read-surface
   problem — it defeats WRITE-side guards too.** Q8's registry-presence check would have been
   useless as a bare `count(:SoftwareProduct)`: `schema_graph.cypher:109` MERGEs

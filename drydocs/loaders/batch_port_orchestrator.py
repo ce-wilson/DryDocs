@@ -24,16 +24,21 @@ coverage-policy precedent: surfaced, never guessed).
 """
 from __future__ import annotations
 
+import logging
 from pathlib import Path
 from typing import TYPE_CHECKING, ClassVar, Iterator
 
 import yaml
 
 from drydocs_core.models.registry import BatchPortOrchestratorRow
-from .base import BaseLoader
+from .base import BaseLoader, LoadSummary
 
 if TYPE_CHECKING:  # pragma: no cover
     from types import TracebackType
+
+    from drydocs_core.run_log import LoaderRunLog
+
+LOGGER = logging.getLogger(__name__)
 
 CYPHER_DIR = Path(__file__).resolve().parent / "cypher"
 REPO_ROOT = Path(__file__).resolve().parents[2]
@@ -116,7 +121,184 @@ class BatchOrchestratorYamlAdapter:
 
 
 class BatchPortOrchestratorLoader(BaseLoader):
+    """Writes the declared-orchestrator edge; refuses when its endpoints are absent.
+
+    This pass is MATCH-only on BOTH endpoints, so it has TWO ways to succeed
+    while doing nothing (the failure family Q8 closed in ``bmc_docs``):
+
+    * the app registry absent — the hard ``MATCH (a:BusinessApplication ...)``
+      fails per row, so the row writes nothing at all, not even the raw string;
+    * the product registry absent — the ``OPTIONAL MATCH`` + FOREACH guard drops
+      every USES_SOFTWARE edge.
+
+    Both are whole-registry conditions and both are refused up front. Their
+    per-ROW counterparts (this app is missing / this product is missing) stay
+    tolerated — one bad row must not cost the other apps their edges — but are
+    reported after the load, never silent.
+    """
+
     name: ClassVar[str] = "batch_port_orchestrator.v1"
     cypher_path: ClassVar[Path] = CYPHER_DIR / "batch_port_orchestrator.cypher"
     row_model: ClassVar[type] = BatchPortOrchestratorRow
     source_label: ClassVar[str] = "taxonomy"
+
+    def __init__(self, *args, **kwargs) -> None:
+        super().__init__(*args, **kwargs)
+        # seal_ids actually sent to the database this run (recorded in _flush).
+        self.seal_ids_sent: set[str] = set()
+        # Post-load coverage: rows whose app was not in the graph, and apps this
+        # run stamped that ended up with no batch-port edge.
+        self.apps_not_in_graph: list[str] = []
+        self.apps_without_edge: list[dict] = []
+
+    # ---- prereq enforcement -------------------------------------------------
+
+    def _load(self, summary: LoadSummary, run_log: LoaderRunLog | None) -> LoadSummary:
+        """Refuse absent endpoint registries, then report the per-row misses.
+
+        The refusal runs BEFORE ``super()._load`` — which is what reaches
+        ``_preflight_indexes`` and ``_open_run`` — so a refused load writes
+        nothing at all, not even the :JobRun (the ``_preflight_indexes``
+        convention).
+        """
+        self._assert_endpoint_registries_present()
+        result = super()._load(summary, run_log)
+        self._report_rows_that_wrote_nothing()
+        return result
+
+    def _flush(self, cypher: str, batch: list[dict]) -> None:
+        """Record what was sent, then send it.
+
+        A hard-MATCH miss leaves NO trace in the graph, so unlike the
+        ``bmc_docs`` probe it cannot be found by asking what this run touched —
+        the only way to name those apps is to remember what we asked for.
+        ``_flush`` is the right place: it is already the "these rows go to the
+        database" seam, so it stays honest bookkeeping rather than the stateful
+        ``to_params`` that Q8 rejected.
+        """
+        self.seal_ids_sent.update(
+            str(row["seal_id"]) for row in batch if row.get("seal_id") is not None
+        )
+        super()._flush(cypher, batch)
+
+    def _count_real_nodes(self, label: str, key: str) -> int:
+        """Count real nodes of ``label``, excluding the schema exemplars.
+
+        ``schema_graph.cypher`` MERGEs ``:SchemaMeta:<Label> {name: '<Label>'}``
+        exemplars that carry the REAL label with no key property, so a bare
+        ``count()`` would count the exemplar and wave an empty registry straight
+        through — the whole failure this check exists to catch. ``NOT n:SchemaMeta``
+        is the rename-proof form; the key-not-null clause additionally rejects
+        any other keyless stub. (``label``/``key`` are module-controlled
+        literals, never row data — no injection surface.)
+        """
+        rows = self.client.run(
+            f"MATCH (n:{label}) WHERE NOT n:SchemaMeta AND n.{key} IS NOT NULL "
+            "RETURN count(n) AS found"
+        )
+        return rows[0].get("found", 0) if rows else 0
+
+    def _assert_endpoint_registries_present(self) -> None:
+        """Fail loudly when either MATCH-only endpoint registry is empty."""
+        apps = self._count_real_nodes("BusinessApplication", "seal_id")
+        if not apps:
+            raise RuntimeError(
+                f"Loader {self.name}: refusing to load — no :BusinessApplication "
+                "nodes are reachable in this database, so every row's MATCH would "
+                "fail and the run would still report success with nothing written. "
+                "Load the SEAL application chain against this database first "
+                "(`drydocs load-seal-applications`)."
+            )
+        products = self._count_real_nodes("SoftwareProduct", "product_id")
+        if not products:
+            raise RuntimeError(
+                f"Loader {self.name}: refusing to load — no :SoftwareProduct nodes "
+                "are reachable in this database, so every USES_SOFTWARE edge would "
+                "be silently dropped and the load would still report success. Run "
+                "`drydocs load-software-registry` against this database first "
+                "(a relationship cannot span databases — check you are pointed at "
+                "the database that holds the registry)."
+            )
+        LOGGER.info(
+            "Loader %s: endpoints present (%d :BusinessApplication, %d :SoftwareProduct)",
+            self.name, apps, products,
+        )
+
+    def _report_rows_that_wrote_nothing(self) -> None:
+        """Warn (never fail) about the per-row misses both endpoints can produce."""
+        self._report_apps_not_in_graph()
+        self._report_apps_without_edge()
+
+    def _report_apps_not_in_graph(self) -> None:
+        """Rows whose ``MATCH (a:BusinessApplication ...)`` found nothing.
+
+        These write NOTHING — not the edge, not even ``batch_orchestrator_raw``
+        — so they are invisible in the graph and in the CLI coverage report,
+        which counts crosswalk hits on the SOURCE side and would happily read
+        "3/3 mapped" while three rows landed nowhere.
+        """
+        if not self.seal_ids_sent:
+            return
+        rows = self.client.run(
+            "UNWIND $seal_ids AS sid "
+            "OPTIONAL MATCH (a:BusinessApplication {seal_id: sid}) "
+            "WITH sid, a WHERE a IS NULL "
+            "RETURN sid AS seal_id ORDER BY seal_id",
+            seal_ids=sorted(self.seal_ids_sent),
+        )
+        self.apps_not_in_graph = [r["seal_id"] for r in rows]
+        if not self.apps_not_in_graph:
+            return
+        LOGGER.warning(
+            "Loader %s: %d of %d row(s) named a :BusinessApplication that is not in "
+            "this database — nothing was written for them, not even the raw "
+            "orchestrator string (seal_id(s): %s). The SEAL capture and the graph "
+            "have drifted; re-run the SEAL application load.",
+            self.name,
+            len(self.apps_not_in_graph),
+            len(self.seal_ids_sent),
+            ", ".join(self.apps_not_in_graph),
+        )
+
+    def _report_apps_without_edge(self) -> None:
+        """Apps this run stamped that ended up with no batch-port edge.
+
+        Asks the graph what actually happened rather than re-deriving it from
+        the rows. Two distinct causes, split apart because they need different
+        actions: ``batch_orchestrator_unmapped`` means platforms.yaml has no
+        ``software_registry_ref`` for the string (a CONFIG gap — extend the
+        crosswalk, gate the new seed row); anything else means the crosswalk
+        DID resolve but that product is missing from the registry (a LOAD gap —
+        the registry is present but incomplete, which the whole-registry
+        refusal above cannot see).
+        """
+        rows = self.client.run(
+            "MATCH (a:BusinessApplication {batch_orchestrator_last_run_id: $run_id}) "
+            "WHERE NOT (a)-[:USES_SOFTWARE {source: 'batch-port'}]->(:SoftwareProduct) "
+            "RETURN a.seal_id AS seal_id, "
+            "       a.batch_orchestrator_raw AS orchestrator_raw, "
+            "       a.batch_orchestrator_unmapped AS unmapped "
+            "ORDER BY seal_id",
+            run_id=self.run_id,
+        )
+        self.apps_without_edge = [dict(r) for r in rows]
+        if not self.apps_without_edge:
+            return
+        missing_product = [r for r in self.apps_without_edge if not r.get("unmapped")]
+        LOGGER.warning(
+            "Loader %s: %d app(s) stamped WITHOUT a USES_SOFTWARE {source:'batch-port'} "
+            "edge (%d unmapped in platforms.yaml, %d resolved to a product that is not "
+            "in the registry).",
+            self.name,
+            len(self.apps_without_edge),
+            len(self.apps_without_edge) - len(missing_product),
+            len(missing_product),
+        )
+        for row in missing_product:
+            LOGGER.warning(
+                "Loader %s: app %s declares '%s' — the platforms.yaml crosswalk "
+                "resolved it, but no matching :SoftwareProduct is in this database. "
+                "The registry is present but incomplete; re-run "
+                "`drydocs load-software-registry`.",
+                self.name, row.get("seal_id"), row.get("orchestrator_raw"),
+            )

@@ -10,6 +10,7 @@ on source so the edges can never collide). Pure file/adapter checks — no Neo4j
 """
 from __future__ import annotations
 
+from collections.abc import Iterator
 from pathlib import Path
 
 import pytest
@@ -170,3 +171,234 @@ def test_registry_cypher_keys_its_own_source() -> None:
     edges on shared app/product pairs."""
     cypher = REGISTRY_CYPHER_FILE.read_text(encoding="utf-8")
     assert "MERGE (a)-[u:USES_SOFTWARE {source: 'registry'}]->(sp)" in cypher
+
+
+def test_cypher_unmapped_flag_keys_on_the_crosswalk_not_the_node_lookup() -> None:
+    """``batch_orchestrator_unmapped`` means "platforms.yaml had no
+    software_registry_ref for this string" — a CONFIG gap. Keyed on ``sp`` (the
+    node lookup) instead of ``row.product_id`` (the crosswalk result), an absent
+    or incomplete registry relabels correctly-mapped apps as unmapped, writing
+    the wrong diagnosis into the graph and contradicting the CLI coverage report
+    on the very same run."""
+    cypher = CYPHER_FILE.read_text(encoding="utf-8")
+    assert (
+        "a.batch_orchestrator_unmapped     = "
+        "CASE WHEN row.product_id IS NULL THEN true ELSE null END" in cypher
+    )
+    assert "CASE WHEN sp IS NULL THEN true" not in cypher
+
+
+def test_cypher_header_documents_where_the_prereq_is_enforced() -> None:
+    """The template cannot make the whole-registry check itself (it runs per
+    BATCH), so its header must point at the loader method that does — otherwise
+    the next person re-pointing this loader at another database re-opens the
+    silent-success hole."""
+    cypher = CYPHER_FILE.read_text(encoding="utf-8")
+    assert "_assert_endpoint_registries_present" in cypher
+    assert "cannot span databases" in cypher
+
+
+# ---- prereq enforcement (Q8 family) -----------------------------------------
+
+
+class _FakeAdapter:
+    def __init__(self, rows: list[dict]) -> None:
+        self._rows = rows
+
+    def __enter__(self) -> _FakeAdapter:
+        return self
+
+    def __exit__(self, *_: object) -> None:
+        return None
+
+    def rows(self) -> Iterator[dict]:
+        yield from self._rows
+
+
+class _FakeClient:
+    """Stands in for the graph: which apps and products actually exist.
+
+    ``apps`` is the set of seal_ids a real (non-SchemaMeta) :BusinessApplication
+    exists for; ``products`` likewise for :SoftwareProduct. Both start empty in
+    a fresh database — which is exactly the pair of silent-success cases these
+    tests pin down. The template's write behaviour is simulated from the flushed
+    rows: an app is stamped only if it was matched, and the edge is written only
+    if the row's product_id resolves.
+    """
+
+    def __init__(self, apps: set[str], products: set[str]) -> None:
+        self.apps = apps
+        self.products = products
+        self.run_calls: list[tuple[str, dict]] = []
+        self.run_script_calls: list[tuple[str, dict]] = []
+
+    def run(self, cypher: str, params: dict | None = None, **kwargs) -> list[dict]:
+        bind = {**(params or {}), **kwargs}
+        self.run_calls.append((cypher, bind))
+        if "AS found" in cypher:
+            # The SchemaMeta exemplars are excluded by the query's own
+            # NOT n:SchemaMeta predicate, so they never reach these counts.
+            if "(n:BusinessApplication)" in cypher:
+                return [{"found": len(self.apps)}]
+            if "(n:SoftwareProduct)" in cypher:
+                return [{"found": len(self.products)}]
+            return [{"found": 0}]
+        if "WITH sid, a WHERE a IS NULL" in cypher:
+            return [
+                {"seal_id": sid}
+                for sid in sorted(bind.get("seal_ids", []))
+                if sid not in self.apps
+            ]
+        if "WHERE NOT (a)-[:USES_SOFTWARE {source: 'batch-port'}]" in cypher:
+            out = []
+            for row in self.flushed_rows():
+                if row["seal_id"] not in self.apps:
+                    continue  # hard MATCH missed — nothing was stamped
+                if row.get("product_id") in self.products:
+                    continue  # edge written
+                out.append(
+                    {
+                        "seal_id": row["seal_id"],
+                        "orchestrator_raw": row.get("orchestrator_raw"),
+                        "unmapped": True if row.get("product_id") is None else None,
+                    }
+                )
+            return sorted(out, key=lambda r: r["seal_id"])
+        if "SHOW INDEXES" in cypher:
+            return []
+        if "AS rows_changed" in cypher:
+            return [{"rows_changed": 0}]
+        return []
+
+    def run_script(self, script: str, params: dict | None = None) -> None:
+        self.run_script_calls.append((script, dict(params or {})))
+
+    def flushed_rows(self) -> list[dict]:
+        rows: list[dict] = []
+        for _, bind in self.run_calls:
+            rows.extend(bind.get("batch", []))
+        for _, params in self.run_script_calls:
+            rows.extend(params.get("batch", []))
+        return rows
+
+
+def _row(seal_id: str, raw: str = "ControlM", product_id: str | None = "controlm") -> dict:
+    return {"seal_id": seal_id, "orchestrator_raw": raw, "product_id": product_id}
+
+
+def _loader(client: _FakeClient, rows: list[dict]):
+    from drydocs.loaders.batch_port_orchestrator import BatchPortOrchestratorLoader
+
+    return BatchPortOrchestratorLoader(client, _FakeAdapter(rows), run_log=False)
+
+
+def test_empty_app_registry_fails_loudly() -> None:
+    """The hard-MATCH endpoint: ZERO :BusinessApplication means every row's
+    MATCH fails and nothing is written — not even the raw string — while the
+    run reports OK with rows_processed > 0."""
+    client = _FakeClient(apps=set(), products={"controlm"})
+    with pytest.raises(RuntimeError, match="no :BusinessApplication nodes are reachable"):
+        _loader(client, [_row("1")]).load()
+
+
+def test_empty_product_registry_fails_loudly() -> None:
+    """The FOREACH-guard endpoint: ZERO :SoftwareProduct silently drops every
+    USES_SOFTWARE edge (the defect Q8 closed in bmc_docs)."""
+    client = _FakeClient(apps={"1"}, products=set())
+    with pytest.raises(RuntimeError, match="no :SoftwareProduct nodes are reachable"):
+        _loader(client, [_row("1")]).load()
+
+
+def test_refusal_writes_nothing_not_even_the_job_run() -> None:
+    """Refusal follows the _preflight_indexes convention — it lands before
+    _open_run, so a refused load leaves no :JobRun behind to look successful."""
+    client = _FakeClient(apps=set(), products=set())
+    with pytest.raises(RuntimeError):
+        _loader(client, [_row("1")]).load()
+    assert not client.flushed_rows()
+    assert not [c for c, _ in client.run_calls if "MERGE (run:JobRun" in c]
+
+
+def test_schema_meta_exemplars_alone_do_not_satisfy_the_prereqs() -> None:
+    """schema_graph.cypher MERGEs :SchemaMeta:<Label> exemplars carrying the
+    REAL label with no key property. A bare count() would see them and wave both
+    empty registries straight through, so both probes must exclude them."""
+    client = _FakeClient(apps=set(), products=set())
+    with pytest.raises(RuntimeError):
+        _loader(client, [_row("1")]).load()
+
+    probes = [c for c, _ in client.run_calls if "AS found" in c]
+    assert probes, "no endpoint-presence probe was issued"
+    for probe in probes:
+        assert "NOT n:SchemaMeta" in probe, (
+            "endpoint probes must use the rename-proof label predicate"
+        )
+        assert "IS NOT NULL" in probe, "keyless stubs must not satisfy the probe"
+
+
+def test_healthy_load_reports_no_misses() -> None:
+    client = _FakeClient(apps={"1", "2"}, products={"controlm", "autosys"})
+    loader = _loader(client, [_row("1"), _row("2", "Autosys", "autosys")])
+    summary = loader.load()
+
+    assert summary.status == "OK"
+    assert summary.rows_processed == 2
+    assert loader.apps_not_in_graph == []
+    assert loader.apps_without_edge == []
+
+
+def test_row_whose_app_is_absent_is_named_not_silently_dropped() -> None:
+    """A hard-MATCH miss leaves NO trace in the graph, so it cannot be found by
+    asking what this run touched — the loader must remember what it sent. The
+    CLI coverage report counts crosswalk hits on the SOURCE side and would read
+    "2/2 mapped" while one row landed nowhere at all."""
+    client = _FakeClient(apps={"1"}, products={"controlm"})
+    loader = _loader(client, [_row("1"), _row("9999")])
+    loader.load()
+
+    assert loader.seal_ids_sent == {"1", "9999"}
+    assert loader.apps_not_in_graph == ["9999"]
+
+
+def test_product_missing_from_registry_is_reported_as_a_load_gap() -> None:
+    """The crosswalk resolved, but that product is not in the registry. The
+    whole-registry refusal cannot see this — the registry is present, just
+    incomplete — so it has to surface here, flagged as a LOAD gap (unmapped
+    falsy) rather than a platforms.yaml config gap."""
+    client = _FakeClient(apps={"1"}, products={"controlm"})
+    loader = _loader(client, [_row("1", "Airflow", "airflow")])
+    loader.load()
+
+    assert loader.apps_without_edge == [
+        {"seal_id": "1", "orchestrator_raw": "Airflow", "unmapped": None}
+    ]
+
+
+def test_unmapped_string_is_reported_as_a_config_gap() -> None:
+    """product_id=None is the platforms.yaml gap the C12 gate ruled on: flagged
+    on the node, no edge, reported — and distinguished from the load gap above,
+    because the two need different fixes."""
+    client = _FakeClient(apps={"1"}, products={"controlm"})
+    loader = _loader(client, [_row("1", "IBM TWS", None)])
+    loader.load()
+
+    assert loader.apps_without_edge == [
+        {"seal_id": "1", "orchestrator_raw": "IBM TWS", "unmapped": True}
+    ]
+
+
+def test_missing_edge_probe_is_scoped_to_this_run() -> None:
+    """The probe must key on batch_orchestrator_last_run_id — an unscoped sweep
+    would report apps from earlier runs as this run's misses."""
+    client = _FakeClient(apps={"1"}, products={"controlm"})
+    loader = _loader(client, [_row("1")])
+    loader.load()
+
+    probe = [
+        (c, b) for c, b in client.run_calls
+        if "WHERE NOT (a)-[:USES_SOFTWARE {source: 'batch-port'}]" in c
+    ]
+    assert probe, "no missing-edge probe was issued"
+    cypher, bind = probe[0]
+    assert "batch_orchestrator_last_run_id: $run_id" in cypher
+    assert bind["run_id"] == loader.run_id

@@ -773,7 +773,8 @@ def load_batch_orchestrators(
             console.print(f"[red]Missing: {path}[/]"); raise typer.Exit(1)
     adapter = BatchOrchestratorYamlAdapter(apps_path, platforms_path)
     with _client() as cli:
-        summary = BatchPortOrchestratorLoader(cli, adapter).load()
+        loader = BatchPortOrchestratorLoader(cli, adapter)
+        summary = loader.load()
     console.print(summary.as_dict())
     # Coverage report (the invocation-patterns coverage-policy rule: counts
     # always reported, never silent).
@@ -787,6 +788,24 @@ def load_batch_orchestrators(
             f"[yellow]UNMAPPED[/]: app {miss['seal_id']} declares "
             f"'{miss['orchestrator_raw']}' — no software_registry_ref in "
             "platforms.yaml (flagged batch_orchestrator_unmapped; no edge written)"
+        )
+    # The GRAPH-side view. The block above counts crosswalk hits on the SOURCE
+    # side, so on its own it reads "n/n mapped" even when every row missed its
+    # app or its product in the database (Q8 family, 2026-07-27).
+    for seal_id in loader.apps_not_in_graph:
+        console.print(
+            f"[red]NOT IN GRAPH[/]: app {seal_id} is declared in the capture but has "
+            "no :BusinessApplication node — NOTHING was written for it, not even the "
+            "raw string. Re-run the SEAL application load."
+        )
+    for row in loader.apps_without_edge:
+        if row.get("unmapped"):
+            continue  # already reported above as a platforms.yaml config gap
+        console.print(
+            f"[red]PRODUCT MISSING[/]: app {row['seal_id']} declares "
+            f"'{row['orchestrator_raw']}' and the crosswalk resolved it, but no "
+            "matching :SoftwareProduct is in this database — the registry is "
+            "present but incomplete. Re-run `drydocs load-software-registry`."
         )
 
 

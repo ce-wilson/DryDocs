@@ -17,6 +17,23 @@
 // surfaced for review, never guessed into a product. A later run that maps
 // the string clears the flag (idempotent, re-run safe).
 //
+// PREREQ (Q8 family, 2026-07-27). MATCH-only cuts both ways: an app registry
+// that is absent ENTIRELY makes every row's MATCH fail, and a product registry
+// that is absent entirely makes the FOREACH guard drop every edge — either way
+// the run reported OK having written nothing. Both are now refused BEFORE the
+// load in BatchPortOrchestratorLoader._assert_endpoint_registries_present, and
+// the per-row survivors are reported after it. The check cannot live here: a
+// template that runs per BATCH cannot tell "this row's id is wrong" from "the
+// registry is not in this database". Read that method before re-pointing this
+// loader at another database (a relationship cannot span databases).
+//
+// The unmapped flag is keyed on row.product_id — the CROSSWALK result — not on
+// sp, the node lookup. Keyed on sp (as it was until 2026-07-27) an absent or
+// incomplete registry silently relabelled correctly-mapped apps as "unmapped in
+// platforms.yaml", contradicting the CLI coverage report on the same run. The
+// registry-gap case is a LOAD problem, not a CONFIG problem, and is reported by
+// the loader instead of being written into the graph as the wrong diagnosis.
+//
 // Parameters: $batch (seal_id, orchestrator_raw, product_id),
 //             $run_id, $loaded_at, $loader, $source_label.
 // =============================================================================
@@ -34,5 +51,5 @@ FOREACH (_ IN CASE WHEN sp IS NOT NULL THEN [1] ELSE [] END |
       u.last_run_id      = $run_id
 )
 SET a.batch_orchestrator_raw          = row.orchestrator_raw,
-    a.batch_orchestrator_unmapped     = CASE WHEN sp IS NULL THEN true ELSE null END,
+    a.batch_orchestrator_unmapped     = CASE WHEN row.product_id IS NULL THEN true ELSE null END,
     a.batch_orchestrator_last_run_id  = $run_id;
