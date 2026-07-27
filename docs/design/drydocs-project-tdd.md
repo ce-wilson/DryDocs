@@ -14,7 +14,7 @@ reconciling ports. ·
 family (component topology); `docs/whitepaper/drydocs-whitepaper.md` (the external framing).
 
 Worked example throughout (the sanitized sample family already committed in
-`config/taxonomy/controlm.yaml`): folders `PRARAG-HLDM-85025-PEX-TRUST-{DLY,CYC}` on server
+`config/taxonomy/controlm.yaml`): folders `PRARAG-HLDM-70011-PEX-TRUST-{DLY,CYC}` on server
 `P32`, their jobs, conditions, and the `ARA` application grouping.
 
 > **Read-me-first.** DryDocs is a *governance machine that happens to load a graph*, not a

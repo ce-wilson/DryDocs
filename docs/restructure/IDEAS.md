@@ -206,15 +206,23 @@ Tags help grooming: `idea` · `bug` · `doc` · `source` (new data source) · `q
   doc-inventory row, git-readme table, and PAT/catalog ontology citations keep resolving
   (`catalog_ontology_supplement.cypher` comments repointed). The cabinet tables double as
   the candidate person-level cabinet extract the K5 gate left as K6's missing feed.**
-  (2) two test fixtures (`tests/unit/test_command_parser.py:208`,
-  `test_variable_classifier.py:85`) embed two real support-DL names in sample CMD_LINEs —
-  fixtures assert on these strings, so the fix is synthetic DLs + updated assertions, not a
-  bare grep-replace; (3) `config/taxonomy/controlm.yaml:38-40` sample folder names carry ids
-  `85025` / `94028` — OUTSIDE the reserved 70001-70099 block (line 37 was resweeped to 70002;
-  these were not) — realness unknown, exactly the case J15's allowlist will force a ruling on.
-  (`jpmorganchase.com` in `config/doc-source-registry.yaml` is FINE — public IR URLs on an
-  External-classified source.) → groom: fold (3) into J15's build; (2) needs a
-  sweep item or a J15 rider.
+  ~~(2) two test fixtures embedded two real support-DL names in sample CMD_LINEs~~
+  **RESOLVED 2026-07-27: synthetic `@example.com` DLs swapped in (repo precedent), assertions
+  unchanged by design (they test the split, not the values).** ~~(3) sample folder names
+  carried two ids outside the reserved 70001-70099 block~~ **RESOLVED 2026-07-27 via the J15
+  build: BOTH resweeped into the block (values now internal-side only — treated as real, same
+  range/family as the confirmed-real worked-example SEAL). Building the J15 guard forced 14
+  resweeps total, including values CONFIRMED real against the untracked production extract
+  (a %%SEAL value, a FID triplet + RFID, a verbatim job-name segment) and authored strays
+  (a lineage-fixture folder id, the PAT sample's out-of-block seal_ids). Full real↔synthetic
+  key table: `internal/standards/technology/folder-naming-convention.md` §J15 resweep
+  additions.** (`jpmorganchase.com` in `config/doc-source-registry.yaml` is FINE — public IR
+  URLs on an External-classified source.) RESIDUAL FOR SME (recorded ruling, flip if
+  disagreed): 6-digit Control-M surrogate folder TABLE KEYS (sample family + real-extract ids
+  cited in resolver-test comments) stay in the publishable tree, allowlisted in the J15 guard
+  — private-DB row keys, no SEAL/roster/credential semantics. String-vocabulary (flow/DB/
+  dataflow names, script paths in test fixtures) stays with the parked platform-vocabulary
+  [question] / J13.
 
 - 2026-07-26 — [doc] **Startup-refresh runbook owes three edits, HELD until the SME review
   closes** (found doing G29; the doc is mid-L5/L6 review — `docs/design/feedback/

@@ -40,7 +40,7 @@ def test_self_contained(page: str) -> None:
 
 
 def test_shows_folder_sections_and_jobs(page: str) -> None:
-    assert "PRARAG-HLDM-85025-PEX-TRUST-DLY" in page
+    assert "PRARAG-HLDM-70011-PEX-TRUST-DLY" in page
     assert "PEX_SPARK_REFINE" in page
 
 

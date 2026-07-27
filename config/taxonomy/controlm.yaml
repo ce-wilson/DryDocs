@@ -35,13 +35,13 @@ nodes:
   # status A = active, R = retired. jobs[] = contained ControlMJob keys (classification only).
   folders:
     - { id: 161014, name: PRARAG-HLDM-70002-PEX-RFND-DLY, server: P12, status: A, jobs: ["161014:5","161014:3"] }
-    - { id: 161015, name: PRARAG-HLDM-85025-PEX-TRUST-DLY, server: P12, status: A, jobs: ["161015:22","161015:23","161015:24","161015:25","161015:12"] }
-    - { id: 161016, name: PRARAG-HLDM-85025-PEX-TRUST-CYC, server: P14, status: A, jobs: ["161016:22","161016:21","161016:13"] }
-    - { id: 161020, name: PRARAG-HLDM-94028-PEX-PROV-DLY,  server: P32, status: A, jobs: [] }   # active, no jobs in sample
-    - { id: 160500, name: PRAUTG-AUTO-15001-AUT-RFND-DLY,  server: P12, status: A, jobs: ["160500:1","160500:2"] }
-    - { id: 160501, name: PRAUTG-AUTO-15002-AUT-TRUST-DLY, server: P12, status: A, jobs: [] }   # active, no jobs in sample
-    - { id: 162001, name: PRDATG-DAT-20001-AC-RECON-DLY,   server: P33, status: A, jobs: ["162001:1"] }
-    - { id: 161999, name: PRRPDG-RPD-19999-RISK-RETIRED,   server: P14, status: R, jobs: [] }   # retired (user_daily empty)
+    - { id: 161015, name: PRARAG-HLDM-70011-PEX-TRUST-DLY, server: P12, status: A, jobs: ["161015:22","161015:23","161015:24","161015:25","161015:12"] }
+    - { id: 161016, name: PRARAG-HLDM-70011-PEX-TRUST-CYC, server: P14, status: A, jobs: ["161016:22","161016:21","161016:13"] }
+    - { id: 161020, name: PRARAG-HLDM-70012-PEX-PROV-DLY,  server: P32, status: A, jobs: [] }   # active, no jobs in sample
+    - { id: 160500, name: PRAUTG-AUTO-70021-AUT-RFND-DLY,  server: P12, status: A, jobs: ["160500:1","160500:2"] }
+    - { id: 160501, name: PRAUTG-AUTO-70022-AUT-TRUST-DLY, server: P12, status: A, jobs: [] }   # active, no jobs in sample
+    - { id: 162001, name: PRDATG-DAT-70031-AC-RECON-DLY,   server: P33, status: A, jobs: ["162001:1"] }
+    - { id: 161999, name: PRRPDG-RPD-70041-RISK-RETIRED,   server: P14, status: R, jobs: [] }   # retired (user_daily empty)
 
   # ControlMJob — child of a folder. Key: (folder_id, job_id). app = application column.
   jobs:
@@ -104,7 +104,7 @@ open_questions:
       to restore the complete fixture (empty=0).
   - id: retired-folder
     note: >
-      Folder 161999 (PRRPDG-RPD-19999-RISK-RETIRED) is status=R / user_daily empty — kept as
+      Folder 161999 (PRRPDG-RPD-70041-RISK-RETIRED) is status=R / user_daily empty — kept as
       classified-but-inactive; the ontology pass should decide whether retired folders load.
   - id: folder-name-parse
     note: >

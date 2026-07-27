@@ -195,17 +195,17 @@ def test_filewatch_path_gets_watch_role_and_date_token() -> None:
 # --- fact / notification routing ----------------------------------------------
 
 def test_route_semantic_fact() -> None:
-    cv = classify_variable("%%SEAL", "34544")
-    facts, notes = route_fact(cv, "34544")
+    cv = classify_variable("%%SEAL", "70004")
+    facts, notes = route_fact(cv, "70004")
     assert notes == []
     assert facts[0].fact_type == "SEAL"
-    assert facts[0].fact_value == "34544"
+    assert facts[0].fact_value == "70004"
 
 
 def test_route_notification_splits_addresses() -> None:
     cv = classify_variable(
         "%%NOTIFY",
-        "CDW_L2_Production_Support@restricted.chase.com;Team_Data_Pirates@restricted.chase.com",
+        "APP_L2_Production_Support@example.com;Team_Night_Herons@example.com",
     )
     facts, notes = route_fact(cv, cv.raw_value)
     assert facts == []

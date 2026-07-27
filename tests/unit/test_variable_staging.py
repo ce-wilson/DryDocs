@@ -154,7 +154,7 @@ def test_bundle_routes_shell_to_invocation_and_file_ops() -> None:
 
 def test_bundle_routes_facts_and_notifications() -> None:
     jobs = collect_jobs([
-        _row("100", "2", "%%SEAL", "34544"),
+        _row("100", "2", "%%SEAL", "70004"),
         _row("100", "2", "%%NOTIFY", "a@x.com;b@x.com"),
     ])
     bundle = build_staging_bundle(jobs, "run-1")

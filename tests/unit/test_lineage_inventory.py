@@ -75,7 +75,7 @@ def test_field_mapping(graph: LineageGraph) -> None:
     assert job.node_target == "host-emr-01"  # node_id -> node_target (host-or-group; gate controlm-hosts-topology)
     assert job.run_as == "svc.hldm"       # owner -> run_as
     assert job.application == "ARA"
-    assert job.folder.startswith("PRARAG-HLDM-90001")
+    assert job.folder.startswith("PRARAG-HLDM-70014")
 
 
 def test_shared_script_collapses(graph: LineageGraph) -> None:

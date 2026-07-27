@@ -77,12 +77,12 @@ requires_sample = pytest.mark.skipif(
         ("%%PRECMD", "mkdir -p %%R_PATH/VPC_P_VMSTR_BAL_%%$ODATE/%%R_PATH/backup;",
          VariableKind.EMBEDDED_SHELL),
         # semantic facts
-        ("%%SEAL", "34544", VariableKind.SEMANTIC_FACT),
-        ("%%FID_D", "B022876", VariableKind.SEMANTIC_FACT),
-        ("%%RFID", "B019757", VariableKind.SEMANTIC_FACT),
+        ("%%SEAL", "70004", VariableKind.SEMANTIC_FACT),
+        ("%%FID_D", "B0004", VariableKind.SEMANTIC_FACT),
+        ("%%RFID", "B0007", VariableKind.SEMANTIC_FACT),
         ("%%DATAFLOW", "CMHA_HLSF_CAMPAIGN", VariableKind.SEMANTIC_FACT),
         ("%%NOTIFY",
-         "CDW_L2_Production_Support@restricted.chase.com;Team_Data_Pirates@restricted.chase.com",
+         "APP_L2_Production_Support@example.com;Team_Night_Herons@example.com",
          VariableKind.SEMANTIC_FACT),
         ("%%TGT_DB_NM", "ICDW_MB_PRSN_T", VariableKind.SEMANTIC_FACT),
         # malformed — a system-function expression where a NAME should be
@@ -162,16 +162,16 @@ def test_malformed_name_extracts_no_namespace() -> None:
 
 def test_fact_type_via_env_suffix_base() -> None:
     # FID_D maps through base name FID in the registry
-    assert classify_variable("%%FID_Q", "H024490").fact_type == "FID"
+    assert classify_variable("%%FID_Q", "H0005").fact_type == "FID"
 
 
 # --- job-level environment-triplet confirmation -------------------------------
 
 def test_env_triplet_confirmed() -> None:
     defs = [
-        ("%%FID_D", "B022876"),
-        ("%%FID_Q", "H024490"),
-        ("%%FID_P", "K024761"),
+        ("%%FID_D", "B0004"),
+        ("%%FID_Q", "H0005"),
+        ("%%FID_P", "K0006"),
         ("%%CLUST", "prod"),
     ]
     out = {cv.name: cv for cv in classify_job_variables(defs)}
@@ -200,16 +200,16 @@ def test_model_accepts_raw_extract_headers() -> None:
     row = ControlMVariableRow.model_validate(
         {
             "table_name": "185894",
-            "job_name": "PDCLD0003_24412_CMS_IDW_SCRA_REPORTING_CZ_AWS_TRUST",
+            "job_name": "PDCLD0003_70013_CMS_IDW_SCRA_REPORTING_CZ_AWS_TRUST",
             "job_id": "4",
             "appl_type": "OS",
             "name": "%%SEAL",
-            "value": "34544",
+            "value": "70004",
         }
     )
     assert row.folder_id == "185894"
     assert row.var_name == "%%SEAL"
-    assert row.var_value == "34544"
+    assert row.var_value == "70004"
     assert row.data_center is None
 
 
@@ -235,7 +235,7 @@ def test_sample_classifies_end_to_end() -> None:
     assert cov.by_kind["PLUGIN_NS"] > 0          # FileWatch-/UCM- rows exist
     assert cov.by_kind["EMBEDDED_SHELL"] > 0     # PRECMD/POSTCMD rows exist
     assert cov.by_kind["FLOW_REF"] > 0           # %%\FLOW\VAR rows exist
-    assert cov.fact_types["SEAL"] >= 1           # %%SEAL 34544 + UCM-SEALID
+    assert cov.fact_types["SEAL"] >= 1           # %%SEAL 70004 + UCM-SEALID
     assert cov.system_vars["ODATE"] > 0          # system variable, not function
     assert cov.system_funcs["CALCDATE"] > 0
     # system variables must NOT appear in the user-resolution hot set

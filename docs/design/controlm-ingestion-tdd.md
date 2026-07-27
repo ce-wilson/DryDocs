@@ -12,7 +12,7 @@ committed sample fixtures — no real SIDs/servers) ·
 Worked example throughout:
 
 ```bash
-poetry run drydocs ingest-controlm --use-oracle --folder 'PRARAG-HLDM-85025-PEX%'
+poetry run drydocs ingest-controlm --use-oracle --folder 'PRARAG-HLDM-70011-PEX%'
 ```
 
 > **What changed in Rev 5 (2026-07-23) — folder property diet (SME ruling).** The
@@ -312,8 +312,8 @@ Hierarchy `ControlMServer > ControlMFolder > ControlMJob`; `Condition` keyed `(f
 The `controlm-q1q3-phase1` gate (2026-07-07) added **`ControlMApplication`** as a folder
 grouping (Control-M `APPLICATION`, *not* the SEAL business app).
 
-Example folders in the sample: **161015** `PRARAG-HLDM-85025-PEX-TRUST-DLY` (P12) & **161016**
-`PRARAG-HLDM-85025-PEX-TRUST-CYC` (P14).
+Example folders in the sample: **161015** `PRARAG-HLDM-70011-PEX-TRUST-DLY` (P12) & **161016**
+`PRARAG-HLDM-70011-PEX-TRUST-CYC` (P14).
 
 ---
 
@@ -349,15 +349,15 @@ SOSA observation (`proposed`, gate not run).
 
 ---
 
-## 7. Worked example — `--folder 'PRARAG-HLDM-85025-PEX%'`
+## 7. Worked example — `--folder 'PRARAG-HLDM-70011-PEX%'`
 
 ### 7a. What the pattern matches
-`SCHED_TABLE LIKE 'PRARAG-HLDM-85025-PEX%'` is a **prefix** match → selects **both** 85025
+`SCHED_TABLE LIKE 'PRARAG-HLDM-70011-PEX%'` is a **prefix** match → selects **both** 70011
 folders: `161015` (…-DLY, P12) and `161016` (…-CYC, P14). It does **not** match `161014`
 (…-**70002**-…). Drop the `%` for a single exact folder.
 
 ### 7b. Folder-name parse (app_code join key; decode stays off the node)
-`folder_name.py` decodes `PRARAG-HLDM-85025-PEX-TRUST-DLY` from its first segment `PRARAG`:
+`folder_name.py` decodes `PRARAG-HLDM-70011-PEX-TRUST-DLY` from its first segment `PRARAG`:
 
 | Position | Char | Meaning |
 |---|---|---|
@@ -380,7 +380,7 @@ property). (This parsed `app_code = ARA` is a *third*, separate thing from the h
 ### 7c. The five SQL steps (one shared bind dict)
 
 ```python
-binds = {"folder_filter": "PRARAG-HLDM-85025-PEX%",
+binds = {"folder_filter": "PRARAG-HLDM-70011-PEX%",
          "run_as": None, "developer_sid": None, "row_cap": None}
 ```
 
@@ -420,7 +420,7 @@ run would MATCH-miss predecessors in folders not yet loaded).
 
 ### 7e. Execution path (code)
 ```
-cli.ingest_controlm(use_oracle=True, folder='PRARAG-HLDM-85025-PEX%', phase='nodes')
+cli.ingest_controlm(use_oracle=True, folder='PRARAG-HLDM-70011-PEX%', phase='nodes')
   → validate phase in (nodes | relationships | all)      # exit 2 on a bad value
   → _gate_source("controlm-psgmgr")                     # D3 confirmed-gate
   → scope = _scope_binds(folder, None, None, None)

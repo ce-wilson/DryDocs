@@ -28,7 +28,7 @@ def test_dev_environment() -> None:
 
 
 def test_auto_appcode() -> None:
-    p = parse_folder_name("PRAUTG-AUTO-15001-AUT-RFND-DLY")
+    p = parse_folder_name("PRAUTG-AUTO-70021-AUT-RFND-DLY")
     assert p.app_code == "AUT"
     assert p.lob == "Retail"
     assert p.folder_type == "Group Table/Smart folder"
