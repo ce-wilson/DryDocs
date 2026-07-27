@@ -26,6 +26,37 @@ Tags help grooming: `idea` · `bug` · `doc` · `source` (new data source) · `q
 
 <!-- add new ideas at the top -->
 
+- 2026-07-26 — [chore] **Three `:BusinessApplication` indexes are never used as predicates;
+  the one property that IS a predicate has none.** Spotted by the user while reading
+  `constraints.cypher` during the business-application-identity gate review. `businessapplication_risk`
+  (`risk_level`), `businessapplication_status` (`status`) and `businessapplication_name` (`name`)
+  — lines 37-39 — index properties that appear ONLY in loader `SET` clauses and `RETURN`
+  projections. Every bind on `:BusinessApplication` in the repo goes through `seal_id`, already
+  covered by the UNIQUE constraint's backing index (line 36); an index cannot help a projection,
+  because the node is bound before the property is read. `explorer.applications.v1` is an
+  unfiltered `MATCH (a:BusinessApplication) ... ORDER BY seal_id LIMIT $limit` label scan, which
+  a `name`/`status` index cannot accelerate either. `risk_level` is the starkest: not in a single
+  QuerySpec, zero hits in `web/src/`. THE INVERSION: `manual_loads.py:113` does
+  `OPTIONAL MATCH (n:BusinessApplication {manually_created: true})` — a real predicate, no index.
+  Not rescued by "we might query it later": at registry cardinality a label scan is
+  sub-millisecond, and a declared index READS AS A CLAIM that the property is queried, so it
+  mis-maps the access patterns for the next reader. Original intent is unrecoverable —
+  `git log -L` on those lines returns only `c5a84c3 Initial import` (the 2026-07-20 squash).
+  Proposed: drop all three, add `manually_created` if the predicate is worth covering.
+  Touches bootstrap schema, so it needs a re-run, not a drive-by edit. Same family as the
+  session through-line — declared, maintained on every write, never consulted.
+- 2026-07-26 — [bug] **Applying the schema meta-graph contaminates the Applications frame.**
+  Found alongside the index note above. `schema_graph.cypher:69` MERGEs
+  `(n:SchemaMeta:BusinessApplication {name: 'BusinessApplication'})` — an exemplar node carrying
+  the REAL label with no `seal_id`. `explorer.applications.v1` scans `MATCH (a:BusinessApplication)`
+  unfiltered, so the exemplar would surface in the console as an application with a null id.
+  The UNIQUE constraint on `seal_id` does not stop it — Neo4j uniqueness ignores nulls (the same
+  property behind the G30-family cutover hazard in the identity gate §C2). LATENT, not live:
+  the file is `Applied MANUALLY only — never part of drydocs bootstrap` and is removable with
+  `MATCH (n:SchemaMeta) DETACH DELETE n`. Fix is a one-line predicate on the affected specs
+  (`WHERE NOT a:SchemaMeta`, or require `seal_id IS NOT NULL`) rather than dropping the very
+  useful meta-graph. Check whether other `:SchemaMeta:<RealLabel>` exemplars hit other
+  unfiltered specs the same way — there are ~20 of them.
 - 2026-07-26 — [question] **drydocs-deepdoc's SCOPE has drifted between two ADRs and needs
   one ruling** (raised by the user in the docs-residency session; NOT covered by G32, which
   rules the databases, not deepdoc's job). ADR 0002 (accepted 06-26) defines deepdoc as
