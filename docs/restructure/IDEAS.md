@@ -49,6 +49,40 @@ Tags help grooming: `idea` · `bug` · `doc` · `source` (new data source) · `q
   label ruling) or an explicit port-prompt divergence-ledger entry. COORDINATE FIRST: a laptop
   session (unpushed as of 2026-07-27) is re-working BusinessApplication mapping — don't touch
   catalog/SEAL map entries until it lands.
+
+- 2026-07-27 — [p0/boundary] **`knowledge/standards/technology/` carries real SEALIDs, real
+  application names, and a real Oracle table/column — and it is `Internal-Public`, i.e.
+  publishable.** Found while sweeping the SEALID publish-boundary breach (the other 13 files
+  were sanitized in the same session; these two were deliberately left because sanitizing
+  them destroys their content). `description-field-metadata-plan.md` and
+  `folder-naming-convention.md` hold the app-code→SEAL registry (`PRSRV` → an app, `PRARA` →
+  an app), real application names, the SEAL-ID *format* disclosure (digit widths, older
+  short ids), and the escalation-table join (`psgmgr.cm_escalation_db`, column `ECOMPONENT`,
+  value stored with a `.00` suffix). **The real mappings ARE the knowledge** — replacing them
+  with synthetic values leaves a document that no longer says anything true, so this is a
+  RELOCATE-vs-SANITIZE decision, not a find-and-replace. Options: (a) move both to
+  `internal/` and leave a mechanism-only stub in `knowledge/`; (b) split each file —
+  mechanism (the naming grammar, the join shape) stays public, the registry table and real
+  values move to `internal/`; (c) reclassify `knowledge/standards/technology/` as `Internal`.
+  (b) is the shape the repo already uses elsewhere. **Also unresolved and adjacent:** the
+  sample corpus still carries real-looking internal platform vocabulary (`HLDM`, `PRARAG`,
+  `svc.hldm`, `/opt/scripts/hldm/`, `host-hldm-01`, datacenter codes) — a different class
+  from SEALIDs, not ruled on, and deliberately left untouched by the 2026-07-27 sweep.
+  → needs a backlog item; blocks any public push.
+
+- 2026-07-27 — [lesson] **The 2026-07-27 SEALID sweep and the earlier one (9d59f53) failed the
+  same way: they searched for the FIELD, not the VALUE.** `9d59f53` deleted a sample CSV for
+  "real seal_ids" and concluded "samples now synthetic-only" — but real SEALIDs survived for
+  months *embedded inside Control-M folder-name strings* (`PRARAG-HLDM-<sealid>-…`), where no
+  grep for `seal_id` could see them. Same failure class as the session through-line
+  *"succeeds loudly, does nothing"* (G29 / G30 / Q8 / the `CREATE CONSTRAINT … IF NOT EXISTS`
+  name-match trap). **Proposal: a boundary guard test** that greps the publishable tree for
+  the shapes real ids take — bare 5-6 digit ids in taxonomy/sample files, and the numeric
+  segment of a parsed folder name — and fails if one is outside the reserved synthetic block
+  (`70001-70099`). A convention that has now been violated twice needs an enforcement point,
+  which is the same conclusion as the gate's own §F2 (a controlled vocabulary without an
+  enforcement point rots).
+
 - 2026-07-26 — [chore] **Three `:BusinessApplication` indexes are never used as predicates;
   the one property that IS a predicate has none.** Spotted by the user while reading
   `constraints.cypher` during the business-application-identity gate review. `businessapplication_risk`
@@ -371,7 +405,7 @@ Tags help grooming: `idea` · `bug` · `doc` · `source` (new data source) · `q
   CONTAINS_FOLDER already ties to folders, so folder edges derive from the app-code row).
   Two tiers:
   **Tier 1 — seal-born app code (1:1):** the code was created FOR a SEAL → direct
-  app-code→SEAL mapping. Declared examples: ARA=111027 (CMH Advice R&A), SRV=110865
+  app-code→SEAL mapping. Declared examples: ARA=70002 (CMH Advice R&A), SRV=70003
   (HL Servicing R&A). Easy to define; enumerate these first.
   **Tier 2 — platform app code (1:many):** the code is a shared platform, mapping to
   MANY AreaProducts, not one SEAL — e.g. DPL= ?? (enumeration OPEN, SME to supply).

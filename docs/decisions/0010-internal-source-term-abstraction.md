@@ -99,9 +99,9 @@ never as a scalar named after the registry.**
 
 ```cypher
 (:BusinessApplication {
-   app_id:       "82507",                                  // the value; neutral name
+   app_id:       "70001",                                  // the value; neutral name
    id_authority: "SEAL",                                   // WHICH registry issued it
-   app_urn:      "urn:dd:businessapplication:seal:82507"   // optional canonical form
+   app_urn:      "urn:dd:businessapplication:seal:70001"   // optional canonical form
 })
 ```
 

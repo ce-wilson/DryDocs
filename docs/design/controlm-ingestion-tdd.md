@@ -354,7 +354,7 @@ SOSA observation (`proposed`, gate not run).
 ### 7a. What the pattern matches
 `SCHED_TABLE LIKE 'PRARAG-HLDM-85025-PEX%'` is a **prefix** match → selects **both** 85025
 folders: `161015` (…-DLY, P12) and `161016` (…-CYC, P14). It does **not** match `161014`
-(…-**111027**-…). Drop the `%` for a single exact folder.
+(…-**70002**-…). Drop the `%` for a single exact folder.
 
 ### 7b. Folder-name parse (app_code join key; decode stays off the node)
 `folder_name.py` decodes `PRARAG-HLDM-85025-PEX-TRUST-DLY` from its first segment `PRARAG`:

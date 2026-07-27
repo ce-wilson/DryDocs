@@ -34,7 +34,7 @@ nodes:
   # ControlMFolder — child of a server. Key: folder_id. name = sched_table.
   # status A = active, R = retired. jobs[] = contained ControlMJob keys (classification only).
   folders:
-    - { id: 161014, name: PRARAG-HLDM-111027-PEX-RFND-DLY, server: P12, status: A, jobs: ["161014:5","161014:3"] }
+    - { id: 161014, name: PRARAG-HLDM-70002-PEX-RFND-DLY, server: P12, status: A, jobs: ["161014:5","161014:3"] }
     - { id: 161015, name: PRARAG-HLDM-85025-PEX-TRUST-DLY, server: P12, status: A, jobs: ["161015:22","161015:23","161015:24","161015:25","161015:12"] }
     - { id: 161016, name: PRARAG-HLDM-85025-PEX-TRUST-CYC, server: P14, status: A, jobs: ["161016:22","161016:21","161016:13"] }
     - { id: 161020, name: PRARAG-HLDM-94028-PEX-PROV-DLY,  server: P32, status: A, jobs: [] }   # active, no jobs in sample

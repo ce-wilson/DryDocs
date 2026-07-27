@@ -51,7 +51,7 @@ for fname, Model, expected_min in checks:
     print(f"  {fname}: {len(rows)} rows OK")
 
 from drydocs_core.controlm.folder_name import parse_folder_name
-p = parse_folder_name("PRARAG-HLDM-111027-PEX-RFND-DLY")
+p = parse_folder_name("PRARAG-HLDM-70002-PEX-RFND-DLY")
 assert p.prefix_recognized
 assert p.environment == "Production"
 print(f"  folder_name parser: environment={p.environment} lob={p.lob} OK")

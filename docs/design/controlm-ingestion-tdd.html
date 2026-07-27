@@ -202,7 +202,7 @@ h1, h2, h3, h4, h5, h6, p, table, pre, ul, ol, blockquote { position: relative; 
 <hr>
 <h2>7. Worked example — <code>--folder &#x27;PRARAG-HLDM-85025-PEX%&#x27;</code></h2>
 <h3>7a. What the pattern matches</h3>
-<p><code>SCHED_TABLE LIKE &#x27;PRARAG-HLDM-85025-PEX%&#x27;</code> is a <strong>prefix</strong> match → selects <strong>both</strong> 85025 folders: <code>161015</code> (…-DLY, P12) and <code>161016</code> (…-CYC, P14). It does <strong>not</strong> match <code>161014</code> (…-<strong>111027</strong>-…). Drop the <code>%</code> for a single exact folder.</p>
+<p><code>SCHED_TABLE LIKE &#x27;PRARAG-HLDM-85025-PEX%&#x27;</code> is a <strong>prefix</strong> match → selects <strong>both</strong> 85025 folders: <code>161015</code> (…-DLY, P12) and <code>161016</code> (…-CYC, P14). It does <strong>not</strong> match <code>161014</code> (…-<strong>70002</strong>-…). Drop the <code>%</code> for a single exact folder.</p>
 <h3>7b. Folder-name parse (app_code join key; decode stays off the node)</h3>
 <p><code>folder_name.py</code> decodes <code>PRARAG-HLDM-85025-PEX-TRUST-DLY</code> from its first segment <code>PRARAG</code>:</p>
 <table><thead><tr><th>Position</th><th>Char</th><th>Meaning</th></tr></thead><tbody><tr><td>1</td><td><code>P</code></td><td>environment = <strong>Production</strong></td></tr><tr><td>2</td><td><code>R</code></td><td>LOB = <strong>Retail</strong></td></tr><tr><td>3–5</td><td><code>ARA</code></td><td>app_code = <strong>ARA</strong></td></tr><tr><td>6</td><td><code>G</code></td><td>folder_type = <strong>Group Table / Smart folder</strong></td></tr></tbody></table>

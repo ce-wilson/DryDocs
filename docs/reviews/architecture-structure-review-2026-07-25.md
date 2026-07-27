@@ -233,9 +233,9 @@ carry identity as a **qualified reference**, not a vendor-named scalar —
 
 ```
 (:BusinessApplication {
-   app_id: "82507",            # the value, neutral name
+   app_id: "70001",            # the value, neutral name
    id_authority: "SEAL",       # WHICH registry issued it  ← survives the rename
-   app_urn: "urn:dd:businessapplication:seal:82507"   # optional canonical form
+   app_urn: "urn:dd:businessapplication:seal:70001"   # optional canonical form
 })
 ```
 

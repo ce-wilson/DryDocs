@@ -5,9 +5,9 @@ from drydocs_core.controlm import parse_folder_name
 
 
 def test_real_folder_name_from_recursive_sample() -> None:
-    """PRARAG-HLDM-111027-PEX-RFND-DLY:
+    """PRARAG-HLDM-70002-PEX-RFND-DLY:
        P=Prod, R=Retail, ARA=appcode, G=Smart folder, then domain segments."""
-    p = parse_folder_name("PRARAG-HLDM-111027-PEX-RFND-DLY")
+    p = parse_folder_name("PRARAG-HLDM-70002-PEX-RFND-DLY")
     assert p.prefix_recognized is True
     assert p.prefix == "PRARAG"
     assert p.environment_code == "P"
@@ -17,11 +17,11 @@ def test_real_folder_name_from_recursive_sample() -> None:
     assert p.app_code == "ARA"
     assert p.folder_type_code == "G"
     assert p.folder_type == "Group Table/Smart folder"
-    assert p.segments == ("HLDM", "111027", "PEX", "RFND", "DLY")
+    assert p.segments == ("HLDM", "70002", "PEX", "RFND", "DLY")
 
 
 def test_dev_environment() -> None:
-    p = parse_folder_name("DRARAG-HLDM-111027-DEV")
+    p = parse_folder_name("DRARAG-HLDM-70002-DEV")
     assert p.environment == "Development"
     assert p.environment_code == "D"
     assert p.app_code == "ARA"

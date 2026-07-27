@@ -47,8 +47,29 @@
 # New B1(c) + B5 propose writing that ledger; B6 records the honest limit (the ledger is
 # declarative + guard-reconciled today, NOT a runtime mapping the loaders read).
 #
-# Mechanism-only. The one id shown (82507) is the SYNTHETIC sample value already
-# committed in config/taxonomy/business-application.yaml — not a real SEALID.
+# CORRECTED v3.1 2026-07-27 — three defects found by walking the page with the SME, fixed
+# BEFORE §H can sign. None changes the proposal; all three were the page misdescribing the
+# repo, which is exactly the failure a gate exists to catch:
+#   (1) §D2 counted THREE attribution_id sites; there are FOUR. seal_contacts.cypher:53 was
+#       missing, and it is the only one where the role segment is DATA (row.role_name) not a
+#       literal — the site any re-shaping would break first.
+#   (2) §D2 option (b) offered "re-form it from id_authority" — a property §B0 WITHDREW in
+#       v2. The page was offering a choice built on something it had already deleted.
+#   (3) §F1 said the registry name survives in "exactly four places"; CONSTRAINT NAMES are a
+#       fifth (constraints.cypher:36 `businessapplication_seal`) — neither config nor a
+#       filename, and the most operator-visible of the five.
+# Sections corrected in place with the superseded text kept visible, per this file's rule
+# that the reasoning IS the audit trail.
+#
+# Mechanism-only. The one id shown (70001) is a synthetic sample value from the
+# reserved 70001-70099 block committed in config/taxonomy/business-application.yaml.
+#
+# NOTE 2026-07-27: this line previously cited a different id and asserted it was
+# synthetic. It was not — that file's three sample rows carried REAL SEALIDs and REAL
+# application names under a header claiming they were synthetic, and this page
+# repeated the claim. Sanitized as a p0 publish-boundary fix before §H could sign;
+# §B4 cites that file as the single record of authority, so signing on top of the
+# mislabel would have propagated it further.
 classification: Internal-Public
 schema: drydocs.gate-prompt.v1
 id: business-application-identity
@@ -169,7 +190,7 @@ sections:
   - title: "D. Dependent keys — what else carries the registry name"
     confirmations:
       - "D1 [pick one]: :Port NODE KEY (parent_seal_id, kind) — (a) follows to parent_app_id in the same change [consistent; but a NODE KEY cannot be added additively, so this needs create-then-drop and is the one genuinely awkward step], (b) follows in a later phase [AGENT RECOMMENDATION — it is an internal FK with no API or console exposure, so it carries none of the timing pressure that argues for §B; splitting it keeps the risky constraint work out of the phase that has to land before the console], (c) stays as-is permanently [then the neutral-name rule has a visible exception on a canonical child node]."
-      - "D2: attribution_id embeds the authority in a STRING key — app_id + '|SEAL|' + role + '|' + sid (seal_applications.cypher:124,147,170). Rule: (a) leave it — it is an opaque composite, not a queried property; or (b) re-form it from id_authority so the literal disappears. AGENT RECOMMENDATION: (a), and record WHY, so the next reviewer does not read it as an oversight."
+      - "D2 [CORRECTED 2026-07-27 — the site count and option (b) were both wrong in v3]: attribution_id embeds the authority in a STRING key — app_id + '|SEAL|' + role + '|' + sid. FOUR sites, not three: seal_applications.cypher:124,147,170 (role is a LITERAL — application_owner / cto / primary_information_owner) and seal_contacts.cypher:53 (role is DATA — row.role_name). The fourth is the one that matters: it is the only site where the role segment comes from the source, so any re-shaping of the key has to hold for values nobody has enumerated. Rule: (a) leave it — it is an opaque composite, not a queried property; or (b) drop the '|SEAL|' segment, leaving a 3-part app_id|role|sid key. AGENT RECOMMENDATION: (a), and record WHY, so the next reviewer does not read it as an oversight. NOTE the 4-part shape may not be NARROWED past that: drop the sid and two L1 Operate Managers on one app collide; drop the role and one person holding three accountable roles collides. Both are the normal case, not the edge case. [VOID: v3's option (b) read 're-form it from id_authority so the literal disappears' — id_authority is the property B0 WITHDREW, so the page was offering a choice built on something it had already deleted. Replaced above with the alternative that can actually be built.]"
   - title: "E. External surface contract — the part that is free today"
     confirmations:
       - "E1: drydocs_api and web/ expose the NEUTRAL PAIR ONLY — no seal_id in a route, a QuerySpec, a column header, or a demo fixture. web/src/data/mappingsDemo.ts loses app_seal_id; match_method: 'seal_var' is reworded. This is the rule that costs nothing today and is unaffordable once routes and fixtures depend on it."
@@ -177,7 +198,7 @@ sections:
       - "E3: 22 seal_id references live in drydocs_api/query_specs.py and 14 in drydocs_api/mappings.py — the API is already the second-largest holder after the attribution loader. E1 is therefore a real diff, not a formality."
   - title: "F. Where the registry name still lives (RESHAPED v2)"
     confirmations:
-      - "F1 [replaces the withdrawn id_authority vocabulary; extended v3]: after this gate the string 'SEAL'/'SEALID' survives in the repo in exactly FOUR legitimate places — (1) config/taxonomy/business-application.yaml (source_of_record + identifier, the single record of authority), (2) config/source-registry.yaml (the seal-extract source entry), (3) config/source-mappings/seal-extract.yaml (the field-name ledger, if B1(c) signs — the SEALID column declaring `target: BusinessApplication.app_id`), and (4) module/file names (seal_applications.py and kin, whose rename is phase 3+ and lowest value per §G2). Confirm that list is complete and intended; anything ELSE naming the registry after this gate is drift, and all four are CONFIG or filenames — none is graph data."
+      - "F1 [replaces the withdrawn id_authority vocabulary; extended v3; CORRECTED 2026-07-27 — the list was one short]: after this gate the string 'SEAL'/'SEALID' survives in the repo in exactly FIVE legitimate places — (1) config/taxonomy/business-application.yaml (source_of_record + identifier, the single record of authority), (2) config/source-registry.yaml (the seal-extract source entry), (3) config/source-mappings/seal-extract.yaml (the field-name ledger, if B1(c) signs — the SEALID column declaring `target: BusinessApplication.app_id`), (4) module/file names (seal_applications.py and kin, whose rename is phase 3+ and lowest value per §G2), and (5) CONSTRAINT NAMES — constraints.cypher:36 is named `businessapplication_seal`, which is neither config nor a filename and so fell through v3's four-way split. It is the most OPERATOR-VISIBLE survivor of the five: it prints in `SHOW CONSTRAINTS` and in the text of every uniqueness-violation error, so an operator who never opens the repo still reads the registry name. Confirm whether constraint names follow app_id or are scoped out; either is defensible, but v3 did not ask. Confirm the list is complete and intended; anything ELSE naming the registry after this gate is drift, and all five are CONFIG, filenames or schema-object names — none is graph data."
       - "F2: the durable home for what 'SEAL' MEANS is a CatalogBusinessTerm-shaped glossary (docs/patterns/data-catalog/enterprise-data-catalog-ontology.md) — the same conclusion the reopened gate-log Q6 acronym question is circling, and the Unity Catalog note's takeaway 2 (a controlled vocabulary needs an enforcement point or it rots). Recorded as DIRECTION only; the glossary is not built, is not gated, and this gate does NOT depend on it. B0 makes it LESS urgent, not more — with one permanent authority there is no id space to disambiguate, only a term to define."
   - title: "G. Migration, sequencing, and what is NOT decided"
     confirmations:

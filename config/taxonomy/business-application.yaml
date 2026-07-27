@@ -9,9 +9,21 @@
 # PURE CLASSIFICATION ONLY: BusinessApplication ▸ Port; Membership ▸ Role ▸ Employee.
 # No meaning edges (ownership/attribution semantics) — those are ontology (C2).
 #
-# Built from the SYNTHETIC sample (publishable shape). The SOURCE (seal-extract) is
+# Built from a SYNTHETIC sample (publishable shape). The SOURCE (seal-extract) is
 # Internal-Confidential: in production, real names/emails/SIDs are NOT written here —
 # referenced by SID/SEALID; real rosters live in internal/. Captured 2026-06-20.
+#
+# SANITIZED 2026-07-27 (p0 publish-boundary fix). Until this date the three sample
+# rows below carried REAL SEALIDs and REAL application names while the header claimed
+# they were synthetic — verified against the SEAL portal by the SME. They have been
+# replaced with values from the RESERVED SYNTHETIC BLOCK 70001-70099, which SEAL does
+# not issue. The same real ids were embedded inside Control-M folder-name strings
+# (e.g. the numeric segment of PRARAG-HLDM-<sealid>-...), which is why the earlier
+# sample cleanup (9d59f53, "samples now synthetic-only") missed them: it searched for
+# the seal_id COLUMN, not for the value inside a composite string.
+#
+# RULE for anything added here: ids come from 70001-70099 and names are invented.
+# If you need a real id/name to make a point, the file belongs in internal/.
 # =============================================================================
 
 taxonomy: business-application
@@ -36,25 +48,25 @@ nodes:
   # and is written only by the batch_port_orchestrator loader via the platforms.yaml
   # seed-row crosswalk (software_registry_ref). Absent field = no declaration (skipped).
   business_applications:
-    - sealid: 82507
-      name: Database Scanning Tools
-      short_name: db scanning
+    - sealid: 70001
+      name: Schema Inspection Toolkit
+      short_name: schema-inspect
       state: Operate
       lob: CCB
       info_classification: Internal
       ports: [EventProcessing, BatchProcessing]
       batch_orchestrator: ControlM
-    - sealid: 111027
-      name: Chase MyHome Advice Reporting & Analytics
-      short_name: CMH-ADV-R&A
+    - sealid: 70002
+      name: Retail Advice Reporting & Analytics
+      short_name: RET-ADV-R&A
       state: Operate
       lob: CCB
       info_classification: Highly Confidential
       ports: [EventProcessing, BatchProcessing]
       batch_orchestrator: ControlM
-    - sealid: 110865
-      name: Home Loan Servicing Reporting & Analytics
-      short_name: HL-SERV-R&A
+    - sealid: 70003
+      name: Consumer Servicing Reporting & Analytics
+      short_name: CONS-SERV-R&A
       state: Operate
       lob: CCB
       info_classification: Highly Confidential
@@ -69,14 +81,14 @@ nodes:
   # Membership ▸ Role ▸ Employee (n-ary). Keyed (sealid, role, sid). Employees referenced by
   # SID only — real names/emails are confidential (synthetic in the sample) -> internal/.
   memberships:
-    - sealid: 82507
+    - sealid: 70001
       roles:
         - { role: Backup Information Owner, sid: K123456 }
         - { role: Design Authority, sid: K234567 }
         - { role: Chief Business Technologist, sid: K345678 }
         - { role: L2 Operate Manager, sid: K456789 }
         - { role: Risk Manager, sid: K567890 }
-    - sealid: 111027
+    - sealid: 70002
       roles:
         - { role: Backup Information Owner, sid: L123456 }
         - { role: Design Authority, sid: L234567 }
@@ -84,7 +96,7 @@ nodes:
         - { role: L1 Operate Manager, sid: L456789 }
         - { role: L2 Operate Manager, sid: L567890 }
         - { role: Risk Manager, sid: L678901 }
-    - sealid: 110865
+    - sealid: 70003
       roles:
         - { role: Backup Information Owner, sid: M123456 }
         - { role: Design Authority, sid: M234567 }

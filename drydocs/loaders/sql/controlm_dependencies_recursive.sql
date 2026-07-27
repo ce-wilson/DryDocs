@@ -29,7 +29,7 @@
 -- only — the predecessor side is ALWAYS unscoped, so rows can reference
 -- jobs in OTHER folders):
 --   :folder_filter  successor folder-name LIKE pattern (e.g.
---                   'PRARAG-HLDM-111027-PEX-RFND-DLY' or 'CCB_AUTO_%')
+--                   'PRARAG-HLDM-70002-PEX-RFND-DLY' or 'CCB_AUTO_%')
 --   :run_as         successor job tenant FID (service) user — OWNER, exact
 --   :developer_sid  successor authoring developer SID — AUTHOR /
 --                   CREATION_USER / CHANGE_USERID (lowercase-initial;

@@ -12,12 +12,12 @@ folder-type signature in positions:
     Positions 3-5  appcode (3-char)   e.g. ARA, DAT, SRV
     Position 6     folder type        G=Smart folder,D=Daily, M=Monthly, etc.
 
-Example:  ``PRARAG-HLDM-111027-PEX-RFND-DLY``
+Example:  ``PRARAG-HLDM-70002-PEX-RFND-DLY``
     P    -> Production
     R    -> Retail
     ARA  -> appcode
     G    -> Smart folder
-    HLDM, 111027, PEX, RFND, DLY  -> Folder domain segments
+    HLDM, 70002, PEX, RFND, DLY  -> Folder domain segments
 
 Some teams use the ``APPLICATION`` column on ``CM_DEF_VJOB`` to carry a
 3-char appcode, others use it for a Platform name. **It does NOT
