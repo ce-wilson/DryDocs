@@ -15,7 +15,7 @@
 # =============================================================================
 
 schema: drydocs.taxonomy-ontology-map.v1
-updated: 2026-07-22                        # +app-code-defined-mapping, +dl-contact-point (both proposed — attribution close-out + email-DL gates); prior: C12/C13 requires-scheduler rejected (platforms-taxonomy gate)
+updated: 2026-07-27                        # +business-application-identity (S3 gate SIGNED OFF — property binding, no edge); prior 2026-07-22: +app-code-defined-mapping, +dl-contact-point (both proposed — attribution close-out + email-DL gates); prior: C12/C13 requires-scheduler rejected (platforms-taxonomy gate)
 
 mappings:
 
@@ -1005,9 +1005,62 @@ mappings:
       - "Membership + email-observed usage = layer-4 context only (SOSA experimental family or store metadata), never ontology-core — gate section E; inherits sosa adoption: experimental."
       - "Local-db posture: synthetic fixture DLs only in neo4jtest; real rows company-side, Internal-Confidential (escalation-db rows Internal)."
 
+
+  # ---- BusinessApplication identity property contract (CONFIRMED 2026-07-27 — gate business-application-identity) ----
+  # NOT an edge mapping: a PROPERTY BINDING on the canonical :BusinessApplication node
+  # (property-supplement shape — job-runtime-stats-supplement precedent, 2026-07-14).
+  # No relationship_vocabulary.yaml term is created or changed; no edge is touched.
+  # The gate ruled the NAME the canonical node's identity value is written under, and
+  # the cutover discipline the eight key-bearing loader sites share.
+
+  - id: business-application-identity
+    taxonomy:
+      source: seal-extract
+      element: "SEAL application row supplies the business application's identity value. The SOURCE calls the field `Application ID` (SME-confirmed 2026-07-27 from the Reports export header — NOT 'SEALID', which was repo vernacular and appears nowhere in code, SQL or Cypher). The row model field was already neutral: SealApplicationRow.app_id."
+    ontology:
+      from_node: BusinessApplication            # prov:Entity — the property lands here
+      to_node: ~                                # no target node — property binding, not an edge
+      prov_type_from: Entity
+      prov_type_to: "n/a (no edge)"
+      matrix_row: "no matrix row — node-property binding (property-supplement pattern)"
+      neo4j_label: ~
+      property_targets:
+        - "BusinessApplication.app_id (the canonical identity key — replaces seal_id as the MERGE key across 8 sites; seal_id retained as a deprecated alias through phase 3, its retirement is a SEPARATE later gate per §G3)"
+        - "Port.parent_app_id (the NODE KEY follows in the same change — §D1(a); constraints.cypher:44 port_unique must be DROPped or renamed first, because CREATE CONSTRAINT ... IF NOT EXISTS matches on the NAME and would otherwise succeed while doing nothing)"
+      prov_maps_to: ~
+      not_written:
+        - "id_authority — WITHDRAWN v2. §B0 ruled a second issuing authority will not happen, so it would be a constant column on every node. The authority is recorded ONCE in config/taxonomy/business-application.yaml (source_of_record: SEAL)."
+        - "app_urn — DEFERRED with a named trigger (§B3): the phase where a second authority actually appears. §B0 confirms that trigger will not fire; the URN form stays documented in docs/patterns/data-catalog/enterprise-data-catalog-ontology.md."
+    precedence_authority: lob-product-team
+    vocab_id: ~                             # deliberately none — property binding, no edge terms
+    vocab_id_reason: "node-property binding, not an edge — no relationship_vocabulary.yaml term exists or is needed. §A1 explicitly scopes edge work out, and §E1/§B2(ii) scope out the SEAL match-tier vocabulary, which belongs to the signed seal-attribution-match-policy gate (2026-07-14)."
+    capture: config/taxonomy/business-application.yaml
+    capture_note: >
+      The taxonomy file already classified the concept (concept: BusinessApplication,
+      source_of_record: SEAL, classification_only: true), so no new capture was needed —
+      but its `identifier:` field was CORRECTED at this sign-off: it recorded SEALID, a
+      name the source does not use. The source calls the field `Application ID` (§B4/§B5).
+    naming_rule: >
+      TWO-PART, ruled at §B2 (the session's load-bearing correction). (i) IDENTITY —
+      canonical nodes take neutral property names; registry-named properties are permitted
+      only on source-labeled nodes (ADR 0003 rule 1). (ii) EVIDENCE — provenance and match
+      vocabulary KEEPS the source's own term, because it records what another system
+      literally wrote. ATTRIBUTION_TIERS 'SEAL' and match_method 'seal' therefore STAY:
+      SEAL's portal calls the field `Application ID`, but Control-M CMDLINEs and internal
+      documentation refer to it as SEAL / SEAL_ID, so the tier name is fidelity to the
+      source, not drift. Renaming it would make the graph misdescribe its own evidence.
+    status: confirmed
+    confirmed_by: chad.wilson
+    confirmed_on: 2026-07-27                # gate SIGNED OFF, 22/22 confirmations, 0 edits, 0 rejections
+    gate_spec: config/gate-prompts/business-application-identity.yaml
+    reopenable_by: >
+      seal-app-ref-edge-reshape v2 — but ONLY §C1 (the 8-site inventory, which goes stale if
+      the reshape re-targets seal_attribution) and §D2 (whose "leave it" is judged against
+      today's attribution grain). §A4 carve-out: every other item ruled here is SEALED.
+
 # Counts the gate reports to the SME each run.
 summary:
   applied: 8          # +application-as-dataproduct, +seal-tom-attribution (K4, 2026-07-15); prior 6 = job-contains, application-contains-folder, doc-describes-product, doc-chunk-part-of, doc-first-chunk, doc-next-chunk
-  confirmed: 22       # +doc-traceability-feedback (L7 gate signed off 2026-07-20, 21/21 confirmations; supplement landed same day, loader load-doc-traceability follows); +product-cabinet-attribution (K5 gate signed off 2026-07-20; applied waits on the K6 supplement + a person-level cabinet extract)
+  confirmed: 23       # +business-application-identity (S3 gate signed off 2026-07-27, 22/22 confirmations, 0 edits — property binding, no edge; implementation follows at backlog S3); +doc-traceability-feedback (L7 gate signed off 2026-07-20, 21/21 confirmations; supplement landed same day, loader load-doc-traceability follows); +product-cabinet-attribution (K5 gate signed off 2026-07-20; applied waits on the K6 supplement + a person-level cabinet extract)
   proposed: 4         # oracle-schema-asset, jobrun-observation, +app-code-defined-mapping, +dl-contact-point (both 2026-07-22 — the attribution close-out + email-DL gates)
   rejected: 1         # requires-scheduler (C12 platforms-taxonomy gate 2026-07-21 — SUPERSEDED by reg_uses_software {source: 'batch-port'}, not repudiated)

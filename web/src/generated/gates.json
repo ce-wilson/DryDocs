@@ -69,7 +69,8 @@
       ],
       "log_ref": "config/gate-log.md:93",
       "unblocks": [
-        "K3"
+        "K3",
+        "G35"
       ]
     },
     {
@@ -112,7 +113,9 @@
       "log_ref": "config/gate-log.md:195",
       "unblocks": [
         "K2",
-        "K3"
+        "K3",
+        "S3",
+        "G35"
       ]
     },
     {
@@ -182,7 +185,8 @@
       ],
       "log_ref": "config/gate-log.md:329",
       "unblocks": [
-        "K2"
+        "K2",
+        "S3"
       ]
     },
     {
@@ -322,23 +326,30 @@
       ]
     },
     {
+      "kind": "log-entry",
+      "date": "2026-07-27",
+      "title": "BusinessApplication identity: `seal_id` → `app_id` on the canonical node (business-application-identity) — SIGNED OFF (S3)",
+      "status": "signed-off",
+      "prompt_files": [
+        "config/gate-prompts/business-application-identity.yaml",
+        "config/gate-prompts/seal-app-ref-edge-reshape.yaml",
+        "config/gate-prompts/seal-attribution-match-policy.yaml"
+      ],
+      "log_ref": "config/gate-log.md:828",
+      "unblocks": [
+        "K2",
+        "S3",
+        "G34",
+        "G35"
+      ]
+    },
+    {
       "kind": "prompt-only",
       "date": null,
       "title": "bmc-docs-example (gate page rendered — session not yet run)",
       "status": "open",
       "prompt_files": [
         "config/gate-prompts/bmc-docs-example.yaml"
-      ],
-      "log_ref": null,
-      "unblocks": []
-    },
-    {
-      "kind": "prompt-only",
-      "date": null,
-      "title": "business-application-identity (gate page rendered — session not yet run)",
-      "status": "open",
-      "prompt_files": [
-        "config/gate-prompts/business-application-identity.yaml"
       ],
       "log_ref": null,
       "unblocks": []

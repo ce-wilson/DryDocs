@@ -824,3 +824,123 @@ SME-supplied PAT screenshots held OUT of the repo — Internal-Confidential).
 - **Effect:** loader + cypher + tests edited this commit; TDD Rev 5 follows. The tier-2
   platform-code enumeration stays parked in IDEAS (SME to supply). Staging DDL
   `fn_lob_code` (analysis staging, not graph) untouched.
+
+## 2026-07-27 — BusinessApplication identity: `seal_id` → `app_id` on the canonical node (business-application-identity) — SIGNED OFF (S3)
+
+- **Scope:** the identity PROPERTY CONTRACT of the canonical `:BusinessApplication` node —
+  and the MERGE-key cutover eight loader sites share. Raised by ADR 0010 (pre-UI structure
+  review §4.2 F2), groomed as backlog **S3**. Guided in-chat session (chad.wilson) across
+  2026-07-25/26/27; spec revised v1→v3.3 during the walk. **No edge, no vocabulary term** —
+  a node-property binding, property-supplement shape (`to_node: ~`, `vocab_id: ~`),
+  precedent `job-runtime-stats-supplement` (2026-07-14).
+- **Confirmed: 22 · Edited: 0 · Rejected: 0** (A1–A4, B0–B6, C1–C4, D1–D2, E1–E3, F1–F2, G1–G4)
+
+- **B0 (premise) → B1(c) (the ruling):** SEAL remains the single issuing registry, so v1's
+  `id_authority` stays WITHDRAWN and `app_urn` stays DEFERRED with its named trigger (B3).
+  The canonical node takes **`app_id`**, plus a declared source-field ledger in
+  `config/source-mappings/seal-extract.yaml` — the mechanism `controlm-psgmgr.yaml` already
+  uses, guarded by `test_source_mapping_drift.py`. B6 records the honest limit: that ledger
+  is DECLARATIVE and guard-reconciled, **not** a runtime mapping — loaders still hardcode,
+  and making it load-bearing is a real build, scoped out.
+
+- **B2 — THE RULE IS TWO-PART** (SME correction, the session's most consequential ruling):
+  *(i) IDENTITY* — canonical nodes take neutral property names (ADR 0003 rule 1).
+  *(ii) EVIDENCE* — provenance/match vocabulary KEEPS the source's own term.
+  Why: SEAL's portal calls the field `Application ID`, but the wider ecosystem (Control-M
+  CMDLINEs, internal docs) says SEAL / SEAL_ID. So `ATTRIBUTION_TIERS 'SEAL'` and
+  `match_method: 'seal'` record **what another system literally wrote** — renaming them
+  would make the graph misdescribe its own source, not tidy it.
+
+- **B4/B5 — `SEALID` was never a source field name.** It appears nowhere in code, SQL or
+  Cypher, only in prose; the row model was already `app_id`. The SME confirmed seal-extract
+  reads the SEAL Reports export, whose header is `Application ID`. So `seal_id` was a
+  DryDocs-era coinage over a value that was already neutral everywhere else, and
+  `config/taxonomy/business-application.yaml`'s `identifier: SEALID` recorded a name the
+  source does not use — **corrected at this sign-off**.
+
+- **C1–C4 — the cutover.** Corrected inventory: **8 key-bearing sites**, not 7 — 4 MERGE
+  (`seal_applications:19`, `manual_seal_attribution:32`, `pat_product_mapping:54`,
+  `software_registry:52`) and 4 MATCH (`batch_port_orchestrator:25`,
+  `manual_seal_attribution:41`, `seal_attribution:32`, `seal_contacts:27`). The key flips in
+  ONE atomic change across all of them: a Neo4j uniqueness constraint IGNORES NULLS, so a
+  partial cutover would **silently double** the canonical node rather than fail. Dual-write
+  through phases 1–3 with a `graph-tests/` assertion that `app_id = seal_id`; existing graphs
+  handled by REBUILD, not migration (wipe-and-rebuild doctrine, 2026-07-23).
+
+- **D1 — (a), `:Port` follows NOW** (against the spec's own recommendation). Measured blast
+  radius: three functional lines in two files §C already opens (`constraints.cypher:44`,
+  `seal_applications.cypher:96,100`); zero references in `drydocs_api/`, `graph-tests/`,
+  `web/src/`; `cli.py` binds ports through `HAS_PORT`, not the property. The spec's (b) rested
+  on create-then-drop being awkward — which assumes in-place migration, and **C4 ruled that
+  out**. **TRAP recorded for the implementing phase:** `CREATE CONSTRAINT <name> IF NOT
+  EXISTS` matches on the NAME, so redefining `port_unique` under the same name SUCCEEDS AND
+  DOES NOTHING, leaving the old definition live. DROP first or take a new name.
+
+- **D2 — (a), the pin holds, now evidence-backed.** `attribution_id` keeps its 4-part shape
+  `app_id|SEAL|role|sid` and the SOURCE role string (rename-orphaning cost accepted). SME
+  screenshots of the live registry showed BOTH collision cases on a single application: one
+  person holding L1 Operate manager, L2 Operate manager AND Operate Manager (drop the role →
+  three collapse), and four different people holding Backup Information Owner (drop the sid →
+  four collapse). Both are the normal case, not the edge case.
+
+- **E1–E3 — surface contract.** API and console emit `app_id` (singular). `mappingsDemo.ts`
+  loses `app_seal_id`; its stray `'seal_var'` corrects to the real `'seal'`. The SEAL
+  match-tier vocabulary is SCOPED OUT per B2(ii) — it belongs to the signed
+  `seal-attribution-match-policy` (2026-07-14), which A1 declares unchanged. E2 confirmed as
+  a STANDING rule, not a fallback: the console never leaks an internal registry name
+  regardless of what the graph stores. Diff is real — 22 `seal_id` lines in
+  `query_specs.py`, 14 in `mappings.py`.
+
+- **F1 — SIX legitimate homes** for the registry name after this gate: (1) taxonomy
+  `source_of_record`, (2) `source-registry.yaml`, (3) the ledger FILENAME (its column row is
+  `Application ID`), (4) module/file names, (5) CONSTRAINT NAMES (`businessapplication_seal`
+  — the most operator-visible, it prints in `SHOW CONSTRAINTS` and every violation error),
+  (6) EVIDENCE VOCABULARY. **(6) IS graph data** — `match_method` is a property on every
+  automated attribution edge — which falsifies v3.1's "none is graph data" and is recorded so
+  no future reviewer deletes it as drift. Clean outcome: **`SEALID` leaves the repo entirely**;
+  `SEAL` survives in three non-overlapping roles — authority, source id, ecosystem convention.
+
+- **F2 — glossary is DIRECTION, plus scaffolding is RAISED.** The SME's reason: the glossary
+  is mostly internal (except industry-standard terms), and doing the scaffolding producer-side
+  now prevents an internal-port collision later on **both** a name and a backlog slot. Handled
+  as a raised backlog item rather than an act of this gate, so A1 ("creates no
+  relationship-vocabulary term") stays intact — the `status: planned` registration is the
+  documented pre-gate step (SOSA/SSN precedent). Split ruled: **schema public** (label, key,
+  edge terms, YAML shape — portable to the company repo), **definitions internal**;
+  industry-standard terms bind to SKOS, already a declared reference standard.
+
+- **G1–G4 — sequencing.** Phase 1: loaders write both + new `app_id` constraint under a NEW
+  name + the `:Port` flip (DROP-then-CREATE, per the trap above). Phase 2 (the one with the
+  deadline, before more console routes land): API/console emit `app_id`. Phase 3: loader
+  Cypher, `graph-tests/` (one line) and gate pages move over; `seal_id` becomes a deprecated
+  alias still written. Module/file renames are phase 3+ and lowest value (G2). **Retiring
+  `seal_id` is NOT decided here** (G3) — separate later gate, after the company side ports.
+  This lands before any other wide structural port (G4).
+
+- **A4 — CARVE-OUT.** Everything ruled here is SEALED except **§C1** (the site inventory,
+  which goes stale if `seal-app-ref-edge-reshape` v2 re-targets `seal_attribution`) and
+  **§D2** (whose "leave it" is judged against today's attribution grain). Those two — and
+  only those — may be re-opened by the reshape v2 gate. D1 dropped off the carve-out: ruling
+  (a) settles it either way. This is a THIRD disposition the spec did not offer; its own two
+  were "rule both together" or "the later re-opens the earlier", both of which discard
+  rulings the reshape never touches.
+
+- **TEN SPEC DEFECTS found and fixed during the walk (v3.1–v3.3)** — every one the page
+  misdescribing the repo it governs, which is the gate working as intended. Nine fall into
+  two families: **a v2/v3 withdrawal whose dependents were never updated** (§D2's void
+  option (b), §E1 + mapping n:7 + §G1's "neutral pair", §E2's stale option letter), and
+  **an inventory that counted filenames instead of sites** (§D2's missing
+  `seal_contacts:53` — the only site where the role segment is DATA; §C1's missing
+  `manual_seal_attribution:41` — missed because that file already appears in the MERGE list;
+  §F1's missing constraint names, then missing evidence vocabulary). The tenth is §B5's
+  `SEALID` assumption. Recorded because the pattern predicts where the next one will be.
+
+- **Effect:** map entry `business-application-identity` CREATED as `confirmed` (property-
+  supplement shape). `config/taxonomy/business-application.yaml` `identifier` corrected to the
+  source's real field name. Backlog **S3 unblocked** and its title/acceptance corrected — both
+  still described the WITHDRAWN `app_id + id_authority` shape, so implementing to them would
+  have written a property this gate deleted. **ADR 0010 must be AMENDED at S1** (its Option C
+  and rules 2/3 assume the withdrawn shape). New items raised: glossary scaffolding, and the
+  **TOM-roles gate** (the SME's live registry shows 9 distinct role classes against the signed
+  7, with L1/L2/Operate Manager as three concepts — cannot fold into S3, because A1 declares
+  the 2026-07-10 §B enumeration unchanged). Nothing written to the graph at the gate itself.

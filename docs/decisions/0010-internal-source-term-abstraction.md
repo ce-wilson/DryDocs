@@ -16,6 +16,38 @@ affects:
 extends: 0003-application-naming-disambiguation.md
 ```
 
+> ## ⚠️ PARTIALLY SUPERSEDED — do not build from this ADR as written
+>
+> The **`business-application-identity` gate SIGNED OFF 2026-07-27** (`config/gate-log.md`)
+> and overruled this ADR's central mechanism. **`id_authority` is WITHDRAWN.** The SME ruled
+> at §B0 that a second authority issuing app ids will not happen, which removed the only
+> justification for a qualified reference — with one permanent registry it is a constant
+> column on every node. The authority is recorded **once**, in
+> `config/taxonomy/business-application.yaml` (`source_of_record: SEAL`), which is also
+> strictly cheaper under the case that *can* still happen, a registry rename.
+>
+> **What still stands:** rule 1 — canonical nodes take neutral property names. That is the
+> ADR's durable contribution and the gate confirmed it at §B1(c)/§B2(i).
+>
+> **What is dead as written:** this ADR's title, its Decision block (the three-property
+> Cypher example), Option C, and rules 2/3 — all assume `id_authority`. `app_urn` is not
+> written either, but is DEFERRED with a named trigger (§B3), not withdrawn.
+>
+> **What the gate ADDED that this ADR lacks — the two-part rule (§B2).** The naming rule has
+> a second half: *evidence and provenance vocabulary keeps the source's own term.* SEAL's
+> portal calls the field `Application ID`, but Control-M CMDLINEs and internal docs refer to
+> it as SEAL / SEAL_ID — so `ATTRIBUTION_TIERS 'SEAL'` and `match_method: 'seal'` STAY.
+> They record what another system literally wrote; renaming them would make the graph
+> misdescribe its own source. An amendment that restates rule 1 without this half is
+> incomplete.
+>
+> **Also corrected:** this ADR (and everything downstream of it) assumed the source field was
+> called `SEALID`. It is not — that string appears nowhere in code, SQL or Cypher, only in
+> prose. See §B5.
+>
+> **Amendment is owed at backlog S1**, which this ADR gates. Until then, treat the ruling in
+> `config/gate-log.md` (2026-07-27) as the authority, not this document.
+
 ## Context
 
 Two internal abbreviations run through DryDocs:

@@ -32,7 +32,16 @@ taxonomy_path_root: business/application
 concept: BusinessApplication           # generic node concept (graph label :BusinessApplication — normalized at K4, 2026-07-15)
 source: seal-extract                   # config/source-registry.yaml
 source_of_record: SEAL                 # authoritative registry for BusinessApplication
-identifier: SEALID                     # the unique id (= app_id); how every app is keyed
+identifier: "Application ID"           # the SOURCE's own field name for the unique id (= app_id).
+                                       # CORRECTED 2026-07-27 at the business-application-identity
+                                       # gate (§B4/§B5): this said `SEALID`, which the source does
+                                       # not use — SEAL's portal and Reports export both call the
+                                       # field `Application ID`, and `SEALID` appears nowhere in
+                                       # code, SQL or Cypher. It was repo vernacular recorded as if
+                                       # it were the source's term. The ECOSYSTEM term (SEAL /
+                                       # SEAL_ID, as used in Control-M CMDLINEs and internal docs)
+                                       # is a different axis and lives in the evidence vocabulary —
+                                       # ATTRIBUTION_TIERS / match_method — per the §B2 two-part rule.
 authority: lob-product-team            # config/precedence.yaml tier 3
 classification: Internal-Confidential  # config/classification.yaml (source sensitivity)
 classification_only: true
