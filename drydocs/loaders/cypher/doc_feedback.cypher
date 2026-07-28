@@ -15,6 +15,14 @@
 // only — an unknown author drops the edge, provenance is never fabricated
 // (gate C1). Correlation to :Requirement is the mixed-direction traversal
 // ANNOTATES + reverse SPECIFIED_IN — deliberately NOT stored (gate C4).
+// PREREQ ENFORCEMENT (L17, Q8 family): this template cannot check the
+// whole-registry conditions (it runs per batch) — DocFeedbackLoader
+// refuses up front via _assert_doc_sections_present (NO :DocSection
+// reachable -> every ANNOTATES would drop; a relationship cannot span databases)
+// and _assert_employees_present_if_authored (authored batch,
+// EMPTY :Employee registry -> every attribution would drop); per-row
+// misses are listed after the load by _report_unmatched_anchors /
+// _report_unknown_authors, never silent.
 //
 // Parameters: $batch (origin, doc_id, doc_rev, anchor, base_anchor, note,
 //   status, author, row_checksum), $run_id, $loaded_at, $loader, $source_label.

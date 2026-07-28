@@ -8,6 +8,12 @@
 // PREREQ: doc_sections.cypher ran first — SPECIFIED_IN MATCHes (NEVER MERGEs)
 // its :DocSection target, so a mis-cited anchor silently drops that edge
 // instead of creating a stub section (the bmc_docs DESCRIBES convention).
+// PREREQ ENFORCEMENT (L17, Q8 family): this template cannot check the
+// whole-registry condition (it runs per batch) —
+// DocTraceabilityLoader._assert_doc_sections_present refuses the load up
+// front when NO :DocSection is reachable (a relationship cannot span databases
+// — point at the DB that holds the doc_sections.v1 output), and
+// _report_unmatched_anchors lists every per-row MATCH miss after the load.
 // :Component / :TestCase ARE MERGEd here — this loader is their source of
 // record, keys (origin, ref) per gate A2 (same-basename-within-origin stays
 // an SME-merge case, gate D1 — never auto-merged here).

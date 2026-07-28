@@ -1027,8 +1027,25 @@ def load_doc_traceability(
             (DocTraceabilityLoader, TraceabilityMatrixAdapter(design_dir)),
             (DocFeedbackLoader, DesignDocFeedbackAdapter(feedback_dir)),
         ):
-            summary = loader_cls(cli, adapter).load()
+            loader = loader_cls(cli, adapter)
+            try:
+                summary = loader.load()
+            except RuntimeError as exc:  # L17 prereq refusal — loud, exit 2
+                console.print(f"[red]{exc}[/]")
+                raise typer.Exit(2) from exc
             console.print(summary.as_dict())
+            # L17 per-row coverage: anchor links / attributions that MATCHed
+            # nothing were dropped by design — reported, never silent.
+            for attr, what in (
+                ("unmatched_anchors", "cited anchor(s) matched no :DocSection"),
+                ("unknown_authors", "author(s) matched no :Employee"),
+            ):
+                missed = getattr(loader, attr, None)
+                if missed:
+                    console.print(
+                        f"[yellow]{loader.name}: {len(missed)} {what} — "
+                        f"dropped, not written: {missed}[/]"
+                    )
 
 
 @app.command(name="load-essential-graphrag")

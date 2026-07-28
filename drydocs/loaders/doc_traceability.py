@@ -21,6 +21,7 @@ the render pipeline.
 """
 from __future__ import annotations
 
+import logging
 import re
 from pathlib import Path
 from typing import TYPE_CHECKING, ClassVar, Iterator
@@ -35,10 +36,14 @@ from drydocs_core.models.doc_traceability import (
     TraceabilityRow,
 )
 from drydocs_core.doc_anchors import ANCHOR_RE, DERIVED_ANCHOR_SEP
-from .base import BaseLoader, compute_row_checksum
+from .base import BaseLoader, LoadSummary, compute_row_checksum
 
 if TYPE_CHECKING:  # pragma: no cover
     from types import TracebackType
+
+    from drydocs_core.run_log import LoaderRunLog
+
+LOGGER = logging.getLogger(__name__)
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
 CYPHER_DIR = Path(__file__).resolve().parent / "cypher"
@@ -373,15 +378,173 @@ class DesignDocSectionsLoader(_ChecksummedLoader):
     source_label: ClassVar[str] = "markdown"
 
 
-class DocTraceabilityLoader(_ChecksummedLoader):
+class _SectionPrereqLoader(_ChecksummedLoader):
+    """Shared L17 guard: both passes 2 and 3 MATCH (never MERGE) the
+    :DocSection nodes pass 1 (doc_sections.v1) wrote — the OPTIONAL MATCH +
+    FOREACH idiom means an absent section registry drops EVERY anchor link
+    while the run still reports OK (the Q8 / batch_port_orchestrator
+    "succeeds loudly, does nothing" family). Whole-registry absence is
+    refused up front; per-row misses are tolerated (one mis-cited anchor
+    must not cost the other rows their edges) but COUNTED and listed after
+    the load, never silent.
+    """
+
+    #: subclass hook: the row field naming the anchors this loader links to
+    anchor_field: ClassVar[str] = ""
+
+    def __init__(self, *args, **kwargs) -> None:
+        super().__init__(*args, **kwargs)
+        # (origin, doc_id, anchor) triples this run actually sent — a MATCH
+        # miss leaves no trace in the graph, so the loader must remember
+        # what it cited (the batch_port seal_ids_sent idiom).
+        self.anchors_sent: set[tuple[str, str, str]] = set()
+        self.unmatched_anchors: list[dict] = []
+
+    def _load(self, summary: LoadSummary, run_log: "LoaderRunLog | None") -> LoadSummary:
+        """Refusal runs BEFORE ``super()._load`` — which is what reaches
+        ``_preflight_indexes`` and ``_open_run`` — so a refused load writes
+        nothing at all, not even the :JobRun."""
+        self._assert_prereqs()
+        result = super()._load(summary, run_log)
+        self._report_link_coverage()
+        return result
+
+    def _assert_prereqs(self) -> None:
+        self._assert_doc_sections_present()
+
+    def _report_link_coverage(self) -> None:
+        self._report_unmatched_anchors()
+
+    def to_params(self, model: BaseModel) -> dict:
+        params = super().to_params(model)
+        anchors = params.get(self.anchor_field)
+        for anchor in anchors if isinstance(anchors, list) else [anchors]:
+            if anchor:
+                self.anchors_sent.add((params["origin"], params["doc_id"], anchor))
+        return params
+
+    def _count_real_nodes(self, label: str, key: str) -> int:
+        """Count real nodes of ``label``, excluding the schema exemplars.
+
+        ``schema_graph.cypher`` MERGEs ``:SchemaMeta:<Label>`` exemplars that
+        carry the REAL label with no key property, so a bare ``count()``
+        would wave an empty registry straight through — the whole failure
+        this check exists to catch. (``label``/``key`` are module-controlled
+        literals, never row data — no injection surface.)
+        """
+        rows = self.client.run(
+            f"MATCH (n:{label}) WHERE NOT n:SchemaMeta AND n.{key} IS NOT NULL "
+            "RETURN count(n) AS found"
+        )
+        return rows[0].get("found", 0) if rows else 0
+
+    def _assert_doc_sections_present(self) -> None:
+        if self._count_real_nodes("DocSection", "anchor"):
+            return
+        raise RuntimeError(
+            f"Loader {self.name}: refusing to load — no :DocSection nodes are "
+            "reachable in this database, so every anchor link would be silently "
+            "dropped (OPTIONAL MATCH + FOREACH guard) and the run would still "
+            "report success. Run the doc_sections.v1 pass against THIS database "
+            "first (`drydocs load-doc-traceability` runs the three passes in "
+            "order — a relationship cannot span databases)."
+        )
+
+    def _report_unmatched_anchors(self) -> None:
+        if not self.anchors_sent:
+            return
+        triples = sorted(self.anchors_sent)
+        rows = self.client.run(
+            "UNWIND $anchors AS p "
+            "MATCH (ds:DocSection {origin: p.origin, doc_id: p.doc_id, anchor: p.anchor}) "
+            "RETURN p.origin AS origin, p.doc_id AS doc_id, p.anchor AS anchor",
+            anchors=[{"origin": o, "doc_id": d, "anchor": a} for o, d, a in triples],
+        )
+        found = {(r.get("origin"), r.get("doc_id"), r.get("anchor")) for r in rows}
+        self.unmatched_anchors = [
+            {"doc_id": d, "anchor": a} for o, d, a in triples if (o, d, a) not in found
+        ]
+        if self.unmatched_anchors:
+            LOGGER.warning(
+                "Loader %s: %d cited anchor(s) matched no :DocSection — their "
+                "anchor links were dropped, not written: %s",
+                self.name, len(self.unmatched_anchors), self.unmatched_anchors,
+            )
+
+
+class DocTraceabilityLoader(_SectionPrereqLoader):
     name: ClassVar[str] = "doc_traceability.v1"
     cypher_path: ClassVar[Path] = CYPHER_DIR / "doc_traceability.cypher"
     row_model: ClassVar[type] = TraceabilityRow
     source_label: ClassVar[str] = "markdown"
+    anchor_field: ClassVar[str] = "section_anchors"
 
 
-class DocFeedbackLoader(_ChecksummedLoader):
+class DocFeedbackLoader(_SectionPrereqLoader):
+    """Pass 3 — the L5/L6 re-attachment loop itself, so its silent failure
+    mode is the worst of the family: SME feedback loading "successfully"
+    while detached from the doc it annotates. Beyond the section guard it
+    also refuses an authored batch against an EMPTY :Employee registry —
+    an unknown author dropping its attribution edge is by-design (gate C1,
+    provenance never fabricated) and stays a per-row reported case, but a
+    whole-registry absence means every attribution silently drops."""
+
     name: ClassVar[str] = "doc_feedback.v1"
     cypher_path: ClassVar[Path] = CYPHER_DIR / "doc_feedback.cypher"
     row_model: ClassVar[type] = FeedbackNoteRow
     source_label: ClassVar[str] = "human"
+    anchor_field: ClassVar[str] = "base_anchor"
+
+    def __init__(self, *args, **kwargs) -> None:
+        super().__init__(*args, **kwargs)
+        self.authors_sent: set[str] = set()
+        self.unknown_authors: list[str] = []
+
+    def _assert_prereqs(self) -> None:
+        super()._assert_prereqs()
+        self._assert_employees_present_if_authored()
+
+    def _report_link_coverage(self) -> None:
+        super()._report_link_coverage()
+        self._report_unknown_authors()
+
+    def to_params(self, model: BaseModel) -> dict:
+        params = super().to_params(model)
+        if params.get("author"):
+            self.authors_sent.add(str(params["author"]))
+        return params
+
+    def _assert_employees_present_if_authored(self) -> None:
+        """Pre-scan the (re-enterable, file-backed) adapter: only a batch
+        that actually carries authors needs the :Employee registry — an
+        author-less batch loads fine without one."""
+        with self.adapter as adapter:
+            authored = any(r.get("author") for r in adapter.rows())
+        if not authored or self._count_real_nodes("Employee", "employee_id"):
+            return
+        raise RuntimeError(
+            f"Loader {self.name}: refusing to load — this batch carries "
+            "author(s) but no :Employee nodes are reachable in this database, "
+            "so every WAS_ATTRIBUTED_TO edge would be silently dropped and the "
+            "run would still report success. Load the employee registry "
+            "against THIS database first, or remove the author fields if "
+            "attribution is not wanted (gate C1: never fabricated)."
+        )
+
+    def _report_unknown_authors(self) -> None:
+        if not self.authors_sent:
+            return
+        rows = self.client.run(
+            "UNWIND $authors AS a MATCH (e:Employee {employee_id: a}) "
+            "RETURN e.employee_id AS employee_id",
+            authors=sorted(self.authors_sent),
+        )
+        found = {r.get("employee_id") for r in rows}
+        self.unknown_authors = sorted(self.authors_sent - found)
+        if self.unknown_authors:
+            LOGGER.warning(
+                "Loader %s: %d author(s) matched no :Employee — their "
+                "WAS_ATTRIBUTED_TO edges were dropped by design (gate C1, "
+                "never fabricated), reported here: %s",
+                self.name, len(self.unknown_authors), self.unknown_authors,
+            )

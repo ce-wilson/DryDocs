@@ -2450,7 +2450,7 @@ items:
     agent: main
     model: sonnet
     priority: p2
-    status: todo
+    status: done
     depends_on: []
     inputs: [drydocs/loaders/doc_traceability.py, drydocs/loaders/cypher/doc_traceability.cypher, drydocs/loaders/cypher/doc_feedback.cypher, drydocs/loaders/batch_port_orchestrator.py]
     acceptance: >
@@ -2476,6 +2476,16 @@ items:
       self-references (bmc_docs.cypher:94, essential_graphrag.cypher:80,
       same-loader same-run) and pat_product_mapping.cypher:129,133
       (stale-edge cleanup, not prereq joins).
+      CLOSED 2026-07-28: _SectionPrereqLoader shared guard (refusal before
+      _open_run, so a refused load leaves no :JobRun; probes exclude
+      :SchemaMeta exemplars per the O33 write-side clause) + per-row
+      unmatched-anchor reporting on both loaders; DocFeedbackLoader
+      additionally refuses an AUTHORED batch against an empty :Employee
+      registry (author-less batches load fine — gate C1 keeps attribution
+      optional) and reports unknown authors. CLI load-doc-traceability:
+      refusal -> red + exit 2; per-row misses -> yellow report. Both cypher
+      headers now point at the enforcing loader methods (the batch_port
+      header convention, test-pinned). 9 guard tests, no Neo4j.
 
   # Groomed 2026-07-08 from the 2026-07-05 IDEAS line + the 2026-07-07 property-terms
   # line. Doc 06 Phases 0-1 (Control-M envelope: audit-fields.yaml + jobs/folders
@@ -7490,11 +7500,11 @@ items:
       only (legacy 1_* family proves it is not always a SEAL).
 
 summary:
-  todo: 53                                         # +4 at the 2026-07-28 inbox groom (C19 ontology-comment fix, J16 port-manifest fall-through guard, L17 doc-loader prereq guards, O34 web npm advisories); C19 + J16 closed same day, L16 closed alongside; prior: +5 2026-07-27 groom (J14/J15/G36/O33/G38), +2 PAT review (C17/C18), +5 code-graph-review (U1-U5), +2 cmdline seam (G39/G40, built+closed same day)
+  todo: 52                                         # +4 at the 2026-07-28 inbox groom (C19 ontology-comment fix, J16 port-manifest fall-through guard, L17 doc-loader prereq guards, O34 web npm advisories); C19 + J16 + L17 closed same day, L16 closed alongside; prior: +5 2026-07-27 groom (J14/J15/G36/O33/G38), +2 PAT review (C17/C18), +5 code-graph-review (U1-U5), +2 cmdline seam (G39/G40, built+closed same day)
   in_progress: 1                                   # E1 (gate deferred both sides)
   blocked: 0
-  done: 150                                        # 2026-07-28: G41 glue base-table inventory seam (built + closed same day), C19 ontology-comment fix (groomed + closed same day), J16 port-manifest fall-through guard (same), L16 runbook container/port refresh. 2026-07-27 closes: J14 SEALID split, P3 hosts+RUNS_ON, G21 rua code-ops, G24 code-repo seam, G26 launcher-registry config, Q8 bmc-docs prereq, C18 shadow-model guard, J15 value-shape boundary guard, G33 code-snapshot loader (gate signed + built same day), G39 cmdline staging store + G40 parse (groomed am, built pm)
-  next_ready: [M3, M4, J10, Q6, O23, J13, O26, O27, C15, C16, C17, O28, R3, R4, L17, O29, O30, O31, O32, S1, S8, S9, Q7, G32, G34, G35, O33, O34, P5, G22, U1, U2, U3]
+  done: 151                                        # 2026-07-28: G41 glue base-table inventory seam (built + closed same day), L17 doc-loader prereq guards (same), C19 ontology-comment fix (groomed + closed same day), J16 port-manifest fall-through guard (same), L16 runbook container/port refresh. 2026-07-27 closes: J14 SEALID split, P3 hosts+RUNS_ON, G21 rua code-ops, G24 code-repo seam, G26 launcher-registry config, Q8 bmc-docs prereq, C18 shadow-model guard, J15 value-shape boundary guard, G33 code-snapshot loader (gate signed + built same day), G39 cmdline staging store + G40 parse (groomed am, built pm)
+  next_ready: [M3, M4, J10, Q6, O23, J13, O26, O27, C15, C16, C17, O28, R3, R4, O29, O30, O31, O32, S1, S8, S9, Q7, G32, G34, G35, O33, O34, P5, G22, U1, U2, U3]
   # 2026-07-27 code-graph-review groom: U1-U3 = the three personas of
   # docs/reviews/code-graph-review-plan.md, dependency-free -> next_ready;
   # U4/U5 = the optional skill edits, gated on their phase (U1/U2) proving the
