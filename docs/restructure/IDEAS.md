@@ -26,16 +26,39 @@ Tags help grooming: `idea` · `bug` · `doc` · `source` (new data source) · `q
 
 <!-- add new ideas at the top -->
 
-- 2026-07-28 — [question] **depgraph sibling-repo fork merge — user's call, worth a sitting.**
-  `depgraph` has two divergent siblings off a one-commit `main` (`76ba075`): `feat/p0-vector`
-  (`--tree`, Neo4j-optional rendering) and `feat/controlm-lineage` (Control-M lineage, RHEL
-  collector, **the U6 multi-root fix**); neither is an ancestor of the other, so no single
-  revision has everything DryDocs calls, and a fresh clone reproduces the broken scanner.
-  Plan when convened: land `controlm-lineage` first (the correctness fix), then `p0-vector`,
-  then delete both; substantive conflicts only in `cli.py`/`model.py`; both sides ship tests.
-  Different repo — never a DryDocs backlog item. (The DryDocs-side instrument hardening this
-  pairs with is groomed → **U7** revision-pin + capability probe, **U8** abs_path strip; the
-  full two-entry analysis lives in git history at `947920c`.)
+- 2026-07-28 — [question] **Retire the `depgraph` sibling repo entirely by bringing the SCANNER
+  in-house?** The user's reaction to the fork merge was *"I didn't realize it was still used
+  after we made it a module"* — and that instinct was half right in a way worth acting on. ADR
+  0002-C absorbed depgraph's **lineage** assets into drydocs-core, but the **scanner** never
+  moved: `snapshot.ps1` shells out to `../depgraph` every session, which is precisely why a
+  months-old sibling checkout could write a 105-edge undercount (→ U7). The whole *class* of
+  defect — instrument revision decided by a checkout nobody looks at, capability split across
+  branches, `dirty:true` in every meta block — exists only because the tool lives outside this
+  repo's history. In-housing it (`drydocs_core/codegraph/`, or a thin vendored package) would
+  delete that class outright: one `poetry run` invocation, pinned by `poetry.lock`, versioned
+  with the code it measures, no probe needed because the tool and the caller ship together.
+  Against: depgraph is deliberately stdlib-only and general-purpose (it scans any project, not
+  just this one), it has its own Control-M/RUA/html-review surfaces DryDocs does not use, and
+  0002-C consciously chose absorb-the-assets-not-the-tool. So this is a real trade, not a
+  cleanup — size it before committing. Precondition now satisfied either way: the fork is
+  consolidated (depgraph `5006567`, one branch), so there is a single revision to vendor from.
+- 2026-07-28 — [question] **`config/dev-environment.yaml` under a `canonical-producer` row —
+  decide the disposition producer-side too, not just company-side.** Step 48 raises this for the
+  consumer, but the asymmetry is ours: `config/**` is `canonical-producer`, and U7 has just made
+  that file *producer-local infrastructure* (sibling repo path, expected instrument commit, on
+  top of the pre-existing container name + host ports). A port applies it wholesale, and the L16
+  runbook's Appendix A is a **render** of it — so a producer value propagates into consumer
+  documentation, which is exactly the drift Appendix A was restated to prevent. Options: a
+  per-entry row (which keys? the file has no id-keyed grain — probably section-level: `neo4j:`
+  and `depgraph:` are environment-specific, `services:` ports arguably shared), a
+  canonical-company row, or split the file into a portable contract + a local overlay. The last
+  is the cleanest and the most work. Left deliberately un-made by the 2026-07-28 session, per
+  J16's own rule that a disposition is a decision, not a default. ~~Fork merge~~ — **RESOLVED
+  2026-07-28**: both branches merged into depgraph `main` (`5006567`) and DELETED, local and
+  remote; `main` now carries every capability (probe reports `multi_root` AND `tree` true for
+  the first time, `-Tree` works). Semantic merge details in DryDocs `8a82e3b` and the depgraph
+  merge commit; the `add_rel` signature/shape collision and three regions git auto-merged that
+  should have conflicted are the parts worth re-reading if that code is touched again.
 - 2026-07-28 — [chore] **react-router high advisory (GHSA-qwww-vcr4-c8h2, RSC-mode CSRF) cannot
   clear without the v7→v8 major migration** — v8 absorbs `react-router-dom` (its latest is
   still 7.18.1, inside the vulnerable 7.12.0–8.2.0 range), so `npm audit fix` is a no-op and
