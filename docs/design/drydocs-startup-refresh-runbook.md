@@ -1,9 +1,11 @@
 # Runbook — DryDocs local startup & refresh (EE container + sample ingest)
 
 <!-- anchor: front-matter -->
-- **Status:** DESCRIPTIVE — documents the working procedure. **Rev 2, 2026-07-20**
-  (rev1 SME feedback applied; content reflects commit `a135a6d`: post-D6 quick-start
-  with step 3b, post-D7 sweep, post-K6 supplements)
+- **Status:** DESCRIPTIVE — documents the working procedure. **Rev 3, 2026-07-28**
+  (container facts re-pointed onto the `neo4jtest` recreation and sourced from
+  `config/dev-environment.yaml`; on top of Rev 2's rev1-SME-feedback pass, which
+  reflected commit `a135a6d`: post-D6 quick-start with step 3b, post-D7 sweep,
+  post-K6 supplements)
 - **Classification:** Internal (operational metadata — local host-port mapping and
   container names, the same class as `internal/helpmeloginlocalneo4j.md`; NO
   credentials — the password lives only in the repo-root `.env`, never here)
@@ -13,6 +15,16 @@
   `internal/helpmeloginlocalneo4j.md` (login/port troubleshooting evidence),
   `.claude/skills/run-drydocs/SKILL.md` (agent-facing run notes)
 
+> **What changed in Rev 3 (2026-07-28) — container facts follow the `neo4jtest`
+> recreation.** The runbook still told you to start `neo4j-drydocs-ee` on host ports
+> 7476/7689. That container was retired 2026-07-23: the graph moved into the named volume
+> `neo4j-testdata` and the canonical container was recreated as `neo4jtest` on the
+> 7474/7687 defaults (the old one is kept stopped as a rollback copy). Every container
+> name, port, and `NEO4J_URI` example below now matches, and Appendix A is restated as a
+> *render* of `config/dev-environment.yaml` — the single source of truth the
+> `.env.example` templates and the `run-drydocs` skill already defer to — so the next
+> container change is one edit, not five. Documentation-only; no procedure changed.
+>
 > **What changed in Rev 2 (2026-07-20).** Applied the rev1 SME feedback
 > (`docs/design/feedback/drydocs-startup-refresh-runbook-rev1.yaml`): front-matter items
 > are now one per line, and the out-of-scope list drops the company-side Track-2 item.
@@ -40,14 +52,16 @@ beyond a first-time pointer (G1's `provision.ps1` README owns it).
 ## Prerequisites
 
 1. **Docker Desktop** running, with the Neo4j **Enterprise** container present —
-   locally `neo4j-drydocs-ee` (Neo4j 2026.05.0 EE, host ports **7476** HTTP / **7689**
-   Bolt as of 2026-07-03). Any EE container works; the *actual* host ports are whatever
-   `docker port <container>` says — never assume the 7474/7687 defaults.
+   locally `neo4jtest` (Neo4j 2026.05.0 EE, host ports **7474** HTTP / **7687** Bolt
+   since the 2026-07-23 recreation). Names and ports are declared once in
+   `config/dev-environment.yaml`; Appendix A renders them. Any EE container works, and
+   the *actual* host ports are still whatever `docker port <container>` says — Docker
+   remaps them on recreation, so confirm rather than assume, defaults included.
 2. **Toolchain:** pipx-installed Poetry with the in-project `.venv` synced
    (`poetry install`). Run everything through `poetry run` — the bare `drydocs.cmd`
    Store-venv wrapper mis-reports exit codes (a known wrapper artifact, not a CLI bug).
 3. **`.env` at the repo root** with the connection settings the CLI and
-   `scripts/ingest.sh` read: `NEO4J_URI` (e.g. `bolt://localhost:7689`), `NEO4J_USER`,
+   `scripts/ingest.sh` read: `NEO4J_URI` (e.g. `bolt://localhost:7687`), `NEO4J_USER`,
    `NEO4J_PASSWORD`. Secrets live ONLY here — `.env` is gitignored; nothing in this
    runbook or any committed file carries the password.
 4. **Reference docs at hand:** `internal/repo-README.md` §Quick start (the canonical
@@ -62,8 +76,8 @@ check; go to Troubleshooting.
 
 1. **Start the container:**
    ```powershell
-   docker start neo4j-drydocs-ee
-   docker port neo4j-drydocs-ee        # confirm the real host ports
+   docker start neo4jtest
+   docker port neo4jtest               # confirm the real host ports
    ```
    *Success:* `docker ps` shows the container up; `docker logs` ends with
    `INFO  Started.`; the port mapping matches what `.env`'s `NEO4J_URI` expects.
@@ -154,8 +168,9 @@ Known-good is cheap here because every loader MERGEs idempotently.
    poetry run drydocs sweep-removed --days 30 --yes    # hard-delete past retention
    ```
 3. **Container-level:** `docker stop` is always safe — graph data lives in the named
-   volume and survives restarts. Recreating the *container* can remap host ports
-   (re-check `docker port`, update `.env`); deleting the *volume* loses the graph — the
+   volume `neo4j-testdata` and survives restarts. Recreating the *container* can remap
+   host ports (re-check `docker port`, update `.env` — that is exactly what the
+   2026-07-23 recreation did, Appendix A); deleting the *volume* loses the graph — the
    recovery is this runbook from Startup step 3, including Refresh step 3 (the document
    corpora live only in the DB).
 4. **Destructive last resort:** `poetry run drydocs reset --yes` DETACH-DELETEs every
@@ -194,21 +209,26 @@ don't duplicate it here.
 <!-- anchor: appendices -->
 ## Appendices
 
-**A. Current local environment (2026-07-20; verify with `docker port`, never assume):**
+**A. Current local environment** — a render of `config/dev-environment.yaml` (2026-07-28).
+Change it *there* first, then here; verify against `docker port`, never assume:
 
 | Item | Value |
 |---|---|
-| Container | `neo4j-drydocs-ee` (Neo4j 2026.05.0 Enterprise) |
-| HTTP / Browser | container 7474 → host **7476** (`http://localhost:7476/browser/`) |
-| Bolt | container 7687 → host **7689** (`bolt://localhost:7689`) |
+| Container | `neo4jtest` (Neo4j 2026.05.0 Enterprise) |
+| Volume | `neo4j-testdata` (the graph survives container recreation) |
+| HTTP / Browser | container 7474 → host **7474** (`http://localhost:7474/browser/`) |
+| Bolt | container 7687 → host **7687** (`bolt://localhost:7687`) |
 | Databases | `drydocs`, `ddlineage`, `ddcontext` + composite `ddall` (G1/G7) |
 | Credentials | `.env` only (`NEO4J_URI` / `NEO4J_USER` / `NEO4J_PASSWORD`) |
+
+The retired `neo4j-drydocs-ee` (7476/7689) is kept **stopped** as a rollback copy. If both
+are ever up, `docker port` is the only way to tell which one `.env` is talking to.
 
 **B. The full cold-start command sequence,** in one block (each step's success check is
 in the sections above):
 
 ```powershell
-docker start neo4j-drydocs-ee
+docker start neo4jtest
 poetry run drydocs check
 poetry run drydocs bootstrap
 poetry run drydocs apply-ontology-supplement
