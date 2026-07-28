@@ -214,3 +214,98 @@ to `internal/` alongside the screenshots.
 4. **DL-7** (free — one merged sentence into O32)
 5. **DL-5, DL-6** (visual-change items that want screenshot review)
 6. **DL-8** (requirement; producer slot now or when Track-2 asks)
+
+
+---
+
+## Addendum 2026-07-28 — Data State Intelligence (the data-management view)
+
+> Second reference tool reviewed same day: **DSI** (screenshots + classification in
+> `internal/dsi-reference/` — Internal-Confidential there, stricter than this folder).
+> Positioning: DataLens is the *execution* view (did tonight's jobs run), DSI is the
+> *data-management* view (are the datasets ready; platform catalog; cost). DryDocs
+> sits between them — the graph that joins job ↔ dataset ↔ application ↔ owner,
+> which neither neighbor can answer.
+
+### UI review (condensed)
+
+- **Typography:** humanist sans (Open Sans / Segoe family) — hierarchy carried by
+  color + size (big light-weight KPI numerals ~40px, blue headers), not weight.
+  Proportional figures in counts/grids — our DL-1 tabular-nums already beats both tools.
+- **Color:** corporate-blue monoculture — solid JPMC-blue header band (~#1173C1), pale
+  blue-tinted canvas, blue as the workhorse everywhere; semantic color *only* for state
+  (green check "Ready", flag "Pending"), red nearly absent. More disciplined than
+  DataLens's threshold-red spray; closer to site-plan §2 restraint.
+- **Shape:** squarer than DataLens (~4–8px), flat 1px borders, minimal shadow —
+  structurally closer to our chrome than DataLens is. DL-5's ~10px midpoint sits
+  exactly between the two neighbors. Both neighbors are light-first → doubles the
+  weight behind O32/DL-7 (light is the bridge in BOTH directions).
+- **Signature elements:** KPI-card-as-filter (two card rows — status and stage — with
+  "Apply filter" footers scoping the grid below); enterprise data grid (AG-Grid idiom:
+  per-column filter menus, Filters/Columns right rail, pagination); icon+word status
+  chips; flat gray stage badges; question-led home cards ("Which datasets are ready
+  vs not ready for business?"); Backstage-style dashboard catalog (Category / Pillars /
+  Views + Grafana/Datadog tool tags); embedded assistant.
+
+### New groom candidates
+
+### DL-10 — StatTiles click-to-filter (the KPI-card→filter idiom)
+
+DSI's best pattern: a stat tile is also the filter control for the view below it.
+Extend `StatTiles` with an optional per-tile `onClick`/active state (token-tinted
+active ring, `aria-pressed`) so count tiles scope the adjacent list/grid — first
+candidates: the loads timeline (tile = status, filters runs) and any module page
+whose StatTiles At-a-Glance row fronts a table.
+
+- type: task · module: drydocs-web · phase: 12 · agent: main · model: sonnet · priority: p3
+- depends_on: [] · inputs: `web/src/components/StatTiles.tsx`, `web/src/loads/`, `internal/dsi-reference/DSI-ui-readiness.png`
+- acceptance sketch: StatTiles accepts optional onSelect + active tile id; active state
+  is token-only and keyboard-operable (`aria-pressed`, focus-visible); adopted on one
+  live surface where tiles filter the content below; both themes verified; build +
+  lint green.
+
+### DL-11 — Shared stage taxonomy: RAW → TRUSTED → REFINED → SNOWFLAKE
+
+Both neighbors expose the SAME medallion stage vocabulary (DataLens pipeline cards;
+DSI stage KPI row). That is the estate's canonical stage taxonomy — two work items in
+one groom decision:
+(a) **UI:** stage names render identically everywhere in the console (mono chips per
+DL-6's convention, flat badge form per DSI) — extends DL-6, not a separate component;
+(b) **Graph model:** the stage vocabulary belongs in `config/taxonomy/` as pure
+classification (the Epic B idiom) so datasets/jobs can carry stage attribution the
+same way they carry source attribution — a taxonomy-layer item OUTSIDE the web
+console's layer, needs its own groom against the taxonomy capture rules (and an SME
+check that the stage set is what the estate actually standardizes on).
+
+- (a) folds into DL-6 (module drydocs-web); (b) type: requirement · module: taxonomy ·
+  agent: main · priority: p3 · gate: SME confirm of the canonical stage set
+- inputs: `internal/datalens-reference/HL-Datalens-ui-dataflow1.png`, `internal/dsi-reference/DSI-ui-readiness.png`, `config/taxonomy/`
+
+### DL-12 — Status-vocabulary mapping for StatusChip
+
+DSI's status set is richer than DataLens's: Ready / Failed / Processing / Pending /
+Not Scheduled (vs Completed / Not Completed). Document one mapping table —
+ecosystem status term → StatusChip token (Ready→`--green`, Failed→`--status-fail-soft`,
+Processing→`--teal`, Pending→`--yellow`, Not Scheduled→`--muted`) — in the site-plan
+(or a UI-WIP note) so every surface colors the same state the same way, and chips read
+identically across all three tools.
+
+- type: chore · module: drydocs-web · phase: 12 · agent: main · model: haiku · priority: p3
+- acceptance sketch: mapping documented; StatusChip call sites conform; no surface
+  invents a divergent status→token pairing (grep-checked).
+
+### Epic R precedent note (for the R1 / ADR 0007 gate session)
+
+DSI ships an embedded assistant and a question-led home ("Which datasets are ready vs
+not ready for business?") — an in-company, in-production precedent for exactly the
+Epic R shape (free-text questions over data-management state). Bank precedent lowers
+the novelty bar for ADR 0007's gate; the differentiating DryDocs claim stays the
+graph: R answers *relationship* questions (who depends on this, what breaks downstream)
+that a readiness grid cannot.
+
+### Do not adopt (DSI)
+
+- Marketing-style hero illustration + tagline block on the home page — the console's
+  landing already leads with the graph; keep it.
+- Blue-for-everything hierarchy — our token palette deliberately separates semantic
+  hues; DSI's monoculture is what makes its grids feel flatter than they are.
