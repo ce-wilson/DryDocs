@@ -1245,7 +1245,7 @@ local_relationships:
     inverse_label: "required by"
     role:         ~
     from_node:    Port                       # as registered; the pre-gate HOIST direction (to :BusinessApplication) was absorbed by the reg_uses_software landing, so no reshape ever applied here
-    to_node:      SchedulerKind              # RETIRED TARGET — :SchedulerKind deprecated at C12 (seeds retired in ontology.cypher; constraint kept for old graphs)
+    to_node:      SchedulerKind              # RETIRED TARGET — :SchedulerKind deprecated at C12 (seeds retired in ontology.cypher; the scheduler_kind constraint was then REMOVED 2026-07-23 in the C13 leftover sweep — pre-C13 graphs are wiped and rebuilt from bootstrap, so nothing creates or holds the label)
     prov_maps_to: ~
     note: >
       Registered per backlog C6 (2026-07-09) to close the drift where

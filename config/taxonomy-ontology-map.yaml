@@ -192,7 +192,7 @@ mappings:
       element: "A BatchProcessing data port requires a scheduler technology (which orchestrator runs its batch)"
     ontology:
       from_node: Port                       # as registered; the pre-gate HOIST direction was absorbed by the reg_uses_software landing (that edge is app-level already), so no reshape ever applied
-      to_node: SchedulerKind                # RETIRED TARGET — deprecated at C12 (seeds retired in ontology.cypher; constraint kept for old graphs). The fact lands on the ACTIVE registry edge (:BusinessApplication)-[:USES_SOFTWARE {source: 'batch-port'}]->(:SoftwareProduct {role: orchestrator}) — reg_uses_software
+      to_node: SchedulerKind                # RETIRED TARGET — deprecated at C12 (seeds retired in ontology.cypher; the scheduler_kind constraint was then REMOVED 2026-07-23 in the C13 leftover sweep — pre-C13 graphs are wiped and rebuilt from bootstrap, so nothing creates or holds the label). The fact lands on the ACTIVE registry edge (:BusinessApplication)-[:USES_SOFTWARE {source: 'batch-port'}]->(:SoftwareProduct {role: orchestrator}) — reg_uses_software
       prov_type_from: Entity                # dprod port (Entity semantics)
       prov_type_to: ~                        # moot — the entry retired before a target class was ever settled
       matrix_row: "n/a — infrastructure/capability placement, no PROV row (same family as SCHEDULED_ON)"
