@@ -26,6 +26,22 @@ Tags help grooming: `idea` · `bug` · `doc` · `source` (new data source) · `q
 
 <!-- add new ideas at the top -->
 
+- 2026-07-27 — [idea] **Code-graph multi-persona review — plan written, ready to groom into
+  phase items.** `docs/reviews/code-graph-review-plan.md`: three phases over the now-live G33
+  code graph (python-architect structural review with a probed query pack — layering already
+  verified clean, 24 orphan candidates waiting; project-manager backlog-truth audit; tech-writer
+  doc-status board, needs `load-doc-traceability` first), plus inspected verdicts that the
+  `tech-debt` and `groom-backlog` skills can consume the graph as an OPTIONAL evidence/validation
+  source (never a dependency — §H3 decoupling). Groom: one item per phase + two optional
+  skill-edit follow-ups; none HITL. (User ask 2026-07-27, same session as the G33 build.)
+
+- 2026-07-27 — [chore] **EE home db `neo4j` carries pre-existing stray sample loads** (17
+  ControlMJob, 15 Condition, 8 ControlMFolder, ontology terms, 8 JobRun — found during the G33
+  live load when `.env` drift pointed loads there; my session's strays cleaned, these predate
+  it). dev-environment.yaml says the home db is outside the topology and no query surface reads
+  it — decide: wipe it (`MATCH (n) DETACH DELETE n` on `neo4j` db) or leave as scratch. Cheap
+  either way; the .env comment now warns against the drift recurring.
+
 - 2026-07-27 — [bug] **`ontology.cypher:109` points at a file that was never created —
   `ontology/reference/swo_sdlc_ontology.cypher` does not exist anywhere in the tree.** The
   comment reads: *"Full SDLC subset (~250 terms) loads from ontology/reference/swo_sdlc_ontology.cypher
