@@ -298,6 +298,52 @@ def pipeline_guid(args: tuple[str, ...] | list[str]) -> str | None:
     return None
 
 
+#: DPL launcher argument contract → definition-level PROPERTIES (G15;
+#: properties never identity, the G12 rule). Runtime values are deliberately
+#: EXCLUDED: -bd/-od (partition values), -proId (per-run GUID threaded via
+#: cross-job %%\\JOB\\VAR refs), -timeout/-sleep (tuning). Promoted here from
+#: drydocs_lineage.extractors.controlm_inventory (G40) — commands.py is the
+#: shared parser surface (MODULE_MAP), so the load component's cmdline
+#: staging parser and the lineage extractors read ONE contract.
+DPL_PROPERTY_FLAGS: dict[str, str] = {
+    "-env": "env",
+    "-appName": "app_name",
+    "-alias": "alias",
+    "-seal": "seal",           # direct SEAL-attribution source (gate cmdline-nfr-vetting)
+    "-fid": "fid",
+    "-img": "image",
+    "-dataflow": "dataflow",
+    "-conf": "config_path",
+    "-compute": "compute",
+    # on-prem shell-launcher (dpl_spark_processor) argument contract
+    "--dataset-id": "dataset_id",
+    "--user-jar-path": "user_jar_path",
+    "--hdfs-location": "hdfs_location",
+    "--token-file-path": "token_file_path",
+    "--manifest-file-path": "manifest_file_path",
+    "--queue-name": "queue_name",
+}
+#: launch-mode flags stay a PROPERTY — all three are kind=dpl, never a
+#: separate invocation_type (G15 acceptance d; -i/-t semantics still open)
+DPL_MODE_FLAGS = ("-i", "-t", "-py")
+DPL_BOOL_FLAGS = {"--aws": "aws"}
+
+
+def dpl_properties(args: tuple[str, ...] | list[str]) -> dict[str, str]:
+    """Definition-level properties from a DPL launcher arg list. Values may be
+    unresolved ``%%VAR`` references — kept verbatim (candidates for curation)."""
+    props: dict[str, str] = {}
+    for i, a in enumerate(args):
+        name = DPL_PROPERTY_FLAGS.get(a)
+        if name and i + 1 < len(args) and not args[i + 1].startswith("-"):
+            props[name] = args[i + 1]
+        elif a in DPL_BOOL_FLAGS:
+            props[DPL_BOOL_FLAGS[a]] = "true"
+        elif a in DPL_MODE_FLAGS:
+            props["launch_mode"] = a
+    return props
+
+
 def parse_invocation_statement(statement: str) -> Invocation | None:
     """Parse one already-split statement into an Invocation, or None if it
     is a no-op / pure assignment."""

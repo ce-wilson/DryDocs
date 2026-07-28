@@ -47,6 +47,7 @@
 | `drydocs/cli.py` | `drydocs-load` (entrypoint) | — (orchestrates loaders) |
 | `drydocs/snapshots/` | `drydocs-load` (tooling) | depgraph snapshot |
 | `drydocs/staging.py` | `drydocs-load` (staging bundle builder; ex `controlm/staging.py`) | — (builds loader input) |
+| `drydocs/cmdline_staging.py` | `drydocs-load` — G39/G40 TEMPORARY cmd-line job-detail staging store + parse (stand-in for the unbuilt psgmgr `CM_DEF_VJOB_DETAIL`; retire when a real table exists) | SQLite under `DRYDOCS_DATA_ROOT` (**no graph write**; G22 gates any load) |
 | `drydocs/graph_verify.py` | `drydocs-review` — data-driven Cypher acceptance runner (Epic H) | — (reads graph; asserts) |
 | `drydocs/review_labels.py` | `drydocs-review` — the review spine (source→DATA-label map); consumed by review | — (pure config) |
 | `drydocs/source_mappings.py` | `drydocs-review` — per-source column ledger accessor (doc 08); projected/filter-only/excluded/deferred disposition per profiled column | — (pure config) |

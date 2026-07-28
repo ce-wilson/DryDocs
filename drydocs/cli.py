@@ -37,6 +37,13 @@ Ingest commands:
                                     (config/manual-loads/, PIN semantics)
   drydocs load-code-snapshot      — G33 self-documentation: newest depgraph
                                     snapshot -> :Project / :CodeModule subgraph
+  drydocs export-cmdline-staging  — G39: graph :ControlMJob rows -> the
+                                    TEMPORARY job-detail staging store (SQLite
+                                    under DRYDOCS_DATA_ROOT; stand-in for the
+                                    unbuilt psgmgr CM_DEF_VJOB_DETAIL table)
+  drydocs parse-cmdline-staging   — G40: staged cmd_lines -> structured detail
+                                    columns (G26 registry + G15 DPL contract);
+                                    NO graph writes — G22 gates any load
 """
 from __future__ import annotations
 
@@ -878,6 +885,87 @@ def load_code_snapshot(
             f"[yellow]NO SWO TERM[/]: {n} node(s) with extension '{ext}' — "
             "IS_ENCODED_IN skipped (no seeded SwoClass term; see EXTENSION_LANGUAGE_IRI)"
         )
+
+
+@app.command(name="export-cmdline-staging")
+def export_cmdline_staging(
+    db_path: Path | None = typer.Option(
+        None,
+        "--db-path",
+        help="Store location override (default: <DRYDOCS_DATA_ROOT>/cmdline-staging/job_detail.db).",
+    ),
+) -> None:
+    """G39: materialize the TEMPORARY cmd-line job-detail staging store.
+
+    One row per loaded :ControlMJob — identity keys, task-type discriminator,
+    VERBATIM cmd_line — read FROM THE GRAPH (no Oracle needed; the psgmgr
+    CM_DEF_VJOB projection for the same shape is documented in the module and
+    the store's meta). Stand-in for the unbuilt CM_DEF_VJOB_DETAIL table —
+    deleted the day a real one exists. Reads the graph, writes only SQLite.
+    """
+    from .cmdline_staging import default_db_path, export_job_detail  # noqa: PLC0415
+
+    path = Path(db_path) if db_path else default_db_path(create=True)
+    run_id = str(uuid.uuid4())
+    run_log = LoaderRunLog("cmdline_staging_export.v1", run_id,
+                           source="graph::ControlMJob", target=str(path))
+    run_log.open()
+    run_log.attach()
+    try:
+        with _client() as cli:
+            report = export_job_detail(cli, path)
+    except Exception as exc:
+        run_log.close(error=exc)
+        raise
+    run_log.close(summary={"store": path, **report.__dict__})
+    console.print(f"store: {path}")
+    console.print(report.summary())
+    if report.jobs == 0:
+        console.print(
+            "[yellow]0 jobs exported — the target database has no :ControlMJob "
+            "rows (wrong DB, or controlm jobs not loaded?)[/]"
+        )
+
+
+@app.command(name="parse-cmdline-staging")
+def parse_cmdline_staging(
+    db_path: Path | None = typer.Option(
+        None,
+        "--db-path",
+        help="Store location override (default: <DRYDOCS_DATA_ROOT>/cmdline-staging/job_detail.db).",
+    ),
+) -> None:
+    """G40: parse staged cmd_lines into structured job-detail columns.
+
+    Shared core parser end to end (G26 launcher registry + G15 DPL arg
+    contract incl. the %%VAR-launcher GUID fallback; G16 values-decide).
+    Partial/unparsed rows hit the WARN stream and are counted, never dropped.
+    NO graph writes — G22 remains the terminus gate for anything entering
+    Neo4j.
+    """
+    from .cmdline_staging import (  # noqa: PLC0415
+        CmdlineStagingError,
+        default_db_path,
+        parse_job_detail,
+    )
+
+    path = Path(db_path) if db_path else default_db_path()
+    run_id = str(uuid.uuid4())
+    run_log = LoaderRunLog("cmdline_staging_parse.v1", run_id,
+                           source=str(path), target=str(path))
+    run_log.open()
+    run_log.attach()
+    try:
+        coverage = parse_job_detail(path)
+    except CmdlineStagingError as exc:
+        run_log.close(error=exc)
+        console.print(f"[red]{exc}[/]")
+        raise typer.Exit(2) from exc
+    except Exception as exc:
+        run_log.close(error=exc)
+        raise
+    run_log.close(summary=coverage.__dict__)
+    console.print(coverage.summary())
 
 
 @app.command(name="load-bmc-docs")

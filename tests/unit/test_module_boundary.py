@@ -51,7 +51,11 @@ CORE_PREFIXES: tuple[str, ...] = (
 COMPONENT_GROUPS: dict[str, tuple[str, ...]] = {
     # drydocs.staging = the load-cadence staging bundle builder (0002-a §6 borderline;
     # relocated out of core's controlm/ in Phase B).
-    "load": ("drydocs.loaders", "drydocs.cli", "drydocs.snapshots", "drydocs.staging"),
+    # drydocs.cmdline_staging = the G39/G40 TEMPORARY cmd-line job-detail
+    # staging store + parse (graph read -> SQLite under the data root; no
+    # graph writes) — load-cadence tooling, same bucket as staging.
+    "load": ("drydocs.loaders", "drydocs.cli", "drydocs.snapshots", "drydocs.staging",
+             "drydocs.cmdline_staging"),
     # drydocs-review — SME review + graph acceptance + docs publish (Epic H).
     # The default-deny test below FORCES a new review module to be classified here
     # rather than being silently unguarded.

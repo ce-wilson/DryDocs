@@ -38,6 +38,7 @@ from dataclasses import asdict, dataclass
 from pathlib import Path
 
 from drydocs_core.controlm import parse_command, pipeline_guid
+from drydocs_core.controlm.commands import dpl_properties as _dpl_properties
 
 from ..model import DataAssetNode, LineageGraph, ProcessNode, asset_id, process_id
 
@@ -119,47 +120,11 @@ def _stable_invocation_key(inv, target: str) -> str:
     return target
 
 
-#: DPL launcher argument contract → ProcessNode PROPERTIES (G15). Definition-
-#: level params only; properties NEVER identity (the G12 rule). Runtime values
-#: are deliberately EXCLUDED: -bd/-od (partition values), -proId (per-run GUID
-#: threaded via cross-job %%\\JOB\\VAR refs), -timeout/-sleep (tuning).
-_DPL_PROPERTY_FLAGS: dict[str, str] = {
-    "-env": "env",
-    "-appName": "app_name",
-    "-alias": "alias",
-    "-seal": "seal",           # direct SEAL-attribution source (gate cmdline-nfr-vetting)
-    "-fid": "fid",
-    "-img": "image",
-    "-dataflow": "dataflow",
-    "-conf": "config_path",
-    "-compute": "compute",
-    # on-prem shell-launcher (dpl_spark_processor) argument contract
-    "--dataset-id": "dataset_id",
-    "--user-jar-path": "user_jar_path",
-    "--hdfs-location": "hdfs_location",
-    "--token-file-path": "token_file_path",
-    "--manifest-file-path": "manifest_file_path",
-    "--queue-name": "queue_name",
-}
-#: launch-mode flags stay a PROPERTY — all three are kind=dpl, never a
-#: separate invocation_type (G15 acceptance d; -i/-t semantics still open)
-_DPL_MODE_FLAGS = ("-i", "-t", "-py")
-_DPL_BOOL_FLAGS = {"--aws": "aws"}
-
-
-def _dpl_properties(args: tuple[str, ...]) -> dict[str, str]:
-    """Definition-level properties from a DPL launcher arg list. Values may be
-    unresolved ``%%VAR`` references — kept verbatim (candidates for curation)."""
-    props: dict[str, str] = {}
-    for i, a in enumerate(args):
-        name = _DPL_PROPERTY_FLAGS.get(a)
-        if name and i + 1 < len(args) and not args[i + 1].startswith("-"):
-            props[name] = args[i + 1]
-        elif a in _DPL_BOOL_FLAGS:
-            props[_DPL_BOOL_FLAGS[a]] = "true"
-        elif a in _DPL_MODE_FLAGS:
-            props["launch_mode"] = a
-    return props
+# The DPL launcher argument contract (G15) is PROMOTED to the shared core
+# parser — drydocs_core.controlm.commands.dpl_properties — so the load
+# component's cmdline staging parser (G40) and these extractors read ONE
+# contract (imported above as _dpl_properties; rua_code_ops imports it from
+# here, unchanged).
 
 
 def _basename(path: str) -> str:
