@@ -5,10 +5,12 @@ Plan: [`code-graph-review-plan.md`](code-graph-review-plan.md).
 
 ## State
 
-- phase: ALL THREE COMPLETE (run 1)
-- next_action: none — next run only worth a session after the scanner fix
-  (see run log 2026-07-28); U4 (tech-debt query pack) should wait on the
-  same fix or it enshrines vacuous queries.
+- phase: ALL THREE COMPLETE (run 1); scanner fix LANDED (U6, same day)
+- next_action: U4 (tech-debt query pack) is unblocked — the graph is now
+  truthful (205 modules, 370 IMPORTS incl. cross-root + function-level;
+  drydocs_api scanned). Run 2 of the personas is worth a session whenever
+  drift is suspected: A1/A4/A5/A6 are answerable from the graph for the
+  first time.
 
 ## Run log
 
@@ -36,3 +38,11 @@ Plan: [`code-graph-review-plan.md`](code-graph-review-plan.md).
     component; sdlc-*.md §DEP stale in 3 rows (pre-G2 paths).
   - 5 IDEAS lines filed (see inbox, 2026-07-28); zero backlog/graph
     edits from within the reviews themselves.
+- 2026-07-28 (same day) — **Scanner fix built (U6).** Root cause was one
+  defect: `scan()` ran each root in isolation, so absolute imports naming a
+  sibling root OR the file's own package dir never resolved (`ast.walk`
+  always covered function bodies). Fix = shared-namespace `extract_many`
+  in the depgraph repo + `drydocs_api` added to snapshot.ps1 targets.
+  Post-fix graph: 205 modules / 370 IMPORTS (was 194/105), 0 cycles,
+  drydocs→drydocs_core probe matches grep ground truth module-for-module
+  (24), orphan signal reduced to genuine pytest entry points only.

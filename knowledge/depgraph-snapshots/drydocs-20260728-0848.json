@@ -1,0 +1,3364 @@
+{
+  "meta": {"project":"drydocs","captured_at":"2026-07-28T08:48:29","date":"20260728","scan":["drydocs","drydocs_core","drydocs_api","drydocs_remediation","drydocs_lineage","drydocs_deepdoc","tests"],"tree":false,"git":{"commit":"2905065","full":"2905065466e68fd5f66351695b24eddc0f0ebec9","branch":"main","describe":"2905065","subject":"chore(backlog): groom - 1 promoted (U6 scanner blind-spot fix), U4 re-sequenced","dirty":true,"pr":null}},
+  "schema": "depgraph-machine-first/v2",
+  "projects": [
+    "drydocs",
+    "drydocs_api",
+    "drydocs_core",
+    "drydocs_deepdoc",
+    "drydocs_lineage",
+    "drydocs_remediation",
+    "tests"
+  ],
+  "nodes": [
+    {
+      "file_id": "drydocs/__init__.py",
+      "name": "__init__.py",
+      "extension": ".py",
+      "rel_path": "__init__.py",
+      "abs_path": "C:/coding/projects/DryDocs/drydocs/__init__.py",
+      "project": "drydocs",
+      "circular": false
+    },
+    {
+      "file_id": "drydocs/cli.py",
+      "name": "cli.py",
+      "extension": ".py",
+      "rel_path": "cli.py",
+      "abs_path": "C:/coding/projects/DryDocs/drydocs/cli.py",
+      "project": "drydocs",
+      "circular": false
+    },
+    {
+      "file_id": "drydocs/cmdline_staging.py",
+      "name": "cmdline_staging.py",
+      "extension": ".py",
+      "rel_path": "cmdline_staging.py",
+      "abs_path": "C:/coding/projects/DryDocs/drydocs/cmdline_staging.py",
+      "project": "drydocs",
+      "circular": false
+    },
+    {
+      "file_id": "drydocs/design_doc.py",
+      "name": "design_doc.py",
+      "extension": ".py",
+      "rel_path": "design_doc.py",
+      "abs_path": "C:/coding/projects/DryDocs/drydocs/design_doc.py",
+      "project": "drydocs",
+      "circular": false
+    },
+    {
+      "file_id": "drydocs/doc_outline.py",
+      "name": "doc_outline.py",
+      "extension": ".py",
+      "rel_path": "doc_outline.py",
+      "abs_path": "C:/coding/projects/DryDocs/drydocs/doc_outline.py",
+      "project": "drydocs",
+      "circular": false
+    },
+    {
+      "file_id": "drydocs/doc_pdf.py",
+      "name": "doc_pdf.py",
+      "extension": ".py",
+      "rel_path": "doc_pdf.py",
+      "abs_path": "C:/coding/projects/DryDocs/drydocs/doc_pdf.py",
+      "project": "drydocs",
+      "circular": false
+    },
+    {
+      "file_id": "drydocs/gate_pages.py",
+      "name": "gate_pages.py",
+      "extension": ".py",
+      "rel_path": "gate_pages.py",
+      "abs_path": "C:/coding/projects/DryDocs/drydocs/gate_pages.py",
+      "project": "drydocs",
+      "circular": false
+    },
+    {
+      "file_id": "drydocs/graph_review.py",
+      "name": "graph_review.py",
+      "extension": ".py",
+      "rel_path": "graph_review.py",
+      "abs_path": "C:/coding/projects/DryDocs/drydocs/graph_review.py",
+      "project": "drydocs",
+      "circular": false
+    },
+    {
+      "file_id": "drydocs/graph_verify.py",
+      "name": "graph_verify.py",
+      "extension": ".py",
+      "rel_path": "graph_verify.py",
+      "abs_path": "C:/coding/projects/DryDocs/drydocs/graph_verify.py",
+      "project": "drydocs",
+      "circular": false
+    },
+    {
+      "file_id": "drydocs/loaders/__init__.py",
+      "name": "__init__.py",
+      "extension": ".py",
+      "rel_path": "loaders/__init__.py",
+      "abs_path": "C:/coding/projects/DryDocs/drydocs/loaders/__init__.py",
+      "project": "drydocs",
+      "circular": false
+    },
+    {
+      "file_id": "drydocs/loaders/base.py",
+      "name": "base.py",
+      "extension": ".py",
+      "rel_path": "loaders/base.py",
+      "abs_path": "C:/coding/projects/DryDocs/drydocs/loaders/base.py",
+      "project": "drydocs",
+      "circular": false
+    },
+    {
+      "file_id": "drydocs/loaders/batch_port_orchestrator.py",
+      "name": "batch_port_orchestrator.py",
+      "extension": ".py",
+      "rel_path": "loaders/batch_port_orchestrator.py",
+      "abs_path": "C:/coding/projects/DryDocs/drydocs/loaders/batch_port_orchestrator.py",
+      "project": "drydocs",
+      "circular": false
+    },
+    {
+      "file_id": "drydocs/loaders/bmc_docs.py",
+      "name": "bmc_docs.py",
+      "extension": ".py",
+      "rel_path": "loaders/bmc_docs.py",
+      "abs_path": "C:/coding/projects/DryDocs/drydocs/loaders/bmc_docs.py",
+      "project": "drydocs",
+      "circular": false
+    },
+    {
+      "file_id": "drydocs/loaders/business_segments.py",
+      "name": "business_segments.py",
+      "extension": ".py",
+      "rel_path": "loaders/business_segments.py",
+      "abs_path": "C:/coding/projects/DryDocs/drydocs/loaders/business_segments.py",
+      "project": "drydocs",
+      "circular": false
+    },
+    {
+      "file_id": "drydocs/loaders/catalog.py",
+      "name": "catalog.py",
+      "extension": ".py",
+      "rel_path": "loaders/catalog.py",
+      "abs_path": "C:/coding/projects/DryDocs/drydocs/loaders/catalog.py",
+      "project": "drydocs",
+      "circular": false
+    },
+    {
+      "file_id": "drydocs/loaders/code_snapshot.py",
+      "name": "code_snapshot.py",
+      "extension": ".py",
+      "rel_path": "loaders/code_snapshot.py",
+      "abs_path": "C:/coding/projects/DryDocs/drydocs/loaders/code_snapshot.py",
+      "project": "drydocs",
+      "circular": false
+    },
+    {
+      "file_id": "drydocs/loaders/controlm.py",
+      "name": "controlm.py",
+      "extension": ".py",
+      "rel_path": "loaders/controlm.py",
+      "abs_path": "C:/coding/projects/DryDocs/drydocs/loaders/controlm.py",
+      "project": "drydocs",
+      "circular": false
+    },
+    {
+      "file_id": "drydocs/loaders/controlm_conditions_in.py",
+      "name": "controlm_conditions_in.py",
+      "extension": ".py",
+      "rel_path": "loaders/controlm_conditions_in.py",
+      "abs_path": "C:/coding/projects/DryDocs/drydocs/loaders/controlm_conditions_in.py",
+      "project": "drydocs",
+      "circular": false
+    },
+    {
+      "file_id": "drydocs/loaders/controlm_conditions_out.py",
+      "name": "controlm_conditions_out.py",
+      "extension": ".py",
+      "rel_path": "loaders/controlm_conditions_out.py",
+      "abs_path": "C:/coding/projects/DryDocs/drydocs/loaders/controlm_conditions_out.py",
+      "project": "drydocs",
+      "circular": false
+    },
+    {
+      "file_id": "drydocs/loaders/controlm_dependencies_derived.py",
+      "name": "controlm_dependencies_derived.py",
+      "extension": ".py",
+      "rel_path": "loaders/controlm_dependencies_derived.py",
+      "abs_path": "C:/coding/projects/DryDocs/drydocs/loaders/controlm_dependencies_derived.py",
+      "project": "drydocs",
+      "circular": false
+    },
+    {
+      "file_id": "drydocs/loaders/controlm_folders.py",
+      "name": "controlm_folders.py",
+      "extension": ".py",
+      "rel_path": "loaders/controlm_folders.py",
+      "abs_path": "C:/coding/projects/DryDocs/drydocs/loaders/controlm_folders.py",
+      "project": "drydocs",
+      "circular": false
+    },
+    {
+      "file_id": "drydocs/loaders/controlm_hosts.py",
+      "name": "controlm_hosts.py",
+      "extension": ".py",
+      "rel_path": "loaders/controlm_hosts.py",
+      "abs_path": "C:/coding/projects/DryDocs/drydocs/loaders/controlm_hosts.py",
+      "project": "drydocs",
+      "circular": false
+    },
+    {
+      "file_id": "drydocs/loaders/controlm_jobs.py",
+      "name": "controlm_jobs.py",
+      "extension": ".py",
+      "rel_path": "loaders/controlm_jobs.py",
+      "abs_path": "C:/coding/projects/DryDocs/drydocs/loaders/controlm_jobs.py",
+      "project": "drydocs",
+      "circular": false
+    },
+    {
+      "file_id": "drydocs/loaders/doc_traceability.py",
+      "name": "doc_traceability.py",
+      "extension": ".py",
+      "rel_path": "loaders/doc_traceability.py",
+      "abs_path": "C:/coding/projects/DryDocs/drydocs/loaders/doc_traceability.py",
+      "project": "drydocs",
+      "circular": false
+    },
+    {
+      "file_id": "drydocs/loaders/essential_graphrag.py",
+      "name": "essential_graphrag.py",
+      "extension": ".py",
+      "rel_path": "loaders/essential_graphrag.py",
+      "abs_path": "C:/coding/projects/DryDocs/drydocs/loaders/essential_graphrag.py",
+      "project": "drydocs",
+      "circular": false
+    },
+    {
+      "file_id": "drydocs/loaders/manual_loads.py",
+      "name": "manual_loads.py",
+      "extension": ".py",
+      "rel_path": "loaders/manual_loads.py",
+      "abs_path": "C:/coding/projects/DryDocs/drydocs/loaders/manual_loads.py",
+      "project": "drydocs",
+      "circular": false
+    },
+    {
+      "file_id": "drydocs/loaders/runs_on_resolution.py",
+      "name": "runs_on_resolution.py",
+      "extension": ".py",
+      "rel_path": "loaders/runs_on_resolution.py",
+      "abs_path": "C:/coding/projects/DryDocs/drydocs/loaders/runs_on_resolution.py",
+      "project": "drydocs",
+      "circular": false
+    },
+    {
+      "file_id": "drydocs/loaders/seal_applications.py",
+      "name": "seal_applications.py",
+      "extension": ".py",
+      "rel_path": "loaders/seal_applications.py",
+      "abs_path": "C:/coding/projects/DryDocs/drydocs/loaders/seal_applications.py",
+      "project": "drydocs",
+      "circular": false
+    },
+    {
+      "file_id": "drydocs/loaders/seal_attribution.py",
+      "name": "seal_attribution.py",
+      "extension": ".py",
+      "rel_path": "loaders/seal_attribution.py",
+      "abs_path": "C:/coding/projects/DryDocs/drydocs/loaders/seal_attribution.py",
+      "project": "drydocs",
+      "circular": false
+    },
+    {
+      "file_id": "drydocs/loaders/seal_contacts.py",
+      "name": "seal_contacts.py",
+      "extension": ".py",
+      "rel_path": "loaders/seal_contacts.py",
+      "abs_path": "C:/coding/projects/DryDocs/drydocs/loaders/seal_contacts.py",
+      "project": "drydocs",
+      "circular": false
+    },
+    {
+      "file_id": "drydocs/loaders/software_registry.py",
+      "name": "software_registry.py",
+      "extension": ".py",
+      "rel_path": "loaders/software_registry.py",
+      "abs_path": "C:/coding/projects/DryDocs/drydocs/loaders/software_registry.py",
+      "project": "drydocs",
+      "circular": false
+    },
+    {
+      "file_id": "drydocs/plan_board.py",
+      "name": "plan_board.py",
+      "extension": ".py",
+      "rel_path": "plan_board.py",
+      "abs_path": "C:/coding/projects/DryDocs/drydocs/plan_board.py",
+      "project": "drydocs",
+      "circular": false
+    },
+    {
+      "file_id": "drydocs/publishing/__init__.py",
+      "name": "__init__.py",
+      "extension": ".py",
+      "rel_path": "publishing/__init__.py",
+      "abs_path": "C:/coding/projects/DryDocs/drydocs/publishing/__init__.py",
+      "project": "drydocs",
+      "circular": false
+    },
+    {
+      "file_id": "drydocs/publishing/assembler.py",
+      "name": "assembler.py",
+      "extension": ".py",
+      "rel_path": "publishing/assembler.py",
+      "abs_path": "C:/coding/projects/DryDocs/drydocs/publishing/assembler.py",
+      "project": "drydocs",
+      "circular": false
+    },
+    {
+      "file_id": "drydocs/publishing/preview.py",
+      "name": "preview.py",
+      "extension": ".py",
+      "rel_path": "publishing/preview.py",
+      "abs_path": "C:/coding/projects/DryDocs/drydocs/publishing/preview.py",
+      "project": "drydocs",
+      "circular": false
+    },
+    {
+      "file_id": "drydocs/publishing/publisher.py",
+      "name": "publisher.py",
+      "extension": ".py",
+      "rel_path": "publishing/publisher.py",
+      "abs_path": "C:/coding/projects/DryDocs/drydocs/publishing/publisher.py",
+      "project": "drydocs",
+      "circular": false
+    },
+    {
+      "file_id": "drydocs/publishing/validator.py",
+      "name": "validator.py",
+      "extension": ".py",
+      "rel_path": "publishing/validator.py",
+      "abs_path": "C:/coding/projects/DryDocs/drydocs/publishing/validator.py",
+      "project": "drydocs",
+      "circular": false
+    },
+    {
+      "file_id": "drydocs/review_labels.py",
+      "name": "review_labels.py",
+      "extension": ".py",
+      "rel_path": "review_labels.py",
+      "abs_path": "C:/coding/projects/DryDocs/drydocs/review_labels.py",
+      "project": "drydocs",
+      "circular": false
+    },
+    {
+      "file_id": "drydocs/sme_notes.py",
+      "name": "sme_notes.py",
+      "extension": ".py",
+      "rel_path": "sme_notes.py",
+      "abs_path": "C:/coding/projects/DryDocs/drydocs/sme_notes.py",
+      "project": "drydocs",
+      "circular": false
+    },
+    {
+      "file_id": "drydocs/snapshots/__init__.py",
+      "name": "__init__.py",
+      "extension": ".py",
+      "rel_path": "snapshots/__init__.py",
+      "abs_path": "C:/coding/projects/DryDocs/drydocs/snapshots/__init__.py",
+      "project": "drydocs",
+      "circular": false
+    },
+    {
+      "file_id": "drydocs/snapshots/writer.py",
+      "name": "writer.py",
+      "extension": ".py",
+      "rel_path": "snapshots/writer.py",
+      "abs_path": "C:/coding/projects/DryDocs/drydocs/snapshots/writer.py",
+      "project": "drydocs",
+      "circular": false
+    },
+    {
+      "file_id": "drydocs/source_mappings.py",
+      "name": "source_mappings.py",
+      "extension": ".py",
+      "rel_path": "source_mappings.py",
+      "abs_path": "C:/coding/projects/DryDocs/drydocs/source_mappings.py",
+      "project": "drydocs",
+      "circular": false
+    },
+    {
+      "file_id": "drydocs/staging.py",
+      "name": "staging.py",
+      "extension": ".py",
+      "rel_path": "staging.py",
+      "abs_path": "C:/coding/projects/DryDocs/drydocs/staging.py",
+      "project": "drydocs",
+      "circular": false
+    },
+    {
+      "file_id": "drydocs_api/__init__.py",
+      "name": "__init__.py",
+      "extension": ".py",
+      "rel_path": "__init__.py",
+      "abs_path": "C:/coding/projects/DryDocs/drydocs_api/__init__.py",
+      "project": "drydocs_api",
+      "circular": false
+    },
+    {
+      "file_id": "drydocs_api/app.py",
+      "name": "app.py",
+      "extension": ".py",
+      "rel_path": "app.py",
+      "abs_path": "C:/coding/projects/DryDocs/drydocs_api/app.py",
+      "project": "drydocs_api",
+      "circular": false
+    },
+    {
+      "file_id": "drydocs_api/exports.py",
+      "name": "exports.py",
+      "extension": ".py",
+      "rel_path": "exports.py",
+      "abs_path": "C:/coding/projects/DryDocs/drydocs_api/exports.py",
+      "project": "drydocs_api",
+      "circular": false
+    },
+    {
+      "file_id": "drydocs_api/guard.py",
+      "name": "guard.py",
+      "extension": ".py",
+      "rel_path": "guard.py",
+      "abs_path": "C:/coding/projects/DryDocs/drydocs_api/guard.py",
+      "project": "drydocs_api",
+      "circular": false
+    },
+    {
+      "file_id": "drydocs_api/handlers.py",
+      "name": "handlers.py",
+      "extension": ".py",
+      "rel_path": "handlers.py",
+      "abs_path": "C:/coding/projects/DryDocs/drydocs_api/handlers.py",
+      "project": "drydocs_api",
+      "circular": false
+    },
+    {
+      "file_id": "drydocs_api/mappings.py",
+      "name": "mappings.py",
+      "extension": ".py",
+      "rel_path": "mappings.py",
+      "abs_path": "C:/coding/projects/DryDocs/drydocs_api/mappings.py",
+      "project": "drydocs_api",
+      "circular": false
+    },
+    {
+      "file_id": "drydocs_api/personas.py",
+      "name": "personas.py",
+      "extension": ".py",
+      "rel_path": "personas.py",
+      "abs_path": "C:/coding/projects/DryDocs/drydocs_api/personas.py",
+      "project": "drydocs_api",
+      "circular": false
+    },
+    {
+      "file_id": "drydocs_api/queries.py",
+      "name": "queries.py",
+      "extension": ".py",
+      "rel_path": "queries.py",
+      "abs_path": "C:/coding/projects/DryDocs/drydocs_api/queries.py",
+      "project": "drydocs_api",
+      "circular": false
+    },
+    {
+      "file_id": "drydocs_api/query_specs.py",
+      "name": "query_specs.py",
+      "extension": ".py",
+      "rel_path": "query_specs.py",
+      "abs_path": "C:/coding/projects/DryDocs/drydocs_api/query_specs.py",
+      "project": "drydocs_api",
+      "circular": false
+    },
+    {
+      "file_id": "drydocs_api/routing.py",
+      "name": "routing.py",
+      "extension": ".py",
+      "rel_path": "routing.py",
+      "abs_path": "C:/coding/projects/DryDocs/drydocs_api/routing.py",
+      "project": "drydocs_api",
+      "circular": false
+    },
+    {
+      "file_id": "drydocs_api/sessions.py",
+      "name": "sessions.py",
+      "extension": ".py",
+      "rel_path": "sessions.py",
+      "abs_path": "C:/coding/projects/DryDocs/drydocs_api/sessions.py",
+      "project": "drydocs_api",
+      "circular": false
+    },
+    {
+      "file_id": "drydocs_core/__init__.py",
+      "name": "__init__.py",
+      "extension": ".py",
+      "rel_path": "__init__.py",
+      "abs_path": "C:/coding/projects/DryDocs/drydocs_core/__init__.py",
+      "project": "drydocs_core",
+      "circular": false
+    },
+    {
+      "file_id": "drydocs_core/adapters/__init__.py",
+      "name": "__init__.py",
+      "extension": ".py",
+      "rel_path": "adapters/__init__.py",
+      "abs_path": "C:/coding/projects/DryDocs/drydocs_core/adapters/__init__.py",
+      "project": "drydocs_core",
+      "circular": false
+    },
+    {
+      "file_id": "drydocs_core/adapters/base.py",
+      "name": "base.py",
+      "extension": ".py",
+      "rel_path": "adapters/base.py",
+      "abs_path": "C:/coding/projects/DryDocs/drydocs_core/adapters/base.py",
+      "project": "drydocs_core",
+      "circular": false
+    },
+    {
+      "file_id": "drydocs_core/adapters/csv_adapter.py",
+      "name": "csv_adapter.py",
+      "extension": ".py",
+      "rel_path": "adapters/csv_adapter.py",
+      "abs_path": "C:/coding/projects/DryDocs/drydocs_core/adapters/csv_adapter.py",
+      "project": "drydocs_core",
+      "circular": false
+    },
+    {
+      "file_id": "drydocs_core/adapters/oracle_adapter.py",
+      "name": "oracle_adapter.py",
+      "extension": ".py",
+      "rel_path": "adapters/oracle_adapter.py",
+      "abs_path": "C:/coding/projects/DryDocs/drydocs_core/adapters/oracle_adapter.py",
+      "project": "drydocs_core",
+      "circular": false
+    },
+    {
+      "file_id": "drydocs_core/adapters/sql_run_log.py",
+      "name": "sql_run_log.py",
+      "extension": ".py",
+      "rel_path": "adapters/sql_run_log.py",
+      "abs_path": "C:/coding/projects/DryDocs/drydocs_core/adapters/sql_run_log.py",
+      "project": "drydocs_core",
+      "circular": false
+    },
+    {
+      "file_id": "drydocs_core/config.py",
+      "name": "config.py",
+      "extension": ".py",
+      "rel_path": "config.py",
+      "abs_path": "C:/coding/projects/DryDocs/drydocs_core/config.py",
+      "project": "drydocs_core",
+      "circular": false
+    },
+    {
+      "file_id": "drydocs_core/controlm/__init__.py",
+      "name": "__init__.py",
+      "extension": ".py",
+      "rel_path": "controlm/__init__.py",
+      "abs_path": "C:/coding/projects/DryDocs/drydocs_core/controlm/__init__.py",
+      "project": "drydocs_core",
+      "circular": false
+    },
+    {
+      "file_id": "drydocs_core/controlm/commands.py",
+      "name": "commands.py",
+      "extension": ".py",
+      "rel_path": "controlm/commands.py",
+      "abs_path": "C:/coding/projects/DryDocs/drydocs_core/controlm/commands.py",
+      "project": "drydocs_core",
+      "circular": false
+    },
+    {
+      "file_id": "drydocs_core/controlm/facts.py",
+      "name": "facts.py",
+      "extension": ".py",
+      "rel_path": "controlm/facts.py",
+      "abs_path": "C:/coding/projects/DryDocs/drydocs_core/controlm/facts.py",
+      "project": "drydocs_core",
+      "circular": false
+    },
+    {
+      "file_id": "drydocs_core/controlm/folder_name.py",
+      "name": "folder_name.py",
+      "extension": ".py",
+      "rel_path": "controlm/folder_name.py",
+      "abs_path": "C:/coding/projects/DryDocs/drydocs_core/controlm/folder_name.py",
+      "project": "drydocs_core",
+      "circular": false
+    },
+    {
+      "file_id": "drydocs_core/controlm/paths.py",
+      "name": "paths.py",
+      "extension": ".py",
+      "rel_path": "controlm/paths.py",
+      "abs_path": "C:/coding/projects/DryDocs/drydocs_core/controlm/paths.py",
+      "project": "drydocs_core",
+      "circular": false
+    },
+    {
+      "file_id": "drydocs_core/controlm/resolver.py",
+      "name": "resolver.py",
+      "extension": ".py",
+      "rel_path": "controlm/resolver.py",
+      "abs_path": "C:/coding/projects/DryDocs/drydocs_core/controlm/resolver.py",
+      "project": "drydocs_core",
+      "circular": false
+    },
+    {
+      "file_id": "drydocs_core/controlm/variable_report.py",
+      "name": "variable_report.py",
+      "extension": ".py",
+      "rel_path": "controlm/variable_report.py",
+      "abs_path": "C:/coding/projects/DryDocs/drydocs_core/controlm/variable_report.py",
+      "project": "drydocs_core",
+      "circular": false
+    },
+    {
+      "file_id": "drydocs_core/controlm/variables.py",
+      "name": "variables.py",
+      "extension": ".py",
+      "rel_path": "controlm/variables.py",
+      "abs_path": "C:/coding/projects/DryDocs/drydocs_core/controlm/variables.py",
+      "project": "drydocs_core",
+      "circular": false
+    },
+    {
+      "file_id": "drydocs_core/cypher_split.py",
+      "name": "cypher_split.py",
+      "extension": ".py",
+      "rel_path": "cypher_split.py",
+      "abs_path": "C:/coding/projects/DryDocs/drydocs_core/cypher_split.py",
+      "project": "drydocs_core",
+      "circular": false
+    },
+    {
+      "file_id": "drydocs_core/data_root.py",
+      "name": "data_root.py",
+      "extension": ".py",
+      "rel_path": "data_root.py",
+      "abs_path": "C:/coding/projects/DryDocs/drydocs_core/data_root.py",
+      "project": "drydocs_core",
+      "circular": false
+    },
+    {
+      "file_id": "drydocs_core/doc_anchors.py",
+      "name": "doc_anchors.py",
+      "extension": ".py",
+      "rel_path": "doc_anchors.py",
+      "abs_path": "C:/coding/projects/DryDocs/drydocs_core/doc_anchors.py",
+      "project": "drydocs_core",
+      "circular": false
+    },
+    {
+      "file_id": "drydocs_core/manual_mappings.py",
+      "name": "manual_mappings.py",
+      "extension": ".py",
+      "rel_path": "manual_mappings.py",
+      "abs_path": "C:/coding/projects/DryDocs/drydocs_core/manual_mappings.py",
+      "project": "drydocs_core",
+      "circular": false
+    },
+    {
+      "file_id": "drydocs_core/mapping_store.py",
+      "name": "mapping_store.py",
+      "extension": ".py",
+      "rel_path": "mapping_store.py",
+      "abs_path": "C:/coding/projects/DryDocs/drydocs_core/mapping_store.py",
+      "project": "drydocs_core",
+      "circular": false
+    },
+    {
+      "file_id": "drydocs_core/models/__init__.py",
+      "name": "__init__.py",
+      "extension": ".py",
+      "rel_path": "models/__init__.py",
+      "abs_path": "C:/coding/projects/DryDocs/drydocs_core/models/__init__.py",
+      "project": "drydocs_core",
+      "circular": false
+    },
+    {
+      "file_id": "drydocs_core/models/attribution.py",
+      "name": "attribution.py",
+      "extension": ".py",
+      "rel_path": "models/attribution.py",
+      "abs_path": "C:/coding/projects/DryDocs/drydocs_core/models/attribution.py",
+      "project": "drydocs_core",
+      "circular": false
+    },
+    {
+      "file_id": "drydocs_core/models/code_snapshot.py",
+      "name": "code_snapshot.py",
+      "extension": ".py",
+      "rel_path": "models/code_snapshot.py",
+      "abs_path": "C:/coding/projects/DryDocs/drydocs_core/models/code_snapshot.py",
+      "project": "drydocs_core",
+      "circular": false
+    },
+    {
+      "file_id": "drydocs_core/models/controlm.py",
+      "name": "controlm.py",
+      "extension": ".py",
+      "rel_path": "models/controlm.py",
+      "abs_path": "C:/coding/projects/DryDocs/drydocs_core/models/controlm.py",
+      "project": "drydocs_core",
+      "circular": false
+    },
+    {
+      "file_id": "drydocs_core/models/doc_traceability.py",
+      "name": "doc_traceability.py",
+      "extension": ".py",
+      "rel_path": "models/doc_traceability.py",
+      "abs_path": "C:/coding/projects/DryDocs/drydocs_core/models/doc_traceability.py",
+      "project": "drydocs_core",
+      "circular": false
+    },
+    {
+      "file_id": "drydocs_core/models/docs.py",
+      "name": "docs.py",
+      "extension": ".py",
+      "rel_path": "models/docs.py",
+      "abs_path": "C:/coding/projects/DryDocs/drydocs_core/models/docs.py",
+      "project": "drydocs_core",
+      "circular": false
+    },
+    {
+      "file_id": "drydocs_core/models/registry.py",
+      "name": "registry.py",
+      "extension": ".py",
+      "rel_path": "models/registry.py",
+      "abs_path": "C:/coding/projects/DryDocs/drydocs_core/models/registry.py",
+      "project": "drydocs_core",
+      "circular": false
+    },
+    {
+      "file_id": "drydocs_core/models/seal.py",
+      "name": "seal.py",
+      "extension": ".py",
+      "rel_path": "models/seal.py",
+      "abs_path": "C:/coding/projects/DryDocs/drydocs_core/models/seal.py",
+      "project": "drydocs_core",
+      "circular": false
+    },
+    {
+      "file_id": "drydocs_core/neo4j_client.py",
+      "name": "neo4j_client.py",
+      "extension": ".py",
+      "rel_path": "neo4j_client.py",
+      "abs_path": "C:/coding/projects/DryDocs/drydocs_core/neo4j_client.py",
+      "project": "drydocs_core",
+      "circular": false
+    },
+    {
+      "file_id": "drydocs_core/ontology/__init__.py",
+      "name": "__init__.py",
+      "extension": ".py",
+      "rel_path": "ontology/__init__.py",
+      "abs_path": "C:/coding/projects/DryDocs/drydocs_core/ontology/__init__.py",
+      "project": "drydocs_core",
+      "circular": false
+    },
+    {
+      "file_id": "drydocs_core/ontology/namespaces.py",
+      "name": "namespaces.py",
+      "extension": ".py",
+      "rel_path": "ontology/namespaces.py",
+      "abs_path": "C:/coding/projects/DryDocs/drydocs_core/ontology/namespaces.py",
+      "project": "drydocs_core",
+      "circular": false
+    },
+    {
+      "file_id": "drydocs_core/ontology/schema_graph.py",
+      "name": "schema_graph.py",
+      "extension": ".py",
+      "rel_path": "ontology/schema_graph.py",
+      "abs_path": "C:/coding/projects/DryDocs/drydocs_core/ontology/schema_graph.py",
+      "project": "drydocs_core",
+      "circular": false
+    },
+    {
+      "file_id": "drydocs_core/precedence.py",
+      "name": "precedence.py",
+      "extension": ".py",
+      "rel_path": "precedence.py",
+      "abs_path": "C:/coding/projects/DryDocs/drydocs_core/precedence.py",
+      "project": "drydocs_core",
+      "circular": false
+    },
+    {
+      "file_id": "drydocs_core/run_log.py",
+      "name": "run_log.py",
+      "extension": ".py",
+      "rel_path": "run_log.py",
+      "abs_path": "C:/coding/projects/DryDocs/drydocs_core/run_log.py",
+      "project": "drydocs_core",
+      "circular": false
+    },
+    {
+      "file_id": "drydocs_core/schema/supplements.py",
+      "name": "supplements.py",
+      "extension": ".py",
+      "rel_path": "schema/supplements.py",
+      "abs_path": "C:/coding/projects/DryDocs/drydocs_core/schema/supplements.py",
+      "project": "drydocs_core",
+      "circular": false
+    },
+    {
+      "file_id": "drydocs_core/source_registry.py",
+      "name": "source_registry.py",
+      "extension": ".py",
+      "rel_path": "source_registry.py",
+      "abs_path": "C:/coding/projects/DryDocs/drydocs_core/source_registry.py",
+      "project": "drydocs_core",
+      "circular": false
+    },
+    {
+      "file_id": "drydocs_deepdoc/__init__.py",
+      "name": "__init__.py",
+      "extension": ".py",
+      "rel_path": "__init__.py",
+      "abs_path": "C:/coding/projects/DryDocs/drydocs_deepdoc/__init__.py",
+      "project": "drydocs_deepdoc",
+      "circular": false
+    },
+    {
+      "file_id": "drydocs_deepdoc/investigate.py",
+      "name": "investigate.py",
+      "extension": ".py",
+      "rel_path": "investigate.py",
+      "abs_path": "C:/coding/projects/DryDocs/drydocs_deepdoc/investigate.py",
+      "project": "drydocs_deepdoc",
+      "circular": false
+    },
+    {
+      "file_id": "drydocs_deepdoc/writer.py",
+      "name": "writer.py",
+      "extension": ".py",
+      "rel_path": "writer.py",
+      "abs_path": "C:/coding/projects/DryDocs/drydocs_deepdoc/writer.py",
+      "project": "drydocs_deepdoc",
+      "circular": false
+    },
+    {
+      "file_id": "drydocs_lineage/__init__.py",
+      "name": "__init__.py",
+      "extension": ".py",
+      "rel_path": "__init__.py",
+      "abs_path": "C:/coding/projects/DryDocs/drydocs_lineage/__init__.py",
+      "project": "drydocs_lineage",
+      "circular": false
+    },
+    {
+      "file_id": "drydocs_lineage/curation.py",
+      "name": "curation.py",
+      "extension": ".py",
+      "rel_path": "curation.py",
+      "abs_path": "C:/coding/projects/DryDocs/drydocs_lineage/curation.py",
+      "project": "drydocs_lineage",
+      "circular": false
+    },
+    {
+      "file_id": "drydocs_lineage/extractors/__init__.py",
+      "name": "__init__.py",
+      "extension": ".py",
+      "rel_path": "extractors/__init__.py",
+      "abs_path": "C:/coding/projects/DryDocs/drydocs_lineage/extractors/__init__.py",
+      "project": "drydocs_lineage",
+      "circular": false
+    },
+    {
+      "file_id": "drydocs_lineage/extractors/code_repo.py",
+      "name": "code_repo.py",
+      "extension": ".py",
+      "rel_path": "extractors/code_repo.py",
+      "abs_path": "C:/coding/projects/DryDocs/drydocs_lineage/extractors/code_repo.py",
+      "project": "drydocs_lineage",
+      "circular": false
+    },
+    {
+      "file_id": "drydocs_lineage/extractors/controlm_inventory.py",
+      "name": "controlm_inventory.py",
+      "extension": ".py",
+      "rel_path": "extractors/controlm_inventory.py",
+      "abs_path": "C:/coding/projects/DryDocs/drydocs_lineage/extractors/controlm_inventory.py",
+      "project": "drydocs_lineage",
+      "circular": false
+    },
+    {
+      "file_id": "drydocs_lineage/extractors/dpl_mac.py",
+      "name": "dpl_mac.py",
+      "extension": ".py",
+      "rel_path": "extractors/dpl_mac.py",
+      "abs_path": "C:/coding/projects/DryDocs/drydocs_lineage/extractors/dpl_mac.py",
+      "project": "drydocs_lineage",
+      "circular": false
+    },
+    {
+      "file_id": "drydocs_lineage/extractors/dpl_registry.py",
+      "name": "dpl_registry.py",
+      "extension": ".py",
+      "rel_path": "extractors/dpl_registry.py",
+      "abs_path": "C:/coding/projects/DryDocs/drydocs_lineage/extractors/dpl_registry.py",
+      "project": "drydocs_lineage",
+      "circular": false
+    },
+    {
+      "file_id": "drydocs_lineage/extractors/glue_tables.py",
+      "name": "glue_tables.py",
+      "extension": ".py",
+      "rel_path": "extractors/glue_tables.py",
+      "abs_path": "C:/coding/projects/DryDocs/drydocs_lineage/extractors/glue_tables.py",
+      "project": "drydocs_lineage",
+      "circular": false
+    },
+    {
+      "file_id": "drydocs_lineage/extractors/rua_code_ops.py",
+      "name": "rua_code_ops.py",
+      "extension": ".py",
+      "rel_path": "extractors/rua_code_ops.py",
+      "abs_path": "C:/coding/projects/DryDocs/drydocs_lineage/extractors/rua_code_ops.py",
+      "project": "drydocs_lineage",
+      "circular": false
+    },
+    {
+      "file_id": "drydocs_lineage/extractors/rua_inventory.py",
+      "name": "rua_inventory.py",
+      "extension": ".py",
+      "rel_path": "extractors/rua_inventory.py",
+      "abs_path": "C:/coding/projects/DryDocs/drydocs_lineage/extractors/rua_inventory.py",
+      "project": "drydocs_lineage",
+      "circular": false
+    },
+    {
+      "file_id": "drydocs_lineage/model.py",
+      "name": "model.py",
+      "extension": ".py",
+      "rel_path": "model.py",
+      "abs_path": "C:/coding/projects/DryDocs/drydocs_lineage/model.py",
+      "project": "drydocs_lineage",
+      "circular": false
+    },
+    {
+      "file_id": "drydocs_lineage/review.py",
+      "name": "review.py",
+      "extension": ".py",
+      "rel_path": "review.py",
+      "abs_path": "C:/coding/projects/DryDocs/drydocs_lineage/review.py",
+      "project": "drydocs_lineage",
+      "circular": false
+    },
+    {
+      "file_id": "drydocs_lineage/writer.py",
+      "name": "writer.py",
+      "extension": ".py",
+      "rel_path": "writer.py",
+      "abs_path": "C:/coding/projects/DryDocs/drydocs_lineage/writer.py",
+      "project": "drydocs_lineage",
+      "circular": false
+    },
+    {
+      "file_id": "drydocs_remediation/__init__.py",
+      "name": "__init__.py",
+      "extension": ".py",
+      "rel_path": "__init__.py",
+      "abs_path": "C:/coding/projects/DryDocs/drydocs_remediation/__init__.py",
+      "project": "drydocs_remediation",
+      "circular": false
+    },
+    {
+      "file_id": "drydocs_remediation/corroborate.py",
+      "name": "corroborate.py",
+      "extension": ".py",
+      "rel_path": "corroborate.py",
+      "abs_path": "C:/coding/projects/DryDocs/drydocs_remediation/corroborate.py",
+      "project": "drydocs_remediation",
+      "circular": false
+    },
+    {
+      "file_id": "drydocs_remediation/detect.py",
+      "name": "detect.py",
+      "extension": ".py",
+      "rel_path": "detect.py",
+      "abs_path": "C:/coding/projects/DryDocs/drydocs_remediation/detect.py",
+      "project": "drydocs_remediation",
+      "circular": false
+    },
+    {
+      "file_id": "drydocs_remediation/equivalence.py",
+      "name": "equivalence.py",
+      "extension": ".py",
+      "rel_path": "equivalence.py",
+      "abs_path": "C:/coding/projects/DryDocs/drydocs_remediation/equivalence.py",
+      "project": "drydocs_remediation",
+      "circular": false
+    },
+    {
+      "file_id": "drydocs_remediation/formats.py",
+      "name": "formats.py",
+      "extension": ".py",
+      "rel_path": "formats.py",
+      "abs_path": "C:/coding/projects/DryDocs/drydocs_remediation/formats.py",
+      "project": "drydocs_remediation",
+      "circular": false
+    },
+    {
+      "file_id": "drydocs_remediation/jira.py",
+      "name": "jira.py",
+      "extension": ".py",
+      "rel_path": "jira.py",
+      "abs_path": "C:/coding/projects/DryDocs/drydocs_remediation/jira.py",
+      "project": "drydocs_remediation",
+      "circular": false
+    },
+    {
+      "file_id": "drydocs_remediation/transform.py",
+      "name": "transform.py",
+      "extension": ".py",
+      "rel_path": "transform.py",
+      "abs_path": "C:/coding/projects/DryDocs/drydocs_remediation/transform.py",
+      "project": "drydocs_remediation",
+      "circular": false
+    },
+    {
+      "file_id": "tests/conftest.py",
+      "name": "conftest.py",
+      "extension": ".py",
+      "rel_path": "conftest.py",
+      "abs_path": "C:/coding/projects/DryDocs/tests/conftest.py",
+      "project": "tests",
+      "circular": false
+    },
+    {
+      "file_id": "tests/integration/__init__.py",
+      "name": "__init__.py",
+      "extension": ".py",
+      "rel_path": "integration/__init__.py",
+      "abs_path": "C:/coding/projects/DryDocs/tests/integration/__init__.py",
+      "project": "tests",
+      "circular": false
+    },
+    {
+      "file_id": "tests/integration/test_e2e_load.py",
+      "name": "test_e2e_load.py",
+      "extension": ".py",
+      "rel_path": "integration/test_e2e_load.py",
+      "abs_path": "C:/coding/projects/DryDocs/tests/integration/test_e2e_load.py",
+      "project": "tests",
+      "circular": false
+    },
+    {
+      "file_id": "tests/integration/test_graph_qa_read_mode.py",
+      "name": "test_graph_qa_read_mode.py",
+      "extension": ".py",
+      "rel_path": "integration/test_graph_qa_read_mode.py",
+      "abs_path": "C:/coding/projects/DryDocs/tests/integration/test_graph_qa_read_mode.py",
+      "project": "tests",
+      "circular": false
+    },
+    {
+      "file_id": "tests/integration/test_meta_graph_exclusion.py",
+      "name": "test_meta_graph_exclusion.py",
+      "extension": ".py",
+      "rel_path": "integration/test_meta_graph_exclusion.py",
+      "abs_path": "C:/coding/projects/DryDocs/tests/integration/test_meta_graph_exclusion.py",
+      "project": "tests",
+      "circular": false
+    },
+    {
+      "file_id": "tests/unit/__init__.py",
+      "name": "__init__.py",
+      "extension": ".py",
+      "rel_path": "unit/__init__.py",
+      "abs_path": "C:/coding/projects/DryDocs/tests/unit/__init__.py",
+      "project": "tests",
+      "circular": false
+    },
+    {
+      "file_id": "tests/unit/conftest.py",
+      "name": "conftest.py",
+      "extension": ".py",
+      "rel_path": "unit/conftest.py",
+      "abs_path": "C:/coding/projects/DryDocs/tests/unit/conftest.py",
+      "project": "tests",
+      "circular": false
+    },
+    {
+      "file_id": "tests/unit/test_audit_fields.py",
+      "name": "test_audit_fields.py",
+      "extension": ".py",
+      "rel_path": "unit/test_audit_fields.py",
+      "abs_path": "C:/coding/projects/DryDocs/tests/unit/test_audit_fields.py",
+      "project": "tests",
+      "circular": false
+    },
+    {
+      "file_id": "tests/unit/test_backlog.py",
+      "name": "test_backlog.py",
+      "extension": ".py",
+      "rel_path": "unit/test_backlog.py",
+      "abs_path": "C:/coding/projects/DryDocs/tests/unit/test_backlog.py",
+      "project": "tests",
+      "circular": false
+    },
+    {
+      "file_id": "tests/unit/test_base_loader_smoke.py",
+      "name": "test_base_loader_smoke.py",
+      "extension": ".py",
+      "rel_path": "unit/test_base_loader_smoke.py",
+      "abs_path": "C:/coding/projects/DryDocs/tests/unit/test_base_loader_smoke.py",
+      "project": "tests",
+      "circular": false
+    },
+    {
+      "file_id": "tests/unit/test_batch_port_orchestrator.py",
+      "name": "test_batch_port_orchestrator.py",
+      "extension": ".py",
+      "rel_path": "unit/test_batch_port_orchestrator.py",
+      "abs_path": "C:/coding/projects/DryDocs/tests/unit/test_batch_port_orchestrator.py",
+      "project": "tests",
+      "circular": false
+    },
+    {
+      "file_id": "tests/unit/test_bmc_docs.py",
+      "name": "test_bmc_docs.py",
+      "extension": ".py",
+      "rel_path": "unit/test_bmc_docs.py",
+      "abs_path": "C:/coding/projects/DryDocs/tests/unit/test_bmc_docs.py",
+      "project": "tests",
+      "circular": false
+    },
+    {
+      "file_id": "tests/unit/test_classification.py",
+      "name": "test_classification.py",
+      "extension": ".py",
+      "rel_path": "unit/test_classification.py",
+      "abs_path": "C:/coding/projects/DryDocs/tests/unit/test_classification.py",
+      "project": "tests",
+      "circular": false
+    },
+    {
+      "file_id": "tests/unit/test_cmdline_staging.py",
+      "name": "test_cmdline_staging.py",
+      "extension": ".py",
+      "rel_path": "unit/test_cmdline_staging.py",
+      "abs_path": "C:/coding/projects/DryDocs/tests/unit/test_cmdline_staging.py",
+      "project": "tests",
+      "circular": false
+    },
+    {
+      "file_id": "tests/unit/test_code_snapshot_loader.py",
+      "name": "test_code_snapshot_loader.py",
+      "extension": ".py",
+      "rel_path": "unit/test_code_snapshot_loader.py",
+      "abs_path": "C:/coding/projects/DryDocs/tests/unit/test_code_snapshot_loader.py",
+      "project": "tests",
+      "circular": false
+    },
+    {
+      "file_id": "tests/unit/test_command_parser.py",
+      "name": "test_command_parser.py",
+      "extension": ".py",
+      "rel_path": "unit/test_command_parser.py",
+      "abs_path": "C:/coding/projects/DryDocs/tests/unit/test_command_parser.py",
+      "project": "tests",
+      "circular": false
+    },
+    {
+      "file_id": "tests/unit/test_controlm_cypher.py",
+      "name": "test_controlm_cypher.py",
+      "extension": ".py",
+      "rel_path": "unit/test_controlm_cypher.py",
+      "abs_path": "C:/coding/projects/DryDocs/tests/unit/test_controlm_cypher.py",
+      "project": "tests",
+      "circular": false
+    },
+    {
+      "file_id": "tests/unit/test_controlm_models.py",
+      "name": "test_controlm_models.py",
+      "extension": ".py",
+      "rel_path": "unit/test_controlm_models.py",
+      "abs_path": "C:/coding/projects/DryDocs/tests/unit/test_controlm_models.py",
+      "project": "tests",
+      "circular": false
+    },
+    {
+      "file_id": "tests/unit/test_cypher_split.py",
+      "name": "test_cypher_split.py",
+      "extension": ".py",
+      "rel_path": "unit/test_cypher_split.py",
+      "abs_path": "C:/coding/projects/DryDocs/tests/unit/test_cypher_split.py",
+      "project": "tests",
+      "circular": false
+    },
+    {
+      "file_id": "tests/unit/test_data_root.py",
+      "name": "test_data_root.py",
+      "extension": ".py",
+      "rel_path": "unit/test_data_root.py",
+      "abs_path": "C:/coding/projects/DryDocs/tests/unit/test_data_root.py",
+      "project": "tests",
+      "circular": false
+    },
+    {
+      "file_id": "tests/unit/test_database_names.py",
+      "name": "test_database_names.py",
+      "extension": ".py",
+      "rel_path": "unit/test_database_names.py",
+      "abs_path": "C:/coding/projects/DryDocs/tests/unit/test_database_names.py",
+      "project": "tests",
+      "circular": false
+    },
+    {
+      "file_id": "tests/unit/test_design_doc.py",
+      "name": "test_design_doc.py",
+      "extension": ".py",
+      "rel_path": "unit/test_design_doc.py",
+      "abs_path": "C:/coding/projects/DryDocs/tests/unit/test_design_doc.py",
+      "project": "tests",
+      "circular": false
+    },
+    {
+      "file_id": "tests/unit/test_dev_environment.py",
+      "name": "test_dev_environment.py",
+      "extension": ".py",
+      "rel_path": "unit/test_dev_environment.py",
+      "abs_path": "C:/coding/projects/DryDocs/tests/unit/test_dev_environment.py",
+      "project": "tests",
+      "circular": false
+    },
+    {
+      "file_id": "tests/unit/test_doc_outline.py",
+      "name": "test_doc_outline.py",
+      "extension": ".py",
+      "rel_path": "unit/test_doc_outline.py",
+      "abs_path": "C:/coding/projects/DryDocs/tests/unit/test_doc_outline.py",
+      "project": "tests",
+      "circular": false
+    },
+    {
+      "file_id": "tests/unit/test_doc_pdf.py",
+      "name": "test_doc_pdf.py",
+      "extension": ".py",
+      "rel_path": "unit/test_doc_pdf.py",
+      "abs_path": "C:/coding/projects/DryDocs/tests/unit/test_doc_pdf.py",
+      "project": "tests",
+      "circular": false
+    },
+    {
+      "file_id": "tests/unit/test_doc_registry.py",
+      "name": "test_doc_registry.py",
+      "extension": ".py",
+      "rel_path": "unit/test_doc_registry.py",
+      "abs_path": "C:/coding/projects/DryDocs/tests/unit/test_doc_registry.py",
+      "project": "tests",
+      "circular": false
+    },
+    {
+      "file_id": "tests/unit/test_doc_traceability_guards.py",
+      "name": "test_doc_traceability_guards.py",
+      "extension": ".py",
+      "rel_path": "unit/test_doc_traceability_guards.py",
+      "abs_path": "C:/coding/projects/DryDocs/tests/unit/test_doc_traceability_guards.py",
+      "project": "tests",
+      "circular": false
+    },
+    {
+      "file_id": "tests/unit/test_doc_traceability_loader.py",
+      "name": "test_doc_traceability_loader.py",
+      "extension": ".py",
+      "rel_path": "unit/test_doc_traceability_loader.py",
+      "abs_path": "C:/coding/projects/DryDocs/tests/unit/test_doc_traceability_loader.py",
+      "project": "tests",
+      "circular": false
+    },
+    {
+      "file_id": "tests/unit/test_drydocs_api.py",
+      "name": "test_drydocs_api.py",
+      "extension": ".py",
+      "rel_path": "unit/test_drydocs_api.py",
+      "abs_path": "C:/coding/projects/DryDocs/tests/unit/test_drydocs_api.py",
+      "project": "tests",
+      "circular": false
+    },
+    {
+      "file_id": "tests/unit/test_enforcement_matrix.py",
+      "name": "test_enforcement_matrix.py",
+      "extension": ".py",
+      "rel_path": "unit/test_enforcement_matrix.py",
+      "abs_path": "C:/coding/projects/DryDocs/tests/unit/test_enforcement_matrix.py",
+      "project": "tests",
+      "circular": false
+    },
+    {
+      "file_id": "tests/unit/test_essential_graphrag.py",
+      "name": "test_essential_graphrag.py",
+      "extension": ".py",
+      "rel_path": "unit/test_essential_graphrag.py",
+      "abs_path": "C:/coding/projects/DryDocs/tests/unit/test_essential_graphrag.py",
+      "project": "tests",
+      "circular": false
+    },
+    {
+      "file_id": "tests/unit/test_folder_name_parser.py",
+      "name": "test_folder_name_parser.py",
+      "extension": ".py",
+      "rel_path": "unit/test_folder_name_parser.py",
+      "abs_path": "C:/coding/projects/DryDocs/tests/unit/test_folder_name_parser.py",
+      "project": "tests",
+      "circular": false
+    },
+    {
+      "file_id": "tests/unit/test_gate_pages.py",
+      "name": "test_gate_pages.py",
+      "extension": ".py",
+      "rel_path": "unit/test_gate_pages.py",
+      "abs_path": "C:/coding/projects/DryDocs/tests/unit/test_gate_pages.py",
+      "project": "tests",
+      "circular": false
+    },
+    {
+      "file_id": "tests/unit/test_gates_json.py",
+      "name": "test_gates_json.py",
+      "extension": ".py",
+      "rel_path": "unit/test_gates_json.py",
+      "abs_path": "C:/coding/projects/DryDocs/tests/unit/test_gates_json.py",
+      "project": "tests",
+      "circular": false
+    },
+    {
+      "file_id": "tests/unit/test_graph_qa.py",
+      "name": "test_graph_qa.py",
+      "extension": ".py",
+      "rel_path": "unit/test_graph_qa.py",
+      "abs_path": "C:/coding/projects/DryDocs/tests/unit/test_graph_qa.py",
+      "project": "tests",
+      "circular": false
+    },
+    {
+      "file_id": "tests/unit/test_graph_review.py",
+      "name": "test_graph_review.py",
+      "extension": ".py",
+      "rel_path": "unit/test_graph_review.py",
+      "abs_path": "C:/coding/projects/DryDocs/tests/unit/test_graph_review.py",
+      "project": "tests",
+      "circular": false
+    },
+    {
+      "file_id": "tests/unit/test_graph_verify.py",
+      "name": "test_graph_verify.py",
+      "extension": ".py",
+      "rel_path": "unit/test_graph_verify.py",
+      "abs_path": "C:/coding/projects/DryDocs/tests/unit/test_graph_verify.py",
+      "project": "tests",
+      "circular": false
+    },
+    {
+      "file_id": "tests/unit/test_incremental_delete.py",
+      "name": "test_incremental_delete.py",
+      "extension": ".py",
+      "rel_path": "unit/test_incremental_delete.py",
+      "abs_path": "C:/coding/projects/DryDocs/tests/unit/test_incremental_delete.py",
+      "project": "tests",
+      "circular": false
+    },
+    {
+      "file_id": "tests/unit/test_launcher_registry.py",
+      "name": "test_launcher_registry.py",
+      "extension": ".py",
+      "rel_path": "unit/test_launcher_registry.py",
+      "abs_path": "C:/coding/projects/DryDocs/tests/unit/test_launcher_registry.py",
+      "project": "tests",
+      "circular": false
+    },
+    {
+      "file_id": "tests/unit/test_lineage_code_repo.py",
+      "name": "test_lineage_code_repo.py",
+      "extension": ".py",
+      "rel_path": "unit/test_lineage_code_repo.py",
+      "abs_path": "C:/coding/projects/DryDocs/tests/unit/test_lineage_code_repo.py",
+      "project": "tests",
+      "circular": false
+    },
+    {
+      "file_id": "tests/unit/test_lineage_deepdoc_scaffold.py",
+      "name": "test_lineage_deepdoc_scaffold.py",
+      "extension": ".py",
+      "rel_path": "unit/test_lineage_deepdoc_scaffold.py",
+      "abs_path": "C:/coding/projects/DryDocs/tests/unit/test_lineage_deepdoc_scaffold.py",
+      "project": "tests",
+      "circular": false
+    },
+    {
+      "file_id": "tests/unit/test_lineage_dpl_registry.py",
+      "name": "test_lineage_dpl_registry.py",
+      "extension": ".py",
+      "rel_path": "unit/test_lineage_dpl_registry.py",
+      "abs_path": "C:/coding/projects/DryDocs/tests/unit/test_lineage_dpl_registry.py",
+      "project": "tests",
+      "circular": false
+    },
+    {
+      "file_id": "tests/unit/test_lineage_glue_tables.py",
+      "name": "test_lineage_glue_tables.py",
+      "extension": ".py",
+      "rel_path": "unit/test_lineage_glue_tables.py",
+      "abs_path": "C:/coding/projects/DryDocs/tests/unit/test_lineage_glue_tables.py",
+      "project": "tests",
+      "circular": false
+    },
+    {
+      "file_id": "tests/unit/test_lineage_inventory.py",
+      "name": "test_lineage_inventory.py",
+      "extension": ".py",
+      "rel_path": "unit/test_lineage_inventory.py",
+      "abs_path": "C:/coding/projects/DryDocs/tests/unit/test_lineage_inventory.py",
+      "project": "tests",
+      "circular": false
+    },
+    {
+      "file_id": "tests/unit/test_lineage_mac.py",
+      "name": "test_lineage_mac.py",
+      "extension": ".py",
+      "rel_path": "unit/test_lineage_mac.py",
+      "abs_path": "C:/coding/projects/DryDocs/tests/unit/test_lineage_mac.py",
+      "project": "tests",
+      "circular": false
+    },
+    {
+      "file_id": "tests/unit/test_lineage_review.py",
+      "name": "test_lineage_review.py",
+      "extension": ".py",
+      "rel_path": "unit/test_lineage_review.py",
+      "abs_path": "C:/coding/projects/DryDocs/tests/unit/test_lineage_review.py",
+      "project": "tests",
+      "circular": false
+    },
+    {
+      "file_id": "tests/unit/test_lineage_rua.py",
+      "name": "test_lineage_rua.py",
+      "extension": ".py",
+      "rel_path": "unit/test_lineage_rua.py",
+      "abs_path": "C:/coding/projects/DryDocs/tests/unit/test_lineage_rua.py",
+      "project": "tests",
+      "circular": false
+    },
+    {
+      "file_id": "tests/unit/test_lineage_rua_code_ops.py",
+      "name": "test_lineage_rua_code_ops.py",
+      "extension": ".py",
+      "rel_path": "unit/test_lineage_rua_code_ops.py",
+      "abs_path": "C:/coding/projects/DryDocs/tests/unit/test_lineage_rua_code_ops.py",
+      "project": "tests",
+      "circular": false
+    },
+    {
+      "file_id": "tests/unit/test_lineage_writer.py",
+      "name": "test_lineage_writer.py",
+      "extension": ".py",
+      "rel_path": "unit/test_lineage_writer.py",
+      "abs_path": "C:/coding/projects/DryDocs/tests/unit/test_lineage_writer.py",
+      "project": "tests",
+      "circular": false
+    },
+    {
+      "file_id": "tests/unit/test_loader_run_log.py",
+      "name": "test_loader_run_log.py",
+      "extension": ".py",
+      "rel_path": "unit/test_loader_run_log.py",
+      "abs_path": "C:/coding/projects/DryDocs/tests/unit/test_loader_run_log.py",
+      "project": "tests",
+      "circular": false
+    },
+    {
+      "file_id": "tests/unit/test_manual_loads.py",
+      "name": "test_manual_loads.py",
+      "extension": ".py",
+      "rel_path": "unit/test_manual_loads.py",
+      "abs_path": "C:/coding/projects/DryDocs/tests/unit/test_manual_loads.py",
+      "project": "tests",
+      "circular": false
+    },
+    {
+      "file_id": "tests/unit/test_mapping_api.py",
+      "name": "test_mapping_api.py",
+      "extension": ".py",
+      "rel_path": "unit/test_mapping_api.py",
+      "abs_path": "C:/coding/projects/DryDocs/tests/unit/test_mapping_api.py",
+      "project": "tests",
+      "circular": false
+    },
+    {
+      "file_id": "tests/unit/test_mapping_store.py",
+      "name": "test_mapping_store.py",
+      "extension": ".py",
+      "rel_path": "unit/test_mapping_store.py",
+      "abs_path": "C:/coding/projects/DryDocs/tests/unit/test_mapping_store.py",
+      "project": "tests",
+      "circular": false
+    },
+    {
+      "file_id": "tests/unit/test_module_boundary.py",
+      "name": "test_module_boundary.py",
+      "extension": ".py",
+      "rel_path": "unit/test_module_boundary.py",
+      "abs_path": "C:/coding/projects/DryDocs/tests/unit/test_module_boundary.py",
+      "project": "tests",
+      "circular": false
+    },
+    {
+      "file_id": "tests/unit/test_namespaces.py",
+      "name": "test_namespaces.py",
+      "extension": ".py",
+      "rel_path": "unit/test_namespaces.py",
+      "abs_path": "C:/coding/projects/DryDocs/tests/unit/test_namespaces.py",
+      "project": "tests",
+      "circular": false
+    },
+    {
+      "file_id": "tests/unit/test_no_shadow_definitions.py",
+      "name": "test_no_shadow_definitions.py",
+      "extension": ".py",
+      "rel_path": "unit/test_no_shadow_definitions.py",
+      "abs_path": "C:/coding/projects/DryDocs/tests/unit/test_no_shadow_definitions.py",
+      "project": "tests",
+      "circular": false
+    },
+    {
+      "file_id": "tests/unit/test_oracle_kerberos_login.py",
+      "name": "test_oracle_kerberos_login.py",
+      "extension": ".py",
+      "rel_path": "unit/test_oracle_kerberos_login.py",
+      "abs_path": "C:/coding/projects/DryDocs/tests/unit/test_oracle_kerberos_login.py",
+      "project": "tests",
+      "circular": false
+    },
+    {
+      "file_id": "tests/unit/test_pat_product_mapping.py",
+      "name": "test_pat_product_mapping.py",
+      "extension": ".py",
+      "rel_path": "unit/test_pat_product_mapping.py",
+      "abs_path": "C:/coding/projects/DryDocs/tests/unit/test_pat_product_mapping.py",
+      "project": "tests",
+      "circular": false
+    },
+    {
+      "file_id": "tests/unit/test_plan_board.py",
+      "name": "test_plan_board.py",
+      "extension": ".py",
+      "rel_path": "unit/test_plan_board.py",
+      "abs_path": "C:/coding/projects/DryDocs/tests/unit/test_plan_board.py",
+      "project": "tests",
+      "circular": false
+    },
+    {
+      "file_id": "tests/unit/test_port_manifest.py",
+      "name": "test_port_manifest.py",
+      "extension": ".py",
+      "rel_path": "unit/test_port_manifest.py",
+      "abs_path": "C:/coding/projects/DryDocs/tests/unit/test_port_manifest.py",
+      "project": "tests",
+      "circular": false
+    },
+    {
+      "file_id": "tests/unit/test_port_reconcile_guards.py",
+      "name": "test_port_reconcile_guards.py",
+      "extension": ".py",
+      "rel_path": "unit/test_port_reconcile_guards.py",
+      "abs_path": "C:/coding/projects/DryDocs/tests/unit/test_port_reconcile_guards.py",
+      "project": "tests",
+      "circular": false
+    },
+    {
+      "file_id": "tests/unit/test_precedence.py",
+      "name": "test_precedence.py",
+      "extension": ".py",
+      "rel_path": "unit/test_precedence.py",
+      "abs_path": "C:/coding/projects/DryDocs/tests/unit/test_precedence.py",
+      "project": "tests",
+      "circular": false
+    },
+    {
+      "file_id": "tests/unit/test_provenance_migration.py",
+      "name": "test_provenance_migration.py",
+      "extension": ".py",
+      "rel_path": "unit/test_provenance_migration.py",
+      "abs_path": "C:/coding/projects/DryDocs/tests/unit/test_provenance_migration.py",
+      "project": "tests",
+      "circular": false
+    },
+    {
+      "file_id": "tests/unit/test_publish_boundary_values.py",
+      "name": "test_publish_boundary_values.py",
+      "extension": ".py",
+      "rel_path": "unit/test_publish_boundary_values.py",
+      "abs_path": "C:/coding/projects/DryDocs/tests/unit/test_publish_boundary_values.py",
+      "project": "tests",
+      "circular": false
+    },
+    {
+      "file_id": "tests/unit/test_publishing.py",
+      "name": "test_publishing.py",
+      "extension": ".py",
+      "rel_path": "unit/test_publishing.py",
+      "abs_path": "C:/coding/projects/DryDocs/tests/unit/test_publishing.py",
+      "project": "tests",
+      "circular": false
+    },
+    {
+      "file_id": "tests/unit/test_query_specs.py",
+      "name": "test_query_specs.py",
+      "extension": ".py",
+      "rel_path": "unit/test_query_specs.py",
+      "abs_path": "C:/coding/projects/DryDocs/tests/unit/test_query_specs.py",
+      "project": "tests",
+      "circular": false
+    },
+    {
+      "file_id": "tests/unit/test_remediation_corroborate.py",
+      "name": "test_remediation_corroborate.py",
+      "extension": ".py",
+      "rel_path": "unit/test_remediation_corroborate.py",
+      "abs_path": "C:/coding/projects/DryDocs/tests/unit/test_remediation_corroborate.py",
+      "project": "tests",
+      "circular": false
+    },
+    {
+      "file_id": "tests/unit/test_remediation_handoff.py",
+      "name": "test_remediation_handoff.py",
+      "extension": ".py",
+      "rel_path": "unit/test_remediation_handoff.py",
+      "abs_path": "C:/coding/projects/DryDocs/tests/unit/test_remediation_handoff.py",
+      "project": "tests",
+      "circular": false
+    },
+    {
+      "file_id": "tests/unit/test_remediation_m0.py",
+      "name": "test_remediation_m0.py",
+      "extension": ".py",
+      "rel_path": "unit/test_remediation_m0.py",
+      "abs_path": "C:/coding/projects/DryDocs/tests/unit/test_remediation_m0.py",
+      "project": "tests",
+      "circular": false
+    },
+    {
+      "file_id": "tests/unit/test_remediation_no_graph_write.py",
+      "name": "test_remediation_no_graph_write.py",
+      "extension": ".py",
+      "rel_path": "unit/test_remediation_no_graph_write.py",
+      "abs_path": "C:/coding/projects/DryDocs/tests/unit/test_remediation_no_graph_write.py",
+      "project": "tests",
+      "circular": false
+    },
+    {
+      "file_id": "tests/unit/test_remediation_scaffold.py",
+      "name": "test_remediation_scaffold.py",
+      "extension": ".py",
+      "rel_path": "unit/test_remediation_scaffold.py",
+      "abs_path": "C:/coding/projects/DryDocs/tests/unit/test_remediation_scaffold.py",
+      "project": "tests",
+      "circular": false
+    },
+    {
+      "file_id": "tests/unit/test_remediation_tier1.py",
+      "name": "test_remediation_tier1.py",
+      "extension": ".py",
+      "rel_path": "unit/test_remediation_tier1.py",
+      "abs_path": "C:/coding/projects/DryDocs/tests/unit/test_remediation_tier1.py",
+      "project": "tests",
+      "circular": false
+    },
+    {
+      "file_id": "tests/unit/test_review_labels.py",
+      "name": "test_review_labels.py",
+      "extension": ".py",
+      "rel_path": "unit/test_review_labels.py",
+      "abs_path": "C:/coding/projects/DryDocs/tests/unit/test_review_labels.py",
+      "project": "tests",
+      "circular": false
+    },
+    {
+      "file_id": "tests/unit/test_row_checksum.py",
+      "name": "test_row_checksum.py",
+      "extension": ".py",
+      "rel_path": "unit/test_row_checksum.py",
+      "abs_path": "C:/coding/projects/DryDocs/tests/unit/test_row_checksum.py",
+      "project": "tests",
+      "circular": false
+    },
+    {
+      "file_id": "tests/unit/test_runs_on_resolution.py",
+      "name": "test_runs_on_resolution.py",
+      "extension": ".py",
+      "rel_path": "unit/test_runs_on_resolution.py",
+      "abs_path": "C:/coding/projects/DryDocs/tests/unit/test_runs_on_resolution.py",
+      "project": "tests",
+      "circular": false
+    },
+    {
+      "file_id": "tests/unit/test_schema.py",
+      "name": "test_schema.py",
+      "extension": ".py",
+      "rel_path": "unit/test_schema.py",
+      "abs_path": "C:/coding/projects/DryDocs/tests/unit/test_schema.py",
+      "project": "tests",
+      "circular": false
+    },
+    {
+      "file_id": "tests/unit/test_schema_graph.py",
+      "name": "test_schema_graph.py",
+      "extension": ".py",
+      "rel_path": "unit/test_schema_graph.py",
+      "abs_path": "C:/coding/projects/DryDocs/tests/unit/test_schema_graph.py",
+      "project": "tests",
+      "circular": false
+    },
+    {
+      "file_id": "tests/unit/test_schema_meta_exclusion.py",
+      "name": "test_schema_meta_exclusion.py",
+      "extension": ".py",
+      "rel_path": "unit/test_schema_meta_exclusion.py",
+      "abs_path": "C:/coding/projects/DryDocs/tests/unit/test_schema_meta_exclusion.py",
+      "project": "tests",
+      "circular": false
+    },
+    {
+      "file_id": "tests/unit/test_seal_attribution.py",
+      "name": "test_seal_attribution.py",
+      "extension": ".py",
+      "rel_path": "unit/test_seal_attribution.py",
+      "abs_path": "C:/coding/projects/DryDocs/tests/unit/test_seal_attribution.py",
+      "project": "tests",
+      "circular": false
+    },
+    {
+      "file_id": "tests/unit/test_skip_guard_policy.py",
+      "name": "test_skip_guard_policy.py",
+      "extension": ".py",
+      "rel_path": "unit/test_skip_guard_policy.py",
+      "abs_path": "C:/coding/projects/DryDocs/tests/unit/test_skip_guard_policy.py",
+      "project": "tests",
+      "circular": false
+    },
+    {
+      "file_id": "tests/unit/test_sme_notes.py",
+      "name": "test_sme_notes.py",
+      "extension": ".py",
+      "rel_path": "unit/test_sme_notes.py",
+      "abs_path": "C:/coding/projects/DryDocs/tests/unit/test_sme_notes.py",
+      "project": "tests",
+      "circular": false
+    },
+    {
+      "file_id": "tests/unit/test_software_registry.py",
+      "name": "test_software_registry.py",
+      "extension": ".py",
+      "rel_path": "unit/test_software_registry.py",
+      "abs_path": "C:/coding/projects/DryDocs/tests/unit/test_software_registry.py",
+      "project": "tests",
+      "circular": false
+    },
+    {
+      "file_id": "tests/unit/test_source_mapping_drift.py",
+      "name": "test_source_mapping_drift.py",
+      "extension": ".py",
+      "rel_path": "unit/test_source_mapping_drift.py",
+      "abs_path": "C:/coding/projects/DryDocs/tests/unit/test_source_mapping_drift.py",
+      "project": "tests",
+      "circular": false
+    },
+    {
+      "file_id": "tests/unit/test_source_mappings.py",
+      "name": "test_source_mappings.py",
+      "extension": ".py",
+      "rel_path": "unit/test_source_mappings.py",
+      "abs_path": "C:/coding/projects/DryDocs/tests/unit/test_source_mappings.py",
+      "project": "tests",
+      "circular": false
+    },
+    {
+      "file_id": "tests/unit/test_source_registry.py",
+      "name": "test_source_registry.py",
+      "extension": ".py",
+      "rel_path": "unit/test_source_registry.py",
+      "abs_path": "C:/coding/projects/DryDocs/tests/unit/test_source_registry.py",
+      "project": "tests",
+      "circular": false
+    },
+    {
+      "file_id": "tests/unit/test_sql_run_log.py",
+      "name": "test_sql_run_log.py",
+      "extension": ".py",
+      "rel_path": "unit/test_sql_run_log.py",
+      "abs_path": "C:/coding/projects/DryDocs/tests/unit/test_sql_run_log.py",
+      "project": "tests",
+      "circular": false
+    },
+    {
+      "file_id": "tests/unit/test_supplements.py",
+      "name": "test_supplements.py",
+      "extension": ".py",
+      "rel_path": "unit/test_supplements.py",
+      "abs_path": "C:/coding/projects/DryDocs/tests/unit/test_supplements.py",
+      "project": "tests",
+      "circular": false
+    },
+    {
+      "file_id": "tests/unit/test_taxonomy_ontology_map.py",
+      "name": "test_taxonomy_ontology_map.py",
+      "extension": ".py",
+      "rel_path": "unit/test_taxonomy_ontology_map.py",
+      "abs_path": "C:/coding/projects/DryDocs/tests/unit/test_taxonomy_ontology_map.py",
+      "project": "tests",
+      "circular": false
+    },
+    {
+      "file_id": "tests/unit/test_transcribe_doc_markup.py",
+      "name": "test_transcribe_doc_markup.py",
+      "extension": ".py",
+      "rel_path": "unit/test_transcribe_doc_markup.py",
+      "abs_path": "C:/coding/projects/DryDocs/tests/unit/test_transcribe_doc_markup.py",
+      "project": "tests",
+      "circular": false
+    },
+    {
+      "file_id": "tests/unit/test_variable_classifier.py",
+      "name": "test_variable_classifier.py",
+      "extension": ".py",
+      "rel_path": "unit/test_variable_classifier.py",
+      "abs_path": "C:/coding/projects/DryDocs/tests/unit/test_variable_classifier.py",
+      "project": "tests",
+      "circular": false
+    },
+    {
+      "file_id": "tests/unit/test_variable_resolver.py",
+      "name": "test_variable_resolver.py",
+      "extension": ".py",
+      "rel_path": "unit/test_variable_resolver.py",
+      "abs_path": "C:/coding/projects/DryDocs/tests/unit/test_variable_resolver.py",
+      "project": "tests",
+      "circular": false
+    },
+    {
+      "file_id": "tests/unit/test_variable_staging.py",
+      "name": "test_variable_staging.py",
+      "extension": ".py",
+      "rel_path": "unit/test_variable_staging.py",
+      "abs_path": "C:/coding/projects/DryDocs/tests/unit/test_variable_staging.py",
+      "project": "tests",
+      "circular": false
+    }
+  ],
+  "edges": [
+    [
+      "drydocs/cli.py",
+      "drydocs/cmdline_staging.py"
+    ],
+    [
+      "drydocs/cli.py",
+      "drydocs/loaders/__init__.py"
+    ],
+    [
+      "drydocs/cli.py",
+      "drydocs/loaders/base.py"
+    ],
+    [
+      "drydocs/cli.py",
+      "drydocs/loaders/batch_port_orchestrator.py"
+    ],
+    [
+      "drydocs/cli.py",
+      "drydocs/loaders/bmc_docs.py"
+    ],
+    [
+      "drydocs/cli.py",
+      "drydocs/loaders/business_segments.py"
+    ],
+    [
+      "drydocs/cli.py",
+      "drydocs/loaders/catalog.py"
+    ],
+    [
+      "drydocs/cli.py",
+      "drydocs/loaders/code_snapshot.py"
+    ],
+    [
+      "drydocs/cli.py",
+      "drydocs/loaders/controlm_conditions_in.py"
+    ],
+    [
+      "drydocs/cli.py",
+      "drydocs/loaders/controlm_conditions_out.py"
+    ],
+    [
+      "drydocs/cli.py",
+      "drydocs/loaders/controlm_dependencies_derived.py"
+    ],
+    [
+      "drydocs/cli.py",
+      "drydocs/loaders/controlm_folders.py"
+    ],
+    [
+      "drydocs/cli.py",
+      "drydocs/loaders/controlm_hosts.py"
+    ],
+    [
+      "drydocs/cli.py",
+      "drydocs/loaders/controlm_jobs.py"
+    ],
+    [
+      "drydocs/cli.py",
+      "drydocs/loaders/doc_traceability.py"
+    ],
+    [
+      "drydocs/cli.py",
+      "drydocs/loaders/essential_graphrag.py"
+    ],
+    [
+      "drydocs/cli.py",
+      "drydocs/loaders/manual_loads.py"
+    ],
+    [
+      "drydocs/cli.py",
+      "drydocs/loaders/runs_on_resolution.py"
+    ],
+    [
+      "drydocs/cli.py",
+      "drydocs/loaders/seal_attribution.py"
+    ],
+    [
+      "drydocs/cli.py",
+      "drydocs/loaders/software_registry.py"
+    ],
+    [
+      "drydocs/cli.py",
+      "drydocs/snapshots/__init__.py"
+    ],
+    [
+      "drydocs/cli.py",
+      "drydocs/staging.py"
+    ],
+    [
+      "drydocs/cli.py",
+      "drydocs_core/__init__.py"
+    ],
+    [
+      "drydocs/cli.py",
+      "drydocs_core/adapters/__init__.py"
+    ],
+    [
+      "drydocs/cli.py",
+      "drydocs_core/config.py"
+    ],
+    [
+      "drydocs/cli.py",
+      "drydocs_core/controlm/__init__.py"
+    ],
+    [
+      "drydocs/cli.py",
+      "drydocs_core/models/__init__.py"
+    ],
+    [
+      "drydocs/cli.py",
+      "drydocs_core/neo4j_client.py"
+    ],
+    [
+      "drydocs/cli.py",
+      "drydocs_core/run_log.py"
+    ],
+    [
+      "drydocs/cli.py",
+      "drydocs_core/schema/supplements.py"
+    ],
+    [
+      "drydocs/cli.py",
+      "drydocs_core/source_registry.py"
+    ],
+    [
+      "drydocs/cli.py",
+      "drydocs_lineage/extractors/__init__.py"
+    ],
+    [
+      "drydocs/cli.py",
+      "drydocs_lineage/model.py"
+    ],
+    [
+      "drydocs/cli.py",
+      "drydocs_lineage/review.py"
+    ],
+    [
+      "drydocs/cmdline_staging.py",
+      "drydocs_core/controlm/commands.py"
+    ],
+    [
+      "drydocs/cmdline_staging.py",
+      "drydocs_core/data_root.py"
+    ],
+    [
+      "drydocs/doc_outline.py",
+      "drydocs_core/doc_anchors.py"
+    ],
+    [
+      "drydocs/loaders/__init__.py",
+      "drydocs/loaders/base.py"
+    ],
+    [
+      "drydocs/loaders/__init__.py",
+      "drydocs/loaders/catalog.py"
+    ],
+    [
+      "drydocs/loaders/__init__.py",
+      "drydocs/loaders/controlm.py"
+    ],
+    [
+      "drydocs/loaders/__init__.py",
+      "drydocs/loaders/seal_applications.py"
+    ],
+    [
+      "drydocs/loaders/__init__.py",
+      "drydocs/loaders/seal_contacts.py"
+    ],
+    [
+      "drydocs/loaders/base.py",
+      "drydocs_core/adapters/__init__.py"
+    ],
+    [
+      "drydocs/loaders/base.py",
+      "drydocs_core/cypher_split.py"
+    ],
+    [
+      "drydocs/loaders/base.py",
+      "drydocs_core/neo4j_client.py"
+    ],
+    [
+      "drydocs/loaders/base.py",
+      "drydocs_core/run_log.py"
+    ],
+    [
+      "drydocs/loaders/batch_port_orchestrator.py",
+      "drydocs/loaders/base.py"
+    ],
+    [
+      "drydocs/loaders/batch_port_orchestrator.py",
+      "drydocs_core/models/registry.py"
+    ],
+    [
+      "drydocs/loaders/batch_port_orchestrator.py",
+      "drydocs_core/run_log.py"
+    ],
+    [
+      "drydocs/loaders/bmc_docs.py",
+      "drydocs/loaders/base.py"
+    ],
+    [
+      "drydocs/loaders/bmc_docs.py",
+      "drydocs_core/models/docs.py"
+    ],
+    [
+      "drydocs/loaders/bmc_docs.py",
+      "drydocs_core/run_log.py"
+    ],
+    [
+      "drydocs/loaders/business_segments.py",
+      "drydocs_core/neo4j_client.py"
+    ],
+    [
+      "drydocs/loaders/catalog.py",
+      "drydocs/loaders/base.py"
+    ],
+    [
+      "drydocs/loaders/catalog.py",
+      "drydocs_core/precedence.py"
+    ],
+    [
+      "drydocs/loaders/code_snapshot.py",
+      "drydocs/loaders/base.py"
+    ],
+    [
+      "drydocs/loaders/code_snapshot.py",
+      "drydocs_core/models/code_snapshot.py"
+    ],
+    [
+      "drydocs/loaders/controlm.py",
+      "drydocs/loaders/controlm_conditions_in.py"
+    ],
+    [
+      "drydocs/loaders/controlm.py",
+      "drydocs/loaders/controlm_conditions_out.py"
+    ],
+    [
+      "drydocs/loaders/controlm.py",
+      "drydocs/loaders/controlm_dependencies_derived.py"
+    ],
+    [
+      "drydocs/loaders/controlm.py",
+      "drydocs/loaders/controlm_folders.py"
+    ],
+    [
+      "drydocs/loaders/controlm.py",
+      "drydocs/loaders/controlm_hosts.py"
+    ],
+    [
+      "drydocs/loaders/controlm.py",
+      "drydocs/loaders/controlm_jobs.py"
+    ],
+    [
+      "drydocs/loaders/controlm_conditions_in.py",
+      "drydocs/loaders/base.py"
+    ],
+    [
+      "drydocs/loaders/controlm_conditions_in.py",
+      "drydocs_core/models/__init__.py"
+    ],
+    [
+      "drydocs/loaders/controlm_conditions_out.py",
+      "drydocs/loaders/base.py"
+    ],
+    [
+      "drydocs/loaders/controlm_conditions_out.py",
+      "drydocs_core/models/__init__.py"
+    ],
+    [
+      "drydocs/loaders/controlm_dependencies_derived.py",
+      "drydocs/loaders/base.py"
+    ],
+    [
+      "drydocs/loaders/controlm_dependencies_derived.py",
+      "drydocs_core/models/__init__.py"
+    ],
+    [
+      "drydocs/loaders/controlm_folders.py",
+      "drydocs/loaders/base.py"
+    ],
+    [
+      "drydocs/loaders/controlm_folders.py",
+      "drydocs_core/controlm/__init__.py"
+    ],
+    [
+      "drydocs/loaders/controlm_folders.py",
+      "drydocs_core/models/__init__.py"
+    ],
+    [
+      "drydocs/loaders/controlm_hosts.py",
+      "drydocs/loaders/base.py"
+    ],
+    [
+      "drydocs/loaders/controlm_hosts.py",
+      "drydocs_core/models/__init__.py"
+    ],
+    [
+      "drydocs/loaders/controlm_jobs.py",
+      "drydocs/loaders/base.py"
+    ],
+    [
+      "drydocs/loaders/controlm_jobs.py",
+      "drydocs_core/models/__init__.py"
+    ],
+    [
+      "drydocs/loaders/doc_traceability.py",
+      "drydocs/loaders/base.py"
+    ],
+    [
+      "drydocs/loaders/doc_traceability.py",
+      "drydocs_core/doc_anchors.py"
+    ],
+    [
+      "drydocs/loaders/doc_traceability.py",
+      "drydocs_core/models/doc_traceability.py"
+    ],
+    [
+      "drydocs/loaders/doc_traceability.py",
+      "drydocs_core/run_log.py"
+    ],
+    [
+      "drydocs/loaders/essential_graphrag.py",
+      "drydocs/loaders/base.py"
+    ],
+    [
+      "drydocs/loaders/essential_graphrag.py",
+      "drydocs_core/models/docs.py"
+    ],
+    [
+      "drydocs/loaders/manual_loads.py",
+      "drydocs/loaders/base.py"
+    ],
+    [
+      "drydocs/loaders/manual_loads.py",
+      "drydocs_core/manual_mappings.py"
+    ],
+    [
+      "drydocs/loaders/manual_loads.py",
+      "drydocs_core/mapping_store.py"
+    ],
+    [
+      "drydocs/loaders/manual_loads.py",
+      "drydocs_core/models/__init__.py"
+    ],
+    [
+      "drydocs/loaders/seal_applications.py",
+      "drydocs/loaders/base.py"
+    ],
+    [
+      "drydocs/loaders/seal_applications.py",
+      "drydocs_core/models/__init__.py"
+    ],
+    [
+      "drydocs/loaders/seal_attribution.py",
+      "drydocs/loaders/base.py"
+    ],
+    [
+      "drydocs/loaders/seal_attribution.py",
+      "drydocs_core/models/__init__.py"
+    ],
+    [
+      "drydocs/loaders/seal_attribution.py",
+      "drydocs_core/neo4j_client.py"
+    ],
+    [
+      "drydocs/loaders/seal_contacts.py",
+      "drydocs/loaders/base.py"
+    ],
+    [
+      "drydocs/loaders/seal_contacts.py",
+      "drydocs_core/models/__init__.py"
+    ],
+    [
+      "drydocs/loaders/software_registry.py",
+      "drydocs/loaders/base.py"
+    ],
+    [
+      "drydocs/loaders/software_registry.py",
+      "drydocs_core/models/registry.py"
+    ],
+    [
+      "drydocs/publishing/__init__.py",
+      "drydocs/publishing/assembler.py"
+    ],
+    [
+      "drydocs/publishing/__init__.py",
+      "drydocs/publishing/preview.py"
+    ],
+    [
+      "drydocs/publishing/__init__.py",
+      "drydocs/publishing/publisher.py"
+    ],
+    [
+      "drydocs/publishing/__init__.py",
+      "drydocs/publishing/validator.py"
+    ],
+    [
+      "drydocs/snapshots/__init__.py",
+      "drydocs/snapshots/writer.py"
+    ],
+    [
+      "drydocs/snapshots/writer.py",
+      "drydocs_core/neo4j_client.py"
+    ],
+    [
+      "drydocs/staging.py",
+      "drydocs_core/controlm/commands.py"
+    ],
+    [
+      "drydocs/staging.py",
+      "drydocs_core/controlm/facts.py"
+    ],
+    [
+      "drydocs/staging.py",
+      "drydocs_core/controlm/paths.py"
+    ],
+    [
+      "drydocs/staging.py",
+      "drydocs_core/controlm/resolver.py"
+    ],
+    [
+      "drydocs/staging.py",
+      "drydocs_core/controlm/variables.py"
+    ],
+    [
+      "drydocs/staging.py",
+      "drydocs_core/models/__init__.py"
+    ],
+    [
+      "drydocs_api/__init__.py",
+      "drydocs_api/guard.py"
+    ],
+    [
+      "drydocs_api/__init__.py",
+      "drydocs_api/handlers.py"
+    ],
+    [
+      "drydocs_api/__init__.py",
+      "drydocs_api/routing.py"
+    ],
+    [
+      "drydocs_api/__init__.py",
+      "drydocs_api/sessions.py"
+    ],
+    [
+      "drydocs_api/app.py",
+      "drydocs_api/exports.py"
+    ],
+    [
+      "drydocs_api/app.py",
+      "drydocs_api/guard.py"
+    ],
+    [
+      "drydocs_api/app.py",
+      "drydocs_api/handlers.py"
+    ],
+    [
+      "drydocs_api/app.py",
+      "drydocs_api/mappings.py"
+    ],
+    [
+      "drydocs_api/app.py",
+      "drydocs_api/personas.py"
+    ],
+    [
+      "drydocs_api/app.py",
+      "drydocs_api/queries.py"
+    ],
+    [
+      "drydocs_api/app.py",
+      "drydocs_api/query_specs.py"
+    ],
+    [
+      "drydocs_api/app.py",
+      "drydocs_api/sessions.py"
+    ],
+    [
+      "drydocs_api/app.py",
+      "drydocs_core/config.py"
+    ],
+    [
+      "drydocs_api/exports.py",
+      "drydocs_api/__init__.py"
+    ],
+    [
+      "drydocs_api/exports.py",
+      "drydocs_api/guard.py"
+    ],
+    [
+      "drydocs_api/exports.py",
+      "drydocs_api/handlers.py"
+    ],
+    [
+      "drydocs_api/exports.py",
+      "drydocs_api/queries.py"
+    ],
+    [
+      "drydocs_api/exports.py",
+      "drydocs_api/query_specs.py"
+    ],
+    [
+      "drydocs_api/exports.py",
+      "drydocs_api/sessions.py"
+    ],
+    [
+      "drydocs_api/handlers.py",
+      "drydocs_api/guard.py"
+    ],
+    [
+      "drydocs_api/handlers.py",
+      "drydocs_api/queries.py"
+    ],
+    [
+      "drydocs_api/handlers.py",
+      "drydocs_api/routing.py"
+    ],
+    [
+      "drydocs_api/handlers.py",
+      "drydocs_api/sessions.py"
+    ],
+    [
+      "drydocs_api/mappings.py",
+      "drydocs_api/handlers.py"
+    ],
+    [
+      "drydocs_api/mappings.py",
+      "drydocs_api/sessions.py"
+    ],
+    [
+      "drydocs_api/mappings.py",
+      "drydocs_core/mapping_store.py"
+    ],
+    [
+      "drydocs_api/mappings.py",
+      "drydocs_core/models/seal.py"
+    ],
+    [
+      "drydocs_api/query_specs.py",
+      "drydocs_api/guard.py"
+    ],
+    [
+      "drydocs_api/query_specs.py",
+      "drydocs_api/queries.py"
+    ],
+    [
+      "drydocs_api/sessions.py",
+      "drydocs_api/personas.py"
+    ],
+    [
+      "drydocs_core/__init__.py",
+      "drydocs_core/neo4j_client.py"
+    ],
+    [
+      "drydocs_core/adapters/__init__.py",
+      "drydocs_core/adapters/base.py"
+    ],
+    [
+      "drydocs_core/adapters/__init__.py",
+      "drydocs_core/adapters/csv_adapter.py"
+    ],
+    [
+      "drydocs_core/adapters/__init__.py",
+      "drydocs_core/adapters/oracle_adapter.py"
+    ],
+    [
+      "drydocs_core/adapters/oracle_adapter.py",
+      "drydocs_core/adapters/sql_run_log.py"
+    ],
+    [
+      "drydocs_core/adapters/sql_run_log.py",
+      "drydocs_core/run_log.py"
+    ],
+    [
+      "drydocs_core/controlm/__init__.py",
+      "drydocs_core/controlm/commands.py"
+    ],
+    [
+      "drydocs_core/controlm/__init__.py",
+      "drydocs_core/controlm/facts.py"
+    ],
+    [
+      "drydocs_core/controlm/__init__.py",
+      "drydocs_core/controlm/folder_name.py"
+    ],
+    [
+      "drydocs_core/controlm/__init__.py",
+      "drydocs_core/controlm/paths.py"
+    ],
+    [
+      "drydocs_core/controlm/__init__.py",
+      "drydocs_core/controlm/resolver.py"
+    ],
+    [
+      "drydocs_core/controlm/__init__.py",
+      "drydocs_core/controlm/variable_report.py"
+    ],
+    [
+      "drydocs_core/controlm/__init__.py",
+      "drydocs_core/controlm/variables.py"
+    ],
+    [
+      "drydocs_core/controlm/facts.py",
+      "drydocs_core/controlm/variables.py"
+    ],
+    [
+      "drydocs_core/controlm/resolver.py",
+      "drydocs_core/controlm/variables.py"
+    ],
+    [
+      "drydocs_core/controlm/variable_report.py",
+      "drydocs_core/controlm/variables.py"
+    ],
+    [
+      "drydocs_core/controlm/variables.py",
+      "drydocs_core/controlm/commands.py"
+    ],
+    [
+      "drydocs_core/manual_mappings.py",
+      "drydocs_core/__init__.py"
+    ],
+    [
+      "drydocs_core/manual_mappings.py",
+      "drydocs_core/models/__init__.py"
+    ],
+    [
+      "drydocs_core/mapping_store.py",
+      "drydocs_core/__init__.py"
+    ],
+    [
+      "drydocs_core/mapping_store.py",
+      "drydocs_core/manual_mappings.py"
+    ],
+    [
+      "drydocs_core/mapping_store.py",
+      "drydocs_core/models/__init__.py"
+    ],
+    [
+      "drydocs_core/mapping_store.py",
+      "drydocs_core/models/seal.py"
+    ],
+    [
+      "drydocs_core/models/__init__.py",
+      "drydocs_core/models/attribution.py"
+    ],
+    [
+      "drydocs_core/models/__init__.py",
+      "drydocs_core/models/code_snapshot.py"
+    ],
+    [
+      "drydocs_core/models/__init__.py",
+      "drydocs_core/models/controlm.py"
+    ],
+    [
+      "drydocs_core/models/__init__.py",
+      "drydocs_core/models/docs.py"
+    ],
+    [
+      "drydocs_core/models/__init__.py",
+      "drydocs_core/models/registry.py"
+    ],
+    [
+      "drydocs_core/models/__init__.py",
+      "drydocs_core/models/seal.py"
+    ],
+    [
+      "drydocs_core/neo4j_client.py",
+      "drydocs_core/cypher_split.py"
+    ],
+    [
+      "drydocs_core/schema/supplements.py",
+      "drydocs_core/cypher_split.py"
+    ],
+    [
+      "drydocs_deepdoc/investigate.py",
+      "drydocs_core/controlm/__init__.py"
+    ],
+    [
+      "drydocs_deepdoc/writer.py",
+      "drydocs_deepdoc/investigate.py"
+    ],
+    [
+      "drydocs_lineage/extractors/__init__.py",
+      "drydocs_lineage/extractors/code_repo.py"
+    ],
+    [
+      "drydocs_lineage/extractors/__init__.py",
+      "drydocs_lineage/extractors/controlm_inventory.py"
+    ],
+    [
+      "drydocs_lineage/extractors/__init__.py",
+      "drydocs_lineage/extractors/dpl_mac.py"
+    ],
+    [
+      "drydocs_lineage/extractors/__init__.py",
+      "drydocs_lineage/extractors/dpl_registry.py"
+    ],
+    [
+      "drydocs_lineage/extractors/__init__.py",
+      "drydocs_lineage/extractors/glue_tables.py"
+    ],
+    [
+      "drydocs_lineage/extractors/__init__.py",
+      "drydocs_lineage/extractors/rua_code_ops.py"
+    ],
+    [
+      "drydocs_lineage/extractors/__init__.py",
+      "drydocs_lineage/extractors/rua_inventory.py"
+    ],
+    [
+      "drydocs_lineage/extractors/code_repo.py",
+      "drydocs_lineage/extractors/rua_inventory.py"
+    ],
+    [
+      "drydocs_lineage/extractors/code_repo.py",
+      "drydocs_lineage/model.py"
+    ],
+    [
+      "drydocs_lineage/extractors/controlm_inventory.py",
+      "drydocs_core/controlm/__init__.py"
+    ],
+    [
+      "drydocs_lineage/extractors/controlm_inventory.py",
+      "drydocs_core/controlm/commands.py"
+    ],
+    [
+      "drydocs_lineage/extractors/controlm_inventory.py",
+      "drydocs_lineage/model.py"
+    ],
+    [
+      "drydocs_lineage/extractors/dpl_mac.py",
+      "drydocs_lineage/model.py"
+    ],
+    [
+      "drydocs_lineage/extractors/dpl_registry.py",
+      "drydocs_lineage/model.py"
+    ],
+    [
+      "drydocs_lineage/extractors/glue_tables.py",
+      "drydocs_lineage/extractors/dpl_mac.py"
+    ],
+    [
+      "drydocs_lineage/extractors/glue_tables.py",
+      "drydocs_lineage/model.py"
+    ],
+    [
+      "drydocs_lineage/extractors/rua_code_ops.py",
+      "drydocs_core/controlm/__init__.py"
+    ],
+    [
+      "drydocs_lineage/extractors/rua_code_ops.py",
+      "drydocs_lineage/extractors/controlm_inventory.py"
+    ],
+    [
+      "drydocs_lineage/extractors/rua_code_ops.py",
+      "drydocs_lineage/extractors/rua_inventory.py"
+    ],
+    [
+      "drydocs_lineage/extractors/rua_code_ops.py",
+      "drydocs_lineage/model.py"
+    ],
+    [
+      "drydocs_lineage/extractors/rua_inventory.py",
+      "drydocs_core/data_root.py"
+    ],
+    [
+      "drydocs_lineage/extractors/rua_inventory.py",
+      "drydocs_lineage/model.py"
+    ],
+    [
+      "drydocs_lineage/review.py",
+      "drydocs_lineage/model.py"
+    ],
+    [
+      "drydocs_lineage/review.py",
+      "drydocs_lineage/writer.py"
+    ],
+    [
+      "drydocs_lineage/writer.py",
+      "drydocs_core/ontology/__init__.py"
+    ],
+    [
+      "drydocs_lineage/writer.py",
+      "drydocs_lineage/model.py"
+    ],
+    [
+      "drydocs_remediation/corroborate.py",
+      "drydocs_core/neo4j_client.py"
+    ],
+    [
+      "drydocs_remediation/corroborate.py",
+      "drydocs_remediation/formats.py"
+    ],
+    [
+      "drydocs_remediation/detect.py",
+      "drydocs_core/controlm/__init__.py"
+    ],
+    [
+      "drydocs_remediation/detect.py",
+      "drydocs_remediation/formats.py"
+    ],
+    [
+      "drydocs_remediation/equivalence.py",
+      "drydocs_core/controlm/__init__.py"
+    ],
+    [
+      "drydocs_remediation/equivalence.py",
+      "drydocs_remediation/formats.py"
+    ],
+    [
+      "drydocs_remediation/jira.py",
+      "drydocs_remediation/detect.py"
+    ],
+    [
+      "drydocs_remediation/jira.py",
+      "drydocs_remediation/equivalence.py"
+    ],
+    [
+      "drydocs_remediation/transform.py",
+      "drydocs_remediation/formats.py"
+    ],
+    [
+      "tests/integration/test_e2e_load.py",
+      "drydocs/cli.py"
+    ],
+    [
+      "tests/integration/test_e2e_load.py",
+      "drydocs_core/neo4j_client.py"
+    ],
+    [
+      "tests/integration/test_graph_qa_read_mode.py",
+      "drydocs_api/guard.py"
+    ],
+    [
+      "tests/integration/test_meta_graph_exclusion.py",
+      "drydocs_api/query_specs.py"
+    ],
+    [
+      "tests/integration/test_meta_graph_exclusion.py",
+      "drydocs_core/neo4j_client.py"
+    ],
+    [
+      "tests/unit/conftest.py",
+      "drydocs_core/run_log.py"
+    ],
+    [
+      "tests/unit/test_base_loader_smoke.py",
+      "drydocs/loaders/base.py"
+    ],
+    [
+      "tests/unit/test_base_loader_smoke.py",
+      "drydocs_core/neo4j_client.py"
+    ],
+    [
+      "tests/unit/test_batch_port_orchestrator.py",
+      "drydocs/loaders/batch_port_orchestrator.py"
+    ],
+    [
+      "tests/unit/test_batch_port_orchestrator.py",
+      "drydocs_core/models/registry.py"
+    ],
+    [
+      "tests/unit/test_bmc_docs.py",
+      "drydocs/loaders/bmc_docs.py"
+    ],
+    [
+      "tests/unit/test_bmc_docs.py",
+      "drydocs_core/models/docs.py"
+    ],
+    [
+      "tests/unit/test_cmdline_staging.py",
+      "drydocs/__init__.py"
+    ],
+    [
+      "tests/unit/test_cmdline_staging.py",
+      "drydocs/cmdline_staging.py"
+    ],
+    [
+      "tests/unit/test_code_snapshot_loader.py",
+      "drydocs/loaders/code_snapshot.py"
+    ],
+    [
+      "tests/unit/test_code_snapshot_loader.py",
+      "drydocs_core/models/code_snapshot.py"
+    ],
+    [
+      "tests/unit/test_command_parser.py",
+      "drydocs_core/controlm/__init__.py"
+    ],
+    [
+      "tests/unit/test_command_parser.py",
+      "drydocs_core/controlm/commands.py"
+    ],
+    [
+      "tests/unit/test_command_parser.py",
+      "drydocs_core/controlm/facts.py"
+    ],
+    [
+      "tests/unit/test_command_parser.py",
+      "drydocs_core/controlm/paths.py"
+    ],
+    [
+      "tests/unit/test_command_parser.py",
+      "drydocs_core/controlm/variables.py"
+    ],
+    [
+      "tests/unit/test_controlm_models.py",
+      "drydocs_core/models/__init__.py"
+    ],
+    [
+      "tests/unit/test_cypher_split.py",
+      "drydocs_core/cypher_split.py"
+    ],
+    [
+      "tests/unit/test_cypher_split.py",
+      "drydocs_core/neo4j_client.py"
+    ],
+    [
+      "tests/unit/test_data_root.py",
+      "drydocs_core/__init__.py"
+    ],
+    [
+      "tests/unit/test_data_root.py",
+      "drydocs_core/data_root.py"
+    ],
+    [
+      "tests/unit/test_database_names.py",
+      "drydocs_api/query_specs.py"
+    ],
+    [
+      "tests/unit/test_database_names.py",
+      "drydocs_lineage/writer.py"
+    ],
+    [
+      "tests/unit/test_design_doc.py",
+      "drydocs/design_doc.py"
+    ],
+    [
+      "tests/unit/test_doc_outline.py",
+      "drydocs/doc_outline.py"
+    ],
+    [
+      "tests/unit/test_doc_pdf.py",
+      "drydocs/doc_pdf.py"
+    ],
+    [
+      "tests/unit/test_doc_traceability_guards.py",
+      "drydocs/loaders/doc_traceability.py"
+    ],
+    [
+      "tests/unit/test_doc_traceability_guards.py",
+      "drydocs_core/models/doc_traceability.py"
+    ],
+    [
+      "tests/unit/test_doc_traceability_loader.py",
+      "drydocs/loaders/doc_traceability.py"
+    ],
+    [
+      "tests/unit/test_doc_traceability_loader.py",
+      "drydocs_core/models/doc_traceability.py"
+    ],
+    [
+      "tests/unit/test_drydocs_api.py",
+      "drydocs_api/app.py"
+    ],
+    [
+      "tests/unit/test_drydocs_api.py",
+      "drydocs_api/guard.py"
+    ],
+    [
+      "tests/unit/test_drydocs_api.py",
+      "drydocs_api/handlers.py"
+    ],
+    [
+      "tests/unit/test_drydocs_api.py",
+      "drydocs_api/personas.py"
+    ],
+    [
+      "tests/unit/test_drydocs_api.py",
+      "drydocs_api/queries.py"
+    ],
+    [
+      "tests/unit/test_drydocs_api.py",
+      "drydocs_api/routing.py"
+    ],
+    [
+      "tests/unit/test_drydocs_api.py",
+      "drydocs_api/sessions.py"
+    ],
+    [
+      "tests/unit/test_essential_graphrag.py",
+      "drydocs/loaders/base.py"
+    ],
+    [
+      "tests/unit/test_essential_graphrag.py",
+      "drydocs/loaders/essential_graphrag.py"
+    ],
+    [
+      "tests/unit/test_essential_graphrag.py",
+      "drydocs_core/models/docs.py"
+    ],
+    [
+      "tests/unit/test_folder_name_parser.py",
+      "drydocs_core/controlm/__init__.py"
+    ],
+    [
+      "tests/unit/test_gate_pages.py",
+      "drydocs/gate_pages.py"
+    ],
+    [
+      "tests/unit/test_graph_review.py",
+      "drydocs/graph_review.py"
+    ],
+    [
+      "tests/unit/test_graph_review.py",
+      "drydocs/review_labels.py"
+    ],
+    [
+      "tests/unit/test_graph_verify.py",
+      "drydocs/graph_verify.py"
+    ],
+    [
+      "tests/unit/test_graph_verify.py",
+      "drydocs/review_labels.py"
+    ],
+    [
+      "tests/unit/test_incremental_delete.py",
+      "drydocs/loaders/base.py"
+    ],
+    [
+      "tests/unit/test_launcher_registry.py",
+      "drydocs_core/controlm/__init__.py"
+    ],
+    [
+      "tests/unit/test_launcher_registry.py",
+      "drydocs_core/controlm/commands.py"
+    ],
+    [
+      "tests/unit/test_lineage_code_repo.py",
+      "drydocs_lineage/extractors/__init__.py"
+    ],
+    [
+      "tests/unit/test_lineage_code_repo.py",
+      "drydocs_lineage/model.py"
+    ],
+    [
+      "tests/unit/test_lineage_deepdoc_scaffold.py",
+      "drydocs_core/controlm/__init__.py"
+    ],
+    [
+      "tests/unit/test_lineage_deepdoc_scaffold.py",
+      "drydocs_deepdoc/__init__.py"
+    ],
+    [
+      "tests/unit/test_lineage_deepdoc_scaffold.py",
+      "drydocs_deepdoc/investigate.py"
+    ],
+    [
+      "tests/unit/test_lineage_deepdoc_scaffold.py",
+      "drydocs_deepdoc/writer.py"
+    ],
+    [
+      "tests/unit/test_lineage_deepdoc_scaffold.py",
+      "drydocs_lineage/__init__.py"
+    ],
+    [
+      "tests/unit/test_lineage_deepdoc_scaffold.py",
+      "drydocs_lineage/curation.py"
+    ],
+    [
+      "tests/unit/test_lineage_deepdoc_scaffold.py",
+      "drydocs_lineage/extractors/__init__.py"
+    ],
+    [
+      "tests/unit/test_lineage_deepdoc_scaffold.py",
+      "drydocs_lineage/extractors/controlm_inventory.py"
+    ],
+    [
+      "tests/unit/test_lineage_deepdoc_scaffold.py",
+      "drydocs_lineage/model.py"
+    ],
+    [
+      "tests/unit/test_lineage_deepdoc_scaffold.py",
+      "drydocs_lineage/writer.py"
+    ],
+    [
+      "tests/unit/test_lineage_dpl_registry.py",
+      "drydocs_lineage/extractors/__init__.py"
+    ],
+    [
+      "tests/unit/test_lineage_dpl_registry.py",
+      "drydocs_lineage/model.py"
+    ],
+    [
+      "tests/unit/test_lineage_glue_tables.py",
+      "drydocs_lineage/extractors/__init__.py"
+    ],
+    [
+      "tests/unit/test_lineage_glue_tables.py",
+      "drydocs_lineage/extractors/dpl_mac.py"
+    ],
+    [
+      "tests/unit/test_lineage_glue_tables.py",
+      "drydocs_lineage/extractors/glue_tables.py"
+    ],
+    [
+      "tests/unit/test_lineage_glue_tables.py",
+      "drydocs_lineage/model.py"
+    ],
+    [
+      "tests/unit/test_lineage_inventory.py",
+      "drydocs_core/controlm/__init__.py"
+    ],
+    [
+      "tests/unit/test_lineage_inventory.py",
+      "drydocs_lineage/extractors/__init__.py"
+    ],
+    [
+      "tests/unit/test_lineage_inventory.py",
+      "drydocs_lineage/model.py"
+    ],
+    [
+      "tests/unit/test_lineage_mac.py",
+      "drydocs_lineage/extractors/__init__.py"
+    ],
+    [
+      "tests/unit/test_lineage_mac.py",
+      "drydocs_lineage/model.py"
+    ],
+    [
+      "tests/unit/test_lineage_mac.py",
+      "drydocs_lineage/writer.py"
+    ],
+    [
+      "tests/unit/test_lineage_review.py",
+      "drydocs_lineage/extractors/__init__.py"
+    ],
+    [
+      "tests/unit/test_lineage_review.py",
+      "drydocs_lineage/model.py"
+    ],
+    [
+      "tests/unit/test_lineage_review.py",
+      "drydocs_lineage/review.py"
+    ],
+    [
+      "tests/unit/test_lineage_rua.py",
+      "drydocs_lineage/extractors/__init__.py"
+    ],
+    [
+      "tests/unit/test_lineage_rua.py",
+      "drydocs_lineage/model.py"
+    ],
+    [
+      "tests/unit/test_lineage_rua_code_ops.py",
+      "drydocs_lineage/extractors/__init__.py"
+    ],
+    [
+      "tests/unit/test_lineage_rua_code_ops.py",
+      "drydocs_lineage/model.py"
+    ],
+    [
+      "tests/unit/test_lineage_writer.py",
+      "drydocs_lineage/__init__.py"
+    ],
+    [
+      "tests/unit/test_lineage_writer.py",
+      "drydocs_lineage/extractors/__init__.py"
+    ],
+    [
+      "tests/unit/test_lineage_writer.py",
+      "drydocs_lineage/model.py"
+    ],
+    [
+      "tests/unit/test_lineage_writer.py",
+      "drydocs_lineage/writer.py"
+    ],
+    [
+      "tests/unit/test_loader_run_log.py",
+      "drydocs/loaders/base.py"
+    ],
+    [
+      "tests/unit/test_loader_run_log.py",
+      "drydocs_core/__init__.py"
+    ],
+    [
+      "tests/unit/test_loader_run_log.py",
+      "drydocs_core/adapters/sql_run_log.py"
+    ],
+    [
+      "tests/unit/test_loader_run_log.py",
+      "drydocs_core/run_log.py"
+    ],
+    [
+      "tests/unit/test_mapping_api.py",
+      "drydocs_api/handlers.py"
+    ],
+    [
+      "tests/unit/test_mapping_api.py",
+      "drydocs_api/mappings.py"
+    ],
+    [
+      "tests/unit/test_mapping_api.py",
+      "drydocs_api/personas.py"
+    ],
+    [
+      "tests/unit/test_mapping_api.py",
+      "drydocs_api/sessions.py"
+    ],
+    [
+      "tests/unit/test_mapping_api.py",
+      "drydocs_core/mapping_store.py"
+    ],
+    [
+      "tests/unit/test_mapping_store.py",
+      "drydocs/loaders/manual_loads.py"
+    ],
+    [
+      "tests/unit/test_mapping_store.py",
+      "drydocs_core/mapping_store.py"
+    ],
+    [
+      "tests/unit/test_namespaces.py",
+      "drydocs_core/ontology/namespaces.py"
+    ],
+    [
+      "tests/unit/test_pat_product_mapping.py",
+      "drydocs/loaders/catalog.py"
+    ],
+    [
+      "tests/unit/test_plan_board.py",
+      "drydocs/plan_board.py"
+    ],
+    [
+      "tests/unit/test_precedence.py",
+      "drydocs/loaders/catalog.py"
+    ],
+    [
+      "tests/unit/test_precedence.py",
+      "drydocs_core/precedence.py"
+    ],
+    [
+      "tests/unit/test_publish_boundary_values.py",
+      "drydocs_core/controlm/folder_name.py"
+    ],
+    [
+      "tests/unit/test_publishing.py",
+      "drydocs/publishing/__init__.py"
+    ],
+    [
+      "tests/unit/test_publishing.py",
+      "drydocs/publishing/publisher.py"
+    ],
+    [
+      "tests/unit/test_remediation_corroborate.py",
+      "drydocs_remediation/corroborate.py"
+    ],
+    [
+      "tests/unit/test_remediation_corroborate.py",
+      "drydocs_remediation/formats.py"
+    ],
+    [
+      "tests/unit/test_remediation_handoff.py",
+      "drydocs_remediation/detect.py"
+    ],
+    [
+      "tests/unit/test_remediation_handoff.py",
+      "drydocs_remediation/equivalence.py"
+    ],
+    [
+      "tests/unit/test_remediation_handoff.py",
+      "drydocs_remediation/jira.py"
+    ],
+    [
+      "tests/unit/test_remediation_m0.py",
+      "drydocs_remediation/detect.py"
+    ],
+    [
+      "tests/unit/test_remediation_m0.py",
+      "drydocs_remediation/equivalence.py"
+    ],
+    [
+      "tests/unit/test_remediation_m0.py",
+      "drydocs_remediation/formats.py"
+    ],
+    [
+      "tests/unit/test_remediation_scaffold.py",
+      "drydocs_remediation/__init__.py"
+    ],
+    [
+      "tests/unit/test_remediation_scaffold.py",
+      "drydocs_remediation/detect.py"
+    ],
+    [
+      "tests/unit/test_remediation_scaffold.py",
+      "drydocs_remediation/formats.py"
+    ],
+    [
+      "tests/unit/test_remediation_scaffold.py",
+      "drydocs_remediation/jira.py"
+    ],
+    [
+      "tests/unit/test_remediation_tier1.py",
+      "drydocs_remediation/equivalence.py"
+    ],
+    [
+      "tests/unit/test_remediation_tier1.py",
+      "drydocs_remediation/formats.py"
+    ],
+    [
+      "tests/unit/test_remediation_tier1.py",
+      "drydocs_remediation/transform.py"
+    ],
+    [
+      "tests/unit/test_review_labels.py",
+      "drydocs/review_labels.py"
+    ],
+    [
+      "tests/unit/test_row_checksum.py",
+      "drydocs/loaders/base.py"
+    ],
+    [
+      "tests/unit/test_row_checksum.py",
+      "drydocs/loaders/controlm_conditions_in.py"
+    ],
+    [
+      "tests/unit/test_row_checksum.py",
+      "drydocs/loaders/controlm_conditions_out.py"
+    ],
+    [
+      "tests/unit/test_row_checksum.py",
+      "drydocs/loaders/controlm_folders.py"
+    ],
+    [
+      "tests/unit/test_row_checksum.py",
+      "drydocs/loaders/controlm_jobs.py"
+    ],
+    [
+      "tests/unit/test_row_checksum.py",
+      "drydocs_core/models/__init__.py"
+    ],
+    [
+      "tests/unit/test_runs_on_resolution.py",
+      "drydocs/loaders/runs_on_resolution.py"
+    ],
+    [
+      "tests/unit/test_schema_graph.py",
+      "drydocs_core/ontology/schema_graph.py"
+    ],
+    [
+      "tests/unit/test_schema_meta_exclusion.py",
+      "drydocs/loaders/__init__.py"
+    ],
+    [
+      "tests/unit/test_schema_meta_exclusion.py",
+      "drydocs/loaders/batch_port_orchestrator.py"
+    ],
+    [
+      "tests/unit/test_schema_meta_exclusion.py",
+      "drydocs/loaders/bmc_docs.py"
+    ],
+    [
+      "tests/unit/test_schema_meta_exclusion.py",
+      "drydocs/loaders/doc_traceability.py"
+    ],
+    [
+      "tests/unit/test_schema_meta_exclusion.py",
+      "drydocs/loaders/runs_on_resolution.py"
+    ],
+    [
+      "tests/unit/test_schema_meta_exclusion.py",
+      "drydocs_api/query_specs.py"
+    ],
+    [
+      "tests/unit/test_seal_attribution.py",
+      "drydocs/graph_verify.py"
+    ],
+    [
+      "tests/unit/test_seal_attribution.py",
+      "drydocs/loaders/seal_attribution.py"
+    ],
+    [
+      "tests/unit/test_seal_attribution.py",
+      "drydocs_core/adapters/__init__.py"
+    ],
+    [
+      "tests/unit/test_seal_attribution.py",
+      "drydocs_core/models/__init__.py"
+    ],
+    [
+      "tests/unit/test_sme_notes.py",
+      "drydocs/sme_notes.py"
+    ],
+    [
+      "tests/unit/test_software_registry.py",
+      "drydocs/loaders/software_registry.py"
+    ],
+    [
+      "tests/unit/test_software_registry.py",
+      "drydocs_core/models/registry.py"
+    ],
+    [
+      "tests/unit/test_source_mapping_drift.py",
+      "drydocs/source_mappings.py"
+    ],
+    [
+      "tests/unit/test_source_mapping_drift.py",
+      "drydocs_lineage/extractors/controlm_inventory.py"
+    ],
+    [
+      "tests/unit/test_source_mappings.py",
+      "drydocs/source_mappings.py"
+    ],
+    [
+      "tests/unit/test_source_registry.py",
+      "drydocs/__init__.py"
+    ],
+    [
+      "tests/unit/test_source_registry.py",
+      "drydocs/cli.py"
+    ],
+    [
+      "tests/unit/test_source_registry.py",
+      "drydocs_core/source_registry.py"
+    ],
+    [
+      "tests/unit/test_sql_run_log.py",
+      "drydocs_core/adapters/oracle_adapter.py"
+    ],
+    [
+      "tests/unit/test_sql_run_log.py",
+      "drydocs_core/adapters/sql_run_log.py"
+    ],
+    [
+      "tests/unit/test_supplements.py",
+      "drydocs/__init__.py"
+    ],
+    [
+      "tests/unit/test_supplements.py",
+      "drydocs/cli.py"
+    ],
+    [
+      "tests/unit/test_supplements.py",
+      "drydocs_core/schema/supplements.py"
+    ],
+    [
+      "tests/unit/test_transcribe_doc_markup.py",
+      "drydocs/design_doc.py"
+    ],
+    [
+      "tests/unit/test_variable_classifier.py",
+      "drydocs_core/adapters/csv_adapter.py"
+    ],
+    [
+      "tests/unit/test_variable_classifier.py",
+      "drydocs_core/controlm/__init__.py"
+    ],
+    [
+      "tests/unit/test_variable_classifier.py",
+      "drydocs_core/controlm/commands.py"
+    ],
+    [
+      "tests/unit/test_variable_classifier.py",
+      "drydocs_core/models/__init__.py"
+    ],
+    [
+      "tests/unit/test_variable_resolver.py",
+      "drydocs_core/controlm/resolver.py"
+    ],
+    [
+      "tests/unit/test_variable_staging.py",
+      "drydocs/staging.py"
+    ],
+    [
+      "tests/unit/test_variable_staging.py",
+      "drydocs_core/adapters/csv_adapter.py"
+    ],
+    [
+      "tests/unit/test_variable_staging.py",
+      "drydocs_core/models/__init__.py"
+    ]
+  ],
+  "processes": [],
+  "data_assets": [],
+  "hosts": [],
+  "rels": [],
+  "stats": {
+    "projects": [
+      "drydocs",
+      "drydocs_api",
+      "drydocs_core",
+      "drydocs_deepdoc",
+      "drydocs_lineage",
+      "drydocs_remediation",
+      "tests"
+    ],
+    "files": 205,
+    "edges": 370,
+    "circular_files": 0,
+    "processes": 0,
+    "data_assets": 0,
+    "hosts": 0,
+    "rels": 0
+  }
+}
