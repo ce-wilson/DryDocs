@@ -26,6 +26,17 @@ Tags help grooming: `idea` · `bug` · `doc` · `source` (new data source) · `q
 
 <!-- add new ideas at the top -->
 
+- 2026-07-28 — [source] **Snowflake data-catalog (dataset/distribution) — loader plan drafted**
+  (`docs/generic-snowflake-data-catalog-ingestion-plan.md`, from the curated-view screenshot
+  walkthrough; real system name company-side per the twin convention). The fourth registry
+  seam: dataset GUID + producing app id + contact + per-platform physical coordinates
+  (table/file/s3 shapes) joining the G17/G25/G41 DataAsset GUID space. Groom into:
+  Phase 0 source registration `snowflake-data-catalog` + landing zone, Phase 1 extractor
+  `snowflake_catalog.py` (synthetic fixtures, coverage counters), Phase 2 cross-check reports
+  (catalog↔DPL-registry, catalog↔Glue placements, app-id↔SEAL census), Phase 3 gate prompt
+  `snowflake-data-catalog.yaml` (one-node-or-two dcat ruling + second GUID authority +
+  contact folds into email-dl-contact-point). Relationships stay post-lineage, post-G22.
+
 - 2026-07-28 — [idea] **Agent graph-navigation surface** (benchmarked live 2026-07-28): agents
   answering code-nav questions from the loaded code graph instead of the filesystem is real —
   5 questions in ~410ms / ~1.2k chars total vs grep's noisy or infeasible equivalents
