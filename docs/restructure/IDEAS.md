@@ -26,17 +26,6 @@ Tags help grooming: `idea` · `bug` · `doc` · `source` (new data source) · `q
 
 <!-- add new ideas at the top -->
 
-- 2026-07-28 — [source] **Snowflake data-catalog (dataset/distribution) — loader plan drafted**
-  (`docs/generic-snowflake-data-catalog-ingestion-plan.md`, from the curated-view screenshot
-  walkthrough; real system name company-side per the twin convention). The fourth registry
-  seam: dataset GUID + producing app id + contact + per-platform physical coordinates
-  (table/file/s3 shapes) joining the G17/G25/G41 DataAsset GUID space. Groom into:
-  Phase 0 source registration `snowflake-data-catalog` + landing zone, Phase 1 extractor
-  `snowflake_catalog.py` (synthetic fixtures, coverage counters), Phase 2 cross-check reports
-  (catalog↔DPL-registry, catalog↔Glue placements, app-id↔SEAL census), Phase 3 gate prompt
-  `snowflake-data-catalog.yaml` (one-node-or-two dcat ruling + second GUID authority +
-  contact folds into email-dl-contact-point). Relationships stay post-lineage, post-G22.
-
 - 2026-07-28 — [idea] **Agent graph-navigation surface** (benchmarked live 2026-07-28): agents
   answering code-nav questions from the loaded code graph instead of the filesystem is real —
   5 questions in ~410ms / ~1.2k chars total vs grep's noisy or infeasible equivalents
@@ -47,23 +36,6 @@ Tags help grooming: `idea` · `bug` · `doc` · `source` (new data source) · `q
   a read-only `drydocs query <spec>` CLI subcommand over the (O33-guarded) query_specs so
   agents get one deterministic, testable command — folds naturally into U4's tech-debt query
   pack; MCP (mcp-neo4j-cypher) is the richer later option but adds config + write-risk surface.
-- 2026-07-28 — [bug] **Component-cell comma-split shears 8 of 56 Component.ref values** (U3):
-  refs holding commas/semicolons inside parentheticals truncate (`K2 loader (`seal_attribution.cypher`),
-  corrupting (origin, ref) node identity. Fix = extend `_split_cell` with the
-  `_PAREN_QUALIFIER_RE` strip the section cells already use, or tighten the authoring convention.
-- 2026-07-28 — [doc] **Design-doc commit-citation sweep** (U3 board): five docs cite PRE-SQUASH
-  hashes that dangle off main on a fresh clone (project-tdd, project-review, remediation-tdd,
-  web-console-tdd, benchmark-explainer); startup-refresh runbook was edited 07-28 (L16) but
-  still cites the 07-20 commit; mapping-demo runbook has NO commit citation. One re-cite sweep.
-- 2026-07-28 — [doc] **The two fan-in hotspots are cited by no traceability component** (U3):
-  drydocs/loaders/base.py (fan-in 19) and drydocs_lineage/model.py (9) appear in zero matrix
-  component cells — the docs cite the loaders' cypher but not the lifecycle/identity contracts
-  they all inherit.
-- 2026-07-28 — [doc] **sdlc-*.md §DEP tables contradict the post-G2 tree** (U3): neo4j_client
-  and relationship_vocabulary.yaml still cited at pre-extraction `drydocs/` paths; APOC listed
-  as an open question (OQ-NS-3) though run_script + the J9 container made it load-bearing.
-  These docs live outside the design-doc render pipeline, so no sweep catches them drifting.
-
 - 2026-07-28 — [chore] **react-router high advisory (GHSA-qwww-vcr4-c8h2, RSC-mode CSRF) cannot
   clear without the v7→v8 major migration** — v8 absorbs `react-router-dom` (its latest is
   still 7.18.1, inside the vulnerable 7.12.0–8.2.0 range), so `npm audit fix` is a no-op and
@@ -71,18 +43,6 @@ Tags help grooming: `idea` · `bug` · `doc` · `source` (new data source) · `q
   per its stop clause (postcss/nanoid patches applied there); a UI-workstream decision, and
   likely moot in practice — the console is a Vite SPA, no RSC actions — but the audit stays
   red until ruled. Pairs with the code-splitting design call O34 also parked.
-
-- 2026-07-28 — [bug] **`drydocs bootstrap` reported "Constraints applied." while applying zero
-  constraints, from the initial commit until D5.** Root cause, reproduced in a throwaway
-  container: `apoc.cypher.runMany` executes DML but **silently no-ops DDL** — no exception, no
-  warning; the same statements via `session.run` work. Pre-D5 `run_script` used runMany, so from
-  `9893c19` (2026-05-05) to `771326b` (D5, 2026-07-18) every bootstrap on every edition created
-  nothing while printing success. The post-D5 client-side split is sound (51/51 verified).
-  **The fix this argues for is not the past, it is the missing check:** `_apply_supplement_chain`
-  already guards this exact failure family for supplements ("a supplement that is truncated,
-  renamed, or comment-only runs 'fine' and seeds nothing") — `bootstrap` has no equivalent. It
-  should count `SHOW CONSTRAINTS` against what `constraints.cypher` declares and refuse loudly on
-  a mismatch. Same "succeeds loudly, does nothing" through-line as G29/G30/Q8/L17.
 
 - 2026-07-28 — [idea] **`VERIFIED LIVE` does not say WHICH machine — and there are two graphs.**
   Laptop and desktop each run their own local Docker Neo4j; git syncs the repo, never the volume.
@@ -92,14 +52,6 @@ Tags help grooming: `idea` · `bug` · `doc` · `source` (new data source) · `q
   was built on the desktop and is fine. Cheap fix: tag the claim with the machine/container.
   Better fix: make live verification reproducible from a fresh bootstrap so it stops mattering
   where it ran. Until then, treat "absent from every database" as "absent *here*".
-
-- 2026-07-28 — [chore] **`render_gates.py` is missing from the stale-render ritual.** CLAUDE.md's
-  stale-render check names `docs/plan/board.html` and `docs/design/*.html`, and `snapshot.ps1`
-  regenerates those two — but `web/src/generated/gates.json` is *also* a deterministic render, and
-  its `unblocks` edges derive from **backlog.yaml item text**. So any groom that promotes an item
-  naming a gate slug silently drifts it and reddens `test_gates_json`. Happened twice on
-  2026-07-28. Either add `render_gates.py` to `snapshot.ps1` + the CLAUDE.md ritual line, or fold
-  it into `render_board.py` since the same edit triggers both.
 
 - 2026-07-28 — [idea] **Two sessions picked the same backlog item ten minutes apart.** Both a groom
   session and this one independently built C19; the duplicate was thrown away. CLAUDE.md's pull
@@ -841,6 +793,19 @@ Tags help grooming: `idea` · `bug` · `doc` · `source` (new data source) · `q
 
 ## Recently groomed (audit trail)
 
+- 2026-07-28 — [source] Snowflake data-catalog (dataset/distribution) loader plan → **G42**
+  (source registration + taxonomy-first extractor), **G43** (cross-check reports),
+  **G44** (gate prompt + proposed ontology entries; the dcat one-node-or-two ruling
+  rides the gate). Epic-close-out groom run; the plan doc is the mapping ledger.
+- 2026-07-28 — [bug] Component-cell comma-split shears parenthetical refs (U3) → **L18**.
+- 2026-07-28 — [doc]×3 U3-census doc-drift lines (pre-squash citation sweep + sdlc §DEP
+  tables + fan-in hotspot citation gap) consolidated → **L19** (one sweep, one review).
+- 2026-07-28 — [bug] bootstrap "Constraints applied." with zero constraints (runMany
+  no-ops DDL; pre-D5 window) → **D8** (the missing SHOW CONSTRAINTS count guard — the
+  history is already fixed by D5, the item is the structural check).
+- 2026-07-28 — [chore] render_gates.py missing from the stale-render ritual → **J17**.
+- 2026-07-28 — U5 executed INSIDE the groom run (graph cross-check subsection added to
+  this very skill) — **Epic U closed 6/6**, the run's close-out target.
 - 2026-07-28 — [bug] depgraph scanner blind spots — one fix, three symptoms (cross-root
   IMPORTS, function-level imports, missing drydocs_api scan root; U1 F1 + U2 census,
   confirmed live by the graph-navigation benchmark 0-vs-24) → **U6** (p2, graph-infra;

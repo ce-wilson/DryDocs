@@ -76,6 +76,27 @@ as `- [tag] one line. (why/where seen)` with tag ∈ idea | bug | doc | source |
 6. **Commit**: `chore(backlog): groom — <n> promoted, <n> inboxed, <n> merged`, listing new ids
    in the body. Push per the session ritual.
 
+## Graph cross-check (optional, needs Neo4j)
+
+Purely optional enrichment — a groom with no database running is NEVER blocked by
+this section; skip it silently when the local `drydocs` DB is down (the offline flow
+above is complete on its own).
+
+When the container IS up, two cheap checks catch transcription mistakes:
+
+- **Module sanity:** for a code item, compare its `module:` against the code-graph
+  census (`MATCH (m:CodeModule) WHERE NOT m:SchemaMeta RETURN m.project, count(*)`) —
+  an item filed against a module whose files the graph places in a different root is
+  probably mis-binned.
+- **Close-note claims:** before flipping an item `done`, spot-check file paths named
+  in its close note against `:CodeModule.file_id` — a claim naming a file the graph
+  has never seen deserves a manual look before it becomes history.
+
+Run both via a scratchpad script using `Neo4jSettings` from `drydocs_core.config`
+(never raw env vars); the guarded-query conventions live in
+`.claude/skills/tech-debt/SKILL.md`. The validator/test flow above is unchanged
+either way.
+
 ## Model guidance
 
 This skill was authored on opus (I3). **Routine grooming runs on sonnet** — the schema,

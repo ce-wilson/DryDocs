@@ -380,7 +380,9 @@
         "config/gate-prompts/email-dl-contact-point.yaml"
       ],
       "log_ref": null,
-      "unblocks": []
+      "unblocks": [
+        "G44"
+      ]
     },
     {
       "kind": "prompt-only",
