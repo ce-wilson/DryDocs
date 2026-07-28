@@ -7058,7 +7058,7 @@ items:
     agent: main
     model: haiku
     priority: p3
-    status: todo
+    status: done
     depends_on: [U1, U6]
     inputs: [.claude/skills/tech-debt/SKILL.md, docs/reviews/code-graph-review-plan.md]
     acceptance: >
@@ -7074,6 +7074,14 @@ items:
       RE-SEQUENCED 2026-07-28 groom: also depends on U6 — U1's verdict was
       that A1/A5/A6 are vacuous until the scanner fix lands, so transcribing
       the query pack now would enshrine vacuous queries.
+      CLOSED 2026-07-28 (same day as U6): section added with the A1-A6 pack
+      NOT transcribed verbatim — hardened with the O33 NOT :SchemaMeta
+      guards, the D2 IMPORTS caveat, the scripts/-unscanned caveat, and
+      post-U6 baselines (205/370). All 7 probes (A2 = two) executed live
+      against `drydocs`: A1=0, cycles=0, A4 dead-code candidates=0, A5=26
+      no-direct-test-importer modules (real future audit signal), A6=12
+      cross-root pairs. Offline fallback documented (snapshot JSON fields +
+      viewer.html; exemplars absent from JSON so no guard needed there).
   - id: U5
     epic: self-documentation
     title: "OPTIONAL: add an optional graph cross-check subsection to the groom-backlog skill"
@@ -7608,15 +7616,14 @@ items:
       only (legacy 1_* family proves it is not always a SEAL).
 
 summary:
-  todo: 47                                         # U6 groomed + built + closed same day 2026-07-28 (net 0); prior: +4 at the 2026-07-28 inbox groom (C19 ontology-comment fix, J16 port-manifest fall-through guard, L17 doc-loader prereq guards, O34 web npm advisories); all four closed same day (O34 via its stop clause), L16 closed alongside; prior: +5 2026-07-27 groom (J14/J15/G36/O33/G38), +2 PAT review (C17/C18), +5 code-graph-review (U1-U5), +2 cmdline seam (G39/G40, built+closed same day)
+  todo: 46                                         # U4 closed 2026-07-28 pm (right after U6 unblocked it); U6 groomed + built + closed same day (net 0); prior: +4 at the 2026-07-28 inbox groom (C19 ontology-comment fix, J16 port-manifest fall-through guard, L17 doc-loader prereq guards, O34 web npm advisories); all four closed same day (O34 via its stop clause), L16 closed alongside; prior: +5 2026-07-27 groom (J14/J15/G36/O33/G38), +2 PAT review (C17/C18), +5 code-graph-review (U1-U5), +2 cmdline seam (G39/G40, built+closed same day)
   in_progress: 1                                   # E1 (gate deferred both sides)
   blocked: 0
-  done: 157                                        # 2026-07-28 pm: U6 depgraph scanner blind-spot fix (shared-namespace extract_many + drydocs_api root; 205 modules / 370 IMPORTS, all 24 U1 orphan false-positives resolved). Earlier 2026-07-28: G41 glue base-table inventory seam (built + closed same day), L17 doc-loader prereq guards (same), O33 SchemaMeta exemplar audit (22 specs + runs_on write path; live-proven), O34 npm advisories (postcss cleared; react-router escalated via the stop clause), U1/U2/U3 code-graph persona reviews run 1 (scanner blind-spot headline; backlog verified truthful; doc board + citation sweep queued), C19 ontology-comment fix (groomed + closed same day), J16 port-manifest fall-through guard (same), L16 runbook container/port refresh. 2026-07-27 closes: J14 SEALID split, P3 hosts+RUNS_ON, G21 rua code-ops, G24 code-repo seam, G26 launcher-registry config, Q8 bmc-docs prereq, C18 shadow-model guard, J15 value-shape boundary guard, G33 code-snapshot loader (gate signed + built same day), G39 cmdline staging store + G40 parse (groomed am, built pm)
-  next_ready: [M3, M4, J10, Q6, O23, J13, O26, O27, C15, C16, C17, O28, R3, R4, O29, O30, O31, O32, S1, S8, S9, Q7, G32, G34, G35, P5, G22, U4, U5]
-  # 2026-07-28 pm: U6 closed same day it was groomed -> U4 (tech-debt query pack)
-  # re-enters next_ready with its wait-condition SATISFIED — the queries it
-  # transcribes now run against a truthful graph (370 edges, cross-root visible).
-  # U5 stays: its gate (U2) passed and the groom census worked.
+  done: 158                                        # 2026-07-28 pm: U4 tech-debt graph-evidence section (hardened A1-A6 pack + offline fallback, all probes run live), U6 depgraph scanner blind-spot fix (shared-namespace extract_many + drydocs_api root; 205 modules / 370 IMPORTS, all 24 U1 orphan false-positives resolved). Earlier 2026-07-28: G41 glue base-table inventory seam (built + closed same day), L17 doc-loader prereq guards (same), O33 SchemaMeta exemplar audit (22 specs + runs_on write path; live-proven), O34 npm advisories (postcss cleared; react-router escalated via the stop clause), U1/U2/U3 code-graph persona reviews run 1 (scanner blind-spot headline; backlog verified truthful; doc board + citation sweep queued), C19 ontology-comment fix (groomed + closed same day), J16 port-manifest fall-through guard (same), L16 runbook container/port refresh. 2026-07-27 closes: J14 SEALID split, P3 hosts+RUNS_ON, G21 rua code-ops, G24 code-repo seam, G26 launcher-registry config, Q8 bmc-docs prereq, C18 shadow-model guard, J15 value-shape boundary guard, G33 code-snapshot loader (gate signed + built same day), G39 cmdline staging store + G40 parse (groomed am, built pm)
+  next_ready: [M3, M4, J10, Q6, O23, J13, O26, O27, C15, C16, C17, O28, R3, R4, O29, O30, O31, O32, S1, S8, S9, Q7, G32, G34, G35, P5, G22, U5]
+  # 2026-07-28 pm: U6 closed same day it was groomed; U4 closed right behind it
+  # (the query pack transcribed against the now-truthful graph, hardened with
+  # the O33 SchemaMeta guards). U5 = the last open Epic U item.
   # 2026-07-27 code-graph-review groom: U1-U3 = the three personas of
   # docs/reviews/code-graph-review-plan.md, dependency-free -> next_ready;
   # U4/U5 = the optional skill edits, gated on their phase (U1/U2) proving the
