@@ -15,8 +15,16 @@ Opt-in and Docker-gated:
 * run explicitly with:  ``poetry run pytest tests/integration -m integration -q``
 * auto-SKIPS (never fails) when Docker or the bundled samples are unavailable.
 
-First run pulls the ``neo4j:5.26`` image (+ APOC via NEO4J_PLUGINS) — allow a
-few minutes and outbound network.
+The container is **Enterprise**, and must be: `constraints.cypher` declares
+``IS NODE KEY`` constraints, which Community rejects outright — `bootstrap`
+cannot complete on Community, so a Community fixture can only ever error here.
+(ADR 0002 commits the project to EE for multi-DB + composite; Community is a
+recorded *rejected alternative*, not a supported test target.) The image is read
+from ``config/dev-environment.yaml``, the declared single source of truth for
+local infra, so this fixture cannot drift from the container operators run.
+
+First run pulls that image (+ APOC via NEO4J_PLUGINS) — allow a few minutes and
+outbound network.
 """
 from __future__ import annotations
 
@@ -25,10 +33,29 @@ import subprocess
 from pathlib import Path
 
 import pytest
+import yaml
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
 SAMPLES = REPO_ROOT / "drydocs" / "data" / "samples"
-NEO4J_IMAGE = "neo4j:5.26"
+DEV_ENVIRONMENT = REPO_ROOT / "config" / "dev-environment.yaml"
+
+
+def _neo4j_image() -> str:
+    """The Enterprise image declared in config/dev-environment.yaml.
+
+    Deliberately unforgiving: a missing key is a real config defect, and
+    silently falling back to a default is how this fixture drifted onto a
+    Community image in the first place.
+    """
+    declared = yaml.safe_load(DEV_ENVIRONMENT.read_text(encoding="utf-8"))["neo4j"]["image"]
+    assert "enterprise" in declared, (
+        f"{DEV_ENVIRONMENT.name} declares a non-Enterprise image ({declared!r}); "
+        "bootstrap's NODE KEY constraints require Enterprise"
+    )
+    return declared
+
+
+NEO4J_IMAGE = _neo4j_image()
 
 
 def _docker_available() -> bool:
@@ -57,10 +84,18 @@ pytestmark = [
 
 @pytest.fixture(scope="module")
 def neo4j_env():
-    """A throwaway Neo4j (community + APOC) and the NEO4J_* env the CLI reads."""
+    """A throwaway Neo4j (Enterprise + APOC) and the NEO4J_* env the CLI reads.
+
+    ``NEO4J_ACCEPT_LICENSE_AGREEMENT=eval`` matches the local `neo4jtest`
+    container's setting — the evaluation license, not a commercial one.
+    """
     from testcontainers.neo4j import Neo4jContainer
 
-    container = Neo4jContainer(NEO4J_IMAGE).with_env("NEO4J_PLUGINS", '["apoc"]')
+    container = (
+        Neo4jContainer(NEO4J_IMAGE)
+        .with_env("NEO4J_PLUGINS", '["apoc"]')
+        .with_env("NEO4J_ACCEPT_LICENSE_AGREEMENT", "eval")
+    )
     with container as neo4j:
         yield {
             "NEO4J_URI": neo4j.get_connection_url(),

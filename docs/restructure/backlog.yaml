@@ -3847,6 +3847,19 @@ items:
       grouped (job_id, version_serial) — stale vs the (folder_id, job_id) NODE KEY;
       the sample's legitimate DLY/CYC promoted pair (job_id 22 in two folders) proved
       it; check now groups the composite.
+      CORRECTED 2026-07-27: the fixture's Community image was wrong and the suite had
+      rotted to 3 errors — constraints.cypher has declared `port_unique ... IS NODE KEY`
+      since the 2026-05-05 initial commit, and NODE KEY is Enterprise-only, so `bootstrap`
+      could not complete. (Community was never a supported target: ADR 0002 commits the
+      project to EE and records Community single-DB only as a rejected alternative.) The
+      fixture now reads its image from config/dev-environment.yaml — the declared single
+      source of truth for local infra, so it cannot drift again — and sets
+      NEO4J_ACCEPT_LICENSE_AGREEMENT=eval, matching the local neo4jtest container.
+      Re-verified live 2026-07-27: 3 passed (~38s), full integration suite 6 passed.
+      How the 2026-07-11 "verified live on community" run above ever passed is unresolved;
+      the likeliest cause is that bootstrap's error handling changed underneath it (the D5
+      client-side split gave each statement its own auto-commit transaction, where the
+      earlier apoc.cypher.runMany path could swallow the constraint failure).
 
   - id: J10
     epic: release-infrastructure
