@@ -32,8 +32,18 @@
   --teal: #167f73;
   --green: #1f7a46;
   --yellow: #8a6a0c;
-  --red: #c8202e; /* brand core — same hue both themes (brand rule, site-plan §2) */
+  --red: #c8202e; /* brand core — same hue both themes (brand rule, site-plan §2).
+                     BRAND ONLY (DL-2, internal/datalens-reference/continuity.md):
+                     danger/failure surfaces use --status-fail below, so "red = failed"
+                     matches the runtime monitor without contaminating the Kept Orbit core. */
   --red-soft: #a81824;
+
+  /* Status/danger rose (DL-2) — distinct from brand --red. Soft = the text-safe
+     variant (darker in light, brighter in dark), same convention as --red-soft.
+     Contrast (computed 2026-07-28): fail 6.10:1 on --panel / 5.43:1 on --panel2
+     (text-safe); fail-soft 8.37:1. */
+  --status-fail: #bd1f43;
+  --status-fail-soft: #971936;
 
   /* Kept Orbit brand constants (UI-WIP/kept-orbit-philosophy.md): like --red,
      the mark's stave colors are identity, not theme — same values both sheets. */
@@ -66,6 +76,11 @@
   --red: #c8202e;
   --red-soft: #e4525d;
 
+  /* DL-2 dark set: fail 3.82:1 on --panel (borders/fills/large, ≥3:1);
+     fail-soft 5.98:1 (text-safe). */
+  --status-fail: #e0325c;
+  --status-fail-soft: #f2708e;
+
   --brand-navy: #1e3a5c;
   --brand-green: #2bb673;
 
@@ -96,6 +111,8 @@
   --color-yellow: var(--yellow);
   --color-brand: var(--red);
   --color-brand-soft: var(--red-soft);
+  --color-status-fail: var(--status-fail);
+  --color-status-fail-soft: var(--status-fail-soft);
 
   --font-sans: var(--sans);
   --font-mono: var(--mono);

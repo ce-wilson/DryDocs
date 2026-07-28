@@ -5,11 +5,13 @@ import type { ResultKind } from './benchmarkData'
 // the same way, so the meaning of "pass"/"fail"/etc. never drifts between
 // panels on this one page.
 const META: Record<ResultKind, { glyph: string; label: string; token: string }> = {
+  // fail/hallucination use --status-fail-soft, not --red: red = brand only (DL-2),
+  // and the soft variant is the text-safe one in both themes (tokens.css).
   pass: { glyph: '✔', label: 'pass', token: '--green' },
-  fail: { glyph: '✗', label: 'fail', token: '--red' },
+  fail: { glyph: '✗', label: 'fail', token: '--status-fail-soft' },
   partial: { glyph: '~', label: 'partial', token: '--yellow' },
   abstain: { glyph: 'Ⓐ', label: 'abstain', token: '--teal' },
-  hallucination: { glyph: '⚠', label: 'hallucination', token: '--red' },
+  hallucination: { glyph: '⚠', label: 'hallucination', token: '--status-fail-soft' },
 }
 
 export default function ResultChip({ kind, compact }: { kind: ResultKind; compact?: boolean }) {

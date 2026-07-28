@@ -6,7 +6,9 @@ import type { RunRow } from './demoLoads'
 // frame linking, the Explorer contract).
 
 function statusToken(status: RunRow['status']): string {
-  return status === 'COMPLETED' ? '--green' : status === 'FAILED' ? '--red' : '--yellow'
+  // FAILED = --status-fail-soft (text-safe in both themes), not --red — red is
+  // brand-only per DL-2 (internal/datalens-reference/continuity.md).
+  return status === 'COMPLETED' ? '--green' : status === 'FAILED' ? '--status-fail-soft' : '--yellow'
 }
 
 export default function LoadsTimeline({
@@ -70,7 +72,7 @@ export default function LoadsTimeline({
                   <span>rows {r.rows_processed}</span>
                   <span>changed {r.rows_changed}</span>
                   {r.rows_rejected > 0 && <span className="text-yellow">rejected {r.rows_rejected}</span>}
-                  {r.nodes_marked_removed > 0 && <span className="text-brand-soft">marked-removed {r.nodes_marked_removed}</span>}
+                  {r.nodes_marked_removed > 0 && <span className="text-status-fail-soft">marked-removed {r.nodes_marked_removed}</span>}
                   {r.nodes_reactivated > 0 && <span>reactivated {r.nodes_reactivated}</span>}
                 </div>
                 <div className="mt-0.5 break-all font-mono text-[9px] text-faint">{r.run_id}</div>
