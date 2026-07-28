@@ -39,3 +39,23 @@ services:
   # Local dev servers the web UI expects (see web/.env.example).
   adk_api: 8000           # agents ADK server (VITE_ADK_URL)
   drydocs_api: 8001       # thin read API, ADR 0005 (VITE_API_URL)
+
+depgraph:
+  # The code-graph INSTRUMENT (U7). knowledge/depgraph-snapshots/snapshot.ps1
+  # shells out to this sibling checkout, so the revision here decides what a
+  # snapshot can see — it is dev infrastructure exactly like the container above.
+  repo: ../depgraph       # sibling of the DryDocs repo root, NOT a submodule
+  remote: https://github.com/ce-wilson/depgraph.git
+  # depgraph is a FORK WITH DIVERGENT SIBLINGS off a one-commit main (76ba075):
+  # feat/p0-vector has --tree, feat/controlm-lineage has the multi-root resolver
+  # fix (U6). Neither is an ancestor of the other, so NO single revision has
+  # everything and `main` still reproduces the broken scanner. Until they are
+  # merged, a -Tree snapshot and a code-graph snapshot need different checkouts.
+  expected_branch: feat/controlm-lineage
+  expected_commit: aa52315
+  # What snapshot.ps1 REFUSES to scan without. These are probed behaviourally
+  # (knowledge/depgraph-snapshots/probe_instrument.py) — never by version
+  # string, because the fork has no monotonic version to compare.
+  requires:
+    scan: [multi_root]    # every run
+    tree: [tree]          # additionally, when -Tree is passed

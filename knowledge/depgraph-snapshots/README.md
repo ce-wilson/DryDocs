@@ -23,9 +23,23 @@ header** so each snapshot is self-identifying:
   "scan": ["drydocs","drydocs_core","drydocs_api","drydocs_remediation",
            "drydocs_lineage","drydocs_deepdoc","tests"], "tree": false,
   "git": { "commit": "<short>", "full": "...", "branch": "main",
-           "describe": "...", "subject": "...", "dirty": false, "pr": <num|null> }
+           "describe": "...", "subject": "...", "dirty": false, "pr": <num|null> },
+  "depgraph": { "commit": "<short>", "full": "...", "branch": "feat/controlm-lineage",
+                "dirty": false, "version": "0.1.0",
+                "capabilities": { "multi_root": true, "tree": false } }
 }
 ```
+
+**`git` is what was measured; `depgraph` is what measured it** (U7). Both matter, because the
+scan runs in a *sibling repo* whose checked-out revision decides what the snapshot can see —
+until 2026-07-28 the header pinned the subject precisely and said nothing about the instrument,
+which is how a scanner regression became invisible. Before scanning, `snapshot.ps1` runs
+[`probe_instrument.py`](probe_instrument.py) and **refuses** (exit 1, no file written) when the
+checkout cannot do what the run needs: multi-root resolution always, `--tree` additionally for
+`-Tree`. The probe is **behavioural, never a version string** — depgraph is a fork whose
+branches are not ancestors of each other, so there is no monotonic version to compare. Expected
+revision and required capabilities live in [`config/dev-environment.yaml`](../../config/dev-environment.yaml);
+`tests/unit/test_probe_instrument.py` fails if this machine's instrument has regressed.
 
 `pr` is best-effort (parsed from recent commit subjects/bodies — `pull request #N`, `(#N)`).
 The header is **prepended** to depgraph's JSON without reformatting (clean diffs, no BOM), and
@@ -69,6 +83,22 @@ Each snapshot's summary line reports `files`, `edges`, `circular_files`. To see 
 > because the fix landed mid-day; the bare-date `drydocs-20260728.json` from that morning was
 > **deleted** — it undercounted *and* its commit message asserted "no structural drift" on
 > numbers taken from the blind region.)
+> **⚠ Instrument change — `abs_path` is gone from snapshots written after 2026-07-28 12:00.**
+> Nodes used to carry `abs_path`, stamped with the *checkout location*, so the same code read
+> `C:/coding/projects/DryDocs/...` on the desktop, `.../sandbox/DryDocs/...` on the laptop, and
+> `.claude/worktrees/<name>/...` from an agent worktree. Two snapshots of identical code
+> therefore agreed on all 370 edges while **every one of their 205+ nodes read as changed** —
+> a 100%-false structural diff. It was not cosmetic: it blocked the session-end ritual twice on
+> 2026-07-28 (a cross-machine comparison, then a worktree snapshot deferred at the P5 close,
+> leaving real scan-root drift uncaptured). `snapshot.ps1` now strips the field textually before
+> writing, the same way it injects the `meta` header, and refuses to write if any survive.
+> `file_id` and `rel_path` already carried the stable identity and the G33 loader dropped
+> `abs_path` at load anyway (§H4), so **nothing is lost** — but the first diff across this
+> boundary shows every node changed by the field's removal alone. That is the marker, not
+> growth. After it, snapshots taken on different machines are comparable for the first time:
+> the laptop-vs-desktop pair straddling the fix differed by exactly **one** node — the single
+> test file genuinely added — where before it would have differed by all of them.
+
 - or diff the two `.json` files (`git diff` / any JSON diff tool), or watch the summary counts.
 
 ### Seeded comparison — the v1 rewrite (original vs this version)
