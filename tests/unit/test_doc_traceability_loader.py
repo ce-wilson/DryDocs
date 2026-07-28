@@ -142,6 +142,40 @@ def test_matrix_adapter_only_yields_docs_with_a_matrix() -> None:
     assert all(r["doc_id"] != "drydocs-startup-refresh-runbook" for r in rows)
 
 
+# ---- L18: separators inside parentheticals never shear a ref -------------------
+
+def test_split_cell_keeps_parenthetical_separators_whole() -> None:
+    # The committed shear case: FR-CMI-007's component cell held
+    # `K2 loader (`seal_attribution.cypher`, `load-seal-attribution`)` and the
+    # naive comma split stored two corrupt (origin, ref) identities.
+    from drydocs.loaders.doc_traceability import _split_cell
+
+    assert _split_cell(
+        "K2 loader (`a.cypher`, `load-x`), drydocs/cli.py", ","
+    ) == ["K2 loader (`a.cypher`, `load-x`)", "drydocs/cli.py"]
+    # Test cells split on ';' — same rule.
+    assert _split_cell("t.py (a; b); u.py", ";") == ["t.py (a; b)", "u.py"]
+    # Plain cells are unchanged by the depth-aware split.
+    assert _split_cell("a.py, b.py", ",") == ["a.py", "b.py"]
+    # An unbalanced cell still terminates (no separator ever closes it).
+    assert _split_cell("broken (x, y", ",") == ["broken (x, y"]
+
+
+def test_no_committed_ref_is_sheared_mid_parenthetical() -> None:
+    """Conformance guard over the real docs: a ref with unbalanced parens is
+    the shear signature (or an authoring typo) — either way it corrupts
+    (origin, ref) identity and must fail here before any load."""
+    for row in TraceabilityMatrixAdapter(DESIGN_DIR).rows():
+        for ref in row["components"]:
+            assert ref.count("(") == ref.count(")"), (
+                f"{row['doc_id']} {row['requirement_id']}: sheared component ref {ref!r}"
+            )
+        for t in row["tests"]:
+            assert t["ref"].count("(") == t["ref"].count(")"), (
+                f"{row['doc_id']} {row['requirement_id']}: sheared test ref {t['ref']!r}"
+            )
+
+
 # ---- feedback stream ----------------------------------------------------------
 
 def test_feedback_adapter_reads_rev1_with_lifecycle_and_author() -> None:

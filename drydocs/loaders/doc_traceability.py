@@ -102,7 +102,30 @@ def classify_test_kind(ref: str) -> str:
 
 
 def _split_cell(cell: str, sep: str) -> list[str]:
-    return [t for t in (_clean_ref(part) for part in cell.split(sep)) if t]
+    """Split on *sep* OUTSIDE parentheses only (L18).
+
+    Component/test refs may carry a parenthetical qualifier whose text itself
+    contains the separator (``drydocs/cli.py (bootstrap, verify)``). A naive
+    split sheared 8 of 56 committed Component.ref values into two corrupt
+    ``(origin, ref)`` identities each; the depth-0 split keeps the ref whole.
+    The parenthetical stays PART of the ref — stripping it would re-key every
+    already-loaded ref that carries a benign qualifier.
+    """
+    parts: list[str] = []
+    buf: list[str] = []
+    depth = 0
+    for ch in cell:
+        if ch == "(":
+            depth += 1
+        elif ch == ")":
+            depth = max(0, depth - 1)
+        if ch == sep and depth == 0:
+            parts.append("".join(buf))
+            buf = []
+        else:
+            buf.append(ch)
+    parts.append("".join(buf))
+    return [t for t in (_clean_ref(part) for part in parts) if t]
 
 
 #: A trailing "(Stage B)"-style qualifier on a design-section citation — a
