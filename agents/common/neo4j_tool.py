@@ -36,6 +36,19 @@ def get_driver() -> neo4j.Driver:
     return _get_driver()
 
 
+def close_driver() -> None:
+    """Close and drop the shared driver — the counterpart to `_get_driver`.
+
+    Drivers own a connection pool and must be closed explicitly; the neo4j
+    driver deprecates relying on `Driver.__del__` and will stop closing
+    automatically in its 6.0 line. Call this at process/test-session teardown.
+    """
+    global _driver
+    if _driver is not None:
+        _driver.close()
+        _driver = None
+
+
 def read_cypher(query: str) -> dict:
     """Run a read-only Cypher query against the DryDocs knowledge graph.
 
