@@ -26,6 +26,14 @@ Tags help grooming: `idea` · `bug` · `doc` · `source` (new data source) · `q
 
 <!-- add new ideas at the top -->
 
+- 2026-07-28 — [chore] **react-router high advisory (GHSA-qwww-vcr4-c8h2, RSC-mode CSRF) cannot
+  clear without the v7→v8 major migration** — v8 absorbs `react-router-dom` (its latest is
+  still 7.18.1, inside the vulnerable 7.12.0–8.2.0 range), so `npm audit fix` is a no-op and
+  the fix means rewriting the router imports against `react-router@8.3.0`. Escalated from O34
+  per its stop clause (postcss/nanoid patches applied there); a UI-workstream decision, and
+  likely moot in practice — the console is a Vite SPA, no RSC actions — but the audit stays
+  red until ruled. Pairs with the code-splitting design call O34 also parked.
+
 - 2026-07-28 — [bug] **`drydocs bootstrap` reported "Constraints applied." while applying zero
   constraints, from the initial commit until D5.** Root cause, reproduced in a throwaway
   container: `apoc.cypher.runMany` executes DML but **silently no-ops DDL** — no exception, no
