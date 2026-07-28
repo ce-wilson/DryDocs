@@ -147,6 +147,28 @@ rows:
   - path: "config/gate-prompts/**"
     disposition: canonical-company
     note: "consumer's real gate specs win; producer specs are prep/templates — new producer specs that don't collide are clean-adds"
+  - path: "config/dev-environment.yaml"
+    disposition: canonical-company
+    entry_rule: >
+      Each side keeps its OWN file — every value in it is a local fact (Neo4j
+      container name, host ports, and since U7 the depgraph sibling repo path +
+      expected_commit). New producer KEYS/SECTIONS are ADAPTED BY HAND, never
+      adopted: surface the structural delta in the PORT-REPORT and let the
+      consumer fill in its own values. NEVER port a remote/URL value across —
+      the company's depgraph fork remote is a GHE name (PUBLISH-BOUNDARY).
+    note: >
+      Back-flow landed 2026-07-28 from PORT-REPORT-94132c80, which resolved the
+      step-48 caveat exactly this way. It was previously covered only by
+      `config/**` = canonical-producer, i.e. the manifest said "take the
+      producer's copy wholesale" for a file of producer-LOCAL infrastructure —
+      and the L16 runbook's Appendix A is a RENDER of it, so a blind take would
+      have propagated producer container names and ports into consumer
+      documentation, the precise drift Appendix A was restated to prevent. The
+      consumer runs its own depgraph fork at a different remote, so its
+      `depgraph:` block can never equal the producer's. Live example for the
+      next port: producer `33cfc68` adds a `plugins:` block + `plugins_volume`
+      here (APOC/GDS as a mounted volume) — structure to adapt, values to
+      decide locally, NOT a file to check out.
   - path: "graph-tests/**"
     disposition: canonical-company
     note: "consumer's real acceptance suites win; seed twins follow producer renames as deliberate consumer commits"
@@ -250,7 +272,7 @@ rows:
     note: "web-console design record (wireframes, nav flow, dark landing mock; step 31) — static reference material"
   - path: "config/**"
     disposition: canonical-producer
-    note: "configuration layer default — the per-entry/canonical-company/union rows ABOVE override for the map, gate-prompts, review-labels, gate-log (first match wins)"
+    note: "configuration layer default — the per-entry/canonical-company/union rows ABOVE override for the map, gate-prompts, review-labels, gate-log, dev-environment (first match wins). A file of LOCAL infrastructure facts does not belong under this default; dev-environment.yaml sat here by omission until the 2026-07-28 port"
 
   # ---- integration points (hand-merge per the reconcile-port ledger) --------
   - path: "drydocs/cli.py"

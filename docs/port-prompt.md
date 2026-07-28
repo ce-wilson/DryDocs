@@ -631,6 +631,13 @@ STEP LEDGER — delta since `6fd3270` (numbering continues from the archive):
     unilaterally. Decide it your side: most likely a `config/dev-environment.yaml`
     per-entry or canonical-company row, then send the row back so both manifests
     agree.
+    **RESOLVED — do not re-decide.** The 2026-07-28 port (PORT-REPORT-94132c80)
+    ruled it **canonical-company**, and the producer manifest now carries the
+    matching `config/dev-environment.yaml` row, so both sides agree. Each side
+    keeps its own file; new producer KEYS are adapted by hand, never adopted.
+    Immediately relevant: producer `33cfc68` (step 49, outside that port) adds a
+    `plugins:` block + `plugins_volume` here — structure to adapt, values to
+    decide locally.
 
 ACCEPTANCE GATE (behavior is the contract, not a byte-compare):
 - Track 1 (portable, no production sample present):
