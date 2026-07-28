@@ -302,6 +302,22 @@ not in the default chain; every term they seed carries
 
 ## Maintaining existing relationships
 
+### `inverse_label` — display phrasing only (C15)
+
+Every vocabulary entry carries `inverse_label`: the **target-side display
+phrasing**, read as `<target> <inverse_label> <source>` (`SUPPORTS` →
+Product *"supported by"* DevTeam). Consumers use it to phrase INCOMING edges
+correctly when inspecting a node from the target side (the Backstage
+`ownedBy`/`ownerOf` inverse-pair pattern).
+
+**PRESENTATIONAL ONLY — recorded as such, 2026-07-28.** The field changes no
+direction, relationship type, status, or semantics; storage stays exactly one
+directed edge; adding or rewording an `inverse_label` is explicitly **not a
+gate matter** (contrast every other semantic field in the entry, which is).
+Presence is enforced by `test_schema.py::test_vocabulary_every_entry_has_inverse_label` —
+a new entry without one fails CI. Consumption in the node inspector rides the
+next Epic O inspector touch, not the vocabulary.
+
 ### Role rename
 
 Change the `role` value on the edge everywhere it appears:

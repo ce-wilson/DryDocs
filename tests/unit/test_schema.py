@@ -171,3 +171,21 @@ def test_vocabulary_no_duplicate_ids() -> None:
     ids = [r["id"] for r in vocab.get("local_relationships", [])]
     dupes = {i for i in ids if ids.count(i) > 1}
     assert not dupes, f"Duplicate relationship ids in vocabulary: {dupes}"
+
+
+@pytest.mark.skipif(not _YAML_AVAILABLE, reason="PyYAML not installed")
+def test_vocabulary_every_entry_has_inverse_label() -> None:
+    """C15: every entry carries a non-empty inverse_label — the target-side
+    display phrasing (SUPPORTS -> "supported by"). PRESENTATIONAL ONLY: it
+    changes no direction, type, status, or semantics (storage stays one
+    directed edge), so its presence is a schema rule, not a gate matter."""
+    if not VOCAB_FILE.exists():
+        pytest.skip("relationship_vocabulary.yaml not present")
+
+    vocab = yaml.safe_load(VOCAB_FILE.read_text(encoding="utf-8"))
+    missing = [
+        r["id"]
+        for r in vocab.get("local_relationships", [])
+        if not (isinstance(r.get("inverse_label"), str) and r["inverse_label"].strip())
+    ]
+    assert not missing, f"Entries without inverse_label: {missing}"

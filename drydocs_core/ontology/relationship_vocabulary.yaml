@@ -20,6 +20,11 @@
 # Fields:
 #   id            unique snake_case identifier
 #   neo4j_label   the Cypher relationship type
+#   inverse_label target-side display phrasing (SUPPORTS -> "supported by"),
+#                 read as "<target> <inverse_label> <source>". PRESENTATIONAL
+#                 ONLY (C15, 2026-07-28): changes no direction, type, status,
+#                 or semantics; storage stays ONE directed edge; explicitly
+#                 not a gate matter. Presence enforced by test_schema.py.
 #   role          edge property for disambiguation (null = label is sufficient)
 #   from_node     source node label
 #   to_node       target node label
@@ -655,6 +660,7 @@ local_relationships:
 
   - id:           m3_scheduled_on
     neo4j_label:  SCHEDULED_ON
+    inverse_label: "schedules"
     role:         ~
     from_node:    ControlMFolder
     to_node:      ControlMServer
@@ -673,6 +679,7 @@ local_relationships:
 
   - id:           m3_runs_on
     neo4j_label:  RUNS_ON
+    inverse_label: "runs"
     role:         ~
     from_node:    ControlMFolder
     to_node:      ControlMServer
@@ -691,6 +698,7 @@ local_relationships:
 
   - id:           m3_contains_job
     neo4j_label:  CONTAINS_JOB
+    inverse_label: "contained in"
     role:         ~
     from_node:    ControlMFolder
     to_node:      ControlMJob
@@ -706,6 +714,7 @@ local_relationships:
 
   - id:           m3_contains_folder
     neo4j_label:  CONTAINS_FOLDER
+    inverse_label: "contained in"
     role:         ~
     from_node:    ControlMApplication
     to_node:      ControlMFolder
@@ -726,6 +735,7 @@ local_relationships:
 
   - id:           m3_requires_in_condition
     neo4j_label:  REQUIRES_IN_CONDITION
+    inverse_label: "required by"
     role:         ~
     from_node:    ControlMJob
     to_node:      Condition
@@ -742,6 +752,7 @@ local_relationships:
 
   - id:           m3_emits_out_condition
     neo4j_label:  EMITS_OUT_CONDITION
+    inverse_label: "emitted by"
     role:         ~
     from_node:    ControlMJob
     to_node:      Condition
@@ -757,6 +768,7 @@ local_relationships:
 
   - id:           m3_was_informed_by
     neo4j_label:  WAS_INFORMED_BY
+    inverse_label: "informed"
     role:         ~
     from_node:    ControlMJob
     to_node:      ControlMJob
@@ -775,6 +787,7 @@ local_relationships:
 
   - id:           m3_depends_on_file
     neo4j_label:  USED
+    inverse_label: "used by"
     role:         file_dependency
     from_node:    ControlMJob
     to_node:      File
@@ -793,6 +806,7 @@ local_relationships:
 
   - id:           p2_deployed_by
     neo4j_label:  DEPLOYED_BY
+    inverse_label: "deployed"
     role:         ~
     from_node:    Deployment
     to_node:      Developer
@@ -807,6 +821,7 @@ local_relationships:
 
   - id:           p2_deployed_to
     neo4j_label:  DEPLOYED_TO
+    inverse_label: "deployment target of"
     role:         ~
     from_node:    Deployment
     to_node:      ControlMServer
@@ -824,6 +839,7 @@ local_relationships:
 
   - id:           p2_deploys_folder
     neo4j_label:  DEPLOYS_FOLDER
+    inverse_label: "deployed by"
     role:         ~
     from_node:    Deployment
     to_node:      ControlMFolder
@@ -838,6 +854,7 @@ local_relationships:
 
   - id:           p2_authored_by
     neo4j_label:  AUTHORED_BY
+    inverse_label: "authored"
     role:         ~
     from_node:    ControlMFolder
     to_node:      Developer
@@ -852,6 +869,7 @@ local_relationships:
 
   - id:           p2_instance_of
     neo4j_label:  INSTANCE_OF
+    inverse_label: "has instance"
     role:         ~
     from_node:    ControlMJobRun
     to_node:      ControlMJob
@@ -868,6 +886,7 @@ local_relationships:
 
   - id:           m3_executed_by
     neo4j_label:  EXECUTED_BY
+    inverse_label: "executed"
     role:         ~
     from_node:    ControlMJobRun
     to_node:      AppUser
@@ -883,6 +902,7 @@ local_relationships:
 
   - id:           m3_seal_app_ref
     neo4j_label:  WAS_ASSOCIATED_WITH
+    inverse_label: "agent for"
     role:         seal_app_ref
     from_node:    ControlMJob
     to_node:      BusinessApplication
@@ -914,6 +934,7 @@ local_relationships:
 
   - id:           m3_invokes
     neo4j_label:  INVOKES
+    inverse_label: "invoked by"
     role:         ~
     from_node:    ControlMJob
     to_node:      Script
@@ -943,6 +964,7 @@ local_relationships:
 
   - id:           m3_triggers
     neo4j_label:  TRIGGERS
+    inverse_label: "triggered by"
     role:         ~
     from_node:    Script
     to_node:      ETLProcess
@@ -987,6 +1009,7 @@ local_relationships:
 
   - id:           m7_uses_artifact
     neo4j_label:  USES_ARTIFACT
+    inverse_label: "used as artifact by"
     role:         ~
     from_node:    ControlMJob
     to_node:      Script
@@ -1015,6 +1038,7 @@ local_relationships:
 
   - id:           m3_runs_on_agent_host
     neo4j_label:  RUNS_ON
+    inverse_label: "runs"
     role:         agent_host
     from_node:    ControlMJob
     to_node:      ExecutionHost
@@ -1036,6 +1060,7 @@ local_relationships:
 
   - id:           m3_runs_on_etl_host
     neo4j_label:  RUNS_ON
+    inverse_label: "runs"
     role:         etl_host
     from_node:    ETLProcess
     to_node:      ExecutionHost
@@ -1059,6 +1084,7 @@ local_relationships:
 
   - id:           m3_runs_on_host_group
     neo4j_label:  RUNS_ON
+    inverse_label: "runs"
     role:         host_group
     from_node:    ControlMJob
     to_node:      ControlMHostGroup
@@ -1085,6 +1111,7 @@ local_relationships:
 
   - id:           m3_host_group_contains_host
     neo4j_label:  CONTAINS_HOST
+    inverse_label: "contained in"
     role:         ~
     from_node:    ControlMHostGroup
     to_node:      ExecutionHost
@@ -1105,6 +1132,7 @@ local_relationships:
 
   - id:           m3_host_group_defined_on
     neo4j_label:  DEFINED_ON
+    inverse_label: "defines"
     role:         ~
     from_node:    ControlMHostGroup
     to_node:      ControlMServer
@@ -1126,6 +1154,7 @@ local_relationships:
 
   - id:           m3_reads_from
     neo4j_label:  READS_FROM
+    inverse_label: "read by"
     role:         ~
     from_node:    "ETLProcess | ControlMJob"
     to_node:      DataAsset
@@ -1150,6 +1179,7 @@ local_relationships:
 
   - id:           m3_writes_to
     neo4j_label:  WRITES_TO
+    inverse_label: "written by"
     role:         ~
     from_node:    "ETLProcess | ControlMJob"
     to_node:      DataAsset
@@ -1176,6 +1206,7 @@ local_relationships:
 
   - id:           m3_delegates_to
     neo4j_label:  DELEGATES_TO
+    inverse_label: "delegated to by"
     role:         ~
     from_node:    AppUser
     to_node:      ExecutionHost
@@ -1195,6 +1226,7 @@ local_relationships:
 
   - id:           seal_has_port
     neo4j_label:  HAS_PORT
+    inverse_label: "port of"
     role:         ~
     from_node:    BusinessApplication
     to_node:      Port
@@ -1210,6 +1242,7 @@ local_relationships:
 
   - id:           seal_requires_scheduler
     neo4j_label:  REQUIRES_SCHEDULER
+    inverse_label: "required by"
     role:         ~
     from_node:    Port                       # as registered; the pre-gate HOIST direction (to :BusinessApplication) was absorbed by the reg_uses_software landing, so no reshape ever applied here
     to_node:      SchedulerKind              # RETIRED TARGET — :SchedulerKind deprecated at C12 (seeds retired in ontology.cypher; constraint kept for old graphs)
@@ -1245,6 +1278,7 @@ local_relationships:
 
   - id:           seal_has_membership
     neo4j_label:  HAS_MEMBERSHIP
+    inverse_label: "membership of"
     role:         ~
     from_node:    BusinessApplication
     to_node:      Membership
@@ -1270,6 +1304,7 @@ local_relationships:
 
   - id:           seal_of_role
     neo4j_label:  OF_ROLE
+    inverse_label: "role of"
     role:         ~
     from_node:    Membership
     to_node:      Role
@@ -1289,6 +1324,7 @@ local_relationships:
 
   - id:           seal_held_by
     neo4j_label:  HELD_BY
+    inverse_label: "holds"
     role:         ~
     from_node:    Membership
     to_node:      Employee
@@ -1319,6 +1355,7 @@ local_relationships:
 
   - id:           seal_had_primary_source
     neo4j_label:  HAD_PRIMARY_SOURCE
+    inverse_label: "primary source for"
     role:         ~
     from_node:    BusinessApplication
     to_node:      Document
@@ -1339,6 +1376,7 @@ local_relationships:
 
   - id:           seal_app_attributed_to_employee
     neo4j_label:  WAS_ATTRIBUTED_TO
+    inverse_label: "attributed with"
     role:         tom_role_holder
     from_node:    BusinessApplication
     to_node:      Employee
@@ -1358,6 +1396,7 @@ local_relationships:
 
   - id:           seal_qualified_attribution
     neo4j_label:  QUALIFIED_ATTRIBUTION
+    inverse_label: "attribution of"
     role:         ~
     from_node:    BusinessApplication
     to_node:      Attribution
@@ -1376,6 +1415,7 @@ local_relationships:
 
   - id:           seal_attribution_has_agent
     neo4j_label:  HAS_AGENT
+    inverse_label: "agent of"
     role:         ~
     from_node:    Attribution
     to_node:      Employee
@@ -1396,6 +1436,7 @@ local_relationships:
 
   - id:           seal_attribution_had_role
     neo4j_label:  HAD_ROLE
+    inverse_label: "role in"
     role:         ~
     from_node:    Attribution
     to_node:      TOMRole
@@ -1419,6 +1460,7 @@ local_relationships:
 
   - id:           catalog_reconciles_to
     neo4j_label:  RECONCILES_TO
+    inverse_label: "reconciled from"
     role:         ~
     from_node:    CatalogLOB
     to_node:      BusinessSegment
@@ -1435,6 +1477,7 @@ local_relationships:
 
   - id:           catalog_has_product_line
     neo4j_label:  HAS_PRODUCT_LINE
+    inverse_label: "product line of"
     role:         ~
     from_node:    CatalogLOB
     to_node:      ProductLine
@@ -1447,6 +1490,7 @@ local_relationships:
 
   - id:           catalog_has_product
     neo4j_label:  HAS_PRODUCT
+    inverse_label: "product of"
     role:         ~
     from_node:    ProductLine
     to_node:      Product
@@ -1459,6 +1503,7 @@ local_relationships:
 
   - id:           catalog_has_dev_team
     neo4j_label:  HAS_DEV_TEAM
+    inverse_label: "dev team of"
     role:         ~
     from_node:    Product
     to_node:      DevTeam
@@ -1471,6 +1516,7 @@ local_relationships:
 
   - id:           catalog_has_jira_board
     neo4j_label:  HAS_JIRA_BOARD
+    inverse_label: "Jira board of"
     role:         ~
     from_node:    DevTeam
     to_node:      JiraBoard
@@ -1483,6 +1529,7 @@ local_relationships:
 
   - id:           catalog_has_application
     neo4j_label:  HAS_APPLICATION
+    inverse_label: "application of"
     role:         ~
     from_node:    Product
     to_node:      BusinessApplication
@@ -1503,6 +1550,7 @@ local_relationships:
 
   - id:           catalog_has_area_product
     neo4j_label:  HAS_AREA_PRODUCT
+    inverse_label: "area product of"
     role:         ~
     from_node:    Product
     to_node:      AreaProduct
@@ -1515,6 +1563,7 @@ local_relationships:
 
   - id:           catalog_area_product_has_dev_team
     neo4j_label:  HAS_DEV_TEAM
+    inverse_label: "dev team of"
     role:         ~
     from_node:    AreaProduct
     to_node:      DevTeam
@@ -1534,6 +1583,7 @@ local_relationships:
   #   qualified-attribution infrastructure — rescoped family-agnostic at the K5 sign-off) —
   - id:           catalog_cabinet_qualified_attribution
     neo4j_label:  QUALIFIED_ATTRIBUTION
+    inverse_label: "attribution of"
     role:         ~
     from_node:    "Product | AreaProduct"
     to_node:      Attribution
@@ -1555,6 +1605,7 @@ local_relationships:
 
   - id:           catalog_cabinet_attribution_had_role
     neo4j_label:  HAD_ROLE
+    inverse_label: "role in"
     role:         ~
     from_node:    Attribution
     to_node:      ProductRole
@@ -1572,6 +1623,7 @@ local_relationships:
 
   - id:           catalog_cabinet_attributed_to
     neo4j_label:  WAS_ATTRIBUTED_TO
+    inverse_label: "attributed with"
     role:         product_cabinet_role_holder
     from_node:    "Product | AreaProduct"
     to_node:      Employee
@@ -1596,6 +1648,7 @@ local_relationships:
 
   - id:           catalog_supports
     neo4j_label:  SUPPORTS
+    inverse_label: "supported by"
     role:         ~
     from_node:    DevTeam
     to_node:      Product
@@ -1620,6 +1673,7 @@ local_relationships:
 
   - id:           catalog_supports_area_product
     neo4j_label:  SUPPORTS
+    inverse_label: "supported by"
     role:         ~
     from_node:    DevTeam
     to_node:      AreaProduct
@@ -1639,6 +1693,7 @@ local_relationships:
 
   - id:           catalog_dev_team_has_membership
     neo4j_label:  HAS_MEMBERSHIP
+    inverse_label: "membership of"
     role:         ~
     from_node:    DevTeam
     to_node:      Membership
@@ -1661,6 +1716,7 @@ local_relationships:
 
   - id:           arch_develops
     neo4j_label:  WAS_ATTRIBUTED_TO
+    inverse_label: "develops"
     role:         developed_by
     from_node:    BusinessApplication          # the BusinessApplication concept; key = SEALID
     to_node:      DevTeam
@@ -1686,6 +1742,7 @@ local_relationships:
 
   - id:           arch_owns_code
     neo4j_label:  WAS_ATTRIBUTED_TO
+    inverse_label: "owns"
     role:         owner
     from_node:    Code
     to_node:      DevTeam
@@ -1700,6 +1757,7 @@ local_relationships:
 
   - id:           arch_stored_in
     neo4j_label:  STORED_IN
+    inverse_label: "stores"
     role:         ~
     from_node:    Code
     to_node:      Bitbucket
@@ -1715,6 +1773,7 @@ local_relationships:
 
   - id:           arch_contains_service
     neo4j_label:  CONTAINS_SERVICE
+    inverse_label: "contained in"
     role:         ~
     from_node:    Code
     to_node:      PipelineService
@@ -1730,6 +1789,7 @@ local_relationships:
 
   - id:           arch_contains_batch
     neo4j_label:  CONTAINS_BATCH
+    inverse_label: "contained in"
     role:         ~
     from_node:    BusinessApplication
     to_node:      Batch
@@ -1745,6 +1805,7 @@ local_relationships:
 
   - id:           arch_contains_folder
     neo4j_label:  CONTAINS_FOLDER
+    inverse_label: "contained in"
     role:         ~
     from_node:    Batch
     to_node:      ControlMFolder
@@ -1761,6 +1822,7 @@ local_relationships:
 
   - id:           reg_made_by
     neo4j_label:  MADE_BY
+    inverse_label: "makes"
     role:         ~
     from_node:    SoftwareProduct
     to_node:      Vendor
@@ -1775,6 +1837,7 @@ local_relationships:
 
   - id:           reg_uses_software
     neo4j_label:  USES_SOFTWARE
+    inverse_label: "used by"
     role:         ~
     from_node:    BusinessApplication
     to_node:      SoftwareProduct
@@ -1806,6 +1869,7 @@ local_relationships:
 
   - id:           docs_describes
     neo4j_label:  DESCRIBES
+    inverse_label: "described by"
     role:         ~
     from_node:    Document
     to_node:      SoftwareProduct
@@ -1823,6 +1887,7 @@ local_relationships:
 
   - id:           docs_chunk_part_of
     neo4j_label:  PART_OF
+    inverse_label: "has part"
     role:         ~
     from_node:    Chunk
     to_node:      Document
@@ -1839,6 +1904,7 @@ local_relationships:
 
   - id:           docs_first_chunk
     neo4j_label:  FIRST_CHUNK
+    inverse_label: "first chunk of"
     role:         ~
     from_node:    Document
     to_node:      Chunk
@@ -1854,6 +1920,7 @@ local_relationships:
 
   - id:           docs_next_chunk
     neo4j_label:  NEXT_CHUNK
+    inverse_label: "follows"
     role:         ~
     from_node:    Chunk
     to_node:      Chunk
@@ -1876,6 +1943,7 @@ local_relationships:
 
   - id:           docs_has_document
     neo4j_label:  HAS_DOCUMENT
+    inverse_label: "sourced from"
     role:         ~
     from_node:    DocSource
     to_node:      Document
@@ -1893,6 +1961,7 @@ local_relationships:
 
   - id:           docs_governed_by
     neo4j_label:  GOVERNED_BY
+    inverse_label: "governs"
     role:         ~
     from_node:    Document
     to_node:      OntologyTerm
@@ -1918,6 +1987,7 @@ local_relationships:
 
   - id:           doc_section_part_of
     neo4j_label:  PART_OF
+    inverse_label: "has part"
     role:         ~
     from_node:    DocSection
     to_node:      DesignDoc
@@ -1942,6 +2012,7 @@ local_relationships:
 
   - id:           doc_requirement_specified_in
     neo4j_label:  SPECIFIED_IN
+    inverse_label: "specifies"
     role:         ~
     from_node:    Requirement
     to_node:      DocSection
@@ -1960,6 +2031,7 @@ local_relationships:
 
   - id:           doc_requirement_implemented_by
     neo4j_label:  IMPLEMENTED_BY
+    inverse_label: "implements"
     role:         ~
     from_node:    Requirement
     to_node:      Component
@@ -1977,6 +2049,7 @@ local_relationships:
 
   - id:           doc_requirement_verified_by
     neo4j_label:  VERIFIED_BY
+    inverse_label: "verifies"
     role:         ~
     from_node:    Requirement
     to_node:      TestCase
@@ -1993,6 +2066,7 @@ local_relationships:
 
   - id:           doc_feedback_annotates
     neo4j_label:  ANNOTATES
+    inverse_label: "annotated by"
     role:         ~
     from_node:    FeedbackNote
     to_node:      DocSection
@@ -2016,6 +2090,7 @@ local_relationships:
 
   - id:           doc_feedback_authored_by
     neo4j_label:  WAS_ATTRIBUTED_TO
+    inverse_label: "authored"
     role:         feedback_author
     from_node:    FeedbackNote
     to_node:      Employee
@@ -2041,6 +2116,7 @@ local_relationships:
 
   - id:           prov_was_generated_by
     neo4j_label:  WAS_GENERATED_BY
+    inverse_label: "generated"
     role:         ~
     from_node:    "*"
     to_node:      JobRun
@@ -2080,6 +2156,7 @@ local_relationships:
 
   - id:           sosa_observes
     neo4j_label:  OBSERVES
+    inverse_label: "observed by"
     role:         ~
     from_node:    Observation
     to_node:      ControlMJob          # or ControlMFolder — both can act as sosa:FeatureOfInterest
@@ -2096,6 +2173,7 @@ local_relationships:
 
   - id:           sosa_has_result
     neo4j_label:  HAS_RESULT
+    inverse_label: "result of"
     role:         ~
     from_node:    Observation
     to_node:      Result
@@ -2111,6 +2189,7 @@ local_relationships:
 
   - id:           sosa_made_by_sensor
     neo4j_label:  MADE_BY_SENSOR
+    inverse_label: "made"
     role:         ~
     from_node:    Observation
     to_node:      Sensor
@@ -2126,6 +2205,7 @@ local_relationships:
 
   - id:           sosa_observed_property
     neo4j_label:  OF_OBSERVABLE_PROPERTY
+    inverse_label: "observed in"
     role:         ~
     from_node:    Observation
     to_node:      ObservableProperty
@@ -2145,6 +2225,7 @@ local_relationships:
   #    when the loader was built (the m3_host_group_contains_host precedent).
   - id:           u1_has_module
     neo4j_label:  HAS_MODULE
+    inverse_label: "module of"
     role:         ~
     from_node:    Project
     to_node:      CodeModule
@@ -2161,6 +2242,7 @@ local_relationships:
     status:       active
   - id:           u1_imports
     neo4j_label:  IMPORTS
+    inverse_label: "imported by"
     role:         ~
     from_node:    CodeModule
     to_node:      CodeModule
@@ -2179,6 +2261,7 @@ local_relationships:
     status:       active
   - id:           u1_is_encoded_in
     neo4j_label:  IS_ENCODED_IN
+    inverse_label: "encodes"
     role:         ~
     from_node:    CodeModule
     to_node:      SwoClass
