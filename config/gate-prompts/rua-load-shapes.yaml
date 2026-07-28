@@ -1,0 +1,148 @@
+# SME gate-prompt spec — rua load shapes (backlog G22; THE TERMINUS of the
+# G18-G21/G24/G25 candidate chain: nothing rua-shaped writes the graph before
+# this session signs off). GATE-BOUND: this page PROPOSES; rendering it builds,
+# flips, and stamps nothing. DRAFTED 2026-07-28 for a future SME session.
+# Mechanism-only: every host/user/path/script spelling below is the SYNTHETIC
+# sample-corpus contract (host-hldm-01, svc.hldm, /opt/scripts/...); real
+# values stay company-side (PUBLISH-BOUNDARY.md).
+# PREMISE (2026-07-27 correction, carried from the G22 item): the job-detail
+# table this planning once assumed company-side WAS NEVER BUILT — the CMD_LINE
+# fact clauses below read from the G39 temporary staging store + G40 parse
+# until it exists. Neither writes the graph; this gate stays the terminus.
+classification: Internal-Public
+schema: drydocs.gate-prompt.v1
+id: rua-load-shapes
+title: "SME Gate — rua load shapes: which planned edges activate, the new edge meanings the bundles imply, ONE script identity across three sources, source precedence, classification on load, GUID-vs-URN, and the three-signal usage ruling"
+step: "The activation gate for everything the rua chain staged: G18 collector v2 bundles (scripts.tsv + sha256 + meta.txt), G20 bundle extractor, G21 code-operations facts, G24 code-repo seam (server/repo corroboration on content hash), G25 dpl-registry (per-SEAL GUIDs + active flag) — all candidate-side today, none graph-resident"
+summary: >
+  Five staging seams now hold corroborable facts about what actually runs on
+  the execution hosts: the server extract (what is present), the code repo
+  (what is intended), CMD_LINE/variable references (what is called), the DPL
+  registry (what is managed + active), and the MAC/launcher facts. This
+  session rules the graph shape BEFORE any loader exists: (a) which
+  already-registered planned vocabulary these facts may activate; (b) the two
+  NEW edge meanings the bundles imply, proposed planned-first via
+  ontology-mapper; (c) the script identity + dedup contract so the SAME file
+  arriving from three sources merges to ONE node with per-source occurrence
+  records; (d) the source-precedence ruling in config/precedence.yaml terms;
+  (e) classification handling on load; (f) GUID-vs-URN identity where the
+  registry knows the asset, content hash as the version discriminator; and
+  (g) the three-signal usage ruling — referenced / registry-active /
+  present-on-server stay separate, corroborated, never conflated. Two riders
+  merged onto this agenda from later grooms: Script->SWO IS_ENCODED_IN (the
+  G33 §E1(b) precedent) and the m3_invokes endpoint question. Nothing below
+  is applied until ticked and transcribed to config/gate-log.md; anything
+  declined stays candidate-only.
+meta:
+  Module: "ontology + future load (drydocs_core/ontology/relationship_vocabulary.yaml · config/precedence.yaml · the G22-ruled loader is a FOLLOW-UP build, not this gate)"
+  Source: "G18 rua collector v2 bundles (scripts.tsv incl. sha256, size cap, COLLECTOR_VERSION) · G20 extractor staging · G21 code-operations facts · G24 code-repo seam · G25 dpl-registry (GUID + active) · G16 FACT_REGISTRY SCRIPT_PATH facts · G39/G40 cmdline staging (interim seam, premise note above)"
+  Precedent: "arch_owns_code WAS_ATTRIBUTED_TO {role} (ownership-as-attribution) · D1 urn:drydocs:dataasset URN grammar · ADR 0001 registry-GUID-as-business-key · G33 §E1(b) EXTENSION_LANGUAGE_IRI adapter (first live SWO binding) · K2/G27 flips-are-follow-ups"
+  Registry ref: "source-registry: rua-server-extract / code-repo / dpl-registry rows arrive confirmed:false with THIS gate as the activation condition; clause rulings flip confirmed, never the build"
+  Classification: "Internal-Public page (mechanism + synthetic spellings); clause E rules the per-property classification of the LOADED data — hostnames, run-as users, and real paths are the internal-confidential candidates"
+  Vocabulary: "activations (clause A) touch existing planned entries only; NEW meanings (clause C) enter as status: planned via ontology-mapper + RELATIONSHIP_GUIDE flow — nothing lands active at this gate"
+  Source of record: "backlog G22 · config/gate-log.md (transcription target) · docs/restructure/03-hitl-sme-flow.md"
+
+mapping:
+  - n: 1
+    element: "Run-as user (AppUser, e.g. svc.hldm) executing on a host"
+    target: "AppUser -DELEGATES_TO-> ExecutionHost (planned entry m3_delegates_to)"
+    edge: "activation candidate  [clause A]"
+  - n: 2
+    element: "ETL process placed on a host (server extract)"
+    target: "ETLProcess -RUNS_ON {role: etl_host}-> ExecutionHost (planned m3_runs_on_etl_host)"
+    edge: "activation candidate  [clause A]"
+  - n: 3
+    element: "Job calls a script (CMD_LINE / variable reference facts, G21/G16)"
+    target: "ControlMJob -INVOKES-> Script (planned m3_invokes) — endpoint question in rider R2"
+    edge: "activation candidate  [clause A + rider R2]"
+  - n: 4
+    element: "Job ships/uses a file artifact"
+    target: "ControlMJob -USES_ARTIFACT-> Script (planned m7_uses_artifact)"
+    edge: "activation candidate  [clause A]"
+  - n: 5
+    element: "Process reads/writes a data asset"
+    target: "ETLProcess|ControlMJob -READS_FROM / WRITES_TO-> DataAsset (planned m3_reads_from / m3_writes_to)"
+    edge: "activation candidate  [clause A]"
+  - n: 6
+    element: "Run-as user owns a home/directory DataAsset (bundle fact, no vocabulary today)"
+    target: "PROPOSED NEW MEANING: WAS_ATTRIBUTED_TO {role: 'directory_owner'} per the arch_owns_code precedent, OR a new dedicated type — ontology-mapper proposes, status: planned"
+    edge: "new meaning  [clause C]"
+  - n: 7
+    element: "Profile sources/invokes a script (G21 flagged dependency candidates)"
+    target: "PROPOSED NEW MEANING: profile->script edge (type to be ruled) — ontology-mapper proposes, status: planned"
+    edge: "new meaning  [clause C]"
+  - n: 8
+    element: "The SAME script file seen by server extract (G20), code repo (G24), and reference facts (G21/G16)"
+    target: "ONE :Script node keyed by a ruled URN (urn:drydocs:script:{segments TBD}); per-source OCCURRENCE records carry origin (server-extract | code-repo) + full locator (host+path vs repo+branch+commit+path) + content hash"
+    edge: "identity + dedup contract  [clause D — THE CENTER OF THE GATE]"
+  - n: 9
+    element: ":Script node lands with a path extension (.sh, .sql, .ksh)"
+    target: "RIDER R1: (:Script)-[:IS_ENCODED_IN]->(SwoClass) derived by extension — .sh -> SWO Shell, .sql -> SWO SQL (the G33 §E1(b) adapter verbatim; binds two seeded-but-unused SWO terms). Boundary already ruled in discussion: run_as/J.OWNER is Agent territory (PROV/ORG), NEVER an SWO binding"
+    edge: "rider R1  [clause C adjunct]"
+  - n: 10
+    element: "DPL-managed pipeline/dataset the registry knows (G25 GUID)"
+    target: "registry GUID IS the business key (ADR 0001); gate rules WHERE it sits — URN segment vs node property — with urn:drydocs:dataasset as the fallback grammar for unmanaged assets"
+    edge: "identity  [clause G]"
+
+provenance:
+  - label: "What is staged and corroborable today (every mechanism claim on this page)"
+    source_object: "drydocs_lineage/ staging seams (G20 extractor, G24 repo seam, G25 dpl_registry cross-check) + G16 FACT_REGISTRY + G39/G40 cmdline staging"
+    key: "G18 v2 (2026-07-23) · G20/G25 (2026-07-23) · G21/G24 (2026-07-27) · G39/G40 (2026-07-27, v2 caveat 2026-07-28) — all test-pinned, all staging-only"
+    loader: "~ (deliberately none — this gate is why)"
+    properties:
+      - {name: bundle_contract, origin: source, from: "G18 collector v2", note: "scripts.tsv columns incl. sha256 + size cap + COLLECTOR_VERSION stamp; meta.txt provenance envelope; company runs its own -n twin (tracker T14) — converge before mixing bundles"}
+      - {name: corroboration, origin: derived, from: "G24 seam", note: "server occurrence vs repo occurrence matched on CONTENT HASH — the drift/version discriminator clause G formalizes"}
+      - {name: registry_axis, origin: source, from: "G25 dpl-registry", note: "per-SEAL pipeline/dataset GUIDs + version + active flag; field contract ASSUMED until a real export validates (tracker T13); cross_check clone-lag column = the stale-main measurement"}
+      - {name: reference_axis, origin: source, from: "G21/G16 facts (+ G39/G40 interim seam)", note: "SCRIPT_PATH + code-operation references = the 'what calls it' axis; the never-in-repo evidence case (2026-07-21 SME chat, mechanism-only): a production script referenced only by a folder VARIABLE was unfindable in the repo because code-fetch tooling keys on pipeline-id this job family lacks"}
+      - {name: swo_adapter, origin: derived, from: "drydocs/loaders/code_snapshot.py EXTENSION_LANGUAGE_IRI (G33 §E1(b))", note: "the extension->SWO-term mechanism exists and is live for :CodeModule; rider R1 reuses it for :Script"}
+
+sections:
+  - title: "A. Activation scope — which planned vocabulary these facts may turn on (clause a)"
+    confirmations:
+      - "A1: m3_delegates_to (AppUser -DELEGATES_TO-> ExecutionHost) may activate for run-as facts from the server extract. [activate / hold]"
+      - "A2: m3_runs_on_etl_host (ETLProcess -RUNS_ON {role: etl_host}-> ExecutionHost) may activate for placement facts. [activate / hold]"
+      - "A3: m3_invokes (ControlMJob -INVOKES-> Script) may activate for reference facts — endpoint shape decided in R2 below FIRST. [activate / hold]"
+      - "A4: m7_uses_artifact (ControlMJob -USES_ARTIFACT-> Script) may activate; its registered-planned build follow-up (2026-07-21 cmdline-nfr-vetting) rides the same loader. [activate / hold]"
+      - "A5: m3_reads_from / m3_writes_to may activate ONLY where the fact is launcher/registry-grounded (dataset_flow-class evidence), never parsed prose. [activate with that restriction / hold]"
+      - "A6: anything NOT ticked above stays planned and candidate-side — declining an activation here is a normal outcome, not a failure."
+  - title: "B. Rider R2 — the m3_invokes endpoint question (decide before A3)"
+    confirmations:
+      - "B1 [option]: to_node stays Script only; wrapper-payload cases where the call lands directly on a managed process (no script hop — the G12-implemented expansion, 2026-07-19 finding) are modeled as INVOKES->Script absent + a separate job->ETLProcess edge. [choose]"
+      - "B2 [option]: to_node broadens to Script|ETLProcess (the m3_reads_from precedent for union endpoints) so INVOKES lands on whichever the evidence names — one edge meaning, two endpoint classes, endpoint recorded per edge. [choose]"
+      - "B3 [both options]: the raw evidence string (command line / variable form) is kept verbatim on the edge or occurrence record — the derivation is always re-checkable."
+  - title: "C. New edge meanings the bundles imply — planned-first, never invented at load (clause b + rider R1)"
+    confirmations:
+      - "C1: run-as user owns home/directory DataAssets — PROPOSED as WAS_ATTRIBUTED_TO {role: 'directory_owner'} (the arch_owns_code ownership-as-attribution precedent) rather than a new relationship type; ontology-mapper drafts the entry status: planned. [that shape / a new dedicated type / decline]"
+      - "C2: profile sources/invokes script (G21's flagged dependency candidates) — PROPOSED as its own entry (candidate spellings: SOURCES for dot-sourcing, INVOKES reuse for execution); ontology-mapper drafts status: planned with the from_node = the profile's node class ruled here too (Script? a :Profile subclass? the cheapest honest answer wins). [rule shape / decline]"
+      - "C3 [rider R1]: when clause-D lands :Script nodes, (:Script)-[:IS_ENCODED_IN]->(SwoClass) derived from the path extension — the G33 §E1(b) adapter applied verbatim to the second software-artifact class (.sh -> Shell, .sql -> SQL; binds two of the three seeded-but-unused SWO terms). Boundary CONFIRMED as pre-ruled: run_as/J.OWNER is Agent territory (PROV/ORG), never an SWO binding. [adopt / decline]"
+  - title: "D. Script identity + dedup — one file, one node, every occurrence recorded (clause c)"
+    confirmations:
+      - "D1: a logical script gets ONE DryDocs URN extending the D1 grammar — urn:drydocs:script:{segments} — and the SAME file arriving from the server extract (G20), the code repo (G24), or reference facts (G21/G16) MERGEs to that one node; duplicate nodes/labels are a defect by definition. THE SESSION RULES THE SEGMENTS (candidates: basename? path-normalized logical name? content-hash-free — identity must survive edits, hash is the VERSION axis per clause G)."
+      - "D2: every source occurrence is recorded WITH origin (server-extract | code-repo) and its full locator — host+path for the extract, repo+branch+commit+path for the repo — as occurrence records (properties vs child nodes: rule the grain here), never squashed into node properties that overwrite each other."
+      - "D3: identity keys for the adjacent nodes are ruled in the same breath: ExecutionHost by fqdn (or nodeid where Control-M-known — reconcile with the P3 executionhost_nodeid constraint), AppUser by (user, uid) vs user-only. [rule each]"
+      - "D4: the meta.txt provenance envelope lands per the provenance-audit-fields plan (docs 06/06a): the per-source audit envelope shape, not ad-hoc properties — or defers to that plan's own gate if the SME prefers one envelope ruling for everything. [rule / defer to the envelope gate]"
+  - title: "E. Source precedence — recorded in config/precedence.yaml terms (clause d)"
+    confirmations:
+      - "E1: the SERVER EXTRACT is the truth for 'latest code that actually runs'. Evidence (mechanism-only, 2026-07-21 SME chat): a production script referenced only by a folder variable was unfindable in the repo — repo completeness can never be assumed. [confirm]"
+      - "E2: the CODE REPO is the truth for intent/history ONLY where the team maintains a clean branch — a per-team/per-repo trust flag in config, never a global assumption. [confirm + name the flag's home]"
+      - "E3: the USAGE axis stays separate from presence: present-on-server does not mean used; G21/G16 reference facts decide 'what calls it'; a script with NO references is FLAGGED unreferenced — the dead-script detection feature — never auto-judged unused. [confirm]"
+  - title: "F. Classification on load (clause e)"
+    confirmations:
+      - "F1: per-property classification is ruled here in O11 spec-vocabulary terms — candidates for internal-confidential: real hostnames, run-as usernames/uids, real filesystem paths; the URN and structural facts are the publishable layer. A publishable export can never emit the confidential properties. [rule the property list]"
+      - "F2: the loaded sources register with classification set (no unlabeled default): rua-server-extract and code-repo rows arrive Internal-Confidential-or-Internal as ruled in F1; confirmed flips only at THIS gate's sign-off."
+  - title: "G. GUID vs URN + the version axis (clause f)"
+    confirmations:
+      - "G1: where an asset is DPL-managed, the registry GUID IS the business key (ADR 0001). Rule WHERE it sits: as a URN segment (urn:drydocs:dataasset:dpl:{guid}) or as a keyed property beside a grammar-built URN. urn:drydocs:dataasset stays the fallback for everything unmanaged. [choose]"
+      - "G2: the CONTENT HASH rides on source-occurrence records as the VERSION discriminator — same URN + different hashes = drift, queryable (the G24 corroboration made concrete). Versions do NOT become their own nodes unless ruled otherwise HERE. [confirm / rule version nodes]"
+  - title: "H. The three-signal usage ruling (clause g)"
+    confirmations:
+      - "H1: referenced (G21/G16), registry-active (G25 flag), and present-on-server (G20) are THREE SEPARATE AXES — corroborated in queries, never conflated into one 'used' property. [confirm]"
+      - "H2: active=false-but-referenced and active=true-but-unreferenced are FINDINGS (the remediation-feeder pattern, P5 precedent), not load errors and not auto-corrections. [confirm]"
+  - title: "I. Consequences recorded at sign-off"
+    confirmations:
+      - "I1: ruled activations flip their vocabulary entries planned->active WITH supplement blocks; new meanings land as planned entries via ontology-mapper; the loader build is a groomed FOLLOW-UP item (the K2/G27 flips-are-follow-ups pattern) — nothing loads at the gate itself."
+      - "I2: source-registry confirmed flips + precedence.yaml rows + the F1 classification list are transcribed; the decision lands in config/gate-log.md; gates.json regenerates (the O19 drift guard enforces the row)."
+      - "I3: interim-seam note stands until the real job-detail table is built: CMD_LINE facts read from the G39/G40 staging seam; when the table lands company-side, the seam retires per its own stand-in contract (tracker T16) with no re-gate needed UNLESS the fact shapes change."
+  - title: "J. Sign-off"
+    confirmations:
+      - "SME sign-off recorded here and transcribed to config/gate-log.md with the date and per-item outcomes (A1–A6, B1-or-B2 + B3, C1–C3, D1–D4, E1–E3, F1–F2, G1–G2, H1–H2, I1–I3)."

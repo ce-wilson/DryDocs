@@ -396,6 +396,19 @@
       "unblocks": [
         "G27"
       ]
+    },
+    {
+      "kind": "prompt-only",
+      "date": null,
+      "title": "rua-load-shapes (gate page rendered — session not yet run)",
+      "status": "open",
+      "prompt_files": [
+        "config/gate-prompts/rua-load-shapes.yaml"
+      ],
+      "log_ref": null,
+      "unblocks": [
+        "G22"
+      ]
     }
   ]
 }

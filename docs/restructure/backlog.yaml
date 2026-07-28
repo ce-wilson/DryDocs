@@ -5338,6 +5338,10 @@ items:
       with no Script hop (G12 implements exactly that; 2026-07-19 subagent
       finding). Vocabulary-shape decisions, so they ride THIS gate, never
       an auto-edit.
+      PROMPT DRAFTED 2026-07-28 (config/gate-prompts/rua-load-shapes.yaml):
+      clauses a-g as sections A/C-H, riders R1/R2 as C3/B, the G39/G40
+      interim-seam premise carried in the header + I3. Session-ready —
+      sign-off is the SME's, in its own session; item stays todo until then.
 
   - id: G23
     epic: component-topology
