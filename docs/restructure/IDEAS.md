@@ -26,6 +26,18 @@ Tags help grooming: `idea` · `bug` · `doc` · `source` (new data source) · `q
 
 <!-- add new ideas at the top -->
 
+- 2026-07-27 — [idea] **Script→SWO rider: `(:Script)-[:IS_ENCODED_IN]->(SwoClass)` derived from
+  the path extension, riding the m7_uses_artifact / G22 rua-load builds.** The G33 §E1(b)
+  precedent applied verbatim to the second software-artifact class: `.sh` → the seeded Shell
+  term (SWO_0000124), `.sql` → SQL (SWO_0000126) — finally binding two of the three language
+  terms G33 left unused (§E2 partial-use note). Ontology decision → rider on whichever gate
+  builds :Script nodes first (m7 build or G22 clauses), NOT a silent loader addition; the
+  adapter mechanism already exists (EXTENSION_LANGUAGE_IRI, code_snapshot.py). Also record the
+  boundary ruled in the same discussion: run_as/J.OWNER is Agent territory (PROV/ORG,
+  WAS_ASSOCIATED_WITH {role: owner} reserved in the K2 note) — NEVER an SWO binding; and
+  inventory-fed Scripts with no job edge after the RUA join are the dead-script detection
+  list, a feature to surface, not a gap to fix. (User ask 2026-07-27, post-G33 session.)
+
 - 2026-07-27 — [bug] **`ontology.cypher:109` points at a file that was never created —
   `ontology/reference/swo_sdlc_ontology.cypher` does not exist anywhere in the tree.** The
   comment reads: *"Full SDLC subset (~250 terms) loads from ontology/reference/swo_sdlc_ontology.cypher
