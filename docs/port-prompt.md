@@ -40,10 +40,13 @@ apply. Work in a clean checkout of company `main`.
 GUARDRAILS (durable — apply to every port):
 
 1. AUTHORITIES FIRST: read `git show cewilson/main:PORT-MANIFEST.yaml` (disposition per
-   path — first matching glob row wins; unmatched paths: clean-add if absent
-   consumer-side, evaluate if both sides created it) and
+   path — first matching glob row wins; `**` spans separators, `*`/`?` do not) and
    `git show cewilson/main:git-readme.md` (narrative WHY + acceptance oracle) BEFORE
-   touching anything. Do not improvise around them.
+   touching anything. Do not improvise around them. Coverage is EXPLICIT since J16
+   (2026-07-28): a path matching no row is legitimate only if listed under
+   `default_ok:` with a reason; a path in NEITHER is an un-made decision, not a
+   clean-add — stop, decide it, and send the row back (guarded by
+   test_port_reconcile_guards.py::test_no_tracked_path_falls_through_silently).
 
 2. DISJOINT HISTORIES: no common ancestor exists — never `git merge`/`git pull`.
    Small ranges: cherry-pick / `git am --3way`, resolving collisions per manifest.
@@ -118,9 +121,12 @@ STANDING DIVERGENCES LEDGER (expected collisions — resolve as stated, do NOT "
 - tests/unit/test_doc_traceability_loader.py: two assertions pinned to the company's
   ahead controlm-ingestion-tdd.md (9 matrix rows incl. NFR-CMI-002). Keep company pins.
   Producer back-flow candidate: derive expected counts from the doc under test.
-- EXPECTED_CONSTRAINTS: company 52 vs producer 48 (company base +4 from local
-  consolidation; both sides added the 2 K4 constraints independently). Evaluate counts
-  company-based every port; never double-add a shared addition — the K4 precedent.
+- EXPECTED_CONSTRAINTS: company 52 (at the last port) vs producer 51 at `947920c`
+  (48 at 6fd3270 → 49 across the step-45/46 ranges → 51 after G33: +project_id
+  +codemodule_file_id). Company base carries +4 from local consolidation; both sides
+  added the 2 K4 constraints independently. Evaluate counts company-based every port;
+  never double-add a shared addition — the K4 precedent. Adopting the G33 stream
+  (step 47b) adds the same 2 company-side.
 - Canonical-company set (manifest rows): controlm-ingestion-tdd.md, the design_doc
   renderer output, review internals (drydocs-review back-flow stream), oracle_adapter,
   company sources/supplements. Producer touches = drop the incoming side.
@@ -156,6 +162,8 @@ OWED COMPANY-SIDE (from the 6fd3270 review):
 | T12 | Company platforms gate: 06-29 AIS position vs producer C12 — supersede-or-reconcile (Tier B, gated step 43's flips) | **RULED — SUPERSEDE, 2026-07-21, company `config/gate-log.md`.** Evidence (producer review 2026-07-27, company Control-M Initial-Load Runbook): step 7b reads "AIS platform catalog — RETIRED (T12 company platforms gate, SUPERSEDE, 2026-07-21)" — the `:AisCapability` / `:AisTool` class layer is superseded by the software-registry model (role over class), the seeds are commented-out audit tags, `apply-platforms-supplement` is a NO-OP on a fresh graph and no longer a prerequisite. Excision APPLIED: step 10 confirms `USES_TOOL` → `:AisTool` retired from the app-code link, the edge landing on `USES_SOFTWARE {source:'batch-port'}` via C14. **This also closes the 2026-07-24 open question** ("`Ais*` live in the app-code loader may falsify the pack's declared-only premise — count edges first"): the retirement is applied, so the premise no longer matters. **Tier B holds in steps 43 and 45b are DISCHARGED.** Session materials (`port-T12-company-gate-pack.md`, `port-T12-ais-excision-company-prompt.md`) retired from the tree 2026-07-27 — spent; recoverable from git history if the ruling is ever re-litigated |
 | T13 | DPL registry field contract validated vs a REAL per-SEAL export (pipeline_id.json/dataset_id.json) — amend dpl_registry.py header + fixtures together, cite provenance (the T10 discipline) | pending |
 | T14 | rua collector convergence: company's own -n implementation (observed 2026-07-20, internals unseen) vs producer G18 v2 — reconcile to ONE v2 (flags, scripts.tsv columns incl. sha256, size cap, COLLECTOR_VERSION stamp) so bundles stay cross-ingestible | pending |
+| T15 | G33 company code-graph load: run YOUR post-U6 `snapshot.ps1` (snapshot `*.json` is never-port BOTH ways — each side loads its own; run it from the primary on-main checkout, never a worktree, or abs_path pollutes) → `drydocs load-code-snapshot` into your graph. A second `:Project` root is ruled INTENDED (gate §B3(a)). Rides with the Tier A ratification entry for the gate itself (guardrail 6) | pending |
+| T16 | CM_DEF_VJOB_DETAIL built for real in psgmgr — retires the G39 temporary staging stand-in as the feed (the G40 Python parse stays as the cross-check); the premise correction is already folded into G22 prep (step 47c) | pending |
 
   Done-means for T1–T10 are unchanged — they live verbatim in the archive's tracker
   section. T9 reminder: producer sign-off never substitutes for load verification on
@@ -418,24 +426,113 @@ STEP LEDGER — delta since `6fd3270` (numbering continues from the archive):
     (unchanged from `0ce7333` — the tail commits are docs/config only): 982 passed /
     6 skipped.
 
+47. SELF-DOCUMENTATION GATE + PORT-CONTROL OVERHAUL + STAGING SEAMS (2026-07-27 →
+    2026-07-28; `78ba7fd..cewilson/main` — compute the range live and record the
+    exact head in the PORT-REPORT, the step-46 lesson; 52 commits to `947920c`
+    known at 2026-07-28). Eight sub-streams; **(a) first — it rewrites the
+    authorities this port runs under.**
+    a. PORT-CONTROL + MANIFEST COVERAGE (`378f4ba` step-46 corrections + the
+       depgraph never-port row, `bf3fd34` docs/port-*.md never-port, `0b7f391`
+       J16, `fb0a612` J16-as-code, `f67e308`): PORT-MANIFEST.yaml is largely
+       REWRITTEN (+~200 lines) — every top-level tracked path now has an explicit
+       row, `default:` is legitimate only via `default_ok:` (guardrail 1, updated),
+       and `test_port_reconcile_guards.py` gains the coverage + glob-semantics +
+       backlog-no-regression guards (these run UNCONDITIONALLY, no
+       RECONCILE_BEFORE_DIR needed). Read the NEW manifest before classifying
+       anything else in this range. Company-side the coverage guard runs against
+       YOUR tree: company-only paths it surfaces are un-made decisions to add rows
+       for — findings, not port failures (the J15 spirit).
+    b. G33 SELF-DOCUMENTATION CODE-GRAPH + EPIC U (gate
+       `self-documentation-code-graph` SIGNED OFF 36/36 `c876b73`, spec walk
+       `b46178d`/`fb0d4b5`, loader `7f5f1d3` — `drydocs load-code-snapshot`,
+       LIVE-verified producer-side, v2 snapshot-schema accept `a45f124`, U1–U3
+       persona reviews `6de57d9`, U4 skill `691cfb9`, U6 scanner blind-spot fix
+       `047c319`): DryDocs' own source tree as a `(:Project {project_id:'drydocs'})`
+       subgraph; first live use of the SWO layer. Gate adoption: Tier A (no company
+       position on self-documentation) — ratification entry per guardrail 6.
+       Schema effects: +2 constraints (project_id, codemodule_file_id) → producer
+       EXPECTED_CONSTRAINTS 51 (ledger); vocab / map / audit-fields /
+       source-registry (`depgraph-snapshot` arrives `confirmed: true` — the gate IS
+       its confirmation) per-entry as always. THE LOADER'S INPUT IS NEVER-PORT:
+       snapshot `*.json` stays each side's own — generate yours with the POST-U6
+       instrument only (pre-U6 silently under-scanned: `279d84d` dropped such a
+       snapshot, `fbff983` marks the scanner change in the README so the node-count
+       jump is not read as growth) and load into YOUR graph; §B3(a) rules the second
+       `:Project` root intended (tracker T15). Live-load verification is yours
+       regardless of tier (T9).
+    c. G39+G40 CMDLINE JOB-DETAIL STAGING (`4883778` build, `13a93a0` caveat v2 —
+       resolved command lines ARE in scope as input; groom `3f7753f` folds a
+       CM_DEF_VJOB_DETAIL premise correction into G22): temporary staging store +
+       Python parse, a STAND-IN for the unbuilt psgmgr CM_DEF_VJOB_DETAIL.
+       Staging-only, NO graph writes — G22 remains the activation gate. You own the
+       real source: building the actual psgmgr table retires the stand-in feed
+       (tracker T16); fold the premise correction into YOUR G22 session prep.
+    d. P5 PATCH-WINDOW + EPIC P COMPLETE (`31dc41d` pushed claim, `db43baa` build):
+       `drydocs patch-window --host|--group [--json]` — read-only committed cypher
+       (asserted by test), busy time = interval UNION (critical-path extent, never
+       a path sum — the TDQ-ETA rule, pinned by test), runtime outliers >=24h
+       excluded + flagged, NODE_GROUP<->RUNS_ON cross-validation riding along as
+       the remediation-feeder findings list. Producer verified STRUCTURE ONLY —
+       the P4 timing supplement is company-side (your `15043cd`), so YOUR graph is
+       the first place real patch windows appear; re-run the acceptance there.
+    e. LOADER REFUSALS ROUND 2 + HYGIENE (`30bff33` L17, `36866f9` O33, `6dfab5e`
+       shared-driver close, `d9c6644` e2e fixture onto Enterprise, `6b3fd76`,
+       `422b141` O34): L17 closes EXACTLY the doc_traceability/doc_feedback
+       unguarded-idiom gap step 46d told you to check — if you already patched
+       yours, RECONCILE, don't clobber. O33: SchemaMeta exemplars can no longer
+       contaminate QuerySpecs or the runs_on write path (`WHERE NOT n:SchemaMeta`
+       is the standing anchor invariant). `6b3fd76` swaps httpx -> httpx2 for the
+       TestClient transport — dependency change, evaluate against your own env;
+       never overwrite the company pyproject version string (guardrail 9).
+       `422b141` is web package-lock only.
+    f. G41 GLUE BASE-TABLE INVENTORY SEAM (`b6dc6fe`): extractor + tests,
+       nodes-only dataset population, staging — field contract ASSUMED until a
+       real export validates it (the T10/T13 discipline: amend header + fixtures
+       together, cite provenance).
+    g. GENERIC SNOWFLAKE DATA-CATALOG PLAN (`985273e`): the sanitized twin —
+       `<CATALOG>`/`AUTHORITY2` placeholders per the twin convention; your side
+       reads it against the REAL curated views. Plan only, no code in this range;
+       the G42–G44 backlog items encode the phases (extractor → cross-check → gate
+       prompt); the DCAT dataset/distribution one-node-or-two question is the
+       central gate decision and is deliberately NOT pre-decided.
+    h. DOCS / CHORES: L16 startup runbook Rev 3 (`9a85fb9` — producer-local
+       container names, adapt-don't-adopt), C19 `802f3fe` SWO anchor comment,
+       home-db strays wipe `3bc461d` (producer-local graph op, no action for you),
+       grooms `770f6dc` / `2905065` / `cedb3c6` / `3f8890a` (U5 executed in-run —
+       Epic U closed 6/6), IDEAS union-appends incl. the depgraph-instrument
+       capture chain (`fd2834d`, `5ad4bcc`, `947920c` — read these before trusting
+       any snapshot diff: the instrument does not record its own scanner revision,
+       and abs_path is machine/worktree-dependent).
+    Snapshots in the range (`00e811b`, `403e10c`, `e99ff1f`, `a850b85`, `9113cc5`,
+    `b2dc6ef`, `7ea6828`, `8f8de29`) are EXCLUDED class (guardrail 4 + never-port
+    manifest row); `279d84d` deletes one producer-side (net no-op for you).
+    backlog.yaml per-entry: G33/G39/G40/G41/L16/L17/J16/C19/O33/O34/U1–U6/P5/U5
+    arrive done (Epic U complete 6/6, Epic P complete 5/5), G42/G43/G44/L18/L19/
+    D8/J17 arrive todo; re-insert company DD-series, recompute the summary exactly
+    as test_backlog does. Producer reference at `947920c`: 1070 passed / 8 skipped
+    (production CSV absent on the measuring machine).
+
 ACCEPTANCE GATE (behavior is the contract, not a byte-compare):
 - Track 1 (portable, no production sample present):
     poetry run pytest tests/unit/test_variable_classifier.py tests/unit/test_variable_resolver.py \
                       tests/unit/test_variable_staging.py tests/unit/test_command_parser.py \
                       tests/unit/test_module_boundary.py -q
-  Producer reference: 90 passed / 3 skipped (sample-backed tests skip without the
-  gitignored production CSV). Company baseline is ABOVE this (113 at the last port) —
-  compare against your own prior report, not the producer floor.
+  Producer reference at `947920c`: 114 passed / 3 skipped (sample-backed tests skip
+  without the gitignored production CSV). Company baseline is ABOVE this (113 at the
+  last port) — compare against your own prior report, not the producer floor.
 - Full `pytest tests/unit/` — ZERO failures is the contract; skips are
   environment/fixture-absence by design (production CSVs, XML fixtures, fastapi
   optional dep, essential-graphrag PDF, J7 guards without RECONCILE_BEFORE_DIR).
-  Producer reference at the current head (step 46, `78ba7fd`): 982 passed /
-  6 skipped (step-45 head bf33c8a was 900 / 6; step-43 head 2adec42 was 840 / 6).
+  Producer reference at the current head (step 47, `947920c`): 1070 passed /
+  8 skipped with the production CSV absent (step-46 head 78ba7fd was 982 / 6;
+  step-45 head bf33c8a was 900 / 6; step-43 head 2adec42 was 840 / 6).
   Company reference at the last port: 1174 passed / 21 skipped / 0 failed.
 - CI guards green: test_schema.py (EXPECTED_CONSTRAINTS company-based — see ledger;
   every active edge has its supplement block), test_classification.py,
   test_taxonomy_ontology_map.py, test_backlog.py, test_doc_outline.py,
   test_enforcement_matrix.py, test_gates_json.py.
-- J7 reconcile guards with RECONCILE_BEFORE_DIR set: all pass (9 at the last port).
+- J7 reconcile guards with RECONCILE_BEFORE_DIR set: all pass (9 at the last port;
+  the guard file has since grown — the J16 manifest-coverage / default_ok /
+  backlog-no-regression checks run unconditionally, no env var needed).
 - Historical per-step producer counts (483 → 831 across steps 28–42): archive file.
 ```
