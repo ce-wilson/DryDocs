@@ -6690,6 +6690,133 @@ items:
       not in their imports. This item lands the code subgraph and the shared database
       that make the join possible; the join itself is a separate Epic U item.
 
+  # ── Epic U — Self-documentation (phase 16; opened by G33, which keeps its G id) ──
+  # U1-U3 = the three phases of docs/reviews/code-graph-review-plan.md (groomed
+  # 2026-07-27 from the IDEAS hook, same session as the G33 build). U4/U5 = the
+  # plan's two OPTIONAL skill-edit follow-ups, gated on their phase proving the
+  # queries earn their keep. All read-only analysis — findings route through
+  # IDEAS, never direct backlog/graph edits; none is HITL.
+  - id: U1
+    epic: self-documentation
+    title: "Run the python-architect structural review over the live code graph (code-graph review plan, Phase 1)"
+    type: task
+    module: docs
+    phase: 16
+    agent: main
+    model: opus
+    priority: p2
+    status: todo
+    depends_on: []
+    inputs: [docs/reviews/code-graph-review-plan.md, knowledge/depgraph-snapshots/]
+    acceptance: >
+      docs/reviews/persona-python-architect-2026-07.md exists and answers all six
+      seed units (A1 layering, A2 circular cross-check, A3 fan-in ranking, A4 the
+      24 orphan candidates each dispositioned entry-point/dead/blind-spot by a
+      human read, A5 test-coverage shape, A6 cross-root coupling vs MODULE_MAP),
+      recording the plan's probed baselines next to current values so drift is
+      visible. Every finding carries the query that found it AND the confirming
+      file read; findings are ranked by the tech-debt skill's
+      (Impact+Risk)x(6-Effort) score; each actionable one lands as a tagged
+      IDEAS inbox line. Zero backlog.yaml or graph edits.
+    notes: >
+      Fresh-graph precondition: snapshot.ps1 -> drydocs load-code-snapshot
+      (idempotent). Model opus, not sonnet: A4/A6 dispositions are judgment
+      reads, not checklist work; not fable — no schema/boundary decision rides
+      on it. IMPORTS caveat (gate D2) applies to every conclusion: never read
+      an edge as "breaks if removed".
+  - id: U2
+    epic: self-documentation
+    title: "Project-manager audit: does backlog.yaml tell the truth about done and todo, checked against the code graph (Phase 2)"
+    type: task
+    module: docs
+    phase: 16
+    agent: main
+    model: sonnet
+    priority: p2
+    status: todo
+    depends_on: []
+    inputs: [docs/reviews/code-graph-review-plan.md, docs/restructure/backlog.yaml]
+    acceptance: >
+      docs/reviews/persona-project-manager-2026-07.md contains the drift table
+      (item -> claim -> graph verdict) covering all four units: (1) every item
+      closed in the last ~30 days whose close_note names files verified against
+      :CodeModule file_ids; (2) the modules: registry censused against the six
+      project values + top-level file_id prefixes both directions; (3) every
+      next_ready item's inputs: paths confirmed to exist; (4) the per-epic code
+      footprint view. Every mismatch has a tagged IDEAS line; ZERO direct
+      backlog.yaml edits (the groom owns those).
+    notes: >
+      Sonnet: mechanical cross-checks with a written pass/fail acceptance.
+      D7 makes deletions visible (removed_from_source_at) — use it in unit 2.
+  - id: U3
+    epic: self-documentation
+    title: "Technical-writer doc-status board: join the docs subgraph to the code graph (Phase 3)"
+    type: task
+    module: docs
+    phase: 16
+    agent: main
+    model: sonnet
+    priority: p2
+    status: todo
+    depends_on: []
+    inputs: [docs/reviews/code-graph-review-plan.md, docs/design/]
+    acceptance: >
+      Precondition executed and shown: drydocs load-doc-traceability against
+      `drydocs` (the DesignDoc/Requirement/Component subgraph was EMPTY at plan
+      time). docs/reviews/persona-tech-writer-2026-07.md contains the doc-status
+      board (doc -> last commit -> cited components alive? -> fresh/stale/
+      orphaned) for every docs/design/*.md, the Component.ref <-> file_id join
+      results both directions (stale citations + heavily-imported modules no doc
+      cites), the staleness ranking vs Project.git_commit, and the sdlc-*.md
+      SDEP-section regeneration check. Mismatches -> tagged IDEAS lines.
+    notes: >
+      Independent of U1/U2 — runnable in parallel. The code<->Control-M join
+      (gate H5) does NOT exist; the plan forbids faking it with string matching.
+  - id: U4
+    epic: self-documentation
+    title: "OPTIONAL: add a 'DryDocs graph evidence' section to the tech-debt skill (query pack + offline fallback)"
+    type: chore
+    module: docs
+    phase: 16
+    agent: main
+    model: haiku
+    priority: p3
+    status: todo
+    depends_on: [U1]
+    inputs: [.claude/skills/tech-debt/SKILL.md, docs/reviews/code-graph-review-plan.md]
+    acceptance: >
+      .claude/skills/tech-debt/SKILL.md gains a DryDocs-specific graph-evidence
+      section carrying the Phase-1 query pack (A1-A6) with one-line "what debt
+      category this measures" notes, AND an explicit no-database fallback
+      (snapshot JSON + viewer.html) so the skill never hard-depends on Neo4j —
+      the same decoupling rule as the session ritual (gate H3). Skill loads and
+      reads coherently offline.
+    notes: >
+      Gated on U1 proving the queries earn their keep (the plan's own condition).
+      Haiku: transcription of already-written queries + a caveat, no judgment.
+  - id: U5
+    epic: self-documentation
+    title: "OPTIONAL: add an optional graph cross-check subsection to the groom-backlog skill"
+    type: chore
+    module: docs
+    phase: 16
+    agent: main
+    model: haiku
+    priority: p3
+    status: todo
+    depends_on: [U2]
+    inputs: [.claude/skills/groom-backlog/SKILL.md, docs/reviews/code-graph-review-plan.md]
+    acceptance: >
+      The groom-backlog skill gains a short "graph cross-check (optional, needs
+      Neo4j)" subsection in its mechanics: (a) sanity-check an item's module:
+      against the graph census, (b) verify close_note file claims before
+      flipping done — both marked EXPLICITLY optional so a groom with no
+      database running is never blocked. The skill's validator/test flow is
+      unchanged.
+    notes: >
+      Gated on U2 (same earn-their-keep condition). The groom itself stays
+      offline-first — grooming is yaml transcription; the graph only validates.
+
   - id: G34
     epic: ontology-mapping
     title: "Scaffold the business glossary NOW so the internal port cannot collide on a name or a backlog slot: reserve CatalogBusinessTerm + its edges as status: planned, schema public / definitions internal"
@@ -6992,11 +7119,15 @@ items:
       the primary fix.
 
 summary:
-  todo: 47                                         # +5 at the 2026-07-27 groom (J14/J15/G36/O33/G38), +2 from the same day's PAT-structure review (C17/C18); J14 + P3 + G21 + G24 + G26 + Q8 + C18 + J15 + G33 closed same day
+  todo: 52                                         # +5 at the 2026-07-27 groom (J14/J15/G36/O33/G38), +2 from the same day's PAT-structure review (C17/C18), +5 at the same day's code-graph-review groom (U1-U5); J14 + P3 + G21 + G24 + G26 + Q8 + C18 + J15 + G33 closed same day
   in_progress: 1                                   # E1 (gate deferred both sides)
   blocked: 0
   done: 144                                        # 2026-07-27 closes: J14 SEALID split, P3 hosts+RUNS_ON, G21 rua code-ops, G24 code-repo seam, G26 launcher-registry config, Q8 bmc-docs prereq, C18 shadow-model guard, J15 value-shape boundary guard, G33 code-snapshot loader (gate signed + built same day)
-  next_ready: [M3, M4, J10, Q6, O23, J13, O26, O27, C15, C16, C17, O28, R3, R4, L16, O29, O30, O31, O32, S1, S8, S9, Q7, G32, G34, G35, O33, P5, G22]
+  next_ready: [M3, M4, J10, Q6, O23, J13, O26, O27, C15, C16, C17, O28, R3, R4, L16, O29, O30, O31, O32, S1, S8, S9, Q7, G32, G34, G35, O33, P5, G22, U1, U2, U3]
+  # 2026-07-27 code-graph-review groom: U1-U3 = the three personas of
+  # docs/reviews/code-graph-review-plan.md, dependency-free -> next_ready;
+  # U4/U5 = the optional skill edits, gated on their phase (U1/U2) proving the
+  # queries earn their keep. All read-only; none HITL.
   # 2026-07-27 groom (weekly inbox): 5 promoted, 1 merged, 1 resolved. None of
   # the five touch edge semantics — no gate needed: J14 is a publish-boundary
   # file split (fable because the boundary decision rides in it), J15/G36/G38/O33
