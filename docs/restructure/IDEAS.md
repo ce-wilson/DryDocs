@@ -26,6 +26,30 @@ Tags help grooming: `idea` · `bug` · `doc` · `source` (new data source) · `q
 
 <!-- add new ideas at the top -->
 
+- 2026-07-28 — [bug] **Depgraph snapshot scanner blind spots — one fix, three symptoms** (U1 F1 +
+  U2 census, code-graph review run 1): (a) ZERO cross-root IMPORTS edges recorded (base.py's
+  top-level imports of drydocs_core.cypher_split/run_log have no edge), (b) function-level
+  imports unrecorded even in-root (neo4j_client.py:74 → cypher_split), (c) `drydocs_api/` is
+  not a scan root at all. Consequences measured: A1 layering vacuous (real guard =
+  test_module_boundary.py), A4 orphan signal 100% false-positive (24/24), A5/A6 vacuous.
+  U4 (tech-debt query pack) should WAIT on this fix or it enshrines vacuous queries.
+- 2026-07-28 — [bug] **Component-cell comma-split shears 8 of 56 Component.ref values** (U3):
+  refs holding commas/semicolons inside parentheticals truncate (`K2 loader (`seal_attribution.cypher`),
+  corrupting (origin, ref) node identity. Fix = extend `_split_cell` with the
+  `_PAREN_QUALIFIER_RE` strip the section cells already use, or tighten the authoring convention.
+- 2026-07-28 — [doc] **Design-doc commit-citation sweep** (U3 board): five docs cite PRE-SQUASH
+  hashes that dangle off main on a fresh clone (project-tdd, project-review, remediation-tdd,
+  web-console-tdd, benchmark-explainer); startup-refresh runbook was edited 07-28 (L16) but
+  still cites the 07-20 commit; mapping-demo runbook has NO commit citation. One re-cite sweep.
+- 2026-07-28 — [doc] **The two fan-in hotspots are cited by no traceability component** (U3):
+  drydocs/loaders/base.py (fan-in 19) and drydocs_lineage/model.py (9) appear in zero matrix
+  component cells — the docs cite the loaders' cypher but not the lifecycle/identity contracts
+  they all inherit.
+- 2026-07-28 — [doc] **sdlc-*.md §DEP tables contradict the post-G2 tree** (U3): neo4j_client
+  and relationship_vocabulary.yaml still cited at pre-extraction `drydocs/` paths; APOC listed
+  as an open question (OQ-NS-3) though run_script + the J9 container made it load-bearing.
+  These docs live outside the design-doc render pipeline, so no sweep catches them drifting.
+
 - 2026-07-28 — [chore] **react-router high advisory (GHSA-qwww-vcr4-c8h2, RSC-mode CSRF) cannot
   clear without the v7→v8 major migration** — v8 absorbs `react-router-dom` (its latest is
   still 7.18.1, inside the vulnerable 7.12.0–8.2.0 range), so `npm audit fix` is a no-op and

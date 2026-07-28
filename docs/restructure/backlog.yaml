@@ -6957,7 +6957,7 @@ items:
     agent: main
     model: opus
     priority: p2
-    status: todo
+    status: done
     depends_on: []
     inputs: [docs/reviews/code-graph-review-plan.md, knowledge/depgraph-snapshots/]
     acceptance: >
@@ -6976,6 +6976,14 @@ items:
       reads, not checklist work; not fable — no schema/boundary decision rides
       on it. IMPORTS caveat (gate D2) applies to every conclusion: never read
       an edge as "breaks if removed".
+      CLOSED 2026-07-28 (run 1, all six units): headline = the snapshot
+      records ZERO cross-root IMPORTS edges and no function-level imports,
+      and drydocs_api is not a scan root — A1/A5/A6 vacuous, A4's 24
+      orphans = 24 false positives (each dispositioned with grep evidence);
+      A2 healthy (scanner + live graph agree, 0 cycles); A3 base.py 18->19,
+      lineage/model.py 9 = new second hotspot. Findings ranked; scanner-fix
+      IDEAS line filed — U4 should wait on that fix or the query pack
+      enshrines vacuous queries. Zero graph/backlog edits from the review.
   - id: U2
     epic: self-documentation
     title: "Project-manager audit: does backlog.yaml tell the truth about done and todo, checked against the code graph (Phase 2)"
@@ -6985,7 +6993,7 @@ items:
     agent: main
     model: sonnet
     priority: p2
-    status: todo
+    status: done
     depends_on: []
     inputs: [docs/reviews/code-graph-review-plan.md, docs/restructure/backlog.yaml]
     acceptance: >
@@ -7000,6 +7008,14 @@ items:
     notes: >
       Sonnet: mechanical cross-checks with a written pass/fail acceptance.
       D7 makes deletions visible (removed_from_source_at) — use it in unit 2.
+      CLOSED 2026-07-28 (run 1): the backlog is telling the truth — 80
+      recent done items / 91 path claims, ZERO false done-claims (8
+      mechanical flags all dispositioned: matcher artifacts, recorded
+      relocations, or files whose ABSENCE was the acceptance); 30/30
+      next_ready inputs alive; D7 removed count 0. Census gap: drydocs_api
+      is a real package with no scan root — folded into the U1 scanner
+      IDEAS line (one fix, three symptoms). No epic footprint contradicts
+      its charter.
   - id: U3
     epic: self-documentation
     title: "Technical-writer doc-status board: join the docs subgraph to the code graph (Phase 3)"
@@ -7009,7 +7025,7 @@ items:
     agent: main
     model: sonnet
     priority: p2
-    status: todo
+    status: done
     depends_on: []
     inputs: [docs/reviews/code-graph-review-plan.md, docs/design/]
     acceptance: >
@@ -7024,6 +7040,15 @@ items:
     notes: >
       Independent of U1/U2 — runnable in parallel. The code<->Control-M join
       (gate H5) does NOT exist; the plan forbids faking it with string matching.
+      CLOSED 2026-07-28 (run 1): precondition run shown — sections 148 +
+      matrix 51 loaded; the feedback pass REFUSED via the L17 :Employee
+      guard (first live firing — recorded as evidence, the honest producer
+      state). Board: 5 docs cite pre-squash commits that dangle off main,
+      startup-refresh edited same day still cites 07-20, mapping-demo has
+      no cite; ZERO dead component citations both directions; 8/56
+      Component refs sheared by the comma-split convention; base.py +
+      lineage/model.py cited by no component; sdlc-*.md par-DEP stale in 3
+      rows. Four IDEAS lines filed.
   - id: U4
     epic: self-documentation
     title: "OPTIONAL: add a 'DryDocs graph evidence' section to the tech-debt skill (query pack + offline fallback)"
@@ -7527,11 +7552,14 @@ items:
       only (legacy 1_* family proves it is not always a SEAL).
 
 summary:
-  todo: 50                                         # +4 at the 2026-07-28 inbox groom (C19 ontology-comment fix, J16 port-manifest fall-through guard, L17 doc-loader prereq guards, O34 web npm advisories); all four closed same day (O34 via its stop clause), L16 closed alongside; prior: +5 2026-07-27 groom (J14/J15/G36/O33/G38), +2 PAT review (C17/C18), +5 code-graph-review (U1-U5), +2 cmdline seam (G39/G40, built+closed same day)
+  todo: 47                                         # +4 at the 2026-07-28 inbox groom (C19 ontology-comment fix, J16 port-manifest fall-through guard, L17 doc-loader prereq guards, O34 web npm advisories); all four closed same day (O34 via its stop clause), L16 closed alongside; prior: +5 2026-07-27 groom (J14/J15/G36/O33/G38), +2 PAT review (C17/C18), +5 code-graph-review (U1-U5), +2 cmdline seam (G39/G40, built+closed same day)
   in_progress: 1                                   # E1 (gate deferred both sides)
   blocked: 0
-  done: 153                                        # 2026-07-28: G41 glue base-table inventory seam (built + closed same day), L17 doc-loader prereq guards (same), O33 SchemaMeta exemplar audit (22 specs + runs_on write path; live-proven), O34 npm advisories (postcss cleared; react-router escalated via the stop clause), C19 ontology-comment fix (groomed + closed same day), J16 port-manifest fall-through guard (same), L16 runbook container/port refresh. 2026-07-27 closes: J14 SEALID split, P3 hosts+RUNS_ON, G21 rua code-ops, G24 code-repo seam, G26 launcher-registry config, Q8 bmc-docs prereq, C18 shadow-model guard, J15 value-shape boundary guard, G33 code-snapshot loader (gate signed + built same day), G39 cmdline staging store + G40 parse (groomed am, built pm)
-  next_ready: [M3, M4, J10, Q6, O23, J13, O26, O27, C15, C16, C17, O28, R3, R4, O29, O30, O31, O32, S1, S8, S9, Q7, G32, G34, G35, P5, G22, U1, U2, U3]
+  done: 156                                        # 2026-07-28: G41 glue base-table inventory seam (built + closed same day), L17 doc-loader prereq guards (same), O33 SchemaMeta exemplar audit (22 specs + runs_on write path; live-proven), O34 npm advisories (postcss cleared; react-router escalated via the stop clause), U1/U2/U3 code-graph persona reviews run 1 (scanner blind-spot headline; backlog verified truthful; doc board + citation sweep queued), C19 ontology-comment fix (groomed + closed same day), J16 port-manifest fall-through guard (same), L16 runbook container/port refresh. 2026-07-27 closes: J14 SEALID split, P3 hosts+RUNS_ON, G21 rua code-ops, G24 code-repo seam, G26 launcher-registry config, Q8 bmc-docs prereq, C18 shadow-model guard, J15 value-shape boundary guard, G33 code-snapshot loader (gate signed + built same day), G39 cmdline staging store + G40 parse (groomed am, built pm)
+  next_ready: [M3, M4, J10, Q6, O23, J13, O26, O27, C15, C16, C17, O28, R3, R4, O29, O30, O31, O32, S1, S8, S9, Q7, G32, G34, G35, P5, G22, U4, U5]
+  # U4/U5 enter next_ready mechanically (their U1/U2 deps closed 2026-07-28) — but the
+  # U1 verdict says U4 should WAIT on the scanner-fix IDEAS item, or the query pack
+  # enshrines vacuous queries; re-sequence at the next groom.
   # 2026-07-27 code-graph-review groom: U1-U3 = the three personas of
   # docs/reviews/code-graph-review-plan.md, dependency-free -> next_ready;
   # U4/U5 = the optional skill edits, gated on their phase (U1/U2) proving the
