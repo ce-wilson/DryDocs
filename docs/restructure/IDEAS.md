@@ -26,6 +26,19 @@ Tags help grooming: `idea` · `bug` · `doc` · `source` (new data source) · `q
 
 <!-- add new ideas at the top -->
 
+- 2026-07-28 — [chore] **PARKED UNTIL AFTER THE PORT REVIEW: verify the `neo4j-drydocs` MCP
+  server actually works now.** It requires APOC, and APOC was silently ABSENT from the
+  `neo4jtest` container for weeks (`NEO4J_PLUGINS=[apoc]` set, `/plugins` empty — fixed
+  `33cfc68`, plugins now a mounted volume, apoc 174 procs + gds 471). So the server cannot
+  have functioned in that window and **has never been verified since the fix**. Check: the
+  server is `~/.claude.json` local scope, stdio, `mcp/neo4j:latest`, `NEO4J_DATABASE=drydocs`,
+  re-pointed to 7687 — confirm it connects and returns a query against the freshly reloaded
+  graph (210 `:CodeModule` is a convenient marker). Note the container was RECREATED, so also
+  re-confirm the port with `docker port neo4jtest` rather than trusting the config. Second,
+  smaller thing worth doing in the same pass: **GDS is new here** (471 procs) — nothing in
+  DryDocs calls it yet, so decide whether it earns a place (Epic R / graph-retrieval
+  benchmark) or is just available. Deliberately deferred so it does not interleave with the
+  port review.
 - 2026-07-28 — [idea] **Agent-runtime target state re-confirmed: OSS Google ADK 2.0 idioms are
   the Epic R build surface** (ADR 0007's revisit-if check ran 2026-07-28 and PASSED; the
   detailed review is `internal/agent-platform/smartsdk-3-adr0007-compatibility.md`, never
