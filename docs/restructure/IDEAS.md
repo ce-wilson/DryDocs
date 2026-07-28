@@ -32,17 +32,10 @@ Tags help grooming: `idea` · `bug` · `doc` · `source` (new data source) · `q
   (fan-in: graph exact 19 vs grep 33 with ~10 false positives from unrelated `base.py` packages;
   cycles + transitive dependents: 1 query / ~25 chars vs infeasible-or-iterative greps; root
   census: 245 chars vs ~7k est. of Glob paths). BUT cross-root question returned 0 vs grep's
-  true 24 — graph-first is only safe AFTER the scanner fix (line below). Mechanism proposal:
+  true 24 — graph-first is only safe AFTER the scanner fix (groomed → U6). Mechanism proposal:
   a read-only `drydocs query <spec>` CLI subcommand over the (O33-guarded) query_specs so
   agents get one deterministic, testable command — folds naturally into U4's tech-debt query
   pack; MCP (mcp-neo4j-cypher) is the richer later option but adds config + write-risk surface.
-- 2026-07-28 — [bug] **Depgraph snapshot scanner blind spots — one fix, three symptoms** (U1 F1 +
-  U2 census, code-graph review run 1): (a) ZERO cross-root IMPORTS edges recorded (base.py's
-  top-level imports of drydocs_core.cypher_split/run_log have no edge), (b) function-level
-  imports unrecorded even in-root (neo4j_client.py:74 → cypher_split), (c) `drydocs_api/` is
-  not a scan root at all. Consequences measured: A1 layering vacuous (real guard =
-  test_module_boundary.py), A4 orphan signal 100% false-positive (24/24), A5/A6 vacuous.
-  U4 (tech-debt query pack) should WAIT on this fix or it enshrines vacuous queries.
 - 2026-07-28 — [bug] **Component-cell comma-split shears 8 of 56 Component.ref values** (U3):
   refs holding commas/semicolons inside parentheticals truncate (`K2 loader (`seal_attribution.cypher`),
   corrupting (origin, ref) node identity. Fix = extend `_split_cell` with the
@@ -832,6 +825,12 @@ Tags help grooming: `idea` · `bug` · `doc` · `source` (new data source) · `q
 
 ## Recently groomed (audit trail)
 
+- 2026-07-28 — [bug] depgraph scanner blind spots — one fix, three symptoms (cross-root
+  IMPORTS, function-level imports, missing drydocs_api scan root; U1 F1 + U2 census,
+  confirmed live by the graph-navigation benchmark 0-vs-24) → **U6** (p2, graph-infra;
+  work spans the external depgraph repo + snapshot.ps1 target list); **U4 re-sequenced**
+  to depend on U6, encoding the U1 wait-verdict. Companion agent-graph-navigation
+  [idea] line stays inboxed (mechanism decision = `drydocs query` CLI vs MCP, user call).
 - 2026-07-28 — [bug] ontology.cypher:109 dangling SDLC-subset load reference → **C19**
   (comment fix; the build-the-subset-at-all question recorded IN the item as an open
   user/SME call, not silently dropped).
