@@ -42,7 +42,13 @@ CYPHER_DIR = Path(__file__).resolve().parent / "cypher"
 DEFAULT_SNAPSHOT_DIR = (
     Path(__file__).resolve().parents[2] / "knowledge" / "depgraph-snapshots"
 )
-SNAPSHOT_SCHEMA = "depgraph-machine-first/v1"
+# v2 (first seen 2026-07-27, ritual snapshot 20260727-2019) is a SUPERSET of
+# v1 for this loader's concern: nodes/edges/meta are unchanged; v2 adds
+# lineage sections (processes/data_assets/hosts/rels) and stats, which this
+# loader does NOT load — it warns when they carry content (never silent).
+SNAPSHOT_SCHEMAS = ("depgraph-machine-first/v1", "depgraph-machine-first/v2")
+SNAPSHOT_SCHEMA = SNAPSHOT_SCHEMAS[0]  # back-compat name (fixtures/tests)
+_V2_UNLOADED_SECTIONS = ("processes", "data_assets", "hosts", "rels")
 SNAPSHOT_GLOB = "drydocs-*.json"  # dated dependency snapshots ONLY — never tree-*.json
 
 # §E1(b)/§E2: extension -> the ALREADY-SEEDED SwoClass term (ontology.cypher).
@@ -109,10 +115,19 @@ def read_snapshot(path: Path | str) -> dict:
         raise CodeSnapshotError(f"cannot read snapshot {path}: {exc}") from exc
 
     schema = doc.get("schema")
-    if schema != SNAPSHOT_SCHEMA:
+    if schema not in SNAPSHOT_SCHEMAS:
         raise CodeSnapshotError(
-            f"{path.name}: schema is {schema!r}, expected {SNAPSHOT_SCHEMA!r} (nothing was loaded)"
+            f"{path.name}: schema is {schema!r}, expected one of {SNAPSHOT_SCHEMAS!r} "
+            "(nothing was loaded)"
         )
+    for section in _V2_UNLOADED_SECTIONS:
+        n = len(doc.get(section) or [])
+        if n:
+            LOGGER.warning(
+                "%s: v2 section '%s' carries %d record(s) this loader does NOT "
+                "load (code modules only) — a lineage-side consumer is needed "
+                "for that content", path.name, section, n,
+            )
     meta = doc.get("meta")
     if not isinstance(meta, dict):
         raise CodeSnapshotError(

@@ -154,6 +154,27 @@ def test_refuses_wrong_schema(tmp_path: Path) -> None:
         read_snapshot(path)
 
 
+def test_accepts_v2_schema_and_warns_on_unloaded_sections(tmp_path: Path, caplog) -> None:
+    """v2 (ritual bump 2026-07-27): nodes/edges/meta unchanged, new lineage
+    sections added. Empty sections load silently; NON-empty ones warn — this
+    loader loads code modules only, and dropping content silently is the one
+    thing the house rule forbids."""
+    doc = _dep_snapshot(schema="depgraph-machine-first/v2",
+                        processes=[], data_assets=[], hosts=[], rels=[],
+                        stats={"nodes": 2})
+    path = _write(tmp_path, "drydocs-20260101-0000.json", doc)
+    with caplog.at_level("WARNING", logger="drydocs.loaders.code_snapshot"):
+        assert len(read_snapshot(path)["nodes"]) == 2
+    assert not [r for r in caplog.records if "does NOT" in r.message]
+
+    doc["processes"] = [{"node_id": "x"}]
+    path2 = _write(tmp_path, "drydocs-20260102-0000.json", doc)
+    with caplog.at_level("WARNING", logger="drydocs.loaders.code_snapshot"):
+        read_snapshot(path2)
+    assert any("processes" in r.getMessage() for r in caplog.records
+               if r.levelname == "WARNING")
+
+
 def test_refuses_zero_nodes(tmp_path: Path) -> None:
     """'Succeeds loudly, does nothing' — an empty load is a refusal, not an OK."""
     path = _write(tmp_path, "drydocs-20260101-0000.json", _dep_snapshot(nodes=[]))
