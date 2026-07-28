@@ -2414,7 +2414,7 @@ items:
     agent: main
     model: sonnet
     priority: p3
-    status: todo
+    status: done
     depends_on: []
     inputs: [docs/design/drydocs-startup-refresh-runbook.md, scripts/render_design_doc.py]
     acceptance: >
@@ -2432,6 +2432,14 @@ items:
       re-pointed 7689->7687) — this item is documentation-only catch-up
       through the governed doc pipeline (CLAUDE.md L13 idiom: one .html,
       deterministic render, no hand-restyling).
+      DONE 2026-07-28: Rev 2 -> Rev 3. Container/ports fixed in prerequisite 1,
+      the NEO4J_URI example, Startup step 1, Rollback step 3, Appendix A and
+      Appendix B. Appendix A is now stated as a RENDER of
+      config/dev-environment.yaml rather than an independently-maintained
+      table — the drift happened because the doc kept its own copy of facts
+      that file already owns. Render proven deterministic (rendered twice,
+      byte-identical). test_doc_traceability_loader.py pins the parsed rev, so
+      its expected value moved with the bump.
 
   - id: L17
     epic: doc-infrastructure
@@ -7265,7 +7273,7 @@ items:
     agent: main
     model: sonnet
     priority: p2
-    status: todo
+    status: done
     depends_on: []
     inputs: [PORT-MANIFEST.yaml, tests/unit/test_port_reconcile_guards.py, git-readme.md]
     acceptance: >
@@ -7290,6 +7298,21 @@ items:
       inverse question: which paths match NO row? Until it exists every port
       re-derives the same judgment calls and the manifest keeps disagreeing
       with practice.
+      DONE 2026-07-28. Measured answer: 398 of 1415 tracked paths (28%) took
+      `default:` with nothing written down. FOUR became real rows, and the
+      first is the finding that justifies the item on its own —
+      docs/restructure/backlog.yaml HAD NO ROW, so the manifest was telling
+      the consumer that a blind checkout of the producer's plan was an
+      acceptable resolution for a file whose ids overlap both sides; it is now
+      per-entry with an entry_rule modelled on the taxonomy-ontology-map row.
+      Also new rows: docs/plan/board.html (derived — regenerate, never take
+      the producer render), docs/design/** and libs/oracle_kerberos/**
+      (evaluate + warning notes; the second records that the oracle_adapter.py
+      port-freeze does NOT extend there). Everything else became a
+      `default_ok:` entry — BEHAVIOR-PRESERVING by construction, recording why
+      the default is right rather than changing it — including the git-readme.md
+      standing decision, which now has its own regression test. Guard proven to
+      bite against an uncovered probe file, not just in principle.
   - id: G36
     epic: component-topology
     title: "Drop the three never-consulted :BusinessApplication indexes (risk_level/status/name) and decide coverage for the one property that IS a predicate, manually_created"
@@ -7426,11 +7449,11 @@ items:
       that escalates to the UI workstream, not a forced upgrade.
 
 summary:
-  todo: 55                                         # +4 at the 2026-07-28 inbox groom (C19 ontology-comment fix, J16 port-manifest fall-through guard, L17 doc-loader prereq guards, O34 web npm advisories); C19 closed same day; prior: +5 2026-07-27 groom (J14/J15/G36/O33/G38), +2 PAT review (C17/C18), +5 code-graph-review (U1-U5), +2 cmdline seam (G39/G40, built+closed same day)
+  todo: 53                                         # +4 at the 2026-07-28 inbox groom (C19 ontology-comment fix, J16 port-manifest fall-through guard, L17 doc-loader prereq guards, O34 web npm advisories); C19 + J16 closed same day, L16 closed alongside; prior: +5 2026-07-27 groom (J14/J15/G36/O33/G38), +2 PAT review (C17/C18), +5 code-graph-review (U1-U5), +2 cmdline seam (G39/G40, built+closed same day)
   in_progress: 1                                   # E1 (gate deferred both sides)
   blocked: 0
-  done: 147                                        # 2026-07-28: C19 ontology-comment fix (groomed + closed same day). 2026-07-27 closes: J14 SEALID split, P3 hosts+RUNS_ON, G21 rua code-ops, G24 code-repo seam, G26 launcher-registry config, Q8 bmc-docs prereq, C18 shadow-model guard, J15 value-shape boundary guard, G33 code-snapshot loader (gate signed + built same day), G39 cmdline staging store + G40 parse (groomed am, built pm)
-  next_ready: [M3, M4, J10, Q6, O23, J13, O26, O27, C15, C16, C17, O28, R3, R4, L16, L17, O29, O30, O31, O32, S1, S8, S9, Q7, G32, G34, G35, O33, O34, P5, G22, J16, U1, U2, U3]
+  done: 149                                        # 2026-07-28: C19 ontology-comment fix (groomed + closed same day), J16 port-manifest fall-through guard (same), L16 runbook container/port refresh. 2026-07-27 closes: J14 SEALID split, P3 hosts+RUNS_ON, G21 rua code-ops, G24 code-repo seam, G26 launcher-registry config, Q8 bmc-docs prereq, C18 shadow-model guard, J15 value-shape boundary guard, G33 code-snapshot loader (gate signed + built same day), G39 cmdline staging store + G40 parse (groomed am, built pm)
+  next_ready: [M3, M4, J10, Q6, O23, J13, O26, O27, C15, C16, C17, O28, R3, R4, L17, O29, O30, O31, O32, S1, S8, S9, Q7, G32, G34, G35, O33, O34, P5, G22, U1, U2, U3]
   # 2026-07-27 code-graph-review groom: U1-U3 = the three personas of
   # docs/reviews/code-graph-review-plan.md, dependency-free -> next_ready;
   # U4/U5 = the optional skill edits, gated on their phase (U1/U2) proving the
