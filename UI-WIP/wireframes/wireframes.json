@@ -1,0 +1,128 @@
+{
+  "meta": {
+    "title": "DryDocs console wireframes — SME review set",
+    "spec_version": "1",
+    "date": "2026-07-28",
+    "source_branch": "feat/datalens-quickwins",
+    "feedback_addressed": [
+      {"id": "FB-2026-07-28-01", "text": "Landing hub image has too many items in it", "disposition": "hub art demoted to a small decorative mark; navigation moves to explicit category pick-lists (WF-LND-05/06)"},
+      {"id": "FB-2026-07-28-02", "text": "Display name is cluttered, not readable", "disposition": "product name appears ONCE (nav wordmark); hero h1 becomes the value proposition (design-review rec #2)"}
+    ],
+    "key_convention": "WF-<VIEW>-<NN>; SME feedback cites the key; keys map to label/data/react/graph in KEYS.md and re-attach through the L5/L6 loop"
+  },
+  "views": [
+    {
+      "id": "landing",
+      "title": "Landing / Overview — decluttered, category-first (proposed)",
+      "route": "/",
+      "canvas": [1280, 860],
+      "elements": [
+        {"key": "WF-LND-01", "type": "box", "x": 20, "y": 20, "w": 1240, "h": 56,
+         "label": "Header: wordmark (only place the product name renders) · search · env pills · theme toggle · persona",
+         "meta": {"label_src": "static wordmark + persona displayName", "data": "lib/auth.ts PERSONAS (mock)", "react": "layout/Header.tsx + components/BrandMark.tsx", "graph": "n/a (auth pending O1 ADR)"}},
+        {"key": "WF-LND-02", "type": "text", "x": 40, "y": 110, "w": 560, "h": 60,
+         "label": "H1 (value prop, NOT the product name): 'A Don’t-Repeat-Yourself Knowledge Graph'",
+         "meta": {"label_src": "static copy", "data": "static", "react": "routes/OverviewRoute.tsx hero copy", "graph": "n/a"}},
+        {"key": "WF-LND-03", "type": "text", "x": 40, "y": 180, "w": 560, "h": 44,
+         "label": "Subline: 'Pick an area below to start — every view is backed by the graph.'",
+         "meta": {"label_src": "static copy", "data": "static", "react": "routes/OverviewRoute.tsx", "graph": "n/a"}},
+        {"key": "WF-LND-04", "type": "box", "x": 640, "y": 100, "w": 220, "h": 130,
+         "label": "Kept Orbit mark — SMALL, decorative only (replaces the dense radial hub; FB-01)",
+         "meta": {"label_src": "brand mark", "data": "static SVG", "react": "components/BrandMark.tsx (HeroArt.tsx demoted)", "graph": "n/a"}},
+        {"key": "WF-LND-05", "type": "list", "x": 40, "y": 260, "w": 580, "h": 380,
+         "label": "PICK-LIST A — 'What do you want to look at?' (modules; tagline + phase badge per row)",
+         "items": [
+           "Explorer — Tower / app drill-down graph",
+           "Lineage — Source → target DAG",
+           "Ownership — SEAL → PAT → team rollup",
+           "Runbooks — Data-series provisioning chain",
+           "Remediation — Finding → fix-batch flow",
+           "Docs — Document → Chunk corpus map",
+           "Gates — Gate dependency graph",
+           "Loads — Loader → JobRun timeline",
+           "Under the Hood — retrieval benchmark"
+         ],
+         "meta": {"label_src": "MODULES[].label + tagline", "data": "modules/registry.ts (static registry)", "react": "routes/OverviewRoute.tsx → new CategoryList; rows link MODULES[].path", "graph": "per-module backsOnto: drydocs / seal-attribution / docmeta / … (registry backsOnto field)"}},
+        {"key": "WF-LND-06", "type": "list", "x": 660, "y": 260, "w": 580, "h": 250,
+         "label": "PICK-LIST B — 'Business area / tower' (SME picks a target; scopes Explorer + Lineage)",
+         "items": [
+           "Home Lending — 12 Products · 42 Teams",
+           "Tower Auto",
+           "Credit Cards",
+           "Infrastructure (shared platform)"
+         ],
+         "meta": {"label_src": "TOWERS[].title + stats", "data": "data/towers.ts (SYNTHESIZED fixture); live target = LOB→Product→Team taxonomy", "react": "components/TowerDrill.tsx entry cards", "graph": "MATCH (t:Tower {name: $title}) — fixture cypherHtml; live: org taxonomy rollup"}},
+        {"key": "WF-LND-07", "type": "box", "x": 660, "y": 530, "w": 580, "h": 110,
+         "label": "Getting-started checklist (existing 0/5 list, unchanged)",
+         "meta": {"label_src": "static checklist copy", "data": "static", "react": "routes/OverviewRoute.tsx", "graph": "n/a"}},
+        {"key": "WF-LND-08", "type": "text", "x": 40, "y": 680, "w": 1200, "h": 40,
+         "label": "Provenance footer: 'Signed in as … · demo/synthetic content tagged EXAMPLE DATA · ILLUSTRATIVE'",
+         "meta": {"label_src": "session + honesty tag", "data": "lib/auth.ts session", "react": "routes/OverviewRoute.tsx footer", "graph": "n/a"}}
+      ]
+    },
+    {
+      "id": "loads",
+      "title": "Loads — run timeline (as built on feat/datalens-quickwins)",
+      "route": "/loads",
+      "canvas": [1280, 800],
+      "elements": [
+        {"key": "WF-LDS-01", "type": "box", "x": 20, "y": 20, "w": 1240, "h": 48,
+         "label": "Module toolbar: breadcrumb Home / Loads · Layout · Fit · Refresh · Export",
+         "meta": {"label_src": "MODULES.loads.label", "data": "modules/registry.ts", "react": "layout/ModuleToolbar.tsx", "graph": "n/a"}},
+        {"key": "WF-LDS-02", "type": "chip", "x": 40, "y": 90, "w": 360, "h": 36,
+         "label": "StatusChips: ✔ 3 completed · ✗ 1 failed · ~ running (DL-3)",
+         "meta": {"label_src": "counts derived from runs[].status", "data": "loads/demoLoads.ts fixture → live QuerySpec loads.runs.v1", "react": "components/ui/StatusChip.tsx in loads/LoadsTimeline.tsx", "graph": ":JobRun.status ∈ {COMPLETED, FAILED, …}"}},
+        {"key": "WF-LDS-03", "type": "meter", "x": 420, "y": 90, "w": 200, "h": 36,
+         "label": "Completion meter 75% — green only at threshold (DL-4)",
+         "meta": {"label_src": "completed/total", "data": "derived from runs[]", "react": "components/ui/Meter.tsx", "graph": "count(:JobRun {status:'COMPLETED'}) / count(:JobRun)"}},
+        {"key": "WF-LDS-04", "type": "chip", "x": 900, "y": 90, "w": 340, "h": 36,
+         "label": "Mode tag: 'LIVE — :JobRun envelope' vs 'EXAMPLE DATA · ILLUSTRATIVE'",
+         "meta": {"label_src": "live boolean", "data": "QuerySpec reachability", "react": "loads/LoadsTimeline.tsx header tag", "graph": "n/a (transport state)"}},
+        {"key": "WF-LDS-05", "type": "list", "x": 40, "y": 150, "w": 1200, "h": 420,
+         "label": "Run timeline (dot-and-rail, newest first) — row anatomy: loader · source · status chip · start→end · rows/changed/rejected/marked-removed · run_id",
+         "items": [
+           "seal_attribution · controlm-variable-normalization · COMPLETED",
+           "controlm_jobs · controlm-psgmgr · COMPLETED",
+           "controlm_folders · controlm-psgmgr · FAILED",
+           "bmc_docs · bmc-docs-corpus · COMPLETED"
+         ],
+         "meta": {"label_src": "RunRow fields", "data": "loads/demoLoads.ts → live loads.runs.v1", "react": "loads/LoadsTimeline.tsx (statusToken → --green/--status-fail-soft/--yellow)", "graph": ":JobRun {run_id, loader, source, status, started_at, completed_at, rows_processed, rows_changed, rows_rejected, nodes_marked_removed, nodes_reactivated}"}},
+        {"key": "WF-LDS-06", "type": "box", "x": 40, "y": 590, "w": 1200, "h": 60,
+         "label": "Data-frame tabs: Runs · Rejects · Drift/coverage",
+         "meta": {"label_src": "MODULES.loads.tabs", "data": "modules/registry.ts", "react": "explorer/DataFrame.tsx via ModuleTemplate", "graph": "per-tab QuerySpecs"}},
+        {"key": "WF-LDS-07", "type": "text", "x": 40, "y": 660, "w": 1200, "h": 40,
+         "label": "Fallback banner: 'Live QuerySpec loads.runs.v1 unavailable … showing the SYNTHESIZED demo frame instead.'",
+         "meta": {"label_src": "static template + spec id", "data": "QuerySpec error state", "react": "ModuleTemplate fallback banner", "graph": "n/a"}}
+      ]
+    },
+    {
+      "id": "underhood",
+      "title": "Under the Hood — retrieval benchmark (as built)",
+      "route": "/under-the-hood",
+      "canvas": [1280, 800],
+      "elements": [
+        {"key": "WF-UTH-01", "type": "box", "x": 20, "y": 20, "w": 1240, "h": 90,
+         "label": "StatTiles headline row: 12/12 recall · 27.4× token efficiency · ~4.1k vs ~112.4k · 75ms · 374/26 · 3 strategies (tabular-nums, DL-1)",
+         "meta": {"label_src": "benchmark verdict figures", "data": "underhood/benchmarkData.ts (P0 fixture; regenerated by O31)", "react": "components/StatTiles.tsx", "graph": "docmeta P0 corpus (Document/Chunk graph) — fixture of committed verdict"}},
+        {"key": "WF-UTH-02", "type": "box", "x": 20, "y": 130, "w": 1240, "h": 150,
+         "label": "Three strategy cards: Manifest-routed · Full-text (Lucene top-3) · Graph traversal — recall/tokens/latency + failure modes",
+         "meta": {"label_src": "StrategyCards copy", "data": "underhood/benchmarkData.ts", "react": "underhood/StrategyCards.tsx", "graph": "traversal = Document→Chunk Cypher; fulltext = Neo4j Lucene index"}},
+        {"key": "WF-UTH-03", "type": "chip", "x": 20, "y": 300, "w": 500, "h": 36,
+         "label": "Pass chips: 11 Traversal · 6 Full-text · 9 Manifest / 12 (DL-3)",
+         "meta": {"label_src": "derived pass counts", "data": "QUESTIONS[].{traversal,fulltext,manifest}.kind", "react": "components/ui/StatusChip.tsx in underhood/Scoreboard.tsx", "graph": "n/a (fixture aggregate)"}},
+        {"key": "WF-UTH-04", "type": "list", "x": 20, "y": 350, "w": 760, "h": 380,
+         "label": "Scoreboard: 12 fixed support questions × 3 strategies; ResultChip pass/fail/partial/abstain/hallucination (fail = --status-fail-soft, DL-2)",
+         "items": [
+           "SA1 structure/aggregation — how many documents …",
+           "EL1 exact lookup — what is %%LIBMEMSYM",
+           "PC1 paraphrase — job waits on job",
+           "… 12 rows total"
+         ],
+         "meta": {"label_src": "QUESTIONS[].question + class", "data": "underhood/benchmarkData.ts", "react": "underhood/Scoreboard.tsx + underhood/ResultChip.tsx", "graph": "per-question executed Cypher recorded in fixture"}},
+        {"key": "WF-UTH-05", "type": "box", "x": 800, "y": 350, "w": 460, "h": 380,
+         "label": "Question detail: per-strategy chars/ms + verdict prose for the selected row",
+         "meta": {"label_src": "selected question record", "data": "underhood/benchmarkData.ts", "react": "underhood/QuestionDetail.tsx", "graph": "as above"}}
+      ]
+    }
+  ]
+}

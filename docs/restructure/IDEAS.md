@@ -26,6 +26,23 @@ Tags help grooming: `idea` · `bug` · `doc` · `source` (new data source) · `q
 
 <!-- add new ideas at the top -->
 
+- 2026-07-28 — [idea] **SME feedback FB-01/FB-02 + landing declutter proposal (wireframes
+  shipped).** SME feedback on the landing: the hub image has too many items; the display
+  name is cluttered/not readable (echoes design-review rec #2). Proposal wireframed:
+  demote HeroArt to a small decorative mark, product name renders once (nav wordmark),
+  h1 becomes the value prop, and navigation moves to two explicit pick-lists — modules
+  ("what do you want to look at?", from `modules/registry.ts`) and business towers
+  (SME picks a target, scopes Explorer/Lineage). Wireframes + key legend + deterministic
+  stdlib renderer: `UI-WIP/wireframes/` (`python UI-WIP/wireframes/render_wireframes.py`);
+  every element keys to label/data/React/Cypher (`out/KEYS.md`) so feedback re-attaches
+  per the L5/L6 idiom. SME launch runbook: `UI-WIP/sme-ui-launch-guide.md` (fixture mode
+  today, live checklist for T2-1). Groom candidate: implement the WF-LND landing revision.
+
+- 2026-07-28 — [bug] **Loads timeline rail dot clips the first character of loader names**
+  ("eal_attribution", "ntrolm_folders") — seen in branch screenshots 2026-07-28, both
+  themes; pre-existing dot-and-rail layout in `web/src/loads/LoadsTimeline.tsx` (li pl-6
+  vs absolute dot), not from the DL quick wins. One-line padding fix + screenshot check.
+
 - 2026-07-28 — [idea] **DSI (Data State Intelligence) reviewed — the data-management view;
   DryDocs sits between it and DataLens.** Screenshots classified Internal-Confidential in
   `internal/dsi-reference/` (real hostnames + a person's name); groomed findings appended to
