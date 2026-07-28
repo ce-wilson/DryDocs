@@ -26,6 +26,16 @@ Tags help grooming: `idea` · `bug` · `doc` · `source` (new data source) · `q
 
 <!-- add new ideas at the top -->
 
+- 2026-07-28 — [idea] **Runtime-monitor (HL DataLens) UI continuity — groom candidates
+  DL-1…DL-9 in `internal/datalens-reference/continuity.md`** (moved from UI-WIP with the
+  screenshots per DL-9's home-ruling — it quotes real identifier shapes). DataLens is the SRE runtime view over the
+  same batch estate; users will hop between it and the console, so the doc maps the seams
+  (theme polarity → O32 merge, shape language, brand-red vs status-red) into 8 proposed
+  items + 1 groom-merge, quick wins flagged (DL-1 tabular-nums, DL-2 `--status-fail` token
+  split, DL-3 status chips, DL-4 threshold meter, DL-9 publish-boundary re-home of the
+  `HL-Datalens-ui-*.png` screenshots currently at repo root — that one is p2, do first).
+  Also records the ruled-out adoptions (emoji icons, gradient banners, stacked drill-down).
+
 - 2026-07-28 — [idea] **Agent graph-navigation surface** (benchmarked live 2026-07-28): agents
   answering code-nav questions from the loaded code graph instead of the filesystem is real —
   5 questions in ~410ms / ~1.2k chars total vs grep's noisy or infeasible equivalents
