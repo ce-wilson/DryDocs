@@ -26,13 +26,6 @@ Tags help grooming: `idea` · `bug` · `doc` · `source` (new data source) · `q
 
 <!-- add new ideas at the top -->
 
-- 2026-07-27 — [chore] **EE home db `neo4j` carries pre-existing stray sample loads** (17
-  ControlMJob, 15 Condition, 8 ControlMFolder, ontology terms, 8 JobRun — found during the G33
-  live load when `.env` drift pointed loads there; my session's strays cleaned, these predate
-  it). dev-environment.yaml says the home db is outside the topology and no query surface reads
-  it — decide: wipe it (`MATCH (n) DETACH DELETE n` on `neo4j` db) or leave as scratch. Cheap
-  either way; the .env comment now warns against the drift recurring.
-
 - 2026-07-27 — [bug] **`ontology.cypher:109` points at a file that was never created —
   `ontology/reference/swo_sdlc_ontology.cypher` does not exist anywhere in the tree.** The
   comment reads: *"Full SDLC subset (~250 terms) loads from ontology/reference/swo_sdlc_ontology.cypher
@@ -903,6 +896,9 @@ Tags help grooming: `idea` · `bug` · `doc` · `source` (new data source) · `q
 
 ## Recently groomed (audit trail)
 
+- 2026-07-27 — [chore] EE home db `neo4j` pre-existing strays → **RESOLVED same day, no item**:
+  user ruled "wipe it, it can be rebuilt" — 288 nodes deleted, 0 remain; topology DBs verified
+  untouched (drydocs 834). The .env comment + dev-environment.yaml home_db_warning guard recurrence.
 - 2026-07-27 — [idea] code-graph multi-persona review plan (docs/reviews/code-graph-review-plan.md)
   → **U1** (python-architect, opus), **U2** (PM backlog-truth audit), **U3** (tech-writer
   doc-status board) — all next_ready; optional skill-edit follow-ups → **U4** (tech-debt,
