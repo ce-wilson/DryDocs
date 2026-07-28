@@ -6046,6 +6046,12 @@ items:
       functional today, but derived, not designed"). Not previously tracked
       as its own item (checked backlog.yaml — only a passing site-plan §2
       mention of the equivalent solid-outline treatment).
+      DL-7 merge (2026-07-28, internal/datalens-reference/continuity.md): the
+      light pass should land on (or consciously near) the runtime monitor's
+      observed values — bg ~#F4F6FA, tinted table headers #EEF2F7, threshold
+      green/--status-fail semantics per DL-2 — light mode is the bridge
+      surface between the console and the SRE runtime view, and theme
+      polarity is the harshest transition between the two tools.
 
   # ── Epic R — Agentic Q&A console (ADR 0007; phase 15) ──────────────────────
   # Groomed 2026-07-23 from the llm-graph-builder vs knowledge-graph-of-thoughts

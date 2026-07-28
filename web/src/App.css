@@ -58,7 +58,7 @@
 .persona-card .persona-chip { font-size: 12px; color: var(--muted); grid-row: 3; grid-column: 1 / -1; }
 .role-badge { font: 600 10.5px var(--mono); text-transform: uppercase; padding: 3px 8px; border-radius: 4px; align-self: start; }
 .role-badge.role-user { border: 1px solid var(--blue-br); color: var(--blue-br); background: rgba(77, 139, 224, 0.1); }
-.role-badge.role-admin { border: 1px solid var(--red); color: var(--red-soft); background: rgba(200, 32, 46, 0.12); }
+.role-badge.role-admin { border: 1px solid var(--status-fail); color: var(--status-fail-soft); background: color-mix(in srgb, var(--status-fail) 12%, transparent); } /* DL-2: danger ≠ brand red */
 
 /* ── landing: hero / features / towers ─────────────────────────────────── */
 .hero { display: grid; grid-template-columns: 1fr 1.15fr; gap: 20px; align-items: center; padding: 44px 0 40px; }
@@ -156,7 +156,7 @@ td:first-child { font-family: var(--sans); font-weight: 500; font-size: 12.5px; 
 .badge-snow, .badge-pat { font: 500 9.5px var(--mono); padding: 3px 8px; border-radius: 4px; white-space: nowrap; }
 .badge-snow-read { border: 1px solid var(--blue-br); color: var(--blue-br); background: rgba(77, 139, 224, 0.1); }
 .badge-snow-contribute { border: 1px solid var(--green); color: var(--green); background: rgba(58, 174, 107, 0.1); }
-.badge-snow-admin { border: 1px solid var(--red); color: var(--red-soft); background: rgba(200, 32, 46, 0.12); }
+.badge-snow-admin { border: 1px solid var(--status-fail); color: var(--status-fail-soft); background: color-mix(in srgb, var(--status-fail) 12%, transparent); } /* DL-2: danger ≠ brand red */
 .badge-pat { border: 1px solid var(--yellow); color: var(--yellow); background: rgba(217, 184, 49, 0.08); }
 
 /* ── graph explorer (live view, O6) ────────────────────────────────────── */

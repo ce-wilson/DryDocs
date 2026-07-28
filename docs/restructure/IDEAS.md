@@ -93,6 +93,49 @@ Tags help grooming: `idea` · `bug` · `doc` · `source` (new data source) · `q
   Snapshot DEFERRED to the next on-main session even though scan roots DID change this time
   (patch_window.py + cli.py + a test module are uncaptured until then) — this bug is now
   blocking the ritual whenever the tree is shared, not just muddying cross-machine diffs.
+- 2026-07-28 — [idea] **SME feedback FB-01/FB-02 + landing declutter proposal (wireframes
+  shipped).** SME feedback on the landing: the hub image has too many items; the display
+  name is cluttered/not readable (echoes design-review rec #2). Proposal wireframed:
+  demote HeroArt to a small decorative mark, product name renders once (nav wordmark),
+  h1 becomes the value prop, and navigation moves to two explicit pick-lists — modules
+  ("what do you want to look at?", from `modules/registry.ts`) and business towers
+  (SME picks a target, scopes Explorer/Lineage). Wireframes + key legend + deterministic
+  stdlib renderer: `UI-WIP/wireframes/` (`python UI-WIP/wireframes/render_wireframes.py`);
+  every element keys to label/data/React/Cypher (`out/KEYS.md`) so feedback re-attaches
+  per the L5/L6 idiom. SME launch runbook: `UI-WIP/sme-ui-launch-guide.md` (fixture mode
+  today, live checklist for T2-1). Groom candidate: implement the WF-LND landing revision.
+
+- 2026-07-28 — [bug] **Loads timeline rail dot clips the first character of loader names**
+  ("eal_attribution", "ntrolm_folders") — seen in branch screenshots 2026-07-28, both
+  themes; pre-existing dot-and-rail layout in `web/src/loads/LoadsTimeline.tsx` (li pl-6
+  vs absolute dot), not from the DL quick wins. One-line padding fix + screenshot check.
+
+- 2026-07-28 — [idea] **DSI (Data State Intelligence) reviewed — the data-management view;
+  DryDocs sits between it and DataLens.** Screenshots classified Internal-Confidential in
+  `internal/dsi-reference/` (real hostnames + a person's name); groomed findings appended to
+  `internal/datalens-reference/continuity.md` §Addendum: DL-10 (StatTiles click-to-filter, DSI's
+  KPI-card→filter idiom), DL-11 (RAW→TRUSTED→REFINED→SNOWFLAKE is the estate's canonical stage
+  taxonomy — (a) UI chips fold into DL-6, (b) `config/taxonomy/` capture is a NEW taxonomy-layer
+  requirement wanting an SME gate), DL-12 (status-vocabulary → StatusChip token map), plus an
+  Epic R precedent note for the R1/ADR-0007 gate (DSI ships an embedded assistant + question-led
+  home in production — bank precedent for agentic Q&A; DryDocs differentiates on relationship
+  questions). Note DL-11(b) likely intersects the Snowflake data-catalog entry below (same
+  dataset/distribution estate seen from the management side).
+
+- 2026-07-28 — [idea] **Runtime-monitor (HL DataLens) UI continuity — groom candidates
+  DL-1…DL-9 in `internal/datalens-reference/continuity.md`** (moved from UI-WIP with the
+  screenshots per DL-9's home-ruling — it quotes real identifier shapes). DataLens is the SRE runtime view over the
+  same batch estate; users will hop between it and the console, so the doc maps the seams
+  (theme polarity → O32 merge, shape language, brand-red vs status-red) into 8 proposed
+  items + 1 groom-merge, quick wins flagged (DL-1 tabular-nums, DL-2 `--status-fail` token
+  split, DL-3 status chips, DL-4 threshold meter, DL-9 publish-boundary re-home of the
+  `HL-Datalens-ui-*.png` screenshots currently at repo root — that one is p2, do first).
+  Also records the ruled-out adoptions (emoji icons, gradient banners, stacked drill-down).
+  *Execution note:* quick wins DL-9/2/1/3/4 + the DL-7 merge shipped 2026-07-28 on
+  `feat/datalens-quickwins`; DL-5/6/8 + DL-10..12 remain for the groom.
+  <!-- merge note 2026-07-28: the branch's copy of the Snowflake data-catalog [source]
+       entry was dropped here, not lost — main groomed it same day into G42–G44
+       (3f8890a); see the audit trail below. -->
 - 2026-07-28 — [idea] **Agent graph-navigation surface** (benchmarked live 2026-07-28): agents
   answering code-nav questions from the loaded code graph instead of the filesystem is real —
   5 questions in ~410ms / ~1.2k chars total vs grep's noisy or infeasible equivalents

@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 800" font-family="sans-serif">
+<rect width="1280" height="800" fill="#f4f6f9"/>
+<text x="20" y="766" font-size="15" font-weight="bold" fill="#111a26">Under the Hood — retrieval benchmark (as built)</text>
+<text x="20" y="786" font-family="monospace" font-size="11" fill="#48566c">/under-the-hood · wireframe spec v1 · 2026-07-28 · feat/datalens-quickwins · keys resolve in KEYS.md</text>
+<rect x="20" y="20" width="1240" height="90" rx="6" fill="#ffffff" stroke="#94a3b8" stroke-width="1.4"/>
+<rect x="20" y="4" width="91" height="18" rx="4" fill="#2e6bc4"/>
+<text x="25" y="17" font-family="monospace" font-size="12" fill="#ffffff">WF-UTH-01</text>
+<text x="32" y="40" font-family="sans-serif" font-size="13" fill="#111a26">StatTiles headline row: 12/12 recall · 27.4× token efficiency · ~4.1k vs ~112.4k · 75ms · 374/26 · 3 strategies (tabular-nums, DL-1)</text>
+<rect x="20" y="130" width="1240" height="150" rx="6" fill="#ffffff" stroke="#94a3b8" stroke-width="1.4"/>
+<rect x="20" y="114" width="91" height="18" rx="4" fill="#2e6bc4"/>
+<text x="25" y="127" font-family="monospace" font-size="12" fill="#ffffff">WF-UTH-02</text>
+<text x="32" y="150" font-family="sans-serif" font-size="13" fill="#111a26">Three strategy cards: Manifest-routed · Full-text (Lucene top-3) · Graph traversal — recall/tokens/latency + failure modes</text>
+<rect x="20" y="300" width="500" height="36" rx="18" fill="#ffffff" stroke="#94a3b8" stroke-width="1.4" stroke-dasharray="6 4"/>
+<rect x="20" y="284" width="91" height="18" rx="4" fill="#2e6bc4"/>
+<text x="25" y="297" font-family="monospace" font-size="12" fill="#ffffff">WF-UTH-03</text>
+<text x="32" y="320" font-family="sans-serif" font-size="13" fill="#111a26">Pass chips: 11 Traversal · 6 Full-text · 9 Manifest / 12 (DL-3)</text>
+<rect x="20" y="350" width="760" height="380" rx="6" fill="#ffffff" stroke="#94a3b8" stroke-width="1.4"/>
+<rect x="20" y="334" width="91" height="18" rx="4" fill="#2e6bc4"/>
+<text x="25" y="347" font-family="monospace" font-size="12" fill="#ffffff">WF-UTH-04</text>
+<text x="32" y="370" font-family="sans-serif" font-size="13" fill="#111a26">Scoreboard: 12 fixed support questions × 3 strategies; ResultChip</text>
+<text x="32" y="387" font-family="sans-serif" font-size="13" fill="#111a26">pass/fail/partial/abstain/hallucination (fail = --status-fail-soft, DL-2)</text>
+<circle cx="42" cy="400" r="3" fill="#48566c"/>
+<text x="54" y="404" font-family="sans-serif" font-size="12.5" fill="#48566c">SA1 structure/aggregation — how many documents …</text>
+<circle cx="42" cy="421" r="3" fill="#48566c"/>
+<text x="54" y="425" font-family="sans-serif" font-size="12.5" fill="#48566c">EL1 exact lookup — what is %%LIBMEMSYM</text>
+<circle cx="42" cy="442" r="3" fill="#48566c"/>
+<text x="54" y="446" font-family="sans-serif" font-size="12.5" fill="#48566c">PC1 paraphrase — job waits on job</text>
+<circle cx="42" cy="463" r="3" fill="#48566c"/>
+<text x="54" y="467" font-family="sans-serif" font-size="12.5" fill="#48566c">… 12 rows total</text>
+<rect x="800" y="350" width="460" height="380" rx="6" fill="#ffffff" stroke="#94a3b8" stroke-width="1.4"/>
+<rect x="800" y="334" width="91" height="18" rx="4" fill="#2e6bc4"/>
+<text x="805" y="347" font-family="monospace" font-size="12" fill="#ffffff">WF-UTH-05</text>
+<text x="812" y="370" font-family="sans-serif" font-size="13" fill="#111a26">Question detail: per-strategy chars/ms + verdict prose for</text>
+<text x="812" y="387" font-family="sans-serif" font-size="13" fill="#111a26">the selected row</text>
+</svg>

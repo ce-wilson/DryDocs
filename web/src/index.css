@@ -25,6 +25,12 @@ a { color: var(--blue-br); }
 
 code { font-family: var(--mono); }
 
+/* DL-1 (internal/datalens-reference/continuity.md): digit columns align in every
+   table regardless of typeface — Plex Mono is fixed-width anyway; this covers the
+   Plex Sans cells (counts, timestamps) so numeric columns never wobble. Spot
+   applications on non-table numerics use Tailwind's `tabular-nums` utility. */
+table { font-variant-numeric: tabular-nums; }
+
 button { font: inherit; color: inherit; cursor: pointer; }
 
 input, select, textarea {

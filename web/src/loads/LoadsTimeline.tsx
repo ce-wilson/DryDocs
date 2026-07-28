@@ -1,4 +1,6 @@
 import type { RunRow } from './demoLoads'
+import StatusChip from '../components/ui/StatusChip'
+import Meter from '../components/ui/Meter'
 
 // The /loads canvas (O16, site-plan §3 row 8): loader → :JobRun provenance as
 // a run TIMELINE — dot-and-rail vertical list, newest first, status colored
@@ -6,7 +8,9 @@ import type { RunRow } from './demoLoads'
 // frame linking, the Explorer contract).
 
 function statusToken(status: RunRow['status']): string {
-  return status === 'COMPLETED' ? '--green' : status === 'FAILED' ? '--red' : '--yellow'
+  // FAILED = --status-fail-soft (text-safe in both themes), not --red — red is
+  // brand-only per DL-2 (internal/datalens-reference/continuity.md).
+  return status === 'COMPLETED' ? '--green' : status === 'FAILED' ? '--status-fail-soft' : '--yellow'
 }
 
 export default function LoadsTimeline({
@@ -20,10 +24,22 @@ export default function LoadsTimeline({
   selectedRunId: string | null
   onSelect: (runId: string | null) => void
 }) {
+  // DL-3 summary chips: the run population at a glance, before scanning the rail.
+  const completed = runs.filter((r) => r.status === 'COMPLETED').length
+  const failed = runs.filter((r) => r.status === 'FAILED').length
+  const other = runs.length - completed - failed
   return (
     <div className="flex h-full min-h-0 flex-col">
       <div className="flex shrink-0 flex-wrap items-center gap-1.5 border-b border-edge-soft px-3 py-2">
         <span className="text-xs font-medium text-muted">Run timeline · newest first</span>
+        <StatusChip count={completed} label="completed" token="--green" glyph="✔" />
+        <StatusChip count={failed} label="failed" token="--status-fail-soft" glyph="✗" />
+        {other > 0 && <StatusChip count={other} label="running" token="--yellow" glyph="~" />}
+        {runs.length > 0 && (
+          // DL-4: run-completion meter — green only when every run completed;
+          // any failed/running run drops it below threshold and it reads fail-rose.
+          <Meter value={(completed / runs.length) * 100} label="runs completed" />
+        )}
         <span
           className={
             'ml-auto rounded border px-2 py-0.5 font-mono text-[10px] ' +
@@ -70,7 +86,7 @@ export default function LoadsTimeline({
                   <span>rows {r.rows_processed}</span>
                   <span>changed {r.rows_changed}</span>
                   {r.rows_rejected > 0 && <span className="text-yellow">rejected {r.rows_rejected}</span>}
-                  {r.nodes_marked_removed > 0 && <span className="text-brand-soft">marked-removed {r.nodes_marked_removed}</span>}
+                  {r.nodes_marked_removed > 0 && <span className="text-status-fail-soft">marked-removed {r.nodes_marked_removed}</span>}
                   {r.nodes_reactivated > 0 && <span>reactivated {r.nodes_reactivated}</span>}
                 </div>
                 <div className="mt-0.5 break-all font-mono text-[9px] text-faint">{r.run_id}</div>

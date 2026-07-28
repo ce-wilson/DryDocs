@@ -1,0 +1,69 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 860" font-family="sans-serif">
+<rect width="1280" height="860" fill="#f4f6f9"/>
+<text x="20" y="826" font-size="15" font-weight="bold" fill="#111a26">Landing / Overview — decluttered, category-first (proposed)</text>
+<text x="20" y="846" font-family="monospace" font-size="11" fill="#48566c">/ · wireframe spec v1 · 2026-07-28 · feat/datalens-quickwins · keys resolve in KEYS.md</text>
+<rect x="20" y="20" width="1240" height="56" rx="6" fill="#ffffff" stroke="#94a3b8" stroke-width="1.4"/>
+<rect x="20" y="4" width="91" height="18" rx="4" fill="#2e6bc4"/>
+<text x="25" y="17" font-family="monospace" font-size="12" fill="#ffffff">WF-LND-01</text>
+<text x="32" y="40" font-family="sans-serif" font-size="13" fill="#111a26">Header: wordmark (only place the product name renders) · search · env pills · theme toggle · persona</text>
+<rect x="40" y="110" width="560" height="60" rx="6" fill="#ffffff" stroke="#94a3b8" stroke-width="1.4" stroke-dasharray="6 4"/>
+<rect x="40" y="94" width="91" height="18" rx="4" fill="#2e6bc4"/>
+<text x="45" y="107" font-family="monospace" font-size="12" fill="#ffffff">WF-LND-02</text>
+<text x="52" y="130" font-family="sans-serif" font-size="13" fill="#111a26">H1 (value prop, NOT the product name): &#x27;A Don’t-Repeat-Yourself Knowledge</text>
+<text x="52" y="147" font-family="sans-serif" font-size="13" fill="#111a26">Graph&#x27;</text>
+<rect x="40" y="180" width="560" height="44" rx="6" fill="#ffffff" stroke="#94a3b8" stroke-width="1.4" stroke-dasharray="6 4"/>
+<rect x="40" y="164" width="91" height="18" rx="4" fill="#2e6bc4"/>
+<text x="45" y="177" font-family="monospace" font-size="12" fill="#ffffff">WF-LND-03</text>
+<text x="52" y="200" font-family="sans-serif" font-size="13" fill="#111a26">Subline: &#x27;Pick an area below to start — every view is backed by the</text>
+<text x="52" y="217" font-family="sans-serif" font-size="13" fill="#111a26">graph.&#x27;</text>
+<rect x="640" y="100" width="220" height="130" rx="6" fill="#ffffff" stroke="#94a3b8" stroke-width="1.4"/>
+<rect x="640" y="84" width="91" height="18" rx="4" fill="#2e6bc4"/>
+<text x="645" y="97" font-family="monospace" font-size="12" fill="#ffffff">WF-LND-04</text>
+<text x="652" y="120" font-family="sans-serif" font-size="13" fill="#111a26">Kept Orbit mark — SMALL,</text>
+<text x="652" y="137" font-family="sans-serif" font-size="13" fill="#111a26">decorative only (replaces the</text>
+<text x="652" y="154" font-family="sans-serif" font-size="13" fill="#111a26">dense radial hub; FB-01)</text>
+<rect x="40" y="260" width="580" height="380" rx="6" fill="#ffffff" stroke="#94a3b8" stroke-width="1.4"/>
+<rect x="40" y="244" width="91" height="18" rx="4" fill="#2e6bc4"/>
+<text x="45" y="257" font-family="monospace" font-size="12" fill="#ffffff">WF-LND-05</text>
+<text x="52" y="280" font-family="sans-serif" font-size="13" fill="#111a26">PICK-LIST A — &#x27;What do you want to look at?&#x27; (modules; tagline + phase badge</text>
+<text x="52" y="297" font-family="sans-serif" font-size="13" fill="#111a26">per row)</text>
+<circle cx="62" cy="310" r="3" fill="#48566c"/>
+<text x="74" y="314" font-family="sans-serif" font-size="12.5" fill="#48566c">Explorer — Tower / app drill-down graph</text>
+<circle cx="62" cy="331" r="3" fill="#48566c"/>
+<text x="74" y="335" font-family="sans-serif" font-size="12.5" fill="#48566c">Lineage — Source → target DAG</text>
+<circle cx="62" cy="352" r="3" fill="#48566c"/>
+<text x="74" y="356" font-family="sans-serif" font-size="12.5" fill="#48566c">Ownership — SEAL → PAT → team rollup</text>
+<circle cx="62" cy="373" r="3" fill="#48566c"/>
+<text x="74" y="377" font-family="sans-serif" font-size="12.5" fill="#48566c">Runbooks — Data-series provisioning chain</text>
+<circle cx="62" cy="394" r="3" fill="#48566c"/>
+<text x="74" y="398" font-family="sans-serif" font-size="12.5" fill="#48566c">Remediation — Finding → fix-batch flow</text>
+<circle cx="62" cy="415" r="3" fill="#48566c"/>
+<text x="74" y="419" font-family="sans-serif" font-size="12.5" fill="#48566c">Docs — Document → Chunk corpus map</text>
+<circle cx="62" cy="436" r="3" fill="#48566c"/>
+<text x="74" y="440" font-family="sans-serif" font-size="12.5" fill="#48566c">Gates — Gate dependency graph</text>
+<circle cx="62" cy="457" r="3" fill="#48566c"/>
+<text x="74" y="461" font-family="sans-serif" font-size="12.5" fill="#48566c">Loads — Loader → JobRun timeline</text>
+<circle cx="62" cy="478" r="3" fill="#48566c"/>
+<text x="74" y="482" font-family="sans-serif" font-size="12.5" fill="#48566c">Under the Hood — retrieval benchmark</text>
+<rect x="660" y="260" width="580" height="250" rx="6" fill="#ffffff" stroke="#94a3b8" stroke-width="1.4"/>
+<rect x="660" y="244" width="91" height="18" rx="4" fill="#2e6bc4"/>
+<text x="665" y="257" font-family="monospace" font-size="12" fill="#ffffff">WF-LND-06</text>
+<text x="672" y="280" font-family="sans-serif" font-size="13" fill="#111a26">PICK-LIST B — &#x27;Business area / tower&#x27; (SME picks a target; scopes Explorer +</text>
+<text x="672" y="297" font-family="sans-serif" font-size="13" fill="#111a26">Lineage)</text>
+<circle cx="682" cy="310" r="3" fill="#48566c"/>
+<text x="694" y="314" font-family="sans-serif" font-size="12.5" fill="#48566c">Home Lending — 12 Products · 42 Teams</text>
+<circle cx="682" cy="331" r="3" fill="#48566c"/>
+<text x="694" y="335" font-family="sans-serif" font-size="12.5" fill="#48566c">Tower Auto</text>
+<circle cx="682" cy="352" r="3" fill="#48566c"/>
+<text x="694" y="356" font-family="sans-serif" font-size="12.5" fill="#48566c">Credit Cards</text>
+<circle cx="682" cy="373" r="3" fill="#48566c"/>
+<text x="694" y="377" font-family="sans-serif" font-size="12.5" fill="#48566c">Infrastructure (shared platform)</text>
+<rect x="660" y="530" width="580" height="110" rx="6" fill="#ffffff" stroke="#94a3b8" stroke-width="1.4"/>
+<rect x="660" y="514" width="91" height="18" rx="4" fill="#2e6bc4"/>
+<text x="665" y="527" font-family="monospace" font-size="12" fill="#ffffff">WF-LND-07</text>
+<text x="672" y="550" font-family="sans-serif" font-size="13" fill="#111a26">Getting-started checklist (existing 0/5 list, unchanged)</text>
+<rect x="40" y="680" width="1200" height="40" rx="6" fill="#ffffff" stroke="#94a3b8" stroke-width="1.4" stroke-dasharray="6 4"/>
+<rect x="40" y="664" width="91" height="18" rx="4" fill="#2e6bc4"/>
+<text x="45" y="677" font-family="monospace" font-size="12" fill="#ffffff">WF-LND-08</text>
+<text x="52" y="700" font-family="sans-serif" font-size="13" fill="#111a26">Provenance footer: &#x27;Signed in as … · demo/synthetic content tagged EXAMPLE DATA · ILLUSTRATIVE&#x27;</text>
+</svg>
