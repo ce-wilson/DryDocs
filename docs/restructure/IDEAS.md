@@ -53,6 +53,12 @@ Tags help grooming: `idea` · `bug` · `doc` · `source` (new data source) · `q
   the project-relative path only, or keep `abs_path` out of the committed artifact; the
   `file_id` already carries the stable identity. Cheap, and it makes cross-machine snapshots
   comparable for the first time.
+  *Second occurrence, same day (P5 close, desktop):* the P5 build ran in an isolated worktree
+  (shared tree held by the UI branch), so a session-end snapshot would stamp
+  `.claude/worktrees/p5-main/...` on all 205+ nodes — path pollution worse than the laptop's.
+  Snapshot DEFERRED to the next on-main session even though scan roots DID change this time
+  (patch_window.py + cli.py + a test module are uncaptured until then) — this bug is now
+  blocking the ritual whenever the tree is shared, not just muddying cross-machine diffs.
 - 2026-07-28 — [idea] **Agent graph-navigation surface** (benchmarked live 2026-07-28): agents
   answering code-nav questions from the loaded code graph instead of the filesystem is real —
   5 questions in ~410ms / ~1.2k chars total vs grep's noisy or infeasible equivalents
