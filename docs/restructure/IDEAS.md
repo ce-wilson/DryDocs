@@ -26,6 +26,33 @@ Tags help grooming: `idea` · `bug` · `doc` · `source` (new data source) · `q
 
 <!-- add new ideas at the top -->
 
+- 2026-07-28 — [bug] **`snapshot.ps1` neither pins nor records the depgraph revision it scanned
+  with — the instrument can silently regress and the snapshot looks normal.** Caught at the
+  session-end ritual: this machine's `depgraph` checkout sat on `feat/p0-vector` (2026-06-24,
+  pre-U6), so the run wrote a **105-edge** graph — the old blind-spot count — with no warning,
+  and would have been committed as a routine snapshot if the counts had not been eyeballed
+  against the 0848 baseline. The `meta` header pins the *DryDocs* commit precisely (`git.full`,
+  branch, dirty, PR) but says nothing about the tool, which is the half that actually determines
+  the numbers. Two aggravating facts: the U6 resolver fix is on the **unmerged** branch
+  `feat/controlm-lineage` (`aa52315`) while depgraph `main` is still the 2026-06-19 initial
+  commit, so a fresh clone reproduces the broken scanner; and the desktop's checkout emits a
+  `hosts` section this one does not, so the two machines' instruments differ even after the
+  branch switch. Fix: add `depgraph: {commit, branch, dirty}` to the `meta` header (makes the
+  regression visible in the diff), and have `snapshot.ps1` hard-fail when the resolver lacks
+  the multi-root fix — a capability probe, not a version string. Until then the laptop checkout
+  is left on `feat/controlm-lineage`; switching it back silently re-breaks the snapshot. Pairs
+  with the instrument-change note now in `knowledge/depgraph-snapshots/README.md`, which warns
+  about reading *across* the boundary but assumed the boundary only ever moves forward.
+- 2026-07-28 — [bug] **Snapshot nodes carry machine-absolute paths, so the series is
+  machine-dependent.** `abs_path` records `C:/coding/projects/DryDocs/...` on the desktop and
+  `C:/coding/projects/sandbox/DryDocs/...` on the laptop. Verified today on two snapshots of the
+  same code: the 370 edges were **byte-identical**, while all **205** nodes read as changed —
+  a 100%-false structural diff from the checkout location alone. `viewer.html` is unaffected
+  (it compares by project-relative path, as its README says), but `git diff` and any JSON diff
+  tool — the other two comparison routes the README recommends — show pure noise. Fix: store
+  the project-relative path only, or keep `abs_path` out of the committed artifact; the
+  `file_id` already carries the stable identity. Cheap, and it makes cross-machine snapshots
+  comparable for the first time.
 - 2026-07-28 — [idea] **Agent graph-navigation surface** (benchmarked live 2026-07-28): agents
   answering code-nav questions from the loaded code graph instead of the filesystem is real —
   5 questions in ~410ms / ~1.2k chars total vs grep's noisy or infeasible equivalents
