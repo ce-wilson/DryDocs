@@ -2433,6 +2433,42 @@ items:
       through the governed doc pipeline (CLAUDE.md L13 idiom: one .html,
       deterministic render, no hand-restyling).
 
+  - id: L17
+    epic: doc-infrastructure
+    title: "doc_traceability + doc_feedback load 'successfully' with every anchor link silently dropped when their cross-loader prereqs are absent — add the Q8 loud-refusal guards"
+    type: bug
+    module: drydocs-load
+    phase: 10
+    agent: main
+    model: sonnet
+    priority: p2
+    status: todo
+    depends_on: []
+    inputs: [drydocs/loaders/doc_traceability.py, drydocs/loaders/cypher/doc_traceability.cypher, drydocs/loaders/cypher/doc_feedback.cypher, drydocs/loaders/batch_port_orchestrator.py]
+    acceptance: >
+      DocTraceabilityLoader and DocFeedbackLoader (today bare class bodies,
+      doc_traceability.py:376,383 — no prereq check) refuse loudly BEFORE
+      writing when a cross-loader prerequisite set is absent, per the Q8 /
+      batch_port_orchestrator precedent: doc_traceability.cypher:69 and
+      doc_feedback.cypher:37 both OPTIONAL MATCH (:DocSection) written by a
+      DIFFERENT loader (doc_sections.v1), and doc_feedback.cypher:49 does the
+      same for (:Employee) — an absent set currently drops every anchor link
+      and still reports OK. After the guard: absent prereq -> loud refusal
+      (exit 2, nothing written); present prereq -> per-row unmatched anchors
+      COUNTED in the load report, never silent. Tests pin both paths for both
+      loaders. Full suite green.
+    notes: >
+      Groomed 2026-07-28 from the 2026-07-27 sweep that fixed
+      batch_port_orchestrator (same defect family, instances five-through-
+      seven of the "succeeds loudly, does nothing" through-line: G29, G30,
+      Q8, both batch_port halves, these two). doc_feedback matters MOST: it
+      IS the L5/L6 re-attachment loop, so its failure mode is SME feedback
+      loading "successfully" while silently detached from the doc it
+      annotates. Cleared as NOT defective by the same sweep: the prev:Chunk
+      self-references (bmc_docs.cypher:94, essential_graphrag.cypher:80,
+      same-loader same-run) and pat_product_mapping.cypher:129,133
+      (stale-edge cleanup, not prereq joins).
+
   # Groomed 2026-07-08 from the 2026-07-05 IDEAS line + the 2026-07-07 property-terms
   # line. Doc 06 Phases 0-1 (Control-M envelope: audit-fields.yaml + jobs/folders
   # extraction) shipped 2026-07-07 PRE-groom (gate controlm-q1q3-phase1) — recorded
@@ -4188,6 +4224,36 @@ items:
       exactly why the shadow drifted invisibly; the guard closes that, no new
       pin needed. Suite 979 (+3), ruff-neutral, drydocs --help OK.
 
+  - id: C19
+    epic: ontology-mapping
+    title: "ontology.cypher describes an SWO load step that cannot run — the referenced swo_sdlc_ontology.cypher was never created; fix the comment, record the subset question"
+    type: chore
+    module: ontology
+    phase: 2
+    agent: main
+    model: haiku
+    priority: p3
+    status: todo
+    depends_on: []
+    inputs: [drydocs_core/schema/ontology.cypher, config/gate-prompts/self-documentation-code-graph.yaml]
+    acceptance: >
+      The comment above the 13 seeded SWO anchor terms (ontology.cypher:109
+      today) no longer describes loading a file that does not exist —
+      `ontology/reference/swo_sdlc_ontology.cypher` is referenced nowhere in
+      the tracked tree (grep-verified), and the rewritten comment states
+      reality: the anchors are the seeded set; a wider ~250-term SDLC subset
+      WOULD HAVE TO BE BUILT (it is not a load step), and whether it is worth
+      building is an OPEN question recorded in the comment, not silently
+      dropped. Suite green; apply-supplements unaffected (comment-only edit).
+    notes: >
+      Found drafting the G33 gate spec (2026-07-27 inbox): §A4 scoped "the
+      wider set" out, and this finding retroactively justifies it — the M0
+      framing dates the dangling reference to the earliest phase. Context has
+      moved since the sibling §E0 zero-consumers finding: G33 shipped the
+      FIRST SWO consumer (IS_ENCODED_IN -> the Python term), so the anchors
+      are no longer decoration. Whether the SDLC subset is built at all stays
+      a user/SME call — this chore only stops the comment lying to readers.
+
   # ── Epic Q — Document ingestion & doc-graph benchmarks (docmeta) — Phase 14 ─
   # Born 2026-07-16: the Essential GraphRAG ebook groomed on user-decided intents,
   # with the phase-14 plan change user-approved in-session (the phase-12/13 idiom).
@@ -5086,6 +5152,23 @@ items:
       VARIABLES pull stays deferred exactly as originally sequenced;
       neither G39 nor G40 touches it, and neither writes the graph — this
       gate remains the terminus.
+      TWO RIDERS merged from the inbox 2026-07-28, for this session's
+      agenda: (R1, Script->SWO) when clause (b)/(c) lands :Script nodes,
+      propose (:Script)-[:IS_ENCODED_IN]->(SwoClass) derived from the path
+      extension — the G33 §E1(b) precedent applied verbatim to the second
+      software-artifact class (.sh -> SWO_0000124 Shell, .sql ->
+      SWO_0000126 SQL, binding two of the three seeded-but-unused terms;
+      the adapter mechanism exists, EXTENSION_LANGUAGE_IRI in
+      code_snapshot.py). Boundary already ruled in that discussion:
+      run_as/J.OWNER is Agent territory (PROV/ORG), NEVER an SWO binding;
+      unreferenced Scripts are the dead-script detection FEATURE per
+      clause (d)'s flagged-never-auto-judged rule. (R2, m3_invokes
+      endpoint) clause (a) activates m3_invokes — rule whether its to_node
+      broadens Script -> Script|ETLProcess: the abioncloud wrapper-payload
+      expansion means INVOKES sometimes lands directly on an :ETLProcess
+      with no Script hop (G12 implements exactly that; 2026-07-19 subagent
+      finding). Vocabulary-shape decisions, so they ride THIS gate, never
+      an auto-edit.
 
   - id: G23
     epic: component-topology
@@ -7159,6 +7242,41 @@ items:
       convention violated twice needs an enforcement point or it rots.
       depends_on J14 because the test is red today on the two files J14
       relocates — landing it first would just document the breach in CI.
+
+  - id: J16
+    epic: release-infrastructure
+    title: "PORT-MANIFEST fall-through guard — no tracked path may silently resolve to `default: clean-add`; the inverse question nobody has asked"
+    type: task
+    module: config
+    phase: 8
+    agent: main
+    model: sonnet
+    priority: p2
+    status: todo
+    depends_on: []
+    inputs: [PORT-MANIFEST.yaml, tests/unit/test_port_reconcile_guards.py, git-readme.md]
+    acceptance: >
+      A guard in tests/unit/test_port_reconcile_guards.py walks the tracked
+      tree, resolves every path FIRST-MATCH against PORT-MANIFEST.yaml's rows,
+      and FAILS on any path that falls through to `default:` unless the path
+      (or a covering pattern) is on a written allowlist with a reason per
+      entry — the test_no_shadow_definitions shape (C18) applied to port
+      dispositions. Making it green forces the backlog of judgment calls into
+      rows: whatever falls through today gets an explicit row or an allowlist
+      entry, including the standing DECISION that git-readme.md is deliberately
+      uncovered (the WHY guide for the cross-repo model, both sides benefit) —
+      currently written down nowhere but the idea inbox. Runs in the default
+      suite, no live services, no consumer-side env vars required.
+    notes: >
+      Groomed 2026-07-28 from the 2026-07-27 inbox. The motivating incidents:
+      depgraph snapshots and docs/port-*.md were both silently on clean-add —
+      the manifest was instructing the consumer to commit the producer's port
+      INSTRUCTIONS as payload — found by accident one at a time, and a prose
+      "do NOT clean-add" workaround in step 43 stood in for the missing row
+      for a week. Both rows are fixed (378f4ba, bf3fd34); this item is the
+      inverse question: which paths match NO row? Until it exists every port
+      re-derives the same judgment calls and the manifest keeps disagreeing
+      with practice.
   - id: G36
     epic: component-topology
     title: "Drop the three never-consulted :BusinessApplication indexes (risk_level/status/name) and decide coverage for the one property that IS a predicate, manually_created"
@@ -7242,10 +7360,15 @@ items:
       `:SchemaMeta:<RealLabel>` pairs — ~20 of them) excludes the exemplar,
       preferring the rename-proof label predicate (`WHERE NOT n:SchemaMeta`)
       over a non-null-key predicate. The audit covers ALL exemplar labels
-      against ALL specs, not just explorer.applications.v1. A test proves it:
-      with the meta-graph applied to a test database, no spec returns a
-      :SchemaMeta node. The meta-graph itself is KEPT — it is applied manually
-      by design and removable with `MATCH (n:SchemaMeta) DETACH DELETE n`.
+      against ALL specs, not just explorer.applications.v1 — AND (merged
+      2026-07-28) prereq/guard queries in LOADERS: any loader guard that
+      counts a label the meta-graph stamps must exclude exemplars the way Q8
+      shipped (`WHERE NOT sp:SchemaMeta AND sp.product_id IS NOT NULL`),
+      else a keyless exemplar waves an empty registry through. A test proves
+      it: with the meta-graph applied to a test database, no spec returns a
+      :SchemaMeta node and no loader guard is satisfied by exemplars alone.
+      The meta-graph itself is KEPT — it is applied manually by design and
+      removable with `MATCH (n:SchemaMeta) DETACH DELETE n`.
     notes: >
       Found 2026-07-26 alongside the G36 index note. LATENT, not live: the file
       header says "Applied MANUALLY only — never part of drydocs bootstrap",
@@ -7255,13 +7378,46 @@ items:
       gate's §C2 partial-cutover hazard). Key-predicate wording would change
       under S3's seal_id -> app_id flip — another reason the label predicate is
       the primary fix.
+      MERGED 2026-07-28 (inbox line, Q8 build finding): the contamination
+      defeats WRITE-side guards too, hence the loader-guard audit clause
+      above. Root-fix option to weigh during the audit: give the exemplars
+      their key properties (a keyless exemplar is indistinguishable from a
+      real node with an unset key) — if taken, record it in the commit body;
+      the label predicate stays the belt either way.
+
+  - id: O34
+    epic: web-console
+    title: "web/ dependency hygiene: clear the 3 high-severity npm advisories (bundle code-splitting explicitly NOT included — design call)"
+    type: chore
+    module: drydocs-web
+    phase: 12
+    agent: main
+    model: sonnet
+    priority: p2
+    status: todo
+    depends_on: []
+    inputs: [web/package.json, web/package-lock.json]
+    acceptance: >
+      `npm audit` in web/ reports ZERO high-severity advisories; `npm run
+      build` passes; the lockfile diff is reviewed and any major-version bump
+      is named in the commit body (audit-fix moves versions — that is the
+      verification pass the fix was deferred for). EXPLICITLY OUT OF SCOPE:
+      the 1,485 kB main bundle (390 kB gzipped, past Vite's 500 kB warning) —
+      code-splitting is a design call for the UI workstream, recorded here so
+      it is not lost, not smuggled into a dependency chore.
+    notes: >
+      Groomed 2026-07-28 from the 2026-07-27 inbox (found while removing the
+      never-committed check/no-op junk deps; sibling of J1 unused-deps). The
+      advisories predate that cleanup. If `npm audit fix` cannot clear a
+      high-severity advisory without a breaking major bump, say so and stop —
+      that escalates to the UI workstream, not a forced upgrade.
 
 summary:
-  todo: 52                                         # +5 at the 2026-07-27 groom (J14/J15/G36/O33/G38), +2 from the same day's PAT-structure review (C17/C18), +5 at the same day's code-graph-review groom (U1-U5), +2 cmdline-detail seam (G39/G40 — the CM_DEF_VJOB_DETAIL premise correction); G39+G40 built and closed same day
+  todo: 56                                         # +4 at the 2026-07-28 inbox groom (C19 ontology-comment fix, J16 port-manifest fall-through guard, L17 doc-loader prereq guards, O34 web npm advisories); prior: +5 2026-07-27 groom (J14/J15/G36/O33/G38), +2 PAT review (C17/C18), +5 code-graph-review (U1-U5), +2 cmdline seam (G39/G40, built+closed same day)
   in_progress: 1                                   # E1 (gate deferred both sides)
   blocked: 0
   done: 146                                        # 2026-07-27 closes: J14 SEALID split, P3 hosts+RUNS_ON, G21 rua code-ops, G24 code-repo seam, G26 launcher-registry config, Q8 bmc-docs prereq, C18 shadow-model guard, J15 value-shape boundary guard, G33 code-snapshot loader (gate signed + built same day), G39 cmdline staging store + G40 parse (groomed am, built pm)
-  next_ready: [M3, M4, J10, Q6, O23, J13, O26, O27, C15, C16, C17, O28, R3, R4, L16, O29, O30, O31, O32, S1, S8, S9, Q7, G32, G34, G35, O33, P5, G22, U1, U2, U3]
+  next_ready: [M3, M4, J10, Q6, O23, J13, O26, O27, C15, C16, C17, C19, O28, R3, R4, L16, L17, O29, O30, O31, O32, S1, S8, S9, Q7, G32, G34, G35, O33, O34, P5, G22, J16, U1, U2, U3]
   # 2026-07-27 code-graph-review groom: U1-U3 = the three personas of
   # docs/reviews/code-graph-review-plan.md, dependency-free -> next_ready;
   # U4/U5 = the optional skill edits, gated on their phase (U1/U2) proving the

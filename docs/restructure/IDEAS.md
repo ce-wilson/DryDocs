@@ -26,100 +26,6 @@ Tags help grooming: `idea` · `bug` · `doc` · `source` (new data source) · `q
 
 <!-- add new ideas at the top -->
 
-- 2026-07-27 — [idea] **Script→SWO rider: `(:Script)-[:IS_ENCODED_IN]->(SwoClass)` derived from
-  the path extension, riding the m7_uses_artifact / G22 rua-load builds.** The G33 §E1(b)
-  precedent applied verbatim to the second software-artifact class: `.sh` → the seeded Shell
-  term (SWO_0000124), `.sql` → SQL (SWO_0000126) — finally binding two of the three language
-  terms G33 left unused (§E2 partial-use note). Ontology decision → rider on whichever gate
-  builds :Script nodes first (m7 build or G22 clauses), NOT a silent loader addition; the
-  adapter mechanism already exists (EXTENSION_LANGUAGE_IRI, code_snapshot.py). Also record the
-  boundary ruled in the same discussion: run_as/J.OWNER is Agent territory (PROV/ORG,
-  WAS_ASSOCIATED_WITH {role: owner} reserved in the K2 note) — NEVER an SWO binding; and
-  inventory-fed Scripts with no job edge after the RUA join are the dead-script detection
-  list, a feature to surface, not a gap to fix. (User ask 2026-07-27, post-G33 session.)
-
-- 2026-07-27 — [bug] **`ontology.cypher:109` points at a file that was never created —
-  `ontology/reference/swo_sdlc_ontology.cypher` does not exist anywhere in the tree.** The
-  comment reads: *"Full SDLC subset (~250 terms) loads from ontology/reference/swo_sdlc_ontology.cypher
-  in the M0 follow-up step"*, immediately above the 13 SWO anchor terms it says are the
-  high-frequency subset of it. Found while drafting the `self-documentation-code-graph` gate
-  spec (G33), whose §A4 scopes the wider set out — the finding retroactively justifies that
-  exclusion, because **"the wider set" is not something that can be loaded, it is something
-  that would have to be built.** Two things to decide, neither urgent: (1) does the ~250-term
-  SDLC subset still want building at all, or was it superseded by the decision to seed only
-  anchors? (2) either way the comment must stop describing a load step that cannot run —
-  a reader following it hits nothing. Related to the same gate's §E0 finding that all 13
-  seeded terms have **zero consumers anywhere in the tree**: the SWO layer as a whole is
-  seeded-but-unused, and G33 is its first proposed use. Note the M0 framing dates the
-  reference to the earliest phase, so this has been dangling a long time.
-- 2026-07-27 — [bug] **`PORT-MANIFEST.yaml`'s `default:` is `clean-add`, so a MISSING row means
-  "port it" — absence is not exclusion, and two whole classes of producer-only file were sitting
-  in that gap.** Found while reviewing the company-side step-46 port plan: the plan listed
-  "all depgraph snapshots" under Excluded, correctly, but **no row said so**. Same for
-  `docs/port-prompt.md`, its step archive and the hand-off packs. On its face the manifest was
-  instructing the consumer to commit the producer's port *instructions* into their tree as
-  payload. This is not hypothetical — it is exactly why step 43 carried a prose *"do NOT
-  clean-add the T12 session materials"* instruction that had to be hand-rewritten this week when
-  the packs were retired. **A prose workaround was standing in for a missing row.** Both fixed
-  (`378f4ba`, `bf3fd34`): `knowledge/depgraph-snapshots/*.json` never-port with the tooling split
-  out as canonical-producer, and `docs/port-*.md` never-port.
-  **THE FOLLOW-UP IS THE REAL ITEM — these two were found by accident, one at a time, while
-  looking at something else. Nobody has ever asked the inverse question: which paths in the tree
-  match NO row?** That set is silently on `clean-add`. Wanted: a guard in
-  `tests/unit/test_port_reconcile_guards.py` that walks the tracked tree, resolves each path
-  first-match, and fails on anything falling through to `default:` unless it is on a written
-  allowlist — the `test_no_shadow_definitions` shape (C18), applied to port dispositions instead
-  of class names. Until then every port re-derives the same judgment calls from scratch and the
-  manifest keeps disagreeing with practice. Related: `git-readme.md` is also uncovered — left
-  deliberately (it is the WHY guide for the cross-repo model, not a control doc for one run, and
-  both sides benefit) but it is a *decision*, and it is not written down anywhere but here.
-- 2026-07-27 — [chore] **`web/` carries 3 high-severity npm advisories and a 1,485 kB main bundle
-  (390 kB gzipped), past Vite's 500 kB warning.** Both surfaced incidentally while removing the
-  `check` / `no-op` junk deps (those are gone — they were never committed, so `git restore` +
-  `npm prune` reverted them exactly; build still passes). Neither is touched: `npm audit fix`
-  moves versions and wants its own verification pass, and the bundle wants code-splitting, which
-  is a design call. Sibling to the existing J1 "unused deps" line.
-- 2026-07-27 — [bug] **The PAT team extract keys Products but NOT Product Lines — the cascade's
-  first dropdown has no stable key.** From an SME review of the source report headers (structure
-  only; the captures are Internal-Confidential and nothing from them is transcribed). The
-  Team Details Report carries an ID **and** a Name for `Product`, `Supporting Area Product`,
-  `Sponsoring Area Product` and `Sponsoring Product` — but **`Product Line` and
-  `Sponsoring Product Line` are NAME-ONLY, no ID column at either**. Our `:ProductLine` node key
-  is `product_line_id`, **required**, `min_length=1` (`drydocs/loaders/catalog.py` ProductLineRow;
-  `products.cypher:17` MATCHes `parent_product_line_id`), so this extract can only join product
-  lines **by name** — renames and near-duplicates silently re-point a mapping. Groomed as **C17**.
-  Four sub-findings:
-  1. **Product-line keying** (above) — the direct consequence for the §G6 cascade: the FIRST
-     picker is the one without a key. Either a product-line-scoped extract supplies the id, or
-     the picker resolves name→id against the already-loaded `:ProductLine` set and reports
-     ambiguity rather than guessing (the coverage-policy rule).
-  2. **`area_product_id` is UNQUALIFIED in the live row model** while the Team Details Report
-     splits *Supporting* Area Product from *Sponsoring* Area Product as two separate ID columns.
-     Confirm which column feeds it. Likely why unqualified looked right: the **Team Member
-     Details Report** carries a plain unqualified `Area Product ID` / `Area Product Name` — the
-     qualification is REPORT-SPECIFIC, not universal.
-  3. **`Sponsoring Product Line` is a THIRD sponsoring form and is unmodeled.** C9 §d extended
-     sponsoring to two forms (product + area product, both ID-bearing, both wired —
-     `pat_product_mapping.cypher` §3a/§3b). This third one is name-only and has no field.
-  4. **The two sponsoring ID columns appear CO-POPULATED on the same row**, not exclusive. §3a
-     and §3b already fire independently, so the loader is right — worth confirming the model
-     intends both rather than one-or-the-other.
-
-- 2026-07-27 — [bug] **`drydocs_core/models/catalog.py` is a STALE SHADOW of the live catalog row
-  models, and it has already drifted past a gate ruling.** All 8 catalog row classes exist twice —
-  in `drydocs_core/models/catalog.py` and again in `drydocs/loaders/catalog.py`. **Nothing imports
-  the `drydocs_core` copies**; the loaders use their local definitions. The shadow copy's
-  `PatProductMappingRow` is **missing `sponsored_area_product_id`** — the field C9 §d ruled in on
-  2026-07-18 — and its `model_config` is `extra="ignore"`, so a switch to it would drop that
-  column **silently at validation**, leaving `pat_product_mapping.cypher` §3b permanently dead
-  with no error. It also lacks the `;`→`,` `seal_ids` normalizer the real PAT report needs.
-  **Why this is a live landmine, not cosmetics:** every OTHER loader imports its row model from
-  `drydocs_core.models` (controlm_*, seal_*, manual_loads, cli) — the catalog loaders are the ONLY
-  ones defining models locally, and the ADR 0002-A-1 migration direction is *toward* `drydocs_core`,
-  so a Phase-C move would make **the stale copy win**. Delete the shadow or make it the single
-  source; do not leave two. Groomed as **C18**. (Also the reason a spot-check of "did C9 §d land?"
-  can answer NO from one file and YES from the other — it landed; the shadow is what's wrong.)
-
 - 2026-07-27 — [idea] **The SME orchestrator-mapping act: what actually flips a batch port on.**
   SME direction, this session. CONFIRMED first, since the design rests on it: both ports are
   created `active = false` (`seal_applications.cypher:97,101`, `ON CREATE SET`) — and the
@@ -170,38 +76,6 @@ Tags help grooming: `idea` · `bug` · `doc` · `source` (new data source) · `q
   collapses into the BatchProcessing `:Port` (§C2 already proposes retiring it); and what makes
   a folder "available" in the filter — unmapped only, naming-pattern match, or both.
 
-- ~~2026-07-27 — [bug] `batch_port_orchestrator.cypher:26` carries the exact defect Q8 closed in
-  `bmc_docs.cypher`.~~ **FIXED 2026-07-27** — and it was worse than logged: MATCH-only on BOTH
-  endpoints means two silent-success paths (absent app registry → every row's hard MATCH fails,
-  writing nothing at all, not even the raw string; absent product registry → the FOREACH guard
-  drops every edge). Both now refused pre-`_open_run`; per-row survivors reported after the
-  load. Also fixed a third defect found on the way: `batch_orchestrator_unmapped` was keyed on
-  `sp IS NULL` (the node lookup) rather than `row.product_id IS NULL` (the crosswalk result),
-  so a missing registry wrote the WRONG DIAGNOSIS onto correctly-mapped apps — "unmapped in
-  platforms.yaml" — while the CLI coverage report on the same run said they mapped fine.
-  **Sweep done — two more carry it, both unguarded** (`DocTraceabilityLoader` /
-  `DocFeedbackLoader` in `doc_traceability.py:376,383` are bare class bodies, no prereq check):
-  `doc_traceability.cypher:69` and `doc_feedback.cypher:37` both `OPTIONAL MATCH (ds:DocSection
-  ...)` written by a DIFFERENT loader (`doc_sections.v1`), so an absent DocSection set drops
-  every anchor link and still reports OK — and `doc_feedback.cypher:49` does the same for
-  `:Employee`. That one matters more than the others: **doc_feedback IS the L5/L6 re-attachment
-  loop**, so the failure mode is SME feedback loading "successfully" while silently detached
-  from the doc it annotates. Cleared as NOT the defect: the `prev:Chunk` lookups
-  (`bmc_docs.cypher:94`, `essential_graphrag.cypher:80`) are same-loader/same-run
-  self-references, and `pat_product_mapping.cypher:129,133` are stale-edge cleanup, not prereq
-  joins. Fifth-through-seventh instances of the "succeeds loudly, does nothing" through-line
-  (G29, G30, Q8, both halves of this one, plus the two doc loaders).
-- 2026-07-27 — [bug] **The SchemaMeta contamination O33 describes is not only a read-surface
-  problem — it defeats WRITE-side guards too.** Q8's registry-presence check would have been
-  useless as a bare `count(:SoftwareProduct)`: `schema_graph.cypher:109` MERGEs
-  `:SchemaMeta:SoftwareProduct {name: 'SoftwareProduct'}` with NO `product_id`, so the exemplar
-  alone would satisfy the guard and wave an empty registry straight through. Q8 shipped with
-  `WHERE NOT sp:SchemaMeta AND sp.product_id IS NOT NULL` and a test pinning it. Two
-  consequences for O33's scope: its audit should cover prereq/guard queries in LOADERS, not
-  just QuerySpecs, and the exemplars' missing key properties are arguably the root fix
-  (a keyless exemplar is indistinguishable from a real node with an unset key — the same
-  null-blindness as the identity gate's §C2).
-
 - 2026-07-27 — [idea] **Company catalog gate (`internal/org/catalog/`, page dated 2026-06-25) has
   drifted ahead of the producer catalog ontology — back-flow / divergence-ledger candidate.**
   Screenshot review of `_catalog_gate_page.html` ("SME Gate Prompt — PAT Catalog Loader", step 1
@@ -248,34 +122,6 @@ Tags help grooming: `idea` · `bug` · `doc` · `source` (new data source) · `q
   ruling should cover: platform tokens, DC codes, schema/table/column identifiers, and
   synthetic-sample product NAMES that echo real ones ("Home Lending Servicing" in
   lob-product-team.yaml, paired only with synthetic ids).
-
-- 2026-07-27 — [p0/boundary] **Out-of-J14-scope real values still in the publishable tree**
-  (found running J14's moved-value greps, same day; entry REDACTED at the (1) fix — value
-  strings live internal/-side only now). ~~(1) `docs/Product/product-overview.md` carried real
-  rosters — the Operations Strategy Cabinet + ODPM/ERM tables (~25 named people), two real
-  SIDs, and a real internal contact DL~~ **RESOLVED same day (J14 follow-up (1), "J14:a"):
-  the whole 2026-06-09 capture relocated VERBATIM to `internal/org/product-overview.md`
-  (the internal/org charter home), a mechanism-only stub kept at the old path so the
-  doc-inventory row, git-readme table, and PAT/catalog ontology citations keep resolving
-  (`catalog_ontology_supplement.cypher` comments repointed). The cabinet tables double as
-  the candidate person-level cabinet extract the K5 gate left as K6's missing feed.**
-  ~~(2) two test fixtures embedded two real support-DL names in sample CMD_LINEs~~
-  **RESOLVED 2026-07-27: synthetic `@example.com` DLs swapped in (repo precedent), assertions
-  unchanged by design (they test the split, not the values).** ~~(3) sample folder names
-  carried two ids outside the reserved 70001-70099 block~~ **RESOLVED 2026-07-27 via the J15
-  build: BOTH resweeped into the block (values now internal-side only — treated as real, same
-  range/family as the confirmed-real worked-example SEAL). Building the J15 guard forced 14
-  resweeps total, including values CONFIRMED real against the untracked production extract
-  (a %%SEAL value, a FID triplet + RFID, a verbatim job-name segment) and authored strays
-  (a lineage-fixture folder id, the PAT sample's out-of-block seal_ids). Full real↔synthetic
-  key table: `internal/standards/technology/folder-naming-convention.md` §J15 resweep
-  additions.** (`jpmorganchase.com` in `config/doc-source-registry.yaml` is FINE — public IR
-  URLs on an External-classified source.) RESIDUAL FOR SME (recorded ruling, flip if
-  disagreed): 6-digit Control-M surrogate folder TABLE KEYS (sample family + real-extract ids
-  cited in resolver-test comments) stay in the publishable tree, allowlisted in the J15 guard
-  — private-DB row keys, no SEAL/roster/credential semantics. String-vocabulary (flow/DB/
-  dataflow names, script paths in test fixtures) stays with the parked platform-vocabulary
-  [question] / J13.
 
 - 2026-07-26 — [doc] **Startup-refresh runbook owes three edits, HELD until the SME review
   closes** (found doing G29; the doc is mid-L5/L6 review — `docs/design/feedback/
@@ -446,9 +292,13 @@ Tags help grooming: `idea` · `bug` · `doc` · `source` (new data source) · `q
   remediation M2 generalization opens (FR-REM-5's schedule/command/conditions slice).
 - 2026-07-23 — [chore] **Delete the rollback container** `neo4j-drydocs-ee` (stopped,
   restart=no) + its two anonymous volumes once `neo4jtest` has survived a week of normal
-  use; also prune orphan volumes neo4j_data/neo4j_logs/neo4j2_data/neo4j2_logs (attached
-  to nothing; likely relics of pre-2026-07-02 containers — verify before pruning). The
-  first-attempt community container `DryDocs` was deleted 2026-07-23 (user-confirmed).
+  use (week is up ~2026-07-30); also prune orphan volumes neo4j_data/neo4j_logs/
+  neo4j2_data/neo4j2_logs (attached to nothing; likely relics of pre-2026-07-02
+  containers — verify before pruning). The first-attempt community container `DryDocs`
+  was deleted 2026-07-23 (user-confirmed). MERGED IN 2026-07-28: the 2026-07-03 chore
+  about this same container's password being the literal string `<password>` — deleting
+  the container retires that too (the live `neo4jtest` has a real password), so no
+  separate action.
 - 2026-07-22 — [idea] **PDN trigger design: milestone/SLA grain + graph-computed slack,
   not per-job failure mail (SME, chat pm).** Current state: dev teams default ON/DO-MAIL
   + SHOUT to L2-on-failure → hundreds of ignored mails daily (alert fatigue — the
@@ -763,12 +613,6 @@ Tags help grooming: `idea` · `bug` · `doc` · `source` (new data source) · `q
   (`config/source-mappings/seal-extract.yaml`) carrying what each source CALLS it; build = S3.
   Decisions 1 (display-label scope) and 2 (placement/plan-change) remain the parked user calls.
 
-- 2026-07-19 — [question] **m3_invokes `to_node: Script` may need broadening to
-  `Script | ETLProcess`** in relationship_vocabulary.yaml: the abioncloud wrapper-payload
-  expansion (`runScript.sh -g <pset>` → the ABINITIO invocation replaces the wrapper's)
-  means INVOKES sometimes lands directly on an :ETLProcess endpoint with no Script hop —
-  G12 implements exactly that (fixture job 25 → trust.pset). Vocabulary-shape decision →
-  next gate session, not an auto-edit. (G12 subagent finding.)
 - 2026-07-19 — [idea] **depgraph metric extensions (codeflow takeaways — ideas, not code)**:
   compute codeflow's three genuinely useful metrics ON TOP of our existing ast-accurate
   graph, in the depgraph sibling repo (stdlib, deterministic, rides the snapshot JSON,
@@ -900,14 +744,40 @@ Tags help grooming: `idea` · `bug` · `doc` · `source` (new data source) · `q
   plan-tracked until Q4–Q6 land. NEW RIDER (GraphAcademy advisor, 2026-07-17): when the docmeta
   loaders land, add existence constraints on `Document.trust_default` / `Chunk.tier_rule`
   (silent null = provenance undercount).
-- 2026-07-03 — [chore] the local `neo4j-drydocs-ee` Docker container's password is literally the
-  string `<password>` (copy-paste artifact at creation). Fine for sandbox; change it before
-  anything less throwaway. (Found while wiring web/ + agents/ to it.)
 - 2026-07-03 — [chore] `common/` shows up in ADK `/list-apps` (it's a shared-tools package, not
   an app). Cosmetic; hide or restructure later.
 
 ## Recently groomed (audit trail)
 
+- 2026-07-28 — [bug] ontology.cypher:109 dangling SDLC-subset load reference → **C19**
+  (comment fix; the build-the-subset-at-all question recorded IN the item as an open
+  user/SME call, not silently dropped).
+- 2026-07-28 — [bug] PORT-MANIFEST `default: clean-add` fall-through gap → **J16** (the
+  inverse-question guard: no tracked path resolves to default without an allowlisted
+  reason; the git-readme.md deliberately-uncovered DECISION gets written into the
+  allowlist rather than living only in this inbox).
+- 2026-07-28 — [bug] doc_traceability/doc_feedback silent-prereq sweep leftovers → **L17**
+  (Q8-pattern loud refusal; doc_feedback is the L5/L6 re-attachment loop, so it headlines).
+  The batch_port_orchestrator half of that line was already FIXED 2026-07-27 in-session.
+- 2026-07-28 — [chore] web/ 3 high-severity npm advisories → **O34** (audit-fix + verify;
+  the 1,485 kB bundle/code-splitting design call recorded as explicitly OUT of O34's scope,
+  parked in its notes).
+- 2026-07-28 — [idea] Script→SWO rider (`:Script -IS_ENCODED_IN-> SwoClass` by extension,
+  G33 §E1(b) precedent; run_as = Agent territory boundary; dead-script detection framing)
+  → **MERGED into G22 notes as rider R1** for the gate session's agenda.
+- 2026-07-28 — [question] m3_invokes `to_node` broadening (Script → Script|ETLProcess, the
+  abioncloud wrapper-payload finding) → **MERGED into G22 notes as rider R2** — same gate
+  session, vocabulary-shape decision.
+- 2026-07-28 — [bug] SchemaMeta contamination defeats WRITE-side guards too (the Q8 build
+  finding) → **MERGED into O33**: acceptance now covers loader prereq/guard queries, and
+  the keyless-exemplar root-fix option is recorded in its notes.
+- 2026-07-28 — [chore] neo4j-drydocs-ee literal `<password>` (2026-07-03 line) → **MERGED
+  into the 2026-07-23 delete-rollback-container line** — deleting the container retires it.
+- 2026-07-28 — trail moves, no new ids: the C17 PAT-keying and C18 shadow-model lines
+  (both said "Groomed as …" since 2026-07-27, C18 since closed) and the fully-RESOLVED
+  p0/boundary J14-residual line (its surviving question is the standalone
+  platform-vocabulary line; the 6-digit-table-keys SME ruling is recorded in J15's
+  close_note) moved out of the inbox.
 - 2026-07-27 — [chat notes] G18→G22 premise correction: the psgmgr CM_DEF_VJOB_DETAIL-style
   table (split by job type) was never built → **G39** (temporary cmd-line staging store,
   graph-sourced — j.cmd_line already loads; next_ready) + **G40** (Python cmd-line parse into
