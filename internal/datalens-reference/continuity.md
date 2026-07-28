@@ -31,6 +31,11 @@ The real friction is concentrated in three places: **theme polarity** (their lig
 vs our dark-canonical → DL-7/O32), **shape language** (their 12–16px pills vs our 6px
 flat borders → DL-3/DL-5), and **red** (our brand core vs their failure red → DL-2).
 
+> **Execution note 2026-07-28:** the flagged quick wins (DL-9, DL-2, DL-1, DL-3, DL-4)
+> plus the DL-7 merge were executed the same day on `feat/datalens-quickwins`
+> (user-directed, two-track intended-bypass precedent — retro-groom records them;
+> DL-5 / DL-6 / DL-8 remain open candidates).
+
 ## Candidate items
 
 | # | Item | Type | Size | Quick win? |
