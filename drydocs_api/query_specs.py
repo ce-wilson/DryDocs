@@ -357,7 +357,7 @@ QUERY_SPECS: dict[str, QuerySpec] = {
                 "honest producer state until that source loads."
             ),
             cypher=(
-                "MATCH (g:ServiceNowGroup) "
+                "MATCH (g:ServiceNowGroup) WHERE NOT g:SchemaMeta "
                 "RETURN g.group_id AS group_id, coalesce(g.name, g.group_id) AS group_name "
                 "ORDER BY group_id LIMIT $limit"
             ),

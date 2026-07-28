@@ -47,20 +47,25 @@ def test_meta_graph_parses_and_covers_the_known_contaminators() -> None:
     } <= labels
 
 
-def test_every_spec_binding_a_stamped_label_excludes_the_exemplars() -> None:
-    """The audit itself: any spec whose MATCH binds a stamped label (or an
-    unlabeled anchor, as lineage.hops does) must carry the rename-proof
-    ``NOT <alias>:SchemaMeta`` predicate. Specs binding only unstamped
-    labels (e.g. ServiceNowGroup) are exempt."""
-    labels = stamped_labels()
-    missing = []
-    for spec in QUERY_SPECS.values():
-        bound = set(_BOUND_LABEL_RE.findall(spec.cypher))
-        exposed = bool(bound & labels) or "MATCH (n)" in spec.cypher or "MATCH (x)" in spec.cypher
-        if exposed and not _EXCLUSION_RE.search(spec.cypher):
-            missing.append(spec.id)
+def test_every_spec_excludes_the_exemplars() -> None:
+    """The audit itself: EVERY spec must carry the rename-proof
+    ``NOT <alias>:SchemaMeta`` predicate — not merely those binding a label
+    this repo's meta-graph stamps today.
+
+    Tightened 2026-07-28 (back-flow #3). The old rule exempted "unstamped"
+    labels and named ServiceNowGroup as the example, which made the invariant
+    depend on THIS repo's vocabulary size: the consumer's larger vocab does
+    stamp :ServiceNowGroup, so its schema_graph contaminated
+    ownership.escalation-routing.v1 while the producer sweep saw nothing to fix
+    (PORT-REPORT-94132c80). A vocabulary is a moving target — growing it must
+    not silently widen query exposure. The predicate is a no-op on a label that
+    is never stamped, so requiring it everywhere costs nothing and cannot go
+    stale; 22 of 23 specs already satisfied it when this was tightened.
+    """
+    missing = [s.id for s in QUERY_SPECS.values() if not _EXCLUSION_RE.search(s.cypher)]
     assert missing == [], (
-        f"specs bind meta-stamped labels with no :SchemaMeta exclusion: {missing}"
+        f"specs with no :SchemaMeta exclusion: {missing} — the predicate is required "
+        "regardless of whether this repo's vocab currently stamps the bound label"
     )
 
 

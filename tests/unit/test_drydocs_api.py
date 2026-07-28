@@ -215,3 +215,40 @@ def test_fastapi_wiring_smoke():
         headers={"Authorization": f"Bearer {token}"},
     )
     assert forbidden.status_code == 403
+
+
+# --- test-transport dependency (back-flow #4, 2026-07-28) --------------------
+
+
+def test_declared_test_transport_matches_what_starlette_resolves() -> None:
+    """The declared httpx/httpx2 dependency must match what starlette imports.
+
+    starlette >=1.3 does ``try: import httpx2 ... except ModuleNotFoundError:
+    import httpx`` and warns (StarletteDeprecationWarning) when it lands on the
+    fallback — so BOTH work and neither side is broken. That is precisely why
+    this drifted silently: the producer swapped to httpx2 for starlette 1.3,
+    the consumer kept httpx on an older starlette, and each was correct in its
+    own environment (PORT-REPORT-94132c80, back-flow #4).
+
+    So the answer is environment-derived, not a fact to carry in a ledger or a
+    comment: ask the installed starlette what it actually resolved. The
+    consumer's own suite then tells it to switch when it bumps starlette,
+    instead of someone having to remember.
+    """
+    pytest.importorskip("starlette", reason="fastapi/starlette is an optional dep")
+    import starlette.testclient as tc
+
+    resolved = tc.httpx.__name__  # "httpx2" on starlette >=1.3, else "httpx"
+    pyproject = (
+        Path(__file__).resolve().parents[2] / "pyproject.toml"
+    ).read_text(encoding="utf-8")
+    declared = {
+        name
+        for name in ("httpx2", "httpx")
+        if re.search(rf"^{name}\s*=", pyproject, re.MULTILINE)
+    }
+    assert declared == {resolved}, (
+        f"pyproject declares {sorted(declared)} but the installed starlette resolves "
+        f"{resolved!r} for TestClient — declare exactly the one it uses (the other "
+        "still works, but via the deprecated fallback path)"
+    )
