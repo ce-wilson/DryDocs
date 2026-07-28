@@ -39,7 +39,7 @@
 # =============================================================================
 
 schema: drydocs.backlog.v2
-updated: 2026-07-27
+updated: 2026-07-28
 
 # ── The high-level project plan (rendered as the board's roadmap strip) ───────
 plan:
@@ -7448,11 +7448,52 @@ items:
       high-severity advisory without a breaking major bump, say so and stop —
       that escalates to the UI workstream, not a forced upgrade.
 
+  - id: G41
+    epic: component-topology
+    title: "AWS Glue base-table inventory seam: stage the dataset POPULATION (per-zone glue db/table placements) onto the GUID-keyed dpl_dataset DataAssets, path-keyed fallback for GUID-less rows — nodes only, no edges, no graph writes"
+    type: task
+    module: drydocs-lineage
+    phase: 6
+    agent: main
+    model: sonnet
+    priority: p1
+    status: done
+    depends_on: [G17]
+    inputs: [drydocs_lineage/extractors/dpl_mac.py, drydocs_lineage/model.py]
+    acceptance: >
+      A GlueTableInventoryExtractor consumes the three observed sheet variants
+      (GUID-bearing inventory / GUID-less consumption inventory / normalized
+      appId load sheet) through one header-synonym contract; rows whose
+      tableDatasetIdSource is datasetGuid land per-zone glue placements
+      (glue_database_/glue_table_/glue_path_<zone>) as PROPERTIES on the SAME
+      dpl_dataset DataAsset the G17 MAC seam stages (identity = GUID alone);
+      GUID-less rows key on the canonical lowercase db.table path as
+      glue_table DataAssets, joining an already-staged GUID placement when
+      the path matches; appId lands as a seal property FACT (never an edge);
+      a coverage dataclass counts every skip/mismatch by reason; the
+      extractor adds ZERO relationships and performs NO graph writes; unit
+      tests pin all of it on synthetic fixtures (70001-70099 SEAL block).
+    notes: >
+      Built + closed 2026-07-28 from the user's three sheet screenshots
+      (real sheets are Internal-Confidential; screenshots moved to
+      internal-local/, mechanism only in-repo). Load-bearing observation
+      captured in the module docstring: a *_RAW_TRUSTED table appears in
+      BOTH the RAW__ and TRUSTED__ databases with the SAME dataset GUID —
+      one dataset, two zone placements (measures the FILE->CONFORMED ~
+      RAW->TRUSTED note); REFINED placements carry their own GUID. The GUID
+      is the join key that makes G17's READS_FROM/WRITES_TO candidates land
+      on these same nodes — relationships come from the join, never from
+      this loader; SEAL attribution edges stay Epic K; path-vs-GUID identity
+      unification rides G22 clause f; every graph write stays behind G22.
+      databaseName grammar: <ZONE>__<LOB>__<segments>__<name> on double
+      underscore; tableName numeric prefix is a cross-check against appId
+      only (legacy 1_* family proves it is not always a SEAL).
+
 summary:
   todo: 53                                         # +4 at the 2026-07-28 inbox groom (C19 ontology-comment fix, J16 port-manifest fall-through guard, L17 doc-loader prereq guards, O34 web npm advisories); C19 + J16 closed same day, L16 closed alongside; prior: +5 2026-07-27 groom (J14/J15/G36/O33/G38), +2 PAT review (C17/C18), +5 code-graph-review (U1-U5), +2 cmdline seam (G39/G40, built+closed same day)
   in_progress: 1                                   # E1 (gate deferred both sides)
   blocked: 0
-  done: 149                                        # 2026-07-28: C19 ontology-comment fix (groomed + closed same day), J16 port-manifest fall-through guard (same), L16 runbook container/port refresh. 2026-07-27 closes: J14 SEALID split, P3 hosts+RUNS_ON, G21 rua code-ops, G24 code-repo seam, G26 launcher-registry config, Q8 bmc-docs prereq, C18 shadow-model guard, J15 value-shape boundary guard, G33 code-snapshot loader (gate signed + built same day), G39 cmdline staging store + G40 parse (groomed am, built pm)
+  done: 150                                        # 2026-07-28: G41 glue base-table inventory seam (built + closed same day), C19 ontology-comment fix (groomed + closed same day), J16 port-manifest fall-through guard (same), L16 runbook container/port refresh. 2026-07-27 closes: J14 SEALID split, P3 hosts+RUNS_ON, G21 rua code-ops, G24 code-repo seam, G26 launcher-registry config, Q8 bmc-docs prereq, C18 shadow-model guard, J15 value-shape boundary guard, G33 code-snapshot loader (gate signed + built same day), G39 cmdline staging store + G40 parse (groomed am, built pm)
   next_ready: [M3, M4, J10, Q6, O23, J13, O26, O27, C15, C16, C17, O28, R3, R4, L17, O29, O30, O31, O32, S1, S8, S9, Q7, G32, G34, G35, O33, O34, P5, G22, U1, U2, U3]
   # 2026-07-27 code-graph-review groom: U1-U3 = the three personas of
   # docs/reviews/code-graph-review-plan.md, dependency-free -> next_ready;

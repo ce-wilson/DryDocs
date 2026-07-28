@@ -9,6 +9,11 @@ from .dpl_registry import (
     RegistryRecord,
     cross_check,
 )
+from .glue_tables import (
+    GlueInventoryCoverage,
+    GlueTableInventoryExtractor,
+    parse_database_name,
+)
 from .code_repo import (
     CodeRepoExtractor,
     CorroborationReport,
@@ -30,7 +35,10 @@ __all__ = [
     "DplMacExtractor",
     "DplRegistryExtractor",
     "ExtractCoverage",
+    "GlueInventoryCoverage",
+    "GlueTableInventoryExtractor",
     "MacCoverage",
+    "parse_database_name",
     "RegistryCoverage",
     "RegistryCrossCheck",
     "RegistryExtract",
