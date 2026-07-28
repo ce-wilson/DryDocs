@@ -26,6 +26,47 @@ Tags help grooming: `idea` · `bug` · `doc` · `source` (new data source) · `q
 
 <!-- add new ideas at the top -->
 
+- 2026-07-28 — [bug] **`drydocs bootstrap` reported "Constraints applied." while applying zero
+  constraints, from the initial commit until D5.** Root cause, reproduced in a throwaway
+  container: `apoc.cypher.runMany` executes DML but **silently no-ops DDL** — no exception, no
+  warning; the same statements via `session.run` work. Pre-D5 `run_script` used runMany, so from
+  `9893c19` (2026-05-05) to `771326b` (D5, 2026-07-18) every bootstrap on every edition created
+  nothing while printing success. The post-D5 client-side split is sound (51/51 verified).
+  **The fix this argues for is not the past, it is the missing check:** `_apply_supplement_chain`
+  already guards this exact failure family for supplements ("a supplement that is truncated,
+  renamed, or comment-only runs 'fine' and seeds nothing") — `bootstrap` has no equivalent. It
+  should count `SHOW CONSTRAINTS` against what `constraints.cypher` declares and refuse loudly on
+  a mismatch. Same "succeeds loudly, does nothing" through-line as G29/G30/Q8/L17.
+
+- 2026-07-28 — [idea] **`VERIFIED LIVE` does not say WHICH machine — and there are two graphs.**
+  Laptop and desktop each run their own local Docker Neo4j; git syncs the repo, never the volume.
+  So a live claim is implicitly scoped to the machine that ran it, and **no claim in backlog.yaml
+  records which one** (grep-checked). This is not theoretical: an audit this session read the
+  laptop's graph, found G33's `:Project`/`:CodeModule` absent, and nearly recorded a defect — G33
+  was built on the desktop and is fine. Cheap fix: tag the claim with the machine/container.
+  Better fix: make live verification reproducible from a fresh bootstrap so it stops mattering
+  where it ran. Until then, treat "absent from every database" as "absent *here*".
+
+- 2026-07-28 — [chore] **`render_gates.py` is missing from the stale-render ritual.** CLAUDE.md's
+  stale-render check names `docs/plan/board.html` and `docs/design/*.html`, and `snapshot.ps1`
+  regenerates those two — but `web/src/generated/gates.json` is *also* a deterministic render, and
+  its `unblocks` edges derive from **backlog.yaml item text**. So any groom that promotes an item
+  naming a gate slug silently drifts it and reddens `test_gates_json`. Happened twice on
+  2026-07-28. Either add `render_gates.py` to `snapshot.ps1` + the CLAUDE.md ritual line, or fold
+  it into `render_board.py` since the same edit triggers both.
+
+- 2026-07-28 — [idea] **Two sessions picked the same backlog item ten minutes apart.** Both a groom
+  session and this one independently built C19; the duplicate was thrown away. CLAUDE.md's pull
+  rule already says *"set it `in_progress`"* — what is missing is that the claim only works if it
+  is **pushed before the work starts**, not written at the end. Worth making explicit in the pull
+  rule, since the cost is silent and only visible after both sides commit.
+
+- 2026-07-28 — [chore] **`docs/design/feedback/drydocs-startup-refresh-runbook-sme.html` is
+  misnamed and stale.** It is YAML content (a Copy-feedback export) carrying an `.html` extension,
+  and its two notes are the rev1 feedback that Rev 2 already applied — so it is neither loadable as
+  feedback (`<doc-stem>-rev<N>.yaml` is the expected name) nor new. Left untracked, untouched.
+  Either rename it to the next rev with `status: applied` on both notes, or delete it.
+
 - 2026-07-27 — [idea] **The SME orchestrator-mapping act: what actually flips a batch port on.**
   SME direction, this session. CONFIRMED first, since the design rests on it: both ports are
   created `active = false` (`seal_applications.cypher:97,101`, `ON CREATE SET`) — and the
