@@ -2652,6 +2652,120 @@ items:
       CSV contract: CSV_CONTRACT constant AST-matched to the code's row.get() keys and
       subset-checked against controlm_jobs.sql aliases.
 
+  # Groomed 2026-07-28 pm from the in-session "one document with loaders, order,
+  # commands, source→target mapping?" scope. Answer was NO — it is split across
+  # internal/repo-README.md (CLI reference + Control-M run order), the startup/refresh
+  # runbook (operational chain), 04-sme-checklist-and-load-plan.md (sequential plan)
+  # and config/source-mappings/*.yaml (the column ledgers). N3-N6 build it as a
+  # RENDER rather than a fourth hand-written doc — hand-authoring it would create
+  # exactly the drift this session fixed twice (README scan roots, provision.ps1).
+  - id: N3
+    epic: source-column-mappings
+    title: "Declare the three joins a load map needs: loader->source_id, command->loaders, and the canonical load sequence"
+    type: task
+    module: drydocs-load
+    phase: 11
+    agent: main
+    model: sonnet
+    priority: p2
+    status: todo
+    depends_on: []
+    inputs: [drydocs/loaders/base.py, drydocs/loaders/, drydocs/cli.py, config/source-registry.yaml, scripts/ingest.sh]
+    acceptance: >
+      The three facts a load map is built from become machine-readable, because none of
+      them are today. (1) Every BaseLoader subclass declares source_id resolving to a
+      config/source-registry.yaml id — BaseLoader carries name (e.g. controlm_jobs.v1)
+      and source_label ('csv'|'oracle'|'agent'|'human') but NOTHING tying a loader to its
+      registered source, so loader->source->column-ledger cannot be traversed at all.
+      (2) Each Typer command that runs loaders declares which ones, in order (today it is
+      only in the function body). (3) ONE canonical ordered load sequence is declared
+      once. Guards: every declared source_id resolves in the registry; every sequence step
+      is a real registered command; every loader is either declared or explicitly exempt
+      (base/abstract) — no silent omissions.
+    notes: >
+      Counts at groom time: 25 BaseLoader subclasses across 21 modules, 32 registered
+      Typer commands, 16 registry sources. Module drydocs-load (the declarations live on
+      loader classes) rather than config like N1/N2 — the ledgers are config, the joins
+      are code. The guard catches an UNRESOLVABLE source_id, not a WRONG one, so assign
+      each from the loader's own SQL/adapter and review in one pass. Startable now:
+      N1/N2 are done.
+  - id: N4
+    epic: source-column-mappings
+    title: "Render the load map: one generated artifact joining sources, loaders, commands, order and column ledgers"
+    type: task
+    module: drydocs-docgen
+    phase: 11
+    agent: main
+    model: sonnet
+    priority: p2
+    status: todo
+    depends_on: [N3]
+    inputs: [config/source-registry.yaml, config/source-mappings/, drydocs/source_mappings.py, scripts/render_gates.py, scripts/render_enforcement_matrix.py]
+    acceptance: >
+      A scripts/render_*.py emits web/src/generated/load-map.json joining the N3
+      declarations to the registry and the column ledgers, plus a committed==regenerated
+      guard (the gates.json / enforcement-matrix.json precedent, and J17's lesson: wire it
+      into the default board render so a groom cannot leave it stale). Ledger coverage is
+      rendered in the THREE states governance already defines, never omitted: has a ledger
+      (3 — controlm-psgmgr, depgraph-snapshot, design-docs), confirmed but on the frozen
+      shrink-only LEDGER_PENDING list (8), unconfirmed placeholder (5). A source that is
+      silently absent from the render is a defect.
+    notes: >
+      Deliberately reuses existing governance instead of inventing a "no ledger yet"
+      concept: LEDGER_PENDING and test_every_confirmed_source_has_a_ledger_or_is_named_pending
+      (N2) already carry that state, and the list is frozen shrink-only, so the render
+      inherits the guarantee. Module drydocs-docgen — it is a renderer of the L3 class,
+      even though its inputs are config.
+  - id: N5
+    epic: source-column-mappings
+    title: "The human load-map surface: a readable page generated from load-map.json, wired into the session ritual"
+    type: task
+    module: drydocs-docgen
+    phase: 11
+    agent: main
+    model: sonnet
+    priority: p2
+    status: todo
+    depends_on: [N4]
+    inputs: [web/src/generated/load-map.json, scripts/render_design_doc.py, knowledge/depgraph-snapshots/snapshot.ps1]
+    acceptance: >
+      A readable rendered page (screen + print, PDF-able for the SME loop) generated from
+      load-map.json and refreshed by the session ritual alongside the board and design
+      docs; re-render leaves a clean tree. It does NOT live under docs/design/ as a
+      generated .md: that tree's contract is hand-authored .md as the single source of
+      truth, validated against the outline templates, so a generated file there would
+      break both the contract and test_doc_outline. Either a separate home or an explicit
+      generated-doc carve-out — decide and record which.
+    notes: >
+      The placement question is the real content of this item; the rendering is
+      mechanical. Answers the original ask (one surface with loaders, order, commands and
+      source->target mapping) and supersedes reading three docs plus three YAML ledgers.
+  - id: N6
+    epic: source-column-mappings
+    title: "Retire the two disagreeing load sequences: ingest.sh and the startup runbook both derive from the declared one"
+    type: chore
+    module: docs
+    phase: 11
+    agent: main
+    model: sonnet
+    priority: p3
+    status: todo
+    depends_on: [N3]
+    inputs: [scripts/ingest.sh, docs/design/drydocs-startup-refresh-runbook.md, drydocs/cli.py]
+    acceptance: >
+      scripts/ingest.sh and the startup/refresh runbook stop carrying independent
+      sequences and derive from the one declared in N3 — a guard proves they agree.
+      Today they disagree in SCOPE, not just wording: ingest.sh runs check -> bootstrap ->
+      apply-supplements -> ingest-controlm -> m1/m3-verify, while the runbook expands the
+      supplements into three separate commands and adds refresh-reference plus the two
+      corpora loaders. Whichever is generated from, the other is currently wrong.
+    notes: >
+      p3 and last because it is the only phase that changes behaviour rather than adding
+      a surface, and it touches a GOVERNED render (the runbook — Rev bump + change note +
+      pinned rev in test_doc_traceability_loader.py). Without it the load map is accurate
+      the day it ships and drifts the first time either sequence is edited, which is the
+      failure mode N3-N5 exist to end.
+
   # ── Epic O — Web console / graph visualization (main) — Phase 12 ───────────
   # Groomed 2026-07-09 (user decision: promote to a module + phase — the web/ front-end
   # design pass is in flight on branches). NEW module drydocs-web (JS/TS under web/, not a
@@ -8232,11 +8346,11 @@ items:
       remaining two as one revision.
 
 summary:
-  todo: 59                                         # 2026-07-28 pm post-UI-merge groom: +15 (U7/U8 instrument hardening, O35 WF-LND landing, O36 dot clip, O37-O41 DataLens/DSI continuity, B5 stage taxonomy, R9 agent query surface, J18/J19 process, L20 stray-file guard, L21 runbook Rev 4).                                       # C15/C16/L18/D8/J17 claimed in_progress 2026-07-28 (batch claim, pushed-claim discipline). P5 claimed in_progress 2026-07-28 pm (pushed-claim discipline). 2026-07-28 pm epic-close-out groom: +7 (G42-G44 Snowflake data-catalog seam from the loader plan; L18 comma-split bug, L19 doc-drift sweep, D8 bootstrap guard, J17 gates.json ritual — all from same-day inbox lines), U5 executed in-run (-1, Epic U closed 6/6); prior: U4 closed 2026-07-28 pm (right after U6 unblocked it); U6 groomed + built + closed same day (net 0); +4 at the 2026-07-28 inbox groom (C19 ontology-comment fix, J16 port-manifest fall-through guard, L17 doc-loader prereq guards, O34 web npm advisories); all four closed same day (O34 via its stop clause), L16 closed alongside; +5 2026-07-27 groom (J14/J15/G36/O33/G38), +2 PAT review (C17/C18), +5 code-graph-review (U1-U5), +2 cmdline seam (G39/G40, built+closed same day)
+  todo: 63                                         # 2026-07-28 pm load-map groom: +4 (N3-N6 — the generated loaders/order/commands/source-target surface; only N3 is dependency-free, N4->N5 chain and N6 waits on N3's declared sequence). # 2026-07-28 pm post-UI-merge groom: +15 (U7/U8 instrument hardening, O35 WF-LND landing, O36 dot clip, O37-O41 DataLens/DSI continuity, B5 stage taxonomy, R9 agent query surface, J18/J19 process, L20 stray-file guard, L21 runbook Rev 4).                                       # C15/C16/L18/D8/J17 claimed in_progress 2026-07-28 (batch claim, pushed-claim discipline). P5 claimed in_progress 2026-07-28 pm (pushed-claim discipline). 2026-07-28 pm epic-close-out groom: +7 (G42-G44 Snowflake data-catalog seam from the loader plan; L18 comma-split bug, L19 doc-drift sweep, D8 bootstrap guard, J17 gates.json ritual — all from same-day inbox lines), U5 executed in-run (-1, Epic U closed 6/6); prior: U4 closed 2026-07-28 pm (right after U6 unblocked it); U6 groomed + built + closed same day (net 0); +4 at the 2026-07-28 inbox groom (C19 ontology-comment fix, J16 port-manifest fall-through guard, L17 doc-loader prereq guards, O34 web npm advisories); all four closed same day (O34 via its stop clause), L16 closed alongside; +5 2026-07-27 groom (J14/J15/G36/O33/G38), +2 PAT review (C17/C18), +5 code-graph-review (U1-U5), +2 cmdline seam (G39/G40, built+closed same day)
   in_progress: 1                                   # E1 (gate deferred both sides). 2026-07-28 batch claim fully closed: J17, D8, L18, C15, C16 all done same day
   blocked: 0
   done: 167                                        # 2026-07-28: C16 key-prefix governance in the metadata plan (drydocs./system/team-local classes), C15 inverse_label on all 78 vocab entries (presentational only, schema-test enforced), L18 depth-0 cell split (the K2 shear healed; conformance guard over the real matrices), D8 bootstrap constraint guard (names-not-counts presence check after apply, live 51/51), J17 gates.json folded into the default-paths board render (drift closed at the ritual level). Earlier 2026-07-28 pm: P5 maintenance-window query (patch-window CLI + union-not-sum window math + findings feeder; claimed-then-closed same day — EPIC P COMPLETE 5/5), U5 groom-skill graph cross-check subsection (executed inside the close-out groom — EPIC U COMPLETE 6/6), U4 tech-debt graph-evidence section (hardened A1-A6 pack + offline fallback, all probes run live), U6 depgraph scanner blind-spot fix (shared-namespace extract_many + drydocs_api root; 205 modules / 370 IMPORTS, all 24 U1 orphan false-positives resolved). Earlier 2026-07-28: G41 glue base-table inventory seam (built + closed same day), L17 doc-loader prereq guards (same), O33 SchemaMeta exemplar audit (22 specs + runs_on write path; live-proven), O34 npm advisories (postcss cleared; react-router escalated via the stop clause), U1/U2/U3 code-graph persona reviews run 1 (scanner blind-spot headline; backlog verified truthful; doc board + citation sweep queued), C19 ontology-comment fix (groomed + closed same day), J16 port-manifest fall-through guard (same), L16 runbook container/port refresh. 2026-07-27 closes: J14 SEALID split, P3 hosts+RUNS_ON, G21 rua code-ops, G24 code-repo seam, G26 launcher-registry config, Q8 bmc-docs prereq, C18 shadow-model guard, J15 value-shape boundary guard, G33 code-snapshot loader (gate signed + built same day), G39 cmdline staging store + G40 parse (groomed am, built pm)
-  next_ready: [M3, M4, J10, Q6, O23, J13, O26, O27, C17, O28, R3, R4, O29, O30, O31, O32, S1, S8, S9, Q7, G32, G34, G35, G22, G42, L19, O35, O36, O37, O38, O40, O41, B5, R9, J18, J19, L20, L21]
+  next_ready: [N3, M3, M4, J10, Q6, O23, J13, O26, O27, C17, O28, R3, R4, O29, O30, O31, O32, S1, S8, S9, Q7, G32, G34, G35, G22, G42, L19, O35, O36, O37, O38, O40, O41, B5, R9, J18, J19, L20, L21]
   # 2026-07-28 pm post-UI-merge groom: all 15 new items dependency-free except
   # O39 (waits on O38's IdChips — the link surface). O37 coordinates with O30
   # informally (no hard dependency; whichever lands second re-verifies).

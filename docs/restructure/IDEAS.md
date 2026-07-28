@@ -809,6 +809,17 @@ Tags help grooming: `idea` · `bug` · `doc` · `source` (new data source) · `q
 
 ## Recently groomed (audit trail)
 
+- 2026-07-28 pm — [question] "do we have ONE document with the loaders and order, commands,
+  source→target mapping?" → answered NO, then scoped and groomed as **N3–N6** (Epic N,
+  phase 11). It is split today across `internal/repo-README.md` (CLI reference + Control-M
+  run order), the startup/refresh runbook (operational chain),
+  `04-sme-checklist-and-load-plan.md` (sequential plan) and `config/source-mappings/*.yaml`
+  (column ledgers). Built as a RENDER, not a fourth hand-written doc — hand-authoring it
+  would create exactly the drift this session fixed twice (the depgraph README's stale scan
+  roots, `provision.ps1`'s stale `docker run`). The blocker found while scoping: loaders
+  declare `name` and `source_label` but NO source-registry id, so loader→source→column-ledger
+  cannot be traversed at all — that is N3, and it has value even if N4–N6 never ship.
+  No inbox line preceded this; the question arrived in chat and is recorded here for the trail.
 - 2026-07-28 pm (post-UI-merge pass) — [bug] snapshot instrument unpinned (fd2834d) → **U7**
   (revision pin + capability probe); the sibling-repo depgraph fork merge stays inboxed as a
   [question] — user's call, different repo.
