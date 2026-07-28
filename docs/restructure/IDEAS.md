@@ -26,6 +26,16 @@ Tags help grooming: `idea` · `bug` · `doc` · `source` (new data source) · `q
 
 <!-- add new ideas at the top -->
 
+- 2026-07-28 — [idea] **Agent graph-navigation surface** (benchmarked live 2026-07-28): agents
+  answering code-nav questions from the loaded code graph instead of the filesystem is real —
+  5 questions in ~410ms / ~1.2k chars total vs grep's noisy or infeasible equivalents
+  (fan-in: graph exact 19 vs grep 33 with ~10 false positives from unrelated `base.py` packages;
+  cycles + transitive dependents: 1 query / ~25 chars vs infeasible-or-iterative greps; root
+  census: 245 chars vs ~7k est. of Glob paths). BUT cross-root question returned 0 vs grep's
+  true 24 — graph-first is only safe AFTER the scanner fix (line below). Mechanism proposal:
+  a read-only `drydocs query <spec>` CLI subcommand over the (O33-guarded) query_specs so
+  agents get one deterministic, testable command — folds naturally into U4's tech-debt query
+  pack; MCP (mcp-neo4j-cypher) is the richer later option but adds config + write-risk surface.
 - 2026-07-28 — [bug] **Depgraph snapshot scanner blind spots — one fix, three symptoms** (U1 F1 +
   U2 census, code-graph review run 1): (a) ZERO cross-root IMPORTS edges recorded (base.py's
   top-level imports of drydocs_core.cypher_split/run_log have no edge), (b) function-level
