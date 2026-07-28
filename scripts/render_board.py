@@ -4,6 +4,12 @@ Thin CLI entry point beside ``knowledge/depgraph-snapshots/snapshot.ps1`` (see b
 item I2 / CLAUDE.md §0 session ritual) until the ``drydocs/cli.py`` entrypoint-boundary
 TODO (MODULE_MAP.md) is resolved. Stdlib + ``drydocs.plan_board`` only.
 
+A default-paths run ALSO refreshes ``web/src/generated/gates.json`` (J17):
+``render_gates.py`` reads backlog item text, so a groom that edits it would
+otherwise silently drift gates.json past ``tests/unit/test_gates_json.py``.
+One command refreshes both; an explicit ``--backlog``/``--out`` run (tests,
+previews) renders the board only.
+
 Usage:
     python scripts/render_board.py
     python scripts/render_board.py --backlog path/to/backlog.yaml --out path/to/board.html
@@ -34,6 +40,11 @@ def main() -> None:
 
     out_path = write_board(args.backlog, args.out)
     print(f"wrote {out_path}")
+
+    if args.backlog == DEFAULT_BACKLOG_PATH and args.out == DEFAULT_BOARD_PATH:
+        import render_gates
+
+        render_gates.main()
 
 
 if __name__ == "__main__":
