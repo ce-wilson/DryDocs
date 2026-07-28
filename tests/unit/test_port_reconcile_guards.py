@@ -7,9 +7,11 @@ as the map guard (pytest + yaml.safe_load) — no second parser.
 Three rules:
 
 * **Status no-downgrade** — a merge may never downgrade
-  relationship_vocabulary.yaml ``active`` → planned/deprecated/removed, nor
-  taxonomy-ontology-map.yaml ``confirmed``/``applied`` → proposed; and a
-  consumer entry may never simply VANISH (per-entry means union of entries).
+  relationship_vocabulary.yaml ``active`` → planned/deprecated/removed,
+  taxonomy-ontology-map.yaml ``confirmed``/``applied`` → proposed, nor
+  backlog.yaml ``done`` → todo/in_progress (J16, 2026-07-28: that file became a
+  per-entry row once the fall-through guard showed it had none); and a consumer
+  entry may never simply VANISH (per-entry means union of entries).
 * **Append-only** — union-append audit files (config/gate-log.md): the
   pre-merge text must be a byte prefix of the merged text.
 * **Version-string rule** — asserted in test_port_manifest.py (the manifest row
@@ -44,6 +46,7 @@ REPO = Path(__file__).resolve().parents[2]
 MANIFEST_FILE = REPO / "PORT-MANIFEST.yaml"
 VOCAB_FILE = REPO / "drydocs_core" / "ontology" / "relationship_vocabulary.yaml"
 MAP_FILE = REPO / "config" / "taxonomy-ontology-map.yaml"
+BACKLOG_FILE = REPO / "docs" / "restructure" / "backlog.yaml"
 GATE_LOG = REPO / "config" / "gate-log.md"
 
 BEFORE_DIR_ENV = "RECONCILE_BEFORE_DIR"
@@ -55,6 +58,13 @@ VOCAB_DOWNGRADES: dict[str, set[str]] = {"active": {"planned", "deprecated", "re
 MAP_DOWNGRADES: dict[str, set[str]] = {
     "confirmed": {"proposed"},
     "applied": {"proposed"},
+}
+# entry_rule (J16): "NEVER regress a status (done -> in_progress/todo) or drop an
+# entry". Both sides plan against OVERLAPPING ids, so a port that walks work
+# backwards is indistinguishable from a port that never happened.
+BACKLOG_DOWNGRADES: dict[str, set[str]] = {
+    "done": {"in_progress", "todo", "blocked"},
+    "in_progress": {"todo"},
 }
 
 
@@ -104,6 +114,10 @@ def vocab_entries(doc: dict) -> list[dict]:
 
 def map_entries(doc: dict) -> list[dict]:
     return doc["mappings"]
+
+
+def backlog_entries(doc: dict) -> list[dict]:
+    return doc["items"]
 
 
 # --- fixture-driven mechanics (run everywhere) ------------------------------------
@@ -157,6 +171,32 @@ def test_map_confirmed_and_applied_downgrades_fail() -> None:
     assert len(violations) == 2 and all("downgraded" in v for v in violations)
 
 
+def test_backlog_status_regression_fails() -> None:
+    """A port that walks a `done` item back to `todo` erases the fact that the
+    work happened — the reason backlog.yaml is per-entry and not `evaluate`."""
+    before = [
+        {"id": "J16", "status": "done"},
+        {"id": "L17", "status": "in_progress"},
+        {"id": "U1", "status": "todo"},
+    ]
+    after = [
+        {"id": "J16", "status": "todo"},          # the producer's older plan won
+        {"id": "L17", "status": "in_progress"},
+        {"id": "U1", "status": "done"},           # progress forward: fine
+    ]
+    violations = status_downgrades(before, after, key="id", downgrade_map=BACKLOG_DOWNGRADES)
+    assert violations == ["J16: status downgraded 'done' -> 'todo'"]
+
+
+def test_backlog_dropped_item_fails() -> None:
+    """The other half of per-entry: a whole-file checkout deletes the ids the
+    other side added, and nothing else in the port would notice."""
+    before = [{"id": "J16", "status": "done"}, {"id": "COMPANY-ONLY", "status": "todo"}]
+    after = [{"id": "J16", "status": "done"}]
+    violations = status_downgrades(before, after, key="id", downgrade_map=BACKLOG_DOWNGRADES)
+    assert violations == ["COMPANY-ONLY: entry DROPPED by the merge (was 'todo')"]
+
+
 def test_gate_log_append_only_mechanics() -> None:
     before = "# HITL gate log\n\n## 2026-06-21 - C1\n- Confirmed: 4\n"
     appended = before + "\n## 2026-07-11 - new gate\n- Confirmed: 1\n"
@@ -176,6 +216,11 @@ def test_current_files_pass_their_own_rules() -> None:
     mapping = yaml.safe_load(MAP_FILE.read_text(encoding="utf-8"))
     assert status_downgrades(
         map_entries(mapping), map_entries(mapping), key="id", downgrade_map=MAP_DOWNGRADES
+    ) == []
+    backlog = yaml.safe_load(BACKLOG_FILE.read_text(encoding="utf-8"))
+    assert status_downgrades(
+        backlog_entries(backlog), backlog_entries(backlog),
+        key="id", downgrade_map=BACKLOG_DOWNGRADES,
     ) == []
     text = GATE_LOG.read_text(encoding="utf-8")
     assert append_only_violation(text, text) is None
@@ -211,6 +256,18 @@ def test_reconcile_map_no_downgrade_live() -> None:
     after = yaml.safe_load(MAP_FILE.read_text(encoding="utf-8"))
     violations = status_downgrades(
         map_entries(before), map_entries(after), key="id", downgrade_map=MAP_DOWNGRADES
+    )
+    assert not violations, "\n".join(violations)
+
+
+@_needs_before
+def test_reconcile_backlog_no_regression_live() -> None:
+    before_dir = Path(os.environ[BEFORE_DIR_ENV])
+    before = yaml.safe_load((before_dir / "backlog.yaml").read_text(encoding="utf-8"))
+    after = yaml.safe_load(BACKLOG_FILE.read_text(encoding="utf-8"))
+    violations = status_downgrades(
+        backlog_entries(before), backlog_entries(after),
+        key="id", downgrade_map=BACKLOG_DOWNGRADES,
     )
     assert not violations, "\n".join(violations)
 

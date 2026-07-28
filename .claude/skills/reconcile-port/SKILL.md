@@ -22,8 +22,12 @@ the accumulated lessons from prior ports. Read both.
    `git remote add cewilson https://github.com/ce-wilson/DryDocs.git` (ignore if
    it exists), then `git fetch cewilson main`.
 2. **Read the manifest first:** `git show cewilson/main:PORT-MANIFEST.yaml` —
-   the machine-readable disposition per path (first match wins; per-entry rows
-   FORBID whole-file checkout). Then the narrative:
+   the machine-readable disposition per path (first match wins; `**` spans
+   separators, `*`/`?` do not; per-entry rows FORBID whole-file checkout).
+   A path matching no row takes `default:` — but only legitimately if it is
+   listed in `default_ok:` at the bottom of the manifest with a reason (J16).
+   **A path in neither is an un-made decision, not a clean-add:** stop and
+   decide it, then send the row back. Then the narrative:
    `git show cewilson/main:git-readme.md` ("Clean-adds", "Canonical-here",
    "Collisions" sections). Manifest wins on disagreement.
 3. **Apply onto `main`** (skip the optional scratch branch unless asked):
@@ -146,13 +150,14 @@ that owns the review commands passes as-is; do NOT extract a `review_cli.py` sub
 
 The PORT-MANIFEST `per-entry` / `union-append` entry_rules are executable
 (`tests/unit/test_port_reconcile_guards.py`): status no-downgrade (vocabulary
-`active`, map `confirmed`/`applied`), no dropped entries, gate-log append-only.
-Use them to PROVE the merge respected the rules instead of eyeballing:
+`active`, map `confirmed`/`applied`, **backlog `done`** — J16), no dropped
+entries, gate-log append-only. Use them to PROVE the merge respected the rules
+instead of eyeballing:
 
 ```
 # 1. BEFORE applying the port — snapshot the consumer copies
 mkdir "$env:TEMP/reconcile-before"
-cp drydocs_core/ontology/relationship_vocabulary.yaml, config/taxonomy-ontology-map.yaml, config/gate-log.md "$env:TEMP/reconcile-before/"
+cp drydocs_core/ontology/relationship_vocabulary.yaml, config/taxonomy-ontology-map.yaml, docs/restructure/backlog.yaml, config/gate-log.md "$env:TEMP/reconcile-before/"
 
 # 2. apply the range / resolve collisions as usual
 
