@@ -175,6 +175,10 @@ def test_dev_environment_records_the_expected_instrument():
     dep = _configured_instrument()
     assert dep["repo"], "the sibling checkout path must be recorded"
     assert dep["expected_branch"] and dep["expected_commit"]
+    assert isinstance(dep["capability_assert"], bool), (
+        "capability_assert must be an explicit bool — a missing key would silently "
+        "decide whether the live check asserts or skips"
+    )
     assert "multi_root" in dep["requires"]["scan"]
     assert "tree" in dep["requires"]["tree"]
     # every required capability must be one the probe actually knows how to test
@@ -185,10 +189,27 @@ def test_dev_environment_records_the_expected_instrument():
 def test_live_instrument_satisfies_the_capabilities_snapshot_requires():
     """The check that was missing on 2026-07-28.
 
-    Skips when the sibling repo is not checked out — this repo must stay
-    clonable and testable on its own.
+    Two ways this legitimately does not run, and they are different:
+
+    * the sibling repo is not checked out — this repo must stay clonable and
+      testable on its own;
+    * ``depgraph.capability_assert`` is false — the deployment's scanner is
+      separately owned, so a missing capability is an owed action elsewhere
+      rather than a defect here. The consumer hit exactly this: its depgraph
+      fork lacks the U6 resolver and the producer remote is unreachable from
+      it, so the port could not remediate (PORT-REPORT-94132c80 / 48e).
+
+    The second gate is config, not an env var, so this file stays identical on
+    both sides and there is nothing to reconcile at the next port.
     """
-    dep_path = (REPO_ROOT / _configured_instrument()["repo"]).resolve()
+    dep = _configured_instrument()
+    if not dep["capability_assert"]:
+        pytest.skip(
+            "config/dev-environment.yaml sets depgraph.capability_assert: false — "
+            "the configured scanner is separately owned; its capability gap is an "
+            "owed action there, not a failure here"
+        )
+    dep_path = (REPO_ROOT / dep["repo"]).resolve()
     if not (dep_path / "depgraph").is_dir():
         pytest.skip(f"depgraph sibling checkout absent at {dep_path}")
     sys.path.insert(0, str(dep_path))

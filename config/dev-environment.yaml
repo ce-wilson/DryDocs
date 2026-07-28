@@ -74,3 +74,14 @@ depgraph:
   requires:
     scan: [multi_root]    # every run
     tree: [tree]          # additionally, when -Tree is passed
+  # Does the live-capability test ASSERT against the checkout, or skip?
+  # True producer-side: the sibling is ours, a missing capability is a real defect
+  # here, and failing loudly is the entire point of U7. A consumer whose depgraph
+  # fork is separately owned — and so cannot be remediated by a port — sets this
+  # FALSE with the owed action recorded, and flips it back when the fork catches up
+  # (PORT-REPORT-94132c80 / owed action 48e). Deliberately a config flag and NOT an
+  # env var or a second test variant: this file is canonical-company in
+  # PORT-MANIFEST.yaml, so the divergence lives in the one file already ruled
+  # per-side and tests/unit/test_probe_instrument.py stays BYTE-IDENTICAL on both
+  # sides — nothing to reconcile at the next port.
+  capability_assert: true
