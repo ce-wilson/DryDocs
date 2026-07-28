@@ -125,8 +125,45 @@ The legacy job illustrates the hazards agents must handle when parsing/resolving
 ### Phase 1 — Template
 Define the **proper-variable template**: canonical names (e.g. `DROPBOX_DIR` not `DRPBX_DIR`), when a variable is warranted vs a literal, no punctuation-as-value, direct paths over indirection chains. Plus the **Description metadata template**: approved key list (table above as seed), `key: value | key: value` format, split-on-first-colon rule, escaping convention (to define).
 
+#### Key-prefix governance (C16, 2026-07-28 — modeled on annotation-naming governance)
+
+Metadata keys carry an **ownership prefix**, the way annotation keys do in
+catalog systems (Backstage's `<domain>/<name>` annotation convention): the
+prefix says *who owns the key's meaning*, so two teams can never silently
+collide on the same spelling and a parser can tell load-bearing keys from
+local notes. Three classes:
+
+1. **Reserved core prefix — `drydocs.`** Keys whose meaning the template/graph
+   owns (`drydocs.datasetSeriesName`, `drydocs.seriesSLA`). Only this standard
+   (post-ratification: only the gate) may add or change `drydocs.*` keys; they
+   are the keys loaders may build relationships from.
+2. **System-owned prefixes.** A key whose value belongs to an external
+   system's namespace carries that system's prefix — the `scim.` / `jira.` /
+   `seal.` families, plus the ones the observed table already implies
+   (`snow.` for ServiceNow queues, `mfts.` for MFT routes/accounts). The
+   owning system's documentation defines the value format; this standard only
+   registers the prefix. Example targets for the observed keys:
+   `SourceSnowQueue` → `snow.assignmentQueue`, `ROUTE_ID` → `mfts.routeId`,
+   `SEAL` (Description-carried, if ever) → `seal.id`.
+3. **Unprefixed = team-local.** A bare key (`myNote`, `runbookHint`) is a
+   team-local annotation: legal, preserved verbatim, **never load-bearing for
+   ingestion** — no loader may key a relationship or a join on an unprefixed
+   key, and validation never fails a folder/job for its team-local keys.
+
+**Migration note:** every key in the observed-inventory table above is
+currently unprefixed. They are grandfathered as *observed* spellings only;
+ratification of the Phase-1 template assigns each one a home (`drydocs.*` or
+a system prefix) and records the old→new mapping so Phase-2 validation can
+recognize both during the transition. (Open items 1–2 in §5 — the approved
+key list and the escaping rules — are decided in the same ratification.)
+
 ### Phase 2 — Validate (don't break)
 Inventory existing variables/descriptions estate-wide and validate against the template **read-only**. Classify: conforming / non-conforming-but-functional / hazardous (e.g. concatenation-dot patterns). **Nothing is changed in this phase** — resolution behavior of legacy patterns (per [controlm-variables](../../../external/orchestration/bmc-controlm/controlm-variables.md) scope/resolution rules, incl. `VARIABLE_INC_SEC`) must be preserved.
+Validation **will enforce the key-prefix governance rules** (Phase 1 above):
+an unregistered `drydocs.*` key, a system-prefixed key whose value fails the
+owning system's format, or a loader observed keying on an unprefixed key are
+each findings; bare team-local keys themselves are reported informationally,
+never as failures.
 
 ### Phase 3 — Modernize via ontology
 Map each job/folder's variables + description metadata onto the **DryDocs ontology** so the graph *defines what the job is doing* (dataset series, delivery route, source system, support queue, SEAL application). Remediate legacy patterns to the template only once the graph confirms equivalence (the modern job above is the worked example: 5 locals → 0, path direct, metadata moved to Description/variables where it's queryable).
