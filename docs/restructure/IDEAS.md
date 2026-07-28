@@ -43,6 +43,40 @@ Tags help grooming: `idea` · `bug` · `doc` · `source` (new data source) · `q
   is left on `feat/controlm-lineage`; switching it back silently re-breaks the snapshot. Pairs
   with the instrument-change note now in `knowledge/depgraph-snapshots/README.md`, which warns
   about reading *across* the boundary but assumed the boundary only ever moves forward.
+  - **Root cause is a fork, not a stale checkout.** `depgraph` has two *divergent siblings* off a
+    one-commit `main` (`76ba075`, 2026-06-19): `feat/p0-vector` (`3806278`, +3 — `--tree`,
+    Neo4j-optional rendering, version targeting) and `feat/controlm-lineage` (`aa52315`, +4 —
+    Control-M lineage, RHEL collector, html-review profile, **the U6 multi-root fix**). Neither
+    is an ancestor of the other, so **no single revision has everything DryDocs calls**, and
+    whichever one is checked out, something is missing.
+  - **CONSEQUENCE OF THE 2026-07-28 SWITCH — `snapshot.ps1 -Tree` is broken on the laptop.**
+    `--tree` exists only on `p0-vector` (6 refs in `depgraph/cli.py`; absent from
+    `controlm-lineage`). The switch bought a truthful code graph at the price of tree mode.
+    Cost is low — no `drydocs-tree-*.json` has ever been committed, and the two `tree-*.json`
+    files are the seeded v1-rewrite pair from other provenance — but it is a real trade, and
+    `git -C ../depgraph checkout feat/p0-vector` trades it straight back. The capability probe
+    above must therefore cover **both** directions: resolver fix for a normal scan, `--tree`
+    support when `-Tree` is passed.
+  - **The consolidating fix:** merge both branches into depgraph `main` so one revision is
+    correct by default and a fresh clone stops reproducing the broken scanner. Conflict surface
+    is the six files both touched — `.gitignore`, `CONTINUATION.md`, `depgraph/__init__.py`,
+    `depgraph/cli.py`, `depgraph/extractors/__init__.py`, `depgraph/model.py` — of which only
+    `cli.py` and `model.py` are substantive. Both sides ship tests (`test_smoke.py`;
+    `test_python_imports_multiroot.py`, `test_controlm.py`, `test_html_review.py`), so the merge
+    is verifiable. Land `controlm-lineage` first (it holds the correctness fix), then
+    `p0-vector`, then delete both branches.
+  - **RESUME HERE (next session, after the 2026-07-28 reboot).** Nothing is half-applied — the
+    repo is clean and pushed; all of the below is unstarted work. In order:
+    1. **DryDocs-side, groom + build (this is the one that stops recurrence):** the `depgraph:
+       {commit, branch, dirty}` meta block in `snapshot.ps1` (gather it the way `:51–63` already
+       does for DryDocs; emit at `:86`) + the capability probe before the scan at `:82`. Expected
+       revision belongs in `config/dev-environment.yaml`, already canonical for environment facts
+       and already the render source for the L16 runbook. Not yet a `backlog.yaml` item —
+       **deliberately**, because a concurrent session held P5 `in_progress` at the time and the
+       per-entry rule (J16) makes a blind two-sided edit of that file the hazard. Groom it first.
+    2. **Sibling-repo, user's call:** the merge above. Different repo, real conflicts, worth a
+       sitting rather than a drive-by.
+    3. The `abs_path` entry below is independent of both and can go in any order.
 - 2026-07-28 — [bug] **Snapshot nodes carry machine-absolute paths, so the series is
   machine-dependent.** `abs_path` records `C:/coding/projects/DryDocs/...` on the desktop and
   `C:/coding/projects/sandbox/DryDocs/...` on the laptop. Verified today on two snapshots of the
