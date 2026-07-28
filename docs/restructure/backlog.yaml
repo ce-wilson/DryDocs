@@ -7873,12 +7873,362 @@ items:
       stale-render line names gates.json. Verified: text-edited backlog +
       one render -> gates.json in sync, test_gates_json green.
 
+  # --- 2026-07-28 pm post-UI-merge groom: instrument hardening (U7/U8), the SME
+  # --- landing revision + DataLens/DSI continuity (O35-O41, B5), the agent query
+  # --- surface (R9), process fixes (J18/J19), doc-loader guard (L20), runbook
+  # --- Rev 4 (L21). DL-7 was a merge, executed on-branch (bc61408) pre-groom.
+  - id: U7
+    epic: self-documentation
+    title: "snapshot.ps1 records and probes its own instrument: depgraph {commit, branch, dirty} in the meta header + a capability probe so a regressed scanner cannot write a silent snapshot"
+    type: bug
+    module: graph-infra
+    phase: 16
+    agent: main
+    model: sonnet
+    priority: p2
+    status: todo
+    depends_on: []
+    inputs: [knowledge/depgraph-snapshots/snapshot.ps1, config/dev-environment.yaml, knowledge/depgraph-snapshots/README.md]
+    acceptance: >
+      snapshot.ps1 emits a depgraph {commit, branch, dirty} block inside the
+      meta header (gathered the way the DryDocs git block already is) AND
+      refuses to scan when the checked-out depgraph lacks the capability the
+      run needs — a capability probe, not a version string: multi-root
+      resolution for a normal scan, --tree support when -Tree is passed. The
+      expected instrument revision is recorded in config/dev-environment.yaml.
+      A snapshot taken with a regressed scanner can no longer be written
+      silently (the 105-edge near-commit of 2026-07-28).
+    notes: >
+      Groomed 2026-07-28 pm (post-UI-merge pass) from the laptop's
+      instrument-unpinned [bug] line (fd2834d). The sibling-repo fork merge
+      (depgraph feat/controlm-lineage + feat/p0-vector -> main) stays inboxed
+      — different repo, user's call. Pairs with U8.
+  - id: U8
+    epic: self-documentation
+    title: "Committed depgraph snapshots carry no machine-absolute paths — strip/relativize abs_path so cross-machine and worktree snapshots stop producing 100%-false node diffs"
+    type: bug
+    module: graph-infra
+    phase: 16
+    agent: main
+    model: sonnet
+    priority: p2
+    status: todo
+    depends_on: []
+    inputs: [knowledge/depgraph-snapshots/snapshot.ps1, drydocs/loaders/code_snapshot.py, knowledge/depgraph-snapshots/README.md]
+    acceptance: >
+      Committed snapshot JSON carries no machine-absolute paths — snapshot.ps1
+      post-processes abs_path out (or relativizes to the repo root) the same
+      way it already injects the meta header; two snapshots of identical code
+      taken from different checkout locations differ only in their meta block;
+      the G33 code_snapshot loader stays green (it already drops abs_path at
+      load); the README documents the change as an instrument-change boundary
+      marker so the diff jump is not read as growth.
+    notes: >
+      Groomed 2026-07-28 pm from the abs_path [bug] line — twice
+      ritual-blocking that day (laptop cross-machine diff; P5 worktree
+      deferral). Closing this unblocks session-end snapshots from worktrees.
+  - id: O35
+    epic: web-console
+    title: "WF-LND landing declutter per SME feedback FB-01/FB-02: HeroArt demoted to a mark, one product-name render, h1 = value prop, navigation = modules + business-tower pick-lists"
+    type: task
+    module: drydocs-web
+    phase: 12
+    agent: main
+    model: sonnet
+    priority: p2
+    status: todo
+    depends_on: []
+    inputs: [UI-WIP/wireframes/, UI-WIP/sme-ui-launch-guide.md, web/src/modules/registry.ts, web/src/]
+    acceptance: >
+      The landing implements the WF-LND wireframes (UI-WIP/wireframes/, element
+      keys in out/KEYS.md): HeroArt demoted to a small decorative mark, the
+      product name renders exactly once (nav wordmark), the h1 carries the
+      value proposition, and navigation is two explicit pick-lists — modules
+      from modules/registry.ts and business towers scoping Explorer/Lineage.
+      Element keys still map per the L5/L6 feedback re-attachment idiom; both
+      themes screenshot-checked; npm build + lint green.
+    notes: >
+      Groomed 2026-07-28 pm from the SME FB-01/FB-02 [idea] line — direct SME
+      feedback (hub too busy, name unreadable), wireframes + key legend
+      shipped on the branch same day. p2 because it is customer feedback.
+  - id: O36
+    epic: web-console
+    title: "Loads timeline rail dot clips the first character of loader names — padding fix in LoadsTimeline"
+    type: bug
+    module: drydocs-web
+    phase: 12
+    agent: main
+    model: haiku
+    priority: p3
+    status: todo
+    depends_on: []
+    inputs: [web/src/loads/LoadsTimeline.tsx]
+    acceptance: >
+      Loader names in the loads timeline render their first character in both
+      themes (the rail dot no longer overlaps the label); screenshot check
+      attached; build green.
+    notes: >
+      Groomed 2026-07-28 pm from the branch-screenshot [bug] line
+      ("eal_attribution" / "ntrolm_folders"); pre-existing dot-and-rail
+      layout, not from the DL quick wins.
+  - id: O37
+    epic: web-console
+    title: "DL-5 radius tokens + soften pass: --radius-sm/--radius-md, cards to md, no pill buttons or gradient headers"
+    type: task
+    module: drydocs-web
+    phase: 12
+    agent: main
+    model: sonnet
+    priority: p3
+    status: todo
+    depends_on: []
+    inputs: [web/src/styles/tokens.css, web/src/index.css, web/src/App.css, internal/datalens-reference/continuity.md]
+    acceptance: >
+      --radius-sm/--radius-md tokens exist and every hard-coded border-radius
+      in web/src resolves through them; cards/panels lift to --radius-md while
+      inputs/small controls stay --radius-sm; before/after screenshots in both
+      themes attached to the review; pill buttons and gradient headers
+      explicitly NOT adopted (the continuity doc's ruled-out list); build +
+      lint green.
+    notes: >
+      Groomed 2026-07-28 pm from continuity.md DL-5. Coordinate with O30 —
+      both touch every surface's chrome; whichever lands second re-verifies
+      the other's surfaces.
+  - id: O38
+    epic: web-console
+    title: "DL-6 entity-rendering convention: identifiers as mono IdChips colored by the shared status vocabulary; medallion stage names ride the same convention (DL-11a)"
+    type: task
+    module: drydocs-web
+    phase: 12
+    agent: main
+    model: sonnet
+    priority: p3
+    status: todo
+    depends_on: []
+    inputs: [web/src/, internal/datalens-reference/continuity.md, UI-WIP/site-plan.md]
+    acceptance: >
+      A documented identifier-rendering convention (site-plan or a UI-WIP
+      note) plus an IdChip component: Control-M/product identifiers render in
+      Plex Mono inside a subtle chip colored by the shared status vocabulary;
+      adopted on the node inspector and at least one graph/list surface with
+      no bespoke identifier styling left on the touched surfaces; medallion
+      stage names (RAW/TRUSTED/REFINED/SNOWFLAKE — DL-11a) render as flat
+      mono badges through the same convention; both themes verified; build +
+      lint green.
+    notes: >
+      Groomed 2026-07-28 pm from continuity.md DL-6 + the DSI addendum's
+      DL-11(a) fold. DL-3 (its dependency) shipped on the branch, so this is
+      dependency-free. The graph-model half of DL-11 is B5.
+  - id: O39
+    epic: web-console
+    title: "DL-8 cross-tool deep-link seam, mechanism only: config/env-driven runtime-view URL-template slot on entity surfaces; company binding stays company-side"
+    type: requirement
+    module: drydocs-web
+    phase: 12
+    agent: main
+    model: sonnet
+    priority: p3
+    status: todo
+    depends_on: [O38]
+    inputs: [web/src/, UI-WIP/two-track-ui-plan.md, internal/datalens-reference/continuity.md]
+    acceptance: >
+      An optional config/env-driven "runtime view" URL-template slot renders
+      an external-link affordance on entity surfaces (inspector + IdChips)
+      when set and renders nothing when unset; the template is documented in
+      .env.example; no company URL or hostname appears anywhere in the repo;
+      build + lint green. Company-side binding is a DD-series item in the
+      company tracker, never here (the two-track seam rule).
+    notes: >
+      Groomed 2026-07-28 pm from continuity.md DL-8. Depends on O38 (IdChips
+      are the link surface).
+  - id: O40
+    epic: web-console
+    title: "DL-10 StatTiles click-to-filter: optional onSelect + active tile scopes the adjacent list (DSI's KPI-card→filter idiom)"
+    type: task
+    module: drydocs-web
+    phase: 12
+    agent: main
+    model: sonnet
+    priority: p3
+    status: todo
+    depends_on: []
+    inputs: [web/src/components/StatTiles.tsx, web/src/loads/, internal/dsi-reference/]
+    acceptance: >
+      StatTiles accepts an optional onSelect + active-tile id; the active
+      state is token-only and keyboard-operable (aria-pressed, focus-visible);
+      adopted on one live surface where tiles filter the content below (first
+      candidate: loads timeline, tile = status filters runs); both themes
+      verified; build + lint green.
+    notes: >
+      Groomed 2026-07-28 pm from the DSI addendum DL-10.
+  - id: O41
+    epic: web-console
+    title: "DL-12 one status-vocabulary → StatusChip token mapping, documented and conformed (Ready/Failed/Processing/Pending/Not Scheduled)"
+    type: chore
+    module: drydocs-web
+    phase: 12
+    agent: main
+    model: haiku
+    priority: p3
+    status: todo
+    depends_on: []
+    inputs: [web/src/components/ui/StatusChip.tsx, UI-WIP/site-plan.md, internal/datalens-reference/continuity.md]
+    acceptance: >
+      One ecosystem-status → StatusChip token mapping table is documented
+      (site-plan or a UI-WIP note): Ready→green, Failed→status-fail-soft,
+      Processing→teal, Pending→yellow, Not Scheduled→muted; StatusChip call
+      sites conform and no surface invents a divergent status→token pairing
+      (grep-checked).
+    notes: >
+      Groomed 2026-07-28 pm from the DSI addendum DL-12.
+  - id: B5
+    epic: taxonomy-capture
+    title: "Capture the medallion stage vocabulary (RAW → TRUSTED → REFINED → SNOWFLAKE) as pure classification in config/taxonomy/ — the estate's canonical stage set, SME-confirmed via the gate"
+    type: requirement
+    module: taxonomy
+    phase: 1
+    agent: taxonomy-importer
+    model: sonnet
+    priority: p3
+    status: todo
+    depends_on: []
+    inputs: [config/taxonomy/, internal/datalens-reference/continuity.md, internal/dsi-reference/]
+    acceptance: >
+      The medallion stage vocabulary is captured as pure classification in
+      config/taxonomy/ (the Epic B idiom — no meaning edges), registered per
+      the taxonomy capture rules, with the canonical stage set SME-confirmed
+      via the gate before any dataset/job stage-attribution edge is declared;
+      any such edge enters relationship_vocabulary.yaml as status: planned
+      only.
+    notes: >
+      Groomed 2026-07-28 pm from the DSI addendum DL-11(b) — both neighbor
+      tools (DataLens pipeline cards, DSI stage KPI row) expose the same
+      stage vocabulary; likely intersects the Snowflake data-catalog seam
+      (G42-G44) and the DPL S3 zone prefixes. UI half is O38.
+  - id: R9
+    epic: agentic-qa
+    title: "Read-only agent query command over the O33-guarded QuerySpecs: one deterministic, testable graph-navigation surface for agents (MCP recorded as the later option)"
+    type: task
+    module: drydocs-api
+    phase: 15
+    agent: main
+    model: sonnet
+    priority: p2
+    status: todo
+    depends_on: []
+    inputs: [drydocs_api/query_specs.py, tests/unit/test_module_boundary.py, docs/reviews/persona-architect-2026-07.md]
+    acceptance: >
+      A read-only, deterministic query command over the O33-guarded
+      QuerySpecs, placed so the module boundary holds (drydocs_api owns the
+      specs; test_module_boundary stays green): each spec addressable by name
+      with typed params, stable JSON output, refuses unknown specs/params,
+      zero write paths; unit tests drive it against a fake client; a short
+      agent-facing usage note documents it as the graph-navigation surface.
+      MCP (mcp-neo4j-cypher) explicitly out of scope, recorded as the richer
+      later option.
+    notes: >
+      Groomed 2026-07-28 pm from the live-benchmarked [idea] line (5
+      questions ~410ms/~1.2k chars vs grep's noisy equivalents; safe now that
+      U6 fixed the cross-root blind spot). CLI-vs-MCP resolved toward CLI by
+      the line's own analysis: MCP adds config + write-risk surface.
+  - id: J18
+    epic: release-infrastructure
+    title: "Live-verification claims name their machine/container/database — convention written down, recent close notes retro-tagged, sample-reproducible evidence preferred"
+    type: chore
+    module: docs
+    phase: 8
+    agent: main
+    model: haiku
+    priority: p3
+    status: todo
+    depends_on: []
+    inputs: [CLAUDE.md, docs/restructure/backlog.yaml]
+    acceptance: >
+      The live-verification convention is written down where claims are made
+      (backlog header comment + a CLAUDE.md working-agreements line): a
+      VERIFIED LIVE claim names the machine/container/database it ran on, and
+      sample-reproducible evidence ("ingest-controlm reproduces X") is
+      preferred over machine-pinned claims; the P3/P5/G33 close notes are
+      retro-tagged as the worked examples.
+    notes: >
+      Groomed 2026-07-28 pm from the two-graphs [idea] line — an audit read
+      the laptop's graph and nearly recorded G33 (desktop-built) as a defect.
+  - id: J19
+    epic: release-infrastructure
+    title: "Pull rule states the claim is pushed BEFORE work starts — the pushed-claim discipline becomes the written rule, not session lore"
+    type: chore
+    module: docs
+    phase: 8
+    agent: main
+    model: haiku
+    priority: p3
+    status: todo
+    depends_on: []
+    inputs: [CLAUDE.md, .claude/skills/groom-backlog/SKILL.md]
+    acceptance: >
+      CLAUDE.md's pull rule (and the groom-backlog skill where it restates
+      it) says the in_progress claim is COMMITTED AND PUSHED before work
+      starts, not written at close, and names why (two sessions independently
+      built C19 ten minutes apart on 2026-07-28).
+    notes: >
+      Groomed 2026-07-28 pm from the duplicate-C19 [idea] line.
+  - id: L20
+    epic: doc-infrastructure
+    title: "feedback/ stray-file guard: files matching no expected -rev<N>.yaml pattern are reported as findings, not silently ignored"
+    type: task
+    module: drydocs-load
+    phase: 10
+    agent: main
+    model: sonnet
+    priority: p3
+    status: todo
+    depends_on: []
+    inputs: [drydocs/loaders/doc_traceability.py, docs/design/feedback/]
+    acceptance: >
+      The feedback adapter (or a companion check in the same loader family)
+      reports files under docs/design/feedback/ that match no expected
+      -rev<N>.yaml pattern as findings instead of silently ignoring them —
+      the misnamed Copy-feedback export dead end (resolved 2026-07-28)
+      becomes detectable; a test pins a stray-file fixture producing a
+      finding; suite green.
+    notes: >
+      Groomed 2026-07-28 pm from the resolved misnamed-export [chore] line's
+      latent gap: the L5 Copy-feedback path trusts the human to name the
+      file, and a wrong name is invisible today. Sits in the L17/L18
+      loud-refusal family.
+  - id: L21
+    epic: doc-infrastructure
+    title: "Startup-refresh runbook Rev 4: collapse the per-file supplement verbs to the single apply-supplements chain (G29) — also retires Appendix B's missing registry-supplement gap"
+    type: chore
+    module: docs
+    phase: 10
+    agent: main
+    model: haiku
+    priority: p3
+    status: todo
+    depends_on: []
+    inputs: [docs/design/drydocs-startup-refresh-runbook.md, scripts/render_design_doc.py]
+    acceptance: >
+      Runbook Rev 4: the per-file supplement verb block (step 4 + Appendix B)
+      collapses to the single verified `poetry run drydocs apply-supplements`
+      chain (G29), which also retires Appendix B's long-standing missing
+      apply-registry-supplement gap; rendered HTML regenerated and the
+      stale-render check passes.
+    notes: >
+      Groomed 2026-07-28 pm from the held 2026-07-26 [doc] line — the hold
+      (SME review in flight) lifted when the review closed; edit 3 of its
+      trio (container facts) already landed via L16 Rev 3, this is the
+      remaining two as one revision.
+
 summary:
-  todo: 46                                         # C15/C16/L18/D8/J17 claimed in_progress 2026-07-28 (batch claim, pushed-claim discipline). P5 claimed in_progress 2026-07-28 pm (pushed-claim discipline). 2026-07-28 pm epic-close-out groom: +7 (G42-G44 Snowflake data-catalog seam from the loader plan; L18 comma-split bug, L19 doc-drift sweep, D8 bootstrap guard, J17 gates.json ritual — all from same-day inbox lines), U5 executed in-run (-1, Epic U closed 6/6); prior: U4 closed 2026-07-28 pm (right after U6 unblocked it); U6 groomed + built + closed same day (net 0); +4 at the 2026-07-28 inbox groom (C19 ontology-comment fix, J16 port-manifest fall-through guard, L17 doc-loader prereq guards, O34 web npm advisories); all four closed same day (O34 via its stop clause), L16 closed alongside; +5 2026-07-27 groom (J14/J15/G36/O33/G38), +2 PAT review (C17/C18), +5 code-graph-review (U1-U5), +2 cmdline seam (G39/G40, built+closed same day)
+  todo: 61                                         # 2026-07-28 pm post-UI-merge groom: +15 (U7/U8 instrument hardening, O35 WF-LND landing, O36 dot clip, O37-O41 DataLens/DSI continuity, B5 stage taxonomy, R9 agent query surface, J18/J19 process, L20 stray-file guard, L21 runbook Rev 4).                                       # C15/C16/L18/D8/J17 claimed in_progress 2026-07-28 (batch claim, pushed-claim discipline). P5 claimed in_progress 2026-07-28 pm (pushed-claim discipline). 2026-07-28 pm epic-close-out groom: +7 (G42-G44 Snowflake data-catalog seam from the loader plan; L18 comma-split bug, L19 doc-drift sweep, D8 bootstrap guard, J17 gates.json ritual — all from same-day inbox lines), U5 executed in-run (-1, Epic U closed 6/6); prior: U4 closed 2026-07-28 pm (right after U6 unblocked it); U6 groomed + built + closed same day (net 0); +4 at the 2026-07-28 inbox groom (C19 ontology-comment fix, J16 port-manifest fall-through guard, L17 doc-loader prereq guards, O34 web npm advisories); all four closed same day (O34 via its stop clause), L16 closed alongside; +5 2026-07-27 groom (J14/J15/G36/O33/G38), +2 PAT review (C17/C18), +5 code-graph-review (U1-U5), +2 cmdline seam (G39/G40, built+closed same day)
   in_progress: 1                                   # E1 (gate deferred both sides). 2026-07-28 batch claim fully closed: J17, D8, L18, C15, C16 all done same day
   blocked: 0
   done: 165                                        # 2026-07-28: C16 key-prefix governance in the metadata plan (drydocs./system/team-local classes), C15 inverse_label on all 78 vocab entries (presentational only, schema-test enforced), L18 depth-0 cell split (the K2 shear healed; conformance guard over the real matrices), D8 bootstrap constraint guard (names-not-counts presence check after apply, live 51/51), J17 gates.json folded into the default-paths board render (drift closed at the ritual level). Earlier 2026-07-28 pm: P5 maintenance-window query (patch-window CLI + union-not-sum window math + findings feeder; claimed-then-closed same day — EPIC P COMPLETE 5/5), U5 groom-skill graph cross-check subsection (executed inside the close-out groom — EPIC U COMPLETE 6/6), U4 tech-debt graph-evidence section (hardened A1-A6 pack + offline fallback, all probes run live), U6 depgraph scanner blind-spot fix (shared-namespace extract_many + drydocs_api root; 205 modules / 370 IMPORTS, all 24 U1 orphan false-positives resolved). Earlier 2026-07-28: G41 glue base-table inventory seam (built + closed same day), L17 doc-loader prereq guards (same), O33 SchemaMeta exemplar audit (22 specs + runs_on write path; live-proven), O34 npm advisories (postcss cleared; react-router escalated via the stop clause), U1/U2/U3 code-graph persona reviews run 1 (scanner blind-spot headline; backlog verified truthful; doc board + citation sweep queued), C19 ontology-comment fix (groomed + closed same day), J16 port-manifest fall-through guard (same), L16 runbook container/port refresh. 2026-07-27 closes: J14 SEALID split, P3 hosts+RUNS_ON, G21 rua code-ops, G24 code-repo seam, G26 launcher-registry config, Q8 bmc-docs prereq, C18 shadow-model guard, J15 value-shape boundary guard, G33 code-snapshot loader (gate signed + built same day), G39 cmdline staging store + G40 parse (groomed am, built pm)
-  next_ready: [M3, M4, J10, Q6, O23, J13, O26, O27, C17, O28, R3, R4, O29, O30, O31, O32, S1, S8, S9, Q7, G32, G34, G35, G22, G42, L19]
+  next_ready: [M3, M4, J10, Q6, O23, J13, O26, O27, C17, O28, R3, R4, O29, O30, O31, O32, S1, S8, S9, Q7, G32, G34, G35, G22, G42, L19, U7, U8, O35, O36, O37, O38, O40, O41, B5, R9, J18, J19, L20, L21]
+  # 2026-07-28 pm post-UI-merge groom: all 15 new items dependency-free except
+  # O39 (waits on O38's IdChips — the link surface). O37 coordinates with O30
+  # informally (no hard dependency; whichever lands second re-verifies).
   # 2026-07-28 pm epic-close-out groom: G42 (catalog seam start), L18, L19, D8,
   # J17 all dependency-free -> next_ready; G43 waits on G42, G44 on G43 (the
   # gate's evidence pack). U5 left next_ready by execution — Epic U is the run's

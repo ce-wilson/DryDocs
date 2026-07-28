@@ -26,126 +26,16 @@ Tags help grooming: `idea` · `bug` · `doc` · `source` (new data source) · `q
 
 <!-- add new ideas at the top -->
 
-- 2026-07-28 — [bug] **`snapshot.ps1` neither pins nor records the depgraph revision it scanned
-  with — the instrument can silently regress and the snapshot looks normal.** Caught at the
-  session-end ritual: this machine's `depgraph` checkout sat on `feat/p0-vector` (2026-06-24,
-  pre-U6), so the run wrote a **105-edge** graph — the old blind-spot count — with no warning,
-  and would have been committed as a routine snapshot if the counts had not been eyeballed
-  against the 0848 baseline. The `meta` header pins the *DryDocs* commit precisely (`git.full`,
-  branch, dirty, PR) but says nothing about the tool, which is the half that actually determines
-  the numbers. Two aggravating facts: the U6 resolver fix is on the **unmerged** branch
-  `feat/controlm-lineage` (`aa52315`) while depgraph `main` is still the 2026-06-19 initial
-  commit, so a fresh clone reproduces the broken scanner; and the desktop's checkout emits a
-  `hosts` section this one does not, so the two machines' instruments differ even after the
-  branch switch. Fix: add `depgraph: {commit, branch, dirty}` to the `meta` header (makes the
-  regression visible in the diff), and have `snapshot.ps1` hard-fail when the resolver lacks
-  the multi-root fix — a capability probe, not a version string. Until then the laptop checkout
-  is left on `feat/controlm-lineage`; switching it back silently re-breaks the snapshot. Pairs
-  with the instrument-change note now in `knowledge/depgraph-snapshots/README.md`, which warns
-  about reading *across* the boundary but assumed the boundary only ever moves forward.
-  - **Root cause is a fork, not a stale checkout.** `depgraph` has two *divergent siblings* off a
-    one-commit `main` (`76ba075`, 2026-06-19): `feat/p0-vector` (`3806278`, +3 — `--tree`,
-    Neo4j-optional rendering, version targeting) and `feat/controlm-lineage` (`aa52315`, +4 —
-    Control-M lineage, RHEL collector, html-review profile, **the U6 multi-root fix**). Neither
-    is an ancestor of the other, so **no single revision has everything DryDocs calls**, and
-    whichever one is checked out, something is missing.
-  - **CONSEQUENCE OF THE 2026-07-28 SWITCH — `snapshot.ps1 -Tree` is broken on the laptop.**
-    `--tree` exists only on `p0-vector` (6 refs in `depgraph/cli.py`; absent from
-    `controlm-lineage`). The switch bought a truthful code graph at the price of tree mode.
-    Cost is low — no `drydocs-tree-*.json` has ever been committed, and the two `tree-*.json`
-    files are the seeded v1-rewrite pair from other provenance — but it is a real trade, and
-    `git -C ../depgraph checkout feat/p0-vector` trades it straight back. The capability probe
-    above must therefore cover **both** directions: resolver fix for a normal scan, `--tree`
-    support when `-Tree` is passed.
-  - **The consolidating fix:** merge both branches into depgraph `main` so one revision is
-    correct by default and a fresh clone stops reproducing the broken scanner. Conflict surface
-    is the six files both touched — `.gitignore`, `CONTINUATION.md`, `depgraph/__init__.py`,
-    `depgraph/cli.py`, `depgraph/extractors/__init__.py`, `depgraph/model.py` — of which only
-    `cli.py` and `model.py` are substantive. Both sides ship tests (`test_smoke.py`;
-    `test_python_imports_multiroot.py`, `test_controlm.py`, `test_html_review.py`), so the merge
-    is verifiable. Land `controlm-lineage` first (it holds the correctness fix), then
-    `p0-vector`, then delete both branches.
-  - **RESUME HERE (next session, after the 2026-07-28 reboot).** Nothing is half-applied — the
-    repo is clean and pushed; all of the below is unstarted work. In order:
-    1. **DryDocs-side, groom + build (this is the one that stops recurrence):** the `depgraph:
-       {commit, branch, dirty}` meta block in `snapshot.ps1` (gather it the way `:51–63` already
-       does for DryDocs; emit at `:86`) + the capability probe before the scan at `:82`. Expected
-       revision belongs in `config/dev-environment.yaml`, already canonical for environment facts
-       and already the render source for the L16 runbook. Not yet a `backlog.yaml` item —
-       **deliberately**, because a concurrent session held P5 `in_progress` at the time and the
-       per-entry rule (J16) makes a blind two-sided edit of that file the hazard. Groom it first.
-    2. **Sibling-repo, user's call:** the merge above. Different repo, real conflicts, worth a
-       sitting rather than a drive-by.
-    3. The `abs_path` entry below is independent of both and can go in any order.
-- 2026-07-28 — [bug] **Snapshot nodes carry machine-absolute paths, so the series is
-  machine-dependent.** `abs_path` records `C:/coding/projects/DryDocs/...` on the desktop and
-  `C:/coding/projects/sandbox/DryDocs/...` on the laptop. Verified today on two snapshots of the
-  same code: the 370 edges were **byte-identical**, while all **205** nodes read as changed —
-  a 100%-false structural diff from the checkout location alone. `viewer.html` is unaffected
-  (it compares by project-relative path, as its README says), but `git diff` and any JSON diff
-  tool — the other two comparison routes the README recommends — show pure noise. Fix: store
-  the project-relative path only, or keep `abs_path` out of the committed artifact; the
-  `file_id` already carries the stable identity. Cheap, and it makes cross-machine snapshots
-  comparable for the first time.
-  *Second occurrence, same day (P5 close, desktop):* the P5 build ran in an isolated worktree
-  (shared tree held by the UI branch), so a session-end snapshot would stamp
-  `.claude/worktrees/p5-main/...` on all 205+ nodes — path pollution worse than the laptop's.
-  Snapshot DEFERRED to the next on-main session even though scan roots DID change this time
-  (patch_window.py + cli.py + a test module are uncaptured until then) — this bug is now
-  blocking the ritual whenever the tree is shared, not just muddying cross-machine diffs.
-- 2026-07-28 — [idea] **SME feedback FB-01/FB-02 + landing declutter proposal (wireframes
-  shipped).** SME feedback on the landing: the hub image has too many items; the display
-  name is cluttered/not readable (echoes design-review rec #2). Proposal wireframed:
-  demote HeroArt to a small decorative mark, product name renders once (nav wordmark),
-  h1 becomes the value prop, and navigation moves to two explicit pick-lists — modules
-  ("what do you want to look at?", from `modules/registry.ts`) and business towers
-  (SME picks a target, scopes Explorer/Lineage). Wireframes + key legend + deterministic
-  stdlib renderer: `UI-WIP/wireframes/` (`python UI-WIP/wireframes/render_wireframes.py`);
-  every element keys to label/data/React/Cypher (`out/KEYS.md`) so feedback re-attaches
-  per the L5/L6 idiom. SME launch runbook: `UI-WIP/sme-ui-launch-guide.md` (fixture mode
-  today, live checklist for T2-1). Groom candidate: implement the WF-LND landing revision.
-
-- 2026-07-28 — [bug] **Loads timeline rail dot clips the first character of loader names**
-  ("eal_attribution", "ntrolm_folders") — seen in branch screenshots 2026-07-28, both
-  themes; pre-existing dot-and-rail layout in `web/src/loads/LoadsTimeline.tsx` (li pl-6
-  vs absolute dot), not from the DL quick wins. One-line padding fix + screenshot check.
-
-- 2026-07-28 — [idea] **DSI (Data State Intelligence) reviewed — the data-management view;
-  DryDocs sits between it and DataLens.** Screenshots classified Internal-Confidential in
-  `internal/dsi-reference/` (real hostnames + a person's name); groomed findings appended to
-  `internal/datalens-reference/continuity.md` §Addendum: DL-10 (StatTiles click-to-filter, DSI's
-  KPI-card→filter idiom), DL-11 (RAW→TRUSTED→REFINED→SNOWFLAKE is the estate's canonical stage
-  taxonomy — (a) UI chips fold into DL-6, (b) `config/taxonomy/` capture is a NEW taxonomy-layer
-  requirement wanting an SME gate), DL-12 (status-vocabulary → StatusChip token map), plus an
-  Epic R precedent note for the R1/ADR-0007 gate (DSI ships an embedded assistant + question-led
-  home in production — bank precedent for agentic Q&A; DryDocs differentiates on relationship
-  questions). Note DL-11(b) likely intersects the Snowflake data-catalog entry below (same
-  dataset/distribution estate seen from the management side).
-
-- 2026-07-28 — [idea] **Runtime-monitor (HL DataLens) UI continuity — groom candidates
-  DL-1…DL-9 in `internal/datalens-reference/continuity.md`** (moved from UI-WIP with the
-  screenshots per DL-9's home-ruling — it quotes real identifier shapes). DataLens is the SRE runtime view over the
-  same batch estate; users will hop between it and the console, so the doc maps the seams
-  (theme polarity → O32 merge, shape language, brand-red vs status-red) into 8 proposed
-  items + 1 groom-merge, quick wins flagged (DL-1 tabular-nums, DL-2 `--status-fail` token
-  split, DL-3 status chips, DL-4 threshold meter, DL-9 publish-boundary re-home of the
-  `HL-Datalens-ui-*.png` screenshots currently at repo root — that one is p2, do first).
-  Also records the ruled-out adoptions (emoji icons, gradient banners, stacked drill-down).
-  *Execution note:* quick wins DL-9/2/1/3/4 + the DL-7 merge shipped 2026-07-28 on
-  `feat/datalens-quickwins`; DL-5/6/8 + DL-10..12 remain for the groom.
-  <!-- merge note 2026-07-28: the branch's copy of the Snowflake data-catalog [source]
-       entry was dropped here, not lost — main groomed it same day into G42–G44
-       (3f8890a); see the audit trail below. -->
-- 2026-07-28 — [idea] **Agent graph-navigation surface** (benchmarked live 2026-07-28): agents
-  answering code-nav questions from the loaded code graph instead of the filesystem is real —
-  5 questions in ~410ms / ~1.2k chars total vs grep's noisy or infeasible equivalents
-  (fan-in: graph exact 19 vs grep 33 with ~10 false positives from unrelated `base.py` packages;
-  cycles + transitive dependents: 1 query / ~25 chars vs infeasible-or-iterative greps; root
-  census: 245 chars vs ~7k est. of Glob paths). BUT cross-root question returned 0 vs grep's
-  true 24 — graph-first is only safe AFTER the scanner fix (groomed → U6). Mechanism proposal:
-  a read-only `drydocs query <spec>` CLI subcommand over the (O33-guarded) query_specs so
-  agents get one deterministic, testable command — folds naturally into U4's tech-debt query
-  pack; MCP (mcp-neo4j-cypher) is the richer later option but adds config + write-risk surface.
+- 2026-07-28 — [question] **depgraph sibling-repo fork merge — user's call, worth a sitting.**
+  `depgraph` has two divergent siblings off a one-commit `main` (`76ba075`): `feat/p0-vector`
+  (`--tree`, Neo4j-optional rendering) and `feat/controlm-lineage` (Control-M lineage, RHEL
+  collector, **the U6 multi-root fix**); neither is an ancestor of the other, so no single
+  revision has everything DryDocs calls, and a fresh clone reproduces the broken scanner.
+  Plan when convened: land `controlm-lineage` first (the correctness fix), then `p0-vector`,
+  then delete both; substantive conflicts only in `cli.py`/`model.py`; both sides ship tests.
+  Different repo — never a DryDocs backlog item. (The DryDocs-side instrument hardening this
+  pairs with is groomed → **U7** revision-pin + capability probe, **U8** abs_path strip; the
+  full two-entry analysis lives in git history at `947920c`.)
 - 2026-07-28 — [chore] **react-router high advisory (GHSA-qwww-vcr4-c8h2, RSC-mode CSRF) cannot
   clear without the v7→v8 major migration** — v8 absorbs `react-router-dom` (its latest is
   still 7.18.1, inside the vulnerable 7.12.0–8.2.0 range), so `npm audit fix` is a no-op and
@@ -153,36 +43,6 @@ Tags help grooming: `idea` · `bug` · `doc` · `source` (new data source) · `q
   per its stop clause (postcss/nanoid patches applied there); a UI-workstream decision, and
   likely moot in practice — the console is a Vite SPA, no RSC actions — but the audit stays
   red until ruled. Pairs with the code-splitting design call O34 also parked.
-
-- 2026-07-28 — [idea] **`VERIFIED LIVE` does not say WHICH machine — and there are two graphs.**
-  Laptop and desktop each run their own local Docker Neo4j; git syncs the repo, never the volume.
-  So a live claim is implicitly scoped to the machine that ran it, and **no claim in backlog.yaml
-  records which one** (grep-checked). This is not theoretical: an audit this session read the
-  laptop's graph, found G33's `:Project`/`:CodeModule` absent, and nearly recorded a defect — G33
-  was built on the desktop and is fine. Cheap fix: tag the claim with the machine/container.
-  Better fix: make live verification reproducible from a fresh bootstrap so it stops mattering
-  where it ran. Until then, treat "absent from every database" as "absent *here*".
-  *Evidence for the better fix (2026-07-28 pm, P5 close):* the desktop drydocs DB had ZERO host
-  topology (P3's live numbers were the other machine's) — one `drydocs ingest-controlm` against
-  the bundled samples reproduced the P3 coverage digit-for-digit (9/7/1, reconciles=true). The
-  sample pipeline already IS the reproducible path; the gap is only that claims don't say so.
-
-- 2026-07-28 — [idea] **Two sessions picked the same backlog item ten minutes apart.** Both a groom
-  session and this one independently built C19; the duplicate was thrown away. CLAUDE.md's pull
-  rule already says *"set it `in_progress`"* — what is missing is that the claim only works if it
-  is **pushed before the work starts**, not written at the end. Worth making explicit in the pull
-  rule, since the cost is silent and only visible after both sides commit.
-
-- 2026-07-28 — [chore] ~~**`docs/design/feedback/drydocs-startup-refresh-runbook-sme.html` is
-  misnamed and stale.**~~ **RESOLVED same day — deleted (user's call).** It was YAML content (a
-  Copy-feedback export) carrying an `.html` extension, and its two notes were the rev1 feedback
-  that Rev 2 had already applied — neither loadable as feedback (`<doc-stem>-rev<N>.yaml` is the
-  expected name) nor new. Nothing was lost: both notes survive as applied edits in the runbook and
-  are described in its Rev 2 change note; the canonical `-rev1.yaml` is still on disk. It had never
-  been tracked, so the deletion produced no diff — this line is the only record that it existed.
-  Worth noticing for the L5 loop: the digital **Copy feedback** path hands you a clipboard block
-  and trusts you to name the file, so a wrong extension is a silent dead end — the export tells you
-  the target filename in a comment, but nothing checks that anyone followed it.
 
 - 2026-07-27 — [idea] **The SME orchestrator-mapping act: what actually flips a batch port on.**
   SME direction, this session. CONFIRMED first, since the design rests on it: both ports are
@@ -281,17 +141,6 @@ Tags help grooming: `idea` · `bug` · `doc` · `source` (new data source) · `q
   synthetic-sample product NAMES that echo real ones ("Home Lending Servicing" in
   lob-product-team.yaml, paired only with synthetic ids).
 
-- 2026-07-26 — [doc] **Startup-refresh runbook owes three edits, HELD until the SME review
-  closes** (found doing G29; the doc is mid-L5/L6 review — `docs/design/feedback/
-  drydocs-startup-refresh-runbook-sme.html` is in the tree — so nothing was hot-edited,
-  which would break feedback re-attachment). (1) Step 3 and Appendix B now name a verb set
-  that G29 replaced: the whole block collapses to `poetry run drydocs apply-supplements`.
-  (2) Appendix B has always been MISSING `apply-registry-supplement` while it runs
-  `load-software-registry` — a genuine Rev 3 gap, now moot if (1) lands but a real bug if
-  the per-file verbs are kept. (3) `docker start neo4j-drydocs-ee` is stale: the live
-  container has been `neo4jtest` (7474/7687) since 2026-07-23 and `neo4j-drydocs-ee` was
-  stopped as the rollback. Do all three in one revision after the review closes, then
-  re-render.
 - 2026-07-25 — [question] **How much depgraph audit history do we keep?** (review finding
   F11, `docs/reviews/architecture-structure-review-2026-07-25.md`). `knowledge/depgraph-snapshots/`
   holds 66 JSON files / 4.2 MB, several per day, unbounded — some 2026-07-20/21 timestamps are
@@ -907,6 +756,32 @@ Tags help grooming: `idea` · `bug` · `doc` · `source` (new data source) · `q
 
 ## Recently groomed (audit trail)
 
+- 2026-07-28 pm (post-UI-merge pass) — [bug] snapshot instrument unpinned (fd2834d) → **U7**
+  (revision pin + capability probe); the sibling-repo depgraph fork merge stays inboxed as a
+  [question] — user's call, different repo.
+- 2026-07-28 pm — [bug] snapshot abs_path machine/worktree-dependent (twice ritual-blocking) → **U8**.
+- 2026-07-28 pm — [idea] SME landing feedback FB-01/FB-02 + WF-LND wireframes → **O35** (p2 —
+  direct SME feedback).
+- 2026-07-28 pm — [bug] loads timeline rail dot clips first character → **O36**.
+- 2026-07-28 pm — [idea] DataLens continuity DL-5/6/8 → **O37** (radius tokens), **O38**
+  (IdChip convention), **O39** (deep-link slot, depends O38). DL-1/2/3/4/9 shipped pre-groom
+  on `feat/datalens-quickwins`; DL-7 was a groom-MERGE into O32's notes, executed on-branch
+  (`bc61408`) — counted as this pass's 1 merge.
+- 2026-07-28 pm — [idea] DSI review DL-10/11/12 → **O40** (StatTiles click-to-filter), DL-11(a)
+  folded into **O38**, DL-11(b) → **B5** (stage taxonomy capture, SME gate for the canonical
+  set), **O41** (status-vocabulary map). The Epic R precedent note stays with the R1/ADR-0007
+  gate materials in `continuity.md` — gate-session input, not a backlog item.
+- 2026-07-28 pm — [idea] agent graph-navigation surface (live-benchmarked) → **R9** (read-only
+  query command over the O33-guarded specs; MCP recorded as the later option).
+- 2026-07-28 pm — [idea] VERIFIED-LIVE claims don't name their machine → **J18**.
+- 2026-07-28 pm — [idea] two sessions built C19 concurrently; pushed-claim wording → **J19**.
+- 2026-07-28 pm — [chore] misnamed Copy-feedback export (RESOLVED same day — deleted, user's
+  call; it was rev1 YAML content under an .html name, both notes already applied in Rev 2;
+  the deletion produced no diff and this trail line is the record it existed) → latent gap
+  promoted as **L20** (feedback/ stray-file findings guard).
+- 2026-07-28 pm — [doc] startup-runbook three held edits (2026-07-26 line): hold lifted (the
+  SME review closed); edit 3 (container facts) landed via **L16** Rev 3; edits 1+2 (supplement
+  verb collapse + Appendix B registry gap) → **L21** as one Rev 4.
 - 2026-07-28 — [source] Snowflake data-catalog (dataset/distribution) loader plan → **G42**
   (source registration + taxonomy-first extractor), **G43** (cross-check reports),
   **G44** (gate prompt + proposed ontology entries; the dcat one-node-or-two ruling
