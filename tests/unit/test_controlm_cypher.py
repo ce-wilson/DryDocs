@@ -245,7 +245,13 @@ def test_runs_on_resolution_implements_group_wins() -> None:
     text = (CYPHER_DIR / "runs_on_resolution.cypher").read_text(encoding="utf-8")
     assert "MERGE (j)-[r:RUNS_ON {role: 'host_group'}]->(g)" in text
     assert "MERGE (j)-[r:RUNS_ON {role: 'agent_host'}]->(h)" in text
-    assert "NOT EXISTS { MATCH (:ControlMHostGroup {name: j.node_id}) }" in text
+    # the group-absence guard excludes the :SchemaMeta exemplar (O33): the
+    # exemplar carries name='ControlMHostGroup', so an unguarded EXISTS would
+    # treat the label string as a real group name
+    assert (
+        "NOT EXISTS { MATCH (g:ControlMHostGroup {name: j.node_id}) "
+        "WHERE NOT g:SchemaMeta }" in text
+    )
     # the guard must precede the agent_host MERGE (it scopes that statement)
     assert "NOT EXISTS" in text[: text.index("role: 'agent_host'")]
     assert "r.derived" in text

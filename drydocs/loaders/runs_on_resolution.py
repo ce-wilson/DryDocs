@@ -34,10 +34,11 @@ CYPHER_PATH = Path(__file__).resolve().parent / "cypher" / "runs_on_resolution.c
 
 _COVERAGE_QUERY = """
 MATCH (j:ControlMJob)
+WHERE NOT j:SchemaMeta
 WITH j, (j.node_id IS NULL OR j.node_id = '') AS is_null
 WITH j, is_null,
-     (NOT is_null AND EXISTS { MATCH (:ControlMHostGroup {name: j.node_id}) })   AS grp,
-     (NOT is_null AND EXISTS { MATCH (:ExecutionHost   {nodeid: j.node_id}) })   AS hst
+     (NOT is_null AND EXISTS { MATCH (g:ControlMHostGroup {name: j.node_id}) WHERE NOT g:SchemaMeta })   AS grp,
+     (NOT is_null AND EXISTS { MATCH (h:ExecutionHost   {nodeid: j.node_id}) WHERE NOT h:SchemaMeta })   AS hst
 RETURN count(j)                                                        AS total_jobs,
        sum(CASE WHEN is_null THEN 1 ELSE 0 END)                        AS null_node_id,
        sum(CASE WHEN grp THEN 1 ELSE 0 END)                            AS matched_host_group,
@@ -48,8 +49,9 @@ RETURN count(j)                                                        AS total_
 
 _MULTI_DC_QUERY = """
 MATCH (j:ControlMJob)
-WHERE j.node_id IS NOT NULL AND j.node_id <> ''
+WHERE j.node_id IS NOT NULL AND j.node_id <> '' AND NOT j:SchemaMeta
 MATCH (g:ControlMHostGroup {name: j.node_id})
+WHERE NOT g:SchemaMeta
 WITH j, count(g) AS gcount
 WHERE gcount > 1
 RETURN count(j) AS multi_dc_group_jobs

@@ -14,6 +14,16 @@ Registry rules (asserted at import, so a bad spec can never ship):
   reads uncertain ``ddcontext``/``ddall`` content is an explicit, reviewed row
   here — never a default; those results are watermarked SYNTHESIZED)
 - classification comes from the config/classification.yaml vocabulary
+- a spec that binds a label the schema meta-graph stamps on a ``:SchemaMeta``
+  exemplar (``drydocs_core/schema/schema_graph.cypher`` — applied manually,
+  keyless by design) excludes the exemplars with the rename-proof label
+  predicate ``WHERE NOT n:SchemaMeta`` (O33; the exemplar carries the REAL
+  label with no key, so an unguarded spec returns it as a phantom null-keyed
+  row — and the meta-graph also MERGEs exemplar EDGES, including property-
+  qualified ones like ``{role: 'seal_app_ref'}``, so pattern specs are
+  exposed too, not just single-node ones). Enforced by
+  ``tests/unit/test_schema_meta_exclusion.py`` against the committed
+  meta-graph, and proven live by ``tests/integration/test_meta_graph_exclusion.py``.
 """
 
 from __future__ import annotations
@@ -71,7 +81,7 @@ QUERY_SPECS: dict[str, QuerySpec] = {
             database="drydocs",
             description="Business applications (SEAL-keyed) for the Explorer Applications frame.",
             cypher=(
-                "MATCH (a:BusinessApplication) "
+                "MATCH (a:BusinessApplication) WHERE NOT a:SchemaMeta "
                 "RETURN a.seal_id AS seal_id, a.name AS name, a.status AS status "
                 "ORDER BY seal_id LIMIT $limit"
             ),
@@ -95,6 +105,7 @@ QUERY_SPECS: dict[str, QuerySpec] = {
             ),
             cypher=(
                 "MATCH (f:ControlMFolder)-[:CONTAINS_JOB]->(j:ControlMJob) "
+                "WHERE NOT f:SchemaMeta "
                 "OPTIONAL MATCH (f)-[:SCHEDULED_ON]->(s:ControlMServer) "
                 "RETURN j.job_name AS job_name, f.sched_table AS folder, "
                 "s.name AS data_center, j.job_id AS job_id "
@@ -118,7 +129,7 @@ QUERY_SPECS: dict[str, QuerySpec] = {
                 "folder_id join key)."
             ),
             cypher=(
-                "MATCH (c:Condition) "
+                "MATCH (c:Condition) WHERE NOT c:SchemaMeta "
                 "OPTIONAL MATCH (f:ControlMFolder {folder_id: c.folder_id}) "
                 "RETURN c.name AS name, coalesce(f.sched_table, c.folder_id) AS folder "
                 "ORDER BY name LIMIT $limit"
@@ -142,6 +153,7 @@ QUERY_SPECS: dict[str, QuerySpec] = {
             cypher=(
                 "MATCH (f:ControlMFolder)-[:CONTAINS_JOB]->(j:ControlMJob)"
                 "-[:WAS_ASSOCIATED_WITH {role: 'seal_app_ref'}]->(a:BusinessApplication) "
+                "WHERE NOT f:SchemaMeta "
                 "OPTIONAL MATCH (f)-[:SCHEDULED_ON]->(s:ControlMServer) "
                 "RETURN f.sched_table AS folder, s.name AS data_center, "
                 "a.seal_id AS seal_id, a.name AS application, count(DISTINCT j) AS jobs "
@@ -171,7 +183,7 @@ QUERY_SPECS: dict[str, QuerySpec] = {
                 "mapping table is a gate-bound O13 mapping domain, not this view."
             ),
             cypher=(
-                "MATCH (ca:ControlMApplication) "
+                "MATCH (ca:ControlMApplication) WHERE NOT ca:SchemaMeta "
                 "OPTIONAL MATCH (ca)-[:CONTAINS_FOLDER]->(f:ControlMFolder) "
                 "OPTIONAL MATCH (f)-[:CONTAINS_JOB]->(j:ControlMJob) "
                 "OPTIONAL MATCH (j)-[:WAS_ASSOCIATED_WITH {role: 'seal_app_ref'}]"
@@ -213,6 +225,7 @@ QUERY_SPECS: dict[str, QuerySpec] = {
             ),
             cypher=(
                 "MATCH (f:ControlMFolder)-[:CONTAINS_JOB]->(j:ControlMJob) "
+                "WHERE NOT f:SchemaMeta "
                 "OPTIONAL MATCH (j)-[r:WAS_ASSOCIATED_WITH {role: 'seal_app_ref'}]"
                 "->(a:BusinessApplication) "
                 "WITH f, j, [h IN collect({seal_id: a.seal_id, name: a.name, "
@@ -253,7 +266,8 @@ QUERY_SPECS: dict[str, QuerySpec] = {
             ),
             cypher=(
                 "MATCH (a:BusinessApplication)-[:QUALIFIED_ATTRIBUTION]->(m:Attribution) "
-                "WHERE m.role_source_name IN ['L1 Operate Manager', 'L2 Operate Manager'] "
+                "WHERE NOT a:SchemaMeta "
+                "AND m.role_source_name IN ['L1 Operate Manager', 'L2 Operate Manager'] "
                 "AND m.valid_to IS NULL "
                 "OPTIONAL MATCH (m)-[:HAS_AGENT]->(e:Employee) "
                 "RETURN a.seal_id AS app_seal_id, a.name AS application, "
@@ -276,7 +290,10 @@ QUERY_SPECS: dict[str, QuerySpec] = {
             id="explorer.servers.v1",
             database="drydocs",
             description="Control-M servers for the Explorer Servers frame.",
-            cypher="MATCH (s:ControlMServer) RETURN s.name AS name ORDER BY name",
+            cypher=(
+                "MATCH (s:ControlMServer) WHERE NOT s:SchemaMeta "
+                "RETURN s.name AS name ORDER BY name"
+            ),
             columns=(ColumnDef("name", "string", "Server"),),
             classification="internal",
         ),
@@ -286,7 +303,7 @@ QUERY_SPECS: dict[str, QuerySpec] = {
             database="drydocs",
             description="Dev teams with their DEVELOPS application count (arch_develops, C3 gate).",
             cypher=(
-                "MATCH (dt:DevTeam) "
+                "MATCH (dt:DevTeam) WHERE NOT dt:SchemaMeta "
                 "OPTIONAL MATCH (dt)-[:DEVELOPS]->(a:BusinessApplication) "
                 "RETURN dt.team_id AS team_id, dt.name AS team, "
                 "count(DISTINCT a) AS applications "
@@ -311,6 +328,7 @@ QUERY_SPECS: dict[str, QuerySpec] = {
             ),
             cypher=(
                 "MATCH (a:BusinessApplication)-[:QUALIFIED_ATTRIBUTION]->(m:Attribution) "
+                "WHERE NOT a:SchemaMeta "
                 "OPTIONAL MATCH (m)-[:HAD_ROLE]->(tr:TOMRole) "
                 "OPTIONAL MATCH (m)-[:HAS_AGENT]->(e) "
                 "RETURN a.seal_id AS seal_id, m.attribution_id AS attribution_id, "
@@ -359,7 +377,7 @@ QUERY_SPECS: dict[str, QuerySpec] = {
                 "GROUNDED / SYNTHESIZED) visible as a column, never hidden."
             ),
             cypher=(
-                "MATCH (d:Document) "
+                "MATCH (d:Document) WHERE NOT d:SchemaMeta "
                 "OPTIONAL MATCH (c:Chunk)-[:PART_OF]->(d) "
                 "RETURN d.doc_id AS doc_id, d.title AS title, "
                 "d.trust_default AS trust_default, d.classification AS classification, "
@@ -385,6 +403,7 @@ QUERY_SPECS: dict[str, QuerySpec] = {
             ),
             cypher=(
                 "MATCH (c:Chunk)-[:PART_OF]->(d:Document) "
+                "WHERE NOT c:SchemaMeta "
                 "RETURN c.chunk_id AS chunk_id, d.doc_id AS doc_id, c.seq AS seq, "
                 "c.heading AS heading, coalesce(c.trust, d.trust_default) AS trust "
                 "ORDER BY doc_id, seq LIMIT $limit"
@@ -405,6 +424,7 @@ QUERY_SPECS: dict[str, QuerySpec] = {
             description="Trust-tier census over the corpus — the provenance audit frame.",
             cypher=(
                 "MATCH (c:Chunk)-[:PART_OF]->(d:Document) "
+                "WHERE NOT c:SchemaMeta "
                 "RETURN coalesce(c.trust, d.trust_default) AS trust, "
                 "count(*) AS chunks, count(DISTINCT d) AS documents "
                 "ORDER BY trust"
@@ -429,6 +449,7 @@ QUERY_SPECS: dict[str, QuerySpec] = {
             ),
             cypher=(
                 "MATCH (j:ControlMJob)-[:TRIGGERS]->(e:ETLProcess) "
+                "WHERE NOT j:SchemaMeta "
                 "OPTIONAL MATCH (e)-[:WRITES_TO]->(d:DataAsset) "
                 "RETURN j.job_name AS trigger_job, e.token AS process, e.kind AS kind, "
                 "collect(DISTINCT d.assetId) AS lands "
@@ -454,6 +475,7 @@ QUERY_SPECS: dict[str, QuerySpec] = {
             ),
             cypher=(
                 "MATCH (f:ControlMFolder)-[:CONTAINS_JOB]->(j:ControlMJob) "
+                "WHERE NOT f:SchemaMeta "
                 "WITH f, j, (j.description IS NULL OR j.description = '') AS missing "
                 "RETURN f.sched_table AS folder, j.job_name AS job, "
                 "CASE WHEN missing THEN 'missing' ELSE 'present' END AS description_metadata "
@@ -473,7 +495,7 @@ QUERY_SPECS: dict[str, QuerySpec] = {
             database="drydocs",
             description="Loader :JobRun envelope, newest first — the /loads timeline feed.",
             cypher=(
-                "MATCH (r:JobRun) WHERE r.kind = 'load' "
+                "MATCH (r:JobRun) WHERE NOT r:SchemaMeta AND r.kind = 'load' "
                 "RETURN r.run_id AS run_id, r.loader AS loader, r.source AS source, "
                 "toString(r.started_at) AS started_at, toString(r.completed_at) AS completed_at, "
                 "r.status AS status, r.rows_processed AS rows_processed, "
@@ -498,7 +520,8 @@ QUERY_SPECS: dict[str, QuerySpec] = {
             database="drydocs",
             description="Runs that rejected rows (rows_rejected > 0) — never silent drops.",
             cypher=(
-                "MATCH (r:JobRun) WHERE r.kind = 'load' AND coalesce(r.rows_rejected, 0) > 0 "
+                "MATCH (r:JobRun) WHERE NOT r:SchemaMeta AND r.kind = 'load' "
+                "AND coalesce(r.rows_rejected, 0) > 0 "
                 "RETURN r.run_id AS run_id, r.loader AS loader, "
                 "toString(r.started_at) AS started_at, r.rows_rejected AS rows_rejected, "
                 "r.rows_processed AS rows_processed "
@@ -522,7 +545,7 @@ QUERY_SPECS: dict[str, QuerySpec] = {
                 "full-diff marked or reactivated nodes."
             ),
             cypher=(
-                "MATCH (r:JobRun) WHERE r.kind = 'load' AND "
+                "MATCH (r:JobRun) WHERE NOT r:SchemaMeta AND r.kind = 'load' AND "
                 "(coalesce(r.nodes_marked_removed, 0) > 0 OR coalesce(r.nodes_reactivated, 0) > 0) "
                 "RETURN r.run_id AS run_id, r.loader AS loader, "
                 "toString(r.started_at) AS started_at, "
@@ -556,6 +579,7 @@ QUERY_SPECS: dict[str, QuerySpec] = {
             ),
             cypher=(
                 "MATCH (x)-[r:READS_FROM|WRITES_TO]->(d:DataAsset) "
+                "WHERE NOT x:SchemaMeta "
                 "RETURN coalesce(x.token, x.path, x.job_name) AS activity, "
                 "labels(x)[0] AS activity_type, type(r) AS hop, "
                 "d.assetId AS asset_id, d.kind AS asset_kind "
@@ -579,7 +603,7 @@ QUERY_SPECS: dict[str, QuerySpec] = {
                 "produce and consume each asset."
             ),
             cypher=(
-                "MATCH (d:DataAsset) "
+                "MATCH (d:DataAsset) WHERE NOT d:SchemaMeta "
                 "OPTIONAL MATCH (w)-[:WRITES_TO]->(d) "
                 "OPTIONAL MATCH (rd)-[:READS_FROM]->(d) "
                 "RETURN d.assetId AS asset_id, d.kind AS kind, "
@@ -605,7 +629,7 @@ QUERY_SPECS: dict[str, QuerySpec] = {
                 "carrying node-schema only until that feed lands."
             ),
             cypher=(
-                "MATCH (d:DataAsset) "
+                "MATCH (d:DataAsset) WHERE NOT d:SchemaMeta "
                 "RETURN d.assetId AS asset_id, d.kind AS kind, "
                 "[k IN keys(d) WHERE NOT k IN ['assetId', 'kind']] AS properties, "
                 "toString(d.created_at) AS created_at "
@@ -628,7 +652,8 @@ QUERY_SPECS: dict[str, QuerySpec] = {
                 "ddcontext example (results watermark SYNTHESIZED by rule)."
             ),
             cypher=(
-                "MATCH (n) RETURN labels(n) AS labels, count(*) AS count ORDER BY count DESC"
+                "MATCH (n) WHERE NOT n:SchemaMeta "
+                "RETURN labels(n) AS labels, count(*) AS count ORDER BY count DESC"
             ),
             columns=(
                 ColumnDef("labels", "string", "Labels"),

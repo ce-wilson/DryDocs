@@ -31,9 +31,13 @@
 // =============================================================================
 
 // -- 1. The 2-hop case: NODE_ID names a host group (group match wins). -------
+// NOT :SchemaMeta (O33): the meta-graph exemplar carries the real label with
+// name = the label string — a name-keyed MATCH could otherwise attach a real
+// job's edge to the schema exemplar.
 MATCH (j:ControlMJob)
-WHERE j.node_id IS NOT NULL AND j.node_id <> ''
+WHERE j.node_id IS NOT NULL AND j.node_id <> '' AND NOT j:SchemaMeta
 MATCH (g:ControlMHostGroup {name: j.node_id})
+WHERE NOT g:SchemaMeta
 MERGE (j)-[r:RUNS_ON {role: 'host_group'}]->(g)
   ON CREATE SET r.first_seen_at = datetime($resolved_at),
                 r.derived       = true,
@@ -45,9 +49,10 @@ SET r.last_seen_at = datetime($resolved_at),
 // -- 2. The 1-hop case: NODE_ID hard-codes a member host — only when NO group
 //       carries that name (the signed group-wins precedence). ----------------
 MATCH (j:ControlMJob)
-WHERE j.node_id IS NOT NULL AND j.node_id <> ''
-  AND NOT EXISTS { MATCH (:ControlMHostGroup {name: j.node_id}) }
+WHERE j.node_id IS NOT NULL AND j.node_id <> '' AND NOT j:SchemaMeta
+  AND NOT EXISTS { MATCH (g:ControlMHostGroup {name: j.node_id}) WHERE NOT g:SchemaMeta }
 MATCH (h:ExecutionHost {nodeid: j.node_id})
+WHERE NOT h:SchemaMeta
 MERGE (j)-[r:RUNS_ON {role: 'agent_host'}]->(h)
   ON CREATE SET r.first_seen_at = datetime($resolved_at),
                 r.derived       = true,
