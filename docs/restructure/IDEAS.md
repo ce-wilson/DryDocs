@@ -96,11 +96,16 @@ Tags help grooming: `idea` · `bug` · `doc` · `source` (new data source) · `q
   is **pushed before the work starts**, not written at the end. Worth making explicit in the pull
   rule, since the cost is silent and only visible after both sides commit.
 
-- 2026-07-28 — [chore] **`docs/design/feedback/drydocs-startup-refresh-runbook-sme.html` is
-  misnamed and stale.** It is YAML content (a Copy-feedback export) carrying an `.html` extension,
-  and its two notes are the rev1 feedback that Rev 2 already applied — so it is neither loadable as
-  feedback (`<doc-stem>-rev<N>.yaml` is the expected name) nor new. Left untracked, untouched.
-  Either rename it to the next rev with `status: applied` on both notes, or delete it.
+- 2026-07-28 — [chore] ~~**`docs/design/feedback/drydocs-startup-refresh-runbook-sme.html` is
+  misnamed and stale.**~~ **RESOLVED same day — deleted (user's call).** It was YAML content (a
+  Copy-feedback export) carrying an `.html` extension, and its two notes were the rev1 feedback
+  that Rev 2 had already applied — neither loadable as feedback (`<doc-stem>-rev<N>.yaml` is the
+  expected name) nor new. Nothing was lost: both notes survive as applied edits in the runbook and
+  are described in its Rev 2 change note; the canonical `-rev1.yaml` is still on disk. It had never
+  been tracked, so the deletion produced no diff — this line is the only record that it existed.
+  Worth noticing for the L5 loop: the digital **Copy feedback** path hands you a clipboard block
+  and trusts you to name the file, so a wrong extension is a silent dead end — the export tells you
+  the target filename in a comment, but nothing checks that anyone followed it.
 
 - 2026-07-27 — [idea] **The SME orchestrator-mapping act: what actually flips a batch port on.**
   SME direction, this session. CONFIRMED first, since the design rests on it: both ports are
