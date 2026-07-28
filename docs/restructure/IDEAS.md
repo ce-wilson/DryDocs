@@ -26,6 +26,29 @@ Tags help grooming: `idea` · `bug` · `doc` · `source` (new data source) · `q
 
 <!-- add new ideas at the top -->
 
+- 2026-07-28 — [idea] **SmartSDK 3.0 release notes reviewed against ADR 0007 / Epic R —
+  COMPATIBLE; the ADR's revisit-if trigger fired and PASSED.** The internal SDK's v3 rebuilds
+  on Google ADK 2.0 and CONVERGES on OSS ADK rather than diverging (its agents now subclass
+  `google.adk` agents directly — `isinstance(agent, google.adk.agents.LlmAgent)` is True; the
+  2.x SMARTGraph/Teams/adapter layers are deprecated/removed), so our `graph_qa`
+  BaseAgent/LlmAgent shape ports company-side without wrapping. Direct confirmations of ruled
+  plans: `use_v1_api` Azure-OpenAI V1 routing = the company half of the R1 env-split provider
+  ruling (company binding becomes that Model flag; our `extract_usage` seam already normalizes
+  the openai token shape); ADK 2.0's Workflow (Edge/FunctionNode/JoinNode, RetryConfig,
+  NodeTimeoutError, RequestInput HITL, nested composition) = the native substrate for **R6**'s
+  bounded enhance/solve loop — build R6 ON Workflow primitives, never the deprecated graph
+  module or a bespoke controller; `InjectedArgsMcpTool` (sensitive params pinned at
+  construction, stripped from the LLM's view) matures **R9**'s parked MCP-later option without
+  changing the CLI-first decision; the Harness Agent is private-preview / LOB-owns-risk —
+  confirms R6 stays self-built and bounded, no dependency; A2A servers now REQUIRE auth
+  (IDAConfig) — any company-side A2A/A2UI exposure of graph_qa is a DD-series item with auth
+  mandatory, which fits the governance stack. Follow-ups to groom: [chore] pin `google-adk`
+  (`>=2,<3`) in `agents/requirements.txt` — currently unpinned while 2.0 breaking changes land
+  upstream; [idea] **R3** envelope reserves a hashed caller-identity slot (ADK 2.0
+  `run_async` now takes `user_id` per call; hash like the question text); [doc] date-stamp
+  the passed revisit check in ADR 0007's Revisit-if section. (Release-notes file itself stays
+  untracked on the machine that has it — if kept, its home is `internal/`: it carries the
+  internal package name + artifact-index URL.)
 - 2026-07-28 — [question] **Retire the `depgraph` sibling repo entirely by bringing the SCANNER
   in-house?** The user's reaction to the fork merge was *"I didn't realize it was still used
   after we made it a module"* — and that instinct was half right in a way worth acting on. ADR
