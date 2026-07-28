@@ -79,6 +79,10 @@ Tags help grooming: `idea` · `bug` · `doc` · `source` (new data source) · `q
   was built on the desktop and is fine. Cheap fix: tag the claim with the machine/container.
   Better fix: make live verification reproducible from a fresh bootstrap so it stops mattering
   where it ran. Until then, treat "absent from every database" as "absent *here*".
+  *Evidence for the better fix (2026-07-28 pm, P5 close):* the desktop drydocs DB had ZERO host
+  topology (P3's live numbers were the other machine's) — one `drydocs ingest-controlm` against
+  the bundled samples reproduced the P3 coverage digit-for-digit (9/7/1, reconciles=true). The
+  sample pipeline already IS the reproducible path; the gap is only that claims don't say so.
 
 - 2026-07-28 — [idea] **Two sessions picked the same backlog item ten minutes apart.** Both a groom
   session and this one independently built C19; the duplicate was thrown away. CLAUDE.md's pull

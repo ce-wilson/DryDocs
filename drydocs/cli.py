@@ -44,6 +44,11 @@ Ingest commands:
   drydocs parse-cmdline-staging   — G40: staged cmd_lines -> structured detail
                                     columns (G26 registry + G15 DPL contract);
                                     NO graph writes — G22 gates any load
+  drydocs patch-window            — P5: best patch window for a host/host
+                                    group (READ-ONLY; quiet windows = the
+                                    complement of the busy UNION — critical
+                                    path, never a path sum) + the
+                                    NODE_GROUP<->RUNS_ON metadata findings
 """
 from __future__ import annotations
 
@@ -99,6 +104,7 @@ from .loaders.essential_graphrag import (
     EssentialGraphragAdapter,
     EssentialGraphragLoader,
 )
+from .loaders.patch_window import PatchWindowQuery
 from .loaders.business_segments import refresh_business_segments
 from .loaders.catalog import (
     AreaProductsLoader,
@@ -885,6 +891,94 @@ def load_code_snapshot(
             f"[yellow]NO SWO TERM[/]: {n} node(s) with extension '{ext}' — "
             "IS_ENCODED_IN skipped (no seeded SwoClass term; see EXTENSION_LANGUAGE_IRI)"
         )
+
+
+@app.command(name="patch-window")
+def patch_window_cmd(
+    host: str = typer.Option(
+        None, "--host", help="ExecutionHost nodeid you want to patch."
+    ),
+    group: str = typer.Option(
+        None, "--group", help="ControlMHostGroup name you want to patch."
+    ),
+    database: str = typer.Option(
+        None, "--database", help="Override the configured target DB."
+    ),
+    as_json: bool = typer.Option(False, "--json", help="Print the report as JSON."),
+) -> None:
+    """Best patch window for a host or host group (P5 — READ-ONLY).
+
+    Collects every job that can land on the target (2-hop RUNS_ON
+    {role: host_group} through CONTAINS_HOST + 1-hop {role: agent_host}),
+    places each on the 24h clock from the P4 timing supplement (job
+    avg_start_time/avg_run_time, else the folder window rollup), and prints
+    the QUIET windows — the busy math is the interval UNION (critical-path
+    extent, never a path sum; the standing TDQ-ETA rule). The
+    NODE_GROUP<->RUNS_ON cross-validation rides along as a metadata-findings
+    list (the remediation feeder). Cypher: drydocs/loaders/cypher/patch_window.cypher.
+    """
+    if bool(host) == bool(group):
+        console.print("[red]Pass exactly one of --host or --group.[/]")
+        raise typer.Exit(2)
+    mode, target = ("host", host) if host else ("group", group)
+    with _client(database) as cli:
+        query = PatchWindowQuery(cli)
+        if not query.target_exists(mode, target):
+            label = "ExecutionHost nodeid" if mode == "host" else "ControlMHostGroup name"
+            console.print(f"[red]No {label} {target!r} in the graph.[/]")
+            raise typer.Exit(2)
+        report = query.run(mode, target)
+
+    if as_json:
+        console.print_json(data=report.as_dict())
+        return
+
+    jobs_table = Table(title=f"Jobs that can land on {mode} '{target}'")
+    for col in ("job", "path", "via", "folder", "window source", "node_id"):
+        jobs_table.add_column(col)
+    for job in report.jobs:
+        via = job.get("pinned_host") or job.get("group_name") or "-"
+        jobs_table.add_row(
+            str(job.get("job_name") or job.get("job_id") or "?"),
+            str(job.get("path")),
+            str(via),
+            str(job.get("folder") or "-"),
+            str(job.get("window_source")),
+            str(job.get("node_id") or "-"),
+        )
+    console.print(jobs_table)
+
+    if report.busy:
+        console.print(
+            "busy (union — critical-path extent, never a sum): "
+            + ", ".join(f"{w['start']}-{w['end']}" for w in report.busy)
+        )
+    quiet_table = Table(title="Quiet windows (patch candidates, longest first)")
+    for col in ("start", "end", "minutes"):
+        quiet_table.add_column(col)
+    for w in report.quiet:
+        quiet_table.add_row(w["start"], w["end"], str(w["minutes"]))
+    console.print(quiet_table)
+    if report.placeable_jobs == 0:
+        console.print(
+            "[yellow]CAVEAT[/]: 0 of "
+            f"{report.placeable_jobs + report.unplaceable_jobs} job(s) carried "
+            "usable timing — the whole day reads quiet. The findings below are "
+            "the fix list (the P4 supplement loader is company-side today)."
+        )
+    console.print(
+        f"placed {report.placeable_jobs} job(s), "
+        f"unplaceable {report.unplaceable_jobs} — every gap is a finding, never a guess"
+    )
+    if report.findings:
+        findings_table = Table(title="Metadata findings (remediation feeder)")
+        for col in ("kind", "subject", "detail"):
+            findings_table.add_column(col)
+        for f in report.findings:
+            findings_table.add_row(f.kind, f.subject, f.detail)
+        console.print(findings_table)
+    else:
+        console.print("no metadata findings — intent and derived topology agree")
 
 
 @app.command(name="export-cmdline-staging")
