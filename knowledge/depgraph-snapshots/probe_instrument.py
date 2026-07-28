@@ -1,11 +1,10 @@
 """Capability probe for the depgraph instrument (U7).
 
 `snapshot.ps1` shells out to a *sibling repo* (`depgraph`) to produce the code
-graph. That repo is a fork with divergent branches, so the checked-out revision
-decides what the scan can actually see — and on 2026-07-28 a checkout without
-the multi-root resolver wrote a 105-edge snapshot (vs the truthful 370) that
-looked completely normal. Nothing in the artifact recorded which instrument
-produced it.
+graph, so the checked-out revision decides what the scan can actually see — and
+on 2026-07-28 a checkout without the multi-root resolver wrote a 105-edge
+snapshot (vs the truthful 370) that looked completely normal. Nothing in the
+artifact recorded which instrument produced it.
 
 This script answers one question — *what can the depgraph on PYTHONPATH
 actually do?* — as JSON on stdout::
@@ -16,9 +15,11 @@ It deliberately reports rather than decides: it exits 0 even when a capability
 is missing, and `snapshot.ps1` owns the refusal. That keeps the policy in one
 place and makes this script safe to run for diagnosis.
 
-Probes are **behavioural, not version strings**. The fork has no monotonic
-version — `--tree` and the multi-root fix live on branches that are not
-ancestors of each other — so a version comparison would be actively wrong.
+Probes are **behavioural, not version strings**. depgraph's `0.1.0` spans both
+the broken and the fixed resolver, so a version comparison would be actively
+wrong; only what the code can *do* is decisive. (The fork that made this acute —
+`--tree` and the multi-root fix on branches neither of which was an ancestor of
+the other — was consolidated onto `main` on 2026-07-28.)
 """
 
 from __future__ import annotations

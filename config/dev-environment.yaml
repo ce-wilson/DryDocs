@@ -46,16 +46,18 @@ depgraph:
   # snapshot can see — it is dev infrastructure exactly like the container above.
   repo: ../depgraph       # sibling of the DryDocs repo root, NOT a submodule
   remote: https://github.com/ce-wilson/depgraph.git
-  # depgraph is a FORK WITH DIVERGENT SIBLINGS off a one-commit main (76ba075):
-  # feat/p0-vector has --tree, feat/controlm-lineage has the multi-root resolver
-  # fix (U6). Neither is an ancestor of the other, so NO single revision has
-  # everything and `main` still reproduces the broken scanner. Until they are
-  # merged, a -Tree snapshot and a code-graph snapshot need different checkouts.
-  expected_branch: feat/controlm-lineage
-  expected_commit: aa52315
+  # FORK CONSOLIDATED 2026-07-28 (depgraph 5006567). It was two divergent
+  # siblings off a one-commit main — feat/p0-vector (--tree) and
+  # feat/controlm-lineage (the U6 multi-root resolver) — with neither an
+  # ancestor of the other, so no revision had everything and a plain clone of
+  # `main` reproduced the broken scanner. Both are now merged into main and the
+  # branches are DELETED (local + remote); main is the only branch. Track main.
+  expected_branch: main
+  expected_commit: 5006567
   # What snapshot.ps1 REFUSES to scan without. These are probed behaviourally
-  # (knowledge/depgraph-snapshots/probe_instrument.py) — never by version
-  # string, because the fork has no monotonic version to compare.
+  # (knowledge/depgraph-snapshots/probe_instrument.py) rather than by version
+  # string — capability is the thing that matters, and depgraph's 0.1.0 spans
+  # both the broken and the fixed resolver, so a version says nothing.
   requires:
     scan: [multi_root]    # every run
     tree: [tree]          # additionally, when -Tree is passed

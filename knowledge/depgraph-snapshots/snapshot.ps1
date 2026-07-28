@@ -60,7 +60,8 @@ $dep  = (Resolve-Path "$here\..\..\..\depgraph").Path
 # wrote 105 edges instead of 370 and looked entirely normal. Two defences: record
 # which instrument ran (below, into the meta header), and refuse to scan when it
 # cannot do what this run needs. The probe is behavioural, never a version string
-# — depgraph is a fork whose branches are not ancestors of each other.
+# — capability is what matters, and depgraph's 0.1.0 spans both the broken and
+# the fixed resolver, so a version string says nothing.
 Push-Location $dep
 $depCommit = (git rev-parse --short HEAD).Trim()
 $depFull   = (git rev-parse HEAD).Trim()
@@ -80,7 +81,7 @@ $absent = @($needed | Where-Object { -not $caps.$_ })
 if ($absent.Count -gt 0) {
   $why = @{
     multi_root = "cross-root and same-package absolute imports resolve only when every scan root shares one namespace; without it the edge count silently collapses (U6)"
-    tree       = "``scan --tree`` walks the full file tree; it lives only on feat/p0-vector"
+    tree       = "``scan --tree`` walks the full file tree (-Tree snapshots)"
   }
   $lines = $absent | ForEach-Object { "    - {0}: {1}" -f $_, $why[$_] }
   throw @"
@@ -92,9 +93,9 @@ Refusing to scan — the checked-out depgraph cannot do what this run needs.
 $($lines -join "`n")
 
   Expected branch/commit are recorded in config/dev-environment.yaml.
-  Fix: git -C "$dep" checkout <branch that has it>, or merge the fork onto main
-  so one revision carries everything (depgraph has divergent siblings: --tree on
-  feat/p0-vector, the multi-root fix on feat/controlm-lineage).
+  Fix: git -C "$dep" fetch && git -C "$dep" checkout main && git -C "$dep" pull.
+  main has carried every capability since the fork was consolidated 2026-07-28
+  (depgraph 5006567); a checkout stranded on an older revision is the likely cause.
 
 A snapshot written by a regressed scanner is worse than no snapshot: it is
 plausible, diffable, and wrong (the 105-edge near-commit of 2026-07-28).

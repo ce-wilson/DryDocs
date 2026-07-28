@@ -6,7 +6,14 @@ date: 2026-06-29
 companion_to: docs/decisions/0002-component-database-topology.md   # ADR 0002, D2 (drydocs-lineage)
 depends_on: docs/decisions/0002-a-drydocs-core-extraction-plan.md  # core must exist first
 gated_by: ADR 0002 ACCEPTED (2026-06-26)        # topology is settled; this is execution
-source_repo: ce-wilson/depgraph @ feat/controlm-lineage (PR #2, OPEN)   # prototype, pre-monorepo
+source_repo: ce-wilson/depgraph @ feat/controlm-lineage (PR #2, SUPERSEDED — see §6)   # prototype, pre-monorepo
+source_branch_fate: >-
+  MERGED INTO depgraph main + BRANCH DELETED 2026-07-28 (merge commit 5006567,
+  alongside feat/p0-vector). Every `@feat/controlm-lineage` reference in this ADR
+  and in the backlog items that cite it now resolves through `main` — the branch
+  name is history, the code is not lost. depgraph itself is NOT retired: the
+  lineage assets were absorbed here, but its SCANNER is still live infrastructure,
+  invoked every session by knowledge/depgraph-snapshots/snapshot.ps1.
 target_package: lineage/  (drydocs-lineage)
 skill: reconcile-port   # disjoint-history re-home flow
 sibling_of: docs/decisions/0002-b-spinoff-rebase-checklist.md   # same move, different component

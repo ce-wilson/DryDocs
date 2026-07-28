@@ -24,7 +24,7 @@ header** so each snapshot is self-identifying:
            "drydocs_lineage","drydocs_deepdoc","tests"], "tree": false,
   "git": { "commit": "<short>", "full": "...", "branch": "main",
            "describe": "...", "subject": "...", "dirty": false, "pr": <num|null> },
-  "depgraph": { "commit": "<short>", "full": "...", "branch": "feat/controlm-lineage",
+  "depgraph": { "commit": "<short>", "full": "...", "branch": "main",
                 "dirty": false, "version": "0.1.0",
                 "capabilities": { "multi_root": true, "tree": false } }
 }
@@ -36,8 +36,11 @@ until 2026-07-28 the header pinned the subject precisely and said nothing about 
 which is how a scanner regression became invisible. Before scanning, `snapshot.ps1` runs
 [`probe_instrument.py`](probe_instrument.py) and **refuses** (exit 1, no file written) when the
 checkout cannot do what the run needs: multi-root resolution always, `--tree` additionally for
-`-Tree`. The probe is **behavioural, never a version string** — depgraph is a fork whose
-branches are not ancestors of each other, so there is no monotonic version to compare. Expected
+`-Tree`. The probe is **behavioural, never a version string** — depgraph's `0.1.0` spans both
+the broken and the fixed resolver, so a version says nothing; only what the code can *do* is
+decisive. (depgraph was a fork with two divergent branches until 2026-07-28, when both were
+merged into `main` and deleted; `main` is now the only branch and carries every capability.)
+Expected
 revision and required capabilities live in [`config/dev-environment.yaml`](../../config/dev-environment.yaml);
 `tests/unit/test_probe_instrument.py` fails if this machine's instrument has regressed.
 
@@ -98,6 +101,15 @@ Each snapshot's summary line reports `files`, `edges`, `circular_files`. To see 
 > growth. After it, snapshots taken on different machines are comparable for the first time:
 > the laptop-vs-desktop pair straddling the fix differed by exactly **one** node — the single
 > test file genuinely added — where before it would have differed by all of them.
+
+> **⚠ Instrument change — every node gains `"kind"` after 2026-07-28 12:39.** Consolidating the
+> depgraph fork onto `main` brought the file-tree branch's `FileNode.kind` with it, so nodes now
+> carry `"kind": "file"` (or `"dir"` in a `-Tree` scan). Purely **additive** and verified so: the
+> same code scanned before and after the merge produced identical `file_id` sets, byte-identical
+> edges, and identical `stats` — the *only* change was the new field. The G33 loader reads
+> field-by-field and ignores it. But because it lands on every node at once, the first diff
+> across this boundary again shows all nodes changed. Third marker in a day, same lesson: read
+> `meta.depgraph` before concluding anything from a node-level diff.
 
 - or diff the two `.json` files (`git diff` / any JSON diff tool), or watch the summary counts.
 
