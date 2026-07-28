@@ -106,9 +106,19 @@ MERGE (n:OntologyTerm:OrgProperty {iri:"http://www.w3.org/ns/org#hasMembership"}
 
 
 // ----- SWO anchor terms (SDLC subset) ---------------------------------------
-//   Full SDLC subset (~250 terms) loads from ontology/reference/swo_sdlc_ontology.cypher
-//   in the M0 follow-up step. The following are the high-frequency anchors
-//   referenced by loaders and Streamlit pages.
+//   These 13 anchors ARE the seeded SWO set — there is no wider load step.
+//   (An earlier revision of this comment said a ~250-term SDLC subset "loads
+//   from ontology/reference/swo_sdlc_ontology.cypher"; that file was never
+//   created — it existed only in the pre-repo savepoint and was never ported
+//   (docs/history/M0-README.md). C19, 2026-07-28.) If the wider subset is
+//   ever wanted it would have to be BUILT, and whether it is worth building
+//   is an OPEN question — its own decision about loading a public ontology
+//   into the operational database (G33 gate §A4 scoped it out).
+//   First live consumer (G33, 2026-07-27): the code-snapshot loader binds
+//   :CodeModule -IS_ENCODED_IN-> the Python term (SWO_0000118), with the
+//   edge mapped to SWO_0000741 in ontology_supplement.cypher; Shell/SQL stay
+//   seeded-but-unbound until a scan emits them (G22 rider R1 proposes the
+//   :Script binding).
 MERGE (n:OntologyTerm:SwoClass {iri:"http://www.ebi.ac.uk/swo/SWO_0000001"})       SET n.label = "software";
 MERGE (n:OntologyTerm:SwoClass {iri:"http://purl.obolibrary.org/obo/IAO_0000025"}) SET n.label = "programming language";
 MERGE (n:OntologyTerm:SwoClass {iri:"http://www.ebi.ac.uk/swo/SWO_0000118"})       SET n.label = "Python";

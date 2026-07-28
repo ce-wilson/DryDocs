@@ -4233,7 +4233,7 @@ items:
     agent: main
     model: haiku
     priority: p3
-    status: todo
+    status: done
     depends_on: []
     inputs: [drydocs_core/schema/ontology.cypher, config/gate-prompts/self-documentation-code-graph.yaml]
     acceptance: >
@@ -4253,6 +4253,19 @@ items:
       FIRST SWO consumer (IS_ENCODED_IN -> the Python term), so the anchors
       are no longer decoration. Whether the SDLC subset is built at all stays
       a user/SME call — this chore only stops the comment lying to readers.
+      CLOSED 2026-07-28 (same day): comment rewritten — the 13 anchors ARE
+      the seeded set, no wider load step exists; provenance recovered from
+      docs/history/M0-README.md (the ~250-term file lived only in the
+      pre-repo SAVEPOINT and was never ported — a port that never happened,
+      not a file that vanished); the open build-it-at-all question recorded
+      in the comment itself, plus the first-consumer state (G33 Python
+      binding live; Shell/SQL await G22 rider R1). The stale "Streamlit
+      pages" claim went with it. Remaining grep hits for the old path are
+      correct by design: gate-log.md:1014 + gate §A4 QUOTE the finding on
+      append-only audit surfaces, and docs/history/* accurately describe the
+      savepoint plan. Comment-only edit; regenerating gates.json picked up
+      C19's gate-prompt input (unblocks list) — drift introduced at the
+      groom, caught by test_gates_json. Suite green.
 
   # ── Epic Q — Document ingestion & doc-graph benchmarks (docmeta) — Phase 14 ─
   # Born 2026-07-16: the Essential GraphRAG ebook groomed on user-decided intents,
@@ -7413,11 +7426,11 @@ items:
       that escalates to the UI workstream, not a forced upgrade.
 
 summary:
-  todo: 56                                         # +4 at the 2026-07-28 inbox groom (C19 ontology-comment fix, J16 port-manifest fall-through guard, L17 doc-loader prereq guards, O34 web npm advisories); prior: +5 2026-07-27 groom (J14/J15/G36/O33/G38), +2 PAT review (C17/C18), +5 code-graph-review (U1-U5), +2 cmdline seam (G39/G40, built+closed same day)
+  todo: 55                                         # +4 at the 2026-07-28 inbox groom (C19 ontology-comment fix, J16 port-manifest fall-through guard, L17 doc-loader prereq guards, O34 web npm advisories); C19 closed same day; prior: +5 2026-07-27 groom (J14/J15/G36/O33/G38), +2 PAT review (C17/C18), +5 code-graph-review (U1-U5), +2 cmdline seam (G39/G40, built+closed same day)
   in_progress: 1                                   # E1 (gate deferred both sides)
   blocked: 0
-  done: 146                                        # 2026-07-27 closes: J14 SEALID split, P3 hosts+RUNS_ON, G21 rua code-ops, G24 code-repo seam, G26 launcher-registry config, Q8 bmc-docs prereq, C18 shadow-model guard, J15 value-shape boundary guard, G33 code-snapshot loader (gate signed + built same day), G39 cmdline staging store + G40 parse (groomed am, built pm)
-  next_ready: [M3, M4, J10, Q6, O23, J13, O26, O27, C15, C16, C17, C19, O28, R3, R4, L16, L17, O29, O30, O31, O32, S1, S8, S9, Q7, G32, G34, G35, O33, O34, P5, G22, J16, U1, U2, U3]
+  done: 147                                        # 2026-07-28: C19 ontology-comment fix (groomed + closed same day). 2026-07-27 closes: J14 SEALID split, P3 hosts+RUNS_ON, G21 rua code-ops, G24 code-repo seam, G26 launcher-registry config, Q8 bmc-docs prereq, C18 shadow-model guard, J15 value-shape boundary guard, G33 code-snapshot loader (gate signed + built same day), G39 cmdline staging store + G40 parse (groomed am, built pm)
+  next_ready: [M3, M4, J10, Q6, O23, J13, O26, O27, C15, C16, C17, O28, R3, R4, L16, L17, O29, O30, O31, O32, S1, S8, S9, Q7, G32, G34, G35, O33, O34, P5, G22, J16, U1, U2, U3]
   # 2026-07-27 code-graph-review groom: U1-U3 = the three personas of
   # docs/reviews/code-graph-review-plan.md, dependency-free -> next_ready;
   # U4/U5 = the optional skill edits, gated on their phase (U1/U2) proving the
