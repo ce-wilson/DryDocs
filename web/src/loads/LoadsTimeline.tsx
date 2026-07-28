@@ -1,4 +1,5 @@
 import type { RunRow } from './demoLoads'
+import StatusChip from '../components/ui/StatusChip'
 
 // The /loads canvas (O16, site-plan §3 row 8): loader → :JobRun provenance as
 // a run TIMELINE — dot-and-rail vertical list, newest first, status colored
@@ -22,10 +23,17 @@ export default function LoadsTimeline({
   selectedRunId: string | null
   onSelect: (runId: string | null) => void
 }) {
+  // DL-3 summary chips: the run population at a glance, before scanning the rail.
+  const completed = runs.filter((r) => r.status === 'COMPLETED').length
+  const failed = runs.filter((r) => r.status === 'FAILED').length
+  const other = runs.length - completed - failed
   return (
     <div className="flex h-full min-h-0 flex-col">
       <div className="flex shrink-0 flex-wrap items-center gap-1.5 border-b border-edge-soft px-3 py-2">
         <span className="text-xs font-medium text-muted">Run timeline · newest first</span>
+        <StatusChip count={completed} label="completed" token="--green" glyph="✔" />
+        <StatusChip count={failed} label="failed" token="--status-fail-soft" glyph="✗" />
+        {other > 0 && <StatusChip count={other} label="running" token="--yellow" glyph="~" />}
         <span
           className={
             'ml-auto rounded border px-2 py-0.5 font-mono text-[10px] ' +

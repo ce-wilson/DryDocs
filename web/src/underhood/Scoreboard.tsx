@@ -1,5 +1,6 @@
 import { CLASS_TOKEN, QUESTIONS, type StrategyResult } from './benchmarkData'
 import ResultChip from './ResultChip'
+import StatusChip from '../components/ui/StatusChip'
 
 // The 12-row scoreboard (docmeta-p0-verdict.md's Results table, reproduced
 // live): one row per fixed support question, a color-chipped class tag, and
@@ -12,8 +13,17 @@ export default function Scoreboard({
   selectedId: string | null
   onSelect: (id: string) => void
 }) {
+  // DL-3 summary chips: per-strategy pass totals before the 12-row scan.
+  const passes = (pick: (q: (typeof QUESTIONS)[number]) => StrategyResult) =>
+    QUESTIONS.filter((q) => pick(q).kind === 'pass').length
   return (
     <div className="overflow-x-auto rounded-lg border border-edge bg-panel">
+      <div className="flex flex-wrap items-center gap-1.5 border-b border-edge bg-panel-2 px-2.5 py-2">
+        <span className="text-[10px] font-semibold uppercase tracking-wide text-faint">Pass / {QUESTIONS.length}</span>
+        <StatusChip count={passes((q) => q.traversal)} label="Traversal" token="--green" title={`${passes((q) => q.traversal)} of ${QUESTIONS.length} pass`} />
+        <StatusChip count={passes((q) => q.fulltext)} label="Full-text" token="--teal" title={`${passes((q) => q.fulltext)} of ${QUESTIONS.length} pass`} />
+        <StatusChip count={passes((q) => q.manifest)} label="Manifest" token="--blue-br" title={`${passes((q) => q.manifest)} of ${QUESTIONS.length} pass`} />
+      </div>
       <table className="w-full min-w-[720px] border-collapse text-xs">
         <thead>
           <tr>
