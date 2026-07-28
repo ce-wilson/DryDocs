@@ -512,19 +512,122 @@ STEP LEDGER — delta since `6fd3270` (numbering continues from the archive):
     as test_backlog does. Producer reference at `947920c`: 1070 passed / 8 skipped
     (production CSV absent on the measuring machine).
 
+48. DATALENS UI + INSTRUMENT HARDENING + THE DEPGRAPH FORK CONSOLIDATION
+    (2026-07-28; `947920c..cewilson/main` — compute the range live and record the
+    exact head in the PORT-REPORT; 24 commits to `8a82e3b` known at 2026-07-28 pm).
+    Six sub-streams; **(d) changes how your session-end ritual BEHAVES — read it
+    before you run the first snapshot company-side.**
+    a. DATALENS UI QUICK WINS + SME WIREFRAMES (`ace7e12` DL-9, `52418dc` DL-2,
+       `8f6bdd2` DL-1, `908fbee` DL-3, `50158d0` DL-4, `bc61408` DL-7/O32,
+       `a4e91ec` board, `852ebb0` SME launch guide + keyed wireframes,
+       `b4f5d3c` sync, `f574e97` `--no-ff` merge, `d6022c3` marks + Neo4j logo):
+       design-token work in `web/` — `--status-fail` splits status red from brand
+       red, StatusChip count pills on loads + scoreboard, a threshold-coloured
+       Meter on the loads header, tabular numerals on numeric columns. The
+       wireframes carry L5/L6 ELEMENT KEYS (`out/KEYS.md`) — that is the feedback
+       re-attachment idiom, so keep the keys if you adopt the wireframes at all.
+       Reconcile against your own `web/**` rows; the console is a surface where
+       both sides legitimately diverge.
+    b. DSI + DATALENS REFERENCE PACKS (`d146015`, `ace7e12`): Internal-tier
+       reference material, classified and re-homed under `internal/`. That path is
+       `default_ok: internal/**` — union / evaluate, NEVER a blind checkout. These
+       are producer-sourced documents; yours may legitimately differ or not exist.
+    c. THE C15/C16/L18/D8/J17 BATCH (`ba25ed4` pushed claim, then `f3a153b`,
+       `e003512`, `12c36a4`, `915429f`, `bb028d2`): **step 47 told you these arrive
+       `todo` — they now arrive `done`.** Correct the expectation before you
+       recompute the backlog summary.
+       * **D8 `e003512` — bootstrap constraint guard. Port this one first.** After
+         apply, every DECLARED constraint NAME must be present (names, not counts).
+         It closes the failure the producer audit found: `apoc.cypher.runMany`
+         executes DML but SILENTLY NO-OPS DDL, so `drydocs bootstrap` printed
+         "Constraints applied." while creating ZERO constraints, on every edition,
+         from `9893c19` (2026-05-05) until D5 client-side splitting landed
+         (`771326b`, 2026-07-18). **If any company path still bootstraps through
+         runMany, you have the same silent hole** — and any past "live-verified"
+         claim that reasoned about a constraint in that window deserves a re-check.
+         EXPECTED_CONSTRAINTS is UNCHANGED at 51 producer-side (a guard, not new
+         constraints), so your ledger arithmetic is untouched.
+       * L18 `12c36a4` — depth-0 cell split; separators inside parentheticals no
+         longer shear a ref (the K2 shear healed, conformance guard over the real
+         matrices).
+       * C15 `915429f` — display-only `inverse_label` on all 78 vocabulary entries,
+         schema-test enforced. Presentational only: no edge semantics change.
+       * C16 `bb028d2` — key-prefix governance (`drydocs.` / `system` / team-local
+         classes) in the description-metadata plan.
+       * J17 `f3a153b` — `gates.json` now rides the default-paths board render, so
+         one render keeps it in sync (the drift that bit twice).
+    d. U7 + U8 — THE SNAPSHOT INSTRUMENT NOW RECORDS AND POLICES ITSELF
+       (`134c2e5`; new `knowledge/depgraph-snapshots/probe_instrument.py` +
+       `tests/unit/test_probe_instrument.py`). Both are canonical-producer /
+       `tests/**`, so they PORT. Two behaviour changes you must plan for:
+       * **`snapshot.ps1` now REFUSES rather than writing a wrong snapshot** —
+         exit 1, no file — when the depgraph sibling checkout cannot do what the
+         run needs (multi-root resolution always; `--tree` additionally for
+         `-Tree`). Probed behaviourally, never by version string. This WILL fire
+         company-side if your `../depgraph` checkout is stale or absent, and that
+         is the intended outcome: on 2026-07-28 a months-old checkout produced a
+         105-edge graph where the truth was 370, and it looked entirely normal.
+         Point your sibling checkout at depgraph `main` (see (e)) before the first
+         ritual run.
+       * **`abs_path` is stripped from committed snapshots**, and `meta` gains a
+         `depgraph {commit, branch, dirty, version, capabilities}` block beside the
+         existing `git` block. `abs_path` was stamped with the checkout location,
+         so the same code diffed as 100% changed nodes across machines — and it
+         blocked the ritual outright from an agent worktree. Your `*.json` are
+         still never-port, so this only matters for how YOUR series behaves: expect
+         one boundary diff where every node loses the field, then clean diffs.
+         The G33 loader already dropped `abs_path` at load (§H4), so nothing
+         downstream changes.
+    e. DEPGRAPH FORK CONSOLIDATED (`8a82e3b` here; depgraph `5006567` there).
+       The sibling `ce-wilson/depgraph` was a fork with TWO DIVERGENT BRANCHES off
+       a one-commit `main` — `--tree` on one, the U6 multi-root resolver on the
+       other, neither an ancestor of the other — so no revision had everything and
+       a plain clone of `main` reproduced the BROKEN scanner. Both are now merged
+       into `main` and DELETED; `main` is the only branch. **Action for you: if you
+       maintain a depgraph checkout, `git fetch && git checkout main && git pull`.
+       Any pinned reference to `feat/controlm-lineage` or `feat/p0-vector` no
+       longer resolves** — including ADR 0002-C's header and the two done backlog
+       items that cite it, which is why 0002-C now carries a `source_branch_fate`
+       note recording that those references resolve through `main`. Nothing was
+       lost. Note also what 0002-C now states plainly: the lineage assets were
+       absorbed into drydocs-core, but the SCANNER never was — depgraph is live
+       infrastructure invoked every session, not a retired prototype.
+    f. POST-UI-MERGE GROOM (`684c0fe`) + snapshots. The groom promotes 15 (U7/U8,
+       O35-O41 the SME landing / DataLens continuity set, B5, R9 the agent query
+       surface, J18/J19, L20, L21) and resolves 2 in-trail. `1b5b269` and `c5d5e3d`
+       are snapshots — EXCLUDED class (guardrail 4 + the never-port row).
+       backlog.yaml per-entry: U7/U8/C15/C16/L18/D8/J17 arrive `done`; the 15 new
+       items arrive `todo`; re-insert the company DD-series and recompute the
+       summary exactly as `test_backlog` does.
+    *** CAVEAT — `config/**` IS `canonical-producer`, AND `config/dev-environment.yaml`
+    IS NOW PRODUCER-LOCAL INFRASTRUCTURE ***: U7 added a `depgraph:` block to that
+    file (sibling repo PATH, expected branch + commit, required capabilities)
+    alongside the pre-existing Neo4j container name and host ports. Under the
+    current row you would take the producer's copy WHOLESALE — adopting producer
+    container names, producer ports, and a producer-relative `../depgraph` path as
+    if they were yours. That is the same adapt-don't-adopt hazard step 47h flagged
+    for the L16 runbook, except here the manifest actively says take-mine, and the
+    runbook's Appendix A is a RENDER of this file, so a wrong value would
+    propagate into documentation. **This is an un-made decision in the J16 sense,
+    surfaced not fixed** — the producer deliberately did not change the disposition
+    unilaterally. Decide it your side: most likely a `config/dev-environment.yaml`
+    per-entry or canonical-company row, then send the row back so both manifests
+    agree.
+
 ACCEPTANCE GATE (behavior is the contract, not a byte-compare):
 - Track 1 (portable, no production sample present):
     poetry run pytest tests/unit/test_variable_classifier.py tests/unit/test_variable_resolver.py \
                       tests/unit/test_variable_staging.py tests/unit/test_command_parser.py \
                       tests/unit/test_module_boundary.py -q
-  Producer reference at `947920c`: 114 passed / 3 skipped (sample-backed tests skip
-  without the gitignored production CSV). Company baseline is ABOVE this (113 at the
+  Producer reference at `8a82e3b` (step 48): 114 passed / 3 skipped — unchanged from
+  `947920c` (sample-backed tests skip without the gitignored production CSV). Company baseline is ABOVE this (113 at the
   last port) — compare against your own prior report, not the producer floor.
 - Full `pytest tests/unit/` — ZERO failures is the contract; skips are
   environment/fixture-absence by design (production CSVs, XML fixtures, fastapi
   optional dep, essential-graphrag PDF, J7 guards without RECONCILE_BEFORE_DIR).
-  Producer reference at the current head (step 47, `947920c`): 1070 passed /
-  8 skipped with the production CSV absent (step-46 head 78ba7fd was 982 / 6;
+  Producer reference at the current head (step 48, `8a82e3b`): 1099 passed /
+  7 skipped with the production CSV absent (step-47 head 947920c was 1070 / 8;
+  step-46 head 78ba7fd was 982 / 6;
   step-45 head bf33c8a was 900 / 6; step-43 head 2adec42 was 840 / 6).
   Company reference at the last port: 1174 passed / 21 skipped / 0 failed.
 - CI guards green: test_schema.py (EXPECTED_CONSTRAINTS company-based — see ledger;
