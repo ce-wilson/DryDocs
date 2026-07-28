@@ -48,7 +48,7 @@ def test_runbook_header_carries_rev_and_commit() -> None:
     assert header["origin"] == DESIGN_DOCS_ORIGIN
     assert header["doc_id"] == "drydocs-startup-refresh-runbook"
     assert header["doc_type"] == "Runbook"
-    assert header["rev"] == 3  # Rev 3, 2026-07-28 (L16 container/port refresh)
+    assert header["rev"] == 4  # Rev 4, 2026-07-28 (plugins volume: APOC absent + GDS added)
     assert header["doc_status"] == "DESCRIPTIVE"
     assert header["commit"], "front-matter commit citation should parse"
     assert header["path"] == "docs/design/drydocs-startup-refresh-runbook.md"

@@ -7,11 +7,32 @@
     * a Neo4j ENTERPRISE instance — multi-database + composite are Enterprise-only.
       Community edition (exactly one database) CANNOT host this topology.
 
-  Local dev Enterprise via Docker (free evaluation license), e.g.:
-    docker run -d --name neo4j-ent -p 7474:7474 -p 7687:7687 `
-      -e NEO4J_AUTH=neo4j/password `
+  Local dev Enterprise via Docker (free evaluation license). Canonical names/ports/
+  plugins live in config/dev-environment.yaml — change them THERE, then here
+  (tests/unit/test_dev_environment.py fails if this command drifts from that file).
+
+  STEP 1 — populate the plugins volume ONCE, from the image itself:
+    docker volume create neo4j-testplugins
+    docker run --rm --entrypoint sh -v neo4j-testplugins:/plugins neo4j:2026.05.0-enterprise `
+      -c 'cp /var/lib/neo4j/labs/apoc-*-core.jar /plugins/ && cp /var/lib/neo4j/products/neo4j-graph-data-science-*.jar /plugins/'
+
+  STEP 2 — create the container, mounting BOTH volumes:
+    docker run -d --name neo4jtest --restart unless-stopped -p 7474:7474 -p 7687:7687 `
+      -v neo4j-testdata:/data `
+      -v neo4j-testplugins:/plugins `
+      -e NEO4J_AUTH=neo4j/<password> `
       -e NEO4J_ACCEPT_LICENSE_AGREEMENT=eval `
-      -e NEO4J_PLUGINS='["apoc"]' neo4j:5-enterprise
+      -e NEO4J_dbms_security_procedures_unrestricted=apoc.*,gds.* `
+      -e NEO4J_dbms_security_procedures_allowlist=apoc.*,gds.* `
+      neo4j:2026.05.0-enterprise
+
+  DO NOT use `-e NEO4J_PLUGINS='["apoc"]'` (what this header said until 2026-07-28).
+  That asks the entrypoint to DOWNLOAD the plugin at startup; when the download cannot
+  happen the container starts anyway and the plugin is silently absent — the failure
+  mode actually observed, for weeks, with the env var set the whole time. The jars ship
+  inside the image and are version-matched to the server, so STEP 1 needs no network.
+  The volume is what makes it survive `docker rm` + `docker run`; a jar copied into a
+  running container lives in its writable layer and dies on recreate.
 
   Then:
     .\provision.ps1 -Uri bolt://localhost:7687 -User neo4j -Password password

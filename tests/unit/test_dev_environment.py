@@ -76,3 +76,51 @@ def test_env_templates_target_ground_truth_db_not_home_db():
             f"{template.name}: {key}={m.group(1)} — templates must default to the "
             f"ADR 0002 ground-truth db {ground!r}, never the EE home db"
         )
+
+
+PROVISION_PS1 = REPO / "drydocs_core" / "schema" / "provisioning" / "provision.ps1"
+
+
+def test_plugins_are_declared():
+    """Plugins are infrastructure, so they belong in the canonical file too.
+
+    They were invisible here while `NEO4J_PLUGINS=[apoc]` sat on the container and
+    /plugins held only README.txt — declared nowhere, verified by nothing, and only
+    noticed when `drydocs bootstrap` refused with "APOC required" (2026-07-28).
+    """
+    neo = _load()["neo4j"]
+    assert neo["plugins_volume"], "the plugins volume must be named here"
+    assert neo["plugins_volume"] != neo["volume"], "plugins and data are separate volumes"
+    assert set(neo["plugins"]) >= {"apoc", "graph-data-science"}
+
+
+def test_provisioning_header_matches_canonical_container():
+    """The documented `docker run` must not drift from the canonical facts.
+
+    It did: the header said `neo4j:5-enterprise`, no volume mounts, and the
+    NEO4J_PLUGINS env-var form — while the real container ran 2026.05.0 with a
+    named data volume. A stale recipe is worse than none; it gets copy-pasted.
+    """
+    neo = _load()["neo4j"]
+    header = PROVISION_PS1.read_text(encoding="utf-8")
+    for token in (
+        neo["image"],
+        f"{neo['volume']}:/data",
+        f"{neo['plugins_volume']}:/plugins",
+        f"--name {neo['container']}",
+        f"-p {neo['ports']['http']}:{neo['ports']['http']}",
+        f"-p {neo['ports']['bolt']}:{neo['ports']['bolt']}",
+    ):
+        assert token in header, f"provision.ps1 no longer documents {token!r}"
+
+
+def test_provisioning_header_warns_off_the_download_form():
+    """NEO4J_PLUGINS must not come back as the recommended mechanism.
+
+    It fails OPEN — the container starts fine and the plugin is simply missing —
+    so nothing surfaces the mistake until a loader refuses.
+    """
+    header = PROVISION_PS1.read_text(encoding="utf-8")
+    assert "DO NOT use" in header and "NEO4J_PLUGINS" in header
+    for proc in ("apoc.*", "gds.*"):
+        assert proc in header, f"allowlist for {proc} missing from the documented run"

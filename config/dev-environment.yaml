@@ -16,7 +16,20 @@ neo4j:
   # drydocs_core/schema/provisioning/provision.ps1
   container: neo4jtest
   image: neo4j:2026.05.0-enterprise   # store written by 2026.05.0 — cannot downgrade to 5.26
-  volume: neo4j-testdata
+  volume: neo4j-testdata              # -> /data   (the graph; survives container recreation)
+  plugins_volume: neo4j-testplugins   # -> /plugins (see `plugins:` below)
+  plugins: [apoc, graph-data-science]
+  # PLUGINS ARE A MOUNTED VOLUME, NOT `NEO4J_PLUGINS` (fixed 2026-07-28). The env-var
+  # form asks the entrypoint to DOWNLOAD each plugin at startup; when that download
+  # cannot happen the container starts anyway and the plugin is simply absent — which
+  # is exactly what was found: `NEO4J_PLUGINS=[apoc]` was set for weeks while
+  # /plugins held only README.txt, so `drydocs bootstrap` refused with "APOC required"
+  # and the neo4j-drydocs MCP server could not work. Both jars SHIP INSIDE the image
+  # (/var/lib/neo4j/labs for apoc, /var/lib/neo4j/products for GDS) and are version-
+  # matched to the server, so populating a named volume from the image needs no network
+  # and cannot drift from the server version. Populate + create: see the header of
+  # drydocs_core/schema/provisioning/provision.ps1 (guarded by tests/unit/test_dev_environment.py).
+  # Requires the procedure allowlists — apoc.*,gds.* in BOTH unrestricted and allowlist.
   ports:
     http: 7474            # browser UI  -> http://localhost:7474
     bolt: 7687            # drivers     -> bolt://localhost:7687

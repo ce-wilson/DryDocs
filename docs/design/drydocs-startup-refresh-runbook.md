@@ -1,8 +1,10 @@
 # Runbook — DryDocs local startup & refresh (EE container + sample ingest)
 
 <!-- anchor: front-matter -->
-- **Status:** DESCRIPTIVE — documents the working procedure. **Rev 3, 2026-07-28**
-  (container facts re-pointed onto the `neo4jtest` recreation and sourced from
+- **Status:** DESCRIPTIVE — documents the working procedure. **Rev 4, 2026-07-28**
+  (plugins are a mounted volume, not `NEO4J_PLUGINS` — APOC was silently absent; GDS
+  added; on top of Rev 3's container-fact re-point onto the `neo4jtest` recreation,
+  sourced from
   `config/dev-environment.yaml`; on top of Rev 2's rev1-SME-feedback pass, which
   reflected commit `a135a6d`: post-D6 quick-start with step 3b, post-D7 sweep,
   post-K6 supplements)
@@ -15,6 +17,20 @@
   `internal/helpmeloginlocalneo4j.md` (login/port troubleshooting evidence),
   `.claude/skills/run-drydocs/SKILL.md` (agent-facing run notes)
 
+> **What changed in Rev 4 (2026-07-28) — the plugins were never actually installed.**
+> `NEO4J_PLUGINS=[apoc]` was set on the container for weeks while `/plugins` held only
+> `README.txt`, so APOC was ABSENT: `drydocs bootstrap` refused with "APOC required"
+> and the `neo4j-drydocs` MCP server could not function. That env var asks the
+> entrypoint to *download* each plugin at startup and **fails open** — the container
+> starts healthy and the plugin is simply missing, so nothing surfaces it until a
+> loader refuses. Both jars ship INSIDE the image, version-matched to the server, so
+> plugins are now a **named volume (`neo4j-testplugins`) populated from the image** and
+> mounted at `/plugins` — which is also what makes them survive `docker rm` + `docker
+> run` (a jar copied into a running container dies with its writable layer).
+> **graph-data-science added alongside APOC** (471 procedures). The provisioning
+> header's `docker run` — which still said `neo4j:5-enterprise` with no volume mounts —
+> is corrected and now guarded by `tests/unit/test_dev_environment.py`.
+>
 > **What changed in Rev 3 (2026-07-28) — container facts follow the `neo4jtest`
 > recreation.** The runbook still told you to start `neo4j-drydocs-ee` on host ports
 > 7476/7689. That container was retired 2026-07-23: the graph moved into the named volume
@@ -215,7 +231,9 @@ Change it *there* first, then here; verify against `docker port`, never assume:
 | Item | Value |
 |---|---|
 | Container | `neo4jtest` (Neo4j 2026.05.0 Enterprise) |
-| Volume | `neo4j-testdata` (the graph survives container recreation) |
+| Volume (data) | `neo4j-testdata` → `/data` (the graph survives container recreation) |
+| Volume (plugins) | `neo4j-testplugins` → `/plugins` — APOC + graph-data-science, populated from the image; survives recreation for the same reason |
+| Plugins | `apoc` (174 procs) + `gds` (471 procs), both 2026.05.0. Needs `apoc.*,gds.*` in BOTH `dbms.security.procedures.unrestricted` and `..._allowlist`. NOT `NEO4J_PLUGINS` — see Rev 4 |
 | HTTP / Browser | container 7474 → host **7474** (`http://localhost:7474/browser/`) |
 | Bolt | container 7687 → host **7687** (`bolt://localhost:7687`) |
 | Databases | `drydocs`, `ddlineage`, `ddcontext` + composite `ddall` (G1/G7) |
