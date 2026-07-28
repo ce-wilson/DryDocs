@@ -70,6 +70,7 @@ from drydocs_core.controlm import (
 )
 from drydocs_core.models import ControlMVariableRow
 from drydocs_core.run_log import LoaderRunLog
+from drydocs_core.schema.constraints import declared_constraint_names
 from drydocs_core.schema.supplements import (
     BY_NAME as SUPPLEMENTS_BY_NAME,
 )
@@ -375,7 +376,22 @@ def bootstrap(
             console.print("[red]APOC required.[/]"); raise typer.Exit(2)
         if not skip_constraints:
             cli.execute_file(CONSTRAINTS_FILE)
-            console.print("[green]Constraints applied.[/]")
+            # D8 guard: execute_file raising is not enough — a silent DDL
+            # no-op (the pre-D5 apoc.cypher.runMany class) "succeeds" while
+            # creating nothing. Assert every declared name is now present.
+            declared = declared_constraint_names(CONSTRAINTS_FILE)
+            present = cli.constraint_names()
+            missing = [n for n in declared if n not in present]
+            if missing:
+                console.print(
+                    f"[red]Constraint guard: {len(missing)} of {len(declared)} declared "
+                    f"constraints absent after apply: {', '.join(missing)} — the apply "
+                    "did not take. Nothing further runs.[/]"
+                )
+                raise typer.Exit(2)
+            console.print(
+                f"[green]Constraints applied ({len(declared)}/{len(declared)} declared present).[/]"
+            )
         if not skip_ontology:
             cli.execute_file(ONTOLOGY_FILE)
             console.print("[green]Ontology seed applied.[/]")

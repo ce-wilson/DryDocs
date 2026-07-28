@@ -103,3 +103,7 @@ class Neo4jClient:
             return True
         except Exception:
             return False
+
+    def constraint_names(self) -> frozenset[str]:
+        """Names from ``SHOW CONSTRAINTS`` — the D8 bootstrap guard keys on these."""
+        return frozenset(r["name"] for r in self.run("SHOW CONSTRAINTS YIELD name RETURN name"))
