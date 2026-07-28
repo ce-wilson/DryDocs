@@ -1,5 +1,6 @@
 import type { RunRow } from './demoLoads'
 import StatusChip from '../components/ui/StatusChip'
+import Meter from '../components/ui/Meter'
 
 // The /loads canvas (O16, site-plan §3 row 8): loader → :JobRun provenance as
 // a run TIMELINE — dot-and-rail vertical list, newest first, status colored
@@ -34,6 +35,11 @@ export default function LoadsTimeline({
         <StatusChip count={completed} label="completed" token="--green" glyph="✔" />
         <StatusChip count={failed} label="failed" token="--status-fail-soft" glyph="✗" />
         {other > 0 && <StatusChip count={other} label="running" token="--yellow" glyph="~" />}
+        {runs.length > 0 && (
+          // DL-4: run-completion meter — green only when every run completed;
+          // any failed/running run drops it below threshold and it reads fail-rose.
+          <Meter value={(completed / runs.length) * 100} label="runs completed" />
+        )}
         <span
           className={
             'ml-auto rounded border px-2 py-0.5 font-mono text-[10px] ' +
