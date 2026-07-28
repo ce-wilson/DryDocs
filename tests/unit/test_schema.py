@@ -32,8 +32,10 @@ VOCAB_FILE       = ONTOLOGY_DIR / "relationship_vocabulary.yaml"
 # rationale no longer applies).
 # 49 after the P3 host topology (gate controlm-hosts-topology 2026-07-09):
 # controlmhostgroup_key (data_center, name) NODE KEY + executionhost_nodeid.
+# 51 after the G33 self-documentation code graph (gate
+# self-documentation-code-graph 2026-07-27): project_id + codemodule_file_id.
 # Bump this when you intentionally add/remove a CREATE CONSTRAINT.
-EXPECTED_CONSTRAINTS = 49
+EXPECTED_CONSTRAINTS = 51
 
 # SchedulerKind removed 2026-07-21 (C12 platforms-taxonomy gate): its seeds are
 # retired (commented, audit-kept) in ontology.cypher — no longer a seeded label.

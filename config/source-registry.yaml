@@ -125,6 +125,26 @@ sources:
     confirmed: true                     # SME gate 2026-07-07 (ADR 0004; config/gate-log.md)
     notes: "Third-party software registry (plan 07). Vendor = brand only; graph is the lookup."
 
+  - id: depgraph-snapshot
+    classification: Internal-Public     # our own repo-relative paths only; abs_path DROPPED at load (§H4)
+    source: "knowledge/depgraph-snapshots/drydocs-*.json (dated dependency snapshots; snapshot.ps1 writes one per session ritual)"
+    kind: derived                       # NOT an imported hierarchy — deterministic structural capture of code we control
+    orchestrator: ~
+    adapter: json                       # CodeSnapshotAdapter (newest-file selection + positive meta.tree discrimination)
+    locator:
+      mapping: config/source-mappings/depgraph-snapshot.yaml   # field ledger (doc 08; census COMPLETE — gate §C5 enumerated the fields)
+    feeds_taxonomy: []                  # no config/taxonomy/ file — lands as ontology + loader (gate meta.Taxonomy)
+    confirmed: true                     # gate self-documentation-code-graph SIGNED OFF 2026-07-27 (36/36; config/gate-log.md)
+    gate_spec: config/gate-prompts/self-documentation-code-graph.yaml
+    notes: >
+      G33 / Epic U self-documentation: DryDocs' own source tree as a queryable
+      :Project subgraph (loader `drydocs load-code-snapshot`). Tree-mode files
+      in the same directory are REFUSED by a positive assertion (meta present
+      AND meta.tree == false — they carry NO meta key at all; §G1(a) + the
+      2026-07-27 build note). Internal-Public holds BECAUSE abs_path (the one
+      producer-local value) never loads; the snapshot files themselves are
+      never-port in PORT-MANIFEST.yaml for the same reason.
+
   # ---- Docs corpora (converted documentation → lexical graph) ---------------
   - id: bmc-docs
     classification: External             # public BMC documentation, converted; cite source_url per doc

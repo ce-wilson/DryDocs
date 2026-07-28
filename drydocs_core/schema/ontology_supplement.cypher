@@ -349,3 +349,73 @@ MERGE (n:OntologyTerm:LocalRelationship {iri: "https://drydocs.local/ontology#fe
 MATCH (local:OntologyTerm:LocalRelationship {iri: "https://drydocs.local/ontology#feedbackAuthoredBy"})
 MATCH (prov:OntologyTerm:ProvProperty       {iri: "http://www.w3.org/ns/prov#wasAttributedTo"})
 MERGE (local)-[:MAPS_TO]->(prov);
+
+// --- Self-documentation code graph (G33 / Epic U; gate ---------------------
+// self-documentation-code-graph SIGNED OFF 2026-07-27). DryDocs' own source
+// tree as a queryable subgraph — the depgraph ritual's output entering Neo4j.
+
+// Project + CodeModule local class anchors.
+MERGE (n:OntologyTerm:LocalClass {iri: "https://drydocs.local/ontology#Project"})
+  SET n.label = "Project",
+      n.notes = "The single software-repository root (prov:Collection) — ONE node per repo "
+              + "(gate B1(a)); the snapshot's six scan roots are the CodeModule.project "
+              + "property, never sibling roots. The 'is this our own code?' one-hop anchor; "
+              + "nothing else hangs off it (F2). Reads against the PAT :Product family as "
+              + "SOFTWARE repo vs BUSINESS product (F3).";
+MERGE (n:OntologyTerm:LocalClass {iri: "https://drydocs.local/ontology#CodeModule"})
+  SET n.label = "Code Module",
+      n.notes = "One source FILE (prov:Entity), keyed on file_id = repo-relative path — the "
+              + "only non-colliding key (C2/C4). One file = one module (C1(a); the label says "
+              + "'module', the thing is a file — accepted cost, recorded at the gate). MUST "
+              + "NEVER also carry :SoftwareProduct (F1 — graph-test in m1-verify).";
+
+MATCH (lc:OntologyTerm:LocalClass {iri: "https://drydocs.local/ontology#Project"})
+MATCH (pc:OntologyTerm:ProvClass  {iri: "http://www.w3.org/ns/prov#Collection"})
+MERGE (lc)-[r:SUBCLASS_OF]->(pc)
+  ON CREATE SET r.source = "drydocs.ontology_supplement";
+
+MATCH (lc:OntologyTerm:LocalClass {iri: "https://drydocs.local/ontology#CodeModule"})
+MATCH (pc:OntologyTerm:ProvClass  {iri: "http://www.w3.org/ns/prov#Entity"})
+MERGE (lc)-[r:SUBCLASS_OF]->(pc)
+  ON CREATE SET r.source = "drydocs.ontology_supplement";
+
+// HAS_MODULE  —  Project → CodeModule  (prov:hadMember; u1_has_module)
+MERGE (n:OntologyTerm:LocalRelationship {iri: "https://drydocs.local/ontology#hasModule"})
+  SET n.label  = "HAS_MODULE",
+      n.domain = "Project",
+      n.range  = "CodeModule",
+      n.notes  = "Repository contains this source file — from the SINGLE root to ALL modules; "
+               + "'which of the six scan roots' is the CodeModule.project property, never this "
+               + "edge (gate B1(a)). prov:hadMember, Collection -> any matrix row.";
+MATCH (local:OntologyTerm:LocalRelationship {iri: "https://drydocs.local/ontology#hasModule"})
+MATCH (prov:OntologyTerm:ProvProperty       {iri: "http://www.w3.org/ns/prov#hadMember"})
+MERGE (local)-[:MAPS_TO]->(prov);
+
+// IMPORTS  —  CodeModule → CodeModule  (prov:wasDerivedFrom; u1_imports)
+MERGE (n:OntologyTerm:LocalRelationship {iri: "https://drydocs.local/ontology#imports"})
+  SET n.label  = "IMPORTS",
+      n.domain = "CodeModule",
+      n.range  = "CodeModule",
+      n.notes  = "Source-level import, importer -> imported. ACCEPTED LIMIT (gate D2): bare "
+               + "pairs — cannot distinguish `import x` / `from x import y` / TYPE_CHECKING-"
+               + "only. Never read as 'breaks if removed'.";
+MATCH (local:OntologyTerm:LocalRelationship {iri: "https://drydocs.local/ontology#imports"})
+MATCH (prov:OntologyTerm:ProvProperty       {iri: "http://www.w3.org/ns/prov#wasDerivedFrom"})
+MERGE (local)-[:MAPS_TO]->(prov);
+
+// IS_ENCODED_IN  —  CodeModule → SwoClass  (SWO_0000741; u1_is_encoded_in)
+// FIRST USE of the SWO layer (seeded in ontology.cypher with zero consumers
+// until this gate). Precedent set at E1(b): bind to a seeded term that already
+// means the thing, derive the value from data the artifact carries, invent
+// nothing. MAPS_TO the seeded SwoProperty rather than a PROV property.
+MERGE (n:OntologyTerm:LocalRelationship {iri: "https://drydocs.local/ontology#isEncodedIn"})
+  SET n.label  = "IS_ENCODED_IN",
+      n.domain = "CodeModule",
+      n.range  = "SwoClass",
+      n.notes  = "Module -> programming language, value derived from node.extension "
+               + "(.py -> the seeded SWO Python term). Realises SWO_0000741 'is encoded in'; "
+               + "function-level binding ('implements', 'uses platform') REJECTED at E1 — a "
+               + "dependency snapshot does not know software function.";
+MATCH (local:OntologyTerm:LocalRelationship {iri: "https://drydocs.local/ontology#isEncodedIn"})
+MATCH (swo:OntologyTerm:SwoProperty         {iri: "http://www.ebi.ac.uk/swo/SWO_0000741"})
+MERGE (local)-[:MAPS_TO]->(swo);

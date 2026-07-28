@@ -1,0 +1,88 @@
+# =============================================================================
+# config/source-mappings/depgraph-snapshot.yaml — the field ledger for source
+# `depgraph-snapshot` (G33 / Epic U; gate self-documentation-code-graph signed
+# off 2026-07-27).
+#
+# JSON source, not a DB table — "objects" are the shapes of the dependency-mode
+# snapshot document (nodes array / meta block / meta.git block / edges array)
+# and "columns" are their fields. The census is COMPLETE and exact: the gate's
+# §C5 finding enumerated the node fields verbatim ("the node fields are exactly
+# abs_path, circular, extension, file_id, kind, name, project, rel_path — no
+# URN anywhere in the artifact"). Field names are mechanism (our own repo's
+# structural capture, no data values) — classification: Internal-Public.
+# =============================================================================
+schema: drydocs.source-mapping.v1
+source: depgraph-snapshot
+classification: Internal-Public
+updated: 2026-07-27
+
+objects:
+  - name: node
+    kind: json-record
+    profile:
+      profiled_on: 2026-07-27
+      via: "gate §C5 field enumeration + drydocs-20260727-1732.json (183 records)"
+      column_count: 8
+      census: complete
+    note: >
+      One record = one source FILE (:CodeModule, keyed file_id — gate §C1(a)/§C2).
+      Loader: code_snapshot.v1 (drydocs/loaders/cypher/code_snapshot.cypher).
+    columns:
+      - {name: file_id,   disposition: projected, origin: source, target: CodeModule.file_id,   note: "THE key — repo-relative path; also every edge endpoint (§C2)"}
+      - {name: project,   disposition: projected, origin: source, target: CodeModule.project,   note: "one of six scan roots — a PROPERTY, never a node (§B1(a))"}
+      - {name: rel_path,  disposition: projected, origin: source, target: CodeModule.rel_path,  note: "collides across scan roots — display only, never a key (§C4)"}
+      - {name: name,      disposition: projected, origin: source, target: CodeModule.name,      note: "collides 15 ways on '__init__.py' — display only (§C4)"}
+      - {name: extension, disposition: projected, origin: source, target: CodeModule.extension, note: "also derives language_iri -> edge:IS_ENCODED_IN (§E1(b), adapter EXTENSION_LANGUAGE_IRI)"}
+      - {name: circular,  disposition: projected, origin: source, target: CodeModule.circular,  note: "scanner's verdict AT CAPTURE TIME — a later graph query disagreeing is signal (§C3)"}
+      - {name: kind,      disposition: excluded, reason: scope,       note: "constant 'file' in dependency mode; 'dir' exists only in the refused tree mode (§G1)"}
+      - {name: abs_path,  disposition: excluded, reason: sensitivity, decided_by: self-documentation-code-graph, note: "producer-local machine path — never loads (§H4); same fact made the *.json never-port"}
+
+  - name: meta
+    kind: json-block
+    profile:
+      profiled_on: 2026-07-27
+      via: "drydocs-20260727-1732.json meta block"
+      column_count: 6
+      census: complete
+    note: >
+      Snapshot-level capture metadata, denormalized onto every row by the
+      adapter so the Cypher can MERGE the single :Project root (§B1(a)).
+    columns:
+      - {name: project,     disposition: projected, origin: source, target: Project.project_id,  note: "the ONE root key — 'drydocs'"}
+      - {name: captured_at, disposition: projected, origin: source, target: Project.captured_at, note: "point-in-time capture; the load is current-state only (§H2/§A5)"}
+      - {name: tree,        disposition: filter-only, note: "THE DISCRIMINATOR — must be present AND exactly false (§G1(a) + build note: tree-mode files have NO meta at all)"}
+      - {name: scan,        disposition: excluded, reason: duplicate, note: "the six roots — same information as node.project values"}
+      - {name: date,        disposition: excluded, reason: duplicate, note: "YYYYMMDD restatement of captured_at"}
+      - {name: git,         disposition: projected, origin: source, target: "Project.git_* (see meta.git object)", note: "full git provenance — why the load is honestly VERBATIM"}
+
+  - name: meta.git
+    kind: json-block
+    profile:
+      profiled_on: 2026-07-27
+      via: "drydocs-20260727-1732.json meta.git block"
+      column_count: 7
+      census: complete
+    note: "The commit the snapshot describes — the graph can state it exactly."
+    columns:
+      - {name: commit,   disposition: projected, origin: source, target: Project.git_commit}
+      - {name: full,     disposition: projected, origin: source, target: Project.git_full}
+      - {name: branch,   disposition: projected, origin: source, target: Project.git_branch}
+      - {name: dirty,    disposition: projected, origin: source, target: Project.git_dirty, note: "true = the worktree had uncommitted changes at capture"}
+      - {name: describe, disposition: excluded, reason: duplicate, note: "== commit when no tag is reachable (this repo tags nothing)"}
+      - {name: subject,  disposition: excluded, reason: scope,     note: "commit message headline — derivable from git by hash; display text, not structure"}
+      - {name: pr,       disposition: deferred, note: "null in every producer snapshot; named future use if PR-linked captures ever matter"}
+
+  - name: edge
+    kind: json-array
+    profile:
+      profiled_on: 2026-07-27
+      via: "drydocs-20260727-1732.json edges array (98 bare 2-element arrays)"
+      column_count: 2
+      census: complete
+    note: >
+      Bare positional pairs — no type, no properties (§D1). Position IS the
+      schema: [0] importer, [1] imported. The adapter nests them onto the
+      importer's row as `imports`.
+    columns:
+      - {name: source_file_id, disposition: projected, origin: source, target: "edge:IMPORTS (from CodeModule)", note: "position 0 — the importer"}
+      - {name: target_file_id, disposition: projected, origin: source, target: "edge:IMPORTS (to CodeModule)",   note: "position 1 — the imported; MERGEd as a stub if its own row lands later in the batch"}

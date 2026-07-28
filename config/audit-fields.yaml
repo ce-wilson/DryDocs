@@ -134,3 +134,13 @@ sources:
       only (the envelope is node-level authorship, which this loader never
       touches). Whether a source-authorship envelope even applies to a
       self-authored staging table is a doc-06 Phase 4 gate question.
+
+  - id: depgraph-snapshot
+    status: stub                             # deterministic derivation of our own tree: git IS the audit trail
+    notes: >
+      Confirmed 2026-07-27 (gate self-documentation-code-graph; code_snapshot.v1
+      built the same day). The snapshot has no source-system audit columns —
+      meta.git (commit/branch/dirty, loaded onto :Project) already states
+      exactly which commit the capture describes, and git blame answers who/when
+      per file. Same permanent-stub rationale as software-registry; revisit only
+      at a doc-06 Phase 4 gate.

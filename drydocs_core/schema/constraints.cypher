@@ -117,3 +117,11 @@ CREATE CONSTRAINT requirement_key     IF NOT EXISTS FOR (r:Requirement)         
 CREATE CONSTRAINT component_key       IF NOT EXISTS FOR (c:Component)           REQUIRE (c.origin, c.ref) IS NODE KEY;
 CREATE CONSTRAINT test_case_key       IF NOT EXISTS FOR (t:TestCase)            REQUIRE (t.origin, t.ref) IS NODE KEY;
 CREATE CONSTRAINT feedback_note_key   IF NOT EXISTS FOR (f:FeedbackNote)        REQUIRE (f.origin, f.doc_id, f.doc_rev, f.anchor) IS NODE KEY;
+
+// --- Self-documentation code graph (G33 / Epic U; gate
+// self-documentation-code-graph signed off 2026-07-27). ONE :Project root
+// (§B1(a)); :CodeModule keyed on file_id — the only non-colliding key (§C2).
+// The :CodeModule/:SoftwareProduct mutual-exclusion is a GRAPH-TEST in
+// m1-verify, NOT a constraint — Neo4j cannot declare label exclusion (§F1).
+CREATE CONSTRAINT project_id          IF NOT EXISTS FOR (p:Project)             REQUIRE p.project_id IS UNIQUE;
+CREATE CONSTRAINT codemodule_file_id  IF NOT EXISTS FOR (m:CodeModule)          REQUIRE m.file_id IS UNIQUE;

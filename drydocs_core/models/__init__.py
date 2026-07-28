@@ -34,6 +34,7 @@ from .controlm import (
 from .registry import SoftwareProductRow
 from .docs import BmcDocChunkRow
 from .attribution import ManualMappingRow, SealAttributionRow, StgAppFactRow
+from .code_snapshot import CodeModuleRow
 
 __all__ = [
     # SEAL
@@ -59,4 +60,6 @@ __all__ = [
     "StgAppFactRow",
     "SealAttributionRow",
     "ManualMappingRow",
+    # Self-documentation code graph (G33 / Epic U)
+    "CodeModuleRow",
 ]

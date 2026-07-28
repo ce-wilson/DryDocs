@@ -35,6 +35,8 @@ Ingest commands:
                                     WAS_ASSOCIATED_WITH {role: seal_app_ref} edges
   drydocs load-manual-mappings    — tier-5 SME-authored mapping CSV
                                     (config/manual-loads/, PIN semantics)
+  drydocs load-code-snapshot      — G33 self-documentation: newest depgraph
+                                    snapshot -> :Project / :CodeModule subgraph
 """
 from __future__ import annotations
 
@@ -131,6 +133,13 @@ from .loaders.batch_port_orchestrator import (
     DEFAULT_PLATFORMS_PATH,
     BatchOrchestratorYamlAdapter,
     BatchPortOrchestratorLoader,
+)
+from .loaders.code_snapshot import (
+    DEFAULT_SNAPSHOT_DIR,
+    CodeSnapshotAdapter,
+    CodeSnapshotError,
+    CodeSnapshotLoader,
+    select_newest_snapshot,
 )
 from drydocs_core.neo4j_client import Neo4jClient
 from drydocs_core.source_registry import (
@@ -504,6 +513,15 @@ def refresh_reference(
 def m1_verify() -> None:
     """Assert M1 invariants on the populated graph."""
     with _client() as cli:
+        # G33 §F1 (gate self-documentation-code-graph): :CodeModule and
+        # :SoftwareProduct are two kinds of 'software' in one database and must
+        # never co-label a node. Neo4j cannot declare label mutual-exclusion,
+        # so the invariant lives here as a graph-test (0 also passes on a graph
+        # with no code snapshot loaded — vacuously true, deliberately).
+        colabeled = cli.run("""
+            MATCH (n:CodeModule:SoftwareProduct)
+            RETURN count(n) AS n
+        """)
         # Scoped to SEAL-loaded apps (a.source = 'SEAL'): port data comes from the
         # SEAL extract only. Anchor apps MERGEd by attribution edges (e.g. the C9
         # pat mapping's seal_ids, a.source = 'pat') are legitimately port-less
@@ -535,7 +553,13 @@ def m1_verify() -> None:
     console.print(
         f"no join-restating DevTeam->Product SUPPORTS: {'yes' if ok2 else 'NO'} (found={n_restate})"
     )
-    if not (ok and ok2):
+    n_colabeled = colabeled[0]["n"] if colabeled else 0
+    ok3 = n_colabeled == 0
+    console.print(
+        f"no :CodeModule+:SoftwareProduct co-labeling (G33 §F1): "
+        f"{'yes' if ok3 else 'NO'} (found={n_colabeled})"
+    )
+    if not (ok and ok2 and ok3):
         raise typer.Exit(1)
 
 
@@ -806,6 +830,53 @@ def load_batch_orchestrators(
             f"'{row['orchestrator_raw']}' and the crosswalk resolved it, but no "
             "matching :SoftwareProduct is in this database — the registry is "
             "present but incomplete. Re-run `drydocs load-software-registry`."
+        )
+
+
+@app.command(name="load-code-snapshot")
+def load_code_snapshot(
+    snapshot_dir: Path = typer.Option(
+        DEFAULT_SNAPSHOT_DIR,
+        "--snapshot-dir",
+        help="Directory of dated depgraph snapshots (defaults to knowledge/depgraph-snapshots).",
+    ),
+    file: Path | None = typer.Option(
+        None,
+        "--file",
+        help="Load this exact snapshot file instead of the newest drydocs-*.json "
+        "(still refused unless it is a dependency-mode snapshot).",
+    ),
+) -> None:
+    """Load DryDocs' own code-dependency snapshot (G33 / Epic U self-documentation).
+
+    MERGEs the newest knowledge/depgraph-snapshots/drydocs-*.json into one
+    (:Project {project_id:'drydocs'}) root + :CodeModule nodes (keyed file_id)
+    + HAS_MODULE / IMPORTS / IS_ENCODED_IN edges. Idempotent; re-runnable from
+    committed files (ADR 0002 D3). Tree-mode files are REFUSED loudly — the
+    discriminator is a positive assertion (meta present AND meta.tree == false;
+    gate §G1(a) + the 2026-07-27 build note). abs_path never loads (§H4).
+    """
+    _gate_source("depgraph-snapshot")  # confirmed-gate before any DB write
+    try:
+        path = Path(file) if file else select_newest_snapshot(snapshot_dir)
+        adapter = CodeSnapshotAdapter(path)
+        console.print(f"snapshot: {path.name}")
+        with _client() as cli:
+            # Every snapshot is a FULL scan of the source tree by construction,
+            # so the run declares full_extract: the D7 mark pass flags
+            # :CodeModule nodes whose file left the tree between snapshots.
+            loader = CodeSnapshotLoader(cli, adapter, full_extract=True)
+            summary = loader.load()
+    except CodeSnapshotError as exc:
+        console.print(f"[red]{exc}[/]")
+        raise typer.Exit(2) from exc
+    console.print(summary.as_dict())
+    # Counts always reported, never silent: extensions with no seeded SWO term
+    # load their node fine but skip the IS_ENCODED_IN edge (§E2 partial use).
+    for ext, n in sorted(adapter.unmapped_extensions.items()):
+        console.print(
+            f"[yellow]NO SWO TERM[/]: {n} node(s) with extension '{ext}' — "
+            "IS_ENCODED_IN skipped (no seeded SwoClass term; see EXTENSION_LANGUAGE_IRI)"
         )
 
 

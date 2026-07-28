@@ -2140,8 +2140,9 @@ local_relationships:
     status:       planned
 
   # ── Epic U / self-documentation (gate self-documentation-code-graph, SIGNED 2026-07-27)
-  #    All three are `planned`: the gate registers them, the loader is not built yet
-  #    (gate §A3 — this gate builds nothing). G33 is the build item.
+  #    All three ACTIVE 2026-07-27 — the G33 build (code_snapshot.v1) landed the
+  #    same day the gate signed; registered `planned` at sign-off per §A3, flipped
+  #    when the loader was built (the m3_host_group_contains_host precedent).
   - id:           u1_has_module
     neo4j_label:  HAS_MODULE
     role:         ~
@@ -2154,10 +2155,10 @@ local_relationships:
       ALL modules (183 at the 2026-07-27 snapshot); "which of the six scan roots" is
       answered by the CodeModule.project property, never by this edge (gate §B1(a)).
       prov:hadMember follows the Collection -> any matrix row.
-    supplement:   ~
-    loader:       ~
+    supplement:   ontology_supplement.cypher
+    loader:       code_snapshot.v1
     domain:       architecture
-    status:       planned
+    status:       active
   - id:           u1_imports
     neo4j_label:  IMPORTS
     role:         ~
@@ -2172,10 +2173,10 @@ local_relationships:
       TYPE_CHECKING-only import from a runtime one. Do NOT read an IMPORTS edge as
       "breaks if removed". Carries the M2 pull-provenance properties like every other
       edge (§D3 — the no-properties divergence was rejected).
-    supplement:   ~
-    loader:       ~
+    supplement:   ontology_supplement.cypher
+    loader:       code_snapshot.v1
     domain:       architecture
-    status:       planned
+    status:       active
   - id:           u1_is_encoded_in
     neo4j_label:  IS_ENCODED_IN
     role:         ~
@@ -2193,7 +2194,7 @@ local_relationships:
       carries (node.extension), and invent nothing. Broader function-level binding
       ("implements", "uses platform") was REJECTED — a dependency snapshot does not
       know what a module implements. Value is .py-only today (§E2).
-    supplement:   ~
-    loader:       ~
+    supplement:   ontology_supplement.cypher
+    loader:       code_snapshot.v1
     domain:       architecture
-    status:       planned
+    status:       active
