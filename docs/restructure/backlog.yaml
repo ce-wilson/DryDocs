@@ -5170,6 +5170,16 @@ items:
       ExportReport + LoaderRunLog; loud yellow on 0 jobs. Classified into
       the load bucket (MODULE_MAP + boundary guard). 12 fixture tests;
       suite 1019 green.
+      CAVEAT AMENDED 2026-07-28 (user; store schema v2): "variables out of
+      scope" was overstated. Precisely: variable COLUMNS / the variables
+      pull stay deferred (G18->G22 sequencing unchanged), but RESOLVED
+      command lines are in scope as an INPUT — the user has an internal
+      (company-side) %%VAR resolution query; job_detail gained the nullable
+      cmd_line_resolved landing column for it. This module never resolves;
+      cmd_line stays verbatim beside the resolved value (O24 source-vs-
+      derived discipline); re-export rebuilds the store, so resolution
+      re-runs after each export (documented loudly — temporary plumbing,
+      not a system of record).
 
   - id: G40
     epic: component-topology
@@ -5218,6 +5228,12 @@ items:
       never dropped) + WARN stream counted + coverage line on every run.
       NO graph writes (pinned by test: read seam is one MATCH; parse takes
       no client). G22 stays the terminus.
+      AMENDED 2026-07-28 (with the G39 caveat fix): the parser now prefers
+      cmd_line_resolved when the internal resolution query has populated
+      it, else the verbatim cmd_line (the core parser is designed for
+      resolved values — resolution improves coverage); parse_quality
+      gained parsed_from (resolved|raw) and the coverage line reports
+      the from-resolved count.
 
   - id: G24
     epic: component-topology

@@ -212,6 +212,64 @@ def test_parse_warn_stream_counts(store, caplog):
     assert len(warned) == 2  # one partial + one unparsed, each COUNTED and logged
 
 
+def test_parse_prefers_resolved_cmd_line(store):
+    """The internal resolution query's output wins when present (the core
+    parser is designed for resolved values); parsed_from records which text
+    was parsed, per job."""
+    conn = sqlite3.connect(str(store))
+    conn.execute(
+        "UPDATE job_detail SET cmd_line_resolved = ? "
+        "WHERE folder_id='70003' AND job_id='3'",
+        ("python /apps/syn/resolved_step.py",),
+    )
+    conn.commit(); conn.close()
+    coverage = parse_job_detail(store)
+    # raw 'echo done' was unparsed; the resolved text parses instead
+    assert coverage.from_resolved == 1
+    assert coverage.unparsed == 0
+    assert coverage.parsed == 4
+    assert "1 from resolved" in coverage.summary()
+    row = _q(store, "SELECT verdict, parsed_from FROM parse_quality "
+                    "WHERE folder_id='70003' AND job_id='3'")[0]
+    assert row == ("parsed", "resolved")
+    others = _q(store, "SELECT DISTINCT parsed_from FROM parse_quality "
+                       "WHERE verdict != 'no_cmd_line' "
+                       "AND NOT (folder_id='70003' AND job_id='3')")
+    assert others == [("raw",)]
+
+
+def test_reexport_clears_resolution_column(store):
+    """Documented loudly: the store is temporary plumbing — re-export rebuilds
+    everything, and the internal resolution query re-runs afterward."""
+    conn = sqlite3.connect(str(store))
+    conn.execute("UPDATE job_detail SET cmd_line_resolved = 'x'")
+    conn.commit(); conn.close()
+    export_job_detail(FakeClient(), store)
+    assert _q(store, "SELECT count(*) FROM job_detail "
+                     "WHERE cmd_line_resolved IS NOT NULL")[0][0] == 0
+
+
+def test_export_rebuilds_stale_v1_store_in_place(tmp_path):
+    """A v1-era file (no cmd_line_resolved column) is rebuilt by export, not
+    tripped over — the store is derived, DROP+recreate is the contract."""
+    path = tmp_path / "old.db"
+    conn = sqlite3.connect(str(path))
+    conn.executescript(
+        "CREATE TABLE meta (key TEXT PRIMARY KEY, value TEXT NOT NULL);"
+        "CREATE TABLE job_detail (folder_id TEXT NOT NULL, job_id TEXT NOT NULL,"
+        " job_name TEXT, data_center TEXT, task_type TEXT, active INTEGER,"
+        " cmd_line TEXT, PRIMARY KEY (folder_id, job_id));"
+        "INSERT INTO meta VALUES ('schema_version', 'drydocs.cmdline-staging.v1');"
+    )
+    conn.commit(); conn.close()
+    report = export_job_detail(FakeClient(), path)
+    assert report.jobs == 6
+    meta = dict(_q(path, "SELECT key, value FROM meta"))
+    assert meta["schema_version"] == SCHEMA_VERSION
+    cols = [r[1] for r in _q(path, "PRAGMA table_info(job_detail)")]
+    assert "cmd_line_resolved" in cols
+
+
 def test_reexport_clears_parsed_tables(store):
     parse_job_detail(store)
     assert _q(store, "SELECT count(*) FROM job_detail_parsed")[0][0] > 0
