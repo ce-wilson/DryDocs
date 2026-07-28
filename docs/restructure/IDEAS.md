@@ -26,6 +26,18 @@ Tags help grooming: `idea` · `bug` · `doc` · `source` (new data source) · `q
 
 <!-- add new ideas at the top -->
 
+- 2026-07-28 — [idea] **DSI (Data State Intelligence) reviewed — the data-management view;
+  DryDocs sits between it and DataLens.** Screenshots classified Internal-Confidential in
+  `internal/dsi-reference/` (real hostnames + a person's name); groomed findings appended to
+  `internal/datalens-reference/continuity.md` §Addendum: DL-10 (StatTiles click-to-filter, DSI's
+  KPI-card→filter idiom), DL-11 (RAW→TRUSTED→REFINED→SNOWFLAKE is the estate's canonical stage
+  taxonomy — (a) UI chips fold into DL-6, (b) `config/taxonomy/` capture is a NEW taxonomy-layer
+  requirement wanting an SME gate), DL-12 (status-vocabulary → StatusChip token map), plus an
+  Epic R precedent note for the R1/ADR-0007 gate (DSI ships an embedded assistant + question-led
+  home in production — bank precedent for agentic Q&A; DryDocs differentiates on relationship
+  questions). Note DL-11(b) likely intersects the Snowflake data-catalog entry below (same
+  dataset/distribution estate seen from the management side).
+
 - 2026-07-28 — [idea] **Runtime-monitor (HL DataLens) UI continuity — groom candidates
   DL-1…DL-9 in `internal/datalens-reference/continuity.md`** (moved from UI-WIP with the
   screenshots per DL-9's home-ruling — it quotes real identifier shapes). DataLens is the SRE runtime view over the
@@ -35,6 +47,19 @@ Tags help grooming: `idea` · `bug` · `doc` · `source` (new data source) · `q
   split, DL-3 status chips, DL-4 threshold meter, DL-9 publish-boundary re-home of the
   `HL-Datalens-ui-*.png` screenshots currently at repo root — that one is p2, do first).
   Also records the ruled-out adoptions (emoji icons, gradient banners, stacked drill-down).
+  *Execution note:* quick wins DL-9/2/1/3/4 + the DL-7 merge shipped 2026-07-28 on
+  `feat/datalens-quickwins`; DL-5/6/8 + DL-10..12 remain for the groom.
+
+- 2026-07-28 — [source] **Snowflake data-catalog (dataset/distribution) — loader plan drafted**
+  (`docs/generic-snowflake-data-catalog-ingestion-plan.md`, from the curated-view screenshot
+  walkthrough; real system name company-side per the twin convention). The fourth registry
+  seam: dataset GUID + producing app id + contact + per-platform physical coordinates
+  (table/file/s3 shapes) joining the G17/G25/G41 DataAsset GUID space. Groom into:
+  Phase 0 source registration `snowflake-data-catalog` + landing zone, Phase 1 extractor
+  `snowflake_catalog.py` (synthetic fixtures, coverage counters), Phase 2 cross-check reports
+  (catalog↔DPL-registry, catalog↔Glue placements, app-id↔SEAL census), Phase 3 gate prompt
+  `snowflake-data-catalog.yaml` (one-node-or-two dcat ruling + second GUID authority +
+  contact folds into email-dl-contact-point). Relationships stay post-lineage, post-G22.
 
 - 2026-07-28 — [idea] **Agent graph-navigation surface** (benchmarked live 2026-07-28): agents
   answering code-nav questions from the loaded code graph instead of the filesystem is real —
