@@ -515,8 +515,26 @@ STEP LEDGER — delta since `6fd3270` (numbering continues from the archive):
 48. DATALENS UI + INSTRUMENT HARDENING + THE DEPGRAPH FORK CONSOLIDATION
     (2026-07-28; `947920c..cewilson/main` — compute the range live and record the
     exact head in the PORT-REPORT; 24 commits to `8a82e3b` known at 2026-07-28 pm).
-    Six sub-streams; **(d) changes how your session-end ritual BEHAVES — read it
-    before you run the first snapshot company-side.**
+    Six sub-streams. **FOUR THINGS THAT BITE, IN THE ORDER THEY BITE — do not
+    start until you have read all four:**
+      i.   **A DECISION YOU OWE BEFORE THE PORT RUNS, not one to discover during
+           it — the `*** CAVEAT ***` at the END of this step.** `config/**` is
+           `canonical-producer`, and `config/dev-environment.yaml` has just become
+           producer-local infrastructure (sibling repo path, expected instrument
+           commit, container names, host ports). Applied as-is it silently adopts
+           producer facts as yours AND propagates them into documentation via the
+           L16 runbook's rendered Appendix A. Settle the row first.
+      ii.  **D8 (48c) is the first thing to PORT in this range** — the bootstrap
+           constraint guard. It closes a silent `apoc.cypher.runMany` DDL no-op
+           that you may still be carrying, and which retroactively weakens any
+           "live-verified" constraint claim made in its window.
+      iii. **(d) changes how your session-end ritual BEHAVES** — `snapshot.ps1`
+           now REFUSES (exit 1, no file) rather than writing a wrong snapshot,
+           and will fire on a stale or absent `../depgraph` checkout. Read it
+           before the first snapshot company-side, not after it fails.
+      iv.  **Step 47 mis-stated C15/C16/L18/D8/J17 as arriving `todo` — they
+           arrive `done`** (48c). Correct that before recomputing the backlog
+           summary, or the rollup will not reconcile.
     a. DATALENS UI QUICK WINS + SME WIREFRAMES (`ace7e12` DL-9, `52418dc` DL-2,
        `8f6bdd2` DL-1, `908fbee` DL-3, `50158d0` DL-4, `bc61408` DL-7/O32,
        `a4e91ec` board, `852ebb0` SME launch guide + keyed wireframes,
