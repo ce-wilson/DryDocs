@@ -31,6 +31,8 @@ mechanics tests run everywhere (producer CI included).
 from __future__ import annotations
 
 import os
+import re
+import subprocess
 from pathlib import Path
 from typing import Any, Iterable, Mapping
 
@@ -39,6 +41,7 @@ import pytest
 yaml = pytest.importorskip("yaml")
 
 REPO = Path(__file__).resolve().parents[2]
+MANIFEST_FILE = REPO / "PORT-MANIFEST.yaml"
 VOCAB_FILE = REPO / "drydocs_core" / "ontology" / "relationship_vocabulary.yaml"
 MAP_FILE = REPO / "config" / "taxonomy-ontology-map.yaml"
 GATE_LOG = REPO / "config" / "gate-log.md"
@@ -219,3 +222,144 @@ def test_reconcile_gate_log_append_only_live() -> None:
     after = GATE_LOG.read_text(encoding="utf-8")
     violation = append_only_violation(before, after)
     assert violation is None, violation
+
+
+# --- J16: no tracked path may silently resolve to `default:` ----------------------
+#
+# The manifest answers "how does THIS path resolve"; nobody had asked the inverse,
+# "which paths match no row at all". Those take `default:` — clean-add if absent
+# consumer-side — silently, so a deliberate default reads exactly like an oversight.
+# It cost real incidents: knowledge/depgraph-snapshots/*.json and docs/port-*.md
+# were each instructing the consumer to commit the producer's port INSTRUCTIONS as
+# payload, found by accident one at a time, with a prose workaround standing in for
+# a missing row for a week. This is test_no_shadow_definitions (C18) applied to port
+# dispositions: default-deny, with an allowlist that must carry a reason.
+
+
+def glob_to_regex(pattern: str) -> re.Pattern[str]:
+    """Compile a manifest path glob, anchored.
+
+    ``**`` spans separators, ``*`` and ``?`` do not — so ``drydocs/publishing/**``
+    covers the whole subtree while ``docs/*.md`` stays at one level and cannot
+    quietly swallow ``docs/decisions/adr.md``. That distinction is the whole point
+    of the allowlist's "prefer a narrow pattern" rule; fnmatch would erase it.
+    """
+    out: list[str] = []
+    i = 0
+    while i < len(pattern):
+        if pattern.startswith("**", i):
+            out.append(".*")
+            i += 2
+        elif pattern[i] == "*":
+            out.append("[^/]*")
+            i += 1
+        elif pattern[i] == "?":
+            out.append("[^/]")
+            i += 1
+        else:
+            out.append(re.escape(pattern[i]))
+            i += 1
+    return re.compile("".join(out) + r"\Z")
+
+
+def resolve_path(path: str, patterns: Iterable[tuple[str, re.Pattern[str]]]) -> str | None:
+    """The manifest's own rule: first row whose glob matches wins (top-down).
+
+    Returns the winning pattern, or None when the path falls through to ``default:``.
+    """
+    for pattern, rx in patterns:
+        if rx.match(path):
+            return pattern
+    return None
+
+
+def _compiled(entries: Iterable[Mapping[str, Any]]) -> list[tuple[str, re.Pattern[str]]]:
+    return [(e["path"], glob_to_regex(e["path"])) for e in entries]
+
+
+@pytest.fixture(scope="module")
+def manifest() -> dict:
+    return yaml.safe_load(MANIFEST_FILE.read_text(encoding="utf-8"))
+
+
+def _tracked_files() -> list[str]:
+    try:
+        out = subprocess.run(
+            ["git", "ls-files"], cwd=REPO, capture_output=True, text=True, check=True,
+        ).stdout
+    except (OSError, subprocess.CalledProcessError):  # pragma: no cover
+        pytest.skip("git unavailable — the tracked tree cannot be enumerated")
+    return [line for line in out.splitlines() if line]
+
+
+def test_glob_matcher_separator_and_first_match_rules() -> None:
+    """Mechanics, pinned separately from the live tree so a matcher regression
+    cannot masquerade as a clean manifest."""
+    subtree = glob_to_regex("drydocs/publishing/**")
+    assert subtree.match("drydocs/publishing/confluence/client.py")
+    assert not subtree.match("drydocs/publishing.py")
+
+    one_level = glob_to_regex("docs/*.md")
+    assert one_level.match("docs/RELATIONSHIP_GUIDE.md")
+    assert not one_level.match("docs/decisions/0002-packaging.md")
+
+    exact = glob_to_regex("PORT-MANIFEST.yaml")
+    assert exact.match("PORT-MANIFEST.yaml")
+    assert not exact.match("docs/PORT-MANIFEST.yaml")
+
+    # first match wins, top-down — the *.json row above the directory row is the
+    # live instance of this (depgraph snapshots: outputs held back, tooling ports)
+    ordered = _compiled([
+        {"path": "knowledge/depgraph-snapshots/*.json"},
+        {"path": "knowledge/depgraph-snapshots/**"},
+    ])
+    assert resolve_path("knowledge/depgraph-snapshots/drydocs-20260727.json", ordered) == \
+        "knowledge/depgraph-snapshots/*.json"
+    assert resolve_path("knowledge/depgraph-snapshots/snapshot.ps1", ordered) == \
+        "knowledge/depgraph-snapshots/**"
+
+
+def test_default_ok_entries_are_well_formed(manifest: dict) -> None:
+    """The allowlist is only worth anything if every entry says WHY."""
+    entries = manifest.get("default_ok")
+    assert entries, "default_ok must exist — it is what makes the guard below meaningful"
+
+    unreasoned = [e["path"] for e in entries if not str(e.get("reason", "")).strip()]
+    assert not unreasoned, f"default_ok entries without a reason: {unreasoned}"
+
+    paths = [e["path"] for e in entries]
+    assert len(paths) == len(set(paths)), "duplicate default_ok paths"
+
+    # An allowlist entry that shadows a real row is a contradiction: the row already
+    # decided, so the entry either does nothing or misleads the next reader.
+    row_paths = {r["path"] for r in manifest["rows"]}
+    both = sorted(set(paths) & row_paths)
+    assert not both, f"paths in BOTH rows and default_ok — the row already decides: {both}"
+
+
+def test_git_readme_decision_is_recorded(manifest: dict) -> None:
+    """Regression pin: the one entry that exists to record a DECISION rather than
+    to excuse an oversight. Before J16 it lived only in the idea inbox."""
+    entry = next(
+        (e for e in manifest["default_ok"] if e["path"] == "git-readme.md"), None
+    )
+    assert entry is not None, "the git-readme.md standing decision must stay written down"
+    assert "deliberately uncovered" in entry["reason"]
+
+
+def test_no_tracked_path_falls_through_silently(manifest: dict) -> None:
+    """Every tracked path resolves to a row, or to an allowlist entry that says why
+    the default is right. Nothing resolves to `default:` by silence."""
+    rows = _compiled(manifest["rows"])
+    allowed = _compiled(manifest["default_ok"])
+
+    orphans = [
+        p for p in _tracked_files()
+        if resolve_path(p, rows) is None and resolve_path(p, allowed) is None
+    ]
+    assert not orphans, (
+        f"{len(orphans)} tracked path(s) resolve to PORT-MANIFEST `default:` with "
+        "nothing written down. Decide each one: add a row (it needs a real "
+        "disposition) or a default_ok entry with a reason (the default is right "
+        f"and here is why).\n  " + "\n  ".join(sorted(orphans)[:40])
+    )

@@ -9,10 +9,12 @@
 # ordinal-free on purpose (the port-prompt step-number coupling is retired as
 # the authority; steps remain as narrative).
 #
-# Matching: first row whose glob matches the path wins (top-down). Paths not
-# matching any row take the DEFAULT: clean-add if absent on the consumer,
-# evaluate if both sides created it (the disjoint-history rule — git cannot
-# auto-merge without a merge-base).
+# Matching: first row whose glob matches the path wins (top-down). `**` spans
+# path separators, `*` and `?` stay within one segment. Paths not matching any
+# row take the DEFAULT: clean-add if absent on the consumer, evaluate if both
+# sides created it (the disjoint-history rule — git cannot auto-merge without a
+# merge-base) — and taking the default is only legitimate when the path is
+# listed in `default_ok:` at the bottom of this file with a reason (J16).
 #
 # dispositions:
 #   clean-add          path absent on consumer — applies untouched
@@ -27,7 +29,10 @@
 #   never-port         must not cross the boundary in either direction (values,
 #                      credentials, gitignored data)
 #
-# Guarded by tests/unit/test_port_manifest.py. Born from
+# Guarded by tests/unit/test_port_manifest.py (well-formedness) and
+# tests/unit/test_port_reconcile_guards.py (entry_rules as code; the J16
+# fall-through guard — no tracked path may resolve to `default:` in silence).
+# Born from
 # docs/reviews/tech-debt-port-boundary.md (2026-07-09, remediation Phase 1);
 # sequencing rule recorded there: this manifest lands BEFORE the ADR 0002
 # Phase B package split, so the rename wave is a path-column diff here, not a
@@ -35,7 +40,15 @@
 # =============================================================================
 schema: drydocs.port-manifest.v1
 classification: Internal-Public
-updated: 2026-07-27   # 2026-07-27 (step 46): knowledge/depgraph-snapshots/*.json is now an
+updated: 2026-07-28   # 2026-07-28 (J16): the FALL-THROUGH question, asked for the first
+                      # time. 398 of 1415 tracked paths matched no row and took `default:`
+                      # in silence. Four gaps became real rows — docs/restructure/backlog.yaml
+                      # (per-entry; a blind checkout of the plan deletes one side's work),
+                      # docs/plan/board.html (derived, regenerate), docs/design/** and
+                      # libs/oracle_kerberos/** (evaluate + the warning notes) — and the
+                      # rest became `default_ok:` entries that record WHY the default is
+                      # right. A new uncovered path now fails the suite.
+                      # 2026-07-27 (step 46): knowledge/depgraph-snapshots/*.json is now an
                       # EXPLICIT never-port row with the tooling split out as canonical-producer.
                       # It had NO row and therefore fell to `default:` = clean-add — i.e. the
                       # manifest said PORT THEM while every port excluded them by planner
@@ -77,6 +90,21 @@ rows:
     entry_rule: >
       union of dependencies; KEEP the consumer's version string (per-repo
       release cadence); producer v* release tags never cherry-pick.
+  - path: "docs/restructure/backlog.yaml"
+    disposition: per-entry
+    entry_rule: >
+      id-keyed (items[].id). Both sides run their own plan against OVERLAPPING
+      ids, so a path-level checkout silently deletes one side's work — the same
+      hazard the taxonomy-ontology-map row exists for. Union the items; NEVER
+      regress a status (done -> in_progress/todo) or drop an entry; when both
+      sides hold the same id, keep the one that is FURTHER ALONG and fold the
+      other's notes in. The `summary` block (counts, next_ready) is COMPUTED —
+      recount after any merge (test_backlog.py enforces), never hand-merge it.
+    note: >
+      had NO row until 2026-07-28 (J16) — the machine-readable source of truth
+      for what is done was resolving to `default:`, i.e. the manifest was
+      telling the consumer that a blind checkout of the producer's plan was an
+      acceptable resolution. Human view is docs/plan/board.html (its own row).
   - path: "config/manual-loads/manifest.yaml"
     disposition: per-entry
     entry_rule: >
@@ -138,6 +166,14 @@ rows:
       RETIRED producer-side (L13, 2026-07-18): the render series collapsed to the single
       .html (screen + @media print). At the next port, DELETE the consumer-side twin and
       regenerate the single .html consumer-side — never take a producer render.
+  - path: "docs/plan/board.html"
+    disposition: canonical-company
+    note: >
+      DERIVED — a deterministic render of docs/restructure/backlog.yaml
+      (scripts/render_board.py). Keep the consumer's copy through the port, then
+      REGENERATE it from the merged backlog; taking the producer's render ships
+      the producer's plan as the consumer's board. Same rule as the design-doc
+      renders. Had no row until 2026-07-28 (J16).
   - path: "drydocs_core/adapters/oracle_adapter.py"
     disposition: canonical-company
     note: >
@@ -235,6 +271,24 @@ rows:
   - path: "tests/unit/test_controlm_cypher.py"
     disposition: evaluate
     note: "consumer scope_key condition-key variant wins"
+  - path: "docs/design/**"
+    disposition: evaluate
+    note: >
+      design docs + their governed renders. Deliberately NOT canonical-producer:
+      the controlm-ingestion-tdd rows above are the precedent — a doc the
+      consumer FINALIZES becomes its own canonical-company row, and a blanket
+      take-producer would overwrite the next one before anybody noticed. Check
+      whether the consumer's copy is ahead first; renders are regenerated from
+      the resolved .md, never taken. (Row added 2026-07-28, J16.)
+  - path: "libs/oracle_kerberos/**"
+    disposition: evaluate
+    note: >
+      READ THIS BEFORE ASSUMING: the PORT-FROZEN rule on
+      drydocs_core/adapters/oracle_adapter.py does NOT extend here. Everything
+      identifying lives in the gitignored oracle_kerberos_connection.txt, so
+      the tracked module is sanitized producer mechanism (placeholders only) —
+      but the consumer may have adapted it for its own FID/RAC realities, so
+      hand-merge rather than checkout either way. (Row added 2026-07-28, J16.)
 
   # ---- never cross the boundary ---------------------------------------------
   - path: "drydocs/locations.py"
@@ -276,3 +330,114 @@ rows:
     disposition: canonical-producer
     note: "README.md + snapshot.ps1 + viewer.html — the snapshot tooling and its
       documentation DO port; only the *.json outputs above are held back"
+
+# =============================================================================
+# default_ok — paths that take the `default:` above ON PURPOSE (J16, 2026-07-28)
+#
+# The inverse question nobody had asked: which tracked paths match NO row? 398
+# of 1415 did, and "deliberately default" was indistinguishable from "nobody
+# thought about it" — which is how knowledge/depgraph-snapshots/*.json and
+# docs/port-*.md each spent months instructing the consumer to port the
+# producer's port INSTRUCTIONS as payload, found by accident, one at a time.
+#
+# Every entry below is BEHAVIOR-PRESERVING: it records why `default:` is the
+# right resolution, it does not change one. A tracked path matching neither a
+# row nor an entry here now FAILS
+# tests/unit/test_port_reconcile_guards.py::test_no_tracked_path_falls_through_silently
+# — so the next such path gets a decision instead of a silence.
+#
+# `reason` is mandatory. Prefer a narrow pattern: a broad subtree entry excuses
+# every future file under it, which is the failure mode this block exists to end.
+# =============================================================================
+default_ok:
+  - path: "git-readme.md"
+    reason: >
+      THE STANDING DECISION, written down here for the first time (it lived only
+      in the idea inbox): git-readme.md is deliberately uncovered. It is the WHY
+      guide for the cross-repo model itself — the document that explains what a
+      port IS — so both sides benefit from holding their own copy, and neither
+      side's is wrong. Note the contrast with docs/port-*.md (never-port): those
+      DIRECT a specific port and are not its payload; this one describes the
+      model and is nobody's payload.
+
+  # ---- repo identity + toolchain -------------------------------------------
+  - path: "README.md"
+    reason: "each repo's own front door; on collision the default's `evaluate` is right — never a blind checkout"
+  - path: "CHANGELOG.md"
+    reason: "per-repo release record, like the pyproject version string that is already per-entry — the two histories are disjoint and neither side's entries are the other's"
+  - path: "VERSIONING.md"
+    reason: "states this repo's release cadence; consumer's cadence is its own (same reasoning as CHANGELOG.md)"
+  - path: "LICENSE"
+    reason: "repo-level legal identity — a company fork's licensing is a company decision, never carried by a port"
+  - path: ".gitignore"
+    reason: "both sides accumulate their own ignore lines (consumer ignores company-specific data paths); union by hand on collision, never checkout"
+  - path: ".gitattributes"
+    reason: "same accumulate-and-union shape as .gitignore"
+  - path: ".env.example"
+    reason: "key-name template only, no values (PUBLISH-BOUNDARY). Consumer adds its own keys (Kerberos/RAC), so union on collision"
+  - path: "poetry.lock"
+    reason: "DERIVED from pyproject.toml, which is per-entry — taking the producer's lock against a merged pyproject yields an inconsistent pair. Re-lock after the merge instead"
+  - path: "poetry.toml"
+    reason: "local venv preference; per-machine, not per-project content"
+
+  # ---- producer-authored code the default already resolves correctly --------
+  - path: "agents/**"
+    reason: "the ADK agent package — producer-authored, but agents/.env.example and provider wiring are environment-specific, so evaluate-on-collision beats take-producer"
+  - path: "drydocs/**"
+    reason: "the drydocs remainder (ADR 0002-A-1) — the rows above already pin every file with a real disposition (back-flow, never-port, cli.py); what is left is ordinary producer code where evaluate-on-collision is correct"
+  - path: "drydocs_api/**"
+    reason: "the thin read API (ADR 0005) — producer-authored; consumer QuerySpecs legitimately differ, so hand-merge on collision"
+  - path: "drydocs_core/**"
+    reason: "core package minus the schema/**, controlm/**, ontology and models rows above — the two explicit models rows set the precedent that evaluate-on-collision is the right default here"
+  - path: "drydocs_deepdoc/**"
+    reason: "SYNTHESIZED-tier investigation writer (ddcontext); producer-authored, no consumer wiring"
+  - path: "drydocs_lineage/**"
+    reason: "cross-platform lineage extractors; producer-authored, but collectors carry site-specific inventory config (rua_inventory.conf) — evaluate, do not checkout"
+  - path: "scripts/**"
+    reason: "render + ingest scripts; producer-authored tooling where a collision means both sides edited it and a hand-merge is right"
+  - path: "libs/**"
+    reason: "standalone drop-in modules; the one with a port hazard (oracle_kerberos) has its own row above"
+
+  # ---- tests ----------------------------------------------------------------
+  - path: "tests/**"
+    reason: >
+      the suite is producer-authored, but consumer expectations legitimately
+      diverge (test_schema.py's constraint count is the standing example, and
+      has its own row) — so evaluate-on-collision is exactly right, and the
+      four rows above pin the exceptions that must NOT be re-derived.
+
+  # ---- docs -----------------------------------------------------------------
+  - path: "docs/*.md"
+    reason: "loose repo-root docs (RELATIONSHIP_GUIDE, the Control-M flow/status notes). S9 will move most of these into subdirectory homes; revisit the pattern then"
+  - path: "docs/decisions/**"
+    reason: "ADRs — a decision record is append-only-ish history for the repo that made it; both sides may hold the same ADR number for different decisions, so never checkout"
+  - path: "docs/reviews/**"
+    reason: "point-in-time review records (tech-debt, code-graph plans) — historical artifacts of the side that ran the review"
+  - path: "docs/patterns/**"
+    reason: "reusable pattern write-ups; producer-authored reference prose with no consumer wiring"
+  - path: "docs/history/**"
+    reason: "superseded planning docs kept for provenance — by definition nobody's live content"
+  - path: "docs/whitepaper/**"
+    reason: "outward-facing non-governed doc (CLAUDE.md §6) — editorial treatment applies, and each side's audience differs"
+  - path: "docs/overview/**"
+    reason: "outward-facing executive overview; same audience-differs reasoning as the whitepaper"
+  - path: "docs/Product/**"
+    reason: "product/role reference prose captured producer-side; consumer has the authoritative originals internally"
+  - path: "SDLC-Docs/**"
+    reason: "extracted SDLC method docs (BDD/SDD howto, FCD requirements) — external method material, not DryDocs content"
+
+  # ---- assets + knowledge ---------------------------------------------------
+  - path: "drydocs-icons/**"
+    reason: "vendor/product icon assets (svg/png/webp). External marks reproduced for UI use; binary, no merge semantics — clean-add is the only sensible resolution"
+  - path: "knowledge/**"
+    reason: "Internal-Public design prose + upgrade plans (the depgraph-snapshots rows above are the exception). Producer-authored thinking; a collision means both sides wrote on the topic and both texts matter"
+  - path: "internal/**"
+    reason: >
+      Internal-tier operational metadata. Precedent is already set by the
+      internal/remediation/** and internal/context-graph-analysis/** rows:
+      Internal content is fine on the PRIVATE company remote and never in a
+      public mirror. Applies to internal/pat-evidence/*.png too — screenshots
+      of internal evidence, which is exactly why they must never reach a public
+      mirror (PUBLISH-BOUNDARY.md is what enforces that, not this manifest).
+  - path: "external/ServiceNow/**"
+    reason: "vendor reference stub; the populated vendor trees under external/orchestration/** have their own canonical-producer row"
