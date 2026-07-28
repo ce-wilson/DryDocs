@@ -10,7 +10,7 @@ project to a Neo4j-style dependency model + machine-first JSON).
 ## Command (after `git push`)
 
 ```powershell
-.\snapshot.ps1            # -> drydocs-YYYYMMDD.json   (code graph: drydocs/ + tests/)
+.\snapshot.ps1            # -> drydocs-YYYYMMDD.json   (code graph: the 7 package roots below)
 .\snapshot.ps1 -Tree      # -> drydocs-tree-YYYYMMDD.json  (full repo file tree)
 ```
 
@@ -20,7 +20,8 @@ header** so each snapshot is self-identifying:
 ```jsonc
 "meta": {
   "project": "drydocs", "captured_at": "...", "date": "YYYYMMDD",
-  "scan": ["drydocs","tests"], "tree": false,
+  "scan": ["drydocs","drydocs_core","drydocs_api","drydocs_remediation",
+           "drydocs_lineage","drydocs_deepdoc","tests"], "tree": false,
   "git": { "commit": "<short>", "full": "...", "branch": "main",
            "describe": "...", "subject": "...", "dirty": false, "pr": <num|null> }
 }
@@ -28,8 +29,11 @@ header** so each snapshot is self-identifying:
 
 `pr` is best-effort (parsed from recent commit subjects/bodies — `pull request #N`, `(#N)`).
 The header is **prepended** to depgraph's JSON without reformatting (clean diffs, no BOM), and
-`viewer.html` shows `@<commit> (branch) PR#<n>` in its stats. Focused scan = `drydocs/` + `tests/`
-(the project's own code); `-Tree` captures the full file tree (noisier; includes `.claude/skills`).
+`viewer.html` shows `@<commit> (branch) PR#<n>` in its stats. Focused scan = the project's own
+code — the six `drydocs*` package roots plus `tests/`, passed to depgraph in ONE invocation so
+they share a namespace (see the discontinuity note under **Compare**); `-Tree` captures the full
+file tree instead (noisier; includes `.claude/skills`). The `scan` list in each header is the
+authority for what a given snapshot actually covered — read it before comparing two of them.
 
 ## Compare
 
@@ -43,6 +47,28 @@ Each snapshot's summary line reports `files`, `edges`, `circular_files`. To see 
 > **Historical note:** Snapshots captured before 2026-07-01 are named `drydocs1-*.json`
 > (the project's original name). Files are intentionally not renamed; the historical record
 > is preserved as-is. New snapshots follow the `drydocs-<date>.json` convention.
+
+> **⚠ Instrument change — do not read across 2026-07-28 08:48 as growth.** The scanner had a
+> resolution defect: `scan()` ran each root in **isolation**, so an absolute import naming a
+> *sibling* root, or the file's own package directory, never resolved — and `drydocs_api` was
+> not a scan root at all. Fixed by U6 in two halves: the resolver itself in the **`depgraph`
+> sibling repo** (shared-namespace `extract_many`, 7 regression tests), and the scan-root list
+> here in `047c319`. Note the consequence of that split — **re-running an old snapshot will not
+> reproduce it**, because half the fix lives outside this repo's history. Every snapshot up to
+> and including
+> `drydocs-20260728-0754.json` undercounts; `drydocs-20260728-0848.json` is the first truthful
+> one and the baseline going forward. Across that boundary the counts go **194 files / 105
+> edges → 205 / 370** on essentially the same code: the files rose because a root was added,
+> but the edges more than **tripled** because they had been silently unresolved all along.
+>
+> Practical rules: diffs **within** either era are still valid — the instrument was at least
+> consistent — but any comparison **straddling** the boundary shows a phantom jump, and an
+> import edge absent from a pre-fix snapshot is not evidence it did not exist. When in doubt,
+> compare each snapshot's `meta.scan` list first; two snapshots with different scan roots are
+> not comparable at all. (Two snapshots exist for 2026-07-28 rather than the usual one-per-day
+> because the fix landed mid-day; the bare-date `drydocs-20260728.json` from that morning was
+> **deleted** — it undercounted *and* its commit message asserted "no structural drift" on
+> numbers taken from the blind region.)
 - or diff the two `.json` files (`git diff` / any JSON diff tool), or watch the summary counts.
 
 ### Seeded comparison — the v1 rewrite (original vs this version)
@@ -82,4 +108,7 @@ domain graph (distinct labels, no overlap). Native visualization:
 
 - Snapshots are committed so the structural history is diffable. **Prune** old ones periodically
   to keep the repo lean (keep e.g. the last ~10 + one per milestone).
-- Baseline: `depgraph.20260621-091057.json` — 49 files, 70 import edges, 0 circular.
+- Baseline: [`drydocs1-20260621.json`](drydocs1-20260621.json) — 49 files, 70 import edges, 0
+  circular. (Filename corrected 2026-07-28: this line said `depgraph.20260621-091057.json`, which
+  has never existed in this directory; the counts were right. Being pre-U6 it undercounts edges
+  like everything before 2026-07-28 08:48 — see the instrument-change note above.)
