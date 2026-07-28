@@ -5064,6 +5064,15 @@ items:
       the code repo — the team's code-fetch tooling keys on pipeline-id,
       which this job family lacks — so repo completeness can never be
       assumed and the server extract is the reliable "what runs" source.
+      PREMISE CORRECTION 2026-07-27 (user): the planning around this gate
+      assumed a psgmgr CM_DEF_VJOB_DETAIL-style table (split by job type:
+      file_watcher, cmd_line, ...) would exist company-side. IT WAS NEVER
+      BUILT. The G39 temporary staging store (graph-sourced cmd_line) +
+      the G40 Python parse stand in until it is — the gate's CMD_LINE-fact
+      clauses (a)/(g) read from that seam in the interim. The folder/job
+      VARIABLES pull stays deferred exactly as originally sequenced;
+      neither G39 nor G40 touches it, and neither writes the graph — this
+      gate remains the terminus.
 
   - id: G23
     epic: component-topology
@@ -5096,6 +5105,79 @@ items:
       Sequenced after the gate on purpose (K2 -> K4 loader precedent:
       gate first, build same day after sign-off). Synthetic fixtures only
       in-repo; real bundles stay in the G19 landing zone.
+
+  - id: G39
+    epic: component-topology
+    title: "Temporary CMD_LINE job-detail staging store — the seam that stands in for the unbuilt psgmgr CM_DEF_VJOB_DETAIL table"
+    type: task
+    module: drydocs-load
+    phase: 6
+    agent: main
+    model: sonnet
+    priority: p2
+    status: todo
+    depends_on: []
+    inputs: [drydocs/loaders/cypher/controlm_jobs.cypher, drydocs_core/data_root.py, drydocs_core/mapping_store.py, config/source-registry.yaml]
+    acceptance: >
+      A CLI verb (working name `drydocs export-cmdline-staging`) materializes
+      the TEMPORARY job-detail staging store: one row per loaded job carrying
+      the identity keys (folder_id, job_id, job_name, data_center where
+      present), the job/task type discriminator (file_watcher vs cmd_line
+      etc.), and the VERBATIM cmd_line — sourced FROM THE GRAPH (j.cmd_line
+      is already loaded, controlm_jobs.cypher), with the equivalent psgmgr
+      CM_DEF_VJOB SQL projection documented beside it as the company-side
+      source for the same shape. The store lives under the G19 data root
+      (DRYDOCS_DATA_ROOT — real command lines are Internal; NEVER in-repo),
+      is deterministic (same graph -> same rows), reports its counts (the
+      never-silent rule), and carries an explicit RETIREMENT note: this
+      store is deleted the day a real psgmgr CM_DEF_VJOB_DETAIL-style table
+      exists. EXPLICITLY OUT OF SCOPE, by design not omission: folder/job
+      VARIABLE columns — the variables pull stays deferred exactly as the
+      original G18->G22 plan sequenced it.
+    notes: >
+      PREMISE CORRECTION (user, 2026-07-27): the G18->G22 rua/cmdline plan
+      assumed a company-side psgmgr detail table (CM_DEF_VJOB split by job
+      type) would exist by now. It was never built — this seam stands in
+      until it is, and the graph is a legitimate interim source precisely
+      because the jobs loader already lands cmd_line verbatim. SQLite via
+      the mapping-store precedent (M2) or a flat file both satisfy the
+      acceptance; pick at build. Groomed from user chat notes 2026-07-27
+      (audit trail in IDEAS.md). G37 deliberately NOT allocated — skipped
+      in the sequence (G38 exists), possibly reserved by the concurrent
+      session; ids are cheap, collisions are not.
+
+  - id: G40
+    epic: component-topology
+    title: "Parse the staged command lines in Python into structured job-detail columns (launcher / payload / args), loaded back into the staging store"
+    type: task
+    module: drydocs-core
+    phase: 6
+    agent: main
+    model: sonnet
+    priority: p2
+    status: todo
+    depends_on: [G39]
+    inputs: [drydocs_core/controlm/commands.py, config/launcher-registry (G26), docs/restructure/backlog.yaml]
+    acceptance: >
+      Every cmd_line row in the G39 store decomposes through the EXISTING
+      machinery — the G26 launcher registry + the G15 DPL launcher arg
+      contract (both GUID spellings, %%VAR-launcher fallback, launch_mode +
+      props) — into structured detail columns: launcher, launch_mode,
+      payload/script_path, artifact kind, and the argument map. The G16
+      values-decide contract holds (aliases suggest, VALUES decide — never
+      the variable name alone); unparseable/partial rows go to the WARN
+      stream and are COUNTED, never silently dropped; a coverage line
+      (parsed / partial / unparsed) prints on every run. Output lands as
+      the detail columns/table beside the G39 rows. NO graph writes — the
+      SCRIPT_PATH/artifact facts this produces feed the m7_uses_artifact
+      and G22 rulings later; G22 stays the terminus gate for anything
+      entering Neo4j.
+    notes: >
+      The company-side end state — loading this parser's output into the
+      real psgmgr detail table once it is built — is a company-side
+      follow-up (their tracker / DD-series), recorded here so the intent
+      is not lost; producer ships the parser + the temporary landing.
+      Groomed from the same 2026-07-27 user chat notes as G39.
 
   - id: G24
     epic: component-topology
@@ -7119,11 +7201,11 @@ items:
       the primary fix.
 
 summary:
-  todo: 52                                         # +5 at the 2026-07-27 groom (J14/J15/G36/O33/G38), +2 from the same day's PAT-structure review (C17/C18), +5 at the same day's code-graph-review groom (U1-U5); J14 + P3 + G21 + G24 + G26 + Q8 + C18 + J15 + G33 closed same day
+  todo: 54                                         # +5 at the 2026-07-27 groom (J14/J15/G36/O33/G38), +2 from the same day's PAT-structure review (C17/C18), +5 at the same day's code-graph-review groom (U1-U5), +2 cmdline-detail seam (G39/G40 — the CM_DEF_VJOB_DETAIL premise correction); J14 + P3 + G21 + G24 + G26 + Q8 + C18 + J15 + G33 closed same day
   in_progress: 1                                   # E1 (gate deferred both sides)
   blocked: 0
   done: 144                                        # 2026-07-27 closes: J14 SEALID split, P3 hosts+RUNS_ON, G21 rua code-ops, G24 code-repo seam, G26 launcher-registry config, Q8 bmc-docs prereq, C18 shadow-model guard, J15 value-shape boundary guard, G33 code-snapshot loader (gate signed + built same day)
-  next_ready: [M3, M4, J10, Q6, O23, J13, O26, O27, C15, C16, C17, O28, R3, R4, L16, O29, O30, O31, O32, S1, S8, S9, Q7, G32, G34, G35, O33, P5, G22, U1, U2, U3]
+  next_ready: [M3, M4, J10, Q6, O23, J13, O26, O27, C15, C16, C17, O28, R3, R4, L16, O29, O30, O31, O32, S1, S8, S9, Q7, G32, G34, G35, O33, P5, G22, U1, U2, U3, G39]
   # 2026-07-27 code-graph-review groom: U1-U3 = the three personas of
   # docs/reviews/code-graph-review-plan.md, dependency-free -> next_ready;
   # U4/U5 = the optional skill edits, gated on their phase (U1/U2) proving the

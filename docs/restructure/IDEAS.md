@@ -908,6 +908,14 @@ Tags help grooming: `idea` · `bug` · `doc` · `source` (new data source) · `q
 
 ## Recently groomed (audit trail)
 
+- 2026-07-27 — [chat notes] G18→G22 premise correction: the psgmgr CM_DEF_VJOB_DETAIL-style
+  table (split by job type) was never built → **G39** (temporary cmd-line staging store,
+  graph-sourced — j.cmd_line already loads; next_ready) + **G40** (Python cmd-line parse into
+  detail columns via the G26 registry + G15 arg contract; depends G39) + the correction merged
+  into **G22**'s notes (gate stays the graph terminus; folder/job VARIABLES stay deferred as
+  originally sequenced). Company-side "load into the real detail table when built" recorded in
+  G40's notes for their tracker. G37 left unallocated (sequence gap beside G38 — possibly the
+  concurrent session's; not risked).
 - 2026-07-27 — [chore] EE home db `neo4j` pre-existing strays → **RESOLVED same day, no item**:
   user ruled "wipe it, it can be rebuilt" — 288 nodes deleted, 0 remain; topology DBs verified
   untouched (drydocs 834). The .env comment + dev-environment.yaml home_db_warning guard recurrence.
