@@ -9,6 +9,13 @@
 # table this planning once assumed company-side WAS NEVER BUILT — the CMD_LINE
 # fact clauses below read from the G39 temporary staging store + G40 parse
 # until it exists. Neither writes the graph; this gate stays the terminus.
+# PREMISE 2 (2026-07-28, from the company rua-ingest session note — mechanism
+# only, values stay company-side): real bundles ship scripts as a METADATA-ONLY
+# pipe-delimited scripts.csv LISTING (path|script|permission|date|size — no
+# sha256, no body copies) while still wearing the rua-inventory/v1 schema tag.
+# Occurrence records therefore CANNOT assume a content hash exists (see G2);
+# the collector-side schema-tag bump is its own follow-up (rides the T14
+# collector convergence), never this gate.
 classification: Internal-Public
 schema: drydocs.gate-prompt.v1
 id: rua-load-shapes
@@ -95,6 +102,15 @@ provenance:
       - {name: registry_axis, origin: source, from: "G25 dpl-registry", note: "per-SEAL pipeline/dataset GUIDs + version + active flag; field contract ASSUMED until a real export validates (tracker T13); cross_check clone-lag column = the stale-main measurement"}
       - {name: reference_axis, origin: source, from: "G21/G16 facts (+ G39/G40 interim seam)", note: "SCRIPT_PATH + code-operation references = the 'what calls it' axis; the never-in-repo evidence case (2026-07-21 SME chat, mechanism-only): a production script referenced only by a folder VARIABLE was unfindable in the repo because code-fetch tooling keys on pipeline-id this job family lacks"}
       - {name: swo_adapter, origin: derived, from: "drydocs/loaders/code_snapshot.py EXTENSION_LANGUAGE_IRI (G33 §E1(b))", note: "the extension->SWO-term mechanism exists and is live for :CodeModule; rider R1 reuses it for :Script"}
+  - label: "Company staging profile 2026-07-28 (mechanism + counts only; hosts/users/paths stay in the company-side session note)"
+    source_object: "company rua-ingest session (their extractor fix + two production bundles, in-memory staging only)"
+    key: "the first REAL-data dry run of everything this gate rules — and the terminus HELD: rua-inventory stayed confirmed:false, zero graph writes, their loader (G23) waits on this sign-off"
+    loader: "~ (staging only, both sides, by design)"
+    properties:
+      - {name: listing_fallback, origin: source, from: "company _stage_scripts fix", note: "dispatch by presence — scripts.tsv (v2, richer) WINS over scripts.csv when both present; csv rows stage metadata-only ('a LISTING is a fact, never implied content'); absence files optional-absent. 561 scripts staged across two bundles (172 + 389) that were ALL silently dropped pre-fix"}
+      - {name: hash_absence_is_real, origin: source, from: "coverage counters on the real bundles", note: "metadata-only rows carry NO sha256 and NO body copy — hash_missing / script_copies_missing counted per the never-silent house rule; clause G2's drift detection can only compare among hash-BEARING occurrences"}
+      - {name: envelope_as_built, origin: source, from: "meta.txt -> rua_* stamping", note: "the extractor already stamps a fixed rua_* property set from the envelope on every staged record (schema, collected_at/by, user, uid, groups, shell, host, fqdn, os, kernel, scan_roots + an always-present bundle name that survives a missing meta.txt); the rest of meta.txt is kept in coverage, not stamped — D4 confirms or reshapes exactly this"}
+      - {name: collision_counter, origin: source, from: "RuaCoverage.cross_host_collisions", note: "same id on different hosts is ALREADY counted as an explicit this-gate review item — the D3 identity ruling has a live evidence feed waiting"}
 
 sections:
   - title: "A. Activation scope — which planned vocabulary these facts may turn on (clause a)"
@@ -119,8 +135,8 @@ sections:
     confirmations:
       - "D1: a logical script gets ONE DryDocs URN extending the D1 grammar — urn:drydocs:script:{segments} — and the SAME file arriving from the server extract (G20), the code repo (G24), or reference facts (G21/G16) MERGEs to that one node; duplicate nodes/labels are a defect by definition. THE SESSION RULES THE SEGMENTS (candidates: basename? path-normalized logical name? content-hash-free — identity must survive edits, hash is the VERSION axis per clause G)."
       - "D2: every source occurrence is recorded WITH origin (server-extract | code-repo) and its full locator — host+path for the extract, repo+branch+commit+path for the repo — as occurrence records (properties vs child nodes: rule the grain here), never squashed into node properties that overwrite each other."
-      - "D3: identity keys for the adjacent nodes are ruled in the same breath: ExecutionHost by fqdn (or nodeid where Control-M-known — reconcile with the P3 executionhost_nodeid constraint), AppUser by (user, uid) vs user-only. [rule each]"
-      - "D4: the meta.txt provenance envelope lands per the provenance-audit-fields plan (docs 06/06a): the per-source audit envelope shape, not ad-hoc properties — or defers to that plan's own gate if the SME prefers one envelope ruling for everything. [rule / defer to the envelope gate]"
+      - "D3: identity keys for the adjacent nodes are ruled in the same breath: ExecutionHost by fqdn (or nodeid where Control-M-known — reconcile with the P3 executionhost_nodeid constraint), AppUser by (user, uid) vs user-only. Evidence feed already live: the coverage counter for same-id-on-different-hosts (cross_host_collisions) was built as THIS gate's review item — rule what a collision MEANS (one logical script deployed twice vs two scripts sharing a name). [rule each]"
+      - "D4: the meta.txt provenance envelope lands per the provenance-audit-fields plan (docs 06/06a): the per-source audit envelope shape, not ad-hoc properties — or defers to that plan's own gate if the SME prefers one envelope ruling for everything. AS-BUILT INPUT (2026-07-28): the extractor already stamps a fixed rua_* property set from the envelope on every staged record (see provenance) and keeps the rest in coverage un-stamped — confirm that split, reshape it, or fold it into the envelope plan. [rule / defer to the envelope gate]"
   - title: "E. Source precedence — recorded in config/precedence.yaml terms (clause d)"
     confirmations:
       - "E1: the SERVER EXTRACT is the truth for 'latest code that actually runs'. Evidence (mechanism-only, 2026-07-21 SME chat): a production script referenced only by a folder variable was unfindable in the repo — repo completeness can never be assumed. [confirm]"
@@ -133,7 +149,7 @@ sections:
   - title: "G. GUID vs URN + the version axis (clause f)"
     confirmations:
       - "G1: where an asset is DPL-managed, the registry GUID IS the business key (ADR 0001). Rule WHERE it sits: as a URN segment (urn:drydocs:dataasset:dpl:{guid}) or as a keyed property beside a grammar-built URN. urn:drydocs:dataasset stays the fallback for everything unmanaged. [choose]"
-      - "G2: the CONTENT HASH rides on source-occurrence records as the VERSION discriminator — same URN + different hashes = drift, queryable (the G24 corroboration made concrete). Versions do NOT become their own nodes unless ruled otherwise HERE. [confirm / rule version nodes]"
+      - "G2: the CONTENT HASH rides on source-occurrence records as the VERSION discriminator — same URN + different hashes = drift, queryable (the G24 corroboration made concrete). HASH ABSENCE IS A REAL STATE, not an error: metadata-only listing occurrences (the scripts.csv fallback, premise 2) stage hash-absent with the absence counted; drift detection compares only among hash-bearing occurrences, and a URN whose occurrences are ALL hash-absent is simply uncorroborable-yet (a coverage fact). Versions do NOT become their own nodes unless ruled otherwise HERE. [confirm / rule version nodes]"
   - title: "H. The three-signal usage ruling (clause g)"
     confirmations:
       - "H1: referenced (G21/G16), registry-active (G25 flag), and present-on-server (G20) are THREE SEPARATE AXES — corroborated in queries, never conflated into one 'used' property. [confirm]"

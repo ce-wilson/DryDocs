@@ -26,6 +26,22 @@ Tags help grooming: `idea` · `bug` · `doc` · `source` (new data source) · `q
 
 <!-- add new ideas at the top -->
 
+- 2026-07-28 — [bug] **Back-flow candidate: `rua_inventory` silently drops every script when a
+  bundle ships the metadata-only `scripts.csv` listing — producer extractor reads `scripts.tsv`
+  only** (confirmed live: `drydocs_lineage/extractors/rua_inventory.py:55` declares SCRIPTS_TSV
+  as the sole scripts source). The company session fixed theirs 2026-07-28 (mechanism observed
+  from their session note; hosts/users/paths stay company-side): `_stage_scripts` dispatches by
+  presence — `scripts.tsv` (v2, richer) WINS when both present; else `scripts.csv`
+  (`path|script|permission|date|size`, pipe-delimited) stages METADATA-ONLY (abs_path joined
+  from path+script; no sha256 → hash_missing counted; no body copy → script_copies_missing
+  counted — "a LISTING is a fact, never implied content"); else optional-absent. Plus a thin
+  `_read_delimited` refactor under `_read_tsv` and two regression tests (csv fallback stages;
+  tsv preferred when both). Reproduce generically with synthetic fixtures (mechanism-not-
+  instance). Evidence scale: two production bundles, 561 scripts staged (was 0 pre-fix),
+  staging-only — the G22 terminus HELD on both sides. RIDERS captured onto the gate page
+  (rua-load-shapes.yaml, premise 2 + provenance): occurrences cannot assume a content hash
+  exists; the collector still tags csv-shipping bundles `rua-inventory/v1` — a v2 payload
+  wearing a v1 tag; the collector-side schema bump rides T14 collector convergence, not G22.
 - 2026-07-28 — [chore] **PARKED UNTIL AFTER THE PORT REVIEW: verify the `neo4j-drydocs` MCP
   server actually works now.** It requires APOC, and APOC was silently ABSENT from the
   `neo4jtest` container for weeks (`NEO4J_PLUGINS=[apoc]` set, `/plugins` empty — fixed
