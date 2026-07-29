@@ -12,6 +12,7 @@ from pathlib import Path
 from drydocs_core import data_root as dr
 from drydocs_core.data_root import (
     catalog_dir,
+    controlm_xml_dir,
     dpl_registry_dir,
     resolve_data_root,
     rua_extracted_dir,
@@ -52,6 +53,13 @@ def test_catalog_subfolder_convention(tmp_path, monkeypatch):
     monkeypatch.setenv(dr.DATA_ROOT_ENV, str(tmp_path))
     assert catalog_dir() == tmp_path / "catalog"
     assert catalog_dir("screenshots") == tmp_path / "catalog" / "screenshots"
+
+
+def test_controlm_xml_subfolder_convention(tmp_path, monkeypatch):
+    # G47: exports are arbitrarily-named generic .xml, so no tree sweep is
+    # possible — the landing-zone convention itself is the guard
+    monkeypatch.setenv(dr.DATA_ROOT_ENV, str(tmp_path))
+    assert controlm_xml_dir() == tmp_path / "controlm-xml"
 
 
 def test_create_on_demand_only(tmp_path, monkeypatch):

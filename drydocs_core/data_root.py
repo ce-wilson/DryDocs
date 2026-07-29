@@ -78,3 +78,12 @@ def catalog_dir(sub: str | None = None, *, create: bool = False) -> Path:
     ``catalog_dir("screenshots")`` is the evidence-capture area."""
     parts = ("catalog",) + ((sub,) if sub else ())
     return source_dir(*parts, create=create)
+
+
+def controlm_xml_dir(*, create: bool = False) -> Path:
+    """Landing zone for Control-M XML definition exports (G47 — the
+    9.0.21.300 config SoR; real folder/job/variable values are Internal).
+    No filename-fingerprint tree sweep exists for these: exports are
+    arbitrarily-named generic ``.xml``, so the guard is this landing-zone
+    convention itself plus the classification on the source entry."""
+    return source_dir("controlm-xml", create=create)

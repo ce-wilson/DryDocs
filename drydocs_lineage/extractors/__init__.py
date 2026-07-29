@@ -1,5 +1,13 @@
 """Lineage extractors — re-homed from depgraph@feat/controlm-lineage (ADR 0002-C §4)."""
 from .controlm_inventory import ControlMInventoryExtractor, ExtractCoverage
+from .controlm_xml import (
+    ControlMXmlDefsExtractor,
+    XmlDefsCoverage,
+    XmlDefsExtract,
+    XmlFolderRecord,
+    XmlJobRecord,
+    XmlVariableRecord,
+)
 from .dpl_mac import CloneFolder, DplMacExtractor, MacCoverage, parse_clone_folder
 from .dpl_registry import (
     DplRegistryExtractor,
@@ -39,6 +47,7 @@ __all__ = [
     "CloneFolder",
     "CodeRepoExtractor",
     "ControlMInventoryExtractor",
+    "ControlMXmlDefsExtractor",
     "CorroborationReport",
     "RepoManifestCoverage",
     "corroborate",
@@ -60,6 +69,11 @@ __all__ = [
     "RuaCoverage",
     "RuaInventoryExtractor",
     "SnowflakeCatalogExtractor",
+    "XmlDefsCoverage",
+    "XmlDefsExtract",
+    "XmlFolderRecord",
+    "XmlJobRecord",
+    "XmlVariableRecord",
     "cross_check",
     "parse_clone_folder",
 ]

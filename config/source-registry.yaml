@@ -46,6 +46,35 @@ sources:
       controlm-avg-run-supplement AWAITING SME; property supplement onto
       :ControlMJob, no new vocabulary.
 
+  - id: controlm-xml-export
+    classification: Internal              # real folder/job names, command lines, variable values
+    source: "Control-M 9.0.21.300 XML definition exports (DEFTABLE format) under DRYDOCS_DATA_ROOT (~/data/DryDocs/controlm-xml/)"
+    kind: orchestration
+    orchestrator: bmc-controlm            # baseline vendor — no crosswalk needed
+    adapter: ~                            # G47 extractor (drydocs_lineage/extractors/controlm_xml.py) — taxonomy-first staging, no loader
+    locator:
+      data_root: "DRYDOCS_DATA_ROOT (default ~/data/DryDocs); controlm-xml/ = definition exports (arbitrarily-named .xml — no filename-fingerprint sweep possible; the landing-zone convention + this classification are the guard)"
+      resolver: drydocs_core/data_root.py # controlm_xml_dir() (the G19 shared helper)
+    feeds_taxonomy: [folders, jobs, variables]
+    confirmed: false                      # OPEN precedence ruling vs controlm-psgmgr (HITL — see the IDEAS question 2026-07-29); NOTHING writes the graph before it
+    notes: >
+      G47 registration — the XML export is the environment's real config
+      SoR (XML-not-JSON finding; the JSON Automation API is conceptual
+      reference only) and carries the job definition AND its ordered
+      folder/job variables in one self-consistent snapshot. Staged
+      taxonomy-first by the G47 extractor (ASSUMED element/attribute
+      contract defined by SYNTHETIC fixtures; the company's real export
+      validates or amends it — XML schema docs are a known gap). Feeds the
+      G48 resolve-cmdline-staging step: variables go through the ONE
+      shared resolver (drydocs_core.controlm.resolver, guardrail 1) to
+      populate the G39 store's cmd_line_resolved DERIVED column
+      (guardrail 2 — verbatim preserved). Which source wins per object
+      when this and controlm-psgmgr disagree is an OPEN config/
+      precedence.yaml ruling with a named owner-and-sunset for the dual
+      path (guardrail 3) — parked in the IDEAS inbox, never auto-decided.
+      The company-side XML loader (run-log tee, _ts() normalizer) is the
+      raw twin of this sanitized mechanism seam.
+
   - id: autosys-export
     classification: Internal
     source: "autosys export (TBD)"
