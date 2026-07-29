@@ -1,29 +1,23 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import type { Persona } from '../lib/auth'
+import { canDrill } from '../lib/views'
 import { MODULES } from '../modules/registry'
+import { TOWERS } from '../data/towers'
 import ModuleIcon from '../components/ModuleIcon'
 import ModuleToolbar from '../layout/ModuleToolbar'
-import HeroArt from '../components/HeroArt'
+import BrandMark from '../components/BrandMark'
 
-// The Overview / landing route (`/`, site-plan §3 row 0, wf-landing-01):
-// radial hub — brand core center, one spoke per module, same registry that
-// drives the aside nav (wf-landing-01 annotation 1 — one array, two
-// renderings). No page actions in this toolbar (wf-landing-01: "(no page
-// actions)"); Overview has no spoke of its own — the core sphere IS its
-// representation (annotation 3).
-//
-// Theme-pass rebuild (drydocs-landing-dark.html parity): the hub gains the
-// mock's signature art (HeroArt.tsx — gradient core/petals/web-rings/node
-// network) and the page adopts the mock's 2-col hero grid (copy left, hub art
-// right on wide screens). The spoke NavLinks + mobile card fallback are
-// UNCHANGED functionally — same registry, same routes, same health glyph —
-// only the art behind/around them is new.
+// The Overview / landing route (`/`) — O35 category-first rebuild per SME
+// feedback FB-2026-07-28-01/02 (UI-WIP/wireframes/, keys WF-LND-*): the dense
+// radial hub (HeroArt + spoke ring) is DEMOTED to a small decorative mark
+// (WF-LND-04), the product name renders exactly ONCE (the header wordmark —
+// this page's h1 is the value proposition, WF-LND-02), and navigation is two
+// explicit pick-lists: modules ("what do you want to look at?", WF-LND-05,
+// same registry as the aside nav) and business towers (WF-LND-06, scoping
+// Explorer drill-down per persona). data-wf attributes keep the wireframe
+// keys attached to the DOM for the L5/L6 feedback loop.
 export default function OverviewRoute({ persona }: { persona: Persona }) {
-  const cx = 320
-  const cy = 240
-  const r = 190
-
   return (
     <div className="flex h-full min-h-0 flex-col">
       <ModuleToolbar crumbs={[{ label: 'Home' }]} />
@@ -33,16 +27,17 @@ export default function OverviewRoute({ persona }: { persona: Persona }) {
 
       <div className="flex-1 overflow-y-auto">
         <div className="mx-auto max-w-6xl px-4 py-8">
-          <div className="grid grid-cols-1 items-center gap-6 lg:grid-cols-[1fr_1.15fr] lg:gap-8">
-            {/* copy — landing headline (mock §hero h1/h2/desc/CTA) */}
-            <div>
-              <h1 className="text-[clamp(2.5rem,6vw,4rem)] font-extrabold tracking-tight text-text">DryDocs</h1>
-              <p className="mt-2 text-lg font-medium text-muted">A Don&rsquo;t Repeat Yourself Knowledge Graph</p>
-              <p className="mt-5 max-w-md text-[15.5px] leading-relaxed text-muted">
-                Visualize and understand your D&amp;A batch landscape. Connect pipelines, jobs, systems, and data
-                across applications, products, and teams.
+          {/* hero — copy left, small mark right (WF-LND-02/03/04) */}
+          <div className="flex flex-wrap items-center justify-between gap-6">
+            <div className="max-w-xl">
+              <h1 data-wf="WF-LND-02" className="text-[clamp(1.9rem,4vw,2.6rem)] font-extrabold leading-tight tracking-tight text-text">
+                A Don&rsquo;t-Repeat-Yourself Knowledge Graph
+              </h1>
+              <p data-wf="WF-LND-03" className="mt-3 max-w-lg text-[15.5px] leading-relaxed text-muted">
+                What runs, what it depends on, who owns it, which application it belongs to. Pick an
+                area below to start &mdash; every view is backed by the graph.
               </p>
-              <div className="mt-7 flex flex-wrap gap-3.5">
+              <div className="mt-6 flex flex-wrap gap-3.5">
                 <Link
                   to="/explorer"
                   className="rounded-md border border-blue-bright bg-blue px-5 py-3 text-sm font-semibold text-white no-underline transition-colors hover:bg-blue-bright"
@@ -53,73 +48,79 @@ export default function OverviewRoute({ persona }: { persona: Persona }) {
                   to="/under-the-hood"
                   className="rounded-md border border-edge px-5 py-3 text-sm font-semibold text-text no-underline transition-colors hover:border-faint"
                 >
-                  See how retrieval works →
+                  See how retrieval works &rarr;
                 </Link>
               </div>
             </div>
-
-            {/* radial hub — desktop/tablet */}
-            <div className="relative mx-auto hidden aspect-[640/480] w-full max-w-2xl md:block">
-              <HeroArt />
-              <svg viewBox="0 0 640 480" className="absolute inset-0 h-full w-full" aria-hidden="true">
-                {MODULES.map((m, i) => {
-                  const angle = (-90 + i * (360 / MODULES.length)) * (Math.PI / 180)
-                  const x = cx + r * Math.cos(angle)
-                  const y = cy + r * Math.sin(angle)
-                  return <line key={m.id} x1={cx} y1={cy} x2={x} y2={y} stroke="var(--edge)" strokeWidth="1" opacity=".6" />
-                })}
-              </svg>
-
-              <div
-                className="absolute flex -translate-x-1/2 -translate-y-1/2 flex-col items-center justify-center text-center"
-                style={{ left: `${(cx / 640) * 100}%`, top: `${(cy / 480) * 100}%` }}
-              >
-                <span className="font-bold text-white drop-shadow">DryDocs</span>
-              </div>
-
-              {MODULES.map((m, i) => {
-                const angle = (-90 + i * (360 / MODULES.length)) * (Math.PI / 180)
-                const x = cx + r * Math.cos(angle)
-                const y = cy + r * Math.sin(angle)
-                return (
-                  <Link
-                    key={m.id}
-                    to={m.path}
-                    className="group absolute flex w-32 -translate-x-1/2 -translate-y-1/2 flex-col items-center gap-1 rounded-lg p-2 text-center no-underline hover:bg-panel-2"
-                    style={{ left: `${(x / 640) * 100}%`, top: `${(y / 480) * 100}%` }}
-                  >
-                    <span className="flex h-10 w-10 items-center justify-center rounded-full border border-edge bg-panel text-muted group-hover:border-blue-bright group-hover:text-blue-bright">
-                      <ModuleIcon id={m.id} className="h-5 w-5" />
-                    </span>
-                    <span className="text-sm font-semibold text-text">{m.label}</span>
-                    <span className="line-clamp-1 text-[11px] text-faint">{m.tagline}</span>
-                    {/* health glyph: static neutral until the Loads module's JobRun
-                        QuerySpec lands (wf-landing-01 annotation 4) — no fake green */}
-                    <span
-                      aria-hidden="true"
-                      title="Health: not yet wired up"
-                      className="h-1.5 w-1.5 rounded-full bg-faint"
-                    />
-                  </Link>
-                )
-              })}
+            <div data-wf="WF-LND-04" className="hidden shrink-0 pr-6 md:block" aria-hidden="true">
+              <BrandMark size={120} />
             </div>
           </div>
 
-          {/* module card grid — narrow screens (wf-landing-01 annotation 8: the
-              radial SVG is desktop-only sugar, never the only path) */}
-          <div className="mt-8 grid grid-cols-2 gap-3 md:hidden">
-            {MODULES.map((m) => (
-              <Link
-                key={m.id}
-                to={m.path}
-                className="hover-lift flex flex-col gap-1 rounded-lg border border-edge bg-panel p-3 no-underline hover:border-faint"
-              >
-                <ModuleIcon id={m.id} className="h-5 w-5 text-muted" />
-                <span className="text-sm font-semibold text-text">{m.label}</span>
-                <span className="text-[11px] text-faint">{m.tagline}</span>
-              </Link>
-            ))}
+          {/* category pick-lists (WF-LND-05/06) */}
+          <div className="mt-8 grid grid-cols-1 gap-4 lg:grid-cols-[1.1fr_1fr]">
+            <section data-wf="WF-LND-05" className="rounded-lg border border-edge bg-panel p-4">
+              <h3 className="text-sm font-semibold text-text">What do you want to look at?</h3>
+              <ul className="mt-3 grid grid-cols-1 gap-1.5 sm:grid-cols-2">
+                {MODULES.map((m) => (
+                  <li key={m.id}>
+                    <Link
+                      to={m.path}
+                      className="group flex items-center gap-2.5 rounded-md border border-transparent px-2 py-1.5 no-underline hover:border-edge hover:bg-panel-2"
+                    >
+                      <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-edge bg-panel text-muted group-hover:border-blue-bright group-hover:text-blue-bright">
+                        <ModuleIcon id={m.id} className="h-4 w-4" />
+                      </span>
+                      <span className="min-w-0">
+                        <span className="block text-[13px] font-semibold text-text">{m.label}</span>
+                        <span className="block truncate text-[11px] text-faint">{m.tagline}</span>
+                      </span>
+                      <span className="ml-auto rounded border border-edge-soft px-1 py-0.5 font-mono text-[9px] text-faint">
+                        P{m.phase}
+                      </span>
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </section>
+
+            <section data-wf="WF-LND-06" className="rounded-lg border border-edge bg-panel p-4">
+              <h3 className="text-sm font-semibold text-text">Business area / tower</h3>
+              <p className="mt-0.5 text-[11px] text-faint">Pick a target &mdash; it scopes the Explorer drill-down.</p>
+              <ul className="mt-3 flex flex-col gap-1.5">
+                {Object.values(TOWERS).map((tw) => {
+                  const drillable = canDrill(tw.key, persona)
+                  const inner = (
+                    <>
+                      <span className="h-2.5 w-2.5 shrink-0 rounded-full" style={{ background: tw.color }} aria-hidden="true" />
+                      <span className="text-[13px] font-semibold text-text">{tw.title}</span>
+                      <span className="ml-auto font-mono text-[10px] text-faint">
+                        {tw.stats.map(([v, l]) => `${v} ${l}`).join(' \u00b7 ')}
+                      </span>
+                    </>
+                  )
+                  return (
+                    <li key={tw.key}>
+                      {drillable ? (
+                        <Link
+                          to={`/explorer/tower/${tw.key}`}
+                          className="flex items-center gap-2.5 rounded-md border border-transparent px-2 py-2 no-underline hover:border-edge hover:bg-panel-2"
+                        >
+                          {inner}
+                        </Link>
+                      ) : (
+                        <div
+                          className="flex items-center gap-2.5 rounded-md px-2 py-2 opacity-55"
+                          title="Outside your persona's drill scope (mock auth)"
+                        >
+                          {inner}
+                        </div>
+                      )}
+                    </li>
+                  )
+                })}
+              </ul>
+            </section>
           </div>
 
           <div className="mt-10 grid grid-cols-1 gap-4 border-t border-edge-soft pt-6 sm:grid-cols-2 lg:grid-cols-4">
