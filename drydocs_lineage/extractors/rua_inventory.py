@@ -26,6 +26,13 @@ What each bundle section becomes:
 - ``scripts.tsv`` + ``scripts/``   → script artifacts, ``kind="rua_script"``.
   OPTIONAL — a v1 bundle has no scripts section and stays fully ingestible
   (the collector's compat contract); likewise the ``sha256`` columns.
+- ``scripts.csv``                  → the same ``rua_script`` artifacts,
+  METADATA-ONLY (G45): real bundles ship a pipe-delimited LISTING
+  (``path|script|permission|date|size`` — no sha256 column, no body mirror)
+  while still wearing the v1 schema tag. A listing is a fact, never implied
+  content: rows stage with ``hash_missing`` and ``script_copies_missing``
+  counted. Presence dispatch: ``scripts.tsv`` (v2, richer) WINS when both
+  exist; the csv is the fallback; neither present files optional-absent.
 
 Identity is deliberately rua-scoped (``rua_script`` / ``rua_profile`` /
 ``rua_path``), NOT shared with the CMD_LINE invocation namespace: whether a
@@ -52,7 +59,8 @@ from ..model import DataAssetNode, LineageGraph, ProcessNode, asset_id, process_
 META_TXT = "meta.txt"
 DIRECTORIES_TSV = "directories.tsv"
 PROFILES_TSV = "profiles.tsv"
-SCRIPTS_TSV = "scripts.tsv"          # v2 only — OPTIONAL on ingest
+SCRIPTS_TSV = "scripts.tsv"          # v2 only — OPTIONAL on ingest; WINS over the csv
+SCRIPTS_CSV = "scripts.csv"          # metadata-only listing fallback (G45; pipe-delim)
 OWNERSHIP_TSV = "ownership_dirs.tsv"  # only when OWNERSHIP_SWEEP=yes
 
 #: staged kinds — rua-scoped on purpose (cross-source identity is G22's ruling)
@@ -85,6 +93,10 @@ _REQUIRED_COLS = {
     SCRIPTS_TSV: ("path", "owner", "group", "perms", "size", "mtime"),
     OWNERSHIP_TSV: ("path", "type", "perms", "size", "mtime"),
 }
+
+#: the metadata-only listing contract (G45): path = containing directory,
+#: script = filename; permission/date/size are the only facts it carries
+_SCRIPTS_CSV_COLS = ("path", "script", "permission", "date", "size")
 
 _TARBALL_SUFFIXES = (".tar.gz", ".tgz", ".tar")
 
@@ -144,16 +156,18 @@ def _basename(path: str) -> str:
     return path.rstrip("/").rsplit("/", 1)[-1] or path
 
 
-def _read_tsv(tsv: Path, required: tuple[str, ...]):
+def _read_delimited(path: Path, required: tuple[str, ...], sep: str):
     """Yield row dicts keyed by header name; ``None`` first yield = bad header.
 
     Header-name mapping (not positional) so the v2 ``sha256`` column — and any
-    future additive column — never breaks older parsers."""
-    lines = tsv.read_text(encoding="utf-8", errors="replace").splitlines()
+    future additive column — never breaks older parsers. One reader for every
+    delimited section (G45): tab for the tsv contract, pipe for the
+    metadata-only ``scripts.csv`` listing."""
+    lines = path.read_text(encoding="utf-8", errors="replace").splitlines()
     if not lines:
         yield None
         return
-    header = lines[0].split("\t")
+    header = lines[0].split(sep)
     if any(col not in header for col in required):
         yield None
         return
@@ -161,11 +175,16 @@ def _read_tsv(tsv: Path, required: tuple[str, ...]):
     for line in lines[1:]:
         if not line:
             continue
-        cells = line.split("\t")
+        cells = line.split(sep)
         if len(cells) != len(header):
             yield {}  # malformed row marker — counted by the caller
             continue
         yield {name: cells[i] for name, i in idx.items()}
+
+
+def _read_tsv(tsv: Path, required: tuple[str, ...]):
+    """Thin wrapper — the tab-delimited half of :func:`_read_delimited`."""
+    yield from _read_delimited(tsv, required, "\t")
 
 
 class RuaInventoryExtractor:
@@ -316,7 +335,7 @@ class RuaInventoryExtractor:
                 row, bundle_dir, copy_rel, graph, coverage, env_props,
             )
 
-    # -- scripts.tsv + scripts/ → rua_script artifacts (v2; OPTIONAL) -------------
+    # -- scripts.tsv | scripts.csv → rua_script artifacts (OPTIONAL) --------------
     def _stage_scripts(
         self,
         bundle_dir: Path,
@@ -324,11 +343,25 @@ class RuaInventoryExtractor:
         coverage: RuaCoverage,
         env_props: dict[str, str],
     ) -> None:
-        tsv = bundle_dir / SCRIPTS_TSV
-        if not tsv.is_file():
-            # a v1 bundle — explicitly ingestible, the section is optional
+        """Presence dispatch (G45): the v2 ``scripts.tsv`` (abs-path rows,
+        sha256, ``scripts/`` body mirror) WINS when both files exist; else the
+        metadata-only ``scripts.csv`` listing stages; else the bundle carries
+        no scripts section and stays ingestible (optional-absent)."""
+        if (bundle_dir / SCRIPTS_TSV).is_file():
+            self._stage_scripts_tsv(bundle_dir, graph, coverage, env_props)
+        elif (bundle_dir / SCRIPTS_CSV).is_file():
+            self._stage_scripts_csv(bundle_dir, graph, coverage, env_props)
+        else:
             coverage.sections_optional_absent.append(SCRIPTS_TSV)
-            return
+
+    def _stage_scripts_tsv(
+        self,
+        bundle_dir: Path,
+        graph: LineageGraph,
+        coverage: RuaCoverage,
+        env_props: dict[str, str],
+    ) -> None:
+        tsv = bundle_dir / SCRIPTS_TSV
         for row in _read_tsv(tsv, _REQUIRED_COLS[SCRIPTS_TSV]):
             if row is None:
                 coverage.sections_missing.append(f"{SCRIPTS_TSV}:bad-header")
@@ -341,6 +374,41 @@ class RuaInventoryExtractor:
             self._stage_artifact(
                 RUA_SCRIPT_KIND, row["path"], _basename(row["path"]),
                 row, bundle_dir, copy_rel, graph, coverage, env_props,
+            )
+
+    def _stage_scripts_csv(
+        self,
+        bundle_dir: Path,
+        graph: LineageGraph,
+        coverage: RuaCoverage,
+        env_props: dict[str, str],
+    ) -> None:
+        """The metadata-only listing (G45): ``path`` is the containing
+        directory and ``script`` the filename, so the staged identity is the
+        JOINED absolute path — the same ``rua_script`` node path the tsv route
+        produces. No sha256 column and no body mirror exist by contract:
+        ``_stage_artifact`` counts ``hash_missing`` and
+        ``script_copies_missing`` for every row (a LISTING is a fact, never
+        implied content)."""
+        csv = bundle_dir / SCRIPTS_CSV
+        for row in _read_delimited(csv, _SCRIPTS_CSV_COLS, "|"):
+            if row is None:
+                coverage.sections_missing.append(f"{SCRIPTS_CSV}:bad-header")
+                return
+            if not row or not row.get("path") or not row.get("script"):
+                coverage.scripts_malformed += 1
+                continue
+            coverage.scripts_rows += 1
+            abs_path = f"{row['path'].rstrip('/')}/{row['script']}"
+            mapped = {
+                "perms": row.get("permission", ""),
+                "mtime": row.get("date", ""),
+                "size": row.get("size", ""),
+            }
+            copy_rel = f"scripts{abs_path}"  # never shipped for a listing —
+            self._stage_artifact(          # counted missing, not implied
+                RUA_SCRIPT_KIND, abs_path, row["script"],
+                mapped, bundle_dir, copy_rel, graph, coverage, env_props,
             )
 
     # -- shared artifact staging ---------------------------------------------------

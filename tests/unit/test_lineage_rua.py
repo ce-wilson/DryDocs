@@ -252,3 +252,62 @@ def test_no_rels_and_no_new_relationship_types(v2_run) -> None:
     assert g.rels == set()                              # G20 stages NODES only
     assert "scripts=2" in cov.summary()
     assert "profiles=1" in cov.summary()
+
+
+# -- (h) G45: the metadata-only scripts.csv listing fallback ---------------------------
+# Real bundles ship the listing (pipe-delimited, no sha256, no body mirror)
+# while still wearing the v1 schema tag; pre-G45 every such row silently
+# dropped (scripts_rows=0, section filed optional-absent).
+
+_SCRIPTS_CSV = (
+    "path|script|permission|date|size\n"
+    f"/home/{USER}/app|conform.py|644|2026-07-20 09:00|17\n"
+    "/opt/app/lookup|refund_lkp.ksh|750|2026-07-19 08:30|2048\n"
+)
+
+
+def test_scripts_csv_metadata_only_fallback(tmp_path: Path) -> None:
+    bundle = _write_bundle(tmp_path, v2=False)          # v1: no scripts.tsv
+    (bundle / "scripts.csv").write_text(_SCRIPTS_CSV, encoding="utf-8")
+    g = LineageGraph()
+    cov = RuaInventoryExtractor().extract(bundle, g)
+    assert cov.scripts_rows == 2 and cov.scripts_staged == 2
+    assert cov.script_copies_missing == 2       # a LISTING never implies content
+    node = g.processes[process_id("rua_script", f"/home/{USER}/app/conform.py")]
+    assert node.path == f"/home/{USER}/app/conform.py"  # joined absolute path
+    assert node.name == "conform.py"
+    assert node.properties["perms"] == "644"
+    assert node.properties["mtime"] == "2026-07-20 09:00"
+    assert node.properties["size"] == "17"
+    assert node.properties["origin"] == "server-extract"
+    assert "sha256" not in node.properties
+    assert "rua_copy" not in node.properties
+    assert cov.hash_missing == 3                # 2 csv rows + the v1 profile
+    # the section ARRIVED — it must not also be filed optional-absent
+    assert "scripts.tsv" not in cov.sections_optional_absent
+
+
+def test_scripts_tsv_preferred_over_csv(tmp_path: Path) -> None:
+    bundle = _write_bundle(tmp_path, v2=True)           # scripts.tsv present (richer)
+    (bundle / "scripts.csv").write_text(_SCRIPTS_CSV, encoding="utf-8")
+    g = LineageGraph()
+    cov = RuaInventoryExtractor().extract(bundle, g)
+    # the tsv route ran: its sha256 travels, and the csv-only row never staged
+    conform = g.processes[process_id("rua_script", f"/home/{USER}/app/conform.py")]
+    assert conform.properties["sha256"] == SHA_CONFORM
+    assert process_id("rua_script", "/opt/app/lookup/refund_lkp.ksh") not in g.processes
+    assert cov.scripts_staged == 2                      # the two tsv rows only
+
+
+def test_scripts_csv_malformed_rows_counted_never_dropped(tmp_path: Path) -> None:
+    bundle = _write_bundle(tmp_path, v2=False)
+    (bundle / "scripts.csv").write_text(
+        "path|script|permission|date|size\n"
+        "/opt/app|good.sh|644|2026-07-20 09:00|10\n"
+        "|orphan.sh|644|2026-07-20 09:00|10\n"          # empty containing dir
+        "broken-row\n",                                 # wrong cell count
+        encoding="utf-8")
+    g = LineageGraph()
+    cov = RuaInventoryExtractor().extract(bundle, g)
+    assert cov.scripts_staged == 1
+    assert cov.scripts_malformed == 2
