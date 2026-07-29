@@ -1,6 +1,7 @@
 # drydocs-agents — ADK agent service (own venv, NOT part of the poetry env).
 # python -m venv .venv && .venv\Scripts\pip install -r requirements.txt
-google-adk
+google-adk>=2,<3   # R10: ADK 2.0 idioms are the ruled build surface (ADR 0007 revisit
+                   # check PASSED 2026-07-28); unpinned drifted under breaking changes
 neo4j
 python-dotenv
 litellm       # graph_qa provider adapter (R1 ruling: anthropic local / azure company)

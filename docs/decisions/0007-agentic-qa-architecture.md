@@ -230,6 +230,13 @@ would re-open the boundary ADR 0005 closed.
   never reached (delete it) or dominates cost (raise Tier-1 quality instead);
   or per-user Neo4j entitlements ever arrive (reopens parts of ADR 0005, not
   this ADR).
+  - *Revisit check ran 2026-07-28 — PASSED (R10).* The company SDK's v3
+    release CONVERGES on OSS ADK rather than diverging (direct subclassing;
+    the wrapper layers retired), so the app shape stands; ADK 2.0 Workflow
+    primitives become R6's build substrate and the Azure OpenAI V1 binding
+    confirms the R1 provider ruling. Detailed review (internal names, never
+    public): `internal/agent-platform/smartsdk-3-adr0007-compatibility.md`.
+    The trigger itself stays live for the next major.
 
 ## Action items
 
