@@ -50,7 +50,14 @@ CREATE CONSTRAINT employee_id         IF NOT EXISTS FOR (e:Employee)            
 CREATE CONSTRAINT sn_group_id         IF NOT EXISTS FOR (g:ServiceNowGroup)     REQUIRE g.group_id IS UNIQUE;
 CREATE CONSTRAINT jira_board_id       IF NOT EXISTS FOR (b:JiraBoard)           REQUIRE b.board_id IS UNIQUE;
 
-// Reified Membership pattern (W3C ORG) — deprecated by K4; kept for old graphs
+// Role / Membership keys — LIVE, with a scoped deprecation (C20, 2026-07-28).
+// K4 (gate 2026-07-10 §B/§C) deprecated the reified Membership pattern (W3C
+// ORG) in the SEAL ATTRIBUTION loaders specifically — qualified attribution
+// replaced it there. These keys remain load-bearing for the catalog paths:
+// catalog_ontology_supplement.cypher seeds the canonical :Role rows and
+// pat_team_roles.cypher MERGEs :Membership on membership_id (PAT team roles).
+// The earlier "kept for old graphs" phrase was void — graphs rebuild from
+// bootstrap, they are never migrated (the C13 precedent).
 CREATE CONSTRAINT role_name           IF NOT EXISTS FOR (r:Role)                REQUIRE r.name IS UNIQUE;
 CREATE CONSTRAINT role_id             IF NOT EXISTS FOR (r:Role)                REQUIRE r.role_id IS UNIQUE;
 CREATE CONSTRAINT membership_id       IF NOT EXISTS FOR (m:Membership)          REQUIRE m.membership_id IS UNIQUE;
