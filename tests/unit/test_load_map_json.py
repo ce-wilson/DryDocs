@@ -33,6 +33,20 @@ def test_committed_load_map_matches_regeneration():
     )
 
 
+def test_committed_load_map_html_matches_regeneration():
+    """N5 — the human surface is deterministic and committed==regenerated
+    (the board.html contract; docs/plan/ is the generated-surface home)."""
+    mod = _generator()
+    fresh = mod.build_load_map_html(mod.build_load_map())
+    committed_html = (REPO / "docs" / "plan" / "load-map.html").read_text(
+        encoding="utf-8"
+    )
+    assert committed_html == fresh, (
+        "docs/plan/load-map.html drifted — run: python scripts/render_load_map.py "
+        "(or the default board render) and commit the result"
+    )
+
+
 def test_every_registered_source_has_a_row():
     committed = json.loads(COMMITTED.read_text(encoding="utf-8"))
     registry = yaml.safe_load(
