@@ -8095,7 +8095,7 @@ items:
     agent: main
     model: sonnet
     priority: p2
-    status: todo
+    status: in_progress   # claimed 2026-07-29 UI sweep (this session)
     depends_on: []
     inputs: [UI-WIP/wireframes/, UI-WIP/sme-ui-launch-guide.md, web/src/modules/registry.ts, web/src/]
     acceptance: >
@@ -8119,7 +8119,7 @@ items:
     agent: main
     model: haiku
     priority: p3
-    status: todo
+    status: in_progress   # claimed 2026-07-29 UI sweep (this session)
     depends_on: []
     inputs: [web/src/loads/LoadsTimeline.tsx]
     acceptance: >
@@ -8139,7 +8139,7 @@ items:
     agent: main
     model: sonnet
     priority: p3
-    status: todo
+    status: in_progress   # claimed 2026-07-29 UI sweep (this session)
     depends_on: []
     inputs: [web/src/styles/tokens.css, web/src/index.css, web/src/App.css, internal/datalens-reference/continuity.md]
     acceptance: >
@@ -8162,7 +8162,7 @@ items:
     agent: main
     model: sonnet
     priority: p3
-    status: todo
+    status: in_progress   # claimed 2026-07-29 UI sweep (this session)
     depends_on: []
     inputs: [web/src/, internal/datalens-reference/continuity.md, UI-WIP/site-plan.md]
     acceptance: >
@@ -8187,7 +8187,7 @@ items:
     agent: main
     model: sonnet
     priority: p3
-    status: todo
+    status: in_progress   # claimed 2026-07-29 UI sweep (this session)
     depends_on: [O38]
     inputs: [web/src/, UI-WIP/two-track-ui-plan.md, internal/datalens-reference/continuity.md]
     acceptance: >
@@ -8209,7 +8209,7 @@ items:
     agent: main
     model: sonnet
     priority: p3
-    status: todo
+    status: in_progress   # claimed 2026-07-29 UI sweep (this session)
     depends_on: []
     inputs: [web/src/components/StatTiles.tsx, web/src/loads/, internal/dsi-reference/]
     acceptance: >
@@ -8229,7 +8229,7 @@ items:
     agent: main
     model: haiku
     priority: p3
-    status: todo
+    status: in_progress   # claimed 2026-07-29 UI sweep (this session)
     depends_on: []
     inputs: [web/src/components/ui/StatusChip.tsx, UI-WIP/site-plan.md, internal/datalens-reference/continuity.md]
     acceptance: >
@@ -8676,11 +8676,11 @@ items:
       takes effect at that venv's next pip install, by design.)
 
 summary:
-  todo: 62                                         # G48 claimed in_progress 2026-07-29 once G46/G47 closed (pushed-claim discipline). 2026-07-29 groom: +3 (G46 resolver cmd-line API, G47 controlm-xml-export seam, G48 resolve-cmdline-staging — the XML-fed resolution chain; precedence ruling parked as an inbox question, guardrail 3). G42 claimed in_progress 2026-07-28 (catalog seam start; pushed-claim discipline). G45/C20/J20/R10 claimed in_progress 2026-07-28 evening (batch claim, pushed before work). 2026-07-28 evening groom: +4 (G45 rua listing fallback back-flow, C20 K4-comment scope, J20 matrix render fold, R10 agent-runtime chores; R3 caller-identity merged in place). Earlier 2026-07-28 pm load-map groom: +4 (N3-N6 — the generated loaders/order/commands/source-target surface; only N3 is dependency-free, N4->N5 chain and N6 waits on N3's declared sequence). # 2026-07-28 pm post-UI-merge groom: +15 (U7/U8 instrument hardening, O35 WF-LND landing, O36 dot clip, O37-O41 DataLens/DSI continuity, B5 stage taxonomy, R9 agent query surface, J18/J19 process, L20 stray-file guard, L21 runbook Rev 4).                                       # C15/C16/L18/D8/J17 claimed in_progress 2026-07-28 (batch claim, pushed-claim discipline). P5 claimed in_progress 2026-07-28 pm (pushed-claim discipline). 2026-07-28 pm epic-close-out groom: +7 (G42-G44 Snowflake data-catalog seam from the loader plan; L18 comma-split bug, L19 doc-drift sweep, D8 bootstrap guard, J17 gates.json ritual — all from same-day inbox lines), U5 executed in-run (-1, Epic U closed 6/6); prior: U4 closed 2026-07-28 pm (right after U6 unblocked it); U6 groomed + built + closed same day (net 0); +4 at the 2026-07-28 inbox groom (C19 ontology-comment fix, J16 port-manifest fall-through guard, L17 doc-loader prereq guards, O34 web npm advisories); all four closed same day (O34 via its stop clause), L16 closed alongside; +5 2026-07-27 groom (J14/J15/G36/O33/G38), +2 PAT review (C17/C18), +5 code-graph-review (U1-U5), +2 cmdline seam (G39/G40, built+closed same day)
-  in_progress: 1                                   # E1 (gate deferred both sides). G46/G47/G48 — the whole XML-fed resolution chain — claimed + closed 2026-07-29 same session. G42 claimed + closed 2026-07-28 same session. 2026-07-28 evening batch claim fully closed: J20, R10, C20, G45 all done same evening
+  todo: 55                                         # G48 claimed in_progress 2026-07-29 once G46/G47 closed (pushed-claim discipline). 2026-07-29 groom: +3 (G46 resolver cmd-line API, G47 controlm-xml-export seam, G48 resolve-cmdline-staging — the XML-fed resolution chain; precedence ruling parked as an inbox question, guardrail 3). G42 claimed in_progress 2026-07-28 (catalog seam start; pushed-claim discipline). G45/C20/J20/R10 claimed in_progress 2026-07-28 evening (batch claim, pushed before work). 2026-07-28 evening groom: +4 (G45 rua listing fallback back-flow, C20 K4-comment scope, J20 matrix render fold, R10 agent-runtime chores; R3 caller-identity merged in place). Earlier 2026-07-28 pm load-map groom: +4 (N3-N6 — the generated loaders/order/commands/source-target surface; only N3 is dependency-free, N4->N5 chain and N6 waits on N3's declared sequence). # 2026-07-28 pm post-UI-merge groom: +15 (U7/U8 instrument hardening, O35 WF-LND landing, O36 dot clip, O37-O41 DataLens/DSI continuity, B5 stage taxonomy, R9 agent query surface, J18/J19 process, L20 stray-file guard, L21 runbook Rev 4).                                       # C15/C16/L18/D8/J17 claimed in_progress 2026-07-28 (batch claim, pushed-claim discipline). P5 claimed in_progress 2026-07-28 pm (pushed-claim discipline). 2026-07-28 pm epic-close-out groom: +7 (G42-G44 Snowflake data-catalog seam from the loader plan; L18 comma-split bug, L19 doc-drift sweep, D8 bootstrap guard, J17 gates.json ritual — all from same-day inbox lines), U5 executed in-run (-1, Epic U closed 6/6); prior: U4 closed 2026-07-28 pm (right after U6 unblocked it); U6 groomed + built + closed same day (net 0); +4 at the 2026-07-28 inbox groom (C19 ontology-comment fix, J16 port-manifest fall-through guard, L17 doc-loader prereq guards, O34 web npm advisories); all four closed same day (O34 via its stop clause), L16 closed alongside; +5 2026-07-27 groom (J14/J15/G36/O33/G38), +2 PAT review (C17/C18), +5 code-graph-review (U1-U5), +2 cmdline seam (G39/G40, built+closed same day)
+  in_progress: 8                                   # E1 (gate deferred both sides) + O35-O41 UI sweep batch claim 2026-07-29 (pushed-claim discipline; O39 rides its O38 dep inside the sweep). G46/G47/G48 — the whole XML-fed resolution chain — claimed + closed 2026-07-29 same session. G42 claimed + closed 2026-07-28 same session. 2026-07-28 evening batch claim fully closed: J20, R10, C20, G45 all done same evening
   blocked: 0
   done: 175                                        # 2026-07-29: G48 resolve-cmdline-staging (store v3 + resolution_quality provenance; verbatim-beside-derived; precedence evidence counted never ruled), G47 controlm-xml-export seam (taxonomy-first defs+ordered-variables staging, scope_layers handoff proven against the resolver), G46 resolve_command_line on the shared resolver (one scope-chain walk, substitution provenance with winning scope, %%VAR-launcher round-trip proven). 2026-07-28 late: G42 Snowflake data-catalog seam (source registered + catalog_dir landing zone + SnowflakeCatalogExtractor staging both views, three-shape discrimination, sentinel counted, latest-per-GUID, origin routing, urn fact column; G43 cross-checks unblocked). Earlier 2026-07-28 evening: G45 rua listing fallback (presence dispatch, 561-script company incident's producer parity), C20 K4-comment re-scope (SEAL-loader-specific deprecation; live catalog writers named), R10 agent-runtime alignment (google-adk pinned >=2,<3 + ADR 0007 revisit date-stamp), J20 one-render-entry-point part 2 (matrix rides the default board render). Earlier: C16 key-prefix governance in the metadata plan (drydocs./system/team-local classes), C15 inverse_label on all 78 vocab entries (presentational only, schema-test enforced), L18 depth-0 cell split (the K2 shear healed; conformance guard over the real matrices), D8 bootstrap constraint guard (names-not-counts presence check after apply, live 51/51), J17 gates.json folded into the default-paths board render (drift closed at the ritual level). Earlier 2026-07-28 pm: P5 maintenance-window query (patch-window CLI + union-not-sum window math + findings feeder; claimed-then-closed same day — EPIC P COMPLETE 5/5), U5 groom-skill graph cross-check subsection (executed inside the close-out groom — EPIC U COMPLETE 6/6), U4 tech-debt graph-evidence section (hardened A1-A6 pack + offline fallback, all probes run live), U6 depgraph scanner blind-spot fix (shared-namespace extract_many + drydocs_api root; 205 modules / 370 IMPORTS, all 24 U1 orphan false-positives resolved). Earlier 2026-07-28: G41 glue base-table inventory seam (built + closed same day), L17 doc-loader prereq guards (same), O33 SchemaMeta exemplar audit (22 specs + runs_on write path; live-proven), O34 npm advisories (postcss cleared; react-router escalated via the stop clause), U1/U2/U3 code-graph persona reviews run 1 (scanner blind-spot headline; backlog verified truthful; doc board + citation sweep queued), C19 ontology-comment fix (groomed + closed same day), J16 port-manifest fall-through guard (same), L16 runbook container/port refresh. 2026-07-27 closes: J14 SEALID split, P3 hosts+RUNS_ON, G21 rua code-ops, G24 code-repo seam, G26 launcher-registry config, Q8 bmc-docs prereq, C18 shadow-model guard, J15 value-shape boundary guard, G33 code-snapshot loader (gate signed + built same day), G39 cmdline staging store + G40 parse (groomed am, built pm)
-  next_ready: [N3, M3, M4, J10, Q6, O23, J13, O26, O27, C17, O28, R3, R4, O29, O30, O31, O32, S1, S8, S9, Q7, G32, G34, G35, G22, G43, L19, O35, O36, O37, O38, O40, O41, B5, R9, J18, J19, L20, L21]
+  next_ready: [N3, M3, M4, J10, Q6, O23, J13, O26, O27, C17, O28, R3, R4, O29, O30, O31, O32, S1, S8, S9, Q7, G32, G34, G35, G22, G43, L19, B5, R9, J18, J19, L20, L21]
   # 2026-07-28 pm post-UI-merge groom: all 15 new items dependency-free except
   # O39 (waits on O38's IdChips — the link surface). O37 coordinates with O30
   # informally (no hard dependency; whichever lands second re-verifies).
