@@ -7,6 +7,7 @@ import ModuleTemplate from './ModuleTemplate'
 import SpecGrid from '../explorer/SpecGrid'
 import EmptyState from '../components/ui/EmptyState'
 import LoadsTimeline from '../loads/LoadsTimeline'
+import StatTiles from '../components/StatTiles'
 import { DEMO_RUNS, type RunRow } from '../loads/demoLoads'
 
 // /loads (O16): the shared template with the run TIMELINE as this module's
@@ -21,6 +22,8 @@ export default function LoadsRoute({ persona }: { persona: Persona }) {
   const [selectedRunId, setSelectedRunId] = useState<string | null>(runId ?? null)
   const [runs, setRuns] = useState<readonly RunRow[] | null>(null)
   const [live, setLive] = useState(false)
+  // O40 (DL-10): status stat-tiles ARE the filter controls for the timeline below.
+  const [statusFilter, setStatusFilter] = useState<string | null>(null)
 
   const apiUrl = (import.meta.env.VITE_API_URL as string | undefined) ?? 'http://localhost:8001'
   const access = useMemo(() => createApiAccess(apiUrl, persona.id), [apiUrl, persona.id])
@@ -59,7 +62,26 @@ export default function LoadsRoute({ persona }: { persona: Persona }) {
       selection={selectedRunId ?? undefined}
       graphPane={
         runs ? (
-          <LoadsTimeline runs={runs} live={live} selectedRunId={selectedRunId} onSelect={setSelectedRunId} />
+          <div className="flex h-full min-h-0 flex-col">
+            <div className="shrink-0 px-3 pt-3">
+              <StatTiles
+                tiles={[
+                  { id: 'all', value: String(runs.length), label: 'All runs' },
+                  { id: 'COMPLETED', value: String(runs.filter((r) => r.status === 'COMPLETED').length), label: 'Completed' },
+                  { id: 'FAILED', value: String(runs.filter((r) => r.status === 'FAILED').length), label: 'Failed' },
+                  { id: 'STARTED', value: String(runs.filter((r) => r.status === 'STARTED').length), label: 'Running' },
+                ]}
+                selectedId={statusFilter ?? 'all'}
+                onSelect={(id) => setStatusFilter(id === 'all' ? null : id)}
+              />
+            </div>
+            <LoadsTimeline
+              runs={statusFilter ? runs.filter((r) => r.status === statusFilter) : runs}
+              live={live}
+              selectedRunId={selectedRunId}
+              onSelect={setSelectedRunId}
+            />
+          </div>
         ) : (
           <EmptyState title="Loading…" hint="Running QuerySpec loads.runs.v1 via drydocs-api." />
         )
