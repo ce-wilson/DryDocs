@@ -821,6 +821,18 @@ Tags help grooming: `idea` · `bug` · `doc` · `source` (new data source) · `q
 
 ## Recently groomed (audit trail)
 
+- 2026-07-29 — [doc] "create a SME-Runbook for each module" (user directive, chat) → new
+  **Epic V** (sme-runbooks, phase 10): **V1** coverage rule — every modules-registry entry
+  maps to a governed runbook, an explicit EXEMPT reason, or a frozen shrink-only
+  RUNBOOK_PENDING list (N2's LEDGER_PENDING idiom) — then **V2–V10** per-module runbooks
+  (core, load, review, docgen, lineage, remediation, api, agents, web-audit), each gated
+  on V1's extend-vs-author dispositions for the five runbooks that already exist.
+- 2026-07-29 — [question] "one view of all of the taxonomy by source, ontology, extract and
+  loads in one place — is it done?" (user, restating the 2026-07-28 ask) → confirmed **NOT
+  built yet**: N3–N6 are the build and all four are still `todo` (N3 is next_ready). The
+  restated ask is WIDER than the 07-28 scope (taxonomy + ontology weren't in it), so the
+  taxonomy-capture and taxonomy-ontology-map joins were MERGED into **N4**'s acceptance
+  rather than opened as a new item.
 - 2026-07-29 — [idea] XML-fed CMD_LINE resolution (Control-M XML ingestion parses folder/job
   variables → shared resolver populates the G39 store's cmd_line_resolved; three guardrails:
   one-resolver-in-core, derived-beside-verbatim-with-provenance, precedence-before-first-

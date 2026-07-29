@@ -361,6 +361,15 @@
       ]
     },
     {
+      "kind": "log-entry",
+      "date": "2026-07-29",
+      "title": "FB-04 · Agent Test harness — UI surface ruling (SME sign-off)",
+      "status": "recorded",
+      "prompt_files": [],
+      "log_ref": "config/gate-log.md:1023",
+      "unblocks": []
+    },
+    {
       "kind": "prompt-only",
       "date": null,
       "title": "bmc-docs-example (gate page rendered — session not yet run)",

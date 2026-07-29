@@ -2709,13 +2709,22 @@ items:
       rendered in the THREE states governance already defines, never omitted: has a ledger
       (3 — controlm-psgmgr, depgraph-snapshot, design-docs), confirmed but on the frozen
       shrink-only LEDGER_PENDING list (8), unconfirmed placeholder (5). A source that is
-      silently absent from the render is a defect.
+      silently absent from the render is a defect. WIDENED 2026-07-29: the per-source row
+      also joins the source's taxonomy capture (its config/taxonomy/ file, when one
+      exists) and its config/taxonomy-ontology-map.yaml entries with their status
+      (proposed/planned/confirmed) — so the one surface answers taxonomy-by-source,
+      ontology, extract AND load, not just the load half.
     notes: >
       Deliberately reuses existing governance instead of inventing a "no ledger yet"
       concept: LEDGER_PENDING and test_every_confirmed_source_has_a_ledger_or_is_named_pending
       (N2) already carry that state, and the list is frozen shrink-only, so the render
       inherits the guarantee. Module drydocs-docgen — it is a renderer of the L3 class,
-      even though its inputs are config.
+      even though its inputs are config. MERGE 2026-07-29: the user restated the ask as
+      "one view of all of the taxonomy by source, ontology, extract and loads in one
+      place" — the 2026-07-28 groom had scoped only loaders/order/commands/ledgers, so
+      the taxonomy + ontology-map joins were added here rather than as a new item. The
+      map file and taxonomy captures are already status-bearing YAML; no gate is implied
+      (the render displays statuses, it never rules them).
   - id: N5
     epic: source-column-mappings
     title: "The human load-map surface: a readable page generated from load-map.json, wired into the session ritual"
@@ -8675,12 +8684,244 @@ items:
       kept live for the next major. (agents/ has its own venv — the pin
       takes effect at that venv's next pip install, by design.)
 
+  # ── Epic V — SME runbooks per module (main) — Phase 10 ─────────────────────
+  # Groomed 2026-07-29 (user directive, chat): "create a SME-Runbook for each
+  # module." Runbooks are the Epic L governed-doc class (runbook.outline.yaml,
+  # test_doc_outline auto-sweep, deterministic render, L5/L6 feedback loop) —
+  # this epic makes coverage PER MODULE a rule rather than an accident. Five
+  # runbooks already exist (startup-refresh, web-console, mapping-store,
+  # mapping-demo, lineage-mac, cmdline-resolution) but they are chain- or
+  # system-scoped; V1 maps them onto the modules registry and the per-module
+  # items fill the gaps. Pending-list idiom reused from N2's LEDGER_PENDING
+  # (frozen, shrink-only) so the guard ships day one without lying.
+  - id: V1
+    epic: sme-runbooks
+    title: "SME-runbook coverage rule: every module in the registry maps to a governed runbook or sits on a frozen shrink-only RUNBOOK_PENDING list"
+    type: task
+    module: docs
+    phase: 10
+    agent: main
+    model: sonnet
+    priority: p2
+    status: todo
+    depends_on: []
+    inputs: [docs/restructure/backlog.yaml, docs/design/, docs/design/templates/runbook.outline.yaml, tests/unit/test_doc_outline.py]
+    acceptance: >
+      A unit test maps every entry in the backlog modules: registry to exactly one
+      of three states, none silently absent: (1) COVERED — a governed
+      docs/design/*-runbook.md names the module in its front matter; (2) EXEMPT —
+      an explicit list with a reason per entry (work areas by rule:
+      reference/taxonomy/ontology/config/graph-infra/docs are captures and
+      registries, not operable components; placeholder modules with no code to
+      operate: drydocs-plan, drydocs-docmeta, and drydocs-deepdoc if still
+      placeholder); (3) RUNBOOK_PENDING — real modules awaiting authorship,
+      frozen shrink-only per the N2 LEDGER_PENDING idiom. The map also
+      dispositions the five existing runbooks (web-console -> drydocs-web;
+      mapping-store/mapping-demo -> decide; lineage-mac + cmdline-resolution =
+      chain-scoped, decide whether they satisfy drydocs-lineage or index under
+      it; startup-refresh = system-level, decide whether it counts for
+      drydocs-load). Suite green.
+    notes: >
+      Groomed 2026-07-29 from the user directive "create a SME-Runbook for each
+      module". The mapping decisions here gate V2-V10's scope (extend an
+      existing runbook vs author a new one), which is why they depend on this.
+      Module docs (the rule is about the doc corpus), phase 10 with Epic L —
+      no plan change.
+  - id: V2
+    epic: sme-runbooks
+    title: "SME runbook: drydocs-core — config/env roots, schema provisioning, vocabulary registry, run logs"
+    type: task
+    module: docs
+    phase: 10
+    agent: main
+    model: sonnet
+    priority: p2
+    status: todo
+    depends_on: [V1]
+    inputs: [drydocs_core/, docs/design/templates/runbook.outline.yaml, drydocs_core/schema/provisioning/]
+    acceptance: >
+      docs/design/drydocs-core-runbook.md conforming to runbook.outline.yaml
+      (test_doc_outline auto-sweep), rendered .html committed and
+      stale-render-clean, drydocs-core removed from RUNBOOK_PENDING. Covers the
+      module's operate surface: Neo4jSettings/env-root configuration (names
+      only, no secrets), manual DB provisioning + when to re-run it, the
+      relationship-vocabulary registry checks, and the run-log family
+      (DRYDOCS_LOGDIR chain) as the review surface.
+    notes: "Groomed 2026-07-29 (Epic V). SME-facing: operate + verify, not API docs."
+  - id: V3
+    epic: sme-runbooks
+    title: "SME runbook: drydocs-load — loaders, CLI chain, snapshots; rule the overlap with the system-level startup-refresh runbook"
+    type: task
+    module: docs
+    phase: 10
+    agent: main
+    model: sonnet
+    priority: p2
+    status: todo
+    depends_on: [V1]
+    inputs: [drydocs/, docs/design/drydocs-startup-refresh-runbook.md, docs/design/templates/runbook.outline.yaml]
+    acceptance: >
+      Per V1's disposition: EITHER the startup-refresh runbook is declared the
+      drydocs-load runbook (then this item brings it current with module
+      framing + a coverage note, Rev bump per the governed-render rules) OR a
+      distinct docs/design/drydocs-load-runbook.md is authored (outline-
+      conformant, rendered, stale-render-clean) and the two cross-reference
+      without duplicating the load sequence — N3's declared canonical sequence
+      is the single source once it lands. drydocs-load off RUNBOOK_PENDING.
+    notes: >
+      Groomed 2026-07-29 (Epic V). Coordinate with N6 (the two disagreeing
+      load sequences) — this runbook must not become a third one.
+  - id: V4
+    epic: sme-runbooks
+    title: "SME runbook: drydocs-review — gate pages, graph verify, review labels, publishing flow"
+    type: task
+    module: docs
+    phase: 10
+    agent: main
+    model: sonnet
+    priority: p2
+    status: todo
+    depends_on: [V1]
+    inputs: [drydocs/review/, docs/design/templates/runbook.outline.yaml]
+    acceptance: >
+      docs/design/drydocs-review-runbook.md (outline-conformant, rendered,
+      stale-render-clean), drydocs-review off RUNBOOK_PENDING. Covers: generating
+      a gate page from a gate prompt, the no-write-until-confirmed contract,
+      graph_verify/review_labels runs and where their output lands, and the
+      Confluence publishing path (mechanism only — base URL as config).
+    notes: "Groomed 2026-07-29 (Epic V)."
+  - id: V5
+    epic: sme-runbooks
+    title: "SME runbook: drydocs-docgen — design-doc render chain, outline validation, the L5/L6 feedback loop"
+    type: task
+    module: docs
+    phase: 10
+    agent: main
+    model: sonnet
+    priority: p2
+    status: todo
+    depends_on: [V1]
+    inputs: [scripts/render_design_doc.py, scripts/render_board.py, docs/design/templates/, docs/design/feedback/]
+    acceptance: >
+      docs/design/drydocs-docgen-runbook.md (outline-conformant, rendered,
+      stale-render-clean), drydocs-docgen off RUNBOOK_PENDING. Covers: the
+      md-is-source / html-is-render contract, the default-paths board render
+      and everything that rides it (gates.json, enforcement matrix — J17/J20),
+      the stale-render check, and both feedback halves (L5 save-button export,
+      L6 scan + transcribe-doc-markup) back to anchor-keyed YAML.
+    notes: "Groomed 2026-07-29 (Epic V). This one documents the machinery the other runbooks are rendered BY — author it early."
+  - id: V6
+    epic: sme-runbooks
+    title: "SME runbook: drydocs-lineage — module-wide operate surface; index or absorb the chain-scoped lineage-mac and cmdline-resolution runbooks"
+    type: task
+    module: docs
+    phase: 10
+    agent: main
+    model: sonnet
+    priority: p2
+    status: todo
+    depends_on: [V1]
+    inputs: [drydocs_lineage/, docs/design/drydocs-lineage-mac-runbook.md, docs/design/drydocs-cmdline-resolution-runbook.md]
+    acceptance: >
+      Per V1's disposition: a module-level drydocs-lineage runbook exists that
+      either absorbs or explicitly indexes the two chain-scoped runbooks
+      (lineage-mac, cmdline-resolution) so an SME landing on the module finds
+      one entry point; outline-conformant, rendered, stale-render-clean;
+      drydocs-lineage off RUNBOOK_PENDING. No procedure duplicated across the
+      three — chain runbooks keep their depth, the module runbook routes.
+    notes: "Groomed 2026-07-29 (Epic V)."
+  - id: V7
+    epic: sme-runbooks
+    title: "SME runbook: drydocs-remediation — detector, transform engine, corroboration, Jira handoff"
+    type: task
+    module: docs
+    phase: 10
+    agent: main
+    model: sonnet
+    priority: p2
+    status: todo
+    depends_on: [V1]
+    inputs: [drydocs_remediation/, docs/design/templates/runbook.outline.yaml]
+    acceptance: >
+      docs/design/drydocs-remediation-runbook.md (outline-conformant, rendered,
+      stale-render-clean), drydocs-remediation off RUNBOOK_PENDING. Covers: the
+      two-tier fix model, running the R1 detector, the transform engine's
+      before/after artifacts, corroboration, and the SoD boundary (we analyze,
+      dev implements) at the Jira handoff. Mechanism-only — real instances
+      stay internal/.
+    notes: "Groomed 2026-07-29 (Epic V)."
+  - id: V8
+    epic: sme-runbooks
+    title: "SME runbook: drydocs-api — server run + mappings API; rule the overlap with the mapping-store runbook"
+    type: task
+    module: docs
+    phase: 10
+    agent: main
+    model: sonnet
+    priority: p2
+    status: todo
+    depends_on: [V1]
+    inputs: [drydocs_api/, docs/design/drydocs-mapping-store-runbook.md]
+    acceptance: >
+      Per V1's disposition: EITHER the mapping-store runbook is extended to be
+      the drydocs-api module runbook (Rev bump) OR a distinct
+      drydocs-api-runbook.md is authored; outline-conformant, rendered,
+      stale-render-clean; drydocs-api off RUNBOOK_PENDING. Covers: starting the
+      thin API, its read-only vs store-write surfaces, and the
+      loader-stays-the-only-graph-writer contract as the operating rule.
+    notes: "Groomed 2026-07-29 (Epic V)."
+  - id: V9
+    epic: sme-runbooks
+    title: "SME runbook: drydocs-agents — ADK service venv, run, console wiring, agent smoke checks"
+    type: task
+    module: docs
+    phase: 10
+    agent: main
+    model: sonnet
+    priority: p2
+    status: todo
+    depends_on: [V1]
+    inputs: [agents/, docs/design/templates/runbook.outline.yaml]
+    acceptance: >
+      docs/design/drydocs-agents-runbook.md (outline-conformant, rendered,
+      stale-render-clean), drydocs-agents off RUNBOOK_PENDING. Covers: the
+      module's own venv (pinned google-adk per R10), starting the service,
+      wiring the console to it (VITE_ADK_URL, names only), the read-only
+      contract, and a smoke check per registered app with expected output
+      shape — including the ADK-unreachable fallback behaviour the console
+      surfaces (SYNTHESIZED demo trace + banner).
+    notes: "Groomed 2026-07-29 (Epic V)."
+  - id: V10
+    epic: sme-runbooks
+    title: "SME runbook: drydocs-web — audit the existing web-console runbook current (post O35-O41, FB-03/FB-04 access model)"
+    type: chore
+    module: docs
+    phase: 10
+    agent: main
+    model: sonnet
+    priority: p2
+    status: todo
+    depends_on: [V1]
+    inputs: [docs/design/drydocs-web-console-runbook.md, web/]
+    acceptance: >
+      The web-console runbook is audited against the shipped state and Rev-bumped
+      where stale: category-first landing (O35), the FB-03 page-role/access
+      designations, the standalone agent-test page's build/ship path (FB-04
+      re-ruling), and current build/verify commands; rendered, stale-render-clean;
+      drydocs-web marked COVERED in V1's map.
+    notes: >
+      Groomed 2026-07-29 (Epic V). COORDINATE: a parallel session is actively
+      working the standalone agent-test page — audit only after its stream
+      lands; do not describe in-flight state.
+
 summary:
-  todo: 55                                         # G48 claimed in_progress 2026-07-29 once G46/G47 closed (pushed-claim discipline). 2026-07-29 groom: +3 (G46 resolver cmd-line API, G47 controlm-xml-export seam, G48 resolve-cmdline-staging — the XML-fed resolution chain; precedence ruling parked as an inbox question, guardrail 3). G42 claimed in_progress 2026-07-28 (catalog seam start; pushed-claim discipline). G45/C20/J20/R10 claimed in_progress 2026-07-28 evening (batch claim, pushed before work). 2026-07-28 evening groom: +4 (G45 rua listing fallback back-flow, C20 K4-comment scope, J20 matrix render fold, R10 agent-runtime chores; R3 caller-identity merged in place). Earlier 2026-07-28 pm load-map groom: +4 (N3-N6 — the generated loaders/order/commands/source-target surface; only N3 is dependency-free, N4->N5 chain and N6 waits on N3's declared sequence). # 2026-07-28 pm post-UI-merge groom: +15 (U7/U8 instrument hardening, O35 WF-LND landing, O36 dot clip, O37-O41 DataLens/DSI continuity, B5 stage taxonomy, R9 agent query surface, J18/J19 process, L20 stray-file guard, L21 runbook Rev 4).                                       # C15/C16/L18/D8/J17 claimed in_progress 2026-07-28 (batch claim, pushed-claim discipline). P5 claimed in_progress 2026-07-28 pm (pushed-claim discipline). 2026-07-28 pm epic-close-out groom: +7 (G42-G44 Snowflake data-catalog seam from the loader plan; L18 comma-split bug, L19 doc-drift sweep, D8 bootstrap guard, J17 gates.json ritual — all from same-day inbox lines), U5 executed in-run (-1, Epic U closed 6/6); prior: U4 closed 2026-07-28 pm (right after U6 unblocked it); U6 groomed + built + closed same day (net 0); +4 at the 2026-07-28 inbox groom (C19 ontology-comment fix, J16 port-manifest fall-through guard, L17 doc-loader prereq guards, O34 web npm advisories); all four closed same day (O34 via its stop clause), L16 closed alongside; +5 2026-07-27 groom (J14/J15/G36/O33/G38), +2 PAT review (C17/C18), +5 code-graph-review (U1-U5), +2 cmdline seam (G39/G40, built+closed same day)
+  todo: 65                                         # 2026-07-29 groom (user directive): +10 (new Epic V sme-runbooks — V1 coverage rule + V2-V10 per-module runbooks; only V1 dependency-free, the rest wait on its mapping dispositions; N4 widened in place with the taxonomy/ontology-map joins — merge, not a new item). G48 claimed in_progress 2026-07-29 once G46/G47 closed (pushed-claim discipline). 2026-07-29 groom: +3 (G46 resolver cmd-line API, G47 controlm-xml-export seam, G48 resolve-cmdline-staging — the XML-fed resolution chain; precedence ruling parked as an inbox question, guardrail 3). G42 claimed in_progress 2026-07-28 (catalog seam start; pushed-claim discipline). G45/C20/J20/R10 claimed in_progress 2026-07-28 evening (batch claim, pushed before work). 2026-07-28 evening groom: +4 (G45 rua listing fallback back-flow, C20 K4-comment scope, J20 matrix render fold, R10 agent-runtime chores; R3 caller-identity merged in place). Earlier 2026-07-28 pm load-map groom: +4 (N3-N6 — the generated loaders/order/commands/source-target surface; only N3 is dependency-free, N4->N5 chain and N6 waits on N3's declared sequence). # 2026-07-28 pm post-UI-merge groom: +15 (U7/U8 instrument hardening, O35 WF-LND landing, O36 dot clip, O37-O41 DataLens/DSI continuity, B5 stage taxonomy, R9 agent query surface, J18/J19 process, L20 stray-file guard, L21 runbook Rev 4).                                       # C15/C16/L18/D8/J17 claimed in_progress 2026-07-28 (batch claim, pushed-claim discipline). P5 claimed in_progress 2026-07-28 pm (pushed-claim discipline). 2026-07-28 pm epic-close-out groom: +7 (G42-G44 Snowflake data-catalog seam from the loader plan; L18 comma-split bug, L19 doc-drift sweep, D8 bootstrap guard, J17 gates.json ritual — all from same-day inbox lines), U5 executed in-run (-1, Epic U closed 6/6); prior: U4 closed 2026-07-28 pm (right after U6 unblocked it); U6 groomed + built + closed same day (net 0); +4 at the 2026-07-28 inbox groom (C19 ontology-comment fix, J16 port-manifest fall-through guard, L17 doc-loader prereq guards, O34 web npm advisories); all four closed same day (O34 via its stop clause), L16 closed alongside; +5 2026-07-27 groom (J14/J15/G36/O33/G38), +2 PAT review (C17/C18), +5 code-graph-review (U1-U5), +2 cmdline seam (G39/G40, built+closed same day)
   in_progress: 1                                   # E1 (gate deferred both sides). O35-O41 UI sweep claimed + closed 2026-07-29 same session. + old-note: batch claim 2026-07-29 (pushed-claim discipline; O39 rides its O38 dep inside the sweep). G46/G47/G48 — the whole XML-fed resolution chain — claimed + closed 2026-07-29 same session. G42 claimed + closed 2026-07-28 same session. 2026-07-28 evening batch claim fully closed: J20, R10, C20, G45 all done same evening
   blocked: 0
   done: 182                                        # 2026-07-29 UI sweep O35-O41: O36 root cause = unlayered *{padding:0} reset out-cascading layered Tailwind utilities (preflight keeps the reset; box-sizing only retained); O37 radius tokens (lg collapsed onto md=10px, App.css/index.css radii tokenized); O41 status-vocab map + O38 IdChip/StageBadge convention (UI-WIP/ui-conventions.md) adopted inspector+loads; O39 runtime-view env-template slot (mechanism only, renders nothing unset); O40 StatTiles click-to-filter live on loads (Failed tile 4->1 verified); O35 category-first landing per SME FB-01/FB-02 (hub demoted, name renders once, modules+towers pick-lists, data-wf keys kept). Both themes screenshot-checked; build+lint green container AND device. # 2026-07-29: G48 resolve-cmdline-staging (store v3 + resolution_quality provenance; verbatim-beside-derived; precedence evidence counted never ruled), G47 controlm-xml-export seam (taxonomy-first defs+ordered-variables staging, scope_layers handoff proven against the resolver), G46 resolve_command_line on the shared resolver (one scope-chain walk, substitution provenance with winning scope, %%VAR-launcher round-trip proven). 2026-07-28 late: G42 Snowflake data-catalog seam (source registered + catalog_dir landing zone + SnowflakeCatalogExtractor staging both views, three-shape discrimination, sentinel counted, latest-per-GUID, origin routing, urn fact column; G43 cross-checks unblocked). Earlier 2026-07-28 evening: G45 rua listing fallback (presence dispatch, 561-script company incident's producer parity), C20 K4-comment re-scope (SEAL-loader-specific deprecation; live catalog writers named), R10 agent-runtime alignment (google-adk pinned >=2,<3 + ADR 0007 revisit date-stamp), J20 one-render-entry-point part 2 (matrix rides the default board render). Earlier: C16 key-prefix governance in the metadata plan (drydocs./system/team-local classes), C15 inverse_label on all 78 vocab entries (presentational only, schema-test enforced), L18 depth-0 cell split (the K2 shear healed; conformance guard over the real matrices), D8 bootstrap constraint guard (names-not-counts presence check after apply, live 51/51), J17 gates.json folded into the default-paths board render (drift closed at the ritual level). Earlier 2026-07-28 pm: P5 maintenance-window query (patch-window CLI + union-not-sum window math + findings feeder; claimed-then-closed same day — EPIC P COMPLETE 5/5), U5 groom-skill graph cross-check subsection (executed inside the close-out groom — EPIC U COMPLETE 6/6), U4 tech-debt graph-evidence section (hardened A1-A6 pack + offline fallback, all probes run live), U6 depgraph scanner blind-spot fix (shared-namespace extract_many + drydocs_api root; 205 modules / 370 IMPORTS, all 24 U1 orphan false-positives resolved). Earlier 2026-07-28: G41 glue base-table inventory seam (built + closed same day), L17 doc-loader prereq guards (same), O33 SchemaMeta exemplar audit (22 specs + runs_on write path; live-proven), O34 npm advisories (postcss cleared; react-router escalated via the stop clause), U1/U2/U3 code-graph persona reviews run 1 (scanner blind-spot headline; backlog verified truthful; doc board + citation sweep queued), C19 ontology-comment fix (groomed + closed same day), J16 port-manifest fall-through guard (same), L16 runbook container/port refresh. 2026-07-27 closes: J14 SEALID split, P3 hosts+RUNS_ON, G21 rua code-ops, G24 code-repo seam, G26 launcher-registry config, Q8 bmc-docs prereq, C18 shadow-model guard, J15 value-shape boundary guard, G33 code-snapshot loader (gate signed + built same day), G39 cmdline staging store + G40 parse (groomed am, built pm)
-  next_ready: [N3, M3, M4, J10, Q6, O23, J13, O26, O27, C17, O28, R3, R4, O29, O30, O31, O32, S1, S8, S9, Q7, G32, G34, G35, G22, G43, L19, B5, R9, J18, J19, L20, L21]
+  next_ready: [N3, M3, M4, J10, Q6, O23, J13, O26, O27, C17, O28, R3, R4, O29, O30, O31, O32, S1, S8, S9, Q7, G32, G34, G35, G22, G43, L19, B5, R9, J18, J19, L20, L21, V1]
+  # 2026-07-29 groom: V1 dependency-free -> next_ready; V2-V10 wait on V1's
+  # coverage-map dispositions (extend-vs-author decisions), so they stay out.
   # 2026-07-28 pm post-UI-merge groom: all 15 new items dependency-free except
   # O39 (waits on O38's IdChips — the link surface). O37 coordinates with O30
   # informally (no hard dependency; whichever lands second re-verifies).
