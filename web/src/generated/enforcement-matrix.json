@@ -287,7 +287,7 @@
       ],
       "gate_ref": "(is the gate record)",
       "status": "gate-pending",
-      "pending_entries": 68,
+      "pending_entries": 73,
       "env_refs": [],
       "files": [
         "config/gate-prompts/airflow-crosswalk.yaml",
@@ -303,6 +303,7 @@
         "config/gate-prompts/etlprocess-kind-enum.yaml",
         "config/gate-prompts/platforms-taxonomy.yaml",
         "config/gate-prompts/product-cabinet-attribution.yaml",
+        "config/gate-prompts/rua-load-shapes.yaml",
         "config/gate-prompts/seal-app-ref-edge-reshape.yaml",
         "config/gate-prompts/seal-attribution-match-policy.yaml",
         "config/gate-prompts/seal-tom-attribution-reshape.yaml",

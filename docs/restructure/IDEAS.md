@@ -26,6 +26,27 @@ Tags help grooming: `idea` · `bug` · `doc` · `source` (new data source) · `q
 
 <!-- add new ideas at the top -->
 
+- 2026-07-28 — [question] **Is `constraints.cypher`'s "deprecated by K4" comment under-scoped?**
+  Line 53 heads `role_name` / `role_id` / `membership_id` with "Reified Membership pattern
+  (W3C ORG) — deprecated by K4; kept for old graphs", but all three are actively WRITTEN today:
+  `catalog_ontology_supplement.cypher` seeds the canonical `:Role` rows (11+, from `MERGE (n:Role
+  {name: ...})`) and `drydocs/loaders/cypher/pat_team_roles.cypher:24` MERGEs `:Membership`. K4
+  deprecated the pattern *in the SEAL loaders* specifically, so the comment is most likely
+  under-scoped rather than stale — but "kept for old graphs" is the exact phrase the 2026-07-23
+  C13 sweep retired elsewhere as void (graphs are rebuilt from bootstrap, not migrated), so it
+  should not be left ambiguous. Noticed 2026-07-28 while checking the producer for the company's
+  AIS "supplement applied" bug (commit `87ba693`); deliberately NOT fixed there — it is a
+  K4-scope question for whoever owns that follow-up, not a straggler from the scheduler_kind sweep.
+
+- 2026-07-28 — [chore] **The stale-render check earns its place — it fired on a real drift today.**
+  `49667dd` (concurrent desktop session) added `config/gate-prompts/rua-load-shapes.yaml` and
+  regenerated `gates.json` but NOT `enforcement-matrix.json`, which also reads the gate-prompts
+  tree (`pending_entries` 68 → 73 + the new file in the surface's source list). Caught by the
+  CLAUDE.md §0 re-render-then-diff step and swept in the same session. Worth asking whether the
+  two renders should be driven by ONE entry point the way a default-paths `render_board.py` run
+  already refreshes `gates.json` (J17) — a second render that a contributor must remember
+  separately is the same shape of defect J17 closed.
+
 - 2026-07-28 — [bug] **Back-flow candidate: `rua_inventory` silently drops every script when a
   bundle ships the metadata-only `scripts.csv` listing — producer extractor reads `scripts.tsv`
   only** (confirmed live: `drydocs_lineage/extractors/rua_inventory.py:55` declares SCRIPTS_TSV
