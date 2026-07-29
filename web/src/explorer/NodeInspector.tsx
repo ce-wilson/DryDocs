@@ -3,6 +3,7 @@ import type { Persona } from '../lib/auth'
 import { canDrill } from '../lib/views'
 import { TOWERS } from '../data/towers'
 import { connectionsOf, KIND_TOKEN, type NodeKind, type Selection } from './demoGraph'
+import IdChip, { StageBadge } from '../components/ui/IdChip'
 
 // The right-sidebar node inspector (O9, wf-module-subpage-01 annotation 2):
 // content variant keyed by node type. Fed into the shell's RightSidebarSlot by
@@ -52,11 +53,31 @@ export default function NodeInspector({ selection, persona, onSelect }: {
 
       <p className="text-xs text-muted">{KIND_BLURB[selection.kind]}</p>
 
+      {selection.kind === 'S3Stage' && (
+        // DL-11a: the medallion stage vocabulary renders as flat mono badges
+        // (the same words both neighboring tools use), never prose-only.
+        <div className="flex flex-wrap items-center gap-1" aria-label="Medallion stages">
+          <StageBadge stage="RAW" />
+          <span className="text-[10px] text-faint">→</span>
+          <StageBadge stage="TRUSTED" />
+          <span className="text-[10px] text-faint">→</span>
+          <StageBadge stage="REFINED" />
+          <span className="text-[10px] text-faint">→</span>
+          <StageBadge stage="SNOWFLAKE" />
+        </div>
+      )}
+
       <dl className="grid grid-cols-[auto_1fr] gap-x-3 gap-y-1 text-xs">
         <dt className="text-faint">Tower</dt>
         <dd className="text-text">{tower.title}</dd>
         <dt className="text-faint">Node id</dt>
-        <dd className="font-mono text-muted">{selection.id}</dd>
+        <dd>
+          {/* O38 IdChip convention; O39: grows a runtime-view link once the env template is set */}
+          <IdChip
+            id={selection.id}
+            runtimeKind={selection.kind === 'ControlMJob' || selection.kind === 'EtlJob' ? 'job' : 'dataset'}
+          />
+        </dd>
         <dt className="text-faint">Provenance</dt>
         <dd className="font-mono text-[10px] text-yellow">SYNTHESIZED · illustrative</dd>
       </dl>

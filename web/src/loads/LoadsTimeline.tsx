@@ -1,6 +1,7 @@
 import type { RunRow } from './demoLoads'
 import StatusChip from '../components/ui/StatusChip'
 import Meter from '../components/ui/Meter'
+import IdChip from '../components/ui/IdChip'
 
 // The /loads canvas (O16, site-plan §3 row 8): loader → :JobRun provenance as
 // a run TIMELINE — dot-and-rail vertical list, newest first, status colored
@@ -8,9 +9,16 @@ import Meter from '../components/ui/Meter'
 // frame linking, the Explorer contract).
 
 function statusToken(status: RunRow['status']): string {
-  // FAILED = --status-fail-soft (text-safe in both themes), not --red — red is
-  // brand-only per DL-2 (internal/datalens-reference/continuity.md).
-  return status === 'COMPLETED' ? '--green' : status === 'FAILED' ? '--status-fail-soft' : '--yellow'
+  // The shared status vocabulary (O41 / DL-12, UI-WIP/ui-conventions.md §1):
+  // COMPLETED/Ready → green · FAILED → status-fail-soft (never brand --red,
+  // DL-2) · STARTED/Processing → teal · anything pending-shaped → yellow.
+  return status === 'COMPLETED'
+    ? '--green'
+    : status === 'FAILED'
+      ? '--status-fail-soft'
+      : status === 'STARTED'
+        ? '--teal'
+        : '--yellow'
 }
 
 export default function LoadsTimeline({
@@ -34,7 +42,7 @@ export default function LoadsTimeline({
         <span className="text-xs font-medium text-muted">Run timeline · newest first</span>
         <StatusChip count={completed} label="completed" token="--green" glyph="✔" />
         <StatusChip count={failed} label="failed" token="--status-fail-soft" glyph="✗" />
-        {other > 0 && <StatusChip count={other} label="running" token="--yellow" glyph="~" />}
+        {other > 0 && <StatusChip count={other} label="running" token="--teal" glyph="~" />}
         {runs.length > 0 && (
           // DL-4: run-completion meter — green only when every run completed;
           // any failed/running run drops it below threshold and it reads fail-rose.
@@ -73,7 +81,7 @@ export default function LoadsTimeline({
               >
                 <div className="flex flex-wrap items-center gap-2">
                   <span className="text-xs font-semibold text-text">{r.loader}</span>
-                  <span className="font-mono text-[10px] text-faint">{r.source}</span>
+                  <IdChip id={r.source} title={`source: ${r.source}`} />
                   <span className="ml-auto rounded border px-1.5 py-0.5 font-mono text-[10px]" style={{ borderColor: `var(${token})`, color: `var(${token})` }}>
                     {r.status}
                   </span>
@@ -89,7 +97,10 @@ export default function LoadsTimeline({
                   {r.nodes_marked_removed > 0 && <span className="text-status-fail-soft">marked-removed {r.nodes_marked_removed}</span>}
                   {r.nodes_reactivated > 0 && <span>reactivated {r.nodes_reactivated}</span>}
                 </div>
-                <div className="mt-0.5 break-all font-mono text-[9px] text-faint">{r.run_id}</div>
+                <div className="mt-0.5">
+                  {/* O38 IdChip convention + O39 runtime-view slot (renders a plain chip until the env template is set) */}
+                  <IdChip id={r.run_id} runtimeKind="run" />
+                </div>
               </button>
             </li>
           )
