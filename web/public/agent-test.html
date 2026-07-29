@@ -51,6 +51,14 @@
             padding:5px 9px; font:12px var(--mono); font-variant-numeric:tabular-nums; }
   .metric span { color:var(--faint); }
   footer { font:10.5px var(--mono); color:var(--faint); }
+  table.tl { width:100%; border-collapse:collapse; font:11.5px var(--mono); font-variant-numeric:tabular-nums; }
+  .tl th { text-align:left; color:var(--faint); font-weight:600; padding:3px 8px; border-bottom:1px solid var(--edge); text-transform:uppercase; letter-spacing:.05em; font-size:10px; }
+  .tl td { padding:4px 8px; border-bottom:1px solid var(--edge-soft); vertical-align:top; color:var(--text); }
+  .tl td.num { text-align:right; }
+  .tl .bar { height:5px; border-radius:3px; background:var(--edge-soft); min-width:60px; }
+  .tl .bar i { display:block; height:100%; border-radius:3px; background:var(--blue-br); }
+  .thought { color:var(--faint); font-style:italic; white-space:pre-wrap; }
+  .kind-thought { color:var(--yellow); } .kind-tool { color:var(--teal); } .kind-text { color:var(--muted); }
 </style>
 </head>
 <body>
@@ -83,8 +91,15 @@
   <section id="s1"><h2>1 · How the input was interpreted</h2><pre id="p1"></pre></section>
   <section id="s2"><h2>2 · Cypher</h2><pre class="mono" id="p2"></pre></section>
   <section id="s3"><h2>3 · Return path</h2><pre class="mono" id="p3"></pre></section>
-  <section id="s4"><h2>4 · Answer</h2><pre id="p4"></pre></section>
-  <section id="s5"><h2>5 · Metrics</h2><div class="metrics" id="p5"></div></section>
+  <section id="s6"><h2>4 · Agent timeline — thinking &amp; context per stage</h2>
+    <div style="overflow-x:auto"><table class="tl"><thead><tr>
+      <th>#</th><th>author</th><th>kind</th><th>content</th>
+      <th style="text-align:right">ctx in (tok)</th><th>out (tok)</th><th>think (tok)</th><th>context growth</th>
+    </tr></thead><tbody id="p6"></tbody></table></div>
+    <pre id="p6note" style="margin-top:6px;font:10.5px var(--mono);color:var(--faint)"></pre>
+  </section>
+  <section id="s4"><h2>5 · Answer</h2><pre id="p4"></pre></section>
+  <section id="s5"><h2>6 · Metrics</h2><div class="metrics" id="p5"></div></section>
 
   <footer>ships in web/dist via web/public · live = ADK api_server (list-apps → session → run) · ADK down = SYNTHESIZED demo trace, tagged · company port binds the real ADK URL, zero edits here</footer>
 </main>
@@ -96,14 +111,29 @@
       cypher: 'MATCH (j:ControlMJob {name: $name})<-[:WAS_INFORMED_BY*1..3]-(up)\nRETURN up.name AS dependent, labels(up) AS kind\nORDER BY dependent',
       path: 'router → text2cypher → read-only executor → 12 rows (:ControlMJob ×9, :EtlJob ×3) → summarizer',
       answer: '12 upstream dependents found within 3 hops; 9 Control-M jobs and 3 ETL jobs. Deepest chain length 3. (SYNTHESIZED example answer.)',
-      metrics: [['54','chars in'],['208','chars out'],['2','model calls'],['12','rows'],['~180ms','latency']]
+      metrics: [['54','chars in'],['208','chars out'],['2','model calls'],['12','rows'],['~180ms','latency'],['~3.4k','ctx tok @ final'],['~210','think tok']],
+      timeline: [
+        { author:'router', kind:'thought', content:'Fan-in phrasing → upstream traversal, not fulltext. Anchor entity looks like a job name.', prompt:812, out:41, think:96 },
+        { author:'router', kind:'text', content:'route=GRAPH-NAV depth≤3 upstream', prompt:812, out:18, think:0 },
+        { author:'text2cypher', kind:'thought', content:'WAS_INFORMED_BY is the confirmed dependency edge; bound $name, cap depth at 3 per route.', prompt:2140, out:52, think:114 },
+        { author:'text2cypher', kind:'tool', content:'run_readonly_cypher(...)', prompt:2140, out:0, think:0 },
+        { author:'executor', kind:'text', content:'12 rows returned', prompt:0, out:0, think:0 },
+        { author:'summarizer', kind:'text', content:'final answer drafted from row sample', prompt:3390, out:97, think:0 }
+      ],
+      tlnote: 'SYNTHESIZED shape — ctx-in = promptTokenCount per model call (the context size at that stage); executor is a tool step, no model call.'
     },
     docs: {
       interpretation: 'Routed as DOCS / exact-lookup. Term detected → full-text index probe first, graph traversal fallback. (SYNTHESIZED — docmeta-qa demo shape from the P0 benchmark.)',
       cypher: "CALL db.index.fulltext.queryNodes('chunk_text', $term)\nYIELD node, score\nMATCH (node)<-[:CONTAINS]-(d:Document)\nRETURN d.title, node.heading, score LIMIT 3",
       path: 'router → fulltext top-3 → chunk fetch (~1.3k chars) → answer with citation',
       answer: 'Definition returned from the vendor corpus with document + heading citation. (SYNTHESIZED example answer; live equivalent averaged ~52ms in the P0 benchmark.)',
-      metrics: [['31','chars in'],['1,312','chars out'],['1','model calls'],['3','chunks'],['~52ms','latency']]
+      metrics: [['31','chars in'],['1,312','chars out'],['1','model calls'],['3','chunks'],['~52ms','latency'],['~1.9k','ctx tok @ final'],['~60','think tok']],
+      timeline: [
+        { author:'router', kind:'thought', content:'Single term, definition-shaped → fulltext first.', prompt:640, out:12, think:60 },
+        { author:'router', kind:'tool', content:'fulltext_query(chunk_text, $term)', prompt:640, out:0, think:0 },
+        { author:'answerer', kind:'text', content:'answer + citation from top chunk', prompt:1905, out:88, think:0 }
+      ],
+      tlnote: 'SYNTHESIZED shape — live values come from usageMetadata on each ADK event.'
     }
   };
   var $ = function (id) { return document.getElementById(id); };
@@ -118,6 +148,25 @@
     $('p2').textContent = trace.cypher;
     $('p3').textContent = trace.path;
     $('p4').textContent = trace.answer;
+    var tb = $('p6'); tb.innerHTML = '';
+    var rows = trace.timeline || [];
+    var maxCtx = rows.reduce(function (a, r) { return Math.max(a, r.prompt || 0); }, 0) || 1;
+    rows.forEach(function (r, i) {
+      var tr = document.createElement('tr');
+      function td(txt, cls) { var d = document.createElement('td'); if (cls) d.className = cls; d.textContent = txt; return d; }
+      tr.appendChild(td(String(i + 1), 'num'));
+      tr.appendChild(td(r.author || '?'));
+      tr.appendChild(td(r.kind, 'kind-' + r.kind));
+      var c = td('', r.kind === 'thought' ? 'thought' : ''); c.textContent = r.content; c.style.maxWidth = '340px'; tr.appendChild(c);
+      tr.appendChild(td(r.prompt ? r.prompt.toLocaleString() : '—', 'num'));
+      tr.appendChild(td(r.out ? r.out.toLocaleString() : '—', 'num'));
+      tr.appendChild(td(r.think ? r.think.toLocaleString() : '—', 'num'));
+      var bd = document.createElement('td'); var bar = document.createElement('div'); bar.className = 'bar';
+      var fill = document.createElement('i'); fill.style.width = Math.round(100 * (r.prompt || 0) / maxCtx) + '%';
+      bar.appendChild(fill); bd.appendChild(bar); tr.appendChild(bd);
+      tb.appendChild(tr);
+    });
+    $('p6note').textContent = trace.tlnote || '';
     var m = $('p5'); m.innerHTML = '';
     trace.metrics.forEach(function (kv) {
       var el = document.createElement('span');
@@ -126,7 +175,7 @@
       var lab = document.createElement('span'); lab.textContent = kv[1];
       el.appendChild(lab); m.appendChild(el);
     });
-    ['s1','s2','s3','s4','s5'].forEach(function (id) { $(id).style.display = 'block'; });
+    ['s1','s2','s3','s6','s4','s5'].forEach(function (id) { $(id).style.display = 'block'; });
   }
 
   function extractCypher(texts) {
@@ -158,15 +207,39 @@
       }).then(function (r) { if (!r.ok) throw new Error('run ' + r.status); return r.json(); });
       var ms = Math.round(performance.now() - t0);
       var texts = events.map(function (e) {
-        return ((e.content && e.content.parts) || []).map(function (p) { return p.text || ''; }).join('');
+        return ((e.content && e.content.parts) || []).map(function (p) { return p.thought ? '' : (p.text || ''); }).join('');
       }).filter(Boolean);
+      var timeline = [], sawUsage = false, thinkTotal = 0, lastCtx = 0;
+      events.forEach(function (e) {
+        var u = e.usageMetadata || e.usage_metadata || {};
+        var prompt = u.promptTokenCount || u.prompt_token_count || 0;
+        var out = u.candidatesTokenCount || u.candidates_token_count || 0;
+        var think = u.thoughtsTokenCount || u.thoughts_token_count || 0;
+        if (prompt || out) { sawUsage = true; lastCtx = prompt || lastCtx; }
+        thinkTotal += think;
+        var parts = (e.content && e.content.parts) || [];
+        var pushed = false;
+        parts.forEach(function (p) {
+          if (p.thought && p.text) { timeline.push({ author: e.author, kind: 'thought', content: p.text, prompt: prompt, out: 0, think: think }); pushed = true; }
+          else if (p.functionCall) { timeline.push({ author: e.author, kind: 'tool', content: (p.functionCall.name || 'tool') + '(…)', prompt: prompt, out: 0, think: 0 }); pushed = true; }
+          else if (p.functionResponse) { timeline.push({ author: e.author, kind: 'tool', content: (p.functionResponse.name || 'tool') + ' → response', prompt: 0, out: 0, think: 0 }); pushed = true; }
+          else if (p.text) { timeline.push({ author: e.author, kind: 'text', content: p.text.length > 160 ? p.text.slice(0, 157) + '…' : p.text, prompt: prompt, out: out, think: 0 }); pushed = true; }
+        });
+        if (!pushed) timeline.push({ author: e.author, kind: 'text', content: '(non-text event)', prompt: prompt, out: out, think: think });
+      });
       show({
         interpretation: texts[0] || '(no interpretation event)',
         cypher: extractCypher(texts),
         path: events.map(function (e) { return e.author || '?'; }).join(' → ') || '(no events)',
         answer: texts[texts.length - 1] || '(no text in final event)',
         metrics: [[String(q.length),'chars in'], [texts.join('').length.toLocaleString(),'chars out'],
-                  [String(events.length),'events'], [ms + 'ms','latency'], [app,'agent app']]
+                  [String(events.length),'events'], [ms + 'ms','latency'],
+                  [sawUsage ? lastCtx.toLocaleString() : 'n/a','ctx tok @ final'],
+                  [sawUsage ? thinkTotal.toLocaleString() : 'n/a','think tok'], [app,'agent app']],
+        timeline: timeline,
+        tlnote: sawUsage
+          ? 'ctx-in = promptTokenCount per model call (context size at that stage); think = thoughtsTokenCount. Thought rows appear only when the agent runs with include_thoughts enabled.'
+          : 'This agent did not report usageMetadata — token columns show —. Enable usage reporting (and include_thoughts for thinking rows) in the agent config.'
       }, true);
     } catch (e) {
       $('banner').textContent = 'ADK unreachable at ' + base + ' (' + (e && e.message ? e.message : e) + ') — showing the SYNTHESIZED demo trace instead.';
