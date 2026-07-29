@@ -13,6 +13,7 @@ import ConsoleRoute from './routes/ConsoleRoute'
 import MappingsRoute from './routes/MappingsRoute'
 import LineageRoute from './routes/LineageRoute'
 import AdminConfigRoute from './routes/AdminConfigRoute'
+import AgentTestRoute from './routes/AgentTestRoute'
 import LoadsRoute from './routes/LoadsRoute'
 import RunbooksRoute from './routes/RunbooksRoute'
 import RemediationRoute from './routes/RemediationRoute'
@@ -71,10 +72,22 @@ export default function App() {
         <Route path="remediation" element={<RemediationRoute />} />
         <Route path="docs" element={<DocsRoute persona={persona} />} />
         <Route path="docs/document/:docId" element={<DocsRoute persona={persona} />} />
-        <Route path="gates" element={<GatesRoute />} />
+        {/* FB-03: SME designation (steward+admin) from the module registry */}
+        <Route
+          path="gates"
+          element={persona.role === 'steward' || persona.role === 'admin' ? <GatesRoute /> : <Navigate to="/" replace />}
+        />
         <Route path="loads" element={<LoadsRoute persona={persona} />} />
         <Route path="loads/run/:runId" element={<LoadsRoute persona={persona} />} />
-        <Route path="under-the-hood" element={<UnderTheHoodRoute />} />
+        <Route
+          path="under-the-hood"
+          element={persona.role === 'steward' || persona.role === 'admin' ? <UnderTheHoodRoute /> : <Navigate to="/" replace />}
+        />
+        {/* FB-04: admin real-time agent test harness (read-only, O20 stands) */}
+        <Route
+          path="admin/agent-test"
+          element={persona.role === 'admin' ? <AgentTestRoute /> : <Navigate to="/" replace />}
+        />
 
         {/* O13: steward + admin only — the server enforces the same boundary
             on /mappings/*; steward still has NO /console (Cypher sandbox). */}

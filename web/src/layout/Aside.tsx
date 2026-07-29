@@ -1,6 +1,6 @@
 import { NavLink } from 'react-router-dom'
 import type { Persona } from '../lib/auth'
-import { MODULES } from '../modules/registry'
+import { canAccessModule, MODULES } from '../modules/registry'
 import ModuleIcon from '../components/ModuleIcon'
 
 // The ASIDE zone: global module nav (site-plan §3's registry, one entry per
@@ -46,7 +46,8 @@ export default function Aside({
       <div className="my-1 border-t border-edge-soft" />
 
       <ul className="flex flex-1 flex-col gap-1">
-        {MODULES.map((m) => (
+        {/* FB-03: modules render only for personas their `access` designation admits */}
+        {MODULES.filter((m) => canAccessModule(m.access, persona.role)).map((m) => (
           <li key={m.id}>
             <NavLink to={m.path} className={({ isActive }) => navItemClass(isActive)} title={collapsed ? m.label : undefined}>
               <ModuleIcon id={m.id} className="h-5 w-5 shrink-0" />
@@ -56,6 +57,12 @@ export default function Aside({
         ))}
       </ul>
 
+      {persona.role === 'admin' && (
+        <NavLink to="/admin/agent-test" className={({ isActive }) => navItemClass(isActive)} title={collapsed ? 'Agent Test' : undefined}>
+          <span className="flex h-5 w-5 shrink-0 items-center justify-center font-mono text-[13px]" aria-hidden="true">⚗</span>
+          {!collapsed && <span>Agent Test</span>}
+        </NavLink>
+      )}
       {(persona.role === 'steward' || persona.role === 'admin') && (
         <NavLink to="/mappings" className={({ isActive }) => navItemClass(isActive)} title={collapsed ? 'Mappings' : undefined}>
           <span className="flex h-5 w-5 shrink-0 items-center justify-center" aria-hidden="true">⇄</span>

@@ -30,6 +30,23 @@ export interface ModuleDef {
   tabs: readonly string[]
   /** P0/P1/P2/P3 build phase (site-plan §3 "Phase" column) */
   phase: 1 | 2 | 3
+  /** Page designation (FB-2026-07-29-03): who the page is FOR.
+      'all' (default) | 'sme' (steward + admin) | 'admin'. Display/nav gating
+      only under mock auth — server enforcement arrives with the O1 ADR. */
+  access?: 'all' | 'sme' | 'admin'
+  /** Retrieval character: 'deterministic' (QuerySpec-backed; default) vs
+      'agent' (free-input, agent-interpreted — the non-deterministic modules
+      the /admin/agent-test harness exposes). */
+  retrieval?: 'deterministic' | 'agent'
+  /** Agent identity shown by the agent-test harness (only for retrieval:'agent'). */
+  agent?: string
+}
+
+/** FB-03 access check, one place: 'sme' admits steward+admin; 'admin' admits admin. */
+export function canAccessModule(access: ModuleDef['access'], role: 'user' | 'steward' | 'admin'): boolean {
+  if (!access || access === 'all') return true
+  if (access === 'sme') return role === 'steward' || role === 'admin'
+  return role === 'admin'
 }
 
 export const MODULES: readonly ModuleDef[] = [
@@ -46,6 +63,9 @@ export const MODULES: readonly ModuleDef[] = [
     // listed four tabs; these are the reviewed additions.
     tabs: ['Applications', 'Folders', 'App codes', 'Jobs', 'Conditions', 'Servers'],
     phase: 1,
+    retrieval: 'agent', // graph-nav Q&A over the drydocs graph (Epic R router target)
+    agent: 'graph-qa (ADK)',
+
   },
   {
     id: 'lineage',
@@ -95,6 +115,9 @@ export const MODULES: readonly ModuleDef[] = [
     backsOnto: 'docmeta',
     tabs: ['Documents', 'Chunks', 'Trust/provenance audit'],
     phase: 3,
+    retrieval: 'agent', // docmeta corpus Q&A — free-input, agent-interpreted (Epic R target)
+    agent: 'docmeta-qa (ADK)',
+
   },
   {
     id: 'gates',
@@ -104,6 +127,8 @@ export const MODULES: readonly ModuleDef[] = [
     backsOnto: 'HITL/review',
     tabs: ['Open gates', 'Signed off', 'Gate log'],
     phase: 3,
+    access: 'sme', // FB-03: gate reviews are the SME's surface
+
   },
   {
     id: 'loads',
@@ -126,6 +151,8 @@ export const MODULES: readonly ModuleDef[] = [
     // ModuleToolbar breadcrumb (like AssetPathRoute).
     tabs: ['Scoreboard', 'Strategies', 'Token tracker'],
     phase: 1,
+    access: 'sme', // FB-03: benchmark showcase — SME/admin audience, not end users
+
   },
 ]
 
