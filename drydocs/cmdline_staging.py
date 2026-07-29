@@ -22,12 +22,29 @@ Two steps, two CLI verbs:
     The variables caveat, precisely (amended 2026-07-28): folder/job
     VARIABLE columns stay out of scope — the variables pull into the graph
     is deferred exactly as the original G18→G22 plan sequenced it. RESOLVED
-    command lines, however, are IN scope as an input: an internal
-    (company-side) resolution query can substitute %%VARs and populate the
-    nullable ``cmd_line_resolved`` column after export. This module NEVER
-    resolves variables itself — ``cmd_line`` stays verbatim either way, and
-    the resolved value rides beside it, origin-flagged by its own column
-    (the O24 source-vs-derived discipline).
+    command lines, however, are IN scope as an input: the G48 resolve step
+    below (or an internal company-side resolution query) substitutes %%VARs
+    and populates the nullable ``cmd_line_resolved`` column after export.
+    The export itself NEVER resolves variables — ``cmd_line`` stays
+    verbatim either way, and the resolved value rides beside it,
+    origin-flagged (the O24 source-vs-derived discipline).
+
+``drydocs resolve-cmdline-staging`` (G48)
+    Populates ``cmd_line_resolved`` from XML-staged variables: the CLI
+    (composition root) extracts a Control-M XML definition export (G47 —
+    ``ControlMXmlDefsExtractor``) and hands the extract here duck-typed;
+    :func:`resolve_job_detail` joins its jobs to ``job_detail`` rows on
+    (data_center, folder_name, job_name) and resolves each STORE-VERBATIM
+    ``cmd_line`` through the ONE shared resolver
+    (:func:`drydocs_core.controlm.resolve_command_line` — guardrail 1:
+    substitution never happens here or in the extractor). ``cmd_line``
+    stays verbatim beside the derived value (guardrail 2), the
+    ``resolution_quality`` table records provenance per job (source,
+    substituted names + winning scope, unresolved residue, canonical
+    tokens), and every join/skip outcome is counted, never silent. The
+    XML job's own CMDLINE is compared but NEVER substituted for the
+    store's — a disagreement is COUNTED as evidence for the OPEN
+    psgmgr-vs-XML precedence ruling (guardrail 3), not resolved by code.
 
 ``drydocs parse-cmdline-staging`` (G40)
     Decomposes every stored cmd_line through the EXISTING machinery — the
@@ -60,10 +77,13 @@ from drydocs_core.data_root import source_dir
 
 LOGGER = logging.getLogger("drydocs.cmdline_staging")
 
-# v2 (2026-07-28): + job_detail.cmd_line_resolved (the internal resolution
-# query's landing column) and parse_quality.parsed_from. The store is derived
-# and rebuildable — a v1 file is refused by parse; re-run the export.
-SCHEMA_VERSION = "drydocs.cmdline-staging.v2"
+# v2 (2026-07-28): + job_detail.cmd_line_resolved (the resolution landing
+# column) and parse_quality.parsed_from.
+# v3 (2026-07-29, G48): + job_detail.folder_name (the XML join key — graph
+# j.parent_table) and the resolution_quality provenance table. The store is
+# derived and rebuildable — an older file is refused by resolve/parse;
+# re-run the export.
+SCHEMA_VERSION = "drydocs.cmdline-staging.v3"
 DB_FILENAME = "job_detail.db"
 
 RETIREMENT_NOTE = (
@@ -83,6 +103,7 @@ SELECT
     J.TABLE_ID           AS folder_id,
     J.JOB_ID             AS job_id,
     J.JOB_NAME           AS job_name,
+    J.PARENT_TABLE       AS folder_name,
     J.INSTANCE_NAME      AS data_center,
     J.TASK_TYPE          AS task_type,
     CASE WHEN J.IS_CURRENT_VERSION = 'Y' THEN 1 ELSE 0 END AS active,
@@ -104,6 +125,7 @@ MATCH (j:ControlMJob)
 RETURN j.folder_id     AS folder_id,
        j.job_id        AS job_id,
        j.job_name      AS job_name,
+       j.parent_table  AS folder_name,
        j.instance_name AS data_center,
        j.task_type     AS task_type,
        j.active        AS active,
@@ -126,6 +148,7 @@ CREATE TABLE IF NOT EXISTS job_detail (
   folder_id         TEXT NOT NULL,
   job_id            TEXT NOT NULL,
   job_name          TEXT,
+  folder_name       TEXT,      -- graph j.parent_table; the (dc, folder, job) XML join key (G48)
   data_center       TEXT,
   task_type         TEXT,       -- the job/task type discriminator
   active            INTEGER,    -- is_current_version = 'Y' (graph j.active)
@@ -152,6 +175,25 @@ CREATE TABLE IF NOT EXISTS job_detail_parsed (
   raw_command     TEXT,
   PRIMARY KEY (folder_id, job_id, seq),
   FOREIGN KEY (folder_id, job_id) REFERENCES job_detail (folder_id, job_id)
+);
+
+-- G48: per-job resolution provenance — the derived cmd_line_resolved value's
+-- origin story (which source supplied the bindings, what substituted from
+-- which winning scope, what stayed unresolved). One row per job_detail row
+-- on every resolve run; every outcome is a verdict, never silent.
+CREATE TABLE IF NOT EXISTS resolution_quality (
+  folder_id             TEXT NOT NULL,
+  job_id                TEXT NOT NULL,
+  verdict               TEXT NOT NULL
+      CHECK (verdict IN ('resolved','residue','nothing_to_substitute',
+                         'no_xml_match','ambiguous_match','no_cmd_line')),
+  resolution_source     TEXT,       -- origin flag (O24): which source's variables resolved this
+  matched_via           TEXT
+      CHECK (matched_via IN ('exact','dc_fallback') OR matched_via IS NULL),
+  substituted_json      TEXT,       -- [[name, winning scope], ...]
+  unresolved_json       TEXT,       -- user refs left visible in the resolved text
+  canonical_tokens_json TEXT,       -- {ODATE}-class runtime residue (expected, not failure)
+  PRIMARY KEY (folder_id, job_id)
 );
 
 -- G40: per-job verdict — every row accounted for, never silently dropped.
@@ -237,6 +279,7 @@ def export_job_detail(client, db_path: str | Path) -> ExportReport:
         conn.executescript(
             "DROP TABLE IF EXISTS job_detail_parsed;"
             "DROP TABLE IF EXISTS parse_quality;"
+            "DROP TABLE IF EXISTS resolution_quality;"
             "DROP TABLE IF EXISTS job_detail;"
             "DROP TABLE IF EXISTS meta;"
         )
@@ -247,10 +290,11 @@ def export_job_detail(client, db_path: str | Path) -> ExportReport:
                 task_type = row.get("task_type")
                 conn.execute(
                     "INSERT INTO job_detail (folder_id, job_id, job_name, "
-                    "data_center, task_type, active, cmd_line, cmd_line_resolved) "
-                    "VALUES (?, ?, ?, ?, ?, ?, ?, NULL)",
+                    "folder_name, data_center, task_type, active, cmd_line, "
+                    "cmd_line_resolved) "
+                    "VALUES (?, ?, ?, ?, ?, ?, ?, ?, NULL)",
                     (row.get("folder_id"), row.get("job_id"), row.get("job_name"),
-                     row.get("data_center"), task_type,
+                     row.get("folder_name"), row.get("data_center"), task_type,
                      None if row.get("active") is None else int(bool(row.get("active"))),
                      cmd),
                 )
@@ -270,16 +314,201 @@ def export_job_detail(client, db_path: str | Path) -> ExportReport:
                     "variables": "variable COLUMNS stay OUT OF SCOPE (the "
                                  "folder/job variables pull is deferred, "
                                  "G18->G22 plan) — but cmd_line_resolved is "
-                                 "the landing column for the INTERNAL %%VAR "
-                                 "resolution query (company-side); this "
-                                 "module never resolves, and re-export "
-                                 "clears the column (resolution re-runs "
-                                 "after each export)",
+                                 "the landing column for resolution: the "
+                                 "G48 resolve-cmdline-staging verb (XML-"
+                                 "staged variables through the ONE shared "
+                                 "resolver) or an internal company-side "
+                                 "%%VAR query. The export itself never "
+                                 "resolves, and re-export clears the column "
+                                 "AND resolution_quality (resolution "
+                                 "re-runs after each export)",
                 }.items()),
             )
     finally:
         conn.close()
     return report
+
+
+# ---------------------------------------------------------------------------
+# G48 — resolve: XML-staged variables → job_detail.cmd_line_resolved
+# ---------------------------------------------------------------------------
+
+@dataclass
+class ResolveCoverage:
+    """The resolve run's accounting — every job lands in a verdict bucket,
+    every join anomaly is counted, never silent."""
+
+    jobs: int = 0
+    resolved: int = 0               # column populated, no user refs left
+    residue: int = 0                # substitutions ran but %%refs remain visible
+    nothing_to_substitute: int = 0  # matched, but the cmd_line had nothing to do
+    no_xml_match: int = 0           # no XML job at the join key
+    ambiguous_match: int = 0        # >1 XML job at the key (subfolder twins) — skipped
+    no_cmd_line: int = 0
+    no_folder_name: int = 0         # store row without the join key (pre-v3 graph load)
+    dc_fallback_matches: int = 0    # store data_center empty — matched on (folder, job)
+    cmd_line_mismatch: int = 0      # XML CMDLINE != store cmd_line — precedence EVIDENCE, counted not ruled
+    substitutions: int = 0          # total variable names substituted
+    xml_jobs: int = 0
+
+    @property
+    def total(self) -> int:
+        return (self.resolved + self.residue + self.nothing_to_substitute
+                + self.no_xml_match + self.ambiguous_match + self.no_cmd_line)
+
+    def summary(self) -> str:
+        return (
+            f"resolution: resolved={self.resolved} residue={self.residue} "
+            f"nothing={self.nothing_to_substitute} "
+            f"no_match={self.no_xml_match} ambiguous={self.ambiguous_match} "
+            f"no_cmd_line={self.no_cmd_line} (of {self.jobs} jobs, "
+            f"{self.xml_jobs} xml jobs) | substitutions={self.substitutions} "
+            f"dc_fallback={self.dc_fallback_matches} "
+            f"no_folder_name={self.no_folder_name} "
+            f"cmd_line_mismatch={self.cmd_line_mismatch}"
+        )
+
+
+def resolve_job_detail(
+    db_path: str | Path,
+    xml_extract,
+    *,
+    source_name: str = "controlm-xml-export",
+) -> ResolveCoverage:
+    """Populate ``cmd_line_resolved`` from XML-staged variables (G48).
+
+    ``xml_extract`` is duck-typed (the module-boundary seam: the CLI
+    composition root extracts via ``drydocs_lineage``; this module imports
+    only core): it provides ``.jobs`` — records with ``data_center``,
+    ``folder_name``, ``job_name``, ``cmd_line`` — and ``.scope_layers(job)``
+    yielding the resolver's layers shape.
+
+    What is resolved is the STORE's verbatim ``cmd_line`` — the XML supplies
+    ONLY the variable bindings. When the XML job's own CMDLINE disagrees
+    with the store's, that is counted (``cmd_line_mismatch``) as measured
+    evidence for the open psgmgr-vs-XML precedence ruling, never decided
+    here. Re-runs are clean: the column and ``resolution_quality`` are
+    cleared first (deterministic — same store + same XML → same outcome).
+    NO graph writes.
+    """
+    from drydocs_core.controlm import resolve_command_line  # noqa: PLC0415
+
+    db_path = Path(db_path)
+    if not db_path.exists():
+        raise CmdlineStagingError(
+            f"staging store not found: {db_path} — run "
+            "`drydocs export-cmdline-staging` first (G39)"
+        )
+    conn = _connect(db_path)
+    coverage = ResolveCoverage()
+    try:
+        stored = conn.execute(
+            "SELECT value FROM meta WHERE key = 'schema_version'"
+        ).fetchone()
+        if stored is None or stored[0] != SCHEMA_VERSION:
+            raise CmdlineStagingError(
+                f"{db_path}: not a {SCHEMA_VERSION} store "
+                f"(schema_version={stored[0] if stored else 'MISSING'}) — "
+                "re-run `drydocs export-cmdline-staging`"
+            )
+
+        exact: dict[tuple[str, str, str], list] = {}
+        loose: dict[tuple[str, str], list] = {}
+        for xj in xml_extract.jobs:
+            coverage.xml_jobs += 1
+            exact.setdefault(
+                (xj.data_center, xj.folder_name, xj.job_name), []).append(xj)
+            loose.setdefault((xj.folder_name, xj.job_name), []).append(xj)
+
+        rows = conn.execute(
+            "SELECT folder_id, job_id, job_name, folder_name, data_center, "
+            "cmd_line FROM job_detail ORDER BY folder_id, job_id"
+        ).fetchall()
+        with conn:
+            conn.execute("UPDATE job_detail SET cmd_line_resolved = NULL")
+            conn.execute("DELETE FROM resolution_quality")
+            for folder_id, job_id, job_name, folder_name, data_center, cmd in rows:
+                coverage.jobs += 1
+                self_key = (folder_id, job_id)
+                if not cmd or not str(cmd).strip():
+                    coverage.no_cmd_line += 1
+                    _resolution(conn, self_key, "no_cmd_line", None, None)
+                    continue
+                if not folder_name or not str(folder_name).strip():
+                    coverage.no_folder_name += 1
+                    coverage.no_xml_match += 1
+                    _resolution(conn, self_key, "no_xml_match", source_name, None)
+                    continue
+                store_job = str(job_name) if job_name is not None else ""
+                candidates = exact.get(
+                    (str(data_center or ""), str(folder_name), store_job))
+                matched_via = "exact"
+                if candidates is None and not str(data_center or "").strip():
+                    candidates = loose.get((str(folder_name), store_job))
+                    matched_via = "dc_fallback"
+                if not candidates:
+                    coverage.no_xml_match += 1
+                    _resolution(conn, self_key, "no_xml_match", source_name, None)
+                    continue
+                if len(candidates) > 1:
+                    coverage.ambiguous_match += 1
+                    _resolution(conn, self_key, "ambiguous_match", source_name,
+                                matched_via)
+                    continue
+                if matched_via == "dc_fallback":
+                    coverage.dc_fallback_matches += 1
+                xj = candidates[0]
+                if xj.cmd_line and str(xj.cmd_line).strip() != str(cmd).strip():
+                    coverage.cmd_line_mismatch += 1
+                    LOGGER.warning(
+                        "job %s.%s: XML CMDLINE differs from the store's "
+                        "verbatim cmd_line — counted as precedence evidence, "
+                        "store text resolved", folder_id, job_id)
+
+                rcl = resolve_command_line(xml_extract.scope_layers(xj), str(cmd))
+                coverage.substitutions += len(rcl.substituted)
+                if rcl.resolved != rcl.raw:
+                    conn.execute(
+                        "UPDATE job_detail SET cmd_line_resolved = ? "
+                        "WHERE folder_id = ? AND job_id = ?",
+                        (rcl.resolved, folder_id, job_id),
+                    )
+                    verdict = "resolved" if rcl.is_fully_resolved else "residue"
+                elif rcl.unresolved:
+                    verdict = "residue"
+                else:
+                    verdict = "nothing_to_substitute"
+                if verdict == "resolved":
+                    coverage.resolved += 1
+                elif verdict == "residue":
+                    coverage.residue += 1
+                    LOGGER.warning(
+                        "job %s.%s: unresolved residue after XML resolution: "
+                        "%s", folder_id, job_id, ", ".join(rcl.unresolved))
+                else:
+                    coverage.nothing_to_substitute += 1
+                _resolution(
+                    conn, self_key, verdict, source_name, matched_via,
+                    substituted=list(rcl.substituted),
+                    unresolved=list(rcl.unresolved),
+                    tokens=list(rcl.canonical_tokens),
+                )
+    finally:
+        conn.close()
+    return coverage
+
+
+def _resolution(conn, key, verdict, source, matched_via, *,
+                substituted=None, unresolved=None, tokens=None) -> None:
+    conn.execute(
+        "INSERT INTO resolution_quality (folder_id, job_id, verdict, "
+        "resolution_source, matched_via, substituted_json, unresolved_json, "
+        "canonical_tokens_json) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
+        (key[0], key[1], verdict, source, matched_via,
+         json.dumps(substituted) if substituted else None,
+         json.dumps(unresolved) if unresolved else None,
+         json.dumps(tokens) if tokens else None),
+    )
 
 
 # ---------------------------------------------------------------------------

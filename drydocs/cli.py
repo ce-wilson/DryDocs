@@ -41,6 +41,9 @@ Ingest commands:
                                     TEMPORARY job-detail staging store (SQLite
                                     under DRYDOCS_DATA_ROOT; stand-in for the
                                     unbuilt psgmgr CM_DEF_VJOB_DETAIL table)
+  drydocs resolve-cmdline-staging — G48: XML-staged variables -> the store's
+                                    cmd_line_resolved column via the ONE
+                                    shared resolver (verbatim kept beside it)
   drydocs parse-cmdline-staging   — G40: staged cmd_lines -> structured detail
                                     columns (G26 registry + G15 DPL contract);
                                     NO graph writes — G22 gates any load
@@ -1035,6 +1038,64 @@ def export_cmdline_staging(
             "[yellow]0 jobs exported — the target database has no :ControlMJob "
             "rows (wrong DB, or controlm jobs not loaded?)[/]"
         )
+
+
+@app.command(name="resolve-cmdline-staging")
+def resolve_cmdline_staging(
+    db_path: Path | None = typer.Option(
+        None,
+        "--db-path",
+        help="Store location override (default: <DRYDOCS_DATA_ROOT>/cmdline-staging/job_detail.db).",
+    ),
+    xml_source: Path | None = typer.Option(
+        None,
+        "--xml-source",
+        help="Control-M XML export file or directory (default: <DRYDOCS_DATA_ROOT>/controlm-xml/).",
+    ),
+) -> None:
+    """G48: populate cmd_line_resolved from XML-staged variables.
+
+    Extracts a Control-M XML definition export (G47), joins its jobs to the
+    staged rows on (data_center, folder_name, job_name), and resolves each
+    STORE-VERBATIM cmd_line through the one shared resolver (G46) —
+    cmd_line stays untouched beside the derived value; resolution_quality
+    records the provenance per job. Run BEFORE parse-cmdline-staging so the
+    parse reads resolved text. NO graph writes — G22 remains the terminus.
+    """
+    from drydocs_core.data_root import controlm_xml_dir  # noqa: PLC0415
+    from drydocs_lineage.extractors import ControlMXmlDefsExtractor  # noqa: PLC0415
+
+    from .cmdline_staging import (  # noqa: PLC0415
+        CmdlineStagingError,
+        default_db_path,
+        resolve_job_detail,
+    )
+
+    path = Path(db_path) if db_path else default_db_path()
+    source = Path(xml_source) if xml_source else controlm_xml_dir()
+    if not source.exists():
+        console.print(f"[red]XML source not found: {source} — land an export "
+                      "in the controlm-xml/ landing zone or pass --xml-source[/]")
+        raise typer.Exit(2)
+    run_id = str(uuid.uuid4())
+    run_log = LoaderRunLog("cmdline_staging_resolve.v1", run_id,
+                           source=str(source), target=str(path))
+    run_log.open()
+    run_log.attach()
+    try:
+        extract = ControlMXmlDefsExtractor().extract(source)
+        coverage = resolve_job_detail(path, extract)
+    except CmdlineStagingError as exc:
+        run_log.close(error=exc)
+        console.print(f"[red]{exc}[/]")
+        raise typer.Exit(2) from exc
+    except Exception as exc:
+        run_log.close(error=exc)
+        raise
+    run_log.close(summary={"xml": extract.coverage.as_dict(),
+                           "resolution": coverage.__dict__})
+    console.print(extract.coverage.summary())
+    console.print(coverage.summary())
 
 
 @app.command(name="parse-cmdline-staging")
