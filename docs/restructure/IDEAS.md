@@ -26,6 +26,17 @@ Tags help grooming: `idea` · `bug` · `doc` · `source` (new data source) · `q
 
 <!-- add new ideas at the top -->
 
+- 2026-07-29 — [chore] **4 taxonomy-ontology-map entries cite source ids that are NOT
+  source-registry entries** — caught by the new N4 load-map render on its first run
+  (`map_entries_without_registry_source`): `job-seal-app-ref` →
+  `controlm-variable-normalization`, `seal-doc-source-of-record` → `seal-pat-scrape`,
+  `doc-traceability-feedback` → `design-doc-outline`, `dl-contact-point` → `outlook-dl`.
+  Each names a real-but-unregistered feed, so the fix per entry is either (a) register
+  the source (add-source-object walkthrough / a lighter registry stub) or (b) re-point
+  the entry's `taxonomy.source` at the registered feed it actually rides. Some look
+  deliberate (outlook-dl has no feed by design — the DL gate's store-as-source
+  discussion); rule per entry at grooming, don't sweep.
+
 - 2026-07-29 — [idea] **SME feedback FB-03/FB-04 — page role designation + admin Agent Test
   harness (both EXECUTED same day, retro-groom).** FB-03: pages need admin/SME designation —
   `ModuleDef.access` ('all'|'sme'|'admin') + `canAccessModule()` in the registry, aside-nav
