@@ -17,7 +17,11 @@
   -webkit-font-smoothing: antialiased;
 }
 
-* { box-sizing: border-box; margin: 0; padding: 0; }
+/* O36 root cause: this reset used to also zero margin/padding UNLAYERED, which
+   out-cascades every layered Tailwind utility (pl-6 etc. computed to 0 — the
+   loads rail dot overlapped loader names). Tailwind's preflight already resets
+   margin/padding inside @layer; only box-sizing is kept here. */
+* { box-sizing: border-box; }
 
 body { min-height: 100svh; }
 
@@ -38,7 +42,7 @@ input, select, textarea {
   color: inherit;
   background: var(--bg2);
   border: 1px solid var(--edge);
-  border-radius: 6px;
+  border-radius: var(--radius-sm); /* O37: inputs/small controls stay sm */
   padding: 0.35rem 0.5rem;
 }
 
@@ -54,7 +58,7 @@ input, select, textarea {
 /* React Flow (O9 Explorer graph pane): chrome routed through the theme tokens —
    site-plan §2 "graph canvases theme too" (CSS vars work inside SVG). */
 .react-flow { background: var(--bg2); }
-.react-flow__controls { box-shadow: none; border: 1px solid var(--edge); border-radius: 6px; overflow: hidden; }
+.react-flow__controls { box-shadow: none; border: 1px solid var(--edge); border-radius: var(--radius-sm); overflow: hidden; }
 .react-flow__controls-button {
   background: var(--panel);
   color: var(--muted);

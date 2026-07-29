@@ -14,7 +14,7 @@
   font: 500 11px var(--mono);
   color: var(--muted);
   border: 1px solid var(--edge);
-  border-radius: 20px;
+  border-radius: 999px /* pill tag — chip shape, not a card radius (O37) */;
   padding: 5px 12px;
   white-space: nowrap;
   overflow: hidden;
@@ -26,7 +26,7 @@
   font: 500 10.5px var(--mono);
   color: var(--yellow);
   border: 1px solid rgba(217, 184, 49, 0.5);
-  border-radius: 4px;
+  border-radius: var(--radius-xs);
   padding: 4px 9px;
   background: rgba(217, 184, 49, 0.08);
   white-space: nowrap;
@@ -35,7 +35,7 @@
 /* ── sign-in ───────────────────────────────────────────────────────────── */
 .signin-page { max-width: 520px; margin: 0 auto; padding: 12vh 30px 0; }
 .signin-page h1 { font-size: 34px; font-weight: 800; letter-spacing: -0.02em; margin-bottom: 18px; }
-.signin-panel { background: var(--panel); border: 1px solid var(--edge); border-radius: 10px; padding: 18px; }
+.signin-panel { background: var(--panel); border: 1px solid var(--edge); border-radius: var(--radius-md); padding: 18px; }
 .signin-head { display: flex; gap: 12px; align-items: center; }
 .signin-head h2 { font-size: 18px; font-weight: 600; }
 .note { color: var(--muted); font-size: 13px; margin-top: 8px; line-height: 1.55; }
@@ -49,14 +49,14 @@
   padding: 12px 14px;
   background: var(--bg2);
   border: 1px solid var(--edge);
-  border-radius: 9px;
+  border-radius: var(--radius-md);
   transition: border-color 0.15s;
 }
 .persona-card:hover { border-color: var(--faint); }
 .persona-card .persona-name { font-weight: 600; }
 .persona-card .persona-id { font-family: var(--mono); font-size: 12px; color: var(--blue-br); grid-row: 2; }
 .persona-card .persona-chip { font-size: 12px; color: var(--muted); grid-row: 3; grid-column: 1 / -1; }
-.role-badge { font: 600 10.5px var(--mono); text-transform: uppercase; padding: 3px 8px; border-radius: 4px; align-self: start; }
+.role-badge { font: 600 10.5px var(--mono); text-transform: uppercase; padding: 3px 8px; border-radius: var(--radius-xs); align-self: start; }
 .role-badge.role-user { border: 1px solid var(--blue-br); color: var(--blue-br); background: rgba(77, 139, 224, 0.1); }
 .role-badge.role-admin { border: 1px solid var(--status-fail); color: var(--status-fail-soft); background: color-mix(in srgb, var(--status-fail) 12%, transparent); } /* DL-2: danger ≠ brand red */
 
@@ -67,9 +67,9 @@
 .hero h2 { font-size: clamp(17px, 2.2vw, 23px); font-weight: 500; color: #b9c4d2; margin-top: 10px; }
 .hero .desc { font-size: 15.5px; color: var(--muted); margin-top: 20px; max-width: 400px; line-height: 1.65; }
 .hero-btns { display: flex; gap: 14px; margin-top: 30px; flex-wrap: wrap; }
-.btn-primary { background: var(--blue); color: #fff; font-weight: 600; font-size: 14px; padding: 12px 22px; border-radius: 8px; text-decoration: none; border: 1px solid var(--blue-br); }
+.btn-primary { background: var(--blue); color: #fff; font-weight: 600; font-size: 14px; padding: 12px 22px; border-radius: var(--radius-md); text-decoration: none; border: 1px solid var(--blue-br); }
 .btn-primary:hover { background: var(--blue-br); }
-.btn-ghost { color: #c8d2de; font-weight: 600; font-size: 14px; padding: 12px 22px; border-radius: 8px; text-decoration: none; border: 1px solid var(--edge); }
+.btn-ghost { color: #c8d2de; font-weight: 600; font-size: 14px; padding: 12px 22px; border-radius: var(--radius-md); text-decoration: none; border: 1px solid var(--edge); }
 .btn-ghost:hover { border-color: var(--faint); }
 .hero-art { width: 100%; height: auto; display: block; }
 
@@ -89,7 +89,7 @@
   display: block;
   background: var(--panel);
   border: 1px solid var(--edge);
-  border-radius: 10px;
+  border-radius: var(--radius-md);
   padding: 26px 18px 18px;
   text-align: center;
   text-decoration: none;
@@ -109,9 +109,9 @@
 /* ── drill-down / panels / tables (shared surface language) ────────────── */
 .d-bar { display: flex; align-items: center; gap: 14px; padding: 24px 0 16px; flex-wrap: wrap; }
 .d-bar h2 { font-size: 21px; font-weight: 700; }
-.back { font: 600 13px var(--sans); border: 1px solid var(--edge); border-radius: 7px; background: var(--panel); color: #c8d2de; padding: 8px 15px; text-decoration: none; }
+.back { font: 600 13px var(--sans); border: 1px solid var(--edge); border-radius: var(--radius-sm); background: var(--panel); color: #c8d2de; padding: 8px 15px; text-decoration: none; }
 .back:hover { border-color: var(--faint); }
-.btn-myapps { font: 600 13px var(--sans); border: 1px solid var(--blue); border-radius: 7px; background: rgba(46, 107, 196, 0.12); color: #9cc0f0; padding: 8px 15px; margin-left: auto; text-decoration: none; }
+.btn-myapps { font: 600 13px var(--sans); border: 1px solid var(--blue); border-radius: var(--radius-sm); background: rgba(46, 107, 196, 0.12); color: #9cc0f0; padding: 8px 15px; margin-left: auto; text-decoration: none; }
 .btn-myapps:hover { background: rgba(46, 107, 196, 0.25); }
 
 .d-top { display: grid; grid-template-columns: 1fr 1.15fr; gap: 16px; margin-bottom: 16px; }
@@ -122,7 +122,7 @@
 .rollup-panel { margin-bottom: 16px; }
 .rollup-panel .graphbox { max-width: 720px; margin: 0 auto; }
 
-.panel { border: 1px solid var(--edge); border-radius: 10px; overflow: hidden; background: var(--panel); }
+.panel { border: 1px solid var(--edge); border-radius: var(--radius-md); overflow: hidden; background: var(--panel); }
 .p-head { background: var(--panel2); border-bottom: 1px solid var(--edge); padding: 10px 14px; font-weight: 600; font-size: 13.5px; display: flex; justify-content: space-between; align-items: center; gap: 10px; }
 .p-head .m { font: 400 10.5px var(--mono); color: var(--muted); }
 
@@ -153,7 +153,7 @@ td:first-child { font-family: var(--sans); font-weight: 500; font-size: 12.5px; 
 .app-desc { font-size: 11.5px; color: var(--muted); margin: 3px 0 12px; }
 .app-card-foot { border-top: 1px solid var(--edge-soft); padding-top: 10px; font-size: 13px; }
 
-.badge-snow, .badge-pat { font: 500 9.5px var(--mono); padding: 3px 8px; border-radius: 4px; white-space: nowrap; }
+.badge-snow, .badge-pat { font: 500 9.5px var(--mono); padding: 3px 8px; border-radius: var(--radius-xs); white-space: nowrap; }
 .badge-snow-read { border: 1px solid var(--blue-br); color: var(--blue-br); background: rgba(77, 139, 224, 0.1); }
 .badge-snow-contribute { border: 1px solid var(--green); color: var(--green); background: rgba(58, 174, 107, 0.1); }
 .badge-snow-admin { border: 1px solid var(--status-fail); color: var(--status-fail-soft); background: color-mix(in srgb, var(--status-fail) 12%, transparent); } /* DL-2: danger ≠ brand red */
@@ -189,17 +189,17 @@ td:first-child { font-family: var(--sans); font-weight: 500; font-size: 12.5px; 
 main { display: block; }
 main.wrap { padding-bottom: 24px; }
 
-main > section { border: 1px solid var(--edge); border-radius: 10px; padding: 1rem; margin: 1rem 0; background: var(--panel); }
+main > section { border: 1px solid var(--edge); border-radius: var(--radius-md); padding: 1rem; margin: 1rem 0; background: var(--panel); }
 main > section h2 { font-size: 15px; font-weight: 600; margin-bottom: 6px; }
 
 .row { display: flex; gap: 0.5rem; align-items: center; flex-wrap: wrap; margin: 0.5rem 0; }
 textarea { width: 100%; font-family: var(--mono); }
-button.primary { border: 1px solid var(--blue-br); background: var(--blue); color: #fff; border-radius: 6px; padding: 0.35rem 0.9rem; font-weight: 600; }
+button.primary { border: 1px solid var(--blue-br); background: var(--blue); color: #fff; border-radius: var(--radius-sm); padding: 0.35rem 0.9rem; font-weight: 600; }
 button.primary:hover { background: var(--blue-br); }
-section button:not(.primary) { background: var(--bg2); border: 1px solid var(--edge); border-radius: 6px; padding: 0.35rem 0.7rem; }
+section button:not(.primary) { background: var(--bg2); border: 1px solid var(--edge); border-radius: var(--radius-sm); padding: 0.35rem 0.7rem; }
 section button:not(.primary):hover { border-color: var(--faint); }
 
 .status { font-size: 0.85rem; color: var(--muted); word-break: break-all; }
 .scroll { overflow-x: auto; max-height: 420px; overflow-y: auto; }
 
-pre { background: #0a111b; border: 1px solid var(--edge-soft); padding: 0.75rem; border-radius: 6px; font-size: 0.8rem; font-family: var(--mono); white-space: pre-wrap; word-break: break-word; }
+pre { background: #0a111b; border: 1px solid var(--edge-soft); padding: 0.75rem; border-radius: var(--radius-sm); font-size: 0.8rem; font-family: var(--mono); white-space: pre-wrap; word-break: break-word; }

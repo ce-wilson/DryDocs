@@ -118,6 +118,23 @@
   --font-mono: var(--mono);
 }
 
+/* O37 (DL-5, internal/datalens-reference/continuity.md) — radius scale.
+   --radius-sm = inputs/small controls (6px, the house radius until now);
+   --radius-md = cards/panels, softened toward the runtime monitor's shape
+   language (10px — deliberately the midpoint between DataLens ~16px and
+   DSI ~6px); --radius-lg collapses onto the md value so every existing
+   rounded-lg card surface lifts in one move. --radius-xs keeps the small
+   badge radius. Pill buttons and gradient headers remain explicitly NOT
+   adopted (the continuity doc's ruled-out list); rounded-full stays for
+   chips only (StatusChip). Plain-CSS radii in index.css/App.css resolve
+   through these same variables. */
+@theme {
+  --radius-xs: 4px;
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 10px;
+}
+
 /* Class-based dark variant (Tailwind v4 requires this opt-in explicitly —
    default v4 behavior is the `prefers-color-scheme` media query, which would
    ignore the boot script's explicit System/Dark/Light override). */
