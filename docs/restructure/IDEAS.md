@@ -26,6 +26,16 @@ Tags help grooming: `idea` · `bug` · `doc` · `source` (new data source) · `q
 
 <!-- add new ideas at the top -->
 
+- 2026-07-29 — [question] **psgmgr replica vs Control-M XML export: which source wins per
+  object when they disagree?** (Guardrail 3 of the XML-fed cmd-line resolution idea → G46/
+  G47/G48; the build fills a nullable derived column and decides NO source-of-truth
+  question.) Needs a config/precedence.yaml ruling + a named owner-and-sunset for the dual
+  definition path (the context-graph dual-ingestion tale's rule of thumb) — e.g. "XML
+  export is the definition SoR; the Oracle replica remains the runtime/stats feed", or
+  whatever is actually intended. Also touches T16: if XML becomes the standing feed, the
+  CM_DEF_VJOB_DETAIL retirement note gains a second path. HITL — user/SME rules this,
+  never a groom.
+
 - 2026-07-28 — [chore] **PARKED UNTIL AFTER THE PORT REVIEW: verify the `neo4j-drydocs` MCP
   server actually works now.** It requires APOC, and APOC was silently ABSENT from the
   `neo4jtest` container for weeks (`NEO4J_PLUGINS=[apoc]` set, `/plugins` empty — fixed
@@ -792,6 +802,12 @@ Tags help grooming: `idea` · `bug` · `doc` · `source` (new data source) · `q
 
 ## Recently groomed (audit trail)
 
+- 2026-07-29 — [idea] XML-fed CMD_LINE resolution (Control-M XML ingestion parses folder/job
+  variables → shared resolver populates the G39 store's cmd_line_resolved; three guardrails:
+  one-resolver-in-core, derived-beside-verbatim-with-provenance, precedence-before-first-
+  disagreement) → **G46** (resolver cmd-line API), **G47** (controlm-xml-export seam),
+  **G48** (resolve-cmdline-staging, v3 store); guardrail 3 stays in the inbox as the
+  precedence [question].
 - 2026-07-28 evening — [bug] rua_inventory silent scripts drop on metadata-only scripts.csv
   bundles (company fixed theirs same day; producer parity, mechanism-only) → **G45**.
 - 2026-07-28 evening — [question] constraints.cypher "deprecated by K4 — kept for old graphs"
