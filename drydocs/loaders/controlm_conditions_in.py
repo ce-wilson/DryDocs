@@ -20,6 +20,7 @@ from .base import BaseLoader, compute_row_checksum
 
 class ControlMConditionsInLoader(BaseLoader):
     name: ClassVar[str] = "controlm_conditions_in.v1"
+    source_id: ClassVar[str | None] = "controlm-psgmgr"
     cypher_path: ClassVar[Path | None] = (
         Path(__file__).resolve().parent / "cypher" / "controlm_conditions_in.cypher"
     )

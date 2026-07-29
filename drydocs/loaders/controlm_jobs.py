@@ -25,6 +25,7 @@ from .base import BaseLoader, compute_row_checksum
 
 class ControlMJobsLoader(BaseLoader):
     name: ClassVar[str] = "controlm_jobs.v1"
+    source_id: ClassVar[str | None] = "controlm-psgmgr"
     cypher_path: ClassVar[Path | None] = (
         Path(__file__).resolve().parent / "cypher" / "controlm_jobs.cypher"
     )

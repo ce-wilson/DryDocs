@@ -135,6 +135,15 @@ class BaseLoader:
     row_model: ClassVar[type[BaseModel] | None] = None
     source_label: ClassVar[str] = "csv"  # 'csv' | 'oracle' | 'agent' | 'human'
 
+    # ---- N3: the loader -> source join ----------------------------------
+    # The config/source-registry.yaml id this loader draws from. Declared on
+    # every concrete loader so loader -> source -> column-ledger is a
+    # traversal, not tribal knowledge; the D3 confirmed-gate and the load-map
+    # render both read it. None is legal ONLY for abstract bases and for
+    # loaders named in cli.SOURCELESS_LOADERS with a written reason
+    # (guarded by tests/unit/test_load_map_declarations.py).
+    source_id: ClassVar[str | None] = None
+
     # ---- D7: incremental-delete (soft-delete mark) opt-in ----------------
     # sweep_label names the node label whose population this loader's extract
     # DECLARES within scope — after a successful load, in-scope nodes the run

@@ -304,6 +304,7 @@ class EssentialGraphragAdapter:
 
 class EssentialGraphragLoader(BaseLoader):
     name: ClassVar[str] = "essential_graphrag.v1"
+    source_id: ClassVar[str | None] = "essential-graphrag"
     cypher_path: ClassVar[Path] = CYPHER_DIR / "essential_graphrag.cypher"
     row_model: ClassVar[type] = BookChunkRow
     source_label: ClassVar[str] = "pdf"

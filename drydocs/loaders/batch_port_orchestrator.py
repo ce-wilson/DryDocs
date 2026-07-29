@@ -138,6 +138,9 @@ class BatchPortOrchestratorLoader(BaseLoader):
     """
 
     name: ClassVar[str] = "batch_port_orchestrator.v1"
+    # The declared orchestrator string comes out of the SEAL taxonomy capture
+    # (business-application.yaml), so the seal-extract gate is the right gate.
+    source_id: ClassVar[str | None] = "seal-extract"
     cypher_path: ClassVar[Path] = CYPHER_DIR / "batch_port_orchestrator.cypher"
     row_model: ClassVar[type] = BatchPortOrchestratorRow
     source_label: ClassVar[str] = "taxonomy"

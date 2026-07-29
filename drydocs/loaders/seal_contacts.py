@@ -19,6 +19,7 @@ from .base import BaseLoader
 
 class SealContactsLoader(BaseLoader):
     name: ClassVar[str] = "seal_contacts.v1"
+    source_id: ClassVar[str | None] = "seal-extract"
     cypher_path: ClassVar[Path | None] = (
         Path(__file__).resolve().parent / "cypher" / "seal_contacts.cypher"
     )

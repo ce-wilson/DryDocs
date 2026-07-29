@@ -269,6 +269,7 @@ class BmcDocsLoader(BaseLoader):
     """
 
     name: ClassVar[str] = "bmc_docs.v1"
+    source_id: ClassVar[str | None] = "bmc-docs"
     cypher_path: ClassVar[Path] = CYPHER_DIR / "bmc_docs.cypher"
     row_model: ClassVar[type] = BmcDocChunkRow
     source_label: ClassVar[str] = "markdown"

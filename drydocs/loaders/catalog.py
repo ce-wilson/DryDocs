@@ -207,6 +207,7 @@ class PatTeamRoleRow(BaseModel):
 
 class CatalogLOBsLoader(BaseLoader):
     name: ClassVar[str] = "catalog_lobs.v1"
+    source_id: ClassVar[str | None] = "catalog-pat"
     cypher_path: ClassVar[Path | None] = _CYPHER / "catalog_lobs.cypher"
     row_model: ClassVar[type] = CatalogLOBRow
     source_label: ClassVar[str] = "oracle"
@@ -231,6 +232,7 @@ class CatalogLOBsLoader(BaseLoader):
 
 class ProductLinesLoader(BaseLoader):
     name: ClassVar[str] = "product_lines.v1"
+    source_id: ClassVar[str | None] = "catalog-pat"
     cypher_path: ClassVar[Path | None] = _CYPHER / "product_lines.cypher"
     row_model: ClassVar[type] = ProductLineRow
     source_label: ClassVar[str] = "oracle"
@@ -238,6 +240,7 @@ class ProductLinesLoader(BaseLoader):
 
 class ProductsLoader(BaseLoader):
     name: ClassVar[str] = "products.v1"
+    source_id: ClassVar[str | None] = "catalog-pat"
     cypher_path: ClassVar[Path | None] = _CYPHER / "products.cypher"
     row_model: ClassVar[type] = ProductRow
     source_label: ClassVar[str] = "oracle"
@@ -245,6 +248,7 @@ class ProductsLoader(BaseLoader):
 
 class DevTeamsLoader(BaseLoader):
     name: ClassVar[str] = "dev_teams.v1"
+    source_id: ClassVar[str | None] = "catalog-pat"
     cypher_path: ClassVar[Path | None] = _CYPHER / "dev_teams.cypher"
     row_model: ClassVar[type] = DevTeamRow
     source_label: ClassVar[str] = "oracle"
@@ -252,6 +256,7 @@ class DevTeamsLoader(BaseLoader):
 
 class AreaProductsLoader(BaseLoader):
     name: ClassVar[str] = "area_products.v1"
+    source_id: ClassVar[str | None] = "catalog-pat"
     cypher_path: ClassVar[Path | None] = _CYPHER / "area_products.cypher"
     row_model: ClassVar[type] = AreaProductRow
     source_label: ClassVar[str] = "pat"
@@ -259,6 +264,7 @@ class AreaProductsLoader(BaseLoader):
 
 class PatProductMappingLoader(BaseLoader):
     name: ClassVar[str] = "pat_product_mapping.v1"
+    source_id: ClassVar[str | None] = "catalog-pat"
     cypher_path: ClassVar[Path | None] = _CYPHER / "pat_product_mapping.cypher"
     row_model: ClassVar[type] = PatProductMappingRow
     source_label: ClassVar[str] = "pat"
@@ -266,6 +272,7 @@ class PatProductMappingLoader(BaseLoader):
 
 class PatTeamRolesLoader(BaseLoader):
     name: ClassVar[str] = "pat_team_roles.v1"
+    source_id: ClassVar[str | None] = "catalog-pat"
     cypher_path: ClassVar[Path | None] = _CYPHER / "pat_team_roles.cypher"
     row_model: ClassVar[type] = PatTeamRoleRow
     source_label: ClassVar[str] = "pat"

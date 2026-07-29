@@ -96,6 +96,10 @@ class ManualSealAttributionLoader(BaseLoader):
     """
 
     name: ClassVar[str] = "manual_seal_attribution.v1"
+    # Deliberately None: rows are SME-authored CSVs gated by
+    # config/manual-loads/manifest.yaml, not a source-registry feed — the
+    # named exemption lives in cli.SOURCELESS_LOADERS (N3).
+    source_id: ClassVar[str | None] = None
     cypher_path: ClassVar[Path | None] = (
         Path(__file__).resolve().parent / "cypher" / "manual_seal_attribution.cypher"
     )

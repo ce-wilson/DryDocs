@@ -76,6 +76,7 @@ class RegistryYamlAdapter:
 
 class SoftwareRegistryLoader(BaseLoader):
     name: ClassVar[str] = "software_registry.v1"
+    source_id: ClassVar[str | None] = "software-registry"
     cypher_path: ClassVar[Path] = CYPHER_DIR / "software_registry.cypher"
     row_model: ClassVar[type] = SoftwareProductRow
     source_label: ClassVar[str] = "registry"

@@ -86,24 +86,40 @@ def test_folder_sql_joins_header_row_for_application() -> None:
 def test_ingest_chain_order_is_enforced() -> None:
     """The ingest-controlm chain order (nodes before relationships; both
     folder-pass grouping labels before jobs; dependencies in a separate pass):
-    folders -> jobs -> conditions in/out -> derived dependencies."""
-    cli_src = (ROOT / "drydocs" / "cli.py").read_text(encoding="utf-8")
-    ingest = cli_src[cli_src.index("def ingest_controlm"):]
-    positions = [
-        ingest.index(f'("{stage}"')
+    folders -> jobs -> conditions in/out -> derived dependencies.
+
+    Since N3 the stages are module-level declarations the command body
+    consumes (cli.CONTROLM_*_STAGES), so order is asserted on the
+    declarations themselves rather than scanned out of the function text.
+    """
+    from drydocs import cli as drydocs_cli
+
+    chain = [
+        stage[0]
         for stage in (
-            "controlm_folders",
-            "controlm_jobs",
-            "controlm_conditions_in",
-            "controlm_conditions_out",
-            "controlm_hosts",
-            "controlm_dependencies_derived",
+            drydocs_cli.CONTROLM_NODE_STAGES
+            + drydocs_cli.CONTROLM_PART2_STAGES
+            + drydocs_cli.CONTROLM_REL_STAGES
         )
     ]
-    assert positions == sorted(positions), "ingest-controlm stage order drifted"
+    assert chain == [
+        "controlm_folders",
+        "controlm_jobs",
+        "controlm_conditions_in",
+        "controlm_conditions_out",
+        "controlm_hosts",
+        "controlm_dependencies_derived",
+    ], "ingest-controlm stage order drifted"
+    # The dependency pass must be alone in the deferred relationships phase
+    # (two-phase contract: cross-folder WAS_INFORMED_BY needs all nodes first).
+    assert [s[0] for s in drydocs_cli.CONTROLM_REL_STAGES] == [
+        "controlm_dependencies_derived"
+    ]
     # The derived RUNS_ON resolution pass runs after ALL staged loads —
     # it reads the graph, not staging, so it sits after the stage loop.
-    assert ingest.index("runs_on_resolution") > positions[-1]
+    cli_src = (ROOT / "drydocs" / "cli.py").read_text(encoding="utf-8")
+    ingest = cli_src[cli_src.index("def ingest_controlm"):]
+    assert ingest.index("runs_on_resolution") > ingest.index("for stage_name, cls,")
 
 
 def test_constraints_cover_folder_pass_labels() -> None:

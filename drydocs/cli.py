@@ -217,31 +217,134 @@ SQL_DIR = Path(__file__).resolve().parent / "loaders" / "sql"
 
 # Which source-registry entry each loader draws from. The confirmed-gate (D3)
 # uses this to refuse a loader whose source's crosswalk is not SME-confirmed.
+# DERIVED since N3: each loader class declares its own `source_id` — this dict
+# is a projection of those declarations, never hand-maintained (a re-hardcoded
+# entry here would be a drift bug; test_load_map_declarations guards the tie).
+# Note the bmc-docs nuance survives the derivation: until a source is
+# SME-confirmed, `_gate_source` fails fast (exit 2) — correct, not a bug.
 LOADER_SOURCE: dict[str, str] = {
-    "seal_applications":             "seal-extract",
-    "seal_contacts":                 "seal-extract",
-    "catalog_lobs":                  "catalog-pat",
-    "product_lines":                 "catalog-pat",
-    "products":                      "catalog-pat",
-    "dev_teams":                     "catalog-pat",
-    "area_products":                 "catalog-pat",
-    "pat_product_mapping":           "catalog-pat",
-    "pat_team_roles":                "catalog-pat",
-    "controlm_folders":              "controlm-psgmgr",
-    "controlm_jobs":                 "controlm-psgmgr",
-    "controlm_conditions_in":        "controlm-psgmgr",
-    "controlm_conditions_out":       "controlm-psgmgr",
-    "controlm_dependencies_derived": "controlm-psgmgr",
-    "controlm_hosts":                "controlm-psgmgr",
-    # This source id is registered by the dispatcher in parallel
-    # (config/source-registry.yaml); until it is SME-confirmed, `_gate_source`
-    # fails fast (exit 2) on `load-bmc-docs` — that is correct, not a bug.
-    "bmc_docs":                      "bmc-docs",
-    "essential_graphrag":            "essential-graphrag",
-    "doc_sections":                  "design-docs",
-    "doc_traceability":              "design-docs",
-    "doc_feedback":                  "design-docs",
+    cli_name: cls.source_id
+    for cli_name, cls in LOADER_REGISTRY.items()
+    if cls.source_id is not None
 }
+
+# ---- N3: the load map's three declared joins --------------------------------
+# (1) loader -> source_id lives ON each loader class (BaseLoader.source_id);
+# (2) command -> loaders, in run order, is COMMAND_LOADERS below (the chain
+#     constants are consumed by the command bodies, so the declaration cannot
+#     drift from behavior);
+# (3) the ONE canonical ordered load sequence is CANONICAL_LOAD_SEQUENCE.
+# All three are guarded by tests/unit/test_load_map_declarations.py and joined
+# into web/src/generated/load-map.json by the N4 render.
+
+# Loaders with deliberately NO source-registry id — every entry needs a written
+# reason (silent omissions are the defect this exists to end).
+SOURCELESS_LOADERS: dict[type, str] = {
+    ManualSealAttributionLoader: (
+        "SME-authored tier-5 mapping CSVs gated by config/manual-loads/"
+        "manifest.yaml (gate seal-attribution-match-policy §F) — a human "
+        "source with its own manifest governance, not a registry feed"
+    ),
+}
+
+# The M1 reference-refresh chain (weekly cadence): (cli name, loader class,
+# bundled sample filename). Order matters — hierarchy parents before children,
+# SEAL apps before contacts, mapping last.
+REFRESH_REFERENCE_CHAIN: tuple[tuple[str, type, str], ...] = (
+    ("catalog_lobs",        CatalogLOBsLoader,      "catalog_lobs__sample.csv"),
+    ("product_lines",       ProductLinesLoader,     "product_lines__sample.csv"),
+    ("products",            ProductsLoader,         "products__sample.csv"),
+    ("seal_applications",   seal_apps_mod.SealApplicationsLoader,
+                                                    "seal_application_data__sample.csv"),
+    ("seal_contacts",       seal_contacts_mod.SealContactsLoader,
+                                                    "seal_contact_data__sample.csv"),
+    ("dev_teams",           DevTeamsLoader,         "dev_teams__sample.csv"),
+    ("pat_product_mapping", PatProductMappingLoader, "pat_product_mapping__sample.csv"),
+)
+
+# The M3 ingest-controlm stages: (cli name, loader class, sample csv, sql file).
+# Order is enforced — jobs MATCH their parent folder; conditions MATCH their
+# parent job; the deferred dependency pass MATCHes both endpoints (two-phase
+# contract). PART2 extends NODE when --skip-part2 is not set.
+CONTROLM_NODE_STAGES: tuple[tuple[str, type, str, str], ...] = (
+    ("controlm_folders", ControlMFoldersLoader,
+     "controlm_folders__sample.csv", "controlm_folders.sql"),
+    ("controlm_jobs",    ControlMJobsLoader,
+     "controlm_jobs__sample.csv",    "controlm_jobs.sql"),
+)
+CONTROLM_PART2_STAGES: tuple[tuple[str, type, str, str], ...] = (
+    ("controlm_conditions_in",  ControlMConditionsInLoader,
+     "controlm_conditions_in__sample.csv",  "controlm_conditions_in.sql"),
+    ("controlm_conditions_out", ControlMConditionsOutLoader,
+     "controlm_conditions_out__sample.csv", "controlm_conditions_out.sql"),
+    # P3 host topology (gate controlm-hosts-topology): independent of
+    # folders/jobs — CM_HOSTS has no folder/owner/author grain, so the scope
+    # binds don't apply and the extract is always a full snapshot.
+    ("controlm_hosts",          ControlMHostsLoader,
+     "controlm_hosts__sample.csv",          "controlm_hosts.sql"),
+)
+CONTROLM_REL_STAGES: tuple[tuple[str, type, str, str], ...] = (
+    ("controlm_dependencies_derived", ControlMDependenciesDerivedLoader,
+     "controlm_dependencies__sample.csv", "controlm_dependencies_recursive.sql"),
+)
+
+# The L7 doc-traceability chain: (loader class, adapter class, which directory
+# option feeds it). Three passes in a fixed order — sections, then matrix rows
+# (sections MATCHed, never MERGEd), then feedback.
+DOC_TRACEABILITY_CHAIN: tuple[tuple[type, type, str], ...] = (
+    (DesignDocSectionsLoader, DesignDocSectionsAdapter,  "design"),
+    (DocTraceabilityLoader,   TraceabilityMatrixAdapter, "design"),
+    (DocFeedbackLoader,       DesignDocFeedbackAdapter,  "feedback"),
+)
+
+# (2) Command -> the loaders it runs, in order. Derived from the chain
+# constants above wherever a chain exists, so declaration == behavior.
+COMMAND_LOADERS: dict[str, tuple[type, ...]] = {
+    "refresh-reference":        tuple(cls for _, cls, _ in REFRESH_REFERENCE_CHAIN),
+    "ingest-controlm":          tuple(
+        cls for _, cls, *_ in
+        CONTROLM_NODE_STAGES + CONTROLM_PART2_STAGES + CONTROLM_REL_STAGES
+    ),
+    "load-software-registry":   (SoftwareRegistryLoader,),
+    "load-batch-orchestrators": (BatchPortOrchestratorLoader,),
+    "load-code-snapshot":       (CodeSnapshotLoader,),
+    "load-bmc-docs":            (BmcDocsLoader,),
+    "load-doc-traceability":    tuple(cls for cls, _, _ in DOC_TRACEABILITY_CHAIN),
+    "load-essential-graphrag":  (EssentialGraphragLoader,),
+    "load-seal-attribution":    (SealAttributionLoader,),
+    "load-manual-mappings":     (ManualSealAttributionLoader,),
+}
+
+# Loader-running commands that are OPERATOR-DRIVEN, not sequence members:
+# `load` runs any single LOADER_REGISTRY loader ad hoc; manual mappings load
+# when an SME authors one (manifest-gated), not on a refresh cadence.
+AD_HOC_COMMANDS: frozenset[str] = frozenset({"load", "load-manual-mappings"})
+
+# (3) THE canonical ordered load sequence — declared once; ingest.sh and the
+# startup/refresh runbook derive from it (N6 retires their independent copies).
+# mode: "standing" = every full refresh; "optional" = site/experiment decision;
+# "gated" = blocked on a source confirmation or precondition named in the note.
+CANONICAL_LOAD_SEQUENCE: tuple[tuple[str, str, str], ...] = (
+    ("check",                    "standing", "Neo4j + APOC reachable"),
+    ("bootstrap",                "standing", "constraints + ontology seed"),
+    ("apply-supplements",        "standing", "the ONE verified supplement chain (G29)"),
+    ("refresh-reference",        "standing", "catalog + SEAL + dev teams (M1)"),
+    ("ingest-controlm",          "standing", "folders -> jobs -> conditions -> derived deps (M3)"),
+    ("load-software-registry",   "standing", "vendor/product registry (plan 07)"),
+    ("load-batch-orchestrators", "optional",
+     "declared batch-port USES_SOFTWARE edges (C14); MATCH-only — needs the "
+     "SEAL chain and the software registry already loaded"),
+    ("load-bmc-docs",            "standing", "BMC corpus lexical graph"),
+    ("load-essential-graphrag",  "optional", "Q2 experiment -> ddcontext database"),
+    ("load-doc-traceability",    "optional", "L7 self-documentation (design docs + feedback)"),
+    ("load-code-snapshot",       "optional",
+     "G33 self-documentation; ritual-driven (newest committed snapshot)"),
+    ("load-seal-attribution",    "gated",
+     "stg-app-fact is confirmed:false producer-side; needs ingest-controlm + "
+     "refresh-reference first (gate §E preconditions)"),
+    ("m1-verify",                "standing", "M1 invariants"),
+    ("m3-verify",                "standing", "M3 invariants"),
+)
 
 
 # --- helpers -----------------------------------------------------------------
@@ -510,24 +613,14 @@ def refresh_reference(
     snapshot: bool = typer.Option(True),
 ) -> None:
     """M1 reference-refresh chain (catalog + SEAL + dev teams). Weekly cadence."""
-    # Confirmed-gate (D3): both feeds must be SME-confirmed before any write.
-    _gate_source("catalog-pat")
-    _gate_source("seal-extract")
-    chain = [
-        ("catalog_lobs",      CatalogLOBsLoader,             "catalog_lobs__sample.csv"),
-        ("product_lines",     ProductLinesLoader,            "product_lines__sample.csv"),
-        ("products",          ProductsLoader,                "products__sample.csv"),
-        ("seal_applications", seal_apps_mod.SealApplicationsLoader,
-                              "seal_application_data__sample.csv"),
-        ("seal_contacts",     seal_contacts_mod.SealContactsLoader,
-                              "seal_contact_data__sample.csv"),
-        ("dev_teams",         DevTeamsLoader,                "dev_teams__sample.csv"),
-        ("pat_product_mapping", PatProductMappingLoader,     "pat_product_mapping__sample.csv"),
-    ]
+    # Confirmed-gate (D3): every feed the chain touches must be SME-confirmed
+    # before any write — derived from the chain's own source_id declarations.
+    for source_id in sorted({cls.source_id for _, cls, _ in REFRESH_REFERENCE_CHAIN}):
+        _gate_source(source_id)
     with _client() as cli:
         bs = refresh_business_segments(cli)
         console.print(f"[cyan]Business segments active: {bs['codes']}[/]")
-        for nm, cls, sample_csv in chain:
+        for nm, cls, sample_csv in REFRESH_REFERENCE_CHAIN:
             sample = samples_dir / sample_csv
             if not sample.exists():
                 console.print(f"[yellow]No sample for {nm}; skipping.[/]"); continue
@@ -792,7 +885,7 @@ def load_software_registry(
     and wires DryDocs' own stack to the reserved :BusinessApplication node via
     USES_SOFTWARE. Idempotent — the YAML is the source of truth.
     """
-    _gate_source("software-registry")  # confirmed-gate before any DB write
+    _gate_source(SoftwareRegistryLoader.source_id)  # confirmed-gate before any DB write
     if not registry_path.exists():
         console.print(f"[red]Missing: {registry_path}[/]"); raise typer.Exit(1)
     adapter = RegistryYamlAdapter(registry_path)
@@ -823,7 +916,7 @@ def load_batch_orchestrators(
     `drydocs load-software-registry` first. Unmapped strings are REPORTED
     (flagged on the app node + listed below), never guessed.
     """
-    _gate_source("seal-extract")  # confirmed-gate before any DB write
+    _gate_source(BatchPortOrchestratorLoader.source_id)  # confirmed-gate before any DB write
     for path in (apps_path, platforms_path):
         if not path.exists():
             console.print(f"[red]Missing: {path}[/]"); raise typer.Exit(1)
@@ -888,7 +981,7 @@ def load_code_snapshot(
     discriminator is a positive assertion (meta present AND meta.tree == false;
     gate §G1(a) + the 2026-07-27 build note). abs_path never loads (§H4).
     """
-    _gate_source("depgraph-snapshot")  # confirmed-gate before any DB write
+    _gate_source(CodeSnapshotLoader.source_id)  # confirmed-gate before any DB write
     try:
         path = Path(file) if file else select_newest_snapshot(snapshot_dir)
         adapter = CodeSnapshotAdapter(path)
@@ -1156,7 +1249,7 @@ def load_bmc_docs(
     :SoftwareProduct via DESCRIBES (MATCH only — run
     `drydocs load-software-registry` first).
     """
-    _gate_source("bmc-docs")  # confirmed-gate before any DB write
+    _gate_source(BmcDocsLoader.source_id)  # confirmed-gate before any DB write
     if not corpus_dir.exists():
         console.print(f"[red]Missing: {corpus_dir}[/]"); raise typer.Exit(1)
     adapter = BmcDocsAdapter(corpus_dir)
@@ -1189,16 +1282,13 @@ def load_doc_traceability(
     when the author resolves to a real :Employee). Idempotent; fully
     deterministic parsing (no LLM).
     """
-    _gate_source("design-docs")  # confirmed-gate before any DB write
+    _gate_source(DesignDocSectionsLoader.source_id)  # confirmed-gate before any DB write
     if not design_dir.exists():
         console.print(f"[red]Missing: {design_dir}[/]"); raise typer.Exit(1)
+    dirs = {"design": design_dir, "feedback": feedback_dir}
     with _client() as cli:
-        for loader_cls, adapter in (
-            (DesignDocSectionsLoader, DesignDocSectionsAdapter(design_dir)),
-            (DocTraceabilityLoader, TraceabilityMatrixAdapter(design_dir)),
-            (DocFeedbackLoader, DesignDocFeedbackAdapter(feedback_dir)),
-        ):
-            loader = loader_cls(cli, adapter)
+        for loader_cls, adapter_cls, dir_key in DOC_TRACEABILITY_CHAIN:
+            loader = loader_cls(cli, adapter_cls(dirs[dir_key]))
             try:
                 summary = loader.load()
             except RuntimeError as exc:  # L17 prereq refusal — loud, exit 2
@@ -1240,7 +1330,7 @@ def load_essential_graphrag(
     vocabulary confirmed at the bmc-docs-lexical-load gate. The PDF is
     local-only (gitignored); the graph cites source_url.
     """
-    _gate_source("essential-graphrag")  # confirmed-gate before any DB write
+    _gate_source(EssentialGraphragLoader.source_id)  # confirmed-gate before any DB write
     if not pdf_path.exists():
         console.print(f"[red]Missing: {pdf_path} (the PDF is local-only/gitignored — "
                       "obtain it from the source_url in config/source-registry.yaml)[/]")
@@ -1272,7 +1362,7 @@ def load_seal_attribution(
     + pinned = eligible) are stamped on the :JobRun and reconciled by
     graph-tests/seal-attribution-coverage.yaml.
     """
-    _gate_source("stg-app-fact")  # confirmed-gate before any DB write
+    _gate_source(SealAttributionLoader.source_id)  # confirmed-gate before any DB write
     if csv_path is not None:
         inner = _csv_adapter(csv_path)
     else:
@@ -1392,36 +1482,22 @@ def ingest_controlm(
             f"[red]--phase must be nodes | relationships | all (got {phase!r}).[/]"
         )
         raise typer.Exit(2)
-    # Confirmed-gate (D3): the Control-M source must be SME-confirmed before any write.
-    _gate_source("controlm-psgmgr")
+    # Confirmed-gate (D3): the Control-M source must be SME-confirmed before
+    # any write — the id comes from the chain's own declaration (N3).
+    _gate_source(ControlMFoldersLoader.source_id)
     scope = _scope_binds(folder, run_as, developer_sid, row_cap)
-    node_stages: list[tuple[str, type[BaseLoader], str, str]] = [
-        ("controlm_folders",     ControlMFoldersLoader,
-         "controlm_folders__sample.csv",      "controlm_folders.sql"),
-        ("controlm_jobs",        ControlMJobsLoader,
-         "controlm_jobs__sample.csv",         "controlm_jobs.sql"),
-    ]
+    # Stage declarations live at module level (N3: CONTROLM_*_STAGES) so the
+    # command's chain and the load map render from the same source.
+    node_stages: list[tuple[str, type[BaseLoader], str, str]] = list(
+        CONTROLM_NODE_STAGES
+    )
     if not skip_part2:
-        node_stages.extend([
-            ("controlm_conditions_in",  ControlMConditionsInLoader,
-             "controlm_conditions_in__sample.csv",  "controlm_conditions_in.sql"),
-            ("controlm_conditions_out", ControlMConditionsOutLoader,
-             "controlm_conditions_out__sample.csv", "controlm_conditions_out.sql"),
-            # P3 host topology (gate controlm-hosts-topology): independent of
-            # folders/jobs — CM_HOSTS has no folder/owner/author grain, so the
-            # scope binds don't apply and the extract is always a full snapshot.
-            ("controlm_hosts",          ControlMHostsLoader,
-             "controlm_hosts__sample.csv",          "controlm_hosts.sql"),
-        ])
+        node_stages.extend(CONTROLM_PART2_STAGES)
     # The deferred dependency pass: its rows are pure ctlm_id references
     # between independently-loaded jobs, so it runs AFTER all nodes exist.
     rel_stages: list[tuple[str, type[BaseLoader], str, str]] = []
     if not skip_part2:
-        rel_stages.append(
-            ("controlm_dependencies_derived", ControlMDependenciesDerivedLoader,
-             "controlm_dependencies__sample.csv",
-             "controlm_dependencies_recursive.sql"),
-        )
+        rel_stages.extend(CONTROLM_REL_STAGES)
     stages = (
         node_stages if phase == "nodes"
         else rel_stages if phase == "relationships"
