@@ -2819,6 +2819,13 @@ items:
       pinned rev in test_doc_traceability_loader.py). Without it the load map is accurate
       the day it ships and drifts the first time either sequence is edited, which is the
       failure mode N3-N5 exist to end.
+      SEQUENCING NOTE (2026-07-29, at the N3-N5 close): N3 is done, so this is next_ready
+      and the declared sequence it derives from EXISTS (cli.CANONICAL_LOAD_SEQUENCE, on
+      the human surface at docs/plan/load-map.html). BUNDLE the runbook half with L21 —
+      both are Rev-4 edits to the same governed startup-refresh runbook (L21 collapses
+      the supplement verbs; this item re-derives the chain), and two back-to-back rev
+      bumps on one governed doc would be churn the L5/L6 loop has to re-review twice.
+      One session, one Rev, two close notes.
 
   # ── Epic O — Web console / graph visualization (main) — Phase 12 ───────────
   # Groomed 2026-07-09 (user decision: promote to a module + phase — the web/ front-end
