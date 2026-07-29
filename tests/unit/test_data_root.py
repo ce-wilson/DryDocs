@@ -11,6 +11,7 @@ from pathlib import Path
 
 from drydocs_core import data_root as dr
 from drydocs_core.data_root import (
+    catalog_dir,
     dpl_registry_dir,
     resolve_data_root,
     rua_extracted_dir,
@@ -47,6 +48,12 @@ def test_dpl_registry_subfolder_convention(tmp_path, monkeypatch):
     assert dpl_registry_dir("88888") == tmp_path / "dpl-registry" / "88888"
 
 
+def test_catalog_subfolder_convention(tmp_path, monkeypatch):
+    monkeypatch.setenv(dr.DATA_ROOT_ENV, str(tmp_path))
+    assert catalog_dir() == tmp_path / "catalog"
+    assert catalog_dir("screenshots") == tmp_path / "catalog" / "screenshots"
+
+
 def test_create_on_demand_only(tmp_path, monkeypatch):
     monkeypatch.setenv(dr.DATA_ROOT_ENV, str(tmp_path / "root"))
     path = rua_incoming_dir()
@@ -78,4 +85,25 @@ def test_repo_tree_contains_no_rua_bundles():
     assert not offenders, (
         "rua bundle payload found IN the repo tree — move it to the "
         f"DRYDOCS_DATA_ROOT landing zone (~/data/DryDocs/rua/): {offenders}"
+    )
+
+
+def test_repo_tree_contains_no_catalog_exports():
+    """Data-catalog view exports hold real dataset names, GUIDs, producing
+    app ids, contact emails, and physical coordinates (Internal-Confidential)
+    — they live under DRYDOCS_DATA_ROOT/catalog/, never in the tree (G42).
+    An export is recognized by the curated view name traveling in the file
+    name (``*_DATASETS_V`` / ``*_DISTRIBUTIONS_V``, either case — test
+    fixtures are built in tmp_path, so any hit here is a real stray)."""
+    offenders: set[str] = set()
+    for pattern in ("*datasets_v*", "*distributions_v*",
+                    "*DATASETS_V*", "*DISTRIBUTIONS_V*"):
+        for path in REPO.rglob(pattern):
+            if any(part in _SKIP_DIRS for part in path.parts):
+                continue
+            if path.is_file() and path.suffix.lower() in {".csv", ".json"}:
+                offenders.add(str(path.relative_to(REPO)))
+    assert not offenders, (
+        "catalog view export found IN the repo tree — move it to the "
+        f"DRYDOCS_DATA_ROOT landing zone (~/data/DryDocs/catalog/): {sorted(offenders)}"
     )

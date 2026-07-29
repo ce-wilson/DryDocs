@@ -23,8 +23,19 @@ from .code_repo import (
 )
 from .rua_code_ops import RuaCodeOps, RuaCodeOpsCoverage, RuaCodeOpsExtractor
 from .rua_inventory import RuaCoverage, RuaInventoryExtractor
+from .snowflake_catalog import (
+    CatalogCoverage,
+    CatalogDatasetRecord,
+    CatalogDistributionRecord,
+    CatalogExtract,
+    SnowflakeCatalogExtractor,
+)
 
 __all__ = [
+    "CatalogCoverage",
+    "CatalogDatasetRecord",
+    "CatalogDistributionRecord",
+    "CatalogExtract",
     "CloneFolder",
     "CodeRepoExtractor",
     "ControlMInventoryExtractor",
@@ -48,6 +59,7 @@ __all__ = [
     "RuaCodeOpsExtractor",
     "RuaCoverage",
     "RuaInventoryExtractor",
+    "SnowflakeCatalogExtractor",
     "cross_check",
     "parse_clone_folder",
 ]

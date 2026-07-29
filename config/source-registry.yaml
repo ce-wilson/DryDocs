@@ -12,7 +12,7 @@
 # =============================================================================
 
 schema: drydocs.source-registry.v1
-updated: 2026-07-23
+updated: 2026-07-28
 
 sources:
   # ---- Orchestration metadata (Tier-2 vendors) -----------------------------
@@ -265,6 +265,34 @@ sources:
       swagger). The active flag is a THIRD usage signal (beside referenced and
       present-on-server) — staged only; any conflation with "used" is a G22
       ruling.
+
+  # ---- Snowflake data-catalog (dataset/distribution registration views) -----
+  - id: snowflake-data-catalog
+    classification: Internal-Confidential   # real dataset names, GUIDs, producing app ids, contact emails, buckets, URIs
+    source: "full-pull exports (CSV) of the curated Snowflake views <PROD_DB>.<SCHEMA>.<CATALOG>_DATASETS_V / <CATALOG>_DISTRIBUTIONS_V under DRYDOCS_DATA_ROOT (~/data/DryDocs/catalog/)"
+    kind: registry
+    orchestrator: ~
+    adapter: ~                            # G42 extractor (drydocs_lineage/extractors/snowflake_catalog.py) — taxonomy-first staging, no loader
+    locator:
+      data_root: "DRYDOCS_DATA_ROOT (default ~/data/DryDocs); catalog/ = view exports, catalog/screenshots/ = evidence captures (Internal-Confidential, never in-tree even gitignored)"
+      resolver: drydocs_core/data_root.py # catalog_dir() (the G19 shared helper)
+      mapping: docs/generic-snowflake-data-catalog-ingestion-plan.md   # the mapping ledger (field contract §2, identity model §3)
+    feeds_taxonomy: [datasets, distributions]
+    confirmed: false                      # gate snowflake-data-catalog (plan §5 questions a-f; prompt not yet drafted) is the activation condition; NOTHING writes the graph before it
+    notes: >
+      G42 registration — THE POINTER, NEVER THE DATA: exports carry real
+      dataset/distribution GUIDs, producing application ids, contact emails,
+      and physical coordinates (db/schema/table, HDFS paths, S3 buckets/ARNs)
+      and never enter the repo tree (guard: tests/unit/test_data_root.py
+      sweeps for view-export artifacts); fixtures are SYNTHETIC. The catalog
+      is the FOURTH registry seam (beside G17 MAC / G25 registry / G41 Glue)
+      and the inventory backbone: dataset + distribution + app + contact on
+      the same GUID identity space. DPL-registered rows land on the same
+      dpl_dataset identity the other seams stage; AUTHORITY2/null-source rows
+      stay in their own origin (never join a foreign id scheme into DPL GUID
+      space — the G41 rule). Node/edge shape (one node or two,
+      HAS_DISTRIBUTION, attribution, contact, publisher) is entirely the
+      gate's to rule — the plan doc §5 lists the questions un-decided.
 
   - id: code-repo
     classification: Internal            # real repo/branch names + script paths; content stays company-side

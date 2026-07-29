@@ -21,6 +21,14 @@ taxonomy registry; real SEALs + GUIDs + lifecycle state):
 
     <root>/dpl-registry/<seal>/     pipeline_id.json / dataset_id.json per SEAL
 
+and the data-catalog landing zone (G42 — full-pull exports of the curated
+dataset/distribution views; real dataset names, GUIDs, app ids, emails,
+buckets — plus the evidence screenshots, which never sit in the repo tree
+even gitignored):
+
+    <root>/catalog/                 view exports (CSV)
+    <root>/catalog/screenshots/     SME evidence captures
+
 Payloads under the root may hold real hostnames, uids, home paths, and
 profile/script copies (Internal-Confidential) — DATA NEVER ENTERS THE REPO;
 ``tests/unit/test_data_root.py`` sweeps the tree to enforce it.
@@ -62,4 +70,11 @@ def rua_extracted_dir(bundle_name: str | None = None, *, create: bool = False) -
 def dpl_registry_dir(seal: str | None = None, *, create: bool = False) -> Path:
     """Landing zone for per-SEAL DPL registry Swagger exports (G25)."""
     parts = ("dpl-registry",) + ((seal,) if seal else ())
+    return source_dir(*parts, create=create)
+
+
+def catalog_dir(sub: str | None = None, *, create: bool = False) -> Path:
+    """Landing zone for Snowflake data-catalog view exports (G42);
+    ``catalog_dir("screenshots")`` is the evidence-capture area."""
+    parts = ("catalog",) + ((sub,) if sub else ())
     return source_dir(*parts, create=create)
