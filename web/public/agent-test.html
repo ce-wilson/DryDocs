@@ -1,0 +1,181 @@
+<!doctype html>
+<!-- DryDocs — Agent Test (standalone). FB-04 harness re-ruled as an INDEPENDENT
+     page per SME sign-off 2026-07-29 (config/gate-log.md): no auth layer, dark
+     view only, no console shell — the minimal real-time twin of Under the Hood
+     for the company port's live-data test. Read-only throughout (O20). Served
+     from web/public/ → ships verbatim inside web/dist; open via any http server
+     (vite dev: /agent-test.html). Direct file:// works for layout but the ADK
+     fetch may hit CORS — serve over http for live runs. No CDN, no framework,
+     no fonts fetched (locked-down-intranet rule): system + local IBM Plex only. -->
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>DryDocs — Agent Test</title>
+<style>
+  :root { /* dark token sheet values, frozen (tokens.css .dark) */
+    --bg:#0d1520; --bg2:#0f1b29; --panel:#121e2e; --panel2:#152335;
+    --edge:#203045; --edge-soft:#1a2739; --text:#e8edf3; --muted:#8a97a8;
+    --faint:#71809a; --blue:#2e6bc4; --blue-br:#4d8be0; --teal:#2ab3a6;
+    --green:#3aae6b; --yellow:#d9b831; --status-fail:#e0325c; --status-fail-soft:#f2708e;
+    --sans:'IBM Plex Sans','Segoe UI',sans-serif; --mono:'IBM Plex Mono',Consolas,monospace;
+  }
+  * { box-sizing:border-box; }
+  body { margin:0; background:var(--bg); color:var(--text); font:14px/1.5 var(--sans); }
+  main { max-width:920px; margin:0 auto; padding:28px 20px 60px; display:flex; flex-direction:column; gap:12px; }
+  h1 { font-size:19px; margin:0; }
+  .tag { display:inline-block; border:1px solid var(--edge); border-radius:4px; padding:2px 8px;
+         font:11px var(--mono); color:var(--muted); }
+  .controls { display:flex; flex-wrap:wrap; gap:10px; align-items:flex-end;
+              background:var(--panel); border:1px solid var(--edge); border-radius:10px; padding:14px; }
+  label { display:flex; flex-direction:column; gap:4px; font:11px var(--sans); color:var(--muted); }
+  select,input { background:var(--bg2); color:var(--text); border:1px solid var(--edge);
+                 border-radius:6px; padding:7px 9px; font:13px var(--sans); }
+  input#req { min-width:280px; flex:1; }
+  .agent { font:12px var(--mono); color:var(--teal); border:1px solid var(--edge-soft);
+           background:var(--bg2); border-radius:6px; padding:8px 10px; }
+  button { background:var(--blue); color:#fff; border:1px solid var(--blue-br); border-radius:6px;
+           padding:8px 18px; font:600 13px var(--sans); cursor:pointer; }
+  button:disabled { opacity:.5; cursor:default; }
+  .banner { border:1px solid rgba(217,184,49,.5); background:rgba(217,184,49,.1); color:var(--yellow);
+            border-radius:6px; padding:8px 12px; font:11px var(--mono); display:none; }
+  .mode { display:none; align-self:flex-start; border-radius:4px; padding:2px 8px; font:11px var(--mono); }
+  .mode.live { display:inline-block; border:1px solid var(--green); color:var(--green); }
+  .mode.demo { display:inline-block; border:1px solid rgba(217,184,49,.5); background:rgba(217,184,49,.1); color:var(--yellow); }
+  section { background:var(--panel); border:1px solid var(--edge); border-radius:10px; padding:12px 14px; display:none; }
+  section h2 { margin:0 0 6px; font:600 11px var(--sans); letter-spacing:.06em; text-transform:uppercase; color:var(--faint); }
+  pre { margin:0; white-space:pre-wrap; word-break:break-word; font:12.5px/1.6 var(--sans); color:var(--text); }
+  pre.mono { font-family:var(--mono); color:var(--teal); }
+  .metrics { display:flex; flex-wrap:wrap; gap:8px; }
+  .metric { border:1px solid var(--edge-soft); background:var(--bg2); border-radius:6px;
+            padding:5px 9px; font:12px var(--mono); font-variant-numeric:tabular-nums; }
+  .metric span { color:var(--faint); }
+  footer { font:10.5px var(--mono); color:var(--faint); }
+</style>
+</head>
+<body>
+<main>
+  <div>
+    <h1>DryDocs · Agent Test</h1>
+    <p style="margin:6px 0 0"><span class="tag">standalone · real-time · read-only (O20) · dark only · no auth — SME sign-off 2026-07-29</span></p>
+  </div>
+
+  <div class="controls">
+    <label>Module (non-deterministic only)
+      <select id="module">
+        <option value="explorer">Explorer</option>
+        <option value="docs">Docs</option>
+      </select>
+    </label>
+    <label>Agent<span class="agent" id="agent">graph-qa (ADK)</span></label>
+    <label>ADK URL
+      <input id="adk" value="http://localhost:8000" size="22"/>
+    </label>
+    <label style="flex:1">SME request
+      <input id="req" placeholder="e.g. which jobs depend on the nightly folder load?"/>
+    </label>
+    <button id="run">Run</button>
+  </div>
+
+  <p class="banner" id="banner"></p>
+  <span class="mode" id="mode"></span>
+
+  <section id="s1"><h2>1 · How the input was interpreted</h2><pre id="p1"></pre></section>
+  <section id="s2"><h2>2 · Cypher</h2><pre class="mono" id="p2"></pre></section>
+  <section id="s3"><h2>3 · Return path</h2><pre class="mono" id="p3"></pre></section>
+  <section id="s4"><h2>4 · Answer</h2><pre id="p4"></pre></section>
+  <section id="s5"><h2>5 · Metrics</h2><div class="metrics" id="p5"></div></section>
+
+  <footer>ships in web/dist via web/public · live = ADK api_server (list-apps → session → run) · ADK down = SYNTHESIZED demo trace, tagged · company port binds the real ADK URL, zero edits here</footer>
+</main>
+<script>
+  var AGENTS = { explorer: 'graph-qa (ADK)', docs: 'docmeta-qa (ADK)' };
+  var DEMO = {
+    explorer: {
+      interpretation: 'Routed as GRAPH-NAV / fan-in question. Entities: job name → :ControlMJob anchor; "depends on" → WAS_INFORMED_BY traversal, direction=upstream, depth≤3. (SYNTHESIZED — the R2 router is not wired yet.)',
+      cypher: 'MATCH (j:ControlMJob {name: $name})<-[:WAS_INFORMED_BY*1..3]-(up)\nRETURN up.name AS dependent, labels(up) AS kind\nORDER BY dependent',
+      path: 'router → text2cypher → read-only executor → 12 rows (:ControlMJob ×9, :EtlJob ×3) → summarizer',
+      answer: '12 upstream dependents found within 3 hops; 9 Control-M jobs and 3 ETL jobs. Deepest chain length 3. (SYNTHESIZED example answer.)',
+      metrics: [['54','chars in'],['208','chars out'],['2','model calls'],['12','rows'],['~180ms','latency']]
+    },
+    docs: {
+      interpretation: 'Routed as DOCS / exact-lookup. Term detected → full-text index probe first, graph traversal fallback. (SYNTHESIZED — docmeta-qa demo shape from the P0 benchmark.)',
+      cypher: "CALL db.index.fulltext.queryNodes('chunk_text', $term)\nYIELD node, score\nMATCH (node)<-[:CONTAINS]-(d:Document)\nRETURN d.title, node.heading, score LIMIT 3",
+      path: 'router → fulltext top-3 → chunk fetch (~1.3k chars) → answer with citation',
+      answer: 'Definition returned from the vendor corpus with document + heading citation. (SYNTHESIZED example answer; live equivalent averaged ~52ms in the P0 benchmark.)',
+      metrics: [['31','chars in'],['1,312','chars out'],['1','model calls'],['3','chunks'],['~52ms','latency']]
+    }
+  };
+  var $ = function (id) { return document.getElementById(id); };
+  $('module').addEventListener('change', function () { $('agent').textContent = AGENTS[this.value]; });
+  $('req').addEventListener('keydown', function (e) { if (e.key === 'Enter') run(); });
+  $('run').addEventListener('click', run);
+
+  function show(trace, live) {
+    $('mode').className = 'mode ' + (live ? 'live' : 'demo');
+    $('mode').textContent = live ? 'LIVE — ADK run' : 'EXAMPLE DATA · SYNTHESIZED — ADK not reachable';
+    $('p1').textContent = trace.interpretation;
+    $('p2').textContent = trace.cypher;
+    $('p3').textContent = trace.path;
+    $('p4').textContent = trace.answer;
+    var m = $('p5'); m.innerHTML = '';
+    trace.metrics.forEach(function (kv) {
+      var el = document.createElement('span');
+      el.className = 'metric';
+      el.textContent = kv[0] + ' ';
+      var lab = document.createElement('span'); lab.textContent = kv[1];
+      el.appendChild(lab); m.appendChild(el);
+    });
+    ['s1','s2','s3','s4','s5'].forEach(function (id) { $(id).style.display = 'block'; });
+  }
+
+  function extractCypher(texts) {
+    for (var i = 0; i < texts.length; i++) {
+      var m = /```(?:cypher)?\s*([\s\S]*?)```/.exec(texts[i]);
+      if (m) return m[1].trim();
+    }
+    return '(no cypher block surfaced in events)';
+  }
+
+  async function run() {
+    var q = $('req').value.trim();
+    if (!q) return;
+    var mod = $('module').value, base = $('adk').value.replace(/\/$/, '');
+    $('run').disabled = true; $('run').textContent = 'Running…'; $('banner').style.display = 'none';
+    var t0 = performance.now();
+    try {
+      var apps = await fetch(base + '/list-apps').then(function (r) { if (!r.ok) throw new Error(r.status); return r.json(); });
+      var app = apps.find(function (a) { return a.indexOf(mod) >= 0; }) || apps[0];
+      if (!app) throw new Error('ADK reachable but no apps registered');
+      var sid = 'agent-test-' + Date.now();
+      await fetch(base + '/apps/' + app + '/users/admin-test/sessions/' + sid, {
+        method: 'POST', headers: { 'Content-Type': 'application/json' }, body: '{}'
+      }).then(function (r) { if (!r.ok) throw new Error('session ' + r.status); });
+      var events = await fetch(base + '/run', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ appName: app, userId: 'admin-test', sessionId: sid,
+          newMessage: { role: 'user', parts: [{ text: q }] }, streaming: false })
+      }).then(function (r) { if (!r.ok) throw new Error('run ' + r.status); return r.json(); });
+      var ms = Math.round(performance.now() - t0);
+      var texts = events.map(function (e) {
+        return ((e.content && e.content.parts) || []).map(function (p) { return p.text || ''; }).join('');
+      }).filter(Boolean);
+      show({
+        interpretation: texts[0] || '(no interpretation event)',
+        cypher: extractCypher(texts),
+        path: events.map(function (e) { return e.author || '?'; }).join(' → ') || '(no events)',
+        answer: texts[texts.length - 1] || '(no text in final event)',
+        metrics: [[String(q.length),'chars in'], [texts.join('').length.toLocaleString(),'chars out'],
+                  [String(events.length),'events'], [ms + 'ms','latency'], [app,'agent app']]
+      }, true);
+    } catch (e) {
+      $('banner').textContent = 'ADK unreachable at ' + base + ' (' + (e && e.message ? e.message : e) + ') — showing the SYNTHESIZED demo trace instead.';
+      $('banner').style.display = 'block';
+      show(DEMO[mod], false);
+    } finally {
+      $('run').disabled = false; $('run').textContent = 'Run';
+    }
+  }
+</script>
+</body>
+</html>

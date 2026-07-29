@@ -1019,3 +1019,24 @@ stated premises did not survive reading the newest snapshot:
 `status: planned`; `self-documentation-code-graph` map entry → `confirmed` (map now 22 confirmed);
 `schema_graph.cypher`, `gates.json` and the enforcement matrix regenerated; backlog **G33 cleared to
 build** with its three premise errors corrected.
+
+## 2026-07-29 — FB-04 · Agent Test harness — UI surface ruling (SME sign-off)
+- **Presented:** 1 decision — harness shape + delivery path for the real-time
+  agent test view (the live twin of Under the Hood).
+- **Confirmed (SME):** deliver as an **independent standalone page**
+  (`web/public/agent-test.html`, ships verbatim inside `web/dist`) instead of a
+  console fold-in: dark view only, **no authentication layer**, no shell, only
+  working controls (module picker · agent readout · ADK URL · SME request ·
+  Run). Five-section run anatomy stands: interpretation → Cypher → return path
+  → answer → metrics. Read-only throughout (O20). Ship on `main` so the company
+  port can test with live data — the page binds the real ADK URL through its
+  own input, zero code edits on port.
+- **Edited:** the same-day SPA fold-in (route + nav + `AgentTestRoute.tsx`)
+  removed in favor of the standalone page. FB-03's role designation of
+  `gates` / `under-the-hood` (registry `access` + guards) **stands** — the
+  no-auth ruling applies to this standalone page only.
+- **Rejected:** 0
+- **Notes:** live path = ADK api_server (`list-apps → session → run`);
+  unreachable → SYNTHESIZED demo trace behind the standard EXAMPLE DATA tag.
+  R2's router should wire THIS harness when it lands (R5 Ask-spoke seat note in
+  IDEAS.md, 2026-07-29).

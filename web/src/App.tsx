@@ -13,7 +13,6 @@ import ConsoleRoute from './routes/ConsoleRoute'
 import MappingsRoute from './routes/MappingsRoute'
 import LineageRoute from './routes/LineageRoute'
 import AdminConfigRoute from './routes/AdminConfigRoute'
-import AgentTestRoute from './routes/AgentTestRoute'
 import LoadsRoute from './routes/LoadsRoute'
 import RunbooksRoute from './routes/RunbooksRoute'
 import RemediationRoute from './routes/RemediationRoute'
@@ -82,11 +81,6 @@ export default function App() {
         <Route
           path="under-the-hood"
           element={persona.role === 'steward' || persona.role === 'admin' ? <UnderTheHoodRoute /> : <Navigate to="/" replace />}
-        />
-        {/* FB-04: admin real-time agent test harness (read-only, O20 stands) */}
-        <Route
-          path="admin/agent-test"
-          element={persona.role === 'admin' ? <AgentTestRoute /> : <Navigate to="/" replace />}
         />
 
         {/* O13: steward + admin only — the server enforces the same boundary

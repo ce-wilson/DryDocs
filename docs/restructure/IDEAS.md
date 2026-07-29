@@ -40,7 +40,10 @@ Tags help grooming: `idea` · `bug` · `doc` · `source` (new data source) · `q
   build/lint green; screenshot in session record. NOTE for the groom: this harness is an
   early seat for R5's Ask spoke — R2's router landing should wire it before (or instead of)
   building a separate probe page; also rules where `retrieval:'agent'` flags belong once R2
-  defines real agent apps.
+  defines real agent apps. *Re-ruled same day (SME gate sign-off, config/gate-log.md
+  2026-07-29): delivered as the STANDALONE `web/public/agent-test.html` (dark-only, no auth,
+  ships in dist for the company port's live test) — the SPA fold-in was removed; FB-03
+  designations stand.*
 
 - 2026-07-29 — [question] **psgmgr replica vs Control-M XML export: which source wins per
   object when they disagree?** (Guardrail 3 of the XML-fed cmd-line resolution idea → G46/
