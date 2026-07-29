@@ -29,7 +29,13 @@ from .commands import (
 from .facts import route_fact
 from .folder_name import ParsedFolderName, parse_folder_name
 from .paths import FileRef, build_file_ref, canonicalize_path, classify_role
-from .resolver import ResolvedVariable, resolve_job, resolve_layers
+from .resolver import (
+    ResolvedCommandLine,
+    ResolvedVariable,
+    resolve_command_line,
+    resolve_job,
+    resolve_layers,
+)
 from .variable_report import VariableCoverage
 from .variables import (
     ClassifiedVariable,
@@ -46,7 +52,9 @@ __all__ = [
     "classify_variable",
     "classify_job_variables",
     "VariableCoverage",
+    "ResolvedCommandLine",
     "ResolvedVariable",
+    "resolve_command_line",
     "resolve_job",
     "resolve_layers",
     # Phase C — command / path / fact parsing

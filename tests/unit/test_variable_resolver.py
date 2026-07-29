@@ -7,9 +7,11 @@ production extract (controlm_variables__sample.csv): 183213/188252
 """
 from __future__ import annotations
 
+from drydocs_core.controlm.commands import parse_command
 from drydocs_core.controlm.resolver import (
     MAX_DEPTH,
     ResolvedVariable,
+    resolve_command_line,
     resolve_job,
     resolve_layers,
 )
@@ -206,6 +208,87 @@ def test_env_variant_expansion_script_path() -> None:
     assert variants["Development"] == "/apps/dev"
     assert variants["QA"] == "/apps/qa"
     assert variants["Production"] == "/apps/prod"
+
+
+# --- G46: resolve_command_line — the public CMD_LINE entry point -----------------
+# One resolver, both paths (guardrail 1): the command text goes through the
+# SAME scope walk and fixed-point pass the definitions use; the result is a
+# DERIVED fact beside the verbatim command (guardrail 2 — raw never mutated).
+
+def test_command_line_resolves_through_folder_and_job_scopes() -> None:
+    rcl = resolve_command_line(
+        [("FOLDER", [("%%SCRIPT_DIR", "/apps/etl")]),
+         ("JOB", [("%%SCRIPT", "run_conform.sh")])],
+        "%%SCRIPT_DIR/%%SCRIPT -d %%$ODATE",
+    )
+    assert rcl.resolved == "/apps/etl/run_conform.sh -d {ODATE}"
+    assert rcl.raw == "%%SCRIPT_DIR/%%SCRIPT -d %%$ODATE"   # verbatim, untouched
+    assert rcl.is_fully_resolved
+    assert rcl.substituted == (("SCRIPT", "JOB"), ("SCRIPT_DIR", "FOLDER"))
+    assert rcl.canonical_tokens == ("ODATE",)   # runtime residue, not a failure
+    assert rcl.unresolved == ()
+
+
+def test_command_line_var_launcher_becomes_parseable() -> None:
+    # the G15 %%VAR-launcher case: raw text hides the launcher behind a
+    # variable; resolution turns it into the path the core parser is
+    # designed for (G40 parses resolved-when-present for exactly this)
+    rcl = resolve_command_line(
+        [("FOLDER", [("%%DPL_LAUNCHER", "/opt/dpl/dt-launcher.sh")])],
+        "%%DPL_LAUNCHER -i 11111111-aaaa-4bbb-8ccc-000000000001",
+    )
+    assert rcl.resolved.startswith("/opt/dpl/dt-launcher.sh ")
+    parsed = parse_command(rcl.resolved)
+    assert parsed.invocations
+    assert parsed.invocations[0].executable_path == "/opt/dpl/dt-launcher.sh"
+
+
+def test_command_line_unresolved_name_stays_visible() -> None:
+    rcl = resolve_command_line([], "%%UNDEFINED_DIR/x.sh")
+    assert rcl.resolved == "%%UNDEFINED_DIR/x.sh"
+    assert not rcl.is_fully_resolved
+    assert rcl.unresolved == ("UNDEFINED_DIR",)
+    assert rcl.substituted == ()
+
+
+def test_command_line_concat_delimiter_in_argument() -> None:
+    # %%A.%%B — the period is Control-M's name terminator, consumed not emitted
+    rcl = resolve_command_line(
+        [("FOLDER", [("%%A", "abc"), ("%%B", "def")])],
+        "run.sh %%A.%%B",
+    )
+    assert rcl.resolved == "run.sh abcdef"
+
+
+def test_command_line_rebinding_attributes_the_winning_scope() -> None:
+    # job rebinds the folder's name — vendor priority order; the substituted
+    # provenance names the binding that actually produced the value
+    rcl = resolve_command_line(
+        [("FOLDER", [("%%TARGET_ENV", "dev")]),
+         ("JOB", [("%%TARGET_ENV", "prod")])],
+        "deploy.sh %%TARGET_ENV",
+    )
+    assert rcl.resolved == "deploy.sh prod"
+    assert rcl.substituted == (("TARGET_ENV", "JOB"),)
+
+
+def test_command_line_calcdate_residue_compacts() -> None:
+    rcl = resolve_command_line([], "report.sh %%$CALCDATE %%$ODATE -1")
+    assert rcl.resolved == "report.sh {ODATE-1}"
+    assert rcl.is_fully_resolved
+    assert rcl.canonical_tokens == ("ODATE-1",)
+
+
+def test_command_line_env_variants_expand() -> None:
+    rcl = resolve_command_line(
+        [("FOLDER", [("%%RUN_PATH_D", "/apps/dev"),
+                     ("%%RUN_PATH_P", "/apps/prod")])],
+        "%%RUN_PATH_%%HOSTNM/run.sh",
+    )
+    assert not rcl.is_fully_resolved
+    variants = dict(rcl.variants)
+    assert variants["Development"] == "/apps/dev/run.sh"
+    assert variants["Production"] == "/apps/prod/run.sh"
 
 
 def test_env_variant_expansion_tenv_composition() -> None:

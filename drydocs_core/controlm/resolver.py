@@ -69,6 +69,9 @@ _RESIDUAL_REF_RE = re.compile(r"%%\$?([A-Za-z_][A-Za-z0-9_]*)")
 # {CALCDATE} {X} -1  ->  {X-1}     (compact date arithmetic; other function
 # markers keep their args inline as symbolic residue, e.g. {SUBSTR} {X} 7 2)
 _CALCDATE_COMPACT_RE = re.compile(r"\{CALCDATE\}\s+\{(\w+)\}\s+([+-]\d+)")
+# canonical runtime-token residue in resolved text ({ODATE}, {ODATE-1}, …) —
+# expected symbolic output, never a resolution failure
+_CANONICAL_TOKEN_RE = re.compile(r"\{([A-Za-z0-9_$+\-]+)\}")
 
 
 @dataclass(frozen=True)
@@ -225,6 +228,13 @@ def _resolve_value(raw: str, env: _Env) -> tuple[str, int]:
     Returns (resolved, depth) where depth is the number of passes that
     changed the text (0 = the value needed no substitution at all).
     """
+    resolved, depth, _ = _resolve_value_traced(raw, env)
+    return resolved, depth
+
+
+def _resolve_value_traced(raw: str, env: _Env) -> tuple[str, int, set[str]]:
+    """:func:`_resolve_value` plus the set of user names substituted —
+    the provenance :func:`resolve_command_line` reports."""
     text = raw
     blocked: set[str] = set()
     depth = 0
@@ -237,7 +247,7 @@ def _resolve_value(raw: str, env: _Env) -> tuple[str, int]:
         depth += 1
         if depth >= MAX_DEPTH:
             break
-    return _canonicalize(text), depth
+    return _canonicalize(text), depth, blocked
 
 
 def _residuals(text: str) -> tuple[tuple[str, ...], tuple[str, ...]]:
@@ -306,8 +316,20 @@ def resolve_layers(
     Each defs iterable is the ORDERED (name, value) list for that scope.
     Returns one ResolvedVariable per input definition, in processing order.
     """
+    results, _env, _scopes = _resolve_scope_chain(layers)
+    return results
+
+
+def _resolve_scope_chain(
+    layers: Sequence[tuple[str, Iterable[tuple[str, str | None]]]],
+) -> tuple[list[ResolvedVariable], _Env, dict[str, str]]:
+    """The one scope-chain walk (guardrail: never a second engine) —
+    :func:`resolve_layers` and :func:`resolve_command_line` both run through
+    here. Also returns the final environment and each bound name's LAST
+    binding scope (rebinding overwrites, so job > subfolder > folder)."""
     env = _Env()
     results: list[ResolvedVariable] = []
+    scope_by_name: dict[str, str] = {}
     ordinal = 0
     for scope, defs in layers:
         for raw_name, raw_value in defs:
@@ -334,7 +356,66 @@ def resolve_layers(
             results.append(rv)
             if name:
                 env.bind(name, resolved)
-    return results
+                scope_by_name[name] = scope
+    return results, env, scope_by_name
+
+
+@dataclass(frozen=True)
+class ResolvedCommandLine:
+    """One CMD_LINE resolved against a job's variable scope chain (G46).
+
+    A DERIVED fact beside the verbatim command, never a replacement: ``raw``
+    travels unchanged, and the provenance says exactly what happened —
+    which names substituted (with the scope that bound them), what stayed
+    unresolved, and which canonical runtime tokens are EXPECTED residue
+    (``{ODATE}``-class values only exist at execution time; their presence
+    is not a failure)."""
+
+    raw: str
+    resolved: str
+    is_fully_resolved: bool                      # no %% left in resolved
+    resolution_depth: int
+    substituted: tuple[tuple[str, str], ...]     # (name, binding scope), name-sorted
+    unresolved: tuple[str, ...]                  # user refs with no binding — visible, reported
+    external_refs: tuple[str, ...]               # %%\global / %%\\pool\var kept verbatim
+    canonical_tokens: tuple[str, ...]            # {ODATE}-class residue, first-seen order
+    variants: tuple[tuple[str, str], ...] = ()   # (environment, resolved) expansions
+
+
+def resolve_command_line(
+    layers: Sequence[tuple[str, Iterable[tuple[str, str | None]]]],
+    cmd_line: str,
+) -> ResolvedCommandLine:
+    """Resolve a verbatim CMD_LINE against its variable scope chain.
+
+    ``layers`` is the same vendor-priority chain :func:`resolve_layers`
+    takes (outermost first: folder, sub-folder, job). The environment is
+    built by the SAME sequential-assignment walk and the command text goes
+    through the SAME fixed-point substitution pass — this module is the one
+    resolver both ingestion paths (Oracle staging, XML export) call; no
+    caller may re-implement substitution.
+
+    The scope attributed to each substituted name is its LAST binding scope
+    (job overrides folder — vendor priority order), which is the binding
+    that actually produced the substituted value.
+    """
+    _results, env, scope_by_name = _resolve_scope_chain(layers)
+    resolved, depth, substituted = _resolve_value_traced(cmd_line, env)
+    unresolved, externals = _residuals(resolved)
+    variants = _expand_env_variants(cmd_line, env, unresolved)
+    tokens = tuple(dict.fromkeys(_CANONICAL_TOKEN_RE.findall(resolved)))
+    return ResolvedCommandLine(
+        raw=cmd_line,
+        resolved=resolved,
+        is_fully_resolved="%%" not in resolved,
+        resolution_depth=depth,
+        substituted=tuple(sorted(
+            (name, scope_by_name.get(name, "")) for name in substituted)),
+        unresolved=unresolved,
+        external_refs=externals,
+        canonical_tokens=tokens,
+        variants=tuple(variants),
+    )
 
 
 def resolve_job(
