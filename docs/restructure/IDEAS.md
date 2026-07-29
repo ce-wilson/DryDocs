@@ -26,6 +26,22 @@ Tags help grooming: `idea` · `bug` · `doc` · `source` (new data source) · `q
 
 <!-- add new ideas at the top -->
 
+- 2026-07-29 — [idea] **SME feedback FB-03/FB-04 — page role designation + admin Agent Test
+  harness (both EXECUTED same day, retro-groom).** FB-03: pages need admin/SME designation —
+  `ModuleDef.access` ('all'|'sme'|'admin') + `canAccessModule()` in the registry, aside-nav
+  filtering + route guards (O13 idiom); Gates and Under the Hood designated 'sme'
+  (display-gating only under mock auth; server enforcement rides the O1 ADR). FB-04: an
+  admin REAL-TIME twin of Under the Hood — `/admin/agent-test` (light chrome, read-only per
+  O20): dropdown of the registry's non-deterministic modules (`retrieval:'agent'`: Explorer
+  graph-qa, Docs docmeta-qa), agent label, SME request bar, then per run: interpretation →
+  Cypher → return path → answer → metrics. Live via the existing lib/adk.ts client
+  (listApps/createSession/runAgent, VITE_ADK_URL); ADK unreachable → SYNTHESIZED demo trace
+  with the standard banner. Verified: user persona redirected off gated routes + nav filtered;
+  build/lint green; screenshot in session record. NOTE for the groom: this harness is an
+  early seat for R5's Ask spoke — R2's router landing should wire it before (or instead of)
+  building a separate probe page; also rules where `retrieval:'agent'` flags belong once R2
+  defines real agent apps.
+
 - 2026-07-29 — [question] **psgmgr replica vs Control-M XML export: which source wins per
   object when they disagree?** (Guardrail 3 of the XML-fed cmd-line resolution idea → G46/
   G47/G48; the build fills a nullable derived column and decides NO source-of-truth
