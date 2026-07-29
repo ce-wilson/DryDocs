@@ -90,9 +90,10 @@ GUARDRAILS (durable — apply to every port):
    artifacts with producer git metadata; regenerate your own via the session-end ritual.
 
 5. DERIVED ARTIFACTS regenerate AFTER all config edits, never hand-merge:
-   `web/src/generated/gates.json` + `enforcement-matrix.json` (both now ride the
-   default-paths board render — J17/J20 — so one `render_board.py` run refreshes all
-   three), `docs/plan/board.html` (from the reconciled backlog), `docs/design/*.html`
+   `web/src/generated/gates.json` + `enforcement-matrix.json` + `load-map.json`
+   and `docs/plan/load-map.html` (all ride the default-paths board render —
+   J17/J20/N4/N5 — so one `render_board.py` run refreshes all five),
+   `docs/plan/board.html` (from the reconciled backlog), `docs/design/*.html`
    + `*.print.html` (YOUR canonical-company renderer, both variants tracked).
    Run render scripts from the PROJECT VENV with PYTHONPATH=repo root and verify the
    output path resolves into the workspace repo before trusting any regen. Beware

@@ -40,7 +40,10 @@
 # =============================================================================
 schema: drydocs.port-manifest.v1
 classification: Internal-Public
-updated: 2026-07-28   # 2026-07-28 (J16): the FALL-THROUGH question, asked for the first
+updated: 2026-07-29   # 2026-07-29: +docs/plan/load-map.html (canonical-company derived
+                      # render, the board.html rule) — the J16 coverage guard caught the
+                      # new N5 file the day it shipped, exactly as designed.
+                      # 2026-07-28 (J16): the FALL-THROUGH question, asked for the first
                       # time. 398 of 1415 tracked paths matched no row and took `default:`
                       # in silence. Four gaps became real rows — docs/restructure/backlog.yaml
                       # (per-entry; a blind checkout of the plan deletes one side's work),
@@ -188,6 +191,16 @@ rows:
       RETIRED producer-side (L13, 2026-07-18): the render series collapsed to the single
       .html (screen + @media print). At the next port, DELETE the consumer-side twin and
       regenerate the single .html consumer-side — never take a producer render.
+  - path: "docs/plan/load-map.html"
+    disposition: canonical-company
+    note: >
+      DERIVED — the N5 human load-map surface, a deterministic render of the
+      consumer's OWN source registry + N3 loader declarations + ledgers + map
+      (scripts/render_load_map.py, rides the default board render). Same rule
+      as board.html directly below: regenerate from the reconciled tree; taking
+      the producer's render ships the producer's sources as the consumer's map.
+      (Row added 2026-07-29 when the J16 coverage guard caught the new file —
+      the .json twin rides web/** and regenerates under guardrail 5.)
   - path: "docs/plan/board.html"
     disposition: canonical-company
     note: >

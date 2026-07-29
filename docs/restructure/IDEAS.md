@@ -26,6 +26,18 @@ Tags help grooming: `idea` · `bug` · `doc` · `source` (new data source) · `q
 
 <!-- add new ideas at the top -->
 
+- 2026-07-29 — [bug] **The J16 manifest-coverage guard has a tracked-only blind spot: a
+  NEW file passes the suite before `git add` and fails it after.** Live case same day:
+  the N5 session ran the full suite green, committed `docs/plan/load-map.html`, pushed —
+  and the very next full run failed `test_no_tracked_path_falls_through_silently`,
+  because the guard walks `git ls-files` and the pre-commit run couldn't see the
+  untracked file. The defect window is "on main until someone runs the suite again."
+  Candidate fixes: (a) the guard also sweeps untracked-but-not-ignored paths (`git
+  ls-files --others --exclude-standard`) so the PRE-commit run already fails; (b) a
+  ritual note is weaker but free. (a) looks strictly better — same-file semantics, just
+  a wider walk; check it doesn't false-positive on legitimately transient scratch files
+  at repo root before grooming.
+
 - 2026-07-29 — [chore] **4 taxonomy-ontology-map entries cite source ids that are NOT
   source-registry entries** — caught by the new N4 load-map render on its first run
   (`map_entries_without_registry_source`): `job-seal-app-ref` →
