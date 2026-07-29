@@ -4,10 +4,13 @@ Thin CLI entry point beside ``knowledge/depgraph-snapshots/snapshot.ps1`` (see b
 item I2 / CLAUDE.md §0 session ritual) until the ``drydocs/cli.py`` entrypoint-boundary
 TODO (MODULE_MAP.md) is resolved. Stdlib + ``drydocs.plan_board`` only.
 
-A default-paths run ALSO refreshes ``web/src/generated/gates.json`` (J17):
-``render_gates.py`` reads backlog item text, so a groom that edits it would
-otherwise silently drift gates.json past ``tests/unit/test_gates_json.py``.
-One command refreshes both; an explicit ``--backlog``/``--out`` run (tests,
+A default-paths run ALSO refreshes ``web/src/generated/gates.json`` (J17)
+and ``web/src/generated/enforcement-matrix.json`` (J20): both read sources
+this ritual edits (backlog item text; the gate-prompts tree), so a groom or
+a gate-prompt add would otherwise silently drift them past their guards
+(``test_gates_json.py`` / ``test_enforcement_matrix.py`` — the J20 incident:
+a gate-prompt commit regenerated gates.json but not the matrix). One command
+refreshes all three; an explicit ``--backlog``/``--out`` run (tests,
 previews) renders the board only.
 
 Usage:
@@ -42,9 +45,11 @@ def main() -> None:
     print(f"wrote {out_path}")
 
     if args.backlog == DEFAULT_BACKLOG_PATH and args.out == DEFAULT_BOARD_PATH:
+        import render_enforcement_matrix
         import render_gates
 
         render_gates.main()
+        render_enforcement_matrix.main()
 
 
 if __name__ == "__main__":

@@ -59,8 +59,9 @@ things share the word *port* — never conflate them:
    [`knowledge/depgraph-snapshots/README.md`](knowledge/depgraph-snapshots/README.md); view with
    `viewer.html`). Anything unfinished or newly noticed → `IDEAS.md`.
    *Stale-render check (renders are deterministic):* re-render, then `git diff --quiet docs/plan/board.html`
-   (and the `docs/design/*.html` and `web/src/generated/gates.json` — a default-paths `render_board.py` run
-   refreshes gates.json too; J17) — any diff means a committed render didn't match its source; commit the refresh.
+   (and the `docs/design/*.html`, `web/src/generated/gates.json`, and `web/src/generated/enforcement-matrix.json`
+   — a default-paths `render_board.py` run refreshes gates.json and the matrix too; J17/J20) — any diff means
+   a committed render didn't match its source; commit the refresh.
 
 ---
 
