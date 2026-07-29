@@ -6276,6 +6276,13 @@ items:
       used, dbs touched, timings, staleness flags — written to the DB the R1
       ruling names (never drydocs) via a dedicated writer boundary. A
       console.agent-runs.v1 QuerySpec returns runs for the admin view.
+      The envelope also RESERVES a hashed caller-identity slot (user_id
+      sha256 + length, mirroring the question-text rule) — ADK 2.0 run_async
+      takes user_id per call; full identity never lands in the graph.
+    notes: >
+      MERGED 2026-07-28 (groom): the caller-identity slot from the
+      agent-runtime target-state review (ADR 0007 revisit check PASSED;
+      detail in internal/agent-platform/, never public).
 
   - id: R4
     epic: agentic-qa
@@ -8349,12 +8356,124 @@ items:
       trio (container facts) already landed via L16 Rev 3, this is the
       remaining two as one revision.
 
+  # --- 2026-07-28 evening groom (post-rebase): the rua listing fallback (G45),
+  # --- the K4-comment scope fix (C20), the render-entry-point fold part 2
+  # --- (J20), and the agent-runtime alignment chores (R10). R3 gained the
+  # --- caller-identity merge in place.
+  - id: G45
+    epic: component-topology
+    title: "rua_inventory stages the metadata-only scripts.csv listing instead of silently dropping every script — presence-dispatch with scripts.tsv precedence (back-flow, mechanism-only)"
+    type: bug
+    module: drydocs-lineage
+    phase: 6
+    agent: main
+    model: sonnet
+    priority: p2
+    status: todo
+    depends_on: []
+    inputs: [drydocs_lineage/extractors/rua_inventory.py, tests/unit/test_lineage_rua.py, config/gate-prompts/rua-load-shapes.yaml]
+    acceptance: >
+      _stage_scripts dispatches by presence: scripts.tsv (v2, richer) WINS
+      when both files exist; else scripts.csv
+      (path|script|permission|date|size, pipe-delimited) stages METADATA-ONLY
+      — abs_path joined from path+script, no sha256 so hash_missing counts,
+      no body copy so script_copies_missing counts (a LISTING is a fact,
+      never implied content); neither file present files
+      sections_optional_absent. Reader refactor keeps one delimited-read
+      path (the company _read_delimited shape or equivalent). Synthetic
+      fixtures pin BOTH the csv fallback (rows stage, counters assert) and
+      the tsv-wins precedence; zero real values anywhere
+      (mechanism-not-instance); staging-only — no loader, no graph write
+      (G22 stays the terminus); full suite green.
+    notes: >
+      Groomed 2026-07-28 evening from the back-flow [bug] line: company
+      session fixed theirs same day (561 scripts across two production
+      bundles were ALL silently dropped pre-fix; staging-only, terminus
+      held). Producer parity keeps bundles cross-ingestible ahead of the T14
+      collector convergence; the v1-tag-wearing-v2-payload collector caveat
+      rides T14, not this item. Gate-page premise 2 + provenance already
+      carry the hash-absent consequence for G22.
+  - id: C20
+    epic: ontology-mapping
+    title: "constraints.cypher's 'deprecated by K4 — kept for old graphs' comment is under-scoped: role/membership keys are live catalog writes; re-scope the comment to what K4 actually deprecated"
+    type: chore
+    module: ontology
+    phase: 2
+    agent: main
+    model: sonnet
+    priority: p3
+    status: todo
+    depends_on: []
+    inputs: [drydocs_core/schema/constraints.cypher, config/gate-log.md, drydocs_core/schema/catalog_ontology_supplement.cypher, drydocs/loaders/cypher/pat_team_roles.cypher]
+    acceptance: >
+      The comment heading role_name / role_id / membership_id in
+      constraints.cypher names the ACTUAL K4 scope (verified against the K4
+      gate-log entry): the reified-membership pattern is deprecated in the
+      SEAL attribution loaders specifically, while :Role seeds
+      (catalog_ontology_supplement) and :Membership writes
+      (pat_team_roles.cypher) remain live catalog paths; the void phrase
+      "kept for old graphs" is gone (the C13 precedent — graphs rebuild from
+      bootstrap, never migrate); test_schema stays green with
+      EXPECTED_CONSTRAINTS unchanged (comment-only edit).
+    notes: >
+      Groomed 2026-07-28 evening from the same-day [question] line (noticed
+      during the AIS back-flow check, 87ba693; deliberately not hot-fixed
+      there). Same comment-accuracy family as C19.
+  - id: J20
+    epic: release-infrastructure
+    title: "One render entry point, part 2: enforcement-matrix.json joins the default-paths board render (the J17 fold applied to the second generated surface)"
+    type: chore
+    module: docs
+    phase: 8
+    agent: main
+    model: haiku
+    priority: p3
+    status: todo
+    depends_on: []
+    inputs: [scripts/render_board.py, scripts/render_enforcement_matrix.py, CLAUDE.md]
+    acceptance: >
+      A default-paths scripts/render_board.py run also refreshes
+      web/src/generated/enforcement-matrix.json (explicit --backlog/--out
+      runs stay board-only, the J17 rule); after the change, adding a
+      gate-prompt file or editing a matrix source followed by the documented
+      ritual leaves tests/unit/test_enforcement_matrix.py green with no
+      separately remembered step; the CLAUDE.md stale-render line names the
+      matrix alongside gates.json.
+    notes: >
+      Groomed 2026-07-28 evening from the same-day [chore] line: the
+      stale-render check caught exactly this drift live (49667dd regenerated
+      gates.json but not the matrix; swept in a90fdad). Same defect shape
+      J17 closed for gates.json.
+  - id: R10
+    epic: agentic-qa
+    title: "Agent-runtime alignment chores from the passed ADR 0007 revisit check: pin google-adk to >=2,<3 and date-stamp the revisit clause"
+    type: chore
+    module: drydocs-agents
+    phase: 15
+    agent: main
+    model: haiku
+    priority: p3
+    status: todo
+    depends_on: []
+    inputs: [agents/requirements.txt, docs/decisions/0007-agentic-qa-architecture.md]
+    acceptance: >
+      agents/requirements.txt pins google-adk>=2,<3 (currently unpinned
+      while ADK 2.0 breaking changes land upstream — an unpinned install can
+      drift under the app shape); ADR 0007's Revisit-if section carries a
+      dated note that the trigger fired 2026-07-28 and PASSED (convergence,
+      not divergence), citing the internal review by path only
+      (internal/agent-platform/smartsdk-3-adr0007-compatibility.md).
+    notes: >
+      Groomed 2026-07-28 evening from the agent-runtime target-state [idea]
+      line's follow-ups; the third follow-up (R3 caller-identity slot) was
+      MERGED into R3's acceptance in the same groom.
+
 summary:
-  todo: 63                                         # 2026-07-28 pm load-map groom: +4 (N3-N6 — the generated loaders/order/commands/source-target surface; only N3 is dependency-free, N4->N5 chain and N6 waits on N3's declared sequence). # 2026-07-28 pm post-UI-merge groom: +15 (U7/U8 instrument hardening, O35 WF-LND landing, O36 dot clip, O37-O41 DataLens/DSI continuity, B5 stage taxonomy, R9 agent query surface, J18/J19 process, L20 stray-file guard, L21 runbook Rev 4).                                       # C15/C16/L18/D8/J17 claimed in_progress 2026-07-28 (batch claim, pushed-claim discipline). P5 claimed in_progress 2026-07-28 pm (pushed-claim discipline). 2026-07-28 pm epic-close-out groom: +7 (G42-G44 Snowflake data-catalog seam from the loader plan; L18 comma-split bug, L19 doc-drift sweep, D8 bootstrap guard, J17 gates.json ritual — all from same-day inbox lines), U5 executed in-run (-1, Epic U closed 6/6); prior: U4 closed 2026-07-28 pm (right after U6 unblocked it); U6 groomed + built + closed same day (net 0); +4 at the 2026-07-28 inbox groom (C19 ontology-comment fix, J16 port-manifest fall-through guard, L17 doc-loader prereq guards, O34 web npm advisories); all four closed same day (O34 via its stop clause), L16 closed alongside; +5 2026-07-27 groom (J14/J15/G36/O33/G38), +2 PAT review (C17/C18), +5 code-graph-review (U1-U5), +2 cmdline seam (G39/G40, built+closed same day)
+  todo: 67                                         # 2026-07-28 evening groom: +4 (G45 rua listing fallback back-flow, C20 K4-comment scope, J20 matrix render fold, R10 agent-runtime chores; R3 caller-identity merged in place). Earlier 2026-07-28 pm load-map groom: +4 (N3-N6 — the generated loaders/order/commands/source-target surface; only N3 is dependency-free, N4->N5 chain and N6 waits on N3's declared sequence). # 2026-07-28 pm post-UI-merge groom: +15 (U7/U8 instrument hardening, O35 WF-LND landing, O36 dot clip, O37-O41 DataLens/DSI continuity, B5 stage taxonomy, R9 agent query surface, J18/J19 process, L20 stray-file guard, L21 runbook Rev 4).                                       # C15/C16/L18/D8/J17 claimed in_progress 2026-07-28 (batch claim, pushed-claim discipline). P5 claimed in_progress 2026-07-28 pm (pushed-claim discipline). 2026-07-28 pm epic-close-out groom: +7 (G42-G44 Snowflake data-catalog seam from the loader plan; L18 comma-split bug, L19 doc-drift sweep, D8 bootstrap guard, J17 gates.json ritual — all from same-day inbox lines), U5 executed in-run (-1, Epic U closed 6/6); prior: U4 closed 2026-07-28 pm (right after U6 unblocked it); U6 groomed + built + closed same day (net 0); +4 at the 2026-07-28 inbox groom (C19 ontology-comment fix, J16 port-manifest fall-through guard, L17 doc-loader prereq guards, O34 web npm advisories); all four closed same day (O34 via its stop clause), L16 closed alongside; +5 2026-07-27 groom (J14/J15/G36/O33/G38), +2 PAT review (C17/C18), +5 code-graph-review (U1-U5), +2 cmdline seam (G39/G40, built+closed same day)
   in_progress: 1                                   # E1 (gate deferred both sides). 2026-07-28 batch claim fully closed: J17, D8, L18, C15, C16 all done same day
   blocked: 0
   done: 167                                        # 2026-07-28: C16 key-prefix governance in the metadata plan (drydocs./system/team-local classes), C15 inverse_label on all 78 vocab entries (presentational only, schema-test enforced), L18 depth-0 cell split (the K2 shear healed; conformance guard over the real matrices), D8 bootstrap constraint guard (names-not-counts presence check after apply, live 51/51), J17 gates.json folded into the default-paths board render (drift closed at the ritual level). Earlier 2026-07-28 pm: P5 maintenance-window query (patch-window CLI + union-not-sum window math + findings feeder; claimed-then-closed same day — EPIC P COMPLETE 5/5), U5 groom-skill graph cross-check subsection (executed inside the close-out groom — EPIC U COMPLETE 6/6), U4 tech-debt graph-evidence section (hardened A1-A6 pack + offline fallback, all probes run live), U6 depgraph scanner blind-spot fix (shared-namespace extract_many + drydocs_api root; 205 modules / 370 IMPORTS, all 24 U1 orphan false-positives resolved). Earlier 2026-07-28: G41 glue base-table inventory seam (built + closed same day), L17 doc-loader prereq guards (same), O33 SchemaMeta exemplar audit (22 specs + runs_on write path; live-proven), O34 npm advisories (postcss cleared; react-router escalated via the stop clause), U1/U2/U3 code-graph persona reviews run 1 (scanner blind-spot headline; backlog verified truthful; doc board + citation sweep queued), C19 ontology-comment fix (groomed + closed same day), J16 port-manifest fall-through guard (same), L16 runbook container/port refresh. 2026-07-27 closes: J14 SEALID split, P3 hosts+RUNS_ON, G21 rua code-ops, G24 code-repo seam, G26 launcher-registry config, Q8 bmc-docs prereq, C18 shadow-model guard, J15 value-shape boundary guard, G33 code-snapshot loader (gate signed + built same day), G39 cmdline staging store + G40 parse (groomed am, built pm)
-  next_ready: [N3, M3, M4, J10, Q6, O23, J13, O26, O27, C17, O28, R3, R4, O29, O30, O31, O32, S1, S8, S9, Q7, G32, G34, G35, G22, G42, L19, O35, O36, O37, O38, O40, O41, B5, R9, J18, J19, L20, L21]
+  next_ready: [N3, M3, M4, J10, Q6, O23, J13, O26, O27, C17, O28, R3, R4, O29, O30, O31, O32, S1, S8, S9, Q7, G32, G34, G35, G22, G42, L19, O35, O36, O37, O38, O40, O41, B5, R9, J18, J19, L20, L21, G45, C20, J20, R10]
   # 2026-07-28 pm post-UI-merge groom: all 15 new items dependency-free except
   # O39 (waits on O38's IdChips — the link surface). O37 coordinates with O30
   # informally (no hard dependency; whichever lands second re-verifies).

@@ -407,7 +407,8 @@
       ],
       "log_ref": null,
       "unblocks": [
-        "G22"
+        "G22",
+        "G45"
       ]
     }
   ]

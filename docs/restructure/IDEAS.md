@@ -26,43 +26,6 @@ Tags help grooming: `idea` · `bug` · `doc` · `source` (new data source) · `q
 
 <!-- add new ideas at the top -->
 
-- 2026-07-28 — [question] **Is `constraints.cypher`'s "deprecated by K4" comment under-scoped?**
-  Line 53 heads `role_name` / `role_id` / `membership_id` with "Reified Membership pattern
-  (W3C ORG) — deprecated by K4; kept for old graphs", but all three are actively WRITTEN today:
-  `catalog_ontology_supplement.cypher` seeds the canonical `:Role` rows (11+, from `MERGE (n:Role
-  {name: ...})`) and `drydocs/loaders/cypher/pat_team_roles.cypher:24` MERGEs `:Membership`. K4
-  deprecated the pattern *in the SEAL loaders* specifically, so the comment is most likely
-  under-scoped rather than stale — but "kept for old graphs" is the exact phrase the 2026-07-23
-  C13 sweep retired elsewhere as void (graphs are rebuilt from bootstrap, not migrated), so it
-  should not be left ambiguous. Noticed 2026-07-28 while checking the producer for the company's
-  AIS "supplement applied" bug (commit `87ba693`); deliberately NOT fixed there — it is a
-  K4-scope question for whoever owns that follow-up, not a straggler from the scheduler_kind sweep.
-
-- 2026-07-28 — [chore] **The stale-render check earns its place — it fired on a real drift today.**
-  `49667dd` (concurrent desktop session) added `config/gate-prompts/rua-load-shapes.yaml` and
-  regenerated `gates.json` but NOT `enforcement-matrix.json`, which also reads the gate-prompts
-  tree (`pending_entries` 68 → 73 + the new file in the surface's source list). Caught by the
-  CLAUDE.md §0 re-render-then-diff step and swept in the same session. Worth asking whether the
-  two renders should be driven by ONE entry point the way a default-paths `render_board.py` run
-  already refreshes `gates.json` (J17) — a second render that a contributor must remember
-  separately is the same shape of defect J17 closed.
-
-- 2026-07-28 — [bug] **Back-flow candidate: `rua_inventory` silently drops every script when a
-  bundle ships the metadata-only `scripts.csv` listing — producer extractor reads `scripts.tsv`
-  only** (confirmed live: `drydocs_lineage/extractors/rua_inventory.py:55` declares SCRIPTS_TSV
-  as the sole scripts source). The company session fixed theirs 2026-07-28 (mechanism observed
-  from their session note; hosts/users/paths stay company-side): `_stage_scripts` dispatches by
-  presence — `scripts.tsv` (v2, richer) WINS when both present; else `scripts.csv`
-  (`path|script|permission|date|size`, pipe-delimited) stages METADATA-ONLY (abs_path joined
-  from path+script; no sha256 → hash_missing counted; no body copy → script_copies_missing
-  counted — "a LISTING is a fact, never implied content"); else optional-absent. Plus a thin
-  `_read_delimited` refactor under `_read_tsv` and two regression tests (csv fallback stages;
-  tsv preferred when both). Reproduce generically with synthetic fixtures (mechanism-not-
-  instance). Evidence scale: two production bundles, 561 scripts staged (was 0 pre-fix),
-  staging-only — the G22 terminus HELD on both sides. RIDERS captured onto the gate page
-  (rua-load-shapes.yaml, premise 2 + provenance): occurrences cannot assume a content hash
-  exists; the collector still tags csv-shipping bundles `rua-inventory/v1` — a v2 payload
-  wearing a v1 tag; the collector-side schema bump rides T14 collector convergence, not G22.
 - 2026-07-28 — [chore] **PARKED UNTIL AFTER THE PORT REVIEW: verify the `neo4j-drydocs` MCP
   server actually works now.** It requires APOC, and APOC was silently ABSENT from the
   `neo4jtest` container for weeks (`NEO4J_PLUGINS=[apoc]` set, `/plugins` empty — fixed
@@ -76,23 +39,6 @@ Tags help grooming: `idea` · `bug` · `doc` · `source` (new data source) · `q
   DryDocs calls it yet, so decide whether it earns a place (Epic R / graph-retrieval
   benchmark) or is just available. Deliberately deferred so it does not interleave with the
   port review.
-- 2026-07-28 — [idea] **Agent-runtime target state re-confirmed: OSS Google ADK 2.0 idioms are
-  the Epic R build surface** (ADR 0007's revisit-if check ran 2026-07-28 and PASSED; the
-  detailed review is `internal/agent-platform/smartsdk-3-adr0007-compatibility.md`, never
-  public). Target state: agents subclass `google.adk` `BaseAgent`/`LlmAgent` directly — already
-  true of `graph_qa`, and now the durable shape everywhere our agents run; **R6**'s bounded
-  enhance/solve loop builds ON ADK 2.0 Workflow primitives (Edge/FunctionNode/JoinNode,
-  RetryConfig, NodeTimeoutError, RequestInput for HITL, nested composition) — never a bespoke
-  controller or any deprecated pre-Workflow orchestration API; the non-local half of R1's
-  env-split provider ruling binds Azure OpenAI through the OpenAI-compatible V1 endpoint (the
-  `extract_usage` seam already normalizes that token shape); **R9** stays CLI-first with MCP
-  as the later option — MCP tools with constructor-pinned, LLM-invisible sensitive args make
-  that path viable when wanted; any agent-to-agent exposure of `graph_qa` is authenticated by
-  requirement and lands as a DD-series item, never here. Follow-ups to groom: [chore] pin
-  `google-adk` (`>=2,<3`) in `agents/requirements.txt` (unpinned while ADK 2.0 breaking
-  changes land upstream); [idea] **R3** envelope reserves a hashed caller-identity slot
-  (ADK 2.0 `run_async` takes `user_id` per call — hash it like the question text); [doc]
-  date-stamp the passed revisit check in ADR 0007's Revisit-if section.
 - 2026-07-28 — [question] **Retire the `depgraph` sibling repo entirely by bringing the SCANNER
   in-house?** The user's reaction to the fork merge was *"I didn't realize it was still used
   after we made it a module"* — and that instinct was half right in a way worth acting on. ADR
@@ -846,6 +792,16 @@ Tags help grooming: `idea` · `bug` · `doc` · `source` (new data source) · `q
 
 ## Recently groomed (audit trail)
 
+- 2026-07-28 evening — [bug] rua_inventory silent scripts drop on metadata-only scripts.csv
+  bundles (company fixed theirs same day; producer parity, mechanism-only) → **G45**.
+- 2026-07-28 evening — [question] constraints.cypher "deprecated by K4 — kept for old graphs"
+  comment under-scoped (role/membership keys are live catalog writes) → **C20**.
+- 2026-07-28 evening — [chore] enforcement-matrix render must ride the one entry point (the
+  stale-render check caught the 49667dd drift live; the J17 defect shape, second surface) → **J20**.
+- 2026-07-28 evening — [idea] agent-runtime target-state follow-ups (ADR 0007 revisit check
+  PASSED; detail in internal/agent-platform/) → **R10** (google-adk pin + ADR date-stamp);
+  caller-identity slot MERGED into **R3**'s acceptance. The target-state prose itself lives in
+  the internal review + the R-item acceptances now.
 - 2026-07-28 pm — [question] "do we have ONE document with the loaders and order, commands,
   source→target mapping?" → answered NO, then scoped and groomed as **N3–N6** (Epic N,
   phase 11). It is split today across `internal/repo-README.md` (CLI reference + Control-M
