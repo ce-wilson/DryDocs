@@ -26,6 +26,33 @@ Tags help grooming: `idea` · `bug` · `doc` · `source` (new data source) · `q
 
 <!-- add new ideas at the top -->
 
+- 2026-07-29 — [idea] **N3's loader→source binding needs a per-side value overlay — the
+  company port (PORT-REPORT-e60822fc) DEFERRED N3–N6 over it (their T19), and the
+  deferral exposed a producer design limit + one nasty id collision.** Two company-side
+  blockers, both real: (1) producer `catalog.py` declares `source_id = "catalog-pat"`
+  but the company gates its 8 catalog loaders on `pat-catalog` — their registry has
+  BOTH ids as DIFFERENT feeds (`pat-catalog` = PAT People-Report org catalog,
+  confirmed; `catalog-pat` = separate team-report feed), while the producer has ONE
+  (`catalog-pat` = the whole catalog+PAT sample feed). Same string, different meaning
+  across repos — adopting the class values silently re-points 8 loaders' D3 gate, and
+  no test catches the VALUE (only presence/resolution). (2) ~13 company-only loaders
+  (snow_support_*, employee_roster, seal_deployments, autosys/controlm app-code
+  loaders, avg_run, …) carry no source_id → the derivation drops them from gating and
+  the ungated-loader guard fails. Company action: kept their hardcoded LOADER_SOURCE,
+  dropped the N4/N5/N6 surfaces + render_load_map from their board render, marked
+  their N3/N4/N5 blocked, filed T19; gate review requested by the user. **Producer
+  follow-up candidate (groom as N7 once the company gate rules):** class declarations
+  stay the producer DEFAULT; add a config overlay (loader name → source_id) that wins
+  over the class value — file ruled canonical-company in the manifest (the
+  dev-environment.yaml precedent), LOADER_SOURCE = derivation + overlay, guard tests
+  stay byte-identical both sides, company deltas live in the one per-side file. Also
+  record the catalog-pat≠pat-catalog id collision in BOTH repos' divergence ledgers
+  regardless of ruling, and note the value-level guard gap (a wrong-but-resolving
+  source_id passes; a company-side pin test on the catalog family would close it).
+  NOTE: their port head `e60822f` predates `1b51c04`, which added the
+  docs/plan/load-map.html manifest row their agent had to improvise around — the next
+  range pre-answers that disposition.
+
 - 2026-07-29 — [bug] **The J16 manifest-coverage guard has a tracked-only blind spot: a
   NEW file passes the suite before `git add` and fails it after.** Live case same day:
   the N5 session ran the full suite green, committed `docs/plan/load-map.html`, pushed —
