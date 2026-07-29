@@ -1,0 +1,229 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Runbook — CMD_LINE staging, resolution &amp; parse (the G39→G48→G40 chain)</title>
+<style>
+:root { color-scheme: light dark; --ink:#1a1a1a; --mid:#555; --line:#d0d0d0; --faint:#f6f6f6; --bg:#fff; --link:#0a58ca; }
+@media (prefers-color-scheme: dark) { :root { --ink:#e6e6e6; --mid:#a0a0a0; --line:#3a3a3a; --faint:#1c1c1c; --bg:#141414; --link:#6ea8fe; } }
+:root[data-theme="dark"] { --ink:#e6e6e6; --mid:#a0a0a0; --line:#3a3a3a; --faint:#1c1c1c; --bg:#141414; --link:#6ea8fe; }
+:root[data-theme="light"] { --ink:#1a1a1a; --mid:#555; --line:#d0d0d0; --faint:#f6f6f6; --bg:#fff; --link:#0a58ca; }
+* { box-sizing: border-box; }
+body { font: 15px/1.6 "Segoe UI", system-ui, Arial, sans-serif; color: var(--ink); background: var(--bg); margin: 0; }
+main { max-width: 900px; margin: 0 auto; padding: 32px 24px 80px; }
+h1 { font-size: 28px; margin: 0 0 6px; letter-spacing:-0.3px; }
+h2 { font-size: 20px; margin: 34px 0 10px; padding-bottom:5px; border-bottom: 2px solid var(--ink); }
+h3 { font-size: 16px; margin: 22px 0 8px; }
+h4,h5,h6 { font-size: 14px; margin: 16px 0 6px; }
+p { margin: 10px 0; } strong { font-weight: 700; }
+a { color: var(--link); } a:hover { text-decoration: underline; }
+code { font-family: "Cascadia Mono","Consolas",monospace; font-size: 0.88em; background: var(--faint); padding: 1px 4px; border-radius: 3px; }
+pre { font-family: "Cascadia Mono","Consolas",monospace; font-size: 12.5px; line-height:1.45; border:1px solid var(--line); background: var(--faint); padding: 12px 14px; border-radius: 6px; overflow-x: auto; }
+pre code { background: none; padding: 0; }
+table { border-collapse: collapse; margin: 14px 0; font-size: 13.5px; display:block; overflow-x:auto; }
+th,td { border:1px solid var(--line); padding: 6px 9px; text-align:left; vertical-align: top; }
+th { background: var(--faint); font-weight:700; }
+blockquote { margin: 14px 0; padding: 2px 16px; border-left: 4px solid var(--line); color: var(--mid); }
+ul,ol { margin: 10px 0; padding-left: 26px; } li { margin: 4px 0; }
+hr { border:none; border-top:1px solid var(--line); margin: 26px 0; }
+:target { scroll-margin-top: 12px; } :target > :first-child, h2:target, h3:target { outline: 2px solid var(--link); outline-offset: 4px; }
+.dd-margin-tag, .dd-print-footer { display: none; }
+
+.dd-note-btn { border:1px solid var(--line); background:var(--bg); color:var(--mid); cursor:pointer; font-size:12px; line-height:1; padding:2px 6px; border-radius:5px; margin-right:6px; }
+.dd-note-btn:hover { color:var(--link); border-color:var(--link); }
+.dd-note-box { margin:6px 0 10px; }
+.dd-note-box textarea { width:100%; min-height:56px; font:13px/1.4 "Segoe UI",system-ui,sans-serif; color:var(--ink); background:var(--faint); border:1px solid var(--line); border-radius:6px; padding:8px; resize:vertical; }
+.dd-annotated { box-shadow:-3px 0 0 var(--link); padding-left:8px; }
+.dd-fb-bar { position:fixed; right:16px; bottom:16px; display:flex; flex-direction:column; gap:6px; align-items:stretch; background:var(--bg); border:1px solid var(--line); border-radius:10px; padding:8px 12px; box-shadow:0 2px 10px rgba(0,0,0,.15); font-size:13px; z-index:50; }
+.dd-fb-row { display:flex; gap:8px; align-items:center; justify-content:space-between; }
+.dd-fb-bar button { cursor:pointer; border:1px solid var(--link); background:var(--link); color:#fff; border-radius:6px; padding:5px 10px; font-size:13px; }
+.dd-fb-bar .dd-badge { font-weight:700; }
+.dd-fb-file { cursor:pointer; font-size:11px; color:var(--mid); white-space:nowrap; }
+.dd-fb-file code { font-size:11px; }
+.dd-fb-file:hover code { color:var(--link); }
+.dd-toast { position:fixed; right:16px; bottom:64px; background:var(--ink); color:var(--bg); padding:8px 12px; border-radius:8px; font-size:13px; z-index:60; opacity:0; transition:opacity .2s; }
+.dd-toast.show { opacity:1; }
+.dd-sme-feedback ol li { margin: 6px 0; }
+@media print { .dd-note-btn, .dd-note-box, .dd-fb-bar, .dd-toast, .dd-sme-feedback, .dd-sme-divider { display:none !important; } }
+@page { size: Letter; margin: 0.6in 0.62in 0.55in 0.62in; }
+@media print {
+:root, :root[data-theme="dark"], :root[data-theme="light"] { color-scheme: light; --ink:#1a1a1a; --mid:#555; --line:#bdbdbd; --fill:#eee; --faint:#f6f6f6; --bg:#fff; --link:#0a58ca; }
+html { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+body { font: 10.5px/1.45 "Segoe UI", system-ui, Arial, sans-serif; }
+main { max-width: 7.2in; margin: 0 auto; padding: 0 0 0 0.62in; position: relative; }
+h1 { font-size: 21px; margin: 0 0 2px; letter-spacing:-0.2px; }
+h2 { font-size: 14px; margin: 16px 0 8px; padding-bottom:4px; border-bottom: 2px solid var(--ink); text-transform: uppercase; letter-spacing: 0.6px; }
+h3 { font-size: 11.5px; margin: 13px 0 5px; padding-bottom:2px; border-bottom:1px solid var(--line); }
+h4,h5,h6 { font-size: 10.5px; margin: 9px 0 4px; }
+p { margin: 6px 0; }
+a { color: inherit; text-decoration: underline; }
+code { font-size: 9.2px; padding: 0 2px; border-radius: 2px; }
+table { display: table; width:100%; margin: 7px 0; font-size: 9.1px; overflow-x: visible; }
+th, td { padding: 3px 5px; }
+th { background: var(--fill); }
+td code, th code { background: transparent; padding: 0; }
+pre { font-size: 8.4px; line-height: 1.35; padding: 7px 9px; margin: 7px 0; white-space: pre; overflow: hidden; border-radius: 3px; }
+pre.sql { background:#fbfbfb; }
+blockquote { margin: 7px 0; padding: 2px 10px; border-left: 3px solid var(--line); break-inside: avoid; }
+ul,ol { margin: 6px 0 6px 16px; padding: 0; } li { margin: 3px 0; }
+hr { margin: 10px 0; }
+h2, h3, table, pre { break-inside: avoid; }
+
+/* L6 paper HITL: each anchored block sits in the left gutter (main's own padding-left,
+   reserved above) so a printed page carries the anchor id beside its section — no @page
+   margin-box support required, so headless Chromium print-to-pdf renders it reliably. */
+h1, h2, h3, h4, h5, h6, p, table, pre, ul, ol, blockquote { position: relative; }
+.dd-margin-tag {
+  display: block; position: absolute; left: -0.6in; top: 0.1em; width: 0.54in;
+  font: 6.2px/1.15 "Cascadia Mono","Consolas",monospace; text-align: right;
+  color: var(--mid); letter-spacing: 0.1px; word-break: break-word;
+}
+/* Rev/commit footer: `position: fixed` repeats on every printed page in Chromium's
+   headless print-to-pdf (the standard running-footer technique) without needing CSS
+   Paged-Media margin-box content(), which Chromium supports only partially. */
+.dd-print-footer {
+  display: block; position: fixed; left: 0.62in; right: 0.62in; bottom: 0.12in;
+  font-size: 8px; color: var(--mid); text-align: center;
+  border-top: 1px solid var(--line); padding-top: 3px;
+}
+}
+</style>
+</head>
+<body>
+<main>
+<h1>Runbook — CMD_LINE staging, resolution &amp; parse (the G39→G48→G40 chain)</h1>
+<ul id="front-matter"><span class="dd-margin-tag" aria-hidden="true">front-matter</span><li><strong>Status:</strong> DESCRIPTIVE — documents the working procedure. <strong>Rev 1, 2026-07-29</strong> (reflects commit <code>ba6b83b</code>: the G48 build that completed the chain — store schema v3, <code>resolution_quality</code> provenance, the <code>resolve-cmdline-staging</code> verb)</li><li><strong>Classification:</strong> Internal-Public (mechanism only — every command line, folder, and variable in this document is SYNTHETIC; real command lines are Internal and live only in the out-of-tree store under <code>DRYDOCS_DATA_ROOT</code>)</li><li><strong>Audience:</strong> anyone turning verbatim Control-M <code>CMD_LINE</code>s into resolved, parseable, structured job detail — producer-side with synthetic data, or company-side against the real graph + XML exports</li><li><strong>Companion:</strong> <code>drydocs/cmdline_staging.py</code> (the store + all three steps), <code>drydocs_core/controlm/resolver.py</code> (the ONE resolver, G46), <code>drydocs_lineage/extractors/controlm_xml.py</code> (the XML seam, G47), <code>config/gate-prompts/rua-load-shapes.yaml</code> (G22 — the terminus any load waits on)</li></ul>
+<hr>
+<h2 id="purpose-scope"><span class="dd-margin-tag" aria-hidden="true">purpose-scope</span>Purpose &amp; scope</h2>
+<p><strong>Purpose.</strong> A job&#x27;s <code>CMD_LINE</code> often hides its real payload behind Control-M variables (<code>%%SCRIPT_DIR/%%SCRIPT …</code>) — unparseable as stored. This chain stages every job&#x27;s command verbatim (G39), substitutes variables from a Control-M XML definition export through the one shared resolver (G48), and parses the resolved text into structured detail columns — launcher, script path, DPL pipeline GUID, props (G40). The output is a SQLite evidence store, not a graph.</p>
+<pre><code>Neo4j :ControlMJob ──①export──▶ job_detail (cmd_line VERBATIM)
+XML export ──G47 extractor──▶ ordered variables ──②resolve (G46)──▶ cmd_line_resolved + resolution_quality
+job_detail ──③parse (G26/G15/G16)──▶ job_detail_parsed + parse_quality</code></pre>
+<p><strong>In scope.</strong> The three CLI verbs, their run order and re-run semantics, the store tables, and the coverage/provenance surfaces to check after each step.</p>
+<p><strong>Out of scope.</strong> Writing ANY of this to Neo4j (G22 is the only door); the psgmgr-vs-XML source-precedence ruling (OPEN — parked in <code>IDEAS.md</code> as a HITL question; this chain fills a nullable derived column and decides nothing); the variables pull into the graph itself (deferred by the G18→G22 plan).</p>
+<h2 id="prerequisites"><span class="dd-margin-tag" aria-hidden="true">prerequisites</span>Prerequisites</h2>
+<ol><li id="prerequisites--a-loaded-graph-controlmjob-nodes"><strong>A loaded graph</strong> — <code>:ControlMJob</code> nodes with <code>cmd_line</code>, <code>parent_table</code> (folder name; the v3 join key) and <code>instance_name</code> present, i.e. the <code>controlm_folders</code> → <code>controlm_jobs</code> loader chain has run (see the startup &amp; refresh runbook).</li><li id="prerequisites--drydocs-data-root-resolvable-env-var-els"><strong><code>DRYDOCS_DATA_ROOT</code></strong> resolvable (env var, else <code>~/data/DryDocs</code>) — the store and the XML landing zone both live under it, never in the repo.</li><li id="prerequisites--a-control-m-xml-definition-export-deftab"><strong>A Control-M XML definition export</strong> (DEFTABLE format) landed in <code>&lt;DRYDOCS_DATA_ROOT&gt;/controlm-xml/</code> — arbitrarily-named <code>*.xml</code> files; the landing zone convention is the guard (no filename fingerprint exists). Without one, steps ① and ③ still work; step ② refuses with exit 2.</li><li id="prerequisites--the-poetry-environment-poetry-install-al">The poetry environment (<code>poetry install</code>); all commands below run as <code>poetry run drydocs …</code> (or <code>drydocs …</code> inside the venv).</li></ol>
+<h2 id="startup"><span class="dd-margin-tag" aria-hidden="true">startup</span>Startup</h2>
+<p>Bring the store from NOTHING to POPULATED — the export is the chain&#x27;s step ①:</p>
+<ol><li><strong>Export</strong> — one row per loaded job, command text verbatim:</li></ol>
+<pre class="powershell"><code>   drydocs export-cmdline-staging
+   # jobs=240137 with_cmd_line=182254 active=175003 | task_type: Job=…, Watcher=…</code></pre>
+<p>Writes <code>&lt;DRYDOCS_DATA_ROOT&gt;/cmdline-staging/job_detail.db</code> (schema <code>drydocs.cmdline-staging.v3</code>). The store is REBUILT from scratch on every run — it is derived plumbing (same graph → same rows, no wall-clock values), and it is a TEMPORARY stand-in: the retirement note in its <code>meta</code> table says it dies the day a real <code>CM_DEF_VJOB_DETAIL</code>-style table exists.</p>
+<p>The only graph access in the whole chain happens here, and it is a read-only <code>MATCH</code>:</p>
+<pre class="cypher"><code>   MATCH (j:ControlMJob)
+   RETURN j.folder_id, j.job_id, j.job_name, j.parent_table AS folder_name,
+          j.instance_name AS data_center, j.task_type, j.active, j.cmd_line
+   ORDER BY j.folder_id, j.job_id</code></pre>
+<p>Success looks like: the summary line prints with a per-task-type census and the <code>.db</code> file exists at the path above.</p>
+<h2 id="refresh-ingest"><span class="dd-margin-tag" aria-hidden="true">refresh-ingest</span>Refresh / ingest</h2>
+<p>The recurring chain on a populated store. <strong>Order matters twice</strong>: ② must run before ③ (the parse prefers resolved text), and re-running ① wipes ②+③&#x27;s output by design (resolution re-runs after every export).</p>
+<ol><li><strong>Resolve</strong> (G48) — XML variables through the one shared resolver:</li></ol>
+<pre class="powershell"><code>   drydocs resolve-cmdline-staging          # default XML source: &lt;root&gt;/controlm-xml/
+   drydocs resolve-cmdline-staging --xml-source C:\path\to\export.xml   # override</code></pre>
+<p>What happens, precisely:</p>
+<ul><li>the G47 extractor stages the export taxonomy-first — folders, jobs, and variables with <strong>document-order ordinals</strong> (the resolver&#x27;s sequential-assignment contract);</li><li>each store row joins an XML job on <code>(data_center, folder_name, job_name)</code> (a counted <code>dc_fallback</code> to <code>(folder_name, job_name)</code> exists for rows whose <code>data_center</code> is NULL);</li><li>the <strong>store&#x27;s verbatim</strong> <code>cmd_line</code> is resolved via <code>resolve_command_line(extract.scope_layers(xml_job), cmd_line)</code> — the XML supplies ONLY the bindings. The XML job&#x27;s own <code>CMDLINE</code> is compared and a disagreement is COUNTED (<code>cmd_line_mismatch</code> — measured evidence for the open precedence question), never substituted;</li><li><code>cmd_line_resolved</code> is populated only when resolution changed the text; <code>cmd_line</code> is never touched. Per-job provenance lands in <code>resolution_quality</code>: verdict, source, match route, substituted names with the winning scope, unresolved residue, <code>{ODATE}</code>-class canonical tokens.</li></ul>
+<pre class="text"><code>   resolution: resolved=2 residue=1 nothing=2 no_match=1 ambiguous=1 no_cmd_line=1
+   (of 8 jobs, 7 xml jobs) | substitutions=3 dc_fallback=1 no_folder_name=0 cmd_line_mismatch=1</code></pre>
+<p>Every job lands in exactly one verdict — the buckets always sum to the job count.</p>
+<ol><li><strong>Parse</strong> (G40) — resolved-when-present into structured columns:</li></ol>
+<pre class="powershell"><code>   drydocs parse-cmdline-staging
+   # coverage: parsed=… partial=… unparsed=… no_cmd_line=… (…; N from resolved cmd lines)</code></pre>
+<p><code>parse_command</code> (G26 launcher registry, G15 DPL arg contract, G16 values-decide) fills <code>job_detail_parsed</code> (launcher, launch_mode, script_path, config_path, artifact_kind, pipeline_guid, props/args JSON); <code>parse_quality.parsed_from</code> records <code>resolved</code> or <code>raw</code> per job. Resolution exists to raise this step&#x27;s coverage: a <code>%%VAR</code>-launcher job that was <code>unparsed</code> raw becomes <code>parsed</code> from its resolved text.</p>
+<p>A worked example, one row through all three steps (synthetic):</p>
+<table><thead><tr><th>stage</th><th>value</th></tr></thead><tbody><tr><td>① <code>cmd_line</code> (verbatim, forever)</td><td><code>%%PY_LAUNCH --pipeline-id &lt;guid&gt; --aws</code></td></tr><tr><td>② <code>cmd_line_resolved</code></td><td><code>/apps/py/py-launcher.sh --pipeline-id &lt;guid&gt; --aws</code></td></tr><tr><td>② <code>resolution_quality</code></td><td><code>verdict=resolved · substituted=[[&quot;PY_LAUNCH&quot;,&quot;FOLDER&quot;]]</code></td></tr><tr><td>③ <code>job_detail_parsed</code></td><td><code>launcher=/apps/py/py-launcher.sh · pipeline_guid=&lt;guid&gt;</code></td></tr><tr><td>③ <code>parse_quality</code></td><td><code>verdict=parsed · parsed_from=resolved</code></td></tr></tbody></table>
+<h2 id="verify"><span class="dd-margin-tag" aria-hidden="true">verify</span>Verify</h2>
+<ul><li><strong>Summary lines</strong> print on every verb (the never-silent rule). The resolve buckets must sum to the job count; if <code>no_xml_match</code> dominates, see Troubleshooting before trusting anything downstream.</li><li><strong>Spot-check the store</strong> (sqlite3, or any client):</li></ul>
+<pre class="sql"><code>  SELECT value FROM meta WHERE key=&#x27;schema_version&#x27;;   -- drydocs.cmdline-staging.v3
+  SELECT verdict, count(*) FROM resolution_quality GROUP BY verdict;
+  SELECT parsed_from, count(*) FROM parse_quality GROUP BY parsed_from;
+  SELECT cmd_line, cmd_line_resolved FROM job_detail
+   WHERE cmd_line_resolved IS NOT NULL LIMIT 5;        -- verbatim ALWAYS beside derived</code></pre>
+<ul><li><strong>Determinism:</strong> re-running ② or ③ without a new export produces identical counts (both clear their own output first).</li><li><strong>The unit contract:</strong> <code>poetry run pytest tests/unit/test_cmdline_staging.py tests/unit/test_lineage_controlm_xml.py tests/unit/test_variable_resolver.py -q</code> — green means the chain&#x27;s semantics (verbatim-beside-derived, verdict exhaustiveness, one-resolver handoff) still hold.</li></ul>
+<h2 id="rollback"><span class="dd-margin-tag" aria-hidden="true">rollback</span>Rollback</h2>
+<p>The store is derived and rebuildable — rollback is re-derivation, never surgery:</p>
+<ul><li>A bad resolve or parse run: just re-run it (each step clears its own tables first). A bad export: re-run <code>drydocs export-cmdline-staging</code>.</li><li>Last resort: delete <code>job_detail.db</code> and re-run ①→②→③. Blast radius: the file itself — the graph is never written by this chain, so there is no graph state to restore.</li><li>An older-schema file (v1/v2) needs no migration: export rebuilds it in place; resolve/parse refuse it loudly with a re-export hint rather than guessing.</li></ul>
+<h2 id="troubleshooting"><span class="dd-margin-tag" aria-hidden="true">troubleshooting</span>Troubleshooting</h2>
+<table><thead><tr><th>Symptom</th><th>Diagnosis</th><th>Fix</th></tr></thead><tbody><tr><td><code>XML source not found …</code> (exit 2)</td><td>nothing landed in <code>controlm-xml/</code></td><td>land an export there, or pass <code>--xml-source</code></td></tr><tr><td><code>not a drydocs.cmdline-staging.v3 store</code></td><td>pre-v3 file from an earlier session</td><td><code>drydocs export-cmdline-staging</code> (rebuilds in place)</td></tr><tr><td><code>no_xml_match</code> unexpectedly high</td><td>join key broken: <code>folder_name</code> NULL (graph loaded before the loader stamped <code>parent_table</code>) or <code>data_center</code> spellings differ between psgmgr and the export</td><td>check <code>no_folder_name</code> in the summary; reload jobs, or rely on the counted <code>dc_fallback</code> only where the store dc is NULL</td></tr><tr><td><code>ambiguous_match</code> &gt; 0</td><td>the same job name appears twice under one folder (sub-folder twins) — skipped, never guessed</td><td>expected; resolve those by hand if they matter, or refine the export</td></tr><tr><td><code>cmd_line_mismatch</code> &gt; 0</td><td>psgmgr&#x27;s and the XML&#x27;s command text disagree</td><td>EXPECTED evidence, not an error — it feeds the open precedence ruling; do not &quot;fix&quot; either side</td></tr><tr><td><code>residue</code> verdicts</td><td><code>%%NAME</code> had no binding in scope, or the token is runtime-only</td><td>check <code>unresolved_json</code>; <code>{ODATE}</code>-class canonical tokens are expected residue, not failures</td></tr><tr><td>WARN flood on parse</td><td>partial/unparsed rows log per job</td><td>that is the WARN stream doing its job — counts are in the summary; the rows are all in <code>parse_quality</code></td></tr></tbody></table>
+<h2 id="contacts-escalation"><span class="dd-margin-tag" aria-hidden="true">contacts-escalation</span>Contacts &amp; escalation</h2>
+<ul><li><strong>Owner:</strong> the main (producer) session; company-side the raw-twin XML loader team runs the same mechanism against real exports.</li><li><strong>Anything that would give this data MEANING in the graph</strong> — loading resolved commands, INVOKES edges from parsed detail, usage conclusions — escalates to the HITL gate chain (G22, <code>config/gate-prompts/rua-load-shapes.yaml</code>). No loader exists for this store, deliberately.</li><li><strong>The psgmgr-vs-XML precedence question</strong> (which source wins per object, with a named owner-and-sunset for the dual definition path) is the SME&#x27;s to rule — parked in <code>docs/restructure/IDEAS.md</code>; <code>cmd_line_mismatch</code> is its evidence feed.</li></ul>
+<h2 id="appendices"><span class="dd-margin-tag" aria-hidden="true">appendices</span>Appendices</h2>
+<p><strong>A — store tables (schema <code>drydocs.cmdline-staging.v3</code>).</strong></p>
+<table><thead><tr><th>table</th><th>one row per</th><th>key columns</th></tr></thead><tbody><tr><td><code>meta</code></td><td>store fact</td><td><code>schema_version</code>, <code>retirement</code>, <code>psgmgr_projection</code>, <code>variables</code></td></tr><tr><td><code>job_detail</code></td><td>loaded job</td><td><code>cmd_line</code> (verbatim) · <code>cmd_line_resolved</code> (derived, nullable) · <code>folder_name</code> (v3 join key)</td></tr><tr><td><code>resolution_quality</code></td><td>job, per resolve run</td><td><code>verdict</code> · <code>resolution_source</code> · <code>matched_via</code> · <code>substituted_json</code> · <code>unresolved_json</code> · <code>canonical_tokens_json</code></td></tr><tr><td><code>job_detail_parsed</code></td><td>parsed invocation</td><td><code>invocation_type</code> · <code>launcher</code> · <code>launch_mode</code> · <code>script_path</code> · <code>pipeline_guid</code> · <code>props_json</code></td></tr><tr><td><code>parse_quality</code></td><td>job, per parse run</td><td><code>verdict</code> · <code>parsed_from</code> (<code>resolved</code>\</td><td><code>raw</code>)</td></tr></tbody></table>
+<p><strong>B — verdict vocabularies.</strong></p>
+<ul><li>resolution: <code>resolved · residue · nothing_to_substitute · no_xml_match · ambiguous_match · no_cmd_line</code></li><li>parse: <code>parsed · partial · unparsed · no_cmd_line</code></li></ul>
+<p><strong>C — the company-side equivalent of step ①</strong> is documented inside the store itself (<code>meta.psgmgr_projection</code> — the <code>psgmgr.CM_DEF_VJOB</code> SELECT with the same columns in the same order, <code>cmd_line_resolved</code> as <code>NULL</code> for downstream population).</p>
+<hr class="dd-sme-divider">
+<section class="dd-sme-feedback" aria-label="SME - Feedback">
+<h2>SME - Feedback</h2>
+<p>How to return your notes on this document:</p>
+<ol>
+<li>Click the <strong>✎</strong> button beside any section (or numbered step) and type your note — notes save in your browser as you type.</li>
+<li>When finished, click <strong>Copy feedback</strong> in the bottom-right toolbar. Your notes are copied as anchor-keyed YAML.</li>
+<li>Create the feedback file (it is YAML, <em>not</em> markdown) — <strong>Copy To:</strong> <code>docs/design/feedback/</code> · <strong>File Name:</strong> <code>drydocs-cmdline-resolution-runbook-rev1.yaml</code></li>
+<li>Paste the copied block into that file, save, and commit (or send the file back to the team).</li>
+</ol>
+</section>
+</main>
+<footer class="dd-print-footer">Rev 1 · commit ba6b83b</footer>
+<script>
+
+(function(){
+  var DOC="drydocs-cmdline-resolution-runbook", FILE="drydocs-cmdline-resolution-runbook-rev1.yaml", DIR="docs/design/feedback/", KEY="drydocs-doc-feedback:"+DOC;
+  function load(){ try{return JSON.parse(localStorage.getItem(KEY)||"{}");}catch(e){return {};} }
+  function save(){ localStorage.setItem(KEY, JSON.stringify(state)); }
+  var state=load(), badge;
+  function count(){ return Object.keys(state).filter(function(k){return (state[k]||"").trim();}).length; }
+  function refresh(){ if(badge) badge.textContent=count(); }
+  function toast(msg){ var t=document.createElement("div"); t.className="dd-toast"; t.textContent=msg; document.body.appendChild(t); requestAnimationFrame(function(){t.classList.add("show");}); setTimeout(function(){t.classList.remove("show"); setTimeout(function(){t.remove();},250);},1600); }
+  function exportYaml(){
+    var lines=["# design-doc feedback — paste into docs/design/feedback/"+DOC+"-rev<N>.yaml","doc: "+DOC,"notes:"];
+    Object.keys(state).forEach(function(a){
+      var note=(state[a]||"").replace(/\r/g,""); if(!note.trim()) return;
+      lines.push("  - anchor: "+a); lines.push("    note: |");
+      note.split("\n").forEach(function(l){ lines.push("      "+l); });
+    });
+    return lines.join("\n")+"\n";
+  }
+  function attach(el){
+    var id=el.id;
+    var btn=document.createElement("button"); btn.className="dd-note-btn"; btn.type="button"; btn.textContent="✎"; btn.title="Annotate #"+id;
+    var box=document.createElement("div"); box.className="dd-note-box"; box.style.display=(state[id]||"").trim()?"block":"none";
+    var ta=document.createElement("textarea"); ta.value=state[id]||""; ta.setAttribute("placeholder","note for #"+id+" …");
+    ta.addEventListener("input",function(){ state[id]=ta.value; save(); refresh(); el.classList.toggle("dd-annotated", !!ta.value.trim()); });
+    if((state[id]||"").trim()) el.classList.add("dd-annotated");
+    box.appendChild(ta);
+    btn.addEventListener("click",function(){ box.style.display=box.style.display==="none"?"block":"none"; if(box.style.display==="block") ta.focus(); });
+    if(el.tagName==="LI"){ el.insertAdjacentElement("afterbegin", btn); el.appendChild(box); }
+    else { el.insertAdjacentElement("afterend", box); el.insertAdjacentElement("beforebegin", btn); }
+  }
+  function copyText(txt, ok){
+    var done=function(){toast(ok);};
+    var fallback=function(){ var t=document.createElement("textarea"); t.value=txt; document.body.appendChild(t); t.select(); try{document.execCommand("copy"); toast(ok);}catch(e){toast("copy failed — select the box");} t.remove(); };
+    if(navigator.clipboard&&navigator.clipboard.writeText){ navigator.clipboard.writeText(txt).then(done,fallback); } else { fallback(); }
+  }
+  function fileLine(label, value){
+    var d=document.createElement("div"); d.className="dd-fb-file"; d.title="click to copy";
+    var c=document.createElement("code"); c.textContent=value;
+    d.appendChild(document.createTextNode(label+" ")); d.appendChild(c);
+    d.addEventListener("click",function(){ copyText(value, label.replace(":","")+" copied"); });
+    return d;
+  }
+  document.addEventListener("DOMContentLoaded",function(){
+    document.querySelectorAll("main [id]").forEach(attach);
+    var bar=document.createElement("div"); bar.className="dd-fb-bar";
+    var row=document.createElement("div"); row.className="dd-fb-row";
+    var lbl=document.createElement("span"); lbl.innerHTML='notes <span class="dd-badge">0</span>'; badge=lbl.querySelector(".dd-badge");
+    var ex=document.createElement("button"); ex.type="button"; ex.textContent="Copy feedback";
+    ex.addEventListener("click",function(){ copyText(exportYaml(), "feedback copied — create "+DIR+FILE); });
+    row.appendChild(lbl); row.appendChild(ex);
+    bar.appendChild(row);
+    bar.appendChild(fileLine("file:", FILE));
+    bar.appendChild(fileLine("path:", DIR+FILE));
+    document.body.appendChild(bar); refresh();
+  });
+})();
+
+</script>
+</body>
+</html>
