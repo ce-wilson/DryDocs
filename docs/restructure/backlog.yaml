@@ -7,7 +7,10 @@
 #
 # HOW AN AGENT PULLS WORK:
 #   1. Find the next item with status: todo whose every depends_on id is status: done.
-#   2. Set it status: in_progress and push that change before starting work (git is the only sync layer; a local-only commit is invisible to concurrent sessions).
+#   2. Set it status: in_progress, commit, and PUSH that change BEFORE starting work — not at
+#      close. This file's status is the only claim channel between concurrent sessions on the
+#      two machines and git is the only sync layer, so a local-only claim is invisible to the
+#      other machine (2026-07-28: two sessions independently built C19 ten minutes apart).
 #   3. Do exactly that item — stay inside the named agent's layer. Anything ambiguous
 #      goes to the HITL gate (docs/restructure/03-hitl-sme-flow.md), not auto-decided.
 #   4. Meet the `acceptance` test, then set status: done.
@@ -8392,6 +8395,20 @@ items:
       apart on 2026-07-28).
     notes: >
       Groomed 2026-07-28 pm from the duplicate-C19 [idea] line.
+      2026-07-30 EXECUTION RECORD — acceptance and inputs were REVISED DURING execution
+      (bff98f5), so the closed item is not graded against the text it was groomed with;
+      recording that here because the diff alone reads as a clean pass. Two changes, both
+      substantive: (a) the original clause "and the groom-backlog skill where it restates
+      it" was VACUOUS — that skill covers grooming, not pulling, and never restated the
+      pull rule; it was deliberately left untouched rather than have a pull-rule section
+      invented in it to satisfy the wording. (b) the real third edit site was this file's
+      own "HOW AN AGENT PULLS WORK" header comment — the block agents actually read on
+      pull, whose step 2 still said "(commit that change)"; it was absent from inputs.
+      FOLLOW-UP in the same session: the sub-agent's edits stated only the abstract
+      mechanism and dropped the named incident, so the retained "names why" clause was
+      NOT met at bff98f5 — both sites now name the 2026-07-28 duplicate-C19 build
+      explicitly. Naming the incident is the point of the item's own title (rule, not
+      lore): an abstract sync-layer note reads as theoretical, the incident does not.
   - id: L20
     epic: doc-infrastructure
     title: "feedback/ stray-file guard: files matching no expected -rev<N>.yaml pattern are reported as findings, not silently ignored"

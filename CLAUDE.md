@@ -44,11 +44,13 @@ things share the word *port* — never conflate them:
   text view); `IDEAS.md` is the inbox, groomed into the yaml via the **`groom-backlog` skill**.
 - **Pull rule (give this to a sub-agent verbatim):** *"Take the next `status: todo` item in
   `backlog.yaml` whose every `depends_on` is `done`; **commit and push** `status: in_progress`
-  **before starting work** (git is the only sync layer between concurrent sessions on two
-  machines — a local-only commit is invisible to the other machine, so two sessions will
-  independently claim the same item); do exactly that item, staying inside your layer; meet its
+  **before starting work**; do exactly that item, staying inside your layer; meet its
   `acceptance`; set it `done`."* Anything ambiguous → the HITL
   gate ([`docs/restructure/03-hitl-sme-flow.md`](docs/restructure/03-hitl-sme-flow.md)), never auto-decided.
+  **Pushed, not merely committed — why:** `backlog.yaml` status is the only claim channel between
+  concurrent sessions on the two machines, and git is the only sync layer, so a local-only claim is
+  invisible to the other machine. This is not hypothetical: on **2026-07-28 two sessions independently
+  built C19 about ten minutes apart.** Same at the close — push `done`, don't sit on it.
 
 **Session ritual (keeps every platform aligned):**
 1. **Start:** `git pull` → read this file → read `backlog.yaml`, pick the next ready item.
