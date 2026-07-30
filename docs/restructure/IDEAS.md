@@ -26,6 +26,20 @@ Tags help grooming: `idea` · `bug` · `doc` · `source` (new data source) · `q
 
 <!-- add new ideas at the top -->
 
+- 2026-07-30 — [chore] **Ask spoke LLM-in-the-loop smoke on the agents-venv machine** (R5
+  closed on desktop with wire-level e2e via stub ADK + real drydocs-api/Neo4j; the real
+  graph_qa streaming path — /run_sse + step events + explore_refs from the live pipeline —
+  still wants one live two-question smoke where agents/.env exists, the R2 precedent).
+- 2026-07-30 — [question] **ADK session growth from step events**: agent.py now yields one
+  event per pipeline step; ADK persists yielded events into session history, so long Ask
+  sessions inflate memory_events/memory_chars (the R3 metrics will show it — that telemetry
+  doubling as the ADR 0007 "swap in a DB-backed session store before any soak" tripwire is
+  by design, but a partial=True or non-persisted event mode is worth checking in ADK 2.x).
+- 2026-07-30 — [idea] **Stub-ADK verification harness**: the R5 scratchpad stub (FastAPI,
+  /run_sse SSE + control-part handling + real ephemeral registration) was a clean way to
+  live-verify browser wiring without an LLM key — worth promoting into tests/integration or
+  a dev fixture instead of re-inventing it per session.
+
 - 2026-07-30 — [idea] **Source-registry id-field REDESIGN (user directive, chat): the flat
   `id` does not work — it conflates the source SYSTEM with the extracted DATASET.** We
   extract DIFFERENT data sets from the same system — from the Product Catalog (PAT):
