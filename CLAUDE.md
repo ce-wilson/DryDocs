@@ -43,8 +43,11 @@ things share the word *port* — never conflate them:
   the rendered board [`docs/plan/board.html`](docs/plan/board.html) (`02-backlog.md` is the legacy
   text view); `IDEAS.md` is the inbox, groomed into the yaml via the **`groom-backlog` skill**.
 - **Pull rule (give this to a sub-agent verbatim):** *"Take the next `status: todo` item in
-  `backlog.yaml` whose every `depends_on` is `done`; set it `in_progress`; do exactly that item,
-  staying inside your layer; meet its `acceptance`; set it `done`."* Anything ambiguous → the HITL
+  `backlog.yaml` whose every `depends_on` is `done`; **commit and push** `status: in_progress`
+  **before starting work** (git is the only sync layer between concurrent sessions on two
+  machines — a local-only commit is invisible to the other machine, so two sessions will
+  independently claim the same item); do exactly that item, staying inside your layer; meet its
+  `acceptance`; set it `done`."* Anything ambiguous → the HITL
   gate ([`docs/restructure/03-hitl-sme-flow.md`](docs/restructure/03-hitl-sme-flow.md)), never auto-decided.
 
 **Session ritual (keeps every platform aligned):**
