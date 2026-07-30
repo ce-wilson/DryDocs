@@ -26,6 +26,25 @@ Tags help grooming: `idea` · `bug` · `doc` · `source` (new data source) · `q
 
 <!-- add new ideas at the top -->
 
+- 2026-07-30 — [idea] **Source-registry id-field REDESIGN (user directive, chat): the flat
+  `id` does not work — it conflates the source SYSTEM with the extracted DATASET.** We
+  extract DIFFERENT data sets from the same system — from the Product Catalog (PAT):
+  DPROD-ontology datasets (Product, AreaProduct, Team, …) AND ORG-ontology datasets (the
+  org structure); from Control-M data likewise multiple extraction domains (SWO/software,
+  database, code, …). One registry row per system forces every dataset through one id +
+  one confirmed flag + one feeds_taxonomy list — which is exactly how catalog-pat vs
+  pat-catalog became "same string, different meaning" across repos (the T19 collision) and
+  why `feeds_taxonomy` lists keep widening instead of splitting. Direction to design (NOT
+  decided): two-level identity — source system (the connection/locator/classification
+  carrier) → extracted dataset (the gate/crosswalk/feeds_taxonomy/ontology-domain carrier,
+  each with its OWN confirmed state), with loaders binding to the dataset, not the system;
+  dataset keyed or tagged by ontology domain (DPROD | ORG | SWO | data-platform | code).
+  Sequencing: J21 (built 2026-07-30) hardened the CURRENT shape so nothing drops
+  meanwhile; the redesign should land TOGETHER WITH (or explicitly rule against) the N7
+  per-side overlay + the URN cross-repo identity handle + the reconcile same-id/
+  changed-meaning guard — one design session, HITL-gated (registry schema v2), not a
+  groom. Feeds the company T19 gate review rather than racing it.
+
 - 2026-07-29 — [idea] **N3's loader→source binding needs a per-side value overlay — the
   company port (PORT-REPORT-e60822fc) DEFERRED N3–N6 over it (their T19), and the
   deferral exposed a producer design limit + one nasty id collision.** Two company-side
