@@ -81,6 +81,11 @@ class Envelope:
     answer: str
     model: str | None = None
     provider: str | None = None
+    # R3 reserved caller-identity slot: sha256 + length ONLY (mirrors the
+    # question-text rule; ADK 2.0 run_async takes user_id per call). Full
+    # identity never lands in a payload or the graph.
+    user_id_sha256: str | None = None
+    user_id_chars: int | None = None
     steps: list[StepRecord] = field(default_factory=list)
     sources: list[SourceRecord] = field(default_factory=list)
     metrics: Metrics = field(default_factory=Metrics)

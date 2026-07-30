@@ -645,6 +645,44 @@ QUERY_SPECS: dict[str, QuerySpec] = {
             params=_LIMIT,
         ),
         QuerySpec(
+            id="console.agent-runs.v1",
+            database="ddcontext",  # R1 gate ruling 2026-07-23: :AgentRun lands in ddcontext, never drydocs
+            description=(
+                "R3 agent-run telemetry for the admin view: one :AgentRun per "
+                "answered question (kind 'qa', mirroring :JobRun), newest first. "
+                "Question and caller identity appear as sha256 + length ONLY — "
+                "full text lives solely in the local JSONL ledger. Reads "
+                "ddcontext, so rows carry the standard SYNTHESIZED watermark; "
+                "the telemetry values themselves are measured, not synthesized."
+            ),
+            cypher=(
+                "MATCH (r:AgentRun) WHERE NOT r:SchemaMeta AND r.kind = 'qa' "
+                "RETURN r.run_id AS run_id, toString(r.recorded_at) AS recorded_at, "
+                "r.tier AS tier, r.model AS model, r.llm_calls AS llm_calls, "
+                "r.tokens_total AS tokens_total, r.cost_est_usd AS cost_est_usd, "
+                "r.cypher_count AS cypher_count, r.fix_retries AS fix_retries, "
+                "r.response_ms_total AS response_ms_total, "
+                "r.question_sha256 AS question_sha256, r.question_chars AS question_chars "
+                "ORDER BY r.recorded_at DESC LIMIT $limit"
+            ),
+            columns=(
+                ColumnDef("run_id", "string", "Run id"),
+                ColumnDef("recorded_at", "string", "Recorded"),
+                ColumnDef("tier", "string", "Tier"),
+                ColumnDef("model", "string", "Model"),
+                ColumnDef("llm_calls", "int", "LLM calls"),
+                ColumnDef("tokens_total", "int", "Tokens"),
+                ColumnDef("cost_est_usd", "string", "Cost (est)"),
+                ColumnDef("cypher_count", "int", "Cyphers"),
+                ColumnDef("fix_retries", "int", "Fix retries"),
+                ColumnDef("response_ms_total", "int", "Total ms"),
+                ColumnDef("question_sha256", "string", "Question sha256"),
+                ColumnDef("question_chars", "int", "Chars"),
+            ),
+            classification="internal",
+            params=_LIMIT,
+        ),
+        QuerySpec(
             id="context.label-census.v1",
             database="ddcontext",
             description=(

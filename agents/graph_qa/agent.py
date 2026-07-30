@@ -19,13 +19,16 @@ from google.adk.agents.invocation_context import InvocationContext
 from google.adk.events import Event
 from google.genai import types
 
+from common.agent_run_writer import write_agent_run
 from common.graph_read import run_read
+from common.llm_ledger import LlmLedger
 from common.neo4j_tool import graph_schema_detailed
 from graph_qa.envelope import sha256_text
 from graph_qa.pipeline import GraphQaPipeline
 from graph_qa.providers import ProviderConfigError, provider_from_env
 
 _pipeline: GraphQaPipeline | None = None
+_ledger = LlmLedger()  # R3 sink 1: per-LLM-call JSONL in DRYDOCS_LOGDIR
 
 
 def _get_pipeline() -> GraphQaPipeline:
@@ -35,8 +38,23 @@ def _get_pipeline() -> GraphQaPipeline:
             provider=provider_from_env(),
             run_read=run_read,
             graph_schema=graph_schema_detailed,
+            ledger=_ledger,
         )
     return _pipeline
+
+
+def _record_run(envelope, question: str, user_id: str) -> None:
+    """R3 sinks after the answer: run line in the local ledger (full question
+    text lives ONLY there) + the :AgentRun node via the dedicated writer.
+    Both best-effort — telemetry never turns a good answer into an error."""
+    try:
+        _ledger.run(envelope, question)
+    except Exception:
+        pass
+    try:
+        write_agent_run(envelope, user_id=user_id)
+    except Exception:
+        pass
 
 
 def _memory_size(ctx: InvocationContext) -> tuple[int, int]:
@@ -64,13 +82,17 @@ class GraphQaAgent(BaseAgent):
                 events, chars = _memory_size(ctx)
                 now = datetime.now()
                 run_id = f"qa-{now:%Y%m%d-%H%M%S}-{sha256_text(question)[:6]}"
+                # ADK 2.0 run_async carries user_id per call; only its hash survives.
+                user_id = getattr(ctx, "user_id", "") or ""
                 envelope = _get_pipeline().answer(
                     question,
                     run_id=run_id,
                     session_id=getattr(getattr(ctx, "session", None), "id", "") or "",
                     memory_events=events,
                     memory_chars=chars,
+                    user_id=user_id,
                 )
+                _record_run(envelope, question, user_id)
                 payload = {"status": "success", **envelope.to_dict()}
             except ProviderConfigError as exc:
                 payload = {"status": "error", "error": str(exc)}

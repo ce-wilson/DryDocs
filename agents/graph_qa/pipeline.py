@@ -86,6 +86,7 @@ class GraphQaPipeline:
         clock: Callable[[], float] = time.perf_counter,
         vocabulary_loader: Callable[[], list[dict]] = load_vocabulary,
         register_cypher: Callable | None = None,
+        ledger=None,
     ) -> None:
         self.provider = provider
         self.run_read = run_read
@@ -97,6 +98,10 @@ class GraphQaPipeline:
         # returns the explore_ref (agents/common/ephemeral_client.make_register).
         # None = registration surface not configured; explore_ref stays null.
         self.register_cypher = register_cypher
+        # R3: per-LLM-call JSONL ledger (agents/common/llm_ledger.LlmLedger).
+        # Duck-typed: .call(...) records one line and returns the cost estimate.
+        # None = no ledger; cost_est_usd stays None (the ledger owns the price map).
+        self.ledger = ledger
 
     def _explore_ref(self, cypher: str, database: str, params: dict) -> str | None:
         """Register one EXECUTED query; a registration failure never kills an
@@ -109,7 +114,10 @@ class GraphQaPipeline:
             return None
 
     # -- envelope bookkeeping -------------------------------------------------
-    def _llm(self, envelope: Envelope, system: str, user: str, timings: dict) -> str:
+    def _llm(
+        self, envelope: Envelope, system: str, user: str, timings: dict,
+        step: str = "llm",
+    ) -> str:
         reply = self.provider.complete(system, user)
         envelope.metrics.llm_calls += 1
         envelope.metrics.tokens.prompt += reply.usage.prompt_tokens
@@ -117,6 +125,24 @@ class GraphQaPipeline:
         envelope.metrics.tokens.total += reply.usage.total_tokens
         envelope.model = reply.model
         timings["llm"] += reply.ms
+        if self.ledger is not None:
+            try:  # telemetry is best-effort — never the reason an answer fails
+                cost = self.ledger.call(
+                    run_id=envelope.run_id,
+                    step=step,
+                    model=reply.model,
+                    provider=getattr(self.provider, "provider", None),
+                    prompt_tokens=reply.usage.prompt_tokens,
+                    completion_tokens=reply.usage.completion_tokens,
+                    duration_ms=reply.ms,
+                    iteration=max(envelope.metrics.iterations, 1),
+                )
+                if cost is not None:
+                    envelope.metrics.cost_est_usd = (
+                        envelope.metrics.cost_est_usd or 0.0
+                    ) + cost
+            except Exception:
+                pass
         return reply.text
 
     # -- tiers ----------------------------------------------------------------
@@ -124,7 +150,8 @@ class GraphQaPipeline:
         started = self.clock()
         catalog = "\n".join(specs_catalog.catalog_lines())
         raw = self._llm(
-            envelope, ROUTER_SYSTEM, f"Specs:\n{catalog}\n\nQuestion: {question}", timings
+            envelope, ROUTER_SYSTEM, f"Specs:\n{catalog}\n\nQuestion: {question}", timings,
+            step="router",
         )
         spec_id, params = None, {}
         try:
@@ -179,6 +206,7 @@ class GraphQaPipeline:
         raw = self._llm(
             envelope, schema_prompt,
             TEXT2CYPHER_USER.format(question=question, row_cap=ROW_CAP), timings,
+            step="text2cypher",
         )
         cypher = None
         for attempt in range(MAX_FIX_RETRIES + 1):
@@ -212,7 +240,7 @@ class GraphQaPipeline:
                 raw = self._llm(
                     envelope, schema_prompt,
                     FIX_USER.format(cypher=cypher or raw[:500], error=exc, question=question),
-                    timings,
+                    timings, step="fix",
                 )
         return None
 
@@ -224,6 +252,7 @@ class GraphQaPipeline:
         session_id: str = "",
         memory_events: int = 0,
         memory_chars: int = 0,
+        user_id: str = "",
     ) -> Envelope:
         total_started = self.clock()
         timings = {"routing": 0, "retrieve": 0, "llm": 0}
@@ -241,6 +270,9 @@ class GraphQaPipeline:
             "events": memory_events,
             "tokens_est": memory_chars // 4,
         }
+        if user_id:  # R3 reserved slot: hash + length only, never the identity
+            envelope.user_id_sha256 = sha256_text(user_id)
+            envelope.user_id_chars = len(user_id)
 
         spec_id, params = self._route(envelope, question, timings)
         result = self._run_spec(envelope, spec_id, params, timings) if spec_id else None
@@ -267,7 +299,7 @@ class GraphQaPipeline:
                 envelope, ANSWER_SYSTEM,
                 f"Question: {question}\n\nRows ({result.row_count}"
                 f"{', truncated' if result.truncated else ''}):\n{rows_json}",
-                timings,
+                timings, step="answer",
             )
             envelope.steps.append(
                 StepRecord(i=len(envelope.steps) + 1, kind="answer", ms=timings["llm"])

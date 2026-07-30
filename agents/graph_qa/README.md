@@ -60,9 +60,16 @@ step's EXECUTED Cypher: the pipeline registers it via
 the console session's owner token, forwarded by R5 wiring) and the UI
 re-runs/exports it through `/specs/{ref}/run|export`; `null` when the
 registration surface isn't configured, and a registration failure never
-kills an answer. `fetched_at`/`stale` and `cost_est_usd` are declared now
-and filled by R7 and R3 respectively. `chunks` stays 0 until doc-corpus
-retrieval (R7) wires in.
+kills an answer. `cost_est_usd` (R3) is the sum of per-call estimates from
+the ledger's model→price map (`common/llm_ledger.py`); null when no ledger
+is wired or the model is unpriced. R3 also adds the reserved caller-identity
+slot `user_id_sha256`/`user_id_chars` (hash + length only, mirroring the
+question-text rule) and two sinks beside the envelope: a per-LLM-call JSONL
+ledger in DRYDOCS_LOGDIR (the ONLY home of full question text) and one
+`:AgentRun` node per question in `ddcontext` via
+`common/agent_run_writer.py` (surfaced by the `console.agent-runs.v1` spec).
+`fetched_at`/`stale` are declared now and filled by R7. `chunks` stays 0
+until doc-corpus retrieval (R7) wires in.
 
 ## Provider config (R1 axis-C ruling, gate-log 2026-07-23)
 
