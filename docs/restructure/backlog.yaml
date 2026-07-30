@@ -6357,7 +6357,7 @@ items:
     agent: main
     model: sonnet
     priority: p1
-    status: todo
+    status: in_progress   # claimed 2026-07-30, desktop session
     depends_on: [R2]
     inputs: [drydocs_api/query_specs.py, drydocs_api/app.py, drydocs_api/exports.py, drydocs_api/sessions.py]
     acceptance: >
