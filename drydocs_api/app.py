@@ -15,12 +15,18 @@ drydocs_core.config.Neo4jSettings) — never from a request, never in a browser.
 # annotations at runtime via get_type_hints, and PEP-563 string annotations
 # break body-model detection (a body silently becomes a query param).
 
+import os
 from collections.abc import Mapping
 from pathlib import Path
 
 import neo4j
 from pydantic import BaseModel
 
+from drydocs_api.ephemeral_specs import (
+    EphemeralSpecStore,
+    EphemeralValidationError,
+    register_ephemeral,
+)
 from drydocs_api.exports import (
     ExportLedger,
     UnknownExportError,
@@ -63,6 +69,15 @@ class RawBody(BaseModel):
 
 class ChangesetBody(BaseModel):
     entries: list = []
+
+
+class EphemeralRegisterBody(BaseModel):
+    owner_token: str
+    cypher: str
+    database: str
+    params: dict = {}
+    description: str = ""
+    columns: list = []
 
 
 class LiveRunner:
@@ -201,17 +216,50 @@ def create_app(runner=None, store: InMemorySessionStore | None = None):
 
     # ── O11 QuerySpec registry + two-path export (site-plan §4) ──────────────
     export_ledger = ExportLedger()
+    # R4: ephemeral session-scoped specs (ADR 0007 decision 4). Registration is
+    # agent-key gated — a browser bearer token can never register Cypher, so
+    # /raw-cypher stays the ONLY interactive Cypher surface (admin-gated, ADR 0005).
+    ephemerals = EphemeralSpecStore()
 
     @app.get("/specs")
     def get_specs() -> list[dict[str, object]]:
         return list_specs()
+
+    @app.post("/specs/ephemeral")
+    def post_ephemeral_register(
+        body: EphemeralRegisterBody,
+        x_drydocs_agent_key: str | None = Header(default=None),
+    ) -> dict[str, object]:
+        try:
+            return register_ephemeral(
+                x_drydocs_agent_key,
+                os.environ.get("DRYDOCS_AGENT_REG_KEY"),
+                body.owner_token,
+                body.cypher,
+                body.database,
+                body.params,
+                body.description,
+                body.columns,
+                sessions,
+                ephemerals,
+            )
+        except Forbidden as exc:
+            raise HTTPException(403, str(exc)) from None
+        except InvalidTokenError:
+            raise HTTPException(401, "unknown owner session") from None
+        except WriteRejected as exc:
+            raise HTTPException(400, str(exc)) from None
+        except EphemeralValidationError as exc:
+            raise HTTPException(422, str(exc)) from None
 
     @app.post("/specs/{spec_id}/run")
     def post_spec_run(
         spec_id: str, body: QueryBody, authorization: str | None = Header(default=None)
     ) -> dict[str, object]:
         try:
-            return run_spec(spec_id, body.params, _token(authorization), sessions, graph)
+            return run_spec(
+                spec_id, body.params, _token(authorization), sessions, graph, ephemerals
+            )
         except InvalidTokenError:
             raise HTTPException(401, "invalid session") from None
         except UnknownSpecError:
@@ -230,7 +278,14 @@ def create_app(runner=None, store: InMemorySessionStore | None = None):
 
         try:
             job = export_spec(
-                spec_id, body.params, format, _token(authorization), sessions, graph, export_ledger
+                spec_id,
+                body.params,
+                format,
+                _token(authorization),
+                sessions,
+                graph,
+                export_ledger,
+                ephemerals=ephemerals,
             )
         except InvalidTokenError:
             raise HTTPException(401, "invalid session") from None

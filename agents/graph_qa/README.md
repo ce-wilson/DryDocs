@@ -54,8 +54,14 @@ Notes on honesty markers: `question_sha256`/`question_chars` only — full
 question text belongs to the local ledger (R3), never a persistable payload.
 `*_est` token fields are ~4-chars/token estimates; exact prompt/completion
 tokens come from the provider usage metadata via the extractor seam.
-`explore_ref`, `fetched_at`/`stale`, and `cost_est_usd` are declared now and
-filled by R4, R7, and R3 respectively. `chunks` stays 0 until doc-corpus
+`explore_ref` (R4) is the ephemeral session-spec ref (`eph.<hash>`) of the
+step's EXECUTED Cypher: the pipeline registers it via
+`common/ephemeral_client.make_register` (needs `DRYDOCS_AGENT_REG_KEY` +
+the console session's owner token, forwarded by R5 wiring) and the UI
+re-runs/exports it through `/specs/{ref}/run|export`; `null` when the
+registration surface isn't configured, and a registration failure never
+kills an answer. `fetched_at`/`stale` and `cost_est_usd` are declared now
+and filled by R7 and R3 respectively. `chunks` stays 0 until doc-corpus
 retrieval (R7) wires in.
 
 ## Provider config (R1 axis-C ruling, gate-log 2026-07-23)

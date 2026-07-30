@@ -29,10 +29,11 @@ from collections.abc import Iterable, Iterator, Mapping
 from dataclasses import dataclass
 from datetime import datetime, timezone
 
+from drydocs_api.ephemeral_specs import EphemeralSpecStore, is_ephemeral_ref
 from drydocs_api.guard import ensure_read_only
 from drydocs_api.handlers import GraphRunner, _authenticate
 from drydocs_api.queries import validate_params
-from drydocs_api.query_specs import QuerySpec, is_watermarked, query_spec
+from drydocs_api.query_specs import QuerySpec, UnknownSpecError, is_watermarked, query_spec
 from drydocs_api.sessions import InMemorySessionStore
 
 WATERMARK_COLUMN = "trust_watermark"
@@ -125,6 +126,24 @@ def _collect_trust(row: Mapping[str, object], seen: set[str]) -> None:
             seen.add(value.split(" ")[0].upper() if key == WATERMARK_COLUMN else value)
 
 
+# ── spec resolution: permanent registry row, or the session's ephemeral ──────
+
+
+def _resolve_spec(
+    spec_id: str, token: str, ephemerals: EphemeralSpecStore | None
+) -> tuple[QuerySpec, dict[str, object]]:
+    """Resolve a spec id for run/export. ``eph.`` refs resolve ONLY through the
+    owning session's store entry (R4: foreign/expired/unknown all 404) and
+    carry their params frozen at registration; registry ids resolve as before
+    with no fixed params."""
+    if is_ephemeral_ref(spec_id):
+        if ephemerals is None:
+            raise UnknownSpecError(spec_id)
+        eph = ephemerals.resolve(token, spec_id)
+        return eph.as_query_spec(), dict(eph.bound_params)
+    return query_spec(spec_id), {}
+
+
 # ── spec run (the UI's data-frame read path) ─────────────────────────────────
 
 
@@ -134,14 +153,16 @@ def run_spec(
     token: str,
     store: InMemorySessionStore,
     runner: GraphRunner,
+    ephemerals: EphemeralSpecStore | None = None,
 ) -> dict[str, object]:
     """Run a QuerySpec for a data frame: any authenticated role; params fail
-    closed; database comes from the SPEC (a reviewed registry row); watermark
-    column appended for ddcontext/ddall reads."""
+    closed; database comes from the SPEC (a reviewed registry row, or the
+    session's own ephemeral registration); watermark column appended for
+    ddcontext/ddall reads."""
     _authenticate(token, store)
-    spec = query_spec(spec_id)
-    bound = validate_params(spec, params)
-    ensure_read_only(spec.cypher)  # defense in depth
+    spec, fixed = _resolve_spec(spec_id, token, ephemerals)
+    bound = {**fixed, **validate_params(spec, params)}
+    ensure_read_only(spec.cypher)  # defense in depth — ephemeral specs re-validate here
     keys, rows = runner.run(spec.cypher, dict(bound), spec.database)
     keys, watermarked = _apply_watermark(spec, list(keys), rows)
     out_rows = list(watermarked)
@@ -157,6 +178,7 @@ def run_spec(
         "keys": keys,
         "rows": out_rows,
         "watermarked": is_watermarked(spec),
+        "ephemeral": is_ephemeral_ref(spec.id),
     }
 
 
@@ -186,15 +208,19 @@ def export_spec(
     runner: GraphRunner,
     ledger: ExportLedger,
     now: datetime | None = None,
+    ephemerals: EphemeralSpecStore | None = None,
 ) -> ExportJob:
-    """Build a streaming export of a spec. The returned chunk generator yields
-    the banner (classified specs), header, and rows; when it is EXHAUSTED it
-    registers the provenance manifest in the ledger under ``export_id``."""
+    """Build a streaming export of a spec — permanent or ephemeral: the
+    manifest fields (cypher_sha256, params, database, classification, trust
+    tiers) are produced by the SAME code either way. The returned chunk
+    generator yields the banner (classified specs), header, and rows; when it
+    is EXHAUSTED it registers the provenance manifest in the ledger under
+    ``export_id``."""
     if fmt not in ("csv", "jsonl"):
         raise ValueError(f"unsupported export format '{fmt}' (csv | jsonl)")
     session = _authenticate(token, store)
-    spec = query_spec(spec_id)
-    bound = validate_params(spec, params)
+    spec, fixed = _resolve_spec(spec_id, token, ephemerals)
+    bound = {**fixed, **validate_params(spec, params)}
     ensure_read_only(spec.cypher)
     export_id = secrets.token_urlsafe(12)
     executed_at = (now or datetime.now(timezone.utc)).isoformat(timespec="seconds")

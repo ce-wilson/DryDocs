@@ -38,7 +38,9 @@ class StepRecord:
     truncated: bool = False
     fix_retries: int = 0
     error: str | None = None
-    explore_ref: str | None = None  # filled by R4 (ephemeral specs); None until then
+    # R4 ephemeral session spec ref (eph.<hash>) for /specs/{ref}/run|export;
+    # None when the registration surface isn't configured (pre-R5 wiring).
+    explore_ref: str | None = None
 
 
 @dataclass

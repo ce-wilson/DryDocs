@@ -85,6 +85,7 @@ class GraphQaPipeline:
         default_db: str = "drydocs",
         clock: Callable[[], float] = time.perf_counter,
         vocabulary_loader: Callable[[], list[dict]] = load_vocabulary,
+        register_cypher: Callable | None = None,
     ) -> None:
         self.provider = provider
         self.run_read = run_read
@@ -92,6 +93,20 @@ class GraphQaPipeline:
         self.default_db = default_db
         self.clock = clock
         self.vocabulary_loader = vocabulary_loader
+        # R4: registers executed Cypher as an ephemeral session spec and
+        # returns the explore_ref (agents/common/ephemeral_client.make_register).
+        # None = registration surface not configured; explore_ref stays null.
+        self.register_cypher = register_cypher
+
+    def _explore_ref(self, cypher: str, database: str, params: dict) -> str | None:
+        """Register one EXECUTED query; a registration failure never kills an
+        answer — the step just carries no explore_ref (honest degradation)."""
+        if self.register_cypher is None:
+            return None
+        try:
+            return self.register_cypher(cypher=cypher, database=database, params=params)
+        except Exception:
+            return None
 
     # -- envelope bookkeeping -------------------------------------------------
     def _llm(self, envelope: Envelope, system: str, user: str, timings: dict) -> str:
@@ -148,6 +163,7 @@ class GraphQaPipeline:
             envelope.steps.append(step)
             return None
         step.rows, step.truncated, step.ms = result.row_count, result.truncated, result.ms
+        step.explore_ref = self._explore_ref(spec.cypher, spec.database, resolved)
         envelope.steps.append(step)
         timings["retrieve"] += step.ms
         trust = "SYNTHESIZED" if spec.database in specs_catalog.WATERMARKED_DATABASES else "CONFIRMED"
@@ -181,6 +197,7 @@ class GraphQaPipeline:
                 step.rows, step.truncated, step.ms = (
                     result.row_count, result.truncated, result.ms,
                 )
+                step.explore_ref = self._explore_ref(cypher, self.default_db, {})
                 envelope.steps.append(step)
                 timings["retrieve"] += step.ms
                 envelope.sources.append(

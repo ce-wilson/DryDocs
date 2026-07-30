@@ -110,6 +110,40 @@ def test_tier0_spec_cypher_verbatim() -> None:
     assert env.answer == "There is 1 application."
 
 
+def test_executed_cypher_registers_an_explore_ref() -> None:
+    """R4: every EXECUTED step carries the ephemeral-spec ref the registrar
+    returned; a registration failure degrades to None, never kills the answer."""
+    registered: list[dict] = []
+
+    def register(cypher, database, params):
+        registered.append({"cypher": cypher, "database": database, "params": params})
+        return "eph.abc123def4567890"
+
+    provider = FakeProvider(replies=[
+        '{"spec_id": "%s", "params": {}}' % SPEC_ID,
+        "There is 1 application.",
+    ])
+    pipeline = _pipeline(provider, _ok_read)
+    pipeline.register_cypher = register
+    env = pipeline.answer("how many applications?", run_id="qa-test-r4")
+    spec_step = [s for s in env.steps if s.kind == "spec"][0]
+    assert spec_step.explore_ref == "eph.abc123def4567890"
+    assert registered[0]["cypher"] == SPEC.cypher and registered[0]["database"] == SPEC.database
+
+    def broken_register(cypher, database, params):
+        raise OSError("api down")
+
+    provider2 = FakeProvider(replies=[
+        '{"spec_id": "%s", "params": {}}' % SPEC_ID,
+        "There is 1 application.",
+    ])
+    pipeline2 = _pipeline(provider2, _ok_read)
+    pipeline2.register_cypher = broken_register
+    env2 = pipeline2.answer("how many applications?", run_id="qa-test-r4b")
+    assert env2.answer == "There is 1 application."  # registration failure is non-fatal
+    assert [s for s in env2.steps if s.kind == "spec"][0].explore_ref is None
+
+
 def test_tier1_prompt_is_grounded_and_bounded() -> None:
     provider = FakeProvider(replies=[
         '{"spec_id": null, "params": {}}',
