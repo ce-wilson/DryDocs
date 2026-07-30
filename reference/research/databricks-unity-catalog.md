@@ -40,6 +40,41 @@ Three-level namespace, uniform below. Tables and volumes are either **managed** 
 governance *and* storage) or **external** (governance only; data stays where it is) — the split
 worth noting, because governing what you do not own is our problem too.
 
+## Headings & major categories at a glance (added 2026-07-29)
+
+The four distinct category systems Unity Catalog organizes itself by — kept separate because they
+answer different questions (what exists / what governance does / what things mean / how people find them):
+
+**1. Securable-object taxonomy** (the namespace — "what exists"):
+`metastore` → `catalog` → `schema` → { `table` · `view` · `volume` · `function` · `model` ·
+`service` (model + MCP services) }, plus metastore-level securables that sit OUTSIDE the
+three-level namespace: `storage credential` · `external location` · `connection` (federation) ·
+`share` (Delta Sharing). Tables/volumes split managed vs external.
+
+**2. Governance capability categories** (the docs' functional areas — "what governance does"):
+Access control (privileges, ABAC, filters/masks) · Discovery (Catalog Explorer) · Lineage ·
+Auditing · Data classification · Data quality monitoring · Data sharing · AI governance.
+
+**3. Business-semantics categories** ("what things mean" — the tier the 2026 features live in):
+Domains **with subdomains** (org axes named in the docs: *function* — Marketing/Sales/R&D;
+*business unit* — Consumer/Enterprise; *geography* — EMEA/AMER/APJ; subdomain example: Revenue and
+FP&A within Finance) · Glossary (terms/taxonomies, terms linked to terms) · Governed tags + tag
+policies · Metric views · Agent metadata (synonyms, display names, formatting) · Certification +
+deprecation (the human trust signals).
+
+**4. Discover categories** (the consumption surface — "how people find it"; an internal
+marketplace over #1–#3): homepage sections = AI-powered recommendations · Certified assets ·
+Popular/trending — all grouped **by domain, not by technical location**; asset types surfaced:
+tables, dashboards, notebooks, queries, metric views, Genie Agents, apps. Steward curation:
+build/reorder sections, pin assets, annotate domains with descriptions + business/technical
+contacts, certify, deprecate.
+
+DryDocs reading: #1 ≈ the source-registry `kind` axis + the graph's node classes; #2 ≈ our
+enforcement matrix's surface families; #3 is the crosswalk table below; #4 has no DryDocs analogue
+yet — the closest seat is the web console's category-first landing (O35), and "certification +
+deprecation as first-class curation signals on assets" is a pattern worth remembering when the
+console grows a steward surface.
+
 ## What it captures — three tiers with different trust properties
 
 Keep these separate. They are acquired differently and are trustworthy to different degrees.
