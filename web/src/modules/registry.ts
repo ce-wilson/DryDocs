@@ -6,6 +6,7 @@
 
 export type ModuleId =
   | 'explorer'
+  | 'ask'
   | 'lineage'
   | 'ownership'
   | 'runbooks'
@@ -66,6 +67,21 @@ export const MODULES: readonly ModuleDef[] = [
     retrieval: 'agent', // graph-nav Q&A over the drydocs graph (Epic R router target)
     agent: 'graph-qa (ADK)',
 
+  },
+  {
+    // R5 (ADR 0007): the Ask spoke — the agentic Q&A surface for every
+    // persona. Free-input by definition, hence retrieval:'agent'; the page
+    // itself never writes (O20) and never submits raw Cypher (R4 ephemeral
+    // refs ride the /specs paths).
+    id: 'ask',
+    label: 'Ask',
+    path: '/ask',
+    tagline: 'Free-text Q&A with every Cypher inspectable',
+    backsOnto: 'graph_qa (ADK) → drydocs',
+    tabs: ['Ask'],
+    phase: 3,
+    retrieval: 'agent',
+    agent: 'graph_qa (ADK)',
   },
   {
     id: 'lineage',

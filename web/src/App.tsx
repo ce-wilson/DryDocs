@@ -7,6 +7,7 @@ import OverviewRoute from './routes/OverviewRoute'
 import ExplorerRoute from './routes/explorer/ExplorerRoute'
 import ExplorerLiveRoute from './routes/explorer/ExplorerLiveRoute'
 import ExplorerTowerRoute from './routes/explorer/ExplorerTowerRoute'
+import AskRoute from './routes/AskRoute'
 import OwnershipRoute from './routes/OwnershipRoute'
 import AssetPathRoute from './routes/AssetPathRoute'
 import ConsoleRoute from './routes/ConsoleRoute'
@@ -62,6 +63,10 @@ export default function App() {
         <Route path="explorer" element={<ExplorerRoute persona={persona} />} />
         <Route path="explorer/live" element={<ExplorerLiveRoute personaId={session.personaId} />} />
         <Route path="explorer/tower/:towerKey" element={<ExplorerTowerRoute persona={persona} />} />
+
+        {/* R5: the Ask spoke — every persona, including non-admin (the whole
+            point: agentic Q&A without the admin-only raw-Cypher console). */}
+        <Route path="ask" element={<AskRoute persona={persona} />} />
 
         <Route path="lineage" element={<LineageRoute persona={persona} />} />
         <Route path="lineage/asset/:assetId" element={<LineageRoute persona={persona} />} />

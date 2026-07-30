@@ -14,6 +14,15 @@ export default function ModuleIcon({ id, className }: { id: ModuleId; className?
           <path d="M12 8.4V13m0 0-5 3m5-3 5 3" />
         </svg>
       )
+    case 'ask':
+      // speech bubble with a graph node inside — Q&A over the graph
+      return (
+        <svg viewBox="0 0 24 24" aria-hidden="true" {...common}>
+          <path d="M4 5.5h16v11H10l-4.5 4v-4H4Z" />
+          <circle cx="12" cy="11" r="1.6" />
+          <path d="M12 9.4V7.8M9.8 12.6l-1.5 1M14.2 12.6l1.5 1" />
+        </svg>
+      )
     case 'lineage':
       return (
         <svg viewBox="0 0 24 24" aria-hidden="true" {...common}>

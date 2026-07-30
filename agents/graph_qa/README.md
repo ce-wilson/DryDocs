@@ -1,9 +1,17 @@
 # graph_qa — tiered read-only Q&A over the knowledge graph (Epic R / ADR 0007)
 
-Free-text question in, **one JSON envelope** out: the answer, every piece of
-Cypher that ran (and where, and how long, and how many repairs), the sources,
-and the metrics block. R2 ships Tiers 0–1; the bounded graph-of-thoughts loop
-(Tier 2) is R6.
+Free-text question in, a stream of `{"kind": "step", "step": {...}}` events
+while the pipeline works (R5 — the Ask spoke renders them live over the ADK
+`/run_sse` transport), then **one JSON envelope** out: the answer, every
+piece of Cypher that ran (and where, and how long, and how many repairs),
+the sources, and the metrics block. R2 ships Tiers 0–1; the bounded
+graph-of-thoughts loop (Tier 2) is R6.
+
+**Message parts (R5):** part 0 is the question; an optional later part is
+the `drydocs_control` JSON (`control.py`) carrying the console session's
+drydocs-api token + url — the R4 owner-token handshake that lets the agent
+register ephemeral specs the ASKING session can run/export. Control parts
+never reach the LLM.
 
 ## The tiers
 

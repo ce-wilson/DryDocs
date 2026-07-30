@@ -87,6 +87,7 @@ class GraphQaPipeline:
         vocabulary_loader: Callable[[], list[dict]] = load_vocabulary,
         register_cypher: Callable | None = None,
         ledger=None,
+        on_step: Callable | None = None,
     ) -> None:
         self.provider = provider
         self.run_read = run_read
@@ -102,6 +103,19 @@ class GraphQaPipeline:
         # Duck-typed: .call(...) records one line and returns the cost estimate.
         # None = no ledger; cost_est_usd stays None (the ledger owns the price map).
         self.ledger = ledger
+        # R5: step observer — called with each StepRecord the moment it lands
+        # in the envelope, so the ADK wrapper can stream steps to the Ask
+        # spoke while the answer is still being produced. Observer failures
+        # never affect the answer.
+        self.on_step = on_step
+
+    def _push_step(self, envelope: Envelope, step: StepRecord) -> None:
+        envelope.steps.append(step)
+        if self.on_step is not None:
+            try:
+                self.on_step(step)
+            except Exception:
+                pass
 
     def _explore_ref(self, cypher: str, database: str, params: dict) -> str | None:
         """Register one EXECUTED query; a registration failure never kills an
@@ -161,9 +175,10 @@ class GraphQaPipeline:
         except (ValueError, json.JSONDecodeError):
             spec_id = None  # router noise never kills the question — fall through to Tier 1
         timings["routing"] += int((self.clock() - started) * 1000)
-        envelope.steps.append(
+        self._push_step(
+            envelope,
             StepRecord(i=len(envelope.steps) + 1, kind="router", spec_id=spec_id,
-                       ms=timings["routing"])
+                       ms=timings["routing"]),
         )
         return spec_id, params
 
@@ -187,11 +202,11 @@ class GraphQaPipeline:
         except Exception as exc:  # a registered spec failing is exceptional — record, fall through
             step.error = str(exc)
             step.ms = int((self.clock() - started) * 1000)
-            envelope.steps.append(step)
+            self._push_step(envelope, step)
             return None
         step.rows, step.truncated, step.ms = result.row_count, result.truncated, result.ms
         step.explore_ref = self._explore_ref(spec.cypher, spec.database, resolved)
-        envelope.steps.append(step)
+        self._push_step(envelope, step)
         timings["retrieve"] += step.ms
         trust = "SYNTHESIZED" if spec.database in specs_catalog.WATERMARKED_DATABASES else "CONFIRMED"
         envelope.sources.append(SourceRecord(document=f"spec:{spec.id}", trust=trust))
@@ -226,7 +241,7 @@ class GraphQaPipeline:
                     result.row_count, result.truncated, result.ms,
                 )
                 step.explore_ref = self._explore_ref(cypher, self.default_db, {})
-                envelope.steps.append(step)
+                self._push_step(envelope, step)
                 timings["retrieve"] += step.ms
                 envelope.sources.append(
                     SourceRecord(document=f"text2cypher:{self.default_db}", trust="CONFIRMED")
@@ -234,7 +249,7 @@ class GraphQaPipeline:
                 return result
             except Exception as exc:  # WriteRejected, JSON/parse noise, CypherReadError alike
                 step.error = str(exc)
-                envelope.steps.append(step)
+                self._push_step(envelope, step)
                 if attempt == MAX_FIX_RETRIES:
                     return None
                 raw = self._llm(
@@ -301,8 +316,9 @@ class GraphQaPipeline:
                 f"{', truncated' if result.truncated else ''}):\n{rows_json}",
                 timings, step="answer",
             )
-            envelope.steps.append(
-                StepRecord(i=len(envelope.steps) + 1, kind="answer", ms=timings["llm"])
+            self._push_step(
+                envelope,
+                StepRecord(i=len(envelope.steps) + 1, kind="answer", ms=timings["llm"]),
             )
         else:
             envelope.answer = (

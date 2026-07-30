@@ -30,6 +30,11 @@ export async function readDetail(res: Response): Promise<string> {
 export interface ApiClient {
   authedPost(path: string, body: unknown): Promise<Response>
   authedGet(path: string): Promise<Response>
+  /** The session's own bearer token (logging in first if needed). R5 hands it
+   *  to the graph_qa agent as the R4 owner token, so ephemeral specs the agent
+   *  registers resolve for THIS session's runSpec/exportSpec calls — which is
+   *  why the Ask spoke must share ONE client between token and GraphAccess. */
+  getToken(): Promise<string>
 }
 
 export function createApiClient(baseUrl: string, personaId: string): ApiClient {
@@ -73,11 +78,18 @@ export function createApiClient(baseUrl: string, personaId: string): ApiClient {
       if (res.status === 401) res = await get(await login())
       return res
     },
+    async getToken(): Promise<string> {
+      return token ?? login()
+    },
   }
 }
 
-export function createApiAccess(baseUrl: string, personaId: string): GraphAccess {
-  const { authedPost, authedGet } = createApiClient(baseUrl, personaId)
+export function createApiAccess(
+  baseUrl: string,
+  personaId: string,
+  client: ApiClient = createApiClient(baseUrl, personaId),
+): GraphAccess {
+  const { authedPost, authedGet } = client
 
   async function envelope(path: string, body: unknown): Promise<ApiEnvelope> {
     const res = await authedPost(path, body)

@@ -144,6 +144,54 @@ def test_executed_cypher_registers_an_explore_ref() -> None:
     assert [s for s in env2.steps if s.kind == "spec"][0].explore_ref is None
 
 
+def test_steps_stream_to_the_observer_in_order() -> None:
+    """R5: on_step fires per StepRecord as it lands (the Ask spoke's live
+    stream); an observer that throws never affects the answer."""
+    provider = FakeProvider(replies=[
+        '{"spec_id": "%s", "params": {}}' % SPEC_ID,
+        "There is 1 application.",
+    ])
+    seen: list[str] = []
+    pipeline = pl.GraphQaPipeline(
+        provider=provider, run_read=_ok_read,
+        graph_schema=lambda: LIVE_SCHEMA, vocabulary_loader=lambda: VOCAB,
+        on_step=lambda step: seen.append(step.kind),
+    )
+    env = pipeline.answer("how many applications?", run_id="qa-test-r5")
+    assert seen == [s.kind for s in env.steps] == ["router", "spec", "answer"]
+
+    provider2 = FakeProvider(replies=[
+        '{"spec_id": "%s", "params": {}}' % SPEC_ID,
+        "There is 1 application.",
+    ])
+    pipeline2 = pl.GraphQaPipeline(
+        provider=provider2, run_read=_ok_read,
+        graph_schema=lambda: LIVE_SCHEMA, vocabulary_loader=lambda: VOCAB,
+        on_step=lambda step: (_ for _ in ()).throw(RuntimeError("observer down")),
+    )
+    env2 = pipeline2.answer("how many applications?", run_id="qa-test-r5b")
+    assert env2.answer == "There is 1 application."  # observer failure is non-fatal
+
+
+def test_control_part_parsing() -> None:
+    """R5: part 0 is the question; a drydocs_control JSON part contributes the
+    R4 owner-token handshake; malformed control degrades to none."""
+    from graph_qa.control import split_question_and_control
+
+    q, c = split_question_and_control([
+        "how many jobs?",
+        '{"drydocs_control": {"api_token": "tok-1", "api_url": "http://localhost:8001"}}',
+    ])
+    assert q == "how many jobs?"
+    assert c == {"api_token": "tok-1", "api_url": "http://localhost:8001"}
+
+    q2, c2 = split_question_and_control(["just a question"])
+    assert q2 == "just a question" and c2 == {}
+    q3, c3 = split_question_and_control(["q", "not json", '{"other": 1}'])
+    assert q3 == "q" and c3 == {}
+    assert split_question_and_control([]) == ("", {})
+
+
 def test_tier1_prompt_is_grounded_and_bounded() -> None:
     provider = FakeProvider(replies=[
         '{"spec_id": null, "params": {}}',
