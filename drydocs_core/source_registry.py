@@ -25,6 +25,15 @@ class UnknownSourceError(KeyError):
     """A source id that is not declared in source-registry.yaml."""
 
 
+class DuplicateSourceIdError(ValueError):
+    """The same source id declared more than once in source-registry.yaml.
+
+    Silent last-one-wins would let file position decide the D3 gate: two entries
+    sharing an id with different ``confirmed`` values (the catalog-pat /
+    pat-catalog collision class) must refuse at parse time, never resolve.
+    """
+
+
 class UnconfirmedSourceError(RuntimeError):
     """A declared source whose crosswalk is not yet SME-confirmed (confirmed: false)."""
 
@@ -54,6 +63,12 @@ class SourceRegistry:
         sources: dict[str, Source] = {}
         for entry in doc.get("sources", []):
             sid = entry["id"]
+            if sid in sources:
+                raise DuplicateSourceIdError(
+                    f"Duplicate source id {sid!r} in {path} — each id must be "
+                    f"declared exactly once (last-one-wins would let file "
+                    f"position decide the confirmed-gate)."
+                )
             sources[sid] = Source(id=sid, confirmed=bool(entry.get("confirmed", False)), data=entry)
         return cls(sources)
 

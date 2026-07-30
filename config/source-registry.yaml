@@ -86,11 +86,14 @@ sources:
     crosswalk: config/crosswalks/autosys-to-bmc.yaml
     gate_spec: config/gate-prompts/autosys-crosswalk.yaml
     notes: >
-      Placeholder. 11-row draft crosswalk to bmc-controlm (config/crosswalks/autosys-to-bmc.yaml)
-      is status: proposed, stopped at the HITL gate — SME not yet run. See
-      external/orchestration/autosys/README.md for the narrative summary. Activate
-      (confirmed: true) only after the gate spec above is SME-confirmed and logged in
-      config/gate-log.md.
+      Crosswalk CONFIRMED: gate autosys-crosswalk ACCEPTED IN FULL 2026-07-14
+      (13 confirmations; config/gate-log.md F1) — the 11-row crosswalk to
+      bmc-controlm (config/crosswalks/autosys-to-bmc.yaml) is status: confirmed
+      (row 6 demoted exact -> approximate at the SME wording review; registry
+      rows autosys/broadcom created for the Software/§A linkage). Source-row
+      activation ONLY: no export feed exists and no loader is built — loading
+      remains separately gated when one arrives. Narrative summary:
+      external/orchestration/autosys/README.md.
 
   - id: airflow-mwaa
     classification: Internal
@@ -103,11 +106,14 @@ sources:
     crosswalk: config/crosswalks/airflow-to-bmc.yaml
     gate_spec: config/gate-prompts/airflow-crosswalk.yaml
     notes: >
-      Placeholder. 12-row draft crosswalk to bmc-controlm (config/crosswalks/airflow-to-bmc.yaml)
-      is status: proposed, stopped at the HITL gate — SME not yet run. See
-      external/orchestration/airflow/README.md for the narrative summary. Activate
-      (confirmed: true) only after the gate spec above is SME-confirmed and logged in
-      config/gate-log.md.
+      Crosswalk CONFIRMED: gate airflow-crosswalk ACCEPTED IN FULL 2026-07-14
+      (17 confirmations; config/gate-log.md F2) — the crosswalk to bmc-controlm
+      (config/crosswalks/airflow-to-bmc.yaml) is status: confirmed (row 8 split
+      8a/8b/8c at the SME wording review; registry rows airflow/apache created
+      for the Software/§A linkage). Source-row activation ONLY: no DAG-export
+      feed exists and no loader is built — loading remains separately gated
+      when one arrives. Narrative summary:
+      external/orchestration/airflow/README.md.
 
   # ---- Internal reference data (Tier-3 confidential) -----------------------
   - id: seal-extract
