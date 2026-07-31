@@ -93,6 +93,7 @@ from .loaders.bmc_docs import (
     BmcDocsAdapter,
     BmcDocsLoader,
 )
+from .loaders.vendor_docs import VendorDocsLoader
 from .loaders.doc_traceability import (
     DEFAULT_DESIGN_DIR,
     DEFAULT_FEEDBACK_DIR,
@@ -310,6 +311,7 @@ COMMAND_LOADERS: dict[str, tuple[type, ...]] = {
     "load-batch-orchestrators": (BatchPortOrchestratorLoader,),
     "load-code-snapshot":       (CodeSnapshotLoader,),
     "load-bmc-docs":            (BmcDocsLoader,),
+    "load-vendor-docs":         (VendorDocsLoader,),
     "load-doc-traceability":    tuple(cls for cls, _, _ in DOC_TRACEABILITY_CHAIN),
     "load-essential-graphrag":  (EssentialGraphragLoader,),
     "load-seal-attribution":    (SealAttributionLoader,),
@@ -336,6 +338,9 @@ CANONICAL_LOAD_SEQUENCE: tuple[tuple[str, str, str], ...] = (
      "declared batch-port USES_SOFTWARE edges (C14); MATCH-only — needs the "
      "SEAL chain and the software registry already loaded"),
     ("load-bmc-docs",            "standing", "BMC corpus lexical graph"),
+    ("load-vendor-docs",         "optional",
+     "Q13 captured vendor documentation (verbatim, out-of-repo capture -> "
+     "convert -> load); taxonomy only, gated until its corpus is confirmed"),
     ("load-essential-graphrag",  "optional", "Q2 experiment -> ddcontext database"),
     ("load-doc-traceability",    "optional", "L7 self-documentation (design docs + feedback)"),
     ("load-code-snapshot",       "optional",
@@ -1267,6 +1272,58 @@ def load_bmc_docs(
     adapter = BmcDocsAdapter(corpus_dir)
     with _client() as cli:
         summary = BmcDocsLoader(cli, adapter).load()
+    console.print(summary.as_dict())
+
+
+@app.command(name="convert-vendor-docs")
+def convert_vendor_docs(
+    capture_id: str = typer.Argument(..., help="Capture id, e.g. bmc-controlm-9.0.20-utilities."),
+) -> None:
+    """Stage 2 of the vendor-docs pipeline: captured HTML -> markdown.
+
+    Reads the capture manifest written by scripts/external_vendor_scrape.py,
+    strips the Author-it navigation chrome, normalizes heading levels (they
+    encode TOC depth, not importance), derives page_role from an explicit title
+    rule, and writes markdown/ + convert-manifest.json beside the capture.
+    No graph, no network — safe to re-run.
+    """
+    from drydocs.loaders.vendor_docs import convert_capture  # noqa: PLC0415
+    from drydocs_core.data_root import vendor_docs_dir  # noqa: PLC0415
+
+    base = vendor_docs_dir(capture_id)
+    if not (base / "capture-manifest.json").exists():
+        console.print(f"[red]No capture at {base}[/] — run scripts/external_vendor_scrape.py first.")
+        raise typer.Exit(1)
+    summary = convert_capture(capture_id)
+    console.print(summary.render())
+
+
+@app.command(name="load-vendor-docs")
+def load_vendor_docs(
+    capture_id: str = typer.Argument(..., help="Capture id, e.g. bmc-controlm-9.0.20-utilities."),
+) -> None:
+    """Stage 3: load a converted vendor capture as a navigable Document graph.
+
+    Writes :Document + :Chunk (PART_OF / FIRST_CHUNK / NEXT_CHUNK) and the
+    publisher's own TOC hierarchy (:DocSection, IN_SECTION, SUBSECTION_OF).
+    TAXONOMY ONLY — no :ControlMUtility, no DOCUMENTS/DESCRIBES, no SEE_ALSO;
+    those are gate-bound (Q14) and the estate join additionally waits on the
+    database-residency ruling (G32), because a relationship cannot span
+    Neo4j databases.
+    """
+    from drydocs.loaders.vendor_docs import VendorDocsAdapter  # noqa: PLC0415
+    from drydocs_core.data_root import vendor_docs_dir  # noqa: PLC0415
+
+    _gate_loader(VendorDocsLoader)  # confirmed-gate before any DB write
+    base = vendor_docs_dir(capture_id)
+    if not (base / "convert-manifest.json").exists():
+        console.print(
+            f"[red]Not converted:[/] {base} — run `drydocs convert-vendor-docs {capture_id}` first."
+        )
+        raise typer.Exit(1)
+    adapter = VendorDocsAdapter(capture_id)
+    with _client() as cli:
+        summary = VendorDocsLoader(cli, adapter).load()
     console.print(summary.as_dict())
 
 

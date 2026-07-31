@@ -71,6 +71,14 @@
       ]
     },
     {
+      "command": "load-vendor-docs",
+      "mode": "optional",
+      "note": "Q13 captured vendor documentation (verbatim, out-of-repo capture -> convert -> load); taxonomy only, gated until its corpus is confirmed",
+      "loaders": [
+        "vendor_docs.v1"
+      ]
+    },
+    {
       "command": "load-essential-graphrag",
       "mode": "optional",
       "note": "Q2 experiment -> ddcontext database",
@@ -1229,7 +1237,17 @@
       },
       "taxonomy_captures": [],
       "ontology_mappings": [],
-      "loaders": []
+      "loaders": [
+        {
+          "name": "vendor_docs.v1",
+          "class": "VendorDocsLoader",
+          "cli_name": null,
+          "source_label": "vendor-docs",
+          "commands": [
+            "load-vendor-docs"
+          ]
+        }
+      ]
     },
     {
       "id": "essential-graphrag",
