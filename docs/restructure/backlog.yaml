@@ -2844,7 +2844,7 @@ items:
     priority: p1
     status: todo
     depends_on: []
-    inputs: [config/source-registry.yaml, drydocs_core/source_registry.py, config/taxonomy-ontology-map.yaml, PORT-MANIFEST.yaml, git-readme.md]
+    inputs: [config/source-registry.yaml, drydocs_core/source_registry.py, config/taxonomy-ontology-map.yaml, PORT-MANIFEST.yaml, git-readme.md, internal/registry-redesign/REGISTRY-PLAN.md]
     acceptance: >
       A design doc + gate prompt exist covering the four coupled decisions as ONE
       design, and an SME gate session rules each (active, or explicitly deferred
@@ -2872,7 +2872,18 @@ items:
       informing the design: 8 company loaders gate on pat-catalog while the producer
       class says catalog-pat (value-level guard gap — a wrong-but-resolving source_id
       passes), and ~13 company-only loaders carry no source_id. Direction, NOT
-      decided — everything routes through the gate.
+      decided — everything routes through the gate. 2026-07-31 the user expanded
+      the design input (chat + saved samples): THREE distinctions — software we
+      use/trace (software-registry.yaml, not a source) vs ingested data sources
+      (system + dataset two-level) vs REPLICA datasets whose id combines
+      origin@carrier:artifact (SEAL loaded into psgmgr = seal@psgmgr:CM_ESCALATION_DB);
+      documents keep their own ledger; dataset rows adopt the FCDO Data Authority
+      SOR/ADS vocabulary as a field; classification simplifies to 3 levels for now
+      (External / Internal-Public / Internal). Plan of record + target-column
+      worksheet + SNOW-CMDB / DataHub / SDLC-metamodel samples:
+      internal/registry-redesign/ (REGISTRY-PLAN.md; Phase 0 re-home done, Phase 1
+      classification collapse may land pre-gate, Phases 2-3 = this item's session
+      and gate).
   - id: N8
     epic: source-column-mappings
     title: "Resolve the 4 taxonomy-ontology-map entries citing unregistered source ids (N4 render day-one finding): register, re-point, or exempt — ruled per entry"

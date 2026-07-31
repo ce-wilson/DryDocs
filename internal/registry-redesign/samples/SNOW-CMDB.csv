@@ -1,0 +1,362 @@
+﻿Business Application is software used by business users to perform a business function,,,,,,,,
+,,,,,,,,
+Catalog,Base class,Description,Relationship,Dependent class,Child,Parent,CMDB rel type,Display name
+Company,Company,,,,,,Parent::Child_of,
+Company,Location,,,,,,,
+Company,Country,,,,,,,
+Company,Timezone,,,,,,,
+Company,City,,,,,,,
+Company,Organization,,,,,,Parent::Child_of,
+Company,Manager,,,,,,Manages::Managed_By,
+Company,Employee,,,,,,Works_For::Employed_By,
+Company,Group,,,,,,Belongs_To::Member_Of,
+Company,Account,,,,,,Has_Account,
+,,,,,,,,
+Business,Business_Capibility,,,,,,Maps_to::Mapped_by,
+Business,Business_Service,,,,FALSE,TRUE,,
+Business,Business_Function,,,,TRUE,FALSE,Maps_to::Mapped_by,
+Business,Business_Process,,,,TRUE,FALSE,Maps_to::Mapped_by,
+Business,Dataset,,,,,,Process::Uses_DataSet,
+Business,Business_Logic,,,,,,,
+,,,,,,,,
+Data,,,Aplication:Creates-Maintains?,,,,,
+Data,Source of Record,,,,,,,
+Data,Dataset,,Data Record,,,,,
+Data,Metadata,,Metadata,,,,,
+Data,Dataflow,ETL Terms,,,,,,
+View,Conceptual_View, high-level data requirements,,,,,,
+View,Logical_View,The Class Model and Domain Model View,,,,,,
+View,Physical_View,physical model takes into consideration DBMS capabilities and data modeling concepts,,,,,,
+View,Component View,The high level view of what software is to be built,,,,,,
+View,Deployment View,The physical model; what hardware is to be deployed and what software is to run on it,,,,,Requesting::Requested by,
+DevOps,Change Request,,,,,,Contains::Task of,
+DevOps,Change Request,,,,,,Related to::Related to,
+DevOps,Change Request,,,,,,Solved by::Solves,
+DevOps,Incident,,,,,,Investigated by::Investigates,
+DevOps,Incident,,,,,,Solution is documented in::Documenting solution for,
+IT,IT_Service,,,,FALSE,TRUE,,
+IT,IT_Technology,,,,,,,
+Business_Service,Application,,Sends data to (child),Service,TRUE,FALSE,Receives data from::Sends data to,cmdb_ci_appl
+Business_Service,Application,,Used by (child),Service,TRUE,FALSE,Depends on::Used by,cmdb_ci_appl
+Business_Service,Business_Application,Software used by business users to perform a business function,Consumes (parent),Service,FALSE,TRUE,Consumes::Consumed by,cmdb_ci_business_app
+Business_Service,Service,,Used by (child),Service,TRUE,FALSE,Depends on::Used by,cmdb_ci_service
+Business_Service,Business_Service,,Depends on (parent),Service,FALSE,TRUE,Depends on::Used by,cmdb_ci_service
+IT_Service,A10 Load Balancer,,IP Connection (parent),IP Switch,FALSE,TRUE,IP Connection::IP Connection,cmdb_ci_lb_a10
+IT_Service,AIX Server,,IP Connection (parent),IP Switch,FALSE,TRUE,IP Connection::IP Connection,cmdb_ci_aix_server
+IT_Service,Alteon,,IP Connection (parent),IP Switch,FALSE,TRUE,IP Connection::IP Connection,cmdb_ci_lb_alteon
+IT_Service,Apache Web Server,,Depends on (parent),Tomcat,FALSE,TRUE,Depends on::Used by,cmdb_ci_apache_web_server
+IT_Service,Application,,Runs on (parent),Windows Server,FALSE,TRUE,Runs on::Runs,cmdb_ci_appl
+IT_Service,Application,,Depends on (parent),Database,FALSE,TRUE,Depends on::Used by,cmdb_ci_appl
+IT_Service,Application,,Runs on (parent),UNIX Server,FALSE,TRUE,Runs on::Runs,cmdb_ci_appl
+IT_Service,Application,,Depends on (parent),Storage Server,FALSE,TRUE,Depends on::Used by,cmdb_ci_appl
+IT_Service,Application,,Runs on (parent),Server,FALSE,TRUE,Runs on::Runs,cmdb_ci_appl
+IT_Service,Application Cluster,,Cluster (child),Endpoint,TRUE,FALSE,Cluster of::Cluster,cmdb_ci_application_cluster
+IT_Service,Availability Zone,,Contains (parent),Cloud Network,FALSE,TRUE,Contains::Contained by,cmdb_ci_availability_zone
+IT_Service,Availability Zone,,Contains (parent),Cloud Subnet,FALSE,TRUE,Contains::Contained by,cmdb_ci_availability_zone
+IT_Service,Business Application,,Uses (parent),Information Object,FALSE,TRUE,Uses::Used by,cmdb_ci_business_app
+IT_Service,Circuit,,Powers (parent),Server,FALSE,TRUE,Powers::Powered by,cmdb_ci_circuit
+IT_Service,Circuit,,Powers (parent),Rack,FALSE,TRUE,Powers::Powered by,cmdb_ci_circuit
+IT_Service,Circuit,,Fed By (child),UPS,TRUE,FALSE,Feeds::Fed By,cmdb_ci_circuit
+IT_Service,Cisco UCS Blade,,Contained by (child),Cisco UCS Chassis,TRUE,FALSE,Contains::Contained by,cmdb_ci_ucs_blade
+IT_Service,Cisco UCS Chassis,,Contained by (child),Cisco UCS Equipment,TRUE,FALSE,Contains::Contained by,cmdb_ci_ucs_chassis
+IT_Service,Cisco UCS Chassis,,Contains (parent),Cisco UCS Blade,FALSE,TRUE,Contains::Contained by,cmdb_ci_ucs_chassis
+IT_Service,Cisco UCS Equipment,,Contains (parent),Cisco UCS Rack Mount Unit,FALSE,TRUE,Contains::Contained by,cmdb_ci_ucs_equipment
+IT_Service,Cisco UCS Equipment,,Contains (parent),Cisco UCS Chassis,FALSE,TRUE,Contains::Contained by,cmdb_ci_ucs_equipment
+IT_Service,Cisco UCS Rack Mount Unit,,Contained by (child),Cisco UCS Equipment,TRUE,FALSE,Contains::Contained by,cmdb_ci_ucs_rack_unit
+IT_Service,Citrix Netscaler,,IP Connection (parent),IP Switch,FALSE,TRUE,IP Connection::IP Connection,cmdb_ci_lb_netscaler
+IT_Service,Cloud Mgmt Network Interface,,Contained by (child),Resource Group,TRUE,FALSE,Contains::Contained by,cmdb_ci_nic
+IT_Service,Cloud Mgmt Network Interface,,Contained by (child),Cloud Subnet,TRUE,FALSE,Contains::Contained by,cmdb_ci_nic
+IT_Service,Cloud Network,,Contains (parent),Compute Security Group,FALSE,TRUE,Contains::Contained by,cmdb_ci_network
+IT_Service,Cloud Network,,Contained by (child),Resource Group,TRUE,FALSE,Contains::Contained by,cmdb_ci_network
+IT_Service,Cloud Network,,Contained by (child),Availability Zone,TRUE,FALSE,Contains::Contained by,cmdb_ci_network
+IT_Service,Cloud Public IP Address,,Contained by (child),Resource Group,TRUE,FALSE,Contains::Contained by,cmdb_ci_cloud_public_ipaddress
+IT_Service,Cloud Storage Account,,Contained by (child),Resource Group,TRUE,FALSE,Contains::Contained by,cmdb_ci_cloud_storage_account
+IT_Service,Cloud Subnet,,Contained by (child),Resource Group,TRUE,FALSE,Contains::Contained by,cmdb_ci_cloud_subnet
+IT_Service,Cloud Subnet,,Contains (parent),Cloud Mgmt Network Interface,FALSE,TRUE,Contains::Contained by,cmdb_ci_cloud_subnet
+IT_Service,Cloud Subnet,,Contained by (child),Availability Zone,TRUE,FALSE,Contains::Contained by,cmdb_ci_cloud_subnet
+IT_Service,Cluster,,Members (parent),Computer,FALSE,TRUE,Members::Member of,cmdb_ci_cluster
+IT_Service,Cluster,,Used by (child),Database,TRUE,FALSE,Depends on::Used by,cmdb_ci_cluster
+IT_Service,Cluster,,Members (parent),UNIX Server,FALSE,TRUE,Members::Member of,cmdb_ci_cluster
+IT_Service,Cluster,,Cluster (child),Cluster Node,TRUE,FALSE,Cluster of::Cluster,cmdb_ci_cluster
+IT_Service,Cluster,,Members (parent),Database,FALSE,TRUE,Members::Member of,cmdb_ci_cluster
+IT_Service,Cluster Node,,Cluster of (parent),Cluster,FALSE,TRUE,Cluster of::Cluster,cmdb_ci_cluster_node
+IT_Service,Cluster Node,,Hosted on (parent),Server,FALSE,TRUE,Hosted on::Hosts,cmdb_ci_cluster_node
+IT_Service,Cluster Virtual IP,,Applicative Flow To (parent),Windows Cluster Node,FALSE,TRUE,Applicative Flow To::Applicative Flow From,cmdb_ci_cluster_vip
+IT_Service,Compute Security Group,,Contained by (child),Cloud Network,TRUE,FALSE,Contains::Contained by,cmdb_ci_compute_security_group
+IT_Service,Compute Security Group,,Contained by (child),Resource Group,TRUE,FALSE,Contains::Contained by,cmdb_ci_compute_security_group
+IT_Service,Computer,,Used by (child),Computer,TRUE,FALSE,Depends on::Used by,cmdb_ci_computer
+IT_Service,Computer,,Depends on (parent),Computer Peripheral,FALSE,TRUE,Depends on::Used by,cmdb_ci_computer
+IT_Service,Computer,,Used by (child),Service,TRUE,FALSE,Depends on::Used by,cmdb_ci_computer
+IT_Service,Computer,,Depends on (parent),Computer,FALSE,TRUE,Depends on::Used by,cmdb_ci_computer
+IT_Service,Computer,,Member of (child),Cluster,TRUE,FALSE,Members::Member of,cmdb_ci_computer
+IT_Service,Computer,,Powered by (child),Rack,TRUE,FALSE,Powers::Powered by,cmdb_ci_computer
+IT_Service,Computer Peripheral,,Used by (child),Computer,TRUE,FALSE,Depends on::Used by,cmdb_ci_peripheral
+IT_Service,Computer Room,,Contains Room (child),Data Center,TRUE,FALSE,Located In::Contains Room,cmdb_ci_computer_room
+IT_Service,Computer Room,,Houses (child),Data Center,TRUE,FALSE,Located in::Houses,cmdb_ci_computer_room
+IT_Service,Computer Room,,Located in (parent),Data Center Zone,FALSE,TRUE,Located in::Houses,cmdb_ci_computer_room
+IT_Service,Computer Room,,Cooled By (child),Computer Room AC,TRUE,FALSE,Cools::Cooled By,cmdb_ci_computer_room
+IT_Service,Computer Room,,Located in (parent),Zones,FALSE,TRUE,Located in::Houses,cmdb_ci_computer_room
+IT_Service,Computer Room,,Located In (parent),Data Center Zone,FALSE,TRUE,Located In::Contains Room,cmdb_ci_computer_room
+IT_Service,Computer Room AC,,Cools (parent),Computer Room,FALSE,TRUE,Cools::Cooled By,cmdb_ci_crac
+IT_Service,Configuration file,,Used by (child),Information Object,TRUE,FALSE,Depends on::Used by,cmdb_ci_config_file
+IT_Service,Data Center,,Located in (parent),Computer Room,FALSE,TRUE,Located in::Houses,cmdb_ci_datacenter
+IT_Service,Data Center,,Located In (parent),Computer Room,FALSE,TRUE,Located In::Contains Room,cmdb_ci_datacenter
+IT_Service,Data Center Zone,,Located in Zone (parent),Rack,FALSE,TRUE,Located in Zone::Zone contains,cmdb_ci_zone
+IT_Service,Data Center Zone,,Houses (child),Computer Room,TRUE,FALSE,Located in::Houses,cmdb_ci_zone
+IT_Service,Data Center Zone,,Contains Room (child),Computer Room,TRUE,FALSE,Located In::Contains Room,cmdb_ci_zone
+IT_Service,Data Center Zone,,Contains (parent),Rack,FALSE,TRUE,Contains::Contained by,cmdb_ci_zone
+IT_Service,Data Power Hosting Server,,Owned by (child),IP Address,TRUE,FALSE,Owns::Owned by,cmdb_ci_datapower_server
+IT_Service,Data Power Hosting Server,,IP Connection (parent),IP Switch,FALSE,TRUE,IP Connection::IP Connection,cmdb_ci_datapower_server
+IT_Service,Database,,Hosted on (parent),Database,FALSE,TRUE,Hosted on::Hosts,cmdb_ci_database
+IT_Service,Database,,Runs on (parent),UNIX Server,FALSE,TRUE,Runs on::Runs,cmdb_ci_database
+IT_Service,Database,,Hosts (child),Database,TRUE,FALSE,Hosted on::Hosts,cmdb_ci_database
+IT_Service,Database,,Depends on (parent),Cluster,FALSE,TRUE,Depends on::Used by,cmdb_ci_database
+IT_Service,Database,,Member of (child),Cluster,TRUE,FALSE,Members::Member of,cmdb_ci_database
+IT_Service,Database,,Used by (child),Service,TRUE,FALSE,Depends on::Used by,cmdb_ci_database
+IT_Service,Database,,Used by (child),Application,TRUE,FALSE,Depends on::Used by,cmdb_ci_database
+IT_Service,Database,,Hosted on (parent),Server,FALSE,TRUE,Hosted on::Hosts,cmdb_ci_database
+IT_Service,Database Catalog,,Used by (child),Information Object,TRUE,FALSE,Depends on::Used by,cmdb_ci_db_catalog
+IT_Service,Datastore Disk,,Provides (child),VMware vCenter Datastore,TRUE,FALSE,Provided By::Provides,cmdb_ci_vcenter_datastore_disk
+IT_Service,Disk,,Provides (parent),File System,FALSE,TRUE,Provides::Provided by,cmdb_ci_disk
+IT_Service,Disk,,Provided by (child),File System,TRUE,FALSE,Provides::Provided by,cmdb_ci_disk
+IT_Service,Disk Partition,,Provides (child),NAS File System,TRUE,FALSE,Provided By::Provides,cmdb_ci_disk_partition
+IT_Service,Disk Partition,,Provides (child),File System,TRUE,FALSE,Provided By::Provides,cmdb_ci_disk_partition
+IT_Service,DNS Alias,,Uses (child),DNS Name,TRUE,FALSE,Used by::Uses,cmdb_ci_dns_alias
+IT_Service,DNS Name,,Uses (parent),IP Address,FALSE,TRUE,Uses::Used by,cmdb_ci_dns_name
+IT_Service,DNS Name,,Used by (parent),DNS Alias,FALSE,TRUE,Used by::Uses,cmdb_ci_dns_name
+IT_Service,Docker Container,,Instantiates (parent),Docker Local Image,FALSE,TRUE,Instantiates::Instantiated by,cmdb_ci_docker_container
+IT_Service,Docker Image,,Instantiated by (child),Docker Local Image,TRUE,FALSE,Instantiates::Instantiated by,cmdb_ci_docker_image
+IT_Service,Docker Local Image,,Instantiated by (child),Docker Container,TRUE,FALSE,Instantiates::Instantiated by,cmdb_ci_docker_local_image
+IT_Service,Docker Local Image,,Instantiates (parent),Docker Image,FALSE,TRUE,Instantiates::Instantiated by,cmdb_ci_docker_local_image
+IT_Service,Email Server,,Used by (child),Email Server,TRUE,FALSE,Depends on::Used by,cmdb_ci_email_server
+IT_Service,Email Server,,Depends on (parent),Email Server,FALSE,TRUE,Depends on::Used by,cmdb_ci_email_server
+IT_Service,Email Server,,Depends on (parent),Mass Storage Device,FALSE,TRUE,Depends on::Used by,cmdb_ci_email_server
+IT_Service,Email Server,,Connects to (parent),Mass Storage Device,FALSE,TRUE,Connects to::Connected by,cmdb_ci_email_server
+IT_Service,Email Server,,Used by (child),Service,TRUE,FALSE,Depends on::Used by,cmdb_ci_email_server
+IT_Service,Endpoint,,Used by (child),Service,TRUE,FALSE,Depends on::Used by,cmdb_ci_endpoint
+IT_Service,ESX Resource Pool,,Defines resources for (parent),ESX Server,FALSE,TRUE,Defines resources for::Gets resources from,cmdb_ci_esx_resource_pool
+IT_Service,ESX Resource Pool,,Defines resources for (parent),VMware vCenter Cluster,FALSE,TRUE,Defines resources for::Gets resources from,cmdb_ci_esx_resource_pool
+IT_Service,ESX Resource Pool,,Members (parent),VMware Virtual Machine Instance,FALSE,TRUE,Members::Member of,cmdb_ci_esx_resource_pool
+IT_Service,ESX Server,,Provides (child),VMware vCenter Network,TRUE,FALSE,Provided By::Provides,cmdb_ci_esx_server
+IT_Service,ESX Server,,Has registered (child),VMware Virtual Machine Instance,TRUE,FALSE,Registered on::Has registered,cmdb_ci_esx_server
+IT_Service,ESX Server,,Has registered (child),Virtual Machine Instance,TRUE,FALSE,Registered on::Has registered,cmdb_ci_esx_server
+IT_Service,ESX Server,,Managed by (parent),VMware vCenter Instance,FALSE,TRUE,Managed by::Manages,cmdb_ci_esx_server
+IT_Service,ESX Server,,Gets resources from (child),ESX Resource Pool,TRUE,FALSE,Defines resources for::Gets resources from,cmdb_ci_esx_server
+IT_Service,ESX Server,,Virtualizes (child),Linux Server,TRUE,FALSE,Virtualized by::Virtualizes,cmdb_ci_esx_server
+IT_Service,ESX Server,,Uses (child),VMware vCenter Datastore,TRUE,FALSE,Used by::Uses,cmdb_ci_esx_server
+IT_Service,ESX Server,,Has registered (child),VMware Virtual Machine Template,TRUE,FALSE,Registered on::Has registered,cmdb_ci_esx_server
+IT_Service,ESX Server,,Member of (child),VMware vCenter Cluster,TRUE,FALSE,Members::Member of,cmdb_ci_esx_server
+IT_Service,Exchange MailBox,,Used by (child),Information Object,TRUE,FALSE,Depends on::Used by,cmdb_ci_exchange_mailbox
+IT_Service,Exit Interface Routing Rule,,Owned by (child),Router Interface,TRUE,FALSE,Owns::Owned by,dscy_route_interface
+IT_Service,Exit Interface Routing Rule,,Owns (parent),Next Hop Routing Rule,FALSE,TRUE,Owns::Owned by,dscy_route_interface
+IT_Service,F5 BIG-IP,,IP Connection (parent),IP Switch,FALSE,TRUE,IP Connection::IP Connection,cmdb_ci_lb_bigip
+IT_Service,Fibre Channel Disk,,Provided by (child),NAS File System,TRUE,FALSE,Provides::Provided by,cmdb_ci_fc_disk
+IT_Service,File System,,Provided By (parent),Storage Pool,FALSE,TRUE,Provided By::Provides,cmdb_ci_file_system
+IT_Service,File System,,Used by (child),Information Object,TRUE,FALSE,Depends on::Used by,cmdb_ci_file_system
+IT_Service,File System,,Provided by (child),Disk,TRUE,FALSE,Provides::Provided by,cmdb_ci_file_system
+IT_Service,File System,,Provides (parent),Disk,FALSE,TRUE,Provides::Provided by,cmdb_ci_file_system
+IT_Service,File System,,Provides (parent),Storage Device,FALSE,TRUE,Provides::Provided by,cmdb_ci_file_system
+IT_Service,File System,,Provided by (child),iSCSI Disk,TRUE,FALSE,Provides::Provided by,cmdb_ci_file_system
+IT_Service,File System,,Provided By (parent),Disk Partition,FALSE,TRUE,Provided By::Provides,cmdb_ci_file_system
+IT_Service,Hardware Type,,Provisioned (child),Virtual Machine Instance,TRUE,FALSE,Provisioned From::Provisioned,cmdb_ci_compute_template
+IT_Service,HPUX Server,,IP Connection (parent),IP Switch,FALSE,TRUE,IP Connection::IP Connection,cmdb_ci_hpux_server
+IT_Service,Hyper-V Cluster,,Members (parent),Hyper-V Server,FALSE,TRUE,Members::Member of,cmdb_ci_hyper_v_cluster
+IT_Service,Hyper-V Resource Pool,,Defines resources for (parent),Hyper-V Server,FALSE,TRUE,Defines resources for::Gets resources from,cmdb_ci_hyper_v_resource_pool
+IT_Service,Hyper-V Server,,Gets resources from (child),Hyper-V Resource Pool,TRUE,FALSE,Defines resources for::Gets resources from,cmdb_ci_hyper_v_server
+IT_Service,Hyper-V Server,,Runs (child),Software,TRUE,FALSE,Runs on::Runs,cmdb_ci_hyper_v_server
+IT_Service,Hyper-V Server,,Member of (child),Hyper-V Cluster,TRUE,FALSE,Members::Member of,cmdb_ci_hyper_v_server
+IT_Service,Hyper-V Server,,Runs on (parent),Windows Server,FALSE,TRUE,Runs on::Runs,cmdb_ci_hyper_v_server
+IT_Service,Hyper-V Virtual Machine Instance,,Connected by (parent),Hyper-V Virtual Network,FALSE,TRUE,Connected by::Connects,cmdb_ci_hyper_v_instance
+IT_Service,Hyper-V Virtual Network,,Connects (child),Hyper-V Virtual Machine Instance,TRUE,FALSE,Connected by::Connects,cmdb_ci_hyper_v_network
+IT_Service,IBM Websphere,,Contains (parent),Websphere Cell,FALSE,TRUE,Contains::Contained by,cmdb_ci_app_server_websphere
+IT_Service,IBM Websphere,,Contains (parent),Web Application,FALSE,TRUE,Contains::Contained by,cmdb_ci_app_server_websphere
+IT_Service,IBM Websphere,,Runs (child),Web Service,TRUE,FALSE,Runs on::Runs,cmdb_ci_app_server_websphere
+IT_Service,Image,,Provisioned (child),Virtual Machine Instance,TRUE,FALSE,Provisioned From::Provisioned,cmdb_ci_os_template
+IT_Service,Information Object,,Depends on (parent),Configuration file,FALSE,TRUE,Depends on::Used by,cmdb_ci_information_object
+IT_Service,Information Object,,Used by (child),Business Application,TRUE,FALSE,Uses::Used by,cmdb_ci_information_object
+IT_Service,Information Object,,Depends on (parent),File System,FALSE,TRUE,Depends on::Used by,cmdb_ci_information_object
+IT_Service,Information Object,,Depends on (parent),Exchange MailBox,FALSE,TRUE,Depends on::Used by,cmdb_ci_information_object
+IT_Service,Information Object,,Depends on (parent),Database Catalog,FALSE,TRUE,Depends on::Used by,cmdb_ci_information_object
+IT_Service,IP Address,,Owns (parent),Data Power Hosting Server,FALSE,TRUE,Owns::Owned by,cmdb_ci_ip_address
+IT_Service,IP Address,,Owned by (child),Network Adapter,TRUE,FALSE,Owns::Owned by,cmdb_ci_ip_address
+IT_Service,IP Address,,Used by (child),DNS Name,TRUE,FALSE,Uses::Used by,cmdb_ci_ip_address
+IT_Service,IP Switch,,IP Connection (child),Windows Server,TRUE,FALSE,IP Connection::IP Connection,cmdb_ci_ip_switch
+IT_Service,IP Switch,,IP Connection (child),F5 BIG-IP,TRUE,FALSE,IP Connection::IP Connection,cmdb_ci_ip_switch
+IT_Service,IP Switch,,IP Connection (child),AIX Server,TRUE,FALSE,IP Connection::IP Connection,cmdb_ci_ip_switch
+IT_Service,IP Switch,,IP Connection (child),Linux Server,TRUE,FALSE,IP Connection::IP Connection,cmdb_ci_ip_switch
+IT_Service,IP Switch,,IP Connection (child),Citrix Netscaler,TRUE,FALSE,IP Connection::IP Connection,cmdb_ci_ip_switch
+IT_Service,IP Switch,,IP Connection (child),HPUX Server,TRUE,FALSE,IP Connection::IP Connection,cmdb_ci_ip_switch
+IT_Service,IP Switch,,IP Connection (child),Alteon,TRUE,FALSE,IP Connection::IP Connection,cmdb_ci_ip_switch
+IT_Service,IP Switch,,IP Connection (child),A10 Load Balancer,TRUE,FALSE,IP Connection::IP Connection,cmdb_ci_ip_switch
+IT_Service,IP Switch,,IP Connection (child),Data Power Hosting Server,TRUE,FALSE,IP Connection::IP Connection,cmdb_ci_ip_switch
+IT_Service,IP Switch,,IP Connection (child),Solaris Server,TRUE,FALSE,IP Connection::IP Connection,cmdb_ci_ip_switch
+IT_Service,iSCSI Disk,,Provided by (child),NAS File System,TRUE,FALSE,Provides::Provided by,cmdb_ci_iscsi_disk
+IT_Service,iSCSI Disk,,Provides (parent),File System,FALSE,TRUE,Provides::Provided by,cmdb_ci_iscsi_disk
+IT_Service,JBoss,,Contains (parent),Web Application,FALSE,TRUE,Contains::Contained by,cmdb_ci_app_server_jboss
+IT_Service,Linux Server,,Virtualized by (parent),Virtual Machine Instance,FALSE,TRUE,Virtualized by::Virtualizes,cmdb_ci_linux_server
+IT_Service,Linux Server,,Used by (child),Service,TRUE,FALSE,Depends on::Used by,cmdb_ci_linux_server
+IT_Service,Linux Server,,Instantiates (parent),VMware Virtual Machine Instance,FALSE,TRUE,Instantiates::Instantiated by,cmdb_ci_linux_server
+IT_Service,Linux Server,,Virtualized by (parent),ESX Server,FALSE,TRUE,Virtualized by::Virtualizes,cmdb_ci_linux_server
+IT_Service,Linux Server,,Runs (child),Web Server,TRUE,FALSE,Runs on::Runs,cmdb_ci_linux_server
+IT_Service,Linux Server,,IP Connection (parent),IP Switch,FALSE,TRUE,IP Connection::IP Connection,cmdb_ci_linux_server
+IT_Service,Load Balancer Interface,,Used by (child),Load Balancer VLAN,TRUE,FALSE,Uses::Used by,cmdb_ci_lb_interface
+IT_Service,Load Balancer Pool,,Used by (child),Load Balancer Service,TRUE,FALSE,Uses::Used by,cmdb_ci_lb_pool
+IT_Service,Load Balancer Pool,,Members (parent),Load Balancer Pool Member,FALSE,TRUE,Members::Member of,cmdb_ci_lb_pool
+IT_Service,Load Balancer Pool,,Uses (child),Load Balancer Service,TRUE,FALSE,Used by::Uses,cmdb_ci_lb_pool
+IT_Service,Load Balancer Pool Member,,Member of (child),Load Balancer Pool,TRUE,FALSE,Members::Member of,cmdb_ci_lb_pool_member
+IT_Service,Load Balancer Service,,Used by (parent),Load Balancer Pool,FALSE,TRUE,Used by::Uses,cmdb_ci_lb_service
+IT_Service,Load Balancer Service,,Distributes (child),Windows Server,TRUE,FALSE,Distributed by::Distributes,cmdb_ci_lb_service
+IT_Service,Load Balancer Service,,Distributes (child),Tomcat,TRUE,FALSE,Distributed by::Distributes,cmdb_ci_lb_service
+IT_Service,Load Balancer Service,,Uses (parent),Load Balancer Pool,FALSE,TRUE,Uses::Used by,cmdb_ci_lb_service
+IT_Service,Load Balancer Service,,Uses (parent),Load Balancer VLAN,FALSE,TRUE,Uses::Used by,cmdb_ci_lb_service
+IT_Service,Load Balancer VLAN,,Uses (parent),Load Balancer Interface,FALSE,TRUE,Uses::Used by,cmdb_ci_lb_vlan
+IT_Service,Load Balancer VLAN,,Used by (child),Load Balancer Service,TRUE,FALSE,Uses::Used by,cmdb_ci_lb_vlan
+IT_Service,Mass Storage Device,,Connected by (child),Email Server,TRUE,FALSE,Connects to::Connected by,cmdb_ci_msd
+IT_Service,Mass Storage Device,,Sends data to (child),Windows Server,TRUE,FALSE,Receives data from::Sends data to,cmdb_ci_msd
+IT_Service,Mass Storage Device,,Sends data to (child),Server,TRUE,FALSE,Receives data from::Sends data to,cmdb_ci_msd
+IT_Service,Mass Storage Device,,Used by (child),Email Server,TRUE,FALSE,Depends on::Used by,cmdb_ci_msd
+IT_Service,Mass Storage Device,,Used by (child),UNIX Server,TRUE,FALSE,Depends on::Used by,cmdb_ci_msd
+IT_Service,MSFT SQL Instance,,Used by (child),Tomcat,TRUE,FALSE,Depends on::Used by,cmdb_ci_db_mssql_instance
+IT_Service,NAS File System,,Provided By (parent),Disk Partition,FALSE,TRUE,Provided By::Provides,cmdb_ci_nas_file_system
+IT_Service,NAS File System,,Provides (parent),Fibre Channel Disk,FALSE,TRUE,Provides::Provided by,cmdb_ci_nas_file_system
+IT_Service,NAS File System,,Provided By (parent),Storage Pool,FALSE,TRUE,Provided By::Provides,cmdb_ci_nas_file_system
+IT_Service,NAS File System,,Provides (parent),iSCSI Disk,FALSE,TRUE,Provides::Provided by,cmdb_ci_nas_file_system
+IT_Service,Network Adapter,,Owns (parent),IP Address,FALSE,TRUE,Owns::Owned by,cmdb_ci_network_adapter
+IT_Service,Network Gear,,Exchanges data with (child),Windows Server,TRUE,FALSE,Exchanges data with::Exchanges data with,cmdb_ci_netgear
+IT_Service,Network Gear,,Used by (child),Service,TRUE,FALSE,Depends on::Used by,cmdb_ci_netgear
+IT_Service,Network Gear,,Connected by (child),Service,TRUE,FALSE,Connects to::Connected by,cmdb_ci_netgear
+IT_Service,Network Gear,,Connected by (child),UNIX Server,TRUE,FALSE,Connects to::Connected by,cmdb_ci_netgear
+IT_Service,Next Hop Routing Rule,,Owned by (child),Exit Interface Routing Rule,TRUE,FALSE,Owns::Owned by,dscy_route_next_hop
+IT_Service,Nginx Load Balancer,,Provided by (child),Nginx Web Server,TRUE,FALSE,Provides::Provided by,cmdb_ci_lb_nginx
+IT_Service,Nginx Web Server,,Provides (parent),Nginx Load Balancer,FALSE,TRUE,Provides::Provided by,cmdb_ci_nginx_web_server
+IT_Service,Oracle Database Listener,,Depends on (parent),Oracle Instance,FALSE,TRUE,Depends on::Used by,cmdb_ci_db_ora_listener
+IT_Service,Oracle Database Listener,,Used by (child),Oracle Instance,TRUE,FALSE,Depends on::Used by,cmdb_ci_db_ora_listener
+IT_Service,Oracle Instance,,Used by (child),Oracle Database Listener,TRUE,FALSE,Depends on::Used by,cmdb_ci_db_ora_instance
+IT_Service,Oracle Instance,,Depends on (parent),Oracle Database Listener,FALSE,TRUE,Depends on::Used by,cmdb_ci_db_ora_instance
+IT_Service,Rack,,Zone contains (child),Data Center Zone,TRUE,FALSE,Located in Zone::Zone contains,cmdb_ci_rack
+IT_Service,Rack,,Contained by (child),Data Center Zone,TRUE,FALSE,Contains::Contained by,cmdb_ci_rack
+IT_Service,Rack,,Powered by (child),Circuit,TRUE,FALSE,Powers::Powered by,cmdb_ci_rack
+IT_Service,Rack,,Powers (parent),Computer,FALSE,TRUE,Powers::Powered by,cmdb_ci_rack
+IT_Service,Resource Group,,Contains (parent),Cloud Mgmt Network Interface,FALSE,TRUE,Contains::Contained by,cmdb_ci_resource_group
+IT_Service,Resource Group,,Contains (parent),Cloud Network,FALSE,TRUE,Contains::Contained by,cmdb_ci_resource_group
+IT_Service,Resource Group,,Contains (parent),Cloud Public IP Address,FALSE,TRUE,Contains::Contained by,cmdb_ci_resource_group
+IT_Service,Resource Group,,Contains (parent),Cloud Subnet,FALSE,TRUE,Contains::Contained by,cmdb_ci_resource_group
+IT_Service,Resource Group,,Contains (parent),Compute Security Group,FALSE,TRUE,Contains::Contained by,cmdb_ci_resource_group
+IT_Service,Resource Group,,Contains (parent),Cloud Storage Account,FALSE,TRUE,Contains::Contained by,cmdb_ci_resource_group
+IT_Service,Router Interface,,Owns (parent),Exit Interface Routing Rule,FALSE,TRUE,Owns::Owned by,dscy_router_interface
+IT_Service,Server,,Powered by (child),Circuit,TRUE,FALSE,Powers::Powered by,cmdb_ci_server
+IT_Service,Server,,Runs (child),Application,TRUE,FALSE,Runs on::Runs,cmdb_ci_server
+IT_Service,Server,,Hosts (child),Database,TRUE,FALSE,Hosted on::Hosts,cmdb_ci_server
+IT_Service,Server,,Used by (child),Service,TRUE,FALSE,Depends on::Used by,cmdb_ci_server
+IT_Service,Server,,Runs (child),Windows Server,TRUE,FALSE,Runs on::Runs,cmdb_ci_server
+IT_Service,Server,,Receives data from (parent),Mass Storage Device,FALSE,TRUE,Receives data from::Sends data to,cmdb_ci_server
+IT_Service,Server,,Hosts (child),Cluster Node,TRUE,FALSE,Hosted on::Hosts,cmdb_ci_server
+IT_Service,Service,,Connects to (parent),Network Gear,FALSE,TRUE,Connects to::Connected by,cmdb_ci_service
+IT_Service,Service,,Depends on (parent),Database,FALSE,TRUE,Depends on::Used by,cmdb_ci_service
+IT_Service,Service,,Consumed by (child),Business Application,TRUE,FALSE,Consumes::Consumed by,cmdb_ci_service
+IT_Service,Service,,Depends on (parent),Network Gear,FALSE,TRUE,Depends on::Used by,cmdb_ci_service
+IT_Service,Service,,Depends on (parent),Server,FALSE,TRUE,Depends on::Used by,cmdb_ci_service
+IT_Service,Service,,Depends on (parent),Email Server,FALSE,TRUE,Depends on::Used by,cmdb_ci_service
+IT_Service,Service,,Depends on (parent),Linux Server,FALSE,TRUE,Depends on::Used by,cmdb_ci_service
+IT_Service,Service,,Depends on (parent),Windows Server,FALSE,TRUE,Depends on::Used by,cmdb_ci_service
+IT_Service,Service,,Depends on (parent),Application,FALSE,TRUE,Depends on::Used by,cmdb_ci_service
+IT_Service,Service,,Depends on (parent),Computer,FALSE,TRUE,Depends on::Used by,cmdb_ci_service
+IT_Service,Service,,Depends on (parent),Endpoint,FALSE,TRUE,Depends on::Used by,cmdb_ci_service
+IT_Service,Service,,Depends on (parent),UNIX Server,FALSE,TRUE,Depends on::Used by,cmdb_ci_service
+IT_Service,Service,,Provides DR for (child),Service,TRUE,FALSE,DR provided by::Provides DR for,cmdb_ci_service
+IT_Service,Service,,Receives data from (parent),Application,FALSE,TRUE,Receives data from::Sends data to,cmdb_ci_service
+IT_Service,Service,,Depends on (parent),Web Server,FALSE,TRUE,Depends on::Used by,cmdb_ci_service
+IT_Service,Service,,Runs on (parent),UNIX Server,FALSE,TRUE,Runs on::Runs,cmdb_ci_service
+IT_Service,Service,,DR provided by (parent),Service,FALSE,TRUE,DR provided by::Provides DR for,cmdb_ci_service
+IT_Service,Software,,Runs on (parent),Hyper-V Server,FALSE,TRUE,Runs on::Runs,cmdb_ci_spkg
+IT_Service,Solaris Server,,Instantiates (parent),Solaris Virtual Machine Instance,FALSE,TRUE,Instantiates::Instantiated by,cmdb_ci_solaris_server
+IT_Service,Solaris Server,,Virtualized by (parent),Zones,FALSE,TRUE,Virtualized by::Virtualizes,cmdb_ci_solaris_server
+IT_Service,Solaris Server,,IP Connection (parent),IP Switch,FALSE,TRUE,IP Connection::IP Connection,cmdb_ci_solaris_server
+IT_Service,Solaris Virtual Machine Instance,,Instantiated by (child),Solaris Server,TRUE,FALSE,Instantiates::Instantiated by,cmdb_ci_solaris_instance
+IT_Service,Solaris Virtual Machine Instance,,Registered on (parent),Zones,FALSE,TRUE,Registered on::Has registered,cmdb_ci_solaris_instance
+IT_Service,Storage Cluster,,Manages (child),Storage Server,TRUE,FALSE,Managed by::Manages,cmdb_ci_storage_cluster
+IT_Service,Storage Device,,Provided by (child),File System,TRUE,FALSE,Provides::Provided by,cmdb_ci_storage_device
+IT_Service,Storage Pool,,Provides (child),File System,TRUE,FALSE,Provided By::Provides,cmdb_ci_storage_pool
+IT_Service,Storage Pool,,Provides (child),NAS File System,TRUE,FALSE,Provided By::Provides,cmdb_ci_storage_pool
+IT_Service,Storage Server,,Managed by (parent),Storage Cluster,FALSE,TRUE,Managed by::Manages,cmdb_ci_storage_server
+IT_Service,Storage Server,,Used by (child),Application,TRUE,FALSE,Depends on::Used by,cmdb_ci_storage_server
+IT_Service,Switch Forwarding Rule,,Distributed by (parent),Switchport,FALSE,TRUE,Distributed by::Distributes,dscy_swtch_fwd_rule
+IT_Service,Switch Partition,,Runs on (parent),Switchport,FALSE,TRUE,Runs on::Runs,dscy_swtch_partition
+IT_Service,Switchport,,Distributes (child),Switch Forwarding Rule,TRUE,FALSE,Distributed by::Distributes,dscy_switchport
+IT_Service,Switchport,,Runs (child),Switch Partition,TRUE,FALSE,Runs on::Runs,dscy_switchport
+IT_Service,Tomcat,,Depends on (parent),MSFT SQL Instance,FALSE,TRUE,Depends on::Used by,cmdb_ci_app_server_tomcat
+IT_Service,Tomcat,,Distributed by (parent),Load Balancer Service,FALSE,TRUE,Distributed by::Distributes,cmdb_ci_app_server_tomcat
+IT_Service,Tomcat,,Used by (child),Apache Web Server,TRUE,FALSE,Depends on::Used by,cmdb_ci_app_server_tomcat
+IT_Service,UNIX Server,,Used by (child),Service,TRUE,FALSE,Depends on::Used by,cmdb_ci_unix_server
+IT_Service,UNIX Server,,Connects to (parent),Network Gear,FALSE,TRUE,Connects to::Connected by,cmdb_ci_unix_server
+IT_Service,UNIX Server,,Runs (child),Service,TRUE,FALSE,Runs on::Runs,cmdb_ci_unix_server
+IT_Service,UNIX Server,,Runs (child),Application,TRUE,FALSE,Runs on::Runs,cmdb_ci_unix_server
+IT_Service,UNIX Server,,Member of (child),Cluster,TRUE,FALSE,Members::Member of,cmdb_ci_unix_server
+IT_Service,UNIX Server,,Depends on (parent),Mass Storage Device,FALSE,TRUE,Depends on::Used by,cmdb_ci_unix_server
+IT_Service,UNIX Server,,Runs (child),Database,TRUE,FALSE,Runs on::Runs,cmdb_ci_unix_server
+IT_Service,UPS,,Feeds (parent),Circuit,FALSE,TRUE,Feeds::Fed By,cmdb_ci_ups
+IT_Service,Virtual Machine Instance,,Virtualizes (child),Windows Server,TRUE,FALSE,Virtualized by::Virtualizes,cmdb_ci_vm_instance
+IT_Service,Virtual Machine Instance,,Virtualizes (child),Linux Server,TRUE,FALSE,Virtualized by::Virtualizes,cmdb_ci_vm_instance
+IT_Service,Virtual Machine Instance,,Provisioned From (parent),Hardware Type,FALSE,TRUE,Provisioned From::Provisioned,cmdb_ci_vm_instance
+IT_Service,Virtual Machine Instance,,Provisioned From (parent),Image,FALSE,TRUE,Provisioned From::Provisioned,cmdb_ci_vm_instance
+IT_Service,Virtual Machine Instance,,Registered on (parent),ESX Server,FALSE,TRUE,Registered on::Has registered,cmdb_ci_vm_instance
+IT_Service,VMware vCenter Cluster,,Members (parent),ESX Server,FALSE,TRUE,Members::Member of,cmdb_ci_vcenter_cluster
+IT_Service,VMware vCenter Cluster,,Gets resources from (child),ESX Resource Pool,TRUE,FALSE,Defines resources for::Gets resources from,cmdb_ci_vcenter_cluster
+IT_Service,VMware vCenter Datacenter,,Contains (parent),VMware vCenter Folder,FALSE,TRUE,Contains::Contained by,cmdb_ci_vcenter_datacenter
+IT_Service,VMware vCenter Datacenter,,Contains (parent),VMware Virtual Machine Template,FALSE,TRUE,Contains::Contained by,cmdb_ci_vcenter_datacenter
+IT_Service,VMware vCenter Datacenter,,Contains (parent),VMware vCenter Network,FALSE,TRUE,Contains::Contained by,cmdb_ci_vcenter_datacenter
+IT_Service,VMware vCenter Datacenter,,Contains (parent),VMware vCenter Datastore,FALSE,TRUE,Contains::Contained by,cmdb_ci_vcenter_datacenter
+IT_Service,VMware vCenter Datastore,,Provides storage for (parent),VMware Virtual Machine Instance,FALSE,TRUE,Provides storage for::Stored on,cmdb_ci_vcenter_datastore
+IT_Service,VMware vCenter Datastore,,Used by (parent),ESX Server,FALSE,TRUE,Used by::Uses,cmdb_ci_vcenter_datastore
+IT_Service,VMware vCenter Datastore,,Contained by (child),VMware vCenter Datacenter,TRUE,FALSE,Contains::Contained by,cmdb_ci_vcenter_datastore
+IT_Service,VMware vCenter Datastore,,Provides storage for (parent),VMware Virtual Machine Template,FALSE,TRUE,Provides storage for::Stored on,cmdb_ci_vcenter_datastore
+IT_Service,VMware vCenter Datastore,,Provided By (parent),Datastore Disk,FALSE,TRUE,Provided By::Provides,cmdb_ci_vcenter_datastore
+IT_Service,VMware vCenter Folder,,Contained by (child),VMware vCenter Datacenter,TRUE,FALSE,Contains::Contained by,cmdb_ci_vcenter_folder
+IT_Service,VMware vCenter Folder,,Contains (parent),VMware Virtual Machine Instance,FALSE,TRUE,Contains::Contained by,cmdb_ci_vcenter_folder
+IT_Service,VMware vCenter Folder,,Contains (parent),VMware Virtual Machine Template,FALSE,TRUE,Contains::Contained by,cmdb_ci_vcenter_folder
+IT_Service,VMware vCenter Instance,,Manages (child),ESX Server,TRUE,FALSE,Managed by::Manages,cmdb_ci_vcenter
+IT_Service,VMware vCenter Network,,Contained by (child),VMware vCenter Datacenter,TRUE,FALSE,Contains::Contained by,cmdb_ci_vcenter_network
+IT_Service,VMware vCenter Network,,Connects (child),VMware Virtual Machine Instance,TRUE,FALSE,Connected by::Connects,cmdb_ci_vcenter_network
+IT_Service,VMware vCenter Network,,Connects (child),VMware Virtual Machine Template,TRUE,FALSE,Connected by::Connects,cmdb_ci_vcenter_network
+IT_Service,VMware vCenter Network,,Provided By (parent),ESX Server,FALSE,TRUE,Provided By::Provides,cmdb_ci_vcenter_network
+IT_Service,VMware Virtual Machine Instance,,Stored on (child),VMware vCenter Datastore,TRUE,FALSE,Provides storage for::Stored on,cmdb_ci_vmware_instance
+IT_Service,VMware Virtual Machine Instance,,Registered on (parent),ESX Server,FALSE,TRUE,Registered on::Has registered,cmdb_ci_vmware_instance
+IT_Service,VMware Virtual Machine Instance,,Member of (child),ESX Resource Pool,TRUE,FALSE,Members::Member of,cmdb_ci_vmware_instance
+IT_Service,VMware Virtual Machine Instance,,Connected by (parent),VMware vCenter Network,FALSE,TRUE,Connected by::Connects,cmdb_ci_vmware_instance
+IT_Service,VMware Virtual Machine Instance,,Contained by (child),VMware vCenter Folder,TRUE,FALSE,Contains::Contained by,cmdb_ci_vmware_instance
+IT_Service,VMware Virtual Machine Instance,,Instantiated by (child),Linux Server,TRUE,FALSE,Instantiates::Instantiated by,cmdb_ci_vmware_instance
+IT_Service,VMware Virtual Machine Template,,Registered on (parent),ESX Server,FALSE,TRUE,Registered on::Has registered,cmdb_ci_vmware_template
+IT_Service,VMware Virtual Machine Template,,Contained by (child),VMware vCenter Datacenter,TRUE,FALSE,Contains::Contained by,cmdb_ci_vmware_template
+IT_Service,VMware Virtual Machine Template,,Connected by (parent),VMware vCenter Network,FALSE,TRUE,Connected by::Connects,cmdb_ci_vmware_template
+IT_Service,VMware Virtual Machine Template,,Stored on (child),VMware vCenter Datastore,TRUE,FALSE,Provides storage for::Stored on,cmdb_ci_vmware_template
+IT_Service,VMware Virtual Machine Template,,Contained by (child),VMware vCenter Folder,TRUE,FALSE,Contains::Contained by,cmdb_ci_vmware_template
+IT_Service,Web Application,,Contained by (child),JBoss,TRUE,FALSE,Contains::Contained by,cmdb_ci_web_application
+IT_Service,Web Application,,Contained by (child),IBM Websphere,TRUE,FALSE,Contains::Contained by,cmdb_ci_web_application
+IT_Service,Web Server,,Used by (child),Service,TRUE,FALSE,Depends on::Used by,cmdb_ci_web_server
+IT_Service,Web Server,,Runs on (parent),Linux Server,FALSE,TRUE,Runs on::Runs,cmdb_ci_web_server
+IT_Service,Web Service,,Runs on (parent),IBM Websphere,FALSE,TRUE,Runs on::Runs,cmdb_ci_web_service
+IT_Service,Weblogic,,Used by (child),Weblogic,TRUE,FALSE,Depends on::Used by,cmdb_ci_app_server_weblogic
+IT_Service,Weblogic,,Depends on (parent),Weblogic,FALSE,TRUE,Depends on::Used by,cmdb_ci_app_server_weblogic
+IT_Service,Websphere Cell,,Contained by (child),IBM Websphere,TRUE,FALSE,Contains::Contained by,cmdb_ci_websphere_cell
+IT_Service,Windows Cluster,,Cluster (child),Windows Cluster Node,TRUE,FALSE,Cluster of::Cluster,cmdb_ci_win_cluster
+IT_Service,Windows Cluster,,Hosted on (parent),Windows Server,FALSE,TRUE,Hosted on::Hosts,cmdb_ci_win_cluster
+IT_Service,Windows Cluster Node,,Applicative Flow From (child),Cluster Virtual IP,TRUE,FALSE,Applicative Flow To::Applicative Flow From,cmdb_ci_win_cluster_node
+IT_Service,Windows Cluster Node,,Cluster of (parent),Windows Cluster,FALSE,TRUE,Cluster of::Cluster,cmdb_ci_win_cluster_node
+IT_Service,Windows Cluster Node,,Hosted on (parent),Windows Server,FALSE,TRUE,Hosted on::Hosts,cmdb_ci_win_cluster_node
+IT_Service,Windows Cluster Node,,Gets resources from (child),Windows Cluster Resource,TRUE,FALSE,Defines resources for::Gets resources from,cmdb_ci_win_cluster_node
+IT_Service,Windows Cluster Resource,,Defines resources for (parent),Windows Cluster Node,FALSE,TRUE,Defines resources for::Gets resources from,cmdb_ci_win_cluster_resource
+IT_Service,Windows Server,,Runs (child),Application,TRUE,FALSE,Runs on::Runs,cmdb_ci_win_server
+IT_Service,Windows Server,,IP Connection (parent),IP Switch,FALSE,TRUE,IP Connection::IP Connection,cmdb_ci_win_server
+IT_Service,Windows Server,,Distributed by (parent),Load Balancer Service,FALSE,TRUE,Distributed by::Distributes,cmdb_ci_win_server
+IT_Service,Windows Server,,Runs (child),Hyper-V Server,TRUE,FALSE,Runs on::Runs,cmdb_ci_win_server
+IT_Service,Windows Server,,Virtualized by (parent),Virtual Machine Instance,FALSE,TRUE,Virtualized by::Virtualizes,cmdb_ci_win_server
+IT_Service,Windows Server,,Runs on (parent),Server,FALSE,TRUE,Runs on::Runs,cmdb_ci_win_server
+IT_Service,Windows Server,,Hosts (child),Windows Cluster Node,TRUE,FALSE,Hosted on::Hosts,cmdb_ci_win_server
+IT_Service,Windows Server,,Exchanges data with (parent),Network Gear,FALSE,TRUE,Exchanges data with::Exchanges data with,cmdb_ci_win_server
+IT_Service,Windows Server,,Hosts (child),Windows Cluster,TRUE,FALSE,Hosted on::Hosts,cmdb_ci_win_server
+IT_Service,Windows Server,,Used by (child),Service,TRUE,FALSE,Depends on::Used by,cmdb_ci_win_server
+IT_Service,Windows Server,,Receives data from (parent),Mass Storage Device,FALSE,TRUE,Receives data from::Sends data to,cmdb_ci_win_server
+IT_Service,Zones,,Houses (child),Computer Room,TRUE,FALSE,Located in::Houses,cmdb_ci_vm_zones
+IT_Service,Zones,,Virtualizes (child),Solaris Server,TRUE,FALSE,Virtualized by::Virtualizes,cmdb_ci_vm_zones
+IT_Service,Zones,,Has registered (child),Solaris Virtual Machine Instance,TRUE,FALSE,Registered on::Has registered,cmdb_ci_vm_zones
+,Endpoint,,Cluster of (parent),Application Cluster,FALSE,TRUE,Cluster of::Cluster,cmdb_ci_endpoint

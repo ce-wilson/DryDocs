@@ -26,6 +26,23 @@ Tags help grooming: `idea` · `bug` · `doc` · `source` (new data source) · `q
 
 <!-- add new ideas at the top -->
 
+- 2026-07-31 — [chore] **Classification collapse to 3 levels (registry-plan Phase 1).**
+  User directive: "for now leave as External or Internal Public, or Internal" —
+  Internal-Confidential folds into Internal (same publish boundary; the tier bought
+  ceremony, not a different behavior). Mechanical change-set listed in
+  `internal/registry-redesign/REGISTRY-PLAN.md` §Classification: classification.yaml
+  level drop, ~8 entry relabels across both registries, test_classification +
+  test_doc_registry CURATION_BY_TIER (T4 → sme-confirm), internal/ README headers,
+  PUBLISH-BOUNDARY.md note. Can land ahead of the N7 gate — removes machinery, adds none.
+
+- 2026-07-31 — [idea] **Registry-plan directive captured → N7 input** (audit line; N7
+  already exists and now points at `internal/registry-redesign/REGISTRY-PLAN.md`): three
+  distinctions (software registry ≠ ingestion sources ≠ replica datasets), dataset id =
+  `{origin}[@{carrier}]:{artifact}` incl. report/file/query-table, FCDO SOR/ADS as a
+  dataset field, docs keep their own ledger. Samples (SNOW CMDB, DataHub URN mapping,
+  target-column worksheet w/ real SEAL ids, 2 public Neo4j metamodel gists) re-homed
+  from repo root to `internal/registry-redesign/samples/` (clears the J22 guard failure).
+
 - 2026-07-31 — [idea] **FCDO ontology crosswalk (Phase 1 of the alignment plan).** The
   internal governance group's frameworks captured 2026-07-30 (now at
   `internal/fcdo-reference/`, source `fcdo-frameworks`); plan =
