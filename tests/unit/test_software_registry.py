@@ -163,3 +163,73 @@ def test_documentation_currency_drift_is_visible_not_hidden() -> None:
     assert drifted == [
         "controlm: runtime 9.0.21.300 not covered by docs 9.0.20",
     ], f"documentation currency changed: {drifted}"
+
+
+ACCESS_STATES = {"open", "forbidden"}
+ENUMERABLE_STATES = {True, False, "unknown"}
+
+
+def test_available_documentation_versions_are_well_formed() -> None:
+    """The pre-populated version list must stay usable as a lookup table."""
+    for product in _doc()["products"]:
+        doc = product.get("documentation") or {}
+        available = doc.get("available_versions")
+        if available is None:
+            continue
+        pid = product["id"]
+        seen: set[str] = set()
+        for row in available:
+            ver = row.get("version")
+            assert ver, f"'{pid}' available_versions row missing version: {row}"
+            assert ver not in seen, f"'{pid}' duplicate documentation version '{ver}'"
+            seen.add(ver)
+            assert row.get("path"), f"'{pid}' version '{ver}' missing path"
+            assert row.get("access") in ACCESS_STATES, (
+                f"'{pid}' version '{ver}' access '{row.get('access')}' not in {ACCESS_STATES}"
+            )
+            assert row.get("enumerable") in ENUMERABLE_STATES, (
+                f"'{pid}' version '{ver}' enumerable '{row.get('enumerable')}' not in {ENUMERABLE_STATES}"
+            )
+            # A forbidden tree cannot have been probed for a toc.json, so
+            # claiming to know is a transcription error.
+            if row["access"] == "forbidden":
+                assert row["enumerable"] == "unknown", (
+                    f"'{pid}' version '{ver}' is forbidden but claims enumerable="
+                    f"{row['enumerable']} — unprobeable, so this cannot be known"
+                )
+
+
+def test_captured_docs_version_is_one_of_the_available_versions() -> None:
+    """docs_version must name a real published version, and one we can reach."""
+    for product in _doc()["products"]:
+        doc = product.get("documentation") or {}
+        available = doc.get("available_versions")
+        if not available:
+            continue
+        by_version = {r["version"]: r for r in available}
+        captured = doc["docs_version"]
+        assert captured in by_version, (
+            f"'{product['id']}' docs_version '{captured}' is not in available_versions "
+            f"{sorted(by_version)}"
+        )
+        assert by_version[captured]["access"] == "open", (
+            f"'{product['id']}' claims a capture from '{captured}', which is not "
+            f"reachable — a capture cannot have come from a forbidden tree"
+        )
+
+
+def test_estate_runtime_documentation_reachability_is_recorded() -> None:
+    """Pin the finding that motivated the list.
+
+    Docs for the exact runtime exist but are not retrievable, so "recapture at
+    the right version" is not currently available. If this ever changes, this
+    test fails and the recapture becomes a real option worth taking.
+    """
+    controlm = next(p for p in _doc()["products"] if p["id"] == "controlm")
+    by_version = {r["version"]: r for r in controlm["documentation"]["available_versions"]}
+    for runtime in controlm["versions"]:
+        assert runtime in by_version, f"runtime {runtime} absent from available_versions"
+        assert by_version[runtime]["access"] == "forbidden", (
+            f"runtime {runtime} documentation is now reachable — recapture is "
+            f"newly possible; update this pin and consider recapturing"
+        )

@@ -119,6 +119,34 @@ products:
                                        # capture is 9.0.20 (BMC ships no Utilities
                                        # book in the trimmed 9.0.21 publication)
                                        # while the runtime is 9.0.21.300.
+      # Documentation versions BMC publishes for this product, newest first —
+      # transcribed from the site's own version picker and PROBED 2026-07-31.
+      # Pre-populated so a version bump is a lookup, not a re-investigation.
+      #
+      #   access: open       200 to our client; capturable.
+      #           forbidden  403 to a plain HTTP client. These are EXACTLY the
+      #                      paths documents.bmc.com/robots.txt does not Allow —
+      #                      perfect correlation, so it is deliberate vendor
+      #                      policy, not a transport fault. They render normally
+      #                      in a browser. We do NOT work around it.
+      #   enumerable: publishes help/Main_help/en-US/toc.json, which is what
+      #           scripts/external_vendor_scrape.py needs to size and bound a
+      #           capture. `unknown` where access is forbidden — unprobeable.
+      #
+      # THE CONSEQUENCE WORTH KNOWING: documentation for the estate's exact
+      # runtime (9.0.21.300) EXISTS but is not retrievable programmatically. So
+      # "just recapture at the right version" is not currently an option, and
+      # the 9.0.20 capture stands as the best enumerable source. Revisit if BMC
+      # widens robots.txt or the content moves.
+      available_versions:
+        - {version: "SaaS",       path: "controlm-saas", access: open,      enumerable: false}
+        - {version: "9.0.22",     path: "9.0.22",        access: forbidden, enumerable: unknown}
+        - {version: "9.0.21.300", path: "9.0.21.300",    access: forbidden, enumerable: unknown}  # ESTATE RUNTIME
+        - {version: "9.0.21.200", path: "9.0.21.200",    access: forbidden, enumerable: unknown}
+        - {version: "9.0.21.100", path: "9.0.21.100",    access: forbidden, enumerable: unknown}
+        - {version: "9.0.21",     path: "9.0.21",        access: open,      enumerable: true}   # trimmed: no Utilities book
+        - {version: "9.0.20",     path: "9.0.20",        access: open,      enumerable: true}   # CAPTURED (bmc-controlm-utilities)
+        - {version: "9.0.19",     path: "9.0.19",        access: open,      enumerable: true}
 
   - id: oracle-db
     vendor: oracle
