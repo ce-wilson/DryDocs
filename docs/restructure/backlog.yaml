@@ -9442,7 +9442,16 @@ items:
     notes: >
       Groomed 2026-07-31 — ALIGNMENT-PLAN Phase 2 (planned-items-only rule).
       Registration is startable now; each activation rides its host gate/build
-      (prose dependency per the O31 precedent, not depends_on ids).
+      (prose dependency per the O31 precedent, not depends_on ids). SCOPE NOTE
+      (user ruling 2026-07-31): the Run property semantics in (1) — run UUID,
+      nominalTime, parent link, errorMessage, START/COMPLETE/FAIL/ABORT —
+      would apply IF DryDocs becomes event-based / near-real-time monitoring,
+      WHICH IT IS NOT. Our run data is batch history (CM_HIST / cm_avg_run
+      supplements), not a live OpenLineage event stream — so item (1) stays a
+      registered-planned naming alignment only, adopted so that IF an
+      event-based mode ever arrives the names are already conformant; it is
+      not a mandate to build run-event ingestion, and no gate should treat it
+      as one.
   - id: W3
     epic: fcdo-alignment
     title: "fcdo-ontology-builder documented as an optional add-source-object Step-3 aid (structural profiling only, never bypasses the gate)"
