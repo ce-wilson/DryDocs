@@ -42,7 +42,7 @@
 # =============================================================================
 
 schema: drydocs.backlog.v2
-updated: 2026-07-30
+updated: 2026-07-31
 
 # ── The high-level project plan (rendered as the board's roadmap strip) ───────
 plan:
@@ -9206,6 +9206,37 @@ items:
       by intent); no allowlist entries added or widened. Live-proven both ways: a
       probe file under docs/plan/ failed the guard BEFORE git add and the clean
       tree passes (zero untracked orphans today = no false positives). Suite 1188.
+  - id: J23
+    epic: release-infrastructure
+    title: "Classification collapses to three levels (External / Internal-Public / Internal): drop the Internal-Confidential tier everywhere, publish boundary unchanged"
+    type: chore
+    module: config
+    phase: 8
+    agent: main
+    model: sonnet
+    priority: p1
+    status: todo
+    depends_on: []
+    inputs: [config/classification.yaml, config/source-registry.yaml, config/doc-source-registry.yaml, tests/unit/test_classification.py, tests/unit/test_doc_registry.py, PUBLISH-BOUNDARY.md, internal/registry-redesign/REGISTRY-PLAN.md]
+    acceptance: >
+      config/classification.yaml defines exactly three levels (External,
+      Internal-Public, Internal) with the publish rule unchanged (publishable =
+      External + Internal-Public); no entry in config/source-registry.yaml or
+      config/doc-source-registry.yaml carries Internal-Confidential (relabels
+      to Internal, keeping a confidential-handling comment where rosters/SIDs/
+      SEAL values warrant it); test_classification.py + test_doc_registry.py
+      updated (CURATION_BY_TIER T4 becomes sme-confirm — the +confidential
+      rider retires with the level); the internal/ capture READMEs
+      (fcdo-reference, registry-redesign) restate Internal; PUBLISH-BOUNDARY.md
+      records the collapse and that a fourth tier can return if a real handling
+      difference ever materializes. Full suite green.
+    notes: >
+      Groomed 2026-07-31 from the same-day inbox chore — registry-plan Phase 1
+      (internal/registry-redesign/REGISTRY-PLAN.md §Classification). The
+      DECISION is a recorded user ruling 2026-07-31 ("for now leave as External
+      or Internal Public, or Internal") — not a gate question: the tier bought
+      handling ceremony, not a different publish behavior. Deliberately allowed
+      to land ahead of the N7 schema-v2 gate — it removes machinery, adds none.
   - id: R11
     epic: agentic-qa
     title: "Ask spoke LLM-in-the-loop smoke on the agents-venv machine: two live questions through the real graph_qa streaming path"
@@ -9342,12 +9373,110 @@ items:
       chore merged into this line 2026-07-28 retires with the container.
       Machine-local (this desktop).
 
+  # ── Epic W — FCDO ontology alignment (main / ontology-mapper) — Phase 2 ─────
+  # Groomed 2026-07-31 from the FCDO capture (internal/fcdo-reference/, 8abc05f)
+  # and its ALIGNMENT-PLAN.md: align producer ontology to the internal governance
+  # group's firmwide frameworks ON PLANNED ITEMS ONLY (user rule: don't add what
+  # we won't use). Every confirmation routes through the SME gate; the plan's
+  # explicit skip list is BINDING (Business Processes, mapping path expressions,
+  # SHACL artifacts, JDI producer-side, FIBO, Data Authority classes, telemetry,
+  # naming renames). The live-scrape [source] line stays parked in IDEAS.md —
+  # company-side connector work, not producer-actionable.
+  - id: W1
+    epic: fcdo-alignment
+    title: "FCDO vocabulary crosswalk: DryDocs terms mapped to the firmwide framework terms as status: proposed, with a gate spec — mechanism-only rows"
+    type: task
+    module: ontology
+    phase: 2
+    agent: main
+    model: sonnet
+    priority: p2
+    status: todo
+    depends_on: []
+    inputs: [internal/fcdo-reference/ALIGNMENT-PLAN.md, drydocs_core/ontology/relationship_vocabulary.yaml, config/crosswalks/, config/gate-prompts/]
+    acceptance: >
+      config/crosswalks/fcdo-vocabulary.yaml exists carrying the ALIGNMENT-PLAN
+      Phase-1 rows (ControlMJob<->OL Job, JobRun<->OL Run, DataAsset<->Dataset,
+      READS_FROM/WRITES_TO<->prov:used/wasGeneratedBy with the Run-grain vs
+      definition-grain note, loader envelope<->metadata envelope,
+      lifecycle<->adms:status as documentation-only, SUBCLASS_OF/MAPS_TO<->rdfs
+      bridging, RECONCILES_TO confidence<->skos:closeMatch+mappingConfidence),
+      every row status: proposed and MECHANISM-ONLY (standard CURIEs; no
+      internal URLs/names — those stay in internal/); a gate prompt
+      config/gate-prompts/fcdo-crosswalk.yaml covers every row; rows whose
+      evidence sits in the known capture holes (Descriptive Metadata, Data
+      Quality, DPROD contracts, taxonomy property tables) are marked
+      blocked-on-recapture, not proposed-as-ready. NOTHING flips confirmed
+      except the SME gate session (gate-log entry). Schema/board tests green.
+    notes: >
+      Groomed 2026-07-31 from the same-day inbox idea (FCDO crosswalk = Phase 1
+      of the alignment plan). Phase chosen: 2 (ontology mapping + HITL) over 11
+      — this is term-mapping, not a per-source ledger (recorded per the groom
+      rule). Same mechanism as the AutoSys/Airflow crosswalks (F1/F2 precedent).
+  - id: W2
+    epic: fcdo-alignment
+    title: "FCDO property/enum alignment registered as planned on the planned items: Run properties + run-event enum, SKOS-required attrs on enum gates, ColumnShape property names"
+    type: task
+    module: ontology
+    phase: 2
+    agent: ontology-mapper
+    model: sonnet
+    priority: p2
+    status: todo
+    depends_on: []
+    inputs: [internal/fcdo-reference/ALIGNMENT-PLAN.md, drydocs_core/ontology/relationship_vocabulary.yaml, config/gate-prompts/, drydocs_core/schema/]
+    acceptance: >
+      The FCDO-aligned names are REGISTERED as planned/proposed on their three
+      landing spots, each activating only at its host gate/build — never from
+      this item: (1) the planned ControlMJobRun material carries the required
+      Run property semantics (run UUID, nominalTime scheduled time, parent
+      run/job link, errorMessage) and START/COMPLETE/FAIL/ABORT as the
+      run-event value set, with wiring the three seeded :OlClass nodes (OL
+      Run/Job/Dataset) via MAPS_TO listed as part of that build; (2) the open
+      G27 etlprocess-kind-enum prompt (and the enum-gate idiom it sets) states
+      the SKOS-required concept attributes (prefLabel, definition, identifier,
+      created/creator) with the tom_roles/product_roles backfill named; (3)
+      the oracle-schema-asset gate material names the ColumnShape property
+      names (precision, scale, length, isNullable) for column facts. All
+      entries status planned; vocabulary/schema tests green.
+    notes: >
+      Groomed 2026-07-31 — ALIGNMENT-PLAN Phase 2 (planned-items-only rule).
+      Registration is startable now; each activation rides its host gate/build
+      (prose dependency per the O31 precedent, not depends_on ids).
+  - id: W3
+    epic: fcdo-alignment
+    title: "fcdo-ontology-builder documented as an optional add-source-object Step-3 aid (structural profiling only, never bypasses the gate)"
+    type: chore
+    module: docs
+    phase: 2
+    agent: main
+    model: sonnet
+    priority: p3
+    status: todo
+    depends_on: []
+    inputs: [internal/fcdo-reference/ALIGNMENT-PLAN.md, .claude/skills/add-source-object/]
+    acceptance: >
+      The add-source-object skill documents the optional aid for flat/
+      denormalized sources: run on header-only/redacted extracts ONLY; reuse
+      its SKOS enum extraction + HTML data-dictionary render; translate its
+      generic classes through ontology-mapper into decision-matrix terms; and
+      state plainly that it does NO data profiling (counts/nulls/grain/join
+      coverage stay ours) and never bypasses the HITL gate. Cites the
+      PAT-catalog worked example (ALIGNMENT-PLAN Phase 3).
+    notes: >
+      Groomed 2026-07-31 — ALIGNMENT-PLAN Phase 3 (process adoption, not
+      ontology; docs module because the deliverable is a skill-doc change).
+
 summary:
-  todo: 65                                         # J22 claimed in_progress 2026-07-30 (desktop, pushed-claim discipline, right after the weekly groom). 2026-07-30 weekly groom: +8 (N7 registry-v2 design session — user directive, fable/HITL; N8 the four unregistered map-source ids from N4's day-one render; J22 the J16 guard's untracked blind spot; R11-R13 the R5 follow-up trio — live smoke, stub-ADK fixture, ADK event-persistence check; G49/G50 the two time-parked infra chores whose triggers fired — port review done + neo4jtest probation week up). R5 claimed in_progress 2026-07-30 (desktop, after R4+R3 closed same session). R3 claimed in_progress 2026-07-30 (desktop, right after R4 closed; R5 queued next). R4 claimed in_progress 2026-07-30 (desktop session, non-HITL lane; laptop holds the HITL lane). J19 claimed in_progress 2026-07-30 (laptop session, pushed-claim discipline — the item that codifies the discipline itself; desktop session open concurrently). N5 claimed in_progress 2026-07-29 pm right after N4 closed (pushed-claim discipline). N3+N4 claimed in_progress 2026-07-29 (batch claim, pushed before work; N4 rides its N3 dep inside the chain — the O39 precedent). 2026-07-29 groom (user directive): +10 (new Epic V sme-runbooks — V1 coverage rule + V2-V10 per-module runbooks; only V1 dependency-free, the rest wait on its mapping dispositions; N4 widened in place with the taxonomy/ontology-map joins — merge, not a new item). G48 claimed in_progress 2026-07-29 once G46/G47 closed (pushed-claim discipline). 2026-07-29 groom: +3 (G46 resolver cmd-line API, G47 controlm-xml-export seam, G48 resolve-cmdline-staging — the XML-fed resolution chain; precedence ruling parked as an inbox question, guardrail 3). G42 claimed in_progress 2026-07-28 (catalog seam start; pushed-claim discipline). G45/C20/J20/R10 claimed in_progress 2026-07-28 evening (batch claim, pushed before work). 2026-07-28 evening groom: +4 (G45 rua listing fallback back-flow, C20 K4-comment scope, J20 matrix render fold, R10 agent-runtime chores; R3 caller-identity merged in place). Earlier 2026-07-28 pm load-map groom: +4 (N3-N6 — the generated loaders/order/commands/source-target surface; only N3 is dependency-free, N4->N5 chain and N6 waits on N3's declared sequence). # 2026-07-28 pm post-UI-merge groom: +15 (U7/U8 instrument hardening, O35 WF-LND landing, O36 dot clip, O37-O41 DataLens/DSI continuity, B5 stage taxonomy, R9 agent query surface, J18/J19 process, L20 stray-file guard, L21 runbook Rev 4).                                       # C15/C16/L18/D8/J17 claimed in_progress 2026-07-28 (batch claim, pushed-claim discipline). P5 claimed in_progress 2026-07-28 pm (pushed-claim discipline). 2026-07-28 pm epic-close-out groom: +7 (G42-G44 Snowflake data-catalog seam from the loader plan; L18 comma-split bug, L19 doc-drift sweep, D8 bootstrap guard, J17 gates.json ritual — all from same-day inbox lines), U5 executed in-run (-1, Epic U closed 6/6); prior: U4 closed 2026-07-28 pm (right after U6 unblocked it); U6 groomed + built + closed same day (net 0); +4 at the 2026-07-28 inbox groom (C19 ontology-comment fix, J16 port-manifest fall-through guard, L17 doc-loader prereq guards, O34 web npm advisories); all four closed same day (O34 via its stop clause), L16 closed alongside; +5 2026-07-27 groom (J14/J15/G36/O33/G38), +2 PAT review (C17/C18), +5 code-graph-review (U1-U5), +2 cmdline seam (G39/G40, built+closed same day)
+  todo: 69                                         # 2026-07-31 groom: +4 (J23 classification collapse to 3 levels — user ruling pre-decided, registry-plan Phase 1; W1-W3 new Epic W fcdo-alignment: crosswalk + gate spec, planned property/enum registration, ontology-builder skill note). J22 claimed in_progress 2026-07-30 (desktop, pushed-claim discipline, right after the weekly groom). 2026-07-30 weekly groom: +8 (N7 registry-v2 design session — user directive, fable/HITL; N8 the four unregistered map-source ids from N4's day-one render; J22 the J16 guard's untracked blind spot; R11-R13 the R5 follow-up trio — live smoke, stub-ADK fixture, ADK event-persistence check; G49/G50 the two time-parked infra chores whose triggers fired — port review done + neo4jtest probation week up). R5 claimed in_progress 2026-07-30 (desktop, after R4+R3 closed same session). R3 claimed in_progress 2026-07-30 (desktop, right after R4 closed; R5 queued next). R4 claimed in_progress 2026-07-30 (desktop session, non-HITL lane; laptop holds the HITL lane). J19 claimed in_progress 2026-07-30 (laptop session, pushed-claim discipline — the item that codifies the discipline itself; desktop session open concurrently). N5 claimed in_progress 2026-07-29 pm right after N4 closed (pushed-claim discipline). N3+N4 claimed in_progress 2026-07-29 (batch claim, pushed before work; N4 rides its N3 dep inside the chain — the O39 precedent). 2026-07-29 groom (user directive): +10 (new Epic V sme-runbooks — V1 coverage rule + V2-V10 per-module runbooks; only V1 dependency-free, the rest wait on its mapping dispositions; N4 widened in place with the taxonomy/ontology-map joins — merge, not a new item). G48 claimed in_progress 2026-07-29 once G46/G47 closed (pushed-claim discipline). 2026-07-29 groom: +3 (G46 resolver cmd-line API, G47 controlm-xml-export seam, G48 resolve-cmdline-staging — the XML-fed resolution chain; precedence ruling parked as an inbox question, guardrail 3). G42 claimed in_progress 2026-07-28 (catalog seam start; pushed-claim discipline). G45/C20/J20/R10 claimed in_progress 2026-07-28 evening (batch claim, pushed before work). 2026-07-28 evening groom: +4 (G45 rua listing fallback back-flow, C20 K4-comment scope, J20 matrix render fold, R10 agent-runtime chores; R3 caller-identity merged in place). Earlier 2026-07-28 pm load-map groom: +4 (N3-N6 — the generated loaders/order/commands/source-target surface; only N3 is dependency-free, N4->N5 chain and N6 waits on N3's declared sequence). # 2026-07-28 pm post-UI-merge groom: +15 (U7/U8 instrument hardening, O35 WF-LND landing, O36 dot clip, O37-O41 DataLens/DSI continuity, B5 stage taxonomy, R9 agent query surface, J18/J19 process, L20 stray-file guard, L21 runbook Rev 4).                                       # C15/C16/L18/D8/J17 claimed in_progress 2026-07-28 (batch claim, pushed-claim discipline). P5 claimed in_progress 2026-07-28 pm (pushed-claim discipline). 2026-07-28 pm epic-close-out groom: +7 (G42-G44 Snowflake data-catalog seam from the loader plan; L18 comma-split bug, L19 doc-drift sweep, D8 bootstrap guard, J17 gates.json ritual — all from same-day inbox lines), U5 executed in-run (-1, Epic U closed 6/6); prior: U4 closed 2026-07-28 pm (right after U6 unblocked it); U6 groomed + built + closed same day (net 0); +4 at the 2026-07-28 inbox groom (C19 ontology-comment fix, J16 port-manifest fall-through guard, L17 doc-loader prereq guards, O34 web npm advisories); all four closed same day (O34 via its stop clause), L16 closed alongside; +5 2026-07-27 groom (J14/J15/G36/O33/G38), +2 PAT review (C17/C18), +5 code-graph-review (U1-U5), +2 cmdline seam (G39/G40, built+closed same day)
   in_progress: 1                                   # J22 claimed AND closed 2026-07-30 same session (desktop; guard walk widened to untracked). E1 remains. R5 claimed AND closed 2026-07-30 same session (desktop — the whole R4->R3->R5 run in one day). R3 claimed AND closed 2026-07-30 same session (desktop; agent telemetry — ledger + :AgentRun + admin spec). E1 remains. R4 claimed AND closed 2026-07-30 same session (desktop; ephemeral session specs). E1 remains gate-deferred (J19 closed 2026-07-30: pull rule documentation — CLAUDE.md §0 + backlog.yaml header + acceptance test all updated to make the pushed-claim discipline explicit). J21 claimed AND closed 2026-07-30 same session (registry pk check + binding guard, 087a685). N3+N4+N5 all claimed AND closed 2026-07-29 same session (the load-map chain). E1 remains. E1 (gate deferred both sides). O35-O41 UI sweep claimed + closed 2026-07-29 same session. + old-note: batch claim 2026-07-29 (pushed-claim discipline; O39 rides its O38 dep inside the sweep). G46/G47/G48 — the whole XML-fed resolution chain — claimed + closed 2026-07-29 same session. G42 claimed + closed 2026-07-28 same session. 2026-07-28 evening batch claim fully closed: J20, R10, C20, G45 all done same evening
   blocked: 0
   done: 191                                        # 2026-07-30 (desktop): J22 the J16 guard's untracked blind spot closed same day it was groomed (walk = tracked + --others --exclude-standard, pure fall_through_orphans + mechanics pin, [untracked] tagging + .gitignore resolution in the message; live-proven with a pre-add probe failing and the clean tree passing). Earlier 2026-07-30 (desktop): R5 Ask spoke (/ask for every persona — streamed steps via on_step+SSE, control-part owner-token handshake, citations w/ trust+classification, SpecGrid-on-eph-ref explorer/export, metrics chip; wire-level live e2e + headless render check), R3 agent run telemetry (per-call JSONL ledger w/ price map in DRYDOCS_LOGDIR — full question text ledger-only; :AgentRun kind='qa' via dedicated ddcontext writer that refuses drydocs; console.agent-runs.v1 admin spec; hashed caller-identity slot filled from ADK ctx), R4 ephemeral session-scoped QuerySpecs (eph.<hash> refs, agent-key-gated registration, frozen params, TTL+capacity bounds, one manifest code path, /raw-cypher untouched; pipeline explore_ref hook + urllib client, live wiring rides R5). Earlier 2026-07-30: J19 pull rule documentation (pushed-claim discipline codified in CLAUDE.md §0 + backlog.yaml header + items inputs/acceptance updated), J21 source-registry hardening (duplicate-id refusal + shipped-registry uniqueness pin + loader-field/N3-binding agreement guard + autosys/airflow stale-note refresh; 087a685). Earlier — 2026-07-29: N3+N4+N5 the load-map chain — N5 human surface (docs/plan/load-map.html, placement decided plan-not-design, ritual-wired, print-ready) — N4 render (load-map.json, 18 sources joined, rides the default board render; caught 4 map entries citing unregistered source ids on day one) on top of N3 load-map joins declared (source_id on all 25 loaders + one named exemption; chains lifted to consumed constants; CANONICAL_LOAD_SEQUENCE; 11-test guard). Earlier 2026-07-29 UI sweep O35-O41: O36 root cause = unlayered *{padding:0} reset out-cascading layered Tailwind utilities (preflight keeps the reset; box-sizing only retained); O37 radius tokens (lg collapsed onto md=10px, App.css/index.css radii tokenized); O41 status-vocab map + O38 IdChip/StageBadge convention (UI-WIP/ui-conventions.md) adopted inspector+loads; O39 runtime-view env-template slot (mechanism only, renders nothing unset); O40 StatTiles click-to-filter live on loads (Failed tile 4->1 verified); O35 category-first landing per SME FB-01/FB-02 (hub demoted, name renders once, modules+towers pick-lists, data-wf keys kept). Both themes screenshot-checked; build+lint green container AND device. # 2026-07-29: G48 resolve-cmdline-staging (store v3 + resolution_quality provenance; verbatim-beside-derived; precedence evidence counted never ruled), G47 controlm-xml-export seam (taxonomy-first defs+ordered-variables staging, scope_layers handoff proven against the resolver), G46 resolve_command_line on the shared resolver (one scope-chain walk, substitution provenance with winning scope, %%VAR-launcher round-trip proven). 2026-07-28 late: G42 Snowflake data-catalog seam (source registered + catalog_dir landing zone + SnowflakeCatalogExtractor staging both views, three-shape discrimination, sentinel counted, latest-per-GUID, origin routing, urn fact column; G43 cross-checks unblocked). Earlier 2026-07-28 evening: G45 rua listing fallback (presence dispatch, 561-script company incident's producer parity), C20 K4-comment re-scope (SEAL-loader-specific deprecation; live catalog writers named), R10 agent-runtime alignment (google-adk pinned >=2,<3 + ADR 0007 revisit date-stamp), J20 one-render-entry-point part 2 (matrix rides the default board render). Earlier: C16 key-prefix governance in the metadata plan (drydocs./system/team-local classes), C15 inverse_label on all 78 vocab entries (presentational only, schema-test enforced), L18 depth-0 cell split (the K2 shear healed; conformance guard over the real matrices), D8 bootstrap constraint guard (names-not-counts presence check after apply, live 51/51), J17 gates.json folded into the default-paths board render (drift closed at the ritual level). Earlier 2026-07-28 pm: P5 maintenance-window query (patch-window CLI + union-not-sum window math + findings feeder; claimed-then-closed same day — EPIC P COMPLETE 5/5), U5 groom-skill graph cross-check subsection (executed inside the close-out groom — EPIC U COMPLETE 6/6), U4 tech-debt graph-evidence section (hardened A1-A6 pack + offline fallback, all probes run live), U6 depgraph scanner blind-spot fix (shared-namespace extract_many + drydocs_api root; 205 modules / 370 IMPORTS, all 24 U1 orphan false-positives resolved). Earlier 2026-07-28: G41 glue base-table inventory seam (built + closed same day), L17 doc-loader prereq guards (same), O33 SchemaMeta exemplar audit (22 specs + runs_on write path; live-proven), O34 npm advisories (postcss cleared; react-router escalated via the stop clause), U1/U2/U3 code-graph persona reviews run 1 (scanner blind-spot headline; backlog verified truthful; doc board + citation sweep queued), C19 ontology-comment fix (groomed + closed same day), J16 port-manifest fall-through guard (same), L16 runbook container/port refresh. 2026-07-27 closes: J14 SEALID split, P3 hosts+RUNS_ON, G21 rua code-ops, G24 code-repo seam, G26 launcher-registry config, Q8 bmc-docs prereq, C18 shadow-model guard, J15 value-shape boundary guard, G33 code-snapshot loader (gate signed + built same day), G39 cmdline staging store + G40 parse (groomed am, built pm)
-  next_ready: [M3, M4, J10, Q6, O23, J13, O26, O27, C17, O28, R6, R7, R8, O29, O30, O31, O32, S1, S8, S9, Q7, G32, G34, G35, G22, G43, L19, B5, R9, J18, L20, L21, V1, N6, N7, N8, R11, R12, R13, G49, G50]
+  next_ready: [M3, M4, J10, Q6, O23, J13, O26, O27, C17, O28, R6, R7, R8, O29, O30, O31, O32, S1, S8, S9, Q7, G32, G34, G35, G22, G43, L19, B5, R9, J18, L20, L21, V1, N6, N7, N8, R11, R12, R13, G49, G50, J23, W1, W2, W3]
+  # 2026-07-31 groom: all 4 new items dependency-free -> next_ready. J23 is
+  # pre-decided (user ruling — no gate); W1/W2 draft proposed/planned entries
+  # ONLY (the FCDO crosswalk sign-off is an SME gate session, never auto-decided;
+  # W2's activations ride their host gates as prose deps); W3 is a skill-doc chore.
   # 2026-07-30 weekly groom: all 8 new items are dependency-free -> next_ready.
   # N7 is the design SESSION (fable, HITL-gated) — the schema change itself never
   # lands from a groom; N8 closes a live render defect under the current shape

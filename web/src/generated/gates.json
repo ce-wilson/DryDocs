@@ -404,7 +404,8 @@
       ],
       "log_ref": null,
       "unblocks": [
-        "G27"
+        "G27",
+        "W2"
       ]
     },
     {

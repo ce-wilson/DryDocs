@@ -26,34 +26,6 @@ Tags help grooming: `idea` · `bug` · `doc` · `source` (new data source) · `q
 
 <!-- add new ideas at the top -->
 
-- 2026-07-31 — [chore] **Classification collapse to 3 levels (registry-plan Phase 1).**
-  User directive: "for now leave as External or Internal Public, or Internal" —
-  Internal-Confidential folds into Internal (same publish boundary; the tier bought
-  ceremony, not a different behavior). Mechanical change-set listed in
-  `internal/registry-redesign/REGISTRY-PLAN.md` §Classification: classification.yaml
-  level drop, ~8 entry relabels across both registries, test_classification +
-  test_doc_registry CURATION_BY_TIER (T4 → sme-confirm), internal/ README headers,
-  PUBLISH-BOUNDARY.md note. Can land ahead of the N7 gate — removes machinery, adds none.
-
-- 2026-07-31 — [idea] **Registry-plan directive captured → N7 input** (audit line; N7
-  already exists and now points at `internal/registry-redesign/REGISTRY-PLAN.md`): three
-  distinctions (software registry ≠ ingestion sources ≠ replica datasets), dataset id =
-  `{origin}[@{carrier}]:{artifact}` incl. report/file/query-table, FCDO SOR/ADS as a
-  dataset field, docs keep their own ledger. Samples (SNOW CMDB, DataHub URN mapping,
-  target-column worksheet w/ real SEAL ids, 2 public Neo4j metamodel gists) re-homed
-  from repo root to `internal/registry-redesign/samples/` (clears the J22 guard failure).
-
-- 2026-07-31 — [idea] **FCDO ontology crosswalk (Phase 1 of the alignment plan).** The
-  internal governance group's frameworks captured 2026-07-30 (now at
-  `internal/fcdo-reference/`, source `fcdo-frameworks`); plan =
-  `internal/fcdo-reference/ALIGNMENT-PLAN.md`. Crosswalk entries DryDocs ↔ FCDO terms
-  (same mechanism as the AutoSys/Airflow crosswalks) + a gate spec; committed rows stay
-  mechanism-only. Groom Phases 1–3 into backlog items: (1) crosswalk + gate, (2) run-model
-  property/enum alignment at the ControlMJobRun build + SKOS-required attrs on enum gates
-  (touches open G27) + ColumnShape property names at the oracle-schema-asset gate, (3)
-  fcdo-ontology-builder as optional add-source-object Step-3 aid. Explicit skip list is in
-  the plan — don't groom skipped items in.
-
 - 2026-07-31 — [source] **fcdo-frameworks live Confluence scrape (company-side).**
   Registered on-demand in `config/doc-source-registry.yaml` (connector: confluence, T4,
   ddcontext); page-ID target list in `internal/fcdo-reference/README.md`. Priority
@@ -815,6 +787,18 @@ Tags help grooming: `idea` · `bug` · `doc` · `source` (new data source) · `q
 
 ## Recently groomed (audit trail)
 
+- 2026-07-31 — [chore] classification collapse to 3 levels (registry-plan Phase 1; user
+  ruling same day, pre-decided) → **J23** (may land ahead of the N7 gate — removes
+  machinery, adds none).
+- 2026-07-31 — [idea] registry-plan directive captured → **MERGED into N7** same day
+  (`2d6f705`: inputs + notes point at `internal/registry-redesign/REGISTRY-PLAN.md`;
+  samples re-homed, J22 guard failure cleared). No new item.
+- 2026-07-31 — [idea] FCDO ontology crosswalk Phases 1–3 → new **Epic W**
+  (fcdo-alignment, phase 2): **W1** crosswalk + gate spec (mechanism-only rows,
+  capture-hole rows blocked-on-recapture), **W2** planned property/enum registration
+  (Run props + event enum, SKOS attrs on enum gates incl. G27, ColumnShape names),
+  **W3** ontology-builder as optional add-source-object aid. Skip list binding; the
+  companion [source] live-scrape line stays parked (company-side connector).
 - 2026-07-30 — [idea] Source-registry id-field redesign (user directive: flat id conflates
   source SYSTEM with extracted DATASET) + the 2026-07-29 per-side loader→source overlay
   candidate (which had reserved the id) → **N7**, ONE fable/HITL-gated design session
