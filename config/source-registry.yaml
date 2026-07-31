@@ -251,6 +251,25 @@ sources:
       their OWN source entries feeding the same classes, each through its own
       gate.
 
+  - id: fcdo-frameworks
+    classification: Internal-Confidential  # transcripts carry real employee names + internal Confluence URLs; the POINTER lives here, the content in internal/
+    source: "internal/fcdo-reference/*.md (screenshot transcriptions of the firmwide data-publishing framework Confluence space; page-ID scrape list in its README)"
+    kind: docs
+    orchestrator: ~
+    adapter: ~                            # no adapter yet — docmeta confluence connector (doc-source-registry twin) is the ingestion path
+    feeds_taxonomy: [documents, chunks]
+    confirmed: false                      # crosswalk gate not yet drafted; see internal/fcdo-reference/ALIGNMENT-PLAN.md Phase 1
+    notes: >
+      The FCDO data-governance/ontology standards capture (2026-07-30) — the
+      internal counterpart standard our ontology aligns to where planned work
+      overlaps (PROV-O + OpenLineage ETL model, SKOS taxonomy profile, W3C ORG
+      people/org model). Registered as the doc-governance twin fcdo-frameworks
+      in config/doc-source-registry.yaml (connector: confluence, on-demand)
+      for a company-side live scrape that supersedes the transcripts. The
+      alignment/adoption plan and explicit skip list:
+      internal/fcdo-reference/ALIGNMENT-PLAN.md. Mechanism-only here — no
+      internal URLs or names outside internal/.
+
   # ---- Server inventory (rua collector bundles) -----------------------------
   - id: rua-inventory
     classification: Internal-Confidential   # bundles hold real hostnames, uids, home paths, profile + script copies

@@ -26,6 +26,24 @@ Tags help grooming: `idea` · `bug` · `doc` · `source` (new data source) · `q
 
 <!-- add new ideas at the top -->
 
+- 2026-07-31 — [idea] **FCDO ontology crosswalk (Phase 1 of the alignment plan).** The
+  internal governance group's frameworks captured 2026-07-30 (now at
+  `internal/fcdo-reference/`, source `fcdo-frameworks`); plan =
+  `internal/fcdo-reference/ALIGNMENT-PLAN.md`. Crosswalk entries DryDocs ↔ FCDO terms
+  (same mechanism as the AutoSys/Airflow crosswalks) + a gate spec; committed rows stay
+  mechanism-only. Groom Phases 1–3 into backlog items: (1) crosswalk + gate, (2) run-model
+  property/enum alignment at the ControlMJobRun build + SKOS-required attrs on enum gates
+  (touches open G27) + ColumnShape property names at the oracle-schema-asset gate, (3)
+  fcdo-ontology-builder as optional add-source-object Step-3 aid. Explicit skip list is in
+  the plan — don't groom skipped items in.
+
+- 2026-07-31 — [source] **fcdo-frameworks live Confluence scrape (company-side).**
+  Registered on-demand in `config/doc-source-registry.yaml` (connector: confluence, T4,
+  ddcontext); page-ID target list in `internal/fcdo-reference/README.md`. Priority
+  recapture: Descriptive Metadata, Data Quality, Data Contracts (DPROD), Taxonomy
+  Framework property tables — the capture holes that block crosswalk sign-off. Needs the
+  docmeta confluence connector (or an interim company-side capture) — company network only.
+
 - 2026-07-29 — [question] **psgmgr replica vs Control-M XML export: which source wins per
   object when they disagree?** (Guardrail 3 of the XML-fed cmd-line resolution idea → G46/
   G47/G48; the build fills a nullable derived column and decides NO source-of-truth

@@ -66,6 +66,27 @@ sources:
       verdict (traversal arm). Pattern notes mined from the same book:
       reference/research/essential-graphrag-notes.md (Q1).
 
+  # ---- Queued corpora (registered, not yet ingested) ------------------------
+  - id: fcdo-frameworks
+    classification: Internal-Confidential  # real employee names + internal Confluence URLs in the capture
+    source: "internal/fcdo-reference/*.md (2026-07-30 screenshot transcriptions; live-page scrape target list = the page-ID table in internal/fcdo-reference/README.md)"
+    connector: confluence                 # company-network only; scrape supersedes the transcripts
+    manifest: ~                           # provenance + gap ledger lives in internal/fcdo-reference/README.md
+    trust_default: GROUNDED               # screenshot transcription is faithful but partial; a direct Confluence fetch upgrades to VERBATIM
+    tier: T4
+    curation: sme-confirm+confidential
+    target_db: ddcontext                  # reference/standards content, never ground truth
+    refresh: on-demand
+    taxonomy_path: ~
+    notes: >
+      The FCDO firmwide data-publishing frameworks corpus (ontology/taxonomy/
+      provenance/ETL standards from the internal governance group). Purpose:
+      reference for the FCDO ontology crosswalk
+      (internal/fcdo-reference/ALIGNMENT-PLAN.md). Priority recapture targets
+      when the confluence connector runs: Descriptive Metadata, Data Quality,
+      Data Contracts (DPROD) frameworks + the Taxonomy Framework property
+      tables — the known capture holes that block crosswalk sign-off.
+
   - id: jpmc-reports
     classification: External            # public SEC filings / investor-relations PDFs
     source: "scripts/ingest_jpmc_reports.py (REMOVED 2026-07-22 — one-off script with hardcoded connection, superseded by module loaders; recover via git history if needed. 2 local-only PDFs: annualreport-2024 + mda10k-2024; never committed — the root /*.pdf gitignore precedent)"

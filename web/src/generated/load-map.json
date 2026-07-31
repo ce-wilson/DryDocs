@@ -648,6 +648,19 @@
       ]
     },
     {
+      "id": "fcdo-frameworks",
+      "kind": "docs",
+      "classification": "Internal-Confidential",
+      "confirmed": false,
+      "ledger": {
+        "state": "placeholder",
+        "path": null
+      },
+      "taxonomy_captures": [],
+      "ontology_mappings": [],
+      "loaders": []
+    },
+    {
       "id": "rua-inventory",
       "kind": "server-inventory",
       "classification": "Internal-Confidential",
