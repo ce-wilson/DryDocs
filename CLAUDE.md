@@ -134,8 +134,7 @@ drives the GitHub publish boundary like a `.gitignore`:
 |----------------|--------------|--------------|
 | **External** | **Yes** | `reference/`, `external/` (public vendor/standards; cite `source_url`) |
 | **Internal-Public** | **Yes** | `knowledge/` (internal design prose, no secrets) |
-| **Internal** | **NO — excluded from public push** | `internal/` (operational metadata) |
-| **Internal-Confidential** | **NO — excluded + extra protection** | `internal/` (real rosters, SIDs, schemas, PII) |
+| **Internal** | **NO — excluded from public push** | `internal/` (operational metadata AND confidential material — rosters, SIDs, SEAL ids, schemas; the former Internal-Confidential tier collapsed into this level 2026-07-31, J23 — mark confidential handling in a note on the entry) |
 
 **Never** commit real SIDs, credentials, server addresses, GHE org names, or production data
 values outside `internal/`. When registering a source, **set its `classification`** — there is no

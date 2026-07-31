@@ -14,7 +14,7 @@
 #   connector      — web | filedrop | confluence | sharepoint | teams | email
 #   tier           — T1 vendor | T2 internal-platform | T3 product/process | T4 SME-context
 #   curation       — the ADR 0006 §4 ladder, FIXED per tier:
-#                      T1 → none · T2/T3 → sme-confirm · T4 → sme-confirm+confidential
+#                      T1 → none · T2/T3/T4 → sme-confirm (the +confidential rider retired with the J23 tier collapse 2026-07-31)
 #   target_db      — dddocs | ddcontext (ADR 0006 §2; never any other DB)
 #   refresh        — manual | on-demand | scheduled(<cron>)
 #   trust_default  — VERBATIM | GROUNDED | SYNTHESIZED (per-chunk overrides live in
@@ -68,13 +68,13 @@ sources:
 
   # ---- Queued corpora (registered, not yet ingested) ------------------------
   - id: fcdo-frameworks
-    classification: Internal-Confidential  # real employee names + internal Confluence URLs in the capture
+    classification: Internal               # confidential handling: real employee names + internal Confluence URLs in the capture (J23 collapse)
     source: "internal/fcdo-reference/*.md (2026-07-30 screenshot transcriptions; live-page scrape target list = the page-ID table in internal/fcdo-reference/README.md)"
     connector: confluence                 # company-network only; scrape supersedes the transcripts
     manifest: ~                           # provenance + gap ledger lives in internal/fcdo-reference/README.md
     trust_default: GROUNDED               # screenshot transcription is faithful but partial; a direct Confluence fetch upgrades to VERBATIM
     tier: T4
-    curation: sme-confirm+confidential
+    curation: sme-confirm                 # T4 ladder post-J23 (+confidential rider retired with the tier)
     target_db: ddcontext                  # reference/standards content, never ground truth
     refresh: on-demand
     taxonomy_path: ~

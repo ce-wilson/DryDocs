@@ -11,7 +11,7 @@ via the guided gate (`docs/restructure/03-hitl-sme-flow.md`).
 |------|---------|
 | [`precedence.yaml`](precedence.yaml) | The authority order when sources disagree: BMC baseline → internal standards → LOB→Product→Team. |
 | [`source-registry.yaml`](source-registry.yaml) | Every pipeline source: orchestrator, adapter, taxonomy fed, confirmed crosswalk, **and its `classification` + `source`**. |
-| [`classification.yaml`](classification.yaml) | The sensitivity vocabulary (External / Internal-Public / Internal / Internal-Confidential) that drives the GitHub publish boundary. Required on every source. |
+| [`classification.yaml`](classification.yaml) | The sensitivity vocabulary (External / Internal-Public / Internal; 3 levels since the J23 collapse 2026-07-31) that drives the GitHub publish boundary. Required on every source. |
 | [`taxonomy-ontology-map.yaml`](taxonomy-ontology-map.yaml) | The HITL-confirmed bindings: "this imported taxonomy → apply this ontology rule." |
 | `taxonomy/` | Imported raw hierarchies (apps, products, schemas, scripts, variables, LOB→Product→Team) as **pure classification** — no meaning-bearing edges yet. |
 | [`gate-log.md`](gate-log.md) | **Append-only** record of every HITL gate decision. |

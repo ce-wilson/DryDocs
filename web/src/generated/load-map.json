@@ -295,7 +295,7 @@
     {
       "id": "seal-extract",
       "kind": "internal",
-      "classification": "Internal-Confidential",
+      "classification": "Internal",
       "confirmed": true,
       "ledger": {
         "state": "pending",
@@ -379,7 +379,7 @@
     {
       "id": "catalog-pat",
       "kind": "internal",
-      "classification": "Internal-Confidential",
+      "classification": "Internal",
       "confirmed": true,
       "ledger": {
         "state": "pending",
@@ -650,7 +650,7 @@
     {
       "id": "fcdo-frameworks",
       "kind": "docs",
-      "classification": "Internal-Confidential",
+      "classification": "Internal",
       "confirmed": false,
       "ledger": {
         "state": "placeholder",
@@ -663,7 +663,7 @@
     {
       "id": "rua-inventory",
       "kind": "server-inventory",
-      "classification": "Internal-Confidential",
+      "classification": "Internal",
       "confirmed": false,
       "ledger": {
         "state": "placeholder",
@@ -676,7 +676,7 @@
     {
       "id": "dpl-registry",
       "kind": "registry",
-      "classification": "Internal-Confidential",
+      "classification": "Internal",
       "confirmed": false,
       "ledger": {
         "state": "placeholder",
@@ -689,7 +689,7 @@
     {
       "id": "snowflake-data-catalog",
       "kind": "registry",
-      "classification": "Internal-Confidential",
+      "classification": "Internal",
       "confirmed": false,
       "ledger": {
         "state": "ledger",
@@ -715,7 +715,7 @@
     {
       "id": "oracle-schemas",
       "kind": "data-platform",
-      "classification": "Internal-Confidential",
+      "classification": "Internal",
       "confirmed": false,
       "ledger": {
         "state": "placeholder",
@@ -736,7 +736,7 @@
     {
       "id": "snowflake",
       "kind": "data-platform",
-      "classification": "Internal-Confidential",
+      "classification": "Internal",
       "confirmed": false,
       "ledger": {
         "state": "placeholder",

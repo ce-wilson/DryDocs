@@ -14,7 +14,7 @@
 # =============================================================================
 
 schema: drydocs.classification.v1
-updated: 2026-06-20
+updated: 2026-07-31        # J23: Internal-Confidential collapsed into Internal (3 levels; a 4th tier can return if a real handling difference ever materializes)
 
 levels:
   - id: External
@@ -38,22 +38,21 @@ levels:
     rank: 2
     publishable: false
     description: >
-      Internal-only — shareable inside the company but NOT for public GitHub. Operational
-      metadata and internal process docs. No real secrets / PII.
-    homes: [internal/]
-
-  - id: Internal-Confidential
-    rank: 3
-    publishable: false
-    description: >
-      Confidential — real rosters, people, SIDs, schema object names, secrets, PII/PCI/MNPi.
-      Highest protection.
+      Internal-only — NOT for public GitHub, never leaves the private repo. Operational
+      metadata, internal process docs, AND confidential material (real rosters, SIDs,
+      SEAL ids, schema object names) — the former Internal-Confidential tier collapsed
+      into this level (user ruling 2026-07-31, J23): the private repo + publish boundary
+      is the protection, and the extra tier's pointer-never-the-data discipline was
+      preventing internal/ from holding the values the work needs. Where a source is
+      confidential, say so in a handling note on the entry. Real secrets/credentials
+      still never commit anywhere; large or PII-bearing payloads may stay out-of-tree
+      per source (noted on the entry), no longer tier-forced.
     homes: [internal/]
 
 # The GitHub publish boundary (a .gitignore-style guard).
 publish_rule:
   publish_when: "level.publishable == true"            # External + Internal-Public
-  exclude_from_public_push: [Internal, Internal-Confidential]
+  exclude_from_public_push: [Internal]
   enforced_by: "PUBLISH-BOUNDARY.md (+ .gitignore on the public remote)"
   note: >
     The directory layout aligns with this — reference/ + external/ + knowledge/ are

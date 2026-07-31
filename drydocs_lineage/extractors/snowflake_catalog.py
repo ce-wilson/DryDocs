@@ -58,7 +58,7 @@ without a schema yield the G41-style ``db`` namespace so Glue placements
 join on the same canonical lowercase path (G43's join). Any missing part →
 ``""`` and counted.
 
-Real exports are Internal-Confidential and live in the G19 landing zone
+Real exports are confidential (Internal, J23) and live in the G19 landing zone
 (``catalog/``, resolver ``drydocs_core.data_root.catalog_dir``), never in
 the repo; ``tests/unit/test_data_root.py`` sweeps the tree for strays.
 """

@@ -2,7 +2,7 @@
 
 The logs idiom (:mod:`drydocs_core.run_log` — ``~/logs/DryDocs``,
 env-overridable) applied to DATA: bundles and other large or
-Internal-Confidential source payloads get a real home OUTSIDE the project
+confidential (Internal, J23) source payloads get a real home OUTSIDE the project
 tree, and the repo carries only the pointer. ``internal-local/`` remains the
 in-tree hand-carry WORKING area (pointers, notes) — never the payload store.
 
@@ -30,7 +30,7 @@ even gitignored):
     <root>/catalog/screenshots/     SME evidence captures
 
 Payloads under the root may hold real hostnames, uids, home paths, and
-profile/script copies (Internal-Confidential) — DATA NEVER ENTERS THE REPO;
+profile/script copies (confidential (Internal, J23)) — DATA NEVER ENTERS THE REPO;
 ``tests/unit/test_data_root.py`` sweeps the tree to enforce it.
 """
 from __future__ import annotations

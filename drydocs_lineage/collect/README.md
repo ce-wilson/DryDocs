@@ -113,7 +113,7 @@ blob sweep. v1 bundles STAY ingestible: the (G20) extractor must treat
 ## Where bundles live (G19 — the landing zone)
 
 **Bundles NEVER enter the repo tree.** They hold real hostnames, uids, home
-paths, and profile/script copies (Internal-Confidential), so they land
+paths, and profile/script copies (confidential (Internal, J23)), so they land
 out-of-tree — the same idiom as the run logs (`~/logs/DryDocs`):
 
 ```

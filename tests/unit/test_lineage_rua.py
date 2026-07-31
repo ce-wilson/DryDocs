@@ -2,7 +2,7 @@
 
 SYNTHETIC fixtures throughout (shape-faithful, value-fake — the collector's
 output contract from ``drydocs_lineage/collect/rua_inventory.sh``; real bundles
-are Internal-Confidential and live in the G19 landing zone, never here). Each
+are confidential (Internal, J23) and live in the G19 landing zone, never here). Each
 case pins one acceptance clause: (a) the meta.txt provenance envelope on every
 record, (b) directories/ownership → rua_path DataAssets, (c) profile + script
 artifacts with sha256 and copy pointers, (d) v1 AND v2 bundles both parse,

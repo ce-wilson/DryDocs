@@ -43,7 +43,7 @@ identifier: "Application ID"           # the SOURCE's own field name for the uni
                                        # is a different axis and lives in the evidence vocabulary —
                                        # ATTRIBUTION_TIERS / match_method — per the §B2 two-part rule.
 authority: lob-product-team            # config/precedence.yaml tier 3
-classification: Internal-Confidential  # config/classification.yaml (source sensitivity)
+classification: Internal               # config/classification.yaml; confidential handling (J23 collapse)
 classification_only: true
 
 nodes:

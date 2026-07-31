@@ -36,7 +36,7 @@ families carry pipeline ids at all (the code-fetch tooling gap). An optional
 third column takes clone folder GUIDs (:func:`~.dpl_mac.parse_clone_folder`)
 so clone lag is measured, not guessed.
 
-Real exports are Internal-Confidential (SEALs + GUIDs + lifecycle state) and
+Real exports are confidential (Internal, J23) (SEALs + GUIDs + lifecycle state) and
 live in the G19 landing zone (``dpl-registry/<seal>/``), never in the repo.
 """
 from __future__ import annotations

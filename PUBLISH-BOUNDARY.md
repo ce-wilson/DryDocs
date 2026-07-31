@@ -12,8 +12,7 @@ authoritative.
 |----------------|--------------|--------------|
 | **External** | ✅ yes | `reference/`, `external/` |
 | **Internal-Public** (Internal-Public Availability) | ✅ yes | `knowledge/` |
-| **Internal** | ❌ no — excluded from public push | `internal/` |
-| **Internal-Confidential** | ❌ no — excluded + extra protection | `internal/` |
+| **Internal** | ❌ no — excluded from public push | `internal/` (incl. confidential material — the former Internal-Confidential tier collapsed into this level 2026-07-31, J23; a 4th tier can return if a real handling difference ever materializes) |
 
 ## Publishable (stays in a public push)
 - `reference/` — External platform/standard/research knowledge (public by nature)
@@ -26,13 +25,13 @@ authoritative.
   (no embedded secrets)
 - `CLAUDE.md`, `README.md`
 
-## Excluded before any public push (classification: Internal or Internal-Confidential)
+## Excluded before any public push (classification: Internal)
 - `internal/**` — real rosters, schemas, SIDs, server addresses, GHE org names
 - `internal-local/**` — gitignored entirely (never committed to ANY remote): real configs,
   raw extracts, screenshot evidence, Confluence sandbox output
 - `.env`, `*.env`, credentials, `Neo4j-credentials-*.txt`
 - `drydocs/data/samples/**` if it ever contains real (non-synthetic) rows
-- Any file whose source is registered `Internal` / `Internal-Confidential` in
+- Any file whose source is registered `Internal` in
   `config/source-registry.yaml`, or any file with real production data values
 
 ## Enforcement

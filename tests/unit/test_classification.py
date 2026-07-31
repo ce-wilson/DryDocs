@@ -31,7 +31,7 @@ def test_classification_file_exists() -> None:
 def test_classification_vocabulary_shape() -> None:
     doc = yaml.safe_load(CLASSIFICATION.read_text(encoding="utf-8"))
     ids = {lvl["id"] for lvl in doc.get("levels", [])}
-    assert ids == {"External", "Internal-Public", "Internal", "Internal-Confidential"}, (
+    assert ids == {"External", "Internal-Public", "Internal"}, (  # J23: Internal absorbs the former Internal-Confidential
         f"classification levels drifted: {ids}"
     )
     # publishable must be a bool on every level

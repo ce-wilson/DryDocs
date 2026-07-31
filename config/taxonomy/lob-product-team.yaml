@@ -17,7 +17,7 @@ domain: business
 taxonomy_path_root: business/lob
 source: catalog-pat
 authority: lob-product-team
-classification: Internal-Confidential
+classification: Internal               # confidential handling: real rosters (J23 collapse)
 classification_only: true
 
 nodes:

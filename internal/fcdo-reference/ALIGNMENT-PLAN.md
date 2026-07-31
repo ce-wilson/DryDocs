@@ -1,6 +1,6 @@
 # FCDO ontology alignment plan
 
-**Classification: Internal-Confidential** (names the internal org and its internal
+**Classification: Internal** (confidential handling — J23 collapse 2026-07-31; names the internal org and its internal
 systems). Drafted 2026-07-31 from the capture in this directory. Scope rule set by the
 user: **align our ontology to theirs for what we have planned — do not add what we
 won't use.**

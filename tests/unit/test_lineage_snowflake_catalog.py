@@ -2,7 +2,7 @@
 
 SYNTHETIC fixtures throughout (shape-faithful, value-fake; the column names
 ARE the assumed contract documented in ``snowflake_catalog.py`` — a real
-sample validates or amends them; real exports are Internal-Confidential and
+sample validates or amends them; real exports are confidential (Internal, J23) and
 live in the catalog/ landing zone, never here — app ids come from the
 synthetic 70001-70099 block). Each case pins one acceptance clause:
 (a) taxonomy-first staging records with provenance, (b) origin routing

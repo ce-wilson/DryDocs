@@ -24,7 +24,7 @@ sources:
     adapter: oracle                     # OracleAdapter over psgmgr.* views
     # locator — granular source coordinates (SEAL app → platform → service →
     # schema → objects). Mechanism committed here; REAL values (SEAL id, DB
-    # service/TNS name) are Internal-Confidential and live only in the
+    # service/TNS name) are confidential (Internal) and live only in the
     # internal/ twin + connection env (internal-local/) — the publish
     # boundary is why a public "test Oracle container" is never needed.
     locator:
@@ -117,7 +117,7 @@ sources:
 
   # ---- Internal reference data (Tier-3 confidential) -----------------------
   - id: seal-extract
-    classification: Internal-Confidential   # real applications, ownership, employees, SEAL ids
+    classification: Internal                # confidential handling: real applications, ownership, employees, SEAL ids (J23 collapse)
     source: "SEAL extract (internal)"
     kind: internal
     orchestrator: ~
@@ -127,7 +127,7 @@ sources:
     notes: "Live. SEAL applications + ownership."
 
   - id: catalog-pat
-    classification: Internal-Confidential   # real LOB→Product→Team rosters, team names, SEAL ids
+    classification: Internal                # confidential handling: real LOB→Product→Team rosters, team names, SEAL ids (J23 collapse)
     source: "PAT/Catalog extract (internal): catalog hierarchy + the PAT team report"
     kind: internal
     orchestrator: ~
@@ -147,7 +147,7 @@ sources:
       (supporting area product, else product) is VOLATILE and relationship-typed
       (dedicated|aligned|flex), swept per team on each load; sponsoring product/
       area-product are distinct sponsored:true edges. SME evidence held
-      in-session (screenshots, Internal-Confidential — not committed).
+      in-session (screenshots, confidential — not committed).
 
   # ---- Reference ledgers (repo-committed, publishable) ----------------------
   - id: software-registry
@@ -252,7 +252,7 @@ sources:
       gate.
 
   - id: fcdo-frameworks
-    classification: Internal-Confidential  # transcripts carry real employee names + internal Confluence URLs; the POINTER lives here, the content in internal/
+    classification: Internal               # confidential handling: real employee names + internal Confluence URLs in the transcripts; the POINTER lives here, the content in internal/ (J23 collapse)
     source: "internal/fcdo-reference/*.md (screenshot transcriptions of the firmwide data-publishing framework Confluence space; page-ID scrape list in its README)"
     kind: docs
     orchestrator: ~
@@ -272,7 +272,7 @@ sources:
 
   # ---- Server inventory (rua collector bundles) -----------------------------
   - id: rua-inventory
-    classification: Internal-Confidential   # bundles hold real hostnames, uids, home paths, profile + script copies
+    classification: Internal                # confidential handling: bundles hold real hostnames, uids, home paths, profile + script copies (J23 collapse)
     source: "rua_*.tar.gz bundles under DRYDOCS_DATA_ROOT (~/data/DryDocs/rua/) — collected on Control-M execution hosts by drydocs_lineage/collect/rua_inventory.sh"
     kind: server-inventory
     orchestrator: bmc-controlm            # inventories the orchestrator's execution hosts
@@ -284,7 +284,7 @@ sources:
     confirmed: false                      # G22 rua-load gate pending (clauses a-g); NOTHING writes the graph before it
     notes: >
       G19 registration — THE POINTER, NEVER THE DATA: bundle payloads are
-      Internal-Confidential and NEVER enter the repo tree (guard:
+      confidential and NEVER enter the repo tree — size + payload rule, per-source (guard:
       tests/unit/test_data_root.py sweeps for rua_*.tar.gz / extracted
       bundles; transport is the internal-local hand-carry note). Bundles land
       out-of-tree beside the run logs (~/data like ~/logs — user call
@@ -295,7 +295,7 @@ sources:
 
   # ---- DPL taxonomy registry (per-SEAL Swagger exports) ---------------------
   - id: dpl-registry
-    classification: Internal-Confidential   # real SEAL ids + pipeline/dataset GUIDs + lifecycle state
+    classification: Internal                # confidential handling: real SEAL ids + pipeline/dataset GUIDs + lifecycle state (J23 collapse)
     source: "per-SEAL Swagger JSON exports of the DPL taxonomy registry (pipeline_id.json / dataset_id.json) under DRYDOCS_DATA_ROOT (~/data/DryDocs/dpl-registry/<seal>/)"
     kind: registry
     orchestrator: ~
@@ -307,7 +307,7 @@ sources:
     confirmed: false                      # G22 clauses (f)/(g) own the rulings this feeds; NOTHING writes the graph before it
     notes: >
       G25 registration — THE POINTER, NEVER THE DATA: exports carry real SEAL
-      ids, pipeline/dataset GUIDs, and lifecycle state (Internal-Confidential)
+      ids, pipeline/dataset GUIDs, and lifecycle state (confidential)
       and never enter the repo tree; fixtures are SYNTHETIC. The registry sits
       ABOVE the pipelines (G17 reads each pipeline's own MAC set; the shared
       join key is the same GUID G15 extracts from CMD_LINE). Ingested
@@ -322,13 +322,13 @@ sources:
 
   # ---- Snowflake data-catalog (dataset/distribution registration views) -----
   - id: snowflake-data-catalog
-    classification: Internal-Confidential   # real dataset names, GUIDs, producing app ids, contact emails, buckets, URIs
+    classification: Internal                # confidential handling: real dataset names, GUIDs, producing app ids, contact emails, buckets, URIs (J23 collapse)
     source: "full-pull exports (CSV) of the curated Snowflake views <PROD_DB>.<SCHEMA>.<CATALOG>_DATASETS_V / <CATALOG>_DISTRIBUTIONS_V under DRYDOCS_DATA_ROOT (~/data/DryDocs/catalog/)"
     kind: registry
     orchestrator: ~
     adapter: ~                            # G42 extractor (drydocs_lineage/extractors/snowflake_catalog.py) — taxonomy-first staging, no loader
     locator:
-      data_root: "DRYDOCS_DATA_ROOT (default ~/data/DryDocs); catalog/ = view exports, catalog/screenshots/ = evidence captures (Internal-Confidential, never in-tree even gitignored)"
+      data_root: "DRYDOCS_DATA_ROOT (default ~/data/DryDocs); catalog/ = view exports, catalog/screenshots/ = evidence captures (confidential, never in-tree even gitignored)"
       resolver: drydocs_core/data_root.py # catalog_dir() (the G19 shared helper)
       mapping: docs/generic-snowflake-data-catalog-ingestion-plan.md   # the mapping ledger (field contract §2, identity model §3)
     feeds_taxonomy: [datasets, distributions]
@@ -371,7 +371,7 @@ sources:
 
   # ---- Data platforms (sources of DataAsset/lineage) -----------------------
   - id: oracle-schemas
-    classification: Internal-Confidential   # real schema/table/object names
+    classification: Internal                # confidential handling: real schema/table/object names (J23 collapse)
     source: "oracle:<schema> (internal)"
     kind: data-platform
     orchestrator: ~
@@ -381,7 +381,7 @@ sources:
     notes: "Oracle DB schemas/scripts as taxonomy → DataAsset. Real names are confidential."
 
   - id: snowflake
-    classification: Internal-Confidential
+    classification: Internal
     source: "snowflake (TBD)"
     kind: data-platform
     orchestrator: ~

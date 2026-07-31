@@ -1,6 +1,6 @@
 # internal/fcdo-reference — FCDO Data Publishing Frameworks capture
 
-**Classification: Internal-Confidential** — contains real employee names, internal
+**Classification: Internal** (confidential handling — J23 collapse 2026-07-31) — contains real employee names, internal
 Confluence URLs, and internal org detail. Never leaves `internal/`; excluded from any
 public push (`PUBLISH-BOUNDARY.md`).
 

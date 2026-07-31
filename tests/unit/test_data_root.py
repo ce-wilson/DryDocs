@@ -77,7 +77,7 @@ _SKIP_DIRS = {".git", ".venv", "node_modules", "__pycache__", ".pytest_cache"}
 
 
 def test_repo_tree_contains_no_rua_bundles():
-    """Bundles hold real hostnames/uids/home paths (Internal-Confidential) —
+    """Bundles hold real hostnames/uids/home paths (confidential (Internal, J23)) —
     they live under DRYDOCS_DATA_ROOT, never in the tree. An extracted bundle
     is recognized by its collector marker (a ``meta.txt`` inside a ``rua_*``
     directory)."""
@@ -98,7 +98,7 @@ def test_repo_tree_contains_no_rua_bundles():
 
 def test_repo_tree_contains_no_catalog_exports():
     """Data-catalog view exports hold real dataset names, GUIDs, producing
-    app ids, contact emails, and physical coordinates (Internal-Confidential)
+    app ids, contact emails, and physical coordinates (confidential (Internal, J23))
     — they live under DRYDOCS_DATA_ROOT/catalog/, never in the tree (G42).
     An export is recognized by the curated view name traveling in the file
     name (``*_DATASETS_V`` / ``*_DISTRIBUTIONS_V``, either case — test

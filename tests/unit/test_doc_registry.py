@@ -37,7 +37,7 @@ CURATION_BY_TIER = {
     "T1": "none",
     "T2": "sme-confirm",
     "T3": "sme-confirm",
-    "T4": "sme-confirm+confidential",
+    "T4": "sme-confirm",   # J23: the +confidential rider retired with the Internal-Confidential tier collapse
 }
 
 # The corpora known to be ingested as of Q5 (the backfill guard). EXTEND this set

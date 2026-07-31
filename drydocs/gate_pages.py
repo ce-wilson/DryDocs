@@ -10,7 +10,7 @@ confirmed** in ``config/taxonomy-ontology-map.yaml`` (decisions logged to
 Pure/offline — no Neo4j, no graph write. **The repo is the system of record; the browser
 ticks are a working aid.** classification: Internal-Public — the generator is generic and
 the committed example spec is a vendor-BMC step. Pages for real PAT/SEAL steps are
-Internal-Confidential (real LoB/SEAL data) and render into a gitignored dir, never here.
+confidential (Internal, J23) (real LoB/SEAL data) and render into a gitignored dir, never here.
 """
 from __future__ import annotations
 

@@ -2,7 +2,7 @@
 
 SYNTHETIC fixtures throughout (shape-faithful, value-fake; the field names ARE
 the assumed contract documented in ``dpl_registry.py`` — a real sample
-validates or amends them; real exports are Internal-Confidential and live in
+validates or amends them; real exports are confidential (Internal, J23) and live in
 the dpl-registry/ landing zone, never here). Each case pins one acceptance
 clause: (a) taxonomy-first staging records with provenance, (b) v-shape
 tolerance (bare list / wrapped) + malformed counted, (c) the active flag

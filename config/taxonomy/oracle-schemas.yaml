@@ -16,7 +16,7 @@ domain: data
 taxonomy_path_root: data/oracle
 source: oracle-schemas
 authority: internal-standards          # config/precedence.yaml tier 2
-classification: Internal-Confidential  # real object names are confidential
+classification: Internal               # confidential handling: real object names (J23 collapse)
 classification_only: true
 status: placeholder                    # populate from the Oracle extract when confirmed
 
