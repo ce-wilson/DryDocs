@@ -233,3 +233,49 @@ def test_estate_runtime_documentation_reachability_is_recorded() -> None:
             f"runtime {runtime} documentation is now reachable — recapture is "
             f"newly possible; update this pin and consider recapturing"
         )
+
+
+# --------------------------------------------------------------------------- #
+# stack membership: "what is DryDocs built on" as a query, not a comment
+# --------------------------------------------------------------------------- #
+ALLOWED_STACKS = {"backend", "web-console", "source"}
+
+
+def test_stack_membership_is_declared_for_everything_we_build_on() -> None:
+    """`used_by_drydocs` says THAT we use it; `stack` says WHERE.
+
+    Without the second field "what is our UI stack?" is answerable only by
+    reading comments or package.json — which is how the ReUI/Neo4j-driver
+    membership got missed in the first place.
+    """
+    failures: list[str] = []
+    for product in _doc()["products"]:
+        pid, stack = product["id"], product.get("stack")
+        if not product.get("used_by_drydocs"):
+            assert stack is None, f"'{pid}': stack is only meaningful when used_by_drydocs"
+            continue
+        if not stack:
+            failures.append(f"'{pid}' is used_by_drydocs but declares no stack")
+            continue
+        bad = set(stack) - ALLOWED_STACKS
+        if bad:
+            failures.append(f"'{pid}' has unknown stack(s) {sorted(bad)}")
+    assert not failures, "\n".join(failures)
+
+
+def test_neo4j_spans_both_stacks() -> None:
+    """One product, two stacks — the case that motivated the field.
+
+    The database is backend; the SAME product's JS driver (neo4j-driver in
+    web/package.json) also ships in the console for the ADR 0005 dev-mode bolt
+    adapter. Registering the driver separately would collide with this file's
+    "drivers stay out" scope rule, so membership is modelled on the product.
+    """
+    neo4j = next(p for p in _doc()["products"] if p["id"] == "neo4j")
+    assert set(neo4j["stack"]) == {"backend", "web-console"}
+
+
+def test_web_console_stack_matches_the_locked_site_plan() -> None:
+    """The locked stack (UI-WIP/site-plan.md §1), pinned so a swap is deliberate."""
+    web = {p["id"] for p in _doc()["products"] if "web-console" in (p.get("stack") or [])}
+    assert web == {"react", "reui", "react-flow", "tailwindcss", "neo4j"}
