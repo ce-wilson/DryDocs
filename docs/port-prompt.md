@@ -79,6 +79,22 @@ GUARDRAILS (durable — apply to every port):
    `default_ok:` with a reason; a path in NEITHER is an un-made decision, not a
    clean-add — stop, decide it, and send the row back (guarded by
    test_port_reconcile_guards.py::test_no_tracked_path_falls_through_silently).
+   RESOLVING THE REFERENCES BELOW: this prompt cites two producer documents it does
+   not contain. Both are `docs/port-*.md` = never-port, so they are NOT in your tree —
+   read them at the fetched producer ref, same idiom as the authorities above:
+   - `git show cewilson/main:docs/port-prompt-archive-steps-1-42.md` — the FROZEN
+     steps 1–42. Any "archive step N" citation in the tracker below (T5/T6/T7/T8 cite
+     steps 31/16/16/29) resolves there, and the **Done-means for T1–T10 live only in
+     its tracker section** — this prompt states them nowhere. Needed when you work a
+     T1–T10 row, not to execute a port step.
+   - `git show cewilson/main:docs/port-ais-supplement-company-prompt.md` — the T17
+     hand-off pack. It is NOT part of this port: no producer payload, four actions on
+     company-local code, and it carries the repo-wide evidence table behind the
+     back-flow REFUSAL that T17 asserts. Run it as its own session; do not fold it
+     into a port run, and never commit it company-side.
+   Hand-off packs are always paste-into-a-session artifacts, never payload. If a
+   citation anywhere in this prompt has no openable path, treat that as a defect and
+   send it back — a cited artifact nobody can open is the failure J25 exists to end.
 
 2. DISJOINT HISTORIES: no common ancestor exists — never `git merge`/`git pull`.
    Small ranges: cherry-pick / `git am --3way`, resolving collisions per manifest.
@@ -268,7 +284,8 @@ OWED COMPANY-SIDE:
 - L7 RATIFICATION ENTRY in the company gate-log (Tier A adopted-via-port). The
   paste-ready block is **§6a below** — committed, not "provided in a session". Open
   as of 2026-07-31 (tracker T11).
-- TRACKER (T1–T8 origin steps live in the archive; statuses tracked here):
+- TRACKER (T1–T8 origin steps live in the archive — guardrail 1 has the path;
+  statuses tracked here):
 
 | # | Item | Status |
 |---|------|--------|
@@ -293,7 +310,7 @@ OWED COMPANY-SIDE:
 | T19 | N3–N6 load-map adoption gate (deferral filed at PORT-REPORT-e60822fc; gate review requested by the user): rule (1) the catalog-pat/pat-catalog id collision (divergence ledger row) and (2) the ~13 sourceless company-only loaders BEFORE adopting the N3 class-declaration derivation, N4/N5 renders, or N6. **INPUTS DELIVERED 2026-07-31 — the ONE design session ran and BUILT: gate `source-registry-v2` SIGNED OFF (`323f5aa`, N7) and schema v2 landed (`86914ad`, N9). All four inputs this row was holding are now concrete, not candidates: the per-side overlay IS `config/loader-source-overlay.yaml` (D2 — ships EMPTY producer-side, built explicitly as your rebind seam), the URN handle is D3, the same-id/changed-meaning guard is D4's retired-id refusal list, and the registry-redesign directive is the whole of N7. The catalog id collision has an SME naming ruling (`pat:product-catalog` / `pat:people-report`) that matches NEITHER legacy string. See step 51(a)/(b) for the port disposition and the CAUTION.** Your gate still rules — producer sign-off never substitutes for it | pending — inputs delivered, ruling open |
 
   Done-means for T1–T10 are unchanged — they live verbatim in the archive's tracker
-  section. T9 reminder: producer sign-off never substitutes for load verification on
+  section (guardrail 1 has the `git show` path; they are NOT restated here). T9 reminder: producer sign-off never substitutes for load verification on
   your graph. T10/T13: until a real export parses with zero mismatches, treat the
   field names as ASSUMED.
 
