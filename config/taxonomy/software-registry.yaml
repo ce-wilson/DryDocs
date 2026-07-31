@@ -202,6 +202,14 @@ products:
     versions: ["19.2.7"]          # web/package.json
     used_by_drydocs: true
     stack: [web-console]
+    # The FIRST-PARTY sub-ledger: what we BUILT with this framework, as opposed
+    # to the framework itself. Same shape as `documentation:` on the controlm
+    # product — a third-party entry naming the ledger that details it. Kept out
+    # of THIS file because a first-party inventory is not third-party software;
+    # see that file's header, and backlog O42 for why it had no home at all.
+    components:
+      ledger: config/taxonomy/ui-components.yaml
+      schema: drydocs.ui-component-registry.v1
 
   - id: reui
     vendor: reui

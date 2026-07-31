@@ -203,7 +203,8 @@
         "config/taxonomy/oracle-schemas.yaml",
         "config/taxonomy/platforms.yaml",
         "config/taxonomy/README.md",
-        "config/taxonomy/software-registry.yaml"
+        "config/taxonomy/software-registry.yaml",
+        "config/taxonomy/ui-components.yaml"
       ],
       "content": null,
       "extra_contents": {}

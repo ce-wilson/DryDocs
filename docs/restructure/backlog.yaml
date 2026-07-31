@@ -8794,6 +8794,26 @@ items:
       the scan.
       Option (b) is a legitimate answer, not a cop-out: the front end may not
       earn a graph. But it must be a decision rather than an omission.
+      PARTIALLY ANSWERED 2026-07-31, same session (user directive: "create
+      another sub-ledger for only our UI that links from the first"):
+      config/taxonomy/ui-components.yaml now inventories all 62 components by
+      area, joined to the software registry's `react` product through a
+      RECIPROCAL pointer (ledger -> framework/stack, product -> components), the
+      same shape as `documentation:` on the controlm product. A bidirectional
+      drift guard (tests/unit/test_ui_components.py) fails when a component is
+      added without being registered OR when an entry names a missing file —
+      PROVEN by adding a probe component and watching the suite go red. The
+      inventory half of this item is therefore CLOSED.
+      WHAT REMAINS, and why this item stays open: the ledger records WHAT EXISTS
+      AND WHERE, not what imports what. There are still no import edges for the
+      front end, so questions the Python code graph answers routinely — blast
+      radius, orphan detection, coupling — remain unanswerable for web/. That
+      needs a real TS resolver in the depgraph instrument; size it against the
+      U6 multi-root work before committing.
+      Worth recording as evidence for why the guard was built: the ledger was
+      generated from a `find` whose output truncated at 60 of 62 files, so the
+      first hand-read of the tree silently missed ThinkingLogicPanel and
+      TokenMemoryChart. A machine-checked inventory catches exactly that.
   - id: B5
     epic: taxonomy-capture
     title: "Capture the medallion stage vocabulary (RAW → TRUSTED → REFINED → SNOWFLAKE) as pure classification in config/taxonomy/ — the estate's canonical stage set, SME-confirmed via the gate"

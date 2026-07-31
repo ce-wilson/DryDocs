@@ -1,0 +1,137 @@
+# =============================================================================
+# config/taxonomy/ui-components.yaml — FIRST-PARTY UI component ledger.
+#
+# The sub-ledger of config/taxonomy/software-registry.yaml. That file is the
+# THIRD-PARTY register (what we are built ON); this one is the FIRST-PARTY
+# inventory (what we BUILT) for the one stack that has no other home.
+#
+# THE LINK: `framework: react` and `stack: web-console` below join to
+# software-registry.yaml, whose `react` product carries the reciprocal
+# `components:` pointer back to this file. Same shape as the `documentation:`
+# pointer on the controlm product — a registry entry naming the ledger that
+# details it.
+#
+# WHY THIS FILE EXISTS (backlog O42): the 62 components under web/src were in
+# no machine-readable inventory. The code-graph snapshot scans PYTHON roots
+# only; MODULE_MAP.md omits drydocs-web by construction ("not a Python
+# package"); and the software registry correctly declines first-party code.
+# All three plausible homes declined it, so the whole of Epic O was invisible
+# to tooling. This is the cheap answer — a maintained ledger with a drift
+# guard — rather than teaching the depgraph scanner TypeScript.
+#
+# THE GUARD IS THE POINT: tests/unit/test_ui_components.py checks the ledger
+# against the filesystem in BOTH directions, so a new component that is never
+# registered fails the suite, and an entry whose file was deleted or moved
+# fails too. An inventory nobody is forced to update rots into fiction.
+#
+# NOT a dependency graph: this records WHAT EXISTS and WHERE, not what imports
+# what. Import edges would need a real TS resolver (still open in O42).
+# =============================================================================
+
+schema: drydocs.ui-component-registry.v1
+classification: Internal-Public
+updated: 2026-07-31
+
+# --- join keys back to the third-party registry ------------------------------
+framework: react              # -> software-registry.yaml products[].id
+stack: web-console            # -> software-registry.yaml products[].stack
+root: web/src
+extension: .tsx
+
+areas:
+  - { id: entry,         title: "Application entry points (bootstrap + top-level composition)" }
+  - { id: layout,        title: "The shell: header, sidebars, toolbar, right-sidebar slot" }
+  - { id: route,         title: "One per addressable view — real routes, not display toggles (site-plan §1)" }
+  - { id: ui-primitive,  title: "Hand-rolled ReUI/shadcn-style primitives (copied-in, not an npm dependency)" }
+  - { id: component,     title: "Shared cross-module components" }
+  - { id: icon,          title: "Icon glyph sets" }
+  - { id: explorer,      title: "Explorer module panes" }
+  - { id: lineage,       title: "Lineage module panes" }
+  - { id: loads,         title: "Loads module panes" }
+  - { id: ownership,     title: "Ownership module panes" }
+  - { id: underhood,     title: "/under-the-hood benchmark showcase" }
+
+components:
+  # --- entry (2) ---
+  - { id: App,                     area: entry,        path: App.tsx }
+  - { id: main,                    area: entry,        path: main.tsx }
+
+  # --- layout (6) ---
+  - { id: Aside,                   area: layout,       path: layout/Aside.tsx }
+  - { id: Header,                  area: layout,       path: layout/Header.tsx }
+  - { id: ModuleToolbar,           area: layout,       path: layout/ModuleToolbar.tsx }
+  - { id: RightSidebarSlot,        area: layout,       path: layout/RightSidebarSlot.tsx }
+  - { id: Shell,                   area: layout,       path: layout/Shell.tsx }
+  - { id: rightSidebarContext,     area: layout,       path: layout/rightSidebarContext.tsx }
+
+  # --- route (18) ---
+  - { id: AdminConfigRoute,        area: route,        path: routes/AdminConfigRoute.tsx }
+  - { id: AskRoute,                area: route,        path: routes/AskRoute.tsx }
+  - { id: AssetPathRoute,          area: route,        path: routes/AssetPathRoute.tsx }
+  - { id: ConsoleRoute,            area: route,        path: routes/ConsoleRoute.tsx }
+  - { id: DocsRoute,               area: route,        path: routes/DocsRoute.tsx }
+  - { id: GatesRoute,              area: route,        path: routes/GatesRoute.tsx }
+  - { id: LineageRoute,            area: route,        path: routes/LineageRoute.tsx }
+  - { id: LoadsRoute,              area: route,        path: routes/LoadsRoute.tsx }
+  - { id: MappingsRoute,           area: route,        path: routes/MappingsRoute.tsx }
+  - { id: ModuleTemplate,          area: route,        path: routes/ModuleTemplate.tsx }
+  - { id: OverviewRoute,           area: route,        path: routes/OverviewRoute.tsx }
+  - { id: OwnershipRoute,          area: route,        path: routes/OwnershipRoute.tsx }
+  - { id: RemediationRoute,        area: route,        path: routes/RemediationRoute.tsx }
+  - { id: RunbooksRoute,           area: route,        path: routes/RunbooksRoute.tsx }
+  - { id: UnderTheHoodRoute,       area: route,        path: routes/UnderTheHoodRoute.tsx }
+  - { id: ExplorerLiveRoute,       area: route,        path: routes/explorer/ExplorerLiveRoute.tsx }
+  - { id: ExplorerRoute,           area: route,        path: routes/explorer/ExplorerRoute.tsx }
+  - { id: ExplorerTowerRoute,      area: route,        path: routes/explorer/ExplorerTowerRoute.tsx }
+
+  # --- ui-primitive (6) ---
+  - { id: EmptyState,              area: ui-primitive, path: components/ui/EmptyState.tsx }
+  - { id: IdChip,                  area: ui-primitive, path: components/ui/IdChip.tsx }
+  - { id: Meter,                   area: ui-primitive, path: components/ui/Meter.tsx }
+  - { id: ResizableSplit,          area: ui-primitive, path: components/ui/ResizableSplit.tsx }
+  - { id: StatusChip,              area: ui-primitive, path: components/ui/StatusChip.tsx }
+  - { id: Tabs,                    area: ui-primitive, path: components/ui/Tabs.tsx }
+
+  # --- component (14) ---
+  - { id: BrandMark,               area: component,    path: components/BrandMark.tsx }
+  - { id: CypherConsole,           area: component,    path: components/CypherConsole.tsx }
+  - { id: GraphExplorer,           area: component,    path: components/GraphExplorer.tsx }
+  - { id: GraphSvg,                area: component,    path: components/GraphSvg.tsx }
+  - { id: HeroArt,                 area: component,    path: components/HeroArt.tsx }
+  - { id: LinkedDemoFrame,         area: component,    path: components/LinkedDemoFrame.tsx }
+  - { id: MiniDag,                 area: component,    path: components/MiniDag.tsx }
+  - { id: ModuleIcon,              area: component,    path: components/ModuleIcon.tsx }
+  - { id: MyApps,                  area: component,    path: components/MyApps.tsx }
+  - { id: SignIn,                  area: component,    path: components/SignIn.tsx }
+  - { id: StatTiles,               area: component,    path: components/StatTiles.tsx }
+  - { id: ThemeToggle,             area: component,    path: components/ThemeToggle.tsx }
+  - { id: TowerDrill,              area: component,    path: components/TowerDrill.tsx }
+  - { id: TowerIcon,               area: component,    path: components/TowerIcon.tsx }
+
+  # --- icon (1) ---
+  - { id: HubGlyphs,               area: icon,         path: components/icons/HubGlyphs.tsx }
+
+  # --- explorer (4) ---
+  - { id: DataFrame,               area: explorer,     path: explorer/DataFrame.tsx }
+  - { id: ExplorerGraphPane,       area: explorer,     path: explorer/ExplorerGraphPane.tsx }
+  - { id: NodeInspector,           area: explorer,     path: explorer/NodeInspector.tsx }
+  - { id: SpecGrid,                area: explorer,     path: explorer/SpecGrid.tsx }
+
+  # --- lineage (1) ---
+  - { id: LineageGraphPane,        area: lineage,      path: lineage/LineageGraphPane.tsx }
+
+  # --- loads (1) ---
+  - { id: LoadsTimeline,           area: loads,        path: loads/LoadsTimeline.tsx }
+
+  # --- ownership (2) ---
+  - { id: AssetSearchPanel,        area: ownership,    path: ownership/AssetSearchPanel.tsx }
+  - { id: OwnershipGraphPane,      area: ownership,    path: ownership/OwnershipGraphPane.tsx }
+
+  # --- underhood (7) ---
+  - { id: HallucinationSpotlight,  area: underhood,    path: underhood/HallucinationSpotlight.tsx }
+  - { id: QuestionDetail,          area: underhood,    path: underhood/QuestionDetail.tsx }
+  - { id: ResultChip,              area: underhood,    path: underhood/ResultChip.tsx }
+  - { id: Scoreboard,              area: underhood,    path: underhood/Scoreboard.tsx }
+  - { id: StrategyCards,           area: underhood,    path: underhood/StrategyCards.tsx }
+  - { id: ThinkingLogicPanel,      area: underhood,    path: underhood/ThinkingLogicPanel.tsx }
+  - { id: TokenMemoryChart,        area: underhood,    path: underhood/TokenMemoryChart.tsx }
