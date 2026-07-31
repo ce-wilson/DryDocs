@@ -75,9 +75,13 @@ the row — a render, not a second hand-maintained field.
 **System row** (one per technical system):
 `id`, `name`, `seal_id` *(real value — this file/`internal/` twin only)*,
 `cmdb_ci` (ServiceNow class, e.g. `cmdb_ci_business_app` — crosswalk hook to
-`samples/SNOW-CMDB.csv`), `layer` (`human | business | technology` — the target
-sheet's Layer/View column; precedent = the SDLC-notebook NodeDomain metamodel and the
-two planes in the user's ER screenshot), `classification`, `locator`
+`samples/SNOW-CMDB.csv`), `layer` (`human | business | data | technology` — the
+four-value BDAT architecture view, user ruling 2026-07-31; extends the target
+sheet's three-value Layer/View column with the explicit Data layer so
+data-platform systems like the Snowflake catalog and psgmgr class as `data`
+rather than being folded into `business` or `technology`; precedent = the
+SDLC-notebook NodeDomain metamodel and the two planes in the user's ER
+screenshot), `classification`, `locator`
 (connection coordinates — unchanged discipline: service/TNS names stay in
 internal-local), `sdlc` (link to the module runbook / SDLC doc — every source is a
 participant in the SDLC process), `notes`.
