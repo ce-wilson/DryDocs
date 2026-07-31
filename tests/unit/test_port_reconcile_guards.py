@@ -291,6 +291,14 @@ def test_reconcile_gate_log_append_only_live() -> None:
 # payload, found by accident one at a time, with a prose workaround standing in for
 # a missing row for a week. This is test_no_shadow_definitions (C18) applied to port
 # dispositions: default-deny, with an allowlist that must carry a reason.
+#
+# J22 (2026-07-30): the walk also covers untracked-but-not-ignored paths. The J16
+# guard walked `git ls-files` only, so a NEW file passed the suite before `git add`
+# and failed it after — live incident: the N5 session ran the suite green, committed
+# docs/plan/load-map.html, and the very next full run failed this guard. The defect
+# window was "on main until someone runs the suite again", which inverts the guard's
+# purpose. Same fall-through semantics, wider walk; an untracked orphan has a third
+# legitimate resolution the message names (.gitignore it — local-only by intent).
 
 
 def glob_to_regex(pattern: str) -> re.Pattern[str]:
@@ -339,14 +347,36 @@ def manifest() -> dict:
     return yaml.safe_load(MANIFEST_FILE.read_text(encoding="utf-8"))
 
 
-def _tracked_files() -> list[str]:
+def _git_files(*extra_args: str) -> list[str]:
     try:
         out = subprocess.run(
-            ["git", "ls-files"], cwd=REPO, capture_output=True, text=True, check=True,
+            ["git", "ls-files", *extra_args],
+            cwd=REPO, capture_output=True, text=True, check=True,
         ).stdout
     except (OSError, subprocess.CalledProcessError):  # pragma: no cover
-        pytest.skip("git unavailable — the tracked tree cannot be enumerated")
+        pytest.skip("git unavailable — the tree cannot be enumerated")
     return [line for line in out.splitlines() if line]
+
+
+def _tracked_files() -> list[str]:
+    return _git_files()
+
+
+def _untracked_files() -> list[str]:
+    """Untracked-but-not-ignored paths — the pre-`git add` view (J22)."""
+    return _git_files("--others", "--exclude-standard")
+
+
+def fall_through_orphans(
+    paths: Iterable[str],
+    rows: list[tuple[str, re.Pattern[str]]],
+    allowed: list[tuple[str, re.Pattern[str]]],
+) -> list[str]:
+    """Paths resolving to neither a manifest row nor a reasoned default_ok entry."""
+    return [
+        p for p in paths
+        if resolve_path(p, rows) is None and resolve_path(p, allowed) is None
+    ]
 
 
 def test_glob_matcher_separator_and_first_match_rules() -> None:
@@ -404,19 +434,38 @@ def test_git_readme_decision_is_recorded(manifest: dict) -> None:
     assert "deliberately uncovered" in entry["reason"]
 
 
+def test_untracked_new_file_is_caught_before_add() -> None:
+    """J22 mechanics pin: a brand-new path with no disposition is an orphan in the
+    pre-commit view already — same fall-through semantics as the tracked walk —
+    while dispositioned or allowlisted paths stay clean (no false positives)."""
+    rows = _compiled([{"path": "docs/plan/*.html"}])
+    allowed = _compiled([{"path": "scratch-*.txt"}])
+
+    # dispositioned path: clean, tracked or not
+    assert fall_through_orphans(["docs/plan/board.html"], rows, allowed) == []
+    # the N5 shape: a NEW sibling with no row is caught NOW, not one commit later
+    assert fall_through_orphans(["docs/plan/new-surface.json"], rows, allowed) == [
+        "docs/plan/new-surface.json"
+    ]
+    # an allowlisted transient resolves — the reasoned-entry route, not silence
+    assert fall_through_orphans(["scratch-notes.txt"], rows, allowed) == []
+
+
 def test_no_tracked_path_falls_through_silently(manifest: dict) -> None:
-    """Every tracked path resolves to a row, or to an allowlist entry that says why
-    the default is right. Nothing resolves to `default:` by silence."""
+    """Every tracked AND untracked-but-not-ignored path resolves to a row, or to an
+    allowlist entry that says why the default is right. Nothing resolves to
+    `default:` by silence — and nothing waits for `git add` to be asked (J22)."""
     rows = _compiled(manifest["rows"])
     allowed = _compiled(manifest["default_ok"])
 
-    orphans = [
-        p for p in _tracked_files()
-        if resolve_path(p, rows) is None and resolve_path(p, allowed) is None
-    ]
+    untracked = set(_untracked_files())
+    orphans = fall_through_orphans([*_tracked_files(), *untracked], rows, allowed)
     assert not orphans, (
-        f"{len(orphans)} tracked path(s) resolve to PORT-MANIFEST `default:` with "
-        "nothing written down. Decide each one: add a row (it needs a real "
-        "disposition) or a default_ok entry with a reason (the default is right "
-        f"and here is why).\n  " + "\n  ".join(sorted(orphans)[:40])
+        f"{len(orphans)} path(s) resolve to PORT-MANIFEST `default:` with nothing "
+        "written down. Decide each one: add a row (it needs a real disposition), a "
+        "default_ok entry with a reason (the default is right and here is why) — "
+        "or, for an [untracked] path that is local-only by intent, .gitignore it.\n  "
+        + "\n  ".join(
+            f"{p} [untracked]" if p in untracked else p for p in sorted(orphans)[:40]
+        )
     )
