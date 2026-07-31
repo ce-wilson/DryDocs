@@ -26,108 +26,6 @@ Tags help grooming: `idea` · `bug` · `doc` · `source` (new data source) · `q
 
 <!-- add new ideas at the top -->
 
-- 2026-07-30 — [chore] **Ask spoke LLM-in-the-loop smoke on the agents-venv machine** (R5
-  closed on desktop with wire-level e2e via stub ADK + real drydocs-api/Neo4j; the real
-  graph_qa streaming path — /run_sse + step events + explore_refs from the live pipeline —
-  still wants one live two-question smoke where agents/.env exists, the R2 precedent).
-- 2026-07-30 — [question] **ADK session growth from step events**: agent.py now yields one
-  event per pipeline step; ADK persists yielded events into session history, so long Ask
-  sessions inflate memory_events/memory_chars (the R3 metrics will show it — that telemetry
-  doubling as the ADR 0007 "swap in a DB-backed session store before any soak" tripwire is
-  by design, but a partial=True or non-persisted event mode is worth checking in ADK 2.x).
-- 2026-07-30 — [idea] **Stub-ADK verification harness**: the R5 scratchpad stub (FastAPI,
-  /run_sse SSE + control-part handling + real ephemeral registration) was a clean way to
-  live-verify browser wiring without an LLM key — worth promoting into tests/integration or
-  a dev fixture instead of re-inventing it per session.
-
-- 2026-07-30 — [idea] **Source-registry id-field REDESIGN (user directive, chat): the flat
-  `id` does not work — it conflates the source SYSTEM with the extracted DATASET.** We
-  extract DIFFERENT data sets from the same system — from the Product Catalog (PAT):
-  DPROD-ontology datasets (Product, AreaProduct, Team, …) AND ORG-ontology datasets (the
-  org structure); from Control-M data likewise multiple extraction domains (SWO/software,
-  database, code, …). One registry row per system forces every dataset through one id +
-  one confirmed flag + one feeds_taxonomy list — which is exactly how catalog-pat vs
-  pat-catalog became "same string, different meaning" across repos (the T19 collision) and
-  why `feeds_taxonomy` lists keep widening instead of splitting. Direction to design (NOT
-  decided): two-level identity — source system (the connection/locator/classification
-  carrier) → extracted dataset (the gate/crosswalk/feeds_taxonomy/ontology-domain carrier,
-  each with its OWN confirmed state), with loaders binding to the dataset, not the system;
-  dataset keyed or tagged by ontology domain (DPROD | ORG | SWO | data-platform | code).
-  Sequencing: J21 (built 2026-07-30) hardened the CURRENT shape so nothing drops
-  meanwhile; the redesign should land TOGETHER WITH (or explicitly rule against) the N7
-  per-side overlay + the URN cross-repo identity handle + the reconcile same-id/
-  changed-meaning guard — one design session, HITL-gated (registry schema v2), not a
-  groom. Feeds the company T19 gate review rather than racing it.
-
-- 2026-07-29 — [idea] **N3's loader→source binding needs a per-side value overlay — the
-  company port (PORT-REPORT-e60822fc) DEFERRED N3–N6 over it (their T19), and the
-  deferral exposed a producer design limit + one nasty id collision.** Two company-side
-  blockers, both real: (1) producer `catalog.py` declares `source_id = "catalog-pat"`
-  but the company gates its 8 catalog loaders on `pat-catalog` — their registry has
-  BOTH ids as DIFFERENT feeds (`pat-catalog` = PAT People-Report org catalog,
-  confirmed; `catalog-pat` = separate team-report feed), while the producer has ONE
-  (`catalog-pat` = the whole catalog+PAT sample feed). Same string, different meaning
-  across repos — adopting the class values silently re-points 8 loaders' D3 gate, and
-  no test catches the VALUE (only presence/resolution). (2) ~13 company-only loaders
-  (snow_support_*, employee_roster, seal_deployments, autosys/controlm app-code
-  loaders, avg_run, …) carry no source_id → the derivation drops them from gating and
-  the ungated-loader guard fails. Company action: kept their hardcoded LOADER_SOURCE,
-  dropped the N4/N5/N6 surfaces + render_load_map from their board render, marked
-  their N3/N4/N5 blocked, filed T19; gate review requested by the user. **Producer
-  follow-up candidate (groom as N7 once the company gate rules):** class declarations
-  stay the producer DEFAULT; add a config overlay (loader name → source_id) that wins
-  over the class value — file ruled canonical-company in the manifest (the
-  dev-environment.yaml precedent), LOADER_SOURCE = derivation + overlay, guard tests
-  stay byte-identical both sides, company deltas live in the one per-side file. Also
-  record the catalog-pat≠pat-catalog id collision in BOTH repos' divergence ledgers
-  regardless of ruling, and note the value-level guard gap (a wrong-but-resolving
-  source_id passes; a company-side pin test on the catalog family would close it).
-  NOTE: their port head `e60822f` predates `1b51c04`, which added the
-  docs/plan/load-map.html manifest row their agent had to improvise around — the next
-  range pre-answers that disposition.
-
-- 2026-07-29 — [bug] **The J16 manifest-coverage guard has a tracked-only blind spot: a
-  NEW file passes the suite before `git add` and fails it after.** Live case same day:
-  the N5 session ran the full suite green, committed `docs/plan/load-map.html`, pushed —
-  and the very next full run failed `test_no_tracked_path_falls_through_silently`,
-  because the guard walks `git ls-files` and the pre-commit run couldn't see the
-  untracked file. The defect window is "on main until someone runs the suite again."
-  Candidate fixes: (a) the guard also sweeps untracked-but-not-ignored paths (`git
-  ls-files --others --exclude-standard`) so the PRE-commit run already fails; (b) a
-  ritual note is weaker but free. (a) looks strictly better — same-file semantics, just
-  a wider walk; check it doesn't false-positive on legitimately transient scratch files
-  at repo root before grooming.
-
-- 2026-07-29 — [chore] **4 taxonomy-ontology-map entries cite source ids that are NOT
-  source-registry entries** — caught by the new N4 load-map render on its first run
-  (`map_entries_without_registry_source`): `job-seal-app-ref` →
-  `controlm-variable-normalization`, `seal-doc-source-of-record` → `seal-pat-scrape`,
-  `doc-traceability-feedback` → `design-doc-outline`, `dl-contact-point` → `outlook-dl`.
-  Each names a real-but-unregistered feed, so the fix per entry is either (a) register
-  the source (add-source-object walkthrough / a lighter registry stub) or (b) re-point
-  the entry's `taxonomy.source` at the registered feed it actually rides. Some look
-  deliberate (outlook-dl has no feed by design — the DL gate's store-as-source
-  discussion); rule per entry at grooming, don't sweep.
-
-- 2026-07-29 — [idea] **SME feedback FB-03/FB-04 — page role designation + admin Agent Test
-  harness (both EXECUTED same day, retro-groom).** FB-03: pages need admin/SME designation —
-  `ModuleDef.access` ('all'|'sme'|'admin') + `canAccessModule()` in the registry, aside-nav
-  filtering + route guards (O13 idiom); Gates and Under the Hood designated 'sme'
-  (display-gating only under mock auth; server enforcement rides the O1 ADR). FB-04: an
-  admin REAL-TIME twin of Under the Hood — `/admin/agent-test` (light chrome, read-only per
-  O20): dropdown of the registry's non-deterministic modules (`retrieval:'agent'`: Explorer
-  graph-qa, Docs docmeta-qa), agent label, SME request bar, then per run: interpretation →
-  Cypher → return path → answer → metrics. Live via the existing lib/adk.ts client
-  (listApps/createSession/runAgent, VITE_ADK_URL); ADK unreachable → SYNTHESIZED demo trace
-  with the standard banner. Verified: user persona redirected off gated routes + nav filtered;
-  build/lint green; screenshot in session record. NOTE for the groom: this harness is an
-  early seat for R5's Ask spoke — R2's router landing should wire it before (or instead of)
-  building a separate probe page; also rules where `retrieval:'agent'` flags belong once R2
-  defines real agent apps. *Re-ruled same day (SME gate sign-off, config/gate-log.md
-  2026-07-29): delivered as the STANDALONE `web/public/agent-test.html` (dark-only, no auth,
-  ships in dist for the company port's live test) — the SPA fold-in was removed; FB-03
-  designations stand.*
-
 - 2026-07-29 — [question] **psgmgr replica vs Control-M XML export: which source wins per
   object when they disagree?** (Guardrail 3 of the XML-fed cmd-line resolution idea → G46/
   G47/G48; the build fills a nullable derived column and decides NO source-of-truth
@@ -138,19 +36,6 @@ Tags help grooming: `idea` · `bug` · `doc` · `source` (new data source) · `q
   CM_DEF_VJOB_DETAIL retirement note gains a second path. HITL — user/SME rules this,
   never a groom.
 
-- 2026-07-28 — [chore] **PARKED UNTIL AFTER THE PORT REVIEW: verify the `neo4j-drydocs` MCP
-  server actually works now.** It requires APOC, and APOC was silently ABSENT from the
-  `neo4jtest` container for weeks (`NEO4J_PLUGINS=[apoc]` set, `/plugins` empty — fixed
-  `33cfc68`, plugins now a mounted volume, apoc 174 procs + gds 471). So the server cannot
-  have functioned in that window and **has never been verified since the fix**. Check: the
-  server is `~/.claude.json` local scope, stdio, `mcp/neo4j:latest`, `NEO4J_DATABASE=drydocs`,
-  re-pointed to 7687 — confirm it connects and returns a query against the freshly reloaded
-  graph (210 `:CodeModule` is a convenient marker). Note the container was RECREATED, so also
-  re-confirm the port with `docker port neo4jtest` rather than trusting the config. Second,
-  smaller thing worth doing in the same pass: **GDS is new here** (471 procs) — nothing in
-  DryDocs calls it yet, so decide whether it earns a place (Epic R / graph-retrieval
-  benchmark) or is just available. Deliberately deferred so it does not interleave with the
-  port review.
 - 2026-07-28 — [question] **Retire the `depgraph` sibling repo entirely by bringing the SCANNER
   in-house?** The user's reaction to the fork merge was *"I didn't realize it was still used
   after we made it a module"* — and that instinct was half right in a way worth acting on. ADR
@@ -445,15 +330,6 @@ Tags help grooming: `idea` · `bug` · `doc` · `source` (new data source) · `q
   standard and `transform.py` still notes the canonical variable map is "a company-side
   ratified value". Candidate: bring both docs in as the ratified maps when the
   remediation M2 generalization opens (FR-REM-5's schedule/command/conditions slice).
-- 2026-07-23 — [chore] **Delete the rollback container** `neo4j-drydocs-ee` (stopped,
-  restart=no) + its two anonymous volumes once `neo4jtest` has survived a week of normal
-  use (week is up ~2026-07-30); also prune orphan volumes neo4j_data/neo4j_logs/
-  neo4j2_data/neo4j2_logs (attached to nothing; likely relics of pre-2026-07-02
-  containers — verify before pruning). The first-attempt community container `DryDocs`
-  was deleted 2026-07-23 (user-confirmed). MERGED IN 2026-07-28: the 2026-07-03 chore
-  about this same container's password being the literal string `<password>` — deleting
-  the container retires that too (the live `neo4jtest` has a real password), so no
-  separate action.
 - 2026-07-22 — [idea] **PDN trigger design: milestone/SLA grain + graph-computed slack,
   not per-job failure mail (SME, chat pm).** Current state: dev teams default ON/DO-MAIL
   + SHOUT to L2-on-failure → hundreds of ignored mails daily (alert fatigue — the
@@ -904,6 +780,33 @@ Tags help grooming: `idea` · `bug` · `doc` · `source` (new data source) · `q
 
 ## Recently groomed (audit trail)
 
+- 2026-07-30 — [idea] Source-registry id-field redesign (user directive: flat id conflates
+  source SYSTEM with extracted DATASET) + the 2026-07-29 per-side loader→source overlay
+  candidate (which had reserved the id) → **N7**, ONE fable/HITL-gated design session
+  bundling two-level identity, the overlay, the URN handle, and the reconcile
+  same-id/changed-meaning guard; feeds the company T19 gate review. Nothing decided at
+  groom — everything routes through the gate.
+- 2026-07-30 — [chore] 4 taxonomy-ontology-map entries citing unregistered source ids
+  (N4 render day-one finding) → **N8** (per-entry ruling: register / re-point / exempt;
+  outlook-dl expected exemption per the DL gate's store-as-source design).
+- 2026-07-30 — [bug] J16 manifest-coverage guard tracked-only blind spot (new file passes
+  pre-commit, fails post-commit — live N5 incident) → **J22** (widen the walk to
+  `git ls-files --others --exclude-standard`, false-positive check on scratch files).
+- 2026-07-30 — [chore/question/idea] the R5 follow-up trio → **R11** (Ask-spoke
+  LLM-in-the-loop smoke on the agents-venv machine), **R13** (ADK 2.x partial/
+  non-persisted event mode check vs the session-growth tripwire), **R12** (promote the
+  stub-ADK harness into a committed fixture).
+- 2026-07-30 — [chore] verify the neo4j-drydocs MCP server post-APOC-fix + GDS
+  disposition (parked-until-port-review; the review completed with PORT-REPORT-e60822fc)
+  → **G49**.
+- 2026-07-30 — [chore] delete rollback container neo4j-drydocs-ee + verify-then-prune the
+  orphan volumes (the neo4jtest probation week ended ~today; user pre-decided 2026-07-23)
+  → **G50**.
+- 2026-07-30 — [idea] SME feedback FB-03/FB-04 (page-role designations + agent-test
+  harness) — retro-recorded, NO item: both were executed and SME-re-ruled same day
+  (standalone `web/public/agent-test.html`; FB-03 designations stand); the "early seat
+  for R5" note was superseded by R5 building `/ask` directly. V10's audit covers the
+  runbook side.
 - 2026-07-29 — [doc] "create a SME-Runbook for each module" (user directive, chat) → new
   **Epic V** (sme-runbooks, phase 10): **V1** coverage rule — every modules-registry entry
   maps to a governed runbook, an explicit EXEMPT reason, or a frozen shrink-only
