@@ -5,8 +5,11 @@ item I2 / CLAUDE.md §0 session ritual) until the ``drydocs/cli.py`` entrypoint-
 TODO (MODULE_MAP.md) is resolved. Stdlib + ``drydocs.plan_board`` only.
 
 A default-paths run ALSO refreshes ``web/src/generated/gates.json`` (J17),
-``web/src/generated/enforcement-matrix.json`` (J20) and
-``web/src/generated/load-map.json`` (N4): all read sources this ritual edits
+``web/src/generated/enforcement-matrix.json`` (J20),
+``web/src/generated/load-map.json`` (N4) and
+``web/src/generated/software-registry.json`` (+ its ``web/public/vendor-icons/``
+assets — the software-registry <-> drydocs-icons soft link, 2026-07-31): all
+read sources this ritual edits
 (backlog item text; the gate-prompts tree; the source registry + N3 loader
 declarations), so a groom, gate-prompt add or loader change would otherwise
 silently drift them past their guards (``test_gates_json.py`` /
@@ -50,10 +53,12 @@ def main() -> None:
         import render_enforcement_matrix
         import render_gates
         import render_load_map
+        import render_software_registry
 
         render_gates.main()
         render_enforcement_matrix.main()
         render_load_map.main()
+        render_software_registry.main()
 
 
 if __name__ == "__main__":

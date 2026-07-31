@@ -12,8 +12,15 @@
 # sealId, support/EOL dates) are Phase-4 material — internal/-side only, never
 # here. Drivers/utilities/etc. (the catalog long tail) stay out by design.
 #
-# Vendor ids match drydocs-icons/manifest.json where an icon exists.
-# Guarded by tests/unit/test_software_registry.py.
+# Vendor ids match drydocs-icons/manifest.json where an icon exists — the SOFT
+# LINK for UI rendering (user directive 2026-07-31): by-id convention, with an
+# optional per-vendor `icon:` override where the two ids differ (abinitio ->
+# ab-initio). scripts/render_software_registry.py joins this file to the icon
+# manifest and emits web/src/generated/software-registry.json (+ copies the
+# display assets to web/public/vendor-icons/) on every default board render;
+# vendors with no icon are REPORTED in the json (vendors_without_icons), never
+# silently dropped, and never an error — the link is soft by design.
+# Guarded by tests/unit/test_software_registry.py + test_software_registry_json.py.
 # =============================================================================
 
 schema: drydocs.software-registry.v1
@@ -59,6 +66,7 @@ vendors:
   - id: abinitio
     name: Ab Initio Software
     publisher_url: https://www.abinitio.com/
+    icon: ab-initio               # manifest id differs from vendor id — the one explicit soft-link override
   - id: informatica
     name: Informatica
     publisher_url: https://www.informatica.com/

@@ -1,0 +1,221 @@
+{
+  "schema": "drydocs.software-registry-view.v1",
+  "generated_from": [
+    "config/taxonomy/software-registry.yaml",
+    "drydocs-icons/manifest.json"
+  ],
+  "note": "Soft link by id (vendor.icon override, else vendor.id). Vendors without a manifest icon are listed in vendors_without_icons — reported, never silent, never an error.",
+  "acronyms": {
+    "AIS": "Application Integration Streaming"
+  },
+  "drydocs_application_id": "DRYDOCS-SELF",
+  "vendors": [
+    {
+      "id": "neo4j",
+      "name": "Neo4j",
+      "publisher_url": "https://neo4j.com/",
+      "icon": {
+        "id": "neo4j",
+        "label": "neo4j",
+        "kind": "software",
+        "vendor": null,
+        "category": "platform",
+        "hex": "#4581C3",
+        "verified": true,
+        "asset": "vendor-icons/neo4j.svg",
+        "source": "vendors/packaged/neo4j.svg"
+      }
+    },
+    {
+      "id": "bmc",
+      "name": "BMC Software",
+      "publisher_url": "https://www.bmc.com/",
+      "icon": {
+        "id": "bmc",
+        "label": "BMC",
+        "kind": "software",
+        "vendor": null,
+        "category": "ops",
+        "hex": "#FE5000",
+        "verified": true,
+        "asset": "vendor-icons/bmc.svg",
+        "source": "vendors/packaged/bmc.svg"
+      }
+    },
+    {
+      "id": "oracle",
+      "name": "Oracle",
+      "publisher_url": "https://www.oracle.com/",
+      "icon": {
+        "id": "oracle",
+        "label": "Oracle",
+        "kind": "software",
+        "vendor": null,
+        "category": "platform",
+        "hex": "#C74634",
+        "verified": false,
+        "asset": "vendor-icons/oracle.svg",
+        "source": "vendors/external/oracle.svg"
+      }
+    },
+    {
+      "id": "psf",
+      "name": "Python Software Foundation",
+      "publisher_url": "https://www.python.org/",
+      "icon": null
+    },
+    {
+      "id": "abinitio",
+      "name": "Ab Initio Software",
+      "publisher_url": "https://www.abinitio.com/",
+      "icon": {
+        "id": "ab-initio",
+        "label": "Ab Initio",
+        "kind": "software",
+        "vendor": null,
+        "category": "integration",
+        "hex": "#E31A2E",
+        "verified": true,
+        "asset": "vendor-icons/ab-initio.png",
+        "source": "vendors/external/ab-initio/block.png"
+      }
+    },
+    {
+      "id": "informatica",
+      "name": "Informatica",
+      "publisher_url": "https://www.informatica.com/",
+      "icon": {
+        "id": "informatica",
+        "label": "Informatica",
+        "kind": "software",
+        "vendor": null,
+        "category": "integration",
+        "hex": "#FF4D00",
+        "verified": false,
+        "asset": "vendor-icons/informatica.svg",
+        "source": "vendors/external/informatica.svg"
+      }
+    },
+    {
+      "id": "apache",
+      "name": "Apache Software Foundation",
+      "publisher_url": "https://apache.org/",
+      "icon": null
+    },
+    {
+      "id": "broadcom",
+      "name": "Broadcom",
+      "publisher_url": "https://www.broadcom.com/",
+      "icon": null
+    }
+  ],
+  "vendors_without_icons": [
+    "psf",
+    "apache",
+    "broadcom"
+  ],
+  "products": [
+    {
+      "id": "neo4j",
+      "vendor": "neo4j",
+      "name": "Neo4j",
+      "category": "DBMS - Graph Database",
+      "role": "graph-platform",
+      "type": "commercial",
+      "versions": [
+        "5.x"
+      ],
+      "used_by_drydocs": true
+    },
+    {
+      "id": "neo4j-bloom",
+      "vendor": "neo4j",
+      "name": "Neo4j Bloom",
+      "category": "BI - Graph Analytics/Visualization",
+      "role": "tool",
+      "type": "commercial",
+      "versions": [
+        "2.x"
+      ],
+      "used_by_drydocs": false
+    },
+    {
+      "id": "controlm",
+      "vendor": "bmc",
+      "name": "Control-M",
+      "category": "Workload Automation",
+      "role": "orchestrator",
+      "type": "commercial",
+      "versions": [
+        "9.0.21.300"
+      ],
+      "used_by_drydocs": true
+    },
+    {
+      "id": "oracle-db",
+      "vendor": "oracle",
+      "name": "Oracle Database",
+      "category": "DBMS - Relational",
+      "role": "data-platform",
+      "type": "commercial",
+      "versions": [
+        "19c"
+      ],
+      "used_by_drydocs": true
+    },
+    {
+      "id": "python",
+      "vendor": "psf",
+      "name": "Python",
+      "category": "Language Runtime",
+      "role": "tool",
+      "type": "open-source",
+      "versions": [
+        "3.11+"
+      ],
+      "used_by_drydocs": true
+    },
+    {
+      "id": "abinitio",
+      "vendor": "abinitio",
+      "name": "Ab Initio (Co>Operating System)",
+      "category": "Data Integration (ETL)",
+      "role": "tool",
+      "type": "commercial",
+      "versions": [],
+      "used_by_drydocs": false
+    },
+    {
+      "id": "informatica-powercenter",
+      "vendor": "informatica",
+      "name": "PowerCenter",
+      "category": "Data Integration (ETL)",
+      "role": "tool",
+      "type": "commercial",
+      "versions": [],
+      "used_by_drydocs": false
+    },
+    {
+      "id": "airflow",
+      "vendor": "apache",
+      "name": "Apache Airflow",
+      "category": "Workload Automation",
+      "role": "orchestrator",
+      "type": "open-source",
+      "versions": [
+        "3.x"
+      ],
+      "used_by_drydocs": false
+    },
+    {
+      "id": "autosys",
+      "vendor": "broadcom",
+      "name": "Broadcom Workload Automation",
+      "category": "Workload Automation",
+      "role": "orchestrator",
+      "type": "commercial",
+      "versions": [],
+      "used_by_drydocs": false
+    }
+  ]
+}
