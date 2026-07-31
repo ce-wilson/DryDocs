@@ -33,7 +33,7 @@ from .base import BaseLoader, compute_row_checksum
 
 class ControlMFoldersLoader(BaseLoader):
     name: ClassVar[str] = "controlm_folders.v1"
-    source_id: ClassVar[str | None] = "controlm-psgmgr"
+    source_id: ClassVar[str | None] = "controlm@[db].psgmgr.cm_def_vtab"
     cypher_path: ClassVar[Path | None] = (
         Path(__file__).resolve().parent / "cypher" / "controlm_folders.cypher"
     )

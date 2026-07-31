@@ -48,15 +48,27 @@ def test_committed_load_map_html_matches_regeneration():
 
 
 def test_every_registered_source_has_a_row():
+    """v2: every DATASET row (registry order), then every doc-ledger corpus
+    (the union — pipeline twins dropped at N9); systems get their own list."""
     committed = json.loads(COMMITTED.read_text(encoding="utf-8"))
     registry = yaml.safe_load(
         (REPO / "config" / "source-registry.yaml").read_text(encoding="utf-8")
+    )
+    doc_registry = yaml.safe_load(
+        (REPO / "config" / "doc-source-registry.yaml").read_text(encoding="utf-8")
     )["sources"]
     rendered = [s["id"] for s in committed["sources"]]
-    assert rendered == [e["id"] for e in registry], (
-        "a registered source is absent from (or reordered in) load-map.json — "
-        "silent absence is the defect N4 exists to end"
+    expected = [e["id"] for e in registry["datasets"]] + [e["id"] for e in doc_registry]
+    assert rendered == expected, (
+        "a registered dataset/doc corpus is absent from (or reordered in) "
+        "load-map.json — silent absence is the defect N4 exists to end"
     )
+    assert [s["id"] for s in committed["systems"]] == [
+        e["id"] for e in registry["systems"]
+    ], "a v2 system row is absent from load-map.json"
+    assert [r["id"] for r in committed["retired"]] == [
+        e["id"] for e in registry["retired"]
+    ], "the D4 retired list drifted from the render"
 
 
 def test_ledger_states_are_the_three_governed_ones():

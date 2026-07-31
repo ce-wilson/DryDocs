@@ -16,6 +16,7 @@ import yaml
 ROOT = Path(__file__).resolve().parent.parent.parent
 AUDIT_FILE = ROOT / "config" / "audit-fields.yaml"
 REGISTRY_FILE = ROOT / "config" / "source-registry.yaml"
+DOC_REGISTRY_FILE = ROOT / "config" / "doc-source-registry.yaml"
 
 FROZEN_ENVELOPE = [
     "source_created_by",
@@ -32,7 +33,11 @@ def audit() -> dict:
 
 @pytest.fixture(scope="module")
 def registry() -> dict:
-    return yaml.safe_load(REGISTRY_FILE.read_text(encoding="utf-8"))
+    """v2: the audit ledger keys on DATASET ids, plus the doc-ledger corpora
+    the runtime registry unions in (their pipeline twins dropped at N9)."""
+    reg = yaml.safe_load(REGISTRY_FILE.read_text(encoding="utf-8"))
+    doc = yaml.safe_load(DOC_REGISTRY_FILE.read_text(encoding="utf-8"))
+    return {"sources": list(reg["datasets"]) + list(doc["sources"])}
 
 
 def test_schema_and_classification(audit: dict) -> None:
@@ -77,7 +82,9 @@ def test_confirmed_entries_are_gated_and_envelope_only(audit: dict) -> None:
 def test_controlm_mapping_matches_the_gate(audit: dict) -> None:
     """The gate-confirmed Control-M envelope (controlm-q1q3-phase1):
     CREATION_* + CHANGE_* on jobs; VERSION_* excluded as duplicates."""
-    entry = next(s for s in audit["sources"] if s["id"] == "controlm-psgmgr")
+    entry = next(
+        s for s in audit["sources"] if s["id"] == "controlm@[db].psgmgr.cm_def_vjob"
+    )
     vjob = next(o for o in entry["objects"] if o["object"] == "CM_DEF_VJOB")
     assert vjob["mapping"]["source_created_by"] == "CREATION_USER"
     assert vjob["mapping"]["source_updated_by"] == "CHANGE_USERID"

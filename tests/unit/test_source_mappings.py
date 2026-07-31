@@ -181,7 +181,8 @@ def test_malformed_docs_raise(bad: dict, match: str) -> None:
 
 
 # ---------------------------------------------------------------------------
-# The committed controlm-psgmgr.yaml ledger (doc 08 Phase 0)
+# The committed psgmgr.yaml ledger (doc 08 Phase 0; renamed from
+# controlm-psgmgr.yaml at the N9 v2 migration — carrier-scope key)
 # ---------------------------------------------------------------------------
 
 _EXPECTED_OBJECTS = [
@@ -197,11 +198,11 @@ _EXPECTED_OBJECTS = [
 
 @pytest.fixture(scope="module")
 def controlm() -> SourceMapping:
-    return SourceMapping.load_source("controlm-psgmgr")
+    return SourceMapping.load_source("psgmgr")
 
 
 def test_committed_ledger_loads(controlm: SourceMapping) -> None:
-    assert controlm.source == "controlm-psgmgr"
+    assert controlm.source == "psgmgr"    # v2 SYSTEM id (carrier scope)
     assert controlm.classification == "Internal-Public"
     assert controlm.schema == "drydocs.source-mapping.v1"
     assert controlm.objects() == _EXPECTED_OBJECTS

@@ -1,0 +1,28 @@
+# =============================================================================
+# config/loader-source-overlay.yaml — the PER-SIDE loader -> dataset binding
+# overlay (D2, gate source-registry-v2 SIGNED OFF 2026-07-31).
+#
+# Each loader class declares its DEFAULT dataset id (BaseLoader.source_id, the
+# N3 binding). An entry here WINS over that default for THIS repo only —
+# rebinding happens in config, never in code. This is the company T19 rebind
+# seam: the ~8 mismatched + ~13 unbound company loaders re-point here without
+# touching ported loader modules.
+#
+# Shape:
+#   overrides:
+#     <loader name (the class's `name` ClassVar, e.g. controlm_folders.v1)>:
+#       <registered dataset id>
+#
+# GUARDED (extends the J21 agreement guard): every override value MUST resolve
+# to a registered dataset id and MUST NOT be a retired id —
+# SourceRegistry.from_yaml refuses the whole overlay otherwise (fail fast,
+# never a silent mis-bind).
+#
+# The producer repo ships this EMPTY: producer class defaults are already the
+# registered v2 dataset ids.
+# =============================================================================
+schema: drydocs.loader-source-overlay.v1
+classification: Internal-Public
+updated: 2026-07-31
+
+overrides: {}

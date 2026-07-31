@@ -385,6 +385,42 @@
       ]
     },
     {
+      "kind": "log-entry",
+      "date": "2026-07-31",
+      "title": "AMENDMENT: source-registry v2 id migration — old→new id map (N9 build; gate source-registry-v2 Q6)",
+      "status": "recorded",
+      "prompt_files": [
+        "config/gate-prompts/airflow-crosswalk.yaml",
+        "config/gate-prompts/autosys-crosswalk.yaml",
+        "config/gate-prompts/bmc-docs-lexical-load.yaml",
+        "config/gate-prompts/controlm-avg-run-supplement.yaml",
+        "config/gate-prompts/controlm-hosts-topology.yaml",
+        "config/gate-prompts/controlm-q1q3-phase1.yaml",
+        "config/gate-prompts/doc-traceability-feedback.yaml",
+        "config/gate-prompts/seal-attribution-match-policy.yaml",
+        "config/gate-prompts/self-documentation-code-graph.yaml",
+        "config/gate-prompts/source-registry-v2.yaml"
+      ],
+      "log_ref": "config/gate-log.md:1105",
+      "unblocks": [
+        "K2",
+        "N1",
+        "N7",
+        "N8",
+        "N9",
+        "O12",
+        "P1",
+        "P2",
+        "P3",
+        "P4",
+        "P5",
+        "C19",
+        "Q2",
+        "S3",
+        "G33"
+      ]
+    },
+    {
       "kind": "prompt-only",
       "date": null,
       "title": "bmc-docs-example (gate page rendered — session not yet run)",

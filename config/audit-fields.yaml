@@ -30,7 +30,7 @@
 # =============================================================================
 schema: drydocs.audit-fields.v1
 classification: Internal-Public
-updated: 2026-07-14
+updated: 2026-07-31                    # N9: re-keyed to the v2 dataset ids (gate source-registry-v2; Q6 transfers)
 
 # The four envelope property names, frozen (test-enforced).
 envelope:
@@ -40,7 +40,7 @@ envelope:
   - source_updated_at
 
 sources:
-  - id: controlm-psgmgr                      # config/source-registry.yaml id
+  - id: "controlm@[db].psgmgr.cm_def_vjob"   # config/source-registry.yaml v2 dataset id
     status: confirmed
     decided_by: controlm-q1q3-phase1         # SME gate 2026-07-07 (config/gate-log.md)
     objects:
@@ -59,6 +59,11 @@ sources:
           (SME 2026-07-06) — stays a plain property, not envelope. Derived
           employee_sid (strip trailing 'p' from *_USER) approved at the gate but
           built separately. Loader: controlm_jobs.cypher.
+
+  - id: "controlm@[db].psgmgr.cm_def_vtab"
+    status: confirmed
+    decided_by: controlm-q1q3-phase1
+    objects:
       - object: CM_DEF_VTAB                  # -> :ControlMFolder
         mapping:                             # no creation columns on folders
           source_updated_by: LAST_UPDATED_USER
@@ -70,15 +75,42 @@ sources:
           kept until the doc-06 Phase 3 migration retires them. Loader:
           controlm_folders.cypher.
 
-  - id: seal-extract
+  # Newly per-row-visible psgmgr datasets (v2 split, N9): their crosswalk
+  # gates signed (q1q3 / hosts-topology / avg-run) but the ENVELOPE gate never
+  # ran object-by-object for these — stubs until a doc-06 Phase 4 pass.
+  - id: "controlm@[db].psgmgr.cm_def_lnki_p_vw"
     status: stub                             # envelope gate not run (doc 06 Phase 4)
-    notes: "Internal-Confidential — real column mapping goes to the internal twin when gated."
+    notes: "Link view — likely no authorship columns beyond the def tables'; census pending."
 
-  - id: catalog-pat
+  - id: "controlm@[db].psgmgr.cm_def_lnko_p_vw"
     status: stub                             # envelope gate not run (doc 06 Phase 4)
-    notes: "Internal-Confidential — real column mapping goes to the internal twin when gated."
+    notes: "Link view — likely no authorship columns beyond the def tables'; census pending."
 
-  - id: software-registry
+  - id: "controlm@[db].psgmgr.cm_def_setvar_vw"
+    status: stub                             # envelope gate not run (doc 06 Phase 4)
+    notes: "Variables view — feeds the C3/C4 normalizer, no direct graph loader."
+
+  - id: "controlm@[db].psgmgr.cm_hosts"
+    status: stub                             # envelope gate not run — hosts-topology gate covered shape, not authorship
+    notes: "Envelope columns unknown; census pending (P4)."
+
+  - id: "controlm@[db].psgmgr.cm_avg_run"
+    status: stub                             # envelope gate not run — avg-run gate covered the supplement join, not authorship
+    notes: "Aggregate stats table — authorship envelope likely n/a; decide at a Phase 4 gate."
+
+  - id: "seal:app-extract"
+    status: stub                             # envelope gate not run (doc 06 Phase 4)
+    notes: "Confidential handling — real column mapping goes to the internal twin when gated."
+
+  - id: "pat:product-catalog"
+    status: stub                             # envelope gate not run (doc 06 Phase 4)
+    notes: "Confidential handling — real column mapping goes to the internal twin when gated."
+
+  - id: "pat:people-report"
+    status: stub                             # envelope gate not run (doc 06 Phase 4; split from the catalog-pat stub at N9)
+    notes: "Confidential handling — real column mapping goes to the internal twin when gated."
+
+  - id: "repo:software-registry"
     status: stub                             # repo-committed ledger: git history IS the audit trail
     notes: "Envelope likely unnecessary (git blame answers who/when); decide at a Phase 4 gate."
 
@@ -100,7 +132,7 @@ sources:
       source_url) live on the :Document node and the local PDF is gitignored. Same
       permanent-stub rationale as bmc-docs.
 
-  - id: design-docs
+  - id: "repo:design-docs"
     status: stub                             # repo-native markdown/yaml: git history IS the audit envelope; no source-system created_by/updated_at columns exist
     notes: >
       Confirmed 2026-07-20 (gate doc-traceability-feedback). The source is the
@@ -111,21 +143,21 @@ sources:
       optional author field). Same permanent-stub rationale as bmc-docs /
       essential-graphrag: no source-system audit columns exist to map.
 
-  - id: airflow-mwaa
+  - id: "airflow:dag-export"
     status: stub                             # envelope gate not run — crosswalk-only activation, no loader/live export
     notes: >
       Confirmed 2026-07-14 (gate airflow-crosswalk) as a crosswalk sign-off only.
       Native audit columns are unknowable until a live MWAA DAG export exists;
       the envelope gate runs with the future loader gate.
 
-  - id: autosys-export
+  - id: "autosys:export"
     status: stub                             # envelope gate not run — crosswalk-only activation, no loader/live export
     notes: >
       Confirmed 2026-07-14 (gate autosys-crosswalk) as a crosswalk sign-off only.
       Native audit columns are unknowable until a live JIL export exists; the
       envelope gate runs with the future loader gate.
 
-  - id: stg-app-fact
+  - id: "controlm@[db].drydocs_stg.stg_app_fact"
     status: stub                             # envelope gate not run — staging table authored by our own normalizer
     notes: >
       Confirmed 2026-07-14 (gate seal-attribution-match-policy; K2 loader built
@@ -135,7 +167,7 @@ sources:
       touches). Whether a source-authorship envelope even applies to a
       self-authored staging table is a doc-06 Phase 4 gate question.
 
-  - id: depgraph-snapshot
+  - id: "repo:depgraph-snapshot"
     status: stub                             # deterministic derivation of our own tree: git IS the audit trail
     notes: >
       Confirmed 2026-07-27 (gate self-documentation-code-graph; code_snapshot.v1

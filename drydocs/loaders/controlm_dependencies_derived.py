@@ -25,7 +25,9 @@ from .base import BaseLoader
 
 class ControlMDependenciesDerivedLoader(BaseLoader):
     name: ClassVar[str] = "controlm_dependencies_derived.v1"
-    source_id: ClassVar[str | None] = "controlm-psgmgr"
+    # anchor dataset of the IN⋈OUT condition pairing (recorded on the dataset
+    # row's note at the N9 per-row confirmation, 2026-07-31)
+    source_id: ClassVar[str | None] = "controlm@[db].psgmgr.cm_def_lnki_p_vw"
     cypher_path: ClassVar[Path | None] = (
         Path(__file__).resolve().parent / "cypher" / "controlm_dependencies_derived.cypher"
     )

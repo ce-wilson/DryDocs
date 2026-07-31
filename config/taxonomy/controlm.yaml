@@ -15,7 +15,7 @@
 taxonomy: controlm
 domain: technology
 taxonomy_path_root: technology/orchestration/control-m
-source: controlm-psgmgr            # config/source-registry.yaml
+source: controlm                   # config/source-registry.yaml v2 SYSTEM id (the origin system this hierarchy classifies; the extracts are its controlm@[db].psgmgr.* datasets)
 adapter: csv-sample                 # OracleAdapter (psgmgr) in production
 authority: bmc-baseline             # config/precedence.yaml tier 1
 classification: Internal            # config/classification.yaml (source sensitivity)

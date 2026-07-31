@@ -160,6 +160,7 @@ from .loaders.code_snapshot import (
 )
 from drydocs_core.neo4j_client import Neo4jClient
 from drydocs_core.source_registry import (
+    RetiredSourceIdError,
     SourceRegistry,
     UnconfirmedSourceError,
     UnknownSourceError,
@@ -340,8 +341,8 @@ CANONICAL_LOAD_SEQUENCE: tuple[tuple[str, str, str], ...] = (
     ("load-code-snapshot",       "optional",
      "G33 self-documentation; ritual-driven (newest committed snapshot)"),
     ("load-seal-attribution",    "gated",
-     "stg-app-fact is confirmed:false producer-side; needs ingest-controlm + "
-     "refresh-reference first (gate §E preconditions)"),
+     "the stg_app_fact dataset (controlm@[db].drydocs_stg.stg_app_fact) needs "
+     "ingest-controlm + refresh-reference first (gate §E preconditions)"),
     ("m1-verify",                "standing", "M1 invariants"),
     ("m3-verify",                "standing", "M3 invariants"),
 )
@@ -363,9 +364,19 @@ def _gate_source(source_id: str) -> None:
     """Confirmed-gate (D3): fail fast (exit 2) unless the source is SME-confirmed."""
     try:
         _source_registry().require_confirmed(source_id)
-    except (UnconfirmedSourceError, UnknownSourceError) as exc:
+    except (UnconfirmedSourceError, UnknownSourceError, RetiredSourceIdError) as exc:
         console.print(f"[red]{exc}[/]")
         raise typer.Exit(2) from exc
+
+
+def _gate_loader(cls: type) -> None:
+    """Confirmed-gate for a LOADER: gate the dataset id the loader actually
+    binds to — the per-side overlay entry when one exists (D2,
+    config/loader-source-overlay.yaml wins over the class default), else the
+    class's own N3 ``source_id`` declaration."""
+    effective = _source_registry().effective_source_id(cls.name, cls.source_id)
+    if effective is not None:
+        _gate_source(effective)
 
 def _client(database: str | None = None) -> Neo4jClient:
     """Build the Neo4j client from settings; ``database`` overrides the
@@ -589,7 +600,7 @@ def load(
     if cls is None:
         console.print(f"[red]Unknown loader: {name}[/]"); raise typer.Exit(2)
     if name in LOADER_SOURCE:
-        _gate_source(LOADER_SOURCE[name])  # confirmed-gate before any DB write
+        _gate_loader(cls)  # confirmed-gate (overlay-aware, D2) before any DB write
     if csv_path is not None:
         adapter = _csv_adapter(csv_path)
     elif sql is not None:
@@ -614,9 +625,10 @@ def refresh_reference(
 ) -> None:
     """M1 reference-refresh chain (catalog + SEAL + dev teams). Weekly cadence."""
     # Confirmed-gate (D3): every feed the chain touches must be SME-confirmed
-    # before any write — derived from the chain's own source_id declarations.
-    for source_id in sorted({cls.source_id for _, cls, _ in REFRESH_REFERENCE_CHAIN}):
-        _gate_source(source_id)
+    # before any write — derived from the chain's own source_id declarations
+    # (overlay-aware per D2).
+    for cls in {cls for _, cls, _ in REFRESH_REFERENCE_CHAIN}:
+        _gate_loader(cls)
     with _client() as cli:
         bs = refresh_business_segments(cli)
         console.print(f"[cyan]Business segments active: {bs['codes']}[/]")
@@ -885,7 +897,7 @@ def load_software_registry(
     and wires DryDocs' own stack to the reserved :BusinessApplication node via
     USES_SOFTWARE. Idempotent — the YAML is the source of truth.
     """
-    _gate_source(SoftwareRegistryLoader.source_id)  # confirmed-gate before any DB write
+    _gate_loader(SoftwareRegistryLoader)  # confirmed-gate (overlay-aware) before any DB write
     if not registry_path.exists():
         console.print(f"[red]Missing: {registry_path}[/]"); raise typer.Exit(1)
     adapter = RegistryYamlAdapter(registry_path)
@@ -916,7 +928,7 @@ def load_batch_orchestrators(
     `drydocs load-software-registry` first. Unmapped strings are REPORTED
     (flagged on the app node + listed below), never guessed.
     """
-    _gate_source(BatchPortOrchestratorLoader.source_id)  # confirmed-gate before any DB write
+    _gate_loader(BatchPortOrchestratorLoader)  # confirmed-gate (overlay-aware) before any DB write
     for path in (apps_path, platforms_path):
         if not path.exists():
             console.print(f"[red]Missing: {path}[/]"); raise typer.Exit(1)
@@ -981,7 +993,7 @@ def load_code_snapshot(
     discriminator is a positive assertion (meta present AND meta.tree == false;
     gate §G1(a) + the 2026-07-27 build note). abs_path never loads (§H4).
     """
-    _gate_source(CodeSnapshotLoader.source_id)  # confirmed-gate before any DB write
+    _gate_loader(CodeSnapshotLoader)  # confirmed-gate (overlay-aware) before any DB write
     try:
         path = Path(file) if file else select_newest_snapshot(snapshot_dir)
         adapter = CodeSnapshotAdapter(path)
@@ -1249,7 +1261,7 @@ def load_bmc_docs(
     :SoftwareProduct via DESCRIBES (MATCH only — run
     `drydocs load-software-registry` first).
     """
-    _gate_source(BmcDocsLoader.source_id)  # confirmed-gate before any DB write
+    _gate_loader(BmcDocsLoader)  # confirmed-gate (overlay-aware; doc-ledger union) before any DB write
     if not corpus_dir.exists():
         console.print(f"[red]Missing: {corpus_dir}[/]"); raise typer.Exit(1)
     adapter = BmcDocsAdapter(corpus_dir)
@@ -1282,7 +1294,7 @@ def load_doc_traceability(
     when the author resolves to a real :Employee). Idempotent; fully
     deterministic parsing (no LLM).
     """
-    _gate_source(DesignDocSectionsLoader.source_id)  # confirmed-gate before any DB write
+    _gate_loader(DesignDocSectionsLoader)  # confirmed-gate (overlay-aware) before any DB write
     if not design_dir.exists():
         console.print(f"[red]Missing: {design_dir}[/]"); raise typer.Exit(1)
     dirs = {"design": design_dir, "feedback": feedback_dir}
@@ -1330,7 +1342,7 @@ def load_essential_graphrag(
     vocabulary confirmed at the bmc-docs-lexical-load gate. The PDF is
     local-only (gitignored); the graph cites source_url.
     """
-    _gate_source(EssentialGraphragLoader.source_id)  # confirmed-gate before any DB write
+    _gate_loader(EssentialGraphragLoader)  # confirmed-gate (overlay-aware; doc-ledger union) before any DB write
     if not pdf_path.exists():
         console.print(f"[red]Missing: {pdf_path} (the PDF is local-only/gitignored — "
                       "obtain it from the source_url in config/source-registry.yaml)[/]")
@@ -1362,7 +1374,7 @@ def load_seal_attribution(
     + pinned = eligible) are stamped on the :JobRun and reconciled by
     graph-tests/seal-attribution-coverage.yaml.
     """
-    _gate_source(SealAttributionLoader.source_id)  # confirmed-gate before any DB write
+    _gate_loader(SealAttributionLoader)  # confirmed-gate (overlay-aware) before any DB write
     if csv_path is not None:
         inner = _csv_adapter(csv_path)
     else:
@@ -1482,9 +1494,17 @@ def ingest_controlm(
             f"[red]--phase must be nodes | relationships | all (got {phase!r}).[/]"
         )
         raise typer.Exit(2)
-    # Confirmed-gate (D3): the Control-M source must be SME-confirmed before
-    # any write — the id comes from the chain's own declaration (N3).
-    _gate_source(ControlMFoldersLoader.source_id)
+    # Confirmed-gate (D3): every Control-M dataset the chain touches must be
+    # SME-confirmed before any write — since the v2 registry split (N9) the
+    # stages bind DIFFERENT psgmgr datasets, so each stage's own declaration
+    # gates (overlay-aware per D2), not a single umbrella id.
+    for cls in {
+        cls
+        for _, cls, *_ in (
+            CONTROLM_NODE_STAGES + CONTROLM_PART2_STAGES + CONTROLM_REL_STAGES
+        )
+    }:
+        _gate_loader(cls)
     scope = _scope_binds(folder, run_as, developer_sid, row_cap)
     # Stage declarations live at module level (N3: CONTROLM_*_STAGES) so the
     # command's chain and the load map render from the same source.

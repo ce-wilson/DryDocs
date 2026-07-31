@@ -34,7 +34,7 @@ from .base import BaseLoader
 
 class ControlMHostsLoader(BaseLoader):
     name: ClassVar[str] = "controlm_hosts.v1"
-    source_id: ClassVar[str | None] = "controlm-psgmgr"
+    source_id: ClassVar[str | None] = "controlm@[db].psgmgr.cm_hosts"
     cypher_path: ClassVar[Path | None] = (
         Path(__file__).resolve().parent / "cypher" / "controlm_hosts.cypher"
     )

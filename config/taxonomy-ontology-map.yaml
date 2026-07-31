@@ -22,7 +22,7 @@ mappings:
   # ---- Example: a confirmed orchestration mapping (already live) -----------
   - id: job-contains
     taxonomy:
-      source: controlm-psgmgr
+      source: "controlm@[db].psgmgr.cm_def_vjob"
       element: "Folder contains Job"      # raw classification from the import
     ontology:
       from_node: ControlMFolder                 # prov:Collection
@@ -41,7 +41,7 @@ mappings:
   # ---- 2026-07-07 gate: Q1–Q3 resolutions (controlm-q1q3-phase1) ------------
   - id: application-contains-folder
     taxonomy:
-      source: controlm-psgmgr
+      source: "controlm@[db].psgmgr.cm_def_vtab"
       element: "Control-M APPLICATION groups folders (CM_DEF_VJOB.APPLICATION — NOT the business application)"
     ontology:
       from_node: ControlMApplication            # prov:Collection (new label, this gate)
@@ -65,7 +65,7 @@ mappings:
 
   - id: folder-scheduled-on
     taxonomy:
-      source: controlm-psgmgr
+      source: "controlm@[db].psgmgr.cm_def_vtab"
       element: "Folder is scheduled on a Control-M server (data center)"
     ontology:
       from_node: ControlMFolder                 # prov:Collection
@@ -83,7 +83,7 @@ mappings:
 
   - id: job-requires-in-condition
     taxonomy:
-      source: controlm-psgmgr
+      source: "controlm@[db].psgmgr.cm_def_lnki_p_vw"
       element: "Job requires a named IN condition before it runs"
     ontology:
       from_node: ControlMJob               # prov:Activity
@@ -101,7 +101,7 @@ mappings:
 
   - id: job-emits-out-condition
     taxonomy:
-      source: controlm-psgmgr
+      source: "controlm@[db].psgmgr.cm_def_lnko_p_vw"
       element: "Job emits a named OUT condition on completion (SIGN +/-)"
     ontology:
       from_node: ControlMJob               # prov:Activity
@@ -119,7 +119,7 @@ mappings:
 
   - id: job-was-informed-by
     taxonomy:
-      source: controlm-psgmgr
+      source: "controlm@[db].psgmgr.cm_def_lnki_p_vw"   # the IN⋈OUT pairing's anchor dataset (see the dataset row's note)
       element: "Successor job depends on predecessor via shared OUT→IN condition (derived)"
     ontology:
       from_node: ControlMJob               # prov:Activity (successor)
@@ -188,7 +188,7 @@ mappings:
   # ---- REQUIRES_SCHEDULER (backlog C6, 2026-07-09) — REJECTED/superseded at C12 ----
   - id: requires-scheduler
     taxonomy:
-      source: seal-extract
+      source: "seal:app-extract"
       element: "A BatchProcessing data port requires a scheduler technology (which orchestrator runs its batch)"
     ontology:
       from_node: Port                       # as registered; the pre-gate HOIST direction was absorbed by the reg_uses_software landing (that edge is app-level already), so no reshape ever applied
@@ -222,7 +222,7 @@ mappings:
 
   - id: application-as-dataproduct
     taxonomy:
-      source: seal-extract
+      source: "seal:app-extract"
       element: "BusinessApplication (SEAL-registered) is a data-product/asset record, not a software agent"
     ontology:
       from_node: BusinessApplication               # CURRENT (active): prov:SoftwareAgent — see node_classifications
@@ -255,7 +255,7 @@ mappings:
 
   - id: seal-tom-attribution
     taxonomy:
-      source: seal-extract
+      source: "seal:app-extract"
       element: "SEAL Technical Operating Model (TOM) role-holders (gate §B revised fixed 7: application_owner, primary_information_owner, backup_information_owner, cto, technology_risk_controls, design_authority, operate_manager L1/L2) attributed to the BusinessApplication asset"
     ontology:
       from_node: BusinessApplication                # PROPOSED class: prov:Entity / dprod:DataProduct
@@ -341,7 +341,7 @@ mappings:
 
   - id: product-cabinet-attribution
     taxonomy:
-      source: catalog-pat
+      source: "pat:product-catalog"
       element: "Product Cabinet role-holders (Area Product Owner, Product Owner, Product Architect, Tech Partner, Data Owner, Data Certifier, Analytics Lead — exactly the fixed 7; NO shared cto, per the 2026-07-20 in-session SME answers) attributed to the Product / AreaProduct PAT hierarchy nodes (2026-07-10 gate §B split, backlog K5)"
     ontology:
       from_node: "Product | AreaProduct"    # dd:Product / dd:AreaProduct (local catalog hierarchy; prov:Entity)
@@ -484,7 +484,7 @@ mappings:
   # ---- Example: a PROPOSED mapping awaiting the SME gate -------------------
   - id: oracle-schema-asset
     taxonomy:
-      source: oracle-schemas
+      source: "oracle:schema-inventory"
       element: "Schema contains Table (script reads/writes Table)"
     ontology:
       from_node: ControlMJob               # or Script (prov:Entity/Plan)
@@ -510,7 +510,7 @@ mappings:
   # no graph write.
   - id: jobrun-observation
     taxonomy:
-      source: controlm-psgmgr
+      source: "controlm@[db].psgmgr.cm_hist_vw"   # the run-history view got its own v2 dataset row at N9
       element: "Job execution produced a run with a status at a time (run-history source: psgmgr CM_HIST_VW)"
     ontology:
       from_node: ControlMJobRun            # planned execution node (prov:Activity)
@@ -602,7 +602,7 @@ mappings:
   # All reuse active seal_* vocabulary terms (DPROD + W3C ORG).
 
   - id: app-has-port
-    taxonomy: { source: seal-extract, element: "BusinessApplication exposes a data Port (Event/Batch)" }
+    taxonomy: { source: "seal:app-extract", element: "BusinessApplication exposes a data Port (Event/Batch)" }
     ontology:
       from_node: BusinessApplication       # prov:SoftwareAgent (label :BusinessApplication)
       to_node: Port                         # dprod:Port (prov:Entity)
@@ -616,7 +616,7 @@ mappings:
     confirmed_on: 2026-06-21
 
   - id: app-has-membership
-    taxonomy: { source: seal-extract, element: "BusinessApplication has a role-holder membership" }
+    taxonomy: { source: "seal:app-extract", element: "BusinessApplication has a role-holder membership" }
     ontology:
       from_node: BusinessApplication
       to_node: Membership                   # org:Membership (n-ary)
@@ -630,7 +630,7 @@ mappings:
     confirmed_on: 2026-06-21
 
   - id: membership-of-role
-    taxonomy: { source: seal-extract, element: "Membership is for a named Role" }
+    taxonomy: { source: "seal:app-extract", element: "Membership is for a named Role" }
     ontology:
       from_node: Membership
       to_node: Role                          # org:Role
@@ -644,7 +644,7 @@ mappings:
     confirmed_on: 2026-06-21
 
   - id: membership-held-by
-    taxonomy: { source: seal-extract, element: "Membership is held by an Employee (by SID)" }
+    taxonomy: { source: "seal:app-extract", element: "Membership is held by an Employee (by SID)" }
     ontology:
       from_node: Membership
       to_node: Employee                      # prov:Agent; referenced by SID
@@ -661,7 +661,7 @@ mappings:
   # Source taxonomy: config/taxonomy/lob-product-team.yaml.
 
   - id: lob-has-product-line
-    taxonomy: { source: catalog-pat, element: "LOB contains ProductLine" }
+    taxonomy: { source: "pat:product-catalog", element: "LOB contains ProductLine" }
     ontology:
       from_node: CatalogLOB
       to_node: ProductLine
@@ -675,7 +675,7 @@ mappings:
     confirmed_on: 2026-06-21
 
   - id: product-line-has-product
-    taxonomy: { source: catalog-pat, element: "ProductLine contains Product" }
+    taxonomy: { source: "pat:product-catalog", element: "ProductLine contains Product" }
     ontology:
       from_node: ProductLine
       to_node: Product
@@ -689,7 +689,7 @@ mappings:
     confirmed_on: 2026-06-21
 
   - id: product-has-dev-team
-    taxonomy: { source: catalog-pat, element: "Product has owning DevTeam" }
+    taxonomy: { source: "pat:product-catalog", element: "Product has owning DevTeam" }
     ontology:
       from_node: Product
       to_node: DevTeam
@@ -703,7 +703,7 @@ mappings:
     confirmed_on: 2026-06-21
 
   - id: lob-reconciles-to-segment
-    taxonomy: { source: catalog-pat, element: "LOB reconciles to a corporate BusinessSegment (confidence)" }
+    taxonomy: { source: "pat:product-catalog", element: "LOB reconciles to a corporate BusinessSegment (confidence)" }
     ontology:
       from_node: CatalogLOB
       to_node: BusinessSegment
@@ -720,7 +720,7 @@ mappings:
   # NOT in the current sample (no AreaProduct / SUPPORTS rows), but the vocabulary has
   # SUPPORTS with range "Product OR AreaProduct" (free-text union) — consolidated-plan E.2.
   - id: dev-team-supports
-    taxonomy: { source: catalog-pat, element: "DevTeam is aligned to / supports an AreaProduct (team_type, sponsored)" }
+    taxonomy: { source: "pat:people-report", element: "DevTeam is aligned to / supports an AreaProduct (team_type, sponsored)" }   # alignment is VOLATILE, swept from the team report per load (C9)
     ontology:
       from_node: DevTeam                     # org:OrganizationalUnit (Agent)
       to_node: AreaProduct                   # RESOLVED: range = AreaProduct (Team-of-Teams)
@@ -740,7 +740,7 @@ mappings:
       C4: set catalog_supports_area_product active; deprecate catalog_supports (DevTeam→Product).
 
   - id: dev-team-develops-app
-    taxonomy: { source: catalog-pat, element: "DevTeam develops a BusinessApplication (joined by SEALID)" }
+    taxonomy: { source: "pat:people-report", element: "DevTeam develops a BusinessApplication (joined by SEALID)" }   # team-scoped seal_ids from the PAT team report (C9)
     ontology:
       from_node: BusinessApplication         # prov:Entity / dprod:DataProduct (K4 reclass); key = SEALID
       to_node: DevTeam                       # org:OrganizationalUnit (Agent)
@@ -839,7 +839,7 @@ mappings:
 
   - id: job-runs-on-host-group
     taxonomy:
-      source: controlm-psgmgr
+      source: "controlm@[db].psgmgr.cm_hosts"
       element: "Job's NODE_ID names a host group (CM_HOSTS.GRPNAME) — Control-M load-balances across its member hosts (2-hop)"
     ontology:
       from_node: ControlMJob                    # prov:Activity
@@ -860,7 +860,7 @@ mappings:
 
   - id: host-group-contains-host
     taxonomy:
-      source: controlm-psgmgr
+      source: "controlm@[db].psgmgr.cm_hosts"
       element: "Host group contains a member agent host (one CM_HOSTS row per DATA_CENTER/GRPNAME/NODEID)"
     ontology:
       from_node: ControlMHostGroup              # prov:Collection
@@ -881,7 +881,7 @@ mappings:
 
   - id: host-group-defined-on
     taxonomy:
-      source: controlm-psgmgr
+      source: "controlm@[db].psgmgr.cm_hosts"
       element: "Host group is defined per data center (CM_HOSTS.DATA_CENTER, long-form names — normalization open question)"
     ontology:
       from_node: ControlMHostGroup              # prov:Collection
@@ -906,7 +906,7 @@ mappings:
 
   - id: job-runtime-stats-supplement
     taxonomy:
-      source: controlm-psgmgr
+      source: "controlm@[db].psgmgr.cm_avg_run"
       element: "CM_AVG_RUN row supplies avg/median start+run timing for a job (join ctlm_id = folder_id.job_id where present — SME edit 2026-07-14; fallback SCHED_TABLE + JOB_MEM_NAME = JOB_NAME)"
     ontology:
       from_node: ControlMJob                    # prov:Activity — properties land here
@@ -942,7 +942,7 @@ mappings:
 
   - id: app-code-defined-mapping
     taxonomy:
-      source: controlm-psgmgr
+      source: "controlm@[db].psgmgr.cm_def_vjob"   # the APP CODE authoring key lives on the CM_DEF_VJOB folder-header rows
       element: "Control-M APP CODE (:ControlMApplication folder-header grouping) carries a steward-DEFINED application mapping: tier 1 seal-born code → one BusinessApplication (1:1); tier 2 shared platform code → many AreaProducts (1:many); folders inherit via CONTAINS_FOLDER, jobs via CONTAINS_JOB"
     ontology:
       from_node: ControlMFolder               # the attribution GRAIN (SME 2026-07-22) — derived from the app-code row; the authoring key itself is :ControlMApplication
@@ -1017,7 +1017,7 @@ mappings:
 
   - id: business-application-identity
     taxonomy:
-      source: seal-extract
+      source: "seal:app-extract"
       element: "SEAL application row supplies the business application's identity value. The SOURCE calls the field `Application ID` (SME-confirmed 2026-07-27 from the Reports export header — NOT 'SEALID', which was repo vernacular and appears nowhere in code, SQL or Cypher). The row model field was already neutral: SealApplicationRow.app_id."
     ontology:
       from_node: BusinessApplication            # prov:Entity — the property lands here
@@ -1062,7 +1062,7 @@ mappings:
 
   - id: self-documentation-code-graph
     taxonomy:
-      source: depgraph-snapshot
+      source: "repo:depgraph-snapshot"
       element: >
         DryDocs' own source tree, captured every session ritual by
         knowledge/depgraph-snapshots/snapshot.ps1 as schema depgraph-machine-first/v1.

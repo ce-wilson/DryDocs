@@ -7,6 +7,13 @@ v2 design session) — nothing here changes a schema, mapping, or loader binding
 the N7 HITL gate rules it (J21's hardening of the current shape is the interim
 guarantee).
 
+> **N9 BUILT 2026-07-31 (same day):** the v2 registry SHIPPED — 15 systems / 28
+> datasets / 17 retired ids; doc-ledger union; the D2 overlay seam
+> (`config/loader-source-overlay.yaml`); derived URNs; all loaders re-bound.
+> Per-row sweep finding: the cm_avg_run gate had actually SIGNED 2026-07-14 (P2)
+> — the v1 umbrella note was stale. Q6 amendment (old→new id map) appended to
+> `config/gate-log.md`. This plan is now the historical design record.
+
 ## RULED — N7 gate session 2026-07-31 (gate-log entry `source-registry-v2`)
 
 The in-chat SME session ruled **all** of D1–D4 and Q1–Q6 (transcription:

@@ -15,7 +15,7 @@
 taxonomy: lob-product-team
 domain: business
 taxonomy_path_root: business/lob
-source: catalog-pat
+source: pat                        # config/source-registry.yaml v2 SYSTEM id (the capture spans both PAT datasets: pat:product-catalog + pat:people-report)
 authority: lob-product-team
 classification: Internal               # confidential handling: real rosters (J23 collapse)
 classification_only: true

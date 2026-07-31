@@ -219,7 +219,7 @@ class CodeSnapshotLoader(BaseLoader):
     nodes that left the source tree between snapshots."""
 
     name: ClassVar[str] = "code_snapshot.v1"
-    source_id: ClassVar[str | None] = "depgraph-snapshot"
+    source_id: ClassVar[str | None] = "repo:depgraph-snapshot"
     cypher_path: ClassVar[Path] = CYPHER_DIR / "code_snapshot.cypher"
     row_model: ClassVar[type] = CodeModuleRow
     source_label: ClassVar[str] = "snapshot"

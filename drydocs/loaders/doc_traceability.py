@@ -396,7 +396,7 @@ class _ChecksummedLoader(BaseLoader):
 
 class DesignDocSectionsLoader(_ChecksummedLoader):
     name: ClassVar[str] = "doc_sections.v1"
-    source_id: ClassVar[str | None] = "design-docs"
+    source_id: ClassVar[str | None] = "repo:design-docs"
     cypher_path: ClassVar[Path] = CYPHER_DIR / "doc_sections.cypher"
     row_model: ClassVar[type] = DocSectionRow
     source_label: ClassVar[str] = "markdown"
@@ -498,7 +498,7 @@ class _SectionPrereqLoader(_ChecksummedLoader):
 
 class DocTraceabilityLoader(_SectionPrereqLoader):
     name: ClassVar[str] = "doc_traceability.v1"
-    source_id: ClassVar[str | None] = "design-docs"
+    source_id: ClassVar[str | None] = "repo:design-docs"
     cypher_path: ClassVar[Path] = CYPHER_DIR / "doc_traceability.cypher"
     row_model: ClassVar[type] = TraceabilityRow
     source_label: ClassVar[str] = "markdown"
@@ -515,7 +515,7 @@ class DocFeedbackLoader(_SectionPrereqLoader):
     whole-registry absence means every attribution silently drops."""
 
     name: ClassVar[str] = "doc_feedback.v1"
-    source_id: ClassVar[str | None] = "design-docs"
+    source_id: ClassVar[str | None] = "repo:design-docs"
     cypher_path: ClassVar[Path] = CYPHER_DIR / "doc_feedback.cypher"
     row_model: ClassVar[type] = FeedbackNoteRow
     source_label: ClassVar[str] = "human"

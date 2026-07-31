@@ -1,419 +1,852 @@
 # =============================================================================
-# config/source-registry.yaml — every data-pipeline source, declared once.
+# config/source-registry.yaml — SCHEMA V2 (N9 build; gate source-registry-v2,
+# SIGNED OFF 2026-07-31 — D1–D4 + Q1–Q6, config/gate-log.md).
 #
-# Each entry binds a SOURCE to: its orchestrator (Tier-2 vendor), its adapter,
-# the taxonomy it feeds, and its crosswalk-confirmation state. Loaders and the
-# `pipeline-config` agent read this; nothing loads until `confirmed: true`.
+# TWO LEVELS (D1): a SYSTEM row is the thing we connect to (connection,
+# locator, classification, SDLC link); a DATASET row is the thing a loader
+# reads and a gate rules (feeds_taxonomy, crosswalk, confirmed — each dataset
+# carries its OWN confirmed state). Loaders bind to DATASET ids
+# (BaseLoader.source_id), overridable per repo by
+# config/loader-source-overlay.yaml (D2 — the T19 rebind seam).
 #
-# REQUIRED on every entry (enforced by tests/unit/test_classification.py):
-#   classification — one of config/classification.yaml levels (sensitivity / publish tier)
-#   source         — the system/path the data comes from
-#   (External sources additionally need source_url + captured_at)
+# ID GRAMMAR (Q1, amended at the gate):
+#   system  id:  {system}                        e.g. psgmgr, seal, pat, snow
+#   dataset id:  {origin}@{db}.{schema}.{table}  replica/derived — the segment
+#                after @ is the ACTUAL qualified carrier locator (it REPLACES
+#                the informal system nickname); lowercase; real db/schema
+#                values are connection coordinates -> internal twin only, so
+#                committed ids carry [db] (and [schema] where the schema name
+#                is not established public vocabulary — psgmgr is)
+#                {system}:{artifact}             born-here datasets
+#   Derived stores keep the @ grammar + `derived: true`; `authority` is
+#   omitted there (Q3 — not SOR/ADS; FCDO SOC = upstream capture, doesn't fit).
+#
+# AUTHORITY (FCDO vocabulary as a FIELD): SOR = originating source for this
+# set of data; ADS = approved copy/redistribution carrier. Attaches to the
+# DATASET, never the system (their own definition is per-data-subset).
+#
+# URN (D3 + Q2): urn:drydocs:dataset:({carrier-or-origin},{artifact},prod) —
+# DERIVED by drydocs_core/source_registry.py from the row's system + artifact,
+# lowercase, env always prod. NEVER hand-maintained: a row carrying `urn:` is
+# refused at parse time.
+#
+# RETIRED IDS (D4): every legacy v1 flat id lands below with its replacement;
+# SourceRegistry.from_yaml AND the overlay guard REFUSE any retired id — a
+# retired string can never be silently re-minted with a different meaning
+# (the catalog-pat / pat-catalog T19 collision class). Renamed rows carry
+# `replaces:` back-pointers.
+#
+# DOC CORPORA live in config/doc-source-registry.yaml ONLY (the twins dropped
+# at N9; one home per source). The runtime SourceRegistry is the UNION of the
+# two ledgers, so the confirmed-gate still guards doc loads. design-docs is
+# pipeline-side only (Q5 — it feeds graph classes beyond Document/Chunk).
+#
+# REQUIRED (enforced by tests/unit/test_classification.py):
+#   system rows:  classification (config/classification.yaml level) + name
+#   dataset rows: system (resolving to a system row) + artifact
+#   seal_id is a STANDING PLACEHOLDER on every committed system row (D1
+#   amendment) — the real value lives only in the internal/ twin.
+#
+# MIGRATION NOTE (the N7 residual, executed 2026-07-31): every v1 row was
+# confirmed PER ROW at this build. Rows whose gates were signed transfer
+# `confirmed: true` per Q6 (one gate-log amendment maps old->new ids);
+# everything else lands `confirmed: false`. The split also RECORDS states the
+# flat v1 rows could not: cm_avg_run is now visibly unconfirmed (its gate
+# controlm-avg-run-supplement is still AWAITING SME) even though the old
+# controlm-psgmgr umbrella row read `confirmed: true`.
 # =============================================================================
 
-schema: drydocs.source-registry.v1
-updated: 2026-07-28
+schema: drydocs.source-registry.v2
+updated: 2026-07-31
 
-sources:
-  # ---- Orchestration metadata (Tier-2 vendors) -----------------------------
-  - id: controlm-psgmgr
+# ---------------------------------------------------------------------------
+# SYSTEMS — the things we connect to. layer = BDAT four-value view
+# (human | business | data | technology; gate ruling 2026-07-31). cmdb_ci is
+# the ServiceNow class crosswalk hook — values land at the crosswalk gate once
+# snow:cmdb-ci-classes is confirmed (Q4); until then `~`.
+# ---------------------------------------------------------------------------
+systems:
+  - id: psgmgr
+    name: "psgmgr Control-M replica DB (Oracle)"
+    seal_id: "[seal-id]"                # PLACEHOLDER — real value internal/ twin only (D1 amendment)
+    cmdb_ci: ~                          # crosswalk source = snow:cmdb-ci-classes (Q4); value lands at that gate
+    layer: data
     classification: Internal            # operational scheduling metadata; not for public GitHub
-    source: "oracle:psgmgr.CM_* objects"
-    kind: orchestration
-    orchestrator: bmc-controlm          # baseline — no crosswalk needed
-    adapter: oracle                     # OracleAdapter over psgmgr.* views
-    # locator — granular source coordinates (SEAL app → platform → service →
-    # schema → objects). Mechanism committed here; REAL values (SEAL id, DB
-    # service/TNS name) are confidential (Internal) and live only in the
-    # internal/ twin + connection env (internal-local/) — the publish
-    # boundary is why a public "test Oracle container" is never needed.
     locator:
-      application: ~                    # SEAL id of the owning application — internal/ twin only
-      source_product: controlm          # what the data IS  — config/taxonomy/software-registry.yaml product id
-      platform: oracle-db               # what CARRIES it   — software-registry product id (the replica's DB)
+      platform: oracle-db               # what CARRIES it — software-registry product id
       service: ~                        # DB service/TNS — connection env (internal-local/), never committed
       schema: psgmgr                    # established public vocabulary
-      mapping: config/source-mappings/controlm-psgmgr.yaml   # object/column ledger
-    feeds_taxonomy: [folders, jobs, conditions, dependencies, variables, hosts, runtime_stats]
-    confirmed: true
+    sdlc: docs/reviews/sdlc-oracle-ingestion.md
     notes: >
-      Live. The canonical structural-lineage feed. See README §Control-M
-      lineage. CM_HOSTS (host-group membership) added 2026-07-09 via the
-      add-source-object walkthrough; gate controlm-hosts-topology SME-confirmed
-      same day (config/gate-log.md) — staging-only until the hosts loader +
-      RUNS_ON resolution pass ship (P3/P4 residual verifications first).
-      CM_AVG_RUN (runtime stats) added 2026-07-09 same walkthrough — gate
-      controlm-avg-run-supplement AWAITING SME; property supplement onto
-      :ControlMJob, no new vocabulary.
+      The Control-M replica database — CARRIER, not origin: Control-M data
+      (origin controlm) and SEAL data (origin seal) both land here as replica
+      datasets; the v2 grammar makes that visible where the old flat
+      controlm-psgmgr id hid it.
 
-  - id: controlm-xml-export
-    classification: Internal              # real folder/job names, command lines, variable values
-    source: "Control-M 9.0.21.300 XML definition exports (DEFTABLE format) under DRYDOCS_DATA_ROOT (~/data/DryDocs/controlm-xml/)"
-    kind: orchestration
-    orchestrator: bmc-controlm            # baseline vendor — no crosswalk needed
-    adapter: ~                            # G47 extractor (drydocs_lineage/extractors/controlm_xml.py) — taxonomy-first staging, no loader
-    locator:
-      data_root: "DRYDOCS_DATA_ROOT (default ~/data/DryDocs); controlm-xml/ = definition exports (arbitrarily-named .xml — no filename-fingerprint sweep possible; the landing-zone convention + this classification are the guard)"
-      resolver: drydocs_core/data_root.py # controlm_xml_dir() (the G19 shared helper)
-    feeds_taxonomy: [folders, jobs, variables]
-    confirmed: false                      # OPEN precedence ruling vs controlm-psgmgr (HITL — see the IDEAS question 2026-07-29); NOTHING writes the graph before it
-    notes: >
-      G47 registration — the XML export is the environment's real config
-      SoR (XML-not-JSON finding; the JSON Automation API is conceptual
-      reference only) and carries the job definition AND its ordered
-      folder/job variables in one self-consistent snapshot. Staged
-      taxonomy-first by the G47 extractor (ASSUMED element/attribute
-      contract defined by SYNTHETIC fixtures; the company's real export
-      validates or amends it — XML schema docs are a known gap). Feeds the
-      G48 resolve-cmdline-staging step: variables go through the ONE
-      shared resolver (drydocs_core.controlm.resolver, guardrail 1) to
-      populate the G39 store's cmd_line_resolved DERIVED column
-      (guardrail 2 — verbatim preserved). Which source wins per object
-      when this and controlm-psgmgr disagree is an OPEN config/
-      precedence.yaml ruling with a named owner-and-sunset for the dual
-      path (guardrail 3) — parked in the IDEAS inbox, never auto-decided.
-      The company-side XML loader (run-log tee, _ts() normalizer) is the
-      raw twin of this sanitized mechanism seam.
-
-  - id: autosys-export
+  - id: controlm
+    name: "BMC Control-M (the orchestrator itself)"
+    seal_id: "[seal-id]"
+    cmdb_ci: ~
+    layer: technology
     classification: Internal
-    source: "autosys export (TBD)"
-    kind: orchestration
-    orchestrator: autosys
-    adapter: ~                          # TBD
-    feeds_taxonomy: [folders, jobs, conditions, dependencies]
-    confirmed: true                     # gate autosys-crosswalk SIGNED OFF 2026-07-14 (config/gate-log.md); loader still unbuilt + separately gated
-    crosswalk: config/crosswalks/autosys-to-bmc.yaml
-    gate_spec: config/gate-prompts/autosys-crosswalk.yaml
+    locator:
+      source_product: controlm          # config/taxonomy/software-registry.yaml product id
+    sdlc: ~
     notes: >
-      Crosswalk CONFIRMED: gate autosys-crosswalk ACCEPTED IN FULL 2026-07-14
-      (13 confirmations; config/gate-log.md F1) — the 11-row crosswalk to
-      bmc-controlm (config/crosswalks/autosys-to-bmc.yaml) is status: confirmed
-      (row 6 demoted exact -> approximate at the SME wording review; registry
-      rows autosys/broadcom created for the Software/§A linkage). Source-row
-      activation ONLY: no export feed exists and no loader is built — loading
-      remains separately gated when one arrives. Narrative summary:
-      external/orchestration/autosys/README.md.
+      The ORIGIN system for every controlm@... replica dataset and for the
+      born-here XML definition export. Version 9.0.21.300 company-side
+      (XML-not-JSON finding — the JSON Automation API is conceptual reference).
 
-  - id: airflow-mwaa
+  - id: seal
+    name: "SEAL application inventory"
+    seal_id: "[seal-id]"
+    cmdb_ci: ~
+    layer: business
+    classification: Internal            # confidential handling: real applications, ownership, employees, SEAL ids
+    locator: {}
+    sdlc: ~
+    notes: "Applications + ownership; SOR for the application/org datasets."
+
+  - id: pat
+    name: "Product Agility Tool (internal catalog UI)"
+    seal_id: "[seal-id]"
+    cmdb_ci: ~
+    layer: business
+    classification: Internal            # confidential handling: real LOB→Product→Team rosters, team names, SEAL ids
+    locator:
+      source_product: pat
+    sdlc: ~
+    notes: >
+      LOB→Product→Team catalog (lowest precedence authority). The T19 naming
+      ruling lives on its datasets: neither legacy string (catalog-pat /
+      pat-catalog) survives — see the retired list.
+
+  - id: snow
+    name: "ServiceNow (SaaS ITSM / CMDB)"
+    seal_id: "[seal-id]"
+    cmdb_ci: ~
+    layer: technology
     classification: Internal
-    source: "MWAA DAG export (TBD)"
-    kind: orchestration
-    orchestrator: airflow
-    adapter: ~
-    feeds_taxonomy: [folders, jobs, conditions, dependencies]
-    confirmed: true                     # gate airflow-crosswalk SIGNED OFF 2026-07-14 (config/gate-log.md); loader still unbuilt + separately gated
-    crosswalk: config/crosswalks/airflow-to-bmc.yaml
-    gate_spec: config/gate-prompts/airflow-crosswalk.yaml
-    notes: >
-      Crosswalk CONFIRMED: gate airflow-crosswalk ACCEPTED IN FULL 2026-07-14
-      (17 confirmations; config/gate-log.md F2) — the crosswalk to bmc-controlm
-      (config/crosswalks/airflow-to-bmc.yaml) is status: confirmed (row 8 split
-      8a/8b/8c at the SME wording review; registry rows airflow/apache created
-      for the Software/§A linkage). Source-row activation ONLY: no DAG-export
-      feed exists and no loader is built — loading remains separately gated
-      when one arrives. Narrative summary:
-      external/orchestration/airflow/README.md.
-
-  # ---- Internal reference data (Tier-3 confidential) -----------------------
-  - id: seal-extract
-    classification: Internal                # confidential handling: real applications, ownership, employees, SEAL ids (J23 collapse)
-    source: "SEAL extract (internal)"
-    kind: internal
-    orchestrator: ~
-    adapter: csv                        # CsvAdapter (samples) / internal extract in prod
-    feeds_taxonomy: [applications, ports, memberships, roles, employees]
-    confirmed: true
-    notes: "Live. SEAL applications + ownership."
-
-  - id: catalog-pat
-    classification: Internal                # confidential handling: real LOB→Product→Team rosters, team names, SEAL ids (J23 collapse)
-    source: "PAT/Catalog extract (internal): catalog hierarchy + the PAT team report"
-    kind: internal
-    orchestrator: ~
-    adapter: csv
     locator:
-      source_product: pat                 # the Product Agility Tool (internal catalog UI)
-      extract: ~                          # real report path/export coordinates — internal/ twin only
-      mapping: ~                          # team report: team_id, lob, seal_ids (1..n), jira board,
-                                          # team_type/relationship, status, agile framework — REAL
-                                          # rows (SEAL ids, team names, rosters) never committed here
-    feeds_taxonomy: [lob, product_lines, products, area_products, dev_teams, team_applications]
-    confirmed: true
+      hosting: saas                     # Q4 ruling 2026-07-31: registers NOW, typed SaaS
+    sdlc: ~
     notes: >
-      Live. LOB→Product→Team catalog (lowest precedence authority). C9 gate
-      (2026-07-18): the PAT team report added as the team_applications feed —
-      team-scoped seal_ids populate the ACTIVE arch_develops edge; alignment
-      (supporting area product, else product) is VOLATILE and relationship-typed
-      (dedicated|aligned|flex), swept per team on each load; sponsoring product/
-      area-product are distinct sponsored:true edges. SME evidence held
-      in-session (screenshots, confidential — not committed).
+      Registered at the N7 gate (Q4). First dataset = snow:cmdb-ci-classes,
+      which doubles as the crosswalk source for every system row's cmdb_ci
+      field.
 
-  # ---- Reference ledgers (repo-committed, publishable) ----------------------
-  - id: software-registry
-    classification: Internal-Public     # DryDocs' own stack only; no company catalog rows
-    source: "config/taxonomy/software-registry.yaml"
-    kind: reference
-    orchestrator: ~
-    adapter: yaml                       # RegistryYamlAdapter (flattens vendors/products)
-    feeds_taxonomy: [vendors, software_products]
-    confirmed: true                     # SME gate 2026-07-07 (ADR 0004; config/gate-log.md)
-    notes: "Third-party software registry (plan 07). Vendor = brand only; graph is the lookup."
+  - id: autosys
+    name: "AutoSys (CA/Broadcom) — placeholder orchestrator"
+    seal_id: "[seal-id]"
+    cmdb_ci: ~
+    layer: technology
+    classification: Internal
+    locator: {}
+    sdlc: ~
+    notes: "Crosswalk-only activation; no export feed exists (external/orchestration/autosys/)."
 
-  - id: depgraph-snapshot
-    classification: Internal-Public     # our own repo-relative paths only; abs_path DROPPED at load (§H4)
-    source: "knowledge/depgraph-snapshots/drydocs-*.json (dated dependency snapshots; snapshot.ps1 writes one per session ritual)"
-    kind: derived                       # NOT an imported hierarchy — deterministic structural capture of code we control
-    orchestrator: ~
-    adapter: json                       # CodeSnapshotAdapter (newest-file selection + positive meta.tree discrimination)
-    locator:
-      mapping: config/source-mappings/depgraph-snapshot.yaml   # field ledger (doc 08; census COMPLETE — gate §C5 enumerated the fields)
-    feeds_taxonomy: []                  # no config/taxonomy/ file — lands as ontology + loader (gate meta.Taxonomy)
-    confirmed: true                     # gate self-documentation-code-graph SIGNED OFF 2026-07-27 (36/36; config/gate-log.md)
-    gate_spec: config/gate-prompts/self-documentation-code-graph.yaml
-    notes: >
-      G33 / Epic U self-documentation: DryDocs' own source tree as a queryable
-      :Project subgraph (loader `drydocs load-code-snapshot`). Tree-mode files
-      in the same directory are REFUSED by a positive assertion (meta present
-      AND meta.tree == false — they carry NO meta key at all; §G1(a) + the
-      2026-07-27 build note). Internal-Public holds BECAUSE abs_path (the one
-      producer-local value) never loads; the snapshot files themselves are
-      never-port in PORT-MANIFEST.yaml for the same reason.
+  - id: airflow
+    name: "AWS Airflow / MWAA — placeholder orchestrator"
+    seal_id: "[seal-id]"
+    cmdb_ci: ~
+    layer: technology
+    classification: Internal
+    locator: {}
+    sdlc: ~
+    notes: "Crosswalk-only activation; no DAG-export feed exists (external/orchestration/airflow/)."
 
-  # ---- Docs corpora (converted documentation → lexical graph) ---------------
-  - id: bmc-docs
-    classification: External             # public BMC documentation, converted; cite source_url per doc
-    source: "external/orchestration/bmc-controlm/controlm-*.md (26 converted BMC pages; SOURCE-MANIFEST.md = provenance model)"
-    source_url: "https://documents.bmc.com/ (per-doc URLs in each file header)"
-    captured_at: 2026-06-11
-    kind: docs
-    orchestrator: ~
-    adapter: markdown                    # BmcDocsAdapter (H2 chunking, manifest tier rule)
-    feeds_taxonomy: [documents, chunks]
-    confirmed: true                      # gate bmc-docs-lexical-load SME-accepted 2026-07-08 (config/gate-log.md)
-    gate_spec: config/gate-prompts/bmc-docs-lexical-load.yaml
-    notes: >
-      The converted BMC docs corpus loaded as the llm-graph-builder LEXICAL graph
-      (Document -> Chunk chains) with per-chunk provenance tier
-      VERBATIM|GROUNDED|SYNTHESIZED per the SOURCE-MANIFEST default rule —
-      SYNTHESIZED chunks are Claude inference, never vendor ground truth (the
-      two-corpus rule). Software-ontology hook: (Document)-[:DESCRIBES
-      {target_version}]->(SoftwareProduct controlm); load ORDER: the software
-      registry loads first (DESCRIBES MATCHes the product, never MERGEs it).
-      NOT a source-of-record (the XML-format acquisition stub tracks the real
-      9.0.21.300 config SoR). User-directed 2026-07-08: the local EE DB carries
-      only sample Control-M data, so this corpus is the demonstrable content.
-
-  - id: essential-graphrag
-    classification: External             # published Manning/Neo4j-sponsored ebook; the PDF is LOCAL-ONLY (gitignored) — cite source_url, never commit
-    source: "Essential-GraphRAG.pdf (repo root, gitignored local copy of the published ebook; Bratanič & Hane, Manning 2025, 179 PDF pages)"
-    source_url: "https://www.manning.com/books/essential-graphrag"
-    captured_at: 2026-07-14
-    kind: docs
-    orchestrator: ~
-    adapter: pdf                         # EssentialGraphragAdapter (pdf-lexical-v1: deterministic chapter/section chunking via pypdf)
-    feeds_taxonomy: [documents, chunks]
-    confirmed: true                      # Q2 groom decision 2026-07-16 (user-directed experiment): pure REUSE of the ACTIVE docs_* lexical vocabulary — no new edge meaning, so the covering gate is bmc-docs-lexical-load (2026-07-08); no new gate session required
-    notes: >
-      The Q2 experiment corpus (backlog Q2, Epic Q / phase 14): the Essential
-      GraphRAG ebook loaded as a Document -> Chunk lexical graph for
-      agent-traversal testing, feeding the docmeta P0 benchmark verdict
-      (traversal arm). Target DB = ddcontext (execution decision recorded in
-      backlog Q2 notes: experiment/reference content stays out of the
-      ground-truth drydocs DB; matches the user's "our own unstructured
-      context graph" phrasing and the jpmc-reports ddcontext precedent).
-      Every chunk is tier GROUNDED (pdf-extract-grounded-v1: pypdf extraction
-      is mechanical but lossy). The bmc_docs DESCRIBES hook is deliberately
-      omitted — the book describes a methodology, not a registry
-      SoftwareProduct, and ddcontext carries no product nodes. Pattern notes
-      mined from the same book: reference/research/essential-graphrag-notes.md (Q1).
-
-  - id: design-docs
-    classification: Internal-Public      # repo-native authored design docs; an individual doc self-declares its own class (the startup runbook says Internal in its front-matter) — the graph carries structure + text as committed, nothing beyond what the repo already holds
-    source: "docs/design/*.md (drydocs.doc-outline.v1 anchors + traceability matrices) + docs/design/feedback/<doc-id>-rev<N>.yaml (drydocs.design_doc.feedback_yaml)"
-    kind: docs
-    orchestrator: ~
-    adapter: markdown                    # DesignDocSectionsAdapter / TraceabilityMatrixAdapter / DesignDocFeedbackAdapter (drydocs/loaders/doc_traceability.py)
-    locator:
-      mapping: config/source-mappings/design-docs.yaml   # field ledger (three parse streams)
-    feeds_taxonomy: [design_docs, doc_sections, requirements, components, test_cases, feedback_notes]
-    confirmed: true                      # gate doc-traceability-feedback signed off 2026-07-20 (config/gate-log.md; all 21 confirmations)
-    gate_spec: config/gate-prompts/doc-traceability-feedback.yaml
-    notes: >
-      L7 connector #1 ("tenant 0" — the SaaS app documenting itself): the
-      PRODUCT-PLANE documentation ontology validated on DryDocs' own Epic L
-      artifacts. Three-pass load (`drydocs load-doc-traceability`): sections ->
-      matrix star (SPECIFIED_IN / IMPLEMENTED_BY / VERIFIED_BY off
-      :Requirement) -> feedback notes (ANNOTATES + lifecycle status +
-      attribution only when the author resolves to a real :Employee). Keys are
-      source-namespaced (origin = drydocs-design-docs). Future connectors
-      (Jira, Gherkin/BDD, BRD — the incremental-context-loop plan) register as
-      their OWN source entries feeding the same classes, each through its own
-      gate.
-
-  - id: fcdo-frameworks
-    classification: Internal               # confidential handling: real employee names + internal Confluence URLs in the transcripts; the POINTER lives here, the content in internal/ (J23 collapse)
-    source: "internal/fcdo-reference/*.md (screenshot transcriptions of the firmwide data-publishing framework Confluence space; page-ID scrape list in its README)"
-    kind: docs
-    orchestrator: ~
-    adapter: ~                            # no adapter yet — docmeta confluence connector (doc-source-registry twin) is the ingestion path
-    feeds_taxonomy: [documents, chunks]
-    confirmed: false                      # crosswalk gate not yet drafted; see internal/fcdo-reference/ALIGNMENT-PLAN.md Phase 1
-    notes: >
-      The FCDO data-governance/ontology standards capture (2026-07-30) — the
-      internal counterpart standard our ontology aligns to where planned work
-      overlaps (PROV-O + OpenLineage ETL model, SKOS taxonomy profile, W3C ORG
-      people/org model). Registered as the doc-governance twin fcdo-frameworks
-      in config/doc-source-registry.yaml (connector: confluence, on-demand)
-      for a company-side live scrape that supersedes the transcripts. The
-      alignment/adoption plan and explicit skip list:
-      internal/fcdo-reference/ALIGNMENT-PLAN.md. Mechanism-only here — no
-      internal URLs or names outside internal/.
-
-  # ---- Server inventory (rua collector bundles) -----------------------------
-  - id: rua-inventory
-    classification: Internal                # confidential handling: bundles hold real hostnames, uids, home paths, profile + script copies (J23 collapse)
-    source: "rua_*.tar.gz bundles under DRYDOCS_DATA_ROOT (~/data/DryDocs/rua/) — collected on Control-M execution hosts by drydocs_lineage/collect/rua_inventory.sh"
-    kind: server-inventory
-    orchestrator: bmc-controlm            # inventories the orchestrator's execution hosts
-    adapter: ~                            # G20 extractor (drydocs_lineage/extractors/rua_inventory.py) built 2026-07-23 — staging only; no loader before G22
-    locator:
-      data_root: "DRYDOCS_DATA_ROOT (default ~/data/DryDocs); rua/incoming/ = tarballs, rua/extracted/<bundle>/ = unpacked"
-      resolver: drydocs_core/data_root.py # the ONE shared helper (G19)
-    feeds_taxonomy: [scripts, hosts]
-    confirmed: false                      # G22 rua-load gate pending (clauses a-g); NOTHING writes the graph before it
-    notes: >
-      G19 registration — THE POINTER, NEVER THE DATA: bundle payloads are
-      confidential and NEVER enter the repo tree — size + payload rule, per-source (guard:
-      tests/unit/test_data_root.py sweeps for rua_*.tar.gz / extracted
-      bundles; transport is the internal-local hand-carry note). Bundles land
-      out-of-tree beside the run logs (~/data like ~/logs — user call
-      2026-07-21: unstructured, can be big, belongs outside the project).
-      Chain: G18 collector parity -> G20 extractor (staging records with the
-      meta.txt provenance envelope) -> G21 code-operations pass -> G22 HITL
-      gate, which is this entry's activation condition.
-
-  # ---- DPL taxonomy registry (per-SEAL Swagger exports) ---------------------
-  - id: dpl-registry
-    classification: Internal                # confidential handling: real SEAL ids + pipeline/dataset GUIDs + lifecycle state (J23 collapse)
-    source: "per-SEAL Swagger JSON exports of the DPL taxonomy registry (pipeline_id.json / dataset_id.json) under DRYDOCS_DATA_ROOT (~/data/DryDocs/dpl-registry/<seal>/)"
-    kind: registry
-    orchestrator: ~
-    adapter: ~                            # G25 extractor (drydocs_lineage/extractors/dpl_registry.py) — taxonomy-first staging, no loader
+  - id: dpl
+    name: "DPL pipeline/dataset taxonomy registry"
+    seal_id: "[seal-id]"
+    cmdb_ci: ~
+    layer: technology
+    classification: Internal            # confidential handling: real SEAL ids + pipeline/dataset GUIDs
     locator:
       data_root: "DRYDOCS_DATA_ROOT (default ~/data/DryDocs); dpl-registry/<seal>/ = per-SEAL exports"
-      resolver: drydocs_core/data_root.py # dpl_registry_dir() (the G19 shared helper)
-    feeds_taxonomy: [pipelines, datasets]
-    confirmed: false                      # G22 clauses (f)/(g) own the rulings this feeds; NOTHING writes the graph before it
+      resolver: drydocs_core/data_root.py   # dpl_registry_dir() (the G19 shared helper)
+    sdlc: ~
     notes: >
-      G25 registration — THE POINTER, NEVER THE DATA: exports carry real SEAL
-      ids, pipeline/dataset GUIDs, and lifecycle state (confidential)
-      and never enter the repo tree; fixtures are SYNTHETIC. The registry sits
-      ABOVE the pipelines (G17 reads each pipeline's own MAC set; the shared
-      join key is the same GUID G15 extracts from CMD_LINE). Ingested
-      taxonomy-first into staging records (guid, kind, version, active, seal +
-      provenance); the extractor also emits the GUID cross-check report —
-      observed-not-registered / registered-not-observed, plus the clone-lag
-      column (SME caveat 2026-07-23: the promotion clone's main lags; this
-      bulk export is the backup discovery source; dataflow stays per-pipeline
-      swagger). The active flag is a THIRD usage signal (beside referenced and
-      present-on-server) — staged only; any conflation with "used" is a G22
-      ruling.
-
-  # ---- Snowflake data-catalog (dataset/distribution registration views) -----
-  - id: snowflake-data-catalog
-    classification: Internal                # confidential handling: real dataset names, GUIDs, producing app ids, contact emails, buckets, URIs (J23 collapse)
-    source: "full-pull exports (CSV) of the curated Snowflake views <PROD_DB>.<SCHEMA>.<CATALOG>_DATASETS_V / <CATALOG>_DISTRIBUTIONS_V under DRYDOCS_DATA_ROOT (~/data/DryDocs/catalog/)"
-    kind: registry
-    orchestrator: ~
-    adapter: ~                            # G42 extractor (drydocs_lineage/extractors/snowflake_catalog.py) — taxonomy-first staging, no loader
-    locator:
-      data_root: "DRYDOCS_DATA_ROOT (default ~/data/DryDocs); catalog/ = view exports, catalog/screenshots/ = evidence captures (confidential, never in-tree even gitignored)"
-      resolver: drydocs_core/data_root.py # catalog_dir() (the G19 shared helper)
-      mapping: docs/generic-snowflake-data-catalog-ingestion-plan.md   # the mapping ledger (field contract §2, identity model §3)
-    feeds_taxonomy: [datasets, distributions]
-    confirmed: false                      # gate snowflake-data-catalog (plan §5 questions a-f; prompt not yet drafted) is the activation condition; NOTHING writes the graph before it
-    notes: >
-      G42 registration — THE POINTER, NEVER THE DATA: exports carry real
-      dataset/distribution GUIDs, producing application ids, contact emails,
-      and physical coordinates (db/schema/table, HDFS paths, S3 buckets/ARNs)
-      and never enter the repo tree (guard: tests/unit/test_data_root.py
-      sweeps for view-export artifacts); fixtures are SYNTHETIC. The catalog
-      is the FOURTH registry seam (beside G17 MAC / G25 registry / G41 Glue)
-      and the inventory backbone: dataset + distribution + app + contact on
-      the same GUID identity space. DPL-registered rows land on the same
-      dpl_dataset identity the other seams stage; AUTHORITY2/null-source rows
-      stay in their own origin (never join a foreign id scheme into DPL GUID
-      space — the G41 rule). Node/edge shape (one node or two,
-      HAS_DISTRIBUTION, attribution, contact, publisher) is entirely the
-      gate's to rule — the plan doc §5 lists the questions un-decided.
-
-  - id: code-repo
-    classification: Internal            # real repo/branch names + script paths; content stays company-side
-    source: "per-repo object-sweep manifest (repo_objects.tsv: git rev-list --all --objects + ref tips) under company tooling — the G24 seam input; producer fixtures are SYNTHETIC"
-    kind: code-repo
-    orchestrator: ~
-    adapter: ~                          # G24 extractor (drydocs_lineage/extractors/code_repo.py) — staging + corroboration report, no loader
-    feeds_taxonomy: [scripts]
-    confirmed: false                    # G22 owns identity/dedup + precedence between origins; NOTHING writes the graph before it
-    trusted_ref: ~                      # HUMAN-BLESSED intent line (G24): the one ref this repo's team keeps clean.
-                                        # null = server-extract-only truth (the stale-main case — main exists but
-                                        # dead, real code scattered in feature branches). The corroboration sweep
-                                        # NAMES a candidate ref mechanically; only a human sets this field.
-    notes: >
-      G24 registration — the code-repo origin seam. A repo is a valid truth
-      source ONLY where a team keeps a clean branch (trusted_ref); production
-      servers always run the latest RUNNING code. The corroboration report
-      joins origins on git blob content hash into found-at-refs / behind /
-      never-committed / repo-only buckets; per-team hash drift is the
-      clean-branch signal. Real Bitbucket/GitHub access stays company-side
-      behind the manifest contract.
-
-  # ---- Data platforms (sources of DataAsset/lineage) -----------------------
-  - id: oracle-schemas
-    classification: Internal                # confidential handling: real schema/table/object names (J23 collapse)
-    source: "oracle:<schema> (internal)"
-    kind: data-platform
-    orchestrator: ~
-    adapter: oracle
-    feeds_taxonomy: [schemas, tables, scripts]
-    confirmed: false                    # ingestion pipeline planned (see backlog)
-    notes: "Oracle DB schemas/scripts as taxonomy → DataAsset. Real names are confidential."
+      THE POINTER, NEVER THE DATA: per-SEAL Swagger exports carry real SEAL
+      ids, GUIDs and lifecycle state and never enter the repo tree; fixtures
+      are SYNTHETIC (G25).
 
   - id: snowflake
+    name: "Snowflake (data platform)"
+    seal_id: "[seal-id]"
+    cmdb_ci: ~
+    layer: data
     classification: Internal
-    source: "snowflake (TBD)"
-    kind: data-platform
-    orchestrator: ~
+    locator: {}
+    sdlc: ~
+    notes: "Carrier for the catalog@... registration views; per-schema data expansion is a future gate."
+
+  - id: catalog
+    name: "Enterprise data catalog (dataset/distribution registration)"
+    seal_id: "[seal-id]"
+    cmdb_ci: ~
+    layer: data
+    classification: Internal            # confidential handling: real dataset names, GUIDs, app ids, contacts, buckets, URIs
+    locator:
+      data_root: "DRYDOCS_DATA_ROOT (default ~/data/DryDocs); catalog/ = view exports, catalog/screenshots/ = evidence captures (confidential, never in-tree even gitignored)"
+      resolver: drydocs_core/data_root.py   # catalog_dir() (the G19 shared helper)
+    sdlc: ~
+    notes: >
+      The registration system whose curated views we read FROM Snowflake (the
+      carrier) — origin catalog, carrier snowflake, exactly the replica case
+      the @ grammar exists for (G42 seam).
+
+  - id: exec-hosts
+    name: "Control-M execution hosts (rua collector)"
+    seal_id: "[seal-id]"
+    cmdb_ci: ~
+    layer: technology
+    classification: Internal            # confidential handling: bundles hold real hostnames, uids, home paths, script copies
+    locator:
+      data_root: "DRYDOCS_DATA_ROOT (default ~/data/DryDocs); rua/incoming/ = tarballs, rua/extracted/<bundle>/ = unpacked"
+      resolver: drydocs_core/data_root.py   # the ONE shared helper (G19)
+    sdlc: ~
+    notes: >
+      THE POINTER, NEVER THE DATA: bundle payloads are confidential and never
+      enter the repo tree (guard: tests/unit/test_data_root.py); transport is
+      the internal-local hand-carry note (G19).
+
+  - id: bitbucket
+    name: "Company code repositories (Bitbucket/GitHub)"
+    seal_id: "[seal-id]"
+    cmdb_ci: ~
+    layer: technology
+    classification: Internal            # real repo/branch names + script paths; content stays company-side
+    locator: {}
+    sdlc: ~
+    notes: >
+      A repo is a valid truth source ONLY where a team keeps a clean branch
+      (trusted_ref on the dataset row); production servers always run the
+      latest RUNNING code (G24).
+
+  - id: oracle
+    name: "Oracle DB schemas (data platform, placeholder)"
+    seal_id: "[seal-id]"
+    cmdb_ci: ~
+    layer: data
+    classification: Internal            # confidential handling: real schema/table/object names
+    locator: {}
+    sdlc: ~
+    notes: "Per-schema system split + datasets per table group are a future gate (migration sketch row)."
+
+  - id: drydocs-stg
+    name: "DryDocs staging schema (our own derived store)"
+    seal_id: "[seal-id]"
+    cmdb_ci: ~
+    layer: data
+    classification: Internal
+    locator:
+      schema: drydocs_stg               # our own staging schema (mechanism; committed in v1 too)
+    sdlc: docs/reviews/sdlc-oracle-ingestion.md
+    notes: "Holds the C3/C4 normalizer outputs (derived stores — Q3: derived: true, authority omitted)."
+
+  - id: repo
+    name: "The DryDocs repo itself (repo-committed ledgers + derived captures)"
+    seal_id: "[seal-id]"
+    cmdb_ci: ~
+    layer: technology
+    classification: Internal-Public     # the repo's own committed artifacts; per-dataset notes tighten where needed
+    locator: {}
+    sdlc: ~
+    notes: "Born-here datasets: the software-registry ledger, depgraph snapshots, design docs (tenant 0)."
+
+# ---------------------------------------------------------------------------
+# DATASETS — what loaders read and gates rule. `confirmed` is PER DATASET.
+# `urn` is DERIVED (never written here). `replaces` back-points the retired
+# v1 flat id (D4).
+# ---------------------------------------------------------------------------
+datasets:
+  # ---- Control-M replica datasets in psgmgr (origin controlm = SOR, carrier
+  # ---- psgmgr = ADS). Column ledger: config/source-mappings/psgmgr.yaml.
+  - id: "controlm@[db].psgmgr.cm_def_vtab"
+    system: psgmgr
+    origin: controlm
+    artifact: cm_def_vtab
+    artifact_kind: table
+    taxonomy_category: Pipelines
+    asset_type: dcat:Dataset
+    authority: ADS
+    feeds_taxonomy: [folders]
+    adapter: oracle
+    locator:
+      mapping: config/source-mappings/psgmgr.yaml
+    confirmed: true                     # gate controlm-q1q3-phase1 (2026-07-07) — transfers per Q6
+    replaces: controlm-psgmgr
+    notes: >
+      Folders (replicated DEF_VTAB). Loader controlm_folders.v1 (+ the
+      CM_DEF_VJOB folder HEADER ROW join for APPLICATION — gate q1q3 §Q3).
+
+  - id: "controlm@[db].psgmgr.cm_def_vjob"
+    system: psgmgr
+    origin: controlm
+    artifact: cm_def_vjob
+    artifact_kind: table
+    taxonomy_category: Pipelines
+    asset_type: dcat:Dataset
+    authority: ADS
+    feeds_taxonomy: [jobs]
+    adapter: oracle
+    locator:
+      mapping: config/source-mappings/psgmgr.yaml
+    confirmed: true                     # gate controlm-q1q3-phase1 (2026-07-07) — transfers per Q6
+    replaces: controlm-psgmgr
+    notes: >
+      Job definitions — the SME's own worked example for the amended Q1
+      grammar (controlm@[db].[schema].cm_def_vjob). Audit envelope confirmed
+      (config/audit-fields.yaml). job.APPLICATION is NOT reliable SEAL
+      identity (K1) — SEAL attribution rides the stg_app_fact dataset.
+
+  - id: "controlm@[db].psgmgr.cm_def_lnki_p_vw"
+    system: psgmgr
+    origin: controlm
+    artifact: cm_def_lnki_p_vw
+    artifact_kind: view
+    taxonomy_category: Pipelines
+    asset_type: dcat:Dataset
+    authority: ADS
+    feeds_taxonomy: [conditions, dependencies]
+    adapter: oracle
+    locator:
+      mapping: config/source-mappings/psgmgr.yaml
+    confirmed: true                     # gate controlm-q1q3-phase1 (2026-07-07) — transfers per Q6
+    replaces: controlm-psgmgr
+    notes: >
+      IN-conditions. Also the anchor dataset for the derived WAS_INFORMED_BY
+      pairing (controlm_dependencies_derived.v1 joins this view to the OUT
+      view on condition name — recorded here, per-row residual 2026-07-31).
+
+  - id: "controlm@[db].psgmgr.cm_def_lnko_p_vw"
+    system: psgmgr
+    origin: controlm
+    artifact: cm_def_lnko_p_vw
+    artifact_kind: view
+    taxonomy_category: Pipelines
+    asset_type: dcat:Dataset
+    authority: ADS
+    feeds_taxonomy: [conditions]
+    adapter: oracle
+    locator:
+      mapping: config/source-mappings/psgmgr.yaml
+    confirmed: true                     # gate controlm-q1q3-phase1 (2026-07-07) — transfers per Q6
+    replaces: controlm-psgmgr
+    notes: "OUT-conditions."
+
+  - id: "controlm@[db].psgmgr.cm_def_setvar_vw"
+    system: psgmgr
+    origin: controlm
+    artifact: cm_def_setvar_vw
+    artifact_kind: view
+    taxonomy_category: Pipelines
+    asset_type: dcat:Dataset
+    authority: ADS
+    feeds_taxonomy: [variables]
+    adapter: oracle
+    locator:
+      mapping: config/source-mappings/psgmgr.yaml
+    confirmed: true                     # covered by controlm-q1q3-phase1 (the five psgmgr extracts) + the C3/C4 normalization gates — transfers per Q6
+    replaces: controlm-psgmgr
+    notes: >
+      Folder/job variables — the C3/C4 Python-normalizer input feeding the
+      derived stg_app_fact dataset. No direct graph loader; Python owns var
+      resolution.
+
+  - id: "controlm@[db].psgmgr.cm_hosts"
+    system: psgmgr
+    origin: controlm
+    artifact: cm_hosts
+    artifact_kind: table
+    taxonomy_category: Infrastructure
+    asset_type: dcat:Dataset
+    authority: ADS
+    feeds_taxonomy: [hosts]
+    adapter: oracle
+    locator:
+      mapping: config/source-mappings/psgmgr.yaml
+    confirmed: true                     # gate controlm-hosts-topology (2026-07-09); hosts loader + RUNS_ON shipped at P3 (2026-07-27) — transfers per Q6
+    replaces: controlm-psgmgr
+    notes: "Host-group membership (added 2026-07-09 via add-source-object)."
+
+  - id: "controlm@[db].psgmgr.cm_avg_run"
+    system: psgmgr
+    origin: controlm
+    artifact: cm_avg_run
+    artifact_kind: table
+    taxonomy_category: Pipelines
+    asset_type: dcat:Dataset
+    authority: ADS
+    feeds_taxonomy: [runtime_stats]
+    adapter: oracle
+    locator:
+      mapping: config/source-mappings/psgmgr.yaml
+    confirmed: true                     # gate controlm-avg-run-supplement SIGNED OFF 2026-07-14 (P2; 20 confirmations, §B ctlm_id join edit) — transfers per Q6. The v1 umbrella row's note still read "AWAITING SME": stale since 07-14, caught at this per-row confirmation sweep.
+    replaces: controlm-psgmgr
+    notes: >
+      Runtime stats (avg/median start+run) — property supplement onto
+      :ControlMJob, no new vocabulary (MATCH-never-MERGE). Join: ctlm_id
+      where the replica exposes it; SCHED_TABLE + JOB_MEM_NAME fallback;
+      MEMNAME never a key. Supplement loader itself still unbuilt.
+
+  - id: "controlm@[db].psgmgr.cm_hist_vw"
+    system: psgmgr
+    origin: controlm
+    artifact: cm_hist_vw
+    artifact_kind: view
+    taxonomy_category: Pipelines
+    asset_type: dcat:Dataset
+    authority: ADS
+    feeds_taxonomy: []
     adapter: ~
+    confirmed: false                    # planned run-history feed (jobrun-observation mapping, status proposed); no extractor/loader yet
+    notes: >
+      Run history (DTSREMGR retired; JOB_MEM_NAME = JOB_NAME is the only
+      reliable join back to CM_DEF_VJOB — MEMNAME is junk, never a key).
+      Registered at the N9 build because the v2 grain finally has a row for
+      the jobrun-observation mapping to cite; expensive view — every extract
+      must bind an indexed predicate.
+
+  - id: "seal@[db].psgmgr.cm_escalation_db"
+    system: psgmgr
+    origin: seal
+    artifact: cm_escalation_db
+    artifact_kind: table
+    taxonomy_category: ITSM / Gov
+    asset_type: dcat:Dataset
+    authority: ADS
+    feeds_taxonomy: []
+    adapter: ~
+    confirmed: false                    # future feed — no extractor/loader; registered because it is the gate's own worked example of a replica (origin seal, carrier psgmgr)
+    notes: >
+      Escalation/SCIM routing (EJOBNAME join, ECOMPONENT = SEAL). The user's
+      named case for the replica grammar: SEAL data landing in psgmgr is a
+      SEAL dataset ON a psgmgr carrier, not "a psgmgr table".
+
+  # ---- Control-M born-here export --------------------------------------------
+  - id: "controlm:deftable-xml-export"
+    system: controlm
+    origin: controlm
+    artifact: deftable-xml-export
+    artifact_kind: file
+    taxonomy_category: Pipelines
+    asset_type: dcat:Dataset
+    authority: SOR
+    feeds_taxonomy: [folders, jobs, variables]
+    adapter: ~                          # G47 extractor (drydocs_lineage/extractors/controlm_xml.py) — taxonomy-first staging, no loader
+    locator:
+      data_root: "DRYDOCS_DATA_ROOT (default ~/data/DryDocs); controlm-xml/ = definition exports (arbitrarily-named .xml — landing-zone convention + classification are the guard)"
+      resolver: drydocs_core/data_root.py   # controlm_xml_dir() (the G19 shared helper)
+    confirmed: false                    # OPEN precedence ruling vs the psgmgr replica datasets (HITL — IDEAS question 2026-07-29); NOTHING writes the graph before it
+    replaces: controlm-xml-export
+    notes: >
+      The environment's real config SoR (XML-not-JSON): definitions + ordered
+      folder/job variables in one self-consistent snapshot (G47, ASSUMED
+      element contract from SYNTHETIC fixtures). Feeds G48
+      resolve-cmdline-staging through the ONE shared resolver. Which source
+      wins per object vs the psgmgr replica is the open precedence.yaml
+      ruling with a named owner-and-sunset (guardrail 3).
+
+  # ---- Orchestrator placeholders (crosswalk-only activations) ----------------
+  - id: "autosys:export"
+    system: autosys
+    origin: autosys
+    artifact: export
+    artifact_kind: file
+    taxonomy_category: Pipelines
+    asset_type: dcat:Dataset
+    authority: SOR
+    feeds_taxonomy: [folders, jobs, conditions, dependencies]
+    adapter: ~
+    crosswalk: config/crosswalks/autosys-to-bmc.yaml
+    gate_spec: config/gate-prompts/autosys-crosswalk.yaml
+    confirmed: true                     # gate autosys-crosswalk SIGNED OFF 2026-07-14 (13 confirmations) — transfers per Q6; loader still unbuilt + separately gated
+    replaces: autosys-export
+    notes: >
+      Crosswalk CONFIRMED (row 6 demoted exact -> approximate at the SME
+      wording review). Source-row activation ONLY: no export feed exists and
+      no loader is built. Narrative: external/orchestration/autosys/README.md.
+
+  - id: "airflow:dag-export"
+    system: airflow
+    origin: airflow
+    artifact: dag-export
+    artifact_kind: file
+    taxonomy_category: Pipelines
+    asset_type: dcat:Dataset
+    authority: SOR
+    feeds_taxonomy: [folders, jobs, conditions, dependencies]
+    adapter: ~
+    crosswalk: config/crosswalks/airflow-to-bmc.yaml
+    gate_spec: config/gate-prompts/airflow-crosswalk.yaml
+    confirmed: true                     # gate airflow-crosswalk SIGNED OFF 2026-07-14 (17 confirmations) — transfers per Q6; loader still unbuilt + separately gated
+    replaces: airflow-mwaa
+    notes: >
+      Crosswalk CONFIRMED (row 8 split 8a/8b/8c at the SME wording review).
+      Source-row activation ONLY: no DAG-export feed exists. Narrative:
+      external/orchestration/airflow/README.md.
+
+  # ---- SEAL --------------------------------------------------------------------
+  - id: "seal:app-extract"
+    system: seal
+    origin: seal
+    artifact: app-extract
+    artifact_kind: report
+    taxonomy_category: Software / Apps
+    asset_type: dcat:Dataset
+    authority: SOR
+    feeds_taxonomy: [applications, ports, memberships, roles, employees]
+    adapter: csv                        # CsvAdapter (samples) / internal extract in prod
+    confirmed: true                     # live since the M1 chain; transfers per Q6
+    replaces: seal-extract
+    notes: "Live. SEAL applications + ownership."
+
+  # ---- PAT (the T19 naming ruling: neither legacy string survives) -----------
+  - id: "pat:product-catalog"
+    system: pat
+    origin: pat
+    artifact: product-catalog
+    artifact_kind: report
+    taxonomy_category: Product
+    asset_type: dcat:Dataset
+    authority: SOR
+    feeds_taxonomy: [lob, product_lines, products, area_products, dev_teams]
+    adapter: csv
+    locator:
+      extract: ~                        # real report path/export coordinates — internal/ twin only
+    confirmed: true                     # catalog-hierarchy gates (SME 2026-06-21 rulings; C9 2026-07-18) — transfers per Q6
+    replaces: catalog-pat
+    notes: >
+      The catalog hierarchy feed (LOB→Product→Team; lowest precedence
+      authority). T19 ruling 2026-07-31: named pat:product-catalog —
+      industry-standard naming matching NEITHER legacy string (catalog-pat /
+      pat-catalog), so neither repo's wrong value survives; recorded in the
+      docs/port-prompt.md divergence ledger for the company T19 gate.
+
+  - id: "pat:people-report"
+    system: pat
+    origin: pat
+    artifact: people-report
+    artifact_kind: report
+    taxonomy_category: People & Org
+    asset_type: dcat:Dataset
+    authority: SOR
+    feeds_taxonomy: [team_applications]
+    adapter: csv
+    locator:
+      mapping: ~                        # team report: team_id, lob, seal_ids (1..n), jira board, team_type/relationship, status, agile framework — REAL rows never committed here
+    confirmed: true                     # C9 gate (2026-07-18): the PAT team report as the team_applications feed — transfers per Q6
+    replaces: catalog-pat
+    notes: >
+      The PAT team report (split out of the old catalog-pat umbrella — the
+      forced-split example). Team-scoped seal_ids populate the ACTIVE
+      arch_develops edge; alignment (supporting area product, else product)
+      is VOLATILE and relationship-typed (dedicated|aligned|flex), swept per
+      team on each load. SME evidence held in-session (confidential).
+
+  # ---- ServiceNow (Q4 — registers now, typed SaaS) ---------------------------
+  - id: "snow:cmdb-ci-classes"
+    system: snow
+    origin: snow
+    artifact: cmdb-ci-classes
+    artifact_kind: file
+    taxonomy_category: ITSM / Gov
+    asset_type: dcat:Dataset
+    authority: SOR
+    feeds_taxonomy: []
+    adapter: ~
+    confirmed: false                    # no gate yet — the sampled class export (internal/registry-redesign/samples/SNOW-CMDB.csv is the header-only capture)
+    notes: >
+      The CMDB class/relationship export (Q4). Doubles as the crosswalk
+      source for every system row's cmdb_ci field once its gate rules.
+
+  # ---- Repo-native datasets ---------------------------------------------------
+  - id: "repo:software-registry"
+    system: repo
+    origin: repo
+    artifact: software-registry
+    artifact_kind: file
+    taxonomy_category: Software / Apps
+    asset_type: dcat:Dataset
+    authority: SOR
+    feeds_taxonomy: [vendors, software_products]
+    adapter: yaml                       # RegistryYamlAdapter (flattens vendors/products)
+    confirmed: true                     # SME gate 2026-07-07 (ADR 0004) — transfers per Q6
+    replaces: software-registry
+    notes: >
+      The taxonomy ledger config/taxonomy/software-registry.yaml loading as
+      an ordinary dataset (the three-distinctions ruling: the LEDGER is not a
+      source; its graph LOAD is). Vendor = brand only; graph is the lookup.
+
+  - id: "repo:depgraph-snapshot"
+    system: repo
+    origin: repo
+    artifact: depgraph-snapshot
+    artifact_kind: file
+    taxonomy_category: Architecture
+    asset_type: dcat:Dataset
+    derived: true                       # deterministic structural capture of code we control (Q3: authority omitted on derived stores)
+    feeds_taxonomy: []                  # no config/taxonomy/ file — lands as ontology + loader (gate meta.Taxonomy)
+    adapter: json                       # CodeSnapshotAdapter (newest-file selection + positive meta.tree discrimination)
+    locator:
+      mapping: config/source-mappings/depgraph-snapshot.yaml   # field ledger (doc 08)
+    gate_spec: config/gate-prompts/self-documentation-code-graph.yaml
+    confirmed: true                     # gate self-documentation-code-graph SIGNED OFF 2026-07-27 (36/36) — transfers per Q6
+    replaces: depgraph-snapshot
+    notes: >
+      G33 / Epic U self-documentation (loader `drydocs load-code-snapshot`).
+      Tree-mode files REFUSED by positive assertion (meta present AND
+      meta.tree == false). Internal-Public holds BECAUSE abs_path never
+      loads; the snapshot files are never-port in PORT-MANIFEST.yaml.
+
+  - id: "repo:design-docs"
+    system: repo
+    origin: repo
+    artifact: design-docs
+    artifact_kind: file
+    taxonomy_category: Architecture
+    asset_type: dcat:Dataset
+    authority: SOR
+    feeds_taxonomy: [design_docs, doc_sections, requirements, components, test_cases, feedback_notes]
+    adapter: markdown                   # DesignDocSectionsAdapter / TraceabilityMatrixAdapter / DesignDocFeedbackAdapter
+    locator:
+      mapping: config/source-mappings/design-docs.yaml   # field ledger (three parse streams)
+    gate_spec: config/gate-prompts/doc-traceability-feedback.yaml
+    confirmed: true                     # gate doc-traceability-feedback signed off 2026-07-20 (21 confirmations) — transfers per Q6
+    replaces: design-docs
+    notes: >
+      PIPELINE-SIDE ONLY (Q5 ruling): feeds graph classes beyond
+      Document/Chunk, so it lives here and has NO doc-registry twin. L7
+      connector #1 ("tenant 0"). Keys are source-namespaced
+      (origin = drydocs-design-docs).
+
+  # ---- Server inventory -------------------------------------------------------
+  - id: "exec-hosts:rua-bundle"
+    system: exec-hosts
+    origin: exec-hosts
+    artifact: rua-bundle
+    artifact_kind: file
+    taxonomy_category: Infrastructure
+    asset_type: dcat:Dataset
+    authority: SOR
+    feeds_taxonomy: [scripts, hosts]
+    adapter: ~                          # G20 extractor (drydocs_lineage/extractors/rua_inventory.py) — staging only; no loader before G22
+    confirmed: false                    # G22 rua-load gate pending (clauses a–g); NOTHING writes the graph before it
+    replaces: rua-inventory
+    notes: >
+      rua_*.tar.gz bundles collected on execution hosts by
+      drydocs_lineage/collect/rua_inventory.sh. Chain: G18 collector parity
+      -> G20 extractor (meta.txt provenance envelope) -> G21 code-operations
+      -> G22 HITL gate = this row's activation condition.
+
+  # ---- DPL taxonomy registry --------------------------------------------------
+  - id: "dpl:pipeline-registry"
+    system: dpl
+    origin: dpl
+    artifact: pipeline-registry
+    artifact_kind: api
+    taxonomy_category: Pipelines
+    asset_type: dcat:Dataset
+    authority: SOR
+    feeds_taxonomy: [pipelines]
+    adapter: ~                          # G25 extractor (drydocs_lineage/extractors/dpl_registry.py) — taxonomy-first staging, no loader
+    confirmed: false                    # G22 clauses (f)/(g) own the rulings this feeds; NOTHING writes the graph before it
+    replaces: dpl-registry
+    notes: >
+      pipeline_id.json Swagger exports (per SEAL) — another forced-split
+      example: the old dpl-registry umbrella hid two artifacts. The registry
+      sits ABOVE the pipelines (shared GUID join with G15/G17); the active
+      flag is a THIRD usage signal — staged only; any conflation with "used"
+      is a G22 ruling.
+
+  - id: "dpl:dataset-registry"
+    system: dpl
+    origin: dpl
+    artifact: dataset-registry
+    artifact_kind: api
+    taxonomy_category: Data Asset
+    asset_type: dcat:Dataset
+    authority: SOR
+    feeds_taxonomy: [datasets]
+    adapter: ~
+    confirmed: false                    # same activation condition as dpl:pipeline-registry
+    replaces: dpl-registry
+    notes: "dataset_id.json Swagger exports (per SEAL); clone-lag caveat (SME 2026-07-23) — bulk export is the backup discovery source."
+
+  # ---- Snowflake data-catalog registration views (origin catalog = SOR,
+  # ---- carrier snowflake = ADS) ----------------------------------------------
+  - id: "catalog@[db].[schema].datasets_v"
+    system: snowflake
+    origin: catalog
+    artifact: datasets_v
+    artifact_kind: view
+    taxonomy_category: Data Asset
+    asset_type: dcat:Dataset
+    authority: ADS
+    feeds_taxonomy: [datasets]
+    adapter: ~                          # G42 extractor (drydocs_lineage/extractors/snowflake_catalog.py) — taxonomy-first staging, no loader
+    locator:
+      mapping: docs/generic-snowflake-data-catalog-ingestion-plan.md   # the mapping ledger (field contract §2, identity model §3)
+    confirmed: false                    # gate snowflake-data-catalog (plan §5 questions a–f; prompt not yet drafted) is the activation condition
+    replaces: snowflake-data-catalog
+    notes: >
+      Full-pull CSV exports of the curated dataset-registration view (real
+      view name carries a catalog prefix — internal twin). THE POINTER,
+      NEVER THE DATA (guard: tests/unit/test_data_root.py). DPL-registered
+      rows land on the same dpl_dataset identity the other seams stage;
+      AUTHORITY2/null-source rows stay in their own origin (the G41 rule).
+
+  - id: "catalog@[db].[schema].distributions_v"
+    system: snowflake
+    origin: catalog
+    artifact: distributions_v
+    artifact_kind: view
+    taxonomy_category: Data Asset
+    asset_type: dcat:Dataset
+    authority: ADS
+    feeds_taxonomy: [distributions]
+    adapter: ~
+    confirmed: false                    # same activation condition as the datasets view
+    replaces: snowflake-data-catalog
+    notes: "The distribution/physical-coordinates view (HDFS paths, S3 buckets/ARNs — real values never in-tree)."
+
+  # ---- Code repositories ------------------------------------------------------
+  - id: "bitbucket:repo-objects-manifest"
+    system: bitbucket
+    origin: bitbucket
+    artifact: repo-objects-manifest
+    artifact_kind: file
+    taxonomy_category: Software / Apps
+    asset_type: dcat:Dataset
+    authority: SOR
+    feeds_taxonomy: [scripts]
+    adapter: ~                          # G24 extractor (drydocs_lineage/extractors/code_repo.py) — staging + corroboration report, no loader
+    confirmed: false                    # G22 owns identity/dedup + precedence between origins; NOTHING writes the graph before it
+    replaces: code-repo
+    trusted_ref: ~                      # HUMAN-BLESSED intent line (G24): the one ref this repo's team keeps clean.
+                                        # null = server-extract-only truth (the stale-main case). The corroboration
+                                        # sweep NAMES a candidate ref mechanically; only a human sets this field.
+    notes: >
+      Per-repo object-sweep manifest (repo_objects.tsv: git rev-list --all
+      --objects + ref tips); producer fixtures are SYNTHETIC. Real
+      Bitbucket/GitHub access stays company-side behind the manifest contract.
+
+  # ---- Data-platform placeholders --------------------------------------------
+  - id: "oracle:schema-inventory"
+    system: oracle
+    origin: oracle
+    artifact: schema-inventory
+    artifact_kind: query
+    taxonomy_category: Data Asset
+    asset_type: dcat:Dataset
+    authority: SOR
+    feeds_taxonomy: [schemas, tables, scripts]
+    adapter: oracle
+    confirmed: false                    # ingestion pipeline planned (see backlog)
+    replaces: oracle-schemas
+    notes: "Oracle DB schemas/scripts as taxonomy -> DataAsset. Per-schema split is the future gate; real names are confidential."
+
+  - id: "snowflake:schema-inventory"
+    system: snowflake
+    origin: snowflake
+    artifact: schema-inventory
+    artifact_kind: query
+    taxonomy_category: Data Asset
+    asset_type: dcat:Dataset
+    authority: SOR
     feeds_taxonomy: [schemas, tables]
+    adapter: ~
     confirmed: false
+    replaces: snowflake
     notes: "Expansion placeholder."
 
-  # ---- Staging semantic-fact streams (C3/C4 variable normalization) --------
-  - id: stg-app-fact
-    classification: Internal             # mechanism-only entry; no real SEAL/FID/app-name values here
-    source: "oracle:DRYDOCS_STG.STG_APP_FACT (Python normalizer output over CM_DEF_SETVAR_VW)"
-    kind: staging
-    orchestrator: ~                      # not an orchestration vendor — a staging table fed by the C3/C4 variable-normalization stream
+  # ---- Staging semantic-fact stream (derived store — Q3) ---------------------
+  - id: "controlm@[db].drydocs_stg.stg_app_fact"
+    system: drydocs-stg
+    origin: controlm
+    artifact: stg_app_fact
+    artifact_kind: table
+    taxonomy_category: Software / Apps
+    asset_type: dcat:Dataset
+    derived: true                       # Q3 ruling: derived store — @ grammar for visibility, authority omitted (not SOR/ADS; FCDO SOC checked, doesn't fit)
+    feeds_taxonomy: [applications]      # semantic facts attribute a ControlMJob to an Application (SEAL)
     adapter: oracle
-    feeds_taxonomy: [applications]       # semantic facts attribute a ControlMJob to an Application (SEAL)
-    confirmed: true                      # gate seal-attribution-match-policy SIGNED OFF 24/24 (2026-07-14, config/gate-log.md) — the entry's own activation condition
     gate_spec: config/gate-prompts/seal-attribution-match-policy.yaml
     loader: drydocs/loaders/seal_attribution.py   # built with the flip (K2); cypher seal_attribution.cypher
+    confirmed: true                     # gate seal-attribution-match-policy SIGNED OFF 24/24 (2026-07-14) — transfers per Q6
+    replaces: stg-app-fact
     notes: >
-      Registered per K1's flag (docs/restructure/backlog.yaml Epic K): job.APPLICATION
-      (CM_DEF_VJOB) is NOT reliable SEAL identity — the SEAL-attribution feed is this
-      table's semantic facts instead. Rows carry fact_type in {SEAL, FID, APP_NAME,
-      ALIAS, ...} + fact_value, one row per (run, job, fact_type) — see
-      docs/controlm-staging-ingestion-flow.md (STG_APP_FACT ER block) and
-      docs/reviews/sdlc-oracle-ingestion.md §FR-OI-007. Feeds the now-ACTIVE
-      m3_seal_app_ref mapping (WAS_ASSOCIATED_WITH, role seal_app_ref,
-      drydocs_core/ontology/relationship_vocabulary.yaml) and the confirmed
-      taxonomy-ontology-map.yaml entry (job-seal-app-ref). Mechanism-only
-      here — no real SEAL id / FID / application-name values, column/fact-type names
-      only. ACTIVATED 2026-07-14 with the K2 loader build: the match-policy gate
-      (SEAL-fact precedence; one-to-one accepted, zero-unmatched surfaced, multi-hit
-      deterministic triage; manual tier-5 PIN) was SME-confirmed and logged that day —
-      exactly the activation condition this entry carried since K1. Extract:
-      drydocs/loaders/sql/controlm_app_facts.sql (ORDER BY = the tie-break contract).
+      Python normalizer output over CM_DEF_SETVAR_VW (K1: job.APPLICATION is
+      NOT reliable SEAL identity — this table's semantic facts are the feed
+      instead). Rows carry fact_type in {SEAL, FID, APP_NAME, ALIAS, ...};
+      feeds the ACTIVE m3_seal_app_ref mapping. Mechanism-only here — no
+      real SEAL/FID/app-name values. Extract:
+      drydocs/loaders/sql/controlm_app_facts.sql (ORDER BY = tie-break
+      contract).
+
+# ---------------------------------------------------------------------------
+# RETIRED IDS (D4) — the refusal list. SourceRegistry.from_yaml and the
+# loader-source overlay guard REFUSE every id below; renamed rows above carry
+# the matching `replaces:` back-pointer. A retired string can NEVER be
+# re-minted with a different meaning.
+# ---------------------------------------------------------------------------
+retired:
+  - id: controlm-psgmgr
+    replaced_by: ["controlm@[db].psgmgr.cm_def_vtab", "controlm@[db].psgmgr.cm_def_vjob",
+                  "controlm@[db].psgmgr.cm_def_lnki_p_vw", "controlm@[db].psgmgr.cm_def_lnko_p_vw",
+                  "controlm@[db].psgmgr.cm_def_setvar_vw", "controlm@[db].psgmgr.cm_hosts",
+                  "controlm@[db].psgmgr.cm_avg_run"]
+    reason: "one flat id spanned a connection AND seven datasets (the drift the gate closed)"
+  - id: controlm-xml-export
+    replaced_by: ["controlm:deftable-xml-export"]
+    reason: "born-here grammar"
+  - id: autosys-export
+    replaced_by: ["autosys:export"]
+    reason: "born-here grammar"
+  - id: airflow-mwaa
+    replaced_by: ["airflow:dag-export"]
+    reason: "born-here grammar"
+  - id: seal-extract
+    replaced_by: ["seal:app-extract"]
+    reason: "born-here grammar"
+  - id: catalog-pat
+    replaced_by: ["pat:product-catalog", "pat:people-report"]
+    reason: "T19 ruling 2026-07-31: one id for two unrelated feeds; replacement matches NEITHER legacy string"
+  - id: pat-catalog
+    replaced_by: ["pat:product-catalog", "pat:people-report"]
+    reason: "the company-side twin of the same-string collision (tracker T19) — refused here so neither repo's wrong value can ever land"
+  - id: software-registry
+    replaced_by: ["repo:software-registry"]
+    reason: "the LEDGER is taxonomy, not a source; its graph LOAD is the dataset"
+  - id: depgraph-snapshot
+    replaced_by: ["repo:depgraph-snapshot"]
+    reason: "born-here grammar"
+  - id: design-docs
+    replaced_by: ["repo:design-docs"]
+    reason: "born-here grammar (pipeline-side only per Q5)"
+  # NOTE — bmc-docs / essential-graphrag / fcdo-frameworks are NOT retired:
+  # those ids stay LIVE in their one home (config/doc-source-registry.yaml);
+  # only the pipeline twin rows dropped. The runtime registry unions the doc
+  # ledger, so loaders bound to them still resolve and gate.
+  - id: rua-inventory
+    replaced_by: ["exec-hosts:rua-bundle"]
+    reason: "born-here grammar on the exec-hosts system"
+  - id: dpl-registry
+    replaced_by: ["dpl:pipeline-registry", "dpl:dataset-registry"]
+    reason: "one id for two Swagger artifacts — forced split"
+  - id: snowflake-data-catalog
+    replaced_by: ["catalog@[db].[schema].datasets_v", "catalog@[db].[schema].distributions_v"]
+    reason: "replica grammar: origin catalog, carrier snowflake; one id spanned two views"
+  - id: code-repo
+    replaced_by: ["bitbucket:repo-objects-manifest"]
+    reason: "born-here grammar on the bitbucket system"
+  - id: oracle-schemas
+    replaced_by: ["oracle:schema-inventory"]
+    reason: "born-here grammar; per-schema split is a future gate"
+  - id: snowflake
+    replaced_by: ["snowflake:schema-inventory"]
+    reason: "the flat id collided with the v2 SYSTEM id; the placeholder dataset gets its own name"
+  - id: stg-app-fact
+    replaced_by: ["controlm@[db].drydocs_stg.stg_app_fact"]
+    reason: "derived-store grammar (Q3): origin controlm visible, carrier our own staging schema"

@@ -11,7 +11,7 @@
 # are mechanism (no data values) — classification: Internal-Public.
 # =============================================================================
 schema: drydocs.source-mapping.v1
-source: design-docs
+source: "repo:design-docs"            # v2 dataset id (N9; file name keeps the artifact stem — ':' is not filename-safe)
 classification: Internal-Public
 updated: 2026-07-20
 

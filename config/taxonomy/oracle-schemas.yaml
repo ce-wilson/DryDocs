@@ -14,7 +14,7 @@
 taxonomy: oracle-schemas
 domain: data
 taxonomy_path_root: data/oracle
-source: oracle-schemas
+source: "oracle:schema-inventory"  # config/source-registry.yaml v2 dataset id
 authority: internal-standards          # config/precedence.yaml tier 2
 classification: Internal               # confidential handling: real object names (J23 collapse)
 classification_only: true

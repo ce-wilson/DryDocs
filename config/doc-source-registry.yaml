@@ -22,10 +22,16 @@
 #
 # Freshness is gate-preserving (ADR 0006 §4): a sha256 change on refetch
 # RE-QUEUES curation — a changed page never silently overwrites confirmed content.
+#
+# N9 (2026-07-31, gate source-registry-v2): the pipeline-registry twin entries
+# for these corpora DROPPED — this file is now each corpus's ONE home, so it
+# also carries the pipeline `confirmed:` gate state (the lexical-load gates
+# that used to live on the twins). The runtime SourceRegistry unions this
+# ledger, so doc loaders still gate through require_confirmed.
 # =============================================================================
 
 schema: drydocs.doc-source-registry.v1
-updated: 2026-07-18
+updated: 2026-07-31
 
 sources:
   # ---- Currently ingested corpora (backfill, Q5) ----------------------------
@@ -42,6 +48,7 @@ sources:
     target_db: dddocs                   # ADR 0006 §2 — demonstrated in `drydocs` today; RE-TARGETS to dddocs at the P4 loader build (idempotent reload, not a migration)
     refresh: manual
     taxonomy_path: technology/orchestration/control-m
+    confirmed: true                     # gate bmc-docs-lexical-load SME-accepted 2026-07-08 (config/gate-log.md) — moved here from the dropped pipeline twin (N9)
     notes: >
       The canonical T1 vendor corpus (gate bmc-docs-lexical-load, 2026-07-08 —
       recorded on the pipeline-registry twin entry). Loaded as the ACTIVE
@@ -61,6 +68,7 @@ sources:
     target_db: ddcontext                # experiment/reference content stays out of ground truth (Q2 decision; ADR 0006 §2 keeps it here)
     refresh: manual
     taxonomy_path: ~                    # a methodology book — deliberately no DESCRIBES / product taxonomy hook
+    confirmed: true                     # Q2 groom decision 2026-07-16: pure REUSE of the ACTIVE docs_* vocabulary — covering gate = bmc-docs-lexical-load (moved here from the dropped pipeline twin, N9)
     notes: >
       The Q2 agent-traversal experiment corpus; fed the docmeta P0 benchmark
       verdict (traversal arm). Pattern notes mined from the same book:
@@ -78,6 +86,7 @@ sources:
     target_db: ddcontext                  # reference/standards content, never ground truth
     refresh: on-demand
     taxonomy_path: ~
+    confirmed: false                    # crosswalk gate not yet drafted (ALIGNMENT-PLAN Phase 1 / backlog W1) — moved here from the dropped pipeline twin (N9)
     notes: >
       The FCDO firmwide data-publishing frameworks corpus (ontology/taxonomy/
       provenance/ETL standards from the internal governance group). Purpose:
@@ -100,6 +109,7 @@ sources:
     target_db: ddcontext                # the original ddcontext precedent the Q2 book load cited
     refresh: manual
     taxonomy_path: ~
+    confirmed: false                    # no active loader binds here; reshaping onto the lexical spine is a P4+ decision — a future loader gates on this flag (N9)
     notes: >
       The FIRST ddcontext doc ingestion (pre-dates the docmeta plan): JPMC
       annual-report sections as :DataAsset slices seeding the effective-dated

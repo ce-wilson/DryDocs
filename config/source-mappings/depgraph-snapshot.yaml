@@ -12,7 +12,7 @@
 # structural capture, no data values) — classification: Internal-Public.
 # =============================================================================
 schema: drydocs.source-mapping.v1
-source: depgraph-snapshot
+source: "repo:depgraph-snapshot"      # v2 dataset id (N9; file name keeps the artifact stem — ':' is not filename-safe)
 classification: Internal-Public
 updated: 2026-07-27
 

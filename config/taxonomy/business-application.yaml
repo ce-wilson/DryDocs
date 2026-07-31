@@ -30,7 +30,7 @@ taxonomy: business-application
 domain: business
 taxonomy_path_root: business/application
 concept: BusinessApplication           # generic node concept (graph label :BusinessApplication — normalized at K4, 2026-07-15)
-source: seal-extract                   # config/source-registry.yaml
+source: "seal:app-extract"             # config/source-registry.yaml v2 dataset id
 source_of_record: SEAL                 # authoritative registry for BusinessApplication
 identifier: "Application ID"           # the SOURCE's own field name for the unique id (= app_id).
                                        # CORRECTED 2026-07-27 at the business-application-identity

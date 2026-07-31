@@ -169,7 +169,10 @@ def test_registry_carries_the_trusted_ref_field() -> None:
     reg = yaml.safe_load(
         Path("config/source-registry.yaml").read_text(encoding="utf-8")
     )
-    entry = next(s for s in reg["sources"] if s["id"] == "code-repo")
+    # v2 (N9): code-repo retired -> the bitbucket:repo-objects-manifest dataset;
+    # classification lives on the bitbucket SYSTEM row.
+    entry = next(s for s in reg["datasets"] if s["id"] == "bitbucket:repo-objects-manifest")
     assert "trusted_ref" in entry and entry["trusted_ref"] is None
     assert entry["confirmed"] is False
-    assert entry["classification"] == "Internal"
+    system = next(s for s in reg["systems"] if s["id"] == entry["system"])
+    assert system["classification"] == "Internal"

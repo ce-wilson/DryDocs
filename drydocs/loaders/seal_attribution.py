@@ -367,7 +367,7 @@ class SealAttributionLoader(BaseLoader):
     can reconcile them (§B: the invariant joins graph_verify)."""
 
     name: ClassVar[str] = "seal_attribution.v1"
-    source_id: ClassVar[str | None] = "stg-app-fact"
+    source_id: ClassVar[str | None] = "controlm@[db].drydocs_stg.stg_app_fact"
     cypher_path: ClassVar[Path | None] = (
         Path(__file__).resolve().parent / "cypher" / "seal_attribution.cypher"
     )

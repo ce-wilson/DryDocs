@@ -1,6 +1,10 @@
 # =============================================================================
-# config/source-mappings/controlm-psgmgr.yaml — the column ledger for source
-# `controlm-psgmgr` (config/source-registry.yaml id).
+# config/source-mappings/psgmgr.yaml — the column ledger for the psgmgr
+# CARRIER (config/source-registry.yaml v2 system id `psgmgr`). One ledger for
+# the whole replica DB: each OBJECT below is its own v2 DATASET row
+# (controlm@[db].psgmgr.<object>), and every one of those rows points its
+# locator.mapping here. (Renamed from controlm-psgmgr.yaml at the N9 build —
+# the flat source id retired with the v2 split.)
 #
 # THE LEDGER: per source OBJECT (a psgmgr CM_ table/view), one row per column
 # recording its DISPOSITION — projected (lands in staging/graph) | filter-only
@@ -36,9 +40,9 @@
 # tests/unit/test_source_mapping_drift.py.
 # =============================================================================
 schema: drydocs.source-mapping.v1
-source: controlm-psgmgr
+source: psgmgr                # v2 SYSTEM id (carrier scope) — objects below map 1:1 to controlm@[db].psgmgr.* dataset rows
 classification: Internal-Public
-updated: 2026-07-09
+updated: 2026-07-31
 
 objects:
   # ---------------------------------------------------------------------------

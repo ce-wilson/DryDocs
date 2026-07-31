@@ -1101,3 +1101,34 @@ build** with its three premise errors corrected.
   lands; J21's hardening of the CURRENT registry remains the interim
   guarantee. The classification collapse (J23) already landed pre-gate as
   machinery removal. Output feeds the company T19 review, not a port.
+
+## 2026-07-31 — AMENDMENT: source-registry v2 id migration — old→new id map (N9 build; gate source-registry-v2 Q6)
+
+**One amendment entry, per the Q6 ruling:** existing signed-off gates TRANSFER to the renamed
+dataset rows as-is (rename = identity refactoring, not meaning change); this entry maps every
+old id to its replacement so gate-log history keyed on v1 ids stays traceable. The D4 refusal
+list in `config/source-registry.yaml` refuses every old id from here on.
+
+| v1 flat id (retired) | v2 replacement(s) | transferred gate(s) |
+|---|---|---|
+| `controlm-psgmgr` | `controlm@[db].psgmgr.cm_def_vtab` · `cm_def_vjob` · `cm_def_lnki_p_vw` · `cm_def_lnko_p_vw` · `cm_def_setvar_vw` (confirmed: controlm-q1q3-phase1 2026-07-07) · `cm_hosts` (controlm-hosts-topology 2026-07-09) · `cm_avg_run` (controlm-avg-run-supplement 2026-07-14 — the v1 umbrella note still said AWAITING SME; stale since 07-14, corrected at this per-row sweep) | q1q3-phase1 · hosts-topology · avg-run-supplement |
+| `catalog-pat` / `pat-catalog` | `pat:product-catalog` + `pat:people-report` (the T19 naming ruling — neither legacy string survives; BOTH retired) | catalog-hierarchy rulings 2026-06-21 · C9 2026-07-18 |
+| `seal-extract` | `seal:app-extract` | (live M1 chain) |
+| `stg-app-fact` | `controlm@[db].drydocs_stg.stg_app_fact` (derived: true, Q3) | seal-attribution-match-policy 2026-07-14 |
+| `autosys-export` / `airflow-mwaa` | `autosys:export` / `airflow:dag-export` | autosys-crosswalk / airflow-crosswalk 2026-07-14 |
+| `software-registry` | `repo:software-registry` | software-registry gate 2026-07-07 (ADR 0004) |
+| `depgraph-snapshot` | `repo:depgraph-snapshot` | self-documentation-code-graph 2026-07-27 |
+| `design-docs` | `repo:design-docs` | doc-traceability-feedback 2026-07-20 |
+| `controlm-xml-export` | `controlm:deftable-xml-export` | (unconfirmed — open precedence ruling stands) |
+| `rua-inventory` | `exec-hosts:rua-bundle` | (unconfirmed — G22 pending) |
+| `dpl-registry` | `dpl:pipeline-registry` + `dpl:dataset-registry` | (unconfirmed — G22 f/g) |
+| `snowflake-data-catalog` | `catalog@[db].[schema].datasets_v` + `distributions_v` | (unconfirmed — gate prompt not drafted) |
+| `code-repo` | `bitbucket:repo-objects-manifest` | (unconfirmed — G22) |
+| `oracle-schemas` / `snowflake` | `oracle:schema-inventory` / `snowflake:schema-inventory` | (unconfirmed placeholders) |
+| `bmc-docs` / `essential-graphrag` / `fcdo-frameworks` | NOT renamed — pipeline twins dropped; ids stay live in `config/doc-source-registry.yaml` (one home), which now carries their `confirmed:` state | bmc-docs-lexical-load 2026-07-08 (covers essential-graphrag per the Q2 groom) |
+
+**Per-row residual executed:** every row above was confirmed individually at the N9 build
+(the N7 residual). New rows registered: `seal@[db].psgmgr.cm_escalation_db` (the gate's worked
+example), `controlm@[db].psgmgr.cm_hist_vw` (gives jobrun-observation a citable feed),
+`snow` system + `snow:cmdb-ci-classes` (Q4). Anything that would CHANGE meaning (not rename)
+goes back to the SME — none arose.

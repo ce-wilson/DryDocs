@@ -28,7 +28,7 @@ The `taxonomy-importer` sub-agent writes here. Keep imports faithful to the sour
 One file per taxonomy, e.g. `lob-product-team.yaml`:
 ```yaml
 taxonomy: lob-product-team
-source: catalog-pat
+source: pat                        # a v2 SYSTEM id (or a dataset id where the capture is single-feed)
 authority: lob-product-team        # from precedence.yaml
 nodes:
   - id: LOB:CCB

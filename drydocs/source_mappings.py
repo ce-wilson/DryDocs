@@ -5,7 +5,9 @@ are EXCLUDED (a deliberate no — ``reason: scope | sensitivity | junk | duplica
 and which are DEFERRED (a named future use).
 
 Pure config layer — **no Neo4j, no graph writes**. Schema ``drydocs.source-mapping.v1``.
-The committed ``controlm-psgmgr.yaml`` ledger is TRANSCRIBED from already-decided
+A ledger's ``source:`` names either a v2 DATASET id or the carrier SYSTEM id
+(``psgmgr.yaml`` covers every ``controlm@[db].psgmgr.*`` dataset in one file).
+The committed ``psgmgr.yaml`` ledger is TRANSCRIBED from already-decided
 sources: the five ``drydocs/loaders/sql/controlm_*.sql`` projections, the
 ``controlm-q1q3-phase1`` gate, ``config/audit-fields.yaml``, and doc 06a's SME
 resolutions — never invented here. See

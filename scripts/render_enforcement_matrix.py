@@ -54,6 +54,14 @@ SURFACES: list[dict] = [
         "gate_ref": "per-source gates (add-source-object flow)",
     },
     {
+        "id": "loader-source-overlay",
+        "title": "Loader-source binding overlay",
+        "file": "config/loader-source-overlay.yaml",
+        "consumers": ["drydocs_core/source_registry.py", "drydocs/cli.py"],
+        "guard_tests": ["test_source_registry.py"],
+        "gate_ref": "gate source-registry-v2 D2 (2026-07-31; the company T19 rebind seam)",
+    },
+    {
         "id": "source-mappings",
         "title": "Column-mapping ledgers",
         "file": "config/source-mappings/",

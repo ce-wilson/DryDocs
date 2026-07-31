@@ -126,7 +126,7 @@ def _parse_projection(sql_file: str) -> tuple[list[tuple[str, str, str]], list[s
 
 @pytest.fixture(scope="module")
 def ledger() -> SourceMapping:
-    return SourceMapping.load_source("controlm-psgmgr")
+    return SourceMapping.load_source("psgmgr")
 
 
 # --- 1. SQL drift guard --------------------------------------------------------
@@ -221,47 +221,61 @@ def test_census_with_uncounted_sweep_fails() -> None:
 
 # --- 3. registry integration -----------------------------------------------------
 
-# Confirmed sources that predate doc 08 and have no ledger YET — shrink-only.
-# A NEW confirmed source must ship its ledger (or extend this list through a
-# deliberate commit, which is the point: visible, named debt).
-# airflow-mwaa / autosys-export (2026-07-14, gates airflow-crosswalk /
-# autosys-crosswalk): crosswalk-only activations — no live export exists, so
-# there are no columns to ledger; each ledger ships with its future loader gate.
-# stg-app-fact (2026-07-14, gate seal-attribution-match-policy; K2 loader built
-# with the flip): the table is our own normalizer's staging output — its column
-# ledger belongs to the doc-08 STG census (Phase 2), not the K2 slice.
-# essential-graphrag (2026-07-16, Q2 experiment): a book PDF has no source
-# COLUMNS to ledger — the adapter's chunk fields are our own derivation, the
-# same non-tabular rationale as bmc-docs.
+# Confirmed datasets that predate doc 08 and have no ledger YET — shrink-only.
+# A NEW confirmed dataset must ship its ledger (or extend this list through a
+# deliberate commit, which is the point: visible, named debt). Re-keyed to the
+# v2 dataset ids at N9 (gate source-registry-v2); the doc corpora dropped off
+# the list with their pipeline twins (the doc ledger is not column-ledgered).
+# airflow:dag-export / autosys:export: crosswalk-only activations — no live
+# export exists, so there are no columns to ledger.
+# controlm@[db].drydocs_stg.stg_app_fact: our own normalizer's staging output —
+# its column ledger belongs to the doc-08 STG census (Phase 2), not K2.
+# seal:app-extract / pat:*: confidential extracts — real column mappings go to
+# the internal twin when ledgered.
 LEDGER_PENDING = frozenset(
-    {"seal-extract", "catalog-pat", "software-registry", "bmc-docs",
-     "airflow-mwaa", "autosys-export", "stg-app-fact", "essential-graphrag"}
+    {"seal:app-extract", "pat:product-catalog", "pat:people-report",
+     "repo:software-registry", "airflow:dag-export", "autosys:export",
+     "controlm@[db].drydocs_stg.stg_app_fact"}
 )
 
 
 def test_every_confirmed_source_has_a_ledger_or_is_named_pending() -> None:
     registry = yaml.safe_load(REGISTRY.read_text(encoding="utf-8"))
+    system_ids = {s["id"] for s in registry.get("systems", [])}
     problems: list[str] = []
     seen_pending: set[str] = set()
-    for entry in registry.get("sources", []):
+    for entry in registry.get("datasets", []):
         sid = entry.get("id")
         if not entry.get("confirmed"):
             continue
         mapping = (entry.get("locator") or {}).get("mapping")
-        if mapping:
+        if mapping and mapping.startswith("config/source-mappings/"):
             path = REPO_ROOT / mapping
             if not path.exists():
                 problems.append(f"{sid}: mapping pointer {mapping} does not exist")
-            elif SourceMapping.load(path).source != sid:
-                problems.append(f"{sid}: ledger at {mapping} declares a different source id")
+            else:
+                declared = SourceMapping.load(path).source
+                # a ledger may be dataset-scoped (source == the dataset id) or
+                # carrier-scoped (source == the dataset's system id, one ledger
+                # for the whole replica DB — the psgmgr.yaml case)
+                if declared != sid and declared != entry.get("system"):
+                    problems.append(
+                        f"{sid}: ledger at {mapping} declares source {declared!r} "
+                        f"(neither the dataset id nor its system)"
+                    )
+                if declared in system_ids and declared != entry.get("system"):
+                    problems.append(
+                        f"{sid}: ledger at {mapping} is scoped to a DIFFERENT "
+                        f"system ({declared!r})"
+                    )
         elif sid in LEDGER_PENDING:
             seen_pending.add(sid)
-        else:
+        elif not mapping:
             problems.append(
-                f"{sid}: confirmed source with no locator.mapping ledger pointer "
+                f"{sid}: confirmed dataset with no locator.mapping ledger pointer "
                 "(doc 08 Phase 1) and not on the frozen LEDGER_PENDING list"
             )
-    # shrink-only: a pending source that gained a ledger must leave the list
+    # shrink-only: a pending dataset that gained a ledger must leave the list
     stale = LEDGER_PENDING - seen_pending
     if stale:
         problems.append(f"LEDGER_PENDING entries no longer pending (remove them): {sorted(stale)}")

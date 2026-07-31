@@ -40,6 +40,7 @@ REPO = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(REPO))
 
 REGISTRY = REPO / "config" / "source-registry.yaml"
+DOC_REGISTRY = REPO / "config" / "doc-source-registry.yaml"
 TAXONOMY_DIR = REPO / "config" / "taxonomy"
 MAP_FILE = REPO / "config" / "taxonomy-ontology-map.yaml"
 OUT = REPO / "web" / "src" / "generated" / "load-map.json"
@@ -55,13 +56,28 @@ def _ledger_state(entry: dict) -> dict:
     return {"state": "placeholder", "path": None}
 
 
+def _derived_urn(entry: dict) -> str:
+    """D3 — same derivation as drydocs_core.source_registry.Source.urn."""
+    carrier = entry.get("system") or entry["id"]
+    artifact = entry.get("artifact") or entry["id"]
+    return f"urn:drydocs:dataset:({carrier},{artifact},prod)".lower()
+
+
 def build_load_map() -> dict:
     from drydocs import cli  # deferred: scripts/ runs outside the package
 
-    registry_entries = yaml.safe_load(REGISTRY.read_text(encoding="utf-8"))["sources"]
+    registry_doc = yaml.safe_load(REGISTRY.read_text(encoding="utf-8"))
+    system_entries = registry_doc.get("systems", [])
+    dataset_entries = registry_doc.get("datasets", [])
+    retired_entries = registry_doc.get("retired", [])
+    doc_entries = yaml.safe_load(DOC_REGISTRY.read_text(encoding="utf-8"))["sources"]
     map_entries = yaml.safe_load(MAP_FILE.read_text(encoding="utf-8"))["mappings"]
 
-    # taxonomy captures, joined by their own top-level `source:` declaration
+    system_by_id = {e["id"]: e for e in system_entries}
+
+    # taxonomy captures, joined by their own top-level `source:` declaration —
+    # a capture may name a DATASET id (single-feed) or a SYSTEM id (the
+    # hierarchy spans several of the system's datasets).
     captures_by_source: dict[str, list[str]] = {}
     for path in sorted(TAXONOMY_DIR.glob("*.yaml")):
         doc = yaml.safe_load(path.read_text(encoding="utf-8"))
@@ -98,10 +114,10 @@ def build_load_map() -> dict:
     for rows in loaders_by_source.values():
         rows.sort(key=lambda r: r["name"])
 
-    # ontology mappings by taxonomy.source
+    # ontology mappings by taxonomy.source (dataset ids; doc-corpus ids valid too)
     mappings_by_source: dict[str, list[dict]] = {}
     unmatched_map_sources: list[dict] = []
-    registry_ids = {e["id"] for e in registry_entries}
+    registry_ids = {e["id"] for e in dataset_entries} | {e["id"] for e in doc_entries}
     for m in map_entries:
         source = (m.get("taxonomy") or {}).get("source")
         row = {
@@ -116,13 +132,54 @@ def build_load_map() -> dict:
             # source is drift worth seeing on the one surface
             unmatched_map_sources.append({**row, "source": source})
 
+    systems: list[dict] = []
+    for entry in system_entries:  # registry order — the file's own grouping
+        systems.append(
+            {
+                "id": entry["id"],
+                "name": entry.get("name"),
+                "layer": entry.get("layer"),
+                "classification": entry.get("classification"),
+                "taxonomy_captures": captures_by_source.get(entry["id"], []),
+            }
+        )
+
     sources: list[dict] = []
-    for entry in registry_entries:  # registry order — the file's own grouping
+    for entry in dataset_entries:  # registry order — the file's own grouping
+        sid = entry["id"]
+        system = system_by_id.get(entry.get("system"), {})
+        sources.append(
+            {
+                "id": sid,
+                "home": "source-registry",
+                "system": entry.get("system"),
+                "origin": entry.get("origin"),
+                "kind": entry.get("artifact_kind"),
+                "authority": entry.get("authority"),
+                "derived": bool(entry.get("derived")),
+                "urn": _derived_urn(entry),
+                "replaces": entry.get("replaces"),
+                "classification": system.get("classification"),
+                "confirmed": bool(entry.get("confirmed")),
+                "ledger": _ledger_state(entry),
+                "taxonomy_captures": captures_by_source.get(sid, []),
+                "ontology_mappings": mappings_by_source.get(sid, []),
+                "loaders": loaders_by_source.get(sid, []),
+            }
+        )
+    for entry in doc_entries:  # the doc-ledger union (pipeline twins dropped, N9)
         sid = entry["id"]
         sources.append(
             {
                 "id": sid,
-                "kind": entry.get("kind"),
+                "home": "doc-registry",
+                "system": None,
+                "origin": None,
+                "kind": "doc-corpus",
+                "authority": None,
+                "derived": False,
+                "urn": None,
+                "replaces": None,
                 "classification": entry.get("classification"),
                 "confirmed": bool(entry.get("confirmed")),
                 "ledger": _ledger_state(entry),
@@ -131,6 +188,15 @@ def build_load_map() -> dict:
                 "loaders": loaders_by_source.get(sid, []),
             }
         )
+
+    retired = [
+        {
+            "id": e["id"],
+            "replaced_by": list(e.get("replaced_by") or []),
+            "reason": e.get("reason"),
+        }
+        for e in retired_entries
+    ]
 
     sequence = [
         {
@@ -158,12 +224,15 @@ def build_load_map() -> dict:
         "note": (
             "GENERATED by scripts/render_load_map.py -- never hand-edit. "
             "tests/unit/test_load_map_json.py fails when this drifts from the "
-            "declarations it joins (N3) or the registries it reads. One surface "
-            "answering taxonomy-by-source, ontology, extract and loads."
+            "declarations it joins (N3) or the registries it reads (v2: "
+            "systems + datasets + the doc-ledger union + retired ids). One "
+            "surface answering taxonomy-by-source, ontology, extract and loads."
         ),
         "sequence": sequence,
         "ad_hoc_commands": sorted(cli.AD_HOC_COMMANDS),
+        "systems": systems,
         "sources": sources,
+        "retired": retired,
         "sourceless_loaders": sourceless,
         "map_entries_without_registry_source": unmatched_map_sources,
     }
@@ -237,10 +306,13 @@ def build_load_map_html(data: dict) -> str:
     add("<h1>DryDocs — Load Map</h1>")
     add(
         '<p class="sub">GENERATED by scripts/render_load_map.py from the N3 '
-        "declarations + config/source-registry.yaml + config/source-mappings/ + "
+        "declarations + config/source-registry.yaml (v2: systems/datasets/"
+        "retired) + config/doc-source-registry.yaml + config/source-mappings/ + "
         "config/taxonomy/ + config/taxonomy-ontology-map.yaml — never hand-edit. "
-        f"{len(data['sources'])} sources ({n_ledger} with column ledgers, "
+        f"{len(data['systems'])} systems · {len(data['sources'])} datasets "
+        f"({n_ledger} with column ledgers, "
         f"{n_pending} ledger-pending, {n_placeholder} placeholders) · "
+        f"{len(data['retired'])} retired ids · "
         f"{len(data['sequence'])} sequence steps.</p>"
     )
 
@@ -267,10 +339,34 @@ def build_load_map_html(data: dict) -> str:
         f'<p class="sub">Operator-driven (not sequence members): {ad_hoc}.</p>'
     )
 
-    # -- source summary --------------------------------------------------------
-    add("<h2>Sources — taxonomy · ontology · extract · load</h2>")
+    # -- systems (v2) ----------------------------------------------------------
+    add("<h2>Systems — the things we connect to (v2)</h2>")
     add(
-        "<table><tr><th>source</th><th>kind</th><th>classification</th>"
+        '<p class="sub">SYSTEM rows carry connection/locator/classification; '
+        "DATASET rows below carry the gate state. A taxonomy capture may join "
+        "at either level (system when the hierarchy spans several datasets).</p>"
+    )
+    add(
+        "<table><tr><th>system</th><th>name</th><th>layer</th>"
+        "<th>classification</th><th>taxonomy captures</th></tr>"
+    )
+    for sysrow in data["systems"]:
+        captures = (
+            "<br>".join(f"<code>{_esc(c)}</code>" for c in sysrow["taxonomy_captures"])
+            or '<span class="muted">—</span>'
+        )
+        add(
+            f"<tr><td><code>{_esc(sysrow['id'])}</code></td>"
+            f"<td>{_esc(sysrow['name'])}</td><td>{_esc(sysrow['layer'])}</td>"
+            f"<td>{_esc(sysrow['classification'])}</td><td>{captures}</td></tr>"
+        )
+    add("</table>")
+
+    # -- dataset summary -------------------------------------------------------
+    add("<h2>Datasets — taxonomy · ontology · extract · load</h2>")
+    add(
+        "<table><tr><th>dataset</th><th>system</th><th>origin</th><th>kind</th>"
+        "<th>authority</th><th>classification</th>"
         "<th>confirmed</th><th>column ledger</th><th>taxonomy</th>"
         "<th>ontology mappings</th><th>loaders</th></tr>"
     )
@@ -299,9 +395,16 @@ def build_load_map_html(data: dict) -> str:
             or '<span class="muted">—</span>'
         )
         confirmed = "✓" if s["confirmed"] else '<span class="muted">no</span>'
+        authority = (
+            _esc(s["authority"]) if s["authority"]
+            else ("derived" if s["derived"] else '<span class="muted">—</span>')
+        )
         add(
             f'<tr><td><a href="#src-{_esc(s["id"])}"><code>{_esc(s["id"])}</code></a></td>'
-            f"<td>{_esc(s['kind'])}</td><td>{_esc(s['classification'])}</td>"
+            f"<td><code>{_esc(s['system']) or '—'}</code></td>"
+            f"<td><code>{_esc(s['origin']) or '—'}</code></td>"
+            f"<td>{_esc(s['kind'])}</td><td>{authority}</td>"
+            f"<td>{_esc(s['classification'])}</td>"
             f"<td>{confirmed}</td><td>{ledger_cell}</td><td>{captures}</td>"
             f"<td>{mappings}</td><td>{loaders}</td></tr>"
         )
@@ -347,6 +450,25 @@ def build_load_map_html(data: dict) -> str:
                     f"<li>{_status_chip(m['status'])} <code>{_esc(m['id'])}</code>{label}</li>"
                 )
             add("</ul>")
+
+    # -- retired ids (D4) ------------------------------------------------------
+    add("<h2>Retired ids (D4 refusal list)</h2>")
+    add(
+        '<p class="sub">Legacy v1 flat ids — the registry loader and the '
+        "loader-source overlay REFUSE every one of them; renamed rows carry "
+        "the matching <code>replaces:</code> back-pointer.</p>"
+    )
+    add("<table><tr><th>retired id</th><th>replaced by</th><th>reason</th></tr>")
+    for r in data["retired"]:
+        replaced = (
+            "<br>".join(f"<code>{_esc(x)}</code>" for x in r["replaced_by"])
+            or '<span class="muted">(not re-minted)</span>'
+        )
+        add(
+            f"<tr><td><code>{_esc(r['id'])}</code></td><td>{replaced}</td>"
+            f"<td>{_esc(r['reason'])}</td></tr>"
+        )
+    add("</table>")
 
     # -- sourceless + drift ----------------------------------------------------
     add("<h2>Named sourceless loaders</h2>")

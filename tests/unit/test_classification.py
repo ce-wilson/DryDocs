@@ -41,8 +41,11 @@ def test_classification_vocabulary_shape() -> None:
 
 @pytest.mark.skipif(not _YAML_AVAILABLE, reason="PyYAML not installed")
 def test_every_source_is_classified() -> None:
-    """Each source-registry entry has a valid classification + source; External
-    entries additionally carry source_url + captured_at."""
+    """v2 registry (gate source-registry-v2): every SYSTEM row carries a valid
+    classification + name + the standing seal_id PLACEHOLDER (D1 amendment);
+    every DATASET row joins to a classified system and names its artifact —
+    the publish-boundary axis attaches at the system, datasets inherit.
+    External systems additionally carry source_url + captured_at."""
     if not SOURCE_REGISTRY.exists():
         pytest.skip("source-registry.yaml not present")
 
@@ -52,18 +55,33 @@ def test_every_source_is_classified() -> None:
     reg = yaml.safe_load(SOURCE_REGISTRY.read_text(encoding="utf-8"))
     failures: list[str] = []
 
-    for src in reg.get("sources", []):
-        sid = src.get("id", "<no-id>")
-        cls = src.get("classification")
+    systems = {s.get("id"): s for s in reg.get("systems", [])}
+    for sid, sys_row in systems.items():
+        cls = sys_row.get("classification")
         if cls not in valid:
-            failures.append(f"[{sid}] classification '{cls}' not in {sorted(valid)}")
+            failures.append(f"[system {sid}] classification '{cls}' not in {sorted(valid)}")
             continue
-        if not src.get("source"):
-            failures.append(f"[{sid}] missing required field 'source'")
+        if not sys_row.get("name"):
+            failures.append(f"[system {sid}] missing required field 'name'")
+        if "seal_id" not in sys_row:
+            failures.append(
+                f"[system {sid}] missing the standing seal_id PLACEHOLDER "
+                "(D1 amendment — present on every committed system row)"
+            )
         if cls == "External":
             for field in ("source_url", "captured_at"):
-                if not src.get(field):
-                    failures.append(f"[{sid}] External source missing '{field}'")
+                if not sys_row.get(field):
+                    failures.append(f"[system {sid}] External system missing '{field}'")
+
+    for ds in reg.get("datasets", []):
+        did = ds.get("id", "<no-id>")
+        if ds.get("system") not in systems:
+            failures.append(
+                f"[dataset {did}] system '{ds.get('system')}' does not resolve "
+                "to a registered system row (classification would be undefined)"
+            )
+        if not ds.get("artifact"):
+            failures.append(f"[dataset {did}] missing required field 'artifact'")
 
     assert not failures, (
         f"{len(failures)} classification error(s):\n" + "\n".join(failures)
