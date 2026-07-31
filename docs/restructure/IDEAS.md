@@ -312,8 +312,6 @@ Tags help grooming: `idea` · `bug` · `doc` · `source` (new data source) · `q
   call and the order is enforced in code. Offered as the likely origin, NOT declared closed:
   if the user meant somewhere else, the report is still open. The runbook itself stays
   untouched and its three owed edits are the separate 2026-07-26 [doc] entry above.
-- 2026-07-24 — [chore] **T11 L7-ratification paste-ready snippet still owed producer-side**
-  (noted while confirming PORT-REPORT-73ee97a; the company gate pack references it).
 - 2026-07-23 — [idea] **Oracle connection for the lineage/remediation path (user note,
   chat pm).** The lineage jobs step still stages a CSV by hand through a JDBC client;
   the Oracle connection is planned — and the user's note ties it to the REMEDIATION
@@ -500,6 +498,19 @@ Tags help grooming: `idea` · `bug` · `doc` · `source` (new data source) · `q
   unknown non-compact forms pass through to `datetime()` (docstring claims None) and 14
   valid digits aren't validated as a real date (`strptime` beats `isdigit`+len) — carry
   both hardenings into the back-flowed version.
+  KEPT-UPDATED 2026-07-31 (weekly groom) — **trigger CHECKED and NOT fired, but the
+  landing site now has a name.** A producer-side XML seam DOES exist as of 2026-07-29
+  (**G47**, `drydocs_lineage/extractors/controlm_xml.py`), which looked like the
+  back-flow trigger — but the file consumes **no temporal fields at all**: its declared
+  contract is folders, jobs, and ordered variables only, and a search of it for
+  timestamp/datetime handling returns nothing. So there is still no producer surface
+  where a compact `yyyyMMddHHmmssUTC` value could arrive, and nothing to normalize. Stays
+  parked, with the trigger sharpened: this grooms when the XML seam (or any producer
+  extractor) starts consuming a temporal field — at which point the normalizer belongs in
+  the EXTRACTOR emitting the ISO string the loaders' existing
+  `datetime(replace(x, ' ', 'T'))` Cypher contract expects (the as-built company `_ts()`
+  shape, which deliberately shares one temporal contract with the Oracle path rather than
+  forking to native datetimes), plus the two hardenings above.
 
 - 2026-07-21 — [chore] **Next cross-repo port: carry the AIS acronym expansion across
   files.** Producer's authoritative home is `software-registry.yaml#acronyms`; the company's
@@ -617,9 +628,6 @@ Tags help grooming: `idea` · `bug` · `doc` · `source` (new data source) · `q
   new safety tag `archive/old-history-2026-07-20` (this machine's pre-squash history; the other
   machine has `archive/full-history`). Deleting the remote branches is the user's call.
 
-- 2026-07-20 — [doc] Runbook Rev 3 candidate: mention `drydocs load-doc-traceability` in the
-  Refresh/ingest demonstrable-content step (L7 shipped the loader after Rev 2 was signed —
-  ride the next feedback loop rather than bumping a fresh Rev for one line).
 - 2026-07-20 — [chore] **USER MANUAL STEP: add the SNYK_TOKEN repo secret** so the new CI
   snyk job (44523ab) runs for real — token from app.snyk.io (Account settings → API
   token) → repo Settings → Secrets and variables → Actions. Until then every scan step
@@ -786,6 +794,42 @@ Tags help grooming: `idea` · `bug` · `doc` · `source` (new data source) · `q
   an app). Cosmetic; hide or restructure later.
 
 ## Recently groomed (audit trail)
+
+- 2026-07-31 (pm, weekly groom — run AFTER the N7 gate + N9 build closed the registry-v2
+  work) — [chore] T11 L7-ratification paste-ready snippet still owed producer-side →
+  **J25**. Verified genuinely owed before promoting: `docs/port-prompt.md` §6 states the
+  four elements a Tier-A ratification entry must carry and records that the snippet was
+  "provided in the producer session 2026-07-21", but a repo-wide search for `0252d29` /
+  `PORT-REPORT-6fd3270` finds prose references only — the block itself was never
+  committed, so the company gate pack cites an artifact no company session can open, and
+  tracker T11 has read `pending` since. J25 is producer-side AUTHORING only; the entry
+  lands in the company gate-log at their next port and their sign-off stays theirs.
+- 2026-07-31 (pm, weekly groom) — [doc] Runbook Rev 3 candidate: mention
+  `drydocs load-doc-traceability` in the Refresh/ingest step → **MERGED into L21**
+  (Runbook Rev 4) as an acceptance clause. The line parked itself explicitly to "ride the
+  next feedback loop rather than bump a fresh Rev for one line", and L21 IS that revision
+  — so it became a clause, not an item.
+- 2026-07-31 (pm, weekly groom) — [new, raised AT the groom] **J23's own residual: the
+  retired `Internal-Confidential` tier survives in FORWARD-LOOKING specs** → **J24**.
+  J23 collapsed the vocabulary to three levels the same morning and correctly scoped
+  itself to config + the boundary docs + the two tests, leaving history alone. The sweep
+  found the token still live in surfaces that are neither config nor history but
+  *instructions for assigning a tier*: `UI-WIP/site-plan.md`'s classification union type
+  (a TypeScript enum in waiting) and its banner rule, `wf-admin-config-01.md`, two skill
+  reference tables that ROUTE material by tier (`data-context-extractor/references/
+  platforms.md`, `controlm-runbook-automation/references/fix-package.md`), and the
+  `bmc-docs-example.yaml` gate-prompt template. Left as history and named so in J24:
+  `config/gate-log.md`, signed-off gate prompts, `done` backlog close-notes,
+  `SDLC-Docs/extracted/`, this audit trail. J24 also adds a regression guard to
+  `test_classification.py` scoped by an explicit file list, so history can never be swept
+  in by accident.
+- 2026-07-31 (pm, weekly groom) — [database fix, no item] **M3's acceptance still failed
+  its own vocabulary**: it required column mappings "authored in the internal twin —
+  Internal-Confidential never lands producer-side", naming a tier retired hours earlier.
+  Fixed inline at the groom (now: "Internal, and confidential-handling, so never
+  producer-side") rather than deferred into J24 — a `todo` item whose pass/fail test
+  cites a dead enum value is exactly what grooming exists to prevent. Deliberately kept
+  OUT of J24's scope so each surface has one owner.
 
 - 2026-07-31 — [chore] classification collapse to 3 levels (registry-plan Phase 1; user
   ruling same day, pre-decided) → **J23** (may land ahead of the N7 gate — removes

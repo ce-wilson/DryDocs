@@ -264,7 +264,8 @@
       "log_ref": "config/gate-log.md:617",
       "unblocks": [
         "N8",
-        "O12"
+        "O12",
+        "J25"
       ]
     },
     {
@@ -417,7 +418,8 @@
         "C19",
         "Q2",
         "S3",
-        "G33"
+        "G33",
+        "J25"
       ]
     },
     {
@@ -429,7 +431,9 @@
         "config/gate-prompts/bmc-docs-example.yaml"
       ],
       "log_ref": null,
-      "unblocks": []
+      "unblocks": [
+        "J24"
+      ]
     },
     {
       "kind": "prompt-only",
