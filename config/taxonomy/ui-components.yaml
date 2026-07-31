@@ -26,6 +26,21 @@
 #
 # NOT a dependency graph: this records WHAT EXISTS and WHERE, not what imports
 # what. Import edges would need a real TS resolver (still open in O42).
+#
+# `module` / `module_evidence` (2026-07-31) — the one idea worth borrowing from
+# the Miller software-development-process model (the uploaded notebook): its
+# real leverage is not the file labels but the JOIN UP from a UI element to the
+# FEATURE it serves, which is what makes "what does changing this affect?"
+# answerable. Our equivalent of its :Feature/:Area layer already exists as
+# web/src/modules/registry.ts, so the binding is a lookup rather than a new
+# vocabulary.
+# DERIVED FROM EVIDENCE ONLY, never guessed — `directory` (the component lives
+# under a module-named folder), `route-name` (a route whose name IS a module
+# id), or `route-dir`. 26 of 62 bind that way. The other 36 carry NO module key
+# on purpose: shell, ui primitives and shared components serve many modules or
+# none, and inventing a binding for them would be exactly the silent default
+# this repo keeps refusing. Assigning those properly means reading imports —
+# i.e. the TS resolver, i.e. O42.
 # =============================================================================
 
 schema: drydocs.ui-component-registry.v1
@@ -37,6 +52,12 @@ framework: react              # -> software-registry.yaml products[].id
 stack: web-console            # -> software-registry.yaml products[].stack
 root: web/src
 extension: .tsx
+# SCOPE CAVEAT: .tsx only. 25 plain .ts files under web/src — including
+# modules/registry.ts, which this file's `module` column JOINS TO — are NOT
+# inventoried here. Components are the thing O42 raised, but a ledger that
+# silently omits the file it depends on is worth saying out loud. Widening to
+# .ts is a one-line change plus 25 rows; it waits on O42's disposition so the
+# scan boundary is decided once rather than twice.
 
 areas:
   - { id: entry,         title: "Application entry points (bootstrap + top-level composition)" }
@@ -66,23 +87,23 @@ components:
 
   # --- route (18) ---
   - { id: AdminConfigRoute,        area: route,        path: routes/AdminConfigRoute.tsx }
-  - { id: AskRoute,                area: route,        path: routes/AskRoute.tsx }
+  - { id: AskRoute,                area: route,        path: routes/AskRoute.tsx,                         module: ask,        module_evidence: route-name }
   - { id: AssetPathRoute,          area: route,        path: routes/AssetPathRoute.tsx }
   - { id: ConsoleRoute,            area: route,        path: routes/ConsoleRoute.tsx }
-  - { id: DocsRoute,               area: route,        path: routes/DocsRoute.tsx }
-  - { id: GatesRoute,              area: route,        path: routes/GatesRoute.tsx }
-  - { id: LineageRoute,            area: route,        path: routes/LineageRoute.tsx }
-  - { id: LoadsRoute,              area: route,        path: routes/LoadsRoute.tsx }
+  - { id: DocsRoute,               area: route,        path: routes/DocsRoute.tsx,                        module: docs,       module_evidence: route-name }
+  - { id: GatesRoute,              area: route,        path: routes/GatesRoute.tsx,                       module: gates,      module_evidence: route-name }
+  - { id: LineageRoute,            area: route,        path: routes/LineageRoute.tsx,                     module: lineage,    module_evidence: route-name }
+  - { id: LoadsRoute,              area: route,        path: routes/LoadsRoute.tsx,                       module: loads,      module_evidence: route-name }
   - { id: MappingsRoute,           area: route,        path: routes/MappingsRoute.tsx }
   - { id: ModuleTemplate,          area: route,        path: routes/ModuleTemplate.tsx }
   - { id: OverviewRoute,           area: route,        path: routes/OverviewRoute.tsx }
-  - { id: OwnershipRoute,          area: route,        path: routes/OwnershipRoute.tsx }
-  - { id: RemediationRoute,        area: route,        path: routes/RemediationRoute.tsx }
-  - { id: RunbooksRoute,           area: route,        path: routes/RunbooksRoute.tsx }
+  - { id: OwnershipRoute,          area: route,        path: routes/OwnershipRoute.tsx,                   module: ownership,  module_evidence: route-name }
+  - { id: RemediationRoute,        area: route,        path: routes/RemediationRoute.tsx,                 module: remediation, module_evidence: route-name }
+  - { id: RunbooksRoute,           area: route,        path: routes/RunbooksRoute.tsx,                    module: runbooks,   module_evidence: route-name }
   - { id: UnderTheHoodRoute,       area: route,        path: routes/UnderTheHoodRoute.tsx }
-  - { id: ExplorerLiveRoute,       area: route,        path: routes/explorer/ExplorerLiveRoute.tsx }
-  - { id: ExplorerRoute,           area: route,        path: routes/explorer/ExplorerRoute.tsx }
-  - { id: ExplorerTowerRoute,      area: route,        path: routes/explorer/ExplorerTowerRoute.tsx }
+  - { id: ExplorerLiveRoute,       area: route,        path: routes/explorer/ExplorerLiveRoute.tsx,       module: explorer,   module_evidence: route-dir }
+  - { id: ExplorerRoute,           area: route,        path: routes/explorer/ExplorerRoute.tsx,           module: explorer,   module_evidence: route-name }
+  - { id: ExplorerTowerRoute,      area: route,        path: routes/explorer/ExplorerTowerRoute.tsx,      module: explorer,   module_evidence: route-dir }
 
   # --- ui-primitive (6) ---
   - { id: EmptyState,              area: ui-primitive, path: components/ui/EmptyState.tsx }
@@ -112,26 +133,26 @@ components:
   - { id: HubGlyphs,               area: icon,         path: components/icons/HubGlyphs.tsx }
 
   # --- explorer (4) ---
-  - { id: DataFrame,               area: explorer,     path: explorer/DataFrame.tsx }
-  - { id: ExplorerGraphPane,       area: explorer,     path: explorer/ExplorerGraphPane.tsx }
-  - { id: NodeInspector,           area: explorer,     path: explorer/NodeInspector.tsx }
-  - { id: SpecGrid,                area: explorer,     path: explorer/SpecGrid.tsx }
+  - { id: DataFrame,               area: explorer,     path: explorer/DataFrame.tsx,                      module: explorer,   module_evidence: directory }
+  - { id: ExplorerGraphPane,       area: explorer,     path: explorer/ExplorerGraphPane.tsx,              module: explorer,   module_evidence: directory }
+  - { id: NodeInspector,           area: explorer,     path: explorer/NodeInspector.tsx,                  module: explorer,   module_evidence: directory }
+  - { id: SpecGrid,                area: explorer,     path: explorer/SpecGrid.tsx,                       module: explorer,   module_evidence: directory }
 
   # --- lineage (1) ---
-  - { id: LineageGraphPane,        area: lineage,      path: lineage/LineageGraphPane.tsx }
+  - { id: LineageGraphPane,        area: lineage,      path: lineage/LineageGraphPane.tsx,                module: lineage,    module_evidence: directory }
 
   # --- loads (1) ---
-  - { id: LoadsTimeline,           area: loads,        path: loads/LoadsTimeline.tsx }
+  - { id: LoadsTimeline,           area: loads,        path: loads/LoadsTimeline.tsx,                     module: loads,      module_evidence: directory }
 
   # --- ownership (2) ---
-  - { id: AssetSearchPanel,        area: ownership,    path: ownership/AssetSearchPanel.tsx }
-  - { id: OwnershipGraphPane,      area: ownership,    path: ownership/OwnershipGraphPane.tsx }
+  - { id: AssetSearchPanel,        area: ownership,    path: ownership/AssetSearchPanel.tsx,              module: ownership,  module_evidence: directory }
+  - { id: OwnershipGraphPane,      area: ownership,    path: ownership/OwnershipGraphPane.tsx,            module: ownership,  module_evidence: directory }
 
   # --- underhood (7) ---
-  - { id: HallucinationSpotlight,  area: underhood,    path: underhood/HallucinationSpotlight.tsx }
-  - { id: QuestionDetail,          area: underhood,    path: underhood/QuestionDetail.tsx }
-  - { id: ResultChip,              area: underhood,    path: underhood/ResultChip.tsx }
-  - { id: Scoreboard,              area: underhood,    path: underhood/Scoreboard.tsx }
-  - { id: StrategyCards,           area: underhood,    path: underhood/StrategyCards.tsx }
-  - { id: ThinkingLogicPanel,      area: underhood,    path: underhood/ThinkingLogicPanel.tsx }
-  - { id: TokenMemoryChart,        area: underhood,    path: underhood/TokenMemoryChart.tsx }
+  - { id: HallucinationSpotlight,  area: underhood,    path: underhood/HallucinationSpotlight.tsx,        module: underhood,  module_evidence: directory }
+  - { id: QuestionDetail,          area: underhood,    path: underhood/QuestionDetail.tsx,                module: underhood,  module_evidence: directory }
+  - { id: ResultChip,              area: underhood,    path: underhood/ResultChip.tsx,                    module: underhood,  module_evidence: directory }
+  - { id: Scoreboard,              area: underhood,    path: underhood/Scoreboard.tsx,                    module: underhood,  module_evidence: directory }
+  - { id: StrategyCards,           area: underhood,    path: underhood/StrategyCards.tsx,                 module: underhood,  module_evidence: directory }
+  - { id: ThinkingLogicPanel,      area: underhood,    path: underhood/ThinkingLogicPanel.tsx,            module: underhood,  module_evidence: directory }
+  - { id: TokenMemoryChart,        area: underhood,    path: underhood/TokenMemoryChart.tsx,              module: underhood,  module_evidence: directory }

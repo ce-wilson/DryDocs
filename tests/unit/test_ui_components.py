@@ -134,3 +134,64 @@ def test_the_pointer_is_reciprocal() -> None:
         f"components.ledger points at {pointer['ledger']}, not {UI_LEDGER.name}"
     )
     assert pointer["schema"] == doc["schema"], "pointer schema disagrees with the ledger"
+
+
+# --------------------------------------------------------------------------- #
+# module binding — the one idea borrowed from the Miller process model:
+# the join UP from a UI element to the feature it serves
+# --------------------------------------------------------------------------- #
+import re  # noqa: E402
+
+MODULE_REGISTRY_TS = REPO / "web" / "src" / "modules" / "registry.ts"
+VALID_EVIDENCE = {"directory", "route-name", "route-dir"}
+
+
+def _module_ids() -> set[str]:
+    return set(re.findall(r"id:\s*'([a-z-]+)'", MODULE_REGISTRY_TS.read_text(encoding="utf-8")))
+
+
+def test_every_module_binding_names_a_real_console_module() -> None:
+    """The binding joins to web/src/modules/registry.ts, the canonical list."""
+    valid = _module_ids()
+    assert valid, "could not read module ids from registry.ts"
+    bad = [
+        (c["id"], c["module"]) for c in _ui()["components"]
+        if c.get("module") and c["module"] not in valid
+    ]
+    assert not bad, f"component(s) bound to unknown modules: {bad} (valid: {sorted(valid)})"
+
+
+def test_a_binding_always_records_how_it_was_derived() -> None:
+    """Evidence is mandatory, so a guess can never masquerade as a fact."""
+    failures = []
+    for c in _ui()["components"]:
+        has_module, has_evidence = bool(c.get("module")), bool(c.get("module_evidence"))
+        if has_module != has_evidence:
+            failures.append(f"{c['id']}: module={c.get('module')!r} evidence={c.get('module_evidence')!r}")
+        if has_evidence and c["module_evidence"] not in VALID_EVIDENCE:
+            failures.append(f"{c['id']}: unknown evidence '{c['module_evidence']}'")
+    assert not failures, "\n".join(failures)
+
+
+def test_directory_evidence_actually_holds() -> None:
+    """'directory' must mean the file really lives under that module folder."""
+    for c in _ui()["components"]:
+        if c.get("module_evidence") == "directory":
+            assert c["path"].split("/")[0] == c["module"], (
+                f"{c['id']} claims directory evidence for '{c['module']}' but sits at {c['path']}"
+            )
+
+
+def test_unbound_components_are_counted_not_hidden() -> None:
+    """36 shell/primitive/shared components carry no module ON PURPOSE.
+
+    Pinned so the split stays visible: if it moves, someone either bound more
+    (good — update the pin) or added components without thinking about it.
+    Assigning the rest properly means reading imports, which is O42's TS
+    resolver, not a naming heuristic.
+    """
+    comps = _ui()["components"]
+    bound = [c for c in comps if c.get("module")]
+    assert (len(bound), len(comps)) == (26, 62), (
+        f"module-binding coverage changed: {len(bound)}/{len(comps)} bound"
+    )
