@@ -106,3 +106,60 @@ def test_cypher_constraints_and_supplement_declare_the_gated_labels() -> None:
     supplement = SUPPLEMENT_FILE.read_text(encoding="utf-8")
     for token in ("Vendor", "SoftwareProduct", "MADE_BY", "USES_SOFTWARE", "wasAttributedTo"):
         assert token in supplement, f"supplement missing {token}"
+
+
+# --------------------------------------------------------------------------- #
+# documentation pointer: which vendor docs describe this product, and are they
+# still current for the version we actually run (user requirement 2026-07-31)
+# --------------------------------------------------------------------------- #
+DOC_REGISTRY_FILE = REPO / "config" / "doc-source-registry.yaml"
+
+
+def _doc_corpus_ids() -> set[str]:
+    reg = yaml.safe_load(DOC_REGISTRY_FILE.read_text(encoding="utf-8"))
+    return {s["id"] for s in reg.get("sources", [])}
+
+
+def test_documentation_pointer_is_well_formed_and_resolves() -> None:
+    """A pointer to a corpus that does not exist is worse than no pointer."""
+    corpus_ids = _doc_corpus_ids()
+    for product in _doc()["products"]:
+        doc = product.get("documentation")
+        if doc is None:
+            continue
+        pid = product["id"]
+        assert doc.get("corpus") in corpus_ids, (
+            f"product '{pid}' documentation.corpus '{doc.get('corpus')}' is not a "
+            f"doc-source-registry id: {sorted(corpus_ids)}"
+        )
+        assert doc.get("docs_version"), f"product '{pid}' documentation missing docs_version"
+        assert isinstance(doc.get("current_for", []), list), (
+            f"product '{pid}' documentation.current_for must be a list"
+        )
+
+
+def test_documentation_currency_drift_is_visible_not_hidden() -> None:
+    """Every RUNTIME version must be declared `current_for`, or reported as drift.
+
+    This is the mechanism behind the requirement: when the estate moves to a new
+    version it lands in `versions:` and is absent from `current_for`, so the gap
+    is computable. The test does not FAIL on drift — drift is a true statement
+    about the world today (9.0.20 docs, 9.0.21.300 runtime), not a code defect.
+    What it enforces is that the drift can be COMPUTED at all: both sides
+    present and typed, so a report can never silently find nothing.
+    """
+    drifted: list[str] = []
+    for product in _doc()["products"]:
+        doc = product.get("documentation")
+        if doc is None:
+            continue
+        current_for = set(doc.get("current_for") or [])
+        for version in product.get("versions", []) or []:
+            if version not in current_for:
+                drifted.append(f"{product['id']}: runtime {version} not covered by docs {doc['docs_version']}")
+
+    # The known state, pinned so a silent change is loud. Update this list when
+    # an SME confirms a capture against a runtime version (or recaptures).
+    assert drifted == [
+        "controlm: runtime 9.0.21.300 not covered by docs 9.0.20",
+    ], f"documentation currency changed: {drifted}"

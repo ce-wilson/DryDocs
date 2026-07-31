@@ -156,6 +156,64 @@ in the scraper) can flip `version_verified` per topic where the two agree.
 
 ---
 
+## 5a. Standalone pipeline, not a widened `load-bmc-docs`
+
+**Ruled 2026-07-31 (user):** "unique enough to use a stand alone, but repeatable
+ingestion and loader."
+
+`load-bmc-docs` cannot be stretched to cover this, and should not be. It
+consumes hand-written markdown, splits on `##`, and *infers a provenance tier
+from heading text* — a heuristic that exists only because that corpus is our
+lossy paraphrase. This corpus is `VERBATIM` throughout, so there is no tier to
+infer, and its real structure (TOC hierarchy, `page_role`, section anchors) has
+nowhere to go in that loader's model. Two loaders with honest contracts beat one
+with a mode flag.
+
+**Repeatable** means the capture manifest is the contract between three
+independently re-runnable stages:
+
+```
+capture  ──manifest──▶  convert  ──markdown──▶  load
+(scraper)               (strip chrome)          (MERGE on doc_id)
+```
+
+The scraper already emits what the later stages need — `sha256` per document,
+`page` + `anchor` per TOC node — so a recapture after a version bump re-runs
+convert + load with no code change. Re-running any stage is idempotent.
+
+## 5b. The documentation-currency pointer
+
+**Requirement (user, 2026-07-31):** a pointer from the software registry to the
+docs corpus carrying the vendor version, "so that when our ingestion process
+moves to the next major version, we know we need to update the docs."
+
+Built the same session, in `config/taxonomy/software-registry.yaml`, deliberately
+**beside** the product's existing `versions:` so the two numbers a human must
+compare sit on adjacent lines:
+
+```yaml
+  - id: controlm
+    versions: ["9.0.21.300"]         # what we RUN
+    documentation:
+      corpus: bmc-controlm-utilities # -> doc-source-registry.yaml
+      docs_version: "9.0.20"         # what we CAPTURED
+      current_for: []                # runtime versions a human confirmed
+```
+
+The mechanism is **declaration-based, not derived**: when the estate moves to a
+new version it lands in `versions:` and is absent from `current_for`, so the gap
+falls out with no version-string parsing. That is on purpose — "does 9.0.20
+documentation still describe 9.0.21.300?" is a judgement, not a string
+comparison, and only a human can assert it.
+
+Two guards in `tests/unit/test_software_registry.py` enforce that the corpus id
+resolves to a real doc-source-registry entry, and that the drift is *computable*
+(both sides present and typed). The drift-pinning guard asserts the KNOWN state
+rather than failing on it — drift is a true statement about the world today, not
+a code defect, so a red suite would be dishonest. What it prevents is the drift
+changing **silently**. The operational alarm (a report that exits non-zero) is
+**Q16**.
+
 ## 6. Sequencing
 
 1. **Convert + load layer 1** — HTML→markdown against the existing H2 chunking

@@ -104,6 +104,21 @@ products:
     type: commercial
     versions: ["9.0.21.300"]      # company runtime — known
     used_by_drydocs: true         # the baseline orchestration source we ingest
+    # Which captured vendor documentation describes this product, and for which
+    # RUNTIME versions a human has confirmed it still applies. The point of
+    # keeping this beside `versions:` is that the drift is then local and
+    # obvious: when the estate moves to a new version, it lands in `versions:`
+    # and is absent from `current_for`, which is the signal that the docs need
+    # recapturing. `current_for` is an explicit human assertion — never derived
+    # by parsing version strings, because "does 9.0.20 documentation still
+    # describe 9.0.21.300?" is a judgement, not a string comparison.
+    documentation:
+      corpus: bmc-controlm-utilities   # -> config/doc-source-registry.yaml id
+      docs_version: "9.0.20"           # the VENDOR DOC version captured
+      current_for: []                  # EMPTY = unverified. Known drift TODAY: the
+                                       # capture is 9.0.20 (BMC ships no Utilities
+                                       # book in the trimmed 9.0.21 publication)
+                                       # while the runtime is 9.0.21.300.
 
   - id: oracle-db
     vendor: oracle
