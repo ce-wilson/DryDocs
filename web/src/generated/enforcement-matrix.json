@@ -197,12 +197,12 @@
       "pending_entries": 9,
       "env_refs": [],
       "files": [
+        "config/taxonomy/README.md",
         "config/taxonomy/business-application.yaml",
         "config/taxonomy/controlm.yaml",
         "config/taxonomy/lob-product-team.yaml",
         "config/taxonomy/oracle-schemas.yaml",
         "config/taxonomy/platforms.yaml",
-        "config/taxonomy/README.md",
         "config/taxonomy/software-registry.yaml",
         "config/taxonomy/ui-components.yaml",
         "config/taxonomy/ui-tests.yaml"
@@ -226,9 +226,9 @@
       "pending_entries": 1,
       "env_refs": [],
       "files": [
-        "config/manual-loads/manifest.yaml",
         "config/manual-loads/README.md",
-        "config/manual-loads/TEMPLATE-node-mapping.csv"
+        "config/manual-loads/TEMPLATE-node-mapping.csv",
+        "config/manual-loads/manifest.yaml"
       ],
       "content": null,
       "extra_contents": {}

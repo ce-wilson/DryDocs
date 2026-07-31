@@ -79,7 +79,12 @@ def build_load_map() -> dict:
     # a capture may name a DATASET id (single-feed) or a SYSTEM id (the
     # hierarchy spans several of the system's datasets).
     captures_by_source: dict[str, list[str]] = {}
-    for path in sorted(TAXONOMY_DIR.glob("*.yaml")):
+    # key= on the string, not the Path — see the note in
+    # render_enforcement_matrix.py: sorting Path objects is case-folded on
+    # Windows and case-sensitive on POSIX. Benign here today (every capture
+    # filename is lowercase) and kept that way on purpose, because the day one
+    # is not, this render starts drifting per-OS like the matrix did.
+    for path in sorted(TAXONOMY_DIR.glob("*.yaml"), key=lambda p: p.as_posix()):
         doc = yaml.safe_load(path.read_text(encoding="utf-8"))
         source = doc.get("source") if isinstance(doc, dict) else None
         if source:

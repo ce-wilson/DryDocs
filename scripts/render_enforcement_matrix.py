@@ -223,7 +223,20 @@ def build_matrix() -> dict:
 
         files: list[Path]
         if is_dir:
-            files = sorted(p for p in target.rglob("*") if p.is_file())
+            # Sort on the POSIX STRING, never on the Path objects.
+            # `sorted()` over Path compares PurePath._str_normcase, which is
+            # case-FOLDED on Windows and case-SENSITIVE on POSIX — so the same
+            # directory renders in two different orders depending on the OS, and
+            # a matrix committed from Windows fails this file's own drift guard
+            # the moment CI regenerates it on Linux. That is exactly what
+            # happened: `config/taxonomy/` put README.md between platforms.yaml
+            # and software-registry.yaml on Windows, but first on Linux, and CI
+            # was red from 2026-07-21 to 2026-07-31 because of it.
+            # test_render_determinism.py pins this.
+            files = sorted(
+                (p for p in target.rglob("*") if p.is_file()),
+                key=lambda p: p.as_posix(),
+            )
         else:
             files = [primary]
         for extra in s.get("extra_files", []):
