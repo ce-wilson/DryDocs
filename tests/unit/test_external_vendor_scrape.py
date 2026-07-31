@@ -130,8 +130,8 @@ def test_capture_writes_pages_and_manifest(tmp_path):
         tree, entries, delay=0, fetcher=fake_fetch, out_root=tmp_path
     )
 
-    assert manifest["pages_captured"] == 3
-    assert manifest["pages_failed"] == 0
+    assert manifest["documents"] == 3
+    assert manifest["failed"] == 0
     assert manifest["trust"] == "VERBATIM", "a scrape is the vendor's words, not our summary"
     assert manifest["classification"] == "External"
     assert all(u.startswith(tree.base_url) for u in calls)
@@ -156,8 +156,31 @@ def test_capture_skips_existing_unless_refresh(tmp_path):
     manifest = capture(
         tree, entries, delay=0, fetcher=lambda url: b"new", out_root=tmp_path
     )
-    assert manifest["pages_skipped_existing"] == 1
+    assert manifest["documents_skipped_existing"] == 1
     assert (tmp_path / "pages" / "16200.htm").read_bytes() == b"already here"
+
+
+def test_skipped_pages_still_appear_in_the_manifest(tmp_path):
+    """A resumed capture must produce a COMPLETE manifest.
+
+    Regression: rows were only recorded for pages fetched by that run, so
+    re-running a finished capture wrote a manifest describing almost nothing —
+    and the manifest is what the loader consumes.
+    """
+    tree = TREES["bmc-controlm-9.0.20-utilities"]
+    entries, _ = parse_toc(FIXTURE_TOC, book="Utilities")
+    payload = b"<html>x</html>"
+
+    first = capture(tree, entries, delay=0, fetcher=lambda url: payload, out_root=tmp_path)
+    assert first["documents_fetched_this_run"] == 3
+
+    def refuse(url: str) -> bytes:  # nothing should be re-fetched
+        raise AssertionError(f"unexpected refetch of {url}")
+
+    second = capture(tree, entries, delay=0, fetcher=refuse, out_root=tmp_path)
+    assert second["documents_skipped_existing"] == 3
+    assert second["toc_nodes_recorded"] == first["toc_nodes_recorded"] == 3
+    assert [p["sha256"] for p in second["pages"]] == [p["sha256"] for p in first["pages"]]
 
 
 def test_capture_survives_a_failing_page(tmp_path):
@@ -170,9 +193,58 @@ def test_capture_survives_a_failing_page(tmp_path):
         return b"ok"
 
     manifest = capture(tree, entries, delay=0, fetcher=flaky, out_root=tmp_path)
-    assert manifest["pages_captured"] == 2
-    assert manifest["pages_failed"] == 1
+    assert manifest["documents"] == 2
+    assert manifest["failed"] == 1
     assert manifest["failures"][0]["url"] == "3930.htm"
+
+
+# --------------------------------------------------------------------------- #
+# fragment (#anchor) TOC nodes: real navigation, but not a second document
+# --------------------------------------------------------------------------- #
+FIXTURE_TOC_WITH_ANCHOR = json.dumps(
+    [
+        {
+            "id": 1,
+            "text": "Utilities",
+            "children": [
+                {"id": 2, "text": "ctl", "url": "89881.htm", "leaf": True},
+                # a SECTION of the page above — a real TOC node, same document
+                {"id": 3, "text": "ctl HA parameters", "url": "89881.htm#o90021", "leaf": True},
+            ],
+        }
+    ]
+)
+
+
+def test_fragment_node_keeps_its_identity_but_is_not_a_second_document(tmp_path):
+    """Regression from the live 1,017-page run.
+
+    `89881.htm#o90021` was written as a literal filename and fetched a second
+    time, producing two byte-identical files for one page.
+    """
+    tree = TREES["bmc-controlm-9.0.20-utilities"]
+    entries, _ = parse_toc(FIXTURE_TOC_WITH_ANCHOR, book="Utilities")
+    assert [e.page for e in entries] == ["89881.htm", "89881.htm"]
+    assert [e.anchor for e in entries] == [None, "o90021"]
+
+    calls: list[str] = []
+
+    def counting_fetch(url: str) -> bytes:
+        calls.append(url)
+        return b"<html>ctl</html>"
+
+    manifest = capture(tree, entries, delay=0, fetcher=counting_fetch, out_root=tmp_path)
+
+    assert calls == [tree.base_url + "89881.htm"], "the page is fetched exactly once"
+    assert manifest["documents"] == 1
+    assert manifest["toc_nodes_recorded"] == 2, "both navigation nodes survive"
+
+    on_disk = [p.name for p in (tmp_path / "pages").iterdir()]
+    assert on_disk == ["89881.htm"], "no '#' in any filename"
+
+    anchored = [p for p in manifest["pages"] if p["anchor"]][0]
+    assert anchored["page"] == "89881.htm"
+    assert anchored["title"] == "ctl HA parameters"
 
 
 # --------------------------------------------------------------------------- #

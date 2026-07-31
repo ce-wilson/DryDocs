@@ -146,9 +146,30 @@ def fetch(url: str, *, timeout: int = 30, retries: int = 3) -> bytes:
 # --------------------------------------------------------------------------- #
 @dataclass
 class TocEntry:
+    """One node of the vendor's table of contents.
+
+    A TOC node is not the same thing as a page. Some nodes address a SECTION of
+    a page via a fragment (``89881.htm#o90021`` — "ctl High Availability Server
+    parameters" inside the broader ``ctl`` topic). Those are real navigation
+    nodes with their own titles, so they are kept, but they must not cause the
+    underlying page to be fetched or stored twice: ``page`` is what gets
+    downloaded, ``anchor`` is where inside it this node points.
+    """
+
     url: str
     title: str
     path: list[str] = field(default_factory=list)
+
+    @property
+    def page(self) -> str:
+        """The fetchable document — the url with any fragment removed."""
+        return self.url.split("#", 1)[0]
+
+    @property
+    def anchor(self) -> str | None:
+        """The within-page anchor, if this node addresses a section."""
+        _, _, frag = self.url.partition("#")
+        return frag or None
 
     @property
     def breadcrumb(self) -> str:
@@ -159,8 +180,9 @@ def parse_toc(raw: bytes | str, *, book: str | None = None) -> tuple[list[TocEnt
     """Flatten an Author-it ``toc.json`` into (entries, pages-per-book).
 
     ``book`` restricts the result to one top-level book. Entries are
-    de-duplicated on url, first occurrence winning, so a topic reachable from
-    two places is captured once.
+    de-duplicated on the FULL url (page + fragment), first occurrence winning,
+    so a topic reachable from two places appears once while a section node
+    keeps its own identity.
     """
     text = raw.decode("utf-8", "replace") if isinstance(raw, bytes) else raw
     tree = json.loads(text)
@@ -197,8 +219,12 @@ def _size(node: dict) -> int:
 # --------------------------------------------------------------------------- #
 # pre-flight plan + the refusal
 # --------------------------------------------------------------------------- #
-#: measured over sampled BMC help pages (2026-07-31): ~19 KB raw per page
-BYTES_PER_PAGE_ESTIMATE = 19_000
+#: Order-of-magnitude only, and it varies a lot by book — measured 2026-07-31:
+#: sampled Parameters pages ~19 KB each, but the full Utilities capture came in
+#: at ~5.9 KB/page (6.0 MB / 1016 documents). Sizing off three sampled pages
+#: over-estimated that run by 3x, so the pre-flight says "estimated" and this
+#: number exists to catch order-of-magnitude mistakes, not to be accurate.
+BYTES_PER_PAGE_ESTIMATE = 12_000
 
 
 def render_plan(tree: VendorTree, entries: list[TocEntry], per_book: dict[str, int], delay: float) -> str:
@@ -264,34 +290,50 @@ def capture(
     pages_dir = root / "pages"
     pages_dir.mkdir(parents=True, exist_ok=True)
 
-    records, failures, skipped = [], [], 0
+    records, failures = [], []
+    fetched, skipped = 0, 0
+    #: page -> (bytes, sha256) for pages this run has already handled, so a TOC
+    #: node addressing a SECTION of an already-captured page costs no request.
+    seen_pages: dict[str, tuple[int, str]] = {}
+
     for i, entry in enumerate(entries, start=1):
-        dest = pages_dir / entry.url
-        if dest.exists() and not refresh:
-            skipped += 1
-            continue
-        try:
-            body = fetcher(tree.base_url + entry.url)
-        except Exception as exc:  # keep going; a partial capture is still useful
-            failures.append({"url": entry.url, "error": str(exc)})
-            print(f"  [{i}/{len(entries)}] FAILED {entry.url}: {exc}", file=sys.stderr)
-            continue
-        dest.write_bytes(body)
+        dest = pages_dir / entry.page
+
+        if entry.page not in seen_pages:
+            if dest.exists() and not refresh:
+                body = dest.read_bytes()
+                skipped += 1
+            else:
+                try:
+                    body = fetcher(tree.base_url + entry.page)
+                except Exception as exc:  # keep going; a partial capture is still useful
+                    failures.append({"url": entry.url, "page": entry.page, "error": str(exc)})
+                    print(f"  [{i}/{len(entries)}] FAILED {entry.page}: {exc}", file=sys.stderr)
+                    continue
+                dest.write_bytes(body)
+                fetched += 1
+                if delay:
+                    time.sleep(delay)
+            seen_pages[entry.page] = (len(body), hashlib.sha256(body).hexdigest())
+
+        size, digest = seen_pages[entry.page]
+        # One row per TOC NODE — the hierarchy is the point — but `page`/`anchor`
+        # make it explicit when several nodes share one document.
         records.append(
             {
                 "url": entry.url,
+                "page": entry.page,
+                "anchor": entry.anchor,
                 "source_url": tree.base_url + entry.url,
                 "title": entry.title,
                 "breadcrumb": entry.breadcrumb,
                 "toc_path": entry.path,
-                "bytes": len(body),
-                "sha256": hashlib.sha256(body).hexdigest(),
+                "bytes": size,
+                "sha256": digest,
             }
         )
         if i % 50 == 0:
             print(f"  [{i}/{len(entries)}] captured ...")
-        if delay:
-            time.sleep(delay)
 
     manifest = {
         "capture_id": tree.id,
@@ -304,10 +346,13 @@ def capture(
         "captured_at": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
         "trust": "VERBATIM",
         "note": tree.note,
-        "pages_requested": len(entries),
-        "pages_captured": len(records),
-        "pages_skipped_existing": skipped,
-        "pages_failed": len(failures),
+        # toc_nodes >= documents whenever a node addresses a section of a page.
+        "toc_nodes_requested": len(entries),
+        "toc_nodes_recorded": len(records),
+        "documents": len(seen_pages),
+        "documents_fetched_this_run": fetched,
+        "documents_skipped_existing": skipped,
+        "failed": len(failures),
         "failures": failures,
         "pages": records,
     }
@@ -372,8 +417,11 @@ def main(argv: list[str] | None = None) -> int:
     print(f"\nCapturing {len(entries)} pages at {args.delay}s/request ...\n")
     manifest = capture(tree, entries, delay=args.delay, refresh=args.refresh)
     print(
-        f"\nDONE  captured={manifest['pages_captured']} "
-        f"skipped={manifest['pages_skipped_existing']} failed={manifest['pages_failed']}"
+        f"\nDONE  toc_nodes={manifest['toc_nodes_recorded']} "
+        f"documents={manifest['documents']} "
+        f"(fetched={manifest['documents_fetched_this_run']} "
+        f"skipped={manifest['documents_skipped_existing']}) "
+        f"failed={manifest['failed']}"
     )
     print(f"      {vendor_docs_dir(tree.id)}")
     return 0

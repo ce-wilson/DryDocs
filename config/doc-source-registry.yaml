@@ -57,7 +57,7 @@ sources:
 
   - id: bmc-controlm-utilities
     classification: External            # public BMC documentation; robots.txt allows /supportu/9.0.20/*
-    source: "DRYDOCS_DATA_ROOT/vendor-docs/bmc-controlm-9.0.20-utilities/pages/ (1017 captured .htm topics — OUT of the repo tree)"
+    source: "DRYDOCS_DATA_ROOT/vendor-docs/bmc-controlm-9.0.20-utilities/pages/ (1016 documents / 1017 TOC nodes, 6.0 MB — OUT of the repo tree)"
     source_url: "https://documents.bmc.com/supportu/9.0.20/help/Main_help/en-US/ (Utilities book; per-topic URLs in the capture manifest)"
     captured_at: 2026-07-31
     connector: web
@@ -71,7 +71,14 @@ sources:
     confirmed: false                    # NOT gated yet — no loader may write from this entry until an SME gate signs the doc-graph shape
     notes: >
       Captured 2026-07-31 by scripts/external_vendor_scrape.py (capture id
-      bmc-controlm-9.0.20-utilities). WHY THE PAYLOAD IS NOT IN THE REPO: a
+      bmc-controlm-9.0.20-utilities): 1017 TOC nodes over 1016 DOCUMENTS,
+      6.0 MB, zero failures. The two counts differ by one on purpose — one TOC
+      node (`89881.htm#o90021`, "ctl High Availability Server parameters")
+      addresses a SECTION of another page via a fragment, so it is a real
+      navigation node but not a second document. The manifest carries
+      `page` + `anchor` per row so the Q13 loader can build the hierarchy
+      faithfully without minting a phantom :Document.
+      WHY THE PAYLOAD IS NOT IN THE REPO: a
       verbatim vendor scrape is BMC's copyrighted words, not our summary — the
       external/ServiceNow/extracted/ .gitignore precedent, generalized to the
       out-of-repo data root. What is committed is this entry, the capture id,
