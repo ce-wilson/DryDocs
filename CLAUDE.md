@@ -105,9 +105,22 @@ Index: [`reference/REGISTRY.yaml`](reference/REGISTRY.yaml)
 
 | Platform | What it is | How to call it |
 |----------|-----------|----------------|
-| **Neo4j** | the graph platform itself | `neo4j-skills` plugin (cypher, modeling, import, graphrag, vector-index, gds, …; the `aura-*` skills are removed locally — Aura was ruled out for the Docker EE container, 2026-07-06; a plugin update may restore them, delete again) + [`reference/platforms/neo4j/`](reference/platforms/neo4j/README.md) |
+| **Neo4j** | the graph platform itself | `neo4j-skills` plugin — trimmed locally to 9 skills: cypher, modeling, import, graphrag, vector-index, gds, driver-python, query-tuning, security (see the trim note below) + [`reference/platforms/neo4j/`](reference/platforms/neo4j/README.md) |
 | **Ontology standards** | PROV-O, W3C ORG, DPROD/EKGF, **SOSA/SSN**, DCAT, SKOS | [`reference/standards/`](reference/standards/README.md) |
 | **Academic research** | papers backing modeling choices | [`reference/research/`](reference/research/README.md) |
+
+> **Trimming `neo4j-skills` — delete the directory AND prune the manifest, or the whole plugin dies.**
+> The plugin ships 29 skills (~8k always-on tokens); we run 9 (~3k). Trimming takes **two** steps, both
+> required, in the plugin cache (`~/.claude/plugins/cache/neo4j-skills-marketplace/neo4j-skills/<ver>/`):
+> **(1)** delete the unwanted `neo4j-*-skill/` directories, **(2)** remove their entries from that
+> directory's `.claude-plugin/plugin.json` `skills` array. Step 1 without step 2 makes Claude Code fail
+> the *entire* plugin on the missing paths — every skill vanishes with no error at the prompt. That is
+> exactly what happened: the `aura-*` deletion (Aura ruled out for the Docker EE container, 2026-07-06)
+> silently took **all** Neo4j reference offline until 2026-07-31, while this table still routed work to it.
+> `skillOverrides` is **not** an alternative — it gates filesystem skills (`.claude/skills/`) only, never
+> plugin skills; verified inert in both project and local scope. Any `claude plugin install`/`update`
+> re-fetches all 29 and reverts both steps — redo them, then confirm with `claude plugin details neo4j-skills`
+> (expect `Skills (9)` and `✔ enabled` in `claude plugin list`).
 
 ### Tier 2 — Orchestration *vendors* (you ingest FROM these — one level lower)
 Index: [`external/orchestration/README.md`](external/orchestration/README.md)
@@ -165,7 +178,7 @@ Defined in [`.claude/agents/`](.claude/agents/) — each agent's frontmatter car
 description, tools, and model; the layer table in §1 names the owner agent. Dispatch by layer.
 
 **Orchestration stays with the main (Opus) session.** Sub-agents do scoped, well-specified
-units from `docs/restructure/02-backlog.md`. Each backlog item names its agent + acceptance test.
+units from `docs/restructure/backlog.yaml`. Each backlog item names its agent + acceptance test.
 
 ---
 

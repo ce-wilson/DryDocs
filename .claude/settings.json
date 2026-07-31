@@ -20,5 +20,8 @@
       "PowerShell($env:NEO4J_DATABASE)",
       "PowerShell(.claude/skills/run-drydocs/smoke.ps1)"
     ]
+  },
+  "enabledPlugins": {
+    "neo4j-skills@neo4j-skills-marketplace": true
   }
 }
