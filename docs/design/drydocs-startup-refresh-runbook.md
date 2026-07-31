@@ -1,8 +1,11 @@
 # Runbook — DryDocs local startup & refresh (EE container + sample ingest)
 
 <!-- anchor: front-matter -->
-- **Status:** DESCRIPTIVE — documents the working procedure. **Rev 4, 2026-07-28**
-  (plugins are a mounted volume, not `NEO4J_PLUGINS` — APOC was silently absent; GDS
+- **Status:** DESCRIPTIVE — documents the working procedure. **Rev 5, 2026-07-31**
+  (the per-file supplement verbs collapse to the one `apply-supplements` chain, which
+  also closes Appendix B's long-missing registry supplement; `load-doc-traceability`
+  named in the ingest step; on top of Rev 4's plugin correction — plugins are a mounted
+  volume, not `NEO4J_PLUGINS`, APOC was silently absent, GDS
   added; on top of Rev 3's container-fact re-point onto the `neo4jtest` recreation,
   sourced from
   `config/dev-environment.yaml`; on top of Rev 2's rev1-SME-feedback pass, which
@@ -17,6 +20,27 @@
   `internal/helpmeloginlocalneo4j.md` (login/port troubleshooting evidence),
   `.claude/skills/run-drydocs/SKILL.md` (agent-facing run notes)
 
+> **What changed in Rev 5 (2026-07-31) — one supplement command, and Appendix B was
+> quietly one supplement short.** The cold-start step listed three per-file verbs
+> (`apply-ontology-supplement` / `-seal-` / `-catalog-`) and Appendix B copied the same
+> three. Since **G29** the chain is DATA — `drydocs_core.schema.supplements.SUPPLEMENTS`
+> — and it has FOUR members: `base -> seal -> catalog -> registry`. So every reader who
+> followed this runbook literally skipped the **registry** supplement, and
+> `load-software-registry` (which is in the ingest step, and which MATCHes the terms that
+> supplement seeds) was running against a graph that had never been given them. That is
+> the G29 failure class the chain was built to end, sitting in the runbook that teaches
+> the procedure. Both blocks now run the single verified `poetry run drydocs
+> apply-supplements`, which applies each file in the load-bearing order and then CHECKS
+> that every `:OntologyTerm` IRI it declares is actually present — a supplement that runs
+> and seeds nothing now fails the command instead of surfacing later as an empty loader
+> MATCH. The per-file verbs still work as thin aliases; they are simply no longer how the
+> procedure is written. The Refresh/ingest demonstrable-content step also names
+> `drydocs load-doc-traceability` (shipped by L7 after Rev 2 was signed, never added
+> here). Procedure-only; no container or environment fact changed.
+>
+> *Numbering note:* the backlog item that asked for this says "Rev 4" — it was groomed
+> before Rev 4 (plugins) landed on the same day. This is that revision, one number on.
+>
 > **What changed in Rev 4 (2026-07-28) — the plugins were never actually installed.**
 > `NEO4J_PLUGINS=[apoc]` was set on the container for weeks while `/plugins` held only
 > `README.txt`, so APOC was ABSENT: `drydocs bootstrap` refused with "APOC required"
@@ -102,16 +126,28 @@ check; go to Troubleshooting.
    poetry run drydocs check
    ```
    *Success:* exit 0 — server version and APOC reported.
-3. **Schema backbone, then the three domain supplements** (order matters —
-   `catalog_ontology_supplement.cypher` owns the canonical `:Role` seeds the SEAL/PAT
-   loaders MATCH at runtime, and since K6 also the `product_roles` ProductRole scheme):
+3. **Schema backbone, then the supplement chain:**
    ```powershell
    poetry run drydocs bootstrap                   # constraints.cypher + ontology.cypher
-   poetry run drydocs apply-ontology-supplement   # Control-M anchor terms
-   poetry run drydocs apply-seal-supplement       # SEAL domain terms (TOM scheme)
-   poetry run drydocs apply-catalog-supplement    # Catalog/PAT terms + Role seeds + Product Cabinet
+   poetry run drydocs apply-supplements           # base -> seal -> catalog -> registry
    ```
-   *Success:* each command exits 0; all four are idempotent — re-running is safe.
+   One command, not four. The order is load-bearing — `catalog` reuses the
+   `:Attribution` class and `#hasAgent` term that `seal` declares, and `catalog` owns
+   the canonical `:Role` seeds the SEAL/PAT loaders MATCH at runtime (since K6 also the
+   `product_roles` ProductRole scheme) — so the order lives in ONE place,
+   `drydocs_core.schema.supplements.SUPPLEMENTS`, rather than in whatever sequence a
+   runbook happened to list (G29). Do not hand-run the per-file verbs to "save a step":
+   that is exactly how `registry` went missing from this runbook for months.
+
+   *Success:* exit 0, and the printed table shows every supplement with
+   `Verified == Declared terms` and `OK = yes`. The command FAILS if a supplement
+   applies but seeds nothing, so a green run is evidence the terms are in the graph —
+   not just that a file executed. Idempotent; re-running is safe. A run log lands in
+   `DRYDOCS_LOGDIR`.
+
+   *Opt-in:* `--with-sosa` appends the EXPERIMENTAL SOSA/SSN supplement. It is not a
+   declared company standard and is never in the default chain — leave it off unless
+   you are deliberately working layer-4.
 4. **First-time only — multi-DB topology** (drydocs + ddlineage + ddcontext + the
    ddall composite): run the G1 provisioning per
    `drydocs_core/schema/provisioning/README.md` (`provision.ps1`). Skip on an
@@ -138,8 +174,14 @@ samples; the Oracle variant is the same chain with scope binds.
    ```powershell
    poetry run drydocs load-software-registry
    poetry run drydocs load-bmc-docs
+   poetry run drydocs load-doc-traceability       # L7 — DryDocs documenting itself
    poetry run drydocs load-essential-graphrag     # optional (-> ddcontext)
    ```
+   `load-doc-traceability` is the L7 self-documentation chain: `docs/design/*.md` →
+   `:DesignDoc`/`:DocSection`, the traceability-matrix rows → `:Requirement`/
+   `:Component`/`:TestCase`, and `docs/design/feedback/*.yaml` → `:FeedbackNote`. It
+   shipped after Rev 2 was signed and was never added here, so a rebuilt container had
+   no doc graph until someone remembered the verb.
 4. **One-shot alternative:** `scripts/ingest.sh [args…]` runs check → bootstrap →
    supplements → ingest-controlm → m1/m3-verify in order and fails fast; arguments are
    forwarded to the `ingest-controlm` step.
@@ -249,13 +291,17 @@ in the sections above):
 docker start neo4jtest
 poetry run drydocs check
 poetry run drydocs bootstrap
-poetry run drydocs apply-ontology-supplement
-poetry run drydocs apply-seal-supplement
-poetry run drydocs apply-catalog-supplement
+poetry run drydocs apply-supplements
 poetry run drydocs refresh-reference
 poetry run drydocs ingest-controlm
 poetry run drydocs load-software-registry
 poetry run drydocs load-bmc-docs
+poetry run drydocs load-doc-traceability
 poetry run drydocs m1-verify
 poetry run drydocs m3-verify
 ```
+
+The three per-file supplement verbs this block used to list are gone on purpose: they
+covered `base`/`seal`/`catalog` and silently omitted `registry`, so
+`load-software-registry` two lines down was MATCHing terms nothing had seeded.
+`apply-supplements` is the whole chain and verifies it landed (Rev 5).

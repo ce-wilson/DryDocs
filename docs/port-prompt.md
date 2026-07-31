@@ -120,6 +120,60 @@ GUARDRAILS (durable — apply to every port):
    - Graph WRITES are always yours regardless of tier (tracker T9): adoption can flip
      config status, never substitute for load verification against the company graph.
 
+6a. PASTE-READY L7 RATIFICATION ENTRY (discharges tracker T11).
+   §6 Tier A requires the ratification entry to land in the COMPANY gate-log, and
+   port-prompt has said since 2026-07-21 that a snippet "was provided in the producer
+   session" — but the block itself was never committed, so no company session could
+   open it. It is committed here now. Copy it verbatim into the company `gate-log.md`
+   in gate-log date order, fill the four `[...]` placeholders from YOUR port report,
+   and flip T11.
+
+   WHAT IS PRE-FILLED vs WHAT YOU FILL: the subject, the producer gate reference, and
+   the six-and-six inventory are FACTS OF THE PRODUCER GATE — verified against
+   `config/gate-log.md` (2026-07-20 entry), `relationship_vocabulary.yaml`, and
+   `config/taxonomy-ontology-map.yaml`, so they are written out. The check RESULTS and
+   the sign-off are yours: they describe what ran against the COMPANY tree, which no
+   producer session can know. They are bracketed placeholders, deliberately not
+   invented — an entry citing numbers nobody ran is worse than no entry.
+
+   ```markdown
+   ## [PORT DATE] — L7 · Documentation traceability + review feedback — RATIFIED (Tier A, adopted via port)
+
+   - **Tier:** A — the company held no signed position on documentation traceability
+     at adoption time. Per the two-tier gate-adoption doctrine (port-prompt §6), a
+     port MAY adopt a producer-signed outcome; this entry is the required company
+     record. A PORT-REPORT is evidence, not a gate ledger.
+   - **Subject:** the product-plane documentation ontology — 6 node classes
+     (DesignDoc, DocSection, Requirement, Component, TestCase, FeedbackNote) and 6
+     `doc_` relationship vocabulary entries (doc_section_part_of,
+     doc_requirement_specified_in, doc_requirement_implemented_by,
+     doc_requirement_verified_by, doc_feedback_annotates, doc_feedback_authored_by)
+     activated planned → active; taxonomy-ontology map entry
+     `doc-traceability-feedback` proposed → confirmed.
+   - **Producer gate reference:** producer gate-log 2026-07-20, "L7 · Documentation
+     traceability + review feedback (doc-traceability-feedback) — SIGNED OFF";
+     21 confirmed / 0 edited / 0 rejected; SME chad.wilson; gate spec
+     `config/gate-prompts/doc-traceability-feedback.yaml`; producer commit `0252d29`.
+     Adopted into this repo by `PORT-REPORT-6fd3270`.
+   - **Same-SME condition (§6 Tier A clause a):** MET — the SME who signed the
+     producer gate is the SME signing here.
+   - **Checks performed company-side (§6 Tier A clause b):**
+     - Full unit suite: [N] passed, [N] skipped.
+     - J7 reconcile guards with `RECONCILE_BEFORE_DIR` set: no active/confirmed/
+       applied downgrade, no dropped per-entry rows, gate-log append-only — [RESULT].
+     - Vocabulary + map entries resolved BY ID (never whole-file checkout); summaries
+       recomputed as the guard tests do — [RESULT].
+     - [Any company-side adaptation applied at adoption, or "none".]
+   - **Graph writes:** NONE ruled in by this entry. Per §6 and tracker T9, adoption
+     flips config status only; loading `load-doc-traceability` against the company
+     graph and verifying it remains a separate company action.
+   - **Signed off:** [SME NAME], [DATE].
+   ```
+
+   Note the deliberate shape: this ratifies an ADOPTION, so it records no new
+   decisions. If the company ever wants to change any of the 21 producer rulings,
+   that is a full company gate session (Tier B), not an edit to this entry.
+
 7. RECONCILE GUARDS: full unit suite green PLUS the J7 reconcile guards with
    RECONCILE_BEFORE_DIR set (proves no active/confirmed/applied downgrade, no dropped
    per-entry rows, gate-log append-only). Per-entry files (relationship_vocabulary,
@@ -192,10 +246,9 @@ STANDING DIVERGENCES LEDGER (expected collisions — resolve as stated, do NOT "
   stay planned/proposed (inert). Resolve at the company platforms gate, not by editing.
 
 OWED COMPANY-SIDE:
-- L7 RATIFICATION ENTRY in the company gate-log (Tier A adopted-via-port; paste-ready
-  snippet provided in the producer session 2026-07-21 — subject: 6 doc_* edges + 6 doc
-  node classes active, doc-traceability-feedback confirmed; references producer gate
-  0252d29 via PORT-REPORT-6fd3270). Still outstanding as of 2026-07-29 (tracker T11).
+- L7 RATIFICATION ENTRY in the company gate-log (Tier A adopted-via-port). The
+  paste-ready block is **§6a below** — committed, not "provided in a session". Open
+  as of 2026-07-31 (tracker T11).
 - TRACKER (T1–T8 origin steps live in the archive; statuses tracked here):
 
 | # | Item | Status |
@@ -210,7 +263,7 @@ OWED COMPANY-SIDE:
 | T8  | M0 equivalence unblocks: A3 filename + B1 dot rule (archive step 29) | pending |
 | T9  | Lineage curated live load — YOUR vocab gate + m3_* flips, then write_curated on your graph | pending |
 | T10 | MAC field contract validated vs a REAL DPL export — amend dpl_mac.py contract + fixtures together | pending |
-| T11 | L7 ratification entry in company gate-log (Tier A record; see above) | pending |
+| T11 | L7 ratification entry in company gate-log (Tier A record) — **paste-ready block is §6a**; fill the four bracketed placeholders and append to your gate-log | pending |
 | T12 | Company platforms gate: AIS position vs producer C12 | **RULED — SUPERSEDE, 2026-07-21**, company gate-log: the `:AisCapability`/`:AisTool` layer superseded by the software-registry model; excision APPLIED company-side (initial-load runbook steps 7b/10); Tier B holds in old steps 43/45b discharged 2026-07-27; session packs retired from the tree (git history if re-litigated) |
 | T13 | DPL registry field contract validated vs a REAL per-SEAL export (pipeline_id.json/dataset_id.json) — amend dpl_registry.py header + fixtures together, cite provenance (the T10 discipline) | pending |
 | T14 | rua collector convergence: company's own -n implementation vs producer G18 v2 — reconcile to ONE v2 (flags, scripts.tsv columns incl. sha256, size cap, COLLECTOR_VERSION stamp) so bundles stay cross-ingestible. Step 49e's G45 listing fallback is the same family — reconcile together | pending |
