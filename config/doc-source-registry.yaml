@@ -55,6 +55,50 @@ sources:
       lexical shape: (:Chunk)-[:PART_OF]->(:Document) + FIRST_CHUNK/NEXT_CHUNK,
       (:Document)-[:DESCRIBES]->(:SoftwareProduct).
 
+  - id: bmc-controlm-utilities
+    classification: External            # public BMC documentation; robots.txt allows /supportu/9.0.20/*
+    source: "DRYDOCS_DATA_ROOT/vendor-docs/bmc-controlm-9.0.20-utilities/pages/ (1016 documents / 1017 TOC nodes, 6.0 MB — OUT of the repo tree)"
+    source_url: "https://documents.bmc.com/supportu/9.0.20/help/Main_help/en-US/ (Utilities book; per-topic URLs in the capture manifest)"
+    captured_at: 2026-07-31
+    connector: web
+    manifest: DRYDOCS_DATA_ROOT/vendor-docs/bmc-controlm-9.0.20-utilities/capture-manifest.json
+    trust_default: VERBATIM             # a scrape is the vendor's OWN words — unlike bmc-docs, which is our lossy paraphrase
+    tier: T1
+    curation: none                      # T1 ladder (ADR 0006 §4)
+    target_db: dddocs
+    refresh: on-demand
+    taxonomy_path: technology/orchestration/control-m
+    confirmed: false                    # NOT gated yet — no loader may write from this entry until an SME gate signs the doc-graph shape
+    notes: >
+      Captured 2026-07-31 by scripts/external_vendor_scrape.py (capture id
+      bmc-controlm-9.0.20-utilities): 1017 TOC nodes over 1016 DOCUMENTS,
+      6.0 MB, zero failures. The two counts differ by one on purpose — one TOC
+      node (`89881.htm#o90021`, "ctl High Availability Server parameters")
+      addresses a SECTION of another page via a fragment, so it is a real
+      navigation node but not a second document. The manifest carries
+      `page` + `anchor` per row so the Q13 loader can build the hierarchy
+      faithfully without minting a phantom :Document.
+      WHY THE PAYLOAD IS NOT IN THE REPO: a
+      verbatim vendor scrape is BMC's copyrighted words, not our summary — the
+      external/ServiceNow/extracted/ .gitignore precedent, generalized to the
+      out-of-repo data root. What is committed is this entry, the capture id,
+      and the scraper; never the pages.
+      WHY 9.0.20 AND NOT THE ESTATE'S 9.0.21.300: BMC trimmed the 9.0.21 help
+      publication, which carries NO Utilities book at all (6 books / 1,965
+      pages vs 9.0.20's 20 books / 3,860). Version-specific details therefore
+      need confirming against 9.0.21 before they are treated as estate truth —
+      the same standing caveat the hand-converted corpus carries for its
+      SaaS-sourced pages, and a per-Document property the loader should carry
+      rather than a footnote a reader can miss.
+      WHAT IT UNBLOCKS: 258 of the 1017 pages are XML/export/import/definition
+      topics — "XML file rules", "Creating an XML file", "XML file validation",
+      and the emdef family (defjob / exportdefjob / updatedef / copydefjob /
+      deldefjob / duplicatedefjob), each with rules + parameters + examples.
+      That is the documented gap behind drydocs_lineage/extractors/controlm_xml.py,
+      whose XML contract is currently ASSUMED and defined only by synthetic
+      fixtures ("XML schema docs are a known reference gap"). exportdefjob is
+      the likely producer of the estate's own exports.
+
   - id: essential-graphrag
     classification: External            # published Manning/Neo4j-sponsored ebook; PDF is LOCAL-ONLY (root /*.pdf gitignore) — cite source_url, never commit
     source: "Essential-GraphRAG.pdf (repo root, gitignored local copy; Bratanič & Hane, Manning 2025)"

@@ -159,3 +159,51 @@ class BookChunkRow(BaseModel):
     @classmethod
     def _opt_str(cls, v: Any) -> str | None:
         return _str_or_none(v)
+
+
+class VendorDocChunkRow(BaseModel):
+    """One chunk of one captured vendor documentation topic (Q13).
+
+    Distinct from :class:`BmcDocChunkRow` on purpose. That corpus is our
+    paraphrase, so it carries a per-chunk provenance TIER inferred from heading
+    text. This corpus is a verbatim vendor capture: the trust is uniform, and
+    what varies instead is navigational structure — breadcrumb, toc_path,
+    page_role — plus the version the documentation describes.
+    """
+
+    model_config = ConfigDict(
+        populate_by_name=True,
+        str_strip_whitespace=True,
+        extra="ignore",
+    )
+
+    # --- corpus / document fields (denormalized onto every chunk row) ---
+    corpus_id: str = Field(..., min_length=1, description="Capture id, e.g. 'bmc-controlm-9.0.20-utilities'.")
+    doc_id: str = Field(..., min_length=1, description="Topic file stem, e.g. '3921'.")
+    title: str = Field(..., min_length=1)
+    abstract: str = Field("", description="First paragraph — cheap triage before spending context on chunks.")
+    page_role: str = Field(..., min_length=1, description="examples|parameters|rules|overview|topic.")
+    breadcrumb: str = Field("", description="TOC path as text, e.g. 'Utilities > emdef utility for jobs'.")
+    toc_path: list[str] = Field(default_factory=list, description="TOC ancestry, outermost first.")
+    source_url: str = Field(..., min_length=1, description="Canonical vendor URL, fragment stripped.")
+    sha256: str = Field(..., min_length=1, description="Digest of the captured bytes.")
+    captured_at: str = Field(..., min_length=1)
+    doc_version: str = Field(..., min_length=1, description="Vendor documentation version, e.g. '9.0.20'.")
+    version_verified: bool = Field(
+        False,
+        description=(
+            "Whether a human confirmed this documentation against the runtime version. "
+            "NEVER true at load time — only Q16's currency workflow may flip it."
+        ),
+    )
+    trust: str = Field("VERBATIM", description="A capture is the vendor's own words.")
+    classification: str = Field("External")
+
+    # --- chunk fields ---
+    chunk_id: str = Field(..., min_length=1)
+    seq: int = Field(..., ge=0)
+    heading: str = Field(..., min_length=1)
+    level: int = Field(..., ge=0, le=6)
+    text: str = Field(...)
+    char_count: int = Field(..., ge=0)
+    prev_chunk_id: str | None = Field(None)

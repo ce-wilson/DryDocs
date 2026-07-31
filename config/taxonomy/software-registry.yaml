@@ -76,6 +76,19 @@ vendors:
   - id: broadcom
     name: Broadcom
     publisher_url: https://www.broadcom.com/
+  # --- web-console stack vendors (2026-07-31) ------------------------------
+  - id: meta
+    name: Meta
+    publisher_url: https://react.dev/
+  - id: reui
+    name: ReUI
+    publisher_url: https://reui.io/
+  - id: xyflow
+    name: xyflow
+    publisher_url: https://xyflow.com/
+  - id: tailwind-labs
+    name: Tailwind Labs
+    publisher_url: https://tailwindcss.com/
 
 products:
   - id: neo4j
@@ -86,6 +99,13 @@ products:
     type: commercial              # EE via local Docker; community edition open-source
     versions: ["5.x"]             # catalog window 5.19-5.26; pin when container verifiable
     used_by_drydocs: true
+    stack: [web-console]
+    stack: [backend, web-console]  # the DATABASE is backend; the JS driver
+                                   # (neo4j-driver, web/package.json) also ships in
+                                   # the console for the ADR 0005 dev-mode bolt
+                                   # adapter — one product, two stacks. Registering
+                                   # the driver as its OWN product would hit this
+                                   # file's "drivers stay out" scope rule.
 
   - id: neo4j-bloom
     vendor: neo4j
@@ -104,6 +124,50 @@ products:
     type: commercial
     versions: ["9.0.21.300"]      # company runtime — known
     used_by_drydocs: true         # the baseline orchestration source we ingest
+    stack: [source]               # ingested FROM, not built ON
+    # Which captured vendor documentation describes this product, and for which
+    # RUNTIME versions a human has confirmed it still applies. The point of
+    # keeping this beside `versions:` is that the drift is then local and
+    # obvious: when the estate moves to a new version, it lands in `versions:`
+    # and is absent from `current_for`, which is the signal that the docs need
+    # recapturing. `current_for` is an explicit human assertion — never derived
+    # by parsing version strings, because "does 9.0.20 documentation still
+    # describe 9.0.21.300?" is a judgement, not a string comparison.
+    documentation:
+      corpus: bmc-controlm-utilities   # -> config/doc-source-registry.yaml id
+      docs_version: "9.0.20"           # the VENDOR DOC version captured
+      current_for: []                  # EMPTY = unverified. Known drift TODAY: the
+                                       # capture is 9.0.20 (BMC ships no Utilities
+                                       # book in the trimmed 9.0.21 publication)
+                                       # while the runtime is 9.0.21.300.
+      # Documentation versions BMC publishes for this product, newest first —
+      # transcribed from the site's own version picker and PROBED 2026-07-31.
+      # Pre-populated so a version bump is a lookup, not a re-investigation.
+      #
+      #   access: open       200 to our client; capturable.
+      #           forbidden  403 to a plain HTTP client. These are EXACTLY the
+      #                      paths documents.bmc.com/robots.txt does not Allow —
+      #                      perfect correlation, so it is deliberate vendor
+      #                      policy, not a transport fault. They render normally
+      #                      in a browser. We do NOT work around it.
+      #   enumerable: publishes help/Main_help/en-US/toc.json, which is what
+      #           scripts/external_vendor_scrape.py needs to size and bound a
+      #           capture. `unknown` where access is forbidden — unprobeable.
+      #
+      # THE CONSEQUENCE WORTH KNOWING: documentation for the estate's exact
+      # runtime (9.0.21.300) EXISTS but is not retrievable programmatically. So
+      # "just recapture at the right version" is not currently an option, and
+      # the 9.0.20 capture stands as the best enumerable source. Revisit if BMC
+      # widens robots.txt or the content moves.
+      available_versions:
+        - {version: "SaaS",       path: "controlm-saas", access: open,      enumerable: false}
+        - {version: "9.0.22",     path: "9.0.22",        access: forbidden, enumerable: unknown}
+        - {version: "9.0.21.300", path: "9.0.21.300",    access: forbidden, enumerable: unknown}  # ESTATE RUNTIME
+        - {version: "9.0.21.200", path: "9.0.21.200",    access: forbidden, enumerable: unknown}
+        - {version: "9.0.21.100", path: "9.0.21.100",    access: forbidden, enumerable: unknown}
+        - {version: "9.0.21",     path: "9.0.21",        access: open,      enumerable: true}   # trimmed: no Utilities book
+        - {version: "9.0.20",     path: "9.0.20",        access: open,      enumerable: true}   # CAPTURED (bmc-controlm-utilities)
+        - {version: "9.0.19",     path: "9.0.19",        access: open,      enumerable: true}
 
   - id: oracle-db
     vendor: oracle
@@ -113,6 +177,73 @@ products:
     type: commercial
     versions: ["19c"]             # company psgmgr host — VERIFY on connection
     used_by_drydocs: true
+    stack: [backend]
+
+  # --- Web-console stack (Epic O; UI-WIP/site-plan.md §1 "Stack (locked)") ---
+  # INCLUSION RULE, so this does not become the dependency tree: a LOCKED STACK
+  # DECISION goes here — something the site plan committed to and that a
+  # replacement would be a real architectural change. Ordinary npm packages
+  # (clsx, d3-force, fontsource, oxlint) do NOT, per this file's standing
+  # "drivers/utilities/etc. stay out by design" scope. `python` is the
+  # precedent that makes this an existing category rather than a widening:
+  # third-party software DryDocs itself is BUILT ON has always belonged here.
+  #
+  # NOT in scope here either way: DryDocs' OWN 62 React components under
+  # web/src/. This registry is the THIRD-PARTY ledger — first-party code
+  # belongs to the code graph, and today nothing inventories them (the depgraph
+  # scan covers Python roots only, and MODULE_MAP.md omits drydocs-web because
+  # it is not a Python package). That gap is backlog O42, not an entry here.
+  - id: react
+    vendor: meta
+    name: React
+    category: UI Framework
+    role: tool
+    type: open-source
+    versions: ["19.2.7"]          # web/package.json
+    used_by_drydocs: true
+    stack: [web-console]
+    # The FIRST-PARTY sub-ledger: what we BUILT with this framework, as opposed
+    # to the framework itself. Same shape as `documentation:` on the controlm
+    # product — a third-party entry naming the ledger that details it. Kept out
+    # of THIS file because a first-party inventory is not third-party software;
+    # see that file's header, and backlog O42 for why it had no home at all.
+    components:
+      ledger: config/taxonomy/ui-components.yaml
+      schema: drydocs.ui-component-registry.v1
+
+  - id: reui
+    vendor: reui
+    name: ReUI
+    category: UI Component Library
+    role: tool
+    type: open-source
+    versions: ["free tier"]       # NOT an npm dependency by design — shadcn-style,
+    used_by_drydocs: true         # components are COPIED into web/src/components/ui/,
+                                  # which is why it appears in no package.json. Locked
+                                  # 2026-07-17 (site-plan.md); Salt DS dropped.
+    stack: [web-console]
+
+  - id: react-flow
+    vendor: xyflow
+    name: React Flow
+    category: Graph Visualization
+    role: tool
+    type: open-source
+    versions: ["12.11.2"]         # @xyflow/react
+    used_by_drydocs: true
+    stack: [web-console]         # lineage + explorer canvases; Neo4j NVL is the
+                                  # documented fallback if Neo4j-native rendering
+                                  # ever becomes a requirement
+
+  - id: tailwindcss
+    vendor: tailwind-labs
+    name: Tailwind CSS
+    category: UI Styling
+    role: tool
+    type: open-source
+    versions: ["4.1.16"]
+    used_by_drydocs: true
+    stack: [web-console]         # tokens are the theme API (site-plan §2)
 
   - id: python
     vendor: psf
@@ -122,6 +253,8 @@ products:
     type: open-source
     versions: ["3.11+"]           # pyproject floor; 3.13 in local use
     used_by_drydocs: true
+    stack: [backend]              # every Python component: core, load, api, lineage,
+                                  # remediation, docgen — the whole server side
 
   - id: abinitio
     vendor: abinitio

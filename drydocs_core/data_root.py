@@ -80,6 +80,25 @@ def catalog_dir(sub: str | None = None, *, create: bool = False) -> Path:
     return source_dir(*parts, create=create)
 
 
+def vendor_docs_dir(vendor_tree: str | None = None, *, create: bool = False) -> Path:
+    """Landing zone for VERBATIM external-vendor documentation captures.
+
+    Vendor help trees are the vendor's own words, not our summary — the
+    ``external/ServiceNow/extracted/`` .gitignore precedent generalized to a
+    real out-of-repo home. Our publishable artifacts stay in
+    ``external/orchestration/`` (summaries we wrote); the raw capture lands
+    here and is never committed:
+
+        <root>/vendor-docs/<tree>/pages/     captured .htm, one file per topic
+        <root>/vendor-docs/<tree>/capture-manifest.json
+
+    ``vendor_tree`` is the capture id from the scraper's TREES table (e.g.
+    ``bmc-controlm-9.0.20-utilities``).
+    """
+    parts = ("vendor-docs",) + ((vendor_tree,) if vendor_tree else ())
+    return source_dir(*parts, create=create)
+
+
 def controlm_xml_dir(*, create: bool = False) -> Path:
     """Landing zone for Control-M XML definition exports (G47 — the
     9.0.21.300 config SoR; real folder/job/variable values are Internal).

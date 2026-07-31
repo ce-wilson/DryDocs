@@ -96,6 +96,19 @@ external/ServiceNow/*.pptx
 external/ServiceNow/*.docx
 external/ServiceNow/extracted/
 
+# External-vendor documentation CAPTURES (scripts/external_vendor_scrape.py) —
+# the ServiceNow rule generalized: a verbatim scrape of a vendor help tree is
+# the vendor's copyrighted words, not our summary, so it never enters a repo
+# that is private-but-sometimes-published. The real landing zone is OUT of the
+# tree entirely (DRYDOCS_DATA_ROOT/vendor-docs/<capture-id>/, per
+# drydocs_core.data_root.vendor_docs_dir) — these patterns are belt-and-braces
+# for anyone who mirrors a capture in-tree. What IS committed: the capture id
+# and its doc-source-registry entry, and whatever summaries we write ourselves
+# under external/orchestration/.
+external/vendor-docs/
+vendor-docs/
+**/capture-manifest.json
+
 # Design-doc PDFs (Epic L / L4) — BUILD-ON-DEMAND from the .md via scripts/doc_to_pdf.py.
 # The .md is the source of truth and the single .html render is committed (L13); the PDF is a
 # regenerable binary (not byte-identical run-to-run — trailer /ID varies), so it is not tracked.

@@ -1,0 +1,129 @@
+# =============================================================================
+# config/taxonomy/ui-tests.yaml — UI test cases, keyed to console modules.
+#
+# WHY THIS EXISTS: adopted from the Process/Testing domains of the Miller
+# software-development-process model (uploaded notebook, 2026-07-31), on the
+# user's condition — "if this framework works internally use it". It does, but
+# only the SHAPE: TestSuite -> TestCase, and TestSuite -> Feature. Our :Feature
+# layer already exists as web/src/modules/registry.ts, so the join is a lookup.
+#
+# THE PAYOFF CHAIN, which is the model's headline query realized on our data:
+#
+#   component --module--> module <--module-- suite --> cases to run
+#
+# Change LineageGraphPane, and its ui-components.yaml `module: lineage` binding
+# leads to the lineage suite and the cases worth re-running. The notebook does
+# this as MATCH (css)--(vw:MvcView) MATCH (vw)-[*1..3]-(feature:Feature); we do
+# it as two ledger joins, no graph required.
+#
+# NOT REUSING graph-tests/ ON PURPOSE. That format (drydocs.graph-tests.v1) is
+# excellent and stays the precedent for STRUCTURE — but its cases are Cypher
+# with empty/nonempty/equals assertions against a live graph. A UI case is
+# "click this, see that". Same spirit, different assertion surface, so this is
+# a sibling schema rather than a strained reuse.
+#
+# EXECUTION IS MANUAL. There is no UI test runner today: web/package.json has
+# dev/build/lint/preview and nothing else, and there is not a single .test.tsx
+# in the tree. These are CHECKLISTS a human works through — which is exactly
+# how the UI is being tested right now, so the ledger meets reality instead of
+# assuming a harness that does not exist. `execution: manual` says so out loud;
+# if a runner ever lands, cases gain an `automated_by` key and the mode flips
+# per case, not per file.
+#
+# SEEDED FROM VERIFIED BEHAVIOUR, NOT INVENTED. Every case below cites a
+# backlog close note recording something that was actually observed working.
+# Those observations are currently trapped in commit messages, where they
+# cannot be re-run; this file is where they become durable. A case with no
+# `source` is a case nobody has ever seen pass.
+#
+# COVERAGE IS PARTIAL AND SAYS SO: 2 of 11 areas seeded. The rest are declared
+# with `cases: []` so the gap is a visible number rather than an absence, and
+# the guard pins it.
+# =============================================================================
+
+schema: drydocs.ui-tests.v1
+classification: Internal-Public
+updated: 2026-07-31
+
+# --- joins -------------------------------------------------------------------
+component_ledger: config/taxonomy/ui-components.yaml   # component -> module
+module_registry: web/src/modules/registry.ts           # the canonical module ids
+execution: manual                                      # no runner exists (see header)
+
+suites:
+  # ---------------------------------------------------------------------------
+  - id: TS-SHELL
+    module: shell               # not a registry module: the frame every module renders in
+    description: >
+      Cross-module shell behaviour — theming, layout cascade, and the chrome
+      that is shared by every route. A regression here shows up everywhere at
+      once, which is why it is its own suite rather than repeated per module.
+    cases:
+      - id: TC-SHELL-01
+        description: Tailwind utilities are not out-cascaded by the global reset
+        steps:
+          - Open any module route.
+          - Inspect a component that sets padding via a Tailwind utility class.
+        expect: >
+          The utility wins. Preflight's reset is retained for box-sizing only —
+          an unlayered `* { padding: 0 }` out-cascades layered Tailwind
+          utilities and silently flattens spacing across the whole console.
+        source: "O36 close note — root cause found and fixed 2026-07-29"
+
+      - id: TC-SHELL-02
+        description: Both themes render correctly
+        steps:
+          - Load the console in light theme, then toggle to dark.
+        expect: >
+          Both themes render without unstyled or invisible elements. The
+          viewer's system preference is the default and the manual toggle wins
+          over it (site-plan §2).
+        source: "O35-O41 close note — both themes screenshot-checked 2026-07-29"
+
+      - id: TC-SHELL-03
+        description: Radius tokens are consistent
+        steps:
+          - Compare corner radii across cards, chips and panels.
+        expect: "Radii come from tokens; `lg` is collapsed onto `md` (10px)."
+        source: "O37 close note — App.css/index.css radii tokenized"
+
+  # ---------------------------------------------------------------------------
+  - id: TS-LOADS
+    module: loads
+    description: Loader run timeline, stat tiles and their filter interaction.
+    cases:
+      - id: TC-LOADS-01
+        description: Stat tiles filter the timeline when clicked
+        steps:
+          - Open /loads.
+          - Note the run count shown in the timeline.
+          - Click the "Failed" stat tile.
+        expect: >
+          The timeline filters to failed runs only and the visible count drops
+          accordingly (observed 4 -> 1 on the sample data). Clicking again
+          clears the filter.
+        source: "O40 close note — click-to-filter live on loads, 4->1 verified"
+
+      - id: TC-LOADS-02
+        description: Run status uses the shared status vocabulary
+        steps:
+          - Open /loads and compare status chips against the Explorer inspector.
+        expect: >
+          Both surfaces render the same status vocabulary through StatusChip —
+          Ready / Failed / Processing / Pending / Not Scheduled — with no
+          module-local spelling.
+        source: "O41 close note — status-vocab map adopted inspector + loads"
+
+  # --- declared, not yet seeded ----------------------------------------------
+  # Present so the coverage gap is a number, not an absence. Seed each from
+  # verified behaviour when that module is next worked on — never by inventing
+  # cases that nobody has watched pass.
+  - { id: TS-EXPLORER,    module: explorer,    description: "Explorer tower/app drill-down + inspector.", cases: [] }
+  - { id: TS-LINEAGE,     module: lineage,     description: "Lineage source->target DAG canvas.", cases: [] }
+  - { id: TS-OWNERSHIP,   module: ownership,   description: "SEAL->PAT->team rollup + asset search.", cases: [] }
+  - { id: TS-RUNBOOKS,    module: runbooks,    description: "Data-series provisioning chain views.", cases: [] }
+  - { id: TS-REMEDIATION, module: remediation, description: "Finding -> fix-batch flow.", cases: [] }
+  - { id: TS-DOCS,        module: docs,        description: "Document->Chunk corpus map (Q13/Q15 will extend this).", cases: [] }
+  - { id: TS-GATES,       module: gates,       description: "Gate dependency graph + gate log.", cases: [] }
+  - { id: TS-ASK,         module: ask,         description: "Agent Q&A spoke: streamed steps, citations, metrics chip.", cases: [] }
+  - { id: TS-UNDERHOOD,   module: underhood,   description: "Benchmark showcase surfaces.", cases: [] }

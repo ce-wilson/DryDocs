@@ -71,6 +71,14 @@
       ]
     },
     {
+      "command": "load-vendor-docs",
+      "mode": "optional",
+      "note": "Q13 captured vendor documentation (verbatim, out-of-repo capture -> convert -> load); taxonomy only, gated until its corpus is confirmed",
+      "loaders": [
+        "vendor_docs.v1"
+      ]
+    },
+    {
       "command": "load-essential-graphrag",
       "mode": "optional",
       "note": "Q2 experiment -> ddcontext database",
@@ -1207,6 +1215,36 @@
           "source_label": "markdown",
           "commands": [
             "load-bmc-docs"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "bmc-controlm-utilities",
+      "home": "doc-registry",
+      "system": null,
+      "origin": null,
+      "kind": "doc-corpus",
+      "authority": null,
+      "derived": false,
+      "urn": null,
+      "replaces": null,
+      "classification": "External",
+      "confirmed": false,
+      "ledger": {
+        "state": "placeholder",
+        "path": null
+      },
+      "taxonomy_captures": [],
+      "ontology_mappings": [],
+      "loaders": [
+        {
+          "name": "vendor_docs.v1",
+          "class": "VendorDocsLoader",
+          "cli_name": null,
+          "source_label": "vendor-docs",
+          "commands": [
+            "load-vendor-docs"
           ]
         }
       ]
