@@ -9237,6 +9237,16 @@ items:
       or Internal Public, or Internal") — not a gate question: the tier bought
       handling ceremony, not a different publish behavior. Deliberately allowed
       to land ahead of the N7 schema-v2 gate — it removes machinery, adds none.
+      ADDED RATIONALE (user, 2026-07-31 pm): Internal-Confidential actively
+      PREVENTS storing relevant information — its pointer-never-the-data
+      discipline pushes real values (SEAL ids, object names, report
+      coordinates) out of the repo entirely, so the internal/ twins stay
+      thinner than the work needs. After content moves under internal/, its
+      classification changes to Internal and the real values may live there
+      in-tree — the private repo + publish boundary is the protection, not
+      the extra tier. Per-source out-of-tree rules (rua bundles, view
+      exports) survive where SIZE or PII justifies them — noted per source,
+      no longer tier-forced.
   - id: R11
     epic: agentic-qa
     title: "Ask spoke LLM-in-the-loop smoke on the agents-venv machine: two live questions through the real graph_qa streaming path"
