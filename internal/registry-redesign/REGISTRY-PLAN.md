@@ -7,6 +7,40 @@ v2 design session) — nothing here changes a schema, mapping, or loader binding
 the N7 HITL gate rules it (J21's hardening of the current shape is the interim
 guarantee).
 
+## RULED — N7 gate session 2026-07-31 (gate-log entry `source-registry-v2`)
+
+The in-chat SME session ruled **all** of D1–D4 and Q1–Q6 (transcription:
+`config/gate-log.md` 2026-07-31; prompt: `config/gate-prompts/source-registry-v2.yaml`):
+
+- **D1 adopted, amended** — two-level split as designed; **`seal_id` is a standing
+  PLACEHOLDER field on every committed system row** (real value internal-twin only).
+- **D2 adopted** — the per-side loader→source_id overlay wins over class defaults,
+  guarded to resolve to registered dataset ids (extends J21).
+- **D3 adopted** — the derived URN handle; **Q2: env segment always `prod`**.
+- **D4 adopted** — `replaces:` back-pointers + retired-id refusal list; the loader and
+  overlay guard refuse any retired flat id.
+- **Q1 @ grammar kept, amended** — replica/derived ids are
+  **`{origin}@{db}.{schema}.{table}`**: all dots after `@`, and the qualified segment
+  is the **actual carrier locator, replacing the informal system nickname** (SME
+  example: `controlm@[db].[schema].cm_def_vjob`); born-here datasets stay
+  `{system}:{artifact}`; **lowercase throughout**. Real db/schema values are
+  connection coordinates → internal twin only; committed producer ids carry
+  `[db].[schema]` placeholders.
+- **Q3** — derived stores: @ grammar + `derived: true`; `authority` omitted (SOC
+  checked against transcript §H = upstream System of Capture; does not fit).
+- **Q4** — **`snow` registers now as a SaaS system**; first dataset
+  `snow:cmdb-ci-classes`; doubles as the `cmdb_ci` crosswalk source.
+- **Q5** — design-docs pipeline-side only; the doc-registry twin drops.
+- **Q6** — signed-off gates **transfer** across renames; one gate-log amendment entry
+  maps old→new ids at the build; D4 catches actual meaning changes.
+- **T19 naming note** — the catalog feed's replacement name is
+  **`pat:product-catalog`** (industry-standard naming; matches neither legacy string);
+  the people report splits out as `pat:people-report`. Recorded in the
+  `docs/port-prompt.md` divergence ledger for the company T19 review.
+- **RESIDUAL** — the migration table below is NOT block-confirmed: each row confirms
+  individually at the **N9 build** (previously signed rows transfer per Q6; everything
+  else lands `confirmed: false`).
+
 ## The problem (why the current registry "drifted more than planned")
 
 `config/source-registry.yaml` grew to 18 entries whose flat `id` conflates three
@@ -44,12 +78,22 @@ Document/Chunk (gate question Q5 below).
 ## The id grammar
 
 ```
-system  id:   {system}                          e.g.  psgmgr, seal, pat, snow, dpl
-dataset id:   {origin}[@{carrier}]:{artifact}   e.g.  seal@psgmgr:CM_ESCALATION_DB
+system  id:   {system}                            e.g.  psgmgr, seal, pat, snow, dpl
+dataset id:   {origin}@{db}.{schema}.{table}      replica/derived — the segment after @
+                                                  is the ACTUAL qualified carrier
+                                                  locator (ruled 2026-07-31: it
+                                                  REPLACES the informal nickname)
+              {system}:{artifact}                 born-here datasets
+e.g.  controlm@[db].[schema].cm_def_vjob          (real db/schema: internal twin only)
+      seal@[db].[schema].cm_escalation_db
+      pat:product-catalog
 ```
 
 - **origin** — the system the data is *about* / born in (the SOR side).
-- **@carrier** — present only for replicas: the system we actually read.
+- **@{db}.{schema}.{table}** — present only for replica/derived datasets: the fully
+  qualified locator of what we actually read, dot-separated like SQL, **lowercase**.
+  Real db/schema names stay internal-twin; committed ids carry `[db].[schema]`
+  placeholders. The dataset row's `system:` field still joins to the system row.
 - **artifact** — the report, file, query, or table: the thing a support person can
   point at. `artifact_kind: table | file | report | query | api`.
 
@@ -185,18 +229,13 @@ change-set:
   company T19 gate review (the catalog-pat ≠ pat-catalog divergence stays recorded in
   the port ledger regardless of the ruling).
 
-## Open questions for the gate
+## Open questions for the gate — ALL RULED 2026-07-31 (see RULED section above)
 
-- **Q1** `@` carrier notation vs nested `origin:`/`carrier:` fields only (id stays
-  flat)? The `@` makes replicas visible in every log line; the field-only form is
-  easier to parse.
-- **Q2** URN env segment: always `prod`, or model the promotion-clone/lag cases the
-  DPL work surfaced?
-- **Q3** Derived stores (`drydocs-stg`, depgraph snapshots): replica grammar, plain
-  origin field, or a `derived: true` flag?
-- **Q4** Does `snow` become a registered system now (we hold a class export sample)
-  or stay crosswalk-only until a real CMDB feed exists?
-- **Q5** design-docs: pipeline-side only, doc-side only, or the one legitimate twin?
-- **Q6** Per-dataset `confirmed`: does an existing signed-off gate (e.g.
-  seal-attribution-match-policy) transfer to the renamed dataset row as-is, or does
-  each rename re-gate?
+- **Q1** `@` carrier notation — **RULED: kept, amended** to
+  `{origin}@{db}.{schema}.{table}` (qualified locator replaces the nickname; lowercase).
+- **Q2** URN env segment — **RULED: always `prod`**.
+- **Q3** Derived stores — **RULED: @ grammar + `derived: true`; authority omitted**.
+- **Q4** `snow` — **RULED: registers now as a SaaS system** (`snow:cmdb-ci-classes`).
+- **Q5** design-docs — **RULED: pipeline-side only** (doc twin drops).
+- **Q6** Per-dataset `confirmed` — **RULED: signed-off gates transfer across renames**
+  (one gate-log amendment at the build; D4 catches meaning changes).

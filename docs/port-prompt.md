@@ -149,7 +149,12 @@ STANDING DIVERGENCES LEDGER (expected collisions — resolve as stated, do NOT "
   `catalog-pat` = a separate team-report feed. NEVER adopt producer source_id VALUES
   for the catalog family — presence/resolution tests do not catch a wrong-but-
   resolving value (the value-level guard gap). Resolution belongs to the T19 gate +
-  the registry redesign (step 50d), not to a port.
+  the registry redesign (step 50d), not to a port. **Producer N7 gate ruling
+  2026-07-31 (SME naming note, feeds — never pre-empts — your T19 review): the
+  replacement dataset name is `pat:product-catalog` (industry-standard naming; the
+  people report splits out as `pat:people-report`) — deliberately matching NEITHER
+  legacy string, so neither repo's wrong value survives the v2 migration; both
+  legacy ids land in the D4 retired-id refusal list.**
 - N3–N5 load-map machinery: company runs hardcoded `LOADER_SOURCE` and excludes
   `render_load_map` from its board render until T19 rules; producer runs the N3
   class-declaration derivation. Both are correct on their own side — reconcile at

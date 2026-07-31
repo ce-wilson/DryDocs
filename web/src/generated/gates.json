@@ -371,6 +371,20 @@
       "unblocks": []
     },
     {
+      "kind": "log-entry",
+      "date": "2026-07-31",
+      "title": "Source-registry schema v2: system/dataset split, qualified replica ids, overlay, URN, reconcile guard (source-registry-v2) — SIGNED OFF (N7)",
+      "status": "signed-off",
+      "prompt_files": [
+        "config/gate-prompts/source-registry-v2.yaml"
+      ],
+      "log_ref": "config/gate-log.md:1044",
+      "unblocks": [
+        "N7",
+        "N9"
+      ]
+    },
+    {
       "kind": "prompt-only",
       "date": null,
       "title": "bmc-docs-example (gate page rendered — session not yet run)",

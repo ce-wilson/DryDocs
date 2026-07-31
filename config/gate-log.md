@@ -1040,3 +1040,64 @@ build** with its three premise errors corrected.
   unreachable → SYNTHESIZED demo trace behind the standard EXAMPLE DATA tag.
   R2's router should wire THIS harness when it lands (R5 Ask-spoke seat note in
   IDEAS.md, 2026-07-29).
+
+## 2026-07-31 — Source-registry schema v2: system/dataset split, qualified replica ids, overlay, URN, reconcile guard (source-registry-v2) — SIGNED OFF (N7)
+
+- **Scope:** the registry-redesign terminus — the four coupled decisions the N7
+  acceptance names as ONE design, plus open questions Q1–Q6, decided FROM
+  internal/registry-redesign/REGISTRY-PLAN.md (plan of record 2026-07-31).
+  Guided in-chat session (chad.wilson); prompt authored from the session record
+  (config/gate-prompts/source-registry-v2.yaml). 10 rulings; 2 SME amendments;
+  1 explicit residual.
+- **Confirmed: 10 · Amended: 2 (D1, Q1) · Rejected: 0 · Residual: 1**
+  - **D1 — two-level identity, ADOPTED with amendment:** SYSTEM rows
+    (connection/locator/classification/SDLC) split from DATASET rows
+    (gate/crosswalk/feeds_taxonomy/authority, each with its OWN confirmed);
+    loaders bind to the DATASET; datasets tagged by ontology domain.
+    **AMENDMENT: seal_id is a standing PLACEHOLDER field on every committed
+    system row** — real value internal-twin only (the ccb-twin convention).
+  - **D2 — per-side loader→source_id overlay, ADOPTED:** per-repo config wins
+    over class defaults, guarded to resolve to registered dataset ids
+    (extends J21). The company T19 rebind seam — config, not code.
+  - **D3 — URN handle, ADOPTED:** urn:drydocs:dataset:({carrier-or-origin},
+    {artifact},prod), lowercase, derived deterministically (a render, never a
+    hand-maintained field).
+  - **D4 — reconcile guard, ADOPTED:** renamed rows carry replaces: <old-id>;
+    retired ids land in a refusal list; SourceRegistry.from_yaml AND the
+    overlay guard refuse any retired id — same-string-different-meaning (the
+    T19 failure) becomes structurally impossible.
+  - **Q1 — id grammar, @ KEPT with amendment:** replica/derived ids =
+    **{origin}@{db}.{schema}.{table}** — all dots after @, and the qualified
+    segment is the ACTUAL carrier locator, REPLACING the informal system
+    nickname (SME worked example: controlm@[db].[schema].cm_def_vjob);
+    born-here datasets = {system}:{artifact}; **lowercase throughout**.
+    Real db/schema values are connection coordinates → internal twin only;
+    committed producer ids carry [db].[schema] placeholders.
+  - **Q2 — URN env segment: always prod** (promotion-clone/lag not modeled).
+  - **Q3 — derived stores:** @ grammar + derived: true; authority OMITTED —
+    not SOR/ADS, and FCDO SOC was checked (§H vocabulary: System of Capture =
+    upstream ingestion feeding an SOR) and does not fit downstream transforms.
+  - **Q4 — snow registers NOW as a SaaS system;** first dataset =
+    snow:cmdb-ci-classes (the sampled CMDB class export), doubling as the
+    crosswalk source for every system row's cmdb_ci field.
+  - **Q5 — design-docs: pipeline-side only** (feeds graph classes beyond
+    Document/Chunk); the doc-registry twin drops — one home per source.
+  - **Q6 — signed-off gates TRANSFER across renames** (identity refactoring,
+    not meaning change): one gate-log amendment entry maps old→new ids at the
+    build; re-gating reserved for actual meaning changes (which D4 catches).
+- **T19 naming note (recorded in the docs/port-prompt.md divergence ledger):**
+  the catalog feed's replacement dataset name is **pat:product-catalog**
+  (industry-standard naming — matches NEITHER legacy string, so neither
+  repo's wrong value survives); the PAT people report splits out as
+  pat:people-report. Feeds the company T19 gate review; producer sign-off
+  never substitutes for it.
+- **RESIDUAL (explicitly deferred with reason):** the 18-row migration table
+  is NOT block-confirmed — the SME closed the session's HITL portion after
+  the shape rulings; each row confirms individually at the build. Previously
+  signed rows transfer per Q6; everything else lands confirmed: false.
+- **Effect:** N7 done. The build grooms as **N9** (schema v2 + migration +
+  overlay seam + retired-id refusal + URN render + render/guard updates + the
+  doc-twin drops + the snow system row) — nothing changes shape before N9
+  lands; J21's hardening of the CURRENT registry remains the interim
+  guarantee. The classification collapse (J23) already landed pre-gate as
+  machinery removal. Output feeds the company T19 review, not a port.

@@ -1,0 +1,102 @@
+# SME gate-prompt spec — source-registry schema v2 (backlog N7; the registry
+# redesign directive 2026-07-30/31). GATE-BOUND: this page RECORDS the ruled
+# design; nothing is built, migrated, or re-bound by rendering it — the build
+# is the groomed follow-up (N9). SESSION RUN IN-CHAT 2026-07-31 (chad.wilson):
+# the four coupled decisions D1–D4 and open questions Q1–Q6 are ALL RULED
+# (D1 and Q1 with SME amendments issued in-chat); the 18-row migration table
+# is the one explicit residual — deferred to per-row confirmation at the N9
+# build (SME closed the session's HITL portion after the shape rulings).
+# Mechanism-only: id grammar, field names, and public system nicknames only.
+# Real SEAL ids, db/schema names, and connection coordinates stay in the
+# internal/ twin (PUBLISH-BOUNDARY.md) — committed examples use [db].[schema]
+# placeholders by design (that placeholder discipline is itself part of the
+# D1/Q1 rulings).
+classification: Internal-Public
+schema: drydocs.gate-prompt.v1
+id: source-registry-v2
+title: "SME Gate — source-registry schema v2: SYSTEM/DATASET two-level identity, qualified replica ids (origin@db.schema.table), per-side loader overlay, URN handle, reconcile guard"
+step: "Decision gate for the registry redesign (N7) — decides FROM internal/registry-redesign/REGISTRY-PLAN.md (the 2026-07-31 plan of record: three distinctions, id grammar, FCDO authority field, migration sketch) bundling the four coupled decisions the backlog acceptance names as ONE design"
+summary: >
+  The flat source-registry id conflated three different things — software we
+  use/trace (its own taxonomy ledger, not a source), ingested data sources,
+  and replica datasets — which is exactly how the company-side catalog-pat
+  vs pat-catalog same-string collision (tracker T19) happened and why
+  feeds_taxonomy lists kept widening instead of splitting. v2 splits SYSTEM
+  rows (connection, locator, classification, SDLC link) from DATASET rows
+  (gate, crosswalk, feeds_taxonomy, FCDO authority — each with its OWN
+  confirmed state); loaders bind to the dataset. Replica/derived dataset ids
+  carry the origin AND the actual qualified carrier locator:
+  {origin}@{db}.{schema}.{table} (SME amendment: the qualified path REPLACES
+  the informal system nickname; real names internal-twin only); born-here
+  datasets stay {system}:{artifact}; lowercase throughout. Session run
+  in-chat 2026-07-31: D1–D4 and Q1–Q6 all ruled; the migration table is the
+  explicit residual (per-row confirmation at the N9 build). Transcribed to
+  config/gate-log.md the same day.
+meta:
+  Module: "config (config/source-registry.yaml v2 · drydocs_core/source_registry.py) — taxonomy ledger and doc ledger unchanged in role"
+  Source: "internal/registry-redesign/REGISTRY-PLAN.md (plan of record 2026-07-31) + samples/ (SNOW CMDB classes, DataHub URN convention, target-column worksheet)"
+  Registry ref: "all 18 current source-registry entries migrate per the plan's sketch table — rows land at the N9 build, individually confirmed there (the deferred residual)"
+  Classification: "Internal-Public (grammar + mechanism); real SEAL ids / db / schema / connection values stay internal/ — committed rows carry placeholders"
+  Standards: "FCDO Data Authority vocabulary adopted as a FIELD (authority: SOR|ADS, transcript §H — SOR is per-data-subset, the two-level argument; replica carrier = ADS); JDI id principles (§A) shape the grammar; SOC checked and NOT used for derived stores (SOC = upstream System of Capture, does not fit)"
+  Source of record: "backlog N7 · config/gate-log.md (transcribed 2026-07-31) · docs/restructure/03-hitl-sme-flow.md"
+
+mapping:
+  - n: 1
+    element: "Source SYSTEM (the thing we connect to)"
+    target: "v2 system row: id (short nickname, e.g. psgmgr/seal/pat/snow/dpl), name, seal_id (STANDING PLACEHOLDER field — present on every committed row, real value internal-twin only; SME amendment to D1), cmdb_ci (ServiceNow class crosswalk hook), layer (human|business|data|technology — the four-value BDAT ruling 2026-07-31), classification, locator, sdlc"
+    edge: "two-level split  [RULED 2026-07-31 — D1 adopted with the seal_id-placeholder amendment]"
+  - n: 2
+    element: "Extracted DATASET (the thing a loader reads and a gate rules)"
+    target: "v2 dataset row: id (grammar below), system (join to the system row), origin, artifact + artifact_kind, taxonomy_category, asset_type (dcat:Dataset), authority (SOR|ADS), feeds_taxonomy (scoped per dataset — the drift fix), adapter, crosswalk/gate_spec, confirmed (OWN state per dataset), urn (derived). Loaders bind HERE, not to the system"
+    edge: "loader binding moves to dataset  [RULED 2026-07-31 — D1]"
+  - n: 3
+    element: "Replica/derived dataset id"
+    target: "{origin}@{db}.{schema}.{table} — all dots after @; the qualified segment is the ACTUAL carrier locator, replacing the informal system nickname (SME amendment to Q1, issued in-chat with the worked example controlm@[db].[schema].cm_def_vjob); lowercase; real db/schema values internal-twin only, committed ids carry [db].[schema] placeholders. Born-here datasets: {system}:{artifact} (e.g. pat:product-catalog). derived: true flags transformation stores (authority omitted there — not SOR/ADS, and FCDO SOC is upstream capture, checked §H)"
+    edge: "id grammar  [RULED 2026-07-31 — Q1 amended + Q3]"
+  - n: 4
+    element: "Per-side loader→source_id overlay"
+    target: "small per-repo config mapping loader → dataset id, WINNING over the class default; guarded so every overlay value must resolve to a registered dataset id (extends the J21 agreement guard). The company T19 rebind seam: 8 mismatched + ~13 unbound company loaders rebind in config, not code"
+    edge: "overlay adopted  [RULED 2026-07-31 — D2]"
+  - n: 5
+    element: "Cross-repo identity handle"
+    target: "urn:drydocs:dataset:({carrier-or-origin},{artifact},prod) — lowercase, DERIVED deterministically from the row (a render, never hand-maintained); env segment ALWAYS prod (SME ruling Q2 — promotion-clone/lag cases not modeled)"
+    edge: "URN adopted  [RULED 2026-07-31 — D3 + Q2]"
+  - n: 6
+    element: "Retired flat ids (the same-string-different-meaning defense)"
+    target: "every v2 row renaming a legacy id records replaces: <old-id>; retired ids land in a refusal list; SourceRegistry.from_yaml (and the overlay guard) REFUSES any retired id — catalog-pat can never be silently re-minted with a different meaning"
+    edge: "reconcile guard  [RULED 2026-07-31 — D4]"
+
+provenance:
+  - label: "The plan of record every ruling above decides from"
+    source_object: "internal/registry-redesign/REGISTRY-PLAN.md"
+    key: "drafted 2026-07-31 from the user directive + saved samples"
+    loader: "~ (no loader — design input; samples are header-only/redacted captures)"
+    properties:
+      - {name: three_distinctions, origin: source, from: "user directive 2026-07-30/31 (chat)", note: "software-we-use ≠ ingested sources ≠ replica datasets; documents keep their own ledger"}
+      - {name: fcdo_authority_field, origin: source, from: "internal/fcdo-reference/CONFLUENCE-TRANSCRIPT.md §H (jpmv:designation ADS/SOC/SOR; SOR defined per data subset)", note: "adopted as a registry FIELD only — no Data Authority graph classes (ALIGNMENT-PLAN skip list refined, not violated)"}
+      - {name: urn_convention, origin: source, from: "samples/DataHubExample.csv", note: "tuple shape + the lowercase PROD-vs-prod duplicate warning"}
+      - {name: in_chat_rulings, origin: source, from: "SME in-chat session 2026-07-31 (chad.wilson)", note: "D1 adopt + seal_id placeholder; D2 overlay adopt; D3 URN adopt; D4 refusal+replaces adopt; Q1 @ grammar amended to origin@db.schema.table (qualified locator replaces the nickname, lowercase); Q2 env always prod; Q3 derived flag, authority omitted; Q4 snow registered NOW as a SaaS system; Q5 design-docs pipeline-side only; Q6 signed-off gates TRANSFER across renames (one gate-log amendment; D4 catches meaning changes). T19 naming note: the catalog feed's replacement name = pat:product-catalog (industry-standard naming), recorded in the divergence ledger"}
+
+sections:
+  - title: "A. The four coupled decisions (the backlog N7 acceptance set)"
+    confirmations:
+      - "D1 [RULED — adopted, amended]: two-level SYSTEM/DATASET identity; loaders bind to the dataset; per-dataset confirmed; datasets tagged by ontology domain. AMENDMENT: seal_id is a STANDING PLACEHOLDER field on every committed system row (real value internal-twin only — the ccb-twin convention)."
+      - "D2 [RULED — adopted]: the per-side loader→source_id config overlay wins over class defaults, guarded to resolve to registered dataset ids (extends J21). Producer classes stay the default; each repo rebinds in config."
+      - "D3 [RULED — adopted]: derived URN handle urn:drydocs:dataset:({carrier-or-origin},{artifact},prod), lowercase, deterministic render — with Q2 fixing env at prod."
+      - "D4 [RULED — adopted]: replaces: back-pointers + retired-id refusal list; the registry loader and overlay guard refuse any retired flat id."
+  - title: "B. Open questions Q1–Q6 (all ruled in-chat 2026-07-31)"
+    confirmations:
+      - "Q1 [RULED — @ grammar, amended]: replica/derived ids = {origin}@{db}.{schema}.{table}, all dots after @, the qualified segment being the ACTUAL carrier locator (replaces the informal nickname; worked example controlm@[db].[schema].cm_def_vjob); born-here datasets = {system}:{artifact}; lowercase throughout; real db/schema values internal-twin only."
+      - "Q2 [RULED]: URN env segment always prod — promotion-clone/lag cases not modeled."
+      - "Q3 [RULED]: derived stores keep the @ grammar for visibility + derived: true; authority OMITTED (not SOR/ADS; FCDO SOC = upstream System of Capture, checked against §H and does not fit)."
+      - "Q4 [RULED]: snow (ServiceNow) registers as a system NOW, typed SaaS; first dataset = snow:cmdb-ci-classes (the sampled class export), doubling as the crosswalk source for every system row's cmdb_ci field."
+      - "Q5 [RULED]: design-docs is pipeline-side only — it feeds graph classes beyond Document/Chunk; the doc-registry twin drops (one home per source)."
+      - "Q6 [RULED]: existing signed-off gates TRANSFER to renamed dataset rows as-is (rename = identity refactoring, not meaning change); ONE gate-log amendment entry maps every old→new id at the build; re-gating is reserved for actual meaning changes, which D4 catches."
+  - title: "C. Residual + consequences"
+    confirmations:
+      - "RESIDUAL (explicitly deferred with reason): the 18-row migration table is NOT block-confirmed — each row is confirmed individually at the N9 build (SME closed the session's HITL portion after the shape rulings). Previously signed rows transfer per Q6; everything else lands confirmed: false."
+      - "T19 naming note (recorded in the docs/port-prompt.md divergence ledger): the catalog feed's replacement dataset name is pat:product-catalog — industry-standard naming, matching NEITHER legacy string, so neither repo's wrong value survives; the PAT people report splits out as pat:people-report."
+      - "Nothing changes shape before the N9 build lands: J21's hardening of the CURRENT registry remains the interim guarantee; the classification collapse (J23) already landed pre-gate as pure machinery removal."
+  - title: "D. Sign-off"
+    confirmations:
+      - "SME sign-off recorded in-chat 2026-07-31 and transcribed to config/gate-log.md (D1–D4 + Q1–Q6 rulings verbatim, amendments included); N7 closes; N9 (the build) grooms as the follow-up."

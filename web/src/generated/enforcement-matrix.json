@@ -310,6 +310,7 @@
         "config/gate-prompts/self-documentation-code-graph.yaml",
         "config/gate-prompts/software-usage-patterns.yaml",
         "config/gate-prompts/sosa-jobrun-observation.yaml",
+        "config/gate-prompts/source-registry-v2.yaml",
         "config/gate-prompts/ui-write-surface.yaml",
         "config/gate-log.md"
       ],
