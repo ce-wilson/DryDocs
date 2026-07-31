@@ -1212,6 +1212,26 @@
       ]
     },
     {
+      "id": "bmc-controlm-utilities",
+      "home": "doc-registry",
+      "system": null,
+      "origin": null,
+      "kind": "doc-corpus",
+      "authority": null,
+      "derived": false,
+      "urn": null,
+      "replaces": null,
+      "classification": "External",
+      "confirmed": false,
+      "ledger": {
+        "state": "placeholder",
+        "path": null
+      },
+      "taxonomy_captures": [],
+      "ontology_mappings": [],
+      "loaders": []
+    },
+    {
       "id": "essential-graphrag",
       "home": "doc-registry",
       "system": null,
