@@ -93,6 +93,9 @@ from drydocs_core.source_registry import (
     UnknownSourceError,
 )
 
+from .docs_verify import Summary as DocsVerifySummary
+from .docs_verify import exit_code as docs_verify_exit_code
+from .docs_verify import verify as verify_corpora
 from .loaders import seal_applications as seal_apps_mod
 from .loaders import seal_contacts as seal_contacts_mod
 from .loaders.base import BaseLoader
@@ -378,6 +381,11 @@ CANONICAL_LOAD_SEQUENCE: tuple[tuple[str, str, str], ...] = (
     ),
     ("m1-verify", "standing", "M1 invariants"),
     ("m3-verify", "standing", "M3 invariants"),
+    (
+        "docs-verify",
+        "standing",
+        "doc corpora declared vs loaded (registry-driven; non-zero on wrong-db)",
+    ),
 )
 
 
@@ -1719,6 +1727,91 @@ def lineage_review(
         f"data_assets={st['data_assets']} rels={st['rels']}"
     )
     console.print(f"coverage: {coverage.summary()}")
+
+
+DOC_REGISTRY_PATH = Path(__file__).resolve().parents[1] / "config" / "doc-source-registry.yaml"
+
+#: Databases docs-verify sweeps. The registry admits dddocs | ddcontext as
+#: targets, but a corpus can only be found in a database that EXISTS — and
+#: `drydocs` is where the bmc-docs corpus actually lives today. The sweep is
+#: intersected with SHOW DATABASES at runtime, so an unprovisioned name here is
+#: reported as db-absent rather than raising from the driver.
+DOC_SWEEP_DATABASES = ("drydocs", "dddocs", "ddcontext", "ddlineage")
+
+
+@app.command(name="docs-verify")
+def docs_verify() -> None:
+    """Reconcile the doc-source registry against what the graph actually holds.
+
+    One row per config/doc-source-registry.yaml entry: declared target_db, the
+    loaded Document/Chunk counts, and a status. Exits non-zero on wrong-db —
+    a corpus sitting in a database it did not declare is the G30 failure class
+    at corpus granularity, and it is the one result that cannot be seen by
+    querying a single database.
+    """
+    import yaml
+
+    registry = yaml.safe_load(DOC_REGISTRY_PATH.read_text(encoding="utf-8"))
+    sources = registry.get("sources", [])
+
+    # The sweep deliberately probes databases that hold no documents — that is
+    # how a stray copy is found — so the driver's "unknown label :Document"
+    # notifications are the EXPECTED case here, not a warning worth printing.
+    # Scoped to this command: elsewhere an unknown label really is a signal.
+    notifications = logging.getLogger("neo4j.notifications")
+    prior = notifications.level
+    notifications.setLevel(logging.ERROR)
+
+    try:
+        _docs_verify_run(sources)
+    finally:
+        notifications.setLevel(prior)
+
+
+def _docs_verify_run(sources: list[dict]) -> None:
+    with _client() as probe:
+        existing = {r["name"] for r in probe.run("SHOW DATABASES YIELD name RETURN name")}
+
+        def run(database: str, cypher: str, params: dict) -> list[dict]:
+            # One client per database: a transaction cannot span databases, and
+            # the whole point of the sweep is to look in the OTHER ones.
+            with _client(database) as cli:
+                return cli.run(cypher, params)
+
+        rows = verify_corpora(
+            sources,
+            DOC_SWEEP_DATABASES,
+            run,
+            available=[db for db in DOC_SWEEP_DATABASES if db in existing],
+        )
+
+    table = Table(title="doc corpora — declared vs loaded")
+    for col in ("corpus", "target_db", "status", "docs", "chunks", "detail"):
+        table.add_column(col)
+    for r in rows:
+        colour = {
+            "loaded": "green",
+            "wrong-db": "red",
+            "stale": "yellow",
+            "missing": "yellow",
+        }.get(r.status, "dim")
+        table.add_row(
+            r.corpus_id,
+            r.target_db,
+            f"[{colour}]{r.status}[/]",
+            str(r.documents) if r.documents else "-",
+            str(r.chunks) if r.chunks else "-",
+            r.detail,
+        )
+    console.print(table)
+    console.print(DocsVerifySummary.of(rows).line())
+
+    code = docs_verify_exit_code(rows)
+    if code:
+        console.print(
+            "[red]wrong-db rows present — a corpus is not in the database it declared.[/]"
+        )
+        raise typer.Exit(code)
 
 
 @app.command(name="m3-verify")

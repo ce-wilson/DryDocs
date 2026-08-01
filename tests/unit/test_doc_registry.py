@@ -29,6 +29,7 @@ DOC_REGISTRY = CONFIG_DIR / "doc-source-registry.yaml"
 CLASSIFICATION = CONFIG_DIR / "classification.yaml"
 
 CONNECTORS = {"web", "filedrop", "confluence", "sharepoint", "teams", "email"}
+LOCATOR_KINDS = {"corpus_id", "doc_id", "path_prefix", "none"}
 TIERS = {"T1", "T2", "T3", "T4"}
 TARGET_DBS = {"dddocs", "ddcontext"}  # ADR 0006 §2 — nothing else, ever
 TRUSTS = {"VERBATIM", "GROUNDED", "SYNTHESIZED"}
@@ -112,6 +113,33 @@ def test_curation_matches_tier_ladder() -> None:
         if src.get("curation") != CURATION_BY_TIER.get(src.get("tier"))
     ]
     assert not failures, "\n".join(failures)
+
+
+def test_every_corpus_declares_how_to_find_itself() -> None:
+    """Q7: `graph_locator` is required, because the registry is corpus-keyed and
+    the graph is not — only the Q13 loader writes `corpus_id`.
+
+    `match: none` is a legitimate answer (the corpus is deliberately not on the
+    Document->Chunk spine), but it has to be SAID. An entry that declares nothing
+    is indistinguishable from one nobody thought about, and docs-verify would
+    have to guess which — so the guard is on the declaration, not on the value.
+    """
+    failures: list[str] = []
+    for src in _registry().get("sources", []):
+        sid = src.get("id", "<no-id>")
+        loc = src.get("graph_locator")
+        if loc is None:
+            failures.append(
+                f"[{sid}] no graph_locator — declare one, or `match: none` with a reason"
+            )
+            continue
+        kind = loc.get("match")
+        if kind not in LOCATOR_KINDS:
+            failures.append(f"[{sid}] graph_locator.match '{kind}' not in {sorted(LOCATOR_KINDS)}")
+        elif kind != "none" and not loc.get("value"):
+            failures.append(f"[{sid}] graph_locator.match '{kind}' needs a value")
+
+    assert not failures, f"{len(failures)} locator error(s):\n" + "\n".join(failures)
 
 
 def test_ingested_corpora_are_backfilled() -> None:

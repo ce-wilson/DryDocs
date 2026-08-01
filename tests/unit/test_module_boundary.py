@@ -53,12 +53,17 @@ COMPONENT_GROUPS: dict[str, tuple[str, ...]] = {
     # drydocs.cmdline_staging = the G39/G40 TEMPORARY cmd-line job-detail
     # staging store + parse (graph read -> SQLite under the data root; no
     # graph writes) — load-cadence tooling, same bucket as staging.
+    # drydocs.docs_verify = the Q7 doc-corpus reconciliation behind `docs-verify`.
+    # Classified load, not review: the item chose drydocs-load because the verb sits
+    # beside m1-verify/m3-verify and must work BEFORE the docmeta component exists
+    # (Q6). RE-HOME it to docmeta if that component takes over corpus state.
     "load": (
         "drydocs.loaders",
         "drydocs.cli",
         "drydocs.snapshots",
         "drydocs.staging",
         "drydocs.cmdline_staging",
+        "drydocs.docs_verify",
     ),
     # drydocs-review — SME review + graph acceptance + docs publish (Epic H).
     # The default-deny test below FORCES a new review module to be classified here

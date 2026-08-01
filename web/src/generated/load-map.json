@@ -123,6 +123,12 @@
       "mode": "standing",
       "note": "M3 invariants",
       "loaders": []
+    },
+    {
+      "command": "docs-verify",
+      "mode": "standing",
+      "note": "doc corpora declared vs loaded (registry-driven; non-zero on wrong-db)",
+      "loaders": []
     }
   ],
   "ad_hoc_commands": [
