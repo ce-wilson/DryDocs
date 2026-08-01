@@ -120,6 +120,25 @@ def test_registration_validates_at_the_door():
         ephemerals.register("tok", "   ", "drydocs")
 
 
+def test_registration_rejects_graph_internal_element_ids():
+    """O27 rule 3 on the path that actually carries the risk. This Cypher is
+    LLM-authored at runtime and flows into the SAME export/manifest code as a
+    reviewed spec, so an element id here would land in a provenance manifest
+    that can never be re-resolved (they change on restore and re-load).
+    Rejected as a validation error — 422, never stored."""
+    ephemerals = EphemeralSpecStore()
+    for bad in (
+        "MATCH (j:ControlMJob) RETURN elementId(j) AS ref",
+        "MATCH (j:ControlMJob) RETURN ID(j) AS ref",
+    ):
+        with pytest.raises(EphemeralValidationError):
+            ephemerals.register("tok", bad, "drydocs")
+
+    # ...while the declared source-system keys register normally.
+    ok = ephemerals.register("tok", "MATCH (j:ControlMJob) RETURN j.job_id AS job_id", "drydocs")
+    assert ok.ref.startswith("eph.")
+
+
 # ── the pure registration handler (trusted-caller gate) ──────────────────────
 
 

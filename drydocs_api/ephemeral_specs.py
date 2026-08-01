@@ -27,6 +27,11 @@ The store's rules (all fail closed):
   never by outliving its TTL here.
 - **Read-only twice:** ``ensure_read_only`` at registration AND again on the
   run/export path (exports.py re-validates every spec it executes).
+- **No graph-internal element ids** (O27 rule 3, ``AUTHORING.md``): the same
+  check the permanent registry applies at import runs here too. This is the
+  path that carries the exposure — the Cypher is LLM-authored at runtime and
+  reaches the same manifest/export code — so a guard on the reviewed registry
+  alone would sit where there is no risk.
 - **Classification is the fail-closed ceiling** (``internal-confidential``):
   un-reviewed Cypher cannot be assumed less sensitive than the most
   restrictive data it could reach in its database.
@@ -47,7 +52,7 @@ from collections.abc import Callable, Mapping, Sequence
 from dataclasses import dataclass
 from datetime import UTC, datetime
 
-from drydocs_api.guard import ensure_read_only
+from drydocs_api.guard import ElementIdRejected, ensure_no_element_ids, ensure_read_only
 from drydocs_api.handlers import Forbidden
 from drydocs_api.query_specs import (
     SPEC_DATABASES,
@@ -139,6 +144,16 @@ class EphemeralSpecStore:
         if not cypher:
             raise EphemeralValidationError("empty cypher")
         ensure_read_only(cypher)  # raises WriteRejected — never stored
+        # O27 rule 3. This is the path that actually carries the risk: the
+        # Cypher here is LLM-authored at runtime and flows into the same export
+        # and manifest code as a reviewed spec, so an element id would land in a
+        # provenance manifest that can never be re-resolved. Rejected as a
+        # validation error (422, never stored) rather than propagating the
+        # ValueError — a bad registration is a client error, not a server fault.
+        try:
+            ensure_no_element_ids(cypher, "ephemeral spec")
+        except ElementIdRejected as exc:
+            raise EphemeralValidationError(str(exc)) from exc
         if database not in SPEC_DATABASES:
             raise EphemeralValidationError(
                 f"database '{database}' not in the reviewed spec set {sorted(SPEC_DATABASES)}"

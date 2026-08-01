@@ -5,6 +5,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+import pathlib
 import re
 
 import pytest
@@ -20,7 +21,7 @@ from drydocs_api.exports import (
     list_specs,
     run_spec,
 )
-from drydocs_api.guard import is_write_cypher
+from drydocs_api.guard import ElementIdRejected, ensure_no_element_ids, is_write_cypher
 from drydocs_api.queries import ParamValidationError
 from drydocs_api.query_specs import (
     CLASSIFICATIONS,
@@ -138,6 +139,109 @@ def test_app_codes_spec_classifies_both_mapping_patterns():
     assert "shared platform code" in spec.cypher
     assert "unmapped" in spec.cypher
     assert "mapping_pattern" in [c.name for c in spec.columns]
+
+
+# ── O27 authoring conventions (drydocs_api/AUTHORING.md) ────────────────────
+
+_REPO_ROOT = pathlib.Path(__file__).resolve().parents[2]
+_AUTHORING_DOC = _REPO_ROOT / "drydocs_api" / "AUTHORING.md"
+_CONSTRAINTS = _REPO_ROOT / "drydocs_core" / "schema" / "constraints.cypher"
+
+
+def test_no_spec_returns_a_graph_internal_element_id():
+    """O27 rule 3. Element ids are Neo4j-internal pointers that change on
+    restore and re-load, so one in a deep link or export manifest later
+    resolves to a DIFFERENT node — a silent wrong answer, not an error."""
+    for spec in QUERY_SPECS.values():
+        ensure_no_element_ids(spec.cypher, f"spec '{spec.id}'")
+
+
+def test_element_id_guard_catches_both_spellings_and_spares_source_ids():
+    """Assert the RULE, not just today's registry — the registry is currently
+    clean, so a scan of it alone would pass even if the detector were broken.
+    Cypher function names are case-insensitive, hence the spelling cases."""
+    for bad in (
+        "MATCH (n) RETURN elementId(n) AS x",
+        "MATCH (n) RETURN ElementId(n) AS x",
+        "MATCH (n) RETURN id(n) AS x",
+        "MATCH (n) RETURN ID(n) AS x",
+        "MATCH (n) RETURN id (n) AS x",
+    ):
+        with pytest.raises(ElementIdRejected):
+            ensure_no_element_ids(bad, "probe")
+
+    # Source-system ids are declared in constraints.cypher and are CORRECT to
+    # return. A guard that flagged these would push authors toward element ids.
+    for good in (
+        "MATCH (j:ControlMJob) RETURN j.job_id AS job_id, j.folder_id AS folder_id",
+        "MATCH (a:BusinessApplication) RETURN a.seal_id AS seal_id",
+        "MATCH (r:JobRun) RETURN r.run_id AS run_id, toString(r.started_at) AS started_at",
+    ):
+        ensure_no_element_ids(good, "probe")
+
+
+def _declared_keys() -> dict[str, list[set[str]]]:
+    """label -> every declared key property-set (NODE KEY or UNIQUE)."""
+    text = _CONSTRAINTS.read_text(encoding="utf-8")
+    keys: dict[str, list[set[str]]] = {}
+    for label, expr in re.findall(
+        r"FOR\s+\(\w+:(\w+)\)\s+REQUIRE\s+(.+?)\s+IS\s+(?:NODE KEY|UNIQUE)", text
+    ):
+        keys.setdefault(label, []).append(set(re.findall(r"\.(\w+)", expr)))
+    return keys
+
+
+def _documented_namespace_table() -> list[tuple[str, set[str], str]]:
+    """(label, key properties, namespace) rows from AUTHORING.md rule 2."""
+    rows = []
+    for label, key_expr, namespace in re.findall(
+        r"^\|\s*`(\w+)`\s*\|\s*`([^`]+)`[^|]*\|\s*(.+?)\s*\|\s*$",
+        _AUTHORING_DOC.read_text(encoding="utf-8"),
+        re.MULTILINE,
+    ):
+        rows.append((label, set(re.findall(r"\w+", key_expr)), namespace.strip("* ")))
+    return rows
+
+
+def test_authoring_doc_namespace_table_matches_declared_keys():
+    """O27 rule 2 ties the external-ref namespace to the DECLARED uniqueness
+    scope, so the doc's table is only trustworthy if it still agrees with
+    constraints.cypher. Without this the table is a record checkable only
+    against itself — it would go stale the first time a key changes.
+
+    This also pins the correction O27 needed: the item was groomed as
+    "namespace = data center", which holds for exactly ONE node kind
+    (ControlMHostGroup). Jobs and conditions are folder-scoped.
+    """
+    declared = _declared_keys()
+    rows = _documented_namespace_table()
+    assert len(rows) >= 6, "rule 2's namespace table did not parse — did its shape change?"
+
+    for label, doc_props, namespace in rows:
+        assert label in declared, f"AUTHORING.md documents {label}, constraints.cypher has no key"
+        assert doc_props in declared[label], (
+            f"AUTHORING.md says {label}'s key is {sorted(doc_props)}, "
+            f"constraints.cypher declares {[sorted(k) for k in declared[label]]}"
+        )
+        # The load-bearing invariant: a namespace is needed EXACTLY when the
+        # name alone is not unique, i.e. when the declared key is composite.
+        if namespace == "none":
+            assert len(doc_props) == 1, f"{label}: no namespace, but a composite key"
+        else:
+            assert len(doc_props) > 1, f"{label}: namespace '{namespace}' but a single-prop key"
+            normalized = namespace.replace(" ", "_")
+            assert any(
+                normalized in p for p in doc_props
+            ), f"{label}: namespace '{namespace}' names no part of its key {sorted(doc_props)}"
+
+
+def test_authoring_conventions_are_discoverable_from_the_registry():
+    """The acceptance is 'discoverable from query_specs.py' — a conventions doc
+    nobody can find from the file it governs is not a convention."""
+    import drydocs_api.query_specs as qs
+
+    assert _AUTHORING_DOC.exists()
+    assert "AUTHORING.md" in (qs.__doc__ or "")
 
 
 def test_unknown_spec_fails_closed():

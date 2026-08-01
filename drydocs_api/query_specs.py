@@ -24,6 +24,15 @@ Registry rules (asserted at import, so a bad spec can never ship):
   exposed too, not just single-node ones). Enforced by
   ``tests/unit/test_schema_meta_exclusion.py`` against the committed
   meta-graph, and proven live by ``tests/integration/test_meta_graph_exclusion.py``.
+- no spec returns a graph-internal element id (``elementId()`` / ``id()``) —
+  they are unstable across restore and re-load, so a deep link or manifest
+  built on one silently resolves to a DIFFERENT node later (O27 rule 3)
+
+**Authoring conventions: see ``drydocs_api/AUTHORING.md``** (O27) — the three
+rules a new spec must satisfy, with their rationale: consume gate-confirmed
+edges rather than re-deriving meaning from raw staged columns; the
+``kind:namespace/name`` external-ref grammar; and the element-id rule enforced
+below.
 """
 
 from __future__ import annotations
@@ -31,7 +40,7 @@ from __future__ import annotations
 import re
 from dataclasses import dataclass, field
 
-from drydocs_api.guard import ensure_read_only
+from drydocs_api.guard import ensure_no_element_ids, ensure_read_only
 from drydocs_api.queries import ParamSpec
 
 # Databases a spec may read. Deliberately NOT the whole provisioned topology:
@@ -716,6 +725,7 @@ def _validate_registry() -> None:
         ), f"spec '{spec.id}': classification '{spec.classification}' unknown"
         assert spec.columns, f"spec '{spec.id}' declares no columns"
         ensure_read_only(spec.cypher)  # raises WriteRejected on a write-shaped spec
+        ensure_no_element_ids(spec.cypher, f"spec '{spec.id}'")  # O27 rule 3
 
 
 _validate_registry()
