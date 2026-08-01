@@ -1,0 +1,17 @@
+# Revisions git blame should skip — mechanical, zero-behavior-change rewrites.
+#
+# Enable locally (once per clone; it is a git config setting, not a tracked one):
+#     git config blame.ignoreRevsFile .git-blame-ignore-revs
+# GitHub honours this file automatically in its blame view.
+#
+# Add a commit here ONLY if it changed layout and nothing else. A commit that
+# mixes formatting with a real edit must never be listed — blame would skip the
+# real edit too, which is worse than the noise this file exists to remove.
+#
+# NOTE for the company side: these are PRODUCER SHAs and mean nothing in
+# <company-org>/DryDocs, whose histories are disjoint. Do not copy this file
+# across. Per docs/ruff-format-convergence.md §3.4, list YOUR OWN regenerated
+# format commit's SHA instead.
+
+# J10 stage 3 — adopt ruff format across the tree (279 of 328 files).
+2a4f0be4bd9025158f4f2dca54006cb08438d834
