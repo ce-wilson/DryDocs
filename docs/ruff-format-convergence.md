@@ -100,8 +100,21 @@ commit.
 3. **Keeper set** — B008 (Typer/FastAPI call-in-default idiom, 14 hits):
    per-file-ignore the CLI/API modules; RUF001/2/3 (prose unicode in
    docstrings, 15): decide once, fix-or-ignore; E402 (6, deliberate `sys.path`
-   setup in scripts): per-file-ignore candidates; **B023 (2, loop-variable
-   late-binding): review individually — potential real bugs, never blanket-ignore.**
+   setup in scripts): per-file-ignore candidates.
+
+   **B023 — RULED AND FIXED 2026-07-31, ahead of the sweep.** Reviewed
+   individually as the plan required. Both findings were ONE site, not two:
+   `knowledge/upgrade-plans/p0-benchmark/benchmark_p0.py:206`, same closure,
+   same variable, flagged twice because `marker` appears twice on the line.
+   Verdict: **not a live bug** — `score` is called on lines 216/218/222, all
+   inside the iteration that defined it, and is never stored, returned, or
+   deferred, so late binding cannot trigger. Fixed anyway with `marker=marker`
+   (bind at definition time), because the failure mode under any future
+   refactor — laziness, collection into a list, parallelising the loop — is
+   silently scoring every question against the LAST marker and publishing
+   plausible wrong benchmark numbers with no error. A per-file-ignore would
+   have preserved exactly that trap. `ruff check` 1019 -> 1017; the fix PORTS
+   normally (hand-authored code, not a mechanical stage-2 commit).
 
 ---
 

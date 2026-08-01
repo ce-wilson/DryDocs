@@ -202,7 +202,12 @@ for spec in QUESTIONS:
     entry = dict(id=spec["id"], cls=spec["cls"], q=spec["q"], arms={})
     marker = spec["marker"]
 
-    def score(rows, text_blob, ms):
+    # marker= binds at DEFINITION time, not call time (B023). Harmless today —
+    # every call below happens inside this same iteration — but the day an arm
+    # goes lazy, gets collected into a list, or the loop is parallelised, late
+    # binding would score every question against the LAST marker and report
+    # plausible, wrong numbers with no error.
+    def score(rows, text_blob, ms, marker=marker):
         found = bool(re.search(marker, text_blob)) if marker else None
         return dict(
             rows=len(rows), ms=round(ms, 1), chars=len(text_blob),
