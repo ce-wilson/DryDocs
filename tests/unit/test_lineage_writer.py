@@ -97,7 +97,7 @@ def test_only_writer_touches_a_database_and_context_is_unnameable() -> None:
         docstrings = {
             ast.get_docstring(n, clean=False)
             for n in ast.walk(tree)
-            if isinstance(n, (ast.Module, ast.ClassDef, ast.FunctionDef, ast.AsyncFunctionDef))
+            if isinstance(n, ast.Module | ast.ClassDef | ast.FunctionDef | ast.AsyncFunctionDef)
         }
         for node in ast.walk(tree):
             if (

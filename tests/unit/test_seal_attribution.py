@@ -147,7 +147,8 @@ def test_resolution_is_deterministic_under_input_reordering() -> None:
     ]
     forward, _ = resolve_attributions(rows)
     backward, _ = resolve_attributions(list(reversed(rows)))
-    by_job = lambda ds: {(d.folder_id, d.job_id): (d.seal_id, d.match_method) for d in ds}
+    def by_job(ds):
+        return {(d.folder_id, d.job_id): (d.seal_id, d.match_method) for d in ds}
     assert by_job(forward) == by_job(backward)
 
 

@@ -291,16 +291,7 @@ def test_reexport_clears_parsed_tables(store):
 # ---------------------------------------------------------------------------
 
 #: extra rows exercising the resolve verdicts (beside the shared ROWS)
-RESOLVE_ROWS = ROWS + [
-    {"folder_id": "70001", "job_id": "4", "job_name": "SYN_RESIDUE",
-     "folder_name": "PRHLD1G",
-     "data_center": "P032-E0700-DMA", "task_type": "Job", "active": True,
-     "cmd_line": "%%RUN_DIR/step.sh %%UNDEFINED_ARG"},
-    {"folder_id": "70009", "job_id": "1", "job_name": "SYN_DCLESS",
-     "folder_name": "PRHLD1G",
-     "data_center": None, "task_type": "Job", "active": True,
-     "cmd_line": "%%PY_LAUNCH -x"},
-]
+RESOLVE_ROWS = [*ROWS, {"folder_id": "70001", "job_id": "4", "job_name": "SYN_RESIDUE", "folder_name": "PRHLD1G", "data_center": "P032-E0700-DMA", "task_type": "Job", "active": True, "cmd_line": "%%RUN_DIR/step.sh %%UNDEFINED_ARG"}, {"folder_id": "70009", "job_id": "1", "job_name": "SYN_DCLESS", "folder_name": "PRHLD1G", "data_center": None, "task_type": "Job", "active": True, "cmd_line": "%%PY_LAUNCH -x"}]
 
 _RESOLVE_XML = f"""<?xml version="1.0" encoding="UTF-8"?>
 <DEFTABLE>

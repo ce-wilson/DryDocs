@@ -182,7 +182,7 @@ class CodeSnapshotAdapter:
 
         imports_by_source: dict[str, list[str]] = {}
         for edge in doc.get("edges", []):
-            if not (isinstance(edge, (list, tuple)) and len(edge) == 2):
+            if not (isinstance(edge, list | tuple) and len(edge) == 2):
                 raise CodeSnapshotError(
                     f"{self.path.name}: malformed edge {edge!r} — expected [source_file_id, target_file_id]"
                 )

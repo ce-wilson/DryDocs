@@ -46,7 +46,7 @@ def resolved_watch(folder_vars: VariableDefs, job: JobDefinition) -> str | None:
     """Resolve ``job``'s watch template under its folder scope; None if no template."""
     if job.watch_template is None:
         return None
-    defs = list(job.variables) + [(_WATCH_PROBE, job.watch_template)]
+    defs = [*list(job.variables), (_WATCH_PROBE, job.watch_template)]
     for rv in resolve_job(folder_vars, defs):
         if rv.name == _WATCH_PROBE_NAME:
             return rv.resolved_value

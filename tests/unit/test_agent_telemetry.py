@@ -83,7 +83,7 @@ def _ok_read(cypher, params=None, database=None, row_cap=100, timeout_s=15.0):
 def _answer(tmp_path, user_id=""):
     """Run one Tier-0 question through the pipeline with a tmp-dir ledger."""
     provider = FakeProvider([
-        '{"spec_id": "%s", "params": {}}' % SPEC_ID,
+        f'{{"spec_id": "{SPEC_ID}", "params": {{}}}}',
         "There is 1 application.",
     ])
     pipeline = pl.GraphQaPipeline(
@@ -155,7 +155,7 @@ def test_run_line_is_the_only_home_of_the_question_text(tmp_path):
 
 def test_no_ledger_means_no_cost_and_no_failure(tmp_path):
     provider = FakeProvider([
-        '{"spec_id": "%s", "params": {}}' % SPEC_ID,
+        f'{{"spec_id": "{SPEC_ID}", "params": {{}}}}',
         "There is 1 application.",
     ])
     pipeline = pl.GraphQaPipeline(

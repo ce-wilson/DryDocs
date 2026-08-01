@@ -394,8 +394,7 @@ class PatchWindowQuery:
     def run(self, mode: str, target: str) -> PatchWindowReport:
         if mode not in _JOB_SECTIONS:
             raise ValueError(f"mode must be 'host' or 'group', got {mode!r}")
-        wanted = list(_JOB_SECTIONS[mode]) + ["xval_intent_without_edge",
-                                              _STALE_SECTION[mode]]
+        wanted = [*list(_JOB_SECTIONS[mode]), "xval_intent_without_edge", _STALE_SECTION[mode]]
         if mode == "group":
             wanted.append("group_dcs")
         fetched = {

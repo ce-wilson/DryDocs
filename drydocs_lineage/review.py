@@ -48,7 +48,7 @@ def _assertions(graph: LineageGraph) -> list[dict]:
     missing_run_as = [j for j in jobs if not j.run_as]
     # children pointed at by an INVOKES that the parser could not classify
     unresolved = []
-    for src, rel, dst in graph.rels:
+    for _src, rel, dst in graph.rels:
         if rel == "INVOKES":
             d = graph.get_any(dst)
             if d is not None and getattr(d, "kind", "") == _UNRESOLVED:

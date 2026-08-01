@@ -62,7 +62,7 @@ _ROLE_RULES: tuple[tuple[str, re.Pattern[str]], ...] = (
     ("overview", re.compile(r"\b(overview|introduction to)\b", re.I)),
 )
 ROLE_FALLBACK = "topic"
-ROLES = tuple(name for name, _ in _ROLE_RULES) + (ROLE_FALLBACK,)
+ROLES = (*tuple(name for name, _ in _ROLE_RULES), ROLE_FALLBACK)
 
 
 def derive_page_role(title: str) -> str:

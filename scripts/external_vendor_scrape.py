@@ -198,7 +198,7 @@ def parse_toc(raw: bytes | str, *, book: str | None = None) -> tuple[list[TocEnt
             seen.add(url)
             entries.append(TocEntry(url=url, title=title, path=path))
         for child in node.get("children") or []:
-            count += walk(child, path + [title])
+            count += walk(child, [*path, title])
         return count
 
     for top in tree:

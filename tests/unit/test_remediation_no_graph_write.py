@@ -42,7 +42,7 @@ def test_neo4j_driver_confined_to_the_corroboration_wrapper() -> None:
             continue  # the sole sanctioned reference (TYPE_CHECKING-only import)
         tree = ast.parse(path.read_text(encoding="utf-8"), filename=str(path))
         for node in ast.walk(tree):
-            if isinstance(node, (ast.Import, ast.ImportFrom)):
+            if isinstance(node, ast.Import | ast.ImportFrom):
                 mod = getattr(node, "module", "") or ""
                 names = ", ".join(a.name for a in node.names)
                 if "neo4j" in mod.lower() or "neo4j" in names.lower():

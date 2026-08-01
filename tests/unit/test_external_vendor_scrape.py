@@ -242,7 +242,7 @@ def test_fragment_node_keeps_its_identity_but_is_not_a_second_document(tmp_path)
     on_disk = [p.name for p in (tmp_path / "pages").iterdir()]
     assert on_disk == ["89881.htm"], "no '#' in any filename"
 
-    anchored = [p for p in manifest["pages"] if p["anchor"]][0]
+    anchored = next(p for p in manifest["pages"] if p["anchor"])
     assert anchored["page"] == "89881.htm"
     assert anchored["title"] == "ctl HA parameters"
 

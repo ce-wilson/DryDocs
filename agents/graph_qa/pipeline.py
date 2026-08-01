@@ -236,7 +236,6 @@ class GraphQaPipeline:
                 if not cypher:
                     raise ValueError("model returned empty cypher")
                 ensure_read_only(cypher)  # pre-flight; READ mode in run_read is the boundary
-                started = self.clock()
                 result = self.run_read(cypher, database=self.default_db, row_cap=ROW_CAP)
                 step.rows, step.truncated, step.ms = (
                     result.row_count, result.truncated, result.ms,

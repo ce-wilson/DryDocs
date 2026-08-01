@@ -60,7 +60,7 @@ def sql_literal(value: Any) -> str:
         return "NULL"
     if isinstance(value, bool):
         return "1" if value else "0"
-    if isinstance(value, (int, float)):
+    if isinstance(value, int | float):
         return str(value)
     return "'" + str(value).replace("'", "''") + "'"
 

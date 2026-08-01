@@ -267,7 +267,7 @@ def build_matrix() -> dict:
             listing = [str(p.relative_to(REPO)).replace("\\", "/") for p in files]
             content = None
         else:
-            listing = [s["file"]] + s.get("extra_files", [])
+            listing = [s["file"], *s.get("extra_files", [])]
             content = _read_capped(primary)
         extra_contents = {e: _read_capped(REPO / e) for e in s.get("extra_files", [])}
 

@@ -151,7 +151,6 @@ def _parse_header(md_path: Path) -> _DocHeader:
     h2_match = _H2_RE.search(text)
     header_block = text[: h2_match.start()] if h2_match else text
 
-    source_m = _SOURCE_RE.search(header_block)
     document_m = _DOCUMENT_RE.search(header_block)
     date_m = _DATE_SCRAPED_RE.search(header_block) or _CAPTURED_RE.search(header_block)
     purpose_m = _PURPOSE_RE.search(header_block)

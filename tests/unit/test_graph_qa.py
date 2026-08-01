@@ -92,7 +92,7 @@ def _ok_read(cypher, params=None, database=None, row_cap=100, timeout_s=15.0):
 
 def test_tier0_spec_cypher_verbatim() -> None:
     provider = FakeProvider(replies=[
-        '{"spec_id": "%s", "params": {}}' % SPEC_ID,  # router
+        f'{{"spec_id": "{SPEC_ID}", "params": {{}}}}',  # router
         "There is 1 application.",                     # answer
     ])
     executed: list[tuple] = []
@@ -119,13 +119,13 @@ def test_executed_cypher_registers_an_explore_ref() -> None:
         return "eph.abc123def4567890"
 
     provider = FakeProvider(replies=[
-        '{"spec_id": "%s", "params": {}}' % SPEC_ID,
+        f'{{"spec_id": "{SPEC_ID}", "params": {{}}}}',
         "There is 1 application.",
     ])
     pipeline = _pipeline(provider, _ok_read)
     pipeline.register_cypher = register
     env = pipeline.answer("how many applications?", run_id="qa-test-r4")
-    spec_step = [s for s in env.steps if s.kind == "spec"][0]
+    spec_step = next(s for s in env.steps if s.kind == "spec")
     assert spec_step.explore_ref == "eph.abc123def4567890"
     assert registered[0]["cypher"] == SPEC.cypher and registered[0]["database"] == SPEC.database
 
@@ -133,21 +133,21 @@ def test_executed_cypher_registers_an_explore_ref() -> None:
         raise OSError("api down")
 
     provider2 = FakeProvider(replies=[
-        '{"spec_id": "%s", "params": {}}' % SPEC_ID,
+        f'{{"spec_id": "{SPEC_ID}", "params": {{}}}}',
         "There is 1 application.",
     ])
     pipeline2 = _pipeline(provider2, _ok_read)
     pipeline2.register_cypher = broken_register
     env2 = pipeline2.answer("how many applications?", run_id="qa-test-r4b")
     assert env2.answer == "There is 1 application."  # registration failure is non-fatal
-    assert [s for s in env2.steps if s.kind == "spec"][0].explore_ref is None
+    assert next(s for s in env2.steps if s.kind == "spec").explore_ref is None
 
 
 def test_steps_stream_to_the_observer_in_order() -> None:
     """R5: on_step fires per StepRecord as it lands (the Ask spoke's live
     stream); an observer that throws never affects the answer."""
     provider = FakeProvider(replies=[
-        '{"spec_id": "%s", "params": {}}' % SPEC_ID,
+        f'{{"spec_id": "{SPEC_ID}", "params": {{}}}}',
         "There is 1 application.",
     ])
     seen: list[str] = []
@@ -160,7 +160,7 @@ def test_steps_stream_to_the_observer_in_order() -> None:
     assert seen == [s.kind for s in env.steps] == ["router", "spec", "answer"]
 
     provider2 = FakeProvider(replies=[
-        '{"spec_id": "%s", "params": {}}' % SPEC_ID,
+        f'{{"spec_id": "{SPEC_ID}", "params": {{}}}}',
         "There is 1 application.",
     ])
     pipeline2 = pl.GraphQaPipeline(
@@ -245,14 +245,14 @@ def test_write_shaped_cypher_never_reaches_executor() -> None:
 
     env = _pipeline(provider, run_read).answer("sneaky", run_id="qa-test-4")
     assert all("CREATE" not in c for c in executed)  # pre-flight stopped it
-    write_step = [s for s in env.steps if s.kind == "text2cypher"][0]
+    write_step = next(s for s in env.steps if s.kind == "text2cypher")
     assert "write clause" in (write_step.error or "")
     assert env.tier == "text2cypher"  # fix loop recovered with a read query
 
 
 def test_envelope_contract_fields() -> None:
     provider = FakeProvider(replies=[
-        '{"spec_id": "%s", "params": {}}' % SPEC_ID,
+        f'{{"spec_id": "{SPEC_ID}", "params": {{}}}}',
         "answer text",
     ])
     env = _pipeline(provider, _ok_read).answer(
@@ -309,7 +309,7 @@ def test_schema_prompt_truncates_at_cap() -> None:
 def test_tier0_zero_rows_falls_through_to_tier1() -> None:
     """A routed spec returning 0 rows is insufficient context — Tier 1 must engage."""
     provider = FakeProvider(replies=[
-        '{"spec_id": "%s", "params": {}}' % SPEC_ID,                       # router
+        f'{{"spec_id": "{SPEC_ID}", "params": {{}}}}',                       # router
         '{"cypher": "MATCH (f:ControlMFolder) RETURN count(f) AS n"}',     # text2cypher
         "5 folders.",                                                       # answer
     ])
@@ -325,7 +325,7 @@ def test_tier0_zero_rows_falls_through_to_tier1() -> None:
     assert env.tier == "text2cypher"                       # what actually answered
     kinds = [s.kind for s in env.steps]
     assert "spec" in kinds and "text2cypher" in kinds      # both attempts recorded
-    assert [s for s in env.steps if s.kind == "spec"][0].rows == 0
+    assert next(s for s in env.steps if s.kind == "spec").rows == 0
     assert env.metrics.context["rows"] == 1
     assert env.answer == "5 folders."
 

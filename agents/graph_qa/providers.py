@@ -48,7 +48,7 @@ def extract_usage(usage_obj) -> LlmUsage:
             value = usage_obj.get(name)
         else:
             value = getattr(usage_obj, name, None)
-        return int(value) if isinstance(value, (int, float)) else None
+        return int(value) if isinstance(value, int | float) else None
 
     prompt = _get("prompt_tokens")  # openai / azure / litellm
     completion = _get("completion_tokens")
