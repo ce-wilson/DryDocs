@@ -92,6 +92,18 @@ GUARDRAILS (durable — apply to every port):
    company main; `git switch -c drydocs-port-<date> main`. NOT pushed until reviewed;
    land as a `--no-ff` merge or PR; never fast-forward company main; NEVER push back
    to cewilson.
+   COMMIT THE PORT TO THE BRANCH BEFORE WRITING THE PORT-REPORT, and prove it:
+   `git rev-list --count <tag>..HEAD` must be ≥1, and the report's reversibility
+   section quotes that output — not the claim alone. A port left in the working tree
+   is NOT revertable: the branch equals main equals the tag, so the documented undo
+   `git reset --hard <tag>` DESTROYS the port instead of restoring a safe point.
+   (2026-07-31, PORT-REPORT-57914bf4: 159 tracked + ~25 untracked, ZERO commits,
+   reversibility asserted anyway. Producer review cannot catch this — it checks
+   report claims against PRODUCER state, never your git. Only you can.)
+   If committed config references company-local code that is still uncommitted, land
+   that code as its OWN commit FIRST and move the tag onto it. Folding it into the
+   port commit poisons the revert; leaving it out commits a config whose loader is
+   not in history.
 
 4. ALWAYS EXCLUDED: `knowledge/depgraph-snapshots/*.json` — producer-local derived
    artifacts with producer git metadata; regenerate your own via the session-end ritual.
