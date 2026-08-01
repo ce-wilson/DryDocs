@@ -336,8 +336,11 @@ OWED COMPANY-SIDE:
 STEP LEDGER — delta since `57914bf4` (steps 43–51 collapsed above). Each sub-stream
 carries its producer-side verification status in [BRACKETS]; spend review on [UNRULED].
 
-52. CI DETERMINISM FIX + J10 STAGE 0 (2026-07-31 → 08-01; `57914bf4..cewilson/main`
-    — compute the range live; 5 commits to `6e993d2` known at 2026-08-01).
+52. CI DETERMINISM FIX + **J10 COMPLETE PRODUCER-SIDE** (2026-07-31 → 08-01;
+    `57914bf4..cewilson/main` — compute the range live; 16 commits to `0ab54cd` known
+    at 2026-08-01). ***READ (b) BEFORE PLANNING THE RANGE.*** The diff is dominated by
+    a 284-file whole-tree reformat that you must NOT apply as content — classifying it
+    path-by-path under guardrail 2 would be 284 wrong decisions.
     a. RENDER DETERMINISM [LIVE-VERIFIED] (`7ccc655`). Producer CI was RED every run
        2026-07-21..07-31 on `test_committed_matrix_matches_regeneration` claiming
        `enforcement-matrix.json` drift. It had not drifted: the renderer sorted `Path`
@@ -348,10 +351,27 @@ carries its producer-side verification status in [BRACKETS]; spend review on [UN
        compares a render against itself and can never catch this class).
        ***YOUR `render_enforcement_matrix.py` IS A 3-WAY MERGE WITH COMPANY SURFACES
        ROWS*** — take the `key=` change into YOUR file; do not overwrite it wholesale.
-    b. J10 STAGE 0 [PORTS] (`f18c88e`) — `ruff = "0.5.7"` EXACT + settled
-       `[tool.ruff*]` + `*.py text eol=lf`. Guardrail 9 has the stage semantics.
-       `line-ending = "lf"` and the gitattributes rule are a PAIR: pinning one without
-       the other makes `ruff format --check` unsatisfiable on a Windows checkout.
+    b. J10 ALL SIX STAGES LANDED [LIVE-VERIFIED] (`f18c88e`, `966b324`, `f90ad92`,
+       `2a4f0be`, `3a8bdbd`, `6d4a10a`, `1fcbf63`, merged `--no-ff` as `fb798c5`).
+       **1,017 findings → 0**; 284 of 328 files reformatted; producer CI now BLOCKS on
+       both `ruff check` and `ruff format --check`. Guardrail 9 has the port
+       disposition per stage and it is unchanged — but the range now carries stages
+       1–5, not just stage 0, so the DO-NOT-PORT half is live:
+       - **stages 1/2/3 are the 284-file sweep. Do not apply, do not hand-merge, do
+         not tree-reconcile.** Take stage 0, then run the same pinned tool on YOUR
+         tree; the plan doc §3 is the regeneration procedure.
+       - **stage 4 PORTS** (`pyproject` ignores + the vendored-skills `extend-exclude`)
+         but its CONTENT was a per-origin judgement: 177 of 362 residual findings were
+         vendored Anthropic skill scripts we do not author. Re-make that call against
+         YOUR residual — do not assume the same split.
+       - **stage 5 PORTS LAST**, only once your own residual is zero, or your CI reds
+         out by construction.
+       - `.git-blame-ignore-revs` is `never-port` (manifest row): those are PRODUCER
+         SHAs and mean nothing on a disjoint history. List your own stage-3 SHA.
+       Three execution findings that would be buried by the cheap option — ruff's F841
+       unsafe fix leaves dead code, a `pytest.raises(Exception)` proving nothing, and
+       RUF003 hiding a double-encoded character — are written up in the plan doc's
+       "Three findings from execution". Read them before running stage 2.
     c. B023 FIX [PORTS normally] (`b3b90dc`) — `marker=marker` late-binding bind in
        `benchmark_p0.py`. Hand-authored, NOT a mechanical stage-2 commit.
     d. PORT-CONTROL DOCS [never-port, but they change YOUR next port] (`7f6c5d2`,
