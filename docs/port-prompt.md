@@ -18,13 +18,12 @@ finishes reading is not a control document. So:
 - a roll REPLACES the previous roll note; it does not stack another one;
 - if a section can only be understood by reading it twice, cut it rather than expand it.
 
-**Roll state.** Steps 50 + 51 are BOTH live (50 was authored 2026-07-30, 51 appended
-2026-07-31; neither had been applied company-side when 51 was written, so nothing was
-collapsed). A port takes both — read 51(b) first, it carries the registry schema v2
-landing. Steps keep the verification tags introduced at step 49 — `[SME-SIGNED]`,
-`[LIVE-VERIFIED]`, `[TEST-PINNED]`, `[STAGING-ONLY]`, `[RECORD-CORRECTION]`, `[UNRULED]`
-— so review effort goes to what is genuinely open. Anything untagged is NOT confirmed:
-treat contracts as ASSUMED until your side validates them (the T10/T13 discipline).
+**Roll state.** Steps 50 + 51 COLLAPSED at the 2026-08-01 roll (both applied in
+PORT-REPORT-57914bf4). The live ledger is **step 52 only**. Steps keep the
+verification tags introduced at step 49 — `[SME-SIGNED]`, `[LIVE-VERIFIED]`,
+`[TEST-PINNED]`, `[STAGING-ONLY]`, `[RECORD-CORRECTION]`, `[UNRULED]` — so review
+effort goes to what is genuinely open. Anything untagged is NOT confirmed: treat
+contracts as ASSUMED until your side validates them (the T10/T13 discipline).
 
 Authorities are unchanged: [`PORT-MANIFEST.yaml`](../PORT-MANIFEST.yaml) is the WHAT
 (per-path disposition, first-matching-glob-row wins); [`git-readme.md`](../git-readme.md)
@@ -32,31 +31,29 @@ is the WHY + the acceptance oracle; this prompt is sequencing + delta context on
 
 ## Last completed port
 
-- **Producer head `e60822f`** (2026-07-29), applied company-side as
-  **PORT-REPORT-e60822fc** — covered producer range `94132c8..e60822f` (step 49 in
-  full, plus the N3–N5 load-map builds that landed inside the range after the step
-  was authored).
-- **The N3–N6 load-map stream was DEFERRED company-side — now tracker row T19.**
-  Two real blockers, both acknowledged producer-side (IDEAS 2026-07-29): (1) the
-  `catalog-pat` ≠ `pat-catalog` id collision — same string, different meaning across
-  repos (see the divergence ledger row below); (2) ~13 company-only loaders carry no
-  class `source_id`, so the N3 derivation would drop them from gating. Company
-  actions taken: kept the hardcoded `LOADER_SOURCE`, dropped `render_load_map` +
-  the N4/N5/N6 surfaces from the company board render, marked N3/N4/N5 blocked,
-  filed T19, requested a gate review. Producer answers-in-progress: the manifest
-  row your agent had to improvise around is fixed (`1b51c04`, step 50a), the N7
-  per-side overlay candidate and the registry-redesign directive are inboxed
-  (step 50c/50d) — **do not adopt producer source_id VALUES for the catalog family
-  until the T19 gate rules.**
-- The PORT-REPORT-94132c80 findings loop is CLOSED: all four back-flows were
-  enacted producer-side (`0c629e4`, `855b09d`, `f6b9ca0`) and applied company-side
-  as step 49a. `config/dev-environment.yaml` remains canonical-company on both
-  manifests — do not re-decide. Owed action 48e remains tracker **T18**.
-- **Applied steps, collapsed** (full text: git history + the PORT-REPORTs):
-  43–48 — one line each in PORT-REPORT-94132c80. 49 — back-flows, dev-infra plugins,
-  G22 prep, AIS refusal pack, G45/C20/J20/R10, G42 catalog seam, G46–G48 cmdline
-  chain, UI sweep O35–O41, cmdline runbook Rev 1, grooms. N3–N5 arrived inside the
-  range and were deferred (T19).
+- **Producer head `57914bf4`** (2026-07-31), applied company-side as
+  **PORT-REPORT-57914bf4** — range `e60822fc..57914bf4`, 55 commits, scoped
+  TREE-RECONCILE. Landed as merge `7b85a034` (`--no-ff`; pre-port baseline
+  `7ffd430c` preserved as FIRST PARENT — which is what makes `git show
+  7ffd430c:<path>` a durable pointer from any clone). Company acceptance:
+  Track-1 `120 / 3 / 0`, full `1569 / 24 / 0`.
+- **Steps 50 + 51 applied in full**, collapsed: 50 — manifest row, J21 registry
+  hardening, T19 capture, registry-redesign directive, Unity Catalog note.
+  51 — N7 gate + N9 schema v2, J23 classification collapse, J22, Epic R
+  (R3/R4/R5), Q13 vendor-docs, UI ledgers, L21/J25.
+- **N9 registry v2 was FULL-ADOPTED, not deferred** — all 57 company v1 sources
+  migrated, 18 company loaders rebound through `config/loader-source-overlay.yaml`
+  (D2's first real use, and what made full adoption possible). **T19 therefore
+  narrows to the N3–N6 load-map stream ONLY.**
+- **Tier-A ratifications landed** in the company gate-log 2026-07-31:
+  `source-registry-v2` (N7/N9) and `J23`. L7 was already ratified 2026-07-27 —
+  T11 is discharged.
+- **Owed company-side** (config adoption never substitutes for graph writes):
+  T9/T15 graph loads of the v2-registered datasets, code-graph and
+  doc-traceability; T15 P3 host wiring; **DD5** the 18 dropped `reference_docs`
+  re-home; T18/48e depgraph fork consolidation (their snapshot ritual is blocked
+  until it clears).
+- Earlier ports: 43–48 in PORT-REPORT-94132c80, 49 in PORT-REPORT-e60822fc.
 
 ```text
 You are porting the DryDocs PRODUCER repo (ce-wilson/DryDocs, github.com) onto the
@@ -228,23 +225,29 @@ GUARDRAILS (durable — apply to every port):
    Never overwrite the company pyproject version string; never import producer git tags.
 
 STANDING DIVERGENCES LEDGER (expected collisions — resolve as stated, do NOT "fix"):
-- **`catalog-pat` ≠ `pat-catalog` (recorded BOTH sides regardless of the T19 ruling):
-  the same string names DIFFERENT feeds across repos.** Producer `catalog-pat` = the
-  whole catalog+PAT sample feed (one registry entry). Company `pat-catalog` = the PAT
-  People-Report org catalog (confirmed, gates 8 catalog loaders); company
-  `catalog-pat` = a separate team-report feed. NEVER adopt producer source_id VALUES
-  for the catalog family — presence/resolution tests do not catch a wrong-but-
-  resolving value (the value-level guard gap). Resolution belongs to the T19 gate +
-  the registry redesign (step 50d), not to a port. **Producer N7 gate ruling
-  2026-07-31 (SME naming note, feeds — never pre-empts — your T19 review): the
-  replacement dataset name is `pat:product-catalog` (industry-standard naming; the
-  people report splits out as `pat:people-report`) — deliberately matching NEITHER
-  legacy string, so neither repo's wrong value survives the v2 migration; both
-  legacy ids land in the D4 retired-id refusal list.**
-- N3–N5 load-map machinery: company runs hardcoded `LOADER_SOURCE` and excludes
-  `render_load_map` from its board render until T19 rules; producer runs the N3
-  class-declaration derivation. Both are correct on their own side — reconcile at
-  the gate, not in a port.
+- **`catalog-pat` ≠ `pat-catalog` — RESOLVED 2026-07-31 by the v2 rename, kept as
+  history because it is the reason D4 exists.** The same string named DIFFERENT feeds
+  in the two repos, and presence/resolution tests cannot catch a wrong-but-resolving
+  value. The N7 ruling replaced both with `pat:product-catalog` + `pat:people-report`
+  — matching NEITHER legacy string, so neither repo's wrong value survived — and both
+  legacy ids sit in the D4 retired-id refusal list, which now makes the recurrence
+  structurally impossible rather than merely documented.
+- **Registry v2 is now a COMPANY-CANONICAL SURFACE (PORT-REPORT-57914bf4).** The v2
+  systems/datasets shape, `loader-source-overlay.yaml` (18 company loaders) and the
+  retired-id refusal list are company-canonical from here. Future ports reconcile
+  **v2 ↔ v2**, not v1 → v2; a producer row and a company row with the same dataset id
+  are the SAME thing now, which is what the D4 refusal list exists to keep true.
+- **Gate-state values diverge by design, and the tests know it:** `cm_hosts`
+  `confirmed: false` company-side (T15, P3 not wired) vs producer `true`;
+  `controlm:deftable-xml-export` `confirmed: true` company-side (live XML ingestion)
+  vs producer `false`. The company `test_source_registry` gate-state list is adapted
+  to match. Do NOT "fix" either direction — the value follows each side's reality.
+- **Company `.gitignore` additions are standing:** `/scratch/`, `/.oracle-config/`,
+  `/workspace/`, local model/log ignores. J22's untracked-sweep guard requires the
+  company working tree to be gitignored-clean, so these are load-bearing, not noise.
+- **NEVER `git clean` during a port.** The company tree carries ~25 untracked paths
+  including the `internal/**` data corpora and `UI-WIP/**`. `git reset --hard` leaves
+  untracked files alone; `git clean -fd` destroys them with NO reflog recovery.
 - **`config/loader-source-overlay.yaml` (NEW at N9, 2026-07-31): canonical-PER-SIDE by
   design.** The file itself ports (it is the D2 mechanism + its guard); its CONTENTS
   never do. Producer ships `overrides: {}` because producer class defaults already are
@@ -267,7 +270,7 @@ STANDING DIVERGENCES LEDGER (expected collisions — resolve as stated, do NOT "
 - tests/unit/test_doc_traceability_loader.py: two assertions pinned to the company's
   ahead controlm-ingestion-tdd.md (9 matrix rows incl. NFR-CMI-002). Keep company pins.
   Producer back-flow candidate: derive expected counts from the doc under test.
-  **2026-07-31 (L21, step 51h): a THIRD pin in this same file moved —
+  **2026-07-31 (L21, applied at PORT-REPORT-57914bf4): a THIRD pin in this same file moved —
   `header["rev"] == 4` → `5` for the startup-refresh runbook.** That one is NOT a
   company pin: it tracks `docs/design/drydocs-startup-refresh-runbook.md`, which is
   `evaluate` disposition. If you take the Rev 5 runbook, take the rev pin with it; if
@@ -292,256 +295,99 @@ STANDING DIVERGENCES LEDGER (expected collisions — resolve as stated, do NOT "
   stay planned/proposed (inert). Resolve at the company platforms gate, not by editing.
 
 OWED COMPANY-SIDE:
-- L7 RATIFICATION ENTRY in the company gate-log (Tier A adopted-via-port). The
-  paste-ready block is **§6a below** — committed, not "provided in a session". Open
-  as of 2026-07-31 (tracker T11).
-- TRACKER (T1–T8 origin steps live in the archive — guardrail 1 has the path;
-  statuses tracked here):
+- L7 ratification: **DISCHARGED** (company gate-log 2026-07-27; T11). §6a below stays
+  as the STANDING Tier-A template — `source-registry-v2` and `J23` both used its shape
+  at PORT-REPORT-57914bf4, and every future Tier-A adoption needs one.
+- TRACKER (T1–T8 origin steps live in the archive — guardrail 1 has the path).
+  **STATUS IS A PRODUCER BELIEF, NOT COMPANY STATE.** The producer cannot see your
+  gate-log or your tree, so every `pending` here means "not known to be done", never
+  "confirmed open" — T11 read `pending` for four days after the company had already
+  ratified it. Rows now carry an as-of date; correct any that are stale in your
+  PORT-REPORT and the producer will flip them:
 
 | # | Item | Status |
 |---|------|--------|
-| T1  | K2 live attribution load + job-seal-app-ref confirmed→applied flip | pending |
-| T2  | FID→seal_id reconciliation table sourced + wired (TierReconcilers) | pending |
-| T3  | ALIAS reconciliation table sourced + wired | pending |
-| T4  | Real tier-5 manual CSVs under internal/ + own manifest entries | pending |
-| T5  | P1 internal probes P0/P4 — unblocks P2 loader (archive step 31) | pending |
-| T6  | Docs Track-2: docs-fetch/docs-load vs real sources (archive step 16) | pending |
-| T7  | Live multi-DB Enterprise Neo4j deploy — G7 half (archive step 16) | pending |
-| T8  | M0 equivalence unblocks: A3 filename + B1 dot rule (archive step 29) | pending |
-| T9  | Lineage curated live load — YOUR vocab gate + m3_* flips, then write_curated on your graph | pending |
-| T10 | MAC field contract validated vs a REAL DPL export — amend dpl_mac.py contract + fixtures together | pending |
+| T1  | K2 live attribution load + job-seal-app-ref confirmed→applied flip | pending (producer belief, as of 2026-08-01) |
+| T2  | FID→seal_id reconciliation table sourced + wired (TierReconcilers) | pending (producer belief, as of 2026-08-01) |
+| T3  | ALIAS reconciliation table sourced + wired | pending (producer belief, as of 2026-08-01) |
+| T4  | Real tier-5 manual CSVs under internal/ + own manifest entries | pending (producer belief, as of 2026-08-01) |
+| T5  | P1 internal probes P0/P4 — unblocks P2 loader (archive step 31) | pending (producer belief, as of 2026-08-01) |
+| T6  | Docs Track-2: docs-fetch/docs-load vs real sources (archive step 16) | pending (producer belief, as of 2026-08-01) |
+| T7  | Live multi-DB Enterprise Neo4j deploy — G7 half (archive step 16) | pending (producer belief, as of 2026-08-01) |
+| T8  | M0 equivalence unblocks: A3 filename + B1 dot rule (archive step 29) | pending (producer belief, as of 2026-08-01) |
+| T9  | Lineage curated live load — YOUR vocab gate + m3_* flips, then write_curated on your graph | pending (producer belief, as of 2026-08-01) |
+| T10 | MAC field contract validated vs a REAL DPL export — amend dpl_mac.py contract + fixtures together | pending (producer belief, as of 2026-08-01) |
 | T11 | L7 ratification entry in company gate-log (Tier A record) | **RATIFIED 2026-07-27** (company gate-log, prior port; reported at PORT-REPORT-57914bf4). The producer row read `pending` until 2026-07-31 — producer-side staleness, not a company gap. §6a stays as the STANDING Tier-A template (source-registry-v2 and J23 both used that shape) |
 | T12 | Company platforms gate: AIS position vs producer C12 | **RULED — SUPERSEDE, 2026-07-21** (company gate-log): the AIS layer is superseded by the software-registry model; excision applied, Tier B holds discharged 2026-07-27, session packs retired |
-| T13 | DPL registry field contract validated vs a REAL per-SEAL export (pipeline_id.json/dataset_id.json) — amend dpl_registry.py header + fixtures together, cite provenance (the T10 discipline) | pending |
-| T14 | rua collector convergence: company's own -n implementation vs producer G18 v2 — reconcile to ONE v2 (flags, scripts.tsv columns incl. sha256, size cap, COLLECTOR_VERSION stamp) so bundles stay cross-ingestible. Step 49e's G45 listing fallback is the same family — reconcile together | pending |
-| T15 | G33 company code-graph load: run YOUR post-U6 `snapshot.ps1` (snapshot `*.json` is never-port BOTH ways; primary on-main checkout, never a worktree) → `drydocs load-code-snapshot` into your graph; second `:Project` root is INTENDED (gate §B3(a)); rides with the Tier A ratification entry (guardrail 6) | pending |
-| T16 | CM_DEF_VJOB_DETAIL built for real in psgmgr — retires the G39 staging stand-in as the feed (G40 parse stays as cross-check); premise correction folded into G22 prep. NOTE step 49g: if the XML export becomes a standing feed, this retirement gains a SECOND path — the unruled precedence question decides, not the port | pending |
-| T17 | AIS platform supplement follow-through (company-local; NO producer payload): (1) the back-flow REFUSAL — producer grounds formalized in `87ba693` (premise false: producer has no AIS layer; C12 took the direct route); (2) apply-platforms-supplement disposition (fold/delete/keep); (3) ais_* constraint CREATEs vs commented seeds on the scheduler_kind precedent, with EXPECTED_CONSTRAINTS arithmetic written in; (4) commit the company-local cli.py wording fix before the next port branch. One fact owed back: are any company Neo4j environments carried forward rather than rebuilt from bootstrap? | pending |
-| T18 | Depgraph fork capability catch-up (owed action 48e, PORT-REPORT-94132c80): your separately-owned depgraph fork lacks the U6 multi-root resolver (and `--tree`), and the producer remote is unreachable from it, so the port could not remediate. Until it catches up, `config/dev-environment.yaml` keeps `depgraph.capability_assert: false` (test skips, owed action recorded). When it gains the capabilities: flip the flag true and your `snapshot.ps1` refusal guard goes live | pending |
-| T19 | N3–N6 load-map adoption gate (deferral filed at PORT-REPORT-e60822fc; gate review requested by the user): rule (1) the catalog-pat/pat-catalog id collision (divergence ledger row) and (2) the ~13 sourceless company-only loaders BEFORE adopting the N3 class-declaration derivation, N4/N5 renders, or N6. **INPUTS DELIVERED 2026-07-31 — the ONE design session ran and BUILT: gate `source-registry-v2` SIGNED OFF (`323f5aa`, N7) and schema v2 landed (`86914ad`, N9). All four inputs this row was holding are now concrete, not candidates: the per-side overlay IS `config/loader-source-overlay.yaml` (D2 — ships EMPTY producer-side, built explicitly as your rebind seam), the URN handle is D3, the same-id/changed-meaning guard is D4's retired-id refusal list, and the registry-redesign directive is the whole of N7. The catalog id collision has an SME naming ruling (`pat:product-catalog` / `pat:people-report`) that matches NEITHER legacy string. See step 51(a)/(b) for the port disposition and the CAUTION.** Your gate still rules — producer sign-off never substitutes for it | pending — inputs delivered, ruling open |
+| T13 | DPL registry field contract validated vs a REAL per-SEAL export (pipeline_id.json/dataset_id.json) — amend dpl_registry.py header + fixtures together, cite provenance (the T10 discipline) | pending (producer belief, as of 2026-08-01) |
+| T14 | rua collector convergence: company's own -n implementation vs producer G18 v2 — reconcile to ONE v2 (flags, scripts.tsv columns incl. sha256, size cap, COLLECTOR_VERSION stamp) so bundles stay cross-ingestible. Step 49e's G45 listing fallback is the same family — reconcile together | pending (producer belief, as of 2026-08-01) |
+| T15 | G33 company code-graph load: run YOUR post-U6 `snapshot.ps1` (snapshot `*.json` is never-port BOTH ways; primary on-main checkout, never a worktree) → `drydocs load-code-snapshot` into your graph; second `:Project` root is INTENDED (gate §B3(a)); rides with the Tier A ratification entry (guardrail 6) | pending (producer belief, as of 2026-08-01) |
+| T16 | CM_DEF_VJOB_DETAIL built for real in psgmgr — retires the G39 staging stand-in as the feed (G40 parse stays as cross-check); premise correction folded into G22 prep. NOTE step 49g: if the XML export becomes a standing feed, this retirement gains a SECOND path — the unruled precedence question decides, not the port | pending (producer belief, as of 2026-08-01) |
+| T17 | AIS platform supplement follow-through (company-local; NO producer payload): (1) the back-flow REFUSAL — producer grounds formalized in `87ba693` (premise false: producer has no AIS layer; C12 took the direct route); (2) apply-platforms-supplement disposition (fold/delete/keep); (3) ais_* constraint CREATEs vs commented seeds on the scheduler_kind precedent, with EXPECTED_CONSTRAINTS arithmetic written in; (4) commit the company-local cli.py wording fix before the next port branch. One fact owed back: are any company Neo4j environments carried forward rather than rebuilt from bootstrap? | pending (producer belief, as of 2026-08-01) |
+| T18 | Depgraph fork capability catch-up (owed action 48e, PORT-REPORT-94132c80): your separately-owned depgraph fork lacks the U6 multi-root resolver (and `--tree`), and the producer remote is unreachable from it, so the port could not remediate. Until it catches up, `config/dev-environment.yaml` keeps `depgraph.capability_assert: false` (test skips, owed action recorded). When it gains the capabilities: flip the flag true and your `snapshot.ps1` refusal guard goes live | pending (producer belief, as of 2026-08-01) |
+| T19 | N3–N6 LOAD-MAP adoption gate — **narrowed 2026-08-01**: registry v2 is ADOPTED (N9 full-adopt at PORT-REPORT-57914bf4), so this row now covers ONLY the N3 class-declaration derivation, the N4/N5 renders and N6. The id-collision blocker is resolved by the v2 rename (`pat:product-catalog` / `pat:people-report`); what remains is the sourceless company-only loaders. Company `cli.py` still has no `COMMAND_LOADERS`/`CANONICAL_LOAD_SEQUENCE` and the load-map pair stays out of the company board render until this rules | pending (producer belief, as of 2026-08-01) |
 
   Done-means for T1–T10 are unchanged — they live verbatim in the archive's tracker
   section (guardrail 1 has the `git show` path; they are NOT restated here). T9 reminder: producer sign-off never substitutes for load verification on
   your graph. T10/T13: until a real export parses with zero mismatches, treat the
   field names as ASSUMED.
 
-STEP LEDGER — delta since `e60822f` (numbering continues; steps 43–49 are collapsed
-above). Every sub-stream carries its producer-side verification status in [BRACKETS]
-— review effort belongs on the [UNRULED] and RECONCILE items, not on re-proving the
-tagged ones.
+STEP LEDGER — delta since `57914bf4` (steps 43–51 collapsed above). Each sub-stream
+carries its producer-side verification status in [BRACKETS]; spend review on [UNRULED].
 
-50. T19 FOLLOW-THROUGH: MANIFEST ROW + J21 REGISTRY HARDENING + THE REDESIGN
-    DIRECTIVE (2026-07-29 pm → 2026-07-30; `e60822f..cewilson/main` — compute the
-    range live and record the exact head in the PORT-REPORT; 7 commits to `e0dc403`
-    known at 2026-07-30). A small range, but most of it exists BECAUSE of your
-    PORT-REPORT-e60822fc — it answers your report, it does not re-open T19.
-    a. MANIFEST ROW FOR docs/plan/load-map.html [RECORD-CORRECTION] (`1b51c04`):
-       the row your agent had to improvise around — the producer J16 coverage guard
-       caught it (a NEW render committed without its manifest row; the guard's
-       tracked-only blind spot is a known producer IDEAS bug). The ROW ports
-       (coverage is explicit — guardrail 1); the RENDER itself stays OFF your side
-       under T19 (guardrail 5 note).
-    b. J21 SOURCE-REGISTRY HARDENING [TEST-PINNED] (`087a685`; claim/close
-       `c7e5fb9`/`19c5424` ride the backlog per-entry rule): three parts with
-       DIFFERENT port dispositions —
-       - (1) pk check: `SourceRegistry.from_yaml` REFUSES a duplicate source id
-         (`DuplicateSourceIdError` naming the id — last-one-wins would let file
-         position decide the D3 gate), plus a shipped-registry uniqueness pin.
-         ADOPT CLEANLY: your `pat-catalog` and `catalog-pat` are DISTINCT ids, so
-         the guard does not conflate them — it prevents the third failure mode
-         (a duplicated entry deciding a gate by position).
-       - (2) loader:-field agreement guard
-         (`test_registry_loader_fields_agree_with_class_source_id`): registry
-         entries carrying a `loader:` field must AGREE with that module's
-         class-level `source_id`. ***CAUTION — this test PRESUPPOSES the N3 class
-         declarations you deferred under T19.*** If your loader classes carry no
-         `source_id` (you kept the hardcoded `LOADER_SOURCE`), this test will fail
-         or error your side. Disposition: adapt — skip or adjust it under your T19
-         deferral (document the adaptation in the PORT-REPORT), and adopt it for
-         real when the T19 gate rules. Do NOT resolve the failure by adding
-         producer source_id values to your classes (the divergence-ledger rule).
-       - (3) stale-note refresh: `autosys-export` / `airflow-mwaa` notes corrected
-         to the recorded 2026-07-14 crosswalk-gate sign-off facts (both still said
-         "SME not yet run" against `confirmed: true`). Adopt; pure record accuracy.
-    c. THE T19 CAPTURE + N7 CANDIDATE [RECORD — union-append] (`49cb365`): the
-       producer IDEAS entry recording YOUR deferral verbatim (both blockers, your
-       actions, the N7 per-side overlay direction: class declarations stay the
-       producer DEFAULT, a canonical-company config overlay loader→source_id wins
-       over the class value, guard tests byte-identical both sides). Held inboxed
-       until your T19 gate rules — nothing to build either side yet.
-    d. REGISTRY-REDESIGN DIRECTIVE [UNRULED — DO NOT INFER A RULING] (`19c5424`,
-       IDEAS 2026-07-30, user directive): the flat registry `id` conflates the
-       source SYSTEM with the extracted DATASET — one system yields multiple
-       datasets across ontology domains (Product Catalog → DPROD datasets
-       Product/AreaProduct/Team AND ORG datasets; Control-M → SWO/database/code).
-       Direction to design (NOT decided): two-level identity — system carries
-       connection/locator/classification; each extracted dataset carries its own
-       gate/crosswalk/feeds_taxonomy/confirmed state; loaders bind to the dataset.
-       Producer intent: ONE design session bundling this with the N7 overlay, the
-       URN handle, and the reconcile same-id/changed-meaning guard — HITL-gated as
-       registry schema v2, FEEDING your T19 gate review. J21 (b) hardened the
-       CURRENT shape so nothing drops meanwhile.
-    e. UNITY CATALOG REFERENCE NOTE [RECORD — union-append] (`0a7e4d0`):
-       reference/ prose only (headings/categories-at-a-glance, 4 category systems,
-       Discover homepage detail, subdomains). Clean-add.
-    Snapshot `e0dc403` is EXCLUDED class (guardrail 4 + the never-port manifest
-    row).
-    Producer reference at `e0dc403`: full suite 1163 passed / 5 skipped, Track-1
-    subset 124 passed / 0 skipped — BOTH measured with the production CSV PRESENT
-    on the measuring machine; expect a larger skip count where it is absent, and
-    expect (b)(2) to move your failure count until adapted.
-
-51. REGISTRY SCHEMA v2 LANDS + THE T19 INPUTS ARRIVE + EPIC R RUNTIME + THE LEDGERS
-    (2026-07-30 → 2026-07-31; `e0dc403..cewilson/main` — compute the range live and
-    record the exact head in the PORT-REPORT; 45 commits to `6113d10` known at
-    2026-07-31). Read (b) FIRST: it decides whether you take this step whole or in
-    two passes.
-    a. N7 SOURCE-REGISTRY-V2 GATE [SME-SIGNED] (`323f5aa`; claim `9c98b71`).
-       **This is the design session your T19 row was holding four inputs for — it
-       ran, and it ruled once rather than four times, exactly as intended.** Ten
-       rulings, two SME amendments, one explicit residual, SME chad.wilson; gate
-       prompt `config/gate-prompts/source-registry-v2.yaml`, outcome in the
-       union-append gate-log. The four rulings that matter to you:
-       - **D1 two-level identity** — SYSTEM rows (connection/locator/classification)
-         split from DATASET rows (gate/crosswalk/feeds_taxonomy, each with its OWN
-         `confirmed`); loaders bind to the DATASET. Amendment: `seal_id` is a
-         standing PLACEHOLDER on committed system rows (ccb-twin convention).
-       - **D2 per-side overlay** — config wins over class defaults. This is your
-         rebind seam; see the divergence ledger row.
-       - **D3 URN** `urn:drydocs:dataset:{carrier-or-origin},{artifact},prod`,
-         derived deterministically — a render, never a hand-maintained field.
-       - **D4 reconcile guard** — renamed rows carry `replaces:`, retired ids land
-         in a refusal list, and BOTH `SourceRegistry.from_yaml` and the overlay
-         guard refuse a retired id. Same-string-different-meaning — the T19 failure
-         itself — becomes structurally impossible rather than merely documented.
-       Q1 fixed the id grammar (`{origin}@{db}.{schema}.{table}` for replicas,
-       `{system}:{artifact}` born-here, lowercase; real db/schema are connection
-       coordinates → internal twin only, committed ids carry `[db].[schema]`
-       placeholders). Q6 ruled that signed gates TRANSFER across renames — identity
-       refactoring is not meaning change — so no previously-signed gate re-opens.
-       RESIDUAL, stated: the 18-row migration table was NOT block-confirmed; rows
-       confirmed individually at the build.
-       **Producer sign-off does not substitute for your T19 review.** This feeds it.
-    b. N9 SCHEMA v2 BUILD [TEST-PINNED] (`86914ad`; claim `c0b623a`). 15 systems /
-       28 datasets / 17 retired ids; 14 loaders rebound; ledgers, captures, the
-       taxonomy-ontology map and audit-fields re-keyed; doc-registry pipeline twins
-       dropped per Q5 (one home per source); the `snow` SaaS system registered per
-       Q4; URNs derived; a gate-log AMENDMENT entry maps every old id → new id so
-       history keyed on v1 ids stays traceable.
-       ***CAUTION — this is the one sub-stream that can break your loaders.***
-       `SourceRegistry.from_yaml` now REFUSES any id on the D4 retired list, and
-       **both `catalog-pat` and `pat-catalog` are on it** (the T19 ruling replaces
-       them with `pat:product-catalog` + `pat:people-report`, deliberately matching
-       neither legacy string). Your loaders bind those strings today.
-       - Do NOT resolve this by adopting producer source_id values — the
-         divergence-ledger rule is unchanged, and a wrong-but-resolving value is
-         precisely what presence tests do not catch.
-       - The intended path is (a)'s D2 overlay: your loaders keep their names, and
-         `config/loader-source-overlay.yaml` maps them to whatever dataset ids YOUR
-         T19 gate rules. That file is the seam; it exists for you.
-       - Legitimate disposition: DEFER (a)+(b) as one unit under T19 and take
-         (c)–(h) now. They are independent — nothing in (c)–(h) reads the registry
-         schema. Document the split in the PORT-REPORT.
-       Retires step 50(b)(2)'s caution: the loader-field agreement guard now reads
-       through the overlay, so it no longer presupposes N3 class declarations.
-    c. J23 CLASSIFICATION COLLAPSE [RECORD-CORRECTION + GUARD] (`dba8150`; rationale
-       `9f9744c`, claim `e477b9f`). Four tiers → three: **Internal-Confidential is
-       gone**, folded into Internal (a 4th tier can return if a real handling
-       difference ever materializes; confidential handling now rides as a note on
-       the entry). Touches `config/classification.yaml`, `config/README.md`, 8
-       registry entries and 3 taxonomy files, plus the CLAUDE.md / PUBLISH-BOUNDARY
-       tables.
-       ***CHECK BEFORE APPLYING:*** `test_classification.py` is in your acceptance
-       gate, and there is no unlabelled default. If ANY company-only source row is
-       still labelled `Internal-Confidential`, the incoming classification.yaml
-       refuses it and your suite goes red. Sweep your registries first; the fix is a
-       relabel to Internal plus a handling note, not a re-added tier.
-    d. J22 UNTRACKED-PATH GUARD [LIVE-VERIFIED] (`e2bf366`; claim `889488f`).
-       Closes the blind spot step 50(a) called "a known producer IDEAS bug": the J16
-       manifest-coverage guard now walks tracked paths AND
-       `--others --exclude-standard`, so a new file catches its missing manifest row
-       BEFORE it is staged. Proven with a pre-add probe. Adopt — it is the guard that
-       would have caught the load-map.html row 50(a) had to correct by hand.
-    e. EPIC R AGENT RUNTIME [LIVE-VERIFIED producer-side] (`59250cf`, `7e9ed8b`,
-       `66eadb5`; follow-ups inboxed `8801e1f`). R4 ephemeral session-scoped
-       QuerySpecs (`eph.<hash>` refs, agent-key-gated, frozen params, TTL + capacity
-       bounds; `/raw-cypher` untouched). R3 agent-run telemetry — a per-call JSONL
-       ledger in `DRYDOCS_LOGDIR` (full question text is ledger-only, never graph)
-       plus `:AgentRun` written to **ddcontext** by a dedicated writer that refuses
-       drydocs. R5 the Ask spoke (streamed steps over SSE, citations carrying trust +
-       classification, metrics chip).
-       Your side: the R3 graph half needs the multi-DB deploy — that is still **T7**.
-       The JSONL ledger works without it. `google-adk` stays pinned `>=2,<3` (R10).
-    f. Q13 VENDOR-DOCS PIPELINE [TEST-PINNED — mechanism only, NO corpus]
-       (`e549f07`, `8a1780c`, `1c183d6`, `5a9160e`, `9713118`). A STANDALONE external
-       vendor doc pipeline: capture (`scripts/external_vendor_scrape.py`, with the
-       Q12 page-count refusal that stops a 2k–11k-page scrape before it starts) →
-       convert → load, with two new CLI verbs and its own `:Document`/`:Chunk`
-       writer. New `bmc-controlm-utilities` doc-registry entry ships
-       `confirmed: false`, so `_gate_loader` refuses the load until a gate signs it —
-       adopt the config as-is, do not flip it. **No captured content crosses:** the
-       HTML lands out-of-repo under `DRYDOCS_DATA_ROOT` and is gitignored. Also adds
-       a `documentation:` currency pointer on the `controlm` registry product
-       (docs_version vs the version you actually run).
-    g. UI LEDGERS [TEST-PINNED] (`31dcfe5`, `975a144`, `369f1f6`, `133eaf0`).
-       `config/taxonomy/ui-components.yaml` (62 first-party React components, drift-
-       guarded in BOTH directions against `web/src`) and `config/taxonomy/ui-tests.yaml`
-       (suites keyed to console modules; `execution: manual` — no runner exists, and a
-       test enforces that flag). Both land as `canonical-producer` via `config/**`.
-       ***Expect the drift guard to fail on arrival if your `web/src` differs from
-       producer's*** — that is the guard working. Disposition: adapt the ledger to YOUR
-       tree (it is an inventory of what each side built), do not delete the guard.
-    h. DOCS + PROCESS [RECORD] — J19 pull-rule discipline now explicit in CLAUDE.md §0
-       and the backlog header (`bff98f5`, `16de770`); FCDO framework capture re-homed
-       to `internal/` with an alignment plan (`8abc05f`); the registry-redesign plan
-       that became N7 (`2d6f705`, `8747fed`); grooms (`1bae5ac`, `3c76234`, `db74546`,
-       `e9ece37`, `c9ba402`).
-       **L21 + J25 (`554a4e8`) concern you directly:**
-       - **§6a of this prompt is NEW — it is the paste-ready T11 ratification block.**
-         It was previously only ever "provided in a session", which is why T11 has read
-         `pending` since 2026-07-21 with nothing openable behind it. Fill the four
-         bracketed placeholders from your PORT-REPORT and append it to your gate-log.
-       - L21 revised the startup-refresh runbook to Rev 5: the per-file supplement
-         verbs collapse to the one `apply-supplements` chain. Step 46(c) warned this
-         was coming ("your doc, your rev"). Producer-side the collapse also fixed a
-         real defect — the old block listed base/seal/catalog and OMITTED registry, so
-         the runbook told readers to skip the supplement that `load-software-registry`
-         depends on. **Check your initial-load runbook for the same omission**; it is
-         a content bug, not a style one. Rev 5 also names `load-doc-traceability` in
-         the ingest step. See the divergence ledger for the rev-pin note.
-       - RETIRED from the producer tree: `docs/port-step46-company-prompt.md` — spent
-         per its own lifecycle note once PORT-REPORT-94132c80 was written; its durable
-         content lives in the PORT-MANIFEST rows it created. Recoverable from git
-         history. `docs/port-ais-supplement-company-prompt.md` STAYS (T17 open).
-    Snapshots `fea4f03` / `b940d25` / `f7b2806` / `ecf49d4` / `6113d10` are EXCLUDED
-    class (guardrail 4 + the never-port manifest row).
-    Producer reference at `6113d10`: full suite **1269 passed / 5 skipped**, Track-1
-    **124 passed / 0 skipped** — both with the production CSV PRESENT on the measuring
-    machine. `EXPECTED_CONSTRAINTS` is UNCHANGED at 51 across the whole step-51 range
-    (v2 is an identity refactor; it adds no active edges).
+52. CI DETERMINISM FIX + J10 STAGE 0 (2026-07-31 → 08-01; `57914bf4..cewilson/main`
+    — compute the range live; 5 commits to `6e993d2` known at 2026-08-01).
+    a. RENDER DETERMINISM [LIVE-VERIFIED] (`7ccc655`). Producer CI was RED every run
+       2026-07-21..07-31 on `test_committed_matrix_matches_regeneration` claiming
+       `enforcement-matrix.json` drift. It had not drifted: the renderer sorted `Path`
+       OBJECTS, and `PurePath.__lt__` compares a key that is case-FOLDED on Windows and
+       case-SENSITIVE on POSIX, so a matrix committed from Windows can never match its
+       own regeneration on a Linux runner. Fixed with `key=lambda p: p.as_posix()`;
+       `tests/unit/test_render_determinism.py` now asserts the RULE (a drift guard
+       compares a render against itself and can never catch this class).
+       ***YOUR `render_enforcement_matrix.py` IS A 3-WAY MERGE WITH COMPANY SURFACES
+       ROWS*** — take the `key=` change into YOUR file; do not overwrite it wholesale.
+    b. J10 STAGE 0 [PORTS] (`f18c88e`) — `ruff = "0.5.7"` EXACT + settled
+       `[tool.ruff*]` + `*.py text eol=lf`. Guardrail 9 has the stage semantics.
+       `line-ending = "lf"` and the gitattributes rule are a PAIR: pinning one without
+       the other makes `ruff format --check` unsatisfiable on a Windows checkout.
+    c. B023 FIX [PORTS normally] (`b3b90dc`) — `marker=marker` late-binding bind in
+       `benchmark_p0.py`. Hand-authored, NOT a mechanical stage-2 commit.
+    d. PORT-CONTROL DOCS [never-port, but they change YOUR next port] (`7f6c5d2`,
+       `6e993d2`): guardrail 3 now requires the port to be COMMITTED before the
+       PORT-REPORT is written, with `rev-list --count` quoted as proof; guardrail 5
+       drops the `.print.html` twins claim; T11 recorded discharged; v3 length
+       discipline added. Your copy of this file is your own — re-read it at the
+       producer ref rather than assuming your copy is current (yours was stale at
+       94132c80 this port).
+    Producer reference at `6e993d2`: full suite 1272 / 5 skipped, Track-1 124 / 0.
+    `EXPECTED_CONSTRAINTS` unchanged at 51.
 
 ACCEPTANCE GATE (behavior is the contract, not a byte-compare):
 - Track 1 (portable):
     poetry run pytest tests/unit/test_variable_classifier.py tests/unit/test_variable_resolver.py \
                       tests/unit/test_variable_staging.py tests/unit/test_command_parser.py \
                       tests/unit/test_module_boundary.py -q
-  Producer reference at `6113d10` (step 51): 124 passed / 0 skipped WITH the
+  Producer reference at `6e993d2` (step 52): 124 passed / 0 skipped WITH the
   production CSV present (unchanged since step 49; sample-backed tests skip without
   it — at step 48 the CSV-absent figure was 114 / 3). Company baseline is ABOVE the
   producer floor — compare against your own PORT-REPORT-e60822fc numbers, not these.
 - Full `pytest tests/unit/` — ZERO failures is the contract; skips are
   environment/fixture-absence by design (production CSVs, XML fixtures, fastapi
   optional dep, essential-graphrag PDF, J7 guards without RECONCILE_BEFORE_DIR,
-  capability_assert=false skips per T18; a temporary company-side failure on the
-  J21 loader-field guard is EXPECTED until the step-50(b)(2) adaptation is applied —
-  step 51(b) retires that particular adaptation, but introduces its own: if you take
-  51(b) without your T19 ruling, retired-id refusals will fail loudly, which is the
-  guard doing its job and the signal to DEFER (a)+(b) rather than to weaken it).
-  Producer reference at the current head (step 51, `6113d10`): 1269 passed /
-  5 skipped, production CSV present. Earlier heads (e0dc403 1163/5, 3fe69c1 1144/5,
-  8a82e3b 1099/7, 947920c 1070/8, 78ba7fd 982/6) and the 483→831 series for steps
-  28–42 are in git history and the archive — do not re-derive them here.
-  Company reference: your own PORT-REPORT baseline.
+  capability_assert=false skips per T18). A retired-id refusal from
+  `SourceRegistry.from_yaml` is the D4 guard WORKING, not a port failure — rebind the
+  loader in `loader-source-overlay.yaml`, never by re-adding the retired id.
+  Producer reference at the current head (step 52, `6e993d2`): 1272 passed /
+  5 skipped, production CSV present. Earlier producer heads are in git history and the
+  archive — do not re-derive them here.
+  Company reference (PORT-REPORT-57914bf4): full `1569 / 24 / 0`, Track-1 `120 / 3 / 0`.
+  COUNT THE RIGHT THING: producer "changed paths" (the range diff) and company
+  "files in the port commit" are different numbers by construction — 139 vs 135 this
+  port, because the company figure counts the APPLIED RESULT (regenerated derived
+  artifacts + adaptations) and drops excluded paths. And `git status --short` line
+  count is NOT a file count: `MM` and rename double-entries inflate it (that is where
+  the transient "159" came from). Reconcile the three in your PORT-REPORT.
 - CI guards green: test_schema.py (EXPECTED_CONSTRAINTS company-based — see ledger;
   every active edge has its supplement block), test_classification.py,
   test_taxonomy_ontology_map.py, test_backlog.py, test_doc_outline.py,
