@@ -250,7 +250,15 @@ would re-open the boundary ADR 0005 closed.
 3. [ ] **R3** telemetry: JSONL ledger + `:AgentRun` + `console.agent-runs.v1`.
 4. [ ] **R4** ephemeral session specs in `drydocs_api`.
 5. [ ] **R5** Ask spoke in the console (streamed steps, Cypher panel, metrics).
-6. [ ] **R6** Tier-2 bounded loop + task-scoped context graph + snapshots.
+6. [x] **R6** Tier-2 bounded loop + task-scoped context graph + snapshots.
+       DONE 2026-08-01 — `graph_qa/tier2.py` + `task_graph.py`; caps as ruled
+       (iterations ≤2, vote ×3, fix loop ≤2 inherited, per-question token
+       budget), forced-solve fallback, in-process residency proved
+       structurally, per-iteration snapshots rendered by the console's
+       `TaskGraphPane`, ledger `iteration` now real per call.
+       *(Boxes 2–5 above read unticked but those items are `done` in
+       `backlog.yaml` — doc drift belonging to L19's sweep, not re-adjudicated
+       here.)*
 7. [ ] **R7** freshness fields + rescrape queue (code-enforce the registry).
 8. [ ] **R8** evaluation metrics + promotion feed + cap tuning from the ledger.
 

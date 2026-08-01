@@ -66,6 +66,7 @@ areas:
   - { id: ui-primitive,  title: "Hand-rolled ReUI/shadcn-style primitives (copied-in, not an npm dependency)" }
   - { id: component,     title: "Shared cross-module components" }
   - { id: icon,          title: "Icon glyph sets" }
+  - { id: ask,           title: "Ask module panes" }
   - { id: explorer,      title: "Explorer module panes" }
   - { id: lineage,       title: "Lineage module panes" }
   - { id: loads,         title: "Loads module panes" }
@@ -134,6 +135,12 @@ components:
   - { id: HubGlyphs,               area: icon,         path: components/icons/HubGlyphs.tsx }
 
   # --- explorer (4) ---
+  # --- ask (1) ---
+  # R6 Tier-2 task graph. Renders the agent's IN-PROCESS working memory (R1
+  # ruling A) — deliberately its own visual language so it is never mistaken
+  # for the knowledge graph, though it shares lib/forceLayout.ts.
+  - { id: TaskGraphPane,           area: ask,          path: ask/TaskGraphPane.tsx,                       module: ask,        module_evidence: directory }
+
   - { id: DataFrame,               area: explorer,     path: explorer/DataFrame.tsx,                      module: explorer,   module_evidence: directory }
   - { id: ExplorerGraphPane,       area: explorer,     path: explorer/ExplorerGraphPane.tsx,              module: explorer,   module_evidence: directory }
   - { id: NodeInspector,           area: explorer,     path: explorer/NodeInspector.tsx,                  module: explorer,   module_evidence: directory }

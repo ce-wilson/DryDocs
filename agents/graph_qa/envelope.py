@@ -29,7 +29,7 @@ def est_tokens(text: str) -> int:
 @dataclass
 class StepRecord:
     i: int
-    kind: str  # 'router' | 'spec' | 'text2cypher' | 'answer'
+    kind: str  # 'router' | 'spec' | 'text2cypher' | 'answer' | 'tier2'
     ms: int = 0
     spec_id: str | None = None
     cypher: str | None = None
@@ -69,13 +69,22 @@ class Metrics:
     response_ms: dict = field(
         default_factory=lambda: {"total": 0, "routing": 0, "retrieve": 0, "llm": 0}
     )
+    # R6 Tier-2 caps and what they DID. A cap whose effect is invisible cannot
+    # be tuned, which is the whole point of recording it: `exhausted` and
+    # `forced_solve` are the two signals that say a bound actually bit.
+    budget: dict = field(
+        default_factory=lambda: {"tokens_limit": 0, "tokens_used": 0, "exhausted": False}
+    )
+    tier2: dict = field(
+        default_factory=lambda: {"engaged": False, "votes": [], "forced_solve": False}
+    )
 
 
 @dataclass
 class Envelope:
     run_id: str
     session_id: str
-    tier: str  # 'spec' | 'text2cypher' | 'unanswered'
+    tier: str  # 'spec' | 'text2cypher' | 'tier2' | 'unanswered'
     question_sha256: str
     question_chars: int
     answer: str
@@ -89,6 +98,11 @@ class Envelope:
     steps: list[StepRecord] = field(default_factory=list)
     sources: list[SourceRecord] = field(default_factory=list)
     metrics: Metrics = field(default_factory=Metrics)
+    # R6: per-iteration Tier-2 task-graph snapshots, cumulative state each.
+    # Edges are {source, target, via} — the record web/src/lib/forceLayout.ts
+    # already lays out, so the console renders them with no adapter. Empty on
+    # every run that never reached Tier 2, which is most of them.
+    task_graph: list[dict] = field(default_factory=list)
 
     def to_dict(self) -> dict:
         return asdict(self)

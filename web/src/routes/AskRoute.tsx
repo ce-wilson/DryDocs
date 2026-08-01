@@ -4,6 +4,7 @@ import EmptyState from '../components/ui/EmptyState'
 import SpecGrid from '../explorer/SpecGrid'
 import { createApiAccess, createApiClient } from '../lib/graphApi'
 import { ask, controlPart, type AskEnvelope, type AskSource, type AskStep } from '../ask/askApi'
+import TaskGraphPane from '../ask/TaskGraphPane'
 import type { Persona } from '../lib/auth'
 
 // The Ask spoke (R5 / ADR 0007): free-text Q&A over the knowledge graph for
@@ -217,6 +218,12 @@ function TurnCard({
 
           <MetricsChip envelope={envelope} />
 
+          {/* R6: the Tier-2 task graph, one frame per iteration. Present only
+              on runs that actually escalated — most never do. */}
+          {(envelope.task_graph?.length ?? 0) > 0 && (
+            <TaskGraphPane snapshots={envelope.task_graph!} />
+          )}
+
           <details className="rounded border border-edge-soft bg-bg-2/40 px-2 py-1">
             <summary className="cursor-pointer text-xs font-medium text-muted">
               How I got this — {envelope.steps?.length ?? 0} steps, every Cypher inspectable
@@ -293,6 +300,23 @@ function MetricsChip({ envelope }: { envelope: AskEnvelope }) {
       <span>
         tier {envelope.tier} · {envelope.model ?? 'model n/a'} · run {envelope.run_id}
       </span>
+      {/* R6: a cap is only tunable if you can see it act. Shown when Tier 2
+          engaged, and always when the budget was spent — never silently. */}
+      {m.tier2?.engaged && (
+        <span
+          className="rounded-full border border-edge bg-bg-2 px-2 py-0.5"
+          title={`next-step votes: ${(m.tier2.votes ?? []).join(', ') || 'none'}`}
+        >
+          tier-2 · {(m.tier2.votes ?? []).filter((v) => v === 'enhance').length}/
+          {(m.tier2.votes ?? []).length} enhance votes
+          {m.tier2.forced_solve ? ' · forced solve' : ''}
+        </span>
+      )}
+      {m.budget?.exhausted && (
+        <span className="rounded-full border border-yellow/50 bg-yellow/10 px-2 py-0.5 text-yellow">
+          token budget spent ({m.budget.tokens_used}/{m.budget.tokens_limit}) — exploration stopped
+        </span>
+      )}
     </p>
   )
 }

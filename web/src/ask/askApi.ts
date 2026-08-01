@@ -39,6 +39,19 @@ export interface AskMetrics {
   memory: Record<string, number>
   cost_est_usd?: number | null
   response_ms: Record<string, number>
+  // R6 Tier-2 caps and whether they bit. Optional because an envelope from a
+  // pre-R6 agent build has neither.
+  budget?: { tokens_limit: number; tokens_used: number; exhausted: boolean }
+  tier2?: { engaged: boolean; votes: string[]; forced_solve: boolean }
+}
+
+/** R6: one cumulative frame of the Tier-2 task graph. Edges are exactly the
+ *  record lib/forceLayout.ts lays out, so no adapter sits between them. */
+export interface TaskGraphSnapshot {
+  iteration: number
+  phase: 'start' | 'iteration' | 'final'
+  nodes: { id: string; kind: string; label: string; iteration: number; rows: number | null }[]
+  edges: { source: string; target: string; via: string }[]
 }
 
 export interface AskEnvelope {
@@ -51,6 +64,7 @@ export interface AskEnvelope {
   steps?: AskStep[]
   sources?: AskSource[]
   metrics?: AskMetrics
+  task_graph?: TaskGraphSnapshot[]
 }
 
 export function controlPart(apiToken: string, apiUrl: string): AdkPart {

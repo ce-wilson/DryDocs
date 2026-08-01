@@ -1,16 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
-import {
-  forceCenter,
-  forceCollide,
-  forceLink,
-  forceManyBody,
-  forceSimulation,
-  forceX,
-  forceY,
-  type SimulationLinkDatum,
-  type SimulationNodeDatum,
-} from 'd3-force'
 import { createApiAccess } from '../lib/graphApi'
+import { forceLayout, trimEdge, type PlacedNode } from '../lib/forceLayout'
 
 // The LIVE graph view (backlog O6, wf-console-01 V5): real WAS_INFORMED_BY
 // dependency edges from the knowledge graph, through the GraphAccess seam with
@@ -20,10 +10,11 @@ import { createApiAccess } from '../lib/graphApi'
 // D4/V3 finding): there is no Cypher affordance here at all; raw Cypher stays
 // on the admin Console bench.
 //
-// Rendering: d3-force layout (ISC, layout-only; deterministic — d3-force's
-// default random source is a fixed-seed LCG) + the in-repo SVG idiom
-// (GraphSvg's visual language). NVL deferred — revisit when the V5 explorer
-// grows the C4 zoom ladder or >200-node scenes (decision recorded on O6).
+// Rendering: the shared deterministic d3-force placement engine
+// (lib/forceLayout.ts — extracted at R6 when the Ask spoke's Tier-2 task graph
+// became the second scene needing it) + the in-repo SVG idiom (GraphSvg's
+// visual language, which stays local to this pane). NVL deferred — revisit when
+// the V5 explorer grows the C4 zoom ladder or >200-node scenes (decision on O6).
 
 const env = import.meta.env
 
@@ -33,55 +24,13 @@ interface DepEdge {
   via: string
 }
 
-interface LayoutNode extends SimulationNodeDatum {
-  id: string
-}
-
-interface PlacedNode {
-  id: string
-  x: number
-  y: number
-}
-
 const W = 940
 const H = 540
 const R = 27
 const PAD = 56
 
-// Static, deterministic force layout: run the simulation to convergence
-// synchronously, then rescale into the viewBox. No animation by design —
-// stable positions make the view screenshot- and CDP-assertable.
 function layout(edges: DepEdge[]): PlacedNode[] {
-  const ids = [...new Set(edges.flatMap((e) => [e.source, e.target]))]
-  const nodes: LayoutNode[] = ids.map((id) => ({ id }))
-  const links: SimulationLinkDatum<LayoutNode>[] = edges.map((e) => ({
-    source: e.source,
-    target: e.target,
-  }))
-  const sim = forceSimulation(nodes)
-    .force('link', forceLink<LayoutNode, SimulationLinkDatum<LayoutNode>>(links).id((d) => d.id).distance(110))
-    .force('charge', forceManyBody().strength(-380))
-    .force('center', forceCenter(W / 2, H / 2))
-    .force('collide', forceCollide(R + 14))
-    // Weak pull to center keeps DISCONNECTED chains from repelling each other
-    // to the bbox extremes (which would crush each cluster in the rescale).
-    .force('x', forceX(W / 2).strength(0.08))
-    .force('y', forceY(H / 2).strength(0.1))
-    .stop()
-  sim.tick(300)
-
-  const xs = nodes.map((n) => n.x ?? 0)
-  const ys = nodes.map((n) => n.y ?? 0)
-  const [minX, maxX] = [Math.min(...xs), Math.max(...xs)]
-  const [minY, maxY] = [Math.min(...ys), Math.max(...ys)]
-  const sx = (W - 2 * PAD) / Math.max(1, maxX - minX)
-  const sy = (H - 2 * PAD) / Math.max(1, maxY - minY)
-  const s = Math.min(sx, sy, 1.4)
-  return nodes.map((n) => ({
-    id: n.id,
-    x: PAD + ((n.x ?? 0) - minX) * s + (W - 2 * PAD - (maxX - minX) * s) / 2,
-    y: PAD + ((n.y ?? 0) - minY) * s + (H - 2 * PAD - (maxY - minY) * s) / 2,
-  }))
+  return forceLayout(edges, { width: W, height: H, radius: R, pad: PAD })
 }
 
 const JOB_COLOR = '#9B6BD4' // ControlMJob's label-family color (towers.ts idiom)
@@ -194,13 +143,7 @@ export default function GraphExplorer({ personaId }: { personaId: string }) {
                   const a = byId.get(e.source)
                   const b = byId.get(e.target)
                   if (!a || !b) return null
-                  const dx = b.x - a.x
-                  const dy = b.y - a.y
-                  const len = Math.hypot(dx, dy) || 1
-                  const x1 = a.x + (dx / len) * R
-                  const y1 = a.y + (dy / len) * R
-                  const x2 = b.x - (dx / len) * (R + 4)
-                  const y2 = b.y - (dy / len) * (R + 4)
+                  const { x1, y1, x2, y2 } = trimEdge(a, b, R)
                   const dim = selected && e.source !== selected && e.target !== selected
                   return (
                     <g key={i} className="gx-edge" opacity={dim ? 0.25 : 1}>

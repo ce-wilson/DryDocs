@@ -189,12 +189,14 @@ def test_unbound_components_are_counted_not_hidden() -> None:
     62 -> 63 at O28: StatusItems (with HealthGlyph) is deliberately UNBOUND —
     it renders the node-status envelope for the Explorer inspector AND the
     landing hub's spokes, so binding it to either module would misstate it.
+    63 -> 64 at R6: TaskGraphPane IS bound (ask/, directory evidence), so the
+    bound count moves too — the Tier-2 task graph serves exactly one module.
     Assigning the rest properly means reading imports, which is O42's TS
     resolver, not a naming heuristic.
     """
     comps = _ui()["components"]
     bound = [c for c in comps if c.get("module")]
     assert (len(bound), len(comps)) == (
-        26,
-        63,
+        27,
+        64,
     ), f"module-binding coverage changed: {len(bound)}/{len(comps)} bound"

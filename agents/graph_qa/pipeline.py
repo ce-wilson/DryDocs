@@ -4,8 +4,10 @@ Tier 0: the router matches the question onto a registered QuerySpec; the
 spec's Cypher runs VERBATIM (deterministic, provenance-clean). Tier 1:
 schema-grounded text2cypher with the fix loop (<= MAX_FIX_RETRIES) — the
 read-only guard is a pre-flight, READ access mode in the executor is the
-boundary. Tier 2 (the bounded enhance/solve loop) is R6, not here: when
-Tier 1 cannot answer, the envelope says so honestly (tier='unanswered').
+boundary. Tier 2 (R6, `graph_qa/tier2.py`) engages ONLY when Tier 1's context is
+insufficient — no valid query, or a query that returned nothing. It is bounded
+on four axes and always terminates; when even it cannot answer, the envelope
+says so honestly (tier='unanswered').
 
 Everything is dependency-injected (provider, executor, schema sources,
 clock) so the poetry unit suite tests the full control flow with fakes —
@@ -31,6 +33,7 @@ from graph_qa.envelope import (
     sha256_text,
 )
 from graph_qa.schema_context import build_schema_prompt, load_vocabulary
+from graph_qa.tier2 import DEFAULT_TOKEN_BUDGET, run_tier2
 
 MAX_FIX_RETRIES = 2  # R2 acceptance: fix loop capped at 2
 ROW_CAP = 100
@@ -92,6 +95,7 @@ class GraphQaPipeline:
         register_cypher: Callable | None = None,
         ledger=None,
         on_step: Callable | None = None,
+        token_budget: int = DEFAULT_TOKEN_BUDGET,
     ) -> None:
         self.provider = provider
         self.run_read = run_read
@@ -112,6 +116,9 @@ class GraphQaPipeline:
         # spoke while the answer is still being produced. Observer failures
         # never affect the answer.
         self.on_step = on_step
+        # R6: per-question Tier-2 exploration budget (see tier2.py — it bounds
+        # exploration, not the one terminating answer call).
+        self.token_budget = token_budget
 
     def _push_step(self, envelope: Envelope, step: StepRecord) -> None:
         envelope.steps.append(step)
@@ -281,6 +288,58 @@ class GraphQaPipeline:
                 )
         return None
 
+    def _run_tier2(self, envelope: Envelope, question: str, timings: dict):
+        """The bounded enhance/solve loop. Reuses Tier-1 retrieval, so its <=2
+        fix loop and the read-only pre-flight are inherited rather than
+        reimplemented — there is exactly one path that runs Cypher."""
+
+        def _set_iteration(n: int) -> None:
+            # Drives the R3 ledger's `iteration` column, which is what makes the
+            # caps tunable from data rather than from opinion.
+            envelope.metrics.iterations = n
+
+        def _llm(system: str, user: str, step: str = "tier2") -> str:
+            return self._llm(envelope, system, user, timings, step=step)
+
+        def _retrieve(subquestion: str):
+            return self._run_text2cypher(envelope, subquestion, timings)
+
+        outcome = run_tier2(
+            question,
+            llm=_llm,
+            retrieve=_retrieve,
+            tokens_used=lambda: envelope.metrics.tokens.total,
+            set_iteration=_set_iteration,
+            token_budget=self.token_budget,
+        )
+        envelope.task_graph = outcome.graph.snapshots
+        envelope.metrics.iterations = outcome.iterations
+        envelope.metrics.context = {
+            "rows": outcome.evidence_rows,
+            "chunks": 0,  # doc-chunk retrieval arrives with R7 corpora wiring
+            "tokens_est": est_tokens("x" * outcome.evidence_chars),
+        }
+        envelope.metrics.budget = {
+            "tokens_limit": self.token_budget,
+            "tokens_used": envelope.metrics.tokens.total,
+            "exhausted": outcome.budget_exhausted,
+        }
+        envelope.metrics.tier2 = {
+            "engaged": True,
+            "votes": outcome.votes,
+            "forced_solve": outcome.forced_solve,
+        }
+        self._push_step(
+            envelope,
+            StepRecord(
+                i=len(envelope.steps) + 1,
+                kind="tier2",
+                rows=outcome.evidence_rows,
+                error=None if outcome.answered else "no usable evidence gathered",
+            ),
+        )
+        return outcome
+
     # -- entry point ----------------------------------------------------------
     def answer(
         self,
@@ -345,13 +404,20 @@ class GraphQaPipeline:
                 StepRecord(i=len(envelope.steps) + 1, kind="answer", ms=timings["llm"]),
             )
         else:
-            envelope.answer = (
-                "I could not produce a valid read-only query for this question. "
-                "The attempted Cypher and errors are in the steps — try rephrasing, "
-                "or run one of the registered explorer views."
-            )
+            # Tier-1 context was insufficient — this, and only this, is where
+            # Tier 2 engages (ADR 0007 tiering). A run that answered above never
+            # reaches the loop, so the common question never pays for it.
+            outcome = self._run_tier2(envelope, question, timings)
+            envelope.answer = outcome.answer or ""
+            envelope.tier = "tier2" if outcome.answered else "unanswered"
 
-        envelope.metrics.iterations = 1  # Tier-2 (R6) will count real loop iterations
+        if not envelope.metrics.iterations:
+            envelope.metrics.iterations = 1  # tiers 0/1 are a single pass
+        # Budget is reported on EVERY run, not only the ones that hit it —
+        # a limit you can only see once it bites is one nobody can tune before
+        # it does. `exhausted` is whatever Tier 2 set, or False if it never ran.
+        envelope.metrics.budget["tokens_limit"] = self.token_budget
+        envelope.metrics.budget["tokens_used"] = envelope.metrics.tokens.total
         envelope.metrics.response_ms = {
             "total": int((self.clock() - total_started) * 1000),
             **timings,
