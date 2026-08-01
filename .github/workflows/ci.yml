@@ -6,9 +6,12 @@
 # enforces that they skip, never fail). The classification test is the automated
 # half of the publish boundary (PUBLISH-BOUNDARY.md).
 #
-# ruff is ADVISORY (continue-on-error): the repo has never gated on lint and
-# carries ~757 pre-existing findings — gating it needs its own cleanup item
-# first (see backlog J5 notes). Everything else is blocking.
+# ruff is BLOCKING as of J10 (2026-08-01) — both `ruff check .` and `ruff format
+# --check .`. It was advisory from J5 while the repo carried ~757 pre-existing
+# findings; J10 cleared them (docs/ruff-format-convergence.md). The version pin
+# in pyproject is EXACT and load-bearing: formatter output varies across ruff
+# releases, so a floating pin would turn an upgrade into a red build here and a
+# spurious cross-repo diff company-side.
 # =============================================================================
 name: ci
 
@@ -62,10 +65,16 @@ jobs:
       - name: Schema / vocabulary guard
         run: poetry run pytest tests/unit/test_schema.py -q
 
-      # --- advisory (non-blocking): pre-existing findings, not yet gated ----
-      - name: ruff check (advisory)
-        continue-on-error: true
+      # --- BLOCKING as of J10 stage 5 (2026-08-01) --------------------------
+      # Both gates are green on a clean tree; a red here is a real regression,
+      # not inherited debt. `format --check` must sit alongside `check` — lint
+      # alone would let the tree drift out of formatter agreement silently, and
+      # formatter agreement is what keeps cross-repo port collisions content-only.
+      - name: ruff check
         run: poetry run ruff check .
+
+      - name: ruff format --check
+        run: poetry run ruff format --check .
 
   # --- Snyk security scanning (added 2026-07-20, user request) ---------------
   # SCA over the Poetry manifest/lockfile (Snyk reads pyproject.toml/poetry.lock
