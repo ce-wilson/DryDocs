@@ -7,6 +7,7 @@ present and skips otherwise.
 
 from __future__ import annotations
 
+from itertools import pairwise
 from pathlib import Path
 
 import pytest
@@ -95,7 +96,7 @@ def test_adapter_rows_denormalize_and_chain():
     rows = list(adapter.rows())
     assert len(rows) == 10
     assert rows[0]["prev_chunk_id"] is None
-    for prev, row in zip(rows, rows[1:], strict=False):
+    for prev, row in pairwise(rows):
         assert row["prev_chunk_id"] == prev["chunk_id"]
     seqs = [r["seq"] for r in rows]
     assert seqs == list(range(10))

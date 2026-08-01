@@ -351,6 +351,15 @@ rows:
       PASTED into the executing session, never committed company-side. The company's own
       PORT-REPORT-<date>.md is a company artifact and is likewise not producer content."
 
+  - path: ".git-blame-ignore-revs"
+    disposition: never-port
+    note: "PRODUCER SHAs, and a SHA is the one thing two disjoint histories can never
+      share — the listed commit does not exist company-side, so a ported copy would
+      point blame at nothing. Same shape as the depgraph *.json row below: per-repo
+      state whose content is meaningless across the boundary, not a secret. The
+      company side maintains its OWN file listing its OWN regenerated format commit
+      (docs/ruff-format-convergence.md §3.4). Added with J10 stage 3, 2026-08-01."
+
   # depgraph snapshots: the OUTPUTS never cross, the TOOLING does. Order matters —
   # the *.json row must stay ABOVE the directory row (first match wins).
   - path: "knowledge/depgraph-snapshots/*.json"

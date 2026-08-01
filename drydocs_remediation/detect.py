@@ -5,7 +5,7 @@ pure punctuation, smuggled through Control-M's concatenation operator), rule id 
 in the rules registry. Detection runs on the core classifier's ``value_is_delimiter``
 feature so remediation and the loaders share one truth for the pattern.
 
-The registry-driven rules ENGINE (R1–R29 from
+The registry-driven rules ENGINE (R1-R29 from
 ``internal/remediation/standards-rules-registry.md``) is the M1 deliverable — per the
 M0 scope doc, other standards are checked by hand in M0. Findings here are emitted
 ``ratified=False`` (WARN-only downstream) until the registry is machine-readable and

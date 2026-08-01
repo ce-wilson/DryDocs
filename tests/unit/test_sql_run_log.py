@@ -17,6 +17,7 @@ from __future__ import annotations
 import sys
 import types
 from pathlib import Path
+from typing import ClassVar
 
 import pytest
 
@@ -150,7 +151,9 @@ def test_run_log_failure_recorded(tmp_path, monkeypatch):
 
 
 class _FakeCursor:
-    description = [("FOLDER_NAME", None), ("JOB_COUNT", None)]
+    # Shared across instances on purpose — it mirrors DB-API's cursor.description,
+    # which the adapter only ever reads.
+    description: ClassVar[list[tuple[str, None]]] = [("FOLDER_NAME", None), ("JOB_COUNT", None)]
     arraysize = 0
 
     def __init__(self):

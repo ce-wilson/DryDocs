@@ -132,7 +132,7 @@ def test_no_duplicate_node_classification_labels() -> None:
     node_classifications; a label must classify exactly once."""
     doc = yaml.safe_load(VOCAB_FILE.read_text(encoding="utf-8"))
     labels = [n["label"] for n in doc["node_classifications"]]
-    dupes = [l for l, n in Counter(labels).items() if n > 1]
+    dupes = [label for label, n in Counter(labels).items() if n > 1]
     assert not dupes, f"duplicate node_classifications labels: {dupes}"
 
 

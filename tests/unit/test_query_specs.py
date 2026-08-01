@@ -243,7 +243,7 @@ def test_jsonl_export_watermarks_ddcontext_and_reports_trust_tier():
     token = _token(store)
     job = export_spec("context.label-census.v1", {}, "jsonl", token, store, runner, ledger)
     lines = "".join(job.chunks).splitlines()
-    assert len(lines) == 1  # internal-public â†’ no banner object
+    assert len(lines) == 1  # internal-public -> no banner object
     row = json.loads(lines[0])
     assert row[WATERMARK_COLUMN].startswith("SYNTHESIZED")
 

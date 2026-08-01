@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+import dataclasses
+
 import pytest
 
 try:
@@ -233,7 +235,10 @@ def test_write_board_writes_file(tmp_path) -> None:
 def test_phase_and_workitem_dataclasses_are_frozen() -> None:
     phase = Phase(id=0, title="t")
     item = WorkItem(id="A1", title="t")
-    with pytest.raises(Exception):
+    # FrozenInstanceError specifically, not bare Exception: the point of the test
+    # is that frozen-ness rejects the write, and `Exception` would pass just as
+    # happily on a typo'd attribute name or an unrelated TypeError.
+    with pytest.raises(dataclasses.FrozenInstanceError):
         phase.title = "changed"  # type: ignore[misc]
-    with pytest.raises(Exception):
+    with pytest.raises(dataclasses.FrozenInstanceError):
         item.title = "changed"  # type: ignore[misc]

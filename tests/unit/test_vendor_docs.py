@@ -267,9 +267,10 @@ def test_cypher_writes_the_spine():
         assert token in cypher, f"missing {token}"
 
 
-def test_cypher_writes_NO_meaning_edges():
-    """Q13 is taxonomy only. These belong to Q14's gate (and G32 for the
-    estate join, since a relationship cannot span Neo4j databases)."""
+def test_cypher_writes_no_meaning_edges():
+    """Q13 is taxonomy only — the loader writes NOT ONE meaning edge. Those
+    belong to Q14's gate (and G32 for the estate join, since a relationship
+    cannot span Neo4j databases)."""
     body = "\n".join(
         line
         for line in CYPHER.read_text(encoding="utf-8").splitlines()

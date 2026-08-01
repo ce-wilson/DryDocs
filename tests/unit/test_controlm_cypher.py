@@ -48,7 +48,9 @@ def test_cypher_uses_unwind_batch(name: str) -> None:
 @pytest.mark.parametrize("name", ALL_CYPHERS)
 def test_cypher_idempotent_merge(name: str) -> None:
     text = (CYPHER_DIR / name).read_text(encoding="utf-8")
-    body = "\n".join(l for l in text.splitlines() if l.strip() and not l.strip().startswith("//"))
+    body = "\n".join(
+        line for line in text.splitlines() if line.strip() and not line.strip().startswith("//")
+    )
     assert "MERGE" in body
     assert not re.findall(r"^\s*CREATE\s+\(", body, re.MULTILINE)
 
@@ -242,7 +244,9 @@ def test_hosts_cypher_merges_the_gated_topology() -> None:
     assert "CONTAINS_HOST" in text
     assert "m.participation_type = row.participation_type" in text
     assert "last_capture_date" in text
-    body = "\n".join(l for l in text.splitlines() if l.strip() and not l.strip().startswith("//"))
+    body = "\n".join(
+        line for line in text.splitlines() if line.strip() and not line.strip().startswith("//")
+    )
     assert "DEFINED_ON" not in body
     assert "RUNS_ON" not in body
 
@@ -283,7 +287,7 @@ def test_hosts_sql_uses_its_own_scope_binds() -> None:
     :grpname_filter and :row_cap only, and the CLI binds grpname_filter NULL
     (see ingest_controlm's stage_scope special case)."""
     text = (SQL_DIR / "controlm_hosts.sql").read_text(encoding="utf-8")
-    code = "\n".join(l for l in text.splitlines() if not l.strip().startswith("--"))
+    code = "\n".join(line for line in text.splitlines() if not line.strip().startswith("--"))
     assert ":grpname_filter" in code
     assert ":row_cap" in code
     # the folder-grained quartet does not apply at this grain (header comment
@@ -322,7 +326,9 @@ def test_was_generated_by_is_checksum_guarded(name: str) -> None:
     # Exactly one WAS_GENERATED_BY MERGE (comments may still name the label
     # in prose; only count non-comment code lines), and it must live INSIDE
     # the FOREACH body (i.e. conditionally), not before/after it.
-    code_lines = [l for l in text.splitlines() if l.strip() and not l.strip().startswith("//")]
+    code_lines = [
+        line for line in text.splitlines() if line.strip() and not line.strip().startswith("//")
+    ]
     code = "\n".join(code_lines)
     assert code.count("WAS_GENERATED_BY") == 1
     assert "WAS_GENERATED_BY" in text[foreach_start:foreach_end]

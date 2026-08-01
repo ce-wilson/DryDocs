@@ -119,8 +119,8 @@ def test_every_llm_call_appends_one_jsonl_line(tmp_path):
     envelope = _answer(tmp_path)
     ledger_files = list(tmp_path.glob("qa.graph_qa.*.jsonl"))
     assert len(ledger_files) == 1  # in the log dir, never the repo
-    lines = [json.loads(l) for l in ledger_files[0].read_text(encoding="utf-8").splitlines()]
-    calls = [l for l in lines if l["kind"] == "llm_call"]
+    lines = [json.loads(line) for line in ledger_files[0].read_text(encoding="utf-8").splitlines()]
+    calls = [rec for rec in lines if rec["kind"] == "llm_call"]
     assert len(calls) == envelope.metrics.llm_calls == 2  # router + answer
     assert [c["step"] for c in calls] == ["router", "answer"]
     for call in calls:
@@ -145,8 +145,8 @@ def test_run_line_is_the_only_home_of_the_question_text(tmp_path):
     envelope = _answer(tmp_path)
     ledger = LlmLedger(log_dir=tmp_path)
     ledger.run(envelope, "how many applications?")
-    lines = [json.loads(l) for l in ledger.path().read_text(encoding="utf-8").splitlines()]
-    runs = [l for l in lines if l["kind"] == "run"]
+    lines = [json.loads(line) for line in ledger.path().read_text(encoding="utf-8").splitlines()]
+    runs = [rec for rec in lines if rec["kind"] == "run"]
     assert len(runs) == 1
     run = runs[0]
     assert run["question"] == "how many applications?"  # full text: ledger only

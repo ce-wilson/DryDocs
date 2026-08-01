@@ -46,6 +46,7 @@ from __future__ import annotations
 import math
 import re
 from dataclasses import dataclass, field
+from itertools import pairwise
 from pathlib import Path
 
 CYPHER_PATH = Path(__file__).resolve().parent / "cypher" / "patch_window.cypher"
@@ -220,7 +221,7 @@ def quiet_gaps(busy: list[tuple[int, int]]) -> list[tuple[int, int]]:
         else:
             flat.append((s, e))
     flat.sort()
-    gaps = [(e1, s2) for (_, e1), (s2, _) in zip(flat, flat[1:], strict=False) if s2 > e1]
+    gaps = [(e1, s2) for (_, e1), (s2, _) in pairwise(flat) if s2 > e1]
     head, tail = flat[0][0], flat[-1][1]
     # the wrap-around gap: last busy end -> first busy start next morning.
     # Absent exactly when busy coverage touches BOTH midnight boundaries

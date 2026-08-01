@@ -163,21 +163,21 @@ def test_dependencies_resolve_and_are_acyclic() -> None:
                 failures.append(f"[{iid}] depends_on unknown id '{dep}'")
     assert not failures, f"{len(failures)} dependency error(s):\n" + "\n".join(failures)
 
-    # cycle detection (DFS, three-color)
-    WHITE, GRAY, BLACK = 0, 1, 2
-    color = dict.fromkeys(items, WHITE)
+    # cycle detection (DFS, three-color: unvisited / on the current path / done)
+    white, gray, black = 0, 1, 2
+    color = dict.fromkeys(items, white)
 
     def visit(node: str, path: list[str]) -> None:
-        color[node] = GRAY
+        color[node] = gray
         for dep in items[node].get("depends_on", []):
-            if color[dep] == GRAY:
+            if color[dep] == gray:
                 pytest.fail(f"dependency cycle: {' -> '.join([*path, node, dep])}")
-            if color[dep] == WHITE:
+            if color[dep] == white:
                 visit(dep, [*path, node])
-        color[node] = BLACK
+        color[node] = black
 
     for iid in items:
-        if color[iid] == WHITE:
+        if color[iid] == white:
             visit(iid, [])
 
 

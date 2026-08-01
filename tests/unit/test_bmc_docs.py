@@ -232,7 +232,9 @@ def test_cypher_uses_unwind_batch() -> None:
 
 def test_cypher_idempotent_merge_not_create() -> None:
     text = CYPHER_PATH.read_text(encoding="utf-8")
-    body = "\n".join(l for l in text.splitlines() if l.strip() and not l.strip().startswith("//"))
+    body = "\n".join(
+        line for line in text.splitlines() if line.strip() and not line.strip().startswith("//")
+    )
     assert "MERGE" in body
     assert not re.findall(r"^\s*CREATE\s+\(", body, re.MULTILINE)
 
@@ -261,7 +263,9 @@ def test_was_generated_by_is_checksum_guarded_exactly_once() -> None:
     assert close_match, "FOREACH block has no standalone closing paren"
     foreach_end = foreach_start + close_match.end()
 
-    code_lines = [l for l in text.splitlines() if l.strip() and not l.strip().startswith("//")]
+    code_lines = [
+        line for line in text.splitlines() if line.strip() and not line.strip().startswith("//")
+    ]
     code = "\n".join(code_lines)
     assert code.count("WAS_GENERATED_BY") == 1
     assert "WAS_GENERATED_BY" in text[foreach_start:foreach_end]

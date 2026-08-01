@@ -64,11 +64,56 @@ build-backend = "poetry.core.masonry.api"
 [tool.ruff]
 line-length = 100
 target-version = "py311"
+# Vendored Anthropic skill scripts (J10 stage 4). Not our code: docx/pptx/xlsx
+# ship three near-identical copies of the same office validators, and any fix we
+# make here is reverted the next time the skill is re-vendored — so linting them
+# buys churn, not quality. They were 177 of the 362 findings that survived the
+# formatter, 49% of the residual, and every one of the naming hits among them is
+# a required idiom (do_GET/do_POST are BaseHTTPRequestHandler overrides).
+# `.claude/skills/groom-backlog` is OURS and deliberately stays in scope.
+extend-exclude = [
+    ".claude/skills/docx",
+    ".claude/skills/pptx",
+    ".claude/skills/xlsx",
+    ".claude/skills/pdf",
+    ".claude/skills/skill-creator",
+]
 
 [tool.ruff.lint]
 select = ["E", "F", "W", "I", "B", "UP", "N", "RUF"]
-# per-file-ignores land at stage 4, each with a reason comment. Deliberately
-# absent here: stage 0 settles the CONTRACT, it rules on no findings.
+ignore = [
+    # The formatter owns layout. What survives `ruff format` is prose inside
+    # strings, comments and docstrings, which the formatter never wraps — by
+    # design, like Black. Keeping E501 would mean hand-wrapping prose to satisfy
+    # a rule the formatter is already the authority on. Ruled 2026-08-01.
+    "E501",
+    # Every hit is `import xml.etree.ElementTree as ET` — the alias the stdlib's
+    # own documentation uses. Renaming makes the code less recognisable, not more.
+    "N817",
+]
+
+[tool.ruff.lint.per-file-ignores]
+# Typer's API IS a call in the default: `def cmd(x: str = typer.Option(...))`.
+# B008 cannot be satisfied without abandoning the framework's calling convention.
+"drydocs/cli.py" = ["B008"]
+# `pytest.importorskip(...)` must run BEFORE the imports it guards, which is
+# exactly what E402 flags. The guard is the point: these modules skip cleanly
+# when an optional dependency is absent.
+"tests/unit/test_seal_attribution.py" = ["E402"]
+"tests/unit/test_manual_loads.py" = ["E402"]
+# N818 wants an `Error` suffix on exception names. `WriteRejected` and
+# `Forbidden` have 55 call sites between them across drydocs_api, and these same
+# files are cherry-picked onto the company repo's disjoint history — a rename
+# buys a suffix and costs a port collision across every one of those sites.
+# `raise Forbidden(...)` also reads perfectly well. Revisit if drydocs_api ever
+# gets a versioned public API, where the convention would start to earn its keep.
+"drydocs_api/guard.py" = ["N818"]
+"drydocs_api/handlers.py" = ["N818"]
+"scripts/external_vendor_scrape.py" = ["N818"]
+# The alias is the point: `__version__ as APP_VERSION` says at the call site
+# WHICH package's version this is. N812 would have us keep the bare dunder,
+# which is exactly the ambiguity the alias removes.
+"drydocs_api/exports.py" = ["N812"]
 
 [tool.ruff.format]
 # Values are ruff's own defaults, written out on purpose. The formatter's

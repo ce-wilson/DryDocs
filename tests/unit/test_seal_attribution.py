@@ -287,8 +287,8 @@ def test_adapter_counts_malformed_fact_rows_as_rejects() -> None:
 
 def test_automated_cypher_creates_no_nodes() -> None:
     text = AUTOMATED_CYPHER.read_text(encoding="utf-8")
-    code = "\n".join(l for l in text.splitlines() if not l.strip().startswith("//"))
-    merges = [l for l in code.splitlines() if "MERGE" in l]
+    code = "\n".join(line for line in text.splitlines() if not line.strip().startswith("//"))
+    merges = [line for line in code.splitlines() if "MERGE" in line]
     assert len(merges) == 1, "the automated path MERGEs exactly one thing: the edge"
     assert "MERGE (j)-[r:WAS_ASSOCIATED_WITH {role: 'seal_app_ref'}]->(a)" in code
     assert "MATCH (j:ControlMJob {folder_id: row.folder_id, job_id: row.job_id})" in code
@@ -318,7 +318,7 @@ def test_manual_cypher_stamps_manual_provenance_and_guards_node_creation() -> No
     # node creation only inside the SME-authorized FOREACH guard
     assert "FOREACH (_ IN CASE WHEN row.create_target_if_missing THEN [1] ELSE [] END |" in text
     assert "n.manually_created" in text
-    merge_app_lines = [l for l in text.splitlines() if "MERGE (n:BusinessApplication" in l]
+    merge_app_lines = [line for line in text.splitlines() if "MERGE (n:BusinessApplication" in line]
     assert len(merge_app_lines) == 1, "Application MERGE exists only in the FOREACH guard"
 
 
