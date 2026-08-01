@@ -16,8 +16,27 @@ warns. `poetry run ruff format .` before committing, or expect the failure.
 Two settings live in *git config / the working tree*, not in the repo, so each
 clone needs them once. The desktop has had neither applied:
 
-1. `git config blame.ignoreRevsFile .git-blame-ignore-revs` — otherwise every
-   blame on a Python file lands on the stage-3 reformat instead of the author.
+1. `git config blame.ignoreRevsFile .git-blame-ignore-revs` — worth setting, but
+   **the earlier version of this line overstated it and was corrected by
+   measurement** (desktop 2026-08-01, reproduced on the laptop). It claimed
+   blame would otherwise land on the reformat. It mostly does not.
+
+   On `drydocs/cli.py` — the most-reformatted file, untouched since stage 3 —
+   only **41 of 2,055 lines (2%)** trace to the reformat at all, and the setting
+   reattributes **zero** of them: identical counts with the config on and off,
+   and with an explicit `--ignore-rev`. The reason is structural, not a
+   misconfiguration: all 41 are lines the formatter *created* — 14 blank, 27
+   lone `(`/`)` continuation lines from exploding calls across lines — and a
+   line with no earlier version has nothing to reattribute to. The other 98%
+   never pointed at the reformat, because `ruff format` re-wrapped and
+   re-spaced far more than it rewrote.
+
+   Keep the config: it is correct, costs nothing, GitHub's blame view honours
+   the file, and a future reformat that genuinely rewrites lines will have
+   something to reattribute. Just do not expect it to have rescued this one.
+   General rule worth carrying: ignore-revs pays off in proportion to how many
+   *existing* lines a mechanical commit modified, which for a formatter is
+   usually far fewer than the diffstat suggests.
 2. If `ruff format --check .` reports far more files than expected (~315 rather
    than 0), the working tree is CRLF while the index is LF. Fix once:
    `git add --renormalize .`, then delete and re-checkout the tracked `.py`
