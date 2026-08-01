@@ -26,6 +26,32 @@ Tags help grooming: `idea` · `bug` · `doc` · `source` (new data source) · `q
 
 <!-- add new ideas at the top -->
 
+- 2026-08-01 — [question] **We model no Sub-LoB, and the SME fact that closed C17 says it is a
+  real grain with its own numeric id.** The catalog hierarchy runs
+  `BusinessSegment → CatalogLOB → ProductLine → Product → AreaProduct`; the source runs
+  `LoB → Sub-LoB → Product Line → …`, so our chain silently flattens one level. Corroborated
+  three ways: the SME statement (2026-08-01), the FCDO capture's "5-level hierarchy … native
+  IDs at each level", and the company's own catalog gate page which already introduces
+  `:SubLOB` + `HAS_SUB_LOB` ("only CIB and AWM have them") and widens `HAS_PRODUCT_LINE` to
+  `(:SubLOB|:LOB)`. NOT built at C17 on purpose — a new node label + relationship is an
+  ontology decision, and this is the same divergence the parked 2026-07-27 company-catalog
+  back-flow note already owns (its trigger is the COMPANY gate's sign-off). Worth noting the
+  flattening is currently INVISIBLE rather than merely absent: `parent_lob_id` on a product
+  line will carry whatever the extract puts there, so a sub-LoB id would land in a
+  `:CatalogLOB`-keyed field and MERGE a phantom LOB. Fold into that back-flow item when its
+  trigger fires; do not open a second one.
+
+- 2026-08-01 — [bug] **Sweep the remaining silent parent joins in the catalog loaders.** C17
+  fixed `products.cypher`, where a hard `MATCH` on the parent placed AFTER the node `MERGE`
+  left an unparented Product carrying `orphan: false` from `ON CREATE` — a flag no code path
+  could set true. The identical shape survives in `product_lines.cypher` (→ `:CatalogLOB`) and
+  `area_products.cypher` (→ `:Product`). Deliberately not swept at C17: changing four loaders'
+  write behaviour on one item's authority is a drive-by. The sweep is mechanical (OPTIONAL
+  MATCH + per-run flag + the unresolved id kept), but it should also answer the question C17
+  did not: whether the unresolved-parent count belongs in the O28 status envelope as a
+  `drydocs.loader/unresolved-parent` warning rather than only as a node property — which would
+  make it visible on the loads surface instead of only to someone who thinks to query for it.
+
 - 2026-07-31 — [source] **fcdo-frameworks live Confluence scrape (company-side).**
   Registered on-demand in `config/doc-source-registry.yaml` (connector: confluence, T4,
   ddcontext); page-ID target list in `internal/fcdo-reference/README.md`. Priority

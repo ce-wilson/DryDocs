@@ -1,5 +1,16 @@
 // =============================================================================
 // product_lines.cypher  —  Product Lines under CatalogLOBs.
+//
+// :ProductLine is keyed on product_line_id and NOTHING here keys on name (C17
+// §a): the name is written as an attribute only. This loader therefore requires
+// an extract at the product-line grain that carries the id — the PAT team
+// report, which projects the product line as a name, cannot feed it and is not
+// meant to.
+//
+// The parent MATCH below is the same silent-miss shape products.cypher just
+// fixed; sweeping the remaining hierarchy joins is inboxed rather than done
+// here, so one item's authority does not quietly change four loaders.
+//
 // Parameters: $batch (product_line_id, name, parent_lob_id), $run_id,
 //             $loaded_at, $loader, $source_label.
 // =============================================================================

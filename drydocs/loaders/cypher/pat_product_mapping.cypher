@@ -26,6 +26,16 @@
 //      developed_by edges not refreshed by this run — tracked, never frozen.
 //      Scoped to teams in the batch (the D7 scoping philosophy).
 //
+// C17 (2026-08-01) — which report column is which, now that the source report
+// structure has been reviewed. §2's row.area_product_id is the SUPPORTING area
+// product; §3b's row.sponsored_area_product_id is the SPONSORING one. The two
+// sponsoring columns are CO-POPULATED rather than mutually exclusive, so §3a
+// and §3b firing independently is correct and intended, not a latent bug —
+// that was the open question C17 closed, and the answer changed no write here.
+// The report's THIRD sponsoring form, Sponsoring Product Line, is ruled OUT OF
+// SCOPE: it is name-only, and modelling it would mean MERGEing a :ProductLine
+// on a name, which §a forbids outright.
+//
 // Product→HAS_APPLICATION is NO LONGER written here (C9): the row's seal_ids
 // are TEAM-scoped; attributing them to the Product conflated two PAT screens.
 // catalog_has_application stays status: planned until a product-scoped

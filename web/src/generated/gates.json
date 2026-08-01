@@ -325,7 +325,8 @@
       "log_ref": "config/gate-log.md:804",
       "unblocks": [
         "C17",
-        "S3"
+        "S3",
+        "J24"
       ]
     },
     {
@@ -345,7 +346,8 @@
         "S3",
         "G34",
         "G35",
-        "G36"
+        "G36",
+        "J24"
       ]
     },
     {
@@ -420,6 +422,21 @@
         "S3",
         "G33",
         "J25"
+      ]
+    },
+    {
+      "kind": "log-entry",
+      "date": "2026-08-01",
+      "title": "PARTIAL RULING: PAT grain keying (C17; gate `seal-app-ref-edge-reshape` §G6-RIDER)",
+      "status": "recorded",
+      "prompt_files": [
+        "config/gate-prompts/seal-app-ref-edge-reshape.yaml"
+      ],
+      "log_ref": "config/gate-log.md:1136",
+      "unblocks": [
+        "C17",
+        "S3",
+        "J24"
       ]
     },
     {

@@ -519,7 +519,14 @@ datasets:
     replaces: catalog-pat
     notes: >
       The catalog hierarchy feed (LOB→Product→Team; lowest precedence
-      authority). T19 ruling 2026-07-31: named pat:product-catalog —
+      authority). C17 (2026-08-01): this is the ID-CARRYING side — every grain
+      (LoB, Sub-LoB, Product Line, Product, Area Product) has a numeric id at
+      source, and the hierarchy loaders key on those ids, never on names. The
+      product-line rows must come from an extract AT that grain; the sibling
+      pat:people-report projects product lines as names only and cannot feed
+      them. Sub-LoB is a real source grain we do not model yet (ontology
+      decision — see the parked company-catalog back-flow item).
+      T19 ruling 2026-07-31: named pat:product-catalog —
       industry-standard naming matching NEITHER legacy string (catalog-pat /
       pat-catalog), so neither repo's wrong value survives; recorded in the
       docs/port-prompt.md divergence ledger for the company T19 gate.
@@ -544,6 +551,12 @@ datasets:
       arch_develops edge; alignment (supporting area product, else product)
       is VOLATILE and relationship-typed (dedicated|aligned|flex), swept per
       team on each load. SME evidence held in-session (confidential).
+      C17 (2026-08-01): this report carries ID+Name for Product / Supporting
+      Area Product / Sponsoring Area Product / Sponsoring Product, but projects
+      Product Line and Sponsoring Product Line as NAMES ONLY. That is a report
+      projection, not a source limitation — the ids exist upstream. It therefore
+      feeds team alignment and never the product-line grain; Sponsoring Product
+      Line stays unmodelled while it is name-only.
 
   # ---- ServiceNow (Q4 — registers now, typed SaaS) ---------------------------
   - id: "snow:cmdb-ci-classes"

@@ -1132,3 +1132,74 @@ list in `config/source-registry.yaml` refuses every old id from here on.
 example), `controlm@[db].psgmgr.cm_hist_vw` (gives jobrun-observation a citable feed),
 `snow` system + `snow:cmdb-ci-classes` (Q4). Anything that would CHANGE meaning (not rename)
 goes back to the SME — none arose.
+
+## 2026-08-01 — PARTIAL RULING: PAT grain keying (C17; gate `seal-app-ref-edge-reshape` §G6-RIDER)
+
+**Scope of this entry.** The §G6-RIDER questions only. The
+`seal-app-ref-edge-reshape` gate as a whole is **still unsigned** — nothing in
+§A–§F or the rest of §G is ruled here, and §H is untouched. This is logged as a
+partial ruling rather than a sign-off because the SME answered one rider's
+question in-chat, not the gate.
+
+**The SME fact that decided it (2026-08-01, user, in-chat):** on the company
+side **LoB, Sub-LoB, Product Line, Product and Area Product each carry a numeric
+ID field.**
+
+That inverts the rider's premise. The rider read the PAT team report's name-only
+Product Line column as a property of the SOURCE; it is a property of the REPORT.
+The id exists at every grain — the team report just does not project it.
+
+- **§a — RULED: option (a). A product-line-scoped extract supplies
+  `product_line_id`.** Name → id resolution (option b) is **not** adopted as the
+  mechanism. It survives only as a bounded migration path for extracts already
+  captured without the column, and even then reports ambiguity counts rather
+  than picking a winner. `ProductLineRow.product_line_id` stays REQUIRED, which
+  is what makes the ruling executable: while it is required, the name-only team
+  report cannot load product lines at all, so a name cannot become the de-facto
+  key by accident. Corroborated independently of the SME by
+  `internal/fcdo-reference` (the PAT-catalog artifact described as a 5-level
+  hierarchy with "native IDs at each level") and by the company's own 5-field
+  `pat_lob_sublob_productline.csv` — an extract already at that grain.
+- **§b — RECORDED: `area_product_id` is the SUPPORTING area product.**
+  Sponsoring rides `sponsored_area_product_id`. The field name stays
+  unqualified deliberately: the qualification is REPORT-SPECIFIC (a sibling
+  member-level report carries a plain unqualified "Area Product" meaning the
+  supporting one), so the unqualified name is the union of both spellings and
+  the field description is the join key. The two sponsoring columns are
+  **co-populated, not exclusive** — cypher §3a/§3b firing independently is
+  correct and intended. No write changed.
+- **§c — RULED OUT OF SCOPE: Sponsoring Product Line.** The third sponsoring
+  form is name-only, and modelling it would mean MERGEing a `:ProductLine` on a
+  name — exactly what §a forbids. It becomes modellable the day the extract
+  carries a sponsoring product-line ID, and not before. Closes C9 §d's coverage
+  question.
+- **§d — BUILT.** `_catalog_id` on every id field across the catalog row models;
+  `products.cypher` reworked; drift guards in `tests/unit/test_catalog_keying.py`.
+
+**What the fact exposed that the rider did not ask about.** Our node keys are
+strings and pydantic v2 does not coerce a number to a string, so a numerically
+typed read of the real feed rejected **every** catalog row, not some of them —
+verified against the shipped models before the fix. `attribution.py` already
+carried this coercion for the Control-M keys; the catalog loaders never got it.
+The coercion refuses a fractional id rather than rounding it, and normalizes
+integral floats (a nullable numeric column read through pandas arrives as
+float64, where a blind `str()` keys the node `'12345.0'` and MERGEs a duplicate
+beside the real one).
+
+**Corollary applied, and its limit.** Having ruled the join is BY ID, the id
+join must not fail silently either — otherwise the silence just moves from
+"which key?" to "did it match?". `products.cypher` had a hard `MATCH` on the
+parent placed AFTER the Product `MERGE`, so an unresolvable parent produced a
+real Product with no parent edge and `orphan: false` still set from `ON CREATE`
+— unparented and reporting itself as fine, with an `orphan` flag no code path
+could ever set true. It is now `OPTIONAL MATCH` + a per-run flag plus
+`orphan_parent_product_line_id`, so the gap is a query. The **identical shape in
+`product_lines.cypher` and `area_products.cypher` was left alone and inboxed**:
+changing four loaders' write behaviour on one item's authority is the drive-by
+this log exists to prevent.
+
+**NOT decided here.** The SME fact names a **Sub-LoB** grain we do not model at
+all (no `:SubLOB`, not even `status: planned`). Introducing it is an ontology
+decision, and it already belongs to the parked company-catalog back-flow item
+(`IDEAS.md`, 2026-07-27) whose trigger is the COMPANY gate's own sign-off.
+Recorded, not built.

@@ -9,12 +9,20 @@ Target hierarchy:
 Row models are defined here alongside their loaders. When the team confirms
 exact catalog table names + column names, only the SQL SELECT in each loader
 needs to change — the model field names stay constant.
+
+KEYING (C17, gate `seal-app-ref-edge-reshape` §G6-RIDER, 2026-08-01). Every
+grain in this hierarchy — LOB, Sub-LOB, Product Line, Product, Area Product —
+carries a NUMERIC id at source. Our node keys are strings, so every id field
+below runs through ``_catalog_id``: the ids arrive as numbers and pydantic v2
+does not coerce a number to a string. A name is NEVER a key here; see the
+ruling in ``config/gate-log.md``.
 """
 
 from __future__ import annotations
 
 from collections.abc import Iterable
 from datetime import date
+from decimal import Decimal, InvalidOperation
 from pathlib import Path
 from typing import Any, ClassVar
 
@@ -59,6 +67,47 @@ def resolve_lob_reconciliation(
         "reconcile_authority": res.authority,
         "reconcile_aliases": res.alias_strings(),
     }
+
+
+def _catalog_id(v: Any) -> Any:
+    """Coerce a source catalog id to its canonical string node-key form.
+
+    The catalog grains are NUMERIC at source (C17 §a) while every node key here
+    is a string, and pydantic v2 — unlike v1 — refuses int -> str. Without this
+    validator an Oracle NUMBER column or a numerically-typed CSV read rejects
+    EVERY row of a catalog load, not some of them. ``attribution.py`` already
+    carries the same coercion for the Control-M keys ("Coerce Oracle NUMBER /
+    int inputs to the stripped-string node-key form") — the catalog loaders
+    simply never got it.
+
+    A blind ``str(v)`` is not good enough, and that is the whole reason this is
+    a function rather than one line: a nullable numeric column read through
+    pandas comes back as float64, so ``str(12345.0)`` yields ``'12345.0'`` —
+    an id that matches NOTHING and MERGEs a duplicate node beside the real one.
+    Integral floats/Decimals therefore normalize to their integer form, and a
+    genuinely fractional value is REFUSED rather than rounded: an id with a
+    fractional part is corruption, and guessing at it is how a bad join becomes
+    permanent.
+    """
+    if v is None:
+        return None
+    if isinstance(v, bool):
+        # bool is an int subclass — True would silently key a node as '1'
+        raise ValueError("a boolean is not a catalog id")
+    if isinstance(v, str):
+        return v.strip()
+    if isinstance(v, int | float | Decimal):
+        try:
+            number = Decimal(str(v))
+        except InvalidOperation as exc:  # NaN / Infinity
+            raise ValueError(f"{v!r} is not a usable catalog id") from exc
+        if number != number.to_integral_value():
+            raise ValueError(
+                f"catalog id {v!r} has a fractional part — refusing to coerce "
+                "(rounding would invent a key)"
+            )
+        return str(int(number))
+    return str(v).strip()
 
 
 def _date_or_none(v: Any) -> date | None:
@@ -106,13 +155,34 @@ class CatalogLOBRow(BaseModel):
     )
     reconcile_confidence: float | None = Field(None, ge=0.0, le=1.0)
 
+    @field_validator("lob_id", mode="before")
+    @classmethod
+    def _ids(cls, v: Any) -> Any:
+        return _catalog_id(v)
+
 
 class ProductLineRow(BaseModel):
+    """A Product Line, keyed on the source's numeric product_line_id.
+
+    ``product_line_id`` is REQUIRED and stays required — that is the executable
+    half of the C17 §a ruling. The PAT team report projects this grain as a NAME
+    with no id column, and a name is exactly what must not become the key here:
+    product lines are renamed and near-duplicate names exist, so a name-keyed
+    join silently re-points a confirmed mapping the next time someone edits a
+    label. The id exists at source; the fix is to extract it, not to key on what
+    the report happened to project.
+    """
+
     model_config = ConfigDict(populate_by_name=True, str_strip_whitespace=True, extra="ignore")
 
     product_line_id: str = Field(..., min_length=1)
     name: str = Field(..., min_length=1)
     parent_lob_id: str = Field(..., min_length=1)
+
+    @field_validator("product_line_id", "parent_lob_id", mode="before")
+    @classmethod
+    def _ids(cls, v: Any) -> Any:
+        return _catalog_id(v)
 
 
 class ProductRow(BaseModel):
@@ -121,6 +191,11 @@ class ProductRow(BaseModel):
     product_id: str = Field(..., min_length=1)
     name: str = Field(..., min_length=1)
     parent_product_line_id: str = Field(..., min_length=1)
+
+    @field_validator("product_id", "parent_product_line_id", mode="before")
+    @classmethod
+    def _ids(cls, v: Any) -> Any:
+        return _catalog_id(v)
 
 
 class DevTeamRow(BaseModel):
@@ -141,10 +216,21 @@ class DevTeamRow(BaseModel):
         ),
     )
 
+    @field_validator("team_id", "parent_product_id", "jira_board_id", mode="before")
+    @classmethod
+    def _ids(cls, v: Any) -> Any:
+        return _catalog_id(v)
+
 
 class AreaProductRow(BaseModel):
     """Area Product Group (Team of Teams) — intermediate between Product and
-    DevTeam in the PAT/Align hierarchy."""
+    DevTeam in the PAT/Align hierarchy.
+
+    This is the hierarchy grain (one row per area product). It is UNQUALIFIED
+    on purpose: Supporting vs Sponsoring is a property of a TEAM's relationship
+    to an area product, not of the area product itself — see
+    ``PatProductMappingRow`` for where that qualification lives (C17 §b).
+    """
 
     model_config = ConfigDict(populate_by_name=True, str_strip_whitespace=True, extra="ignore")
 
@@ -152,19 +238,47 @@ class AreaProductRow(BaseModel):
     name: str = Field(..., min_length=1)
     parent_product_id: str = Field(..., min_length=1)
 
+    @field_validator("area_product_id", "parent_product_id", mode="before")
+    @classmethod
+    def _ids(cls, v: Any) -> Any:
+        return _catalog_id(v)
+
 
 _VALID_TEAM_TYPES = {"aligned", "flex", "dedicated"}
 
 
 class PatProductMappingRow(BaseModel):
     """PAT product mapping — links DevTeam to home Product, optional AreaProduct,
-    and SEAL applications. Records team type and sponsored status."""
+    and SEAL applications. Records team type and sponsored status.
+
+    C17 §b — WHICH SOURCE COLUMN FEEDS ``area_product_id``. The team report
+    splits its area-product columns into **Supporting** and **Sponsoring**;
+    ``area_product_id`` is the SUPPORTING one (the team's own alignment) and
+    ``sponsored_area_product_id`` is the Sponsoring one. The field name is
+    unqualified for a reason worth stating rather than fixing by rename: the
+    qualification is REPORT-SPECIFIC — a sibling member-level report carries a
+    plain "Area Product" with no split at all, and it means the supporting one.
+    So the unqualified name is the union of both spellings and this docstring is
+    the join key; a rename to ``supporting_area_product_id`` would read as if the
+    member report had a column it does not have.
+
+    C17 §c — the THIRD sponsoring form is OUT OF SCOPE. The team report also
+    carries **Sponsoring Product Line**, beyond the two sponsoring forms C9 §d
+    modelled. It is deliberately absent here: that column is NAME-ONLY, and
+    modelling it would require keying a :ProductLine by name — precisely what
+    §a forbids. It becomes modellable the day the extract carries a sponsoring
+    product-line ID, and not before. Note ``extra="ignore"`` means the column is
+    silently dropped when present, which is the intended handling but is only
+    visible because it is written down here.
+    """
 
     model_config = ConfigDict(populate_by_name=True, str_strip_whitespace=True, extra="ignore")
 
     team_id: str = Field(..., min_length=1)
     product_id: str = Field(..., min_length=1)
-    area_product_id: str | None = None
+    area_product_id: str | None = Field(
+        None, description="PAT Supporting Area Product — the team's alignment target (C17 §b)."
+    )
     seal_ids: str | None = Field(
         None,
         description="SEAL app IDs (team-scoped; feeds arch_develops). Comma- or "
@@ -176,6 +290,18 @@ class PatProductMappingRow(BaseModel):
     sponsored_area_product_id: str | None = Field(
         None, description="PAT Sponsoring Area Product (C9 gate 2026-07-18)."
     )
+
+    @field_validator(
+        "team_id",
+        "product_id",
+        "area_product_id",
+        "sponsored_product_id",
+        "sponsored_area_product_id",
+        mode="before",
+    )
+    @classmethod
+    def _ids(cls, v: Any) -> Any:
+        return _catalog_id(v)
 
     @field_validator("seal_ids", mode="before")
     @classmethod
@@ -206,6 +332,11 @@ class PatTeamRoleRow(BaseModel):
     role_id: str = Field(..., min_length=1)
     valid_from: str | None = None
     valid_to: str | None = None
+
+    @field_validator("team_id", "employee_sid", "role_id", mode="before")
+    @classmethod
+    def _ids(cls, v: Any) -> Any:
+        return _catalog_id(v)
 
 
 class CatalogLOBsLoader(BaseLoader):
