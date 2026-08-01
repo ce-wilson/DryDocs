@@ -35,7 +35,8 @@ is the WHY + the acceptance oracle; this prompt is sequencing + delta context on
   **PORT-REPORT-57914bf4** — range `e60822fc..57914bf4`, 55 commits, scoped
   TREE-RECONCILE. Landed as merge `7b85a034` (`--no-ff`; pre-port baseline
   `7ffd430c` preserved as FIRST PARENT — which is what makes `git show
-  7ffd430c:<path>` a durable pointer from any clone). Company acceptance:
+  7ffd430c:<path>` a durable pointer from any clone), and **pushed to company
+  origin 2026-08-01** (reported, not producer-verifiable). Company acceptance:
   Track-1 `120 / 3 / 0`, full `1569 / 24 / 0`.
 - **Steps 50 + 51 applied in full**, collapsed: 50 — manifest row, J21 registry
   hardening, T19 capture, registry-redesign directive, Unity Catalog note.

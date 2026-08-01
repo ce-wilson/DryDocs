@@ -78,12 +78,18 @@ producer-side is waiting on it. Instructions are unchanged and now current in
 that doc: stages 1–3 regenerate locally, 0 and 4 port, 5 ports but only once
 their own residuals hit zero.
 
-## 3. Still open from the previous handoff — please confirm
+## 3. The cross-repo port is CLOSED — nothing outstanding
 
-`PORT-REPORT-57914bf4` merged company-side as `7b85a034` but, as of the desktop's
-2026-08-01 note, **had not been pushed to company origin**. That is the user's
-call and cannot be verified from the producer side. If it still has not happened,
-the port exists in exactly one place.
+`PORT-REPORT-57914bf4` merged company-side as `7b85a034` **and was pushed**
+(confirmed 2026-08-01; `origin/main` at `7b85a034`, 0 commits between, parents
+`7ffd430c` first + `e2cf3485` — the intended `--no-ff` non-fast-forward shape).
+The producer ledger, T19 narrowing and the four v2 divergence rows are all rolled
+(`3882db5`). No producer-side item is waiting on the company.
+
+*Recorded as REPORTED, not verified.* The producer cannot see that repo, and the
+company session carrying the confirmation was deleted after it was read — so this
+line is the record. Same reason T11 went stale: a fact whose only home is a chat
+stops existing when the chat does.
 
 ## 4. Ritual state
 
