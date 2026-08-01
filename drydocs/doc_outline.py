@@ -46,7 +46,7 @@ import yaml
 #: ``<!-- anchor: some-id -->`` section marker, and DERIVED_ANCHOR_SEP is the
 #: L11 ``--`` separator (design_doc._inject_subsection_anchors) — RESERVED,
 #: never use a double hyphen inside an authored anchor id.
-from drydocs_core.doc_anchors import ANCHOR_RE, DERIVED_ANCHOR_SEP  # noqa: E402
+from drydocs_core.doc_anchors import ANCHOR_RE, DERIVED_ANCHOR_SEP
 
 
 def feedback_anchor_valid(anchor: str, md: str) -> bool:

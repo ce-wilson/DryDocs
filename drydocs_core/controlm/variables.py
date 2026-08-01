@@ -44,7 +44,7 @@ are canonicalized, not resolved). The doc's name/value constraint table
 from __future__ import annotations
 
 import re
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from enum import Enum
 
 from .commands import is_registered_launcher
@@ -261,7 +261,7 @@ class ClassifiedVariable:
         are excluded: they canonicalize to symbolic tokens, not lookups."""
         return self.plain_refs + self.dollar_refs
 
-    def with_env_tag(self, env_tag: str) -> "ClassifiedVariable":
+    def with_env_tag(self, env_tag: str) -> ClassifiedVariable:
         return ClassifiedVariable(**{**self.__dict__, "env_tag": env_tag})
 
 

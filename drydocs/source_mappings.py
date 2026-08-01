@@ -20,9 +20,10 @@ resolve-at-move rule).
 """
 from __future__ import annotations
 
+from collections.abc import Iterable
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any, Iterable
+from typing import Any
 
 import yaml
 
@@ -173,7 +174,7 @@ class SourceMapping:
     objects_by_name: dict[str, MappedObject]
 
     @classmethod
-    def load(cls, path: str | Path) -> "SourceMapping":
+    def load(cls, path: str | Path) -> SourceMapping:
         """Load and validate a source-mapping YAML file at an explicit path."""
         path = Path(path)
         if not path.exists():
@@ -184,12 +185,12 @@ class SourceMapping:
     @classmethod
     def load_source(
         cls, source_id: str, base_dir: str | Path = DEFAULT_SOURCE_MAPPINGS_DIR
-    ) -> "SourceMapping":
+    ) -> SourceMapping:
         """Load ``<base_dir>/<source_id>.yaml`` — the registry-id-keyed convenience path."""
         return cls.load(Path(base_dir) / f"{source_id}.yaml")
 
     @classmethod
-    def from_dict(cls, doc: dict[str, Any]) -> "SourceMapping":
+    def from_dict(cls, doc: dict[str, Any]) -> SourceMapping:
         schema = doc.get("schema")
         if schema != SCHEMA_ID:
             raise SourceMappingError(

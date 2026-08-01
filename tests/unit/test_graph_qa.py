@@ -34,7 +34,6 @@ for entry in (str(REPO_ROOT / "agents"), str(REPO_ROOT)):
 
 from common import specs_catalog  # noqa: E402
 from graph_qa import pipeline as pl  # noqa: E402
-from graph_qa.envelope import Envelope  # noqa: E402
 from graph_qa.providers import LlmReply, LlmUsage, extract_usage  # noqa: E402
 from graph_qa.schema_context import MAX_PROMPT_CHARS, build_schema_prompt  # noqa: E402
 

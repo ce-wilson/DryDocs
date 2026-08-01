@@ -18,7 +18,7 @@ import hashlib
 import json
 import logging
 import uuid
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta
 from typing import TYPE_CHECKING, Any
 
 if TYPE_CHECKING:
@@ -30,7 +30,7 @@ LOGGER = logging.getLogger(__name__)
 class SnapshotWriter:
     """Materializes :ApplicationSnapshot / :ProductSnapshot / :CatalogLOBSnapshot."""
 
-    def __init__(self, client: "Neo4jClient") -> None:
+    def __init__(self, client: Neo4jClient) -> None:
         self.client = client
 
     # ---- public API ------------------------------------------------------
@@ -101,7 +101,7 @@ class SnapshotWriter:
     def prune_older_than(self, retention_years: int = 5) -> dict[str, int]:
         """Delete snapshots older than the retention window, keeping the most
         recent one per entity regardless of age."""
-        cutoff = (datetime.now(timezone.utc) - timedelta(days=365 * retention_years)).date().isoformat()
+        cutoff = (datetime.now(UTC) - timedelta(days=365 * retention_years)).date().isoformat()
         deleted = {}
         for label in ("ApplicationSnapshot", "ProductSnapshot", "CatalogLOBSnapshot"):
             rows = self.client.run(
@@ -161,7 +161,7 @@ class SnapshotWriter:
                 continue
 
             snapshot_id = str(uuid.uuid4())
-            now_iso = datetime.now(timezone.utc).replace(microsecond=0).isoformat()
+            now_iso = datetime.now(UTC).replace(microsecond=0).isoformat()
 
             self.client.run(
                 f"""

@@ -56,8 +56,8 @@ Semantics (external/orchestration/bmc-controlm/controlm-variables.md + observed 
 from __future__ import annotations
 
 import re
+from collections.abc import Iterable, Sequence
 from dataclasses import dataclass
-from typing import Iterable, Sequence
 
 from .variables import ENV_LETTER_MAP, _is_system_func, _is_system_var
 
@@ -100,7 +100,7 @@ class _Env:
     def bind(self, name: str, value: str) -> None:
         self._bindings[name] = value
 
-    def clone(self) -> "_Env":
+    def clone(self) -> _Env:
         other = _Env()
         other._bindings = dict(self._bindings)
         return other

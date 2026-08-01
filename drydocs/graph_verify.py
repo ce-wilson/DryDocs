@@ -15,10 +15,11 @@ test. Real acceptance suites (internal counts/IDs) live in a gitignored twin.
 """
 from __future__ import annotations
 
+from collections.abc import Iterable
 from dataclasses import dataclass, field
 from enum import Enum
 from pathlib import Path
-from typing import Any, Iterable, Protocol, runtime_checkable
+from typing import Any, Protocol, runtime_checkable
 
 import yaml
 

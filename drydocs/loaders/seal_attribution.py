@@ -33,9 +33,10 @@ unresolved (counted, never guessed) until a table is wired company-side.
 from __future__ import annotations
 
 import logging
+from collections.abc import Iterable, Iterator, Mapping
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import TYPE_CHECKING, Any, ClassVar, Iterable, Iterator, Mapping
+from typing import TYPE_CHECKING, Any, ClassVar
 
 from pydantic import ValidationError
 
@@ -328,7 +329,7 @@ class SealAttributionAdapter:
         self.coverage: AttributionCoverage | None = None
         self.fact_rejects: list[dict] = []
 
-    def __enter__(self) -> "SealAttributionAdapter":
+    def __enter__(self) -> SealAttributionAdapter:
         enter = getattr(self.inner, "__enter__", None)
         if enter is not None:
             enter()
@@ -426,7 +427,7 @@ class SealAttributionLoader(BaseLoader):
 # Live-graph helpers (thin; the CLI wires these into the adapter)
 # ---------------------------------------------------------------------------
 
-def fetch_pinned_attributions(client: "Neo4jClient") -> dict[tuple[str, str], str]:
+def fetch_pinned_attributions(client: Neo4jClient) -> dict[tuple[str, str], str]:
     """Jobs carrying a manually-asserted seal_app_ref edge (gate §F: PIN)."""
     rows = client.run(
         """
@@ -440,7 +441,7 @@ def fetch_pinned_attributions(client: "Neo4jClient") -> dict[tuple[str, str], st
     }
 
 
-def fetch_app_name_reconciler(client: "Neo4jClient") -> dict[str, str]:
+def fetch_app_name_reconciler(client: Neo4jClient) -> dict[str, str]:
     """APP_NAME tier table from the loaded SEAL reference (exact, normalized
     match on Application.name / app_short_name). Ambiguous names — two
     applications sharing one normalized name — are dropped from the table:
@@ -476,7 +477,7 @@ def fetch_app_name_reconciler(client: "Neo4jClient") -> dict[str, str]:
     return table
 
 
-def check_sequencing_preconditions(client: "Neo4jClient") -> tuple[int, int]:
+def check_sequencing_preconditions(client: Neo4jClient) -> tuple[int, int]:
     """Gate §E: the loader runs only after jobs + SEAL reference exist.
     Returns (job_count, application_count); the CLI refuses on zeros."""
     rows = client.run(

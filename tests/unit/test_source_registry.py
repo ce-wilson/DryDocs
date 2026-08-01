@@ -22,13 +22,13 @@ try:
     import yaml
 
     from drydocs_core.source_registry import (
+        DEFAULT_REGISTRY_PATH,
         DuplicateSourceIdError,
         OverlayBindingError,
         RetiredSourceIdError,
         SourceRegistry,
         UnconfirmedSourceError,
         UnknownSourceError,
-        DEFAULT_REGISTRY_PATH,
     )
 
     _AVAILABLE = True

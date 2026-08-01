@@ -218,7 +218,7 @@ def quiet_gaps(busy: list[tuple[int, int]]) -> list[tuple[int, int]]:
     flat.sort()
     gaps = [
         (e1, s2)
-        for (_, e1), (s2, _) in zip(flat, flat[1:])
+        for (_, e1), (s2, _) in zip(flat, flat[1:], strict=False)
         if s2 > e1
     ]
     head, tail = flat[0][0], flat[-1][1]

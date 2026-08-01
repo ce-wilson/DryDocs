@@ -19,7 +19,6 @@ from drydocs_core.models import (
     ControlMJobRow,
 )
 
-
 # ---- compute_row_checksum, in isolation ------------------------------------
 
 def test_same_row_same_hash() -> None:

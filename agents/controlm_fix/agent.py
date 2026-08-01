@@ -7,9 +7,8 @@ proposes a remediation plan. Read-only: fixes are executed by humans/tooling.
 
 import os
 
-from google.adk.agents.llm_agent import Agent
-
 from common.neo4j_tool import graph_schema, read_cypher
+from google.adk.agents.llm_agent import Agent
 
 root_agent = Agent(
     model=os.getenv("ADK_MODEL", "gemini-flash-latest"),

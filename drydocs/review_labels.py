@@ -51,7 +51,7 @@ class ReviewLabels:
         self.classification = classification
 
     @classmethod
-    def load(cls, path: str | Path = DEFAULT_REVIEW_LABELS_PATH) -> "ReviewLabels":
+    def load(cls, path: str | Path = DEFAULT_REVIEW_LABELS_PATH) -> ReviewLabels:
         path = Path(path)
         if not path.exists():
             raise ReviewLabelsError(f"review-labels file not found: {path}")
@@ -59,7 +59,7 @@ class ReviewLabels:
         return cls.from_dict(doc)
 
     @classmethod
-    def from_dict(cls, doc: dict[str, Any]) -> "ReviewLabels":
+    def from_dict(cls, doc: dict[str, Any]) -> ReviewLabels:
         raw_sources = doc.get("sources")
         if not isinstance(raw_sources, list):
             raise ReviewLabelsError("review-labels.yaml must contain a `sources:` list")

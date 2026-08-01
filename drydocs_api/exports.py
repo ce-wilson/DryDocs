@@ -27,7 +27,7 @@ import secrets
 from collections import OrderedDict
 from collections.abc import Iterable, Iterator, Mapping
 from dataclasses import dataclass
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 
 from drydocs_api.ephemeral_specs import EphemeralSpecStore, is_ephemeral_ref
 from drydocs_api.guard import ensure_read_only
@@ -223,7 +223,7 @@ def export_spec(
     bound = {**fixed, **validate_params(spec, params)}
     ensure_read_only(spec.cypher)
     export_id = secrets.token_urlsafe(12)
-    executed_at = (now or datetime.now(timezone.utc)).isoformat(timespec="seconds")
+    executed_at = (now or datetime.now(UTC)).isoformat(timespec="seconds")
 
     def chunks() -> Iterator[str]:
         keys, rows = _rows_iter(runner, spec, bound)

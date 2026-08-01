@@ -13,12 +13,14 @@ true — a USES_SOFTWARE edge from the reserved DryDocs :BusinessApplication nod
 """
 from __future__ import annotations
 
+from collections.abc import Iterator
 from pathlib import Path
-from typing import TYPE_CHECKING, ClassVar, Iterator
+from typing import TYPE_CHECKING, ClassVar
 
 import yaml
 
 from drydocs_core.models.registry import SoftwareProductRow
+
 from .base import BaseLoader
 
 if TYPE_CHECKING:  # pragma: no cover
@@ -41,14 +43,14 @@ class RegistryYamlAdapter:
     def __init__(self, path: Path | str = DEFAULT_REGISTRY_PATH) -> None:
         self.path = Path(path)
 
-    def __enter__(self) -> "RegistryYamlAdapter":
+    def __enter__(self) -> RegistryYamlAdapter:
         return self
 
     def __exit__(
         self,
         exc_type: type[BaseException] | None,
         exc: BaseException | None,
-        tb: "TracebackType | None",
+        tb: TracebackType | None,
     ) -> None:
         return None
 

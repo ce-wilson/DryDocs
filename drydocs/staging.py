@@ -18,15 +18,15 @@ are still emitted on STG_VARIABLE only.
 from __future__ import annotations
 
 import json
+from collections.abc import Iterable
 from dataclasses import dataclass, field
-from typing import Iterable
 
-from drydocs_core.models import ControlMVariableRow
 from drydocs_core.controlm.commands import extract_container_command, parse_command
 from drydocs_core.controlm.facts import route_fact
 from drydocs_core.controlm.paths import build_file_ref
 from drydocs_core.controlm.resolver import ResolvedVariable, resolve_job
 from drydocs_core.controlm.variables import ClassifiedVariable, VariableKind, classify_job_variables
+from drydocs_core.models import ControlMVariableRow
 
 _ENV_NAME_TO_LETTER = {"Development": "D", "QA": "Q", "Production": "P"}
 
@@ -229,7 +229,7 @@ def build_staging_bundle(
         counters = {"inv": 0, "fop": 0}
         var_resolved = 0
         job_unresolved: list[str] = []
-        for ordinal, (cv, rv) in enumerate(zip(classified, resolved), start=1):
+        for ordinal, (cv, rv) in enumerate(zip(classified, resolved, strict=False), start=1):
             bundle.variable.append(_stg_variable_row(jd, run_id, ordinal, cv, rv))
             var_resolved += rv.is_fully_resolved
             job_unresolved.extend(rv.unresolved)

@@ -18,10 +18,6 @@ as a grouped namespace; see that module for the convenience re-exports.
 """
 from .base import BaseLoader, LoadSummary
 
-# SEAL
-from .seal_applications import SealApplicationsLoader
-from .seal_contacts import SealContactsLoader
-
 # Catalog
 from .catalog import (
     CatalogLOBsLoader,
@@ -40,6 +36,10 @@ from .controlm import (
     ControlMHostsLoader,
     ControlMJobsLoader,
 )
+
+# SEAL
+from .seal_applications import SealApplicationsLoader
+from .seal_contacts import SealContactsLoader
 
 __all__ = [
     "BaseLoader",

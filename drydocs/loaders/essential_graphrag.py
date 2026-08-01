@@ -33,13 +33,15 @@ faithful derivation of the published book, not byte-VERBATIM.
 from __future__ import annotations
 
 import re
+from collections.abc import Iterator, Mapping, Sequence
 from dataclasses import dataclass
 from pathlib import Path
-from typing import TYPE_CHECKING, ClassVar, Iterator, Mapping, Sequence
+from typing import TYPE_CHECKING, ClassVar
 
 from pydantic import BaseModel
 
 from drydocs_core.models.docs import BookChunkRow
+
 from .base import BaseLoader, compute_row_checksum
 
 if TYPE_CHECKING:  # pragma: no cover
@@ -158,8 +160,8 @@ def split_book(
         flat: list[tuple[int, str]],
         preamble: _RawChunk,
         boundary: re.Pattern[str],
-        accept: "callable",
-        section_of: "callable",
+        accept: callable,
+        section_of: callable,
     ) -> None:
         current = preamble
         expected = 1
@@ -181,7 +183,7 @@ def split_book(
         appendix_page if appendix_page is not None
         else (index_page if index_page is not None else len(pages))
     ]
-    for c, (start, end) in enumerate(zip(chapter_start_pages, region_ends), 1):
+    for c, (start, end) in enumerate(zip(chapter_start_pages, region_ends, strict=False), 1):
         flat = _flat(start, end)
         preamble = _RawChunk(
             heading=f"{c} {chapter_titles[c]}", level=1, chapter=c,
@@ -251,14 +253,14 @@ class EssentialGraphragAdapter:
         self._chapter_titles = chapter_titles
         self._appendix_title = appendix_title
 
-    def __enter__(self) -> "EssentialGraphragAdapter":
+    def __enter__(self) -> EssentialGraphragAdapter:
         return self
 
     def __exit__(
         self,
         exc_type: type[BaseException] | None,
         exc: BaseException | None,
-        tb: "TracebackType | None",
+        tb: TracebackType | None,
     ) -> None:
         return None
 

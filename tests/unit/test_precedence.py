@@ -13,13 +13,13 @@ import pytest
 try:
     import yaml
 
+    from drydocs.loaders.catalog import CatalogLOBRow, resolve_lob_reconciliation
     from drydocs_core.precedence import (
+        DEFAULT_PRECEDENCE_PATH,
         Claim,
         PrecedenceResolver,
         UnknownAuthorityError,
-        DEFAULT_PRECEDENCE_PATH,
     )
-    from drydocs.loaders.catalog import CatalogLOBRow, resolve_lob_reconciliation
 
     _AVAILABLE = True
 except ImportError:

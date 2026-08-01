@@ -8,8 +8,9 @@ semantics are plain Cypher over the run bookkeeping every template writes
 """
 from __future__ import annotations
 
+from collections.abc import Iterator
 from pathlib import Path
-from typing import Any, ClassVar, Iterator
+from typing import Any, ClassVar
 
 import pytest
 from pydantic import BaseModel
@@ -21,7 +22,7 @@ class _FakeAdapter:
     def __init__(self, rows: list[dict]) -> None:
         self._rows = rows
 
-    def __enter__(self) -> "_FakeAdapter":
+    def __enter__(self) -> _FakeAdapter:
         return self
 
     def __exit__(self, *_: Any) -> None:
@@ -196,7 +197,7 @@ def test_sweep_deletes_only_past_retention_and_reports_counts() -> None:
     client = _FakeClient(swept=4, retained=2)
     counts = sweep_removed(client, "SweepJob", older_than_days=30)
 
-    (cypher, bind), = [(c, b) for c, b in client.run_calls if "DETACH DELETE" in c]
+    (cypher, bind), = ((c, b) for c, b in client.run_calls if "DETACH DELETE" in c)
     assert "removed_from_source_at < datetime() - duration({days: $days})" in cypher
     assert bind["days"] == 30
     assert counts == {"swept": 4, "retained": 2}

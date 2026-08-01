@@ -25,12 +25,14 @@ coverage-policy precedent: surfaced, never guessed).
 from __future__ import annotations
 
 import logging
+from collections.abc import Iterator
 from pathlib import Path
-from typing import TYPE_CHECKING, ClassVar, Iterator
+from typing import TYPE_CHECKING, ClassVar
 
 import yaml
 
 from drydocs_core.models.registry import BatchPortOrchestratorRow
+
 from .base import BaseLoader, LoadSummary
 
 if TYPE_CHECKING:  # pragma: no cover
@@ -86,14 +88,14 @@ class BatchOrchestratorYamlAdapter:
         self.unmapped: list[dict] = []
         self.apps_without_declaration = 0
 
-    def __enter__(self) -> "BatchOrchestratorYamlAdapter":
+    def __enter__(self) -> BatchOrchestratorYamlAdapter:
         return self
 
     def __exit__(
         self,
         exc_type: type[BaseException] | None,
         exc: BaseException | None,
-        tb: "TracebackType | None",
+        tb: TracebackType | None,
     ) -> None:
         return None
 

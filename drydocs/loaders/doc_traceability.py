@@ -23,19 +23,21 @@ from __future__ import annotations
 
 import logging
 import re
+from collections.abc import Iterator
 from pathlib import Path
-from typing import TYPE_CHECKING, ClassVar, Iterator
+from typing import TYPE_CHECKING, ClassVar
 
 import yaml
 from pydantic import BaseModel
 
+from drydocs_core.doc_anchors import ANCHOR_RE, DERIVED_ANCHOR_SEP
 from drydocs_core.models.doc_traceability import (
     DESIGN_DOCS_ORIGIN,
     DocSectionRow,
     FeedbackNoteRow,
     TraceabilityRow,
 )
-from drydocs_core.doc_anchors import ANCHOR_RE, DERIVED_ANCHOR_SEP
+
 from .base import BaseLoader, LoadSummary, compute_row_checksum
 
 if TYPE_CHECKING:  # pragma: no cover
@@ -292,14 +294,14 @@ class DesignDocSectionsAdapter:
     def __init__(self, design_dir: Path | str = DEFAULT_DESIGN_DIR) -> None:
         self.design_dir = Path(design_dir)
 
-    def __enter__(self) -> "DesignDocSectionsAdapter":
+    def __enter__(self) -> DesignDocSectionsAdapter:
         return self
 
     def __exit__(
         self,
         exc_type: type[BaseException] | None,
         exc: BaseException | None,
-        tb: "TracebackType | None",
+        tb: TracebackType | None,
     ) -> None:
         return None
 
@@ -319,14 +321,14 @@ class TraceabilityMatrixAdapter:
     def __init__(self, design_dir: Path | str = DEFAULT_DESIGN_DIR) -> None:
         self.design_dir = Path(design_dir)
 
-    def __enter__(self) -> "TraceabilityMatrixAdapter":
+    def __enter__(self) -> TraceabilityMatrixAdapter:
         return self
 
     def __exit__(
         self,
         exc_type: type[BaseException] | None,
         exc: BaseException | None,
-        tb: "TracebackType | None",
+        tb: TracebackType | None,
     ) -> None:
         return None
 
@@ -349,14 +351,14 @@ class DesignDocFeedbackAdapter:
     def __init__(self, feedback_dir: Path | str = DEFAULT_FEEDBACK_DIR) -> None:
         self.feedback_dir = Path(feedback_dir)
 
-    def __enter__(self) -> "DesignDocFeedbackAdapter":
+    def __enter__(self) -> DesignDocFeedbackAdapter:
         return self
 
     def __exit__(
         self,
         exc_type: type[BaseException] | None,
         exc: BaseException | None,
-        tb: "TracebackType | None",
+        tb: TracebackType | None,
     ) -> None:
         return None
 
@@ -424,7 +426,7 @@ class _SectionPrereqLoader(_ChecksummedLoader):
         self.anchors_sent: set[tuple[str, str, str]] = set()
         self.unmatched_anchors: list[dict] = []
 
-    def _load(self, summary: LoadSummary, run_log: "LoaderRunLog | None") -> LoadSummary:
+    def _load(self, summary: LoadSummary, run_log: LoaderRunLog | None) -> LoadSummary:
         """Refusal runs BEFORE ``super()._load`` — which is what reaches
         ``_preflight_indexes`` and ``_open_run`` — so a refused load writes
         nothing at all, not even the :JobRun."""

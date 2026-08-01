@@ -4,8 +4,6 @@ is exercised manually / in the L4 run, not in unit tests.
 """
 from __future__ import annotations
 
-from pathlib import Path
-
 from drydocs.doc_pdf import find_browser, normalize_pdf_bytes, print_flags
 
 

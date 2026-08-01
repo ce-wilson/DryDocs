@@ -37,7 +37,6 @@ from drydocs_api.exports import (
 )
 from drydocs_api.guard import WriteRejected
 from drydocs_api.handlers import Forbidden, login, logout, run_named, run_raw
-from drydocs_api.query_specs import UnknownSpecError
 from drydocs_api.mappings import (
     ChangesetValidationError,
     MappingStore,
@@ -51,6 +50,7 @@ from drydocs_api.mappings import (
 )
 from drydocs_api.personas import UnknownPersonaError
 from drydocs_api.queries import NAMED_QUERIES, ParamValidationError, UnknownQueryError
+from drydocs_api.query_specs import UnknownSpecError
 from drydocs_api.sessions import InMemorySessionStore, InvalidTokenError
 from drydocs_core.config import Neo4jSettings
 

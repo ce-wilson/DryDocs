@@ -10,15 +10,15 @@ test forces that to surface in CI rather than in production.
 from __future__ import annotations
 
 import inspect
+from collections.abc import Iterator
 from pathlib import Path
-from typing import Any, ClassVar, Iterator
+from typing import Any, ClassVar
 
 import pytest
 from pydantic import BaseModel
 
 from drydocs.loaders.base import BaseLoader
 from drydocs_core.neo4j_client import Neo4jClient
-
 
 # ---- in-memory fakes -------------------------------------------------------
 
@@ -30,7 +30,7 @@ class _FakeAdapter:
     def __init__(self, rows: list[dict]) -> None:
         self._rows = rows
 
-    def __enter__(self) -> "_FakeAdapter":
+    def __enter__(self) -> _FakeAdapter:
         return self
 
     def __exit__(self, *_: Any) -> None:

@@ -5,12 +5,12 @@ from pathlib import Path
 
 import pytest
 
-from drydocs_core.adapters.csv_adapter import CsvAdapter
 from drydocs.staging import (
     build_staging_bundle,
     build_staging_rows,
     collect_jobs,
 )
+from drydocs_core.adapters.csv_adapter import CsvAdapter
 from drydocs_core.models import ControlMVariableRow
 
 SAMPLE = (

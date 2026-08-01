@@ -14,9 +14,6 @@ import pytest
 
 yaml = pytest.importorskip("yaml")
 
-from drydocs_core.adapters import CsvAdapter
-from drydocs_core.models import SealAttributionRow, StgAppFactRow
-
 from drydocs.graph_verify import Assertion, load_suite
 from drydocs.loaders.seal_attribution import (
     ATTRIBUTION_TIERS,
@@ -26,6 +23,8 @@ from drydocs.loaders.seal_attribution import (
     TierReconcilers,
     resolve_attributions,
 )
+from drydocs_core.adapters import CsvAdapter
+from drydocs_core.models import SealAttributionRow, StgAppFactRow
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
 FIXTURE_CSV = REPO_ROOT / "tests" / "fixtures" / "attribution" / "stg_app_fact__synthetic.csv"

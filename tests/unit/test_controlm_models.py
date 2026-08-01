@@ -14,7 +14,6 @@ from drydocs_core.models import (
     ControlMJobRow,
 )
 
-
 # ---- ControlMFolderRow -----------------------------------------------------
 
 def test_folder_basic_real_columns() -> None:

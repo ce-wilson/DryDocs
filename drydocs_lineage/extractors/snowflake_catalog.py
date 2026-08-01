@@ -66,7 +66,7 @@ from __future__ import annotations
 
 import csv
 from dataclasses import asdict, dataclass, field
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 
 #: the instrumentation sentinel — nulled AND counted wherever it appears
@@ -94,7 +94,7 @@ def _parse_ts(raw: str) -> datetime | None:
         except ValueError:
             return None
     if dt.tzinfo is not None:
-        dt = dt.astimezone(timezone.utc).replace(tzinfo=None)
+        dt = dt.astimezone(UTC).replace(tzinfo=None)
     return dt
 
 

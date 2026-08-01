@@ -33,7 +33,7 @@ confirmed one. The CLI wraps it at each production-load point (see
 """
 from __future__ import annotations
 
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
 
@@ -148,7 +148,7 @@ class SourceRegistry:
         path: str | Path = DEFAULT_REGISTRY_PATH,
         doc_registry_path: str | Path | None = None,
         overlay_path: str | Path | None = None,
-    ) -> "SourceRegistry":
+    ) -> SourceRegistry:
         """Parse the v2 registry (+ the doc ledger union + the D2 overlay).
 
         ``doc_registry_path`` / ``overlay_path`` default to the shipped files

@@ -35,8 +35,9 @@ from __future__ import annotations
 import os
 import re
 import subprocess
+from collections.abc import Iterable, Mapping
 from pathlib import Path
-from typing import Any, Iterable, Mapping
+from typing import Any
 
 import pytest
 

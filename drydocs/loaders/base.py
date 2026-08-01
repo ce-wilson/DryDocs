@@ -25,7 +25,7 @@ import json
 import logging
 import uuid
 from dataclasses import dataclass, field
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 from typing import TYPE_CHECKING, Any, ClassVar
 
@@ -160,8 +160,8 @@ class BaseLoader:
 
     def __init__(
         self,
-        client: "Neo4jClient",
-        adapter: "Adapter",
+        client: Neo4jClient,
+        adapter: Adapter,
         *,
         batch_size: int = 1000,
         max_rejects_kept: int = 100,
@@ -180,7 +180,7 @@ class BaseLoader:
         self.index_wait_seconds = index_wait_seconds
         self.run_id = str(uuid.uuid4())
         self.loaded_at = (
-            datetime.now(timezone.utc).replace(microsecond=0).isoformat()
+            datetime.now(UTC).replace(microsecond=0).isoformat()
         )
         self.full_extract = full_extract
         self.run_log = run_log
@@ -242,7 +242,7 @@ class BaseLoader:
             self._close_run(status="FAILED", summary=summary)
             summary.status = "FAILED"
             summary.completed_at = (
-                datetime.now(timezone.utc).replace(microsecond=0).isoformat()
+                datetime.now(UTC).replace(microsecond=0).isoformat()
             )
             raise
 
@@ -250,7 +250,7 @@ class BaseLoader:
 
         summary.status = "OK"
         summary.completed_at = (
-            datetime.now(timezone.utc).replace(microsecond=0).isoformat()
+            datetime.now(UTC).replace(microsecond=0).isoformat()
         )
         self._close_run(status="OK", summary=summary)
         LOGGER.info("Loader %s done: %s", self.name, summary.as_dict())
@@ -467,7 +467,7 @@ class BaseLoader:
 
 
 def sweep_removed(
-    client: "Neo4jClient",
+    client: Neo4jClient,
     label: str,
     *,
     older_than_days: int,

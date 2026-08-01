@@ -45,7 +45,7 @@ import time
 from collections import OrderedDict
 from collections.abc import Callable, Mapping, Sequence
 from dataclasses import dataclass
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 
 from drydocs_api.guard import ensure_read_only
 from drydocs_api.handlers import Forbidden
@@ -107,7 +107,7 @@ class EphemeralSpec:
         )
 
     def expires_at_iso(self) -> str:
-        return datetime.fromtimestamp(self.expires_at, tz=timezone.utc).isoformat(
+        return datetime.fromtimestamp(self.expires_at, tz=UTC).isoformat(
             timespec="seconds"
         )
 

@@ -27,9 +27,10 @@ from __future__ import annotations
 import json
 import logging
 import re
+from collections.abc import Iterator
 from dataclasses import dataclass
 from pathlib import Path
-from typing import TYPE_CHECKING, ClassVar, Iterator
+from typing import TYPE_CHECKING, ClassVar
 
 from pydantic import BaseModel
 
@@ -188,7 +189,7 @@ class VendorDocsAdapter:
         self.capture_id = capture_id
         self.base = root or vendor_docs_dir(capture_id)
 
-    def __enter__(self) -> "VendorDocsAdapter":
+    def __enter__(self) -> VendorDocsAdapter:
         return self
 
     def __exit__(self, exc_type, exc, tb) -> None:

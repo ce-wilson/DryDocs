@@ -3,10 +3,11 @@
 Quick validation script for skills - minimal version
 """
 
-import sys
 import re
-import yaml
+import sys
 from pathlib import Path
+
+import yaml
 
 # Directories whose contents are not packaged as part of the skill, so any
 # SKILL.md inside them shouldn't count toward the single-SKILL.md check below.

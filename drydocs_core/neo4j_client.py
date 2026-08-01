@@ -23,7 +23,7 @@ class Neo4jClient:
         self._database = database
         self._driver = None
 
-    def __enter__(self) -> "Neo4jClient":
+    def __enter__(self) -> Neo4jClient:
         # liveness_check_timeout=0 forces the driver to re-validate pooled
         # connections before use, preventing SessionExpired on Aura.
         self._driver = GraphDatabase.driver(

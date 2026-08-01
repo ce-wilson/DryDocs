@@ -10,12 +10,11 @@ runs (no model variance between requests).
 import json
 from collections.abc import AsyncGenerator
 
+from common.neo4j_tool import read_cypher
 from google.adk.agents import BaseAgent
 from google.adk.agents.invocation_context import InvocationContext
 from google.adk.events import Event
 from google.genai import types
-
-from common.neo4j_tool import read_cypher
 
 DEFAULT_QUERY = (
     "MATCH (a:CodeFile)-[:DEPENDS_ON]->(b:CodeFile) "

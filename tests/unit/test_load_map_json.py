@@ -84,7 +84,6 @@ def test_ledger_states_are_the_three_governed_ones():
 
 
 def test_every_concrete_loader_appears_exactly_once():
-    from drydocs import cli
     from tests.unit.test_load_map_declarations import _concrete_loader_classes
 
     committed = json.loads(COMMITTED.read_text(encoding="utf-8"))

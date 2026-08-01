@@ -57,10 +57,11 @@ silent shrink.
 from __future__ import annotations
 
 import re
+from collections.abc import Iterable
 from dataclasses import dataclass
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
-from typing import Any, Iterable
+from typing import Any
 
 import drydocs_core.ontology as _core_ontology
 
@@ -497,7 +498,7 @@ def write_curated(
             f"flips these active in relationship_vocabulary.yaml: {blocked}"
         )
 
-    written_at = datetime.now(timezone.utc).isoformat()
+    written_at = datetime.now(UTC).isoformat()
     written = 0
     for cypher, params in plan.statements:
         rows = client.run(cypher, {**params, "written_at": written_at})

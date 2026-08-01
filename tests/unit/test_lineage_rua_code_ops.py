@@ -62,7 +62,7 @@ _SCRIPT_NO_OPS = """#!/bin/sh
 # nothing but a comment and a blank line
 """
 
-_PROFILE = f"""# synthetic .profile (fixture)
+_PROFILE = """# synthetic .profile (fixture)
 export PATH=$PATH:/opt/app/bin
 . /opt/app/env/common_env.sh
 sh /opt/app/bin/warmup.sh

@@ -76,7 +76,7 @@ def test_constraints_are_idempotent() -> None:
         if "CREATE CONSTRAINT" in line and "IF NOT EXISTS" not in line
     ]
     assert not non_idempotent, (
-        f"Constraints missing IF NOT EXISTS (not idempotent):\n"
+        "Constraints missing IF NOT EXISTS (not idempotent):\n"
         + "\n".join(non_idempotent)
     )
 

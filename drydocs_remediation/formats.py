@@ -168,8 +168,8 @@ class XmlDefinitionFormat(DefinitionFormat):
         "the authoritative sources). Use TranscriptDefinitionFormat meanwhile."
     )
 
-    def load(self, source: Path) -> DefinitionSet:  # noqa: ARG002
+    def load(self, source: Path) -> DefinitionSet:
         raise NotImplementedError(self._BLOCKED)
 
-    def dump(self, definitions: DefinitionSet, target: Path) -> Path:  # noqa: ARG002
+    def dump(self, definitions: DefinitionSet, target: Path) -> Path:
         raise NotImplementedError(self._BLOCKED)

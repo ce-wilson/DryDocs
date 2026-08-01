@@ -41,9 +41,10 @@ from __future__ import annotations
 import csv
 import re
 import time
+from collections.abc import Mapping, Sequence
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Mapping, Sequence
+from typing import Any
 
 from drydocs_core.run_log import caller_stamp, claim_log_path
 

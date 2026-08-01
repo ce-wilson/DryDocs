@@ -40,7 +40,7 @@ class GraphWriteAttemptError(RuntimeError):
 class ReadOnlyGraph:
     """The component's sole graph access path — read queries only."""
 
-    def __init__(self, client: "Neo4jClient") -> None:
+    def __init__(self, client: Neo4jClient) -> None:
         self._client = client
 
     def fetch(self, query: str, params: dict[str, Any] | None = None) -> list[Any]:

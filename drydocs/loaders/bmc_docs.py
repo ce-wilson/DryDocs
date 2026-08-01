@@ -24,13 +24,15 @@ from __future__ import annotations
 
 import logging
 import re
+from collections.abc import Iterator
 from dataclasses import dataclass
 from pathlib import Path
-from typing import TYPE_CHECKING, ClassVar, Iterator
+from typing import TYPE_CHECKING, ClassVar
 
 from pydantic import BaseModel
 
 from drydocs_core.models.docs import BmcDocChunkRow
+
 from .base import BaseLoader, LoadSummary, compute_row_checksum
 
 if TYPE_CHECKING:  # pragma: no cover
@@ -211,14 +213,14 @@ class BmcDocsAdapter:
     def __init__(self, corpus_dir: Path | str = DEFAULT_CORPUS_DIR) -> None:
         self.corpus_dir = Path(corpus_dir)
 
-    def __enter__(self) -> "BmcDocsAdapter":
+    def __enter__(self) -> BmcDocsAdapter:
         return self
 
     def __exit__(
         self,
         exc_type: type[BaseException] | None,
         exc: BaseException | None,
-        tb: "TracebackType | None",
+        tb: TracebackType | None,
     ) -> None:
         return None
 

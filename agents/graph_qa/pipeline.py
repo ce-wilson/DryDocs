@@ -21,6 +21,7 @@ from collections.abc import Callable
 
 from common import specs_catalog
 from common.specs_catalog import ensure_read_only
+
 from graph_qa.envelope import (
     Envelope,
     Metrics,

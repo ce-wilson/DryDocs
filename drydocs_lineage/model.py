@@ -149,7 +149,7 @@ class LineageGraph:
         }
 
     @classmethod
-    def from_dict(cls, data: dict) -> "LineageGraph":
+    def from_dict(cls, data: dict) -> LineageGraph:
         schema = data.get("schema")
         if schema not in SCHEMA_COMPAT:
             raise ValueError(f"unexpected schema: {schema!r}")

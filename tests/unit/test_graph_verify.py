@@ -10,10 +10,10 @@ from typing import Any
 import pytest
 
 from drydocs.graph_verify import (
+    DEFAULT_GRAPH_TESTS_DIR,
     Assertion,
     GraphVerifyError,
     Suite,
-    DEFAULT_GRAPH_TESTS_DIR,
     evaluate,
     exit_code,
     load_suite,

@@ -14,8 +14,6 @@ import pytest
 
 yaml = pytest.importorskip("yaml")
 
-from drydocs_core.models import ManualMappingRow
-
 from drydocs.loaders.manual_loads import (
     DEFAULT_MANIFEST_PATH,
     SUPPORTED_SHAPE,
@@ -26,6 +24,7 @@ from drydocs.loaders.manual_loads import (
     relationship_registered,
     require_registered,
 )
+from drydocs_core.models import ManualMappingRow
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
 TEMPLATE = REPO_ROOT / "config" / "manual-loads" / "TEMPLATE-node-mapping.csv"

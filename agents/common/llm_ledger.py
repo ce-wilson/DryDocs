@@ -29,7 +29,7 @@ from __future__ import annotations
 
 import json
 import sys
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 
 _REPO_ROOT = Path(__file__).resolve().parents[2]
@@ -111,7 +111,7 @@ class LlmLedger:
         self._append(
             {
                 "kind": "llm_call",
-                "ts": datetime.now(timezone.utc).isoformat(timespec="seconds"),
+                "ts": datetime.now(UTC).isoformat(timespec="seconds"),
                 "run_id": run_id,
                 "step": step,
                 "iteration": iteration,
@@ -133,7 +133,7 @@ class LlmLedger:
         self._append(
             {
                 "kind": "run",
-                "ts": datetime.now(timezone.utc).isoformat(timespec="seconds"),
+                "ts": datetime.now(UTC).isoformat(timespec="seconds"),
                 "run_id": envelope.run_id,
                 "session_id": envelope.session_id,
                 "tier": envelope.tier,

@@ -10,9 +10,9 @@ import re
 import pytest
 
 from drydocs_api.exports import (
+    WATERMARK_COLUMN,
     ExportLedger,
     UnknownExportError,
-    WATERMARK_COLUMN,
     banner_text,
     export_manifest,
     export_spec,
@@ -20,6 +20,7 @@ from drydocs_api.exports import (
     list_specs,
     run_spec,
 )
+from drydocs_api.guard import is_write_cypher
 from drydocs_api.queries import ParamValidationError
 from drydocs_api.query_specs import (
     CLASSIFICATIONS,
@@ -28,7 +29,6 @@ from drydocs_api.query_specs import (
     UnknownSpecError,
     query_spec,
 )
-from drydocs_api.guard import is_write_cypher
 from drydocs_api.sessions import InMemorySessionStore, InvalidTokenError
 
 

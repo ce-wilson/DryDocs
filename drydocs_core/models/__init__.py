@@ -21,7 +21,8 @@ columns need to change — adapters and Cypher do not.
 # not which one is stale. tests/unit/test_no_shadow_definitions.py keeps a
 # second copy from reappearing. Phase C (ADR 0002-A-1) may move the live models
 # here — one definition, MOVED.
-from .seal import SealApplicationRow, SealContactRow
+from .attribution import ManualMappingRow, SealAttributionRow, StgAppFactRow
+from .code_snapshot import CodeModuleRow
 from .controlm import (
     ControlMConditionInRow,
     ControlMConditionOutRow,
@@ -31,10 +32,9 @@ from .controlm import (
     ControlMJobRow,
     ControlMVariableRow,
 )
-from .registry import SoftwareProductRow
 from .docs import BmcDocChunkRow
-from .attribution import ManualMappingRow, SealAttributionRow, StgAppFactRow
-from .code_snapshot import CodeModuleRow
+from .registry import SoftwareProductRow
+from .seal import SealApplicationRow, SealContactRow
 
 __all__ = [
     # SEAL

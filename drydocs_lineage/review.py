@@ -26,7 +26,7 @@ from __future__ import annotations
 
 import html
 import json
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 
 from .model import LineageGraph
 from .writer import unresolved_file_op_candidates
@@ -147,7 +147,7 @@ def to_html(
     generated_at: str | None = None,
 ) -> str:
     """Render the graph as a single self-contained SME review page."""
-    gen = generated_at or datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M UTC")
+    gen = generated_at or datetime.now(UTC).strftime("%Y-%m-%d %H:%M UTC")
     doc = _e(doc_id)
 
     jobs = [p for p in graph.processes.values() if p.kind == "controlm_job"]

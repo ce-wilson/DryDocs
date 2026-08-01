@@ -32,7 +32,7 @@ for entry in (str(REPO_ROOT / "agents"), str(REPO_ROOT)):
     if entry not in sys.path:
         sys.path.insert(0, entry)
 
-from common import agent_run_writer, llm_ledger  # noqa: E402
+from common import agent_run_writer  # noqa: E402
 from common.llm_ledger import LlmLedger, estimate_cost_usd  # noqa: E402
 from graph_qa import pipeline as pl  # noqa: E402
 

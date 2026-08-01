@@ -23,7 +23,7 @@ class SpyClient:
     def __init__(self) -> None:
         self.queries: list[str] = []
 
-    def run(self, query: str, params: dict[str, Any] | None = None) -> list[Any]:  # noqa: ARG002
+    def run(self, query: str, params: dict[str, Any] | None = None) -> list[Any]:
         self.queries.append(query)
         return []
 

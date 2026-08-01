@@ -25,7 +25,7 @@ from __future__ import annotations
 import logging
 import uuid
 from dataclasses import dataclass, field
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 
 LOGGER = logging.getLogger("drydocs.loaders.runs_on_resolution")
@@ -106,7 +106,7 @@ class RunsOnResolutionPass:
         self.client = client
         self.run_id = str(uuid.uuid4())
         self.resolved_at = (
-            datetime.now(timezone.utc).replace(microsecond=0, tzinfo=None).isoformat()
+            datetime.now(UTC).replace(microsecond=0, tzinfo=None).isoformat()
         )
 
     def run(self) -> RunsOnCoverage:

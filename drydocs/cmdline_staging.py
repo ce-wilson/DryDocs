@@ -391,7 +391,7 @@ def resolve_job_detail(
     cleared first (deterministic — same store + same XML → same outcome).
     NO graph writes.
     """
-    from drydocs_core.controlm import resolve_command_line  # noqa: PLC0415
+    from drydocs_core.controlm import resolve_command_line
 
     db_path = Path(db_path)
     if not db_path.exists():

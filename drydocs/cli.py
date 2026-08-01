@@ -57,6 +57,7 @@ from __future__ import annotations
 
 import logging
 import uuid
+from datetime import UTC
 from pathlib import Path
 
 import typer
@@ -72,6 +73,7 @@ from drydocs_core.controlm import (
     resolve_job,
 )
 from drydocs_core.models import ControlMVariableRow
+from drydocs_core.neo4j_client import Neo4jClient
 from drydocs_core.run_log import LoaderRunLog
 from drydocs_core.schema.constraints import declared_constraint_names
 from drydocs_core.schema.supplements import (
@@ -83,17 +85,50 @@ from drydocs_core.schema.supplements import (
     declared_terms,
     default_chain,
 )
+from drydocs_core.source_registry import (
+    RetiredSourceIdError,
+    SourceRegistry,
+    UnconfirmedSourceError,
+    UnknownSourceError,
+)
 
-from .staging import build_staging_bundle, collect_jobs
 from .loaders import seal_applications as seal_apps_mod
 from .loaders import seal_contacts as seal_contacts_mod
 from .loaders.base import BaseLoader
+from .loaders.batch_port_orchestrator import (
+    DEFAULT_APPS_PATH,
+    DEFAULT_PLATFORMS_PATH,
+    BatchOrchestratorYamlAdapter,
+    BatchPortOrchestratorLoader,
+)
 from .loaders.bmc_docs import (
     DEFAULT_CORPUS_DIR,
     BmcDocsAdapter,
     BmcDocsLoader,
 )
-from .loaders.vendor_docs import VendorDocsLoader
+from .loaders.business_segments import refresh_business_segments
+from .loaders.catalog import (
+    AreaProductsLoader,
+    CatalogLOBsLoader,
+    DevTeamsLoader,
+    PatProductMappingLoader,
+    PatTeamRolesLoader,
+    ProductLinesLoader,
+    ProductsLoader,
+)
+from .loaders.code_snapshot import (
+    DEFAULT_SNAPSHOT_DIR,
+    CodeSnapshotAdapter,
+    CodeSnapshotError,
+    CodeSnapshotLoader,
+    select_newest_snapshot,
+)
+from .loaders.controlm_conditions_in import ControlMConditionsInLoader
+from .loaders.controlm_conditions_out import ControlMConditionsOutLoader
+from .loaders.controlm_dependencies_derived import ControlMDependenciesDerivedLoader
+from .loaders.controlm_folders import ControlMFoldersLoader
+from .loaders.controlm_hosts import ControlMHostsLoader
+from .loaders.controlm_jobs import ControlMJobsLoader
 from .loaders.doc_traceability import (
     DEFAULT_DESIGN_DIR,
     DEFAULT_FEEDBACK_DIR,
@@ -109,30 +144,14 @@ from .loaders.essential_graphrag import (
     EssentialGraphragAdapter,
     EssentialGraphragLoader,
 )
-from .loaders.patch_window import PatchWindowQuery
-from .loaders.business_segments import refresh_business_segments
-from .loaders.catalog import (
-    AreaProductsLoader,
-    CatalogLOBsLoader,
-    DevTeamsLoader,
-    PatProductMappingLoader,
-    PatTeamRolesLoader,
-    ProductLinesLoader,
-    ProductsLoader,
-)
-from .loaders.controlm_conditions_in import ControlMConditionsInLoader
-from .loaders.controlm_conditions_out import ControlMConditionsOutLoader
-from .loaders.controlm_dependencies_derived import ControlMDependenciesDerivedLoader
-from .loaders.controlm_folders import ControlMFoldersLoader
-from .loaders.controlm_hosts import ControlMHostsLoader
-from .loaders.controlm_jobs import ControlMJobsLoader
-from .loaders.runs_on_resolution import RunsOnResolutionPass
 from .loaders.manual_loads import (
     ManualLoadError,
     ManualMappingAdapter,
     ManualSealAttributionLoader,
     mapping_rows,
 )
+from .loaders.patch_window import PatchWindowQuery
+from .loaders.runs_on_resolution import RunsOnResolutionPass
 from .loaders.seal_attribution import (
     SealAttributionAdapter,
     SealAttributionLoader,
@@ -146,28 +165,9 @@ from .loaders.software_registry import (
     RegistryYamlAdapter,
     SoftwareRegistryLoader,
 )
-from .loaders.batch_port_orchestrator import (
-    DEFAULT_APPS_PATH,
-    DEFAULT_PLATFORMS_PATH,
-    BatchOrchestratorYamlAdapter,
-    BatchPortOrchestratorLoader,
-)
-from .loaders.code_snapshot import (
-    DEFAULT_SNAPSHOT_DIR,
-    CodeSnapshotAdapter,
-    CodeSnapshotError,
-    CodeSnapshotLoader,
-    select_newest_snapshot,
-)
-from drydocs_core.neo4j_client import Neo4jClient
-from drydocs_core.source_registry import (
-    RetiredSourceIdError,
-    SourceRegistry,
-    UnconfirmedSourceError,
-    UnknownSourceError,
-)
-
+from .loaders.vendor_docs import VendorDocsLoader
 from .snapshots import SnapshotWriter
+from .staging import build_staging_bundle, collect_jobs
 
 app = typer.Typer(no_args_is_help=True, rich_markup_mode="rich")
 console = Console()
@@ -572,7 +572,7 @@ def sweep_removed_cmd(
     older than the retention window, reporting swept/retained per label.
     DESTRUCTIVE unless --dry-run.
     """
-    from .loaders.base import sweep_removed  # noqa: PLC0415
+    from .loaders.base import sweep_removed
 
     if not dry_run and not yes:
         if not typer.confirm(
@@ -1126,7 +1126,7 @@ def export_cmdline_staging(
     the store's meta). Stand-in for the unbuilt CM_DEF_VJOB_DETAIL table —
     deleted the day a real one exists. Reads the graph, writes only SQLite.
     """
-    from .cmdline_staging import default_db_path, export_job_detail  # noqa: PLC0415
+    from .cmdline_staging import default_db_path, export_job_detail
 
     path = Path(db_path) if db_path else default_db_path(create=True)
     run_id = str(uuid.uuid4())
@@ -1172,10 +1172,10 @@ def resolve_cmdline_staging(
     records the provenance per job. Run BEFORE parse-cmdline-staging so the
     parse reads resolved text. NO graph writes — G22 remains the terminus.
     """
-    from drydocs_core.data_root import controlm_xml_dir  # noqa: PLC0415
-    from drydocs_lineage.extractors import ControlMXmlDefsExtractor  # noqa: PLC0415
+    from drydocs_core.data_root import controlm_xml_dir
+    from drydocs_lineage.extractors import ControlMXmlDefsExtractor
 
-    from .cmdline_staging import (  # noqa: PLC0415
+    from .cmdline_staging import (
         CmdlineStagingError,
         default_db_path,
         resolve_job_detail,
@@ -1224,7 +1224,7 @@ def parse_cmdline_staging(
     NO graph writes — G22 remains the terminus gate for anything entering
     Neo4j.
     """
-    from .cmdline_staging import (  # noqa: PLC0415
+    from .cmdline_staging import (
         CmdlineStagingError,
         default_db_path,
         parse_job_detail,
@@ -1287,8 +1287,8 @@ def convert_vendor_docs(
     rule, and writes markdown/ + convert-manifest.json beside the capture.
     No graph, no network — safe to re-run.
     """
-    from drydocs.loaders.vendor_docs import convert_capture  # noqa: PLC0415
-    from drydocs_core.data_root import vendor_docs_dir  # noqa: PLC0415
+    from drydocs.loaders.vendor_docs import convert_capture
+    from drydocs_core.data_root import vendor_docs_dir
 
     base = vendor_docs_dir(capture_id)
     if not (base / "capture-manifest.json").exists():
@@ -1311,8 +1311,8 @@ def load_vendor_docs(
     database-residency ruling (G32), because a relationship cannot span
     Neo4j databases.
     """
-    from drydocs.loaders.vendor_docs import VendorDocsAdapter  # noqa: PLC0415
-    from drydocs_core.data_root import vendor_docs_dir  # noqa: PLC0415
+    from drydocs.loaders.vendor_docs import VendorDocsAdapter
+    from drydocs_core.data_root import vendor_docs_dir
 
     _gate_loader(VendorDocsLoader)  # confirmed-gate before any DB write
     base = vendor_docs_dir(capture_id)
@@ -1645,9 +1645,9 @@ def lineage_review(
     nothing here writes the graph (the curated write is gate-bound in
     drydocs_lineage.writer).
     """
-    from drydocs_lineage.extractors import ControlMInventoryExtractor  # noqa: PLC0415
-    from drydocs_lineage.model import LineageGraph  # noqa: PLC0415
-    from drydocs_lineage.review import to_html  # noqa: PLC0415
+    from drydocs_lineage.extractors import ControlMInventoryExtractor
+    from drydocs_lineage.model import LineageGraph
+    from drydocs_lineage.review import to_html
 
     if not source.exists():
         console.print(f"[red]Source not found: {source}[/]")
@@ -1939,7 +1939,7 @@ def analyze_variables(
         for raw in adapter.rows():
             try:
                 row = ControlMVariableRow.model_validate(raw)
-            except Exception:  # noqa: BLE001 — count + continue, like BaseLoader
+            except Exception:  # — count + continue, like BaseLoader
                 rejected += 1
                 continue
             dc = row.data_center or "UNKNOWN"
@@ -2009,7 +2009,7 @@ def analyze_variables(
         (k[0], k[1]): defs for k, defs in per_job.items() if k in folder_headers
     }
     total = fully = with_variants = with_externals = 0
-    unresolved_names: "_Counter[str]" = _Counter()
+    unresolved_names: _Counter[str] = _Counter()
     max_depth_seen = 0
     for key, defs in per_job.items():
         if key in folder_headers:
@@ -2077,7 +2077,7 @@ def normalize_variables(
     """
     import csv as _csv
     import uuid
-    from datetime import datetime, timezone
+    from datetime import datetime
 
     if use_oracle:
         sql = (SQL_DIR / "controlm_variables.sql").read_text(encoding="utf-8")
@@ -2091,7 +2091,7 @@ def normalize_variables(
             raise typer.Exit(2)
         adapter = CsvAdapter(csv_path, delimiter=delimiter)
 
-    started_at = datetime.now(timezone.utc)
+    started_at = datetime.now(UTC)
     run_id = str(uuid.uuid4())
     rejected = 0
 
@@ -2100,13 +2100,13 @@ def normalize_variables(
         for raw in adapter.rows():
             try:
                 yield ControlMVariableRow.model_validate(raw)
-            except Exception:  # noqa: BLE001 — count + continue, like BaseLoader
+            except Exception:  # — count + continue, like BaseLoader
                 rejected += 1
 
     with adapter:
         jobs = collect_jobs(_validated())
     bundle = build_staging_bundle(jobs, run_id)
-    ended_at = datetime.now(timezone.utc)
+    ended_at = datetime.now(UTC)
 
     run_row = {
         "run_id": run_id,

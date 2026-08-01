@@ -43,13 +43,12 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
-import re
 import sys
 import time
 import urllib.error
 import urllib.request
 from dataclasses import dataclass, field
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
@@ -343,7 +342,7 @@ def capture(
         "base_url": tree.base_url,
         "book": tree.book,
         "classification": tree.classification,
-        "captured_at": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
+        "captured_at": datetime.now(UTC).strftime("%Y-%m-%dT%H:%M:%SZ"),
         "trust": "VERBATIM",
         "note": tree.note,
         # toc_nodes >= documents whenever a node addresses a section of a page.

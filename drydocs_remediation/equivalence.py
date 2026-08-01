@@ -65,7 +65,7 @@ def prove_equivalence(
     legacy_folder = legacy.folder_variables()
     greenfield_folder = greenfield.folder_variables()
     compared = 0
-    for lj, gj in zip(legacy.jobs, greenfield.jobs):
+    for lj, gj in zip(legacy.jobs, greenfield.jobs, strict=False):
         compared += 1
         lw = resolved_watch(legacy_folder, lj)
         gw = resolved_watch(greenfield_folder, gj)

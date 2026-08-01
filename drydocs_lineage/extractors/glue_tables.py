@@ -59,7 +59,7 @@ edges are Epic K territory and every graph write stays behind G22.
 from __future__ import annotations
 
 import csv
-from dataclasses import asdict, dataclass, field
+from dataclasses import asdict, dataclass
 from pathlib import Path
 
 from ..model import DataAssetNode, LineageGraph, asset_id

@@ -6,7 +6,8 @@ adapters return strings as-is and let pydantic coerce.
 """
 from __future__ import annotations
 
-from typing import Iterator, Protocol, runtime_checkable
+from collections.abc import Iterator
+from typing import Protocol, runtime_checkable
 
 
 @runtime_checkable
@@ -19,10 +20,10 @@ class Adapter(Protocol):
 
     name: str  # short identifier used in log lines (e.g. 'csv:seal_apps', 'oracle:lobs')
 
-    def __enter__(self) -> "Adapter":
+    def __enter__(self) -> Adapter:
         ...
 
-    def __exit__(self, exc_type, exc_val, exc_tb) -> None:  # noqa: ANN001
+    def __exit__(self, exc_type, exc_val, exc_tb) -> None:
         ...
 
     def rows(self) -> Iterator[dict]:

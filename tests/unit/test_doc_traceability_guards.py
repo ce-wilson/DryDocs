@@ -31,7 +31,7 @@ class _FakeAdapter:
     def __init__(self, rows: list[dict]) -> None:
         self._rows = rows
 
-    def __enter__(self) -> "_FakeAdapter":
+    def __enter__(self) -> _FakeAdapter:
         return self
 
     def __exit__(self, *_: object) -> None:

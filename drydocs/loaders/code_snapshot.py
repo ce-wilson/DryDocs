@@ -26,8 +26,9 @@ from __future__ import annotations
 import json
 import logging
 import re
+from collections.abc import Iterator
 from pathlib import Path
-from typing import TYPE_CHECKING, ClassVar, Iterator
+from typing import TYPE_CHECKING, ClassVar
 
 from drydocs_core.models.code_snapshot import CodeModuleRow
 
@@ -160,14 +161,14 @@ class CodeSnapshotAdapter:
         self.path = Path(path)
         self.unmapped_extensions: dict[str, int] = {}
 
-    def __enter__(self) -> "CodeSnapshotAdapter":
+    def __enter__(self) -> CodeSnapshotAdapter:
         return self
 
     def __exit__(
         self,
         exc_type: type[BaseException] | None,
         exc: BaseException | None,
-        tb: "TracebackType | None",
+        tb: TracebackType | None,
     ) -> None:
         return None
 
