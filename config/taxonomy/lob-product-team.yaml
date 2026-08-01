@@ -5,7 +5,7 @@
 # No meaning edges — RECONCILES_TO (LOB→segment), SUPPORTS, ownership are ontology (C3).
 #
 # Built from the SYNTHETIC sample (publishable shape). SOURCE (catalog-pat) is
-# Internal-Confidential: real team names/rosters are NOT authoritative here — keyed by id;
+# Internal (confidential material): real team names/rosters are NOT authoritative here — keyed by id;
 # production confidential values live in internal/. Captured 2026-06-20.
 #
 # This is the lowest precedence authority for object *meaning* but the SOLE authority for

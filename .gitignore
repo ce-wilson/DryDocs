@@ -36,7 +36,7 @@ stg_out/
 /stg_*/
 
 # SDLC-Docs — Fidelity-internal source corpus: keep LOCAL for reference, never commit/publish.
-# Internal-Confidential per PUBLISH-BOUNDARY.md (real org name "Fidelity/FMR", internal fmr.com
+# Internal, confidential material per PUBLISH-BOUNDARY.md (real org name "Fidelity/FMR", internal fmr.com
 # URLs, internal tool/standard code names). Ignore the WHOLE corpus (docx/doc/pdf/xls/txt/json,
 # any type) and keep only the clean design artifacts SDLC-Docs/extracted/*.md tracked.
 /SDLC-Docs/*
@@ -51,7 +51,7 @@ stg_out/
 # Only the .sample.txt is committed.
 libs/oracle_kerberos/oracle_kerberos_connection.txt
 
-# Local real-data working area (Internal-Confidential): consolidated
+# Local real-data working area (Internal, confidential material): consolidated
 # troubleshooting notes, screenshots with live values, filled configs.
 # Never committed; travels to the company side by hand, not by git.
 /internal-local/

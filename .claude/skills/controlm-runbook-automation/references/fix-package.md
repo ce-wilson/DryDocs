@@ -29,9 +29,11 @@ Rules:
 - `original/` is evidence — never edited, checksummed in the manifest.
 - `target/` is fully regenerable from (`original/` + the approved change-set);
   the manifest records the change-set id so regeneration is reproducible.
-- Real values live throughout the package — so **fix packages are
-  Internal-Confidential**: company side under `internal/` conventions; on the
-  producer only sanitized samples ever exist, under a gitignored path.
+- Real values live throughout the package — so **fix packages are `Internal`,
+  and carry confidential material** (J23 retired the separate fourth tier;
+  confidential handling is a note on the entry, not its own level): company
+  side under `internal/` conventions; on the producer only sanitized samples
+  ever exist, under a gitignored path.
 
 ## §XML — round-trip rules for `<folder>.updated.xml`
 

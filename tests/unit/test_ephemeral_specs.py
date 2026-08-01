@@ -10,8 +10,10 @@ What this suite proves, per R4's acceptance:
 - params are frozen at registration — supplying params at run time fails
   closed exactly like an undeclared param on a permanent spec;
 - the export manifest carries cypher_sha256 + provenance through the SAME
-  code path as permanent specs, with the fail-closed internal-confidential
-  classification (banner + filename prefix);
+  code path as permanent specs, with the fail-closed ceiling classification
+  (banner + filename prefix). The literals below are pinned deliberately: they
+  prove the ceiling still produces a restricted export artifact, so a change to
+  EPHEMERAL_CLASSIFICATION has to be made here too, on purpose (J24);
 - registration is a trusted-caller surface: no agent key (or no configured
   key) is Forbidden — a browser bearer token alone can never register
   Cypher, so the admin-only /raw-cypher gate (ADR 0005) stays the only
@@ -229,16 +231,16 @@ def test_export_manifest_matches_permanent_spec_provenance():
     token = _session(sessions)
     eph = ephemerals.register(token, CYPHER, "drydocs", params={"limit": 5})
     job = export_spec(eph.ref, {}, "csv", token, sessions, runner, ledger, ephemerals=ephemerals)
-    assert job.filename == f"INTERNAL-CONFIDENTIAL__{eph.ref}.csv"
+    assert job.filename == f"INTERNAL__{eph.ref}.csv"
     chunks = list(job.chunks)  # exhausting the stream registers the manifest
-    assert chunks[0].startswith("# CLASSIFICATION: INTERNAL-CONFIDENTIAL")
+    assert chunks[0].startswith("# CLASSIFICATION: INTERNAL")
     manifest = ledger.manifest(job.export_id)
     assert manifest["query_spec"] == eph.ref
     assert manifest["cypher_sha256"] == hashlib.sha256(CYPHER.encode("utf-8")).hexdigest()
     assert manifest["params"] == {"limit": 5}
     assert manifest["database"] == "drydocs"
     assert manifest["classification"] == EPHEMERAL_CLASSIFICATION
-    assert filename_for(eph.as_query_spec(), "jsonl").startswith("INTERNAL-CONFIDENTIAL__")
+    assert filename_for(eph.as_query_spec(), "jsonl").startswith("INTERNAL__")
 
 
 def test_raw_cypher_gate_still_admin_only():
@@ -285,7 +287,7 @@ def test_ephemeral_wiring_end_to_end(monkeypatch):
     exported = client.post(f"/specs/{ref}/export?format=csv", json={"params": {}}, headers=auth)
     assert exported.status_code == 200
     assert exported.headers["Content-Disposition"].startswith(
-        'attachment; filename="INTERNAL-CONFIDENTIAL__eph.'
+        'attachment; filename="INTERNAL__eph.'
     )
     manifest_path = exported.headers["X-DryDocs-Manifest-Path"]
     manifest = client.get(manifest_path, headers=auth).json()

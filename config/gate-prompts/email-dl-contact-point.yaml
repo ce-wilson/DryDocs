@@ -38,13 +38,13 @@ summary: >
   (C) the AUTHORING SURFACE for notification config going forward; (D) the
   source/store model and what may load into the knowledge graph; (E) the
   layer-4 boundary — membership and email-observed usage are volatile,
-  Internal-Confidential context, never ontology-core edges. Nothing below is
+  Internal (confidential) context, never ontology-core edges. Nothing below is
   applied until ticked and transcribed to config/gate-log.md.
 meta:
   Module: "drydocs_core/ontology (new class + edges) · mapping store (O24 pattern) · future extractors (runbook corpus, Jira, email headers, escalation-db special instructions) · context graph (layer 4)"
   Source: "TWO source problems: (1) app/team→DL contact mapping — outlook-dl, NO machine feed, steward-defined rows are the source of record; (2) job→DL notification wiring — candidate authoritative source = CM_ESCALATION_DB special-instructions (psgmgr, EJOBNAME join, SEAL via ECOMPONENT) once a keyed convention lands (section C)"
-  Registry ref: "no existing source-registry entries — outlook-dl registers at build (Internal-Confidential); the escalation DB is an already-known internal source whose special-instructions field would register as a new source OBJECT at the C2 build; mechanism-only in this repo"
-  Classification: "Internal-Confidential (real DL rows, membership) · Internal (escalation-db rows, runbook mentions) · this page Internal-Public (mechanism only)"
+  Registry ref: "no existing source-registry entries — outlook-dl registers at build (Internal — confidential material); the escalation DB is an already-known internal source whose special-instructions field would register as a new source OBJECT at the C2 build; mechanism-only in this repo"
+  Classification: "Internal — real DL rows + membership are confidential material; escalation-db rows and runbook mentions are ordinary Internal (J23 collapsed these two into one tier; the handling difference is now a note on the entry, not a separate level) · this page Internal-Public (mechanism only)"
   Vocabulary: "no existing term fits (grepped: no contact/notification/channel class or edge in relationship_vocabulary.yaml); everything here registers status: planned on sign-off, per sections B/F. Related existing machinery: ETLProcess kind=notification (send-email utility psets) — the WIRED-notification evidence family"
   Ontology map: "config/taxonomy-ontology-map.yaml dl-contact-point (proposed 2026-07-22, this gate's entry)"
   Related gates: "ui-write-surface (O24 store ratified 2026-07-21) · seal-app-ref-edge-reshape §E2 (store-as-source scoping precedent — cite, don't re-decide) · description-metadata plan (the 3-phase template→validate→ontology modernization — section C shares its template discipline, the two plans must not fork) · sosa-jobrun-observation (the layer-4 experimental family, section E)"
@@ -111,7 +111,7 @@ sections:
       - "D2 [NOTIFIES rows — override-until-fixed]: once C2's escalation-db convention exists, that field is the source of record for intended routing; steward rows for this leg are ORDINARY O24 overrides (active until corrected-in-source, side-by-side display, corrections report addressed to whoever edits the escalation DB). Until the convention lands, NOTIFIES rows are steward-defined with origin=defined — explicitly transitional."
       - "D3 [extraction proposes, steward disposes]: runbook-corpus scans, Jira sign-off records, email-thread harvesting, and wired-evidence extraction (DO-MAIL/SHOUT, notification psets) all produce CANDIDATE rows (value + where-seen provenance) into the store for steward confirmation — extraction NEVER writes the graph directly, and unconfirmed candidates never load."
       - "D4 [future feed supersedes]: if an Exchange/GAL extract ever becomes available for the DL definitions themselves, it registers as a real source and the precedence question comes back to a gate — defined rows do not silently lose to it (the O24 side-by-side rule)."
-      - "D5 [local db]: the producer-side neo4jtest EE container loads SYNTHETIC fixture DLs only (the standing sample-data-only rule); real addresses/rows are company-side, classification Internal-Confidential (escalation-db rows Internal)."
+      - "D5 [local db]: the producer-side neo4jtest EE container loads SYNTHETIC fixture DLs only (the standing sample-data-only rule); real addresses/rows are company-side, classification Internal — confidential material (escalation-db rows Internal too)."
   - title: "E. The context-graph boundary (layer 4)"
     confirmations:
       - "E1: DL MEMBERSHIP (who is on it) is volatile, Outlook-held, and PII — it is NEVER an ontology-core edge. If membership is ever captured (from email headers or a GAL probe), it lands as layer-4 observations in the experimental SOSA family (an :Observation about the DL, observed_at, source sensor = the extraction run) or as last_seen_* candidate metadata in the store — queryable as 'what matters right now', deletable as a unit, never part of the durable knowledge graph."

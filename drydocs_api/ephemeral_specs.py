@@ -32,9 +32,16 @@ The store's rules (all fail closed):
   path that carries the exposure — the Cypher is LLM-authored at runtime and
   reaches the same manifest/export code — so a guard on the reviewed registry
   alone would sit where there is no risk.
-- **Classification is the fail-closed ceiling** (``internal-confidential``):
+- **Classification is the fail-closed ceiling** — currently ``internal``:
   un-reviewed Cypher cannot be assumed less sensitive than the most
-  restrictive data it could reach in its database.
+  restrictive data it could reach in its database. The VALUE is incidental;
+  the rule is "the most restrictive level the vocabulary currently defines".
+  It read ``internal-confidential`` until J23 collapsed the vocabulary to
+  three levels (2026-07-31), and it moved DOWN with the ceiling rather than
+  being deleted — deleting it would have removed the cap from the one path
+  whose Cypher is LLM-authored at runtime and never human-reviewed. If a
+  fourth, more restrictive tier is ever reintroduced, re-point this constant
+  in the same commit.
 - **Params are frozen at registration.** An ephemeral spec declares no
   ParamSpecs — the caller re-runs exactly what the agent ran; supplying
   params at run time fails closed (422), the same validate_params rule as
@@ -64,9 +71,11 @@ from drydocs_api.query_specs import (
 from drydocs_api.sessions import InMemorySessionStore
 
 EPHEMERAL_PREFIX = "eph."
-# Fail-closed ceiling: an un-reviewed query gets the most restrictive stamp —
-# the export banner + INTERNAL-CONFIDENTIAL__ filename prefix follow from it.
-EPHEMERAL_CLASSIFICATION = "internal-confidential"
+# Fail-closed CEILING, not a label: an un-reviewed query gets the most
+# restrictive stamp the vocabulary currently defines — the export banner +
+# INTERNAL__ filename prefix follow from it. Re-point (never delete) this if
+# the vocabulary ever gains a more restrictive level; see the module docstring.
+EPHEMERAL_CLASSIFICATION = "internal"
 DEFAULT_TTL_SECONDS = 30 * 60
 DEFAULT_CAPACITY = 500
 

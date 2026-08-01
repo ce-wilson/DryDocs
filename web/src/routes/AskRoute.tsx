@@ -270,9 +270,11 @@ function StepLine({ step }: { step: AskStep }) {
 function SourceChip({ source, specClass }: { source: AskSource; specClass: Record<string, string> }) {
   const [kind, id] = source.document.split(':', 2)
   // spec sources carry the registry row's classification; agent-generated
-  // Cypher carries the ephemeral ceiling (internal-confidential) — the same
-  // stamp its export manifest will carry (R4).
-  const classification = kind === 'spec' ? (specClass[id] ?? 'internal') : 'internal-confidential'
+  // Cypher carries the ephemeral ceiling — the same stamp its export manifest
+  // will carry (R4). Mirrors EPHEMERAL_CLASSIFICATION in
+  // drydocs_api/ephemeral_specs.py; if that ceiling is ever re-pointed, this
+  // moves with it.
+  const classification = kind === 'spec' ? (specClass[id] ?? 'internal') : 'internal'
   const confirmed = source.trust === 'CONFIRMED'
   return (
     <span

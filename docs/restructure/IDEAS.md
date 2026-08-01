@@ -26,6 +26,15 @@ Tags help grooming: `idea` · `bug` · `doc` · `source` (new data source) · `q
 
 <!-- add new ideas at the top -->
 
+- 2026-08-01 — [chore] **`.gitignore` names the real org and internal domain in two explanatory
+  comments** (`"Fidelity/FMR"`, `fmr.com`) — seen while rewording the retired-tier labels on those
+  same lines at J24, and deliberately left alone there because half-redacting one line while the
+  next keeps the domain is worse than leaving both. It is a boundary question (CLAUDE.md §3 bans
+  real org names outside `internal/`), not a classification one, so it wants its own decision:
+  either reword both comments to describe the corpus without naming the org, or accept that a
+  private producer repo may carry it and say so once in `PUBLISH-BOUNDARY.md`. Cheap either way;
+  the point is that it is currently neither decided nor recorded.
+
 - 2026-08-01 — [source] **Company catalog-loader review (screenshots, same day as C17) — three
   back-flow candidates and one confirmation.** CONFIRMS C17 §a from the other side: the company's
   `product_lines.cypher` takes `product_line_id` + `parent_lob_id` + `parent_sub_lob_id` and keys

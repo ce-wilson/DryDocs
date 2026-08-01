@@ -45,7 +45,7 @@ open_questions:
     note: >
       Source not confirmed (source-registry confirmed: false) and no sample exists. This is a
       SHAPE TEMPLATE; populate via the Oracle extract (Oracle `db:` skill). Real schema/table/
-      object names and SIDs are Internal-Confidential -> internal/schemas/, referenced by id.
+      object names and SIDs are Internal (confidential) -> internal/schemas/, referenced by id.
   - id: dataasset-mapping
     note: >
       Table -> DataAsset (dcat:Dataset / prov:Entity) and ControlMJob -[USED/GENERATED]-> DataAsset

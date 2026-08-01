@@ -1,7 +1,9 @@
 # Example SME gate-prompt spec — generic bmc-docs load step (publishable).
 # (Corpus id per ADR 0004: `bmc-docs` names the BMC documentation corpus.)
 # classification: Internal-Public. Real PAT/SEAL gate specs (real LoB/SEAL data) are
-# Internal-Confidential and live in a gitignored twin — never commit them here.
+# Internal — confidential material, so they live in a gitignored twin and are never
+# committed here. (J23: the separate Internal-Confidential tier retired into Internal;
+# confidential handling is a note on the entry, not its own level.)
 classification: Internal-Public
 schema: drydocs.gate-prompt.v1
 id: bmc-docs-structural

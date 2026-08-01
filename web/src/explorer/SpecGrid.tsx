@@ -96,7 +96,9 @@ export default function SpecGrid({ access, specId, fallback }: SpecGridProps) {
     )
   }
 
-  const isInternal = result.classification === 'internal' || result.classification === 'internal-confidential'
+  // `internal` is the most restrictive level in the vocabulary — J23 collapsed
+  // the former fourth tier into it (2026-07-31).
+  const isInternal = result.classification === 'internal'
 
   async function serverExport(format: 'csv' | 'jsonl') {
     setStatus(`exporting ${format}…`)

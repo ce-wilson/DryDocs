@@ -10,8 +10,8 @@ only known when the stream finishes, the manifest is registered in the
 next to the data file.
 
 Classification rules (PUBLISH-BOUNDARY.md wired in):
-- ``internal`` / ``internal-confidential`` exports carry a banner row and the
-  ``INTERNAL__`` / ``INTERNAL-CONFIDENTIAL__`` filename prefix
+- ``internal`` exports carry a banner row and the ``INTERNAL__`` filename
+  prefix (``internal-confidential`` retired into ``internal`` at J23)
 - anything read from a watermarked database (ddcontext/ddall) gains a
   grid-visible ``trust_watermark`` column and ``SYNTHESIZED`` in the
   manifest's trust tiers
@@ -72,15 +72,12 @@ class ExportLedger:
 
 
 def filename_for(spec: QuerySpec, fmt: str) -> str:
-    prefix = {
-        "internal": "INTERNAL__",
-        "internal-confidential": "INTERNAL-CONFIDENTIAL__",
-    }.get(spec.classification, "")
+    prefix = {"internal": "INTERNAL__"}.get(spec.classification, "")
     return f"{prefix}{spec.id}.{fmt}"
 
 
 def banner_text(spec: QuerySpec) -> str | None:
-    if spec.classification in ("internal", "internal-confidential"):
+    if spec.classification == "internal":
         return (
             f"CLASSIFICATION: {spec.classification.upper()} — not for redistribution "
             "(PUBLISH-BOUNDARY.md); exported from DryDocs with provenance manifest"

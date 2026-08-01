@@ -125,7 +125,7 @@ type QuerySpec = {
   cypher: string;           // parameterized, read-only
   params: Record<string, unknown>;
   columns: ColumnDef[];     // names, types, formatters
-  classification: "external" | "internal-public" | "internal" | "internal-confidential";
+  classification: "external" | "internal-public" | "internal";   // 3 levels (J23)
 };
 ```
 
@@ -164,8 +164,9 @@ metadata for Parquet:
 ```
 
 Rules wired to the repo's classification model (`PUBLISH-BOUNDARY.md`):
-- Classification comes from the QuerySpec; **`internal`/`internal-confidential`
-  exports get a banner row + filename prefix** (`INTERNAL__…csv`).
+- Classification comes from the QuerySpec; **`internal` exports get a banner row
+  + filename prefix** (`INTERNAL__…csv`). `internal` is the most restrictive
+  level — it absorbed the retired `internal-confidential` tier at J23.
 - Anything touching `ddcontext` (or `ddall`, which can read it) is watermarked
   `SYNTHESIZED — unverified` in the manifest AND as a grid-visible column.
 - A "Copy as Cypher" action alongside export (the spec's query + params) — reproduces

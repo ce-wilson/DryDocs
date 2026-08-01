@@ -20,7 +20,7 @@
 # steward UI cascade. Evidence basis for §G6 is a company-side session reviewed
 # 2026-07-27 (screenshots) plus the source system's own report headers — STRUCTURE ONLY:
 # those captures carry real application ids, SIDs, names and team/LoB values and are
-# Internal-Confidential, so nothing from them is transcribed here or anywhere in the
+# Internal and confidential material, so nothing from them is transcribed here or anywhere in the
 # publishable tree (PUBLISH-BOUNDARY.md; the sealid-in-strings lesson).
 classification: Internal-Public
 schema: drydocs.gate-prompt.v1
@@ -55,7 +55,7 @@ summary: >
 meta:
   Module: "drydocs-load · seal_attribution loader + manual tier-5 writer (K2) · mapping store (O13/O24) · drydocs_api/mappings.py"
   Source: "STG_APP_FACT (fact_type SEAL) demotes to fallback; NEW authoring source = the steward-defined app-code mapping (config/overrides/ CSV → mapping.db domain — no source system exists for it)"
-  Registry ref: "stg-app-fact — confirmed, unchanged; the defined-mapping store needs its own source-registry entry at build (classification Internal-Confidential company-side, mechanism-only here)"
+  Registry ref: "stg-app-fact — confirmed, unchanged; the defined-mapping store needs its own source-registry entry at build (classification Internal — confidential material — company-side, mechanism-only here)"
   Classification: "Internal (real code→SEAL rows) · this page Internal-Public (mechanism only)"
   Vocabulary: "m3_seal_app_ref (active, rider) · m3_contains_folder (active — the app-code→folder tie) · arch_contains_batch/arch_contains_folder (planned :Batch bridge — candidate for retirement at this gate, section D) · §G adds: reg_uses_software (active — the orchestrator edge, authorship under decision G1/G2) · seal_has_port (active — Port.active activation semantics, G4) · catalog_has_application (PLANNED producer-side with no loader, ACTIVE company-side with one — the §G6 back-flow)"
   Ontology map: "config/taxonomy-ontology-map.yaml job-seal-app-ref (confirmed, type_conflict_note) + app-code-defined-mapping (proposed 2026-07-22, this gate's entry)"

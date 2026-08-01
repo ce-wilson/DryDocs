@@ -52,9 +52,13 @@ SPEC_DATABASES: frozenset[str] = frozenset({"drydocs", "ddcontext", "ddall"})
 # Databases whose content is synthesized/uncertain — results carry the
 # SYNTHESIZED watermark in the manifest AND as a grid-visible column.
 WATERMARKED_DATABASES: frozenset[str] = frozenset({"ddcontext", "ddall"})
-CLASSIFICATIONS: frozenset[str] = frozenset(
-    {"external", "internal-public", "internal", "internal-confidential"}
-)
+# The publish-boundary vocabulary. This is a SECOND copy of what
+# config/classification.yaml defines — the API is pure and does not read the
+# config at import — so tests/unit/test_classification.py asserts the two agree.
+# That guard is why J23's collapse to three levels could be missed here for a
+# day: nothing checked. `internal-confidential` was retired 2026-07-31 (J23);
+# `internal` absorbs it.
+CLASSIFICATIONS: frozenset[str] = frozenset({"external", "internal-public", "internal"})
 _SPEC_ID_RE = re.compile(r"^[a-z0-9-]+(\.[a-z0-9-]+)+\.v\d+$")
 
 
@@ -310,7 +314,10 @@ QUERY_SPECS: dict[str, QuerySpec] = {
         QuerySpec(
             id="ownership.teams.v1",
             database="drydocs",
-            description="Dev teams with their DEVELOPS application count (arch_develops, C3 gate).",
+            description=(
+                "Dev teams with their DEVELOPS application count (arch_develops, C3 gate). "
+                "Team rosters are confidential material — Internal handling (J23)."
+            ),
             cypher=(
                 "MATCH (dt:DevTeam) WHERE NOT dt:SchemaMeta "
                 "OPTIONAL MATCH (dt)-[:DEVELOPS]->(a:BusinessApplication) "
@@ -323,7 +330,7 @@ QUERY_SPECS: dict[str, QuerySpec] = {
                 ColumnDef("team", "string", "Team"),
                 ColumnDef("applications", "int", "Applications"),
             ),
-            classification="internal-confidential",
+            classification="internal",
             params=_LIMIT,
         ),
         QuerySpec(
@@ -354,7 +361,7 @@ QUERY_SPECS: dict[str, QuerySpec] = {
                 ColumnDef("unmapped_role", "string", "Unmapped?"),
                 ColumnDef("holder_sid", "string", "Holder SID"),
             ),
-            classification="internal-confidential",
+            classification="internal",
             params=_LIMIT,
         ),
         QuerySpec(

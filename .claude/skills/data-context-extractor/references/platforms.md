@@ -24,7 +24,7 @@ on `:DataAsset` and `:ControlMJob`.
 |---|---|---|---|---|
 | Public annual reports, 10-K SEC filings | External | VERBATIM / GROUNDED | `drydocs` | No — public domain; cite `source_url` |
 | Internal slide decks, design docs, org charts | Internal-Public | SYNTHESIZED | `ddcontext` | Yes — omit internal names before committing |
-| Internal-confidential documents | Internal-Confidential | SYNTHESIZED | `ddcontext` | Never commit even sanitized |
+| Confidential internal documents (rosters, SIDs, SEAL ids, schema object names) | Internal | SYNTHESIZED | `ddcontext` | Never commit even sanitized — flag the confidential handling in a note on the entry (J23) |
 
 > **External documents** (annual reports, SEC filings, public vendor docs) are in the
 > public domain. They carry `classification: External`, require no sanitization, and

@@ -10,7 +10,7 @@
 # No meaning edges (ownership/attribution semantics) — those are ontology (C2).
 #
 # Built from a SYNTHETIC sample (publishable shape). The SOURCE (seal-extract) is
-# Internal-Confidential: in production, real names/emails/SIDs are NOT written here —
+# Internal (confidential material): in production, real names/emails/SIDs are NOT written here —
 # referenced by SID/SEALID; real rosters live in internal/. Captured 2026-06-20.
 #
 # SANITIZED 2026-07-27 (p0 publish-boundary fix). Until this date the three sample

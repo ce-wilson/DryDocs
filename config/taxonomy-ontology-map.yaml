@@ -323,7 +323,7 @@ mappings:
       documented proposed_additions entry, NOT wired into the live order:/active: chain — see
       that file); (2) every fact/record extracted from a scraped page carries this
       hadPrimarySource edge back to the Document it was extracted from. Trust axis
-      (VERBATIM/GROUNDED/SYNTHESIZED) and classification (Internal / Internal-Confidential) are
+      (VERBATIM/GROUNDED/SYNTHESIZED) and classification (Internal-Public / Internal) are
       carried on the Document/Chunk nodes themselves, per
       knowledge/upgrade-plans/docmeta-component.md — out of scope for this entry.
     open_questions:
@@ -1005,7 +1005,7 @@ mappings:
       - "Intended-vs-wired split: NOTIFIES is authored from the C surface; DO-MAIL/SHOUT + notification-pset extraction is corroboration — mismatches surface to the steward, never auto-resolve (gate B2)."
       - "Store posture differs per leg: HAS_CONTACT_POINT = store-as-source (no feed exists, the seal-app-ref-edge-reshape §E2 scoping); NOTIFIES = ordinary O24 override-until-fixed once the escalation-db convention lands (gate D1/D2)."
       - "Membership + email-observed usage = layer-4 context only (SOSA experimental family or store metadata), never ontology-core — gate section E; inherits sosa adoption: experimental."
-      - "Local-db posture: synthetic fixture DLs only in neo4jtest; real rows company-side, Internal-Confidential (escalation-db rows Internal)."
+      - "Local-db posture: synthetic fixture DLs only in neo4jtest; real rows company-side, Internal — confidential material (escalation-db rows Internal too)."
 
 
   # ---- BusinessApplication identity property contract (CONFIRMED 2026-07-27 — gate business-application-identity) ----

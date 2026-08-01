@@ -58,9 +58,10 @@ drift.
    (b) a row references a missing file/test — the matrix cannot drift from the repo.
    (Same pattern as the board render: yaml = truth, render = artifact, test = guard.)
 5. Surface detail tab renders the YAML read-only with the schema header highlighted;
-   `internal`/`internal-confidential` surfaces show the classification banner and
-   redact values client-side never sees (server sends structure + keys only for
-   confidential surfaces).
+   `internal` surfaces show the classification banner and redact values the
+   client-side never sees (server sends structure + keys only for surfaces
+   carrying confidential material — since J23 that handling is a property of
+   the entry, not a separate tier).
 6. Status column values: `enforced` (guard test exists + passing at last CI),
    `unguarded` (surface with no test — a visible red flag, this is the page's KPI),
    `gate-pending` (entries with status planned awaiting HITL).

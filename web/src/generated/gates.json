@@ -463,7 +463,8 @@
       ],
       "log_ref": null,
       "unblocks": [
-        "G44"
+        "G44",
+        "J24"
       ]
     },
     {
@@ -491,7 +492,8 @@
       "log_ref": null,
       "unblocks": [
         "G22",
-        "G45"
+        "G45",
+        "J24"
       ]
     }
   ]
