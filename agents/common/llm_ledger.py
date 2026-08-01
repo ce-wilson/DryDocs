@@ -66,9 +66,7 @@ def estimate_cost_usd(
     for key in sorted(PRICE_PER_MTOK, key=len, reverse=True):
         if key in model:
             in_rate, out_rate = PRICE_PER_MTOK[key]
-            return round(
-                (prompt_tokens * in_rate + completion_tokens * out_rate) / 1_000_000, 6
-            )
+            return round((prompt_tokens * in_rate + completion_tokens * out_rate) / 1_000_000, 6)
     return None
 
 

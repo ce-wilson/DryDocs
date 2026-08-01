@@ -22,6 +22,7 @@ the C12 gate). An unmapped string yields ``product_id=None`` — the Cypher
 flags the app node and the adapter reports it (the invocation-patterns
 coverage-policy precedent: surfaced, never guessed).
 """
+
 from __future__ import annotations
 
 import logging
@@ -226,7 +227,9 @@ class BatchPortOrchestratorLoader(BaseLoader):
             )
         LOGGER.info(
             "Loader %s: endpoints present (%d :BusinessApplication, %d :SoftwareProduct)",
-            self.name, apps, products,
+            self.name,
+            apps,
+            products,
         )
 
     def _report_rows_that_wrote_nothing(self) -> None:
@@ -305,5 +308,7 @@ class BatchPortOrchestratorLoader(BaseLoader):
                 "resolved it, but no matching :SoftwareProduct is in this database. "
                 "The registry is present but incomplete; re-run "
                 "`drydocs load-software-registry`.",
-                self.name, row.get("seal_id"), row.get("orchestrator_raw"),
+                self.name,
+                row.get("seal_id"),
+                row.get("orchestrator_raw"),
             )

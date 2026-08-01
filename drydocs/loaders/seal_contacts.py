@@ -8,6 +8,7 @@ If the actual SEAL Contact extract is wide-format (one row per app with
 five role columns), add a small splayer in this module that emits one
 SealContactRow per non-empty role column before invoking the loader.
 """
+
 from __future__ import annotations
 
 from pathlib import Path

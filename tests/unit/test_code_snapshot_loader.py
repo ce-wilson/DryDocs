@@ -7,6 +7,7 @@ picks ``tree-this-version.json`` as "newest". These tests pin exactly the
 failure modes that literal reading would reintroduce, plus the §H4 abs_path
 drop and the wiring declarations — all without a Neo4j connection.
 """
+
 from __future__ import annotations
 
 import json
@@ -85,6 +86,7 @@ def _write(tmp_path: Path, name: str, doc: dict) -> Path:
 # Newest-file selection (§H2) — tree files must never be candidates
 # ---------------------------------------------------------------------------
 
+
 def test_selection_ignores_tree_files_despite_name_sort(tmp_path: Path) -> None:
     """'t' > 'd': a bare *.json name-sort would pick tree-this-version.json.
     The glob is drydocs-*.json only, so it cannot."""
@@ -120,6 +122,7 @@ def test_selection_refuses_empty_dir_loudly(tmp_path: Path) -> None:
 # ---------------------------------------------------------------------------
 # The positive discriminator (§G1(a) + build note 2026-07-27)
 # ---------------------------------------------------------------------------
+
 
 def test_refuses_snapshot_with_no_meta_key(tmp_path: Path) -> None:
     """The ACTUAL tree-mode shape: same schema string, NO meta key at all.
@@ -159,9 +162,14 @@ def test_accepts_v2_schema_and_warns_on_unloaded_sections(tmp_path: Path, caplog
     sections added. Empty sections load silently; NON-empty ones warn — this
     loader loads code modules only, and dropping content silently is the one
     thing the house rule forbids."""
-    doc = _dep_snapshot(schema="depgraph-machine-first/v2",
-                        processes=[], data_assets=[], hosts=[], rels=[],
-                        stats={"nodes": 2})
+    doc = _dep_snapshot(
+        schema="depgraph-machine-first/v2",
+        processes=[],
+        data_assets=[],
+        hosts=[],
+        rels=[],
+        stats={"nodes": 2},
+    )
     path = _write(tmp_path, "drydocs-20260101-0000.json", doc)
     with caplog.at_level("WARNING", logger="drydocs.loaders.code_snapshot"):
         assert len(read_snapshot(path)["nodes"]) == 2
@@ -171,8 +179,7 @@ def test_accepts_v2_schema_and_warns_on_unloaded_sections(tmp_path: Path, caplog
     path2 = _write(tmp_path, "drydocs-20260102-0000.json", doc)
     with caplog.at_level("WARNING", logger="drydocs.loaders.code_snapshot"):
         read_snapshot(path2)
-    assert any("processes" in r.getMessage() for r in caplog.records
-               if r.levelname == "WARNING")
+    assert any("processes" in r.getMessage() for r in caplog.records if r.levelname == "WARNING")
 
 
 def test_refuses_zero_nodes(tmp_path: Path) -> None:
@@ -191,6 +198,7 @@ def test_accepts_dependency_mode(tmp_path: Path) -> None:
 # ---------------------------------------------------------------------------
 # Adapter semantics — abs_path drop (§H4), imports nesting (§D1), SWO (§E1b)
 # ---------------------------------------------------------------------------
+
 
 def test_adapter_drops_abs_path_and_rows_validate(tmp_path: Path) -> None:
     path = _write(tmp_path, "drydocs-20260101-0000.json", _dep_snapshot())
@@ -252,6 +260,7 @@ def test_adapter_refuses_malformed_edge(tmp_path: Path) -> None:
 # The committed artifact itself — the loader's real input stays loadable
 # ---------------------------------------------------------------------------
 
+
 def test_committed_newest_snapshot_is_accepted_and_clean() -> None:
     if not DEFAULT_SNAPSHOT_DIR.exists():  # pragma: no cover
         pytest.skip("snapshot dir absent")
@@ -273,6 +282,7 @@ def test_committed_newest_snapshot_is_accepted_and_clean() -> None:
 # Wiring declarations — cypher, constraints, supplement, loader class
 # ---------------------------------------------------------------------------
 
+
 def test_loader_class_wiring() -> None:
     assert CodeSnapshotLoader.name == "code_snapshot.v1"
     assert CodeSnapshotLoader.cypher_path == CYPHER_FILE
@@ -285,10 +295,10 @@ def test_cypher_writes_only_gated_edges_and_drops_abs_path() -> None:
     text = CYPHER_FILE.read_text(encoding="utf-8")
     for token in ("HAS_MODULE", "IMPORTS", "IS_ENCODED_IN", ":Project", ":CodeModule"):
         assert token in text, f"cypher missing {token}"
-    code = "\n".join(
-        line for line in text.splitlines() if not line.lstrip().startswith("//")
-    )
-    assert "abs_path" not in code, "§H4: abs_path must not appear in cypher CODE (comments may document the drop)"
+    code = "\n".join(line for line in text.splitlines() if not line.lstrip().startswith("//"))
+    assert (
+        "abs_path" not in code
+    ), "§H4: abs_path must not appear in cypher CODE (comments may document the drop)"
     # M2 pull-provenance convention (§D3 — divergence rejected).
     for prop in ("first_seen_at", "last_seen_at", "last_run_id"):
         assert prop in text
@@ -304,6 +314,6 @@ def test_supplement_declares_terms_and_swo_mapping() -> None:
     text = SUPPLEMENT_FILE.read_text(encoding="utf-8")
     for iri_tail in ("#Project", "#CodeModule", "#hasModule", "#imports", "#isEncodedIn"):
         assert f"https://drydocs.local/ontology{iri_tail}" in text
-    assert "http://www.ebi.ac.uk/swo/SWO_0000741" in text, (
-        "IS_ENCODED_IN must MAPS_TO the seeded SWO 'is encoded in' term (§E1(b))"
-    )
+    assert (
+        "http://www.ebi.ac.uk/swo/SWO_0000741" in text
+    ), "IS_ENCODED_IN must MAPS_TO the seeded SWO 'is encoded in' term (§E1(b))"

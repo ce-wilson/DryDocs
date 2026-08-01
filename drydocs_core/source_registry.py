@@ -31,6 +31,7 @@ error for an unknown, retired, or unconfirmed source, and is a no-op for a
 confirmed one. The CLI wraps it at each production-load point (see
 ``drydocs/cli.py``).
 """
+
 from __future__ import annotations
 
 from dataclasses import dataclass
@@ -219,8 +220,10 @@ class SourceRegistry:
             _add(entry, "source-registry")
 
         # -- doc-ledger union (one home per source; gate still covers docs) --
-        doc_path = Path(doc_registry_path) if doc_registry_path else (
-            DEFAULT_DOC_REGISTRY_PATH if is_default else None
+        doc_path = (
+            Path(doc_registry_path)
+            if doc_registry_path
+            else (DEFAULT_DOC_REGISTRY_PATH if is_default else None)
         )
         if doc_path is not None and doc_path.exists():
             doc_doc = yaml.safe_load(doc_path.read_text(encoding="utf-8")) or {}
@@ -228,8 +231,8 @@ class SourceRegistry:
                 _add(entry, "doc-registry")
 
         # -- the D2 overlay ---------------------------------------------------
-        ov_path = Path(overlay_path) if overlay_path else (
-            DEFAULT_OVERLAY_PATH if is_default else None
+        ov_path = (
+            Path(overlay_path) if overlay_path else (DEFAULT_OVERLAY_PATH if is_default else None)
         )
         overlay: dict[str, str] = {}
         if ov_path is not None and ov_path.exists():
@@ -302,9 +305,7 @@ class SourceRegistry:
 
     # ---- the D2 overlay ---------------------------------------------------
 
-    def effective_source_id(
-        self, loader_name: str, declared: str | None
-    ) -> str | None:
+    def effective_source_id(self, loader_name: str, declared: str | None) -> str | None:
         """The dataset id a loader actually binds to: the per-side overlay
         entry when one exists (D2 — config wins over the class default),
         else the loader's own declared ``source_id``."""

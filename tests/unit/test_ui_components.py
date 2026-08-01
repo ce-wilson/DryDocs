@@ -9,6 +9,7 @@ to update rots into fiction — and this one was hand-generated from a `find`
 whose output truncated at 60 of 62 files, which is precisely the failure mode
 the guard exists to catch.
 """
+
 from __future__ import annotations
 
 from pathlib import Path
@@ -88,18 +89,13 @@ def test_no_ledger_entry_points_at_a_missing_file() -> None:
     """Delete or move a component without updating the ledger and this fails."""
     doc = _ui()
     stale = sorted({c["path"] for c in doc["components"]} - _on_disk(doc))
-    assert not stale, (
-        f"{len(stale)} ledger entr(ies) name a file that no longer exists: {stale}"
-    )
+    assert not stale, f"{len(stale)} ledger entr(ies) name a file that no longer exists: {stale}"
 
 
 def test_component_id_matches_its_filename() -> None:
     doc = _ui()
     ext = doc["extension"]
-    bad = [
-        c["id"] for c in doc["components"]
-        if c["path"].rsplit("/", 1)[-1] != f"{c['id']}{ext}"
-    ]
+    bad = [c["id"] for c in doc["components"] if c["path"].rsplit("/", 1)[-1] != f"{c['id']}{ext}"]
     assert not bad, f"component id does not match filename for: {bad}"
 
 
@@ -110,9 +106,9 @@ def test_ledger_joins_to_a_real_registered_product() -> None:
     """`framework` and `stack` must name things the software registry knows."""
     doc, reg = _ui(), _registry()
     products = {p["id"]: p for p in reg["products"]}
-    assert doc["framework"] in products, (
-        f"ui ledger framework '{doc['framework']}' is not a registered product"
-    )
+    assert (
+        doc["framework"] in products
+    ), f"ui ledger framework '{doc['framework']}' is not a registered product"
     product = products[doc["framework"]]
     assert doc["stack"] in (product.get("stack") or []), (
         f"ui ledger stack '{doc['stack']}' is not one of product "
@@ -130,9 +126,9 @@ def test_the_pointer_is_reciprocal() -> None:
     product = next(p for p in reg["products"] if p["id"] == doc["framework"])
     pointer = product.get("components")
     assert pointer, f"product '{product['id']}' has no components pointer"
-    assert (REPO / pointer["ledger"]) == UI_LEDGER, (
-        f"components.ledger points at {pointer['ledger']}, not {UI_LEDGER.name}"
-    )
+    assert (
+        REPO / pointer["ledger"]
+    ) == UI_LEDGER, f"components.ledger points at {pointer['ledger']}, not {UI_LEDGER.name}"
     assert pointer["schema"] == doc["schema"], "pointer schema disagrees with the ledger"
 
 
@@ -155,7 +151,8 @@ def test_every_module_binding_names_a_real_console_module() -> None:
     valid = _module_ids()
     assert valid, "could not read module ids from registry.ts"
     bad = [
-        (c["id"], c["module"]) for c in _ui()["components"]
+        (c["id"], c["module"])
+        for c in _ui()["components"]
         if c.get("module") and c["module"] not in valid
     ]
     assert not bad, f"component(s) bound to unknown modules: {bad} (valid: {sorted(valid)})"
@@ -167,7 +164,9 @@ def test_a_binding_always_records_how_it_was_derived() -> None:
     for c in _ui()["components"]:
         has_module, has_evidence = bool(c.get("module")), bool(c.get("module_evidence"))
         if has_module != has_evidence:
-            failures.append(f"{c['id']}: module={c.get('module')!r} evidence={c.get('module_evidence')!r}")
+            failures.append(
+                f"{c['id']}: module={c.get('module')!r} evidence={c.get('module_evidence')!r}"
+            )
         if has_evidence and c["module_evidence"] not in VALID_EVIDENCE:
             failures.append(f"{c['id']}: unknown evidence '{c['module_evidence']}'")
     assert not failures, "\n".join(failures)
@@ -177,9 +176,9 @@ def test_directory_evidence_actually_holds() -> None:
     """'directory' must mean the file really lives under that module folder."""
     for c in _ui()["components"]:
         if c.get("module_evidence") == "directory":
-            assert c["path"].split("/")[0] == c["module"], (
-                f"{c['id']} claims directory evidence for '{c['module']}' but sits at {c['path']}"
-            )
+            assert (
+                c["path"].split("/")[0] == c["module"]
+            ), f"{c['id']} claims directory evidence for '{c['module']}' but sits at {c['path']}"
 
 
 def test_unbound_components_are_counted_not_hidden() -> None:
@@ -192,6 +191,7 @@ def test_unbound_components_are_counted_not_hidden() -> None:
     """
     comps = _ui()["components"]
     bound = [c for c in comps if c.get("module")]
-    assert (len(bound), len(comps)) == (26, 62), (
-        f"module-binding coverage changed: {len(bound)}/{len(comps)} bound"
-    )
+    assert (len(bound), len(comps)) == (
+        26,
+        62,
+    ), f"module-binding coverage changed: {len(bound)}/{len(comps)} bound"

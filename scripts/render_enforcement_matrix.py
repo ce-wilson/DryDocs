@@ -20,6 +20,7 @@ CI freshness is LAST-RUN metadata only (user decision 2026-07-17): if
 embedded verbatim; otherwise ``ci_last_run`` is null and the page says so --
 no live CI polling, ever.
 """
+
 from __future__ import annotations
 
 import json
@@ -191,7 +192,10 @@ CONFIG_EXEMPT = {"README.md"}
 def _read_capped(path: Path) -> str:
     text = path.read_text(encoding="utf-8", errors="replace")
     if len(text) > CONTENT_CAP:
-        return text[:CONTENT_CAP] + f"\n[truncated at {CONTENT_CAP} chars -- full file at {path.name}]\n"
+        return (
+            text[:CONTENT_CAP]
+            + f"\n[truncated at {CONTENT_CAP} chars -- full file at {path.name}]\n"
+        )
     return text
 
 
@@ -316,7 +320,9 @@ def build_matrix() -> dict:
             "tests/unit/test_enforcement_matrix.py fails when this drifts from the repo."
         ),
         "ci_last_run": ci_last_run,
-        "ci_note": None if ci_last_run else (
+        "ci_note": None
+        if ci_last_run
+        else (
             "no CI artifact at var/ci-last-run.json -- guard-test freshness unknown "
             "(last-run metadata only; the page never polls CI)"
         ),

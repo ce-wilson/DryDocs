@@ -13,6 +13,7 @@ can serve it same-origin (the artifact CSP / self-contained rule).
 Rides the default ``render_board.py`` run (the J17/J20/N4 one-entry-point
 idiom); ``tests/unit/test_software_registry_json.py`` is the drift guard.
 """
+
 from __future__ import annotations
 
 import json
@@ -44,7 +45,7 @@ def build_software_registry_view() -> dict:
 
     vendors, without_icons = [], []
     for v in registry["vendors"]:
-        icon_id = v.get("icon", v["id"])          # the soft link: override, else convention
+        icon_id = v.get("icon", v["id"])  # the soft link: override, else convention
         icon = icons.get(icon_id)
         row = {
             "id": v["id"],
@@ -59,14 +60,16 @@ def build_software_registry_view() -> dict:
             row["icon"] = {
                 "id": icon_id,
                 "label": icon["label"],
-                "kind": icon.get("kind"),         # software | product | infrastructure | persona
-                "vendor": icon.get("vendor"),     # owning brand when the icon is a product (e.g. jira -> atlassian)
+                "kind": icon.get("kind"),  # software | product | infrastructure | persona
+                "vendor": icon.get(
+                    "vendor"
+                ),  # owning brand when the icon is a product (e.g. jira -> atlassian)
                 "category": icon.get("category"),
                 "hex": icon.get("hex"),
                 "verified": icon.get("verified", False),
                 # served same-origin by the Vite app (web/public/)
                 "asset": f"vendor-icons/{icon_id}{Path(source).suffix}",
-                "source": source,                 # repo path inside drydocs-icons/ (provenance)
+                "source": source,  # repo path inside drydocs-icons/ (provenance)
             }
         vendors.append(row)
 

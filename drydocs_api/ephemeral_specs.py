@@ -107,9 +107,7 @@ class EphemeralSpec:
         )
 
     def expires_at_iso(self) -> str:
-        return datetime.fromtimestamp(self.expires_at, tz=UTC).isoformat(
-            timespec="seconds"
-        )
+        return datetime.fromtimestamp(self.expires_at, tz=UTC).isoformat(timespec="seconds")
 
 
 class EphemeralSpecStore:
@@ -206,9 +204,7 @@ def register_ephemeral(
     With no key configured the surface is disabled entirely (fail closed).
     """
     if not expected_key:
-        raise Forbidden(
-            "ephemeral registration is disabled (DRYDOCS_AGENT_REG_KEY not configured)"
-        )
+        raise Forbidden("ephemeral registration is disabled (DRYDOCS_AGENT_REG_KEY not configured)")
     if not agent_key or not secrets.compare_digest(agent_key, expected_key):
         raise Forbidden("ephemeral registration requires the agent key")
     sessions.resolve(owner_token)  # raises InvalidTokenError — the owner must be live

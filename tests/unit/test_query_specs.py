@@ -1,4 +1,4 @@
-﻿"""O11 QuerySpec registry + export tests — pure handlers over a duck-typed
+"""O11 QuerySpec registry + export tests — pure handlers over a duck-typed
 runner (the drydocs-api offline idiom): no server, no driver, no FastAPI."""
 
 from __future__ import annotations

@@ -65,9 +65,7 @@ def run_read(
         return rows, list(result.keys()), truncated
 
     try:
-        with get_driver().session(
-            database=db, default_access_mode=neo4j.READ_ACCESS
-        ) as session:
+        with get_driver().session(database=db, default_access_mode=neo4j.READ_ACCESS) as session:
             rows, keys, truncated = session.execute_read(_work)
     except neo4j.exceptions.Neo4jError as exc:
         raise CypherReadError(str(exc), code=getattr(exc, "code", None)) from exc

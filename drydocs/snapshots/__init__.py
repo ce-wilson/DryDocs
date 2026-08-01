@@ -2,6 +2,7 @@
 
 5-year rolling retention; runs at the end of every ``refresh-reference``.
 """
+
 from .writer import SnapshotWriter
 
 __all__ = ["SnapshotWriter"]

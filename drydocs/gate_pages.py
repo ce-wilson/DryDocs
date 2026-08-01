@@ -12,6 +12,7 @@ ticks are a working aid.** classification: Internal-Public — the generator is 
 the committed example spec is a vendor-BMC step. Pages for real PAT/SEAL steps are
 confidential (Internal, J23) (real LoB/SEAL data) and render into a gitignored dir, never here.
 """
+
 from __future__ import annotations
 
 import html
@@ -49,8 +50,8 @@ class PropRow:
     """One node property with its provenance: straight from a source column, or derived."""
 
     name: str
-    origin: str          # "source" | "derived"
-    source: str          # column name, or the derivation rule
+    origin: str  # "source" | "derived"
+    source: str  # column name, or the derivation rule
     note: str = ""
 
 
@@ -72,7 +73,7 @@ class GateSpec:
     step: str = ""
     classification: str = "Internal-Public"
     summary: str = ""
-    meta: tuple[tuple[str, str], ...] = ()          # header card rows (Module, Source, Registry ref, …)
+    meta: tuple[tuple[str, str], ...] = ()  # header card rows (Module, Source, Registry ref, …)
     sections: tuple[Section, ...] = ()
     mapping: tuple[MappingRow, ...] = ()
     provenance: tuple[ProvenanceBlock, ...] = ()
@@ -116,19 +117,23 @@ def spec_from_dict(doc: dict[str, Any], default_id: str = "gate") -> GateSpec:
             origin = str(p.get("origin", "source"))
             if origin not in ("source", "derived"):
                 raise GateSpecError(f"property origin must be 'source' or 'derived': {p!r}")
-            props.append(PropRow(
-                name=str(p.get("name", "")),
-                origin=origin,
-                source=str(p.get("from", "")),
-                note=str(p.get("note", "")),
-            ))
-        provenance.append(ProvenanceBlock(
-            label=str(raw.get("label", "")),
-            source_object=str(raw.get("source_object", "")),
-            key=str(raw.get("key", "")),
-            loader=str(raw.get("loader", "")),
-            properties=tuple(props),
-        ))
+            props.append(
+                PropRow(
+                    name=str(p.get("name", "")),
+                    origin=origin,
+                    source=str(p.get("from", "")),
+                    note=str(p.get("note", "")),
+                )
+            )
+        provenance.append(
+            ProvenanceBlock(
+                label=str(raw.get("label", "")),
+                source_object=str(raw.get("source_object", "")),
+                key=str(raw.get("key", "")),
+                loader=str(raw.get("loader", "")),
+                properties=tuple(props),
+            )
+        )
     return GateSpec(
         id=str(doc.get("id", default_id)),
         title=str(doc["title"]),
@@ -174,6 +179,7 @@ def _checkbox(cid: str, text: str) -> str:
 # an M2 upgrade would be its own gate decision.
 # ---------------------------------------------------------------------------
 
+
 def _draft_payload(spec: GateSpec) -> dict[str, Any]:
     """Everything the client-side draft needs, with per-confirmation lines
     PREBUILT here so browser output and draft_gate_log_entry() cannot drift."""
@@ -181,11 +187,13 @@ def _draft_payload(spec: GateSpec) -> dict[str, Any]:
     for si, s in enumerate(spec.sections):
         confs = []
         for ci, text in enumerate(s.confirmations):
-            confs.append({
-                "id": f"c{si}_{ci}",
-                "ticked": f"    - [x] {text}",
-                "unticked": f"    - [ ] {text}",
-            })
+            confs.append(
+                {
+                    "id": f"c{si}_{ci}",
+                    "ticked": f"    - [x] {text}",
+                    "unticked": f"    - [ ] {text}",
+                }
+            )
         sections.append({"title": s.title, "confs": confs})
     return {
         "heading": f"## {{date}} — {spec.title} ({spec.id}) — {{status}}",
@@ -290,7 +298,8 @@ def render_gate_page(spec: GateSpec, page_path: str | None = None) -> str:
 
     if spec.meta:
         rows = "\n".join(
-            f"      <tr><td>{html.escape(k)}</td><td>{html.escape(v)}</td></tr>" for k, v in spec.meta
+            f"      <tr><td>{html.escape(k)}</td><td>{html.escape(v)}</td></tr>"
+            for k, v in spec.meta
         )
         parts.append(f"<div class='meta'><table><tbody>\n{rows}\n    </tbody></table></div>")
 
@@ -335,7 +344,7 @@ def render_gate_page(spec: GateSpec, page_path: str | None = None) -> str:
         boxes = "\n".join(
             _checkbox(f"c{si}_{ci}", conf) for ci, conf in enumerate(section.confirmations)
         )
-        parts.append(f'<h2>{html.escape(section.title)}</h2>\n{boxes}')
+        parts.append(f"<h2>{html.escape(section.title)}</h2>\n{boxes}")
 
     # O25 — the M1 drafting affordance (client-side only; see draft_gate_log_entry)
     parts.append(

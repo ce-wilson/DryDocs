@@ -62,6 +62,7 @@ Real exports are confidential (Internal, J23) and live in the G19 landing zone
 (``catalog/``, resolver ``drydocs_core.data_root.catalog_dir``), never in
 the repo; ``tests/unit/test_data_root.py`` sweeps the tree for strays.
 """
+
 from __future__ import annotations
 
 import csv
@@ -110,34 +111,34 @@ class CatalogDatasetRecord:
     """One logical dataset, taxonomy-first: classification facts +
     provenance, no meaning."""
 
-    guid: str                       # DATASET_IDENTIFIER — the identity key
+    guid: str  # DATASET_IDENTIFIER — the identity key
     name: str = ""
     business_name: str = ""
     description: str = ""
-    publisher: str = ""             # org/product line — taxonomy fact (§5f)
-    producedby_app_id: str = ""     # SEAL-shaped bridge key — fact, not edge (§5c)
-    contact_email: str = ""         # routes to the email-dl-contact-point gate (§5d)
-    registration_source: str = ""   # verbatim upstream authority name
+    publisher: str = ""  # org/product line — taxonomy fact (§5f)
+    producedby_app_id: str = ""  # SEAL-shaped bridge key — fact, not edge (§5c)
+    contact_email: str = ""  # routes to the email-dl-contact-point gate (§5d)
+    registration_source: str = ""  # verbatim upstream authority name
     registration_source_ref: str = ""  # foreign key into that authority (DPL rows: the DPL GUID)
-    origin: str = "catalog"         # dpl | authority2 | catalog (§3)
-    timestamp: str = ""             # audit time, verbatim (latest-per-GUID already applied)
-    source_file: str = ""           # provenance: which export staged this record
+    origin: str = "catalog"  # dpl | authority2 | catalog (§3)
+    timestamp: str = ""  # audit time, verbatim (latest-per-GUID already applied)
+    source_file: str = ""  # provenance: which export staged this record
 
 
 @dataclass(frozen=True)
 class CatalogDistributionRecord:
     """One physical materialization of a dataset on a platform."""
 
-    dataset_guid: str               # parent DATASET_IDENTIFIER ("" counted)
-    distribution_guid: str          # DISTRIBUTION_IDENTIFIER — the identity key
-    name: str = ""                  # platform-prefixed — cross-check only, never extraction
-    shape: str = ""                 # "table" | "file" | "s3" | "" (unresolved/ambiguous — counted)
+    dataset_guid: str  # parent DATASET_IDENTIFIER ("" counted)
+    distribution_guid: str  # DISTRIBUTION_IDENTIFIER — the identity key
+    name: str = ""  # platform-prefixed — cross-check only, never extraction
+    shape: str = ""  # "table" | "file" | "s3" | "" (unresolved/ambiguous — counted)
     platform: str = ""
-    namespace: str = ""             # db(.schema) / directory / bucket, lowercase
-    asset_name: str = ""            # table / file / s3 asset
-    storage_uri: str = ""           # the shape's resource URI (jdbc:/hdfs:/s3a:)
-    candidate_asset_urn: str = ""   # FACT column only — never an identity ruling
-    consumable: str = ""            # CONSUMABLE_INDICATOR, verbatim (lifecycle is layer-4, §5e)
+    namespace: str = ""  # db(.schema) / directory / bucket, lowercase
+    asset_name: str = ""  # table / file / s3 asset
+    storage_uri: str = ""  # the shape's resource URI (jdbc:/hdfs:/s3a:)
+    candidate_asset_urn: str = ""  # FACT column only — never an identity ruling
+    consumable: str = ""  # CONSUMABLE_INDICATOR, verbatim (lifecycle is layer-4, §5e)
     publication_mode: str = ""
     registration_source: str = ""
     registration_source_ref: str = ""
@@ -152,20 +153,20 @@ class CatalogCoverage:
     """Per-run accounting — every skip is counted BY REASON, never silent."""
 
     files_read: int = 0
-    files_invalid: int = 0              # unreadable / header names neither view
+    files_invalid: int = 0  # unreadable / header names neither view
     rows_read: int = 0
-    rows_no_guid: int = 0               # missing the view's identity column — skipped
-    datasets_staged: int = 0            # unique dataset GUIDs after dedup
-    distributions_staged: int = 0       # unique distribution GUIDs after dedup
-    duplicate_datasets: int = 0         # union dupes — latest-per-GUID wins
+    rows_no_guid: int = 0  # missing the view's identity column — skipped
+    datasets_staged: int = 0  # unique dataset GUIDs after dedup
+    distributions_staged: int = 0  # unique distribution GUIDs after dedup
+    duplicate_datasets: int = 0  # union dupes — latest-per-GUID wins
     duplicate_distributions: int = 0
-    distributions_no_dataset: int = 0   # distribution row without a parent GUID — staged, counted
-    shape_unresolved: int = 0           # no physical shape populated — staged ""
-    shape_ambiguous: int = 0            # >1 shape populated (contract violation) — staged ""
+    distributions_no_dataset: int = 0  # distribution row without a parent GUID — staged, counted
+    shape_unresolved: int = 0  # no physical shape populated — staged ""
+    shape_ambiguous: int = 0  # >1 shape populated (contract violation) — staged ""
     sentinel_not_instrumented: int = 0  # NOT INSTRUMENTED occurrences nulled
-    timestamp_unparsed: int = 0         # neither observed format — loses dedup ties
-    urn_underived: int = 0              # distribution without a full urn triple
-    origin_dpl: int = 0                 # census over the staged (deduped) datasets
+    timestamp_unparsed: int = 0  # neither observed format — loses dedup ties
+    urn_underived: int = 0  # distribution without a full urn triple
+    origin_dpl: int = 0  # census over the staged (deduped) datasets
     origin_authority2: int = 0
     origin_catalog: int = 0
 
@@ -286,12 +287,14 @@ class SnowflakeCatalogExtractor:
         once per row in :meth:`_count_sentinels` (eager, whole row) so an
         occurrence in a column the shape branch never reads still counts —
         instrumentation coverage is itself a finding."""
+
         def cell(key: str) -> str:
             idx = cols.get(key)
             if idx is None or idx >= len(raw):
                 return ""
             value = raw[idx].strip()
             return "" if value.upper() == NOT_INSTRUMENTED else value
+
         return cell
 
     @staticmethod
@@ -420,11 +423,13 @@ class SnowflakeCatalogExtractor:
         s3_asset = cell("s3dataassetname")
 
         populated = [
-            name for name, hit in (
+            name
+            for name, hit in (
                 ("table", bool(table_name)),
                 ("file", bool(file_name)),
                 ("s3", bool(s3_bucket or s3_asset)),
-            ) if hit
+            )
+            if hit
         ]
         if len(populated) != 1:
             if populated:

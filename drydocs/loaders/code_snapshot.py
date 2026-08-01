@@ -21,6 +21,7 @@ this back to one.
 snapshot.ps1 stays DECOUPLED (§H3): nothing here is imported by the session
 ritual, which must keep working with no database running.
 """
+
 from __future__ import annotations
 
 import json
@@ -40,9 +41,7 @@ if TYPE_CHECKING:  # pragma: no cover
 LOGGER = logging.getLogger(__name__)
 
 CYPHER_DIR = Path(__file__).resolve().parent / "cypher"
-DEFAULT_SNAPSHOT_DIR = (
-    Path(__file__).resolve().parents[2] / "knowledge" / "depgraph-snapshots"
-)
+DEFAULT_SNAPSHOT_DIR = Path(__file__).resolve().parents[2] / "knowledge" / "depgraph-snapshots"
 # v2 (first seen 2026-07-27, ritual snapshot 20260727-2019) is a SUPERSET of
 # v1 for this loader's concern: nodes/edges/meta are unchanged; v2 adds
 # lineage sections (processes/data_assets/hosts/rels) and stats, which this
@@ -89,7 +88,8 @@ def select_newest_snapshot(snapshot_dir: Path | str = DEFAULT_SNAPSHOT_DIR) -> P
         if not m:
             LOGGER.warning(
                 "select_newest_snapshot: %s matches the glob but not the "
-                "drydocs-YYYYMMDD[-HHMM].json pattern — skipped", path.name,
+                "drydocs-YYYYMMDD[-HHMM].json pattern — skipped",
+                path.name,
             )
             continue
         candidates.append((m.group(1), m.group(2) or "0000", path))
@@ -127,7 +127,10 @@ def read_snapshot(path: Path | str) -> dict:
             LOGGER.warning(
                 "%s: v2 section '%s' carries %d record(s) this loader does NOT "
                 "load (code modules only) — a lineage-side consumer is needed "
-                "for that content", path.name, section, n,
+                "for that content",
+                path.name,
+                section,
+                n,
             )
     meta = doc.get("meta")
     if not isinstance(meta, dict):
@@ -192,9 +195,7 @@ class CodeSnapshotAdapter:
             extension = node.get("extension", "")
             language_iri = EXTENSION_LANGUAGE_IRI.get(extension)
             if language_iri is None:
-                self.unmapped_extensions[extension] = (
-                    self.unmapped_extensions.get(extension, 0) + 1
-                )
+                self.unmapped_extensions[extension] = self.unmapped_extensions.get(extension, 0) + 1
             yield {
                 # abs_path deliberately NOT emitted (§H4)
                 "file_id": node.get("file_id"),

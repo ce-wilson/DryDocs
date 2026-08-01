@@ -45,6 +45,7 @@ rules, the join material is properties — ``path`` on the artifact, and the
 Coverage follows the house rule: every malformed row, missing section, absent
 copy, and cross-host id collision is COUNTED by reason, never silent.
 """
+
 from __future__ import annotations
 
 import tarfile
@@ -59,8 +60,8 @@ from ..model import DataAssetNode, LineageGraph, ProcessNode, asset_id, process_
 META_TXT = "meta.txt"
 DIRECTORIES_TSV = "directories.tsv"
 PROFILES_TSV = "profiles.tsv"
-SCRIPTS_TSV = "scripts.tsv"          # v2 only — OPTIONAL on ingest; WINS over the csv
-SCRIPTS_CSV = "scripts.csv"          # metadata-only listing fallback (G45; pipe-delim)
+SCRIPTS_TSV = "scripts.tsv"  # v2 only — OPTIONAL on ingest; WINS over the csv
+SCRIPTS_CSV = "scripts.csv"  # metadata-only listing fallback (G45; pipe-delim)
 OWNERSHIP_TSV = "ownership_dirs.tsv"  # only when OWNERSHIP_SWEEP=yes
 
 #: staged kinds — rua-scoped on purpose (cross-source identity is G22's ruling)
@@ -106,9 +107,9 @@ class RuaCoverage:
     """Per-bundle accounting — every skip/miss is counted BY REASON, never
     silent (the STG_PARSE_QUALITY / UNMATCHED house rule, candidate side)."""
 
-    meta_missing: int = 0               # no meta.txt — records carry rua_bundle only
-    meta_fields_missing: int = 0        # named envelope fields absent from meta.txt
-    sections_missing: list[str] = field(default_factory=list)   # required file absent
+    meta_missing: int = 0  # no meta.txt — records carry rua_bundle only
+    meta_fields_missing: int = 0  # named envelope fields absent from meta.txt
+    sections_missing: list[str] = field(default_factory=list)  # required file absent
     sections_optional_absent: list[str] = field(default_factory=list)  # v1/sweep-off
     directories_rows: int = 0
     directories_staged: int = 0
@@ -116,20 +117,20 @@ class RuaCoverage:
     profiles_rows: int = 0
     profiles_staged: int = 0
     profiles_malformed: int = 0
-    profile_copies_present: int = 0     # copy found under profiles/
-    profile_copies_missing: int = 0     # listed but no copy (COPY_PROFILES=no, or lost)
+    profile_copies_present: int = 0  # copy found under profiles/
+    profile_copies_missing: int = 0  # listed but no copy (COPY_PROFILES=no, or lost)
     scripts_rows: int = 0
     scripts_staged: int = 0
     scripts_malformed: int = 0
-    script_copies_present: int = 0      # copy found under scripts/ (tree-mirrored)
-    script_copies_missing: int = 0      # listed but no copy (over-cap or COPY_SCRIPTS=no)
+    script_copies_present: int = 0  # copy found under scripts/ (tree-mirrored)
+    script_copies_missing: int = 0  # listed but no copy (over-cap or COPY_SCRIPTS=no)
     ownership_rows: int = 0
     ownership_staged: int = 0
     ownership_malformed: int = 0
-    hash_missing: int = 0               # artifact row without a sha256 (v1, or unreadable)
-    cross_host_collisions: int = 0      # id already staged from a DIFFERENT host
+    hash_missing: int = 0  # artifact row without a sha256 (v1, or unreadable)
+    cross_host_collisions: int = 0  # id already staged from a DIFFERENT host
     meta: dict[str, str] = field(default_factory=dict)  # the FULL parsed meta.txt
-                                        # (G23's metadata-as-nodes raw material)
+    # (G23's metadata-as-nodes raw material)
 
     def as_dict(self) -> dict:
         return asdict(self)
@@ -211,10 +212,8 @@ class RuaInventoryExtractor:
         bundle_dir = self._resolve_bundle_dir(src)
 
         env_props = self._read_envelope(bundle_dir, coverage)
-        self._stage_paths(bundle_dir / DIRECTORIES_TSV, DIRECTORIES_TSV,
-                          into, coverage, env_props)
-        self._stage_paths(bundle_dir / OWNERSHIP_TSV, OWNERSHIP_TSV,
-                          into, coverage, env_props)
+        self._stage_paths(bundle_dir / DIRECTORIES_TSV, DIRECTORIES_TSV, into, coverage, env_props)
+        self._stage_paths(bundle_dir / OWNERSHIP_TSV, OWNERSHIP_TSV, into, coverage, env_props)
         self._stage_profiles(bundle_dir, into, coverage, env_props)
         self._stage_scripts(bundle_dir, into, coverage, env_props)
         return coverage
@@ -239,8 +238,7 @@ class RuaInventoryExtractor:
         tarball carries the ``rua_<host>_<user>_<ts>/`` dir at top level)."""
         if (path / META_TXT).is_file():
             return path
-        children = [c for c in path.iterdir() if (c / META_TXT).is_file()] \
-            if path.is_dir() else []
+        children = [c for c in path.iterdir() if (c / META_TXT).is_file()] if path.is_dir() else []
         if len(children) == 1:
             return children[0]
         return path  # no meta.txt anywhere — counted by _read_envelope
@@ -276,8 +274,9 @@ class RuaInventoryExtractor:
     ) -> None:
         optional = section == OWNERSHIP_TSV
         if not tsv.is_file():
-            (coverage.sections_optional_absent if optional
-             else coverage.sections_missing).append(section)
+            (coverage.sections_optional_absent if optional else coverage.sections_missing).append(
+                section
+            )
             return
         for row in _read_tsv(tsv, _REQUIRED_COLS[section]):
             if row is None:
@@ -299,9 +298,14 @@ class RuaInventoryExtractor:
             props["rua_section"] = section
             existing = graph.data_assets.get(aid)
             if existing is None:
-                graph.add_data_asset(DataAssetNode(
-                    node_id=aid, kind=RUA_PATH_KIND, location=path, properties=props,
-                ))
+                graph.add_data_asset(
+                    DataAssetNode(
+                        node_id=aid,
+                        kind=RUA_PATH_KIND,
+                        location=path,
+                        properties=props,
+                    )
+                )
                 if optional:
                     coverage.ownership_staged += 1
                 else:
@@ -331,8 +335,15 @@ class RuaInventoryExtractor:
             coverage.profiles_rows += 1
             copy_rel = f"profiles/{row['name']}"
             self._stage_artifact(
-                RUA_PROFILE_KIND, row["path"], row.get("name") or _basename(row["path"]),
-                row, bundle_dir, copy_rel, graph, coverage, env_props,
+                RUA_PROFILE_KIND,
+                row["path"],
+                row.get("name") or _basename(row["path"]),
+                row,
+                bundle_dir,
+                copy_rel,
+                graph,
+                coverage,
+                env_props,
             )
 
     # -- scripts.tsv | scripts.csv → rua_script artifacts (OPTIONAL) --------------
@@ -372,8 +383,15 @@ class RuaInventoryExtractor:
             coverage.scripts_rows += 1
             copy_rel = f"scripts{row['path']}"  # the collector mirrors the abs tree
             self._stage_artifact(
-                RUA_SCRIPT_KIND, row["path"], _basename(row["path"]),
-                row, bundle_dir, copy_rel, graph, coverage, env_props,
+                RUA_SCRIPT_KIND,
+                row["path"],
+                _basename(row["path"]),
+                row,
+                bundle_dir,
+                copy_rel,
+                graph,
+                coverage,
+                env_props,
             )
 
     def _stage_scripts_csv(
@@ -406,9 +424,16 @@ class RuaInventoryExtractor:
                 "size": row.get("size", ""),
             }
             copy_rel = f"scripts{abs_path}"  # never shipped for a listing —
-            self._stage_artifact(          # counted missing, not implied
-                RUA_SCRIPT_KIND, abs_path, row["script"],
-                mapped, bundle_dir, copy_rel, graph, coverage, env_props,
+            self._stage_artifact(  # counted missing, not implied
+                RUA_SCRIPT_KIND,
+                abs_path,
+                row["script"],
+                mapped,
+                bundle_dir,
+                copy_rel,
+                graph,
+                coverage,
+                env_props,
             )
 
     # -- shared artifact staging ---------------------------------------------------
@@ -434,7 +459,7 @@ class RuaInventoryExtractor:
                 props[col] = row[col]
         sha = (row.get("sha256") or "").strip()
         if sha:
-            props["sha256"] = sha   # the version discriminator (G24 anchor)
+            props["sha256"] = sha  # the version discriminator (G24 anchor)
         else:
             coverage.hash_missing += 1
         copy_path = bundle_dir / copy_rel.lstrip("/")
@@ -455,9 +480,15 @@ class RuaInventoryExtractor:
         pid = process_id(kind, path)
         existing = graph.processes.get(pid)
         if existing is None:
-            graph.add_process(ProcessNode(
-                node_id=pid, kind=kind, name=name, path=path, properties=props,
-            ))
+            graph.add_process(
+                ProcessNode(
+                    node_id=pid,
+                    kind=kind,
+                    name=name,
+                    path=path,
+                    properties=props,
+                )
+            )
             if is_profile:
                 coverage.profiles_staged += 1
             else:

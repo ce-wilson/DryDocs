@@ -1,10 +1,11 @@
 """Assemble authored XHTML fragments into a single page body via a template."""
+
 from __future__ import annotations
 
 from collections.abc import Iterable
 
 # The template wraps the joined fragments; ``{body}`` is the only placeholder.
-DEFAULT_TEMPLATE = "<div class=\"drydocs-doc\">\n{body}\n</div>"
+DEFAULT_TEMPLATE = '<div class="drydocs-doc">\n{body}\n</div>'
 
 
 def assemble(fragments: Iterable[str], *, template: str = DEFAULT_TEMPLATE, sep: str = "\n") -> str:

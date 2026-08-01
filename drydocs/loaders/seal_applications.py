@@ -6,6 +6,7 @@ Idempotent. Always creates :EventProcessing and :BatchProcessing ports for
 every Application per v3 §C, even if the app currently has no observed
 runtime in that mode.
 """
+
 from __future__ import annotations
 
 from pathlib import Path

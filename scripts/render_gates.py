@@ -18,6 +18,7 @@ record, it never reinterprets it):
 - ``recorded``   -- everything else (decisions logged without the formal
                     sign-off wording, e.g. early C1-C4 entries).
 """
+
 from __future__ import annotations
 
 import json

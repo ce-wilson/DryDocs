@@ -31,6 +31,7 @@ runnable as a CLI for envs without pytest::
     python -m drydocs.doc_outline --outline docs/design/templates/tdd.outline.yaml \
                                   --doc docs/design/controlm-ingestion-tdd.md
 """
+
 from __future__ import annotations
 
 import argparse
@@ -93,7 +94,9 @@ class Outline:
 def load_outline(path: str | Path) -> Outline:
     doc = yaml.safe_load(Path(path).read_text(encoding="utf-8"))
     if doc.get("schema") != "drydocs.doc-outline.v1":
-        raise ValueError(f"{path}: not a drydocs.doc-outline.v1 outline (schema={doc.get('schema')!r})")
+        raise ValueError(
+            f"{path}: not a drydocs.doc-outline.v1 outline (schema={doc.get('schema')!r})"
+        )
     return Outline(
         schema=doc["schema"],
         doc_type=doc.get("doc_type", "?"),
@@ -154,7 +157,9 @@ def check(outline: Outline, md: str) -> list[str]:
     # 1 — completeness
     for anchor in outline.required_anchors():
         if anchor not in present:
-            problems.append(f"missing required section — add `<!-- anchor: {anchor} -->` before its heading")
+            problems.append(
+                f"missing required section — add `<!-- anchor: {anchor} -->` before its heading"
+            )
 
     # 2 — traceability. `mode: loose` (default when absent = strict) checks the matrix
     # shape only; `strict` also enforces requirement-id format + no-orphans/no-dups.
@@ -191,7 +196,9 @@ def check(outline: Outline, md: str) -> list[str]:
             continue
         # both modes: each row must trace a design-section anchor + a test
         if not any(a in row[c_design] for a in valid_anchors):
-            problems.append(f"matrix row design cell {row[c_design]!r} cites no known outline anchor")
+            problems.append(
+                f"matrix row design cell {row[c_design]!r} cites no known outline anchor"
+            )
         if not row[c_test].strip():
             problems.append(f"matrix row has an empty test/verify cell: {row}")
         # strict only: collect + format-check the requirement id
@@ -207,7 +214,9 @@ def check(outline: Outline, md: str) -> list[str]:
             problems.append(f"[{rid}] appears in more than one matrix row")
         body_ids = {t for t in re.findall(r"[A-Za-z0-9][A-Za-z0-9-]*", md) if req_re.match(t)}
         for rid in sorted(body_ids - set(matrix_ids)):
-            problems.append(f"[{rid}] requirement id used in the doc but has no traceability-matrix row")
+            problems.append(
+                f"[{rid}] requirement id used in the doc but has no traceability-matrix row"
+            )
 
     return problems
 

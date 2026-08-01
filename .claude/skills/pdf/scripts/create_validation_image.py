@@ -14,10 +14,10 @@ def create_validation_image(page_number, fields_json_path, input_path, output_pa
 
         for field in data["form_fields"]:
             if field["page_number"] == page_number:
-                entry_box = field['entry_bounding_box']
-                label_box = field['label_bounding_box']
-                draw.rectangle(entry_box, outline='red', width=2)
-                draw.rectangle(label_box, outline='blue', width=2)
+                entry_box = field["entry_bounding_box"]
+                label_box = field["label_bounding_box"]
+                draw.rectangle(entry_box, outline="red", width=2)
+                draw.rectangle(label_box, outline="blue", width=2)
                 num_boxes += 2
 
         img.save(output_path)
@@ -26,7 +26,9 @@ def create_validation_image(page_number, fields_json_path, input_path, output_pa
 
 if __name__ == "__main__":
     if len(sys.argv) != 5:
-        print("Usage: create_validation_image.py [page number] [fields.json file] [input image path] [output image path]")
+        print(
+            "Usage: create_validation_image.py [page number] [fields.json file] [input image path] [output image path]"
+        )
         sys.exit(1)
     page_number = int(sys.argv[1])
     fields_json_path = sys.argv[2]

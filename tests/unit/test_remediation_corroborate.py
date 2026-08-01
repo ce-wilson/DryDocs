@@ -1,5 +1,6 @@
 """Read-only corroboration (0002-B §2 step 5) — the reconcile logic and the RUNTIME
 half of the no-graph-write gate (NFR-REM-1): write Cypher cannot reach the driver."""
+
 from __future__ import annotations
 
 from pathlib import Path

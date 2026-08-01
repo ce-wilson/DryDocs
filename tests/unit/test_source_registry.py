@@ -12,6 +12,7 @@ Acceptance (gate source-registry-v2, SIGNED OFF 2026-07-31; built at N9):
 - the runtime registry is the UNION of the pipeline and doc ledgers (one home
   per source — doc loaders still gate).
 """
+
 from __future__ import annotations
 
 from pathlib import Path
@@ -58,19 +59,40 @@ def _write_registry(
 
 # --- the gate -----------------------------------------------------------------
 
+
 def test_confirmed_source_passes(tmp_path: Path) -> None:
-    reg = SourceRegistry.from_yaml(_write_registry(tmp_path, [
-        {"id": "sys:live-feed", "confirmed": True, "system": "sys", "artifact": "live-feed"},
-    ]))
+    reg = SourceRegistry.from_yaml(
+        _write_registry(
+            tmp_path,
+            [
+                {
+                    "id": "sys:live-feed",
+                    "confirmed": True,
+                    "system": "sys",
+                    "artifact": "live-feed",
+                },
+            ],
+        )
+    )
     assert reg.is_confirmed("sys:live-feed")
     assert reg.require_confirmed("sys:live-feed").id == "sys:live-feed"  # no raise
 
 
 def test_unconfirmed_source_fails_fast_with_clear_message(tmp_path: Path) -> None:
-    reg = SourceRegistry.from_yaml(_write_registry(tmp_path, [
-        {"id": "autosys:export", "confirmed": False, "system": "autosys",
-         "artifact": "export", "crosswalk": "external/orchestration/autosys/README.md"},
-    ]))
+    reg = SourceRegistry.from_yaml(
+        _write_registry(
+            tmp_path,
+            [
+                {
+                    "id": "autosys:export",
+                    "confirmed": False,
+                    "system": "autosys",
+                    "artifact": "export",
+                    "crosswalk": "external/orchestration/autosys/README.md",
+                },
+            ],
+        )
+    )
     assert not reg.is_confirmed("autosys:export")
     with pytest.raises(UnconfirmedSourceError) as exc:
         reg.require_confirmed("autosys:export")
@@ -82,9 +104,14 @@ def test_unconfirmed_source_fails_fast_with_clear_message(tmp_path: Path) -> Non
 
 def test_missing_confirmed_defaults_to_unconfirmed(tmp_path: Path) -> None:
     # A dataset with no `confirmed:` key is treated as NOT confirmed (fail-closed).
-    reg = SourceRegistry.from_yaml(_write_registry(tmp_path, [
-        {"id": "sys:no-flag", "system": "sys", "artifact": "no-flag"},
-    ]))
+    reg = SourceRegistry.from_yaml(
+        _write_registry(
+            tmp_path,
+            [
+                {"id": "sys:no-flag", "system": "sys", "artifact": "no-flag"},
+            ],
+        )
+    )
     with pytest.raises(UnconfirmedSourceError):
         reg.require_confirmed("sys:no-flag")
 
@@ -97,14 +124,18 @@ def test_unknown_source_raises(tmp_path: Path) -> None:
 
 # --- the pk check (J21): duplicate ids refuse loudly --------------------------
 
+
 def test_duplicate_source_id_refuses_naming_the_id(tmp_path: Path) -> None:
     """Last-one-wins would let file position decide the D3 gate — a duplicated
     id with different confirmed values must refuse at parse time (the
     catalog-pat / pat-catalog collision class, PORT-REPORT-e60822fc)."""
-    path = _write_registry(tmp_path, [
-        {"id": "sys:twin-feed", "confirmed": True, "system": "sys", "artifact": "twin-feed"},
-        {"id": "sys:twin-feed", "confirmed": False, "system": "sys", "artifact": "twin-feed"},
-    ])
+    path = _write_registry(
+        tmp_path,
+        [
+            {"id": "sys:twin-feed", "confirmed": True, "system": "sys", "artifact": "twin-feed"},
+            {"id": "sys:twin-feed", "confirmed": False, "system": "sys", "artifact": "twin-feed"},
+        ],
+    )
     with pytest.raises(DuplicateSourceIdError) as exc:
         SourceRegistry.from_yaml(path)
     assert "sys:twin-feed" in str(exc.value)
@@ -128,18 +159,31 @@ def test_shipped_registry_ids_are_unique() -> None:
 
 # --- D4: retired ids refuse everywhere ----------------------------------------
 
-RETIRED_FIXTURE = [{"id": "catalog-pat",
-                    "replaced_by": ["pat:product-catalog", "pat:people-report"],
-                    "reason": "T19 split"}]
+RETIRED_FIXTURE = [
+    {
+        "id": "catalog-pat",
+        "replaced_by": ["pat:product-catalog", "pat:people-report"],
+        "reason": "T19 split",
+    }
+]
 
 
 def test_retired_id_lookup_names_the_replacement(tmp_path: Path) -> None:
-    reg = SourceRegistry.from_yaml(_write_registry(
-        tmp_path,
-        [{"id": "pat:product-catalog", "confirmed": True, "system": "pat",
-          "artifact": "product-catalog", "replaces": "catalog-pat"}],
-        retired=RETIRED_FIXTURE,
-    ))
+    reg = SourceRegistry.from_yaml(
+        _write_registry(
+            tmp_path,
+            [
+                {
+                    "id": "pat:product-catalog",
+                    "confirmed": True,
+                    "system": "pat",
+                    "artifact": "product-catalog",
+                    "replaces": "catalog-pat",
+                }
+            ],
+            retired=RETIRED_FIXTURE,
+        )
+    )
     with pytest.raises(RetiredSourceIdError) as exc:
         reg.require_confirmed("catalog-pat")
     msg = str(exc.value)
@@ -164,11 +208,25 @@ def test_shipped_registry_retires_the_full_v1_id_set() -> None:
     with the refusal list."""
     reg = SourceRegistry.from_yaml(DEFAULT_REGISTRY_PATH)
     retired = set(reg.retired_ids())
-    for legacy in ("controlm-psgmgr", "catalog-pat", "pat-catalog", "seal-extract",
-                   "controlm-xml-export", "autosys-export", "airflow-mwaa",
-                   "software-registry", "depgraph-snapshot", "design-docs",
-                   "rua-inventory", "dpl-registry", "snowflake-data-catalog",
-                   "code-repo", "oracle-schemas", "snowflake", "stg-app-fact"):
+    for legacy in (
+        "controlm-psgmgr",
+        "catalog-pat",
+        "pat-catalog",
+        "seal-extract",
+        "controlm-xml-export",
+        "autosys-export",
+        "airflow-mwaa",
+        "software-registry",
+        "depgraph-snapshot",
+        "design-docs",
+        "rua-inventory",
+        "dpl-registry",
+        "snowflake-data-catalog",
+        "code-repo",
+        "oracle-schemas",
+        "snowflake",
+        "stg-app-fact",
+    ):
         assert legacy in retired, f"v1 id {legacy!r} missing from the retired list"
         with pytest.raises(RetiredSourceIdError):
             reg.get(legacy)
@@ -182,49 +240,69 @@ def test_shipped_registry_retires_the_full_v1_id_set() -> None:
             assert rep in retired, f"{entry['id']}: replaces {rep!r} not on the retired list"
     for r in doc["retired"]:
         for new_id in r.get("replaced_by") or []:
-            assert new_id in ds_ids, (
-                f"retired {r['id']!r} points at {new_id!r}, which is not a registered dataset"
-            )
+            assert (
+                new_id in ds_ids
+            ), f"retired {r['id']!r} points at {new_id!r}, which is not a registered dataset"
 
 
 # --- D3: the derived URN ------------------------------------------------------
 
+
 def test_urn_is_derived_lowercase_prod(tmp_path: Path) -> None:
-    reg = SourceRegistry.from_yaml(_write_registry(tmp_path, [
-        {"id": "seal@[db].psgmgr.cm_escalation_db", "system": "psgmgr",
-         "origin": "seal", "artifact": "CM_ESCALATION_DB", "confirmed": False},
-    ]))
+    reg = SourceRegistry.from_yaml(
+        _write_registry(
+            tmp_path,
+            [
+                {
+                    "id": "seal@[db].psgmgr.cm_escalation_db",
+                    "system": "psgmgr",
+                    "origin": "seal",
+                    "artifact": "CM_ESCALATION_DB",
+                    "confirmed": False,
+                },
+            ],
+        )
+    )
     src = reg.get("seal@[db].psgmgr.cm_escalation_db")
     assert src.urn == "urn:drydocs:dataset:(psgmgr,cm_escalation_db,prod)"
 
 
 def test_hand_maintained_urn_is_refused(tmp_path: Path) -> None:
-    path = _write_registry(tmp_path, [
-        {"id": "sys:x", "system": "sys", "artifact": "x",
-         "urn": "urn:drydocs:dataset:(sys,x,prod)"},
-    ])
+    path = _write_registry(
+        tmp_path,
+        [
+            {
+                "id": "sys:x",
+                "system": "sys",
+                "artifact": "x",
+                "urn": "urn:drydocs:dataset:(sys,x,prod)",
+            },
+        ],
+    )
     with pytest.raises(ValueError, match="DERIVED"):
         SourceRegistry.from_yaml(path)
 
 
 # --- D2: the loader-source overlay --------------------------------------------
 
+
 def _write_overlay(tmp_path: Path, overrides: dict) -> Path:
     p = tmp_path / "loader-source-overlay.yaml"
     p.write_text(
-        yaml.safe_dump(
-            {"schema": "drydocs.loader-source-overlay.v1", "overrides": overrides}
-        ),
+        yaml.safe_dump({"schema": "drydocs.loader-source-overlay.v1", "overrides": overrides}),
         encoding="utf-8",
     )
     return p
 
 
 def test_overlay_wins_over_class_default(tmp_path: Path) -> None:
-    reg_path = _write_registry(tmp_path, [
-        {"id": "sys:default", "confirmed": True, "system": "sys", "artifact": "default"},
-        {"id": "sys:override", "confirmed": True, "system": "sys", "artifact": "override"},
-    ])
+    reg_path = _write_registry(
+        tmp_path,
+        [
+            {"id": "sys:default", "confirmed": True, "system": "sys", "artifact": "default"},
+            {"id": "sys:override", "confirmed": True, "system": "sys", "artifact": "override"},
+        ],
+    )
     ov = _write_overlay(tmp_path, {"some_loader.v1": "sys:override"})
     reg = SourceRegistry.from_yaml(reg_path, overlay_path=ov)
     assert reg.effective_source_id("some_loader.v1", "sys:default") == "sys:override"
@@ -234,8 +312,14 @@ def test_overlay_wins_over_class_default(tmp_path: Path) -> None:
 def test_overlay_refuses_unregistered_and_retired_ids(tmp_path: Path) -> None:
     reg_path = _write_registry(
         tmp_path,
-        [{"id": "pat:product-catalog", "confirmed": True, "system": "pat",
-          "artifact": "product-catalog"}],
+        [
+            {
+                "id": "pat:product-catalog",
+                "confirmed": True,
+                "system": "pat",
+                "artifact": "product-catalog",
+            }
+        ],
         retired=RETIRED_FIXTURE,
     )
     with pytest.raises(OverlayBindingError, match="unregistered"):
@@ -252,34 +336,42 @@ def test_shipped_overlay_is_empty_and_parses() -> None:
     """Producer ships an EMPTY overlay (class defaults are already the v2 ids);
     the file existing and parsing is the company rebind seam's contract."""
     reg = SourceRegistry.from_yaml(DEFAULT_REGISTRY_PATH)
-    assert reg.effective_source_id("controlm_folders.v1",
-                                   "controlm@[db].psgmgr.cm_def_vtab") \
+    assert (
+        reg.effective_source_id("controlm_folders.v1", "controlm@[db].psgmgr.cm_def_vtab")
         == "controlm@[db].psgmgr.cm_def_vtab"
+    )
 
 
 # --- the doc-ledger union (one home per source) --------------------------------
 
+
 def test_doc_ledger_union_gates_doc_corpora() -> None:
     reg = SourceRegistry.from_yaml(DEFAULT_REGISTRY_PATH)
-    bmc = reg.require_confirmed("bmc-docs")          # gate bmc-docs-lexical-load
+    bmc = reg.require_confirmed("bmc-docs")  # gate bmc-docs-lexical-load
     assert bmc.home == "doc-registry"
-    assert bmc.urn is None                            # doc corpora keep docmeta identity
+    assert bmc.urn is None  # doc corpora keep docmeta identity
     reg.require_confirmed("essential-graphrag")
     with pytest.raises(UnconfirmedSourceError) as exc:
-        reg.require_confirmed("fcdo-frameworks")      # crosswalk gate not drafted (W1)
+        reg.require_confirmed("fcdo-frameworks")  # crosswalk gate not drafted (W1)
     assert "doc-source-registry" in str(exc.value)
 
 
 def test_temp_registry_does_not_union_shipped_ledgers(tmp_path: Path) -> None:
     """A test-written registry gets exactly what it wrote — the shipped doc
     ledger and overlay merge in ONLY for the default path."""
-    reg = SourceRegistry.from_yaml(_write_registry(tmp_path, [
-        {"id": "sys:only", "confirmed": True, "system": "sys", "artifact": "only"},
-    ]))
+    reg = SourceRegistry.from_yaml(
+        _write_registry(
+            tmp_path,
+            [
+                {"id": "sys:only", "confirmed": True, "system": "sys", "artifact": "only"},
+            ],
+        )
+    )
     assert reg.ids() == ["sys:only"]
 
 
 # --- the loader: field agrees with the N3 class binding (J21) -----------------
+
 
 def test_registry_loader_fields_agree_with_class_source_id() -> None:
     """A registry entry naming a loader module must AGREE with that module's
@@ -323,34 +415,47 @@ def test_registry_loader_fields_agree_with_class_source_id() -> None:
 
 # --- the shipped registry is wired as documented ------------------------------
 
+
 def test_real_registry_gate_state() -> None:
     reg = SourceRegistry.from_yaml(DEFAULT_REGISTRY_PATH)
     # Q6 transfers (previously signed gates ride the rename); the per-row split
     # also made cm_avg_run's 2026-07-14 sign-off (P2) finally visible.
-    for live in ("controlm@[db].psgmgr.cm_def_vtab",
-                 "controlm@[db].psgmgr.cm_def_vjob",
-                 "controlm@[db].psgmgr.cm_hosts",
-                 "controlm@[db].psgmgr.cm_avg_run",
-                 "seal:app-extract", "pat:product-catalog", "pat:people-report",
-                 "airflow:dag-export", "autosys:export",
-                 "controlm@[db].drydocs_stg.stg_app_fact",
-                 "repo:software-registry", "repo:depgraph-snapshot",
-                 "repo:design-docs"):
+    for live in (
+        "controlm@[db].psgmgr.cm_def_vtab",
+        "controlm@[db].psgmgr.cm_def_vjob",
+        "controlm@[db].psgmgr.cm_hosts",
+        "controlm@[db].psgmgr.cm_avg_run",
+        "seal:app-extract",
+        "pat:product-catalog",
+        "pat:people-report",
+        "airflow:dag-export",
+        "autosys:export",
+        "controlm@[db].drydocs_stg.stg_app_fact",
+        "repo:software-registry",
+        "repo:depgraph-snapshot",
+        "repo:design-docs",
+    ):
         assert reg.is_confirmed(live), f"{live} should be confirmed"
     # Everything else landed confirmed: false at the N9 per-row sweep.
-    for placeholder in ("oracle:schema-inventory", "snowflake:schema-inventory",
-                        "exec-hosts:rua-bundle", "dpl:pipeline-registry",
-                        "dpl:dataset-registry", "snow:cmdb-ci-classes",
-                        "seal@[db].psgmgr.cm_escalation_db",
-                        "controlm@[db].psgmgr.cm_hist_vw",
-                        "controlm:deftable-xml-export",
-                        "bitbucket:repo-objects-manifest"):
+    for placeholder in (
+        "oracle:schema-inventory",
+        "snowflake:schema-inventory",
+        "exec-hosts:rua-bundle",
+        "dpl:pipeline-registry",
+        "dpl:dataset-registry",
+        "snow:cmdb-ci-classes",
+        "seal@[db].psgmgr.cm_escalation_db",
+        "controlm@[db].psgmgr.cm_hist_vw",
+        "controlm:deftable-xml-export",
+        "bitbucket:repo-objects-manifest",
+    ):
         assert not reg.is_confirmed(placeholder), f"{placeholder} should be unconfirmed"
         with pytest.raises(UnconfirmedSourceError):
             reg.require_confirmed(placeholder)
 
 
 # --- CLI fail-fast: load <loader> exits 2 before touching Neo4j ---------------
+
 
 def test_cli_load_blocks_unconfirmed_source(tmp_path: Path, monkeypatch) -> None:
     """If a loader's source is unconfirmed, `drydocs load` exits 2 with the gate
@@ -359,10 +464,20 @@ def test_cli_load_blocks_unconfirmed_source(tmp_path: Path, monkeypatch) -> None
     from drydocs import cli
 
     # Flip the folders dataset to unconfirmed via an injected registry.
-    reg = SourceRegistry.from_yaml(_write_registry(tmp_path, [
-        {"id": "controlm@[db].psgmgr.cm_def_vtab", "confirmed": False,
-         "system": "psgmgr", "origin": "controlm", "artifact": "cm_def_vtab"},
-    ]))
+    reg = SourceRegistry.from_yaml(
+        _write_registry(
+            tmp_path,
+            [
+                {
+                    "id": "controlm@[db].psgmgr.cm_def_vtab",
+                    "confirmed": False,
+                    "system": "psgmgr",
+                    "origin": "controlm",
+                    "artifact": "cm_def_vtab",
+                },
+            ],
+        )
+    )
     monkeypatch.setattr(cli, "_registry", reg)
 
     runner = typer_testing.CliRunner()
@@ -380,13 +495,26 @@ def test_cli_load_blocks_retired_binding(tmp_path: Path, monkeypatch) -> None:
     typer_testing = pytest.importorskip("typer.testing")
     from drydocs import cli
 
-    reg = SourceRegistry.from_yaml(_write_registry(
-        tmp_path,
-        [{"id": "pat:product-catalog", "confirmed": True, "system": "pat",
-          "artifact": "product-catalog"}],
-        retired=[{"id": "controlm@[db].psgmgr.cm_def_vtab",
-                  "replaced_by": ["pat:product-catalog"], "reason": "test"}],
-    ))
+    reg = SourceRegistry.from_yaml(
+        _write_registry(
+            tmp_path,
+            [
+                {
+                    "id": "pat:product-catalog",
+                    "confirmed": True,
+                    "system": "pat",
+                    "artifact": "product-catalog",
+                }
+            ],
+            retired=[
+                {
+                    "id": "controlm@[db].psgmgr.cm_def_vtab",
+                    "replaced_by": ["pat:product-catalog"],
+                    "reason": "test",
+                }
+            ],
+        )
+    )
     monkeypatch.setattr(cli, "_registry", reg)
 
     runner = typer_testing.CliRunner()

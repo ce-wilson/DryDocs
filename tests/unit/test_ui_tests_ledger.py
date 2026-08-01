@@ -9,6 +9,7 @@ The test that matters is test_which_cases_should_i_run_after_changing — it
 exercises the actual payoff chain (component -> module -> suite -> cases)
 rather than merely asserting the ledger is well-formed.
 """
+
 from __future__ import annotations
 
 import re
@@ -88,9 +89,7 @@ def test_every_case_cites_verified_behaviour() -> None:
     that actually happened; keeping `source` mandatory stops the ledger
     drifting into aspirational tests.
     """
-    unsourced = [
-        c["id"] for s in _tests()["suites"] for c in s["cases"] if not c.get("source")
-    ]
+    unsourced = [c["id"] for s in _tests()["suites"] for c in s["cases"] if not c.get("source")]
     assert not unsourced, f"case(s) with no verified source: {unsourced}"
 
 
@@ -118,14 +117,10 @@ def test_every_console_module_has_a_suite_even_if_empty() -> None:
 # --------------------------------------------------------------------------- #
 def _cases_for_component(component_id: str) -> list[str]:
     """component -> module -> suite -> case ids. The whole point of the join."""
-    comp = next(
-        (c for c in _components()["components"] if c["id"] == component_id), None
-    )
+    comp = next((c for c in _components()["components"] if c["id"] == component_id), None)
     if comp is None or not comp.get("module"):
         return []
-    suite = next(
-        (s for s in _tests()["suites"] if s["module"] == comp["module"]), None
-    )
+    suite = next((s for s in _tests()["suites"] if s["module"] == comp["module"]), None)
     return [c["id"] for c in suite["cases"]] if suite else []
 
 

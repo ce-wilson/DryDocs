@@ -10,6 +10,7 @@ Usage:
     poetry run python scripts/render_schema_graph.py
     poetry run python scripts/render_schema_graph.py --vocabulary path/to/vocab.yaml --out path/to/out.cypher
 """
+
 from __future__ import annotations
 
 import argparse

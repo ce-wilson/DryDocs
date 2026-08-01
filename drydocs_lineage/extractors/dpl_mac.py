@@ -77,6 +77,7 @@ per-pipeline swagger REGARDLESS of which source discovered the pipeline. A
 lagging clone surfaces in the existing accounting: extracted DPL processes
 with no clone folder and no set land in ``dpl_without_mac``.
 """
+
 from __future__ import annotations
 
 import json
@@ -122,6 +123,7 @@ def parse_clone_folder(dirname: str) -> CloneFolder | None:
         kind = "ambiguous"
     return CloneFolder(name=name, guid=guid, kind=kind)
 
+
 #: DPL invocation kind — MUST match controlm_inventory's ``inv.invocation_type.lower()``
 _DPL_KIND = "dpl"
 #: DataAsset kind for MAC dataset endpoints. Candidate-side shape for the
@@ -138,7 +140,7 @@ MAC_DATASET_KIND = "dpl_dataset"
 #: (DB load, no transform — wrong-by-signal as 'etl', but whether the enum
 #: extends or maps to 'utility' is an enum-semantics gate question).
 _KIND_BY_SUBTYPE: dict[str, str] = {
-    "transformation": "etl",   # ASSUMED subType spelling — synthetic-contract value
+    "transformation": "etl",  # ASSUMED subType spelling — synthetic-contract value
 }
 
 
@@ -147,34 +149,34 @@ class MacCoverage:
     """Per-run accounting — every skip/mismatch is counted BY REASON, never
     silent (the STG_PARSE_QUALITY / UNMATCHED house rule, candidate side)."""
 
-    sets_read: int = 0                  # pipeline.json files parsed
-    sets_invalid: int = 0               # unreadable/invalid JSON — set skipped
-    sets_no_guid: int = 0               # pipeline.json without a pipelineId — skipped
-    matched: int = 0                    # GUID joined an extracted proc#dpl node
-    unmatched: int = 0                  # GUID with no extracted DPL process (staged mac_only)
+    sets_read: int = 0  # pipeline.json files parsed
+    sets_invalid: int = 0  # unreadable/invalid JSON — set skipped
+    sets_no_guid: int = 0  # pipeline.json without a pipelineId — skipped
+    matched: int = 0  # GUID joined an extracted proc#dpl node
+    unmatched: int = 0  # GUID with no extracted DPL process (staged mac_only)
     unmatched_guids: list[str] = field(default_factory=list)
-    dpl_without_mac: int = 0            # extracted DPL processes no MAC set covered
-    kind_derived: int = 0               # mac_kind stamped from _KIND_BY_SUBTYPE
-    kind_riders: int = 0                # subType on the rider path (enum question)
-    seal_facts: int = 0                 # ownerSealId captured
-    seal_disagreements: int = 0         # MAC ownerSealId != G15 -seal property
-    reads_added: int = 0                # READS_FROM candidates
-    writes_added: int = 0               # WRITES_TO candidates
-    datasets_added: int = 0             # distinct DataAsset nodes staged
-    dataset_no_guid: int = 0            # flow entry without a guid — skipped
+    dpl_without_mac: int = 0  # extracted DPL processes no MAC set covered
+    kind_derived: int = 0  # mac_kind stamped from _KIND_BY_SUBTYPE
+    kind_riders: int = 0  # subType on the rider path (enum question)
+    seal_facts: int = 0  # ownerSealId captured
+    seal_disagreements: int = 0  # MAC ownerSealId != G15 -seal property
+    reads_added: int = 0  # READS_FROM candidates
+    writes_added: int = 0  # WRITES_TO candidates
+    datasets_added: int = 0  # distinct DataAsset nodes staged
+    dataset_no_guid: int = 0  # flow entry without a guid — skipped
     dataset_version_conflicts: int = 0  # same GUID seen with a different version
-    flow_missing: int = 0               # set without a dataset_flow.json
-    flow_guid_mismatch: int = 0         # dataset_flow pipelineId != pipeline.json's
-    files_ignored: int = 0              # other *.json in the set (the rest of the 6)
+    flow_missing: int = 0  # set without a dataset_flow.json
+    flow_guid_mismatch: int = 0  # dataset_flow pipelineId != pipeline.json's
+    files_ignored: int = 0  # other *.json in the set (the rest of the 6)
     # -- promotion-clone layout (all zero on a hand-staged root) --
-    clone_pipeline_folders: int = 0     # lowercase name#guid dirs seen
-    clone_dataset_folders: int = 0      # UPPERCASE name#guid dirs seen
-    clone_ambiguous_folders: int = 0    # mixed-casing name#guid dirs — review, not guessed
-    clone_sets_missing: int = 0         # pipeline folders with no pipeline.json yet
+    clone_pipeline_folders: int = 0  # lowercase name#guid dirs seen
+    clone_dataset_folders: int = 0  # UPPERCASE name#guid dirs seen
+    clone_ambiguous_folders: int = 0  # mixed-casing name#guid dirs — review, not guessed
+    clone_sets_missing: int = 0  # pipeline folders with no pipeline.json yet
     clone_missing_set_guids: list[str] = field(default_factory=list)  # the fetch work list
-    clone_guid_mismatch: int = 0        # folder GUID != pipeline.json pipelineId (json wins)
-    clone_names_applied: int = 0        # mac_clone_name stamped from a folder name
-    dataset_names_from_clone: int = 0   # dataset_name filled from a dataset folder name
+    clone_guid_mismatch: int = 0  # folder GUID != pipeline.json pipelineId (json wins)
+    clone_names_applied: int = 0  # mac_clone_name stamped from a folder name
+    dataset_names_from_clone: int = 0  # dataset_name filled from a dataset folder name
 
     def as_dict(self) -> dict:
         return asdict(self)
@@ -247,9 +249,7 @@ class DplMacExtractor:
             {p.parent for p in root.rglob(PIPELINE_JSON)},
         )
         for set_dir in set_dirs:
-            self._extract_set(
-                set_dir, into, coverage, dataset_names, pipeline_dirs.get(set_dir)
-            )
+            self._extract_set(set_dir, into, coverage, dataset_names, pipeline_dirs.get(set_dir))
 
         # pipeline folders with no JSON set yet: the swagger tool serves
         # dataflow only per-pipeline, so a fresh clone lands here — the GUID
@@ -269,7 +269,8 @@ class DplMacExtractor:
         # the reverse join: extracted DPL processes no MAC set covered keep the
         # writer's default kind (acceptance c) — counted so the gap is visible
         covered = {
-            nid for nid in into.processes
+            nid
+            for nid in into.processes
             if into.processes[nid].properties.get("mac_covered") == "true"
         }
         coverage.dpl_without_mac = sum(
@@ -397,9 +398,7 @@ class DplMacExtractor:
                 if not ds_guid:
                     coverage.dataset_no_guid += 1
                     continue
-                aid = self._stage_dataset(
-                    ds_guid, entry, graph, coverage, dataset_names
-                )
+                aid = self._stage_dataset(ds_guid, entry, graph, coverage, dataset_names)
                 graph.add_rel(pid, rel_type, aid)
                 if rel_type == "READS_FROM":
                     coverage.reads_added += 1
@@ -431,7 +430,9 @@ class DplMacExtractor:
                     coverage.dataset_names_from_clone += 1
             graph.add_data_asset(
                 DataAssetNode(
-                    node_id=aid, kind=MAC_DATASET_KIND, location=ds_guid,
+                    node_id=aid,
+                    kind=MAC_DATASET_KIND,
+                    location=ds_guid,
                     properties=props,
                 )
             )

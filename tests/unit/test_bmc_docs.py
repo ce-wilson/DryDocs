@@ -1,6 +1,7 @@
 """bmc-docs lexical-graph loader tests: adapter over the REAL corpus (26
 committed, deterministic controlm-*.md files) + static Cypher checks in the
 test_controlm_cypher.py style."""
+
 from __future__ import annotations
 
 import logging
@@ -42,6 +43,7 @@ def _rows_by_doc(rows: list[dict]) -> dict[str, list[dict]]:
 
 # ---- corpus-level shape ----------------------------------------------------
 
+
 def test_corpus_dir_exists() -> None:
     assert DEFAULT_CORPUS_DIR.exists()
 
@@ -63,6 +65,7 @@ def test_every_row_validates_against_the_row_model() -> None:
 
 
 # ---- known-file header parse -------------------------------------------------
+
 
 def test_known_file_header_parses() -> None:
     rows = _rows_by_doc(_all_rows())["controlm-variables"]
@@ -109,6 +112,7 @@ def test_acquisition_stub_has_no_header_fields() -> None:
 
 # ---- chunk shape -------------------------------------------------------------
 
+
 def test_chunk_id_format_is_zero_padded() -> None:
     rows = _rows_by_doc(_all_rows())["controlm-variables"]
     for row in rows:
@@ -150,6 +154,7 @@ def test_row_checksum_present_after_to_params() -> None:
 
 # ---- tier classifier ----------------------------------------------------------
 
+
 @pytest.mark.parametrize(
     "heading,text,expected",
     [
@@ -187,18 +192,22 @@ def test_classify_chunk_tier_does_not_misfire_on_pattern_matching_doc() -> None:
 
 def test_classify_chunk_tier_majority_fenced_code_is_synthesized() -> None:
     code_heavy = "\n".join(
-        ["Some intro line."]
-        + ["```json"]
-        + ['{"Type": "Job:Command"}'] * 10
-        + ["```"]
+        ["Some intro line."] + ["```json"] + ['{"Type": "Job:Command"}'] * 10 + ["```"]
     )
     assert classify_chunk_tier("Usage Examples", code_heavy) == "SYNTHESIZED"
 
 
 def test_classify_chunk_tier_minority_code_stays_grounded() -> None:
     mostly_prose = "\n".join(
-        ["Line of prose one.", "Line of prose two.", "Line of prose three.",
-         "Line of prose four.", "```", "one code line", "```"]
+        [
+            "Line of prose one.",
+            "Line of prose two.",
+            "Line of prose three.",
+            "Line of prose four.",
+            "```",
+            "one code line",
+            "```",
+        ]
     )
     assert classify_chunk_tier("Command Syntax", mostly_prose) == "GROUNDED"
 
@@ -211,6 +220,7 @@ def test_tier_distribution_only_uses_the_three_contract_values() -> None:
 
 # ---- static Cypher checks (test_controlm_cypher.py style) --------------------
 
+
 def test_cypher_exists() -> None:
     assert CYPHER_PATH.exists()
 
@@ -222,9 +232,7 @@ def test_cypher_uses_unwind_batch() -> None:
 
 def test_cypher_idempotent_merge_not_create() -> None:
     text = CYPHER_PATH.read_text(encoding="utf-8")
-    body = "\n".join(
-        l for l in text.splitlines() if l.strip() and not l.strip().startswith("//")
-    )
+    body = "\n".join(l for l in text.splitlines() if l.strip() and not l.strip().startswith("//"))
     assert "MERGE" in body
     assert not re.findall(r"^\s*CREATE\s+\(", body, re.MULTILINE)
 
@@ -253,9 +261,7 @@ def test_was_generated_by_is_checksum_guarded_exactly_once() -> None:
     assert close_match, "FOREACH block has no standalone closing paren"
     foreach_end = foreach_start + close_match.end()
 
-    code_lines = [
-        l for l in text.splitlines() if l.strip() and not l.strip().startswith("//")
-    ]
+    code_lines = [l for l in text.splitlines() if l.strip() and not l.strip().startswith("//")]
     code = "\n".join(code_lines)
     assert code.count("WAS_GENERATED_BY") == 1
     assert "WAS_GENERATED_BY" in text[foreach_start:foreach_end]
@@ -322,8 +328,7 @@ class _FakeClient:
         self.run_calls: list[tuple[str, dict]] = []
         self.run_script_calls: list[tuple[str, dict]] = []
 
-    def run(self, cypher: str, params: dict[str, Any] | None = None,
-            **kwargs: Any) -> list[dict]:
+    def run(self, cypher: str, params: dict[str, Any] | None = None, **kwargs: Any) -> list[dict]:
         bind = {**(params or {}), **kwargs}
         self.run_calls.append((cypher, bind))
         if "AS products" in cypher:
@@ -398,9 +403,9 @@ def test_schema_meta_exemplar_alone_does_not_satisfy_the_prereq() -> None:
 
     probe = [c for c, _ in client.run_calls if "AS products" in c]
     assert probe, "no registry-presence probe was issued"
-    assert "NOT sp:SchemaMeta" in probe[0], (
-        "the registry probe must use the rename-proof label predicate"
-    )
+    assert (
+        "NOT sp:SchemaMeta" in probe[0]
+    ), "the registry probe must use the rename-proof label predicate"
 
 
 def test_populated_registry_loads_and_reports_no_missing_edges() -> None:
@@ -449,7 +454,8 @@ def test_missing_edge_probe_is_scoped_to_this_run() -> None:
     loader = _loader(client, [_chunk_row()])
     loader.load()
     probes = [
-        (c, b) for c, b in client.run_calls
+        (c, b)
+        for c, b in client.run_calls
         if "WHERE NOT (doc)-[:DESCRIBES]->(:SoftwareProduct)" in c
     ]
     assert len(probes) == 1

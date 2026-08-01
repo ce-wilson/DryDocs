@@ -1,4 +1,5 @@
 """Unit tests for gate_pages (drydocs/gate_pages.py) — pure, no Neo4j."""
+
 from __future__ import annotations
 
 import pytest
@@ -45,10 +46,10 @@ def test_render_has_checkbox_per_confirmation() -> None:
 def test_render_includes_gate_semantics() -> None:
     out = render_gate_page(spec_from_dict(_DOC))
     assert "No graph write" in out
-    assert "localStorage" in out                    # persistence wired
+    assert "localStorage" in out  # persistence wired
     assert "CLASSIFICATION: Internal-Public" in out
-    assert "0 / 3" in out                            # progress counter seeded
-    assert ":ControlMFolder" in out                       # mapping table rendered
+    assert "0 / 3" in out  # progress counter seeded
+    assert ":ControlMFolder" in out  # mapping table rendered
 
 
 def test_render_is_self_contained() -> None:
@@ -76,7 +77,12 @@ _DOC_RICH = {
             "loader": "controlm_folders",
             "properties": [
                 {"name": "folder_id", "origin": "source", "from": "TABLE_ID"},
-                {"name": "app_code", "origin": "derived", "from": "name pos 3-5", "note": "platform caveat"},
+                {
+                    "name": "app_code",
+                    "origin": "derived",
+                    "from": "name pos 3-5",
+                    "note": "platform caveat",
+                },
             ],
         }
     ],
@@ -95,7 +101,10 @@ def test_render_provenance_origin_badges() -> None:
 
 
 def test_provenance_rejects_bad_origin() -> None:
-    bad = {**_DOC, "provenance": [{"label": "X", "properties": [{"name": "p", "origin": "guessed"}]}]}
+    bad = {
+        **_DOC,
+        "provenance": [{"label": "X", "properties": [{"name": "p", "origin": "guessed"}]}],
+    }
     with pytest.raises(GateSpecError):
         spec_from_dict(bad)
 
@@ -120,8 +129,8 @@ def test_committed_q1q3_spec_loads_and_renders() -> None:
     assert spec.classification == "Internal-Public"
     out = render_gate_page(spec)
     assert out.count('type="checkbox"') == spec.total_confirmations
-    assert "origin-derived" in out                    # provenance split rendered
-    assert "CONTAINS_FOLDER" in out                   # proposed edge visible
+    assert "origin-derived" in out  # provenance split rendered
+    assert "CONTAINS_FOLDER" in out  # proposed edge visible
 
 
 # ---------------------------------------------------------------------------
@@ -130,10 +139,12 @@ def test_committed_q1q3_spec_loads_and_renders() -> None:
 # client-side assembly (the payload embeds prebuilt lines, JS only selects).
 # ---------------------------------------------------------------------------
 
+
 def test_draft_entry_all_ticked_proposes_signed_off() -> None:
     spec = spec_from_dict(_DOC)
-    all_ids = {f"c{si}_{ci}" for si, s in enumerate(spec.sections)
-               for ci in range(len(s.confirmations))}
+    all_ids = {
+        f"c{si}_{ci}" for si, s in enumerate(spec.sections) for ci in range(len(s.confirmations))
+    }
     entry = draft_gate_log_entry(spec, ticked=all_ids, date="2026-07-21")
     assert entry.startswith("## 2026-07-21 — Demo gate (demo) — SIGNED OFF\n")
     assert "- **Ticked: 3/3**" in entry
@@ -171,18 +182,20 @@ def test_render_embeds_the_draft_affordance() -> None:
     out = render_gate_page(spec_from_dict(_DOC))
     assert "Draft gate-log entry" in out
     assert "Copy snippet" in out and "Download .md" in out
-    assert '"    - [x] safe to confirm"' in out    # prebuilt ticked line, JSON-embedded
-    assert '"    - [ ] safe to confirm"' in out    # ... and its unticked twin
+    assert '"    - [x] safe to confirm"' in out  # prebuilt ticked line, JSON-embedded
+    assert '"    - [ ] safe to confirm"' in out  # ... and its unticked twin
     assert "gate-log-entry-demo-draft.md" in out
     assert "this page writes nothing" in out
-    assert out.count('type="checkbox"') == 3       # affordance adds no checkboxes
+    assert out.count('type="checkbox"') == 3  # affordance adds no checkboxes
 
 
 def test_render_page_footer_carries_paths() -> None:
     """SME request 2026-07-21: gate pages show their own rendered-file path
     (with a copy button) plus the durable spec path, like design-doc renders."""
     spec = load_gate_spec(DEFAULT_GATE_PROMPTS_DIR / "ui-write-surface.yaml")
-    out = render_gate_page(spec, page_path="C:/coding/projects/DryDocs/var/gate-ui-write-surface.html")
+    out = render_gate_page(
+        spec, page_path="C:/coding/projects/DryDocs/var/gate-ui-write-surface.html"
+    )
     assert "C:/coding/projects/DryDocs/var/gate-ui-write-surface.html" in out
     assert "Copy path" in out
     assert "config/gate-prompts/ui-write-surface.yaml" in out

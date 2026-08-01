@@ -21,6 +21,7 @@ reads the IRIs a file MERGEs so the post-apply assertion has a ground truth
 that cannot drift out of step with the .cypher — a hand-maintained "expect N
 terms" constant would silently rot the first time a term is added.
 """
+
 from __future__ import annotations
 
 import re
@@ -44,10 +45,10 @@ _TERM_MERGE = re.compile(
 class Supplement:
     """One ontology supplement file and how it is applied."""
 
-    name: str          #: chain name — what ``--only`` takes
-    filename: str      #: file beside this module
-    legacy_verb: str   #: the pre-G29 CLI verb, kept as a delegating alias
-    summary: str       #: one line for --help and the run log
+    name: str  #: chain name — what ``--only`` takes
+    filename: str  #: file beside this module
+    legacy_verb: str  #: the pre-G29 CLI verb, kept as a delegating alias
+    summary: str  #: one line for --help and the run log
     opt_in: bool = False  #: excluded from the default chain (SOSA is experimental)
 
     @property
@@ -114,6 +115,4 @@ def declared_terms(path: Path) -> frozenset[str]:
     so a commented-out MERGE — the natural way to retire a term — does not
     become an IRI the graph is then required to hold forever.
     """
-    return frozenset(
-        _TERM_MERGE.findall(strip_comments(path.read_text(encoding="utf-8")))
-    )
+    return frozenset(_TERM_MERGE.findall(strip_comments(path.read_text(encoding="utf-8"))))

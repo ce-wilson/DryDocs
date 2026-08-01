@@ -14,6 +14,7 @@
 Discovery walks the drydocs.loaders package, so a NEW loader module is
 covered the moment it exists — an undeclared source_id fails here by name.
 """
+
 from __future__ import annotations
 
 import importlib
@@ -59,6 +60,7 @@ REGISTRY_IDS = frozenset(SourceRegistry.from_yaml().ids())
 
 # ---- (1) loader -> source ----------------------------------------------------
 
+
 def test_every_concrete_loader_declares_a_source_or_is_named_exempt():
     missing = sorted(
         cls.__name__
@@ -97,9 +99,7 @@ def test_declared_source_ids_resolve_in_the_registry():
         for cls in _concrete_loader_classes()
         if cls.source_id is not None and cls.source_id not in REGISTRY_IDS
     )
-    assert not unresolved, (
-        f"source_id(s) not in config/source-registry.yaml: {unresolved}"
-    )
+    assert not unresolved, f"source_id(s) not in config/source-registry.yaml: {unresolved}"
 
 
 def test_loader_source_projection_matches_the_class_declarations():
@@ -118,21 +118,19 @@ def test_loader_source_projection_matches_the_class_declarations():
 def test_every_registry_runnable_loader_declares_a_source():
     """`drydocs load <name>` gates on LOADER_SOURCE — a registry loader with
     no source_id would skip the D3 confirmed-gate silently."""
-    ungated = sorted(
-        name for name, cls in cli.LOADER_REGISTRY.items() if cls.source_id is None
-    )
+    ungated = sorted(name for name, cls in cli.LOADER_REGISTRY.items() if cls.source_id is None)
     assert not ungated, f"LOADER_REGISTRY loader(s) with no source_id: {ungated}"
 
 
 # ---- (2) command -> loaders --------------------------------------------------
+
 
 def test_command_loaders_name_real_commands_and_real_loaders():
     registered = _registered_command_names()
     concrete = _concrete_loader_classes()
     for command, loader_classes in cli.COMMAND_LOADERS.items():
         assert command in registered, (
-            f"COMMAND_LOADERS declares {command!r}, which is not a registered "
-            "Typer command."
+            f"COMMAND_LOADERS declares {command!r}, which is not a registered " "Typer command."
         )
         assert loader_classes, f"COMMAND_LOADERS[{command!r}] is empty."
         for cls in loader_classes:
@@ -150,9 +148,7 @@ def test_chain_constants_agree_with_the_loader_registry():
     pairs += [
         (nm, cls)
         for nm, cls, *_ in (
-            cli.CONTROLM_NODE_STAGES
-            + cli.CONTROLM_PART2_STAGES
-            + cli.CONTROLM_REL_STAGES
+            cli.CONTROLM_NODE_STAGES + cli.CONTROLM_PART2_STAGES + cli.CONTROLM_REL_STAGES
         )
     ]
     for nm, cls in pairs:
@@ -169,9 +165,7 @@ def test_every_concrete_loader_is_reachable_or_ad_hoc():
     reachable: set[type] = set(cli.LOADER_REGISTRY.values())
     for loader_classes in cli.COMMAND_LOADERS.values():
         reachable.update(loader_classes)
-    orphans = sorted(
-        cls.__name__ for cls in _concrete_loader_classes() if cls not in reachable
-    )
+    orphans = sorted(cls.__name__ for cls in _concrete_loader_classes() if cls not in reachable)
     assert not orphans, (
         f"Concrete loader(s) no declared command runs and `load` cannot reach: "
         f"{orphans} — declare them in COMMAND_LOADERS or LOADER_REGISTRY."
@@ -180,19 +174,21 @@ def test_every_concrete_loader_is_reachable_or_ad_hoc():
 
 # ---- (3) the canonical sequence ---------------------------------------------
 
+
 def test_sequence_steps_are_real_commands_with_valid_modes():
     registered = _registered_command_names()
     seen: set[str] = set()
     for command, mode, note in cli.CANONICAL_LOAD_SEQUENCE:
         assert command in registered, (
-            f"CANONICAL_LOAD_SEQUENCE step {command!r} is not a registered "
-            "Typer command."
+            f"CANONICAL_LOAD_SEQUENCE step {command!r} is not a registered " "Typer command."
         )
         assert command not in seen, f"duplicate sequence step {command!r}"
         seen.add(command)
-        assert mode in ("standing", "optional", "gated"), (
-            f"step {command!r}: mode {mode!r} not in standing|optional|gated"
-        )
+        assert mode in (
+            "standing",
+            "optional",
+            "gated",
+        ), f"step {command!r}: mode {mode!r} not in standing|optional|gated"
         assert note.strip(), f"step {command!r}: empty note"
 
 
@@ -212,6 +208,6 @@ def test_loader_commands_are_sequenced_or_declared_ad_hoc():
 def test_ad_hoc_commands_are_real():
     registered = _registered_command_names()
     for command in cli.AD_HOC_COMMANDS:
-        assert command in registered, (
-            f"AD_HOC_COMMANDS names {command!r}, not a registered command."
-        )
+        assert (
+            command in registered
+        ), f"AD_HOC_COMMANDS names {command!r}, not a registered command."

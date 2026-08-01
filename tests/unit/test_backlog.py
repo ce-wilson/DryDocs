@@ -10,6 +10,7 @@ guard keeps the database honest so those renders can trust it:
 - the `summary:` roll-up and `next_ready:` list are COMPUTED views — they must
   match the items exactly, so they can never silently drift again.
 """
+
 from __future__ import annotations
 
 from pathlib import Path
@@ -18,6 +19,7 @@ import pytest
 
 try:
     import yaml
+
     _YAML_AVAILABLE = True
 except ImportError:
     _YAML_AVAILABLE = False
@@ -29,10 +31,25 @@ AGENTS_DIR = REPO_ROOT / ".claude" / "agents"
 STATUSES = {"todo", "in_progress", "blocked", "done"}
 TYPES = {"requirement", "task", "chore", "bug"}
 PRIORITIES = {"p0", "p1", "p2", "p3"}
-MODELS = {"haiku", "sonnet", "opus", "fable"}  # fable = Mythos-class top tier (2026-07-10); opus stays valid for existing items
+MODELS = {
+    "haiku",
+    "sonnet",
+    "opus",
+    "fable",
+}  # fable = Mythos-class top tier (2026-07-10); opus stays valid for existing items
 REQUIRED_FIELDS = (
-    "id", "title", "type", "module", "phase", "epic",
-    "agent", "model", "priority", "status", "depends_on", "acceptance",
+    "id",
+    "title",
+    "type",
+    "module",
+    "phase",
+    "epic",
+    "agent",
+    "model",
+    "priority",
+    "status",
+    "depends_on",
+    "acceptance",
 )
 
 pytestmark = pytest.mark.skipif(not _YAML_AVAILABLE, reason="PyYAML not installed")
@@ -51,9 +68,9 @@ def _agents() -> set[str]:
 
 def test_schema_is_v2() -> None:
     doc = _load()
-    assert doc.get("schema") == "drydocs.backlog.v2", (
-        f"backlog schema drifted: {doc.get('schema')!r}"
-    )
+    assert (
+        doc.get("schema") == "drydocs.backlog.v2"
+    ), f"backlog schema drifted: {doc.get('schema')!r}"
     assert doc.get("updated"), "backlog.yaml missing `updated:` date"
 
 
@@ -116,7 +133,9 @@ def test_items_have_valid_v2_fields() -> None:
         if item.get("type") not in TYPES:
             failures.append(f"[{iid}] type {item.get('type')!r} not in {sorted(TYPES)}")
         if item.get("priority") not in PRIORITIES:
-            failures.append(f"[{iid}] priority {item.get('priority')!r} not in {sorted(PRIORITIES)}")
+            failures.append(
+                f"[{iid}] priority {item.get('priority')!r} not in {sorted(PRIORITIES)}"
+            )
         if item.get("model") not in MODELS:
             failures.append(f"[{iid}] model {item.get('model')!r} not in {sorted(MODELS)}")
         if item.get("agent") not in agents:

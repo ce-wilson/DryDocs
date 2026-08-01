@@ -20,6 +20,7 @@ and the CLI prints the dict — reported, never silent (the
 STG_PARSE_QUALITY house rule). The P4 both-match collision census
 (expected zero) and the multi-DC group ambiguity count ride along.
 """
+
 from __future__ import annotations
 
 import logging
@@ -78,10 +79,7 @@ class RunsOnCoverage:
     def reconciles(self) -> bool:
         """Every job is exactly one of: null, group-matched, host-matched, unmatched."""
         return (
-            self.null_node_id
-            + self.matched_host_group
-            + self.matched_agent_host
-            + self.unmatched
+            self.null_node_id + self.matched_host_group + self.matched_agent_host + self.unmatched
         ) == self.total_jobs
 
     def as_dict(self) -> dict:
@@ -105,9 +103,7 @@ class RunsOnResolutionPass:
     def __init__(self, client) -> None:
         self.client = client
         self.run_id = str(uuid.uuid4())
-        self.resolved_at = (
-            datetime.now(UTC).replace(microsecond=0, tzinfo=None).isoformat()
-        )
+        self.resolved_at = datetime.now(UTC).replace(microsecond=0, tzinfo=None).isoformat()
 
     def run(self) -> RunsOnCoverage:
         params = {
@@ -172,9 +168,5 @@ class RunsOnResolutionPass:
             """,
             run_id=self.run_id,
             resolved_at=self.resolved_at,
-            **{
-                k: v
-                for k, v in coverage.as_dict().items()
-                if k != "reconciles"
-            },
+            **{k: v for k, v in coverage.as_dict().items() if k != "reconciles"},
         )

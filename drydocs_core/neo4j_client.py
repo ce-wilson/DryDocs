@@ -4,6 +4,7 @@ Wraps the official ``neo4j`` driver with a thin context-manager interface.
 All callers should use ``with Neo4jClient(...) as client:`` to ensure the
 underlying driver is closed on exit.
 """
+
 from __future__ import annotations
 
 import logging
@@ -53,9 +54,7 @@ class Neo4jClient:
         assert self._driver is not None, "Use Neo4jClient as a context manager"
         bind = {**(params or {}), **kwargs}
         with self._driver.session(database=self._database) as session:
-            return session.execute_write(
-                lambda tx: [dict(r) for r in tx.run(cypher, bind)]
-            )
+            return session.execute_write(lambda tx: [dict(r) for r in tx.run(cypher, bind)])
 
     def run_script(self, script: str, params: dict[str, Any] | None = None) -> None:
         """Run a multi-statement Cypher script, split CLIENT-SIDE (D5).

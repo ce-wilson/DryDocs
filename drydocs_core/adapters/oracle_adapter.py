@@ -11,6 +11,7 @@ Every run writes a per-run SQL log (header -> handshake -> rendered SQL ->
 CSV result) under ``SPIDERP_LOGDIR`` so the HITL can verify exactly what was
 extracted — see :mod:`drydocs_core.adapters.sql_run_log`.
 """
+
 from __future__ import annotations
 
 import logging

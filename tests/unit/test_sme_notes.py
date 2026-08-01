@@ -1,4 +1,5 @@
 """Unit tests for sme_notes (drydocs/sme_notes.py) — pure, no Neo4j. Synthetic SIDs only."""
+
 from __future__ import annotations
 
 from drydocs.sme_notes import ROUTE_TAGS, harvest_text, harvest_tree, route
@@ -46,4 +47,4 @@ def test_harvest_tree_respects_extensions_and_excludes(tmp_path) -> None:
 
     notes = harvest_tree(tmp_path)
     sids = {n.sid for n in notes}
-    assert sids == {"s1"}          # .txt skipped, data/ excluded
+    assert sids == {"s1"}  # .txt skipped, data/ excluded

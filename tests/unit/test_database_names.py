@@ -16,6 +16,7 @@ the only thing that decides whether a database exists.
 
 Pure stdlib + a regex over the DDL — no Neo4j, no driver, no live connection.
 """
+
 from __future__ import annotations
 
 import ast
@@ -42,8 +43,8 @@ SCANNED_PACKAGES: tuple[str, ...] = (
 SUPERSEDED_NAMES: frozenset[str] = frozenset(
     {
         "drydocs_context",  # -> ddcontext   (ADR 0002 original; superseded at the G6/G7 deploy)
-        "drydocs_all",      # -> ddall       (same)
-        "drydocs_docs",     # -> dddocs      (docmeta plan working name; ADR 0006 §1 renamed it)
+        "drydocs_all",  # -> ddall       (same)
+        "drydocs_docs",  # -> dddocs      (docmeta plan working name; ADR 0006 §1 renamed it)
     }
 )
 
@@ -198,9 +199,9 @@ def test_the_lineage_writer_still_targets_the_ruled_database() -> None:
         "lineage.schema-definition.v1",
         "runbooks.series.v1",
     ):
-        assert query_spec(spec_id).database == LINEAGE_DATABASE, (
-            f"{spec_id} reads a different database than drydocs-lineage writes"
-        )
+        assert (
+            query_spec(spec_id).database == LINEAGE_DATABASE
+        ), f"{spec_id} reads a different database than drydocs-lineage writes"
 
 
 def test_superseded_names_are_really_superseded() -> None:

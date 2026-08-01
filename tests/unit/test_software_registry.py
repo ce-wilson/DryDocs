@@ -6,6 +6,7 @@ gated enums) and keep the loader wiring honest (adapter flattening, row
 validation, cypher/constraints/supplement declarations) without needing a
 Neo4j connection.
 """
+
 from __future__ import annotations
 
 from pathlib import Path
@@ -44,9 +45,9 @@ def test_ids_unique_and_vendor_refs_resolve() -> None:
     product_ids = [p["id"] for p in doc["products"]]
     assert len(product_ids) == len(set(product_ids)), "duplicate product id"
     for product in doc["products"]:
-        assert product["vendor"] in vendor_ids, (
-            f"product '{product['id']}' references unknown vendor '{product['vendor']}'"
-        )
+        assert (
+            product["vendor"] in vendor_ids
+        ), f"product '{product['id']}' references unknown vendor '{product['vendor']}'"
 
 
 def test_product_required_fields_and_enums() -> None:
@@ -60,9 +61,9 @@ def test_product_required_fields_and_enums() -> None:
 
 def test_vendors_carry_publisher_url() -> None:
     for vendor in _doc()["vendors"]:
-        assert str(vendor.get("publisher_url", "")).startswith("http"), (
-            f"vendor '{vendor['id']}' missing publisher_url"
-        )
+        assert str(vendor.get("publisher_url", "")).startswith(
+            "http"
+        ), f"vendor '{vendor['id']}' missing publisher_url"
 
 
 def test_adapter_flattens_and_rows_validate() -> None:
@@ -133,9 +134,9 @@ def test_documentation_pointer_is_well_formed_and_resolves() -> None:
             f"doc-source-registry id: {sorted(corpus_ids)}"
         )
         assert doc.get("docs_version"), f"product '{pid}' documentation missing docs_version"
-        assert isinstance(doc.get("current_for", []), list), (
-            f"product '{pid}' documentation.current_for must be a list"
-        )
+        assert isinstance(
+            doc.get("current_for", []), list
+        ), f"product '{pid}' documentation.current_for must be a list"
 
 
 def test_documentation_currency_drift_is_visible_not_hidden() -> None:
@@ -156,7 +157,9 @@ def test_documentation_currency_drift_is_visible_not_hidden() -> None:
         current_for = set(doc.get("current_for") or [])
         for version in product.get("versions", []) or []:
             if version not in current_for:
-                drifted.append(f"{product['id']}: runtime {version} not covered by docs {doc['docs_version']}")
+                drifted.append(
+                    f"{product['id']}: runtime {version} not covered by docs {doc['docs_version']}"
+                )
 
     # The known state, pinned so a silent change is loud. Update this list when
     # an SME confirms a capture against a runtime version (or recaptures).
@@ -184,12 +187,12 @@ def test_available_documentation_versions_are_well_formed() -> None:
             assert ver not in seen, f"'{pid}' duplicate documentation version '{ver}'"
             seen.add(ver)
             assert row.get("path"), f"'{pid}' version '{ver}' missing path"
-            assert row.get("access") in ACCESS_STATES, (
-                f"'{pid}' version '{ver}' access '{row.get('access')}' not in {ACCESS_STATES}"
-            )
-            assert row.get("enumerable") in ENUMERABLE_STATES, (
-                f"'{pid}' version '{ver}' enumerable '{row.get('enumerable')}' not in {ENUMERABLE_STATES}"
-            )
+            assert (
+                row.get("access") in ACCESS_STATES
+            ), f"'{pid}' version '{ver}' access '{row.get('access')}' not in {ACCESS_STATES}"
+            assert (
+                row.get("enumerable") in ENUMERABLE_STATES
+            ), f"'{pid}' version '{ver}' enumerable '{row.get('enumerable')}' not in {ENUMERABLE_STATES}"
             # A forbidden tree cannot have been probed for a toc.json, so
             # claiming to know is a transcription error.
             if row["access"] == "forbidden":

@@ -9,6 +9,7 @@ artifacts with sha256 and copy pointers, (d) v1 AND v2 bundles both parse,
 (e) tarball input, (f) malformed/missing counted never dropped, (g) candidates
 only — no rels, no graph writes.
 """
+
 from __future__ import annotations
 
 import tarfile
@@ -77,19 +78,25 @@ _SCRIPTS = (
 
 _OWNERSHIP = (
     "path\ttype\tperms\tsize\tmtime\n"
-    f"/home/{USER}\td\t750\t4096\t2026-07-20 09:00\n"      # dup of directories.tsv
+    f"/home/{USER}\td\t750\t4096\t2026-07-20 09:00\n"  # dup of directories.tsv
     f"/data/landing/in.dat\tf\t640\t100\t2026-07-20 09:00\n"
 )
 
 
-def _write_bundle(root: Path, name: str = f"rua_{HOST}_{USER}_20260723T120000Z",
-                  *, v2: bool = True, host: str = HOST,
-                  ownership: bool = False) -> Path:
+def _write_bundle(
+    root: Path,
+    name: str = f"rua_{HOST}_{USER}_20260723T120000Z",
+    *,
+    v2: bool = True,
+    host: str = HOST,
+    ownership: bool = False,
+) -> Path:
     bundle = root / name
     bundle.mkdir(parents=True)
     schema = "rua-inventory/v2" if v2 else "rua-inventory/v1"
     (bundle / "meta.txt").write_text(
-        _META.format(schema=schema, host=host, user=USER), encoding="utf-8")
+        _META.format(schema=schema, host=host, user=USER), encoding="utf-8"
+    )
     (bundle / "directories.tsv").write_text(_DIRECTORIES, encoding="utf-8")
     (bundle / "profiles").mkdir()
     (bundle / "profiles" / ".profile").write_text("export SYNTH=1\n", encoding="utf-8")
@@ -118,6 +125,7 @@ def v2_run(tmp_path: Path):
 
 # -- (a) the provenance envelope on every record ------------------------------------
 
+
 def test_envelope_stamped_on_every_record(v2_run) -> None:
     g, cov = v2_run
     everything = list(g.processes.values()) + list(g.data_assets.values())
@@ -132,11 +140,12 @@ def test_envelope_stamped_on_every_record(v2_run) -> None:
         assert node.properties["rua_collected_at"] == "2026-07-23T12:00:00Z"
         assert node.properties["rua_bundle"].startswith("rua_")
     assert cov.meta_fields_missing == 0
-    assert cov.meta["kernel"] == "5.14.0-synth"      # full meta kept for G23
+    assert cov.meta["kernel"] == "5.14.0-synth"  # full meta kept for G23
     assert cov.meta["scripts_copy_skipped_size"] == "1"
 
 
 # -- (b) directories / ownership → rua_path DataAssets ------------------------------
+
 
 def test_directories_become_rua_path_assets(v2_run) -> None:
     g, cov = v2_run
@@ -153,14 +162,15 @@ def test_ownership_sweep_consumed_and_dedups(tmp_path: Path) -> None:
     g = LineageGraph()
     cov = RuaInventoryExtractor().extract(bundle, g)
     assert cov.ownership_rows == 2
-    assert cov.ownership_staged == 1                 # /home dup deduped by id
+    assert cov.ownership_staged == 1  # /home dup deduped by id
     swept = g.data_assets[asset_id("rua_path", "/data/landing/in.dat")]
     assert swept.properties["type"] == "f"
     assert swept.properties["rua_section"] == "ownership_dirs.tsv"
-    assert cov.cross_host_collisions == 0            # same host — not a collision
+    assert cov.cross_host_collisions == 0  # same host — not a collision
 
 
 # -- (c) profile + script artifacts --------------------------------------------------
+
 
 def test_profile_artifact_with_hash_and_copy(v2_run) -> None:
     g, cov = v2_run
@@ -177,13 +187,14 @@ def test_script_artifacts_copy_pointer_and_overcap_listing(v2_run) -> None:
     copied = g.processes[process_id("rua_script", f"/home/{USER}/app/conform.py")]
     assert copied.properties["rua_copy"] == f"scripts/home/{USER}/app/conform.py"
     listed = g.processes[process_id("rua_script", f"/home/{USER}/app/big.py")]
-    assert "rua_copy" not in listed.properties       # over-cap: listed, not copied
-    assert listed.properties["sha256"] == SHA_BIG    # hash still travels
+    assert "rua_copy" not in listed.properties  # over-cap: listed, not copied
+    assert listed.properties["sha256"] == SHA_BIG  # hash still travels
     assert cov.scripts_staged == 2
     assert cov.script_copies_present == 1 and cov.script_copies_missing == 1
 
 
 # -- (d) v1 AND v2 bundles both parse -------------------------------------------------
+
 
 def test_v1_bundle_fully_ingestible(tmp_path: Path) -> None:
     bundle = _write_bundle(tmp_path, v2=False)
@@ -191,14 +202,15 @@ def test_v1_bundle_fully_ingestible(tmp_path: Path) -> None:
     cov = RuaInventoryExtractor().extract(bundle, g)
     assert cov.directories_staged == 2 and cov.profiles_staged == 1
     assert cov.scripts_staged == 0
-    assert "scripts.tsv" in cov.sections_optional_absent   # optional, NOT missing
+    assert "scripts.tsv" in cov.sections_optional_absent  # optional, NOT missing
     assert not any(s.startswith("scripts.tsv") for s in cov.sections_missing)
     prof = g.processes[process_id("rua_profile", f"/home/{USER}/.profile")]
     assert "sha256" not in prof.properties
-    assert cov.hash_missing == 1                     # v1 has no hashes — counted
+    assert cov.hash_missing == 1  # v1 has no hashes — counted
 
 
 # -- (e) tarball input ----------------------------------------------------------------
+
 
 def test_tarball_unpacks_and_parses(tmp_path: Path) -> None:
     bundle = _write_bundle(tmp_path / "staging", v2=True)
@@ -206,27 +218,28 @@ def test_tarball_unpacks_and_parses(tmp_path: Path) -> None:
     with tarfile.open(tarball, "w:gz") as tf:
         tf.add(bundle, arcname=bundle.name)
     g = LineageGraph()
-    cov = RuaInventoryExtractor().extract(
-        tarball, g, unpack_dir=tmp_path / "unpacked")
+    cov = RuaInventoryExtractor().extract(tarball, g, unpack_dir=tmp_path / "unpacked")
     assert cov.directories_staged == 2 and cov.scripts_staged == 2
     assert next(iter(g.data_assets.values())).properties["rua_host"] == HOST
 
 
 # -- (f) malformed / missing counted, never dropped -----------------------------------
 
+
 def test_malformed_rows_and_missing_meta_counted(tmp_path: Path) -> None:
     bundle = _write_bundle(tmp_path, v2=True)
     (bundle / "directories.tsv").write_text(
         "path\ttype\towner\tgroup\tperms\tsize\tmtime\n"
         f"/home/{USER}\td\t{USER}\tsynthgrp\t750\t4096\t2026-07-20 09:00\n"
-        "short\trow\n",                                 # wrong column count
-        encoding="utf-8")
+        "short\trow\n",  # wrong column count
+        encoding="utf-8",
+    )
     (bundle / "meta.txt").unlink()
     g = LineageGraph()
     cov = RuaInventoryExtractor().extract(bundle, g)
     assert cov.meta_missing == 1
     assert cov.directories_malformed == 1
-    assert cov.directories_staged == 1                  # the good row still lands
+    assert cov.directories_staged == 1  # the good row still lands
     node = g.data_assets[asset_id("rua_path", f"/home/{USER}")]
     assert node.properties["rua_bundle"] == bundle.name  # bundle stamp survives
     assert "rua_host" not in node.properties
@@ -234,22 +247,27 @@ def test_malformed_rows_and_missing_meta_counted(tmp_path: Path) -> None:
 
 def test_cross_host_collision_counted_first_seen_wins(tmp_path: Path) -> None:
     a = _write_bundle(tmp_path / "a", v2=True, host="vsi-synth-01")
-    b = _write_bundle(tmp_path / "b", v2=True, host="vsi-synth-02",
-                      name=f"rua_vsi-synth-02_{USER}_20260723T130000Z")
+    b = _write_bundle(
+        tmp_path / "b",
+        v2=True,
+        host="vsi-synth-02",
+        name=f"rua_vsi-synth-02_{USER}_20260723T130000Z",
+    )
     g = LineageGraph()
     extractor = RuaInventoryExtractor()
     extractor.extract(a, g)
     cov_b = extractor.extract(b, g)
-    assert cov_b.cross_host_collisions > 0              # same paths, other host
+    assert cov_b.cross_host_collisions > 0  # same paths, other host
     home = g.data_assets[asset_id("rua_path", f"/home/{USER}")]
-    assert home.properties["rua_host"] == "vsi-synth-01"   # first seen wins
+    assert home.properties["rua_host"] == "vsi-synth-01"  # first seen wins
 
 
 # -- (g) candidates only: no rels, nothing but nodes -----------------------------------
 
+
 def test_no_rels_and_no_new_relationship_types(v2_run) -> None:
     g, cov = v2_run
-    assert g.rels == set()                              # G20 stages NODES only
+    assert g.rels == set()  # G20 stages NODES only
     assert "scripts=2" in cov.summary()
     assert "profiles=1" in cov.summary()
 
@@ -267,12 +285,12 @@ _SCRIPTS_CSV = (
 
 
 def test_scripts_csv_metadata_only_fallback(tmp_path: Path) -> None:
-    bundle = _write_bundle(tmp_path, v2=False)          # v1: no scripts.tsv
+    bundle = _write_bundle(tmp_path, v2=False)  # v1: no scripts.tsv
     (bundle / "scripts.csv").write_text(_SCRIPTS_CSV, encoding="utf-8")
     g = LineageGraph()
     cov = RuaInventoryExtractor().extract(bundle, g)
     assert cov.scripts_rows == 2 and cov.scripts_staged == 2
-    assert cov.script_copies_missing == 2       # a LISTING never implies content
+    assert cov.script_copies_missing == 2  # a LISTING never implies content
     node = g.processes[process_id("rua_script", f"/home/{USER}/app/conform.py")]
     assert node.path == f"/home/{USER}/app/conform.py"  # joined absolute path
     assert node.name == "conform.py"
@@ -282,13 +300,13 @@ def test_scripts_csv_metadata_only_fallback(tmp_path: Path) -> None:
     assert node.properties["origin"] == "server-extract"
     assert "sha256" not in node.properties
     assert "rua_copy" not in node.properties
-    assert cov.hash_missing == 3                # 2 csv rows + the v1 profile
+    assert cov.hash_missing == 3  # 2 csv rows + the v1 profile
     # the section ARRIVED — it must not also be filed optional-absent
     assert "scripts.tsv" not in cov.sections_optional_absent
 
 
 def test_scripts_tsv_preferred_over_csv(tmp_path: Path) -> None:
-    bundle = _write_bundle(tmp_path, v2=True)           # scripts.tsv present (richer)
+    bundle = _write_bundle(tmp_path, v2=True)  # scripts.tsv present (richer)
     (bundle / "scripts.csv").write_text(_SCRIPTS_CSV, encoding="utf-8")
     g = LineageGraph()
     cov = RuaInventoryExtractor().extract(bundle, g)
@@ -296,7 +314,7 @@ def test_scripts_tsv_preferred_over_csv(tmp_path: Path) -> None:
     conform = g.processes[process_id("rua_script", f"/home/{USER}/app/conform.py")]
     assert conform.properties["sha256"] == SHA_CONFORM
     assert process_id("rua_script", "/opt/app/lookup/refund_lkp.ksh") not in g.processes
-    assert cov.scripts_staged == 2                      # the two tsv rows only
+    assert cov.scripts_staged == 2  # the two tsv rows only
 
 
 def test_scripts_csv_malformed_rows_counted_never_dropped(tmp_path: Path) -> None:
@@ -304,9 +322,10 @@ def test_scripts_csv_malformed_rows_counted_never_dropped(tmp_path: Path) -> Non
     (bundle / "scripts.csv").write_text(
         "path|script|permission|date|size\n"
         "/opt/app|good.sh|644|2026-07-20 09:00|10\n"
-        "|orphan.sh|644|2026-07-20 09:00|10\n"          # empty containing dir
-        "broken-row\n",                                 # wrong cell count
-        encoding="utf-8")
+        "|orphan.sh|644|2026-07-20 09:00|10\n"  # empty containing dir
+        "broken-row\n",  # wrong cell count
+        encoding="utf-8",
+    )
     g = LineageGraph()
     cov = RuaInventoryExtractor().extract(bundle, g)
     assert cov.scripts_staged == 1

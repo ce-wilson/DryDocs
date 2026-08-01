@@ -10,6 +10,7 @@ auth, wrapper) in its gitignored twin. No internal push details live here.
 Offline tooling — assembling/validating/previewing needs no HITL gate. classification:
 Internal-Public.
 """
+
 from __future__ import annotations
 
 from .assembler import DEFAULT_TEMPLATE, assemble

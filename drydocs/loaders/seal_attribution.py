@@ -30,6 +30,7 @@ reference names by default (:func:`fetch_app_name_reconciler`); FID and ALIAS
 have no producer-side reconciliation source yet, so their facts stay
 unresolved (counted, never guessed) until a table is wired company-side.
 """
+
 from __future__ import annotations
 
 import logging
@@ -68,6 +69,7 @@ AUTOMATED_SOURCE = "controlm-variable-normalization"
 # Reconciliation seam (tiers 2-4)
 # ---------------------------------------------------------------------------
 
+
 @dataclass(frozen=True)
 class TierReconcilers:
     """Value -> seal_id lookups for the non-SEAL tiers.
@@ -102,6 +104,7 @@ class TierReconcilers:
 # Coverage report (gate §B / §C / §F — report, never drop)
 # ---------------------------------------------------------------------------
 
+
 @dataclass(frozen=True)
 class MultiHit:
     """A flagged multi-hit case: >1 distinct seal_id at the winning tier."""
@@ -109,9 +112,9 @@ class MultiHit:
     folder_id: str
     job_id: str
     tier: str
-    candidates: tuple[str, ...]         # sorted, for reproducible reports
+    candidates: tuple[str, ...]  # sorted, for reproducible reports
     accepted: str
-    tie_break: str                       # 'run_recency' | 'lowest_seal_id'
+    tie_break: str  # 'run_recency' | 'lowest_seal_id'
 
 
 @dataclass(frozen=True)
@@ -126,7 +129,7 @@ class PinConflict:
     job_id: str
     pinned_seal_id: str
     derived_seal_id: str | None
-    agrees: bool | None                  # None when nothing was derived
+    agrees: bool | None  # None when nothing was derived
 
 
 @dataclass
@@ -141,11 +144,11 @@ class AttributionCoverage:
     matched_by_method: dict[str, int] = field(default_factory=dict)
     multi_hits: list[MultiHit] = field(default_factory=list)
     pin_conflicts: list[PinConflict] = field(default_factory=list)
-    corroboration_agree: int = 0         # lower-tier facts agreeing with the accepted match
-    corroboration_disagree: int = 0      # lower-tier facts naming a DIFFERENT app (flag material)
+    corroboration_agree: int = 0  # lower-tier facts agreeing with the accepted match
+    corroboration_disagree: int = 0  # lower-tier facts naming a DIFFERENT app (flag material)
     unresolved_facts_by_tier: dict[str, int] = field(default_factory=dict)
-    ignored_fact_rows: int = 0           # non-attribution fact types (DS_ID, DATAFLOW, ...)
-    fact_rows_rejected: int = 0          # raw rows failing StgAppFactRow validation
+    ignored_fact_rows: int = 0  # non-attribution fact types (DS_ID, DATAFLOW, ...)
+    fact_rows_rejected: int = 0  # raw rows failing StgAppFactRow validation
 
     def reconciles(self) -> bool:
         return self.matched + self.unmatched + self.pinned == self.eligible_jobs
@@ -158,9 +161,7 @@ class AttributionCoverage:
             "pinned": self.pinned,
             "matched_by_method": dict(self.matched_by_method),
             "multi_hit_count": len(self.multi_hits),
-            "pin_conflict_count": sum(
-                1 for c in self.pin_conflicts if c.agrees is not None
-            ),
+            "pin_conflict_count": sum(1 for c in self.pin_conflicts if c.agrees is not None),
             "corroboration_agree": self.corroboration_agree,
             "corroboration_disagree": self.corroboration_disagree,
             "unresolved_facts_by_tier": dict(self.unresolved_facts_by_tier),
@@ -173,6 +174,7 @@ class AttributionCoverage:
 # ---------------------------------------------------------------------------
 # The match policy (pure)
 # ---------------------------------------------------------------------------
+
 
 def resolve_attributions(
     rows: Iterable[StgAppFactRow],
@@ -201,20 +203,20 @@ def resolve_attributions(
     decisions: list[SealAttributionRow] = []
 
     for (folder_id, job_id), job_rows in jobs.items():
-        winner, winning_tier = _resolve_job(
-            folder_id, job_id, job_rows, reconcilers, coverage
-        )
+        winner, winning_tier = _resolve_job(folder_id, job_id, job_rows, reconcilers, coverage)
 
         pin = pinned.get((folder_id, job_id))
         if pin is not None:
             coverage.pinned += 1
-            coverage.pin_conflicts.append(PinConflict(
-                folder_id=folder_id,
-                job_id=job_id,
-                pinned_seal_id=pin,
-                derived_seal_id=winner,
-                agrees=None if winner is None else winner == pin,
-            ))
+            coverage.pin_conflicts.append(
+                PinConflict(
+                    folder_id=folder_id,
+                    job_id=job_id,
+                    pinned_seal_id=pin,
+                    derived_seal_id=winner,
+                    agrees=None if winner is None else winner == pin,
+                )
+            )
             continue
 
         if winner is None:
@@ -223,15 +225,15 @@ def resolve_attributions(
 
         method = MATCH_METHOD_BY_TIER[winning_tier]
         coverage.matched += 1
-        coverage.matched_by_method[method] = (
-            coverage.matched_by_method.get(method, 0) + 1
+        coverage.matched_by_method[method] = coverage.matched_by_method.get(method, 0) + 1
+        decisions.append(
+            SealAttributionRow(
+                folder_id=folder_id,
+                job_id=job_id,
+                seal_id=winner,
+                match_method=method,
+            )
         )
-        decisions.append(SealAttributionRow(
-            folder_id=folder_id,
-            job_id=job_id,
-            seal_id=winner,
-            match_method=method,
-        ))
 
     return decisions, coverage
 
@@ -254,7 +256,7 @@ def _resolve_job(
     winner: str | None = None
     winning_tier = ""
     for tier in ATTRIBUTION_TIERS:
-        candidates: dict[str, int] = {}   # seal_id -> max recency at this tier
+        candidates: dict[str, int] = {}  # seal_id -> max recency at this tier
         for recency, row in by_tier.get(tier, []):
             seal_id = reconcilers.resolve(tier, row.fact_value)
             if seal_id is None:
@@ -276,20 +278,22 @@ def _resolve_job(
             top = sorted(s for s, r in candidates.items() if r == top_recency)
             winner = top[0]
             tie_break = "run_recency" if len(top) == 1 else "lowest_seal_id"
-            coverage.multi_hits.append(MultiHit(
-                folder_id=folder_id,
-                job_id=job_id,
-                tier=tier,
-                candidates=tuple(sorted(candidates)),
-                accepted=winner,
-                tie_break=tie_break,
-            ))
+            coverage.multi_hits.append(
+                MultiHit(
+                    folder_id=folder_id,
+                    job_id=job_id,
+                    tier=tier,
+                    candidates=tuple(sorted(candidates)),
+                    accepted=winner,
+                    tie_break=tie_break,
+                )
+            )
         break
 
     # §A: lower-tier facts are corroboration only — recorded, never override.
     if winner is not None:
         tier_rank = ATTRIBUTION_TIERS.index(winning_tier)
-        for tier in ATTRIBUTION_TIERS[tier_rank + 1:]:
+        for tier in ATTRIBUTION_TIERS[tier_rank + 1 :]:
             for _, row in by_tier.get(tier, []):
                 seal_id = reconcilers.resolve(tier, row.fact_value)
                 if seal_id is None:
@@ -305,6 +309,7 @@ def _resolve_job(
 # ---------------------------------------------------------------------------
 # Adapter + loader
 # ---------------------------------------------------------------------------
+
 
 class SealAttributionAdapter:
     """Wraps a raw STG_APP_FACT adapter (CSV or Oracle) and yields resolved
@@ -349,9 +354,7 @@ class SealAttributionAdapter:
             except ValidationError as exc:
                 rejected += 1
                 if len(self.fact_rejects) < self.max_rejects_kept:
-                    self.fact_rejects.append(
-                        {"row_index": idx, "errors": exc.errors(), "raw": raw}
-                    )
+                    self.fact_rejects.append({"row_index": idx, "errors": exc.errors(), "raw": raw})
         decisions, coverage = resolve_attributions(
             facts, reconcilers=self.reconcilers, pinned=self.pinned
         )
@@ -408,9 +411,7 @@ class SealAttributionLoader(BaseLoader):
             unmatched=coverage.unmatched,
             pinned=coverage.pinned,
             multi_hit_count=len(coverage.multi_hits),
-            pin_conflict_count=sum(
-                1 for c in coverage.pin_conflicts if c.agrees is not None
-            ),
+            pin_conflict_count=sum(1 for c in coverage.pin_conflicts if c.agrees is not None),
         )
         if result:
             dropped = coverage.matched - result[0].get("edges_written", 0)
@@ -427,6 +428,7 @@ class SealAttributionLoader(BaseLoader):
 # Live-graph helpers (thin; the CLI wires these into the adapter)
 # ---------------------------------------------------------------------------
 
+
 def fetch_pinned_attributions(client: Neo4jClient) -> dict[tuple[str, str], str]:
     """Jobs carrying a manually-asserted seal_app_ref edge (gate §F: PIN)."""
     rows = client.run(
@@ -436,9 +438,7 @@ def fetch_pinned_attributions(client: Neo4jClient) -> dict[tuple[str, str], str]
         RETURN j.folder_id AS folder_id, j.job_id AS job_id, a.seal_id AS seal_id
         """
     )
-    return {
-        (str(r["folder_id"]), str(r["job_id"])): str(r["seal_id"]) for r in rows
-    }
+    return {(str(r["folder_id"]), str(r["job_id"])): str(r["seal_id"]) for r in rows}
 
 
 def fetch_app_name_reconciler(client: Neo4jClient) -> dict[str, str]:
@@ -472,7 +472,8 @@ def fetch_app_name_reconciler(client: Neo4jClient) -> dict[str, str]:
     if ambiguous:
         LOGGER.info(
             "seal_attribution: %d ambiguous application name(s) excluded from "
-            "APP_NAME reconciliation.", len(ambiguous)
+            "APP_NAME reconciliation.",
+            len(ambiguous),
         )
     return table
 

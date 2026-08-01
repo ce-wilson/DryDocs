@@ -38,6 +38,7 @@ USAGE
     python scripts/external_vendor_scrape.py bmc-controlm-9.0.20-utilities --dry-run
     python scripts/external_vendor_scrape.py bmc-controlm-9.0.20-utilities --max-pages 1200
 """
+
 from __future__ import annotations
 
 import argparse
@@ -175,7 +176,9 @@ class TocEntry:
         return " > ".join(self.path)
 
 
-def parse_toc(raw: bytes | str, *, book: str | None = None) -> tuple[list[TocEntry], dict[str, int]]:
+def parse_toc(
+    raw: bytes | str, *, book: str | None = None
+) -> tuple[list[TocEntry], dict[str, int]]:
     """Flatten an Author-it ``toc.json`` into (entries, pages-per-book).
 
     ``book`` restricts the result to one top-level book. Entries are
@@ -226,7 +229,9 @@ def _size(node: dict) -> int:
 BYTES_PER_PAGE_ESTIMATE = 12_000
 
 
-def render_plan(tree: VendorTree, entries: list[TocEntry], per_book: dict[str, int], delay: float) -> str:
+def render_plan(
+    tree: VendorTree, entries: list[TocEntry], per_book: dict[str, int], delay: float
+) -> str:
     est_bytes = len(entries) * BYTES_PER_PAGE_ESTIMATE
     est_seconds = len(entries) * max(delay, 0.0)
     lines = [
@@ -355,9 +360,7 @@ def capture(
         "failures": failures,
         "pages": records,
     }
-    (root / "capture-manifest.json").write_text(
-        json.dumps(manifest, indent=2), encoding="utf-8"
-    )
+    (root / "capture-manifest.json").write_text(json.dumps(manifest, indent=2), encoding="utf-8")
     return manifest
 
 
@@ -372,11 +375,15 @@ def build_parser() -> argparse.ArgumentParser:
     p.add_argument("--list", action="store_true", help="list known vendor trees and exit")
     p.add_argument("--dry-run", action="store_true", help="print the plan, fetch nothing")
     p.add_argument(
-        "--max-pages", type=int, default=DEFAULT_MAX_PAGES,
+        "--max-pages",
+        type=int,
+        default=DEFAULT_MAX_PAGES,
         help=f"refuse a capture larger than this (default {DEFAULT_MAX_PAGES})",
     )
     p.add_argument(
-        "--delay", type=float, default=DEFAULT_DELAY_SECONDS,
+        "--delay",
+        type=float,
+        default=DEFAULT_DELAY_SECONDS,
         help=f"seconds between requests (default {DEFAULT_DELAY_SECONDS})",
     )
     p.add_argument("--refresh", action="store_true", help="re-fetch pages already on disk")

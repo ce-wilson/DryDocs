@@ -44,6 +44,7 @@ Inclusion rule (the deterministic vocabulary→Cypher mapping, backlog C8)
   ``status``. Entry prose (``note``) stays in the vocabulary — the render
   carries structure only.
 """
+
 from __future__ import annotations
 
 import re
@@ -230,7 +231,8 @@ def render_schema_graph(vocab_path: str | Path = DEFAULT_VOCAB_PATH) -> str:
         if isinstance(lbl, str) and lbl not in by_label:
             by_label[lbl] = entry
     classified_order = [
-        lbl for lbl in dict.fromkeys(e.get("label") for e in classifications)
+        lbl
+        for lbl in dict.fromkeys(e.get("label") for e in classifications)
         if isinstance(lbl, str) and lbl in referenced
     ]
     unclassified_order = [lbl for lbl in referenced if lbl not in by_label]

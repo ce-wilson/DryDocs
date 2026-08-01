@@ -13,6 +13,7 @@ convention). Each case pins one acceptance clause:
     flagged needs_vocabulary, and stage NO rels;
 (e) skipped/unparseable constructs are counted by reason, never dropped.
 """
+
 from __future__ import annotations
 
 from pathlib import Path
@@ -162,9 +163,9 @@ def test_c_file_ops_emit_gate_edit_endpoints(staged) -> None:
 def test_d_profiles_stage_no_rels_only_candidates(staged) -> None:
     graph, result = staged
     profile_id = process_id("rua_profile", f"/home/{USER}/.profile")
-    assert not [r for r in graph.rels if r[0] == profile_id], (
-        "a profile's edge meaning is G22's — no rels from profile nodes"
-    )
+    assert not [
+        r for r in graph.rels if r[0] == profile_id
+    ], "a profile's edge meaning is G22's — no rels from profile nodes"
     assert result.path_mutations and result.path_mutations[0]["value"].endswith("/opt/app/bin")
     deps = {(d["via"], d["target"]) for d in result.dependency_candidates}
     assert ("source", "/opt/app/env/common_env.sh") in deps
@@ -177,11 +178,11 @@ def test_e_skips_counted_by_reason(staged) -> None:
     cov = result.coverage
     assert cov.scripts_seen == 3
     assert cov.scripts_parsed == 2
-    assert cov.scripts_no_copy == 1          # lost.sh — listed, content absent
+    assert cov.scripts_no_copy == 1  # lost.sh — listed, content absent
     assert cov.profiles_parsed == 1
     assert cov.lines_comment >= 3
     assert cov.lines_blank >= 2
     assert cov.lines_continuation_joined == 1  # the dt-launcher backslash line
-    assert cov.statements_unparsed >= 1        # frobnicate
+    assert cov.statements_unparsed >= 1  # frobnicate
     summary = cov.summary()
     assert "unparsed=" in summary and "unresolved=" in summary

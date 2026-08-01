@@ -5,6 +5,7 @@ per-source subfolders (``rua/incoming/``, ``rua/extracted/<bundle>/``), and —
 the publish-boundary safety net — the repo tree NEVER contains a rua bundle
 (``rua_*.tar.gz`` or an extracted bundle dir), only pointers.
 """
+
 from __future__ import annotations
 
 from pathlib import Path
@@ -24,6 +25,7 @@ REPO = Path(__file__).resolve().parents[2]
 
 
 # ---- resolution -------------------------------------------------------------
+
 
 def test_default_and_env_override(tmp_path, monkeypatch):
     monkeypatch.delenv(dr.DATA_ROOT_ENV, raising=False)
@@ -104,8 +106,7 @@ def test_repo_tree_contains_no_catalog_exports():
     name (``*_DATASETS_V`` / ``*_DISTRIBUTIONS_V``, either case — test
     fixtures are built in tmp_path, so any hit here is a real stray)."""
     offenders: set[str] = set()
-    for pattern in ("*datasets_v*", "*distributions_v*",
-                    "*DATASETS_V*", "*DISTRIBUTIONS_V*"):
+    for pattern in ("*datasets_v*", "*distributions_v*", "*DATASETS_V*", "*DISTRIBUTIONS_V*"):
         for path in REPO.rglob(pattern):
             if any(part in _SKIP_DIRS for part in path.parts):
                 continue

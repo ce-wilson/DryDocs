@@ -211,7 +211,8 @@ def test_fastapi_wiring_smoke():
     )
     assert ok.status_code == 200 and ok.json()["database"] == "drydocs"
     forbidden = client.post(
-        "/raw-cypher", json={"cypher": "MATCH (n) RETURN n"},
+        "/raw-cypher",
+        json={"cypher": "MATCH (n) RETURN n"},
         headers={"Authorization": f"Bearer {token}"},
     )
     assert forbidden.status_code == 403
@@ -239,13 +240,9 @@ def test_declared_test_transport_matches_what_starlette_resolves() -> None:
     import starlette.testclient as tc
 
     resolved = tc.httpx.__name__  # "httpx2" on starlette >=1.3, else "httpx"
-    pyproject = (
-        Path(__file__).resolve().parents[2] / "pyproject.toml"
-    ).read_text(encoding="utf-8")
+    pyproject = (Path(__file__).resolve().parents[2] / "pyproject.toml").read_text(encoding="utf-8")
     declared = {
-        name
-        for name in ("httpx2", "httpx")
-        if re.search(rf"^{name}\s*=", pyproject, re.MULTILINE)
+        name for name in ("httpx2", "httpx") if re.search(rf"^{name}\s*=", pyproject, re.MULTILINE)
     }
     assert declared == {resolved}, (
         f"pyproject declares {sorted(declared)} but the installed starlette resolves "

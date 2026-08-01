@@ -31,6 +31,7 @@ Mapping → ProcessNode:
     owner→run_as   job_name→name   parent_table→folder
     application→application   cmd_line→command
 """
+
 from __future__ import annotations
 
 import csv
@@ -59,8 +60,15 @@ _FILE_OP_ASSET_KIND = "local_file"
 #: keys in the code — a renamed alias fails the guard instead of silently
 #: dropping the column (the G9 tech-debt finding #2).
 CSV_CONTRACT = (
-    "application", "cmd_line", "folder_id", "is_current_version", "job_id",
-    "job_name", "node_id", "owner", "parent_table",
+    "application",
+    "cmd_line",
+    "folder_id",
+    "is_current_version",
+    "job_id",
+    "job_name",
+    "node_id",
+    "owner",
+    "parent_table",
 )
 
 
@@ -71,17 +79,17 @@ class ExtractCoverage:
     """
 
     rows_read: int = 0
-    jobs_added: int = 0                 # distinct current-version job nodes
-    skipped_stale_version: int = 0      # is_current_version present and not current ('Y')
-    skipped_nameless: int = 0           # row with no job_name
-    commands_empty: int = 0             # job kept, but cmd_line blank — no candidate
-    commands_unparsed: int = 0          # job kept, cmd_line present but 0 invocations AND 0 file ops
-    invocations_added: int = 0          # INVOKES candidates linked
-    invocations_unresolved: int = 0     # added but kind UNKNOWN (review page warns)
-    invocations_no_target: int = 0      # parsed invocation without a resolvable target
-    file_ops_added: int = 0             # READS_FROM/WRITES_TO candidates linked (G14)
+    jobs_added: int = 0  # distinct current-version job nodes
+    skipped_stale_version: int = 0  # is_current_version present and not current ('Y')
+    skipped_nameless: int = 0  # row with no job_name
+    commands_empty: int = 0  # job kept, but cmd_line blank — no candidate
+    commands_unparsed: int = 0  # job kept, cmd_line present but 0 invocations AND 0 file ops
+    invocations_added: int = 0  # INVOKES candidates linked
+    invocations_unresolved: int = 0  # added but kind UNKNOWN (review page warns)
+    invocations_no_target: int = 0  # parsed invocation without a resolvable target
+    file_ops_added: int = 0  # READS_FROM/WRITES_TO candidates linked (G14)
     file_ops_skipped_non_dataflow: int = 0  # op parsed, but not a data-flow op (DELETE/MKDIR/...)
-    file_ops_no_operand: int = 0        # data-flow op missing a usable src/tgt
+    file_ops_no_operand: int = 0  # data-flow op missing a usable src/tgt
 
     def as_dict(self) -> dict[str, int]:
         return asdict(self)
@@ -188,16 +196,18 @@ class ControlMInventoryExtractor:
         jid = process_id("controlm_job", key)
         if jid not in into.processes:
             coverage.jobs_added += 1
-        into.add_process(ProcessNode(
-            node_id=jid,
-            kind="controlm_job",
-            name=job_name,
-            command=cmd,
-            node_target=(row.get("node_id") or "").strip(),
-            run_as=(row.get("owner") or "").strip(),
-            folder=folder,
-            application=(row.get("application") or "").strip(),
-        ))
+        into.add_process(
+            ProcessNode(
+                node_id=jid,
+                kind="controlm_job",
+                name=job_name,
+                command=cmd,
+                node_target=(row.get("node_id") or "").strip(),
+                run_as=(row.get("owner") or "").strip(),
+                folder=folder,
+                application=(row.get("application") or "").strip(),
+            )
+        )
 
         if not cmd:
             coverage.commands_empty += 1
@@ -218,23 +228,23 @@ class ControlMInventoryExtractor:
             kind = inv.invocation_type.lower()
             cid = process_id(kind, _stable_invocation_key(inv, target))
             props = _dpl_properties(inv.args) if kind == "dpl" else {}
-            into.add_process(ProcessNode(
-                node_id=cid,
-                kind=kind,
-                name=_basename(target),
-                path=inv.script_path or inv.executable_path or "",
-                dataflow=props.pop("dataflow", ""),
-                config_path=props.pop("config_path", "") or (inv.config_path or ""),
-                properties=props,
-            ))
+            into.add_process(
+                ProcessNode(
+                    node_id=cid,
+                    kind=kind,
+                    name=_basename(target),
+                    path=inv.script_path or inv.executable_path or "",
+                    dataflow=props.pop("dataflow", ""),
+                    config_path=props.pop("config_path", "") or (inv.config_path or ""),
+                    properties=props,
+                )
+            )
             into.add_rel(jid, "INVOKES", cid)
             coverage.invocations_added += 1
             if kind == "unknown":
                 coverage.invocations_unresolved += 1
 
-    def _file_op(
-        self, jid: str, fop, into: LineageGraph, coverage: ExtractCoverage
-    ) -> None:
+    def _file_op(self, jid: str, fop, into: LineageGraph, coverage: ExtractCoverage) -> None:
         """One parsed CMD_LINE file op → READS_FROM/WRITES_TO candidates (G14).
 
         The src endpoint is the JOB itself — a CMD_LINE file op is performed by
@@ -251,8 +261,12 @@ class ControlMInventoryExtractor:
             return
         for location, rel_type in ((src, "READS_FROM"), (tgt, "WRITES_TO")):
             aid = asset_id(_FILE_OP_ASSET_KIND, location)
-            into.add_data_asset(DataAssetNode(
-                node_id=aid, kind=_FILE_OP_ASSET_KIND, location=location,
-            ))
+            into.add_data_asset(
+                DataAssetNode(
+                    node_id=aid,
+                    kind=_FILE_OP_ASSET_KIND,
+                    location=location,
+                )
+            )
             into.add_rel(jid, rel_type, aid)
             coverage.file_ops_added += 1

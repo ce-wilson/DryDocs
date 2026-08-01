@@ -1,4 +1,5 @@
 """Unit tests for the publishing pipeline (drydocs/publishing/) — offline, no Neo4j."""
+
 from __future__ import annotations
 
 from drydocs.publishing import (

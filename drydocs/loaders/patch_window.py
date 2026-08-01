@@ -40,6 +40,7 @@ Read-only: the committed Cypher lives in ``cypher/patch_window.cypher``
 (named ``// >>> section`` statements); the pass that WRITES the edges is
 ``runs_on_resolution.py``.
 """
+
 from __future__ import annotations
 
 import math
@@ -70,12 +71,13 @@ def load_sections(path: Path = CYPHER_PATH) -> dict[str, str]:
     sections: dict[str, str] = {}
     for i, m in enumerate(matches):
         end = matches[i + 1].start() if i + 1 < len(matches) else len(text)
-        stmt = text[m.end():end].strip().rstrip(";").strip()
+        stmt = text[m.end() : end].strip().rstrip(";").strip()
         sections[m.group("name")] = stmt
     return sections
 
 
 # -- time parsing (tolerant, counted) -----------------------------------------
+
 
 def parse_time_of_day(value: object) -> int | None:
     """Time-of-day → minutes since midnight, or None when unparseable.
@@ -121,13 +123,14 @@ def _run_minutes(value: object) -> int | None:
 
 # -- report shapes -------------------------------------------------------------
 
+
 @dataclass(frozen=True)
 class Finding:
     """One metadata finding — the remediation-feeder unit."""
 
-    kind: str      # no_timing_data | unparseable_timing | hardcoded_bypass |
-                   # intent_without_edge | stale_edge | multi_dc_group
-    subject: str   # job name (or group name for multi_dc_group)
+    kind: str  # no_timing_data | unparseable_timing | hardcoded_bypass |
+    # intent_without_edge | stale_edge | multi_dc_group
+    subject: str  # job name (or group name for multi_dc_group)
     detail: str
 
 
@@ -135,11 +138,11 @@ class Finding:
 class PatchWindowReport:
     """Everything `drydocs patch-window` prints; ``as_dict`` is the --json shape."""
 
-    mode: str                  # 'host' | 'group'
+    mode: str  # 'host' | 'group'
     target: str
     jobs: list[dict] = field(default_factory=list)
-    busy: list[dict] = field(default_factory=list)     # {start,end,minutes} HH:MM
-    quiet: list[dict] = field(default_factory=list)    # ranked longest-first
+    busy: list[dict] = field(default_factory=list)  # {start,end,minutes} HH:MM
+    quiet: list[dict] = field(default_factory=list)  # ranked longest-first
     placeable_jobs: int = 0
     unplaceable_jobs: int = 0
     findings: list[Finding] = field(default_factory=list)
@@ -158,6 +161,7 @@ class PatchWindowReport:
 
 
 # -- interval math (union on the 24h circle — never a sum) ---------------------
+
 
 def merge_busy(intervals: list[tuple[int, int]]) -> list[tuple[int, int]]:
     """Union of ``(start, end)`` minute intervals on a wrapping day.
@@ -216,11 +220,7 @@ def quiet_gaps(busy: list[tuple[int, int]]) -> list[tuple[int, int]]:
         else:
             flat.append((s, e))
     flat.sort()
-    gaps = [
-        (e1, s2)
-        for (_, e1), (s2, _) in zip(flat, flat[1:], strict=False)
-        if s2 > e1
-    ]
+    gaps = [(e1, s2) for (_, e1), (s2, _) in zip(flat, flat[1:], strict=False) if s2 > e1]
     head, tail = flat[0][0], flat[-1][1]
     # the wrap-around gap: last busy end -> first busy start next morning.
     # Absent exactly when busy coverage touches BOTH midnight boundaries
@@ -236,13 +236,11 @@ def _fmt(minute: int) -> str:
 
 
 def _window_dicts(windows: list[tuple[int, int]]) -> list[dict]:
-    return [
-        {"start": _fmt(s), "end": _fmt(e), "minutes": e - s}
-        for s, e in windows
-    ]
+    return [{"start": _fmt(s), "end": _fmt(e), "minutes": e - s} for s, e in windows]
 
 
 # -- assembly -------------------------------------------------------------------
+
 
 def build_report(mode: str, target: str, sections: dict[str, list[dict]]) -> PatchWindowReport:
     """Pure assembly: fetched rows → report. No I/O, fully unit-testable."""
@@ -252,8 +250,12 @@ def build_report(mode: str, target: str, sections: dict[str, list[dict]]) -> Pat
 
     for section in _JOB_SECTIONS[mode]:
         for row in sections.get(section, []):
-            key = (row.get("job_id"), row.get("path"), row.get("group_name"),
-                   row.get("pinned_host"))
+            key = (
+                row.get("job_id"),
+                row.get("path"),
+                row.get("group_name"),
+                row.get("pinned_host"),
+            )
             if key in seen:
                 continue
             seen.add(key)
@@ -268,8 +270,10 @@ def build_report(mode: str, target: str, sections: dict[str, list[dict]]) -> Pat
             else:
                 report.unplaceable_jobs += 1
                 if placement == "unparseable":
-                    kind, detail = ("unparseable_timing",
-                                    "timing present but not in an accepted shape")
+                    kind, detail = (
+                        "unparseable_timing",
+                        "timing present but not in an accepted shape",
+                    )
                 elif placement == "outlier":
                     kind, detail = (
                         "runtime_outlier",
@@ -286,47 +290,56 @@ def build_report(mode: str, target: str, sections: dict[str, list[dict]]) -> Pat
                     )
                 report.findings.append(Finding(kind=kind, subject=name, detail=detail))
             if section == "group_hardcoded":
-                report.findings.append(Finding(
-                    kind="hardcoded_bypass",
-                    subject=name,
-                    detail=(
-                        f"pinned to member host {row.get('pinned_host')} — "
-                        f"bypasses group '{target}' load balancing"
-                    ),
-                ))
+                report.findings.append(
+                    Finding(
+                        kind="hardcoded_bypass",
+                        subject=name,
+                        detail=(
+                            f"pinned to member host {row.get('pinned_host')} — "
+                            f"bypasses group '{target}' load balancing"
+                        ),
+                    )
+                )
 
     for row in sections.get("xval_intent_without_edge", []):
-        report.findings.append(Finding(
-            kind="intent_without_edge",
-            subject=str(row.get("job_name") or "?"),
-            detail=(
-                f"node_id names '{target}' but no RUNS_ON edge exists — "
-                "rerun the resolution pass or the target is missing from the "
-                "CM_HOSTS capture"
-            ),
-        ))
-    for row in sections.get(_STALE_SECTION[mode], []):
-        report.findings.append(Finding(
-            kind="stale_edge",
-            subject=str(row.get("job_name") or "?"),
-            detail=(
-                f"RUNS_ON edge into '{target}' but the job's node_id is now "
-                f"{row.get('node_id')!r} — the edge outlived the intent"
-            ),
-        ))
-    if mode == "group":
-        dcs = sorted({r.get("data_center") for r in sections.get("group_dcs", [])
-                      if r.get("data_center")})
-        if len(dcs) > 1:
-            report.findings.append(Finding(
-                kind="multi_dc_group",
-                subject=target,
+        report.findings.append(
+            Finding(
+                kind="intent_without_edge",
+                subject=str(row.get("job_name") or "?"),
                 detail=(
-                    f"group name exists in {len(dcs)} data centers "
-                    f"({', '.join(dcs)}) — jobs shown span all of them "
-                    "(DC scoping blocked on the DEFINED_ON residuals)"
+                    f"node_id names '{target}' but no RUNS_ON edge exists — "
+                    "rerun the resolution pass or the target is missing from the "
+                    "CM_HOSTS capture"
                 ),
-            ))
+            )
+        )
+    for row in sections.get(_STALE_SECTION[mode], []):
+        report.findings.append(
+            Finding(
+                kind="stale_edge",
+                subject=str(row.get("job_name") or "?"),
+                detail=(
+                    f"RUNS_ON edge into '{target}' but the job's node_id is now "
+                    f"{row.get('node_id')!r} — the edge outlived the intent"
+                ),
+            )
+        )
+    if mode == "group":
+        dcs = sorted(
+            {r.get("data_center") for r in sections.get("group_dcs", []) if r.get("data_center")}
+        )
+        if len(dcs) > 1:
+            report.findings.append(
+                Finding(
+                    kind="multi_dc_group",
+                    subject=target,
+                    detail=(
+                        f"group name exists in {len(dcs)} data centers "
+                        f"({', '.join(dcs)}) — jobs shown span all of them "
+                        "(DC scoping blocked on the DEFINED_ON residuals)"
+                    ),
+                )
+            )
 
     busy = merge_busy(intervals)
     gaps = sorted(quiet_gaps(busy), key=lambda g: (-(g[1] - g[0]), g[0]))
@@ -342,9 +355,7 @@ def _place(row: dict) -> tuple[str, tuple[int, int] | None]:
     ``folder_window`` / ``none`` / ``unparseable`` / ``outlier``.
     """
     has_job_timing = row.get("avg_start_time") is not None
-    has_folder_window = (
-        row.get("window_start") is not None or row.get("window_end") is not None
-    )
+    has_folder_window = row.get("window_start") is not None or row.get("window_end") is not None
     if has_job_timing:
         start = parse_time_of_day(row.get("avg_start_time"))
         run = _run_minutes(row.get("avg_run_time"))
@@ -380,6 +391,7 @@ def _folder_interval(row: dict) -> tuple[int, int] | None:
 
 # -- fetch ----------------------------------------------------------------------
 
+
 class PatchWindowQuery:
     """Run the committed read-only sections for one target and build the report."""
 
@@ -397,8 +409,5 @@ class PatchWindowQuery:
         wanted = [*list(_JOB_SECTIONS[mode]), "xval_intent_without_edge", _STALE_SECTION[mode]]
         if mode == "group":
             wanted.append("group_dcs")
-        fetched = {
-            name: self.client.run(self.sections[name], target=target)
-            for name in wanted
-        }
+        fetched = {name: self.client.run(self.sections[name], target=target) for name in wanted}
         return build_report(mode, target, fetched)

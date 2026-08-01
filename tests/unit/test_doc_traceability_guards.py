@@ -9,6 +9,7 @@ refusal, nothing written (not even the :JobRun); present prereq -> per-row
 misses COUNTED and listed, never silent. No Neo4j — the client is faked the
 same way test_batch_port_orchestrator does it.
 """
+
 from __future__ import annotations
 
 from collections.abc import Iterator
@@ -70,9 +71,7 @@ class _FakeClient:
                 if (p["doc_id"], p["anchor"]) in self.sections
             ]
         if "UNWIND $authors AS a" in cypher:
-            return [
-                {"employee_id": a} for a in bind["authors"] if a in self.employees
-            ]
+            return [{"employee_id": a} for a in bind["authors"] if a in self.employees]
         if "SHOW INDEXES" in cypher:
             return []
         if "AS rows_changed" in cypher:
@@ -127,6 +126,7 @@ def _feedback_loader(client: _FakeClient, rows: list[dict]) -> DocFeedbackLoader
 
 
 # ---- absent prereq -> loud refusal, nothing written ---------------------------
+
 
 def test_traceability_refuses_on_empty_section_registry() -> None:
     client = _FakeClient(sections=set())
@@ -184,6 +184,7 @@ def test_feedback_authorless_batch_loads_without_employee_registry() -> None:
 
 # ---- present prereq -> per-row misses counted, never silent -------------------
 
+
 def test_traceability_unmatched_anchors_are_listed() -> None:
     client = _FakeClient(sections={("synth-tdd", "design")})
     loader = _trace_loader(
@@ -218,6 +219,7 @@ def test_feedback_unmatched_anchor_and_unknown_author_are_listed() -> None:
 
 
 # ---- the template documents where its prereq is enforced ----------------------
+
 
 def test_cypher_headers_document_where_the_prereqs_are_enforced() -> None:
     """The templates cannot make the whole-registry check themselves (they

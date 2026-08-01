@@ -6,6 +6,7 @@ registry: kind distribution per data center, plugin namespaces, fact
 types, system functions in use, and the most-referenced variable names
 (the resolution hot set).
 """
+
 from __future__ import annotations
 
 from collections import Counter
@@ -24,8 +25,8 @@ class VariableCoverage:
     plugin_namespaces: Counter = field(default_factory=Counter)
     fact_types: Counter = field(default_factory=Counter)
     fact_warns: Counter = field(default_factory=Counter)  # G16 conformance signal:
-                                       # name_value_mismatch / alias_rename —
-                                       # canonical names are WARN-free
+    # name_value_mismatch / alias_rename —
+    # canonical names are WARN-free
     system_funcs: Counter = field(default_factory=Counter)
     system_vars: Counter = field(default_factory=Counter)
     referenced_names: Counter = field(default_factory=Counter)
@@ -64,7 +65,10 @@ class VariableCoverage:
             self.flow_targets[flow] += 1
         for gv in cv.global_refs:
             self.global_targets[gv] += 1
-        if cv.kind is VariableKind.MALFORMED and len(self.malformed_samples) < self.MAX_MALFORMED_SAMPLES:
+        if (
+            cv.kind is VariableKind.MALFORMED
+            and len(self.malformed_samples) < self.MAX_MALFORMED_SAMPLES
+        ):
             self.malformed_samples.append(f"{cv.raw_name!r} = {(cv.raw_value or '')[:120]!r}")
         if job_key is not None:
             self.jobs_seen.add(job_key)
@@ -73,7 +77,4 @@ class VariableCoverage:
     def pct_by_kind(self) -> dict[str, float]:
         if not self.total:
             return {}
-        return {
-            k: round(100 * n / self.total, 2)
-            for k, n in self.by_kind.most_common()
-        }
+        return {k: round(100 * n / self.total, 2) for k, n in self.by_kind.most_common()}

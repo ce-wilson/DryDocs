@@ -8,6 +8,7 @@ adds new segments without disturbing the seeded set.
 For phase 1 this is rarely needed; it lives here to keep the loader-set
 exhaustive and to give the CLI a target to call when manually triggered.
 """
+
 from __future__ import annotations
 
 import logging

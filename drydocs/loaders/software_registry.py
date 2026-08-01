@@ -11,6 +11,7 @@ MADE_BY (prov:wasAttributedTo), and — for rows where ``used_by_drydocs`` is
 true — a USES_SOFTWARE edge from the reserved DryDocs :BusinessApplication node
 (``drydocs_application_id``; company side reconciles it to the real SEAL id).
 """
+
 from __future__ import annotations
 
 from collections.abc import Iterator

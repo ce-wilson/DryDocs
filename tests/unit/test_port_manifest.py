@@ -6,6 +6,7 @@ mechanically; these checks keep it well-formed and pin the rows whose loss
 would be catastrophic (a blind checkout of drydocs/publishing/** destroys the
 consumer's wired Confluence originals). Pure YAML — no git, no Neo4j.
 """
+
 from __future__ import annotations
 
 from collections import Counter
@@ -19,8 +20,13 @@ REPO = Path(__file__).resolve().parents[2]
 MANIFEST = REPO / "PORT-MANIFEST.yaml"
 
 VALID_DISPOSITIONS = {
-    "clean-add", "canonical-producer", "canonical-company",
-    "union-append", "per-entry", "evaluate", "never-port",
+    "clean-add",
+    "canonical-producer",
+    "canonical-company",
+    "union-append",
+    "per-entry",
+    "evaluate",
+    "never-port",
 }
 
 
@@ -42,23 +48,31 @@ def test_paths_unique(manifest: dict) -> None:
 
 
 def test_dispositions_valid(manifest: dict) -> None:
-    bad = [(r["path"], r.get("disposition")) for r in manifest["rows"]
-           if r.get("disposition") not in VALID_DISPOSITIONS]
+    bad = [
+        (r["path"], r.get("disposition"))
+        for r in manifest["rows"]
+        if r.get("disposition") not in VALID_DISPOSITIONS
+    ]
     assert not bad, f"invalid dispositions: {bad}"
 
 
 def test_per_entry_rows_carry_an_entry_rule(manifest: dict) -> None:
-    missing = [r["path"] for r in manifest["rows"]
-               if r["disposition"] == "per-entry" and not r.get("entry_rule")]
+    missing = [
+        r["path"]
+        for r in manifest["rows"]
+        if r["disposition"] == "per-entry" and not r.get("entry_rule")
+    ]
     assert not missing, f"per-entry rows without entry_rule: {missing}"
 
 
 def test_protective_rows_carry_a_note(manifest: dict) -> None:
     """canonical-company and never-port rows exist to STOP someone — the note
     is the one-line why that stops them."""
-    missing = [r["path"] for r in manifest["rows"]
-               if r["disposition"] in ("canonical-company", "never-port")
-               and not r.get("note")]
+    missing = [
+        r["path"]
+        for r in manifest["rows"]
+        if r["disposition"] in ("canonical-company", "never-port") and not r.get("note")
+    ]
     assert not missing, f"protective rows without a note: {missing}"
 
 
@@ -77,9 +91,9 @@ def test_critical_rows_are_pinned(manifest: dict) -> None:
         "drydocs/data/**": "never-port",
     }
     for path, disposition in expected.items():
-        assert by_path.get(path) == disposition, (
-            f"{path}: expected {disposition}, manifest says {by_path.get(path)}"
-        )
+        assert (
+            by_path.get(path) == disposition
+        ), f"{path}: expected {disposition}, manifest says {by_path.get(path)}"
 
 
 def test_overrides_precede_their_broader_glob(manifest: dict) -> None:
@@ -91,11 +105,13 @@ def test_overrides_precede_their_broader_glob(manifest: dict) -> None:
         return paths.index(p)
 
     broad = "config/**"
-    for override in ("config/gate-log.md", "config/gate-prompts/**",
-                     "config/review-labels.yaml", "config/taxonomy-ontology-map.yaml"):
-        assert idx(override) < idx(broad), (
-            f"{override} must precede {broad} (first match wins)"
-        )
+    for override in (
+        "config/gate-log.md",
+        "config/gate-prompts/**",
+        "config/review-labels.yaml",
+        "config/taxonomy-ontology-map.yaml",
+    ):
+        assert idx(override) < idx(broad), f"{override} must precede {broad} (first match wins)"
     # same shape for the drydocs/ tree: the frozen adapter + review modules are
     # file-specific rows, and no broad drydocs/** row may exist at all
     assert "drydocs/**" not in paths, "no blanket drydocs/** row — keep dispositions explicit"

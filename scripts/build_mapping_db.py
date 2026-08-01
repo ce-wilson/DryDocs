@@ -8,6 +8,7 @@
 The output is DERIVED — never commit var/mapping.db; the committed YAML/CSV
 sources (and, when adopted, the CSV dumps) are what the gate reviews.
 """
+
 from __future__ import annotations
 
 import argparse
@@ -27,10 +28,7 @@ def main() -> int:
 
     conn = build(args.db)
     try:
-        counts = {
-            t: conn.execute(f"SELECT count(*) FROM {t}").fetchone()[0]
-            for t in tables(conn)
-        }
+        counts = {t: conn.execute(f"SELECT count(*) FROM {t}").fetchone()[0] for t in tables(conn)}
         print(f"built {args.db}")
         for t, n in counts.items():
             print(f"  {t}: {n}")

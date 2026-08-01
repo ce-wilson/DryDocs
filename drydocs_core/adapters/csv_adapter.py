@@ -7,6 +7,7 @@ The implementation uses Python's stdlib ``csv`` rather than pandas so we
 don't pay the pandas import cost for every loader; pandas is still in
 ``pyproject.toml`` for analytical work but loaders don't need it.
 """
+
 from __future__ import annotations
 
 import csv

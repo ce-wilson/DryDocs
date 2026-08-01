@@ -10,6 +10,7 @@ Usage:
     python scripts/render_design_doc.py docs/design/*.md            # several docs
     python scripts/render_design_doc.py docs/design/foo.md --out-dir build/
 """
+
 from __future__ import annotations
 
 import argparse
@@ -21,7 +22,9 @@ from drydocs.design_doc import write_doc
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("docs", nargs="+", type=Path, help="design-doc .md file(s) to render")
-    parser.add_argument("--out-dir", type=Path, default=None, help="output dir (default: beside each .md)")
+    parser.add_argument(
+        "--out-dir", type=Path, default=None, help="output dir (default: beside each .md)"
+    )
     args = parser.parse_args()
 
     for md in args.docs:

@@ -1,10 +1,12 @@
 """Unit tests for plan_board (drydocs/plan_board.py) — pure, no Neo4j."""
+
 from __future__ import annotations
 
 import pytest
 
 try:
     import yaml
+
     _YAML_AVAILABLE = True
 except ImportError:
     _YAML_AVAILABLE = False

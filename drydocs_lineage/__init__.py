@@ -30,6 +30,7 @@ GATE-BOUND: the vocabulary is ``status: planned``, so ``write_curated`` refuses 
 load until the HITL gate flips it active; ``plan_curated`` is the review surface).
 STILL A STUB: ``curation.curate`` (phased cadence — trigger wiring is later work).
 """
+
 from . import curation, extractors, model, review, writer
 
 #: The write target — ground truth. Defined AT the write boundary (writer.py);

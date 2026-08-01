@@ -130,7 +130,11 @@ class GraphQaPipeline:
 
     # -- envelope bookkeeping -------------------------------------------------
     def _llm(
-        self, envelope: Envelope, system: str, user: str, timings: dict,
+        self,
+        envelope: Envelope,
+        system: str,
+        user: str,
+        timings: dict,
         step: str = "llm",
     ) -> str:
         reply = self.provider.complete(system, user)
@@ -153,9 +157,7 @@ class GraphQaPipeline:
                     iteration=max(envelope.metrics.iterations, 1),
                 )
                 if cost is not None:
-                    envelope.metrics.cost_est_usd = (
-                        envelope.metrics.cost_est_usd or 0.0
-                    ) + cost
+                    envelope.metrics.cost_est_usd = (envelope.metrics.cost_est_usd or 0.0) + cost
             except Exception:
                 pass
         return reply.text
@@ -165,7 +167,10 @@ class GraphQaPipeline:
         started = self.clock()
         catalog = "\n".join(specs_catalog.catalog_lines())
         raw = self._llm(
-            envelope, ROUTER_SYSTEM, f"Specs:\n{catalog}\n\nQuestion: {question}", timings,
+            envelope,
+            ROUTER_SYSTEM,
+            f"Specs:\n{catalog}\n\nQuestion: {question}",
+            timings,
             step="router",
         )
         spec_id, params = None, {}
@@ -178,8 +183,9 @@ class GraphQaPipeline:
         timings["routing"] += int((self.clock() - started) * 1000)
         self._push_step(
             envelope,
-            StepRecord(i=len(envelope.steps) + 1, kind="router", spec_id=spec_id,
-                       ms=timings["routing"]),
+            StepRecord(
+                i=len(envelope.steps) + 1, kind="router", spec_id=spec_id, ms=timings["routing"]
+            ),
         )
         return spec_id, params
 
@@ -193,8 +199,11 @@ class GraphQaPipeline:
             resolved = specs_catalog.resolve_params(spec, {})  # defaults over router noise
         started = self.clock()
         step = StepRecord(
-            i=len(envelope.steps) + 1, kind="spec", spec_id=spec.id,
-            cypher=spec.cypher, database=spec.database,
+            i=len(envelope.steps) + 1,
+            kind="spec",
+            spec_id=spec.id,
+            cypher=spec.cypher,
+            database=spec.database,
         )
         try:
             result = self.run_read(
@@ -209,7 +218,9 @@ class GraphQaPipeline:
         step.explore_ref = self._explore_ref(spec.cypher, spec.database, resolved)
         self._push_step(envelope, step)
         timings["retrieve"] += step.ms
-        trust = "SYNTHESIZED" if spec.database in specs_catalog.WATERMARKED_DATABASES else "CONFIRMED"
+        trust = (
+            "SYNTHESIZED" if spec.database in specs_catalog.WATERMARKED_DATABASES else "CONFIRMED"
+        )
         envelope.sources.append(SourceRecord(document=f"spec:{spec.id}", trust=trust))
         return result
 
@@ -220,15 +231,19 @@ class GraphQaPipeline:
             [(s.id, s.description, s.cypher) for s in specs_catalog.QUERY_SPECS.values()],
         )
         raw = self._llm(
-            envelope, schema_prompt,
-            TEXT2CYPHER_USER.format(question=question, row_cap=ROW_CAP), timings,
+            envelope,
+            schema_prompt,
+            TEXT2CYPHER_USER.format(question=question, row_cap=ROW_CAP),
+            timings,
             step="text2cypher",
         )
         cypher = None
         for attempt in range(MAX_FIX_RETRIES + 1):
             step = StepRecord(
-                i=len(envelope.steps) + 1, kind="text2cypher",
-                database=self.default_db, fix_retries=attempt,
+                i=len(envelope.steps) + 1,
+                kind="text2cypher",
+                database=self.default_db,
+                fix_retries=attempt,
             )
             try:
                 cypher = _extract_json(raw).get("cypher", "").strip()
@@ -238,7 +253,9 @@ class GraphQaPipeline:
                 ensure_read_only(cypher)  # pre-flight; READ mode in run_read is the boundary
                 result = self.run_read(cypher, database=self.default_db, row_cap=ROW_CAP)
                 step.rows, step.truncated, step.ms = (
-                    result.row_count, result.truncated, result.ms,
+                    result.row_count,
+                    result.truncated,
+                    result.ms,
                 )
                 step.explore_ref = self._explore_ref(cypher, self.default_db, {})
                 self._push_step(envelope, step)
@@ -253,9 +270,11 @@ class GraphQaPipeline:
                 if attempt == MAX_FIX_RETRIES:
                     return None
                 raw = self._llm(
-                    envelope, schema_prompt,
+                    envelope,
+                    schema_prompt,
                     FIX_USER.format(cypher=cypher or raw[:500], error=exc, question=question),
-                    timings, step="fix",
+                    timings,
+                    step="fix",
                 )
         return None
 
@@ -311,10 +330,12 @@ class GraphQaPipeline:
                 "tokens_est": est_tokens(rows_json),
             }
             envelope.answer = self._llm(
-                envelope, ANSWER_SYSTEM,
+                envelope,
+                ANSWER_SYSTEM,
                 f"Question: {question}\n\nRows ({result.row_count}"
                 f"{', truncated' if result.truncated else ''}):\n{rows_json}",
-                timings, step="answer",
+                timings,
+                step="answer",
             )
             self._push_step(
                 envelope,

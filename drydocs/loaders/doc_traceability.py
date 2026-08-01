@@ -19,6 +19,7 @@ Parsing is stdlib + PyYAML only and reuses the Epic L anchor contract
 beyond the documented cell-split + kind rules below — same determinism bar as
 the render pipeline.
 """
+
 from __future__ import annotations
 
 import logging
@@ -172,7 +173,7 @@ def parse_sections(md_text: str) -> list[dict]:
     for seq, m in enumerate(ANCHOR_RE.finditer(md_text)):
         anchor = m.group(1).lower()
         heading = anchor
-        for line in md_text[m.end():].splitlines():
+        for line in md_text[m.end() :].splitlines():
             stripped = line.strip()
             if stripped:
                 heading = stripped.lstrip("#").strip() or anchor
@@ -188,7 +189,7 @@ def _matrix_block(md_text: str) -> str | None:
     for i, m in enumerate(anchors):
         if m.group(1).lower() == MATRIX_ANCHOR:
             end = anchors[i + 1].start() if i + 1 < len(anchors) else len(md_text)
-            match = md_text[m.end():end]
+            match = md_text[m.end() : end]
             break
     return match
 
@@ -494,7 +495,9 @@ class _SectionPrereqLoader(_ChecksummedLoader):
             LOGGER.warning(
                 "Loader %s: %d cited anchor(s) matched no :DocSection — their "
                 "anchor links were dropped, not written: %s",
-                self.name, len(self.unmatched_anchors), self.unmatched_anchors,
+                self.name,
+                len(self.unmatched_anchors),
+                self.unmatched_anchors,
             )
 
 
@@ -574,5 +577,7 @@ class DocFeedbackLoader(_SectionPrereqLoader):
                 "Loader %s: %d author(s) matched no :Employee — their "
                 "WAS_ATTRIBUTED_TO edges were dropped by design (gate C1, "
                 "never fabricated), reported here: %s",
-                self.name, len(self.unknown_authors), self.unknown_authors,
+                self.name,
+                len(self.unknown_authors),
+                self.unknown_authors,
             )

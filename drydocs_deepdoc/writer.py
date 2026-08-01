@@ -6,6 +6,7 @@ This is the ONLY module in the component that writes a database, and it writes o
 on the URN business key only — ground-truth properties are never copied across the
 boundary. Promotion to ``drydocs`` is NOT this module's job (HITL gate + loader path).
 """
+
 from __future__ import annotations
 
 from .investigate import ContextFinding

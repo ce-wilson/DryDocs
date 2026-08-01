@@ -7,6 +7,7 @@ way, which is the point: one store, two engines.
 
     $env:PYTHONPATH = "."; python scripts/mapping_analytics.py [--db var/mapping.db]
 """
+
 from __future__ import annotations
 
 import argparse

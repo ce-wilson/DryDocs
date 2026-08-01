@@ -31,6 +31,7 @@ topic's first content heading becomes ``#`` and every later one ``##``. That
 also makes the established "split on H2" chunking contract behave uniformly
 across a corpus where 993 of 1,016 pages carry exactly one heading.
 """
+
 from __future__ import annotations
 
 import html as _html
@@ -43,7 +44,22 @@ _CHROME_TABLE_MARKER = "relatedtopics"
 _RELATED_FOOT_MARKER = "belowtopictext"
 _HEADING_CLASS_RE = re.compile(r"heading[1-6]")
 
-_BLOCK_TAGS = {"p", "div", "tr", "li", "h1", "h2", "h3", "h4", "h5", "h6", "table", "ul", "ol", "pre"}
+_BLOCK_TAGS = {
+    "p",
+    "div",
+    "tr",
+    "li",
+    "h1",
+    "h2",
+    "h3",
+    "h4",
+    "h5",
+    "h6",
+    "table",
+    "ul",
+    "ol",
+    "pre",
+}
 
 
 @dataclass
@@ -85,13 +101,13 @@ class _AuthorItParser(HTMLParser):
         self.related: list[RelatedLink] = []
         self.headings: list[str] = []
 
-        self._skip_depth = 0          # inside script/style
-        self._chrome_tables = 0       # nested depth inside a relatedtopics table
-        self._in_foot_related = False # that table is the "Related Topics" block
+        self._skip_depth = 0  # inside script/style
+        self._chrome_tables = 0  # nested depth inside a relatedtopics table
+        self._in_foot_related = False  # that table is the "Related Topics" block
         self._table_depth = 0
         self._in_title_tag = False
 
-        self._heading: str | None = None   # normalized marker while inside a heading
+        self._heading: str | None = None  # normalized marker while inside a heading
         self._buf: list[str] = []
         self._href: str | None = None
         self._link_text: list[str] = []

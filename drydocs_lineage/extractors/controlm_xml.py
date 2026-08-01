@@ -39,6 +39,7 @@ possible (unlike rua bundles / catalog exports) — the landing-zone
 convention and the source entry's classification are the guard, and that
 limitation is documented rather than papered over.
 """
+
 from __future__ import annotations
 
 import xml.etree.ElementTree as ET
@@ -69,7 +70,7 @@ class XmlFolderRecord:
 
     data_center: str
     folder_name: str
-    kind: str                    # "folder" | "smart_folder"
+    kind: str  # "folder" | "smart_folder"
     source_file: str = ""
 
 
@@ -80,7 +81,7 @@ class XmlJobRecord:
 
     data_center: str
     folder_name: str
-    subfolder_path: str          # "" at folder level, else "A" / "A/B" / …
+    subfolder_path: str  # "" at folder level, else "A" / "A/B" / …
     job_name: str
     task_type: str = ""
     cmd_line: str = ""
@@ -97,10 +98,10 @@ class XmlVariableRecord:
 
     data_center: str
     folder_name: str
-    scope: str                   # FOLDER | SUBFOLDER | JOB (resolver spellings)
-    container: str               # "" | subfolder path | subfolder path + "/" + job name
+    scope: str  # FOLDER | SUBFOLDER | JOB (resolver spellings)
+    container: str  # "" | subfolder path | subfolder path + "/" + job name
     ordinal: int
-    name: str                    # verbatim, %% prefix as exported
+    name: str  # verbatim, %% prefix as exported
     value: str
     source_file: str = ""
 
@@ -110,16 +111,16 @@ class XmlDefsCoverage:
     """Per-run accounting — every skip is counted BY REASON, never silent."""
 
     files_read: int = 0
-    files_invalid: int = 0           # unparseable XML / root not DEFTABLE
+    files_invalid: int = 0  # unparseable XML / root not DEFTABLE
     folders: int = 0
     jobs: int = 0
     variables: int = 0
-    folders_no_name: int = 0         # folder element without a name — skipped
-    jobs_no_name: int = 0            # JOB without JOBNAME — skipped
-    jobs_no_cmd_line: int = 0        # staged anyway (file watchers etc.) — counted
-    variables_no_name: int = 0       # VARIABLE without NAME — skipped
-    duplicate_jobs: int = 0          # same (dc, folder, subfolder, name) — first wins
-    elements_ignored: int = 0        # tags this seam does not consume — tolerated
+    folders_no_name: int = 0  # folder element without a name — skipped
+    jobs_no_name: int = 0  # JOB without JOBNAME — skipped
+    jobs_no_cmd_line: int = 0  # staged anyway (file watchers etc.) — counted
+    variables_no_name: int = 0  # VARIABLE without NAME — skipped
+    duplicate_jobs: int = 0  # same (dc, folder, subfolder, name) — first wins
+    elements_ignored: int = 0  # tags this seam does not consume — tolerated
 
     def as_dict(self) -> dict:
         return asdict(self)
@@ -156,6 +157,7 @@ class XmlDefsExtract:
         takes (folder first, enclosing sub-folders outermost-in, job last).
         This is the G48 join surface: staging hands the ordered definitions
         over; the shared resolver does every substitution."""
+
         def defs(scope: str, container: str):
             return [
                 (v.name, v.value)
@@ -170,12 +172,8 @@ class XmlDefsExtract:
         if job.subfolder_path:
             parts = job.subfolder_path.split("/")
             for i in range(1, len(parts) + 1):
-                layers.append(
-                    ("SUBFOLDER", defs("SUBFOLDER", "/".join(parts[:i])))
-                )
-        layers.append(
-            ("JOB", defs("JOB", _job_container(job.subfolder_path, job.job_name)))
-        )
+                layers.append(("SUBFOLDER", defs("SUBFOLDER", "/".join(parts[:i]))))
+        layers.append(("JOB", defs("JOB", _job_container(job.subfolder_path, job.job_name))))
         return layers
 
 
@@ -237,16 +235,25 @@ class ControlMXmlDefsExtractor:
             coverage.folders_no_name += 1
             return
         data_center = _attr(elem, "DATACENTER")
-        result.folders.append(XmlFolderRecord(
-            data_center=data_center,
-            folder_name=folder_name,
-            kind="smart_folder" if tag in _SMART_TAGS else "folder",
-            source_file=path.as_posix(),
-        ))
+        result.folders.append(
+            XmlFolderRecord(
+                data_center=data_center,
+                folder_name=folder_name,
+                kind="smart_folder" if tag in _SMART_TAGS else "folder",
+                source_file=path.as_posix(),
+            )
+        )
         coverage.folders += 1
         self._read_container(
-            elem, data_center, folder_name, "", "FOLDER", "",
-            path, result, seen_jobs,
+            elem,
+            data_center,
+            folder_name,
+            "",
+            "FOLDER",
+            "",
+            path,
+            result,
+            seen_jobs,
         )
 
     # -- one container level (folder / sub-folder / job) ------------------------
@@ -272,33 +279,45 @@ class ControlMXmlDefsExtractor:
                     coverage.variables_no_name += 1
                     continue
                 ordinal += 1
-                result.variables.append(XmlVariableRecord(
-                    data_center=data_center,
-                    folder_name=folder_name,
-                    scope=var_scope,
-                    container=var_container,
-                    ordinal=ordinal,
-                    name=name,
-                    value=_attr(child, "VALUE"),
-                    source_file=path.as_posix(),
-                ))
+                result.variables.append(
+                    XmlVariableRecord(
+                        data_center=data_center,
+                        folder_name=folder_name,
+                        scope=var_scope,
+                        container=var_container,
+                        ordinal=ordinal,
+                        name=name,
+                        value=_attr(child, "VALUE"),
+                        source_file=path.as_posix(),
+                    )
+                )
                 coverage.variables += 1
             elif tag in _SUBFOLDER_TAGS:
                 sub_name = _attr(child, *_SUBFOLDER_NAME_ATTRS)
                 if not sub_name:
                     coverage.folders_no_name += 1
                     continue
-                sub_path = (
-                    f"{subfolder_path}/{sub_name}" if subfolder_path else sub_name
-                )
+                sub_path = f"{subfolder_path}/{sub_name}" if subfolder_path else sub_name
                 self._read_container(
-                    child, data_center, folder_name, sub_path,
-                    "SUBFOLDER", sub_path, path, result, seen_jobs,
+                    child,
+                    data_center,
+                    folder_name,
+                    sub_path,
+                    "SUBFOLDER",
+                    sub_path,
+                    path,
+                    result,
+                    seen_jobs,
                 )
             elif tag == "JOB":
                 self._read_job(
-                    child, data_center, folder_name, subfolder_path,
-                    path, result, seen_jobs,
+                    child,
+                    data_center,
+                    folder_name,
+                    subfolder_path,
+                    path,
+                    result,
+                    seen_jobs,
                 )
             else:
                 coverage.elements_ignored += 1
@@ -326,22 +345,30 @@ class ControlMXmlDefsExtractor:
         cmd_line = _attr(elem, "CMDLINE")
         if not cmd_line:
             coverage.jobs_no_cmd_line += 1
-        result.jobs.append(XmlJobRecord(
-            data_center=data_center,
-            folder_name=folder_name,
-            subfolder_path=subfolder_path,
-            job_name=job_name,
-            task_type=_attr(elem, "TASKTYPE"),
-            cmd_line=cmd_line,
-            node_id=_attr(elem, "NODEID"),
-            application=_attr(elem, "APPLICATION"),
-            run_as=_attr(elem, "RUN_AS"),
-            source_file=path.as_posix(),
-        ))
+        result.jobs.append(
+            XmlJobRecord(
+                data_center=data_center,
+                folder_name=folder_name,
+                subfolder_path=subfolder_path,
+                job_name=job_name,
+                task_type=_attr(elem, "TASKTYPE"),
+                cmd_line=cmd_line,
+                node_id=_attr(elem, "NODEID"),
+                application=_attr(elem, "APPLICATION"),
+                run_as=_attr(elem, "RUN_AS"),
+                source_file=path.as_posix(),
+            )
+        )
         coverage.jobs += 1
         # job-scope variables (and anything else nested under the job)
         self._read_container(
-            elem, data_center, folder_name, subfolder_path,
-            "JOB", _job_container(subfolder_path, job_name),
-            path, result, seen_jobs,
+            elem,
+            data_center,
+            folder_name,
+            subfolder_path,
+            "JOB",
+            _job_container(subfolder_path, job_name),
+            path,
+            result,
+            seen_jobs,
         )

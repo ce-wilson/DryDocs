@@ -16,6 +16,7 @@ PDF from the L6 paper loop.
 The pure helpers (``find_browser``, ``normalize_pdf_bytes``, ``print_flags``) are unit-
 tested; ``html_to_pdf`` shells out. Stdlib only. classification: Internal-Public (tool).
 """
+
 from __future__ import annotations
 
 import re
@@ -80,8 +81,9 @@ def print_flags(html_path: str | Path, pdf_path: str | Path) -> list[str]:
     ]
 
 
-def html_to_pdf(html_path: str | Path, pdf_path: str | Path | None = None,
-                browser: str | Path | None = None) -> Path:
+def html_to_pdf(
+    html_path: str | Path, pdf_path: str | Path | None = None, browser: str | Path | None = None
+) -> Path:
     """Render ``html_path`` (the design doc's .html; @media print rules apply) to a
     normalized PDF; return its path."""
     html_path = Path(html_path)
@@ -95,6 +97,8 @@ def html_to_pdf(html_path: str | Path, pdf_path: str | Path | None = None,
         cmd = [str(exe), f"--user-data-dir={profile}", *print_flags(html_path, pdf_path)]
         proc = subprocess.run(cmd, capture_output=True, timeout=180)
     if not pdf_path.exists():
-        raise RuntimeError(f"PDF not produced by {exe.name}: {proc.stderr.decode('utf-8', 'replace')[-500:]}")
+        raise RuntimeError(
+            f"PDF not produced by {exe.name}: {proc.stderr.decode('utf-8', 'replace')[-500:]}"
+        )
     pdf_path.write_bytes(normalize_pdf_bytes(pdf_path.read_bytes()))
     return pdf_path

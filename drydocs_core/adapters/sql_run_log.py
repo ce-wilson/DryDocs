@@ -36,6 +36,7 @@ so ONE knob configures the whole log family):
 A log may contain real DSNs and extracted data values — logs live outside the
 repo and are never committed. This module is mechanism only.
 """
+
 from __future__ import annotations
 
 import csv

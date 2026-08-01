@@ -10,6 +10,7 @@ Row models are defined here alongside their loaders. When the team confirms
 exact catalog table names + column names, only the SQL SELECT in each loader
 needs to change — the model field names stay constant.
 """
+
 from __future__ import annotations
 
 from collections.abc import Iterable

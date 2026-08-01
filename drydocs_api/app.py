@@ -143,7 +143,9 @@ def create_app(runner=None, store: InMemorySessionStore | None = None):
     from fastapi import FastAPI, Header, HTTPException
     from fastapi.middleware.cors import CORSMiddleware
 
-    app = FastAPI(title="drydocs-api", description="Thin read API over the knowledge graph (ADR 0005)")
+    app = FastAPI(
+        title="drydocs-api", description="Thin read API over the knowledge graph (ADR 0005)"
+    )
     # The web console dev server is the only expected browser origin today.
     app.add_middleware(
         CORSMiddleware,
@@ -204,7 +206,9 @@ def create_app(runner=None, store: InMemorySessionStore | None = None):
             raise HTTPException(422, str(exc)) from None
 
     @app.post("/raw-cypher")
-    def post_raw(body: RawBody, authorization: str | None = Header(default=None)) -> dict[str, object]:
+    def post_raw(
+        body: RawBody, authorization: str | None = Header(default=None)
+    ) -> dict[str, object]:
         try:
             return run_raw(body.cypher, _token(authorization), sessions, graph)
         except InvalidTokenError:
@@ -372,9 +376,7 @@ def create_app(runner=None, store: InMemorySessionStore | None = None):
         )
 
     @app.get("/mappings/overrides/report")
-    def get_override_report(
-        authorization: str | None = Header(default=None)
-    ) -> dict[str, object]:
+    def get_override_report(authorization: str | None = Header(default=None)) -> dict[str, object]:
         return _mapping_call(
             source_corrections_report, _token(authorization), sessions, mapping_store
         )

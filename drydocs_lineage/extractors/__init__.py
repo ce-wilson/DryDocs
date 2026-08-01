@@ -1,4 +1,5 @@
 """Lineage extractors — re-homed from depgraph@feat/controlm-lineage (ADR 0002-C §4)."""
+
 from .code_repo import (
     CodeRepoExtractor,
     CorroborationReport,

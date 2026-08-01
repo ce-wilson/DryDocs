@@ -48,8 +48,7 @@ def catalog_lines() -> list[str]:
     lines = []
     for spec in QUERY_SPECS.values():
         params = ", ".join(
-            f"{p.name}:{p.type}" + ("" if p.required else f"={p.default}")
-            for p in spec.params
+            f"{p.name}:{p.type}" + ("" if p.required else f"={p.default}") for p in spec.params
         )
         lines.append(
             f"- {spec.id} [{spec.database}]"

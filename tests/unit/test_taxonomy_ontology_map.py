@@ -8,6 +8,7 @@ relationship_vocabulary.yaml; labels must agree between the two files so the
 map and the vocabulary cannot silently diverge (the dual-source-of-truth debt).
 Pure YAML checks — no Neo4j.
 """
+
 from __future__ import annotations
 
 from collections import Counter
@@ -47,8 +48,11 @@ def test_mapping_ids_unique_and_present(map_doc: dict) -> None:
 
 
 def test_status_lifecycle_enum(map_doc: dict) -> None:
-    bad = [(m["id"], m.get("status")) for m in map_doc["mappings"]
-           if m.get("status") not in VALID_STATUSES]
+    bad = [
+        (m["id"], m.get("status"))
+        for m in map_doc["mappings"]
+        if m.get("status") not in VALID_STATUSES
+    ]
     assert not bad, f"invalid lifecycle status (proposed|confirmed|applied|rejected): {bad}"
 
 
@@ -85,7 +89,7 @@ def test_vocab_id_resolves_into_the_vocabulary(map_doc: dict, vocab_ids: dict) -
         vid = m.get("vocab_id")
         if vid is None:
             continue
-        for one in (vid if isinstance(vid, list) else [vid]):
+        for one in vid if isinstance(vid, list) else [vid]:
             if one not in vocab_ids:
                 failures.append(f"{m['id']}: vocab_id '{one}' not in relationship_vocabulary.yaml")
     assert not failures, "\n".join(failures)
@@ -118,9 +122,9 @@ def test_updated_header_is_not_stale(map_doc: dict) -> None:
     dates = [d if isinstance(d, dt.date) else dt.date.fromisoformat(str(d)) for d in dates]
     updated = map_doc["updated"]
     updated = updated if isinstance(updated, dt.date) else dt.date.fromisoformat(str(updated))
-    assert updated >= max(dates), (
-        f"updated: {updated} is older than the newest entry date {max(dates)}"
-    )
+    assert updated >= max(
+        dates
+    ), f"updated: {updated} is older than the newest entry date {max(dates)}"
 
 
 def test_no_duplicate_node_classification_labels() -> None:
@@ -165,9 +169,7 @@ def test_post_cutoff_mappings_declare_vocab_id(map_doc: dict) -> None:
     failures = []
     for m in _confirmed_after_cutoff(map_doc["mappings"]):
         if "vocab_id" not in m:
-            failures.append(
-                f"{m['id']}: confirmed {m['confirmed_on']} without a vocab_id field"
-            )
+            failures.append(f"{m['id']}: confirmed {m['confirmed_on']} without a vocab_id field")
         elif m["vocab_id"] is None:
             reason = m.get("vocab_id_reason")
             if not (isinstance(reason, str) and reason.strip()):
@@ -186,9 +188,7 @@ def test_post_cutoff_mappings_declare_capture(map_doc: dict) -> None:
     for m in _confirmed_after_cutoff(map_doc["mappings"]):
         capture = m.get("capture")
         if not isinstance(capture, str) or not capture.strip():
-            failures.append(
-                f"{m['id']}: confirmed {m['confirmed_on']} without a capture field"
-            )
+            failures.append(f"{m['id']}: confirmed {m['confirmed_on']} without a capture field")
             continue
         capture = capture.strip()
         if capture.startswith("waived"):

@@ -16,6 +16,7 @@ THE RULES enforced (unchanged from the loader docstring):
 - Supported shape: exactly the K2 shape today
   (ControlMJob -[WAS_ASSOCIATED_WITH {role: seal_app_ref}]-> BusinessApplication).
 """
+
 from __future__ import annotations
 
 import csv
@@ -29,8 +30,7 @@ from drydocs_core.models import ManualMappingRow
 _REPO_ROOT = Path(drydocs_core.__file__).resolve().parent.parent
 DEFAULT_MANIFEST_PATH = _REPO_ROOT / "config" / "manual-loads" / "manifest.yaml"
 VOCABULARY_PATH = (
-    Path(drydocs_core.__file__).resolve().parent
-    / "ontology" / "relationship_vocabulary.yaml"
+    Path(drydocs_core.__file__).resolve().parent / "ontology" / "relationship_vocabulary.yaml"
 )
 
 # The one shape the manual writer supports today (K2). Extending this map is
@@ -123,9 +123,7 @@ def _parse_key(raw: str, column: str, line_no: int) -> dict[str, str]:
         if not part:
             continue
         if "=" not in part:
-            raise ManualLoadError(
-                f"row {line_no}: {column} segment '{part}' is not k=v"
-            )
+            raise ManualLoadError(f"row {line_no}: {column} segment '{part}' is not k=v")
         k, v = part.split("=", 1)
         pairs[k.strip()] = v.strip()
     if not pairs:
@@ -189,20 +187,21 @@ def parse_mapping_csv(
                 )
             if "seal_id" not in target_key:
                 raise ManualLoadError(
-                    f"row {line_no}: target_key missing seal_id "
-                    "(Application node key)"
+                    f"row {line_no}: target_key missing seal_id " "(Application node key)"
                 )
 
-            rows.append(ManualMappingRow(
-                folder_id=source_key["folder_id"],
-                job_id=source_key["job_id"],
-                seal_id=target_key["seal_id"],
-                create_target_if_missing=raw.get("create_target_if_missing", "false"),
-                manual_load_file=manifest_file,
-                authored_by=raw.get("authored_by") or "",
-                authored_on=raw.get("authored_on"),
-                note=raw.get("note"),
-            ))
+            rows.append(
+                ManualMappingRow(
+                    folder_id=source_key["folder_id"],
+                    job_id=source_key["job_id"],
+                    seal_id=target_key["seal_id"],
+                    create_target_if_missing=raw.get("create_target_if_missing", "false"),
+                    manual_load_file=manifest_file,
+                    authored_by=raw.get("authored_by") or "",
+                    authored_on=raw.get("authored_on"),
+                    note=raw.get("note"),
+                )
+            )
     if not rows:
         raise ManualLoadError(f"{csv_path}: no mapping rows found")
     return rows

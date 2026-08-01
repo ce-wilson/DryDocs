@@ -1,4 +1,5 @@
 """Smoke test the namespaces helper."""
+
 from __future__ import annotations
 
 import pytest

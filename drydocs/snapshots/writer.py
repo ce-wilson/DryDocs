@@ -12,6 +12,7 @@ Retention: 5 years. A nightly ``prune`` call deletes snapshots whose
 their entity (the latest snapshot is kept regardless of age so the
 "current state" never disappears).
 """
+
 from __future__ import annotations
 
 import hashlib
@@ -131,9 +132,7 @@ class SnapshotWriter:
         snapshot_label: str,
         relationship_query: str,
     ) -> dict[str, int]:
-        entity_rows = self.client.run(
-            f"MATCH (e:{entity_label}) RETURN e.{entity_key} AS k"
-        )
+        entity_rows = self.client.run(f"MATCH (e:{entity_label}) RETURN e.{entity_key} AS k")
         keys = [r["k"] for r in entity_rows if r["k"] is not None]
 
         n_new = 0
@@ -205,10 +204,10 @@ class SnapshotWriter:
     @staticmethod
     def _stable(d: dict[str, Any]) -> str:
         """Deterministic JSON for hashing: sort keys, sort lists."""
+
         def normalize(v: Any) -> Any:
             if isinstance(v, list):
-                return sorted([normalize(x) for x in v if x is not None],
-                              key=lambda x: str(x))
+                return sorted([normalize(x) for x in v if x is not None], key=lambda x: str(x))
             if isinstance(v, dict):
                 return {k: normalize(v[k]) for k in sorted(v)}
             return v

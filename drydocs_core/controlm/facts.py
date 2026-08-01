@@ -6,6 +6,7 @@ rows: notification facts split on ``;`` into one STG_NOTIFICATION row per
 address; everything else becomes one STG_APP_FACT row, carrying the env
 tag when the variable was part of a _D/_Q/_P triplet.
 """
+
 from __future__ import annotations
 
 import re
@@ -51,13 +52,14 @@ def route_fact(
             if not addr:
                 continue
             channel = "EMAIL" if _EMAIL_RE.match(addr) else "OTHER"
-            notes.append(Notification(channel=channel, address=addr[:320],
-                                      source_var=cv.raw_name))
+            notes.append(Notification(channel=channel, address=addr[:320], source_var=cv.raw_name))
         return [], notes
 
-    return [AppFact(
-        fact_type=cv.fact_type,
-        fact_value=value[:500],
-        environment=cv.env_candidate if cv.env_tag else None,
-        source_var=cv.raw_name,
-    )], []
+    return [
+        AppFact(
+            fact_type=cv.fact_type,
+            fact_value=value[:500],
+            environment=cv.env_candidate if cv.env_tag else None,
+            source_var=cv.raw_name,
+        )
+    ], []

@@ -28,6 +28,7 @@ module (M3 phase / M4 deliverable).
 Application codes are used for security in the production environment. The code is for naming standard at
 folder and job level.  Application Codes are 3 alphanumeric numeric characters.
 """
+
 from __future__ import annotations
 
 from dataclasses import dataclass
@@ -43,7 +44,7 @@ LOB_CODE_MAP = {
     "Y": "Testing3",  # provisional placeholder
     "K": "Testing2",  # provisional
     "B": "Testing",  # provisional
-    }
+}
 
 FOLDER_TYPE_MAP = {
     "G": "Group Table/Smart folder",
@@ -52,7 +53,7 @@ FOLDER_TYPE_MAP = {
     "M": "Monthly",
     "Q": "Quarterly",
     "H": "Holiday",
-    "R": "Request Job/ Ad-hoc"  # provisional
+    "R": "Request Job/ Ad-hoc",  # provisional
 }
 
 
@@ -67,15 +68,15 @@ class ParsedFolderName:
     """
 
     raw: str
-    prefix: str                  # the first segment (e.g. "PRARAG")
-    environment_code: str | None # 'P'
-    environment: str | None      # 'Production'
-    lob_code: str | None         # 'R'
-    lob: str | None              # 'Retail'
-    app_code: str | None         # 'ARA'
-    folder_type_code: str | None # 'G'
-    folder_type: str | None      # 'Smart folder'
-    segments: tuple[str, ...]    # the segments AFTER the prefix
+    prefix: str  # the first segment (e.g. "PRARAG")
+    environment_code: str | None  # 'P'
+    environment: str | None  # 'Production'
+    lob_code: str | None  # 'R'
+    lob: str | None  # 'Retail'
+    app_code: str | None  # 'ARA'
+    folder_type_code: str | None  # 'G'
+    folder_type: str | None  # 'Smart folder'
+    segments: tuple[str, ...]  # the segments AFTER the prefix
     prefix_recognized: bool
 
 

@@ -23,6 +23,7 @@ pass sweeps ControlMHostGroup whenever the caller declares full_extract.
 (ExecutionHost is deliberately NOT swept — hosts are shared endpoints of
 the agent_host edges and the wipe-and-rebuild doctrine covers them.)
 """
+
 from __future__ import annotations
 
 from pathlib import Path

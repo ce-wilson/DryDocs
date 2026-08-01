@@ -29,6 +29,7 @@ A log may contain real source values (job names, rejected rows) — logs live
 outside the repo and are never committed. Writing is best-effort after open:
 the log is an audit trail, never the reason a load fails.
 """
+
 from __future__ import annotations
 
 import getpass

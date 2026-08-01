@@ -2,6 +2,7 @@
 render must equal regeneration, every registered source must have a row
 (silent absence is a defect), and every concrete loader must appear on the
 one surface exactly once."""
+
 from __future__ import annotations
 
 import importlib.util
@@ -38,9 +39,7 @@ def test_committed_load_map_html_matches_regeneration():
     (the board.html contract; docs/plan/ is the generated-surface home)."""
     mod = _generator()
     fresh = mod.build_load_map_html(mod.build_load_map())
-    committed_html = (REPO / "docs" / "plan" / "load-map.html").read_text(
-        encoding="utf-8"
-    )
+    committed_html = (REPO / "docs" / "plan" / "load-map.html").read_text(encoding="utf-8")
     assert committed_html == fresh, (
         "docs/plan/load-map.html drifted — run: python scripts/render_load_map.py "
         "(or the default board render) and commit the result"
@@ -75,21 +74,23 @@ def test_ledger_states_are_the_three_governed_ones():
     committed = json.loads(COMMITTED.read_text(encoding="utf-8"))
     for s in committed["sources"]:
         state = s["ledger"]["state"]
-        assert state in ("ledger", "pending", "placeholder"), (
-            f"source {s['id']}: unknown ledger state {state!r}"
-        )
-        assert (state == "ledger") == bool(s["ledger"]["path"]), (
-            f"source {s['id']}: ledger state/path disagree"
-        )
+        assert state in (
+            "ledger",
+            "pending",
+            "placeholder",
+        ), f"source {s['id']}: unknown ledger state {state!r}"
+        assert (state == "ledger") == bool(
+            s["ledger"]["path"]
+        ), f"source {s['id']}: ledger state/path disagree"
 
 
 def test_every_concrete_loader_appears_exactly_once():
     from tests.unit.test_load_map_declarations import _concrete_loader_classes
 
     committed = json.loads(COMMITTED.read_text(encoding="utf-8"))
-    rendered = [
-        loader["name"] for s in committed["sources"] for loader in s["loaders"]
-    ] + [loader["name"] for loader in committed["sourceless_loaders"]]
+    rendered = [loader["name"] for s in committed["sources"] for loader in s["loaders"]] + [
+        loader["name"] for loader in committed["sourceless_loaders"]
+    ]
     assert sorted(rendered) == sorted(
         cls.name for cls in _concrete_loader_classes()
     ), "load-map.json loader coverage drifted from the concrete loader set"
@@ -100,8 +101,6 @@ def test_sequence_mirrors_the_declaration():
     from drydocs import cli
 
     committed = json.loads(COMMITTED.read_text(encoding="utf-8"))
-    assert [
-        (s["command"], s["mode"], s["note"]) for s in committed["sequence"]
-    ] == list(cli.CANONICAL_LOAD_SEQUENCE), (
-        "load-map.json sequence drifted from cli.CANONICAL_LOAD_SEQUENCE"
-    )
+    assert [(s["command"], s["mode"], s["note"]) for s in committed["sequence"]] == list(
+        cli.CANONICAL_LOAD_SEQUENCE
+    ), "load-map.json sequence drifted from cli.CANONICAL_LOAD_SEQUENCE"

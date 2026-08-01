@@ -30,6 +30,7 @@ Consumer-side usage during reconcile-port (documented in that skill):
 Without RECONCILE_BEFORE_DIR the live-comparison tests SKIP; the fixture-driven
 mechanics tests run everywhere (producer CI included).
 """
+
 from __future__ import annotations
 
 import os
@@ -71,6 +72,7 @@ BACKLOG_DOWNGRADES: dict[str, set[str]] = {
 
 # --- the executable rules (pure) -------------------------------------------------
 
+
 def status_downgrades(
     before: Iterable[Mapping[str, Any]],
     after: Iterable[Mapping[str, Any]],
@@ -88,9 +90,7 @@ def status_downgrades(
         if merged is None:
             violations.append(f"{k}: entry DROPPED by the merge (was {status!r})")
         elif merged.get(status_field) in downgrade_map.get(status, set()):
-            violations.append(
-                f"{k}: status downgraded {status!r} -> {merged.get(status_field)!r}"
-            )
+            violations.append(f"{k}: status downgraded {status!r} -> {merged.get(status_field)!r}")
     return violations
 
 
@@ -99,9 +99,7 @@ def append_only_violation(before_text: str, after_text: str) -> str | None:
     if after_text.startswith(before_text):
         return None
     limit = min(len(before_text), len(after_text))
-    at = next(
-        (i for i in range(limit) if before_text[i] != after_text[i]), limit
-    )
+    at = next((i for i in range(limit) if before_text[i] != after_text[i]), limit)
     return (
         f"append-only violated: merged file diverges from the pre-merge text at "
         f"char {at} (existing entries must be a prefix — dropping or editing "
@@ -131,30 +129,28 @@ _VOCAB_BEFORE = [
 
 def test_vocab_active_downgrade_fails() -> None:
     after = [
-        {"id": "m3_active_edge", "status": "planned"},   # producer clobbered it
+        {"id": "m3_active_edge", "status": "planned"},  # producer clobbered it
         {"id": "m3_planned_edge", "status": "planned"},
     ]
-    violations = status_downgrades(
-        _VOCAB_BEFORE, after, key="id", downgrade_map=VOCAB_DOWNGRADES
-    )
+    violations = status_downgrades(_VOCAB_BEFORE, after, key="id", downgrade_map=VOCAB_DOWNGRADES)
     assert violations == ["m3_active_edge: status downgraded 'active' -> 'planned'"]
 
 
 def test_vocab_upgrade_and_new_entries_pass() -> None:
     after = [
         {"id": "m3_active_edge", "status": "active"},
-        {"id": "m3_planned_edge", "status": "active"},    # upgrade: fine
-        {"id": "m3_brand_new", "status": "planned"},      # union: fine
+        {"id": "m3_planned_edge", "status": "active"},  # upgrade: fine
+        {"id": "m3_brand_new", "status": "planned"},  # union: fine
     ]
-    assert status_downgrades(
-        _VOCAB_BEFORE, after, key="id", downgrade_map=VOCAB_DOWNGRADES
-    ) == []
+    assert status_downgrades(_VOCAB_BEFORE, after, key="id", downgrade_map=VOCAB_DOWNGRADES) == []
 
 
 def test_dropped_entry_fails() -> None:
     violations = status_downgrades(
-        _VOCAB_BEFORE, [{"id": "m3_planned_edge", "status": "planned"}],
-        key="id", downgrade_map=VOCAB_DOWNGRADES,
+        _VOCAB_BEFORE,
+        [{"id": "m3_planned_edge", "status": "planned"}],
+        key="id",
+        downgrade_map=VOCAB_DOWNGRADES,
     )
     assert violations == ["m3_active_edge: entry DROPPED by the merge (was 'active')"]
 
@@ -181,9 +177,9 @@ def test_backlog_status_regression_fails() -> None:
         {"id": "U1", "status": "todo"},
     ]
     after = [
-        {"id": "J16", "status": "todo"},          # the producer's older plan won
+        {"id": "J16", "status": "todo"},  # the producer's older plan won
         {"id": "L17", "status": "in_progress"},
-        {"id": "U1", "status": "done"},           # progress forward: fine
+        {"id": "U1", "status": "done"},  # progress forward: fine
     ]
     violations = status_downgrades(before, after, key="id", downgrade_map=BACKLOG_DOWNGRADES)
     assert violations == ["J16: status downgraded 'done' -> 'todo'"]
@@ -211,18 +207,29 @@ def test_gate_log_append_only_mechanics() -> None:
 def test_current_files_pass_their_own_rules() -> None:
     """Sanity: each real file vs itself is violation-free (loaders + rules wire up)."""
     vocab = yaml.safe_load(VOCAB_FILE.read_text(encoding="utf-8"))
-    assert status_downgrades(
-        vocab_entries(vocab), vocab_entries(vocab), key="id", downgrade_map=VOCAB_DOWNGRADES
-    ) == []
+    assert (
+        status_downgrades(
+            vocab_entries(vocab), vocab_entries(vocab), key="id", downgrade_map=VOCAB_DOWNGRADES
+        )
+        == []
+    )
     mapping = yaml.safe_load(MAP_FILE.read_text(encoding="utf-8"))
-    assert status_downgrades(
-        map_entries(mapping), map_entries(mapping), key="id", downgrade_map=MAP_DOWNGRADES
-    ) == []
+    assert (
+        status_downgrades(
+            map_entries(mapping), map_entries(mapping), key="id", downgrade_map=MAP_DOWNGRADES
+        )
+        == []
+    )
     backlog = yaml.safe_load(BACKLOG_FILE.read_text(encoding="utf-8"))
-    assert status_downgrades(
-        backlog_entries(backlog), backlog_entries(backlog),
-        key="id", downgrade_map=BACKLOG_DOWNGRADES,
-    ) == []
+    assert (
+        status_downgrades(
+            backlog_entries(backlog),
+            backlog_entries(backlog),
+            key="id",
+            downgrade_map=BACKLOG_DOWNGRADES,
+        )
+        == []
+    )
     text = GATE_LOG.read_text(encoding="utf-8")
     assert append_only_violation(text, text) is None
 
@@ -251,9 +258,7 @@ def test_reconcile_vocab_no_downgrade_live() -> None:
 @_needs_before
 def test_reconcile_map_no_downgrade_live() -> None:
     before_dir = Path(os.environ[BEFORE_DIR_ENV])
-    before = yaml.safe_load(
-        (before_dir / "taxonomy-ontology-map.yaml").read_text(encoding="utf-8")
-    )
+    before = yaml.safe_load((before_dir / "taxonomy-ontology-map.yaml").read_text(encoding="utf-8"))
     after = yaml.safe_load(MAP_FILE.read_text(encoding="utf-8"))
     violations = status_downgrades(
         map_entries(before), map_entries(after), key="id", downgrade_map=MAP_DOWNGRADES
@@ -267,8 +272,10 @@ def test_reconcile_backlog_no_regression_live() -> None:
     before = yaml.safe_load((before_dir / "backlog.yaml").read_text(encoding="utf-8"))
     after = yaml.safe_load(BACKLOG_FILE.read_text(encoding="utf-8"))
     violations = status_downgrades(
-        backlog_entries(before), backlog_entries(after),
-        key="id", downgrade_map=BACKLOG_DOWNGRADES,
+        backlog_entries(before),
+        backlog_entries(after),
+        key="id",
+        downgrade_map=BACKLOG_DOWNGRADES,
     )
     assert not violations, "\n".join(violations)
 
@@ -352,7 +359,10 @@ def _git_files(*extra_args: str) -> list[str]:
     try:
         out = subprocess.run(
             ["git", "ls-files", *extra_args],
-            cwd=REPO, capture_output=True, text=True, check=True,
+            cwd=REPO,
+            capture_output=True,
+            text=True,
+            check=True,
         ).stdout
     except (OSError, subprocess.CalledProcessError):  # pragma: no cover
         pytest.skip("git unavailable — the tree cannot be enumerated")
@@ -374,10 +384,7 @@ def fall_through_orphans(
     allowed: list[tuple[str, re.Pattern[str]]],
 ) -> list[str]:
     """Paths resolving to neither a manifest row nor a reasoned default_ok entry."""
-    return [
-        p for p in paths
-        if resolve_path(p, rows) is None and resolve_path(p, allowed) is None
-    ]
+    return [p for p in paths if resolve_path(p, rows) is None and resolve_path(p, allowed) is None]
 
 
 def test_glob_matcher_separator_and_first_match_rules() -> None:
@@ -397,14 +404,20 @@ def test_glob_matcher_separator_and_first_match_rules() -> None:
 
     # first match wins, top-down — the *.json row above the directory row is the
     # live instance of this (depgraph snapshots: outputs held back, tooling ports)
-    ordered = _compiled([
-        {"path": "knowledge/depgraph-snapshots/*.json"},
-        {"path": "knowledge/depgraph-snapshots/**"},
-    ])
-    assert resolve_path("knowledge/depgraph-snapshots/drydocs-20260727.json", ordered) == \
-        "knowledge/depgraph-snapshots/*.json"
-    assert resolve_path("knowledge/depgraph-snapshots/snapshot.ps1", ordered) == \
-        "knowledge/depgraph-snapshots/**"
+    ordered = _compiled(
+        [
+            {"path": "knowledge/depgraph-snapshots/*.json"},
+            {"path": "knowledge/depgraph-snapshots/**"},
+        ]
+    )
+    assert (
+        resolve_path("knowledge/depgraph-snapshots/drydocs-20260727.json", ordered)
+        == "knowledge/depgraph-snapshots/*.json"
+    )
+    assert (
+        resolve_path("knowledge/depgraph-snapshots/snapshot.ps1", ordered)
+        == "knowledge/depgraph-snapshots/**"
+    )
 
 
 def test_default_ok_entries_are_well_formed(manifest: dict) -> None:
@@ -428,9 +441,7 @@ def test_default_ok_entries_are_well_formed(manifest: dict) -> None:
 def test_git_readme_decision_is_recorded(manifest: dict) -> None:
     """Regression pin: the one entry that exists to record a DECISION rather than
     to excuse an oversight. Before J16 it lived only in the idea inbox."""
-    entry = next(
-        (e for e in manifest["default_ok"] if e["path"] == "git-readme.md"), None
-    )
+    entry = next((e for e in manifest["default_ok"] if e["path"] == "git-readme.md"), None)
     assert entry is not None, "the git-readme.md standing decision must stay written down"
     assert "deliberately uncovered" in entry["reason"]
 
@@ -466,7 +477,5 @@ def test_no_tracked_path_falls_through_silently(manifest: dict) -> None:
         "written down. Decide each one: add a row (it needs a real disposition), a "
         "default_ok entry with a reason (the default is right and here is why) — "
         "or, for an [untracked] path that is local-only by intent, .gitignore it.\n  "
-        + "\n  ".join(
-            f"{p} [untracked]" if p in untracked else p for p in sorted(orphans)[:40]
-        )
+        + "\n  ".join(f"{p} [untracked]" if p in untracked else p for p in sorted(orphans)[:40])
     )

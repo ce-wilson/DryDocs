@@ -15,6 +15,7 @@ import; these guards keep it honest:
 Parser BEHAVIOR is deliberately not re-tested here — test_command_parser.py
 staying green untouched is the no-behavior-change proof.
 """
+
 from __future__ import annotations
 
 import re

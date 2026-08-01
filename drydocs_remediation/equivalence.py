@@ -19,6 +19,7 @@ reconcile with the Oracle ``psgmgr`` extract and the loaded graph snapshot via
 ``drydocs_core`` adapters + ``Neo4jClient(database="drydocs")`` — this component
 never writes either.
 """
+
 from __future__ import annotations
 
 from dataclasses import dataclass, field
@@ -53,9 +54,7 @@ def resolved_watch(folder_vars: VariableDefs, job: JobDefinition) -> str | None:
     return None
 
 
-def prove_equivalence(
-    legacy: DefinitionSet, greenfield: DefinitionSet
-) -> EquivalenceReport:
+def prove_equivalence(legacy: DefinitionSet, greenfield: DefinitionSet) -> EquivalenceReport:
     """Prove ``greenfield`` re-derives ``legacy``'s resolved behavior (watch paths)."""
     divergences: list[str] = []
     if len(legacy.jobs) != len(greenfield.jobs):
@@ -70,9 +69,7 @@ def prove_equivalence(
         lw = resolved_watch(legacy_folder, lj)
         gw = resolved_watch(greenfield_folder, gj)
         if lw != gw:
-            divergences.append(
-                f"{lj.name} resolves {lw!r} but {gj.name} resolves {gw!r}"
-            )
+            divergences.append(f"{lj.name} resolves {lw!r} but {gj.name} resolves {gw!r}")
     return EquivalenceReport(
         equivalent=not divergences,
         compared_jobs=compared,

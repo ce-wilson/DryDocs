@@ -25,6 +25,7 @@ source registry:
    its code AND remain a subset of ``controlm_jobs.sql``'s alias list — a
    renamed alias fails here instead of silently dropping a column.
 """
+
 from __future__ import annotations
 
 import ast
@@ -50,7 +51,9 @@ SQL_OBJECT_ALIASES: dict[str, dict[str, str]] = {
     "controlm_conditions_in.sql": {"L": "CM_DEF_LNKI_P_VW"},
     "controlm_conditions_out.sql": {"L": "CM_DEF_LNKO_P_VW"},
     "controlm_variables.sql": {
-        "V": "CM_DEF_SETVAR_VW", "T": "CM_DEF_VTAB", "J": "CM_DEF_VJOB",
+        "V": "CM_DEF_SETVAR_VW",
+        "T": "CM_DEF_VTAB",
+        "J": "CM_DEF_VJOB",
     },
     "controlm_hosts.sql": {"H": "CM_HOSTS"},
     "controlm_avg_run.sql": {"A": "CM_AVG_RUN"},
@@ -69,11 +72,9 @@ _DERIVED_ITEM_RE = re.compile(r"\sAS\s+(?P<alias>\w+)$", re.IGNORECASE)
 def _select_block(sql_text: str) -> str:
     """The first top-level SELECT ... FROM block, comments stripped, one string."""
     lines = sql_text.splitlines()
-    start = next(
-        i for i, ln in enumerate(lines) if ln.strip().upper().startswith("SELECT")
-    )
+    start = next(i for i, ln in enumerate(lines) if ln.strip().upper().startswith("SELECT"))
     block: list[str] = []
-    for ln in lines[start + 1:]:
+    for ln in lines[start + 1 :]:
         if ln.strip().upper().startswith("FROM"):
             return " ".join(block)
         block.append(ln.split("--", 1)[0].strip())
@@ -109,9 +110,7 @@ def _parse_projection(sql_file: str) -> tuple[list[tuple[str, str, str]], list[s
     for item in _split_items(_select_block(text)):
         m = _SOURCE_ITEM_RE.match(item)
         if m:
-            triples.append(
-                (m.group("qual").upper(), m.group("col").upper(), m.group("alias"))
-            )
+            triples.append((m.group("qual").upper(), m.group("col").upper(), m.group("alias")))
             continue
         d = _DERIVED_ITEM_RE.search(item)
         assert d, (
@@ -130,6 +129,7 @@ def ledger() -> SourceMapping:
 
 
 # --- 1. SQL drift guard --------------------------------------------------------
+
 
 def test_loader_projections_set_equal_the_ledger(ledger: SourceMapping) -> None:
     referenced: dict[str, set[str]] = {}
@@ -176,6 +176,7 @@ def test_strict_parser_grammar() -> None:
 
 # --- 2. coverage / census reconciliation ----------------------------------------
 
+
 def test_committed_ledger_census_is_pending_and_reconciles(ledger: SourceMapping) -> None:
     # Phase 0 state: every census pending -> nothing to reconcile, by design
     assert ledger.census_failures() == []
@@ -184,20 +185,29 @@ def test_committed_ledger_census_is_pending_and_reconciles(ledger: SourceMapping
 def _obj(column_count, swept_count, explicit=2):
     doc = {
         "schema": "drydocs.source-mapping.v1",
-        "source": "s", "classification": "Internal-Public",
-        "objects": [{
-            "name": "O", "kind": "table",
-            "profile": {"profiled_on": "2026-07-11", "via": "unit", "column_count": column_count,
-                        "census": "recorded" if column_count else "pending"},
-            "columns": [
-                {"name": f"C{i}", "disposition": "projected", "target": f"X.c{i}"}
-                for i in range(explicit)
-            ],
-            "default_disposition": {
-                "disposition": "excluded", "reason": "scope",
-                **({"count": swept_count} if swept_count is not None else {}),
-            },
-        }],
+        "source": "s",
+        "classification": "Internal-Public",
+        "objects": [
+            {
+                "name": "O",
+                "kind": "table",
+                "profile": {
+                    "profiled_on": "2026-07-11",
+                    "via": "unit",
+                    "column_count": column_count,
+                    "census": "recorded" if column_count else "pending",
+                },
+                "columns": [
+                    {"name": f"C{i}", "disposition": "projected", "target": f"X.c{i}"}
+                    for i in range(explicit)
+                ],
+                "default_disposition": {
+                    "disposition": "excluded",
+                    "reason": "scope",
+                    **({"count": swept_count} if swept_count is not None else {}),
+                },
+            }
+        ],
     }
     return SourceMapping.from_dict(doc)
 
@@ -233,9 +243,15 @@ def test_census_with_uncounted_sweep_fails() -> None:
 # seal:app-extract / pat:*: confidential extracts — real column mappings go to
 # the internal twin when ledgered.
 LEDGER_PENDING = frozenset(
-    {"seal:app-extract", "pat:product-catalog", "pat:people-report",
-     "repo:software-registry", "airflow:dag-export", "autosys:export",
-     "controlm@[db].drydocs_stg.stg_app_fact"}
+    {
+        "seal:app-extract",
+        "pat:product-catalog",
+        "pat:people-report",
+        "repo:software-registry",
+        "airflow:dag-export",
+        "autosys:export",
+        "controlm@[db].drydocs_stg.stg_app_fact",
+    }
 )
 
 
@@ -283,6 +299,7 @@ def test_every_confirmed_source_has_a_ledger_or_is_named_pending() -> None:
 
 
 # --- 4. lineage extractor CSV contract (G9 finding #2, merged into N2) -----------
+
 
 def test_extractor_csv_contract_matches_its_code() -> None:
     src = (REPO_ROOT / "drydocs_lineage" / "extractors" / "controlm_inventory.py").read_text(

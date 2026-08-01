@@ -5,6 +5,7 @@ Covers the shared helper (:func:`drydocs.loaders.base.compute_row_checksum`)
 in isolation, then each Control-M loader's ``to_params`` wiring that feeds
 ``row_checksum`` into the batch the Cypher template consumes.
 """
+
 from __future__ import annotations
 
 from drydocs.loaders.base import compute_row_checksum
@@ -20,6 +21,7 @@ from drydocs_core.models import (
 )
 
 # ---- compute_row_checksum, in isolation ------------------------------------
+
 
 def test_same_row_same_hash() -> None:
     row = {"a": 1, "b": "x", "c": None}
@@ -59,9 +61,9 @@ def test_batch_level_params_excluded_defensively() -> None:
 def test_custom_exclude_set_widens_default() -> None:
     row1 = {"a": 1, "noisy": "x"}
     row2 = {"a": 1, "noisy": "y"}
-    assert compute_row_checksum(
-        row1, exclude=frozenset({"noisy"})
-    ) == compute_row_checksum(row2, exclude=frozenset({"noisy"}))
+    assert compute_row_checksum(row1, exclude=frozenset({"noisy"})) == compute_row_checksum(
+        row2, exclude=frozenset({"noisy"})
+    )
 
 
 def test_checksum_is_a_stable_hex_digest() -> None:
@@ -119,8 +121,14 @@ def test_folders_to_params_adds_row_checksum_alongside_parsed_fields() -> None:
     assert "app_code" in params  # the one surviving parsed field (join key)
     # folder property diet (SME ruling 2026-07-23): the expanded
     # naming-convention decode never reaches the batch params
-    for retired in ("environment_code", "environment", "lob_code", "lob",
-                    "folder_type_code", "folder_type"):
+    for retired in (
+        "environment_code",
+        "environment",
+        "lob_code",
+        "lob",
+        "folder_type_code",
+        "folder_type",
+    ):
         assert retired not in params
 
 

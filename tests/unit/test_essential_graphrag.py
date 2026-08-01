@@ -4,6 +4,7 @@ The splitter is exercised on SYNTHETIC page lists (the real PDF is
 gitignored and machine-local); one live test runs against the real PDF when
 present and skips otherwise.
 """
+
 from __future__ import annotations
 
 from pathlib import Path
@@ -30,15 +31,15 @@ TITLES = {1: "Alpha", 2: "Beta"}
 APPENDIX = "The Test environment"
 
 PAGES = [
-    "ESSENTIAL TESTBOOK\nby Nobody",                          # p1  front matter
-    "contents\n1.1 Alpha One 2\n2.1 Beta One 9",              # p2  TOC (never scanned)
-    "1\nAlpha\nThis chapter covers\nintro line",              # p3  ch1 opener
-    "31.1 Alpha One\n1.1 Alpha One\nbody a\n2.4 GHz clock",   # p4  running head + real 1.1 + decimal trap
-    "1.2 Alpha Two\nbody b",                                  # p5
-    "2\nBeta\nThis chapter covers\nbeta intro",               # p6  ch2 opener
-    "2.1 Beta One\nbody c\n2.3 Skipped Nonmono\nmore c",      # p7  2.3 rejected (2.2 expected)
+    "ESSENTIAL TESTBOOK\nby Nobody",  # p1  front matter
+    "contents\n1.1 Alpha One 2\n2.1 Beta One 9",  # p2  TOC (never scanned)
+    "1\nAlpha\nThis chapter covers\nintro line",  # p3  ch1 opener
+    "31.1 Alpha One\n1.1 Alpha One\nbody a\n2.4 GHz clock",  # p4  running head + real 1.1 + decimal trap
+    "1.2 Alpha Two\nbody b",  # p5
+    "2\nBeta\nThis chapter covers\nbeta intro",  # p6  ch2 opener
+    "2.1 Beta One\nbody c\n2.3 Skipped Nonmono\nmore c",  # p7  2.3 rejected (2.2 expected)
     "appendix\nThe Test environment\nA.1 Appx One\nappx body\nA.2.1 Nested stays\nA.2 Appx Two\nx",  # p8
-    "index\nalpha 3\nbeta 7",                                 # p9  back matter
+    "index\nalpha 3\nbeta 7",  # p9  back matter
 ]
 
 
@@ -69,9 +70,9 @@ def test_running_head_stays_in_chapter_preamble():
 
 def test_decimal_and_nonmonotonic_lines_are_not_boundaries():
     s11 = next(c for c in _chunks() if c.section == "1.1")
-    assert "2.4 GHz clock" in s11.text          # wrong chapter for region 1
+    assert "2.4 GHz clock" in s11.text  # wrong chapter for region 1
     s21 = next(c for c in _chunks() if c.section == "2.1")
-    assert "2.3 Skipped Nonmono" in s21.text    # 2.2 expected => rejected
+    assert "2.3 Skipped Nonmono" in s21.text  # 2.2 expected => rejected
 
 
 def test_appendix_subsection_stays_embedded():
@@ -86,8 +87,10 @@ def test_chapter_count_mismatch_fails_loud():
 
 def test_adapter_rows_denormalize_and_chain():
     adapter = EssentialGraphragAdapter(
-        Path("Essential-GraphRAG.pdf"), pages=PAGES,
-        chapter_titles=TITLES, appendix_title=APPENDIX,
+        Path("Essential-GraphRAG.pdf"),
+        pages=PAGES,
+        chapter_titles=TITLES,
+        appendix_title=APPENDIX,
     )
     rows = list(adapter.rows())
     assert len(rows) == 10
@@ -130,7 +133,10 @@ def test_real_pdf_splits_cleanly():
         assert any(c.chapter == ch and c.level == 2 for c in chunks), ch
     # appendix sections A.1..A.4 all found
     assert [c.section for c in chunks if c.section and c.section.startswith("A.")] == [
-        "A.1", "A.2", "A.3", "A.4",
+        "A.1",
+        "A.2",
+        "A.3",
+        "A.4",
     ]
     # sections within each chapter are monotonic
     by_ch: dict[int, list[int]] = {}

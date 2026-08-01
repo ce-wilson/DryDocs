@@ -14,6 +14,7 @@ enforces the boundary across BOTH packages, per ``MODULE_MAP.md``:
 It parses files with ``ast`` and never imports ``drydocs`` itself, so it has no DB or driver
 side effects and runs anywhere.
 """
+
 from __future__ import annotations
 
 import ast
@@ -43,9 +44,7 @@ SKIP_DIRS: frozenset[str] = frozenset({".venv", "venv", "node_modules", "__pycac
 
 # Dotted prefixes that make up drydocs-core (see MODULE_MAP.md). Since the Phase B
 # relocate the physical package is the whole of core (ADR 0002-a-1).
-CORE_PREFIXES: tuple[str, ...] = (
-    "drydocs_core",
-)
+CORE_PREFIXES: tuple[str, ...] = ("drydocs_core",)
 
 # Component group -> the dotted prefixes that belong to it.
 COMPONENT_GROUPS: dict[str, tuple[str, ...]] = {
@@ -54,8 +53,13 @@ COMPONENT_GROUPS: dict[str, tuple[str, ...]] = {
     # drydocs.cmdline_staging = the G39/G40 TEMPORARY cmd-line job-detail
     # staging store + parse (graph read -> SQLite under the data root; no
     # graph writes) — load-cadence tooling, same bucket as staging.
-    "load": ("drydocs.loaders", "drydocs.cli", "drydocs.snapshots", "drydocs.staging",
-             "drydocs.cmdline_staging"),
+    "load": (
+        "drydocs.loaders",
+        "drydocs.cli",
+        "drydocs.snapshots",
+        "drydocs.staging",
+        "drydocs.cmdline_staging",
+    ),
     # drydocs-review — SME review + graph acceptance + docs publish (Epic H).
     # The default-deny test below FORCES a new review module to be classified here
     # rather than being silently unguarded.
@@ -69,9 +73,7 @@ COMPONENT_GROUPS: dict[str, tuple[str, ...]] = {
         "drydocs.publishing",
     ),
     # drydocs-plan — backlog.yaml -> HTML project board renderer (Epic I).
-    "plan": (
-        "drydocs.plan_board",
-    ),
+    "plan": ("drydocs.plan_board",),
     # drydocs-docgen — canonical doc-outline validation + deterministic render + HITL
     # markup (Epic L). Imports only stdlib + config; never a component.
     "docgen": (
@@ -81,37 +83,25 @@ COMPONENT_GROUPS: dict[str, tuple[str, ...]] = {
     ),
     # drydocs-remediation — detect → transform → prove → Jira (ADR 0002-B, G3).
     # Writes NO graph; Jira is the SoR; imports only drydocs_core.
-    "remediation": (
-        "drydocs_remediation",
-    ),
+    "remediation": ("drydocs_remediation",),
     # drydocs-lineage — proactive/curated cmd-line lineage → drydocs (ADR 0002 D2 C2, G4).
-    "lineage": (
-        "drydocs_lineage",
-    ),
+    "lineage": ("drydocs_lineage",),
     # drydocs-deepdoc — reactive on-failure deep dive → ddcontext with
     # reliability/trust stamps (ADR 0002 D2 C3, G4). Never imports lineage — the
     # components-don't-import-each-other test IS the D2 separation.
-    "deepdoc": (
-        "drydocs_deepdoc",
-    ),
+    "deepdoc": ("drydocs_deepdoc",),
     # drydocs-api — the thin read API over the graph (ADR 0005, O5). Read-only
     # (endpoint guard + READ routing); imports only drydocs_core; FastAPI is an
     # optional dependency group so the default install stays framework-free.
-    "api": (
-        "drydocs_api",
-    ),
+    "api": ("drydocs_api",),
     # drydocs-agents — the tiered read-only Q&A apps (ADR 0007, R2). Not a poetry
     # package: each ADK app puts REPO_ROOT on sys.path and imports the first-party
     # tree directly. Classified here so default-deny covers it.
-    "agents": (
-        "agents",
-    ),
+    "agents": ("agents",),
     # libs — standalone helpers that depend on NOTHING first-party (today: the Oracle
     # Kerberos connection helper). Leaf infrastructure: its own bucket so a future
     # lib that starts importing a component fails the guard instead of sliding in.
-    "libs": (
-        "libs",
-    ),
+    "libs": ("libs",),
 }
 ALL_COMPONENT_PREFIXES: tuple[str, ...] = tuple(
     p for prefixes in COMPONENT_GROUPS.values() for p in prefixes
@@ -214,8 +204,7 @@ def _iter_py_files():
         if not root.exists():
             continue
         files.extend(
-            p for p in root.rglob("*.py")
-            if not SKIP_DIRS.intersection(p.relative_to(root).parts)
+            p for p in root.rglob("*.py") if not SKIP_DIRS.intersection(p.relative_to(root).parts)
         )
     return sorted(files)
 

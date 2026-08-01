@@ -13,6 +13,7 @@ never import each other. Re-exported here so this module stays the loader's
 single import surface. THE RULES are documented there; the graph-writing
 half (PIN semantics, :JobRun provenance) is HERE and only here.
 """
+
 from __future__ import annotations
 
 import logging
@@ -42,6 +43,7 @@ LOGGER = logging.getLogger(__name__)
 # Read seam (mapping-store plan M1/M3)
 # ---------------------------------------------------------------------------
 
+
 def mapping_rows(
     csv_path: str | Path,
     *,
@@ -69,6 +71,7 @@ def mapping_rows(
 # ---------------------------------------------------------------------------
 # Adapter + loader
 # ---------------------------------------------------------------------------
+
 
 class ManualMappingAdapter:
     """Yields pre-validated manual mapping rows to BaseLoader."""
@@ -130,6 +133,7 @@ class ManualSealAttributionLoader(BaseLoader):
             if dropped:
                 LOGGER.warning(
                     "manual_seal_attribution: %d row(s) found no ControlMJob "
-                    "endpoint — surfaced as JobRun.dropped_in_graph.", dropped
+                    "endpoint — surfaced as JobRun.dropped_in_graph.",
+                    dropped,
                 )
         return summary

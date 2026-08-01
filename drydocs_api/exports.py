@@ -290,7 +290,9 @@ def list_specs() -> list[dict[str, object]]:
             "database": s.database,
             "classification": s.classification,
             "cypher": s.cypher,
-            "columns": [{"name": c.name, "type": c.type, "label": c.label or c.name} for c in s.columns],
+            "columns": [
+                {"name": c.name, "type": c.type, "label": c.label or c.name} for c in s.columns
+            ],
             "params": [
                 {"name": p.name, "type": p.type, "required": p.required, "default": p.default}
                 for p in s.params

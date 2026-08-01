@@ -12,6 +12,7 @@ idempotently in the same UNWIND that MERGEs the :Chunk — matching the
 BaseLoader row-streaming contract (no document-then-chunks two-pass loader
 needed).
 """
+
 from __future__ import annotations
 
 from typing import Any, Literal
@@ -43,7 +44,9 @@ class BmcDocChunkRow(BaseModel):
 
     # --- Document fields (denormalized onto every chunk row) ---
     doc_id: str = Field(..., min_length=1, description="File stem, e.g. 'controlm-variables'.")
-    title: str = Field(..., min_length=1, description="First H1 text (falls back to doc_id if absent).")
+    title: str = Field(
+        ..., min_length=1, description="First H1 text (falls back to doc_id if absent)."
+    )
     source_url: str | None = Field(
         None, description="URL parsed from the doc header, if the header carries one. Null-safe."
     )
@@ -70,11 +73,25 @@ class BmcDocChunkRow(BaseModel):
     subject_product_id: str = "controlm"
 
     # --- Chunk fields ---
-    chunk_id: str = Field(..., min_length=1, description="'<doc_id>#<seq>' zero-padded, e.g. 'controlm-variables#003'.")
-    seq: int = Field(..., ge=0, description="0 = preamble (before the first H2); 1..N = H2 sections in file order.")
-    heading: str = Field(..., min_length=1, description="H2 heading text, or '(preamble)' for seq 0.")
-    level: int = Field(..., ge=0, description="0 for the preamble chunk; 2 for every H2-split chunk.")
-    text: str = Field(..., min_length=1, description="Verbatim chunk markdown (heading line included).")
+    chunk_id: str = Field(
+        ...,
+        min_length=1,
+        description="'<doc_id>#<seq>' zero-padded, e.g. 'controlm-variables#003'.",
+    )
+    seq: int = Field(
+        ...,
+        ge=0,
+        description="0 = preamble (before the first H2); 1..N = H2 sections in file order.",
+    )
+    heading: str = Field(
+        ..., min_length=1, description="H2 heading text, or '(preamble)' for seq 0."
+    )
+    level: int = Field(
+        ..., ge=0, description="0 for the preamble chunk; 2 for every H2-split chunk."
+    )
+    text: str = Field(
+        ..., min_length=1, description="Verbatim chunk markdown (heading line included)."
+    )
     char_count: int = Field(..., ge=0, description="len(text); computed by the adapter.")
     provenance: Literal["VERBATIM", "GROUNDED", "SYNTHESIZED"] = Field(
         ..., description="Per-chunk tier from the deterministic heading classifier."
@@ -88,7 +105,11 @@ class BmcDocChunkRow(BaseModel):
     )
 
     @field_validator(
-        "source_url", "source_page", "scraped_on", "purpose", "prev_chunk_id",
+        "source_url",
+        "source_page",
+        "scraped_on",
+        "purpose",
+        "prev_chunk_id",
         mode="before",
     )
     @classmethod
@@ -118,8 +139,12 @@ class BookChunkRow(BaseModel):
     authors: str = Field(..., min_length=1, description="Comma-separated author names.")
     publisher: str = Field(..., min_length=1, description="e.g. 'Manning'.")
     published: str = Field(..., min_length=1, description="Publication year/month, e.g. '2025-07'.")
-    source_url: str = Field(..., min_length=1, description="Citation URL (the PDF itself is local-only).")
-    path: str = Field(..., min_length=1, description="Repo-relative path of the local (gitignored) PDF.")
+    source_url: str = Field(
+        ..., min_length=1, description="Citation URL (the PDF itself is local-only)."
+    )
+    path: str = Field(
+        ..., min_length=1, description="Repo-relative path of the local (gitignored) PDF."
+    )
     trust_default: str = Field(
         "GROUNDED",
         description=(
@@ -131,11 +156,29 @@ class BookChunkRow(BaseModel):
     classification: str = "External"
 
     # --- Chunk fields ---
-    chunk_id: str = Field(..., min_length=1, description="'<doc_id>#<seq>' zero-padded, e.g. 'essential-graphrag#012'.")
-    seq: int = Field(..., ge=0, description="0 = front matter; then chapter/section chunks in book order.")
-    heading: str = Field(..., min_length=1, description="Section heading line, chapter title, '(front matter)' or '(back matter)'.")
-    level: int = Field(..., ge=0, description="0 front/back matter; 1 chapter/appendix preamble; 2 numbered section.")
-    text: str = Field(..., min_length=1, description="Verbatim extracted text of the chunk (heading line included).")
+    chunk_id: str = Field(
+        ...,
+        min_length=1,
+        description="'<doc_id>#<seq>' zero-padded, e.g. 'essential-graphrag#012'.",
+    )
+    seq: int = Field(
+        ..., ge=0, description="0 = front matter; then chapter/section chunks in book order."
+    )
+    heading: str = Field(
+        ...,
+        min_length=1,
+        description="Section heading line, chapter title, '(front matter)' or '(back matter)'.",
+    )
+    level: int = Field(
+        ...,
+        ge=0,
+        description="0 front/back matter; 1 chapter/appendix preamble; 2 numbered section.",
+    )
+    text: str = Field(
+        ...,
+        min_length=1,
+        description="Verbatim extracted text of the chunk (heading line included).",
+    )
     char_count: int = Field(..., ge=0, description="len(text); computed by the adapter.")
     provenance: Literal["VERBATIM", "GROUNDED", "SYNTHESIZED"] = Field(
         ..., description="Per-chunk tier; constant GROUNDED under pdf-extract-grounded-v1."
@@ -148,10 +191,13 @@ class BookChunkRow(BaseModel):
         None, description="Previous chunk's chunk_id in book order; None for seq 0."
     )
     chapter: int | None = Field(
-        None, ge=1, description="Chapter number for chapter/section chunks; None for front/back matter and appendix."
+        None,
+        ge=1,
+        description="Chapter number for chapter/section chunks; None for front/back matter and appendix.",
     )
     section: str | None = Field(
-        None, description="Section number as printed, e.g. '3.2' or 'A.1'; None for non-section chunks."
+        None,
+        description="Section number as printed, e.g. '3.2' or 'A.1'; None for non-section chunks.",
     )
     page_start: int = Field(..., ge=1, description="1-based PDF page where the chunk begins.")
 
@@ -178,17 +224,29 @@ class VendorDocChunkRow(BaseModel):
     )
 
     # --- corpus / document fields (denormalized onto every chunk row) ---
-    corpus_id: str = Field(..., min_length=1, description="Capture id, e.g. 'bmc-controlm-9.0.20-utilities'.")
+    corpus_id: str = Field(
+        ..., min_length=1, description="Capture id, e.g. 'bmc-controlm-9.0.20-utilities'."
+    )
     doc_id: str = Field(..., min_length=1, description="Topic file stem, e.g. '3921'.")
     title: str = Field(..., min_length=1)
-    abstract: str = Field("", description="First paragraph — cheap triage before spending context on chunks.")
-    page_role: str = Field(..., min_length=1, description="examples|parameters|rules|overview|topic.")
-    breadcrumb: str = Field("", description="TOC path as text, e.g. 'Utilities > emdef utility for jobs'.")
+    abstract: str = Field(
+        "", description="First paragraph — cheap triage before spending context on chunks."
+    )
+    page_role: str = Field(
+        ..., min_length=1, description="examples|parameters|rules|overview|topic."
+    )
+    breadcrumb: str = Field(
+        "", description="TOC path as text, e.g. 'Utilities > emdef utility for jobs'."
+    )
     toc_path: list[str] = Field(default_factory=list, description="TOC ancestry, outermost first.")
-    source_url: str = Field(..., min_length=1, description="Canonical vendor URL, fragment stripped.")
+    source_url: str = Field(
+        ..., min_length=1, description="Canonical vendor URL, fragment stripped."
+    )
     sha256: str = Field(..., min_length=1, description="Digest of the captured bytes.")
     captured_at: str = Field(..., min_length=1)
-    doc_version: str = Field(..., min_length=1, description="Vendor documentation version, e.g. '9.0.20'.")
+    doc_version: str = Field(
+        ..., min_length=1, description="Vendor documentation version, e.g. '9.0.20'."
+    )
     version_verified: bool = Field(
         False,
         description=(

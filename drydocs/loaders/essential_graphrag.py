@@ -30,6 +30,7 @@ Every chunk is tier GROUNDED (``pdf-extract-grounded-v1``): pypdf extraction
 is mechanical but lossy (ligature drops, intra-word splits), so the text is a
 faithful derivation of the published book, not byte-VERBATIM.
 """
+
 from __future__ import annotations
 
 import re
@@ -110,9 +111,7 @@ def split_book(
     ``chapter_titles`` — fail loud, never mis-chunk silently.
     """
     n_chapters = len(chapter_titles)
-    chapter_start_pages = [
-        i for i, text in enumerate(pages) if _CHAPTER_OPENER in text
-    ]
+    chapter_start_pages = [i for i, text in enumerate(pages) if _CHAPTER_OPENER in text]
     if len(chapter_start_pages) != n_chapters:
         raise ValueError(
             f"expected {n_chapters} '{_CHAPTER_OPENER}' pages, "
@@ -149,7 +148,10 @@ def split_book(
     if chapter_start_pages[0] > 0:
         chunks.append(
             _RawChunk(
-                heading="(front matter)", level=0, chapter=None, section=None,
+                heading="(front matter)",
+                level=0,
+                chapter=None,
+                section=None,
                 page_start=1,
                 lines=[ln for _, ln in _flat(0, chapter_start_pages[0])],
             )
@@ -170,9 +172,12 @@ def split_book(
             if m and accept(m, expected):
                 chunks.append(current)
                 current = _RawChunk(
-                    heading=line.strip(), level=2,
-                    chapter=preamble.chapter, section=section_of(m),
-                    page_start=page_no, lines=[line],
+                    heading=line.strip(),
+                    level=2,
+                    chapter=preamble.chapter,
+                    section=section_of(m),
+                    page_start=page_no,
+                    lines=[line],
                 )
                 expected += 1
                 continue
@@ -180,17 +185,24 @@ def split_book(
         chunks.append(current)
 
     region_ends = chapter_start_pages[1:] + [
-        appendix_page if appendix_page is not None
+        appendix_page
+        if appendix_page is not None
         else (index_page if index_page is not None else len(pages))
     ]
     for c, (start, end) in enumerate(zip(chapter_start_pages, region_ends, strict=False), 1):
         flat = _flat(start, end)
         preamble = _RawChunk(
-            heading=f"{c} {chapter_titles[c]}", level=1, chapter=c,
-            section=None, page_start=start + 1, lines=[],
+            heading=f"{c} {chapter_titles[c]}",
+            level=1,
+            chapter=c,
+            section=None,
+            page_start=start + 1,
+            lines=[],
         )
         _split_region(
-            flat, preamble, _SECTION_RE,
+            flat,
+            preamble,
+            _SECTION_RE,
             accept=lambda m, exp, _c=c: int(m.group(1)) == _c and int(m.group(2)) == exp,
             section_of=lambda m: f"{m.group(1)}.{m.group(2)}",
         )
@@ -200,11 +212,17 @@ def split_book(
         app_end = index_page if index_page is not None else len(pages)
         flat = _flat(appendix_page, app_end)
         preamble = _RawChunk(
-            heading=f"appendix {appendix_title}", level=1, chapter=None,
-            section=None, page_start=appendix_page + 1, lines=[],
+            heading=f"appendix {appendix_title}",
+            level=1,
+            chapter=None,
+            section=None,
+            page_start=appendix_page + 1,
+            lines=[],
         )
         _split_region(
-            flat, preamble, _APPENDIX_SECTION_RE,
+            flat,
+            preamble,
+            _APPENDIX_SECTION_RE,
             accept=lambda m, exp: int(m.group(1)) == exp,
             section_of=lambda m: f"A.{m.group(1)}",
         )
@@ -213,7 +231,10 @@ def split_book(
     if index_page is not None:
         chunks.append(
             _RawChunk(
-                heading="(back matter)", level=0, chapter=None, section=None,
+                heading="(back matter)",
+                level=0,
+                chapter=None,
+                section=None,
                 page_start=index_page + 1,
                 lines=[ln for _, ln in _flat(index_page, len(pages))],
             )

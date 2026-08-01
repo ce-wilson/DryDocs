@@ -6,6 +6,7 @@
 - M4: the analytics views exist and answer.
 - The store refuses what the loader refuses (shared validation chain).
 """
+
 from __future__ import annotations
 
 import textwrap
@@ -39,6 +40,7 @@ EXPECTED_TABLES = [
 # ---------------------------------------------------------------------------
 # M0 — build from the real committed sources
 # ---------------------------------------------------------------------------
+
 
 def test_build_materializes_all_tables():
     conn = build(":memory:")
@@ -99,6 +101,7 @@ def test_meta_records_source_hashes():
 # M4 — analytics views
 # ---------------------------------------------------------------------------
 
+
 def test_views_answer():
     conn = build(":memory:")
     try:
@@ -121,6 +124,7 @@ def test_views_answer():
 # M1/M3 — manual-mapping read seam parity (fixture manifest + CSV)
 # ---------------------------------------------------------------------------
 
+
 @pytest.fixture()
 def manual_fixture(tmp_path: Path) -> dict[str, Path]:
     """A tmp repo-root with a registered, loadable manual CSV (K2 shape)."""
@@ -137,16 +141,19 @@ def manual_fixture(tmp_path: Path) -> dict[str, Path]:
         "{note},steward01,2026-07-18"
     )
     csv_path.write_text(
-        "\n".join([
-            header,
-            row.format(job="J0002", create="false", note="support team confirmed owner"),
-            row.format(job="J0003", create="true", note="same series as J0002"),
-            "",
-        ]),
+        "\n".join(
+            [
+                header,
+                row.format(job="J0002", create="false", note="support team confirmed owner"),
+                row.format(job="J0003", create="true", note="same series as J0002"),
+                "",
+            ]
+        ),
         encoding="utf-8",
     )
     manifest = loads_dir / "manifest.yaml"
-    manifest.write_text(textwrap.dedent("""\
+    manifest.write_text(
+        textwrap.dedent("""\
         schema: drydocs.manual-loads.v1
         status: confirmed
         files:
@@ -155,31 +162,25 @@ def manual_fixture(tmp_path: Path) -> dict[str, Path]:
             status: pending-load
             replaces_with: seal-attribution automation (fixture)
             authored_by: steward01
-        """), encoding="utf-8")
+        """),
+        encoding="utf-8",
+    )
     return {"csv": csv_path, "manifest": manifest}
 
 
 def test_store_read_parity_with_legacy_parse(manual_fixture):
-    legacy = parse_mapping_csv(
-        manual_fixture["csv"], manifest_path=manual_fixture["manifest"]
-    )
+    legacy = parse_mapping_csv(manual_fixture["csv"], manifest_path=manual_fixture["manifest"])
     via_store = manual_mapping_rows_from_store(
         manual_fixture["csv"], manifest_path=manual_fixture["manifest"]
     )
     assert [r.model_dump() for r in via_store] == [r.model_dump() for r in legacy]
 
 
-def test_mapping_rows_default_is_store_and_yaml_fallback_works(
-    manual_fixture, monkeypatch
-):
+def test_mapping_rows_default_is_store_and_yaml_fallback_works(manual_fixture, monkeypatch):
     monkeypatch.delenv("DRYDOCS_MAPPING_READ", raising=False)
-    default_rows = mapping_rows(
-        manual_fixture["csv"], manifest_path=manual_fixture["manifest"]
-    )
+    default_rows = mapping_rows(manual_fixture["csv"], manifest_path=manual_fixture["manifest"])
     monkeypatch.setenv("DRYDOCS_MAPPING_READ", "yaml")
-    yaml_rows = mapping_rows(
-        manual_fixture["csv"], manifest_path=manual_fixture["manifest"]
-    )
+    yaml_rows = mapping_rows(manual_fixture["csv"], manifest_path=manual_fixture["manifest"])
     assert [r.model_dump() for r in default_rows] == [r.model_dump() for r in yaml_rows]
     assert len(default_rows) == 2
 
@@ -259,7 +260,7 @@ def test_override_round_trip_and_origin_flag(tmp_path: Path):
             "SELECT app_seal_id, origin, holder_sid FROM v_seal_contact_grid"
         ).fetchall()
         assert grid == [
-            ("APP-1234", "source", "U111111"),    # side-by-side pair,
+            ("APP-1234", "source", "U111111"),  # side-by-side pair,
             ("APP-1234", "override", "U222222"),  # source first
             ("APP-5678", "override", "U333333"),  # no captured SEAL value
             ("APP-9012", "source", "U444444"),
@@ -277,13 +278,16 @@ def test_override_round_trip_and_origin_flag(tmp_path: Path):
         conn.close()
 
 
-@pytest.mark.parametrize("row,reason", [
-    ("APP-1,Head Chef,U1,U2,,r,kchen2190,2026-07-21,active", "unknown role"),
-    ("APP-1,L2 Operate Manager,U1,U2,,,kchen2190,2026-07-21,active", "missing rationale"),
-    ("APP-1,L2 Operate Manager,U1,U1,,r,kchen2190,2026-07-21,active", "override == SEAL value"),
-    ("APP-1,L2 Operate Manager,U1,U2,,r,kchen2190,2026-07-21,maybe", "bad status"),
-    (",L2 Operate Manager,U1,U2,,r,kchen2190,2026-07-21,active", "missing app"),
-])
+@pytest.mark.parametrize(
+    "row,reason",
+    [
+        ("APP-1,Head Chef,U1,U2,,r,kchen2190,2026-07-21,active", "unknown role"),
+        ("APP-1,L2 Operate Manager,U1,U2,,,kchen2190,2026-07-21,active", "missing rationale"),
+        ("APP-1,L2 Operate Manager,U1,U1,,r,kchen2190,2026-07-21,active", "override == SEAL value"),
+        ("APP-1,L2 Operate Manager,U1,U2,,r,kchen2190,2026-07-21,maybe", "bad status"),
+        (",L2 Operate Manager,U1,U2,,r,kchen2190,2026-07-21,active", "missing app"),
+    ],
+)
 def test_override_ingestion_fails_closed(tmp_path: Path, row: str, reason: str):
     with pytest.raises(MappingStoreError):
         build(":memory:", overrides_path=_override_csv(tmp_path, row)).close()
@@ -308,6 +312,7 @@ def test_override_edit_flips_is_current(manual_fixture, tmp_path: Path):
 # O14 — staleness guard: source-hash drift detection
 # ---------------------------------------------------------------------------
 
+
 def test_is_current_tracks_source_edits(manual_fixture, tmp_path: Path):
     """Editing a committed source makes the built file stale; a rebuild from
     the edited sources makes it current again and serves the edit."""
@@ -325,9 +330,7 @@ def test_is_current_tracks_source_edits(manual_fixture, tmp_path: Path):
 
     conn = build(db, manifest_path=manual_fixture["manifest"])
     try:
-        jobs = [r[0] for r in conn.execute(
-            "SELECT job_id FROM manual_mapping ORDER BY line_no"
-        )]
+        jobs = [r[0] for r in conn.execute("SELECT job_id FROM manual_mapping ORDER BY line_no")]
         assert jobs == ["J0002", "J0003", "J0004"]  # the edit is served
     finally:
         conn.close()

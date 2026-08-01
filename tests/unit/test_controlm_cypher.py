@@ -1,4 +1,5 @@
 """Static checks on the M3 Control-M Cypher templates and SQL projections."""
+
 from __future__ import annotations
 
 import re
@@ -32,6 +33,7 @@ ALL_SQL = [
 
 # ---- Cypher --------------------------------------------------------------
 
+
 @pytest.mark.parametrize("name", ALL_CYPHERS)
 def test_cypher_exists(name: str) -> None:
     assert (CYPHER_DIR / name).exists()
@@ -46,10 +48,7 @@ def test_cypher_uses_unwind_batch(name: str) -> None:
 @pytest.mark.parametrize("name", ALL_CYPHERS)
 def test_cypher_idempotent_merge(name: str) -> None:
     text = (CYPHER_DIR / name).read_text(encoding="utf-8")
-    body = "\n".join(
-        l for l in text.splitlines()
-        if l.strip() and not l.strip().startswith("//")
-    )
+    body = "\n".join(l for l in text.splitlines() if l.strip() and not l.strip().startswith("//"))
     assert "MERGE" in body
     assert not re.findall(r"^\s*CREATE\s+\(", body, re.MULTILINE)
 
@@ -80,7 +79,7 @@ def test_folder_sql_joins_header_row_for_application() -> None:
     assert "LEFT JOIN psgmgr.CM_DEF_VJOB H" in text
     assert "H.JOB_ID   = 1" in text or "H.JOB_ID = 1" in text
     assert "H.APPLICATION" in text
-    assert "H.IS_CURRENT_VERSION = 'Y'" in text   # string literal, VARCHAR2(1); domain 'Y' (D4)
+    assert "H.IS_CURRENT_VERSION = 'Y'" in text  # string literal, VARCHAR2(1); domain 'Y' (D4)
 
 
 def test_ingest_chain_order_is_enforced() -> None:
@@ -112,13 +111,11 @@ def test_ingest_chain_order_is_enforced() -> None:
     ], "ingest-controlm stage order drifted"
     # The dependency pass must be alone in the deferred relationships phase
     # (two-phase contract: cross-folder WAS_INFORMED_BY needs all nodes first).
-    assert [s[0] for s in drydocs_cli.CONTROLM_REL_STAGES] == [
-        "controlm_dependencies_derived"
-    ]
+    assert [s[0] for s in drydocs_cli.CONTROLM_REL_STAGES] == ["controlm_dependencies_derived"]
     # The derived RUNS_ON resolution pass runs after ALL staged loads —
     # it reads the graph, not staging, so it sits after the stage loop.
     cli_src = (ROOT / "drydocs" / "cli.py").read_text(encoding="utf-8")
-    ingest = cli_src[cli_src.index("def ingest_controlm"):]
+    ingest = cli_src[cli_src.index("def ingest_controlm") :]
     assert ingest.index("runs_on_resolution") > ingest.index("for stage_name, cls,")
 
 
@@ -171,8 +168,7 @@ def test_conditions_match_jobs_on_folder_id_job_id() -> None:
         assert "folder_id: row.folder_id" in match_keys
         assert "job_id: row.job_id" in match_keys
         # version_serial must NOT be in the MATCH key block
-        assert "version_serial:" not in match_keys, \
-            f"{name} should not key on version_serial"
+        assert "version_serial:" not in match_keys, f"{name} should not key on version_serial"
 
 
 def test_conditions_node_key_is_folder_id_name_only() -> None:
@@ -231,6 +227,7 @@ def test_conditions_share_composite_key() -> None:
 
 # ---- host topology (P3; gate controlm-hosts-topology 2026-07-09) ----------
 
+
 def test_hosts_cypher_merges_the_gated_topology() -> None:
     """The hosts pass MERGEs exactly the three gated elements — group (keyed
     per DC), member host (keyed on nodeid alone), CONTAINS_HOST — and does
@@ -245,10 +242,7 @@ def test_hosts_cypher_merges_the_gated_topology() -> None:
     assert "CONTAINS_HOST" in text
     assert "m.participation_type = row.participation_type" in text
     assert "last_capture_date" in text
-    body = "\n".join(
-        l for l in text.splitlines()
-        if l.strip() and not l.strip().startswith("//")
-    )
+    body = "\n".join(l for l in text.splitlines() if l.strip() and not l.strip().startswith("//"))
     assert "DEFINED_ON" not in body
     assert "RUNS_ON" not in body
 
@@ -273,9 +267,9 @@ def test_runs_on_resolution_implements_group_wins() -> None:
     assert "r.derived" in text
     assert "j.node_id IS NOT NULL AND j.node_id <> ''" in text
     # edges only: no node-creating MERGE (label after the opening paren)
-    assert not re.findall(r"MERGE\s*\(\w+:\w+", text), (
-        "resolution pass must MATCH endpoints, never MERGE them"
-    )
+    assert not re.findall(
+        r"MERGE\s*\(\w+:\w+", text
+    ), "resolution pass must MATCH endpoints, never MERGE them"
 
 
 def test_constraints_cover_host_topology_labels() -> None:
@@ -289,9 +283,7 @@ def test_hosts_sql_uses_its_own_scope_binds() -> None:
     :grpname_filter and :row_cap only, and the CLI binds grpname_filter NULL
     (see ingest_controlm's stage_scope special case)."""
     text = (SQL_DIR / "controlm_hosts.sql").read_text(encoding="utf-8")
-    code = "\n".join(
-        l for l in text.splitlines() if not l.strip().startswith("--")
-    )
+    code = "\n".join(l for l in text.splitlines() if not l.strip().startswith("--"))
     assert ":grpname_filter" in code
     assert ":row_cap" in code
     # the folder-grained quartet does not apply at this grain (header comment
@@ -330,9 +322,7 @@ def test_was_generated_by_is_checksum_guarded(name: str) -> None:
     # Exactly one WAS_GENERATED_BY MERGE (comments may still name the label
     # in prose; only count non-comment code lines), and it must live INSIDE
     # the FOREACH body (i.e. conditionally), not before/after it.
-    code_lines = [
-        l for l in text.splitlines() if l.strip() and not l.strip().startswith("//")
-    ]
+    code_lines = [l for l in text.splitlines() if l.strip() and not l.strip().startswith("//")]
     code = "\n".join(code_lines)
     assert code.count("WAS_GENERATED_BY") == 1
     assert "WAS_GENERATED_BY" in text[foreach_start:foreach_end]
@@ -343,9 +333,9 @@ def test_row_checksum_is_persisted_on_the_node(name: str) -> None:
     """Every guarded loader SETs n.row_checksum = row.row_checksum after the
     FOREACH so the next run's comparison is against this run's content."""
     text = (CYPHER_DIR / name).read_text(encoding="utf-8")
-    assert re.search(r"SET \w\.row_checksum = row\.row_checksum", text), (
-        f"{name}: missing row_checksum SET"
-    )
+    assert re.search(
+        r"SET \w\.row_checksum = row\.row_checksum", text
+    ), f"{name}: missing row_checksum SET"
 
 
 def test_folders_application_block_survives_the_provenance_guard() -> None:
@@ -386,6 +376,7 @@ def test_dependencies_materializes_derived_edge() -> None:
 
 # ---- SQL projections ------------------------------------------------------
 
+
 @pytest.mark.parametrize("name", ALL_SQL)
 def test_sql_exists(name: str) -> None:
     assert (SQL_DIR / name).exists()
@@ -410,7 +401,9 @@ def test_jobs_sql_projects_the_audit_envelope() -> None:
     (gate controlm-q1q3-phase1; mapping in config/audit-fields.yaml)."""
     text = (SQL_DIR / "controlm_jobs.sql").read_text(encoding="utf-8")
     for col in ("J.CREATION_USER", "J.CREATION_DATE", "J.CHANGE_USERID", "J.CHANGE_DATE"):
-        assert f"{col} " in text or f"{col}\t" in text.replace("  ", " "), f"missing projection {col}"
+        assert f"{col} " in text or f"{col}\t" in text.replace(
+            "  ", " "
+        ), f"missing projection {col}"
     assert "AS creation_user" in text
     assert "AS change_date" in text
 
@@ -440,6 +433,7 @@ def test_recursive_sql_cyclic_type_disabled() -> None:
 
 
 # ---- Ontology supplement -------------------------------------------------
+
 
 def test_m3_supplement_wires_to_prov_anchors() -> None:
     # m3_ontology_supplement.cypher was renamed to ontology_supplement.cypher

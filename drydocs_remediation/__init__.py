@@ -33,6 +33,7 @@ verdict on the real M0 unit stays PENDING ground truth (info item A3 / the ``var
 rule B1) — see ``internal/remediation/m0/``. Contract:
 ``docs/design/drydocs-remediation-tdd.md`` wins on conflict.
 """
+
 from . import corroborate, detect, equivalence, formats, jira, transform
 
 __all__ = ["corroborate", "detect", "equivalence", "formats", "jira", "transform"]

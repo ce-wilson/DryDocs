@@ -22,6 +22,7 @@ Usage:
     python scripts/render_board.py
     python scripts/render_board.py --backlog path/to/backlog.yaml --out path/to/board.html
 """
+
 from __future__ import annotations
 
 import argparse

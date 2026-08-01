@@ -29,7 +29,6 @@ def transform_from_pdf_coords(bbox, pdf_height):
 
 
 def fill_pdf_form(input_pdf_path, fields_json_path, output_pdf_path):
-
     with open(fields_json_path) as f:
         fields_data = json.load(f)
 
@@ -52,16 +51,17 @@ def fill_pdf_form(input_pdf_path, fields_json_path, output_pdf_path):
 
         if "pdf_width" in page_info:
             transformed_entry_box = transform_from_pdf_coords(
-                field["entry_bounding_box"],
-                float(pdf_height)
+                field["entry_bounding_box"], float(pdf_height)
             )
         else:
             image_width = page_info["image_width"]
             image_height = page_info["image_height"]
             transformed_entry_box = transform_from_image_coords(
                 field["entry_bounding_box"],
-                image_width, image_height,
-                float(pdf_width), float(pdf_height)
+                image_width,
+                image_height,
+                float(pdf_width),
+                float(pdf_height),
             )
 
         if "entry_text" not in field or "text" not in field["entry_text"]:

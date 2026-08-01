@@ -83,10 +83,31 @@ def graph_schema() -> dict:
     try:
         driver = _get_driver()
         db = os.getenv("NEO4J_DATABASE", "neo4j")
-        labels = [r["label"] for r in driver.execute_query("CALL db.labels() YIELD label RETURN label", database_=db).records]
-        rels = [r["relationshipType"] for r in driver.execute_query("CALL db.relationshipTypes() YIELD relationshipType RETURN relationshipType", database_=db).records]
-        props = [r["propertyKey"] for r in driver.execute_query("CALL db.propertyKeys() YIELD propertyKey RETURN propertyKey", database_=db).records]
-        return {"status": "success", "labels": labels, "relationshipTypes": rels, "propertyKeys": props}
+        labels = [
+            r["label"]
+            for r in driver.execute_query(
+                "CALL db.labels() YIELD label RETURN label", database_=db
+            ).records
+        ]
+        rels = [
+            r["relationshipType"]
+            for r in driver.execute_query(
+                "CALL db.relationshipTypes() YIELD relationshipType RETURN relationshipType",
+                database_=db,
+            ).records
+        ]
+        props = [
+            r["propertyKey"]
+            for r in driver.execute_query(
+                "CALL db.propertyKeys() YIELD propertyKey RETURN propertyKey", database_=db
+            ).records
+        ]
+        return {
+            "status": "success",
+            "labels": labels,
+            "relationshipTypes": rels,
+            "propertyKeys": props,
+        }
     except Exception as exc:
         return {"status": "error", "error": f"{type(exc).__name__}: {exc}"}
 
@@ -97,11 +118,15 @@ def graph_schema_detailed() -> dict:
     guess ControlMFolder.name where the real key is sched_table)."""
     base = graph_schema()
     try:
-        records = _get_driver().execute_query(
-            "CALL db.schema.nodeTypeProperties() "
-            "YIELD nodeLabels, propertyName RETURN nodeLabels, propertyName",
-            database_=os.getenv("NEO4J_DATABASE", "neo4j"),
-        ).records
+        records = (
+            _get_driver()
+            .execute_query(
+                "CALL db.schema.nodeTypeProperties() "
+                "YIELD nodeLabels, propertyName RETURN nodeLabels, propertyName",
+                database_=os.getenv("NEO4J_DATABASE", "neo4j"),
+            )
+            .records
+        )
         by_label: dict[str, set] = {}
         for r in records:
             for label in r["nodeLabels"]:

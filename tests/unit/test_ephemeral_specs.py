@@ -135,8 +135,16 @@ def test_register_handler_requires_the_agent_key():
         register_ephemeral("wrong", "server-key", *args)
     with pytest.raises(InvalidTokenError):  # owner session must be live
         register_ephemeral(
-            "server-key", "server-key", "dead-token", CYPHER, "drydocs", {}, "", (),
-            sessions, ephemerals,
+            "server-key",
+            "server-key",
+            "dead-token",
+            CYPHER,
+            "drydocs",
+            {},
+            "",
+            (),
+            sessions,
+            ephemerals,
         )
 
 
@@ -144,8 +152,16 @@ def test_register_handler_payload():
     sessions, ephemerals = InMemorySessionStore(), EphemeralSpecStore()
     token = _session(sessions)
     out = register_ephemeral(
-        "k", "k", token, CYPHER, "ddcontext", {"limit": 5}, "agent query",
-        ["job_name"], sessions, ephemerals,
+        "k",
+        "k",
+        token,
+        CYPHER,
+        "ddcontext",
+        {"limit": 5},
+        "agent query",
+        ["job_name"],
+        sessions,
+        ephemerals,
     )
     assert is_ephemeral_ref(out["explore_ref"])
     assert out["classification"] == EPHEMERAL_CLASSIFICATION  # fail-closed ceiling

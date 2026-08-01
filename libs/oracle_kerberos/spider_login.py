@@ -117,9 +117,7 @@ def parse_config(text: str) -> dict[str, str]:
     return cfg
 
 
-def load_config(
-    config_path: str | os.PathLike | None = None, **overrides: str
-) -> dict[str, str]:
+def load_config(config_path: str | os.PathLike | None = None, **overrides: str) -> dict[str, str]:
     path = find_config(config_path)
     cfg = parse_config(path.read_text(encoding="utf-8"))
     cfg["_config_path"] = str(path)
@@ -274,9 +272,7 @@ def preflight(cfg: dict[str, str]) -> list[tuple[str, bool, str]]:
     cc_name = normalize_krb5ccname(cfg.get("kerberos5_cc_name", ""), cfg.get("sid", ""))
     if is_mslsa(cc_name):
         try:
-            out = subprocess.run(
-                ["klist"], capture_output=True, text=True, timeout=15
-            ).stdout
+            out = subprocess.run(["klist"], capture_output=True, text=True, timeout=15).stdout
             has_tgt = "krbtgt" in out
             detail = (
                 "krbtgt present in LSA cache"
@@ -386,9 +382,7 @@ def verify(config_path: str | os.PathLike | None = None, **overrides: str) -> di
         with conn.cursor() as cur:
             cur.execute("SELECT USER FROM dual")
             out["authenticated_as"] = cur.fetchone()[0]
-            cur.execute(
-                "SELECT COUNT(*) FROM all_objects WHERE owner = 'PSGMGR'"
-            )
+            cur.execute("SELECT COUNT(*) FROM all_objects WHERE owner = 'PSGMGR'")
             out["psgmgr_objects_visible"] = str(cur.fetchone()[0])
         out["oracle_version"] = conn.version
     finally:

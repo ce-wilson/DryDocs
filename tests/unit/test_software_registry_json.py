@@ -4,6 +4,7 @@
 The link is soft by design: vendors and icons join by id (vendor.icon
 override, else vendor.id); a vendor with no icon is REPORTED in
 vendors_without_icons, never silently dropped and never an error."""
+
 from __future__ import annotations
 
 import importlib.util
@@ -44,9 +45,9 @@ def test_every_vendor_has_icon_or_is_reported():
     committed = json.loads(COMMITTED.read_text(encoding="utf-8"))
     registry = yaml.safe_load(REGISTRY.read_text(encoding="utf-8"))
     rendered = [v["id"] for v in committed["vendors"]]
-    assert rendered == [v["id"] for v in registry["vendors"]], (
-        "a registry vendor is absent from (or reordered in) the rendered view"
-    )
+    assert rendered == [
+        v["id"] for v in registry["vendors"]
+    ], "a registry vendor is absent from (or reordered in) the rendered view"
     for v in committed["vendors"]:
         has_icon = v["icon"] is not None
         reported = v["id"] in committed["vendors_without_icons"]
@@ -87,9 +88,9 @@ def test_every_manifest_icon_has_a_kind():
     icons = json.loads(MANIFEST.read_text(encoding="utf-8"))["icons"]
     kinds = {"software", "product", "infrastructure", "persona"}
     for icon_id, icon in icons.items():
-        assert icon.get("kind") in kinds, (
-            f"icon {icon_id}: kind {icon.get('kind')!r} missing or not in {sorted(kinds)}"
-        )
+        assert (
+            icon.get("kind") in kinds
+        ), f"icon {icon_id}: kind {icon.get('kind')!r} missing or not in {sorted(kinds)}"
     # registry-linked vendor icons must be software — the registry IS the
     # software ledger; a product/persona glyph linked to a Vendor row is a
     # mis-assignment
@@ -106,6 +107,6 @@ def test_every_product_vendor_exists():
     committed = json.loads(COMMITTED.read_text(encoding="utf-8"))
     vendor_ids = {v["id"] for v in committed["vendors"]}
     for p in committed["products"]:
-        assert p["vendor"] in vendor_ids, (
-            f"product {p['id']}: vendor {p['vendor']} not in the rendered view"
-        )
+        assert (
+            p["vendor"] in vendor_ids
+        ), f"product {p['id']}: vendor {p['vendor']} not in the rendered view"

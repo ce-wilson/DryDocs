@@ -11,6 +11,7 @@ module defines the columns the loaders expect after projection. CSV
 samples in ``data/samples/`` use the same column names so offline dev
 paths exercise the same models.
 """
+
 from __future__ import annotations
 
 from typing import Any
@@ -102,9 +103,16 @@ class ControlMFolderRow(BaseModel):
         description="Audit timestamp from the psgmgr replication.",
     )
 
-    @field_validator("application", "user_daily", "table_status", "instance_name",
-                      "last_updated", "last_updated_user", "capture_date",
-                      mode="before")
+    @field_validator(
+        "application",
+        "user_daily",
+        "table_status",
+        "instance_name",
+        "last_updated",
+        "last_updated_user",
+        "capture_date",
+        mode="before",
+    )
     @classmethod
     def _str_passthrough(cls, v: Any) -> str | None:
         return _str_or_none(v)
@@ -207,13 +215,17 @@ class ControlMJobRow(BaseModel):
 
     # --- source audit envelope (doc 06; gate controlm-q1q3-phase1) ---
     creation_user: str | None = Field(
-        None, description="Original creator SID (CREATION_USER) -> source_created_by.")
+        None, description="Original creator SID (CREATION_USER) -> source_created_by."
+    )
     creation_date: str | None = Field(
-        None, description="Creation timestamp (CREATION_DATE) -> source_created_at.")
+        None, description="Creation timestamp (CREATION_DATE) -> source_created_at."
+    )
     change_userid: str | None = Field(
-        None, description="Last editor SID (CHANGE_USERID) -> source_updated_by.")
+        None, description="Last editor SID (CHANGE_USERID) -> source_updated_by."
+    )
     change_date: str | None = Field(
-        None, description="Last change timestamp (CHANGE_DATE) -> source_updated_at.")
+        None, description="Last change timestamp (CHANGE_DATE) -> source_updated_at."
+    )
 
     # --- coercers ---
 
@@ -228,12 +240,33 @@ class ControlMJobRow(BaseModel):
         return _int_or_none(v)
 
     @field_validator(
-        "parent_table", "application", "group_name", "task_type",
-        "cyclic", "cyclic_type", "owner", "author", "node_id", "cmd_line",
-        "description", "memname", "priority", "critical", "active_from",
-        "active_till", "end_folder", "is_current_version", "version_opcode",
-        "version_timestamp", "version_user", "instance_name", "capture_date",
-        "creation_user", "creation_date", "change_userid", "change_date",
+        "parent_table",
+        "application",
+        "group_name",
+        "task_type",
+        "cyclic",
+        "cyclic_type",
+        "owner",
+        "author",
+        "node_id",
+        "cmd_line",
+        "description",
+        "memname",
+        "priority",
+        "critical",
+        "active_from",
+        "active_till",
+        "end_folder",
+        "is_current_version",
+        "version_opcode",
+        "version_timestamp",
+        "version_user",
+        "instance_name",
+        "capture_date",
+        "creation_user",
+        "creation_date",
+        "change_userid",
+        "change_date",
         mode="before",
     )
     @classmethod
@@ -286,8 +319,12 @@ class ControlMConditionInRow(BaseModel):
         return _int_or_none(v)
 
     @field_validator(
-        "odate", "and_or", "parentheses", "version_opcode",
-        "is_current_version", "capture_date",
+        "odate",
+        "and_or",
+        "parentheses",
+        "version_opcode",
+        "is_current_version",
+        "capture_date",
         mode="before",
     )
     @classmethod
@@ -330,7 +367,10 @@ class ControlMConditionOutRow(BaseModel):
         return _int_or_none(v)
 
     @field_validator(
-        "odate", "sign", "version_opcode", "is_current_version",
+        "odate",
+        "sign",
+        "version_opcode",
+        "is_current_version",
         "capture_date",
         mode="before",
     )
@@ -396,8 +436,12 @@ class ControlMVariableRow(BaseModel):
     )
 
     @field_validator(
-        "var_value", "data_center", "folder_name", "job_name",
-        "appl_type", "var_scope",
+        "var_value",
+        "data_center",
+        "folder_name",
+        "job_name",
+        "appl_type",
+        "var_scope",
         mode="before",
     )
     @classmethod
@@ -428,9 +472,7 @@ class ControlMDependencyRow(BaseModel):
     in_table_job_id: str = Field(
         ..., description="Successor composite '<folder_id>.<job_id>' (ctlm_id form)."
     )
-    out_condition: str = Field(
-        ..., min_length=1, description="The condition name that links them."
-    )
+    out_condition: str = Field(..., min_length=1, description="The condition name that links them.")
     out_table_job_id: str = Field(
         ..., description="Predecessor composite '<folder_id>.<job_id>' (ctlm_id form)."
     )
@@ -443,9 +485,7 @@ class ControlMDependencyRow(BaseModel):
         s = str(v).strip()
         head, sep, tail = s.partition(".")
         if not head or not sep or not tail:
-            raise ValueError(
-                f"not a '<folder_id>.<job_id>' composite: {s!r}"
-            )
+            raise ValueError(f"not a '<folder_id>.<job_id>' composite: {s!r}")
         return s
 
 

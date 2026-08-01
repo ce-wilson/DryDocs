@@ -110,9 +110,7 @@ def provider_from_env() -> LiteLlmProvider:
         )
     if provider == "anthropic" and not os.getenv("ANTHROPIC_API_KEY"):
         raise ProviderConfigError("ANTHROPIC_API_KEY is not set (agents/.env)")
-    if provider == "azure" and not (
-        os.getenv("AZURE_API_KEY") and os.getenv("AZURE_API_BASE")
-    ):
+    if provider == "azure" and not (os.getenv("AZURE_API_KEY") and os.getenv("AZURE_API_BASE")):
         raise ProviderConfigError(
             "AZURE_API_KEY / AZURE_API_BASE are not set (agents/.env; company runtime)"
         )

@@ -22,6 +22,7 @@ writes NO meaning edges: no :ControlMUtility, no DOCUMENTS, no SEE_ALSO. The
 vendor's related-topic links ARE carried through conversion (as data, on disk)
 so Q14's gate can argue from evidence, but nothing here turns them into edges.
 """
+
 from __future__ import annotations
 
 import json

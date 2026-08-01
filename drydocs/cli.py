@@ -53,6 +53,7 @@ Ingest commands:
                                     path, never a path sum) + the
                                     NODE_GROUP<->RUNS_ON metadata findings
 """
+
 from __future__ import annotations
 
 import logging
@@ -174,8 +175,8 @@ console = Console()
 LOGGER = logging.getLogger("drydocs.cli")
 
 SCHEMA_DIR = Path(drydocs_core.__file__).resolve().parent / "schema"
-CONSTRAINTS_FILE        = SCHEMA_DIR / "constraints.cypher"
-ONTOLOGY_FILE           = SCHEMA_DIR / "ontology.cypher"
+CONSTRAINTS_FILE = SCHEMA_DIR / "constraints.cypher"
+ONTOLOGY_FILE = SCHEMA_DIR / "ontology.cypher"
 # The supplement .cypher paths are NOT constants here — they live in the
 # registry (drydocs_core.schema.supplements), so the chain and its order have
 # exactly one home. G29.
@@ -186,33 +187,33 @@ ONTOLOGY_FILE           = SCHEMA_DIR / "ontology.cypher"
 DEFAULT_SAMPLES_DIR = Path(__file__).resolve().parent / "data" / "samples"
 
 LOADER_REGISTRY: dict[str, type] = {
-    "seal_applications":  seal_apps_mod.SealApplicationsLoader,
-    "seal_contacts":      seal_contacts_mod.SealContactsLoader,
-    "catalog_lobs":       CatalogLOBsLoader,
-    "product_lines":      ProductLinesLoader,
-    "products":           ProductsLoader,
-    "dev_teams":          DevTeamsLoader,
+    "seal_applications": seal_apps_mod.SealApplicationsLoader,
+    "seal_contacts": seal_contacts_mod.SealContactsLoader,
+    "catalog_lobs": CatalogLOBsLoader,
+    "product_lines": ProductLinesLoader,
+    "products": ProductsLoader,
+    "dev_teams": DevTeamsLoader,
     # PAT (catalog expansion):
-    "area_products":          AreaProductsLoader,
-    "pat_product_mapping":    PatProductMappingLoader,
-    "pat_team_roles":         PatTeamRolesLoader,
+    "area_products": AreaProductsLoader,
+    "pat_product_mapping": PatProductMappingLoader,
+    "pat_team_roles": PatTeamRolesLoader,
     # M3 (part 1):
-    "controlm_folders":   ControlMFoldersLoader,
-    "controlm_jobs":      ControlMJobsLoader,
+    "controlm_folders": ControlMFoldersLoader,
+    "controlm_jobs": ControlMJobsLoader,
     # M3 (part 2):
-    "controlm_conditions_in":       ControlMConditionsInLoader,
-    "controlm_conditions_out":      ControlMConditionsOutLoader,
+    "controlm_conditions_in": ControlMConditionsInLoader,
+    "controlm_conditions_out": ControlMConditionsOutLoader,
     "controlm_dependencies_derived": ControlMDependenciesDerivedLoader,
     # P3 (host topology; gate controlm-hosts-topology):
-    "controlm_hosts":               ControlMHostsLoader,
+    "controlm_hosts": ControlMHostsLoader,
     # bmc-docs lexical graph (Document -> Chunk):
-    "bmc_docs":           BmcDocsLoader,
+    "bmc_docs": BmcDocsLoader,
     # Essential GraphRAG ebook lexical graph (Q2 experiment):
     "essential_graphrag": EssentialGraphragLoader,
     # Doc traceability + review feedback (L7 connector #1):
-    "doc_sections":       DesignDocSectionsLoader,
-    "doc_traceability":   DocTraceabilityLoader,
-    "doc_feedback":       DocFeedbackLoader,
+    "doc_sections": DesignDocSectionsLoader,
+    "doc_traceability": DocTraceabilityLoader,
+    "doc_feedback": DocFeedbackLoader,
 }
 
 SQL_DIR = Path(__file__).resolve().parent / "loaders" / "sql"
@@ -253,14 +254,16 @@ SOURCELESS_LOADERS: dict[type, str] = {
 # bundled sample filename). Order matters — hierarchy parents before children,
 # SEAL apps before contacts, mapping last.
 REFRESH_REFERENCE_CHAIN: tuple[tuple[str, type, str], ...] = (
-    ("catalog_lobs",        CatalogLOBsLoader,      "catalog_lobs__sample.csv"),
-    ("product_lines",       ProductLinesLoader,     "product_lines__sample.csv"),
-    ("products",            ProductsLoader,         "products__sample.csv"),
-    ("seal_applications",   seal_apps_mod.SealApplicationsLoader,
-                                                    "seal_application_data__sample.csv"),
-    ("seal_contacts",       seal_contacts_mod.SealContactsLoader,
-                                                    "seal_contact_data__sample.csv"),
-    ("dev_teams",           DevTeamsLoader,         "dev_teams__sample.csv"),
+    ("catalog_lobs", CatalogLOBsLoader, "catalog_lobs__sample.csv"),
+    ("product_lines", ProductLinesLoader, "product_lines__sample.csv"),
+    ("products", ProductsLoader, "products__sample.csv"),
+    (
+        "seal_applications",
+        seal_apps_mod.SealApplicationsLoader,
+        "seal_application_data__sample.csv",
+    ),
+    ("seal_contacts", seal_contacts_mod.SealContactsLoader, "seal_contact_data__sample.csv"),
+    ("dev_teams", DevTeamsLoader, "dev_teams__sample.csv"),
     ("pat_product_mapping", PatProductMappingLoader, "pat_product_mapping__sample.csv"),
 )
 
@@ -269,53 +272,66 @@ REFRESH_REFERENCE_CHAIN: tuple[tuple[str, type, str], ...] = (
 # parent job; the deferred dependency pass MATCHes both endpoints (two-phase
 # contract). PART2 extends NODE when --skip-part2 is not set.
 CONTROLM_NODE_STAGES: tuple[tuple[str, type, str, str], ...] = (
-    ("controlm_folders", ControlMFoldersLoader,
-     "controlm_folders__sample.csv", "controlm_folders.sql"),
-    ("controlm_jobs",    ControlMJobsLoader,
-     "controlm_jobs__sample.csv",    "controlm_jobs.sql"),
+    (
+        "controlm_folders",
+        ControlMFoldersLoader,
+        "controlm_folders__sample.csv",
+        "controlm_folders.sql",
+    ),
+    ("controlm_jobs", ControlMJobsLoader, "controlm_jobs__sample.csv", "controlm_jobs.sql"),
 )
 CONTROLM_PART2_STAGES: tuple[tuple[str, type, str, str], ...] = (
-    ("controlm_conditions_in",  ControlMConditionsInLoader,
-     "controlm_conditions_in__sample.csv",  "controlm_conditions_in.sql"),
-    ("controlm_conditions_out", ControlMConditionsOutLoader,
-     "controlm_conditions_out__sample.csv", "controlm_conditions_out.sql"),
+    (
+        "controlm_conditions_in",
+        ControlMConditionsInLoader,
+        "controlm_conditions_in__sample.csv",
+        "controlm_conditions_in.sql",
+    ),
+    (
+        "controlm_conditions_out",
+        ControlMConditionsOutLoader,
+        "controlm_conditions_out__sample.csv",
+        "controlm_conditions_out.sql",
+    ),
     # P3 host topology (gate controlm-hosts-topology): independent of
     # folders/jobs — CM_HOSTS has no folder/owner/author grain, so the scope
     # binds don't apply and the extract is always a full snapshot.
-    ("controlm_hosts",          ControlMHostsLoader,
-     "controlm_hosts__sample.csv",          "controlm_hosts.sql"),
+    ("controlm_hosts", ControlMHostsLoader, "controlm_hosts__sample.csv", "controlm_hosts.sql"),
 )
 CONTROLM_REL_STAGES: tuple[tuple[str, type, str, str], ...] = (
-    ("controlm_dependencies_derived", ControlMDependenciesDerivedLoader,
-     "controlm_dependencies__sample.csv", "controlm_dependencies_recursive.sql"),
+    (
+        "controlm_dependencies_derived",
+        ControlMDependenciesDerivedLoader,
+        "controlm_dependencies__sample.csv",
+        "controlm_dependencies_recursive.sql",
+    ),
 )
 
 # The L7 doc-traceability chain: (loader class, adapter class, which directory
 # option feeds it). Three passes in a fixed order — sections, then matrix rows
 # (sections MATCHed, never MERGEd), then feedback.
 DOC_TRACEABILITY_CHAIN: tuple[tuple[type, type, str], ...] = (
-    (DesignDocSectionsLoader, DesignDocSectionsAdapter,  "design"),
-    (DocTraceabilityLoader,   TraceabilityMatrixAdapter, "design"),
-    (DocFeedbackLoader,       DesignDocFeedbackAdapter,  "feedback"),
+    (DesignDocSectionsLoader, DesignDocSectionsAdapter, "design"),
+    (DocTraceabilityLoader, TraceabilityMatrixAdapter, "design"),
+    (DocFeedbackLoader, DesignDocFeedbackAdapter, "feedback"),
 )
 
 # (2) Command -> the loaders it runs, in order. Derived from the chain
 # constants above wherever a chain exists, so declaration == behavior.
 COMMAND_LOADERS: dict[str, tuple[type, ...]] = {
-    "refresh-reference":        tuple(cls for _, cls, _ in REFRESH_REFERENCE_CHAIN),
-    "ingest-controlm":          tuple(
-        cls for _, cls, *_ in
-        CONTROLM_NODE_STAGES + CONTROLM_PART2_STAGES + CONTROLM_REL_STAGES
+    "refresh-reference": tuple(cls for _, cls, _ in REFRESH_REFERENCE_CHAIN),
+    "ingest-controlm": tuple(
+        cls for _, cls, *_ in CONTROLM_NODE_STAGES + CONTROLM_PART2_STAGES + CONTROLM_REL_STAGES
     ),
-    "load-software-registry":   (SoftwareRegistryLoader,),
+    "load-software-registry": (SoftwareRegistryLoader,),
     "load-batch-orchestrators": (BatchPortOrchestratorLoader,),
-    "load-code-snapshot":       (CodeSnapshotLoader,),
-    "load-bmc-docs":            (BmcDocsLoader,),
-    "load-vendor-docs":         (VendorDocsLoader,),
-    "load-doc-traceability":    tuple(cls for cls, _, _ in DOC_TRACEABILITY_CHAIN),
-    "load-essential-graphrag":  (EssentialGraphragLoader,),
-    "load-seal-attribution":    (SealAttributionLoader,),
-    "load-manual-mappings":     (ManualSealAttributionLoader,),
+    "load-code-snapshot": (CodeSnapshotLoader,),
+    "load-bmc-docs": (BmcDocsLoader,),
+    "load-vendor-docs": (VendorDocsLoader,),
+    "load-doc-traceability": tuple(cls for cls, _, _ in DOC_TRACEABILITY_CHAIN),
+    "load-essential-graphrag": (EssentialGraphragLoader,),
+    "load-seal-attribution": (SealAttributionLoader,),
+    "load-manual-mappings": (ManualSealAttributionLoader,),
 }
 
 # Loader-running commands that are OPERATOR-DRIVEN, not sequence members:
@@ -328,28 +344,40 @@ AD_HOC_COMMANDS: frozenset[str] = frozenset({"load", "load-manual-mappings"})
 # mode: "standing" = every full refresh; "optional" = site/experiment decision;
 # "gated" = blocked on a source confirmation or precondition named in the note.
 CANONICAL_LOAD_SEQUENCE: tuple[tuple[str, str, str], ...] = (
-    ("check",                    "standing", "Neo4j + APOC reachable"),
-    ("bootstrap",                "standing", "constraints + ontology seed"),
-    ("apply-supplements",        "standing", "the ONE verified supplement chain (G29)"),
-    ("refresh-reference",        "standing", "catalog + SEAL + dev teams (M1)"),
-    ("ingest-controlm",          "standing", "folders -> jobs -> conditions -> derived deps (M3)"),
-    ("load-software-registry",   "standing", "vendor/product registry (plan 07)"),
-    ("load-batch-orchestrators", "optional",
-     "declared batch-port USES_SOFTWARE edges (C14); MATCH-only — needs the "
-     "SEAL chain and the software registry already loaded"),
-    ("load-bmc-docs",            "standing", "BMC corpus lexical graph"),
-    ("load-vendor-docs",         "optional",
-     "Q13 captured vendor documentation (verbatim, out-of-repo capture -> "
-     "convert -> load); taxonomy only, gated until its corpus is confirmed"),
-    ("load-essential-graphrag",  "optional", "Q2 experiment -> ddcontext database"),
-    ("load-doc-traceability",    "optional", "L7 self-documentation (design docs + feedback)"),
-    ("load-code-snapshot",       "optional",
-     "G33 self-documentation; ritual-driven (newest committed snapshot)"),
-    ("load-seal-attribution",    "gated",
-     "the stg_app_fact dataset (controlm@[db].drydocs_stg.stg_app_fact) needs "
-     "ingest-controlm + refresh-reference first (gate §E preconditions)"),
-    ("m1-verify",                "standing", "M1 invariants"),
-    ("m3-verify",                "standing", "M3 invariants"),
+    ("check", "standing", "Neo4j + APOC reachable"),
+    ("bootstrap", "standing", "constraints + ontology seed"),
+    ("apply-supplements", "standing", "the ONE verified supplement chain (G29)"),
+    ("refresh-reference", "standing", "catalog + SEAL + dev teams (M1)"),
+    ("ingest-controlm", "standing", "folders -> jobs -> conditions -> derived deps (M3)"),
+    ("load-software-registry", "standing", "vendor/product registry (plan 07)"),
+    (
+        "load-batch-orchestrators",
+        "optional",
+        "declared batch-port USES_SOFTWARE edges (C14); MATCH-only — needs the "
+        "SEAL chain and the software registry already loaded",
+    ),
+    ("load-bmc-docs", "standing", "BMC corpus lexical graph"),
+    (
+        "load-vendor-docs",
+        "optional",
+        "Q13 captured vendor documentation (verbatim, out-of-repo capture -> "
+        "convert -> load); taxonomy only, gated until its corpus is confirmed",
+    ),
+    ("load-essential-graphrag", "optional", "Q2 experiment -> ddcontext database"),
+    ("load-doc-traceability", "optional", "L7 self-documentation (design docs + feedback)"),
+    (
+        "load-code-snapshot",
+        "optional",
+        "G33 self-documentation; ritual-driven (newest committed snapshot)",
+    ),
+    (
+        "load-seal-attribution",
+        "gated",
+        "the stg_app_fact dataset (controlm@[db].drydocs_stg.stg_app_fact) needs "
+        "ingest-controlm + refresh-reference first (gate §E preconditions)",
+    ),
+    ("m1-verify", "standing", "M1 invariants"),
+    ("m3-verify", "standing", "M3 invariants"),
 )
 
 
@@ -382,6 +410,7 @@ def _gate_loader(cls: type) -> None:
     effective = _source_registry().effective_source_id(cls.name, cls.source_id)
     if effective is not None:
         _gate_source(effective)
+
 
 def _client(database: str | None = None) -> Neo4jClient:
     """Build the Neo4j client from settings; ``database`` overrides the
@@ -454,17 +483,36 @@ def _scope_binds(
 
 # Reusable scope CLI options — attach to any command that runs a psgmgr extract.
 _SCOPE_HELP = "psgmgr scope (Oracle only); omit for the full population."
+
+
 def _folder_opt():
-    return typer.Option(None, "--folder", help=f"Folder-name LIKE pattern, e.g. 'CCB_AUTO_%'. {_SCOPE_HELP}")
+    return typer.Option(
+        None, "--folder", help=f"Folder-name LIKE pattern, e.g. 'CCB_AUTO_%'. {_SCOPE_HELP}"
+    )
+
+
 def _run_as_opt():
-    return typer.Option(None, "--run-as", help=f"Tenant FID (service) user the job runs as — J.OWNER, exact. {_SCOPE_HELP}")
+    return typer.Option(
+        None,
+        "--run-as",
+        help=f"Tenant FID (service) user the job runs as — J.OWNER, exact. {_SCOPE_HELP}",
+    )
+
+
 def _developer_sid_opt():
-    return typer.Option(None, "--developer-sid", help=f"Developer SID who authored/changed the def — J.AUTHOR/CREATION_USER/CHANGE_USERID or folder LAST_UPDATED_USER. {_SCOPE_HELP}")
+    return typer.Option(
+        None,
+        "--developer-sid",
+        help=f"Developer SID who authored/changed the def — J.AUTHOR/CREATION_USER/CHANGE_USERID or folder LAST_UPDATED_USER. {_SCOPE_HELP}",
+    )
+
+
 def _row_cap_opt():
     return typer.Option(None, "--row-cap", help=f"Unordered ROWNUM sample cap. {_SCOPE_HELP}")
 
 
 # --- callback ---------------------------------------------------------------
+
 
 @app.callback()
 def main(verbose: bool = typer.Option(False, "--verbose", "-v")) -> None:
@@ -477,13 +525,15 @@ def main(verbose: bool = typer.Option(False, "--verbose", "-v")) -> None:
 
 # --- M0 commands -------------------------------------------------------------
 
+
 @app.command()
 def check() -> None:
     """Verify Neo4j connectivity, server version, and APOC availability."""
     with _client() as cli:
         console.print(f"[cyan]Server:[/] {cli.server_version()}")
         if not cli.apoc_available():
-            console.print("[red]APOC not available.[/]"); raise typer.Exit(2)
+            console.print("[red]APOC not available.[/]")
+            raise typer.Exit(2)
         console.print("[green]APOC OK.[/]")
 
 
@@ -495,7 +545,8 @@ def bootstrap(
     """Apply M0 constraints + ontology seed."""
     with _client() as cli:
         if not cli.apoc_available():
-            console.print("[red]APOC required.[/]"); raise typer.Exit(2)
+            console.print("[red]APOC required.[/]")
+            raise typer.Exit(2)
         if not skip_constraints:
             cli.execute_file(CONSTRAINTS_FILE)
             # D8 guard: execute_file raising is not enough — a silent DDL
@@ -531,7 +582,8 @@ def verify() -> None:
             ORDER BY source_label
         """)
     t = Table(title="Ontology terms by source")
-    t.add_column("Label"); t.add_column("Terms", justify="right")
+    t.add_column("Label")
+    t.add_column("Terms", justify="right")
     for r in rows:
         t.add_row(r["source_label"], str(r["terms"]))
     console.print(t)
@@ -556,8 +608,7 @@ def sweep_removed_cmd(
     label: list[str] = typer.Option(
         ["ControlMJob", "ControlMFolder"],
         "--label",
-        help="Node label(s) to sweep (repeatable). Defaults to the labels the "
-        "loaders mark.",
+        help="Node label(s) to sweep (repeatable). Defaults to the labels the " "loaders mark.",
     ),
     dry_run: bool = typer.Option(
         False, "--dry-run", help="Count what WOULD be swept; delete nothing."
@@ -593,6 +644,7 @@ def sweep_removed_cmd(
 
 # --- shared load command -----------------------------------------------------
 
+
 @app.command()
 def load(
     name: str = typer.Argument(..., help=f"Loader: {', '.join(LOADER_REGISTRY)}"),
@@ -603,7 +655,8 @@ def load(
     """Run a single loader against a CSV or Oracle source."""
     cls = LOADER_REGISTRY.get(name)
     if cls is None:
-        console.print(f"[red]Unknown loader: {name}[/]"); raise typer.Exit(2)
+        console.print(f"[red]Unknown loader: {name}[/]")
+        raise typer.Exit(2)
     if name in LOADER_SOURCE:
         _gate_loader(cls)  # confirmed-gate (overlay-aware, D2) before any DB write
     if csv_path is not None:
@@ -611,13 +664,15 @@ def load(
     elif sql is not None:
         adapter = _oracle_adapter(sql)
     else:
-        console.print("[red]Provide either --csv or --sql.[/]"); raise typer.Exit(2)
+        console.print("[red]Provide either --csv or --sql.[/]")
+        raise typer.Exit(2)
     with _client() as cli:
         summary = cls(cli, adapter, batch_size=batch_size).load()
     console.print(summary.as_dict())
 
 
 # --- M1 commands -------------------------------------------------------------
+
 
 @app.command(name="refresh-reference")
 def refresh_reference(
@@ -640,12 +695,11 @@ def refresh_reference(
         for nm, cls, sample_csv in REFRESH_REFERENCE_CHAIN:
             sample = samples_dir / sample_csv
             if not sample.exists():
-                console.print(f"[yellow]No sample for {nm}; skipping.[/]"); continue
+                console.print(f"[yellow]No sample for {nm}; skipping.[/]")
+                continue
             console.print(f"[cyan]>> {nm}[/]")
             summary = cls(cli, _csv_adapter(sample)).load()
-            console.print(
-                f"   rows={summary.rows_processed} rejected={summary.rows_rejected}"
-            )
+            console.print(f"   rows={summary.rows_processed} rejected={summary.rows_rejected}")
         if snapshot:
             console.print("[cyan]>> snapshots[/]")
             console.print(SnapshotWriter(cli).write_all())
@@ -708,9 +762,7 @@ def m1_verify() -> None:
 # --- ontology supplements (G29: one data-driven chain) ------------------------
 
 _TERM_TOTAL = "MATCH (n:OntologyTerm) RETURN count(n) AS n"
-_TERMS_PRESENT = (
-    "MATCH (n:OntologyTerm) WHERE n.iri IN $iris RETURN count(DISTINCT n.iri) AS n"
-)
+_TERMS_PRESENT = "MATCH (n:OntologyTerm) WHERE n.iri IN $iris RETURN count(DISTINCT n.iri) AS n"
 
 
 def _apply_supplement_chain(chain: tuple[Supplement, ...]) -> None:
@@ -746,7 +798,9 @@ def _apply_supplement_chain(chain: tuple[Supplement, ...]) -> None:
     )
     try:
         with _client() as cli:
-            run_log.target = f"{cli.connection_info()['uri']} db={cli.connection_info()['database']}"
+            run_log.target = (
+                f"{cli.connection_info()['uri']} db={cli.connection_info()['database']}"
+            )
             try:
                 run_log.open()
                 run_log.attach()
@@ -772,7 +826,9 @@ def _apply_supplement_chain(chain: tuple[Supplement, ...]) -> None:
                     absent = [i for i in iris if i not in found]
                     LOGGER.error(
                         "supplement %s: %d of %d declared terms absent after apply",
-                        supplement.name, len(absent), len(iris),
+                        supplement.name,
+                        len(absent),
+                        len(iris),
                     )
                 results.append((supplement, before, after, len(iris), absent))
     except BaseException as exc:
@@ -795,9 +851,11 @@ def _apply_supplement_chain(chain: tuple[Supplement, ...]) -> None:
         )
 
     t = Table(title="apply-supplements")
-    t.add_column("Supplement"); t.add_column("Declared terms", justify="right")
+    t.add_column("Supplement")
+    t.add_column("Declared terms", justify="right")
     t.add_column("Verified", justify="right")
-    t.add_column("OntologyTerm total", justify="right"); t.add_column("OK", justify="center")
+    t.add_column("OntologyTerm total", justify="right")
+    t.add_column("OK", justify="center")
     failed = 0
     for supplement, before, after, declared, absent in results:
         t.add_row(
@@ -904,7 +962,8 @@ def load_software_registry(
     """
     _gate_loader(SoftwareRegistryLoader)  # confirmed-gate (overlay-aware) before any DB write
     if not registry_path.exists():
-        console.print(f"[red]Missing: {registry_path}[/]"); raise typer.Exit(1)
+        console.print(f"[red]Missing: {registry_path}[/]")
+        raise typer.Exit(1)
     adapter = RegistryYamlAdapter(registry_path)
     with _client() as cli:
         summary = SoftwareRegistryLoader(cli, adapter).load()
@@ -936,7 +995,8 @@ def load_batch_orchestrators(
     _gate_loader(BatchPortOrchestratorLoader)  # confirmed-gate (overlay-aware) before any DB write
     for path in (apps_path, platforms_path):
         if not path.exists():
-            console.print(f"[red]Missing: {path}[/]"); raise typer.Exit(1)
+            console.print(f"[red]Missing: {path}[/]")
+            raise typer.Exit(1)
     adapter = BatchOrchestratorYamlAdapter(apps_path, platforms_path)
     with _client() as cli:
         loader = BatchPortOrchestratorLoader(cli, adapter)
@@ -1024,15 +1084,9 @@ def load_code_snapshot(
 
 @app.command(name="patch-window")
 def patch_window_cmd(
-    host: str = typer.Option(
-        None, "--host", help="ExecutionHost nodeid you want to patch."
-    ),
-    group: str = typer.Option(
-        None, "--group", help="ControlMHostGroup name you want to patch."
-    ),
-    database: str = typer.Option(
-        None, "--database", help="Override the configured target DB."
-    ),
+    host: str = typer.Option(None, "--host", help="ExecutionHost nodeid you want to patch."),
+    group: str = typer.Option(None, "--group", help="ControlMHostGroup name you want to patch."),
+    database: str = typer.Option(None, "--database", help="Override the configured target DB."),
     as_json: bool = typer.Option(False, "--json", help="Print the report as JSON."),
 ) -> None:
     """Best patch window for a host or host group (P5 — READ-ONLY).
@@ -1130,8 +1184,9 @@ def export_cmdline_staging(
 
     path = Path(db_path) if db_path else default_db_path(create=True)
     run_id = str(uuid.uuid4())
-    run_log = LoaderRunLog("cmdline_staging_export.v1", run_id,
-                           source="graph::ControlMJob", target=str(path))
+    run_log = LoaderRunLog(
+        "cmdline_staging_export.v1", run_id, source="graph::ControlMJob", target=str(path)
+    )
     run_log.open()
     run_log.attach()
     try:
@@ -1184,12 +1239,15 @@ def resolve_cmdline_staging(
     path = Path(db_path) if db_path else default_db_path()
     source = Path(xml_source) if xml_source else controlm_xml_dir()
     if not source.exists():
-        console.print(f"[red]XML source not found: {source} — land an export "
-                      "in the controlm-xml/ landing zone or pass --xml-source[/]")
+        console.print(
+            f"[red]XML source not found: {source} — land an export "
+            "in the controlm-xml/ landing zone or pass --xml-source[/]"
+        )
         raise typer.Exit(2)
     run_id = str(uuid.uuid4())
-    run_log = LoaderRunLog("cmdline_staging_resolve.v1", run_id,
-                           source=str(source), target=str(path))
+    run_log = LoaderRunLog(
+        "cmdline_staging_resolve.v1", run_id, source=str(source), target=str(path)
+    )
     run_log.open()
     run_log.attach()
     try:
@@ -1202,8 +1260,7 @@ def resolve_cmdline_staging(
     except Exception as exc:
         run_log.close(error=exc)
         raise
-    run_log.close(summary={"xml": extract.coverage.as_dict(),
-                           "resolution": coverage.__dict__})
+    run_log.close(summary={"xml": extract.coverage.as_dict(), "resolution": coverage.__dict__})
     console.print(extract.coverage.summary())
     console.print(coverage.summary())
 
@@ -1232,8 +1289,7 @@ def parse_cmdline_staging(
 
     path = Path(db_path) if db_path else default_db_path()
     run_id = str(uuid.uuid4())
-    run_log = LoaderRunLog("cmdline_staging_parse.v1", run_id,
-                           source=str(path), target=str(path))
+    run_log = LoaderRunLog("cmdline_staging_parse.v1", run_id, source=str(path), target=str(path))
     run_log.open()
     run_log.attach()
     try:
@@ -1266,9 +1322,12 @@ def load_bmc_docs(
     :SoftwareProduct via DESCRIBES (MATCH only — run
     `drydocs load-software-registry` first).
     """
-    _gate_loader(BmcDocsLoader)  # confirmed-gate (overlay-aware; doc-ledger union) before any DB write
+    _gate_loader(
+        BmcDocsLoader
+    )  # confirmed-gate (overlay-aware; doc-ledger union) before any DB write
     if not corpus_dir.exists():
-        console.print(f"[red]Missing: {corpus_dir}[/]"); raise typer.Exit(1)
+        console.print(f"[red]Missing: {corpus_dir}[/]")
+        raise typer.Exit(1)
     adapter = BmcDocsAdapter(corpus_dir)
     with _client() as cli:
         summary = BmcDocsLoader(cli, adapter).load()
@@ -1292,7 +1351,9 @@ def convert_vendor_docs(
 
     base = vendor_docs_dir(capture_id)
     if not (base / "capture-manifest.json").exists():
-        console.print(f"[red]No capture at {base}[/] — run scripts/external_vendor_scrape.py first.")
+        console.print(
+            f"[red]No capture at {base}[/] — run scripts/external_vendor_scrape.py first."
+        )
         raise typer.Exit(1)
     summary = convert_capture(capture_id)
     console.print(summary.render())
@@ -1353,7 +1414,8 @@ def load_doc_traceability(
     """
     _gate_loader(DesignDocSectionsLoader)  # confirmed-gate (overlay-aware) before any DB write
     if not design_dir.exists():
-        console.print(f"[red]Missing: {design_dir}[/]"); raise typer.Exit(1)
+        console.print(f"[red]Missing: {design_dir}[/]")
+        raise typer.Exit(1)
     dirs = {"design": design_dir, "feedback": feedback_dir}
     with _client() as cli:
         for loader_cls, adapter_cls, dir_key in DOC_TRACEABILITY_CHAIN:
@@ -1389,7 +1451,7 @@ def load_essential_graphrag(
         "ddcontext",
         "--database",
         help="Target database (Q2 decision: ddcontext — experiment content stays "
-             "out of the ground-truth drydocs DB).",
+        "out of the ground-truth drydocs DB).",
     ),
 ) -> None:
     """Load the Essential GraphRAG ebook as a Document -> Chunk lexical graph (Q2).
@@ -1399,10 +1461,14 @@ def load_essential_graphrag(
     vocabulary confirmed at the bmc-docs-lexical-load gate. The PDF is
     local-only (gitignored); the graph cites source_url.
     """
-    _gate_loader(EssentialGraphragLoader)  # confirmed-gate (overlay-aware; doc-ledger union) before any DB write
+    _gate_loader(
+        EssentialGraphragLoader
+    )  # confirmed-gate (overlay-aware; doc-ledger union) before any DB write
     if not pdf_path.exists():
-        console.print(f"[red]Missing: {pdf_path} (the PDF is local-only/gitignored — "
-                      "obtain it from the source_url in config/source-registry.yaml)[/]")
+        console.print(
+            f"[red]Missing: {pdf_path} (the PDF is local-only/gitignored — "
+            "obtain it from the source_url in config/source-registry.yaml)[/]"
+        )
         raise typer.Exit(1)
     adapter = EssentialGraphragAdapter(pdf_path)
     with _client(database) as cli:
@@ -1416,7 +1482,7 @@ def load_seal_attribution(
         None,
         "--csv",
         help="STG_APP_FACT export CSV; omit to run the Oracle extract "
-             "(controlm_app_facts.sql against DRYDOCS_STG).",
+        "(controlm_app_facts.sql against DRYDOCS_STG).",
     ),
     batch_size: int = typer.Option(1000, "--batch-size"),
 ) -> None:
@@ -1472,7 +1538,7 @@ def load_manual_mappings(
     csv_path: Path = typer.Argument(
         ...,
         help="SME-authored mapping CSV, registered in "
-             "config/manual-loads/manifest.yaml BEFORE load.",
+        "config/manual-loads/manifest.yaml BEFORE load.",
     ),
 ) -> None:
     """Tier-5 manual mapping load (gate seal-attribution-match-policy §F).
@@ -1547,27 +1613,20 @@ def ingest_controlm(
     applies to the job, variable, and dependency-anchor extracts).
     """
     if phase not in ("nodes", "relationships", "all"):
-        console.print(
-            f"[red]--phase must be nodes | relationships | all (got {phase!r}).[/]"
-        )
+        console.print(f"[red]--phase must be nodes | relationships | all (got {phase!r}).[/]")
         raise typer.Exit(2)
     # Confirmed-gate (D3): every Control-M dataset the chain touches must be
     # SME-confirmed before any write — since the v2 registry split (N9) the
     # stages bind DIFFERENT psgmgr datasets, so each stage's own declaration
     # gates (overlay-aware per D2), not a single umbrella id.
     for cls in {
-        cls
-        for _, cls, *_ in (
-            CONTROLM_NODE_STAGES + CONTROLM_PART2_STAGES + CONTROLM_REL_STAGES
-        )
+        cls for _, cls, *_ in (CONTROLM_NODE_STAGES + CONTROLM_PART2_STAGES + CONTROLM_REL_STAGES)
     }:
         _gate_loader(cls)
     scope = _scope_binds(folder, run_as, developer_sid, row_cap)
     # Stage declarations live at module level (N3: CONTROLM_*_STAGES) so the
     # command's chain and the load map render from the same source.
-    node_stages: list[tuple[str, type[BaseLoader], str, str]] = list(
-        CONTROLM_NODE_STAGES
-    )
+    node_stages: list[tuple[str, type[BaseLoader], str, str]] = list(CONTROLM_NODE_STAGES)
     if not skip_part2:
         node_stages.extend(CONTROLM_PART2_STAGES)
     # The deferred dependency pass: its rows are pure ctlm_id references
@@ -1576,8 +1635,10 @@ def ingest_controlm(
     if not skip_part2:
         rel_stages.extend(CONTROLM_REL_STAGES)
     stages = (
-        node_stages if phase == "nodes"
-        else rel_stages if phase == "relationships"
+        node_stages
+        if phase == "nodes"
+        else rel_stages
+        if phase == "relationships"
         else node_stages + rel_stages
     )
     if not stages:
@@ -1595,8 +1656,7 @@ def ingest_controlm(
                 # folder-grained quartet (no folder/owner/author on CM_HOSTS);
                 # bind it NULL so the statement is fully bound, unfiltered.
                 stage_scope = (
-                    {**scope, "grpname_filter": None}
-                    if stage_name == "controlm_hosts" else scope
+                    {**scope, "grpname_filter": None} if stage_name == "controlm_hosts" else scope
                 )
                 adapter = _oracle_adapter(sql, stage_scope, name=sql_file)
             else:
@@ -1630,9 +1690,7 @@ def lineage_review(
     source: Path = typer.Argument(
         ..., help="controlm_jobs CSV export (or a directory to search for one)."
     ),
-    out: Path = typer.Option(
-        Path("lineage-review.html"), "--out", "-o", help="Output HTML path."
-    ),
+    out: Path = typer.Option(Path("lineage-review.html"), "--out", "-o", help="Output HTML path."),
     doc_id: str | None = typer.Option(
         None, "--doc-id", help="Review-page identity (defaults to the source stem)."
     ),
@@ -1677,11 +1735,13 @@ def m3_verify() -> None:
         """)
         if rows:
             r = rows[0]
-            checks.append((
-                "every folder has a server",
-                r["folders"] == r["srv_links"],
-                f"folders={r['folders']} srv_links={r['srv_links']}",
-            ))
+            checks.append(
+                (
+                    "every folder has a server",
+                    r["folders"] == r["srv_links"],
+                    f"folders={r['folders']} srv_links={r['srv_links']}",
+                )
+            )
 
         # Every application grouping contains at least one folder (no orphan
         # :ControlMApplication nodes — they only exist via the header-row join).
@@ -1693,11 +1753,13 @@ def m3_verify() -> None:
         """)
         if rows:
             r = rows[0]
-            checks.append((
-                "every ControlMApplication contains a folder",
-                r["apps"] == r["with_folder"],
-                f"apps={r['apps']} with_folder={r['with_folder']}",
-            ))
+            checks.append(
+                (
+                    "every ControlMApplication contains a folder",
+                    r["apps"] == r["with_folder"],
+                    f"apps={r['apps']} with_folder={r['with_folder']}",
+                )
+            )
 
         # C5 (gate 2026-07-18): no direct edge between the two row-derived
         # satellites of the folder header row. App and server both hang off the
@@ -1710,11 +1772,13 @@ def m3_verify() -> None:
             RETURN count(r) AS direct_edges
         """)
         if rows:
-            checks.append((
-                "no direct ControlMApplication<->ControlMServer edge",
-                rows[0]["direct_edges"] == 0,
-                f"direct_edges={rows[0]['direct_edges']}",
-            ))
+            checks.append(
+                (
+                    "no direct ControlMApplication<->ControlMServer edge",
+                    rows[0]["direct_edges"] == 0,
+                    f"direct_edges={rows[0]['direct_edges']}",
+                )
+            )
 
         # Every job has a folder.
         rows = cli.run("""
@@ -1725,11 +1789,13 @@ def m3_verify() -> None:
         """)
         if rows:
             r = rows[0]
-            checks.append((
-                "every job has a folder",
-                r["jobs"] == r["with_folder"],
-                f"jobs={r['jobs']} with_folder={r['with_folder']}",
-            ))
+            checks.append(
+                (
+                    "every job has a folder",
+                    r["jobs"] == r["with_folder"],
+                    f"jobs={r['jobs']} with_folder={r['with_folder']}",
+                )
+            )
 
         # Composite key sanity — no duplicate (folder_id, job_id): the NODE KEY.
         # JOB_ID alone is folder-scoped in BMC (the same JOB_ID legitimately
@@ -1743,11 +1809,13 @@ def m3_verify() -> None:
             RETURN count(*) AS dupes
         """)
         if rows:
-            checks.append((
-                "no duplicate (folder_id, job_id)",
-                rows[0]["dupes"] == 0,
-                f"dupes={rows[0]['dupes']}",
-            ))
+            checks.append(
+                (
+                    "no duplicate (folder_id, job_id)",
+                    rows[0]["dupes"] == 0,
+                    f"dupes={rows[0]['dupes']}",
+                )
+            )
 
         # The "ControlM SchedulerKind seeded" check retired with the seeds
         # (C12 platforms-taxonomy gate 2026-07-21): fresh bootstraps no longer
@@ -1767,11 +1835,13 @@ def m3_verify() -> None:
             RETURN count(r) AS blanket
         """)
         if rows:
-            checks.append((
-                "no blanket WAS_GENERATED_BY from pre-diet runs",
-                rows[0]["blanket"] == 0,
-                f"blanket={rows[0]['blanket']} (pre-diet load detected — rebuild from bootstrap; the one-time 20260721 migration was removed 2026-07-23)",
-            ))
+            checks.append(
+                (
+                    "no blanket WAS_GENERATED_BY from pre-diet runs",
+                    rows[0]["blanket"] == 0,
+                    f"blanket={rows[0]['blanket']} (pre-diet load detected — rebuild from bootstrap; the one-time 20260721 migration was removed 2026-07-23)",
+                )
+            )
 
         rows = cli.run("""
             MATCH (f:ControlMFolder)
@@ -1779,11 +1849,13 @@ def m3_verify() -> None:
             RETURN count(f) AS raw_props
         """)
         if rows:
-            checks.append((
-                "raw-named folder audit props retired",
-                rows[0]["raw_props"] == 0,
-                f"raw_props={rows[0]['raw_props']} (envelope pair is the record)",
-            ))
+            checks.append(
+                (
+                    "raw-named folder audit props retired",
+                    rows[0]["raw_props"] == 0,
+                    f"raw_props={rows[0]['raw_props']} (envelope pair is the record)",
+                )
+            )
 
         rows = cli.run("""
             MATCH (n)
@@ -1793,11 +1865,13 @@ def m3_verify() -> None:
             RETURN count(n) AS legacy_created_at
         """)
         if rows:
-            checks.append((
-                "loader nodes use first_seen_at (created_at renamed)",
-                rows[0]["legacy_created_at"] == 0,
-                f"legacy_created_at={rows[0]['legacy_created_at']}",
-            ))
+            checks.append(
+                (
+                    "loader nodes use first_seen_at (created_at renamed)",
+                    rows[0]["legacy_created_at"] == 0,
+                    f"legacy_created_at={rows[0]['legacy_created_at']}",
+                )
+            )
 
         # Local-namespace anchor terms present (post supplement).
         # Parentheses around the OR group — without them, AND binds tighter
@@ -1811,11 +1885,13 @@ def m3_verify() -> None:
             RETURN count(DISTINCT n) AS n
         """)
         if rows:
-            checks.append((
-                "M3 local anchor terms seeded",
-                rows[0]["n"] >= 3,
-                f"n={rows[0]['n']} (expect >= 3 after apply-ontology-supplement)",
-            ))
+            checks.append(
+                (
+                    "M3 local anchor terms seeded",
+                    rows[0]["n"] >= 3,
+                    f"n={rows[0]['n']} (expect >= 3 after apply-ontology-supplement)",
+                )
+            )
 
         # Every active folder has at least one active job (sample-friendly bound).
         rows = cli.run("""
@@ -1827,11 +1903,13 @@ def m3_verify() -> None:
         """)
         if rows:
             r = rows[0]
-            checks.append((
-                "active folders contain at least one job",
-                r["empty_folders"] == 0,
-                f"empty={r['empty_folders']} total={r['total']}",
-            ))
+            checks.append(
+                (
+                    "active folders contain at least one job",
+                    r["empty_folders"] == 0,
+                    f"empty={r['empty_folders']} total={r['total']}",
+                )
+            )
 
         # Every :Condition has at least one job referencing it (IN or OUT).
         # Orphans would mean a condition definition without a producer or
@@ -1845,11 +1923,13 @@ def m3_verify() -> None:
         """)
         if rows:
             r = rows[0]
-            checks.append((
-                "no orphan conditions",
-                r["orphan"] == 0,
-                f"orphan={r['orphan']} total={r['total']}",
-            ))
+            checks.append(
+                (
+                    "no orphan conditions",
+                    r["orphan"] == 0,
+                    f"orphan={r['orphan']} total={r['total']}",
+                )
+            )
 
         # Every derived :WAS_INFORMED_BY edge must carry via_condition — the
         # linking condition is the edge's identity discriminator. The old
@@ -1864,14 +1944,18 @@ def m3_verify() -> None:
         """)
         if rows:
             r = rows[0]
-            checks.append((
-                "WAS_INFORMED_BY edges carry via_condition",
-                r["missing_condition"] == 0,
-                f"total={r['total']} missing_condition={r['missing_condition']}",
-            ))
+            checks.append(
+                (
+                    "WAS_INFORMED_BY edges carry via_condition",
+                    r["missing_condition"] == 0,
+                    f"total={r['total']} missing_condition={r['missing_condition']}",
+                )
+            )
 
     t = Table(title="M3 (part 1 + part 2) invariants")
-    t.add_column("Check"); t.add_column("OK", justify="center"); t.add_column("Detail")
+    t.add_column("Check")
+    t.add_column("OK", justify="center")
+    t.add_column("Detail")
     failed = 0
     for name, ok, detail in checks:
         t.add_row(name, "yes" if ok else "NO", detail)
@@ -1879,7 +1963,8 @@ def m3_verify() -> None:
             failed += 1
     console.print(t)
     if failed:
-        console.print(f"[red]{failed} invariant(s) failed.[/]"); raise typer.Exit(1)
+        console.print(f"[red]{failed} invariant(s) failed.[/]")
+        raise typer.Exit(1)
     console.print("[green]All M3 (part 1) invariants passed.[/]")
 
 
@@ -1894,12 +1979,15 @@ def analyze_variables(
             "(TABLE_NAME|JOB_NAME|JOB_ID|APPL_TYPE|NAME|VALUE)."
         ),
     ),
-    delimiter: str = typer.Option(",", "--delimiter", help="Field delimiter; use '|' for raw exports."),
+    delimiter: str = typer.Option(
+        ",", "--delimiter", help="Field delimiter; use '|' for raw exports."
+    ),
     use_oracle: bool = typer.Option(
         False, "--use-oracle", help="Run controlm_variables.sql against psgmgr instead of a file."
     ),
     resolve: bool = typer.Option(
-        False, "--resolve",
+        False,
+        "--resolve",
         help="Also run the Phase-B resolver (folder scope -> job scope) and report resolution coverage.",
     ),
     folder: str | None = _folder_opt(),
@@ -1920,7 +2008,8 @@ def analyze_variables(
     if use_oracle:
         sql = (SQL_DIR / "controlm_variables.sql").read_text(encoding="utf-8")
         adapter = _oracle_adapter(
-            sql, _scope_binds(folder, run_as, developer_sid, row_cap),
+            sql,
+            _scope_binds(folder, run_as, developer_sid, row_cap),
             name="controlm_variables.sql",
         )
     else:
@@ -1956,12 +2045,12 @@ def analyze_variables(
         for cv in classify_job_variables(defs):
             cov.add(cv, data_center=job_meta[key], job_key=key)
 
-    console.print(
-        f"definitions={cov.total} jobs={len(cov.jobs_seen)} rejected={rejected}"
-    )
+    console.print(f"definitions={cov.total} jobs={len(cov.jobs_seen)} rejected={rejected}")
 
     t = Table(title="Variable kind distribution")
-    t.add_column("Kind"); t.add_column("Count", justify="right"); t.add_column("%", justify="right")
+    t.add_column("Kind")
+    t.add_column("Count", justify="right")
+    t.add_column("%", justify="right")
     for kind, pct in cov.pct_by_kind.items():
         t.add_row(kind, str(cov.by_kind[kind]), f"{pct:.2f}")
     console.print(t)
@@ -1988,14 +2077,14 @@ def analyze_variables(
         if not counter:
             continue
         t = Table(title=title)
-        t.add_column("Name"); t.add_column("Count", justify="right")
+        t.add_column("Name")
+        t.add_column("Count", justify="right")
         for name, cnt in counter.most_common(n):
             t.add_row(name, str(cnt))
         console.print(t)
 
     if cov.malformed_samples:
-        console.print("[yellow]Malformed samples (first "
-                      f"{len(cov.malformed_samples)}):[/]")
+        console.print("[yellow]Malformed samples (first " f"{len(cov.malformed_samples)}):[/]")
         for s in cov.malformed_samples:
             console.print(f"  {s}")
 
@@ -2030,7 +2119,8 @@ def analyze_variables(
                 unresolved_names[u] += 1
 
     t = Table(title="Phase-B resolution coverage")
-    t.add_column("Metric"); t.add_column("Value", justify="right")
+    t.add_column("Metric")
+    t.add_column("Value", justify="right")
     t.add_row("definitions resolved", str(total))
     t.add_row("fully resolved", f"{fully} ({100 * fully / total:.1f}%)" if total else "0")
     t.add_row("with env variants", str(with_variants))
@@ -2040,7 +2130,8 @@ def analyze_variables(
 
     if unresolved_names:
         t = Table(title="Top unresolved names (runtime-provided candidates)")
-        t.add_column("Name"); t.add_column("Count", justify="right")
+        t.add_column("Name")
+        t.add_column("Count", justify="right")
         for name, cnt in unresolved_names.most_common(15):
             t.add_row(name, str(cnt))
         console.print(t)
@@ -2053,12 +2144,15 @@ def normalize_variables(
         "--csv",
         help="Variable extract (formal projection or raw SQL Developer export).",
     ),
-    delimiter: str = typer.Option(",", "--delimiter", help="Field delimiter; use '|' for raw exports."),
+    delimiter: str = typer.Option(
+        ",", "--delimiter", help="Field delimiter; use '|' for raw exports."
+    ),
     use_oracle: bool = typer.Option(
         False, "--use-oracle", help="Run controlm_variables.sql against psgmgr instead of a file."
     ),
     out_dir: Path = typer.Option(
-        Path("stg_out"), "--out-dir",
+        Path("stg_out"),
+        "--out-dir",
         help="Output directory for the STG_* load files.",
     ),
     folder: str | None = _folder_opt(),
@@ -2082,7 +2176,8 @@ def normalize_variables(
     if use_oracle:
         sql = (SQL_DIR / "controlm_variables.sql").read_text(encoding="utf-8")
         adapter = _oracle_adapter(
-            sql, _scope_binds(folder, run_as, developer_sid, row_cap),
+            sql,
+            _scope_binds(folder, run_as, developer_sid, row_cap),
             name="controlm_variables.sql",
         )
     else:

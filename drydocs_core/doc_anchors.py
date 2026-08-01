@@ -6,6 +6,7 @@ component (drydocs.loaders.doc_traceability, L7 connector #1) — shared code
 routes through core per ADR 0002-a, so the regex and the L11 derived-anchor
 separator live here and both components import them.
 """
+
 from __future__ import annotations
 
 import re

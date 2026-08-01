@@ -22,6 +22,7 @@ Invariants:
 Scaffold status (2026-07-10, G4): interfaces + contracts; bodies raise
 ``NotImplementedError``. Trigger wiring (on-failure) is later work by design.
 """
+
 from . import investigate, writer
 
 #: The write target — the isolated uncertain context graph (ADR 0002 D1).

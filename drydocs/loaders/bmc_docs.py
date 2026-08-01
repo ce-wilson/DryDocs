@@ -20,6 +20,7 @@ matching, not semantic understanding): the manifest's own per-file
 and an H2 heading is the closest deterministic proxy available without an
 LLM pass — which this loader deliberately does not use.
 """
+
 from __future__ import annotations
 
 import logging
@@ -325,7 +326,8 @@ class BmcDocsLoader(BaseLoader):
         if products:
             LOGGER.info(
                 "Loader %s: product registry present (%d :SoftwareProduct)",
-                self.name, products,
+                self.name,
+                products,
             )
             return
         raise RuntimeError(

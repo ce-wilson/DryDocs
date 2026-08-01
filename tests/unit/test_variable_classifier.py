@@ -3,6 +3,7 @@
 Every classification case below is a real row from the production
 SQL Developer extract (controlm_variables__sample.csv) — not synthetic.
 """
+
 from __future__ import annotations
 
 from pathlib import Path
@@ -20,7 +21,10 @@ from drydocs_core.models import ControlMVariableRow
 
 SAMPLE = (
     Path(__file__).resolve().parents[2]
-    / "drydocs" / "data" / "samples" / "controlm_variables__sample.csv"
+    / "drydocs"
+    / "data"
+    / "samples"
+    / "controlm_variables__sample.csv"
 )
 
 # The production extract is gitignored (stays company-side / regenerate via
@@ -35,27 +39,29 @@ requires_sample = pytest.mark.skipif(
 
 # --- single-definition classification ----------------------------------------
 
+
 @pytest.mark.parametrize(
     ("name", "value", "expected"),
     [
         # literals
         ("%%IMAGE_NAME", "CEMS", VariableKind.SEMANTIC_FACT),
         ("%%CLUST", "prod", VariableKind.LITERAL),
-        ("%%SANDBOX_PATH", "/Data/abinitio/sandboxes/BB/BB_CDM/bb_cdm_pvt/pset",
-         VariableKind.LITERAL),
+        (
+            "%%SANDBOX_PATH",
+            "/Data/abinitio/sandboxes/BB/BB_CDM/bb_cdm_pvt/pset",
+            VariableKind.LITERAL,
+        ),
         # system functions only
         ("%%ODAT", "%%$ODATE", VariableKind.SYSTEM_FUNC),
         ("%%PREV_ODATE", "%%$CALCDATE %%$ODATE -1", VariableKind.SYSTEM_FUNC),
         # %%$SUBSTR is a system func but %%$CURR_DATE_NEXT is a user var
         # referenced with dollar syntax -> needs resolution -> VAR_REF
-        ("%%CURR_DAY_PREV", "%%$SUBSTR %%$CURR_DATE_NEXT 7 2",
-         VariableKind.VAR_REF),
+        ("%%CURR_DAY_PREV", "%%$SUBSTR %%$CURR_DATE_NEXT 7 2", VariableKind.VAR_REF),
         # plain var references
         ("%%B1_SCRIPT", "/gpfs/%%ENV/script/common", VariableKind.VAR_REF),
         # %%$DROPBOX is a dollar-referenced user var; %%$ODATE_1 is a system
         # date token (ODATE-prefixed)
-        ("%%DAT_FILE", "%%$DROPBOX/ptrx_sax_posting_%%$ODATE_1.dat.gz",
-         VariableKind.VAR_REF),
+        ("%%DAT_FILE", "%%$DROPBOX/ptrx_sax_posting_%%$ODATE_1.dat.gz", VariableKind.VAR_REF),
         # dynamic name composition
         ("%%SCRIPT_PATH", "%%SCRIPT_PATH_%%HOSTNM", VariableKind.DYNAMIC_NAME),
         ("%%TENV", "%%TENV%%CURRENVIRON", VariableKind.DYNAMIC_NAME),
@@ -63,27 +69,36 @@ requires_sample = pytest.mark.skipif(
         ("%%PROID", r"%%\\SCRA_REPORTING\\PROID", VariableKind.FLOW_REF),
         ("%%PROID", r"%%\\CALCMOSUMTOTAL\PROID", VariableKind.FLOW_REF),
         # fact name holding a flow pointer is a pointer, not a fact
-        ("%%TGT_TABLE", r"%%\\PDM_CRI_ACTL_TRUSTED\\INGESTED_FILE_NAME",
-         VariableKind.FLOW_REF),
+        ("%%TGT_TABLE", r"%%\\PDM_CRI_ACTL_TRUSTED\\INGESTED_FILE_NAME", VariableKind.FLOW_REF),
         # plugin namespaces
         ("%%FileWatch-MIN_AGE", "NO_MIN_AGE", VariableKind.PLUGIN_NS),
         ("%%UCM-CLUSTER_NAME", "%%CLUSTER_NAME", VariableKind.PLUGIN_NS),
         # embedded shell — including the observed POSCMD typo
-        ("%%POSTCMD",
-         "sh /home/b02supp/xmtr_scripts/run_calp_temp.sh bb.m %%$PRD_END_DATE_1,2,Y,NO",
-         VariableKind.EMBEDDED_SHELL),
-        ("%%POSCMD", "cc /apps/cds/sftp/UIP/vms/DW050/preprocess; mv a b;",
-         VariableKind.EMBEDDED_SHELL),
-        ("%%PRECMD", "mkdir -p %%R_PATH/VPC_P_VMSTR_BAL_%%$ODATE/%%R_PATH/backup;",
-         VariableKind.EMBEDDED_SHELL),
+        (
+            "%%POSTCMD",
+            "sh /home/b02supp/xmtr_scripts/run_calp_temp.sh bb.m %%$PRD_END_DATE_1,2,Y,NO",
+            VariableKind.EMBEDDED_SHELL,
+        ),
+        (
+            "%%POSCMD",
+            "cc /apps/cds/sftp/UIP/vms/DW050/preprocess; mv a b;",
+            VariableKind.EMBEDDED_SHELL,
+        ),
+        (
+            "%%PRECMD",
+            "mkdir -p %%R_PATH/VPC_P_VMSTR_BAL_%%$ODATE/%%R_PATH/backup;",
+            VariableKind.EMBEDDED_SHELL,
+        ),
         # semantic facts
         ("%%SEAL", "70004", VariableKind.SEMANTIC_FACT),
         ("%%FID_D", "B0004", VariableKind.SEMANTIC_FACT),
         ("%%RFID", "B0007", VariableKind.SEMANTIC_FACT),
         ("%%DATAFLOW", "CMHA_HLSF_CAMPAIGN", VariableKind.SEMANTIC_FACT),
-        ("%%NOTIFY",
-         "APP_L2_Production_Support@example.com;Team_Night_Herons@example.com",
-         VariableKind.SEMANTIC_FACT),
+        (
+            "%%NOTIFY",
+            "APP_L2_Production_Support@example.com;Team_Night_Herons@example.com",
+            VariableKind.SEMANTIC_FACT,
+        ),
         ("%%TGT_DB_NM", "ICDW_MB_PRSN_T", VariableKind.SEMANTIC_FACT),
         # malformed — a system-function expression where a NAME should be
         ("%%CALCDATE %%$ODATE -1", "", VariableKind.MALFORMED),
@@ -138,7 +153,7 @@ def test_plain_substr_is_system_function() -> None:
     # classic AutoEdit function syntax without the $ prefix
     # (real row: %%HOSTNM on folder 155768)
     cv = classify_variable("%%HOSTNM", "%%SUBSTR %%DATACENTER 1 1")
-    assert cv.kind is VariableKind.VAR_REF      # DATACENTER needs resolution
+    assert cv.kind is VariableKind.VAR_REF  # DATACENTER needs resolution
     assert cv.system_funcs == ("SUBSTR",)
     assert cv.all_var_refs == ("DATACENTER",)
 
@@ -166,6 +181,7 @@ def test_fact_type_via_env_suffix_base() -> None:
 
 
 # --- job-level environment-triplet confirmation -------------------------------
+
 
 def test_env_triplet_confirmed() -> None:
     defs = [
@@ -195,6 +211,7 @@ def test_env_suffix_requires_underscore() -> None:
 
 
 # --- model + sample integration -----------------------------------------------
+
 
 def test_model_accepts_raw_extract_headers() -> None:
     row = ControlMVariableRow.model_validate(
@@ -232,11 +249,11 @@ def test_sample_classifies_end_to_end() -> None:
     # every definition got exactly one kind
     assert sum(cov.by_kind.values()) == cov.total
     # known population facts from the extract
-    assert cov.by_kind["PLUGIN_NS"] > 0          # FileWatch-/UCM- rows exist
-    assert cov.by_kind["EMBEDDED_SHELL"] > 0     # PRECMD/POSTCMD rows exist
-    assert cov.by_kind["FLOW_REF"] > 0           # %%\FLOW\VAR rows exist
-    assert cov.fact_types["SEAL"] >= 1           # %%SEAL 70004 + UCM-SEALID
-    assert cov.system_vars["ODATE"] > 0          # system variable, not function
+    assert cov.by_kind["PLUGIN_NS"] > 0  # FileWatch-/UCM- rows exist
+    assert cov.by_kind["EMBEDDED_SHELL"] > 0  # PRECMD/POSTCMD rows exist
+    assert cov.by_kind["FLOW_REF"] > 0  # %%\FLOW\VAR rows exist
+    assert cov.fact_types["SEAL"] >= 1  # %%SEAL 70004 + UCM-SEALID
+    assert cov.system_vars["ODATE"] > 0  # system variable, not function
     assert cov.system_funcs["CALCDATE"] > 0
     # system variables must NOT appear in the user-resolution hot set
     assert "ORDERID" not in cov.referenced_names
@@ -247,6 +264,7 @@ def test_sample_classifies_end_to_end() -> None:
 
 # -- G16: artifact/launcher canonicals + value contracts (gate cmdline-nfr-vetting,
 # SME-4, 2026-07-21 — aliases suggest, VALUES decide; canonical names WARN-free) --
+
 
 def test_image_rolls_up_to_artifact_uri_clean_break() -> None:
     # v2 decision log: IMAGE -> IMAGE is removed; IMAGE now suggests ARTIFACT_URI
@@ -261,9 +279,7 @@ def test_image_rolls_up_to_artifact_uri_clean_break() -> None:
 def test_launcher_valued_variable_is_launcher_regardless_of_name() -> None:
     # the JAR_PATH -> dt-launcher.sh gotcha: name says jar, value IS the
     # registered launcher — the VALUE decides, and the mismatch is a WARN
-    cv = classify_variable(
-        "%%JAR_PATH", "/apps/tenants/dpl_utils/dt-accelerators/dt-launcher.sh"
-    )
+    cv = classify_variable("%%JAR_PATH", "/apps/tenants/dpl_utils/dt-accelerators/dt-launcher.sh")
     assert cv.fact_type == "LAUNCHER_SCRIPT_PATH"
     assert cv.fact_name_mismatch is True
     # even an UNREGISTERED name is corrected by the value contract
@@ -285,9 +301,7 @@ def test_sha_digest_is_artifact_sha_never_uri() -> None:
 
 
 def test_canonical_names_are_warn_free() -> None:
-    cv = classify_variable(
-        "%%ETL_ARTIFACT_URI", "https://artifactory/maven/app/bar-1.4.0.jar"
-    )
+    cv = classify_variable("%%ETL_ARTIFACT_URI", "https://artifactory/maven/app/bar-1.4.0.jar")
     assert cv.fact_type == "ARTIFACT_URI"
     assert cv.fact_alias_of is None
     assert cv.fact_name_mismatch is False
@@ -333,9 +347,9 @@ def test_icdw_run_interface_classifies_informatica() -> None:
 
 def test_fact_warns_counted_in_coverage() -> None:
     cov = VariableCoverage()
-    cov.add(classify_variable("%%JAR_PATH", "/a/dt-launcher.sh"))          # mismatch
-    cov.add(classify_variable("%%IMAGE", "registry/app/img:1"))            # alias
-    cov.add(classify_variable("%%ETL_ARTIFACT_URI", "https://r/a.jar"))    # canonical
+    cov.add(classify_variable("%%JAR_PATH", "/a/dt-launcher.sh"))  # mismatch
+    cov.add(classify_variable("%%IMAGE", "registry/app/img:1"))  # alias
+    cov.add(classify_variable("%%ETL_ARTIFACT_URI", "https://r/a.jar"))  # canonical
     assert cov.fact_warns["name_value_mismatch"] == 1
     assert cov.fact_warns["alias_rename"] == 1
     assert sum(cov.fact_warns.values()) == 2

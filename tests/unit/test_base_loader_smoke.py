@@ -7,6 +7,7 @@ historic state where ``run`` was ``(cypher, params=None)`` and
 ``run_script`` was ``(script)``) would crash every loader at runtime; this
 test forces that to surface in CI rather than in production.
 """
+
 from __future__ import annotations
 
 import inspect
@@ -21,6 +22,7 @@ from drydocs.loaders.base import BaseLoader
 from drydocs_core.neo4j_client import Neo4jClient
 
 # ---- in-memory fakes -------------------------------------------------------
+
 
 class _FakeAdapter:
     """Minimal Adapter that yields a fixed list of dicts."""
@@ -103,6 +105,7 @@ def smoke_cypher_files(tmp_path_factory: pytest.TempPathFactory) -> None:
 
 # ---- signature contract ----------------------------------------------------
 
+
 def test_neo4j_client_run_accepts_kwargs() -> None:
     """BaseLoader._open_run / _close_run pass bind values as kwargs.
 
@@ -111,21 +114,20 @@ def test_neo4j_client_run_accepts_kwargs() -> None:
     """
     sig = inspect.signature(Neo4jClient.run)
     kinds = {p.kind for p in sig.parameters.values()}
-    assert inspect.Parameter.VAR_KEYWORD in kinds, (
-        "Neo4jClient.run must accept **kwargs for keyword-style bind values"
-    )
+    assert (
+        inspect.Parameter.VAR_KEYWORD in kinds
+    ), "Neo4jClient.run must accept **kwargs for keyword-style bind values"
 
 
 def test_neo4j_client_run_script_accepts_params() -> None:
     """BaseLoader._flush calls ``run_script(cypher, params=...)`` for
     multi-statement templates; the method must accept that arg."""
     sig = inspect.signature(Neo4jClient.run_script)
-    assert "params" in sig.parameters, (
-        "Neo4jClient.run_script must accept a params kwarg"
-    )
+    assert "params" in sig.parameters, "Neo4jClient.run_script must accept a params kwarg"
 
 
 # ---- end-to-end smoke -------------------------------------------------------
+
 
 def test_single_statement_loader_runs_end_to_end(smoke_cypher_files: None) -> None:
     client = _FakeNeo4jClient()
@@ -177,7 +179,9 @@ def test_close_run_records_rows_changed_from_edge_count(smoke_cypher_files: None
     create/change, this count IS the changed-row total for the run."""
 
     class _ChangeCountingClient(_FakeNeo4jClient):
-        def run(self, cypher: str, params: dict[str, Any] | None = None, **kwargs: Any) -> list[dict]:
+        def run(
+            self, cypher: str, params: dict[str, Any] | None = None, **kwargs: Any
+        ) -> list[dict]:
             bind = {**(params or {}), **kwargs}
             self.run_calls.append((cypher, bind))
             if "rows_changed" in cypher:
@@ -228,7 +232,9 @@ def test_preflight_raises_on_failed_index(smoke_cypher_files: None) -> None:
     no batch flush."""
 
     class _FailedIndexClient(_FakeNeo4jClient):
-        def run(self, cypher: str, params: dict[str, Any] | None = None, **kwargs: Any) -> list[dict]:
+        def run(
+            self, cypher: str, params: dict[str, Any] | None = None, **kwargs: Any
+        ) -> list[dict]:
             bind = {**(params or {}), **kwargs}
             self.run_calls.append((cypher, bind))
             if "SHOW INDEXES" in cypher:
@@ -251,11 +257,15 @@ def test_preflight_awaits_populating_index_then_loads(smoke_cypher_files: None) 
     the load then proceeds normally."""
 
     class _PopulatingIndexClient(_FakeNeo4jClient):
-        def run(self, cypher: str, params: dict[str, Any] | None = None, **kwargs: Any) -> list[dict]:
+        def run(
+            self, cypher: str, params: dict[str, Any] | None = None, **kwargs: Any
+        ) -> list[dict]:
             bind = {**(params or {}), **kwargs}
             self.run_calls.append((cypher, bind))
             if "SHOW INDEXES" in cypher:
-                return [{"name": "job_name", "state": "POPULATING", "labelsOrTypes": ["ControlMJob"]}]
+                return [
+                    {"name": "job_name", "state": "POPULATING", "labelsOrTypes": ["ControlMJob"]}
+                ]
             return []
 
     client = _PopulatingIndexClient()
@@ -272,10 +282,12 @@ def test_preflight_awaits_populating_index_then_loads(smoke_cypher_files: None) 
 
 def test_invalid_rows_are_rejected_not_raised(smoke_cypher_files: None) -> None:
     client = _FakeNeo4jClient()
-    adapter = _FakeAdapter([
-        {"id": "good", "value": 1},
-        {"id": "bad", "value": "not-an-int"},
-    ])
+    adapter = _FakeAdapter(
+        [
+            {"id": "good", "value": 1},
+            {"id": "bad", "value": "not-an-int"},
+        ]
+    )
 
     summary = _SingleStatementLoader(client, adapter).load()
 
@@ -305,5 +317,12 @@ def test_code_semicolons_ignores_comments_and_strings() -> None:
 
     # the real template that broke: single statement despite its comment ';'
     from pathlib import Path
-    folders = Path(__file__).resolve().parents[2] / "drydocs" / "loaders" / "cypher" / "controlm_folders.cypher"
+
+    folders = (
+        Path(__file__).resolve().parents[2]
+        / "drydocs"
+        / "loaders"
+        / "cypher"
+        / "controlm_folders.cypher"
+    )
     assert _code_semicolons(folders.read_text(encoding="utf-8")) <= 1

@@ -10,6 +10,7 @@ artifact travels the K2-gated manual-loads mechanism as-is.
 
 Role gate: steward or admin (user < steward < admin — the O13 persona model).
 """
+
 from __future__ import annotations
 
 import csv
@@ -86,8 +87,15 @@ DOMAINS: tuple[dict, ...] = (
 # The committed override-list column order — the draft artifact reproduces the
 # WHOLE file (existing rows + drafts) so committing it is a plain replace.
 OVERRIDE_HEADER = (
-    "app_seal_id", "role_name", "seal_holder_sid", "override_holder_sid",
-    "override_holder_name", "rationale", "authored_by", "authored_on", "status",
+    "app_seal_id",
+    "role_name",
+    "seal_holder_sid",
+    "override_holder_sid",
+    "override_holder_name",
+    "rationale",
+    "authored_by",
+    "authored_on",
+    "status",
 )
 
 
@@ -167,9 +175,7 @@ class MappingStore:
         """The committed override list in file column order (for the full-file
         draft artifact)."""
         cols = ", ".join(OVERRIDE_HEADER)
-        return self._select(
-            f"SELECT {cols} FROM seal_contact_override ORDER BY line_no"
-        ).rows
+        return self._select(f"SELECT {cols} FROM seal_contact_override ORDER BY line_no").rows
 
     def source_corrections(self) -> list[dict]:
         return self._select("SELECT * FROM v_source_corrections").rows
@@ -213,9 +219,7 @@ def mapping_grid(
     return {"domain": domain_id, "keys": grid.keys, "rows": grid.rows}
 
 
-def mapping_options(
-    token: str, sessions: InMemorySessionStore, store: MappingStore
-) -> dict:
+def mapping_options(token: str, sessions: InMemorySessionStore, store: MappingStore) -> dict:
     _authorize(token, sessions)
     return store.options()
 
@@ -239,10 +243,20 @@ def draft_changeset(
     today = date.today().isoformat()
     out = io.StringIO()
     writer = csv.writer(out, lineterminator="\n")
-    writer.writerow([
-        "source_label", "source_key", "relationship", "rel_props", "target_label",
-        "target_key", "create_target_if_missing", "note", "authored_by", "authored_on",
-    ])
+    writer.writerow(
+        [
+            "source_label",
+            "source_key",
+            "relationship",
+            "rel_props",
+            "target_label",
+            "target_key",
+            "create_target_if_missing",
+            "note",
+            "authored_by",
+            "authored_on",
+        ]
+    )
     for i, entry in enumerate(entries, start=1):
         folder_id = str(entry.get("folder_id") or "").strip()
         job_id = str(entry.get("job_id") or "").strip()
@@ -257,18 +271,20 @@ def draft_changeset(
                 f"entry {i}: rationale is REQUIRED — it is the CSV provenance "
                 "column and the gate reviewer's context"
             )
-        writer.writerow([
-            K2_SHAPE["source_label"],
-            f"folder_id={folder_id};job_id={job_id}",
-            K2_SHAPE["relationship"],
-            f"role={K2_SHAPE['role']}",
-            K2_SHAPE["target_label"],
-            f"seal_id={seal_id}",
-            "true" if entry.get("create_target_if_missing") else "false",
-            rationale,
-            session.persona_id,
-            today,
-        ])
+        writer.writerow(
+            [
+                K2_SHAPE["source_label"],
+                f"folder_id={folder_id};job_id={job_id}",
+                K2_SHAPE["relationship"],
+                f"role={K2_SHAPE['role']}",
+                K2_SHAPE["target_label"],
+                f"seal_id={seal_id}",
+                "true" if entry.get("create_target_if_missing") else "false",
+                rationale,
+                session.persona_id,
+                today,
+            ]
+        )
 
     filename = f"jobs-to-apps-{today}-{session.persona_id}.csv"
     manifest_snippet = (
@@ -299,6 +315,7 @@ def draft_changeset(
 # file as an artifact; the mapping-store table persists it once committed
 # (the file-to-table loop that keeps var/mapping.db rebuildable).
 # ---------------------------------------------------------------------------
+
 
 def draft_override(
     entries: list[dict], token: str, sessions: InMemorySessionStore, store: MappingStore
@@ -340,17 +357,19 @@ def draft_override(
                 f"entry {i}: rationale is REQUIRED — it becomes the "
                 "source-corrections report's justification column"
             )
-        new_rows.append({
-            "app_seal_id": app,
-            "role_name": role,
-            "seal_holder_sid": seal_sid,
-            "override_holder_sid": override_sid,
-            "override_holder_name": str(entry.get("override_holder_name") or "").strip(),
-            "rationale": rationale,
-            "authored_by": session.persona_id,  # server-stamped, never client-supplied
-            "authored_on": today,
-            "status": "active",
-        })
+        new_rows.append(
+            {
+                "app_seal_id": app,
+                "role_name": role,
+                "seal_holder_sid": seal_sid,
+                "override_holder_sid": override_sid,
+                "override_holder_name": str(entry.get("override_holder_name") or "").strip(),
+                "rationale": rationale,
+                "authored_by": session.persona_id,  # server-stamped, never client-supplied
+                "authored_on": today,
+                "status": "active",
+            }
+        )
 
     out = io.StringIO()
     writer = csv.writer(out, lineterminator="\n")
@@ -402,9 +421,7 @@ def source_corrections_report(
         holder = r.get("override_holder_sid") or ""
         if r.get("override_holder_name"):
             holder = f"{holder} ({r['override_holder_name']})"
-        authored = " ".join(
-            p for p in (r.get("authored_by"), r.get("authored_on")) if p
-        )
+        authored = " ".join(p for p in (r.get("authored_by"), r.get("authored_on")) if p)
         lines.append(
             f"| {r['app_seal_id']} | {r['role_name']} "
             f"| {r.get('seal_holder_sid') or '(nobody assigned)'} "

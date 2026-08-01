@@ -39,6 +39,7 @@ so clone lag is measured, not guessed.
 Real exports are confidential (Internal, J23) (SEALs + GUIDs + lifecycle state) and
 live in the G19 landing zone (``dpl-registry/<seal>/``), never in the repo.
 """
+
 from __future__ import annotations
 
 import json
@@ -59,8 +60,16 @@ _EXPORT_SHAPES = {
 
 #: active-flag spellings → normalized value (unknown spellings stay "", counted)
 _ACTIVE_SPELLINGS = {
-    "true": "true", "active": "true", "y": "true", "yes": "true", "1": "true",
-    "false": "false", "inactive": "false", "n": "false", "no": "false", "0": "false",
+    "true": "true",
+    "active": "true",
+    "y": "true",
+    "yes": "true",
+    "1": "true",
+    "false": "false",
+    "inactive": "false",
+    "n": "false",
+    "no": "false",
+    "0": "false",
 }
 
 
@@ -70,10 +79,10 @@ class RegistryRecord:
     no meaning."""
 
     guid: str
-    kind: str            # "pipeline" | "dataset"
+    kind: str  # "pipeline" | "dataset"
     version: str = ""
-    active: str = ""     # "true" | "false" | "" (unknown — counted)
-    seal: str = ""       # record field, else the per-SEAL folder name
+    active: str = ""  # "true" | "false" | "" (unknown — counted)
+    seal: str = ""  # record field, else the per-SEAL folder name
     name: str = ""
     source_file: str = ""  # provenance: which export file staged this record
 
@@ -83,13 +92,13 @@ class RegistryCoverage:
     """Per-run accounting — every skip is counted BY REASON, never silent."""
 
     files_read: int = 0
-    files_invalid: int = 0              # unreadable JSON / unexpected shape
+    files_invalid: int = 0  # unreadable JSON / unexpected shape
     pipelines_read: int = 0
     datasets_read: int = 0
-    records_no_guid: int = 0            # entry without its guid field — skipped
-    records_no_seal: int = 0            # no seal field AND no per-SEAL folder
-    duplicate_guids: int = 0            # same (kind, guid) again — first wins
-    active_unknown: int = 0             # unrecognized active spelling — staged ""
+    records_no_guid: int = 0  # entry without its guid field — skipped
+    records_no_seal: int = 0  # no seal field AND no per-SEAL folder
+    duplicate_guids: int = 0  # same (kind, guid) again — first wins
+    active_unknown: int = 0  # unrecognized active spelling — staged ""
 
     def as_dict(self) -> dict:
         return asdict(self)
@@ -186,15 +195,17 @@ class DplRegistryExtractor:
                 if spelled and not active:
                     coverage.active_unknown += 1
 
-            result.records.append(RegistryRecord(
-                guid=guid,
-                kind=kind,
-                version=str(entry.get("version") or "").strip(),
-                active=active,
-                seal=seal,
-                name=str(entry.get("name") or "").strip(),
-                source_file=export.as_posix(),
-            ))
+            result.records.append(
+                RegistryRecord(
+                    guid=guid,
+                    kind=kind,
+                    version=str(entry.get("version") or "").strip(),
+                    active=active,
+                    seal=seal,
+                    name=str(entry.get("name") or "").strip(),
+                    source_file=export.as_posix(),
+                )
+            )
             if kind == "pipeline":
                 coverage.pipelines_read += 1
             else:
@@ -203,16 +214,17 @@ class DplRegistryExtractor:
 
 # -- the GUID cross-check report ------------------------------------------------
 
+
 @dataclass
 class RegistryCrossCheck:
     """Registry vs G15 CMD_LINE observations (and optionally the clone) —
     every disagreement is counted AND listed, never dropped."""
 
     registered_pipelines: int = 0
-    observed_pipelines: int = 0                 # proc#dpl:{GUID} nodes in the graph
+    observed_pipelines: int = 0  # proc#dpl:{GUID} nodes in the graph
     observed_not_registered: list[str] = field(default_factory=list)
     registered_not_observed: list[str] = field(default_factory=list)
-    clone_checked: bool = False                 # third column ran (SME 2026-07-23)
+    clone_checked: bool = False  # third column ran (SME 2026-07-23)
     clone_pipelines: int = 0
     clone_not_registered: list[str] = field(default_factory=list)
     registered_not_in_clone: list[str] = field(default_factory=list)  # the lag, measured
@@ -251,7 +263,7 @@ def cross_check(
     lag is a measured list instead of a guess. READ-ONLY on the graph."""
     registered = extract.guids("pipeline")
     observed = {
-        node_id[len(_DPL_PROC_PREFIX):]
+        node_id[len(_DPL_PROC_PREFIX) :]
         for node_id in graph.processes
         if node_id.startswith(_DPL_PROC_PREFIX)
     }

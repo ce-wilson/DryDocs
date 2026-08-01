@@ -8,6 +8,7 @@ the coverage policy honest (unmapped strings reported, never guessed), and the
 source-value disambiguation honest (both USES_SOFTWARE writers key their MERGE
 on source so the edges can never collide). Pure file/adapter checks — no Neo4j.
 """
+
 from __future__ import annotations
 
 from collections.abc import Iterator
@@ -26,6 +27,7 @@ REGISTRY_CYPHER_FILE = REPO / "drydocs" / "loaders" / "cypher" / "software_regis
 
 # ---- crosswalk --------------------------------------------------------------
 
+
 def test_crosswalk_resolves_all_seed_row_spellings() -> None:
     from drydocs.loaders.batch_port_orchestrator import build_orchestrator_crosswalk
 
@@ -42,9 +44,9 @@ def test_crosswalk_resolves_all_seed_row_spellings() -> None:
         ("Airflow", "airflow"),
         ("Apache Airflow", "airflow"),
     ):
-        assert xwalk.get(spelling.strip().casefold()) == ref, (
-            f"'{spelling}' should resolve to '{ref}'"
-        )
+        assert (
+            xwalk.get(spelling.strip().casefold()) == ref
+        ), f"'{spelling}' should resolve to '{ref}'"
 
 
 def test_crosswalk_only_carries_gate_confirmed_refs() -> None:
@@ -54,9 +56,7 @@ def test_crosswalk_only_carries_gate_confirmed_refs() -> None:
 
     doc = yaml.safe_load(PLATFORMS_FILE.read_text(encoding="utf-8"))
     declared_refs = {
-        row["software_registry_ref"]
-        for row in doc["platforms"]
-        if row.get("software_registry_ref")
+        row["software_registry_ref"] for row in doc["platforms"] if row.get("software_registry_ref")
     }
     xwalk = build_orchestrator_crosswalk(PLATFORMS_FILE)
     assert set(xwalk.values()) <= declared_refs
@@ -70,16 +70,14 @@ def test_crosswalk_ignores_rows_without_a_ref(tmp_path: Path) -> None:
 
     plat = tmp_path / "platforms.yaml"
     plat.write_text(
-        "platforms:\n"
-        "  - id: tws\n"
-        "    label: IBM TWS\n"
-        "    scheduler_kind: TWS\n",
+        "platforms:\n" "  - id: tws\n" "    label: IBM TWS\n" "    scheduler_kind: TWS\n",
         encoding="utf-8",
     )
     assert build_orchestrator_crosswalk(plat) == {}
 
 
 # ---- adapter ----------------------------------------------------------------
+
 
 def test_adapter_resolves_the_committed_capture() -> None:
     """Every declared orchestrator in the committed taxonomy capture must
@@ -88,18 +86,16 @@ def test_adapter_resolves_the_committed_capture() -> None:
     from drydocs_core.models.registry import BatchPortOrchestratorRow
 
     doc = yaml.safe_load(APPS_FILE.read_text(encoding="utf-8"))
-    declared = [
-        a for a in doc["nodes"]["business_applications"] if a.get("batch_orchestrator")
-    ]
+    declared = [a for a in doc["nodes"]["business_applications"] if a.get("batch_orchestrator")]
     assert declared, "the committed capture should declare at least one orchestrator"
 
     with BatchOrchestratorYamlAdapter(APPS_FILE, PLATFORMS_FILE) as adapter:
         rows = list(adapter.rows())
 
     assert len(rows) == len(declared)
-    assert adapter.unmapped == [], (
-        f"committed capture carries unmapped orchestrator strings: {adapter.unmapped}"
-    )
+    assert (
+        adapter.unmapped == []
+    ), f"committed capture carries unmapped orchestrator strings: {adapter.unmapped}"
     for raw in rows:
         row = BatchPortOrchestratorRow.model_validate(raw)
         assert row.product_id in {"controlm", "autosys", "airflow"}
@@ -136,6 +132,7 @@ def test_adapter_reports_unmapped_and_skips_undeclared(tmp_path: Path) -> None:
 
 # ---- loader wiring ----------------------------------------------------------
 
+
 def test_loader_class_wiring() -> None:
     from drydocs.loaders.batch_port_orchestrator import BatchPortOrchestratorLoader
 
@@ -146,6 +143,7 @@ def test_loader_class_wiring() -> None:
 
 
 # ---- cypher invariants ------------------------------------------------------
+
 
 def test_cypher_stamps_and_keys_the_batch_port_source() -> None:
     """The gate-ruled disambiguation: the edge MERGE must be KEYED on
@@ -245,9 +243,7 @@ class _FakeClient:
             return [{"found": 0}]
         if "WITH sid, a WHERE a IS NULL" in cypher:
             return [
-                {"seal_id": sid}
-                for sid in sorted(bind.get("seal_ids", []))
-                if sid not in self.apps
+                {"seal_id": sid} for sid in sorted(bind.get("seal_ids", [])) if sid not in self.apps
             ]
         if "WHERE NOT (a)-[:USES_SOFTWARE {source: 'batch-port'}]" in cypher:
             out = []
@@ -330,9 +326,9 @@ def test_schema_meta_exemplars_alone_do_not_satisfy_the_prereqs() -> None:
     probes = [c for c, _ in client.run_calls if "AS found" in c]
     assert probes, "no endpoint-presence probe was issued"
     for probe in probes:
-        assert "NOT n:SchemaMeta" in probe, (
-            "endpoint probes must use the rename-proof label predicate"
-        )
+        assert (
+            "NOT n:SchemaMeta" in probe
+        ), "endpoint probes must use the rename-proof label predicate"
         assert "IS NOT NULL" in probe, "keyless stubs must not satisfy the probe"
 
 
@@ -395,7 +391,8 @@ def test_missing_edge_probe_is_scoped_to_this_run() -> None:
     loader.load()
 
     probe = [
-        (c, b) for c, b in client.run_calls
+        (c, b)
+        for c, b in client.run_calls
         if "WHERE NOT (a)-[:USES_SOFTWARE {source: 'batch-port'}]" in c
     ]
     assert probe, "no missing-edge probe was issued"

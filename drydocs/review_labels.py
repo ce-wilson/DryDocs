@@ -14,6 +14,7 @@ Design note (MODULE_MAP): parked in the ``drydocs-review`` component for now. It
 pure config accessor and could be promoted to ``drydocs_core.config`` — do that only
 once a *second, non-review* consumer appears (ADR 0002-a resolve-at-move rule).
 """
+
 from __future__ import annotations
 
 from dataclasses import dataclass

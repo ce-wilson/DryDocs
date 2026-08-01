@@ -6,6 +6,7 @@ if a doc edit breaks the deterministic parse (matrix cell contract, anchor
 convention, feedback format), it fails here before any graph load.
 Gate: doc-traceability-feedback (signed off 2026-07-20, config/gate-log.md).
 """
+
 from __future__ import annotations
 
 from pathlib import Path
@@ -35,6 +36,7 @@ RUNBOOK = DESIGN_DIR / "drydocs-startup-refresh-runbook.md"
 
 # ---- header / doc_type ------------------------------------------------------
 
+
 def test_doc_type_suffix_rule() -> None:
     assert doc_type_for_stem("controlm-ingestion-tdd") == "TDD"
     assert doc_type_for_stem("drydocs-startup-refresh-runbook") == "Runbook"
@@ -48,13 +50,16 @@ def test_runbook_header_carries_rev_and_commit() -> None:
     assert header["origin"] == DESIGN_DOCS_ORIGIN
     assert header["doc_id"] == "drydocs-startup-refresh-runbook"
     assert header["doc_type"] == "Runbook"
-    assert header["rev"] == 5  # Rev 5, 2026-07-31 (L21: apply-supplements chain + load-doc-traceability)
+    assert (
+        header["rev"] == 5
+    )  # Rev 5, 2026-07-31 (L21: apply-supplements chain + load-doc-traceability)
     assert header["doc_status"] == "DESCRIPTIVE"
     assert header["commit"], "front-matter commit citation should parse"
     assert header["path"] == "docs/design/drydocs-startup-refresh-runbook.md"
 
 
 # ---- sections stream --------------------------------------------------------
+
 
 def test_sections_adapter_covers_every_committed_doc() -> None:
     rows = list(DesignDocSectionsAdapter(DESIGN_DIR).rows())
@@ -66,11 +71,14 @@ def test_sections_adapter_covers_every_committed_doc() -> None:
     for r in rows:
         DocSectionRow.model_validate(r)
     # the runbook's authored outline anchors are all present
-    runbook_anchors = {r["anchor"] for r in rows if r["doc_id"] == "drydocs-startup-refresh-runbook"}
+    runbook_anchors = {
+        r["anchor"] for r in rows if r["doc_id"] == "drydocs-startup-refresh-runbook"
+    }
     assert {"front-matter", "purpose-scope", "startup", "verify", "rollback"} <= runbook_anchors
 
 
 # ---- traceability matrix stream ---------------------------------------------
+
 
 def test_controlm_matrix_parses_all_rows() -> None:
     rows = parse_matrix_rows(CONTROLM_TDD.read_text(encoding="utf-8"), "controlm-ingestion-tdd")
@@ -91,7 +99,9 @@ def test_controlm_matrix_parses_all_rows() -> None:
 
 def test_fr_cmi_007_test_cell_splits_and_classifies() -> None:
     rows = parse_matrix_rows(CONTROLM_TDD.read_text(encoding="utf-8"), "controlm-ingestion-tdd")
-    tests = {t["ref"]: t["kind"] for r in rows if r["requirement_id"] == "FR-CMI-007" for t in r["tests"]}
+    tests = {
+        t["ref"]: t["kind"] for r in rows if r["requirement_id"] == "FR-CMI-007" for t in r["tests"]
+    }
     assert len(tests) == 2, f"the ';'-split should yield 2 citations, got {tests}"
     kinds = set(tests.values())
     assert kinds == {"gate", "graph-test"}, f"kind-rule-v1 misclassified: {tests}"
@@ -115,9 +125,9 @@ def test_five_column_matrix_maps_by_header_not_position() -> None:
     assert first["kind"] == "other"  # prose identity, loose mode (gate D5)
     assert first["section_anchors"] == ["detailed-design"]
     assert first["components"] == ["drydocs-web"]
-    assert all(t["ref"] != "done" for r in rows for t in r["tests"]), (
-        "a Status cell leaked into the tests field — column mapping regressed"
-    )
+    assert all(
+        t["ref"] != "done" for r in rows for t in r["tests"]
+    ), "a Status cell leaked into the tests field — column mapping regressed"
     for r in rows:
         TraceabilityRow.model_validate(r)
 
@@ -144,15 +154,17 @@ def test_matrix_adapter_only_yields_docs_with_a_matrix() -> None:
 
 # ---- L18: separators inside parentheticals never shear a ref -------------------
 
+
 def test_split_cell_keeps_parenthetical_separators_whole() -> None:
     # The committed shear case: FR-CMI-007's component cell held
     # `K2 loader (`seal_attribution.cypher`, `load-seal-attribution`)` and the
     # naive comma split stored two corrupt (origin, ref) identities.
     from drydocs.loaders.doc_traceability import _split_cell
 
-    assert _split_cell(
-        "K2 loader (`a.cypher`, `load-x`), drydocs/cli.py", ","
-    ) == ["K2 loader (`a.cypher`, `load-x`)", "drydocs/cli.py"]
+    assert _split_cell("K2 loader (`a.cypher`, `load-x`), drydocs/cli.py", ",") == [
+        "K2 loader (`a.cypher`, `load-x`)",
+        "drydocs/cli.py",
+    ]
     # Test cells split on ';' — same rule.
     assert _split_cell("t.py (a; b); u.py", ";") == ["t.py (a; b)", "u.py"]
     # Plain cells are unchanged by the depth-aware split.
@@ -167,20 +179,22 @@ def test_no_committed_ref_is_sheared_mid_parenthetical() -> None:
     (origin, ref) identity and must fail here before any load."""
     for row in TraceabilityMatrixAdapter(DESIGN_DIR).rows():
         for ref in row["components"]:
-            assert ref.count("(") == ref.count(")"), (
-                f"{row['doc_id']} {row['requirement_id']}: sheared component ref {ref!r}"
-            )
+            assert ref.count("(") == ref.count(
+                ")"
+            ), f"{row['doc_id']} {row['requirement_id']}: sheared component ref {ref!r}"
         for t in row["tests"]:
-            assert t["ref"].count("(") == t["ref"].count(")"), (
-                f"{row['doc_id']} {row['requirement_id']}: sheared test ref {t['ref']!r}"
-            )
+            assert t["ref"].count("(") == t["ref"].count(
+                ")"
+            ), f"{row['doc_id']} {row['requirement_id']}: sheared test ref {t['ref']!r}"
 
 
 # ---- feedback stream ----------------------------------------------------------
 
+
 def test_feedback_adapter_reads_rev1_with_lifecycle_and_author() -> None:
     rows = [
-        r for r in DesignDocFeedbackAdapter(FEEDBACK_DIR).rows()
+        r
+        for r in DesignDocFeedbackAdapter(FEEDBACK_DIR).rows()
         if r["doc_id"] == "drydocs-startup-refresh-runbook"
     ]
     assert len(rows) == 2, f"the committed rev1 file carries 2 notes, got {len(rows)}"

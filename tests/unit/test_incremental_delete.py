@@ -6,6 +6,7 @@ binding, mark/reactivate shapes, count reporting — since the graph-side
 semantics are plain Cypher over the run bookkeeping every template writes
 (last_run_id / last_seen_at).
 """
+
 from __future__ import annotations
 
 from collections.abc import Iterator
@@ -35,8 +36,9 @@ class _FakeAdapter:
 class _FakeClient:
     """Answers the mark/reactivate/sweep count queries; records every call."""
 
-    def __init__(self, *, marked: int = 0, reactivated: int = 0, swept: int = 0,
-                 retained: int = 0) -> None:
+    def __init__(
+        self, *, marked: int = 0, reactivated: int = 0, swept: int = 0, retained: int = 0
+    ) -> None:
         self.marked = marked
         self.reactivated = reactivated
         self.swept = swept
@@ -44,8 +46,7 @@ class _FakeClient:
         self.run_calls: list[tuple[str, dict]] = []
         self.run_script_calls: list[tuple[str, dict]] = []
 
-    def run(self, cypher: str, params: dict[str, Any] | None = None,
-            **kwargs: Any) -> list[dict]:
+    def run(self, cypher: str, params: dict[str, Any] | None = None, **kwargs: Any) -> list[dict]:
         bind = {**(params or {}), **kwargs}
         self.run_calls.append((cypher, bind))
         if "AS marked" in cypher:
@@ -118,22 +119,22 @@ def test_mark_pass_runs_scoped_to_the_extracts_folders() -> None:
     client = _FakeClient(marked=2)
     summary = _ScopedLoader(client, _FakeAdapter(ROWS)).load()
 
-    (cypher, bind), = client.mark_calls()
+    ((cypher, bind),) = client.mark_calls()
     assert "MATCH (n:SweepJob)" in cypher
     assert "n.last_run_id IS NULL OR n.last_run_id <> $run_id" in cypher
     assert "n.folder_id IN $scope_values" in cypher  # the scoping clause
-    assert bind["scope_values"] == ["F1", "F2"]      # exactly the extract's folders
-    assert "removed_by_run_id" in cypher             # mark = property + run id
-    assert summary.nodes_marked_removed == 2         # reported, never silent
+    assert bind["scope_values"] == ["F1", "F2"]  # exactly the extract's folders
+    assert "removed_by_run_id" in cypher  # mark = property + run id
+    assert summary.nodes_marked_removed == 2  # reported, never silent
 
 
 def test_reappeared_nodes_get_their_mark_cleared() -> None:
     client = _FakeClient(reactivated=1)
     summary = _ScopedLoader(client, _FakeAdapter(ROWS)).load()
 
-    (cypher, bind), = client.reactivate_calls()
-    assert "n.last_run_id = $run_id" in cypher            # only nodes seen THIS run
-    assert "removed_from_source_at = null" in cypher      # the mark is cleared
+    ((cypher, bind),) = client.reactivate_calls()
+    assert "n.last_run_id = $run_id" in cypher  # only nodes seen THIS run
+    assert "removed_from_source_at = null" in cypher  # the mark is cleared
     assert bind["run_id"] == summary.run_id
     assert summary.nodes_reactivated == 1
 
@@ -162,7 +163,7 @@ def test_unscoped_loader_marks_globally_under_full_extract() -> None:
     client = _FakeClient(marked=1)
     summary = _UnscopedLoader(client, _FakeAdapter(ROWS), full_extract=True).load()
 
-    (cypher, bind), = client.mark_calls()
+    ((cypher, bind),) = client.mark_calls()
     assert "IN $scope_values" not in cypher  # full population, no scope clause
     assert "scope_values" not in bind
     assert summary.nodes_marked_removed == 1
@@ -193,11 +194,12 @@ def test_loader_without_sweep_label_is_untouched_by_d7() -> None:
 # retention sweep
 # ---------------------------------------------------------------------------
 
+
 def test_sweep_deletes_only_past_retention_and_reports_counts() -> None:
     client = _FakeClient(swept=4, retained=2)
     counts = sweep_removed(client, "SweepJob", older_than_days=30)
 
-    (cypher, bind), = ((c, b) for c, b in client.run_calls if "DETACH DELETE" in c)
+    ((cypher, bind),) = ((c, b) for c, b in client.run_calls if "DETACH DELETE" in c)
     assert "removed_from_source_at < datetime() - duration({days: $days})" in cypher
     assert bind["days"] == 30
     assert counts == {"swept": 4, "retained": 2}

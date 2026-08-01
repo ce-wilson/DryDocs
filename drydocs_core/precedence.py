@@ -13,6 +13,7 @@ Lower ``authority:`` number = higher precedence. If a chain entry omits ``author
 its position in ``order`` is used (top = highest). The ``active:`` map toggles a feed
 off without deleting it.
 """
+
 from __future__ import annotations
 
 from collections.abc import Iterable

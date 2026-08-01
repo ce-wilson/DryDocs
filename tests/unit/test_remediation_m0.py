@@ -7,6 +7,7 @@ resolves to a clean baseline, and the modern-style rewrite DIVERGES under the cu
 resolver (gate 4 — the headline M0 finding; adjudication = ground truth A3 / the
 var.text rule B1, deliberately NOT resolved in code).
 """
+
 from __future__ import annotations
 
 from pathlib import Path

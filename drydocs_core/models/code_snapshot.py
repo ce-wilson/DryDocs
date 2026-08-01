@@ -20,6 +20,7 @@ Gate ``self-documentation-code-graph`` SIGNED OFF 2026-07-27
     for this extension" and the Cypher skips the IS_ENCODED_IN edge.
   * §H4 — ``abs_path`` is DROPPED: it never reaches this model.
 """
+
 from __future__ import annotations
 
 from pydantic import BaseModel, ConfigDict, Field
@@ -45,7 +46,9 @@ class CodeModuleRow(BaseModel):
         min_length=1,
         description="Scan root this file belongs to (one of six) — a PROPERTY per §B1(a).",
     )
-    rel_path: str = Field(..., description="Path relative to the scan root (collides across roots).")
+    rel_path: str = Field(
+        ..., description="Path relative to the scan root (collides across roots)."
+    )
     name: str = Field(..., description="Bare file name (collides 15 ways on '__init__.py').")
     extension: str = Field(..., description="File extension, '.py' for every dependency-mode node.")
     circular: bool = Field(
@@ -73,7 +76,11 @@ class CodeModuleRow(BaseModel):
         description="The single :Project root key (§B1(a)) — 'drydocs' for this repo.",
     )
     captured_at: str = Field(..., description="meta.captured_at ISO timestamp of the snapshot.")
-    git_commit: str = Field(default="", description="meta.git.commit (short) the snapshot describes.")
+    git_commit: str = Field(
+        default="", description="meta.git.commit (short) the snapshot describes."
+    )
     git_full: str = Field(default="", description="meta.git.full — full commit hash.")
     git_branch: str = Field(default="", description="meta.git.branch at capture.")
-    git_dirty: bool = Field(default=False, description="meta.git.dirty — worktree had uncommitted changes.")
+    git_dirty: bool = Field(
+        default=False, description="meta.git.dirty — worktree had uncommitted changes."
+    )

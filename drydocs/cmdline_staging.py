@@ -64,6 +64,7 @@ anything entering Neo4j. The store lives under the G19 data root
 and is deterministic: same graph → same rows (ordered by the node key; no
 wall-clock values stored), mirroring the mapping-store contract.
 """
+
 from __future__ import annotations
 
 import json
@@ -215,11 +216,18 @@ CREATE TABLE IF NOT EXISTS parse_quality (
 #: payload extension → artifact kind (G40 "artifact kind" column). Unmapped
 #: extensions keep the bare extension so nothing is silently lumped.
 _ARTIFACT_KINDS = {
-    ".sh": "shell-script", ".ksh": "shell-script", ".bash": "shell-script",
-    ".py": "python-script", ".pl": "perl-script", ".sql": "sql-script",
+    ".sh": "shell-script",
+    ".ksh": "shell-script",
+    ".bash": "shell-script",
+    ".py": "python-script",
+    ".pl": "perl-script",
+    ".sql": "sql-script",
     ".jar": "java-archive",
-    ".pset": "abinitio-pset", ".m": "abinitio-graph",
-    ".cfg": "config", ".ini": "config", ".json": "config",
+    ".pset": "abinitio-pset",
+    ".m": "abinitio-graph",
+    ".cfg": "config",
+    ".ini": "config",
+    ".json": "config",
 }
 
 
@@ -243,6 +251,7 @@ def _connect(db_path: Path) -> sqlite3.Connection:
 # G39 — export: graph → job_detail
 # ---------------------------------------------------------------------------
 
+
 @dataclass
 class ExportReport:
     """Counts, always reported (the never-silent rule)."""
@@ -253,9 +262,10 @@ class ExportReport:
     by_task_type: dict[str, int] = field(default_factory=dict)
 
     def summary(self) -> str:
-        types = ", ".join(f"{k or '(none)'}={v}"
-                          for k, v in sorted(self.by_task_type.items(),
-                                             key=lambda kv: (kv[0] or "")))
+        types = ", ".join(
+            f"{k or '(none)'}={v}"
+            for k, v in sorted(self.by_task_type.items(), key=lambda kv: (kv[0] or ""))
+        )
         return (
             f"jobs={self.jobs} with_cmd_line={self.with_cmd_line} "
             f"active={self.active} | task_type: {types or '(no rows)'}"
@@ -293,10 +303,16 @@ def export_job_detail(client, db_path: str | Path) -> ExportReport:
                     "folder_name, data_center, task_type, active, cmd_line, "
                     "cmd_line_resolved) "
                     "VALUES (?, ?, ?, ?, ?, ?, ?, ?, NULL)",
-                    (row.get("folder_id"), row.get("job_id"), row.get("job_name"),
-                     row.get("folder_name"), row.get("data_center"), task_type,
-                     None if row.get("active") is None else int(bool(row.get("active"))),
-                     cmd),
+                    (
+                        row.get("folder_id"),
+                        row.get("job_id"),
+                        row.get("job_name"),
+                        row.get("folder_name"),
+                        row.get("data_center"),
+                        task_type,
+                        None if row.get("active") is None else int(bool(row.get("active"))),
+                        cmd,
+                    ),
                 )
                 report.jobs += 1
                 report.with_cmd_line += bool(cmd and str(cmd).strip())
@@ -305,24 +321,25 @@ def export_job_detail(client, db_path: str | Path) -> ExportReport:
                 report.by_task_type[key] = report.by_task_type.get(key, 0) + 1
             conn.executemany(
                 "INSERT INTO meta (key, value) VALUES (?, ?)",
-                sorted({
-                    "schema_version": SCHEMA_VERSION,
-                    "retirement": RETIREMENT_NOTE,
-                    "source": "graph::ControlMJob (loader controlm_jobs; "
-                              "cmd_line verbatim)",
-                    "psgmgr_projection": PSGMGR_PROJECTION_SQL,
-                    "variables": "variable COLUMNS stay OUT OF SCOPE (the "
-                                 "folder/job variables pull is deferred, "
-                                 "G18->G22 plan) — but cmd_line_resolved is "
-                                 "the landing column for resolution: the "
-                                 "G48 resolve-cmdline-staging verb (XML-"
-                                 "staged variables through the ONE shared "
-                                 "resolver) or an internal company-side "
-                                 "%%VAR query. The export itself never "
-                                 "resolves, and re-export clears the column "
-                                 "AND resolution_quality (resolution "
-                                 "re-runs after each export)",
-                }.items()),
+                sorted(
+                    {
+                        "schema_version": SCHEMA_VERSION,
+                        "retirement": RETIREMENT_NOTE,
+                        "source": "graph::ControlMJob (loader controlm_jobs; " "cmd_line verbatim)",
+                        "psgmgr_projection": PSGMGR_PROJECTION_SQL,
+                        "variables": "variable COLUMNS stay OUT OF SCOPE (the "
+                        "folder/job variables pull is deferred, "
+                        "G18->G22 plan) — but cmd_line_resolved is "
+                        "the landing column for resolution: the "
+                        "G48 resolve-cmdline-staging verb (XML-"
+                        "staged variables through the ONE shared "
+                        "resolver) or an internal company-side "
+                        "%%VAR query. The export itself never "
+                        "resolves, and re-export clears the column "
+                        "AND resolution_quality (resolution "
+                        "re-runs after each export)",
+                    }.items()
+                ),
             )
     finally:
         conn.close()
@@ -333,28 +350,37 @@ def export_job_detail(client, db_path: str | Path) -> ExportReport:
 # G48 — resolve: XML-staged variables → job_detail.cmd_line_resolved
 # ---------------------------------------------------------------------------
 
+
 @dataclass
 class ResolveCoverage:
     """The resolve run's accounting — every job lands in a verdict bucket,
     every join anomaly is counted, never silent."""
 
     jobs: int = 0
-    resolved: int = 0               # column populated, no user refs left
-    residue: int = 0                # substitutions ran but %%refs remain visible
+    resolved: int = 0  # column populated, no user refs left
+    residue: int = 0  # substitutions ran but %%refs remain visible
     nothing_to_substitute: int = 0  # matched, but the cmd_line had nothing to do
-    no_xml_match: int = 0           # no XML job at the join key
-    ambiguous_match: int = 0        # >1 XML job at the key (subfolder twins) — skipped
+    no_xml_match: int = 0  # no XML job at the join key
+    ambiguous_match: int = 0  # >1 XML job at the key (subfolder twins) — skipped
     no_cmd_line: int = 0
-    no_folder_name: int = 0         # store row without the join key (pre-v3 graph load)
-    dc_fallback_matches: int = 0    # store data_center empty — matched on (folder, job)
-    cmd_line_mismatch: int = 0      # XML CMDLINE != store cmd_line — precedence EVIDENCE, counted not ruled
-    substitutions: int = 0          # total variable names substituted
+    no_folder_name: int = 0  # store row without the join key (pre-v3 graph load)
+    dc_fallback_matches: int = 0  # store data_center empty — matched on (folder, job)
+    cmd_line_mismatch: int = (
+        0  # XML CMDLINE != store cmd_line — precedence EVIDENCE, counted not ruled
+    )
+    substitutions: int = 0  # total variable names substituted
     xml_jobs: int = 0
 
     @property
     def total(self) -> int:
-        return (self.resolved + self.residue + self.nothing_to_substitute
-                + self.no_xml_match + self.ambiguous_match + self.no_cmd_line)
+        return (
+            self.resolved
+            + self.residue
+            + self.nothing_to_substitute
+            + self.no_xml_match
+            + self.ambiguous_match
+            + self.no_cmd_line
+        )
 
     def summary(self) -> str:
         return (
@@ -402,9 +428,7 @@ def resolve_job_detail(
     conn = _connect(db_path)
     coverage = ResolveCoverage()
     try:
-        stored = conn.execute(
-            "SELECT value FROM meta WHERE key = 'schema_version'"
-        ).fetchone()
+        stored = conn.execute("SELECT value FROM meta WHERE key = 'schema_version'").fetchone()
         if stored is None or stored[0] != SCHEMA_VERSION:
             raise CmdlineStagingError(
                 f"{db_path}: not a {SCHEMA_VERSION} store "
@@ -416,8 +440,7 @@ def resolve_job_detail(
         loose: dict[tuple[str, str], list] = {}
         for xj in xml_extract.jobs:
             coverage.xml_jobs += 1
-            exact.setdefault(
-                (xj.data_center, xj.folder_name, xj.job_name), []).append(xj)
+            exact.setdefault((xj.data_center, xj.folder_name, xj.job_name), []).append(xj)
             loose.setdefault((xj.folder_name, xj.job_name), []).append(xj)
 
         rows = conn.execute(
@@ -440,8 +463,7 @@ def resolve_job_detail(
                     _resolution(conn, self_key, "no_xml_match", source_name, None)
                     continue
                 store_job = str(job_name) if job_name is not None else ""
-                candidates = exact.get(
-                    (str(data_center or ""), str(folder_name), store_job))
+                candidates = exact.get((str(data_center or ""), str(folder_name), store_job))
                 matched_via = "exact"
                 if candidates is None and not str(data_center or "").strip():
                     candidates = loose.get((str(folder_name), store_job))
@@ -452,8 +474,7 @@ def resolve_job_detail(
                     continue
                 if len(candidates) > 1:
                     coverage.ambiguous_match += 1
-                    _resolution(conn, self_key, "ambiguous_match", source_name,
-                                matched_via)
+                    _resolution(conn, self_key, "ambiguous_match", source_name, matched_via)
                     continue
                 if matched_via == "dc_fallback":
                     coverage.dc_fallback_matches += 1
@@ -463,7 +484,10 @@ def resolve_job_detail(
                     LOGGER.warning(
                         "job %s.%s: XML CMDLINE differs from the store's "
                         "verbatim cmd_line — counted as precedence evidence, "
-                        "store text resolved", folder_id, job_id)
+                        "store text resolved",
+                        folder_id,
+                        job_id,
+                    )
 
                 rcl = resolve_command_line(xml_extract.scope_layers(xj), str(cmd))
                 coverage.substitutions += len(rcl.substituted)
@@ -483,12 +507,19 @@ def resolve_job_detail(
                 elif verdict == "residue":
                     coverage.residue += 1
                     LOGGER.warning(
-                        "job %s.%s: unresolved residue after XML resolution: "
-                        "%s", folder_id, job_id, ", ".join(rcl.unresolved))
+                        "job %s.%s: unresolved residue after XML resolution: " "%s",
+                        folder_id,
+                        job_id,
+                        ", ".join(rcl.unresolved),
+                    )
                 else:
                     coverage.nothing_to_substitute += 1
                 _resolution(
-                    conn, self_key, verdict, source_name, matched_via,
+                    conn,
+                    self_key,
+                    verdict,
+                    source_name,
+                    matched_via,
                     substituted=list(rcl.substituted),
                     unresolved=list(rcl.unresolved),
                     tokens=list(rcl.canonical_tokens),
@@ -498,22 +529,30 @@ def resolve_job_detail(
     return coverage
 
 
-def _resolution(conn, key, verdict, source, matched_via, *,
-                substituted=None, unresolved=None, tokens=None) -> None:
+def _resolution(
+    conn, key, verdict, source, matched_via, *, substituted=None, unresolved=None, tokens=None
+) -> None:
     conn.execute(
         "INSERT INTO resolution_quality (folder_id, job_id, verdict, "
         "resolution_source, matched_via, substituted_json, unresolved_json, "
         "canonical_tokens_json) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
-        (key[0], key[1], verdict, source, matched_via,
-         json.dumps(substituted) if substituted else None,
-         json.dumps(unresolved) if unresolved else None,
-         json.dumps(tokens) if tokens else None),
+        (
+            key[0],
+            key[1],
+            verdict,
+            source,
+            matched_via,
+            json.dumps(substituted) if substituted else None,
+            json.dumps(unresolved) if unresolved else None,
+            json.dumps(tokens) if tokens else None,
+        ),
     )
 
 
 # ---------------------------------------------------------------------------
 # G40 — parse: job_detail.cmd_line → job_detail_parsed + parse_quality
 # ---------------------------------------------------------------------------
+
 
 @dataclass
 class ParseCoverage:
@@ -525,7 +564,7 @@ class ParseCoverage:
     no_cmd_line: int = 0
     invocations: int = 0
     file_ops: int = 0
-    from_resolved: int = 0   # jobs parsed from cmd_line_resolved (not raw)
+    from_resolved: int = 0  # jobs parsed from cmd_line_resolved (not raw)
 
     @property
     def total(self) -> int:
@@ -573,9 +612,7 @@ def parse_job_detail(db_path: str | Path) -> ParseCoverage:
     conn = _connect(db_path)
     coverage = ParseCoverage()
     try:
-        stored = conn.execute(
-            "SELECT value FROM meta WHERE key = 'schema_version'"
-        ).fetchone()
+        stored = conn.execute("SELECT value FROM meta WHERE key = 'schema_version'").fetchone()
         if stored is None or stored[0] != SCHEMA_VERSION:
             raise CmdlineStagingError(
                 f"{db_path}: not a {SCHEMA_VERSION} store "
@@ -619,15 +656,22 @@ def _parse_one(conn, folder_id, job_id, cmd, resolved, coverage: ParseCoverage) 
             "script_path, config_path, artifact_kind, pipeline_guid, "
             "props_json, args_json, raw_command) "
             "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
-            (folder_id, job_id, seq,
-             inv.invocation_type, inv.classifier_rule,
-             inv.executable_path, launch_mode,
-             inv.script_path, inv.config_path,
-             _artifact_kind(inv.script_path),
-             pipeline_guid(inv.args),
-             json.dumps(props, sort_keys=True) if props else None,
-             json.dumps(list(inv.args)) if inv.args else None,
-             inv.raw_command),
+            (
+                folder_id,
+                job_id,
+                seq,
+                inv.invocation_type,
+                inv.classifier_rule,
+                inv.executable_path,
+                launch_mode,
+                inv.script_path,
+                inv.config_path,
+                _artifact_kind(inv.script_path),
+                pipeline_guid(inv.args),
+                json.dumps(props, sort_keys=True) if props else None,
+                json.dumps(list(inv.args)) if inv.args else None,
+                inv.raw_command,
+            ),
         )
         unknown += inv.invocation_type == "UNKNOWN"
 
@@ -640,23 +684,29 @@ def _parse_one(conn, folder_id, job_id, cmd, resolved, coverage: ParseCoverage) 
     if n_inv == 0 and n_fop == 0:
         verdict = "unparsed"
         coverage.unparsed += 1
-        LOGGER.warning("%s: cmd_line (%s) yielded no invocation and no file "
-                       "op (unparsed): %.120s", where, parsed_from, text)
+        LOGGER.warning(
+            "%s: cmd_line (%s) yielded no invocation and no file " "op (unparsed): %.120s",
+            where,
+            parsed_from,
+            text,
+        )
     elif unknown or n_unparsed:
         verdict = "partial"
         coverage.partial += 1
-        LOGGER.warning("%s: partial parse (%s) — %d UNKNOWN invocation(s), "
-                       "%d unparsed statement(s)", where, parsed_from,
-                       unknown, n_unparsed)
+        LOGGER.warning(
+            "%s: partial parse (%s) — %d UNKNOWN invocation(s), " "%d unparsed statement(s)",
+            where,
+            parsed_from,
+            unknown,
+            n_unparsed,
+        )
     else:
         verdict = "parsed"
         coverage.parsed += 1
-    _quality(conn, folder_id, job_id, verdict, parsed_from,
-             n_inv, n_fop, unknown, n_unparsed)
+    _quality(conn, folder_id, job_id, verdict, parsed_from, n_inv, n_fop, unknown, n_unparsed)
 
 
-def _quality(conn, folder_id, job_id, verdict, parsed_from,
-             inv, fop, unknown, unparsed) -> None:
+def _quality(conn, folder_id, job_id, verdict, parsed_from, inv, fop, unknown, unparsed) -> None:
     conn.execute(
         "INSERT INTO parse_quality (folder_id, job_id, verdict, parsed_from, "
         "invocations, file_ops, unknown_invocations, unparsed_statements) "

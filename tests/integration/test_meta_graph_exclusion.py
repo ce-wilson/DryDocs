@@ -7,6 +7,7 @@ Opt-in and Docker-gated exactly like test_e2e_load (J9 harness): marked
 bundled samples and no bootstrap — the whole point is a database holding
 ONLY the schema exemplars.
 """
+
 from __future__ import annotations
 
 import shutil
@@ -28,12 +29,7 @@ def _docker_available() -> bool:
     if shutil.which("docker") is None:
         return False
     try:
-        return (
-            subprocess.run(
-                ["docker", "info"], capture_output=True, timeout=30
-            ).returncode
-            == 0
-        )
+        return subprocess.run(["docker", "info"], capture_output=True, timeout=30).returncode == 0
     except (OSError, subprocess.TimeoutExpired):
         return False
 
@@ -128,6 +124,4 @@ def test_runs_on_resolution_refuses_the_exemplar_bait(meta_only_client) -> None:
         )
         assert rows[0]["edges"] == 0, "resolution edged the bait job to an exemplar"
     finally:
-        meta_only_client.run(
-            "MATCH (j:ControlMJob {folder_id: 'F-EXEMPLAR-BAIT'}) DETACH DELETE j"
-        )
+        meta_only_client.run("MATCH (j:ControlMJob {folder_id: 'F-EXEMPLAR-BAIT'}) DETACH DELETE j")

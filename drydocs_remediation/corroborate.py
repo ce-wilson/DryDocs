@@ -13,6 +13,7 @@ mechanism enforces it rather than promising it —
   schema-specific corroboration queries are written company-side against the live graph
   (Track 2) — through this wrapper, so the read-only property survives them.
 """
+
 from __future__ import annotations
 
 import re

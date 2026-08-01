@@ -3,6 +3,7 @@
 Unit tests exercise each block/inline construct on tiny fixtures; the final tests render the
 REAL Control-M TDD and assert the anchors survive as element ids with no comment leakage.
 """
+
 from __future__ import annotations
 
 from pathlib import Path
@@ -132,7 +133,10 @@ def test_fb_bar_carries_prewritten_feedback_file_and_path() -> None:
 
 
 def test_feedback_yaml_format() -> None:
-    out = feedback_yaml("controlm-ingestion-tdd", {"traceability-matrix": "row FR-CMI-003 is wrong\ncheck stage 1", "hitl-gate": ""})
+    out = feedback_yaml(
+        "controlm-ingestion-tdd",
+        {"traceability-matrix": "row FR-CMI-003 is wrong\ncheck stage 1", "hitl-gate": ""},
+    )
     assert out == (
         "# design-doc feedback — paste into docs/design/feedback/controlm-ingestion-tdd-rev<N>.yaml\n"
         "doc: controlm-ingestion-tdd\n"
@@ -169,7 +173,10 @@ def test_margin_anchor_tag_in_gutter_hidden_on_screen() -> None:
     # L13: the tag ships in the one html; base CSS hides it, @media print positions it.
     md = "# Doc\n\n<!-- anchor: purpose-scope -->\n## Purpose\ntext"
     html = render_doc(md)
-    assert '<h2 id="purpose-scope"><span class="dd-margin-tag" aria-hidden="true">purpose-scope</span>Purpose</h2>' in html
+    assert (
+        '<h2 id="purpose-scope"><span class="dd-margin-tag" aria-hidden="true">purpose-scope</span>Purpose</h2>'
+        in html
+    )
     assert ".dd-margin-tag, .dd-print-footer { display: none; }" in html  # screen default
     assert "@media print" in html  # the print block re-shows + positions the gutter tag
 
@@ -218,7 +225,7 @@ def test_sme_feedback_panel_with_exact_filename() -> None:
     assert "SME - Feedback" in html
     assert "<code>docs/design/feedback/</code>" in html
     assert "<code>mydoc-rev7.yaml</code>" in html  # exact per-doc filename, Rev baked in
-    assert "not</em> markdown" in html             # the "is it markdown?" answer
+    assert "not</em> markdown" in html  # the "is it markdown?" answer
     # print-hidden, not print-absent (L13 one-surface): the hide list covers the panel
     assert ".dd-sme-feedback, .dd-sme-divider { display:none !important; }" in html
 
@@ -294,8 +301,8 @@ def test_anchored_subheading_counts_toward_threshold_but_keeps_its_id() -> None:
         "<!-- anchor: sec-own -->\n### Owned\ntext\n\n### Plain a\ntext\n\n### Plain b\ntext"
     )
     html = render_doc(md, doc_id="d")
-    assert '<h3 id="sec-own">' in html           # authored id untouched
-    assert '<h3 id="sec--plain-a">' in html      # 3 subsections total → derive the rest
+    assert '<h3 id="sec-own">' in html  # authored id untouched
+    assert '<h3 id="sec--plain-a">' in html  # 3 subsections total → derive the rest
     assert '<h3 id="sec--plain-b">' in html
 
 
@@ -307,5 +314,7 @@ def test_anchored_list_gets_gutter_tag_and_derived_li_ids() -> None:
         "1. Pull the repo\n2. Start the container\n3. Run the loaders\n"
     )
     html = render_doc(md, doc_id="d")
-    assert '<ol id="run-order"><span class="dd-margin-tag" aria-hidden="true">run-order</span>' in html
+    assert (
+        '<ol id="run-order"><span class="dd-margin-tag" aria-hidden="true">run-order</span>' in html
+    )
     assert '<li id="run-order--start-the-container">' in html
