@@ -182,10 +182,13 @@ def test_directory_evidence_actually_holds() -> None:
 
 
 def test_unbound_components_are_counted_not_hidden() -> None:
-    """36 shell/primitive/shared components carry no module ON PURPOSE.
+    """37 shell/primitive/shared components carry no module ON PURPOSE.
 
     Pinned so the split stays visible: if it moves, someone either bound more
     (good — update the pin) or added components without thinking about it.
+    62 -> 63 at O28: StatusItems (with HealthGlyph) is deliberately UNBOUND —
+    it renders the node-status envelope for the Explorer inspector AND the
+    landing hub's spokes, so binding it to either module would misstate it.
     Assigning the rest properly means reading imports, which is O42's TS
     resolver, not a naming heuristic.
     """
@@ -193,5 +196,5 @@ def test_unbound_components_are_counted_not_hidden() -> None:
     bound = [c for c in comps if c.get("module")]
     assert (len(bound), len(comps)) == (
         26,
-        62,
+        63,
     ), f"module-binding coverage changed: {len(bound)}/{len(comps)} bound"

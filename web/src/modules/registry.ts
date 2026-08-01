@@ -152,7 +152,7 @@ export const MODULES: readonly ModuleDef[] = [
     path: '/loads',
     tagline: 'Loader → JobRun timeline',
     backsOnto: "BaseLoader :JobRuns",
-    tabs: ['Runs', 'Rejects', 'Drift/coverage'],
+    tabs: ['Runs', 'Rejects', 'Drift/coverage', 'Status'],
     phase: 2,
   },
   {

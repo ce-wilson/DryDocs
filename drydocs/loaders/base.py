@@ -25,7 +25,7 @@ import hashlib
 import json
 import logging
 import uuid
-from dataclasses import dataclass, field
+from dataclasses import dataclass, field, replace
 from datetime import UTC, datetime
 from pathlib import Path
 from typing import TYPE_CHECKING, Any, ClassVar
@@ -124,6 +124,66 @@ class LoadSummary:
             "nodes_reactivated": self.nodes_reactivated,
             "status": self.status,
         }
+
+
+# ── O28 node-status envelope ─────────────────────────────────────────────────
+# One shape for every producer, forever: {type, level, message, error?}. New
+# sources add NAMESPACED TYPES, never new shapes — see
+# knowledge/standards/node-status-envelope.md. `type` is namespaced
+# `<source>/<slug>` so the UI can render an unknown type without a code change
+# and nobody has to arbitrate a global type vocabulary.
+STATUS_SOURCE = "drydocs.loader"
+STATUS_LEVELS = ("info", "warning", "error")
+
+
+def status_items_for(summary: LoadSummary) -> list[dict]:
+    """DERIVE the status envelope for a finished run. Never hand-authored.
+
+    A clean run returns ``[]`` deliberately: "no items" means healthy, and the
+    absence of a :JobRun (not an empty list) is what means "never ran". Emitting
+    an all-clear item would make those two states look the same in the grid.
+    """
+    items: list[dict] = []
+    if summary.status not in ("OK", "STARTED"):
+        items.append(
+            {
+                "type": f"{STATUS_SOURCE}/run-failed",
+                "level": "error",
+                "message": f"load run finished {summary.status}",
+            }
+        )
+    if summary.rows_rejected:
+        item = {
+            "type": f"{STATUS_SOURCE}/rows-rejected",
+            "level": "warning",
+            "message": (
+                f"{summary.rows_rejected} of "
+                f"{summary.rows_processed + summary.rows_rejected} rows failed validation"
+            ),
+        }
+        # `error` is the optional detail slot. First reject only: the envelope is
+        # a health signal, not a log — the full stream is in the run log file.
+        if summary.rejects:
+            first = summary.rejects[0]
+            item["error"] = f"row {first.get('row_index')}: {first.get('errors')}"
+        items.append(item)
+    if summary.nodes_marked_removed:
+        items.append(
+            {
+                "type": f"{STATUS_SOURCE}/removed-from-source",
+                "level": "warning",
+                "message": f"{summary.nodes_marked_removed} nodes no longer present in source",
+            }
+        )
+    if summary.nodes_reactivated:
+        items.append(
+            {
+                "type": f"{STATUS_SOURCE}/reactivated",
+                "level": "info",
+                "message": f"{summary.nodes_reactivated} previously-removed nodes returned",
+            }
+        )
+    return items
 
 
 class BaseLoader:
@@ -445,7 +505,8 @@ class BaseLoader:
                 run.rows_rejected        = $rows_rejected,
                 run.rows_changed         = rows_changed,
                 run.nodes_marked_removed = $nodes_marked_removed,
-                run.nodes_reactivated    = $nodes_reactivated
+                run.nodes_reactivated    = $nodes_reactivated,
+                run.status_items         = $status_items
             RETURN rows_changed
             """,
             run_id=self.run_id,
@@ -454,6 +515,24 @@ class BaseLoader:
             rows_rejected=summary.rows_rejected,
             nodes_marked_removed=summary.nodes_marked_removed,
             nodes_reactivated=summary.nodes_reactivated,
+            # O28: the envelope rides as a list of JSON strings on the :JobRun.
+            # A property, NOT a new node + relationship, and that is a deliberate
+            # choice: a relationship type is an ontology decision that goes
+            # through the HITL gate (CLAUDE.md §1), and a derived health signal
+            # carries no ontological meaning to gate. Neo4j cannot store maps in
+            # a list property, hence JSON strings — the consumer parses one
+            # stable shape. Status is derived from the summary here, at the one
+            # place that knows the whole run.
+            status_items=[
+                json.dumps(item, sort_keys=True)
+                for item in status_items_for(
+                    replace(
+                        summary,
+                        status=status,
+                        rows_processed=summary.rows_processed,
+                    )
+                )
+            ],
         )
         if result:
             summary.rows_changed = result[0].get("rows_changed", 0)

@@ -1,7 +1,10 @@
-import { useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import type { Persona } from '../lib/auth'
 import { canDrill } from '../lib/views'
+import { createApiAccess } from '../lib/graphApi'
+import { parseStatusItems, type StatusItem } from '../lib/status'
+import { HealthGlyph } from '../components/ui/StatusItems'
 import { MODULES } from '../modules/registry'
 import { TOWERS } from '../data/towers'
 import ModuleIcon from '../components/ModuleIcon'
@@ -18,6 +21,32 @@ import BrandMark from '../components/BrandMark'
 // Explorer drill-down per persona). data-wf attributes keep the wireframe
 // keys attached to the DOM for the L5/L6 feedback loop.
 export default function OverviewRoute({ persona }: { persona: Persona }) {
+  // O28 spoke health glyphs. The envelope is the contract, so a spoke lights up
+  // as soon as SOME producer reports on it — today that is the loader stream
+  // behind /loads. Every other spoke renders UNKNOWN rather than healthy, which
+  // is the distinction the contract exists to preserve: a green tick for a
+  // module nothing observes is how a dashboard ends up green because nothing is
+  // watching. As producers land, they light their own spokes with no change here.
+  const [loadHealth, setLoadHealth] = useState<StatusItem[] | null>(null)
+  const apiUrl = (import.meta.env.VITE_API_URL as string | undefined) ?? 'http://localhost:8001'
+  const access = useMemo(() => createApiAccess(apiUrl, persona.id), [apiUrl, persona.id])
+
+  useEffect(() => {
+    let cancelled = false
+    access
+      .runSpec('loads.status-items.v1')
+      .then((r) => {
+        if (!cancelled) setLoadHealth(parseStatusItems(r.rows.map((row) => row.status_item)))
+      })
+      // No API (or no runs yet) leaves the spoke UNKNOWN — never a false green.
+      .catch(() => {
+        if (!cancelled) setLoadHealth(null)
+      })
+    return () => {
+      cancelled = true
+    }
+  }, [access])
+
   return (
     <div className="flex h-full min-h-0 flex-col">
       <ModuleToolbar crumbs={[{ label: 'Home' }]} />
@@ -72,7 +101,13 @@ export default function OverviewRoute({ persona }: { persona: Persona }) {
                         <ModuleIcon id={m.id} className="h-4 w-4" />
                       </span>
                       <span className="min-w-0">
-                        <span className="block text-[13px] font-semibold text-text">{m.label}</span>
+                        <span className="flex items-center gap-1.5 text-[13px] font-semibold text-text">
+                          <HealthGlyph
+                            items={m.id === 'loads' ? (loadHealth ?? []) : []}
+                            unknown={m.id !== 'loads' || loadHealth === null}
+                          />
+                          {m.label}
+                        </span>
                         <span className="block truncate text-[11px] text-faint">{m.tagline}</span>
                       </span>
                       <span className="ml-auto rounded border border-edge-soft px-1 py-0.5 font-mono text-[9px] text-faint">

@@ -571,6 +571,37 @@ QUERY_SPECS: dict[str, QuerySpec] = {
             classification="internal",
             params=_LIMIT,
         ),
+        QuerySpec(
+            id="loads.status-items.v1",
+            database="drydocs",
+            description=(
+                "O28 node-status envelope: the per-source status items a producing "
+                "system DERIVED for each load run, newest first. One row per item "
+                "({type, level, message, error?} — see "
+                "knowledge/standards/node-status-envelope.md). The item rides as a "
+                "JSON string because Neo4j cannot hold a map inside a list property; "
+                "the consumer parses ONE stable shape. A run with no items is "
+                "healthy — 'never ran' is the ABSENCE of a :JobRun, which is why no "
+                "all-clear item is emitted and the two states stay distinguishable."
+            ),
+            cypher=(
+                "MATCH (r:JobRun) WHERE NOT r:SchemaMeta AND r.kind = 'load' "
+                "AND r.status_items IS NOT NULL AND size(r.status_items) > 0 "
+                "UNWIND r.status_items AS status_item "
+                "RETURN r.run_id AS run_id, r.loader AS loader, r.source AS source, "
+                "toString(r.started_at) AS started_at, status_item "
+                "ORDER BY started_at DESC, run_id LIMIT $limit"
+            ),
+            columns=(
+                ColumnDef("run_id", "string", "Run id"),
+                ColumnDef("loader", "string", "Loader"),
+                ColumnDef("source", "string", "Source"),
+                ColumnDef("started_at", "string", "Started"),
+                ColumnDef("status_item", "string", "Status item (JSON)"),
+            ),
+            classification="internal",
+            params=_LIMIT,
+        ),
         # O10 lineage frames — target `drydocs`, where the curated writer lands
         # (G30 ruling 2026-07-26; ADR 0002 "Residency clarification"). They were
         # pointed at `ddlineage`, which is provisioned but written by nothing, so

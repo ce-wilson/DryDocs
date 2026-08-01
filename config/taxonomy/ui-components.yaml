@@ -105,12 +105,13 @@ components:
   - { id: ExplorerRoute,           area: route,        path: routes/explorer/ExplorerRoute.tsx,           module: explorer,   module_evidence: route-name }
   - { id: ExplorerTowerRoute,      area: route,        path: routes/explorer/ExplorerTowerRoute.tsx,      module: explorer,   module_evidence: route-dir }
 
-  # --- ui-primitive (6) ---
+  # --- ui-primitive (7) ---
   - { id: EmptyState,              area: ui-primitive, path: components/ui/EmptyState.tsx }
   - { id: IdChip,                  area: ui-primitive, path: components/ui/IdChip.tsx }
   - { id: Meter,                   area: ui-primitive, path: components/ui/Meter.tsx }
   - { id: ResizableSplit,          area: ui-primitive, path: components/ui/ResizableSplit.tsx }
   - { id: StatusChip,              area: ui-primitive, path: components/ui/StatusChip.tsx }
+  - { id: StatusItems,             area: ui-primitive, path: components/ui/StatusItems.tsx }   # O28 node-status envelope (also exports HealthGlyph)
   - { id: Tabs,                    area: ui-primitive, path: components/ui/Tabs.tsx }
 
   # --- component (14) ---

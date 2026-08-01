@@ -4,6 +4,8 @@ import { canDrill } from '../lib/views'
 import { TOWERS } from '../data/towers'
 import { connectionsOf, KIND_TOKEN, type NodeKind, type Selection } from './demoGraph'
 import IdChip, { StageBadge } from '../components/ui/IdChip'
+import StatusItems from '../components/ui/StatusItems'
+import { statusItemsForDemoNode } from './demoStatus'
 
 // The right-sidebar node inspector (O9, wf-module-subpage-01 annotation 2):
 // content variant keyed by node type. Fed into the shell's RightSidebarSlot by
@@ -81,6 +83,14 @@ export default function NodeInspector({ selection, persona, onSelect }: {
         <dt className="text-faint">Provenance</dt>
         <dd className="font-mono text-[10px] text-yellow">SYNTHESIZED · illustrative</dd>
       </dl>
+
+      {/* O28 node-status envelope. Same StatusItem[] contract the live
+          loads.status-items.v1 frame renders; these are demo-derived, like
+          every other value on this panel. */}
+      <StatusItems
+        items={statusItemsForDemoNode(selection)}
+        emptyNote="No producer has reported an issue for this node."
+      />
 
       {connections.length > 0 && (
         <div>

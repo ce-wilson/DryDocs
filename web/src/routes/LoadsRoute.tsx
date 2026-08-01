@@ -90,6 +90,10 @@ export default function LoadsRoute({ persona }: { persona: Persona }) {
         Runs: <SpecGrid access={access} specId="loads.runs.v1" fallback={fallbackNote} />,
         Rejects: <SpecGrid access={access} specId="loads.rejects.v1" fallback={fallbackNote} />,
         'Drift/coverage': <SpecGrid access={access} specId="loads.drift-coverage.v1" fallback={fallbackNote} />,
+        // O28: the node-status envelope, live end-to-end — BaseLoader derives
+        // the items, they ride on the :JobRun, and this frame is the same spec
+        // the inspector and hub glyphs consume.
+        Status: <SpecGrid access={access} specId="loads.status-items.v1" fallback={fallbackNote} />,
       }}
     />
   )
