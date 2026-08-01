@@ -26,8 +26,32 @@ Tags help grooming: `idea` · `bug` · `doc` · `source` (new data source) · `q
 
 <!-- add new ideas at the top -->
 
+- 2026-08-01 — [source] **Company catalog-loader review (screenshots, same day as C17) — three
+  back-flow candidates and one confirmation.** CONFIRMS C17 §a from the other side: the company's
+  `product_lines.cypher` takes `product_line_id` + `parent_lob_id` + `parent_sub_lob_id` and keys
+  on ids throughout, i.e. the id-carrying extract the ruling assumed is not hypothetical — it is
+  what they load. NEW producer-side gaps, none of which exist here: (a) `pat_app_links.cypher` —
+  the product-scoped Product→BusinessApplication loader C9 §c said `catalog_has_application` was
+  waiting for, complete with STUB GOVERNANCE worth copying (`is_stub: true`, `source: 'pat-stub'`,
+  placeholder attrs filled ONLY while stub, cleared once the real SEAL load lands); (b)
+  `pat_product_owners.cypher` — `:Product` ownership enrichment (`product_owner_*`,
+  `tech_partner_*`, sids as join keys for a later employee-hierarchy load), MATCH-only so it never
+  mints products; (c) `products.cypher` step-2a supplement fields (`description`, `alias`,
+  `product_orientation`, `references[]`), each coalesced so a sparse refresh cannot blank an
+  enrichment. Also a straight producer BUG the comparison exposed: our `product_lines.cypher` and
+  `area_products.cypher` do `SET name = row.name` unconditionally, so a sparse refresh BLANKS the
+  name — the company's `coalesce(row.name, p.name)` is the right idiom and we should adopt it
+  (their `product_lines` has our bug, their `products` does not; the inconsistency is theirs,
+  the bug is ours in both). Company-side findings recorded as tracker T20 in `docs/port-prompt.md`.
+
 - 2026-08-01 — [question] **We model no Sub-LoB, and the SME fact that closed C17 says it is a
-  real grain with its own numeric id.** The catalog hierarchy runs
+  real grain with its own numeric id. CONFIRMED BUILT company-side the same day** — their
+  `product_lines.cypher` carries `parent_sub_lob_id` and anchors the line under
+  `MERGE (sl:SubLOB {sub_lob_id: …})` when it is populated, falling back to `:LOB {lob_id}`
+  otherwise, both via `HAS_PRODUCT_LINE`. So this is no longer "should we model it" but "adopt
+  which shape" — and the label ruling (`:LOB` vs our `:CatalogLOB`) has to be settled in the same
+  pass, since their fallback branch and our `catalog_lobs.cypher` write DIFFERENT labels for the
+  same thing. Original note follows. The catalog hierarchy runs
   `BusinessSegment → CatalogLOB → ProductLine → Product → AreaProduct`; the source runs
   `LoB → Sub-LoB → Product Line → …`, so our chain silently flattens one level. Corroborated
   three ways: the SME statement (2026-08-01), the FCDO capture's "5-level hierarchy … native
