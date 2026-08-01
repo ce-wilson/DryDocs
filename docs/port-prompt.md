@@ -1,29 +1,30 @@
 # Port prompt — producer → company (rolling)
 
-**Format (v2 rolling, 2026-07-21):** this prompt carries only (1) the durable
-guardrails and (2) the step ledger SINCE the last completed port. The full historical
-steps 1–42 (everything through producer head `6fd3270`) are frozen in
-[`port-prompt-archive-steps-1-42.md`](port-prompt-archive-steps-1-42.md) — any external
-reference to "port-prompt step N" for N ≤ 42 resolves there; numbering continues here
-at 43. When a port completes company-side: update **Last completed port**, fold any new
-standing divergences into the ledger, and collapse the applied steps into a one-line
-entry under **Last completed port** (pointer to the PORT-REPORT). The steps-1-42
-archive is FROZEN — applied steps ≥43 are summarized here, never appended there; their
-full text survives in git history and the company PORT-REPORT.
+**Format (v3 rolling, 2026-07-31).** This prompt carries ONLY (1) the durable
+guardrails and (2) the step ledger since the last completed port. Steps 1–42 are frozen
+in `port-prompt-archive-steps-1-42.md` (guardrail 1 has the path); numbering continues
+here at 43. On completion company-side: update **Last completed port**, fold new standing
+divergences into the ledger, and collapse the applied steps to ONE LINE each. The archive
+is FROZEN — applied steps ≥43 are never appended there; their full text lives in git
+history and the company PORT-REPORT.
 
-**Extended 2026-07-31:** step 51 APPENDED — nothing collapsed, because step 50 has not
-been applied company-side yet. The live ledger is now steps **50 and 51 together**; a
-port takes both. Step 51 is the larger of the two and carries the registry schema v2
-landing, so read 51(b) before planning the range.
+**LENGTH DISCIPLINE (v3 rule, and the reason for it).** This file regrew to 567 lines by
+step 51 because each roll added prose that the next roll never removed. A prompt nobody
+finishes reading is not a control document. So:
+- a step-ledger sub-stream gets **≤ 8 lines**: what changed, its verification tag, and
+  the ONE caution that would cost you a rework. Everything else belongs in the commit
+  message, which is one `git show` away;
+- a tracker row gets **one sentence plus a pointer**, never a paragraph;
+- a roll REPLACES the previous roll note; it does not stack another one;
+- if a section can only be understood by reading it twice, cut it rather than expand it.
 
-**Rolled 2026-07-30:** step 49 collapsed (applied in PORT-REPORT-e60822fc — WITH the
-N3–N6 load-map deferral, now tracker **T19**); the live ledger was step 50 only. Steps
-keep the verification-status tags introduced at step 49 — `[SME-SIGNED]`,
-`[LIVE-VERIFIED]`, `[TEST-PINNED]`, `[STAGING-ONLY]`, `[RECORD-CORRECTION]`,
-`[UNRULED]` — so the company review can spend its attention on what is genuinely open
-instead of re-deriving what is already proven. Anything not tagged confirmed is NOT
-confirmed; treat contracts as ASSUMED until your side validates them (the T10/T13
-discipline).
+**Roll state.** Steps 50 + 51 are BOTH live (50 was authored 2026-07-30, 51 appended
+2026-07-31; neither had been applied company-side when 51 was written, so nothing was
+collapsed). A port takes both — read 51(b) first, it carries the registry schema v2
+landing. Steps keep the verification tags introduced at step 49 — `[SME-SIGNED]`,
+`[LIVE-VERIFIED]`, `[TEST-PINNED]`, `[STAGING-ONLY]`, `[RECORD-CORRECTION]`, `[UNRULED]`
+— so review effort goes to what is genuinely open. Anything untagged is NOT confirmed:
+treat contracts as ASSUMED until your side validates them (the T10/T13 discipline).
 
 Authorities are unchanged: [`PORT-MANIFEST.yaml`](../PORT-MANIFEST.yaml) is the WHAT
 (per-path disposition, first-matching-glob-row wins); [`git-readme.md`](../git-readme.md)
@@ -51,18 +52,11 @@ is the WHY + the acceptance oracle; this prompt is sequencing + delta context on
   enacted producer-side (`0c629e4`, `855b09d`, `f6b9ca0`) and applied company-side
   as step 49a. `config/dev-environment.yaml` remains canonical-company on both
   manifests — do not re-decide. Owed action 48e remains tracker **T18**.
-- **Applied steps, collapsed** (full text: git history + the PORT-REPORTs;
-  steps 43–48 summaries retired to PORT-REPORT-94132c80 at this roll):
-  - 43–48 — one line each in PORT-REPORT-94132c80 (C12 platforms taxonomy; UI
-    acceleration; lineage/rua/DPL + Epic R; S3 identity gate + boundary hardening;
-    G33 code-graph + J16 manifest overhaul + G39/G40 + Epic P; DataLens UI +
-    U7/U8 + D8 + depgraph fork consolidation).
-  - 49 — back-flow enactments (49a) + dev-infra plugins fix (49b) + G22 prep (49c)
-    + AIS refusal pack (49d) + G45/C20/J20/R10 (49e) + G42 Snowflake catalog seam
-    (49f) + G46–G48 XML-fed cmdline chain (49g, precedence question still UNRULED)
-    + UI sweep O35–O41 / FB-01..FB-04 (49h) + cmdline runbook Rev 1 (49i) + grooms
-    incl. Epic V (49j). N3–N5 arrived built inside the range; company deferred
-    them (T19, above).
+- **Applied steps, collapsed** (full text: git history + the PORT-REPORTs):
+  43–48 — one line each in PORT-REPORT-94132c80. 49 — back-flows, dev-infra plugins,
+  G22 prep, AIS refusal pack, G45/C20/J20/R10, G42 catalog seam, G46–G48 cmdline
+  chain, UI sweep O35–O41, cmdline runbook Rev 1, grooms. N3–N5 arrived inside the
+  range and were deferred (T19).
 
 ```text
 You are porting the DryDocs PRODUCER repo (ce-wilson/DryDocs, github.com) onto the
@@ -79,22 +73,13 @@ GUARDRAILS (durable — apply to every port):
    `default_ok:` with a reason; a path in NEITHER is an un-made decision, not a
    clean-add — stop, decide it, and send the row back (guarded by
    test_port_reconcile_guards.py::test_no_tracked_path_falls_through_silently).
-   RESOLVING THE REFERENCES BELOW: this prompt cites two producer documents it does
-   not contain. Both are `docs/port-*.md` = never-port, so they are NOT in your tree —
-   read them at the fetched producer ref, same idiom as the authorities above:
-   - `git show cewilson/main:docs/port-prompt-archive-steps-1-42.md` — the FROZEN
-     steps 1–42. Any "archive step N" citation in the tracker below (T5/T6/T7/T8 cite
-     steps 31/16/16/29) resolves there, and the **Done-means for T1–T10 live only in
-     its tracker section** — this prompt states them nowhere. Needed when you work a
-     T1–T10 row, not to execute a port step.
-   - `git show cewilson/main:docs/port-ais-supplement-company-prompt.md` — the T17
-     hand-off pack. It is NOT part of this port: no producer payload, four actions on
-     company-local code, and it carries the repo-wide evidence table behind the
-     back-flow REFUSAL that T17 asserts. Run it as its own session; do not fold it
-     into a port run, and never commit it company-side.
-   Hand-off packs are always paste-into-a-session artifacts, never payload. If a
-   citation anywhere in this prompt has no openable path, treat that as a defect and
-   send it back — a cited artifact nobody can open is the failure J25 exists to end.
+   TWO CITED DOCS ARE NOT IN YOUR TREE (both `docs/port-*.md` = never-port). Read them
+   at the fetched producer ref, same idiom as above:
+   - `...:docs/port-prompt-archive-steps-1-42.md` — resolves every "archive step N"
+     citation, and holds the Done-means for T1–T10, which appear nowhere else.
+   - `...:docs/port-ais-supplement-company-prompt.md` — the T17 pack. NOT part of any
+     port (no payload; four actions on company-local code). Run it as its own session.
+   A citation with no openable path is a DEFECT — send it back, do not work around it.
 
 2. DISJOINT HISTORIES: no common ancestor exists — never `git merge`/`git pull`.
    Small ranges: cherry-pick / `git am --3way`, resolving collisions per manifest.
@@ -117,8 +102,10 @@ GUARDRAILS (durable — apply to every port):
    J17/J20/N4/N5 — so one `render_board.py` run refreshes all five; COMPANY-SIDE
    under T19 your render currently EXCLUDES the load-map pair — keep that exclusion
    until the T19 gate rules),
-   `docs/plan/board.html` (from the reconciled backlog), `docs/design/*.html`
-   + `*.print.html` (YOUR canonical-company renderer, both variants tracked).
+   `docs/plan/board.html` (from the reconciled backlog), and `docs/design/*.html`
+   — SINGLE SURFACE, screen + `@media print` in one file (L13). There is no
+   `*.print.html` twin on either side; the twins were retired company-side and
+   this line said otherwise until 2026-07-31.
    Run render scripts from the PROJECT VENV with PYTHONPATH=repo root and verify the
    output path resolves into the workspace repo before trusting any regen. Beware
    NTFS junctions: the company workspace path is a junction and Path.resolve()
@@ -210,29 +197,17 @@ GUARDRAILS (durable — apply to every port):
    deferred, acceptance numbers, manifest adherence, state/reversibility, NEW
    divergences observed). The producer reviews it against producer git.
 
-9. RUFF / FORMAT CONVERGENCE (J10 — each side formats its OWN tree; the
-   mechanical commits are NEVER ported). Authority:
-   `git show cewilson/main:docs/ruff-format-convergence.md`, which carries your
-   instructions verbatim. Locate the boundary BY COMMIT SUBJECT, never by SHA —
-   every producer commit in this stream contains its tag `J10 stage <N>`:
-   - `J10 stage 0` — **PORTS.** The shared contract: `ruff = "0.5.7"` EXACT (the
-     caret is removed deliberately — formatter output varies across versions, and
-     two independently-formatted sides MUST run the same one) plus the settled
-     `[tool.ruff]` / `[tool.ruff.lint]` / `[tool.ruff.format]` blocks. Take it as
-     an ordinary pyproject change; keep YOUR version string (guardrail 9 below).
-   - `J10 stage 1` / `2` / `3` — **DO NOT PORT.** Autofix, hand-reviewed unsafe
-     fixes, and `ruff format .`. Regenerate them on your own tree with the pinned
-     tool once stage 0 has landed your side. Porting them would apply producer
-     line-layout to company code for no benefit and enormous collision surface.
-   - `J10 stage 4` — PORTS normally (per-rule fixes; kept rules become explicit
-     `per-file-ignores` with reason comments).
-   - `J10 stage 5` — PORTS, but apply it only AFTER your own residuals are zero:
-     it drops `continue-on-error` from the CI ruff step and adds
-     `ruff format --check`. Applying it early makes your CI red by construction.
-   Until BOTH sides have run stages 1–3, expect layout-only collisions on any
-   `.py` file and resolve them by taking your own formatting — never by
-   hand-merging whitespace. After both sides converge, this class of collision
-   disappears, which is the entire point of the exercise.
+9. RUFF / FORMAT CONVERGENCE (J10 — each side formats its OWN tree). Authority:
+   `git show cewilson/main:docs/ruff-format-convergence.md`. Find the boundary BY
+   COMMIT SUBJECT, never by SHA — every commit is tagged `J10 stage <N>`:
+   stage 0 PORTS (the shared contract: `ruff = "0.5.7"` EXACT + settled `[tool.ruff*]`
+   + `*.py text eol=lf`); stages 1–3 DO NOT PORT — regenerate them on your own tree
+   once stage 0 lands; stage 4 PORTS normally (per-rule fixes + reasoned
+   `per-file-ignores`); stage 5 PORTS but apply it only AFTER your residuals are zero
+   — it makes the CI ruff step blocking and would otherwise red you out by
+   construction. Until both sides run 1–3, resolve `.py` layout collisions by taking
+   YOUR formatting; never hand-merge whitespace. After both converge, this collision
+   class disappears — that is the whole point.
 
 10. BOUNDARIES: one-way only — never add company main as a remote on the producer,
    never push back to ce-wilson/DryDocs. drydocs/data/ sample CSVs stay local. Never
@@ -323,8 +298,8 @@ OWED COMPANY-SIDE:
 | T8  | M0 equivalence unblocks: A3 filename + B1 dot rule (archive step 29) | pending |
 | T9  | Lineage curated live load — YOUR vocab gate + m3_* flips, then write_curated on your graph | pending |
 | T10 | MAC field contract validated vs a REAL DPL export — amend dpl_mac.py contract + fixtures together | pending |
-| T11 | L7 ratification entry in company gate-log (Tier A record) — **paste-ready block is §6a**; fill the four bracketed placeholders and append to your gate-log | pending |
-| T12 | Company platforms gate: AIS position vs producer C12 | **RULED — SUPERSEDE, 2026-07-21**, company gate-log: the `:AisCapability`/`:AisTool` layer superseded by the software-registry model; excision APPLIED company-side (initial-load runbook steps 7b/10); Tier B holds in old steps 43/45b discharged 2026-07-27; session packs retired from the tree (git history if re-litigated) |
+| T11 | L7 ratification entry in company gate-log (Tier A record) | **RATIFIED 2026-07-27** (company gate-log, prior port; reported at PORT-REPORT-57914bf4). The producer row read `pending` until 2026-07-31 — producer-side staleness, not a company gap. §6a stays as the STANDING Tier-A template (source-registry-v2 and J23 both used that shape) |
+| T12 | Company platforms gate: AIS position vs producer C12 | **RULED — SUPERSEDE, 2026-07-21** (company gate-log): the AIS layer is superseded by the software-registry model; excision applied, Tier B holds discharged 2026-07-27, session packs retired |
 | T13 | DPL registry field contract validated vs a REAL per-SEAL export (pipeline_id.json/dataset_id.json) — amend dpl_registry.py header + fixtures together, cite provenance (the T10 discipline) | pending |
 | T14 | rua collector convergence: company's own -n implementation vs producer G18 v2 — reconcile to ONE v2 (flags, scripts.tsv columns incl. sha256, size cap, COLLECTOR_VERSION stamp) so bundles stay cross-ingestible. Step 49e's G45 listing fallback is the same family — reconcile together | pending |
 | T15 | G33 company code-graph load: run YOUR post-U6 `snapshot.ps1` (snapshot `*.json` is never-port BOTH ways; primary on-main checkout, never a worktree) → `drydocs load-code-snapshot` into your graph; second `:Project` root is INTENDED (gate §B3(a)); rides with the Tier A ratification entry (guardrail 6) | pending |
@@ -551,11 +526,10 @@ ACCEPTANCE GATE (behavior is the contract, not a byte-compare):
   51(b) without your T19 ruling, retired-id refusals will fail loudly, which is the
   guard doing its job and the signal to DEFER (a)+(b) rather than to weaken it).
   Producer reference at the current head (step 51, `6113d10`): 1269 passed /
-  5 skipped, production CSV present (step-50 head e0dc403 was 1163 / 5 CSV-present;
-  step-49 head 3fe69c1 was 1144 / 5 CSV-present;
-  step-48 head 8a82e3b was 1099 / 7 CSV-absent; step-47 head 947920c was 1070 / 8;
-  step-46 head 78ba7fd was 982 / 6).
-  Company reference: your own PORT-REPORT-e60822fc baseline.
+  5 skipped, production CSV present. Earlier heads (e0dc403 1163/5, 3fe69c1 1144/5,
+  8a82e3b 1099/7, 947920c 1070/8, 78ba7fd 982/6) and the 483→831 series for steps
+  28–42 are in git history and the archive — do not re-derive them here.
+  Company reference: your own PORT-REPORT baseline.
 - CI guards green: test_schema.py (EXPECTED_CONSTRAINTS company-based — see ledger;
   every active edge has its supplement block), test_classification.py,
   test_taxonomy_ontology_map.py, test_backlog.py, test_doc_outline.py,
@@ -563,5 +537,4 @@ ACCEPTANCE GATE (behavior is the contract, not a byte-compare):
 - J7 reconcile guards with RECONCILE_BEFORE_DIR set: all pass (producer-side at the
   back-flow enactment: 12 passed / 4 skipped; the J16 manifest-coverage /
   default_ok / backlog-no-regression checks run unconditionally, no env var needed).
-- Historical per-step producer counts (483 → 831 across steps 28–42): archive file.
 ```
