@@ -4307,6 +4307,18 @@ items:
       check .` exits 0 AND `poetry run ruff format --check .` exits 0 AND CI
       blocks both. Full suite green at every stage.
     notes: >
+      STAGE 0 DONE 2026-07-31 (`f18c88e`) + B023 RULED AND FIXED (`b3b90dc`).
+      Stage 0 = ruff pinned "0.5.7" EXACT, [tool.ruff.format] written out, and
+      `*.py text eol=lf` — the last is NOT optional: `line-ending = "lf"` without it
+      makes `ruff format --check` unsatisfiable on a Windows checkout while passing on
+      the Linux runner. B023's two hits were ONE site (benchmark_p0.py:206), not a live
+      bug (same-iteration call), fixed with `marker=marker` because the failure mode
+      under any later refactor is silently scoring every question against the last
+      marker. STAGES 1-5 ARE NOW UNBLOCKED — the port boundary settled at
+      PORT-REPORT-57914bf4 (merged 2026-08-01). Remaining gate is the user's two open
+      calls (E501 residual policy; keeper set B008/RUF001-3/E402) — see the plan doc's
+      "Open calls". Live baseline re-measured at 3882db5: 1,017 findings, 404 safe +
+      42 unsafe, 284 of 328 files would reformat.
       Groomed 2026-07-13 from the 2026-07-11 IDEAS line (found executing J5 — the CI
       workflow runs ruff ADVISORY because gating would have required this mass fix
       inside a CI chore). TIMING (user flag preserved): the diff touches every Python
