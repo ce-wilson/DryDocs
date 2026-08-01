@@ -1,5 +1,6 @@
 """O19 gates.json drift guard (the enforcement-matrix pattern): a gate-log
 entry or gate-prompt file with no row cannot ship."""
+
 from __future__ import annotations
 
 import importlib.util
@@ -38,6 +39,6 @@ def test_every_log_entry_and_prompt_has_a_row():
 
     covered_prompts = {p for g in committed["gates"] for p in g["prompt_files"]}
     for p in sorted((REPO / "config" / "gate-prompts").glob("*.yaml")):
-        assert f"config/gate-prompts/{p.stem}.yaml" in covered_prompts, (
-            f"gate prompt {p.name} has no gates.json row"
-        )
+        assert (
+            f"config/gate-prompts/{p.stem}.yaml" in covered_prompts
+        ), f"gate prompt {p.name} has no gates.json row"

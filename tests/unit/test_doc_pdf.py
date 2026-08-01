@@ -2,9 +2,8 @@
 flag construction). The actual headless render (html_to_pdf) shells out to a browser and
 is exercised manually / in the L4 run, not in unit tests.
 """
-from __future__ import annotations
 
-from pathlib import Path
+from __future__ import annotations
 
 from drydocs.doc_pdf import find_browser, normalize_pdf_bytes, print_flags
 

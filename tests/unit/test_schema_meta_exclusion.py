@@ -17,6 +17,7 @@ strictly safer. The label predicate is the belt everywhere.
 The live proof (meta-graph applied to a real database → every spec returns
 zero rows, no guard satisfied) is tests/integration/test_meta_graph_exclusion.py.
 """
+
 from __future__ import annotations
 
 import re
@@ -42,8 +43,16 @@ def test_meta_graph_parses_and_covers_the_known_contaminators() -> None:
     labels = stamped_labels()
     assert len(labels) >= 40, f"exemplar parse regressed: {len(labels)} labels"
     assert {
-        "BusinessApplication", "ControlMJob", "ControlMServer", "DataAsset",
-        "JobRun", "Document", "Chunk", "Attribution", "DocSection", "Employee",
+        "BusinessApplication",
+        "ControlMJob",
+        "ControlMServer",
+        "DataAsset",
+        "JobRun",
+        "Document",
+        "Chunk",
+        "Attribution",
+        "DocSection",
+        "Employee",
     } <= labels
 
 

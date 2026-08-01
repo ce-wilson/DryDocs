@@ -56,10 +56,11 @@ the G17 ``READS_FROM``/``WRITES_TO`` candidates land on these same nodes; the
 SEAL (``appId``) is an attribution FACT stored as a property — attribution
 edges are Epic K territory and every graph write stays behind G22.
 """
+
 from __future__ import annotations
 
 import csv
-from dataclasses import asdict, dataclass, field
+from dataclasses import asdict, dataclass
 from pathlib import Path
 
 from ..model import DataAssetNode, LineageGraph, asset_id
@@ -99,22 +100,22 @@ class GlueInventoryCoverage:
     silent (the STG_PARSE_QUALITY / UNMATCHED house rule, candidate side)."""
 
     files_read: int = 0
-    files_invalid: int = 0          # unreadable / no recognizable headers
+    files_invalid: int = 0  # unreadable / no recognizable headers
     rows_read: int = 0
-    rows_invalid: int = 0           # missing database or table — skipped
-    guid_rows: int = 0              # GUID-identity rows
-    path_rows: int = 0              # path-identity rows (no GUID)
-    idsource_not_guid: int = 0      # tableDatasetIdSource names another scheme
-    datasets_created: int = 0       # dpl_dataset nodes staged first BY this feed
-    datasets_enriched: int = 0      # dpl_dataset nodes that already existed (MAC/flow)
-    glue_created: int = 0           # path-keyed glue_table nodes staged
-    path_joined_guid: int = 0       # no-GUID row whose path matched a GUID placement
-    placements_added: int = 0       # per-zone glue placements stamped
-    placement_conflicts: int = 0    # same GUID+zone, different path — first wins
-    duplicate_rows: int = 0         # identical placement seen again
-    zone_unknown: int = 0           # databaseName segment 1 not RAW/TRUSTED/REFINED
-    seal_facts: int = 0             # appId captured as a property
-    seal_disagreements: int = 0     # appId differs from an already-staged seal
+    rows_invalid: int = 0  # missing database or table — skipped
+    guid_rows: int = 0  # GUID-identity rows
+    path_rows: int = 0  # path-identity rows (no GUID)
+    idsource_not_guid: int = 0  # tableDatasetIdSource names another scheme
+    datasets_created: int = 0  # dpl_dataset nodes staged first BY this feed
+    datasets_enriched: int = 0  # dpl_dataset nodes that already existed (MAC/flow)
+    glue_created: int = 0  # path-keyed glue_table nodes staged
+    path_joined_guid: int = 0  # no-GUID row whose path matched a GUID placement
+    placements_added: int = 0  # per-zone glue placements stamped
+    placement_conflicts: int = 0  # same GUID+zone, different path — first wins
+    duplicate_rows: int = 0  # identical placement seen again
+    zone_unknown: int = 0  # databaseName segment 1 not RAW/TRUSTED/REFINED
+    seal_facts: int = 0  # appId captured as a property
+    seal_disagreements: int = 0  # appId differs from an already-staged seal
     name_seal_disagreements: int = 0  # appId != the tableName numeric prefix
 
     def as_dict(self) -> dict:
@@ -160,9 +161,7 @@ class GlueTableInventoryExtractor:
 
     name = "glue-tables"
 
-    def extract(
-        self, source: str | Path, into: LineageGraph
-    ) -> GlueInventoryCoverage:
+    def extract(self, source: str | Path, into: LineageGraph) -> GlueInventoryCoverage:
         """``source`` is one CSV export or a directory of them. Returns the
         run's :class:`GlueInventoryCoverage`; callers report it — nothing
         drops silently."""
@@ -191,9 +190,7 @@ class GlueTableInventoryExtractor:
         return coverage
 
     # -- input --------------------------------------------------------------
-    def _read_file(
-        self, path: Path, coverage: GlueInventoryCoverage
-    ) -> list[InventoryRow]:
+    def _read_file(self, path: Path, coverage: GlueInventoryCoverage) -> list[InventoryRow]:
         try:
             with path.open(encoding="utf-8-sig", newline="") as fh:
                 reader = csv.reader(fh)
@@ -266,10 +263,14 @@ class GlueTableInventoryExtractor:
         if not database or not table:
             return None
         return InventoryRow(
-            database=database, table=table,
-            guid=cell("guid"), guid_source=cell("guid_source"),
-            seal=cell("seal"), platform=cell("platform"),
-            platform_id=cell("platform_id"), full_path=cell("full_path"),
+            database=database,
+            table=table,
+            guid=cell("guid"),
+            guid_source=cell("guid_source"),
+            seal=cell("seal"),
+            platform=cell("platform"),
+            platform_id=cell("platform_id"),
+            full_path=cell("full_path"),
         )
 
     # -- identity routing -----------------------------------------------------
@@ -299,7 +300,9 @@ class GlueTableInventoryExtractor:
         node = graph.data_assets.get(aid)
         if node is None:
             node = DataAssetNode(
-                node_id=aid, kind=MAC_DATASET_KIND, location=row.guid,
+                node_id=aid,
+                kind=MAC_DATASET_KIND,
+                location=row.guid,
                 properties={"glue_only": "true"},
             )
             graph.add_data_asset(node)
@@ -330,7 +333,9 @@ class GlueTableInventoryExtractor:
         node = graph.data_assets.get(aid)
         if node is None:
             node = DataAssetNode(
-                node_id=aid, kind=GLUE_TABLE_KIND, location=canonical,
+                node_id=aid,
+                kind=GLUE_TABLE_KIND,
+                location=canonical,
                 properties={},
             )
             graph.add_data_asset(node)

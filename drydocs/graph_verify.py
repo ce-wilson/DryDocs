@@ -13,12 +13,14 @@ component writes no meaning edges, so it needs no HITL gate to run.
 classification: Internal-Public — the committed example suite is a vendor-BMC smoke
 test. Real acceptance suites (internal counts/IDs) live in a gitignored twin.
 """
+
 from __future__ import annotations
 
+from collections.abc import Iterable
 from dataclasses import dataclass, field
 from enum import Enum
 from pathlib import Path
-from typing import Any, Iterable, Protocol, runtime_checkable
+from typing import Any, Protocol, runtime_checkable
 
 import yaml
 
@@ -129,7 +131,9 @@ def _as_row_list(value: Any) -> list[dict[str, Any]]:
     raise GraphVerifyError(f"expected a row dict or list of row dicts, got {type(value).__name__}")
 
 
-def evaluate(assertion: Assertion, rows: list[dict[str, Any]], expected: Any = None) -> tuple[bool, str]:
+def evaluate(
+    assertion: Assertion, rows: list[dict[str, Any]], expected: Any = None
+) -> tuple[bool, str]:
     """Return ``(passed, detail)`` for a set of result rows. Pure — no graph access."""
     if assertion is Assertion.EMPTY:
         return (len(rows) == 0, "" if len(rows) == 0 else f"expected 0 rows, got {len(rows)}")

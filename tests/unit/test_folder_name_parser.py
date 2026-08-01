@@ -1,4 +1,5 @@
 """Folder name parser — verifies the production naming convention."""
+
 from __future__ import annotations
 
 from drydocs_core.controlm import parse_folder_name
@@ -6,7 +7,7 @@ from drydocs_core.controlm import parse_folder_name
 
 def test_real_folder_name_from_recursive_sample() -> None:
     """PRARAG-HLDM-70002-PEX-RFND-DLY:
-       P=Prod, R=Retail, ARA=appcode, G=Smart folder, then domain segments."""
+    P=Prod, R=Retail, ARA=appcode, G=Smart folder, then domain segments."""
     p = parse_folder_name("PRARAG-HLDM-70002-PEX-RFND-DLY")
     assert p.prefix_recognized is True
     assert p.prefix == "PRARAG"

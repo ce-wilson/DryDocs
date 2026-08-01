@@ -21,6 +21,7 @@ produces byte-identical HTML — no build timestamps, no randomness. The board i
 to git, so its diffs must reflect real backlog changes, not render noise. The backlog's
 own ``updated:`` date is shown in the header instead of a build time.
 """
+
 from __future__ import annotations
 
 import html
@@ -192,7 +193,7 @@ def _render_phase_card(phase: Phase, items: tuple[WorkItem, ...]) -> str:
         f'<div class="phase-head"><span class="phase-id">P{_esc(phase.id)}</span>'
         f'<span class="status-badge status-{_esc(phase.status)}">'
         f"{_esc(phase.status)}</span>{release}</div>"
-        f'<h3>{_esc(phase.title)}</h3>'
+        f"<h3>{_esc(phase.title)}</h3>"
         f'<p class="goal">{_esc(phase.goal)}</p>'
         '<div class="progress"><div class="progress-bar" style="width:'
         f'{pct}%"></div></div>'
@@ -497,7 +498,7 @@ document.addEventListener("DOMContentLoaded", () => {
 """.strip()
 
     return (
-        "<!doctype html>\n<html><head><meta charset=\"utf-8\">\n"
+        '<!doctype html>\n<html><head><meta charset="utf-8">\n'
         "<title>DryDocs — project board</title>\n"
         f"<style>{_CSS}</style>\n</head><body>\n"
         "<h1>DryDocs — project board</h1>\n"

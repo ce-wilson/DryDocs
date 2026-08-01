@@ -33,6 +33,7 @@ Payloads under the root may hold real hostnames, uids, home paths, and
 profile/script copies (confidential (Internal, J23)) — DATA NEVER ENTERS THE REPO;
 ``tests/unit/test_data_root.py`` sweeps the tree to enforce it.
 """
+
 from __future__ import annotations
 
 import os

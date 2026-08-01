@@ -6,6 +6,7 @@ jdoe/svc.hldm/generic hosts+paths). The parser cases double as the §3/G8 fold
 regression: the CORE parser must reproduce what depgraph's fork asserted —
 .pset → ABINITIO and spark-submit skipping option values are the folded deltas.
 """
+
 from __future__ import annotations
 
 from pathlib import Path
@@ -20,6 +21,7 @@ FIXTURE = Path(__file__).resolve().parents[1] / "fixtures" / "lineage" / "jobs.c
 
 
 # -- parser equivalence (0002-C §3/G8 — the core parser IS depgraph's, unified) ----
+
 
 def test_plain_script_path() -> None:
     inv = parse_command("/opt/scripts/hldm/onpm_fw.ksh").invocations
@@ -50,6 +52,7 @@ def test_python_dash_m_module() -> None:
 
 # -- extractor behavior (ported expectations, verbatim semantics) ------------------
 
+
 @pytest.fixture()
 def graph() -> LineageGraph:
     g = LineageGraph()
@@ -72,8 +75,10 @@ def test_stale_version_skipped(graph: LineageGraph) -> None:
 
 def test_field_mapping(graph: LineageGraph) -> None:
     job = next(p for p in graph.processes.values() if p.name == "PEX_SPARK_REFINE")
-    assert job.node_target == "host-emr-01"  # node_id -> node_target (host-or-group; gate controlm-hosts-topology)
-    assert job.run_as == "svc.hldm"       # owner -> run_as
+    assert (
+        job.node_target == "host-emr-01"
+    )  # node_id -> node_target (host-or-group; gate controlm-hosts-topology)
+    assert job.run_as == "svc.hldm"  # owner -> run_as
     assert job.application == "ARA"
     assert job.folder.startswith("PRARAG-HLDM-70014")
 
@@ -88,6 +93,7 @@ def test_shared_script_collapses(graph: LineageGraph) -> None:
 
 
 # -- ontology reconcile (0002-C §4 identity/vocabulary rules) ----------------------
+
 
 def test_rel_vocabulary_is_the_registered_set() -> None:
     assert REL_TYPES == {"INVOKES", "TRIGGERS", "READS_FROM", "WRITES_TO"}
@@ -105,20 +111,29 @@ def test_legacy_host_key_normalizes_to_node_target() -> None:
     controlm-hosts-topology: host GROUP in the common case, not a server)."""
     from drydocs_lineage.model import LineageGraph
 
-    g = LineageGraph.from_dict({
-        "schema": "depgraph-machine-first/v2",
-        "processes": [{
-            "node_id": "proc#controlm_job:1.2", "kind": "controlm_job",
-            "name": "J", "host": "SOME-GROUP", "project": "dropped",
-        }],
-        "data_assets": [], "rels": [],
-    })
+    g = LineageGraph.from_dict(
+        {
+            "schema": "depgraph-machine-first/v2",
+            "processes": [
+                {
+                    "node_id": "proc#controlm_job:1.2",
+                    "kind": "controlm_job",
+                    "name": "J",
+                    "host": "SOME-GROUP",
+                    "project": "dropped",
+                }
+            ],
+            "data_assets": [],
+            "rels": [],
+        }
+    )
     job = g.processes["proc#controlm_job:1.2"]
     assert job.node_target == "SOME-GROUP"
     assert not hasattr(job, "host")
 
 
 # -- coverage accounting (G11 — report every skip by reason, never drop silently) ---
+
 
 def test_coverage_counts_pinned_on_fixture() -> None:
     g = LineageGraph()
@@ -139,10 +154,10 @@ def test_coverage_reports_nameless_empty_and_unresolved(tmp_path) -> None:
     csv_path = tmp_path / "jobs.csv"
     csv_path.write_text(
         "job_id,folder_id,job_name,parent_table,owner,node_id,cmd_line,is_current_version\n"
-        "1,10,JOB_EMPTY_CMD,F1,svc.x,h1,,Y\n"          # kept; empty command
-        "2,10,,F1,svc.x,h1,/opt/x.sh,Y\n"              # nameless -> skipped
+        "1,10,JOB_EMPTY_CMD,F1,svc.x,h1,,Y\n"  # kept; empty command
+        "2,10,,F1,svc.x,h1,/opt/x.sh,Y\n"  # nameless -> skipped
         "3,10,JOB_UNKNOWN,F1,svc.x,h1,mystery_bin,Y\n"  # UNKNOWN kind -> unresolved
-        "4,10,JOB_STALE,F1,svc.x,h1,/opt/y.sh,N\n",     # stale -> skipped
+        "4,10,JOB_STALE,F1,svc.x,h1,/opt/y.sh,N\n",  # stale -> skipped
         encoding="utf-8",
     )
     g = LineageGraph()
@@ -155,14 +170,18 @@ def test_coverage_reports_nameless_empty_and_unresolved(tmp_path) -> None:
     assert cov.invocations_added == 1
     assert cov.invocations_unresolved == 1  # mystery_bin classified UNKNOWN, still a candidate
     # the accounting is total: every row lands in exactly one row-level bucket
-    assert cov.rows_read == (
-        cov.jobs_added + cov.skipped_nameless + cov.skipped_stale_version
-    )
+    assert cov.rows_read == (cov.jobs_added + cov.skipped_nameless + cov.skipped_stale_version)
     # dict view carries every counter (machine-readable for future STG_PARSE_QUALITY hookup)
     assert set(cov.as_dict()) >= {
-        "rows_read", "jobs_added", "skipped_stale_version", "skipped_nameless",
-        "commands_empty", "commands_unparsed", "invocations_added",
-        "invocations_unresolved", "invocations_no_target",
+        "rows_read",
+        "jobs_added",
+        "skipped_stale_version",
+        "skipped_nameless",
+        "commands_empty",
+        "commands_unparsed",
+        "invocations_added",
+        "invocations_unresolved",
+        "invocations_no_target",
     }
     assert "skipped: stale=1 nameless=1" in cov.summary()
 
@@ -173,6 +192,7 @@ def test_coverage_missing_source_is_all_zero(tmp_path) -> None:
 
 
 # -- file-ops candidates (G14 — the feed that activates G13's dormant resolution) --
+
 
 def test_cmdline_move_gzip_emits_reads_writes_candidates(tmp_path) -> None:
     """The gate-caveat wrapper case (unix move/gzip, no ETL engine): CMD_LINE
@@ -199,7 +219,9 @@ def test_cmdline_move_gzip_emits_reads_writes_candidates(tmp_path) -> None:
     # a pure file-op command line is PARSED, not "unparsed"
     assert cov.commands_unparsed == 0
     assert {a.location for a in g.data_assets.values()} == {
-        "/data/out/loans.dat", "/data/arch/loans.dat", "/data/arch/loans.dat.gz",
+        "/data/out/loans.dat",
+        "/data/arch/loans.dat",
+        "/data/arch/loans.dat.gz",
     }
     assert all(a.kind == "local_file" for a in g.data_assets.values())
 
@@ -219,7 +241,7 @@ def test_non_dataflow_and_operandless_file_ops_are_counted_never_silent(tmp_path
     cov = ControlMInventoryExtractor().extract(csv_path, g)
     assert cov.file_ops_added == 0
     assert cov.file_ops_skipped_non_dataflow == 2  # mkdir + rm: not lineage flow
-    assert cov.file_ops_no_operand == 1            # mv with no target operand
+    assert cov.file_ops_no_operand == 1  # mv with no target operand
     assert not g.data_assets
     assert not g.rels
     assert "file-ops: added=0 non_dataflow=2 no_operand=1" in cov.summary()
@@ -267,9 +289,9 @@ def test_stable_invocation_keys_dpl_guid_and_pset_basename(tmp_path) -> None:
     child_ids = {pid for pid in g.processes if not pid.startswith("proc#controlm_job:")}
     assert child_ids == {
         "proc#dpl:00000000-0000-0000-0000-000000000000",  # GUID, not the jar path
-        "proc#abinitio:ing.pset",                          # basename: dev+prod converge
-        "proc#shell_script:/data/mnt/check.ksh",           # scripts stay path-keyed:
-        "proc#shell_script:/home/mnt/check.ksh",           # dupes surface for SME merge
+        "proc#abinitio:ing.pset",  # basename: dev+prod converge
+        "proc#shell_script:/data/mnt/check.ksh",  # scripts stay path-keyed:
+        "proc#shell_script:/home/mnt/check.ksh",  # dupes surface for SME merge
     }
     # full paths retained as properties on the converged pset node
     assert g.processes["proc#abinitio:ing.pset"].path.endswith("ing.pset")
@@ -278,9 +300,7 @@ def test_stable_invocation_keys_dpl_guid_and_pset_basename(tmp_path) -> None:
 # -- DPL launcher argument contract (G15; gate cmdline-nfr-vetting evidence) -------
 
 _GUID = "11111111-2222-3333-4444-555555555555"
-_CSV_HEADER = (
-    "job_id,folder_id,job_name,parent_table,owner,node_id,cmd_line,is_current_version\n"
-)
+_CSV_HEADER = "job_id,folder_id,job_name,parent_table,owner,node_id,cmd_line,is_current_version\n"
 
 
 def _extract(tmp_path, *rows: str):
@@ -340,9 +360,7 @@ def test_mode_flags_are_a_property_never_a_kind(tmp_path) -> None:
         f'2,10,JOB_T,F1,svc.x,h1,"sh /a/dt-launcher.sh -pipeline {guids[1]} -t",Y\n',
         f'3,10,JOB_PY,F1,svc.x,h1,"sh /a/dt-launcher.sh -pipeline {guids[2]} -py",Y\n',
     )
-    modes = {
-        g.processes[f"proc#dpl:{guid}"].properties["launch_mode"] for guid in guids
-    }
+    modes = {g.processes[f"proc#dpl:{guid}"].properties["launch_mode"] for guid in guids}
     assert modes == {"-i", "-t", "-py"}
     assert all(g.processes[f"proc#dpl:{guid}"].kind == "dpl" for guid in guids)
 
@@ -360,12 +378,17 @@ def test_definition_properties_captured_runtime_values_excluded(tmp_path) -> Non
         f'-i -conf /cfg/c.json -compute /cfg/compute_small.json",Y\n',
     )
     node = g.processes[f"proc#dpl:{_GUID}"]
-    assert node.dataflow == "DF1"           # dedicated G12 field
+    assert node.dataflow == "DF1"  # dedicated G12 field
     assert node.config_path == "/cfg/c.json"
     assert node.properties == {
-        "env": "D", "app_name": "APP1", "alias": "AL1", "seal": "99999",
-        "fid": "FID1", "image": "img-repo/ing:1",
-        "compute": "/cfg/compute_small.json", "launch_mode": "-i",
+        "env": "D",
+        "app_name": "APP1",
+        "alias": "AL1",
+        "seal": "99999",
+        "fid": "FID1",
+        "image": "img-repo/ing:1",
+        "compute": "/cfg/compute_small.json",
+        "launch_mode": "-i",
     }
     # identity is the GUID, properties never leak into the key
     assert node.node_id == f"proc#dpl:{_GUID}"

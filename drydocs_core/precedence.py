@@ -13,11 +13,13 @@ Lower ``authority:`` number = higher precedence. If a chain entry omits ``author
 its position in ``order`` is used (top = highest). The ``active:`` map toggles a feed
 off without deleting it.
 """
+
 from __future__ import annotations
 
+from collections.abc import Iterable
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any, Iterable, Optional
+from typing import Any
 
 import yaml
 
@@ -56,7 +58,7 @@ class Claim:
 class Resolution:
     """The outcome of resolving a set of claims."""
 
-    winner: Optional[Claim]
+    winner: Claim | None
     aliases: tuple[Claim, ...] = ()
 
     @property
@@ -100,7 +102,7 @@ class PrecedenceResolver:
     # ---- construction ----------------------------------------------------
 
     @classmethod
-    def from_yaml(cls, path: str | Path = DEFAULT_PRECEDENCE_PATH) -> "PrecedenceResolver":
+    def from_yaml(cls, path: str | Path = DEFAULT_PRECEDENCE_PATH) -> PrecedenceResolver:
         doc = yaml.safe_load(Path(path).read_text(encoding="utf-8")) or {}
         return cls(
             order=doc.get("order", []),

@@ -26,8 +26,7 @@ AGENT_RUN_DB_ENV = "DRYDOCS_AGENTRUN_DB"
 DEFAULT_AGENT_RUN_DB = "ddcontext"  # R1 gate ruling 2026-07-23 (config/gate-log.md)
 
 _MERGE_AGENT_RUN = (
-    "MERGE (r:AgentRun {run_id: $run_id}) "
-    "SET r += $props, r.recorded_at = datetime()"
+    "MERGE (r:AgentRun {run_id: $run_id}) " "SET r += $props, r.recorded_at = datetime()"
 )
 
 
@@ -109,9 +108,7 @@ def write_agent_run(envelope, user_id: str = "", database: str | None = None) ->
     props = agent_run_props(envelope, user_id=user_id)
     run_id = props.pop("run_id")
     props = {k: v for k, v in props.items() if v is not None}
-    with get_driver().session(
-        database=db, default_access_mode=neo4j.WRITE_ACCESS
-    ) as session:
+    with get_driver().session(database=db, default_access_mode=neo4j.WRITE_ACCESS) as session:
         session.execute_write(
             lambda tx: tx.run(_MERGE_AGENT_RUN, run_id=run_id, props=props).consume()
         )

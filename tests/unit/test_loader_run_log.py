@@ -10,6 +10,7 @@ Contract under test (user directive 2026-07-22):
   rejects land uncapped, the footer carries the summary counts;
 * best-effort: the log is never the reason a load fails.
 """
+
 from __future__ import annotations
 
 import logging
@@ -26,6 +27,7 @@ def _read(path):
 
 
 # ---- configurable path ------------------------------------------------------
+
 
 def test_logdir_resolution_order(tmp_path, monkeypatch):
     assert resolve_log_dir() == rl.DEFAULT_LOGDIR  # env cleared by conftest
@@ -47,6 +49,7 @@ def test_sql_run_log_shares_the_same_knob(tmp_path, monkeypatch):
 
 # ---- naming convention ------------------------------------------------------
 
+
 def test_naming_convention_and_collision_suffix(tmp_path, monkeypatch):
     monkeypatch.setenv("DRYDOCS_LOGDIR", str(tmp_path))
     first = claim_log_path("load.controlm_jobs.v1")
@@ -57,6 +60,7 @@ def test_naming_convention_and_collision_suffix(tmp_path, monkeypatch):
 
 
 # ---- header / meta ----------------------------------------------------------
+
 
 def test_header_carries_process_meta(tmp_path, monkeypatch):
     monkeypatch.setenv("DRYDOCS_LOGDIR", str(tmp_path))
@@ -85,6 +89,7 @@ def test_header_carries_process_meta(tmp_path, monkeypatch):
 
 
 # ---- WARN-stream capture ----------------------------------------------------
+
 
 def test_warn_stream_tees_into_file_and_detaches(tmp_path, monkeypatch):
     monkeypatch.setenv("DRYDOCS_LOGDIR", str(tmp_path))
@@ -127,11 +132,12 @@ def test_rejects_logged_uncapped(tmp_path, monkeypatch):
 
 # ---- best-effort contract ---------------------------------------------------
 
+
 def test_methods_are_noops_after_close_and_before_open(tmp_path, monkeypatch):
     monkeypatch.setenv("DRYDOCS_LOGDIR", str(tmp_path))
     log = LoaderRunLog("x.v1", "r1")
     log.reject(0, "early")  # before open: silent no-op
-    log.close({})           # close without open: silent no-op
+    log.close({})  # close without open: silent no-op
     path = log.open()
     log.close({"status": "OK"})
     log.reject(1, "late")
@@ -140,6 +146,7 @@ def test_methods_are_noops_after_close_and_before_open(tmp_path, monkeypatch):
 
 
 # ---- BaseLoader wiring ------------------------------------------------------
+
 
 class _FakeClient:
     _uri = "bolt://localhost:7687"

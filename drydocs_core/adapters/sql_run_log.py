@@ -36,14 +36,16 @@ so ONE knob configures the whole log family):
 A log may contain real DSNs and extracted data values — logs live outside the
 repo and are never committed. This module is mechanism only.
 """
+
 from __future__ import annotations
 
 import csv
 import re
 import time
+from collections.abc import Mapping, Sequence
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Mapping, Sequence
+from typing import Any
 
 from drydocs_core.run_log import caller_stamp, claim_log_path
 
@@ -59,7 +61,7 @@ def sql_literal(value: Any) -> str:
         return "NULL"
     if isinstance(value, bool):
         return "1" if value else "0"
-    if isinstance(value, (int, float)):
+    if isinstance(value, int | float):
         return str(value)
     return "'" + str(value).replace("'", "''") + "'"
 

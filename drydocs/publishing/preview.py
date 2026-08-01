@@ -1,4 +1,5 @@
 """Write an assembled page to a local file for offline preview (no publish)."""
+
 from __future__ import annotations
 
 from pathlib import Path

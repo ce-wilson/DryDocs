@@ -5,6 +5,7 @@ are DRIFT GUARDS on the row model and the cypher text: the ladder the SME
 confirmed (apps via arch_develops + fallback-only home product) must not
 quietly regress to the pre-C9 shape the 2026-06-21 gate deprecated.
 """
+
 from __future__ import annotations
 
 from pathlib import Path
@@ -15,7 +16,13 @@ from drydocs.loaders.catalog import PatProductMappingRow
 
 
 def _cypher() -> str:
-    path = Path(__file__).resolve().parents[2] / "drydocs" / "loaders" / "cypher" / "pat_product_mapping.cypher"
+    path = (
+        Path(__file__).resolve().parents[2]
+        / "drydocs"
+        / "loaders"
+        / "cypher"
+        / "pat_product_mapping.cypher"
+    )
     return path.read_text(encoding="utf-8")
 
 
@@ -23,7 +30,7 @@ def test_row_model_accepts_sponsored_area_product() -> None:
     row = PatProductMappingRow(
         team_id="T1",
         product_id="P1",
-        team_type="Dedicated",          # normalizes to lowercase
+        team_type="Dedicated",  # normalizes to lowercase
         sponsored_area_product_id="AP9",
     )
     assert row.team_type == "dedicated"
@@ -75,7 +82,13 @@ def test_cypher_sweeps_stale_alignment() -> None:
 
 
 def test_migration_file_exists_and_targets_pat_edges_only() -> None:
-    path = Path(__file__).resolve().parents[2] / "drydocs" / "loaders" / "cypher" / "migrate_pat_alignment_c9.cypher"
+    path = (
+        Path(__file__).resolve().parents[2]
+        / "drydocs"
+        / "loaders"
+        / "cypher"
+        / "migrate_pat_alignment_c9.cypher"
+    )
     text = path.read_text(encoding="utf-8")
     # both cleanups are scoped to pat-sourced edges — never other writers' edges
     assert text.count("r.source = 'pat'") == 2

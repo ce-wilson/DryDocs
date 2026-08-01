@@ -11,11 +11,13 @@ python-oracledb path. Pins:
   header -> handshake -> statement -> result (csv) -> footer.
 * ``OracleAdapter`` tees rows into the log without changing what it yields.
 """
+
 from __future__ import annotations
 
 import sys
 import types
 from pathlib import Path
+from typing import ClassVar
 
 import pytest
 
@@ -35,6 +37,7 @@ SCOPE_BINDS = {
 
 # --- render_sql: literals ----------------------------------------------------
 
+
 def test_sql_literal_rendering():
     assert sql_literal(None) == "NULL"
     assert sql_literal(100) == "100"
@@ -46,9 +49,7 @@ def test_sql_literal_rendering():
 def test_render_sql_substitutes_in_code_regions():
     sql = "SELECT * FROM t WHERE name LIKE :folder_filter AND ROWNUM <= :row_cap"
     rendered = render_sql(sql, SCOPE_BINDS)
-    assert rendered == (
-        "SELECT * FROM t WHERE name LIKE 'CCB_AUTO_%' AND ROWNUM <= 100"
-    )
+    assert rendered == ("SELECT * FROM t WHERE name LIKE 'CCB_AUTO_%' AND ROWNUM <= 100")
 
 
 def test_render_sql_null_and_unknown_binds():
@@ -61,6 +62,7 @@ def test_render_sql_null_and_unknown_binds():
 
 # --- render_sql: the company hardening (code regions only) -------------------
 
+
 def test_render_sql_never_touches_comments_strings_identifiers():
     sql = (
         "-- line comment mentions :folder_filter and :DEPENDS_ON\n"
@@ -71,9 +73,9 @@ def test_render_sql_never_touches_comments_strings_identifiers():
     rendered = render_sql(sql, SCOPE_BINDS)
     assert "-- line comment mentions :folder_filter and :DEPENDS_ON" in rendered
     assert "/* block comment :row_cap\n   spans lines :folder_filter */" in rendered
-    assert "':folder_filter'" in rendered          # single-quoted string verbatim
-    assert '":row_cap"' in rendered                # quoted identifier verbatim
-    assert "'it''s :run_as'" in rendered           # escaped quote keeps string open
+    assert "':folder_filter'" in rendered  # single-quoted string verbatim
+    assert '":row_cap"' in rendered  # quoted identifier verbatim
+    assert "'it''s :run_as'" in rendered  # escaped quote keeps string open
     assert rendered.endswith("FROM t WHERE f LIKE 'CCB_AUTO_%'")
 
 
@@ -89,6 +91,7 @@ def test_render_sql_recursive_extract_stays_byte_identical_outside_code():
 
 
 # --- SqlRunLog ----------------------------------------------------------------
+
 
 def _read_only_log(tmp_path: Path) -> str:
     logs = list(tmp_path.glob("*.log"))
@@ -120,7 +123,7 @@ def test_run_log_shape(tmp_path, monkeypatch):
     assert "SELECT 1 FROM dual" in text
     assert "row_cap = 100" in text
     assert "-- result (csv) --" in text
-    assert '1,"x,y"' in text          # csv quoting on embedded delimiter
+    assert '1,"x,y"' in text  # csv quoting on embedded delimiter
     assert "Done. 1 statement(s), 2 row(s) in" in text
 
 
@@ -128,7 +131,8 @@ def test_run_log_same_second_collision(tmp_path, monkeypatch):
     monkeypatch.setenv("SPIDERP_LOGDIR", str(tmp_path))
     first, second = SqlRunLog("x.sql"), SqlRunLog("x.sql")
     p1, p2 = first.open(), second.open()
-    first.close(); second.close()
+    first.close()
+    second.close()
     assert p1 != p2 and p1.exists() and p2.exists()
 
 
@@ -145,8 +149,11 @@ def test_run_log_failure_recorded(tmp_path, monkeypatch):
 
 # --- OracleAdapter wiring -----------------------------------------------------
 
+
 class _FakeCursor:
-    description = [("FOLDER_NAME", None), ("JOB_COUNT", None)]
+    # Shared across instances on purpose — it mirrors DB-API's cursor.description,
+    # which the adapter only ever reads.
+    description: ClassVar[list[tuple[str, None]]] = [("FOLDER_NAME", None), ("JOB_COUNT", None)]
     arraysize = 0
 
     def __init__(self):
@@ -195,8 +202,11 @@ def test_adapter_tees_run_log(tmp_path, monkeypatch, fake_oracledb):
     monkeypatch.setenv("SPIDERP_LOGDIR", str(tmp_path))
     query = "SELECT folder_name, job_count FROM v WHERE f LIKE :folder_filter"
     adapter = OracleAdapter(
-        user="CM_RO_USER", password="pw", dsn="ALIAS",
-        query=query, bind_params={"folder_filter": "CCB_AUTO_%"},
+        user="CM_RO_USER",
+        password="pw",
+        dsn="ALIAS",
+        query=query,
+        bind_params={"folder_filter": "CCB_AUTO_%"},
         name="controlm_folders.sql",
     )
     with adapter:
@@ -208,12 +218,10 @@ def test_adapter_tees_run_log(tmp_path, monkeypatch, fake_oracledb):
         {"folder_name": "CCB_AUTO_EOD", "job_count": 3},
     ]
     # execution stayed parameterized — the ORIGINAL query + native binds
-    assert fake_oracledb.last_conn.cursor_obj.executed == (
-        query, {"folder_filter": "CCB_AUTO_%"}
-    )
+    assert fake_oracledb.last_conn.cursor_obj.executed == (query, {"folder_filter": "CCB_AUTO_%"})
     text = _read_only_log(tmp_path)
     assert "connected  : Oracle Database 19.0.0.0.0" in text
-    assert "WHERE f LIKE 'CCB_AUTO_%'" in text       # rendered for review
+    assert "WHERE f LIKE 'CCB_AUTO_%'" in text  # rendered for review
     assert "FOLDER_NAME,JOB_COUNT" in text
     assert "CCB_AUTO_DAILY,12" in text
     assert "Done. 1 statement(s), 2 row(s) in" in text
@@ -222,7 +230,11 @@ def test_adapter_tees_run_log(tmp_path, monkeypatch, fake_oracledb):
 def test_adapter_run_log_opt_out(tmp_path, monkeypatch, fake_oracledb):
     monkeypatch.setenv("SPIDERP_LOGDIR", str(tmp_path))
     adapter = OracleAdapter(
-        user="u", password="p", dsn="d", query="SELECT 1 FROM dual", run_log=False,
+        user="u",
+        password="p",
+        dsn="d",
+        query="SELECT 1 FROM dual",
+        run_log=False,
     )
     with adapter:
         list(adapter.rows())

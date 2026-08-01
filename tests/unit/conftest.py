@@ -6,6 +6,7 @@ under ``~/logs/DryDocs``. Keep the suite hermetic: point the log family's
 default at the test's tmp dir and clear the ambient env knobs. Tests that
 exercise the env resolution set the variables themselves AFTER this fixture.
 """
+
 from __future__ import annotations
 
 import pytest

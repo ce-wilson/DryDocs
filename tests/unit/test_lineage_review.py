@@ -5,6 +5,7 @@ job metadata, dependency kinds, assertion panel, per-folder notes + export),
 adapted to the re-homed surface: LineageGraph, node_target instead of host, the
 registered rel spellings.
 """
+
 from __future__ import annotations
 
 from pathlib import Path
@@ -65,17 +66,23 @@ def test_assertion_panel_passes_for_clean_fixture(page: str) -> None:
 def test_comment_box_per_folder_and_export(page: str) -> None:
     assert 'class="note"' in page
     assert "exportNotes()" in page
-    assert "drydocs-lineage-review-" in page   # localStorage namespace is ours
+    assert "drydocs-lineage-review-" in page  # localStorage namespace is ours
 
 
 def test_html_escaped() -> None:
     # markup-looking tokens in a cmd_line must be escaped, never raw
     g = LineageGraph()
-    g.add_process(ProcessNode(
-        node_id=process_id("controlm_job", "1.2"), kind="controlm_job",
-        name="J_ESC", command="run.sh --tag <odate> & echo 'x'",
-        node_target="host-x", run_as="svc.x", folder="F",
-    ))
+    g.add_process(
+        ProcessNode(
+            node_id=process_id("controlm_job", "1.2"),
+            kind="controlm_job",
+            name="J_ESC",
+            command="run.sh --tag <odate> & echo 'x'",
+            node_target="host-x",
+            run_as="svc.x",
+            folder="F",
+        )
+    )
     html = to_html(g, doc_id="esc")
     assert "<odate>" not in html
     assert "&lt;odate&gt;" in html
@@ -86,8 +93,11 @@ def test_unresolved_dependency_flags_review_needed() -> None:
     g = LineageGraph()
     jid = process_id("controlm_job", "1.2")
     cid = process_id("unknown", "mystery_bin")
-    g.add_process(ProcessNode(node_id=jid, kind="controlm_job", name="J",
-                              node_target="h", run_as="u", folder="F"))
+    g.add_process(
+        ProcessNode(
+            node_id=jid, kind="controlm_job", name="J", node_target="h", run_as="u", folder="F"
+        )
+    )
     g.add_process(ProcessNode(node_id=cid, kind="unknown", name="mystery_bin"))
     g.add_rel(jid, "INVOKES", cid)
     html = to_html(g, doc_id="warn")
@@ -102,8 +112,9 @@ def test_unresolved_file_op_candidate_flags_review_needed() -> None:
     g = LineageGraph()
     sid = process_id("shell_script", "/opt/orphan.ksh")
     aid = asset_id("local_file", "/data/x.dat")
-    g.add_process(ProcessNode(node_id=sid, kind="shell_script", name="orphan.ksh",
-                              path="/opt/orphan.ksh"))
+    g.add_process(
+        ProcessNode(node_id=sid, kind="shell_script", name="orphan.ksh", path="/opt/orphan.ksh")
+    )
     g.add_data_asset(DataAssetNode(node_id=aid, kind="local_file", location="/data/x.dat"))
     g.add_rel(sid, "READS_FROM", aid)  # no job INVOKES sid anywhere
     html = to_html(g, doc_id="fops")
@@ -118,12 +129,24 @@ def test_file_op_candidates_render_on_the_job_card() -> None:
     g = LineageGraph()
     jid = process_id("controlm_job", "161015.22")
     aid = asset_id("local_file", "/data/arch/loans.dat.gz")
-    g.add_process(ProcessNode(node_id=jid, kind="controlm_job", name="JOB_ARCHIVE",
-                              node_target="h", run_as="svc.x", folder="F",
-                              command="gzip /data/arch/loans.dat"))
-    g.add_data_asset(DataAssetNode(
-        node_id=aid, kind="local_file", location="/data/arch/loans.dat.gz",
-    ))
+    g.add_process(
+        ProcessNode(
+            node_id=jid,
+            kind="controlm_job",
+            name="JOB_ARCHIVE",
+            node_target="h",
+            run_as="svc.x",
+            folder="F",
+            command="gzip /data/arch/loans.dat",
+        )
+    )
+    g.add_data_asset(
+        DataAssetNode(
+            node_id=aid,
+            kind="local_file",
+            location="/data/arch/loans.dat.gz",
+        )
+    )
     g.add_rel(jid, "WRITES_TO", aid)
     html = to_html(g, doc_id="fop-card")
     assert "all checks passed" in html
@@ -138,8 +161,11 @@ def test_prototype_rel_spellings_render_as_registered(page_graph=None) -> None:
     g = LineageGraph()
     jid = process_id("controlm_job", "1.2")
     cid = process_id("shell_script", "/opt/x.sh")
-    g.add_process(ProcessNode(node_id=jid, kind="controlm_job", name="J",
-                              node_target="h", run_as="u", folder="F"))
+    g.add_process(
+        ProcessNode(
+            node_id=jid, kind="controlm_job", name="J", node_target="h", run_as="u", folder="F"
+        )
+    )
     g.add_process(ProcessNode(node_id=cid, kind="shell_script", name="x.sh"))
     g.add_rel(jid, "READS", cid)  # prototype spelling in, registered out
     html = to_html(g, doc_id="rels")

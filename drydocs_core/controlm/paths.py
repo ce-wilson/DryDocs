@@ -11,6 +11,7 @@ Wildcards (vendor: controlm-file-watcher.md, controlm-pattern-matching.md):
   ``?``  single char        -> a run of N is collapsed to a token: the
          16-``?`` timestamp idiom -> ``{TS16}``; other runs -> ``{Q<n>}``
 """
+
 from __future__ import annotations
 
 import re
@@ -37,8 +38,15 @@ _ROLE_RULES: list[tuple[re.Pattern, str]] = [
     (re.compile(r"OUT|TGT|TARGET|DEST"), "OUTPUT"),
 ]
 _VALID_ROLES = {
-    "WATCH_INPUT", "INPUT", "OUTPUT", "BACKUP", "ARCHIVE",
-    "LOG", "CONFIG", "DROPBOX", "SCRIPT_DIR",
+    "WATCH_INPUT",
+    "INPUT",
+    "OUTPUT",
+    "BACKUP",
+    "ARCHIVE",
+    "LOG",
+    "CONFIG",
+    "DROPBOX",
+    "SCRIPT_DIR",
 }
 
 
@@ -69,6 +77,7 @@ def looks_like_path(value: str) -> bool:
 def canonicalize_path(value: str) -> str:
     """Collapse wildcard runs to stable tokens; leave Phase-B date tokens
     and ``*`` globs intact."""
+
     def _qrun(m: re.Match) -> str:
         n = len(m.group(0))
         return "{TS16}" if n == 16 else f"{{Q{n}}}"

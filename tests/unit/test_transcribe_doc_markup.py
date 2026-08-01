@@ -10,6 +10,7 @@ This test proves the paper path really does produce that schema, using a synthet
 that stands in for a faithfully-transcribed (but fake) scanned page — no real scan, no real
 annotation content, nothing beyond what's already committed in the fixture file.
 """
+
 from __future__ import annotations
 
 from pathlib import Path
@@ -43,9 +44,9 @@ def test_fixture_anchors_are_real_anchors_in_the_doc() -> None:
     md = CONTROLM_TDD.read_text(encoding="utf-8")
     fx = _load_fixture()
     for row in fx["faithful_transcription"]:
-        assert f'<!-- anchor: {row["margin_tag_seen"]} -->' in md, (
-            f"fixture anchor {row['margin_tag_seen']!r} does not exist in the real TDD"
-        )
+        assert (
+            f'<!-- anchor: {row["margin_tag_seen"]} -->' in md
+        ), f"fixture anchor {row['margin_tag_seen']!r} does not exist in the real TDD"
 
 
 def test_transcription_keys_to_feedback_yaml_schema() -> None:
@@ -73,7 +74,12 @@ def test_transcription_output_matches_l5_yaml_shape() -> None:
     notes = {row["margin_tag_seen"]: row["pen_note"] for row in fx["faithful_transcription"]}
     out = feedback_yaml(fx["doc"], notes)
 
-    parsed = yaml.safe_load("\n".join(out.splitlines()[1:]))  # drop feedback_yaml's own '# ...' header line
+    parsed = yaml.safe_load(
+        "\n".join(out.splitlines()[1:])
+    )  # drop feedback_yaml's own '# ...' header line
     assert parsed["doc"] == fx["doc"]
     assert {n["anchor"] for n in parsed["notes"]} == set(notes)
-    assert all(parsed_note["note"].strip() == notes[parsed_note["anchor"]] for parsed_note in parsed["notes"])
+    assert all(
+        parsed_note["note"].strip() == notes[parsed_note["anchor"]]
+        for parsed_note in parsed["notes"]
+    )

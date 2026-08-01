@@ -16,11 +16,8 @@ convenient top-level imports::
 The Control-M loaders are also available under ``drydocs.loaders.controlm``
 as a grouped namespace; see that module for the convenience re-exports.
 """
-from .base import BaseLoader, LoadSummary
 
-# SEAL
-from .seal_applications import SealApplicationsLoader
-from .seal_contacts import SealContactsLoader
+from .base import BaseLoader, LoadSummary
 
 # Catalog
 from .catalog import (
@@ -40,6 +37,10 @@ from .controlm import (
     ControlMHostsLoader,
     ControlMJobsLoader,
 )
+
+# SEAL
+from .seal_applications import SealApplicationsLoader
+from .seal_contacts import SealContactsLoader
 
 __all__ = [
     "BaseLoader",

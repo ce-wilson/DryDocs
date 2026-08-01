@@ -4,6 +4,7 @@ Every test here runs with NO network (the Track-1 portable rule): the table of
 contents is a fixture and the fetcher is injected. The behaviour that matters
 is the REFUSAL — a capture nobody sized must not start.
 """
+
 from __future__ import annotations
 
 import hashlib
@@ -40,10 +41,20 @@ FIXTURE_TOC = json.dumps(
                     "text": "emdef utility for jobs",
                     "url": "emdef.htm",
                     "children": [
-                        {"id": 4, "text": "defjob XML file rules", "url": "16200.htm", "leaf": True},
+                        {
+                            "id": 4,
+                            "text": "defjob XML file rules",
+                            "url": "16200.htm",
+                            "leaf": True,
+                        },
                         {"id": 5, "text": "exportdefjob", "url": "3930.htm", "leaf": True},
                         # duplicate url reachable from a second place
-                        {"id": 6, "text": "defjob XML file rules", "url": "16200.htm", "leaf": True},
+                        {
+                            "id": 6,
+                            "text": "defjob XML file rules",
+                            "url": "16200.htm",
+                            "leaf": True,
+                        },
                     ],
                 }
             ],
@@ -126,9 +137,7 @@ def test_capture_writes_pages_and_manifest(tmp_path):
         calls.append(url)
         return payload
 
-    manifest = capture(
-        tree, entries, delay=0, fetcher=fake_fetch, out_root=tmp_path
-    )
+    manifest = capture(tree, entries, delay=0, fetcher=fake_fetch, out_root=tmp_path)
 
     assert manifest["documents"] == 3
     assert manifest["failed"] == 0
@@ -153,9 +162,7 @@ def test_capture_skips_existing_unless_refresh(tmp_path):
     (tmp_path / "pages").mkdir(parents=True)
     (tmp_path / "pages" / "16200.htm").write_bytes(b"already here")
 
-    manifest = capture(
-        tree, entries, delay=0, fetcher=lambda url: b"new", out_root=tmp_path
-    )
+    manifest = capture(tree, entries, delay=0, fetcher=lambda url: b"new", out_root=tmp_path)
     assert manifest["documents_skipped_existing"] == 1
     assert (tmp_path / "pages" / "16200.htm").read_bytes() == b"already here"
 
@@ -242,7 +249,7 @@ def test_fragment_node_keeps_its_identity_but_is_not_a_second_document(tmp_path)
     on_disk = [p.name for p in (tmp_path / "pages").iterdir()]
     assert on_disk == ["89881.htm"], "no '#' in any filename"
 
-    anchored = [p for p in manifest["pages"] if p["anchor"]][0]
+    anchored = next(p for p in manifest["pages"] if p["anchor"])
     assert anchored["page"] == "89881.htm"
     assert anchored["title"] == "ctl HA parameters"
 

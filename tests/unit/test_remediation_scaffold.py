@@ -6,6 +6,7 @@ cleanly, the format seam is abstract, and the remaining stubs are honest about b
 stubs (NotImplementedError, not silent no-ops). The implemented M0 behavior lives in
 ``test_remediation_m0.py``.
 """
+
 from __future__ import annotations
 
 from pathlib import Path
@@ -20,7 +21,12 @@ from drydocs_remediation.jira import JiraRef
 
 def test_package_surface() -> None:
     assert set(drydocs_remediation.__all__) == {
-        "corroborate", "detect", "equivalence", "formats", "jira", "transform",
+        "corroborate",
+        "detect",
+        "equivalence",
+        "formats",
+        "jira",
+        "transform",
     }
 
 

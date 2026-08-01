@@ -41,25 +41,26 @@ are canonicalized, not resolved). The doc's name/value constraint table
 (alphanumeric-only names, 214-char values) is contradicted by observed
 9.0.x production data and is NOT enforced here.
 """
+
 from __future__ import annotations
 
 import re
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from enum import Enum
 
 from .commands import is_registered_launcher
 
 
 class VariableKind(str, Enum):
-    MALFORMED      = "MALFORMED"
+    MALFORMED = "MALFORMED"
     EMBEDDED_SHELL = "EMBEDDED_SHELL"
-    PLUGIN_NS      = "PLUGIN_NS"
-    FLOW_REF       = "FLOW_REF"
-    DYNAMIC_NAME   = "DYNAMIC_NAME"
-    SEMANTIC_FACT  = "SEMANTIC_FACT"
-    SYSTEM_FUNC    = "SYSTEM_FUNC"
-    VAR_REF        = "VAR_REF"
-    LITERAL        = "LITERAL"
+    PLUGIN_NS = "PLUGIN_NS"
+    FLOW_REF = "FLOW_REF"
+    DYNAMIC_NAME = "DYNAMIC_NAME"
+    SEMANTIC_FACT = "SEMANTIC_FACT"
+    SYSTEM_FUNC = "SYSTEM_FUNC"
+    VAR_REF = "VAR_REF"
+    LITERAL = "LITERAL"
 
 
 # --- token grammar ------------------------------------------------------------
@@ -81,16 +82,35 @@ KNOWN_SYSTEM_FUNCS = frozenset({"CALCDATE", "SUBSTR", "GETENV", "WCALC", "BLANK"
 # (§System Variables Reference): job-general, scheduling, environment, and
 # action variables. Referenced as %%NAME or century-format %%$NAME — never
 # user-defined, so they must NOT enter the Phase-B resolution hot set.
-KNOWN_SYSTEM_VARIABLES = frozenset({
-    # job general
-    "JOBNAME", "OWNER", "APPLIC", "ORDERID", "RUNCOUNT",
-    # scheduling (ODATE-prefixed variants like ODATE_1 handled separately)
-    "ODATE", "NEXT", "ODAY", "OMONTH", "OYEAR", "OWDAY",
-    # environment
-    "DATE", "TIME", "MONTH", "DAY", "YEAR", "WDAY",
-    # action / status
-    "COMPSTAT", "AVG_TIME", "JOBID", "NODEID",
-})
+KNOWN_SYSTEM_VARIABLES = frozenset(
+    {
+        # job general
+        "JOBNAME",
+        "OWNER",
+        "APPLIC",
+        "ORDERID",
+        "RUNCOUNT",
+        # scheduling (ODATE-prefixed variants like ODATE_1 handled separately)
+        "ODATE",
+        "NEXT",
+        "ODAY",
+        "OMONTH",
+        "OYEAR",
+        "OWDAY",
+        # environment
+        "DATE",
+        "TIME",
+        "MONTH",
+        "DAY",
+        "YEAR",
+        "WDAY",
+        # action / status
+        "COMPSTAT",
+        "AVG_TIME",
+        "JOBID",
+        "NODEID",
+    }
+)
 
 
 def _is_system_func(token: str) -> bool:
@@ -101,13 +121,14 @@ def _is_system_var(token: str) -> bool:
     t = token.upper()
     return t in KNOWN_SYSTEM_VARIABLES or t.startswith("ODATE")
 
+
 # backslash-scoped references, per external/orchestration/bmc-controlm/controlm-variables.md
 # (§Scope Levels): %%\VAR is a GLOBAL variable (server-wide), %%\\POOL\VAR
 # is a pool-qualified reference. This shop uses the two-segment form to
 # hand values between jobs of a dataflow (%%\\SCRA_REPORTING\PROID) — the
 # graph treats both as cross-job shared state. Separator backslash count
 # varies in the wild; match one-or-more.
-POOL_REF_RE = re.compile(r"%%\\+(\w+)\\+(\w+)")     # %%\\POOL\VAR
+POOL_REF_RE = re.compile(r"%%\\+(\w+)\\+(\w+)")  # %%\\POOL\VAR
 GLOBAL_REF_RE = re.compile(r"%%\\+(\w+)(?!\\|\w)")  # %%\VAR with no second segment
 
 # plain %%VAR reference — no $ (system func), no \ (flow ref), no dash
@@ -142,53 +163,53 @@ SHELL_VAR_NAMES = {"PRECMD", "POSTCMD", "POSCMD", "PRECOMMAND", "POSTCOMMAND"}
 # name -> STG_APP_FACT.fact_type. Names are matched after stripping a
 # confirmed env suffix, so FID_D / FID_Q / FID_P all map through FID.
 FACT_REGISTRY: dict[str, str] = {
-    "SEAL":            "SEAL",
-    "SEALID":          "SEAL",
-    "FID":             "FID",
-    "RFID":            "FID",
-    "DS_ID":           "DS_ID",
-    "DS_VER":          "DS_VER",
-    "DS_NAME":         "DS_NAME",
-    "PID":             "DS_ID",
-    "DATAFLOW":        "DATAFLOW",
+    "SEAL": "SEAL",
+    "SEALID": "SEAL",
+    "FID": "FID",
+    "RFID": "FID",
+    "DS_ID": "DS_ID",
+    "DS_VER": "DS_VER",
+    "DS_NAME": "DS_NAME",
+    "PID": "DS_ID",
+    "DATAFLOW": "DATAFLOW",
     # -- artifact / launcher canonicals (G16; gate cmdline-nfr-vetting SME-4;
     # ratification source = the digested v2 command-line/variables standard).
     # A NAME here is a SUGGESTION only — _value_fact() decides by VALUE
     # (aliases suggest, values decide). IMAGE -> ARTIFACT_URI is the v2
     # decision-log clean break (the old IMAGE -> IMAGE mapping is removed).
-    "ETL_ARTIFACT_URI":     "ARTIFACT_URI",
-    "IMAGE":                "ARTIFACT_URI",
-    "IMAGE_NAME":           "ARTIFACT_URI",
-    "IMG_PATH":             "ARTIFACT_URI",
-    "CONTAINER_IMAGE":      "ARTIFACT_URI",
-    "JAR_PATH":             "ARTIFACT_URI",
-    "USER_JAR":             "ARTIFACT_URI",
-    "JAR_LOC":              "ARTIFACT_URI",
-    "JAR_NAME":             "ARTIFACT_URI",
-    "MULTI_FILE_JAR":       "ARTIFACT_URI",
-    "PYTHON_SCRIPT":        "ARTIFACT_URI",   # gap-analysis gotcha: often holds the launcher
-    "PY_PATH":              "ARTIFACT_URI",   # ditto — the value contract corrects it
-    "ETL_ARTIFACT_KIND":    "ARTIFACT_KIND",
-    "ETL_ARTIFACT_SHA":     "ARTIFACT_SHA",
-    "IMAGE_SHA":            "ARTIFACT_SHA",
-    "PRE_MR_IMAGE_SHA":     "ARTIFACT_SHA",
-    "ETL_PLATFORM":         "ETL_PLATFORM",
-    "ETL_PLATFORM_FLAGS":   "PLATFORM_FLAGS",
+    "ETL_ARTIFACT_URI": "ARTIFACT_URI",
+    "IMAGE": "ARTIFACT_URI",
+    "IMAGE_NAME": "ARTIFACT_URI",
+    "IMG_PATH": "ARTIFACT_URI",
+    "CONTAINER_IMAGE": "ARTIFACT_URI",
+    "JAR_PATH": "ARTIFACT_URI",
+    "USER_JAR": "ARTIFACT_URI",
+    "JAR_LOC": "ARTIFACT_URI",
+    "JAR_NAME": "ARTIFACT_URI",
+    "MULTI_FILE_JAR": "ARTIFACT_URI",
+    "PYTHON_SCRIPT": "ARTIFACT_URI",  # gap-analysis gotcha: often holds the launcher
+    "PY_PATH": "ARTIFACT_URI",  # ditto — the value contract corrects it
+    "ETL_ARTIFACT_KIND": "ARTIFACT_KIND",
+    "ETL_ARTIFACT_SHA": "ARTIFACT_SHA",
+    "IMAGE_SHA": "ARTIFACT_SHA",
+    "PRE_MR_IMAGE_SHA": "ARTIFACT_SHA",
+    "ETL_PLATFORM": "ETL_PLATFORM",
+    "ETL_PLATFORM_FLAGS": "PLATFORM_FLAGS",
     "LAUNCHER_SCRIPT_PATH": "LAUNCHER_SCRIPT_PATH",
-    "PY_LAUNCH":            "LAUNCHER_SCRIPT_PATH",
-    "PY_LAUNCHER":          "LAUNCHER_SCRIPT_PATH",
-    "SCRIPT_PATH":          "LAUNCHER_SCRIPT_PATH",
-    "ACCELERATOR_PATH":     "LAUNCHER_SCRIPT_PATH",
-    "MULTI_SCRIPT_PATH":    "LAUNCHER_SCRIPT_PATH",
-    "TGT_TABLE":       "TGT_TABLE",
-    "TGT_TABLE_PQU":   "TGT_TABLE",
-    "TGT_DB_NM":       "TGT_DB",
-    "APP_NAME":        "APP_NAME",
-    "ALIAS":           "ALIAS",
-    "NOTIFY":          "NOTIFICATION",
-    "EMAIL":           "NOTIFICATION",
-    "EMAIL_GRP":       "NOTIFICATION",
-    "EMAIL_LIST":      "NOTIFICATION",
+    "PY_LAUNCH": "LAUNCHER_SCRIPT_PATH",
+    "PY_LAUNCHER": "LAUNCHER_SCRIPT_PATH",
+    "SCRIPT_PATH": "LAUNCHER_SCRIPT_PATH",
+    "ACCELERATOR_PATH": "LAUNCHER_SCRIPT_PATH",
+    "MULTI_SCRIPT_PATH": "LAUNCHER_SCRIPT_PATH",
+    "TGT_TABLE": "TGT_TABLE",
+    "TGT_TABLE_PQU": "TGT_TABLE",
+    "TGT_DB_NM": "TGT_DB",
+    "APP_NAME": "APP_NAME",
+    "ALIAS": "ALIAS",
+    "NOTIFY": "NOTIFICATION",
+    "EMAIL": "NOTIFICATION",
+    "EMAIL_GRP": "NOTIFICATION",
+    "EMAIL_LIST": "NOTIFICATION",
 }
 
 # --- G16: value contracts (aliases suggest, VALUES decide) ---------------------
@@ -201,11 +222,11 @@ _SHA_DIGEST_RE = re.compile(r"^([0-9a-f]{40}|[0-9a-f]{64})$", re.IGNORECASE)
 #: rolls up here is an ALIAS — still materialized (non-destructive on legacy),
 #: but flagged for rename via ClassifiedVariable.fact_alias_of
 CANONICAL_FACT_NAMES: dict[str, str] = {
-    "ARTIFACT_URI":         "ETL_ARTIFACT_URI",
-    "ARTIFACT_KIND":        "ETL_ARTIFACT_KIND",
-    "ARTIFACT_SHA":         "ETL_ARTIFACT_SHA",
-    "ETL_PLATFORM":         "ETL_PLATFORM",
-    "PLATFORM_FLAGS":       "ETL_PLATFORM_FLAGS",
+    "ARTIFACT_URI": "ETL_ARTIFACT_URI",
+    "ARTIFACT_KIND": "ETL_ARTIFACT_KIND",
+    "ARTIFACT_SHA": "ETL_ARTIFACT_SHA",
+    "ETL_PLATFORM": "ETL_PLATFORM",
+    "PLATFORM_FLAGS": "ETL_PLATFORM_FLAGS",
     "LAUNCHER_SCRIPT_PATH": "LAUNCHER_SCRIPT_PATH",
 }
 
@@ -234,25 +255,25 @@ class ClassifiedVariable:
 
     raw_name: str
     raw_value: str | None
-    name: str                                  # raw_name minus the %% prefix
+    name: str  # raw_name minus the %% prefix
     kind: VariableKind
     # feature extraction (populated regardless of primary kind)
-    plugin_namespace: str | None = None        # 'FileWatch', 'UCM', ...
-    fact_type: str | None = None               # FACT_REGISTRY hit, if any
-    env_candidate: str | None = None           # D/Q/P/T suffix letter (unconfirmed)
-    env_tag: str | None = None                 # confirmed by classify_job_variables
-    plain_refs: tuple[str, ...] = ()           # user %%VAR references in value
-    dollar_refs: tuple[str, ...] = ()          # user vars referenced as %%$VAR
-    system_funcs: tuple[str, ...] = ()         # CALCDATE, SUBSTR, GETENV, ...
-    system_vars: tuple[str, ...] = ()          # ODATE, ORDERID, JOBNAME, ...
+    plugin_namespace: str | None = None  # 'FileWatch', 'UCM', ...
+    fact_type: str | None = None  # FACT_REGISTRY hit, if any
+    env_candidate: str | None = None  # D/Q/P/T suffix letter (unconfirmed)
+    env_tag: str | None = None  # confirmed by classify_job_variables
+    plain_refs: tuple[str, ...] = ()  # user %%VAR references in value
+    dollar_refs: tuple[str, ...] = ()  # user vars referenced as %%$VAR
+    system_funcs: tuple[str, ...] = ()  # CALCDATE, SUBSTR, GETENV, ...
+    system_vars: tuple[str, ...] = ()  # ODATE, ORDERID, JOBNAME, ...
     flow_refs: tuple[tuple[str, str], ...] = ()  # (pool/flow, var) two-segment refs
-    global_refs: tuple[str, ...] = ()          # %%\VAR single-segment global refs
-    has_adjacent_refs: bool = False            # dynamic-name composition hazard
-    value_is_delimiter: bool = False           # value is pure punctuation (dot-smuggling)
-    fact_name_mismatch: bool = False           # G16 WARN: name suggested one fact family,
-                                               # the VALUE decided another (values win)
-    fact_alias_of: str | None = None           # G16 WARN: canonical name to rename to;
-                                               # None == canonical spelling (WARN-free)
+    global_refs: tuple[str, ...] = ()  # %%\VAR single-segment global refs
+    has_adjacent_refs: bool = False  # dynamic-name composition hazard
+    value_is_delimiter: bool = False  # value is pure punctuation (dot-smuggling)
+    fact_name_mismatch: bool = False  # G16 WARN: name suggested one fact family,
+    # the VALUE decided another (values win)
+    fact_alias_of: str | None = None  # G16 WARN: canonical name to rename to;
+    # None == canonical spelling (WARN-free)
 
     @property
     def all_var_refs(self) -> tuple[str, ...]:
@@ -261,7 +282,7 @@ class ClassifiedVariable:
         are excluded: they canonicalize to symbolic tokens, not lookups."""
         return self.plain_refs + self.dollar_refs
 
-    def with_env_tag(self, env_tag: str) -> "ClassifiedVariable":
+    def with_env_tag(self, env_tag: str) -> ClassifiedVariable:
         return ClassifiedVariable(**{**self.__dict__, "env_tag": env_tag})
 
 
@@ -293,30 +314,19 @@ def classify_variable(name: str, value: str | None) -> ClassifiedVariable:
 
     # route every token: system function / system variable / user reference.
     # Both %%TOKEN and century-format %%$TOKEN syntaxes carry system tokens.
-    system_funcs = tuple(
-        t for t in (*dollar_tokens, *plain_tokens) if _is_system_func(t)
-    )
+    system_funcs = tuple(t for t in (*dollar_tokens, *plain_tokens) if _is_system_func(t))
     system_vars = tuple(
-        t for t in (*dollar_tokens, *plain_tokens)
-        if _is_system_var(t) and not _is_system_func(t)
+        t for t in (*dollar_tokens, *plain_tokens) if _is_system_var(t) and not _is_system_func(t)
     )
     dollar_refs = tuple(
-        t for t in dollar_tokens
-        if not _is_system_func(t) and not _is_system_var(t)
+        t for t in dollar_tokens if not _is_system_func(t) and not _is_system_var(t)
     )
-    plain_refs = tuple(
-        t for t in plain_tokens
-        if not _is_system_func(t) and not _is_system_var(t)
-    )
+    plain_refs = tuple(t for t in plain_tokens if not _is_system_func(t) and not _is_system_var(t))
 
     env_m = ENV_SUFFIX_RE.match(bare) if is_valid_name else None
     env_candidate = env_m.group("env") if env_m else None
     fact_base = env_m.group("base") if env_m else bare
-    fact_type = (
-        FACT_REGISTRY.get(bare) or FACT_REGISTRY.get(fact_base)
-        if is_valid_name
-        else None
-    )
+    fact_type = FACT_REGISTRY.get(bare) or FACT_REGISTRY.get(fact_base) if is_valid_name else None
 
     ns = bare.split("-", 1)[0] if is_valid_name and "-" in bare else None
 
@@ -330,9 +340,13 @@ def classify_variable(name: str, value: str | None) -> ClassifiedVariable:
     # family is the name-value-mismatch WARN.
     fact_name_mismatch = False
     if (
-        is_valid_name and text
-        and not any_user_refs and not any_system_tokens
-        and not flow_refs and not global_refs and not has_adjacent
+        is_valid_name
+        and text
+        and not any_user_refs
+        and not any_system_tokens
+        and not flow_refs
+        and not global_refs
+        and not has_adjacent
     ):
         value_fact = _value_fact(text)
         if value_fact is not None and value_fact != fact_type:
@@ -342,8 +356,7 @@ def classify_variable(name: str, value: str | None) -> ClassifiedVariable:
     # canonical spelling itself (legacy stays materialized — non-destructive)
     canonical = CANONICAL_FACT_NAMES.get(fact_type or "")
     fact_alias_of = (
-        canonical if canonical and bare != canonical and fact_base != canonical
-        else None
+        canonical if canonical and bare != canonical and fact_base != canonical else None
     )
     # Dot-smuggling detector (metadata-plan Phase 2): a value that is wholly
     # punctuation — '.', '_', '-', '/' — is a literal delimiter parked in a
@@ -417,8 +430,7 @@ def classify_job_variables(
     confirmed = {base for base, envs in by_base.items() if len(envs) >= 2}
     return [
         cv.with_env_tag(ENV_LETTER_MAP[cv.env_candidate])
-        if cv.env_candidate
-        and cv.name[: -(len(cv.env_candidate) + 1)] in confirmed
+        if cv.env_candidate and cv.name[: -(len(cv.env_candidate) + 1)] in confirmed
         else cv
         for cv in classified
     ]

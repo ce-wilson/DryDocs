@@ -8,6 +8,7 @@ Three settings groups, each loaded from environment variables (or .env):
 Use :func:`load_settings` to fetch all three at once. Loaders construct only
 what they need; the bootstrap CLI pulls Neo4jSettings first.
 """
+
 from __future__ import annotations
 
 from pathlib import Path

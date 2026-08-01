@@ -26,6 +26,7 @@ local infra, so this fixture cannot drift from the container operators run.
 First run pulls that image (+ APOC via NEO4J_PLUGINS) — allow a few minutes and
 outbound network.
 """
+
 from __future__ import annotations
 
 import shutil
@@ -62,12 +63,7 @@ def _docker_available() -> bool:
     if shutil.which("docker") is None:
         return False
     try:
-        return (
-            subprocess.run(
-                ["docker", "info"], capture_output=True, timeout=30
-            ).returncode
-            == 0
-        )
+        return subprocess.run(["docker", "info"], capture_output=True, timeout=30).returncode == 0
     except (OSError, subprocess.TimeoutExpired):
         return False
 
@@ -111,9 +107,9 @@ def _invoke(env: dict, *args: str):
     from drydocs.cli import app
 
     result = CliRunner().invoke(app, list(args), env=env)
-    assert result.exit_code == 0, (
-        f"drydocs {' '.join(args)} exited {result.exit_code}:\n{result.output}"
-    )
+    assert (
+        result.exit_code == 0
+    ), f"drydocs {' '.join(args)} exited {result.exit_code}:\n{result.output}"
     return result
 
 
@@ -121,13 +117,13 @@ def _invoke(env: dict, *args: str):
 def loaded_graph(neo4j_env):
     """Run the operator chain once; every test below asserts against the result."""
     _invoke(neo4j_env, "check")
-    _invoke(neo4j_env, "bootstrap")                    # constraints + ontology (APOC path)
+    _invoke(neo4j_env, "bootstrap")  # constraints + ontology (APOC path)
     # G29: the chain verb, scoped to the one supplement M3 needs. The verb also
     # asserts every :OntologyTerm IRI the .cypher declares is present after the
     # apply — so this step now proves the supplement LANDED against real Neo4j,
     # not merely that its Cypher parsed.
     _invoke(neo4j_env, "apply-supplements", "--only", "base")
-    _invoke(neo4j_env, "ingest-controlm")              # bundled-sample M3 chain
+    _invoke(neo4j_env, "ingest-controlm")  # bundled-sample M3 chain
     return neo4j_env
 
 

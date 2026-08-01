@@ -18,6 +18,7 @@ allowlisted here with a recorded reason. The guard deliberately embeds NO real
 values — membership in the block is the whole check, so the test itself can
 never leak what it protects against.
 """
+
 from __future__ import annotations
 
 import re
@@ -42,8 +43,21 @@ BARE_ID_EXCLUDED_PREFIXES = (
 )
 
 BINARY_SUFFIXES = {
-    ".png", ".webp", ".jpg", ".jpeg", ".gif", ".ico", ".pdf", ".pyc",
-    ".woff", ".woff2", ".ttf", ".eot", ".zip", ".gz", ".lock",
+    ".png",
+    ".webp",
+    ".jpg",
+    ".jpeg",
+    ".gif",
+    ".ico",
+    ".pdf",
+    ".pyc",
+    ".woff",
+    ".woff2",
+    ".ttf",
+    ".eot",
+    ".zip",
+    ".gz",
+    ".lock",
 }
 
 # --------------------------------------------------------------------------
@@ -54,27 +68,47 @@ BINARY_SUFFIXES = {
 # so they stay. Identity-shaped values (SEAL/FID/roster/DL) never get
 # allowlisted; they get resweeped into the block instead.
 # --------------------------------------------------------------------------
-CTM_FOLDER_KEYS = frozenset({
-    "161014", "161015", "161016", "161020",
-    "160500", "160501", "162001", "161999",
-})
+CTM_FOLDER_KEYS = frozenset(
+    {
+        "161014",
+        "161015",
+        "161016",
+        "161020",
+        "160500",
+        "160501",
+        "162001",
+        "161999",
+    }
+)
 ALLOWLIST: dict[str, tuple[frozenset[str], str]] = {
     "config/taxonomy/controlm.yaml": (
         CTM_FOLDER_KEYS,
         "Control-M surrogate folder table keys of the sanitized sample family",
     ),
     "drydocs/data/samples/controlm_folders__sample.csv": (
-        CTM_FOLDER_KEYS, "sample-family folder table keys"),
+        CTM_FOLDER_KEYS,
+        "sample-family folder table keys",
+    ),
     "drydocs/data/samples/controlm_jobs__sample.csv": (
-        CTM_FOLDER_KEYS, "sample-family folder table keys"),
+        CTM_FOLDER_KEYS,
+        "sample-family folder table keys",
+    ),
     "drydocs/data/samples/controlm_conditions_in__sample.csv": (
-        CTM_FOLDER_KEYS, "sample-family folder table keys"),
+        CTM_FOLDER_KEYS,
+        "sample-family folder table keys",
+    ),
     "drydocs/data/samples/controlm_conditions_out__sample.csv": (
-        CTM_FOLDER_KEYS, "sample-family folder table keys"),
+        CTM_FOLDER_KEYS,
+        "sample-family folder table keys",
+    ),
     "drydocs/data/samples/controlm_dependencies__sample.csv": (
-        CTM_FOLDER_KEYS, "sample-family folder table keys"),
+        CTM_FOLDER_KEYS,
+        "sample-family folder table keys",
+    ),
     "drydocs/data/samples/controlm_hosts__sample.csv": (
-        CTM_FOLDER_KEYS, "sample-family folder table keys"),
+        CTM_FOLDER_KEYS,
+        "sample-family folder table keys",
+    ),
 }
 
 _BARE_ID = re.compile(r"\b\d{5,6}\b")
@@ -86,14 +120,19 @@ _SEAL_PAIR = re.compile(r"%%SEAL\b[^0-9\n]{0,40}(\d{4,7})")
 def _tracked_files() -> list[str]:
     try:
         out = subprocess.run(
-            ["git", "ls-files"], cwd=REPO, capture_output=True,
-            text=True, check=True,
+            ["git", "ls-files"],
+            cwd=REPO,
+            capture_output=True,
+            text=True,
+            check=True,
         ).stdout
     except (OSError, subprocess.CalledProcessError):  # pragma: no cover
         pytest.skip("git unavailable — publishable tree cannot be enumerated")
     return [
-        line for line in out.splitlines()
-        if line and not line.startswith("internal/")
+        line
+        for line in out.splitlines()
+        if line
+        and not line.startswith("internal/")
         and Path(line).suffix.lower() not in BINARY_SUFFIXES
     ]
 
@@ -147,8 +186,12 @@ def test_folder_name_numeric_segments_are_synthetic_everywhere() -> None:
             if not parsed.prefix_recognized:
                 continue
             for seg in parsed.segments:
-                if seg.isdigit() and 5 <= len(seg) <= 6 \
-                        and not _in_block(seg) and not _allowed(rel, seg):
+                if (
+                    seg.isdigit()
+                    and 5 <= len(seg) <= 6
+                    and not _in_block(seg)
+                    and not _allowed(rel, seg)
+                ):
                     violations.append(f"{rel}: {m.group(0)} -> segment {seg}")
     assert not violations, (
         "folder-name-embedded ids outside the reserved synthetic block "

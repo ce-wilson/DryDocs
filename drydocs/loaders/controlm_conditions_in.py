@@ -7,6 +7,7 @@ boolean-expression metadata, no SIGN column.
 Prereq: :class:`ControlMJobsLoader` must run first; conditions MATCH
 their parent job by ``(job_id, version_serial)``.
 """
+
 from __future__ import annotations
 
 from pathlib import Path
@@ -15,6 +16,7 @@ from typing import ClassVar
 from pydantic import BaseModel
 
 from drydocs_core.models import ControlMConditionInRow
+
 from .base import BaseLoader, compute_row_checksum
 
 

@@ -11,10 +11,12 @@ Every run writes a per-run SQL log (header -> handshake -> rendered SQL ->
 CSV result) under ``SPIDERP_LOGDIR`` so the HITL can verify exactly what was
 extracted — see :mod:`drydocs_core.adapters.sql_run_log`.
 """
+
 from __future__ import annotations
 
 import logging
-from typing import Any, Iterator
+from collections.abc import Iterator
+from typing import Any
 
 from .sql_run_log import SqlRunLog, render_sql
 
@@ -66,9 +68,9 @@ class OracleAdapter:
         self._cursor = None  # type: ignore[assignment]
         self._log: SqlRunLog | None = None
 
-    def __enter__(self) -> "OracleAdapter":
+    def __enter__(self) -> OracleAdapter:
         # Lazy import so we don't require oracledb just to import the module.
-        import oracledb  # noqa: PLC0415
+        import oracledb
 
         if self.run_log:
             self._log = SqlRunLog(self.name, target=self.dsn, user=self.user)
@@ -91,7 +93,7 @@ class OracleAdapter:
             raise
         return self
 
-    def __exit__(self, exc_type, exc_val, exc_tb) -> None:  # noqa: ANN001
+    def __exit__(self, exc_type, exc_val, exc_tb) -> None:
         if self._log is not None:
             self._log.close(error=exc_val)
             self._log = None
@@ -112,4 +114,4 @@ class OracleAdapter:
         for row in self._cursor:
             if self._log is not None:
                 self._log.result_row(row)
-            yield dict(zip(cols, row))
+            yield dict(zip(cols, row, strict=False))

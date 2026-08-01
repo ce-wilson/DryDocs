@@ -7,6 +7,7 @@ source_url + captured_at rule shared with test_classification.py. The backfill
 guard pins the corpora known to be ingested — a new corpus loaded without a
 registry entry should fail HERE, not be discovered in the graph.
 """
+
 from __future__ import annotations
 
 import re
@@ -16,28 +17,29 @@ import pytest
 
 try:
     import yaml
+
     _YAML_AVAILABLE = True
 except ImportError:
     _YAML_AVAILABLE = False
 
 pytestmark = pytest.mark.skipif(not _YAML_AVAILABLE, reason="PyYAML not installed")
 
-CONFIG_DIR     = Path(__file__).resolve().parents[2] / "config"
-DOC_REGISTRY   = CONFIG_DIR / "doc-source-registry.yaml"
+CONFIG_DIR = Path(__file__).resolve().parents[2] / "config"
+DOC_REGISTRY = CONFIG_DIR / "doc-source-registry.yaml"
 CLASSIFICATION = CONFIG_DIR / "classification.yaml"
 
 CONNECTORS = {"web", "filedrop", "confluence", "sharepoint", "teams", "email"}
-TIERS      = {"T1", "T2", "T3", "T4"}
-TARGET_DBS = {"dddocs", "ddcontext"}                 # ADR 0006 §2 — nothing else, ever
-TRUSTS     = {"VERBATIM", "GROUNDED", "SYNTHESIZED"}
-_REFRESH   = re.compile(r"^(manual|on-demand|scheduled\(.+\))$")
+TIERS = {"T1", "T2", "T3", "T4"}
+TARGET_DBS = {"dddocs", "ddcontext"}  # ADR 0006 §2 — nothing else, ever
+TRUSTS = {"VERBATIM", "GROUNDED", "SYNTHESIZED"}
+_REFRESH = re.compile(r"^(manual|on-demand|scheduled\(.+\))$")
 
 # ADR 0006 §4: the curation ladder is FIXED per tier, not chosen per entry.
 CURATION_BY_TIER = {
     "T1": "none",
     "T2": "sme-confirm",
     "T3": "sme-confirm",
-    "T4": "sme-confirm",   # J23: the +confidential rider retired with the Internal-Confidential tier collapse
+    "T4": "sme-confirm",  # J23: the +confidential rider retired with the Internal-Confidential tier collapse
 }
 
 # The corpora known to be ingested as of Q5 (the backfill guard). EXTEND this set
@@ -69,19 +71,29 @@ def test_every_doc_source_fully_declared() -> None:
         seen_ids.add(sid)
 
         if src.get("classification") not in valid_cls:
-            failures.append(f"[{sid}] classification '{src.get('classification')}' not in {sorted(valid_cls)}")
+            failures.append(
+                f"[{sid}] classification '{src.get('classification')}' not in {sorted(valid_cls)}"
+            )
         if not src.get("source"):
             failures.append(f"[{sid}] missing required field 'source'")
         if src.get("connector") not in CONNECTORS:
-            failures.append(f"[{sid}] connector '{src.get('connector')}' not in {sorted(CONNECTORS)}")
+            failures.append(
+                f"[{sid}] connector '{src.get('connector')}' not in {sorted(CONNECTORS)}"
+            )
         if src.get("tier") not in TIERS:
             failures.append(f"[{sid}] tier '{src.get('tier')}' not in {sorted(TIERS)}")
         if src.get("target_db") not in TARGET_DBS:
-            failures.append(f"[{sid}] target_db '{src.get('target_db')}' not in {sorted(TARGET_DBS)} (ADR 0006)")
+            failures.append(
+                f"[{sid}] target_db '{src.get('target_db')}' not in {sorted(TARGET_DBS)} (ADR 0006)"
+            )
         if src.get("trust_default") not in TRUSTS:
-            failures.append(f"[{sid}] trust_default '{src.get('trust_default')}' not in {sorted(TRUSTS)}")
+            failures.append(
+                f"[{sid}] trust_default '{src.get('trust_default')}' not in {sorted(TRUSTS)}"
+            )
         if not _REFRESH.match(str(src.get("refresh", ""))):
-            failures.append(f"[{sid}] refresh '{src.get('refresh')}' not manual | on-demand | scheduled(...)")
+            failures.append(
+                f"[{sid}] refresh '{src.get('refresh')}' not manual | on-demand | scheduled(...)"
+            )
         if src.get("classification") == "External":
             for field in ("source_url", "captured_at"):
                 if not src.get(field):

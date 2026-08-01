@@ -597,7 +597,7 @@ QUERY_SPECS: dict[str, QuerySpec] = {
         ),
         QuerySpec(
             id="lineage.data-assets.v1",
-            database="drydocs",   # G30: was ddlineage — see the block comment above
+            database="drydocs",  # G30: was ddlineage — see the block comment above
             description=(
                 "DataAsset inventory with writer/reader degree — which activities "
                 "produce and consume each asset."
@@ -621,7 +621,7 @@ QUERY_SPECS: dict[str, QuerySpec] = {
         ),
         QuerySpec(
             id="lineage.schema-definition.v1",
-            database="drydocs",   # G30: was ddlineage — see the block comment above
+            database="drydocs",  # G30: was ddlineage — see the block comment above
             description=(
                 "Definition-level schema of each DataAsset node: identity, kind, and "
                 "the property set present. Column-level schema arrives with the DPL "
@@ -705,9 +705,15 @@ QUERY_SPECS: dict[str, QuerySpec] = {
 
 def _validate_registry() -> None:
     for spec in QUERY_SPECS.values():
-        assert _SPEC_ID_RE.match(spec.id), f"spec id '{spec.id}' is not versioned (<area>.<frame>.vN)"
-        assert spec.database in SPEC_DATABASES, f"spec '{spec.id}': database '{spec.database}' not in the reviewed set"
-        assert spec.classification in CLASSIFICATIONS, f"spec '{spec.id}': classification '{spec.classification}' unknown"
+        assert _SPEC_ID_RE.match(
+            spec.id
+        ), f"spec id '{spec.id}' is not versioned (<area>.<frame>.vN)"
+        assert (
+            spec.database in SPEC_DATABASES
+        ), f"spec '{spec.id}': database '{spec.database}' not in the reviewed set"
+        assert (
+            spec.classification in CLASSIFICATIONS
+        ), f"spec '{spec.id}': classification '{spec.classification}' unknown"
         assert spec.columns, f"spec '{spec.id}' declares no columns"
         ensure_read_only(spec.cypher)  # raises WriteRejected on a write-shaped spec
 

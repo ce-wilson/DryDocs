@@ -1,4 +1,4 @@
-﻿"""Offline tests for the tier-5 manual mapping mechanism (gate
+"""Offline tests for the tier-5 manual mapping mechanism (gate
 seal-attribution-match-policy §F, SME-confirmed 2026-07-14).
 
 Pins the manifest gate (registered BEFORE load, replaces_with required,
@@ -6,6 +6,7 @@ superseded refuses), the never-mint-a-relationship rule, the supported-shape
 guard, and template-CSV parsing. Pure — tmp-dir manifests + the real
 relationship vocabulary, no network/DB.
 """
+
 from __future__ import annotations
 
 from pathlib import Path
@@ -13,8 +14,6 @@ from pathlib import Path
 import pytest
 
 yaml = pytest.importorskip("yaml")
-
-from drydocs_core.models import ManualMappingRow
 
 from drydocs.loaders.manual_loads import (
     DEFAULT_MANIFEST_PATH,
@@ -26,16 +25,20 @@ from drydocs.loaders.manual_loads import (
     relationship_registered,
     require_registered,
 )
+from drydocs_core.models import ManualMappingRow
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
 TEMPLATE = REPO_ROOT / "config" / "manual-loads" / "TEMPLATE-node-mapping.csv"
 
-CSV_HEADER = ("source_label,source_key,relationship,rel_props,target_label,"
-              "target_key,create_target_if_missing,note,authored_by,authored_on")
+CSV_HEADER = (
+    "source_label,source_key,relationship,rel_props,target_label,"
+    "target_key,create_target_if_missing,note,authored_by,authored_on"
+)
 
 
-def _repo(tmp_path: Path, *, entry: dict | None = None,
-          manifest_status: str = "confirmed") -> tuple[Path, Path]:
+def _repo(
+    tmp_path: Path, *, entry: dict | None = None, manifest_status: str = "confirmed"
+) -> tuple[Path, Path]:
     """Build a tmp repo skeleton: manifest + a registered CSV. Returns
     (manifest_path, csv_path)."""
     manifest_dir = tmp_path / "config" / "manual-loads"
@@ -70,6 +73,7 @@ def _repo(tmp_path: Path, *, entry: dict | None = None,
 
 # --- the manifest gate (§F.5) --------------------------------------------------
 
+
 def test_registered_pending_load_csv_is_accepted(tmp_path: Path) -> None:
     manifest_path, csv_path = _repo(tmp_path)
     entry = require_registered(csv_path, manifest_path)
@@ -85,20 +89,26 @@ def test_unregistered_csv_is_refused(tmp_path: Path) -> None:
 
 
 def test_superseded_entry_is_refused(tmp_path: Path) -> None:
-    manifest_path, csv_path = _repo(tmp_path, entry={
-        "file": "internal/manual/batch1-mappings.csv",
-        "status": "superseded",
-        "replaces_with": "stg-app-fact automated attribution",
-    })
+    manifest_path, csv_path = _repo(
+        tmp_path,
+        entry={
+            "file": "internal/manual/batch1-mappings.csv",
+            "status": "superseded",
+            "replaces_with": "stg-app-fact automated attribution",
+        },
+    )
     with pytest.raises(ManualLoadError, match="superseded|not loadable"):
         require_registered(csv_path, manifest_path)
 
 
 def test_entry_without_replaces_with_is_refused(tmp_path: Path) -> None:
-    manifest_path, csv_path = _repo(tmp_path, entry={
-        "file": "internal/manual/batch1-mappings.csv",
-        "status": "pending-load",
-    })
+    manifest_path, csv_path = _repo(
+        tmp_path,
+        entry={
+            "file": "internal/manual/batch1-mappings.csv",
+            "status": "pending-load",
+        },
+    )
     with pytest.raises(ManualLoadError, match="replaces_with"):
         require_registered(csv_path, manifest_path)
 
@@ -111,11 +121,12 @@ def test_unconfirmed_manifest_refuses_everything(tmp_path: Path) -> None:
 
 def test_shipped_manifest_is_confirmed_with_empty_queue() -> None:
     doc = yaml.safe_load(DEFAULT_MANIFEST_PATH.read_text(encoding="utf-8"))
-    assert doc["status"] == "confirmed"        # flipped at the 2026-07-14 gate
-    assert doc["files"] == []                  # producer ships mechanism only
+    assert doc["status"] == "confirmed"  # flipped at the 2026-07-14 gate
+    assert doc["files"] == []  # producer ships mechanism only
 
 
 # --- never mint a relationship type (§F.1) --------------------------------------
+
 
 def test_the_k2_shape_is_a_registered_vocabulary_entry() -> None:
     assert relationship_registered("WAS_ASSOCIATED_WITH", "seal_app_ref")
@@ -139,6 +150,7 @@ def test_csv_naming_an_unregistered_relationship_is_refused(tmp_path: Path) -> N
 
 
 # --- the supported-shape guard ---------------------------------------------------
+
 
 def test_unsupported_shape_is_refused_loudly(tmp_path: Path) -> None:
     manifest_path, csv_path = _repo(tmp_path)
@@ -167,6 +179,7 @@ def test_source_key_missing_a_node_key_part_is_refused(tmp_path: Path) -> None:
 
 
 # --- parsing ---------------------------------------------------------------------
+
 
 def test_valid_row_parses_to_the_narrowed_shape(tmp_path: Path) -> None:
     manifest_path, csv_path = _repo(tmp_path)

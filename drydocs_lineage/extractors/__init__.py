@@ -1,4 +1,12 @@
 """Lineage extractors — re-homed from depgraph@feat/controlm-lineage (ADR 0002-C §4)."""
+
+from .code_repo import (
+    CodeRepoExtractor,
+    CorroborationReport,
+    RepoManifestCoverage,
+    corroborate,
+    git_blob_sha1,
+)
 from .controlm_inventory import ControlMInventoryExtractor, ExtractCoverage
 from .controlm_xml import (
     ControlMXmlDefsExtractor,
@@ -21,13 +29,6 @@ from .glue_tables import (
     GlueInventoryCoverage,
     GlueTableInventoryExtractor,
     parse_database_name,
-)
-from .code_repo import (
-    CodeRepoExtractor,
-    CorroborationReport,
-    RepoManifestCoverage,
-    corroborate,
-    git_blob_sha1,
 )
 from .rua_code_ops import RuaCodeOps, RuaCodeOpsCoverage, RuaCodeOpsExtractor
 from .rua_inventory import RuaCoverage, RuaInventoryExtractor

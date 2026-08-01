@@ -34,6 +34,7 @@ Determinism: byte-identical dumps for identical sources — insertion order is
 file order, dumps are ordered by primary key, and no wall-clock values are
 stored (meta carries source content hashes, not timestamps).
 """
+
 from __future__ import annotations
 
 import csv
@@ -60,9 +61,7 @@ from drydocs_core.models import ManualMappingRow
 REPO_ROOT = Path(drydocs_core.__file__).resolve().parent.parent
 DEFAULT_DB_PATH = REPO_ROOT / "var" / "mapping.db"
 ONTOLOGY_MAP_PATH = REPO_ROOT / "config" / "taxonomy-ontology-map.yaml"
-SEAL_CONTACT_OVERRIDES_PATH = (
-    REPO_ROOT / "config" / "overrides" / "seal-contact-overrides.csv"
-)
+SEAL_CONTACT_OVERRIDES_PATH = REPO_ROOT / "config" / "overrides" / "seal-contact-overrides.csv"
 _OVERRIDES_META_KEY = "source:config/overrides/seal-contact-overrides.csv"
 _OVERRIDE_STATUSES = ("active", "corrected-in-seal")
 
@@ -364,18 +363,30 @@ def _ingest_vocabulary(conn: sqlite3.Connection, path: Path) -> None:
         conn.execute(
             "INSERT OR REPLACE INTO node_classification (label, class, prov_type, note) "
             "VALUES (?, ?, ?, ?)",
-            (_text(nc.get("label")), _text(nc.get("class")),
-             _text(nc.get("prov_type")), _text(nc.get("note"))),
+            (
+                _text(nc.get("label")),
+                _text(nc.get("class")),
+                _text(nc.get("prov_type")),
+                _text(nc.get("note")),
+            ),
         )
     for rel in vocab.get("local_relationships") or []:
         conn.execute(
             "INSERT INTO relationship_vocabulary "
             "(id, neo4j_label, role, from_node, to_node, prov_maps_to, sosa_maps_to, "
             " domain, status, note) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
-            (_text(rel.get("id")), _text(rel.get("neo4j_label")), _text(rel.get("role")),
-             _text(rel.get("from_node")), _text(rel.get("to_node")),
-             _text(rel.get("prov_maps_to")), _text(rel.get("sosa_maps_to")),
-             _text(rel.get("domain")), _text(rel.get("status")), _text(rel.get("note"))),
+            (
+                _text(rel.get("id")),
+                _text(rel.get("neo4j_label")),
+                _text(rel.get("role")),
+                _text(rel.get("from_node")),
+                _text(rel.get("to_node")),
+                _text(rel.get("prov_maps_to")),
+                _text(rel.get("sosa_maps_to")),
+                _text(rel.get("domain")),
+                _text(rel.get("status")),
+                _text(rel.get("note")),
+            ),
         )
 
 
@@ -391,14 +402,21 @@ def _ingest_ontology_map(conn: sqlite3.Connection, path: Path) -> None:
             " vocab_id, status, confirmed_by, confirmed_on, applied_on) "
             "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
             (
-                _text(entry.get("id")), seq,
-                _text(tax.get("source")), _text(tax.get("element")),
-                _text(ont.get("from_node")), _text(ont.get("to_node")),
-                _text(ont.get("neo4j_label")), _text(ont.get("role")),
-                _text(ont.get("prov_maps_to")), _text(ont.get("matrix_row")),
-                _text(entry.get("precedence_authority")), _text(entry.get("vocab_id")),
+                _text(entry.get("id")),
+                seq,
+                _text(tax.get("source")),
+                _text(tax.get("element")),
+                _text(ont.get("from_node")),
+                _text(ont.get("to_node")),
+                _text(ont.get("neo4j_label")),
+                _text(ont.get("role")),
+                _text(ont.get("prov_maps_to")),
+                _text(ont.get("matrix_row")),
+                _text(entry.get("precedence_authority")),
+                _text(entry.get("vocab_id")),
                 _text(entry.get("status")),
-                _text(entry.get("confirmed_by")), _text(entry.get("confirmed_on")),
+                _text(entry.get("confirmed_by")),
+                _text(entry.get("confirmed_on")),
                 _text(entry.get("applied_on")),
             ),
         )
@@ -419,9 +437,14 @@ def _ingest_manual_loads(
         conn.execute(
             "INSERT INTO manual_load_file (file, scope, status, replaces_with, "
             "authored_by, notes) VALUES (?, ?, ?, ?, ?, ?)",
-            (file_rel, _text(entry.get("scope")), _text(entry.get("status")),
-             _text(entry.get("replaces_with")), _text(entry.get("authored_by")),
-             _text(entry.get("notes"))),
+            (
+                file_rel,
+                _text(entry.get("scope")),
+                _text(entry.get("status")),
+                _text(entry.get("replaces_with")),
+                _text(entry.get("authored_by")),
+                _text(entry.get("notes")),
+            ),
         )
         if entry.get("status") not in ("pending-load", "loaded"):
             continue  # superseded files are registered (audit) but not materialized
@@ -435,9 +458,17 @@ def _ingest_manual_loads(
                 "INSERT INTO manual_mapping (file, line_no, folder_id, job_id, seal_id, "
                 "create_target_if_missing, authored_by, authored_on, note) "
                 "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
-                (file_rel, line_no, row.folder_id, row.job_id, row.seal_id,
-                 int(row.create_target_if_missing), row.authored_by,
-                 row.authored_on, row.note),
+                (
+                    file_rel,
+                    line_no,
+                    row.folder_id,
+                    row.job_id,
+                    row.seal_id,
+                    int(row.create_target_if_missing),
+                    row.authored_by,
+                    row.authored_on,
+                    row.note,
+                ),
             )
     return hashes
 
@@ -484,22 +515,30 @@ def _ingest_seal_overrides(conn: sqlite3.Connection, path: Path) -> None:
             if not authored_by:
                 raise MappingStoreError(f"{where}: authored_by is required")
             if status not in _OVERRIDE_STATUSES:
-                raise MappingStoreError(
-                    f"{where}: status {status!r} not in {_OVERRIDE_STATUSES}"
-                )
+                raise MappingStoreError(f"{where}: status {status!r} not in {_OVERRIDE_STATUSES}")
             conn.execute(
                 "INSERT INTO seal_contact_override (line_no, app_seal_id, role_name, "
                 "seal_holder_sid, override_holder_sid, override_holder_name, rationale, "
                 "authored_by, authored_on, status) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
-                (line_no, app, role, seal_sid, override_sid,
-                 _text(raw.get("override_holder_name")), rationale, authored_by,
-                 _text(raw.get("authored_on")), status),
+                (
+                    line_no,
+                    app,
+                    role,
+                    seal_sid,
+                    override_sid,
+                    _text(raw.get("override_holder_name")),
+                    rationale,
+                    authored_by,
+                    _text(raw.get("authored_on")),
+                    status,
+                ),
             )
 
 
 # ---------------------------------------------------------------------------
 # Deterministic dumps — the gate-reviewable text twin of the binary DB.
 # ---------------------------------------------------------------------------
+
 
 def dump_csv(conn: sqlite3.Connection, out_dir: str | Path) -> list[Path]:
     """Write one sorted CSV per table. Byte-identical for identical sources —
@@ -523,6 +562,7 @@ def dump_csv(conn: sqlite3.Connection, out_dir: str | Path) -> list[Path]:
 # ---------------------------------------------------------------------------
 # M1/M3 read seam — manual mapping rows served FROM the materialization.
 # ---------------------------------------------------------------------------
+
 
 def manual_mapping_rows_from_store(
     csv_path: str | Path,
@@ -555,9 +595,14 @@ def manual_mapping_rows_from_store(
         )
         rows = [
             ManualMappingRow(
-                folder_id=r[0], job_id=r[1], seal_id=r[2],
-                create_target_if_missing=bool(r[3]), manual_load_file=r[4],
-                authored_by=r[5], authored_on=r[6], note=r[7],
+                folder_id=r[0],
+                job_id=r[1],
+                seal_id=r[2],
+                create_target_if_missing=bool(r[3]),
+                manual_load_file=r[4],
+                authored_by=r[5],
+                authored_on=r[6],
+                note=r[7],
             )
             for r in cur
         ]
@@ -572,6 +617,7 @@ def manual_mapping_rows_from_store(
 
 
 def tables(conn: sqlite3.Connection) -> Iterable[str]:
-    return [r[0] for r in conn.execute(
-        "SELECT name FROM sqlite_master WHERE type = 'table' ORDER BY name"
-    )]
+    return [
+        r[0]
+        for r in conn.execute("SELECT name FROM sqlite_master WHERE type = 'table' ORDER BY name")
+    ]

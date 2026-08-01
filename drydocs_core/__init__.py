@@ -17,6 +17,7 @@ Usage::
     from drydocs_core import controlm, models
     client = drydocs_core.Neo4jClient(uri, user, password, database="ddcontext")
 """
+
 from . import adapters, config, controlm, models, ontology, precedence, source_registry
 from .neo4j_client import Neo4jClient
 

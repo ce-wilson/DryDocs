@@ -32,7 +32,7 @@ for entry in (str(REPO_ROOT / "agents"), str(REPO_ROOT)):
     if entry not in sys.path:
         sys.path.insert(0, entry)
 
-from common import agent_run_writer, llm_ledger  # noqa: E402
+from common import agent_run_writer  # noqa: E402
 from common.llm_ledger import LlmLedger, estimate_cost_usd  # noqa: E402
 from graph_qa import pipeline as pl  # noqa: E402
 
@@ -42,8 +42,11 @@ SPEC_ID = "explorer.applications.v1"
 
 VOCAB = [
     {
-        "neo4j_label": "WAS_INFORMED_BY", "from_node": "ControlMJob",
-        "to_node": "ControlMJob", "role": None, "note": "job dependency",
+        "neo4j_label": "WAS_INFORMED_BY",
+        "from_node": "ControlMJob",
+        "to_node": "ControlMJob",
+        "role": None,
+        "note": "job dependency",
         "status": "active",
     }
 ]
@@ -82,10 +85,12 @@ def _ok_read(cypher, params=None, database=None, row_cap=100, timeout_s=15.0):
 
 def _answer(tmp_path, user_id=""):
     """Run one Tier-0 question through the pipeline with a tmp-dir ledger."""
-    provider = FakeProvider([
-        '{"spec_id": "%s", "params": {}}' % SPEC_ID,
-        "There is 1 application.",
-    ])
+    provider = FakeProvider(
+        [
+            f'{{"spec_id": "{SPEC_ID}", "params": {{}}}}',
+            "There is 1 application.",
+        ]
+    )
     pipeline = pl.GraphQaPipeline(
         provider=provider,
         run_read=_ok_read,
@@ -93,9 +98,7 @@ def _answer(tmp_path, user_id=""):
         vocabulary_loader=lambda: VOCAB,
         ledger=LlmLedger(log_dir=tmp_path),
     )
-    return pipeline.answer(
-        "how many applications?", run_id="qa-test-r3", user_id=user_id
-    )
+    return pipeline.answer("how many applications?", run_id="qa-test-r3", user_id=user_id)
 
 
 # ── price map ────────────────────────────────────────────────────────────────
@@ -116,33 +119,34 @@ def test_every_llm_call_appends_one_jsonl_line(tmp_path):
     envelope = _answer(tmp_path)
     ledger_files = list(tmp_path.glob("qa.graph_qa.*.jsonl"))
     assert len(ledger_files) == 1  # in the log dir, never the repo
-    lines = [json.loads(l) for l in ledger_files[0].read_text(encoding="utf-8").splitlines()]
-    calls = [l for l in lines if l["kind"] == "llm_call"]
+    lines = [json.loads(line) for line in ledger_files[0].read_text(encoding="utf-8").splitlines()]
+    calls = [rec for rec in lines if rec["kind"] == "llm_call"]
     assert len(calls) == envelope.metrics.llm_calls == 2  # router + answer
     assert [c["step"] for c in calls] == ["router", "answer"]
     for call in calls:
         for field in (
-            "run_id", "step", "model", "prompt_tokens", "completion_tokens",
-            "cost_est_usd", "duration_ms", "iteration",
+            "run_id",
+            "step",
+            "model",
+            "prompt_tokens",
+            "completion_tokens",
+            "cost_est_usd",
+            "duration_ms",
+            "iteration",
         ):
             assert field in call, f"ledger line missing {field}"
         assert call["run_id"] == "qa-test-r3"
         assert call["cost_est_usd"] is not None  # sonnet-4-5 is in the price map
     # the envelope's cost is the sum the ledger priced
-    assert envelope.metrics.cost_est_usd == pytest.approx(
-        sum(c["cost_est_usd"] for c in calls)
-    )
+    assert envelope.metrics.cost_est_usd == pytest.approx(sum(c["cost_est_usd"] for c in calls))
 
 
 def test_run_line_is_the_only_home_of_the_question_text(tmp_path):
     envelope = _answer(tmp_path)
     ledger = LlmLedger(log_dir=tmp_path)
     ledger.run(envelope, "how many applications?")
-    lines = [
-        json.loads(l)
-        for l in ledger.path().read_text(encoding="utf-8").splitlines()
-    ]
-    runs = [l for l in lines if l["kind"] == "run"]
+    lines = [json.loads(line) for line in ledger.path().read_text(encoding="utf-8").splitlines()]
+    runs = [rec for rec in lines if rec["kind"] == "run"]
     assert len(runs) == 1
     run = runs[0]
     assert run["question"] == "how many applications?"  # full text: ledger only
@@ -154,13 +158,17 @@ def test_run_line_is_the_only_home_of_the_question_text(tmp_path):
 
 
 def test_no_ledger_means_no_cost_and_no_failure(tmp_path):
-    provider = FakeProvider([
-        '{"spec_id": "%s", "params": {}}' % SPEC_ID,
-        "There is 1 application.",
-    ])
+    provider = FakeProvider(
+        [
+            f'{{"spec_id": "{SPEC_ID}", "params": {{}}}}',
+            "There is 1 application.",
+        ]
+    )
     pipeline = pl.GraphQaPipeline(
-        provider=provider, run_read=_ok_read,
-        graph_schema=lambda: LIVE_SCHEMA, vocabulary_loader=lambda: VOCAB,
+        provider=provider,
+        run_read=_ok_read,
+        graph_schema=lambda: LIVE_SCHEMA,
+        vocabulary_loader=lambda: VOCAB,
     )
     envelope = pipeline.answer("how many applications?", run_id="qa-test-r3b")
     assert envelope.metrics.cost_est_usd is None

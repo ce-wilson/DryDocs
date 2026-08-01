@@ -6,6 +6,7 @@ write targets across the trust boundary, and are honest stubs. The D2 separation
 ("neither imports the other") is enforced by test_module_boundary's
 components-don't-import-each-other rule over the new `lineage`/`deepdoc` groups.
 """
+
 from __future__ import annotations
 
 import pytest
@@ -21,21 +22,25 @@ from drydocs_lineage.writer import write_curated
 
 def test_package_surfaces() -> None:
     assert set(drydocs_lineage.__all__) == {
-        "DATABASE", "curation", "extractors", "model", "review", "writer",
+        "DATABASE",
+        "curation",
+        "extractors",
+        "model",
+        "review",
+        "writer",
     }
     assert set(drydocs_deepdoc.__all__) == {"DATABASE", "investigate", "writer"}
 
 
 def test_write_targets_sit_on_opposite_sides_of_the_trust_boundary() -> None:
-    assert drydocs_lineage.DATABASE == "drydocs"           # ground truth (curated)
-    assert drydocs_deepdoc.DATABASE == "ddcontext"   # isolated uncertain
+    assert drydocs_lineage.DATABASE == "drydocs"  # ground truth (curated)
+    assert drydocs_deepdoc.DATABASE == "ddcontext"  # isolated uncertain
     assert drydocs_lineage.DATABASE != drydocs_deepdoc.DATABASE
 
 
 def test_both_components_share_the_core_parser() -> None:
     # D2: "they share the command-line/lineage parser in drydocs-core"
     import drydocs_core.controlm as core_parser
-
     from drydocs_deepdoc import investigate
     from drydocs_lineage.extractors import controlm_inventory
 
@@ -60,9 +65,12 @@ def test_stubs_raise_not_implemented() -> None:
 def test_value_objects_carry_the_trust_contract() -> None:
     assert CurationStatus.PROPOSED.value == "proposed"  # candidates never born confirmed
     finding = ContextFinding(
-        subject_urn="urn:sample:job", predicate="observed_reads",
-        object_urn="urn:sample:asset", reliability=0.4,
-        trust="SYNTHESIZED", evidence="synthetic",
+        subject_urn="urn:sample:job",
+        predicate="observed_reads",
+        object_urn="urn:sample:asset",
+        reliability=0.4,
+        trust="SYNTHESIZED",
+        evidence="synthetic",
     )
     assert 0.0 <= finding.reliability <= 1.0
     assert finding.trust == "SYNTHESIZED"  # VERBATIM never originates in deepdoc

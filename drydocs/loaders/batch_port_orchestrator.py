@@ -22,15 +22,18 @@ the C12 gate). An unmapped string yields ``product_id=None`` — the Cypher
 flags the app node and the adapter reports it (the invocation-patterns
 coverage-policy precedent: surfaced, never guessed).
 """
+
 from __future__ import annotations
 
 import logging
+from collections.abc import Iterator
 from pathlib import Path
-from typing import TYPE_CHECKING, ClassVar, Iterator
+from typing import TYPE_CHECKING, ClassVar
 
 import yaml
 
 from drydocs_core.models.registry import BatchPortOrchestratorRow
+
 from .base import BaseLoader, LoadSummary
 
 if TYPE_CHECKING:  # pragma: no cover
@@ -86,14 +89,14 @@ class BatchOrchestratorYamlAdapter:
         self.unmapped: list[dict] = []
         self.apps_without_declaration = 0
 
-    def __enter__(self) -> "BatchOrchestratorYamlAdapter":
+    def __enter__(self) -> BatchOrchestratorYamlAdapter:
         return self
 
     def __exit__(
         self,
         exc_type: type[BaseException] | None,
         exc: BaseException | None,
-        tb: "TracebackType | None",
+        tb: TracebackType | None,
     ) -> None:
         return None
 
@@ -224,7 +227,9 @@ class BatchPortOrchestratorLoader(BaseLoader):
             )
         LOGGER.info(
             "Loader %s: endpoints present (%d :BusinessApplication, %d :SoftwareProduct)",
-            self.name, apps, products,
+            self.name,
+            apps,
+            products,
         )
 
     def _report_rows_that_wrote_nothing(self) -> None:
@@ -303,5 +308,7 @@ class BatchPortOrchestratorLoader(BaseLoader):
                 "resolved it, but no matching :SoftwareProduct is in this database. "
                 "The registry is present but incomplete; re-run "
                 "`drydocs load-software-registry`.",
-                self.name, row.get("seal_id"), row.get("orchestrator_raw"),
+                self.name,
+                row.get("seal_id"),
+                row.get("orchestrator_raw"),
             )

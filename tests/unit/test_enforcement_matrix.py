@@ -5,6 +5,7 @@ committed web/src/generated/enforcement-matrix.json, every referenced
 file/consumer/guard-test must exist (the generator fails closed on those),
 and every top-level config/ entry must have a surface row.
 """
+
 from __future__ import annotations
 
 import importlib.util

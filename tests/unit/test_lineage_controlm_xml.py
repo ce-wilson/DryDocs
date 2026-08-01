@@ -12,6 +12,7 @@ stays VERBATIM in staging, (e) every skip counted by reason, unknown
 elements tolerated-and-counted, (f) older-format tag synonyms, (g) ZERO
 graph writes — the API is graph-free.
 """
+
 from __future__ import annotations
 
 import inspect
@@ -60,8 +61,7 @@ def xml_root(tmp_path: Path) -> Path:
     root = tmp_path / "controlm-xml"
     root.mkdir()
     (root / "export_p032.xml").write_text(_EXPORT, encoding="utf-8")
-    (root / "not_a_deftable.xml").write_text(
-        "<WORKFLOW><STEP/></WORKFLOW>", encoding="utf-8")
+    (root / "not_a_deftable.xml").write_text("<WORKFLOW><STEP/></WORKFLOW>", encoding="utf-8")
     (root / "broken.xml").write_text("<DEFTABLE><FOLDER", encoding="utf-8")
     return root
 
@@ -73,6 +73,7 @@ def run(xml_root: Path):
 
 # -- (a) taxonomy-first staging with provenance ---------------------------------------
 
+
 def test_folders_and_jobs_staged_with_provenance(run) -> None:
     folders = {f.folder_name: f for f in run.folders}
     assert folders["PRHLD1G"].kind == "smart_folder"
@@ -80,9 +81,13 @@ def test_folders_and_jobs_staged_with_provenance(run) -> None:
     jobs = {j.job_name: j for j in run.jobs}
     j1 = jobs["PRHLD1G001"]
     assert (j1.task_type, j1.node_id, j1.application, j1.run_as) == (
-        "Command", "host-hldm-01", "HLDM", "svc.hldm")
+        "Command",
+        "host-hldm-01",
+        "HLDM",
+        "svc.hldm",
+    )
     assert j1.subfolder_path == ""
-    assert j1.source_file.endswith("export_p032.xml")   # provenance
+    assert j1.source_file.endswith("export_p032.xml")  # provenance
     nested = jobs["PRHLD1G101"]
     assert nested.subfolder_path == "NESTED"
     assert run.coverage.folders == 2
@@ -91,19 +96,18 @@ def test_folders_and_jobs_staged_with_provenance(run) -> None:
 
 # -- (b) document order preserved (the sequential-assignment contract) ----------------
 
+
 def test_variable_order_scope_and_container(run) -> None:
     folder_vars = [v for v in run.variables if v.scope == "FOLDER"]
-    assert [(v.ordinal, v.name) for v in folder_vars] == [
-        (1, "%%SCRIPT_DIR"), (2, "%%ENV_SUFFIX")]
+    assert [(v.ordinal, v.name) for v in folder_vars] == [(1, "%%SCRIPT_DIR"), (2, "%%ENV_SUFFIX")]
     job_vars = [v for v in run.variables if v.scope == "JOB"]
-    assert [(v.container, v.name) for v in job_vars] == [
-        ("PRHLD1G001", "%%SCRIPT")]
+    assert [(v.container, v.name) for v in job_vars] == [("PRHLD1G001", "%%SCRIPT")]
     sub_vars = [v for v in run.variables if v.scope == "SUBFOLDER"]
-    assert [(v.container, v.value) for v in sub_vars] == [
-        ("NESTED", "/apps/etl/nested")]
+    assert [(v.container, v.value) for v in sub_vars] == [("NESTED", "/apps/etl/nested")]
 
 
 # -- (c) the scope_layers handoff — guardrail 1 proven end to end ---------------------
+
 
 def test_scope_layers_feed_the_one_shared_resolver(run) -> None:
     """Staging hands ordered defs to drydocs_core.controlm — the extractor
@@ -121,11 +125,12 @@ def test_subfolder_layer_overrides_the_folder_binding(run) -> None:
     layers = run.scope_layers(job)
     assert [scope for scope, _ in layers] == ["FOLDER", "SUBFOLDER", "JOB"]
     rcl = resolve_command_line(layers, job.cmd_line)
-    assert rcl.resolved == "/apps/etl/nested/cleanup.sh"   # job > subfolder > folder
+    assert rcl.resolved == "/apps/etl/nested/cleanup.sh"  # job > subfolder > folder
     assert rcl.substituted == (("SCRIPT_DIR", "SUBFOLDER"),)
 
 
 # -- (d) cmd_line stays VERBATIM in staging -------------------------------------------
+
 
 def test_cmd_line_staged_verbatim_never_resolved(run) -> None:
     job = next(j for j in run.jobs if j.job_name == "PRHLD1G001")
@@ -134,15 +139,16 @@ def test_cmd_line_staged_verbatim_never_resolved(run) -> None:
 
 # -- (e) every skip counted by reason --------------------------------------------------
 
+
 def test_skips_and_tolerated_elements_counted(run) -> None:
     cov = run.coverage
     assert cov.files_read == 1
-    assert cov.files_invalid == 2        # not-a-DEFTABLE root + broken XML
-    assert cov.jobs_no_name == 1         # the ghost JOB
-    assert cov.duplicate_jobs == 1       # PRHLD1G001 again — first wins
-    assert cov.jobs_no_cmd_line == 1     # the FileWatch job, staged anyway
-    assert cov.variables_no_name == 1    # the nameless VARIABLE
-    assert cov.elements_ignored == 2     # INCOND + SHOUT — tolerated, counted
+    assert cov.files_invalid == 2  # not-a-DEFTABLE root + broken XML
+    assert cov.jobs_no_name == 1  # the ghost JOB
+    assert cov.duplicate_jobs == 1  # PRHLD1G001 again — first wins
+    assert cov.jobs_no_cmd_line == 1  # the FileWatch job, staged anyway
+    assert cov.variables_no_name == 1  # the nameless VARIABLE
+    assert cov.elements_ignored == 2  # INCOND + SHOUT — tolerated, counted
     dupe_kept = next(j for j in run.jobs if j.job_name == "PRHLD1G001")
     assert dupe_kept.cmd_line != "dupe.sh"
     watcher = next(j for j in run.jobs if j.job_name == "PRHLD1G002")
@@ -152,6 +158,7 @@ def test_skips_and_tolerated_elements_counted(run) -> None:
 
 # -- (f) older-format tag synonyms ------------------------------------------------------
 
+
 def test_legacy_table_tags_accepted(run) -> None:
     legacy = next(f for f in run.folders if f.folder_name == "LEGACY1G")
     assert legacy.kind == "folder"
@@ -160,10 +167,11 @@ def test_legacy_table_tags_accepted(run) -> None:
 
 # -- (g) ZERO graph writes: the API is graph-free ---------------------------------------
 
+
 def test_staging_is_graph_free(run) -> None:
     """No LineageGraph parameter exists anywhere in the extractor API —
     staging cannot write what it never receives; activation waits on the
     psgmgr-vs-XML precedence ruling (guardrail 3)."""
     params = inspect.signature(ControlMXmlDefsExtractor.extract).parameters
     assert set(params) == {"self", "source"}
-    assert run.folders and run.jobs and run.variables   # flat records only
+    assert run.folders and run.jobs and run.variables  # flat records only

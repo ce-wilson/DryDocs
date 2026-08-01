@@ -12,13 +12,14 @@ Retention: 5 years. A nightly ``prune`` call deletes snapshots whose
 their entity (the latest snapshot is kept regardless of age so the
 "current state" never disappears).
 """
+
 from __future__ import annotations
 
 import hashlib
 import json
 import logging
 import uuid
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta
 from typing import TYPE_CHECKING, Any
 
 if TYPE_CHECKING:
@@ -30,7 +31,7 @@ LOGGER = logging.getLogger(__name__)
 class SnapshotWriter:
     """Materializes :ApplicationSnapshot / :ProductSnapshot / :CatalogLOBSnapshot."""
 
-    def __init__(self, client: "Neo4jClient") -> None:
+    def __init__(self, client: Neo4jClient) -> None:
         self.client = client
 
     # ---- public API ------------------------------------------------------
@@ -101,7 +102,7 @@ class SnapshotWriter:
     def prune_older_than(self, retention_years: int = 5) -> dict[str, int]:
         """Delete snapshots older than the retention window, keeping the most
         recent one per entity regardless of age."""
-        cutoff = (datetime.now(timezone.utc) - timedelta(days=365 * retention_years)).date().isoformat()
+        cutoff = (datetime.now(UTC) - timedelta(days=365 * retention_years)).date().isoformat()
         deleted = {}
         for label in ("ApplicationSnapshot", "ProductSnapshot", "CatalogLOBSnapshot"):
             rows = self.client.run(
@@ -131,9 +132,7 @@ class SnapshotWriter:
         snapshot_label: str,
         relationship_query: str,
     ) -> dict[str, int]:
-        entity_rows = self.client.run(
-            f"MATCH (e:{entity_label}) RETURN e.{entity_key} AS k"
-        )
+        entity_rows = self.client.run(f"MATCH (e:{entity_label}) RETURN e.{entity_key} AS k")
         keys = [r["k"] for r in entity_rows if r["k"] is not None]
 
         n_new = 0
@@ -161,7 +160,7 @@ class SnapshotWriter:
                 continue
 
             snapshot_id = str(uuid.uuid4())
-            now_iso = datetime.now(timezone.utc).replace(microsecond=0).isoformat()
+            now_iso = datetime.now(UTC).replace(microsecond=0).isoformat()
 
             self.client.run(
                 f"""
@@ -205,10 +204,10 @@ class SnapshotWriter:
     @staticmethod
     def _stable(d: dict[str, Any]) -> str:
         """Deterministic JSON for hashing: sort keys, sort lists."""
+
         def normalize(v: Any) -> Any:
             if isinstance(v, list):
-                return sorted([normalize(x) for x in v if x is not None],
-                              key=lambda x: str(x))
+                return sorted([normalize(x) for x in v if x is not None], key=lambda x: str(x))
             if isinstance(v, dict):
                 return {k: normalize(v[k]) for k in sorted(v)}
             return v

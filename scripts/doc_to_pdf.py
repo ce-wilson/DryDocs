@@ -10,6 +10,7 @@ Usage:
     python scripts/doc_to_pdf.py docs/design/controlm-ingestion-tdd.html
     python scripts/doc_to_pdf.py docs/design/foo.html --out build/foo.pdf --browser "C:/.../brave.exe"
 """
+
 from __future__ import annotations
 
 import argparse
@@ -20,14 +21,22 @@ from drydocs.doc_pdf import find_browser, html_to_pdf
 
 def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__)
-    ap.add_argument("html", type=Path, help="the design-doc .html to convert (its @media print sheet drives the PDF layout)")
+    ap.add_argument(
+        "html",
+        type=Path,
+        help="the design-doc .html to convert (its @media print sheet drives the PDF layout)",
+    )
     ap.add_argument("--out", type=Path, default=None, help="output .pdf (default: <stem>.pdf)")
-    ap.add_argument("--browser", type=Path, default=None, help="browser exe (default: Brave/Chrome/Edge)")
+    ap.add_argument(
+        "--browser", type=Path, default=None, help="browser exe (default: Brave/Chrome/Edge)"
+    )
     args = ap.parse_args()
 
     if args.browser is None and find_browser() is None:
-        print("no headless Chromium-family browser found (Brave / Chrome / Edge); "
-              "install one or pass --browser")
+        print(
+            "no headless Chromium-family browser found (Brave / Chrome / Edge); "
+            "install one or pass --browser"
+        )
         return 2
     pdf = html_to_pdf(args.html, args.out, args.browser)
     print(f"wrote {pdf}")

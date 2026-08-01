@@ -18,11 +18,13 @@ Design note (MODULE_MAP): parked in the ``drydocs-review`` component alongside
 ``drydocs_core.config`` only if a non-review second consumer appears (ADR 0002-a
 resolve-at-move rule).
 """
+
 from __future__ import annotations
 
+from collections.abc import Iterable
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any, Iterable
+from typing import Any
 
 import yaml
 
@@ -31,13 +33,9 @@ DEFAULT_SOURCE_MAPPINGS_DIR = _REPO_ROOT / "config" / "source-mappings"
 
 SCHEMA_ID = "drydocs.source-mapping.v1"
 
-VALID_DISPOSITIONS: frozenset[str] = frozenset(
-    {"projected", "filter-only", "excluded", "deferred"}
-)
+VALID_DISPOSITIONS: frozenset[str] = frozenset({"projected", "filter-only", "excluded", "deferred"})
 VALID_ORIGINS: frozenset[str] = frozenset({"source", "derived"})
-VALID_EXCLUDED_REASONS: frozenset[str] = frozenset(
-    {"scope", "sensitivity", "junk", "duplicate"}
-)
+VALID_EXCLUDED_REASONS: frozenset[str] = frozenset({"scope", "sensitivity", "junk", "duplicate"})
 
 
 class SourceMappingError(RuntimeError):
@@ -173,7 +171,7 @@ class SourceMapping:
     objects_by_name: dict[str, MappedObject]
 
     @classmethod
-    def load(cls, path: str | Path) -> "SourceMapping":
+    def load(cls, path: str | Path) -> SourceMapping:
         """Load and validate a source-mapping YAML file at an explicit path."""
         path = Path(path)
         if not path.exists():
@@ -184,17 +182,15 @@ class SourceMapping:
     @classmethod
     def load_source(
         cls, source_id: str, base_dir: str | Path = DEFAULT_SOURCE_MAPPINGS_DIR
-    ) -> "SourceMapping":
+    ) -> SourceMapping:
         """Load ``<base_dir>/<source_id>.yaml`` — the registry-id-keyed convenience path."""
         return cls.load(Path(base_dir) / f"{source_id}.yaml")
 
     @classmethod
-    def from_dict(cls, doc: dict[str, Any]) -> "SourceMapping":
+    def from_dict(cls, doc: dict[str, Any]) -> SourceMapping:
         schema = doc.get("schema")
         if schema != SCHEMA_ID:
-            raise SourceMappingError(
-                f"source-mapping schema must be {SCHEMA_ID!r}, got {schema!r}"
-            )
+            raise SourceMappingError(f"source-mapping schema must be {SCHEMA_ID!r}, got {schema!r}")
         source = doc.get("source")
         if not source:
             raise SourceMappingError("source-mapping must declare a `source:` id")
@@ -239,9 +235,7 @@ class SourceMapping:
         )
 
     @staticmethod
-    def _parse_profile(
-        source: str, oname: str, raw_profile: Any
-    ) -> ObjectProfile | None:
+    def _parse_profile(source: str, oname: str, raw_profile: Any) -> ObjectProfile | None:
         if raw_profile is None:
             return None
         if not isinstance(raw_profile, dict):
@@ -254,9 +248,7 @@ class SourceMapping:
         )
 
     @staticmethod
-    def _parse_columns(
-        source: str, oname: str, raw_columns: Any
-    ) -> tuple[ColumnDisposition, ...]:
+    def _parse_columns(source: str, oname: str, raw_columns: Any) -> tuple[ColumnDisposition, ...]:
         if not isinstance(raw_columns, list):
             raise SourceMappingError(f"[{source}/{oname}] `columns:` must be a list")
 
@@ -267,9 +259,7 @@ class SourceMapping:
                 raise SourceMappingError(f"[{source}/{oname}] malformed column entry: {col!r}")
             cname = col.get("name")
             if not cname:
-                raise SourceMappingError(
-                    f"[{source}/{oname}] column entry missing `name`: {col!r}"
-                )
+                raise SourceMappingError(f"[{source}/{oname}] column entry missing `name`: {col!r}")
             if cname in seen:
                 raise SourceMappingError(f"[{source}/{oname}/{cname}] duplicate column")
             seen.add(cname)
@@ -312,9 +302,7 @@ class SourceMapping:
         return tuple(columns)
 
     @staticmethod
-    def _parse_default_disposition(
-        source: str, oname: str, raw: Any
-    ) -> dict[str, Any] | None:
+    def _parse_default_disposition(source: str, oname: str, raw: Any) -> dict[str, Any] | None:
         if raw is None:
             return None
         if not isinstance(raw, dict):

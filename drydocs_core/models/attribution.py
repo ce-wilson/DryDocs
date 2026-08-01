@@ -15,6 +15,7 @@ Three contracts:
 Mechanism only: fact-type names and node keys — real SEAL ids / app names
 never appear in committed fixtures (synthetic twins only).
 """
+
 from __future__ import annotations
 
 from typing import Any
@@ -67,8 +68,7 @@ class StgAppFactRow(BaseModel):
         None, description="Staging identity column — the row-recency key."
     )
 
-    @field_validator("run_id", "folder_id", "job_id", "fact_type", "fact_value",
-                     mode="before")
+    @field_validator("run_id", "folder_id", "job_id", "fact_type", "fact_value", mode="before")
     @classmethod
     def _keys(cls, v: Any) -> str:
         return _stripped_str(v)
@@ -124,8 +124,9 @@ class ManualMappingRow(BaseModel):
     authored_on: str | None = None
     note: str | None = None
 
-    @field_validator("folder_id", "job_id", "seal_id", "manual_load_file",
-                     "authored_by", mode="before")
+    @field_validator(
+        "folder_id", "job_id", "seal_id", "manual_load_file", "authored_by", mode="before"
+    )
     @classmethod
     def _keys(cls, v: Any) -> str:
         return _stripped_str(v)

@@ -35,6 +35,7 @@ machinery:
 Run AFTER :class:`RuaInventoryExtractor` on the same :class:`LineageGraph`
 and the same bundle directory.
 """
+
 from __future__ import annotations
 
 import re
@@ -67,7 +68,7 @@ class RuaCodeOpsCoverage:
 
     scripts_seen: int = 0
     scripts_parsed: int = 0
-    scripts_no_copy: int = 0          # staged listing, but no carried-back content
+    scripts_no_copy: int = 0  # staged listing, but no carried-back content
     scripts_unreadable: int = 0
     profiles_seen: int = 0
     profiles_parsed: int = 0
@@ -78,19 +79,19 @@ class RuaCodeOpsCoverage:
     lines_comment: int = 0
     lines_continuation_joined: int = 0
     assignments_classified: int = 0
-    facts_classified: int = 0         # FACT_REGISTRY / value-contract hits
-    fact_name_mismatches: int = 0     # G16 WARN: name suggested, value decided
-    fact_alias_renames: int = 0       # G16 WARN: non-canonical ETL_* spelling
-    invocations_added: int = 0        # INVOKES candidates (scripts only)
-    invocations_unresolved: int = 0   # added but classified UNKNOWN
+    facts_classified: int = 0  # FACT_REGISTRY / value-contract hits
+    fact_name_mismatches: int = 0  # G16 WARN: name suggested, value decided
+    fact_alias_renames: int = 0  # G16 WARN: non-canonical ETL_* spelling
+    invocations_added: int = 0  # INVOKES candidates (scripts only)
+    invocations_unresolved: int = 0  # added but classified UNKNOWN
     invocations_no_target: int = 0
-    file_ops_added: int = 0           # READS_FROM/WRITES_TO candidates (scripts)
+    file_ops_added: int = 0  # READS_FROM/WRITES_TO candidates (scripts)
     file_ops_skipped_non_dataflow: int = 0
     file_ops_no_operand: int = 0
     profile_file_ops_skipped: int = 0  # profiles stage no rels — counted, not staged
-    statements_unparsed: int = 0      # parse_command could not classify
+    statements_unparsed: int = 0  # parse_command could not classify
     path_mutations: int = 0
-    dependency_candidates: int = 0    # source/invocation inclusions (needs vocabulary)
+    dependency_candidates: int = 0  # source/invocation inclusions (needs vocabulary)
 
     def as_dict(self) -> dict:
         return asdict(self)
@@ -232,9 +233,7 @@ class RuaCodeOpsExtractor:
                 cov.profiles_no_copy += 1
             return
         try:
-            text = (bundle_dir / copy_rel.lstrip("/")).read_text(
-                encoding="utf-8", errors="replace"
-            )
+            text = (bundle_dir / copy_rel.lstrip("/")).read_text(encoding="utf-8", errors="replace")
         except OSError:
             if is_script:
                 cov.scripts_unreadable += 1
@@ -265,15 +264,17 @@ class RuaCodeOpsExtractor:
         # (d) inclusion semantics: `. /path` / `source /path` — a dependency
         # CANDIDATE (needs vocabulary), in scripts and profiles alike.
         if first in _SOURCE_VERBS:
-            target = next(
-                (t for t in line.split()[1:] if not t.startswith("-")), None
-            )
+            target = next((t for t in line.split()[1:] if not t.startswith("-")), None)
             if target:
-                result.dependency_candidates.append({
-                    "src_kind": node.kind, "src_path": node.path,
-                    "target": target, "via": "source",
-                    "needs_vocabulary": True,
-                })
+                result.dependency_candidates.append(
+                    {
+                        "src_kind": node.kind,
+                        "src_path": node.path,
+                        "target": target,
+                        "via": "source",
+                        "needs_vocabulary": True,
+                    }
+                )
                 cov.dependency_candidates += 1
             return
 
@@ -281,9 +282,12 @@ class RuaCodeOpsExtractor:
         for name, value in assigns:
             cov.assignments_classified += 1
             if name == "PATH" and not is_script:
-                result.path_mutations.append({
-                    "profile_path": node.path, "value": value,
-                })
+                result.path_mutations.append(
+                    {
+                        "profile_path": node.path,
+                        "value": value,
+                    }
+                )
                 cov.path_mutations += 1
                 continue
             cv = classify_variable(name, value)
@@ -293,13 +297,17 @@ class RuaCodeOpsExtractor:
                     cov.fact_name_mismatches += 1
                 if cv.fact_alias_of:
                     cov.fact_alias_renames += 1
-                result.facts.append({
-                    "artifact_kind": node.kind, "artifact_path": node.path,
-                    "name": name, "value": value,
-                    "fact_type": cv.fact_type,
-                    "fact_name_mismatch": cv.fact_name_mismatch,
-                    "fact_alias_of": cv.fact_alias_of,
-                })
+                result.facts.append(
+                    {
+                        "artifact_kind": node.kind,
+                        "artifact_path": node.path,
+                        "name": name,
+                        "value": value,
+                        "fact_type": cv.fact_type,
+                        "fact_name_mismatch": cv.fact_name_mismatch,
+                        "fact_alias_of": cv.fact_alias_of,
+                    }
+                )
         if not remainder:
             return
 
@@ -312,8 +320,13 @@ class RuaCodeOpsExtractor:
 
     # -- (c) file ops → READS_FROM / WRITES_TO candidates -------------------------
     def _file_op(
-        self, node: ProcessNode, fop, graph: LineageGraph,
-        cov: RuaCodeOpsCoverage, *, is_script: bool,
+        self,
+        node: ProcessNode,
+        fop,
+        graph: LineageGraph,
+        cov: RuaCodeOpsCoverage,
+        *,
+        is_script: bool,
     ) -> None:
         """Mirrors the G14 CMD_LINE idiom one level down: the acting artifact
         is the staged script node; endpoints per the 2026-07-15 gate EDIT.
@@ -330,16 +343,25 @@ class RuaCodeOpsExtractor:
             return
         for location, rel_type in ((src, "READS_FROM"), (tgt, "WRITES_TO")):
             aid = asset_id(_FILE_OP_ASSET_KIND, location)
-            graph.add_data_asset(DataAssetNode(
-                node_id=aid, kind=_FILE_OP_ASSET_KIND, location=location,
-            ))
+            graph.add_data_asset(
+                DataAssetNode(
+                    node_id=aid,
+                    kind=_FILE_OP_ASSET_KIND,
+                    location=location,
+                )
+            )
             graph.add_rel(node.node_id, rel_type, aid)
             cov.file_ops_added += 1
 
     # -- (a) invocations → INVOKES candidates (scripts) / dep candidates (profiles)
     def _invocation(
-        self, node: ProcessNode, inv, graph: LineageGraph,
-        result: RuaCodeOps, *, is_script: bool,
+        self,
+        node: ProcessNode,
+        inv,
+        graph: LineageGraph,
+        result: RuaCodeOps,
+        *,
+        is_script: bool,
     ) -> None:
         cov = result.coverage
         target = inv.target
@@ -349,26 +371,32 @@ class RuaCodeOpsExtractor:
         if not is_script:
             # (d) a profile invoking a script is inclusion, not a gated
             # Activity edge — dependency candidate, no rel.
-            result.dependency_candidates.append({
-                "src_kind": node.kind, "src_path": node.path,
-                "target": target, "via": "invocation",
-                "invocation_type": inv.invocation_type,
-                "needs_vocabulary": True,
-            })
+            result.dependency_candidates.append(
+                {
+                    "src_kind": node.kind,
+                    "src_path": node.path,
+                    "target": target,
+                    "via": "invocation",
+                    "invocation_type": inv.invocation_type,
+                    "needs_vocabulary": True,
+                }
+            )
             cov.dependency_candidates += 1
             return
         kind = inv.invocation_type.lower()
         cid = process_id(kind, _stable_invocation_key(inv, target))
         props = _dpl_properties(inv.args) if kind == "dpl" else {}
-        graph.add_process(ProcessNode(
-            node_id=cid,
-            kind=kind,
-            name=_basename(target),
-            path=inv.script_path or inv.executable_path or "",
-            dataflow=props.pop("dataflow", ""),
-            config_path=props.pop("config_path", "") or (inv.config_path or ""),
-            properties=props,
-        ))
+        graph.add_process(
+            ProcessNode(
+                node_id=cid,
+                kind=kind,
+                name=_basename(target),
+                path=inv.script_path or inv.executable_path or "",
+                dataflow=props.pop("dataflow", ""),
+                config_path=props.pop("config_path", "") or (inv.config_path or ""),
+                properties=props,
+            )
+        )
         graph.add_rel(node.node_id, "INVOKES", cid)
         cov.invocations_added += 1
         if kind == "unknown":

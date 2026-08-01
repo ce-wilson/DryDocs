@@ -22,11 +22,12 @@ Re-home deltas from the depgraph original (kept deliberately small):
   the Epic P RUNS_ON pass). The panel wording says so.
 - rel spellings are the registered vocabulary (READS_FROM / WRITES_TO).
 """
+
 from __future__ import annotations
 
 import html
 import json
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 
 from .model import LineageGraph
 from .writer import unresolved_file_op_candidates
@@ -48,13 +49,14 @@ def _assertions(graph: LineageGraph) -> list[dict]:
     missing_run_as = [j for j in jobs if not j.run_as]
     # children pointed at by an INVOKES that the parser could not classify
     unresolved = []
-    for src, rel, dst in graph.rels:
+    for _src, rel, dst in graph.rels:
         if rel == "INVOKES":
             d = graph.get_any(dst)
             if d is not None and getattr(d, "kind", "") == _UNRESOLVED:
                 unresolved.append(d)
     orphan_assets = [
-        a for a in graph.data_assets.values()
+        a
+        for a in graph.data_assets.values()
         if not any(r[0] == a.node_id or r[2] == a.node_id for r in graph.rels)
     ]
     # script-src file-op candidates with no owning job — exactly what the
@@ -64,27 +66,36 @@ def _assertions(graph: LineageGraph) -> list[dict]:
     unresolved_fops = unresolved_file_op_candidates(graph)
     if unresolved_fops:
         fop_detail = (
-            f"{len(unresolved_fops)} of {len(file_ops)} would drop at plan "
-            "(unresolved_file_ops)"
+            f"{len(unresolved_fops)} of {len(file_ops)} would drop at plan " "(unresolved_file_ops)"
         )
     else:
         fop_detail = f"{len(file_ops)} candidate(s)" if file_ops else "n/a"
     return [
-        {"label": "Every job has a node target (host or host group)",
-         "ok": not missing_target,
-         "detail": f"{len(missing_target)} missing" if missing_target else f"{len(jobs)} jobs"},
-        {"label": "Every job has a run-as user",
-         "ok": not missing_run_as,
-         "detail": f"{len(missing_run_as)} missing" if missing_run_as else f"{len(jobs)} jobs"},
-        {"label": "Every invoked command resolved to a known type",
-         "ok": not unresolved,
-         "detail": f"{len(unresolved)} unresolved" if unresolved else "all classified"},
-        {"label": "No orphan data assets",
-         "ok": not orphan_assets,
-         "detail": f"{len(orphan_assets)} orphan" if orphan_assets else "n/a"},
-        {"label": "Every file-op candidate has an owning Activity (job or ETL process)",
-         "ok": not unresolved_fops,
-         "detail": fop_detail},
+        {
+            "label": "Every job has a node target (host or host group)",
+            "ok": not missing_target,
+            "detail": f"{len(missing_target)} missing" if missing_target else f"{len(jobs)} jobs",
+        },
+        {
+            "label": "Every job has a run-as user",
+            "ok": not missing_run_as,
+            "detail": f"{len(missing_run_as)} missing" if missing_run_as else f"{len(jobs)} jobs",
+        },
+        {
+            "label": "Every invoked command resolved to a known type",
+            "ok": not unresolved,
+            "detail": f"{len(unresolved)} unresolved" if unresolved else "all classified",
+        },
+        {
+            "label": "No orphan data assets",
+            "ok": not orphan_assets,
+            "detail": f"{len(orphan_assets)} orphan" if orphan_assets else "n/a",
+        },
+        {
+            "label": "Every file-op candidate has an owning Activity (job or ETL process)",
+            "ok": not unresolved_fops,
+            "detail": fop_detail,
+        },
     ]
 
 
@@ -101,9 +112,7 @@ def _children(graph: LineageGraph, job_id: str) -> list[tuple[str, object]]:
 def _job_card(graph: LineageGraph, job) -> str:
     rows = []
     if job.node_target:
-        rows.append(
-            f'<span class="kv"><b>node target</b> {_e(job.node_target)}</span>'
-        )
+        rows.append(f'<span class="kv"><b>node target</b> {_e(job.node_target)}</span>')
     rows.append(
         f'<span class="kv {"warn" if not job.run_as else ""}"><b>run as</b> '
         f'{_e(job.run_as) or "&mdash; missing"}</span>'
@@ -119,7 +128,9 @@ def _job_card(graph: LineageGraph, job) -> str:
             path = getattr(node, "path", "") or getattr(node, "location", "")
             warn = " warn" if kind == _UNRESOLVED else ""
             # data assets have no name — show the location's last segment (G14)
-            name = getattr(node, "name", "") or (path.rstrip("/").rsplit("/", 1)[-1] if path else "")
+            name = getattr(node, "name", "") or (
+                path.rstrip("/").rsplit("/", 1)[-1] if path else ""
+            )
             items.append(
                 f'<li class="dep{warn}"><span class="rel">{_e(rel)}</span> '
                 f'<span class="kind k-{_e(kind)}">{_e(kind)}</span> '
@@ -128,7 +139,9 @@ def _job_card(graph: LineageGraph, job) -> str:
             )
         dep_html = '<ul class="deps">' + "".join(items) + "</ul>"
     else:
-        dep_html = '<div class="nodeps">no resolved dependency &mdash; cmd_line empty or unparsed</div>'
+        dep_html = (
+            '<div class="nodeps">no resolved dependency &mdash; cmd_line empty or unparsed</div>'
+        )
 
     cmd = f'<pre class="cmd">{_e(job.command)}</pre>' if job.command else ""
     return (
@@ -147,7 +160,7 @@ def to_html(
     generated_at: str | None = None,
 ) -> str:
     """Render the graph as a single self-contained SME review page."""
-    gen = generated_at or datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M UTC")
+    gen = generated_at or datetime.now(UTC).strftime("%Y-%m-%d %H:%M UTC")
     doc = _e(doc_id)
 
     jobs = [p for p in graph.processes.values() if p.kind == "controlm_job"]
@@ -175,12 +188,12 @@ def to_html(
     w('<header><div class="wrap">')
     w(f"<h1>Control-M lineage review &mdash; {doc}</h1>")
     w('<div class="prov">')
-    w(f'<span><b>generated</b> {_e(gen)}</span>')
-    w(f'<span><b>jobs</b> {len(jobs)}</span>')
-    w(f'<span><b>folders</b> {len(folders)}</span>')
-    w(f'<span><b>dependencies</b> {sum(kinds.values())}</span>')
-    w(f'<span><b>rels</b> {len(graph.rels)}</span>')
-    w('</div>')
+    w(f"<span><b>generated</b> {_e(gen)}</span>")
+    w(f"<span><b>jobs</b> {len(jobs)}</span>")
+    w(f"<span><b>folders</b> {len(folders)}</span>")
+    w(f"<span><b>dependencies</b> {sum(kinds.values())}</span>")
+    w(f"<span><b>rels</b> {len(graph.rels)}</span>")
+    w("</div>")
     if kinds:
         chips = "".join(
             f'<span class="chip k-{_e(k)}">{_e(k)} &middot; {n}</span>'
@@ -188,18 +201,22 @@ def to_html(
         )
         w(f'<div class="chips">{chips}</div>')
     w('<button class="export" onclick="exportNotes()">&#11015; Export SME notes (JSON)</button>')
-    w('</div></header>')
+    w("</div></header>")
 
     # assertion panel
     w('<section class="wrap checks">')
-    w(f'<div class="checkhdr {"ok" if all_ok else "fail"}">'
-      f'{"&#10003; all checks passed" if all_ok else "&#9888; review needed"}</div>')
-    w('<ul>')
+    w(
+        f'<div class="checkhdr {"ok" if all_ok else "fail"}">'
+        f'{"&#10003; all checks passed" if all_ok else "&#9888; review needed"}</div>'
+    )
+    w("<ul>")
     for a in asserts:
-        w(f'<li class="{"ok" if a["ok"] else "fail"}">'
-          f'<span class="mark">{"&#10003;" if a["ok"] else "&#10007;"}</span> '
-          f'{_e(a["label"])} <span class="adetail">{a["detail"]}</span></li>')
-    w('</ul></section>')
+        w(
+            f'<li class="{"ok" if a["ok"] else "fail"}">'
+            f'<span class="mark">{"&#10003;" if a["ok"] else "&#10007;"}</span> '
+            f'{_e(a["label"])} <span class="adetail">{a["detail"]}</span></li>'
+        )
+    w("</ul></section>")
 
     # folder sections
     for folder in sorted(folders):
@@ -210,16 +227,20 @@ def to_html(
         w('<div class="jobs">')
         for j in fjobs:
             w(_job_card(graph, j))
-        w('</div>')
-        w(f'<textarea class="note" data-sid="{sid}" data-folder="{sid}" '
-          f'placeholder="SME notes for {sid} — saved in your browser; click Export to download all"></textarea>')
-        w('</section>')
+        w("</div>")
+        w(
+            f'<textarea class="note" data-sid="{sid}" data-folder="{sid}" '
+            f'placeholder="SME notes for {sid} — saved in your browser; click Export to download all"></textarea>'
+        )
+        w("</section>")
 
     if not jobs:
-        w('<section class="wrap"><p class="empty">No Control-M jobs in this graph. '
-          'Point <code>drydocs lineage-review</code> at a controlm_jobs CSV export.</p></section>')
+        w(
+            '<section class="wrap"><p class="empty">No Control-M jobs in this graph. '
+            "Point <code>drydocs lineage-review</code> at a controlm_jobs CSV export.</p></section>"
+        )
 
-    w(f'<script>const DOC_ID={json.dumps(doc_id)};{_JS}</script>')
+    w(f"<script>const DOC_ID={json.dumps(doc_id)};{_JS}</script>")
     w("</body></html>")
     return "".join(parts)
 

@@ -6,12 +6,14 @@ Idempotent. Always creates :EventProcessing and :BatchProcessing ports for
 every Application per v3 §C, even if the app currently has no observed
 runtime in that mode.
 """
+
 from __future__ import annotations
 
 from pathlib import Path
 from typing import ClassVar
 
 from drydocs_core.models import SealApplicationRow
+
 from .base import BaseLoader
 
 

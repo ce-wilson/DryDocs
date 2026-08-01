@@ -19,23 +19,26 @@ Parsing is stdlib + PyYAML only and reuses the Epic L anchor contract
 beyond the documented cell-split + kind rules below — same determinism bar as
 the render pipeline.
 """
+
 from __future__ import annotations
 
 import logging
 import re
+from collections.abc import Iterator
 from pathlib import Path
-from typing import TYPE_CHECKING, ClassVar, Iterator
+from typing import TYPE_CHECKING, ClassVar
 
 import yaml
 from pydantic import BaseModel
 
+from drydocs_core.doc_anchors import ANCHOR_RE, DERIVED_ANCHOR_SEP
 from drydocs_core.models.doc_traceability import (
     DESIGN_DOCS_ORIGIN,
     DocSectionRow,
     FeedbackNoteRow,
     TraceabilityRow,
 )
-from drydocs_core.doc_anchors import ANCHOR_RE, DERIVED_ANCHOR_SEP
+
 from .base import BaseLoader, LoadSummary, compute_row_checksum
 
 if TYPE_CHECKING:  # pragma: no cover
@@ -170,7 +173,7 @@ def parse_sections(md_text: str) -> list[dict]:
     for seq, m in enumerate(ANCHOR_RE.finditer(md_text)):
         anchor = m.group(1).lower()
         heading = anchor
-        for line in md_text[m.end():].splitlines():
+        for line in md_text[m.end() :].splitlines():
             stripped = line.strip()
             if stripped:
                 heading = stripped.lstrip("#").strip() or anchor
@@ -186,7 +189,7 @@ def _matrix_block(md_text: str) -> str | None:
     for i, m in enumerate(anchors):
         if m.group(1).lower() == MATRIX_ANCHOR:
             end = anchors[i + 1].start() if i + 1 < len(anchors) else len(md_text)
-            match = md_text[m.end():end]
+            match = md_text[m.end() : end]
             break
     return match
 
@@ -292,14 +295,14 @@ class DesignDocSectionsAdapter:
     def __init__(self, design_dir: Path | str = DEFAULT_DESIGN_DIR) -> None:
         self.design_dir = Path(design_dir)
 
-    def __enter__(self) -> "DesignDocSectionsAdapter":
+    def __enter__(self) -> DesignDocSectionsAdapter:
         return self
 
     def __exit__(
         self,
         exc_type: type[BaseException] | None,
         exc: BaseException | None,
-        tb: "TracebackType | None",
+        tb: TracebackType | None,
     ) -> None:
         return None
 
@@ -319,14 +322,14 @@ class TraceabilityMatrixAdapter:
     def __init__(self, design_dir: Path | str = DEFAULT_DESIGN_DIR) -> None:
         self.design_dir = Path(design_dir)
 
-    def __enter__(self) -> "TraceabilityMatrixAdapter":
+    def __enter__(self) -> TraceabilityMatrixAdapter:
         return self
 
     def __exit__(
         self,
         exc_type: type[BaseException] | None,
         exc: BaseException | None,
-        tb: "TracebackType | None",
+        tb: TracebackType | None,
     ) -> None:
         return None
 
@@ -349,14 +352,14 @@ class DesignDocFeedbackAdapter:
     def __init__(self, feedback_dir: Path | str = DEFAULT_FEEDBACK_DIR) -> None:
         self.feedback_dir = Path(feedback_dir)
 
-    def __enter__(self) -> "DesignDocFeedbackAdapter":
+    def __enter__(self) -> DesignDocFeedbackAdapter:
         return self
 
     def __exit__(
         self,
         exc_type: type[BaseException] | None,
         exc: BaseException | None,
-        tb: "TracebackType | None",
+        tb: TracebackType | None,
     ) -> None:
         return None
 
@@ -424,7 +427,7 @@ class _SectionPrereqLoader(_ChecksummedLoader):
         self.anchors_sent: set[tuple[str, str, str]] = set()
         self.unmatched_anchors: list[dict] = []
 
-    def _load(self, summary: LoadSummary, run_log: "LoaderRunLog | None") -> LoadSummary:
+    def _load(self, summary: LoadSummary, run_log: LoaderRunLog | None) -> LoadSummary:
         """Refusal runs BEFORE ``super()._load`` — which is what reaches
         ``_preflight_indexes`` and ``_open_run`` — so a refused load writes
         nothing at all, not even the :JobRun."""
@@ -492,7 +495,9 @@ class _SectionPrereqLoader(_ChecksummedLoader):
             LOGGER.warning(
                 "Loader %s: %d cited anchor(s) matched no :DocSection — their "
                 "anchor links were dropped, not written: %s",
-                self.name, len(self.unmatched_anchors), self.unmatched_anchors,
+                self.name,
+                len(self.unmatched_anchors),
+                self.unmatched_anchors,
             )
 
 
@@ -572,5 +577,7 @@ class DocFeedbackLoader(_SectionPrereqLoader):
                 "Loader %s: %d author(s) matched no :Employee — their "
                 "WAS_ATTRIBUTED_TO edges were dropped by design (gate C1, "
                 "never fabricated), reported here: %s",
-                self.name, len(self.unknown_authors), self.unknown_authors,
+                self.name,
+                len(self.unknown_authors),
+                self.unknown_authors,
             )

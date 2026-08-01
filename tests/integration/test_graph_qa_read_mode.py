@@ -61,7 +61,7 @@ def test_read_query_works() -> None:
     "probe",
     [
         "CREATE(x:GuardProbe {p: 1}) RETURN x",  # evades the legacy substring guard
-        "CALL db.createLabel('GuardProbe')",     # evades BOTH token guards
+        "CALL db.createLabel('GuardProbe')",  # evades BOTH token guards
     ],
 )
 def test_server_rejects_writes_the_token_guards_miss(probe: str) -> None:

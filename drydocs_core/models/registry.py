@@ -6,6 +6,7 @@ loader Cypher wants flat rows). ``used_by_app_id`` is the reserved DryDocs
 Application id when the product is part of DryDocs' own stack, else None —
 the Cypher writes a USES_SOFTWARE edge only when it is set.
 """
+
 from __future__ import annotations
 
 from typing import Literal

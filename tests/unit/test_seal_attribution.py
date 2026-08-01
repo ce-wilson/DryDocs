@@ -6,6 +6,7 @@ tiers (§A), coverage reconciliation (§B), deterministic multi-hit tie-break
 (§C), the edge write shape (§D), and PIN semantics (§F). Pure — synthetic
 fixtures only, no network/DB.
 """
+
 from __future__ import annotations
 
 from pathlib import Path
@@ -13,9 +14,6 @@ from pathlib import Path
 import pytest
 
 yaml = pytest.importorskip("yaml")
-
-from drydocs_core.adapters import CsvAdapter
-from drydocs_core.models import SealAttributionRow, StgAppFactRow
 
 from drydocs.graph_verify import Assertion, load_suite
 from drydocs.loaders.seal_attribution import (
@@ -26,6 +24,8 @@ from drydocs.loaders.seal_attribution import (
     TierReconcilers,
     resolve_attributions,
 )
+from drydocs_core.adapters import CsvAdapter
+from drydocs_core.models import SealAttributionRow, StgAppFactRow
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
 FIXTURE_CSV = REPO_ROOT / "tests" / "fixtures" / "attribution" / "stg_app_fact__synthetic.csv"
@@ -35,20 +35,29 @@ VOCAB_FILE = REPO_ROOT / "drydocs_core" / "ontology" / "relationship_vocabulary.
 SUITE_FILE = REPO_ROOT / "graph-tests" / "seal-attribution-coverage.yaml"
 
 
-def _fact(folder: str, job: str, ftype: str, value: str,
-          sk: int | None = None, run: str = "run-x") -> StgAppFactRow:
+def _fact(
+    folder: str, job: str, ftype: str, value: str, sk: int | None = None, run: str = "run-x"
+) -> StgAppFactRow:
     return StgAppFactRow(
-        run_id=run, folder_id=folder, job_id=job,
-        fact_type=ftype, fact_value=value, app_fact_sk=sk,
+        run_id=run,
+        folder_id=folder,
+        job_id=job,
+        fact_type=ftype,
+        fact_value=value,
+        app_fact_sk=sk,
     )
 
 
 # --- §A precedence -----------------------------------------------------------
 
+
 def test_tier_order_is_the_gate_confirmed_precedence() -> None:
     assert ATTRIBUTION_TIERS == ("SEAL", "FID", "APP_NAME", "ALIAS")
     assert MATCH_METHOD_BY_TIER == {
-        "SEAL": "seal", "FID": "fid", "APP_NAME": "app_name", "ALIAS": "alias",
+        "SEAL": "seal",
+        "FID": "fid",
+        "APP_NAME": "app_name",
+        "ALIAS": "alias",
     }
 
 
@@ -63,13 +72,16 @@ def test_seal_tier_one_to_one_accepts_without_review() -> None:
 
 def test_seal_hit_attributes_alone_lower_tiers_are_corroboration_only() -> None:
     recon = TierReconcilers(app_name={"AGREES": "SL0001", "DISAGREES": "SL0099"})
-    decisions, cov = resolve_attributions([
-        _fact("f1", "j1", "SEAL", "SL0001", sk=1),
-        _fact("f1", "j1", "APP_NAME", "agrees", sk=2),
-        _fact("f1", "j1", "APP_NAME", "disagrees", sk=3),
-    ], reconcilers=recon)
+    decisions, cov = resolve_attributions(
+        [
+            _fact("f1", "j1", "SEAL", "SL0001", sk=1),
+            _fact("f1", "j1", "APP_NAME", "agrees", sk=2),
+            _fact("f1", "j1", "APP_NAME", "disagrees", sk=3),
+        ],
+        reconcilers=recon,
+    )
     assert len(decisions) == 1
-    assert decisions[0].match_method == "seal"       # never overridden
+    assert decisions[0].match_method == "seal"  # never overridden
     assert decisions[0].seal_id == "SL0001"
     assert cov.corroboration_agree == 1
     assert cov.corroboration_disagree == 1
@@ -77,40 +89,51 @@ def test_seal_hit_attributes_alone_lower_tiers_are_corroboration_only() -> None:
 
 def test_tier_walk_falls_back_in_precedence_order() -> None:
     recon = TierReconcilers(fid={"F-1": "SL0002"}, alias={"AL-1": "SL0003"})
-    decisions, _ = resolve_attributions([
-        _fact("f1", "j1", "FID", "F-1", sk=1),
-        _fact("f1", "j1", "ALIAS", "AL-1", sk=2),
-    ], reconcilers=recon)
-    assert decisions[0].match_method == "fid"        # FID outranks ALIAS
+    decisions, _ = resolve_attributions(
+        [
+            _fact("f1", "j1", "FID", "F-1", sk=1),
+            _fact("f1", "j1", "ALIAS", "AL-1", sk=2),
+        ],
+        reconcilers=recon,
+    )
+    assert decisions[0].match_method == "fid"  # FID outranks ALIAS
     assert decisions[0].seal_id == "SL0002"
 
 
 # --- §B coverage / unmatched -------------------------------------------------
 
+
 def test_unmatched_job_is_surfaced_never_dropped() -> None:
-    decisions, cov = resolve_attributions([
-        _fact("f1", "j1", "DS_ID", "DS-1", sk=1),    # not an attribution tier
-    ])
+    decisions, cov = resolve_attributions(
+        [
+            _fact("f1", "j1", "DS_ID", "DS-1", sk=1),  # not an attribution tier
+        ]
+    )
     assert decisions == []
     assert cov.unmatched == 1 and cov.ignored_fact_rows == 1
     assert cov.reconciles()
 
 
 def test_unresolvable_reconciler_values_are_counted() -> None:
-    decisions, cov = resolve_attributions([
-        _fact("f1", "j1", "APP_NAME", "no such app", sk=1),
-    ])
+    decisions, cov = resolve_attributions(
+        [
+            _fact("f1", "j1", "APP_NAME", "no such app", sk=1),
+        ]
+    )
     assert decisions == [] and cov.unmatched == 1
     assert cov.unresolved_facts_by_tier == {"APP_NAME": 1}
 
 
 # --- §C multi-hit triage -----------------------------------------------------
 
+
 def test_multi_hit_tie_break_prefers_most_recent_feed_row() -> None:
-    decisions, cov = resolve_attributions([
-        _fact("f1", "j1", "SEAL", "SL0009", sk=1, run="run-a"),
-        _fact("f1", "j1", "SEAL", "SL0002", sk=2, run="run-b"),
-    ])
+    decisions, cov = resolve_attributions(
+        [
+            _fact("f1", "j1", "SEAL", "SL0009", sk=1, run="run-a"),
+            _fact("f1", "j1", "SEAL", "SL0002", sk=2, run="run-b"),
+        ]
+    )
     assert decisions[0].seal_id == "SL0002"
     (hit,) = cov.multi_hits
     assert hit.tie_break == "run_recency"
@@ -120,10 +143,12 @@ def test_multi_hit_tie_break_prefers_most_recent_feed_row() -> None:
 
 def test_multi_hit_tie_break_last_resort_is_lowest_seal_id() -> None:
     # Equal recency keys — only the lexicographic rule can decide.
-    decisions, cov = resolve_attributions([
-        _fact("f1", "j1", "SEAL", "SL0007", sk=5),
-        _fact("f1", "j1", "SEAL", "SL0003", sk=5),
-    ])
+    decisions, cov = resolve_attributions(
+        [
+            _fact("f1", "j1", "SEAL", "SL0007", sk=5),
+            _fact("f1", "j1", "SEAL", "SL0003", sk=5),
+        ]
+    )
     assert decisions[0].seal_id == "SL0003"
     assert cov.multi_hits[0].tie_break == "lowest_seal_id"
 
@@ -131,10 +156,13 @@ def test_multi_hit_tie_break_last_resort_is_lowest_seal_id() -> None:
 def test_multi_hit_only_counts_same_tier_conflicts() -> None:
     # SEAL resolves alone; a conflicting FID is corroboration, not a multi-hit.
     recon = TierReconcilers(fid={"F-1": "SL0099"})
-    decisions, cov = resolve_attributions([
-        _fact("f1", "j1", "SEAL", "SL0001", sk=1),
-        _fact("f1", "j1", "FID", "F-1", sk=2),
-    ], reconcilers=recon)
+    decisions, cov = resolve_attributions(
+        [
+            _fact("f1", "j1", "SEAL", "SL0001", sk=1),
+            _fact("f1", "j1", "FID", "F-1", sk=2),
+        ],
+        reconcilers=recon,
+    )
     assert decisions[0].seal_id == "SL0001"
     assert not cov.multi_hits
     assert cov.corroboration_disagree == 1
@@ -148,19 +176,26 @@ def test_resolution_is_deterministic_under_input_reordering() -> None:
     ]
     forward, _ = resolve_attributions(rows)
     backward, _ = resolve_attributions(list(reversed(rows)))
-    by_job = lambda ds: {(d.folder_id, d.job_id): (d.seal_id, d.match_method) for d in ds}
+
+    def by_job(ds):
+        return {(d.folder_id, d.job_id): (d.seal_id, d.match_method) for d in ds}
+
     assert by_job(forward) == by_job(backward)
 
 
 # --- §F pins -----------------------------------------------------------------
 
+
 def test_pinned_job_produces_no_decision_and_surfaces_the_conflict() -> None:
     pinned = {("f1", "j1"): "SL0001", ("f1", "j2"): "SL0777"}
-    decisions, cov = resolve_attributions([
-        _fact("f1", "j1", "SEAL", "SL0001", sk=1),   # agrees with the pin
-        _fact("f1", "j2", "SEAL", "SL0002", sk=2),   # disagrees with the pin
-    ], pinned=pinned)
-    assert decisions == []                            # automation never touches pins
+    decisions, cov = resolve_attributions(
+        [
+            _fact("f1", "j1", "SEAL", "SL0001", sk=1),  # agrees with the pin
+            _fact("f1", "j2", "SEAL", "SL0002", sk=2),  # disagrees with the pin
+        ],
+        pinned=pinned,
+    )
+    assert decisions == []  # automation never touches pins
     assert cov.pinned == 2 and cov.reconciles()
     agrees = {(c.folder_id, c.job_id): c.agrees for c in cov.pin_conflicts}
     assert agrees == {("f1", "j1"): True, ("f1", "j2"): False}
@@ -177,6 +212,7 @@ def test_pinned_job_with_no_derivation_holds_without_conflict() -> None:
 
 
 # --- fixture batch end-to-end (adapter) ---------------------------------------
+
 
 def _fixture_adapter() -> SealAttributionAdapter:
     return SealAttributionAdapter(
@@ -206,15 +242,14 @@ def test_fixture_batch_counts_pin_exactly() -> None:
     assert cov.unresolved_facts_by_tier == {"APP_NAME": 1}
     assert cov.fact_rows_rejected == 0
 
-    by_job = {(d["folder_id"], d["job_id"]): (d["seal_id"], d["match_method"])
-              for d in decisions}
+    by_job = {(d["folder_id"], d["job_id"]): (d["seal_id"], d["match_method"]) for d in decisions}
     assert by_job == {
         ("900001", "3"): ("SL0001", "seal"),
         ("900001", "7"): ("SL0002", "fid"),
         ("900002", "2"): ("SL0003", "app_name"),
         ("900002", "4"): ("SL0004", "alias"),
-        ("900003", "1"): ("SL0003", "seal"),     # run_recency tie-break
-        ("900003", "5"): ("SL0004", "seal"),     # run_recency tie-break
+        ("900003", "1"): ("SL0003", "seal"),  # run_recency tie-break
+        ("900003", "5"): ("SL0004", "seal"),  # run_recency tie-break
     }
     # every emitted decision re-validates against the loader's row model
     for d in decisions:
@@ -224,10 +259,20 @@ def test_fixture_batch_counts_pin_exactly() -> None:
 def test_adapter_counts_malformed_fact_rows_as_rejects() -> None:
     class _Inner:
         def rows(self):
-            yield {"run_id": "r", "folder_id": "f", "job_id": "",   # invalid
-                   "fact_type": "SEAL", "fact_value": "SL1"}
-            yield {"run_id": "r", "folder_id": "f", "job_id": "1",
-                   "fact_type": "SEAL", "fact_value": "SL1"}
+            yield {
+                "run_id": "r",
+                "folder_id": "f",
+                "job_id": "",  # invalid
+                "fact_type": "SEAL",
+                "fact_value": "SL1",
+            }
+            yield {
+                "run_id": "r",
+                "folder_id": "f",
+                "job_id": "1",
+                "fact_type": "SEAL",
+                "fact_value": "SL1",
+            }
 
     adapter = SealAttributionAdapter(_Inner())
     decisions = list(adapter.rows())
@@ -239,10 +284,11 @@ def test_adapter_counts_malformed_fact_rows_as_rejects() -> None:
 
 # --- §D cypher shape pins ------------------------------------------------------
 
+
 def test_automated_cypher_creates_no_nodes() -> None:
     text = AUTOMATED_CYPHER.read_text(encoding="utf-8")
-    code = "\n".join(l for l in text.splitlines() if not l.strip().startswith("//"))
-    merges = [l for l in code.splitlines() if "MERGE" in l]
+    code = "\n".join(line for line in text.splitlines() if not line.strip().startswith("//"))
+    merges = [line for line in code.splitlines() if "MERGE" in line]
     assert len(merges) == 1, "the automated path MERGEs exactly one thing: the edge"
     assert "MERGE (j)-[r:WAS_ASSOCIATED_WITH {role: 'seal_app_ref'}]->(a)" in code
     assert "MATCH (j:ControlMJob {folder_id: row.folder_id, job_id: row.job_id})" in code
@@ -272,11 +318,12 @@ def test_manual_cypher_stamps_manual_provenance_and_guards_node_creation() -> No
     # node creation only inside the SME-authorized FOREACH guard
     assert "FOREACH (_ IN CASE WHEN row.create_target_if_missing THEN [1] ELSE [] END |" in text
     assert "n.manually_created" in text
-    merge_app_lines = [l for l in text.splitlines() if "MERGE (n:BusinessApplication" in l]
+    merge_app_lines = [line for line in text.splitlines() if "MERGE (n:BusinessApplication" in line]
     assert len(merge_app_lines) == 1, "Application MERGE exists only in the FOREACH guard"
 
 
 # --- activation pins (vocabulary + verify suite) --------------------------------
+
 
 def test_vocab_entry_is_active_with_loader_and_supplement_recorded() -> None:
     vocab = yaml.safe_load(VOCAB_FILE.read_text(encoding="utf-8"))

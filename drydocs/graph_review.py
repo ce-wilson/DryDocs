@@ -12,6 +12,7 @@ classification: Internal-Public — the renderer is generic. A *rendered page* i
 the classification of the graph rows fed to it (real graph data is Internal+); such
 pages are written to a gitignored output dir, never committed.
 """
+
 from __future__ import annotations
 
 import html
@@ -29,7 +30,9 @@ def _is_hidden(key: str, hidden: frozenset[str]) -> bool:
     return key.startswith("_") or key in hidden
 
 
-def group_rows(rows: Iterable[Mapping[str, Any]], label_key: str = "_label") -> dict[str, list[dict[str, Any]]]:
+def group_rows(
+    rows: Iterable[Mapping[str, Any]], label_key: str = "_label"
+) -> dict[str, list[dict[str, Any]]]:
     """Group a flat row stream into ``{label: [props_without_label_key, ...]}``."""
     grouped: dict[str, list[dict[str, Any]]] = {}
     for row in rows:
@@ -99,7 +102,9 @@ def render_review(
         if prov:
             header += f'<br><span class="prov">{html.escape(prov)}</span>'
         header += "</h2>"
-        cards = "\n".join(_render_card(n, hidden) for n in nodes) or "  <p class='empty'>(no rows)</p>"
+        cards = (
+            "\n".join(_render_card(n, hidden) for n in nodes) or "  <p class='empty'>(no rows)</p>"
+        )
         sections.append(header + "\n" + cards)
 
     return (

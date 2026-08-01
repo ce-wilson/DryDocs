@@ -15,6 +15,7 @@ import; these guards keep it honest:
 Parser BEHAVIOR is deliberately not re-tested here — test_command_parser.py
 staying green untouched is the no-behavior-change proof.
 """
+
 from __future__ import annotations
 
 import re
@@ -60,7 +61,7 @@ def test_rule_ids_unique() -> None:
 def test_loaded_module_state_matches_the_file() -> None:
     data = _load()
     assert len(commands.LAUNCHER_REGISTRY) == len(data["rules"])
-    for (pattern, itype, rule), row in zip(commands.LAUNCHER_REGISTRY, data["rules"]):
+    for (pattern, itype, rule), row in zip(commands.LAUNCHER_REGISTRY, data["rules"], strict=False):
         assert pattern.pattern == row["pattern"]
         assert bool(pattern.flags & re.IGNORECASE) == bool(row.get("ignore_case"))
         assert itype == row["invocation_type"]

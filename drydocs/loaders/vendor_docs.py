@@ -22,14 +22,16 @@ writes NO meaning edges: no :ControlMUtility, no DOCUMENTS, no SEE_ALSO. The
 vendor's related-topic links ARE carried through conversion (as data, on disk)
 so Q14's gate can argue from evidence, but nothing here turns them into edges.
 """
+
 from __future__ import annotations
 
 import json
 import logging
 import re
+from collections.abc import Iterator
 from dataclasses import dataclass
 from pathlib import Path
-from typing import TYPE_CHECKING, ClassVar, Iterator
+from typing import TYPE_CHECKING, ClassVar
 
 from pydantic import BaseModel
 
@@ -61,7 +63,7 @@ _ROLE_RULES: tuple[tuple[str, re.Pattern[str]], ...] = (
     ("overview", re.compile(r"\b(overview|introduction to)\b", re.I)),
 )
 ROLE_FALLBACK = "topic"
-ROLES = tuple(name for name, _ in _ROLE_RULES) + (ROLE_FALLBACK,)
+ROLES = (*tuple(name for name, _ in _ROLE_RULES), ROLE_FALLBACK)
 
 
 def derive_page_role(title: str) -> str:
@@ -188,7 +190,7 @@ class VendorDocsAdapter:
         self.capture_id = capture_id
         self.base = root or vendor_docs_dir(capture_id)
 
-    def __enter__(self) -> "VendorDocsAdapter":
+    def __enter__(self) -> VendorDocsAdapter:
         return self
 
     def __exit__(self, exc_type, exc, tb) -> None:

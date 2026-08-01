@@ -14,7 +14,7 @@ Invariants (0002-B §0/§3 — each lands as a test with the real implementation
   artifact and the Jira (the system of record).
 - **Imports only ``drydocs_core.*``** — never another component
   (``tests/unit/test_module_boundary.py`` enforces, group ``remediation``).
-- **Rules are gate-bound.** The rule source is the R1–R29 registry
+- **Rules are gate-bound.** The rule source is the R1-R29 registry
   (``internal/remediation/standards-rules-registry.md``, Internal): only ✅-ratified rules
   may drive greenfield changes; 🟡/❓ rules surface as WARN-only findings.
 - **Format-agnostic definitions.** No XML assumption outside the
@@ -33,6 +33,7 @@ verdict on the real M0 unit stays PENDING ground truth (info item A3 / the ``var
 rule B1) — see ``internal/remediation/m0/``. Contract:
 ``docs/design/drydocs-remediation-tdd.md`` wins on conflict.
 """
+
 from . import corroborate, detect, equivalence, formats, jira, transform
 
 __all__ = ["corroborate", "detect", "equivalence", "formats", "jira", "transform"]

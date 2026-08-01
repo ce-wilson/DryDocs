@@ -5,6 +5,7 @@ Hermetic (files only, no Docker/Neo4j): the point is that when the canonical
 container/port/database changes, it changes in ONE place and this test forces
 the templates to follow.
 """
+
 from __future__ import annotations
 
 import re
@@ -35,9 +36,9 @@ def test_schema_and_required_fields():
 def test_databases_match_provisioning_script():
     """The topology names here must be exactly what 01_databases.cypher creates."""
     dbs = _load()["neo4j"]["databases"]
-    cypher = (
-        REPO / "drydocs_core" / "schema" / "provisioning" / "01_databases.cypher"
-    ).read_text(encoding="utf-8")
+    cypher = (REPO / "drydocs_core" / "schema" / "provisioning" / "01_databases.cypher").read_text(
+        encoding="utf-8"
+    )
     for name in dbs.values():
         assert re.search(
             rf"CREATE (?:COMPOSITE )?DATABASE {re.escape(name)} IF NOT EXISTS", cypher

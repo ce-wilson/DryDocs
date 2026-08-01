@@ -48,6 +48,7 @@ mechanical findings. Identity stays origin-scoped (``repo_script`` vs
 ruling. NO graph writes, no new relationship types; every unmatched or
 uncomputable record is counted, never dropped.
 """
+
 from __future__ import annotations
 
 import hashlib
@@ -81,9 +82,9 @@ class RepoManifestCoverage:
 
     rows_read: int = 0
     staged: int = 0
-    malformed: int = 0            # wrong cell count / empty path or blob_sha
-    historical_rows: int = 0      # empty ref — history-only blob occurrences
-    duplicate_rows: int = 0       # same (path, blob_sha, ref) seen again
+    malformed: int = 0  # wrong cell count / empty path or blob_sha
+    historical_rows: int = 0  # empty ref — history-only blob occurrences
+    duplicate_rows: int = 0  # same (path, blob_sha, ref) seen again
 
     def as_dict(self) -> dict:
         return asdict(self)
@@ -99,7 +100,7 @@ class CorroborationReport:
     behind: list[dict] = field(default_factory=list)
     never_committed: list[dict] = field(default_factory=list)
     repo_only: list[dict] = field(default_factory=list)
-    server_uncomputable: int = 0     # no carried-back copy -> no content hash
+    server_uncomputable: int = 0  # no carried-back copy -> no content hash
     candidate_ref: str | None = None
     trusted_ref: str | None = None
     trusted_ref_confirmed: bool | None = None  # None == no trusted_ref declared
@@ -115,10 +116,7 @@ class CorroborationReport:
             f"uncomputable={self.server_uncomputable} | "
             f"candidate_ref={self.candidate_ref or '~'} "
             f"trusted_ref={self.trusted_ref or '~'}"
-            + (
-                f" confirmed={self.trusted_ref_confirmed}"
-                if self.trusted_ref is not None else ""
-            )
+            + (f" confirmed={self.trusted_ref_confirmed}" if self.trusted_ref is not None else "")
         )
 
 
@@ -129,9 +127,7 @@ class CodeRepoExtractor:
 
     def extract(self, manifest: str | Path, into: LineageGraph) -> RepoManifestCoverage:
         coverage = RepoManifestCoverage()
-        lines = Path(manifest).read_text(
-            encoding="utf-8", errors="replace"
-        ).splitlines()
+        lines = Path(manifest).read_text(encoding="utf-8", errors="replace").splitlines()
         if not lines:
             return coverage
         header = lines[0].split("\t")
@@ -164,17 +160,19 @@ class CodeRepoExtractor:
             pid = process_id(REPO_SCRIPT_KIND, f"{row['repo']}:{row['path']}")
             existing = into.processes.get(pid)
             if existing is None:
-                into.add_process(ProcessNode(
-                    node_id=pid,
-                    kind=REPO_SCRIPT_KIND,
-                    name=row["path"].rstrip("/").rsplit("/", 1)[-1],
-                    path=row["path"],
-                    properties={
-                        "origin": "code-repo",
-                        "repo": row["repo"],
-                        "occurrences": self._occurrence(row),
-                    },
-                ))
+                into.add_process(
+                    ProcessNode(
+                        node_id=pid,
+                        kind=REPO_SCRIPT_KIND,
+                        name=row["path"].rstrip("/").rsplit("/", 1)[-1],
+                        path=row["path"],
+                        properties={
+                            "origin": "code-repo",
+                            "repo": row["repo"],
+                            "occurrences": self._occurrence(row),
+                        },
+                    )
+                )
                 coverage.staged += 1
             else:
                 occ = existing.properties.get("occurrences", "")
@@ -186,9 +184,7 @@ class CodeRepoExtractor:
     @staticmethod
     def _occurrence(row: dict[str, str]) -> str:
         # ref|commit|commit_date|blob_sha — parsed back by corroborate()
-        return "|".join(
-            (row["ref"], row["commit"], row["commit_date"], row["blob_sha"])
-        )
+        return "|".join((row["ref"], row["commit"], row["commit_date"], row["blob_sha"]))
 
 
 def _occurrences(node: ProcessNode) -> list[tuple[str, str, str, str]]:
@@ -245,49 +241,66 @@ def corroborate(
         if hits:
             matched_shas.add(sha)
         ref_hits = [
-            {"repo": n.properties.get("repo", ""), "ref": occ[0],
-             "commit": occ[1], "commit_date": occ[2], "repo_path": n.path}
-            for n, occ in hits if occ[0]
+            {
+                "repo": n.properties.get("repo", ""),
+                "ref": occ[0],
+                "commit": occ[1],
+                "commit_date": occ[2],
+                "repo_path": n.path,
+            }
+            for n, occ in hits
+            if occ[0]
         ]
         if ref_hits:
-            report.found_at_refs.append({
-                "server_path": node.path, "blob_sha": sha, "refs": ref_hits,
-            })
+            report.found_at_refs.append(
+                {
+                    "server_path": node.path,
+                    "blob_sha": sha,
+                    "refs": ref_hits,
+                }
+            )
             for h in ref_hits:
                 key = (h["commit_date"], h["ref"])
                 if best is None or key > best:
                     best = key
         elif hits:
-            report.behind.append({
-                "server_path": node.path, "blob_sha": sha,
-                "commits": [
-                    {"commit": occ[1], "commit_date": occ[2], "repo_path": n.path}
-                    for n, occ in hits
-                ],
-            })
+            report.behind.append(
+                {
+                    "server_path": node.path,
+                    "blob_sha": sha,
+                    "commits": [
+                        {"commit": occ[1], "commit_date": occ[2], "repo_path": n.path}
+                        for n, occ in hits
+                    ],
+                }
+            )
         else:
             # weak fallback until the G22 URN ruling: same path tail in the repo
             tail = node.path.rstrip("/").rsplit("/", 1)[-1]
-            hints = sorted({
-                n.path for n in repo_nodes
-                if n.path.rstrip("/").rsplit("/", 1)[-1] == tail
-            })
-            report.never_committed.append({
-                "server_path": node.path, "blob_sha": sha,
-                "path_tail_hints": hints,
-            })
+            hints = sorted(
+                {n.path for n in repo_nodes if n.path.rstrip("/").rsplit("/", 1)[-1] == tail}
+            )
+            report.never_committed.append(
+                {
+                    "server_path": node.path,
+                    "blob_sha": sha,
+                    "path_tail_hints": hints,
+                }
+            )
 
     for node in repo_nodes:
         unmatched = [occ for occ in _occurrences(node) if occ[3] not in matched_shas]
         if unmatched and len(unmatched) == len(_occurrences(node)):
-            report.repo_only.append({
-                "repo": node.properties.get("repo", ""), "repo_path": node.path,
-            })
+            report.repo_only.append(
+                {
+                    "repo": node.properties.get("repo", ""),
+                    "repo_path": node.path,
+                }
+            )
 
     report.candidate_ref = best[1] if best else None
     if trusted_ref is not None:
         report.trusted_ref_confirmed = any(
-            h["ref"] == trusted_ref
-            for entry in report.found_at_refs for h in entry["refs"]
+            h["ref"] == trusted_ref for entry in report.found_at_refs for h in entry["refs"]
         )
     return report

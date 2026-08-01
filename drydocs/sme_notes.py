@@ -14,6 +14,7 @@ Read-only — this module never writes the graph or the repo, so it needs no HIT
 ``<sid>`` is an owner id; **use synthetic sids in committed fixtures** (real SIDs are
 Internal-Confidential). classification: Internal-Public.
 """
+
 from __future__ import annotations
 
 import re

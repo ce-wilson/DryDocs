@@ -45,7 +45,7 @@ import time
 from collections import OrderedDict
 from collections.abc import Callable, Mapping, Sequence
 from dataclasses import dataclass
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 
 from drydocs_api.guard import ensure_read_only
 from drydocs_api.handlers import Forbidden
@@ -107,9 +107,7 @@ class EphemeralSpec:
         )
 
     def expires_at_iso(self) -> str:
-        return datetime.fromtimestamp(self.expires_at, tz=timezone.utc).isoformat(
-            timespec="seconds"
-        )
+        return datetime.fromtimestamp(self.expires_at, tz=UTC).isoformat(timespec="seconds")
 
 
 class EphemeralSpecStore:
@@ -206,9 +204,7 @@ def register_ephemeral(
     With no key configured the surface is disabled entirely (fail closed).
     """
     if not expected_key:
-        raise Forbidden(
-            "ephemeral registration is disabled (DRYDOCS_AGENT_REG_KEY not configured)"
-        )
+        raise Forbidden("ephemeral registration is disabled (DRYDOCS_AGENT_REG_KEY not configured)")
     if not agent_key or not secrets.compare_digest(agent_key, expected_key):
         raise Forbidden("ephemeral registration requires the agent key")
     sessions.resolve(owner_token)  # raises InvalidTokenError — the owner must be live

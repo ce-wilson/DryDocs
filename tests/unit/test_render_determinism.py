@@ -20,6 +20,7 @@ platform-dependence. These tests assert the ORDERING RULE directly, so they fail
 on the machine that would introduce the bug rather than on the runner that
 discovers it two commits later.
 """
+
 from __future__ import annotations
 
 import ast
@@ -52,8 +53,8 @@ def test_path_object_sorting_really_is_platform_dependent() -> None:
     # by_string is the same everywhere; by_path is not.
     assert by_string == ["README.md", "platforms.yaml", "software-registry.yaml"]
     assert by_path in (
-        ["README.md", "platforms.yaml", "software-registry.yaml"],          # POSIX
-        ["platforms.yaml", "README.md", "software-registry.yaml"],          # Windows
+        ["README.md", "platforms.yaml", "software-registry.yaml"],  # POSIX
+        ["platforms.yaml", "README.md", "software-registry.yaml"],  # Windows
     )
 
 
@@ -100,7 +101,7 @@ def test_committed_renderers_never_sort_path_objects() -> None:
         "OS-dependent ordering in a committed render:\n  "
         + "\n  ".join(failures)
         + "\nsorted() over Path compares a case-folded key on Windows and a "
-          "case-sensitive one on POSIX. Use key=lambda p: p.as_posix()."
+        "case-sensitive one on POSIX. Use key=lambda p: p.as_posix()."
     )
 
 

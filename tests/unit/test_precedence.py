@@ -4,6 +4,7 @@ Acceptance: *flipping `order:` in precedence.yaml changes RECONCILES_TO resoluti
 with no code edit.* The flip tests below change only a YAML file (loaded via
 `from_yaml`) and assert the winner — and the catalog `:RECONCILES_TO` target — changes.
 """
+
 from __future__ import annotations
 
 from pathlib import Path
@@ -13,13 +14,13 @@ import pytest
 try:
     import yaml
 
+    from drydocs.loaders.catalog import CatalogLOBRow, resolve_lob_reconciliation
     from drydocs_core.precedence import (
+        DEFAULT_PRECEDENCE_PATH,
         Claim,
         PrecedenceResolver,
         UnknownAuthorityError,
-        DEFAULT_PRECEDENCE_PATH,
     )
-    from drydocs.loaders.catalog import CatalogLOBRow, resolve_lob_reconciliation
 
     _AVAILABLE = True
 except ImportError:
@@ -56,12 +57,15 @@ def _write_precedence(tmp_path: Path, order: list[dict], active: dict | None = N
 
 # --- core resolution ----------------------------------------------------------
 
+
 def test_highest_authority_wins() -> None:
     r = PrecedenceResolver(_DEFAULT_ORDER)
-    res = r.resolve([
-        Claim("lob-product-team", "AWM", 0.5),
-        Claim("internal-standards", "CIB", 0.9),
-    ])
+    res = r.resolve(
+        [
+            Claim("lob-product-team", "AWM", 0.5),
+            Claim("internal-standards", "CIB", 0.9),
+        ]
+    )
     assert res.value == "CIB"
     assert res.authority == "internal-standards"
     # The loser is kept, never dropped.
@@ -79,15 +83,20 @@ def test_flipping_order_flips_the_winner(tmp_path: Path) -> None:
     default = PrecedenceResolver.from_yaml(_write_precedence(tmp_path, _DEFAULT_ORDER))
     flipped = PrecedenceResolver.from_yaml(_write_precedence(tmp_path, _FLIPPED_ORDER))
 
-    assert default.resolve(claims).value == "CIB"           # internal-standards wins
-    assert flipped.resolve(claims).value == "AWM"           # lob-product-team now wins
+    assert default.resolve(claims).value == "CIB"  # internal-standards wins
+    assert flipped.resolve(claims).value == "AWM"  # lob-product-team now wins
 
 
 def test_reconciles_to_resolution_is_config_driven(tmp_path: Path) -> None:
     """The acceptance contract, on the actual RECONCILES_TO path: the catalog
     LOB's reconciled segment flips when only precedence.yaml#order flips."""
-    model = CatalogLOBRow(lob_id="LOB002", code="AWMCIB", name="legacy",
-                          reconciles_to_segment="AWM", reconcile_confidence=0.5)
+    model = CatalogLOBRow(
+        lob_id="LOB002",
+        code="AWMCIB",
+        name="legacy",
+        reconciles_to_segment="AWM",
+        reconcile_confidence=0.5,
+    )
     override = [Claim("internal-standards", "CIB", 0.9)]  # a more-authoritative crosswalk
 
     default = PrecedenceResolver.from_yaml(_write_precedence(tmp_path, _DEFAULT_ORDER))
@@ -106,23 +115,28 @@ def test_reconciles_to_resolution_is_config_driven(tmp_path: Path) -> None:
 
 # --- toggles & edge cases -----------------------------------------------------
 
+
 def test_inactive_authority_is_skipped() -> None:
     r = PrecedenceResolver(_DEFAULT_ORDER, active={"internal-standards": False})
-    res = r.resolve([
-        Claim("lob-product-team", "AWM", 0.5),
-        Claim("internal-standards", "CIB", 0.9),
-    ])
-    assert res.value == "AWM"            # winner toggled off -> next authority wins
+    res = r.resolve(
+        [
+            Claim("lob-product-team", "AWM", 0.5),
+            Claim("internal-standards", "CIB", 0.9),
+        ]
+    )
+    assert res.value == "AWM"  # winner toggled off -> next authority wins
     assert res.authority == "lob-product-team"
 
 
 def test_abstaining_claim_has_no_opinion() -> None:
     r = PrecedenceResolver(_DEFAULT_ORDER)
     # A None/"" value means the authority abstains and cannot win.
-    res = r.resolve([
-        Claim("bmc-baseline", None),
-        Claim("lob-product-team", "Corp", 1.0),
-    ])
+    res = r.resolve(
+        [
+            Claim("bmc-baseline", None),
+            Claim("lob-product-team", "Corp", 1.0),
+        ]
+    )
     assert res.value == "Corp"
     assert res.authority == "lob-product-team"
 
@@ -137,10 +151,12 @@ def test_no_eligible_claims_yields_empty() -> None:
 
 def test_same_authority_breaks_ties_on_confidence() -> None:
     r = PrecedenceResolver(_DEFAULT_ORDER)
-    res = r.resolve([
-        Claim("internal-standards", "low", 0.3),
-        Claim("internal-standards", "high", 0.8),
-    ])
+    res = r.resolve(
+        [
+            Claim("internal-standards", "low", 0.3),
+            Claim("internal-standards", "high", 0.8),
+        ]
+    )
     assert res.value == "high"
 
 
@@ -158,6 +174,7 @@ def test_position_used_when_authority_field_omitted() -> None:
 
 
 # --- the shipped config is well-formed ---------------------------------------
+
 
 def test_real_precedence_yaml_chain() -> None:
     r = PrecedenceResolver.from_yaml(DEFAULT_PRECEDENCE_PATH)

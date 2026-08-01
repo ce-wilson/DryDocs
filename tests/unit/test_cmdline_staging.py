@@ -4,6 +4,7 @@ Synthetic fixtures only (house rule: real command lines are Internal and
 never enter the repo). The fake client stands in for the graph read; the
 SQLite round-trip is real.
 """
+
 from __future__ import annotations
 
 import json
@@ -26,32 +27,68 @@ _GUID = "12345678-1234-1234-1234-123456789abc"
 
 #: synthetic graph rows (the export Cypher's RETURN shape)
 ROWS = [
-    {"folder_id": "70001", "job_id": "1", "job_name": "SYN_DPL_DLY",
-     "folder_name": "PRHLD1G",
-     "data_center": "P032-E0700-DMA", "task_type": "Job", "active": True,
-     "cmd_line": f"/apps/dpl/dt-launcher.sh -pipeline {_GUID} -env prod -seal 70002 -i"},
-    {"folder_id": "70001", "job_id": "2", "job_name": "SYN_VAR_LAUNCH",
-     "folder_name": "PRHLD1G",
-     "data_center": "P032-E0700-DMA", "task_type": "Job", "active": True,
-     # launcher hidden in a folder variable — the GUID literal still decides
-     # (G15 acceptance c / G16 values-decide)
-     "cmd_line": f"%%PY_LAUNCH --pipeline-id {_GUID} --aws --queue-name synq"},
-    {"folder_id": "70001", "job_id": "3", "job_name": "SYN_PY",
-     "folder_name": "PRHLD1G",
-     "data_center": "P032-E0700-DMA", "task_type": "Job", "active": False,
-     "cmd_line": "python /apps/syn/etl_step.py --conf /apps/syn/etl.json"},
-    {"folder_id": "70003", "job_id": "1", "job_name": "SYN_WATCHER",
-     "folder_name": "PRHLD2G",
-     "data_center": "P045-E0700-DMB", "task_type": "Watcher", "active": True,
-     "cmd_line": None},
-    {"folder_id": "70003", "job_id": "2", "job_name": "SYN_UNKNOWN_BIN",
-     "folder_name": "PRHLD2G",
-     "data_center": "P045-E0700-DMB", "task_type": "Job", "active": True,
-     "cmd_line": "/apps/bin/mystery_widget --frob 7"},
-    {"folder_id": "70003", "job_id": "3", "job_name": "SYN_NOOP",
-     "folder_name": "PRHLD2G",
-     "data_center": "P045-E0700-DMB", "task_type": "Job", "active": True,
-     "cmd_line": "echo done"},
+    {
+        "folder_id": "70001",
+        "job_id": "1",
+        "job_name": "SYN_DPL_DLY",
+        "folder_name": "PRHLD1G",
+        "data_center": "P032-E0700-DMA",
+        "task_type": "Job",
+        "active": True,
+        "cmd_line": f"/apps/dpl/dt-launcher.sh -pipeline {_GUID} -env prod -seal 70002 -i",
+    },
+    {
+        "folder_id": "70001",
+        "job_id": "2",
+        "job_name": "SYN_VAR_LAUNCH",
+        "folder_name": "PRHLD1G",
+        "data_center": "P032-E0700-DMA",
+        "task_type": "Job",
+        "active": True,
+        # launcher hidden in a folder variable — the GUID literal still decides
+        # (G15 acceptance c / G16 values-decide)
+        "cmd_line": f"%%PY_LAUNCH --pipeline-id {_GUID} --aws --queue-name synq",
+    },
+    {
+        "folder_id": "70001",
+        "job_id": "3",
+        "job_name": "SYN_PY",
+        "folder_name": "PRHLD1G",
+        "data_center": "P032-E0700-DMA",
+        "task_type": "Job",
+        "active": False,
+        "cmd_line": "python /apps/syn/etl_step.py --conf /apps/syn/etl.json",
+    },
+    {
+        "folder_id": "70003",
+        "job_id": "1",
+        "job_name": "SYN_WATCHER",
+        "folder_name": "PRHLD2G",
+        "data_center": "P045-E0700-DMB",
+        "task_type": "Watcher",
+        "active": True,
+        "cmd_line": None,
+    },
+    {
+        "folder_id": "70003",
+        "job_id": "2",
+        "job_name": "SYN_UNKNOWN_BIN",
+        "folder_name": "PRHLD2G",
+        "data_center": "P045-E0700-DMB",
+        "task_type": "Job",
+        "active": True,
+        "cmd_line": "/apps/bin/mystery_widget --frob 7",
+    },
+    {
+        "folder_id": "70003",
+        "job_id": "3",
+        "job_name": "SYN_NOOP",
+        "folder_name": "PRHLD2G",
+        "data_center": "P045-E0700-DMB",
+        "task_type": "Job",
+        "active": True,
+        "cmd_line": "echo done",
+    },
 ]
 
 
@@ -86,9 +123,13 @@ def _q(path, sql):
 # G39 — export
 # ---------------------------------------------------------------------------
 
+
 def test_export_one_row_per_job_verbatim(store):
-    rows = _q(store, "SELECT folder_id, job_id, task_type, cmd_line FROM job_detail "
-                     "ORDER BY folder_id, job_id")
+    rows = _q(
+        store,
+        "SELECT folder_id, job_id, task_type, cmd_line FROM job_detail "
+        "ORDER BY folder_id, job_id",
+    )
     assert len(rows) == 6
     by_key = {(r[0], r[1]): r for r in rows}
     # verbatim cmd_line, task-type discriminator, NULL for the watcher
@@ -138,6 +179,7 @@ def test_export_no_timestamp_in_store(store):
 # G40 — parse
 # ---------------------------------------------------------------------------
 
+
 def test_parse_refuses_missing_or_foreign_store(tmp_path):
     with pytest.raises(CmdlineStagingError, match="not found"):
         parse_job_detail(tmp_path / "nope.db")
@@ -147,7 +189,8 @@ def test_parse_refuses_missing_or_foreign_store(tmp_path):
         "CREATE TABLE meta (key TEXT PRIMARY KEY, value TEXT NOT NULL);"
         "CREATE TABLE job_detail (folder_id TEXT, job_id TEXT, cmd_line TEXT);"
     )
-    conn.commit(); conn.close()
+    conn.commit()
+    conn.close()
     with pytest.raises(CmdlineStagingError, match="schema_version"):
         parse_job_detail(foreign)
 
@@ -155,9 +198,9 @@ def test_parse_refuses_missing_or_foreign_store(tmp_path):
 def test_parse_coverage_accounts_for_every_row(store):
     coverage = parse_job_detail(store)
     assert coverage.total == 6  # never-silent: every job lands in a bucket
-    assert coverage.no_cmd_line == 1        # the watcher
-    assert coverage.partial == 1            # mystery_widget -> UNKNOWN
-    assert coverage.unparsed == 1           # echo done -> no-op, nothing extracted
+    assert coverage.no_cmd_line == 1  # the watcher
+    assert coverage.partial == 1  # mystery_widget -> UNKNOWN
+    assert coverage.unparsed == 1  # echo done -> no-op, nothing extracted
     assert coverage.parsed == 3
     assert "parsed=3" in coverage.summary()
     verdicts = dict(
@@ -172,28 +215,32 @@ def test_parse_coverage_accounts_for_every_row(store):
 
 def test_parse_dpl_detail_columns(store):
     parse_job_detail(store)
-    row = _q(store,
-             "SELECT invocation_type, launcher, launch_mode, pipeline_guid, "
-             "props_json FROM job_detail_parsed "
-             "WHERE folder_id='70001' AND job_id='1'")[0]
+    row = _q(
+        store,
+        "SELECT invocation_type, launcher, launch_mode, pipeline_guid, "
+        "props_json FROM job_detail_parsed "
+        "WHERE folder_id='70001' AND job_id='1'",
+    )[0]
     itype, launcher, mode, guid, props_json = row
     assert itype == "DPL"
     assert launcher == "/apps/dpl/dt-launcher.sh"
-    assert mode == "-i"                      # G15: property, never identity
+    assert mode == "-i"  # G15: property, never identity
     assert guid == _GUID
     props = json.loads(props_json)
     assert props["env"] == "prod"
-    assert props["seal"] == "70002"          # direct SEAL-attribution source
-    assert "launch_mode" not in props        # popped into its own column
+    assert props["seal"] == "70002"  # direct SEAL-attribution source
+    assert "launch_mode" not in props  # popped into its own column
 
 
 def test_parse_var_launcher_guid_fallback(store):
     """%%VAR launcher + --pipeline-id GUID literal still classifies DPL
     (G15 acceptance c — values decide, never the variable name)."""
     parse_job_detail(store)
-    row = _q(store,
-             "SELECT invocation_type, classifier_rule, pipeline_guid, props_json "
-             "FROM job_detail_parsed WHERE folder_id='70001' AND job_id='2'")[0]
+    row = _q(
+        store,
+        "SELECT invocation_type, classifier_rule, pipeline_guid, props_json "
+        "FROM job_detail_parsed WHERE folder_id='70001' AND job_id='2'",
+    )[0]
     assert row[0] == "DPL"
     assert row[1] == "dpl.pipeline_guid_literal"
     assert row[2] == _GUID
@@ -204,9 +251,11 @@ def test_parse_var_launcher_guid_fallback(store):
 
 def test_parse_python_payload_and_artifact_kind(store):
     parse_job_detail(store)
-    row = _q(store,
-             "SELECT invocation_type, script_path, config_path, artifact_kind "
-             "FROM job_detail_parsed WHERE folder_id='70001' AND job_id='3'")[0]
+    row = _q(
+        store,
+        "SELECT invocation_type, script_path, config_path, artifact_kind "
+        "FROM job_detail_parsed WHERE folder_id='70001' AND job_id='3'",
+    )[0]
     assert row[0] == "PYTHON"
     assert row[1] == "/apps/syn/etl_step.py"
     assert row[2] == "/apps/syn/etl.json"
@@ -226,23 +275,28 @@ def test_parse_prefers_resolved_cmd_line(store):
     was parsed, per job."""
     conn = sqlite3.connect(str(store))
     conn.execute(
-        "UPDATE job_detail SET cmd_line_resolved = ? "
-        "WHERE folder_id='70003' AND job_id='3'",
+        "UPDATE job_detail SET cmd_line_resolved = ? " "WHERE folder_id='70003' AND job_id='3'",
         ("python /apps/syn/resolved_step.py",),
     )
-    conn.commit(); conn.close()
+    conn.commit()
+    conn.close()
     coverage = parse_job_detail(store)
     # raw 'echo done' was unparsed; the resolved text parses instead
     assert coverage.from_resolved == 1
     assert coverage.unparsed == 0
     assert coverage.parsed == 4
     assert "1 from resolved" in coverage.summary()
-    row = _q(store, "SELECT verdict, parsed_from FROM parse_quality "
-                    "WHERE folder_id='70003' AND job_id='3'")[0]
+    row = _q(
+        store,
+        "SELECT verdict, parsed_from FROM parse_quality " "WHERE folder_id='70003' AND job_id='3'",
+    )[0]
     assert row == ("parsed", "resolved")
-    others = _q(store, "SELECT DISTINCT parsed_from FROM parse_quality "
-                       "WHERE verdict != 'no_cmd_line' "
-                       "AND NOT (folder_id='70003' AND job_id='3')")
+    others = _q(
+        store,
+        "SELECT DISTINCT parsed_from FROM parse_quality "
+        "WHERE verdict != 'no_cmd_line' "
+        "AND NOT (folder_id='70003' AND job_id='3')",
+    )
     assert others == [("raw",)]
 
 
@@ -251,10 +305,13 @@ def test_reexport_clears_resolution_column(store):
     everything, and the internal resolution query re-runs afterward."""
     conn = sqlite3.connect(str(store))
     conn.execute("UPDATE job_detail SET cmd_line_resolved = 'x'")
-    conn.commit(); conn.close()
+    conn.commit()
+    conn.close()
     export_job_detail(FakeClient(), store)
-    assert _q(store, "SELECT count(*) FROM job_detail "
-                     "WHERE cmd_line_resolved IS NOT NULL")[0][0] == 0
+    assert (
+        _q(store, "SELECT count(*) FROM job_detail " "WHERE cmd_line_resolved IS NOT NULL")[0][0]
+        == 0
+    )
 
 
 def test_export_rebuilds_stale_v1_store_in_place(tmp_path):
@@ -269,7 +326,8 @@ def test_export_rebuilds_stale_v1_store_in_place(tmp_path):
         " cmd_line TEXT, PRIMARY KEY (folder_id, job_id));"
         "INSERT INTO meta VALUES ('schema_version', 'drydocs.cmdline-staging.v1');"
     )
-    conn.commit(); conn.close()
+    conn.commit()
+    conn.close()
     report = export_job_detail(FakeClient(), path)
     assert report.jobs == 6
     meta = dict(_q(path, "SELECT key, value FROM meta"))
@@ -291,15 +349,28 @@ def test_reexport_clears_parsed_tables(store):
 # ---------------------------------------------------------------------------
 
 #: extra rows exercising the resolve verdicts (beside the shared ROWS)
-RESOLVE_ROWS = ROWS + [
-    {"folder_id": "70001", "job_id": "4", "job_name": "SYN_RESIDUE",
-     "folder_name": "PRHLD1G",
-     "data_center": "P032-E0700-DMA", "task_type": "Job", "active": True,
-     "cmd_line": "%%RUN_DIR/step.sh %%UNDEFINED_ARG"},
-    {"folder_id": "70009", "job_id": "1", "job_name": "SYN_DCLESS",
-     "folder_name": "PRHLD1G",
-     "data_center": None, "task_type": "Job", "active": True,
-     "cmd_line": "%%PY_LAUNCH -x"},
+RESOLVE_ROWS = [
+    *ROWS,
+    {
+        "folder_id": "70001",
+        "job_id": "4",
+        "job_name": "SYN_RESIDUE",
+        "folder_name": "PRHLD1G",
+        "data_center": "P032-E0700-DMA",
+        "task_type": "Job",
+        "active": True,
+        "cmd_line": "%%RUN_DIR/step.sh %%UNDEFINED_ARG",
+    },
+    {
+        "folder_id": "70009",
+        "job_id": "1",
+        "job_name": "SYN_DCLESS",
+        "folder_name": "PRHLD1G",
+        "data_center": None,
+        "task_type": "Job",
+        "active": True,
+        "cmd_line": "%%PY_LAUNCH -x",
+    },
 ]
 
 _RESOLVE_XML = f"""<?xml version="1.0" encoding="UTF-8"?>
@@ -338,15 +409,15 @@ def test_resolve_every_job_lands_in_a_verdict(resolve_setup):
     path, extract = resolve_setup
     coverage = resolve_job_detail(path, extract)
     assert coverage.jobs == 8
-    assert coverage.total == 8                 # never-silent
-    assert coverage.resolved == 2              # SYN_VAR_LAUNCH + SYN_DCLESS
-    assert coverage.residue == 1               # SYN_RESIDUE (%%UNDEFINED_ARG left)
-    assert coverage.nothing_to_substitute == 2 # SYN_DPL_DLY + SYN_PY (no %% at all)
-    assert coverage.no_xml_match == 1          # SYN_UNKNOWN_BIN — not in the export
-    assert coverage.ambiguous_match == 1       # SYN_NOOP — subfolder twin, skipped
-    assert coverage.no_cmd_line == 1           # the watcher
-    assert coverage.dc_fallback_matches == 1   # SYN_DCLESS (store dc is NULL)
-    assert coverage.cmd_line_mismatch == 1     # SYN_DPL_DLY XML text differs — counted
+    assert coverage.total == 8  # never-silent
+    assert coverage.resolved == 2  # SYN_VAR_LAUNCH + SYN_DCLESS
+    assert coverage.residue == 1  # SYN_RESIDUE (%%UNDEFINED_ARG left)
+    assert coverage.nothing_to_substitute == 2  # SYN_DPL_DLY + SYN_PY (no %% at all)
+    assert coverage.no_xml_match == 1  # SYN_UNKNOWN_BIN — not in the export
+    assert coverage.ambiguous_match == 1  # SYN_NOOP — subfolder twin, skipped
+    assert coverage.no_cmd_line == 1  # the watcher
+    assert coverage.dc_fallback_matches == 1  # SYN_DCLESS (store dc is NULL)
+    assert coverage.cmd_line_mismatch == 1  # SYN_DPL_DLY XML text differs — counted
     assert coverage.substitutions == 3
     assert coverage.xml_jobs == 7
     assert "resolved=2" in coverage.summary()
@@ -356,23 +427,36 @@ def test_resolve_populates_derived_column_beside_verbatim(resolve_setup):
     path, extract = resolve_setup
     resolve_job_detail(path, extract)
     raw, resolved = _q(
-        path, "SELECT cmd_line, cmd_line_resolved FROM job_detail "
-              "WHERE folder_id='70001' AND job_id='2'")[0]
-    assert raw.startswith("%%PY_LAUNCH ")                 # verbatim untouched
+        path,
+        "SELECT cmd_line, cmd_line_resolved FROM job_detail "
+        "WHERE folder_id='70001' AND job_id='2'",
+    )[0]
+    assert raw.startswith("%%PY_LAUNCH ")  # verbatim untouched
     assert resolved.startswith("/apps/py/py-launcher.sh ")
     # nothing-to-substitute and skipped rows keep the column NULL
     for key in (("70001", "1"), ("70001", "3"), ("70003", "2"), ("70003", "3")):
-        assert _q(path, "SELECT cmd_line_resolved FROM job_detail "
-                        f"WHERE folder_id='{key[0]}' AND job_id='{key[1]}'")[0][0] is None
+        assert (
+            _q(
+                path,
+                "SELECT cmd_line_resolved FROM job_detail "
+                f"WHERE folder_id='{key[0]}' AND job_id='{key[1]}'",
+            )[0][0]
+            is None
+        )
 
 
 def test_resolve_provenance_rows(resolve_setup):
     path, extract = resolve_setup
     resolve_job_detail(path, extract)
-    rows = {(r[0], r[1]): r[2:] for r in _q(
-        path, "SELECT folder_id, job_id, verdict, resolution_source, "
-              "matched_via, substituted_json, unresolved_json "
-              "FROM resolution_quality")}
+    rows = {
+        (r[0], r[1]): r[2:]
+        for r in _q(
+            path,
+            "SELECT folder_id, job_id, verdict, resolution_source, "
+            "matched_via, substituted_json, unresolved_json "
+            "FROM resolution_quality",
+        )
+    }
     assert len(rows) == 8
     verdict, source, via, subs, unres = rows[("70001", "2")]
     assert (verdict, source, via) == ("resolved", "controlm-xml-export", "exact")
@@ -403,8 +487,9 @@ def test_resolve_then_parse_reads_resolved_text(resolve_setup):
     resolve_job_detail(path, extract)
     coverage = parse_job_detail(path)
     assert coverage.from_resolved >= 2
-    row = _q(path, "SELECT parsed_from FROM parse_quality "
-                   "WHERE folder_id='70001' AND job_id='2'")[0]
+    row = _q(
+        path, "SELECT parsed_from FROM parse_quality " "WHERE folder_id='70001' AND job_id='2'"
+    )[0]
     assert row[0] == "resolved"
 
 
@@ -415,7 +500,8 @@ def test_resolve_refuses_older_store(tmp_path):
         "CREATE TABLE meta (key TEXT PRIMARY KEY, value TEXT NOT NULL);"
         "INSERT INTO meta VALUES ('schema_version', 'drydocs.cmdline-staging.v2');"
     )
-    conn.commit(); conn.close()
+    conn.commit()
+    conn.close()
 
     class _EmptyExtract:
         jobs = ()
@@ -433,8 +519,10 @@ def test_reexport_clears_resolution_quality(resolve_setup):
     assert _q(path, "SELECT count(*) FROM resolution_quality")[0][0] == 8
     export_job_detail(FakeClient(RESOLVE_ROWS), path)
     assert _q(path, "SELECT count(*) FROM resolution_quality")[0][0] == 0
-    assert _q(path, "SELECT count(*) FROM job_detail "
-                    "WHERE cmd_line_resolved IS NOT NULL")[0][0] == 0
+    assert (
+        _q(path, "SELECT count(*) FROM job_detail " "WHERE cmd_line_resolved IS NOT NULL")[0][0]
+        == 0
+    )
 
 
 def test_module_never_writes_the_graph():
@@ -448,6 +536,7 @@ def test_module_never_writes_the_graph():
     fake = FakeClient()
     import tempfile
     from pathlib import Path
+
     with tempfile.TemporaryDirectory() as td:
         export_job_detail(fake, Path(td) / "s.db")
     assert len(fake.queries) == 1

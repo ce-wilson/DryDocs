@@ -10,16 +10,19 @@ Row models are defined here alongside their loaders. When the team confirms
 exact catalog table names + column names, only the SQL SELECT in each loader
 needs to change — the model field names stay constant.
 """
+
 from __future__ import annotations
 
+from collections.abc import Iterable
 from datetime import date
 from pathlib import Path
-from typing import Any, ClassVar, Iterable, Optional
+from typing import Any, ClassVar
 
 from pydantic import BaseModel, ConfigDict, Field, field_validator
 
-from .base import BaseLoader
 from drydocs_core.precedence import Claim, PrecedenceResolver
+
+from .base import BaseLoader
 
 _CYPHER = Path(__file__).resolve().parent / "cypher"
 
@@ -31,7 +34,7 @@ _CATALOG_AUTHORITY = "lob-product-team"
 
 
 def resolve_lob_reconciliation(
-    model: "CatalogLOBRow",
+    model: CatalogLOBRow,
     resolver: PrecedenceResolver,
     extra_claims: Iterable[Claim] = (),
 ) -> dict[str, Any]:
@@ -161,16 +164,16 @@ class PatProductMappingRow(BaseModel):
 
     team_id: str = Field(..., min_length=1)
     product_id: str = Field(..., min_length=1)
-    area_product_id: Optional[str] = None
-    seal_ids: Optional[str] = Field(
+    area_product_id: str | None = None
+    seal_ids: str | None = Field(
         None,
         description="SEAL app IDs (team-scoped; feeds arch_develops). Comma- or "
         "semicolon-delimited on input; normalized to commas.",
     )
     team_type: str = Field(..., description="aligned | flex | dedicated")
     sponsored: bool = False
-    sponsored_product_id: Optional[str] = None
-    sponsored_area_product_id: Optional[str] = Field(
+    sponsored_product_id: str | None = None
+    sponsored_area_product_id: str | None = Field(
         None, description="PAT Sponsoring Area Product (C9 gate 2026-07-18)."
     )
 
@@ -201,8 +204,8 @@ class PatTeamRoleRow(BaseModel):
     team_id: str = Field(..., min_length=1)
     employee_sid: str = Field(..., min_length=1)
     role_id: str = Field(..., min_length=1)
-    valid_from: Optional[str] = None
-    valid_to: Optional[str] = None
+    valid_from: str | None = None
+    valid_to: str | None = None
 
 
 class CatalogLOBsLoader(BaseLoader):

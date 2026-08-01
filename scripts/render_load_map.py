@@ -28,6 +28,7 @@ that tree's contract is hand-authored .md validated against outline
 templates, and a generated file there would break both the contract and
 test_doc_outline.
 """
+
 from __future__ import annotations
 
 import json
@@ -88,9 +89,7 @@ def build_load_map() -> dict:
         doc = yaml.safe_load(path.read_text(encoding="utf-8"))
         source = doc.get("source") if isinstance(doc, dict) else None
         if source:
-            captures_by_source.setdefault(source, []).append(
-                path.relative_to(REPO).as_posix()
-            )
+            captures_by_source.setdefault(source, []).append(path.relative_to(REPO).as_posix())
 
     # loaders by source_id; cli names + commands reverse-joined
     cli_name_by_class = {cls: nm for nm, cls in cli.LOADER_REGISTRY.items()}
@@ -220,9 +219,7 @@ def build_load_map() -> dict:
             "reason": reason,
             "commands": sorted(commands_by_class.get(cls, [])),
         }
-        for cls, reason in sorted(
-            cli.SOURCELESS_LOADERS.items(), key=lambda kv: kv[0].__name__
-        )
+        for cls, reason in sorted(cli.SOURCELESS_LOADERS.items(), key=lambda kv: kv[0].__name__)
     ]
 
     return {
@@ -304,7 +301,7 @@ def build_load_map_html(data: dict) -> str:
     n_pending = sum(1 for s in data["sources"] if s["ledger"]["state"] == "pending")
     n_placeholder = len(data["sources"]) - n_ledger - n_pending
 
-    add("<!DOCTYPE html>\n<html lang=\"en\"><head><meta charset=\"utf-8\">")
+    add('<!DOCTYPE html>\n<html lang="en"><head><meta charset="utf-8">')
     add('<meta name="viewport" content="width=device-width, initial-scale=1">')
     add("<title>DryDocs — Load Map</title>")
     add(f"<style>{_CSS}</style></head><body>")
@@ -340,9 +337,7 @@ def build_load_map_html(data: dict) -> str:
         )
     add("</table>")
     ad_hoc = ", ".join(f"<code>drydocs {_esc(c)}</code>" for c in data["ad_hoc_commands"])
-    add(
-        f'<p class="sub">Operator-driven (not sequence members): {ad_hoc}.</p>'
-    )
+    add(f'<p class="sub">Operator-driven (not sequence members): {ad_hoc}.</p>')
 
     # -- systems (v2) ----------------------------------------------------------
     add("<h2>Systems — the things we connect to (v2)</h2>")
@@ -377,9 +372,7 @@ def build_load_map_html(data: dict) -> str:
     )
     for s in data["sources"]:
         ledger = s["ledger"]
-        ledger_cell = (
-            f'<span class="chip ledger-{ledger["state"]}">{ledger["state"]}</span>'
-        )
+        ledger_cell = f'<span class="chip ledger-{ledger["state"]}">{ledger["state"]}</span>'
         if ledger["path"]:
             ledger_cell += f'<br><code>{_esc(ledger["path"])}</code>'
         captures = (
@@ -390,9 +383,7 @@ def build_load_map_html(data: dict) -> str:
         for m in s["ontology_mappings"]:
             by_status[m["status"]] = by_status.get(m["status"], 0) + 1
         mappings = (
-            " ".join(
-                f"{_status_chip(st)}&thinsp;{n}" for st, n in sorted(by_status.items())
-            )
+            " ".join(f"{_status_chip(st)}&thinsp;{n}" for st, n in sorted(by_status.items()))
             or '<span class="muted">—</span>'
         )
         loaders = (
@@ -401,7 +392,8 @@ def build_load_map_html(data: dict) -> str:
         )
         confirmed = "✓" if s["confirmed"] else '<span class="muted">no</span>'
         authority = (
-            _esc(s["authority"]) if s["authority"]
+            _esc(s["authority"])
+            if s["authority"]
             else ("derived" if s["derived"] else '<span class="muted">—</span>')
         )
         add(
@@ -429,16 +421,12 @@ def build_load_map_html(data: dict) -> str:
     for s in detailed:
         add(f'<h3 id="src-{_esc(s["id"])}">{_esc(s["id"])}</h3>')
         if s["loaders"]:
-            add("<ul class=\"tight\">")
+            add('<ul class="tight">')
             for loader in s["loaders"]:
                 if loader["commands"]:
-                    cmds = ", ".join(
-                        f"<code>drydocs {_esc(c)}</code>" for c in loader["commands"]
-                    )
+                    cmds = ", ".join(f"<code>drydocs {_esc(c)}</code>" for c in loader["commands"])
                 elif loader["cli_name"]:
-                    cmds = (
-                        f'ad hoc via <code>drydocs load {_esc(loader["cli_name"])}</code>'
-                    )
+                    cmds = f'ad hoc via <code>drydocs load {_esc(loader["cli_name"])}</code>'
                 else:
                     cmds = '<span class="muted">no command</span>'
                 add(
@@ -448,12 +436,10 @@ def build_load_map_html(data: dict) -> str:
                 )
             add("</ul>")
         if s["ontology_mappings"]:
-            add("<ul class=\"tight\">")
+            add('<ul class="tight">')
             for m in s["ontology_mappings"]:
                 label = f" → <code>{_esc(m['label'])}</code>" if m["label"] else ""
-                add(
-                    f"<li>{_status_chip(m['status'])} <code>{_esc(m['id'])}</code>{label}</li>"
-                )
+                add(f"<li>{_status_chip(m['status'])} <code>{_esc(m['id'])}</code>{label}</li>")
             add("</ul>")
 
     # -- retired ids (D4) ------------------------------------------------------
@@ -489,7 +475,7 @@ def build_load_map_html(data: dict) -> str:
             '<div class="warn">These taxonomy-ontology-map entries name a '
             "<code>taxonomy.source</code> with no source-registry entry — surfaced "
             "here, never dropped; rule each at grooming (register the feed or "
-            "re-point the entry).<ul class=\"tight\">"
+            're-point the entry).<ul class="tight">'
         )
         for m in data["map_entries_without_registry_source"]:
             add(

@@ -1,6 +1,7 @@
 """Jira handoff boundary (TDD Stage E, FR-REM-6): deterministic render, the
 Jira-only side-effect boundary, ownership surfaced-not-guessed, and the
 no-unproven-submit rule."""
+
 from __future__ import annotations
 
 from pathlib import Path
@@ -31,10 +32,15 @@ class RecordingSubmitter(JiraSubmitter):
 def _package(equivalent: bool = True, owner: str | None = "Synthetic Dev Team"):
     return HandoffPackage(
         title="[Remediation] JOB0001_SAMPLE_FW - remove dot-smuggling",
-        findings=[Finding(
-            rule_id="R1", severity="should-fix", ratified=False,
-            target="JOB0001_SAMPLE_FW:SUFX", message="dot-smuggling",
-        )],
+        findings=[
+            Finding(
+                rule_id="R1",
+                severity="should-fix",
+                ratified=False,
+                target="JOB0001_SAMPLE_FW:SUFX",
+                message="dot-smuggling",
+            )
+        ],
         proof=EquivalenceReport(equivalent=equivalent, compared_jobs=1),
         greenfield_artifact=Path("greenfield-sample.yaml"),
         owner=owner,

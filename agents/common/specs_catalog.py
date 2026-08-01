@@ -20,7 +20,7 @@ _REPO_ROOT = Path(__file__).resolve().parents[2]
 if str(_REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(_REPO_ROOT))
 
-from drydocs_api.guard import WriteRejected, ensure_read_only  # noqa: E402,F401
+from drydocs_api.guard import WriteRejected, ensure_read_only  # noqa: E402
 from drydocs_api.query_specs import (  # noqa: E402
     QUERY_SPECS,
     WATERMARKED_DATABASES,
@@ -48,8 +48,7 @@ def catalog_lines() -> list[str]:
     lines = []
     for spec in QUERY_SPECS.values():
         params = ", ".join(
-            f"{p.name}:{p.type}" + ("" if p.required else f"={p.default}")
-            for p in spec.params
+            f"{p.name}:{p.type}" + ("" if p.required else f"={p.default}") for p in spec.params
         )
         lines.append(
             f"- {spec.id} [{spec.database}]"

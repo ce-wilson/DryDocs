@@ -6,6 +6,7 @@ fragment (seen live at the first EE-container bootstrap, 2026-07-15).
 run_script must therefore split CLIENT-SIDE, comment/string-aware, and
 never hand the server an empty or comment-only fragment.
 """
+
 from __future__ import annotations
 
 from drydocs_core.cypher_split import (
@@ -62,6 +63,7 @@ def test_unterminated_final_statement_is_kept():
 # run_script executes per-statement through a duck-typed driver (no live DB)
 # ---------------------------------------------------------------------------
 
+
 class _FakeResult:
     def consume(self) -> None:
         return None
@@ -106,6 +108,7 @@ def test_run_script_sends_each_statement_once_with_params():
 
 
 # ---- strip_comments (added G29 — the supplement IRI parser reads code only) ---
+
 
 def test_strip_comments_removes_line_and_block_comments():
     src = (

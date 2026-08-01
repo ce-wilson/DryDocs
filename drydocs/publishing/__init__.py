@@ -10,12 +10,19 @@ auth, wrapper) in its gitignored twin. No internal push details live here.
 Offline tooling — assembling/validating/previewing needs no HITL gate. classification:
 Internal-Public.
 """
+
 from __future__ import annotations
 
 from .assembler import DEFAULT_TEMPLATE, assemble
 from .preview import write_preview
-from .publisher import LocalPublisher, NoopPublisher, PublishResult, Publisher
-from .validator import DEFAULT_ALLOWED_MACROS, ValidationError, validate, validate_macros, validate_xml
+from .publisher import LocalPublisher, NoopPublisher, Publisher, PublishResult
+from .validator import (
+    DEFAULT_ALLOWED_MACROS,
+    ValidationError,
+    validate,
+    validate_macros,
+    validate_xml,
+)
 
 __all__ = [
     "assemble",

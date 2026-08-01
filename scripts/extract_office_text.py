@@ -13,6 +13,7 @@ Usage:
     poetry run python scripts/extract_office_text.py external/ServiceNow
     poetry run python scripts/extract_office_text.py <dir> --out-dir <dir>/extracted
 """
+
 from __future__ import annotations
 
 import argparse
@@ -41,14 +42,19 @@ def pptx_text(path: Path) -> str:
     """Slide-by-slide text (a:t runs), slides in numeric order, notes included."""
     out: list[str] = []
     with zipfile.ZipFile(path) as zf:
+
         def num(name: str) -> int:
             m = re.search(r"(\d+)\.xml$", name)
             return int(m.group(1)) if m else 0
 
-        slides = sorted((n for n in zf.namelist()
-                         if re.fullmatch(r"ppt/slides/slide\d+\.xml", n)), key=num)
-        notes = {num(n): n for n in zf.namelist()
-                 if re.fullmatch(r"ppt/notesSlides/notesSlide\d+\.xml", n)}
+        slides = sorted(
+            (n for n in zf.namelist() if re.fullmatch(r"ppt/slides/slide\d+\.xml", n)), key=num
+        )
+        notes = {
+            num(n): n
+            for n in zf.namelist()
+            if re.fullmatch(r"ppt/notesSlides/notesSlide\d+\.xml", n)
+        }
         for name in slides:
             n = num(name)
             root = ElementTree.fromstring(zf.read(name))
@@ -81,15 +87,15 @@ _EXTRACTORS = {".docx": docx_text, ".pptx": pptx_text, ".pdf": pdf_text}
 def main(argv: list[str] | None = None) -> int:
     ap = argparse.ArgumentParser(description="Extract text twins from pdf/docx/pptx files.")
     ap.add_argument("src_dir", type=Path)
-    ap.add_argument("--out-dir", type=Path, default=None,
-                    help="default: <src_dir>/extracted")
+    ap.add_argument("--out-dir", type=Path, default=None, help="default: <src_dir>/extracted")
     args = ap.parse_args(argv)
 
     out_dir = args.out_dir or (args.src_dir / "extracted")
     out_dir.mkdir(parents=True, exist_ok=True)
 
-    files = sorted(p for p in args.src_dir.iterdir()
-                   if p.is_file() and p.suffix.lower() in _EXTRACTORS)
+    files = sorted(
+        p for p in args.src_dir.iterdir() if p.is_file() and p.suffix.lower() in _EXTRACTORS
+    )
     if not files:
         print(f"no extractable files in {args.src_dir}")
         return 1

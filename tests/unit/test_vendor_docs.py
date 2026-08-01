@@ -3,6 +3,7 @@
 Offline throughout: the Author-it HTML is a fixture, the capture manifest is
 written to tmp_path, and nothing touches Neo4j.
 """
+
 from __future__ import annotations
 
 import json
@@ -20,7 +21,9 @@ from drydocs.loaders.vendor_docs import (
 )
 from drydocs_core.docs.vendor_html import html_to_markdown
 
-CYPHER = Path(__file__).resolve().parents[2] / "drydocs" / "loaders" / "cypher" / "vendor_docs.cypher"
+CYPHER = (
+    Path(__file__).resolve().parents[2] / "drydocs" / "loaders" / "cypher" / "vendor_docs.cypher"
+)
 
 # Trimmed from a real captured topic: the isTOCLoaded shim, the Previous/Next
 # icon strip, the topic heading rendered at h4 (depth, not importance), and the
@@ -52,7 +55,13 @@ FIXTURE_HTML = """﻿<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//
 # --------------------------------------------------------------------------- #
 def test_navigation_chrome_never_reaches_the_body():
     doc = html_to_markdown(FIXTURE_HTML)
-    for chrome in ("Previous Topic", "Next Topic", "isTOCLoaded", "Related Topics", "location.href"):
+    for chrome in (
+        "Previous Topic",
+        "Next Topic",
+        "isTOCLoaded",
+        "Related Topics",
+        "location.href",
+    ):
         assert chrome not in doc.markdown, f"chrome leaked into body: {chrome}"
 
 
@@ -94,8 +103,10 @@ def test_list_items_and_abstract():
 
 
 def test_page_with_no_heading_still_gets_a_title():
-    doc = html_to_markdown("<html><head><title>Bare</title></head><body>"
-                           "<p class='bodytext'>Body only.</p></body></html>")
+    doc = html_to_markdown(
+        "<html><head><title>Bare</title></head><body>"
+        "<p class='bodytext'>Body only.</p></body></html>"
+    )
     assert doc.markdown.startswith("# Bare")
     assert doc.abstract == "Body only."
 
@@ -149,25 +160,34 @@ def fake_capture(tmp_path: Path) -> Path:
     pages.mkdir()
     (pages / "16200.htm").write_text(FIXTURE_HTML, encoding="utf-8")
     manifest = {
-        "vendor": "BMC", "product": "Control-M", "version": "9.0.20",
-        "book": "Utilities", "captured_at": "2026-07-31T14:43:32Z",
+        "vendor": "BMC",
+        "product": "Control-M",
+        "version": "9.0.20",
+        "book": "Utilities",
+        "captured_at": "2026-07-31T14:43:32Z",
         "base_url": "https://example.invalid/",
         "pages": [
             {
-                "url": "16200.htm", "page": "16200.htm", "anchor": None,
+                "url": "16200.htm",
+                "page": "16200.htm",
+                "anchor": None,
                 "source_url": "https://example.invalid/16200.htm",
                 "title": "defjob XML file rules",
                 "breadcrumb": "Utilities > emdef utility for jobs",
                 "toc_path": ["Utilities", "emdef utility for jobs"],
-                "bytes": 10, "sha256": "abc123",
+                "bytes": 10,
+                "sha256": "abc123",
             },
             {  # a fragment node: same document, a section within it
-                "url": "16200.htm#adv", "page": "16200.htm", "anchor": "adv",
+                "url": "16200.htm#adv",
+                "page": "16200.htm",
+                "anchor": "adv",
                 "source_url": "https://example.invalid/16200.htm#adv",
                 "title": "Advanced usage",
                 "breadcrumb": "Utilities > emdef utility for jobs > Advanced usage",
                 "toc_path": ["Utilities", "emdef utility for jobs", "defjob XML file rules"],
-                "bytes": 10, "sha256": "abc123",
+                "bytes": 10,
+                "sha256": "abc123",
             },
         ],
     }
@@ -189,8 +209,11 @@ def test_convert_writes_markdown_and_manifest(fake_capture: Path):
     assert doc["page_role"] == "rules"
     assert doc["source_url"] == "https://example.invalid/16200.htm", "fragment stripped"
     assert doc["sections"] == [
-        {"anchor": "adv", "title": "Advanced usage",
-         "breadcrumb": "Utilities > emdef utility for jobs > Advanced usage"}
+        {
+            "anchor": "adv",
+            "title": "Advanced usage",
+            "breadcrumb": "Utilities > emdef utility for jobs > Advanced usage",
+        }
     ]
     assert (fake_capture / "markdown" / "16200.md").exists()
 
@@ -231,19 +254,29 @@ def test_loader_wiring():
 
 def test_cypher_writes_the_spine():
     cypher = CYPHER.read_text(encoding="utf-8")
-    for token in (":Document", ":Chunk", ":DocSection", "PART_OF",
-                  "FIRST_CHUNK", "NEXT_CHUNK", "IN_SECTION", "SUBSECTION_OF"):
+    for token in (
+        ":Document",
+        ":Chunk",
+        ":DocSection",
+        "PART_OF",
+        "FIRST_CHUNK",
+        "NEXT_CHUNK",
+        "IN_SECTION",
+        "SUBSECTION_OF",
+    ):
         assert token in cypher, f"missing {token}"
 
 
-def test_cypher_writes_NO_meaning_edges():
-    """Q13 is taxonomy only. These belong to Q14's gate (and G32 for the
-    estate join, since a relationship cannot span Neo4j databases)."""
+def test_cypher_writes_no_meaning_edges():
+    """Q13 is taxonomy only — the loader writes NOT ONE meaning edge. Those
+    belong to Q14's gate (and G32 for the estate join, since a relationship
+    cannot span Neo4j databases)."""
     body = "\n".join(
-        line for line in CYPHER.read_text(encoding="utf-8").splitlines()
+        line
+        for line in CYPHER.read_text(encoding="utf-8").splitlines()
         if not line.strip().startswith("//")
     )
     for forbidden in (":ControlMUtility", "DESCRIBES", "SEE_ALSO", "DOCUMENTS", ":SoftwareProduct"):
-        assert forbidden not in body, (
-            f"{forbidden} is gate-bound and must not appear in the executable template"
-        )
+        assert (
+            forbidden not in body
+        ), f"{forbidden} is gate-bound and must not appear in the executable template"

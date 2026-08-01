@@ -11,6 +11,7 @@ SYNTHETIC fixtures (shape-faithful, value-fake). Cases pin the acceptance:
 (d) unmatched/uncomputable records are counted, never dropped; no rels, no
     new relationship types, no graph writes.
 """
+
 from __future__ import annotations
 
 from pathlib import Path
@@ -30,9 +31,9 @@ USER = "svc_synth"
 REPO = "synth-org/etl-scripts"
 
 # server-side contents (carried-back copies)
-CURRENT = "#!/bin/ksh\necho current\n"       # committed at the live ref tip
+CURRENT = "#!/bin/ksh\necho current\n"  # committed at the live ref tip
 OLD_AHEAD = "#!/bin/ksh\necho old-version\n"  # in HISTORY only (no live tip) —
-                                              # the server still runs it: "behind"
+# the server still runs it: "behind"
 ROGUE = "#!/bin/ksh\necho never-committed\n"  # absent from the repo entirely
 # NOTE the honest limit (recorded in the module docstring too): locally EDITED
 # running code matches no repo object at all and lands in never_committed —
@@ -61,7 +62,9 @@ def _write_bundle(root: Path) -> Path:
     )
     rows = ["path\towner\tgroup\tperms\tsize\tmtime"]
     for fname, content in (
-        ("current.ksh", CURRENT), ("ahead.ksh", OLD_AHEAD), ("rogue.ksh", ROGUE),
+        ("current.ksh", CURRENT),
+        ("ahead.ksh", OLD_AHEAD),
+        ("rogue.ksh", ROGUE),
     ):
         rows.append(f"/opt/app/{fname}\t{USER}\tsynthgrp\t750\t40\t2026-07-20 09:00")
         # bytes verbatim — the content hash is over what is ON DISK, and
@@ -132,7 +135,8 @@ def test_b_verdict_buckets_and_mechanical_candidate_ref(corroborated) -> None:
     rogue = [e for e in report.never_committed if e["server_path"] == "/opt/app/rogue.ksh"]
     assert rogue and rogue[0]["path_tail_hints"] == ["old/rogue.ksh"]
     assert {e["repo_path"] for e in report.repo_only} == {
-        "etl/unused_helper.ksh", "old/rogue.ksh",
+        "etl/unused_helper.ksh",
+        "old/rogue.ksh",
     }
 
 
@@ -166,9 +170,7 @@ def test_d_counted_never_dropped_and_no_writes(corroborated) -> None:
 
 
 def test_registry_carries_the_trusted_ref_field() -> None:
-    reg = yaml.safe_load(
-        Path("config/source-registry.yaml").read_text(encoding="utf-8")
-    )
+    reg = yaml.safe_load(Path("config/source-registry.yaml").read_text(encoding="utf-8"))
     # v2 (N9): code-repo retired -> the bitbucket:repo-objects-manifest dataset;
     # classification lives on the bitbucket SYSTEM row.
     entry = next(s for s in reg["datasets"] if s["id"] == "bitbucket:repo-objects-manifest")

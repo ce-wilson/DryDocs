@@ -15,18 +15,19 @@ Row dict keys match controlm_staging_ddl.sql columns exactly so the
 emitted CSVs load without mapping. Variant rows (env-triplet expansions)
 are still emitted on STG_VARIABLE only.
 """
+
 from __future__ import annotations
 
 import json
+from collections.abc import Iterable
 from dataclasses import dataclass, field
-from typing import Iterable
 
-from drydocs_core.models import ControlMVariableRow
 from drydocs_core.controlm.commands import extract_container_command, parse_command
 from drydocs_core.controlm.facts import route_fact
 from drydocs_core.controlm.paths import build_file_ref
 from drydocs_core.controlm.resolver import ResolvedVariable, resolve_job
 from drydocs_core.controlm.variables import ClassifiedVariable, VariableKind, classify_job_variables
+from drydocs_core.models import ControlMVariableRow
 
 _ENV_NAME_TO_LETTER = {"Development": "D", "QA": "Q", "Production": "P"}
 
@@ -68,9 +69,7 @@ def collect_jobs(rows: Iterable[ControlMVariableRow]) -> dict[tuple, JobDefiniti
         key = (dc, row.folder_id, row.job_id)
         jd = jobs.get(key)
         if jd is None:
-            is_header = row.var_scope == "FOLDER" or (
-                row.var_scope is None and row.job_id == "1"
-            )
+            is_header = row.var_scope == "FOLDER" or (row.var_scope is None and row.job_id == "1")
             jd = JobDefinitions(dc, row.folder_id, row.job_id, is_header)
             jobs[key] = jd
         jd.defs.append((row.var_name, row.var_value))
@@ -123,8 +122,7 @@ def _route_technical_objects(
 
     if cv.kind is VariableKind.PLUGIN_NS and cv.plugin_namespace == "FileWatch":
         if cv.name.upper().endswith("FILE_PATH"):
-            ref = build_file_ref(cv.name, value, source_field=cv.raw_name,
-                                 role="WATCH_INPUT")
+            ref = build_file_ref(cv.name, value, source_field=cv.raw_name, role="WATCH_INPUT")
             if ref:
                 bundle.file_ref.append({**base, **_file_ref_cols(ref)})
         return
@@ -133,22 +131,38 @@ def _route_technical_objects(
         if "CONTAINER_OVERRIDES" in cv.name.upper():
             inner = extract_container_command(value)
             if inner:
-                _emit_command(base, "CONTAINER_OVERRIDE", inner, cv.raw_name,
-                              counters, bundle, default_type="ECS_TASK")
+                _emit_command(
+                    base,
+                    "CONTAINER_OVERRIDE",
+                    inner,
+                    cv.raw_name,
+                    counters,
+                    bundle,
+                    default_type="ECS_TASK",
+                )
         return
 
     if cv.kind is VariableKind.SEMANTIC_FACT:
         facts, notes = route_fact(cv, value)
         for f in facts:
-            bundle.app_fact.append({
-                **base, "fact_type": f.fact_type, "fact_value": f.fact_value,
-                "environment": f.environment, "source_var": f.source_var,
-            })
+            bundle.app_fact.append(
+                {
+                    **base,
+                    "fact_type": f.fact_type,
+                    "fact_value": f.fact_value,
+                    "environment": f.environment,
+                    "source_var": f.source_var,
+                }
+            )
         for note in notes:
-            bundle.notification.append({
-                **base, "channel": note.channel, "address": note.address,
-                "source_var": note.source_var,
-            })
+            bundle.notification.append(
+                {
+                    **base,
+                    "channel": note.channel,
+                    "address": note.address,
+                    "source_var": note.source_var,
+                }
+            )
         return
 
     if cv.kind in (VariableKind.LITERAL, VariableKind.VAR_REF):
@@ -170,8 +184,14 @@ def _file_ref_cols(ref) -> dict:
 
 
 def _emit_command(
-    base, source, command, source_field, counters, bundle,
-    *, default_type: str | None = None,
+    base,
+    source,
+    command,
+    source_field,
+    counters,
+    bundle,
+    *,
+    default_type: str | None = None,
 ) -> None:
     parsed = parse_command(command)
     for inv in parsed.invocations:
@@ -179,40 +199,40 @@ def _emit_command(
         itype = inv.invocation_type
         if itype == "UNKNOWN" and default_type:
             itype = default_type
-        bundle.invocation.append({
-            **base,
-            "seq": counters["inv"],
-            "invocation_source": source,
-            "invocation_type": itype,
-            "executable_path": inv.executable_path,
-            "script_path": inv.script_path,
-            "config_path": inv.config_path,
-            "args_json": json.dumps(list(inv.args)) if inv.args else None,
-            "raw_command": inv.raw_command,
-            "is_classified": "Y" if (inv.is_classified or default_type) else "N",
-            "classifier_rule": inv.classifier_rule,
-        })
+        bundle.invocation.append(
+            {
+                **base,
+                "seq": counters["inv"],
+                "invocation_source": source,
+                "invocation_type": itype,
+                "executable_path": inv.executable_path,
+                "script_path": inv.script_path,
+                "config_path": inv.config_path,
+                "args_json": json.dumps(list(inv.args)) if inv.args else None,
+                "raw_command": inv.raw_command,
+                "is_classified": "Y" if (inv.is_classified or default_type) else "N",
+                "classifier_rule": inv.classifier_rule,
+            }
+        )
     for fop in parsed.file_ops:
         counters["fop"] += 1
-        bundle.file_op.append({
-            **base,
-            "seq": counters["fop"],
-            "op_type": fop.op_type,
-            "src_pattern": fop.src_pattern,
-            "tgt_pattern": fop.tgt_pattern,
-            "source_field": source,
-            "raw_statement": fop.raw_statement,
-        })
+        bundle.file_op.append(
+            {
+                **base,
+                "seq": counters["fop"],
+                "op_type": fop.op_type,
+                "src_pattern": fop.src_pattern,
+                "tgt_pattern": fop.tgt_pattern,
+                "source_field": source,
+                "raw_statement": fop.raw_statement,
+            }
+        )
 
 
-def build_staging_bundle(
-    jobs: dict[tuple, JobDefinitions], run_id: str
-) -> StagingBundle:
+def build_staging_bundle(jobs: dict[tuple, JobDefinitions], run_id: str) -> StagingBundle:
     """Classify + resolve every job and emit every STG_* row type."""
     headers: dict[tuple, JobDefinitions] = {
-        (jd.data_center, jd.folder_id): jd
-        for jd in jobs.values()
-        if jd.is_folder_header
+        (jd.data_center, jd.folder_id): jd for jd in jobs.values() if jd.is_folder_header
     }
     bundle = StagingBundle()
     for jd in jobs.values():
@@ -222,14 +242,12 @@ def build_staging_bundle(
         else:
             header = headers.get((jd.data_center, jd.folder_id))
             fdefs = header.defs if header else []
-            resolved = [
-                rv for rv in resolve_job(fdefs, jd.defs) if rv.scope == "JOB"
-            ]
+            resolved = [rv for rv in resolve_job(fdefs, jd.defs) if rv.scope == "JOB"]
 
         counters = {"inv": 0, "fop": 0}
         var_resolved = 0
         job_unresolved: list[str] = []
-        for ordinal, (cv, rv) in enumerate(zip(classified, resolved), start=1):
+        for ordinal, (cv, rv) in enumerate(zip(classified, resolved, strict=False), start=1):
             bundle.variable.append(_stg_variable_row(jd, run_id, ordinal, cv, rv))
             var_resolved += rv.is_fully_resolved
             job_unresolved.extend(rv.unresolved)
@@ -242,18 +260,20 @@ def build_staging_bundle(
             _route_technical_objects(jd, run_id, cv, rv, counters, bundle)
 
         has_cmd = any(c.kind is VariableKind.EMBEDDED_SHELL for c in classified)
-        bundle.parse_quality.append({
-            "run_id": run_id,
-            **_job_keys(jd),
-            "var_total": len(jd.defs),
-            "var_resolved": var_resolved,
-            "cmd_present": "Y" if has_cmd else "N",
-            "cmd_classified": "Y" if counters["inv"] or counters["fop"] else "N",
-            "invocation_count": counters["inv"],
-            "file_ref_count": counters["fop"],
-            "unresolved_tokens": ",".join(dict.fromkeys(job_unresolved)) or None,
-            "notes": None,
-        })
+        bundle.parse_quality.append(
+            {
+                "run_id": run_id,
+                **_job_keys(jd),
+                "var_total": len(jd.defs),
+                "var_resolved": var_resolved,
+                "cmd_present": "Y" if has_cmd else "N",
+                "cmd_classified": "Y" if counters["inv"] or counters["fop"] else "N",
+                "invocation_count": counters["inv"],
+                "file_ref_count": counters["fop"],
+                "unresolved_tokens": ",".join(dict.fromkeys(job_unresolved)) or None,
+                "notes": None,
+            }
+        )
     return bundle
 
 

@@ -33,9 +33,7 @@ NAMED_QUERIES: dict[str, NamedQuery] = {
         NamedQuery(
             id="overview-counts",
             description="Node label counts — the console's overview/health strip.",
-            cypher=(
-                "MATCH (n) RETURN labels(n) AS labels, count(*) AS count ORDER BY count DESC"
-            ),
+            cypher=("MATCH (n) RETURN labels(n) AS labels, count(*) AS count ORDER BY count DESC"),
         ),
         NamedQuery(
             id="folder-census",

@@ -19,6 +19,7 @@ Active filter (``USER_DAILY IS NOT NULL``) lives in the SQL projection.
 There is NO ``IS_CURRENT_VERSION`` filter on folders — that column
 doesn't exist on ``CM_DEF_VTAB`` (only jobs and conditions are versioned).
 """
+
 from __future__ import annotations
 
 from pathlib import Path
@@ -28,6 +29,7 @@ from pydantic import BaseModel
 
 from drydocs_core.controlm import parse_folder_name
 from drydocs_core.models import ControlMFolderRow
+
 from .base import BaseLoader, compute_row_checksum
 
 

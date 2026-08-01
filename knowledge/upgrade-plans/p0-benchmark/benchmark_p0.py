@@ -4,6 +4,7 @@ Throwaway spike script (Q3). Creates a fulltext index on Chunk for the
 benchmark and DROPS it at the end (DB left as found, minus nothing).
 Results -> JSON for the written verdict.
 """
+
 from __future__ import annotations
 
 import json
@@ -48,7 +49,8 @@ def blob(rows) -> str:
 
 QUESTIONS = [
     dict(
-        id="SA1", cls="structure/aggregation",
+        id="SA1",
+        cls="structure/aggregation",
         q="How many documents are in the corpus, and which has the most content?",
         marker=r"controlm-",  # a doc id must be present; value-correctness judged from data
         traversal="""MATCH (d:Document)<-[:PART_OF]-(c:Chunk)
@@ -61,7 +63,8 @@ QUESTIONS = [
         manifest=["SOURCE-MANIFEST.md"],
     ),
     dict(
-        id="SA2", cls="structure/aggregation",
+        id="SA2",
+        cls="structure/aggregation",
         q="How much of the corpus is Claude inference (SYNTHESIZED) vs vendor-grounded?",
         marker=r"SYNTHESIZED",
         traversal="""MATCH (c:Chunk) WHERE c.chunk_id STARTS WITH 'controlm-'
@@ -71,7 +74,8 @@ QUESTIONS = [
         manifest=["SOURCE-MANIFEST.md"],
     ),
     dict(
-        id="EL1", cls="exact lookup",
+        id="EL1",
+        cls="exact lookup",
         q="What is %%LIBMEMSYM?",
         marker=r"LIBMEMSYM",
         traversal="""MATCH (c:Chunk)-[:PART_OF]->(d:Document)
@@ -82,7 +86,8 @@ QUESTIONS = [
         manifest=["controlm-variables.md"],
     ),
     dict(
-        id="EL2", cls="exact lookup",
+        id="EL2",
+        cls="exact lookup",
         q="What does the ctmcreate utility do?",
         marker=r"ctmcreate",
         traversal="""MATCH (c:Chunk)-[:PART_OF]->(d:Document)
@@ -93,7 +98,8 @@ QUESTIONS = [
         manifest=["controlm-general-parameters.md"],
     ),
     dict(
-        id="EL3", cls="exact lookup",
+        id="EL3",
+        cls="exact lookup",
         q="What does ODAT mean?",
         marker=r"ODAT",
         traversal="""MATCH (c:Chunk)-[:PART_OF]->(d:Document)
@@ -104,7 +110,8 @@ QUESTIONS = [
         manifest=["controlm-variables.md"],
     ),
     dict(
-        id="PC1", cls="paraphrase/conceptual",
+        id="PC1",
+        cls="paraphrase/conceptual",
         q="How do I make one job wait for another job to finish before it runs?",
         marker=r"prerequisite condition|[Ii]n [Cc]ondition|condition",
         traversal_naive="""MATCH (c:Chunk) WHERE c.text CONTAINS 'wait for another job'
@@ -116,7 +123,8 @@ QUESTIONS = [
         manifest=["controlm-events.md"],
     ),
     dict(
-        id="PC2", cls="paraphrase/conceptual",
+        id="PC2",
+        cls="paraphrase/conceptual",
         q="Can a job start automatically when a file arrives?",
         marker=r"[Ff]ile ?[Ww]atcher",
         traversal_naive="""MATCH (c:Chunk) WHERE c.text CONTAINS 'when a file arrives'
@@ -129,7 +137,8 @@ QUESTIONS = [
         manifest=["controlm-file-watcher.md"],
     ),
     dict(
-        id="PC3", cls="paraphrase/conceptual",
+        id="PC3",
+        cls="paraphrase/conceptual",
         q="How do I keep jobs from running on holidays?",
         marker=r"holiday",
         traversal="""MATCH (c:Chunk)-[:PART_OF]->(d:Document)
@@ -140,7 +149,8 @@ QUESTIONS = [
         manifest=["controlm-calendars.md"],
     ),
     dict(
-        id="MD1", cls="multi-doc",
+        id="MD1",
+        cls="multi-doc",
         q="Which docs cover pool variables, and how do they relate to %% user variables?",
         marker=r"pool",
         traversal="""MATCH (c:Chunk)-[:PART_OF]->(d:Document)
@@ -148,10 +158,15 @@ QUESTIONS = [
                      RETURN d.doc_id AS doc, collect(c.heading)[..4] AS headings,
                             sum(c.char_count) AS chars""",
         fulltext="pool variables named pool",
-        manifest=["controlm-variables.md", "controlm-api-job-properties.md", "controlm-file-transfer-job.md"],
+        manifest=[
+            "controlm-variables.md",
+            "controlm-api-job-properties.md",
+            "controlm-file-transfer-job.md",
+        ],
     ),
     dict(
-        id="MD2", cls="multi-doc + provenance",
+        id="MD2",
+        cls="multi-doc + provenance",
         q="Which Control-M version do these docs target, and is the Automation API compatible with it?",
         marker=r"9\.0\.20 and higher|9\.0\.21\.300",
         traversal="""MATCH (d:Document) WITH DISTINCT d.target_version AS target LIMIT 1
@@ -163,7 +178,8 @@ QUESTIONS = [
         manifest=["SOURCE-MANIFEST.md", "controlm-api-installation.md"],
     ),
     dict(
-        id="PV1", cls="provenance",
+        id="PV1",
+        cls="provenance",
         q="Are the JSON job-definition examples in the API docs vendor ground truth?",
         marker=r"SYNTHESIZED",
         traversal="""MATCH (c:Chunk)-[:PART_OF]->(d:Document)
@@ -174,7 +190,8 @@ QUESTIONS = [
         manifest=["SOURCE-MANIFEST.md"],
     ),
     dict(
-        id="OS1", cls="out-of-scope",
+        id="OS1",
+        cls="out-of-scope",
         q="How do I define an AutoSys global variable?",
         marker=None,  # expect-empty: correct behavior is an abstention
         traversal="""MATCH (c:Chunk) WHERE c.text CONTAINS 'AutoSys global variable'
@@ -210,8 +227,11 @@ for spec in QUESTIONS:
     def score(rows, text_blob, ms, marker=marker):
         found = bool(re.search(marker, text_blob)) if marker else None
         return dict(
-            rows=len(rows), ms=round(ms, 1), chars=len(text_blob),
-            marker_found=found, empty=(len(rows) == 0),
+            rows=len(rows),
+            ms=round(ms, 1),
+            chars=len(text_blob),
+            marker_found=found,
+            empty=(len(rows) == 0),
             sample=text_blob[:300],
         )
 
@@ -234,7 +254,9 @@ for spec in QUESTIONS:
     ms = (time.perf_counter() - t0) * 1000
     text_blob = "\n".join(texts)
     entry["arms"]["manifest"] = dict(
-        rows=len(spec["manifest"]), ms=round(ms, 1), chars=len(text_blob),
+        rows=len(spec["manifest"]),
+        ms=round(ms, 1),
+        chars=len(text_blob),
         marker_found=(bool(re.search(marker, text_blob)) if marker else None),
         empty=(len(spec["manifest"]) == 0),
         files=spec["manifest"],
@@ -251,6 +273,10 @@ for e in results:
     line = f"{e['id']:4} "
     for arm in ("traversal", "fulltext", "manifest"):
         a = e["arms"][arm]
-        mark = "EMPTY" if a["empty"] else ("HIT" if a["marker_found"] else ("n/a" if a["marker_found"] is None else "miss"))
+        mark = (
+            "EMPTY"
+            if a["empty"]
+            else ("HIT" if a["marker_found"] else ("n/a" if a["marker_found"] is None else "miss"))
+        )
         line += f"| {arm[:8]}: {mark:5} {a['chars']:>7}ch {a['ms']:>7.1f}ms "
     print(line)

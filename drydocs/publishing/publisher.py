@@ -6,6 +6,7 @@ deliberately **not** in this public template — a company profile provides a
 template ships only offline publishers so the pipeline is testable without any
 external service or credentials.
 """
+
 from __future__ import annotations
 
 from dataclasses import dataclass, field
@@ -16,7 +17,7 @@ from typing import Protocol, runtime_checkable
 @dataclass(frozen=True)
 class PublishResult:
     title: str
-    location: str          # a URL/path/uri identifying where it went
+    location: str  # a URL/path/uri identifying where it went
     published: bool
 
 
@@ -32,7 +33,9 @@ class NoopPublisher:
     sent: list[PublishResult] = field(default_factory=list)
 
     def publish(self, *, title: str, body: str, space: str | None = None) -> PublishResult:
-        result = PublishResult(title=title, location=f"noop://{space or 'preview'}/{title}", published=False)
+        result = PublishResult(
+            title=title, location=f"noop://{space or 'preview'}/{title}", published=False
+        )
         self.sent.append(result)
         return result
 

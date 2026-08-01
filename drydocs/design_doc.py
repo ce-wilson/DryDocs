@@ -27,6 +27,7 @@ Rendering is DETERMINISTIC: given the same ``.md`` it always produces byte-ident
 render carries no build time. classification: Internal-Public (generic renderer; the docs
 it renders carry their own classification in their front matter).
 """
+
 from __future__ import annotations
 
 import html
@@ -50,11 +51,11 @@ def _inline(text: str) -> str:
         codes.append(html.escape(m.group(1)))
         return f"\x00{len(codes) - 1}\x00"
 
-    text = _CODE_SPAN.sub(_protect, text)          # 1. pull code spans out
-    text = html.escape(text)                       # 2. escape everything else
+    text = _CODE_SPAN.sub(_protect, text)  # 1. pull code spans out
+    text = html.escape(text)  # 2. escape everything else
     text = _BOLD.sub(r"<strong>\1</strong>", text)  # 3. bold
-    text = _ITALIC.sub(r"<em>\1</em>", text)        # 3b. italic
-    text = _LINK.sub(                              # 4. links
+    text = _ITALIC.sub(r"<em>\1</em>", text)  # 3b. italic
+    text = _LINK.sub(  # 4. links
         lambda m: f'<a href="{html.escape(m.group(2), quote=True)}">{m.group(1)}</a>', text
     )
     text = _PLACEHOLDER.sub(lambda m: f"<code>{codes[int(m.group(1))]}</code>", text)  # 5. restore
@@ -358,15 +359,19 @@ def _inject_margin_anchors(body_html: str) -> str:
     print). Runs BEFORE ``_inject_subsection_anchors`` so only AUTHORED anchors get a
     printed gutter tag — the L11 derived ids stay screen-annotation-only. Pure string
     substitution on the already-rendered body — deterministic."""
+
     def _tag(m: re.Match[str]) -> str:
         opening, anchor = m.group(1), m.group(2)
-        return f'{opening}<span class="dd-margin-tag" aria-hidden="true">{html.escape(anchor)}</span>'
+        return (
+            f'{opening}<span class="dd-margin-tag" aria-hidden="true">{html.escape(anchor)}</span>'
+        )
+
     return _MARGIN_TAG_OPEN.sub(_tag, body_html)
 
 
 _REV_RE = re.compile(r"\bRev\s+(\d+)\b")
 _COMMIT_RE = re.compile(r"\bcommit\s+`([0-9a-fA-F]{6,40})`")
-_REV_PLACEHOLDER = "Rev —"     # em dash: a doc that declares no Rev still gets a footer
+_REV_PLACEHOLDER = "Rev —"  # em dash: a doc that declares no Rev still gets a footer
 _COMMIT_PLACEHOLDER = "—"
 
 
@@ -493,7 +498,9 @@ def _inject_subsection_anchors(body_html: str) -> str:
             while stack and stack[-1][1] >= level:
                 stack.pop()
             if stack:
-                group = heading_groups.setdefault((stack[-1][0], level), {"total": 0, "unanchored": []})
+                group = heading_groups.setdefault(
+                    (stack[-1][0], level), {"total": 0, "unanchored": []}
+                )
                 group["total"] += 1  # anchored subheadings count toward the >2 threshold
                 if not hid:
                     group["unanchored"].append(idx)
@@ -512,7 +519,7 @@ def _inject_subsection_anchors(body_html: str) -> str:
             for idx in group["unanchored"]:
                 hm = _H_BLOCK.match(lines[idx])
                 did = _derived_id(parent, hm.group(3), used)
-                lines[idx] = f"<h{hm.group(1)} id=\"{did}\">{hm.group(3)}</h{hm.group(1)}>"
+                lines[idx] = f'<h{hm.group(1)} id="{did}">{hm.group(3)}</h{hm.group(1)}>'
     for idx, parent in ol_candidates:
         lines[idx] = _inject_li_ids(lines[idx], parent, used)
     return "\n".join(lines)
@@ -661,7 +668,7 @@ def render_doc(md: str, doc_id: str | None = None) -> str:
     did = html.escape(doc_id, quote=True)
     feedback = _feedback_html(did, sme_feedback_filename(doc_id, md))
     return (
-        "<!doctype html>\n<html lang=\"en\">\n<head>\n<meta charset=\"utf-8\">\n"
+        '<!doctype html>\n<html lang="en">\n<head>\n<meta charset="utf-8">\n'
         '<meta name="viewport" content="width=device-width, initial-scale=1">\n'
         f"<title>{title}</title>\n<style>\n{css}</style>\n</head>\n<body>\n"
         f"<main>\n{body}\n</main>\n{footer}{feedback}\n</body>\n</html>\n"

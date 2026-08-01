@@ -6,6 +6,7 @@ poetry/pytest are not installed. If the two ever disagree, test_backlog.py wins.
 Usage (from the repo root):
     python .claude/skills/groom-backlog/validate.py
 """
+
 from __future__ import annotations
 
 import sys
@@ -22,8 +23,18 @@ TYPES = {"requirement", "task", "chore", "bug"}
 PRIORITIES = {"p0", "p1", "p2", "p3"}
 MODELS = {"haiku", "sonnet", "opus", "fable"}  # keep in sync with test_backlog.py (it wins)
 REQUIRED = (
-    "id", "title", "type", "module", "phase", "epic",
-    "agent", "model", "priority", "status", "depends_on", "acceptance",
+    "id",
+    "title",
+    "type",
+    "module",
+    "phase",
+    "epic",
+    "agent",
+    "model",
+    "priority",
+    "status",
+    "depends_on",
+    "acceptance",
 )
 
 
@@ -109,7 +120,8 @@ def main() -> int:
             fails.append(f"summary.{s}={summary.get(s)} but items say {computed[s]}")
 
     expected = {
-        iid for iid, it in by_id.items()
+        iid
+        for iid, it in by_id.items()
         if it["status"] == "todo"
         and all(by_id[d]["status"] == "done" for d in it.get("depends_on", []))
     }

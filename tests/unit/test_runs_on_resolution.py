@@ -7,6 +7,7 @@ of null / group-matched / host-matched / unmatched, counts are stamped on
 the pass's :JobRun, and the resolution script runs between the run-open
 and the census.
 """
+
 from __future__ import annotations
 
 from drydocs.loaders.runs_on_resolution import (
@@ -18,15 +19,21 @@ from drydocs.loaders.runs_on_resolution import (
 
 def test_coverage_reconciles_partitions_the_job_population() -> None:
     ok = RunsOnCoverage(
-        total_jobs=17, null_node_id=0,
-        matched_host_group=9, matched_agent_host=7, unmatched=1,
+        total_jobs=17,
+        null_node_id=0,
+        matched_host_group=9,
+        matched_agent_host=7,
+        unmatched=1,
     )
     assert ok.reconciles()
     assert ok.as_dict()["reconciles"] is True
 
     drifted = RunsOnCoverage(
-        total_jobs=17, null_node_id=0,
-        matched_host_group=9, matched_agent_host=7, unmatched=2,
+        total_jobs=17,
+        null_node_id=0,
+        matched_host_group=9,
+        matched_agent_host=7,
+        unmatched=2,
     )
     assert not drifted.reconciles()
     assert drifted.as_dict()["reconciles"] is False
@@ -51,11 +58,16 @@ class FakeClient:
     def run(self, cypher, params=None, **kwargs):
         self.calls.append(("run", cypher))
         if "AS total_jobs" in cypher:
-            return [{
-                "total_jobs": 17, "null_node_id": 0,
-                "matched_host_group": 9, "matched_agent_host": 7,
-                "unmatched": 1, "both_match": 0,
-            }]
+            return [
+                {
+                    "total_jobs": 17,
+                    "null_node_id": 0,
+                    "matched_host_group": 9,
+                    "matched_agent_host": 7,
+                    "unmatched": 1,
+                    "both_match": 0,
+                }
+            ]
         if "multi_dc_group_jobs" in cypher:
             return [{"multi_dc_group_jobs": 0}]
         return []

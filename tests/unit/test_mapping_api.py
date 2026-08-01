@@ -4,6 +4,7 @@ Covers: the steward role gate (user < steward < admin), grid/options reads
 over a real mapping-store build, changeset artifact generation (fail-closed
 validation, REQUIRED rationale, template column order, zero server writes).
 """
+
 from __future__ import annotations
 
 import csv
@@ -60,7 +61,9 @@ def test_user_role_is_refused(sessions, store):
     with pytest.raises(Forbidden):
         draft_changeset(
             [{"folder_id": "F", "job_id": "J", "seal_id": "S", "rationale": "r"}],
-            token, sessions, store,
+            token,
+            sessions,
+            store,
         )
 
 
@@ -76,12 +79,18 @@ def test_grid_serves_the_quintuple(sessions, store):
     token = _token(sessions, "kchen2190")
     out = mapping_grid("ontology-map", token, sessions, store)
     assert out["keys"][:5] == [
-        "id", "source_label", "relationship_type", "role", "target_label",
+        "id",
+        "source_label",
+        "relationship_type",
+        "role",
+        "target_label",
     ]
     by_id = {r["id"]: r for r in out["rows"]}
     seed = by_id["job-contains"]
     assert (seed["source_label"], seed["relationship_type"], seed["target_label"]) == (
-        "ControlMFolder", "CONTAINS_JOB", "ControlMJob"
+        "ControlMFolder",
+        "CONTAINS_JOB",
+        "ControlMJob",
     )
 
 
@@ -98,9 +107,7 @@ def test_stale_store_rebuilds_on_read(sessions, tmp_path):
     mapping_grid("ontology-map", token, sessions, own)  # first read builds
 
     rw = sqlite3.connect(str(tmp_path / "mapping.db"))  # simulate source drift
-    rw.execute(
-        "UPDATE meta SET value = 'drifted' WHERE key = 'source:taxonomy-ontology-map.yaml'"
-    )
+    rw.execute("UPDATE meta SET value = 'drifted' WHERE key = 'source:taxonomy-ontology-map.yaml'")
     rw.commit()
     rw.close()
 
@@ -133,12 +140,23 @@ def test_changeset_artifact_shape(sessions, store):
     token = _token(sessions, "kchen2190")
     out = draft_changeset(
         [
-            {"folder_id": "F0001", "job_id": "J0002", "seal_id": "APP-9876",
-             "rationale": "support team confirmed owner"},
-            {"folder_id": "F0001", "job_id": "J0003", "seal_id": "APP-9876",
-             "rationale": "same series as J0002", "create_target_if_missing": True},
+            {
+                "folder_id": "F0001",
+                "job_id": "J0002",
+                "seal_id": "APP-9876",
+                "rationale": "support team confirmed owner",
+            },
+            {
+                "folder_id": "F0001",
+                "job_id": "J0003",
+                "seal_id": "APP-9876",
+                "rationale": "same series as J0002",
+                "create_target_if_missing": True,
+            },
         ],
-        token, sessions, store,
+        token,
+        sessions,
+        store,
     )
     rows = list(csv.DictReader(io.StringIO(out["csv"])))
     assert len(rows) == 2
@@ -151,17 +169,23 @@ def test_changeset_artifact_shape(sessions, store):
     assert "replaces_with" in out["manifest_snippet"]
     # The artifact parses under the SAME validation chain the loader uses
     # once registered — assert the header matches the committed template.
-    template = Path(__file__).resolve().parents[2] / "config" / "manual-loads" / (
-        "TEMPLATE-node-mapping.csv"
+    template = (
+        Path(__file__).resolve().parents[2]
+        / "config"
+        / "manual-loads"
+        / ("TEMPLATE-node-mapping.csv")
     )
     assert out["csv"].splitlines()[0] == template.read_text(encoding="utf-8").splitlines()[0]
 
 
-@pytest.mark.parametrize("bad,reason", [
-    ([], "empty"),
-    ([{"folder_id": "F", "job_id": "J", "seal_id": "S", "rationale": "  "}], "rationale"),
-    ([{"folder_id": "", "job_id": "J", "seal_id": "S", "rationale": "r"}], "required"),
-])
+@pytest.mark.parametrize(
+    "bad,reason",
+    [
+        ([], "empty"),
+        ([{"folder_id": "F", "job_id": "J", "seal_id": "S", "rationale": "  "}], "rationale"),
+        ([{"folder_id": "", "job_id": "J", "seal_id": "S", "rationale": "r"}], "required"),
+    ],
+)
 def test_changeset_fails_closed(sessions, store, bad, reason):
     token = _token(sessions, "kchen2190")
     with pytest.raises(ChangesetValidationError):
@@ -172,6 +196,7 @@ def test_changeset_fails_closed(sessions, store, bad, reason):
 # O24 — SEAL-contact override domain (ui-write-surface gate SME-3, M2 tier).
 # Synthetic values only (publish boundary).
 # ---------------------------------------------------------------------------
+
 
 @pytest.fixture()
 def override_store(tmp_path, monkeypatch) -> MappingStore:
@@ -187,9 +212,7 @@ def override_store(tmp_path, monkeypatch) -> MappingStore:
         "kchen2190,2026-07-21,active\n",
         encoding="utf-8",
     )
-    monkeypatch.setattr(
-        "drydocs_core.mapping_store.SEAL_CONTACT_OVERRIDES_PATH", fix
-    )
+    monkeypatch.setattr("drydocs_core.mapping_store.SEAL_CONTACT_OVERRIDES_PATH", fix)
     return MappingStore(tmp_path / "mapping.db")
 
 
@@ -221,11 +244,19 @@ def test_draft_override_returns_full_updated_file(sessions, override_store):
     wrote nothing."""
     token = _token(sessions, "asmith7734")
     out = draft_override(
-        [{"app_seal_id": "APP-9012", "role_name": "l1 ops manager",
-          "seal_holder_sid": "U444444", "override_holder_sid": "U555555",
-          "override_holder_name": "Ada Admin",
-          "rationale": "SEAL points at the retired rota owner"}],
-        token, sessions, override_store,
+        [
+            {
+                "app_seal_id": "APP-9012",
+                "role_name": "l1 ops manager",
+                "seal_holder_sid": "U444444",
+                "override_holder_sid": "U555555",
+                "override_holder_name": "Ada Admin",
+                "rationale": "SEAL points at the retired rota owner",
+            }
+        ],
+        token,
+        sessions,
+        override_store,
     )
     rows = list(csv.DictReader(io.StringIO(out["csv"])))
     assert out["filename"] == "seal-contact-overrides.csv"
@@ -240,16 +271,37 @@ def test_draft_override_returns_full_updated_file(sessions, override_store):
     assert "wrote NOTHING" in out["note"]
 
 
-@pytest.mark.parametrize("bad", [
-    [],
-    [{"app_seal_id": "A", "role_name": "Head Chef", "override_holder_sid": "U2",
-      "rationale": "r"}],  # unknown role
-    [{"app_seal_id": "A", "role_name": "L2 Operate Manager",
-      "override_holder_sid": "U2", "rationale": " "}],  # rationale required
-    [{"app_seal_id": "A", "role_name": "L2 Operate Manager",
-      "seal_holder_sid": "U2", "override_holder_sid": "U2",
-      "rationale": "r"}],  # not a correction
-])
+@pytest.mark.parametrize(
+    "bad",
+    [
+        [],
+        [
+            {
+                "app_seal_id": "A",
+                "role_name": "Head Chef",
+                "override_holder_sid": "U2",
+                "rationale": "r",
+            }
+        ],  # unknown role
+        [
+            {
+                "app_seal_id": "A",
+                "role_name": "L2 Operate Manager",
+                "override_holder_sid": "U2",
+                "rationale": " ",
+            }
+        ],  # rationale required
+        [
+            {
+                "app_seal_id": "A",
+                "role_name": "L2 Operate Manager",
+                "seal_holder_sid": "U2",
+                "override_holder_sid": "U2",
+                "rationale": "r",
+            }
+        ],  # not a correction
+    ],
+)
 def test_draft_override_fails_closed(sessions, override_store, bad):
     token = _token(sessions, "kchen2190")
     with pytest.raises(ChangesetValidationError):
@@ -260,9 +312,17 @@ def test_override_endpoints_refuse_user_role(sessions, override_store):
     token = _token(sessions, "jdoe4821")
     with pytest.raises(Forbidden):
         draft_override(
-            [{"app_seal_id": "A", "role_name": "L2 Operate Manager",
-              "override_holder_sid": "U2", "rationale": "r"}],
-            token, sessions, override_store,
+            [
+                {
+                    "app_seal_id": "A",
+                    "role_name": "L2 Operate Manager",
+                    "override_holder_sid": "U2",
+                    "rationale": "r",
+                }
+            ],
+            token,
+            sessions,
+            override_store,
         )
     with pytest.raises(Forbidden):
         source_corrections_report(token, sessions, override_store)

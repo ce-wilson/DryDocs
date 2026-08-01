@@ -4,6 +4,7 @@ Per-rule contract: pure, idempotent, ratified-only application, behavior-preserv
 (the equivalence proof passes across the transform). Rule VALUES here are synthetic —
 real maps/ids are company-side.
 """
+
 from __future__ import annotations
 
 from pathlib import Path
@@ -23,7 +24,9 @@ def _legacy():
 
 def _rename_rule(ratified: bool = True):
     return canonical_variable_rename(
-        {"DIR_A": "DIR_CANON", "PFX": "FILE_PREFIX"}, rule_id="SYN-1", ratified=ratified,
+        {"DIR_A": "DIR_CANON", "PFX": "FILE_PREFIX"},
+        rule_id="SYN-1",
+        ratified=ratified,
     )
 
 
@@ -73,9 +76,7 @@ def test_rename_does_not_touch_longer_names() -> None:
     rule = canonical_variable_rename({"DIR": "X"}, rule_id="SYN-2", ratified=True)
     out = rule.apply(_legacy())
     assert out.jobs[0].watch_template == _legacy().jobs[0].watch_template
-    assert [n for n, _ in out.jobs[0].variables] == [
-        n for n, _ in _legacy().jobs[0].variables
-    ]
+    assert [n for n, _ in out.jobs[0].variables] == [n for n, _ in _legacy().jobs[0].variables]
 
 
 def test_conflicting_rename_raises() -> None:

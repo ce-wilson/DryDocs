@@ -10,6 +10,7 @@ Until that lands, the wire format here is the **transcript**: the M0 gate-1 fall
 Everything above this module speaks :class:`DefinitionSet`; only a
 :class:`DefinitionFormat` implementation may know a wire shape.
 """
+
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
@@ -34,9 +35,9 @@ class JobDefinition:
     """
 
     name: str
-    job_type: str | None = None            # e.g. "FileWatcher"
+    job_type: str | None = None  # e.g. "FileWatcher"
     variables: VariableDefs = field(default_factory=list)
-    watch_template: str | None = None      # FileWatcher watched-path template
+    watch_template: str | None = None  # FileWatcher watched-path template
 
 
 @dataclass
@@ -76,8 +77,9 @@ class DefinitionFormat(ABC):
 
 
 def _read_vars(raw: list | None) -> VariableDefs:
-    return [(str(v["name"]), None if v.get("value") is None else str(v["value"]))
-            for v in (raw or [])]
+    return [
+        (str(v["name"]), None if v.get("value") is None else str(v["value"])) for v in (raw or [])
+    ]
 
 
 class TranscriptDefinitionFormat(DefinitionFormat):
@@ -107,10 +109,12 @@ class TranscriptDefinitionFormat(DefinitionFormat):
             raise ValueError(f"not a {TRANSCRIPT_SCHEMA} transcript: schema={schema!r}")
         folders: list[FolderDefinition] = []
         if data.get("folder"):
-            folders.append(FolderDefinition(
-                name=str(data["folder"]["name"]),
-                variables=_read_vars(data["folder"].get("variables")),
-            ))
+            folders.append(
+                FolderDefinition(
+                    name=str(data["folder"]["name"]),
+                    variables=_read_vars(data["folder"].get("variables")),
+                )
+            )
         jobs = [
             JobDefinition(
                 name=str(j["name"]),
@@ -120,8 +124,7 @@ class TranscriptDefinitionFormat(DefinitionFormat):
             )
             for j in (data.get("jobs") or [])
         ]
-        return DefinitionSet(folders=folders, jobs=jobs,
-                             source=data.get("source") or str(source))
+        return DefinitionSet(folders=folders, jobs=jobs, source=data.get("source") or str(source))
 
     def dump(self, definitions: DefinitionSet, target: Path) -> Path:
         payload = {
@@ -130,10 +133,12 @@ class TranscriptDefinitionFormat(DefinitionFormat):
             "folder": (
                 {
                     "name": definitions.folders[0].name,
-                    "variables": [{"name": n, "value": v}
-                                  for n, v in definitions.folders[0].variables],
+                    "variables": [
+                        {"name": n, "value": v} for n, v in definitions.folders[0].variables
+                    ],
                 }
-                if definitions.folders else None
+                if definitions.folders
+                else None
             ),
             "jobs": [
                 {
@@ -168,8 +173,8 @@ class XmlDefinitionFormat(DefinitionFormat):
         "the authoritative sources). Use TranscriptDefinitionFormat meanwhile."
     )
 
-    def load(self, source: Path) -> DefinitionSet:  # noqa: ARG002
+    def load(self, source: Path) -> DefinitionSet:
         raise NotImplementedError(self._BLOCKED)
 
-    def dump(self, definitions: DefinitionSet, target: Path) -> Path:  # noqa: ARG002
+    def dump(self, definitions: DefinitionSet, target: Path) -> Path:
         raise NotImplementedError(self._BLOCKED)

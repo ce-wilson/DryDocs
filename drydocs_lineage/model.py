@@ -29,6 +29,7 @@ The depgraph prototype's *lineage layer*, reconciled to DryDocs identity and ont
 Everything in a :class:`LineageGraph` is a CANDIDATE until curation confirms it
 (D2: curated-only writes) — the graph is working memory, not ground truth.
 """
+
 from __future__ import annotations
 
 from dataclasses import asdict, dataclass, field
@@ -56,42 +57,42 @@ VOCAB_IDS = {
 class ProcessNode:
     """A unit of execution: a Control-M job, or an artifact it invokes."""
 
-    node_id: str          # stable key (see process_id)
-    kind: str             # "controlm_job" | "shell" | "spark_job" | "sql" | ...
-    name: str             # job name or script basename
-    command: str = ""     # the raw command line (Control-M jobs)
+    node_id: str  # stable key (see process_id)
+    kind: str  # "controlm_job" | "shell" | "spark_job" | "sql" | ...
+    name: str  # job name or script basename
+    command: str = ""  # the raw command line (Control-M jobs)
     node_target: str = ""  # Control-M CM_DEF_VJOB.NODE_ID — POLYMORPHIC per gate
-                           # controlm-hosts-topology (2026-07-09): a host GROUP in
-                           # the common case (load-balanced across CM_HOSTS members,
-                           # group match wins) or a hard-coded agent host. NOT
-                           # reliably "the server it runs on" — resolution is the
-                           # Epic P RUNS_ON pass; reruns stick to the first host.
-    run_as: str = ""      # system user OR software agent (Control-M OWNER / FID)
-    path: str = ""        # script/artifact path, once resolved
-    folder: str = ""      # Control-M folder (PARENT_TABLE) — review grouping
+    # controlm-hosts-topology (2026-07-09): a host GROUP in
+    # the common case (load-balanced across CM_HOSTS members,
+    # group match wins) or a hard-coded agent host. NOT
+    # reliably "the server it runs on" — resolution is the
+    # Epic P RUNS_ON pass; reruns stick to the first host.
+    run_as: str = ""  # system user OR software agent (Control-M OWNER / FID)
+    path: str = ""  # script/artifact path, once resolved
+    folder: str = ""  # Control-M folder (PARENT_TABLE) — review grouping
     application: str = ""  # business app (Control-M APPLICATION); SEAL reconcile key
-    dataflow: str = ""    # DPL -dataflow name (G12: ETLProcess PROPERTY, never identity)
+    dataflow: str = ""  # DPL -dataflow name (G12: ETLProcess PROPERTY, never identity)
     config_path: str = ""  # config/JSON path alongside the invocation (G12: ETLProcess
-                            # PROPERTY; mirrors drydocs_core.controlm.Invocation.config_path)
+    # PROPERTY; mirrors drydocs_core.controlm.Invocation.config_path)
     properties: dict[str, str] = field(default_factory=dict)
-                           # remaining definition-level launcher params (G15: the DPL
-                           # argument contract — env/app_name/alias/seal/fid/image/
-                           # compute/launch_mode/…). PROPERTIES, never identity.
+    # remaining definition-level launcher params (G15: the DPL
+    # argument contract — env/app_name/alias/seal/fid/image/
+    # compute/launch_mode/…). PROPERTIES, never identity.
 
 
 @dataclass
 class DataAssetNode:
     """A piece of data a process reads or writes (the D1 :DataAsset proxy shape)."""
 
-    node_id: str          # stable key (see asset_id)
-    kind: str             # "hdfs" | "s3" | "hive_table" | "local_file" | ...
-    location: str         # the actual path / URI / table name
-    fmt: str = ""         # "avro" | "parquet" | "csv" | "ebcdic" | ...
+    node_id: str  # stable key (see asset_id)
+    kind: str  # "hdfs" | "s3" | "hive_table" | "local_file" | ...
+    location: str  # the actual path / URI / table name
+    fmt: str = ""  # "avro" | "parquet" | "csv" | "ebcdic" | ...
     properties: dict[str, str] = field(default_factory=dict)
-                          # definition-level facts beside the key (G17: the MAC
-                          # dataset version + zone — PROPERTIES, never identity;
-                          # the G12 rule, mirrored from ProcessNode.properties.
-                          # Version-as-identity is a G22 clause-f gate question.)
+    # definition-level facts beside the key (G17: the MAC
+    # dataset version + zone — PROPERTIES, never identity;
+    # the G12 rule, mirrored from ProcessNode.properties.
+    # Version-as-identity is a G22 clause-f gate question.)
 
 
 # -- stable id helpers (one id scheme, used by every extractor) -----------------
@@ -149,7 +150,7 @@ class LineageGraph:
         }
 
     @classmethod
-    def from_dict(cls, data: dict) -> "LineageGraph":
+    def from_dict(cls, data: dict) -> LineageGraph:
         schema = data.get("schema")
         if schema not in SCHEMA_COMPAT:
             raise ValueError(f"unexpected schema: {schema!r}")
@@ -157,7 +158,7 @@ class LineageGraph:
         for p in data.get("processes", []):
             p = dict(p)
             p.pop("project", None)  # depgraph multi-repo field — dropped on re-home
-            if "host" in p:         # legacy key (prototype + pre-rename v1) → node_target
+            if "host" in p:  # legacy key (prototype + pre-rename v1) → node_target
                 p.setdefault("node_target", p.pop("host") or "")
                 p.pop("host", None)
             g.add_process(ProcessNode(**p))

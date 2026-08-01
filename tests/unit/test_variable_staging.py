@@ -1,21 +1,25 @@
 """Unit tests for the STG_* staging-row builder (Phase A output side)."""
+
 from __future__ import annotations
 
 from pathlib import Path
 
 import pytest
 
-from drydocs_core.adapters.csv_adapter import CsvAdapter
 from drydocs.staging import (
     build_staging_bundle,
     build_staging_rows,
     collect_jobs,
 )
+from drydocs_core.adapters.csv_adapter import CsvAdapter
 from drydocs_core.models import ControlMVariableRow
 
 SAMPLE = (
     Path(__file__).resolve().parents[2]
-    / "drydocs" / "data" / "samples" / "controlm_variables__sample.csv"
+    / "drydocs"
+    / "data"
+    / "samples"
+    / "controlm_variables__sample.csv"
 )
 
 # Gitignored production extract — skip (don't fail) the sample-backed tests
@@ -28,21 +32,46 @@ requires_sample = pytest.mark.skipif(
 
 # every column of STG_VARIABLE except the identity PK, in DDL order
 STG_VARIABLE_COLUMNS = [
-    "run_id", "data_center", "folder_id", "job_id", "src_ordinal",
-    "var_scope", "var_name", "raw_value", "resolved_value", "var_kind",
-    "env_tag", "is_fully_resolved", "resolution_depth", "unresolved_tokens",
+    "run_id",
+    "data_center",
+    "folder_id",
+    "job_id",
+    "src_ordinal",
+    "var_scope",
+    "var_name",
+    "raw_value",
+    "resolved_value",
+    "var_kind",
+    "env_tag",
+    "is_fully_resolved",
+    "resolution_depth",
+    "unresolved_tokens",
 ]
 STG_QUALITY_COLUMNS = [
-    "run_id", "data_center", "folder_id", "job_id", "var_total",
-    "var_resolved", "cmd_present", "cmd_classified", "invocation_count",
-    "file_ref_count", "unresolved_tokens", "notes",
+    "run_id",
+    "data_center",
+    "folder_id",
+    "job_id",
+    "var_total",
+    "var_resolved",
+    "cmd_present",
+    "cmd_classified",
+    "invocation_count",
+    "file_ref_count",
+    "unresolved_tokens",
+    "notes",
 ]
 
 
 def _row(folder: str, job: str, name: str, value: str, scope: str | None = None):
     return ControlMVariableRow.model_validate(
-        {"table_name": folder, "job_id": job, "name": name, "value": value,
-         **({"var_scope": scope} if scope else {})}
+        {
+            "table_name": folder,
+            "job_id": job,
+            "name": name,
+            "value": value,
+            **({"var_scope": scope} if scope else {}),
+        }
     )
 
 
@@ -67,20 +96,24 @@ def test_var_scope_column_overrides_heuristic() -> None:
 
 
 def test_staging_rows_match_ddl_columns() -> None:
-    jobs = collect_jobs([
-        _row("100", "1", "%%DROPBOX", "/d"),
-        _row("100", "2", "%%PATH", "%%DROPBOX/f_%%$ODATE.dat"),
-    ])
+    jobs = collect_jobs(
+        [
+            _row("100", "1", "%%DROPBOX", "/d"),
+            _row("100", "2", "%%PATH", "%%DROPBOX/f_%%$ODATE.dat"),
+        ]
+    )
     var_rows, q_rows = build_staging_rows(jobs, "run-1")
     assert all(list(r.keys()) == STG_VARIABLE_COLUMNS for r in var_rows)
     assert all(list(r.keys()) == STG_QUALITY_COLUMNS for r in q_rows)
 
 
 def test_job_resolves_under_folder_scope() -> None:
-    jobs = collect_jobs([
-        _row("100", "1", "%%DROPBOX", "/d"),
-        _row("100", "2", "%%PATH", "%%DROPBOX/f_%%$ODATE.dat"),
-    ])
+    jobs = collect_jobs(
+        [
+            _row("100", "1", "%%DROPBOX", "/d"),
+            _row("100", "2", "%%PATH", "%%DROPBOX/f_%%$ODATE.dat"),
+        ]
+    )
     var_rows, q_rows = build_staging_rows(jobs, "run-1")
     by_job = {(r["job_id"], r["var_name"]): r for r in var_rows}
     path = by_job[("2", "%%PATH")]
@@ -103,12 +136,14 @@ def test_unresolved_tokens_and_quality_rollup() -> None:
 
 
 def test_env_variant_extra_rows() -> None:
-    jobs = collect_jobs([
-        _row("100", "1", "%%SCRIPT_PATH_D", "/apps/dev"),
-        _row("100", "1", "%%SCRIPT_PATH_Q", "/apps/qa"),
-        _row("100", "1", "%%SCRIPT_PATH_P", "/apps/prod"),
-        _row("100", "4", "%%SCRIPT_PATH", "%%SCRIPT_PATH_%%HOSTNM"),
-    ])
+    jobs = collect_jobs(
+        [
+            _row("100", "1", "%%SCRIPT_PATH_D", "/apps/dev"),
+            _row("100", "1", "%%SCRIPT_PATH_Q", "/apps/qa"),
+            _row("100", "1", "%%SCRIPT_PATH_P", "/apps/prod"),
+            _row("100", "4", "%%SCRIPT_PATH", "%%SCRIPT_PATH_%%HOSTNM"),
+        ]
+    )
     var_rows, _ = build_staging_rows(jobs, "run-1")
     script = [r for r in var_rows if r["var_name"] == "%%SCRIPT_PATH"]
     base = [r for r in script if r["env_tag"] is None]
@@ -123,26 +158,51 @@ def test_env_variant_extra_rows() -> None:
 
 # every column of the Phase-C tables, in DDL order (minus identity PK)
 STG_INVOCATION_COLUMNS = [
-    "run_id", "data_center", "folder_id", "job_id", "seq",
-    "invocation_source", "invocation_type", "executable_path",
-    "script_path", "config_path", "args_json", "raw_command",
-    "is_classified", "classifier_rule",
+    "run_id",
+    "data_center",
+    "folder_id",
+    "job_id",
+    "seq",
+    "invocation_source",
+    "invocation_type",
+    "executable_path",
+    "script_path",
+    "config_path",
+    "args_json",
+    "raw_command",
+    "is_classified",
+    "classifier_rule",
 ]
 STG_FILE_OP_COLUMNS = [
-    "run_id", "data_center", "folder_id", "job_id", "seq", "op_type",
-    "src_pattern", "tgt_pattern", "source_field", "raw_statement",
+    "run_id",
+    "data_center",
+    "folder_id",
+    "job_id",
+    "seq",
+    "op_type",
+    "src_pattern",
+    "tgt_pattern",
+    "source_field",
+    "raw_statement",
 ]
 STG_APP_FACT_COLUMNS = [
-    "run_id", "data_center", "folder_id", "job_id", "fact_type",
-    "fact_value", "environment", "source_var",
+    "run_id",
+    "data_center",
+    "folder_id",
+    "job_id",
+    "fact_type",
+    "fact_value",
+    "environment",
+    "source_var",
 ]
 
 
 def test_bundle_routes_shell_to_invocation_and_file_ops() -> None:
-    jobs = collect_jobs([
-        _row("100", "2", "%%POSTCMD",
-             "sh /x/run_data_validation.sh TBL,{ODATE},YES; mv a b"),
-    ])
+    jobs = collect_jobs(
+        [
+            _row("100", "2", "%%POSTCMD", "sh /x/run_data_validation.sh TBL,{ODATE},YES; mv a b"),
+        ]
+    )
     bundle = build_staging_bundle(jobs, "run-1")
     assert list(bundle.invocation[0].keys()) == STG_INVOCATION_COLUMNS
     assert bundle.invocation[0]["invocation_type"] == "VALIDATION_UTIL"
@@ -153,10 +213,12 @@ def test_bundle_routes_shell_to_invocation_and_file_ops() -> None:
 
 
 def test_bundle_routes_facts_and_notifications() -> None:
-    jobs = collect_jobs([
-        _row("100", "2", "%%SEAL", "70004"),
-        _row("100", "2", "%%NOTIFY", "a@x.com;b@x.com"),
-    ])
+    jobs = collect_jobs(
+        [
+            _row("100", "2", "%%SEAL", "70004"),
+            _row("100", "2", "%%NOTIFY", "a@x.com;b@x.com"),
+        ]
+    )
     bundle = build_staging_bundle(jobs, "run-1")
     assert list(bundle.app_fact[0].keys()) == STG_APP_FACT_COLUMNS
     assert bundle.app_fact[0]["fact_type"] == "SEAL"
@@ -164,10 +226,11 @@ def test_bundle_routes_facts_and_notifications() -> None:
 
 
 def test_bundle_routes_filewatch_path() -> None:
-    jobs = collect_jobs([
-        _row("100", "2", "%%FileWatch-FILE_PATH",
-             "/data/dropbox/RPM/tbl_{ODATE}.dat"),
-    ])
+    jobs = collect_jobs(
+        [
+            _row("100", "2", "%%FileWatch-FILE_PATH", "/data/dropbox/RPM/tbl_{ODATE}.dat"),
+        ]
+    )
     bundle = build_staging_bundle(jobs, "run-1")
     assert bundle.file_ref[0]["ref_role"] == "WATCH_INPUT"
     assert bundle.file_ref[0]["date_token"] == "{ODATE}"
@@ -198,5 +261,4 @@ def test_sample_end_to_end_counts() -> None:
     assert len(var_rows) >= 323
     # invariant: every fully-resolved row has no %% left
     for r in var_rows:
-        assert (("%%" not in (r["resolved_value"] or ""))
-                == (r["is_fully_resolved"] == "Y"))
+        assert ("%%" not in (r["resolved_value"] or "")) == (r["is_fully_resolved"] == "Y")

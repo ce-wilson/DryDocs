@@ -17,6 +17,7 @@ Two things were unguarded and are guarded here:
 No Neo4j: the chain runner is driven against a fake client that models the
 graph as a set of IRIs.
 """
+
 from __future__ import annotations
 
 import pytest
@@ -30,9 +31,14 @@ runner = CliRunner()
 
 # ---- the registry -----------------------------------------------------------
 
+
 def test_registry_order_is_the_documented_chain() -> None:
     assert [s.name for s in sup.SUPPLEMENTS] == [
-        "base", "seal", "catalog", "registry", "sosa",
+        "base",
+        "seal",
+        "catalog",
+        "registry",
+        "sosa",
     ]
     # The reason the order exists — catalog reuses seal's Attribution/#hasAgent.
     names = [s.name for s in sup.SUPPLEMENTS]
@@ -91,6 +97,7 @@ def test_declared_terms_keeps_slashes_inside_the_iri(tmp_path) -> None:
 
 # ---- the CLI surface ---------------------------------------------------------
 
+
 def _command_names() -> set[str]:
     return {c.name for c in cli_mod.app.registered_commands}
 
@@ -113,6 +120,7 @@ def test_legacy_verb_names_are_the_ones_the_docs_publish() -> None:
 
 
 # ---- the chain runner --------------------------------------------------------
+
 
 class _FakeClient:
     """Models the graph as the set of :OntologyTerm IRIs it holds."""
@@ -210,9 +218,7 @@ def test_only_flag_follows_registry_order_not_flag_order(
     ]
 
 
-def test_with_sosa_appends_the_experimental_supplement(
-    fake_client, tmp_path, monkeypatch
-) -> None:
+def test_with_sosa_appends_the_experimental_supplement(fake_client, tmp_path, monkeypatch) -> None:
     monkeypatch.setenv("DRYDOCS_LOGDIR", str(tmp_path / "logs"))
     client = fake_client(_FakeClient())
     result = runner.invoke(cli_mod.app, ["apply-supplements", "--with-sosa"])

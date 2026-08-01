@@ -18,6 +18,7 @@ Consumers:
   IRIs a supplement MERGEs, via :func:`strip_comments`, so a commented-out
   MERGE is not mistaken for a term the graph must hold (G29).
 """
+
 from __future__ import annotations
 
 

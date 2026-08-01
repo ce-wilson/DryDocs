@@ -14,6 +14,7 @@ Design note (MODULE_MAP): parked in the ``drydocs-review`` component for now. It
 pure config accessor and could be promoted to ``drydocs_core.config`` — do that only
 once a *second, non-review* consumer appears (ADR 0002-a resolve-at-move rule).
 """
+
 from __future__ import annotations
 
 from dataclasses import dataclass
@@ -51,7 +52,7 @@ class ReviewLabels:
         self.classification = classification
 
     @classmethod
-    def load(cls, path: str | Path = DEFAULT_REVIEW_LABELS_PATH) -> "ReviewLabels":
+    def load(cls, path: str | Path = DEFAULT_REVIEW_LABELS_PATH) -> ReviewLabels:
         path = Path(path)
         if not path.exists():
             raise ReviewLabelsError(f"review-labels file not found: {path}")
@@ -59,7 +60,7 @@ class ReviewLabels:
         return cls.from_dict(doc)
 
     @classmethod
-    def from_dict(cls, doc: dict[str, Any]) -> "ReviewLabels":
+    def from_dict(cls, doc: dict[str, Any]) -> ReviewLabels:
         raw_sources = doc.get("sources")
         if not isinstance(raw_sources, list):
             raise ReviewLabelsError("review-labels.yaml must contain a `sources:` list")

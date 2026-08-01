@@ -24,6 +24,7 @@ Design (vendor: controlm-os-job-parameters.md, controlm-api-job-types.md):
 The registry is intentionally data-driven: growing coverage means adding a
 rule, not editing parser logic.
 """
+
 from __future__ import annotations
 
 import re
@@ -69,9 +70,7 @@ def load_launcher_registry(
     named: set[str] = set()
     for row in data.get("rules") or []:
         flags = re.IGNORECASE if row.get("ignore_case") else 0
-        rules.append(
-            (re.compile(row["pattern"], flags), row["invocation_type"], row["rule"])
-        )
+        rules.append((re.compile(row["pattern"], flags), row["invocation_type"], row["rule"]))
         if row.get("named_launcher"):
             named.add(row["rule"])
     if not rules:
@@ -83,17 +82,43 @@ LAUNCHER_REGISTRY, NAMED_LAUNCHER_RULES = load_launcher_registry()
 
 # shell verbs that ARE file operations -> STG_FILE_OP (not invocations)
 _FILE_OP_VERBS: dict[str, str] = {
-    "cp": "COPY", "scp": "COPY",
-    "mv": "MOVE", "rename": "MOVE",
-    "rm": "DELETE", "rmdir": "DELETE",
+    "cp": "COPY",
+    "scp": "COPY",
+    "mv": "MOVE",
+    "rename": "MOVE",
+    "rm": "DELETE",
+    "rmdir": "DELETE",
     "mkdir": "MKDIR",
-    "sed": "TRANSFORM", "awk": "TRANSFORM", "tr": "TRANSFORM",
-    "gzip": "COMPRESS", "gunzip": "COMPRESS",
-    "chmod": "OTHER", "chown": "OTHER", "ln": "OTHER", "touch": "OTHER",
+    "sed": "TRANSFORM",
+    "awk": "TRANSFORM",
+    "tr": "TRANSFORM",
+    "gzip": "COMPRESS",
+    "gunzip": "COMPRESS",
+    "chmod": "OTHER",
+    "chown": "OTHER",
+    "ln": "OTHER",
+    "touch": "OTHER",
 }
 # verbs that are neither invocation nor file-op (control/no-op) — skipped
-_NOOP_VERBS = {"cd", "cc", "echo", "ls", "set", "export", "true", "wait", "TZ=",
-               "fi", "done", "exit", "[[", "]]", "[", "test", ":"}
+_NOOP_VERBS = {
+    "cd",
+    "cc",
+    "echo",
+    "ls",
+    "set",
+    "export",
+    "true",
+    "wait",
+    "TZ=",
+    "fi",
+    "done",
+    "exit",
+    "[[",
+    "]]",
+    "[",
+    "test",
+    ":",
+}
 # wrapper verbs whose real target is a later token
 _WRAPPER_VERBS = {"sh", "bash", "ksh", "zsh", "csh", "env", "nohup", "exec", "time"}
 _WRAPPER_FLAGS = {"-c", "-e", "-x", "-eu", "-ex", "-l"}
@@ -309,7 +334,7 @@ DPL_PROPERTY_FLAGS: dict[str, str] = {
     "-env": "env",
     "-appName": "app_name",
     "-alias": "alias",
-    "-seal": "seal",           # direct SEAL-attribution source (gate cmdline-nfr-vetting)
+    "-seal": "seal",  # direct SEAL-attribution source (gate cmdline-nfr-vetting)
     "-fid": "fid",
     "-img": "image",
     "-dataflow": "dataflow",
@@ -372,9 +397,8 @@ def parse_invocation_statement(statement: str) -> Invocation | None:
     if itype in {"PYTHON", "PYSPARK"} or _basename(verb).startswith("python"):
         # prefer a script-looking token (skips `--master yarn` option values),
         # then fall back to the first bare non-flag arg (e.g. `python -m module`)
-        script_path = (
-            next((a for a in args if _looks_script(a)), None)
-            or next((a for a in args if not a.startswith("-")), None)
+        script_path = next((a for a in args if _looks_script(a)), None) or next(
+            (a for a in args if not a.startswith("-")), None
         )
     elif itype == "JAVA":
         # the launched artifact is the first .jar token (-D*/-jar flags skipped);
@@ -444,9 +468,7 @@ def parse_file_op_statement(statement: str) -> FileOp | None:
     )
 
 
-_CONTAINER_CMD_RE = re.compile(
-    r"command:\s*(?P<arr>.+?)\s*[}\]]", re.IGNORECASE | re.DOTALL
-)
+_CONTAINER_CMD_RE = re.compile(r"command:\s*(?P<arr>.+?)\s*[}\]]", re.IGNORECASE | re.DOTALL)
 
 
 def extract_container_command(value: str) -> str | None:
@@ -463,7 +485,7 @@ def extract_container_command(value: str) -> str | None:
     elements = [e.strip() for e in m.group("arr").split(",")]
     if "-c" in elements:
         idx = elements.index("-c")
-        inner = ", ".join(elements[idx + 1:]).strip()
+        inner = ", ".join(elements[idx + 1 :]).strip()
         # the inner command itself may contain commas (arg lists) — those
         # were split above; rejoin with space which tokenizes the same
         return inner.replace(",", " ").strip() or None
@@ -489,8 +511,7 @@ def _expand_wrapper_payload(inv: Invocation) -> list[Invocation]:
     if not flag:
         return [inv]
     payload = next(
-        (inv.args[i + 1] for i, a in enumerate(inv.args)
-         if a == flag and i + 1 < len(inv.args)),
+        (inv.args[i + 1] for i, a in enumerate(inv.args) if a == flag and i + 1 < len(inv.args)),
         None,
     )
     if not payload:

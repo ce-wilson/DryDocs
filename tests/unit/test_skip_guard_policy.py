@@ -17,6 +17,7 @@ Phase 4 / Class E):
 * The guard requirement is file-level: one guard marker per referencing file. That is
   the granularity the port failure had, and finer analysis would need real dataflow.
 """
+
 from __future__ import annotations
 
 import re

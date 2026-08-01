@@ -29,7 +29,7 @@ from __future__ import annotations
 
 import json
 import sys
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 
 _REPO_ROOT = Path(__file__).resolve().parents[2]
@@ -66,9 +66,7 @@ def estimate_cost_usd(
     for key in sorted(PRICE_PER_MTOK, key=len, reverse=True):
         if key in model:
             in_rate, out_rate = PRICE_PER_MTOK[key]
-            return round(
-                (prompt_tokens * in_rate + completion_tokens * out_rate) / 1_000_000, 6
-            )
+            return round((prompt_tokens * in_rate + completion_tokens * out_rate) / 1_000_000, 6)
     return None
 
 
@@ -111,7 +109,7 @@ class LlmLedger:
         self._append(
             {
                 "kind": "llm_call",
-                "ts": datetime.now(timezone.utc).isoformat(timespec="seconds"),
+                "ts": datetime.now(UTC).isoformat(timespec="seconds"),
                 "run_id": run_id,
                 "step": step,
                 "iteration": iteration,
@@ -133,7 +131,7 @@ class LlmLedger:
         self._append(
             {
                 "kind": "run",
-                "ts": datetime.now(timezone.utc).isoformat(timespec="seconds"),
+                "ts": datetime.now(UTC).isoformat(timespec="seconds"),
                 "run_id": envelope.run_id,
                 "session_id": envelope.session_id,
                 "tier": envelope.tier,

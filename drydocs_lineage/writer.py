@@ -54,13 +54,15 @@ cannot be planned as a Script-sourced edge, so the candidate is dropped —
 counted in ``WritePlan.unresolved_file_ops`` so review sees the loss, never a
 silent shrink.
 """
+
 from __future__ import annotations
 
 import re
+from collections.abc import Iterable
 from dataclasses import dataclass
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
-from typing import Any, Iterable
+from typing import Any
 
 import drydocs_core.ontology as _core_ontology
 
@@ -112,9 +114,7 @@ _ID_RE = re.compile(r"^\s*-\s*id:\s*(\S+)")
 _STATUS_RE = re.compile(r"^\s*status:\s*(\S+)")
 
 
-def vocabulary_status(
-    vocab_ids: Iterable[str], registry: Path | None = None
-) -> dict[str, str]:
+def vocabulary_status(vocab_ids: Iterable[str], registry: Path | None = None) -> dict[str, str]:
     """``id → status`` for the requested entries, read from the registry.
 
     Deliberately a line scan (id, then the first status under it) rather than a
@@ -136,6 +136,7 @@ def vocabulary_status(
 
 
 # --- identity helpers -----------------------------------------------------------
+
 
 def _node_key(node_id: str) -> str:
     """The business key inside a namespaced id (``proc#kind:KEY`` / ``data#kind:KEY``)."""
@@ -168,12 +169,10 @@ def asset_urn(kind: str, location: str) -> str:
 # --- the plan --------------------------------------------------------------------
 
 _SCRIPT_CONSTRAINT = (
-    "CREATE CONSTRAINT script_path IF NOT EXISTS "
-    "FOR (s:Script) REQUIRE s.path IS UNIQUE"
+    "CREATE CONSTRAINT script_path IF NOT EXISTS " "FOR (s:Script) REQUIRE s.path IS UNIQUE"
 )
 _ASSET_CONSTRAINT = (
-    "CREATE CONSTRAINT dataasset_id IF NOT EXISTS "
-    "FOR (a:DataAsset) REQUIRE a.assetId IS UNIQUE"
+    "CREATE CONSTRAINT dataasset_id IF NOT EXISTS " "FOR (a:DataAsset) REQUIRE a.assetId IS UNIQUE"
 )
 #: key = the stable token alone (not token+kind) — AMBIGUITY CALL (G12,
 #: guardrail 5): the gate log is silent on whether the constraint composites
@@ -231,14 +230,14 @@ class WritePlan:
     """The exact statements a live load runs — gate/review material."""
 
     statements: tuple[tuple[str, dict[str, Any]], ...]
-    rel_types: tuple[str, ...]   # rel labels actually planned for write, sorted
-    rels: int                    # confirmed rels planned
-    scripts: int                 # Script nodes MERGEd
-    etl_processes: int           # ETLProcess nodes MERGEd (G12: abinitio/dpl kinds)
-    assets: int                  # DataAsset nodes MERGEd
-    unresolved_file_ops: int     # script-src READS_FROM/WRITES_TO dropped: no
-                                 # owning job found via INVOKES (G13) — counted,
-                                 # never silently swallowed; see plan_curated
+    rel_types: tuple[str, ...]  # rel labels actually planned for write, sorted
+    rels: int  # confirmed rels planned
+    scripts: int  # Script nodes MERGEd
+    etl_processes: int  # ETLProcess nodes MERGEd (G12: abinitio/dpl kinds)
+    assets: int  # DataAsset nodes MERGEd
+    unresolved_file_ops: int  # script-src READS_FROM/WRITES_TO dropped: no
+    # owning job found via INVOKES (G13) — counted,
+    # never silently swallowed; see plan_curated
 
 
 def _endpoint_class(graph: LineageGraph, node_id: str) -> str:
@@ -261,9 +260,11 @@ def _endpoint_params(graph: LineageGraph, node_id: str, side: str) -> dict[str, 
         return {f"{side}_folder_id": folder_id, f"{side}_job_id": job_id}
     if cls in ("script", "etl_process"):
         return {f"{side}_key": _node_key(node_id)}
-    return {f"{side}_key": asset_urn(
-        graph.data_assets[node_id].kind, graph.data_assets[node_id].location
-    )}
+    return {
+        f"{side}_key": asset_urn(
+            graph.data_assets[node_id].kind, graph.data_assets[node_id].location
+        )
+    }
 
 
 def _owning_jobs(graph: LineageGraph, script_id: str) -> list[str]:
@@ -355,9 +356,7 @@ def _resolve_file_ops(
     return resolved, unresolved
 
 
-def plan_curated(
-    graph: LineageGraph, confirmed: set[tuple[str, str, str]]
-) -> WritePlan:
+def plan_curated(graph: LineageGraph, confirmed: set[tuple[str, str, str]]) -> WritePlan:
     """Validate the curated subset and return the exact write batches (PURE)."""
     unknown = confirmed - graph.rels
     if unknown:
@@ -382,29 +381,39 @@ def plan_curated(
             _job_composite(nid)  # identity refusal happens at plan time
         elif cls == "script":
             node = graph.processes[nid]
-            script_rows.append({
-                "path": _node_key(nid), "kind": node.kind, "name": node.name,
-            })
+            script_rows.append(
+                {
+                    "path": _node_key(nid),
+                    "kind": node.kind,
+                    "name": node.name,
+                }
+            )
         elif cls == "etl_process":
             node = graph.processes[nid]
-            etl_process_rows.append({
-                "token": _node_key(nid),
-                # MAC-derived kind wins over the blind default (G17 acceptance c);
-                # a rider-path node (mac_kind_rider set, no mac_kind) deliberately
-                # keeps the default until the gate rules the enum question
-                "kind": node.properties.get("mac_kind") or _DEFAULT_ETL_KIND,
-                "engine": node.kind,
-                "name": node.name,
-                "path": node.path,
-                "dataflow": node.dataflow,
-                "config_path": node.config_path,
-            })
+            etl_process_rows.append(
+                {
+                    "token": _node_key(nid),
+                    # MAC-derived kind wins over the blind default (G17 acceptance c);
+                    # a rider-path node (mac_kind_rider set, no mac_kind) deliberately
+                    # keeps the default until the gate rules the enum question
+                    "kind": node.properties.get("mac_kind") or _DEFAULT_ETL_KIND,
+                    "engine": node.kind,
+                    "name": node.name,
+                    "path": node.path,
+                    "dataflow": node.dataflow,
+                    "config_path": node.config_path,
+                }
+            )
         else:
             node = graph.data_assets[nid]
-            asset_rows.append({
-                "asset_id": asset_urn(node.kind, node.location),
-                "kind": node.kind, "location": node.location, "fmt": node.fmt,
-            })
+            asset_rows.append(
+                {
+                    "asset_id": asset_urn(node.kind, node.location),
+                    "kind": node.kind,
+                    "location": node.location,
+                    "fmt": node.fmt,
+                }
+            )
 
     statements: list[tuple[str, dict[str, Any]]] = []
     if script_rows:
@@ -427,8 +436,10 @@ def plan_curated(
     for (src_cls, rel_type, dst_cls), rows in sorted(groups.items()):
         cypher = (
             "UNWIND $rows AS row\n"
-            + _MATCH_FRAGMENT[src_cls].format(var="src", side="src") + "\n"
-            + _MATCH_FRAGMENT[dst_cls].format(var="dst", side="dst") + "\n"
+            + _MATCH_FRAGMENT[src_cls].format(var="src", side="src")
+            + "\n"
+            + _MATCH_FRAGMENT[dst_cls].format(var="dst", side="dst")
+            + "\n"
             + f"MERGE (src)-[r:{rel_type}]->(dst)\n"
             + "  ON CREATE SET r.first_seen_at = datetime($written_at),\n"
             + "                r.source        = 'drydocs-lineage',\n"
@@ -450,6 +461,7 @@ def plan_curated(
 
 
 # --- the live load ---------------------------------------------------------------
+
 
 def write_curated(
     graph: LineageGraph,
@@ -497,7 +509,7 @@ def write_curated(
             f"flips these active in relationship_vocabulary.yaml: {blocked}"
         )
 
-    written_at = datetime.now(timezone.utc).isoformat()
+    written_at = datetime.now(UTC).isoformat()
     written = 0
     for cypher, params in plan.statements:
         rows = client.run(cypher, {**params, "written_at": written_at})

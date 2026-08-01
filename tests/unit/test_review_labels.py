@@ -1,4 +1,5 @@
 """Unit tests for the review spine (drydocs/review_labels.py) — pure, no Neo4j."""
+
 from __future__ import annotations
 
 import pytest
@@ -47,8 +48,8 @@ def test_unknown_source_raises() -> None:
     "bad",
     [
         {"sources": "not-a-list"},
-        {"sources": [{"provenance": "x", "labels": ["A"]}]},   # missing id
-        {"sources": [{"id": "x", "labels": []}]},              # empty labels
+        {"sources": [{"provenance": "x", "labels": ["A"]}]},  # missing id
+        {"sources": [{"id": "x", "labels": []}]},  # empty labels
         {"sources": [{"id": "x", "labels": ["A"]}, {"id": "x", "labels": ["B"]}]},  # dup id
     ],
 )
@@ -61,8 +62,9 @@ def test_committed_spine_loads_and_is_publishable() -> None:
     """The real config/review-labels.yaml parses and is committed at a publishable tier."""
     rl = ReviewLabels.load()
     assert rl.sources(), "committed spine should declare sources"
-    assert rl.classification in {"External", "Internal-Public"}, (
-        "committed review spine must stay within the public-producer ceiling"
-    )
+    assert rl.classification in {
+        "External",
+        "Internal-Public",
+    }, "committed review spine must stay within the public-producer ceiling"
     # grounded in real schema labels
     assert "ControlMJob" in rl.all_labels()

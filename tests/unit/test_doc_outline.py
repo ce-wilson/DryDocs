@@ -4,6 +4,7 @@ Unit tests run on tiny in-memory fixtures; the final test asserts the REAL Contr
 conforms to the REAL tdd.outline.yaml, so the exemplar can never silently drift from the
 contract (Epic L / L1).
 """
+
 from __future__ import annotations
 
 from pathlib import Path
@@ -128,7 +129,9 @@ def test_real_tdd_outline_loads() -> None:
 
 def test_controlm_tdd_conforms_to_outline() -> None:
     problems = validate_paths(TDD_OUTLINE, CONTROLM_TDD)
-    assert problems == [], "Control-M TDD drifted from tdd.outline.yaml:\n  " + "\n  ".join(problems)
+    assert problems == [], "Control-M TDD drifted from tdd.outline.yaml:\n  " + "\n  ".join(
+        problems
+    )
 
 
 def test_every_committed_tdd_conforms_to_outline() -> None:
@@ -137,7 +140,9 @@ def test_every_committed_tdd_conforms_to_outline() -> None:
     assert tdds, "no committed TDDs found"
     for tdd in tdds:
         problems = validate_paths(TDD_OUTLINE, tdd)
-        assert problems == [], f"{tdd.name} drifted from tdd.outline.yaml:\n  " + "\n  ".join(problems)
+        assert problems == [], f"{tdd.name} drifted from tdd.outline.yaml:\n  " + "\n  ".join(
+            problems
+        )
 
 
 # ── L8: the Runbook — the second doc type through the same contract ───────────
@@ -162,8 +167,8 @@ def test_every_committed_runbook_conforms_to_outline() -> None:
     assert runbooks, "no committed runbooks found"
     for rb in runbooks:
         problems = validate_paths(RUNBOOK_OUTLINE, rb)
-        assert problems == [], (
-            f"{rb.name} drifted from runbook.outline.yaml:\n  " + "\n  ".join(problems)
+        assert problems == [], f"{rb.name} drifted from runbook.outline.yaml:\n  " + "\n  ".join(
+            problems
         )
 
 
@@ -183,8 +188,8 @@ def test_real_review_outline_loads() -> None:
 
 def test_project_review_conforms_to_outline() -> None:
     problems = validate_paths(REVIEW_OUTLINE, PROJECT_REVIEW)
-    assert problems == [], (
-        "project review drifted from review.outline.yaml:\n  " + "\n  ".join(problems)
+    assert problems == [], "project review drifted from review.outline.yaml:\n  " + "\n  ".join(
+        problems
     )
 
 

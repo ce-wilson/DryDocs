@@ -6,6 +6,7 @@ enums, excluded-must-carry-reason) plus the committed `controlm-psgmgr.yaml` led
 one disposition, traced to the SQL projections / controlm-q1q3-phase1 gate /
 config/audit-fields.yaml — never invented.
 """
+
 from __future__ import annotations
 
 import pytest
@@ -24,7 +25,12 @@ _DOC = {
         {
             "name": "SWEPT_OBJ",
             "kind": "table",
-            "profile": {"profiled_on": None, "via": "unit test", "column_count": None, "census": "pending"},
+            "profile": {
+                "profiled_on": None,
+                "via": "unit test",
+                "column_count": None,
+                "census": "pending",
+            },
             "columns": [
                 {"name": "A", "disposition": "projected", "origin": "source", "target": "Thing.a"},
                 {"name": "B", "disposition": "excluded", "reason": "scope", "note": "not needed"},
@@ -91,8 +97,15 @@ def test_to_records_is_flat_dataframe_ready_view() -> None:
     assert all(r["source"] == "test-source" for r in records)
     first = records[0]
     assert set(first) == {
-        "source", "object", "column", "disposition", "origin",
-        "target", "reason", "decided_by", "note",
+        "source",
+        "object",
+        "column",
+        "disposition",
+        "origin",
+        "target",
+        "reason",
+        "decided_by",
+        "note",
     }
 
 
@@ -131,7 +144,9 @@ def test_to_records_is_flat_dataframe_ready_view() -> None:
         (
             {
                 **_DOC,
-                "objects": [{"name": "O", "columns": [{"name": "A", "disposition": "not-a-real-value"}]}],
+                "objects": [
+                    {"name": "O", "columns": [{"name": "A", "disposition": "not-a-real-value"}]}
+                ],
             },
             "invalid disposition",
         ),
@@ -139,7 +154,10 @@ def test_to_records_is_flat_dataframe_ready_view() -> None:
             {
                 **_DOC,
                 "objects": [
-                    {"name": "O", "columns": [{"name": "A", "disposition": "projected", "origin": "made-up"}]}
+                    {
+                        "name": "O",
+                        "columns": [{"name": "A", "disposition": "projected", "origin": "made-up"}],
+                    }
                 ],
             },
             "invalid origin",
@@ -155,7 +173,10 @@ def test_to_records_is_flat_dataframe_ready_view() -> None:
             {
                 **_DOC,
                 "objects": [
-                    {"name": "O", "columns": [{"name": "A", "disposition": "excluded", "reason": "made-up"}]}
+                    {
+                        "name": "O",
+                        "columns": [{"name": "A", "disposition": "excluded", "reason": "made-up"}],
+                    }
                 ],
             },
             "invalid reason",
@@ -202,7 +223,7 @@ def controlm() -> SourceMapping:
 
 
 def test_committed_ledger_loads(controlm: SourceMapping) -> None:
-    assert controlm.source == "psgmgr"    # v2 SYSTEM id (carrier scope)
+    assert controlm.source == "psgmgr"  # v2 SYSTEM id (carrier scope)
     assert controlm.classification == "Internal-Public"
     assert controlm.schema == "drydocs.source-mapping.v1"
     assert controlm.objects() == _EXPECTED_OBJECTS
@@ -233,7 +254,14 @@ def test_vjob_projected_includes_the_audit_envelope(controlm: SourceMapping) -> 
     """controlm_jobs.sql now projects the four audit-envelope columns
     (creation_user/creation_date/change_userid/change_date) alongside the rest."""
     projected = controlm.projected("CM_DEF_VJOB")
-    for col in ("CREATION_USER", "CREATION_DATE", "CHANGE_USERID", "CHANGE_DATE", "JOB_ID", "CMD_LINE"):
+    for col in (
+        "CREATION_USER",
+        "CREATION_DATE",
+        "CHANGE_USERID",
+        "CHANGE_DATE",
+        "JOB_ID",
+        "CMD_LINE",
+    ):
         assert col in projected, col
 
 
@@ -297,7 +325,11 @@ def test_cm_hosts_targets_the_gated_topology(controlm: SourceMapping) -> None:
     is deliberately absent (DC value-domain probe + scope call still open)."""
     hosts = controlm.get("CM_HOSTS")
     assert hosts.projected() == [
-        "DATA_CENTER", "GRPNAME", "NODEID", "PARTICIPATION_TYPE", "CAPTURE_DATE",
+        "DATA_CENTER",
+        "GRPNAME",
+        "NODEID",
+        "PARTICIPATION_TYPE",
+        "CAPTURE_DATE",
     ]
     targets = {col.name: col.target for col in hosts.columns}
     assert targets == {
@@ -312,7 +344,9 @@ def test_cm_hosts_targets_the_gated_topology(controlm: SourceMapping) -> None:
     assert "DEFINED_ON" in (hosts.note or "") or "DC value-domain" in (hosts.note or "")
 
 
-def test_cm_avg_run_is_staging_only_with_the_weak_join_key_documented(controlm: SourceMapping) -> None:
+def test_cm_avg_run_is_staging_only_with_the_weak_join_key_documented(
+    controlm: SourceMapping,
+) -> None:
     """CM_AVG_RUN (runtime stats) landed 2026-07-09 via add-source-object:
     14 columns projected, staging-only pending gate controlm-avg-run-supplement;
     the join key is (SCHED_TABLE, JOB_MEM_NAME = JOB_NAME) — never MEMNAME."""

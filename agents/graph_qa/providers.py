@@ -48,7 +48,7 @@ def extract_usage(usage_obj) -> LlmUsage:
             value = usage_obj.get(name)
         else:
             value = getattr(usage_obj, name, None)
-        return int(value) if isinstance(value, (int, float)) else None
+        return int(value) if isinstance(value, int | float) else None
 
     prompt = _get("prompt_tokens")  # openai / azure / litellm
     completion = _get("completion_tokens")
@@ -110,9 +110,7 @@ def provider_from_env() -> LiteLlmProvider:
         )
     if provider == "anthropic" and not os.getenv("ANTHROPIC_API_KEY"):
         raise ProviderConfigError("ANTHROPIC_API_KEY is not set (agents/.env)")
-    if provider == "azure" and not (
-        os.getenv("AZURE_API_KEY") and os.getenv("AZURE_API_BASE")
-    ):
+    if provider == "azure" and not (os.getenv("AZURE_API_KEY") and os.getenv("AZURE_API_BASE")):
         raise ProviderConfigError(
             "AZURE_API_KEY / AZURE_API_BASE are not set (agents/.env; company runtime)"
         )

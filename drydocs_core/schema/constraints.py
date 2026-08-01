@@ -14,6 +14,7 @@ Names, not counts, carry the check: the target database may legitimately hold
 constraints this file never declared (provisioning, older experiments), so
 "applied count == declared count" can pass while the apply landed nothing.
 """
+
 from __future__ import annotations
 
 import re

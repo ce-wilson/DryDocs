@@ -8,7 +8,8 @@ behavior is provable without a server or a driver.
 
 from __future__ import annotations
 
-from typing import Mapping, Protocol
+from collections.abc import Mapping
+from typing import Protocol
 
 from drydocs_api.guard import ensure_read_only
 from drydocs_api.queries import named_query, validate_params

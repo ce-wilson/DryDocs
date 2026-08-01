@@ -34,7 +34,6 @@ for entry in (str(REPO_ROOT / "agents"), str(REPO_ROOT)):
 
 from common import specs_catalog  # noqa: E402
 from graph_qa import pipeline as pl  # noqa: E402
-from graph_qa.envelope import Envelope  # noqa: E402
 from graph_qa.providers import LlmReply, LlmUsage, extract_usage  # noqa: E402
 from graph_qa.schema_context import MAX_PROMPT_CHARS, build_schema_prompt  # noqa: E402
 
@@ -43,8 +42,11 @@ SPEC = specs_catalog.QUERY_SPECS[SPEC_ID]
 
 VOCAB = [
     {
-        "neo4j_label": "WAS_INFORMED_BY", "from_node": "ControlMJob",
-        "to_node": "ControlMJob", "role": None, "note": "job dependency",
+        "neo4j_label": "WAS_INFORMED_BY",
+        "from_node": "ControlMJob",
+        "to_node": "ControlMJob",
+        "role": None,
+        "note": "job dependency",
         "status": "active",
     }
 ]
@@ -92,10 +94,12 @@ def _ok_read(cypher, params=None, database=None, row_cap=100, timeout_s=15.0):
 
 
 def test_tier0_spec_cypher_verbatim() -> None:
-    provider = FakeProvider(replies=[
-        '{"spec_id": "%s", "params": {}}' % SPEC_ID,  # router
-        "There is 1 application.",                     # answer
-    ])
+    provider = FakeProvider(
+        replies=[
+            f'{{"spec_id": "{SPEC_ID}", "params": {{}}}}',  # router
+            "There is 1 application.",  # answer
+        ]
+    )
     executed: list[tuple] = []
 
     def run_read(cypher, params=None, database=None, row_cap=100, timeout_s=15.0):
@@ -119,54 +123,66 @@ def test_executed_cypher_registers_an_explore_ref() -> None:
         registered.append({"cypher": cypher, "database": database, "params": params})
         return "eph.abc123def4567890"
 
-    provider = FakeProvider(replies=[
-        '{"spec_id": "%s", "params": {}}' % SPEC_ID,
-        "There is 1 application.",
-    ])
+    provider = FakeProvider(
+        replies=[
+            f'{{"spec_id": "{SPEC_ID}", "params": {{}}}}',
+            "There is 1 application.",
+        ]
+    )
     pipeline = _pipeline(provider, _ok_read)
     pipeline.register_cypher = register
     env = pipeline.answer("how many applications?", run_id="qa-test-r4")
-    spec_step = [s for s in env.steps if s.kind == "spec"][0]
+    spec_step = next(s for s in env.steps if s.kind == "spec")
     assert spec_step.explore_ref == "eph.abc123def4567890"
     assert registered[0]["cypher"] == SPEC.cypher and registered[0]["database"] == SPEC.database
 
     def broken_register(cypher, database, params):
         raise OSError("api down")
 
-    provider2 = FakeProvider(replies=[
-        '{"spec_id": "%s", "params": {}}' % SPEC_ID,
-        "There is 1 application.",
-    ])
+    provider2 = FakeProvider(
+        replies=[
+            f'{{"spec_id": "{SPEC_ID}", "params": {{}}}}',
+            "There is 1 application.",
+        ]
+    )
     pipeline2 = _pipeline(provider2, _ok_read)
     pipeline2.register_cypher = broken_register
     env2 = pipeline2.answer("how many applications?", run_id="qa-test-r4b")
     assert env2.answer == "There is 1 application."  # registration failure is non-fatal
-    assert [s for s in env2.steps if s.kind == "spec"][0].explore_ref is None
+    assert next(s for s in env2.steps if s.kind == "spec").explore_ref is None
 
 
 def test_steps_stream_to_the_observer_in_order() -> None:
     """R5: on_step fires per StepRecord as it lands (the Ask spoke's live
     stream); an observer that throws never affects the answer."""
-    provider = FakeProvider(replies=[
-        '{"spec_id": "%s", "params": {}}' % SPEC_ID,
-        "There is 1 application.",
-    ])
+    provider = FakeProvider(
+        replies=[
+            f'{{"spec_id": "{SPEC_ID}", "params": {{}}}}',
+            "There is 1 application.",
+        ]
+    )
     seen: list[str] = []
     pipeline = pl.GraphQaPipeline(
-        provider=provider, run_read=_ok_read,
-        graph_schema=lambda: LIVE_SCHEMA, vocabulary_loader=lambda: VOCAB,
+        provider=provider,
+        run_read=_ok_read,
+        graph_schema=lambda: LIVE_SCHEMA,
+        vocabulary_loader=lambda: VOCAB,
         on_step=lambda step: seen.append(step.kind),
     )
     env = pipeline.answer("how many applications?", run_id="qa-test-r5")
     assert seen == [s.kind for s in env.steps] == ["router", "spec", "answer"]
 
-    provider2 = FakeProvider(replies=[
-        '{"spec_id": "%s", "params": {}}' % SPEC_ID,
-        "There is 1 application.",
-    ])
+    provider2 = FakeProvider(
+        replies=[
+            f'{{"spec_id": "{SPEC_ID}", "params": {{}}}}',
+            "There is 1 application.",
+        ]
+    )
     pipeline2 = pl.GraphQaPipeline(
-        provider=provider2, run_read=_ok_read,
-        graph_schema=lambda: LIVE_SCHEMA, vocabulary_loader=lambda: VOCAB,
+        provider=provider2,
+        run_read=_ok_read,
+        graph_schema=lambda: LIVE_SCHEMA,
+        vocabulary_loader=lambda: VOCAB,
         on_step=lambda step: (_ for _ in ()).throw(RuntimeError("observer down")),
     )
     env2 = pipeline2.answer("how many applications?", run_id="qa-test-r5b")
@@ -178,10 +194,12 @@ def test_control_part_parsing() -> None:
     R4 owner-token handshake; malformed control degrades to none."""
     from graph_qa.control import split_question_and_control
 
-    q, c = split_question_and_control([
-        "how many jobs?",
-        '{"drydocs_control": {"api_token": "tok-1", "api_url": "http://localhost:8001"}}',
-    ])
+    q, c = split_question_and_control(
+        [
+            "how many jobs?",
+            '{"drydocs_control": {"api_token": "tok-1", "api_url": "http://localhost:8001"}}',
+        ]
+    )
     assert q == "how many jobs?"
     assert c == {"api_token": "tok-1", "api_url": "http://localhost:8001"}
 
@@ -193,29 +211,33 @@ def test_control_part_parsing() -> None:
 
 
 def test_tier1_prompt_is_grounded_and_bounded() -> None:
-    provider = FakeProvider(replies=[
-        '{"spec_id": null, "params": {}}',
-        '{"cypher": "MATCH (j:ControlMJob) RETURN count(j) AS jobs"}',
-        "42 jobs.",
-    ])
+    provider = FakeProvider(
+        replies=[
+            '{"spec_id": null, "params": {}}',
+            '{"cypher": "MATCH (j:ControlMJob) RETURN count(j) AS jobs"}',
+            "42 jobs.",
+        ]
+    )
     env = _pipeline(provider, _ok_read).answer("count the jobs", run_id="qa-test-2")
     assert env.tier == "text2cypher"
     schema_prompt = provider.calls[1][0]  # system prompt of the text2cypher call
-    assert "WAS_INFORMED_BY" in schema_prompt          # vocabulary row
-    assert "BusinessApplication" in schema_prompt      # live schema
-    assert SPEC_ID in schema_prompt                    # few-shot spec example
-    assert len(schema_prompt) <= MAX_PROMPT_CHARS      # bounded — never whole-graph state
+    assert "WAS_INFORMED_BY" in schema_prompt  # vocabulary row
+    assert "BusinessApplication" in schema_prompt  # live schema
+    assert SPEC_ID in schema_prompt  # few-shot spec example
+    assert len(schema_prompt) <= MAX_PROMPT_CHARS  # bounded — never whole-graph state
 
 
 def test_fix_loop_caps_at_two() -> None:
     from common.graph_read import CypherReadError
 
-    provider = FakeProvider(replies=[
-        '{"spec_id": null, "params": {}}',
-        '{"cypher": "MATCH (x) RETURN broken"}',
-        '{"cypher": "MATCH (x) RETURN broken2"}',
-        '{"cypher": "MATCH (x) RETURN broken3"}',
-    ])
+    provider = FakeProvider(
+        replies=[
+            '{"spec_id": null, "params": {}}',
+            '{"cypher": "MATCH (x) RETURN broken"}',
+            '{"cypher": "MATCH (x) RETURN broken2"}',
+            '{"cypher": "MATCH (x) RETURN broken3"}',
+        ]
+    )
     attempts: list[str] = []
 
     def failing_read(cypher, params=None, database=None, row_cap=100, timeout_s=15.0):
@@ -232,12 +254,14 @@ def test_fix_loop_caps_at_two() -> None:
 
 
 def test_write_shaped_cypher_never_reaches_executor() -> None:
-    provider = FakeProvider(replies=[
-        '{"spec_id": null, "params": {}}',
-        '{"cypher": "CREATE (x:Evil) RETURN x"}',
-        '{"cypher": "MATCH (x) RETURN x LIMIT 1"}',
-        "ok",
-    ])
+    provider = FakeProvider(
+        replies=[
+            '{"spec_id": null, "params": {}}',
+            '{"cypher": "CREATE (x:Evil) RETURN x"}',
+            '{"cypher": "MATCH (x) RETURN x LIMIT 1"}',
+            "ok",
+        ]
+    )
     executed: list[str] = []
 
     def run_read(cypher, params=None, database=None, row_cap=100, timeout_s=15.0):
@@ -246,35 +270,64 @@ def test_write_shaped_cypher_never_reaches_executor() -> None:
 
     env = _pipeline(provider, run_read).answer("sneaky", run_id="qa-test-4")
     assert all("CREATE" not in c for c in executed)  # pre-flight stopped it
-    write_step = [s for s in env.steps if s.kind == "text2cypher"][0]
+    write_step = next(s for s in env.steps if s.kind == "text2cypher")
     assert "write clause" in (write_step.error or "")
     assert env.tier == "text2cypher"  # fix loop recovered with a read query
 
 
 def test_envelope_contract_fields() -> None:
-    provider = FakeProvider(replies=[
-        '{"spec_id": "%s", "params": {}}' % SPEC_ID,
-        "answer text",
-    ])
+    provider = FakeProvider(
+        replies=[
+            f'{{"spec_id": "{SPEC_ID}", "params": {{}}}}',
+            "answer text",
+        ]
+    )
     env = _pipeline(provider, _ok_read).answer(
         "q", run_id="qa-test-5", session_id="s1", memory_events=4, memory_chars=400
     )
     d = env.to_dict()
     for key in (
-        "run_id", "session_id", "tier", "question_sha256", "question_chars",
-        "answer", "model", "provider", "steps", "sources", "metrics",
+        "run_id",
+        "session_id",
+        "tier",
+        "question_sha256",
+        "question_chars",
+        "answer",
+        "model",
+        "provider",
+        "steps",
+        "sources",
+        "metrics",
     ):
         assert key in d, f"envelope missing {key}"
-    for key in ("iterations", "llm_calls", "tokens", "context", "memory",
-                "cost_est_usd", "response_ms"):
+    for key in (
+        "iterations",
+        "llm_calls",
+        "tokens",
+        "context",
+        "memory",
+        "cost_est_usd",
+        "response_ms",
+    ):
         assert key in d["metrics"], f"metrics missing {key}"
     assert d["metrics"]["memory"] == {"events": 4, "tokens_est": 100}
-    assert d["metrics"]["tokens"]["total"] == d["metrics"]["tokens"]["prompt"] + d[
-        "metrics"]["tokens"]["completion"]
+    assert (
+        d["metrics"]["tokens"]["total"]
+        == d["metrics"]["tokens"]["prompt"] + d["metrics"]["tokens"]["completion"]
+    )
     assert d["question_sha256"] != "q"  # hashed, never raw
     step_keys = set(d["steps"][0])
-    assert {"i", "kind", "ms", "cypher", "database", "rows", "fix_retries",
-            "error", "explore_ref"} <= step_keys
+    assert {
+        "i",
+        "kind",
+        "ms",
+        "cypher",
+        "database",
+        "rows",
+        "fix_retries",
+        "error",
+        "explore_ref",
+    } <= step_keys
 
 
 def test_usage_extractor_normalizes_provider_shapes() -> None:
@@ -299,8 +352,13 @@ def test_catalog_covers_every_spec_and_defines_no_cypher() -> None:
 
 def test_schema_prompt_truncates_at_cap() -> None:
     rows = [
-        {"neo4j_label": f"REL_{i}", "from_node": "A", "to_node": "B",
-         "note": "x" * 200, "status": "active"}
+        {
+            "neo4j_label": f"REL_{i}",
+            "from_node": "A",
+            "to_node": "B",
+            "note": "x" * 200,
+            "status": "active",
+        }
         for i in range(500)
     ]
     prompt = build_schema_prompt(rows, LIVE_SCHEMA, [("s.v1", "d", "MATCH (n) RETURN n")])
@@ -309,11 +367,13 @@ def test_schema_prompt_truncates_at_cap() -> None:
 
 def test_tier0_zero_rows_falls_through_to_tier1() -> None:
     """A routed spec returning 0 rows is insufficient context — Tier 1 must engage."""
-    provider = FakeProvider(replies=[
-        '{"spec_id": "%s", "params": {}}' % SPEC_ID,                       # router
-        '{"cypher": "MATCH (f:ControlMFolder) RETURN count(f) AS n"}',     # text2cypher
-        "5 folders.",                                                       # answer
-    ])
+    provider = FakeProvider(
+        replies=[
+            f'{{"spec_id": "{SPEC_ID}", "params": {{}}}}',  # router
+            '{"cypher": "MATCH (f:ControlMFolder) RETURN count(f) AS n"}',  # text2cypher
+            "5 folders.",  # answer
+        ]
+    )
     calls: list[str] = []
 
     def run_read(cypher, params=None, database=None, row_cap=100, timeout_s=15.0):
@@ -323,10 +383,10 @@ def test_tier0_zero_rows_falls_through_to_tier1() -> None:
         return FakeResult(records=[{"n": 5}], keys=["n"], row_count=1)
 
     env = _pipeline(provider, run_read).answer("count folders", run_id="qa-test-6")
-    assert env.tier == "text2cypher"                       # what actually answered
+    assert env.tier == "text2cypher"  # what actually answered
     kinds = [s.kind for s in env.steps]
-    assert "spec" in kinds and "text2cypher" in kinds      # both attempts recorded
-    assert [s for s in env.steps if s.kind == "spec"][0].rows == 0
+    assert "spec" in kinds and "text2cypher" in kinds  # both attempts recorded
+    assert next(s for s in env.steps if s.kind == "spec").rows == 0
     assert env.metrics.context["rows"] == 1
     assert env.answer == "5 folders."
 
@@ -344,8 +404,13 @@ def test_schema_prompt_sections_survive_oversized_vocabulary() -> None:
     schema, per-label properties, and ALL examples once the vocabulary outgrew the
     cap. Per-section budgets must keep every section present."""
     huge_vocab = [
-        {"neo4j_label": f"REL_{i}", "from_node": "A", "to_node": "B",
-         "note": "x" * 300, "status": "active"}
+        {
+            "neo4j_label": f"REL_{i}",
+            "from_node": "A",
+            "to_node": "B",
+            "note": "x" * 300,
+            "status": "active",
+        }
         for i in range(500)
     ]
     schema = dict(LIVE_SCHEMA)

@@ -53,11 +53,12 @@ Semantics (external/orchestration/bmc-controlm/controlm-variables.md + observed 
       the offline answer to runtime selectors like
       ``%%SCRIPT_PATH_%%HOSTNM``.
 """
+
 from __future__ import annotations
 
 import re
+from collections.abc import Iterable, Sequence
 from dataclasses import dataclass
-from typing import Iterable, Sequence
 
 from .variables import ENV_LETTER_MAP, _is_system_func, _is_system_var
 
@@ -80,14 +81,14 @@ class ResolvedVariable:
     resolved columns."""
 
     name: str
-    scope: str                                  # FOLDER | SUBFOLDER | JOB
-    src_ordinal: int                            # definition order within scope chain
+    scope: str  # FOLDER | SUBFOLDER | JOB
+    src_ordinal: int  # definition order within scope chain
     raw_value: str | None
     resolved_value: str
-    is_fully_resolved: bool                     # no %% left in resolved_value
-    resolution_depth: int                       # substitution iterations used
-    unresolved: tuple[str, ...]                 # user names left unresolved
-    external_refs: tuple[str, ...]              # %%\global / %%\\pool\var kept verbatim
+    is_fully_resolved: bool  # no %% left in resolved_value
+    resolution_depth: int  # substitution iterations used
+    unresolved: tuple[str, ...]  # user names left unresolved
+    external_refs: tuple[str, ...]  # %%\global / %%\\pool\var kept verbatim
     variants: tuple[tuple[str, str], ...] = ()  # (environment, resolved) expansions
 
 
@@ -100,7 +101,7 @@ class _Env:
     def bind(self, name: str, value: str) -> None:
         self._bindings[name] = value
 
-    def clone(self) -> "_Env":
+    def clone(self) -> _Env:
         other = _Env()
         other._bindings = dict(self._bindings)
         return other
@@ -127,8 +128,7 @@ class _Env:
         return [
             letter
             for letter in ("D", "Q", "P", "T")
-            if f"{name}_{letter}" in self._bindings
-            or f"{name}{letter}" in self._bindings
+            if f"{name}_{letter}" in self._bindings or f"{name}{letter}" in self._bindings
         ]
 
     def env_sibling(self, name: str, letter: str) -> str | None:
@@ -150,9 +150,7 @@ def _consume_delimiter(text: str, i: int) -> int:
     return i + 1 if text.startswith(".%%", i) else i
 
 
-def _substitute_once(
-    text: str, env: _Env, blocked: set[str]
-) -> tuple[str, bool, set[str]]:
+def _substitute_once(text: str, env: _Env, blocked: set[str]) -> tuple[str, bool, set[str]]:
     """One left-to-right substitution pass.
 
     A name may substitute at MANY sites within one pass (real values
@@ -175,7 +173,7 @@ def _substitute_once(
         # %%\... global / pool reference: external state, copy verbatim
         if j < n and text[j] == "\\":
             m = _EXTERNAL_RE.match(text, i)
-            out.append(m.group(0) if m else text[i:j + 1])
+            out.append(m.group(0) if m else text[i : j + 1])
             i = m.end() if m else j + 1
             continue
         # century-format %%$TOKEN shares the user namespace after the $
@@ -194,9 +192,7 @@ def _substitute_once(
         # defined ODAT). A binding shorter than the word token consumes its
         # prefix and leaves the rest literal (FILE_NAME_PREFIX_ case) —
         # but only when the word is not itself a system token.
-        if user_name is not None and (
-            len(user_name) >= len(word) or not is_system
-        ):
+        if user_name is not None and (len(user_name) >= len(word) or not is_system):
             out.append(env[user_name])
             pass_seen.add(user_name)
             i = _consume_delimiter(text, j + len(user_name))
@@ -207,7 +203,7 @@ def _substitute_once(
             changed = True
         else:
             # no binding: keep the %%NAME text visible and move past it
-            out.append(text[i:j + len(word)])
+            out.append(text[i : j + len(word)])
             i = j + len(word)
     return "".join(out), changed, pass_seen
 
@@ -281,9 +277,9 @@ def _expand_env_variants(
         # selector = the unresolved ref immediately following the stuck
         # prefix in the raw text (%%STUCK%%SELECTOR / %%STUCK%%$SELECTOR)
         selectors = [
-            u for u in unresolved
-            if u != stuck
-            and (f"{stuck}%%{u}" in raw_value or f"{stuck}%%${u}" in raw_value)
+            u
+            for u in unresolved
+            if u != stuck and (f"{stuck}%%{u}" in raw_value or f"{stuck}%%${u}" in raw_value)
         ]
         if not selectors:
             continue
@@ -373,13 +369,13 @@ class ResolvedCommandLine:
 
     raw: str
     resolved: str
-    is_fully_resolved: bool                      # no %% left in resolved
+    is_fully_resolved: bool  # no %% left in resolved
     resolution_depth: int
-    substituted: tuple[tuple[str, str], ...]     # (name, binding scope), name-sorted
-    unresolved: tuple[str, ...]                  # user refs with no binding — visible, reported
-    external_refs: tuple[str, ...]               # %%\global / %%\\pool\var kept verbatim
-    canonical_tokens: tuple[str, ...]            # {ODATE}-class residue, first-seen order
-    variants: tuple[tuple[str, str], ...] = ()   # (environment, resolved) expansions
+    substituted: tuple[tuple[str, str], ...]  # (name, binding scope), name-sorted
+    unresolved: tuple[str, ...]  # user refs with no binding — visible, reported
+    external_refs: tuple[str, ...]  # %%\global / %%\\pool\var kept verbatim
+    canonical_tokens: tuple[str, ...]  # {ODATE}-class residue, first-seen order
+    variants: tuple[tuple[str, str], ...] = ()  # (environment, resolved) expansions
 
 
 def resolve_command_line(
@@ -409,8 +405,7 @@ def resolve_command_line(
         resolved=resolved,
         is_fully_resolved="%%" not in resolved,
         resolution_depth=depth,
-        substituted=tuple(sorted(
-            (name, scope_by_name.get(name, "")) for name in substituted)),
+        substituted=tuple(sorted((name, scope_by_name.get(name, "")) for name in substituted)),
         unresolved=unresolved,
         external_refs=externals,
         canonical_tokens=tokens,

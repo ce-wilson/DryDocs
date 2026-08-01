@@ -6,6 +6,7 @@ is ever referenced, and (2) the Neo4j driver is referenced ONLY by corroborate.p
 lives in test_remediation_corroborate.py: write Cypher raises before the driver is
 touched.
 """
+
 from __future__ import annotations
 
 import ast
@@ -32,7 +33,9 @@ def test_no_write_transaction_markers() -> None:
                 name = node.id
             if name in WRITE_MARKERS:
                 hits.append(f"{path.name}:{node.lineno} -> {name}")
-    assert not hits, "graph-write marker referenced in the no-graph-write component:\n" + "\n".join(hits)
+    assert not hits, "graph-write marker referenced in the no-graph-write component:\n" + "\n".join(
+        hits
+    )
 
 
 def test_neo4j_driver_confined_to_the_corroboration_wrapper() -> None:
@@ -42,7 +45,7 @@ def test_neo4j_driver_confined_to_the_corroboration_wrapper() -> None:
             continue  # the sole sanctioned reference (TYPE_CHECKING-only import)
         tree = ast.parse(path.read_text(encoding="utf-8"), filename=str(path))
         for node in ast.walk(tree):
-            if isinstance(node, (ast.Import, ast.ImportFrom)):
+            if isinstance(node, ast.Import | ast.ImportFrom):
                 mod = getattr(node, "module", "") or ""
                 names = ", ".join(a.name for a in node.names)
                 if "neo4j" in mod.lower() or "neo4j" in names.lower():

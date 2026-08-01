@@ -19,6 +19,7 @@ Pins, in order of importance:
 4. **Mechanics:** constraint-on-key MERGE, UNWIND batches, MATCH (never MERGE)
    for job endpoints, registered vocab_id stamped on every rel.
 """
+
 from __future__ import annotations
 
 import ast
@@ -88,6 +89,7 @@ ACTIVE_REGISTRY = """\
 
 # --- 1. ground-truth-only (§5, structural + runtime) -------------------------------
 
+
 def test_only_writer_touches_a_database_and_context_is_unnameable() -> None:
     offenders: list[str] = []
     for path in PKG.rglob("*.py"):
@@ -97,7 +99,7 @@ def test_only_writer_touches_a_database_and_context_is_unnameable() -> None:
         docstrings = {
             ast.get_docstring(n, clean=False)
             for n in ast.walk(tree)
-            if isinstance(n, (ast.Module, ast.ClassDef, ast.FunctionDef, ast.AsyncFunctionDef))
+            if isinstance(n, ast.Module | ast.ClassDef | ast.FunctionDef | ast.AsyncFunctionDef)
         }
         for node in ast.walk(tree):
             if (
@@ -134,6 +136,7 @@ def test_trust_boundary_refuses_other_databases() -> None:
 
 # --- 2. the vocabulary gate ---------------------------------------------------------
 
+
 def test_live_load_is_gate_bound_against_the_real_registry() -> None:
     """THE gate: all four labels are status: planned today — a live load must
     refuse. When the HITL gate flips them active, this test flips to the
@@ -144,9 +147,7 @@ def test_live_load_is_gate_bound_against_the_real_registry() -> None:
 
 
 def test_real_registry_statuses_are_readable() -> None:
-    statuses = vocabulary_status(
-        {"m3_invokes", "m3_triggers", "m3_reads_from", "m3_writes_to"}
-    )
+    statuses = vocabulary_status({"m3_invokes", "m3_triggers", "m3_reads_from", "m3_writes_to"})
     assert set(statuses) == {"m3_invokes", "m3_triggers", "m3_reads_from", "m3_writes_to"}
     assert set(statuses.values()) <= {"planned", "active", "deprecated", "removed"}
 
@@ -158,6 +159,7 @@ def test_plan_is_always_allowed_while_gate_is_closed() -> None:
 
 
 # --- 3. curated-only + identity ------------------------------------------------------
+
 
 def test_refuses_confirmed_rel_not_in_graph() -> None:
     g = _fixture_graph()
@@ -184,6 +186,7 @@ def test_empty_confirmed_is_a_noop() -> None:
 
 # --- 4. mechanics ---------------------------------------------------------------------
 
+
 def test_plan_mechanics_constraint_on_key_merge_unwind() -> None:
     g = _fixture_graph()
     plan = plan_curated(g, set(g.rels))
@@ -195,8 +198,7 @@ def test_plan_mechanics_constraint_on_key_merge_unwind() -> None:
     # it stays :Script; disambiguate from the trust.pset :ETLProcess INVOKES
     # batch below (G12 split one INVOKES group into two dst-class groups).
     rel = next(
-        c for c in cyphers
-        if "MERGE (src)-[r:INVOKES]->(dst)" in c and "MATCH (dst:Script" in c
+        c for c in cyphers if "MERGE (src)-[r:INVOKES]->(dst)" in c and "MATCH (dst:Script" in c
     )
     # job endpoints are MATCHed on the NODE KEY — the M3 load owns those nodes
     assert "MATCH (src:ControlMJob {folder_id: row.src_folder_id, job_id: row.src_job_id})" in rel
@@ -205,14 +207,19 @@ def test_plan_mechanics_constraint_on_key_merge_unwind() -> None:
     assert "CYPHER 25" not in " ".join(cyphers)
     # the fixture's composite keys ride the rows
     rel_rows = next(
-        p for c, p in plan.statements
+        p
+        for c, p in plan.statements
         if "MERGE (src)-[r:INVOKES]->(dst)" in c and "MATCH (dst:Script" in c
     )["rows"]
-    assert {"src_folder_id": "161015", "src_job_id": "22",
-            "dst_key": "/opt/scripts/hldm/onpm_fw.ksh"} in rel_rows
+    assert {
+        "src_folder_id": "161015",
+        "src_job_id": "22",
+        "dst_key": "/opt/scripts/hldm/onpm_fw.ksh",
+    } in rel_rows
 
 
 # --- 5. ETLProcess endpoint mapping (G12) --------------------------------------------
+
 
 def test_abinitio_invocation_maps_to_etlprocess_not_script() -> None:
     """The fixture's job 25 invokes trust.pset directly (no wrapper) — an
@@ -244,8 +251,7 @@ def test_abinitio_invocation_maps_to_etlprocess_not_script() -> None:
     assert plan.etl_processes == 1
 
     rel = next(
-        c for c in cyphers
-        if "MERGE (src)-[r:INVOKES]->(dst)" in c and "MATCH (dst:ETLProcess" in c
+        c for c in cyphers if "MERGE (src)-[r:INVOKES]->(dst)" in c and "MATCH (dst:ETLProcess" in c
     )
     assert "MATCH (src:ControlMJob {folder_id: row.src_folder_id, job_id: row.src_job_id})" in rel
     assert "MATCH (dst:ETLProcess {token: row.dst_key})" in rel
@@ -259,16 +265,24 @@ def test_triggers_targets_dpl_pipeline_as_etlprocess_with_properties() -> None:
     g = LineageGraph()
     sid = process_id("shell_script", "/opt/scripts/wrap.ksh")
     did = process_id("dpl", "b6b6c1b2-guid")
-    g.add_process(ProcessNode(
-        node_id=sid, kind="shell_script", name="wrap.ksh",
-        path="/opt/scripts/wrap.ksh",
-    ))
-    g.add_process(ProcessNode(
-        node_id=did, kind="dpl", name="dt-pipelines-launcher.jar",
-        path="/apps/tenants/dpl_utils/dt-accelerators/dt-pipelines-launcher.jar",
-        dataflow="orders_dataflow",
-        config_path="/apps/tenants/dpl_utils/config/orders.json",
-    ))
+    g.add_process(
+        ProcessNode(
+            node_id=sid,
+            kind="shell_script",
+            name="wrap.ksh",
+            path="/opt/scripts/wrap.ksh",
+        )
+    )
+    g.add_process(
+        ProcessNode(
+            node_id=did,
+            kind="dpl",
+            name="dt-pipelines-launcher.jar",
+            path="/apps/tenants/dpl_utils/dt-accelerators/dt-pipelines-launcher.jar",
+            dataflow="orders_dataflow",
+            config_path="/apps/tenants/dpl_utils/config/orders.json",
+        )
+    )
     g.add_rel(sid, "TRIGGERS", did)
 
     plan = plan_curated(g, set(g.rels))
@@ -276,15 +290,17 @@ def test_triggers_targets_dpl_pipeline_as_etlprocess_with_properties() -> None:
     assert plan.etl_processes == 1
 
     etl_rows = next(p for c, p in plan.statements if "MERGE (e:ETLProcess" in c)["rows"]
-    assert etl_rows == [{
-        "token": "b6b6c1b2-guid",
-        "kind": "etl",
-        "engine": "dpl",
-        "name": "dt-pipelines-launcher.jar",
-        "path": "/apps/tenants/dpl_utils/dt-accelerators/dt-pipelines-launcher.jar",
-        "dataflow": "orders_dataflow",
-        "config_path": "/apps/tenants/dpl_utils/config/orders.json",
-    }]
+    assert etl_rows == [
+        {
+            "token": "b6b6c1b2-guid",
+            "kind": "etl",
+            "engine": "dpl",
+            "name": "dt-pipelines-launcher.jar",
+            "path": "/apps/tenants/dpl_utils/dt-accelerators/dt-pipelines-launcher.jar",
+            "dataflow": "orders_dataflow",
+            "config_path": "/apps/tenants/dpl_utils/config/orders.json",
+        }
+    ]
 
     trig = next(c for c, _ in plan.statements if "MERGE (src)-[r:TRIGGERS]->(dst)" in c)
     assert "MATCH (src:Script {path: row.src_key})" in trig
@@ -293,6 +309,7 @@ def test_triggers_targets_dpl_pipeline_as_etlprocess_with_properties() -> None:
 
 
 # --- 6. file-ops endpoint resolution (G13) ---------------------------------------------
+
 
 def test_file_ops_reads_from_script_resolves_to_owning_job() -> None:
     """Gate-log 2026-07-15 EDIT: m3_reads_from's from_node is "ETLProcess |
@@ -306,15 +323,23 @@ def test_file_ops_reads_from_script_resolves_to_owning_job() -> None:
     sid = process_id("shell_script", "/opt/scripts/hldm/mover.ksh")
     aid = asset_id("local_file", "/data/landing/loans.csv")
     g.add_process(ProcessNode(node_id=jid, kind="controlm_job", name="JOB_MOVER"))
-    g.add_process(ProcessNode(
-        node_id=sid, kind="shell_script", name="mover.ksh",
-        path="/opt/scripts/hldm/mover.ksh",
-    ))
-    g.add_data_asset(DataAssetNode(
-        node_id=aid, kind="local_file", location="/data/landing/loans.csv",
-    ))
-    g.add_rel(jid, "INVOKES", sid)      # structural topology (not confirmed here)
-    g.add_rel(sid, "READS_FROM", aid)   # the candidate under curation this batch
+    g.add_process(
+        ProcessNode(
+            node_id=sid,
+            kind="shell_script",
+            name="mover.ksh",
+            path="/opt/scripts/hldm/mover.ksh",
+        )
+    )
+    g.add_data_asset(
+        DataAssetNode(
+            node_id=aid,
+            kind="local_file",
+            location="/data/landing/loans.csv",
+        )
+    )
+    g.add_rel(jid, "INVOKES", sid)  # structural topology (not confirmed here)
+    g.add_rel(sid, "READS_FROM", aid)  # the candidate under curation this batch
 
     plan = plan_curated(g, {(sid, "READS_FROM", aid)})
     assert plan.rel_types == ("READS_FROM",)
@@ -328,10 +353,13 @@ def test_file_ops_reads_from_script_resolves_to_owning_job() -> None:
     assert "r.vocab_id      = 'm3_reads_from'" in rel
 
     rows = next(p for c, p in plan.statements if "MERGE (src)-[r:READS_FROM]->(dst)" in c)["rows"]
-    assert rows == [{
-        "src_folder_id": "161015", "src_job_id": "22",
-        "dst_key": "urn:drydocs:dataasset:local_file:/data/landing:loans.csv",
-    }]
+    assert rows == [
+        {
+            "src_folder_id": "161015",
+            "src_job_id": "22",
+            "dst_key": "urn:drydocs:dataasset:local_file:/data/landing:loans.csv",
+        }
+    ]
 
 
 def test_file_ops_etl_case_src_stays_etlprocess() -> None:
@@ -340,10 +368,14 @@ def test_file_ops_etl_case_src_stays_etlprocess() -> None:
     g = LineageGraph()
     eid = process_id("abinitio", "trust.pset")
     aid = asset_id("hdfs", "/data/landing/loans")
-    g.add_process(ProcessNode(
-        node_id=eid, kind="abinitio", name="trust.pset",
-        path="/opt/scripts/hldm/trust.pset",
-    ))
+    g.add_process(
+        ProcessNode(
+            node_id=eid,
+            kind="abinitio",
+            name="trust.pset",
+            path="/opt/scripts/hldm/trust.pset",
+        )
+    )
     g.add_data_asset(DataAssetNode(node_id=aid, kind="hdfs", location="/data/landing/loans"))
     g.add_rel(eid, "WRITES_TO", aid)
 
@@ -370,13 +402,21 @@ def test_file_ops_script_invoked_by_multiple_jobs_fans_out() -> None:
     aid = asset_id("local_file", "/data/landing/loans.csv")
     g.add_process(ProcessNode(node_id=j1, kind="controlm_job", name="JOB_A"))
     g.add_process(ProcessNode(node_id=j2, kind="controlm_job", name="JOB_B"))
-    g.add_process(ProcessNode(
-        node_id=sid, kind="shell_script", name="mover.ksh",
-        path="/opt/scripts/hldm/mover.ksh",
-    ))
-    g.add_data_asset(DataAssetNode(
-        node_id=aid, kind="local_file", location="/data/landing/loans.csv",
-    ))
+    g.add_process(
+        ProcessNode(
+            node_id=sid,
+            kind="shell_script",
+            name="mover.ksh",
+            path="/opt/scripts/hldm/mover.ksh",
+        )
+    )
+    g.add_data_asset(
+        DataAssetNode(
+            node_id=aid,
+            kind="local_file",
+            location="/data/landing/loans.csv",
+        )
+    )
     g.add_rel(j1, "INVOKES", sid)
     g.add_rel(j2, "INVOKES", sid)
     g.add_rel(sid, "READS_FROM", aid)
@@ -385,10 +425,16 @@ def test_file_ops_script_invoked_by_multiple_jobs_fans_out() -> None:
     assert plan.unresolved_file_ops == 0
     rows = next(p for c, p in plan.statements if "MERGE (src)-[r:READS_FROM]->(dst)" in c)["rows"]
     assert len(rows) == 2
-    assert {"src_folder_id": "161015", "src_job_id": "22",
-            "dst_key": "urn:drydocs:dataasset:local_file:/data/landing:loans.csv"} in rows
-    assert {"src_folder_id": "161015", "src_job_id": "23",
-            "dst_key": "urn:drydocs:dataasset:local_file:/data/landing:loans.csv"} in rows
+    assert {
+        "src_folder_id": "161015",
+        "src_job_id": "22",
+        "dst_key": "urn:drydocs:dataasset:local_file:/data/landing:loans.csv",
+    } in rows
+    assert {
+        "src_folder_id": "161015",
+        "src_job_id": "23",
+        "dst_key": "urn:drydocs:dataasset:local_file:/data/landing:loans.csv",
+    } in rows
 
 
 def test_file_ops_script_with_no_owning_job_is_dropped_and_counted() -> None:
@@ -399,18 +445,26 @@ def test_file_ops_script_with_no_owning_job_is_dropped_and_counted() -> None:
     g = LineageGraph()
     sid = process_id("shell_script", "/opt/scripts/hldm/orphan.ksh")
     aid = asset_id("local_file", "/data/landing/loans.csv")
-    g.add_process(ProcessNode(
-        node_id=sid, kind="shell_script", name="orphan.ksh",
-        path="/opt/scripts/hldm/orphan.ksh",
-    ))
-    g.add_data_asset(DataAssetNode(
-        node_id=aid, kind="local_file", location="/data/landing/loans.csv",
-    ))
+    g.add_process(
+        ProcessNode(
+            node_id=sid,
+            kind="shell_script",
+            name="orphan.ksh",
+            path="/opt/scripts/hldm/orphan.ksh",
+        )
+    )
+    g.add_data_asset(
+        DataAssetNode(
+            node_id=aid,
+            kind="local_file",
+            location="/data/landing/loans.csv",
+        )
+    )
     g.add_rel(sid, "READS_FROM", aid)  # no job INVOKES sid anywhere in the graph
 
     plan = plan_curated(g, set(g.rels))
     assert plan.unresolved_file_ops == 1
-    assert plan.rels == 1        # still the confirmed count (audit trail)
+    assert plan.rels == 1  # still the confirmed count (audit trail)
     assert plan.rel_types == ()  # nothing left to write for this candidate
     assert plan.statements == ()
     assert plan.scripts == 0
@@ -462,13 +516,14 @@ def test_cmdline_file_op_feed_plans_job_to_asset_edges(tmp_path: Path) -> None:
     assert "MATCH (src:ControlMJob {folder_id: row.src_folder_id, job_id: row.src_job_id})" in reads
     assert "MATCH (dst:DataAsset {assetId: row.dst_key})" in reads
     assert "r.vocab_id      = 'm3_reads_from'" in reads
-    rows = next(
-        p for c, p in plan.statements if "MERGE (src)-[r:READS_FROM]->(dst)" in c
-    )["rows"]
-    assert rows == [{
-        "src_folder_id": "161015", "src_job_id": "22",
-        "dst_key": "urn:drydocs:dataasset:local_file:/data/out:loans.dat",
-    }]
+    rows = next(p for c, p in plan.statements if "MERGE (src)-[r:READS_FROM]->(dst)" in c)["rows"]
+    assert rows == [
+        {
+            "src_folder_id": "161015",
+            "src_job_id": "22",
+            "dst_key": "urn:drydocs:dataasset:local_file:/data/out:loans.dat",
+        }
+    ]
     writes = next(c for c in cyphers if "MERGE (src)-[r:WRITES_TO]->(dst)" in c)
     assert "r.vocab_id      = 'm3_writes_to'" in writes
 
@@ -488,13 +543,13 @@ def test_unresolved_file_op_candidates_mirrors_the_plan_drop() -> None:
     g.add_process(ProcessNode(node_id=orphan, kind="shell_script", name="orphan.ksh"))
     g.add_data_asset(DataAssetNode(node_id=aid, kind="local_file", location="/data/x.dat"))
     g.add_rel(jid, "INVOKES", owned)
-    g.add_rel(owned, "READS_FROM", aid)    # resolves via the owning job
-    g.add_rel(orphan, "WRITES_TO", aid)    # no owner — the would-be drop
-    g.add_rel(jid, "READS_FROM", aid)      # already a job src — trivial
+    g.add_rel(owned, "READS_FROM", aid)  # resolves via the owning job
+    g.add_rel(orphan, "WRITES_TO", aid)  # no owner — the would-be drop
+    g.add_rel(jid, "READS_FROM", aid)  # already a job src — trivial
 
     assert unresolved_file_op_candidates(g) == [(orphan, "WRITES_TO", aid)]
     plan = plan_curated(g, {r for r in g.rels if r[1] != "INVOKES"})
-    assert plan.unresolved_file_ops == 1   # the helper and the plan agree
+    assert plan.unresolved_file_ops == 1  # the helper and the plan agree
 
 
 def test_write_executes_when_gate_is_open(tmp_path: Path) -> None:
@@ -516,6 +571,4 @@ def test_asset_urn_is_the_d1_proxy_shape() -> None:
     assert asset_urn("hdfs", "/data/landing/loans") == (
         "urn:drydocs:dataasset:hdfs:/data/landing:loans"
     )
-    assert asset_urn("hive_table", "edw.loans") == (
-        "urn:drydocs:dataasset:hive_table:-:edw.loans"
-    )
+    assert asset_urn("hive_table", "edw.loans") == ("urn:drydocs:dataasset:hive_table:-:edw.loans")

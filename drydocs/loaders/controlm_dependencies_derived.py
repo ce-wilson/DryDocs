@@ -14,12 +14,14 @@ UNSCOPED, after ALL nodes are loaded. The edge links jobs across DIFFERENT
 folders, so a per-folder scoped run silently dropped it (the second
 endpoint's MATCH missed because that job wasn't loaded yet).
 """
+
 from __future__ import annotations
 
 from pathlib import Path
 from typing import ClassVar
 
 from drydocs_core.models import ControlMDependencyRow
+
 from .base import BaseLoader
 
 

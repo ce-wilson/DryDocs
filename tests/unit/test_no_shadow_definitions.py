@@ -35,6 +35,7 @@ Scope is deliberate:
 ALLOWLIST is empty and should stay that way. A genuine same-name-different-thing
 pair goes here WITH its reason — never silently.
 """
+
 from __future__ import annotations
 
 import ast

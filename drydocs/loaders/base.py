@@ -18,6 +18,7 @@ The Cypher template is responsible for MERGE idempotency, port creation
 where applicable, and provenance attribution (`:WAS_GENERATED_BY` to the
 loader's :JobRun).
 """
+
 from __future__ import annotations
 
 import hashlib
@@ -25,7 +26,7 @@ import json
 import logging
 import uuid
 from dataclasses import dataclass, field
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 from typing import TYPE_CHECKING, Any, ClassVar
 
@@ -42,8 +43,6 @@ if TYPE_CHECKING:
     from drydocs_core.neo4j_client import Neo4jClient
 
 LOGGER = logging.getLogger(__name__)
-
-
 
 
 # ---- row checksum (doc 06 Phase 2 — provenance-edge diet) -------------------
@@ -160,8 +159,8 @@ class BaseLoader:
 
     def __init__(
         self,
-        client: "Neo4jClient",
-        adapter: "Adapter",
+        client: Neo4jClient,
+        adapter: Adapter,
         *,
         batch_size: int = 1000,
         max_rejects_kept: int = 100,
@@ -179,9 +178,7 @@ class BaseLoader:
         self.max_rejects_kept = max_rejects_kept
         self.index_wait_seconds = index_wait_seconds
         self.run_id = str(uuid.uuid4())
-        self.loaded_at = (
-            datetime.now(timezone.utc).replace(microsecond=0).isoformat()
-        )
+        self.loaded_at = datetime.now(UTC).replace(microsecond=0).isoformat()
         self.full_extract = full_extract
         self.run_log = run_log
         self._scope_values: set = set()  # distinct sweep_scope_property values seen
@@ -241,17 +238,13 @@ class BaseLoader:
             LOGGER.exception("Loader %s failed: %s", self.name, exc)
             self._close_run(status="FAILED", summary=summary)
             summary.status = "FAILED"
-            summary.completed_at = (
-                datetime.now(timezone.utc).replace(microsecond=0).isoformat()
-            )
+            summary.completed_at = datetime.now(UTC).replace(microsecond=0).isoformat()
             raise
 
         self._mark_removed(summary)
 
         summary.status = "OK"
-        summary.completed_at = (
-            datetime.now(timezone.utc).replace(microsecond=0).isoformat()
-        )
+        summary.completed_at = datetime.now(UTC).replace(microsecond=0).isoformat()
         self._close_run(status="OK", summary=summary)
         LOGGER.info("Loader %s done: %s", self.name, summary.as_dict())
         return summary
@@ -281,7 +274,8 @@ class BaseLoader:
         except OSError as exc:
             LOGGER.warning(
                 "Loader %s: run log unavailable (%s) — continuing without",
-                self.name, exc,
+                self.name,
+                exc,
             )
             return None
         log.attach()
@@ -314,9 +308,7 @@ class BaseLoader:
             return
         failed = [r for r in rows if r.get("state") == "FAILED"]
         if failed:
-            detail = ", ".join(
-                f"{r.get('name')} ({r.get('labelsOrTypes')})" for r in failed
-            )
+            detail = ", ".join(f"{r.get('name')} ({r.get('labelsOrTypes')})" for r in failed)
             raise RuntimeError(
                 f"Loader {self.name}: refusing to load — FAILED index(es): {detail}. "
                 "Drop and recreate them (see constraints.cypher) before loading."
@@ -325,11 +317,11 @@ class BaseLoader:
         # do rather than racing the population. Raises on timeout.
         LOGGER.info(
             "Loader %s: waiting up to %ss for %d index(es) to come ONLINE",
-            self.name, self.index_wait_seconds, len(rows),
+            self.name,
+            self.index_wait_seconds,
+            len(rows),
         )
-        self.client.run(
-            "CALL db.awaitIndexes($seconds)", seconds=self.index_wait_seconds
-        )
+        self.client.run("CALL db.awaitIndexes($seconds)", seconds=self.index_wait_seconds)
 
     def _read_cypher(self) -> str:
         path = self.cypher_path
@@ -414,7 +406,8 @@ class BaseLoader:
             self.name,
             summary.nodes_marked_removed,
             summary.nodes_reactivated,
-            "full" if not self.sweep_scope_property
+            "full"
+            if not self.sweep_scope_property
             else f"{self.sweep_scope_property} x{len(self._scope_values)}",
         )
 
@@ -467,7 +460,7 @@ class BaseLoader:
 
 
 def sweep_removed(
-    client: "Neo4jClient",
+    client: Neo4jClient,
     label: str,
     *,
     older_than_days: int,

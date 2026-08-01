@@ -6,6 +6,7 @@ no AND_OR/PARENTHESES/ORDER_ machinery (those are IN-side concerns).
 
 Prereq: :class:`ControlMJobsLoader` must run first.
 """
+
 from __future__ import annotations
 
 from pathlib import Path
@@ -14,6 +15,7 @@ from typing import ClassVar
 from pydantic import BaseModel
 
 from drydocs_core.models import ControlMConditionOutRow
+
 from .base import BaseLoader, compute_row_checksum
 
 

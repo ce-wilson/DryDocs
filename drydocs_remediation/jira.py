@@ -16,6 +16,7 @@ so every external call stays inside :class:`JiraSubmitter` implementations.
 - A handoff without a PASSING equivalence proof cannot be emitted (M0 Gate 5:
   "do not submit until equivalence is proven") — render a draft instead.
 """
+
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
@@ -40,10 +41,10 @@ class HandoffPackage:
     title: str
     findings: list[Finding]
     proof: EquivalenceReport
-    greenfield_artifact: Path | None = None   # the authored definition artifact
-    owner: str | None = None                  # resolved owning team; None = defect
-    scope: str = ""                           # folder/job/DC coordinates (caller data)
-    change_summary: str = ""                  # BEFORE -> AFTER, caller-authored
+    greenfield_artifact: Path | None = None  # the authored definition artifact
+    owner: str | None = None  # resolved owning team; None = defect
+    scope: str = ""  # folder/job/DC coordinates (caller data)
+    change_summary: str = ""  # BEFORE -> AFTER, caller-authored
     rollback: str = "Restore prior version via Control-M Changes History."
     acceptance: list[str] = field(default_factory=list)
 
@@ -108,8 +109,7 @@ def emit_handoff(package: HandoffPackage, submitter: JiraSubmitter) -> JiraRef:
     """Open the handoff ticket. Refuses without a passing equivalence proof."""
     if not package.proof.equivalent:
         raise UnprovenHandoffError(
-            "equivalence proof is not passing — render a draft, do not submit "
-            "(M0 Gate 5 rule)"
+            "equivalence proof is not passing — render a draft, do not submit " "(M0 Gate 5 rule)"
         )
     body = render_handoff(package)
     attachments = [package.greenfield_artifact] if package.greenfield_artifact else []

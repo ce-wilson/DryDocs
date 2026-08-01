@@ -1,4 +1,4 @@
-﻿"""O11 QuerySpec registry + export tests — pure handlers over a duck-typed
+"""O11 QuerySpec registry + export tests — pure handlers over a duck-typed
 runner (the drydocs-api offline idiom): no server, no driver, no FastAPI."""
 
 from __future__ import annotations
@@ -10,9 +10,9 @@ import re
 import pytest
 
 from drydocs_api.exports import (
+    WATERMARK_COLUMN,
     ExportLedger,
     UnknownExportError,
-    WATERMARK_COLUMN,
     banner_text,
     export_manifest,
     export_spec,
@@ -20,6 +20,7 @@ from drydocs_api.exports import (
     list_specs,
     run_spec,
 )
+from drydocs_api.guard import is_write_cypher
 from drydocs_api.queries import ParamValidationError
 from drydocs_api.query_specs import (
     CLASSIFICATIONS,
@@ -28,7 +29,6 @@ from drydocs_api.query_specs import (
     UnknownSpecError,
     query_spec,
 )
-from drydocs_api.guard import is_write_cypher
 from drydocs_api.sessions import InMemorySessionStore, InvalidTokenError
 
 
@@ -243,7 +243,7 @@ def test_jsonl_export_watermarks_ddcontext_and_reports_trust_tier():
     token = _token(store)
     job = export_spec("context.label-census.v1", {}, "jsonl", token, store, runner, ledger)
     lines = "".join(job.chunks).splitlines()
-    assert len(lines) == 1  # internal-public â†’ no banner object
+    assert len(lines) == 1  # internal-public -> no banner object
     row = json.loads(lines[0])
     assert row[WATERMARK_COLUMN].startswith("SYNTHESIZED")
 

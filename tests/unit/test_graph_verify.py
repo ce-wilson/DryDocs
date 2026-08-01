@@ -3,6 +3,7 @@
 The loader + evaluator are pure/offline, so these run with no Neo4j. The graph
 runner is exercised with a tiny fake that returns canned rows.
 """
+
 from __future__ import annotations
 
 from typing import Any
@@ -10,10 +11,10 @@ from typing import Any
 import pytest
 
 from drydocs.graph_verify import (
+    DEFAULT_GRAPH_TESTS_DIR,
     Assertion,
     GraphVerifyError,
     Suite,
-    DEFAULT_GRAPH_TESTS_DIR,
     evaluate,
     exit_code,
     load_suite,
@@ -32,10 +33,10 @@ from drydocs.review_labels import ReviewLabels
         (Assertion.EMPTY, [{"x": 1}], None, False),
         (Assertion.NONEMPTY, [{"x": 1}], None, True),
         (Assertion.NONEMPTY, [], None, False),
-        (Assertion.EQUALS, [{"n": 3}], {"n": 3}, True),      # dict expected -> wrapped
-        (Assertion.EQUALS, [{"n": 3}], [{"n": 3}], True),    # list expected
+        (Assertion.EQUALS, [{"n": 3}], {"n": 3}, True),  # dict expected -> wrapped
+        (Assertion.EQUALS, [{"n": 3}], [{"n": 3}], True),  # list expected
         (Assertion.EQUALS, [{"n": 2}], {"n": 3}, False),
-        (Assertion.EQUALS, [], None, True),                  # both empty
+        (Assertion.EQUALS, [], None, True),  # both empty
     ],
 )
 def test_evaluate(assertion: Assertion, rows: list, expected: Any, ok: bool) -> None:
@@ -78,9 +79,9 @@ def test_load_suite_parses_cases(tmp_path) -> None:
 @pytest.mark.parametrize(
     "body",
     [
-        "cases: []",                                            # empty cases
-        "cases:\n  - cypher: x\n    assert: empty",             # missing id
-        "cases:\n  - id: TC-1\n    assert: empty",              # missing cypher
+        "cases: []",  # empty cases
+        "cases:\n  - cypher: x\n    assert: empty",  # missing id
+        "cases:\n  - id: TC-1\n    assert: empty",  # missing cypher
         "cases:\n  - id: TC-1\n    cypher: x\n    assert: bogus",  # bad assertion
         "cases:\n  - id: TC-1\n    cypher: x\n    assert: equals",  # equals w/o expected
     ],
@@ -126,7 +127,9 @@ def _mini_suite() -> Suite:
     return Suite(
         name="mini",
         cases=(
-            Case(id="TC-a", cypher="MATCH (f:ControlMFolder) RETURN f", assertion=Assertion.NONEMPTY),
+            Case(
+                id="TC-a", cypher="MATCH (f:ControlMFolder) RETURN f", assertion=Assertion.NONEMPTY
+            ),
             Case(id="TC-b", cypher="RETURN orphan", assertion=Assertion.EMPTY),
         ),
     )

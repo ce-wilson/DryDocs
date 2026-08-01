@@ -16,6 +16,7 @@ settled here.
 High-blast-radius actions (folder renames, watch-template rewrites pending the ``var.text``
 rule B1) are NOT Tier-1 material — propose only, via the Tier-2 path.
 """
+
 from __future__ import annotations
 
 import re
@@ -33,9 +34,9 @@ class Tier1Rule:
     (``apply(apply(ds)) == apply(ds)``) — the per-rule tests assert both.
     """
 
-    rule_id: str          # registry key (company-supplied; synthetic in tests)
-    description: str      # mechanism-only summary
-    ratified: bool        # gate outcome — only True rules may change definitions
+    rule_id: str  # registry key (company-supplied; synthetic in tests)
+    description: str  # mechanism-only summary
+    ratified: bool  # gate outcome — only True rules may change definitions
     apply: Callable[[DefinitionSet], DefinitionSet]
 
 
@@ -44,13 +45,11 @@ class TransformResult:
     """Outcome of a Tier-1 pass."""
 
     greenfield: DefinitionSet
-    applied: list[str] = field(default_factory=list)              # rule ids that ran
-    skipped_unratified: list[str] = field(default_factory=list)   # governance skips
+    applied: list[str] = field(default_factory=list)  # rule ids that ran
+    skipped_unratified: list[str] = field(default_factory=list)  # governance skips
 
 
-def propose_greenfield(
-    definitions: DefinitionSet, rules: Sequence[Tier1Rule]
-) -> TransformResult:
+def propose_greenfield(definitions: DefinitionSet, rules: Sequence[Tier1Rule]) -> TransformResult:
     """Apply the ratified Tier-1 ``rules`` to ``definitions``; skip the rest, loudly."""
     current = definitions
     result = TransformResult(greenfield=definitions)
@@ -67,6 +66,7 @@ def propose_greenfield(
 # --------------------------------------------------------------------------- #
 # Concrete Tier-1 rules (mechanism; values injected by the caller)
 # --------------------------------------------------------------------------- #
+
 
 def _rename_in_text(text: str, old: str, new: str) -> str:
     """Rewrite ``%%OLD`` / ``%%$OLD`` references without touching longer names

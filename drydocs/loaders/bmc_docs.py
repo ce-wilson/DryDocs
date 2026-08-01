@@ -20,17 +20,20 @@ matching, not semantic understanding): the manifest's own per-file
 and an H2 heading is the closest deterministic proxy available without an
 LLM pass — which this loader deliberately does not use.
 """
+
 from __future__ import annotations
 
 import logging
 import re
+from collections.abc import Iterator
 from dataclasses import dataclass
 from pathlib import Path
-from typing import TYPE_CHECKING, ClassVar, Iterator
+from typing import TYPE_CHECKING, ClassVar
 
 from pydantic import BaseModel
 
 from drydocs_core.models.docs import BmcDocChunkRow
+
 from .base import BaseLoader, LoadSummary, compute_row_checksum
 
 if TYPE_CHECKING:  # pragma: no cover
@@ -149,7 +152,6 @@ def _parse_header(md_path: Path) -> _DocHeader:
     h2_match = _H2_RE.search(text)
     header_block = text[: h2_match.start()] if h2_match else text
 
-    source_m = _SOURCE_RE.search(header_block)
     document_m = _DOCUMENT_RE.search(header_block)
     date_m = _DATE_SCRAPED_RE.search(header_block) or _CAPTURED_RE.search(header_block)
     purpose_m = _PURPOSE_RE.search(header_block)
@@ -211,14 +213,14 @@ class BmcDocsAdapter:
     def __init__(self, corpus_dir: Path | str = DEFAULT_CORPUS_DIR) -> None:
         self.corpus_dir = Path(corpus_dir)
 
-    def __enter__(self) -> "BmcDocsAdapter":
+    def __enter__(self) -> BmcDocsAdapter:
         return self
 
     def __exit__(
         self,
         exc_type: type[BaseException] | None,
         exc: BaseException | None,
-        tb: "TracebackType | None",
+        tb: TracebackType | None,
     ) -> None:
         return None
 
@@ -324,7 +326,8 @@ class BmcDocsLoader(BaseLoader):
         if products:
             LOGGER.info(
                 "Loader %s: product registry present (%d :SoftwareProduct)",
-                self.name, products,
+                self.name,
+                products,
             )
             return
         raise RuntimeError(

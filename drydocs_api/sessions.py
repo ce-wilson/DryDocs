@@ -10,7 +10,7 @@ from __future__ import annotations
 
 import secrets
 from dataclasses import dataclass
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 
 from drydocs_api.personas import persona
 
@@ -38,7 +38,7 @@ class InMemorySessionStore:
             token=secrets.token_urlsafe(24),
             persona_id=p.id,
             role=p.role,
-            issued_at=datetime.now(timezone.utc).isoformat(timespec="seconds"),
+            issued_at=datetime.now(UTC).isoformat(timespec="seconds"),
         )
         self._sessions[session.token] = session
         return session

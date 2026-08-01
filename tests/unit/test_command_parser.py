@@ -1,6 +1,7 @@
 """Unit tests for the Phase-C command parser, path classifier, and fact
 routing. Scenarios transcribed from real production rows.
 """
+
 from __future__ import annotations
 
 from drydocs_core.controlm.commands import (
@@ -14,6 +15,7 @@ from drydocs_core.controlm.paths import build_file_ref, canonicalize_path, class
 from drydocs_core.controlm.variables import classify_variable
 
 # --- statement splitting ------------------------------------------------------
+
 
 def test_split_respects_quotes() -> None:
     stmts = split_statements("echo 'a;b'; mv x y; rm z")
@@ -37,14 +39,16 @@ def test_inner_quotes_not_stripped() -> None:
 
 # --- launcher registry --------------------------------------------------------
 
+
 def test_classify_abinitio_graph() -> None:
-    assert classify_executable("loan_trn_bur_misop.m") == (
-        "ABINITIO", "abinitio.graph_or_plan")
+    assert classify_executable("loan_trn_bur_misop.m") == ("ABINITIO", "abinitio.graph_or_plan")
 
 
 def test_classify_validation_util() -> None:
-    assert classify_executable("/home/b02supp/xmtr_scripts/run_data_validation.sh")[0] \
+    assert (
+        classify_executable("/home/b02supp/xmtr_scripts/run_data_validation.sh")[0]
         == "VALIDATION_UTIL"
+    )
 
 
 def test_classify_python_and_unknown() -> None:
@@ -54,10 +58,13 @@ def test_classify_python_and_unknown() -> None:
 
 # --- invocation parsing (real PRECMD/POSTCMD) ---------------------------------
 
+
 def test_postcmd_validation_util_invocation() -> None:
     # real: folder 188252 job 2
-    cmd = ("sh /home/b02supp/xmtr_scripts/run_calp_temp.sh "
-           "bb_bureau_fsh_stg_experian_all_monthly_and.m {ODATE},2,Y,NO")
+    cmd = (
+        "sh /home/b02supp/xmtr_scripts/run_calp_temp.sh "
+        "bb_bureau_fsh_stg_experian_all_monthly_and.m {ODATE},2,Y,NO"
+    )
     parsed = parse_command(cmd)
     assert len(parsed.invocations) == 1
     inv = parsed.invocations[0]
@@ -70,9 +77,11 @@ def test_postcmd_validation_util_invocation() -> None:
 
 def test_precmd_mkdir_and_copy_file_ops() -> None:
     # real: folder 161947 job 12 (PRECMD pair)
-    cmd = ("mkdir -p /apps/serial/VPC_P_VMSTR_BAL_{ODATE}/backup; "
-           "cp /apps/serial/backup/* /apps/serial/VPC/; "
-           "rm -f /home/optsld/p/VMSTR.rec")
+    cmd = (
+        "mkdir -p /apps/serial/VPC_P_VMSTR_BAL_{ODATE}/backup; "
+        "cp /apps/serial/backup/* /apps/serial/VPC/; "
+        "rm -f /home/optsld/p/VMSTR.rec"
+    )
     parsed = parse_command(cmd)
     ops = {op.op_type for op in parsed.file_ops}
     assert ops == {"MKDIR", "COPY", "DELETE"}
@@ -92,12 +101,11 @@ def test_sed_pipeline_is_transform() -> None:
 def test_gzip_is_compress_with_derived_twin() -> None:
     # the 2026-07-15 gate-caveat form: pure unix file ops (move, gzip), no ETL
     # engine involved (G14)
-    parsed = parse_command(
-        "mv /data/out/loans.dat /data/arch/loans.dat; gzip /data/arch/loans.dat"
-    )
+    parsed = parse_command("mv /data/out/loans.dat /data/arch/loans.dat; gzip /data/arch/loans.dat")
     mv = next(o for o in parsed.file_ops if o.op_type == "MOVE")
     assert (mv.src_pattern, mv.tgt_pattern) == (
-        "/data/out/loans.dat", "/data/arch/loans.dat",
+        "/data/out/loans.dat",
+        "/data/arch/loans.dat",
     )
     gz = next(o for o in parsed.file_ops if o.op_type == "COMPRESS")
     assert gz.src_pattern == "/data/arch/loans.dat"
@@ -130,10 +138,13 @@ def test_assignment_and_noop_skipped() -> None:
 
 # --- container override extraction (real UCM) ---------------------------------
 
+
 def test_extract_container_command() -> None:
     # real: folder 185675
-    value = ("containerOverrides:{ command: /bin/sh, -c, "
-             "python /app/app.py --job_name SURVEY --order_id 123 }")
+    value = (
+        "containerOverrides:{ command: /bin/sh, -c, "
+        "python /app/app.py --job_name SURVEY --order_id 123 }"
+    )
     inner = extract_container_command(value)
     assert inner is not None
     assert inner.startswith("python /app/app.py")
@@ -144,17 +155,21 @@ def test_extract_container_command() -> None:
 
 def test_environment_only_override_has_no_command() -> None:
     # real: folder 179833 — environment array, no command
-    value = ("containerOverrides:{environment:[{name:TABLE_NAME,value:custcore},"
-             "{name:FRM_DT,value:{ODATE}}]}")
+    value = (
+        "containerOverrides:{environment:[{name:TABLE_NAME,value:custcore},"
+        "{name:FRM_DT,value:{ODATE}}]}"
+    )
     assert extract_container_command(value) is None
 
 
 # --- path canonicalization + role classification ------------------------------
 
+
 def test_canonicalize_timestamp_wildcard() -> None:
-    assert canonicalize_path(
-        "/apps/dropbox/CMS_IDW_SCRA_Reporting_????????????????.dat"
-    ) == "/apps/dropbox/CMS_IDW_SCRA_Reporting_{TS16}.dat"
+    assert (
+        canonicalize_path("/apps/dropbox/CMS_IDW_SCRA_Reporting_????????????????.dat")
+        == "/apps/dropbox/CMS_IDW_SCRA_Reporting_{TS16}.dat"
+    )
 
 
 def test_role_classification() -> None:
@@ -194,6 +209,7 @@ def test_filewatch_path_gets_watch_role_and_date_token() -> None:
 
 # --- fact / notification routing ----------------------------------------------
 
+
 def test_route_semantic_fact() -> None:
     cv = classify_variable("%%SEAL", "70004")
     facts, notes = route_fact(cv, "70004")
@@ -215,15 +231,20 @@ def test_route_notification_splits_addresses() -> None:
 
 def test_fid_env_triplet_carries_environment() -> None:
     from drydocs_core.controlm.variables import classify_job_variables
-    out = {cv.name: cv for cv in classify_job_variables(
-        [("%%FID_D", "B0001"), ("%%FID_Q", "H0002"), ("%%FID_P", "K0003")]
-    )}
+
+    out = {
+        cv.name: cv
+        for cv in classify_job_variables(
+            [("%%FID_D", "B0001"), ("%%FID_Q", "H0002"), ("%%FID_P", "K0003")]
+        )
+    }
     facts, _ = route_fact(out["FID_P"], "K0003")
     assert facts[0].fact_type == "FID"
     assert facts[0].environment == "P"
 
 
 # --- G8: depgraph parser-delta fold (ADR 0002-C §3) -----------------------------
+
 
 def test_pset_classified_abinitio() -> None:
     itype, rule = classify_executable("/opt/scripts/hldm/trust.pset")
@@ -291,7 +312,7 @@ def test_invocation_target_prefers_script_then_executable() -> None:
     spark = parse_command(
         "spark-submit --master yarn /opt/spark/refine_loans.py --date {ODATE}"
     ).invocations[0]
-    assert spark.target == "/opt/spark/refine_loans.py"      # script wins over exe
+    assert spark.target == "/opt/spark/refine_loans.py"  # script wins over exe
     mod = parse_command("python -m mypkg.run").invocations[0]
     assert mod.target == "mypkg.run"
 
@@ -299,6 +320,7 @@ def test_invocation_target_prefers_script_then_executable() -> None:
 # --- live-pattern coverage (SME session 2026-07-16, gate-log cmdline-lineage- --
 # review). Sanitized mechanism-twins of three production command shapes: the
 # abioncloud wrapper, the DPL java launcher, and a compound if/else command.
+
 
 def test_compound_if_else_surfaces_all_invocations() -> None:
     """`ksh check; if…else sh wrapper…;fi` — the else-prefixed statement carries
@@ -314,7 +336,7 @@ def test_compound_if_else_surfaces_all_invocations() -> None:
         '-TO_MAIL team@example.com" -s 30 -t 3600 -r large;fi'
     )
     parsed = parse_command(cmd)
-    assert parsed.unparsed == []                       # nothing UNKNOWN
+    assert parsed.unparsed == []  # nothing UNKNOWN
     got = [(i.invocation_type, i.script_path) for i in parsed.invocations]
     assert got == [
         ("SHELL_SCRIPT", "/data/sandboxes/app/bin/etl_ctl_file_check.ksh"),
@@ -337,7 +359,7 @@ def test_wrapper_pset_payload_standard_shape() -> None:
         '-e prod -a img -p TAG -g "/home/svc/pset/table_ingestion_sf.pset '
         '-AB_EXPECTED_RECORD_MBYTES 70" -s 30 -t 3600 -r large'
     )
-    inv, = parse_command(cmd).invocations
+    (inv,) = parse_command(cmd).invocations
     assert inv.invocation_type == "ABINITIO"
     assert inv.script_path == "/home/svc/pset/table_ingestion_sf.pset"
     assert inv.target == "/home/svc/pset/table_ingestion_sf.pset"
@@ -352,7 +374,7 @@ def test_dpl_pipelines_launcher_jar_classifies_dpl() -> None:
         "-pipeline 00000000-0000-0000-0000-000000000000 -appName app-prod "
         "-dataflow DATASET_NM -conf /cfg/epv-conf.json"
     )
-    inv, = parse_command(cmd).invocations
+    (inv,) = parse_command(cmd).invocations
     assert inv.invocation_type == "DPL"
     assert inv.classifier_rule == "dpl.pipelines_launcher_jar"
     assert inv.script_path.endswith("dt-pipelines-launcher-current.jar")
@@ -361,7 +383,7 @@ def test_dpl_pipelines_launcher_jar_classifies_dpl() -> None:
 
 def test_dt_launcher_sh_classifies_dpl_both_spellings() -> None:
     for launcher in ("dt-launcher.sh", "dtlaunch.sh"):
-        inv, = parse_command(
+        (inv,) = parse_command(
             f"sh /apps/tenants/dpl_utils/dt-accelerators/{launcher} -py job_conf"
         ).invocations
         assert inv.invocation_type == "DPL", launcher
@@ -369,14 +391,14 @@ def test_dt_launcher_sh_classifies_dpl_both_spellings() -> None:
 
 
 def test_generic_java_jar_stays_java() -> None:
-    inv, = parse_command("java -jar /apps/thing/tool.jar -x 1").invocations
+    (inv,) = parse_command("java -jar /apps/thing/tool.jar -x 1").invocations
     assert inv.invocation_type == "JAVA"
     assert inv.script_path == "/apps/thing/tool.jar"
     assert inv.target == "/apps/thing/tool.jar"
 
 
 def test_air_sandbox_run_classifies_abinitio() -> None:
-    inv, = parse_command("air sandbox run /sandbox/project/mygraph.pset").invocations
+    (inv,) = parse_command("air sandbox run /sandbox/project/mygraph.pset").invocations
     assert inv.invocation_type == "ABINITIO"
     assert inv.classifier_rule == "abinitio.air_cli"
     assert inv.script_path == "/sandbox/project/mygraph.pset"

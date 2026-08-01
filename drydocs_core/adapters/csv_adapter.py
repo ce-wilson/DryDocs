@@ -7,12 +7,13 @@ The implementation uses Python's stdlib ``csv`` rather than pandas so we
 don't pay the pandas import cost for every loader; pandas is still in
 ``pyproject.toml`` for analytical work but loaders don't need it.
 """
+
 from __future__ import annotations
 
 import csv
 import logging
+from collections.abc import Iterator
 from pathlib import Path
-from typing import Iterator
 
 LOGGER = logging.getLogger(__name__)
 
@@ -37,13 +38,13 @@ class CsvAdapter:
         self.name = f"csv:{self.path.name}"
         self._fh = None  # type: ignore[assignment]
 
-    def __enter__(self) -> "CsvAdapter":
+    def __enter__(self) -> CsvAdapter:
         if not self.path.exists():
             raise FileNotFoundError(f"CSV not found: {self.path}")
         self._fh = open(self.path, encoding=self.encoding, newline="")
         return self
 
-    def __exit__(self, exc_type, exc_val, exc_tb) -> None:  # noqa: ANN001
+    def __exit__(self, exc_type, exc_val, exc_tb) -> None:
         if self._fh is not None:
             self._fh.close()
             self._fh = None
@@ -60,5 +61,5 @@ class CsvAdapter:
         for raw in reader:
             yield {
                 norm: ("" if raw.get(orig) is None else str(raw[orig]))
-                for orig, norm in zip(reader.fieldnames, norm_fields)
+                for orig, norm in zip(reader.fieldnames, norm_fields, strict=False)
             }

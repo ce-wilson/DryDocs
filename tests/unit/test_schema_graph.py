@@ -8,6 +8,7 @@ Same committed-render-matches-source idiom as the plan board: the tests here
 re-render the vocabulary in-memory and fail when the committed file has drifted,
 so the meta-graph can never silently stale again.
 """
+
 from __future__ import annotations
 
 import re
@@ -50,9 +51,9 @@ def test_render_is_deterministic() -> None:
 def test_render_carries_no_timestamps() -> None:
     """Determinism: no dates/build times may appear in the generated output."""
     out = render_schema_graph()
-    assert not re.search(r"\d{4}-\d{2}-\d{2}", out), (
-        "generated schema_graph must not embed dates (deterministic render)"
-    )
+    assert not re.search(
+        r"\d{4}-\d{2}-\d{2}", out
+    ), "generated schema_graph must not embed dates (deterministic render)"
 
 
 def test_acceptance_edges_present() -> None:
@@ -81,15 +82,20 @@ def test_deprecated_and_removed_entries_excluded() -> None:
     """Only active/planned entries render; withdrawn meaning stays out."""
     assert set(RENDERED_STATUSES) == {"active", "planned"}
     out = render_schema_graph()
-    for vocab_id in ("m3_runs_on", "seal_has_membership", "seal_of_role", "seal_held_by",
-                     "seal_requires_scheduler"):
-        assert f"r.vocab_id = '{vocab_id}'" not in out, (
-            f"deprecated entry {vocab_id} must not render"
-        )
+    for vocab_id in (
+        "m3_runs_on",
+        "seal_has_membership",
+        "seal_of_role",
+        "seal_held_by",
+        "seal_requires_scheduler",
+    ):
+        assert (
+            f"r.vocab_id = '{vocab_id}'" not in out
+        ), f"deprecated entry {vocab_id} must not render"
     for retired_label in ("DataSource", "DataTarget", "SchedulerKind"):
-        assert f":SchemaMeta:{retired_label} " not in out, (
-            f"retired label {retired_label} must not render (unreferenced by any edge)"
-        )
+        assert (
+            f":SchemaMeta:{retired_label} " not in out
+        ), f"retired label {retired_label} must not render (unreferenced by any edge)"
 
 
 def test_meta_graph_is_idempotent_and_declares_generated() -> None:

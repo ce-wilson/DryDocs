@@ -5,6 +5,7 @@ appear as ``<ac:structured-macro ac:name="...">``. We parse the fragment (wrappe
 namespace prefixes resolve) to check well-formedness, then reject any macro whose name is
 not on the allow-list — a guard against unreviewed/unsafe macros slipping into a push.
 """
+
 from __future__ import annotations
 
 from collections.abc import Iterable
@@ -54,7 +55,9 @@ def validate_macros(fragment: str, allowed: Iterable[str] = DEFAULT_ALLOWED_MACR
     return errors
 
 
-def validate(fragment: str, *, allowed: Iterable[str] = DEFAULT_ALLOWED_MACROS, raise_on_error: bool = False) -> list[str]:
+def validate(
+    fragment: str, *, allowed: Iterable[str] = DEFAULT_ALLOWED_MACROS, raise_on_error: bool = False
+) -> list[str]:
     """Full check: well-formedness then macros. Optionally raise on the first failure."""
     errors = validate_xml(fragment)
     if not errors:  # only check macros if it parses

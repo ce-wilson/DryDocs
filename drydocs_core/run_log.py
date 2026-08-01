@@ -29,6 +29,7 @@ A log may contain real source values (job names, rejected rows) — logs live
 outside the repo and are never committed. Writing is best-effort after open:
 the log is an audit trail, never the reason a load fails.
 """
+
 from __future__ import annotations
 
 import getpass
@@ -36,9 +37,10 @@ import logging
 import os
 import sys
 import time
+from collections.abc import Mapping
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Mapping
+from typing import Any
 
 DEFAULT_LOGDIR = Path.home() / "logs" / "DryDocs"
 LOGDIR_ENV = "DRYDOCS_LOGDIR"
@@ -89,7 +91,7 @@ def claim_log_path(base_name: str) -> Path:
 class _CaptureHandler(logging.Handler):
     """Tees log records into the run-log file (console config untouched)."""
 
-    def __init__(self, run_log: "LoaderRunLog", level: int) -> None:
+    def __init__(self, run_log: LoaderRunLog, level: int) -> None:
         super().__init__(level=level)
         self._run_log = run_log
         self.setFormatter(logging.Formatter("%(levelname)s %(name)s: %(message)s"))
@@ -99,7 +101,7 @@ class _CaptureHandler(logging.Handler):
             self._run_log._write(self.format(record) + "\n")
             if record.levelno >= logging.WARNING:
                 self._run_log._warnings += 1
-        except Exception:  # noqa: BLE001 — audit trail, never the failure
+        except Exception:  # — audit trail, never the failure
             pass
 
 
@@ -144,7 +146,7 @@ class LoaderRunLog:
         now = datetime.now().astimezone().isoformat(timespec="seconds")
         try:
             os_user = getpass.getuser()
-        except Exception:  # noqa: BLE001 — some CI environments have no user
+        except Exception:  # — some CI environments have no user
             os_user = ""
         lines = [
             _RULE,

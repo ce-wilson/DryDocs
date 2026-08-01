@@ -1,4 +1,5 @@
 """Static checks on the Cypher schema files (no Neo4j connection required)."""
+
 from __future__ import annotations
 
 import re
@@ -8,15 +9,16 @@ import pytest
 
 try:
     import yaml
+
     _YAML_AVAILABLE = True
 except ImportError:
     _YAML_AVAILABLE = False
 
-SCHEMA_DIR   = Path(__file__).resolve().parents[2] / "drydocs_core" / "schema"
+SCHEMA_DIR = Path(__file__).resolve().parents[2] / "drydocs_core" / "schema"
 ONTOLOGY_DIR = Path(__file__).resolve().parents[2] / "drydocs_core" / "ontology"
 CONSTRAINTS_FILE = SCHEMA_DIR / "constraints.cypher"
-ONTOLOGY_FILE    = SCHEMA_DIR / "ontology.cypher"
-VOCAB_FILE       = ONTOLOGY_DIR / "relationship_vocabulary.yaml"
+ONTOLOGY_FILE = SCHEMA_DIR / "ontology.cypher"
+VOCAB_FILE = ONTOLOGY_DIR / "relationship_vocabulary.yaml"
 
 # 35 after schema consolidation: m3_constraints_upgrade.cypher absorbed into
 # constraints.cypher + the PAT area_product_id constraint. 37 after the
@@ -75,9 +77,8 @@ def test_constraints_are_idempotent() -> None:
         for line in text.splitlines()
         if "CREATE CONSTRAINT" in line and "IF NOT EXISTS" not in line
     ]
-    assert not non_idempotent, (
-        f"Constraints missing IF NOT EXISTS (not idempotent):\n"
-        + "\n".join(non_idempotent)
+    assert not non_idempotent, "Constraints missing IF NOT EXISTS (not idempotent):\n" + "\n".join(
+        non_idempotent
     )
 
 
@@ -127,21 +128,15 @@ def test_vocabulary_active_entries_declared_in_supplements() -> None:
 
         supplement_path = SCHEMA_DIR / supplement
         if not supplement_path.exists():
-            failures.append(
-                f"[{rel['id']}] supplement '{supplement}' declared but file not found"
-            )
+            failures.append(f"[{rel['id']}] supplement '{supplement}' declared but file not found")
             continue
 
         text = supplement_path.read_text(encoding="utf-8")
         label = rel["neo4j_label"]
         if label not in text:
-            failures.append(
-                f"[{rel['id']}] label '{label}' not found in {supplement}"
-            )
+            failures.append(f"[{rel['id']}] label '{label}' not found in {supplement}")
 
-    assert not failures, (
-        f"{len(failures)} vocabulary drift error(s):\n" + "\n".join(failures)
-    )
+    assert not failures, f"{len(failures)} vocabulary drift error(s):\n" + "\n".join(failures)
 
 
 @pytest.mark.skipif(not _YAML_AVAILABLE, reason="PyYAML not installed")
@@ -154,9 +149,15 @@ def test_vocabulary_prov_matrix_complete() -> None:
     matrix = vocab.get("prov_matrix", [])
     labels = {row["neo4j_label"] for row in matrix}
     expected = {
-        "WAS_INFORMED_BY", "USED", "GENERATED", "WAS_ASSOCIATED_WITH",
-        "WAS_GENERATED_BY", "WAS_DERIVED_FROM", "WAS_ATTRIBUTED_TO",
-        "ACTED_ON_BEHALF_OF", "HAD_MEMBER",
+        "WAS_INFORMED_BY",
+        "USED",
+        "GENERATED",
+        "WAS_ASSOCIATED_WITH",
+        "WAS_GENERATED_BY",
+        "WAS_DERIVED_FROM",
+        "WAS_ATTRIBUTED_TO",
+        "ACTED_ON_BEHALF_OF",
+        "HAD_MEMBER",
     }
     missing = expected - labels
     assert not missing, f"prov_matrix is missing rows for: {missing}"

@@ -8,6 +8,7 @@ creating zero constraints. Bootstrap now parses the names
 (``test_supplements``), driven here against a fake client that models the
 database as the set of constraint names it holds.
 """
+
 from __future__ import annotations
 
 from pathlib import Path
@@ -27,15 +28,12 @@ CONSTRAINTS_FILE = (
 
 # ---- the parser --------------------------------------------------------------
 
+
 def test_parser_agrees_with_the_schema_census() -> None:
     """Every CREATE CONSTRAINT in the real file yields exactly one name."""
     names = declared_constraint_names(CONSTRAINTS_FILE)
     text = CONSTRAINTS_FILE.read_text(encoding="utf-8")
-    raw = sum(
-        1
-        for line in text.splitlines()
-        if line.lstrip().startswith("CREATE CONSTRAINT")
-    )
+    raw = sum(1 for line in text.splitlines() if line.lstrip().startswith("CREATE CONSTRAINT"))
     assert len(names) == raw
     assert len(set(names)) == len(names), "constraint names must be unique"
     assert "controlmjob_key" in names  # spot anchor
@@ -75,6 +73,7 @@ def test_parser_refuses_duplicate_names(tmp_path) -> None:
 
 
 # ---- the bootstrap refusal ----------------------------------------------------
+
 
 class _FakeClient:
     """Models the database as the set of constraint names it holds."""
@@ -146,8 +145,6 @@ def test_bootstrap_guard_tolerates_extra_undeclared_constraints(fake_client) -> 
 
 def test_skip_constraints_skips_the_guard(fake_client) -> None:
     client = fake_client(_FakeClient(apply_lands=False))
-    result = runner.invoke(
-        cli_mod.app, ["bootstrap", "--skip-constraints", "--skip-ontology"]
-    )
+    result = runner.invoke(cli_mod.app, ["bootstrap", "--skip-constraints", "--skip-ontology"])
     assert result.exit_code == 0, result.output
     assert client.applied == []
