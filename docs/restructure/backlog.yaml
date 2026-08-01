@@ -9735,7 +9735,7 @@ items:
     priority: p2
     status: todo
     depends_on: [J23]
-    inputs: [UI-WIP/site-plan.md, UI-WIP/wf-admin-config-01.md, .claude/skills/data-context-extractor/references/platforms.md, .claude/skills/controlm-runbook-automation/references/fix-package.md, config/gate-prompts/bmc-docs-example.yaml, tests/unit/test_classification.py]
+    inputs: [UI-WIP/site-plan.md, UI-WIP/wf-admin-config-01.md, .claude/skills/data-context-extractor/references/platforms.md, .claude/skills/controlm-runbook-automation/references/fix-package.md, config/gate-prompts/bmc-docs-example.yaml, tests/unit/test_classification.py, drydocs_api/query_specs.py, drydocs_api/exports.py, drydocs_api/ephemeral_specs.py, tests/unit/test_query_specs.py]
     acceptance: >
       No surface that would ASSIGN or IMPLEMENT a classification still offers
       Internal-Confidential as a value: UI-WIP/site-plan.md's classification
@@ -9746,7 +9746,16 @@ items:
       controlm-runbook-automation/references/fix-package.md) relabel to
       Internal keeping the confidential-handling note, and the
       bmc-docs-example.yaml gate-prompt TEMPLATE stops modelling the retired
-      value. HISTORY is left untouched and named as such in the close note:
+      value. The LIVE implementation goes with them: drydocs_api's
+      CLASSIFICATIONS vocabulary drops the retired member, the two specs still
+      carrying it (ownership.teams.v1, ownership.attributions.v1) relabel to
+      internal, and exports.py's filename-prefix map + banner tuple stop
+      emitting an `INTERNAL-CONFIDENTIAL__` file for a tier that no longer
+      exists. ephemeral_specs.py's EPHEMERAL_CLASSIFICATION is a FAIL-CLOSED
+      CEILING, not a label — it must be re-pointed at the most restrictive
+      SURVIVING level (internal), never simply deleted, and its docstring
+      restated so the ceiling's intent survives the rename.
+      HISTORY is left untouched and named as such in the close note:
       config/gate-log.md, signed-off gate prompts, `done` backlog close-notes,
       SDLC-Docs/extracted/ corpus, IDEAS.md audit trail. test_classification.py
       gains a regression guard that fails if the retired token reappears in an
@@ -9765,6 +9774,25 @@ items:
       this item's scope. .gitignore's two explanatory comments are cheap to
       reword and may ride along; they assign nothing, so they are not
       acceptance-bearing.
+      WIDENED 2026-08-01 (found while auditing the registry for O27, NOT a new
+      decision — it applies the same recorded J23 ruling). The drydocs_api
+      surfaces were missed TWICE: J23 scoped itself by an inputs list that
+      omitted them, and this item, groomed expressly to catch J23's leftovers,
+      inherited the same omission — its acceptance sentence already claimed
+      "no surface that would ASSIGN or IMPLEMENT a classification", which the
+      API both does. Worth stating plainly because it corrects this item's own
+      premise: the note below calls these "specs in waiting" and cites
+      site-plan's union as "a TypeScript enum in waiting", but drydocs_api is
+      not waiting — two registered specs carry the retired tier TODAY and a
+      real export of either writes a file prefixed INTERNAL-CONFIDENTIAL__ and
+      a banner naming a level config/classification.yaml no longer defines.
+      That makes this a live user-visible inconsistency, not dormant text.
+      Module stays `docs` (the bulk is still docs/skills/templates) but the
+      closer should expect a live Python slice + test, not a docs-only pass.
+      Root cause worth carrying: the API held a SECOND, independent copy of the
+      classification vocabulary that nothing checks against config — so the
+      regression guard is most valuable if it asserts the two agree, rather
+      than just scanning for a token.
 
   - id: J25
     epic: release-infrastructure
