@@ -23,7 +23,14 @@ pyyaml = "^6.0.3"          # runtime: the precedence resolver reads config/*.yam
 pytest = "^8.2"
 pytest-cov = "^5.0"
 testcontainers = { version = "^4.5", extras = ["neo4j"] }
-ruff = "^0.5"
+ruff = "0.5.7"        # EXACT, caret removed deliberately — J10 stage 0. Formatter
+                      # output varies across ruff versions, and the producer and
+                      # company sides format INDEPENDENTLY (disjoint histories; the
+                      # mechanical commits are regenerated, not ported). A floating
+                      # pin would let the two sides converge on different output from
+                      # the same config, which is the one thing this design cannot
+                      # tolerate. Upgrade in lockstep, via a ported pyproject commit.
+                      # Authority: docs/ruff-format-convergence.md
 mypy = "^1.10"
 pypdf = "^6.14.2"
 
@@ -48,12 +55,36 @@ drydocs = "drydocs.cli:app"
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
 
+# --- ruff: the SHARED contract (J10 stage 0) ---------------------------------
+# This block is the only part of the ruff convergence that PORTS. Both repos run
+# the same tool, same pinned version, same config — then each formats its own
+# tree independently (docs/ruff-format-convergence.md). Changing anything here
+# changes the other side's output too, so change it as a ported commit, never
+# as a local convenience.
 [tool.ruff]
 line-length = 100
 target-version = "py311"
 
 [tool.ruff.lint]
 select = ["E", "F", "W", "I", "B", "UP", "N", "RUF"]
+# per-file-ignores land at stage 4, each with a reason comment. Deliberately
+# absent here: stage 0 settles the CONTRACT, it rules on no findings.
+
+[tool.ruff.format]
+# Values are ruff's own defaults, written out on purpose. The formatter's
+# defaults are not a stable contract across versions, and "we both took the
+# default" is not something either side can verify from the repo — an explicit
+# block is.
+quote-style = "double"
+indent-style = "space"
+skip-magic-trailing-comma = false
+docstring-code-format = false
+# LF, never "auto". `auto` infers the ending from each file, so the same source
+# formats differently on a CRLF working tree than on the Linux runner — the
+# exact class of OS-dependent output that kept CI red 2026-07-21..07-31 (see
+# tests/unit/test_render_determinism.py). .gitattributes normalizes *.sh only;
+# this covers *.py.
+line-ending = "lf"
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

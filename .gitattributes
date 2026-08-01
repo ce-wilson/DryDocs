@@ -3,5 +3,16 @@
 *.sh text eol=lf
 *.ksh text eol=lf
 
+# Python must use LF in the WORKING TREE too, not just in the index (J10 stage 0).
+# Git already stores LF via autocrlf, so this changes no committed bytes — it
+# changes what lands on disk at checkout. Needed because [tool.ruff.format]
+# pins line-ending = "lf": without this rule, a Windows checkout materializes
+# CRLF, `ruff format --check` reports every file as needing reformat purely on
+# line endings, and stage 5's "exits 0" acceptance is unreachable on that
+# machine while passing on the Linux runner. Same lesson as the render-ordering
+# bug (tests/unit/test_render_determinism.py): make the platforms agree rather
+# than picking one to be right.
+*.py text eol=lf
+
 # Binary documents — never eol-normalize (autocrlf=true would corrupt them).
 *.pdf binary

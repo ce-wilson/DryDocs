@@ -28,7 +28,32 @@ merge-bases) does not apply. Instead of porting a ~6,800-line mechanical diff:
   deleted seal-sample twins; both gates are recorded in
   [`config/classification.yaml`](../config/classification.yaml)).
 
-## Measured baseline (2026-07-19, ruff 0.5.7)
+## Stage 0 executed 2026-07-31 — one finding worth carrying
+
+`line-ending` in `[tool.ruff.format]` is set to **`lf`, not `auto`**, and stage 0
+therefore also adds `*.py text eol=lf` to `.gitattributes`. Reason, found by
+running it: `auto` infers the ending per file, so the same source formats
+differently on a CRLF working tree than on the Linux runner — the exact
+OS-dependent-output class that kept CI red 2026-07-21..07-31. But pinning `lf`
+without the `.gitattributes` rule makes a Windows checkout materialize CRLF,
+which makes `ruff format --check` report EVERY file as needing reformat on line
+endings alone (284 -> 314 in the live measurement) and stage 5's "exits 0"
+acceptance unreachable on that machine while passing on the runner. Both halves
+are needed; the rule ports with stage 0, so the company inherits it.
+
+Git stores LF either way, so no committed bytes change — a one-time working-tree
+renormalization (`git add --renormalize .`, then re-checkout the `.py` files) is
+all it takes, and stage 3 rewrites every file anyway.
+
+## Measured baseline (2026-07-19, ruff 0.5.7) — SUPERSEDED, see below
+
+**Re-measured 2026-07-31 at producer head `7ccc655` (same ruff 0.5.7):**
+`ruff check .` = **1,019 findings** (was 838), **404** safe fixes + **42**
+unsafe; `ruff format --check .` = **284 of 328 files** would be reformatted
+(was 203 of 237). Advisory CI means the debt grows ~180 findings per 10 days.
+The 2026-07-19 figures below are kept as the decision-session record.
+
+### The 2026-07-19 figures (decision session)
 
 - `poetry run ruff check .`: **838 findings** (was ~757 at groom time
   2026-07-13 — CI is advisory, so the debt grows until this executes).

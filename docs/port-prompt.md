@@ -210,7 +210,31 @@ GUARDRAILS (durable — apply to every port):
    deferred, acceptance numbers, manifest adherence, state/reversibility, NEW
    divergences observed). The producer reviews it against producer git.
 
-9. BOUNDARIES: one-way only — never add company main as a remote on the producer,
+9. RUFF / FORMAT CONVERGENCE (J10 — each side formats its OWN tree; the
+   mechanical commits are NEVER ported). Authority:
+   `git show cewilson/main:docs/ruff-format-convergence.md`, which carries your
+   instructions verbatim. Locate the boundary BY COMMIT SUBJECT, never by SHA —
+   every producer commit in this stream contains its tag `J10 stage <N>`:
+   - `J10 stage 0` — **PORTS.** The shared contract: `ruff = "0.5.7"` EXACT (the
+     caret is removed deliberately — formatter output varies across versions, and
+     two independently-formatted sides MUST run the same one) plus the settled
+     `[tool.ruff]` / `[tool.ruff.lint]` / `[tool.ruff.format]` blocks. Take it as
+     an ordinary pyproject change; keep YOUR version string (guardrail 9 below).
+   - `J10 stage 1` / `2` / `3` — **DO NOT PORT.** Autofix, hand-reviewed unsafe
+     fixes, and `ruff format .`. Regenerate them on your own tree with the pinned
+     tool once stage 0 has landed your side. Porting them would apply producer
+     line-layout to company code for no benefit and enormous collision surface.
+   - `J10 stage 4` — PORTS normally (per-rule fixes; kept rules become explicit
+     `per-file-ignores` with reason comments).
+   - `J10 stage 5` — PORTS, but apply it only AFTER your own residuals are zero:
+     it drops `continue-on-error` from the CI ruff step and adds
+     `ruff format --check`. Applying it early makes your CI red by construction.
+   Until BOTH sides have run stages 1–3, expect layout-only collisions on any
+   `.py` file and resolve them by taking your own formatting — never by
+   hand-merging whitespace. After both sides converge, this class of collision
+   disappears, which is the entire point of the exercise.
+
+10. BOUNDARIES: one-way only — never add company main as a remote on the producer,
    never push back to ce-wilson/DryDocs. drydocs/data/ sample CSVs stay local. Never
    commit real SIDs, credentials, server addresses, GHE org names, or production data
    values; internal/ is the only home for confidential data (PUBLISH-BOUNDARY.md).
