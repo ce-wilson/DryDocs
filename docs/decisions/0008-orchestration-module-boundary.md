@@ -1,8 +1,9 @@
 # ADR 0008 — Orchestration module boundary: add a parent, do not rename `controlm/`
 
 ```yaml
-status: PROPOSED        # PROPOSED | ACCEPTED | SUPERSEDED
+status: ACCEPTED        # PROPOSED | ACCEPTED | SUPERSEDED
 date: 2026-07-25
+accepted: 2026-08-01    # ruled at backlog S1 (chad.wilson); as proposed, no amendments
 deciders: [chad.wilson, SME-gate]
 layer: 0-physical-layout
 affects:
@@ -14,6 +15,11 @@ affects:
   - tests/unit/test_module_boundary.py
 supersedes: ~
 ```
+
+> **ACCEPTED 2026-08-01 as proposed** (backlog S1, chad.wilson). No amendments — the
+> boundary this ADR draws is unchanged. The build is backlog **S2**, which this ADR gates.
+> Note the ADR authorizes the SHAPE only: `git mv` plus the `commands.py` → `shell.py` /
+> `fields.py` split. It writes no graph and needs no ontology gate.
 
 ## Context
 

@@ -1,7 +1,8 @@
 # ADR 0009 — Configuration substrate: git YAML stays the source of truth; SQLite is the read model; drafts absorb UI writes
 
 ```yaml
-status: PROPOSED        # PROPOSED | ACCEPTED | SUPERSEDED
+status: ACCEPTED        # PROPOSED | ACCEPTED | SUPERSEDED
+accepted: 2026-08-01    # ruled at backlog S1 (chad.wilson); as proposed, no amendments
 date: 2026-07-25
 deciders: [chad.wilson, SME-gate]
 layer: 0-configuration
@@ -14,6 +15,11 @@ affects:
   - tests/unit/test_classification.py , test_mapping_store.py
 supersedes: ~
 ```
+
+> **ACCEPTED 2026-08-01 as proposed** (backlog S1, chad.wilson). No amendments. The headline
+> ruling is rule 1: **git text stays the source of truth permanently** — `var/mapping.db`
+> remains derived, rebuildable and gitignored, and this is explicitly NOT a stepping stone to
+> a database. The draft-table build is backlog **S4**, which this ADR gates.
 
 ## Context
 

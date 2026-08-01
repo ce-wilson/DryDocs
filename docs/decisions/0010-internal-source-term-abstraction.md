@@ -1,8 +1,11 @@
-# ADR 0010 — Internal source terms: identity carries its authority (`app_id` + `id_authority`), not the registry's name
+# ADR 0010 — Internal source terms: identity takes a neutral name (`app_id`); evidence keeps the source's
 
 ```yaml
-status: PROPOSED        # PROPOSED | ACCEPTED | SUPERSEDED
+status: ACCEPTED        # PROPOSED | ACCEPTED | SUPERSEDED
 date: 2026-07-25
+accepted: 2026-08-01    # ruled at backlog S1 (chad.wilson) — ACCEPTED WITH AMENDMENTS,
+                        # edited to the business-application-identity gate ruling (2026-07-27)
+gate: business-application-identity   # config/gate-log.md — owns the property-term binding
 deciders: [chad.wilson, ontology-mapper, SME-gate]
 layer: 2-ontology
 affects:
@@ -16,43 +19,41 @@ affects:
 extends: 0003-application-naming-disambiguation.md
 ```
 
-> ## ⚠️ PARTIALLY SUPERSEDED — do not build from this ADR as written
+> ## ACCEPTED WITH AMENDMENTS — 2026-08-01 (backlog S1)
 >
-> The **`business-application-identity` gate SIGNED OFF 2026-07-27** (`config/gate-log.md`)
-> and overruled this ADR's central mechanism. **`id_authority` is WITHDRAWN.** The SME ruled
-> at §B0 that a second authority issuing app ids will not happen, which removed the only
-> justification for a qualified reference — with one permanent registry it is a constant
-> column on every node. The authority is recorded **once**, in
-> `config/taxonomy/business-application.yaml` (`source_of_record: SEAL`), which is also
-> strictly cheaper under the case that *can* still happen, a registry rename.
+> The amendment this ADR was waiting on has been **made**. The body below is now the ruled
+> shape, not the v1 proposal; the `business-application-identity` gate (SIGNED OFF
+> 2026-07-27, `config/gate-log.md`, 22/22 confirmed / 0 edits) is the authority for the
+> property-term binding and this ADR now agrees with it. **Build from this document.**
 >
-> **What still stands:** rule 1 — canonical nodes take neutral property names. That is the
-> ADR's durable contribution and the gate confirmed it at §B1(c)/§B2(i).
+> What the gate changed, recorded here so the reasoning is not lost:
 >
-> **What is dead as written:** this ADR's title, its Decision block (the three-property
-> Cypher example), Option C, and rules 2/3 — all assume `id_authority`. `app_urn` is not
-> written either, but is DEFERRED with a named trigger (§B3), not withdrawn.
+> - **`id_authority` is WITHDRAWN** (§B0 → §B1(c)). The SME ruled that a second authority
+>   issuing app ids will not happen, which removed the only justification for a qualified
+>   reference — with one permanent registry it is a constant column on every node. The
+>   authority is recorded **once**, in `config/taxonomy/business-application.yaml`
+>   (`source_of_record: SEAL`), which is also strictly cheaper under the case that *can*
+>   still happen: a registry rename. The Decision block, Option C and rules 2–3 below were
+>   edited accordingly; the original analysis is kept under "Options considered" because the
+>   dual-registry reasoning is what the ruling had to answer.
+> - **`app_urn` is DEFERRED, not withdrawn**, with a named trigger (§B3).
+> - **The rule is TWO-PART** (§B2 — the session's most consequential correction). Rule 1
+>   alone was incomplete; see the Decision block.
+> - **`SEALID` was never a source field name** (§B4/B5). It appears nowhere in code, SQL or
+>   Cypher — only in prose. The seal-extract reads the SEAL Reports export, whose header is
+>   `Application ID`, and the row model was already `app_id`. `seal_id` was a DryDocs-era
+>   coinage over a value that was already neutral everywhere else.
 >
-> **What the gate ADDED that this ADR lacks — the two-part rule (§B2).** The naming rule has
-> a second half: *evidence and provenance vocabulary keeps the source's own term.* SEAL's
-> portal calls the field `Application ID`, but Control-M CMDLINEs and internal docs refer to
-> it as SEAL / SEAL_ID — so `ATTRIBUTION_TIERS 'SEAL'` and `match_method: 'seal'` STAY.
-> They record what another system literally wrote; renaming them would make the graph
-> misdescribe its own source. An amendment that restates rule 1 without this half is
-> incomplete.
->
-> **Also corrected:** this ADR (and everything downstream of it) assumed the source field was
-> called `SEALID`. It is not — that string appears nowhere in code, SQL or Cypher, only in
-> prose. See §B5.
->
-> **Amendment is owed at backlog S1**, which this ADR gates. Until then, treat the ruling in
-> `config/gate-log.md` (2026-07-27) as the authority, not this document.
+> The build is backlog **S3**, which this ADR gates. This document authorizes the SHAPE;
+> the gate authorized the graph write.
 
 ## Context
 
 Two internal abbreviations run through DryDocs:
 
-- **SEAL** — the internal registry of record for business applications; issues the `SEALID`.
+- **SEAL** — the internal registry of record for business applications; issues the
+  application id. (Amended at S1: this line said "issues the `SEALID`". §B4/B5 established
+  that no source ever used that name — the SEAL Reports export header is `Application ID`.)
 - **PAT** — the internal product/area-product catalog; source of the product hierarchy and
   team roles.
 
@@ -99,14 +100,21 @@ it is exactly the case the rule excludes. The rule is right; it just was not app
 The taxonomy layer already got this right. `config/taxonomy/business-application.yaml`:
 
 ```yaml
-concept: BusinessApplication      # generic node concept
-source_of_record: SEAL            # authoritative registry for BusinessApplication
-identifier: SEALID                # the unique id (= app_id)
+concept: BusinessApplication           # generic node concept
+source_of_record: SEAL                 # authoritative registry for BusinessApplication
+identifier: "Application ID"           # the SOURCE's own field name for the unique id (= app_id)
 ```
 
 with the comment *"The concept is deliberately decoupled from the vendor system — SEAL is one
 source of record for it, not the concept itself."* The graph and API layers did not inherit
 that separation.
+
+**Amended at S1 — and this file is now the two-part rule in miniature.** When this ADR was
+written the `identifier:` line read `SEALID`, which §B4/B5 found recorded *a name the source
+does not use*; it was corrected at the gate sign-off to `"Application ID"`, the export's
+actual header. Note it was NOT corrected to `app_id`: the taxonomy entry is **evidence**, so
+it keeps the source's own term (rule 2), while the graph property is **identity**, so it is
+neutral (rule 1). The same concept, named twice, on purpose.
 
 ### External precedent
 
@@ -126,47 +134,70 @@ than at a rename.
 
 ## Decision
 
-**Carry identity as a qualified reference — the value plus the authority that issued it —
-never as a scalar named after the registry.**
+**The naming rule is TWO-PART. Identity takes a neutral name; evidence keeps the source's
+own term.** Ruled at gate §B2 — the half this ADR originally lacked, and the one that stops
+the rename from becoming a lie about provenance.
 
 ```cypher
 (:BusinessApplication {
-   app_id:       "70001",                                  // the value; neutral name
-   id_authority: "SEAL",                                   // WHICH registry issued it
-   app_urn:      "urn:dd:businessapplication:seal:70001"   // optional canonical form
-})
+   app_id: "70001"        // the canonical key; neutral name, no registry in it
+})                        // the issuing registry is recorded ONCE, in
+                          // config/taxonomy/business-application.yaml (source_of_record: SEAL)
 ```
 
 Six rules:
 
-1. **Canonical nodes take neutral property names.** `:BusinessApplication.app_id`, not
-   `seal_id`. Registry-named properties are permitted only on source-labeled nodes, per
-   ADR 0003 rule 1.
-2. **The registry name becomes data, not a name.** `id_authority: "SEAL"` is a value in a
-   controlled vocabulary. A registry rename becomes a data migration over one property —
-   which is a gate, not a refactor.
-3. **The URN form follows the catalog pattern already documented.**
-   `urn:dd:<concept>:<authority>:<value>`, aligned with the URN section of
-   `enterprise-data-catalog-ontology.md`. Optional in phase 1; it is the join key if a second
+1. **(i) IDENTITY — canonical nodes take neutral property names.**
+   `:BusinessApplication.app_id`, not `seal_id`. Registry-named properties are permitted only
+   on source-labeled nodes, per ADR 0003 rule 1.
+2. **(ii) EVIDENCE — provenance and match vocabulary KEEPS the source's own term.**
+   `ATTRIBUTION_TIERS 'SEAL'` and `match_method: 'seal'` **stay**. SEAL's portal calls the
+   field `Application ID`, but the wider ecosystem — Control-M CMDLINEs, internal docs —
+   says SEAL / SEAL_ID. Those strings record *what another system literally wrote*; renaming
+   them would make the graph misdescribe its own source rather than tidy it. An application
+   of rule 1 that sweeps these too is a misapplication.
+3. **The issuing authority is declared once, not carried per node.** `id_authority` is
+   WITHDRAWN (§B0/§B1(c)): one permanent registry makes it a constant column. The authority
+   lives in `config/taxonomy/business-application.yaml`, and the source-field ledger in
+   `config/source-mappings/seal-extract.yaml` — the mechanism `controlm-psgmgr.yaml` already
+   uses, guarded by `test_source_mapping_drift.py`. **The honest limit (§B6):** that ledger
+   is DECLARATIVE and guard-reconciled, **not** a runtime mapping — loaders still hardcode,
+   and making it load-bearing is a real build, deliberately out of scope.
+   `app_urn` is DEFERRED with a named trigger (§B3), not withdrawn: it returns if a second
    authority ever issues application identifiers.
-4. **External surfaces expose the neutral pair only.** `drydocs_api` and `web/` emit `app_id`
-   and `id_authority`. No `seal_id` in a route, a QuerySpec, a column header, or a demo
-   fixture. This costs nothing today and is the entire reason for doing this before the
-   console hardens.
+4. **External surfaces expose the neutral name only.** `drydocs_api` and `web/` emit
+   `app_id`. No `seal_id` in a route, a QuerySpec, a column header, or a demo fixture —
+   subject to rule 2, which keeps `match_method` values as they are. This costs nothing today
+   and is the entire reason for doing this before the console hardens.
 5. **Abbreviations get defined, not encoded.** "SEAL", "PAT", "AIS" and their kin belong in a
-   `CatalogBusinessTerm`-shaped glossary with a definition, a scope, and an
-   `id_authority` cross-link — not embedded in identifiers. This is the same conclusion the
-   reopened **Q6** acronym question is circling and the gap the Unity Catalog note names
-   (*"Agent metadata (synonyms, display names) — no analogue yet"*).
+   `CatalogBusinessTerm`-shaped glossary with a definition and a scope — not embedded in
+   identifiers. (Amended at S1: this rule originally required an `id_authority` cross-link;
+   with that property withdrawn, the glossary links to the `source_of_record` declared in
+   `config/taxonomy/business-application.yaml`.) Same conclusion the reopened **Q6** acronym
+   question is circling, and the gap the Unity Catalog note names (*"Agent metadata
+   (synonyms, display names) — no analogue yet"*).
 6. **PAT terminology is explicitly out of scope.** It never leaked into code. Touching it
    would be effort with no return.
 
 ### Migration — additive, reversible, gated
 
+**Amended at S1 to the gate's C1–C4 cutover.** The inventory is **8 key-bearing sites**, not
+7 — 4 MERGE (`seal_applications:19`, `manual_seal_attribution:32`, `pat_product_mapping:54`,
+`software_registry:52`) and 4 MATCH (`batch_port_orchestrator:25`,
+`manual_seal_attribution:41`, `seal_attribution:32`, `seal_contacts:27`). The key flips in
+**ONE atomic change across all eight**: a Neo4j uniqueness constraint IGNORES NULLS, so a
+partial cutover would *silently double* the canonical node rather than fail. `:Port` follows
+NOW (§D1). Existing graphs are handled by **REBUILD, not migration** (wipe-and-rebuild
+doctrine, 2026-07-23), which is why phase 4 below is a retirement rather than a backfill.
+
+> **Trap recorded at §D1 for the implementing phase:** `CREATE CONSTRAINT <name> IF NOT
+> EXISTS` matches on the NAME — redefining `port_unique` under the same name SUCCEEDS AND
+> DOES NOTHING, leaving the old definition live. DROP first, or take a new name.
+
 | Phase | Action | Reversible? |
 |---|---|---|
-| **1** | Loaders write `app_id` + `id_authority` **alongside** `seal_id`. Constraint added on `app_id`; existing `seal_id` constraint retained. | Yes — drop two properties |
-| **2** | `drydocs_api` + `web/` read and emit only `app_id`/`id_authority`. QuerySpecs updated. Console fixtures renamed. | Yes — revert the readers |
+| **1** | Loaders write `app_id` **alongside** `seal_id` from the same row value, across all 8 sites at once. Constraint added on `app_id`; existing `seal_id` constraint retained. | Yes — drop one property |
+| **2** | `drydocs_api` + `web/` read and emit only `app_id`. QuerySpecs updated. Console fixtures renamed. Rule 2 keeps `match_method` values unchanged. | Yes — revert the readers |
 | **3** | Loader Cypher, `graph-tests/`, and gate pages move to `app_id`. `seal_id` becomes a **deprecated alias**, still written. | Yes |
 | **4** | Gate: retire `seal_id` writes; keep it on `:Document`-style source-labeled nodes where ADR 0003 rule 1 permits it. | Gate decision |
 
@@ -184,7 +215,7 @@ with the company port. Do them last, or not at all.
 it violates ADR 0003's own rule on the canonical node; and it hard-codes an org-chart artifact
 into the graph's primary key. **Rejected** — the cost is lowest today and rises monotonically.
 
-### Option B — Rename `seal_id` → `app_id`, nothing else
+### Option B — Rename `seal_id` → `app_id`, nothing else ✅ TAKEN (as amended)
 
 | Dimension | Assessment |
 |---|---|
@@ -197,10 +228,23 @@ into the graph's primary key. **Rejected** — the cost is lowest today and rise
 **Cons:** loses the information that the id came from SEAL. If a second registry ever issues
 application ids — the plausible outcome of an internal restructure, e.g. a migration where
 both old and new ids are live — there is no way to say which authority a bare `app_id` came
-from, and the two id spaces silently collide. **Rejected as insufficient**, though it is
-strictly better than Option A and is a valid fallback if capacity is tight.
+from, and the two id spaces silently collide. ~~**Rejected as insufficient**~~
 
-### Option C — `app_id` + `id_authority` (+ optional URN) ✅
+**AMENDED — this option was TAKEN at gate §B0/§B1(c).** The SME ruled the dual-registry
+premise false: SEAL remains the single issuing registry. The stated con is answered without
+a per-node property — the authority is declared once in
+`config/taxonomy/business-application.yaml` plus the `seal-extract.yaml` source-field ledger,
+so nothing is lost except the ability to represent a case that will not arise. If it ever
+does, §B3's named trigger reopens `app_urn`.
+
+> **Amended at S1: the gate chose Option B, not Option C.** §B0 ruled the premise below
+> false — a second issuing authority will not happen — which collapses the case-3 argument
+> that made C worth its cost. What C got right and B as originally written did not is that
+> the authority still has to be *recorded* somewhere; the ruling puts it in the taxonomy file
+> and the source-field ledger instead of on every node. Both options are kept below because
+> the ruling is only legible against the alternative it rejected.
+
+### Option C — `app_id` + `id_authority` (+ optional URN) — NOT TAKEN (superseded at §B0)
 
 | Dimension | Assessment |
 |---|---|
@@ -228,6 +272,13 @@ clean stepping stone; rule 5 keeps the glossary on the roadmap without blocking 
 
 ## Trade-off analysis
 
+> **Amended at S1 — this whole section rested on a premise the gate ruled false.** The
+> analysis below argues from three possible futures and concludes that case 3 justifies
+> Option C's extra property. §B0 established that case 3 will not arise: SEAL remains the
+> single issuing registry. Case 1 is the live risk, and Option B handles it. The section is
+> kept unedited because it is the reasoning the SME was asked to rule on, and a decision
+> record that deletes the argument it overruled is not a record. Read it as history.
+
 The decision hinges on **what an "internal port restructure" would actually do.** Three cases:
 
 1. **SEAL is renamed** — Option B and C both survive; A requires a 47-site sweep across
@@ -250,34 +301,48 @@ contract in the next commit that touches them.**
 
 ## Consequences
 
+*(Amended at S1 to the ruled shape — one property, not two.)*
+
 **Easier**
-- A registry rename or replacement becomes a gated data migration, not a refactor.
-- `id_authority` is queryable — dual-registry transition state is visible in the graph.
+- A registry **rename** becomes a one-line taxonomy edit, not a refactor: the name lives in
+  `business-application.yaml`, not on 47 sites.
 - The canonical/source-labeled split from ADR 0003 becomes consistently true.
 - The console's contract stops leaking an internal tool name to every viewer.
+- Provenance stays honest: rule 2 means `match_method: 'seal'` keeps saying what the source
+  actually said, so the rename cannot quietly rewrite history.
 
 **Harder**
-- Two properties during the transition; a verify rule must assert they agree.
-- Every `seal_*` module, Cypher file, and QuerySpec is touched — mechanical but wide.
+- A dual-write window during phases 1–3; a `graph-tests/` rule must assert
+  `app_id = seal_id`.
+- All 8 key-bearing sites must flip in ONE change — uniqueness constraints ignore nulls, so
+  a partial cutover silently doubles the canonical node instead of failing.
+- Every `seal_*` module, Cypher file, and QuerySpec is touched — mechanical but wide, and
+  rule 2 makes it a *judged* sweep rather than a find-and-replace.
 - The company port must sequence this; `seal_id` almost certainly appears in company-side
   code the producer cannot see.
-- Existing loaded graphs need a backfill (one `SET` statement, plus the new constraint).
+- Existing loaded graphs are handled by **rebuild, not backfill** (wipe-and-rebuild doctrine,
+  2026-07-23).
 
 **To revisit**
 - Whether `Employee.seal_sid` / `seal_holder_sid` follow the same treatment — they name a
   *person* identifier that happens to be sourced from SEAL, which may be a different call.
   Deliberately out of scope here.
-- The `CatalogBusinessTerm` glossary (Option D) once Q6 is ruled — at which point
-  `id_authority` values should become glossary-backed rather than free strings, per Unity
-  Catalog takeaway 2 ("the entry and its enforcement ship together").
+- `app_urn` if §B3's named trigger fires (a second authority issuing application ids).
+- The `CatalogBusinessTerm` glossary (Option D) once Q6 is ruled — the natural home for
+  defining SEAL/PAT/AIS as terms, per Unity Catalog takeaway 2 ("the entry and its
+  enforcement ship together").
 
 ## Action items
 
-1. [ ] Gate spec in `config/gate-prompts/` for the identity reshape; route through `ontology-mapper` and record in `config/gate-log.md`.
-2. [ ] Phase 1: loaders write `app_id` + `id_authority` alongside `seal_id`; add the `app_id` constraint; add a `graph-tests/` rule asserting `app_id = seal_id` during the transition.
-3. [ ] Phase 2 (**do this before more console routes land**): `drydocs_api/query_specs.py` and `web/src/**` emit `app_id` + `id_authority` only; rename `app_seal_id` in `mappingsDemo.ts`; reword `match_method: 'seal_var'`.
-4. [ ] Update `config/taxonomy/business-application.yaml` to state the property contract explicitly (`identifier: SEALID` → `app_id` carried with `id_authority: SEAL`).
-5. [ ] Add the `urn:dd:businessapplication:<authority>:<value>` form to `docs/patterns/data-catalog/` URN reference.
+*(Amended at S1. Items 1 and 4 are DONE — the gate ran 2026-07-27 and corrected the taxonomy
+file at sign-off. The rest are backlog **S3**, now unblocked.)*
+
+1. [x] Gate spec in `config/gate-prompts/` for the identity reshape; routed and recorded in `config/gate-log.md` — **SIGNED OFF 2026-07-27, 22/22 confirmed, 0 edits.**
+2. [ ] Phase 1: loaders write `app_id` alongside `seal_id` across **all 8 key-bearing sites in one atomic change** (4 MERGE, 4 MATCH — §C1); add the `app_id` constraint; add a `graph-tests/` rule asserting `app_id = seal_id` during the transition. `:Port` follows now (§D1) — DROP the old constraint first, since `CREATE CONSTRAINT ... IF NOT EXISTS` matches on name and would silently no-op.
+3. [ ] Phase 2 (**do this before more console routes land**): `drydocs_api/query_specs.py` and `web/src/**` emit `app_id` only; rename `app_seal_id` in `mappingsDemo.ts`. **Do NOT reword `match_method: 'seal_var'`** — rule 2 keeps evidence vocabulary as the source wrote it (this reverses the v1 instruction).
+4. [x] `config/taxonomy/business-application.yaml` corrected at sign-off: `identifier: SEALID` → `"Application ID"`, the export's real header.
+5. [ ] ~~Add the URN form~~ — DEFERRED with §B3's named trigger, not an open item.
 6. [ ] Phase 3–4: migrate loader Cypher and gate pages; gate the `seal_id` retirement.
-7. [ ] Feed rule 5 into the **Q6** disposition and the domain-scoped acronym-catalog idea (`docs/restructure/IDEAS.md` L51/L74) — the glossary is where SEAL/PAT/AIS get defined.
+7. [ ] Feed the glossary rule into the **Q6** disposition and the domain-scoped acronym-catalog idea (`docs/restructure/IDEAS.md` L51/L74) — where SEAL/PAT/AIS get defined.
 8. [ ] Port-sequence through `docs/port-prompt.md` before any other wide structural port.
+9. [ ] Write the missing seal-extract column ledger at `config/source-mappings/seal-extract.yaml` (§B1(c)/§B6) — declarative and guard-reconciled by `test_source_mapping_drift.py`, **not** a runtime mapping.
