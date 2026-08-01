@@ -1,11 +1,14 @@
 # Ruff formatter convergence — two-sided adoption plan (J10 amended scope)
 
-**Status: PLANNED.** Producer-side execution is backlog item **J10** (start is
-user-gated — see "Open calls" below). This doc is the authority for the amended
-J10 scope and carries the **company-side instructions** verbatim; when J10
-executes, stage 0 also adds a numbered step to [`docs/port-prompt.md`](port-prompt.md)
-pointing here. Decision session: 2026-07-19 (all measurements below are live
-from that session, producer tip `83f97cb`).
+**Status: PRODUCER SIDE COMPLETE (2026-08-01, laptop). Company side NOT STARTED.**
+All six producer commits (stages 0–5) are on `main`; `poetry run ruff check .` and
+`poetry run ruff format --check .` both exit 0 and CI blocks on both. The
+**company-side instructions below are unchanged and now live** — they are the
+next action for this stream, and nothing producer-side is waiting on them.
+This doc remains the authority for the amended J10 scope; stage 0 added the
+numbered step to [`docs/port-prompt.md`](port-prompt.md) pointing here. Decision
+session: 2026-07-19 (measurements below are live from that session, producer tip
+`83f97cb`); execution session 2026-08-01.
 
 ## Why this shape
 
@@ -85,22 +88,48 @@ The ruff version is load-bearing on both sides — formatter output varies acros
 versions; upgrade the pin deliberately, in lockstep, via a ported pyproject
 commit.
 
-## Open calls to confirm at execution start (producer side)
+## Open calls — ALL RULED 2026-08-01. Kept as the decision record.
 
-1. **Timing** — the original TIMING flag (never right before a port) is
-   *softened* by this design: port exposure is now two regenerable commits plus
-   the boundary protocol, not a multi-session diff stream. Start still needs
-   the user's go, coordinated so no concurrent session has uncommitted `.py`
-   work when stages 1–3 sweep the tree.
-2. **E501 residual policy** — recommendation: **ignore E501 with a reason
-   comment** ("formatter owns layout; residual is prose in strings/comments" —
-   the standard formatter-era convention; J10's acceptance permits kept rules
-   with reasons). Alternative: keep E501 + per-file-ignore `.claude/**` and
-   hand-wrap the smaller package residue.
-3. **Keeper set** — B008 (Typer/FastAPI call-in-default idiom, 14 hits):
-   per-file-ignore the CLI/API modules; RUF001/2/3 (prose unicode in
-   docstrings, 15): decide once, fix-or-ignore; E402 (6, deliberate `sys.path`
-   setup in scripts): per-file-ignore candidates.
+1. **Timing** — ✅ user's go given 2026-08-01; stages 1–5 ran in one sitting on
+   the laptop with a clean tree and no concurrent `.py` work.
+2. **E501 residual policy** — ✅ **ignore with a reason comment**, as
+   recommended. 241 hits survived the formatter. `ignore = ["E501"]` in
+   `[tool.ruff.lint]`, reason inline.
+3. **Keeper set** — ✅ ruled per-origin rather than per-rule, because the
+   residual split cleanly along a line the 2026-07-19 sizing had not seen:
+   **177 of 362 findings (49%) were vendored** Anthropic skill scripts under
+   `.claude/skills/{docx,pptx,xlsx,pdf,skill-creator}` — three near-identical
+   copies of the same office validators. Those are now an `extend-exclude`, not
+   a per-file-ignore: we do not author them and re-vendoring reverts any fix.
+   `.claude/skills/groom-backlog` is ours and stays in scope.
+
+   Of the rest: **B008** (26 not 14 — it grew while CI was advisory) per-file-
+   ignored in `drydocs/cli.py`; **N817** (11) globally ignored, every hit being
+   `import xml.etree.ElementTree as ET`; **N818** (3) and **N812** (1) per-file-
+   ignored with reasons; **RUF001/2/3** split — vendored copies excluded, all 3
+   of ours fixed. **E402's premise was wrong**: the doc assumed deliberate
+   `sys.path` setup in `scripts/`; all 6 hits are `pytest.importorskip` guards
+   in two test modules, which must precede the imports they guard.
+
+   Everything else was **fixed, not ignored** (30 findings): E741 ×14, B017 ×2,
+   RUF012, RUF007 ×2, N806 ×3, N802.
+
+### Three findings from execution worth carrying to the company side
+
+- **B017 was a real test defect, not a style nit.** `pytest.raises(Exception)`
+  in `test_plan_board.py` "proved" frozen dataclasses reject writes — but it
+  passes just as happily on a typo'd attribute name or an unrelated `TypeError`.
+  Narrowed to `dataclasses.FrozenInstanceError`. Expect the same class of thing
+  in company-only tests; B017 hits are worth reading, not bulk-ignoring.
+- **Ruff's F841 unsafe fix leaves dead code.** It strips the assignment target
+  but KEEPS the call: `holdout = data.get("holdout", 0)` becomes a bare
+  `data.get("holdout", 0)`. Six landed across three files in stage 2. The
+  diagnosis was right every time; the fix was not. Read that diff — §3.2's
+  hunk-by-hunk review is where this gets caught.
+- **A latent encoding bug hid behind RUF003.** `tests/unit/test_query_specs.py`
+  contained `â†’` — a double-encoded `->` whose third byte is the RIGHT SINGLE
+  QUOTATION MARK ruff was flagging. Blanket-ignoring RUF001/2/3 would have
+  preserved it. A tree sweep found no others.
 
    **B023 — RULED AND FIXED 2026-07-31, ahead of the sweep.** Reviewed
    individually as the plan required. Both findings were ONE site, not two:
