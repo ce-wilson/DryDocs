@@ -1,0 +1,247 @@
+# =============================================================================
+# config/source-mappings/seal-extract.yaml — the column ledger for the SEAL
+# application extract (config/source-registry.yaml v2 dataset id
+# `seal:app-extract`).
+#
+# WHY THIS FILE EXISTS: gate business-application-identity §B1(c), SIGNED OFF
+# 2026-07-27. The gate WITHDREW a per-node `id_authority` property — with one
+# permanent issuing registry it would be a constant column on every node — and
+# put the authority in two declarative places instead: `source_of_record: SEAL`
+# in config/taxonomy/business-application.yaml, and this ledger, which records
+# WHICH SOURCE COLUMN carries the identity value the graph keys on.
+#
+# THE HONEST LIMIT (§B6, recorded here because a reader will assume otherwise):
+# this ledger is DECLARATIVE and guard-reconciled, **NOT a runtime mapping**.
+# No loader reads it. drydocs/loaders/seal_applications.py still hardcodes its
+# field names, and making this file load-bearing is a real build that was
+# deliberately scoped OUT of S3. What the file buys today is that the mapping is
+# written down once, in the place the drift guard checks, instead of living only
+# in a pydantic model and a Cypher SET block.
+#
+# THE ROW THE GATE ASKED FOR (§F1(3)): `Application ID -> BusinessApplication.app_id`.
+# The source's own header is `Application ID` — SME-confirmed 2026-07-27 from the
+# SEAL Reports export. It is NOT `SEALID`: §B4/§B5 established that name appears
+# nowhere in code, SQL or Cypher, only in repo prose, and the taxonomy file's
+# `identifier:` was corrected at the same sign-off. `SEAL` survives in this file
+# only in its FILENAME (the source id), never as a column name.
+#
+# NAMING BASIS — read this before adding a row. Unlike psgmgr.yaml, whose
+# `name:` values are real DB column names read from the SQL, only ONE source
+# header here is SME-confirmed: `Application ID`. Every other `name:` below is
+# the LOADER'S field name (drydocs_core/models/seal.py, which is
+# `populate_by_name` and `extra: ignore`, so it reads headers by these names and
+# silently drops anything else). Those are DryDocs' belief about the export's
+# headers, not verified source vocabulary — which is exactly the gap that let
+# `SEALID` live in the repo for months. The Phase-2 column census resolves it;
+# until then `census: pending` says so rather than faking it.
+#
+# THIS IS PHASE 0 (transcription, no new gate): every disposition below is read
+# off already-decided artifacts, never invented —
+#   - drydocs_core/models/seal.py (SealApplicationRow / SealContactRow — the
+#     validated row shapes, 87 and 5 fields)
+#   - drydocs/loaders/cypher/seal_applications.cypher (the SET block: what
+#     actually lands as a node property) and seal_contacts.cypher
+#   - gate business-application-identity (2026-07-27) for the identity row
+#   - gate seal-tom-attribution-reshape / K4 (2026-07-10) for the contact roles
+# `deferred` rows are model fields the loader validates but the Cypher never
+# writes — a known future use, not an exclusion.
+#
+# Column names are source/loader mechanism (no data values) — classification:
+# Internal-Public, even though the real source row (config/source-registry.yaml)
+# is classification: Internal. Typed accessor: drydocs/source_mappings.py.
+# Guarded by tests/unit/test_source_mapping_drift.py (registry-pointer + census
+# reconciliation; the SQL-drift guard does not apply — this is a report extract,
+# not a psgmgr SELECT).
+# =============================================================================
+schema: drydocs.source-mapping.v1
+source: "seal:app-extract"      # v2 DATASET id — both loaders below bind to it
+classification: Internal-Public
+updated: 2026-08-01
+
+objects:
+  # ---------------------------------------------------------------------------
+  # The application extract. drydocs_core/models/seal.py documents this as "one
+  # row of PSGMGR.DECO_SEAL_APP_INFO" while the registry row calls the dataset a
+  # csv `report` with `adapter: csv`. UNRESOLVED and recorded, not papered over:
+  # a psgmgr replica view and a SEAL Reports export are different objects with
+  # different headers, and which one prod actually reads is an SME question. It
+  # does not change any disposition below — both carry the same fields — but it
+  # does decide what the Phase-2 census profiles.
+  # Loader: drydocs/loaders/seal_applications.py + cypher/seal_applications.cypher.
+  # ---------------------------------------------------------------------------
+  - name: DECO_SEAL_APP_INFO
+    kind: extract
+    profile:
+      profiled_on: ~
+      via: "drydocs_core/models/seal.py SealApplicationRow (87 fields) + cypher/seal_applications.cypher SET block — no census run against the live export"
+      column_count: ~
+      census: pending
+    note: >
+      IDENTITY: the first row below is the one gate business-application-identity
+      ruled. The extract's `Application ID` value is written to
+      :BusinessApplication.app_id (the canonical MERGE key since S3), to
+      :Port.parent_app_id (the NODE KEY, §D1(a)), and as the first segment of
+      :Attribution.attribution_id (`app_id|SEAL|role|sid`, §D2 — the SEAL segment
+      there is EVIDENCE and stays). It is ALSO still written to
+      :BusinessApplication.seal_id as a deprecated alias through phase 3;
+      retiring that alias is a separate later gate (§G3), not decided here.
+    columns:
+      # THE gate row. `name` is the SOURCE's header (the only one confirmed);
+      # everything below it is the loader's field name — see NAMING BASIS above.
+      - {name: "Application ID", disposition: projected, origin: source, target: "BusinessApplication.app_id",
+         decided_by: business-application-identity,
+         note: "loader field name: app_id (SealApplicationRow.app_id — already neutral before this gate; `seal_id` was a DryDocs-era coinage over it). ALSO lands as BusinessApplication.seal_id (deprecated alias, phase 3), Port.parent_app_id, and the leading segment of Attribution.attribution_id"}
+      - {name: name, disposition: projected, origin: source, target: "BusinessApplication.name"}
+      - {name: app_short_name, disposition: projected, origin: source, target: "BusinessApplication.app_short_name"}
+      - {name: description, disposition: projected, origin: source, target: "BusinessApplication.description"}
+      - {name: app_state, disposition: projected, origin: source, target: "BusinessApplication.status"}
+      - {name: investment_strategy, disposition: projected, origin: source, target: "BusinessApplication.investment_strategy"}
+      - {name: creation_date, disposition: projected, origin: source, target: "BusinessApplication.creation_date"}
+      - {name: actual_build_start_date, disposition: projected, origin: source, target: "BusinessApplication.actual_build_start_date"}
+      - {name: actual_operate_date, disposition: projected, origin: source, target: "BusinessApplication.actual_operate_date"}
+      - {name: actual_decom_date, disposition: projected, origin: source, target: "BusinessApplication.actual_decom_date"}
+      - {name: actual_retirement_date, disposition: projected, origin: source, target: "BusinessApplication.actual_retirement_date"}
+      - {name: planned_build_start_date, disposition: projected, origin: source, target: "BusinessApplication.planned_build_start_date"}
+      - {name: planned_operate_date, disposition: projected, origin: source, target: "BusinessApplication.planned_operate_date"}
+      - {name: planned_decom_date, disposition: projected, origin: source, target: "BusinessApplication.planned_decom_date"}
+      - {name: planned_decom_date_chg_reason, disposition: projected, origin: source, target: "BusinessApplication.planned_decom_date_chg_reason"}
+      - {name: planned_retirement_date, disposition: projected, origin: source, target: "BusinessApplication.planned_retirement_date"}
+      - {name: replaced_by_app_ids, disposition: projected, origin: source, target: "BusinessApplication.replaced_by_app_ids",
+         note: "a comma-joined list of OTHER applications' identity values — carried verbatim as a string property, never resolved into edges here"}
+      - {name: replacement_app_type, disposition: projected, origin: source, target: "BusinessApplication.replacement_app_type"}
+      - {name: retirement_type, disposition: projected, origin: source, target: "BusinessApplication.retirement_type"}
+      - {name: app_lob, disposition: projected, origin: source, target: "BusinessApplication.app_lob"}
+      - {name: reporting_cio_lob, disposition: projected, origin: source, target: "BusinessApplication.reporting_cio_lob"}
+      - {name: reporting_cto_group, disposition: projected, origin: source, target: "BusinessApplication.reporting_cto_group"}
+      - {name: tech_group_owner, disposition: projected, origin: source, target: "BusinessApplication.tech_group_owner"}
+      - {name: tech_group_owner_id, disposition: projected, origin: source, target: "BusinessApplication.tech_group_owner_id"}
+      - {name: owning_legal_entity, disposition: projected, origin: source, target: "BusinessApplication.owning_legal_entity"}
+      - {name: using_lob_sub_lobs, disposition: projected, origin: source, target: "BusinessApplication.using_lob_sub_lobs"}
+      - {name: overall_risk_rating, disposition: projected, origin: source, target: "BusinessApplication.risk_level",
+         note: "the one renamed landing: source `overall_risk_rating` -> property `risk_level`"}
+      - {name: sox_reportable, disposition: projected, origin: source, target: "BusinessApplication.sox_governed",
+         note: "written TWICE from one column — also lands as BusinessApplication.sox_reportable. Recorded because a reader who sees two properties will look for two source columns"}
+      - {name: glba_reportable, disposition: projected, origin: source, target: "BusinessApplication.glba_reportable"}
+      - {name: pci_reportable, disposition: projected, origin: source, target: "BusinessApplication.pci_reportable"}
+      - {name: soc1_reportable, disposition: projected, origin: source, target: "BusinessApplication.soc1_reportable"}
+      - {name: ccar_reportable, disposition: projected, origin: source, target: "BusinessApplication.ccar_reportable"}
+      - {name: global_statutory_audit, disposition: projected, origin: source, target: "BusinessApplication.global_statutory_audit"}
+      - {name: payment_card_industry_category, disposition: projected, origin: source, target: "BusinessApplication.payment_card_industry_category"}
+      - {name: info_classification, disposition: projected, origin: source, target: "BusinessApplication.info_classification"}
+      - {name: personal_info, disposition: projected, origin: source, target: "BusinessApplication.personal_info"}
+      - {name: sensitive_personal_info, disposition: projected, origin: source, target: "BusinessApplication.sensitive_personal_info"}
+      - {name: client_confidential_info, disposition: projected, origin: source, target: "BusinessApplication.client_confidential_info"}
+      - {name: phi, disposition: projected, origin: source, target: "BusinessApplication.phi"}
+      - {name: mnpi, disposition: projected, origin: source, target: "BusinessApplication.mnpi"}
+      - {name: strictest_rpo, disposition: projected, origin: source, target: "BusinessApplication.strictest_rpo"}
+      - {name: strictest_rto, disposition: projected, origin: source, target: "BusinessApplication.strictest_rto"}
+      - {name: hosting_vendor, disposition: projected, origin: source, target: "BusinessApplication.hosting_vendor"}
+      - {name: overall_hosting_type, disposition: projected, origin: source, target: "BusinessApplication.overall_hosting_type"}
+      - {name: platforms, disposition: projected, origin: source, target: "BusinessApplication.platforms"}
+      - {name: kapp, disposition: projected, origin: source, target: "BusinessApplication.kapp"}
+      - {name: provides_platforms, disposition: projected, origin: source, target: "BusinessApplication.provides_platforms"}
+      - {name: programming_languages, disposition: projected, origin: source, target: "BusinessApplication.programming_languages"}
+      - {name: app_dev_responsibility, disposition: projected, origin: source, target: "BusinessApplication.app_dev_responsibility"}
+      - {name: app_dev_vendor_name, disposition: projected, origin: source, target: "BusinessApplication.app_dev_vendor_name"}
+      - {name: firm_owned_source_code, disposition: projected, origin: source, target: "BusinessApplication.firm_owned_source_code"}
+      - {name: internally_shared, disposition: deferred, origin: source}
+      - {name: dev_app_only, disposition: deferred, origin: source}
+      - {name: external_service, disposition: deferred, origin: source}
+      - {name: tech_maintained, disposition: deferred, origin: source}
+      - {name: hardware_deployments, disposition: deferred, origin: source}
+      - {name: software_deployments, disposition: deferred, origin: source}
+      - {name: third_party_direct_access, disposition: deferred, origin: source}
+      - {name: vendor_engagements, disposition: deferred, origin: source}
+      - {name: source_code_vendor_name, disposition: deferred, origin: source}
+      - {name: direct_access_vendor_name, disposition: deferred, origin: source}
+      - {name: cpof_logical_deployment, disposition: deferred, origin: source}
+      - {name: hvbe, disposition: deferred, origin: source}
+      - {name: iwp_deployment, disposition: deferred, origin: source}
+      - {name: authentication_type, disposition: projected, origin: source, target: "BusinessApplication.authentication_type"}
+      - {name: authorization_type, disposition: projected, origin: source, target: "BusinessApplication.authorization_type"}
+      - {name: fine_grain_authorization_type, disposition: projected, origin: source, target: "BusinessApplication.fine_grain_authorization_type"}
+      - {name: external_network_connectivity, disposition: projected, origin: source, target: "BusinessApplication.external_network_connectivity"}
+      - {name: not_external_facing_reason, disposition: deferred, origin: source}
+      - {name: external_network_exposure, disposition: projected, origin: source, target: "BusinessApplication.external_network_exposure"}
+      - {name: tier_0_1_or_2_network_assets, disposition: projected, origin: source, target: "BusinessApplication.tier_0_1_or_2_network_assets"}
+      - {name: external_api_connectivity, disposition: projected, origin: source, target: "BusinessApplication.external_api_connectivity"}
+      - {name: external_access_control, disposition: projected, origin: source, target: "BusinessApplication.external_access_control"}
+      - {name: instant_change_authorization, disposition: deferred, origin: source}
+      # ---- the three EMBEDDED contacts. The rest arrive via the contact
+      # extract below; these three are columns ON the application row (K4 gate
+      # 2026-07-10 §B/§C — qualified-attribution shape, not Membership/Role).
+      - {name: app_owner_sid, disposition: projected, origin: source, target: "Employee.employee_id",
+         decided_by: seal-tom-attribution-reshape,
+         note: "also the sid segment of Attribution.attribution_id for role application_owner, and the HAS_AGENT target"}
+      - {name: app_owner_name, disposition: projected, origin: source, target: "Employee.full_name"}
+      - {name: chief_tech_officer_sid, disposition: projected, origin: source, target: "Employee.employee_id",
+         decided_by: seal-tom-attribution-reshape,
+         note: "role cto"}
+      - {name: chief_tech_officer_name, disposition: projected, origin: source, target: "Employee.full_name"}
+      - {name: info_owner_sid, disposition: projected, origin: source, target: "Employee.employee_id",
+         decided_by: seal-tom-attribution-reshape,
+         note: "role primary_information_owner"}
+      - {name: info_owner_name, disposition: projected, origin: source, target: "Employee.full_name"}
+      - {name: capture_date, disposition: projected, origin: source, target: "BusinessApplication.capture_date",
+         note: "extract timestamp — never authorship"}
+      - {name: certification_status, disposition: projected, origin: source, target: "BusinessApplication.certification_status"}
+      - {name: last_certified_by_sid, disposition: projected, origin: source, target: "BusinessApplication.last_certified_by_sid"}
+      - {name: last_certified_date, disposition: projected, origin: source, target: "BusinessApplication.last_certified_date"}
+      - {name: data_integrity, disposition: projected, origin: source, target: "BusinessApplication.data_integrity"}
+      - {name: externally_mandated, disposition: deferred, origin: source}
+      - {name: externally_mandated_type, disposition: deferred, origin: source}
+    default_disposition:
+      disposition: excluded
+      reason: scope
+      note: >
+        The row model is `extra: ignore`, so any export column not named above is
+        already dropped at validation — silently. This sweep records that as a
+        DECISION rather than an accident. It carries no `count:` because no
+        census has run: the moment one does, the count must balance explicit rows
+        + this sweep, and any new column has to be dispositioned by name.
+
+  # ---------------------------------------------------------------------------
+  # The separate SEAL Contact extract — the roles DECO_SEAL_APP_INFO does NOT
+  # carry inline (BIO, Design Authority, Chief Business Technologist, L1/L2
+  # Operate Manager, Backup Application Owner, Risk Manager).
+  # Loader: drydocs/loaders/seal_contacts.py + cypher/seal_contacts.cypher
+  # (same `source_id: seal:app-extract` binding as the application loader).
+  # OBJECT NAME NOT ESTABLISHED: SealContactRow calls it "an external SEAL
+  # Contact extract" and names no table or report. The name below is this
+  # ledger's own handle, and the census is what will replace it.
+  # ---------------------------------------------------------------------------
+  - name: seal-contact-extract
+    kind: extract
+    profile:
+      profiled_on: ~
+      via: "drydocs_core/models/seal.py SealContactRow (5 fields) + cypher/seal_contacts.cypher"
+      column_count: ~
+      census: pending
+    note: >
+      role_name is EVIDENCE and is kept verbatim (gate business-application-identity
+      §B2(ii); §D2 pins it): it lands on Attribution.role_source_name AND forms the
+      role segment of attribution_id, while the crosswalked concept goes to
+      TOMRole.id. 'L1 Operate Manager' and 'L2 Operate Manager' both map to the
+      operate_manager concept with the level carried separately — which is why the
+      SOURCE string cannot be dropped from the key without collapsing three real
+      role holdings into one (§D2, evidenced by the SME's live-registry screenshots).
+      OPEN: the seal-tom-attribution-reshape gate has the live registry showing NINE
+      role classes against the signed seven; that gate owns the enumeration, not this
+      ledger.
+    columns:
+      - {name: app_id, disposition: projected, origin: source, target: "BusinessApplication.app_id",
+         decided_by: business-application-identity,
+         note: "the JOIN key — MATCHes the application node, creates nothing. Loader field name; the application extract's confirmed header for the same value is `Application ID`"}
+      - {name: role_name, disposition: projected, origin: source, target: "Attribution.role_source_name",
+         decided_by: seal-tom-attribution-reshape,
+         note: "EVIDENCE — kept verbatim. Also the role segment of Attribution.attribution_id, and crosswalked (not renamed) to TOMRole.id"}
+      - {name: employee_sid, disposition: projected, origin: source, target: "Employee.employee_id",
+         note: "also the trailing segment of Attribution.attribution_id"}
+      - {name: employee_name, disposition: projected, origin: source, target: "Employee.full_name"}
+      - {name: employee_email, disposition: projected, origin: source, target: "Employee.email"}
+    default_disposition:
+      disposition: excluded
+      reason: scope
+      note: >
+        `extra: ignore` on SealContactRow — same posture as the application object
+        above. No census, so no `count:`.

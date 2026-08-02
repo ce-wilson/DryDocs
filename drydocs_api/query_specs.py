@@ -92,14 +92,18 @@ QUERY_SPECS: dict[str, QuerySpec] = {
         QuerySpec(
             id="explorer.applications.v1",
             database="drydocs",
-            description="Business applications (SEAL-keyed) for the Explorer Applications frame.",
+            description=(
+                "Business applications for the Explorer Applications frame, keyed on the "
+                "canonical app_id (gate business-application-identity 2026-07-27 — the "
+                "console never emits the issuing registry's name; ADR 0010 rule 4)."
+            ),
             cypher=(
                 "MATCH (a:BusinessApplication) WHERE NOT a:SchemaMeta "
-                "RETURN a.seal_id AS seal_id, a.name AS name, a.status AS status "
-                "ORDER BY seal_id LIMIT $limit"
+                "RETURN a.app_id AS app_id, a.name AS name, a.status AS status "
+                "ORDER BY app_id LIMIT $limit"
             ),
             columns=(
-                ColumnDef("seal_id", "string", "SEAL id"),
+                ColumnDef("app_id", "string", "Application ID"),
                 ColumnDef("name", "string", "Application"),
                 ColumnDef("status", "string", "Status"),
             ),
@@ -169,13 +173,13 @@ QUERY_SPECS: dict[str, QuerySpec] = {
                 "WHERE NOT f:SchemaMeta "
                 "OPTIONAL MATCH (f)-[:SCHEDULED_ON]->(s:ControlMServer) "
                 "RETURN f.sched_table AS folder, s.name AS data_center, "
-                "a.seal_id AS seal_id, a.name AS application, count(DISTINCT j) AS jobs "
+                "a.app_id AS app_id, a.name AS application, count(DISTINCT j) AS jobs "
                 "ORDER BY folder LIMIT $limit"
             ),
             columns=(
                 ColumnDef("folder", "string", "Folder"),
                 ColumnDef("data_center", "string", "Data center"),
-                ColumnDef("seal_id", "string", "SEAL id"),
+                ColumnDef("app_id", "string", "Application ID"),
                 ColumnDef("application", "string", "Application"),
                 ColumnDef("jobs", "int", "Jobs"),
             ),
@@ -202,15 +206,15 @@ QUERY_SPECS: dict[str, QuerySpec] = {
                 "OPTIONAL MATCH (j)-[:WAS_ASSOCIATED_WITH {role: 'seal_app_ref'}]"
                 "->(a:BusinessApplication) "
                 "WITH ca, count(DISTINCT f) AS folders, count(DISTINCT j) AS jobs, "
-                "collect(DISTINCT a.seal_id) AS seal_ids "
+                "collect(DISTINCT a.app_id) AS app_ids "
                 "RETURN ca.name AS app_code, "
-                "CASE WHEN size(seal_ids) = 0 THEN 'unmapped — SME queue' "
-                "WHEN size(seal_ids) = 1 THEN 'direct (dedicated code)' "
+                "CASE WHEN size(app_ids) = 0 THEN 'unmapped — SME queue' "
+                "WHEN size(app_ids) = 1 THEN 'direct (dedicated code)' "
                 "ELSE 'shared platform code' END AS mapping_pattern, "
-                "size(seal_ids) AS applications, folders, jobs, "
-                "CASE WHEN size(seal_ids) = 1 THEN seal_ids[0] "
-                "WHEN size(seal_ids) = 0 THEN null "
-                "ELSE toString(size(seal_ids)) + ' applications' END AS mapped_to "
+                "size(app_ids) AS applications, folders, jobs, "
+                "CASE WHEN size(app_ids) = 1 THEN app_ids[0] "
+                "WHEN size(app_ids) = 0 THEN null "
+                "ELSE toString(size(app_ids)) + ' applications' END AS mapped_to "
                 "ORDER BY app_code LIMIT $limit"
             ),
             columns=(
@@ -241,11 +245,11 @@ QUERY_SPECS: dict[str, QuerySpec] = {
                 "WHERE NOT f:SchemaMeta "
                 "OPTIONAL MATCH (j)-[r:WAS_ASSOCIATED_WITH {role: 'seal_app_ref'}]"
                 "->(a:BusinessApplication) "
-                "WITH f, j, [h IN collect({seal_id: a.seal_id, name: a.name, "
-                "method: r.match_method}) WHERE h.seal_id IS NOT NULL] AS res "
+                "WITH f, j, [h IN collect({app_id: a.app_id, name: a.name, "
+                "method: r.match_method}) WHERE h.app_id IS NOT NULL] AS res "
                 "RETURN f.sched_table AS folder, j.job_name AS job, "
                 "f.folder_id AS folder_id, j.job_id AS job_id, "
-                "CASE WHEN size(res) = 0 THEN null ELSE res[0].seal_id END AS seal_id, "
+                "CASE WHEN size(res) = 0 THEN null ELSE res[0].app_id END AS app_id, "
                 "CASE WHEN size(res) = 0 THEN null ELSE res[0].name END AS application, "
                 "CASE WHEN size(res) = 0 THEN null ELSE res[0].method END AS match_method, "
                 "CASE WHEN size(res) = 0 THEN 'unresolved' "
@@ -258,8 +262,12 @@ QUERY_SPECS: dict[str, QuerySpec] = {
                 ColumnDef("job", "string", "Job"),
                 ColumnDef("folder_id", "string", "Folder id"),
                 ColumnDef("job_id", "string", "Job id"),
-                ColumnDef("seal_id", "string", "SEAL id"),
+                ColumnDef("app_id", "string", "Application ID"),
                 ColumnDef("application", "string", "Application"),
+                # match_method keeps the source's own vocabulary ('seal', 'fid',
+                # 'app_name', 'alias', 'manual') — gate §B2(ii): evidence records what
+                # another system literally wrote. Renaming it here would make the
+                # console misdescribe the graph's provenance, not tidy it.
                 ColumnDef("match_method", "string", "Tier/evidence"),
                 ColumnDef("status", "string", "Status"),
             ),
@@ -283,13 +291,13 @@ QUERY_SPECS: dict[str, QuerySpec] = {
                 "AND m.role_source_name IN ['L1 Operate Manager', 'L2 Operate Manager'] "
                 "AND m.valid_to IS NULL "
                 "OPTIONAL MATCH (m)-[:HAS_AGENT]->(e:Employee) "
-                "RETURN a.seal_id AS app_seal_id, a.name AS application, "
+                "RETURN a.app_id AS app_id, a.name AS application, "
                 "m.role_source_name AS role_name, m.level AS level, "
                 "e.employee_id AS holder_sid, e.full_name AS holder_name "
-                "ORDER BY app_seal_id, role_name LIMIT $limit"
+                "ORDER BY app_id, role_name LIMIT $limit"
             ),
             columns=(
-                ColumnDef("app_seal_id", "string", "SEAL id"),
+                ColumnDef("app_id", "string", "Application ID"),
                 ColumnDef("application", "string", "Application"),
                 ColumnDef("role_name", "string", "Role"),
                 ColumnDef("level", "string", "Level"),
@@ -347,13 +355,13 @@ QUERY_SPECS: dict[str, QuerySpec] = {
                 "WHERE NOT a:SchemaMeta "
                 "OPTIONAL MATCH (m)-[:HAD_ROLE]->(tr:TOMRole) "
                 "OPTIONAL MATCH (m)-[:HAS_AGENT]->(e) "
-                "RETURN a.seal_id AS seal_id, m.attribution_id AS attribution_id, "
+                "RETURN a.app_id AS app_id, m.attribution_id AS attribution_id, "
                 "m.role_source_name AS source_role, tr.id AS tom_role, m.level AS level, "
                 "m.unmapped_role AS unmapped_role, e.sid AS holder_sid "
-                "ORDER BY m.unmapped_role DESC, seal_id LIMIT $limit"
+                "ORDER BY m.unmapped_role DESC, app_id LIMIT $limit"
             ),
             columns=(
-                ColumnDef("seal_id", "string", "SEAL id"),
+                ColumnDef("app_id", "string", "Application ID"),
                 ColumnDef("attribution_id", "string", "Attribution id"),
                 ColumnDef("source_role", "string", "Source role"),
                 ColumnDef("tom_role", "string", "TOM role"),

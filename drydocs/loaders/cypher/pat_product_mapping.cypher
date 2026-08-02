@@ -8,7 +8,7 @@
 // For each row this loader writes:
 //   1. APPS (always, when seal_ids present): the row's SEAL ids feed the
 //      ACTIVE arch_develops edge —
-//      (:BusinessApplication {seal_id})-[:WAS_ATTRIBUTED_TO {role:'developed_by'}]->(:DevTeam)
+//      (:BusinessApplication {app_id})-[:WAS_ATTRIBUTED_TO {role:'developed_by'}]->(:DevTeam)
 //      No new label: this is the catalog side of the catalog↔SEAL ownership
 //      reconciliation the vocabulary already confirmed.
 //   2. ALIGNMENT (fallback ladder): DevTeam-[:SUPPORTS]->AreaProduct when the
@@ -61,8 +61,11 @@ MATCH (dt:DevTeam {team_id: row.team_id})
 WITH row, dt,
      [id IN split(coalesce(row.seal_ids, ''), ',') WHERE trim(id) <> ''] AS app_ids
 FOREACH (raw_app_id IN app_ids |
-  MERGE (a:BusinessApplication {seal_id: trim(raw_app_id)})
-    ON CREATE SET a.first_seen_at = datetime($loaded_at),
+  // IDENTITY KEY (gate business-application-identity §C1/§C2) — neutral app_id;
+  // seal_id dual-written as a deprecated alias. The PAT column is still `seal_ids`.
+  MERGE (a:BusinessApplication {app_id: trim(raw_app_id)})
+    ON CREATE SET a.seal_id      = trim(raw_app_id),   // deprecated alias — phase 3
+                  a.first_seen_at = datetime($loaded_at),
                   a.source     = 'pat'
   MERGE (a)-[r:WAS_ATTRIBUTED_TO {role: 'developed_by'}]->(dt)
     ON CREATE SET r.first_seen_at = datetime($loaded_at),

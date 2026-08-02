@@ -26,6 +26,32 @@ Tags help grooming: `idea` · `bug` · `doc` · `source` (new data source) · `q
 
 <!-- add new ideas at the top -->
 
+- 2026-08-01 — [chore→L19] **Two governed design docs carry statements the S3 identity cutover
+  made false; deliberately NOT edited in S3, because both are rev-bump surfaces and one of them
+  is a dated snapshot.** (a) `docs/design/drydocs-web-console-tdd.md` §"Source → column-level
+  field mapping": *"Grid columns surfaced to the browser are the table columns verbatim (e.g.
+  `manual_mapping`: `file, folder_id, job_id, seal_id, …`)"*. S3 broke "verbatim" ON PURPOSE —
+  the job-application and seal-contact-override grids now `SELECT … seal_id AS app_id` /
+  `app_seal_id AS app_id`, because gate §E1 puts `app_id` on the wire while the committed CSV
+  keeps its own header. The doc is `Status: DESCRIPTIVE … as of Rev 1, 2026-07-18, authored at
+  commit 807e050`, i.e. a snapshot pinned to a commit, so it is not strictly *wrong* — but a
+  reader will take it as the live contract. (b) `docs/design/controlm-ingestion-tdd.md` naming
+  traps: `Application.seal_id` is stale on BOTH halves — the label became `:BusinessApplication`
+  at ADR 0003 / K4 (pre-existing drift) and the property became `app_id` at S3. L19's acceptance
+  clause (a) already covers web-console-tdd; add controlm-ingestion-tdd and these two lines.
+  NOT drift, checked and correct as-is: `drydocs-mapping-store-tdd.md:154-155` describes the
+  SQLite `manual_mapping` / `seal_contact_override` COLUMNS, which S3 deliberately did not rename.
+
+- 2026-08-01 — [chore] **`tests/unit/test_schema.py::test_constraint_count` counted the string
+  `CREATE CONSTRAINT` anywhere in the file, including comments** — so documenting a DDL trap in a
+  `//` comment inflated the count and simultaneously false-failed
+  `test_constraints_are_idempotent` (the comment "has no IF NOT EXISTS"). Fixed in S3 by anchoring
+  both at line start, mirroring `drydocs_core/schema/constraints.py::_DECLARATION_RE`, which the
+  bootstrap presence guard already uses. Recorded because the shape generalises: several guards in
+  this repo read committed text with a bare substring match, so a file cannot safely describe its
+  own mechanism in prose. Worth a sweep for the same pattern elsewhere (candidates: the render
+  drift checks and the port-manifest walk).
+
 - 2026-08-01 — [chore] **`.gitignore` names the real org and internal domain in two explanatory
   comments** (`"Fidelity/FMR"`, `fmr.com`) — seen while rewording the retired-tier labels on those
   same lines at J24, and deliberately left alone there because half-redacting one line while the

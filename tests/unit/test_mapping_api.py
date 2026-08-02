@@ -60,7 +60,7 @@ def test_user_role_is_refused(sessions, store):
         mapping_grid("ontology-map", token, sessions, store)
     with pytest.raises(Forbidden):
         draft_changeset(
-            [{"folder_id": "F", "job_id": "J", "seal_id": "S", "rationale": "r"}],
+            [{"folder_id": "F", "job_id": "J", "app_id": "S", "rationale": "r"}],
             token,
             sessions,
             store,
@@ -143,13 +143,13 @@ def test_changeset_artifact_shape(sessions, store):
             {
                 "folder_id": "F0001",
                 "job_id": "J0002",
-                "seal_id": "APP-9876",
+                "app_id": "APP-9876",
                 "rationale": "support team confirmed owner",
             },
             {
                 "folder_id": "F0001",
                 "job_id": "J0003",
-                "seal_id": "APP-9876",
+                "app_id": "APP-9876",
                 "rationale": "same series as J0002",
                 "create_target_if_missing": True,
             },
@@ -182,8 +182,8 @@ def test_changeset_artifact_shape(sessions, store):
     "bad,reason",
     [
         ([], "empty"),
-        ([{"folder_id": "F", "job_id": "J", "seal_id": "S", "rationale": "  "}], "rationale"),
-        ([{"folder_id": "", "job_id": "J", "seal_id": "S", "rationale": "r"}], "required"),
+        ([{"folder_id": "F", "job_id": "J", "app_id": "S", "rationale": "  "}], "rationale"),
+        ([{"folder_id": "", "job_id": "J", "app_id": "S", "rationale": "r"}], "required"),
     ],
 )
 def test_changeset_fails_closed(sessions, store, bad, reason):
@@ -229,7 +229,9 @@ def test_override_grid_carries_origin_flag(sessions, override_store):
     token = _token(sessions, "kchen2190")
     out = mapping_grid("seal-contact-override", token, sessions, override_store)
     assert "origin" in out["keys"]
-    flags = [(r["app_seal_id"], r["origin"], r["holder_sid"]) for r in out["rows"]]
+    # The GRID emits app_id (S3 / gate §E1); the committed FILE below keeps
+    # app_seal_id. That split is the contract, not an oversight.
+    flags = [(r["app_id"], r["origin"], r["holder_sid"]) for r in out["rows"]]
     assert flags == [
         ("APP-1234", "source", "U111111"),
         ("APP-1234", "override", "U222222"),
@@ -246,7 +248,7 @@ def test_draft_override_returns_full_updated_file(sessions, override_store):
     out = draft_override(
         [
             {
-                "app_seal_id": "APP-9012",
+                "app_id": "APP-9012",
                 "role_name": "l1 ops manager",
                 "seal_holder_sid": "U444444",
                 "override_holder_sid": "U555555",
@@ -261,6 +263,8 @@ def test_draft_override_returns_full_updated_file(sessions, override_store):
     rows = list(csv.DictReader(io.StringIO(out["csv"])))
     assert out["filename"] == "seal-contact-overrides.csv"
     assert out["entries"] == 1 and out["total_rows"] == 3
+    # The artifact IS config/overrides/seal-contact-overrides.csv, so it keeps the
+    # committed header app_seal_id even though the request field above is app_id.
     assert [r["app_seal_id"] for r in rows] == ["APP-1234", "APP-5678", "APP-9012"]
     new = rows[-1]
     assert new["role_name"] == "L1 Operate Manager"  # canonicalized
@@ -277,7 +281,7 @@ def test_draft_override_returns_full_updated_file(sessions, override_store):
         [],
         [
             {
-                "app_seal_id": "A",
+                "app_id": "A",
                 "role_name": "Head Chef",
                 "override_holder_sid": "U2",
                 "rationale": "r",
@@ -285,7 +289,7 @@ def test_draft_override_returns_full_updated_file(sessions, override_store):
         ],  # unknown role
         [
             {
-                "app_seal_id": "A",
+                "app_id": "A",
                 "role_name": "L2 Operate Manager",
                 "override_holder_sid": "U2",
                 "rationale": " ",
@@ -293,7 +297,7 @@ def test_draft_override_returns_full_updated_file(sessions, override_store):
         ],  # rationale required
         [
             {
-                "app_seal_id": "A",
+                "app_id": "A",
                 "role_name": "L2 Operate Manager",
                 "seal_holder_sid": "U2",
                 "override_holder_sid": "U2",
@@ -314,7 +318,7 @@ def test_override_endpoints_refuse_user_role(sessions, override_store):
         draft_override(
             [
                 {
-                    "app_seal_id": "A",
+                    "app_id": "A",
                     "role_name": "L2 Operate Manager",
                     "override_holder_sid": "U2",
                     "rationale": "r",

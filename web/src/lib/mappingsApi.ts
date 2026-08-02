@@ -31,7 +31,7 @@ export interface MappingOptions {
 export interface DraftEntry {
   folder_id: string
   job_id: string
-  seal_id: string
+  app_id: string
   rationale: string
   create_target_if_missing?: boolean
 }
@@ -50,7 +50,7 @@ export interface ChangesetArtifact {
 // the report is the AO-facing source-corrections artifact. Server writes
 // nothing; the graph is never touched by an override.
 export interface OverrideEntry {
-  app_seal_id: string
+  app_id: string
   role_name: string
   seal_holder_sid?: string
   override_holder_sid: string

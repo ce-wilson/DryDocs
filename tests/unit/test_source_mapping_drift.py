@@ -244,7 +244,9 @@ def test_census_with_uncounted_sweep_fails() -> None:
 # the internal twin when ledgered.
 LEDGER_PENDING = frozenset(
     {
-        "seal:app-extract",
+        # seal:app-extract left this list 2026-08-01 (S3) — it gained
+        # config/source-mappings/seal-extract.yaml, the ledger gate
+        # business-application-identity §B1(c) required.
         "pat:product-catalog",
         "pat:people-report",
         "repo:software-registry",

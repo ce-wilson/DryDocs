@@ -7,7 +7,8 @@
 //
 //   - MATCH both endpoints — this loader creates NO nodes on the automated
 //     path. Job identity = (folder_id, job_id) node key (controlm-psgmgr);
-//     Application identity = seal_id (seal-extract). A decision whose
+//     Application identity = app_id (seal-extract; the key flipped from seal_id
+//     at gate business-application-identity, 2026-07-27). A decision whose
 //     endpoints are absent writes nothing here and is surfaced by the
 //     loader as JobRun.dropped_in_graph (never a silent drop, §B).
 //   - PIN guard (§F): a job carrying a manually-asserted edge
@@ -29,7 +30,11 @@
 UNWIND $batch AS row
 
 MATCH (j:ControlMJob {folder_id: row.folder_id, job_id: row.job_id})
-MATCH (a:BusinessApplication {seal_id: row.seal_id})
+// IDENTITY KEY (gate business-application-identity §C1) — the canonical node is keyed on
+// app_id. row.seal_id keeps its name: it is the value a Control-M CMDLINE literally
+// carried, i.e. EVIDENCE, which §B2(ii) rules stays in the source's own terms. Same
+// reason match_method below is still 'seal'.
+MATCH (a:BusinessApplication {app_id: row.seal_id})
 WHERE NOT EXISTS {
   MATCH (j)-[m:WAS_ASSOCIATED_WITH {role: 'seal_app_ref'}]->(:BusinessApplication)
   WHERE m.match_method = 'manual'

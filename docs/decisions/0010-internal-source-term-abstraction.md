@@ -334,15 +334,15 @@ contract in the next commit that touches them.**
 
 ## Action items
 
-*(Amended at S1. Items 1 and 4 are DONE — the gate ran 2026-07-27 and corrected the taxonomy
-file at sign-off. The rest are backlog **S3**, now unblocked.)*
+*(Amended at S1; items 2/3/9 closed by the **S3 build, 2026-08-01**. Items 1 and 4 were done
+at the gate itself, 2026-07-27.)*
 
 1. [x] Gate spec in `config/gate-prompts/` for the identity reshape; routed and recorded in `config/gate-log.md` — **SIGNED OFF 2026-07-27, 22/22 confirmed, 0 edits.**
-2. [ ] Phase 1: loaders write `app_id` alongside `seal_id` across **all 8 key-bearing sites in one atomic change** (4 MERGE, 4 MATCH — §C1); add the `app_id` constraint; add a `graph-tests/` rule asserting `app_id = seal_id` during the transition. `:Port` follows now (§D1) — DROP the old constraint first, since `CREATE CONSTRAINT ... IF NOT EXISTS` matches on name and would silently no-op.
-3. [ ] Phase 2 (**do this before more console routes land**): `drydocs_api/query_specs.py` and `web/src/**` emit `app_id` only; rename `app_seal_id` in `mappingsDemo.ts`. **Do NOT reword `match_method: 'seal_var'`** — rule 2 keeps evidence vocabulary as the source wrote it (this reverses the v1 instruction).
+2. [x] **Phase 1 — DONE (S3).** All 8 key-bearing sites flipped in one change: the MERGE key is `app_id` at `seal_applications:19`, `manual_seal_attribution:32`, `pat_product_mapping:64`, `software_registry:52`, and the four MATCHes (`batch_port_orchestrator`, `manual_seal_attribution:41`, `seal_attribution`, `seal_contacts`) read it. `seal_id` is dual-written from the same row value as a deprecated alias. New constraint `businessapplication_app_id`; `businessapplication_seal` retained. `:Port` NODE KEY → `port_app_key (parent_app_id, kind)`, with `port_unique` DROPped first. New suite `graph-tests/business-application-identity.yaml` (5 cases) asserts `app_id = seal_id` and the §C2 double.
+3. [x] **Phase 2 — DONE (S3).** `query_specs.py` (6 specs) and `mappings.py` emit `app_id`; `web/src` (`mappingsDemo.ts`, `mappingsApi.ts`, `MappingsRoute.tsx`, `assetSearch.ts`) follows. `match_method` values UNCHANGED per rule 2 — the fixture's invented `'seal_var'` was corrected to the real `'seal'`, which is the opposite of renaming it.
 4. [x] `config/taxonomy/business-application.yaml` corrected at sign-off: `identifier: SEALID` → `"Application ID"`, the export's real header.
 5. [ ] ~~Add the URN form~~ — DEFERRED with §B3's named trigger, not an open item.
-6. [ ] Phase 3–4: migrate loader Cypher and gate pages; gate the `seal_id` retirement.
+6. [ ] Phase 3–4: migrate the remaining loader Cypher prose and gate pages; gate the `seal_id` retirement (§G3). **Carries S3's named residual:** the committed FILE formats still say `seal_id` — the manual-load `target_key=seal_id=<value>` grammar (`manual_mappings.py` refuses a row without it) and the override CSV header `app_seal_id` (`OVERRIDE_HEADER`). S3 aliased at the wire and left the files alone deliberately; renaming them stops every already-committed CSV from parsing, so they belong to the retirement gate.
 7. [ ] Feed the glossary rule into the **Q6** disposition and the domain-scoped acronym-catalog idea (`docs/restructure/IDEAS.md` L51/L74) — where SEAL/PAT/AIS get defined.
 8. [ ] Port-sequence through `docs/port-prompt.md` before any other wide structural port.
-9. [ ] Write the missing seal-extract column ledger at `config/source-mappings/seal-extract.yaml` (§B1(c)/§B6) — declarative and guard-reconciled by `test_source_mapping_drift.py`, **not** a runtime mapping.
+9. [x] **DONE (S3):** `config/source-mappings/seal-extract.yaml` written — 87 + 5 column rows transcribed from `models/seal.py` and the two loaders, `census: pending`, the identity row recorded as `Application ID → BusinessApplication.app_id`. Registered at the dataset's `locator.mapping` and removed from `test_source_mapping_drift.py`'s `LEDGER_PENDING`. Still DECLARATIVE per §B6 — no loader reads it.

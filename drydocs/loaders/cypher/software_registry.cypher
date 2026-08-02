@@ -49,8 +49,11 @@ SET m.last_seen_at = datetime($loaded_at),
 // property, so this stays idempotent against pre-C14 graphs.
 WITH row, sp
 WHERE row.used_by_app_id IS NOT NULL
-MERGE (a:BusinessApplication {seal_id: row.used_by_app_id})
-  ON CREATE SET a.name       = 'DryDocs',
+// IDENTITY KEY (gate business-application-identity §C1/§C2) — neutral app_id;
+// seal_id dual-written as a deprecated alias.
+MERGE (a:BusinessApplication {app_id: row.used_by_app_id})
+  ON CREATE SET a.seal_id     = row.used_by_app_id,   // deprecated alias — phase 3
+                a.name       = 'DryDocs',
                 a.first_seen_at = datetime($loaded_at),
                 a.source     = 'registry'
 MERGE (a)-[u:USES_SOFTWARE {source: 'registry'}]->(sp)

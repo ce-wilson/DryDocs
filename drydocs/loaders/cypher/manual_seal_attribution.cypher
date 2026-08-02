@@ -28,9 +28,14 @@ UNWIND $batch AS row
 MATCH (j:ControlMJob {folder_id: row.folder_id, job_id: row.job_id})
 
 // §F.4 — SME-authorized node creation only, stamped as manual tech debt.
+// IDENTITY KEY (gate business-application-identity §C1/§C2): the graph property is the
+// neutral app_id; the manual-CSV COLUMN is still called seal_id, which is the two-part
+// rule working as ruled — identity takes a neutral name, the source's own term is kept
+// where it records what the source wrote. seal_id is dual-written as a deprecated alias.
 FOREACH (_ IN CASE WHEN row.create_target_if_missing THEN [1] ELSE [] END |
-  MERGE (n:BusinessApplication {seal_id: row.seal_id})
-    ON CREATE SET n.manually_created  = true,
+  MERGE (n:BusinessApplication {app_id: row.seal_id})
+    ON CREATE SET n.seal_id           = row.seal_id,   // deprecated alias — phase 3
+                  n.manually_created  = true,
                   n.manual_load_file  = row.manual_load_file,
                   n.authored_by       = row.authored_by,
                   n.first_seen_at        = datetime($loaded_at),
@@ -38,7 +43,7 @@ FOREACH (_ IN CASE WHEN row.create_target_if_missing THEN [1] ELSE [] END |
 )
 
 WITH j, row
-MATCH (a:BusinessApplication {seal_id: row.seal_id})
+MATCH (a:BusinessApplication {app_id: row.seal_id})
 
 MERGE (j)-[r:WAS_ASSOCIATED_WITH {role: 'seal_app_ref'}]->(a)
   ON CREATE SET r.first_seen_at    = datetime($loaded_at),

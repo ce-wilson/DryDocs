@@ -36,8 +36,12 @@ VOCAB_FILE = ONTOLOGY_DIR / "relationship_vocabulary.yaml"
 # controlmhostgroup_key (data_center, name) NODE KEY + executionhost_nodeid.
 # 51 after the G33 self-documentation code graph (gate
 # self-documentation-code-graph 2026-07-27): project_id + codemodule_file_id.
+# 52 after the BusinessApplication identity cutover (S3; gate
+# business-application-identity 2026-07-27): +businessapplication_app_id, and
+# port_unique -> port_app_key (a DROP + a rename, so the CREATE count is
+# unchanged by that half — see the trap comment in constraints.cypher).
 # Bump this when you intentionally add/remove a CREATE CONSTRAINT.
-EXPECTED_CONSTRAINTS = 51
+EXPECTED_CONSTRAINTS = 52
 
 # SchedulerKind removed 2026-07-21 (C12 platforms-taxonomy gate): its seeds are
 # retired (commented, audit-kept) in ontology.cypher — no longer a seeded label.
@@ -61,9 +65,19 @@ def test_schema_files_exist() -> None:
     assert ONTOLOGY_FILE.exists(), f"Missing: {ONTOLOGY_FILE}"
 
 
+# A DECLARATION only — anchored at line start, so a `//` comment that quotes the
+# DDL is prose, not a constraint. Both checks below read the file as text, and
+# constraints.cypher documents its own traps in comments (the port_app_key rename
+# has to spell out why re-declaring under the same name is a silent no-op). Without
+# the anchor those comments inflate the count and false-fail the idempotence check.
+# This mirrors drydocs_core/schema/constraints.py's `_DECLARATION_RE`, which the
+# bootstrap presence guard already keys on — one reading of "a declaration", not two.
+_DECLARATION_LINE = re.compile(r"^\s*CREATE CONSTRAINT\b")
+
+
 def test_constraint_count() -> None:
     text = CONSTRAINTS_FILE.read_text(encoding="utf-8")
-    found = len(re.findall(r"CREATE CONSTRAINT", text))
+    found = sum(1 for line in text.splitlines() if _DECLARATION_LINE.match(line))
     assert found == EXPECTED_CONSTRAINTS, (
         f"Expected {EXPECTED_CONSTRAINTS} constraints, found {found}. "
         "Update EXPECTED_CONSTRAINTS if you intentionally added or removed constraints."
@@ -75,7 +89,7 @@ def test_constraints_are_idempotent() -> None:
     non_idempotent = [
         line.strip()
         for line in text.splitlines()
-        if "CREATE CONSTRAINT" in line and "IF NOT EXISTS" not in line
+        if _DECLARATION_LINE.match(line) and "IF NOT EXISTS" not in line
     ]
     assert not non_idempotent, "Constraints missing IF NOT EXISTS (not idempotent):\n" + "\n".join(
         non_idempotent

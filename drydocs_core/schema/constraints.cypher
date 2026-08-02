@@ -33,15 +33,37 @@ CREATE CONSTRAINT product_line_id     IF NOT EXISTS FOR (pl:ProductLine)        
 CREATE CONSTRAINT product_id          IF NOT EXISTS FOR (p:Product)             REQUIRE p.product_id IS UNIQUE;
 
 // --- Application + ports -----------------------------------------------------
+// IDENTITY (gate business-application-identity, 2026-07-27; ADR 0010): the canonical
+// node's key is the NEUTRAL app_id. businessapplication_seal is RETAINED, not replaced —
+// seal_id is still dual-written as a deprecated alias through phase 3, and its retirement
+// is a separate later gate (§G3). The constraint NAME keeping "seal" is deliberate and
+// listed at §F1(5) as one of the six legitimate homes for the registry name: it is a
+// schema-object name, and it is the most operator-visible one (it prints in
+// SHOW CONSTRAINTS and in the text of every uniqueness-violation error).
+CREATE CONSTRAINT businessapplication_app_id  IF NOT EXISTS FOR (a:BusinessApplication)         REQUIRE a.app_id IS UNIQUE;
 CREATE CONSTRAINT businessapplication_seal    IF NOT EXISTS FOR (a:BusinessApplication)         REQUIRE a.seal_id IS UNIQUE;
 CREATE INDEX      businessapplication_status  IF NOT EXISTS FOR (a:BusinessApplication)         ON  (a.status);
 CREATE INDEX      businessapplication_risk    IF NOT EXISTS FOR (a:BusinessApplication)         ON  (a.risk_level);
 CREATE INDEX      businessapplication_name    IF NOT EXISTS FOR (a:BusinessApplication)         ON  (a.name);
 
 // Two-port pattern: each Application has exactly one EventProcessing and one
-// BatchProcessing child. Composite uniqueness on (parent_seal_id, kind) lets
+// BatchProcessing child. Composite uniqueness on (parent_app_id, kind) lets
 // us enforce that without modeling the relationship inside the constraint.
-CREATE CONSTRAINT port_unique         IF NOT EXISTS FOR (p:Port)                REQUIRE (p.parent_seal_id, p.kind) IS NODE KEY;
+//
+// TRAP (gate §D1, and the reason the DROP below is not optional): `CREATE CONSTRAINT
+// <name> IF NOT EXISTS` matches on the NAME, not the definition. Redefining port_unique
+// under its own name would SUCCEED AND DO NOTHING, silently leaving the old
+// (parent_seal_id, kind) key live while the loader writes parent_app_id — every Port
+// then has a null in the old key, which a NODE KEY would reject on write but which an
+// already-created constraint never re-validates. Belt and braces: DROP the old name AND
+// create under a new one, so an operator reading SHOW CONSTRAINTS sees the change.
+//
+// Against a graph loaded BEFORE this change the CREATE fails loudly (a NODE KEY requires
+// both properties to exist, and those Ports carry parent_seal_id only). That is the
+// intended outcome, not a regression: §C4 ruled wipe-and-rebuild, so the fix is to
+// rebuild — a bootstrap that quietly succeeded here would be the silent-double failure.
+DROP CONSTRAINT port_unique IF EXISTS;
+CREATE CONSTRAINT port_app_key        IF NOT EXISTS FOR (p:Port)                REQUIRE (p.parent_app_id, p.kind) IS NODE KEY;
 
 // --- People / org chart ------------------------------------------------------
 CREATE CONSTRAINT area_product_id     IF NOT EXISTS FOR (ap:AreaProduct)        REQUIRE ap.area_product_id IS UNIQUE;

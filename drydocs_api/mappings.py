@@ -55,7 +55,7 @@ DOMAINS: tuple[dict, ...] = (
     },
     {
         "id": "fid-seal",
-        "title": "FID → seal_id (tier 2)",
+        "title": "FID → app_id (tier 2)",
         "kind": "manual",
         "source": "(K6/T2 — reconciler table not built yet)",
         "tier": 2,
@@ -63,7 +63,7 @@ DOMAINS: tuple[dict, ...] = (
     },
     {
         "id": "alias-seal",
-        "title": "ALIAS → seal_id (tier 4)",
+        "title": "ALIAS → app_id (tier 4)",
         "kind": "manual",
         "source": "(T3 — reconciler table not built yet)",
         "tier": 4,
@@ -86,6 +86,13 @@ DOMAINS: tuple[dict, ...] = (
 
 # The committed override-list column order — the draft artifact reproduces the
 # WHOLE file (existing rows + drafts) so committing it is a plain replace.
+#
+# S3 BOUNDARY (gate business-application-identity §E1): the WIRE emits app_id — the
+# committed FILE keeps app_seal_id. §E1 rules routes, QuerySpecs, column headers and
+# fixtures, not the format of an already-committed CSV: renaming this tuple renames the
+# header of config/overrides/seal-contact-overrides.csv, which mapping_store.py ingests
+# by name, so every committed override list would stop parsing. The file format follows
+# when §G3's separate gate retires the alias.
 OVERRIDE_HEADER = (
     "app_seal_id",
     "role_name",
@@ -157,15 +164,18 @@ class MappingStore:
                 "prov_maps_to, matrix_row, vocab_id, status, confirmed_on, applied_on "
                 "FROM ontology_mapping ORDER BY seq"
             )
+        # The SELECT aliases are where the S3 boundary sits: the derived table keeps the
+        # committed file's column name, the grid the console receives emits app_id
+        # (gate business-application-identity §E1 / ADR 0010 rule 4).
         if domain_id == "job-application":
             return self._select(
-                "SELECT file, folder_id, job_id, seal_id, create_target_if_missing, "
-                "authored_by, authored_on, note "
+                "SELECT file, folder_id, job_id, seal_id AS app_id, "
+                "create_target_if_missing, authored_by, authored_on, note "
                 "FROM manual_mapping ORDER BY file, line_no"
             )
         if domain_id == "seal-contact-override":
             return self._select(
-                "SELECT app_seal_id, role_name, origin, holder_sid, holder_name, "
+                "SELECT app_seal_id AS app_id, role_name, origin, holder_sid, holder_name, "
                 "rationale, authored_by, authored_on, status "
                 "FROM v_seal_contact_grid"
             )
@@ -260,11 +270,11 @@ def draft_changeset(
     for i, entry in enumerate(entries, start=1):
         folder_id = str(entry.get("folder_id") or "").strip()
         job_id = str(entry.get("job_id") or "").strip()
-        seal_id = str(entry.get("seal_id") or "").strip()
+        app_id = str(entry.get("app_id") or "").strip()
         rationale = str(entry.get("rationale") or "").strip()
-        if not (folder_id and job_id and seal_id):
+        if not (folder_id and job_id and app_id):
             raise ChangesetValidationError(
-                f"entry {i}: folder_id, job_id and seal_id are all required"
+                f"entry {i}: folder_id, job_id and app_id are all required"
             )
         if not rationale:
             raise ChangesetValidationError(
@@ -278,7 +288,12 @@ def draft_changeset(
                 K2_SHAPE["relationship"],
                 f"role={K2_SHAPE['role']}",
                 K2_SHAPE["target_label"],
-                f"seal_id={seal_id}",
+                # S3 BOUNDARY: the manual-load CSV's target_key grammar is unchanged.
+                # manual_mappings.py parses `seal_id=<value>` by name and refuses a row
+                # without it, so every committed config/manual-loads/*.csv (and the
+                # TEMPLATE) would stop loading if this emitted app_id. The wire field
+                # above is app_id; the file format follows at §G3's retirement gate.
+                f"seal_id={app_id}",
                 "true" if entry.get("create_target_if_missing") else "false",
                 rationale,
                 session.persona_id,
@@ -334,13 +349,13 @@ def draft_override(
     existing = store.override_rows()
     new_rows: list[dict] = []
     for i, entry in enumerate(entries, start=1):
-        app = str(entry.get("app_seal_id") or "").strip()
+        app = str(entry.get("app_id") or "").strip()
         role = canonicalize_role(entry.get("role_name"))
         seal_sid = str(entry.get("seal_holder_sid") or "").strip()
         override_sid = str(entry.get("override_holder_sid") or "").strip()
         rationale = str(entry.get("rationale") or "").strip()
         if not app:
-            raise ChangesetValidationError(f"entry {i}: app_seal_id is required")
+            raise ChangesetValidationError(f"entry {i}: app_id is required")
         if role is None:
             raise ChangesetValidationError(
                 f"entry {i}: role_name {entry.get('role_name')!r} does not "
@@ -359,6 +374,7 @@ def draft_override(
             )
         new_rows.append(
             {
+                # File-column name — see the OVERRIDE_HEADER boundary note above.
                 "app_seal_id": app,
                 "role_name": role,
                 "seal_holder_sid": seal_sid,
@@ -414,7 +430,7 @@ def source_corrections_report(
         "",
         f"Outstanding corrections: {len(rows)}",
         "",
-        "| Application (seal_id) | Role | SEAL currently shows | Correct to | Authored | Rationale |",
+        "| Application (app_id) | Role | SEAL currently shows | Correct to | Authored | Rationale |",
         "|---|---|---|---|---|---|",
     ]
     for r in rows:

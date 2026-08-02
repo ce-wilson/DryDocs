@@ -1,0 +1,73 @@
+# business-application-identity suite — the S3 identity cutover invariants
+# (gate business-application-identity, SIGNED OFF 2026-07-27; ADR 0010).
+#
+# §C3 requires ONE rule: `app_id = seal_id` on every :BusinessApplication for as
+# long as both are written. The other cases here guard the failure mode that made
+# this a gate rather than a rename — §C2's SILENT DOUBLE. A Neo4j uniqueness
+# constraint IGNORES NULLS, so a loader left MERGEing on the old key does not
+# violate anything: it quietly creates a SECOND canonical node for an application
+# that already exists. Nothing throws, no count looks wrong in isolation, and the
+# console reads one of the two. These cases are how that shows up as a failure.
+#
+# TIME-BOXED. TC-02 is only meaningful while seal_id is dual-written (phases 1-3).
+# When the deprecated alias is retired — a SEPARATE later gate, §G3, deliberately
+# not decided at this one — TC-02 must be REMOVED, not "fixed". Deleting it then is
+# the correct act; a session that instead relaxes it to tolerate a null seal_id has
+# turned the drift detector off while leaving it looking alive.
+#
+# classification: Internal-Public (shape/consistency only — no counts, no real ids).
+#
+# No `targets:` — the review spine (config/review-labels.yaml) maps Control-M and
+# docs SOURCES to their labels and has no entry covering :BusinessApplication or
+# :Port. Declaring labels the spine cannot check is the drift these suites exist to
+# catch (the sibling seal-attribution-coverage suite still names a retired
+# `Application` label, which is what that looks like once it has set).
+classification: Internal-Public
+schema: drydocs.graph-tests.v1
+suite: business-application-identity
+description: >
+  Identity invariants for the canonical :BusinessApplication node after the
+  seal_id -> app_id cutover: the neutral key is present on every node, the
+  deprecated seal_id alias never drifts from it while both are written, and the
+  :Port NODE KEY (parent_app_id, kind) agrees with the parent it hangs off.
+cases:
+  - id: TC-01
+    description: every :BusinessApplication carries the canonical neutral key (§C1 — a node with a null app_id is one a pre-cutover loader created behind the constraint's back, since uniqueness ignores nulls)
+    cypher: >
+      MATCH (a:BusinessApplication)
+      WHERE a.app_id IS NULL
+      RETURN a.name AS name, a.source AS source
+    assert: empty
+
+  - id: TC-02
+    description: the deprecated seal_id alias equals app_id on every node (§C3 — REMOVE this case when §G3 retires the alias; do not relax it)
+    cypher: >
+      MATCH (a:BusinessApplication)
+      WHERE a.seal_id IS NULL OR a.seal_id <> a.app_id
+      RETURN a.app_id AS app_id, a.seal_id AS seal_id, a.source AS source
+    assert: empty
+
+  - id: TC-03
+    description: no two canonical nodes share an identity value across the two keys — the §C2 silent double, which no constraint can catch because it spans two properties
+    cypher: >
+      MATCH (a:BusinessApplication)
+      WITH coalesce(a.app_id, a.seal_id) AS identity, count(a) AS nodes
+      WHERE identity IS NOT NULL AND nodes > 1
+      RETURN identity, nodes
+    assert: empty
+
+  - id: TC-04
+    description: the :Port NODE KEY followed its parent (§D1(a)) — every port's parent_app_id matches the application it hangs off
+    cypher: >
+      MATCH (a:BusinessApplication)-[:HAS_PORT]->(p:Port)
+      WHERE p.parent_app_id IS NULL OR p.parent_app_id <> a.app_id
+      RETURN a.app_id AS app_id, p.kind AS kind, p.parent_app_id AS parent_app_id
+    assert: empty
+
+  - id: TC-05
+    description: no :Port still carries the retired parent_seal_id — unlike seal_id this key was flipped outright, because the gate measured zero readers to protect
+    cypher: >
+      MATCH (p:Port)
+      WHERE p.parent_seal_id IS NOT NULL
+      RETURN p.kind AS kind, p.parent_seal_id AS stale_key
+    assert: empty

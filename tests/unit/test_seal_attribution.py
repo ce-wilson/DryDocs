@@ -292,7 +292,11 @@ def test_automated_cypher_creates_no_nodes() -> None:
     assert len(merges) == 1, "the automated path MERGEs exactly one thing: the edge"
     assert "MERGE (j)-[r:WAS_ASSOCIATED_WITH {role: 'seal_app_ref'}]->(a)" in code
     assert "MATCH (j:ControlMJob {folder_id: row.folder_id, job_id: row.job_id})" in code
-    assert "MATCH (a:BusinessApplication {seal_id: row.seal_id})" in code
+    # S3 / gate business-application-identity §C1: the canonical node is keyed on the
+    # neutral app_id. `row.seal_id` keeps its name on purpose — it is the value a
+    # Control-M CMDLINE carried, i.e. evidence, which §B2(ii) rules stays in the
+    # source's own terms. The two halves of the two-part rule, on one line.
+    assert "MATCH (a:BusinessApplication {app_id: row.seal_id})" in code
 
 
 def test_automated_cypher_on_create_set_split_matches_the_gate() -> None:

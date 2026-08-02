@@ -265,7 +265,7 @@ export function pathCypher(needle: string): string {
     `//            EMITS_OUT_CONDITION · REQUIRES_IN_CONDITION · WAS_INFORMED_BY\n` +
     `//   planned: WRITES_TO · READS_FROM · USED\n` +
     `MATCH p = SHORTEST 1\n` +
-    `  (a:BusinessApplication {seal_id: $source})\n` +
+    `  (a:BusinessApplication {app_id: $source})\n` +
     `  -[:WAS_ASSOCIATED_WITH|CONTAINS_JOB|CONTAINS_FOLDER|EMITS_OUT_CONDITION|\n` +
     `     REQUIRES_IN_CONDITION|WAS_INFORMED_BY|WRITES_TO|READS_FROM|USED]-{1,12}\n` +
     `  (fn WHERE (fn:File OR fn:DataAsset)\n` +

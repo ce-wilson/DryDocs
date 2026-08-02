@@ -498,9 +498,16 @@ datasets:
     authority: SOR
     feeds_taxonomy: [applications, ports, memberships, roles, employees]
     adapter: csv                        # CsvAdapter (samples) / internal extract in prod
+    locator:
+      mapping: config/source-mappings/seal-extract.yaml   # column ledger (S3; gate business-application-identity §B1(c))
     confirmed: true                     # live since the M1 chain; transfers per Q6
     replaces: seal-extract
-    notes: "Live. SEAL applications + ownership."
+    notes: >
+      Live. SEAL applications + ownership. The column ledger landed 2026-08-01 (S3)
+      as the gate's replacement for the withdrawn per-node id_authority: it records
+      that the source's `Application ID` column is what :BusinessApplication.app_id
+      is keyed on. DECLARATIVE only (§B6) — no loader reads it. Both
+      seal_applications.py and seal_contacts.py bind to this dataset id.
 
   # ---- PAT (the T19 naming ruling: neither legacy string survives) -----------
   - id: "pat:product-catalog"

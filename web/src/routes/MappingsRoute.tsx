@@ -34,7 +34,7 @@ interface TrayEntry {
   folder_id: string
   job_id: string
   jobLabel: string
-  seal_id: string
+  app_id: string
   rationale: string
   createTarget: boolean
   authoredAt: string
@@ -46,13 +46,17 @@ interface TrayEntry {
 const FALLBACK_DOMAINS: MappingDomain[] = [
   { id: 'ontology-map', title: 'Taxonomy ↔ Ontology map (the loading quintuple)', kind: 'quintuple', source: 'config/taxonomy-ontology-map.yaml', tier: null, available: true },
   { id: 'job-application', title: 'Job → Application (tier-5 manual CSV)', kind: 'manual', source: 'config/manual-loads/', tier: 5, available: true },
-  { id: 'fid-seal', title: 'FID → seal_id (tier 2)', kind: 'manual', source: '(K6/T2 — reconciler table not built yet)', tier: 2, available: false },
-  { id: 'alias-seal', title: 'ALIAS → seal_id (tier 4)', kind: 'manual', source: '(T3 — reconciler table not built yet)', tier: 4, available: false },
+  { id: 'fid-seal', title: 'FID → app_id (tier 2)', kind: 'manual', source: '(K6/T2 — reconciler table not built yet)', tier: 2, available: false },
+  { id: 'alias-seal', title: 'ALIAS → app_id (tier 4)', kind: 'manual', source: '(T3 — reconciler table not built yet)', tier: 4, available: false },
   { id: 'seal-contact-override', title: 'SEAL contacts — operate-manager override list (L1/L2)', kind: 'override', source: 'config/overrides/seal-contact-overrides.csv', tier: null, available: true },
 ]
 
 function trayStorageKey(personaId: string): string {
-  return `drydocs.mappings.tray.v1.${personaId}`
+  // v2 (S3, 2026-08-01): TrayEntry.seal_id became app_id. The key is versioned exactly
+  // so a shape change drops the old tray instead of reading it back with an undefined
+  // target — a v1 entry rendered under v2 would show a draft with no application and
+  // submit it that way. Trays hold UNSUBMITTED drafts only, so nothing durable is lost.
+  return `drydocs.mappings.tray.v2.${personaId}`
 }
 
 function loadTray(personaId: string): TrayEntry[] {
@@ -182,7 +186,7 @@ export default function MappingsRoute({ persona }: { persona: Persona }) {
     if (filter) {
       const needle = filter.toLowerCase()
       rows = rows.filter((r) =>
-        [r.folder, r.job, r.seal_id, r.application, r.match_method, r.status].some((v) =>
+        [r.folder, r.job, r.app_id, r.application, r.match_method, r.status].some((v) =>
           String(v ?? '').toLowerCase().includes(needle),
         ),
       )
@@ -212,14 +216,14 @@ export default function MappingsRoute({ persona }: { persona: Persona }) {
     (e: TrayEntry): Lifecycle => {
       if (e.lifecycle !== 'draft' && coverageLive) {
         const row = (coverage ?? []).find((r) => rowKey(r) === e.key)
-        if (row?.match_method === 'manual' && row.seal_id === e.seal_id) return 'loaded'
+        if (row?.match_method === 'manual' && row.app_id === e.app_id) return 'loaded'
       }
       return e.lifecycle
     },
     [coverage, coverageLive],
   )
 
-  function addDrafts(sealId: string, rationale: string, createTarget: boolean) {
+  function addDrafts(appId: string, rationale: string, createTarget: boolean) {
     const authoredAt = new Date().toISOString()
     setTray((prev) => {
       const next = [...prev]
@@ -230,7 +234,7 @@ export default function MappingsRoute({ persona }: { persona: Persona }) {
           folder_id: r.folder_id,
           job_id: r.job_id,
           jobLabel: `${r.folder}/${r.job}`,
-          seal_id: sealId,
+          app_id: appId,
           rationale,
           createTarget,
           authoredAt,
@@ -256,7 +260,7 @@ export default function MappingsRoute({ persona }: { persona: Persona }) {
         drafts.map((e) => ({
           folder_id: e.folder_id,
           job_id: e.job_id,
-          seal_id: e.seal_id,
+          app_id: e.app_id,
           rationale: e.rationale,
           create_target_if_missing: e.createTarget,
         })),
@@ -415,7 +419,7 @@ export default function MappingsRoute({ persona }: { persona: Persona }) {
                             <td className="border-b border-edge-soft px-2.5 py-1.5 text-text">{r.folder}</td>
                             <td className="border-b border-edge-soft px-2.5 py-1.5 text-text">{r.job}</td>
                             <td className="border-b border-edge-soft px-2.5 py-1.5 text-text">
-                              {r.seal_id ? `${r.seal_id}${r.application ? ` · ${r.application}` : ''}` : '—'}
+                              {r.app_id ? `${r.app_id}${r.application ? ` · ${r.application}` : ''}` : '—'}
                             </td>
                             <td className="border-b border-edge-soft px-2.5 py-1.5 font-mono text-[11px] text-muted">
                               {r.match_method ?? '—'}
@@ -485,7 +489,7 @@ export default function MappingsRoute({ persona }: { persona: Persona }) {
                       </span>
                       <LifecycleChip lifecycle={lc} />
                     </div>
-                    <div className="mt-0.5 font-mono text-[10px] text-muted">→ {e.seal_id}</div>
+                    <div className="mt-0.5 font-mono text-[10px] text-muted">→ {e.app_id}</div>
                     <div className="mt-0.5 truncate text-[10px] text-faint" title={e.rationale}>
                       {e.rationale}
                     </div>
@@ -617,7 +621,7 @@ function DomainGridTable({ grid, apiDown }: { grid: MappingGrid | null; apiDown:
 const SEAL_ROLES_SPEC = 'mappings.seal-contact-roles.v1'
 
 interface SealRoleRow {
-  app_seal_id: string
+  app_id: string
   application: string | null
   role_name: string
   level: string | null
@@ -666,12 +670,12 @@ function SealOverridePane({
       ? [...DEMO_OVERRIDE_GRID]
       : ((grid?.rows ?? []) as unknown as OverrideGridRow[])
     const covered = new Set(
-      stored.filter((r) => r.origin === 'source').map((r) => `${r.app_seal_id}|${r.role_name}`),
+      stored.filter((r) => r.origin === 'source').map((r) => `${r.app_id}|${r.role_name}`),
     )
     const live: OverrideGridRow[] = (liveSource ?? [])
-      .filter((s) => !covered.has(`${s.app_seal_id}|${s.role_name}`))
+      .filter((s) => !covered.has(`${s.app_id}|${s.role_name}`))
       .map((s) => ({
-        app_seal_id: s.app_seal_id,
+        app_id: s.app_id,
         role_name: s.role_name,
         origin: 'source' as const,
         holder_sid: s.holder_sid,
@@ -683,7 +687,7 @@ function SealOverridePane({
       }))
     return [...stored, ...live].sort(
       (a, b) =>
-        a.app_seal_id.localeCompare(b.app_seal_id) ||
+        a.app_id.localeCompare(b.app_id) ||
         a.role_name.localeCompare(b.role_name) ||
         (a.origin === b.origin ? 0 : a.origin === 'source' ? -1 : 1),
     )
@@ -767,7 +771,7 @@ function SealOverridePane({
             <tbody>
               {rows.map((r, i) => (
                 <tr key={i} className={i % 2 ? 'bg-bg-2/40' : ''}>
-                  <td className="border-b border-edge-soft px-2.5 py-1.5 font-mono text-[11px] text-text">{r.app_seal_id}</td>
+                  <td className="border-b border-edge-soft px-2.5 py-1.5 font-mono text-[11px] text-text">{r.app_id}</td>
                   <td className="border-b border-edge-soft px-2.5 py-1.5 text-text">{r.role_name}</td>
                   <td className="border-b border-edge-soft px-2.5 py-1.5">
                     <OriginChip origin={r.origin} />
@@ -790,7 +794,7 @@ function SealOverridePane({
                         title="Draft a correction for this SEAL value"
                         onClick={() =>
                           setDialogSeed({
-                            app_seal_id: r.app_seal_id,
+                            app_id: r.app_id,
                             role_name: r.role_name,
                             seal_holder_sid: r.holder_sid ?? '',
                           })
@@ -813,7 +817,7 @@ function SealOverridePane({
           <span className="text-[11px] text-muted">
             {drafts.length} draft override{drafts.length === 1 ? '' : 's'}:{' '}
             <span className="font-mono text-[10px]">
-              {drafts.map((d) => `${d.app_seal_id}/${d.role_name}→${d.override_holder_sid}`).join(', ')}
+              {drafts.map((d) => `${d.app_id}/${d.role_name}→${d.override_holder_sid}`).join(', ')}
             </span>
           </span>
           <button
@@ -843,7 +847,7 @@ function SealOverridePane({
           onDraft={(entry) => {
             setDrafts((prev) => [...prev, entry])
             setDialogSeed(null)
-            setStatus(`override drafted for ${entry.app_seal_id} / ${entry.role_name}`)
+            setStatus(`override drafted for ${entry.app_id} / ${entry.role_name}`)
           }}
         />
       )}
@@ -868,7 +872,7 @@ function OverrideDialog({
   onCancel: () => void
   onDraft: (entry: OverrideEntry) => void
 }) {
-  const [app, setApp] = useState(seed.app_seal_id ?? '')
+  const [app, setApp] = useState(seed.app_id ?? '')
   const [role, setRole] = useState(seed.role_name ?? 'L2 Operate Manager')
   const [sealSid, setSealSid] = useState(seed.seal_holder_sid ?? '')
   const [sid, setSid] = useState('')
@@ -888,7 +892,7 @@ function OverrideDialog({
         </p>
 
         <label className="mt-3 block text-xs font-medium text-muted">
-          Application seal_id
+          Application ID
           <input type="text" value={app} onChange={(e) => setApp(e.target.value)} placeholder="APP-…" className="mt-1 w-full font-mono text-xs" />
         </label>
         <label className="mt-2 block text-xs font-medium text-muted">
@@ -929,7 +933,7 @@ function OverrideDialog({
             disabled={!app.trim() || !sid.trim() || !rationale.trim() || notACorrection}
             onClick={() =>
               onDraft({
-                app_seal_id: app.trim(),
+                app_id: app.trim(),
                 role_name: role,
                 seal_holder_sid: sealSid.trim() || undefined,
                 override_holder_sid: sid.trim(),
@@ -948,7 +952,7 @@ function OverrideDialog({
 }
 
 interface AppOption {
-  seal_id: string
+  app_id: string
   name: string
 }
 
@@ -961,11 +965,11 @@ function AssignDialog({
   rows: CoverageRow[]
   access: ReturnType<typeof createApiAccess>
   onCancel: () => void
-  onAssign: (sealId: string, rationale: string, createTarget: boolean) => void
+  onAssign: (appId: string, rationale: string, createTarget: boolean) => void
 }) {
   const [apps, setApps] = useState<AppOption[] | null>(null)
   const [search, setSearch] = useState('')
-  const [sealId, setSealId] = useState('')
+  const [appId, setSealId] = useState('')
   const [rationale, setRationale] = useState('')
   const [createTarget, setCreateTarget] = useState(false)
 
@@ -977,7 +981,7 @@ function AssignDialog({
         if (!cancelled) setApps(r.rows as unknown as AppOption[])
       })
       .catch(() => {
-        if (!cancelled) setApps([]) // picker degrades to free-text seal_id entry
+        if (!cancelled) setApps([]) // picker degrades to free-text app_id entry
       })
     return () => {
       cancelled = true
@@ -988,7 +992,7 @@ function AssignDialog({
     if (!apps) return []
     const needle = search.toLowerCase()
     return apps
-      .filter((a) => !needle || a.seal_id?.toLowerCase().includes(needle) || a.name?.toLowerCase().includes(needle))
+      .filter((a) => !needle || a.app_id?.toLowerCase().includes(needle) || a.name?.toLowerCase().includes(needle))
       .slice(0, 8)
   }, [apps, search])
 
@@ -1014,41 +1018,41 @@ function AssignDialog({
         )}
 
         <label className="mt-3 block text-xs font-medium text-muted">
-          Target BusinessApplication (search seal_id / name)
+          Target BusinessApplication (search Application ID / name)
           <input
             type="search"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            placeholder={apps && apps.length === 0 ? 'app list unavailable — enter seal_id below' : 'Search…'}
+            placeholder={apps && apps.length === 0 ? 'app list unavailable — enter Application ID below' : 'Search…'}
             className="mt-1 w-full text-xs"
           />
         </label>
         {matches.length > 0 && (
           <ul className="mt-1 max-h-32 overflow-y-auto rounded-md border border-edge">
             {matches.map((a) => (
-              <li key={a.seal_id}>
+              <li key={a.app_id}>
                 <button
                   type="button"
                   onClick={() => {
-                    setSealId(a.seal_id)
-                    setSearch(`${a.seal_id} · ${a.name}`)
+                    setSealId(a.app_id)
+                    setSearch(`${a.app_id} · ${a.name}`)
                   }}
                   className={
                     'w-full px-2 py-1 text-left text-[11px] hover:bg-bg-2 ' +
-                    (sealId === a.seal_id ? 'bg-panel-2 text-text' : 'text-muted')
+                    (appId === a.app_id ? 'bg-panel-2 text-text' : 'text-muted')
                   }
                 >
-                  <span className="font-mono">{a.seal_id}</span> · {a.name}
+                  <span className="font-mono">{a.app_id}</span> · {a.name}
                 </button>
               </li>
             ))}
           </ul>
         )}
         <label className="mt-2 block text-xs font-medium text-muted">
-          seal_id
+          Application ID
           <input
             type="text"
-            value={sealId}
+            value={appId}
             onChange={(e) => setSealId(e.target.value)}
             placeholder="APP-…"
             className="mt-1 w-full font-mono text-xs"
@@ -1080,8 +1084,8 @@ function AssignDialog({
           </button>
           <button
             type="button"
-            disabled={!sealId.trim() || !rationale.trim()}
-            onClick={() => onAssign(sealId.trim(), rationale.trim(), createTarget)}
+            disabled={!appId.trim() || !rationale.trim()}
+            onClick={() => onAssign(appId.trim(), rationale.trim(), createTarget)}
             className="rounded-md border border-brand bg-panel-2 px-2.5 py-1 text-xs font-semibold text-text disabled:cursor-not-allowed disabled:border-edge disabled:text-faint"
           >
             Draft {rows.length} entr{rows.length === 1 ? 'y' : 'ies'}

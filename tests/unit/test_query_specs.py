@@ -81,7 +81,7 @@ def test_mappings_coverage_spec_registered():
     spec = query_spec("mappings.attribution-coverage.v1")
     assert spec.database == "drydocs"
     names = {c.name for c in spec.columns}
-    assert {"status", "match_method", "folder_id", "job_id", "seal_id"} <= names
+    assert {"status", "match_method", "folder_id", "job_id", "app_id"} <= names
 
 
 def test_lineage_frames_have_specs():
@@ -174,7 +174,7 @@ def test_element_id_guard_catches_both_spellings_and_spares_source_ids():
     # return. A guard that flagged these would push authors toward element ids.
     for good in (
         "MATCH (j:ControlMJob) RETURN j.job_id AS job_id, j.folder_id AS folder_id",
-        "MATCH (a:BusinessApplication) RETURN a.seal_id AS seal_id",
+        "MATCH (a:BusinessApplication) RETURN a.app_id AS app_id",
         "MATCH (r:JobRun) RETURN r.run_id AS run_id, toString(r.started_at) AS started_at",
     ):
         ensure_no_element_ids(good, "probe")

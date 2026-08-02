@@ -39,7 +39,9 @@
 // =============================================================================
 
 UNWIND $batch AS row
-MATCH (a:BusinessApplication {seal_id: row.seal_id})
+// IDENTITY KEY (gate business-application-identity §C1) — the canonical node is keyed
+// on app_id; the batch-port row field keeps its own name.
+MATCH (a:BusinessApplication {app_id: row.seal_id})
 OPTIONAL MATCH (sp:SoftwareProduct {product_id: row.product_id})
 FOREACH (_ IN CASE WHEN sp IS NOT NULL THEN [1] ELSE [] END |
   MERGE (a)-[u:USES_SOFTWARE {source: 'batch-port'}]->(sp)

@@ -24,7 +24,9 @@
 
 UNWIND $batch AS row
 
-MATCH (a:BusinessApplication {seal_id: row.app_id})
+// IDENTITY KEY (gate business-application-identity §C1) — the canonical node is keyed
+// on app_id, which is what the contact-extract row already called it.
+MATCH (a:BusinessApplication {app_id: row.app_id})
 
 MERGE (e:Employee {employee_id: row.employee_sid})
   ON CREATE SET e.first_seen_at = datetime($loaded_at),

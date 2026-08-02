@@ -626,8 +626,8 @@
       "classification": "Internal",
       "confirmed": true,
       "ledger": {
-        "state": "pending",
-        "path": null
+        "state": "ledger",
+        "path": "config/source-mappings/seal-extract.yaml"
       },
       "taxonomy_captures": [
         "config/taxonomy/business-application.yaml"

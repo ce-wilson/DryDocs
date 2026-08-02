@@ -16,10 +16,17 @@
 UNWIND $batch AS row
 
 // ---- Application upsert -----------------------------------------------------
-MERGE (a:BusinessApplication {seal_id: row.app_id})
+// IDENTITY KEY (gate business-application-identity, 2026-07-27 §C2; ADR 0010 rule 1):
+// the canonical node is keyed on the NEUTRAL app_id, not the registry-named seal_id.
+// seal_id is still written from the SAME row value as a deprecated alias through
+// phase 3 — its retirement is a separate later gate (§G3). The flip is atomic across
+// all 8 key-bearing sites: a uniqueness constraint IGNORES NULLS, so a loader still
+// MERGEing on seal_id would silently create a SECOND node rather than fail.
+MERGE (a:BusinessApplication {app_id: row.app_id})
   ON CREATE SET a.first_seen_at = datetime($loaded_at),
                 a.source     = 'SEAL'
-SET a.name                          = row.name,
+SET a.seal_id                       = row.app_id,   // deprecated alias — phase 3
+    a.name                          = row.name,
     a.app_short_name                = row.app_short_name,
     a.description                   = row.description,
 
@@ -93,11 +100,17 @@ SET a.name                          = row.name,
     a.last_run_id                   = $run_id
 
 // ---- Two ports (v3 §C) ------------------------------------------------------
-MERGE (ep:Port:EventProcessing {parent_seal_id: row.app_id, kind: 'EventProcessing'})
+// NODE KEY follows the parent in the same change (gate §D1(a)): (parent_app_id, kind).
+// No alias is dual-written here — unlike seal_id there is NO reader to protect
+// (the gate measured zero references in drydocs_api/, graph-tests/ and web/src/;
+// cli.py binds ports through HAS_PORT, not the property), and a NODE KEY property
+// cannot be null. The constraint is DROPped and recreated under a new name in
+// constraints.cypher — see the trap recorded there.
+MERGE (ep:Port:EventProcessing {parent_app_id: row.app_id, kind: 'EventProcessing'})
   ON CREATE SET ep.first_seen_at = datetime($loaded_at), ep.active = false
 SET ep.last_seen_at = datetime($loaded_at)
 
-MERGE (bp:Port:BatchProcessing {parent_seal_id: row.app_id, kind: 'BatchProcessing'})
+MERGE (bp:Port:BatchProcessing {parent_app_id: row.app_id, kind: 'BatchProcessing'})
   ON CREATE SET bp.first_seen_at = datetime($loaded_at), bp.active = false
 SET bp.last_seen_at = datetime($loaded_at)
 
