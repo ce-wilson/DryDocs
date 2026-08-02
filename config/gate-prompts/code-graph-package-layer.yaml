@@ -1,5 +1,50 @@
 # SME gate-prompt spec — CODE GRAPH, LEVEL TWO: does the PACKAGE become a node?
 #
+# REVISED v2 2026-08-02 — THE SCANNER CHANGED UNDER THIS PAGE, same day it was drafted.
+# SME direction: "update the scanner to pull all files, so that we can create the tree.
+# the old dep snapshots can be removed this was the intent." Acted on immediately, so
+# several facts below are now HISTORY rather than current state. Read this block first;
+# every section still stands, but three of them are answered differently now.
+#
+#   WHAT CHANGED IN THE ARTIFACT. snapshot.ps1 now scans the WHOLE REPO by default
+#   (the roots list moved behind -CodeOnly). One snapshot survives — the 101-file dated
+#   series and both tree one-offs were removed, which is what the direction's "this was
+#   the intent" refers to. The artifact went 238 .py nodes -> 1457 files + 251
+#   DIRECTORIES + 1956 CONTAINS, with import edges 376 -> 458. New U9 post-processing
+#   step drops git-ignored paths (649 of them, mostly .ruff_cache): depgraph excludes
+#   .git and .venv but knows nothing about .gitignore, and build caches are not the
+#   project.
+#
+#   §G1 IS REVERSED, by direction. The loader refused `meta.tree: true`; every snapshot
+#   is now tree-shaped, so that ruling would refuse all input. It refused loudly rather
+#   than loading nothing, which is the one thing that ruling got permanently right. The
+#   half that SURVIVES is the `meta`-present assertion — the headerless one-offs would
+#   pass a truthiness test on meta.tree, so it stays POSITIVE.
+#
+#   §G3 IS PARTLY OVERTAKEN. Directory structure was ruled out as "a second capability";
+#   the artifact now carries it. It is NOT yet in the graph: the loader SKIPS kind:'dir'
+#   nodes and counts them, because :Directory is a new node class and CONTAINS a new edge
+#   type, and neither may be invented by a loader (CLAUDE.md §6). §C1/§C3 are therefore
+#   still live decisions — but they get EASIER, because the tree no longer has to be
+#   derived from path strings. §C2 in particular is now mostly moot for identification
+#   (directories are nodes in the artifact) and survives only as "WHICH directories are
+#   packages", where §B2's namespace-package finding still bites.
+#
+#   TWO DEFECTS FOUND AND FIXED WHILE SWITCHING MODES, both live-verified:
+#   (1) KEY FORK. The tree scan's project segment is the REPOSITORY, not a package, so
+#       file_id came through as 'drydocs/drydocs/cli.py' against the roots scan's
+#       'drydocs/cli.py'. Loaded raw it produced TWO nodes for one file, side by side,
+#       neither swept — silently breaking §C2's ruled key and every stored reference to
+#       it. The adapter now strips the project prefix in tree mode, so a mode switch
+#       merges instead of forking.
+#   (2) `project` LOST ITS MEANING. It was "the scan root, one of six" — a concept that
+#       existed only because the scanner took a hand-maintained root list. Whole-repo
+#       scanning has no scan roots, and the raw field reads 'drydocs' for every node.
+#       It now carries the first path segment, with repo-root files as '.' rather than
+#       being labelled a scan root named after themselves. This is exactly §B1's drift
+#       argument arriving: the hand-maintained list is gone, and what replaces it is a
+#       path segment, which is NOT a package — which is what §C exists to fix.
+#
 # RE-OPENS exactly three confirmations of self-documentation-code-graph (SIGNED OFF
 # 2026-07-27, 36/36): §B1 (one root, scan roots as a property), §B2 (the HAS_MODULE
 # name) and §C4 (__init__.py loads as an ordinary node). NOTHING ELSE from that gate
@@ -77,7 +122,7 @@ summary: >
   on this page; everything else follows from it.
 meta:
   Module: "drydocs-load-code-snapshot · drydocs/loaders/code_snapshot.py + cypher/code_snapshot.cypher · drydocs_core/ontology/relationship_vocabulary.yaml · drydocs_core/schema/{constraints,schema_graph,ontology_supplement}.cypher · knowledge/depgraph-snapshots/snapshot.ps1 (scanner, only if §C2 rules (d))"
-  Source: "knowledge/depgraph-snapshots/drydocs-*.json (unchanged — the SAME artifact the parent gate ruled; 101 files, newest drydocs-20260802.json, 238 nodes, meta.tree false) PLUS pyproject.toml [tool.poetry] packages as a second, authoritative input if §C2 rules (c)"
+  Source: "knowledge/depgraph-snapshots/drydocs-*.json — RESHAPED v2: ONE file (drydocs-20260802.json), all-files scan, meta.tree true, 1457 files + 251 directories + 1956 CONTAINS + 458 import edges, git-ignored paths filtered (U9). The 101-file dated series and both tree one-offs are removed. PLUS pyproject.toml [tool.poetry] packages as a second, authoritative input if §C2 rules (c)"
   Registry ref: "depgraph-snapshot — registered at the parent gate §H6, classification Internal-Public. NO new source is registered here if §C2 rules (a)/(b); ruling (c) adds pyproject.toml as an input to an existing source, not a new source"
   Classification: "Internal-Public — repo-relative paths and our own package names only. The parent gate's §H4 abs_path drop still holds and this page adds no new field carrying machine state"
   Taxonomy: "NONE — still a derived structural capture, not an imported hierarchy. The §C2(c) option would read pyproject.toml, which is committed source, not a taxonomy file"

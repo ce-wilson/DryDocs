@@ -134,20 +134,48 @@ def test_refuses_snapshot_with_no_meta_key(tmp_path: Path) -> None:
         read_snapshot(path)
 
 
-def test_refuses_meta_tree_true(tmp_path: Path) -> None:
+def test_accepts_all_files_mode(tmp_path: Path) -> None:
+    """§G1(a) REVERSED by SME direction: the scanner captures the whole tree by
+    default, so `meta.tree: true` is the normal shape. Refusing it would refuse
+    every snapshot that exists."""
     doc = _dep_snapshot()
     doc["meta"]["tree"] = True
     path = _write(tmp_path, "drydocs-20260101-0000.json", doc)
-    with pytest.raises(CodeSnapshotError, match="tree-mode input is refused"):
-        read_snapshot(path)
+    assert read_snapshot(path)["meta"]["tree"] is True
+
+
+def test_directories_are_skipped_and_counted_not_silently_dropped(tmp_path: Path) -> None:
+    """A directory is not a code module. Turning one into a node is a new node
+    class and CONTAINS is a new edge type — both gate decisions this loader may
+    not invent. What it must not do is drop them quietly."""
+    doc = _dep_snapshot()
+    doc["meta"]["tree"] = True
+    doc["nodes"].append(
+        {
+            "file_id": "drydocs/loaders",
+            "project": "drydocs",
+            "rel_path": "loaders",
+            "name": "loaders",
+            "extension": "",
+            "kind": "dir",
+            "circular": False,
+        }
+    )
+    path = _write(tmp_path, "drydocs-20260101-0000.json", doc)
+    with CodeSnapshotAdapter(path) as adapter:
+        rows = list(adapter.rows())
+    assert adapter.skipped_directories == 1
+    assert all(r["file_id"] != "drydocs/loaders" for r in rows)
 
 
 def test_refuses_meta_tree_absent(tmp_path: Path) -> None:
-    """meta present but no tree key — still not `exactly false`, still refused."""
+    """meta present but no `tree` key — an unrecognised third shape, still refused.
+    This stays a POSITIVE assertion: the headerless one-offs carry no meta at all,
+    so a truthiness test on meta.tree would ACCEPT them."""
     doc = _dep_snapshot()
     del doc["meta"]["tree"]
     path = _write(tmp_path, "drydocs-20260101-0000.json", doc)
-    with pytest.raises(CodeSnapshotError, match="required exactly false"):
+    with pytest.raises(CodeSnapshotError, match="expected a boolean"):
         read_snapshot(path)
 
 
@@ -268,14 +296,26 @@ def test_committed_newest_snapshot_is_accepted_and_clean() -> None:
     with CodeSnapshotAdapter(path) as adapter:
         rows = [CodeModuleRow.model_validate(r) for r in adapter.rows()]
     assert rows, "newest committed snapshot yielded no rows"
-    # §E2: dependency mode emits only extensions with a seeded SWO term today.
-    assert adapter.unmapped_extensions == {}, (
-        "committed snapshot carries extensions with no seeded SwoClass term — "
-        "either widen EXTENSION_LANGUAGE_IRI or accept the skipped edges consciously"
-    )
     # file_id is the key: unique across all rows (§C2).
     ids = [r.file_id for r in rows]
     assert len(ids) == len(set(ids))
+
+    # §E2, RESTATED for the all-files scan. The old assertion here was
+    # `unmapped_extensions == {}` — true only while the scan emitted nothing but
+    # .py. An all-files snapshot carries .md, .json, .xsd, .ttf and ~40 more, and
+    # only FOUR languages were ever seeded, so an empty-unmapped assertion would
+    # now be a demand to seed an SWO term for every file type on disk. The intent
+    # it was protecting is what is asserted instead: every extension that DOES
+    # have a seeded term is bound, and everything else is COUNTED rather than
+    # silently skipped (the CLI reports the counts; §E1(b) skips the edge).
+    for ext in EXTENSION_LANGUAGE_IRI:
+        assert ext not in adapter.unmapped_extensions, f"{ext} has a seeded term but was not bound"
+    assert adapter.unmapped_extensions, (
+        "an all-files snapshot must report unmapped extensions — an empty dict here "
+        "means the skip is going unrecorded, which is what §E2 forbids"
+    )
+    bound = sum(1 for r in rows if r.language_iri)
+    assert bound, "no row bound to a seeded SWO language term"
 
 
 # ---------------------------------------------------------------------------

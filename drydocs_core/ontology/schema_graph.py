@@ -5,8 +5,21 @@
 for edge meaning — CLAUDE.md §6): one exemplar node per participating node label
 (real label + ``:SchemaMeta`` marker) and one exemplar relationship per vocabulary
 entry (real relationship type), so ``CALL db.schema.visualization()`` renders the
-full declared schema in Neo4j Browser. The file is applied MANUALLY only —
-``drydocs bootstrap`` never executes it (backlog C8 verification, 2026-07).
+full declared schema in Neo4j Browser.
+
+TARGET DATABASE: ``ddschema``, not ``drydocs`` — applied by
+``drydocs bootstrap-schema-graph`` (SME direction 2026-08-02: "the schema graph is
+for the project labels and relationships with different constraints and the DryDocs
+project has different code and constraints, 2 different graphs"). It was
+manual-only until then, and the reason is structural rather than habit: every
+exemplar carries the REAL label beside the ``:SchemaMeta`` marker, so
+``MERGE (n:SchemaMeta:ControlMJob {name: 'ControlMJob'})`` run against ``drydocs``
+VIOLATES ``controlmjob_key`` (NODE KEY on ``folder_id``/``job_id`` — a NODE KEY
+enforces existence, and the exemplar carries only ``name``). Proven live
+2026-08-02 on a throwaway label: ``Node with label ZZProbe must have the
+properties (folder_id, job_id)``. Dropping the real label would satisfy the
+constraint but is exactly what ``db.schema.visualization()`` reads, so the answer
+is a separate database whose constraints describe LABELS, not job rows.
 
 House pattern: the same deterministic committed-render-matches-source idiom as the
 plan board (``drydocs.plan_board`` + ``scripts/render_board.py``). Thin CLI:
@@ -160,7 +173,15 @@ def _header() -> list[str]:
         "//     CALL db.schema.visualization();",
         "// or browse the meta-graph directly:",
         "//     MATCH p = (:SchemaMeta)-[]->(:SchemaMeta) RETURN p;",
-        "// Applied MANUALLY only — never part of `drydocs bootstrap`.",
+        "//",
+        "// TARGET DATABASE: ddschema — NOT drydocs.  Apply with:",
+        "//     drydocs bootstrap-schema-graph",
+        "// TWO DIFFERENT GRAPHS (SME direction): this one describes LABELS and",
+        "// RELATIONSHIP TYPES, the drydocs graph holds code and operational rows, and",
+        "// their constraints are not the same constraints. Concretely — every exemplar",
+        "// below carries the REAL label beside :SchemaMeta, so running this file",
+        "// against drydocs violates controlmjob_key (NODE KEY on folder_id/job_id;",
+        "// a NODE KEY enforces EXISTENCE and the exemplar carries only `name`).",
         "// To remove the meta-graph:  MATCH (n:SchemaMeta) DETACH DELETE n;",
         "//",
         "// Inclusion rule (drydocs_core/ontology/schema_graph.py):",
@@ -239,6 +260,18 @@ def render_schema_graph(vocab_path: str | Path = DEFAULT_VOCAB_PATH) -> str:
 
     lines: list[str] = []
     lines.extend(_header())
+    lines.append("")
+    lines.append(_rule("Constraint (ddschema's own — describes LABELS, not rows)"))
+    lines.append("")
+    lines.append("// The only constraint this graph needs: one exemplar per label. It is")
+    lines.append("// deliberately NOT in drydocs_core/schema/constraints.cypher — that file")
+    lines.append("// constrains the operational graph, and the two databases do not share a")
+    lines.append("// constraint set. tests/unit/test_schema.py's EXPECTED_CONSTRAINTS")
+    lines.append("// therefore does not move.")
+    lines.append(
+        "CREATE CONSTRAINT schemameta_name IF NOT EXISTS "
+        "FOR (n:SchemaMeta) REQUIRE n.name IS UNIQUE;"
+    )
     lines.append("")
     lines.append(_rule("Node labels"))
     lines.append("")

@@ -15,7 +15,15 @@
 //     CALL db.schema.visualization();
 // or browse the meta-graph directly:
 //     MATCH p = (:SchemaMeta)-[]->(:SchemaMeta) RETURN p;
-// Applied MANUALLY only — never part of `drydocs bootstrap`.
+//
+// TARGET DATABASE: ddschema — NOT drydocs.  Apply with:
+//     drydocs bootstrap-schema-graph
+// TWO DIFFERENT GRAPHS (SME direction): this one describes LABELS and
+// RELATIONSHIP TYPES, the drydocs graph holds code and operational rows, and
+// their constraints are not the same constraints. Concretely — every exemplar
+// below carries the REAL label beside :SchemaMeta, so running this file
+// against drydocs violates controlmjob_key (NODE KEY on folder_id/job_id;
+// a NODE KEY enforces EXISTENCE and the exemplar carries only `name`).
 // To remove the meta-graph:  MATCH (n:SchemaMeta) DETACH DELETE n;
 //
 // Inclusion rule (drydocs_core/ontology/schema_graph.py):
@@ -33,6 +41,15 @@
 // Node properties:  name, class (CURIE per namespaces.py), dual_class, prov_type
 // Edge properties:  vocab_id, role, prov_maps_to, sosa_maps_to, domain, status
 // =============================================================================
+
+// ── Constraint (ddschema's own — describes LABELS, not rows) ────────────────
+
+// The only constraint this graph needs: one exemplar per label. It is
+// deliberately NOT in drydocs_core/schema/constraints.cypher — that file
+// constrains the operational graph, and the two databases do not share a
+// constraint set. tests/unit/test_schema.py's EXPECTED_CONSTRAINTS
+// therefore does not move.
+CREATE CONSTRAINT schemameta_name IF NOT EXISTS FOR (n:SchemaMeta) REQUIRE n.name IS UNIQUE;
 
 // ── Node labels ─────────────────────────────────────────────────────────────
 

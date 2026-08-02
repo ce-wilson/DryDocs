@@ -44,7 +44,15 @@ class CodeModuleRow(BaseModel):
     project: str = Field(
         ...,
         min_length=1,
-        description="Scan root this file belongs to (one of six) — a PROPERTY per §B1(a).",
+        description=(
+            "TOP-LEVEL PATH SEGMENT — a PROPERTY per §B1(a). It was 'the scan root, "
+            "one of six' while the scanner took a hand-maintained root list; the "
+            "all-files scan takes the repo root, so there are no scan roots and this "
+            "generalises to the first path segment ('drydocs', 'tests', 'docs', 'web'). "
+            "Repo-root files have no segment above them and carry '.'. Superseded by "
+            "the :CodePackage layer once that gate signs — a path segment is not a "
+            "package (see the code-graph-package-layer gate §C2)."
+        ),
     )
     rel_path: str = Field(
         ..., description="Path relative to the scan root (collides across roots)."

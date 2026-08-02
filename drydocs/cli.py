@@ -180,6 +180,10 @@ LOGGER = logging.getLogger("drydocs.cli")
 SCHEMA_DIR = Path(drydocs_core.__file__).resolve().parent / "schema"
 CONSTRAINTS_FILE = SCHEMA_DIR / "constraints.cypher"
 ONTOLOGY_FILE = SCHEMA_DIR / "ontology.cypher"
+# The schema meta-graph is a SEPARATE GRAPH with separate constraints (SME
+# 2026-08-02), so it carries its own target rather than following NEO4J_DATABASE.
+SCHEMA_GRAPH_FILE = SCHEMA_DIR / "schema_graph.cypher"
+SCHEMA_GRAPH_DATABASE = "ddschema"
 # The supplement .cypher paths are NOT constants here — they live in the
 # registry (drydocs_core.schema.supplements), so the chain and its order have
 # exactly one home. G29.
@@ -576,6 +580,35 @@ def bootstrap(
         if not skip_ontology:
             cli.execute_file(ONTOLOGY_FILE)
             console.print("[green]Ontology seed applied.[/]")
+
+
+@app.command()
+def bootstrap_schema_graph(
+    database: str = typer.Option(SCHEMA_GRAPH_DATABASE, help="target database for the meta-graph"),
+) -> None:
+    """Apply the schema meta-graph (labels + relationship types) to its OWN database.
+
+    TWO DIFFERENT GRAPHS (SME 2026-08-02). This one describes the declared
+    vocabulary — one exemplar node per label, one exemplar edge per vocabulary
+    entry — so `CALL db.schema.visualization()` draws the schema. The `drydocs`
+    graph holds code and operational rows. Their constraints are not the same
+    constraints, which is why this is a separate verb against a separate target
+    rather than a step inside `bootstrap`: every exemplar carries the REAL label
+    beside :SchemaMeta, so running it against `drydocs` violates controlmjob_key
+    (a NODE KEY enforces existence; the exemplar carries only `name`).
+    """
+    with _client(database=database) as cli:
+        cli.execute_file(SCHEMA_GRAPH_FILE)
+        # Same D8 guard as bootstrap: a silent DDL/data no-op "succeeds" while
+        # writing nothing, which is this repo's most-repeated defect class.
+        n = cli.run("MATCH (n:SchemaMeta) RETURN count(n) AS n")[0]["n"]
+        if not n:
+            console.print(
+                f"[red]Schema meta-graph guard: 0 :SchemaMeta nodes in '{database}' after "
+                "apply — the apply did not take.[/]"
+            )
+            raise typer.Exit(2)
+        console.print(f"[green]Schema meta-graph applied to '{database}' ({n} label nodes).[/]")
 
 
 @app.command()

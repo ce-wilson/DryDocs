@@ -3,9 +3,19 @@
   `meta` header (git commit / branch / PR / capture date) so each snapshot is
   self-identifying and comparable. Run after a push.
 
-    .\snapshot.ps1                       # code graph: the 7 package roots  -> drydocs-YYYYMMDD.json
-    .\snapshot.ps1 -Tree                 # full file tree (repo root)       -> drydocs-tree-YYYYMMDD.json
+    .\snapshot.ps1                       # FULL FILE TREE (repo root)       -> drydocs-YYYYMMDD.json
+    .\snapshot.ps1 -CodeOnly             # legacy: the 7 package roots, .py -> drydocs-code-YYYYMMDD.json
     .\snapshot.ps1 -Project myproj       # override the project name
+
+  THE FULL TREE IS THE DEFAULT (SME direction). It is a strict SUPERSET of the
+  old roots-only scan: same import edges, plus directories, plus CONTAINS, plus
+  every non-.py file. That matters because the old scan could only ever see
+  Python, so the .cypher a loader executes, the .sql an extractor runs and the
+  .yaml a module reads were all invisible — and the containment tree had to be
+  guessed from path strings instead of read from the artifact.
+  -CodeOnly is kept for comparison against the retired series, not for the
+  ritual; it writes a DIFFERENT filename so the two shapes can never collide in
+  the directory or be mistaken for one another by the loader (`meta.tree`).
 
   The header is prepended to depgraph's JSON (formatting preserved, no BOM) so the
   viewer (viewer.html) shows the version and JSON diffs stay clean.
@@ -19,8 +29,11 @@
 [CmdletBinding()]
 param(
   [string]$Project = "drydocs",
-  [switch]$Tree
+  [switch]$CodeOnly
 )
+# The full tree is the default; $Tree stays as the internal name because it is
+# what depgraph's flag and the meta header are both called.
+$Tree = -not $CodeOnly
 $ErrorActionPreference = "Stop"
 $here = $PSScriptRoot
 $repo = (Resolve-Path "$here\..\..").Path
@@ -117,12 +130,16 @@ if ($m.Success) { $pr = [int]$m.Groups[1].Value }
 Pop-Location
 
 # --- scan + name -------------------------------------------------------------
-# Code graph spans every top-level package since the Phase B relocate (ADR
-# 0002-A-1, 2026-07-10): drydocs (components) + drydocs_core + drydocs_remediation
-# + drydocs_lineage + drydocs_deepdoc (G4/G9, 2026-07-11) + drydocs_api (U6,
-# 2026-07-28 — was invisible to every code-graph metric until the U2 census).
-if ($Tree) { $targets = @($repo);                       $tag = "-tree" }
-else       { $targets = @("$repo\drydocs","$repo\drydocs_core","$repo\drydocs_api","$repo\drydocs_remediation","$repo\drydocs_lineage","$repo\drydocs_deepdoc","$repo\tests"); $tag = "" }
+# DEFAULT = the whole repo. The -CodeOnly root list below is the LEGACY shape,
+# retained only for comparison: it spans every top-level package since the Phase B
+# relocate (ADR 0002-A-1, 2026-07-10) — drydocs (components) + drydocs_core +
+# drydocs_remediation + drydocs_lineage + drydocs_deepdoc (G4/G9, 2026-07-11) +
+# drydocs_api (U6, 2026-07-28 — invisible to every code-graph metric until the U2
+# census). That last entry is the argument against the list: it had to be edited
+# by hand when a package appeared, and a stale list silently under-scans. The
+# tree scan takes the repo root and has no list to go stale.
+if ($Tree) { $targets = @($repo);                       $tag = "" }
+else       { $targets = @("$repo\drydocs","$repo\drydocs_core","$repo\drydocs_api","$repo\drydocs_remediation","$repo\drydocs_lineage","$repo\drydocs_deepdoc","$repo\tests"); $tag = "-code" }
 $date = Get-Date -Format "yyyyMMdd"
 $out  = Join-Path $here ("{0}{1}-{2}.json" -f $Project, $tag, $date)
 if (Test-Path $out) { $out = Join-Path $here ("{0}{1}-{2}-{3}.json" -f $Project, $tag, $date, (Get-Date -Format "HHmm")) }
@@ -171,6 +188,16 @@ try { $null = $new | ConvertFrom-Json } catch {
   throw "post-processed snapshot is not valid JSON: $($_.Exception.Message)"
 }
 [System.IO.File]::WriteAllText($out, $new, (New-Object System.Text.UTF8Encoding $false))
+
+# --- drop git-ignored paths (U9) ---------------------------------------------
+# depgraph excludes .git and .venv but knows nothing about .gitignore, so a
+# whole-repo scan collects build caches — 384 .ruff_cache entries and var/ in the
+# first all-files run, ~18% of the artifact. Those are not the project. Filtered
+# HERE so the committed JSON, viewer.html and the graph all show the same thing.
+if ($Tree) {
+  & python (Join-Path $here "filter_ignored.py") $out $repo | Write-Host
+  if ($LASTEXITCODE -ne 0) { throw "git-ignore filter failed; snapshot left unfiltered at $out" }
+}
 Remove-Item $tmp -ErrorAction SilentlyContinue
 
 $prTxt = if ($pr) { ", PR#$pr" } else { "" }

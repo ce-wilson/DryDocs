@@ -139,10 +139,18 @@ def read_snapshot(path: Path | str) -> dict:
             "(same schema string, materially different content; gate §G1). "
             "REFUSED: this loader loads dependency-mode snapshots only (nothing was loaded)"
         )
-    if meta.get("tree") is not False:
+    # §G1(a) REVERSED by SME direction: the scanner now captures the WHOLE tree by
+    # default (snapshot.ps1), so `meta.tree: true` is the normal shape and refusing
+    # it would refuse every snapshot there is. What the original ruling was actually
+    # protecting against survives untouched: the headerless one-off shape, caught by
+    # the `meta` assertion above — that guard is the load-bearing half, and it stays
+    # a POSITIVE assertion for the reason the build note gave (those files carry no
+    # `meta` at all, so a truthiness test on meta.tree would ACCEPT them).
+    # Still refused: a `tree` that is not a bool, i.e. an unrecognised third shape.
+    if not isinstance(meta.get("tree"), bool):
         raise CodeSnapshotError(
-            f"{path.name}: meta.tree is {meta.get('tree')!r}, required exactly false — "
-            "tree-mode input is refused (gate §G1(a); nothing was loaded)"
+            f"{path.name}: meta.tree is {meta.get('tree')!r}, expected a boolean — "
+            "unrecognised snapshot shape (nothing was loaded)"
         )
     if not doc.get("nodes"):
         raise CodeSnapshotError(
@@ -163,6 +171,7 @@ class CodeSnapshotAdapter:
     def __init__(self, path: Path | str) -> None:
         self.path = Path(path)
         self.unmapped_extensions: dict[str, int] = {}
+        self.skipped_directories = 0
 
     def __enter__(self) -> CodeSnapshotAdapter:
         return self
@@ -183,28 +192,70 @@ class CodeSnapshotAdapter:
         # roots in doc['projects'] become the per-node `project` property.
         project_id = meta.get("project") or "drydocs"
 
+        # KEY NORMALISATION — §C2 says file_id IS the repo-relative path, and the
+        # two scan modes disagree about what the scanner puts there.
+        #   roots scan: scan root = drydocs/ ...  file_id 'drydocs/cli.py'      (repo-relative)
+        #   tree scan : scan root = the REPO  ...  file_id 'drydocs/drydocs/cli.py'
+        # because the tree scan's project segment is the REPOSITORY directory, not
+        # a package inside it. Loading that raw produced TWO nodes for one file
+        # (verified live: drydocs/cli.py and drydocs/drydocs/cli.py side by side,
+        # neither swept) and would have silently broken the file_id ruling plus
+        # every stored reference to it. Stripping the project prefix in tree mode
+        # restores the ruled key, so a mode switch merges instead of forking.
+        strip = f"{project_id}/" if meta.get("tree") else ""
+
+        def _key(file_id: str) -> str:
+            if strip and file_id.startswith(strip):
+                return file_id[len(strip) :]
+            return file_id
+
         imports_by_source: dict[str, list[str]] = {}
         for edge in doc.get("edges", []):
             if not (isinstance(edge, list | tuple) and len(edge) == 2):
                 raise CodeSnapshotError(
                     f"{self.path.name}: malformed edge {edge!r} — expected [source_file_id, target_file_id]"
                 )
-            imports_by_source.setdefault(edge[0], []).append(edge[1])
+            imports_by_source.setdefault(_key(edge[0]), []).append(_key(edge[1]))
 
         for node in doc.get("nodes", []):
+            # DIRECTORIES ARE NOT CODE MODULES. An all-files snapshot carries
+            # kind: 'dir' nodes; turning those into graph nodes is a NEW node class
+            # and the CONTAINS edge is a NEW edge type, both of which are gate
+            # decisions (CLAUDE.md §6) and neither of which this loader may invent.
+            # They are counted, not dropped in silence — the count is reported by
+            # the CLI so "the tree is not in the graph yet" is visible rather than
+            # inferred from a node total nobody checks.
+            if node.get("kind") == "dir":
+                self.skipped_directories += 1
+                continue
             extension = node.get("extension", "")
             language_iri = EXTENSION_LANGUAGE_IRI.get(extension)
             if language_iri is None:
                 self.unmapped_extensions[extension] = self.unmapped_extensions.get(extension, 0) + 1
+            file_id = _key(node.get("file_id") or "")
+            # `project` (§B1(a)) was "the scan root, one of six" — a concept that
+            # only existed because the scanner took a hand-maintained root list.
+            # The all-files scan takes the REPO root, so there are no scan roots,
+            # and the tree scan reports this field as the repository for every
+            # node — collapsing a property whose whole job was to distinguish
+            # drydocs / drydocs_core / tests. It generalises to the first path
+            # segment, which is the value the roots scan reported for anything
+            # inside a package. Repo-root files (README.md, pyproject.toml) have
+            # no segment above them and carry '.' rather than being labelled a
+            # "scan root" named after themselves.
+            if strip:
+                project = file_id.split("/", 1)[0] if "/" in file_id else "."
+            else:
+                project = node.get("project")
             yield {
                 # abs_path deliberately NOT emitted (§H4)
-                "file_id": node.get("file_id"),
-                "project": node.get("project"),
+                "file_id": file_id,
+                "project": project,
                 "rel_path": node.get("rel_path"),
                 "name": node.get("name"),
                 "extension": extension,
                 "circular": bool(node.get("circular", False)),
-                "imports": sorted(imports_by_source.get(node.get("file_id"), [])),
+                "imports": sorted(imports_by_source.get(file_id, [])),
                 "language_iri": language_iri,
                 "project_id": project_id,
                 "captured_at": meta.get("captured_at"),
