@@ -26,6 +26,29 @@ Tags help grooming: `idea` · `bug` · `doc` · `source` (new data source) · `q
 
 <!-- add new ideas at the top -->
 
+- 2026-08-02 — [source→Q6] **The fetcher Q6 is parked on exists company-side, and two of its
+  four connectors are company-agnostic by construction** (tracker T21, answered at
+  PORT-REPORT drydocs-port-20260801). Their `drydocs/docmeta/connectors/` is an ACQUISITION
+  framework — a `Connector` protocol, `fetch(source) -> list[RawPage]`, acquisition only with
+  cleaning/hashing downstream — and the split lands exactly where we need it: `web.py`
+  (public http(s) via stdlib `urllib`, **injectable transport** so it is offline-testable
+  with a fake opener, SSRF scheme allow-list) and `filedrop.py` (local file/directory of
+  md/txt/html via `pathlib`) have ZERO internal dependencies; `base.py` is protocol +
+  `RawPage` + `ConnectorUnavailable`; `confluence.py` and the separate `scrapers/` CLI are
+  internal-realm and stay theirs. Their own `base.py` docstring already designates
+  web+filedrop as the "wired and offline-testable" generic pair — i.e. the boundary we would
+  have had to draw was drawn by the authors first, which is the strongest signal a
+  reproduction is clean. WHY THIS MATTERS BEYOND Q6: **R7 was released unbuilt 2026-08-01
+  for exactly this missing fetcher** and Q12 (doc-capture scale guardrail) waits behind Q6,
+  so one reproduction closes three items. Direction rule applies — back-flow is SANITIZED
+  REPRODUCTION, never a copy, so the deliverable is producer-authored code against the same
+  protocol shape, not their files. Groom into Q6's acceptance rather than a new item; the
+  injectable-transport + SSRF-allow-list pair should be non-negotiable in it, since an
+  un-guarded fetcher is precisely what Q12 exists to prevent.
+  CAUTION FOR WHOEVER GROOMS THIS: the company's answer text names their org and an internal
+  tool by name. Neither is recorded above and neither may reach a committed producer file
+  (CLAUDE.md §3) — describe the realm, never name it.
+
 - 2026-08-01 — [chore→L19] **Two governed design docs carry statements the S3 identity cutover
   made false; deliberately NOT edited in S3, because both are rev-bump surfaces and one of them
   is a dated snapshot.** (a) `docs/design/drydocs-web-console-tdd.md` §"Source → column-level
