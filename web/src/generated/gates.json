@@ -456,6 +456,17 @@
     {
       "kind": "prompt-only",
       "date": null,
+      "title": "code-graph-package-layer (gate page rendered — session not yet run)",
+      "status": "open",
+      "prompt_files": [
+        "config/gate-prompts/code-graph-package-layer.yaml"
+      ],
+      "log_ref": null,
+      "unblocks": []
+    },
+    {
+      "kind": "prompt-only",
+      "date": null,
       "title": "email-dl-contact-point (gate page rendered — session not yet run)",
       "status": "open",
       "prompt_files": [

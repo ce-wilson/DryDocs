@@ -312,7 +312,7 @@
       ],
       "gate_ref": "(is the gate record)",
       "status": "gate-pending",
-      "pending_entries": 74,
+      "pending_entries": 77,
       "env_refs": [],
       "files": [
         "config/gate-prompts/airflow-crosswalk.yaml",
@@ -320,6 +320,7 @@
         "config/gate-prompts/bmc-docs-example.yaml",
         "config/gate-prompts/bmc-docs-lexical-load.yaml",
         "config/gate-prompts/business-application-identity.yaml",
+        "config/gate-prompts/code-graph-package-layer.yaml",
         "config/gate-prompts/controlm-avg-run-supplement.yaml",
         "config/gate-prompts/controlm-hosts-topology.yaml",
         "config/gate-prompts/controlm-q1q3-phase1.yaml",

@@ -1,0 +1,217 @@
+# SME gate-prompt spec — CODE GRAPH, LEVEL TWO: does the PACKAGE become a node?
+#
+# RE-OPENS exactly three confirmations of self-documentation-code-graph (SIGNED OFF
+# 2026-07-27, 36/36): §B1 (one root, scan roots as a property), §B2 (the HAS_MODULE
+# name) and §C4 (__init__.py loads as an ordinary node). NOTHING ELSE from that gate
+# is re-opened — §A2 target database, §C1/§C2 file-grain and the file_id key, §D1/§D2
+# IMPORTS and its limits, §E1 the SWO binding, §F1 the :SoftwareProduct collision rule,
+# §G1 the meta.tree discriminator, §H1-§H6 mechanics all STAND. This page is additive:
+# it proposes a level ABOVE the file, and does not touch the file level that works.
+#
+# WHY RE-OPEN A GATE THAT SIGNED CLEAN. Not drift, and not a defect in the ruling —
+# the original gate NAMED this cost in writing and took it deliberately. §C1: "Accepted
+# cost of (a), recorded not hidden: the label says 'module' while the thing is a file."
+# §B1 offered option (c) — "TWO LEVELS — one :Project umbrella plus six :CodePackage
+# children" — described it as "most faithful", and declined it on COST (a fifth new
+# class, growing §F's collision surface), not on correctness. A recorded, accepted cost
+# that is later felt is precisely what a re-open is for. The trigger was an SME reading
+# of the live graph on 2026-08-02: "this relationship :HAS_MODULE is overused ... I
+# thought module described the next highest group under the project."
+#
+# *** THE PART THE SME SHOULD READ FIRST ***
+# The re-opening question was posed with an inverted vocabulary, and the correction
+# MATTERS because it changes what is being asked for:
+#
+#   "every .py including .init can't be a module can it?"  —  IN PYTHON, IT CAN.
+#   A module is what `import` binds; drydocs/cli.py IS the module drydocs.cli. So
+#   :CodeModule on 210 files is NOT a category error and §C1 does not need revisiting.
+#   The level the question points at — drydocs, drydocs_api, drydocs_lineage — is the
+#   PACKAGE (a module carrying __path__). Packages are also modules, which is why the
+#   word felt overloaded; but the missing level has its own name, and it is not "module".
+#   THE ONE PLACE THE MODEL IS FACTUALLY WRONG is __init__.py: drydocs/__init__.py is
+#   not a module named __init__ — executing it IS the package drydocs, whose __name__
+#   is "drydocs". Sixteen nodes sit as flat peers of cli.py while being packages. §D.
+#
+# AND THE KILL-ARGUMENT FROM §C1 DOES NOT APPLY HERE. That argument ("true module-grain
+# collapses file identity into package identity fifteen times over and loses the ability
+# to say 'this file imports X'") killed REPLACING file nodes with dotted-module nodes.
+# This page proposes no such replacement. Every file node, every file_id, and all 376
+# IMPORTS edges survive untouched; a level is ADDED above them. §C1's argument is silent
+# on that, and §D3 below is where the one lossy variant is offered and recommended against.
+#
+# FOUR PREMISE FINDINGS, all from opening the artifacts while drafting (§B). Two of them
+# reshaped this page rather than decorating it: the scan roots have drifted 6 -> 7 since
+# the ruling was written, and `__init__.py` presence is NOT a sound package test — one
+# live, production-imported package in this repo has no __init__.py at all.
+#
+# Mechanism-only, and for the same reason as the parent gate: every value on this page is
+# our own repo-relative path. There is no company data in a code snapshot.
+classification: Internal-Public
+schema: drydocs.gate-prompt.v1
+id: code-graph-package-layer
+title: "SME Gate — Code graph level two: does the PACKAGE become a node, how is a package identified when __init__.py is not a sound test, and what does HAS_MODULE mean once there are two levels"
+step: "Re-opens self-documentation-code-graph §B1/§B2/§C4 only — adds a package level above the file level, rules how packages are identified offline, and settles the edge naming before a second orchestrator or a second project tree makes it expensive"
+summary: >
+  The code subgraph is live and flat: ONE (:Project {project_id:'drydocs'}) with 210
+  HAS_MODULE edges to 210 file nodes, no exceptions, plus 376 IMPORTS. The file level
+  is correct and this gate leaves it alone. What is missing is the level between them —
+  the PACKAGE — and its absence now costs three concrete things.
+  (1) THE EDGE CARRIES NO INFORMATION. HAS_MODULE is TOTAL: every :CodeModule has one,
+  from the same source node. §F2 justified it as the one-hop "is this our own code?"
+  test, but `MATCH (m:CodeModule)` answers that in ZERO hops. An edge that is total and
+  1:1 with a label conveys exactly what the label conveys, while occupying a name that
+  promises structure. It only begins to partition anything under the §B3 second-root
+  scenario, which has not happened.
+  (2) THE GRAPH CANNOT EXPRESS WHAT THE CODE JUST DID. S2 (ADR 0008, 2026-08-01) created
+  drydocs_core/orchestration/ for the express purpose of being a PARENT to controlm/ so a
+  second orchestrator has somewhere to land. In the graph those are eight sibling files
+  and four sibling files with no relationship whatsoever. The single most deliberate
+  structural act of the week is invisible.
+  (3) SIXTEEN NODES ARE MISTYPED. __init__.py is not a module; it is what makes its
+  DIRECTORY a package.
+  WHAT IS GENUINELY HARD is not whether to add the level but HOW TO IDENTIFY ONE OFFLINE
+  (§C2): __init__.py presence is unsound (drydocs_core/schema is a live PEP 420 namespace
+  package with none, imported by drydocs/cli.py), "any directory with a .py" wrongly
+  promotes the tests/ root, and importability is correct but would execute imports at scan
+  time, destroying the offline+deterministic property §H1 guarded. §C2 is the real decision
+  on this page; everything else follows from it.
+meta:
+  Module: "drydocs-load-code-snapshot · drydocs/loaders/code_snapshot.py + cypher/code_snapshot.cypher · drydocs_core/ontology/relationship_vocabulary.yaml · drydocs_core/schema/{constraints,schema_graph,ontology_supplement}.cypher · knowledge/depgraph-snapshots/snapshot.ps1 (scanner, only if §C2 rules (d))"
+  Source: "knowledge/depgraph-snapshots/drydocs-*.json (unchanged — the SAME artifact the parent gate ruled; 101 files, newest drydocs-20260802.json, 238 nodes, meta.tree false) PLUS pyproject.toml [tool.poetry] packages as a second, authoritative input if §C2 rules (c)"
+  Registry ref: "depgraph-snapshot — registered at the parent gate §H6, classification Internal-Public. NO new source is registered here if §C2 rules (a)/(b); ruling (c) adds pyproject.toml as an input to an existing source, not a new source"
+  Classification: "Internal-Public — repo-relative paths and our own package names only. The parent gate's §H4 abs_path drop still holds and this page adds no new field carrying machine state"
+  Taxonomy: "NONE — still a derived structural capture, not an imported hierarchy. The §C2(c) option would read pyproject.toml, which is committed source, not a taxonomy file"
+  Ontology map: "self-documentation-code-graph (confirmed 2026-07-27) — this gate AMENDS that entry rather than adding a second one, because it is the same source, same loader and same subgraph. §H4 rules whether an amendment or a new entry is correct"
+  Vocabulary: "u1_has_module (ACTIVE — from_node/to_node change under every option except §E1(a); relationship_vocabulary.yaml:2226) · u1_imports (ACTIVE, untouched) · u1_is_encoded_in (ACTIVE, untouched) · NEW terms proposed: u1_has_package (Project -> CodePackage) and u1_defines_package (CodeModule -> CodePackage, the __init__.py tie, §D2) — both `status: planned` until §I"
+  Related gates: "self-documentation-code-graph (2026-07-27 — PARENT; §B1/§B2/§C4 re-opened, everything else stands) · software-usage-patterns (:SoftwareProduct — the §F1 collision guard must be EXTENDED to :CodePackage, §G2)"
+  Company impact: "NIL on data. The loader and vocabulary PORT; the company's tree has different packages. But §C2(c) would make the loader read pyproject.toml, and the company's differs — §H5 rules whether that is a hard dependency or a soft input"
+mapping:
+  - n: 1
+    element: "Package level"
+    target: "(:CodePackage) between :Project and :CodeModule — the level the parent gate called 'most faithful' at §B1(c) and declined on cost"
+    edge: "new node class  [DECISION — §C1]"
+  - n: 2
+    element: "Package IDENTITY — the hard one"
+    target: "how a package is recognised OFFLINE. __init__.py presence is UNSOUND: drydocs_core/schema has none and is a live PEP 420 namespace package"
+    edge: "derivation rule  [DECISION — §C2]"
+  - n: 3
+    element: "Package NESTING"
+    target: "(:CodePackage)-[:HAS_PACKAGE]->(:CodePackage) — depth reaches 3 today (drydocs_core/orchestration/controlm). Without it, S2's parent/child act is unrepresentable"
+    edge: "new edge  [DECISION — §C3]"
+  - n: 4
+    element: "__init__.py identity"
+    target: "16 nodes that are packages wearing file identity. Proposed: keep the file node, ADD (:CodeModule)-[:DEFINES_PACKAGE]->(:CodePackage)"
+    edge: "new edge  [DECISION — §D2]"
+  - n: 5
+    element: "HAS_MODULE re-pointing"
+    target: "u1_has_module from_node changes Project -> CodePackage under §C1(b). The registry entry at relationship_vocabulary.yaml:2226 is REVISED, not added"
+    edge: "vocabulary change  [DECISION — §E1]"
+  - n: 6
+    element: "tests/ — 45% of the graph"
+    target: "107 of 238 files are tests/unit. `tests` is NOT a poetry package and its root has no __init__.py; tests/unit and tests/integration ARE packages"
+    edge: "scope rule  [DECISION — §F1]"
+  - n: 7
+    element: "Scan-root drift"
+    target: "the parent gate ruled on SIX scan roots; there are SEVEN (drydocs_api is absent from its §B1 text). Roots went 2 -> 7 across 101 snapshots"
+    edge: "premise correction  [§B2]"
+  - n: 8
+    element: "Collision + boundary"
+    target: "§F1's :CodeModule/:SoftwareProduct graph-test must EXTEND to :CodePackage; §F2's 'nothing else hangs off :Project' is directly touched; §G3's 'no directory structure' must be distinguished from a package layer"
+    edge: "safety rule  [DECISION — §G]"
+provenance:
+  - label: "CodePackage (NEW node — proposed §C1(b))"
+    source_object: "knowledge/depgraph-snapshots/drydocs-*.json — DERIVED from the `nodes` array; the artifact carries NO package record of its own. Optionally pyproject.toml [tool.poetry] packages under §C2(c)"
+    key: "PROPOSED package_id = the directory path, repo-relative ('drydocs_core/orchestration/controlm'). Chosen to mirror §C2's file_id reasoning: structural, deterministic, already the prefix of every file_id it contains"
+    loader: "code_snapshot (EXTENDED — no new verb; the same `drydocs load-code-snapshot` run)"
+    properties:
+      - name: package_id
+        origin: derived
+        from: "os.path.dirname(node.file_id) over the nodes array — 20 distinct values in drydocs-20260802.json"
+        note: "NOT a filesystem walk. It is derived from files the scan already emitted, which is what keeps §H1's offline+deterministic property intact and keeps §G3 (no directory structure) distinguishable — an empty directory can never appear here"
+      - name: import_name
+        origin: derived
+        from: "package_id with '/' -> '.' — 'drydocs_core.orchestration.controlm'"
+        note: "the dotted name Python actually binds. §C1's kill-argument was about REPLACING file identity with this; carrying it as a package property costs nothing and loses nothing"
+      - name: has_init
+        origin: derived
+        from: "whether any child node has name == '__init__.py' — TRUE for 18 of 20 dirs"
+        note: "loaded as a FACT, not used as a filter. This is the §C3 precedent applied ('load what the scanner concluded; a later query disagreeing is itself a signal') and it is what makes the namespace-package case VISIBLE rather than silently dropped"
+      - name: distribution
+        origin: derived
+        from: "membership in pyproject.toml [tool.poetry] packages — SIX: drydocs, drydocs_core, drydocs_remediation, drydocs_lineage, drydocs_deepdoc, drydocs_api"
+        note: "ONLY under §C2(c). This is the single authoritative committed statement of what ships, and it disagrees with the scan roots by exactly one entry: `tests`. §F1 is where that disagreement is ruled rather than papered over"
+      - name: project
+        origin: source
+        from: "node.project of its children — one of the SEVEN scan roots"
+        note: "carried for the same reason :CodeModule carries it, and because §C5's second-project-tree trigger applies identically to a package key. This gate does NOT resolve C5 and must not make it worse"
+  - label: "CodeModule (EXISTING — what changes, and what does not)"
+    source_object: "the `nodes` array — 238 in the newest snapshot; 210 currently in the graph (loaded at commit f76dbb1, 2026-07-28)"
+    key: "file_id — UNCHANGED. §C2 of the parent gate is not re-opened"
+    loader: "code_snapshot (same)"
+    properties:
+      - name: file_id
+        origin: source
+        from: "node.file_id — unchanged, still the IMPORTS join key"
+        note: "explicitly restated so the re-open cannot be read as touching it: all 376 IMPORTS edges and all 210 file nodes survive every option on this page"
+      - name: project
+        origin: source
+        from: "node.project"
+        note: "under §C1(b) this becomes REDUNDANT with a package traversal. §E3 asks whether it is retained (cheap denormalisation, no migration cost) or dropped"
+  - label: "Project (EXISTING — unchanged)"
+    source_object: "the snapshot `meta` block"
+    key: "project_id — 'drydocs'. §B1(a)'s single-root ruling STANDS; this page does not make the seven scan roots into Project nodes"
+    loader: "code_snapshot (same)"
+    properties:
+      - name: git_commit
+        origin: source
+        from: "meta.git.commit — 'f76dbb1' in the live graph"
+        note: "the live graph is FIVE DAYS behind HEAD (238 nodes in today's artifact vs 210 loaded). Not a defect — the load is manual and §H2 reads newest-at-run-time — but stated so nobody reads the counts on this page as disagreeing"
+sections:
+  - title: "A. Scope — a narrow re-open, and what stays shut"
+    confirmations:
+      - "A1: this gate re-opens EXACTLY THREE confirmations of self-documentation-code-graph: §B1 (single root / scan roots as a property), §B2 (the HAS_MODULE name) and §C4 (__init__.py as an ordinary node). Confirm that framing before anything else, because a wider re-open is a different and much more expensive page."
+      - "A2 [what STANDS — confirm, do not re-litigate]: §A2 target database `drydocs` · §C1 file-grain and the :CodeModule label · §C2 the file_id key · §C5 the URN deferral and its second-project-tree trigger · §D1/§D2 IMPORTS and its TYPE_CHECKING limit · §D3 the M2 pull-provenance convention · §E1(b) the single SWO IS_ENCODED_IN binding · §G1 the meta.tree discriminator · §H1-§H6. None of these is touched by any option on this page."
+      - "A3: this gate does NOT build. No node is written, no constraint created, no loader changed, and the proposed vocabulary terms stay `status: planned` until §I signs. Same posture as the parent gate."
+      - "A4: THE FILE LEVEL IS NOT THE PROBLEM AND IS NOT BEING FIXED. In Python a module is what `import` binds, so drydocs/cli.py genuinely IS the module drydocs.cli and 210 :CodeModule nodes are correctly typed. Confirm you accept the vocabulary correction in the header — the re-opening question named the missing level 'module' when the level is 'package' — because §C is written against the corrected reading and would be answering a different question otherwise."
+      - "A5: the SWO layer CANNOT adjudicate this and is not consulted. drydocs_core/schema/ontology.cypher:122-134 seeds 13 terms — software, programming language, Python, Shell, Java, SQL, data transformation, is-executed-in, is-encoded-in, implements, has-specified-data-input/output, uses-platform. NONE expresses module, package or file granularity. Confirm the honest position: the repo's cited software ontology is silent here, the governing vocabulary is Python's own import system, and PROV-O supplies the containment semantics (§E2). Recording this prevents a later 'why was this not bound to SWO?'"
+  - title: "B. Premise findings — what changed under the ruling since 2026-07-27"
+    confirmations:
+      - "B1 [SCAN-ROOT DRIFT — the finding that argues hardest for this gate]: the parent gate's §B1 ruling text enumerates SIX scan roots (drydocs, drydocs_core, drydocs_deepdoc, drydocs_lineage, drydocs_remediation, tests). THE NEWEST SNAPSHOT CARRIES SEVEN — drydocs_api is absent from that list and present in every recent artifact. Across the 101 committed snapshots the count has gone 2 -> 7 (the oldest, drydocs-20260701.json, holds ['drydocs','tests'] and 73 nodes; today's holds seven and 238). Confirm the correction, and note WHY it is load-bearing rather than pedantry: a ruling that hard-codes a count of the thing that keeps growing will keep going stale, which is itself evidence that the roots want to be NODES rather than a sentence in a gate."
+      - "B2 [THE UNSOUND TEST — this one reshaped §C2]: the obvious package rule, 'a directory containing __init__.py', IS WRONG IN THIS REPO. Twenty directories hold .py files; eighteen have __init__.py. Of the two that do not, `tests` is correctly not a package — but drydocs_core/schema IS A LIVE PEP 420 IMPLICIT NAMESPACE PACKAGE. Verified by import 2026-08-02: __file__ is None, __path__ resolves to the directory, and production code imports through it (drydocs/cli.py:79-83, `from drydocs_core.schema.constraints import declared_constraint_names`). An __init__.py rule produces a FALSE NEGATIVE on a package the CLI depends on. Confirm the finding — §C2 exists because of it."
+      - "B3 [THE AUTHORITATIVE LIST NOBODY CONSULTED]: pyproject.toml already declares the top-level packages — `packages = [drydocs, drydocs_core, drydocs_remediation, drydocs_lineage, drydocs_deepdoc, drydocs_api]`. SIX, and `tests` is deliberately not among them. This is committed, machine-readable, and authoritative about what the distribution IS, in exactly the way the parent gate found `projects` in the artifact. Confirm it is admissible as an input (whether it is USED is §C2(c)), and note the asymmetry it exposes: a SCAN ROOT is 'where the scanner looked', a PACKAGE is 'what ships' — the two differ by `tests`, and conflating them is how 45% of the code graph became test files."
+      - "B4 [scale and shape, so no option is priced wrong]: 20 package-candidate directories, nesting depth at most 3 (7 at depth 1, 12 at depth 2, 1 at depth 3 — drydocs_core/orchestration/controlm). So the level being proposed is ~20 nodes and ~20 edges against 238 files and 376 import edges. Confirm the size: this is a SMALL addition, and the parent gate's cost objection at §B1(c) ('a fifth new class') was about class-count discipline, not data volume."
+  - title: "C. The decision — does the package become a node, and how is one recognised"
+    confirmations:
+      - "C1 [THE MAIN RULING]: does the package level become NODES? (a) NO — keep the flat model, accept the recorded cost, and this page closes as 'considered, declined again' [a real option, and the cheapest; it means HAS_MODULE stays a total edge duplicating a label, and S2's parent/child structure stays unrepresentable]. (b) YES — (:CodePackage) between :Project and :CodeModule [AGENT RECOMMENDATION — it is the parent gate's own §B1(c), which that gate called 'most faithful' and declined on cost; §B4 shows the cost is ~20 nodes; and it is ADDITIVE, so §C1's kill-argument about losing file identity does not reach it]. (c) PROPERTY ONLY — add CodeModule.package (dotted name) and no node [cheapest of the two that fix anything; but a property cannot carry nesting, cannot be the endpoint of the __init__.py tie in §D2, and answers 'what is in this package' only by string prefix matching, which is the shape of query the graph exists to replace]."
+      - "C2 *** THE HARD ONE — how is a package IDENTIFIED, offline and deterministically? *** (a) __init__.py presence [REJECTED BY §B2's evidence — false negative on drydocs_core.schema, which drydocs/cli.py imports]. (b) ANY directory holding at least one .py, derived from the file nodes the scan already emitted [AGENT RECOMMENDATION — deterministic, offline, needs no new scanner capability, and cannot invent a directory that holds no code. Its one wrong answer is promoting the `tests` root, which §F1 rules explicitly rather than silently]. (c) (b) PLUS pyproject.toml, with `distribution: true/false` marking the six declared packages [most truthful, and it is the §B3 authoritative list; costs the loader a second input file and a company-side divergence, §H5]. (d) IMPORTABILITY — ask Python [correct by construction and CATEGORICALLY REFUSED: it executes imports at scan time, and §H1 established that the load path has zero network egress and is offline+deterministic+re-runnable-from-committed-files. Importing arbitrary modules to classify them trades all three away]. NOTE: (b) and (c) differ only in whether one extra property is carried; neither changes the node set."
+      - "C3: does the package level NEST — (:CodePackage)-[:HAS_PACKAGE]->(:CodePackage) — or is it one flat level under :Project? THE CONCRETE CASE, and the reason this is not academic: S2 (ADR 0008, merged 2026-08-01) created drydocs_core/orchestration/ FOR THE SOLE PURPOSE of being a parent to controlm/, so a second orchestrator has somewhere to land without forking neutral code. Flat, that parenthood does not exist in the graph. AGENT RECOMMENDATION: NEST — depth is at most 3 (§B4), prov:hadMember composes over nested Collections by construction (§E2), and refusing it means the graph cannot answer the question S2 was built to make answerable."
+      - "C4: under §C1(b), what is the KEY? Proposed package_id = the repo-relative directory path, mirroring file_id's reasoning at the parent §C2 — structural, already the prefix of every file_id it contains, and needing no derivation the artifact cannot support. Confirm, AND confirm the §C5 inheritance: when a second project tree lands (the §B3 company scenario), package_id stops being globally unique on exactly the same day file_id does. This gate does NOT resolve that deferral and must not deepen it — the urn:dd: form named at parent §C5 would extend to packages unchanged."
+  - title: "D. __init__.py — the sixteen mistyped nodes"
+    confirmations:
+      - "D1 [the finding, stated precisely]: there are SIXTEEN __init__.py nodes in the live graph. Each is typed :CodeModule and sits as a flat peer of its siblings. In Python that is wrong in a specific way: importing drydocs executes drydocs/__init__.py and binds a module whose __name__ is 'drydocs' — there is no module named '__init__'. The file does not BELONG TO a package; it CONSTITUTES one. Confirm the finding. Note also that these nodes are load-bearing, not decorative: 65 inbound and 38 outbound IMPORTS run through them, so anything that deletes or merges them moves real edges."
+      - "D2: the fix. (a) STATUS QUO — keep them as ordinary :CodeModule nodes, as parent §C4 ruled [defensible if §C1(a) wins; indefensible alongside a :CodePackage level, because then the package exists as a node AND the thing that defines it sits unrelated beside it]. (b) KEEP THE FILE NODE AND ADD THE TIE — (:CodeModule {name:'__init__.py'})-[:DEFINES_PACKAGE]->(:CodePackage), new vocabulary term u1_defines_package [AGENT RECOMMENDATION — preserves all 103 import edges and file identity, states the real relationship, and leaves the namespace-package case (§B2) honestly represented as a :CodePackage with has_init=false and NO incoming DEFINES_PACKAGE edge, which is exactly what is true of drydocs_core/schema]. (c) COLLAPSE — the __init__.py node BECOMES the package node [this is the one variant parent §C1 correctly killed: it destroys file identity for 16 files and their import edges. Offered here only so the record shows it was considered and refused for the same reason as before]."
+  - title: "E. What HAS_MODULE then means"
+    confirmations:
+      - "E1: under §C1(b) the containment edges must be named. (a) HAS_MODULE for BOTH levels, letting prov:hadMember carry Collection->Collection and Collection->Entity alike [PROV-permitted and fewest terms; but a single edge name meaning two different containments is how the current confusion started]. (b) THREE TERMS — u1_has_package (Project->CodePackage, NEW), u1_has_package again or a distinct nesting term for Package->Package (§C3), and u1_has_module RE-POINTED to Package->Module [AGENT RECOMMENDATION — each edge then says one thing; u1_has_module's registry entry at relationship_vocabulary.yaml:2226 is REVISED (from_node Project -> CodePackage), not duplicated]. (c) rename the whole family to CONTAINS [rejected: tree-mode snapshots already use CONTAINS for filesystem containment (parent §G3) and reusing the name would fuse two concepts the same gate separated]."
+      - "E2 *** THE ONTOLOGY CHECK, since this is what the re-open asked for *** u1_has_module maps to prov:hadMember (Collection -> member). PROV-O places NO constraint against a member being itself a Collection — nesting is native, and a package containing modules while belonging to a project is the textbook shape. Confirm that the PROV mapping SUPPORTS the two-level model rather than merely tolerating it, and that the flat shape was therefore a modelling CHOICE and never a limitation the standard imposed. This is the substantive answer to 'review against the ontology' and belongs in the record."
+      - "E3 [cheap, but decide it explicitly]: with a package traversal available, CodeModule.project becomes redundant — it is derivable as the root of the package chain. Retain it as denormalisation (zero migration cost under wipe-and-rebuild; keeps every existing query working) or drop it? AGENT RECOMMENDATION: RETAIN, and record it as deliberate denormalisation rather than leaving a future reader to wonder whether it was an oversight."
+  - title: "F. tests/ — 45% of the code graph"
+    confirmations:
+      - "F1: 107 of the 238 nodes are tests/unit; with tests/integration the test tree is 112. `tests` is NOT a poetry package (§B3) and its own root has NO __init__.py — but tests/unit and tests/integration BOTH have one and are real packages. So the honest shape is: `tests` is a scan root that is not a package, containing two packages that are not distributed. Rule it: (a) tests packages load like any other, distinguished only by the §C2(c) `distribution` flag [AGENT RECOMMENDATION — the graph should state what is true rather than curate; the flag makes 'our shipped code' a one-property filter, and test-to-code import edges are genuinely useful for the §H5 'which tests cover this module' question the parent gate deferred]. (b) EXCLUDE the test tree from the package layer, leaving those files attached flat to :Project [preserves today's counts; but then 45% of the graph is a special case with no stated rule]. (c) tests get their own root [re-opens §B1's single-root ruling, which §A1 says this gate does not do]."
+      - "F2: whichever wins, confirm the `tests` ROOT ITSELF does not become a :CodePackage under §C2(b)'s 'any directory with a .py' rule — it holds exactly one .py at its top level and is not importable as a package. This is the one wrong answer §C2(b) produces, and naming it here is the difference between a known exception and a silent defect."
+  - title: "G. Safety — three confirmations of the parent gate this touches"
+    confirmations:
+      - "G1 [§G3 must be distinguished, not argued away]: the parent gate ruled that tree-mode's directory structure (663 CONTAINS edges over 124 directories) stays OUT as a second capability. A package layer is ADJACENT to that and the SME should rule it explicitly rather than accept a definition. THE DISTINCTION, offered honestly: a package is an IMPORT-SYSTEM concept, a directory is a FILESYSTEM one; they coincide 18 times out of 20 here and the two exceptions (§B2) are exactly where they diverge. Under §C2(b) the node set is derived from FILES THE SCAN EMITTED, so an empty directory, a docs/ folder or a .git/ can never appear — which is the operative difference from tree-mode. Confirm that this is a package layer and not §G3 by the back door, or rule that it is too close and belongs with §G3 instead."
+      - "G2 [§F1 must EXTEND]: the signed collision rule is 'no node carries both :CodeModule and :SoftwareProduct', expressed as a graph-test because Neo4j cannot declare label mutual-exclusion. :CodePackage is a THIRD kind of 'software' in the same database and inherits the same hazard. Confirm the graph-test is extended to cover :CodePackage against :SoftwareProduct — and note the keys stay disjoint by construction (a directory path vs the registry product id)."
+      - "G3 [§F2 is DIRECTLY touched]: the parent gate confirmed 'a single hop from :Project is the accepted test for this is our own code, and nothing else in the graph will hang off :Project.' Under §C1(b), what hangs off :Project changes from 210 modules to ~7 packages, and the one-hop test becomes a two-or-three-hop traversal. Confirm the replacement test explicitly — the agent view is that the LABEL was always the real test (`MATCH (m:CodeModule)` is zero hops and always was), and that §F2's edge-based framing is the assumption this whole gate is unwinding."
+  - title: "H. Mechanics"
+    confirmations:
+      - "H1 [THE COST CORRECTION — parent §B2 overstated it]: that gate warned 'renaming an edge after it is written is a migration', and that warning is materially weaker than it sounds IN THIS SUBGRAPH. The code graph is regenerated deterministically from a committed artifact every session and the repo's doctrine is wipe-and-rebuild, never migrate. So the true cost of any renaming or re-pointing here is: edit code_snapshot.cypher, the vocabulary registry, schema_graph.cypher, ontology_supplement.cypher and the loader tests, then re-run the loader. THERE IS NO DATA MIGRATION. Confirm the correction — it is the single fact that most changes how expensive this page's options are, and it applies to no other subgraph in the repo."
+      - "H2: no new CLI verb. `drydocs load-code-snapshot` gains the package derivation in the same run and stays idempotent (§H1 of the parent, the ADR 0002 D3 stateless test). Confirm, and confirm the derivation happens in the ADAPTER (Python, testable offline) rather than in Cypher — the loader's Cypher should receive package rows, not compute paths."
+      - "H3: a package_id uniqueness constraint is proposed. NOTE THE LIVE TRAP, proven on this repo 2026-08-01 during S3: `CREATE CONSTRAINT <name> IF NOT EXISTS` matches on the NAME, so redefining an existing name with a different key SUCCEEDS SILENTLY and leaves the original definition in force. Confirm the constraint carries a NEW name, and that tests/unit/test_schema.py's EXPECTED_CONSTRAINTS moves from 52 to 53 in the same commit."
+      - "H4: does this AMEND the existing config/taxonomy-ontology-map.yaml entry `self-documentation-code-graph`, or add a second entry? AGENT RECOMMENDATION: AMEND — same source, same loader, same subgraph, and a second entry would imply a second mapping where there is one. The amendment records this gate's date and the added vocab_ids alongside the original three."
+      - "H5 [the company question, cheap now and expensive later]: under §C2(c) the loader reads pyproject.toml to set `distribution`. The company's pyproject declares DIFFERENT packages. Confirm the correct posture: the flag is derived from WHICHEVER pyproject sits beside the snapshot being loaded, so it stays true per-tree — and confirm the loader treats a missing or unparseable pyproject as `distribution: null` (unknown) rather than false, because silently marking everything undistributed is the 'succeeds loudly, does nothing' family the parent gate's §H2 named as this repo's most-repeated defect."
+      - "H6: the loader must NEVER enumerate scan roots in code. §B1 showed a hard-coded six going stale within a week. Confirm the roots are read from the artifact on every run, and that a new root appearing requires no code change and no gate."
+  - title: "I. Sign-off"
+    confirmations:
+      - "ON SIGN-OFF: the proposed vocabulary terms (u1_has_package, u1_defines_package, plus the u1_has_module revision) are registered in drydocs_core/ontology/relationship_vocabulary.yaml at `status: planned`; the taxonomy-ontology-map entry is amended per §H4; the parent gate's §B1/§B2/§C4 are annotated IN PLACE as re-opened-and-superseded-by-this-gate with the date, per the file class's rule that the reasoning is the audit trail; a build item is added to backlog.yaml naming this gate as its dependency; gates.json and the enforcement matrix are regenerated. NOTHING IS WRITTEN TO THE GRAPH AT THE GATE ITSELF — and note that when the loader IS re-run, the code subgraph is rebuilt from the newest snapshot, so the five-day gap between the live graph (210 nodes, f76dbb1) and HEAD (238) closes as a side effect rather than needing its own step."
