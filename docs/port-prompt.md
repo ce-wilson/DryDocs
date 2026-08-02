@@ -413,6 +413,36 @@ carries its producer-side verification status in [BRACKETS]; spend review on [UN
     Producer reference at `6e993d2`: full suite 1272 / 5 skipped, Track-1 124 / 0.
     `EXPECTED_CONSTRAINTS` unchanged at 51.
 
+53. **TWO STRUCTURAL CHANGES, DISJOINT TREES** (2026-08-01/02; after `ebbc270`).
+    Both are gate- or ADR-authorized and neither writes the graph. They touch
+    nothing in common, so port them in either order — but do NOT land a third
+    structural change alongside them.
+    a. **S3 — `:BusinessApplication` identity `seal_id` → `app_id`** [LIVE-VERIFIED]
+       (`e29427f`; gate `business-application-identity`, 22/22 2026-07-27).
+       The MERGE key flips at all 8 key-bearing sites IN ONE CHANGE — a uniqueness
+       constraint ignores nulls, so a partial cutover SILENTLY DOUBLES the canonical
+       node instead of failing. `seal_id` is dual-written as a deprecated alias;
+       retiring it is a separate later gate. `:Port` NODE KEY follows as
+       `port_app_key (parent_app_id, kind)` — **DROP `port_unique` first**: re-declaring
+       under the same name succeeds and does nothing (verified live on a scratch DB).
+       ***YOUR FILE FORMATS DO NOT CHANGE***: the wire emits `app_id`, but
+       `manual_mappings.py` still parses `target_key=seal_id=` by name and
+       `OVERRIDE_HEADER` is still the committed CSV header — aliased at the boundary
+       on purpose. `EXPECTED_CONSTRAINTS` 51 → 52 producer-side; compute yours.
+    b. **S2 — `drydocs_core/orchestration/` parent** [TEST-PINNED] (ADR 0008, accepted
+       at S1). `git mv controlm → orchestration/controlm`; `commands.py` →
+       `orchestration/shell.py`; `paths.py` splits into the neutral shape + a
+       Control-M `PathDialect`; NEW `orchestration/crosswalk.py` gives
+       `config/crosswalks/` its first runtime consumer and RAISES on
+       `fidelity: no-equivalent`. 25 importers repointed; `drydocs_core/__init__.py`
+       exports `orchestration`, not `controlm`.
+       ***`scripts/render_enforcement_matrix.py` IS A 3-WAY MERGE ON YOUR SIDE*** (the
+       standing divergence: 4 company-only SURFACES rows). Take the `launcher-registry`
+       consumer path change and the NEW `orchestration-crosswalks` row into YOUR file;
+       do not overwrite it wholesale. ADR action item 2 records a correction worth
+       reading before you split anything: the Control-M "field routing" the ADR
+       scheduled out of `commands.py` was not in that file.
+
 ACCEPTANCE GATE (behavior is the contract, not a byte-compare):
 - Track 1 (portable):
     poetry run pytest tests/unit/test_variable_classifier.py tests/unit/test_variable_resolver.py \

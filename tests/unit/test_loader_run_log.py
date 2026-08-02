@@ -96,7 +96,7 @@ def test_warn_stream_tees_into_file_and_detaches(tmp_path, monkeypatch):
     log = LoaderRunLog("x.v1", "r1")
     path = log.open()
     log.attach()
-    logging.getLogger("drydocs_core.controlm.description_tokens").warning(
+    logging.getLogger("drydocs_core.orchestration.controlm.description_tokens").warning(
         "dropping unknown key %r", "SOME KEY"
     )
     # INFO capture follows the process's logging config (effective logger
@@ -114,7 +114,7 @@ def test_warn_stream_tees_into_file_and_detaches(tmp_path, monkeypatch):
     assert "Loader x.v1 done" in text
     assert "warnings captured    : 1" in text
     # after close the handler is gone — further records must not raise or write
-    logging.getLogger("drydocs_core.controlm.description_tokens").warning("late")
+    logging.getLogger("drydocs_core.orchestration.controlm.description_tokens").warning("late")
     assert "late" not in _read(path)
 
 

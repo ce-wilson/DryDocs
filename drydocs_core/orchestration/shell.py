@@ -468,31 +468,6 @@ def parse_file_op_statement(statement: str) -> FileOp | None:
     )
 
 
-_CONTAINER_CMD_RE = re.compile(r"command:\s*(?P<arr>.+?)\s*[}\]]", re.IGNORECASE | re.DOTALL)
-
-
-def extract_container_command(value: str) -> str | None:
-    """Pull the inner shell command from a UCM container-override value.
-
-    The override carries an array like
-    ``command: /bin/sh, -c, python /app/app.py --job_name ...`` — the real
-    command is the element(s) after the ``-c`` flag. Returns None when the
-    override has no command array (e.g. environment-only overrides).
-    """
-    m = _CONTAINER_CMD_RE.search(value)
-    if m is None:
-        return None
-    elements = [e.strip() for e in m.group("arr").split(",")]
-    if "-c" in elements:
-        idx = elements.index("-c")
-        inner = ", ".join(elements[idx + 1 :]).strip()
-        # the inner command itself may contain commas (arg lists) — those
-        # were split above; rejoin with space which tokenizes the same
-        return inner.replace(",", " ").strip() or None
-    # no -c: the array itself is the argv
-    return " ".join(e for e in elements if e and e != "/bin/sh") or None
-
-
 # wrapper launchers whose REAL payload rides an argument flag: the abioncloud
 # runScript.sh wrapper carries its Ab Initio pset (plus an optional nested
 # -run_prog_command_line script) inside the quoted -g value. Without expansion

@@ -36,7 +36,7 @@ Two steps, two CLI verbs:
     :func:`resolve_job_detail` joins its jobs to ``job_detail`` rows on
     (data_center, folder_name, job_name) and resolves each STORE-VERBATIM
     ``cmd_line`` through the ONE shared resolver
-    (:func:`drydocs_core.controlm.resolve_command_line` — guardrail 1:
+    (:func:`drydocs_core.orchestration.controlm.resolve_command_line` — guardrail 1:
     substitution never happens here or in the extractor). ``cmd_line``
     stays verbatim beside the derived value (guardrail 2), the
     ``resolution_quality`` table records provenance per job (source,
@@ -73,8 +73,8 @@ import sqlite3
 from dataclasses import dataclass, field
 from pathlib import Path
 
-from drydocs_core.controlm.commands import dpl_properties, parse_command, pipeline_guid
 from drydocs_core.data_root import source_dir
+from drydocs_core.orchestration.shell import dpl_properties, parse_command, pipeline_guid
 
 LOGGER = logging.getLogger("drydocs.cmdline_staging")
 
@@ -417,7 +417,7 @@ def resolve_job_detail(
     cleared first (deterministic — same store + same XML → same outcome).
     NO graph writes.
     """
-    from drydocs_core.controlm import resolve_command_line
+    from drydocs_core.orchestration.controlm import resolve_command_line
 
     db_path = Path(db_path)
     if not db_path.exists():

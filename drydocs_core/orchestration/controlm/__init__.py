@@ -20,14 +20,16 @@ Keep import/export behind a format-agnostic interface so a JSON backend can be
 added when the platform migrates; do not bake XML assumptions into the engine.
 """
 
-from .commands import (
-    FileOp,
-    Invocation,
-    extract_container_command,
-    parse_command,
-    pipeline_guid,
-)
+# S2 (ADR 0008): the parser and the FileRef shape are vendor-NEUTRAL and now
+# live one level up at orchestration/. They are re-exported here unchanged so
+# every existing importer keeps working — what moved is where the knowledge
+# lives, not what any of it does. `extract_container_command` came with the
+# Control-M half into .fields; `build_file_ref` / `classify_role` /
+# `canonicalize_path` are the neutral functions bound to the Control-M
+# PathDialect in .paths.
+from ..shell import FileOp, Invocation, parse_command, pipeline_guid
 from .facts import route_fact
+from .fields import extract_container_command
 from .folder_name import ParsedFolderName, parse_folder_name
 from .paths import FileRef, build_file_ref, canonicalize_path, classify_role
 from .resolver import (

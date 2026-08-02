@@ -7,7 +7,7 @@ software-ontology surfaces — reusing, never duplicating, the G14/G15/G16
 machinery:
 
 (a) launcher/interpreter invocations found inside SCRIPTS classify via the
-    shared ``LAUNCHER_REGISTRY`` (``drydocs_core.controlm.parse_command``);
+    shared ``LAUNCHER_REGISTRY`` (``drydocs_core.orchestration.controlm.parse_command``);
     a DPL launch keeps its pipeline-GUID identity (G15) via the same
     ``_stable_invocation_key`` the CMD_LINE extractor uses. They become
     INVOKES candidates from the ``rua_script`` node — m3_invokes is
@@ -42,7 +42,7 @@ import re
 from dataclasses import asdict, dataclass, field
 from pathlib import Path
 
-from drydocs_core.controlm import classify_variable, parse_command
+from drydocs_core.orchestration.controlm import classify_variable, parse_command
 
 from ..model import DataAssetNode, LineageGraph, ProcessNode, asset_id, process_id
 from .controlm_inventory import (

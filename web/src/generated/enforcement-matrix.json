@@ -394,7 +394,7 @@
       "file": "config/launcher-registry.yaml",
       "code_resident": false,
       "consumers": [
-        "drydocs_core/controlm/commands.py",
+        "drydocs_core/orchestration/shell.py",
         "drydocs_lineage/"
       ],
       "guard_tests": [
@@ -409,6 +409,28 @@
         "config/launcher-registry.yaml"
       ],
       "content": "# =============================================================================\n# config/launcher-registry.yaml — the Phase-C launcher/classifier registry (G26)\n#\n# schema: drydocs.launcher-registry.v1\n#\n# MOVED OUT OF drydocs_core/controlm/commands.py (2026-07-27, backlog G26 —\n# the 2026-07-16 SME requirement from the cmdline-lineage-review mini-gate):\n# adding a wrapper rule is now a CONFIG EDIT plus a test run, no Python\n# change. commands.py LOADS this file at import; behavior is unchanged.\n#\n# Contract (guarded by tests/unit/test_launcher_registry.py):\n#   - rules are ORDERED — first match on the executable BASENAME wins;\n#   - `pattern` is a Python regex (re.search semantics against the basename);\n#     `ignore_case: true` adds re.IGNORECASE;\n#   - `rule` is the classifier_rule id STG_INVOCATION records — the\n#     software-registry invocation_patterns rows pin these ids for gate\n#     review, so renaming one is a BREAKING change the guard test catches;\n#   - `named_launcher: true` marks a REGISTERED LAUNCHER entrypoint — the\n#     G16 value contract (\"aliases suggest, values decide\"): a variable whose\n#     VALUE hits one of these is a launcher reference regardless of the\n#     variable's NAME (the JAR_PATH -> dt-launcher.sh gotcha). Generic\n#     interpreter/extension rules (shell.script, python.*, java.*) stay\n#     unmarked on purpose — an arbitrary .sh value is not launcher evidence.\n#\n# The dpl.pipeline_guid_literal fallback (an UNKNOWN verb whose args carry a\n# -pipeline GUID) is parser LOGIC, not a basename rule — it stays in\n# commands.py (G15 acceptance c).\n# =============================================================================\n\nschema: drydocs.launcher-registry.v1\nupdated: 2026-07-27\n\nrules:\n  - { pattern: '\\.m$',                          invocation_type: ABINITIO,        rule: abinitio.graph_or_plan }\n  - { pattern: '\\.pset$',                       invocation_type: ABINITIO,        rule: abinitio.pset }\n  - { pattern: '^m_\\w+',        ignore_case: true, invocation_type: INFORMATICA,  rule: informatica.mapping_prefix }\n  - { pattern: '^pmcmd$',       ignore_case: true, invocation_type: INFORMATICA,  rule: informatica.pmcmd, named_launcher: true }\n  # the canonical Informatica wrapper launcher (v2 standard templates 6.4/6.5;\n  # G16 — previously fell through to the generic .ksh shell rule)\n  - { pattern: '^ICDW_etl_run_interface\\.ksh$', ignore_case: true, invocation_type: INFORMATICA, rule: informatica.icdw_run_interface, named_launcher: true }\n  - { pattern: '^run_data_validation\\.sh$',     invocation_type: VALIDATION_UTIL, rule: validation.run_data_validation, named_launcher: true }\n  - { pattern: '^run_calp_temp\\.sh$',           invocation_type: VALIDATION_UTIL, rule: validation.run_calp_temp, named_launcher: true }\n  # DPL data-pipeline accelerators. SME 2026-07-16 (gate-log\n  # cmdline-lineage-review): DPL is NOT Ab Initio — java zilo ETL framework\n  # originally; a -py flag routes to a java-spark/pyspark framework. Common\n  # path /apps/tenants/dpl_utils/dt-accelerators/; the launcher spelling\n  # observed is dt-launcher.sh (dtlaunch.sh kept as a variant).\n  - { pattern: '^dt-?launch(er)?\\.sh$',         ignore_case: true, invocation_type: DPL, rule: dpl.dt_launcher_accelerator, named_launcher: true }\n  - { pattern: '^dt-pipelines-launcher.*\\.jar$', ignore_case: true, invocation_type: DPL, rule: dpl.pipelines_launcher_jar, named_launcher: true }\n  # on-prem shell launcher spelling (dpl_processor/bin; extensionless; the\n  # _dynamic variant adds spark-params passthrough) — same DPL kind (G15,\n  # 2026-07-21 prod samples + variable gap analysis: live folder vars carry it)\n  - { pattern: '^dpl_spark_processor(_dynamic)?$', ignore_case: true, invocation_type: DPL, rule: dpl.spark_processor_onprem, named_launcher: true }\n  - { pattern: '^air$',         ignore_case: true, invocation_type: ABINITIO,     rule: abinitio.air_cli }\n  - { pattern: '^java$',        ignore_case: true, invocation_type: JAVA,         rule: java.interpreter }\n  - { pattern: 'runscript\\.sh$', ignore_case: true, invocation_type: SHELL_SCRIPT, rule: abioncloud.runscript_wrapper, named_launcher: true }\n  - { pattern: '^(spark-submit|pyspark)$',      invocation_type: PYSPARK,         rule: pyspark.spark_submit }\n  - { pattern: 'python[0-9.]*$',                invocation_type: PYTHON,          rule: python.interpreter }\n  - { pattern: '\\.py$',                         invocation_type: PYTHON,          rule: python.script }\n  - { pattern: '\\.(sh|ksh|bash)$',              invocation_type: SHELL_SCRIPT,    rule: shell.script }\n  - { pattern: '\\.(pl)$',                       invocation_type: SHELL_SCRIPT,    rule: perl.script }\n  - { pattern: '^(sftp|ftp|scp|aft)$',          ignore_case: true, invocation_type: FILE_TRANSFER, rule: transfer.client }\n",
+      "extra_contents": {}
+    },
+    {
+      "id": "orchestrator-crosswalks",
+      "title": "Orchestrator crosswalks (native -> BMC baseline)",
+      "file": "config/crosswalks/",
+      "code_resident": false,
+      "consumers": [
+        "drydocs_core/orchestration/crosswalk.py"
+      ],
+      "guard_tests": [
+        "test_orchestration_crosswalk.py"
+      ],
+      "gate_ref": "autosys-crosswalk / airflow-crosswalk (both SIGNED OFF 2026-07-14)",
+      "status": "gate-pending",
+      "pending_entries": 2,
+      "env_refs": [],
+      "files": [
+        "config/crosswalks/airflow-to-bmc.yaml",
+        "config/crosswalks/autosys-to-bmc.yaml"
+      ],
+      "content": null,
       "extra_contents": {}
     }
   ]

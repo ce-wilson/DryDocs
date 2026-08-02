@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from drydocs_core.controlm import parse_folder_name
+from drydocs_core.orchestration.controlm import parse_folder_name
 
 
 def test_real_folder_name_from_recursive_sample() -> None:

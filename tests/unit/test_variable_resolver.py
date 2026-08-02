@@ -8,14 +8,14 @@ production extract (controlm_variables__sample.csv): 183213/188252
 
 from __future__ import annotations
 
-from drydocs_core.controlm.commands import parse_command
-from drydocs_core.controlm.resolver import (
+from drydocs_core.orchestration.controlm.resolver import (
     MAX_DEPTH,
     ResolvedVariable,
     resolve_command_line,
     resolve_job,
     resolve_layers,
 )
+from drydocs_core.orchestration.shell import parse_command
 
 
 def _by_name(rvs: list[ResolvedVariable]) -> dict[str, ResolvedVariable]:

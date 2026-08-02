@@ -4,15 +4,24 @@ routing. Scenarios transcribed from real production rows.
 
 from __future__ import annotations
 
-from drydocs_core.controlm.commands import (
+from drydocs_core.orchestration.controlm.facts import route_fact
+
+# S2 (ADR 0008): the parser is neutral (orchestration.shell); the UCM container
+# override is a Control-M FIELD shape, so it moved to controlm.fields with the
+# rest of the vendor half. The path functions here are the neutral ones bound to
+# the Control-M PathDialect — same behavior, vendor knowledge in the vendor dir.
+from drydocs_core.orchestration.controlm.fields import extract_container_command
+from drydocs_core.orchestration.controlm.paths import (
+    build_file_ref,
+    canonicalize_path,
+    classify_role,
+)
+from drydocs_core.orchestration.controlm.variables import classify_variable
+from drydocs_core.orchestration.shell import (
     classify_executable,
-    extract_container_command,
     parse_command,
     split_statements,
 )
-from drydocs_core.controlm.facts import route_fact
-from drydocs_core.controlm.paths import build_file_ref, canonicalize_path, classify_role
-from drydocs_core.controlm.variables import classify_variable
 
 # --- statement splitting ------------------------------------------------------
 
@@ -230,7 +239,7 @@ def test_route_notification_splits_addresses() -> None:
 
 
 def test_fid_env_triplet_carries_environment() -> None:
-    from drydocs_core.controlm.variables import classify_job_variables
+    from drydocs_core.orchestration.controlm.variables import classify_job_variables
 
     out = {
         cv.name: cv
@@ -307,7 +316,7 @@ def test_sample_reproduces_depgraph_oracle() -> None:
 def test_invocation_target_prefers_script_then_executable() -> None:
     """`target` (folded from the depgraph prototype, ADR 0002-C §3) keys lineage
     child nodes: script wins, executable is the fallback, raw statement last."""
-    from drydocs_core.controlm import parse_command
+    from drydocs_core.orchestration.controlm import parse_command
 
     spark = parse_command(
         "spark-submit --master yarn /opt/spark/refine_loans.py --date {ODATE}"

@@ -7,7 +7,7 @@ reference only). One export carries the job definition AND its folder/job
 variables in a single self-consistent snapshot — which is exactly what the
 XML-fed resolution chain needs: this extractor STAGES the ordered
 definitions; substitution happens exclusively in
-:mod:`drydocs_core.controlm.resolver` (guardrail 1 — one resolver, never a
+:mod:`drydocs_core.orchestration.controlm.resolver` (guardrail 1 — one resolver, never a
 second engine in an adapter), and the G48 ``resolve-cmdline-staging`` step
 joins the two. ZERO graph writes anywhere — no LineageGraph parameter exists
 in this API; the source entry (``controlm-xml-export``) is ``confirmed:
@@ -153,7 +153,7 @@ class XmlDefsExtract:
 
     def scope_layers(self, job: XmlJobRecord):
         """The vendor-priority scope chain for one job — EXACTLY the
-        ``layers`` shape :func:`drydocs_core.controlm.resolve_command_line`
+        ``layers`` shape :func:`drydocs_core.orchestration.controlm.resolve_command_line`
         takes (folder first, enclosing sub-folders outermost-in, job last).
         This is the G48 join surface: staging hands the ordered definitions
         over; the shared resolver does every substitution."""

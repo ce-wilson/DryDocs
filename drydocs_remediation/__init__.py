@@ -4,7 +4,7 @@ The component runs **detect → transform → prove → Jira**: import the *lega
 definition via a :class:`~drydocs_remediation.formats.DefinitionFormat` (XML today, BMC's
 JSON Automation API later), detect standards findings against the rules registry, propose a
 *greenfield* definition, prove offline equivalence (the greenfield re-derives the same
-resolved behavior via ``drydocs_core.controlm``), and hand off as a Jira — the dev team
+resolved behavior via ``drydocs_core.orchestration.controlm``), and hand off as a Jira — the dev team
 holds deploy rights (separation of duties; we author, they implement).
 
 Invariants (0002-B §0/§3 — each lands as a test with the real implementation):

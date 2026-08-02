@@ -40,7 +40,7 @@ def test_write_targets_sit_on_opposite_sides_of_the_trust_boundary() -> None:
 
 def test_both_components_share_the_core_parser() -> None:
     # D2: "they share the command-line/lineage parser in drydocs-core"
-    import drydocs_core.controlm as core_parser
+    import drydocs_core.orchestration.controlm as core_parser
     from drydocs_deepdoc import investigate
     from drydocs_lineage.extractors import controlm_inventory
 

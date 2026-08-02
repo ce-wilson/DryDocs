@@ -1,7 +1,7 @@
 """drydocs-lineage — proactive, curated command-line lineage (ADR 0002 D2, C2; G4).
 
 Deepens job lineage starting from the **job command line**: the shared parser in
-``drydocs_core.controlm`` (``parse_command`` / ``extract_container_command`` /
+``drydocs_core.orchestration.controlm`` (``parse_command`` / ``extract_container_command`` /
 ``build_file_ref``) turns CMD_LINE into invocations and file references; this component
 derives dataset/file lineage candidates from them, runs them through **phased HITL
 curation**, and writes ONLY the curated result to the **ground-truth** database

@@ -68,13 +68,13 @@ from rich.table import Table
 import drydocs_core
 from drydocs_core.adapters import CsvAdapter, OracleAdapter
 from drydocs_core.config import load_settings
-from drydocs_core.controlm import (
+from drydocs_core.models import ControlMVariableRow
+from drydocs_core.neo4j_client import Neo4jClient
+from drydocs_core.orchestration.controlm import (
     VariableCoverage,
     classify_job_variables,
     resolve_job,
 )
-from drydocs_core.models import ControlMVariableRow
-from drydocs_core.neo4j_client import Neo4jClient
 from drydocs_core.run_log import LoaderRunLog
 from drydocs_core.schema.constraints import declared_constraint_names
 from drydocs_core.schema.supplements import (

@@ -13,7 +13,7 @@ from pathlib import Path
 
 import pytest
 
-from drydocs_core.controlm import parse_command
+from drydocs_core.orchestration.controlm import parse_command
 from drydocs_lineage.extractors import ControlMInventoryExtractor
 from drydocs_lineage.model import REL_ALIASES, REL_TYPES, LineageGraph
 

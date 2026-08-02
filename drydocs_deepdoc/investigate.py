@@ -1,6 +1,6 @@
 """On-demand deep dive — a failure names the job/folder; this derives context.
 
-Analysis runs on the shared core parser (``drydocs_core.controlm``); every finding
+Analysis runs on the shared core parser (``drydocs_core.orchestration.controlm``); every finding
 carries an explicit reliability/trust stamp because NOTHING here is verified — that
 verification happens later, at the HITL promotion gate, if ever.
 """
@@ -10,7 +10,10 @@ from __future__ import annotations
 from dataclasses import dataclass
 
 # the shared parser surface — re-exported for the on-failure analysis bodies (G4)
-from drydocs_core.controlm import extract_container_command, parse_command  # noqa: F401
+from drydocs_core.orchestration.controlm import (  # noqa: F401
+    extract_container_command,
+    parse_command,
+)
 
 
 @dataclass(frozen=True)

@@ -20,7 +20,7 @@ from pathlib import Path
 
 import pytest
 
-from drydocs_core.controlm import resolve_command_line
+from drydocs_core.orchestration.controlm import resolve_command_line
 from drydocs_lineage.extractors import ControlMXmlDefsExtractor
 
 DC = "P032-E0700-DMA"
@@ -110,7 +110,7 @@ def test_variable_order_scope_and_container(run) -> None:
 
 
 def test_scope_layers_feed_the_one_shared_resolver(run) -> None:
-    """Staging hands ordered defs to drydocs_core.controlm — the extractor
+    """Staging hands ordered defs to drydocs_core.orchestration.controlm — the extractor
     itself never substitutes anything."""
     job = next(j for j in run.jobs if j.job_name == "PRHLD1G001")
     rcl = resolve_command_line(run.scope_layers(job), job.cmd_line)

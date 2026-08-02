@@ -328,3 +328,46 @@ def test_every_module_is_classified():
             "AMBIGUOUS — classified into more than one bucket:\n  " + "\n  ".join(ambiguous)
         )
     assert not problems, "\n".join(problems)
+
+
+# --- S2 / ADR 0008: the orchestration neutrality direction ---------------------
+#
+# The parent is neutral, the vendor sits beneath it, and the dependency runs ONE
+# way: `orchestration/controlm/` may import `orchestration.shell` / `.paths` /
+# `.crosswalk`; the neutral level must never import the vendor. Without this the
+# split is a directory layout that nothing holds in place — exactly the state
+# before S2, where ~600 neutral lines lived inside a vendor-named package.
+#
+# NOTE the rule is narrower than ADR 0008 action item 4's phrasing ("nothing
+# outside orchestration/controlm/ imports Control-M-specific modules"). Taken
+# literally that would fail the repo on its first run: drydocs/staging.py,
+# drydocs/cli.py and the lineage extractors all import the Control-M parser and
+# are RIGHT to — they ingest Control-M. The enforceable invariant is the
+# WITHIN-CORE direction, which is what makes a second vendor possible.
+ORCHESTRATION_DIR = REPO_ROOT / "drydocs_core" / "orchestration"
+_VENDOR_PREFIX = "drydocs_core.orchestration.controlm"
+
+
+def test_neutral_orchestration_never_imports_a_vendor() -> None:
+    """orchestration/*.py must not depend on orchestration/controlm/ (ADR 0008 rule 1)."""
+    offenders: list[str] = []
+    for path in sorted(ORCHESTRATION_DIR.glob("*.py")):
+        for imported in _imported_drydocs_modules(path):
+            if imported == _VENDOR_PREFIX or imported.startswith(_VENDOR_PREFIX + "."):
+                offenders.append(f"{path.name} -> {imported}")
+    assert not offenders, (
+        "the NEUTRAL orchestration level imported a vendor package — the dependency "
+        "runs the other way (vendor may import neutral, never the reverse):\n  "
+        + "\n  ".join(offenders)
+    )
+
+
+def test_the_vendor_package_actually_sits_beneath_the_parent() -> None:
+    """Guards the shape itself, so a future move cannot quietly undo S2."""
+    assert (ORCHESTRATION_DIR / "controlm" / "__init__.py").exists()
+    for neutral in ("shell.py", "paths.py", "crosswalk.py", "__init__.py"):
+        assert (ORCHESTRATION_DIR / neutral).exists(), f"missing neutral module {neutral}"
+    assert not (REPO_ROOT / "drydocs_core" / "controlm").exists(), (
+        "drydocs_core/controlm/ is back at the top level — S2 moved it under "
+        "orchestration/ so a second orchestrator has a sibling slot"
+    )

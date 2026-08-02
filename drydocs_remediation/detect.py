@@ -20,7 +20,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 
-from drydocs_core.controlm import classify_job_variables
+from drydocs_core.orchestration.controlm import classify_job_variables
 
 from .formats import DefinitionSet
 

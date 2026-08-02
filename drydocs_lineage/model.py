@@ -73,7 +73,7 @@ class ProcessNode:
     application: str = ""  # business app (Control-M APPLICATION); SEAL reconcile key
     dataflow: str = ""  # DPL -dataflow name (G12: ETLProcess PROPERTY, never identity)
     config_path: str = ""  # config/JSON path alongside the invocation (G12: ETLProcess
-    # PROPERTY; mirrors drydocs_core.controlm.Invocation.config_path)
+    # PROPERTY; mirrors drydocs_core.orchestration.controlm.Invocation.config_path)
     properties: dict[str, str] = field(default_factory=dict)
     # remaining definition-level launcher params (G15: the DPL
     # argument contract — env/app_name/alias/seal/fid/image/

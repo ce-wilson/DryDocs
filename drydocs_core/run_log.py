@@ -53,7 +53,7 @@ _THIN_RULE = "-" * 66
 
 #: logger namespaces the capture handler tees into the run log. Both package
 #: roots — the WARN streams live under either (e.g. drydocs.loaders.base,
-#: drydocs_core.controlm.* company-side).
+#: drydocs_core.orchestration.controlm.* company-side).
 CAPTURE_NAMESPACES = ("drydocs", "drydocs_core")
 
 

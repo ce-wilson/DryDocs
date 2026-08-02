@@ -4,7 +4,7 @@ Reads a CSV export of ``psgmgr.CM_DEF_VJOB`` (the projection in the load side's
 ``controlm_jobs.sql``) and turns each current-version job into a
 :class:`~drydocs_lineage.model.ProcessNode` carrying the authoritative
 job/cmd/node_target/run_as/folder/application. It then parses each CMD_LINE — via the
-SHARED core parser, ``drydocs_core.controlm.parse_command`` (the depgraph fork is
+SHARED core parser, ``drydocs_core.orchestration.controlm.parse_command`` (the depgraph fork is
 gone; 0002-C §3/G8) — to find the *next lower dependency*, the script/executable the
 job launches, and links it with an ``INVOKES`` rel (m3_invokes, prov:used). Shared
 scripts invoked from multiple folders collapse to one child node with multiple
@@ -38,8 +38,8 @@ import csv
 from dataclasses import asdict, dataclass
 from pathlib import Path
 
-from drydocs_core.controlm import parse_command, pipeline_guid
-from drydocs_core.controlm.commands import dpl_properties as _dpl_properties
+from drydocs_core.orchestration.controlm import parse_command, pipeline_guid
+from drydocs_core.orchestration.shell import dpl_properties as _dpl_properties
 
 from ..model import DataAssetNode, LineageGraph, ProcessNode, asset_id, process_id
 
@@ -129,7 +129,7 @@ def _stable_invocation_key(inv, target: str) -> str:
 
 
 # The DPL launcher argument contract (G15) is PROMOTED to the shared core
-# parser — drydocs_core.controlm.commands.dpl_properties — so the load
+# parser — drydocs_core.orchestration.shell.dpl_properties — so the load
 # component's cmdline staging parser (G40) and these extractors read ONE
 # contract (imported above as _dpl_properties; rua_code_ops imports it from
 # here, unchanged).

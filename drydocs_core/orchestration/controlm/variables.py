@@ -48,7 +48,7 @@ import re
 from dataclasses import dataclass
 from enum import Enum
 
-from .commands import is_registered_launcher
+from ..shell import is_registered_launcher
 
 
 class VariableKind(str, Enum):

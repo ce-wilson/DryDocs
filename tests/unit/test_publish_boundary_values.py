@@ -27,7 +27,7 @@ from pathlib import Path
 
 import pytest
 
-from drydocs_core.controlm.folder_name import parse_folder_name
+from drydocs_core.orchestration.controlm.folder_name import parse_folder_name
 
 REPO = Path(__file__).resolve().parents[2]
 

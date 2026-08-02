@@ -23,7 +23,7 @@ from pathlib import Path
 
 import yaml
 
-from drydocs_core.controlm import commands
+from drydocs_core.orchestration import shell as commands
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
 REGISTRY = REPO_ROOT / "config" / "launcher-registry.yaml"

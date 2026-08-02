@@ -11,13 +11,13 @@ from pathlib import Path
 import pytest
 
 from drydocs_core.adapters.csv_adapter import CsvAdapter
-from drydocs_core.controlm import (
+from drydocs_core.models import ControlMVariableRow
+from drydocs_core.orchestration.controlm import (
     VariableCoverage,
     VariableKind,
     classify_job_variables,
     classify_variable,
 )
-from drydocs_core.models import ControlMVariableRow
 
 SAMPLE = (
     Path(__file__).resolve().parents[2]
@@ -333,13 +333,13 @@ def test_value_contract_skips_unresolved_and_multitoken_values() -> None:
 
 
 def test_icdw_run_interface_classifies_informatica() -> None:
-    from drydocs_core.controlm.commands import classify_executable
+    from drydocs_core.orchestration.shell import classify_executable
 
     itype, rule = classify_executable("/etlapps/icdw/prod/ops/Scripts/ICDW_etl_run_interface.ksh")
     assert itype == "INFORMATICA"
     assert rule == "informatica.icdw_run_interface"
     # generic shell scripts still classify SHELL_SCRIPT, not launcher
-    from drydocs_core.controlm.commands import is_registered_launcher
+    from drydocs_core.orchestration.shell import is_registered_launcher
 
     assert is_registered_launcher("/apps/x/dt-launcher.sh")
     assert not is_registered_launcher("/opt/scripts/hldm/onpm_fw.ksh")

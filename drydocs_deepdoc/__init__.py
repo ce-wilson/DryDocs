@@ -1,7 +1,7 @@
 """drydocs-deepdoc — reactive, on-demand deep documentation (ADR 0002 D2, C3; G4).
 
 The same dependency analysis as ``drydocs_lineage`` — the shared parser in
-``drydocs_core.controlm`` — run **reactively when a failure needs context**, writing
+``drydocs_core.orchestration.controlm`` — run **reactively when a failure needs context**, writing
 its findings to the **isolated uncertain** database (``ddcontext``) with
 ``reliability`` / ``trust`` stamped on every node and edge. Per D2 the trust axis IS
 the DB boundary: deepdoc never writes ground truth; promotion of an uncertain finding

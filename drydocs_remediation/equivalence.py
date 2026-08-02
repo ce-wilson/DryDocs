@@ -1,6 +1,6 @@
 """Offline equivalence proof — greenfield must re-derive legacy's resolved behavior.
 
-Both sides resolve through ``drydocs_core.controlm.resolve_job`` (the same engine the
+Both sides resolve through ``drydocs_core.orchestration.controlm.resolve_job`` (the same engine the
 loaders trust), so the comparison is apples-to-apples: each FileWatcher job's watch
 template is resolved under its folder scope and the *resolved* watched paths are
 diffed — cosmetic definition differences are fine, behavioral differences fail the
@@ -24,7 +24,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass, field
 
-from drydocs_core.controlm import resolve_job
+from drydocs_core.orchestration.controlm import resolve_job
 
 from .formats import DefinitionSet, JobDefinition, VariableDefs
 

@@ -179,9 +179,23 @@ SURFACES: list[dict] = [
         "id": "launcher-registry",
         "title": "Launcher registry",
         "file": "config/launcher-registry.yaml",
-        "consumers": ["drydocs_core/controlm/commands.py", "drydocs_lineage/"],
+        # S2 (ADR 0008): commands.py became the vendor-neutral orchestration/shell.py.
+        # The registry was never Control-M-specific — it maps executables to launcher
+        # types, which is exactly the knowledge that survives an orchestrator swap.
+        "consumers": ["drydocs_core/orchestration/shell.py", "drydocs_lineage/"],
         "guard_tests": ["test_launcher_registry.py", "test_command_parser.py"],
         "gate_ref": None,
+    },
+    {
+        "id": "orchestrator-crosswalks",
+        "title": "Orchestrator crosswalks (native -> BMC baseline)",
+        "file": "config/crosswalks/",
+        # S2 gave this its FIRST runtime consumer (ADR 0008 rule 3). Until then a
+        # `fidelity: no-equivalent` row was prose nothing could enforce; crosswalk.py
+        # raises NoEquivalent instead of picking the nearest Control-M label.
+        "consumers": ["drydocs_core/orchestration/crosswalk.py"],
+        "guard_tests": ["test_orchestration_crosswalk.py"],
+        "gate_ref": "autosys-crosswalk / airflow-crosswalk (both SIGNED OFF 2026-07-14)",
     },
 ]
 
