@@ -127,8 +127,19 @@ docstring-code-format = false
 # LF, never "auto". `auto` infers the ending from each file, so the same source
 # formats differently on a CRLF working tree than on the Linux runner — the
 # exact class of OS-dependent output that kept CI red 2026-07-21..07-31 (see
-# tests/unit/test_render_determinism.py). .gitattributes normalizes *.sh only;
-# this covers *.py.
+# tests/unit/test_render_determinism.py).
+#
+# This and `.gitattributes` are BOTH required — they close the same gap from
+# opposite ends, and either alone leaves `ruff format --check` red on Windows:
+#   .gitattributes `*.py text eol=lf` decides what lands ON DISK at checkout,
+#   so the tree ruff reads is already LF;
+#   this setting decides what ruff WRITES, so `ruff format .` emits identical
+#   bytes on Windows and on the Linux runner.
+# (Corrected 2026-08-01: this comment used to say .gitattributes normalized
+# `*.sh` only. It gained the `*.py` rule at J10 stage 0 — same commit family —
+# and the comment was never updated. It sits inside the block the company repo
+# holds byte-identical as the shared format contract, so a wrong claim here is
+# read by both sides.)
 line-ending = "lf"
 
 [tool.pytest.ini_options]

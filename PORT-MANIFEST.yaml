@@ -40,7 +40,17 @@
 # =============================================================================
 schema: drydocs.port-manifest.v1
 classification: Internal-Public
-updated: 2026-07-29   # 2026-07-29: +docs/plan/load-map.html (canonical-company derived
+updated: 2026-08-01   # 2026-08-01: +docs/next-session-handoff.md and
+                      # +docs/next-internal-session.md, both never-port. The SECOND
+                      # instance of the docs/port-*.md failure mode — producer-local
+                      # session material falling to `docs/*.md` -> default clean-add.
+                      # The internal-session checklist had been imported by two prior
+                      # ports and was caught only because the copies had not yet
+                      # diverged. The rule, not the files, is the residual: `docs/*.md`
+                      # still defaults to port, so a third session file would fall
+                      # through the same way. Inverting it (name the content, default
+                      # the rest to never-port) is deliberately NOT done here.
+                      # 2026-07-29: +docs/plan/load-map.html (canonical-company derived
                       # render, the board.html rule) — the J16 coverage guard caught the
                       # new N5 file the day it shipped, exactly as designed.
                       # 2026-07-28 (J16): the FALL-THROUGH question, asked for the first
@@ -350,6 +360,32 @@ rows:
       materials' workaround — that instruction is now a manifest row. Hand-off packs are
       PASTED into the executing session, never committed company-side. The company's own
       PORT-REPORT-<date>.md is a company artifact and is likewise not producer content."
+
+  # The same class as the row above, and the two files that PROVED the rule was needed:
+  # both are producer-local session material that fell to `docs/*.md` -> default clean-add.
+  # Added 2026-08-01 from PORT-REPORT drydocs-port-20260801.
+  - path: "docs/next-session-handoff.md"
+    disposition: never-port
+    note: "PRODUCER-LOCAL SESSION STATE — the rolling laptop<->desktop handoff. Its own
+      header says 'overwrite it, do not append', and it pins a producer HEAD SHA, so a
+      ported copy is stale on arrival and re-collides on every later port. It DIRECTS
+      work; it is not the work's payload. The company session declined it on judgement
+      at PORT-REPORT drydocs-port-20260801 and flagged the uncovered path — that
+      judgement is this row."
+
+  - path: "docs/next-internal-session.md"
+    disposition: never-port
+    note: "PRODUCER-LOCAL SESSION DIRECTOR — the live-data confirmation checklist the
+      producer maintains FOR the internal session. THE SECOND FILE to fall through
+      `docs/*.md`: two prior ports imported it (bd7952f6 2026-07-20, c723b1c5
+      2026-07-24) and the company copy was NEVER company-authored. Caught 2026-08-01
+      while the copies were still BYTE-IDENTICAL — luck, not design: producer last
+      touched it at 360b3d9 (2026-07-22 11:10) with 7 items unticked, so the next tick
+      would have forked it silently, with nothing on either side comparing them. Removed
+      company-side at bf19efcd. THE OBLIGATION THIS ROW CREATES: the checklist now
+      reaches the internal session only by being PASTED into it, the same mechanism the
+      port-*.md hand-off packs use. A producer session that adds an item here owes the
+      paste."
 
   - path: ".git-blame-ignore-revs"
     disposition: never-port
