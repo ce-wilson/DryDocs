@@ -32,8 +32,8 @@ Tags help grooming: `idea` · `bug` · `doc` · `source` (new data source) · `q
   280 items. The port's duplicate-`summary:` defect (shipped in company `1a3aff20`, since fixed by
   clean rebuild) was a STRUCTURAL consequence of the format: agents regex-splice a shared mutable
   blob, and pyyaml's last-key-wins hid the duplicate from `test_backlog`. Three phases, ordered:
-  **(1) guard now, both sides** — `test_backlog` rejects duplicate top-level keys / asserts exactly
-  one `^summary:` (mechanism, back-flows); **(2) shard** — `backlog/items/<id>.yaml` one-item-per-
+  **(1) guard now, both sides — BUILT producer-side 2026-08-03 (`c5b689e`, port-prompt step 55);
+  reaches the company on the next port**; **(2) shard** — `backlog/items/<id>.yaml` one-item-per-
   file, `summary` + `next_ready` become DERIVED (board render computes them, never stored where
   agents append); per-entry-by-id reconciliation becomes the filesystem; claim = push a one-file
   status change (shrinks the two-machine claim-collision window, the 2026-07-28 lesson); kills the

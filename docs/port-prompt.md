@@ -392,10 +392,20 @@ OWED COMPANY-SIDE:
   your graph. T10/T13: until a real export parses with zero mismatches, treat the
   field names as ASSUMED.
 
-STEP LEDGER — delta since `40c35724`: **EMPTY** (rolled 2026-08-03; steps 43–54
-collapsed above, applied through PORT-REPORT-40c35724). New sub-streams number
-from 55. Each sub-stream carries its producer-side verification status in
-[BRACKETS]; spend review on [UNRULED].
+STEP LEDGER — delta since `40c35724` (steps 43–54 collapsed above, applied
+through PORT-REPORT-40c35724). Each sub-stream carries its producer-side
+verification status in [BRACKETS]; spend review on [UNRULED].
+
+55. BACKLOG DUPLICATE-KEY GUARD [TEST-PINNED] (`c5b689e`). Direct answer to the
+    defect YOUR DD6 session found: PyYAML is last-key-wins, so the duplicate
+    `summary:` your port merge shipped passed every backlog guard. New
+    `test_no_duplicate_mapping_keys` parses via a SafeLoader subclass that
+    reports every duplicate key at every depth with both line numbers. Ports
+    normally (no company adaptation known for this file). Run it against YOUR
+    rebuilt backlog — it must pass; your pre-rebuild `1a3aff20` state is the
+    proof-case it exists to catch. Phase 1 of the backlog-at-scale epic
+    (IDEAS 2026-08-03); phases 2–3 (per-item sharding, graph query surface)
+    are NOT in this range — they gate first.
 
 ACCEPTANCE GATE (behavior is the contract, not a byte-compare):
 - Track 1 (portable):
