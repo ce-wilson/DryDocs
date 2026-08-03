@@ -15,10 +15,26 @@ import yaml
 
 REPO = Path(__file__).resolve().parents[2]
 CONFIG = REPO / "config" / "dev-environment.yaml"
+PROVISIONING = REPO / "drydocs_core" / "schema" / "provisioning" / "01_databases.cypher"
+
+#: Same idiom as ``tests/unit/test_database_names.py`` — deliberately a local copy
+#: rather than a cross-test import: the two guards read the same DDL for different
+#: reasons (that one checks CODE against it, this one checks CONFIG against it) and
+#: neither should be able to break the other by editing its own parser.
+_CREATE_DB = re.compile(
+    r"CREATE\s+(?:COMPOSITE\s+)?DATABASE\s+([A-Za-z_][A-Za-z0-9_]*)", re.IGNORECASE
+)
 
 
 def _load() -> dict:
     return yaml.safe_load(CONFIG.read_text(encoding="utf-8"))
+
+
+def _provisioned() -> set[str]:
+    text = PROVISIONING.read_text(encoding="utf-8")
+    # Strip // comments so a commented-out CREATE never counts as provisioned.
+    live = "\n".join(line.split("//")[0] for line in text.splitlines())
+    return set(_CREATE_DB.findall(live))
 
 
 def test_schema_and_required_fields():
@@ -30,19 +46,40 @@ def test_schema_and_required_fields():
     assert isinstance(neo["ports"]["bolt"], int)
     assert isinstance(neo["ports"]["http"], int)
     dbs = neo["databases"]
-    assert set(dbs) == {"ground_truth", "lineage", "uncertain_context", "composite"}
+    assert set(dbs) == {
+        "ground_truth",
+        "lineage",
+        "uncertain_context",
+        "composite",
+        "schema_meta",
+    }
 
 
 def test_databases_match_provisioning_script():
-    """The topology names here must be exactly what 01_databases.cypher creates."""
-    dbs = _load()["neo4j"]["databases"]
-    cypher = (REPO / "drydocs_core" / "schema" / "provisioning" / "01_databases.cypher").read_text(
-        encoding="utf-8"
+    """The topology names here must be exactly what 01_databases.cypher creates.
+
+    BIDIRECTIONAL on purpose. The first version asserted only that every name in
+    this file is provisioned — a subset check whose docstring already said
+    "exactly". G51 walked straight through it: ``ddschema`` was added to the DDL
+    and never to this file, so the single source of truth for the local stack went
+    stale on a green suite. Same defect, same day, as the CODE-side guard G51 itself
+    widened (``test_module_level_database_constants_are_provisioned`` keyed on the
+    literal identifier ``DATABASE``), and the same family as J26.
+    """
+    declared = set(_load()["neo4j"]["databases"].values())
+    provisioned = _provisioned()
+
+    missing_here = provisioned - declared
+    assert not missing_here, (
+        f"provisioned by 01_databases.cypher but absent from {CONFIG.name}: "
+        f"{sorted(missing_here)} — add it to neo4j.databases (and to the key set in "
+        "test_schema_and_required_fields, which is the deliberate speed bump)"
     )
-    for name in dbs.values():
-        assert re.search(
-            rf"CREATE (?:COMPOSITE )?DATABASE {re.escape(name)} IF NOT EXISTS", cypher
-        ), f"database {name!r} not provisioned by 01_databases.cypher"
+    missing_there = declared - provisioned
+    assert not missing_there, (
+        f"declared in {CONFIG.name} but not provisioned by 01_databases.cypher: "
+        f"{sorted(missing_there)}"
+    )
 
 
 def test_env_templates_agree_with_canonical_bolt_port():

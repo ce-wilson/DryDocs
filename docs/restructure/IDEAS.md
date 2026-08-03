@@ -26,6 +26,34 @@ Tags help grooming: `idea` · `bug` · `doc` · `source` (new data source) · `q
 
 <!-- add new ideas at the top -->
 
+- 2026-08-03 — [chore] **The G51 tail landed pre-groom — needs a retrospective close, and it
+  carries ONE company consequence the next port must not be surprised by.** G51 provisioned
+  `ddschema` and updated the runbook's step 3 + Appendix B, but the topology is enumerated in
+  four more places and none of them moved: `config/dev-environment.yaml` (the declared single
+  source of truth that Appendix A *renders*), Appendix A's own Databases row, Startup step 4,
+  and `drydocs_core/schema/provisioning/README.md`. Also swept in the same pass, all verified
+  before changing: `internal/repo-README.md` — which the runbook names as "the canonical
+  command chain this runbook operationalizes" — carried neither `bootstrap-schema-graph` nor
+  `load-doc-traceability`; `scripts/ingest.sh` ran a 5-step chain the cold-start block no
+  longer matched (now 6, ruled by the user rather than assumed); and
+  `.claude/skills/run-drydocs/SKILL.md` still prescribed `NEO4J_PLUGINS='["apoc"]'` as the APOC
+  fix — the exact env var runbook **Rev 4** identified as the CAUSE of the weeks-long silent
+  absence, because it fails open. Runbook is now **Rev 7**.
+  THE GUARD IS THE REAL FINDING, and it is the second of its family in one day:
+  `test_databases_match_provisioning_script` promised "exactly what `01_databases.cypher`
+  creates" in its docstring and asserted only yaml ⊆ cypher, so a database added to the DDL and
+  not the config passed green. Now bidirectional — and it FAILED on `['ddschema']` before the
+  config fix, which is how the audit was proven rather than argued. Same shape as the code-side
+  guard G51 itself widened; same family as **J26**, which should absorb this as evidence.
+  **COMPANY CONSEQUENCE (for the reconcile-port ledger, not back-flow):** they took
+  `01_databases.cypher` with `ddschema` wholesale this port, but `config/dev-environment.yaml`
+  is `canonical-company` — "each side keeps its OWN file" — so their copy still enumerates
+  four. `tests/**` is `default_ok` → **evaluate**, so when the widened guard reaches them it
+  will *correctly* fail until they add `schema_meta: ddschema` to their own file. One line,
+  but it should be a tracker row now rather than a surprise. Second ledger line: producer is
+  Rev 7 while the company deliberately holds Rev 5 pending DD6, so their eventual Rev 6 has to
+  absorb two producer revisions.
+
 - 2026-08-03 — [idea] **EPIC: backlog.yaml has outgrown single-file text editing — shard it,
   derive the summary, query it from the graph.** Trigger: during the DD6 session the company
   agent worked lines 10,573–10,669 of a 10.6k-line file; producer copy is 10,784 lines / 722KB /

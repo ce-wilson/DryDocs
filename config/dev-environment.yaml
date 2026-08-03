@@ -42,7 +42,13 @@ neo4j:
     ground_truth: drydocs      # main load + lineage writers; default load target
     lineage: ddlineage         # cross-platform lineage (drydocs_lineage)
     uncertain_context: ddcontext  # SYNTHESIZED/unverified only (drydocs_deepdoc)
-    composite: ddall           # read-only federation of all three
+    composite: ddall           # read-only federation of the three estate databases
+    # Schema meta-graph (`drydocs bootstrap-schema-graph`, C21/G51). Its own database
+    # because exemplar nodes carry REAL labels beside :SchemaMeta and `drydocs`' NODE
+    # KEYs enforce property existence the exemplars don't have. Deliberately NOT an
+    # `ddall` constituent: it describes the schema, not the estate, so federating it
+    # would present labels as data.
+    schema_meta: ddschema
   home_db_warning: >
     The EE home database `neo4j` is NOT part of the topology — loading into it
     puts data where no query surface looks. Set NEO4J_DATABASE to a topology

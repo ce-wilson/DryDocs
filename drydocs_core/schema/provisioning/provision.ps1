@@ -61,12 +61,16 @@ function Invoke-CypherFile([string]$Db, [string]$File) {
 # 1. databases + composite (run on the system database)
 Invoke-CypherFile "system" "01_databases.cypher"
 
-# 2. proxy-node constraints in all three data databases
+# 2. proxy-node constraints in the three ESTATE databases.
+#    `ddschema` is created by step 1 and deliberately skipped here (G51): the schema
+#    meta-graph's exemplars would fail the ControlMJob NODE KEY, so its one constraint
+#    (`schemameta_name`) ships in schema_graph.cypher and is applied by
+#    `drydocs bootstrap-schema-graph`. Its absence below is a decision, not an omission.
 Invoke-CypherFile "drydocs"    "02_proxy_constraints.cypher"
 Invoke-CypherFile "ddlineage"  "02_proxy_constraints.cypher"
 Invoke-CypherFile "ddcontext"  "02_proxy_constraints.cypher"
 
-# 3. read-only federated smoke over the composite
+# 3. read-only federated smoke over the composite (ddschema is not a constituent)
 Invoke-CypherFile "ddall" "smoke_drydocs_all.cypher"
 
-Write-Host "OK  G1 topology provisioned + smoke passed (drydocs, ddlineage, ddcontext, ddall)." -ForegroundColor Green
+Write-Host "OK  G1 topology provisioned + smoke passed (drydocs, ddlineage, ddcontext, ddschema, ddall)." -ForegroundColor Green

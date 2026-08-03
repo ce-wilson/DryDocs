@@ -164,6 +164,21 @@ Gotchas). Run the smoke script instead for offline validation.
 
 **`NEO4J_PASSWORD is empty`** → `.env` file missing or `NEO4J_PASSWORD=` not set. Copy `.env.example` to `.env` and fill in values.
 
-**`APOC not available`** → the Neo4j container lacks the APOC plugin. Required for `bootstrap`. Start the container with `NEO4J_PLUGINS='["apoc"]'` (or drop the APOC jar into the container's plugins dir).
+**`APOC not available`** → the Neo4j container lacks the APOC plugin, which `bootstrap`
+requires. **Do NOT reach for `NEO4J_PLUGINS='["apoc"]'` — that env var is what caused
+this.** It asks the entrypoint to *download* the plugin at startup and it **fails open**:
+the container comes up healthy with `/plugins` empty, so nothing surfaces the problem
+until a loader refuses. It sat set on `neo4jtest` for weeks with APOC absent the whole
+time, and it also took the `neo4j-drydocs` MCP server down (runbook Rev 4, 2026-07-28).
+
+The fix on the record: both jars ship **inside** the image, version-matched to the
+server, so mount a named volume populated from the image (`neo4j-testplugins` → `/plugins`,
+APOC + graph-data-science) — which is also what makes them survive `docker rm` + `docker
+run`, since a jar copied into a running container dies with its writable layer. Needs
+`apoc.*,gds.*` in BOTH `dbms.security.procedures.unrestricted` and `..._allowlist`. The
+canonical `docker run` lives in the header of
+`drydocs_core/schema/provisioning/provision.ps1`, guarded against drift by
+`tests/unit/test_dev_environment.py`; the full account is Appendix A of
+`docs/design/drydocs-startup-refresh-runbook.md` — read it there rather than restating it.
 
 **Import errors on `drydocs.*` / `drydocs_core.*`** → `poetry install` was not run or the venv is not activated. Run `poetry install` from repo root.

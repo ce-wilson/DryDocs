@@ -47,6 +47,7 @@ poetry run drydocs check
 
 # 2. Schema backbone (constraints + ontology), then the whole supplement chain
 poetry run drydocs bootstrap
+poetry run drydocs bootstrap-schema-graph      # schema meta-graph → ddschema (its own database)
 poetry run drydocs apply-supplements           # base → seal → catalog → registry, verified
 
 # 3. Load sample data
@@ -58,6 +59,7 @@ poetry run drydocs ingest-controlm             # Control-M folders → jobs → 
 #     any container re-bootstrap; the loaders are idempotent.
 poetry run drydocs load-software-registry      # third-party software registry
 poetry run drydocs load-bmc-docs               # BMC docs lexical graph (Document → Chunk)
+poetry run drydocs load-doc-traceability       # L7 — DryDocs documenting itself
 poetry run drydocs load-essential-graphrag     # optional: ebook corpus (→ ddcontext)
 
 # 4. Verify invariants
@@ -88,6 +90,7 @@ for its options.
 **Bootstrap & schema**
 - `check` — verify Neo4j connectivity, server version, APOC.
 - `bootstrap` — apply `constraints.cypher` + `ontology.cypher`.
+- `bootstrap-schema-graph` — render + apply the schema meta-graph to `ddschema` (C21/G51). Its own database: the exemplars carry a real label beside `:SchemaMeta`, which the `drydocs` NODE KEYs reject. Chain-independent of the supplements; belongs in cold start because a wiped DBMS is when it gets forgotten. `--database` overrides the target.
 - `apply-supplements` — the ordered, verified supplement chain (base → seal → catalog → registry). `--only NAME` (repeatable) scopes it; `--with-sosa` appends the experimental SOSA/SSN terms. Idempotent.
 - `apply-ontology-supplement` / `apply-seal-supplement` / `apply-catalog-supplement` / `apply-registry-supplement` / `apply-sosa-supplement` — the pre-G29 per-file verbs, kept as delegating aliases (they inherit the verification and the run log).
 - `verify` — report ontology-term counts by source label.

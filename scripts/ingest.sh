@@ -23,19 +23,26 @@ cd "$REPO_ROOT"
 
 DRYDOCS=(poetry run drydocs)
 
-echo "[ingest] 1/5 check — verify Neo4j + APOC reachable"
+echo "[ingest] 1/6 check — verify Neo4j + APOC reachable"
 "${DRYDOCS[@]}" check
 
-echo "[ingest] 2/5 bootstrap — constraints + ontology seed"
+echo "[ingest] 2/6 bootstrap — constraints + ontology seed"
 "${DRYDOCS[@]}" bootstrap
 
-echo "[ingest] 3/5 ontology supplements (ordered chain, verified, idempotent)"
+# Targets ddschema, not the estate graph, so it is chain-independent of everything
+# below. It runs here anyway because a wiped DBMS is exactly when the meta-graph is
+# forgotten — and because this block and the runbook's Appendix B are meant to be the
+# same sequence, not two sequences that drift.
+echo "[ingest] 3/6 schema meta-graph — render + apply to ddschema"
+"${DRYDOCS[@]}" bootstrap-schema-graph
+
+echo "[ingest] 4/6 ontology supplements (ordered chain, verified, idempotent)"
 "${DRYDOCS[@]}" apply-supplements
 
-echo "[ingest] 4/5 ingest-controlm ${*:-(sample mode)}"
+echo "[ingest] 5/6 ingest-controlm ${*:-(sample mode)}"
 "${DRYDOCS[@]}" ingest-controlm "$@"
 
-echo "[ingest] 5/5 verify M1 + M3 invariants"
+echo "[ingest] 6/6 verify M1 + M3 invariants"
 "${DRYDOCS[@]}" m1-verify
 "${DRYDOCS[@]}" m3-verify
 

@@ -1,13 +1,13 @@
 # schema/provisioning — multi-DB topology (Epic G1 · ADR 0002 D1)
 
 Provisions the multi-database topology from
-[ADR 0002](../../../docs/decisions/0002-component-database-topology.md) — three data
-databases plus one composite — on a **Neo4j Enterprise** DBMS. Authoring + structure
-only — **no data load** here.
+[ADR 0002](../../../docs/decisions/0002-component-database-topology.md) — three estate
+databases, the schema meta-graph, and one composite — on a **Neo4j Enterprise** DBMS.
+Authoring + structure only — **no data load** here.
 
 | File | Run against | Purpose |
 |---|---|---|
-| `01_databases.cypher` | `system` | `CREATE DATABASE drydocs`, `ddlineage`, `ddcontext`, `CREATE COMPOSITE DATABASE ddall` + aliases |
+| `01_databases.cypher` | `system` | `CREATE DATABASE drydocs`, `ddlineage`, `ddcontext`, `ddschema`, `CREATE COMPOSITE DATABASE ddall` + aliases |
 
 > **`ddlineage` is provisioned but not live** (G30 ruling, 2026-07-26 — see ADR 0002
 > "Residency clarification"). Curated lineage writes land in `drydocs` per ADR 0002 D1/D2;
@@ -17,6 +17,14 @@ only — **no data load** here.
 
 | `02_proxy_constraints.cypher` | **each** of `drydocs`, `ddlineage`, `ddcontext` | proxy-node business keys: `DataAsset.assetId` UNIQUE, `ControlMJob (folder_id, job_id)` NODE KEY |
 | `smoke_drydocs_all.cypher` | `ddall` | read-only federated query — reads all three constituents, writes none |
+
+> **`ddschema` is in the topology but in neither the proxy-constraint pass nor `ddall`**
+> (G51, 2026-08-03). It holds the schema meta-graph written by `drydocs
+> bootstrap-schema-graph`, where exemplar nodes carry a real label beside `:SchemaMeta`.
+> Two consequences, both deliberate: the `drydocs` NODE KEYs would reject those exemplars,
+> so its one constraint (`schemameta_name`) lives in `schema_graph.cypher` rather than
+> here; and it is not a `ddall` constituent, because it describes the schema, not the
+> estate — a federated support query would present labels as data.
 | `provision.ps1` | — | runner: applies 01 → 02 (×3) → smoke via `cypher-shell` |
 
 ## Run

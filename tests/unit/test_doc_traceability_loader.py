@@ -51,8 +51,9 @@ def test_runbook_header_carries_rev_and_commit() -> None:
     assert header["doc_id"] == "drydocs-startup-refresh-runbook"
     assert header["doc_type"] == "Runbook"
     assert (
-        header["rev"] == 6
-    )  # Rev 6, 2026-08-03 (G51: bootstrap-schema-graph in the chain; ddschema provisioned)
+        header["rev"] == 7
+    )  # Rev 7, 2026-08-03 (the G51 tail: Appendix A, Startup step 4 and ingest.sh catch
+    # up with the verb — five databases everywhere, and the config guard made bidirectional)
     assert header["doc_status"] == "DESCRIPTIVE"
     assert header["commit"], "front-matter commit citation should parse"
     assert header["path"] == "docs/design/drydocs-startup-refresh-runbook.md"

@@ -1,8 +1,10 @@
 # Runbook — DryDocs local startup & refresh (EE container + sample ingest)
 
 <!-- anchor: front-matter -->
-- **Status:** DESCRIPTIVE — documents the working procedure. **Rev 6, 2026-08-03**
-  (the schema meta-graph joins the chain: `bootstrap-schema-graph` after `bootstrap`,
+- **Status:** DESCRIPTIVE — documents the working procedure. **Rev 7, 2026-08-03**
+  (the topology enumerations catch up with the verb — Appendix A, Startup step 4, and
+  the one-shot script now all count five databases; on top of Rev 6, where
+  the schema meta-graph joined the chain: `bootstrap-schema-graph` after `bootstrap`,
   targeting `ddschema`, which provisioning now creates — G51; on top of Rev 5, where
   the per-file supplement verbs collapse to the one `apply-supplements` chain, which
   also closes Appendix B's long-missing registry supplement; `load-doc-traceability`
@@ -22,6 +24,23 @@
   `internal/helpmeloginlocalneo4j.md` (login/port troubleshooting evidence),
   `.claude/skills/run-drydocs/SKILL.md` (agent-facing run notes)
 
+> **What changed in Rev 7 (2026-08-03) — Rev 6 added the verb and left the counts at
+> four.** `ddschema` reached the procedure but not the places that enumerate the topology:
+> Appendix A still listed four databases, Startup step 4 still named four, and
+> `config/dev-environment.yaml` — the single source of truth Appendix A *renders* — had
+> never been told about it at all. `scripts/ingest.sh`, the documented one-shot
+> alternative, likewise ran a five-step chain the cold-start block no longer matched. All
+> four now agree, and the one-shot gained the step so Appendix B and `ingest.sh` are the
+> same sequence rather than two that drift.
+>
+> The reason it survived a green suite is worth recording, because it is the second
+> instance in one day: `test_databases_match_provisioning_script` promised in its docstring
+> that the config names are "exactly what `01_databases.cypher` creates" while asserting
+> only that each configured name is provisioned — a subset check. A database added to the
+> DDL and not the config passed. It is now bidirectional, and it fails loudly in the
+> direction that actually drifted. Same defect class as the code-side guard G51 itself
+> widened, and the same family as J26.
+>
 > **What changed in Rev 6 (2026-08-03) — the meta-graph verb was in shipped code and in
 > no procedure.** `drydocs bootstrap-schema-graph` (C21) writes the schema meta-graph to
 > its own database, `ddschema` — which, until G51, `01_databases.cypher` did not create:
@@ -160,10 +179,16 @@ check; go to Troubleshooting.
    *Opt-in:* `--with-sosa` appends the EXPERIMENTAL SOSA/SSN supplement. It is not a
    declared company standard and is never in the default chain — leave it off unless
    you are deliberately working layer-4.
-4. **First-time only — multi-DB topology** (drydocs + ddlineage + ddcontext + the
-   ddall composite): run the G1 provisioning per
+4. **First-time only — multi-DB topology** (drydocs + ddlineage + ddcontext + ddschema
+   + the ddall composite): run the G1 provisioning per
    `drydocs_core/schema/provisioning/README.md` (`provision.ps1`). Skip on an
    already-provisioned container.
+
+   Note the ordering trap on an EXISTING container: `CREATE DATABASE … IF NOT EXISTS`
+   is a no-op where the database already exists, so re-running provisioning proves
+   nothing about a newly added name. `ddschema` was created by hand during C21 and only
+   provisioned by DDL at G51 — on any machine that predates G51, confirm with
+   `SHOW DATABASES` rather than inferring it from a successful `provision.ps1` run.
 
 <!-- anchor: refresh-ingest -->
 ## Refresh / ingest
@@ -195,8 +220,9 @@ samples; the Oracle variant is the same chain with scope binds.
    shipped after Rev 2 was signed and was never added here, so a rebuilt container had
    no doc graph until someone remembered the verb.
 4. **One-shot alternative:** `scripts/ingest.sh [args…]` runs check → bootstrap →
-   supplements → ingest-controlm → m1/m3-verify in order and fails fast; arguments are
-   forwarded to the `ingest-controlm` step.
+   bootstrap-schema-graph → supplements → ingest-controlm → m1/m3-verify in order and
+   fails fast; arguments are forwarded to the `ingest-controlm` step. Deliberately the
+   same sequence as Appendix B — if the two ever differ, one of them is wrong.
 5. **Derived artifacts** (the session ritual — renders are deterministic, so a clean
    tree stays clean):
    ```powershell
@@ -279,7 +305,7 @@ don't duplicate it here.
 <!-- anchor: appendices -->
 ## Appendices
 
-**A. Current local environment** — a render of `config/dev-environment.yaml` (2026-07-28).
+**A. Current local environment** — a render of `config/dev-environment.yaml` (2026-08-03).
 Change it *there* first, then here; verify against `docker port`, never assume:
 
 | Item | Value |
@@ -290,7 +316,7 @@ Change it *there* first, then here; verify against `docker port`, never assume:
 | Plugins | `apoc` (174 procs) + `gds` (471 procs), both 2026.05.0. Needs `apoc.*,gds.*` in BOTH `dbms.security.procedures.unrestricted` and `..._allowlist`. NOT `NEO4J_PLUGINS` — see Rev 4 |
 | HTTP / Browser | container 7474 → host **7474** (`http://localhost:7474/browser/`) |
 | Bolt | container 7687 → host **7687** (`bolt://localhost:7687`) |
-| Databases | `drydocs`, `ddlineage`, `ddcontext` + composite `ddall` (G1/G7) |
+| Databases | `drydocs`, `ddlineage`, `ddcontext` + composite `ddall` (G1/G7), and `ddschema` for the schema meta-graph (G51) — deliberately NOT a `ddall` constituent, since it describes the schema rather than the estate |
 | Credentials | `.env` only (`NEO4J_URI` / `NEO4J_USER` / `NEO4J_PASSWORD`) |
 
 The retired `neo4j-drydocs-ee` (7476/7689) is kept **stopped** as a rollback copy. If both
