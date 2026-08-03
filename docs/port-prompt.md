@@ -407,6 +407,21 @@ verification status in [BRACKETS]; spend review on [UNRULED].
     (IDEAS 2026-08-03); phases 2–3 (per-item sharding, graph query surface)
     are NOT in this range — they gate first.
 
+56. G51 — `ddschema` PROVISIONED + DATABASE-NAME GUARD WIDENED [TEST-PINNED]
+    (`21c46b8`, claim `f0ca0cc`). `01_databases.cypher` now creates `ddschema`
+    (NOT aliased into `ddall` — deliberate, the comment says why);
+    `test_database_names.py` matches any `*DATABASE*` constant (proof order:
+    the widened guard failed on exactly `SCHEMA_GRAPH_DATABASE`/`ddschema`,
+    then the DDL turned it green); topology anchor 4→5 names; ADR 0002
+    amended; gate-log RECORD entry (a record, not a gate — nothing to ratify);
+    runbook Rev 6 + rev pin 5→6 TOGETHER (the L21-noted mixed-pin file — take
+    both or neither); run-drydocs skill chain updated.
+    ***THIS DISCHARGES THE `ddschema`-DDL CLAUSE OF YOUR DD6*** — after
+    applying, DD6 narrows to `_client(database)` + wiring the two deferred
+    verbs (T22). `EXPECTED_CONSTRAINTS` does not move. The topology-anchor
+    test asserts the producer's five-name SET — verify it against YOUR
+    `01_databases.cypher` on apply rather than assuming the sets match.
+
 ACCEPTANCE GATE (behavior is the contract, not a byte-compare):
 - Track 1 (portable):
     poetry run pytest tests/unit/test_variable_classifier.py tests/unit/test_variable_resolver.py \
