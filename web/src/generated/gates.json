@@ -362,7 +362,9 @@
       "log_ref": "config/gate-log.md:948",
       "unblocks": [
         "C19",
-        "G33"
+        "G33",
+        "U10",
+        "U11"
       ]
     },
     {
@@ -422,7 +424,9 @@
         "Q2",
         "S3",
         "G33",
-        "J25"
+        "J25",
+        "U10",
+        "U11"
       ]
     },
     {
@@ -462,7 +466,10 @@
         "config/gate-prompts/code-graph-package-layer.yaml"
       ],
       "log_ref": null,
-      "unblocks": []
+      "unblocks": [
+        "U10",
+        "U11"
+      ]
     },
     {
       "kind": "prompt-only",

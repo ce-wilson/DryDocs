@@ -42,7 +42,7 @@
 # =============================================================================
 
 schema: drydocs.backlog.v2
-updated: 2026-07-31
+updated: 2026-08-02
 
 # ── The high-level project plan (rendered as the board's roadmap strip) ───────
 plan:
@@ -4978,11 +4978,34 @@ items:
       full suite green. The web connector does NOT ship without Q12's page-count
       refusal — an unguarded bulk scraper is not an acceptable intermediate state
       (see Q12 for why: the trees in scope enumerate 2k-11k pages).
+      CONNECTOR SHAPE (merged 2026-08-02, from the company-side answer to tracker
+      T21): the two generic connectors are ACQUISITION ONLY —
+      `fetch(source) -> list[RawPage]`, with cleaning and hashing downstream — over
+      a `Connector` protocol plus a `RawPage` model and an unavailable-source error;
+      `web` speaks public http(s) through stdlib urllib with an INJECTABLE TRANSPORT
+      and an SSRF scheme allow-list; `filedrop` reads a file or a directory of
+      md/txt/html through pathlib. The transport injection and the allow-list are
+      NON-NEGOTIABLE, not preferences: the first is what makes the Track-1 offline
+      tests real rather than network-dependent, and the second is the same guardrail
+      Q12 exists to enforce. Reproduction is producer-authored against that protocol
+      shape — never a copy of the other tree's files.
     notes: >
       Groomed 2026-07-18 — docmeta plan P3. Module drydocs-docmeta registered at
       this groom as a WORKING NAME (the drydocs-api precedent) — final at the Q4
       gate; this item renames the registry entry if the gate folds it into
       drydocs-deepdoc. Model fable per the component-boundary precedent (O5/G3).
+      MERGED 2026-08-02 (weekly groom), from the [source->Q6] inbox line: the
+      fetcher already exists company-side, and the split lands exactly where this
+      item needs it — web and filedrop have ZERO internal dependencies, while the
+      confluence connector and the separate scrapers CLI are internal-realm and stay
+      there. Their own base.py designates web+filedrop as the "wired and
+      offline-testable" generic pair, i.e. the boundary this port would have had to
+      draw was drawn by the authors first, which is the strongest available signal
+      that a reproduction is clean. Merged into the acceptance rather than opened as
+      an item because it specifies work Q6 already owns. Unblocks three things at
+      once: Q6 itself, R7 (released unbuilt 2026-08-01 for exactly this missing
+      fetcher) and Q12 behind it. Direction rule stands — back-flow is SANITIZED
+      REPRODUCTION, never a copy.
 
   # ── appended at the 2026-07-26 groom run (docs-residency design session) ───
   # Eight items from the 2026-07-26 chat that followed G28/G29/G30. The session
@@ -8915,12 +8938,28 @@ items:
       relationship_vocabulary.yaml at their drydocs_core/ paths; OQ-NS-3
       closed - APOC is load-bearing via run_script + the J9 container); (c)
       drydocs/loaders/base.py and drydocs_lineage/model.py are each cited by
-      at least one traceability component cell; any touched design-doc .md is
-      re-rendered and the stale-render check passes.
+      at least one traceability component cell; (d) the two statements the S3
+      identity cutover made FALSE are corrected on their rev-bump surfaces —
+      drydocs-web-console-tdd.md's "grid columns surfaced to the browser are the
+      table columns verbatim" (S3 broke verbatim ON PURPOSE: the job-application and
+      seal-contact-override grids now SELECT ... AS app_id per that gate's §E1, while
+      the committed CSV keeps its own header), and controlm-ingestion-tdd.md's
+      `Application.seal_id`, which is stale on BOTH halves — the label became
+      :BusinessApplication at ADR 0003 / K4 and the property became app_id at S3.
+      drydocs-mapping-store-tdd.md:154-155 is deliberately NOT touched: it describes
+      the SQLite manual_mapping / seal_contact_override COLUMNS, which S3 chose not
+      to rename. Any touched design-doc .md is re-rendered and the stale-render
+      check passes.
     notes: >
       Groomed 2026-07-28: three same-day U3-census [doc] inbox lines
       consolidated into one sweep (citation sweep + sdlc DEP drift + fan-in
       hotspot citation gap) — one pass, one review.
+      Clause (d) MERGED 2026-08-02 (weekly groom) from the [chore->L19] inbox line.
+      S3 deliberately did not hot-edit either doc: both are rev-bump surfaces and
+      web-console-tdd is "Status: DESCRIPTIVE ... as of Rev 1, 2026-07-18, authored
+      at commit 807e050" — a snapshot pinned to a commit, so it is not strictly
+      wrong. It is still read as the live contract, which is the reason it belongs
+      in a sweep rather than in nothing.
   - id: D8
     epic: config-loaders
     title: "Bootstrap constraint-count guard: count SHOW CONSTRAINTS against constraints.cypher declarations and refuse loudly on mismatch (the supplement-chain guard pattern)"
@@ -10534,12 +10573,375 @@ items:
       Groomed 2026-07-31 — ALIGNMENT-PLAN Phase 3 (process adoption, not
       ontology; docs module because the deliverable is a skill-doc change).
 
+  # ── appended at the 2026-08-02 groom run (weekly inbox + the self-doc session) ─
+  # Nine items. TWO ARE RETROSPECTIVE CLOSES (U9, C21): that work landed at e3f65af
+  # before any item existed, and committed code already cites "U9" as an id —
+  # filter_ignored.py's first line, snapshot.ps1's U9 block, and the package-layer
+  # gate page — an id nothing defined. The groom's own cross-check then found what
+  # rode along unseen: G51. U10 IS A GATE SESSION (never auto-decided); U11 drafts a
+  # gate prompt and decides nothing; C22 consolidates two inbox lines onto the same
+  # three files rather than booking two passes over them.
+
+  - id: U9
+    epic: self-documentation
+    title: "Scanner takes the WHOLE REPO by default + drops git-ignored paths, and the 101-file snapshot series retires to one"
+    type: task
+    module: graph-infra
+    phase: 16
+    agent: main
+    model: sonnet
+    priority: p2
+    status: done
+    closed: 2026-08-02
+    depends_on: [U7, U8]
+    inputs: [knowledge/depgraph-snapshots/snapshot.ps1, knowledge/depgraph-snapshots/filter_ignored.py, drydocs/loaders/code_snapshot.py, drydocs_core/models/code_snapshot.py, tests/unit/test_code_snapshot_loader.py]
+    acceptance: >
+      snapshot.ps1 scans the repository root by default (the hand-maintained root
+      list survives only behind -CodeOnly, writing a DIFFERENT filename so the two
+      shapes cannot collide); a post-processing step drops git-ignored paths through
+      `git check-ignore`, so the rule set is the repo's own and cannot drift from it;
+      exactly one snapshot stays committed; and the loader accepts a tree-shaped
+      artifact, strips the repository prefix from file_id so a mode switch MERGEs
+      instead of forking the ruled key, and SKIPS-AND-COUNTS kind:'dir' nodes rather
+      than inventing a node class. Full suite green.
+    notes: >
+      Groomed RETROSPECTIVELY 2026-08-02 — the work landed at e3f65af on SME
+      direction ("update the scanner to pull all files, so that we can create the
+      tree. the old dep snapshots can be removed this was the intent") and three
+      committed files already cite "U9" by id. No sibling-repo change was needed:
+      depgraph already reported tree: true, and tree mode is a strict SUPERSET.
+      WHY THE FILTER: depgraph excludes .git and .venv but knows nothing about
+      .gitignore, so the first whole-repo scan collected 649 ignored nodes, 386 of
+      them .ruff_cache — ~18% of the artifact. Filtered in snapshot.ps1 rather than
+      the loader so the committed JSON, viewer.html and the graph all show the same
+      thing. Two Windows traps, both load-bearing: text=True translates \n to \r\n
+      into stdin so git receives '.env\r', and in line mode git QUOTES unusual names
+      and hands back '".env\r"' — either alone made the filter report "no git-ignored
+      paths" against a snapshot holding 386. `-z` with binary input kills both.
+      TWO DEFECTS INTRODUCED AND FIXED IN-RUN, both live-verified: the key FORKED
+      (tree file_ids arrive as 'drydocs/drydocs/cli.py'; loaded raw that made two
+      :CodeModule nodes for one file, side by side, NEITHER SWEPT — caught by asking
+      why the count read 2410 instead of 2200), and `project` lost its meaning (it
+      was "the scan root, one of six", a concept that existed only because of the
+      hand-maintained list; the first fix was worse than the bug, labelling
+      README.md a scan root). Result: 1457 :CodeModule (was 210), 458 IMPORTS, and
+      all 45 .cypher files present as nodes for the first time. The tree is in the
+      ARTIFACT (251 directories, 1956 CONTAINS) and deliberately NOT in the graph —
+      U10 owns that gate. Doc drift left behind: U12.
+
+  - id: U10
+    epic: self-documentation
+    title: "Run the code-graph package-layer gate to sign-off: does the PACKAGE become a node, and how is one recognised offline"
+    type: task
+    module: ontology
+    phase: 16
+    agent: main
+    model: fable
+    priority: p2
+    status: todo
+    depends_on: [U9]
+    inputs: [config/gate-prompts/code-graph-package-layer.yaml, config/gate-prompts/self-documentation-code-graph.yaml, config/gate-log.md, drydocs_core/ontology/relationship_vocabulary.yaml, config/taxonomy-ontology-map.yaml, knowledge/depgraph-snapshots/drydocs-20260802.json]
+    acceptance: >
+      All 30 confirmations of config/gate-prompts/code-graph-package-layer.yaml are
+      ruled with the SME and recorded in config/gate-log.md — including §C2, the
+      page's own "real decision" (how a package is recognised OFFLINE, given
+      __init__.py presence is UNSOUND here: drydocs_core/schema is a live PEP 420
+      namespace package with none, imported by the CLI), and the question the U9
+      scanner change added: whether the containment level loads as :CodePackage, as
+      the :Directory nodes the artifact now carries, or both. Then per the page's §I:
+      the proposed terms (u1_has_package, u1_defines_package, and the u1_has_module
+      revision) are registered `status: planned` ONLY; the taxonomy-ontology-map
+      entry is AMENDED per §H4 rather than duplicated; the parent gate's §B1/§B2/§C4
+      are annotated in place as re-opened-and-superseded-by-this-gate with the date;
+      a BUILD item is added to backlog.yaml naming this gate as its dependency; and
+      gates.json + the enforcement matrix regenerate. NOTHING is written to the graph
+      at the gate itself.
+    notes: >
+      HITL — the sign-off is an SME session, never auto-decided (CLAUDE.md §6), and
+      no build item is opened ahead of it because §I says the gate opens it.
+      Trigger was the SME reading the LIVE GRAPH 2026-08-02: ":HAS_MODULE is
+      overused ... I thought module described the next highest group under the
+      project." The page corrects the vocabulary before answering — in Python a
+      module IS what `import` binds, so drydocs/cli.py genuinely is the module
+      drydocs.cli and the file nodes are correctly typed; the level the question
+      points at is the PACKAGE, and the one place the model is factually wrong is
+      __init__.py, which is not a module named __init__ but the thing that makes its
+      directory a package. §A4 asks the SME to accept that correction FIRST, because
+      §C is written against it. Not drift: the parent gate (signed 36/36 2026-07-27)
+      named this exact cost in writing at §C1 and declined the two-level option at
+      §B1(c) on COST, not correctness — a recorded, accepted cost that is later felt
+      is precisely what a re-open is for. Fable: a new node class, two new edge
+      types, and an ACTIVE vocabulary entry re-pointed.
+
+  - id: U11
+    epic: self-documentation
+    title: "Draft the gate prompt for the artifact chain: which .py executes which .cypher, and which labels that .cypher writes (parent gate §H5, deferred)"
+    type: task
+    module: ontology
+    phase: 16
+    agent: main
+    model: fable
+    priority: p3
+    status: todo
+    depends_on: [U9]
+    inputs: [config/gate-prompts/self-documentation-code-graph.yaml, config/gate-prompts/code-graph-package-layer.yaml, drydocs/loaders/, drydocs/loaders/cypher/, drydocs_core/ontology/relationship_vocabulary.yaml]
+    acceptance: >
+      A drydocs.gate-prompt.v1 spec exists proposing the code -> artifact -> label
+      chain the parent gate deferred at §H5, drafted the way the package-layer page
+      was: mechanism only, every number verified against the committed artifact,
+      nothing written, no vocabulary term past `status: planned`. It must put four
+      things to the SME: (a) whether a .cypher file is an ordinary :CodeModule or its
+      own class; (b) the edge names and directions for "this module executes that
+      file" and "that file writes this label"; (c) how the join to the DOMAIN graph
+      is expressed given a label is not a node — the thing that would finally answer
+      "which module loads this job"; and (d) what the loader does with declarations
+      it cannot resolve statically. gates.json + the enforcement matrix regenerate;
+      the SIGN-OFF is a separate SME session.
+    notes: >
+      Groomed 2026-08-02. The chain is STATICALLY DERIVABLE — checked before
+      grooming, not assumed: 26 of 27 `cypher_path` declarations resolve to a literal
+      filename by AST, 39 labels are written across the 45 .cypher files, 16 are
+      read-only, and 9 of 32 loader scripts yield no write-label at all (edge-only or
+      migrations). That residue is exactly what (d) has to rule on, and it is the
+      reason this cannot be a build item. Only possible NOW: .cypher files became
+      graph nodes for the first time at U9 — the old scan saw Python only, so the
+      artifact could not express the chain at all. G27/W1 precedent: drafting a
+      prompt decides nothing.
+
+  - id: U12
+    epic: self-documentation
+    title: "Make the ruled snapshot retention true in the script as well as the prose — the README documents a retired ritual and snapshot.ps1 still accumulates a series"
+    type: chore
+    module: graph-infra
+    phase: 16
+    agent: main
+    model: sonnet
+    priority: p2
+    status: todo
+    depends_on: [U9]
+    inputs: [knowledge/depgraph-snapshots/README.md, knowledge/depgraph-snapshots/snapshot.ps1, knowledge/depgraph-snapshots/filter_ignored.py]
+    acceptance: >
+      (a) snapshot.ps1 ENFORCES the ruled retention — newest all-files snapshot only
+      (SME 2026-08-02) — instead of relying on a human to delete: today a second run
+      on the same day writes `<project>-<date>-<HHmm>.json` beside the first, which
+      is precisely how the 101-file series accumulated, so the ruling survives only
+      until the next double-run. The -CodeOnly comparison shape keeps its own
+      filename and is exempt (it is not the ritual). Whatever the mechanism, an
+      unexpected extra file is not the outcome. (b)
+      knowledge/depgraph-snapshots/README.md matches what the script now does: the
+      command block documents the whole-repo default and -CodeOnly (the -Tree flag it
+      currently shows was REMOVED), the meta example reads tree: true, the "focused
+      scan = the seven package roots" paragraph is rewritten, the git-ignore step is
+      documented beside U7's probe and U8's abs_path strip, and the Housekeeping
+      "prune ... keep the last ~10" line is replaced by the ruled retention. (c) The
+      three citations to files this repo no longer contains (tree-original.json,
+      tree-this-version.json, and the drydocs1-20260621.json baseline) are removed or
+      restated as history recoverable from git, and a fourth instrument-change marker
+      records the all-files boundary in the same voice as the three already there —
+      the node count goes 238 -> 1457 on unchanged code, and nobody should read that
+      as growth.
+    notes: >
+      Groomed 2026-08-02 — drift left behind by U9's own commit and found by this
+      groom, not by the inbox. p2 rather than p3 because this README is the surface
+      the session-end ritual points at and three of its links now resolve to nothing.
+      Clause (a) was raised while regenerating the board AT the groom: the retention
+      question (open since 2026-07-25) is now RULED, and a rule enforced only by
+      whoever remembers it is the same shape as the hand-maintained scan-root list
+      U9 just deleted. Widened from a docs chore to graph-infra for that reason.
+
+  - id: C21
+    epic: ontology-mapping
+    title: "The schema meta-graph gets its own database and a bootstrap verb, because its exemplars cannot satisfy the domain graph's NODE KEYs"
+    type: task
+    module: ontology
+    phase: 2
+    agent: main
+    model: sonnet
+    priority: p2
+    status: done
+    closed: 2026-08-02
+    depends_on: [C8]
+    inputs: [drydocs_core/ontology/schema_graph.py, drydocs_core/schema/schema_graph.cypher, drydocs/cli.py, tests/unit/test_schema_graph.py, tests/unit/test_schema.py]
+    acceptance: >
+      A `drydocs bootstrap-schema-graph` verb applies schema_graph.cypher to a
+      database of its own and REFUSES (exit 2) if no :SchemaMeta node results; the
+      meta-graph carries its own uniqueness constraint; constraints.cypher and
+      test_schema.py's EXPECTED_CONSTRAINTS are untouched; the domain graph holds
+      zero :SchemaMeta nodes afterwards; the generated file names its target database
+      in its own header and the byte-match drift guard stays green.
+    notes: >
+      Groomed RETROSPECTIVELY 2026-08-02 (landed at e3f65af). The SME direction was
+      "promote the meta-graph into bootstrap" — and doing that literally is
+      IMPOSSIBLE, for a reason that is the direction's own point arriving as an
+      error. Every exemplar MERGEs the REAL label beside the marker
+      (:SchemaMeta:ControlMJob {name: ...}) because the real label is exactly what
+      db.schema.visualization() reads; controlmjob_key is a NODE KEY, and a NODE KEY
+      enforces EXISTENCE, not just uniqueness, while the exemplar carries only
+      `name`. Proven LIVE on a throwaway label rather than inferred — "Node with
+      label ZZProbe must have the properties (folder_id, job_id)" — then the probe
+      constraint was dropped and zero nodes/constraints leaked. Dropping the real
+      label would satisfy the constraint and destroy the feature. Hence two graphs,
+      which is what the SME then said independently: "the schema graph is for the
+      project labels and relationships with different constraints and the DryDocs
+      project has different code and constraints, 2 different graphs". Verified after
+      apply: 53 label nodes, 79 exemplar edges, visualization renders 54/288, and the
+      domain graph's 17 :ControlMJob untouched. THE DATABASE IT TARGETS IS NOT
+      PROVISIONED — G51.
+
+  - id: G51
+    epic: component-topology
+    title: "The meta-graph database is named by shipped code and created by nothing — provision it, and widen the guard that let an unprovisioned name through"
+    type: bug
+    module: graph-infra
+    phase: 6
+    agent: main
+    model: sonnet
+    priority: p1
+    status: todo
+    depends_on: [C21]
+    inputs: [drydocs_core/schema/provisioning/01_databases.cypher, drydocs/cli.py, tests/unit/test_database_names.py, docs/decisions/0002-component-database-topology.md, config/gate-log.md, docs/design/drydocs-startup-refresh-runbook.md, .claude/skills/run-drydocs/SKILL.md]
+    acceptance: >
+      EITHER 01_databases.cypher creates the meta-graph database (with the ADR 0002
+      topology record amended and test_database_names.py's
+      test_provisioning_creates_the_expected_topology moved from four names to five
+      in the SAME commit — that assertion is the deliberate speed bump, not an
+      obstacle), OR the meta-graph is re-homed onto a provisioned database and
+      drydocs/cli.py follows. Either way the name a shipped verb targets is one
+      provisioning creates. AND the guard that should have caught this is widened:
+      test_module_level_database_constants_are_provisioned keys on the exact
+      identifier `DATABASE`, so a constant named SCHEMA_GRAPH_DATABASE walked
+      straight past it — after this item, a module-level constant naming an
+      unprovisioned database fails the suite whatever it is called. The SME direction
+      that created a second graph ("2 different graphs", 2026-08-02) is recorded in
+      config/gate-log.md, and the startup-refresh runbook + the run-drydocs skill
+      name `bootstrap-schema-graph` in their chains.
+    notes: >
+      Groomed 2026-08-02 from the groom's own cross-check, not from the inbox. This
+      is the Q7 family exactly — a database DECLARED by code and never provisioned —
+      and it is live rather than theoretical: the standing fact of record is TWO
+      MACHINES, TWO GRAPHS, so the desktop's `drydocs bootstrap-schema-graph` targets
+      a database only the laptop has, created by hand during the C21 session. It
+      fails loudly, which is the one mercy. THE GUARD FIX MATTERS MORE THAN THE
+      CONSTANT: the constant is one line; the blind spot admits the next one, and it
+      is the same family J26 sweeps — a guard whose docstring promises more than its
+      pattern matches.
+
+  - id: C22
+    epic: ontology-mapping
+    title: "Catalog loader sweep: the silent parent joins and the unconditional name SET that C17 fixed in products.cypher and nowhere else"
+    type: bug
+    module: drydocs-load
+    phase: 2
+    agent: main
+    model: sonnet
+    priority: p2
+    status: todo
+    depends_on: [C17]
+    inputs: [drydocs/loaders/cypher/product_lines.cypher, drydocs/loaders/cypher/area_products.cypher, drydocs/loaders/cypher/products.cypher, drydocs/loaders/catalog.py, tests/unit/test_catalog_keying.py]
+    acceptance: >
+      (a) product_lines.cypher (parent :CatalogLOB) and area_products.cypher (parent
+      :Product) take the products.cypher shape — OPTIONAL MATCH, an orphan flag
+      written on EVERY run rather than only ON CREATE, and the unresolved parent id
+      KEPT on the node. The defect: a hard MATCH placed AFTER the node MERGE leaves
+      an unparented node still carrying `orphan: false` from ON CREATE, a flag no
+      code path could ever set true. (b) All THREE catalog loaders stop blanking
+      values on a sparse refresh — `SET x.name = row.name` becomes
+      `coalesce(row.name, x.name)`, and the same treatment covers any other
+      enrichment property a partial extract may omit. (c) The question C17 did not
+      answer is answered and recorded: whether the unresolved-parent count is emitted
+      as a `drydocs.loader/unresolved-parent` item in the O28 status envelope (a
+      namespaced type, no new fields — inside the ruled contract, so no gate) or
+      stays a node property only. Loader tests cover a row whose parent is absent and
+      a row whose name is null.
+    notes: >
+      Groomed 2026-08-02 consolidating TWO inbox lines that land on the same files —
+      one pass, one review (the L19 precedent): the 2026-08-01 [bug] parent-join
+      sweep and the [source] company-comparison finding. C17 deliberately did not
+      sweep ("changing four loaders' write behaviour on one item's authority is a
+      drive-by") and inboxed it instead. VERIFIED AT THE GROOM rather than
+      transcribed: the hard MATCH is live at product_lines.cypher:27 and
+      area_products.cypher:22, and the unconditional name SET at products.cypher:28,
+      product_lines.cypher:22 AND area_products.cypher:17 — so (b) covers three
+      files, not the two the inbox line named. product_lines.cypher even carries a
+      comment saying it is "the same silent-miss shape products.cypher just" fixed.
+      The coalesce idiom is borrowed from the company comparison; no code is.
+
+  - id: J26
+    epic: release-infrastructure
+    title: "Guards that read committed text with a bare substring match — sweep the shape that made a file unable to describe its own mechanism"
+    type: chore
+    module: docs
+    phase: 8
+    agent: main
+    model: sonnet
+    priority: p3
+    status: todo
+    depends_on: []
+    inputs: [tests/unit/test_schema.py, drydocs_core/schema/constraints.py, tests/unit/test_port_reconcile_guards.py, tests/unit/test_database_names.py, scripts/render_board.py]
+    acceptance: >
+      Every guard that asserts over the TEXT of a committed file is inventoried, and
+      each one either matches STRUCTURALLY (anchored at line start, or parsed) or
+      carries a one-line note saying why a bare substring is correct there. At
+      minimum the named candidates are checked: the render-drift checks, the
+      PORT-MANIFEST walk, and test_database_names.py — whose module-constant guard
+      keys on the exact identifier `DATABASE` and therefore missed a differently
+      named constant (G51 owns that fix; this item owns the class). A regression test
+      proves at least one swept guard now survives a file describing its own
+      mechanism in a comment.
+    notes: >
+      Groomed 2026-08-02 from the 2026-08-01 [chore] line. The instance:
+      test_schema.py::test_constraint_count counted `CREATE CONSTRAINT` ANYWHERE in
+      the file, so documenting a DDL trap in a `//` comment inflated the count and
+      simultaneously false-failed test_constraints_are_idempotent (the comment "has
+      no IF NOT EXISTS"). S3 fixed it by anchoring both at line start, mirroring
+      constraints.py::_DECLARATION_RE, which the bootstrap presence guard already
+      used. The generalisation is the point: a guard that reads prose makes the file
+      unable to explain itself, and this repo's whole doctrine is that the reasoning
+      IS the audit trail.
+
+  - id: J27
+    epic: release-infrastructure
+    title: "Two .gitignore comments name the real organisation and its internal domain — apply the CLAUDE.md §3 rule, or record the exception once"
+    type: chore
+    module: docs
+    phase: 8
+    agent: main
+    model: sonnet
+    priority: p2
+    status: todo
+    depends_on: []
+    inputs: [.gitignore, PUBLISH-BOUNDARY.md, CLAUDE.md, tests/unit/test_publish_boundary_values.py]
+    acceptance: >
+      Neither .gitignore comment names the organisation or its internal domain: both
+      are reworded to describe the CORPUS they explain (which is the useful half
+      anyway), OR — if the user rules that a private producer repo may carry them —
+      PUBLISH-BOUNDARY.md states that exception explicitly, once, naming the lines it
+      covers. What is not acceptable is the current state, which is neither. If the
+      ruling admits a guardable shape, J15's value-shape guard is extended to it.
+    notes: >
+      Groomed 2026-08-02 from the 2026-08-01 [chore] line — seen at J24 while
+      rewording the retired-tier labels on those same lines and deliberately left
+      alone there, because half-redacting one line while the next still carries the
+      domain is worse than leaving both. NOT a decision item by default: CLAUDE.md §3
+      already bans real org names outside internal/, and .gitignore sits at the root
+      of a repo that is sometimes published — so the rule exists and this applies it.
+      The exception branch stays available because the boundary is the user's to set.
+
 summary:
-  todo: 64                                         # 2026-08-02: -1 S2 claimed (laptop, pushed before work — the orchestration parent, ADR 0008 accepted as proposed at S1). Earlier 2026-08-01: -1 J24 claimed in_progress (desktop, pushed before work - the retired-tier residual sweep; picked over the other four retire-worded open items after a survey found each of those needs a decision first). Earlier 2026-08-01: -1 S3 claimed (laptop, pushed before work — the BusinessApplication identity cutover, gate-signed 2026-07-27 and ADR-amended at S1 the same day; it is BUILD work, not HITL). Earlier 2026-08-01: -1 S1 ruled (laptop; the three ADRs accepted — 0008/0009 as proposed, 0010 with amendments — which unblocked SIX items at once: S2/S3/S4 at p1 and S5/S6/S7 behind them). Earlier: -1 Q7 claimed (laptop). Earlier: +1 R7 claim RELEASED unbuilt back to todo — a pre-build survey found it needs a fetcher the producer does not have (Q6 owns the web/filedrop connectors, and is itself parked); Q6 added to its depends_on, so it leaves next_ready. A split (freshness-now / rescrape-later) is the user's call, not an agent's. Earlier 2026-08-01: -2 R6+R7 batch-claimed in_progress (desktop, pushed before work — the next two non-HITL ready items; O26 skipped, it carries an explicit SME HOLD and the runbook-template session has not ruled). Earlier 2026-08-01: -1 C17 claimed in_progress (desktop, pushed before work — the PAT grain-keying gate item; user supplied the decisive SME fact in-chat). Earlier 2026-08-01: -1 O27 claimed in_progress (desktop, pushed before work). Earlier 2026-07-31 (pm): +1 O43 — seed the remaining 9 UI test suites + rule on a UI runner (the Process/Testing model admitted for internal use; ui-tests.yaml + the component->module->suite->cases join built same session, 2/11 suites seeded from verified close notes). +1 O42 — the 62 first-party React components are in NO machine-readable inventory (verified: the code-graph snapshot scans Python roots only, MODULE_MAP omits drydocs-web by construction, and the software registry is the third-party ledger so they correctly do not belong there); dependency-free -> next_ready. Earlier (feat/external-vendor-scraper): +1 Q16 documentation currency (software-registry `documentation:` pointer -> docs corpus + version drift; the CONFIG half + its two guards built same session, Q16 owns the report + the graph pointer). Q13 restated STANDALONE per the user ruling (own converter/loader/verb, capture manifest as the inter-stage contract) rather than widening load-bmc-docs. Earlier same session: +3 the vendor-docs load plan (knowledge/upgrade-plans/vendor-docs-agent-navigation.md) — Q13 layer-1 navigable spine (taxonomy only, dependency-free -> next_ready), Q14 layer-2 entity-spine gate PROMPT (drafts only; sign-off is a separate SME session), Q15 agent-navigation QuerySpecs; Q14/Q15 both wait on Q13 so they argue from loaded evidence. Layer 3 (estate join) deliberately has NO item — it is blocked on G32's residency ruling because a relationship cannot span Neo4j databases (Q8). Earlier 2026-07-31 (pm, user-requested during the BMC doc-tree feasibility probe): +1 Q12 doc-capture scale guardrail — NOT next_ready (depends on Q6, which brings the web connector); Q6's acceptance gained the matching blocking clause so an unguarded scraper cannot land as an intermediate state. 2026-07-31 weekly groom (pm, after the N7 gate + N9 build closed): +2 (J24 the retired-tier residual in forward-looking specs — J23's own leftovers; J25 the paste-ready L7 ratification snippet, discharging cross-repo tracker T11). Also at that groom, NO new items: the 2026-07-20 runbook load-doc-traceability line MERGED into L21's acceptance, and M3's acceptance was fixed inline where it still cited the retired Internal-Confidential tier. N9 claimed in_progress 2026-07-31 (desktop, pushed-claim discipline — the gate-authorized build, same session as the N7 close). N9 groomed 2026-07-31 at the N7 close (the gate-authorized build; dependency-free -> next_ready). N7 claimed in_progress 2026-07-31 (desktop, pushed-claim discipline — the registry-v2 HITL gate session, user opened it in-chat with Q2/Q4 pre-rulings). J23 claimed in_progress 2026-07-31 (desktop, pushed-claim discipline). 2026-07-31 groom: +4 (J23 classification collapse to 3 levels — user ruling pre-decided, registry-plan Phase 1; W1-W3 new Epic W fcdo-alignment: crosswalk + gate spec, planned property/enum registration, ontology-builder skill note). J22 claimed in_progress 2026-07-30 (desktop, pushed-claim discipline, right after the weekly groom). 2026-07-30 weekly groom: +8 (N7 registry-v2 design session — user directive, fable/HITL; N8 the four unregistered map-source ids from N4's day-one render; J22 the J16 guard's untracked blind spot; R11-R13 the R5 follow-up trio — live smoke, stub-ADK fixture, ADK event-persistence check; G49/G50 the two time-parked infra chores whose triggers fired — port review done + neo4jtest probation week up). R5 claimed in_progress 2026-07-30 (desktop, after R4+R3 closed same session). R3 claimed in_progress 2026-07-30 (desktop, right after R4 closed; R5 queued next). R4 claimed in_progress 2026-07-30 (desktop session, non-HITL lane; laptop holds the HITL lane). J19 claimed in_progress 2026-07-30 (laptop session, pushed-claim discipline — the item that codifies the discipline itself; desktop session open concurrently). N5 claimed in_progress 2026-07-29 pm right after N4 closed (pushed-claim discipline). N3+N4 claimed in_progress 2026-07-29 (batch claim, pushed before work; N4 rides its N3 dep inside the chain — the O39 precedent). 2026-07-29 groom (user directive): +10 (new Epic V sme-runbooks — V1 coverage rule + V2-V10 per-module runbooks; only V1 dependency-free, the rest wait on its mapping dispositions; N4 widened in place with the taxonomy/ontology-map joins — merge, not a new item). G48 claimed in_progress 2026-07-29 once G46/G47 closed (pushed-claim discipline). 2026-07-29 groom: +3 (G46 resolver cmd-line API, G47 controlm-xml-export seam, G48 resolve-cmdline-staging — the XML-fed resolution chain; precedence ruling parked as an inbox question, guardrail 3). G42 claimed in_progress 2026-07-28 (catalog seam start; pushed-claim discipline). G45/C20/J20/R10 claimed in_progress 2026-07-28 evening (batch claim, pushed before work). 2026-07-28 evening groom: +4 (G45 rua listing fallback back-flow, C20 K4-comment scope, J20 matrix render fold, R10 agent-runtime chores; R3 caller-identity merged in place). Earlier 2026-07-28 pm load-map groom: +4 (N3-N6 — the generated loaders/order/commands/source-target surface; only N3 is dependency-free, N4->N5 chain and N6 waits on N3's declared sequence). # 2026-07-28 pm post-UI-merge groom: +15 (U7/U8 instrument hardening, O35 WF-LND landing, O36 dot clip, O37-O41 DataLens/DSI continuity, B5 stage taxonomy, R9 agent query surface, J18/J19 process, L20 stray-file guard, L21 runbook Rev 4).                                       # C15/C16/L18/D8/J17 claimed in_progress 2026-07-28 (batch claim, pushed-claim discipline). P5 claimed in_progress 2026-07-28 pm (pushed-claim discipline). 2026-07-28 pm epic-close-out groom: +7 (G42-G44 Snowflake data-catalog seam from the loader plan; L18 comma-split bug, L19 doc-drift sweep, D8 bootstrap guard, J17 gates.json ritual — all from same-day inbox lines), U5 executed in-run (-1, Epic U closed 6/6); prior: U4 closed 2026-07-28 pm (right after U6 unblocked it); U6 groomed + built + closed same day (net 0); +4 at the 2026-07-28 inbox groom (C19 ontology-comment fix, J16 port-manifest fall-through guard, L17 doc-loader prereq guards, O34 web npm advisories); all four closed same day (O34 via its stop clause), L16 closed alongside; +5 2026-07-27 groom (J14/J15/G36/O33/G38), +2 PAT review (C17/C18), +5 code-graph-review (U1-U5), +2 cmdline seam (G39/G40, built+closed same day)
+  todo: 71                                         # 2026-08-02 weekly groom: +7 todo (U10 the package-layer gate SESSION, U11 the second gate PROMPT, U12 the snapshot-README drift, G51 the unprovisioned meta-graph database + the guard that missed it, C22 the catalog loader sweep, J26 substring-match guards, J27 the .gitignore org names). Earlier 2026-08-02: -1 S2 claimed (laptop, pushed before work — the orchestration parent, ADR 0008 accepted as proposed at S1). Earlier 2026-08-01: -1 J24 claimed in_progress (desktop, pushed before work - the retired-tier residual sweep; picked over the other four retire-worded open items after a survey found each of those needs a decision first). Earlier 2026-08-01: -1 S3 claimed (laptop, pushed before work — the BusinessApplication identity cutover, gate-signed 2026-07-27 and ADR-amended at S1 the same day; it is BUILD work, not HITL). Earlier 2026-08-01: -1 S1 ruled (laptop; the three ADRs accepted — 0008/0009 as proposed, 0010 with amendments — which unblocked SIX items at once: S2/S3/S4 at p1 and S5/S6/S7 behind them). Earlier: -1 Q7 claimed (laptop). Earlier: +1 R7 claim RELEASED unbuilt back to todo — a pre-build survey found it needs a fetcher the producer does not have (Q6 owns the web/filedrop connectors, and is itself parked); Q6 added to its depends_on, so it leaves next_ready. A split (freshness-now / rescrape-later) is the user's call, not an agent's. Earlier 2026-08-01: -2 R6+R7 batch-claimed in_progress (desktop, pushed before work — the next two non-HITL ready items; O26 skipped, it carries an explicit SME HOLD and the runbook-template session has not ruled). Earlier 2026-08-01: -1 C17 claimed in_progress (desktop, pushed before work — the PAT grain-keying gate item; user supplied the decisive SME fact in-chat). Earlier 2026-08-01: -1 O27 claimed in_progress (desktop, pushed before work). Earlier 2026-07-31 (pm): +1 O43 — seed the remaining 9 UI test suites + rule on a UI runner (the Process/Testing model admitted for internal use; ui-tests.yaml + the component->module->suite->cases join built same session, 2/11 suites seeded from verified close notes). +1 O42 — the 62 first-party React components are in NO machine-readable inventory (verified: the code-graph snapshot scans Python roots only, MODULE_MAP omits drydocs-web by construction, and the software registry is the third-party ledger so they correctly do not belong there); dependency-free -> next_ready. Earlier (feat/external-vendor-scraper): +1 Q16 documentation currency (software-registry `documentation:` pointer -> docs corpus + version drift; the CONFIG half + its two guards built same session, Q16 owns the report + the graph pointer). Q13 restated STANDALONE per the user ruling (own converter/loader/verb, capture manifest as the inter-stage contract) rather than widening load-bmc-docs. Earlier same session: +3 the vendor-docs load plan (knowledge/upgrade-plans/vendor-docs-agent-navigation.md) — Q13 layer-1 navigable spine (taxonomy only, dependency-free -> next_ready), Q14 layer-2 entity-spine gate PROMPT (drafts only; sign-off is a separate SME session), Q15 agent-navigation QuerySpecs; Q14/Q15 both wait on Q13 so they argue from loaded evidence. Layer 3 (estate join) deliberately has NO item — it is blocked on G32's residency ruling because a relationship cannot span Neo4j databases (Q8). Earlier 2026-07-31 (pm, user-requested during the BMC doc-tree feasibility probe): +1 Q12 doc-capture scale guardrail — NOT next_ready (depends on Q6, which brings the web connector); Q6's acceptance gained the matching blocking clause so an unguarded scraper cannot land as an intermediate state. 2026-07-31 weekly groom (pm, after the N7 gate + N9 build closed): +2 (J24 the retired-tier residual in forward-looking specs — J23's own leftovers; J25 the paste-ready L7 ratification snippet, discharging cross-repo tracker T11). Also at that groom, NO new items: the 2026-07-20 runbook load-doc-traceability line MERGED into L21's acceptance, and M3's acceptance was fixed inline where it still cited the retired Internal-Confidential tier. N9 claimed in_progress 2026-07-31 (desktop, pushed-claim discipline — the gate-authorized build, same session as the N7 close). N9 groomed 2026-07-31 at the N7 close (the gate-authorized build; dependency-free -> next_ready). N7 claimed in_progress 2026-07-31 (desktop, pushed-claim discipline — the registry-v2 HITL gate session, user opened it in-chat with Q2/Q4 pre-rulings). J23 claimed in_progress 2026-07-31 (desktop, pushed-claim discipline). 2026-07-31 groom: +4 (J23 classification collapse to 3 levels — user ruling pre-decided, registry-plan Phase 1; W1-W3 new Epic W fcdo-alignment: crosswalk + gate spec, planned property/enum registration, ontology-builder skill note). J22 claimed in_progress 2026-07-30 (desktop, pushed-claim discipline, right after the weekly groom). 2026-07-30 weekly groom: +8 (N7 registry-v2 design session — user directive, fable/HITL; N8 the four unregistered map-source ids from N4's day-one render; J22 the J16 guard's untracked blind spot; R11-R13 the R5 follow-up trio — live smoke, stub-ADK fixture, ADK event-persistence check; G49/G50 the two time-parked infra chores whose triggers fired — port review done + neo4jtest probation week up). R5 claimed in_progress 2026-07-30 (desktop, after R4+R3 closed same session). R3 claimed in_progress 2026-07-30 (desktop, right after R4 closed; R5 queued next). R4 claimed in_progress 2026-07-30 (desktop session, non-HITL lane; laptop holds the HITL lane). J19 claimed in_progress 2026-07-30 (laptop session, pushed-claim discipline — the item that codifies the discipline itself; desktop session open concurrently). N5 claimed in_progress 2026-07-29 pm right after N4 closed (pushed-claim discipline). N3+N4 claimed in_progress 2026-07-29 (batch claim, pushed before work; N4 rides its N3 dep inside the chain — the O39 precedent). 2026-07-29 groom (user directive): +10 (new Epic V sme-runbooks — V1 coverage rule + V2-V10 per-module runbooks; only V1 dependency-free, the rest wait on its mapping dispositions; N4 widened in place with the taxonomy/ontology-map joins — merge, not a new item). G48 claimed in_progress 2026-07-29 once G46/G47 closed (pushed-claim discipline). 2026-07-29 groom: +3 (G46 resolver cmd-line API, G47 controlm-xml-export seam, G48 resolve-cmdline-staging — the XML-fed resolution chain; precedence ruling parked as an inbox question, guardrail 3). G42 claimed in_progress 2026-07-28 (catalog seam start; pushed-claim discipline). G45/C20/J20/R10 claimed in_progress 2026-07-28 evening (batch claim, pushed before work). 2026-07-28 evening groom: +4 (G45 rua listing fallback back-flow, C20 K4-comment scope, J20 matrix render fold, R10 agent-runtime chores; R3 caller-identity merged in place). Earlier 2026-07-28 pm load-map groom: +4 (N3-N6 — the generated loaders/order/commands/source-target surface; only N3 is dependency-free, N4->N5 chain and N6 waits on N3's declared sequence). # 2026-07-28 pm post-UI-merge groom: +15 (U7/U8 instrument hardening, O35 WF-LND landing, O36 dot clip, O37-O41 DataLens/DSI continuity, B5 stage taxonomy, R9 agent query surface, J18/J19 process, L20 stray-file guard, L21 runbook Rev 4).                                       # C15/C16/L18/D8/J17 claimed in_progress 2026-07-28 (batch claim, pushed-claim discipline). P5 claimed in_progress 2026-07-28 pm (pushed-claim discipline). 2026-07-28 pm epic-close-out groom: +7 (G42-G44 Snowflake data-catalog seam from the loader plan; L18 comma-split bug, L19 doc-drift sweep, D8 bootstrap guard, J17 gates.json ritual — all from same-day inbox lines), U5 executed in-run (-1, Epic U closed 6/6); prior: U4 closed 2026-07-28 pm (right after U6 unblocked it); U6 groomed + built + closed same day (net 0); +4 at the 2026-07-28 inbox groom (C19 ontology-comment fix, J16 port-manifest fall-through guard, L17 doc-loader prereq guards, O34 web npm advisories); all four closed same day (O34 via its stop clause), L16 closed alongside; +5 2026-07-27 groom (J14/J15/G36/O33/G38), +2 PAT review (C17/C18), +5 code-graph-review (U1-U5), +2 cmdline seam (G39/G40, built+closed same day)
   in_progress: 1  # S2 claimed AND closed 2026-08-02 same session (LAPTOP; the orchestration parent — one git mv, two file splits, and the crosswalk consumer the config had been waiting on since 2026-07-14). Only E1 remains, gate-deferred. Prior note: S2 claimed 2026-08-02 (LAPTOP, pushed before work — drydocs_core package move; the desktop's last session closed J24 and touched docs/api, no overlap). Earlier: S3 claimed AND closed 2026-08-01 same session (LAPTOP; the BusinessApplication identity cutover — phases 1+2 + the column ledger, live-verified on a scratch database). Only E1 remains, gate-deferred. Earlier: J24 claimed AND closed 2026-08-01 same session (desktop). Prior note: J24 claimed 2026-08-01 (DESKTOP, pushed before work; concurrent with the laptop S3 claim - J24 is docs/skills/templates + drydocs_api classification vocabulary, deliberately not the loader-Cypher/schema/web surfaces S3 holds). S3 claimed 2026-08-01 (LAPTOP, pushed before work; desktop session open concurrently — S3 is loader-Cypher/schema/API/web, deliberately not the R-epic or catalog surfaces the desktop has been working). Earlier: Q7 claimed AND closed 2026-08-01 same session (LAPTOP, concurrent with a desktop R-epic session — claimed deliberately in a module that session was not touching, and it added files rather than editing agents/ or web/; zero collision at merge). Only E1 remains, gate-deferred. R7's claim RELEASED unbuilt 2026-08-01 (blocked on a fetcher — see its notes); only E1 remains, gate-deferred. R6 claimed AND closed 2026-08-01 same session (desktop; Tier-2 bounded loop). R7 still open. R6+R7 batch-claimed 2026-08-01 (desktop, pushed-claim discipline — next two non-HITL ready items). E1 remains gate-deferred. C17 claimed AND closed 2026-08-01 same session (desktop; PAT grain keying — §a/§b/§c ruled + built, gate as a whole still unsigned). E1 remains gate-deferred. O28 claimed AND closed 2026-08-01 same session (desktop; node status envelope, contract + live producer + both UI surfaces). O27 claimed AND closed 2026-08-01 same session (desktop; QuerySpec authoring conventions). E1 remains gate-deferred. J10 CLOSED 2026-08-01 (laptop; stages 1-5 in one sitting after the user ruled the two open calls — ruff check AND ruff format --check both exit 0, CI blocks on both. Company side not started and not blocked). Only E1 remains, gate-deferred. Prior note: J10 claimed 2026-07-31 (desktop; stage 0 only — stages 1-5 wait on the internal port's PORT-REPORT).                                # N9 claimed AND closed 2026-07-31 same session (desktop; the registry v2 build — systems/datasets/retired shipped, suite 1204). E1 remains. N7 claimed AND closed 2026-07-31 same session (desktop; the registry-v2 gate session ran in-chat — D1-D4 + Q1-Q6 all ruled, migration table = per-row residual at N9). E1 remains. J23 claimed AND closed 2026-07-31 same session (desktop; classification collapse to 3 levels). E1 remains. J22 claimed AND closed 2026-07-30 same session (desktop; guard walk widened to untracked). E1 remains. R5 claimed AND closed 2026-07-30 same session (desktop — the whole R4->R3->R5 run in one day). R3 claimed AND closed 2026-07-30 same session (desktop; agent telemetry — ledger + :AgentRun + admin spec). E1 remains. R4 claimed AND closed 2026-07-30 same session (desktop; ephemeral session specs). E1 remains gate-deferred (J19 closed 2026-07-30: pull rule documentation — CLAUDE.md §0 + backlog.yaml header + acceptance test all updated to make the pushed-claim discipline explicit). J21 claimed AND closed 2026-07-30 same session (registry pk check + binding guard, 087a685). N3+N4+N5 all claimed AND closed 2026-07-29 same session (the load-map chain). E1 remains. E1 (gate deferred both sides). O35-O41 UI sweep claimed + closed 2026-07-29 same session. + old-note: batch claim 2026-07-29 (pushed-claim discipline; O39 rides its O38 dep inside the sweep). G46/G47/G48 — the whole XML-fed resolution chain — claimed + closed 2026-07-29 same session. G42 claimed + closed 2026-07-28 same session. 2026-07-28 evening batch claim fully closed: J20, R10, C20, G45 all done same evening
   blocked: 0
-  done: 206                                        # 2026-08-02 (laptop): S2 — drydocs_core/orchestration/ as the parent of controlm/. The item's real value was crosswalk.py: config/crosswalks/*.yaml had been gate-confirmed since 2026-07-14 with NO runtime reader, so `fidelity: no-equivalent` was prose nothing could enforce and an unmapped concept could be rendered as the nearest Control-M label. It now RAISES. Two corrections to the ADR, both recorded in it: the Control-M field routing it scheduled out of commands.py was NOT IN THAT FILE (docstring only — the routing lives in variables.py and staging.py), so fields.py is deliberately thin rather than padded to fill a planned module; and action item 4's guard had to be narrowed, because 'nothing outside orchestration/controlm/ imports Control-M modules' fails on its first run — the loaders ingest Control-M and are right to. paths.py needed a SEAM not a cut: PathDialect lets the vendor supply its token vocabulary while the neutral half keeps the shape, so a second orchestrator adds a dialect instead of forking. Zero graph change. Earlier 2026-08-01 (laptop): S3 — the BusinessApplication identity cutover. seal_id -> app_id as the canonical MERGE key across all 8 key-bearing sites in ONE change (a partial flip would not fail, it would SILENTLY DOUBLE the node — uniqueness ignores nulls), seal_id retained as a dual-written alias, :Port NODE KEY following as port_app_key(parent_app_id, kind). The gate's §D1 trap was PROVEN rather than quoted: on a scratch database, re-declaring a constraint with a DIFFERENT key under the SAME name succeeded and left the old definition live — so the DROP is load-bearing. Two of the eight line numbers in the acceptance had drifted since the gate (the SET of sites had not). :Port deliberately got no alias — the gate measured that parent_seal_id has zero readers, and a NODE KEY cannot be null. Phase 2 put app_id on the wire (6 QuerySpecs, mappings.py, four web files) while the committed FILE formats stayed put and are aliased at the boundary: manual_mappings.py refuses a row whose target_key is not literally `seal_id=`, so renaming it would stop every committed manual-load CSV from parsing — that belongs to §G3's retirement gate, and ADR 0010 action item 6 now carries it. match_method stayed 'seal' (§B2(ii)); the only fixture change went the other way, correcting an invented 'seal_var' the graph never writes. The §B1(c) column ledger landed with both its uncomfortable facts written in: only ONE of its 92 column names is an SME-confirmed source header, and the row model and the registry disagree about whether the source is a psgmgr view or a Reports export. 2026-08-01 (desktop): J24 retired-tier residual sweep. The item's own framing undersold it: the retired tier was LIVE in shipped code (two registered specs, the export prefix map + banner) and in TWO web copies of the vocabulary that neither J23 nor this item listed. Ephemeral ceiling RE-POINTED not deleted (rule preserved over value). Ruled the open unsigned-prompt question the C17 session left: sweep it — its Registry ref line assigns a tier to a future entry, so it is not merely descriptive — which pulled in the two other unsigned prompts, one of which (rua-load-shapes F1) asks the SME a question whose two-tier premise J23 removed: FLAGGED for re-framing, not re-decided. Guard asserts the api and config vocabularies AGREE rather than scanning for a token, so it survives the next change too. Suite 1336.  2026-08-01 (laptop): S1 — ADRs 0008/0009/0010 ruled. 0008 and 0009 ACCEPTED as proposed; 0010 ACCEPTED WITH AMENDMENTS because accepting it as written would have ratified `id_authority`, a property its own gate WITHDREW on 2026-07-27 — the ADR's body carried a "do not build from this as written, amendment owed at S1" banner, and S1's acceptance requires editing to the ruling rather than annotating around it. Unblocked S2/S3/S4 (p1) + S5/S6/S7. Earlier 2026-08-01 (laptop): Q7 docs-verify — the doc-source registry reconciled against the graph for the first time. Found `dddocs` DECLARED BY TWO CORPORA BUT NEVER PROVISIONED (01_databases.cypher creates drydocs/ddlineage/ddcontext/ddall only) — reported as db-absent, not failed, because the topology is G32's open ruling. Also forced a design fact into the open: the registry is corpus-keyed and the graph is not, so every entry now declares `graph_locator` and the check stays registry-driven instead of hard-coding three loader shapes. Earlier 2026-08-01 (desktop): R6 Tier-2 bounded enhance/solve loop — a PURE controller (llm/retrieve callables, not the pipeline) reusing Tier-1 retrieval so the <=2 fix loop and read-only pre-flight are inherited, not reimplemented. Two bounding calls the acceptance left open: a tie or unparseable vote counts as SOLVE (voting's failure mode is a loop that won't stop), and the token budget bounds EXPLORATION not the run (evidence already bought still gets one final answer call, recorded as exhausted; with no evidence and no budget the loop makes zero calls). The R1 in-process residency proof is STRUCTURAL — task_graph.py has no driver/session/db-name/Cypher and the test reads the source. Fixed a real gap named only in passing: the ledger recorded iteration=1 for every call, so per-iteration cost — the thing that makes the caps tunable — did not exist. Web: the d3 placement engine moved to lib/forceLayout.ts instead of being copied; TaskGraphPane keeps its own visual language so a synthesized sub-question is never mistaken for a real graph node. Earlier same day: C17 PAT grain keying — the item's own premise was wrong and the user's SME fact corrected it: every catalog grain (LoB, Sub-LoB, Product Line, Product, Area Product) carries a NUMERIC id at source, so the team report's name-only Product Line is a report projection, not a source limitation. §a rules the id-carrying extract outright (name -> id demoted to a bounded migration path that must report ambiguity); §b records Supporting -> area_product_id / Sponsoring -> sponsored_area_product_id, co-populated so the two independent cypher blocks were already right; §c rules Sponsoring Product Line out of scope while name-only. The fact also exposed a live defect the rider never asked about — pydantic v2 does not coerce int -> str, so a numerically typed read of the real feed rejected EVERY catalog row; attribution.py already had the coercion, the catalog loaders never got it. Corollary: having ruled the join is by id, products.cypher's silent parent MATCH became OPTIONAL MATCH + a per-run orphan flag that keeps the unresolved id (the old `orphan` flag could never be true). Sibling loaders and the Sub-LoB gap both INBOXED rather than swept. Earlier same day: O28 node-status envelope — one shape {type, level, message, error?} for every health signal, always DERIVED, extended by NAMESPACED TYPES never new fields. Producer (BaseLoader, pure fn), wire (loads.status-items.v1), and both UI surfaces (inspector section + hub spoke glyphs) share one contract. Stored as a PROPERTY not an edge — a relationship would have been an ontology decision needing the HITL gate for a signal with no ontological meaning, which would have made every future producer gate-bound. No all-clear item, so healthy stays distinguishable from never-observed. Earlier same day: O27 QuerySpec authoring conventions — drydocs_api/AUTHORING.md, three rules with rationale, linked from query_specs.py. The registry audited CLEAN on all three, so the deliverable is the rule + the guard, not a fix list. Three corrections to the item's own framing: the ref-grammar namespace is the DECLARED UNIQUENESS SCOPE, not the data center (that holds for 1 of 6 kinds — jobs and conditions are folder-scoped), and the doc's table is now held to constraints.cypher by a test; rule (a)'s non-violations had to be stated (a NODE-KEY property join is identity resolution, not meaning re-derivation) or the rule would push authors into worse Cypher; and the element-id guard went to guard.py covering BOTH the registry and the LLM-authored ephemeral path, because the acceptance's "registry invariant" would have guarded the only path that cannot fail. Earlier 2026-08-01 (laptop): J10 ruff convergence, producer side COMPLETE — 1,017 findings to 0, 284 of 328 files reformatted, CI now blocks on both `ruff check` and `ruff format --check`. Half the post-format residual (177 of 362) turned out to be VENDORED skill scripts and became an extend-exclude; 30 findings in our own code were fixed rather than ignored. Three things the sweep surfaced that a bulk-ignore would have buried: ruff's F841 unsafe fix leaves dead calls behind (6 across 3 files), a `pytest.raises(Exception)` that never proved what its name claimed, and a double-encoded "â†’" masquerading as a RUF003 style nit. The J16 fall-through guard caught .git-blame-ignore-revs having no PORT-MANIFEST row — now an explicit never-port. Earlier 2026-07-31 (pm, oldest-first pull): L21 runbook Rev 5 — the collapse found a real defect, not just verbosity: step 3 and Appendix B both listed the three PRE-G29 per-file verbs (base/seal/catalog) and OMITTED registry, so anyone following this runbook literally never seeded the registry supplement that load-software-registry (two lines below it, in the same runbook) MATCHes — the exact G29 'runs and seeds nothing' class, living in the doc that teaches the procedure. Both blocks now run the one verified `apply-supplements` chain (whose per-term verification makes a green run EVIDENCE the terms landed); load-doc-traceability named in the ingest step (shipped by L7 after Rev 2 was signed, never added); rev pin in test_doc_traceability_loader.py bumped 4->5 (it caught the bump, as designed). Numbering note: the item says 'Rev 4' because it was groomed before Rev 4 (plugins) landed the same day — this is that revision, one number on. + J25 the L7 ratification snippet committed as port-prompt §6a — the gap was DURABILITY: port-prompt claimed the snippet was 'provided in the producer session 2026-07-21' and a repo-wide search for 0252d29 / PORT-REPORT-6fd3270 found only prose, so the company gate pack cited an artifact no company session could open, and T11 had read `pending` since. Split written into the block itself: producer-gate facts (6 classes + 6 doc_* ids, all verified against gate-log / relationship_vocabulary.yaml / taxonomy-ontology-map.yaml; commit 0252d29 confirmed reachable) are PRE-FILLED; check results + sign-off are bracketed placeholders because they describe the COMPANY tree — an entry citing numbers nobody ran is worse than no entry. T11 row now points at §6a. The company still signs its own ratification. Suite 1269. Earlier 2026-07-31 (desktop): N9 source-registry v2 BUILD (15 systems / 28 datasets / 17 retired ids; doc-ledger union; D2 overlay seam; derived URNs; 14 loaders re-bound; ledgers/captures/map/audit re-keyed; cm_avg_run stale-note correction; Q6 amendment in gate-log; suite 1204). Earlier 2026-07-31 (desktop): N7 registry-v2 gate session run in-chat (D1-D4 + Q1-Q6 all ruled w/ 2 SME amendments — seal_id placeholder, origin@db.schema.table grammar; T19 pat:product-catalog naming note to the divergence ledger; migration table = explicit per-row residual at the N9 build; gate-log source-registry-v2 + prompt authored). Also 2026-07-31 (desktop): J23 classification collapse (3 levels; 7 source-registry + 1 doc-registry + 3 taxonomy relabels w/ confidential-handling comments kept; both test assertions updated; CLAUDE.md/PUBLISH-BOUNDARY/config-README tables collapsed; internal READMEs restated; history left as history; suite 1188). Earlier 2026-07-30 (desktop): J22 the J16 guard's untracked blind spot closed same day it was groomed (walk = tracked + --others --exclude-standard, pure fall_through_orphans + mechanics pin, [untracked] tagging + .gitignore resolution in the message; live-proven with a pre-add probe failing and the clean tree passing). Earlier 2026-07-30 (desktop): R5 Ask spoke (/ask for every persona — streamed steps via on_step+SSE, control-part owner-token handshake, citations w/ trust+classification, SpecGrid-on-eph-ref explorer/export, metrics chip; wire-level live e2e + headless render check), R3 agent run telemetry (per-call JSONL ledger w/ price map in DRYDOCS_LOGDIR — full question text ledger-only; :AgentRun kind='qa' via dedicated ddcontext writer that refuses drydocs; console.agent-runs.v1 admin spec; hashed caller-identity slot filled from ADK ctx), R4 ephemeral session-scoped QuerySpecs (eph.<hash> refs, agent-key-gated registration, frozen params, TTL+capacity bounds, one manifest code path, /raw-cypher untouched; pipeline explore_ref hook + urllib client, live wiring rides R5). Earlier 2026-07-30: J19 pull rule documentation (pushed-claim discipline codified in CLAUDE.md §0 + backlog.yaml header + items inputs/acceptance updated), J21 source-registry hardening (duplicate-id refusal + shipped-registry uniqueness pin + loader-field/N3-binding agreement guard + autosys/airflow stale-note refresh; 087a685). Earlier — 2026-07-29: N3+N4+N5 the load-map chain — N5 human surface (docs/plan/load-map.html, placement decided plan-not-design, ritual-wired, print-ready) — N4 render (load-map.json, 18 sources joined, rides the default board render; caught 4 map entries citing unregistered source ids on day one) on top of N3 load-map joins declared (source_id on all 25 loaders + one named exemption; chains lifted to consumed constants; CANONICAL_LOAD_SEQUENCE; 11-test guard). Earlier 2026-07-29 UI sweep O35-O41: O36 root cause = unlayered *{padding:0} reset out-cascading layered Tailwind utilities (preflight keeps the reset; box-sizing only retained); O37 radius tokens (lg collapsed onto md=10px, App.css/index.css radii tokenized); O41 status-vocab map + O38 IdChip/StageBadge convention (UI-WIP/ui-conventions.md) adopted inspector+loads; O39 runtime-view env-template slot (mechanism only, renders nothing unset); O40 StatTiles click-to-filter live on loads (Failed tile 4->1 verified); O35 category-first landing per SME FB-01/FB-02 (hub demoted, name renders once, modules+towers pick-lists, data-wf keys kept). Both themes screenshot-checked; build+lint green container AND device. # 2026-07-29: G48 resolve-cmdline-staging (store v3 + resolution_quality provenance; verbatim-beside-derived; precedence evidence counted never ruled), G47 controlm-xml-export seam (taxonomy-first defs+ordered-variables staging, scope_layers handoff proven against the resolver), G46 resolve_command_line on the shared resolver (one scope-chain walk, substitution provenance with winning scope, %%VAR-launcher round-trip proven). 2026-07-28 late: G42 Snowflake data-catalog seam (source registered + catalog_dir landing zone + SnowflakeCatalogExtractor staging both views, three-shape discrimination, sentinel counted, latest-per-GUID, origin routing, urn fact column; G43 cross-checks unblocked). Earlier 2026-07-28 evening: G45 rua listing fallback (presence dispatch, 561-script company incident's producer parity), C20 K4-comment re-scope (SEAL-loader-specific deprecation; live catalog writers named), R10 agent-runtime alignment (google-adk pinned >=2,<3 + ADR 0007 revisit date-stamp), J20 one-render-entry-point part 2 (matrix rides the default board render). Earlier: C16 key-prefix governance in the metadata plan (drydocs./system/team-local classes), C15 inverse_label on all 78 vocab entries (presentational only, schema-test enforced), L18 depth-0 cell split (the K2 shear healed; conformance guard over the real matrices), D8 bootstrap constraint guard (names-not-counts presence check after apply, live 51/51), J17 gates.json folded into the default-paths board render (drift closed at the ritual level). Earlier 2026-07-28 pm: P5 maintenance-window query (patch-window CLI + union-not-sum window math + findings feeder; claimed-then-closed same day — EPIC P COMPLETE 5/5), U5 groom-skill graph cross-check subsection (executed inside the close-out groom — EPIC U COMPLETE 6/6), U4 tech-debt graph-evidence section (hardened A1-A6 pack + offline fallback, all probes run live), U6 depgraph scanner blind-spot fix (shared-namespace extract_many + drydocs_api root; 205 modules / 370 IMPORTS, all 24 U1 orphan false-positives resolved). Earlier 2026-07-28: G41 glue base-table inventory seam (built + closed same day), L17 doc-loader prereq guards (same), O33 SchemaMeta exemplar audit (22 specs + runs_on write path; live-proven), O34 npm advisories (postcss cleared; react-router escalated via the stop clause), U1/U2/U3 code-graph persona reviews run 1 (scanner blind-spot headline; backlog verified truthful; doc board + citation sweep queued), C19 ontology-comment fix (groomed + closed same day), J16 port-manifest fall-through guard (same), L16 runbook container/port refresh. 2026-07-27 closes: J14 SEALID split, P3 hosts+RUNS_ON, G21 rua code-ops, G24 code-repo seam, G26 launcher-registry config, Q8 bmc-docs prereq, C18 shadow-model guard, J15 value-shape boundary guard, G33 code-snapshot loader (gate signed + built same day), G39 cmdline staging store + G40 parse (groomed am, built pm)
-  next_ready: [M3, M4, Q6, O23, J13, O26, R8, O29, O30, O31, O32, S4, S5, S6, S7, S8, S9, G32, G34, G35, G36, G22, G43, L19, B5, R9, J18, L20, V1, N6, N8, R11, R12, R13, G49, G50, W1, W2, W3, Q13, O42, O43]
+  done: 208                                        # 2026-08-02 weekly groom: +2 RETROSPECTIVE closes for work that landed at e3f65af before an item existed — U9 (whole-repo scanner by default, the git-ignore filter, the 101-file series retired to one, the loader's tree acceptance and the two defects fixed in-run) and C21 (the schema meta-graph into its own database behind `drydocs bootstrap-schema-graph`, the NODE KEY blocker proven live on a throwaway label). Groomed retrospectively rather than left invisible because committed code cites "U9" as an id in three files. Earlier 2026-08-02 (laptop): S2 — drydocs_core/orchestration/ as the parent of controlm/. The item's real value was crosswalk.py: config/crosswalks/*.yaml had been gate-confirmed since 2026-07-14 with NO runtime reader, so `fidelity: no-equivalent` was prose nothing could enforce and an unmapped concept could be rendered as the nearest Control-M label. It now RAISES. Two corrections to the ADR, both recorded in it: the Control-M field routing it scheduled out of commands.py was NOT IN THAT FILE (docstring only — the routing lives in variables.py and staging.py), so fields.py is deliberately thin rather than padded to fill a planned module; and action item 4's guard had to be narrowed, because 'nothing outside orchestration/controlm/ imports Control-M modules' fails on its first run — the loaders ingest Control-M and are right to. paths.py needed a SEAM not a cut: PathDialect lets the vendor supply its token vocabulary while the neutral half keeps the shape, so a second orchestrator adds a dialect instead of forking. Zero graph change. Earlier 2026-08-01 (laptop): S3 — the BusinessApplication identity cutover. seal_id -> app_id as the canonical MERGE key across all 8 key-bearing sites in ONE change (a partial flip would not fail, it would SILENTLY DOUBLE the node — uniqueness ignores nulls), seal_id retained as a dual-written alias, :Port NODE KEY following as port_app_key(parent_app_id, kind). The gate's §D1 trap was PROVEN rather than quoted: on a scratch database, re-declaring a constraint with a DIFFERENT key under the SAME name succeeded and left the old definition live — so the DROP is load-bearing. Two of the eight line numbers in the acceptance had drifted since the gate (the SET of sites had not). :Port deliberately got no alias — the gate measured that parent_seal_id has zero readers, and a NODE KEY cannot be null. Phase 2 put app_id on the wire (6 QuerySpecs, mappings.py, four web files) while the committed FILE formats stayed put and are aliased at the boundary: manual_mappings.py refuses a row whose target_key is not literally `seal_id=`, so renaming it would stop every committed manual-load CSV from parsing — that belongs to §G3's retirement gate, and ADR 0010 action item 6 now carries it. match_method stayed 'seal' (§B2(ii)); the only fixture change went the other way, correcting an invented 'seal_var' the graph never writes. The §B1(c) column ledger landed with both its uncomfortable facts written in: only ONE of its 92 column names is an SME-confirmed source header, and the row model and the registry disagree about whether the source is a psgmgr view or a Reports export. 2026-08-01 (desktop): J24 retired-tier residual sweep. The item's own framing undersold it: the retired tier was LIVE in shipped code (two registered specs, the export prefix map + banner) and in TWO web copies of the vocabulary that neither J23 nor this item listed. Ephemeral ceiling RE-POINTED not deleted (rule preserved over value). Ruled the open unsigned-prompt question the C17 session left: sweep it — its Registry ref line assigns a tier to a future entry, so it is not merely descriptive — which pulled in the two other unsigned prompts, one of which (rua-load-shapes F1) asks the SME a question whose two-tier premise J23 removed: FLAGGED for re-framing, not re-decided. Guard asserts the api and config vocabularies AGREE rather than scanning for a token, so it survives the next change too. Suite 1336.  2026-08-01 (laptop): S1 — ADRs 0008/0009/0010 ruled. 0008 and 0009 ACCEPTED as proposed; 0010 ACCEPTED WITH AMENDMENTS because accepting it as written would have ratified `id_authority`, a property its own gate WITHDREW on 2026-07-27 — the ADR's body carried a "do not build from this as written, amendment owed at S1" banner, and S1's acceptance requires editing to the ruling rather than annotating around it. Unblocked S2/S3/S4 (p1) + S5/S6/S7. Earlier 2026-08-01 (laptop): Q7 docs-verify — the doc-source registry reconciled against the graph for the first time. Found `dddocs` DECLARED BY TWO CORPORA BUT NEVER PROVISIONED (01_databases.cypher creates drydocs/ddlineage/ddcontext/ddall only) — reported as db-absent, not failed, because the topology is G32's open ruling. Also forced a design fact into the open: the registry is corpus-keyed and the graph is not, so every entry now declares `graph_locator` and the check stays registry-driven instead of hard-coding three loader shapes. Earlier 2026-08-01 (desktop): R6 Tier-2 bounded enhance/solve loop — a PURE controller (llm/retrieve callables, not the pipeline) reusing Tier-1 retrieval so the <=2 fix loop and read-only pre-flight are inherited, not reimplemented. Two bounding calls the acceptance left open: a tie or unparseable vote counts as SOLVE (voting's failure mode is a loop that won't stop), and the token budget bounds EXPLORATION not the run (evidence already bought still gets one final answer call, recorded as exhausted; with no evidence and no budget the loop makes zero calls). The R1 in-process residency proof is STRUCTURAL — task_graph.py has no driver/session/db-name/Cypher and the test reads the source. Fixed a real gap named only in passing: the ledger recorded iteration=1 for every call, so per-iteration cost — the thing that makes the caps tunable — did not exist. Web: the d3 placement engine moved to lib/forceLayout.ts instead of being copied; TaskGraphPane keeps its own visual language so a synthesized sub-question is never mistaken for a real graph node. Earlier same day: C17 PAT grain keying — the item's own premise was wrong and the user's SME fact corrected it: every catalog grain (LoB, Sub-LoB, Product Line, Product, Area Product) carries a NUMERIC id at source, so the team report's name-only Product Line is a report projection, not a source limitation. §a rules the id-carrying extract outright (name -> id demoted to a bounded migration path that must report ambiguity); §b records Supporting -> area_product_id / Sponsoring -> sponsored_area_product_id, co-populated so the two independent cypher blocks were already right; §c rules Sponsoring Product Line out of scope while name-only. The fact also exposed a live defect the rider never asked about — pydantic v2 does not coerce int -> str, so a numerically typed read of the real feed rejected EVERY catalog row; attribution.py already had the coercion, the catalog loaders never got it. Corollary: having ruled the join is by id, products.cypher's silent parent MATCH became OPTIONAL MATCH + a per-run orphan flag that keeps the unresolved id (the old `orphan` flag could never be true). Sibling loaders and the Sub-LoB gap both INBOXED rather than swept. Earlier same day: O28 node-status envelope — one shape {type, level, message, error?} for every health signal, always DERIVED, extended by NAMESPACED TYPES never new fields. Producer (BaseLoader, pure fn), wire (loads.status-items.v1), and both UI surfaces (inspector section + hub spoke glyphs) share one contract. Stored as a PROPERTY not an edge — a relationship would have been an ontology decision needing the HITL gate for a signal with no ontological meaning, which would have made every future producer gate-bound. No all-clear item, so healthy stays distinguishable from never-observed. Earlier same day: O27 QuerySpec authoring conventions — drydocs_api/AUTHORING.md, three rules with rationale, linked from query_specs.py. The registry audited CLEAN on all three, so the deliverable is the rule + the guard, not a fix list. Three corrections to the item's own framing: the ref-grammar namespace is the DECLARED UNIQUENESS SCOPE, not the data center (that holds for 1 of 6 kinds — jobs and conditions are folder-scoped), and the doc's table is now held to constraints.cypher by a test; rule (a)'s non-violations had to be stated (a NODE-KEY property join is identity resolution, not meaning re-derivation) or the rule would push authors into worse Cypher; and the element-id guard went to guard.py covering BOTH the registry and the LLM-authored ephemeral path, because the acceptance's "registry invariant" would have guarded the only path that cannot fail. Earlier 2026-08-01 (laptop): J10 ruff convergence, producer side COMPLETE — 1,017 findings to 0, 284 of 328 files reformatted, CI now blocks on both `ruff check` and `ruff format --check`. Half the post-format residual (177 of 362) turned out to be VENDORED skill scripts and became an extend-exclude; 30 findings in our own code were fixed rather than ignored. Three things the sweep surfaced that a bulk-ignore would have buried: ruff's F841 unsafe fix leaves dead calls behind (6 across 3 files), a `pytest.raises(Exception)` that never proved what its name claimed, and a double-encoded "â†’" masquerading as a RUF003 style nit. The J16 fall-through guard caught .git-blame-ignore-revs having no PORT-MANIFEST row — now an explicit never-port. Earlier 2026-07-31 (pm, oldest-first pull): L21 runbook Rev 5 — the collapse found a real defect, not just verbosity: step 3 and Appendix B both listed the three PRE-G29 per-file verbs (base/seal/catalog) and OMITTED registry, so anyone following this runbook literally never seeded the registry supplement that load-software-registry (two lines below it, in the same runbook) MATCHes — the exact G29 'runs and seeds nothing' class, living in the doc that teaches the procedure. Both blocks now run the one verified `apply-supplements` chain (whose per-term verification makes a green run EVIDENCE the terms landed); load-doc-traceability named in the ingest step (shipped by L7 after Rev 2 was signed, never added); rev pin in test_doc_traceability_loader.py bumped 4->5 (it caught the bump, as designed). Numbering note: the item says 'Rev 4' because it was groomed before Rev 4 (plugins) landed the same day — this is that revision, one number on. + J25 the L7 ratification snippet committed as port-prompt §6a — the gap was DURABILITY: port-prompt claimed the snippet was 'provided in the producer session 2026-07-21' and a repo-wide search for 0252d29 / PORT-REPORT-6fd3270 found only prose, so the company gate pack cited an artifact no company session could open, and T11 had read `pending` since. Split written into the block itself: producer-gate facts (6 classes + 6 doc_* ids, all verified against gate-log / relationship_vocabulary.yaml / taxonomy-ontology-map.yaml; commit 0252d29 confirmed reachable) are PRE-FILLED; check results + sign-off are bracketed placeholders because they describe the COMPANY tree — an entry citing numbers nobody ran is worse than no entry. T11 row now points at §6a. The company still signs its own ratification. Suite 1269. Earlier 2026-07-31 (desktop): N9 source-registry v2 BUILD (15 systems / 28 datasets / 17 retired ids; doc-ledger union; D2 overlay seam; derived URNs; 14 loaders re-bound; ledgers/captures/map/audit re-keyed; cm_avg_run stale-note correction; Q6 amendment in gate-log; suite 1204). Earlier 2026-07-31 (desktop): N7 registry-v2 gate session run in-chat (D1-D4 + Q1-Q6 all ruled w/ 2 SME amendments — seal_id placeholder, origin@db.schema.table grammar; T19 pat:product-catalog naming note to the divergence ledger; migration table = explicit per-row residual at the N9 build; gate-log source-registry-v2 + prompt authored). Also 2026-07-31 (desktop): J23 classification collapse (3 levels; 7 source-registry + 1 doc-registry + 3 taxonomy relabels w/ confidential-handling comments kept; both test assertions updated; CLAUDE.md/PUBLISH-BOUNDARY/config-README tables collapsed; internal READMEs restated; history left as history; suite 1188). Earlier 2026-07-30 (desktop): J22 the J16 guard's untracked blind spot closed same day it was groomed (walk = tracked + --others --exclude-standard, pure fall_through_orphans + mechanics pin, [untracked] tagging + .gitignore resolution in the message; live-proven with a pre-add probe failing and the clean tree passing). Earlier 2026-07-30 (desktop): R5 Ask spoke (/ask for every persona — streamed steps via on_step+SSE, control-part owner-token handshake, citations w/ trust+classification, SpecGrid-on-eph-ref explorer/export, metrics chip; wire-level live e2e + headless render check), R3 agent run telemetry (per-call JSONL ledger w/ price map in DRYDOCS_LOGDIR — full question text ledger-only; :AgentRun kind='qa' via dedicated ddcontext writer that refuses drydocs; console.agent-runs.v1 admin spec; hashed caller-identity slot filled from ADK ctx), R4 ephemeral session-scoped QuerySpecs (eph.<hash> refs, agent-key-gated registration, frozen params, TTL+capacity bounds, one manifest code path, /raw-cypher untouched; pipeline explore_ref hook + urllib client, live wiring rides R5). Earlier 2026-07-30: J19 pull rule documentation (pushed-claim discipline codified in CLAUDE.md §0 + backlog.yaml header + items inputs/acceptance updated), J21 source-registry hardening (duplicate-id refusal + shipped-registry uniqueness pin + loader-field/N3-binding agreement guard + autosys/airflow stale-note refresh; 087a685). Earlier — 2026-07-29: N3+N4+N5 the load-map chain — N5 human surface (docs/plan/load-map.html, placement decided plan-not-design, ritual-wired, print-ready) — N4 render (load-map.json, 18 sources joined, rides the default board render; caught 4 map entries citing unregistered source ids on day one) on top of N3 load-map joins declared (source_id on all 25 loaders + one named exemption; chains lifted to consumed constants; CANONICAL_LOAD_SEQUENCE; 11-test guard). Earlier 2026-07-29 UI sweep O35-O41: O36 root cause = unlayered *{padding:0} reset out-cascading layered Tailwind utilities (preflight keeps the reset; box-sizing only retained); O37 radius tokens (lg collapsed onto md=10px, App.css/index.css radii tokenized); O41 status-vocab map + O38 IdChip/StageBadge convention (UI-WIP/ui-conventions.md) adopted inspector+loads; O39 runtime-view env-template slot (mechanism only, renders nothing unset); O40 StatTiles click-to-filter live on loads (Failed tile 4->1 verified); O35 category-first landing per SME FB-01/FB-02 (hub demoted, name renders once, modules+towers pick-lists, data-wf keys kept). Both themes screenshot-checked; build+lint green container AND device. # 2026-07-29: G48 resolve-cmdline-staging (store v3 + resolution_quality provenance; verbatim-beside-derived; precedence evidence counted never ruled), G47 controlm-xml-export seam (taxonomy-first defs+ordered-variables staging, scope_layers handoff proven against the resolver), G46 resolve_command_line on the shared resolver (one scope-chain walk, substitution provenance with winning scope, %%VAR-launcher round-trip proven). 2026-07-28 late: G42 Snowflake data-catalog seam (source registered + catalog_dir landing zone + SnowflakeCatalogExtractor staging both views, three-shape discrimination, sentinel counted, latest-per-GUID, origin routing, urn fact column; G43 cross-checks unblocked). Earlier 2026-07-28 evening: G45 rua listing fallback (presence dispatch, 561-script company incident's producer parity), C20 K4-comment re-scope (SEAL-loader-specific deprecation; live catalog writers named), R10 agent-runtime alignment (google-adk pinned >=2,<3 + ADR 0007 revisit date-stamp), J20 one-render-entry-point part 2 (matrix rides the default board render). Earlier: C16 key-prefix governance in the metadata plan (drydocs./system/team-local classes), C15 inverse_label on all 78 vocab entries (presentational only, schema-test enforced), L18 depth-0 cell split (the K2 shear healed; conformance guard over the real matrices), D8 bootstrap constraint guard (names-not-counts presence check after apply, live 51/51), J17 gates.json folded into the default-paths board render (drift closed at the ritual level). Earlier 2026-07-28 pm: P5 maintenance-window query (patch-window CLI + union-not-sum window math + findings feeder; claimed-then-closed same day — EPIC P COMPLETE 5/5), U5 groom-skill graph cross-check subsection (executed inside the close-out groom — EPIC U COMPLETE 6/6), U4 tech-debt graph-evidence section (hardened A1-A6 pack + offline fallback, all probes run live), U6 depgraph scanner blind-spot fix (shared-namespace extract_many + drydocs_api root; 205 modules / 370 IMPORTS, all 24 U1 orphan false-positives resolved). Earlier 2026-07-28: G41 glue base-table inventory seam (built + closed same day), L17 doc-loader prereq guards (same), O33 SchemaMeta exemplar audit (22 specs + runs_on write path; live-proven), O34 npm advisories (postcss cleared; react-router escalated via the stop clause), U1/U2/U3 code-graph persona reviews run 1 (scanner blind-spot headline; backlog verified truthful; doc board + citation sweep queued), C19 ontology-comment fix (groomed + closed same day), J16 port-manifest fall-through guard (same), L16 runbook container/port refresh. 2026-07-27 closes: J14 SEALID split, P3 hosts+RUNS_ON, G21 rua code-ops, G24 code-repo seam, G26 launcher-registry config, Q8 bmc-docs prereq, C18 shadow-model guard, J15 value-shape boundary guard, G33 code-snapshot loader (gate signed + built same day), G39 cmdline staging store + G40 parse (groomed am, built pm)
+  next_ready: [M3, M4, Q6, O23, J13, O26, R8, O29, O30, O31, O32, S4, S5, S6, S7, S8, S9, G32, G34, G35, G36, G22, G43, L19, B5, R9, J18, L20, V1, N6, N8, R11, R12, R13, G49, G50, W1, W2, W3, Q13, O42, O43, U10, U11, U12, G51, C22, J26, J27]
+  # 2026-08-02 weekly groom: all 7 new items are dependency-free or ride a
+  # dependency that closed the same day (U9 for the three U-items, C21 for G51,
+  # C17 for C22) -> all 7 next_ready. HITL status: U10 IS a gate — the sign-off is
+  # an SME session and its §I is what opens the build item, so no build item was
+  # groomed ahead of it. U11 DRAFTS a gate prompt and decides nothing (G27/W1
+  # precedent). The rest are HITL-free: G51 is provisioning + a guard, C22 applies
+  # the shape C17 already ruled, J26/J27 are hygiene with written pass/fail tests.
+  # Two merges, no items: the company-side connector shape into Q6's acceptance,
+  # and the two S3-falsified design-doc statements into L19 as clause (d).
   # 2026-08-01: S3 done -> G36 becomes ready (it drops the three never-consulted
   # :BusinessApplication indexes, which had to wait for the key cutover to settle
   # which properties are actually bound on). J24 closed the same day on the desktop;

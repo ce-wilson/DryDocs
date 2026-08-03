@@ -26,64 +26,6 @@ Tags help grooming: `idea` · `bug` · `doc` · `source` (new data source) · `q
 
 <!-- add new ideas at the top -->
 
-- 2026-08-02 — [source→Q6] **The fetcher Q6 is parked on exists company-side, and two of its
-  four connectors are company-agnostic by construction** (tracker T21, answered at
-  PORT-REPORT drydocs-port-20260801). Their `drydocs/docmeta/connectors/` is an ACQUISITION
-  framework — a `Connector` protocol, `fetch(source) -> list[RawPage]`, acquisition only with
-  cleaning/hashing downstream — and the split lands exactly where we need it: `web.py`
-  (public http(s) via stdlib `urllib`, **injectable transport** so it is offline-testable
-  with a fake opener, SSRF scheme allow-list) and `filedrop.py` (local file/directory of
-  md/txt/html via `pathlib`) have ZERO internal dependencies; `base.py` is protocol +
-  `RawPage` + `ConnectorUnavailable`; `confluence.py` and the separate `scrapers/` CLI are
-  internal-realm and stay theirs. Their own `base.py` docstring already designates
-  web+filedrop as the "wired and offline-testable" generic pair — i.e. the boundary we would
-  have had to draw was drawn by the authors first, which is the strongest signal a
-  reproduction is clean. WHY THIS MATTERS BEYOND Q6: **R7 was released unbuilt 2026-08-01
-  for exactly this missing fetcher** and Q12 (doc-capture scale guardrail) waits behind Q6,
-  so one reproduction closes three items. Direction rule applies — back-flow is SANITIZED
-  REPRODUCTION, never a copy, so the deliverable is producer-authored code against the same
-  protocol shape, not their files. Groom into Q6's acceptance rather than a new item; the
-  injectable-transport + SSRF-allow-list pair should be non-negotiable in it, since an
-  un-guarded fetcher is precisely what Q12 exists to prevent.
-  CAUTION FOR WHOEVER GROOMS THIS: the company's answer text names their org and an internal
-  tool by name. Neither is recorded above and neither may reach a committed producer file
-  (CLAUDE.md §3) — describe the realm, never name it.
-
-- 2026-08-01 — [chore→L19] **Two governed design docs carry statements the S3 identity cutover
-  made false; deliberately NOT edited in S3, because both are rev-bump surfaces and one of them
-  is a dated snapshot.** (a) `docs/design/drydocs-web-console-tdd.md` §"Source → column-level
-  field mapping": *"Grid columns surfaced to the browser are the table columns verbatim (e.g.
-  `manual_mapping`: `file, folder_id, job_id, seal_id, …`)"*. S3 broke "verbatim" ON PURPOSE —
-  the job-application and seal-contact-override grids now `SELECT … seal_id AS app_id` /
-  `app_seal_id AS app_id`, because gate §E1 puts `app_id` on the wire while the committed CSV
-  keeps its own header. The doc is `Status: DESCRIPTIVE … as of Rev 1, 2026-07-18, authored at
-  commit 807e050`, i.e. a snapshot pinned to a commit, so it is not strictly *wrong* — but a
-  reader will take it as the live contract. (b) `docs/design/controlm-ingestion-tdd.md` naming
-  traps: `Application.seal_id` is stale on BOTH halves — the label became `:BusinessApplication`
-  at ADR 0003 / K4 (pre-existing drift) and the property became `app_id` at S3. L19's acceptance
-  clause (a) already covers web-console-tdd; add controlm-ingestion-tdd and these two lines.
-  NOT drift, checked and correct as-is: `drydocs-mapping-store-tdd.md:154-155` describes the
-  SQLite `manual_mapping` / `seal_contact_override` COLUMNS, which S3 deliberately did not rename.
-
-- 2026-08-01 — [chore] **`tests/unit/test_schema.py::test_constraint_count` counted the string
-  `CREATE CONSTRAINT` anywhere in the file, including comments** — so documenting a DDL trap in a
-  `//` comment inflated the count and simultaneously false-failed
-  `test_constraints_are_idempotent` (the comment "has no IF NOT EXISTS"). Fixed in S3 by anchoring
-  both at line start, mirroring `drydocs_core/schema/constraints.py::_DECLARATION_RE`, which the
-  bootstrap presence guard already uses. Recorded because the shape generalises: several guards in
-  this repo read committed text with a bare substring match, so a file cannot safely describe its
-  own mechanism in prose. Worth a sweep for the same pattern elsewhere (candidates: the render
-  drift checks and the port-manifest walk).
-
-- 2026-08-01 — [chore] **`.gitignore` names the real org and internal domain in two explanatory
-  comments** (`"Fidelity/FMR"`, `fmr.com`) — seen while rewording the retired-tier labels on those
-  same lines at J24, and deliberately left alone there because half-redacting one line while the
-  next keeps the domain is worse than leaving both. It is a boundary question (CLAUDE.md §3 bans
-  real org names outside `internal/`), not a classification one, so it wants its own decision:
-  either reword both comments to describe the corpus without naming the org, or accept that a
-  private producer repo may carry it and say so once in `PUBLISH-BOUNDARY.md`. Cheap either way;
-  the point is that it is currently neither decided nor recorded.
-
 - 2026-08-01 — [source] **Company catalog-loader review (screenshots, same day as C17) — three
   back-flow candidates and one confirmation.** CONFIRMS C17 §a from the other side: the company's
   `product_lines.cypher` takes `product_line_id` + `parent_lob_id` + `parent_sub_lob_id` and keys
@@ -101,6 +43,14 @@ Tags help grooming: `idea` · `bug` · `doc` · `source` (new data source) · `q
   name — the company's `coalesce(row.name, p.name)` is the right idiom and we should adopt it
   (their `product_lines` has our bug, their `products` does not; the inconsistency is theirs,
   the bug is ours in both). Company-side findings recorded as tracker T20 in `docs/port-prompt.md`.
+  KEPT-UPDATED 2026-08-02 (weekly groom) — **the bug half is groomed, the back-flow half stays
+  parked.** The `SET name = row.name` finding went to **C22** together with the [bug] parent-join
+  line (same three files, one sweep); the groom verified it and found the blanking SET in
+  `products.cypher` too, so C22 covers three loaders rather than the two named here. What remains
+  parked HERE are the three producer-side GAPS — `pat_app_links` with its stub governance,
+  `pat_product_owners`, and the `products` step-2a supplement fields — because those are back-flow
+  and ride the same trigger as the 2026-07-27 company-catalog line below: the COMPANY gate's own
+  sign-off. Do not open a second back-flow item for them.
 
 - 2026-08-01 — [question] **We model no Sub-LoB, and the SME fact that closed C17 says it is a
   real grain with its own numeric id. CONFIRMED BUILT company-side the same day** — their
@@ -122,17 +72,6 @@ Tags help grooming: `idea` · `bug` · `doc` · `source` (new data source) · `q
   line will carry whatever the extract puts there, so a sub-LoB id would land in a
   `:CatalogLOB`-keyed field and MERGE a phantom LOB. Fold into that back-flow item when its
   trigger fires; do not open a second one.
-
-- 2026-08-01 — [bug] **Sweep the remaining silent parent joins in the catalog loaders.** C17
-  fixed `products.cypher`, where a hard `MATCH` on the parent placed AFTER the node `MERGE`
-  left an unparented Product carrying `orphan: false` from `ON CREATE` — a flag no code path
-  could set true. The identical shape survives in `product_lines.cypher` (→ `:CatalogLOB`) and
-  `area_products.cypher` (→ `:Product`). Deliberately not swept at C17: changing four loaders'
-  write behaviour on one item's authority is a drive-by. The sweep is mechanical (OPTIONAL
-  MATCH + per-run flag + the unresolved id kept), but it should also answer the question C17
-  did not: whether the unresolved-parent count belongs in the O28 status envelope as a
-  `drydocs.loader/unresolved-parent` warning rather than only as a node property — which would
-  make it visible on the loads surface instead of only to someone who thinks to query for it.
 
 - 2026-07-31 — [source] **fcdo-frameworks live Confluence scrape (company-side).**
   Registered on-demand in `config/doc-source-registry.yaml` (connector: confluence, T4,
@@ -167,6 +106,14 @@ Tags help grooming: `idea` · `bug` · `doc` · `source` (new data source) · `q
   0002-C consciously chose absorb-the-assets-not-the-tool. So this is a real trade, not a
   cleanup — size it before committing. Precondition now satisfied either way: the fork is
   consolidated (depgraph `5006567`, one branch), so there is a single revision to vendor from.
+  KEPT-UPDATED 2026-08-02 (weekly groom) — still the user's call, but the argument moved: **U9
+  added a THIRD producer-side post-processing step wrapped around the sibling tool** (git-ignore
+  filtering, after U7's capability probe and U8's abs_path strip). None of the three could live
+  in depgraph, because each encodes something about THIS repo rather than about scanning — which
+  is a point for the fork ("the general instrument stays general") and against it at the same
+  time ("the wrapper is now bigger than the seam it wraps"). Worth deciding before a fourth step
+  appears. What has NOT changed: no scan capability was missing this time — `main` already
+  reported `tree: true`, so the sibling checkout was not the constraint.
 - 2026-07-28 — [question] **`config/dev-environment.yaml` under a `canonical-producer` row —
   decide the disposition producer-side too, not just company-side.** Step 48 raises this for the
   consumer, but the asymmetry is ours: `config/**` is `canonical-producer`, and U7 has just made
@@ -289,18 +236,6 @@ Tags help grooming: `idea` · `bug` · `doc` · `source` (new data source) · `q
   synthetic-sample product NAMES that echo real ones ("Home Lending Servicing" in
   lob-product-team.yaml, paired only with synthetic ids).
 
-- 2026-07-25 — [question] **How much depgraph audit history do we keep?** (review finding
-  F11, `docs/reviews/architecture-structure-review-2026-07-25.md`). `knowledge/depgraph-snapshots/`
-  holds 66 JSON files / 4.2 MB, several per day, unbounded — some 2026-07-20/21 timestamps are
-  minutes apart. The review proposed "run `drydocs prune-snapshots`" and that was **wrong**:
-  that command prunes snapshot nodes INSIDE Neo4j via `SnapshotWriter` and needs a live
-  connection; it never touches these files. So there is no existing mechanism, and the real
-  question is a retention POLICY: the files are a deliberate per-push structural-drift record
-  with a documented A/B compare workflow (`knowledge/depgraph-snapshots/README.md`), so thinning
-  them trades audit history for repo size. Candidate rules if we want one: keep one per day
-  beyond N days; keep every snapshot whose `meta.commit` is a tagged release; keep all, and
-  stop worrying (4.2 MB is not a problem yet). **User call — not groomed until it is made**;
-  the ritual keeps writing one per session meanwhile.
 - 2026-07-25 — [idea] **Supplement shape C — registration-vs-instance-seed re-slice** (the
   parked sibling of shape A, now groomed as **G29**). Re-sliced so that registering an
   ontology term and seeding an instance of it are separate operations rather than two halves
@@ -902,6 +837,55 @@ Tags help grooming: `idea` · `bug` · `doc` · `source` (new data source) · `q
   an app). Cosmetic; hide or restructure later.
 
 ## Recently groomed (audit trail)
+
+- 2026-08-02 (weekly groom) — [source→Q6] the company-side fetcher shape → **MERGED into Q6's
+  acceptance**, not a new item: acquisition-only connectors over a `Connector` protocol, `web`
+  with an INJECTABLE TRANSPORT and an SSRF scheme allow-list, `filedrop` over pathlib. Both
+  guarantees written in as non-negotiable — the transport injection is what makes Q6's Track-1
+  offline tests real, and the allow-list is the guardrail Q12 exists to enforce. Unblocks Q6, R7
+  (released unbuilt 2026-08-01 for exactly this missing fetcher) and Q12 behind it. The line's
+  own caution was honoured: the realm is described, never named.
+- 2026-08-02 (weekly groom) — [chore→L19] two governed design docs falsified by the S3 identity
+  cutover → **MERGED into L19 as acceptance clause (d)** (web-console-tdd's "columns verbatim",
+  controlm-ingestion-tdd's `Application.seal_id` stale on both halves), with the
+  deliberately-untouched mapping-store COLUMNS named so a later sweep does not "fix" them.
+- 2026-08-02 (weekly groom) — [chore] guards that read committed text with a bare substring match
+  → **J26**. The instance (test_constraint_count counting `CREATE CONSTRAINT` inside a comment)
+  was already fixed in S3; the item owns the CLASS, and the groom found a live second member —
+  see G51.
+- 2026-08-02 (weekly groom) — [chore] `.gitignore` names the real org and internal domain in two
+  comments → **J27**. Promoted rather than parked as a decision: CLAUDE.md §3 already bans real
+  org names outside `internal/`, so the default branch is REWORD and the item applies an existing
+  rule; the "record the exception in PUBLISH-BOUNDARY.md" branch stays available because the
+  boundary is the user's to set.
+- 2026-08-02 (weekly groom) — [bug] silent parent joins in the catalog loaders + the [source]
+  line's unconditional `SET name = row.name` → **C22**, two lines into one sweep because they
+  land on the same files (the L19 precedent). Verified at the groom: the blanking SET is in
+  `products.cypher` as well, so C22 covers three loaders, not the two the inbox named. The
+  [source] line's three back-flow candidates stay parked on the company gate's sign-off.
+- 2026-08-02 (weekly groom) — [question] "How much depgraph audit history do we keep?" (review
+  finding F11, open since 2026-07-25) → **RESOLVED by the SME and already executed; no item.**
+  Direction 2026-08-02: "the old dep snapshots can be removed this was the intent", retention =
+  newest all-files snapshot only. Applied at `e3f65af`: 105 files removed (101 dated, 2
+  `drydocs1-*`, 2 tree one-offs), one kept, all recoverable from history. Nothing in code
+  referenced a snapshot by name (checked before deleting). Two halves of the question stay open
+  as **U12**: the README still documents a prune-to-ten rule and cites two of the deleted files,
+  and `snapshot.ps1` still writes `<project>-<date>-<HHmm>.json` when a snapshot already exists
+  for today — so the ruling holds only until the next double-run. A rule enforced by whoever
+  remembers it is the shape U9 just deleted.
+- 2026-08-02 (weekly groom) — **raised AT the groom, not from the inbox** (the skill's optional
+  graph/code cross-check, run as a code cross-check): three follow-ons from the self-doc session
+  plus one defect it left behind. **U9** + **C21** groomed RETROSPECTIVELY as done — that work
+  landed at `e3f65af` before any item existed, and three committed files already cite "U9" as an
+  id nothing defined. **U10** = the code-graph package-layer GATE SESSION (drafted 2026-08-02,
+  unsigned; its own §I is what opens the build item, so none was groomed ahead of it). **U11** =
+  draft the second gate prompt, the `.py → .cypher → :Label` chain the parent gate deferred at
+  §H5 — possible only now, because .cypher files became graph nodes for the first time at U9.
+  **G51** = the defect: `drydocs bootstrap-schema-graph` targets a database that
+  `01_databases.cypher` does not create, so it works only on the machine where it was made by
+  hand — and `test_database_names.py`, the guard written for exactly this drift, missed it
+  because it keys on the identifier `DATABASE` and the constant is called
+  `SCHEMA_GRAPH_DATABASE`. Same family as J26.
 
 - 2026-07-31 (pm, weekly groom — run AFTER the N7 gate + N9 build closed the registry-v2
   work) — [chore] T11 L7-ratification paste-ready snippet still owed producer-side →
