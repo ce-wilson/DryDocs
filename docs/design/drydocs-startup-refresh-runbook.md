@@ -1,8 +1,10 @@
 # Runbook — DryDocs local startup & refresh (EE container + sample ingest)
 
 <!-- anchor: front-matter -->
-- **Status:** DESCRIPTIVE — documents the working procedure. **Rev 5, 2026-07-31**
-  (the per-file supplement verbs collapse to the one `apply-supplements` chain, which
+- **Status:** DESCRIPTIVE — documents the working procedure. **Rev 6, 2026-08-03**
+  (the schema meta-graph joins the chain: `bootstrap-schema-graph` after `bootstrap`,
+  targeting `ddschema`, which provisioning now creates — G51; on top of Rev 5, where
+  the per-file supplement verbs collapse to the one `apply-supplements` chain, which
   also closes Appendix B's long-missing registry supplement; `load-doc-traceability`
   named in the ingest step; on top of Rev 4's plugin correction — plugins are a mounted
   volume, not `NEO4J_PLUGINS`, APOC was silently absent, GDS
@@ -20,6 +22,15 @@
   `internal/helpmeloginlocalneo4j.md` (login/port troubleshooting evidence),
   `.claude/skills/run-drydocs/SKILL.md` (agent-facing run notes)
 
+> **What changed in Rev 6 (2026-08-03) — the meta-graph verb was in shipped code and in
+> no procedure.** `drydocs bootstrap-schema-graph` (C21) writes the schema meta-graph to
+> its own database, `ddschema` — which, until G51, `01_databases.cypher` did not create:
+> the verb worked only on a machine where someone had made the database by hand, and
+> failed loudly everywhere else. Provisioning now creates `ddschema`, and step 3 +
+> Appendix B run the verb right after `bootstrap`. It is chain-independent of the
+> supplement/ingest sequence (a different database), but it lives in the cold-start
+> block because a wiped DBMS is exactly when it is forgotten.
+>
 > **What changed in Rev 5 (2026-07-31) — one supplement command, and Appendix B was
 > quietly one supplement short.** The cold-start step listed three per-file verbs
 > (`apply-ontology-supplement` / `-seal-` / `-catalog-`) and Appendix B copied the same
@@ -129,6 +140,7 @@ check; go to Troubleshooting.
 3. **Schema backbone, then the supplement chain:**
    ```powershell
    poetry run drydocs bootstrap                   # constraints.cypher + ontology.cypher
+   poetry run drydocs bootstrap-schema-graph      # meta-graph -> ddschema (G51 provisions it)
    poetry run drydocs apply-supplements           # base -> seal -> catalog -> registry
    ```
    One command, not four. The order is load-bearing — `catalog` reuses the
@@ -291,6 +303,7 @@ in the sections above):
 docker start neo4jtest
 poetry run drydocs check
 poetry run drydocs bootstrap
+poetry run drydocs bootstrap-schema-graph
 poetry run drydocs apply-supplements
 poetry run drydocs refresh-reference
 poetry run drydocs ingest-controlm

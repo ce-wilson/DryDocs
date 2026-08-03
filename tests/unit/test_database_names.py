@@ -14,6 +14,15 @@ so the suite PROTECTED the wrong name instead of catching it. A test that pins a
 constant to itself proves nothing; this one pins it to the provisioning DDL, which is
 the only thing that decides whether a database exists.
 
+The second drift this closes (backlog G51, found 2026-08-02): the guard below keyed
+on the EXACT identifier ``DATABASE``, so ``SCHEMA_GRAPH_DATABASE = "ddschema"``
+walked straight past it while ``01_databases.cypher`` created no such database —
+a shipped verb (``bootstrap-schema-graph``) targeting a name provisioning never
+makes. A guard whose docstring promises more than its pattern matches is the J26
+family; the match is now "any module-level constant whose name contains
+``DATABASE``", so the next differently-named constant is caught whatever it is
+called.
+
 Pure stdlib + a regex over the DDL — no Neo4j, no driver, no live connection.
 """
 
@@ -74,9 +83,20 @@ def _python_files() -> list[Path]:
     return files
 
 
+def _names_a_database(identifier: str) -> bool:
+    """A constant participates in the guard if its NAME says it holds a database.
+
+    Widened from ``identifier == "DATABASE"`` at G51: the exact-match version let
+    ``SCHEMA_GRAPH_DATABASE`` ship an unprovisioned name through a green suite.
+    Identifier-based on purpose — value-based guessing is what flagged the CSS
+    colour ``#ddd`` in this file's first draft (see SUPERSEDED_NAMES note).
+    """
+    return "DATABASE" in identifier
+
+
 def test_provisioning_creates_the_expected_topology() -> None:
-    """Anchor the other tests: this is the ADR 0002 + ADR 0006 §1 topology."""
-    assert _provisioned() == {"drydocs", "ddlineage", "ddcontext", "ddall"}
+    """Anchor the other tests: ADR 0002 (+ 0006 §1 renames, + the G51 amendment)."""
+    assert _provisioned() == {"drydocs", "ddlineage", "ddcontext", "ddall", "ddschema"}
 
 
 def test_module_level_database_constants_are_provisioned() -> None:
@@ -89,13 +109,14 @@ def test_module_level_database_constants_are_provisioned() -> None:
             if not isinstance(node, ast.Assign):
                 continue
             targets = [t.id for t in node.targets if isinstance(t, ast.Name)]
-            if "DATABASE" not in targets:
+            named = [t for t in targets if _names_a_database(t)]
+            if not named:
                 continue
             if isinstance(node.value, ast.Constant) and isinstance(node.value.value, str):
                 if node.value.value not in provisioned:
                     rel = path.relative_to(REPO_ROOT)
                     offenders.append(
-                        f"{rel}: DATABASE = {node.value.value!r}, "
+                        f"{rel}: {named[0]} = {node.value.value!r}, "
                         f"not created by provisioning ({sorted(provisioned)})"
                     )
     assert not offenders, "database constant names an unprovisioned database:\n" + "\n".join(
@@ -175,7 +196,7 @@ def _write_targets() -> set[str]:
         for node in tree.body:
             if not isinstance(node, ast.Assign):
                 continue
-            if not any(isinstance(t, ast.Name) and t.id == "DATABASE" for t in node.targets):
+            if not any(isinstance(t, ast.Name) and _names_a_database(t.id) for t in node.targets):
                 continue
             if isinstance(node.value, ast.Constant) and isinstance(node.value.value, str):
                 targets.add(node.value.value)

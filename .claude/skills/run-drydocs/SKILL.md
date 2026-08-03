@@ -64,6 +64,7 @@ Then:
 ```powershell
 poetry run drydocs check                       # verify Neo4j + APOC
 poetry run drydocs bootstrap                   # apply constraints + ontology seed
+poetry run drydocs bootstrap-schema-graph      # schema meta-graph -> ddschema (own database, G51)
 poetry run drydocs apply-supplements           # base -> seal -> catalog -> registry, verified
 poetry run drydocs ingest-controlm             # full M3 chain: folders -> jobs -> conditions -> deps
 poetry run drydocs m1-verify                   # assert M1 invariants

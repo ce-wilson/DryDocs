@@ -1203,3 +1203,20 @@ all (no `:SubLOB`, not even `status: planned`). Introducing it is an ontology
 decision, and it already belongs to the parked company-catalog back-flow item
 (`IDEAS.md`, 2026-07-27) whose trigger is the COMPANY gate's own sign-off.
 Recorded, not built.
+
+## 2026-08-03 — RECORD: schema meta-graph database `ddschema` provisioned (G51; SME direction "2 different graphs", 2026-08-02)
+
+- **What this records:** the in-chat SME direction of 2026-08-02 that created a second
+  graph — the schema meta-graph goes to its OWN database (`ddschema`), not `drydocs` —
+  and its enactment at G51. Direction, not a gate session: no ontology edge, no vocab
+  status change, zero writes to `drydocs`.
+- **Why a second database:** exemplar nodes carry the REAL label beside `:SchemaMeta`
+  (that is what `db.schema.visualization()` reads), and `drydocs`' NODE KEYs enforce
+  property EXISTENCE the exemplars do not have — proven live on a throwaway label
+  (`ZZProbe`) at the C21 build rather than inferred.
+- **Enacted at G51:** `01_databases.cypher` creates `ddschema` (NOT aliased into
+  `ddall` — schema description, not estate data); ADR 0002 amended (dated section);
+  `test_database_names.py` widened from exact-identifier `DATABASE` to any
+  `*DATABASE*` constant — the guard that let `SCHEMA_GRAPH_DATABASE` name an
+  unprovisioned database through a green suite. `EXPECTED_CONSTRAINTS` unchanged:
+  `schemameta_name` lives in `schema_graph.cypher` by design.

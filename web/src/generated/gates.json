@@ -445,6 +445,15 @@
       ]
     },
     {
+      "kind": "log-entry",
+      "date": "2026-08-03",
+      "title": "RECORD: schema meta-graph database `ddschema` provisioned (G51; SME direction \"2 different graphs\", 2026-08-02)",
+      "status": "recorded",
+      "prompt_files": [],
+      "log_ref": "config/gate-log.md:1207",
+      "unblocks": []
+    },
+    {
       "kind": "prompt-only",
       "date": null,
       "title": "bmc-docs-example (gate page rendered — session not yet run)",

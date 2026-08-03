@@ -28,6 +28,15 @@ CREATE DATABASE ddlineage IF NOT EXISTS;
 // here can NEVER be written into `drydocs` by accident (the trust axis = the DB boundary).
 CREATE DATABASE ddcontext IF NOT EXISTS;
 
+// Schema meta-graph (drydocs bootstrap-schema-graph) — G51, SME direction "2 different
+// graphs" 2026-08-02. Exemplar nodes carry REAL labels beside :SchemaMeta, and drydocs'
+// NODE KEYs enforce property EXISTENCE the exemplars don't have — so the meta-graph
+// needs a database with no opinion about job rows. Its one constraint (schemameta_name)
+// lives in schema_graph.cypher, NOT constraints.cypher. Deliberately NOT aliased into
+// ddall: it describes the schema, not the estate — a support query federating exemplar
+// nodes with real jobs would present labels as data.
+CREATE DATABASE ddschema IF NOT EXISTS;
+
 // Composite — stores no data of its own; aliases all three constituents. The platform
 // enforces read-from-many / write-to-one, so support queries read all while writes
 // still land in exactly one constituent (no cross-DB writes).

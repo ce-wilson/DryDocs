@@ -215,6 +215,22 @@ proves out there, and lineage grows a proxy-node spine of its own, reopen this. 
 is the cheap direction: `ddlineage` is empty, so choosing it later costs a design, not a
 data migration.
 
+## Topology amendment (2026-08-03, backlog G51) — `ddschema`, the schema meta-graph database
+
+**D1 gains a fifth database.** The SME direction of 2026-08-02 ("2 different graphs")
+put the schema meta-graph — exemplar nodes carrying REAL labels beside `:SchemaMeta`,
+read by `db.schema.visualization()` — into its own database, `ddschema`, written only
+by `drydocs bootstrap-schema-graph`. It cannot live in `drydocs`: the exemplars carry
+only `name`, and `drydocs`' NODE KEYs enforce property EXISTENCE, so bootstrap there
+fails by construction (proven live on a throwaway label before the verb was re-homed).
+`ddschema` is deliberately **not** aliased into `ddall` — it describes the schema, not
+the estate, and a support query federating exemplars with real jobs would present
+labels as data. Its single constraint (`schemameta_name`) lives in
+`schema_graph.cypher`, not `constraints.cypher`, so `EXPECTED_CONSTRAINTS` does not
+count it. Provisioned in `01_databases.cypher` at G51 — which also widened
+`test_database_names.py`'s guard after `SCHEMA_GRAPH_DATABASE` walked past its
+exact-identifier match while naming a database nothing created.
+
 ## Follow-up (small, bounded)
 
 1. **Provision now:** `drydocs_context` (writable) and the `drydocs_all` composite with constraints/

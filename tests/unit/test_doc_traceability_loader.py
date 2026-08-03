@@ -51,8 +51,8 @@ def test_runbook_header_carries_rev_and_commit() -> None:
     assert header["doc_id"] == "drydocs-startup-refresh-runbook"
     assert header["doc_type"] == "Runbook"
     assert (
-        header["rev"] == 5
-    )  # Rev 5, 2026-07-31 (L21: apply-supplements chain + load-doc-traceability)
+        header["rev"] == 6
+    )  # Rev 6, 2026-08-03 (G51: bootstrap-schema-graph in the chain; ddschema provisioned)
     assert header["doc_status"] == "DESCRIPTIVE"
     assert header["commit"], "front-matter commit citation should parse"
     assert header["path"] == "docs/design/drydocs-startup-refresh-runbook.md"
