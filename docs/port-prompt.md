@@ -19,7 +19,7 @@ finishes reading is not a control document. So:
 - if a section can only be understood by reading it twice, cut it rather than expand it.
 
 **Roll state.** Steps 50 + 51 COLLAPSED at the 2026-08-01 roll (both applied in
-PORT-REPORT-57914bf4). The live ledger is **step 52 only**. Steps keep the
+PORT-REPORT-57914bf4). The live ledger is **steps 52–54**. Steps keep the
 verification tags introduced at step 49 — `[SME-SIGNED]`, `[LIVE-VERIFIED]`,
 `[TEST-PINNED]`, `[STAGING-ONLY]`, `[RECORD-CORRECTION]`, `[UNRULED]` — so review
 effort goes to what is genuinely open. Anything untagged is NOT confirmed: treat
@@ -429,8 +429,8 @@ carries its producer-side verification status in [BRACKETS]; spend review on [UN
        `manual_mappings.py` still parses `target_key=seal_id=` by name and
        `OVERRIDE_HEADER` is still the committed CSV header — aliased at the boundary
        on purpose. `EXPECTED_CONSTRAINTS` 51 → 52 producer-side; compute yours.
-    b. **S2 — `drydocs_core/orchestration/` parent** [TEST-PINNED] (ADR 0008, accepted
-       at S1). `git mv controlm → orchestration/controlm`; `commands.py` →
+    b. **S2 — `drydocs_core/orchestration/` parent** [TEST-PINNED] (`4247ccb`;
+       ADR 0008, accepted at S1). `git mv controlm → orchestration/controlm`; `commands.py` →
        `orchestration/shell.py`; `paths.py` splits into the neutral shape + a
        Control-M `PathDialect`; NEW `orchestration/crosswalk.py` gives
        `config/crosswalks/` its first runtime consumer and RAISES on
@@ -443,14 +443,50 @@ carries its producer-side verification status in [BRACKETS]; spend review on [UN
        reading before you split anything: the Control-M "field routing" the ADR
        scheduled out of `commands.py` was not in that file.
 
+54. **SELF-DOC LEVEL 2 + J24 RESIDUAL SWEEP** (2026-08-01/02; `4247ccb..0c4105b`,
+    5 commits).
+    a. J24 RETIRED-TIER RESIDUAL SWEEP [LIVE-VERIFIED] (`12ce1fe`). J23's retired
+       Internal-Confidential tier was still LIVE in shipped code — two registered
+       specs exported `INTERNAL-CONFIDENTIAL__` files. `drydocs_api`
+       CLASSIFICATIONS, export prefix/banner, EPHEMERAL_CLASSIFICATION re-pointed
+       (fail-closed ceiling — re-point, never delete), two web mirrors
+       (SpecGrid.tsx, AskRoute.tsx); `test_classification.py` grows the guards.
+       Ports normally — then sweep YOUR company-local occurrences by the same
+       scope rule (all of config/ except gate-log.md).
+    b. CODE-GRAPH PACKAGE-LAYER GATE — DRAFTED, NOT SIGNED [UNRULED] (`643ac50`).
+       Re-opens exactly three confirmations of self-documentation-code-graph
+       (§B1/§B2/§C4); vocab terms stay `planned` until §I signs; no build, no
+       graph writes. Port the prompt; do NOT anticipate the ruling.
+    c. META-GRAPH INTO ITS OWN GRAPH + ALL-FILES SCANNER [LIVE-VERIFIED]
+       (`e3f65af`; CLI help/skip-count fix `0c4105b`). New verb
+       `drydocs bootstrap-schema-graph` targets a NEW `ddschema` database; its one
+       constraint (`schemameta_name`) is deliberately NOT in constraints.cypher,
+       so `EXPECTED_CONSTRAINTS` does not move. G51: provisioning does not create
+       `ddschema` (fails loudly) — add your own DDL line. ***Scanner default is
+       now whole-repo tree mode (`-CodeOnly` restores the old root list) — your
+       depgraph fork lacks tree mode (T18): keep your current ritual until it clears.***
+    d. SNAPSHOT SERIES RETIRED [SME-SIGNED in-chat 2026-08-02] (`e3f65af`,
+       `6898666`): newest all-files snapshot ONLY; 105 producer files deleted.
+       The `*.json` paths are guardrail-4 excluded — classify the deletions as
+       never-port noise; applying the retention ruling to YOUR snapshots is a
+       company decision, not a port apply. Caution: `snapshot.ps1` still APPENDS
+       on a same-day re-run (U12 owns the script fix).
+    e. Backlog groom [ports by ID] (`3c9ff3b`): U9–U12, C21, C22, G51, J26, J27
+       promoted; the company connector shape folded into Q6's acceptance (the T21
+       back-flow). Reconcile per-entry by id, never whole-file.
+    Producer reference at `0c4105b`: full suite 1355 / 5 skipped, Track-1 126 / 0,
+    live `load-code-snapshot` 1457 rows / 0 rejected. `EXPECTED_CONSTRAINTS`
+    unchanged at 52.
+
 ACCEPTANCE GATE (behavior is the contract, not a byte-compare):
 - Track 1 (portable):
     poetry run pytest tests/unit/test_variable_classifier.py tests/unit/test_variable_resolver.py \
                       tests/unit/test_variable_staging.py tests/unit/test_command_parser.py \
                       tests/unit/test_module_boundary.py -q
-  Producer reference at `6e993d2` (step 52): 124 passed / 0 skipped WITH the
-  production CSV present (unchanged since step 49; sample-backed tests skip without
-  it — at step 48 the CSV-absent figure was 114 / 3). Company baseline is ABOVE the
+  Producer reference at `0c4105b` (step 54): 126 passed / 0 skipped WITH the
+  production CSV present (+2 over step 52 from the S2 module-boundary additions;
+  sample-backed tests skip without the CSV — at step 48 the CSV-absent figure was
+  114 / 3). Company baseline is ABOVE the
   producer floor — compare against your own PORT-REPORT-e60822fc numbers, not these.
 - Full `pytest tests/unit/` — ZERO failures is the contract; skips are
   environment/fixture-absence by design (production CSVs, XML fixtures, fastapi
@@ -458,7 +494,7 @@ ACCEPTANCE GATE (behavior is the contract, not a byte-compare):
   capability_assert=false skips per T18). A retired-id refusal from
   `SourceRegistry.from_yaml` is the D4 guard WORKING, not a port failure — rebind the
   loader in `loader-source-overlay.yaml`, never by re-adding the retired id.
-  Producer reference at the current head (step 52, `6e993d2`): 1272 passed /
+  Producer reference at the current head (step 54, `0c4105b`): 1355 passed /
   5 skipped, production CSV present. Earlier producer heads are in git history and the
   archive — do not re-derive them here.
   Company reference (PORT-REPORT-57914bf4): full `1569 / 24 / 0`, Track-1 `120 / 3 / 0`.
