@@ -883,6 +883,11 @@ Tags help grooming: `idea` · `bug` · `doc` · `source` (new data source) · `q
 
 ## Recently groomed (audit trail)
 
+- 2026-08-03 — [feedback] U.S. business-English instruction set (user, in-chat, after "spine"
+  in the exec overview failed with its own audience) → guide committed as
+  `docs/style/us-business-english.md` + **L22** (wire it in, rewrite the overview, inventory
+  idioms, mechanism-name fence).
+
 - 2026-08-03 — [question] "what's upstream of :Metric?" (user, in-chat, minutes after the
   manual graph wipe — the DQV seed's IN_DIMENSION query was the one thing worth asking about
   what was just deleted) → **C23**: the quality seed floats — no measurement writer, no
