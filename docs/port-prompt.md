@@ -422,6 +422,31 @@ verification status in [BRACKETS]; spend review on [UNRULED].
     test asserts the producer's five-name SET — verify it against YOUR
     `01_databases.cypher` on apply rather than assuming the sets match.
 
+57. L22 — U.S. BUSINESS-ENGLISH STYLE GUIDE + ADOPTION [SME-SIGNED]
+    (guide `6aeaadd`, adoption `e4d05dd`; grooms/claims `480fa04`/`bf2e4bd`).
+    NEW `docs/style/` (guide + idiom inventory) with a NEW PORT-MANIFEST row:
+    `docs/style/**` = canonical-producer (the J16 guard forced the row, as
+    designed). CLAUDE.md §6 gained the prose-style working agreement; the
+    documentation skill opens with it; exec overview → rev 7 (21 idioms
+    rewritten; HTML stays its single source — decision in the rev line);
+    whitepaper: 2 edits applied identically to `.md` + both renders. FENCE:
+    mechanism names are never renamed by a style pass, and "crosswalk(s)" is
+    an SME-approved exception (company-internal vocabulary) — the guide
+    records both. Company adaptation: none expected; your prose sessions
+    inherit the guide via CLAUDE.md.
+
+58. C23 — DQV SEED RULED **DEFER** [SME-SIGNED] (`11f9ab9`, claim `9c8e3d9`;
+    gate-log `dqv-seed-disposition`). The bootstrap :Metric/:Dimension catalog
+    STAYS; revival trigger (first measurement feed = temporal-runtime
+    freshness observations) recorded in `ontology.cypher` above the seed.
+    Vocabulary +4 `c23_*` entries (per-entry union: `c23_in_dimension` ACTIVE
+    — registered retroactively for a bootstrap-written edge — the other three
+    PLANNED; new `quality` domain). `schema_graph.cypher` + `gates.json`
+    regenerated (both drift guards fired first). GUARDRAIL 6: this is a
+    producer gate ruling — union-append the gate-log entry and take the vocab
+    entries, but your OWN measurement-feed timeline decides when planned
+    flips; nothing here writes your graph. `EXPECTED_CONSTRAINTS` unchanged.
+
 ACCEPTANCE GATE (behavior is the contract, not a byte-compare):
 - Track 1 (portable):
     poetry run pytest tests/unit/test_variable_classifier.py tests/unit/test_variable_resolver.py \
@@ -438,8 +463,9 @@ ACCEPTANCE GATE (behavior is the contract, not a byte-compare):
   capability_assert=false skips per T18). A retired-id refusal from
   `SourceRegistry.from_yaml` is the D4 guard WORKING, not a port failure — rebind the
   loader in `loader-source-overlay.yaml`, never by re-adding the retired id.
-  Producer reference at the current head (step 54, `0c4105b`): 1355 passed /
-  5 skipped, production CSV present. Earlier producer heads are in git history and the
+  Producer reference at the current head (step 58, `11f9ab9`): 1356 passed /
+  5 skipped, production CSV present (+1 over step 54 = the duplicate-key
+  guard). Earlier producer heads are in git history and the
   archive — do not re-derive them here.
   Company reference (PORT-REPORT-40c35724): full `1652 / 28 / 0`, Track-1
   `123 / 3 / 0`, `EXPECTED_CONSTRAINTS` 55 company-based.
