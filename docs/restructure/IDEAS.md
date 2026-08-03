@@ -26,6 +26,32 @@ Tags help grooming: `idea` · `bug` · `doc` · `source` (new data source) · `q
 
 <!-- add new ideas at the top -->
 
+- 2026-08-02 — [bug] **Every seed query in `docs/reviews/code-graph-review-plan.md` is missing
+  `removed_from_source_at IS NULL`, and the D7 tombstones are now big enough to change an
+  answer.** Demonstrated live loading the whole-tree snapshot: S2's move of `drydocs_core/controlm/`
+  → `orchestration/controlm/` left 8 correctly-marked tombstones, and the unfiltered A3 fan-in
+  query ranked the DEAD `drydocs_core/controlm/__init__.py` at #6 with fan-in 13, one slot below
+  its live replacement at 14. Graph holds 1465 :CodeModule, 1457 live. The sweep is working; the
+  plan's queries just never filter on it. Fix the plan's query pack, not the sweep.
+
+- 2026-08-02 — [bug] **The whole-tree scan pulled 63 vendored `.py` files from `.claude/skills/`
+  into the architect persona's metrics.** Orphan count reads 77 against a 24 baseline, but 54 are
+  Anthropic-shipped `docx`/`pdf` skill scripts; excluding `.claude` it is 23. Untested reads 130
+  raw, 30 scoped to the six real packages. Either the persona queries need a region allow-list or
+  the scan needs an exclude — the baselines in the review plan are not comparable until one exists.
+
+- 2026-08-02 — [question] **`DesignDoc.commit` is an author's claim, not a git fact — decide
+  whether the writer persona's staleness ranking should use it.** `drydocs-startup-refresh-runbook`
+  carries `a135a6d` (2026-07-20, from the doc's own "reflected commit" prose) while the file's
+  last touch is `554a4e8` (2026-07-31, Rev 5). Both readings are defensible — "what the author says
+  it reflects" vs "when it was edited" — but the plan doesn't say which, so the ranking is undefined.
+
+- 2026-08-02 — [idea] **The 45 `.cypher` files are now nodes with zero edges — nothing joins a
+  loader to the Cypher it executes**, even though the path is a literal in the `.py`
+  (`CYPHER_DIR / "code_snapshot.cypher"`). `drydocs/loaders/` holds 32 `.cypher` + 24 `.py` +
+  15 `.sql` side by side, unconnected. depgraph does not emit the edge and the loader could not
+  load it if it did (new edge type → gate). This is gate §H5's named future item, now with the
+  nodes already in place — the remaining work is the edge, not the corpus.
 - 2026-08-01 — [source] **Company catalog-loader review (screenshots, same day as C17) — three
   back-flow candidates and one confirmation.** CONFIRMS C17 §a from the other side: the company's
   `product_lines.cypher` takes `product_line_id` + `parent_lob_id` + `parent_sub_lob_id` and keys

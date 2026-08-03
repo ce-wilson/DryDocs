@@ -1087,17 +1087,26 @@ def load_code_snapshot(
         None,
         "--file",
         help="Load this exact snapshot file instead of the newest drydocs-*.json "
-        "(still refused unless it is a dependency-mode snapshot).",
+        "(still refused unless it carries a `meta` header).",
     ),
 ) -> None:
-    """Load DryDocs' own code-dependency snapshot (G33 / Epic U self-documentation).
+    """Load DryDocs' own code snapshot (G33 / Epic U self-documentation).
 
     MERGEs the newest knowledge/depgraph-snapshots/drydocs-*.json into one
     (:Project {project_id:'drydocs'}) root + :CodeModule nodes (keyed file_id)
     + HAS_MODULE / IMPORTS / IS_ENCODED_IN edges. Idempotent; re-runnable from
-    committed files (ADR 0002 D3). Tree-mode files are REFUSED loudly — the
-    discriminator is a positive assertion (meta present AND meta.tree == false;
-    gate §G1(a) + the 2026-07-27 build note). abs_path never loads (§H4).
+    committed files (ADR 0002 D3). abs_path never loads (§H4).
+
+    WHOLE-TREE snapshots are the normal shape (meta.tree == true) since the
+    scanner stopped taking a hand-maintained root list; §G1(a)'s "refuse
+    tree-mode" ruling was REVERSED by SME direction and refusing it would now
+    refuse every snapshot there is. What still gets refused, loudly: a file with
+    NO `meta` header at all (the headerless one-off shape §G1 was really
+    protecting against — the assertion stays POSITIVE because those files carry
+    no `meta`, so a truthiness test on meta.tree would ACCEPT them), and a
+    `meta.tree` that is not a boolean. Directories in a tree snapshot are
+    counted and reported, never loaded — :Directory and CONTAINS would be a new
+    node class and a new edge type, both gate decisions (CLAUDE.md §6).
     """
     _gate_loader(CodeSnapshotLoader)  # confirmed-gate (overlay-aware) before any DB write
     try:
@@ -1114,6 +1123,16 @@ def load_code_snapshot(
         console.print(f"[red]{exc}[/]")
         raise typer.Exit(2) from exc
     console.print(summary.as_dict())
+    # The adapter's contract says directories are "counted, not dropped in
+    # silence — the count is reported by the CLI". It was counted and never
+    # printed, so "the tree is not in the graph yet" could only be inferred from
+    # a node total nobody checks. Print it and the claim becomes true.
+    if adapter.skipped_directories:
+        console.print(
+            f"[yellow]DIRECTORIES SKIPPED[/]: {adapter.skipped_directories} tree node(s) "
+            "of kind 'dir' — :Directory nodes and CONTAINS edges are a gate decision "
+            "(CLAUDE.md §6), so the containment tree stays in the snapshot, not the graph"
+        )
     # Counts always reported, never silent: extensions with no seeded SWO term
     # load their node fine but skip the IS_ENCODED_IN edge (§E2 partial use).
     for ext, n in sorted(adapter.unmapped_extensions.items()):
