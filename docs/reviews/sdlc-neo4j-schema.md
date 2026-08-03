@@ -354,7 +354,7 @@ graph LR
 - ⚠️ `JobFolder` constraint still keyed on `:JobFolder` — migration to `:ControlMFolder` is PARTIAL (FR-NS-010, FR-NS-011)
 - ⚠️ `controlm_folders.cypher` writes `RUNS_ON` — must be updated to `SCHEDULED_ON` before incremental ships (FR-NS-012)
 - ⬡ PLANNED active relationships (not shown): `SUPPORTS` (DevTeam → AreaProduct/Product), `HAS_AREA_PRODUCT` (Product → AreaProduct), `HAS_APPLICATION` (Product → Application), `WAS_ASSOCIATED_WITH {role:owner}` (ControlMJob → Employee — FR-NS-015)
-- Other node types with constraints declared but not yet actively loaded: `:Asset`, `:Dataset`, `:Distribution`, `:LineageRun`, `:QualityMeasurement`, `:Metric`, `:Dimension`, `:Company`, `:ServiceNowGroup`, `:File`, `:Channel`, snapshot nodes
+- Other node types with constraints declared but not yet actively loaded: `:Asset`, `:Dataset`, `:Distribution`, `:LineageRun`, `:QualityMeasurement`, `:Metric`, `:Dimension`, `:Company`, `:ServiceNowGroup`, `:File`, `:Channel`, snapshot nodes. For `:QualityMeasurement`/`:Metric`/`:Dimension` this is RULED, not an oversight: gate C23 (SME, 2026-08-03) kept the bootstrap-seeded Metric/Dimension reference catalog and DEFERRED the measurement leg until a measurement feed exists (revival trigger recorded in `ontology.cypher`; edges registered as `c23_*` in `relationship_vocabulary.yaml` — IN_DIMENSION active, the other three planned)
 
 ### §DES/ontology — Ontology Class Hierarchy
 

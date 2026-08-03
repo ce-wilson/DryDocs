@@ -189,6 +189,17 @@ MERGE (jpmc)-[r:HAS_BUSINESS_SEGMENT_HISTORICAL]->(s)
 
 
 // ----- DQV catalog: Dimensions + Metrics (TDQ baseline, v2 §11.6) -----------
+// C23 RULING (SME, 2026-08-03): DEFERRED, kept as a REFERENCE catalog. These
+// rows deliberately have no upstream today — the designed measurement leg
+// (:QualityMeasurement -IS_MEASUREMENT_OF->, COMPUTED_ON, HAS_QUALITY;
+// LoadPlanV2 §4.4) has no writer because no measurement feed exists yet.
+// REVIVAL TRIGGER: the first measurement feed — expected to be the
+// temporal-runtime freshness observations (cm_avg_run / freshness_sla), whose
+// vocabulary notes already reference dqv:QualityMeasurement. When that feed
+// lands, groom the writer items and flip c23_is_measurement_of /
+// c23_computed_on / c23_has_quality from planned. All four DQV edges are
+// registered in relationship_vocabulary.yaml (c23_* ids); IN_DIMENSION below
+// is active — it is written right here at bootstrap.
 MERGE (d:Dimension {name:"Completeness"}) SET d.description = "Whether all required data is present.";
 MERGE (d:Dimension {name:"Accuracy"})     SET d.description = "Whether values match a trusted source.";
 MERGE (d:Dimension {name:"Consistency"})  SET d.description = "Whether values are consistent across structures and over time.";

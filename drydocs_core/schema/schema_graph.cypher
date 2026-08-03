@@ -159,6 +159,14 @@ MERGE (n:SchemaMeta:CodeModule {name: 'CodeModule'})
 MERGE (n:SchemaMeta:OntologyTerm {name: 'OntologyTerm'});
 // (no node_classifications entry)
 MERGE (n:SchemaMeta:SwoClass {name: 'SwoClass'});
+// (no node_classifications entry)
+MERGE (n:SchemaMeta:Metric {name: 'Metric'});
+// (no node_classifications entry)
+MERGE (n:SchemaMeta:Dimension {name: 'Dimension'});
+// (no node_classifications entry)
+MERGE (n:SchemaMeta:QualityMeasurement {name: 'QualityMeasurement'});
+// (no node_classifications entry)
+MERGE (n:SchemaMeta:Dataset {name: 'Dataset'});
 
 // ── Relationships (one exemplar edge per vocabulary entry) ──────────────────
 
@@ -498,3 +506,21 @@ MERGE (a)-[r:IMPORTS]->(a)
 MATCH (a:SchemaMeta {name: 'CodeModule'}), (b:SchemaMeta {name: 'SwoClass'})
 MERGE (a)-[r:IS_ENCODED_IN]->(b)
   SET r.vocab_id = 'u1_is_encoded_in', r.prov_maps_to = null, r.domain = 'architecture', r.status = 'active';
+
+// ── domain: quality ─────────────────────────────────────────────────────────
+
+MATCH (a:SchemaMeta {name: 'Metric'}), (b:SchemaMeta {name: 'Dimension'})
+MERGE (a)-[r:IN_DIMENSION]->(b)
+  SET r.vocab_id = 'c23_in_dimension', r.prov_maps_to = null, r.domain = 'quality', r.status = 'active';
+
+MATCH (a:SchemaMeta {name: 'QualityMeasurement'}), (b:SchemaMeta {name: 'Metric'})
+MERGE (a)-[r:IS_MEASUREMENT_OF]->(b)
+  SET r.vocab_id = 'c23_is_measurement_of', r.prov_maps_to = null, r.domain = 'quality', r.status = 'planned';
+
+MATCH (a:SchemaMeta {name: 'QualityMeasurement'}), (b:SchemaMeta {name: 'Dataset'})
+MERGE (a)-[r:COMPUTED_ON]->(b)
+  SET r.vocab_id = 'c23_computed_on', r.prov_maps_to = null, r.domain = 'quality', r.status = 'planned';
+
+MATCH (a:SchemaMeta {name: 'Dataset'}), (b:SchemaMeta {name: 'QualityMeasurement'})
+MERGE (a)-[r:HAS_QUALITY]->(b)
+  SET r.vocab_id = 'c23_has_quality', r.prov_maps_to = null, r.domain = 'quality', r.status = 'planned';

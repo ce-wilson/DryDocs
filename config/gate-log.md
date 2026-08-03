@@ -1220,3 +1220,30 @@ Recorded, not built.
   `*DATABASE*` constant — the guard that let `SCHEMA_GRAPH_DATABASE` name an
   unprovisioned database through a green suite. `EXPECTED_CONSTRAINTS` unchanged:
   `schemameta_name` lives in `schema_graph.cypher` by design.
+
+
+## 2026-08-03 -- GATE: dqv-seed-disposition (backlog C23) -- SME-RULED: DEFER
+
+- **Question:** the DQV quality seed (10 `:Metric` + 5 `:Dimension` + 10 `IN_DIMENSION`
+  edges, written at bootstrap by `ontology.cypher`) has no upstream measurement leg and
+  predates the vocabulary discipline entirely. Build the designed writers, defer with a
+  recorded trigger, or prune the seed? Raised by the SME post graph-wipe: the one query
+  that survived showed metrics associated with nothing.
+- **Ruling (SME in-chat, 2026-08-03): DEFER.** The seed stays as a REFERENCE catalog.
+  BUILD was declined honestly -- no producer-side TDQ/control-file measurement feed
+  exists, so writers would have nothing to write. PRUNE was declined because the catalog
+  is not fully orphaned: the shipped SOSA `Result` and temporal-runtime `cm_avg_run`
+  vocabulary notes both reference `dqv:QualityMeasurement` (`freshness_sla` is a seeded
+  metric name), making the temporal-runtime freshness observations the catalog's first
+  real customer.
+- **Revival trigger (recorded in `ontology.cypher` above the seed):** the first
+  measurement feed -- expected to be the temporal-runtime freshness observations. When
+  it lands, groom the writer items and flip the planned edges.
+- **Vocabulary gap closed:** four `c23_*` entries in `relationship_vocabulary.yaml`
+  (new `quality` domain) -- `c23_in_dimension` ACTIVE (bootstrap-written, registered
+  retroactively), `c23_is_measurement_of` / `c23_computed_on` / `c23_has_quality`
+  PLANNED per LoadPlanV2 section 4.4 shapes (measurement -> Metric, measurement ->
+  Dataset, Dataset -> measurement).
+- **No graph write, no constraint change:** `measurement_id` / `metric_name` /
+  `dimension_name` stay; `EXPECTED_CONSTRAINTS` unchanged at 52.
+  `sdlc-neo4j-schema.md`'s declared-but-never-loaded row now cites this ruling.

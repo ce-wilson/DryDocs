@@ -454,6 +454,15 @@
       "unblocks": []
     },
     {
+      "kind": "log-entry",
+      "date": "2026-08-03",
+      "title": "- GATE: dqv-seed-disposition (backlog C23) -- SME-RULED: DEFER",
+      "status": "recorded",
+      "prompt_files": [],
+      "log_ref": "config/gate-log.md:1225",
+      "unblocks": []
+    },
+    {
       "kind": "prompt-only",
       "date": null,
       "title": "bmc-docs-example (gate page rendered — session not yet run)",
