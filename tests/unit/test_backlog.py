@@ -8,7 +8,10 @@ guard keeps the database honest so those renders can trust it:
 - ids are unique, dependencies resolve and are acyclic;
 - module values come from the `modules:` registry, phases from `plan.phases`;
 - the `summary:` roll-up and `next_ready:` list are COMPUTED views — they must
-  match the items exactly, so they can never silently drift again.
+  match the items exactly, so they can never silently drift again;
+- no mapping anywhere in the file carries a duplicate key — PyYAML is
+  last-key-wins, so a duplicated block is INVISIBLE to every guard above
+  (they validate whichever copy parsed last).
 """
 
 from __future__ import annotations
@@ -58,6 +61,26 @@ pytestmark = pytest.mark.skipif(not _YAML_AVAILABLE, reason="PyYAML not installe
 def _load() -> dict:
     assert BACKLOG.exists(), f"Missing backlog: {BACKLOG}"
     return yaml.safe_load(BACKLOG.read_text(encoding="utf-8"))
+
+
+def _find_duplicate_keys(text: str) -> list[str]:
+    """Every duplicate mapping key in the document, with both line numbers."""
+    dupes: list[str] = []
+
+    class _Loader(yaml.SafeLoader):
+        def construct_mapping(self, node, deep=False):
+            seen: dict = {}
+            for key_node, _value_node in node.value:
+                key = self.construct_object(key_node, deep=True)
+                line = key_node.start_mark.line + 1
+                if key in seen:
+                    dupes.append(f"duplicate key {key!r}: line {seen[key]} and line {line}")
+                else:
+                    seen[key] = line
+            return super().construct_mapping(node, deep=deep)
+
+    yaml.load(text, Loader=_Loader)
+    return dupes
 
 
 def _agents() -> set[str]:
@@ -179,6 +202,19 @@ def test_dependencies_resolve_and_are_acyclic() -> None:
     for iid in items:
         if color[iid] == white:
             visit(iid, [])
+
+
+def test_no_duplicate_mapping_keys() -> None:
+    """A duplicated block passes every other guard here, so it needs its own.
+
+    PyYAML keeps the LAST value for a duplicated key, so a second `summary:`
+    (or `items:`, or a repeated field inside one item) silently shadows the
+    first and the roll-up guards validate the survivor. A port merge script
+    shipped exactly that — two `summary:` blocks — through a green suite
+    (company PORT-REPORT-40c35724 follow-up, 2026-08-03).
+    """
+    dupes = _find_duplicate_keys(BACKLOG.read_text(encoding="utf-8"))
+    assert not dupes, f"{len(dupes)} duplicate YAML key(s) in backlog.yaml:\n" + "\n".join(dupes)
 
 
 def test_summary_rollup_matches_items() -> None:
