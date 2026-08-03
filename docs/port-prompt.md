@@ -479,6 +479,10 @@ ACCEPTANCE GATE (behavior is the contract, not a byte-compare):
   capability_assert=false skips per T18). A retired-id refusal from
   `SourceRegistry.from_yaml` is the D4 guard WORKING, not a port failure — rebind the
   loader in `loader-source-overlay.yaml`, never by re-adding the retired id.
+  Likewise four `test_port_reconcile_guards` failures naming a before-dir mean a
+  stale `RECONCILE_BEFORE_DIR` is still set in that shell from an earlier reconcile
+  — clear it (reconcile-port step 4) and re-run; that is the guard WORKING too, not
+  a port failure.
   Producer reference at the current head (step 59, `aa0a0eb`): 1354 passed /
   7 skipped with the production CSV **ABSENT** and RECONCILE_BEFORE_DIR unset
   (4 J7 guards + 3 sample-backed) — the step-48 precedent for quoting a
