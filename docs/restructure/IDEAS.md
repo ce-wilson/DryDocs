@@ -883,6 +883,11 @@ Tags help grooming: `idea` · `bug` · `doc` · `source` (new data source) · `q
 
 ## Recently groomed (audit trail)
 
+- 2026-08-03 — [question] "what's upstream of :Metric?" (user, in-chat, minutes after the
+  manual graph wipe — the DQV seed's IN_DIMENSION query was the one thing worth asking about
+  what was just deleted) → **C23**: the quality seed floats — no measurement writer, no
+  vocabulary entries; rule build/defer/prune via the gate.
+
 - 2026-08-02 (weekly groom) — [source→Q6] the company-side fetcher shape → **MERGED into Q6's
   acceptance**, not a new item: acquisition-only connectors over a `Connector` protocol, `web`
   with an INJECTABLE TRANSPORT and an SSRF scheme allow-list, `filedrop` over pathlib. Both
