@@ -447,6 +447,22 @@ verification status in [BRACKETS]; spend review on [UNRULED].
     entries, but your OWN measurement-feed timeline decides when planned
     flips; nothing here writes your graph. `EXPECTED_CONSTRAINTS` unchanged.
 
+59. G51 TAIL — THE TOPOLOGY GUARD THAT LET FOUR DATABASES STAND [TEST-PINNED]
+    (`aa0a0eb`). Step 56 added `ddschema` to the DDL, not to the surfaces that
+    ENUMERATE the topology. `test_databases_match_provisioning_script` was a
+    subset check whose own docstring promised equality; it is now bidirectional
+    and FAILED on `['ddschema']` before the config was touched. Same commit:
+    runbook Rev 7 WITH the `test_doc_traceability_loader` rev pin 6→7 (the L21
+    mixed-pin file — take both or neither), `ingest.sh` 5→6 steps, provisioning
+    README/`provision.ps1`, repo-README, the run-drydocs skill's wrong
+    `NEO4J_PLUGINS` advice, `enforcement-matrix.json` regenerated.
+    ***CAUTION — THIS GUARD WILL RED YOUR TREE, CORRECTLY.***
+    `config/dev-environment.yaml` is canonical-company and you took
+    `01_databases.cypher` with `ddschema` at step 56, so the widened guard fails
+    until YOUR file gains `schema_meta: ddschema` under `neo4j.databases`
+    (structure to adapt by hand, value yours — the standing divergence).
+    `EXPECTED_CONSTRAINTS` does not move.
+
 ACCEPTANCE GATE (behavior is the contract, not a byte-compare):
 - Track 1 (portable):
     poetry run pytest tests/unit/test_variable_classifier.py tests/unit/test_variable_resolver.py \
@@ -463,10 +479,13 @@ ACCEPTANCE GATE (behavior is the contract, not a byte-compare):
   capability_assert=false skips per T18). A retired-id refusal from
   `SourceRegistry.from_yaml` is the D4 guard WORKING, not a port failure — rebind the
   loader in `loader-source-overlay.yaml`, never by re-adding the retired id.
-  Producer reference at the current head (step 58, `11f9ab9`): 1356 passed /
-  5 skipped, production CSV present (+1 over step 54 = the duplicate-key
-  guard). Earlier producer heads are in git history and the
-  archive — do not re-derive them here.
+  Producer reference at the current head (step 59, `aa0a0eb`): 1354 passed /
+  7 skipped with the production CSV **ABSENT** and RECONCILE_BEFORE_DIR unset
+  (4 J7 guards + 3 sample-backed) — the step-48 precedent for quoting a
+  CSV-absent figure. NOT comparable line-for-line with the step-58 figure
+  (1356 / 5, CSV present); `aa0a0eb`'s commit message quotes 1358 / 3, which is
+  this same run with RECONCILE_BEFORE_DIR set. Earlier producer heads are in
+  git history and the archive — do not re-derive them here.
   Company reference (PORT-REPORT-40c35724): full `1652 / 28 / 0`, Track-1
   `123 / 3 / 0`, `EXPECTED_CONSTRAINTS` 55 company-based.
   COUNT THE RIGHT THING: producer "changed paths" (the range diff) and company
