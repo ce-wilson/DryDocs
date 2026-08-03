@@ -193,6 +193,12 @@ units from `docs/restructure/backlog.yaml`. Each backlog item names its agent + 
   "prettier" copy silently breaks feedback re-attachment). *Non-governed outward-facing docs*
   — the whitepaper, the website — are the ONLY place editorial/design treatment
   (artifact-design pass, visual identity) applies.
+- **Prose style: U.S. business-technical English.** All new prose follows
+  [`docs/style/us-business-english.md`](docs/style/us-business-english.md) — plain, concrete,
+  direct; "backbone"/"core"/"source of truth", not "spine"/"planes"/"decays"; lead with the
+  core claim. Two boundaries ride with the guide: mechanism names (HITL status `confirmed`,
+  port-prompt guardrails, identifiers) are never renamed by a style pass, and "crosswalk(s)"
+  is an SME-approved exception (2026-08-03).
 - **Taxonomy imports are reversible; ontology edges are not casual.** New relationship types
   go through `docs/RELATIONSHIP_GUIDE.md` + the `relationship_vocabulary.yaml` registry +
   the HITL gate. Set `status: planned` first.

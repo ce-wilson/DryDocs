@@ -20,7 +20,7 @@ failures into fix packages routed to the owning team. It is built on three commi
 distinguish it from both wiki-style documentation and generic CMDB tooling:
 
 1. **The graph is derived, not authored.** Runbooks and dependency maps generated from the
-   orchestrator's live definitions cannot rot the way hand-written pages do.
+   orchestrator's live definitions cannot go stale the way hand-written pages do.
 2. **No meaning enters the graph without a human decision.** Every relationship type is
    proposed against public ontology standards and confirmed by a subject-matter expert
    through a recorded gate before a single edge loads.
@@ -42,7 +42,7 @@ Batch production support fails in a specific, repeatable way:
 - **Invisible blast radius.** Job-to-job dependencies exist as prerequisite conditions
   inside the scheduler, legible to it but not to the human deciding whether a 3 a.m. failure
   can wait until 9.
-- **Metadata rot compounds.** Escalation routing keyed to stale ownership, description
+- **Metadata drift compounds.** Escalation routing keyed to stale ownership, description
   fields left empty, hard-coded hosts nobody remembers — each defect makes the next incident
   slower, and there is no loop that repairs them.
 

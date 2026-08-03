@@ -37,6 +37,16 @@
        rev 6  2026-07-25  production-support framing sharpened: names the actual decay —
                           overview + business context + process flow down to an Excel
                           sheet of folder/job details
+       rev 7  2026-08-03  style pass per docs/style/us-business-english.md (backlog L22):
+                          spine→backbone, planes→layers, decays/rots→goes stale/becomes
+                          outdated, gate-confirmed→validated through the SME gate, UK
+                          spellings Americanized. SOURCE DECISION recorded: this file
+                          stays the single hand-authored source — HTML edited directly,
+                          no .md source established (non-governed editorial surface,
+                          CLAUDE.md §6). Rev-history lines above left verbatim as
+                          history. Content claims NOT refreshed (ADR statuses and the
+                          crosswalk-consumer line are as of rev 6; S1/S2 have since
+                          landed — a content refresh is a separate revision).
 
      CONVENTION: dashed borders = proposed or planned. As each dotted line
      closes, flip it to solid, add a revision line above, and republish the
@@ -289,8 +299,8 @@
     <p class="log">
       <span><b>Audience:</b> Leadership · Production Support · Engineering · SME</span>
       <span><b>Classification</b> Internal-Public</span>
-      <span><b>Date</b> 2026-07-25</span>
-      <span><b>Revision</b> 6</span>
+      <span><b>Date</b> 2026-08-03</span>
+      <span><b>Revision</b> 7</span>
     </p>
   </header>
 
@@ -409,10 +419,10 @@
 
   <hr class="rule" />
 
-  <!-- ══ 01 · THE SPINE ═══════════════════════════════════════════════════ -->
+  <!-- ══ 01 · THE BACKBONE ════════════════════════════════════════════════ -->
   <section>
     <p class="eyebrow"><span>01</span> The central design choice</p>
-    <h2>Why orchestration is the spine</h2>
+    <h2>Why orchestration is the backbone</h2>
 
     <div class="prose">
       <p>
@@ -423,36 +433,36 @@
 
     <p class="thesis">
       An org chart tells you who is <em>supposed</em> to own an application. The scheduler record
-      tells you what <em>executed</em> — on which server, reading which file, signalling what
-      downstream. One decays the moment someone changes teams. The other is re-derived on every
-      ingest.
+      tells you what <em>executed</em> — on which server, reading which file, signaling what
+      downstream. One goes stale the moment someone changes teams. The other is rebuilt from the
+      execution record on every ingest.
     </p>
 
     <div class="prose">
-      <p>So the orchestration record is the spine, and every other plane attaches to it: <strong>data</strong>
+      <p>So the orchestration record is the backbone, and every other layer connects to it: <strong>data</strong>
         because jobs read and write files; <strong>applications</strong> because jobs are associated with
         one; <strong>products and business lines</strong> because applications roll up a catalog hierarchy;
         <strong>people</strong> because applications carry attributed roles; <strong>documents</strong> because
         facts cite the page they came from.</p>
       <p>
         This is the conclusion Databricks Unity Catalog reached independently, for the same reason:
-        lineage derived from what ran stays true, lineage declared by a human rots. DryDocs derives
+        lineage derived from what ran stays accurate; lineage declared by a human becomes outdated. DryDocs derives
         from Control-M definitions what Unity Catalog derives from Spark execution plans.
       </p>
       <p>
         Which is exactly why the vendor boundary has to be explicit in the code. Control-M is the
         primary Data &amp; Analytics orchestrator today, and its parser sits in the shared core with
         no parent and no sibling — while AutoSys is in a later phase, and AWS Airflow is a
-        placeholder with less visibility owing to tenant guardrails. Both crosswalks are already
-        gate-confirmed on paper, and neither has anywhere to land in code.
+        placeholder with less visibility under tenant-level access restrictions. Both crosswalks
+        are already validated through the SME gate on paper, and neither has anywhere to land in code.
       </p>
     </div>
   </section>
 
-  <!-- ══ 02 · PLANES ══════════════════════════════════════════════════════ -->
+  <!-- ══ 02 · LAYERS ══════════════════════════════════════════════════════ -->
   <section>
     <p class="eyebrow"><span>02</span> What it captures</p>
-    <h2>Five planes, one spine</h2>
+    <h2>Five layers, one backbone</h2>
 
     <figure>
       <div class="canvas">
@@ -479,7 +489,7 @@ flowchart TB
     SwProduct[":SoftwareProduct → :Vendor"]
   end
 
-  subgraph ORCH["◆ ORCHESTRATION — THE SPINE: what actually ran"]
+  subgraph ORCH["◆ ORCHESTRATION — THE BACKBONE: what actually ran"]
     CMApp[":ControlMApplication"]
     Folder[":ControlMFolder"]
     Job[":ControlMJob"]
@@ -522,13 +532,13 @@ flowchart TB
   Job -->|WAS_GENERATED_BY| JobRun
   DesignDoc -.-> Doc
 
-  classDef spine stroke-width:2.5px
-  class CMApp,Folder,Job,Cond,Server,JobRun spine
+  classDef backbone stroke-width:2.5px
+  class CMApp,Folder,Job,Cond,Server,JobRun backbone
 </pre>
       </div>
       <figcaption>
         <b>Solid</b> = active in the relationship vocabulary today. <b>Dashed</b> = registered
-        <code>planned</code> or gate-bound. <b>Thick</b> = the orchestration spine.
+        <code>planned</code> or gate-bound. <b>Thick</b> = the orchestration backbone.
       </figcaption>
     </figure>
 
@@ -544,20 +554,20 @@ flowchart TB
 
   <!-- ══ 03 · ONTOLOGY STANDARDS ══════════════════════════════════════════ -->
   <section>
-    <p class="eyebrow"><span>03</span> What makes the planes joinable</p>
+    <p class="eyebrow"><span>03</span> What makes the layers joinable</p>
     <h2>Ontology standards: data, software, organization</h2>
 
     <div class="prose">
       <p>
         A <strong>taxonomy</strong> tells you what category something is. An <strong>ontology</strong> tells you
-        what a connection <em>means</em>. Five planes only compose into one graph if the edges between
+        what a connection <em>means</em>. Five layers only compose into one graph if the edges between
         them are drawn from a shared, defined vocabulary — otherwise each source arrives with its
         own private notion of &ldquo;owns&rdquo;, &ldquo;uses&rdquo;, and &ldquo;depends on&rdquo;, and the graph becomes a picture
         rather than something you can reason over.
       </p>
       <p>
         DryDocs does not invent that vocabulary. It maps to W3C and community standards, records
-        every mapping in a controlled registry, and puts the ones that are not yet company-blessed
+        every mapping in a controlled registry, and puts the ones that are not yet company-approved
         behind a fence.
       </p>
     </div>
@@ -575,7 +585,7 @@ flowchart TB
           </tr>
           <tr>
             <td>W3C ORG</td><td>Organization</td>
-            <td>People and teams as first-class structure: <em>Membership</em>, <em>Role</em>, <em>OrganizationalUnit</em>, <em>FormalOrganization</em> — so &ldquo;who owns this&rdquo; is a modelled relation, not a text field</td>
+            <td>People and teams as first-class structure: <em>Membership</em>, <em>Role</em>, <em>OrganizationalUnit</em>, <em>FormalOrganization</em> — so &ldquo;who owns this&rdquo; is a modeled relation, not a text field</td>
             <td><span class="chip live">adopted</span></td>
           </tr>
           <tr>
@@ -585,7 +595,7 @@ flowchart TB
           </tr>
           <tr>
             <td>DCAT</td><td>Dataset catalog</td>
-            <td>Datasets, distributions, and sources/targets — the vocabulary the data plane attaches with</td>
+            <td>Datasets, distributions, and sources/targets — the vocabulary the data layer attaches with</td>
             <td><span class="chip live">adopted</span></td>
           </tr>
           <tr>
@@ -595,7 +605,7 @@ flowchart TB
           </tr>
           <tr>
             <td>DQV</td><td>Data quality</td>
-            <td>Quality dimensions and metrics as modelled objects</td>
+            <td>Quality dimensions and metrics as modeled objects</td>
             <td><span class="chip live">adopted</span></td>
           </tr>
           <tr>
@@ -671,7 +681,7 @@ flowchart LR
     </figure>
 
     <div class="prose">
-      <h3>Why this is the agent story, not the modelling story</h3>
+      <h3>Why this is the agent story, not the modeling story</h3>
       <p>
         An agent answering <em>&ldquo;what does this process do, and who do I contact when there is an
         issue?&rdquo;</em> has to cross two kinds of evidence: a structured extract that says a job is
@@ -685,7 +695,7 @@ flowchart LR
         This is the same conclusion Databricks reached out loud: <em>&ldquo;agents are only as good as the
         context they have — without a shared definition of what the business actually means, even a
         capable agent will guess.&rdquo;</em> Defining the ontology properly across the taxonomies is not
-        modelling hygiene. It is the difference between an agent that can cite a path and one that
+        modeling hygiene. It is the difference between an agent that can cite a path and one that
         produces a confident sentence nobody can verify.
       </p>
     </div>
@@ -706,7 +716,7 @@ flowchart LR
     Catalog[("Catalog / product extract<br/>+ team report")]
     AppReg[("Application registry extract<br/>apps · ports · TOM roles")]
     Escal[("Escalation routing<br/>ServiceNow groups")]
-    HR[("HR hierarchy extract<br/>employee spine · REPORTS_TO")]
+    HR[("HR hierarchy extract<br/>employee hierarchy · REPORTS_TO")]
     VendorDocs[("Vendor docs<br/>standards · research")]
   end
 
@@ -792,13 +802,13 @@ flowchart LR
     <div class="prose">
       <h3>Where people come from</h3>
       <p>
-        Three feeds populate the human plane, and they are deliberately separate because they
+        Three feeds populate the people layer, and they are deliberately separate because they
         answer different questions. The <strong>catalog extract</strong> supplies teams and the products they
         support. The <strong>application registry extract</strong> supplies the operating-model roles attached
         to each application — who owns it, who informs it, who operates it at each level. The
         <strong>escalation routing</strong> feed supplies the group you actually page, which is frequently not
         the same as the person listed as owner. An <strong>HR hierarchy</strong> extract — currently at the
-        gate — would add the reporting spine, so an unanswered page can escalate upward rather than
+        gate — would add the reporting chain, so an unanswered page can escalate upward rather than
         sideways.
       </p>
     </div>
@@ -1055,6 +1065,7 @@ flowchart TB
   <footer>
     <div class="revs">
       <span><b>Revisions</b></span>
+      <span>rev 7 · 2026-08-03 — U.S. business-English style pass per <code>docs/style/us-business-english.md</code> (L22): spine→backbone, planes→layers, decays/rots→goes stale/becomes outdated, gate-confirmed→validated through the SME gate, UK spellings Americanized; HTML stays the single hand-authored source (no .md established); content claims unchanged from rev 6</span>
       <span>rev 6 · 2026-07-25 — production-support framing sharpened: names the actual decay, from overview + business context + process flow down to an Excel sheet of folder and job details</span>
       <span>rev 5 · 2026-07-25 — three trust-tier graphs named explicitly (<code>drydocs</code> / <code>ddcontext</code> / <code>dddocs</code>, federated by <code>ddall</code>); §06 states that the original proposal survives as active vocabulary; stale database names corrected to the gated <code>dd*</code> convention</span>
       <span>rev 4 · 2026-07-25 — origin corrected: the original proposal was a Neo4j graph of the batch process and code, linked to requirements and test cases in a document database</span>

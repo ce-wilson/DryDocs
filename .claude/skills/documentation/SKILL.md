@@ -40,6 +40,15 @@ Write clear, maintainable technical documentation for different audiences and pu
 - Common tasks with walkthroughs
 - Who to ask for what
 
+## Style — read this before writing prose
+
+**All DryDocs prose follows [`docs/style/us-business-english.md`](../../../docs/style/us-business-english.md)** —
+U.S. business-technical English for a U.S. enterprise audience. Plain, concrete, direct:
+"backbone"/"core"/"source of truth", not "spine"/"planes"; "becomes outdated", not "decays";
+lead with the core claim. The guide carries two boundaries that are part of the rule:
+mechanism names (the HITL status `confirmed`, port-prompt guardrails, identifiers) are never
+renamed by a style pass, and "crosswalk(s)" is an SME-approved exception (2026-08-03).
+
 ## Principles
 
 1. **Write for the reader** — Who is reading this and what do they need?

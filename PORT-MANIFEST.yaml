@@ -40,7 +40,11 @@
 # =============================================================================
 schema: drydocs.port-manifest.v1
 classification: Internal-Public
-updated: 2026-08-01   # 2026-08-01: +docs/next-session-handoff.md and
+updated: 2026-08-03   # 2026-08-03 (L22): +docs/style/** canonical-producer — the J16
+                      # guard caught both new style files the session they shipped,
+                      # exactly as designed (the guide was committed one session earlier
+                      # without a full-suite run; the guard flagged it here).
+                      # 2026-08-01: +docs/next-session-handoff.md and
                       # +docs/next-internal-session.md, both never-port. The SECOND
                       # instance of the docs/port-*.md failure mode — producer-local
                       # session material falling to `docs/*.md` -> default clean-add.
@@ -251,6 +255,13 @@ rows:
       screenshots stay producer-local (gitignored); company has the real repos anyway.
   - path: "knowledge/standards/**"
     disposition: canonical-producer
+  - path: "docs/style/**"
+    disposition: canonical-producer
+    note: >
+      writing-style governance (us-business-english.md + the L22 idiom
+      inventory) — producer-authored, ports wholesale; the guide's crosswalk
+      exception references company-internal vocabulary on purpose (L22,
+      2026-08-03)
   - path: "drydocs/loaders/**"
     disposition: canonical-producer
     note: "Control-M loaders/SQL/DDL/cypher incl. base.py (provenance diet) — producer-authored"
