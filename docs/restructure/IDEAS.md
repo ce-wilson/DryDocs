@@ -26,6 +26,25 @@ Tags help grooming: `idea` · `bug` · `doc` · `source` (new data source) · `q
 
 <!-- add new ideas at the top -->
 
+- 2026-08-03 — [idea] **EPIC: backlog.yaml has outgrown single-file text editing — shard it,
+  derive the summary, query it from the graph.** Trigger: during the DD6 session the company
+  agent worked lines 10,573–10,669 of a 10.6k-line file; producer copy is 10,784 lines / 722KB /
+  280 items. The port's duplicate-`summary:` defect (shipped in company `1a3aff20`, since fixed by
+  clean rebuild) was a STRUCTURAL consequence of the format: agents regex-splice a shared mutable
+  blob, and pyyaml's last-key-wins hid the duplicate from `test_backlog`. Three phases, ordered:
+  **(1) guard now, both sides** — `test_backlog` rejects duplicate top-level keys / asserts exactly
+  one `^summary:` (mechanism, back-flows); **(2) shard** — `backlog/items/<id>.yaml` one-item-per-
+  file, `summary` + `next_ready` become DERIVED (board render computes them, never stored where
+  agents append); per-entry-by-id reconciliation becomes the filesystem; claim = push a one-file
+  status change (shrinks the two-machine claim-collision window, the 2026-07-28 lesson); kills the
+  extract/merge/splice script class. Touches test_backlog, render_board, J7 guards, groom skill,
+  PORT-MANIFEST rows — both repos must move together ⇒ gate-worthy, own epic. **(3) graph as the
+  QUERY surface only** — load `:BacklogItem` + `DEPENDS_ON` (next_ready is a one-hop Cypher query;
+  agents query instead of reading 10k lines), but the graph stays a derived projection: git remains
+  the sole source of truth and claim channel — a graph write is even less cross-machine-visible
+  than an unpushed commit. Phase 2 is what makes phase 3 trivial and pays off even with no Neo4j
+  running.
+
 - 2026-08-02 — [bug] **Every seed query in `docs/reviews/code-graph-review-plan.md` is missing
   `removed_from_source_at IS NULL`, and the D7 tombstones are now big enough to change an
   answer.** Demonstrated live loading the whole-tree snapshot: S2's move of `drydocs_core/controlm/`
