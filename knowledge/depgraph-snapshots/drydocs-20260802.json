@@ -1,16 +1,16 @@
 {
   "meta": {
     "project": "drydocs",
-    "captured_at": "2026-08-02T18:05:13",
+    "captured_at": "2026-08-02T21:17:14",
     "date": "20260802",
     "scan": "DryDocs",
     "tree": true,
     "git": {
-      "commit": "643ac50",
-      "full": "643ac5043b73737e6d8fd3da1eaeec3b04e5627e",
+      "commit": "3c9ff3b",
+      "full": "3c9ff3bb8148dff744dc5e1eb8b03edda3699f13",
       "branch": "main",
-      "describe": "643ac50",
-      "subject": "docs(gate): code-graph-package-layer — level two for the self-documentation graph",
+      "describe": "3c9ff3b",
+      "subject": "chore(backlog): groom — 9 promoted, 2 merged, 1 resolved, 2 kept-updated",
       "dirty": true,
       "pr": null
     },
