@@ -98,6 +98,49 @@ Consequences:
 - Enforcement path on the vendor side: **Site Standard + Business Parameters + Enforce Validations** (see the folder-definition-parameters doc) is where such a naming rule would be enforced in Control-M itself.
 
 ---
+---
+
+## Platform-ordering folders — `PUDLY` and the User Daily mechanism
+
+**SME-attested 2026-08-03 (~99% confidence), corroborated by the vendor mechanism but NOT
+vendor-confirmed.** `PUDLY` reads as **P**roduction **U**ser **D**ai**LY** — the Control-M
+platform's own folders that set up mapping between data centers.
+
+**What BMC actually documents** (searched 2026-08-03 across the loaded vendor corpus, 374
+chunks; see `controlm-folder-definition-parameters`):
+
+| Parameter | Meaning |
+|---|---|
+| **Order Method** | One of **Automatic (Daily)** — the New Day procedure orders the folder at New Day time; **None (Manual Order)**; or **Specific User Daily** — an identifier assigning the folder to a specific User Daily job, ordered at a set time of day for **load balancing across the day** rather than at New Day time. |
+| **User Daily name** | "Defines User Daily jobs **whose sole purpose is to order jobs.** Instead of directly scheduling production jobs, the New Day procedure can schedule User Daily jobs, which in turn schedule the production jobs." Set when Order Method = Specific User Daily. |
+
+**Three things to know before relying on this:**
+
+1. **The corpus carries no User Daily NAME examples.** The mechanism is documented; naming is
+   not. `PUDLY` is ours, like `PRAOCG` — BMC would never carry it. The expansion above is the
+   SME's, recorded so the next session does not re-search the vendor docs for it.
+2. **The SaaS/API surface drops the value entirely.** `controlm-api-folder-reference` exposes
+   `OrderMethod` as only `"Automatic"` or `"Manual"`; Specific User Daily exists solely in the
+   classic Parameter Reference. Anything reasoning about ordering from the API docs alone will
+   silently miss this whole class of folder.
+3. **The token does not fit the 6-character convention above.** `PUDLY` is five characters, and
+   positions 3–5 read as a frequency word rather than a platform/application acronym. Treat it
+   as an exception or a legacy name predating the convention — not as evidence the convention
+   is wrong.
+
+**Graph consequence (gate `seal-app-ref-edge-reshape` / K7, SIGNED OFF 2026-08-03).** A User
+Daily folder's sole purpose is to order other jobs, so it is scheduling **infrastructure**, not
+business workload. Under the gate's OWNER-NOT-USER rule — a folder belongs to whoever OWNS it,
+not whoever USES it — these folders attribute to the Control-M platform's own SEAL, not to the
+applications whose jobs they order. The vendor definition is what makes that a statement about
+the object rather than a convention.
+
+**Available but not taken:** the Control-M extract carries the Order Method column, so this
+folder class could be identified by FIELD rather than by name pattern — which would be stronger
+than name-parsing, given the caveat above that a folder name does not reliably identify
+anything. Deliberately not pursued at K7 (SME: "we do not need to go down that path"); recorded
+here so it is a choice rather than an oversight.
+
 
 ## Open items to confirm (do not fill speculatively)
 
@@ -106,5 +149,8 @@ Consequences:
 3. Full historical **frequency code** list (position 6) beyond D/W/M.
 4. Is the app code **always exactly 3 chars**, and is there a governed registry or is it per-team mnemonic?
 5. How non-conforming / legacy names are handled (exceptions, grandfathering).
+6. `PUDLY` expansion — **Production User Daily** is SME-attested (2026-08-03, ~99%) and
+   consistent with the vendor User Daily mechanism, but no source states it. Confirm against
+   an internal Control-M standard or the platform team, not against BMC (searched, absent).
 
 Related: [[project-drydocs-scrape-two-corpus]], [[project-controlm-xml-not-json]]

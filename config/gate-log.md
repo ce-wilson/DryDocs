@@ -1247,3 +1247,107 @@ Recorded, not built.
 - **No graph write, no constraint change:** `measurement_id` / `metric_name` /
   `dimension_name` stay; `EXPECTED_CONSTRAINTS` unchanged at 52.
   `sdlc-neo4j-schema.md`'s declared-but-never-loaded row now cites this ruling.
+
+## 2026-08-03 — GATE: seal-app-ref-edge-reshape (backlog K7) — SIGNED OFF, 24/24
+
+**Scope.** The Application ↔ Control-M attribution CLOSE-OUT gate, opened by user
+direction 2026-07-22 ("close out the mapping for any relationships that need to be
+defined or manually overwritten until fixed — the application to Control-M folders").
+Spec v3 (2026-07-27), 8 sections, 25 confirmations. §G6-RIDER was ruled earlier as a
+PARTIAL RULING (2026-08-01, C17, PAT grain keying) and is NOT re-opened here; the
+remaining 24 are ruled below. SME chad.wilson, in-session chat gate. Nothing in this
+entry writes the graph — vocabulary lands `planned`, the loader follows at the build
+items §F2 opens.
+
+**Procedural note worth keeping.** The spec existed from 2026-07-15 and reached v3 on
+2026-07-27, but no backlog item ever owned RUNNING it, so it sat unsigned for six weeks.
+K7 was groomed the same day it was run. The renderer defect that hid it — a gate whose
+prompt file is merely CITED by other entries never appears in the open-gates list — is
+backlog J28.
+
+### Per-item outcomes
+
+| # | Outcome |
+|---|---------|
+| A1 | CONFIRMED — attribution grain is FOLDER-level; jobs inherit via `CONTAINS_JOB`; no per-job application edge is authored going forward. The K2 job-level model is corrected, not extended. |
+| A2 | CONFIRMED — `explorer.folder-applications.v1` keeps deriving through job edges, and says so on the surface, until it re-binds to the gated folder edge at build. |
+| B1 | CONFIRMED WITH EDIT — ONE authoring mechanism: code-level rows, loader fans out to folders via `m3_contains_folder`. `tier` is a ROW PROPERTY, not a structural split. Decided on NEW FOLDERS: under fan-out a new folder inherits attribution the moment it appears; per-folder authoring would leave it unmapped until a generator was re-run, and unmapped-by-default is how coverage silently rots. |
+| B2 | CONFIRMED, THEN AMENDED IN SESSION — THREE tiers, not two: tier 1 seal-born (1:1 code to application); tier 2 shared platform code (resolved per folder); **tier 3 DUAL-CODED/MIGRATING (NEW)** — a team has stood up its own Control-M app code and is moving to it while still running workload under the platform code; both attributions are simultaneously correct. Tier 3 is DECLARED with an explicit end state, so a stalled migration cannot become permanent ambiguity. AMENDMENT: the original wording made `:AreaProduct` a 1:many TARGET; it is a ROUTING step (see below). Unresolved folders SURFACE to the steward and are never auto-picked. |
+| B3 | CONFIRMED WITH A FENCE — the K2 fuzzy match policy (SEAL, then FID, then APP_NAME, then ALIAS; signed 2026-07-14) DEMOTES to fallback for codes with no defined row. Its internals are NOT re-opened. ADDED: every fallback-derived value is DISCLOSED via the origin flag (`defined`, `matched-fallback`, `override`, `manual-pin`) — matched attribution is never presented as though it were defined. |
+| C1 | RULED (b) — the tier-1 target is the application's BatchProcessing `:Port`, not `:BusinessApplication`. **Rationale is supernode avoidance, not preference:** the app node already hubs TOM roles, contacts, product links and orchestrator edges; hanging every folder off it concentrates batch topology on the node that can least afford it. The port is the batch-facing side, the app node stays a record rather than a junction. Side effect: §G5 port confirmation becomes derivable with no separate trigger. |
+| C2 | RULED — RETIRE. `arch_contains_batch` and `arch_contains_folder` flip `planned` to `deprecated`; the SME named no live use for a distinct `:Batch` node. **Do not confuse the twins:** `m3_contains_folder` (`:ControlMApplication` to `:ControlMFolder`) is a DIFFERENT, ACTIVE edge and is the fan-out path B1 depends on. |
+| D1 | RULED (a) — LOCAL domain edge, `prov_maps_to: ~`, label **`BELONGS_TO_APPLICATION`**. `:ControlMFolder` (Collection, subclass of Entity) to `:Port` is an Entity-to-Entity governance/containment fact with no natural PROV verb (the `SCHEDULED_ON` / `reg_uses_software` precedent). Option (b) `prov:used` REJECTED: it type-checks only from an Activity, so it would force keeping a job-side edge alive and contradict A1. Label chosen over `ATTRIBUTED_TO_APPLICATION` because containment is what the fact is, and it reads beside `CONTAINS_FOLDER`. |
+| D2 | CONFIRMED — one shape everywhere: loader edge, manual tier-5 writer `SUPPORTED_SHAPE`, migration target. |
+| E1 | CONFIRMED — override mechanics reuse the O24 origin-flagged store verbatim: committed CSV in `config/overrides/` to `mapping.db` to the `/mappings` console (steward persona); every surface shows ORIGIN; corrections feed a source-corrections report addressed to whoever owns the actual fix. |
+| E2 | CONFIRMED WITH EDIT — defined-mapping rows ARE a graph-loadable source of record; there is no machine feed to defer to, so refusing store-to-graph here would mean the mapping cannot exist. **EDIT: overrides may be PERMANENT in this domain** — the folder-to-application relation runs through a platform code, so an override is not patching a value awaiting an upstream fix; the arrangement is the arrangement. **Permanence is DOMAIN-DEPENDENT** (the SME fact that decided it): application-to-support-team and application-to-operate-manager overrides ARE temporary, months-long, and keep the corrected-in-source lifecycle. The GENERAL override-vs-precedence question (ui-write-surface) stays **OPEN** for other domains; this gate contributes the domain-dependence finding as evidence for whoever runs it. |
+| E3 | CONFIRMED — store rows never write the graph directly; the loader remains the only graph writer (O20 unchanged). |
+| F1 | CONFIRMED, RE-SCOPED — producer-side this is moot under wipe-and-rebuild: a reload at the new shape IS the migration, so no migration artifact is authored here. Company-side it is NOT moot (G4-RIDER (a): real legacy state, ports already active by derivation, manual pins a wipe would destroy). That migration is theirs under guardrail 6 and tracker T23, and becomes a port-ledger obligation rather than a producer build item. |
+| F2 | CONFIRMED, AMENDED — the page listed a separate "tier-2 edge" to register; there is none now that `:AreaProduct` is routing. ADDED: the folder 1:1 graph-test. Change-set = folder edge registered `planned`; `:Batch` retirement; map entries `app-code-defined-mapping` and `job-seal-app-ref` updated; mapping-store domain and `K2_SHAPE` in `drydocs_api/mappings.py`; manual-loads template rekeyed to `app_code`; explorer specs re-bound; 1:1 graph-test; this transcription; `gates.json` regenerated. |
+| G1 | CONFIRMED — the act is ORCHESTRATOR-FIRST: the steward picks the orchestrator before the folder filter, and that choice AUTHORS `(:BusinessApplication)-[:USES_SOFTWARE]->(:SoftwareProduct {role: orchestrator})`. The edge is created BY the confirmed mapping, never derived from a declaration. Folder filter is scoped to the picked orchestrator. |
+| G2 | CONFIRMED, EXISTING EDGES RULED — the SEAL-declared `batch_orchestrator` string demotes to PREFILL. Existing `USES_SOFTWARE {source: 'batch-port'}` edges are **KEPT with `origin=declared` until a confirmation supersedes them** — no cleanup sweep. Forward-looking demotion: each edge is corrected when a steward actually confirms that mapping. Cheaper than the `migrate_pat_alignment_c9.cypher` precedent, and it never destroys a value nothing has replaced. |
+| G3 | CONFIRMED — orchestrator cardinality is 1:N. (a) NEVER a uniqueness constraint — graph-TEST instead (the TOM-roles lesson); (b) the declared side is structurally 1:1 today and must become multi-valued before G2 can prefill honestly; (c) mid-migration is a NORMAL state and must never be reported as drift. |
+| G4 | RULED (b) — `active_state` **PER PORT** (`declared` or `confirmed`) REPLACES the `active` boolean, with `declared_by/at` and `confirmed_by/at/run_id`. The boolean is safe to drop producer-side: it is created `false` and never written true or read anywhere. SME correction to the agent's proposal: activation state is per-PORT, not per-orchestrator — the port answers "does this app run batch", the 1:N `USES_SOFTWARE` edges answer "scheduled by whom". Nothing collapses, because the orchestrator dimension lives on its own edge instead of being duplicated into the port flag. |
+| G4-RIDER | RULED — company ports already `active` by derivation are **GRANDFATHERED as `confirmed`**, provenance recorded as the Control-M app-code link. Because the initial series loads **Control-M only** (AutoSys follows once mapped better), the deriving orchestrator is unambiguous and no disambiguation pass is needed. |
+| G5 | CONFIRMED — C1(b) makes the two consistent by construction: the folder attaches to the Batch `:Port`, so "the relationship to the folders is created" IS that edge and confirmation is derivable with no separate trigger; the company's existing app-code-link derivation lines up rather than needing re-pointing. EVENT PORT: **declared-only** until an event source is onboarded — evidence-backed, since neither app-code loader touches the event port. |
+| G6 | RULED — the **COMPANY reading** of `(:Product)-[:HAS_APPLICATION]->(:BusinessApplication)`: a structural SUPPORT link, a Product supported by 2 or more applications (front-end/back-end), NOT the producer's "a Product owns a set of SEAL-registered applications". Chosen because the company reading is backed by a live extract and loader where the producer's is an unbuilt intention. Rider (ii) follows by entailment: the edge is 1:many by design, so the picker returns a LIST, never a single application. This is a BACK-FLOW to reconcile, not new build. |
+| G7 | CONFIRMED — E3 verbatim: the screen drafts a mapping-store row, the loader writes. The SME check/approval plus notes/user/date ARE the O13 mandatory-rationale and lifecycle chips (draft, submitted, gated, loaded) and become the confirmed edge's provenance (`origin`, `confirmed_by`, `confirmed_at`) — which is also what satisfies G4's confirmation stamp, so the two mechanisms are ONE. "Available folders" = **unmapped only, with naming-pattern as an OPTIONAL filter layered on top** — the pattern cannot be primary, given the naming-convention doc's own warning that a folder name does not reliably identify an application. ADDED by SME: `run_as_user` surfaced on the screen as a sort option. |
+| H | **SIGNED OFF** — chad.wilson, 2026-08-03. |
+
+### Rulings that emerged in session and were not on the page
+
+- **OWNER-NOT-USER.** A folder belongs to whoever OWNS it, not whoever USES it. Three SME
+  cases collapse to this one rule: a batch data-processing folder attributes to its one
+  application; a platform team's all-tenants utility folder attributes to the PLATFORM
+  TEAM's application, not fanned out across the tenants it serves; the Control-M platform's
+  own cross-data-center ordering folders attribute to one SEAL, the platform's own. The rule
+  is worth more than the cases because it decides the next case nobody has thought of yet.
+- **Folder to application is 1:1.** There is no legitimate 1:many, so a folder carrying two
+  application edges is a DEFECT, not a state. Enforced as a GRAPH-TEST: Neo4j cannot declare
+  relationship cardinality any more than it could declare the TOM-roles singleton. Note this
+  points the OPPOSITE way to G3's 1:N orchestrator ruling and both are right — neither is
+  declarable, and each follows its own reality.
+- **`:AreaProduct` is a ROUTING step, not a target.** The SME fact that decided it: *there is
+  no direct mapping of batch technical components to area product.* A folder and a job are
+  technical objects; an area product is an org/catalog grain. Wiring them would assert a
+  correspondence the source does not carry — the same failure C17's grain ruling turned on.
+  Consequence: every folder edge lands on a `:Port`, uniformly, which is what makes D2's
+  one-shape rule true rather than aspirational. The AreaProduct layer stays load-bearing as
+  steward-UI routing rather than as graph structure — a materially smaller obligation than
+  `lob-product-team.yaml` open question `area-product-missing` assumed.
+- **Tier 3 and G3 are the same lesson on two axes:** mid-migration is a normal state, not a
+  conflict. Dual-coded applications and multi-orchestrator applications both have to be
+  representable without being reported as drift.
+- **Bulk authoring CLOSED** — B1's fan-out already covers every folder under a code, so no
+  naming-convention pattern persists as a first-class object. Revisit only if cross-code
+  editing becomes a real burden.
+
+### Evidence gathered during the session
+
+- **Company-side implementation read (screenshot, structure only).** Both ports are seeded
+  `active = false` `ON CREATE` on every `:BusinessApplication` (`seal_applications.cypher`);
+  `ON CREATE` means a later SEAL reload will not reset it. **Two writers flip it true**, not
+  one: `controlm_app_codes.cypher` when a Control-M 3-char app code resolves to that
+  `seal_id`, and an AutoSys twin `autosys_app_codes.cypher`. G4-RIDER knew only about the
+  Control-M one. Consequences: G1 is corroborated harder than the rider argued — AutoSys is
+  not hypothetical company-side, the split has already been built twice; and the current
+  boolean MERGES the two writers, so `active = true` today means "scheduled by Control-M or
+  AutoSys, we do not know which", which is exactly what per-port state plus 1:N
+  `USES_SOFTWARE` edges separates cleanly. Nothing from the capture is transcribed beyond
+  mechanism (PUBLISH-BOUNDARY.md).
+- **BMC vendor corpus searched for the platform-ordering folder token** (374 chunks,
+  `drydocs` database). `Order Method` has three values — Automatic (Daily), None (Manual),
+  **Specific User Daily** — and `User Daily name` defines "User Daily jobs whose sole purpose
+  is to order jobs". No name EXAMPLES exist in the corpus, and the SaaS/API doc drops
+  Specific User Daily entirely. This corroborates owner-not-user from the vendor side: a User
+  Daily folder is scheduling INFRASTRUCTURE, not business workload, so attributing it to the
+  Control-M platform's own SEAL is what the object actually is. The token's expansion is
+  recorded SME-attested, not vendor-confirmed, in
+  `knowledge/standards/technology/folder-naming-convention.md`. The extract carries the Order
+  Method column, so deriving this folder class from a FIELD rather than a name pattern is
+  available — deliberately NOT taken now, recorded so nobody rediscovers it cold.
+
+### Guard-scope note
+
+This is a GATE commit. Per port-prompt guardrail 7 the J7 no-downgrade guards are
+PORT-scoped and must not be run across it: `arch_contains_batch` and `arch_contains_folder`
+moving `planned` to `deprecated` is an AUTHORIZED downgrade, and this entry is its authority.

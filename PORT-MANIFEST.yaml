@@ -292,6 +292,9 @@ rows:
     disposition: canonical-producer
   - path: "external/orchestration/**"
     disposition: canonical-producer
+  - path: "docs/restructure/k7-folder-mapping-decisions.md"
+    disposition: canonical-producer
+    note: "K7 gate WORKING diagram (folder->application decision flow, mermaid). The AUTHORITY for those rulings is the config/gate-log.md entry, which union-appends on its own row — this file is the readable companion, not the record. Mechanism only: no real app codes, SEAL ids or folder names."
   - path: "docs/restructure/0*.md"
     disposition: canonical-producer
     note: "conceptual model / plan / HITL flow docs"

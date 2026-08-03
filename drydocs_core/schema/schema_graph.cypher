@@ -117,8 +117,6 @@ MERGE (n:SchemaMeta:Bitbucket {name: 'Bitbucket'})
   SET n.class = 'dd:CodeRepository', n.prov_type = 'Entity';
 MERGE (n:SchemaMeta:PipelineService {name: 'PipelineService'})
   SET n.class = 'dd:PipelineService', n.prov_type = 'Entity';
-MERGE (n:SchemaMeta:Batch {name: 'Batch'})
-  SET n.class = 'dd:Batch', n.prov_type = 'Collection';
 MERGE (n:SchemaMeta:File {name: 'File'})
   SET n.class = 'dd:File', n.prov_type = 'Entity';
 MERGE (n:SchemaMeta:Vendor {name: 'Vendor'})
@@ -227,6 +225,10 @@ MERGE (a)-[r:EXECUTED_BY]->(b)
 MATCH (a:SchemaMeta {name: 'ControlMJob'}), (b:SchemaMeta {name: 'BusinessApplication'})
 MERGE (a)-[r:WAS_ASSOCIATED_WITH]->(b)
   SET r.vocab_id = 'm3_seal_app_ref', r.role = 'seal_app_ref', r.prov_maps_to = 'prov:wasAssociatedWith', r.domain = 'controlm', r.status = 'active';
+
+MATCH (a:SchemaMeta {name: 'ControlMFolder'}), (b:SchemaMeta {name: 'Port'})
+MERGE (a)-[r:BELONGS_TO_APPLICATION]->(b)
+  SET r.vocab_id = 'm3_belongs_to_application', r.role = 'seal_app_ref', r.prov_maps_to = null, r.domain = 'controlm', r.status = 'planned';
 
 MATCH (a:SchemaMeta {name: 'ControlMJob'}), (b:SchemaMeta {name: 'Script'})
 MERGE (a)-[r:INVOKES]->(b)
@@ -389,14 +391,6 @@ MERGE (a)-[r:STORED_IN]->(b)
 MATCH (a:SchemaMeta {name: 'Code'}), (b:SchemaMeta {name: 'PipelineService'})
 MERGE (a)-[r:CONTAINS_SERVICE]->(b)
   SET r.vocab_id = 'arch_contains_service', r.prov_maps_to = 'prov:hadMember', r.domain = 'architecture', r.status = 'planned';
-
-MATCH (a:SchemaMeta {name: 'BusinessApplication'}), (b:SchemaMeta {name: 'Batch'})
-MERGE (a)-[r:CONTAINS_BATCH]->(b)
-  SET r.vocab_id = 'arch_contains_batch', r.prov_maps_to = null, r.domain = 'architecture', r.status = 'planned';
-
-MATCH (a:SchemaMeta {name: 'Batch'}), (b:SchemaMeta {name: 'ControlMFolder'})
-MERGE (a)-[r:CONTAINS_FOLDER]->(b)
-  SET r.vocab_id = 'arch_contains_folder', r.prov_maps_to = 'prov:hadMember', r.domain = 'architecture', r.status = 'planned';
 
 // ── domain: registry ────────────────────────────────────────────────────────
 

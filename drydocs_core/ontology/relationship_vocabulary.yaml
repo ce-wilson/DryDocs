@@ -927,10 +927,54 @@ local_relationships:
       reclass re-opens the edge SHAPE at its own follow-up gate (see the
       map entry's type_conflict_note); the confirmed match policy itself
       is shape-agnostic and carries over.
+      K7 CLOSE-OUT (gate seal-app-ref-edge-reshape, SIGNED OFF 2026-08-03):
+      this JOB-grain edge is SUPERSEDED by m3_belongs_to_application at the
+      FOLDER grain (§A1) — no per-job application edge is authored going
+      forward. The match policy itself is NOT re-opened (§B3): it DEMOTES to
+      a fallback tier for app codes with no steward-defined row, and every
+      fallback-derived value is DISCLOSED via the origin flag rather than
+      presented as defined. Stays active until the K7 build migrates it.
     supplement:   ontology_supplement.cypher
     loader:       seal_attribution.cypher
     domain:       controlm
     status:       active
+
+  - id:           m3_belongs_to_application
+    neo4j_label:  BELONGS_TO_APPLICATION
+    inverse_label: "application for"
+    role:         seal_app_ref
+    from_node:    ControlMFolder
+    to_node:      Port
+    prov_maps_to: ~
+    note: >
+      FOLDER-grain application attribution — the K7 close-out ruling (gate
+      seal-app-ref-edge-reshape, SIGNED OFF 2026-08-03) that supersedes the
+      job-grain m3_seal_app_ref. Target is the application's BatchProcessing
+      :Port, NOT :BusinessApplication (§C1): the app node is already the hub
+      for SEAL record semantics — TOM roles, contacts, product links,
+      orchestrator edges — so hanging every folder off it concentrates batch
+      topology on the one node that can least afford it. The port is the
+      batch-facing side; the app node stays a record, not a junction.
+      prov_maps_to is deliberately null (§D1 option a): ControlMFolder
+      (Collection ⊑ Entity) → Port is an Entity→Entity governance/containment
+      fact with no natural PROV verb — the SCHEDULED_ON / reg_uses_software
+      precedent. ONE shape everywhere (§D2): loader edge, manual tier-5
+      writer, migration target. Folder→application is 1:1 by SME ruling
+      (OWNER-NOT-USER: a folder belongs to whoever OWNS it, not whoever USES
+      it — a platform team's all-tenants utility folder belongs to the
+      platform team), enforced as a GRAPH-TEST because Neo4j cannot declare
+      relationship cardinality — the TOM-roles precedent. Jobs INHERIT via
+      m3_contains_job; authoring is one steward-defined row per Control-M app
+      code, fanned out to folders via m3_contains_folder (§B1). Tier 2
+      (shared platform code) resolves per folder with :AreaProduct as a
+      ROUTING step, never an edge target — there is no direct mapping of
+      batch technical components to area product (SME 2026-08-03).
+      PLANNED — no loader until the K7 build items land; nothing writes this
+      edge yet.
+    supplement:   ~
+    loader:       ~
+    domain:       controlm
+    status:       planned
 
   - id:           m3_invokes
     neo4j_label:  INVOKES
@@ -1798,10 +1842,16 @@ local_relationships:
       Was mermaid "CONTAINS". Application (Agent) → Batch (Collection):
       Agent sources have no containment row in the matrix, so this stays
       local. Structural app hierarchy only.
+      RETIRED at the K7 close-out gate (seal-app-ref-edge-reshape §C2, SIGNED
+      OFF 2026-08-03): never gated, never loaded, and the steward-defined
+      app-code mapping supersedes the role this bridge was drawn for. The SME
+      named no live use for a distinct :Batch node. NOTE the surviving twin:
+      m3_contains_folder (:ControlMApplication → :ControlMFolder, ACTIVE) is a
+      DIFFERENT edge and is load-bearing — it is the fan-out path §B1 relies on.
     supplement:   catalog_ontology_supplement.cypher
     loader:       ~
     domain:       architecture
-    status:       planned
+    status:       deprecated
 
   - id:           arch_contains_folder
     neo4j_label:  CONTAINS_FOLDER
@@ -1813,10 +1863,16 @@ local_relationships:
     note: >
       Was mermaid "CONTAINS". Batch (prov:Collection) → ControlMFolder.
       Matrix row: Collection → any = HAD_MEMBER; domain label kept.
+      RETIRED at the K7 close-out gate (seal-app-ref-edge-reshape §C2, SIGNED
+      OFF 2026-08-03): never gated, never loaded, and the steward-defined
+      app-code mapping supersedes the role this bridge was drawn for. The SME
+      named no live use for a distinct :Batch node. NOTE the surviving twin:
+      m3_contains_folder (:ControlMApplication → :ControlMFolder, ACTIVE) is a
+      DIFFERENT edge and is load-bearing — it is the fan-out path §B1 relies on.
     supplement:   catalog_ontology_supplement.cypher
     loader:       ~
     domain:       architecture
-    status:       planned
+    status:       deprecated
 
   # ── Software registry (plan 07, gate-confirmed 2026-07-07) ───────────────
 

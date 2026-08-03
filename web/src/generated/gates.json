@@ -325,6 +325,7 @@
       "log_ref": "config/gate-log.md:804",
       "unblocks": [
         "K7",
+        "K11",
         "C17",
         "S3",
         "J24",
@@ -345,6 +346,7 @@
       "unblocks": [
         "K2",
         "K7",
+        "K11",
         "C17",
         "S1",
         "S3",
@@ -444,6 +446,7 @@
       "log_ref": "config/gate-log.md:1136",
       "unblocks": [
         "K7",
+        "K11",
         "C17",
         "S3",
         "J24",
@@ -467,6 +470,28 @@
       "prompt_files": [],
       "log_ref": "config/gate-log.md:1225",
       "unblocks": []
+    },
+    {
+      "kind": "log-entry",
+      "date": "2026-08-03",
+      "title": "GATE: seal-app-ref-edge-reshape (backlog K7) — SIGNED OFF, 24/24",
+      "status": "signed-off",
+      "prompt_files": [
+        "config/gate-prompts/seal-app-ref-edge-reshape.yaml",
+        "config/gate-prompts/ui-write-surface.yaml"
+      ],
+      "log_ref": "config/gate-log.md:1251",
+      "unblocks": [
+        "K7",
+        "K11",
+        "O20",
+        "C17",
+        "O24",
+        "O25",
+        "S3",
+        "J24",
+        "J28"
+      ]
     },
     {
       "kind": "prompt-only",

@@ -463,6 +463,30 @@ verification status in [BRACKETS]; spend review on [UNRULED].
     (structure to adapt by hand, value yours — the standing divergence).
     `EXPECTED_CONSTRAINTS` does not move.
 
+60. K7 — APPLICATION↔CONTROL-M ATTRIBUTION CLOSE-OUT GATE **SIGNED OFF**
+    [SME-SIGNED] (gate-log `seal-app-ref-edge-reshape`, 24/24; §G6-RIDER was
+    already ruled at C17 2026-08-01 and is NOT re-opened). Grain moves job →
+    FOLDER; the edge is `BELONGS_TO_APPLICATION` (LOCAL, `prov_maps_to: ~`)
+    onto the app's Batch `:Port` — NOT `:BusinessApplication`, which is
+    supernode avoidance, not taste. K2 matching DEMOTES to a fallback that is
+    always DISCLOSED via the origin flag. `:Batch` bridge RETIRED
+    (`arch_contains_batch`/`arch_contains_folder` planned→deprecated) — do NOT
+    confuse these with `m3_contains_folder`, which stays ACTIVE and is the
+    load-bearing fan-out path. Build items K8–K13 opened BY the gate.
+    GUARDRAIL 6: union-append the gate-log entry, take the vocab entries
+    (`m3_belongs_to_application` is PLANNED — no loader) and the map flip;
+    every graph write stays yours.
+    GUARDRAIL 7: this is a GATE commit — do NOT run the no-downgrade guards
+    across it. The arch_* deprecation is an AUTHORIZED downgrade and the
+    gate-log entry is its authority.
+    ***YOUR T1 PREMISE CHANGED.*** T1 is the K2 JOB-grain live load; that grain
+    is now superseded. Re-scope T1 to the folder grain rather than running it as
+    written. Second live-behaviour note: your TWO app-code loaders (Control-M +
+    the AutoSys twin) write `Port.active` by derivation — K10 replaces that
+    boolean with per-port `active_state`, and your already-active ports
+    grandfather as `confirmed` with the Control-M link as provenance (§G4-RIDER).
+    `EXPECTED_CONSTRAINTS` does not move.
+
 ACCEPTANCE GATE (behavior is the contract, not a byte-compare):
 - Track 1 (portable):
     poetry run pytest tests/unit/test_variable_classifier.py tests/unit/test_variable_resolver.py \
@@ -479,8 +503,8 @@ ACCEPTANCE GATE (behavior is the contract, not a byte-compare):
   capability_assert=false skips per T18). A retired-id refusal from
   `SourceRegistry.from_yaml` is the D4 guard WORKING, not a port failure — rebind the
   loader in `loader-source-overlay.yaml`, never by re-adding the retired id.
-  Producer reference at the current head (step 59, `aa0a0eb`): 1354 passed /
-  7 skipped with the production CSV **ABSENT** and RECONCILE_BEFORE_DIR unset
+  Producer reference at the current head (step 60, the K7 sign-off): 1354
+  passed / 7 skipped with the production CSV **ABSENT** and RECONCILE_BEFORE_DIR
   (4 J7 guards + 3 sample-backed) — the step-48 precedent for quoting a
   CSV-absent figure. NOT comparable line-for-line with the step-58 figure
   (1356 / 5, CSV present); `aa0a0eb`'s commit message quotes 1358 / 3, which is

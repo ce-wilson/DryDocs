@@ -313,8 +313,8 @@
         },
         {
           "id": "app-code-defined-mapping",
-          "status": "proposed",
-          "label": "ATTRIBUTED_TO_APPLICATION"
+          "status": "confirmed",
+          "label": "BELONGS_TO_APPLICATION"
         }
       ],
       "loaders": [
