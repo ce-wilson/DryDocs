@@ -795,6 +795,75 @@ verification status in [BRACKETS]; spend review on [UNRULED].
     not churn). cypher-shell scripts: copy the file and use `-f`; never pipe
     content through PowerShell 5.1.
 
+75. Q6+Q12 — THE DOCMETA COMPONENT (laptop `d647171`; T21 discharged in the
+    same commit, which was the only ledger touch — this step closes that
+    gap). `drydocs_docmeta/` lands: connectors (`base.py` protocol +
+    `RawPage` + `SourceUnavailableError`; `web.py` stdlib urllib, injectable
+    transport, SSRF scheme allow-list, and the Q12 page-count refusal;
+    `filedrop.py`), pipeline + capture policy in one home; module-boundary
+    rows added. Producer-AUTHORED against the T21 description, never a copy
+    of your tree — your `connectors/` stays canonical-company.
+
+76. SDLC APPLICATION RUN BOOK — FOURTH DOC TYPE (`995eb9a`)
+    [LIKE-FOR-LIKE]. `docs/design/templates/sdlc-app-runbook.outline.yaml`
+    (22 sections captured verbatim from a real 56-page Informatica-ETL run
+    book) + synthesized `sdlc-app-runbook.example.md` (OrderHub, synthetic
+    SEAL block). Deliberately in `templates/` — OUTSIDE the
+    `docs/design/*-runbook.md` governed-sweep glob, so no rev machinery
+    attaches. +2 outline pins in `test_doc_outline.py`.
+
+77. EXCEL MINIMUM-VIABLE RUNBOOK SKILL (`69e1dbe`)
+    `.claude/skills/controlm-runbook-automation-excel/`: template-spec.yaml
+    (2 tabs: 48 Technical_Details rows + 35 job columns, per-field
+    `source: graph|graph-partial|manual`) -> `generate_template.py`
+    (openpyxl, new dev dep) -> committed xlsx. 31/35 job columns
+    graph-derivable. Synthetic values only (SEAL 70004 — the J15 guard
+    caught the original 90123 on first tracked run; reswept, not
+    allowlisted). FILLED workbooks are Internal — never in the skill dir.
+
+78. CONTROLM-PIPELINE-STUB CAPTURE + OPUS WORK ORDER (`0c77426`)
+    [INTERNAL PATHS]. `internal/controlm-config/reference/
+    controlm-pipeline-stub-capture.md` (verbatim: builder catalog, folder/
+    job-name grammars, Folder.xsd contract, DoMail defaults, inheritance
+    table) + `controlm-pipeline-stub-integration-plan.md` (items X1-X3/
+    W1-W4/V1-V2/E1-E4/F1 for YOUR internal Opus agent; deploy/ = SoD,
+    out of scope). Producer-twin groom trigger inboxed; DD-ids are yours.
+
+79. G36 — :BusinessApplication INDEX DROPS (`ea66764`) [LIVE-VERIFIED
+    desktop `neo4jtest`/`drydocs`]. `businessapplication_status/risk/name`
+    removed AND explicitly `DROP INDEX IF EXISTS`'d (the port_unique
+    belt-and-braces — removing the CREATE alone leaves live DBs carrying
+    the stale claim). Recorded rulings: NO index for `manually_created` or
+    `batch_orchestrator_last_run_id` (offline reporting at registry
+    cardinality). `EXPECTED_CONSTRAINTS` does NOT move — these were
+    indexes, not constraints. Re-run bootstrap after taking this.
+
+80. L20 — FEEDBACK STRAY-FILE GUARD (`c075ee2`, +4 tests -> 1505/5).
+    `DesignDocFeedbackAdapter.stray_files()`: top-level files in
+    `docs/design/feedback/` that are neither `<doc>-rev<N>.yaml` nor
+    README.md become findings; `DocFeedbackLoader` WARNs the list after
+    load (duck-typed — fake adapters unaffected). A standing test asserts
+    the committed feedback tree is stray-free — if YOUR feedback dir holds
+    loose files, it reds correctly; rename or move them, don't exempt.
+
+81. S5 — THE REGISTRY SPLIT [STRUCTURE-BREAKING for tooling; PORT-MANIFEST
+    updated] (`d84d86b`, +10 tests -> 1515/5). BOTH central registries are
+    now fragment DIRECTORIES (`config/taxonomy-ontology-map/`,
+    `drydocs_core/ontology/relationship_vocabulary/`) read by ONE loader
+    (`drydocs_core/yaml_fragments.py`: sorted-filename concatenation, loud
+    on duplicate keys/ids, single files still first-class). Split-time
+    proof: 83+38 entries deep-equal; ONLY entry order changed
+    (domain-grouped) — `schema_graph.cypher` regenerated in the commit.
+    ***YOUR SIDE:*** apply the SPLIT SHAPE, not a conflict resolution — the
+    manifest rows now glob the directories and say exactly that. Any of
+    your own scripts reading the two old file paths must repoint (grep for
+    both names); the reconcile-port snapshot step now writes the MERGED
+    documents (skill + guard docstring updated). Per-entry rules unchanged.
+
+    (Chores in the same range, no separate steps: `5d2d5bc` groom promoted
+    K15 — union by id as usual; claim/close/board/snapshot commits carry
+    only backlog.yaml + renders, all per-entry/derived.)
+
 ACCEPTANCE GATE (behavior is the contract, not a byte-compare):
 - Track 1 (portable):
     poetry run pytest tests/unit/test_variable_classifier.py tests/unit/test_variable_resolver.py \
@@ -811,8 +880,8 @@ ACCEPTANCE GATE (behavior is the contract, not a byte-compare):
   capability_assert=false skips per T18). A retired-id refusal from
   `SourceRegistry.from_yaml` is the D4 guard WORKING, not a port failure — rebind the
   loader in `loader-source-overlay.yaml`, never by re-adding the retired id.
-  Producer reference at the current head (step 74, the encoding standard):
-  1450
+  Producer reference at the current head (step 81, the registry split):
+  1515
   passed / 5 skipped with the production CSV PRESENT and no
   RECONCILE_BEFORE_DIR (4 J7 guards + the graphrag PDF) — the like-for-like
   chain: step 58 1356/5 → step 61 1384/5 (+28 K9 guards) → step 63 1399/5
@@ -820,7 +889,9 @@ ACCEPTANCE GATE (behavior is the contract, not a byte-compare):
   delta) → step 68 1413/5 (+3 U12; step 69 no delta) → step 70 1420/5
   (+7 C22) → step 71 1427/5 (+7 J18/J26/J27/J28) → step 72 1430/5 (+3 M4
   property-term guards) → step 73 1449/5 (+19 Q13) → step 74 1450/5
-  (+1 J29). The
+  (+1 J29) → steps 75–78 1501/5 (measured at `0c77426`: Q6/Q12 docmeta
+  suites + SDLC outline pins) → step 80 1505/5 (+4 L20) → step 81 1515/5
+  (+10 S5 fragments). The
   step-60 figure (1354 / 7) was CSV-ABSENT without RECONCILE_BEFORE_DIR and is
   not comparable line-for-line; `aa0a0eb`'s commit message quotes 1358 / 3,
   which is the step-59 run with RECONCILE_BEFORE_DIR set. Earlier producer
