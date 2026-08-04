@@ -26,22 +26,6 @@ Tags help grooming: `idea` · `bug` · `doc` · `source` (new data source) · `q
 
 <!-- add new ideas at the top -->
 
-- 2026-08-04 — [question] **Nothing compares the depgraph checkout against
-  `dev-environment.yaml`'s `expected_commit` — the pin is documentation, not a check.**
-  Residual of the same-day instrument drift, which is otherwise RESOLVED (sibling pulled to
-  `773fb1e`, pin bumped, both machines now on one instrument — see the audit trail).
-  `snapshot.ps1` records the instrument commit into the meta header and refuses on a failed
-  CAPABILITY probe, but it never asks whether the checkout is the revision the config names,
-  and `test_probe_instrument.py` only asserts `expected_commit` is truthy. So a stale sibling
-  scans silently, which is exactly what happened. Why the capability probe cannot cover it:
-  both revisions report `multi_root` + `tree` true, because the newer commits add edge TYPES
-  rather than a capability — behavioural probing is the right idea and still misses this
-  class. Options: compare-and-warn in `snapshot.ps1` (cheap, no network), compare-and-refuse
-  (consistent with the capability stance but blocks work on a legitimately-ahead sibling), or
-  a test that fetches (slow, network-dependent, and wrong for a unit suite). Needs a ruling
-  on which, and it interacts with the `depgraph` in-housing question below — in-housing would
-  delete this whole class, since the tool would be pinned by `poetry.lock`. (laptop — J18)
-
 - 2026-08-04 — [source] **`controlm-pipeline-stub` captured + integration plan written (internal).**
   The internal DPL Control-M XML builder/validator package (config → generate → validate →
   upload → runtime, 14/14 green) is captured VERBATIM at
@@ -799,6 +783,31 @@ Tags help grooming: `idea` · `bug` · `doc` · `source` (new data source) · `q
   an app). Cosmetic; hide or restructure later.
 
 ## Recently groomed (audit trail)
+
+- 2026-08-04 (session close, laptop) — [question] "nothing compares the checkout against
+  `expected_commit`" → **RULED AND BUILT SAME SESSION (user: "warn in snapshot.ps1"), no
+  backlog id.** `snapshot.ps1` now reads the pin, compares against the revision it records
+  (`$depFull`, not a fresh HEAD), and warns with a drift classification that says what to do:
+  *ahead* → the pin is the stale side, bump it; *behind* → this scan is stale and not
+  comparable, `pull --ff-only`; *diverged* → the fork shape behind the 105-edge undercount,
+  resolve first; *unknown* → the pinned commit is absent, fetch. An explicit "currency
+  UNCHECKED" warning fires when the pin cannot be read, so a silent no-op is never mistaken
+  for a clean check. WARN and not refuse was the ruled point: a sibling ahead of the pin is
+  how a bump starts, so refusing would block the fix. All six paths exercised by executing
+  the block extracted from the real file against synthetic states.
+  Two defects found while building it, both worth remembering. (1) The classifier first
+  compared against a fresh `HEAD` rather than the captured `$depFull` — identical in a normal
+  run, so only the test matrix caught it, and it misreported *behind* as *ahead*, the one
+  direction that matters. (2) The advice strings were first written with em dashes and BROKE
+  THE SCRIPT: the file is UTF-8 without a BOM, PS 5.1 therefore decodes it as CP1252, and a
+  UTF-8 em dash arrives ending in a smart quote that PowerShell honours as a string
+  delimiter — the string closed early and the whole file failed to parse (confirmed with
+  `Parser::ParseFile` on the real file). Em dashes in comments and here-strings are harmless
+  and stay. A repo-wide guard now reds on non-ASCII inside a single-line quoted string in any
+  BOM-less `.ps1`, proven red on a probe before being kept. Note J29's encoding standard
+  covers `.cypher`/`.sql`/`.csv` and deliberately not `.ps1`, so this is a neighbouring rule,
+  not a J29 gap. Also removed: the capability refusal's hardcoded `depgraph 5006567`, stale
+  since the morning's bump — it quotes the configured pin now.
 
 - 2026-08-04 (session close, laptop) — [bug]×2 the instrument-drift pair → **BOTH RESOLVED
   SAME SESSION on user direction ("pull the depgraph sibling and bump the pin"), no backlog
