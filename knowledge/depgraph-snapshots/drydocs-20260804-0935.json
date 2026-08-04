@@ -1,17 +1,17 @@
 {
   "meta": {
     "project": "drydocs",
-    "captured_at": "2026-08-04T09:32:35",
+    "captured_at": "2026-08-04T09:35:31",
     "date": "20260804",
     "scan": "DryDocs",
     "tree": true,
     "git": {
-      "commit": "b02fec7",
-      "full": "b02fec73c8d03009a8f8ab7802eef56936200315",
+      "commit": "7ec106a",
+      "full": "7ec106a5314b84e8ee6d3c36dd52543d9eee5d37",
       "branch": "main",
-      "describe": "b02fec7",
-      "subject": "chore(backlog): claim U12 in_progress (snapshot retention enforcement; pushed before work)",
-      "dirty": true,
+      "describe": "7ec106a",
+      "subject": "chore(ritual): U12 done — snapshot retention enforced in snapshot.ps1, proven live on five stale files; step 68 ledgered",
+      "dirty": false,
       "pr": null
     },
     "depgraph": {
@@ -12308,46 +12308,10 @@
       "kind": "file"
     },
     {
-      "file_id": "drydocs/knowledge/depgraph-snapshots/drydocs-20260802.json",
-      "name": "drydocs-20260802.json",
+      "file_id": "drydocs/knowledge/depgraph-snapshots/drydocs-20260804.json",
+      "name": "drydocs-20260804.json",
       "extension": ".json",
-      "rel_path": "knowledge/depgraph-snapshots/drydocs-20260802.json",
-      "project": "drydocs",
-      "circular": false,
-      "kind": "file"
-    },
-    {
-      "file_id": "drydocs/knowledge/depgraph-snapshots/drydocs-20260803-1844.json",
-      "name": "drydocs-20260803-1844.json",
-      "extension": ".json",
-      "rel_path": "knowledge/depgraph-snapshots/drydocs-20260803-1844.json",
-      "project": "drydocs",
-      "circular": false,
-      "kind": "file"
-    },
-    {
-      "file_id": "drydocs/knowledge/depgraph-snapshots/drydocs-20260803-2341.json",
-      "name": "drydocs-20260803-2341.json",
-      "extension": ".json",
-      "rel_path": "knowledge/depgraph-snapshots/drydocs-20260803-2341.json",
-      "project": "drydocs",
-      "circular": false,
-      "kind": "file"
-    },
-    {
-      "file_id": "drydocs/knowledge/depgraph-snapshots/drydocs-20260803-2353.json",
-      "name": "drydocs-20260803-2353.json",
-      "extension": ".json",
-      "rel_path": "knowledge/depgraph-snapshots/drydocs-20260803-2353.json",
-      "project": "drydocs",
-      "circular": false,
-      "kind": "file"
-    },
-    {
-      "file_id": "drydocs/knowledge/depgraph-snapshots/drydocs-20260804-0920.json",
-      "name": "drydocs-20260804-0920.json",
-      "extension": ".json",
-      "rel_path": "knowledge/depgraph-snapshots/drydocs-20260804-0920.json",
+      "rel_path": "knowledge/depgraph-snapshots/drydocs-20260804.json",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -13428,6 +13392,15 @@
       "name": "test_database_names.py",
       "extension": ".py",
       "rel_path": "tests/unit/test_database_names.py",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/tests/unit/test_depgraph_snapshots.py",
+      "name": "test_depgraph_snapshots.py",
+      "extension": ".py",
+      "rel_path": "tests/unit/test_depgraph_snapshots.py",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -24538,27 +24511,7 @@
     [
       "drydocs/knowledge/depgraph-snapshots",
       "CONTAINS",
-      "drydocs/knowledge/depgraph-snapshots/drydocs-20260802.json"
-    ],
-    [
-      "drydocs/knowledge/depgraph-snapshots",
-      "CONTAINS",
-      "drydocs/knowledge/depgraph-snapshots/drydocs-20260803-1844.json"
-    ],
-    [
-      "drydocs/knowledge/depgraph-snapshots",
-      "CONTAINS",
-      "drydocs/knowledge/depgraph-snapshots/drydocs-20260803-2341.json"
-    ],
-    [
-      "drydocs/knowledge/depgraph-snapshots",
-      "CONTAINS",
-      "drydocs/knowledge/depgraph-snapshots/drydocs-20260803-2353.json"
-    ],
-    [
-      "drydocs/knowledge/depgraph-snapshots",
-      "CONTAINS",
-      "drydocs/knowledge/depgraph-snapshots/drydocs-20260804-0920.json"
+      "drydocs/knowledge/depgraph-snapshots/drydocs-20260804.json"
     ],
     [
       "drydocs/knowledge/depgraph-snapshots",
@@ -25094,6 +25047,11 @@
       "drydocs/tests/unit",
       "CONTAINS",
       "drydocs/tests/unit/test_database_names.py"
+    ],
+    [
+      "drydocs/tests/unit",
+      "CONTAINS",
+      "drydocs/tests/unit/test_depgraph_snapshots.py"
     ],
     [
       "drydocs/tests/unit",
@@ -26280,13 +26238,13 @@
     "projects": [
       "drydocs"
     ],
-    "files": 1470,
+    "files": 1467,
     "edges": 472,
     "circular_files": 0,
     "processes": 0,
     "data_assets": 0,
     "hosts": 0,
-    "rels": 1763,
+    "rels": 1760,
     "directories": 256
   }
 }
