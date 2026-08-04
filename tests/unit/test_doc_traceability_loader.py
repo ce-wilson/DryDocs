@@ -223,3 +223,30 @@ def test_feedback_derived_anchor_degrades_to_base(tmp_path: Path) -> None:
     assert rows[0]["doc_rev"] == 3
     assert rows[0]["status"] == "open"  # default when the yaml carries none
     assert rows[0]["author"] is None
+
+
+def test_feedback_stray_files_are_findings(tmp_path: Path) -> None:
+    """L20 — the misnamed Copy-feedback export (2026-07-28) must be visible."""
+    (tmp_path / "some-doc-rev1.yaml").write_text(
+        "doc: some-doc\nnotes:\n  - anchor: design\n    note: fine\n", encoding="utf-8"
+    )
+    (tmp_path / "README.md").write_text("expected extra\n", encoding="utf-8")
+    (tmp_path / "scans").mkdir()  # the L6 paper archive — a dir, never a finding
+    (tmp_path / "scans" / "page1.png").write_bytes(b"\x89PNG")
+    (tmp_path / "some-doc-rev1 - Copy.yaml").write_text("doc: some-doc\n", encoding="utf-8")
+    (tmp_path / "notes.txt").write_text("loose notes\n", encoding="utf-8")
+
+    adapter = DesignDocFeedbackAdapter(tmp_path)
+    assert adapter.stray_files() == ["notes.txt", "some-doc-rev1 - Copy.yaml"]
+    # the stray yaml is a finding, not a row — rows() still loads only the
+    # well-named export
+    assert {r["doc_id"] for r in adapter.rows()} == {"some-doc"}
+
+
+def test_feedback_stray_files_empty_cases(tmp_path: Path) -> None:
+    assert DesignDocFeedbackAdapter(tmp_path / "absent").stray_files() == []
+    assert DesignDocFeedbackAdapter(FEEDBACK_DIR).stray_files() == [], (
+        "the committed feedback/ directory carries a file matching no "
+        "<doc>-rev<N>.yaml pattern — rename it so its notes load, move it "
+        "under scans/, or add it to expected_extra_names with a reason"
+    )

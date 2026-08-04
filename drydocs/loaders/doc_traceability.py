@@ -349,6 +349,11 @@ class DesignDocFeedbackAdapter:
 
     name = "design-docs-feedback"
 
+    #: top-level files that are legitimately not feedback exports: the
+    #: directory's own README. Subdirectories (scans/, the L6 paper archive)
+    #: are outside the contract by shape, not by name.
+    expected_extra_names: ClassVar[frozenset[str]] = frozenset({"README.md"})
+
     def __init__(self, feedback_dir: Path | str = DEFAULT_FEEDBACK_DIR) -> None:
         self.feedback_dir = Path(feedback_dir)
 
@@ -362,6 +367,26 @@ class DesignDocFeedbackAdapter:
         tb: TracebackType | None,
     ) -> None:
         return None
+
+    def stray_files(self) -> list[str]:
+        """L20 — files in feedback/ that match no expected pattern, as findings.
+
+        The L5 Copy-feedback export trusts the human to name the file
+        ``<doc>-rev<N>.yaml``, and until 2026-07-28 a wrong name (``... - Copy
+        .yaml``, ``...-rev1 (1).yaml``) was invisible: outside the loader's
+        glob-plus-regex filter, silently ignored, feedback never loaded. Every
+        top-level file that is neither a well-named export nor an expected
+        extra is a finding for the caller to surface — never silence.
+        """
+        if not self.feedback_dir.is_dir():
+            return []
+        return sorted(
+            p.name
+            for p in self.feedback_dir.iterdir()
+            if p.is_file()
+            and p.name not in self.expected_extra_names
+            and not _FEEDBACK_FILE_RE.match(p.name)
+        )
 
     def rows(self) -> Iterator[dict]:
         for fb_path in sorted(self.feedback_dir.glob("*.y*ml")):
@@ -530,6 +555,7 @@ class DocFeedbackLoader(_SectionPrereqLoader):
         super().__init__(*args, **kwargs)
         self.authors_sent: set[str] = set()
         self.unknown_authors: list[str] = []
+        self.stray_feedback_files: list[str] = []
 
     def _assert_prereqs(self) -> None:
         super()._assert_prereqs()
@@ -538,6 +564,26 @@ class DocFeedbackLoader(_SectionPrereqLoader):
     def _report_link_coverage(self) -> None:
         super()._report_link_coverage()
         self._report_unknown_authors()
+        self._report_stray_files()
+
+    def _report_stray_files(self) -> None:
+        """L20 — a misnamed export in feedback/ is a finding, not silence.
+
+        Duck-typed so a fake adapter without the census stays valid; the real
+        DesignDocFeedbackAdapter always carries it."""
+        census = getattr(self.adapter, "stray_files", None)
+        if census is None:
+            return
+        self.stray_feedback_files = census()
+        if self.stray_feedback_files:
+            LOGGER.warning(
+                "Loader %s: %d file(s) in the feedback directory match no "
+                "expected <doc>-rev<N>.yaml pattern and were NOT loaded — "
+                "rename them to load their notes, or remove them: %s",
+                self.name,
+                len(self.stray_feedback_files),
+                ", ".join(self.stray_feedback_files),
+            )
 
     def to_params(self, model: BaseModel) -> dict:
         params = super().to_params(model)

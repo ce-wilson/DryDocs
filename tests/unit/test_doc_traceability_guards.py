@@ -18,6 +18,7 @@ from pathlib import Path
 import pytest
 
 from drydocs.loaders.doc_traceability import (
+    DesignDocFeedbackAdapter,
     DocFeedbackLoader,
     DocTraceabilityLoader,
 )
@@ -216,6 +217,34 @@ def test_feedback_unmatched_anchor_and_unknown_author_are_listed() -> None:
     assert summary.status == "OK"
     assert loader.unmatched_anchors == [{"doc_id": "synth-tdd", "anchor": "ghost-anchor"}]
     assert loader.unknown_authors == ["E9"]
+
+
+def test_feedback_stray_files_reported_after_load(tmp_path: Path, caplog) -> None:
+    """L20 — a misnamed export beside a good one: the load completes, the
+    stray is listed and warned, never silently ignored (the 2026-07-28
+    Copy-feedback dead end, made detectable)."""
+    (tmp_path / "synth-tdd-rev1.yaml").write_text(
+        "doc: synth-tdd\nnotes:\n  - anchor: design\n    note: fine\n",
+        encoding="utf-8",
+    )
+    (tmp_path / "synth-tdd-rev1 - Copy.yaml").write_text("doc: synth-tdd\n", encoding="utf-8")
+    client = _FakeClient(sections={("synth-tdd", "design")})
+    loader = DocFeedbackLoader(client, DesignDocFeedbackAdapter(tmp_path), run_log=False)
+    with caplog.at_level("WARNING"):
+        summary = loader.load()
+    assert summary.status == "OK"
+    assert loader.stray_feedback_files == ["synth-tdd-rev1 - Copy.yaml"]
+    assert "synth-tdd-rev1 - Copy.yaml" in caplog.text
+    assert "NOT loaded" in caplog.text
+
+
+def test_feedback_fake_adapter_without_stray_census_is_tolerated() -> None:
+    """The report is duck-typed: an adapter with no stray_files census (the
+    fakes here, any future row source) never breaks the load."""
+    client = _FakeClient(sections={("synth-tdd", "design")})
+    loader = _feedback_loader(client, [_note_row("design")])
+    assert loader.load().status == "OK"
+    assert loader.stray_feedback_files == []
 
 
 # ---- the template documents where its prereq is enforced ----------------------
