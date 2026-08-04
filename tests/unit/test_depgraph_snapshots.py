@@ -75,3 +75,112 @@ def test_readme_documents_what_the_script_does() -> None:
             f"README links {target} as a present file but the directory does not contain it — "
             f"restate it as history recoverable from git instead of linking it"
         )
+
+
+# --- instrument currency (2026-08-04) ----------------------------------------
+
+
+def _script() -> str:
+    return (SNAP_DIR / "snapshot.ps1").read_text(encoding="utf-8")
+
+
+def test_script_compares_the_checkout_against_the_pin() -> None:
+    """The check the capability probe cannot do.
+
+    A depgraph revision can pass every behavioural probe and still be stale,
+    because new commits often add edge TYPES rather than capabilities. On
+    2026-08-04 the laptop scanned on 5006567 while the desktop was already on
+    773fb1e and nothing said so, leaving two snapshots that were not comparable
+    by construction. `expected_commit` is the only record of the intended
+    revision, so the script must read it and compare.
+    """
+    script = _script()
+    assert "expected_commit" in script, (
+        "snapshot.ps1 no longer reads depgraph.expected_commit — instrument drift is "
+        "invisible again (the 2026-08-04 two-machine divergence)"
+    )
+    assert "merge-base --is-ancestor" in script, (
+        "the drift classification is gone; a bare mismatch cannot tell 'sibling ahead' "
+        "(benign, bump the pin) from 'sibling behind' (this scan is stale)"
+    )
+    # It must reason about the revision it RECORDS, not a freshly-read HEAD —
+    # they agree in a normal run, but the recorded one is what the snapshot is
+    # attributed to. An early version compared against HEAD and misreported
+    # 'behind' as 'ahead'.
+    assert "--is-ancestor $expCommit $depFull" in script, (
+        "the ancestry test must compare against $depFull (the captured, recorded "
+        "instrument revision), not against a fresh HEAD"
+    )
+
+
+def test_instrument_drift_warns_and_never_refuses() -> None:
+    """Ruled 2026-08-04: WARN, do not refuse.
+
+    A sibling legitimately AHEAD of the pin is the normal way a bump starts, so
+    a hard failure would block the very work that fixes the drift. The capability
+    refusal above it is a different question and keeps its `throw`.
+    """
+    script = _script()
+    start = script.index("--- instrument CURRENCY")
+    end = script.index("--- git metadata")
+    block = script[start:end]
+    assert "Write-Warning" in block, "the currency block no longer warns at all"
+    assert "throw" not in block, (
+        "the currency check must not refuse — a sibling ahead of the pin is normal, "
+        "and refusing would block the bump that resolves it"
+    )
+
+
+def test_capability_refusal_quotes_the_pin_rather_than_a_frozen_sha() -> None:
+    """The refusal text hardcoded `depgraph 5006567` and went stale the moment
+    the pin moved — found at the 2026-08-04 bump. It must quote the config."""
+    script = _script()
+    start = script.index("Refusing to scan")
+    end = script.index("--- instrument CURRENCY")
+    refusal = script[start:end]
+    assert "$pinDesc" in refusal, "the refusal no longer quotes the configured pin"
+    assert not re.search(r"depgraph [0-9a-f]{7}\b", refusal), (
+        "the refusal hardcodes a commit SHA again; it goes stale at the next pin bump"
+    )
+
+
+def test_powershell_keeps_non_ascii_out_of_quoted_strings() -> None:
+    """PS 5.1 decodes a BOM-less .ps1 as the ANSI codepage.
+
+    A UTF-8 em dash then arrives as three CP1252 characters, the last of which
+    is a smart quote — and PowerShell honours smart quotes as string delimiters,
+    so a one-line "..." containing one ends early and the WHOLE script fails to
+    parse. This was hit for real while building the currency check above.
+
+    Comments and here-strings are unaffected and this repo's .ps1 files use em
+    dashes freely in both; only single-line quoted literals are the hazard.
+    """
+    offenders: list[str] = []
+    for path in sorted(REPO.rglob("*.ps1")):
+        if any(part in {".git", "node_modules", "worktrees", ".venv"} for part in path.parts):
+            continue
+        raw = path.read_bytes()
+        if raw[:3] == b"\xef\xbb\xbf":
+            continue  # BOM present: PS decodes it as UTF-8, no hazard
+        in_here_string = False
+        for lineno, line in enumerate(raw.decode("utf-8").splitlines(), 1):
+            stripped = line.strip()
+            if in_here_string:
+                if stripped.startswith('"@') or stripped.startswith("'@"):
+                    in_here_string = False
+                continue
+            if '@"' in line or "@'" in line:
+                in_here_string = True
+                continue
+            if stripped.startswith("#"):
+                continue
+            code = line.split("#", 1)[0]
+            if '"' in code and any(ord(ch) > 127 for ch in code):
+                rel = path.relative_to(REPO).as_posix()
+                offenders.append(f"{rel}:{lineno}: {stripped[:90]}")
+    assert not offenders, (
+        "non-ASCII inside a single-line double-quoted string in a BOM-less .ps1 — "
+        "PS 5.1 reads it as CP1252 and the smart quote ends the string early, failing "
+        "the whole script's parse. Use ASCII there, or move the text into a here-string:\n"
+        + "\n".join(offenders)
+    )

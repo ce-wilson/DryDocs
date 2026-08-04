@@ -75,6 +75,27 @@ try {
 
 $dep  = (Resolve-Path "$here\..\..\..\depgraph").Path
 
+# --- the configured instrument (config/dev-environment.yaml is the record) ----
+# Read the pin BEFORE the probe, so the refusal below and the currency warning
+# further down can both quote it and neither has to hardcode a SHA that goes
+# stale — the 2026-08-04 bump found exactly that inside the refusal text.
+$expCommit = $null
+$expBranch = $null
+try {
+  $cfg = Get-Content (Join-Path $repo "config\dev-environment.yaml") -Raw
+  # Scoped to the `depgraph:` block. A top-level key ends the block, so a
+  # same-named key under another section can never be picked up by accident.
+  if ($cfg -match '(?ms)^depgraph:[\r\n]+(.*?)(?=^\S|\Z)') {
+    $block = $Matches[1]
+    if ($block -match '(?m)^\s+expected_commit:\s*(\S+)') { $expCommit = $Matches[1] }
+    if ($block -match '(?m)^\s+expected_branch:\s*(\S+)') { $expBranch = $Matches[1] }
+  }
+} catch {
+  # Leave both null. The currency block below reports that it could not run,
+  # rather than pretending the instrument was checked.
+}
+if ($expCommit) { $pinDesc = "$expBranch @ $expCommit" } else { $pinDesc = "unreadable" }
+
 # --- instrument identity + capability probe (U7) -----------------------------
 # The scan runs in a SIBLING REPO, so the revision checked out there decides what
 # the snapshot can see. On 2026-07-28 a checkout without the multi-root resolver
@@ -113,14 +134,80 @@ Refusing to scan — the checked-out depgraph cannot do what this run needs.
   missing    :
 $($lines -join "`n")
 
-  Expected branch/commit are recorded in config/dev-environment.yaml.
+  Expected branch/commit are recorded in config/dev-environment.yaml ($pinDesc).
   Fix: git -C "$dep" fetch && git -C "$dep" checkout main && git -C "$dep" pull.
-  main has carried every capability since the fork was consolidated 2026-07-28
-  (depgraph 5006567); a checkout stranded on an older revision is the likely cause.
+  main has carried every capability since the fork was consolidated 2026-07-28;
+  a checkout stranded on an older revision is the likely cause.
 
 A snapshot written by a regressed scanner is worse than no snapshot: it is
 plausible, diffable, and wrong (the 105-edge near-commit of 2026-07-28).
 "@
+}
+
+# --- instrument CURRENCY: compare against the pin and WARN (ruled 2026-08-04) --
+# The capability probe above cannot see a merely STALE sibling. A revision can
+# pass every behavioural probe and still be behind, because new commits often
+# add edge TYPES rather than capabilities — which is how 2026-08-04 happened:
+# the laptop scanned on 5006567 while the desktop was already on 773fb1e, and no
+# surface said so, leaving two snapshots that were not comparable by
+# construction. `expected_commit` is the only record of the intended revision,
+# so it is checked here.
+#
+# WARN, never refuse. A sibling legitimately AHEAD of the pin is the normal way
+# a bump starts, so a hard failure would block the very work that fixes drift.
+# The job of this block is to make drift visible in the run that would otherwise
+# hide it; the meta header still records the instrument that actually ran, so
+# the snapshot stays self-describing whichever way this goes.
+if (-not $expCommit) {
+  Write-Warning @"
+instrument currency UNCHECKED — depgraph.expected_commit could not be read from
+config/dev-environment.yaml. The scan proceeds and the meta header still records
+the instrument that ran ($depBranch @ $depCommit), but nothing compared it to the
+intended revision.
+"@
+} elseif (-not $depFull.StartsWith($expCommit)) {
+  # Classify the drift, so the warning can say what to DO about it. Exit codes
+  # only — no stderr redirection, which PowerShell 5.1 turns into error records.
+  # Compare against $depFull, the revision captured above and written into the
+  # meta header — NOT against a fresh `HEAD`. They are the same thing in a normal
+  # run, but the recorded value is the one this snapshot is actually attributed
+  # to, so it is the one the warning should reason about.
+  $rel = "unknown"
+  $null = git -C "$dep" rev-parse --verify --quiet "$expCommit^{commit}"
+  if ($LASTEXITCODE -eq 0) {
+    git -C "$dep" merge-base --is-ancestor $expCommit $depFull
+    if ($LASTEXITCODE -eq 0) {
+      $rel = "ahead"
+    } else {
+      git -C "$dep" merge-base --is-ancestor $depFull $expCommit
+      if ($LASTEXITCODE -eq 0) { $rel = "behind" } else { $rel = "diverged" }
+    }
+  }
+  # ASCII ONLY inside these double-quoted literals. This file is UTF-8 WITHOUT a
+  # BOM, so PowerShell 5.1 decodes it as the ANSI codepage: a UTF-8 em dash
+  # arrives as three CP1252 characters, the last of which is a smart quote that
+  # PowerShell honours as a string delimiter. The string then ends early and the
+  # whole script fails to parse. Em dashes in comments and here-strings are
+  # harmless and appear elsewhere in this file; in a one-line "..." they are not.
+  $advice = @{
+    ahead    = "The sibling is AHEAD of the pin. Usually fine - this is how a bump starts - but the PIN is now the stale side: set depgraph.expected_commit to $depCommit once you are satisfied with this revision."
+    behind   = "The sibling is BEHIND the pin, so this scan may not see what the pinned revision sees and will not be comparable to a snapshot taken on the pin. Fix: git -C `"$dep`" pull --ff-only"
+    diverged = "The sibling and the pin have DIVERGED - neither is an ancestor of the other. That is the fork shape behind the 105-edge undercount of 2026-07-28; resolve it before trusting this snapshot."
+    unknown  = "The pinned commit $expCommit is not in this checkout at all - unfetched, or rewritten away. Fix: git -C `"$dep`" fetch"
+  }
+  Write-Warning @"
+instrument DRIFT — the depgraph checkout is not the revision config/dev-environment.yaml pins.
+
+  checked out : $depBranch @ $depCommit$(if ($depDirty) { ' (dirty)' })
+  pinned      : $pinDesc
+  relation    : $rel
+
+$($advice[$rel])
+
+Scanning anyway — this is a warning, not a refusal.
+"@
+} elseif ($expBranch -and $depBranch -ne $expBranch) {
+  Write-Warning "instrument branch drift: checked out '$depBranch', config/dev-environment.yaml pins '$expBranch'. The commit matches, so this is most likely a detached HEAD or a local branch sitting at the same revision."
 }
 
 # --- git metadata (best-effort) ---------------------------------------------
