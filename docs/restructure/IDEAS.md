@@ -40,26 +40,13 @@ Tags help grooming: `idea` · `bug` · `doc` · `source` (new data source) · `q
   the stub IS the vendor-schema acquisition remediation XML I/O was parked on
   (Folder.xsd + full attribute reference), and the DPL job-name grammar closes half the
   "job naming standard = outstanding gap" memory (folder grammar corroborates PRAOCG).
-
-- 2026-08-04 — [idea] **`controlm-runbook-automation-SDLC` skill — generate the SDLC Application
-  Run Book doc type from the graph.** The sdlc-app-runbook outline + exemplar landed 2026-08-04
-  (`995eb9a`, doc type SDLC-Runbook); its per-workflow block (Control-M job / schedule / param
-  file / src-stg-target schema@DB + table grain + task table), schedule table (trigger files +
-  alert windows), and SLA table are all generatable from the Control-M graph + cm_avg_run +
-  the escalation DB, the same feeds the runbook-automation skill already names. Shape: a
-  company-side sibling of `controlm-runbook-automation` that emits the outline-conformant .md
-  per application/folder, SME fills the residue (contacts, vault safes, special-case recovery).
-  Sibling precedent: the `controlm-runbook-automation-excel` skill (BUILT same day) does this
-  for the minimum-viable 2-tab Excel runbook — the -SDLC variant is the long-form twin.
-
-- 2026-08-04 — [bug] `provision.ps1` cannot run as documented on this desktop: it requires
-  `cypher-shell` on the host PATH, which only exists inside the container. Worked around
-  at the M3 reload via `docker cp` + `docker exec cypher-shell -f`. Fix: document the
-  docker-exec form in the provision.ps1 header or make the script exec-aware. NOTE the
-  BOM half of the original entry was WRONG and is resolved: the repo .cypher files were
-  clean — the BOM was injected by a PowerShell 5.1 pipe into docker exec; the encoding
-  standard + guard landed as J29 (done 2026-08-04). Avoid piping file content to native
-  commands in PS 5.1; copy the file in and use `-f`. (desktop, `neo4jtest` — J18)
+  TRIGGER CHECKED 2026-08-04 (weekly groom) — **NOT fired, stays parked.** Both capture
+  files verified present (`internal/controlm-config/reference/controlm-pipeline-stub-capture.md`
+  and `internal/controlm-config/controlm-pipeline-stub-integration-plan.md`), but the stated
+  trigger is the INTERNAL build starting to land, and nothing from X1-X3 / W1-W4 / V1-V2 /
+  E1-E4 / F1 has landed yet. The entry's own terms also make this un-groomable today even if
+  it had: epic placement for the producer twins (G-series vs a new epic) is explicitly a user
+  call at that groom, so promoting now would be inventing the answer.
 
 - 2026-08-04 — [question] venue divergence (J18): the DESKTOP `neo4jtest` reports server
   5.26.27, while `config/dev-environment.yaml` + runbook Appendix A say 2026.05.0 EE —
@@ -69,34 +56,18 @@ Tags help grooming: `idea` · `bug` · `doc` · `source` (new data source) · `q
   Ties into G50 (desktop rollback-copy question, open). Re-provisioned + fully reloaded
   today; decide whether to recreate the desktop container on the pinned image or re-point
   the config's version fact with a venue note. (desktop)
-
-- 2026-08-04 — [chore] branch `wip/k9-laptop` (`bfb2f0b`, pushed) holds a SECOND K9
-  implementation, built on the laptop and never pushed, while the desktop independently built
-  and shipped the one now on main (`17d9e08`). The laptop session ended without committing, so
-  the remote read the silent claim as dead (`1807df0` "released unbuilt") — it wasn't. Decide:
-  lift anything worth keeping off the branch, then delete it. The divergence is a rewrite, not
-  a rebase (`mappings.py` 334 lines apart, `mapping_store.py` 348, net −726/+419 over 8 files).
-  Second occurrence of the C19 collision, and it exposes the gap: the pull-rule makes the CLAIM
-  push-before-work, but nothing makes the WORK visible — an in-flight session that dies looks
-  identical to one that never started.
-
-- 2026-08-04 — [chore] `reference/REGISTRY.yaml` cites `reference/standards/dcat/README.md`
-  but the file does not exist (dcat has a registry row and a standards-README table row,
-  no per-standard README dir). Either write the stub (reference-librarian, the dcmi-terms
-  pattern from M4) or re-point the row at `reference/standards/README.md` like skos does.
-  (noticed during the M4 build)
-
-- 2026-08-04 — [bug] `dev_teams.cypher` and `catalog_lobs.cypher` carry the same unconditional
-  enrichment SETs the C22 sweep fixed in the three hierarchy loaders (`SET dt.name = row.name`;
-  `SET l.code/l.name = row.*`) — and catalog_lobs is the worse case, because `CatalogLOBRow`
-  already allows None so a sparse refresh blanks the stored name/code TODAY. Out of C22's
-  three-file acceptance scope, so inboxed per the C17 precedent rather than swept by drive-by.
-
-- 2026-08-04 — [doc] `docs/reviews/sdlc-neo4j-schema.md` still claims `pat_product_mapping.cypher`
-  "MERGE HAS_APPLICATION (Product→Application)" — stale since C9 removed that write (2026-07-18),
-  and now doubly wrong after §G6's support-reading reconciliation (K13). That living doc belongs
-  to the `drydocs-sdlc-docs` cron stream; fix the loader-inventory row there, not piecemeal.
-  (Found at the K13 surface sweep.)
+  KEPT-UPDATED 2026-08-04 (weekly groom) — **still the user's decision, and now confirmed
+  DESKTOP-ONLY.** Verified at this groom from the laptop (J18 venue: laptop, `neo4jtest`,
+  `drydocs` DB): this machine runs the pinned 2026.05.0 Enterprise with `ddschema` present
+  and six user databases online, so the config's version fact matches reality here and the
+  divergence is not a repo-wide drift. That narrows the choice rather than making it — the
+  question is unchanged (recreate the desktop container on the pinned image, or re-point the
+  config's version fact with a venue note), and it stays parked because either answer is a
+  ruling, not a default. Worth noting for whoever rules it: nothing currently DETECTS this.
+  `tests/unit/test_dev_environment.py` pins the provisioning command to the config file, but
+  no check compares a RUNNING server's reported version against the pinned one, which is why
+  the desktop drifted silently. If the ruling is "re-point with a venue note", that gap is
+  the thing worth an item.
 
 - 2026-08-03 — [idea] **EPIC: backlog.yaml has outgrown single-file text editing — shard it,
   derive the summary, query it from the graph.** Trigger: during the DD6 session the company
@@ -812,6 +783,53 @@ Tags help grooming: `idea` · `bug` · `doc` · `source` (new data source) · `q
   an app). Cosmetic; hide or restructure later.
 
 ## Recently groomed (audit trail)
+
+- 2026-08-04 (weekly groom, laptop) — [bug] `provision.ps1` shells out to host-PATH
+  `cypher-shell` → **G54**. Verified at the groom: the REQUIRES block (`:6`) presents host
+  cypher-shell as satisfied by "bundled in the Neo4j Docker image", but the runner (`:57`)
+  invokes the bare binary, which a Docker-only host does not have. Acceptance forces one of
+  two resolutions (exec-aware script preferred over a header-only fix) and carries the J29
+  PS 5.1 trap into the header, since the workaround shape and the encoding standard are one
+  lesson. The BOM half of the report was already resolved by J29 and is recorded as wrong.
+- 2026-08-04 (weekly groom, laptop) — [bug] the two catalog loaders C22's file set excluded
+  → **C24**. Verified statically: `catalog_lobs.cypher:28-29` blanks TODAY (CatalogLOBRow's
+  code/name are already Optional), while `dev_teams.cypher:16` is the latent whole-row-reject
+  case (DevTeamRow.name is required) — so they fail differently and C22's row-model half has
+  to move with the Cypher half. Depends on C22 (done), so it enters next_ready.
+- 2026-08-04 (weekly groom, laptop) — [chore] branch `wip/k9-laptop` → **J30 + J31**, split
+  deliberately. J30 is the one-off disposition (per-file comparison, lift what is worth
+  keeping, then delete local and remote with the tip SHA in the close note); J31 is the rule
+  the collision exposed — the pull rule makes the CLAIM visible but not the WORK, so a
+  session that dies looks identical to one that never started. J31 extends J19's pushed-claim
+  discipline rather than proposing a new direction, which is why it is a chore and not a gate
+  item; its wording is confirmed with the user at build. Second occurrence of the C19 class,
+  and the two failed differently — C19 was two unclaimed sessions, K9 was a pushed claim that
+  went dark while the work existed locally.
+- 2026-08-04 (weekly groom, laptop) — [chore] `reference/REGISTRY.yaml`'s dcat `docs:` path
+  resolves to nothing → **A4**. Verified: no `reference/standards/dcat/` directory exists.
+  Two allowed resolutions (write the dcmi-terms-pattern stub, or re-point at the standards
+  README like skos), the choice recorded in the close note; rides A1's registry-path audit if
+  that is picked up first.
+- 2026-08-04 (weekly groom, laptop) — [idea] the `controlm-runbook-automation-SDLC` skill →
+  **L23**. Promoted rather than parked because it is not a speculative shape: the shipped
+  `-excel` skill's own frontmatter already names "a future -SDLC sibling", and the doc type,
+  worked example and outline tests all landed at `995eb9a`. Acceptance keys on the validation
+  that already exists (a generated doc validates against the outline unedited) and forbids
+  re-writing queries the `-excel` skill owns — two skills disagreeing about the same runbook
+  fact is the failure it exists to prevent. Filed under Epic L: the outline system lives
+  there, and this is a doc GENERATOR, distinct from drydocs-docmeta which ingests.
+- 2026-08-04 (weekly groom, laptop) — [doc] `sdlc-neo4j-schema.md`'s stale HAS_APPLICATION
+  loader-inventory row → **MERGED into L19** as clause (e), no new item. The line's own
+  instruction was "fix it in the stream that owns that doc, not piecemeal", and L19 is
+  already the doc-drift sweep over `docs/reviews/sdlc-*.md`. Verified both halves: `:553`
+  still carries the claim, `pat_product_mapping.cypher:39` says C9 removed the write in
+  2026-07-18. Restated to the K13 support reading so the correction lands once.
+- 2026-08-04 (weekly groom, laptop) — two entries KEPT PARKED with triggers re-checked and
+  NOT fired: the **controlm-pipeline-stub** twins (capture files present, but no internal
+  build has landed, and epic placement is explicitly a user call at that groom) and the
+  **desktop venue divergence** (a user ruling either way; the laptop was verified on the
+  pinned 2026.05.0 with `ddschema` present, so the drift is desktop-only — and the groom
+  noted that nothing currently detects a running server's version against the pinned one).
 
 - 2026-08-04 (Control-M groom) — [chore] the legacy /mappings job-application pane (coverage
   grid + assign flow still on the retired job-grain edge, found at K11) → **K15** (type bug —
