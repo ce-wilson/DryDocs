@@ -189,9 +189,9 @@ export default function AppCodeCascadePane({
   }, [cascade, productLineId])
 
   // §G6: HAS_APPLICATION is 1:many BY DESIGN — this is a LIST, never a single
-  // application. Producer-side the edge is still planned (catalog_has_application,
-  // the K13 back-flow), so the list may be empty; the search fallback keeps the
-  // cascade usable and the notice says why.
+  // application. Producer-side the edge is still planned (catalog_has_application;
+  // loading waits on the C9 product-scoped-extract condition), so the list may be
+  // empty; the search fallback keeps the cascade usable and the notice says why.
   const productApps = useMemo(() => {
     const seen = new Map<string, string>()
     for (const r of cascade ?? []) {
@@ -450,8 +450,8 @@ export default function AppCodeCascadePane({
           ) : productId ? (
             <p className="mt-1 rounded border border-yellow/50 bg-yellow/10 p-1.5 text-[11px] text-yellow">
               No catalog application links loaded — producer-side{' '}
-              <span className="font-mono">catalog_has_application</span> is planned with no loader (the K13
-              back-flow). Search the full application list instead:
+              <span className="font-mono">catalog_has_application</span> is planned with no loader (loading
+              waits on the product-scoped extract). Search the full application list instead:
             </p>
           ) : (
             <p className="mt-1 text-[11px] text-faint">Pick a product first{cascadeLive ? '' : ' · SYNTHESIZED demo catalog'}.</p>

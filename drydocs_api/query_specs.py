@@ -327,10 +327,12 @@ QUERY_SPECS: dict[str, QuerySpec] = {
                 "-> HAS_APPLICATION -> BusinessApplication, flat rows the picker "
                 "groups client-side. §G6 rules the COMPANY reading of "
                 "HAS_APPLICATION (a structural support link, 1:many by design — the "
-                "picker returns a LIST, never a single application). PRODUCER-SIDE "
-                "catalog_has_application is still planned with no loader (the K13 "
-                "back-flow), so app_id is null here until that lands — the pane "
-                "says so and degrades to the full application search."
+                "picker returns a LIST, never a single application; semantics "
+                "reconciled at K13). PRODUCER-SIDE catalog_has_application is "
+                "still planned with no loader — loading waits on the C9 "
+                "product-scoped-extract condition — so app_id is null here until "
+                "that lands; the pane says so and degrades to the full "
+                "application search."
             ),
             cypher=(
                 "MATCH (pl:ProductLine) WHERE NOT pl:SchemaMeta "

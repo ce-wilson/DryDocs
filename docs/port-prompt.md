@@ -635,6 +635,30 @@ verification status in [BRACKETS]; spend review on [UNRULED].
     the RETIRED job-grain edge — the job-application pane is legacy on both
     sides after step 63.
 
+67. K13 — catalog_has_application SEMANTICS RECONCILED TO §G6 (docs/config
+    only, no code behavior change). This is the producer ADOPTING YOUR
+    reading — the gate ruled the company's structural-SUPPORT semantics
+    (a Product supported by 2+ applications, front-end/back-end; 1:many BY
+    DESIGN) over the producer's old "Product owns SEAL applications".
+    Touched: `relationship_vocabulary.yaml` note (support reading leads;
+    the old WAS_ATTRIBUTED_TO matrix hint recorded as FALLEN — both ends
+    Entities post-K4, no PROV row; C9 history + `planned` status kept),
+    `taxonomy-ontology-map.yaml` gains its FIRST entry for this edge
+    (`product-has-application`, confirmed chad.wilson 2026-08-03 = the K7
+    sign-off, capture waived on the C9 reason; map summary confirmed 24),
+    `catalog_ontology_supplement.cypher` OntologyTerm notes (also removes a
+    claim false since C9: "Written by pat_product_mapping loader"),
+    data-context-extractor skill wording, and the step-66 surfaces' "K13
+    back-flow" pointers re-aimed at the C9 extract condition.
+    ***YOUR SIDE:*** (a) if your map already carries an entry for this edge,
+    RECONCILE ids with `product-has-application` (union-append doctrine) —
+    do not end up with two entries for one edge; (b) your vocabulary entry
+    is presumably `active` with a loader — take the NOTE wording
+    like-for-like but keep YOUR status/loader fields (the producer's stays
+    `planned`, loader `~`); (c) the supplement's SET is idempotent MERGE —
+    rerun refreshes the OntologyTerm notes; `EXPECTED_CONSTRAINTS` does not
+    move, suite count does not move (1410/5, no test delta).
+
 ACCEPTANCE GATE (behavior is the contract, not a byte-compare):
 - Track 1 (portable):
     poetry run pytest tests/unit/test_variable_classifier.py tests/unit/test_variable_resolver.py \
@@ -651,7 +675,8 @@ ACCEPTANCE GATE (behavior is the contract, not a byte-compare):
   capability_assert=false skips per T18). A retired-id refusal from
   `SourceRegistry.from_yaml` is the D4 guard WORKING, not a port failure — rebind the
   loader in `loader-source-overlay.yaml`, never by re-adding the retired id.
-  Producer reference at the current head (step 66, the K11 build): 1410
+  Producer reference at the current head (step 67, the K13 semantics
+  reconciliation — no test delta from step 66): 1410
   passed / 5 skipped with the production CSV PRESENT and no
   RECONCILE_BEFORE_DIR (4 J7 guards + the graphrag PDF) — the like-for-like
   chain: step 58 1356/5 → step 61 1384/5 (+28 K9 guards) → step 63 1399/5

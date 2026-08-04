@@ -746,6 +746,11 @@
           "id": "lob-reconciles-to-segment",
           "status": "confirmed",
           "label": "RECONCILES_TO"
+        },
+        {
+          "id": "product-has-application",
+          "status": "confirmed",
+          "label": "HAS_APPLICATION"
         }
       ],
       "loaders": [

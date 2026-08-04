@@ -26,6 +26,12 @@ Tags help grooming: `idea` · `bug` · `doc` · `source` (new data source) · `q
 
 <!-- add new ideas at the top -->
 
+- 2026-08-04 — [doc] `docs/reviews/sdlc-neo4j-schema.md` still claims `pat_product_mapping.cypher`
+  "MERGE HAS_APPLICATION (Product→Application)" — stale since C9 removed that write (2026-07-18),
+  and now doubly wrong after §G6's support-reading reconciliation (K13). That living doc belongs
+  to the `drydocs-sdlc-docs` cron stream; fix the loader-inventory row there, not piecemeal.
+  (Found at the K13 surface sweep.)
+
 - 2026-08-04 — [chore] **The /mappings job-application pane is now the LEGACY surface** — its
   coverage grid (`mappings.attribution-coverage.v1`) still reads the RETIRED job-grain
   `WAS_ASSOCIATED_WITH {seal_app_ref}` edge (TC-08 asserts none exist post-K8, so every row now

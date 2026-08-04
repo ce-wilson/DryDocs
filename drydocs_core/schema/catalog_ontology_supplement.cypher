@@ -129,16 +129,22 @@ MERGE (n:OntologyTerm:LocalClass {iri: "https://drydocs.local/ontology#AreaProdu
 
 // ----- :LocalRelationship declarations — PAT relationships ------------------
 
-// HAS_APPLICATION  —  Product → Application
-// Local alias; PROV matrix would say WAS_ATTRIBUTED_TO (Entity→Agent).
+// HAS_APPLICATION  —  Product → BusinessApplication
+// Structural SUPPORT link (K7 gate §G6, 2026-08-03): a Product supported by
+// 2 or more applications (front-end/back-end), 1:many by design. No PROV row —
+// both ends are Entities post-K4 (the old WAS_ATTRIBUTED_TO hint fell with the
+// ownership reading). No producer loader: the pat_product_mapping write was
+// removed at C9; loading waits on the product-scoped extract.
 // Resolves SnapshotWriter references at writer.py:45,67.
 MERGE (n:OntologyTerm:LocalRelationship {iri: "https://drydocs.local/ontology#hasApplication"})
   SET n.label  = "HAS_APPLICATION",
       n.domain = "Product",
       n.range  = "BusinessApplication",
-      n.notes  = "Product owns a set of SEAL-registered applications. Local alias; "
-               + "matrix equivalent is WAS_ATTRIBUTED_TO (Entity→Agent). "
-               + "Written by pat_product_mapping loader.";
+      n.notes  = "Structural SUPPORT link: a Product is supported by 2 or more "
+               + "applications (front-end/back-end); 1:many by design (K7 gate "
+               + "§G6, 2026-08-03). No PROV row — both ends Entities post-K4. "
+               + "No producer loader yet: the C9 product-scoped extract "
+               + "condition is unchanged.";
 
 // HAS_AREA_PRODUCT  —  Product → AreaProduct
 MERGE (n:OntologyTerm:LocalRelationship {iri: "https://drydocs.local/ontology#hasAreaProduct"})

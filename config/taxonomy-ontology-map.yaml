@@ -15,7 +15,7 @@
 # =============================================================================
 
 schema: drydocs.taxonomy-ontology-map.v1
-updated: 2026-08-03                        # app-code-defined-mapping CONFIRMED (K7 close-out gate seal-app-ref-edge-reshape, 24/24); prior 2026-07-27: +business-application-identity (S3 gate SIGNED OFF — property binding, no edge); prior 2026-07-22: +app-code-defined-mapping, +dl-contact-point (both proposed — attribution close-out + email-DL gates); prior: C12/C13 requires-scheduler rejected (platforms-taxonomy gate)
+updated: 2026-08-04                        # +product-has-application (K13 — the map entry recording the K7 §G6 support-reading ruling; semantics only, loading waits on the C9 extract condition); prior 2026-08-03: app-code-defined-mapping CONFIRMED (K7 close-out gate seal-app-ref-edge-reshape, 24/24); prior 2026-07-27: +business-application-identity (S3 gate SIGNED OFF — property binding, no edge); prior 2026-07-22: +app-code-defined-mapping, +dl-contact-point (both proposed — attribution close-out + email-DL gates); prior: C12/C13 requires-scheduler rejected (platforms-taxonomy gate)
 
 mappings:
 
@@ -770,6 +770,37 @@ mappings:
       no PROV row); post-reclass the PROV-valid inverse WAS_ATTRIBUTED_TO {role: developed_by}
       applies. Migration: migrate_develops_to_was_attributed_to.cypher.
 
+  # ---- K13: catalog_has_application — the §G6 support reading (K7 gate) -----
+  # SEMANTICS confirmed at the K7 close-out gate (seal-app-ref-edge-reshape,
+  # signed 24/24, 2026-08-03, §G6). LOADING still waits on the product-scoped
+  # extract — the C9 condition, unchanged by this entry. Company-side the edge
+  # is ACTIVE (live extract + loader); this entry is the producer's back-flow
+  # adoption of the ruled reading (backlog K13), not new build.
+  - id: product-has-application
+    taxonomy: { source: "pat:product-catalog", element: "Product is supported by its Mapped Applications (product-scoped tab; extract NOT onboarded producer-side)" }
+    ontology:
+      from_node: Product                     # dd:Product (prov:Entity)
+      to_node: BusinessApplication           # prov:Entity / dprod:DataProduct (K4 reclass)
+      matrix_row: "local catalog hierarchy (no PROV row — both ends Entities post-K4)"
+      neo4j_label: HAS_APPLICATION
+      prov_maps_to: ~
+    precedence_authority: lob-product-team
+    vocab_id: catalog_has_application
+    capture: "waived — the product-scoped Mapped Applications extract is not onboarded producer-side (the C9 condition); the semantics were ruled at the K7 gate from the company's live extract (evidence index: internal/pat-evidence/README.md)"
+    status: confirmed
+    confirmed_by: chad.wilson
+    confirmed_on: 2026-08-03
+    decision_resolved: >
+      K7 gate §G6 (2026-08-03): the COMPANY reading — a structural SUPPORT link,
+      a Product supported by 2 or more applications (front-end/back-end) — NOT
+      the producer's "a Product owns a set of SEAL-registered applications".
+      Chosen because the company reading is backed by a live extract and loader
+      where the producer's was an unbuilt intention. The edge is 1:many BY
+      DESIGN (the extract's application-id column is multi-valued), so the K11
+      cascade picker returns a LIST, never a single application. The vocabulary
+      entry stays status: planned until the product-scoped extract is onboarded
+      here (C9 condition unchanged); K13 reconciled the semantics only.
+
   # ---- bmc-docs lexical load (2026-07-08 — GATE PREP, SME not yet run) ------
   # User-directed: only sample Control-M data can reach the local EE DB, so the
   # converted BMC docs corpus (external/orchestration/bmc-controlm/, 26 docs)
@@ -1145,6 +1176,6 @@ mappings:
 # Counts the gate reports to the SME each run.
 summary:
   applied: 10         # +job-runs-on-host-group, +host-group-contains-host (P3 build 2026-07-27); prior 8 = +application-as-dataproduct, +seal-tom-attribution (K4, 2026-07-15), job-contains, application-contains-folder, doc-describes-product, doc-chunk-part-of, doc-first-chunk, doc-next-chunk
-  confirmed: 23       # +app-code-defined-mapping (K7 gate seal-app-ref-edge-reshape signed off 2026-08-03, 24/24 — folder-grain attribution; vocab m3_belongs_to_application registered planned, loader follows at the K7 build items); +self-documentation-code-graph (G33/Epic U gate signed off 2026-07-27, 36/36, 0 edits — 3 edge terms + 2 node classes registered planned; loader follows at backlog G33); -2 to applied at the P3 build (host topology); +business-application-identity (S3 gate signed off 2026-07-27, 22/22 confirmations, 0 edits — property binding, no edge; implementation follows at backlog S3); +doc-traceability-feedback (L7 gate signed off 2026-07-20, 21/21 confirmations; supplement landed same day, loader load-doc-traceability follows); +product-cabinet-attribution (K5 gate signed off 2026-07-20; applied waits on the K6 supplement + a person-level cabinet extract)
+  confirmed: 24       # +product-has-application (K13 back-flow entry 2026-08-04, recording the K7 §G6 support-reading ruling of 2026-08-03 — loading still waits on the product-scoped extract, the C9 condition); +app-code-defined-mapping (K7 gate seal-app-ref-edge-reshape signed off 2026-08-03, 24/24 — folder-grain attribution; vocab m3_belongs_to_application registered planned, loader follows at the K7 build items); +self-documentation-code-graph (G33/Epic U gate signed off 2026-07-27, 36/36, 0 edits — 3 edge terms + 2 node classes registered planned; loader follows at backlog G33); -2 to applied at the P3 build (host topology); +business-application-identity (S3 gate signed off 2026-07-27, 22/22 confirmations, 0 edits — property binding, no edge; implementation follows at backlog S3); +doc-traceability-feedback (L7 gate signed off 2026-07-20, 21/21 confirmations; supplement landed same day, loader load-doc-traceability follows); +product-cabinet-attribution (K5 gate signed off 2026-07-20; applied waits on the K6 supplement + a person-level cabinet extract)
   proposed: 3         # oracle-schema-asset, jobrun-observation, dl-contact-point (2026-07-22 email-DL gate); -1 app-code-defined-mapping CONFIRMED at the K7 sign-off 2026-08-03
   rejected: 1         # requires-scheduler (C12 platforms-taxonomy gate 2026-07-21 — SUPERSEDED by reg_uses_software {source: 'batch-port'}, not repudiated)

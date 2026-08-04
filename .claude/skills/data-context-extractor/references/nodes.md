@@ -157,7 +157,7 @@ and discuss with the graph architect before adding it.
 | `RECONCILES_TO` | CatalogLOB | BusinessSegment | LOB→segment crosswalk; carries `confidence` (0.0–1.0) |
 | `HAS_PRODUCT_LINE` | CatalogLOB | ProductLine | catalog hierarchy — LOB contains product lines |
 | `HAS_PRODUCT` | ProductLine | Product | catalog hierarchy — product line contains products |
-| `HAS_APPLICATION` | Product | Application | product owns SEAL applications (planned) |
+| `HAS_APPLICATION` | Product | Application | structural support link — the applications supporting a product, 1:many by design (planned) |
 | `HAS_AREA_PRODUCT` | Product | AreaProduct | product contains Area Product Groups (planned) |
 | `HAS_DEV_TEAM` | Product / AreaProduct | DevTeam | product or APG owns a dev team |
 | `SUPPORTS` | DevTeam | AreaProduct | confirmed range: AreaProduct (not Product); carries `team_type`, `sponsored` |

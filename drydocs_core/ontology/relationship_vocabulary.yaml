@@ -1589,14 +1589,24 @@ local_relationships:
     to_node:      BusinessApplication
     prov_maps_to: ~
     note: >
-      Product owns a set of SEAL-registered applications. Kept as local label
-      for query clarity; matrix would say WAS_ATTRIBUTED_TO (Entity→Agent).
-      C9 gate (2026-07-18): the pat_product_mapping write REMOVED — the team
-      row's seal_ids are TEAM-scoped (they now feed arch_develops) and
-      attributing them to the Product conflated two PAT screens. Stays planned
-      until a product-scoped extract (PAT "Mapped Applications" product tab) is
-      onboarded; pre-C9 edges cleaned by migrate_pat_alignment_c9.cypher.
-      Resolves the SnapshotWriter references at writer.py:45,67.
+      A structural SUPPORT link: the Product is supported by two or more
+      applications (front-end/back-end). 1:many BY DESIGN — the source
+      extract's application-id column is multi-valued, so a picker over this
+      edge returns a LIST, never a single application. K7 gate §G6
+      (seal-app-ref-edge-reshape, 2026-08-03) ruled this COMPANY reading over
+      the producer's earlier "a Product owns a set of SEAL-registered
+      applications" wording, because the company reading is backed by a live
+      extract and loader where the producer's was an unbuilt intention;
+      surfaces reconciled at K13. The old WAS_ATTRIBUTED_TO matrix hint fell
+      with the ownership reading — both ends are Entities post-K4, so there is
+      no PROV row (local structural link, like the sibling catalog hierarchy
+      edges). C9 gate (2026-07-18): the pat_product_mapping write REMOVED —
+      the team row's seal_ids are TEAM-scoped (they now feed arch_develops)
+      and attributing them to the Product conflated two PAT screens. Stays
+      planned until a product-scoped extract (PAT "Mapped Applications"
+      product tab) is onboarded — the C9 condition, unchanged by §G6; pre-C9
+      edges cleaned by migrate_pat_alignment_c9.cypher. Resolves the
+      SnapshotWriter references at writer.py:45,67.
     supplement:   catalog_ontology_supplement.cypher
     loader:       ~
     domain:       catalog

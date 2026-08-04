@@ -179,7 +179,7 @@ RETURN co.name, seg.code, seg.name, collect(lob.lob_code) AS lobs;
 For each scope node, capture:
 - Which LOBs `RECONCILES_TO` each segment (with `confidence`)
 - Which ProductLines and Products exist under each LOB
-- Which Applications are owned by each Product (`HAS_APPLICATION`)
+- Which Applications support each Product (`HAS_APPLICATION` — a structural support link, 1:many by design)
 - Which AreaProducts and DevTeams are aligned under each Product (`HAS_AREA_PRODUCT` + `SUPPORTS`)
 - Which Control-M jobs run under those applications
 
