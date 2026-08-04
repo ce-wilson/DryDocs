@@ -193,6 +193,38 @@ def test_project_review_conforms_to_outline() -> None:
     )
 
 
+# ── the SDLC Run Book: the fourth doc type — support reference for an ─────────
+#    Informatica-ETL business application (structure transcribed verbatim from a
+#    reviewed enterprise example; all values in the exemplar are synthesized)
+SDLC_RUNBOOK_OUTLINE = REPO_ROOT / "docs" / "design" / "templates" / "sdlc-app-runbook.outline.yaml"
+SDLC_RUNBOOK_EXAMPLE = REPO_ROOT / "docs" / "design" / "templates" / "sdlc-app-runbook.example.md"
+
+
+def test_real_sdlc_runbook_outline_loads() -> None:
+    outline = load_outline(SDLC_RUNBOOK_OUTLINE)
+    assert outline.doc_type == "SDLC-Runbook"
+    # a support run book has inventories and procedures, not requirements
+    assert not outline.traceability.get("matrix_section")
+    # the sections the shape exists for: per-workflow blocks, script inventory,
+    # directory map, recovery, escalation
+    for anchor in (
+        "etl-jobs",
+        "unix-shell-scripts",
+        "directory-configuration",
+        "recovery-procedures",
+        "tier2-escalation",
+    ):
+        assert anchor in outline.required_anchors(), anchor
+
+
+def test_sdlc_runbook_example_conforms_to_outline() -> None:
+    problems = validate_paths(SDLC_RUNBOOK_OUTLINE, SDLC_RUNBOOK_EXAMPLE)
+    assert problems == [], (
+        "sdlc-app-runbook.example.md drifted from sdlc-app-runbook.outline.yaml:\n  "
+        + "\n  ".join(problems)
+    )
+
+
 # ── L11: derived subsection anchors in the feedback namespace ─────────────────
 FB_DOC = "<!-- anchor: purpose -->\n## Purpose\n\n<!-- anchor: detailed-design -->\n## Design\n"
 

@@ -1,0 +1,385 @@
+# =============================================================================
+# sdlc-app-runbook.outline.yaml — the canonical outline for an SDLC APPLICATION
+# Run Book: the production-support reference for one business application module
+# whose batch layer is Informatica ETL orchestrated by Control-M.
+#
+# This is the FOURTH doc type in the Epic L system (after TDD / Runbook / Review)
+# and it is DISTINCT from runbook.outline.yaml: that one is an OPERATIONAL
+# procedure doc (startup/refresh/verify for a system we run); this one is the
+# SDLC-corpus "Run Book" — the Tier 2/Tier 3 support reference that documents an
+# application's entire batch estate: schedules, workflows with source→target
+# mappings, shell scripts, credentials, infrastructure, directories, recovery,
+# and escalation.
+#
+# PROVENANCE — transcribed STRUCTURE-VERBATIM (2026-08-04) from a reviewed
+# enterprise SDLC Run Book example (56 pp., Informatica PowerCenter + Control-M +
+# Oracle, document-processing application; INTERNAL — the source screenshots are
+# gitignored and never committed). Section set, order, and the table shapes in
+# each `guidance` reproduce the example faithfully. All values in the companion
+# example doc (sdlc-app-runbook.example.md) are SYNTHESIZED for a generic
+# application — no real hosts, schemas, job names, links, or people survive.
+# Numbering in the source (1.0–22.0) is preserved in section ORDER only; anchors
+# are authored ids per the doc-outline contract (never `--` inside an id).
+#
+# WHAT MAKES THIS SHAPE WORTH COPYING (why it beat our leaner runbook for the
+# app-support use case; see also the runbook-automation skill):
+#   • the per-workflow block — a fixed header table (Control-M job / schedule /
+#     param file / src-stg-target schema@DB / folder / source-stage-target
+#     TABLES) + a task-by-task function table. Source→target mapping lives at
+#     BOTH grains: schema@DB in the header, table-to-table in the task rows.
+#   • the shell-script inventory — every .ksh with what it DOES and which
+#     workflow (or Control-M) invokes it. Scripts are first-class, not folklore.
+#   • trigger-file discipline — the schedule table names the literal .done file
+#     paths a workflow waits on, the alert cadence while waiting, and the
+#     restart rule when the window expires.
+#   • credentials WITHOUT secrets — the vault function call per script, the safe
+#     / provider / account tables, and the break-glass path for adhoc access.
+#   • directory configuration — one table that says where code, parameter
+#     files, source/target files, archives, session logs, and script logs live.
+#
+# NO TRACEABILITY BLOCK (runbook.outline.yaml precedent): a support run book has
+# inventories and procedures, not requirements. The per-workflow blocks and the
+# recovery/escalation sections ARE its proof surface.
+#
+# VALIDATION: drydocs/doc_outline.py; tests/unit/test_doc_outline.py validates
+# the committed example (sdlc-app-runbook.example.md) against this outline.
+# A required section may be satisfied by an explicit "N/A — <reason>"; the
+# anchor must still be present (the source example itself marks eight sections
+# N/A — the shape survives even where a given app has nothing to say).
+# =============================================================================
+
+schema: drydocs.doc-outline.v1
+doc_type: SDLC-Runbook
+title: SDLC Application Run Book (Informatica ETL / Control-M)
+classification: Internal-Public          # the template + example carry no real data
+updated: 2026-08-04
+
+source_templates:
+  - "enterprise SDLC Run Book example (56 pp., INTERNAL screenshots, gitignored — structure only)"
+  - "tdd.outline.yaml (L1 — doc-outline schema + anchor conventions)"
+  - "runbook.outline.yaml (L8 — the no-traceability precedent for procedure docs)"
+
+sections:
+  - anchor: front-matter
+    heading: "Front matter (cover)"
+    required: true
+    guidance: >
+      The cover block: application name; "Run Book"; Product/Application/System;
+      Project; Date; Version — plus the DryDocs additions every doc type carries:
+      Classification (per config/classification.yaml) and the commit/source the
+      revision reflects. The source example's cover page maps here verbatim.
+
+  - anchor: document-control
+    heading: "Document Control"
+    required: true
+    guidance: >
+      Review ledger, one row per reviewed version. Table columns exactly:
+      Version No. | Name of Reviewer | Role | Date.
+
+  - anchor: change-history
+    heading: "Change History"
+    required: true
+    guidance: >
+      One row per version. Table columns exactly: Version No. | Details of Change |
+      Changed Sections | Prepared by | Date. "Changed Sections" cites section
+      numbers/names so a reader can diff by eye; the source example highlights the
+      current version's rows — keep an equivalent "latest change" marker.
+
+  - anchor: purpose
+    heading: "Purpose"
+    required: true
+    guidance: >
+      One short paragraph: this document is the overall reference for <application>
+      and serves the Tier 2 team (production-support activities).
+
+  - anchor: target-audience
+    heading: "Target Audience"
+    required: true
+    guidance: >
+      The support tiers this book serves (Tier 2 / Tier 3) + a pointer to the
+      Production Support section for contacts.
+
+  - anchor: architecture-model
+    heading: "Architecture Model"
+    required: true
+    guidance: >
+      The end-to-end system diagram: source databases/schemas, the ETL hop(s), the
+      DW/target databases, file exchanges (MFTS/SFTP), and downstream consumers —
+      with environment names on every node. Follow with one schedule sub-diagram
+      per batch stream (the Control-M trigger job + start time above each flow).
+    subsections:
+      - anchor: etl-process-overview
+        heading: "ETL Process Overview"
+        required: true
+        guidance: >
+          Prose: what the ETL populates, from which upstream systems, on what
+          cadence; link to the application's TDD for design detail. Close with the
+          lettered list of ETL processing layers this document covers — in the
+          source: (a) Schedule, (b) FTP/SFTP output files, (c) Archival and file
+          management, (d) Informatica objects, (e) UNIX objects.
+      - anchor: schedule
+        heading: "Schedule"
+        required: true
+        guidance: >
+          THE trigger-discipline table. Columns exactly: Task Name | Type
+          (Workflow/Script) | Schedule Time | Event Wait Trigger Files/
+          Dependencies. The last column carries the LITERAL trigger-file paths
+          (.done files) the task waits on, the alert cadence while waiting (e.g.
+          "alerts Prod Support hourly up to 10.5 hrs, then stops"), and the
+          restart rule when the window expires. Include monitoring scripts as rows
+          (Type=Script), not just workflows.
+      - anchor: archival-file-management
+        heading: "Archival and File Management"
+        required: true
+        guidance: >
+          Retention table. Columns exactly: Sl# | Name (file pattern WITH its
+          date/sequence mask, e.g. *_MMDDYYYYHH24MISS.txt) | Location
+          (Folder/Schema) | Type (File/Table) | Retention Period.
+
+  - anchor: end-to-end-process
+    heading: "End-to-End Process Overview"
+    required: true
+    guidance: >
+      The heart of the book: the batch estate, workflow by workflow. Subsections
+      below reproduce the source structure 6.1–6.7.
+    subsections:
+      - anchor: etl-jobs
+        heading: "Informatica ETL Jobs"
+        required: true
+        guidance: >
+          (1) Workflow inventory table: Sl# | Workflow Name | Description — every
+          scheduled workflow, one line each. (2) A "newly added workflows" table
+          for the current revision, same shape + Comments. (3) THE PER-WORKFLOW
+          BLOCK, repeated for every workflow: a fixed header table with rows
+          exactly — Control-M job name / Schedule Information / Param File Path /
+          Src Schema/DB / Stg Schema/DB / Target Schema/DB / Folder name /
+          Source Table / Stage Table / Target Table — followed by "Below is the
+          description of each task in the workflow": a table Task Name | Task
+          function, where each session row states its table-to-table move
+          ("loads SRC_OWNER.X to STG.Y"), command tasks state their control
+          action (trigger checks, timers, ETL-process status init/update), and
+          event-waits name their trigger file. Schema@DB grain lives in the
+          header; table grain lives in the task rows — keep both. Close the
+          subsection with the Control-M workspace screenshot(s) for the batch.
+      - anchor: etl-adhoc-jobs
+        heading: "Informatica ETL Adhoc Jobs"
+        required: true
+        guidance: >
+          On-demand workflows. Inventory table: S.no | Workflow Name | Comments.
+          For conversion/one-time loads, per-workflow notes carry Source (flat
+          file path or schema.table@DB) and Target Table at <DB> — the same
+          source→target discipline at lighter weight, plus rerun semantics
+          ("on rerun, deletes and reloads X").
+      - anchor: unix-shell-scripts
+        heading: "UNIX Shell Scripts"
+        required: true
+        guidance: >
+          Every .ksh invoked from Informatica workflows or Control-M. Columns
+          exactly: Unix Script Name | Descriptions | Invoking Workflow (session)
+          — the last column names the workflow(s) or reads "Scheduled in
+          Control-M". Cover the whole script taxonomy the source demonstrates:
+          environment setup + common functions (used in all scripts), the
+          workflow wrapper (suspend/recover-aware starter), parameter-file
+          generators (previous-date increments), file/control-file validators
+          (count+date match), archival/purge scripts, SFTP outbound movers,
+          trigger-wait + trigger-removal scripts, record-count/statistics
+          mailers, ETL-process status init/update, and cross-load mutual-
+          exclusion checks.
+      - anchor: unix-servers
+        heading: "UNIX Servers"
+        required: true
+        guidance: >
+          The DNS alias plus the physical/virtual server list per environment
+          (the source titles this "(Tech Refresh)" — keep hostnames current
+          through refreshes).
+      - anchor: password-retrieval-scripts
+        heading: "Password Retrieval for UNIX Shell Scripts"
+        required: true
+        guidance: >
+          How scripts obtain database passwords from the enterprise vault —
+          NEVER a secret value. (1) Per-script table: Script Name | vault
+          function call (e.g. get_connect <account> <db> >> ${logfile}) — the
+          logfile in the call is where retrieval errors land. (2) Safe details
+          table: Env | Server | Safe Name | Provider Name | Vault Server.
+          (3) Vaulted database accounts: Sl# | User | Database | Password
+          object | Comments. (4) Troubleshooting: the provider status command,
+          provider log locations, the owning IAM contact, and the reference doc.
+      - anchor: password-retrieval-adhoc
+        heading: "Password Retrieval for Adhoc Requests"
+        required: true
+        guidance: >
+          The break-glass path for ad-hoc production queries: maintenance-ID
+          table (Sl# | Maintenance FID | Database) + the ticket/break-glass
+          procedure that releases them.
+      - anchor: controlm-job-details
+        heading: "Control-M Job Details"
+        required: true
+        guidance: >
+          Pointer to the authoritative Control-M definition artifact (template
+          sheet / export) and its repository location — the run book summarizes,
+          the export is truth.
+
+  - anchor: service-level-agreement
+    heading: "Service Level Agreement"
+    required: true
+    guidance: >
+      (1) Upstream dependency SLAs the batch inherits (which feeds gate the run,
+      with their times). (2) The process SLA table, columns exactly: DW Process |
+      Job Name | Frequency | Expected Start Time | Expected End Time | SLA |
+      Inbound/Outbound — one row per job per distinct schedule (weekday vs Sunday
+      rows separately), dependencies noted inside Expected Start Time.
+
+  - anchor: architecture-contacts
+    heading: "High-Level Project Technical Architecture and Project Contact Information"
+    required: true
+    guidance: >
+      The tool stack as a short list (ETL engine + version, OS, database) and the
+      management/ownership table: Project | Name | Role | Areas of Responsibility.
+
+  - anchor: task-overview
+    heading: "Task Overview"
+    required: true
+    guidance: "Present even if 'N/A' (the source marks it so)."
+
+  - anchor: pre-installation-checklist
+    heading: "Pre-Installation Checklist"
+    required: true
+    guidance: "Pointer to the deployment checklist; 'N/A' acceptable."
+
+  - anchor: configuration-setup
+    heading: "Configuration & Setup"
+    required: true
+    guidance: "Umbrella for the environment-setup subsections; N/A rows stay present."
+    subsections:
+      - anchor: operating-system
+        heading: "Operating System"
+        required: true
+        guidance: "OS-level setup, or 'N/A'."
+      - anchor: database-server
+        heading: "Database Server"
+        required: true
+        guidance: >
+          Server setup + 'Creation & Setup of Database': the per-environment
+          connect descriptors (TNS entries for DEV/UAT/PROD, hosts+ports+service
+          names) and the access-request procedure (the source shows a sample
+          access request with the proxy grants to ask for).
+
+  - anchor: data-migration
+    heading: "Data Migration"
+    required: true
+    guidance: "'N/A' unless the app carries a migration procedure."
+
+  - anchor: web-server
+    heading: "Web Server"
+    required: true
+    guidance: "'N/A' for pure batch modules."
+
+  - anchor: application-server
+    heading: "Application Server"
+    required: true
+    guidance: "Setup + database connection setup subheads; 'N/A' for pure batch."
+
+  - anchor: front-end-gui-setup
+    heading: "Front-End / GUI Setup"
+    required: true
+    guidance: "'N/A' for pure batch."
+
+  - anchor: security-issues
+    heading: "Security Issues"
+    required: true
+    guidance: "'N/A' if none tracked here."
+
+  - anchor: other-packages
+    heading: "Other Packages"
+    required: true
+    guidance: "'N/A' if none."
+
+  - anchor: application-login-ids
+    heading: "Application Login IDs"
+    required: true
+    guidance: >
+      Every login id and privileged account the application uses. Columns
+      exactly: Application | Systems | Login-id. Retired accounts stay as
+      struck-through rows — the table is also the retirement record.
+
+  - anchor: directory-configuration
+    heading: "Content and Application Directory Configuration"
+    required: true
+    guidance: >
+      THE directory map. Columns exactly: Components of Application | Path |
+      Owner. Rows to cover (source shape): ETL repository details (repository
+      name, integration service, domain, gateway host/port, folder); scripts
+      location; session log files (note the one-file-per-session rule); source
+      files location; target files location; target FTP location; archive files
+      location; script log files location.
+
+  - anchor: recovery-procedures
+    heading: "Recovery Procedures"
+    required: true
+    guidance: >
+      (1) The failure-category table: Sr. No. | Failure Category | Probable
+      Failure Reasons | Action Required — including the orchestrator-outage row
+      (what script to run by hand and which done-file to check "before starting
+      any workflows/jobs"). (2) Special-case recovery per fragile workflow:
+      same-day restart rule (restart from failed task, never rerun a completed
+      task without confirmation), multi-day missed-load recovery (the adhoc
+      workflow + parameter-file override query with the date literal called
+      out), and the hard cautions ("never multiple loads for a single day").
+
+  - anchor: production-support
+    heading: "Production Support"
+    required: true
+    guidance: "The support playbook; subsections reproduce the source 21.1–21.6."
+    subsections:
+      - anchor: alerts
+        heading: "Alerts Generated by System"
+        required: true
+        guidance: >
+          Define the two alert classes verbatim — Threshold Alert (not started /
+          not ended on time) vs Failure Alert (execution issue; fix/debug and
+          restart) — then the category table: Sr. No. | Failure Category |
+          Probable Failure Reasons | Action Required.
+      - anchor: job-monitoring
+        heading: "ETL Job Monitoring / Visual Confirmation"
+        required: true
+        guidance: >
+          How runs are watched (workflow monitor, SLA-deviation capture, on-call
+          paging) + the ETL Rejects subsection: sessions configured to fail on
+          first error (show the stop-on-errors=1 config), prod support finds
+          root cause before reload.
+      - anchor: tier2-escalation
+        heading: "General Tier 2 Escalation Procedures"
+        required: true
+        guidance: >
+          (1) The contact list sorted by escalation level: Escalation Level |
+          Role | Primary Contact # | Comments. (2) Numbered guideline scenarios,
+          one per known failure/wait pattern: trigger-file-not-received-by-<T>
+          (who to contact, the hourly alert window, the restart-after-window
+          rule), upstream-load-incomplete, and the workflow-failure escalation —
+          each with its alert email VERBATIM as a template (To/From/body with
+          Status/Workflow/Task placeholders) and the mailing lists to address.
+      - anchor: security-admin-support
+        heading: "Security Administration Support"
+        required: true
+        guidance: "'N/A' or the security-admin contact path."
+      - anchor: server-database-support
+        heading: "Server/Database Support"
+        required: true
+        guidance: >
+          Platform-team contact table: Escalation Level | Role (Unix SA / DBA /
+          ETL admin / vault IAM) | Primary Contact | Alternate Contact (ticket
+          queue names count as contacts) + the ETL-process failure contact table
+          (Area | Name | Primary Contact # | Comments).
+      - anchor: business-contact
+        heading: "Business Contact"
+        required: true
+        guidance: >
+          Columns: Group | Contact | Role | Primary Contact # | Secondary
+          Contact # | Responsibility.
+
+  - anchor: appendix
+    heading: "Appendix"
+    required: true
+    guidance: >
+      External/additional teams contacted for support or recovery: Sr. No. |
+      Name of Team | Primary Contact | Secondary Contact.
