@@ -37,6 +37,64 @@ Authoring + structure only — **no data load** here.
 Idempotent (`IF NOT EXISTS` throughout). On a fresh topology the smoke returns `0 / 0 / 0`;
 success is that the federated query **runs** (both aliases resolve, no write).
 
+### Docker-only host: run each file explicitly
+
+`provision.ps1` shells out to `cypher-shell` **on the host PATH**, and on a machine whose
+only Neo4j is the container that binary does not exist there — it lives inside the image at
+`/var/lib/neo4j/bin/cypher-shell` (backlog **G54**). Run the same four steps by hand, from
+this directory. Substitute your own container name and credentials: `config/dev-environment.yaml`
+is per-side local infrastructure, so never copy another environment's values.
+
+```powershell
+cd drydocs_core\schema\provisioning
+$c  = "<your-container>"
+$pw = "<your-password>"     # or read it from .env; never commit it
+
+# 1. databases + composite  ->  the SYSTEM database (this is what creates ddschema)
+docker cp .\01_databases.cypher "${c}:/tmp/01_databases.cypher"
+docker exec $c cypher-shell -u neo4j -p $pw -d system -f /tmp/01_databases.cypher
+
+# 2. proxy-node constraints  ->  each ESTATE database, one call per database.
+#    ddschema is NOT in this list on purpose: its exemplar nodes would fail the
+#    NODE KEYs, so its one constraint ships in schema_graph.cypher and is applied
+#    by `drydocs bootstrap-schema-graph` (G51). Its absence is a decision.
+docker cp .\02_proxy_constraints.cypher "${c}:/tmp/02_proxy_constraints.cypher"
+docker exec $c cypher-shell -u neo4j -p $pw -d drydocs   -f /tmp/02_proxy_constraints.cypher
+docker exec $c cypher-shell -u neo4j -p $pw -d ddlineage -f /tmp/02_proxy_constraints.cypher
+docker exec $c cypher-shell -u neo4j -p $pw -d ddcontext -f /tmp/02_proxy_constraints.cypher
+
+# 3. read-only smoke  ->  the COMPOSITE
+docker cp .\smoke_drydocs_all.cypher "${c}:/tmp/smoke_drydocs_all.cypher"
+docker exec $c cypher-shell -u neo4j -p $pw -d ddall -f /tmp/smoke_drydocs_all.cypher
+
+# 4. populate the meta-graph (creates nothing — step 1 already made the database)
+cd ..\..\..
+poetry run drydocs bootstrap-schema-graph
+
+docker exec $c sh -c "rm -f /tmp/*.cypher"    # tidy up
+```
+
+Verified end to end 2026-08-04 (laptop, container `neo4jtest`, Neo4j 2026.05.0 Enterprise):
+all six `cypher-shell` calls exit 0 and the smoke federates `2218 / 0 / 46` across the
+composite.
+
+> **Copy the file in and use `-f`. Do NOT pipe it.**
+> `Get-Content .\01_databases.cypher | docker exec -i $c cypher-shell …` **fails**, and the
+> error blames the file, which is what makes it cost an afternoon:
+>
+> ```
+> Invalid input '﻿' … "﻿// ====…"  (line 1, column 1)
+> ```
+>
+> The file is clean — J29 byte-scans every tracked `.cypher` and this directory passes. The
+> BOM is added by the PIPE: PowerShell 5.1's `[Console]::OutputEncoding` is UTF-8 **with** a
+> 3-byte preamble, and it is written ahead of the first line on stdin redirection. Measured
+> here, not inferred, along with what does NOT fix it — `Get-Content -Raw` fails identically,
+> `$OutputEncoding` is already preamble-free so setting it changes nothing, and reassigning
+> `[Console]::OutputEncoding` mid-session is too late because the redirection is already
+> configured. `docker cp` + `-f` sidesteps the console encoding entirely, which is why it is
+> the documented form rather than a preference.
+
 ## Why these keys (no identity invented)
 
 The composite joins `ddcontext` → `drydocs` by **business key** (proxy-node

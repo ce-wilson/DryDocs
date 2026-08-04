@@ -11263,6 +11263,15 @@ items:
       and J29's own close note says this gap "stays inboxed separately".
       p2 rather than p1: both machines already hold working topologies, so nothing is
       blocked today. What is broken is the documented path for a fresh host.
+      WORKAROUND DOCUMENTED 2026-08-04 (does NOT close this item — the script itself is
+      unchanged): the provisioning README now carries the explicit per-file docker cp +
+      docker exec -f block, verified end to end (laptop, neo4jtest, 2026.05.0 EE — six
+      cypher-shell calls exit 0, smoke federates 2218/0/46). It also records the J29 pipe
+      trap with the MEASURED cause rather than the inferred one: PS 5.1's
+      [Console]::OutputEncoding is UTF-8 WITH a 3-byte preamble that is written ahead of
+      the first line on stdin redirection, and neither `Get-Content -Raw`, nor
+      $OutputEncoding (already preamble-free), nor reassigning [Console]::OutputEncoding
+      mid-session fixes it. That measurement belongs in this item's fix.
 
   # ── Epic W — FCDO ontology alignment (main / ontology-mapper) — Phase 2 ─────
   # Groomed 2026-07-31 from the FCDO capture (internal/fcdo-reference/, 8abc05f)
