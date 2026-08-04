@@ -45,6 +45,14 @@ sections:
       Status + Rev + date + the commit the procedure reflects (the L6 print footer
       derives "Rev N · commit <hash>" from this text); Classification (per
       config/classification.yaml); Audience; Companion docs.
+      MODULE (V1, 2026-08-04): if this runbook IS a module's runbook, declare it as
+      `- **Module:** <name from the backlog modules: registry>`.
+      tests/unit/test_runbook_coverage.py reads that line and nothing else — coverage
+      has to be a claim the document makes about itself, or a rename silently breaks
+      the map. OMIT the line when the runbook is narrower than its module
+      (chain-scoped or single-artifact); the coverage test refuses a partial runbook
+      that claims a module, because that is how a module looks covered while most of
+      it is undocumented.
 
   - anchor: purpose-scope
     heading: "Purpose & scope"

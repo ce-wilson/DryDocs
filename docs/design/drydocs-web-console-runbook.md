@@ -1,6 +1,10 @@
 # Runbook — DryDocs web console & API startup (UI server stack)
 
 <!-- anchor: front-matter -->
+- **Module:** drydocs-web — this runbook IS the module runbook for drydocs-web
+  (V1 coverage rule, 2026-08-04). The `Module:` line is what
+  `tests/unit/test_runbook_coverage.py` reads; coverage is a claim the document
+  makes about itself, never inferred from the filename.
 - **Status:** DESCRIPTIVE — documents the working procedure. **Rev 1, 2026-07-21**
   (content reflects commit `6766b4c`: post-O9 shell + Explorer, post-O11 QuerySpec
   registry/export, post-O22 glyph set; six Explorer frames incl. the SME
