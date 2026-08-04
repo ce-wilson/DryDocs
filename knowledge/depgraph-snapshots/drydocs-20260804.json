@@ -1,16 +1,16 @@
 {
   "meta": {
     "project": "drydocs",
-    "captured_at": "2026-08-04T08:11:35",
+    "captured_at": "2026-08-04T09:03:52",
     "date": "20260804",
     "scan": "DryDocs",
     "tree": true,
     "git": {
-      "commit": "e56f824",
-      "full": "e56f824507042ab25c41337535d5b500f348bcbb",
+      "commit": "804b239",
+      "full": "804b2390954014c4edd6bae1eacae27520f58844",
       "branch": "main",
-      "describe": "e56f824",
-      "subject": "feat(attribution): K10 done — active_state (declared|confirmed) per port replaces the never-read boolean; step 65 ledgered",
+      "describe": "804b239",
+      "subject": "feat(mappings): K11 done — the steward cascade (§G act) + the §G1 confirmed orchestrator edge; step 66 ledgered",
       "dirty": false,
       "pr": null
     },
@@ -12344,10 +12344,10 @@
       "kind": "file"
     },
     {
-      "file_id": "drydocs/knowledge/depgraph-snapshots/drydocs-20260804.json",
-      "name": "drydocs-20260804.json",
+      "file_id": "drydocs/knowledge/depgraph-snapshots/drydocs-20260804-0811.json",
+      "name": "drydocs-20260804-0811.json",
       "extension": ".json",
-      "rel_path": "knowledge/depgraph-snapshots/drydocs-20260804.json",
+      "rel_path": "knowledge/depgraph-snapshots/drydocs-20260804-0811.json",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -15242,6 +15242,15 @@
       "kind": "file"
     },
     {
+      "file_id": "drydocs/web/src/routes/AppCodeCascadePane.tsx",
+      "name": "AppCodeCascadePane.tsx",
+      "extension": ".tsx",
+      "rel_path": "web/src/routes/AppCodeCascadePane.tsx",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
       "file_id": "drydocs/web/src/routes/AskRoute.tsx",
       "name": "AskRoute.tsx",
       "extension": ".tsx",
@@ -15936,6 +15945,10 @@
     ],
     [
       "drydocs/drydocs/loaders/folder_attribution.py",
+      "drydocs/drydocs/loaders/batch_port_orchestrator.py"
+    ],
+    [
+      "drydocs/drydocs/loaders/folder_attribution.py",
       "drydocs/drydocs/loaders/seal_attribution.py"
     ],
     [
@@ -15949,6 +15962,10 @@
     [
       "drydocs/drydocs/loaders/manual_loads.py",
       "drydocs/drydocs/loaders/base.py"
+    ],
+    [
+      "drydocs/drydocs/loaders/manual_loads.py",
+      "drydocs/drydocs/loaders/folder_attribution.py"
     ],
     [
       "drydocs/drydocs/loaders/manual_loads.py",
@@ -16824,7 +16841,15 @@
     ],
     [
       "drydocs/tests/unit/test_folder_attribution.py",
+      "drydocs/drydocs/loaders/base.py"
+    ],
+    [
+      "drydocs/tests/unit/test_folder_attribution.py",
       "drydocs/drydocs/loaders/folder_attribution.py"
+    ],
+    [
+      "drydocs/tests/unit/test_folder_attribution.py",
+      "drydocs/drydocs/loaders/manual_loads.py"
     ],
     [
       "drydocs/tests/unit/test_folder_attribution.py",
@@ -17085,6 +17110,10 @@
     [
       "drydocs/tests/unit/test_manual_loads.py",
       "drydocs/drydocs_core/models/__init__.py"
+    ],
+    [
+      "drydocs/tests/unit/test_mapping_api.py",
+      "drydocs/drydocs_api/app.py"
     ],
     [
       "drydocs/tests/unit/test_mapping_api.py",
@@ -24529,7 +24558,7 @@
     [
       "drydocs/knowledge/depgraph-snapshots",
       "CONTAINS",
-      "drydocs/knowledge/depgraph-snapshots/drydocs-20260804.json"
+      "drydocs/knowledge/depgraph-snapshots/drydocs-20260804-0811.json"
     ],
     [
       "drydocs/knowledge/depgraph-snapshots",
@@ -26104,6 +26133,11 @@
     [
       "drydocs/web/src/routes",
       "CONTAINS",
+      "drydocs/web/src/routes/AppCodeCascadePane.tsx"
+    ],
+    [
+      "drydocs/web/src/routes",
+      "CONTAINS",
       "drydocs/web/src/routes/AskRoute.tsx"
     ],
     [
@@ -26246,13 +26280,13 @@
     "projects": [
       "drydocs"
     ],
-    "files": 1469,
-    "edges": 467,
+    "files": 1470,
+    "edges": 472,
     "circular_files": 0,
     "processes": 0,
     "data_assets": 0,
     "hosts": 0,
-    "rels": 1762,
+    "rels": 1763,
     "directories": 256
   }
 }
