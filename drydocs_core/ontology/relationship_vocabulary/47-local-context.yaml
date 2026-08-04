@@ -1,0 +1,71 @@
+
+  # ── Context graph (SOSA/SSN — EXPERIMENTAL / early adoption) ───────────────
+  # NOT a declared company standard. Declared so the ontology-mapper can carry
+  # the `jobrun-observation` map entry through the HITL gate. SOSA edges sit
+  # OUTSIDE the PROV matrix (prov_maps_to: ~) and map to a sosa:* term instead.
+  # Loaders are intentionally null — no instance data until the gated pilot (E2).
+
+  - id:           sosa_observes
+    neo4j_label:  OBSERVES
+    inverse_label: "observed by"
+    role:         ~
+    from_node:    Observation
+    to_node:      ControlMJob          # or ControlMFolder — both can act as sosa:FeatureOfInterest
+    prov_maps_to: ~
+    sosa_maps_to: "sosa:hasFeatureOfInterest"
+    note: >
+      EXPERIMENTAL. Observation is about a feature of interest (the job/folder).
+      Open gate decision: is ControlMJobRun itself the Observation, or a separate
+      Observation node? See config/taxonomy-ontology-map.yaml `jobrun-observation`.
+    supplement:   sosa_experimental_supplement.cypher
+    loader:       ~
+    domain:       context
+    status:       planned
+
+  - id:           sosa_has_result
+    neo4j_label:  HAS_RESULT
+    inverse_label: "result of"
+    role:         ~
+    from_node:    Observation
+    to_node:      Result
+    prov_maps_to: ~
+    sosa_maps_to: "sosa:hasResult"
+    note: >
+      EXPERIMENTAL. Observation produced a result; the result carries resultTime
+      (xsd:dateTime) and may carry a dqv:QualityMeasurement (freshness_sla etc.).
+    supplement:   sosa_experimental_supplement.cypher
+    loader:       ~
+    domain:       context
+    status:       planned
+
+  - id:           sosa_made_by_sensor
+    neo4j_label:  MADE_BY_SENSOR
+    inverse_label: "made"
+    role:         ~
+    from_node:    Observation
+    to_node:      Sensor
+    prov_maps_to: ~
+    sosa_maps_to: "sosa:madeBySensor"
+    note: >
+      EXPERIMENTAL. Observation was made by a monitoring source (Control-M
+      history API / health probe).
+    supplement:   sosa_experimental_supplement.cypher
+    loader:       ~
+    domain:       context
+    status:       planned
+
+  - id:           sosa_observed_property
+    neo4j_label:  OF_OBSERVABLE_PROPERTY
+    inverse_label: "observed in"
+    role:         ~
+    from_node:    Observation
+    to_node:      ObservableProperty
+    prov_maps_to: ~
+    sosa_maps_to: "sosa:observedProperty"
+    note: >
+      EXPERIMENTAL. Observation targets an observable property (run-status,
+      run-duration, exit-status, freshness).
+    supplement:   sosa_experimental_supplement.cypher
+    loader:       ~
+    domain:       context
+    status:       planned

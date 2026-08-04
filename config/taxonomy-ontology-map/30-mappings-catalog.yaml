@@ -1,0 +1,232 @@
+
+  - id: seal-doc-source-of-record
+    taxonomy:
+      source: seal-pat-scrape           # future drydocs-docmeta component source id — NOT yet registered in config/source-registry.yaml
+      element: "SEAL/PAT scraped documentation page is the source of record for an extracted Application fact/record"
+    ontology:
+      from_node: BusinessApplication                # PROPOSED class: prov:Entity / dprod:DataProduct
+      to_node: Document                      # prov:Entity — scraped SEAL/PAT page (drydocs-docmeta, planned)
+      prov_type_from: Entity
+      prov_type_to: Entity
+      matrix_row: "Entity -> Entity = prov:wasDerivedFrom family (prov:hadPrimarySource is a sub-property)"
+      neo4j_label: HAD_PRIMARY_SOURCE
+      prov_maps_to: "prov:hadPrimarySource"
+      vocab_id: seal_had_primary_source
+    precedence_authority: lob-product-team    # SEAL/PAT precedence wired into the live chain at K4 clause 7 — see config/precedence.yaml
+    standards_cited: ["PROV-O (prov:hadPrimarySource, sub-property of prov:wasDerivedFrom)"]
+    capture: >
+      waived — the source (seal-pat-scrape) is not yet registered in config/source-registry.yaml;
+      registration + capture arrive with the drydocs-docmeta component gate.
+    status: confirmed                       # gate §D CONFIRMED; applied waits on the docmeta Document loader (applied = a loader wrote the graph)
+    depends_on: application-as-dataproduct
+    proposed_at: 2026-07-08
+    confirmed_by: SME
+    confirmed_on: 2026-07-10                # §D also promoted drydocs-docmeta from parked to REQUIRED
+    source_of_record_mechanism: >
+      Two linked mechanisms, both proposed: (1) register SEAL/PAT as the authoritative
+      precedence source for internal product/business identity in config/precedence.yaml (a
+      documented proposed_additions entry, NOT wired into the live order:/active: chain — see
+      that file); (2) every fact/record extracted from a scraped page carries this
+      hadPrimarySource edge back to the Document it was extracted from. Trust axis
+      (VERBATIM/GROUNDED/SYNTHESIZED) and classification (Internal-Public / Internal) are
+      carried on the Document/Chunk nodes themselves, per
+      knowledge/upgrade-plans/docmeta-component.md — out of scope for this entry.
+    open_questions:
+      - "The drydocs-docmeta component (Document/Chunk nodes, scraper, loader) does not exist yet — this mapping type-checks against the PROPOSED node_classifications entries only (Application reclass + the new Document classification); it cannot be loaded until docmeta itself is built and separately gated."
+      - "Does every extracted Application fact get its own hadPrimarySource edge (fact-level granularity), or one edge per Application node against its primary source page (node-level granularity)? Affects loader design once docmeta lands."
+
+  # ---- K5: Product Cabinet attribution model (CONFIRMED — gate signed off 2026-07-20) ----
+  # Gate config/gate-prompts/product-cabinet-attribution.yaml, SIGNED OFF §F 2026-07-20
+  # (SME in-session; transcribed to config/gate-log.md same day). Split out of the
+  # 2026-07-10 BusinessApplication entity-reshape gate §B ("DECISION (SME ok to split)",
+  # config/gate-log.md) into its own backlog item (K5) and its own HITL gate. NOT applied —
+  # the three catalog_cabinet_* vocab terms + the ProductRole node_classifications entry
+  # stay status: planned until the K6 supplement lands (honest-lifecycle); loader blocked
+  # company-side (no person-level cabinet extract).
+
+  - id: product-cabinet-attribution
+    taxonomy:
+      source: "pat:product-catalog"
+      element: "Product Cabinet role-holders (Area Product Owner, Product Owner, Product Architect, Tech Partner, Data Owner, Data Certifier, Analytics Lead — exactly the fixed 7; NO shared cto, per the 2026-07-20 in-session SME answers) attributed to the Product / AreaProduct PAT hierarchy nodes (2026-07-10 gate §B split, backlog K5)"
+    ontology:
+      from_node: "Product | AreaProduct"    # dd:Product / dd:AreaProduct (local catalog hierarchy; prov:Entity)
+      to_node: Employee                     # prov:Agent
+      prov_type_from: Entity
+      prov_type_to: Agent
+      matrix_row: "Entity -> Agent = prov:wasAttributedTo (BOTH forms — the qualified/reified chain AND the simple collapsed WAS_ATTRIBUTED_TO edge; gate section C open question DECIDED 2026-07-20 by the SME in-session, deviating from the K4 qualified-only resolution)"
+      qualified_form:
+        pattern: "(Product|AreaProduct) -[:QUALIFIED_ATTRIBUTION]-> (:Attribution) -[:HAS_AGENT]-> Employee ; (:Attribution) -[:HAD_ROLE]-> ProductRole"
+        prov_maps_to: ["prov:qualifiedAttribution", "prov:agent", "prov:hadRole"]
+        role_vocabulary: "ProductRole (skos:Concept) — EXACTLY the fixed 7 in scheme product_roles: area_product_owner, product_owner, product_architect, tech_partner, data_owner, data_certifier, analytics_lead. Scheme FIXED (the tom_roles precedent — new roles require a new gate) and NO cto member: the families are independent (SME 2026-07-20; rename history as a skos:changeNote on tech_partner — formerly named 'CTO' in SEAL, whose CTO now denotes the product-level role). Scope: :Product / :AreaProduct only, never :BusinessApplication; area_product_owner AND tech_partner attach ONLY to :AreaProduct. DISTINCT from :Role (org:Role, PAT hierarchy membership) and from :TOMRole — no shared concepts."
+      vocab_id: [catalog_cabinet_qualified_attribution, seal_attribution_has_agent, catalog_cabinet_attribution_had_role, catalog_cabinet_attributed_to]   # HAS_AGENT hop REUSES seal_attribution_has_agent (duplicate-triple guard, C8 schema meta-graph); catalog_cabinet_attributed_to = the collapsed simple form, SME-decided 2026-07-20 (gate section C)
+    precedence_authority: lob-product-team
+    standards_cited: ["PROV-O (prov:qualifiedAttribution, prov:agent, prov:hadRole)", "SKOS (skos:Concept, skos:inScheme)", "W3C ORG (org:reportsTo — cited for the deferred cross-family reporting edges, gate section D)"]
+    capture: config/taxonomy/lob-product-team.yaml
+    vocab_id: [catalog_cabinet_qualified_attribution, seal_attribution_has_agent, catalog_cabinet_attribution_had_role, catalog_cabinet_attributed_to]   # entry-level C7 field; mirrors ontology.qualified_form.vocab_id + the collapsed form
+    status: confirmed
+    proposed_at: 2026-07-19
+    confirmed_by: chad.wilson   # SME, in-session chat gate — §F sign-off
+    confirmed_on: 2026-07-20    # gate product-cabinet-attribution signed off (config/gate-log.md)
+    gate_spec: config/gate-prompts/product-cabinet-attribution.yaml
+    note: >
+      Product Cabinet family, split at the 2026-07-10 gate (§B) from the SEAL Technical
+      Operational Contacts family (seal-tom-attribution, applied K4 against
+      :BusinessApplication) into its own scope (:Product / :AreaProduct) and its own gate
+      (K5). Reuses the K4 reified qualifiedAttribution pattern verbatim: catalog-domain
+      twin terms where the triples differ (HAS_DEV_TEAM dual-registration precedent), but
+      the Attribution -[:HAS_AGENT]-> Employee hop REUSES seal_attribution_has_agent —
+      an exact-duplicate triple is refused by the C8 schema meta-graph, so that entry is
+      shared infrastructure (its note rescopes at sign-off), not twinned.
+      The DevTeam<->BusinessApplication M:N read and the
+      cross-family reporting relations are carried in this entry's open_questions pending
+      the gate — no new edges are proposed for either beyond what is listed there.
+      AMENDED 2026-07-20 (in-session SME answers, recorded pre-sign-off): (1) the
+      product_roles scheme is FIXED — new roles require a new gate; (2) the shared-cto
+      concept is DROPPED for now — the families are INDEPENDENT (supersedes the 2026-07-10
+      §B "CTO in both families" record; rename history: the area-product Tech Partner was
+      formerly named "CTO" in SEAL, and SEAL's CTO now denotes the product-level role —
+      SEAL's cto stays a TOM role on :BusinessApplication, untouched); (3) tech_partner
+      joins area_product_owner as :AreaProduct-only; (4) the collapsed simple form
+      catalog_cabinet_attributed_to is ADDED alongside the reified chain (section C).
+      TOM-side shared-cto surfaces (TOMRole notes, seal supplement c4.shared_with) correct
+      themselves at sign-off transcription, each its own logged change.
+    open_questions:
+      - "AreaProduct layer absent from the lob-product-team sample (open_questions#area-product-missing, counts.area_products: 0, config/taxonomy/lob-product-team.yaml) — the ProductRole SCHEME is confirmable now; the AreaProduct loader (catalog_has_area_product / catalog_area_product_has_dev_team, both status: planned) remains a separate, unbuilt dependency."
+      - "The three cross-family reporting relations (tech_partner MANAGES application_owner; information_owner MAY REPORT TO data_owner; data_certifier RELATES TO information_owner, config/gate-log.md 2026-07-10 §B) — gate §D DECIDED 2026-07-20 (SME in-session): RECORDED AS DEFERRED (option b); person-level population is an internal/company-side concern once a person-level PAT cabinet extract exists (SME: \"that can be done internally\"). Semantics preserved verbatim here until then; nothing registered."
+      - "DevTeam<->BusinessApplication M:N — gate §E CONFIRMED 2026-07-20 (SME in-session): M:N in both directions on the EXISTING applied arch_develops edge ((:BusinessApplication)-[:WAS_ATTRIBUTED_TO {role: developed_by}]->(:DevTeam)); semantics confirmation only, no new edge, no cardinality constraint; multiple developed_by teams on one application is valid data for verify rules."
+
+  # ---- C3: LOB→Product→Team edges (reuse ACTIVE vocab — batch) --------------
+  # Source taxonomy: config/taxonomy/lob-product-team.yaml.
+
+  - id: lob-has-product-line
+    taxonomy: { source: "pat:product-catalog", element: "LOB contains ProductLine" }
+    ontology:
+      from_node: CatalogLOB
+      to_node: ProductLine
+      matrix_row: "local catalog hierarchy (no PROV row)"
+      neo4j_label: HAS_PRODUCT_LINE
+      prov_maps_to: ~
+    precedence_authority: lob-product-team
+    vocab_id: catalog_has_product_line
+    status: confirmed
+    confirmed_by: SME
+    confirmed_on: 2026-06-21
+
+  - id: product-line-has-product
+    taxonomy: { source: "pat:product-catalog", element: "ProductLine contains Product" }
+    ontology:
+      from_node: ProductLine
+      to_node: Product
+      matrix_row: "local catalog hierarchy (no PROV row)"
+      neo4j_label: HAS_PRODUCT
+      prov_maps_to: ~
+    precedence_authority: lob-product-team
+    vocab_id: catalog_has_product
+    status: confirmed
+    confirmed_by: SME
+    confirmed_on: 2026-06-21
+
+  - id: product-has-dev-team
+    taxonomy: { source: "pat:product-catalog", element: "Product has owning DevTeam" }
+    ontology:
+      from_node: Product
+      to_node: DevTeam
+      matrix_row: "local organizational linkage (no PROV row)"
+      neo4j_label: HAS_DEV_TEAM
+      prov_maps_to: ~
+    precedence_authority: lob-product-team
+    vocab_id: catalog_has_dev_team
+    status: confirmed
+    confirmed_by: SME
+    confirmed_on: 2026-06-21
+
+  - id: lob-reconciles-to-segment
+    taxonomy: { source: "pat:product-catalog", element: "LOB reconciles to a corporate BusinessSegment (confidence)" }
+    ontology:
+      from_node: CatalogLOB
+      to_node: BusinessSegment
+      matrix_row: "skos:closeMatch (approximate; no PROV row)"
+      neo4j_label: RECONCILES_TO
+      prov_maps_to: ~                        # carries confidence 0.0–1.0; not 1:1 (AWMCIB=0.5)
+    precedence_authority: lob-product-team
+    vocab_id: catalog_reconciles_to
+    status: confirmed
+    confirmed_by: SME
+    confirmed_on: 2026-06-21
+
+  # ---- C3 DECISION: resolve the SUPPORTS range ambiguity -------------------
+  # NOT in the current sample (no AreaProduct / SUPPORTS rows), but the vocabulary has
+  # SUPPORTS with range "Product OR AreaProduct" (free-text union) — consolidated-plan E.2.
+  - id: dev-team-supports
+    taxonomy: { source: "pat:people-report", element: "DevTeam is aligned to / supports an AreaProduct (team_type, sponsored)" }   # alignment is VOLATILE, swept from the team report per load (C9)
+    ontology:
+      from_node: DevTeam                     # org:OrganizationalUnit (Agent)
+      to_node: AreaProduct                   # RESOLVED: range = AreaProduct (Team-of-Teams)
+      matrix_row: "Agent → Entity — no PROV row; local"
+      neo4j_label: SUPPORTS
+      prov_maps_to: ~
+      edge_properties: { team_type: "aligned | flex | dedicated", sponsored: bool }   # 'aligned to' = team_type aligned
+    precedence_authority: lob-product-team
+    vocab_id: catalog_supports_area_product
+    status: confirmed
+    confirmed_by: SME
+    confirmed_on: 2026-06-21
+    decision_resolved: >
+      SME 2026-06-21: SUPPORTS targets AreaProduct (not Product). Product is reached via the
+      hierarchy (Product ▸ AreaProduct ▸ DevTeam), so a DevTeam→Product SUPPORTS edge is dropped
+      in favor of DevTeam→AreaProduct. "aligned to" is captured by team_type=aligned on the edge.
+      C4: set catalog_supports_area_product active; deprecate catalog_supports (DevTeam→Product).
+
+  - id: dev-team-develops-app
+    taxonomy: { source: "pat:people-report", element: "DevTeam develops a BusinessApplication (joined by SEALID)" }   # team-scoped seal_ids from the PAT team report (C9)
+    ontology:
+      from_node: BusinessApplication         # prov:Entity / dprod:DataProduct (K4 reclass); key = SEALID
+      to_node: DevTeam                       # org:OrganizationalUnit (Agent)
+      join_key: SEALID                        # reconcile catalog DevTeam <-> SEAL app by SEALID
+      matrix_row: "Entity → Agent = prov:wasAttributedTo (role=developed_by)"
+      neo4j_label: WAS_ATTRIBUTED_TO
+      role: developed_by
+      prov_maps_to: "prov:wasAttributedTo"
+    precedence_authority: lob-product-team
+    vocab_id: arch_develops
+    status: confirmed
+    confirmed_by: SME
+    confirmed_on: 2026-06-21
+    note: >
+      SME 2026-06-21: DevTeam develops BusinessApplication, reconciled by SEALID. Cross-source
+      edge (lob-product-team taxonomy -> business-application taxonomy); the join (which team
+      builds which app) comes from catalog<->SEAL ownership reconciliation.
+      FLIPPED at K4 (2026-07-15; gate 2026-07-10 §E): was DevTeam-[:DEVELOPS]->(Agent→Agent,
+      no PROV row); post-reclass the PROV-valid inverse WAS_ATTRIBUTED_TO {role: developed_by}
+      applies. Migration: migrate_develops_to_was_attributed_to.cypher.
+
+  # ---- K13: catalog_has_application — the §G6 support reading (K7 gate) -----
+  # SEMANTICS confirmed at the K7 close-out gate (seal-app-ref-edge-reshape,
+  # signed 24/24, 2026-08-03, §G6). LOADING still waits on the product-scoped
+  # extract — the C9 condition, unchanged by this entry. Company-side the edge
+  # is ACTIVE (live extract + loader); this entry is the producer's back-flow
+  # adoption of the ruled reading (backlog K13), not new build.
+  - id: product-has-application
+    taxonomy: { source: "pat:product-catalog", element: "Product is supported by its Mapped Applications (product-scoped tab; extract NOT onboarded producer-side)" }
+    ontology:
+      from_node: Product                     # dd:Product (prov:Entity)
+      to_node: BusinessApplication           # prov:Entity / dprod:DataProduct (K4 reclass)
+      matrix_row: "local catalog hierarchy (no PROV row — both ends Entities post-K4)"
+      neo4j_label: HAS_APPLICATION
+      prov_maps_to: ~
+    precedence_authority: lob-product-team
+    vocab_id: catalog_has_application
+    capture: "waived — the product-scoped Mapped Applications extract is not onboarded producer-side (the C9 condition); the semantics were ruled at the K7 gate from the company's live extract (evidence index: internal/pat-evidence/README.md)"
+    status: confirmed
+    confirmed_by: chad.wilson
+    confirmed_on: 2026-08-03
+    decision_resolved: >
+      K7 gate §G6 (2026-08-03): the COMPANY reading — a structural SUPPORT link,
+      a Product supported by 2 or more applications (front-end/back-end) — NOT
+      the producer's "a Product owns a set of SEAL-registered applications".
+      Chosen because the company reading is backed by a live extract and loader
+      where the producer's was an unbuilt intention. The edge is 1:many BY
+      DESIGN (the extract's application-id column is multi-valued), so the K11
+      cascade picker returns a LIST, never a single application. The vocabulary
+      entry stays status: planned until the product-scoped extract is onboarded
+      here (C9 condition unchanged); K13 reconciled the semantics only.

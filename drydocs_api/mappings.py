@@ -48,7 +48,7 @@ DOMAINS: tuple[dict, ...] = (
         "id": "ontology-map",
         "title": "Taxonomy ↔ Ontology map (the loading quintuple)",
         "kind": "quintuple",
-        "source": "config/taxonomy-ontology-map.yaml",
+        "source": "config/taxonomy-ontology-map/",
         "tier": None,
         "available": True,
     },

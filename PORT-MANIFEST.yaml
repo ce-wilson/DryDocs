@@ -84,9 +84,14 @@ default: "clean-add when absent on consumer; evaluate when both sides created th
 
 rows:
   # ---- per-entry files (checkout of the whole file is FORBIDDEN) ------------
-  - path: "drydocs_core/ontology/relationship_vocabulary.yaml"
+  - path: "drydocs_core/ontology/relationship_vocabulary/**"
     disposition: per-entry
     entry_rule: >
+      S5 (2026-08-04): the registry is a fragment DIRECTORY — per-domain files
+      merged in sorted-filename order by drydocs_core/yaml_fragments.py; apply
+      this split shape on the consumer rather than resolving it as a conflict
+      (entries are unchanged, grouped by their existing domain field; read the
+      merged document, never a fragment alone).
       id-keyed (local_relationships[].id, node_classifications[].label). NEVER
       downgrade a consumer entry whose status is active (or a node class a live
       loader depends on) to the producer's planned/deprecated — EXCEPT gate-authorized
@@ -95,9 +100,11 @@ rows:
       deprecated status; the gate outcome IS the authority). Back-flow-origin
       ids (m3_seal_app_ref and successors) are consumer-canonical once promoted.
     note: "guarded producer-side by test_schema.py + test_taxonomy_ontology_map.py"
-  - path: "config/taxonomy-ontology-map.yaml"
+  - path: "config/taxonomy-ontology-map/**"
     disposition: per-entry
     entry_rule: >
+      S5 (2026-08-04): fragment DIRECTORY, same shape and rule as the
+      relationship_vocabulary row above — apply the split, merge per entry.
       id-keyed (mappings[].id). NEVER downgrade confirmed/applied ->
       proposed; summary block is COMPUTED (recount after any merge —
       test_taxonomy_ontology_map.py enforces); union new entries from both sides.

@@ -1,0 +1,234 @@
+
+  # ── SEAL ─────────────────────────────────────────────────────────────────
+
+  - id:           seal_has_port
+    neo4j_label:  HAS_PORT
+    inverse_label: "port of"
+    role:         ~
+    from_node:    BusinessApplication
+    to_node:      Port
+    prov_maps_to: ~
+    note: >
+      Application exposes a data port (EventProcessing or BatchProcessing).
+      Maps to dprod:hasPort pattern. Port kind is stored as a node property.
+      No PROV-O equivalent; structural dprod relationship.
+    supplement:   seal_ontology_supplement.cypher
+    loader:       seal_applications.cypher
+    domain:       seal
+    status:       active
+
+  - id:           seal_requires_scheduler
+    neo4j_label:  REQUIRES_SCHEDULER
+    inverse_label: "required by"
+    role:         ~
+    from_node:    Port                       # as registered; the pre-gate HOIST direction (to :BusinessApplication) was absorbed by the reg_uses_software landing, so no reshape ever applied here
+    to_node:      SchedulerKind              # RETIRED TARGET — :SchedulerKind deprecated at C12 (seeds retired in ontology.cypher; the scheduler_kind constraint was then REMOVED 2026-07-23 in the C13 leftover sweep — pre-C13 graphs are wiped and rebuilt from bootstrap, so nothing creates or holds the label)
+    prov_maps_to: ~
+    note: >
+      Registered per backlog C6 (2026-07-09) to close the drift where
+      REQUIRES_SCHEDULER appeared in README.md:263 and docs/history/LoadPlanV3.md:82,393
+      but was absent from this registry. Original semantics: the SEAL batch
+      :Port (kind=BatchProcessing) points at a scheduler technology,
+      :SchedulerKind {name: ControlM|Autosys|Airflow}, then seeded in
+      ontology.cypher; null-PROV infrastructure placement (the SCHEDULED_ON
+      family). The three C6 open questions (attach point, target node,
+      null-PROV) were all CLOSED by the deprecation below — the
+      requires-scheduler map entry keeps the question-by-question record.
+    deprecation_note: >
+      DEPRECATED at C12 (platforms-taxonomy gate, SIGNED OFF 2026-07-21 pm;
+      config/gate-log.md) — retired UN-WIRED: status was planned throughout,
+      no loader ever ran and no graph data exists (nothing to migrate; the
+      'data kept in graph' clause of the deprecated lifecycle is vacuous
+      here). The fact lands on the ACTIVE registry edge (:BusinessApplication)
+      -[:USES_SOFTWARE {source: 'batch-port'}]->(:SoftwareProduct
+      {role: orchestrator}) — reg_uses_software — meaning carried by the
+      target's role (SME: role over class; capability node layer NOT
+      adopted); zero new edge or node types. Supersedes the 07-09 Ais*
+      interim retarget, which was removed unbuilt. Loader migration =
+      backlog C14.
+    superseded_by: reg_uses_software
+    supplement:   ~                          # never declared — retired before any supplement block landed
+    loader:       ~
+    domain:       seal
+    status:       deprecated
+    deprecated_at: 2026-07-21
+
+  - id:           seal_has_membership
+    neo4j_label:  HAS_MEMBERSHIP
+    inverse_label: "membership of"
+    role:         ~
+    from_node:    BusinessApplication
+    to_node:      Membership
+    prov_maps_to: ~
+    note: >
+      Application has a role-holder membership record. Maps to
+      org:hasMembership. Membership nodes carry valid_from/valid_to
+      for temporal role tracking.
+    deprecation_note: >
+      DEPRECATED at K4 (2026-07-15; gate 2026-07-10 §C) in favor of the SEAL TOM
+      qualified-attribution pattern (seal_qualified_attribution / seal_attribution_has_agent /
+      seal_attribution_had_role, now active). org:Membership/org:Role is the wrong pattern
+      for SEAL's Technical Operating Model role-holders (a governance model DISTINCT from
+      real organizations); org: stays for the PAT product hierarchy only (e.g.
+      catalog_dev_team_has_membership — SAME labels, different vocab id, NOT deprecated).
+      Existing graph data kept per RELATIONSHIP_GUIDE; loader replacement lands with the
+      K4 clause-6 map flips.
+    supplement:   seal_ontology_supplement.cypher
+    loader:       seal_applications.cypher
+    domain:       seal
+    status:       deprecated
+    deprecated_at: 2026-07-15
+
+  - id:           seal_of_role
+    neo4j_label:  OF_ROLE
+    inverse_label: "role of"
+    role:         ~
+    from_node:    Membership
+    to_node:      Role
+    prov_maps_to: ~
+    note: >
+      Membership is for a specific named role. Maps to org:role property
+      in the W3C ORG ontology.
+    deprecation_note: >
+      DEPRECATED at K4 (2026-07-15; gate 2026-07-10 §C) alongside seal_has_membership /
+      seal_held_by — same TOM-vs-PAT reasoning (see seal_has_membership's deprecation_note).
+      Replacement: Attribution -[:HAD_ROLE]-> TOMRole (seal_attribution_had_role, active).
+    supplement:   seal_ontology_supplement.cypher
+    loader:       seal_applications.cypher
+    domain:       seal
+    status:       deprecated
+    deprecated_at: 2026-07-15
+
+  - id:           seal_held_by
+    neo4j_label:  HELD_BY
+    inverse_label: "holds"
+    role:         ~
+    from_node:    Membership
+    to_node:      Employee
+    prov_maps_to: ~
+    note: >
+      Membership is held by an employee. Inverse of org:member /
+      org:hasMember. Direction chosen so the membership record is the
+      natural starting point for role queries.
+    deprecation_note: >
+      DEPRECATED at K4 (2026-07-15; gate 2026-07-10 §C) alongside seal_has_membership /
+      seal_of_role — same TOM-vs-PAT reasoning (see seal_has_membership's deprecation_note).
+      Replacement: Attribution -[:HAS_AGENT]-> Employee (seal_attribution_has_agent, active),
+      reached via BusinessApplication -[:QUALIFIED_ATTRIBUTION]-> Attribution.
+    supplement:   seal_ontology_supplement.cypher
+    loader:       seal_applications.cypher
+    domain:       seal
+    status:       deprecated
+    deprecated_at: 2026-07-15
+
+  # ── SEAL — PROPOSED reshape (GATE-BOUND, 2026-07-08 review) ────────────────
+  # Nothing below is active. The :BusinessApplication node stays classed prov:SoftwareAgent (see
+  # node_classifications) until the SME confirms; these entries exist ONLY so the proposed
+  # edges type-check under the PROV matrix once that reclass is confirmed. All carry
+  # supplement: ~ / loader: ~ on purpose — no supplement/loader claims for a planned-only
+  # proposal. See config/taxonomy-ontology-map.yaml (application-as-dataproduct,
+  # seal-tom-attribution, seal-doc-source-of-record) and
+  # config/gate-prompts/seal-tom-attribution-reshape.yaml.
+
+  - id:           seal_had_primary_source
+    neo4j_label:  HAD_PRIMARY_SOURCE
+    inverse_label: "primary source for"
+    role:         ~
+    from_node:    BusinessApplication
+    to_node:      Document
+    prov_maps_to: "prov:hadPrimarySource"
+    note: >
+      ACTIVE (K4, 2026-07-15; gate 2026-07-10 §D). Entity -> Entity, a sub-property of
+      prov:wasDerivedFrom: the BusinessApplication record (reclassed prov:Entity/
+      dprod:DataProduct at K4) was primarily sourced from a scraped SEAL/PAT Document.
+      Generalizes to any fact/entity extracted from a scraped page; BusinessApplication is
+      the concrete instance in scope. EDGE-ACTIVE ONLY: the Document node + loader wait on
+      the drydocs-docmeta component (the gate promoted docmeta from parked to a REQUIRED
+      dependency of the provenance goal) — see knowledge/upgrade-plans/docmeta-component.md.
+      Matrix row: Entity -> Entity = prov:wasDerivedFrom family.
+    supplement:   seal_ontology_supplement.cypher
+    loader:       ~
+    domain:       seal
+    status:       active
+
+  - id:           seal_app_attributed_to_employee
+    neo4j_label:  WAS_ATTRIBUTED_TO
+    inverse_label: "attributed with"
+    role:         tom_role_holder
+    from_node:    BusinessApplication
+    to_node:      Employee
+    prov_maps_to: "prov:wasAttributedTo"
+    note: >
+      PROPOSED. Simple/collapsed form of the TOM attribution pattern (matrix row Entity ->
+      Agent = wasAttributedTo). Coexists with the qualified/reified form below
+      (seal_qualified_attribution / seal_attribution_has_agent / seal_attribution_had_role),
+      which carries the specific TOM role. role=tom_role_holder distinguishes this instance
+      from arch_owns_code (role=owner) and reg_made_by on the same WAS_ATTRIBUTED_TO label.
+      Depends on the proposed :BusinessApplication reclass (SoftwareAgent -> Entity) — does NOT
+      type-check under the CURRENT active classification.
+    supplement:   ~
+    loader:       ~
+    domain:       seal
+    status:       planned
+
+  - id:           seal_qualified_attribution
+    neo4j_label:  QUALIFIED_ATTRIBUTION
+    inverse_label: "attribution of"
+    role:         ~
+    from_node:    BusinessApplication
+    to_node:      Attribution
+    prov_maps_to: "prov:qualifiedAttribution"
+    note: >
+      ACTIVE (K4, 2026-07-15; gate 2026-07-10 §B). Reified/n-ary form of the TOM attribution
+      pattern (Attribution is a PROV Influence node, not itself Activity / Entity / Agent /
+      Collection, so no matrix row applies directly). Entry point to Attribution
+      -[:HAS_AGENT]-> Employee and Attribution -[:HAD_ROLE]-> TOMRole below. Type-checks
+      under the K4 :BusinessApplication reclass (prov:Entity). Multi-person roles load THIS
+      form; the simple collapsed edge (seal_app_attributed_to_employee) stays optional/derivable.
+    supplement:   seal_ontology_supplement.cypher
+    loader:       ~
+    domain:       seal
+    status:       active
+
+  - id:           seal_attribution_has_agent
+    neo4j_label:  HAS_AGENT
+    inverse_label: "agent of"
+    role:         ~
+    from_node:    Attribution
+    to_node:      Employee
+    prov_maps_to: "prov:agent"
+    note: >
+      ACTIVE (K4, 2026-07-15; gate 2026-07-10 §B). prov:agent inside the qualified-attribution
+      reification — names which Employee the Attribution is about. No independent matrix row
+      (Attribution is prov_type n/a, same family as seal_held_by's org:member inverse).
+      RESCOPED at the K5 sign-off (2026-07-20): serves BOTH attribution families as
+      family-agnostic infrastructure — the SEAL TOM chain (seal_qualified_attribution) and
+      the Product Cabinet chain (catalog_cabinet_qualified_attribution, planned) — because
+      the (Attribution, HAS_AGENT, Employee) triple is registered exactly once (the C8
+      schema meta-graph refuses ambiguous duplicate triples).
+    supplement:   seal_ontology_supplement.cypher
+    loader:       ~
+    domain:       seal
+    status:       active
+
+  - id:           seal_attribution_had_role
+    neo4j_label:  HAD_ROLE
+    inverse_label: "role in"
+    role:         ~
+    from_node:    Attribution
+    to_node:      TOMRole
+    prov_maps_to: "prov:hadRole"
+    note: >
+      ACTIVE (K4, 2026-07-15; gate 2026-07-10 §B REVISED role set). prov:hadRole inside the
+      qualified-attribution reification — names which TOM role the Attribution grants. The
+      fixed 7-concept scheme (tom_roles): application_owner | primary_information_owner |
+      backup_information_owner | cto | technology_risk_controls |
+      design_authority | operate_manager (L1/L2 = a level property on the Attribution, per
+      the gate's "one or both" wording). Subsumes the old flat 6: data_owner -> Information
+      Owner, risk_compliance_officer -> Technology Risk & Controls; Design Authority is new.
+      cto NOT shared with K5 ProductRole (K5 gate 2026-07-20: families independent).
+      TOMRole is a skos:Concept, DISTINCT from :Role (org:Role, PAT hierarchy only).
+    supplement:   seal_ontology_supplement.cypher
+    loader:       ~
+    domain:       seal
+    status:       active

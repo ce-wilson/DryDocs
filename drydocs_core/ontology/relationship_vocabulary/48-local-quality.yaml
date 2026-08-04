@@ -1,0 +1,80 @@
+
+  # ── DQV quality edges (gate C23 dqv-seed-disposition, SME-ruled DEFER 2026-08-03)
+  # The :Metric/:Dimension catalog (ontology.cypher "DQV catalog" section) is a
+  # bootstrap-seeded REFERENCE catalog — the C23 ruling keeps it and registers
+  # its edges here, closing a gap that predated the vocabulary discipline
+  # entirely. IN_DIMENSION is live (written at bootstrap); the three
+  # measurement-leg edges stay planned until a measurement feed exists — the
+  # revival trigger is recorded in ontology.cypher above the seed.
+  - id:           c23_in_dimension
+    neo4j_label:  IN_DIMENSION
+    inverse_label: "groups"
+    role:         ~
+    from_node:    Metric
+    to_node:      Dimension
+    prov_maps_to: ~
+    note: >
+      dqv:inDimension. Catalog-internal reference edge: each seeded :Metric
+      (rowcount_match, freshness_sla, ...) belongs to one quality :Dimension
+      (Completeness, Accuracy, Consistency, Timeliness, Integrity). Written at
+      bootstrap by ontology.cypher's DQV-catalog section (TDQ baseline,
+      LoadPlanV2 §11.6); no loader touches it after that. Registered
+      retroactively at C23 — the edge shipped before the vocabulary discipline
+      existed.
+    supplement:   ~
+    loader:       ontology.cypher
+    domain:       quality
+    status:       active
+
+  - id:           c23_is_measurement_of
+    neo4j_label:  IS_MEASUREMENT_OF
+    inverse_label: "measured by"
+    role:         ~
+    from_node:    QualityMeasurement
+    to_node:      Metric
+    prov_maps_to: ~
+    note: >
+      dqv:isMeasurementOf. A concrete :QualityMeasurement points at the catalog
+      :Metric it instantiates (LoadPlanV2 §4.4). NO WRITER EXISTS — planned
+      until a measurement feed does; first candidate is the temporal-runtime
+      freshness observations (cm_avg_run), whose shipped vocabulary notes
+      already say a Result "may carry a dqv:QualityMeasurement (freshness_sla
+      etc.)". C23 ruling: DEFER, not build — writers with no data source would
+      have nothing to write.
+    supplement:   ~
+    loader:       ~
+    domain:       quality
+    status:       planned
+
+  - id:           c23_computed_on
+    neo4j_label:  COMPUTED_ON
+    inverse_label: "measured by"
+    role:         ~
+    from_node:    QualityMeasurement
+    to_node:      Dataset
+    prov_maps_to: ~
+    note: >
+      dqv:computedOn. The measurement names the :Dataset it was computed
+      against (LoadPlanV2 §4.4). Planned with the same C23 trigger as
+      c23_is_measurement_of.
+    supplement:   ~
+    loader:       ~
+    domain:       quality
+    status:       planned
+
+  - id:           c23_has_quality
+    neo4j_label:  HAS_QUALITY
+    inverse_label: "quality of"
+    role:         ~
+    from_node:    Dataset
+    to_node:      QualityMeasurement
+    prov_maps_to: ~
+    note: >
+      dqv:hasQualityMeasurement. The dataset-side handle onto its measurements
+      (LoadPlanV2 §4.4: TDQ check produces measurements linked to the Dataset
+      via HAS_QUALITY). Planned with the same C23 trigger as
+      c23_is_measurement_of.
+    supplement:   ~
+    loader:       ~
+    domain:       quality
+    status:       planned

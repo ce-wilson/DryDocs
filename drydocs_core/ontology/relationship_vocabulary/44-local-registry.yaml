@@ -1,0 +1,49 @@
+
+  # ── Software registry (plan 07, gate-confirmed 2026-07-07) ───────────────
+
+  - id:           reg_made_by
+    neo4j_label:  MADE_BY
+    inverse_label: "makes"
+    role:         ~
+    from_node:    SoftwareProduct
+    to_node:      Vendor
+    prov_maps_to: "prov:wasAttributedTo"
+    note: >
+      SoftwareProduct (Entity) → Vendor (Agent). Matrix row: Entity → Agent =
+      wasAttributedTo; domain label kept (ADR 0004).
+    supplement:   registry_ontology_supplement.cypher
+    loader:       software_registry.py
+    domain:       registry
+    status:       active
+
+  - id:           reg_uses_software
+    neo4j_label:  USES_SOFTWARE
+    inverse_label: "used by"
+    role:         ~
+    from_node:    BusinessApplication
+    to_node:      SoftwareProduct
+    prov_maps_to: ~
+    note: >
+      Application (Agent) → SoftwareProduct (Entity). LOCAL domain edge — PROV
+      has no Agent → Entity usage row (prov:used is Activity → Entity); same
+      precedent as arch_contains. Edge properties: version, source, status.
+      Phase 1 loads only DryDocs' own stack (reserved app id DRYDOCS-SELF);
+      derived candidates come from CMD_LINE invocation patterns (plan-07
+      Phase 3), never base ingest. RULED at C12 (platforms-taxonomy gate,
+      SIGNED OFF 2026-07-21 pm, B1/B4; config/gate-log.md): this edge is ALSO
+      the landing for the SEAL batch-port orchestrator fact — source:
+      'batch-port' distinguishes those declared-orchestrator edges from the
+      DRYDOCS-SELF stack rows and the future 'controlm-cmdline' detections —
+      superseding seal_requires_scheduler (now deprecated). B4: the existing
+      LOCAL no-PROV Agent→Entity typing covers the migrated fact unchanged.
+      Loader migration = backlog C14. §G1/§G2 (gate seal-app-ref-edge-reshape
+      2026-08-03, built K11): the CONFIRMED mapping act authors a THIRD
+      source, 'app-code-mapping' {origin: 'confirmed'} — written by the
+      attribution writers when a folder edge lands; the 'batch-port' edges
+      stay origin='declared' (prefill only), superseded by the confirmed
+      edge's existence, never swept. Cardinality is 1:N (§G3 — never a
+      uniqueness constraint; mid-migration is a normal state, not drift).
+    supplement:   registry_ontology_supplement.cypher
+    loader:       software_registry.py + batch_port_orchestrator.py + folder_attribution.cypher/manual_seal_attribution.cypher   # source: 'registry' stack rows / 'batch-port' declared (C14) / 'app-code-mapping' confirmed (G1, K11)
+    domain:       registry
+    status:       active

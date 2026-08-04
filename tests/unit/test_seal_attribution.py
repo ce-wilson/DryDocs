@@ -25,10 +25,11 @@ from drydocs.loaders.seal_attribution import (
     resolve_attributions,
     validate_fact_rows,
 )
+from drydocs_core import yaml_fragments
 from drydocs_core.models import StgAppFactRow
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
-VOCAB_FILE = REPO_ROOT / "drydocs_core" / "ontology" / "relationship_vocabulary.yaml"
+VOCAB_FILE = REPO_ROOT / "drydocs_core" / "ontology" / "relationship_vocabulary"
 
 
 def _fact(
@@ -242,7 +243,7 @@ def test_job_grain_vocab_entry_is_deprecated_with_no_loader() -> None:
     entry records the supersession and names no loader or supplement. The
     K7 sign-off's 'stays active until the K7 build migrates it' clause is
     this downgrade's authority (recorded in the entry note)."""
-    vocab = yaml.safe_load(VOCAB_FILE.read_text(encoding="utf-8"))
+    vocab = yaml_fragments.load_yaml_source(VOCAB_FILE)
     entry = next(r for r in vocab["local_relationships"] if r["id"] == "m3_seal_app_ref")
     assert entry["status"] == "deprecated"
     assert entry["loader"] is None

@@ -13,9 +13,9 @@ import textwrap
 from pathlib import Path
 
 import pytest
-import yaml
 
 from drydocs.loaders.manual_loads import ManualLoadError, mapping_rows, parse_mapping_csv
+from drydocs_core import yaml_fragments
 from drydocs_core.mapping_store import (
     ONTOLOGY_MAP_PATH,
     MappingStoreError,
@@ -48,9 +48,7 @@ def test_build_materializes_all_tables():
     try:
         assert list(tables(conn)) == EXPECTED_TABLES
         ontology_count = conn.execute("SELECT count(*) FROM ontology_mapping").fetchone()[0]
-        yaml_count = len(
-            (yaml.safe_load(ONTOLOGY_MAP_PATH.read_text(encoding="utf-8")) or {})["mappings"]
-        )
+        yaml_count = len((yaml_fragments.load_yaml_source(ONTOLOGY_MAP_PATH) or {})["mappings"])
         assert ontology_count == yaml_count  # one row per YAML entry, no drops
         assert conn.execute("SELECT count(*) FROM relationship_vocabulary").fetchone()[0] > 0
         assert conn.execute("SELECT count(*) FROM node_classification").fetchone()[0] > 0

@@ -14,8 +14,8 @@ drydocs.loaders.manual_loads) and the api component (drydocs_api.mappings)
 consume it, and components never import each other (MODULE_MAP boundary).
 
 Sources materialized (all read-only here):
-- config/taxonomy-ontology-map.yaml          -> ontology_mapping (the quintuple)
-- drydocs_core/ontology/relationship_vocabulary.yaml
+- config/taxonomy-ontology-map/ (fragments)  -> ontology_mapping (the quintuple)
+- drydocs_core/ontology/relationship_vocabulary/ (fragments)
                                              -> relationship_vocabulary,
                                                 node_classification
 - config/manual-loads/manifest.yaml + CSVs   -> manual_load_file, manual_mapping
@@ -49,9 +49,8 @@ from collections.abc import Iterable
 from pathlib import Path
 from typing import Any
 
-import yaml
-
 import drydocs_core
+from drydocs_core import yaml_fragments
 from drydocs_core.manual_mappings import (
     DEFAULT_MANIFEST_PATH as MANIFEST_PATH,
 )
@@ -64,7 +63,7 @@ from drydocs_core.models import ManualMappingRow
 
 REPO_ROOT = Path(drydocs_core.__file__).resolve().parent.parent
 DEFAULT_DB_PATH = REPO_ROOT / "var" / "mapping.db"
-ONTOLOGY_MAP_PATH = REPO_ROOT / "config" / "taxonomy-ontology-map.yaml"
+ONTOLOGY_MAP_PATH = REPO_ROOT / "config" / "taxonomy-ontology-map"
 SEAL_CONTACT_OVERRIDES_PATH = REPO_ROOT / "config" / "overrides" / "seal-contact-overrides.csv"
 _OVERRIDES_META_KEY = "source:config/overrides/seal-contact-overrides.csv"
 _OVERRIDE_STATUSES = ("active", "corrected-in-seal")
@@ -287,13 +286,19 @@ class MappingStoreError(RuntimeError):
 
 
 def _sha256(path: Path) -> str:
-    return hashlib.sha256(path.read_bytes()).hexdigest()
+    # S5: sources may be fragment DIRECTORIES; the hash is over the merged
+    # document bytes, so staleness detection keys on content exactly as before.
+    try:
+        return hashlib.sha256(yaml_fragments.merged_bytes(path)).hexdigest()
+    except yaml_fragments.FragmentSourceError as exc:
+        raise MappingStoreError(f"mapping-store source not found: {path}") from exc
 
 
 def _load_yaml(path: Path) -> dict:
-    if not path.exists():
-        raise MappingStoreError(f"mapping-store source not found: {path}")
-    return yaml.safe_load(path.read_text(encoding="utf-8")) or {}
+    try:
+        return yaml_fragments.load_yaml_source(path) or {}
+    except yaml_fragments.FragmentSourceError as exc:
+        raise MappingStoreError(f"mapping-store source unreadable: {path}: {exc}") from exc
 
 
 def _text(value: Any) -> str | None:

@@ -14,7 +14,7 @@ through the PROV-O decision matrix and the registered standards, and only with S
 
 ## Your inputs
 - `config/taxonomy/*` (from `taxonomy-importer`)
-- `drydocs_core/ontology/relationship_vocabulary.yaml` (the 9-row matrix + existing local terms)
+- `drydocs_core/ontology/relationship_vocabulary/` (fragment dir: the 9-row matrix + existing local terms; edit the `4N-local-<domain>.yaml` fragment for your edge's domain)
 - `reference/standards/` (PROV-O, ORG, DPROD, SOSA/SSN, DCAT, SKOS)
 - `docs/RELATIONSHIP_GUIDE.md` (the 8-step checklist — follow it)
 
@@ -28,7 +28,7 @@ through the PROV-O decision matrix and the registered standards, and only with S
    Never a freestanding local label without a recorded mapping.
 4. Honor `config/precedence.yaml`: tag each mapping's `precedence_authority`; when sources
    conflict, the higher authority wins and the loser becomes an alias/closeMatch.
-5. Write the entry to `config/taxonomy-ontology-map.yaml` with **`status: proposed`** and an
+5. Write the entry to `config/taxonomy-ontology-map/` (the `N0-mappings-<domain>.yaml` fragment) with **`status: proposed`** and an
    `open_questions:` list for anything ambiguous.
 6. Fill BOTH structured fields on the entry (C7 — guarded by
    `tests/unit/test_taxonomy_ontology_map.py` for anything confirmed after 2026-07-10):

@@ -97,7 +97,7 @@ SURFACES: list[dict] = [
     {
         "id": "taxonomy-ontology-map",
         "title": "Taxonomy <-> Ontology map",
-        "file": "config/taxonomy-ontology-map.yaml",
+        "file": "config/taxonomy-ontology-map/",
         "consumers": ["drydocs_core/ontology/", "drydocs/loaders/"],
         "guard_tests": ["test_taxonomy_ontology_map.py"],
         "gate_ref": "HITL gate (docs/restructure/03-hitl-sme-flow.md)",
@@ -105,7 +105,7 @@ SURFACES: list[dict] = [
     {
         "id": "relationship-vocabulary",
         "title": "Relationship vocabulary",
-        "file": "drydocs_core/ontology/relationship_vocabulary.yaml",
+        "file": "drydocs_core/ontology/relationship_vocabulary/",
         "consumers": ["drydocs/loaders/cypher/", "drydocs_core/ontology/"],
         "guard_tests": ["test_controlm_cypher.py", "test_schema.py"],
         "gate_ref": "RELATIONSHIP_GUIDE.md + per-edge gates",

@@ -1,0 +1,63 @@
+# =============================================================================
+# relationship_vocabulary.yaml  —  DryDocs relationship registry
+#
+# SECTION 0 (node_classifications): every node label in the graph mapped to a
+#   CURIE that expands via drydocs_core/ontology/namespaces.py. All local labels
+#   live under dd: (https://drydocs.local/ontology#).
+#
+# SECTION 0b (property_terms): property-level standard-term bindings (what a
+#   node PROPERTY means — e.g. the audit envelope's dct: bindings, gate
+#   envelope-property-terms 2026-08-04). Documentation-grade; no edges.
+#
+# SECTION 1 (prov_matrix): the 9-row decision table. Stable — do not edit.
+#   Pick the row whose from_type/to_type matches your node classifications.
+#   The neo4j_label in that row is what you use in Cypher, unless a more
+#   specific existing label is already established (see local_relationships).
+#
+# SECTION 2 (local_relationships): one entry per declared relationship.
+#   Add here BEFORE writing any Cypher. Status lifecycle:
+#     planned    → declared but loader not yet written
+#     active     → supplement + loader both exist
+#     deprecated → no longer loaded; data kept in graph
+#     removed    → data and code both deleted
+#
+# Fields:
+#   id            unique snake_case identifier
+#   neo4j_label   the Cypher relationship type
+#   inverse_label target-side display phrasing (SUPPORTS -> "supported by"),
+#                 read as "<target> <inverse_label> <source>". PRESENTATIONAL
+#                 ONLY (C15, 2026-07-28): changes no direction, type, status,
+#                 or semantics; storage stays ONE directed edge; explicitly
+#                 not a gate matter. Presence enforced by test_schema.py.
+#   role          edge property for disambiguation (null = label is sufficient)
+#   from_node     source node label
+#   to_node       target node label
+#   prov_maps_to  PROV-O term this maps to (null = local-only or non-PROV standard)
+#   sosa_maps_to  SOSA/SSN term this maps to (experimental context-graph edges only)
+#   note          plain-English description + any gotchas
+#   supplement    schema file where LocalRelationship is declared (null = base PROV-O)
+#   loader        cypher file that writes this relationship
+#   domain        controlm | seal | catalog | architecture | context | all
+#   status        planned | active | deprecated | removed
+#
+# EXPERIMENTAL / early adoption: SOSA/SSN (domain: context) terms are W3C but
+# NOT a declared *company* standard. They are seeded only by the opt-in
+# sosa_experimental_supplement.cypher and tagged adoption:"experimental" in the
+# graph. They use status: planned here until the SME confirms via the gate.
+#
+# Sync history: updated 2026-06-09 from DryDocs Consolidated Documentation
+# (Sections 1–4, 6). Corrections applied during that audit:
+#   * Membership was documented as "prov:Membership" — no such class exists in
+#     PROV-O. Corrected to org:Membership (matches seal_ontology_supplement).
+#   * BusinessSegment: doc says org:FormalOrganization; the catalog supplement
+#     says org:Organization. Both are valid ORG classes; org:FormalOrganization
+#     is the more precise term and is adopted here. Update the supplement
+#     comment when convenient.
+#   * RUNS_ON (ControlMFolder→ControlMServer) renamed SCHEDULED_ON; the RUNS_ON
+#     label is reassigned to execution-host placement (see m3_runs_on_* below).
+#   * Section 4 mermaid edges (develops / owns / stored_in / contains /
+#     DEPENDS_ON) pre-date the ontology and are normalized to
+#     SCREAMING_SNAKE labels with PROV-O mappings where the matrix allows.
+# =============================================================================
+
+

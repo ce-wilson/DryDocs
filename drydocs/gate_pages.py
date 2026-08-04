@@ -3,7 +3,7 @@
 Renders a load-step spec into a **self-contained interactive review page**: an SME
 ticks confirmations, progress is saved in the browser (localStorage) and restored on
 return, and the page states that **no graph write happens until the mapping is
-confirmed** in ``config/taxonomy-ontology-map.yaml`` (decisions logged to
+confirmed** in ``config/taxonomy-ontology-map/`` (decisions logged to
 ``config/gate-log.md``). This is the *renderer* for the gate described in
 ``docs/restructure/03-hitl-sme-flow.md`` / ``04-sme-checklist-and-load-plan.md``.
 
@@ -394,7 +394,7 @@ document.addEventListener('DOMContentLoaded', () => {{
         f"<p>{html.escape(spec.step)} &middot; <span class='badge'>CLASSIFICATION: {html.escape(spec.classification)}</span></p>\n"
         "<div class='banner'><strong>Interactive review page.</strong> Tick each confirmation as you "
         "review — progress is saved in your browser. <strong>No graph write</strong> happens until the "
-        "mappings are <code>confirmed</code> in <code>config/taxonomy-ontology-map.yaml</code>; decisions "
+        "mappings are <code>confirmed</code> in <code>config/taxonomy-ontology-map/</code>; decisions "
         "are logged to <code>config/gate-log.md</code>. The browser ticks are a working aid, not the "
         "system of record — the repo remains the single source of truth.</div>\n"
         f"<p><strong id='count'>0 / {spec.total_confirmations}</strong> confirmations checked</p>\n"

@@ -1,0 +1,251 @@
+
+  # ── Docs corpus — lexical graph (Document→Chunk; llm-graph-builder pattern) ─
+  # Registered 2026-07-08 for the bmc-docs corpus load (user-directed; only
+  # sample Control-M data can reach this DB, so the converted BMC docs are the
+  # demonstrable content). ALL FOUR ARE GATE-BOUND: status planned until the
+  # bmc-docs-lexical-load gate is SME-accepted (config/gate-prompts/).
+
+  - id:           docs_describes
+    neo4j_label:  DESCRIBES
+    inverse_label: "described by"
+    role:         ~
+    from_node:    Document
+    to_node:      SoftwareProduct
+    prov_maps_to: ~
+    note: >
+      Document (prov:Entity) is ABOUT a SoftwareProduct — the software-ontology
+      hook: dcterms:subject / foaf:primaryTopic pattern, no PROV row (Entity →
+      Entity aboutness is not derivation; deliberately NOT wasDerivedFrom).
+      Edge carries target_version (the corpus documents SaaS pages applied to
+      9.0.21.300). Vendor hop rides the existing MADE_BY (product → brand).
+    supplement:   ontology_supplement.cypher
+    loader:       bmc_docs.cypher
+    domain:       docs
+    status:       active    # gate bmc-docs-lexical-load accepted 2026-07-08 (config/gate-log.md)
+
+  - id:           docs_chunk_part_of
+    neo4j_label:  PART_OF
+    inverse_label: "has part"
+    role:         ~
+    from_node:    Chunk
+    to_node:      Document
+    prov_maps_to: ~
+    note: >
+      Lexical-graph containment (llm-graph-builder pattern): Chunk belongs to
+      its Document. dcterms:isPartOf pattern; equivalently the inverse of
+      prov:hadMember (Collection reading) — recorded as structural, not PROV,
+      to keep the lexical graph distinct from the domain Collections.
+    supplement:   ontology_supplement.cypher
+    loader:       bmc_docs.cypher
+    domain:       docs
+    status:       active    # gate bmc-docs-lexical-load accepted 2026-07-08 (config/gate-log.md)
+
+  - id:           docs_first_chunk
+    neo4j_label:  FIRST_CHUNK
+    inverse_label: "first chunk of"
+    role:         ~
+    from_node:    Document
+    to_node:      Chunk
+    prov_maps_to: ~
+    note: >
+      Lexical-graph sequence anchor (llm-graph-builder pattern): entry point
+      to the chunk chain. Local structural edge; no standard term (sequence —
+      same null-mapping precedent as SCHEDULED_ON).
+    supplement:   ontology_supplement.cypher
+    loader:       bmc_docs.cypher
+    domain:       docs
+    status:       active    # gate bmc-docs-lexical-load accepted 2026-07-08 (config/gate-log.md)
+
+  - id:           docs_next_chunk
+    neo4j_label:  NEXT_CHUNK
+    inverse_label: "follows"
+    role:         ~
+    from_node:    Chunk
+    to_node:      Chunk
+    prov_maps_to: ~
+    note: >
+      Lexical-graph reading order (llm-graph-builder pattern): singly-linked
+      chunk chain within one Document (out-degree <= 1, enforced by
+      graph-tests/bmc-docs-lexical.yaml). Local structural edge; no standard
+      term.
+    supplement:   ontology_supplement.cypher
+    loader:       bmc_docs.cypher
+    domain:       docs
+    status:       active    # gate bmc-docs-lexical-load accepted 2026-07-08 (config/gate-log.md)
+
+  # (docs_has_document / docs_governed_by registered PLANNED at the Q4 docmeta
+  # gate, ADR 0006, 2026-07-18. Reconciliation recorded there: the plan's
+  # provisional HAS_CHUNK is SUPERSEDED by the active PART_OF/FIRST_CHUNK/
+  # NEXT_CHUNK shape above — never registered; Chunk-level DESCRIBES to proxy
+  # nodes is DEFERRED to its own gate at extraction design (P4+).)
+
+  - id:           docs_has_document
+    neo4j_label:  HAS_DOCUMENT
+    inverse_label: "sourced from"
+    role:         ~
+    from_node:    DocSource
+    to_node:      Document
+    prov_maps_to: ~
+    note: >
+      A registered doc source contains a fetched Document (docmeta plan §2;
+      ADR 0006). Local structural edge, DCAT-catalog-shaped (dcat:record is
+      the nearest standard term — adopt via the gate if DCAT lands as a
+      declared standard). PLANNED until the docmeta P4+ loader exists — the
+      K2 flips-are-follow-ups pattern; any load before the flip must refuse.
+    supplement:   ~
+    loader:       ~
+    domain:       docs
+    status:       planned   # Q4 docmeta gate 2026-07-18 (ADR 0006, config/gate-log.md)
+
+  - id:           docs_governed_by
+    neo4j_label:  GOVERNED_BY
+    inverse_label: "governs"
+    role:         ~
+    from_node:    Document
+    to_node:      OntologyTerm
+    prov_maps_to: ~
+    note: >
+      A Document is governed by the taxonomy term its registry entry declares
+      (doc-source-registry taxonomy_path — docmeta plan §2; ADR 0006). Links
+      the doc corpus into the ontology layer so corpus queries can traverse
+      by declared subject. PLANNED until the docmeta P4+ loader exists.
+    supplement:   ~
+    loader:       ~
+    domain:       docs
+    status:       planned   # Q4 docmeta gate 2026-07-18 (ADR 0006, config/gate-log.md)
+
+  # ── Documentation traceability + review feedback (ACTIVE, backlog L7) ────────
+  # Gate doc-traceability-feedback SIGNED OFF 2026-07-20 (config/gate-log.md — all 21
+  # confirmations A1-A7/B1-B4/C1-C4/D1-D7; the SaaS-reframe product-plane definitions).
+  # Supplement terms live in ontology_supplement.cypher (the docs-domain home, alongside
+  # the Document/Chunk corpus terms). Loaders: the load-doc-traceability three-pass chain
+  # (doc_sections / doc_traceability / doc_feedback .cypher). Node classes (DesignDoc/DocSection/
+  # Requirement/Component/TestCase/FeedbackNote) registered above in
+  # node_classifications, same gate.
+
+  - id:           doc_section_part_of
+    neo4j_label:  PART_OF
+    inverse_label: "has part"
+    role:         ~
+    from_node:    DocSection
+    to_node:      DesignDoc
+    prov_maps_to: ~
+    note: >
+      ACTIVE (gate doc-traceability-feedback signed off 2026-07-20, B1). DocSection belongs to its DesignDoc — structural containment, kept off the
+      PROV matrix (Entity → Entity structure/aboutness is not derivation) exactly as
+      docs_chunk_part_of (Chunk → Document) does. SAME neo4j_label PART_OF; NOT the same
+      triple (from/to differ: DocSection/DesignDoc vs Chunk/Document — C8-clean, a new
+      entry per the RELATIONSHIP_GUIDE precedent). ALTERNATIVE CONSIDERED, not registered:
+      the m3-folder-family CONTAINS_SECTION shape (DesignDoc reclassed prov:Collection,
+      matrix row Collection → any = prov:hadMember, mirroring CONTAINS_JOB/
+      CONTAINS_FOLDER) — rejected as the primary proposal because DesignDoc's outline
+      sections are AUTHORED/ordered (FIRST_CHUNK/NEXT_CHUNK-style sequence per
+      tdd.outline.yaml) rather than an open collection of members; the closer analog is
+      Document/Chunk, not Folder/Job. Gate section B asks the SME to confirm PART_OF over
+      CONTAINS_SECTION.
+    supplement:   ontology_supplement.cypher
+    loader:       doc_sections.cypher
+    domain:       docs
+    status:       active   # gate doc-traceability-feedback signed off 2026-07-20 (config/gate-log.md)
+
+  - id:           doc_requirement_specified_in
+    neo4j_label:  SPECIFIED_IN
+    inverse_label: "specifies"
+    role:         ~
+    from_node:    Requirement
+    to_node:      DocSection
+    prov_maps_to: "prov:hadPrimarySource"
+    note: >
+      ACTIVE (gate doc-traceability-feedback signed off 2026-07-20, B2). Requirement's traceability-matrix "design-section anchor" column — its
+      specification's primary source is this DocSection's text. Matrix row: Entity →
+      Entity = prov:wasDerivedFrom family; prov:hadPrimarySource is the precise
+      sub-property (same reuse pattern as seal_had_primary_source: BusinessApplication →
+      Document). SPECIFIED_IN kept as the domain label for query clarity
+      (RELATIONSHIP_GUIDE domain-alias rule), mapping recorded here.
+    supplement:   ontology_supplement.cypher
+    loader:       doc_traceability.cypher
+    domain:       docs
+    status:       active   # gate doc-traceability-feedback signed off 2026-07-20 (config/gate-log.md)
+
+  - id:           doc_requirement_implemented_by
+    neo4j_label:  IMPLEMENTED_BY
+    inverse_label: "implements"
+    role:         ~
+    from_node:    Requirement
+    to_node:      Component
+    prov_maps_to: ~
+    note: >
+      ACTIVE (gate doc-traceability-feedback signed off 2026-07-20, B3 — research-grounded local, Ramesh & Jarke Satisfies/Allocated-to). Requirement's traceability-matrix "Component/module" column. No PROV row
+      fits a requirements-realization relation (PROV models data provenance, not
+      requirement-satisfies-artifact semantics); no ORG/DPROD/SOSA/DCAT/SKOS term fits
+      either — local per the RELATIONSHIP_GUIDE local-term rule, same family as
+      FIRST_CHUNK/NEXT_CHUNK (structural edges with no standard mapping).
+    supplement:   ontology_supplement.cypher
+    loader:       doc_traceability.cypher
+    domain:       docs
+    status:       active   # gate doc-traceability-feedback signed off 2026-07-20 (config/gate-log.md)
+
+  - id:           doc_requirement_verified_by
+    neo4j_label:  VERIFIED_BY
+    inverse_label: "verifies"
+    role:         ~
+    from_node:    Requirement
+    to_node:      TestCase
+    prov_maps_to: ~
+    note: >
+      ACTIVE (gate doc-traceability-feedback signed off 2026-07-20, B3 — research-grounded local, Ramesh & Jarke Verifies). Requirement's traceability-matrix "Test/verify" column. Same local-term
+      reasoning as doc_requirement_implemented_by — no PROV/standards term fits
+      requirement-verification; local. Candidate future standard: none of
+      PROV-O/ORG/DPROD/SOSA/DCAT/SKOS models a test-verifies-requirement relation.
+    supplement:   ontology_supplement.cypher
+    loader:       doc_traceability.cypher
+    domain:       docs
+    status:       active   # gate doc-traceability-feedback signed off 2026-07-20 (config/gate-log.md)
+
+  - id:           doc_feedback_annotates
+    neo4j_label:  ANNOTATES
+    inverse_label: "annotated by"
+    role:         ~
+    from_node:    FeedbackNote
+    to_node:      DocSection
+    prov_maps_to: ~
+    note: >
+      ACTIVE (gate doc-traceability-feedback signed off 2026-07-20, C4 — mixed-direction correlation path confirmed, no ABOUT_REQUIREMENT shortcut). FeedbackNote's anchor-keyed target (docs/design/feedback/README.md format
+      — `anchor` must match a `<!-- anchor: id -->` or an L11 derived subsection anchor,
+      drydocs/doc_outline.py feedback_anchor_valid). Entity → Entity "aboutness", not
+      derivation — same reasoning as docs_describes (Document → SoftwareProduct,
+      deliberately NOT wasDerivedFrom). The W3C Web Annotation model (oa:hasTarget) is the
+      standards-precise analog but is NOT a declared company standard (absent from
+      drydocs_core/ontology/namespaces.py) — local ANNOTATES for now; flagged in the gate
+      as a candidate future standard adoption. FeedbackNote.doc_rev (node property, parsed
+      from the `<doc-id>-rev<N>.yaml` filename) records which DesignDoc rev the note was
+      taken against — see the gate prompt section C for why this stays a property rather
+      than a separate Revision node.
+    supplement:   ontology_supplement.cypher
+    loader:       doc_feedback.cypher
+    domain:       docs
+    status:       active   # gate doc-traceability-feedback signed off 2026-07-20 (config/gate-log.md)
+
+  - id:           doc_feedback_authored_by
+    neo4j_label:  WAS_ATTRIBUTED_TO
+    inverse_label: "authored"
+    role:         feedback_author
+    from_node:    FeedbackNote
+    to_node:      Employee
+    prov_maps_to: "prov:wasAttributedTo"
+    note: >
+      ACTIVE (gate doc-traceability-feedback signed off 2026-07-20, C1 — collapsed-only confirmed). FeedbackNote authored by the SME reviewer. Matrix row: Entity → Agent =
+      wasAttributedTo — SIMPLE/COLLAPSED form, same precedent as p2_authored_by
+      (ControlMFolder → Developer) rather than the K4/K5 qualified/reified Attribution
+      pattern (seal_qualified_attribution / catalog_cabinet_qualified_attribution): a
+      FeedbackNote has exactly one author and no role vocabulary to qualify (unlike
+      TOMRole/ProductRole, "SME feedback author" is not a multi-valued concept scheme), so
+      reification would add a hop with no disambiguating payload. role=feedback_author
+      distinguishes this instance on the shared WAS_ATTRIBUTED_TO label (the
+      tom_role_holder / developed_by / owner idiom). Gate section C asks the SME to
+      confirm collapsed-only is sufficient (vs also registering a reified form for future
+      multi-reviewer notes, mirroring the K6 "both forms load" precedent).
+    supplement:   ontology_supplement.cypher
+    loader:       doc_feedback.cypher
+    domain:       docs
+    status:       active   # gate doc-traceability-feedback signed off 2026-07-20 (config/gate-log.md)

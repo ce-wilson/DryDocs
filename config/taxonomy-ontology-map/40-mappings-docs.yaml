@@ -1,0 +1,160 @@
+
+  # ---- L7: Design-doc traceability matrix + anchor-keyed feedback (PROPOSED, 2026-07-20) ----
+  # Gate config/gate-prompts/doc-traceability-feedback.yaml (fresh draft, NOT run). Models
+  # docs/design/templates/tdd.outline.yaml's requirements traceability matrix (requirement ->
+  # design-section anchor -> component/module -> test) and the anchor-keyed SME feedback
+  # format (docs/design/feedback/README.md) as graph edges. Six new node classes + six new
+  # relationship terms, all status: planned in relationship_vocabulary.yaml. Worked example:
+  # docs/design/controlm-ingestion-tdd.md's matrix (FR-CMI-001..007, NFR-CMI-001) and
+  # docs/design/feedback/drydocs-startup-refresh-runbook-rev1.yaml.
+
+  - id: doc-traceability-feedback
+    taxonomy:
+      source: design-doc-outline
+      element: "Design-doc traceability matrix (requirement -> design-section anchor -> component/module -> test) and anchor-keyed SME feedback notes (docs/design/feedback/*.yaml) modeled as DryDocs graph edges (backlog L7)"
+    ontology:
+      from_node: DesignDoc                  # dd:DesignDoc (new, prov:Entity)
+      to_node: "DocSection | Requirement | Component | TestCase | FeedbackNote | Employee"
+      prov_type_from: Entity
+      prov_type_to: "Entity (DocSection/Requirement/Component/TestCase/FeedbackNote) | Agent (Employee)"
+      matrix_row: "several — one row per edge; see edge_shapes"
+      edge_shapes:
+        - edge: "DocSection -[:PART_OF]-> DesignDoc"
+          matrix_row: "structural containment, no PROV row (docs_chunk_part_of precedent)"
+          vocab_id: doc_section_part_of
+        - edge: "Requirement -[:SPECIFIED_IN]-> DocSection"
+          matrix_row: "Entity -> Entity = prov:wasDerivedFrom family (prov:hadPrimarySource sub-property, seal_had_primary_source precedent)"
+          vocab_id: doc_requirement_specified_in
+        - edge: "Requirement -[:IMPLEMENTED_BY]-> Component"
+          matrix_row: "no PROV/standards row — local (FIRST_CHUNK/NEXT_CHUNK precedent)"
+          vocab_id: doc_requirement_implemented_by
+        - edge: "Requirement -[:VERIFIED_BY]-> TestCase"
+          matrix_row: "no PROV/standards row — local (same reasoning as IMPLEMENTED_BY)"
+          vocab_id: doc_requirement_verified_by
+        - edge: "FeedbackNote -[:ANNOTATES]-> DocSection"
+          matrix_row: "Entity -> Entity aboutness, no PROV row (docs_describes precedent)"
+          vocab_id: doc_feedback_annotates
+        - edge: "FeedbackNote -[:WAS_ATTRIBUTED_TO {role: feedback_author}]-> Employee"
+          matrix_row: "Entity -> Agent = prov:wasAttributedTo, collapsed form (p2_authored_by precedent)"
+          vocab_id: doc_feedback_authored_by
+      node_classifications_added: [DesignDoc, DocSection, Requirement, Component, TestCase, FeedbackNote]
+      traversal_note: >
+        The acceptance path FeedbackNote -> DocSection -> Requirement is a MIXED-DIRECTION
+        traversal, not one directed chain: (fn:FeedbackNote)-[:ANNOTATES]->(ds:DocSection)
+        <-[:SPECIFIED_IN]-(req:Requirement) — SPECIFIED_IN points Requirement -> DocSection
+        (the hadPrimarySource reading), so correlating a note to the requirement it comments
+        on means walking that edge in reverse; same idiom as m3_was_informed_by / m3_triggers
+        documenting a "logical" vs "stored" edge direction.
+    precedence_authority: internal-standards   # best fit of the 4 declared authorities (an internal process/documentation artifact, closest to knowledge/standards-governed conventions); NONE of config/precedence.yaml's 4 `governs` lists names design docs/requirements/feedback explicitly — flagged in open_questions, same "authority gap" pattern that seal-pat-source-of-record closed for docmeta.
+    standards_cited: ["PROV-O (prov:hadPrimarySource, prov:wasAttributedTo)", "W3C Web Annotation (oa:hasTarget — cited as the not-yet-declared standard analog for ANNOTATES, section D)"]
+    vocab_id: [doc_section_part_of, doc_requirement_specified_in, doc_requirement_implemented_by, doc_requirement_verified_by, doc_feedback_annotates, doc_feedback_authored_by]
+    capture: >
+      waived — the classification source is docs/design/templates/tdd.outline.yaml (schema
+      drydocs.doc-outline.v1, the traceability-matrix block definition) and
+      docs/design/feedback/README.md (schema drydocs.design_doc.feedback_yaml); neither is a
+      config/taxonomy/ import, so no capture file exists in that directory for design-doc
+      structure — the taxonomy-first gap this field records rather than hides (same
+      disposition as job-seal-app-ref / seal-tom-attribution).
+    status: confirmed
+    proposed_at: 2026-07-20
+    confirmed_by: chad.wilson
+    confirmed_on: 2026-07-20   # in-chat gate session — all 21 confirmations (A1-A7, B1-B4, C1-C4, D1-D7)
+    gate_spec: config/gate-prompts/doc-traceability-feedback.yaml
+    note: >
+      Drafted by the ontology-mapper per backlog L7; AMENDED 2026-07-20 per SME direction
+      (the SaaS reframe): class definitions are PRODUCT-PLANE / source-agnostic with an
+      `origin` discriminator and source-namespaced keys — the DryDocs outline system is
+      source connector #1 ("tenant 0"), the incremental-context-loop connectors (Jira,
+      Gherkin/BDD, BRD) feed the same classes later; Requirement gains kind (FR|UC|NFR),
+      FeedbackNote gains review-lifecycle status (open|applied|rejected|superseded);
+      per-source id config + the Jira-board caveat live in backlog O12's admin-config
+      scope. Everything here stays status: planned
+      (relationship_vocabulary.yaml) / status: proposed (this entry) until the SME runs the
+      gate (config/gate-prompts/doc-traceability-feedback.yaml) — no supplement block, no
+      loader, no graph write. Worked example: docs/design/controlm-ingestion-tdd.md's
+      traceability matrix (anchor traceability-matrix, FR-CMI-001..007 + NFR-CMI-001) and
+      docs/design/feedback/drydocs-startup-refresh-runbook-rev1.yaml. Six new node classes
+      (DesignDoc, DocSection, Requirement, Component, TestCase, FeedbackNote) had no
+      pre-existing equivalent anywhere in relationship_vocabulary.yaml or
+      drydocs_core/schema/*.cypher (grepped for Module/Component/Test — none found); the two
+      existing near-miss Entity classes (:Script, :PipelineService) were considered and
+      rejected as too domain-specific (Control-M job-invocation lineage / deployable-service
+      granularity) — see the Component node_classifications note.
+    open_questions:
+      - "MANAGED vs INGESTED planes (upgraded from 'reconcile later?' at the 2026-07-20 SaaS reframe): :DesignDoc/:DocSection (authored, rev-tracked, outline-validated, annotatable) vs :Document/:Chunk (scraped, H2-chunked, trust-tiered) is a deliberate PRODUCT boundary — a customer estate has both planes. Recommendation is now permanently-distinct planes (shared supertype only if a real cross-plane query need emerges) — gate section A."
+      - "Containment shape for DocSection: PART_OF (registered, recommended — Document/Chunk precedent) vs CONTAINS_SECTION (DesignDoc reclassed prov:Collection, hadMember, Folder/Job precedent) — gate section B."
+      - "FeedbackNote attribution shape: collapsed WAS_ATTRIBUTED_TO (registered, recommended — no role vocabulary needed) vs a future reified Attribution chain for multi-reviewer notes — gate section C."
+      - "FeedbackNote-to-rev correlation: doc_rev as a plain node property (proposed) vs a separate DesignDocRevision node + a PROV wasRevisionOf-style chain — gate section C; the property approach is recommended as the simpler shape until real multi-rev drift data exists."
+      - "precedence_authority: none of config/precedence.yaml's 4 declared authorities explicitly governs design docs/requirements/feedback; internal-standards is the closest fit here but a dedicated authority (mirroring how seal-pat-source-of-record was added for docmeta) may be warranted — not proposed here, flagged only."
+      - "TestCase.kind (unit|verify|gate|graph-test): controlled enum from day one, or free-text until real matrix data across more TDDs is surveyed? The one worked example (controlm-ingestion-tdd.md) already spans all four kinds in one table."
+      - "Requirement id format, PER-SOURCE (reframed 2026-07-20, replaces the global loose/strict timing question): each source/tenant has its own id convention, so the pattern + enforcement mode are per-source connector CONFIG (connector #1 = tdd.outline.yaml's requirement_id_pattern + mode) and graph ingestion mirrors the source's configured mode; the config surface is backlog O12's admin page — gate section D."
+      - "Jira-board configuration caveat (SME direction 2026-07-20): each BusinessApplication or DevTeam MAY have a Jira board, keyed off the Jira PROJECT NAME — the join key the future Jira connector uses to attach Jira-sourced Requirements to the ownership graph. Board-to-owner mapping = per-tenant config (backlog O12) captured BEFORE that connector's gate; the JiraBoard node class + association edge belong to that future gate, not this one — gate section D."
+
+  # ---- bmc-docs lexical load (2026-07-08 — GATE PREP, SME not yet run) ------
+  # User-directed: only sample Control-M data can reach the local EE DB, so the
+  # converted BMC docs corpus (external/orchestration/bmc-controlm/, 26 docs)
+  # becomes the demonstrable content — loaded as the llm-graph-builder lexical
+  # graph (Document→Chunk) and hooked to the software ontology (DESCRIBES →
+  # SoftwareProduct controlm, MADE_BY → bmc already active). Gate spec:
+  # config/gate-prompts/bmc-docs-lexical-load.yaml. All four stop at proposed.
+
+  - id: doc-describes-product
+    taxonomy: { source: bmc-docs, element: "A converted BMC doc is ABOUT the Control-M product" }
+    ontology:
+      from_node: Document                    # prov:Entity
+      to_node: SoftwareProduct               # dd:SoftwareProduct (Entity)
+      matrix_row: "Entity → Entity aboutness — no PROV row (NOT wasDerivedFrom); dcterms:subject / foaf:primaryTopic pattern"
+      neo4j_label: DESCRIBES
+      prov_maps_to: ~
+      edge_properties: { target_version: "9.0.21.300 (corpus version notice)" }
+    precedence_authority: bmc-baseline
+    vocab_id: docs_describes
+    status: applied                              # loader: bmc_docs.cypher (load-bmc-docs, live 2026-07-08)
+    applied_on: 2026-07-08
+    confirmed_by: SME
+    confirmed_on: 2026-07-08
+
+  - id: doc-chunk-part-of
+    taxonomy: { source: bmc-docs, element: "A section chunk belongs to its document (H2 chunking)" }
+    ontology:
+      from_node: Chunk                       # prov:Entity
+      to_node: Document                      # prov:Entity
+      matrix_row: "structural containment — dcterms:isPartOf pattern (lexical graph, kept off prov:hadMember to stay distinct from domain Collections)"
+      neo4j_label: PART_OF
+      prov_maps_to: ~
+    precedence_authority: bmc-baseline
+    vocab_id: docs_chunk_part_of
+    status: applied                              # loader: bmc_docs.cypher (load-bmc-docs, live 2026-07-08)
+    applied_on: 2026-07-08
+    confirmed_by: SME
+    confirmed_on: 2026-07-08
+
+  - id: doc-first-chunk
+    taxonomy: { source: bmc-docs, element: "Document's chunk chain entry point" }
+    ontology:
+      from_node: Document
+      to_node: Chunk
+      matrix_row: "no standard term — sequence anchor (SCHEDULED_ON null-mapping precedent)"
+      neo4j_label: FIRST_CHUNK
+      prov_maps_to: ~
+    precedence_authority: bmc-baseline
+    vocab_id: docs_first_chunk
+    status: applied                              # loader: bmc_docs.cypher (load-bmc-docs, live 2026-07-08)
+    applied_on: 2026-07-08
+    confirmed_by: SME
+    confirmed_on: 2026-07-08
+
+  - id: doc-next-chunk
+    taxonomy: { source: bmc-docs, element: "Reading order between adjacent chunks of one document" }
+    ontology:
+      from_node: Chunk
+      to_node: Chunk
+      matrix_row: "no standard term — singly-linked sequence (out-degree <= 1)"
+      neo4j_label: NEXT_CHUNK
+      prov_maps_to: ~
+    precedence_authority: bmc-baseline
+    vocab_id: docs_next_chunk
+    status: applied                              # loader: bmc_docs.cypher (load-bmc-docs, live 2026-07-08)
+    applied_on: 2026-07-08
+    confirmed_by: SME
+    confirmed_on: 2026-07-08

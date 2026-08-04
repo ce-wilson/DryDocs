@@ -156,8 +156,9 @@ Work top to bottom. Each step has exactly one file to touch.
 
 ### Step 1 — Check the vocabulary
 
-Open [`drydocs_core/ontology/relationship_vocabulary.yaml`](../drydocs_core/ontology/relationship_vocabulary.yaml).
-Search for your source node, target node, or intent. If an entry already
+Open the registry directory [`drydocs_core/ontology/relationship_vocabulary/`](../drydocs_core/ontology/relationship_vocabulary/)
+(S5: per-domain fragments merged in sorted-filename order — read the whole set,
+edit the fragment matching your edge's `domain`). Search for your source node, target node, or intent. If an entry already
 exists with `status: active`, use it — do not create a duplicate.
 
 ### Step 2 — Classify the source node
@@ -184,8 +185,8 @@ If this is the only use of this label on these nodes, `role` can be omitted.
 
 ### Step 6 — Register in the vocabulary
 
-Add an entry to `local_relationships` in
-`drydocs_core/ontology/relationship_vocabulary.yaml`:
+Add an entry to `local_relationships` in the fragment for your edge's domain
+(`drydocs_core/ontology/relationship_vocabulary/4N-local-<domain>.yaml`):
 
 ```yaml
 - id:           domain_relationship_name        # unique snake_case id
@@ -392,7 +393,7 @@ the critical one: it fails if you add a vocabulary entry and set it to
 ```
 drydocs_core/
   ontology/
-    relationship_vocabulary.yaml       ← registry (edit this first)
+    relationship_vocabulary/           ← registry fragments, per domain (edit this first)
     namespaces.py                      ← IRI prefix definitions
   schema/
     ontology.cypher                    ← PROV-O base terms (do not edit)

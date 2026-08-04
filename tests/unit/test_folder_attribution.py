@@ -26,6 +26,7 @@ from drydocs.loaders.folder_attribution import (
     resolve_folder_attributions,
 )
 from drydocs.loaders.seal_attribution import TierReconcilers
+from drydocs_core import yaml_fragments
 from drydocs_core.adapters import CsvAdapter
 from drydocs_core.models import FolderAttributionRow, SealAttributionRow
 
@@ -33,7 +34,7 @@ REPO_ROOT = Path(__file__).resolve().parents[2]
 FIXTURE_CSV = REPO_ROOT / "tests" / "fixtures" / "attribution" / "stg_app_fact__synthetic.csv"
 AUTOMATED_CYPHER = REPO_ROOT / "drydocs" / "loaders" / "cypher" / "folder_attribution.cypher"
 MANUAL_CYPHER = REPO_ROOT / "drydocs" / "loaders" / "cypher" / "manual_seal_attribution.cypher"
-VOCAB_FILE = REPO_ROOT / "drydocs_core" / "ontology" / "relationship_vocabulary.yaml"
+VOCAB_FILE = REPO_ROOT / "drydocs_core" / "ontology" / "relationship_vocabulary"
 SUITE_FILE = REPO_ROOT / "graph-tests" / "folder-attribution-coverage.yaml"
 
 
@@ -385,7 +386,7 @@ def test_manual_cypher_fans_out_per_app_code_and_stamps_manual_pin() -> None:
 
 
 def test_folder_vocab_entry_is_active_with_loader_and_supplement_recorded() -> None:
-    vocab = yaml.safe_load(VOCAB_FILE.read_text(encoding="utf-8"))
+    vocab = yaml_fragments.load_yaml_source(VOCAB_FILE)
     entry = next(r for r in vocab["local_relationships"] if r["id"] == "m3_belongs_to_application")
     assert entry["status"] == "active"
     assert entry["loader"] == "folder_attribution.cypher"

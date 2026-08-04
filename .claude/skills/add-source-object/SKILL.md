@@ -71,11 +71,11 @@ list (+ one object-specific assertion).
 Never invent an edge inside a loader. For each new concept:
 
 1. Classify new node labels via the PROV matrix
-   (`drydocs_core/ontology/relationship_vocabulary.yaml` §0/§1); check for label
+   (`drydocs_core/ontology/relationship_vocabulary/` fragments §0/§1); check for label
    collisions with existing properties/labels before naming.
 2. Register vocabulary entries as `status: planned`, `supplement: ~`,
    `loader: ~` (the SEAL-reshape precedent for gate-bound terms).
-3. Add `config/taxonomy-ontology-map.yaml` entries as `status: proposed`
+3. Add `config/taxonomy-ontology-map/` entries (in the domain's `N0-mappings-*.yaml` fragment) as `status: proposed`
    and bump the `summary:` counts. Every entry carries BOTH structured
    fields (C7 — `tests/unit/test_taxonomy_ontology_map.py` enforces them on
    everything confirmed after 2026-07-10):

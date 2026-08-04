@@ -1,0 +1,626 @@
+
+
+# ── SECTION 2: Local relationships ───────────────────────────────────────────
+# Ordered by domain, then by loader execution order within each domain.
+# ─────────────────────────────────────────────────────────────────────────────
+local_relationships:
+
+  # ── M3: Control-M ────────────────────────────────────────────────────────
+
+  - id:           m3_scheduled_on
+    neo4j_label:  SCHEDULED_ON
+    inverse_label: "schedules"
+    role:         ~
+    from_node:    ControlMFolder
+    to_node:      ControlMServer
+    prov_maps_to: ~
+    note: >
+      Physical hosting — folder is scheduled on a specific Control-M server
+      (DATA_CENTER value). No PROV-O equivalent; infrastructure placement.
+      Edge carries since + last_seen_at for migration auditability.
+      RENAMED from RUNS_ON (see m3_runs_on, deprecated) so the RUNS_ON label
+      can be reused for execution-host placement with role properties.
+
+    supplement:   ontology_supplement.cypher
+    loader:       controlm_folders.cypher
+    domain:       controlm
+    status:       active
+
+  - id:           m3_runs_on
+    neo4j_label:  RUNS_ON
+    inverse_label: "runs"
+    role:         ~
+    from_node:    ControlMFolder
+    to_node:      ControlMServer
+    prov_maps_to: ~
+    note: >
+      DEPRECATED 2026-06-09: renamed to SCHEDULED_ON (m3_scheduled_on) per the
+      consolidated documentation. RUNS_ON is reassigned to ControlMJob/
+      ETLProcess → ExecutionHost (m3_runs_on_agent_host / m3_runs_on_etl_host).
+      Migrate existing edges with:
+      MATCH (f:ControlMFolder)-[r:RUNS_ON]->(s:ControlMServer)
+      then re-create as SCHEDULED_ON and delete r.
+    supplement:   ontology_supplement.cypher
+    loader:       controlm_folders.cypher
+    domain:       controlm
+    status:       deprecated
+
+  - id:           m3_contains_job
+    neo4j_label:  CONTAINS_JOB
+    inverse_label: "contained in"
+    role:         ~
+    from_node:    ControlMFolder
+    to_node:      ControlMJob
+    prov_maps_to: "prov:hadMember"
+    note: >
+      ControlMFolder (prov:Collection) contains ControlMJob (prov:Activity).
+      Matrix row: Collection → any = HAD_MEMBER. CONTAINS_JOB is kept as
+      the label for query clarity; semantics are hadMember.
+    supplement:   ontology_supplement.cypher
+    loader:       controlm_jobs.cypher
+    domain:       controlm
+    status:       active
+
+  - id:           m3_contains_folder
+    neo4j_label:  CONTAINS_FOLDER
+    inverse_label: "contained in"
+    role:         ~
+    from_node:    ControlMApplication
+    to_node:      ControlMFolder
+    prov_maps_to: "prov:hadMember"
+    note: >
+      ControlMApplication (prov:Collection — the Control-M APPLICATION grouping from
+      the folder HEADER ROW in CM_DEF_VJOB (JOB_ID=1), deliberately NOT the business
+      :BusinessApplication / SEAL concept) contains ControlMFolder (prov:Collection). Matrix
+      row: Collection → any = HAD_MEMBER; symmetric with CONTAINS_JOB one level down.
+      SME gate 2026-07-07 (controlm-q1q3-phase1; config/gate-log.md). Loader landed
+      in the FOLDER pass, not jobs (load-order definition 2026-07-07): the folders
+      extract LEFT JOINs the header row so both field-derived grouping labels
+      (ControlMServer, ControlMApplication) exist before the jobs pass runs.
+    supplement:   ontology_supplement.cypher
+    loader:       controlm_folders.cypher
+    domain:       controlm
+    status:       active
+
+  - id:           m3_requires_in_condition
+    neo4j_label:  REQUIRES_IN_CONDITION
+    inverse_label: "required by"
+    role:         ~
+    from_node:    ControlMJob
+    to_node:      Condition
+    prov_maps_to: "prov:used"
+    note: >
+      Job requires a named IN condition to be present before execution.
+      Matrix row: Activity → Entity = USED. REQUIRES_IN_CONDITION kept for
+      domain clarity. Edge carries odate, and_or, parentheses, order_
+      for boolean-expression reconstruction.
+    supplement:   ontology_supplement.cypher
+    loader:       controlm_conditions_in.cypher
+    domain:       controlm
+    status:       active
+
+  - id:           m3_emits_out_condition
+    neo4j_label:  EMITS_OUT_CONDITION
+    inverse_label: "emitted by"
+    role:         ~
+    from_node:    ControlMJob
+    to_node:      Condition
+    prov_maps_to: "prov:generated"
+    note: >
+      Job emits a named OUT condition on completion. SIGN='+' posts the
+      condition; SIGN='-' removes it. Matrix row: Activity → Entity =
+      GENERATED. EMITS_OUT_CONDITION kept for domain clarity.
+    supplement:   ontology_supplement.cypher
+    loader:       controlm_conditions_out.cypher
+    domain:       controlm
+    status:       active
+
+  - id:           m3_was_informed_by
+    neo4j_label:  WAS_INFORMED_BY
+    inverse_label: "informed"
+    role:         ~
+    from_node:    ControlMJob
+    to_node:      ControlMJob
+    prov_maps_to: "prov:wasInformedBy"
+    note: >
+      Derived dependency edge. Successor job was informed by predecessor
+      via a shared OUT→IN condition pair. Direction: (successor)→(predecessor).
+      Matrix row: Activity → Activity = WAS_INFORMED_BY. Carries via_condition,
+      derived=true. Replaces DEPENDS_ON. DIRECT pairs only since the
+      phased-loader port (2026-07-23): transitive reach is a graph traversal,
+      not a stored closure — the level/path properties are retired.
+    supplement:   ontology_supplement.cypher
+    loader:       controlm_dependencies_derived.cypher
+    domain:       controlm
+    status:       active
+
+  - id:           m3_depends_on_file
+    neo4j_label:  USED
+    inverse_label: "used by"
+    role:         file_dependency
+    from_node:    ControlMJob
+    to_node:      File
+    prov_maps_to: "prov:used"
+    note: >
+      Job waits on a file delivered via MFTS agent (fmSubPathId). Normalized
+      from the pre-ontology "DEPENDS_ON" edge in the architecture diagram:
+      DEPENDS_ON is retired (job→job replaced by WAS_INFORMED_BY; job→file
+      is matrix row Activity → Entity = USED with role=file_dependency).
+    supplement:   ontology_supplement.cypher
+    loader:       ~
+    domain:       controlm
+    status:       planned
+
+  # ── M3 phase 2: execution lineage ────────────────────────────────────────
+
+  - id:           p2_deployed_by
+    neo4j_label:  DEPLOYED_BY
+    inverse_label: "deployed"
+    role:         ~
+    from_node:    Deployment
+    to_node:      Developer
+    prov_maps_to: "prov:wasAssociatedWith"
+    note: >
+      Deployment activity associated with the developer who ran it.
+      Matrix row: Activity → Agent = WAS_ASSOCIATED_WITH. Feed: Change/CI-CD.
+    supplement:   ontology_supplement.cypher
+    loader:       ~
+    domain:       controlm
+    status:       planned
+
+  - id:           p2_deployed_to
+    neo4j_label:  DEPLOYED_TO
+    inverse_label: "deployment target of"
+    role:         ~
+    from_node:    Deployment
+    to_node:      ControlMServer
+    prov_maps_to: ~
+    note: >
+      AUDIT CORRECTION: doc mapped this to prov:wasAssociatedWith, but
+      wasAssociatedWith requires an Agent target and ControlMServer is a
+      local platform class, not an Agent. Mapping set to null (local infra
+      placement, same family as SCHEDULED_ON). If a PROV mapping is required,
+      reclassify ControlMServer as prov:SoftwareAgent first. Feed: Change/CI-CD.
+    supplement:   ontology_supplement.cypher
+    loader:       ~
+    domain:       controlm
+    status:       planned
+
+  - id:           p2_deploys_folder
+    neo4j_label:  DEPLOYS_FOLDER
+    inverse_label: "deployed by"
+    role:         ~
+    from_node:    Deployment
+    to_node:      ControlMFolder
+    prov_maps_to: "prov:used"
+    note: >
+      Deployment ships a folder definition. Matrix row: Activity → Entity
+      (Collection ⊑ Entity) = USED. Feed: Change/CI-CD.
+    supplement:   ontology_supplement.cypher
+    loader:       ~
+    domain:       controlm
+    status:       planned
+
+  - id:           p2_authored_by
+    neo4j_label:  AUTHORED_BY
+    inverse_label: "authored"
+    role:         ~
+    from_node:    ControlMFolder
+    to_node:      Developer
+    prov_maps_to: "prov:wasAttributedTo"
+    note: >
+      Folder authorship. Matrix row: Entity → Agent = WAS_ATTRIBUTED_TO.
+      Feed: Folder XML / Git blame.
+    supplement:   ontology_supplement.cypher
+    loader:       ~
+    domain:       controlm
+    status:       planned
+
+  - id:           p2_instance_of
+    neo4j_label:  INSTANCE_OF
+    inverse_label: "has instance"
+    role:         ~
+    from_node:    ControlMJobRun
+    to_node:      ControlMJob
+    prov_maps_to: "prov:wasInfluencedBy"
+    note: >
+      Runtime execution is an instance of the job definition. Mapped to the
+      generic prov:wasInfluencedBy (valid but weak); the tighter PROV pattern
+      would treat ControlMJob as a prov:Plan via qualified association.
+      Feed: Control-M history API.
+    supplement:   ontology_supplement.cypher
+    loader:       ~
+    domain:       controlm
+    status:       planned
+
+  - id:           m3_executed_by
+    neo4j_label:  EXECUTED_BY
+    inverse_label: "executed"
+    role:         ~
+    from_node:    ControlMJobRun
+    to_node:      AppUser
+    prov_maps_to: "prov:wasAssociatedWith"
+    note: >
+      Run executed as a service account (Run-as-User; EPV rows with
+      Use Case='CONTROL-M'). Matrix row: Activity → Agent.
+      Feed: Control-M history API.
+    supplement:   ontology_supplement.cypher
+    loader:       ~
+    domain:       controlm
+    status:       planned
+
+  - id:           m3_seal_app_ref
+    neo4j_label:  WAS_ASSOCIATED_WITH
+    inverse_label: "agent for"
+    role:         seal_app_ref
+    from_node:    ControlMJob
+    to_node:      BusinessApplication
+    prov_maps_to: "prov:wasAssociatedWith"
+    note: >
+      Job attribution to its SEAL-registered application. Matrix row:
+      Activity → Agent = WAS_ASSOCIATED_WITH. role=seal_app_ref discriminates
+      this instance from any future owner/author roles on the same label
+      (see the planned WAS_ASSOCIATED_WITH {role:owner} idea in docs/reviews/).
+      Feed: STG_APP_FACT semantic facts (fact_type SEAL) via the C3/C4
+      variable-normalization stream — NEVER raw job.APPLICATION, which both
+      repos' loader comments document as unreliable for SEAL identity.
+      Registered 2026-07-01 from the company reconciliation (spec-level on
+      both repos at registration). ACTIVATED with the K2 loader build:
+      match policy SME-confirmed at gate seal-attribution-match-policy
+      (config/gate-log.md, 2026-07-14 — precedence SEAL > FID > APP_NAME >
+      ALIAS; one-to-one accept; zero-unmatched surfaced via the JobRun
+      coverage stamp + graph-tests/seal-attribution-coverage.yaml;
+      deterministic multi-hit tie-break, flagged for audit; manual tier-5
+      PIN semantics per config/manual-loads/). K3 RIDER: this shape
+      type-checks while :BusinessApplication is still prov:SoftwareAgent — the K4
+      reclass re-opens the edge SHAPE at its own follow-up gate (see the
+      map entry's type_conflict_note); the confirmed match policy itself
+      is shape-agnostic and carries over.
+      K7 CLOSE-OUT (gate seal-app-ref-edge-reshape, SIGNED OFF 2026-08-03):
+      this JOB-grain edge is SUPERSEDED by m3_belongs_to_application at the
+      FOLDER grain (§A1) — no per-job application edge is authored going
+      forward. The match policy itself is NOT re-opened (§B3): it DEMOTES to
+      a fallback tier for app codes with no steward-defined row, and every
+      fallback-derived value is DISCLOSED via the origin flag rather than
+      presented as defined.
+      DEPRECATED at the K8 build (2026-08-04): the job-grain writer and its
+      cypher are retired (drydocs.loaders.seal_attribution keeps only the
+      match-policy resolver, feeding the K8 fallback); producer-side the
+      migration is the reload itself under wipe-and-rebuild (§F1) — the
+      company-side migration of live job edges is theirs (guardrail 6 /
+      tracker T23). AUTHORIZED DOWNGRADE: the K7 sign-off's "stays active
+      until the K7 build migrates it" clause is this flip's authority.
+    supplement:   ~
+    loader:       ~
+    domain:       controlm
+    status:       deprecated
+
+  - id:           m3_belongs_to_application
+    neo4j_label:  BELONGS_TO_APPLICATION
+    inverse_label: "application for"
+    role:         seal_app_ref
+    from_node:    ControlMFolder
+    to_node:      Port
+    prov_maps_to: ~
+    note: >
+      FOLDER-grain application attribution — the K7 close-out ruling (gate
+      seal-app-ref-edge-reshape, SIGNED OFF 2026-08-03) that supersedes the
+      job-grain m3_seal_app_ref. Target is the application's BatchProcessing
+      :Port, NOT :BusinessApplication (§C1): the app node is already the hub
+      for SEAL record semantics — TOM roles, contacts, product links,
+      orchestrator edges — so hanging every folder off it concentrates batch
+      topology on the one node that can least afford it. The port is the
+      batch-facing side; the app node stays a record, not a junction.
+      prov_maps_to is deliberately null (§D1 option a): ControlMFolder
+      (Collection ⊑ Entity) → Port is an Entity→Entity governance/containment
+      fact with no natural PROV verb — the SCHEDULED_ON / reg_uses_software
+      precedent. ONE shape everywhere (§D2): loader edge, manual tier-5
+      writer, migration target. Folder→application is 1:1 by SME ruling
+      (OWNER-NOT-USER: a folder belongs to whoever OWNS it, not whoever USES
+      it — a platform team's all-tenants utility folder belongs to the
+      platform team), enforced as a GRAPH-TEST because Neo4j cannot declare
+      relationship cardinality — the TOM-roles precedent. Jobs INHERIT via
+      m3_contains_job; authoring is one steward-defined row per Control-M app
+      code, fanned out to folders via m3_contains_folder (§B1). Tier 2
+      (shared platform code) resolves per folder with :AreaProduct as a
+      ROUTING step, never an edge target — there is no direct mapping of
+      batch technical components to area product (SME 2026-08-03).
+      ACTIVATED at the K8 build (2026-08-04): loader
+      folder_attribution.cypher (app-code defined mapping + the demoted K2
+      fallback, origin-flagged per §B3); manual tier-5 pins via
+      manual_seal_attribution.cypher (rekeyed to this shape, §D2); the 1:1
+      graph-test lives in graph-tests/folder-attribution-coverage.yaml.
+    supplement:   ontology_supplement.cypher
+    loader:       folder_attribution.cypher
+    domain:       controlm
+    status:       active
+
+  - id:           m3_invokes
+    neo4j_label:  INVOKES
+    inverse_label: "invoked by"
+    role:         ~
+    from_node:    ControlMJob
+    to_node:      Script
+    prov_maps_to: "prov:used"
+    note: >
+      Gate CONFIRMED 2026-07-15 (config/gate-log.md); planned = the flip +
+      supplement block land with the curated-load build (the K2
+      flips-are-follow-ups pattern — drydocs_lineage.writer keeps refusing
+      a live load until then). Job command line invokes a script/JAR
+      (CMDLINE / MEMNAME; Jar Path + Task Json Path). Matrix row:
+      Activity → Entity = USED. Produced today by
+      drydocs_lineage.extractors.controlm_inventory (job → invoked
+      artifact via the shared core parser); writer MATCHes ControlMJob on
+      the NODE KEY, MERGEs Script on path.
+      2026-07-16 SME session (gate-log cmdline-lineage-review): cardinality is
+      1..n per job (compound if/else commands carry multiple invocations, incl.
+      wrapper payloads); Script identity stays PATH-keyed — same-basename
+      multi-mount duplicates surface in lineage-review for SME merge, never
+      auto-merged. 2026-07-21 (gate-log cmdline-nfr-vetting): payload
+      invocations MIGRATE to the distinct m7_uses_artifact label at its
+      build — until then this entry keeps the 1..n fold; :Script gains
+      script_role {launcher, payload} at the same build (SME-3).
+    supplement:   ontology_supplement.cypher
+    loader:       ~
+    domain:       controlm
+    status:       planned
+
+  - id:           m3_triggers
+    neo4j_label:  TRIGGERS
+    inverse_label: "triggered by"
+    role:         ~
+    from_node:    Script
+    to_node:      ETLProcess
+    prov_maps_to: "prov:wasStartedBy"
+    note: >
+      Gate CONFIRMED 2026-07-15 (config/gate-log.md) — shape validated by
+      the SME caveat: the common case is one .ksh wrapper script (the
+      INVOKES target) that launches the Informatica / Ab Initio / DPL
+      workload, passing the parameters those jobs need on CMD_LINE — so
+      TRIGGERS candidates are derivable from the already-ingested command
+      line, not only from an ETL metadata feed. (The other wrapper case is
+      pure unix file operations — move, gzip — with no ETLProcess; that
+      case is m3_reads_from / m3_writes_to with ControlMJob as the
+      Activity, never a TRIGGERS edge.) DIRECTION NOTE: prov:wasStartedBy
+      flows Activity → Entity (ETLProcess wasStartedBy Script); the graph
+      edge runs the INVERSE direction for query ergonomics. Treat TRIGGERS
+      as inverse-of wasStartedBy. Feed: CMD_LINE wrapper parameters
+      (primary); Informatica / Ab Initio / DPL metadata (enrichment).
+      2026-07-16 SME session (gate-log cmdline-lineage-review, run against 6
+      live captures): the business-key residual is RESOLVED — ETLProcess
+      identity = kind-scoped stable token (Ab Initio pset/graph BASENAME,
+      mount paths vary by env and stay properties; DPL -pipeline GUID with
+      dataflow + config JSON as properties), implemented extractor-side in
+      controlm_inventory._stable_invocation_key. ETLProcess KEEPS its label
+      and gains a kind property (etl|utility|notification — utility psets
+      exist, e.g. script-exec/send-email). DPL is NOT Ab Initio (own
+      invocation_type; java zilo framework originally, -py routes to
+      spark/pyspark). Remaining loader blocker: the ETLProcess endpoint
+      class in drydocs_lineage.writer (every non-job process still maps
+      to :Script).
+      2026-07-21 SME session (gate-log cmdline-nfr-vetting, SME-1): from-node
+      = the invoked wrapper/LAUNCHER Script re-CONFIRMED against the company
+      draft NFR's payload-sourced variant (REJECTED: the -pipeline GUID
+      literal rides the launcher's CMD_LINE — the surface the extractor
+      parses; payloads are often variable-held and unresolvable). Treat any
+      payload-sourced TRIGGERS in company data as a shape to reconcile at
+      their gate, not a producer emission.
+    supplement:   ontology_supplement.cypher
+    loader:       ~
+    domain:       controlm
+    status:       planned
+
+  - id:           m7_uses_artifact
+    neo4j_label:  USES_ARTIFACT
+    inverse_label: "used as artifact by"
+    role:         ~
+    from_node:    ControlMJob
+    to_node:      Script
+    prov_maps_to: "prov:used"
+    note: >
+      Gate CONFIRMED 2026-07-21 (config/gate-log.md cmdline-nfr-vetting,
+      SME-2): job uses a PAYLOAD artifact (jar/wheel/pset/container-image
+      ref) — the Script the launcher dispatches, discriminated from the
+      launcher itself, which stays the m3_invokes target. Matrix row:
+      Activity → Entity = USED; distinct label (not single-label-with-role)
+      per the documented RUNS_ON-overload risk — the company v2
+      command-line/variables standard's tooling table already assumes this
+      edge (its m7_etl_artifact_supplement target). Adopted WITH the :Script
+      refinements (same gate, SME-3): script_role {launcher, payload} +
+      platform / artifact_uri / artifact_kind / platform_flags / script_path
+      properties (+ the 4 Informatica identifiers); Script identity stays
+      PATH-keyed. At this entry's build, payload invocations MIGRATE out of
+      the m3_invokes 1..n fold onto this label. Feed: canonical/aliased
+      artifact variables (FACT_REGISTRY migration — backlog G16) with the
+      aliases-suggest-values-decide contract; never the variable NAME alone
+      (2,384-var gap analysis: names lie).
+    supplement:   ontology_supplement.cypher
+    loader:       ~
+    domain:       controlm
+    status:       planned
+
+  - id:           m3_runs_on_agent_host
+    neo4j_label:  RUNS_ON
+    inverse_label: "runs"
+    role:         agent_host
+    from_node:    ControlMJob
+    to_node:      ExecutionHost
+    prov_maps_to: ~
+    note: >
+      Job executes on a Control-M agent host (Control_M · Host, e.g.
+      PROCO-CDS-UTIL#). Infrastructure placement; no PROV mapping.
+      Same label as m3_runs_on_etl_host / m3_runs_on_host_group — role
+      property disambiguates. Feed UPDATED 2026-07-09: psgmgr CM_HOSTS +
+      the NODE_ID resolution pass — this role is the 1-hop HARD-CODED case
+      (job's NODE_ID matches a member NODEID, not a GRPNAME). Group match
+      wins when both match (mirrors Control-M's own resolution) — see
+      m3_runs_on_host_group and config/gate-prompts/controlm-hosts-topology.yaml.
+      ACTIVE 2026-07-27 (P3): written by the derived resolution pass.
+    supplement:   ontology_supplement.cypher
+    loader:       runs_on_resolution.v1
+    domain:       controlm
+    status:       active
+
+  - id:           m3_runs_on_etl_host
+    neo4j_label:  RUNS_ON
+    inverse_label: "runs"
+    role:         etl_host
+    from_node:    ETLProcess
+    to_node:      ExecutionHost
+    prov_maps_to: ~
+    note: >
+      ETL workload runs on an engine/cluster entry point (Connector ·
+      Region / Bucket Name). Infrastructure placement; no PROV mapping.
+      Feed: CMDB / ETL engine config.
+    supplement:   ontology_supplement.cypher
+    loader:       ~
+    domain:       controlm
+    status:       planned
+
+  # ── M3: host topology (CM_HOSTS — GATE-BOUND, controlm-hosts-topology) ────
+  # Registered 2026-07-09 from the psgmgr CM_HOSTS review (internal profile:
+  # 22 DCs / 5,396 groups / 8,161 nodeids). Gate CONFIRMED 2026-07-09
+  # (config/gate-log.md); status stays planned until the loader ships. Use
+  # case: server-patching / maintenance-window planning (host → jobs that can
+  # land on it → folder avg start/end windows via the planned temporal
+  # runtime supplement).
+
+  - id:           m3_runs_on_host_group
+    neo4j_label:  RUNS_ON
+    inverse_label: "runs"
+    role:         host_group
+    from_node:    ControlMJob
+    to_node:      ControlMHostGroup
+    prov_maps_to: ~
+    note: >
+      Gate CONFIRMED 2026-07-09 (config/gate-log.md); ACTIVE 2026-07-27 —
+      the P3 build (hosts loader + derived resolution pass, backlog P3).
+      Definition-time placement, the
+      2-HOP case: the job's NODE_ID names a host group (matches a
+      CM_HOSTS.GRPNAME) and Control-M load-balances the run across the
+      group's member hosts (reach hosts via CONTAINS_HOST). Derived
+      resolution pass that runs AFTER both the jobs pass and the hosts pass
+      (the WAS_INFORMED_BY derived-pass pattern); group match wins over a
+      direct host match, mirroring Control-M's own resolution. Same RUNS_ON
+      label as role=agent_host (the 1-hop hard-coded case) — role
+      disambiguates. Infrastructure placement; no PROV mapping (SCHEDULED_ON
+      precedent). Runtime rerun-affinity (a rerun sticks to the host of the
+      first attempt) is per-run state — phase-2 ControlMJobRun/SOSA, NOT this
+      definition edge.
+    supplement:   ontology_supplement.cypher
+    loader:       runs_on_resolution.v1
+    domain:       controlm
+    status:       active
+
+  - id:           m3_host_group_contains_host
+    neo4j_label:  CONTAINS_HOST
+    inverse_label: "contained in"
+    role:         ~
+    from_node:    ControlMHostGroup
+    to_node:      ExecutionHost
+    prov_maps_to: "prov:hadMember"
+    note: >
+      Gate CONFIRMED 2026-07-09 (config/gate-log.md); ACTIVE 2026-07-27 —
+      the P3 build. Host-group membership from psgmgr
+      CM_HOSTS: one edge per (DATA_CENTER, GRPNAME, NODEID) row; each
+      distinct NODEID MERGEs one ExecutionHost (keyed on nodeid alone,
+      pending the multi-group probe P2c). Matrix row: Collection → any =
+      HAD_MEMBER; domain label kept (CONTAINS_JOB / CONTAINS_FOLDER family).
+      Edge carries participation_type (VARCHAR2(1) — value domain + BMC
+      semantics pending probe P2a) and last_capture_date.
+    supplement:   ontology_supplement.cypher
+    loader:       controlm_hosts.v1
+    domain:       controlm
+    status:       active
+
+  - id:           m3_host_group_defined_on
+    neo4j_label:  DEFINED_ON
+    inverse_label: "defines"
+    role:         ~
+    from_node:    ControlMHostGroup
+    to_node:      ControlMServer
+    prov_maps_to: ~
+    note: >
+      Gate CONFIRMED 2026-07-09 (config/gate-log.md). A host group is defined
+      per data center (CM_HOSTS.DATA_CENTER — 22 distinct incl.
+      non-production). DC key rule (SME, via knowledge/standards/technology/
+      data-center-naming-convention.md): long-form name is the NATIVE
+      DATA_CENTER value — exact match; segments (environment, instance,
+      default_time E<hhmm> EST) are candidate parsed properties. Loader
+      blocked on the gate-log residuals: P3 value-domain verification
+      (adhoc/profile_cm_hosts.sql) + the 22-DC-vs-production scope call. Infrastructure placement; no
+      PROV mapping (SCHEDULED_ON precedent).
+    supplement:   ~
+    loader:       ~
+    domain:       controlm
+    status:       planned
+
+  - id:           m3_reads_from
+    neo4j_label:  READS_FROM
+    inverse_label: "read by"
+    role:         ~
+    from_node:    "ETLProcess | ControlMJob"
+    to_node:      DataAsset
+    prov_maps_to: "prov:used"
+    note: >
+      Gate CONFIRMED WITH EDIT 2026-07-15 (config/gate-log.md): endpoints
+      re-pointed from the pre-G9 shape (ETLProcess → DataSource) to the
+      two real cases — (1) ETL case: the ETLProcess reads a source dataset
+      (Source Zone + Source Glue Database; feed: Informatica / Ab Initio);
+      (2) file-ops case: the wrapper script is pure unix file operations
+      (move, gzip, …) and the type-correct Activity is the ControlMJob
+      itself (Script is prov:Entity and cannot carry prov:used) — the
+      writer must resolve the owning job via its INVOKES edge (follow-up,
+      IDEAS/backlog). To-node unified on DataAsset (the D1 proxy URN,
+      provisioning/02_proxy_constraints.cypher) — the edge direction
+      already encodes source-vs-target, so the DataSource label is retired
+      (see node_classifications). Matrix row: Activity → Entity = USED.
+    supplement:   ontology_supplement.cypher
+    loader:       ~
+    domain:       controlm
+    status:       planned
+
+  - id:           m3_writes_to
+    neo4j_label:  WRITES_TO
+    inverse_label: "written by"
+    role:         ~
+    from_node:    "ETLProcess | ControlMJob"
+    to_node:      DataAsset
+    prov_maps_to: "prov:generated"
+    note: >
+      Gate CONFIRMED WITH EDIT 2026-07-15 (config/gate-log.md): endpoints
+      re-pointed from the pre-G9 shape (ETLProcess → DataTarget) to the
+      two real cases — (1) ETL case: the ETLProcess writes a target
+      dataset (Target Zone + Glue database / bucket / partition keys;
+      feed: Informatica / Ab Initio); (2) file-ops case: the wrapper
+      script is pure unix file operations (move, gzip, …) and the
+      type-correct Activity is the ControlMJob itself (Script is
+      prov:Entity and cannot carry prov:generated) — the writer must
+      resolve the owning job via its INVOKES edge (follow-up,
+      IDEAS/backlog). To-node unified on DataAsset (the D1 proxy URN,
+      provisioning/02_proxy_constraints.cypher) — the edge direction
+      already encodes source-vs-target, so the DataTarget label is retired
+      (see node_classifications). Matrix row: Activity → Entity =
+      GENERATED.
+    supplement:   ontology_supplement.cypher
+    loader:       ~
+    domain:       controlm
+    status:       planned
+
+  - id:           m3_delegates_to
+    neo4j_label:  DELEGATES_TO
+    inverse_label: "delegated to by"
+    role:         ~
+    from_node:    AppUser
+    to_node:      ExecutionHost
+    prov_maps_to: "prov:actedOnBehalfOf"
+    note: >
+      Service account delegated to a host per environment (EPV FID rows with
+      Use Case='AWS'/'DPL'/'CCMS' + Environment). prov:actedOnBehalfOf
+      requires Agent → Agent — this is why ExecutionHost is classified
+      prov:SoftwareAgent in node_classifications. Edge carries environment.
+      Feed: CMDB / IAM.
+    supplement:   ontology_supplement.cypher
+    loader:       ~
+    domain:       controlm
+    status:       planned

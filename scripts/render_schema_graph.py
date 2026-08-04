@@ -29,8 +29,8 @@ def main() -> None:
         "--vocabulary",
         type=Path,
         default=DEFAULT_VOCAB_PATH,
-        help="path to relationship_vocabulary.yaml "
-        "(default: drydocs_core/ontology/relationship_vocabulary.yaml)",
+        help="path to the relationship-vocabulary source (file or fragment dir) "
+        "(default: drydocs_core/ontology/relationship_vocabulary/)",
     )
     parser.add_argument(
         "--out",

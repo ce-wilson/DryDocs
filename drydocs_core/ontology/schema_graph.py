@@ -64,9 +64,9 @@ import re
 from pathlib import Path
 from typing import Any
 
-import yaml
+from drydocs_core import yaml_fragments
 
-DEFAULT_VOCAB_PATH = Path(__file__).resolve().parent / "relationship_vocabulary.yaml"
+DEFAULT_VOCAB_PATH = Path(__file__).resolve().parent / "relationship_vocabulary"
 DEFAULT_OUTPUT_PATH = Path(__file__).resolve().parents[1] / "schema" / "schema_graph.cypher"
 
 #: Vocabulary statuses rendered into the meta-graph (carried as ``r.status``).
@@ -206,8 +206,8 @@ def render_schema_graph(vocab_path: str | Path = DEFAULT_VOCAB_PATH) -> str:
     """Render the vocabulary to the schema meta-graph Cypher text. Pure/offline."""
     vocab_path = Path(vocab_path)
     if not vocab_path.exists():
-        raise SchemaGraphError(f"vocabulary file not found: {vocab_path}")
-    vocab = yaml.safe_load(vocab_path.read_text(encoding="utf-8")) or {}
+        raise SchemaGraphError(f"vocabulary source not found: {vocab_path}")
+    vocab = yaml_fragments.load_yaml_source(vocab_path) or {}
     classifications: list[dict[str, Any]] = vocab.get("node_classifications") or []
     relationships: list[dict[str, Any]] = vocab.get("local_relationships") or []
 

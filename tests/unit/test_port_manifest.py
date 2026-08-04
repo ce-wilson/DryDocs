@@ -86,8 +86,8 @@ def test_critical_rows_are_pinned(manifest: dict) -> None:
         "config/gate-prompts/**": "canonical-company",
         "drydocs_core/adapters/oracle_adapter.py": "canonical-company",
         "config/gate-log.md": "union-append",
-        "drydocs_core/ontology/relationship_vocabulary.yaml": "per-entry",
-        "config/taxonomy-ontology-map.yaml": "per-entry",
+        "drydocs_core/ontology/relationship_vocabulary/**": "per-entry",
+        "config/taxonomy-ontology-map/**": "per-entry",
         "drydocs/data/**": "never-port",
     }
     for path, disposition in expected.items():
@@ -109,7 +109,7 @@ def test_overrides_precede_their_broader_glob(manifest: dict) -> None:
         "config/gate-log.md",
         "config/gate-prompts/**",
         "config/review-labels.yaml",
-        "config/taxonomy-ontology-map.yaml",
+        "config/taxonomy-ontology-map/**",
     ):
         assert idx(override) < idx(broad), f"{override} must precede {broad} (first match wins)"
     # same shape for the drydocs/ tree: the frozen adapter + review modules are

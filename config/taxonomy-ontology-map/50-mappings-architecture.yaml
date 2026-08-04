@@ -1,0 +1,84 @@
+
+  # ---- Example: a PROPOSED mapping awaiting the SME gate -------------------
+  - id: oracle-schema-asset
+    taxonomy:
+      source: "oracle:schema-inventory"
+      element: "Schema contains Table (script reads/writes Table)"
+    ontology:
+      from_node: ControlMJob               # or Script (prov:Entity/Plan)
+      to_node: DataAsset                   # prov:Entity (dcat:Dataset)
+      prov_type_from: Activity
+      prov_type_to: Entity
+      matrix_row: "Activity → Entity = prov:used / prov:generated"
+      neo4j_label: USED                    # GENERATED for outputs
+      prov_maps_to: "prov:used"
+    precedence_authority: internal-standards   # naming normalized by knowledge/standards
+    status: proposed                       # <-- SME must confirm before load
+    open_questions:
+      - "Is the script the Activity, or the ControlMJob? (affects from_node)"
+      - "Real schema/table names are confidential → resolve in internal/, not here."
+
+  - id: self-documentation-code-graph
+    taxonomy:
+      source: "repo:depgraph-snapshot"
+      element: >
+        DryDocs' own source tree, captured every session ritual by
+        knowledge/depgraph-snapshots/snapshot.ps1 as schema depgraph-machine-first/v1.
+        NOT an imported hierarchy — a DERIVED structural capture of code we control,
+        which is why it has no config/taxonomy/ file and lands as ontology + loader.
+        183 file nodes / 98 import edges at the 2026-07-27 capture.
+    ontology:
+      from_node: Project
+      to_node: CodeModule
+      prov_type_from: Collection
+      prov_type_to: Entity
+      matrix_row: "Collection -> any = prov:hadMember"
+    precedence_authority: internal-standards
+    vocab_id: u1_has_module
+    vocab_id_reason: >
+      THREE edge terms registered at `status: planned` by this gate, not one:
+      u1_has_module (Project -> CodeModule, the containment edge named here),
+      u1_imports (CodeModule -> CodeModule, the dependency edge, §D1) and
+      u1_is_encoded_in (CodeModule -> SwoClass, added by the §E1(b) ruling).
+      Plus two node classifications, :Project and :CodeModule. Unlike the
+      business-application-identity precedent this is NOT a property binding — it
+      creates real edges, so it carries vocab_ids rather than the to_node: ~ shape.
+    capture: >
+      waived — there is no config/taxonomy/ file for this mapping and there should not be.
+      Every other entry captures an IMPORTED hierarchy that a human or a source system
+      asserted; this one describes a DERIVED structural capture of code we control,
+      regenerated deterministically from source by knowledge/depgraph-snapshots/snapshot.ps1
+      every session. A taxonomy file would be a hand-maintained copy of something the
+      scanner already computes, i.e. drift waiting to happen. The artifact itself is the
+      capture and it is committed: knowledge/depgraph-snapshots/*.json. Gate meta records
+      the same call — 'Taxonomy: NONE ... which is why it lands as ontology + loader
+      rather than config/taxonomy/'.
+    capture_note: >
+      The artifact already exists and is committed every session; nothing new is
+      captured. THE GATE CORRECTED THREE PREMISES IN BACKLOG G33 that came from
+      describing it without opening it: `projects` is SIX (drydocs, drydocs_core,
+      drydocs_deepdoc, drydocs_lineage, drydocs_remediation, tests), not one; the
+      "664 nodes / 86 edges" figure belongs to tree-this-version.json, a different
+      TREE-mode artifact, not to the dependency snapshots (183 / 98); and BOTH shapes
+      declare the SAME schema string, which §G1 rules the loader must discriminate on
+      meta.tree rather than trust.
+    naming_rule: >
+      :CodeModule is keyed on file_id, the repo-relative path — the ONLY non-colliding
+      key (§C1/§C4). `name` collides fifteen ways on '__init__.py' and `rel_path`
+      collides across the drydocs / drydocs_core roots, so folder attribution is a
+      property of the key choice, not a separate mechanism. True dotted-module grain
+      was rejected as lossy: drydocs/loaders/__init__.py IS the package
+      `drydocs.loaders`, which is also the directory name. A urn:dd:codemodule: form is
+      DEFERRED with a named trigger (§C5) — when a second project tree enters the
+      graph, which §B3 ruled will happen if the company runs the ritual.
+    status: confirmed
+    confirmed_by: chad.wilson
+    confirmed_on: 2026-07-27                # gate SIGNED OFF, 36/36 confirmations, 0 edits, 0 rejections
+    gate_spec: config/gate-prompts/self-documentation-code-graph.yaml
+    reopenable_by: >
+      Nothing today — the subgraph is disjoint from the Control-M/SEAL graph and §A1
+      re-opens no signed ruling. TWO named triggers would reopen parts: a second
+      project tree entering the graph fires §C5's URN deferral, and any decision to
+      build the ~250-term SWO SDLC subset (which §A4 scoped out, and which cannot be
+      loaded today because ontology.cypher:109 points at a file that does not exist)
+      would revisit §E's binding depth.

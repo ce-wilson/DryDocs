@@ -27,12 +27,13 @@ from pathlib import Path
 import yaml
 
 import drydocs_core
+from drydocs_core import yaml_fragments
 from drydocs_core.models import ManualMappingRow
 
 _REPO_ROOT = Path(drydocs_core.__file__).resolve().parent.parent
 DEFAULT_MANIFEST_PATH = _REPO_ROOT / "config" / "manual-loads" / "manifest.yaml"
 VOCABULARY_PATH = (
-    Path(drydocs_core.__file__).resolve().parent / "ontology" / "relationship_vocabulary.yaml"
+    Path(drydocs_core.__file__).resolve().parent / "ontology" / "relationship_vocabulary"
 )
 
 # The one shape the manual writer supports today — the K7-ruled folder-grain
@@ -109,7 +110,7 @@ def relationship_registered(
 ) -> bool:
     """True iff (label, role) names an existing relationship_vocabulary.yaml
     entry — the 'a CSV can never mint a relationship type' rule (§F.1)."""
-    vocab = yaml.safe_load(Path(vocabulary_path).read_text(encoding="utf-8")) or {}
+    vocab = yaml_fragments.load_yaml_source(vocabulary_path) or {}
     for rel in vocab.get("local_relationships") or []:
         if rel.get("neo4j_label") != neo4j_label:
             continue
@@ -171,7 +172,7 @@ def parse_mapping_csv(
             if not relationship_registered(relationship, role, vocabulary_path):
                 raise ManualLoadError(
                     f"row {line_no}: relationship {relationship} (role={role}) is "
-                    "not registered in relationship_vocabulary.yaml — a manual CSV "
+                    "not registered in the relationship vocabulary — a manual CSV "
                     "can never mint a relationship type (§F.1; ontology-mapper + "
                     "a gate own that decision)."
                 )

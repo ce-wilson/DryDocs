@@ -65,6 +65,7 @@ from pathlib import Path
 from typing import Any
 
 import drydocs_core.ontology as _core_ontology
+from drydocs_core import yaml_fragments
 
 from .model import VOCAB_IDS, LineageGraph
 
@@ -72,7 +73,7 @@ from .model import VOCAB_IDS, LineageGraph
 DATABASE = "drydocs"
 
 #: the registered vocabulary (single source of truth for gate status)
-_VOCAB_REGISTRY = Path(_core_ontology.__file__).resolve().parent / "relationship_vocabulary.yaml"
+_VOCAB_REGISTRY = Path(_core_ontology.__file__).resolve().parent / "relationship_vocabulary"
 
 _JOB_KIND = "controlm_job"
 
@@ -124,7 +125,7 @@ def vocabulary_status(vocab_ids: Iterable[str], registry: Path | None = None) ->
     wanted = set(vocab_ids)
     statuses: dict[str, str] = {}
     current: str | None = None
-    for line in (registry or _VOCAB_REGISTRY).read_text(encoding="utf-8").splitlines():
+    for line in yaml_fragments.merged_text(registry or _VOCAB_REGISTRY).splitlines():
         m = _ID_RE.match(line)
         if m:
             current = m.group(1)

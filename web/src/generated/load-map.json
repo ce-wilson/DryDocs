@@ -1480,6 +1480,12 @@
       "source": "controlm-variable-normalization"
     },
     {
+      "id": "dl-contact-point",
+      "status": "proposed",
+      "label": "HAS_CONTACT_POINT",
+      "source": "outlook-dl"
+    },
+    {
       "id": "seal-doc-source-of-record",
       "status": "confirmed",
       "label": "HAD_PRIMARY_SOURCE",
@@ -1490,12 +1496,6 @@
       "status": "confirmed",
       "label": null,
       "source": "design-doc-outline"
-    },
-    {
-      "id": "dl-contact-point",
-      "status": "proposed",
-      "label": "HAS_CONTACT_POINT",
-      "source": "outlook-dl"
     }
   ]
 }

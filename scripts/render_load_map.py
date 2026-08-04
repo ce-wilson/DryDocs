@@ -40,10 +40,12 @@ import yaml
 REPO = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(REPO))
 
+from drydocs_core import yaml_fragments  # noqa: E402  (needs the sys.path insert above)
+
 REGISTRY = REPO / "config" / "source-registry.yaml"
 DOC_REGISTRY = REPO / "config" / "doc-source-registry.yaml"
 TAXONOMY_DIR = REPO / "config" / "taxonomy"
-MAP_FILE = REPO / "config" / "taxonomy-ontology-map.yaml"
+MAP_FILE = REPO / "config" / "taxonomy-ontology-map"
 OUT = REPO / "web" / "src" / "generated" / "load-map.json"
 OUT_HTML = REPO / "docs" / "plan" / "load-map.html"
 
@@ -72,7 +74,7 @@ def build_load_map() -> dict:
     dataset_entries = registry_doc.get("datasets", [])
     retired_entries = registry_doc.get("retired", [])
     doc_entries = yaml.safe_load(DOC_REGISTRY.read_text(encoding="utf-8"))["sources"]
-    map_entries = yaml.safe_load(MAP_FILE.read_text(encoding="utf-8"))["mappings"]
+    map_entries = yaml_fragments.load_yaml_source(MAP_FILE)["mappings"]
 
     system_by_id = {e["id"]: e for e in system_entries}
 

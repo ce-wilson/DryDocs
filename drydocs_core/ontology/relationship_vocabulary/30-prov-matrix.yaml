@@ -1,0 +1,81 @@
+
+# ── SECTION 1: Decision matrix ────────────────────────────────────────────────
+# Step 1: classify your source node (Activity / Entity / Agent / Collection).
+# Step 2: classify your target node.
+# Step 3: read the neo4j_label. Add a `role` property if the same label is
+#         used in multiple contexts (e.g., USED {role: "reads_config"}).
+# ─────────────────────────────────────────────────────────────────────────────
+prov_matrix:
+
+  - from_type:   Activity
+    to_type:     Activity
+    prov_term:   "prov:wasInformedBy"
+    neo4j_label: WAS_INFORMED_BY
+    note: >
+      One activity's execution depended on outputs produced by another.
+      Examples: ControlMJob waiting on a predecessor job's OUT condition.
+
+  - from_type:   Activity
+    to_type:     Entity
+    prov_term:   "prov:used"
+    neo4j_label: USED
+    note: >
+      Activity consumed / read an entity. Use role= to distinguish multiple
+      uses on the same activity (e.g., role: reads_config vs role: reads_input).
+
+  - from_type:   Activity
+    to_type:     Entity
+    prov_term:   "prov:generated"
+    neo4j_label: GENERATED
+    note: >
+      Activity produced an entity. Inverse of wasGeneratedBy — use this form
+      when the natural edge direction is Activity→Entity (e.g., job emits
+      an OUT condition). role= distinguishes multiple output types.
+
+  - from_type:   Activity
+    to_type:     Agent
+    prov_term:   "prov:wasAssociatedWith"
+    neo4j_label: WAS_ASSOCIATED_WITH
+    note: >
+      Activity linked to an agent (person, software system, org unit).
+      role= on the edge records the agent's participation type.
+
+  - from_type:   Entity
+    to_type:     Activity
+    prov_term:   "prov:wasGeneratedBy"
+    neo4j_label: WAS_GENERATED_BY
+    note: >
+      Entity was produced by an activity. Standard provenance direction —
+      edge flows Entity→Activity. Already used by BaseLoader for all nodes.
+
+  - from_type:   Entity
+    to_type:     Entity
+    prov_term:   "prov:wasDerivedFrom"
+    neo4j_label: WAS_DERIVED_FROM
+    note: >
+      Entity was transformed or computed from another entity.
+      Examples: a derived dataset, a report generated from raw data.
+
+  - from_type:   Entity
+    to_type:     Agent
+    prov_term:   "prov:wasAttributedTo"
+    neo4j_label: WAS_ATTRIBUTED_TO
+    note: >
+      Entity ownership or authorship attributed to an agent.
+      Examples: a script owned by a team, a dataset attributed to an app.
+
+  - from_type:   Agent
+    to_type:     Agent
+    prov_term:   "prov:actedOnBehalfOf"
+    neo4j_label: ACTED_ON_BEHALF_OF
+    note: >
+      Agent delegation — one agent acting for another.
+      Examples: a service account acting on behalf of an application.
+
+  - from_type:   Collection
+    to_type:     any
+    prov_term:   "prov:hadMember"
+    neo4j_label: HAD_MEMBER
+    note: >
+      Collection contains a member entity or activity.
+      Examples: ControlMFolder (Collection) contains ControlMJob (Activity).

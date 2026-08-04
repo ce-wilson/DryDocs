@@ -157,7 +157,9 @@ instead of eyeballing:
 ```
 # 1. BEFORE applying the port — snapshot the consumer copies
 mkdir "$env:TEMP/reconcile-before"
-cp drydocs_core/ontology/relationship_vocabulary.yaml, config/taxonomy-ontology-map.yaml, docs/restructure/backlog.yaml, config/gate-log.md "$env:TEMP/reconcile-before/"
+cp docs/restructure/backlog.yaml, config/gate-log.md "$env:TEMP/reconcile-before/"
+# S5: the two registries are fragment DIRECTORIES — snapshot the MERGED documents:
+poetry run python -c "from pathlib import Path; import os; from drydocs_core import yaml_fragments as yf; d = Path(os.environ['TEMP'])/'reconcile-before'; (d/'relationship_vocabulary.yaml').write_text(yf.merged_text('drydocs_core/ontology/relationship_vocabulary'), encoding='utf-8'); (d/'taxonomy-ontology-map.yaml').write_text(yf.merged_text('config/taxonomy-ontology-map'), encoding='utf-8')"
 
 # 2. apply the range / resolve collisions as usual
 

@@ -145,7 +145,7 @@ LIVE_VOCABULARY_SURFACES = (
     "config/taxonomy/business-application.yaml",
     "config/taxonomy/lob-product-team.yaml",
     "config/taxonomy/oracle-schemas.yaml",
-    "config/taxonomy-ontology-map.yaml",
+    "config/taxonomy-ontology-map",  # S5: fragment directory — scanned per fragment
 )
 
 
@@ -203,9 +203,12 @@ def test_the_retired_tier_is_gone_from_every_live_vocabulary_surface() -> None:
     for rel in LIVE_VOCABULARY_SURFACES:
         path = REPO / rel
         assert path.exists(), f"guard names a missing file: {rel} (update the list)"
-        for n, line in enumerate(path.read_text(encoding="utf-8").splitlines(), 1):
-            if RETIRED_TIER in line.lower() and "J23" not in line and "J24" not in line:
-                offenders.append(f"{rel}:{n}: {line.strip()[:100]}")
+        files = sorted(path.glob("*.yaml"), key=lambda p: p.name) if path.is_dir() else [path]
+        for f in files:
+            label = rel if f == path else f"{rel}/{f.name}"
+            for n, line in enumerate(f.read_text(encoding="utf-8").splitlines(), 1):
+                if RETIRED_TIER in line.lower() and "J23" not in line and "J24" not in line:
+                    offenders.append(f"{label}:{n}: {line.strip()[:100]}")
     assert not offenders, (
         f"{len(offenders)} live surface line(s) still name the retired "
         "Internal-Confidential tier (a line may cite it if it also names the "

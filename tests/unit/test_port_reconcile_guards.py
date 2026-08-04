@@ -21,8 +21,12 @@ Consumer-side usage during reconcile-port (documented in that skill):
 
     1. BEFORE applying the port, snapshot the consumer copies:
          mkdir %TEMP%/reconcile-before
-         cp drydocs_core/ontology/relationship_vocabulary.yaml \
-            config/taxonomy-ontology-map.yaml config/gate-log.md  <before-dir>/
+         python -c "from pathlib import Path; from drydocs_core import yaml_fragments as yf; \
+            Path('<before-dir>/relationship_vocabulary.yaml').write_text(yf.merged_text('drydocs_core/ontology/relationship_vocabulary'), encoding='utf-8'); \
+            Path('<before-dir>/taxonomy-ontology-map.yaml').write_text(yf.merged_text('config/taxonomy-ontology-map'), encoding='utf-8')"
+         cp config/gate-log.md  <before-dir>/
+       (S5: both registries are fragment DIRECTORIES now — the snapshot is the
+       MERGED document, so the before/after comparison stays file-shaped.)
     2. Apply the port range / resolve collisions.
     3. RECONCILE_BEFORE_DIR=<before-dir> pytest tests/unit/test_port_reconcile_guards.py -q
        → FAILS on any downgrade / dropped entry / audit truncation the merge introduced.
@@ -42,12 +46,14 @@ from typing import Any
 
 import pytest
 
+from drydocs_core import yaml_fragments
+
 yaml = pytest.importorskip("yaml")
 
 REPO = Path(__file__).resolve().parents[2]
 MANIFEST_FILE = REPO / "PORT-MANIFEST.yaml"
-VOCAB_FILE = REPO / "drydocs_core" / "ontology" / "relationship_vocabulary.yaml"
-MAP_FILE = REPO / "config" / "taxonomy-ontology-map.yaml"
+VOCAB_FILE = REPO / "drydocs_core" / "ontology" / "relationship_vocabulary"
+MAP_FILE = REPO / "config" / "taxonomy-ontology-map"
 BACKLOG_FILE = REPO / "docs" / "restructure" / "backlog.yaml"
 GATE_LOG = REPO / "config" / "gate-log.md"
 
@@ -206,14 +212,14 @@ def test_gate_log_append_only_mechanics() -> None:
 
 def test_current_files_pass_their_own_rules() -> None:
     """Sanity: each real file vs itself is violation-free (loaders + rules wire up)."""
-    vocab = yaml.safe_load(VOCAB_FILE.read_text(encoding="utf-8"))
+    vocab = yaml_fragments.load_yaml_source(VOCAB_FILE)
     assert (
         status_downgrades(
             vocab_entries(vocab), vocab_entries(vocab), key="id", downgrade_map=VOCAB_DOWNGRADES
         )
         == []
     )
-    mapping = yaml.safe_load(MAP_FILE.read_text(encoding="utf-8"))
+    mapping = yaml_fragments.load_yaml_source(MAP_FILE)
     assert (
         status_downgrades(
             map_entries(mapping), map_entries(mapping), key="id", downgrade_map=MAP_DOWNGRADES
@@ -248,7 +254,7 @@ def test_reconcile_vocab_no_downgrade_live() -> None:
     before = yaml.safe_load(
         (before_dir / "relationship_vocabulary.yaml").read_text(encoding="utf-8")
     )
-    after = yaml.safe_load(VOCAB_FILE.read_text(encoding="utf-8"))
+    after = yaml_fragments.load_yaml_source(VOCAB_FILE)
     violations = status_downgrades(
         vocab_entries(before), vocab_entries(after), key="id", downgrade_map=VOCAB_DOWNGRADES
     )
@@ -259,7 +265,7 @@ def test_reconcile_vocab_no_downgrade_live() -> None:
 def test_reconcile_map_no_downgrade_live() -> None:
     before_dir = Path(os.environ[BEFORE_DIR_ENV])
     before = yaml.safe_load((before_dir / "taxonomy-ontology-map.yaml").read_text(encoding="utf-8"))
-    after = yaml.safe_load(MAP_FILE.read_text(encoding="utf-8"))
+    after = yaml_fragments.load_yaml_source(MAP_FILE)
     violations = status_downgrades(
         map_entries(before), map_entries(after), key="id", downgrade_map=MAP_DOWNGRADES
     )

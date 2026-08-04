@@ -16,23 +16,25 @@ from pathlib import Path
 
 import pytest
 
+from drydocs_core import yaml_fragments
+
 yaml = pytest.importorskip("yaml")
 
 REPO = Path(__file__).resolve().parents[2]
-MAP_FILE = REPO / "config" / "taxonomy-ontology-map.yaml"
-VOCAB_FILE = REPO / "drydocs_core" / "ontology" / "relationship_vocabulary.yaml"
+MAP_FILE = REPO / "config" / "taxonomy-ontology-map"
+VOCAB_FILE = REPO / "drydocs_core" / "ontology" / "relationship_vocabulary"
 
 VALID_STATUSES = {"proposed", "confirmed", "applied", "rejected"}
 
 
 @pytest.fixture(scope="module")
 def map_doc() -> dict:
-    return yaml.safe_load(MAP_FILE.read_text(encoding="utf-8"))
+    return yaml_fragments.load_yaml_source(MAP_FILE)
 
 
 @pytest.fixture(scope="module")
 def vocab_ids() -> dict:
-    doc = yaml.safe_load(VOCAB_FILE.read_text(encoding="utf-8"))
+    doc = yaml_fragments.load_yaml_source(VOCAB_FILE)
     return {rel["id"]: rel for rel in doc["local_relationships"]}
 
 
@@ -130,7 +132,7 @@ def test_updated_header_is_not_stale(map_doc: dict) -> None:
 def test_no_duplicate_node_classification_labels() -> None:
     """F4 regression guard: two `- label: Document` entries once coexisted in
     node_classifications; a label must classify exactly once."""
-    doc = yaml.safe_load(VOCAB_FILE.read_text(encoding="utf-8"))
+    doc = yaml_fragments.load_yaml_source(VOCAB_FILE)
     labels = [n["label"] for n in doc["node_classifications"]]
     dupes = [label for label, n in Counter(labels).items() if n > 1]
     assert not dupes, f"duplicate node_classifications labels: {dupes}"

@@ -18,7 +18,7 @@ change reviewable by `git diff`.
   LOB→Product→Team). Change `order:`/`active:` here, never hardcode precedence in loaders.
 - `config/source-registry.yaml` — every source: orchestrator, adapter, taxonomies fed,
   `confirmed:` state. A source loads only when `confirmed: true`.
-- `config/taxonomy-ontology-map.yaml` — promote `confirmed` mappings toward `applied` (after the
+- `config/taxonomy-ontology-map/` (per-domain fragments) — promote `confirmed` mappings toward `applied` (after the
   loader runs); keep the `summary:` counts accurate.
 - Orchestrator crosswalks in `external/orchestration/<vendor>/` — fill the native→baseline table.
 

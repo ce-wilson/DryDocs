@@ -205,7 +205,7 @@ units from `docs/restructure/backlog.yaml`. Each backlog item names its agent + 
   port-prompt guardrails, identifiers) are never renamed by a style pass, and "crosswalk(s)"
   is an SME-approved exception (2026-08-03).
 - **Taxonomy imports are reversible; ontology edges are not casual.** New relationship types
-  go through `docs/RELATIONSHIP_GUIDE.md` + the `relationship_vocabulary.yaml` registry +
+  go through `docs/RELATIONSHIP_GUIDE.md` + the relationship-vocabulary registry (`drydocs_core/ontology/relationship_vocabulary/`, per-domain fragments; S5) +
   the HITL gate. Set `status: planned` first.
 - **Tests gate every change:** `poetry run pytest -q`, `python -c "import drydocs.cli"`,
   `drydocs --help`.

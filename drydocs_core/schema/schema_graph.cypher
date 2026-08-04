@@ -154,9 +154,9 @@ MERGE (n:SchemaMeta:Project {name: 'Project'})
 MERGE (n:SchemaMeta:CodeModule {name: 'CodeModule'})
   SET n.class = 'dd:CodeModule', n.prov_type = 'Entity';
 // (no node_classifications entry)
-MERGE (n:SchemaMeta:OntologyTerm {name: 'OntologyTerm'});
-// (no node_classifications entry)
 MERGE (n:SchemaMeta:SwoClass {name: 'SwoClass'});
+// (no node_classifications entry)
+MERGE (n:SchemaMeta:OntologyTerm {name: 'OntologyTerm'});
 // (no node_classifications entry)
 MERGE (n:SchemaMeta:Metric {name: 'Metric'});
 // (no node_classifications entry)
@@ -388,6 +388,18 @@ MATCH (a:SchemaMeta {name: 'Code'}), (b:SchemaMeta {name: 'PipelineService'})
 MERGE (a)-[r:CONTAINS_SERVICE]->(b)
   SET r.vocab_id = 'arch_contains_service', r.prov_maps_to = 'prov:hadMember', r.domain = 'architecture', r.status = 'planned';
 
+MATCH (a:SchemaMeta {name: 'Project'}), (b:SchemaMeta {name: 'CodeModule'})
+MERGE (a)-[r:HAS_MODULE]->(b)
+  SET r.vocab_id = 'u1_has_module', r.prov_maps_to = 'prov:hadMember', r.domain = 'architecture', r.status = 'active';
+
+MATCH (a:SchemaMeta {name: 'CodeModule'})
+MERGE (a)-[r:IMPORTS]->(a)
+  SET r.vocab_id = 'u1_imports', r.prov_maps_to = 'prov:wasDerivedFrom', r.domain = 'architecture', r.status = 'active';
+
+MATCH (a:SchemaMeta {name: 'CodeModule'}), (b:SchemaMeta {name: 'SwoClass'})
+MERGE (a)-[r:IS_ENCODED_IN]->(b)
+  SET r.vocab_id = 'u1_is_encoded_in', r.prov_maps_to = null, r.domain = 'architecture', r.status = 'active';
+
 // ── domain: registry ────────────────────────────────────────────────────────
 
 MATCH (a:SchemaMeta {name: 'SoftwareProduct'}), (b:SchemaMeta {name: 'Vendor'})
@@ -482,20 +494,6 @@ MERGE (a)-[r:MADE_BY_SENSOR]->(b)
 MATCH (a:SchemaMeta {name: 'Observation'}), (b:SchemaMeta {name: 'ObservableProperty'})
 MERGE (a)-[r:OF_OBSERVABLE_PROPERTY]->(b)
   SET r.vocab_id = 'sosa_observed_property', r.prov_maps_to = null, r.sosa_maps_to = 'sosa:observedProperty', r.domain = 'context', r.status = 'planned';
-
-// ── domain: architecture ────────────────────────────────────────────────────
-
-MATCH (a:SchemaMeta {name: 'Project'}), (b:SchemaMeta {name: 'CodeModule'})
-MERGE (a)-[r:HAS_MODULE]->(b)
-  SET r.vocab_id = 'u1_has_module', r.prov_maps_to = 'prov:hadMember', r.domain = 'architecture', r.status = 'active';
-
-MATCH (a:SchemaMeta {name: 'CodeModule'})
-MERGE (a)-[r:IMPORTS]->(a)
-  SET r.vocab_id = 'u1_imports', r.prov_maps_to = 'prov:wasDerivedFrom', r.domain = 'architecture', r.status = 'active';
-
-MATCH (a:SchemaMeta {name: 'CodeModule'}), (b:SchemaMeta {name: 'SwoClass'})
-MERGE (a)-[r:IS_ENCODED_IN]->(b)
-  SET r.vocab_id = 'u1_is_encoded_in', r.prov_maps_to = null, r.domain = 'architecture', r.status = 'active';
 
 // ── domain: quality ─────────────────────────────────────────────────────────
 

@@ -1,0 +1,262 @@
+
+  # ── Catalog ──────────────────────────────────────────────────────────────
+
+  - id:           catalog_reconciles_to
+    neo4j_label:  RECONCILES_TO
+    inverse_label: "reconciled from"
+    role:         ~
+    from_node:    CatalogLOB
+    to_node:      BusinessSegment
+    prov_maps_to: ~
+    note: >
+      Catalog LOB reconciled to a canonical corporate business segment.
+      Approximate mapping (skos:closeMatch semantics). Edge carries a
+      confidence property (0.0–1.0). Not always 1:1 (e.g., AWMCIB splits
+      across segments).
+    supplement:   catalog_ontology_supplement.cypher
+    loader:       catalog_lobs.cypher
+    domain:       catalog
+    status:       active
+
+  - id:           catalog_has_product_line
+    neo4j_label:  HAS_PRODUCT_LINE
+    inverse_label: "product line of"
+    role:         ~
+    from_node:    CatalogLOB
+    to_node:      ProductLine
+    prov_maps_to: ~
+    note:         "LOB contains product lines. Local catalog hierarchy."
+    supplement:   catalog_ontology_supplement.cypher
+    loader:       product_lines.cypher
+    domain:       catalog
+    status:       active
+
+  - id:           catalog_has_product
+    neo4j_label:  HAS_PRODUCT
+    inverse_label: "product of"
+    role:         ~
+    from_node:    ProductLine
+    to_node:      Product
+    prov_maps_to: ~
+    note:         "Product line contains products. Local catalog hierarchy."
+    supplement:   catalog_ontology_supplement.cypher
+    loader:       products.cypher
+    domain:       catalog
+    status:       active
+
+  - id:           catalog_has_dev_team
+    neo4j_label:  HAS_DEV_TEAM
+    inverse_label: "dev team of"
+    role:         ~
+    from_node:    Product
+    to_node:      DevTeam
+    prov_maps_to: ~
+    note:         "Product has an owning dev team. Local organizational linkage."
+    supplement:   catalog_ontology_supplement.cypher
+    loader:       dev_teams.cypher
+    domain:       catalog
+    status:       active
+
+  - id:           catalog_has_jira_board
+    neo4j_label:  HAS_JIRA_BOARD
+    inverse_label: "Jira board of"
+    role:         ~
+    from_node:    DevTeam
+    to_node:      JiraBoard
+    prov_maps_to: ~
+    note:         "Dev team's Jira planning board. Local tooling linkage."
+    supplement:   catalog_ontology_supplement.cypher
+    loader:       dev_teams.cypher
+    domain:       catalog
+    status:       active
+
+  - id:           catalog_has_application
+    neo4j_label:  HAS_APPLICATION
+    inverse_label: "application of"
+    role:         ~
+    from_node:    Product
+    to_node:      BusinessApplication
+    prov_maps_to: ~
+    note: >
+      A structural SUPPORT link: the Product is supported by two or more
+      applications (front-end/back-end). 1:many BY DESIGN — the source
+      extract's application-id column is multi-valued, so a picker over this
+      edge returns a LIST, never a single application. K7 gate §G6
+      (seal-app-ref-edge-reshape, 2026-08-03) ruled this COMPANY reading over
+      the producer's earlier "a Product owns a set of SEAL-registered
+      applications" wording, because the company reading is backed by a live
+      extract and loader where the producer's was an unbuilt intention;
+      surfaces reconciled at K13. The old WAS_ATTRIBUTED_TO matrix hint fell
+      with the ownership reading — both ends are Entities post-K4, so there is
+      no PROV row (local structural link, like the sibling catalog hierarchy
+      edges). C9 gate (2026-07-18): the pat_product_mapping write REMOVED —
+      the team row's seal_ids are TEAM-scoped (they now feed arch_develops)
+      and attributing them to the Product conflated two PAT screens. Stays
+      planned until a product-scoped extract (PAT "Mapped Applications"
+      product tab) is onboarded — the C9 condition, unchanged by §G6; pre-C9
+      edges cleaned by migrate_pat_alignment_c9.cypher. Resolves the
+      SnapshotWriter references at writer.py:45,67.
+    supplement:   catalog_ontology_supplement.cypher
+    loader:       ~
+    domain:       catalog
+    status:       planned
+
+  - id:           catalog_has_area_product
+    neo4j_label:  HAS_AREA_PRODUCT
+    inverse_label: "area product of"
+    role:         ~
+    from_node:    Product
+    to_node:      AreaProduct
+    prov_maps_to: ~
+    note:         "Product contains Area Product Groups (Team of Teams). Local catalog hierarchy."
+    supplement:   catalog_ontology_supplement.cypher
+    loader:       area_products.cypher
+    domain:       catalog
+    status:       planned
+
+  - id:           catalog_area_product_has_dev_team
+    neo4j_label:  HAS_DEV_TEAM
+    inverse_label: "dev team of"
+    role:         ~
+    from_node:    AreaProduct
+    to_node:      DevTeam
+    prov_maps_to: ~
+    note:         "Area Product Group contains DevTeams. Same label as Product→DevTeam; from_node type distinguishes context in queries."
+    supplement:   catalog_ontology_supplement.cypher
+    loader:       area_products.cypher
+    domain:       catalog
+    status:       planned
+
+  # — Product Cabinet (K5 gate signed off 2026-07-20; ACTIVE via the K6 supplement;
+  #   catalog-domain siblings of the seal_qualified_attribution / seal_attribution_had_role
+  #   entries where the triples differ (the HAS_DEV_TEAM dual-registration precedent). The
+  #   Attribution -[:HAS_AGENT]-> Employee hop is NOT twinned: its triple would duplicate
+  #   seal_attribution_has_agent exactly (the C8 schema meta-graph refuses ambiguous
+  #   duplicate (from, label, to) triples), so the Cabinet REUSES that entry as shared
+  #   qualified-attribution infrastructure — rescoped family-agnostic at the K5 sign-off) —
+  - id:           catalog_cabinet_qualified_attribution
+    neo4j_label:  QUALIFIED_ATTRIBUTION
+    inverse_label: "attribution of"
+    role:         ~
+    from_node:    "Product | AreaProduct"
+    to_node:      Attribution
+    prov_maps_to: "prov:qualifiedAttribution"
+    note: >
+      ACTIVE (K6, 2026-07-20; gate product-cabinet-attribution signed off same day).
+      Product Cabinet twin of seal_qualified_attribution — same reified PROV pattern, PAT
+      scope; Attribution reused as the n-ary node; one per (scope-node, ProductRole) pair;
+      area_product_owner AND tech_partner attributions attach only to :AreaProduct (SME
+      2026-07-20). The downstream Attribution -[:HAS_AGENT]-> Employee hop REUSES
+      seal_attribution_has_agent (see the section comment — duplicate triple, family-agnostic
+      infrastructure). Coexists with the collapsed catalog_cabinet_attributed_to simple form
+      (gate section C, SME-decided 2026-07-20: both forms load). NO loader yet — blocked
+      company-side until a person-level PAT cabinet extract exists.
+    supplement:   catalog_ontology_supplement.cypher
+    loader:       ~
+    domain:       catalog
+    status:       active
+
+  - id:           catalog_cabinet_attribution_had_role
+    neo4j_label:  HAD_ROLE
+    inverse_label: "role in"
+    role:         ~
+    from_node:    Attribution
+    to_node:      ProductRole
+    prov_maps_to: "prov:hadRole"
+    note: >
+      ACTIVE (K6, 2026-07-20; gate product-cabinet-attribution signed off same day).
+      Names which of the product_roles concepts the Attribution grants — EXACTLY the fixed 7,
+      NO cto concept (SME 2026-07-20: the two role families are independent; the shared-cto
+      mechanics question from the 2026-07-10 §B record is resolved by dropping the sharing
+      for now).
+    supplement:   catalog_ontology_supplement.cypher
+    loader:       ~
+    domain:       catalog
+    status:       active
+
+  - id:           catalog_cabinet_attributed_to
+    neo4j_label:  WAS_ATTRIBUTED_TO
+    inverse_label: "attributed with"
+    role:         product_cabinet_role_holder
+    from_node:    "Product | AreaProduct"
+    to_node:      Employee
+    prov_maps_to: "prov:wasAttributedTo"
+    note: >
+      ACTIVE (K6, 2026-07-20; gate product-cabinet-attribution signed off same day —
+      section C decision: "product attributed to employee should be fine"). Simple/collapsed
+      form of the Product Cabinet attribution (matrix row Entity -> Agent = wasAttributedTo)
+      — catalog-domain twin of seal_app_attributed_to_employee (triples differ: from-node
+      Product|AreaProduct vs BusinessApplication — the HAS_DEV_TEAM dual-registration
+      precedent). Loads ALONGSIDE the reified catalog_cabinet_qualified_attribution chain,
+      a deliberate deviation from the K4 TOM resolution (qualified-only); multi-person roles
+      still load the reified form as the carrier. role=product_cabinet_role_holder
+      distinguishes this instance on the shared WAS_ATTRIBUTED_TO label (the
+      tom_role_holder idiom); the edge names its ProductRole concept as a property. Same
+      scope rules as the reified form: area_product_owner and tech_partner rows attach only
+      to :AreaProduct. NO loader yet — blocked company-side (person-level cabinet extract).
+    supplement:   catalog_ontology_supplement.cypher
+    loader:       ~
+    domain:       catalog
+    status:       active
+
+  - id:           catalog_supports
+    neo4j_label:  SUPPORTS
+    inverse_label: "supported by"
+    role:         ~
+    from_node:    DevTeam
+    to_node:      Product
+    prov_maps_to: ~
+    note: >
+      NARROWED at the C9 gate (2026-07-18, "PAT reconcile"): written ONLY when the
+      team row carries no area_product_id — the sole-assertion fallback of the C5
+      same-row rule. When an area-product alignment exists, Product derives via
+      Product▸HAS_AREA_PRODUCT▸AreaProduct◂SUPPORTS◂DevTeam and the direct edge is
+      a banned join-restatement (m1-verify guard). The sponsored variant
+      (sponsored: true, a DIFFERENT product than the alignment chain) is an
+      independent fact and always allowed. History: DEPRECATED 2026-06-21 (C4,
+      "not modeled") when the unconditional write was superseded by
+      catalog_supports_area_product; re-activated fallback-only at C9 after SME
+      evidence that PAT asserts Supporting Product in its own column and some
+      teams carry no area product. One-time cleanup of pre-C9 edges:
+      migrate_pat_alignment_c9.cypher.
+    supplement:   catalog_ontology_supplement.cypher
+    loader:       pat_product_mapping.cypher
+    domain:       catalog
+    status:       active
+
+  - id:           catalog_supports_area_product
+    neo4j_label:  SUPPORTS
+    inverse_label: "supported by"
+    role:         ~
+    from_node:    DevTeam
+    to_node:      AreaProduct
+    prov_maps_to: ~
+    note: >
+      DevTeam is aligned to / supports an AreaProduct (Team-of-Teams). Confirmed via HITL gate
+      (C3, SME 2026-06-21) as THE SUPPORTS edge — range is AreaProduct; the DevTeam→Product form
+      survives only as the C9 sole-assertion fallback (catalog_supports). Edge carries team_type
+      (aligned|flex|dedicated) + sponsored (bool); 'aligned to' = team_type=aligned. C9
+      (2026-07-18): sponsored area-product variant added (PAT Sponsoring Area Product column);
+      alignment is VOLATILE — each load sweeps the team's stale pat-sourced SUPPORTS edges
+      (tracked, never frozen). Agent→Entity has no PROV-O matrix row; local-only.
+    supplement:   catalog_ontology_supplement.cypher
+    loader:       pat_product_mapping.cypher
+    domain:       catalog
+    status:       active
+
+  - id:           catalog_dev_team_has_membership
+    neo4j_label:  HAS_MEMBERSHIP
+    inverse_label: "membership of"
+    role:         ~
+    from_node:    DevTeam
+    to_node:      Membership
+    prov_maps_to: ~
+    note: >
+      DevTeam has a timed role-holder membership. Reuses the org:Membership
+      n-ary pattern from SEAL (Application→Membership). PAT-side human roles:
+      Tech Partner, Area Tech Partner, Software Engineering Manager,
+      Software Engineer, SRE Director, etc.
+    supplement:   catalog_ontology_supplement.cypher
+    loader:       pat_team_roles.cypher
+    domain:       catalog
+    status:       planned

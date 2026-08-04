@@ -14,11 +14,13 @@ from pathlib import Path
 import pytest
 import yaml
 
+from drydocs_core import yaml_fragments
+
 ROOT = Path(__file__).resolve().parent.parent.parent
 AUDIT_FILE = ROOT / "config" / "audit-fields.yaml"
 REGISTRY_FILE = ROOT / "config" / "source-registry.yaml"
 DOC_REGISTRY_FILE = ROOT / "config" / "doc-source-registry.yaml"
-VOCAB_FILE = ROOT / "drydocs_core" / "ontology" / "relationship_vocabulary.yaml"
+VOCAB_FILE = ROOT / "drydocs_core" / "ontology" / "relationship_vocabulary"
 
 FROZEN_ENVELOPE = [
     "source_created_by",
@@ -114,7 +116,7 @@ def test_loaders_set_exactly_the_confirmed_envelope(audit: dict) -> None:
 
 @pytest.fixture(scope="module")
 def property_terms() -> list[dict]:
-    vocab = yaml.safe_load(VOCAB_FILE.read_text(encoding="utf-8"))
+    vocab = yaml_fragments.load_yaml_source(VOCAB_FILE)
     return vocab["property_terms"]
 
 

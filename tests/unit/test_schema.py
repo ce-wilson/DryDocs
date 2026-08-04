@@ -7,10 +7,11 @@ from pathlib import Path
 
 import pytest
 
+from drydocs_core import yaml_fragments
 from drydocs_core.cypher_split import strip_comments
 
 try:
-    import yaml
+    import yaml  # noqa: F401  (availability probe; loader does the parsing)
 
     _YAML_AVAILABLE = True
 except ImportError:
@@ -20,7 +21,7 @@ SCHEMA_DIR = Path(__file__).resolve().parents[2] / "drydocs_core" / "schema"
 ONTOLOGY_DIR = Path(__file__).resolve().parents[2] / "drydocs_core" / "ontology"
 CONSTRAINTS_FILE = SCHEMA_DIR / "constraints.cypher"
 ONTOLOGY_FILE = SCHEMA_DIR / "ontology.cypher"
-VOCAB_FILE = ONTOLOGY_DIR / "relationship_vocabulary.yaml"
+VOCAB_FILE = ONTOLOGY_DIR / "relationship_vocabulary"
 
 # 35 after schema consolidation: m3_constraints_upgrade.cypher absorbed into
 # constraints.cypher + the PAT area_product_id constraint. 37 after the
@@ -136,7 +137,7 @@ def test_vocabulary_active_entries_declared_in_supplements() -> None:
     if not VOCAB_FILE.exists():
         pytest.skip("relationship_vocabulary.yaml not present")
 
-    vocab = yaml.safe_load(VOCAB_FILE.read_text(encoding="utf-8"))
+    vocab = yaml_fragments.load_yaml_source(VOCAB_FILE)
     failures: list[str] = []
 
     for rel in vocab.get("local_relationships", []):
@@ -167,7 +168,7 @@ def test_vocabulary_prov_matrix_complete() -> None:
     if not VOCAB_FILE.exists():
         pytest.skip("relationship_vocabulary.yaml not present")
 
-    vocab = yaml.safe_load(VOCAB_FILE.read_text(encoding="utf-8"))
+    vocab = yaml_fragments.load_yaml_source(VOCAB_FILE)
     matrix = vocab.get("prov_matrix", [])
     labels = {row["neo4j_label"] for row in matrix}
     expected = {
@@ -190,7 +191,7 @@ def test_vocabulary_no_duplicate_ids() -> None:
     if not VOCAB_FILE.exists():
         pytest.skip("relationship_vocabulary.yaml not present")
 
-    vocab = yaml.safe_load(VOCAB_FILE.read_text(encoding="utf-8"))
+    vocab = yaml_fragments.load_yaml_source(VOCAB_FILE)
     ids = [r["id"] for r in vocab.get("local_relationships", [])]
     dupes = {i for i in ids if ids.count(i) > 1}
     assert not dupes, f"Duplicate relationship ids in vocabulary: {dupes}"
@@ -205,7 +206,7 @@ def test_vocabulary_every_entry_has_inverse_label() -> None:
     if not VOCAB_FILE.exists():
         pytest.skip("relationship_vocabulary.yaml not present")
 
-    vocab = yaml.safe_load(VOCAB_FILE.read_text(encoding="utf-8"))
+    vocab = yaml_fragments.load_yaml_source(VOCAB_FILE)
     missing = [
         r["id"]
         for r in vocab.get("local_relationships", [])

@@ -1,0 +1,511 @@
+# ── SECTION 0: Node classifications ──────────────────────────────────────────
+# class       = primary OWL/RDFS class (CURIE resolvable via namespaces.py)
+# prov_type   = PROV-O behavioural type used to drive the SECTION 1 matrix
+#               (Activity | Entity | Collection | Agent | n/a)
+# All dd:* classes must be MERGEd as :OntologyTerm:LocalClass in a supplement.
+# ─────────────────────────────────────────────────────────────────────────────
+node_classifications:
+
+  # — Control-M (M3, active) —
+  - label:      ControlMJob
+    class:      "dd:ControlMJob"
+    prov_type:  Activity
+    note:       "Job definition; acts as a prov:Activity at runtime. ontology_supplement.cypher."
+
+  - label:      ControlMFolder
+    class:      "dd:ControlMFolder"
+    prov_type:  Collection
+    note:       "prov:Collection of jobs. ontology_supplement.cypher."
+
+  - label:      ControlMApplication
+    class:      "dd:ControlMApplication"
+    prov_type:  Collection
+    note: >
+      Control-M APPLICATION grouping from the folder HEADER ROW in CM_DEF_VJOB
+      (JOB_ID=1) — deliberately NOT the business :BusinessApplication / SEAL concept.
+      prov:Collection of ControlMFolder (see m3_contains_folder). Written in
+      the FOLDER pass. SME gate controlm-q1q3-phase1 (2026-07-07); entry added
+      2026-07-09 to close the node_classifications gap (the edge was
+      registered without its node). ontology_supplement.cypher.
+
+  - label:      ControlMServer
+    class:      "dd:ControlMServer"
+    prov_type:  n/a
+    note: >
+      Local platform/infrastructure class — no W3C equivalent. NOT an Agent:
+      edges targeting it cannot use prov:wasAssociatedWith (see p2_deployed_to).
+      ontology_supplement.cypher.
+
+  - label:      Condition
+    class:      "dd:Condition"
+    prov_type:  Entity
+    note:       "Named scheduling condition (prov:Entity). ontology_supplement.cypher."
+
+  - label:      JobRun
+    class:      "dd:JobRun"
+    prov_type:  Activity
+    note: >
+      Loader-run provenance activity (base ontology). Distinct from
+      ControlMJobRun (phase-2 runtime execution) — do not merge the labels.
+
+  # — Control-M phase 2 (planned) —
+  - label:      ControlMJobRun
+    class:      "dd:ControlMJobRun"
+    prov_type:  Activity
+    note:       "One actual execution of a ControlMJob, from the Control-M history API."
+
+  - label:      Deployment
+    class:      "dd:Deployment"
+    prov_type:  Activity
+    note:       "CI/CD deployment activity that ships folder XML to a server."
+
+  - label:      Developer
+    class:      "prov:Person"
+    prov_type:  Agent
+    note: >
+      Human author from Git blame / change records. Likely the same individual
+      as an Employee node (SEAL); reconcile by SID when both feeds are loaded.
+
+  - label:      AppUser
+    class:      "prov:SoftwareAgent"
+    prov_type:  Agent
+    note:       "Service account / FID that jobs run as (EPV, Run-as-User)."
+
+  - label:      Script
+    class:      "dd:Script"
+    prov_type:  Entity
+    note: >
+      Invocable artifact (placement JAR + Task-JSON). prov:Entity; also a
+      prov:Plan in the wasAssociatedWith(hadPlan) pattern. Finer software
+      typing available via swo: if ever required.
+
+  - label:      ETLProcess
+    class:      "dd:ETLProcess"
+    prov_type:  Activity
+    note:       "AWS-side ingestion/transformation workload (Glue / DPL). obi: offers a data-transformation class if a standards mapping is later required."
+
+  - label:      ExecutionHost
+    class:      "prov:SoftwareAgent"
+    prov_type:  Agent
+    note: >
+      Agent host / ETL cluster entry point. Classified as SoftwareAgent
+      (not pure infrastructure) so that AppUser -[:DELEGATES_TO]->
+      ExecutionHost can legally map to prov:actedOnBehalfOf, which requires
+      Agent → Agent. Local subclass dd:ExecutionHost.
+
+  - label:      ControlMHostGroup
+    class:      "dd:ControlMHostGroup"
+    prov_type:  Collection
+    note: >
+      Gate controlm-hosts-topology CONFIRMED 2026-07-09 (config/gate-log.md): a
+      Control-M host group / node group (vendor 6.4.01 poster: CMS_NODGRP;
+      replica: psgmgr CM_HOSTS) — the load-balancing set of agent hosts a
+      job's NODE_ID can resolve to; the group name may itself be a DNS/LB
+      alias. Key (data_center, name); members are ExecutionHost nodes.
+      Deliberately NOT named "ControlMGroup": CM_DEF_VJOB.GROUP_NAME
+      (ControlMJob.group_name) is the application-group concept — a different
+      thing entirely; "host group" is the 9.0.x vendor term.
+
+  - label:      DataSource
+    class:      "dcat:Dataset"
+    prov_type:  Entity
+    note: >
+      RETIRED 2026-07-15 (lineage rel vocabulary gate, config/gate-log.md):
+      superseded by DataAsset — the READS_FROM edge direction already
+      encodes the source role. Kept for audit; no loader ever shipped.
+      Was: read-side dataset (source zone + Glue database).
+
+  - label:      DataTarget
+    class:      "dcat:Dataset"
+    prov_type:  Entity
+    note: >
+      RETIRED 2026-07-15 (lineage rel vocabulary gate, config/gate-log.md):
+      superseded by DataAsset — the WRITES_TO edge direction already
+      encodes the target role. Kept for audit; no loader ever shipped.
+      Was: write-side dataset (target zone / bucket / partitions).
+
+  - label:      DataAsset
+    class:      "dcat:Dataset"
+    prov_type:  Entity
+    note: >
+      Added at the lineage rel vocabulary gate 2026-07-15: the D1 proxy
+      shape — a piece of data a process reads or writes (hdfs / s3 /
+      hive_table / local_file / Glue table, …), keyed on assetId
+      (urn:drydocs:dataasset:{platform}:{namespace}:{name};
+      provisioning/02_proxy_constraints.cypher — constrained in all three
+      data DBs so the ddall composite joins on it). Replaces the retired
+      DataSource / DataTarget pair as the to-node of m3_reads_from /
+      m3_writes_to.
+
+  # — SEAL (active) —
+  - label:      BusinessApplication
+    class:      "prov:Entity"
+    dual_class: "dprod:DataProduct"
+    prov_type:  Entity
+    note: >
+      SEAL-registered application (a data-product/asset record). seal_ontology_supplement.cypher.
+      RECLASSED + RENAMED (K4, 2026-07-15) per the BusinessApplication entity-reshape gate
+      §A + label decision (config/gate-log.md 2026-07-10, SME chad.wilson): was label
+      Application, class prov:SoftwareAgent/Agent. The old typing carried three incompatible
+      PROV types at once (SoftwareAgent here; dprod:Port children = Entity semantics;
+      org:Membership role-holders = Organization semantics). Label :Application →
+      :BusinessApplication normalized across vocabulary, schema supplements, loaders,
+      constraints (businessapplication_*), and tests in the same K4 change.
+
+  - label:      Employee
+    class:      "prov:Agent"
+    prov_type:  Agent
+    note:       "Person holding a role membership. seal_ontology_supplement.cypher."
+
+  - label:      Membership
+    class:      "org:Membership"
+    prov_type:  n/a
+    note: >
+      CORRECTED: consolidated doc listed "prov:Membership", which does not
+      exist in PROV-O. The W3C ORG ontology owns this class (org:Membership),
+      matching seal_ontology_supplement.cypher. n-ary relation node, not a
+      PROV participant.
+
+  - label:      Role
+    class:      "org:Role"
+    prov_type:  n/a
+    note:       "Named role in a membership. seal_ontology_supplement.cypher."
+
+  - label:      Port
+    class:      "dprod:Port"
+    prov_type:  Entity
+    note:       "Data port (EventProcessing / BatchProcessing). dprod namespace is the EKGF working default pending the corporate IRI."
+
+  # — SEAL reshape (ACTIVE at K4, 2026-07-15 — gate 2026-07-10 §B) —
+  # (seal_had_primary_source targets :Document — declared ONCE in the docs-corpus section
+  # below; the duplicate SEAL-reshape Document entry was merged into it 2026-07-09,
+  # tech-debt audit F4 — one label, one classification entry.)
+
+  - label:      Attribution
+    class:      "prov:Attribution"
+    prov_type:  n/a
+    note: >
+      ACTIVE (K4, 2026-07-15): reified n-ary node for the SEAL Technical Operating Model (TOM)
+      qualified-attribution pattern — BusinessApplication -[:QUALIFIED_ATTRIBUTION]-> Attribution
+      -[:HAS_AGENT]-> Employee, Attribution -[:HAD_ROLE]-> TOMRole. Same pattern family as
+      org:Membership (n-ary relation node, not itself a PROV participant — prov:Attribution
+      rdfs:subClassOf prov:Influence). Supplement: seal_ontology_supplement.cypher. For
+      operate_manager the level (L1|L2) is a property on THIS node.
+
+  - label:      TOMRole
+    class:      "skos:Concept"
+    prov_type:  n/a
+    note: >
+      ACTIVE (K4, 2026-07-15): SEAL Technical Operating Model role vocabulary — skos:Concept
+      in scheme tom_roles (SkosConceptScheme), the gate §B REVISED fixed 7: application_owner,
+      primary_information_owner, backup_information_owner, cto, technology_risk_controls,
+      design_authority, operate_manager (L1/L2 = Attribution property). cto is NOT shared
+      with the K5 ProductRole scheme — the K5 gate (signed off 2026-07-20) decided the two
+      families are INDEPENDENT, superseding the 2026-07-10 §B "CTO in both families" record
+      (rename history in the gate log: the area-product Tech Partner was formerly named
+      "CTO" in SEAL; SEAL's CTO now denotes the product-level role). DISTINCT from :Role
+      (org:Role, PAT product hierarchy only, e.g. catalog_dev_team_has_membership) AND from
+      :ProductRole — do not conflate. Reached via Attribution -[:HAD_ROLE]-> TOMRole
+      (prov:hadRole). Supplement: seal_ontology_supplement.cypher.
+
+  # — Product Cabinet (K5 gate signed off 2026-07-20; supplement landed K6) —
+  - label:      ProductRole
+    class:      "skos:Concept"
+    prov_type:  n/a
+    note: >
+      ACTIVE (K6, 2026-07-20; gate product-cabinet-attribution signed off same day) —
+      Product Cabinet role vocabulary, skos:Concept in scheme product_roles; EXACTLY the
+      fixed 7 (area_product_owner, product_owner, product_architect, tech_partner,
+      data_owner, data_certifier, analytics_lead), scheme FIXED (the tom_roles precedent —
+      new roles require a new gate). NO cto member: the two role families are INDEPENDENT
+      (SME 2026-07-20 — the shared-cto concept from the 2026-07-10 gate §B record is
+      dropped for now; SEAL's cto stays a TOM role attributed to :BusinessApplication).
+      Rename history, carried as a skos:changeNote on the tech_partner concept: in PAT the
+      mapping changed slightly — the area-product Tech Partner was formerly named "CTO" in
+      SEAL, and SEAL's CTO now denotes the product-level role. Scope: :Product /
+      :AreaProduct only, never :BusinessApplication; area_product_owner AND tech_partner
+      attach ONLY to :AreaProduct (scope property on the concepts). DISTINCT from :Role
+      (org:Role, PAT product hierarchy membership) and from :TOMRole — no shared concepts,
+      do not conflate. Supplement: catalog_ontology_supplement.cypher.
+
+  # — Catalog (active) —
+  - label:      CatalogLOB
+    class:      "org:OrganizationalUnit"
+    prov_type:  Agent
+    note:       "Line of business. catalog_ontology_supplement.cypher."
+
+  - label:      BusinessSegment
+    class:      "org:FormalOrganization"
+    prov_type:  Agent
+    note: >
+      Corporate segment. Doc says org:FormalOrganization; supplement comment
+      says org:Organization. FormalOrganization (legally-recognized org)
+      adopted as the more precise valid term.
+
+  - label:      DevTeam
+    class:      "org:OrganizationalUnit"
+    prov_type:  Agent
+    note:       "Development team. catalog_ontology_supplement.cypher."
+
+  - label:      ProductLine
+    class:      "dd:ProductLine"
+    prov_type:  Entity
+    note:       "Local catalog hierarchy; no W3C equivalent."
+
+  - label:      Product
+    class:      "dd:Product"
+    prov_type:  Entity
+    note:       "Local catalog hierarchy; no W3C equivalent."
+
+  - label:      JiraBoard
+    class:      "dd:JiraBoard"
+    prov_type:  Entity
+    note:       "Planning tool artifact; local."
+
+  - label:      AreaProduct
+    class:      "dd:AreaProduct"
+    prov_type:  Entity
+    note:       "Area Product Group / Team of Teams. Intermediate between Product and DevTeam in the PAT hierarchy. catalog_ontology_supplement.cypher."
+
+  # — Architecture flow (Section 4, normalized from pre-ontology diagram) —
+  - label:      Code
+    class:      "dd:Code"
+    prov_type:  Collection
+    note:       "Codebase/repo content owned by a DevTeam; prov:Collection of PipelineService members."
+
+  - label:      Bitbucket
+    class:      "dd:CodeRepository"
+    prov_type:  Entity
+    note: >
+      Repository hosting location. Candidate prov:Location if STORED_IN is
+      ever mapped to prov:atLocation; kept local for now.
+
+  - label:      PipelineService
+    class:      "dd:PipelineService"
+    prov_type:  Entity
+    note:       "Deployable pipeline service definition inside a codebase."
+
+  - label:      Batch
+    class:      "dd:Batch"
+    prov_type:  Collection
+    note:       "Logical batch grouping between Application and Control-M folders."
+
+  - label:      File
+    class:      "dd:File"
+    prov_type:  Entity
+    note:       "File delivered via MFTS agent (fmSubPathId); job input dependency."
+
+  # — Software registry (plan 07, gated 2026-07-07) —
+  - label:      Vendor
+    class:      "org:Organization"
+    prov_type:  Agent
+    note:       "Third-party software company/brand ONLY (ADR 0004). Ids shared with drydocs-icons manifest. registry_ontology_supplement.cypher."
+
+  - label:      SoftwareProduct
+    class:      "dd:SoftwareProduct"
+    prov_type:  Entity
+    note:       "What a Vendor ships (Control-M, Neo4j, Oracle DB). role attribute (orchestrator|data-platform|graph-platform|tool) absorbs the Tier-1/Tier-2 split. registry_ontology_supplement.cypher."
+
+  # — Docs corpus (lexical graph, llm-graph-builder pattern) — GATE-BOUND ————
+  - label:      Document
+    class:      "prov:Entity"
+    prov_type:  Entity
+    note: >
+      A converted external/internal document (first corpus: bmc-docs, the 26
+      converted BMC Control-M pages). Carries source_url + scraped_on +
+      trust_default; NOT a source-of-record — the SOURCE-MANIFEST provenance
+      model governs. Gate: bmc-docs-lexical-load (accepted 2026-07-08).
+      THE single :Document classification (dedupe 2026-07-09, tech-debt audit
+      F4): also covers the SEAL-reshape / drydocs-docmeta use — a scraped
+      SEAL/PAT source page targeted by seal_had_primary_source
+      (prov:hadPrimarySource type-checks Entity -> Entity against this
+      entry); that use stays PROPOSED until docmeta is built and gated.
+      Lands beside the software registry so DESCRIBES can reach
+      :SoftwareProduct in-database.
+
+  - label:      Chunk
+    class:      "prov:Entity"
+    prov_type:  Entity
+    note: >
+      A section-level slice of a Document (H2 chunking, deterministic — no
+      LLM). Carries provenance tier VERBATIM|GROUNDED|SYNTHESIZED per the
+      corpus SOURCE-MANIFEST default rule; SYNTHESIZED chunks are Claude
+      inference and never vendor ground truth. Gate: bmc-docs-lexical-load.
+
+  - label:      DocSource
+    class:      "prov:Entity"
+    prov_type:  Entity
+    note: >
+      A registered document source (one config/doc-source-registry.yaml entry
+      materialized as a node) — DCAT-catalog-shaped: the thing a Document
+      belongs to, carrying connector/classification/tier/curation defaults.
+      Registered PLANNED at the Q4 docmeta gate (ADR 0006, 2026-07-18); built
+      by the docmeta component (plan P4+), nothing loads it today.
+
+  # — Documentation traceability + review feedback (PROPOSED, backlog L7) ——————
+  # Registered for the doc-traceability-feedback gate
+  # (config/gate-prompts/doc-traceability-feedback.yaml). PRODUCT-PLANE family (SaaS
+  # reframe, SME direction 2026-07-20): these classes define the generic documentation
+  # ontology — a requirement proposition, an authored document, a review annotation —
+  # from ANY registered source. DryDocs' own outline system (docs/design/*.md +
+  # docs/design/templates/*.outline.yaml + docs/design/feedback/*.yaml) is SOURCE
+  # CONNECTOR #1, the reference implementation ("tenant 0" — the app documenting
+  # itself); the Full Circle / incremental-context-loop connectors
+  # (SDLC-Docs/extracted/plan-incrementalContextLoop.prompt.md: Jira, Gherkin/BDD, BRD)
+  # feed the SAME classes later. Boundary vs the "Docs corpus" block above
+  # (Document/Chunk/DocSource): MANAGED vs INGESTED content — DesignDoc/DocSection are
+  # authored, rev-tracked, outline-validated, annotatable (lifecycle the platform
+  # enforces); Document/Chunk are scraped/uploaded, H2-chunked, trust-tiered (witnessed,
+  # not governed). That split is a product boundary, not a temporary convenience — see
+  # the gate prompt section A. Gate doc-traceability-feedback SIGNED OFF 2026-07-20 —
+  # all six classes ACTIVE; supplement terms in ontology_supplement.cypher (K6-style
+  # same-day landing; config/gate-log.md).
+
+  - label:      DesignDoc
+    class:      "dd:DesignDoc"
+    prov_type:  Entity
+    note: >
+      ACTIVE (L7, gate doc-traceability-feedback signed off 2026-07-20, config/gate-log.md,
+      all 21 confirmations A1-A7/B1-B4/C1-C4/D1-D7). One MANAGED (authored,
+      rev-tracked, outline-validated) document from any registered source — the
+      product-plane counterpart of the ingested :Document. Carries doc_id, doc_type,
+      rev, status, commit, origin (which source connector produced it). Keying is
+      SOURCE-NAMESPACED: doc_id alone is unique only within one source/repo, so the
+      node key is (origin, doc_id) — never a bare filename stem (single-repo assumption
+      rejected at the SaaS reframe). Connector #1: docs/design/<doc_id>.md conforming
+      to docs/design/templates/*.outline.yaml (schema drydocs.doc-outline.v1), doc_id =
+      filename stem, origin = drydocs-design-docs. Kept DISTINCT from :Document on the
+      managed-vs-ingested product boundary (family header above); display label joins
+      the SaaS terminology-rename surface (knowledge/upgrade-plans/
+      generic-terminology-research.md) — internal label stays stable.
+
+  - label:      DocSection
+    class:      "dd:DocSection"
+    prov_type:  Entity
+    note: >
+      ACTIVE (L7, gate doc-traceability-feedback signed off 2026-07-20, config/gate-log.md). One AUTHORED section of a DesignDoc, keyed
+      (origin, doc_id, anchor) — the stable anchor id namespace the source connector
+      guarantees. Carries anchor, heading, required. Connector #1: the
+      `<!-- anchor: id -->` ids (drydocs/doc_outline.py ANCHOR_RE) plus L11
+      content-derived subsection ids (`<authored-anchor>--<subsection-slug>`). Distinct
+      from :Chunk (ingested/H2-chunked) per the managed-vs-ingested boundary. DocSection
+      is the shared target of both traceability (Requirement -[:SPECIFIED_IN]->) and
+      review feedback (FeedbackNote -[:ANNOTATES]->).
+
+  - label:      Requirement
+    class:      "dd:Requirement"
+    prov_type:  Entity
+    note: >
+      ACTIVE (L7, gate doc-traceability-feedback signed off 2026-07-20, config/gate-log.md). One requirement/capability PROPOSITION from any registered
+      source — the graph-side anchor of the traceability star (SPECIFIED_IN /
+      IMPLEMENTED_BY / VERIFIED_BY). Carries requirement_id, kind (FR|UC|NFR today —
+      use cases fold in as kind=UC until a future BDD gate decides whether Scenario
+      splits out), description, matrix_status, origin. The id FORMAT is per-source
+      configuration, not a global rule (each source/tenant has its own convention:
+      FR-*, REQ-*, Jira keys) — connector #1's pattern is tdd.outline.yaml's
+      requirement_id_pattern `^(FR|UC|NFR)-[A-Z0-9]+-\d+$`, currently mode: loose.
+      Future connectors per the incremental-context-loop plan: Jira stories, Gherkin
+      scenarios, BRD checklist rows ("fill the requirements gaps for context").
+
+  - label:      Component
+    class:      "dd:Component"
+    prov_type:  Entity
+    note: >
+      ACTIVE (L7, gate doc-traceability-feedback signed off 2026-07-20, config/gate-log.md). An implementation artifact (file, module, CLI command,
+      proc/table) cited by a requirement source as the concrete realization of a
+      Requirement. Keying is SOURCE/REPO-NAMESPACED — a bare path string collides the
+      moment there are two repos or tenants, so the key is (origin, ref); same-basename
+      ambiguity within one origin stays an SME-merge case (the m3_invokes :Script
+      precedent). NO existing node class fit (grepped relationship_vocabulary.yaml +
+      drydocs_core/schema/*.cypher for Module/Component/Test: none). Nearest existing
+      Entity classes rejected: :Script (Control-M job-invocation lineage) and
+      :PipelineService (service granularity) — a future gate may fold them under
+      Component or vice versa; flagged, not decided, here.
+
+  - label:      TestCase
+    class:      "dd:TestCase"
+    prov_type:  Entity
+    note: >
+      ACTIVE (L7, gate doc-traceability-feedback signed off 2026-07-20, config/gate-log.md). One test/verification citation proving a Requirement.
+      Carries kind — an OPEN enum (unit|verify|gate|graph-test observed in connector
+      #1's matrices; gherkin-scenario, jira-acceptance anticipated from the
+      context-loop connectors — deliberately NOT a fixed skos scheme while sources are
+      still being onboarded) — plus ref (the literal citation string) and origin.
+      Connector #1 spans pytest ids, m1/m3-verify invariant names, graph-tests/*.yaml
+      checks, and HITL gate names in one table (docs/design/controlm-ingestion-tdd.md).
+
+  - label:      FeedbackNote
+    class:      "dd:FeedbackNote"
+    prov_type:  Entity
+    note: >
+      ACTIVE (L7, gate doc-traceability-feedback signed off 2026-07-20, config/gate-log.md). One anchor-keyed annotation from a REVIEW WORKFLOW — a
+      product feature, not a vendor-internal convenience (the HITL loop is tenant 0).
+      Carries anchor, note (text), doc_id, doc_rev (the rev the note was taken AGAINST,
+      which may trail the DesignDoc's current rev), origin, and lifecycle status
+      (open|applied|rejected|superseded — the drydocs-startup-refresh-runbook rev1 ->
+      Rev 2 loop is the worked precedent: notes were APPLIED and the doc says so).
+      Connector #1: docs/design/feedback/<doc_id>-rev<N>.yaml rows (schema
+      drydocs.design_doc.feedback_yaml), doc_rev parsed from the filename. prov:Entity
+      per the docs_describes "aboutness" precedent (an annotation is not a derivation
+      of its target); W3C Web Annotation (oa:) alignment flagged in gate section D —
+      heavier under the SaaS lens (annotation export/interop), still deferred.
+
+  # — Context graph (SOSA/SSN, EXPERIMENTAL / early adoption) ————————————————
+  # SOSA/SSN is a W3C standard but NOT a declared *company* standard. These
+  # classes are seeded only by the opt-in sosa_experimental_supplement.cypher
+  # (never by `drydocs bootstrap`); every graph term carries adoption:
+  # "experimental". prov_type below is the natural behavioural fit so the PROV
+  # matrix still works if needed, but the SOSA class is primary here. The wiring
+  # of these to ControlMJobRun is the open gate decision — see the
+  # `jobrun-observation` entry in config/taxonomy-ontology-map.yaml.
+  - label:      Observation
+    class:      "sosa:Observation"
+    prov_type:  Activity
+    note:       "EXPERIMENTAL. A single health/run reading about a job/folder. sosa_experimental_supplement.cypher."
+
+  - label:      Sensor
+    class:      "sosa:Sensor"
+    prov_type:  Agent
+    note:       "EXPERIMENTAL. Monitoring source (Control-M history API, health probe). sosa_experimental_supplement.cypher."
+
+  - label:      Result
+    class:      "sosa:Result"
+    prov_type:  Entity
+    note:       "EXPERIMENTAL. Value an observation produced; may carry a dqv:QualityMeasurement. sosa_experimental_supplement.cypher."
+
+  - label:      ObservableProperty
+    class:      "sosa:ObservableProperty"
+    prov_type:  Entity
+    note:       "EXPERIMENTAL. What is observed: run-status, run-duration, exit-status, freshness. sosa_experimental_supplement.cypher."
+
+  # NOTE: ControlMJob and ControlMFolder (declared above as prov:Activity / Collection)
+  # ALSO act as sosa:FeatureOfInterest — an orthogonal context-graph role recorded
+  # via :CAN_ACT_AS in the supplement. Their primary classification is unchanged.
+
+
+  # ── Epic U / self-documentation (gate self-documentation-code-graph, SIGNED 2026-07-27)
+  - label: Project
+    class: "dd:Project"
+    prov_type: Collection
+    note: >
+      A source-code repository loaded into the graph as itself. ONE root per repo
+      (gate §B1(a)): (:Project {project_id:'drydocs'}). The snapshot's six scan roots
+      (drydocs, drydocs_core, drydocs_deepdoc, drydocs_lineage, drydocs_remediation,
+      tests) are a `project` PROPERTY on :CodeModule, NOT sibling Project nodes.
+      prov:Collection because it collects its modules. This is the anchor that makes
+      "is this our own code?" one hop, and §F2 ruled nothing else may hang off it.
+      Reads unambiguously against the PAT :Product/:AreaProduct/:ProductLine labels
+      (§F3): those name a BUSINESS product hierarchy, this names a SOFTWARE repo.
+  - label: CodeModule
+    class: "dd:CodeModule"
+    prov_type: Entity
+    note: >
+      One source FILE, keyed on file_id (repo-relative path, e.g.
+      'drydocs_core/models/seal.py'). Gate §C1(a): one file = one module. True
+      dotted-module grain was REJECTED — drydocs/loaders/__init__.py IS the package
+      `drydocs.loaders`, which is also the directory name, so module-grain collapses
+      file identity into package identity across all 15 __init__.py files.
+      file_id is the ONLY non-colliding key: `name` collides 15 ways on '__init__.py'
+      and `rel_path` collides across the drydocs / drydocs_core roots (§C4).
+      MUST NEVER also carry :SoftwareProduct — §F1, enforced as a graph-test because
+      Neo4j cannot declare label mutual-exclusion.

@@ -1,0 +1,185 @@
+
+  # ── Architecture flow (Section 4, converted from pre-ontology diagram) ───
+  # Original mermaid labels (develops, owns, stored_in, contains, CONTAINS,
+  # DEPENDS_ON) pre-date the ontology; normalized here. Folder→Job "CONTAINS"
+  # is already covered by m3_contains_job. Job→File "DEPENDS_ON" is covered
+  # by m3_depends_on_file above.
+
+  - id:           arch_develops
+    neo4j_label:  WAS_ATTRIBUTED_TO
+    inverse_label: "develops"
+    role:         developed_by
+    from_node:    BusinessApplication          # the BusinessApplication concept; key = SEALID
+    to_node:      DevTeam
+    join_key:     SEALID
+    prov_maps_to: "prov:wasAttributedTo"
+    note: >
+      FLIPPED at K4 (2026-07-15; gate 2026-07-10 §E): was the local
+      (:DevTeam)-[:DEVELOPS]->(:BusinessApplication) with no PROV row (Agent→Agent had no
+      matrix fit). Under the K4 reclass BusinessApplication is prov:Entity, so the PROV-valid
+      inverse applies: Entity → Agent = prov:wasAttributedTo, role=developed_by (distinct on
+      the shared label from arch_owns_code role=owner and seal tom attribution roles).
+      Reconciled by SEALID; cross-source edge (catalog↔SEAL ownership reconciliation).
+      Originally confirmed via HITL gate (C3/C4, SME 2026-06-21); flip decided at the
+      BusinessApplication entity-reshape gate. Live-graph migration:
+      drydocs/loaders/cypher/migrate_develops_to_was_attributed_to.cypher.
+      C9 gate (2026-07-18): loader WIRED — the PAT team report's seal_ids column
+      (team-scoped, the SME's stable mapping) populates this edge from
+      pat_product_mapping.cypher; per-team stale sweep on each load.
+    supplement:   catalog_ontology_supplement.cypher
+    loader:       pat_product_mapping.cypher
+    domain:       architecture
+    status:       active
+
+  - id:           arch_owns_code
+    neo4j_label:  WAS_ATTRIBUTED_TO
+    inverse_label: "owns"
+    role:         owner
+    from_node:    Code
+    to_node:      DevTeam
+    prov_maps_to: "prov:wasAttributedTo"
+    note: >
+      Was mermaid "DevTeam -- owns --> Code". Direction INVERTED to match
+      the matrix: Entity → Agent = WAS_ATTRIBUTED_TO, role=owner.
+    supplement:   catalog_ontology_supplement.cypher
+    loader:       ~
+    domain:       architecture
+    status:       planned
+
+  - id:           arch_stored_in
+    neo4j_label:  STORED_IN
+    inverse_label: "stores"
+    role:         ~
+    from_node:    Code
+    to_node:      Bitbucket
+    prov_maps_to: ~
+    note: >
+      Was mermaid "stored_in". Storage location, not provenance — stays
+      local. Candidate prov:atLocation if Bitbucket is ever classified as
+      prov:Location.
+    supplement:   catalog_ontology_supplement.cypher
+    loader:       ~
+    domain:       architecture
+    status:       planned
+
+  - id:           arch_contains_service
+    neo4j_label:  CONTAINS_SERVICE
+    inverse_label: "contained in"
+    role:         ~
+    from_node:    Code
+    to_node:      PipelineService
+    prov_maps_to: "prov:hadMember"
+    note: >
+      Was mermaid "contains". Code (prov:Collection) → PipelineService.
+      Matrix row: Collection → any = HAD_MEMBER; domain label kept for
+      query clarity (same precedent as CONTAINS_JOB).
+    supplement:   catalog_ontology_supplement.cypher
+    loader:       ~
+    domain:       architecture
+    status:       planned
+
+  - id:           arch_contains_batch
+    neo4j_label:  CONTAINS_BATCH
+    inverse_label: "contained in"
+    role:         ~
+    from_node:    BusinessApplication
+    to_node:      Batch
+    prov_maps_to: ~
+    note: >
+      Was mermaid "CONTAINS". Application (Agent) → Batch (Collection):
+      Agent sources have no containment row in the matrix, so this stays
+      local. Structural app hierarchy only.
+      RETIRED at the K7 close-out gate (seal-app-ref-edge-reshape §C2, SIGNED
+      OFF 2026-08-03): never gated, never loaded, and the steward-defined
+      app-code mapping supersedes the role this bridge was drawn for. The SME
+      named no live use for a distinct :Batch node. NOTE the surviving twin:
+      m3_contains_folder (:ControlMApplication → :ControlMFolder, ACTIVE) is a
+      DIFFERENT edge and is load-bearing — it is the fan-out path §B1 relies on.
+    supplement:   catalog_ontology_supplement.cypher
+    loader:       ~
+    domain:       architecture
+    status:       deprecated
+
+  - id:           arch_contains_folder
+    neo4j_label:  CONTAINS_FOLDER
+    inverse_label: "contained in"
+    role:         ~
+    from_node:    Batch
+    to_node:      ControlMFolder
+    prov_maps_to: "prov:hadMember"
+    note: >
+      Was mermaid "CONTAINS". Batch (prov:Collection) → ControlMFolder.
+      Matrix row: Collection → any = HAD_MEMBER; domain label kept.
+      RETIRED at the K7 close-out gate (seal-app-ref-edge-reshape §C2, SIGNED
+      OFF 2026-08-03): never gated, never loaded, and the steward-defined
+      app-code mapping supersedes the role this bridge was drawn for. The SME
+      named no live use for a distinct :Batch node. NOTE the surviving twin:
+      m3_contains_folder (:ControlMApplication → :ControlMFolder, ACTIVE) is a
+      DIFFERENT edge and is load-bearing — it is the fan-out path §B1 relies on.
+    supplement:   catalog_ontology_supplement.cypher
+    loader:       ~
+    domain:       architecture
+    status:       deprecated
+
+  # ── Epic U / self-documentation (gate self-documentation-code-graph, SIGNED 2026-07-27)
+  #    All three ACTIVE 2026-07-27 — the G33 build (code_snapshot.v1) landed the
+  #    same day the gate signed; registered `planned` at sign-off per §A3, flipped
+  #    when the loader was built (the m3_host_group_contains_host precedent).
+  - id:           u1_has_module
+    neo4j_label:  HAS_MODULE
+    inverse_label: "module of"
+    role:         ~
+    from_node:    Project
+    to_node:      CodeModule
+    prov_maps_to: "prov:hadMember"
+    sosa_maps_to: ~
+    note: >
+      The repository contains this source file. Runs from the SINGLE :Project root to
+      ALL modules (183 at the 2026-07-27 snapshot); "which of the six scan roots" is
+      answered by the CodeModule.project property, never by this edge (gate §B1(a)).
+      prov:hadMember follows the Collection -> any matrix row.
+    supplement:   ontology_supplement.cypher
+    loader:       code_snapshot.v1
+    domain:       architecture
+    status:       active
+  - id:           u1_imports
+    neo4j_label:  IMPORTS
+    inverse_label: "imported by"
+    role:         ~
+    from_node:    CodeModule
+    to_node:      CodeModule
+    prov_maps_to: "prov:wasDerivedFrom"
+    sosa_maps_to: ~
+    note: >
+      Source-level import dependency, direction importer -> imported. KNOWN LIMIT,
+      ruled and ACCEPTED at gate §D2: the snapshot's edges are bare 2-element arrays,
+      so this CANNOT distinguish `import x` from `from x import y`, nor a
+      TYPE_CHECKING-only import from a runtime one. Do NOT read an IMPORTS edge as
+      "breaks if removed". Carries the M2 pull-provenance properties like every other
+      edge (§D3 — the no-properties divergence was rejected).
+    supplement:   ontology_supplement.cypher
+    loader:       code_snapshot.v1
+    domain:       architecture
+    status:       active
+  - id:           u1_is_encoded_in
+    neo4j_label:  IS_ENCODED_IN
+    inverse_label: "encodes"
+    role:         ~
+    from_node:    CodeModule
+    to_node:      SwoClass
+    prov_maps_to: ~
+    sosa_maps_to: ~
+    note: >
+      Binds a module to the programming language it is written in, targeting the
+      ALREADY-SEEDED SwoClass term (ontology.cypher:114, SWO_0000118 "Python").
+      Named for SWO_0000741 "is encoded in", the seeded SwoProperty it realises.
+      THE FIRST USE OF THE SWO LAYER IN THIS REPO — all 13 seeded terms had zero
+      consumers before this gate. Precedent it sets (§E1(b)): bind to a seeded term
+      that already means the thing, derive the value from data the artifact already
+      carries (node.extension), and invent nothing. Broader function-level binding
+      ("implements", "uses platform") was REJECTED — a dependency snapshot does not
+      know what a module implements. Value is .py-only today (§E2).
+    supplement:   ontology_supplement.cypher
+    loader:       code_snapshot.v1
+    domain:       architecture
+    status:       active
