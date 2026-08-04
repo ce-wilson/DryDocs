@@ -51,9 +51,10 @@ def test_runbook_header_carries_rev_and_commit() -> None:
     assert header["doc_id"] == "drydocs-startup-refresh-runbook"
     assert header["doc_type"] == "Runbook"
     assert (
-        header["rev"] == 7
-    )  # Rev 7, 2026-08-03 (the G51 tail: Appendix A, Startup step 4 and ingest.sh catch
-    # up with the verb — five databases everywhere, and the config guard made bidirectional)
+        header["rev"] == 8
+    )  # Rev 8, 2026-08-04 (G52: the rollback copy Appendix A promised no longer exists on
+    # the laptop — container gone, its orphaned data volume deleted; the claim is now
+    # venue-named per J18 rather than stated flat, since the desktop may still hold one)
     assert header["doc_status"] == "DESCRIPTIVE"
     assert header["commit"], "front-matter commit citation should parse"
     assert header["path"] == "docs/design/drydocs-startup-refresh-runbook.md"

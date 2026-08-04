@@ -1,8 +1,10 @@
 # Runbook — DryDocs local startup & refresh (EE container + sample ingest)
 
 <!-- anchor: front-matter -->
-- **Status:** DESCRIPTIVE — documents the working procedure. **Rev 7, 2026-08-03**
-  (the topology enumerations catch up with the verb — Appendix A, Startup step 4, and
+- **Status:** DESCRIPTIVE — documents the working procedure. **Rev 8, 2026-08-04**
+  (the rollback promise retires on the laptop — the copy it pointed at no longer
+  exists, so Appendix A stops offering a recovery path that isn't there; on top of
+  Rev 7, where the topology enumerations catch up with the verb — Appendix A, Startup step 4, and
   the one-shot script now all count five databases; on top of Rev 6, where
   the schema meta-graph joined the chain: `bootstrap-schema-graph` after `bootstrap`,
   targeting `ddschema`, which provisioning now creates — G51; on top of Rev 5, where
@@ -24,6 +26,21 @@
   `internal/helpmeloginlocalneo4j.md` (login/port troubleshooting evidence),
   `.claude/skills/run-drydocs/SKILL.md` (agent-facing run notes)
 
+> **What changed in Rev 8 (2026-08-04) — the rollback copy the doc promised no longer
+> exists on the laptop.** Appendix A told every reader that `neo4j-drydocs-ee` was "kept
+> stopped as a rollback copy." On the laptop the container had already been removed, and
+> a Docker cleanup on 2026-08-04 (G52) deleted the anonymous data volume that had outlived
+> it — 1.35GB still holding a 2026-07-02 `drydocs`/`ddlineage`/`ddcontext`. Appendix A now
+> says so plainly, because the failure mode of a stale rollback line is the worst kind:
+> it is read at exactly the moment someone needs the fallback, and it costs them the time
+> to go looking before they discover it is not there.
+>
+> Worth separating from the fact itself: this is a **machine-local** correction (J18). The
+> desktop may still have its stopped copy — G50 is open there — so the doc names the venue
+> rather than declaring the rollback dead everywhere. The general lesson is that container
+> facts in a shared doc need a venue when the two machines can diverge, which is the same
+> reason Appendix A is a *render* of `config/dev-environment.yaml` rather than prose.
+>
 > **What changed in Rev 7 (2026-08-03) — Rev 6 added the verb and left the counts at
 > four.** `ddschema` reached the procedure but not the places that enumerate the topology:
 > Appendix A still listed four databases, Startup step 4 still named four, and
@@ -319,8 +336,12 @@ Change it *there* first, then here; verify against `docker port`, never assume:
 | Databases | `drydocs`, `ddlineage`, `ddcontext` + composite `ddall` (G1/G7), and `ddschema` for the schema meta-graph (G51) — deliberately NOT a `ddall` constituent, since it describes the schema rather than the estate |
 | Credentials | `.env` only (`NEO4J_URI` / `NEO4J_USER` / `NEO4J_PASSWORD`) |
 
-The retired `neo4j-drydocs-ee` (7476/7689) is kept **stopped** as a rollback copy. If both
-are ever up, `docker port` is the only way to tell which one `.env` is talking to.
+**No rollback copy exists on the laptop.** The retired `neo4j-drydocs-ee` (7476/7689) container
+is long gone there, and the orphaned data volume that outlived it — still holding a 2026-07-02
+`drydocs`/`ddlineage`/`ddcontext` — was deleted 2026-08-04 (G52). A laptop recovery therefore
+restores from `neo4j-testdata` or a re-ingest, never from a second container. The desktop may
+still hold its own stopped copy; G50 is open there. Wherever two Neo4j containers are up,
+`docker port` is the only way to tell which one `.env` is talking to.
 
 **B. The full cold-start command sequence,** in one block (each step's success check is
 in the sections above):

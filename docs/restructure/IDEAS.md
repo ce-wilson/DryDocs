@@ -26,6 +26,16 @@ Tags help grooming: `idea` · `bug` · `doc` · `source` (new data source) · `q
 
 <!-- add new ideas at the top -->
 
+- 2026-08-04 — [chore] branch `wip/k9-laptop` (`bfb2f0b`, pushed) holds a SECOND K9
+  implementation, built on the laptop and never pushed, while the desktop independently built
+  and shipped the one now on main (`17d9e08`). The laptop session ended without committing, so
+  the remote read the silent claim as dead (`1807df0` "released unbuilt") — it wasn't. Decide:
+  lift anything worth keeping off the branch, then delete it. The divergence is a rewrite, not
+  a rebase (`mappings.py` 334 lines apart, `mapping_store.py` 348, net −726/+419 over 8 files).
+  Second occurrence of the C19 collision, and it exposes the gap: the pull-rule makes the CLAIM
+  push-before-work, but nothing makes the WORK visible — an in-flight session that dies looks
+  identical to one that never started.
+
 - 2026-08-04 — [bug] `dev_teams.cypher` and `catalog_lobs.cypher` carry the same unconditional
   enrichment SETs the C22 sweep fixed in the three hierarchy loaders (`SET dt.name = row.name`;
   `SET l.code/l.name = row.*`) — and catalog_lobs is the worse case, because `CatalogLOBRow`
