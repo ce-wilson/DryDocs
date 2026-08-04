@@ -26,6 +26,23 @@ Tags help grooming: `idea` · `bug` · `doc` · `source` (new data source) · `q
 
 <!-- add new ideas at the top -->
 
+- 2026-08-04 — [bug] `provision.ps1` cannot run as documented on this desktop: it requires
+  `cypher-shell` on the host PATH (only in the container), and the three provisioning
+  `.cypher` files carry a UTF-8 BOM that `cypher-shell -f` rejects outright ("Invalid
+  input '﻿'"). Worked around today (M3 reload) by BOM-stripping copies + `docker exec
+  cypher-shell -f`. Fix candidates: strip the BOMs in-repo (+ a guard — the D5 splitter
+  tolerates BOM so the CLI path never noticed), and either document the docker-exec form
+  in provision.ps1 or make it exec-aware. (desktop, `neo4jtest` — J18)
+
+- 2026-08-04 — [question] venue divergence (J18): the DESKTOP `neo4jtest` reports server
+  5.26.27, while `config/dev-environment.yaml` + runbook Appendix A say 2026.05.0 EE —
+  and its `ddschema` was missing today despite G51 (provisioned 2026-08-03, desktop),
+  i.e. the topology state postdating the wipe did not survive to today. Likely the
+  desktop container predates/rolled back from the 2026-07-28 plugin-volume recreation.
+  Ties into G50 (desktop rollback-copy question, open). Re-provisioned + fully reloaded
+  today; decide whether to recreate the desktop container on the pinned image or re-point
+  the config's version fact with a venue note. (desktop)
+
 - 2026-08-04 — [chore] branch `wip/k9-laptop` (`bfb2f0b`, pushed) holds a SECOND K9
   implementation, built on the laptop and never pushed, while the desktop independently built
   and shipped the one now on main (`17d9e08`). The laptop session ended without committing, so
