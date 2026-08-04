@@ -26,6 +26,22 @@ Tags help grooming: `idea` · `bug` · `doc` · `source` (new data source) · `q
 
 <!-- add new ideas at the top -->
 
+- 2026-08-04 — [bug] **N6 is now the only thing keeping three load sequences honest, and it is
+  ready.** Asked to confirm the load sequence, a check of all three surfaces found them agreeing
+  on the shape and disagreeing on membership. `bootstrap-schema-graph` was in BOTH operator
+  surfaces (`scripts/ingest.sh` step 3/6, the startup runbook's Appendix B) and missing ONLY from
+  `cli.CANONICAL_LOAD_SEQUENCE`, so the generated load-map published 15 steps while both real
+  paths ran 16 — FIXED same session (declaration corrected, load-map regenerated at 17). What is
+  NOT fixed is why nothing caught it: `test_load_map_declarations.py` checks that every declared
+  step is a real command and that every LOADER-backed command is sequenced, but
+  `bootstrap-schema-graph` is a schema command, so the completeness check never reaches it — the
+  guard is one-directional for non-loader verbs. ingest.sh's own comment already says this block
+  and Appendix B "are meant to be the same sequence, not two sequences that drift", which is
+  exactly N6's acceptance ("a guard proves they agree"). Remaining divergence for N6 to absorb:
+  ingest.sh omits refresh-reference, load-software-registry, load-bmc-docs, load-doc-traceability
+  and docs-verify that the runbook and the declaration carry — deliberate for a scheduled
+  Control-M ingest, but nothing records that it is deliberate, so it reads identically to drift.
+
 - 2026-08-04 — [source] **`controlm-pipeline-stub` captured + integration plan written (internal).**
   The internal DPL Control-M XML builder/validator package (config → generate → validate →
   upload → runtime, 14/14 green) is captured VERBATIM at

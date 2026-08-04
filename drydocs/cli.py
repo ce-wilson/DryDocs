@@ -357,6 +357,17 @@ AD_HOC_COMMANDS: frozenset[str] = frozenset({"load", "load-manual-mappings"})
 CANONICAL_LOAD_SEQUENCE: tuple[tuple[str, str, str], ...] = (
     ("check", "standing", "Neo4j + APOC reachable"),
     ("bootstrap", "standing", "constraints + ontology seed"),
+    (
+        "bootstrap-schema-graph",
+        "standing",
+        "schema meta-graph rendered + applied to ddschema (C21/G51). Targets a "
+        "DIFFERENT database, so it is chain-independent of everything below and "
+        "could sit anywhere — it sits here because a wiped DBMS is exactly when "
+        "the meta-graph gets forgotten. ADDED 2026-08-04: it was already in both "
+        "operator surfaces (scripts/ingest.sh step 3/6 and the startup runbook's "
+        "Appendix B) and missing ONLY here, so the generated load-map published "
+        "15 steps while both real paths ran 16",
+    ),
     ("apply-supplements", "standing", "the ONE verified supplement chain (G29)"),
     ("refresh-reference", "standing", "catalog + SEAL + dev teams (M1)"),
     ("ingest-controlm", "standing", "folders -> jobs -> conditions -> derived deps (M3)"),
