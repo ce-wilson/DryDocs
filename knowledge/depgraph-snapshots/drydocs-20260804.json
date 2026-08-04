@@ -1,16 +1,16 @@
 {
   "meta": {
     "project": "drydocs",
-    "captured_at": "2026-08-04T10:05:51",
+    "captured_at": "2026-08-04T10:27:00",
     "date": "20260804",
     "scan": "DryDocs",
     "tree": true,
     "git": {
-      "commit": "0862ddb",
-      "full": "0862ddb72fa6e511631d1e7a97e902e1fe183fef",
+      "commit": "3917f3e",
+      "full": "3917f3eb737f2d2ecd17aabcc87c863e6000440b",
       "branch": "main",
-      "describe": "0862ddb",
-      "subject": "feat(load): C22 done — catalog loader sweep; orphan shape + coalesce + the unresolved-parent EMIT ruling; step 70 ledgered",
+      "describe": "3917f3e",
+      "subject": "feat(guards): J-series close-out — J18 venue convention, J26 text-guard sweep, J27 gitignore reword, J28 gate classifier; step 71 ledgered",
       "dirty": false,
       "pr": null
     },
@@ -12308,10 +12308,10 @@
       "kind": "file"
     },
     {
-      "file_id": "drydocs/knowledge/depgraph-snapshots/drydocs-20260804.json",
-      "name": "drydocs-20260804.json",
+      "file_id": "drydocs/knowledge/depgraph-snapshots/drydocs-20260804-1005.json",
+      "name": "drydocs-20260804-1005.json",
       "extension": ".json",
-      "rel_path": "knowledge/depgraph-snapshots/drydocs-20260804.json",
+      "rel_path": "knowledge/depgraph-snapshots/drydocs-20260804-1005.json",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -14130,6 +14130,15 @@
       "name": "test_taxonomy_ontology_map.py",
       "extension": ".py",
       "rel_path": "tests/unit/test_taxonomy_ontology_map.py",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/tests/unit/test_text_guard_conventions.py",
+      "name": "test_text_guard_conventions.py",
+      "extension": ".py",
+      "rel_path": "tests/unit/test_text_guard_conventions.py",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -16613,6 +16622,10 @@
       "drydocs/drydocs/loaders/catalog.py"
     ],
     [
+      "drydocs/tests/unit/test_catalog_keying.py",
+      "drydocs/drydocs_core/cypher_split.py"
+    ],
+    [
       "drydocs/tests/unit/test_classification.py",
       "drydocs/drydocs_api/ephemeral_specs.py"
     ],
@@ -16671,6 +16684,10 @@
     [
       "drydocs/tests/unit/test_controlm_cypher.py",
       "drydocs/drydocs/cli.py"
+    ],
+    [
+      "drydocs/tests/unit/test_controlm_cypher.py",
+      "drydocs/drydocs_core/cypher_split.py"
     ],
     [
       "drydocs/tests/unit/test_controlm_models.py",
@@ -17285,6 +17302,10 @@
       "drydocs/drydocs/loaders/runs_on_resolution.py"
     ],
     [
+      "drydocs/tests/unit/test_schema.py",
+      "drydocs/drydocs_core/cypher_split.py"
+    ],
+    [
       "drydocs/tests/unit/test_schema_graph.py",
       "drydocs/drydocs_core/ontology/schema_graph.py"
     ],
@@ -17379,6 +17400,14 @@
     [
       "drydocs/tests/unit/test_supplements.py",
       "drydocs/drydocs_core/schema/supplements.py"
+    ],
+    [
+      "drydocs/tests/unit/test_text_guard_conventions.py",
+      "drydocs/drydocs_core/cypher_split.py"
+    ],
+    [
+      "drydocs/tests/unit/test_text_guard_conventions.py",
+      "drydocs/drydocs_core/schema/constraints.py"
     ],
     [
       "drydocs/tests/unit/test_transcribe_doc_markup.py",
@@ -24511,7 +24540,7 @@
     [
       "drydocs/knowledge/depgraph-snapshots",
       "CONTAINS",
-      "drydocs/knowledge/depgraph-snapshots/drydocs-20260804.json"
+      "drydocs/knowledge/depgraph-snapshots/drydocs-20260804-1005.json"
     ],
     [
       "drydocs/knowledge/depgraph-snapshots",
@@ -25461,6 +25490,11 @@
     [
       "drydocs/tests/unit",
       "CONTAINS",
+      "drydocs/tests/unit/test_text_guard_conventions.py"
+    ],
+    [
+      "drydocs/tests/unit",
+      "CONTAINS",
       "drydocs/tests/unit/test_tier2.py"
     ],
     [
@@ -26238,13 +26272,13 @@
     "projects": [
       "drydocs"
     ],
-    "files": 1467,
-    "edges": 472,
+    "files": 1468,
+    "edges": 477,
     "circular_files": 0,
     "processes": 0,
     "data_assets": 0,
     "hosts": 0,
-    "rels": 1760,
+    "rels": 1761,
     "directories": 256
   }
 }
