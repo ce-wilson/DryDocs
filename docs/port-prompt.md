@@ -527,6 +527,44 @@ verification status in [BRACKETS]; spend review on [UNRULED].
     parse time. K14 (value-form conformance sweep) is groomed producer-side
     and ports as backlog only.
 
+63. K8 — FOLDER-GRAIN ATTRIBUTION LOADER; THE K2 JOB-GRAIN WRITER RETIRES
+    [TEST-PINNED, GRAIN-BREAKING] (`4df4df2`; claim `72777d8`). NEW
+    `drydocs/loaders/folder_attribution.py` + `folder_attribution.cypher`
+    write the ruled `(:ControlMFolder)-[:BELONGS_TO_APPLICATION
+    {seal_app_ref}]->(:Port BatchProcessing)` edge — authored K9 rows fan
+    out per app code, K2 DEMOTES to the per-folder unanimity fallback with
+    `origin=matched-fallback` (§B3); ties/undeclared-platform folders are
+    steward CONFLICTS, never auto-picks (1:1 OWNER-NOT-USER).
+    DELETED: `seal_attribution.cypher` + the `SealAttributionLoader` class
+    (the module keeps only the match-policy resolver); CLI
+    `load-seal-attribution` → `load-folder-attribution` in
+    `CANONICAL_LOAD_SEQUENCE`; graph-tests suite RENAMED
+    seal-attribution-coverage → folder-attribution-coverage (8 TCs; TC-08
+    asserts NO job-grain edges remain). Vocab: `m3_seal_app_ref`
+    active→deprecated (AUTHORIZED by the K7 sign-off's "stays active until
+    the K7 build migrates it" clause — guardrail-7 the J7 no-downgrade
+    guards across this step), `m3_belongs_to_application` planned→active;
+    supplement block swapped; `schema_graph.cypher` regenerated. Manual
+    tier-5 chain rekeyed end to end: `SUPPORTED_SHAPE`, `_parse_key`
+    requirements (app_code + app_id), the store's `manual_mapping` table
+    columns (`app_code, folder_id NULL-able, app_id`), and the manual
+    cypher now FANS OUT per code.
+    ***YOUR SIDE — THREE CAUTIONS:***
+    (a) T4/T23 SEQUENCING: your real tier-5 CSVs are JOB-grain; this step
+    makes them UNPARSEABLE (parser now requires `app_code`/`app_id`). Take
+    step 62's `;`→`:` conversion AND re-author those CSVs at the app-code
+    grain in the same change that takes this step, or hold both steps
+    together. (b) Your LIVE job edges + `active=true` ports are the real
+    migration (K7 §F1/G4-RIDER) — T23 territory, wipe-and-rebuild does not
+    exist for you; write your own migration before running the new loader.
+    (c) Your `controlm_app_codes.cypher`/AutoSys twin still write the
+    boolean flip — reconcile them with the new edge before both run, or a
+    folder can carry contradictory attribution surfaces.
+    `EXPECTED_CONSTRAINTS` does not move. Producer suite 1384→1399 (+15).
+    BONUS in the same commit: the publish-boundary bare-id guard caught a
+    REAL psgmgr folder id in step 62's standard doc examples — now
+    synthetic. Verify your copy took the fixed examples, not the originals.
+
 ACCEPTANCE GATE (behavior is the contract, not a byte-compare):
 - Track 1 (portable):
     poetry run pytest tests/unit/test_variable_classifier.py tests/unit/test_variable_resolver.py \
@@ -543,10 +581,11 @@ ACCEPTANCE GATE (behavior is the contract, not a byte-compare):
   capability_assert=false skips per T18). A retired-id refusal from
   `SourceRegistry.from_yaml` is the D4 guard WORKING, not a port failure — rebind the
   loader in `loader-source-overlay.yaml`, never by re-adding the retired id.
-  Producer reference at the current head (step 61, the K9 build): 1384
+  Producer reference at the current head (step 63, the K8 build): 1399
   passed / 5 skipped with the production CSV PRESENT and no
   RECONCILE_BEFORE_DIR (4 J7 guards + the graphrag PDF) — like-for-like with
-  the step-58 figure (1356 / 5, same conditions): +28, all K9 guards. The
+  step 61's 1384 / 5 (+15, the K8 folder-attribution + demotion guards) and
+  step-58's 1356 / 5 (+28 of that gap were K9 guards). The
   step-60 figure (1354 / 7) was CSV-ABSENT without RECONCILE_BEFORE_DIR and is
   not comparable line-for-line; `aa0a0eb`'s commit message quotes 1358 / 3,
   which is the step-59 run with RECONCILE_BEFORE_DIR set. Earlier producer
