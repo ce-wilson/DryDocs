@@ -1,8 +1,14 @@
 # Runbook — build, inspect & maintain the mapping store (`var/mapping.db`)
 
 <!-- anchor: front-matter -->
-- **Status:** DESCRIPTIVE — documents the working procedure. **Rev 1, 2026-07-22**,
-  authored at commit `22d1a39` (store per plan M0–M4; O24 override table included).
+- **Status:** DESCRIPTIVE — documents the working procedure. **Rev 2, 2026-08-04**
+  (the store stopped being purely derived: S4's `draft` write-ahead buffer means
+  DELETING the file can now lose unpromoted work, so the "nothing here can lose data"
+  rule gains a stated exception; schema `v1` → `v2`; the table/view inventory catches up
+  with K9's `app_code_mapping` — which it had been missing since 2026-08-03 — and with
+  S4's `draft`, and gains a one-liner that re-derives the inventory from the code, so
+  the next drift is found rather than believed; on top of Rev 1, 2026-07-22, authored at
+  commit `22d1a39` — store per plan M0–M4, O24 override table included).
 - **Classification:** Internal-Public (mechanism only — commands and synthetic/empty
   producer-side data; no credentials, no company values)
 - **Audience:** anyone operating the mapping-store materialization directly — building,
@@ -19,8 +25,23 @@
 produce the deterministic CSV dumps, and run the analytics queries.
 
 **The one rule that shapes every step:** the file is DERIVED. The committed sources are
-truth; every anomaly means "rebuild", never "investigate the DB". Nothing in this
-runbook can lose data, because the store holds none of its own.
+truth; every anomaly means "rebuild", never "investigate the DB".
+
+**The one exception, and it is a data-loss exception — read it before you delete
+anything.** Since S4 (2026-08-04) the store carries a `draft` table: the write-ahead
+buffer for console edits that have not yet been promoted into a git diff (ADR 0009
+rule 5). It is the only content here that is NOT derived from a committed file.
+Consequences, in the order they will bite you:
+
+- **Rebuilding is safe.** `build()` carries draft rows across a rebuild deliberately —
+  a rebuild is routine, since editing any source file makes the store stale, and
+  discarding pending work then would defeat the buffer exactly when it is doing its job.
+- **Deleting the file is NOT unconditionally safe any more.** `rm var/mapping.db`
+  discards every unpromoted draft, and nothing else in the repo holds a copy. Check
+  `SELECT * FROM v_open_drafts;` first; if it returns rows, promote them (or accept
+  losing them) before you delete.
+- Everything else in this runbook still cannot lose data, because everything else in
+  the store is a materialization of committed text.
 
 **In scope.** `scripts/build_mapping_db.py`, `scripts/mapping_analytics.py`, direct
 sqlite3/DuckDB inspection, and the staleness check.
@@ -157,9 +178,26 @@ infrastructure).
 <!-- anchor: appendices -->
 ## Appendices
 
-Table/view inventory (schema `drydocs.mapping-store.v1`): tables `meta`,
+Table/view inventory (schema `drydocs.mapping-store.v2`): tables `meta`,
 `node_classification`, `relationship_vocabulary`, `ontology_mapping`,
-`manual_load_file`, `manual_mapping`, `seal_contact_override`; views
-`v_mapping_quintuple`, `v_status_summary`, `v_vocab_active`, `v_label_options`,
-`v_manual_conflicts`, `v_seal_contact_grid`, `v_source_corrections`. Full DDL and
-column-level source mapping: the TDD's "Source → column-level field mapping" section.
+`manual_load_file`, `manual_mapping`, `seal_contact_override`, `app_code_mapping`,
+`draft`; views `v_mapping_quintuple`, `v_status_summary`, `v_vocab_active`,
+`v_label_options`, `v_manual_conflicts`, `v_seal_contact_grid`,
+`v_source_corrections`, `v_app_code_grid`, `v_dual_coded_migrations`,
+`v_open_drafts`. Full DDL and column-level source mapping: the TDD's
+"Source → column-level field mapping" section.
+
+The inventory is verifiable rather than trusted — if this list and the file ever
+disagree, the file wins and this list is the defect:
+
+```powershell
+$env:PYTHONPATH = "."; poetry run python -c "from drydocs_core.mapping_store import build, tables; c = build(':memory:'); print('tables:', sorted(tables(c))); print('views :', sorted(n for n, t in c.execute('SELECT name, type FROM sqlite_master') if t == 'view'))"
+```
+
+(Every quote inside that `-c` string is a SINGLE quote on purpose. PowerShell 5.1
+rewrites escaped double quotes inside a double-quoted native argument, and the obvious
+`WHERE type="view"` form arrives at Python as an unterminated string — verified, not
+guessed.)
+
+`draft` is the one entry that is not a materialization of a committed file — see the
+data-loss exception under Purpose & scope before deleting the store.
