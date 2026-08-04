@@ -1,16 +1,16 @@
 {
   "meta": {
     "project": "drydocs",
-    "captured_at": "2026-08-04T11:12:57",
+    "captured_at": "2026-08-04T11:32:30",
     "date": "20260804",
     "scan": "DryDocs",
     "tree": true,
     "git": {
-      "commit": "d9d4da6",
-      "full": "d9d4da621e0dabafb34f9a8a89116cf24994f761",
+      "commit": "befc668",
+      "full": "befc66863fe0312d505d195225167fbd3ac12a55",
       "branch": "main",
-      "describe": "d9d4da6",
-      "subject": "feat(ontology): M3+M4 done — both doc-06 envelope gates SIGNED in-chat; four ruled stubs, dct property-term bindings; step 72 ledgered",
+      "describe": "befc668",
+      "subject": "chore(guards): J29 done - UTF-8 no-BOM standard for .cypher/.sql/.csv, guarded; steps 73-74 ledgered",
       "dirty": false,
       "pr": null
     },
@@ -12326,10 +12326,10 @@
       "kind": "file"
     },
     {
-      "file_id": "drydocs/knowledge/depgraph-snapshots/drydocs-20260804.json",
-      "name": "drydocs-20260804.json",
+      "file_id": "drydocs/knowledge/depgraph-snapshots/drydocs-20260804-1112.json",
+      "name": "drydocs-20260804-1112.json",
       "extension": ".json",
-      "rel_path": "knowledge/depgraph-snapshots/drydocs-20260804.json",
+      "rel_path": "knowledge/depgraph-snapshots/drydocs-20260804-1112.json",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -13554,6 +13554,15 @@
       "name": "test_external_vendor_scrape.py",
       "extension": ".py",
       "rel_path": "tests/unit/test_external_vendor_scrape.py",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/tests/unit/test_file_encoding.py",
+      "name": "test_file_encoding.py",
+      "extension": ".py",
+      "rel_path": "tests/unit/test_file_encoding.py",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -16046,6 +16055,10 @@
       "drydocs/drydocs_core/models/docs.py"
     ],
     [
+      "drydocs/drydocs/loaders/vendor_docs.py",
+      "drydocs/drydocs_core/source_registry.py"
+    ],
+    [
       "drydocs/drydocs/publishing/__init__.py",
       "drydocs/drydocs/publishing/assembler.py"
     ],
@@ -17496,6 +17509,14 @@
     [
       "drydocs/tests/unit/test_vendor_docs.py",
       "drydocs/drydocs_core/docs/vendor_html.py"
+    ],
+    [
+      "drydocs/tests/unit/test_vendor_docs.py",
+      "drydocs/drydocs_core/source_registry.py"
+    ],
+    [
+      "drydocs/tests/unit/test_vendor_docs.py",
+      "drydocs/scripts/external_vendor_scrape.py"
     ]
   ],
   "processes": [],
@@ -17661,6 +17682,66 @@
       "drydocs",
       "CONTAINS",
       "drydocs/docs"
+    ],
+    [
+      "drydocs",
+      "CONTAINS",
+      "drydocs/dpl-plug-agent-detailed-readme-2.png"
+    ],
+    [
+      "drydocs",
+      "CONTAINS",
+      "drydocs/dpl-plug-agent-detailed-readme-3.png"
+    ],
+    [
+      "drydocs",
+      "CONTAINS",
+      "drydocs/dpl-plug-agent-detailed-readme-4.png"
+    ],
+    [
+      "drydocs",
+      "CONTAINS",
+      "drydocs/dpl-plug-agent-detailed-readme-5.png"
+    ],
+    [
+      "drydocs",
+      "CONTAINS",
+      "drydocs/dpl-plug-agent-detailed-readme.png"
+    ],
+    [
+      "drydocs",
+      "CONTAINS",
+      "drydocs/dpl-plug-agent-overview-2.png"
+    ],
+    [
+      "drydocs",
+      "CONTAINS",
+      "drydocs/dpl-plug-agent-overview-3.png"
+    ],
+    [
+      "drydocs",
+      "CONTAINS",
+      "drydocs/dpl-plug-agent-overview-4.png"
+    ],
+    [
+      "drydocs",
+      "CONTAINS",
+      "drydocs/dpl-plug-agent-overview.png"
+    ],
+    [
+      "drydocs",
+      "CONTAINS",
+      "drydocs/dpl-plug-mermaid.png"
+    ],
+    [
+      "drydocs",
+      "CONTAINS",
+      "drydocs/dpl-plug-variables-2.png"
+    ],
+    [
+      "drydocs",
+      "CONTAINS",
+      "drydocs/dpl-plug-variables.png"
     ],
     [
       "drydocs",
@@ -24605,7 +24686,7 @@
     [
       "drydocs/knowledge/depgraph-snapshots",
       "CONTAINS",
-      "drydocs/knowledge/depgraph-snapshots/drydocs-20260804.json"
+      "drydocs/knowledge/depgraph-snapshots/drydocs-20260804-1112.json"
     ],
     [
       "drydocs/knowledge/depgraph-snapshots",
@@ -25221,6 +25302,11 @@
       "drydocs/tests/unit",
       "CONTAINS",
       "drydocs/tests/unit/test_external_vendor_scrape.py"
+    ],
+    [
+      "drydocs/tests/unit",
+      "CONTAINS",
+      "drydocs/tests/unit/test_file_encoding.py"
     ],
     [
       "drydocs/tests/unit",
@@ -26347,13 +26433,13 @@
     "projects": [
       "drydocs"
     ],
-    "files": 1471,
-    "edges": 478,
+    "files": 1472,
+    "edges": 481,
     "circular_files": 0,
     "processes": 0,
     "data_assets": 0,
     "hosts": 0,
-    "rels": 1768,
+    "rels": 1781,
     "directories": 257
   }
 }
