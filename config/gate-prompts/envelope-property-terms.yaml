@@ -1,0 +1,93 @@
+# SME gate-prompt spec — property-level ontology terms for the source audit
+# envelope (backlog M4). GATE-BOUND: this page PROPOSES; nothing is built,
+# registered, or renamed by rendering it.
+#
+# THE GAP (raised 2026-07-07 while answering "where are the SOSA mappings for
+# created by?"): the four envelope properties carry authorship provenance but
+# no standard-term binding, and relationship_vocabulary.yaml registers EDGES
+# and node classifications only — there is no registered home for a
+# property→term binding at all. This gate decides both the terms AND the home.
+#
+# Mechanism-only: property names and CURIEs; no data values.
+classification: Internal-Public
+schema: drydocs.gate-prompt.v1
+id: envelope-property-terms
+title: "SME Gate — standard-term bindings for the four audit-envelope properties (dct:/prov:), and where property-term bindings live"
+step: "Doc 06 ontology follow-through (M4) — binds source_created_by/_at, source_updated_by/_at to standard vocabulary terms and creates the registry home for property-level bindings; documentation-grade only, no graph write, no edge change, no loader change"
+summary: >
+  The envelope properties are node PROPERTIES, so the binding is
+  documentation-grade — a recorded statement of what each property MEANS in
+  standard vocabulary, for crosswalks and future RDF export, not a new graph
+  shape. Dublin Core Terms (dct:) is the natural fit for three of the four:
+  dct:creator (created_by), dct:created (created_at), dct:modified
+  (updated_at). The fourth — updated_by — has NO precise DCMI term;
+  dct:contributor ("an entity responsible for making contributions") is the
+  nearest, with PROV qualified attribution the heavier alternative. The dct:
+  prefix is not yet in namespaces.py, and reference/standards/ has no Dublin
+  Core entry — both ride the build if ruled. SOSA is explicitly ruled OUT on
+  this page: authorship provenance is not observation. Nothing below is
+  applied until ticked and transcribed to config/gate-log.md.
+meta:
+  Module: "ontology (drydocs_core/ontology/relationship_vocabulary.yaml · namespaces.py) + reference/standards/"
+  Source: "config/audit-fields.yaml (the frozen envelope, gate controlm-q1q3-phase1) — the binding applies to the PROPERTY NAMES, uniformly across every source that maps them"
+  Registry ref: "no source-registry change — this gate touches the ontology registry layer only"
+  Classification: "Internal-Public (CURIEs and property names)"
+  Vocabulary: "creates the FIRST property-term section; relationship_vocabulary.yaml's Section 0 (node_classifications) is the precedent that the file already holds more than relationships"
+  Precedent: "Section 0 node_classifications (labels→CURIEs in the same file) · C23 DQV DEFER (vocabulary registered without a build when no consumer exists) · namespaces.py expand() as the CURIE guard"
+  Source of record: "backlog M4 · config/gate-log.md (transcription target) · docs/restructure/06-provenance-source-audit-fields.md"
+
+mapping:
+  - n: 1
+    element: "source_created_by"
+    target: "PROPOSED: dct:creator"
+    edge: "property-term binding  [PROPOSED]"
+  - n: 2
+    element: "source_created_at"
+    target: "PROPOSED: dct:created"
+    edge: "property-term binding  [PROPOSED]"
+  - n: 3
+    element: "source_updated_at"
+    target: "PROPOSED: dct:modified"
+    edge: "property-term binding  [PROPOSED]"
+  - n: 4
+    element: "source_updated_by"
+    target: "PROPOSED: dct:contributor (nearest DCMI term); ALTERNATIVE: prov:wasAttributedTo qualified-attribution reading — THE one contested row"
+    edge: "property-term binding  [THE DECISION — §B]"
+  - n: 5
+    element: "the binding registry itself"
+    target: "PROPOSED: a new property_terms section in relationship_vocabulary.yaml (one ontology registry, same file the mapper agent already reads); ALTERNATIVE: a separate property-vocabulary file"
+    edge: "registry home  [THE DECISION — §C]"
+
+provenance:
+  - label: "the four envelope properties (every node whose source maps them)"
+    source_object: "config/audit-fields.yaml envelope block (frozen names, test-enforced)"
+    key: "property name"
+    loader: "~ (no loader change — bindings are registry entries, not Cypher)"
+    properties:
+      - {name: source_created_by, origin: source, from: "per-source native column (e.g. CREATION_USER)", note: "candidate dct:creator; on Control-M this is a team Functional ID, not a person — dct:creator does not require personhood, an org-agent creator is conformant"}
+      - {name: source_created_at, origin: source, from: "per-source native column (e.g. CREATION_DATE)", note: "candidate dct:created — 'date of creation of the resource'"}
+      - {name: source_updated_by, origin: source, from: "per-source native column (e.g. CHANGE_USERID)", note: "the contested row: DCMI has creator/contributor but no 'modifier'"}
+      - {name: source_updated_at, origin: source, from: "per-source native column (e.g. CHANGE_DATE)", note: "candidate dct:modified — 'date on which the resource was changed'"}
+      - {name: dct_namespace_absent, origin: derived, from: "drydocs_core/ontology/namespaces.py", note: "no dct: prefix registered today (http://purl.org/dc/terms/); adding it + the ontology.cypher sync + a reference/standards/dcmi-terms stub rides the build"}
+
+sections:
+  - title: "A. Scope — confirm what a property-level binding is and is not"
+    confirmations:
+      - "A1: the binding is documentation-grade — it records what each envelope property MEANS in standard vocabulary. No graph write, no new edges, no loader change, no rename of the frozen property names (mechanism-name fence)."
+      - "A2 [SOSA ruled out, recorded]: the envelope is authorship provenance, not observation — sosa:Observation/resultTime model measurement acts, and stretching them over 'who edited the record' would misuse the vocabulary. SOSA stays where it is (the experimental context-graph layer)."
+  - title: "B. The four bindings"
+    confirmations:
+      - "B1: source_created_by → dct:creator, source_created_at → dct:created, source_updated_at → dct:modified (mapping rows 1–3 — the uncontested trio)."
+      - "B2 [RECOMMENDED for row 4]: source_updated_by → dct:contributor, with the imprecision RECORDED in the entry note ('nearest DCMI term; DCMI defines no modifier') — a light binding in the same vocabulary family as the other three, honest about its stretch."
+      - "B3 [alternative for row 4]: source_updated_by → prov:wasAttributedTo (qualified-attribution reading) — semantically tighter but mixes vocabularies for one property and implies an edge-shaped model the graph deliberately does not build (the property IS the shorthand for that edge). If chosen, the note must say the property is a compacted qualified attribution, not a prov edge."
+  - title: "C. Where property-term bindings live"
+    confirmations:
+      - "C1 [RECOMMENDED]: a new property_terms section in relationship_vocabulary.yaml — the file already carries node_classifications (Section 0), so it is the ontology registry, not literally a relationship list; one file keeps the mapper agent and the drift guards pointed at one place. Entry shape mirrors node_classifications: property name → CURIE + note."
+      - "C2 [alternative]: a separate drydocs_core/ontology/property_vocabulary.yaml with its own accessor and guard — cleaner file identity, but a second registry to keep discovered, and nothing today needs the separation."
+  - title: "D. Consequences recorded at sign-off"
+    confirmations:
+      - "D1: the build registers the ruled bindings in the ruled home; namespaces.py gains dct: (http://purl.org/dc/terms/) with the ontology.cypher sync the module header demands; reference/standards/ gains a dcmi-terms stub README (reference-librarian pattern) citing the DCMI Terms spec."
+      - "D2: drift guards extend — every envelope property name in audit-fields.yaml has a registered binding, every binding CURIE expands via namespaces.expand() — and the decision is transcribed to config/gate-log.md; gates.json regenerates."
+  - title: "E. Sign-off"
+    confirmations:
+      - "SME sign-off recorded here and transcribed to config/gate-log.md with the date and the per-item outcomes (A1–A2, B1, B2-or-B3, C1-or-C2, D1–D2)."

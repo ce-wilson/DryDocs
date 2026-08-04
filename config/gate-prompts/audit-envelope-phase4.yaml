@@ -1,0 +1,108 @@
+# SME gate-prompt spec — the doc-06 Phase 4 envelope gate for the remaining
+# non-Control-M sources (backlog M3). GATE-BOUND: this page PROPOSES; nothing
+# is built, flipped, or stamped differently by rendering it.
+#
+# SCOPE (deliberate, from M3's acceptance): seal:app-extract, the two PAT
+# datasets, and repo:software-registry. The controlm-family stubs (link views,
+# setvar, cm_hosts, cm_avg_run, stg_app_fact) are NOT on this page — each of
+# those waits on its own census/rider (P4 and the stg self-authorship
+# question), and pulling them in here would rule without the census evidence.
+#
+# Mechanism-only: every column name below is loader-field mechanism already
+# committed Internal-Public (drydocs_core/models/seal.py + the S3 §B1(c)
+# column ledger, drydocs/loaders/catalog.py). No data values, no real
+# headers beyond the one SME-confirmed `Application ID`.
+classification: Internal-Public
+schema: drydocs.gate-prompt.v1
+id: audit-envelope-phase4
+title: "SME Gate — source audit envelope, Phase 4: SEAL extract, PAT catalog + people report, software registry (doc 06)"
+step: "Doc 06 Phase 4 — the per-source envelope decisions the 2026-07-07 Control-M gate deferred; decides which stubs in config/audit-fields.yaml flip to confirmed mappings and which are ruled stubs with a recorded reason"
+summary: >
+  The audit envelope (source_created_by/_at, source_updated_by/_at — frozen
+  names, gate controlm-q1q3-phase1) answers "who created / last changed this
+  record IN THE SOURCE". Control-M jobs and folders were mapped 2026-07-07;
+  every other source has sat at status: stub since. This gate rules the four
+  M3 sources. The evidence changed since M3 was groomed: the SEAL and PAT
+  field inventories are now fully committed producer-side as Internal-Public
+  mechanism (the S3 column ledger and the catalog row models), so the
+  acceptance's internal-twin clause has nothing left to protect — recorded
+  below as a scope finding, not silently dropped. The PAT extracts project NO
+  audit columns at all, so the honest proposal there is a ruled stub, not an
+  invented mapping. Nothing below is applied until ticked and transcribed to
+  config/gate-log.md.
+meta:
+  Module: "config (config/audit-fields.yaml) + drydocs/loaders (seal_applications.cypher if §B confirms)"
+  Source: "seal:app-extract (DECO_SEAL_APP_INFO + the contact extract) · pat:product-catalog · pat:people-report · repo:software-registry — all config/source-registry.yaml v2 dataset ids"
+  Registry ref: "all four registered; seal + both pat rows are classification Internal (confidential handling), software-registry is repo-committed"
+  Classification: "Internal-Public (loader-field mechanism only; the ledger's naming-basis caveat applies — census pending)"
+  Precedent: "controlm-q1q3-phase1 (envelope + CAPTURE_DATE rule) · CM_DEF_VTAB partial mapping (updated-side only) · seal-extract.yaml sox_reportable row (one column, two properties) · bmc-docs / essential-graphrag / repo:design-docs / repo:depgraph-snapshot (ruled permanent stubs with the gate cited in notes)"
+  Source of record: "backlog M3 · config/audit-fields.yaml · config/gate-log.md (transcription target) · docs/restructure/06-provenance-source-audit-fields.md Phase 4"
+
+mapping:
+  - n: 1
+    element: "DECO_SEAL_APP_INFO creation_date (loader field name; census pending)"
+    target: "PROPOSED: BusinessApplication.source_created_at (dual-written beside the existing domain property creation_date — the sox_reportable one-column-two-properties precedent)"
+    edge: "envelope mapping  [THE SEAL DECISION — §B]"
+  - n: 2
+    element: "DECO_SEAL_APP_INFO last_certified_by_sid / last_certified_date"
+    target: "PROPOSED: EXCLUDED from the envelope — certification is attestation, not modification; both stay as the plain domain properties they already are"
+    edge: "exclusion  [PROPOSED]"
+  - n: 3
+    element: "DECO_SEAL_APP_INFO capture_date"
+    target: "EXCLUDED — replication time, never authorship (the standing CAPTURE_DATE rule from controlm-q1q3-phase1)"
+    edge: "exclusion  [RULE REUSE — confirm as-is]"
+  - n: 4
+    element: "pat:product-catalog (all six catalog row shapes) + pat:people-report (PatTeamRoleRow)"
+    target: "PROPOSED: ruled stub — the report extracts project ids/names/hierarchy/validity only, zero audit columns; the envelope gate re-runs if an export ever projects them"
+    edge: "ruled stub  [PROPOSED — §C]"
+  - n: 5
+    element: "repo:software-registry (committed YAML ledger)"
+    target: "PROPOSED: ruled permanent stub — git history (commit author/date) IS the audit envelope, closing the repo-committed trio with design-docs and depgraph-snapshot"
+    edge: "ruled stub  [PROPOSED — §D]"
+
+provenance:
+  - label: ":BusinessApplication (seal:app-extract)"
+    source_object: "DECO_SEAL_APP_INFO (87-field row model; the ledger records the object-identity question — psgmgr view vs Reports export — as UNRESOLVED, census pending)"
+    key: "app_id (source header `Application ID`, gate business-application-identity)"
+    loader: "seal_applications.py + cypher/seal_applications.cypher"
+    properties:
+      - {name: creation_date, origin: source, from: "loader field creation_date", note: "already lands verbatim as BusinessApplication.creation_date; the §B question is whether it ALSO feeds source_created_at"}
+      - {name: capture_date, origin: source, from: "loader field capture_date", note: "extract timestamp — the ledger already carries 'never authorship'"}
+      - {name: last_certified_by_sid, origin: source, from: "loader field", note: "certification attestation — mapping row 2 proposes excluding it from the envelope"}
+      - {name: last_certified_date, origin: source, from: "loader field", note: "same"}
+      - {name: no_updated_side, origin: derived, from: "the full 87-field model", note: "NO last-modified-by/-at columns exist in the extract — an updated-side mapping is not available to confirm, only its absence"}
+  - label: ":CatalogLOB / :ProductLine / :Product / :AreaProduct / :DevTeam / role assignments (both pat datasets)"
+    source_object: "PAT team-report extracts (catalog.py row models)"
+    key: "numeric catalog ids (C17 §a)"
+    loader: "catalog.py loader family + pat_team_roles"
+    properties:
+      - {name: no_audit_columns, origin: derived, from: "all six row models", note: "ids, names, hierarchy joins, jira_board_id, and role validity only — nothing that answers who created/changed the record"}
+      - {name: valid_from_valid_to, origin: source, from: "PatTeamRoleRow", note: "assignment VALIDITY interval — a domain fact about the role holding, NOT record authorship; named here so nobody later maps validity onto the envelope"}
+      - {name: source_has_more, origin: derived, from: "the C17 precedent", note: "the PAT backing store almost certainly carries audit columns the report does not project — which is why §C proposes stub-until-projected, not a permanent stub"}
+
+sections:
+  - title: "A. Scope — confirm what this gate does and does not rule"
+    confirmations:
+      - "A1: the four M3 sources are the page's whole scope; the controlm-family stubs (cm_def_lnki/lnko_p_vw, cm_def_setvar_vw, cm_hosts, cm_avg_run, stg_app_fact) stay stubs pending their own census/riders and are NOT ruled here."
+      - "A2 [scope finding]: M3's internal-twin clause is discharged as not-needed — the SEAL and PAT field inventories are already committed Internal-Public as loader-field mechanism (S3 §B1(c) ledger, catalog row models), so there is no confidential column mapping left to author internal-side. If the Phase-2 census ever surfaces real headers that differ AND are themselves sensitive, that census's gate owns the split."
+  - title: "B. seal:app-extract — the one real mapping decision"
+    confirmations:
+      - "B1 [RECOMMENDED — partial confirm]: source_created_at maps from creation_date (SME reading: SEAL's Creation Date is the date the application record was created in the registry — record authorship, not a lifecycle milestone). The extract has NO created-by and NO updated-side columns, so the envelope is created-at ONLY — a partial mapping, same class as CM_DEF_VTAB's updated-side-only entry. creation_date keeps landing as the domain property too (one column, two properties — the sox_reportable precedent)."
+      - "B2 [alternative — ruled stub]: if Creation Date is NOT record authorship (a lifecycle date), the entry stays a ruled stub: the extract exposes no authorship columns at all, note recorded, revisit at the Phase-2 census."
+      - "B3 [both options]: last_certified_by_sid / last_certified_date are EXCLUDED from the envelope — certifying a record attests it, it does not change it; capture_date stays excluded under the standing CAPTURE_DATE rule (mapping rows 2–3)."
+      - "B4 [both options]: the seal-contact-extract object (5 fields) carries no audit columns — recorded, nothing to map."
+  - title: "C. The two PAT datasets — ruled stub, not permanent"
+    confirmations:
+      - "C1: pat:product-catalog is a ruled stub: the report extracts project no audit columns (evidence: all six row models). The note records this gate's ruling and the re-run trigger — an export that projects created/changed columns re-opens the envelope question. NOT a permanent stub: the C17 lesson says the backing store has more than the report projects."
+      - "C2: pat:people-report — same ruling, plus the explicit exclusion: valid_from/valid_to are role-validity, never authorship."
+  - title: "D. repo:software-registry — close the repo-committed trio"
+    confirmations:
+      - "D1: repo:software-registry is a ruled PERMANENT stub: the ledger is repo-committed YAML, git history (commit author/date) is its audit envelope — the same rationale already ruled for repo:design-docs and repo:depgraph-snapshot. This is the explicit decision M3's acceptance asked for, recorded with this gate's id."
+  - title: "E. Consequences recorded at sign-off"
+    confirmations:
+      - "E1: if B1 — seal_applications.cypher gains the one envelope SET (source_created_at from creation_date, datetime-normalized at the boundary like the Control-M pair), the audit-fields entry flips confirmed with decided_by: audit-envelope-phase4, and the loader-wiring test extends to pin it. If B2 — the entry stays stub with the ruling in its note."
+      - "E2: the ruled-stub entries (C1, C2, D1) keep status: stub with this gate cited in their notes — the established mechanism for 'decided: no envelope' (bmc-docs et al.); the audit-fields status vocabulary does not change."
+      - "E3: doc 06 Phase 4 is marked done for these sources and Phase 5 docs land with the build (loader README envelope note + the port-prompt/git-readme disposition row); gates.json regenerates; the decision is transcribed to config/gate-log.md."
+  - title: "F. Sign-off"
+    confirmations:
+      - "SME sign-off recorded here and transcribed to config/gate-log.md with the date and the per-item outcomes (A1–A2, B1-or-B2, B3–B4, C1–C2, D1, E1–E3)."

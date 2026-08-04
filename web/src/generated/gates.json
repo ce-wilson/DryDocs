@@ -496,6 +496,17 @@
     {
       "kind": "prompt-only",
       "date": null,
+      "title": "audit-envelope-phase4 (gate page rendered — session not yet run)",
+      "status": "open",
+      "prompt_files": [
+        "config/gate-prompts/audit-envelope-phase4.yaml"
+      ],
+      "log_ref": null,
+      "unblocks": []
+    },
+    {
+      "kind": "prompt-only",
+      "date": null,
       "title": "bmc-docs-example (gate page rendered — session not yet run)",
       "status": "open",
       "prompt_files": [
@@ -534,6 +545,17 @@
         "G44",
         "J24"
       ]
+    },
+    {
+      "kind": "prompt-only",
+      "date": null,
+      "title": "envelope-property-terms (gate page rendered — session not yet run)",
+      "status": "open",
+      "prompt_files": [
+        "config/gate-prompts/envelope-property-terms.yaml"
+      ],
+      "log_ref": null,
+      "unblocks": []
     },
     {
       "kind": "prompt-only",
