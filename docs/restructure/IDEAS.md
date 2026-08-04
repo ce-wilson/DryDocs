@@ -26,45 +26,6 @@ Tags help grooming: `idea` · `bug` · `doc` · `source` (new data source) · `q
 
 <!-- add new ideas at the top -->
 
-- 2026-08-03 — ~~[question] Composite-key grammar~~ **RULED BY THE SME SAME DAY, built at
-  the groom.** Two rulings: (1) the `ctlm_id` DOT composite (`folder_id.job_id`, e.g.
-  `161015.7` — the psgmgr convention, P2 gate §B precedent) IS the standard for serialized
-  job identity; (2) key-cell pairs join with **`:` not `;`** — the semicolon is the SQL
-  statement terminator and these cells travel beside SQL. Captured as
-  `knowledge/standards/technology/composite-key-serialization.md`; `_parse_key` flipped to
-  `:` in the same session (zero manual CSVs committed = the free migration window, taken);
-  the value-form conformance sweep is backlog **K14**. The 2026-07-14 ripple idea below
-  stays open for its points (1) and (3); its point (2) `ctlm_id=<id>` shorthand is recorded
-  in the standard as compatible-by-construction.
-
-- 2026-08-03 — [chore] **The G51 tail landed pre-groom — needs a retrospective close, and it
-  carries ONE company consequence the next port must not be surprised by.** G51 provisioned
-  `ddschema` and updated the runbook's step 3 + Appendix B, but the topology is enumerated in
-  four more places and none of them moved: `config/dev-environment.yaml` (the declared single
-  source of truth that Appendix A *renders*), Appendix A's own Databases row, Startup step 4,
-  and `drydocs_core/schema/provisioning/README.md`. Also swept in the same pass, all verified
-  before changing: `internal/repo-README.md` — which the runbook names as "the canonical
-  command chain this runbook operationalizes" — carried neither `bootstrap-schema-graph` nor
-  `load-doc-traceability`; `scripts/ingest.sh` ran a 5-step chain the cold-start block no
-  longer matched (now 6, ruled by the user rather than assumed); and
-  `.claude/skills/run-drydocs/SKILL.md` still prescribed `NEO4J_PLUGINS='["apoc"]'` as the APOC
-  fix — the exact env var runbook **Rev 4** identified as the CAUSE of the weeks-long silent
-  absence, because it fails open. Runbook is now **Rev 7**.
-  THE GUARD IS THE REAL FINDING, and it is the second of its family in one day:
-  `test_databases_match_provisioning_script` promised "exactly what `01_databases.cypher`
-  creates" in its docstring and asserted only yaml ⊆ cypher, so a database added to the DDL and
-  not the config passed green. Now bidirectional — and it FAILED on `['ddschema']` before the
-  config fix, which is how the audit was proven rather than argued. Same shape as the code-side
-  guard G51 itself widened; same family as **J26**, which should absorb this as evidence.
-  **COMPANY CONSEQUENCE (for the reconcile-port ledger, not back-flow):** they took
-  `01_databases.cypher` with `ddschema` wholesale this port, but `config/dev-environment.yaml`
-  is `canonical-company` — "each side keeps its OWN file" — so their copy still enumerates
-  four. `tests/**` is `default_ok` → **evaluate**, so when the widened guard reaches them it
-  will *correctly* fail until they add `schema_meta: ddschema` to their own file. One line,
-  but it should be a tracker row now rather than a surprise. Second ledger line: producer is
-  Rev 7 while the company deliberately holds Rev 5 pending DD6, so their eventual Rev 6 has to
-  absorb two producer revisions.
-
 - 2026-08-03 — [idea] **EPIC: backlog.yaml has outgrown single-file text editing — shard it,
   derive the summary, query it from the graph.** Trigger: during the DD6 session the company
   agent worked lines 10,573–10,669 of a 10.6k-line file; producer copy is 10,784 lines / 722KB /
@@ -83,20 +44,12 @@ Tags help grooming: `idea` · `bug` · `doc` · `source` (new data source) · `q
   the sole source of truth and claim channel — a graph write is even less cross-machine-visible
   than an unpushed commit. Phase 2 is what makes phase 3 trivial and pays off even with no Neo4j
   running.
-
-- 2026-08-02 — [bug] **Every seed query in `docs/reviews/code-graph-review-plan.md` is missing
-  `removed_from_source_at IS NULL`, and the D7 tombstones are now big enough to change an
-  answer.** Demonstrated live loading the whole-tree snapshot: S2's move of `drydocs_core/controlm/`
-  → `orchestration/controlm/` left 8 correctly-marked tombstones, and the unfiltered A3 fan-in
-  query ranked the DEAD `drydocs_core/controlm/__init__.py` at #6 with fan-in 13, one slot below
-  its live replacement at 14. Graph holds 1465 :CodeModule, 1457 live. The sweep is working; the
-  plan's queries just never filter on it. Fix the plan's query pack, not the sweep.
-
-- 2026-08-02 — [bug] **The whole-tree scan pulled 63 vendored `.py` files from `.claude/skills/`
-  into the architect persona's metrics.** Orphan count reads 77 against a 24 baseline, but 54 are
-  Anthropic-shipped `docx`/`pdf` skill scripts; excluding `.claude` it is 23. Untested reads 130
-  raw, 30 scoped to the six real packages. Either the persona queries need a region allow-list or
-  the scan needs an exclude — the baselines in the review plan are not comparable until one exists.
+  KEPT-UPDATED 2026-08-04 (weekly groom) — **user ruled KEEP PARKED at this groom** (asked
+  explicitly, since phases 2–3 are a plan change: new epic, both repos move together). The
+  phase-1 guard already closed the defect class that triggered the entry; the shard is better
+  timed after the in-flight `40c35724..6713c14` port lands and its PORT-REPORT is reviewed,
+  because phase 2 rewrites exactly the files that port carries (test_backlog, render_board,
+  the groom skill, PORT-MANIFEST rows).
 
 - 2026-08-02 — [question] **`DesignDoc.commit` is an author's claim, not a git fact — decide
   whether the writer persona's staleness ranking should use it.** `drydocs-startup-refresh-runbook`
@@ -222,56 +175,6 @@ Tags help grooming: `idea` · `bug` · `doc` · `source` (new data source) · `q
   per its stop clause (postcss/nanoid patches applied there); a UI-workstream decision, and
   likely moot in practice — the console is a Vite SPA, no RSC actions — but the audit stays
   red until ruled. Pairs with the code-splitting design call O34 also parked.
-
-- 2026-07-27 — [idea] **The SME orchestrator-mapping act: what actually flips a batch port on.**
-  SME direction, this session. CONFIRMED first, since the design rests on it: both ports are
-  created `active = false` (`seal_applications.cypher:97,101`, `ON CREATE SET`) — and the
-  stronger finding is that **nothing in the repo ever sets a Port's `active` to true, and
-  nothing reads it.** It is a write-once dead flag today; the mapping act below is its missing
-  writer. The direction: `(:BusinessApplication)-[:USES_SOFTWARE]->(:SoftwareProduct)` for
-  ORCHESTRATION is **SME-mapped, established when the folder/entity mapping is confirmed** —
-  not derived. The mapping table is a UI screen: cascading pickers **Product Line → Product →
-  Business Application → [decision point: Control-M | AutoSys (once built)]** — that choice is
-  what creates the orchestrator relationship — then a **filter of available folders** → the
-  Control-M folder (matched on the internal folder naming-convention pattern) → an **SME
-  check/approval + notes field capturing SME user, date** — and that completes the mapping.
-  Four things this needs, all verified against what exists:
-  1. **Home:** a new domain on the existing steward screen (`UI-WIP/wf-mapping-01.md`, backlog
-     O13 done; O24 is the precedent for adding a domain). Its governing rule already fits this
-     exactly — *the loader stays the ONLY graph writer*: the screen drafts a mapping-table row,
-     which travels change artifact → gate → merge → next load run. The approval/notes/user/date
-     fields ARE that screen's mandatory-rationale + lifecycle chips, already specified.
-  2. **DONE 2026-07-27 — folded into the open gate as a companion section.**
-     `config/gate-prompts/seal-app-ref-edge-reshape.yaml` **v3** now carries **§G** (7
-     confirmations: orchestrator-first authorship, the C14 prefill demotion, 1:N cardinality,
-     port activation, the §G5 consistency tie to §C1, the cascade, the unchanged write path);
-     sign-off moved G→H, every existing id A1–F2 is unchanged so the external citations of
-     §B/§C1/§E2 still resolve. SME rulings recorded as direction-to-confirm, not as decided.
-  3. **What it re-frames in C14:** `batch_port_orchestrator` today writes the USES_SOFTWARE edge
-     straight from the SEAL-declared string via the platforms.yaml crosswalk, with no SME
-     confirmation anywhere in the path. Under this direction that declared string is a
-     **prefill/proposal** and the confirmed folder mapping is the authority. Gate question, not
-     a build decision — the loader was left as-is (§G2).
-  4. ~~Missing edge behind dropdown 3.~~ **CORRECTED 2026-07-27 by the company-side review** —
-     it is a **back-flow, not a build**. Producer-side `catalog_has_application` is `planned`
-     with `loader: ~`, held there by the C9 note *"stays planned until a product-scoped extract
-     is onboarded"*. **Company-side that precondition is already met**: a product-scoped extract
-     feeds a dedicated loader (`pat_app_links.cypher`) and the edge is ACTIVE in the schema
-     graph. Two riders now in §G6: the two sides **word the semantics differently** — producer
-     "Product owns a set of SEAL-registered applications" vs company "a structural SUPPORT link,
-     a Product is supported by 2+ apps (front-end/back-end)", which makes the picker mean
-     different things — and the edge is **1:many by design** on both sides (the source extract's
-     application-id column is multi-valued), so the picker returns a LIST.
-
-  Also confirmed by that review: the company flagged its OWN stale artifact — a gate page still
-  listing `catalog_has_application` as `planned` while its schema graph says `active`. Same
-  root as the producer's staleness, opposite direction. **Divergence-ledger candidate**, and a
-  reminder that "which surface is authoritative" needs an answer per repo, not once.
-
-  Open questions carried into §G: the Event port's confirming evidence (no Control-M analogue —
-  declared-only until an event source exists?); whether the planned `:Batch` intermediate
-  collapses into the BatchProcessing `:Port` (§C2 already proposes retiring it); and what makes
-  a folder "available" in the filter — unmapped only, naming-pattern match, or both.
 
 - 2026-07-27 — [idea] **Company catalog gate (`internal/org/catalog/`, page dated 2026-06-25) has
   drifted ahead of the producer catalog ontology — back-flow / divergence-ledger candidate.**
@@ -517,74 +420,16 @@ Tags help grooming: `idea` · `bug` · `doc` · `source` (new data source) · `q
   runbooks / Jira sign-offs / email threads (brownfield bootstrap, rejected as end
   state). C2 keyed convention must SHARE the description-metadata plan's template
   phase (two 4000-char conventions must not fork).
-- 2026-07-22 — [idea] **The tie we need now: Control-M → SEAL batch :Port attribution as a
-  DEFINED mapping, keyed by the Control-M APP CODE (:ControlMApplication), persisted via
-  the mapping store (steward persona — NOT new UI).** SME model (2026-07-22, refined in
-  session):
-  (a) Grain correction — attribution was NEVER meant to be job-level; the graph grain is
-  **folder → batch :Port** (jobs inherit via CONTAINS_JOB). Corrects the active
-  `m3_seal_app_ref` (ControlMJob → :BusinessApplication, seal_attribution.py live).
-  (b) The mapping should have been DEFINED, not matched: the authoring key is the
-  **Control-M app code** — the :ControlMApplication folder-header grouping (which
-  CONTAINS_FOLDER already ties to folders, so folder edges derive from the app-code row).
-  Two tiers:
-  **Tier 1 — seal-born app code (1:1):** the code was created FOR a SEAL → direct
-  app-code→SEAL mapping. Declared examples: ARA=70002 (CMH Advice R&A), SRV=70003
-  (HL Servicing R&A). Easy to define; enumerate these first.
-  **Tier 2 — platform app code (1:many):** the code is a shared platform, mapping to
-  MANY AreaProducts, not one SEAL — e.g. DPL= ?? (enumeration OPEN, SME to supply).
-  Note: AreaProduct has ZERO rows in the sample taxonomy (lob-product-team.yaml OQ
-  `area-product-missing`) — tier 2 makes that layer load-bearing; the OQs converge.
-  Gate impact: the still-open K4 edge-shape follow-up gate owns target (app node vs
-  BatchProcessing :Port), from_node (job → folder, derived from app-code), the
-  defined-mapping tiers (seal-born vs platform), and migration of K2-written job edges.
-  The K2 fuzzy match policy (SEAL > FID > APP_NAME > ALIAS) demotes to fallback for
-  codes with no defined row; tier-5 manual pins unchanged. Conflict rule: a folder whose
-  app code is tier-2/unresolved surfaces to the steward — never auto-picked.
-  Mechanism after the gate: register the app-code→SEAL(:Port) and app-code→AreaProduct
-  edges (matrix rows for Collection→Entity — Activity→Agent WAS_ASSOCIATED_WITH no
-  longer fits), new mapping-store domain (app-code-keyed table replacing/demoting
-  `job-application`; update K2_SHAPE in drydocs_api/mappings.py), rekey the
-  manual-loads template, migrate live edges. Bonus once this + `batch_orchestrator`
-  (C14) both exist: folder-mapped-to-ControlM vs app-declared Autosys becomes a
-  conformance check.
-  **Property-diet rider (SME, same session):** the naming-convention decode must come
-  OFF :ControlMFolder node properties. Convention (folder_name.py, confirmed):
-  pos1=env, pos2=lob, pos3-5=app_code, pos6=folder_type — so job application=PRSRV =
-  P(rod)+R(etail)+SRV, the prefixed form of the folder's bare app_code=SRV. SME:
-  `lob=Retail` / `lob_code=R` are artifacts of the Control-M app-code naming convention
-  and as node properties they CONFUSE users — f.lob='Retail' collides with the org-
-  taxonomy LOB (business-application.yaml `lob: CCB`), same word, different taxonomy.
-  Today controlm_folders.cypher:66-72 stamps environment*/lob*/app_code/folder_type* on
-  every folder. SME 2026-07-22: the docstring rationale "filter by environment, LOB, or
-  appcode without re-parsing" was likely UNINTENTIONAL, not a decision — and it fails on
-  all three counts: (1) ENV truth is the **data_center prefix** (:ControlMServer name),
-  NOT folder-name pos-1 — this rule is in NO document yet (verified: all data_center doc
-  hits are staging-key mechanics) → gate must land it in the concept-mapping doc;
-  (2) LOB decode has ONE real value (LOB_CODE_MAP: R=Retail; Y/K/B are provisional
-  placeholders per the code comments) — a name wildcard gives the same filter, and users
-  don't know the codes anyway; (3) the real access pattern is a **ROLLUP** (inventory
-  aggregated up folder → app-code → SEAL/AreaProduct via containment + defined mapping),
-  not a property filter. Direction: decode lives ONCE in the app-code registry /
-  defined-mapping rows; the node keeps sched_table raw (+ likely app_code as the join
-  key — confirm at gate; with the filter rationale dead, environment/folder_type decode
-  props presumably go too, env prop being actively misleading vs the data_center rule).
-  Mechanics: loader + cypher edit, property-retirement migration per the M2 doc-06
-  Phase 3 raw-prop pattern; parsed fields are inside row_checksum, so expect a one-time
-  delta-churn on the next run (M2 precedent handled the same).
-  KEPT-UPDATED 2026-07-22 pm (user: "close out the mapping"): the gate this item names
-  is now REVISED to carry it — `config/gate-prompts/seal-app-ref-edge-reshape.yaml` v2
-  (sections A grain / B app-code tiers / C target incl. :Batch-bridge retirement /
-  D shape / E steward-override-until-fixed / F migration) + map entry
-  `app-code-defined-mapping` (proposed, taxonomy-ontology-map.yaml). What stays parked
-  HERE: only the tier-2 platform-code enumeration (SME to supply).
-  **RESOLVED 2026-07-23 (property-diet rider):** SME ruled in-session — the naming
-  convention is the internal Control-M app-code definition; do NOT expand it onto nodes.
-  environment*/lob*/folder_type* retired from controlm_folders loader+cypher; app_code
-  KEPT (join key for app-code → BusinessApplication mapping). No migration —
-  wipe-and-rebuild. Ruling recorded in config/gate-log.md (2026-07-23 folder property
-  diet); the app-code → SEAL mapping itself still belongs to the open
-  seal-app-ref-edge-reshape v2 gate.
+- 2026-07-22 — [source] **Tier-1/tier-2 app-code rows: the SME still owes the enumeration.**
+  (Re-inboxed slim 2026-08-04 from the groomed defined-mapping mega-entry — everything else
+  in it was resolved by the K7 sign-off 2026-08-03 and the K9 build; see the audit trail.)
+  Declared tier-1 examples so far: ARA=70002 (CMH Advice R&A), SRV=70003 (HL Servicing R&A).
+  Tier-2 platform codes (e.g. DPL) map to MANY AreaProducts and the enumeration is OPEN.
+  The landing zone now EXISTS: rows in `config/overrides/app-code-mappings.csv`, authored
+  either directly or via the K11 steward screen once built — this is DATA ENTRY awaiting the
+  SME, not a backlog item. Reminder riding with it: AreaProduct has ZERO rows in the sample
+  taxonomy (lob-product-team.yaml OQ `area-product-missing`) — tier 2 makes that layer
+  load-bearing, so the two OQs converge when the SME supplies the list.
 
 - 2026-07-22 — [idea] **Env toggle = one canonical node identity, never per-env node
   identities.** When the header env toggle [Prod|UAT|Dev] gets built, it must re-scope
@@ -645,27 +490,6 @@ Tags help grooming: `idea` · `bug` · `doc` · `source` (new data source) · `q
   PORT-MANIFEST canonical-producer row expecting the producer expansion at next cherrypick —
   different files, so the port must transplant the value, not same-file overwrite. Also
   still open company-side: no 06-29 gate-log entry (their audit gap; backfill offered).
-
-- 2026-07-21 — [idea] **ControlMApplication code → BusinessApplication mapping: the
-  two-pattern model (SME, chat)**. SME states the code layer maps two ways: (1) some
-  BusinessApplications own a DEDICATED Control-M app code → can map DIRECTLY
-  (code→app 1:1); (2) some share a PLATFORM code (e.g. the DPL pipeline-launcher
-  spine; cloud-ETL platform codes) → one code carries many apps, resolvable only
-  per-folder/job or via the manual mapping table. Shipped today READ-ONLY as
-  `explorer.controlm-app-codes.v1` (pattern DERIVED from observed cardinality over the
-  gated seal_app_ref edges — no new edge invented). The GATE DECISION still open: an
-  authoritative `(:ControlMApplication)-[:?]->(:BusinessApplication)` mapping edge for
-  the dedicated-code pattern + a platform-code marker for shared codes — routes through
-  relationship_vocabulary + HITL; feeds and is fed by the K2 tier model (a confirmed
-  dedicated code is evidence ABOVE manual tier 5) and the O13 "code->application joins
-  the domain strip when that mapping table exists as a reconciler input" hook (this is
-  that table). Also touches plan-07 P3 invocation-pattern rows (AT GATE). SME also
-  flagged: the Folders/App-codes frames are the power-user/SME mapping surface needed
-  SOONEST → prioritize O13's /mappings React screen accordingly. KEPT-UPDATED at the
-  2026-07-21 pm groom: O13 shipped same day (0dc2831) — the prioritization ask is
-  satisfied; what stays parked here is the GATE DECISION core (the authoritative
-  code→app mapping edge + platform-code marker), trigger = the SME convening that
-  mapping gate / the K2 tier model's next touch.
 
 - 2026-07-21 — [idea] **m7 build follow-up** (from gate `cmdline-nfr-vetting`): migrate
   payload invocations out of the m3_invokes 1..n fold onto the registered `USES_ARTIFACT`
@@ -921,6 +745,41 @@ Tags help grooming: `idea` · `bug` · `doc` · `source` (new data source) · `q
   an app). Cosmetic; hide or restructure later.
 
 ## Recently groomed (audit trail)
+
+- 2026-08-04 (weekly groom) — [bug] review-plan seed queries missing the D7 tombstone filter
+  → **U13** (the A3 dead-`__init__.py` ranking is the proof case; fix the query pack, not the
+  sweep).
+- 2026-08-04 (weekly groom) — [bug] 63 vendored `.claude/skills` scripts polluting the
+  architect-persona metrics → **U14**. Fix placed in the QUERIES (region allow-list), not the
+  scan — the U9 whole-tree shape is the ruled intent; the metrics mis-scope it.
+- 2026-08-04 (weekly groom) — [chore] the G51-tail retrospective close → **MERGED into J26** as
+  the second family instance (promise-vs-assertion: `test_databases_match_provisioning_script`
+  docstring promised equality, asserted subset; made bidirectional at `aa0a0eb` and failed on
+  `['ddschema']` before the config fix). Both company consequences were ALREADY ledgered before
+  this groom: port-prompt step 59 carries the schema_meta caution verbatim, and the standing
+  divergences carry the Rev 5 rev-pin note — no tracker row owed.
+- 2026-08-04 (weekly groom) — [question] composite-key grammar → **RESOLVED + BUILT 2026-08-03**
+  (two SME rulings: ctlm_id dot composite is THE value form; key-cell pairs join with `:` not
+  `;`). Standard = `knowledge/standards/technology/composite-key-serialization.md`; `_parse_key`
+  flipped in the free migration window; the value-form sweep is **K14**; port step 62 carries
+  the company T4 caution.
+- 2026-08-04 (weekly groom) — [idea] the 2026-07-27 SME orchestrator-mapping act → **RESOLVED by
+  the K7 sign-off (24/24, 2026-08-03)**: §G ruled all seven confirmations; the cascade screen is
+  **K11**, the `catalog_has_application` back-flow (§G6's company SUPPORT reading) is **K13**,
+  the C14 prefill demotion is §G2, and the folder-availability question is answered in K11's
+  acceptance (unmapped-only, naming-pattern optional). The `:Batch` bridge RETIRED at the gate.
+- 2026-08-04 (weekly groom) — [idea] the 2026-07-22 defined-mapping mega-entry (grain correction,
+  two-tier app-code model, K2 demotion, property-diet rider) → **RESOLVED by the K7 sign-off +
+  the K9 build**: folder grain (§A), tiers seal-born/platform/dual-coded (§B2), origin flags
+  (§B3), store = source of record (§E2); the loader half is **K8**, the taxonomy capture **K12**.
+  Residue re-inboxed slim: the tier-2 platform-code enumeration (SME data entry, no item).
+- 2026-08-04 (weekly groom) — [idea] the 2026-07-21 two-pattern code→app model → **RESOLVED by
+  the K7 sign-off**: the "GATE DECISION core" it parked (authoritative code→app edge +
+  platform-code marker) IS the ruled `BELONGS_TO_APPLICATION` folder-grain edge authored per
+  app code with the tier column as the marker. The read-only explorer spec stands unchanged.
+- 2026-08-04 (weekly groom) — [idea] the backlog-sharding EPIC proposal → **KEPT PARKED by user
+  ruling at this groom** (phases 2–3 are a cross-repo plan change; re-time after the in-flight
+  port's PORT-REPORT lands). Entry stays in the inbox with the ruling annotated.
 
 - 2026-08-03 — [feedback] U.S. business-English instruction set (user, in-chat, after "spine"
   in the exec overview failed with its own audience) → guide committed as
