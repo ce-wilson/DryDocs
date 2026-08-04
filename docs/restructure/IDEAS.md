@@ -26,39 +26,21 @@ Tags help grooming: `idea` · `bug` · `doc` · `source` (new data source) · `q
 
 <!-- add new ideas at the top -->
 
-- 2026-08-04 — [bug] **`dev-environment.yaml`'s `expected_commit: 5006567` is STALE — depgraph
-  `main` is two commits ahead at `773fb1e`, and the two machines are scanning with different
-  instruments.** Found at the weekly-groom session close, when the snapshot step was checked
-  before running it. Verified: the laptop's `../depgraph` sits at 5006567 (matching the pin),
-  depgraph's `origin/main` is at `773fb1e`, and `773fb1e` is a CLEAN DESCENDANT of the pin —
-  `9c663ca` (RUA inventory ingestion + shallow script-op analyzer) then the `773fb1e` merge,
-  which **unions REL_TYPES with TRANSFERS / RUNS_ON / CONTAINS**. Today's committed snapshot
-  was written by the desktop using `773fb1e`, so the desktop is on the newer instrument and
-  the laptop is not. Consequence, and the reason this is a bug rather than a chore: scanning
-  from the laptop today would emit a snapshot missing three relationship types the desktop's
-  can see — the U7 undercount class recurring, with the config pin now pointing at the OLD
-  revision instead of preventing it. Fix is two coupled halves and the second is a ruling:
-  (a) `git pull` the laptop sibling to `773fb1e`; (b) bump `expected_commit` (and refresh the
-  fork-consolidation comment, which still narrates 5006567 as the end state) — a groom must
-  not silently change the instrument revision every future snapshot is measured with. Also
-  worth deciding in the same pass: nothing DETECTS this. `probe_instrument.py` tests
-  capabilities behaviourally, and both revisions report `multi_root` + `tree` true, so the
-  probe passes on a scanner that is missing edge types. The pin is the only check, and it is
-  the thing that went stale. Sibling of the `depgraph` in-housing question below — this is a
-  fresh, concrete instance of that entry's whole argument. (laptop — J18)
-
-- 2026-08-04 — [bug] **Today's committed snapshot `drydocs-20260804.json` cites a git commit
-  that no longer exists.** Its `meta.git.commit` is `63adc2b` (`dirty: true`), one of the two
-  commits removed by this morning's history rewrite, so the drift-comparison header points at
-  a SHA unreachable from any ref — `git rev-parse 63adc2b` fails. The snapshot content is
-  fine; the provenance header is unresolvable, which defeats the reason the header exists.
-  Fix is a re-run from a machine on the correct instrument, so it is BLOCKED behind the
-  `expected_commit` entry above — re-running from the laptop today would trade a dead SHA for
-  a missing-edge-types snapshot. Two notes for whoever does it: U12 is done, so `snapshot.ps1`
-  now REPLACES a same-day file instead of appending, and the `dirty: true` flag means the
-  desktop scanned with a dirty tree, so a clean re-run is worth having on its own merits.
-  Generalizable lesson if it recurs: any artifact that pins a commit in its own header is
-  invalidated by a history rewrite, and nothing currently sweeps for that. (laptop — J18)
+- 2026-08-04 — [question] **Nothing compares the depgraph checkout against
+  `dev-environment.yaml`'s `expected_commit` — the pin is documentation, not a check.**
+  Residual of the same-day instrument drift, which is otherwise RESOLVED (sibling pulled to
+  `773fb1e`, pin bumped, both machines now on one instrument — see the audit trail).
+  `snapshot.ps1` records the instrument commit into the meta header and refuses on a failed
+  CAPABILITY probe, but it never asks whether the checkout is the revision the config names,
+  and `test_probe_instrument.py` only asserts `expected_commit` is truthy. So a stale sibling
+  scans silently, which is exactly what happened. Why the capability probe cannot cover it:
+  both revisions report `multi_root` + `tree` true, because the newer commits add edge TYPES
+  rather than a capability — behavioural probing is the right idea and still misses this
+  class. Options: compare-and-warn in `snapshot.ps1` (cheap, no network), compare-and-refuse
+  (consistent with the capability stance but blocks work on a legitimately-ahead sibling), or
+  a test that fetches (slow, network-dependent, and wrong for a unit suite). Needs a ruling
+  on which, and it interacts with the `depgraph` in-housing question below — in-housing would
+  delete this whole class, since the tool would be pinned by `poetry.lock`. (laptop — J18)
 
 - 2026-08-04 — [source] **`controlm-pipeline-stub` captured + integration plan written (internal).**
   The internal DPL Control-M XML builder/validator package (config → generate → validate →
@@ -817,6 +799,27 @@ Tags help grooming: `idea` · `bug` · `doc` · `source` (new data source) · `q
   an app). Cosmetic; hide or restructure later.
 
 ## Recently groomed (audit trail)
+
+- 2026-08-04 (session close, laptop) — [bug]×2 the instrument-drift pair → **BOTH RESOLVED
+  SAME SESSION on user direction ("pull the depgraph sibling and bump the pin"), no backlog
+  id.** (a) Sibling fast-forwarded 5006567 → 773fb1e (clean descendant: `9c663ca` RUA
+  inventory ingestion + script-op analyzer, then the merge), `expected_commit` bumped, probe
+  re-run the way `snapshot.ps1` runs it (PYTHONPATH=. inside the sibling — a bare run from
+  the DryDocs venv reports everything false and is NOT a valid probe) → importable,
+  multi_root, tree all true. (b) The dead-SHA snapshot header is gone: the re-run replaced
+  `drydocs-20260804.json` (which cited the rewritten-away `63adc2b`) with
+  `drydocs-20260804-1548.json` at the live `299af39`.
+  **One claim in the original entry was WRONG and the correction is worth keeping:** it said
+  scanning from the stale revision "would emit a snapshot missing three relationship types".
+  Measured after the bump, that is false for this repo — DryDocs scans emit exactly ONE
+  relationship type, CONTAINS (1772), with TRANSFERS and RUNS_ON at zero in both the old and
+  new snapshots and an identical 526 edges. Those types come from depgraph's Control-M / RUA
+  lineage extractors, which a Python-tree scan never exercises. The bump was still right —
+  two machines on different instruments cannot be compared, and the pin named a revision main
+  had moved past — but the justification was comparability and currency, not lost output. The
+  inferred consequence had been stated as fact without measuring it. Lesson recorded in the
+  config comment: treat a REL_TYPES change as a reason to re-measure, not as proof of an
+  undercount. Residual (the missing DETECTION) re-inboxed as a [question].
 
 - 2026-08-04 (weekly groom, laptop) — [bug] `provision.ps1` shells out to host-PATH
   `cypher-shell` → **G54**. Verified at the groom: the REQUIRES block (`:6`) presents host

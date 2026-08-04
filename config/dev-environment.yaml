@@ -74,19 +74,29 @@ depgraph:
   #
   # PIN BUMPED 2026-08-04: 5006567 -> 773fb1e, on the SAME main and a clean
   # descendant of the old pin — 9c663ca (RUA inventory ingestion + a shallow
-  # script-op analyzer) then the 773fb1e merge, which UNIONS REL_TYPES with
-  # TRANSFERS / RUNS_ON / CONTAINS. Found at a session close when the laptop was
-  # still on the old pin while the desktop had already written a snapshot with
-  # 773fb1e: scanning from the stale revision emits a graph missing those three
-  # relationship types — the U7 undercount class, with the pin CAUSING it rather
-  # than preventing it. Verified after the bump (laptop; probe run the way
-  # snapshot.ps1 runs it, PYTHONPATH=. inside the sibling): importable,
-  # multi_root and tree all true.
-  # Note WHY the probe below could not have caught this: both revisions pass it,
-  # because the new commits add edge TYPES rather than a capability. The pin is
-  # therefore the only check on instrument currency, and keeping it current is a
-  # maintenance obligation, not a formality. Nothing yet compares the checkout
-  # against this value automatically — that gap is inboxed in IDEAS.md.
+  # script-op analyzer) then the 773fb1e merge, which unions REL_TYPES with
+  # TRANSFERS / RUNS_ON / CONTAINS. Found at a session close: the LAPTOP sibling
+  # was still on 5006567 while the DESKTOP had already written that day's
+  # snapshot with 773fb1e, so the two machines were measuring with different
+  # instruments — which by itself defeats the drift comparison the snapshots
+  # exist for. The pin had also simply gone stale: it named a revision main had
+  # moved past.
+  # MEASURED, because the first reading of this was WRONG and the correction is
+  # the useful part: the stale revision would NOT have undercounted this repo.
+  # Scanning DryDocs emits exactly one relationship type — CONTAINS (1772) —
+  # with TRANSFERS and RUNS_ON at zero in both the desktop's snapshot and the
+  # post-bump one, and an identical 526 edges. Those two types come from
+  # depgraph's Control-M / RUA lineage extractors, which a Python-tree scan of
+  # this repo never exercises. So "newer instrument" was worth having for
+  # comparability and currency, not because output was being lost here. Treat a
+  # REL_TYPES change as a reason to re-measure, not as proof of an undercount.
+  # Verified after the bump (laptop; probe run the way snapshot.ps1 runs it,
+  # PYTHONPATH=. inside the sibling): importable, multi_root and tree all true.
+  # Note WHY the probe below could not have caught the drift: both revisions
+  # pass it, because the new commits add edge TYPES rather than a capability.
+  # The pin is therefore the only check on instrument currency, and keeping it
+  # current is a maintenance obligation, not a formality. Nothing yet compares
+  # the checkout against this value automatically — that gap is in IDEAS.md.
   expected_branch: main
   expected_commit: 773fb1e
   # What snapshot.ps1 REFUSES to scan without. These are probed behaviourally
