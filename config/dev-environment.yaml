@@ -71,8 +71,24 @@ depgraph:
   # ancestor of the other, so no revision had everything and a plain clone of
   # `main` reproduced the broken scanner. Both are now merged into main and the
   # branches are DELETED (local + remote); main is the only branch. Track main.
+  #
+  # PIN BUMPED 2026-08-04: 5006567 -> 773fb1e, on the SAME main and a clean
+  # descendant of the old pin — 9c663ca (RUA inventory ingestion + a shallow
+  # script-op analyzer) then the 773fb1e merge, which UNIONS REL_TYPES with
+  # TRANSFERS / RUNS_ON / CONTAINS. Found at a session close when the laptop was
+  # still on the old pin while the desktop had already written a snapshot with
+  # 773fb1e: scanning from the stale revision emits a graph missing those three
+  # relationship types — the U7 undercount class, with the pin CAUSING it rather
+  # than preventing it. Verified after the bump (laptop; probe run the way
+  # snapshot.ps1 runs it, PYTHONPATH=. inside the sibling): importable,
+  # multi_root and tree all true.
+  # Note WHY the probe below could not have caught this: both revisions pass it,
+  # because the new commits add edge TYPES rather than a capability. The pin is
+  # therefore the only check on instrument currency, and keeping it current is a
+  # maintenance obligation, not a formality. Nothing yet compares the checkout
+  # against this value automatically — that gap is inboxed in IDEAS.md.
   expected_branch: main
-  expected_commit: 5006567
+  expected_commit: 773fb1e
   # What snapshot.ps1 REFUSES to scan without. These are probed behaviourally
   # (knowledge/depgraph-snapshots/probe_instrument.py) rather than by version
   # string — capability is the thing that matters, and depgraph's 0.1.0 spans
