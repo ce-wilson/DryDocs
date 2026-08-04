@@ -19,7 +19,7 @@ and command parsing happen in **Python, not recursive SQL**.
 | A     | Variable extract + taxonomy classifier + staging output | **Code complete** — pending production run (see below) |
 | B     | Fixed-point variable resolver (offline AutoEdit simulation) | **Complete** |
 | C     | Command parsing: FileWatch / OS launcher registry / PRECMD-POSTCMD shell / AIAWSWLK | **Code complete** — registry grows iteratively (Phase E) |
-| D     | Graph load (staging → Neo4j under `:JobRun`) | **Started** — first slice live: K2 SEAL attribution (`drydocs load-seal-attribution`, STG_APP_FACT → `WAS_ASSOCIATED_WITH {role: seal_app_ref}`, gate-confirmed 2026-07-14); the general staging→graph loader (R4) remains open |
+| D     | Graph load (staging → Neo4j under `:JobRun`) | **Started** — first slice live at the folder grain since K8 (2026-08-04): `drydocs load-folder-attribution`, app-code defined mapping + STG_APP_FACT fallback → `BELONGS_TO_APPLICATION {role: seal_app_ref}` (supersedes the 2026-07-14 job-grain K2 slice; the match policy survives as the disclosed fallback); the general staging→graph loader (R4) remains open |
 | E     | TDQ loop (DQV measurements, launcher-registry growth from unparsed backlog) | Not started |
 
 **Extension (2026-07-15):** job-type detail tables — `STG_JOB_FILEWATCH`,

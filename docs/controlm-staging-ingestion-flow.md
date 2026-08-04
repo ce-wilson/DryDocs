@@ -257,7 +257,7 @@ node* (neo4j-skills import/cypher references).
 | 2 | **jobs** | `:ControlMJob` | `CONTAINS_JOB` | `MATCH` folder (exists from pass 1); job silently dropped if folder absent → rerun folders first |
 | 3 | **conditions in / out** | `:Condition` (shared `(folder_id, name)` key) | `REQUIRES_IN_CONDITION`, `EMITS_OUT_CONDITION` | `MATCH` job by `(folder_id, job_id)` |
 | 4 | **dependencies (separate pass)** | none | `WAS_INFORMED_BY` (derived from the recursive LNKO⋈LNKI condition match) | `MATCH` **both** endpoint jobs — pure edge pass, never creates nodes |
-| later | SEAL attribution (K2 — **live 2026-07-14**: gate `seal-attribution-match-policy` confirmed; `drydocs load-seal-attribution`) | none | `WAS_ASSOCIATED_WITH {role: seal_app_ref}` | runs only after jobs **and** `:Application` reference exist |
+| later | SEAL attribution (**folder grain since K8, 2026-08-04** — gate `seal-app-ref-edge-reshape` 24/24; `drydocs load-folder-attribution`: app-code defined mapping primary, the K2 match policy as the disclosed fallback) | none | `BELONGS_TO_APPLICATION {role: seal_app_ref}` onto the app's Batch `:Port` (jobs inherit via `CONTAINS_JOB`) | runs only after folders **and** the `:BusinessApplication` reference exist |
 
 Why the application grouping moved to the **folder** pass (not jobs, where the
 vocabulary note originally parked it): the folder pass is where field-derived

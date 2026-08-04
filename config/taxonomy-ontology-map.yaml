@@ -966,14 +966,7 @@ mappings:
     precedence_authority: internal-standards   # the defined mapping is steward-authored company convention; SEAL identity itself stays with seal-pat-source-of-record
     vocab_id: m3_belongs_to_application        # registered PLANNED at sign-off — no loader until the K7 build items land
     source_evidence: "SME model 2026-07-22 (IDEAS.md top inbox item — grain correction + two-tier code model); tier 3 and the owner-not-user rule added by the SME in the K7 gate session 2026-08-03; read-only cardinality evidence live in explorer.controlm-app-codes.v1; supersession target = the active job-level m3_seal_app_ref (K2)"
-    capture: >
-      waived — no config/taxonomy/ capture exists for :ControlMApplication (the app-code
-      folder-header grouping). controlm.yaml captures servers/folders/jobs/conditions only;
-      the app code arrived later, via the 2026-07-07 folder-pass extension, and was never
-      captured taxonomy-first. Same F5 gap job-seal-app-ref records. Note the DEFINED-mapping
-      rows themselves have no machine feed at all — the steward store IS the source of record
-      (§E2) — so what is owed is a capture of the app-code CLASSIFICATION, not of the mapping.
-      Carried as a K7 build item rather than guessed at here.
+    capture: config/taxonomy/controlm.yaml   # K12 (2026-08-04): the app-code grouping captured as the applications: section — pure classification (code -> member folders) from the sample jobs' application column, jobless folders name-DERIVED and flagged. Replaces the waiver, which recorded that :ControlMApplication arrived via the 2026-07-07 folder-pass extension and was never captured taxonomy-first. The DEFINED-mapping ROWS still have no machine feed — the steward store IS their source of record (§E2); the capture is of the classification, not the mapping.
     status: confirmed                          # gate seal-app-ref-edge-reshape SIGNED OFF 2026-08-03 (K7) — 24/24 confirmations
     proposed_at: 2026-07-22
     confirmed_by: chad.wilson                  # SME, in-session chat gate — §H sign-off

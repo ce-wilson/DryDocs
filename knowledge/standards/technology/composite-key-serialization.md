@@ -38,8 +38,10 @@ node key exactly.
   dependency pass in `drydocs/cli.py`.
 - **Do not invent sibling forms.** A colon, pipe, or underscore join of the
   same pair mints a second identity grammar; any surface that needs the
-  pair as one string uses ctlm_id. (Known internal-only stray: the web
-  mapping tray's `folder_id:job_id` React list key — swept by backlog K14.)
+  pair as one string uses ctlm_id. (The K14 sweep, 2026-08-04, converted
+  the two known strays — the web mapping tray's colon-joined React list
+  key and the static mapping demo's slash join — and found no others
+  across web/src, drydocs_api and drydocs/loaders.)
 - **Caveat that stays true:** not every CM_ table carries the derived
   column (CM_AVG_RUN does not — P0 probe); absence means fallback join,
   never a different serialization.

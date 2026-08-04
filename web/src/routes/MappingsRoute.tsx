@@ -30,7 +30,7 @@ type Queue = 'all' | 'unresolved' | 'conflict'
 type Lifecycle = 'draft' | 'submitted' | 'gated' | 'loaded'
 
 interface TrayEntry {
-  key: string // folder_id:job_id
+  key: string // ctlm_id dot form: folder_id.job_id (composite-key-serialization standard)
   folder_id: string
   job_id: string
   jobLabel: string
@@ -194,7 +194,9 @@ export default function MappingsRoute({ persona }: { persona: Persona }) {
     return rows
   }, [coverage, queue, filter])
 
-  const rowKey = (r: CoverageRow) => `${r.folder_id}:${r.job_id}`
+  // ctlm_id dot form — the SME-ruled serialization of the (folder_id, job_id)
+  // node key (knowledge/standards/technology/composite-key-serialization.md).
+  const rowKey = (r: CoverageRow) => `${r.folder_id}.${r.job_id}`
   const checkedRows = useMemo(
     () => (coverage ?? []).filter((r) => checked.has(rowKey(r))),
     [coverage, checked],

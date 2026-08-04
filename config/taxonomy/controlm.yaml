@@ -31,6 +31,22 @@ nodes:
     - { id: P32 }
     - { id: P33 }
 
+  # ControlMApplication — the Control-M APP CODE grouping (K12, captured
+  # 2026-08-04). Key: name (the 3-char code). PURE CLASSIFICATION: which
+  # folders sit under which code — the code -> business-application MAPPING
+  # is ontology (app-code-defined-mapping, gate seal-app-ref-edge-reshape)
+  # and never lives here. Source grain: the folder HEADER ROW in CM_DEF_VJOB
+  # (JOB_ID=1, the same join the folder pass uses); in this REDUCED sample
+  # the code is observable only through the jobs' application column, so
+  # jobless folders (161020, 160501, 161999) carry no observable code —
+  # their membership below is name-DERIVED (pos3-5), flagged, never treated
+  # as source data (the folder-naming standard warns a name is not a key).
+  applications:
+    - { id: ARA, folders: [161014, 161015, 161016], derived_folders: [161020] }
+    - { id: AUT, folders: [160500], derived_folders: [160501] }
+    - { id: DAT, folders: [162001] }
+    - { id: RPD, folders: [], derived_folders: [161999] }   # retired folder only — code unobserved in sample jobs
+
   # ControlMFolder — child of a server. Key: folder_id. name = sched_table.
   # status A = active, R = retired. jobs[] = contained ControlMJob keys (classification only).
   folders:
@@ -86,6 +102,7 @@ nodes:
 
 counts:
   servers: 4
+  applications: 4      # ARA, AUT, DAT observed in sample jobs; RPD name-derived only (K12)
   folders: 8           # 7 active (1 retired: 161999); 3 active have no jobs in sample
   jobs: 13             # distinct (folder_id, job_id)
   conditions: 15       # distinct (folder_id, name); 7 distinct names

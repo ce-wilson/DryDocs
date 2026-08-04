@@ -198,7 +198,7 @@ nothing; git + gate + loader remain the authority chain.</p>
     $('draftCount').textContent = drafts.length;
     $('submitBtn').disabled = drafts.length === 0;
     $('drafts').innerHTML = drafts.map((d, i) =>
-      '<div class="draft"><b>' + d.folder_id + '/' + d.job_id + ' → ' + d.seal_id + '</b><br>' +
+      '<div class="draft"><b>' + d.folder_id + '.' + d.job_id + ' → ' + d.seal_id + '</b><br>' +
       '<span style="color:#666">"' + d.rationale + '"</span> ' +
       '<a href="#" data-i="' + i + '" class="rm">✕</a></div>').join('');
     document.querySelectorAll('.rm').forEach(a => a.onclick = (ev) => {
