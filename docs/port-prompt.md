@@ -659,6 +659,26 @@ verification status in [BRACKETS]; spend review on [UNRULED].
     rerun refreshes the OntologyTerm notes; `EXPECTED_CONSTRAINTS` does not
     move, suite count does not move (1410/5, no test delta).
 
+68. U12 — SNAPSHOT RETENTION ENFORCED IN snapshot.ps1 (+3 guard tests). The
+    ruled newest-only retention (SME 2026-08-02) moved from prose+human into
+    the script: after a successful write+filter, every other
+    `<project>-<date>[-HHmm].json` is deleted (pattern-anchored — `-code-*`
+    comparison files and `drydocs1-*` history names exempt; deliberately
+    AFTER the write so a failed run cannot delete the only good snapshot;
+    source order pinned by test). Proven live: the first enforcement run
+    removed FIVE stale snapshots. README trued to the all-files instrument
+    (whole-repo default + -CodeOnly, ruled retention replaces "keep ~10",
+    fourth instrument-change marker: 238 -> 1457 nodes on unchanged code at
+    the 2026-08-02 all-files boundary — instrument, not growth; absent-file
+    citations restated as git history). NEW tests/unit/
+    test_depgraph_snapshots.py: exactly-one committed all-files snapshot,
+    script enforcement present and after-the-write, README currency.
+    ***YOUR SIDE:*** the snapshot RITUAL is producer-machine-only, but the
+    directory + tests PORT: (a) the exactly-one test reds a tree carrying a
+    snapshot series — apply the same retention (keep newest, delete the
+    rest) in the port commit; (b) if your ritual wrapper diverged from
+    snapshot.ps1, take the retention block like-for-like. Suite 1410→1413.
+
 ACCEPTANCE GATE (behavior is the contract, not a byte-compare):
 - Track 1 (portable):
     poetry run pytest tests/unit/test_variable_classifier.py tests/unit/test_variable_resolver.py \
@@ -675,12 +695,13 @@ ACCEPTANCE GATE (behavior is the contract, not a byte-compare):
   capability_assert=false skips per T18). A retired-id refusal from
   `SourceRegistry.from_yaml` is the D4 guard WORKING, not a port failure — rebind the
   loader in `loader-source-overlay.yaml`, never by re-adding the retired id.
-  Producer reference at the current head (step 67, the K13 semantics
-  reconciliation — no test delta from step 66): 1410
+  Producer reference at the current head (step 68, the U12 retention
+  enforcement): 1413
   passed / 5 skipped with the production CSV PRESENT and no
   RECONCILE_BEFORE_DIR (4 J7 guards + the graphrag PDF) — the like-for-like
   chain: step 58 1356/5 → step 61 1384/5 (+28 K9 guards) → step 63 1399/5
-  (+15 K8) → step 65 1403/5 (+4 K10) → step 66 1410/5 (+7 K11). The
+  (+15 K8) → step 65 1403/5 (+4 K10) → step 66 1410/5 (+7 K11; step 67 no
+  delta) → step 68 1413/5 (+3 U12). The
   step-60 figure (1354 / 7) was CSV-ABSENT without RECONCILE_BEFORE_DIR and is
   not comparable line-for-line; `aa0a0eb`'s commit message quotes 1358 / 3,
   which is the step-59 run with RECONCILE_BEFORE_DIR set. Earlier producer

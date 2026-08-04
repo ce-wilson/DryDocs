@@ -10,8 +10,8 @@ project to a Neo4j-style dependency model + machine-first JSON).
 ## Command (after `git push`)
 
 ```powershell
-.\snapshot.ps1            # -> drydocs-YYYYMMDD.json   (code graph: the 7 package roots below)
-.\snapshot.ps1 -Tree      # -> drydocs-tree-YYYYMMDD.json  (full repo file tree)
+.\snapshot.ps1            # -> drydocs-YYYYMMDD.json      (DEFAULT: the full repo file tree)
+.\snapshot.ps1 -CodeOnly  # -> drydocs-code-YYYYMMDD.json (legacy comparison shape: the 7 package roots, .py only)
 ```
 
 [`snapshot.ps1`](snapshot.ps1) runs depgraph and writes `<project>-<date>.json` with a **`meta`
@@ -20,13 +20,12 @@ header** so each snapshot is self-identifying:
 ```jsonc
 "meta": {
   "project": "drydocs", "captured_at": "...", "date": "YYYYMMDD",
-  "scan": ["drydocs","drydocs_core","drydocs_api","drydocs_remediation",
-           "drydocs_lineage","drydocs_deepdoc","tests"], "tree": false,
+  "scan": ["DryDocs"], "tree": true,        // default: one root = the repo; -CodeOnly lists the 7 package roots, tree: false
   "git": { "commit": "<short>", "full": "...", "branch": "main",
            "describe": "...", "subject": "...", "dirty": false, "pr": <num|null> },
   "depgraph": { "commit": "<short>", "full": "...", "branch": "main",
                 "dirty": false, "version": "0.1.0",
-                "capabilities": { "multi_root": true, "tree": false } }
+                "capabilities": { "multi_root": true, "tree": true } }
 }
 ```
 
@@ -46,11 +45,22 @@ revision and required capabilities live in [`config/dev-environment.yaml`](../..
 
 `pr` is best-effort (parsed from recent commit subjects/bodies — `pull request #N`, `(#N)`).
 The header is **prepended** to depgraph's JSON without reformatting (clean diffs, no BOM), and
-`viewer.html` shows `@<commit> (branch) PR#<n>` in its stats. Focused scan = the project's own
-code — the six `drydocs*` package roots plus `tests/`, passed to depgraph in ONE invocation so
-they share a namespace (see the discontinuity note under **Compare**); `-Tree` captures the full
-file tree instead (noisier; includes `.claude/skills`). The `scan` list in each header is the
-authority for what a given snapshot actually covered — read it before comparing two of them.
+`viewer.html` shows `@<commit> (branch) PR#<n>` in its stats. **The full tree is the default**
+(SME direction, U9): one scan root — the repo — so there is no root list to go stale, and the
+`.cypher` a loader executes, the `.sql` an extractor runs and the `.yaml` a module reads are all
+visible instead of Python-only. `-CodeOnly` is the retired roots-only shape (the six `drydocs*`
+package roots plus `tests/`, one invocation, shared namespace — see the discontinuity note under
+**Compare**), kept for comparison against the pre-2026-08-02 series; it writes a different
+filename so the two shapes can never collide. The `scan` list in each header is the authority
+for what a given snapshot actually covered — read it before comparing two of them.
+
+Three post-processing steps run between scan and write. **U7** — the instrument probe above.
+**U8** — machine-absolute `abs_path` is stripped textually before writing (and the script refuses
+to write if any survive), so snapshots from different machines or agent worktrees are comparable.
+**U9** — git-ignored paths are dropped ([`filter_ignored.py`](filter_ignored.py)): depgraph
+excludes `.git`/`.venv` but knows nothing about `.gitignore`, and the first all-files run
+collected 384 `.ruff_cache` entries (~18% of the artifact) before the filter existed. The
+committed JSON, `viewer.html` and the graph all show the same filtered thing.
 
 ## Compare
 
@@ -61,9 +71,12 @@ Each snapshot's summary line reports `files`, `edges`, `circular_files`. To see 
   Structure+files, or **Dependencies** (Python imports). Compares by project-relative path,
   so different projects (e.g. `drydocs-original` vs `drydocs`) align.
 
-> **Historical note:** Snapshots captured before 2026-07-01 are named `drydocs1-*.json`
-> (the project's original name). Files are intentionally not renamed; the historical record
-> is preserved as-is. New snapshots follow the `drydocs-<date>.json` convention.
+> **Historical note:** every snapshot older than the newest lives in **git history, not the
+> working tree** (the ruled retention — see Housekeeping). Snapshots captured before 2026-07-01
+> were named `drydocs1-*.json` (the project's original name); the record is preserved in
+> history under those names. New snapshots follow the `drydocs-<date>.json` convention.
+> The instrument-change markers below cite historical filenames — recover any of them with
+> `git log --all --oneline -- knowledge/depgraph-snapshots/<name>` + `git show <commit>:<path>`.
 
 > **⚠ Instrument change — do not read across 2026-07-28 08:48 as growth.** The scanner had a
 > resolution defect: `scan()` ran each root in **isolation**, so an absolute import naming a
@@ -82,10 +95,10 @@ Each snapshot's summary line reports `files`, `edges`, `circular_files`. To see 
 > consistent — but any comparison **straddling** the boundary shows a phantom jump, and an
 > import edge absent from a pre-fix snapshot is not evidence it did not exist. When in doubt,
 > compare each snapshot's `meta.scan` list first; two snapshots with different scan roots are
-> not comparable at all. (Two snapshots exist for 2026-07-28 rather than the usual one-per-day
-> because the fix landed mid-day; the bare-date `drydocs-20260728.json` from that morning was
-> **deleted** — it undercounted *and* its commit message asserted "no structural drift" on
-> numbers taken from the blind region.)
+> not comparable at all. (Two snapshots were kept for 2026-07-28 rather than the usual
+> one-per-day because the fix landed mid-day; the bare-date `drydocs-20260728.json` from that
+> morning was **deleted** — it undercounted *and* its commit message asserted "no structural
+> drift" on numbers taken from the blind region.)
 > **⚠ Instrument change — `abs_path` is gone from snapshots written after 2026-07-28 12:00.**
 > Nodes used to carry `abs_path`, stamped with the *checkout location*, so the same code read
 > `C:/coding/projects/DryDocs/...` on the desktop, `.../sandbox/DryDocs/...` on the laptop, and
@@ -111,13 +124,25 @@ Each snapshot's summary line reports `files`, `edges`, `circular_files`. To see 
 > across this boundary again shows all nodes changed. Third marker in a day, same lesson: read
 > `meta.depgraph` before concluding anything from a node-level diff.
 
+> **⚠ Instrument change — the ALL-FILES tree became the default on 2026-08-02 (U9, `e3f65af`).**
+> The ritual snapshot stopped being a Python-roots code graph and became the whole repo: every
+> directory, every non-`.py` file, plus `CONTAINS` edges read from the tree instead of guessed
+> from path strings. On unchanged code the node count goes **238 → 1457**. That is not growth —
+> it is the instrument seeing the `.cypher`, `.sql`, `.yaml`, docs and config that were always
+> there and always invisible. The old shape survives as `-CodeOnly` under its own
+> `drydocs-code-*` filename; `meta.tree` discriminates the two, and a tree snapshot is **not
+> comparable** to a roots-only one at the node level at all — compare `meta.scan`/`meta.tree`
+> first, same lesson as the three markers above.
+
 - or diff the two `.json` files (`git diff` / any JSON diff tool), or watch the summary counts.
 
 ### Seeded comparison — the v1 rewrite (original vs this version)
-- `tree-original.json` — full tree at commit `683322c` (pre-rewrite): 494 files / 103 dirs, has `vendor/`.
-- `tree-this-version.json` — current v1: 540 files / 124 dirs; adds `reference/ external/ config/ internal/`
-  (the four layers), `vendor/` → `external/orchestration/bmc-controlm`.
-- Load both in the viewer (A = this-version, B = original, or swap) to see the restructure.
+A pair of tree snapshots once seeded this comparison; **both are history now, recoverable from
+git, not files in this directory**: `tree-original.json` (full tree at commit `683322c`,
+pre-rewrite — 494 files / 103 dirs, has `vendor/`) and `tree-this-version.json` (v1 —
+540 files / 124 dirs; adds `reference/ external/ config/ internal/`, the four layers, with
+`vendor/` → `external/orchestration/bmc-controlm`). To re-run the comparison, recover them from
+history (see the Historical note above) and load the pair in the viewer.
 
 ### Live Neo4j connection (viewer.html)
 The viewer's **🔌 Live Neo4j** button fetches the graph straight from a Neo4j **Query API v2**
@@ -148,9 +173,15 @@ domain graph (distinct labels, no overlap). Native visualization:
 
 ## Housekeeping
 
-- Snapshots are committed so the structural history is diffable. **Prune** old ones periodically
-  to keep the repo lean (keep e.g. the last ~10 + one per milestone).
-- Baseline: [`drydocs1-20260621.json`](drydocs1-20260621.json) — 49 files, 70 import edges, 0
-  circular. (Filename corrected 2026-07-28: this line said `depgraph.20260621-091057.json`, which
-  has never existed in this directory; the counts were right. Being pre-U6 it undercounts edges
-  like everything before 2026-07-28 08:48 — see the instrument-change note above.)
+- **Ruled retention (SME 2026-08-02, enforced by `snapshot.ps1` since U12): the newest
+  all-files snapshot is the ONLY one in the directory.** The script deletes every older
+  `<project>-<date>[-HHmm].json` after a successful write — no human pruning step, because the
+  human step is what failed: the ruling was applied by hand four times in the two days after it
+  was made, and a 101-file series accumulated once before it. Structural history stays fully
+  diffable — every superseded snapshot is in **git history** (see the Historical note under
+  Compare for the recovery commands). `-CodeOnly` comparison files (`drydocs-code-*`) are exempt.
+- Historical baseline: `drydocs1-20260621.json` — 49 files, 70 import edges, 0 circular — is in
+  git history, not this directory. (Filename corrected 2026-07-28: this line once said
+  `depgraph.20260621-091057.json`, which never existed; the counts were right. Being pre-U6 it
+  undercounts edges like everything before 2026-07-28 08:48 — see the instrument-change note
+  above.)

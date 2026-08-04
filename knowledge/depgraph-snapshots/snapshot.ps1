@@ -20,11 +20,19 @@
   The header is prepended to depgraph's JSON (formatting preserved, no BOM) so the
   viewer (viewer.html) shows the version and JSON diffs stay clean.
 
-  Two post-processing steps keep the series trustworthy rather than merely present:
+  Post-processing steps keep the series trustworthy rather than merely present:
     U7 — record the INSTRUMENT (depgraph commit/branch/capabilities) in the header,
          and refuse to scan when the sibling checkout cannot do what the run needs.
     U8 — strip machine-absolute abs_path, so snapshots taken on different machines
          (or in an agent worktree) are comparable instead of 100% false-diffing.
+    U9 — drop git-ignored paths, so build caches never masquerade as structure.
+    U12 — ENFORCE the ruled retention (SME 2026-08-02): the newest all-files
+         snapshot is the ONLY one kept; every older <project>-<date>[-HHmm].json
+         is deleted after a successful write. Git history is the archive. Before
+         this, a same-day rerun wrote a -HHmm sibling and relied on a human to
+         delete it — which is exactly how a 101-file series accumulated once,
+         and the sibling reappeared four times in the two days after the ruling.
+         -CodeOnly comparison files keep their own name and are exempt.
 #>
 [CmdletBinding()]
 param(
@@ -199,6 +207,23 @@ if ($Tree) {
   if ($LASTEXITCODE -ne 0) { throw "git-ignore filter failed; snapshot left unfiltered at $out" }
 }
 Remove-Item $tmp -ErrorAction SilentlyContinue
+
+# --- ruled retention: newest all-files snapshot ONLY (SME 2026-08-02; U12) ----
+# Runs AFTER the new snapshot is fully written and filtered, so a failed run can
+# never delete the only good snapshot. Older snapshots stay recoverable from git
+# history; the committed directory carries exactly one all-files snapshot so the
+# ritual cannot re-grow a series. The pattern is anchored to the all-files shape:
+# -CodeOnly files (<project>-code-*) and the retired drydocs1-* names never match.
+if ($Tree) {
+  $retain  = Split-Path $out -Leaf
+  $pattern = ('^{0}-\d{{8}}(-\d{{4}})?\.json$' -f [regex]::Escape($Project))
+  Get-ChildItem $here -File |
+    Where-Object { $_.Name -match $pattern -and $_.Name -ne $retain } |
+    ForEach-Object {
+      Remove-Item $_.FullName -Force -Confirm:$false
+      Write-Host "retention: removed $($_.Name) (newest-only ruling; recover from git history)" -ForegroundColor Yellow
+    }
+}
 
 $prTxt = if ($pr) { ", PR#$pr" } else { "" }
 Write-Host "wrote $(Split-Path $out -Leaf)  (commit $commit, branch $branch$prTxt)" -ForegroundColor Green

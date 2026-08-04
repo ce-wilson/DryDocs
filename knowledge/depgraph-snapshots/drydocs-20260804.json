@@ -1,17 +1,17 @@
 {
   "meta": {
     "project": "drydocs",
-    "captured_at": "2026-08-03T23:53:05",
-    "date": "20260803",
+    "captured_at": "2026-08-04T09:32:35",
+    "date": "20260804",
     "scan": "DryDocs",
     "tree": true,
     "git": {
-      "commit": "e746312",
-      "full": "e7463120d25725bb24e2a08e192f46ae2c5e97a7",
+      "commit": "b02fec7",
+      "full": "b02fec73c8d03009a8f8ab7802eef56936200315",
       "branch": "main",
-      "describe": "e746312",
-      "subject": "feat(standards): composite-key serialization ruled and built — ctlm_id dot composite is THE value form; key-cell pairs join with colon, not semicolon",
-      "dirty": false,
+      "describe": "b02fec7",
+      "subject": "chore(backlog): claim U12 in_progress (snapshot retention enforcement; pushed before work)",
+      "dirty": true,
       "pr": null
     },
     "depgraph": {
@@ -9554,6 +9554,15 @@
       "kind": "file"
     },
     {
+      "file_id": "drydocs/drydocs/loaders/cypher/folder_attribution.cypher",
+      "name": "folder_attribution.cypher",
+      "extension": ".cypher",
+      "rel_path": "drydocs/loaders/cypher/folder_attribution.cypher",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
       "file_id": "drydocs/drydocs/loaders/cypher/manual_seal_attribution.cypher",
       "name": "manual_seal_attribution.cypher",
       "extension": ".cypher",
@@ -9653,15 +9662,6 @@
       "kind": "file"
     },
     {
-      "file_id": "drydocs/drydocs/loaders/cypher/seal_attribution.cypher",
-      "name": "seal_attribution.cypher",
-      "extension": ".cypher",
-      "rel_path": "drydocs/loaders/cypher/seal_attribution.cypher",
-      "project": "drydocs",
-      "circular": false,
-      "kind": "file"
-    },
-    {
       "file_id": "drydocs/drydocs/loaders/cypher/seal_contacts.cypher",
       "name": "seal_contacts.cypher",
       "extension": ".cypher",
@@ -9711,6 +9711,15 @@
       "name": "essential_graphrag.py",
       "extension": ".py",
       "rel_path": "drydocs/loaders/essential_graphrag.py",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/drydocs/loaders/folder_attribution.py",
+      "name": "folder_attribution.py",
+      "extension": ".py",
+      "rel_path": "drydocs/loaders/folder_attribution.py",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -11570,19 +11579,19 @@
       "kind": "file"
     },
     {
-      "file_id": "drydocs/graph-tests/provenance-diet.yaml",
-      "name": "provenance-diet.yaml",
+      "file_id": "drydocs/graph-tests/folder-attribution-coverage.yaml",
+      "name": "folder-attribution-coverage.yaml",
       "extension": ".yaml",
-      "rel_path": "graph-tests/provenance-diet.yaml",
+      "rel_path": "graph-tests/folder-attribution-coverage.yaml",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
     },
     {
-      "file_id": "drydocs/graph-tests/seal-attribution-coverage.yaml",
-      "name": "seal-attribution-coverage.yaml",
+      "file_id": "drydocs/graph-tests/provenance-diet.yaml",
+      "name": "provenance-diet.yaml",
       "extension": ".yaml",
-      "rel_path": "graph-tests/seal-attribution-coverage.yaml",
+      "rel_path": "graph-tests/provenance-diet.yaml",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -12326,10 +12335,19 @@
       "kind": "file"
     },
     {
-      "file_id": "drydocs/knowledge/depgraph-snapshots/drydocs-20260803.json",
-      "name": "drydocs-20260803.json",
+      "file_id": "drydocs/knowledge/depgraph-snapshots/drydocs-20260803-2353.json",
+      "name": "drydocs-20260803-2353.json",
       "extension": ".json",
-      "rel_path": "knowledge/depgraph-snapshots/drydocs-20260803.json",
+      "rel_path": "knowledge/depgraph-snapshots/drydocs-20260803-2353.json",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/knowledge/depgraph-snapshots/drydocs-20260804-0920.json",
+      "name": "drydocs-20260804-0920.json",
+      "extension": ".json",
+      "rel_path": "knowledge/depgraph-snapshots/drydocs-20260804-0920.json",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -13527,6 +13545,15 @@
       "name": "test_external_vendor_scrape.py",
       "extension": ".py",
       "rel_path": "tests/unit/test_external_vendor_scrape.py",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/tests/unit/test_folder_attribution.py",
+      "name": "test_folder_attribution.py",
+      "extension": ".py",
+      "rel_path": "tests/unit/test_folder_attribution.py",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -15215,6 +15242,15 @@
       "kind": "file"
     },
     {
+      "file_id": "drydocs/web/src/routes/AppCodeCascadePane.tsx",
+      "name": "AppCodeCascadePane.tsx",
+      "extension": ".tsx",
+      "rel_path": "web/src/routes/AppCodeCascadePane.tsx",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
       "file_id": "drydocs/web/src/routes/AskRoute.tsx",
       "name": "AskRoute.tsx",
       "extension": ".tsx",
@@ -15613,6 +15649,10 @@
     ],
     [
       "drydocs/drydocs/cli.py",
+      "drydocs/drydocs/loaders/folder_attribution.py"
+    ],
+    [
+      "drydocs/drydocs/cli.py",
       "drydocs/drydocs/loaders/manual_loads.py"
     ],
     [
@@ -15658,6 +15698,10 @@
     [
       "drydocs/drydocs/cli.py",
       "drydocs/drydocs_core/data_root.py"
+    ],
+    [
+      "drydocs/drydocs/cli.py",
+      "drydocs/drydocs_core/mapping_store.py"
     ],
     [
       "drydocs/drydocs/cli.py",
@@ -15896,8 +15940,32 @@
       "drydocs/drydocs_core/models/docs.py"
     ],
     [
+      "drydocs/drydocs/loaders/folder_attribution.py",
+      "drydocs/drydocs/loaders/base.py"
+    ],
+    [
+      "drydocs/drydocs/loaders/folder_attribution.py",
+      "drydocs/drydocs/loaders/batch_port_orchestrator.py"
+    ],
+    [
+      "drydocs/drydocs/loaders/folder_attribution.py",
+      "drydocs/drydocs/loaders/seal_attribution.py"
+    ],
+    [
+      "drydocs/drydocs/loaders/folder_attribution.py",
+      "drydocs/drydocs_core/models/__init__.py"
+    ],
+    [
+      "drydocs/drydocs/loaders/folder_attribution.py",
+      "drydocs/drydocs_core/neo4j_client.py"
+    ],
+    [
       "drydocs/drydocs/loaders/manual_loads.py",
       "drydocs/drydocs/loaders/base.py"
+    ],
+    [
+      "drydocs/drydocs/loaders/manual_loads.py",
+      "drydocs/drydocs/loaders/folder_attribution.py"
     ],
     [
       "drydocs/drydocs/loaders/manual_loads.py",
@@ -15918,10 +15986,6 @@
     [
       "drydocs/drydocs/loaders/seal_applications.py",
       "drydocs/drydocs_core/models/__init__.py"
-    ],
-    [
-      "drydocs/drydocs/loaders/seal_attribution.py",
-      "drydocs/drydocs/loaders/base.py"
     ],
     [
       "drydocs/drydocs/loaders/seal_attribution.py",
@@ -16772,6 +16836,38 @@
       "drydocs/scripts/external_vendor_scrape.py"
     ],
     [
+      "drydocs/tests/unit/test_folder_attribution.py",
+      "drydocs/drydocs/graph_verify.py"
+    ],
+    [
+      "drydocs/tests/unit/test_folder_attribution.py",
+      "drydocs/drydocs/loaders/base.py"
+    ],
+    [
+      "drydocs/tests/unit/test_folder_attribution.py",
+      "drydocs/drydocs/loaders/folder_attribution.py"
+    ],
+    [
+      "drydocs/tests/unit/test_folder_attribution.py",
+      "drydocs/drydocs/loaders/manual_loads.py"
+    ],
+    [
+      "drydocs/tests/unit/test_folder_attribution.py",
+      "drydocs/drydocs/loaders/seal_attribution.py"
+    ],
+    [
+      "drydocs/tests/unit/test_folder_attribution.py",
+      "drydocs/drydocs_api/query_specs.py"
+    ],
+    [
+      "drydocs/tests/unit/test_folder_attribution.py",
+      "drydocs/drydocs_core/adapters/__init__.py"
+    ],
+    [
+      "drydocs/tests/unit/test_folder_attribution.py",
+      "drydocs/drydocs_core/models/__init__.py"
+    ],
+    [
       "drydocs/tests/unit/test_folder_name_parser.py",
       "drydocs/drydocs_core/orchestration/controlm/__init__.py"
     ],
@@ -17017,6 +17113,10 @@
     ],
     [
       "drydocs/tests/unit/test_mapping_api.py",
+      "drydocs/drydocs_api/app.py"
+    ],
+    [
+      "drydocs/tests/unit/test_mapping_api.py",
       "drydocs/drydocs_api/handlers.py"
     ],
     [
@@ -17241,15 +17341,7 @@
     ],
     [
       "drydocs/tests/unit/test_seal_attribution.py",
-      "drydocs/drydocs/graph_verify.py"
-    ],
-    [
-      "drydocs/tests/unit/test_seal_attribution.py",
       "drydocs/drydocs/loaders/seal_attribution.py"
-    ],
-    [
-      "drydocs/tests/unit/test_seal_attribution.py",
-      "drydocs/drydocs_core/adapters/__init__.py"
     ],
     [
       "drydocs/tests/unit/test_seal_attribution.py",
@@ -22911,6 +23003,11 @@
     [
       "drydocs/drydocs/loaders",
       "CONTAINS",
+      "drydocs/drydocs/loaders/folder_attribution.py"
+    ],
+    [
+      "drydocs/drydocs/loaders",
+      "CONTAINS",
       "drydocs/drydocs/loaders/manual_loads.py"
     ],
     [
@@ -23036,6 +23133,11 @@
     [
       "drydocs/drydocs/loaders/cypher",
       "CONTAINS",
+      "drydocs/drydocs/loaders/cypher/folder_attribution.cypher"
+    ],
+    [
+      "drydocs/drydocs/loaders/cypher",
+      "CONTAINS",
       "drydocs/drydocs/loaders/cypher/manual_seal_attribution.cypher"
     ],
     [
@@ -23087,11 +23189,6 @@
       "drydocs/drydocs/loaders/cypher",
       "CONTAINS",
       "drydocs/drydocs/loaders/cypher/seal_applications.cypher"
-    ],
-    [
-      "drydocs/drydocs/loaders/cypher",
-      "CONTAINS",
-      "drydocs/drydocs/loaders/cypher/seal_attribution.cypher"
     ],
     [
       "drydocs/drydocs/loaders/cypher",
@@ -24016,12 +24113,12 @@
     [
       "drydocs/graph-tests",
       "CONTAINS",
-      "drydocs/graph-tests/provenance-diet.yaml"
+      "drydocs/graph-tests/folder-attribution-coverage.yaml"
     ],
     [
       "drydocs/graph-tests",
       "CONTAINS",
-      "drydocs/graph-tests/seal-attribution-coverage.yaml"
+      "drydocs/graph-tests/provenance-diet.yaml"
     ],
     [
       "drydocs/internal",
@@ -24456,7 +24553,12 @@
     [
       "drydocs/knowledge/depgraph-snapshots",
       "CONTAINS",
-      "drydocs/knowledge/depgraph-snapshots/drydocs-20260803.json"
+      "drydocs/knowledge/depgraph-snapshots/drydocs-20260803-2353.json"
+    ],
+    [
+      "drydocs/knowledge/depgraph-snapshots",
+      "CONTAINS",
+      "drydocs/knowledge/depgraph-snapshots/drydocs-20260804-0920.json"
     ],
     [
       "drydocs/knowledge/depgraph-snapshots",
@@ -25057,6 +25159,11 @@
       "drydocs/tests/unit",
       "CONTAINS",
       "drydocs/tests/unit/test_external_vendor_scrape.py"
+    ],
+    [
+      "drydocs/tests/unit",
+      "CONTAINS",
+      "drydocs/tests/unit/test_folder_attribution.py"
     ],
     [
       "drydocs/tests/unit",
@@ -26026,6 +26133,11 @@
     [
       "drydocs/web/src/routes",
       "CONTAINS",
+      "drydocs/web/src/routes/AppCodeCascadePane.tsx"
+    ],
+    [
+      "drydocs/web/src/routes",
+      "CONTAINS",
       "drydocs/web/src/routes/AskRoute.tsx"
     ],
     [
@@ -26168,13 +26280,13 @@
     "projects": [
       "drydocs"
     ],
-    "files": 1466,
-    "edges": 458,
+    "files": 1470,
+    "edges": 472,
     "circular_files": 0,
     "processes": 0,
     "data_assets": 0,
     "hosts": 0,
-    "rels": 1759,
+    "rels": 1763,
     "directories": 256
   }
 }
