@@ -38,8 +38,12 @@ shrink-ambition):
    always a human act, never a load-time side effect.
 
 **Template:** [`TEMPLATE-node-mapping.csv`](TEMPLATE-node-mapping.csv).
-Composite node keys are `field=value` pairs joined by `;`
-(e.g. `folder_id=<FOLDER>;job_id=<JOB>`). **Rekeyed to app_code at K9** (K7
+Composite node keys are `field=value` pairs joined by `:`
+(e.g. `folder_id=<FOLDER>:job_id=<JOB>`; separator ruled by the SME
+2026-08-03 — `;` is the SQL statement terminator and these cells travel
+beside SQL; see
+`knowledge/standards/technology/composite-key-serialization.md`).
+**Rekeyed to app_code at K9** (K7
 gate seal-app-ref-edge-reshape §F2, 2026-08-03): a manual row now pins the
 FOLDER-grain ruled edge — authored per app code (`app_code=<CODE>` →
 `BELONGS_TO_APPLICATION {role: seal_app_ref}` → `Port`, key `app_id=<APPID>`);

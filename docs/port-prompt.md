@@ -509,6 +509,24 @@ verification status in [BRACKETS]; spend review on [UNRULED].
     `EXPECTED_CONSTRAINTS` does not move; nothing writes the graph;
     `m3_belongs_to_application` stays planned.
 
+62. COMPOSITE-KEY SERIALIZATION STANDARD [SME-RULED, TEST-PINNED]. Two
+    in-chat SME rulings, same session as K9: (1) the `ctlm_id` DOT composite
+    (`folder_id.job_id`, the psgmgr-derived convention, P2 §B precedent) is
+    THE serialized form of the job node key; (2) key-cell `field=value`
+    pairs join with **`:` not `;`** — the semicolon is the SQL statement
+    terminator. NEW standard doc
+    `knowledge/standards/technology/composite-key-serialization.md` (+ the
+    standards README index row); `_parse_key` in
+    `drydocs_core/manual_mappings.py` flipped `;`→`:`, fixtures updated.
+    TIMING IS THE POINT: the flip landed while ZERO manual CSVs are
+    committed producer-side (`manifest files: []`), so nothing migrated.
+    ***YOUR SIDE IS DIFFERENT (T4):*** if you hold REAL registered tier-5
+    CSVs under `internal/`, their key cells still say `;` — convert them in
+    the same commit that takes this parser change, or hold the whole step
+    back until you can; a half-applied step strands your committed rows at
+    parse time. K14 (value-form conformance sweep) is groomed producer-side
+    and ports as backlog only.
+
 ACCEPTANCE GATE (behavior is the contract, not a byte-compare):
 - Track 1 (portable):
     poetry run pytest tests/unit/test_variable_classifier.py tests/unit/test_variable_resolver.py \

@@ -137,7 +137,7 @@ def manual_fixture(tmp_path: Path) -> dict[str, Path]:
         "create_target_if_missing,note,authored_by,authored_on"
     )
     row = (
-        "ControlMJob,folder_id=F0001;job_id={job},WAS_ASSOCIATED_WITH,"
+        "ControlMJob,folder_id=F0001:job_id={job},WAS_ASSOCIATED_WITH,"
         "role=seal_app_ref,BusinessApplication,seal_id=APP-9876,{create},"
         "{note},steward01,2026-07-18"
     )
@@ -428,7 +428,7 @@ def test_is_current_tracks_source_edits(manual_fixture, tmp_path: Path):
 
     with manual_fixture["csv"].open("a", encoding="utf-8", newline="") as fh:
         fh.write(
-            "ControlMJob,folder_id=F0001;job_id=J0004,WAS_ASSOCIATED_WITH,"
+            "ControlMJob,folder_id=F0001:job_id=J0004,WAS_ASSOCIATED_WITH,"
             "role=seal_app_ref,BusinessApplication,seal_id=APP-9876,false,"
             "added after build,steward01,2026-07-18\n"
         )

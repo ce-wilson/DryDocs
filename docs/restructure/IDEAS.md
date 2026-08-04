@@ -26,20 +26,16 @@ Tags help grooming: `idea` · `bug` · `doc` · `source` (new data source) · `q
 
 <!-- add new ideas at the top -->
 
-- 2026-08-03 — [question] **Composite-key grammar: `k=v;k=v` vs the SME's `ctlm_id` dot
-  form — a K8 rider, decided now or never cheap again.** The manual-loads key cells use the
-  K2-era `field=value;field=value` grammar (`_parse_key` in
-  `drydocs_core/manual_mappings.py`); the SME's own psgmgr convention (VERIFIED still live
-  2026-08-03) is the DOT composite `ctlm_id = folder_id.job_id` (e.g. `161015.7`) —
-  `controlm_dependencies_recursive.sql` builds it, `drydocs_core/models/controlm.py`
-  documents it, the P2 gate §B join prefers it. K9 deliberately kept the k=v grammar
-  verbatim (its rekey changed WHICH fields, not the syntax). The clean reconciliation is
-  the 2026-07-14 ripple idea's point (2), one page down: `source_key` accepts
-  `ctlm_id=<id>` as shorthand — the cell stays self-describing k=v (order-independent
-  across label key shapes, no separator collision with dotted/coloned values) while the
-  VALUE is the SME's dot composite. If any grammar change is wanted, K8 is the moment:
-  zero manual CSVs are committed (`manifest files: []`), so it is template + `_parse_key` +
-  `draft_changeset` with no data migration — afterwards every committed CSV pins it.
+- 2026-08-03 — ~~[question] Composite-key grammar~~ **RULED BY THE SME SAME DAY, built at
+  the groom.** Two rulings: (1) the `ctlm_id` DOT composite (`folder_id.job_id`, e.g.
+  `161015.7` — the psgmgr convention, P2 gate §B precedent) IS the standard for serialized
+  job identity; (2) key-cell pairs join with **`:` not `;`** — the semicolon is the SQL
+  statement terminator and these cells travel beside SQL. Captured as
+  `knowledge/standards/technology/composite-key-serialization.md`; `_parse_key` flipped to
+  `:` in the same session (zero manual CSVs committed = the free migration window, taken);
+  the value-form conformance sweep is backlog **K14**. The 2026-07-14 ripple idea below
+  stays open for its points (1) and (3); its point (2) `ctlm_id=<id>` shorthand is recorded
+  in the standard as compatible-by-construction.
 
 - 2026-08-03 — [chore] **The G51 tail landed pre-groom — needs a retrospective close, and it
   carries ONE company consequence the next port must not be surprised by.** G51 provisioned

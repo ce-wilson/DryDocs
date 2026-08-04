@@ -48,7 +48,7 @@ def _repo(
     csv_path = csv_dir / "batch1-mappings.csv"
     csv_path.write_text(
         CSV_HEADER + "\n"
-        "ControlMJob,folder_id=900001;job_id=3,WAS_ASSOCIATED_WITH,"
+        "ControlMJob,folder_id=900001:job_id=3,WAS_ASSOCIATED_WITH,"
         "role=seal_app_ref,BusinessApplication,seal_id=SL0001,false,"
         "synthetic test row,tester0001,2026-07-14\n",
         encoding="utf-8",
@@ -141,7 +141,7 @@ def test_csv_naming_an_unregistered_relationship_is_refused(tmp_path: Path) -> N
     manifest_path, csv_path = _repo(tmp_path)
     csv_path.write_text(
         CSV_HEADER + "\n"
-        "ControlMJob,folder_id=900001;job_id=3,MADE_UP_REL,role=seal_app_ref,"
+        "ControlMJob,folder_id=900001:job_id=3,MADE_UP_REL,role=seal_app_ref,"
         "BusinessApplication,seal_id=SL0001,false,x,tester0001,2026-07-14\n",
         encoding="utf-8",
     )
@@ -158,8 +158,8 @@ def test_unsupported_shape_is_refused_loudly(tmp_path: Path) -> None:
         CSV_HEADER + "\n"
         # WAS_INFORMED_BY is registered (so the vocab check passes) but is
         # not the supported manual-writer shape.
-        "ControlMJob,folder_id=900001;job_id=3,WAS_INFORMED_BY,role=,"
-        "ControlMJob,folder_id=900001;job_id=4,false,x,tester0001,2026-07-14\n",
+        "ControlMJob,folder_id=900001:job_id=3,WAS_INFORMED_BY,role=,"
+        "ControlMJob,folder_id=900001:job_id=4,false,x,tester0001,2026-07-14\n",
         encoding="utf-8",
     )
     with pytest.raises(ManualLoadError, match="unsupported shape"):
@@ -197,7 +197,7 @@ def test_create_target_flag_parses_truthy_strings(tmp_path: Path) -> None:
     manifest_path, csv_path = _repo(tmp_path)
     csv_path.write_text(
         CSV_HEADER + "\n"
-        "ControlMJob,folder_id=900001;job_id=3,WAS_ASSOCIATED_WITH,"
+        "ControlMJob,folder_id=900001:job_id=3,WAS_ASSOCIATED_WITH,"
         "role=seal_app_ref,BusinessApplication,seal_id=SL0001,TRUE,x,tester0001,2026-07-14\n",
         encoding="utf-8",
     )

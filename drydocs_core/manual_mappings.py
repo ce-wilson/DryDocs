@@ -116,9 +116,16 @@ def relationship_registered(
 
 
 def _parse_key(raw: str, column: str, line_no: int) -> dict[str, str]:
-    """Parse 'k=v;k=v' key columns from the template CSV."""
+    """Parse 'k=v:k=v' key columns from the template CSV.
+
+    Separator ruled by the SME 2026-08-03 (composite-key serialization
+    standard, knowledge/standards/technology/composite-key-serialization.md):
+    pairs join with ':' — NOT ';', which is the SQL statement terminator and
+    these cells travel beside SQL. Constraint that makes it safe: key VALUES
+    are identifiers and never contain ':'; the dot-composite ctlm_id form
+    (folder_id.job_id) is compatible by design."""
     pairs: dict[str, str] = {}
-    for part in (raw or "").split(";"):
+    for part in (raw or "").split(":"):
         part = part.strip()
         if not part:
             continue

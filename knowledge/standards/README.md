@@ -58,6 +58,7 @@ Data" layers):
 | [data-center-naming-convention](technology/data-center-naming-convention.md) | `…/control-m/data-center` | `ControlMServer.data_center` — DC name encodes the default execution time (EST) | active |
 | [description-field-metadata-plan](technology/description-field-metadata-plan.md) | `…/control-m/job` | `ControlMJob.description` — repurposed as pipe-delimited key:value metadata | 🔵 planned |
 | [calendar-resolution-projection-plan](technology/calendar-resolution-projection-plan.md) | `…/control-m/calendar` | `ControlMJob.schedule` — resolve calendars to project when jobs run | 🔵 planned |
+| [composite-key-serialization](technology/composite-key-serialization.md) | `…/control-m/identity` | `ctlm_id = folder_id.job_id` dot composite + `field=value:field=value` key-cell grammar (SME 2026-08-03) | active |
 
 ### business/  ·  data/
 Placeholders — no standards captured yet. See each domain's README for what belongs there.
