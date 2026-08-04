@@ -42,9 +42,17 @@ CREATE CONSTRAINT product_id          IF NOT EXISTS FOR (p:Product)             
 // SHOW CONSTRAINTS and in the text of every uniqueness-violation error).
 CREATE CONSTRAINT businessapplication_app_id  IF NOT EXISTS FOR (a:BusinessApplication)         REQUIRE a.app_id IS UNIQUE;
 CREATE CONSTRAINT businessapplication_seal    IF NOT EXISTS FOR (a:BusinessApplication)         REQUIRE a.seal_id IS UNIQUE;
-CREATE INDEX      businessapplication_status  IF NOT EXISTS FOR (a:BusinessApplication)         ON  (a.status);
-CREATE INDEX      businessapplication_risk    IF NOT EXISTS FOR (a:BusinessApplication)         ON  (a.risk_level);
-CREATE INDEX      businessapplication_name    IF NOT EXISTS FOR (a:BusinessApplication)         ON  (a.name);
+// G36 (2026-08-04): the former status/risk_level/name indexes are DROPPED, not just
+// no longer created — a declared index reads as a claim the property is a predicate,
+// and none of the three ever was (SET clauses and RETURN projections only; the one
+// name-bind is the single-node SchemaMeta bootstrap MERGE). Every real bind goes
+// through app_id/seal_id, already backed by the UNIQUE constraints above. The two
+// genuine non-key predicates — manually_created (post-load count) and
+// batch_orchestrator_last_run_id (per-run report) — stay UNindexed on purpose:
+// registry cardinality makes a label scan sub-millisecond, and both run offline.
+DROP INDEX businessapplication_status IF EXISTS;
+DROP INDEX businessapplication_risk   IF EXISTS;
+DROP INDEX businessapplication_name   IF EXISTS;
 
 // Two-port pattern: each Application has exactly one EventProcessing and one
 // BatchProcessing child. Composite uniqueness on (parent_app_id, kind) lets
