@@ -1,16 +1,16 @@
 {
   "meta": {
     "project": "drydocs",
-    "captured_at": "2026-08-04T09:03:52",
+    "captured_at": "2026-08-04T09:20:18",
     "date": "20260804",
     "scan": "DryDocs",
     "tree": true,
     "git": {
-      "commit": "804b239",
-      "full": "804b2390954014c4edd6bae1eacae27520f58844",
+      "commit": "94a1600",
+      "full": "94a1600eccef25fe557c1d047747c82d73e7cc66",
       "branch": "main",
-      "describe": "804b239",
-      "subject": "feat(mappings): K11 done — the steward cascade (§G act) + the §G1 confirmed orchestrator edge; step 66 ledgered",
+      "describe": "94a1600",
+      "subject": "docs(ontology): K13 done — catalog_has_application reconciled to the §G6 support reading; step 67 ledgered",
       "dirty": false,
       "pr": null
     },
@@ -12344,10 +12344,10 @@
       "kind": "file"
     },
     {
-      "file_id": "drydocs/knowledge/depgraph-snapshots/drydocs-20260804-0811.json",
-      "name": "drydocs-20260804-0811.json",
+      "file_id": "drydocs/knowledge/depgraph-snapshots/drydocs-20260804.json",
+      "name": "drydocs-20260804.json",
       "extension": ".json",
-      "rel_path": "knowledge/depgraph-snapshots/drydocs-20260804-0811.json",
+      "rel_path": "knowledge/depgraph-snapshots/drydocs-20260804.json",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -24558,7 +24558,7 @@
     [
       "drydocs/knowledge/depgraph-snapshots",
       "CONTAINS",
-      "drydocs/knowledge/depgraph-snapshots/drydocs-20260804-0811.json"
+      "drydocs/knowledge/depgraph-snapshots/drydocs-20260804.json"
     ],
     [
       "drydocs/knowledge/depgraph-snapshots",
