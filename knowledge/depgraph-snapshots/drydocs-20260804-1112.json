@@ -1,16 +1,16 @@
 {
   "meta": {
     "project": "drydocs",
-    "captured_at": "2026-08-04T10:27:00",
+    "captured_at": "2026-08-04T11:12:57",
     "date": "20260804",
     "scan": "DryDocs",
     "tree": true,
     "git": {
-      "commit": "3917f3e",
-      "full": "3917f3eb737f2d2ecd17aabcc87c863e6000440b",
+      "commit": "d9d4da6",
+      "full": "d9d4da621e0dabafb34f9a8a89116cf24994f761",
       "branch": "main",
-      "describe": "3917f3e",
-      "subject": "feat(guards): J-series close-out — J18 venue convention, J26 text-guard sweep, J27 gitignore reword, J28 gate classifier; step 71 ledgered",
+      "describe": "d9d4da6",
+      "subject": "feat(ontology): M3+M4 done — both doc-06 envelope gates SIGNED in-chat; four ruled stubs, dct property-term bindings; step 72 ledgered",
       "dirty": false,
       "pr": null
     },
@@ -6566,6 +6566,15 @@
       "kind": "file"
     },
     {
+      "file_id": "drydocs/config/gate-prompts/audit-envelope-phase4.yaml",
+      "name": "audit-envelope-phase4.yaml",
+      "extension": ".yaml",
+      "rel_path": "config/gate-prompts/audit-envelope-phase4.yaml",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
       "file_id": "drydocs/config/gate-prompts/autosys-crosswalk.yaml",
       "name": "autosys-crosswalk.yaml",
       "extension": ".yaml",
@@ -6651,6 +6660,15 @@
       "name": "email-dl-contact-point.yaml",
       "extension": ".yaml",
       "rel_path": "config/gate-prompts/email-dl-contact-point.yaml",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/config/gate-prompts/envelope-property-terms.yaml",
+      "name": "envelope-property-terms.yaml",
+      "extension": ".yaml",
+      "rel_path": "config/gate-prompts/envelope-property-terms.yaml",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -12308,10 +12326,10 @@
       "kind": "file"
     },
     {
-      "file_id": "drydocs/knowledge/depgraph-snapshots/drydocs-20260804-1005.json",
-      "name": "drydocs-20260804-1005.json",
+      "file_id": "drydocs/knowledge/depgraph-snapshots/drydocs-20260804.json",
+      "name": "drydocs-20260804.json",
       "extension": ".json",
-      "rel_path": "knowledge/depgraph-snapshots/drydocs-20260804-1005.json",
+      "rel_path": "knowledge/depgraph-snapshots/drydocs-20260804.json",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -12843,6 +12861,24 @@
       "name": "README.md",
       "extension": ".md",
       "rel_path": "reference/standards/README.md",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/reference/standards/dcmi-terms",
+      "name": "dcmi-terms",
+      "extension": "",
+      "rel_path": "reference/standards/dcmi-terms",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "dir"
+    },
+    {
+      "file_id": "drydocs/reference/standards/dcmi-terms/README.md",
+      "name": "README.md",
+      "extension": ".md",
+      "rel_path": "reference/standards/dcmi-terms/README.md",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -16582,6 +16618,10 @@
       "drydocs/drydocs_api/query_specs.py"
     ],
     [
+      "drydocs/tests/unit/test_audit_fields.py",
+      "drydocs/drydocs_core/ontology/namespaces.py"
+    ],
+    [
       "drydocs/tests/unit/test_base_loader_smoke.py",
       "drydocs/drydocs/loaders/base.py"
     ],
@@ -17551,6 +17591,21 @@
       "drydocs",
       "CONTAINS",
       "drydocs/SDLC-Docs"
+    ],
+    [
+      "drydocs",
+      "CONTAINS",
+      "drydocs/SEAL-EXAMPLE-DATES-LEGACY-DECOM.png"
+    ],
+    [
+      "drydocs",
+      "CONTAINS",
+      "drydocs/SEAL-EXAMPLE-DATES-LEGACY.png"
+    ],
+    [
+      "drydocs",
+      "CONTAINS",
+      "drydocs/SEAL-EXAMPLE-DATES.png"
     ],
     [
       "drydocs",
@@ -21410,6 +21465,11 @@
     [
       "drydocs/config/gate-prompts",
       "CONTAINS",
+      "drydocs/config/gate-prompts/audit-envelope-phase4.yaml"
+    ],
+    [
+      "drydocs/config/gate-prompts",
+      "CONTAINS",
       "drydocs/config/gate-prompts/autosys-crosswalk.yaml"
     ],
     [
@@ -21456,6 +21516,11 @@
       "drydocs/config/gate-prompts",
       "CONTAINS",
       "drydocs/config/gate-prompts/email-dl-contact-point.yaml"
+    ],
+    [
+      "drydocs/config/gate-prompts",
+      "CONTAINS",
+      "drydocs/config/gate-prompts/envelope-property-terms.yaml"
     ],
     [
       "drydocs/config/gate-prompts",
@@ -24540,7 +24605,7 @@
     [
       "drydocs/knowledge/depgraph-snapshots",
       "CONTAINS",
-      "drydocs/knowledge/depgraph-snapshots/drydocs-20260804-1005.json"
+      "drydocs/knowledge/depgraph-snapshots/drydocs-20260804.json"
     ],
     [
       "drydocs/knowledge/depgraph-snapshots",
@@ -24785,6 +24850,11 @@
     [
       "drydocs/reference/standards",
       "CONTAINS",
+      "drydocs/reference/standards/dcmi-terms"
+    ],
+    [
+      "drydocs/reference/standards",
+      "CONTAINS",
       "drydocs/reference/standards/dprod-ekgf"
     ],
     [
@@ -24801,6 +24871,11 @@
       "drydocs/reference/standards",
       "CONTAINS",
       "drydocs/reference/standards/w3c-org"
+    ],
+    [
+      "drydocs/reference/standards/dcmi-terms",
+      "CONTAINS",
+      "drydocs/reference/standards/dcmi-terms/README.md"
     ],
     [
       "drydocs/reference/standards/dprod-ekgf",
@@ -26272,13 +26347,13 @@
     "projects": [
       "drydocs"
     ],
-    "files": 1468,
-    "edges": 477,
+    "files": 1471,
+    "edges": 478,
     "circular_files": 0,
     "processes": 0,
     "data_assets": 0,
     "hosts": 0,
-    "rels": 1761,
-    "directories": 256
+    "rels": 1768,
+    "directories": 257
   }
 }
