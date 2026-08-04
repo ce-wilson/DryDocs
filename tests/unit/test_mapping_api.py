@@ -460,6 +460,17 @@ def test_draft_app_code_mapping_fails_closed(sessions, app_code_store, bad):
         draft_app_code_mapping(bad, token, sessions, app_code_store)
 
 
+def test_app_code_draft_route_is_wired():
+    """K11: the K9 pure handler is actually SERVED — /mappings/app-code/draft
+    was built at K9 but never routed in app.py, which is exactly the gap the
+    steward cascade pane found when it tried to submit."""
+    pytest.importorskip("fastapi", reason="fastapi not installed")
+    from drydocs_api.app import create_app
+
+    app = create_app(runner=object(), store=InMemorySessionStore())
+    assert "/mappings/app-code/draft" in {getattr(r, "path", None) for r in app.routes}
+
+
 def test_app_code_endpoints_refuse_user_role(sessions, app_code_store):
     token = _token(sessions, "jdoe4821")
     with pytest.raises(Forbidden):

@@ -10,7 +10,7 @@ import { createApiClient, readDetail, type ApiClient } from './graphApi'
 export interface MappingDomain {
   id: string
   title: string
-  kind: 'quintuple' | 'manual' | 'override'
+  kind: 'quintuple' | 'manual' | 'override' | 'defined'
   source: string
   tier: number | null
   available: boolean
@@ -74,12 +74,36 @@ export interface CorrectionsReport {
   generated_by: string
 }
 
+// K9/K11 — the K7 defined-mapping store (app-code -> application). Drafting
+// returns the COMPLETE updated committed file (commit-by-replace, O24
+// mechanics); validation is the store's own rule set server-side, so an
+// artifact can never be refused at materialization. authored_by is
+// server-stamped from the session — never sent from here.
+export interface AppCodeEntry {
+  app_code: string
+  tier: 'seal-born' | 'platform' | 'dual-coded'
+  app_id?: string
+  folder_id?: string
+  declared_end_state?: string
+  origin?: 'defined' | 'override'
+  rationale?: string
+}
+
+export interface AppCodeArtifact {
+  filename: string
+  csv: string
+  entries: number
+  total_rows: number
+  note: string
+}
+
 export interface MappingsApi {
   domains(): Promise<MappingDomain[]>
   grid(domainId: string): Promise<MappingGrid>
   options(): Promise<MappingOptions>
   draftChangeset(entries: DraftEntry[]): Promise<ChangesetArtifact>
   draftOverride(entries: OverrideEntry[]): Promise<OverrideArtifact>
+  draftAppCode(entries: AppCodeEntry[]): Promise<AppCodeArtifact>
   correctionsReport(): Promise<CorrectionsReport>
 }
 
@@ -117,6 +141,12 @@ export function createMappingsApi(baseUrl: string, personaId: string): MappingsA
       return json<OverrideArtifact>(
         await client.authedPost('/mappings/overrides/draft', { entries }),
         'mappings/overrides/draft',
+      )
+    },
+    async draftAppCode(entries) {
+      return json<AppCodeArtifact>(
+        await client.authedPost('/mappings/app-code/draft', { entries }),
+        'mappings/app-code/draft',
       )
     },
     async correctionsReport() {

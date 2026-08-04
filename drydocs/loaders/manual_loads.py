@@ -113,6 +113,13 @@ class ManualSealAttributionLoader(BaseLoader):
     row_model: ClassVar[type] = ManualMappingRow
     source_label: ClassVar[str] = "human"
 
+    def extra_cypher_params(self) -> dict[str, Any]:
+        # §G1 (K11): a manual pin confirms the mapping, so it authors the
+        # same orchestrator USES_SOFTWARE edge as the automated loader.
+        from .folder_attribution import orchestrator_product_ref
+
+        return {"orchestrator_product_id": orchestrator_product_ref()}
+
     def load(self):
         summary = super().load()
         result = self.client.run(

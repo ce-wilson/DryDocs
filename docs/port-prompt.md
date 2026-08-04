@@ -598,6 +598,43 @@ verification status in [BRACKETS]; spend review on [UNRULED].
     FIRST, or hold this step with step 63. `EXPECTED_CONSTRAINTS` does not
     move. Producer suite 1399→1403.
 
+66. K11 — STEWARD MAPPING CASCADE + THE §G1 ORCHESTRATOR-EDGE AUTHORING
+    [TOUCHES YOUR TWO app_codes WRITERS AGAIN]. The K7 gate's §G act built
+    end to end. Web: `AppCodeCascadePane.tsx` (new, clean add) on `/mappings`
+    domain `app-code-mapping` — orchestrator-first cascade, unmapped-only
+    folder queue, run_as_user sort, mandatory rationale, lifecycle chips as
+    confirmation provenance (§G7); `MappingsRoute.tsx` wires the branch;
+    `mappingsApi.ts` gains `draftAppCode` → `POST /mappings/app-code/draft`
+    — a route K9's handler NEVER HAD (`app.py`; route-presence test added).
+    LOADER SIDE IS THE PART THAT TOUCHES YOU: both attribution writers
+    (`folder_attribution.cypher`, `manual_seal_attribution.cypher`) now
+    AUTHOR `(:BusinessApplication)-[:USES_SOFTWARE {source:
+    'app-code-mapping', origin: 'confirmed'}]->(:SoftwareProduct)` when a
+    folder edge lands (§G1 — one mechanism with the K10 port confirmation;
+    FOREACH-guarded on registry presence, shortfall stamped as
+    `JobRun.orchestrator_edges` + warned). The orchestrator ref comes from
+    `platforms.yaml` (`controlm`) via a NEW `BaseLoader.extra_cypher_params`
+    hook — if you subclass BaseLoader with a custom `_flush`, merge the
+    hook. `batch_port_orchestrator.cypher` stamps `origin =
+    coalesce(u.origin, 'declared')` (§G2). Four new QuerySpecs
+    (`mappings.catalog-cascade/orchestrators/app-orchestrators/
+    unmapped-folders.v1`); suite TC-12 (confirmed-edge two-way agreement).
+    ***YOUR SIDE:*** (a) your `controlm_app_codes.cypher` + AutoSys twin are
+    now superseded TWICE over (boolean flip at step 65, orchestrator
+    authoring here) — retiring them into the folder-attribution path is the
+    clean end state; (b) TC-12 reds a confirmed app with an
+    'app-code-mapping' edge but no confirmed Batch port — sequence with the
+    steps 63/65 migrations; (c) `mappings.catalog-cascade.v1` binds
+    HAS_APPLICATION, which is ACTIVE on your side (G6 ruled the COMPANY
+    reading) — your cascade picker goes live immediately, no K13 wait; (d)
+    the AutoSys twin domain slots in per §G by adding its own platforms.yaml
+    ref + attribution loaders — the pane's orchestrator picker already
+    renders it. `EXPECTED_CONSTRAINTS` does not move. Producer suite
+    1403→1410 (+7); web build + oxlint clean. NOTE the legacy finding
+    (inboxed, no item yet): `mappings.attribution-coverage.v1` still reads
+    the RETIRED job-grain edge — the job-application pane is legacy on both
+    sides after step 63.
+
 ACCEPTANCE GATE (behavior is the contract, not a byte-compare):
 - Track 1 (portable):
     poetry run pytest tests/unit/test_variable_classifier.py tests/unit/test_variable_resolver.py \
@@ -614,11 +651,11 @@ ACCEPTANCE GATE (behavior is the contract, not a byte-compare):
   capability_assert=false skips per T18). A retired-id refusal from
   `SourceRegistry.from_yaml` is the D4 guard WORKING, not a port failure — rebind the
   loader in `loader-source-overlay.yaml`, never by re-adding the retired id.
-  Producer reference at the current head (step 65, the K10 build): 1403
+  Producer reference at the current head (step 66, the K11 build): 1410
   passed / 5 skipped with the production CSV PRESENT and no
   RECONCILE_BEFORE_DIR (4 J7 guards + the graphrag PDF) — the like-for-like
   chain: step 58 1356/5 → step 61 1384/5 (+28 K9 guards) → step 63 1399/5
-  (+15 K8) → step 65 1403/5 (+4 K10). The
+  (+15 K8) → step 65 1403/5 (+4 K10) → step 66 1410/5 (+7 K11). The
   step-60 figure (1354 / 7) was CSV-ABSENT without RECONCILE_BEFORE_DIR and is
   not comparable line-for-line; `aa0a0eb`'s commit message quotes 1358 / 3,
   which is the step-59 run with RECONCILE_BEFORE_DIR set. Earlier producer

@@ -78,6 +78,41 @@ MATCH_METHOD_BY_ORIGIN: dict[str, str] = {
 AUTHORED_SOURCE = "config/overrides/app-code-mappings.csv"
 FALLBACK_SOURCE = "controlm-variable-normalization"
 
+# §G1 (K11): the confirmed mapping act authors the app -> orchestrator
+# USES_SOFTWARE edge. This module IS the Control-M attribution domain (§G:
+# AutoSys drops in as a SIBLING domain with its own loaders), so the
+# orchestrator is a per-domain constant — resolved from the C12-confirmed
+# platforms taxonomy, never hardcoded in Cypher.
+ORCHESTRATOR_PLATFORM_ID = "controlm"
+
+
+def orchestrator_product_ref(
+    platform_id: str = ORCHESTRATOR_PLATFORM_ID,
+    platforms_path: Path | None = None,
+) -> str:
+    """The domain orchestrator's software-registry product id, from
+    config/taxonomy/platforms.yaml (the C12 crosswalk seed rows). Raises if
+    the row or its ref is missing — an attribution domain without an
+    orchestrator ref cannot honor §G1, so this fails loudly at wiring time
+    rather than silently skipping the edge forever."""
+    import yaml
+
+    if platforms_path is None:
+        from .batch_port_orchestrator import DEFAULT_PLATFORMS_PATH
+
+        platforms_path = DEFAULT_PLATFORMS_PATH
+    doc = yaml.safe_load(Path(platforms_path).read_text(encoding="utf-8"))
+    for row in doc.get("platforms", []):
+        if row.get("id") == platform_id:
+            ref = row.get("software_registry_ref")
+            if ref:
+                return str(ref)
+            raise ValueError(
+                f"platforms.yaml row '{platform_id}' has no software_registry_ref "
+                "— the §G1 orchestrator edge cannot be authored without it"
+            )
+    raise ValueError(f"platforms.yaml has no platform row '{platform_id}'")
+
 
 # ---------------------------------------------------------------------------
 # Coverage report (report, never drop — the K2 §B doctrine at folder grain)
@@ -364,6 +399,11 @@ class FolderAttributionLoader(BaseLoader):
     row_model: ClassVar[type] = FolderAttributionRow
     source_label: ClassVar[str] = "csv"  # 'oracle' when the fallback feed is live
 
+    def extra_cypher_params(self) -> dict[str, Any]:
+        # §G1 (K11): the domain orchestrator ref for the confirmed
+        # USES_SOFTWARE authoring — a per-domain constant, not a row value.
+        return {"orchestrator_product_id": orchestrator_product_ref()}
+
     def load(self):
         summary = super().load()
         coverage = getattr(self.adapter, "coverage", None)
@@ -381,6 +421,9 @@ class FolderAttributionLoader(BaseLoader):
             OPTIONAL MATCH (:ControlMFolder)-[r:BELONGS_TO_APPLICATION {role: 'seal_app_ref'}]->(:Port)
               WHERE r.last_run_id = $run_id
             WITH run, count(r) AS edges_written
+            OPTIONAL MATCH (:BusinessApplication)-[u:USES_SOFTWARE {source: 'app-code-mapping'}]->(:SoftwareProduct)
+              WHERE u.last_run_id = $run_id
+            WITH run, edges_written, count(u) AS orchestrator_edges
             SET run.eligible_folders   = $eligible_folders,
                 run.attributed         = $attributed,
                 run.unmatched          = $unmatched,
@@ -388,8 +431,9 @@ class FolderAttributionLoader(BaseLoader):
                 run.conflict_count     = $conflict_count,
                 run.pin_conflict_count = $pin_conflict_count,
                 run.edges_written      = edges_written,
+                run.orchestrator_edges = orchestrator_edges,
                 run.dropped_in_graph   = $attributed - edges_written
-            RETURN edges_written
+            RETURN edges_written, orchestrator_edges
             """,
             run_id=self.run_id,
             eligible_folders=coverage.eligible_folders,
@@ -407,6 +451,17 @@ class FolderAttributionLoader(BaseLoader):
                     "(folder or BatchProcessing Port missing) — surfaced as "
                     "JobRun.dropped_in_graph, follow up via the coverage suite.",
                     dropped,
+                )
+            # §G1: attribution landed but no orchestrator edge did — the
+            # software registry (product ref from platforms.yaml) is not in
+            # this graph. Reported, never silent.
+            if result[0].get("edges_written", 0) and not result[0].get("orchestrator_edges", 0):
+                LOGGER.warning(
+                    "folder_attribution: attribution edges landed but NO "
+                    "orchestrator USES_SOFTWARE edge was authored — the "
+                    "'%s' SoftwareProduct is not loaded (run "
+                    "load-software-registry first).",
+                    orchestrator_product_ref(),
                 )
 
 

@@ -14,6 +14,7 @@ import type { SpecResult } from '../lib/graph'
 import { DEMO_COVERAGE, DEMO_OVERRIDE_GRID, type CoverageRow, type OverrideGridRow } from '../data/mappingsDemo'
 import ModuleToolbar from '../layout/ModuleToolbar'
 import EmptyState from '../components/ui/EmptyState'
+import AppCodeCascadePane from './AppCodeCascadePane'
 
 // /mappings — the O13 manual-mapping stewardship screen (wf-mapping-01).
 // Steward + admin only (server-enforced too — /mappings/* returns 403 below
@@ -49,6 +50,7 @@ const FALLBACK_DOMAINS: MappingDomain[] = [
   { id: 'fid-seal', title: 'FID → app_id (tier 2)', kind: 'manual', source: '(K6/T2 — reconciler table not built yet)', tier: 2, available: false },
   { id: 'alias-seal', title: 'ALIAS → app_id (tier 4)', kind: 'manual', source: '(T3 — reconciler table not built yet)', tier: 4, available: false },
   { id: 'seal-contact-override', title: 'SEAL contacts — operate-manager override list (L1/L2)', kind: 'override', source: 'config/overrides/seal-contact-overrides.csv', tier: null, available: true },
+  { id: 'app-code-mapping', title: 'App code → Application (the K7 defined-mapping store)', kind: 'defined', source: 'config/overrides/app-code-mappings.csv', tier: null, available: true },
 ]
 
 function trayStorageKey(personaId: string): string {
@@ -451,6 +453,14 @@ export default function MappingsRoute({ persona }: { persona: Persona }) {
               access={access}
               grid={domainGrid}
               apiDown={apiDown}
+            />
+          ) : activeDomain === 'app-code-mapping' ? (
+            <AppCodeCascadePane
+              mappings={mappings}
+              access={access}
+              grid={domainGrid}
+              apiDown={apiDown}
+              personaId={persona.id}
             />
           ) : (
             <>

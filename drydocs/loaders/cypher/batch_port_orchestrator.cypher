@@ -48,7 +48,12 @@ FOREACH (_ IN CASE WHEN sp IS NOT NULL THEN [1] ELSE [] END |
     ON CREATE SET u.first_seen_at = datetime($loaded_at),
                   u.status        = 'active',
                   u.loader        = $loader
-  SET u.orchestrator_raw = row.orchestrator_raw,
+  // §G2 (gate seal-app-ref-edge-reshape, 2026-08-03): this edge is the SEAL
+  // DECLARATION, kept origin=declared — a steward confirmation supersedes it
+  // by authoring its own {source: 'app-code-mapping', origin: 'confirmed'}
+  // edge (folder_attribution.cypher); no cleanup sweep, nothing overwritten.
+  SET u.origin           = coalesce(u.origin, 'declared'),
+      u.orchestrator_raw = row.orchestrator_raw,
       u.last_seen_at     = datetime($loaded_at),
       u.last_run_id      = $run_id
 )

@@ -279,17 +279,24 @@ def test_adapter_authored_only_run_needs_no_fact_source() -> None:
 def test_automated_cypher_creates_no_nodes_and_targets_the_batch_port() -> None:
     text = AUTOMATED_CYPHER.read_text(encoding="utf-8")
     code = "\n".join(line for line in text.splitlines() if not line.strip().startswith("//"))
-    merges = [line for line in code.splitlines() if "MERGE" in line]
-    assert len(merges) == 1, "the automated path MERGEs exactly one thing: the edge"
-    assert "MERGE (f)-[r:BELONGS_TO_APPLICATION {role: 'seal_app_ref'}]->(p)" in code
+    merges = [line.strip() for line in code.splitlines() if "MERGE" in line]
+    # §C1 + §G1 (K11): exactly two MERGEs, both EDGES — the attribution edge
+    # and the orchestrator USES_SOFTWARE edge the confirmed mapping authors.
+    # The automated path still creates NO nodes (every endpoint is MATCHed).
+    assert merges == [
+        "MERGE (f)-[r:BELONGS_TO_APPLICATION {role: 'seal_app_ref'}]->(p)",
+        "MERGE (a)-[u:USES_SOFTWARE {source: 'app-code-mapping'}]->(sp)",
+    ]
     assert "MATCH (f:ControlMFolder {folder_id: row.folder_id})" in code
-    # §C1: the target is the application's BatchProcessing Port, key
-    # (parent_app_id, kind) — never :BusinessApplication.
+    # §C1: the attribution target is the application's BatchProcessing Port,
+    # key (parent_app_id, kind) — never :BusinessApplication. The app node
+    # appears exactly once, as the §G1 orchestrator edge's MATCHed source.
     assert (
         "MATCH (p:Port:BatchProcessing {parent_app_id: row.app_id, kind: 'BatchProcessing'})"
         in code
     )
-    assert "BusinessApplication" not in code
+    assert code.count("BusinessApplication") == 1
+    assert "MATCH (a:BusinessApplication {app_id: row.app_id})" in code
 
 
 def test_automated_cypher_on_create_set_split_carries_the_origin_flag() -> None:
@@ -402,3 +409,92 @@ def test_loader_class_wiring() -> None:
     assert FolderAttributionLoader.row_model is FolderAttributionRow
     assert FolderAttributionLoader.cypher_path is not None
     assert FolderAttributionLoader.cypher_path.exists()
+
+
+# --- K11 §G1/§G2 — the confirmed orchestrator edge --------------------------------
+
+BATCH_PORT_CYPHER = REPO_ROOT / "drydocs" / "loaders" / "cypher" / "batch_port_orchestrator.cypher"
+
+
+def test_orchestrator_product_ref_resolves_from_the_platforms_taxonomy() -> None:
+    """§G1: the domain orchestrator is a per-domain constant resolved from the
+    C12-confirmed platforms taxonomy — never hardcoded in Cypher; an unknown
+    platform id fails loudly at wiring time."""
+    from drydocs.loaders.folder_attribution import orchestrator_product_ref
+
+    assert orchestrator_product_ref() == "controlm"
+    with pytest.raises(ValueError):
+        orchestrator_product_ref("no-such-platform")
+
+
+def test_attribution_cyphers_author_the_confirmed_orchestrator_edge() -> None:
+    """§G1 (K11): BOTH edge writers author the app -> orchestrator
+    USES_SOFTWARE edge when a folder edge lands — created BY the confirmed
+    mapping, keyed {source: 'app-code-mapping'} so it coexists with the
+    declared 'batch-port' edge, origin/confirmation stamps set ON CREATE
+    only, FOREACH-guarded so an absent registry skips (reported by the
+    loader) rather than erroring."""
+    for path in (AUTOMATED_CYPHER, MANUAL_CYPHER):
+        code = _code_lines(path)
+        assert "MERGE (a)-[u:USES_SOFTWARE {source: 'app-code-mapping'}]->(sp)" in code, path.name
+        assert "$orchestrator_product_id" in code, path.name
+        on_create = code.split("MERGE (a)-[u:USES_SOFTWARE", 1)[1].split("SET u.last_seen_at", 1)[0]
+        assert "u.origin        = 'confirmed'" in on_create, path.name
+        assert "u.confirmed_by" in on_create and "u.confirmed_at" in on_create, path.name
+        assert "FOREACH (_ IN CASE WHEN sp IS NOT NULL THEN [1] ELSE [] END |" in code, path.name
+
+
+def test_batch_port_declared_edges_carry_the_g2_origin() -> None:
+    """§G2: the SEAL-declared 'batch-port' edge is KEPT origin='declared'
+    (prefill only) — coalesce so a re-run never overwrites, and this writer
+    never writes 'confirmed'."""
+    code = _code_lines(BATCH_PORT_CYPHER)
+    assert "u.origin           = coalesce(u.origin, 'declared')" in code
+    assert "'confirmed'" not in code
+
+
+def test_attribution_loaders_supply_the_orchestrator_param() -> None:
+    """Both attribution writers pass the §G1 domain constant into their
+    templates via the extra_cypher_params hook (per-domain constant, not a
+    row value)."""
+    from drydocs.loaders.base import BaseLoader
+    from drydocs.loaders.manual_loads import ManualSealAttributionLoader
+
+    # The hook reads no instance state, so calling it unbound is safe here.
+    expected = {"orchestrator_product_id": "controlm"}
+    assert FolderAttributionLoader.extra_cypher_params(object()) == expected
+    assert ManualSealAttributionLoader.extra_cypher_params(object()) == expected
+    assert BaseLoader.extra_cypher_params(object()) == {}
+
+
+def test_coverage_suite_pins_the_orchestrator_agreement() -> None:
+    """TC-12: a {source: 'app-code-mapping'} edge exists only on apps with a
+    confirmed Batch port, always origin=confirmed with its stamps."""
+    text = SUITE_FILE.read_text(encoding="utf-8")
+    assert "TC-12" in text and "app-code-mapping" in text
+
+
+# --- K11 cascade specs (the steward screen's data frames) -------------------------
+
+
+def test_cascade_specs_are_registered_with_the_ruled_semantics() -> None:
+    """The four cascade specs carry the gate's rulings in their Cypher:
+    unmapped-only folders (§G7), the catalog spine over HAS_APPLICATION
+    (§G6 — the list picker's traversal), the orchestrator role filter (C12),
+    and the per-app edge disclosure (source + origin, §G2/§G3)."""
+    from drydocs_api.query_specs import QUERY_SPECS
+
+    folders = QUERY_SPECS["mappings.unmapped-folders.v1"]
+    assert "NOT EXISTS { MATCH (f)-[:BELONGS_TO_APPLICATION" in folders.cypher
+    assert "run_as_users" in [c.name for c in folders.columns]  # SME sort addition
+
+    cascade = QUERY_SPECS["mappings.catalog-cascade.v1"]
+    assert "[:HAS_APPLICATION]->(a:BusinessApplication)" in cascade.cypher
+    assert "[:HAS_PRODUCT]->(p:Product)" in cascade.cypher
+
+    orchestrators = QUERY_SPECS["mappings.orchestrators.v1"]
+    assert "{role: 'orchestrator'}" in orchestrators.cypher
+
+    app_orch = QUERY_SPECS["mappings.app-orchestrators.v1"]
+    cols = [c.name for c in app_orch.columns]
+    assert "source" in cols and "origin" in cols

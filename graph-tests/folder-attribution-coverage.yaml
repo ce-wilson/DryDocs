@@ -134,3 +134,17 @@ cases:
       WHERE p.active_state = 'confirmed'
       RETURN p.parent_app_id AS app_id
     assert: empty
+
+  - id: TC-12
+    description: the confirmed orchestrator edge (§G1, K11) agrees with the attribution — a {source app-code-mapping} USES_SOFTWARE edge exists ONLY on apps whose Batch port is confirmed, always origin=confirmed with its stamps; and a confirmed app misses the edge only while the orchestrator product is unloaded (reported by the loader, not silent drift)
+    cypher: >
+      MATCH (a:BusinessApplication)-[u:USES_SOFTWARE {source: 'app-code-mapping'}]->(sp)
+      OPTIONAL MATCH (a)-[:HAS_PORT]->(p:Port:BatchProcessing)
+      WHERE p.active_state = 'confirmed'
+      WITH a, u, sp, count(p) AS confirmed_ports
+      WHERE confirmed_ports = 0
+         OR u.origin <> 'confirmed'
+         OR u.confirmed_by IS NULL OR u.confirmed_at IS NULL
+         OR NOT sp:SoftwareProduct
+      RETURN a.app_id AS app_id, u.origin AS origin, confirmed_ports
+    assert: empty

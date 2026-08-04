@@ -388,6 +388,16 @@ class BaseLoader:
         assert path is not None  # narrowed in __init__
         return path.read_text(encoding="utf-8")
 
+    def extra_cypher_params(self) -> dict[str, Any]:
+        """Loader-specific parameters merged into every ``_flush`` call.
+
+        Default: none. Override when a template needs a run-constant beyond
+        the standard five (e.g. the attribution loaders pass the domain's
+        orchestrator product ref for the §G1 USES_SOFTWARE authoring) —
+        per-ROW values belong on the row, this is for per-DOMAIN constants.
+        """
+        return {}
+
     def _flush(self, cypher: str, batch: list[dict]) -> None:
         params: dict[str, Any] = {
             "batch": batch,
@@ -395,6 +405,7 @@ class BaseLoader:
             "loaded_at": self.loaded_at,
             "loader": self.name,
             "source_label": self.source_label,
+            **self.extra_cypher_params(),
         }
         # Use APOC runMany for multi-statement scripts; a single UNWIND
         # template runs faster via plain run() — and runMany SPLITS on

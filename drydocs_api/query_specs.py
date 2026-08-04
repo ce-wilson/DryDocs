@@ -314,6 +314,133 @@ QUERY_SPECS: dict[str, QuerySpec] = {
             classification="internal",
             params=_LIMIT,
         ),
+        # ── K11 — the steward mapping-cascade specs (gate seal-app-ref-edge-
+        # reshape §G, SIGNED OFF 2026-08-03). The cascade is Product Line ->
+        # Product -> Business Application (a LIST, §G6) -> orchestrator (§G1,
+        # prefilled from the declared edge, §G2) -> unmapped-folder filter
+        # (§G7). The screen drafts store rows only; the K8 loader writes. ──
+        QuerySpec(
+            id="mappings.catalog-cascade.v1",
+            database="drydocs",
+            description=(
+                "The cascade's catalog spine: ProductLine -> HAS_PRODUCT -> Product "
+                "-> HAS_APPLICATION -> BusinessApplication, flat rows the picker "
+                "groups client-side. §G6 rules the COMPANY reading of "
+                "HAS_APPLICATION (a structural support link, 1:many by design — the "
+                "picker returns a LIST, never a single application). PRODUCER-SIDE "
+                "catalog_has_application is still planned with no loader (the K13 "
+                "back-flow), so app_id is null here until that lands — the pane "
+                "says so and degrades to the full application search."
+            ),
+            cypher=(
+                "MATCH (pl:ProductLine) WHERE NOT pl:SchemaMeta "
+                "OPTIONAL MATCH (pl)-[:HAS_PRODUCT]->(p:Product) "
+                "OPTIONAL MATCH (p)-[:HAS_APPLICATION]->(a:BusinessApplication) "
+                "RETURN pl.product_line_id AS product_line_id, pl.name AS product_line, "
+                "p.product_id AS product_id, p.name AS product, "
+                "a.app_id AS app_id, a.name AS application "
+                "ORDER BY product_line, product, application LIMIT $limit"
+            ),
+            columns=(
+                ColumnDef("product_line_id", "string", "Product line ID"),
+                ColumnDef("product_line", "string", "Product line"),
+                ColumnDef("product_id", "string", "Product ID"),
+                ColumnDef("product", "string", "Product"),
+                ColumnDef("app_id", "string", "Application ID"),
+                ColumnDef("application", "string", "Application"),
+            ),
+            classification="internal",
+            params=_LIMIT,
+        ),
+        QuerySpec(
+            id="mappings.orchestrators.v1",
+            database="drydocs",
+            description=(
+                "Orchestrator candidates for the cascade's §G1 picker: registry "
+                "SoftwareProducts carrying role='orchestrator' (the C12 ruling — "
+                "the role value IS the classification; no capability node layer)."
+            ),
+            cypher=(
+                "MATCH (sp:SoftwareProduct {role: 'orchestrator'}) "
+                "WHERE NOT sp:SchemaMeta "
+                "RETURN sp.product_id AS product_id, sp.name AS product "
+                "ORDER BY product LIMIT $limit"
+            ),
+            columns=(
+                ColumnDef("product_id", "string", "Product ID"),
+                ColumnDef("product", "string", "Orchestrator"),
+            ),
+            classification="internal",
+            params=_LIMIT,
+        ),
+        QuerySpec(
+            id="mappings.app-orchestrators.v1",
+            database="drydocs",
+            description=(
+                "Per-application orchestrator edges for the §G2 prefill and the "
+                "§G3 1:N display: every USES_SOFTWARE edge onto an orchestrator "
+                "product with its source ('batch-port' = the SEAL declaration, "
+                "prefill only; 'app-code-mapping' = authored by a confirmed "
+                "mapping) and origin (declared | confirmed). An app with several "
+                "orchestrators is mid-migration — a NORMAL state, never drift."
+            ),
+            cypher=(
+                "MATCH (a:BusinessApplication)-[u:USES_SOFTWARE]->"
+                "(sp:SoftwareProduct {role: 'orchestrator'}) "
+                "WHERE NOT a:SchemaMeta "
+                "RETURN a.app_id AS app_id, sp.product_id AS product_id, "
+                "sp.name AS product, u.source AS source, u.origin AS origin, "
+                "u.orchestrator_raw AS declared_raw "
+                "ORDER BY app_id, product LIMIT $limit"
+            ),
+            columns=(
+                ColumnDef("app_id", "string", "Application ID"),
+                ColumnDef("product_id", "string", "Product ID"),
+                ColumnDef("product", "string", "Orchestrator"),
+                ColumnDef("source", "string", "Source"),
+                ColumnDef("origin", "string", "Origin"),
+                ColumnDef("declared_raw", "string", "Declared string"),
+            ),
+            classification="internal",
+            params=_LIMIT,
+        ),
+        QuerySpec(
+            id="mappings.unmapped-folders.v1",
+            database="drydocs",
+            description=(
+                "The cascade's 'available folders' queue — §G7 rules it UNMAPPED "
+                "ONLY (folders with no BELONGS_TO_APPLICATION {role:'seal_app_ref'} "
+                "edge; the naming-pattern filter is OPTIONAL and layered on top "
+                "client-side, never primary). run_as_users aggregates the folder's "
+                "distinct job owners (the Control-M RUN_AS/OWNER field) — surfaced "
+                "as a sort option by SME direction at the gate."
+            ),
+            cypher=(
+                "MATCH (f:ControlMFolder) WHERE NOT f:SchemaMeta "
+                "AND NOT EXISTS { MATCH (f)-[:BELONGS_TO_APPLICATION "
+                "{role: 'seal_app_ref'}]->(:Port) } "
+                "OPTIONAL MATCH (ca:ControlMApplication)-[:CONTAINS_FOLDER]->(f) "
+                "OPTIONAL MATCH (f)-[:SCHEDULED_ON]->(s:ControlMServer) "
+                "OPTIONAL MATCH (f)-[:CONTAINS_JOB]->(j:ControlMJob) "
+                "WITH f, ca, s, count(DISTINCT j) AS jobs, "
+                "[o IN collect(DISTINCT j.owner) WHERE o IS NOT NULL] AS owners "
+                "RETURN f.folder_id AS folder_id, f.sched_table AS folder, "
+                "ca.name AS app_code, s.name AS data_center, jobs, "
+                "reduce(acc = '', o IN owners | acc + "
+                "CASE WHEN acc = '' THEN '' ELSE ', ' END + o) AS run_as_users "
+                "ORDER BY folder LIMIT $limit"
+            ),
+            columns=(
+                ColumnDef("folder_id", "string", "Folder id"),
+                ColumnDef("folder", "string", "Folder"),
+                ColumnDef("app_code", "string", "App code"),
+                ColumnDef("data_center", "string", "Data center"),
+                ColumnDef("jobs", "int", "Jobs"),
+                ColumnDef("run_as_users", "string", "Run-as users"),
+            ),
+            classification="internal",
+            params=_LIMIT,
+        ),
         QuerySpec(
             id="explorer.servers.v1",
             database="drydocs",

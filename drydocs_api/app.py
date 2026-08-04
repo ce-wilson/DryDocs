@@ -41,6 +41,7 @@ from drydocs_api.mappings import (
     ChangesetValidationError,
     MappingStore,
     UnknownDomainError,
+    draft_app_code_mapping,
     draft_changeset,
     draft_override,
     list_domains,
@@ -379,6 +380,18 @@ def create_app(runner=None, store: InMemorySessionStore | None = None):
     def get_override_report(authorization: str | None = Header(default=None)) -> dict[str, object]:
         return _mapping_call(
             source_corrections_report, _token(authorization), sessions, mapping_store
+        )
+
+    # ── K9/K11 app-code defined-mapping drafting (gate seal-app-ref-edge-
+    # reshape §E1/§E2/§G7): the steward cascade drafts store rows; the
+    # artifact is the COMPLETE updated committed file. Server writes nothing;
+    # the K8 loader stays the only graph writer (§E3). ──
+    @app.post("/mappings/app-code/draft")
+    def post_app_code_draft(
+        body: ChangesetBody, authorization: str | None = Header(default=None)
+    ) -> dict[str, object]:
+        return _mapping_call(
+            draft_app_code_mapping, body.entries, _token(authorization), sessions, mapping_store
         )
 
     # Dev-mode demo page (same-origin, so no CORS surface): the live-data twin

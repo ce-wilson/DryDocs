@@ -26,6 +26,15 @@ Tags help grooming: `idea` · `bug` · `doc` · `source` (new data source) · `q
 
 <!-- add new ideas at the top -->
 
+- 2026-08-04 — [chore] **The /mappings job-application pane is now the LEGACY surface** — its
+  coverage grid (`mappings.attribution-coverage.v1`) still reads the RETIRED job-grain
+  `WAS_ASSOCIATED_WITH {seal_app_ref}` edge (TC-08 asserts none exist post-K8, so every row now
+  reads "unresolved"), and its assign flow drafts the retired job-grain changeset the server
+  refuses. Found at K11 while building the app-code cascade pane beside it. Decide: re-bind the
+  coverage spec to folder edges with job inheritance (jobs view of the K8 truth), or retire the
+  pane and make app-code-mapping the default `/mappings` domain. Either way the `derivedLifecycle`
+  self-verification in MappingsRoute needs the same re-bind.
+
 - 2026-08-03 — [idea] **EPIC: backlog.yaml has outgrown single-file text editing — shard it,
   derive the summary, query it from the graph.** Trigger: during the DD6 session the company
   agent worked lines 10,573–10,669 of a 10.6k-line file; producer copy is 10,784 lines / 722KB /

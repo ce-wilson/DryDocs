@@ -191,6 +191,9 @@ def test_unbound_components_are_counted_not_hidden() -> None:
     landing hub's spokes, so binding it to either module would misstate it.
     63 -> 64 at R6: TaskGraphPane IS bound (ask/, directory evidence), so the
     bound count moves too — the Tier-2 task graph serves exactly one module.
+    64 -> 65 at K11: AppCodeCascadePane rides UNBOUND like its parent
+    MappingsRoute — 'mappings' is not a registry module, so a binding would
+    invent one (the same reason the route itself carries no module).
     Assigning the rest properly means reading imports, which is O42's TS
     resolver, not a naming heuristic.
     """
@@ -198,5 +201,5 @@ def test_unbound_components_are_counted_not_hidden() -> None:
     bound = [c for c in comps if c.get("module")]
     assert (len(bound), len(comps)) == (
         27,
-        64,
+        65,
     ), f"module-binding coverage changed: {len(bound)}/{len(comps)} bound"

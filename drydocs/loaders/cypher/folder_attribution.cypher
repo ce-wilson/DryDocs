@@ -29,7 +29,10 @@
 // because Neo4j cannot declare relationship cardinality.
 //
 // Parameters: $batch (validated FolderAttributionRow dicts),
-//             $run_id, $loaded_at, $loader, $source_label.
+//             $run_id, $loaded_at, $loader, $source_label,
+//             $orchestrator_product_id (§G1 — the domain orchestrator's
+//             software-registry ref, resolved from platforms.yaml by the
+//             loader; 'controlm' for this domain).
 // =============================================================================
 
 UNWIND $batch AS row
@@ -58,4 +61,26 @@ SET r.last_seen_at = datetime($loaded_at),
 SET p.active_state     = 'confirmed',
     p.confirmed_by     = coalesce(p.confirmed_by, coalesce(row.authored_by, $loader)),
     p.confirmed_at     = coalesce(p.confirmed_at, datetime($loaded_at)),
-    p.confirmed_run_id = coalesce(p.confirmed_run_id, $run_id);
+    p.confirmed_run_id = coalesce(p.confirmed_run_id, $run_id)
+
+// §G1 (K11): the confirmed mapping act AUTHORS the app -> orchestrator edge
+// — created BY the confirmation, never derived from a declaration. Keyed on
+// {source: 'app-code-mapping'} so it coexists with the DECLARED 'batch-port'
+// edge (§G2: declared edges are KEPT with origin=declared; a confirmation
+// supersedes by existing, no cleanup sweep) and the 'registry' stack rows.
+// FOREACH-guarded: an absent software registry skips the edge — the loader
+// reports the shortfall (JobRun.orchestrator_edges), never silent.
+WITH row
+MATCH (a:BusinessApplication {app_id: row.app_id})
+OPTIONAL MATCH (sp:SoftwareProduct {product_id: $orchestrator_product_id})
+FOREACH (_ IN CASE WHEN sp IS NOT NULL THEN [1] ELSE [] END |
+  MERGE (a)-[u:USES_SOFTWARE {source: 'app-code-mapping'}]->(sp)
+    ON CREATE SET u.first_seen_at = datetime($loaded_at),
+                  u.origin        = 'confirmed',
+                  u.status        = 'active',
+                  u.loader        = $loader,
+                  u.confirmed_by  = coalesce(row.authored_by, $loader),
+                  u.confirmed_at  = datetime($loaded_at)
+  SET u.last_seen_at = datetime($loaded_at),
+      u.last_run_id  = $run_id
+);

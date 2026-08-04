@@ -1921,9 +1921,15 @@ local_relationships:
       DRYDOCS-SELF stack rows and the future 'controlm-cmdline' detections —
       superseding seal_requires_scheduler (now deprecated). B4: the existing
       LOCAL no-PROV Agent→Entity typing covers the migrated fact unchanged.
-      Loader migration = backlog C14.
+      Loader migration = backlog C14. §G1/§G2 (gate seal-app-ref-edge-reshape
+      2026-08-03, built K11): the CONFIRMED mapping act authors a THIRD
+      source, 'app-code-mapping' {origin: 'confirmed'} — written by the
+      attribution writers when a folder edge lands; the 'batch-port' edges
+      stay origin='declared' (prefill only), superseded by the confirmed
+      edge's existence, never swept. Cardinality is 1:N (§G3 — never a
+      uniqueness constraint; mid-migration is a normal state, not drift).
     supplement:   registry_ontology_supplement.cypher
-    loader:       software_registry.py + batch_port_orchestrator.py   # source: 'registry' stack rows / source: 'batch-port' declared orchestrators (C14)
+    loader:       software_registry.py + batch_port_orchestrator.py + folder_attribution.cypher/manual_seal_attribution.cypher   # source: 'registry' stack rows / 'batch-port' declared (C14) / 'app-code-mapping' confirmed (G1, K11)
     domain:       registry
     status:       active
 
