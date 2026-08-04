@@ -1,16 +1,16 @@
 {
   "meta": {
     "project": "drydocs",
-    "captured_at": "2026-08-04T09:35:31",
+    "captured_at": "2026-08-04T09:49:37",
     "date": "20260804",
     "scan": "DryDocs",
     "tree": true,
     "git": {
-      "commit": "7ec106a",
-      "full": "7ec106a5314b84e8ee6d3c36dd52543d9eee5d37",
+      "commit": "88f7a90",
+      "full": "88f7a902fec1bcc77cc755c3e626364feaf00c82",
       "branch": "main",
-      "describe": "7ec106a",
-      "subject": "chore(ritual): U12 done — snapshot retention enforced in snapshot.ps1, proven live on five stale files; step 68 ledgered",
+      "describe": "88f7a90",
+      "subject": "docs(reviews): U13+U14 done — tombstone filter + package scope on the code-graph query pack; step 69 ledgered",
       "dirty": false,
       "pr": null
     },
@@ -12308,10 +12308,10 @@
       "kind": "file"
     },
     {
-      "file_id": "drydocs/knowledge/depgraph-snapshots/drydocs-20260804.json",
-      "name": "drydocs-20260804.json",
+      "file_id": "drydocs/knowledge/depgraph-snapshots/drydocs-20260804-0935.json",
+      "name": "drydocs-20260804-0935.json",
       "extension": ".json",
-      "rel_path": "knowledge/depgraph-snapshots/drydocs-20260804.json",
+      "rel_path": "knowledge/depgraph-snapshots/drydocs-20260804-0935.json",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -24511,7 +24511,7 @@
     [
       "drydocs/knowledge/depgraph-snapshots",
       "CONTAINS",
-      "drydocs/knowledge/depgraph-snapshots/drydocs-20260804.json"
+      "drydocs/knowledge/depgraph-snapshots/drydocs-20260804-0935.json"
     ],
     [
       "drydocs/knowledge/depgraph-snapshots",
