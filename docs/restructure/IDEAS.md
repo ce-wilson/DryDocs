@@ -26,17 +26,20 @@ Tags help grooming: `idea` · `bug` · `doc` · `source` (new data source) · `q
 
 <!-- add new ideas at the top -->
 
-- 2026-08-03 — [question] **Composite-key grammar: `k=v;k=v` vs the user's colon form — a
-  K8 rider, decided now or never cheap again.** The manual-loads key cells use the K2-era
-  `field=value;field=value` grammar (`_parse_key` in `drydocs_core/manual_mappings.py`); the
-  user has authored colon-joined keys (`folder_id:job_id`) and asked why the semicolon form
-  won. K9 deliberately kept the grammar verbatim (its rekey changed WHICH fields, not the
-  syntax). If the colon form is preferred, the K8 loader-chain migration is the moment:
+- 2026-08-03 — [question] **Composite-key grammar: `k=v;k=v` vs the SME's `ctlm_id` dot
+  form — a K8 rider, decided now or never cheap again.** The manual-loads key cells use the
+  K2-era `field=value;field=value` grammar (`_parse_key` in
+  `drydocs_core/manual_mappings.py`); the SME's own psgmgr convention (VERIFIED still live
+  2026-08-03) is the DOT composite `ctlm_id = folder_id.job_id` (e.g. `161015.7`) —
+  `controlm_dependencies_recursive.sql` builds it, `drydocs_core/models/controlm.py`
+  documents it, the P2 gate §B join prefers it. K9 deliberately kept the k=v grammar
+  verbatim (its rekey changed WHICH fields, not the syntax). The clean reconciliation is
+  the 2026-07-14 ripple idea's point (2), one page down: `source_key` accepts
+  `ctlm_id=<id>` as shorthand — the cell stays self-describing k=v (order-independent
+  across label key shapes, no separator collision with dotted/coloned values) while the
+  VALUE is the SME's dot composite. If any grammar change is wanted, K8 is the moment:
   zero manual CSVs are committed (`manifest files: []`), so it is template + `_parse_key` +
-  `draft_changeset` with no data migration — afterwards every committed CSV pins the old
-  grammar. Trade-off to weigh at the ruling: `k=v` pairs are self-describing and
-  order-independent where a positional `A:B` breaks silently across label key shapes, and
-  `:` collides with values that carry colons (times, URNs).
+  `draft_changeset` with no data migration — afterwards every committed CSV pins it.
 
 - 2026-08-03 — [chore] **The G51 tail landed pre-groom — needs a retrospective close, and it
   carries ONE company consequence the next port must not be surprised by.** G51 provisioned
