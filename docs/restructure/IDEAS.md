@@ -26,6 +26,40 @@ Tags help grooming: `idea` · `bug` · `doc` · `source` (new data source) · `q
 
 <!-- add new ideas at the top -->
 
+- 2026-08-04 — [bug] **`dev-environment.yaml`'s `expected_commit: 5006567` is STALE — depgraph
+  `main` is two commits ahead at `773fb1e`, and the two machines are scanning with different
+  instruments.** Found at the weekly-groom session close, when the snapshot step was checked
+  before running it. Verified: the laptop's `../depgraph` sits at 5006567 (matching the pin),
+  depgraph's `origin/main` is at `773fb1e`, and `773fb1e` is a CLEAN DESCENDANT of the pin —
+  `9c663ca` (RUA inventory ingestion + shallow script-op analyzer) then the `773fb1e` merge,
+  which **unions REL_TYPES with TRANSFERS / RUNS_ON / CONTAINS**. Today's committed snapshot
+  was written by the desktop using `773fb1e`, so the desktop is on the newer instrument and
+  the laptop is not. Consequence, and the reason this is a bug rather than a chore: scanning
+  from the laptop today would emit a snapshot missing three relationship types the desktop's
+  can see — the U7 undercount class recurring, with the config pin now pointing at the OLD
+  revision instead of preventing it. Fix is two coupled halves and the second is a ruling:
+  (a) `git pull` the laptop sibling to `773fb1e`; (b) bump `expected_commit` (and refresh the
+  fork-consolidation comment, which still narrates 5006567 as the end state) — a groom must
+  not silently change the instrument revision every future snapshot is measured with. Also
+  worth deciding in the same pass: nothing DETECTS this. `probe_instrument.py` tests
+  capabilities behaviourally, and both revisions report `multi_root` + `tree` true, so the
+  probe passes on a scanner that is missing edge types. The pin is the only check, and it is
+  the thing that went stale. Sibling of the `depgraph` in-housing question below — this is a
+  fresh, concrete instance of that entry's whole argument. (laptop — J18)
+
+- 2026-08-04 — [bug] **Today's committed snapshot `drydocs-20260804.json` cites a git commit
+  that no longer exists.** Its `meta.git.commit` is `63adc2b` (`dirty: true`), one of the two
+  commits removed by this morning's history rewrite, so the drift-comparison header points at
+  a SHA unreachable from any ref — `git rev-parse 63adc2b` fails. The snapshot content is
+  fine; the provenance header is unresolvable, which defeats the reason the header exists.
+  Fix is a re-run from a machine on the correct instrument, so it is BLOCKED behind the
+  `expected_commit` entry above — re-running from the laptop today would trade a dead SHA for
+  a missing-edge-types snapshot. Two notes for whoever does it: U12 is done, so `snapshot.ps1`
+  now REPLACES a same-day file instead of appending, and the `dirty: true` flag means the
+  desktop scanned with a dirty tree, so a clean re-run is worth having on its own merits.
+  Generalizable lesson if it recurs: any artifact that pins a commit in its own header is
+  invalidated by a history rewrite, and nothing currently sweeps for that. (laptop — J18)
+
 - 2026-08-04 — [source] **`controlm-pipeline-stub` captured + integration plan written (internal).**
   The internal DPL Control-M XML builder/validator package (config → generate → validate →
   upload → runtime, 14/14 green) is captured VERBATIM at
