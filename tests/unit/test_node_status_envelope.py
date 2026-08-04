@@ -85,6 +85,17 @@ def test_failure_and_drift_each_get_their_own_namespaced_type():
     assert by_type[f"{STATUS_SOURCE}/reactivated"]["level"] == "info"
 
 
+def test_an_unresolved_parent_count_is_a_warning_item():
+    """C22 §c ruled EMIT over property-only: the per-node `orphan` flag is the
+    durable record, but a property alone is invisible in the loads grid — a
+    green run over a hierarchy with holes is the silent miss one level up."""
+    items = status_items_for(_summary(unresolved_parents=3))
+    assert len(items) == 1
+    assert items[0]["type"] == f"{STATUS_SOURCE}/unresolved-parent"
+    assert items[0]["level"] == "warning"
+    assert "3" in items[0]["message"]
+
+
 def test_every_item_matches_the_one_shape():
     """The rule that makes the envelope extensible: producers add namespaced
     TYPES, never fields. A new key here is the regression to catch."""
@@ -95,6 +106,7 @@ def test_every_item_matches_the_one_shape():
             rejects=[{"row_index": 0, "errors": []}],
             nodes_marked_removed=1,
             nodes_reactivated=1,
+            unresolved_parents=1,
         )
     )
     assert items, "expected items for a summary with every condition set"

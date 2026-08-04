@@ -110,6 +110,22 @@ def _catalog_id(v: Any) -> Any:
     return str(v).strip()
 
 
+def _name_or_none(v: Any) -> Any:
+    """Normalize a sparse-refresh enrichment value: absent OR empty means
+    'no value carried', never 'blank the stored one' (C22 §b).
+
+    A partial extract that carries ids without enrichment columns must not
+    be REJECTED (the row's last-seen bookkeeping would never advance) and
+    must not BLANK what an earlier full extract loaded. An empty CSV cell
+    arrives as '' — normalize both to None so the cypher's
+    ``coalesce(row.name, x.name)`` keeps the existing property.
+    """
+    if v is None:
+        return None
+    s = str(v).strip()
+    return s if s else None
+
+
 def _date_or_none(v: Any) -> date | None:
     if v in (None, ""):
         return None
@@ -176,7 +192,10 @@ class ProductLineRow(BaseModel):
     model_config = ConfigDict(populate_by_name=True, str_strip_whitespace=True, extra="ignore")
 
     product_line_id: str = Field(..., min_length=1)
-    name: str = Field(..., min_length=1)
+    # Optional since C22 §b: a sparse refresh carries the id without the name.
+    # The name is an ATTRIBUTE, never a key (§a) — optionality cannot weaken
+    # the keying ruling.
+    name: str | None = None
     parent_lob_id: str = Field(..., min_length=1)
 
     @field_validator("product_line_id", "parent_lob_id", mode="before")
@@ -184,18 +203,28 @@ class ProductLineRow(BaseModel):
     def _ids(cls, v: Any) -> Any:
         return _catalog_id(v)
 
+    @field_validator("name", mode="before")
+    @classmethod
+    def _sparse_name(cls, v: Any) -> Any:
+        return _name_or_none(v)
+
 
 class ProductRow(BaseModel):
     model_config = ConfigDict(populate_by_name=True, str_strip_whitespace=True, extra="ignore")
 
     product_id: str = Field(..., min_length=1)
-    name: str = Field(..., min_length=1)
+    name: str | None = None  # sparse-refresh optional (C22 §b); never a key (C17 §a)
     parent_product_line_id: str = Field(..., min_length=1)
 
     @field_validator("product_id", "parent_product_line_id", mode="before")
     @classmethod
     def _ids(cls, v: Any) -> Any:
         return _catalog_id(v)
+
+    @field_validator("name", mode="before")
+    @classmethod
+    def _sparse_name(cls, v: Any) -> Any:
+        return _name_or_none(v)
 
 
 class DevTeamRow(BaseModel):
@@ -235,13 +264,18 @@ class AreaProductRow(BaseModel):
     model_config = ConfigDict(populate_by_name=True, str_strip_whitespace=True, extra="ignore")
 
     area_product_id: str = Field(..., min_length=1)
-    name: str = Field(..., min_length=1)
+    name: str | None = None  # sparse-refresh optional (C22 §b); never a key (C17 §a)
     parent_product_id: str = Field(..., min_length=1)
 
     @field_validator("area_product_id", "parent_product_id", mode="before")
     @classmethod
     def _ids(cls, v: Any) -> Any:
         return _catalog_id(v)
+
+    @field_validator("name", mode="before")
+    @classmethod
+    def _sparse_name(cls, v: Any) -> Any:
+        return _name_or_none(v)
 
 
 _VALID_TEAM_TYPES = {"aligned", "flex", "dedicated"}
@@ -370,6 +404,7 @@ class ProductLinesLoader(BaseLoader):
     cypher_path: ClassVar[Path | None] = _CYPHER / "product_lines.cypher"
     row_model: ClassVar[type] = ProductLineRow
     source_label: ClassVar[str] = "oracle"
+    orphan_label: ClassVar[str | None] = "ProductLine"  # C22 §c — envelope surfacing
 
 
 class ProductsLoader(BaseLoader):
@@ -378,6 +413,7 @@ class ProductsLoader(BaseLoader):
     cypher_path: ClassVar[Path | None] = _CYPHER / "products.cypher"
     row_model: ClassVar[type] = ProductRow
     source_label: ClassVar[str] = "oracle"
+    orphan_label: ClassVar[str | None] = "Product"  # C22 §c — envelope surfacing
 
 
 class DevTeamsLoader(BaseLoader):
@@ -394,6 +430,7 @@ class AreaProductsLoader(BaseLoader):
     cypher_path: ClassVar[Path | None] = _CYPHER / "area_products.cypher"
     row_model: ClassVar[type] = AreaProductRow
     source_label: ClassVar[str] = "pat"
+    orphan_label: ClassVar[str | None] = "AreaProduct"  # C22 §c — envelope surfacing
 
 
 class PatProductMappingLoader(BaseLoader):

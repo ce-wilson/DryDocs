@@ -697,6 +697,26 @@ verification status in [BRACKETS]; spend review on [UNRULED].
     producer's (the producer's 2026-08-03 wipe left zero tombstones — a
     fresh-provisioned graph reads the same, an aged one will not).
 
+70. C22 — THE CATALOG LOADER SWEEP (`+7` tests, 1413→1420/5). The silent
+    parent joins C17 fixed in products.cypher only are now the ONE shape in
+    all three hierarchy loaders: OPTIONAL MATCH, `orphan` written EVERY
+    run, unresolved id kept (`pl.orphan_parent_lob_id`,
+    `ap.orphan_parent_product_id`). All three name SETs coalesce, and the
+    row models moved with it — ProductLineRow/ProductRow/AreaProductRow
+    `name` is optional with ''→None normalization (a required name makes a
+    sparse refresh reject wholesale, worse than the blanking it replaces);
+    ids stay required. The C17-deferred question RULED EMIT:
+    `drydocs.loader/unresolved-parent` (warning) rides the O28 envelope —
+    BaseLoader gains `orphan_label` + a run-scoped count at close;
+    per-node flag stays the durable record; envelope standard doc updated.
+    ***YOUR SIDE:*** like-for-like — but if your tree carries loaded
+    :Product/:ProductLine/:AreaProduct data, RE-RUN the catalog loaders
+    after the port so the every-run orphan flags exist (nodes loaded under
+    the old cypher have no flag until touched); and if you extended
+    status-item type handling anywhere, note the new fifth type. The
+    dev_teams/catalog_lobs same-shape gap is INBOXED producer-side, not
+    fixed — do not expect it in this range.
+
 ACCEPTANCE GATE (behavior is the contract, not a byte-compare):
 - Track 1 (portable):
     poetry run pytest tests/unit/test_variable_classifier.py tests/unit/test_variable_resolver.py \
@@ -713,13 +733,14 @@ ACCEPTANCE GATE (behavior is the contract, not a byte-compare):
   capability_assert=false skips per T18). A retired-id refusal from
   `SourceRegistry.from_yaml` is the D4 guard WORKING, not a port failure — rebind the
   loader in `loader-source-overlay.yaml`, never by re-adding the retired id.
-  Producer reference at the current head (step 69, the U13+U14 query-pack
-  filters — no test delta from step 68): 1413
+  Producer reference at the current head (step 70, the C22 catalog loader
+  sweep): 1420
   passed / 5 skipped with the production CSV PRESENT and no
   RECONCILE_BEFORE_DIR (4 J7 guards + the graphrag PDF) — the like-for-like
   chain: step 58 1356/5 → step 61 1384/5 (+28 K9 guards) → step 63 1399/5
   (+15 K8) → step 65 1403/5 (+4 K10) → step 66 1410/5 (+7 K11; step 67 no
-  delta) → step 68 1413/5 (+3 U12). The
+  delta) → step 68 1413/5 (+3 U12; step 69 no delta) → step 70 1420/5
+  (+7 C22). The
   step-60 figure (1354 / 7) was CSV-ABSENT without RECONCILE_BEFORE_DIR and is
   not comparable line-for-line; `aa0a0eb`'s commit message quotes 1358 / 3,
   which is the step-59 run with RECONCILE_BEFORE_DIR set. Earlier producer

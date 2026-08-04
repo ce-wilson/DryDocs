@@ -26,6 +26,12 @@ Tags help grooming: `idea` · `bug` · `doc` · `source` (new data source) · `q
 
 <!-- add new ideas at the top -->
 
+- 2026-08-04 — [bug] `dev_teams.cypher` and `catalog_lobs.cypher` carry the same unconditional
+  enrichment SETs the C22 sweep fixed in the three hierarchy loaders (`SET dt.name = row.name`;
+  `SET l.code/l.name = row.*`) — and catalog_lobs is the worse case, because `CatalogLOBRow`
+  already allows None so a sparse refresh blanks the stored name/code TODAY. Out of C22's
+  three-file acceptance scope, so inboxed per the C17 precedent rather than swept by drive-by.
+
 - 2026-08-04 — [doc] `docs/reviews/sdlc-neo4j-schema.md` still claims `pat_product_mapping.cypher`
   "MERGE HAS_APPLICATION (Product→Application)" — stale since C9 removed that write (2026-07-18),
   and now doubly wrong after §G6's support-reading reconciliation (K13). That living doc belongs

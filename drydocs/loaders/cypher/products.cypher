@@ -17,6 +17,9 @@
 // and `orphan_parent_product_line_id` keeps the id that failed to resolve, so
 // the gap is a query rather than a diff of expected-vs-actual counts.
 //
+// The name SET coalesces (C22 §b): a sparse refresh — ids without enrichment
+// columns — updates last-seen bookkeeping without blanking the stored name.
+//
 // Parameters: $batch (product_id, name, parent_product_line_id), $run_id,
 //             $loaded_at, $loader, $source_label.
 // =============================================================================
@@ -25,7 +28,7 @@ UNWIND $batch AS row
 MERGE (p:Product {product_id: row.product_id})
   ON CREATE SET p.first_seen_at = datetime($loaded_at),
                 p.source     = 'catalog'
-SET p.name         = row.name,
+SET p.name         = coalesce(row.name, p.name),
     p.last_seen_at = datetime($loaded_at),
     p.last_run_id  = $run_id
 

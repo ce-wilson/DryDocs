@@ -108,6 +108,7 @@ class LoadSummary:
     rows_changed: int = 0
     nodes_marked_removed: int = 0
     nodes_reactivated: int = 0
+    unresolved_parents: int = 0
     rejects: list[dict] = field(default_factory=list)
     status: str = "STARTED"
 
@@ -122,6 +123,7 @@ class LoadSummary:
             "rows_changed": self.rows_changed,
             "nodes_marked_removed": self.nodes_marked_removed,
             "nodes_reactivated": self.nodes_reactivated,
+            "unresolved_parents": self.unresolved_parents,
             "status": self.status,
         }
 
@@ -175,6 +177,21 @@ def status_items_for(summary: LoadSummary) -> list[dict]:
                 "message": f"{summary.nodes_marked_removed} nodes no longer present in source",
             }
         )
+    if summary.unresolved_parents:
+        # C22 §c ruling: EMIT, not property-only. The per-node `orphan` flag is
+        # the durable record, but a property alone is invisible in the loads
+        # grid — a green run over a hierarchy with holes is the same silent
+        # miss the orphan flag exists to end, one level up.
+        items.append(
+            {
+                "type": f"{STATUS_SOURCE}/unresolved-parent",
+                "level": "warning",
+                "message": (
+                    f"{summary.unresolved_parents} nodes this run carry a parent id "
+                    "that resolved to no loaded parent (orphan flag set)"
+                ),
+            }
+        )
     if summary.nodes_reactivated:
         items.append(
             {
@@ -216,6 +233,13 @@ class BaseLoader:
     # was unfiltered. Property-only mechanism; no edge meaning involved.
     sweep_label: ClassVar[str | None] = None
     sweep_scope_property: ClassVar[str | None] = None
+
+    # ---- C22: unresolved-parent surfacing ---------------------------------
+    # orphan_label names the node label whose `orphan` flag this loader's
+    # cypher writes (the hierarchy loaders' OPTIONAL-MATCH parent join). When
+    # set, the run counts its OWN nodes left orphaned after the load and the
+    # count rides the O28 envelope as `drydocs.loader/unresolved-parent`.
+    orphan_label: ClassVar[str | None] = None
 
     def __init__(
         self,
@@ -302,6 +326,7 @@ class BaseLoader:
             raise
 
         self._mark_removed(summary)
+        summary.unresolved_parents = self._count_unresolved_parents()
 
         summary.status = "OK"
         summary.completed_at = datetime.now(UTC).replace(microsecond=0).isoformat()
@@ -481,6 +506,24 @@ class BaseLoader:
             if not self.sweep_scope_property
             else f"{self.sweep_scope_property} x{len(self._scope_values)}",
         )
+
+    def _count_unresolved_parents(self) -> int:
+        """C22 §c — count THIS run's nodes whose parent join failed to resolve.
+
+        Scoped to ``last_run_id`` so an orphan left by an earlier run is not
+        re-blamed on this one; the per-node ``orphan`` property remains the
+        durable record either way (the envelope carries the run-scoped count,
+        never replaces the property).
+        """
+        if not self.orphan_label:
+            return 0
+        rows = self.client.run(
+            f"MATCH (n:{self.orphan_label}) "
+            "WHERE n.last_run_id = $run_id AND n.orphan "
+            "RETURN count(n) AS unresolved",
+            run_id=self.run_id,
+        )
+        return rows[0].get("unresolved", 0) if rows else 0
 
     def _open_run(self) -> None:
         self.client.run(

@@ -78,7 +78,13 @@ this repo deliberately does not depend on for read paths.
 
 | Source namespace | Producer | Types |
 |---|---|---|
-| `drydocs.loader` | `BaseLoader._close_run` via `status_items_for()` | `run-failed` (error), `rows-rejected` (warning), `removed-from-source` (warning), `reactivated` (info) |
+| `drydocs.loader` | `BaseLoader._close_run` via `status_items_for()` | `run-failed` (error), `rows-rejected` (warning), `removed-from-source` (warning), `unresolved-parent` (warning), `reactivated` (info) |
+
+`unresolved-parent` (C22, 2026-08-04) carries the run-scoped count of nodes the
+hierarchy loaders left orphaned — a parent id that resolved to no loaded node.
+The per-node `orphan` flag is the durable record; the envelope item exists
+because a node property alone is invisible in the loads grid, and a green run
+over a hierarchy with holes is the same silent miss one level up.
 
 `status_items_for()` is a pure function of the run summary, so the derivation is
 unit-tested without a database — the property that makes "always derived"
