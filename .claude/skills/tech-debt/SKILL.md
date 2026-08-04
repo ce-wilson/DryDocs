@@ -38,23 +38,46 @@ This repo self-documents: the `drydocs` Neo4j database carries a code graph
 newest `knowledge/depgraph-snapshots/drydocs-*.json`). Use it to ground debt
 claims in evidence instead of impressions. Trustworthy since the U6 scanner
 fix (2026-07-28): cross-root and function-level imports are recorded and
-`drydocs_api` is scanned (baseline 205 modules / 370 edges). `scripts/` is
-still NOT a scan root — treat "imported only by scripts/" modules accordingly.
+`drydocs_api` is scanned. Since U9 (2026-08-02) the snapshot is the WHOLE
+repo tree — every region (`.claude`, `docs`, `web`, `agents`, `scripts`, …)
+is in the graph, and `project` is the first path segment. The artifact being
+whole-repo is the ruled shape; the METRICS are what get scoped (U14).
 
-Two standing rules for every query and every conclusion:
+Four standing rules for every query and every conclusion:
 - **Exclude schema exemplars** (O33): always guard node anchors with
   `WHERE NOT m:SchemaMeta`, or exemplar nodes/edges contaminate results.
+- **Exclude tombstones** (U13): the D7 sweep keeps removed modules as
+  tombstones (`removed_from_source_at IS NOT NULL`) so deletions are
+  visible — which means every metric query must filter
+  `m.removed_from_source_at IS NULL` or say in one line why the dead belong
+  in that answer. Proof case: after S2's package move, the unfiltered A3
+  ranking placed the dead `drydocs_core/controlm/__init__.py` at #6, one
+  slot below its live replacement. (A freshly re-provisioned graph carries
+  zero tombstones — the 2026-08-03 wipe did — but they re-accumulate with
+  every load after a move or delete, so the filter is not optional.)
+- **Scope metrics to the package allow-list** (U14): architecture metrics
+  (orphans, untested, fan-in baselines) bind
+  `m.project IN $packages` with `$packages = ['drydocs','drydocs_core',
+  'drydocs_api','drydocs_remediation','drydocs_lineage','drydocs_deepdoc',
+  'tests']` — the seven roots every pre-U9 baseline was measured on. This is
+  an allow-list IN THE QUERIES, never an exclude in the scanner: 54 of 77
+  raw orphan hits were Anthropic-vendored `.claude/skills` scripts, which
+  pollutes the metric but belongs in the tree. First-party Python OUTSIDE
+  the packages (`agents/`, `scripts/`, `knowledge/`) is a separate,
+  labeled queue — report it beside the baseline number, never folded in
+  (it was never in the pre-U9 baselines, so folding it breaks
+  comparability in the other direction).
 - **IMPORTS ≠ breaks-if-removed** (gate D2 caveat): an edge records that an
   import statement resolves, not that the dependency is load-bearing.
 
 | # | Query (run against database `drydocs`) | Debt category it measures |
 |---|---|---|
-| A1 | `MATCH (m:CodeModule {project:'drydocs_core'})-[:IMPORTS]->(t:CodeModule) WHERE NOT m:SchemaMeta AND NOT t:SchemaMeta AND t.project IN ['drydocs','drydocs_api','drydocs_deepdoc','drydocs_remediation','drydocs_lineage'] RETURN m.file_id, t.file_id` | **Architecture debt** — layering violations: the core layer importing upward. Baseline 0; any row is a finding. Cross-check `tests/unit/test_module_boundary.py`. |
-| A2 | `MATCH (m:CodeModule {circular:true}) WHERE NOT m:SchemaMeta RETURN m.file_id` plus live cross-check `MATCH (a:CodeModule)-[:IMPORTS*2..8]->(a) WHERE NOT a:SchemaMeta RETURN count(DISTINCT a)` | **Code debt** — circular imports. Baseline 0 by both probes; scanner-vs-graph disagreement is itself a finding. |
-| A3 | `MATCH (m:CodeModule)<-[:IMPORTS]-(x:CodeModule) WHERE NOT m:SchemaMeta AND NOT x:SchemaMeta RETURN m.file_id, count(x) AS fan_in ORDER BY fan_in DESC LIMIT 15` | **Code debt** — change-risk hotspots: high fan-in means a small edit ripples wide. Read the top entries' diff history first in any review. |
-| A4 | `MATCH (m:CodeModule) WHERE NOT m:SchemaMeta AND m.removed_from_source_at IS NULL AND NOT ()-[:IMPORTS]->(m) AND m.project <> 'tests' AND NOT m.file_id CONTAINS '__init__' RETURN m.file_id` | **Code debt** — dead-code candidates. Post-U6 the signal is real, but every hit still needs a human disposition: entry point (CLI, script, pytest) vs genuinely dead. |
-| A5 | `MATCH (m:CodeModule) WHERE NOT m:SchemaMeta AND m.project <> 'tests' AND NOT EXISTS { MATCH (t:CodeModule {project:'tests'})-[:IMPORTS]->(m) WHERE NOT t:SchemaMeta } RETURN m.file_id` | **Test debt** — modules no test imports (direct-import proxy only; fixtures and subprocess-level coverage won't show). |
-| A6 | `MATCH (a:CodeModule)-[:IMPORTS]->(b:CodeModule) WHERE NOT a:SchemaMeta AND NOT b:SchemaMeta AND a.project <> b.project RETURN a.project, b.project, count(*) ORDER BY count(*) DESC` | **Architecture debt** — cross-root coupling map; compare against MODULE_MAP.md's declared component boundaries. |
+| A1 | `MATCH (m:CodeModule {project:'drydocs_core'})-[:IMPORTS]->(t:CodeModule) WHERE NOT m:SchemaMeta AND NOT t:SchemaMeta AND m.removed_from_source_at IS NULL AND t.removed_from_source_at IS NULL AND t.project IN ['drydocs','drydocs_api','drydocs_deepdoc','drydocs_remediation','drydocs_lineage'] RETURN m.file_id, t.file_id` | **Architecture debt** — layering violations: the core layer importing upward. Baseline 0; any row is a finding. Cross-check `tests/unit/test_module_boundary.py`. |
+| A2 | `MATCH (m:CodeModule {circular:true}) WHERE NOT m:SchemaMeta AND m.removed_from_source_at IS NULL RETURN m.file_id` plus live cross-check `MATCH (a:CodeModule)-[:IMPORTS*2..8]->(a) WHERE NOT a:SchemaMeta AND a.removed_from_source_at IS NULL RETURN count(DISTINCT a)` | **Code debt** — circular imports. Baseline 0 by both probes; scanner-vs-graph disagreement is itself a finding. |
+| A3 | `MATCH (m:CodeModule)<-[:IMPORTS]-(x:CodeModule) WHERE NOT m:SchemaMeta AND NOT x:SchemaMeta AND m.removed_from_source_at IS NULL AND x.removed_from_source_at IS NULL AND m.project IN $packages RETURN m.file_id, count(x) AS fan_in ORDER BY fan_in DESC LIMIT 15` | **Code debt** — change-risk hotspots: high fan-in means a small edit ripples wide. Read the top entries' diff history first in any review. `x` is deliberately unscoped: an importer in `agents/` is real fan-in. Baseline (package scope, 2026-08-04): `loaders/base.py` = 29. |
+| A4 | `MATCH (m:CodeModule) WHERE NOT m:SchemaMeta AND m.removed_from_source_at IS NULL AND m.extension = '.py' AND m.project IN $packages AND NOT ()-[:IMPORTS]->(m) AND NOT (m)-[:IMPORTS]->() AND m.project <> 'tests' AND NOT m.file_id CONTAINS '__init__' RETURN m.file_id` | **Code debt** — dead-code candidates (no imports either direction). Package scope, 2026-08-04: **0** against the old 24 baseline. The separate first-party queue (swap the scope to `['agents','scripts','knowledge']`): 22 candidates — report it beside the baseline, never folded in. Every hit still needs a human disposition: entry point (CLI, script, pytest) vs genuinely dead. |
+| A5 | `MATCH (m:CodeModule) WHERE NOT m:SchemaMeta AND m.removed_from_source_at IS NULL AND m.extension = '.py' AND m.project IN $packages AND m.project <> 'tests' AND NOT EXISTS { MATCH (t:CodeModule {project:'tests'})-[:IMPORTS]->(m) WHERE NOT t:SchemaMeta } RETURN m.file_id` | **Test debt** — modules no test imports (direct-import proxy only; fixtures and subprocess-level coverage won't show). Package scope, 2026-08-04: **29** (raw whole-repo `.py` reads 129 — vendored pollution, not test debt). |
+| A6 | `MATCH (a:CodeModule)-[:IMPORTS]->(b:CodeModule) WHERE NOT a:SchemaMeta AND NOT b:SchemaMeta AND a.removed_from_source_at IS NULL AND b.removed_from_source_at IS NULL AND a.project <> b.project RETURN a.project, b.project, count(*) ORDER BY count(*) DESC` | **Architecture debt** — cross-root coupling map; compare against MODULE_MAP.md's declared component boundaries. Unscoped on purpose: `IMPORTS` edges only exist between Python files, and post-U9 rows involving `agents/` or `scripts/` are first-party coupling worth seeing. |
 
 How to run: no CLI query command exists yet — use a short scratchpad script
 with `Neo4jSettings` from `drydocs_core.config` (reads `.env`; raw
@@ -68,9 +91,11 @@ questions from the newest snapshot JSON directly:
 
 - `knowledge/depgraph-snapshots/drydocs-<latest>.json` — `nodes` (with
   `file_id`, `project`) and `edges` (`[src_file_id, dst_file_id]` pairs)
-  support A1/A3/A4/A5/A6 with a few lines of Python (no SchemaMeta guard
-  needed — exemplars exist only in the loaded graph); `circular_files`
-  in the stats line covers A2.
+  support A1/A3/A4/A5/A6 with a few lines of Python (no SchemaMeta or
+  tombstone guard needed — exemplars and tombstones exist only in the
+  loaded graph; the snapshot is the live tree by construction); the
+  package allow-list (U14) still applies, as a `file_id` first-segment
+  filter. `circular_files` in the stats line covers A2.
 - `knowledge/depgraph-snapshots/viewer.html` — visual inspection of the
   same snapshot, useful for the A6 coupling picture.
 

@@ -85,12 +85,16 @@ above is complete on its own).
 When the container IS up, two cheap checks catch transcription mistakes:
 
 - **Module sanity:** for a code item, compare its `module:` against the code-graph
-  census (`MATCH (m:CodeModule) WHERE NOT m:SchemaMeta RETURN m.project, count(*)`) —
-  an item filed against a module whose files the graph places in a different root is
-  probably mis-binned.
+  census (`MATCH (m:CodeModule) WHERE NOT m:SchemaMeta AND m.removed_from_source_at
+  IS NULL RETURN m.project, count(*)` — tombstones filtered per U13, or a swept
+  package still counts under its old root) — an item filed against a module whose
+  files the graph places in a different root is probably mis-binned.
 - **Close-note claims:** before flipping an item `done`, spot-check file paths named
-  in its close note against `:CodeModule.file_id` — a claim naming a file the graph
-  has never seen deserves a manual look before it becomes history.
+  in its close note against `:CodeModule.file_id`, RETURNing
+  `removed_from_source_at` — tombstones belong in this answer (U13 note): a
+  tombstoned hit means the file existed and was removed (fine for history),
+  where no hit at all means the claim names a file the graph has never seen and
+  deserves a manual look before it becomes history.
 
 Run both via a scratchpad script using `Neo4jSettings` from `drydocs_core.config`
 (never raw env vars); the guarded-query conventions live in

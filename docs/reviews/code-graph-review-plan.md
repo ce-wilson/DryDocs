@@ -16,9 +16,11 @@ queries and spend reading time only where the graph points.
 **The honest limits, up front (do not oversell):**
 - `IMPORTS` cannot distinguish `import x` / `from x import y` /
   `TYPE_CHECKING`-only (gate §D2). Never read it as "breaks if removed".
-- The snapshot sees only intra-repo Python imports of the six scan roots —
-  entry points invoked by packaging (CLI scripts, API apps) can look like
-  orphans. Orphan queries produce CANDIDATES for a human read, never verdicts.
+- `IMPORTS` edges exist only between intra-repo Python files — entry points
+  invoked by packaging (CLI scripts, API apps) can look like orphans. Orphan
+  queries produce CANDIDATES for a human read, never verdicts. (Since U9,
+  2026-08-02, the snapshot is the WHOLE repo tree, not six scan roots — see
+  the scope rule below the seed queries.)
 - The code↔operational join (module → the :ControlMJob its Cypher writes) does
   NOT exist (gate §H5) — it is a named future item, not something to fake with
   string matching.
@@ -49,17 +51,34 @@ findings never edit backlog.yaml directly.
 **Mandate.** Structural health of the six scan roots, graph-first: query,
 rank, then read only the flagged files.
 
-Seed queries (all probed live 2026-07-27; baseline answers recorded so drift
-is visible next run):
+Seed queries. Two standing filters ride EVERY query since U13/U14
+(2026-08-04); the canonical, fully-written forms live in the tech-debt
+skill's A1–A6 pack — this table is the question-and-baseline view:
 
-| # | Question | Query sketch | Baseline |
+- **Tombstones out** (U13): the D7 sweep keeps removed modules as
+  `removed_from_source_at IS NOT NULL` tombstones, so every query filters
+  `removed_from_source_at IS NULL` unless its row says why the dead belong.
+  Proof case: post-S2, the unfiltered A3 ranked the dead
+  `drydocs_core/controlm/__init__.py` at #6, one slot below its live
+  replacement.
+- **Metrics scoped to `$packages`** (U14): the U9 whole-tree snapshot is
+  the ruled artifact, but the METRIC queries bind
+  `m.project IN ['drydocs','drydocs_core','drydocs_api',
+  'drydocs_remediation','drydocs_lineage','drydocs_deepdoc','tests']` — the
+  seven roots the pre-U9 baselines were measured on. Vendored
+  `.claude/skills` scripts stay in the tree and out of the metrics (they
+  were 54 of 77 raw orphan hits). First-party Python outside the packages
+  (`agents/`, `scripts/`, `knowledge/`) is a separate labeled queue,
+  reported beside the baseline, never folded in.
+
+| # | Question | Query sketch | Baseline (scope written next to each number) |
 |---|---|---|---|
-| A1 | Layering: does `drydocs_core` import any app layer? | `MATCH (m:CodeModule {project:'drydocs_core'})-[:IMPORTS]->(t) WHERE t.project IN ['drydocs','drydocs_deepdoc','drydocs_remediation','drydocs_lineage'] RETURN m,t` | **0 — clean** |
-| A2 | Circular imports | `MATCH (m:CodeModule {circular:true}) RETURN m` + cross-check with a live cycle query (`(m)-[:IMPORTS*2..6]->(m)`) — a disagreement between scanner verdict and graph is itself a finding (§C3) | scanner says 0 |
-| A3 | Fan-in hotspots (change-risk ranking) | `MATCH (m)<-[:IMPORTS]-(x) RETURN m.file_id, count(x) ORDER BY count(x) DESC` | `loaders/base.py` = 18 — read ITS diff history first in any review |
-| A4 | Orphan candidates | no in- or out-IMPORTS, project <> 'tests', name <> '__init__.py' | **24 candidates** — human-read each: entry point, dead code, or scanner blind spot? |
-| A5 | Test coverage shape | which non-test modules have NO tests-project importer — `MATCH (m) WHERE m.project<>'tests' AND NOT EXISTS {MATCH (t {project:'tests'})-[:IMPORTS]->(m)} RETURN m` | unprobed |
-| A6 | Cross-root coupling map | `MATCH (a)-[:IMPORTS]->(b) WHERE a.project<>b.project RETURN a.project,b.project,count(*)` — compare against MODULE_MAP's declared component boundaries | unprobed |
+| A1 | Layering: does `drydocs_core` import any app layer? | `MATCH (m:CodeModule {project:'drydocs_core'})-[:IMPORTS]->(t) WHERE t.project IN ['drydocs','drydocs_deepdoc','drydocs_remediation','drydocs_lineage'] ...` + both tombstone filters | **0 — clean** (2026-07-27 six-root scan; scope inherent in the projects named) |
+| A2 | Circular imports | `MATCH (m:CodeModule {circular:true}) ...` + tombstone filter; cross-check with a live cycle query (`(m)-[:IMPORTS*2..6]->(m)`) — a disagreement between scanner verdict and graph is itself a finding (§C3) | scanner says 0 (2026-07-27, six-root; unchanged 2026-08-04 all-files) |
+| A3 | Fan-in hotspots (change-risk ranking) | `MATCH (m)<-[:IMPORTS]-(x) WHERE ... m.project IN $packages RETURN m.file_id, count(x) ORDER BY count(x) DESC` — `x` unscoped (an `agents/` importer is real fan-in), both ends tombstone-filtered | `loaders/base.py` = 18 (2026-07-27, six-root) → **29** (2026-08-04, all-files scan, package scope) — read ITS diff history first in any review |
+| A4 | Orphan candidates | no in- or out-IMPORTS, `extension = '.py'`, `project IN $packages`, project <> 'tests', name <> '__init__.py', tombstone-filtered | 24 candidates (2026-07-27, six-root) → **0 in-package** (2026-08-04, package scope; raw whole-repo `.py` reads 77, of which 54 vendored). The first-party non-package queue (`agents/` 15, `scripts/` 4, `knowledge/` 3) = **22 candidates** — separate queue, never in the 24 baseline |
+| A5 | Test coverage shape | which non-test modules have NO tests-project importer — `MATCH (m) WHERE ... m.extension='.py' AND m.project IN $packages AND m.project<>'tests' AND NOT EXISTS {MATCH (t {project:'tests'})-[:IMPORTS]->(m)} RETURN m` + tombstone filter | **29** (2026-08-04, package scope; raw whole-repo `.py` reads 129 — vendored pollution, not test debt) |
+| A6 | Cross-root coupling map | `MATCH (a)-[:IMPORTS]->(b) WHERE a.project<>b.project RETURN a.project,b.project,count(*)` + both tombstone filters — compare against MODULE_MAP's declared component boundaries | unprobed. Unscoped on purpose: `IMPORTS` edges only join Python files, and post-U9 rows involving `agents/`/`scripts/` are first-party coupling worth seeing |
 
 Deliverable: findings ranked by the tech-debt skill's (Impact+Risk)×(6−Effort)
 score, each with the query that found it and the file(s) read to confirm.
@@ -72,12 +91,16 @@ is left — audited against the code that actually exists?
 Units:
 1. **Done-claims spot check.** For every item closed in the last ~30 days
    whose close_note names modules/files, confirm each named `file_id` exists
-   in the graph (`MATCH (m:CodeModule {file_id:$f})`). A done item naming a
-   file the tree no longer has = drift finding (rename or sweep).
-2. **Module-registry census.** backlog `modules:` registry vs the graph's six
-   `project` values + top-level `file_id` prefixes: every graph region should
+   in the graph (`MATCH (m:CodeModule {file_id:$f})`) — and RETURN
+   `removed_from_source_at`, because tombstones belong in this answer: a hit
+   that is a tombstone means the file existed and was since removed, a
+   different disposition than never-existed (typo'd claim).
+2. **Module-registry census.** backlog `modules:` registry vs the graph's
+   `project` regions + top-level `file_id` prefixes: every graph region should
    be claimable by some module; every module should still have files. (The
-   D7 sweep makes deletions visible: `removed_from_source_at IS NOT NULL`.)
+   D7 sweep makes deletions visible — this unit queries
+   `removed_from_source_at IS NOT NULL` deliberately; the dead ARE the
+   answer here.)
 3. **Todo reality check.** For `next_ready` items, do their `inputs:` paths
    still exist (graph for .py, filesystem for the rest)? Stale inputs = the
    item needs a re-groom before an agent burns a session on it.

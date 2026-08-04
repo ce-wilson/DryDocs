@@ -679,6 +679,24 @@ verification status in [BRACKETS]; spend review on [UNRULED].
     rest) in the port commit; (b) if your ritual wrapper diverged from
     snapshot.ps1, take the retention block like-for-like. Suite 1410→1413.
 
+69. U13+U14 — THE CODE-GRAPH QUERY PACK GETS TWO STANDING FILTERS (docs +
+    skills only, no code change, no test delta — 1413/5). U13: every seed
+    query (tech-debt A1–A6, the review plan's table, groom-backlog's two
+    graph cross-checks) filters `removed_from_source_at IS NULL` or says in
+    one line why tombstones belong (the plan's Phase 2 units 1–2 are the
+    deliberate exceptions). U14: architecture metrics bind
+    `m.project IN $packages` = the SEVEN package roots — an allow-list in
+    the QUERIES, never a scanner exclude (U9's whole-tree artifact is the
+    ruled shape). First-party Python outside the packages (agents/,
+    scripts/, knowledge/) is a separate labeled orphan queue (22 today),
+    reported beside the baseline, never folded in. Baselines restated with
+    scope+date next to every number (fan-in 18→29, orphans 24→0 in-package,
+    untested 29 scoped / 129 raw).
+    ***YOUR SIDE:*** like-for-like docs/skills adoption; your graph carries
+    its own numbers, so re-probe YOUR baselines rather than adopting the
+    producer's (the producer's 2026-08-03 wipe left zero tombstones — a
+    fresh-provisioned graph reads the same, an aged one will not).
+
 ACCEPTANCE GATE (behavior is the contract, not a byte-compare):
 - Track 1 (portable):
     poetry run pytest tests/unit/test_variable_classifier.py tests/unit/test_variable_resolver.py \
@@ -695,8 +713,8 @@ ACCEPTANCE GATE (behavior is the contract, not a byte-compare):
   capability_assert=false skips per T18). A retired-id refusal from
   `SourceRegistry.from_yaml` is the D4 guard WORKING, not a port failure — rebind the
   loader in `loader-source-overlay.yaml`, never by re-adding the retired id.
-  Producer reference at the current head (step 68, the U12 retention
-  enforcement): 1413
+  Producer reference at the current head (step 69, the U13+U14 query-pack
+  filters — no test delta from step 68): 1413
   passed / 5 skipped with the production CSV PRESENT and no
   RECONCILE_BEFORE_DIR (4 J7 guards + the graphrag PDF) — the like-for-like
   chain: step 58 1356/5 → step 61 1384/5 (+28 K9 guards) → step 63 1399/5
