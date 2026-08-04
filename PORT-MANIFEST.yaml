@@ -485,6 +485,16 @@ default_ok:
     reason: "core package minus the schema/**, controlm/**, ontology and models rows above — the two explicit models rows set the precedent that evaluate-on-collision is the right default here"
   - path: "drydocs_deepdoc/**"
     reason: "SYNTHESIZED-tier investigation writer (ddcontext); producer-authored, no consumer wiring"
+  - path: "drydocs_docmeta/**"
+    reason: >
+      document-corpus ingestion (ADR 0006, Q6) — producer-authored, and
+      evaluate-on-collision rather than take-producer for a specific reason
+      named in the docmeta plan §6: the T4 connectors (confluence, sharepoint,
+      teams, email) are Canonical-COMPANY. The producer ships the protocol in
+      connectors/base.py and the two generic connectors that have zero internal
+      dependencies; the consumer's wired Confluence internals win on collision,
+      the same rule as drydocs-review. Take the producer's STRUCTURE, keep your
+      connector internals.
   - path: "drydocs_lineage/**"
     reason: "cross-platform lineage extractors; producer-authored, but collectors carry site-specific inventory config (rua_inventory.conf) — evaluate, do not checkout"
   - path: "scripts/**"

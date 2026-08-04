@@ -370,6 +370,29 @@
       "extra_contents": {}
     },
     {
+      "id": "doc-capture",
+      "title": "Doc-capture policy (page ceiling, delay, scheme allow-list)",
+      "file": "config/doc-capture.yaml",
+      "code_resident": false,
+      "consumers": [
+        "scripts/external_vendor_scrape.py",
+        "drydocs_docmeta/connectors/web.py"
+      ],
+      "guard_tests": [
+        "test_docmeta_pipeline.py",
+        "test_docmeta_connectors.py"
+      ],
+      "gate_ref": null,
+      "status": "enforced",
+      "pending_entries": 0,
+      "env_refs": [],
+      "files": [
+        "config/doc-capture.yaml"
+      ],
+      "content": "# =============================================================================\n# config/doc-capture.yaml — the ONE doc-capture policy (Q12).\n#\n# Q12's acceptance is explicit that \"the threshold and the per-request delay\n# are config values, never hardcoded literals\", and the reason is that these\n# numbers are POLICY about how we treat a third party, not implementation\n# detail of one script. Two consumers read this file:\n#\n#   * scripts/external_vendor_scrape.py — the standalone vendor capture\n#   * drydocs_docmeta/connectors/web.py — the component's generic web connector\n#\n# One file so the two cannot drift into different notions of \"too many pages\",\n# which would make the guardrail depend on which entrypoint the operator\n# happened to use.\n#\n# WHY A CEILING AT ALL — the numbers are measured, not guessed (2026-07-31,\n# from the publishers' own toc.json, so the count is knowable BEFORE any\n# content request):\n#   documents.bmc.com /supportu/INC/      10,912 pages  ~210 MB\n#   documents.bmc.com /supportu/9.0.20/    3,860 pages   ~74 MB\n#   documents.bmc.com /supportu/9.0.21/    1,965 pages   ~38 MB\n# Three harms the refusal prevents: hammering a vendor whose robots.txt ALLOWS\n# these paths (so politeness is entirely ours, hence the delay); committing\n# tens of MB of vendor copyright into a repo that is private-but-sometimes-\n# published; and the operator picking the WRONG TREE and not noticing —\n# /supportu/INC/ is the INCONTROL MAINFRAME family, whose \"Control-M\" subtree\n# is Control-M for z/OS, not the distributed estate DryDocs models.\n# =============================================================================\n\nschema: drydocs.doc-capture.v1\nupdated: 2026-08-04\n\ncapture:\n  # Refuse a capture larger than this unless the operator raises it explicitly.\n  # Deliberately well BELOW every real tree above, so the default answer to an\n  # unsized run is \"stop\" rather than \"probably fine\".\n  max_pages: 600\n\n  # Seconds between content requests. There is no server-side backstop on the\n  # paths we capture, so this is the whole of our politeness.\n  delay_seconds: 1.0\n\n  timeout_seconds: 30\n  retries: 3\n\n  # Identifies the fetcher to the vendor rather than impersonating a browser.\n  user_agent: \"DryDocs-docs-capture/1.0 (+internal knowledge-graph research; contact repo owner)\"\n\n  # SSRF allow-list. A doc capture has no business reaching file://, ftp://,\n  # gopher:// or a data: URI, and http(s) is the whole of what a public vendor\n  # documentation site speaks. Anything else is either a mistake or an attempt\n  # to make the fetcher read something local.\n  allowed_schemes:\n    - https\n    - http\n",
+      "extra_contents": {}
+    },
+    {
       "id": "dev-environment",
       "title": "Dev/test environment names",
       "file": "config/dev-environment.yaml",

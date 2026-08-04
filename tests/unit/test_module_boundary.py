@@ -33,6 +33,7 @@ PKG_ROOTS = [
     REPO_ROOT / "drydocs_remediation",
     REPO_ROOT / "drydocs_lineage",
     REPO_ROOT / "drydocs_deepdoc",
+    REPO_ROOT / "drydocs_docmeta",
     REPO_ROOT / "drydocs_api",
     REPO_ROOT / "agents",
     REPO_ROOT / "libs",
@@ -95,6 +96,13 @@ COMPONENT_GROUPS: dict[str, tuple[str, ...]] = {
     # reliability/trust stamps (ADR 0002 D2 C3, G4). Never imports lineage — the
     # components-don't-import-each-other test IS the D2 separation.
     "deepdoc": ("drydocs_deepdoc",),
+    # drydocs-docmeta — proactive document-corpus ingestion (ADR 0006, Q6).
+    # Separate from deepdoc by the Q4 gate ruling: different duty cycles and
+    # different write targets, with deepdoc a CONSUMER of this corpus. So the
+    # components-don't-import-each-other rule IS that separation, exactly as it
+    # is for lineage/deepdoc — a deepdoc dive that wants a Document cites it
+    # through the graph, never by importing this package.
+    "docmeta": ("drydocs_docmeta",),
     # drydocs-api — the thin read API over the graph (ADR 0005, O5). Read-only
     # (endpoint guard + READ routing); imports only drydocs_core; FastAPI is an
     # optional dependency group so the default install stays framework-free.
@@ -193,6 +201,7 @@ FIRST_PARTY_ROOTS: tuple[str, ...] = (
     "drydocs_api",
     "drydocs_lineage",
     "drydocs_deepdoc",
+    "drydocs_docmeta",
     "drydocs_remediation",
     "agents",
     "libs",

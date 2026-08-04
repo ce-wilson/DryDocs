@@ -1,6 +1,6 @@
 # Upgrade plan — `drydocs-docmeta` (document ingestion component)
 
-**Status:** planned. Phase 0 (benchmark) and Phase 1 (gate/ADR) precede any build.
+**Status:** P0–P3 DONE (benchmark verdict = BUILD, ADR 0006 accepted, registry ledger, and the component itself as of 2026-08-04 / Q6). P4 onward planned.
 **Classification:** Internal-Public.
 **Companion review:** [`../../docs/reviews/doc-knowledge-ingestion-review.md`](../../docs/reviews/doc-knowledge-ingestion-review.md)
 (tiers T1–T4, gap analysis). IDEAS.md 2026-07-06 entries capture the tier to-dos.
@@ -98,29 +98,52 @@ here 2026-07-06, was since TAKEN by `0004-software-registry-vendor-terminology.m
   doc content is an **ontology** decision → `relationship_vocabulary.yaml` `status: planned`
   first, then the HITL gate. No relationship type invented during import.
 
-### 1.3 Package layout (pre-Phase-B flat layout, like every other component)
+### 1.3 Package layout
+
+> **BUILT 2026-08-04 (Q6) — and at `drydocs_docmeta/`, not the `drydocs/docmeta/`
+> written below.** That path predates the Phase B relocate (2026-07-10): every
+> component created since — `drydocs_remediation`, `drydocs_lineage`,
+> `drydocs_deepdoc`, `drydocs_api` — is a top-level package, while the `drydocs`
+> package is the component *remainder* (load / review / plan / docgen). Adding a
+> fifth component inside the remainder would have run against the direction of
+> travel, so docmeta follows the live precedent. The §6 port paths below read
+> `drydocs_docmeta/**`.
 
 ```
-drydocs/docmeta/
+drydocs_docmeta/
   __init__.py
-  registry.py          # doc-source registry models (port: bkup registry.py, reshaped — §5)
-  manifest.py          # per-run manifest + sha256 content integrity (port: bkup manifest.py)
-  cleaner.py           # deterministic HTML→text cleaner (port: bkup cleaner.py, pure)
-  tokenizer.py         # token estimation, labeled fallback (port: bkup tokenizer.py)
-  chunker.py           # NEW — Document→Chunk splitting (llm-graph-builder patterns)
-  curation.py          # NEW — curation_status ladder → HITL gate integration (§3.3)
-  freshness.py         # NEW — refetch + sha256 diff → re-gate queue (§3.4)
+  policy.py            # BUILT — the Q12 capture policy, read from config/doc-capture.yaml
+  registry.py          # BUILT — typed view of the ledger + the two bkup ladders (§5)
+  manifest.py          # BUILT — per-run manifest + sha256 + digest diff → re-gate queue
+  cleaner.py           # BUILT — deterministic HTML→text cleaner (pure, stdlib only)
+  tokenizer.py         # BUILT — token estimation, labeled fallback
+  chunker.py           # P4 — Document→Chunk splitting (llm-graph-builder patterns)
+  curation.py          # P5 — curation_status ladder → HITL gate integration (§3.3)
+  freshness.py         # P5 — refetch cadence on top of manifest.diff() (§3.4)
   connectors/
-    base.py            # NEW — Connector protocol: fetch(source) -> RawPage[]
-    web.py             # NEW — public-URL fetch (T1)
-    filedrop.py        # NEW — local files already in repo/`internal-local/` (T2/T3 backfill)
-    confluence.py      # port: bkup confluence.py — INTERFACE only here; impl is company-side (§6)
-    sharepoint.py      # STUB (Graph API; company-side)
-    teams.py           # STUB (Graph API; company-side)
-    email.py           # STUB (company-side)
+    base.py            # BUILT — Connector protocol: fetch(source) -> list[RawPage]
+    web.py             # BUILT — public http(s), injectable transport, SSRF allow-list, Q12 ceiling
+    filedrop.py        # BUILT — a file or a directory of md/txt/html
+    confluence.py      # company-side impl behind base.py (§6) — no producer stub
+    sharepoint.py      # company-side (Graph API)
+    teams.py           # company-side (Graph API)
+    email.py           # company-side
   loaders/
-    cypher/document.cypher, chunk.cypher, links.cypher
+    cypher/document.cypher, chunk.cypher, links.cypher   # P4
 ```
+
+Two things landed differently from the sketch, both recorded here rather than
+left as surprises:
+
+- **`freshness.py` is not a separate module yet.** Its primitive — sha256 per
+  page, and a diff that separates changed / added / removed — is
+  `manifest.diff()`, because the digest and the comparison over digests are the
+  same fact. What P5 adds is the *cadence* and the queue, not the comparison.
+- **No connector stubs ship for the T4 sources.** A stub that raises is
+  indistinguishable at a call site from a connector that is merely
+  misconfigured, and this repo has spent three items (G29, G30, Q8) on things
+  that succeed loudly and do nothing. The producer ships the protocol; the
+  company implements against it.
 
 ### 1.4 Config (the governance the bkup scraper lacked)
 
@@ -181,7 +204,7 @@ boundary + classification + doc-registry tests green.
 | **P0 — Benchmark spike** (IDEAS T1 entry) — **VERDICT WRITTEN 2026-07-16: [`docmeta-p0-verdict.md`](docmeta-p0-verdict.md) → BUILD** (12-question set, 3 arms live; traversal 12/12 recall at ~27× manifest token efficiency; vector arm assessed analytically behind the LLM-key decision) | Load the BMC corpus into a throwaway local Document→Chunk→Entity graph; benchmark traversal vs manifest-routed markdown vs vector RAG on a fixed support-question set. *Verdict input (Q1, 2026-07-16):* [`reference/research/essential-graphrag-notes.md`](../../reference/research/essential-graphrag-notes.md) — per-arm reference builds (ch.2 vector, ch.4 text2cypher, ch.5 agentic) and, for the verdict's own shape, ch.8's RAGAS metrics + Cypher-as-ground-truth benchmark design (the accuracy methodology this acceptance previously left unnamed). *Traversal-arm evidence (Q2, same day):* [`docs/reviews/essential-graphrag-traversal-experiment.md`](../../docs/reviews/essential-graphrag-traversal-experiment.md) — the book itself loaded as a 43-chunk lexical graph in ddcontext; 7/7 traversal-only questions answered (structure/sequence/aggregation/provenance exact; content questions bounded at exact-substring strength — the vector arm's case) | Written comparison (accuracy/latency/tokens) with a build / shrink-to-registry-only recommendation |
 | **P1 — Gate + the docmeta ADR** | Gate session: component name (docmeta vs deepdoc fold-in), `drydocs_docs` DB, planned relationship entries (`HAS_DOCUMENT`, `HAS_CHUNK`, `DESCRIBES`, `GOVERNED_BY`), curation-ladder→gate mapping | docmeta ADR accepted (next free number — orig. 0004, since taken); vocab entries `status: planned`; gate-log updated |
 | **P2 — Registry** | `config/doc-source-registry.yaml` + `test_doc_registry.py`; backfill all current corpora; classify/evict root-level strays | Test enforces classification+connector+tier on every entry; zero unregistered corpora |
-| **P3 — Port A (bkup → producer)** | Port cleaner/tokenizer/manifest/registry-models per §5; `web` + `filedrop` connectors; `docmeta` COMPONENT_GROUP + MODULE_MAP row | Track-1 portable tests for parse/clean/hash (no network); boundary guard green |
+| **P3 — Port A (bkup → producer)** — **DONE 2026-08-04 (Q6)** | Port cleaner/tokenizer/manifest/registry-models per §5; `web` + `filedrop` connectors; `docmeta` COMPONENT_GROUP + MODULE_MAP row | Track-1 portable tests for parse/clean/hash (no network); boundary guard green — 46 offline tests, no network and no data root |
 | **P4 — Load path** | chunker + loaders + `drydocs_docs` provisioning delta; embeddings via P0 module; load BMC corpus end-to-end locally | `docs-load` idempotent re-run adds nothing; trust labels queryable; composite smoke reads docs+structural |
 | **P5 — Curation + freshness** | `curation.py` gate wiring (T2/T3 require sme-confirm before `drydocs_docs`); `freshness.py` refetch→sha256-diff→re-gate queue | Changed page re-enters gate, does not silently overwrite; unconfirmed T2 source fails fast (D3 pattern) |
 | **P6 — T2/T3 ingestion** | `knowledge/standards/**`, `docs/Product/`, SDLC docs through the gate into `drydocs_docs` | Every loaded doc traces to a confirmed registry entry + curation record |
@@ -207,7 +230,7 @@ container (`config/dev-environment.yaml`) hosts the multi-DB topology, so P4 nee
 
 ---
 
-## 5. Port A — bkup `drydocs.scrapers` → producer `drydocs/docmeta/`
+## 5. Port A — bkup `drydocs.scrapers` → producer `drydocs_docmeta/`
 
 Inventory from the bkup retrieval notes (2026-07-05 session; bkup repo not mounted here —
 **verify module names against `DryDocs-bkup` before porting**, per the verify-before-assert
@@ -245,9 +268,9 @@ then it is a heads-up, like the ADR 0002 Phase B rename warning.*
 
 | Path | What |
 |---|---|
-| `drydocs/docmeta/**` (except `connectors/confluence*` impl) | pipeline, registry models, cleaner/tokenizer/manifest/chunker/curation/freshness |
+| `drydocs_docmeta/**` (except the T4 connectors) | pipeline, registry models, policy/cleaner/tokenizer/manifest — plus `config/doc-capture.yaml`, the ONE home for the page ceiling, politeness delay and scheme allow-list |
 | `config/doc-source-registry.yaml` + `tests/unit/test_doc_registry.py` | registry + guard (Track-1 portable) |
-| `docmeta` group in `tests/unit/test_module_boundary.py` + `MODULE_MAP.md` row | default-deny forces your company-only connector modules to classify |
+| `docmeta` group in `tests/unit/test_module_boundary.py` + `MODULE_MAP.md` row + the `drydocs_docmeta/**` PORT-MANIFEST row | default-deny forces your company-only connector modules to classify |
 | `drydocs_core/schema/provisioning/` delta (`drydocs_docs` + composite update) | target-agnostic scripts, G1 pattern |
 | `knowledge/upgrade-plans/docmeta-component.md`, the docmeta ADR (P1), review doc | plans/decisions |
 | planned entries in `relationship_vocabulary.yaml` / `taxonomy-ontology-map.yaml` | **inert while `planned`** — but if company has already promoted any doc edge to `active`, that entry is a back-flow collision: keep your active version (same rule as `seal_app_ref`) |

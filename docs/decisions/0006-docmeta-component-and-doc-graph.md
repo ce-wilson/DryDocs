@@ -100,6 +100,13 @@ Two facts changed since the plan was written:
 - Q6 builds the `drydocs/docmeta/` package under the confirmed name with its
   own COMPONENT_GROUP; the modules-registry comment updates from "working
   name" to final.
+  > **Amendment, 2026-08-04 (Q6, path only — the decision stands):** the package
+  > landed at **`drydocs_docmeta/`**. The `drydocs/docmeta/` path was inherited
+  > from the plan, which predates the Phase B relocate; every component created
+  > after it is a top-level package. The confirmed NAME (`drydocs-docmeta`), the
+  > separate-component ruling and the COMPONENT_GROUP requirement are unchanged,
+  > so this is recorded as a note rather than a body edit (the ADR 0002 banner
+  > precedent).
 - The two planned vocabulary entries sit gate-bound until their loaders exist
   (the K2 flips-are-follow-ups pattern); nothing flips active in this ADR.
 - The docmeta plan's §1.1/§2 provisional names (`drydocs_docs`, `HAS_CHUNK`)

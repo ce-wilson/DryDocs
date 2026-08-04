@@ -1,0 +1,55 @@
+# =============================================================================
+# config/doc-capture.yaml — the ONE doc-capture policy (Q12).
+#
+# Q12's acceptance is explicit that "the threshold and the per-request delay
+# are config values, never hardcoded literals", and the reason is that these
+# numbers are POLICY about how we treat a third party, not implementation
+# detail of one script. Two consumers read this file:
+#
+#   * scripts/external_vendor_scrape.py — the standalone vendor capture
+#   * drydocs_docmeta/connectors/web.py — the component's generic web connector
+#
+# One file so the two cannot drift into different notions of "too many pages",
+# which would make the guardrail depend on which entrypoint the operator
+# happened to use.
+#
+# WHY A CEILING AT ALL — the numbers are measured, not guessed (2026-07-31,
+# from the publishers' own toc.json, so the count is knowable BEFORE any
+# content request):
+#   documents.bmc.com /supportu/INC/      10,912 pages  ~210 MB
+#   documents.bmc.com /supportu/9.0.20/    3,860 pages   ~74 MB
+#   documents.bmc.com /supportu/9.0.21/    1,965 pages   ~38 MB
+# Three harms the refusal prevents: hammering a vendor whose robots.txt ALLOWS
+# these paths (so politeness is entirely ours, hence the delay); committing
+# tens of MB of vendor copyright into a repo that is private-but-sometimes-
+# published; and the operator picking the WRONG TREE and not noticing —
+# /supportu/INC/ is the INCONTROL MAINFRAME family, whose "Control-M" subtree
+# is Control-M for z/OS, not the distributed estate DryDocs models.
+# =============================================================================
+
+schema: drydocs.doc-capture.v1
+updated: 2026-08-04
+
+capture:
+  # Refuse a capture larger than this unless the operator raises it explicitly.
+  # Deliberately well BELOW every real tree above, so the default answer to an
+  # unsized run is "stop" rather than "probably fine".
+  max_pages: 600
+
+  # Seconds between content requests. There is no server-side backstop on the
+  # paths we capture, so this is the whole of our politeness.
+  delay_seconds: 1.0
+
+  timeout_seconds: 30
+  retries: 3
+
+  # Identifies the fetcher to the vendor rather than impersonating a browser.
+  user_agent: "DryDocs-docs-capture/1.0 (+internal knowledge-graph research; contact repo owner)"
+
+  # SSRF allow-list. A doc capture has no business reaching file://, ftp://,
+  # gopher:// or a data: URI, and http(s) is the whole of what a public vendor
+  # documentation site speaks. Anything else is either a mistake or an attempt
+  # to make the fetcher read something local.
+  allowed_schemes:
+    - https
+    - http

@@ -168,6 +168,17 @@ SURFACES: list[dict] = [
         "gate_ref": "Q4 docmeta gate (ADR 0006)",
     },
     {
+        "id": "doc-capture",
+        "title": "Doc-capture policy (page ceiling, delay, scheme allow-list)",
+        "file": "config/doc-capture.yaml",
+        "consumers": [
+            "scripts/external_vendor_scrape.py",
+            "drydocs_docmeta/connectors/web.py",
+        ],
+        "guard_tests": ["test_docmeta_pipeline.py", "test_docmeta_connectors.py"],
+        "gate_ref": None,
+    },
+    {
         "id": "dev-environment",
         "title": "Dev/test environment names",
         "file": "config/dev-environment.yaml",

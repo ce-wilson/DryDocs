@@ -57,13 +57,18 @@ if str(REPO_ROOT) not in sys.path:  # allow `python scripts/...` without PYTHONP
     sys.path.insert(0, str(REPO_ROOT))
 
 from drydocs_core.data_root import vendor_docs_dir  # noqa: E402
+from drydocs_docmeta.policy import CapturePolicy, TooManyPagesError  # noqa: E402
 
-USER_AGENT = "DryDocs-docs-capture/1.0 (+internal knowledge-graph research; contact repo owner)"
+#: The ceiling, the politeness delay, the user agent and the scheme allow-list
+#: all come from config/doc-capture.yaml (Q12: "config values, never hardcoded
+#: literals"). The component's web connector reads the SAME file, so "too many
+#: pages" cannot come to mean two different things depending on which door the
+#: operator used.
+POLICY = CapturePolicy.load()
 
-#: Refuse a capture larger than this unless --max-pages raises it explicitly.
-#: Deliberately well below every real tree so the default answer is "stop".
-DEFAULT_MAX_PAGES = 600
-DEFAULT_DELAY_SECONDS = 1.0
+USER_AGENT = POLICY.user_agent
+DEFAULT_MAX_PAGES = POLICY.max_pages
+DEFAULT_DELAY_SECONDS = POLICY.delay_seconds
 
 
 @dataclass(frozen=True)
@@ -134,8 +139,11 @@ TREES: dict[str, VendorTree] = {
 # --------------------------------------------------------------------------- #
 # fetching
 # --------------------------------------------------------------------------- #
-def fetch(url: str, *, timeout: int = 30, retries: int = 3) -> bytes:
-    """GET with a descriptive UA and bounded backoff."""
+def fetch(url: str, *, timeout: int | None = None, retries: int | None = None) -> bytes:
+    """GET with a descriptive UA, the policy's scheme allow-list, and bounded backoff."""
+    POLICY.check_scheme(url)
+    timeout = POLICY.timeout_seconds if timeout is None else timeout
+    retries = POLICY.retries if retries is None else retries
     last: Exception | None = None
     for attempt in range(retries):
         req = urllib.request.Request(url, headers={"User-Agent": USER_AGENT})
@@ -271,20 +279,15 @@ def render_plan(
     return "\n".join(lines)
 
 
-class TooManyPages(RuntimeError):
-    """Raised when the resolved page count exceeds the operator's ceiling."""
+#: Kept as an alias so existing callers and tests import one name. The refusal
+#: itself moved into drydocs_docmeta.policy when the component landed (Q6), so
+#: both entrypoints raise the same type from the same rule.
+TooManyPages = TooManyPagesError
 
 
 def enforce_ceiling(page_count: int, max_pages: int) -> None:
     """The Q12 guardrail. Refuse rather than start a run nobody sized."""
-    if page_count > max_pages:
-        raise TooManyPages(
-            f"REFUSING: this capture resolves to {page_count} pages, above the "
-            f"--max-pages ceiling of {max_pages}. Nothing was fetched. Re-run with "
-            f"--max-pages {page_count} if that is genuinely intended, or narrow the "
-            f"subtree. Check the book list above: picking the wrong tree is the "
-            f"common cause of an unexpectedly large count."
-        )
+    POLICY.enforce_ceiling(page_count, max_pages=max_pages)
 
 
 # --------------------------------------------------------------------------- #
