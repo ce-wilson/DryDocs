@@ -23,6 +23,7 @@ from drydocs_api.mappings import (
     ChangesetValidationError,
     MappingStore,
     UnknownDomainError,
+    app_code_migration_report,
     draft_app_code_mapping,
     draft_changeset,
     draft_override,
@@ -631,6 +632,33 @@ def test_app_code_grid_carries_tier_origin_and_end_state(sessions, app_code_stor
     ]
     dual = next(r for r in out["rows"] if r["tier"] == "dual-coded")
     assert "PLT folders drain" in dual["declared_end_state"]
+
+
+def test_app_code_migration_report_reads_the_declared_end_states(sessions, app_code_store):
+    """K7 §B2's readback, lifted from wip/k9-laptop (bfb2f0b) at J30.
+
+    Tier 3 was admitted ON THE CONDITION that the end state is declared. The
+    shipped K9 built the view and the authoring UI but no reader, so
+    v_dual_coded_migrations had exactly one consumer in the tree — a unit test.
+    A declaration nothing reads back is a form field, not a condition.
+    """
+    token = _token(sessions, "kchen2190")
+    out = app_code_migration_report(token, sessions, app_code_store)
+
+    assert out["count"] == len(out["migrations"])
+    assert out["count"] >= 1, "the fixture carries a dual-coded row"
+    row = out["migrations"][0]
+    assert set(row) == {"app_code", "app_id", "declared_end_state", "authored_by", "authored_on"}
+    assert row["declared_end_state"], "a dual-coded row without an end state is the defect"
+    # Tier 3 ONLY — seal-born and platform rows are not migrations.
+    codes = {r["app_code"] for r in out["migrations"]}
+    tiers = {r["app_code"]: r["tier"] for r in app_code_store.app_code_rows()}
+    assert all(tiers[c] == "dual-coded" for c in codes)
+
+
+def test_app_code_migration_report_refuses_user_role(sessions, app_code_store):
+    with pytest.raises(Forbidden):
+        app_code_migration_report(_token(sessions, "jdoe4821"), sessions, app_code_store)
 
 
 def test_draft_app_code_mapping_writes_a_row_and_promotes(sessions, app_code_store):

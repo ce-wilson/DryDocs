@@ -41,6 +41,7 @@ from drydocs_api.mappings import (
     ChangesetValidationError,
     MappingStore,
     UnknownDomainError,
+    app_code_migration_report,
     draft_app_code_mapping,
     draft_changeset,
     draft_override,
@@ -417,6 +418,17 @@ def create_app(runner=None, store: InMemorySessionStore | None = None):
     ) -> dict[str, object]:
         return _mapping_call(
             draft_app_code_mapping, body.entries, _token(authorization), sessions, mapping_store
+        )
+
+    # K7 §B2 tier-3 readback (lifted from wip/k9-laptop at J30): dual-coded was
+    # admitted only because the end state is DECLARED, so the declaration needs a
+    # reader or the condition is decorative.
+    @app.get("/mappings/app-code/migrations")
+    def get_app_code_migrations(
+        authorization: str | None = Header(default=None),
+    ) -> dict[str, object]:
+        return _mapping_call(
+            app_code_migration_report, _token(authorization), sessions, mapping_store
         )
 
     # Dev-mode demo page (same-origin, so no CORS surface): the live-data twin

@@ -321,6 +321,9 @@ class MappingStore:
         cols = ", ".join(APP_CODE_HEADER)
         return self._select(f"SELECT {cols} FROM app_code_mapping ORDER BY line_no").rows
 
+    def app_code_migrations(self) -> list[dict]:
+        return self._select("SELECT * FROM v_dual_coded_migrations").rows
+
     def source_corrections(self) -> list[dict]:
         return self._select("SELECT * FROM v_source_corrections").rows
 
@@ -768,6 +771,28 @@ def draft_app_code_mapping(
             "rationale travels with the row instead of a corrected-in-source lifecycle."
         ),
     }
+
+
+def app_code_migration_report(
+    token: str, sessions: InMemorySessionStore, store: MappingStore
+) -> dict:
+    """The §B2 stalled-migration surface: every dual-coded row with the end state
+    it declared.
+
+    Tier 3 was admitted at the K7 gate ON THE CONDITION that the end state be
+    DECLARED. A declaration nothing ever reads back is not a condition, it is a
+    form field — so this is where it is read, and "temporarily dual-coded"
+    cannot quietly become the permanent state nobody re-opens.
+
+    LIFTED FROM `wip/k9-laptop` (`bfb2f0b`) at J30. The shipped K9 built the
+    `v_dual_coded_migrations` view and the authoring UI that writes
+    `declared_end_state`, but no reader: the view had exactly one consumer in
+    the whole tree, a unit test. The parallel implementation had this endpoint,
+    which is the only thing either version had that the other lacked.
+    """
+    _authorize(token, sessions)
+    rows = store.app_code_migrations()
+    return {"migrations": rows, "count": len(rows)}
 
 
 def source_corrections_report(
