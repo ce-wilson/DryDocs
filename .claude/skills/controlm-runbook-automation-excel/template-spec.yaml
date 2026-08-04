@@ -1,0 +1,150 @@
+# =============================================================================
+# template-spec.yaml — the 2-tab minimum-viable Excel runbook: machine-readable
+# source of truth. generate_template.py renders this spec to
+# controlm-runbook-template.xlsx (both committed; regenerate after editing here).
+#
+# PROVENANCE: structure captured 2026-08-04 from a reviewed company Excel
+# runbook (folder-grain workbook, tabs Overview / Technical_Details /
+# Control M Job details / Recovery Details / Outages / Business Flow /
+# Feedback; screenshots INTERNAL, gitignored, never committed). This spec
+# carries the two tabs the user ruled the MINIMUM VIABLE runbook:
+# Technical_Details + Control M Job details. Header typos in the source
+# ("Dependecy", "Compute Jason File", "Distrubution") are corrected here;
+# everything else is structure-verbatim. ALL example values are SYNTHESIZED
+# (the OrderHub generic universe, shared with sdlc-app-runbook.example.md).
+#
+# `source:` per field — where the value comes from when generating for real:
+#   graph          — already in the DryDocs Control-M graph (or its staging stores)
+#   graph-partial  — partly derivable; a named seam exists but needs enrichment
+#   manual         — SME/manual capture; no system of record we ingest today
+# The generator tints manual/graph-partial rows to match the source workbook's
+# "yellow = needs capture" convention.
+# =============================================================================
+
+schema: drydocs.excel-runbook-template.v1
+title: Control-M Application Runbook (minimum viable, 2-tab)
+classification: Internal-Public          # template only; a FILLED workbook is Internal
+updated: 2026-08-04
+
+tabs:
+  - name: Technical_Details
+    layout: rows                     # one Information row per line
+    columns: [Information, Details, "Description/comments", "SOR Flag"]
+    legend: "SOR Flag: I = Internal, E = External"
+    rows:
+      - {info: "SEAL ID",                                             source: graph,          example: "90123"}
+      - {info: "SEAL Application Name",                               source: graph,          example: "orderhub"}
+      - {info: "Product",                                             source: graph,          example: "Data Delivery"}
+      - {info: "Area-Product",                                        source: graph,          example: "Originations"}
+      - {info: "Confluence Page",                                     source: manual,         example: "<link to the application's runbook/migration page>"}
+      - {info: "Control-M Folder name",                               source: graph,          example: "PRDGRP-OHUB-90123-UPD-TRUST-UPD"}
+      - {info: "Dependency folder info in Control-M",                 source: graph,          example: "<upstream/downstream folders via conditions>"}
+      - {info: "Inbound MFTS Route ID / File mover details",          source: manual,         example: ""}
+      - {info: "File FTS Details",                                    source: manual,         example: ""}
+      - {info: "Outbound MFTS Route ID / File mover details",         source: manual,         example: ""}
+      - {info: "Outbound File FTS Details",                           source: manual,         example: ""}
+      - {info: "Drop Box Location",                                   source: graph-partial,  example: "/data/etl/ohub_data_warehouse/dropbox/"}
+      - {info: "Files Back up location",                              source: manual,         example: ""}
+      - {info: "Files outbound location",                             source: manual,         example: ""}
+      - {info: "Application Specific Log file",                       source: manual,         example: ""}
+      - {info: "SCRIPT / Jar files location",                         source: graph,          example: "/apps/etl/tenants/dpl_utils/dt-accelerators/dt-launcher-current.jar\n/apps/etl/tenants/ohub_data_warehouse/cfg/90123-epv-conf.json"}
+      - {info: "S3 RAW Bucket",                                       source: graph,          example: "s3://app-id-000001-dep-id-000002-uu-id-xxxxxxxx/12345/raw/"}
+      - {info: "S3 Trusted Bucket",                                   source: graph,          example: "s3://app-id-000001-dep-id-000002-uu-id-xxxxxxxx/12345/trusted/"}
+      - {info: "S3 Refined Bucket",                                   source: graph,          example: "s3://app-id-000001-dep-id-000002-uu-id-xxxxxxxx/12345/refined/"}
+      - {info: "S3 TDQ error Files Bucket",                           source: graph-partial,  example: "s3://app-id-000001-dep-id-000002-uu-id-xxxxxxxx/12345/error/"}
+      - {info: "Log file retention period",                           source: manual,         example: "<n> days"}
+      - {info: "DATA Files retention in Back up folder",              source: manual,         example: "<n> days"}
+      - {info: "Archival Path for (Source File) and retention policy", source: manual,        example: ""}
+      - {info: "Bitbucket Repo",                                      source: graph-partial,  example: "<repo link — project overview page>"}
+      - {info: "Required Steps needed to support/Run the jobs",       source: manual,         example: ""}
+      - {info: "Required Steps for checking the logs at multiple Hops", source: manual,       example: ""}
+      - {info: "Access Information",                                  source: manual,         example: "<access/entitlement id>"}
+      - {info: "AO Snow queue (L3) and CI details",                   source: graph,          example: "OrderHub DW Deployment; APP-DAT-SENG-OHUB: Technician", comment: "AO who will be supporting BAU"}
+      - {info: "AO Jira Project (L3)",                                source: manual,         example: "<Jira board link>"}
+      - {info: "AO Distribution list (L3)",                           source: graph,          example: "ohub_prod_support@example.com"}
+      - {info: "RE(RRT) Distribution list (L2)",                      source: graph,          example: "OHUB_L2_Support@example.com"}
+      - {info: "RE(RRT) Snow queue (L2) and CI details",              source: graph,          example: "OrderHub DW Deployment; APP-DAT-ASUP-OHUB: Technician"}
+      - {info: "Downstream/Business Distribution List",               source: manual,         example: "N/A"}
+      - {info: "Downstream snow queue",                               source: manual,         example: "N/A"}
+      - {info: "Source Distribution List /POC",                       source: graph-partial,  example: "upstream.poc@example.com"}
+      - {info: "Source snow queue and CI details",                    source: graph-partial,  example: "", comment: "for external vendors without a queue, enter External"}
+      - {info: "SOR Seal",                                            source: graph,          example: "90123"}
+      - {info: "SOR FLAG",                                            source: graph-partial,  example: "I"}
+      - {info: "Control-M FOLDER SLA",                                source: graph-partial,  example: ""}
+      - {info: "Parameter file path",                                 source: graph,          example: ""}
+      - {info: "S3 Login Details with Commands",                      source: manual,         example: "", comment: "S3 token fetching, S3 access key, listing objects, modifying objects, Postman connection, S3 CLI command"}
+      - {info: "Mercury Storage ID",                                  source: manual,         example: ""}
+      - {info: "Client ID for FID",                                   source: graph-partial,  example: "", comment: "FID co-located with SEAL in folder variables — derivable"}
+      - {info: "Control-M & GKP Configuration Details",               source: manual,         example: "", comment: "GKP using Klogin details"}
+      - {info: "Support Contact Information",                         source: manual,         example: "", comment: "S3, Kubernetes, GNOC and platform details"}
+      - {info: "Engagement and escalation model",                     source: manual,         example: "", comment: "documentation to reach escalation teams (pipeline platform, GKP, cloud, ATLAS-class tooling)"}
+      - {info: "Hygiene activities",                                  source: manual,         example: "", comment: "document any manual workaround with justification why it cannot be automated"}
+      - {info: "Escalation DB",                                       source: graph,          example: "APP_DAT_ASUP_OHUB", comment: "complete SCIM documentation; ticket alerting must route to L2 queues"}
+
+  - name: "Control M Job details"
+    layout: columns                  # one JOB row per line; these are the columns
+    columns:
+      - {name: "Folder Name",                                              source: graph,          example: "PRDGRP-OHUB-90123-UPD-TRUST-UPD"}
+      - {name: "Job Name/ SQL Agent Job",                                  source: graph,          example: "POHUB0015_UPD_ORDER_BAL_W_DAT_ONPM_FW"}
+      - {name: "Description",                                              source: graph,          example: "Control-M File Watcher for DAT"}
+      - {name: "Severity",                                                 source: graph-partial,  example: "P2"}
+      - {name: "QR information",                                           source: graph-partial,  example: "OHUB-FW-CTRL-RES"}
+      - {name: "Source Distribution List /POC",                            source: graph-partial,  example: "upstream.poc@example.com"}
+      - {name: "Source snow queue",                                        source: graph-partial,  example: "External"}
+      - {name: "Target Distribution List /POC",                            source: graph,          example: "OHUB_L2_Support@example.com"}
+      - {name: "Target snow queue",                                        source: graph,          example: "APP-DAT-ASUP-OHUB"}
+      - {name: "File Name for File Watcher (both Token and Data file name with path)", source: graph, example: "/data/etl/ohub_data_warehouse/dropbox/Order_Level_Balance_.dat"}
+      - {name: "Compute JSON File (Default/ Parametrized)",                source: graph-partial,  example: "Default"}
+      - {name: "Control-M Command Line (other than FW jobs)",              source: graph,          example: "N/A"}
+      - {name: "Parameter/YML/Config File Details",                        source: graph-partial,  example: ""}
+      - {name: "Nature of file (Full/Delta) or (Consumer/Producer)",       source: graph-partial,  example: "Delta"}
+      - {name: "SLO based on ODATE",                                       source: graph-partial,  example: "ODATE + 1 8AM EST"}
+      - {name: "SLA based on ODATE",                                       source: graph-partial,  example: "ODATE + 1 8AM EST"}
+      - {name: "Job Start Time",                                           source: graph,          example: "00:00"}
+      - {name: "Avg File/Source availability time",                        source: graph-partial,  example: "N/A"}
+      - {name: "Avg Run time",                                             source: graph,          example: ""}
+      - {name: "Avg Volume",                                               source: manual,         example: ""}
+      - {name: "CYCLIC (Y/N)",                                             source: graph,          example: "N"}
+      - {name: "Job Holiday Calendar",                                     source: graph,          example: "N"}
+      - {name: "ABI PSET/DPL PIPELINE ID/Kafka",                           source: graph,          example: ""}
+      - {name: "Source Dataset GUID",                                      source: graph,          example: ""}
+      - {name: "Target Dataset GUID",                                      source: graph,          example: ""}
+      - {name: "Source Dataset group/Kafka Cluster",                       source: graph-partial,  example: ""}
+      - {name: "Source Entity/Table/Kafka Topic",                          source: graph-partial,  example: ""}
+      - {name: "Target Dataset group/Schema",                              source: graph-partial,  example: ""}
+      - {name: "Target Entity/Table",                                      source: graph-partial,  example: ""}
+      - {name: "Error Table/Entity",                                       source: graph-partial,  example: ""}
+      - {name: "Snowflake Schema",                                         source: graph-partial,  example: ""}
+      - {name: "Snowflake table",                                          source: graph-partial,  example: ""}
+      - {name: "Glue Table",                                               source: graph-partial,  example: ""}
+      - {name: "Job Restartable",                                          source: manual,         example: "Yes"}
+      - {name: "Manual Intervention needed for restart",                   source: manual,         example: "Yes"}
+    # Three example rows — one per job family the source workbook demonstrates.
+    # Values are per-column, in column order; "" = left for capture.
+    example_rows:
+      - ["PRDGRP-OHUB-90123-UPD-TRUST-UPD", "POHUB0015_UPD_ORDER_BAL_W_DAT_ONPM_FW",
+         "Control-M File Watcher for DAT", "P2", "OHUB-FW-CTRL-RES",
+         "upstream.poc@example.com", "External", "OHUB_L2_Support@example.com",
+         "APP-DAT-ASUP-OHUB",
+         "/data/etl/ohub_data_warehouse/dropbox/Order_Level_Balance_.dat",
+         "Default", "N/A", "", "Delta", "ODATE + 1 8AM EST", "ODATE + 1 8AM EST",
+         "00:00", "N/A", "", "", "N", "N", "", "", "", "", "", "", "", "", "", "",
+         "", "Yes", "Yes"]
+      - ["PRDGRP-OHUB-90123-UPD-TRUST-UPD", "POHUB0020_UPD_ORDER_BAL_W_AWS_PLCT",
+         "Control-M Placement Job for UPD_ORDER_BAL_W", "P2", "OHUB-COMPUTE-CTRL-RES",
+         "upstream.poc@example.com", "External", "OHUB_L2_Support@example.com",
+         "APP-DAT-ASUP-OHUB", "N/A", "Default",
+         "/apps/etl/tenants/dpl_utils/dt-accelerators/dt-launcher.sh -env prod -dataset 00000000-0000-4000-8000-000000000001",
+         "", "Delta", "ODATE + 1 8AM EST", "ODATE + 1 8AM EST", "00:30", "N/A", "",
+         "", "N", "N", "", "", "", "", "", "", "", "", "", "", "", "Yes", "Yes"]
+      - ["PRDGRP-OHUB-90123-UPD-TRUST-UPD", "POHUB0050_UPD_ORDER_BAL_W_AWS_TRUST",
+         "Trigger Ingestion for Dataset UPD_ORDER_BAL_W in AWS", "P2",
+         "OHUB-COMPUTE-CTRL-RES", "upstream.poc@example.com", "External",
+         "OHUB_L2_Support@example.com", "APP-DAT-ASUP-OHUB", "N/A", "Default",
+         "/apps/etl/tenants/dpl_utils/dt-accelerators/dt-launcher.sh -env prod -pipeline 00000000-0000-4000-8000-000000000002",
+         "", "Delta", "ODATE + 1 8AM EST", "ODATE + 1 8AM EST", "00:55", "N/A", "",
+         "", "N", "N", "00000000-0000-4000-8000-000000000002",
+         "00000000-0000-4000-8000-000000000001", "00000000-0000-4000-8000-000000000003",
+         "ohub_upd_raw", "order_level_balance_w", "ohub_upd", "order_level_balance_w",
+         "order_level_balance_w_ERR", "prod_90123_db.ohub_svc_col_v",
+         "order_level_balance_w", "order_level_balance_w", "Yes", "Yes"]

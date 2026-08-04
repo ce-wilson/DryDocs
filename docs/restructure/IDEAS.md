@@ -26,6 +26,17 @@ Tags help grooming: `idea` · `bug` · `doc` · `source` (new data source) · `q
 
 <!-- add new ideas at the top -->
 
+- 2026-08-04 — [idea] **`controlm-runbook-automation-SDLC` skill — generate the SDLC Application
+  Run Book doc type from the graph.** The sdlc-app-runbook outline + exemplar landed 2026-08-04
+  (`995eb9a`, doc type SDLC-Runbook); its per-workflow block (Control-M job / schedule / param
+  file / src-stg-target schema@DB + table grain + task table), schedule table (trigger files +
+  alert windows), and SLA table are all generatable from the Control-M graph + cm_avg_run +
+  the escalation DB, the same feeds the runbook-automation skill already names. Shape: a
+  company-side sibling of `controlm-runbook-automation` that emits the outline-conformant .md
+  per application/folder, SME fills the residue (contacts, vault safes, special-case recovery).
+  Sibling precedent: the `controlm-runbook-automation-excel` skill (BUILT same day) does this
+  for the minimum-viable 2-tab Excel runbook — the -SDLC variant is the long-form twin.
+
 - 2026-08-04 — [bug] `provision.ps1` cannot run as documented on this desktop: it requires
   `cypher-shell` on the host PATH, which only exists inside the container. Worked around
   at the M3 reload via `docker cp` + `docker exec cypher-shell -f`. Fix: document the
