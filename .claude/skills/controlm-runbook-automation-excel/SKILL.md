@@ -69,7 +69,7 @@ never silently overwrite either side.
 ## Boundaries
 
 - **Committed files are mechanism-only.** The template + spec carry ONLY
-  synthesized values (the OrderHub universe: SEAL 90123, `example.com`,
+  synthesized values (the OrderHub universe: SEAL 70004, `example.com`,
   zeroed-pattern GUIDs). Real filled workbooks are **Internal**: write them to
   `internal-local/` (machine-local) or `internal/` (repo-internal), never to
   the skill directory.

@@ -26,6 +26,21 @@ Tags help grooming: `idea` · `bug` · `doc` · `source` (new data source) · `q
 
 <!-- add new ideas at the top -->
 
+- 2026-08-04 — [source] **`controlm-pipeline-stub` captured + integration plan written (internal).**
+  The internal DPL Control-M XML builder/validator package (config → generate → validate →
+  upload → runtime, 14/14 green) is captured VERBATIM at
+  `internal/controlm-config/reference/controlm-pipeline-stub-capture.md`, and the
+  work order for the internal Opus 4.8 agent is
+  `internal/controlm-config/controlm-pipeline-stub-integration-plan.md` (items X1-X3 XML-seam
+  supplement, W1-W4 greenfield emitter for the fix module, V1-V2 CR### rules, E1-E4
+  classifier/gate enrichment, F1 fixture factory). Producer-side grooming trigger: the
+  producer-TWIN items (E2 job-name grammar mechanism, F1 sanitized fixtures, W1 if promoted
+  to drydocs_core) groom into backlog.yaml when the internal build starts landing — epic
+  placement (G-series vs new) is a user call at that groom. Notables the capture settles:
+  the stub IS the vendor-schema acquisition remediation XML I/O was parked on
+  (Folder.xsd + full attribute reference), and the DPL job-name grammar closes half the
+  "job naming standard = outstanding gap" memory (folder grammar corroborates PRAOCG).
+
 - 2026-08-04 — [idea] **`controlm-runbook-automation-SDLC` skill — generate the SDLC Application
   Run Book doc type from the graph.** The sdlc-app-runbook outline + exemplar landed 2026-08-04
   (`995eb9a`, doc type SDLC-Runbook); its per-workflow block (Control-M job / schedule / param
