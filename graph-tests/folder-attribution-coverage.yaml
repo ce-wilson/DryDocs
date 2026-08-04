@@ -103,3 +103,34 @@ cases:
       MATCH (j:ControlMJob)-[r:WAS_ASSOCIATED_WITH {role: 'seal_app_ref'}]->(:BusinessApplication)
       RETURN j.folder_id AS folder_id, j.job_id AS job_id
     assert: empty
+
+  - id: TC-09
+    description: every Port carries a valid active_state with its declared stamps, and no port still carries the retired boolean (K10, §G4)
+    cypher: >
+      MATCH (p:Port)
+      WHERE NOT p.active_state IN ['declared', 'confirmed']
+         OR p.declared_by IS NULL OR p.declared_at IS NULL
+         OR p.active IS NOT NULL
+      RETURN p.parent_app_id AS app_id, p.kind AS kind, p.active_state AS state
+    assert: empty
+
+  - id: TC-10
+    description: confirmation and the folder edge agree both ways (§G5 — confirmation is DERIVED, so a confirmed Batch port without an edge or an edge onto an unconfirmed port is bookkeeping drift), and every confirmed port carries all three confirmed stamps
+    cypher: >
+      MATCH (p:Port:BatchProcessing)
+      OPTIONAL MATCH (:ControlMFolder)-[r:BELONGS_TO_APPLICATION {role: 'seal_app_ref'}]->(p)
+      WITH p, count(r) AS folder_edges
+      WHERE (p.active_state = 'confirmed' AND (folder_edges = 0
+               OR p.confirmed_by IS NULL OR p.confirmed_at IS NULL
+               OR p.confirmed_run_id IS NULL))
+         OR (p.active_state = 'declared' AND folder_edges > 0)
+      RETURN p.parent_app_id AS app_id, p.active_state AS state, folder_edges
+    assert: empty
+
+  - id: TC-11
+    description: the EventProcessing port stays declared-only until an event source is onboarded (§G5 — evidence-backed, no app-code loader touches it)
+    cypher: >
+      MATCH (p:Port:EventProcessing)
+      WHERE p.active_state = 'confirmed'
+      RETURN p.parent_app_id AS app_id
+    assert: empty

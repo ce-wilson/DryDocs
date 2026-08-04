@@ -48,4 +48,14 @@ MERGE (f)-[r:BELONGS_TO_APPLICATION {role: 'seal_app_ref'}]->(p)
                 r.match_method  = row.match_method,
                 r.tier          = row.tier
 SET r.last_seen_at = datetime($loaded_at),
-    r.last_run_id  = $run_id;
+    r.last_run_id  = $run_id
+
+// K10 (§G4/§G5): the edge landing on the port IS the confirmation — no
+// separate trigger, which is what §C1(b) bought. First-confirmation stamps
+// are stable (coalesce): a re-run re-confirms without rewriting who/when
+// confirmed first. confirmed_by = the authoring steward when the row was
+// authored, else the loader (a matched-fallback derivation).
+SET p.active_state     = 'confirmed',
+    p.confirmed_by     = coalesce(p.confirmed_by, coalesce(row.authored_by, $loader)),
+    p.confirmed_at     = coalesce(p.confirmed_at, datetime($loaded_at)),
+    p.confirmed_run_id = coalesce(p.confirmed_run_id, $run_id);

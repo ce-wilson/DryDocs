@@ -177,7 +177,7 @@ QUERY_SPECS: dict[str, QuerySpec] = {
                 "OPTIONAL MATCH (f)-[:CONTAINS_JOB]->(j:ControlMJob) "
                 "RETURN f.sched_table AS folder, s.name AS data_center, "
                 "a.app_id AS app_id, a.name AS application, r.origin AS origin, "
-                "count(DISTINCT j) AS jobs "
+                "p.active_state AS port_state, count(DISTINCT j) AS jobs "
                 "ORDER BY folder LIMIT $limit"
             ),
             columns=(
@@ -186,6 +186,7 @@ QUERY_SPECS: dict[str, QuerySpec] = {
                 ColumnDef("app_id", "string", "Application ID"),
                 ColumnDef("application", "string", "Application"),
                 ColumnDef("origin", "string", "Origin"),
+                ColumnDef("port_state", "string", "Port state"),
                 ColumnDef("jobs", "int", "Jobs"),
             ),
             classification="internal",

@@ -106,12 +106,27 @@ SET a.seal_id                       = row.app_id,   // deprecated alias — phas
 // cli.py binds ports through HAS_PORT, not the property), and a NODE KEY property
 // cannot be null. The constraint is DROPped and recreated under a new name in
 // constraints.cypher — see the trap recorded there.
+// K10 (gate seal-app-ref-edge-reshape §G4, ruled 2026-08-03): active_state
+// PER PORT — 'declared' (the SEAL record says the app has this side) or
+// 'confirmed' (a folder mapping landed on it). Replaces the `active` boolean,
+// which was created false and never written true or read anywhere. Seeded
+// ON CREATE only, so a SEAL reload never resets a confirmation (§G5:
+// confirmation is DERIVED from BELONGS_TO_APPLICATION landing on the port —
+// the attribution loaders stamp it, this loader never does). The
+// EventProcessing port stays declared-only until an event source is
+// onboarded (§G5 — evidence-backed: no app-code loader touches it).
 MERGE (ep:Port:EventProcessing {parent_app_id: row.app_id, kind: 'EventProcessing'})
-  ON CREATE SET ep.first_seen_at = datetime($loaded_at), ep.active = false
+  ON CREATE SET ep.first_seen_at = datetime($loaded_at),
+                ep.active_state  = 'declared',
+                ep.declared_by   = 'SEAL',
+                ep.declared_at   = datetime($loaded_at)
 SET ep.last_seen_at = datetime($loaded_at)
 
 MERGE (bp:Port:BatchProcessing {parent_app_id: row.app_id, kind: 'BatchProcessing'})
-  ON CREATE SET bp.first_seen_at = datetime($loaded_at), bp.active = false
+  ON CREATE SET bp.first_seen_at = datetime($loaded_at),
+                bp.active_state  = 'declared',
+                bp.declared_by   = 'SEAL',
+                bp.declared_at   = datetime($loaded_at)
 SET bp.last_seen_at = datetime($loaded_at)
 
 MERGE (a)-[:HAS_PORT]->(ep)

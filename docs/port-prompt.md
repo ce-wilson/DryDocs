@@ -579,6 +579,25 @@ verification status in [BRACKETS]; spend review on [UNRULED].
     folder-grain shape; if your copies carry company edits, merge the row,
     do not overwrite the file. Suite stays 1399.
 
+65. K10 — PORT ACTIVATION CUTOVER [TEST-PINNED, TOUCHES YOUR LIVE WRITERS].
+    `seal_applications.cypher` seeds `active_state='declared'` +
+    `declared_by/declared_at` ON CREATE only and NEVER writes 'confirmed';
+    both attribution edge writers stamp the port
+    `confirmed`/`confirmed_by`/`confirmed_at`/`confirmed_run_id` when the
+    BELONGS_TO_APPLICATION edge lands (§G5 — derived, no separate trigger;
+    coalesce-stable first-confirmation stamps). The `active` boolean is
+    GONE; suite TC-09 fails any port still carrying it.
+    ***YOUR SIDE:*** (a) §G4-RIDER is YOUR migration — grandfather your
+    already-`active=true` ports as `confirmed` with the Control-M app-code
+    link as provenance BEFORE taking TC-09, then drop the boolean; (b) your
+    `controlm_app_codes.cypher` + AutoSys twin still write the boolean —
+    re-point them (or retire them into the folder-attribution path, step
+    63(c)) in the same change; (c) TC-10's two-way confirmation<->edge
+    agreement will red any port confirmed by grandfathering whose folder
+    edges have not yet been migrated — sequence the §F1/T23 edge migration
+    FIRST, or hold this step with step 63. `EXPECTED_CONSTRAINTS` does not
+    move. Producer suite 1399→1403.
+
 ACCEPTANCE GATE (behavior is the contract, not a byte-compare):
 - Track 1 (portable):
     poetry run pytest tests/unit/test_variable_classifier.py tests/unit/test_variable_resolver.py \
@@ -595,11 +614,11 @@ ACCEPTANCE GATE (behavior is the contract, not a byte-compare):
   capability_assert=false skips per T18). A retired-id refusal from
   `SourceRegistry.from_yaml` is the D4 guard WORKING, not a port failure — rebind the
   loader in `loader-source-overlay.yaml`, never by re-adding the retired id.
-  Producer reference at the current head (steps 63-64, the K8/K12/K14 builds): 1399
+  Producer reference at the current head (step 65, the K10 build): 1403
   passed / 5 skipped with the production CSV PRESENT and no
-  RECONCILE_BEFORE_DIR (4 J7 guards + the graphrag PDF) — like-for-like with
-  step 61's 1384 / 5 (+15, the K8 folder-attribution + demotion guards) and
-  step-58's 1356 / 5 (+28 of that gap were K9 guards). The
+  RECONCILE_BEFORE_DIR (4 J7 guards + the graphrag PDF) — the like-for-like
+  chain: step 58 1356/5 → step 61 1384/5 (+28 K9 guards) → step 63 1399/5
+  (+15 K8) → step 65 1403/5 (+4 K10). The
   step-60 figure (1354 / 7) was CSV-ABSENT without RECONCILE_BEFORE_DIR and is
   not comparable line-for-line; `aa0a0eb`'s commit message quotes 1358 / 3,
   which is the step-59 run with RECONCILE_BEFORE_DIR set. Earlier producer

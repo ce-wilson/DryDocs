@@ -47,7 +47,9 @@ WITH row
 FOREACH (_ IN CASE WHEN row.create_target_if_missing THEN [1] ELSE [] END |
   MERGE (bp:Port:BatchProcessing {parent_app_id: row.app_id, kind: 'BatchProcessing'})
     ON CREATE SET bp.first_seen_at = datetime($loaded_at),
-                  bp.active        = false
+                  bp.active_state  = 'declared',
+                  bp.declared_by   = 'manual-csv',
+                  bp.declared_at   = datetime($loaded_at)
 )
 
 // Fan-out (§B1): a code-level row covers every folder under its app code;
@@ -67,4 +69,12 @@ MERGE (f)-[r:BELONGS_TO_APPLICATION {role: 'seal_app_ref'}]->(p)
                 r.manual_load_file = row.manual_load_file,
                 r.authored_by      = row.authored_by
 SET r.last_seen_at = datetime($loaded_at),
-    r.last_run_id  = $run_id;
+    r.last_run_id  = $run_id
+
+// K10 (§G4/§G5/§G7): a manual pin confirms the port like any other landing
+// edge; the authoring steward IS the confirmer, first-confirmation stamps
+// stable.
+SET p.active_state     = 'confirmed',
+    p.confirmed_by     = coalesce(p.confirmed_by, row.authored_by),
+    p.confirmed_at     = coalesce(p.confirmed_at, datetime($loaded_at)),
+    p.confirmed_run_id = coalesce(p.confirmed_run_id, $run_id);

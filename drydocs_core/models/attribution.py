@@ -136,13 +136,16 @@ class FolderAttributionRow(BaseModel):
     match_method: str = Field(..., pattern=r"^(defined|override|manual|seal|fid|app_name|alias)$")
     tier: str | None = Field(None, pattern=r"^(seal-born|platform|dual-coded)$")
     source: str = Field(..., min_length=1)
+    # The authoring steward for authored rows; None on matched-fallback rows
+    # (the loader identity becomes the K10 confirmed_by instead).
+    authored_by: str | None = None
 
     @field_validator("folder_id", "app_id", mode="before")
     @classmethod
     def _keys(cls, v: Any) -> str:
         return _stripped_str(v)
 
-    @field_validator("tier", mode="before")
+    @field_validator("tier", "authored_by", mode="before")
     @classmethod
     def _tier(cls, v: Any) -> str | None:
         return _str_or_none(v)

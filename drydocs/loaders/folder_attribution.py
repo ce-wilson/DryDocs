@@ -229,6 +229,7 @@ def resolve_folder_attributions(
                     match_method=MATCH_METHOD_BY_ORIGIN[origin],
                     tier=row.get("tier"),
                     source=AUTHORED_SOURCE,
+                    authored_by=row.get("authored_by"),
                 )
         elif app_code and app_code in declared_platform_codes:
             conflict = FolderConflict(

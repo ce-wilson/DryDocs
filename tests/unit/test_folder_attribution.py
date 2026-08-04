@@ -306,6 +306,59 @@ def test_automated_cypher_carries_the_pin_guard() -> None:
     assert "NOT EXISTS" in text and "m.match_method = 'manual'" in text
 
 
+# --- K10 port activation cutover (§G4/§G5) ---------------------------------------
+
+SEAL_APPS_CYPHER = REPO_ROOT / "drydocs" / "loaders" / "cypher" / "seal_applications.cypher"
+
+
+def _code_lines(path: Path) -> str:
+    text = path.read_text(encoding="utf-8")
+    return "\n".join(line for line in text.splitlines() if not line.strip().startswith("//"))
+
+
+def test_ports_seed_declared_and_never_confirmed_at_the_seal_load() -> None:
+    """K10 (§G4): seal_applications seeds active_state='declared' ON CREATE
+    only — a SEAL reload never resets a confirmation — and the retired
+    `active` boolean is gone. Confirmation is NEVER written here (§G5: it is
+    derived from the edge landing, by the attribution loaders)."""
+    code = _code_lines(SEAL_APPS_CYPHER)
+    assert code.count("active_state  = 'declared'") == 2  # both ports
+    assert "'confirmed'" not in code
+    assert "active = false" not in code
+    # declared stamps ride the seed (§G4)
+    assert "declared_by" in code and "declared_at" in code
+
+
+def test_attribution_cyphers_derive_confirmation_with_stable_first_stamps() -> None:
+    """K10 (§G5): both edge writers stamp the port confirmed when the edge
+    lands — no separate trigger — and the first-confirmation stamps are
+    coalesce-stable so a re-run re-confirms without rewriting who or when
+    confirmed first."""
+    for path in (AUTOMATED_CYPHER, MANUAL_CYPHER):
+        code = _code_lines(path)
+        assert "p.active_state     = 'confirmed'" in code
+        for stamp in ("p.confirmed_by", "p.confirmed_at", "p.confirmed_run_id"):
+            assert f"coalesce({stamp}" in code, f"{path.name}: {stamp} must be coalesce-stable"
+
+
+def test_authored_by_travels_to_the_row_for_the_confirmed_by_stamp() -> None:
+    """K10: authored rows carry the steward's authored_by (the cypher's
+    confirmed_by source); fallback rows carry None so the loader identity
+    confirms instead."""
+    rows, _ = resolve_folder_attributions([_authored("ARA", "SL0001")], {"f1": "ARA"}, [])
+    assert rows[0].authored_by == "sid-test"
+    rows, _ = resolve_folder_attributions([], {"f1": None}, [_decision("f1", "1", "SL0002")])
+    assert rows[0].authored_by is None
+
+
+def test_folder_applications_spec_surfaces_the_port_state() -> None:
+    from drydocs_api.query_specs import QUERY_SPECS
+
+    spec = QUERY_SPECS["explorer.folder-applications.v1"]
+    assert "p.active_state AS port_state" in spec.cypher
+    assert "port_state" in [c.name for c in spec.columns]
+
+
 def test_manual_cypher_fans_out_per_app_code_and_stamps_manual_pin() -> None:
     text = MANUAL_CYPHER.read_text(encoding="utf-8")
     assert "MATCH (ca:ControlMApplication {name: row.app_code})-[:CONTAINS_FOLDER]->" in text
