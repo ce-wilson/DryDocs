@@ -1,17 +1,17 @@
 {
   "meta": {
     "project": "drydocs",
-    "captured_at": "2026-08-04T15:48:45",
+    "captured_at": "2026-08-04T16:11:13",
     "date": "20260804",
     "scan": "DryDocs",
     "tree": true,
     "git": {
-      "commit": "299af39",
-      "full": "299af399bc71394f4fa413914f8d28955a94b4bf",
+      "commit": "a782860",
+      "full": "a7828602f292130093fda35e0512cc83eeab9427",
       "branch": "main",
-      "describe": "299af39",
-      "subject": "fix(instrument): bump the depgraph pin 5006567 -> 773fb1e and pull the sibling to match",
-      "dirty": true,
+      "describe": "a782860",
+      "subject": "feat(ritual): snapshot.ps1 compares the depgraph checkout against the pin and warns on drift",
+      "dirty": false,
       "pr": null
     },
     "depgraph": {
@@ -12695,10 +12695,10 @@
       "kind": "file"
     },
     {
-      "file_id": "drydocs/knowledge/depgraph-snapshots/drydocs-20260804.json",
-      "name": "drydocs-20260804.json",
+      "file_id": "drydocs/knowledge/depgraph-snapshots/drydocs-20260804-1548.json",
+      "name": "drydocs-20260804-1548.json",
       "extension": ".json",
-      "rel_path": "knowledge/depgraph-snapshots/drydocs-20260804.json",
+      "rel_path": "knowledge/depgraph-snapshots/drydocs-20260804-1548.json",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -25202,7 +25202,7 @@
     [
       "drydocs/knowledge/depgraph-snapshots",
       "CONTAINS",
-      "drydocs/knowledge/depgraph-snapshots/drydocs-20260804.json"
+      "drydocs/knowledge/depgraph-snapshots/drydocs-20260804-1548.json"
     ],
     [
       "drydocs/knowledge/depgraph-snapshots",
