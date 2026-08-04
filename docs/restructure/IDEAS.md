@@ -72,15 +72,6 @@ Tags help grooming: `idea` · `bug` · `doc` · `source` (new data source) · `q
   to the `drydocs-sdlc-docs` cron stream; fix the loader-inventory row there, not piecemeal.
   (Found at the K13 surface sweep.)
 
-- 2026-08-04 — [chore] **The /mappings job-application pane is now the LEGACY surface** — its
-  coverage grid (`mappings.attribution-coverage.v1`) still reads the RETIRED job-grain
-  `WAS_ASSOCIATED_WITH {seal_app_ref}` edge (TC-08 asserts none exist post-K8, so every row now
-  reads "unresolved"), and its assign flow drafts the retired job-grain changeset the server
-  refuses. Found at K11 while building the app-code cascade pane beside it. Decide: re-bind the
-  coverage spec to folder edges with job inheritance (jobs view of the K8 truth), or retire the
-  pane and make app-code-mapping the default `/mappings` domain. Either way the `derivedLifecycle`
-  self-verification in MappingsRoute needs the same re-bind.
-
 - 2026-08-03 — [idea] **EPIC: backlog.yaml has outgrown single-file text editing — shard it,
   derive the summary, query it from the graph.** Trigger: during the DD6 session the company
   agent worked lines 10,573–10,669 of a 10.6k-line file; producer copy is 10,784 lines / 722KB /
@@ -538,6 +529,8 @@ Tags help grooming: `idea` · `bug` · `doc` · `source` (new data source) · `q
   `datetime(replace(x, ' ', 'T'))` Cypher contract expects (the as-built company `_ts()`
   shape, which deliberately shares one temporal contract with the Oracle path rather than
   forking to native datetimes), plus the two hardenings above.
+  Trigger re-checked 2026-08-04 (Control-M inbox groom): `controlm_xml.py` still consumes
+  no temporal fields — stays parked.
 
 - 2026-07-21 — [chore] **Next cross-repo port: carry the AIS acronym expansion across
   files.** Producer's authoritative home is `software-registry.yaml#acronyms`; the company's
@@ -708,13 +701,6 @@ Tags help grooming: `idea` · `bug` · `doc` · `source` (new data source) · `q
   value; the SEAL is also embedded in folder names) — a FID→seal_id pairing may be
   derivable from the already-ingested variables, not only from company tables.
 
-- 2026-07-14 — [idea] **internal psgmgr now derives `ctlm_id` = `folder_id.job_id`** (e.g.
-  `161015.7`; recorded at the P2 avg-run gate sign-off as the §B join upgrade). Ripple beyond
-  CM_AVG_RUN to check: (1) which other CM_ views/extracts carry it — could replace weak joins
-  elsewhere; (2) K2 manual-CSV template `source_key` could accept `ctlm_id=<id>` as shorthand
-  for the composite (folder_id, job_id) key; (3) company-side port alignment — the derived
-  column lives internal-side, keep producer mechanism generic.
-
 - 2026-07-12 — [idea] **dry-docs.com site visual language**: seed from the whitepaper's
   "overnight ledger" identity (greenbar/banner-page/mono-display; canonical source stays
   docs/whitepaper/drydocs-whitepaper.md). Parked until website work starts — the site is
@@ -801,6 +787,15 @@ Tags help grooming: `idea` · `bug` · `doc` · `source` (new data source) · `q
 
 ## Recently groomed (audit trail)
 
+- 2026-08-04 (Control-M groom) — [chore] the legacy /mappings job-application pane (coverage
+  grid + assign flow still on the retired job-grain edge, found at K11) → **K15** (type bug —
+  the surface actively misreports; retire-or-re-bind, direction confirmed with the user at
+  build).
+- 2026-08-04 (Control-M groom) — [idea] the 2026-07-14 ctlm_id ripple → **CONSUMED**: (1) the
+  which-other-CM_-views census is internal-side (docs/next-internal-session.md item 4, needs
+  Oracle — K14's notes keep it separate on purpose); (2) the K2 manual-CSV `ctlm_id=` shorthand
+  is moot — K9 rekeyed the template to app_code; (3) company-side alignment rides port step 62
+  (the composite-key-serialization standard, ctlm_id dot form ruled 2026-08-03).
 - 2026-08-04 (weekly groom) — [bug] review-plan seed queries missing the D7 tombstone filter
   → **U13** (the A3 dead-`__init__.py` ranking is the proof case; fix the query pack, not the
   sweep).
