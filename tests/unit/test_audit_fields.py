@@ -18,6 +18,7 @@ ROOT = Path(__file__).resolve().parent.parent.parent
 AUDIT_FILE = ROOT / "config" / "audit-fields.yaml"
 REGISTRY_FILE = ROOT / "config" / "source-registry.yaml"
 DOC_REGISTRY_FILE = ROOT / "config" / "doc-source-registry.yaml"
+VOCAB_FILE = ROOT / "drydocs_core" / "ontology" / "relationship_vocabulary.yaml"
 
 FROZEN_ENVELOPE = [
     "source_created_by",
@@ -106,3 +107,41 @@ def test_loaders_set_exactly_the_confirmed_envelope(audit: dict) -> None:
     assert "f.source_updated_at" in folders
     assert "f.source_created_by" not in folders  # no creation columns on CM_DEF_VTAB
     assert "f.source_created_at" not in folders
+
+
+# ---- property-term bindings (M4, gate envelope-property-terms) --------------
+
+
+@pytest.fixture(scope="module")
+def property_terms() -> list[dict]:
+    vocab = yaml.safe_load(VOCAB_FILE.read_text(encoding="utf-8"))
+    return vocab["property_terms"]
+
+
+def test_every_envelope_property_carries_a_term_binding(
+    audit: dict, property_terms: list[dict]
+) -> None:
+    """M4 drift guard: the frozen envelope names each have a registered
+    property-term binding in the vocabulary's property_terms section."""
+    bound = {e["property"] for e in property_terms}
+    missing = set(audit["envelope"]) - bound
+    assert not missing, f"envelope properties without a property_terms binding: {missing}"
+
+
+def test_property_term_curies_expand_and_are_gated(property_terms: list[dict]) -> None:
+    from drydocs_core.ontology.namespaces import expand
+
+    for entry in property_terms:
+        assert entry.get("decided_by"), f"{entry['property']}: binding without a gate id"
+        iri = expand(entry["term"])
+        assert iri.startswith("http"), f"{entry['property']}: {entry['term']} -> {iri}"
+
+
+def test_the_ruled_envelope_bindings(property_terms: list[dict]) -> None:
+    """The gate's rulings, pinned: the dct: trio plus the recorded-imprecision
+    contributor row (gate envelope-property-terms §B1/§B2)."""
+    by_prop = {e["property"]: e for e in property_terms}
+    assert by_prop["source_created_by"]["term"] == "dct:creator"
+    assert by_prop["source_created_at"]["term"] == "dct:created"
+    assert by_prop["source_updated_by"]["term"] == "dct:contributor"
+    assert by_prop["source_updated_at"]["term"] == "dct:modified"

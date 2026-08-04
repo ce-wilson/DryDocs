@@ -740,6 +740,33 @@ verification status in [BRACKETS]; spend review on [UNRULED].
     reason in the same commit that takes the guard. J13 (the publish-ceiling
     term sweep) remains OPEN and user-gated — not in this range.
 
+72. M3+M4 — THE DOC-06 ENVELOPE GATES (two gates, one session, 1427→1430/5).
+    M3 (gate `audit-envelope-phase4`, 13/13): the four remaining non-Control-M
+    audit-envelope stubs are RULED, none confirmed — the SME evidence reversed
+    the drafted recommendation: the SEAL registry's date fields are
+    onboarding-LIFECYCLE milestones with two-era capture (legacy applications
+    lack them), so creation_date is not record authorship; certification
+    columns excluded as attestation; the PAT report extracts project zero
+    audit columns (stub-until-projected); software-registry = permanent stub
+    (git history is the envelope). Revisit trigger recorded: the registry UI
+    exposes a per-application audit download. No loader change; audit-fields
+    notes + loader README envelope section + doc 06 phase marks. M4 (gate
+    `envelope-property-terms`, 10/10): the envelope properties bound
+    dct:creator/created/contributor/modified in a NEW `property_terms`
+    section (0b) of relationship_vocabulary.yaml; `dct:` registered in
+    namespaces.py (+ ontology.cypher header sync, documentation-grade — no
+    dct: OntologyTerm nodes seeded); reference/standards/dcmi-terms/ stub +
+    REGISTRY row; +3 drift guards in test_audit_fields.py.
+    ***YOUR SIDE:*** gate ADOPTION per the two-tier doctrine — the gate-log
+    entries union-append and YOUR tree runs its own ratification if it wants
+    the rulings load-bearing; the config/vocabulary/reference files are
+    canonical-producer. Two cautions: (a) if your tree ever mapped SEAL or
+    PAT envelope columns locally, the M3 rulings SUPERSEDE that — remove the
+    mapping or record your own gate divergence; (b) the new test
+    `test_every_envelope_property_carries_a_term_binding` reds a tree whose
+    vocabulary file predates section 0b — take the vocabulary file in the
+    same commit as the test.
+
 ACCEPTANCE GATE (behavior is the contract, not a byte-compare):
 - Track 1 (portable):
     poetry run pytest tests/unit/test_variable_classifier.py tests/unit/test_variable_resolver.py \
@@ -756,14 +783,15 @@ ACCEPTANCE GATE (behavior is the contract, not a byte-compare):
   capability_assert=false skips per T18). A retired-id refusal from
   `SourceRegistry.from_yaml` is the D4 guard WORKING, not a port failure — rebind the
   loader in `loader-source-overlay.yaml`, never by re-adding the retired id.
-  Producer reference at the current head (step 71, the J-series close-out):
-  1427
+  Producer reference at the current head (step 72, the doc-06 envelope gates):
+  1430
   passed / 5 skipped with the production CSV PRESENT and no
   RECONCILE_BEFORE_DIR (4 J7 guards + the graphrag PDF) — the like-for-like
   chain: step 58 1356/5 → step 61 1384/5 (+28 K9 guards) → step 63 1399/5
   (+15 K8) → step 65 1403/5 (+4 K10) → step 66 1410/5 (+7 K11; step 67 no
   delta) → step 68 1413/5 (+3 U12; step 69 no delta) → step 70 1420/5
-  (+7 C22) → step 71 1427/5 (+7 J18/J26/J27/J28). The
+  (+7 C22) → step 71 1427/5 (+7 J18/J26/J27/J28) → step 72 1430/5 (+3 M4
+  property-term guards). The
   step-60 figure (1354 / 7) was CSV-ABSENT without RECONCILE_BEFORE_DIR and is
   not comparable line-for-line; `aa0a0eb`'s commit message quotes 1358 / 3,
   which is the step-59 run with RECONCILE_BEFORE_DIR set. Earlier producer

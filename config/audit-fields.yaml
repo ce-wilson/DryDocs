@@ -14,10 +14,10 @@
 # registered source whose envelope gate has not run; loaders must not write
 # envelope properties for stub sources.
 #
-# Ontology note: the envelope properties are property-level provenance —
-# standard terms dct:creator / dct:created / dct:modified (Dublin Core) or
-# PROV qualified attribution. Property-term binding is NOT yet registered
-# (relationship_vocabulary.yaml covers edges only) — tracked in IDEAS.
+# Ontology note: the envelope properties are property-level provenance,
+# bound to standard terms at gate envelope-property-terms (2026-08-04, M4):
+# dct:creator / dct:created / dct:modified / dct:contributor — registered in
+# the property_terms section of relationship_vocabulary.yaml.
 #
 # classification: Internal-Public — mechanism only (column names + rules; the
 # column names below are vendor-schema mechanism). Confidential sources keep
@@ -30,7 +30,7 @@
 # =============================================================================
 schema: drydocs.audit-fields.v1
 classification: Internal-Public
-updated: 2026-07-31                    # N9: re-keyed to the v2 dataset ids (gate source-registry-v2; Q6 transfers)
+updated: 2026-08-04                    # M3: the four Phase-4 rulings (gate audit-envelope-phase4). Earlier N9: re-keyed to the v2 dataset ids (gate source-registry-v2; Q6 transfers)
 
 # The four envelope property names, frozen (test-enforced).
 envelope:
@@ -99,20 +99,44 @@ sources:
     notes: "Aggregate stats table — authorship envelope likely n/a; decide at a Phase 4 gate."
 
   - id: "seal:app-extract"
-    status: stub                             # envelope gate not run (doc 06 Phase 4)
-    notes: "Confidential handling — real column mapping goes to the internal twin when gated."
+    status: stub                             # RULED stub (gate audit-envelope-phase4, 2026-08-04)
+    notes: >
+      Confirmed 2026-08-04 (gate audit-envelope-phase4 §B2, SME evidence in-session).
+      The registry's date fields are onboarding-LIFECYCLE milestones with two-era
+      capture (legacy applications lack them), so creation_date is not record
+      authorship; the extract carries NO created-by and NO updated-side columns.
+      last_certified_by_sid/date excluded — certification is attestation, not
+      modification; capture_date excluded under the standing CAPTURE_DATE rule.
+      The contact extract (5 fields) has nothing to map. Revisit trigger: the
+      registry UI exposes a per-application AUDIT DOWNLOAD — if an audit export is
+      ever ingested, that is the envelope source and this gate re-runs. The old
+      internal-twin caveat is discharged (gate §A2): the field inventory is already
+      committed Internal-Public as loader-field mechanism.
 
   - id: "pat:product-catalog"
-    status: stub                             # envelope gate not run (doc 06 Phase 4)
-    notes: "Confidential handling — real column mapping goes to the internal twin when gated."
+    status: stub                             # RULED stub-until-projected (gate audit-envelope-phase4, 2026-08-04)
+    notes: >
+      Confirmed 2026-08-04 (gate audit-envelope-phase4 §C1). The report extracts
+      project ids/names/hierarchy only — zero audit columns (all six catalog row
+      models). NOT permanent: the C17 lesson is that the backing store carries
+      more than the report projects; an export that projects created/changed
+      columns re-opens the envelope question. Internal-twin caveat discharged
+      (gate §A2 — the field inventory is committed loader-field mechanism).
 
   - id: "pat:people-report"
-    status: stub                             # envelope gate not run (doc 06 Phase 4; split from the catalog-pat stub at N9)
-    notes: "Confidential handling — real column mapping goes to the internal twin when gated."
+    status: stub                             # RULED stub-until-projected (gate audit-envelope-phase4, 2026-08-04; split from the catalog-pat stub at N9)
+    notes: >
+      Confirmed 2026-08-04 (gate audit-envelope-phase4 §C2) — same ruling as
+      pat:product-catalog, plus the explicit exclusion: valid_from/valid_to are
+      role-VALIDITY (a domain fact about the assignment), never record authorship.
 
   - id: "repo:software-registry"
-    status: stub                             # repo-committed ledger: git history IS the audit trail
-    notes: "Envelope likely unnecessary (git blame answers who/when); decide at a Phase 4 gate."
+    status: stub                             # RULED PERMANENT stub: git history IS the audit envelope (gate audit-envelope-phase4, 2026-08-04)
+    notes: >
+      Confirmed 2026-08-04 (gate audit-envelope-phase4 §D1). The ledger is
+      repo-committed YAML — git history (commit author/date) is its audit
+      envelope. Closes the repo-committed trio with repo:design-docs and
+      repo:depgraph-snapshot; same permanent-stub rationale.
 
   - id: bmc-docs
     status: stub                             # docs corpus: BMC is the author; scraped_on = capture, not authorship

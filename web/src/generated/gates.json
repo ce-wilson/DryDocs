@@ -494,15 +494,32 @@
       ]
     },
     {
-      "kind": "prompt-only",
-      "date": null,
-      "title": "audit-envelope-phase4 (gate page rendered — session not yet run)",
-      "status": "open",
+      "kind": "log-entry",
+      "date": "2026-08-04",
+      "title": "GATE: audit-envelope-phase4 (backlog M3) — SIGNED OFF, 13/13",
+      "status": "signed-off",
       "prompt_files": [
         "config/gate-prompts/audit-envelope-phase4.yaml"
       ],
-      "log_ref": null,
-      "unblocks": []
+      "log_ref": "config/gate-log.md:1355",
+      "unblocks": [
+        "M3"
+      ]
+    },
+    {
+      "kind": "log-entry",
+      "date": "2026-08-04",
+      "title": "GATE: envelope-property-terms (backlog M4) — SIGNED OFF, 10/10",
+      "status": "signed-off",
+      "prompt_files": [
+        "config/gate-prompts/audit-envelope-phase4.yaml",
+        "config/gate-prompts/envelope-property-terms.yaml"
+      ],
+      "log_ref": "config/gate-log.md:1392",
+      "unblocks": [
+        "M3",
+        "M4"
+      ]
     },
     {
       "kind": "prompt-only",
@@ -545,17 +562,6 @@
         "G44",
         "J24"
       ]
-    },
-    {
-      "kind": "prompt-only",
-      "date": null,
-      "title": "envelope-property-terms (gate page rendered — session not yet run)",
-      "status": "open",
-      "prompt_files": [
-        "config/gate-prompts/envelope-property-terms.yaml"
-      ],
-      "log_ref": null,
-      "unblocks": []
     },
     {
       "kind": "prompt-only",

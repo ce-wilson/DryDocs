@@ -91,6 +91,11 @@ standards:
     role: concept-scheme-ontology
     why: "closeMatch / broader / narrower for taxonomy reconciliation (e.g. LOB→segment)."
     docs: reference/standards/README.md
+  - id: dcmi-terms
+    iri: http://purl.org/dc/terms/
+    role: metadata-terms-vocabulary
+    why: "Property-level authorship bindings for the source audit envelope (dct:creator/created/contributor/modified; gate envelope-property-terms, M4)."
+    docs: reference/standards/dcmi-terms/README.md
 
 research:
   docs: reference/research/README.md

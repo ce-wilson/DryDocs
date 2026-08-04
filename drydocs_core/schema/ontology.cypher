@@ -21,6 +21,9 @@
 //   swo    http://www.ebi.ac.uk/swo/
 //   obi    http://purl.obolibrary.org/obo/
 //   iao    http://purl.obolibrary.org/obo/
+//   dct    http://purl.org/dc/terms/   (property-level envelope bindings, M4;
+//          documentation-grade — no dct: OntologyTerm nodes are seeded, the
+//          registry of record is relationship_vocabulary.yaml property_terms)
 // =============================================================================
 
 

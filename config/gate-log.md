@@ -1351,3 +1351,57 @@ backlog J28.
 This is a GATE commit. Per port-prompt guardrail 7 the J7 no-downgrade guards are
 PORT-scoped and must not be run across it: `arch_contains_batch` and `arch_contains_folder`
 moving `planned` to `deprecated` is an AUTHORIZED downgrade, and this entry is its authority.
+
+## 2026-08-04 — GATE: audit-envelope-phase4 (backlog M3) — SIGNED OFF, 13/13
+
+**Spec:** `config/gate-prompts/audit-envelope-phase4.yaml` · **SME:** chad.wilson, in-chat
+(desktop session). Doc 06 Phase 4 for the four remaining non-Control-M sources. The
+controlm-family stubs (link views, setvar, cm_hosts, cm_avg_run, stg_app_fact) were
+explicitly OUT of scope (A1) and stay stubs pending their own census/riders.
+
+| Item | Ruling |
+|---|---|
+| A1 scope | **CONFIRMED** — four sources only. |
+| A2 internal-twin clause | **CONFIRMED discharged** — the SEAL and PAT field inventories are already committed Internal-Public as loader-field mechanism (S3 §B1(c) ledger, catalog row models); nothing confidential remains to author internal-side. A future census that surfaces differing AND sensitive real headers owns its own split. |
+| B1/B2 seal:app-extract | **B2 — RULED STUB**, on SME evidence that REVERSED the page's B1 recommendation (see below). |
+| B3 certification columns | **CONFIRMED** — `last_certified_by_sid`/`last_certified_date` excluded: certification is attestation, not modification. `capture_date` stays excluded (standing CAPTURE_DATE rule). |
+| B4 contact extract | **CONFIRMED** — 5 fields, no audit columns, nothing to map. |
+| C1 pat:product-catalog | **CONFIRMED** — ruled stub-until-projected: the report extracts project zero audit columns; NOT permanent (the C17 lesson — the backing store has more than the report projects). |
+| C2 pat:people-report | **CONFIRMED** — same ruling; `valid_from`/`valid_to` are role-validity, never authorship (recorded so nobody maps validity onto the envelope later). |
+| D1 repo:software-registry | **CONFIRMED** — ruled PERMANENT stub: git history (commit author/date) is the audit envelope; closes the repo-committed trio with design-docs and depgraph-snapshot. |
+| E1–E3 consequences | **CONFIRMED** — B2 branch: no cypher change; all four entries stay `status: stub` with this gate cited in their notes (the bmc-docs mechanism); Phase 4 recorded done for these sources in doc 06; the audit-fields port disposition is already covered mechanically by PORT-MANIFEST `config/**` canonical-producer. |
+
+### The §B evidence (SME, in-session — the ruling's basis; mechanism only)
+
+The SEAL registry's date fields are **onboarding-lifecycle milestones, not record audit**.
+The registry has a two-era data story: under the current phased onboarding process
+(develop → build → operate permits) the planned/actual lifecycle dates are captured;
+**legacy applications lack those fields entirely** (SME showed three live examples —
+one current-era record with full planned/actual pairs, two legacy records with sparse
+actual-only dates). Until an application reaches its operate permit it is supported by
+its dev teams; logical deployments follow the same pattern. The row model itself files
+`creation_date` in its lifecycle block. So `creation_date` is a lifecycle fact with
+era-dependent capture, not "when this record was created in the source" — it cannot
+honestly feed `source_created_at`.
+
+**Revisit trigger (recorded):** the registry UI exposes a per-application **audit
+download** — a true record-audit trail exists source-side; the extract simply does not
+carry it. If an audit export is ever ingested, THAT is the envelope source, and this
+gate re-runs against its columns.
+
+## 2026-08-04 — GATE: envelope-property-terms (backlog M4) — SIGNED OFF, 10/10
+
+**Spec:** `config/gate-prompts/envelope-property-terms.yaml` · **SME:** chad.wilson,
+in-chat (same session as audit-envelope-phase4). Property-level standard-term bindings
+for the four frozen envelope properties, and the registry home for property-term
+bindings. Documentation-grade: no graph write, no edge change, no loader change, no
+rename of the frozen names.
+
+| Item | Ruling |
+|---|---|
+| A1 binding is documentation-grade | **CONFIRMED**. |
+| A2 SOSA ruled OUT | **CONFIRMED** — authorship provenance is not observation; SOSA stays in the experimental context-graph layer. |
+| B1 the uncontested trio | **CONFIRMED** — `source_created_by` → `dct:creator`, `source_created_at` → `dct:created`, `source_updated_at` → `dct:modified`. |
+| B2/B3 the contested row | **B2 — `source_updated_by` → `dct:contributor`**, with the imprecision recorded in the entry note (DCMI defines no "modifier"; nearest term, same vocabulary family as the trio). |
+| C1/C2 registry home | **C1 — a new `property_terms` section in `relationship_vocabulary.yaml`** — the file already carries node_classifications, so it is the ontology registry; one file for the mapper agent and the drift guards. |
+| D1–D2 consequences | **CONFIRMED** — `dct:` (http://purl.org/dc/terms/) registered in namespaces.py + the ontology.cypher comment sync; `reference/standards/dcmi-terms/` stub added; drift guards extend (every envelope property carries a binding; every binding CURIE expands via `namespaces.expand()`). |

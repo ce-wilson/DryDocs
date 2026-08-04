@@ -5,6 +5,10 @@
 #   CURIE that expands via drydocs_core/ontology/namespaces.py. All local labels
 #   live under dd: (https://drydocs.local/ontology#).
 #
+# SECTION 0b (property_terms): property-level standard-term bindings (what a
+#   node PROPERTY means — e.g. the audit envelope's dct: bindings, gate
+#   envelope-property-terms 2026-08-04). Documentation-grade; no edges.
+#
 # SECTION 1 (prov_matrix): the 9-row decision table. Stable — do not edit.
 #   Pick the row whose from_type/to_type matches your node classifications.
 #   The neo4j_label in that row is what you use in Cypher, unless a more
@@ -568,6 +572,42 @@ node_classifications:
       and `rel_path` collides across the drydocs / drydocs_core roots (§C4).
       MUST NEVER also carry :SoftwareProduct — §F1, enforced as a graph-test because
       Neo4j cannot declare label mutual-exclusion.
+
+# ── SECTION 0b: Property-term bindings ───────────────────────────────────────
+# Property-level standard-term bindings — what a node PROPERTY means in
+# standard vocabulary. Documentation-grade (crosswalks, future RDF export):
+# no edges, no loaders, no renames of the bound property names. First entries
+# ruled at gate envelope-property-terms (2026-08-04, M4), which also ruled
+# that this section — not a separate file — is where property bindings live
+# (the file already carries node_classifications, so it is the ontology
+# registry, not literally a relationship list). SOSA explicitly ruled OUT for
+# the envelope: authorship provenance is not observation.
+# property    = the graph property name (frozen names never renamed here)
+# term        = standard-term CURIE, resolvable via namespaces.py expand()
+# decided_by  = gate id in config/gate-log.md
+# ─────────────────────────────────────────────────────────────────────────────
+property_terms:
+
+  # — the source audit envelope (config/audit-fields.yaml, doc 06) —
+  - property:   source_created_by
+    term:       "dct:creator"
+    decided_by: envelope-property-terms
+    note:       "Who created the record in the source system. dct:creator does not require personhood — on Control-M this is a team Functional ID, an org-agent creator, which is conformant."
+
+  - property:   source_created_at
+    term:       "dct:created"
+    decided_by: envelope-property-terms
+    note:       "Date the record was created in the source system ('date of creation of the resource')."
+
+  - property:   source_updated_by
+    term:       "dct:contributor"
+    decided_by: envelope-property-terms
+    note:       "Who last changed the record in the source system. NEAREST DCMI term — DCMI defines no 'modifier'; the imprecision is recorded here by ruling (gate §B2) rather than mixing in a PROV edge-shaped reading for one property."
+
+  - property:   source_updated_at
+    term:       "dct:modified"
+    decided_by: envelope-property-terms
+    note:       "Date the record was last changed in the source system ('date on which the resource was changed')."
 
 # ── SECTION 1: Decision matrix ────────────────────────────────────────────────
 # Step 1: classify your source node (Activity / Entity / Agent / Collection).

@@ -108,8 +108,24 @@ before deleting anything.
 - **Phase 4 — generalize to remaining sources.** SEAL, catalog, escalation,
   area-products loaders adopt the envelope from their `audit-fields.yaml`
   entries; per-source acceptance tests.
+  **✅ DONE for the four M3 sources 2026-08-04** (gate `audit-envelope-phase4`,
+  13/13): all four were RULED STUBS, so "adopt the envelope" resolved to
+  "record why no envelope applies" — SEAL's date fields are onboarding-lifecycle
+  milestones with two-era capture (SME evidence in-session; revisit trigger =
+  the registry's per-application audit download), the two PAT report extracts
+  project zero audit columns (stub-until-projected, the C17 lesson), and
+  software-registry is a permanent stub (git history is the envelope, closing
+  the repo-committed trio). The controlm-family stubs (link views, setvar,
+  cm_hosts, cm_avg_run, stg_app_fact) stay open pending their own
+  census/riders — they are the Phase-4 residual.
 - **Phase 5 — docs + port row.** Loader README, NODE_QUICK_REFERENCE,
   ontology documentation; add the port-prompt/git-readme disposition row.
+  **✅ DONE for the M3 scope 2026-08-04:** loader README envelope note; the
+  port disposition is covered mechanically by `PORT-MANIFEST.yaml`
+  (`config/**` → canonical-producer), which post-dates and supersedes this
+  phase's "disposition row" wording. Property-term ontology documentation
+  landed with M4 (gate `envelope-property-terms`): dct: bindings in the
+  vocabulary's new `property_terms` section + `reference/standards/dcmi-terms/`.
 
 ## Risks
 

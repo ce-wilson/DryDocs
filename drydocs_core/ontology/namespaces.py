@@ -14,6 +14,10 @@ NAMESPACES: dict[str, str] = {
     "org": "http://www.w3.org/ns/org#",
     "skos": "http://www.w3.org/2004/02/skos/core#",
     "rdfs": "http://www.w3.org/2000/01/rdf-schema#",
+    # DCMI Metadata Terms — property-level authorship bindings for the source
+    # audit envelope (gate envelope-property-terms, 2026-08-04; M4). See the
+    # property_terms section of relationship_vocabulary.yaml.
+    "dct": "http://purl.org/dc/terms/",
     "xsd": "http://www.w3.org/2001/XMLSchema#",
     # Data product ontology — using the SEMIC / EKGF DPROD namespace as the
     # working default; replace with the corporate-blessed IRI once published.

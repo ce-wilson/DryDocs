@@ -22,6 +22,7 @@ Two tiers, by adoption status:
 | DCAT | `http://www.w3.org/ns/dcat#` | dataset catalog | DataSource/DataTarget |
 | SKOS | `http://www.w3.org/2004/02/skos/core#` | concept reconciliation | closeMatch for taxonomy mapping |
 | DQV | `http://www.w3.org/ns/dqv#` | data quality | dimensions + metrics (seeded in `ontology.cypher`) |
+| [DCMI Terms](dcmi-terms/README.md) | `http://purl.org/dc/terms/` | property-level authorship | the audit-envelope bindings (`property_terms` section; gate `envelope-property-terms`) |
 
 ## Experimental / Early Adoption
 

@@ -33,3 +33,19 @@ into a `.cypher` template → provenance `:JobRun`). Loaders are grouped here by
 - `base.py` — the loader lifecycle (incl. index preflight)
 - `cypher/` — `UNWIND $batch` MERGE templates (one per loader)
 - `sql/` — Oracle extract queries + staging DDL (vendor source)
+
+## The source audit envelope (doc 06)
+
+Four frozen node properties — `source_created_by/_at`, `source_updated_by/_at` —
+carry "who created / last changed this record IN THE SOURCE." A loader may SET
+them **only** when its source's entry in `config/audit-fields.yaml` is
+`status: confirmed` (gate-decided column→envelope mapping; `test_audit_fields.py`
+enforces it). Today that is the two Control-M definition loaders (jobs = full
+envelope, folders = updated-side only). Every other source is a **ruled stub** —
+the Phase-4 gate (`audit-envelope-phase4`, 2026-08-04) recorded per-source WHY no
+envelope applies (SEAL: lifecycle dates, not record audit; PAT reports: no audit
+columns projected; repo-committed ledgers: git history is the envelope). Do not
+invent an envelope mapping in Cypher — the entry's note names the revisit
+trigger if one exists. Distinct from pull tracking (`first_seen_at`/
+`last_seen_at`/`last_run_id`) and from `:JobRun` load provenance. The properties'
+standard-term bindings (dct:) live in the vocabulary's `property_terms` section.

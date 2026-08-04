@@ -36,6 +36,12 @@ Tags help grooming: `idea` · `bug` · `doc` · `source` (new data source) · `q
   push-before-work, but nothing makes the WORK visible — an in-flight session that dies looks
   identical to one that never started.
 
+- 2026-08-04 — [chore] `reference/REGISTRY.yaml` cites `reference/standards/dcat/README.md`
+  but the file does not exist (dcat has a registry row and a standards-README table row,
+  no per-standard README dir). Either write the stub (reference-librarian, the dcmi-terms
+  pattern from M4) or re-point the row at `reference/standards/README.md` like skos does.
+  (noticed during the M4 build)
+
 - 2026-08-04 — [bug] `dev_teams.cypher` and `catalog_lobs.cypher` carry the same unconditional
   enrichment SETs the C22 sweep fixed in the three hierarchy loaders (`SET dt.name = row.name`;
   `SET l.code/l.name = row.*`) — and catalog_lobs is the worse case, because `CatalogLOBRow`
