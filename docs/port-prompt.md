@@ -487,6 +487,28 @@ verification status in [BRACKETS]; spend review on [UNRULED].
     grandfather as `confirmed` with the Control-M link as provenance (§G4-RIDER).
     `EXPECTED_CONSTRAINTS` does not move.
 
+61. K9 — THE K7 DEFINED-MAPPING STORE [TEST-PINNED] (`17d9e08`; claim
+    `a1b9388`, after the dead remote claim was released at `1807df0`). NEW
+    `config/overrides/app-code-mappings.csv` → `app_code_mapping` table +
+    `v_app_code_grid`/`v_dual_coded_migrations` in `var/mapping.db` → the
+    `app-code-mapping` /mappings domain with an O24-verbatim draft endpoint;
+    ONE shared validator (`validate_app_code_row`) serves ingestion AND
+    drafting, so an artifact can never be refused at materialization. §E2
+    asymmetries are built in: rows ARE the source of record, overrides may be
+    PERMANENT (no status column; rationale required on override/manual-pin),
+    and `matched-fallback` is REFUSED at authoring (derived at load, §B3).
+    `K2_SHAPE` → `ControlMFolder -[BELONGS_TO_APPLICATION {seal_app_ref}]->
+    Port`; `draft_changeset` rekeyed (app_code keys, `app_id=` target grammar
+    — post-S3, and no committed manual CSV exists producer-side to protect);
+    TEMPLATE rekeyed the same way. The manual-loads PARSER deliberately still
+    enforces the job-grain shape until K8 — test-pinned with the rationale —
+    so YOUR real tier-5 CSVs (T4) keep parsing unchanged; the new grammar
+    arrives only in NEW artifacts, which queue fail-closed until your K8.
+    Console note: the job-grain drafting tray now fails closed SERVER-SIDE
+    (§A1, ruling cited in the error) until K11's steward screen lands.
+    `EXPECTED_CONSTRAINTS` does not move; nothing writes the graph;
+    `m3_belongs_to_application` stays planned.
+
 ACCEPTANCE GATE (behavior is the contract, not a byte-compare):
 - Track 1 (portable):
     poetry run pytest tests/unit/test_variable_classifier.py tests/unit/test_variable_resolver.py \
@@ -503,13 +525,14 @@ ACCEPTANCE GATE (behavior is the contract, not a byte-compare):
   capability_assert=false skips per T18). A retired-id refusal from
   `SourceRegistry.from_yaml` is the D4 guard WORKING, not a port failure — rebind the
   loader in `loader-source-overlay.yaml`, never by re-adding the retired id.
-  Producer reference at the current head (step 60, the K7 sign-off): 1354
-  passed / 7 skipped with the production CSV **ABSENT** and RECONCILE_BEFORE_DIR
-  (4 J7 guards + 3 sample-backed) — the step-48 precedent for quoting a
-  CSV-absent figure. NOT comparable line-for-line with the step-58 figure
-  (1356 / 5, CSV present); `aa0a0eb`'s commit message quotes 1358 / 3, which is
-  this same run with RECONCILE_BEFORE_DIR set. Earlier producer heads are in
-  git history and the archive — do not re-derive them here.
+  Producer reference at the current head (step 61, the K9 build): 1384
+  passed / 5 skipped with the production CSV PRESENT and no
+  RECONCILE_BEFORE_DIR (4 J7 guards + the graphrag PDF) — like-for-like with
+  the step-58 figure (1356 / 5, same conditions): +28, all K9 guards. The
+  step-60 figure (1354 / 7) was CSV-ABSENT without RECONCILE_BEFORE_DIR and is
+  not comparable line-for-line; `aa0a0eb`'s commit message quotes 1358 / 3,
+  which is the step-59 run with RECONCILE_BEFORE_DIR set. Earlier producer
+  heads are in git history and the archive — do not re-derive them here.
   Company reference (PORT-REPORT-40c35724): full `1652 / 28 / 0`, Track-1
   `123 / 3 / 0`, `EXPECTED_CONSTRAINTS` 55 company-based.
   COUNT THE RIGHT THING: producer "changed paths" (the range diff) and company

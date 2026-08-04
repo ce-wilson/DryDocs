@@ -26,6 +26,18 @@ Tags help grooming: `idea` · `bug` · `doc` · `source` (new data source) · `q
 
 <!-- add new ideas at the top -->
 
+- 2026-08-03 — [question] **Composite-key grammar: `k=v;k=v` vs the user's colon form — a
+  K8 rider, decided now or never cheap again.** The manual-loads key cells use the K2-era
+  `field=value;field=value` grammar (`_parse_key` in `drydocs_core/manual_mappings.py`); the
+  user has authored colon-joined keys (`folder_id:job_id`) and asked why the semicolon form
+  won. K9 deliberately kept the grammar verbatim (its rekey changed WHICH fields, not the
+  syntax). If the colon form is preferred, the K8 loader-chain migration is the moment:
+  zero manual CSVs are committed (`manifest files: []`), so it is template + `_parse_key` +
+  `draft_changeset` with no data migration — afterwards every committed CSV pins the old
+  grammar. Trade-off to weigh at the ruling: `k=v` pairs are self-describing and
+  order-independent where a positional `A:B` breaks silently across label key shapes, and
+  `:` collides with values that carry colons (times, URNs).
+
 - 2026-08-03 — [chore] **The G51 tail landed pre-groom — needs a retrospective close, and it
   carries ONE company consequence the next port must not be surprised by.** G51 provisioned
   `ddschema` and updated the runbook's step 3 + Appendix B, but the topology is enumerated in
