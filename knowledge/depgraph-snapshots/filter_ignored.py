@@ -74,10 +74,21 @@ def main() -> int:
     doc["edges"] = [e for e in (doc.get("edges") or []) if e[0] not in drop and e[1] not in drop]
     rels = doc.get("rels")
     if isinstance(rels, list):
+        # A rel is [src, TYPE, dst] — endpoints are [0] and [2], NOT [0]/[1].
+        # The original check read [1] (the TYPE string, never in drop), so every
+        # CONTAINS rel to a dropped node survived, leaking git-ignored FILENAMES
+        # into the committed artifact (caught 2026-08-04 by the J15 value guard:
+        # gitignored workbook screenshots in the repo root). Belt and braces:
+        # after the drop, also require both endpoints to EXIST as nodes, so any
+        # future shape drift dangles nothing instead of leaking names.
+        kept_ids = {n["file_id"] for n in doc["nodes"]}
         doc["rels"] = [
             r
             for r in rels
-            if not (isinstance(r, list | tuple) and len(r) >= 2 and (r[0] in drop or r[1] in drop))
+            if isinstance(r, list | tuple)
+            and len(r) >= 3
+            and r[0] in kept_ids
+            and r[2] in kept_ids
         ]
 
     stats = doc.get("stats")

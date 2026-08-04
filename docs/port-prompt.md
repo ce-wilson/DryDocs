@@ -864,6 +864,17 @@ verification status in [BRACKETS]; spend review on [UNRULED].
     K15 — union by id as usual; claim/close/board/snapshot commits carry
     only backlog.yaml + renders, all per-entry/derived.)
 
+82. U9 FILTER OFF-BY-ONE — GIT-IGNORED NAMES LEAKED THROUGH RELS
+    [TEST-PINNED by the J15 value guard, which caught it]. A depgraph rel is
+    `[src, TYPE, dst]`; `filter_ignored.py` checked endpoints at [0]/[1] —
+    [1] is the TYPE string — so every CONTAINS rel to a dropped node
+    SURVIVED, carrying git-ignored FILENAMES into the committed snapshot
+    (here: real workbook screenshot names in the repo root). Fix checks
+    [0]/[2] AND requires both endpoints to exist as kept nodes (dangling
+    rels can never leak again). ***YOUR SIDE:*** you run the same script
+    (step 68 retention); take the fix and REGENERATE your newest snapshot —
+    your current one likely carries ignored names in rels the same way.
+
 ACCEPTANCE GATE (behavior is the contract, not a byte-compare):
 - Track 1 (portable):
     poetry run pytest tests/unit/test_variable_classifier.py tests/unit/test_variable_resolver.py \
