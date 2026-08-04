@@ -317,6 +317,7 @@
       "env_refs": [],
       "files": [
         "config/gate-prompts/airflow-crosswalk.yaml",
+        "config/gate-prompts/audit-envelope-phase4.yaml",
         "config/gate-prompts/autosys-crosswalk.yaml",
         "config/gate-prompts/bmc-docs-example.yaml",
         "config/gate-prompts/bmc-docs-lexical-load.yaml",
@@ -327,6 +328,7 @@
         "config/gate-prompts/controlm-q1q3-phase1.yaml",
         "config/gate-prompts/doc-traceability-feedback.yaml",
         "config/gate-prompts/email-dl-contact-point.yaml",
+        "config/gate-prompts/envelope-property-terms.yaml",
         "config/gate-prompts/etlprocess-kind-enum.yaml",
         "config/gate-prompts/platforms-taxonomy.yaml",
         "config/gate-prompts/product-cabinet-attribution.yaml",
