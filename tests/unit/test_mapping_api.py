@@ -136,7 +136,10 @@ def test_options_feed_the_dropdowns(sessions, store):
     labels = {r["label"] for r in out["labels"]}
     assert {"ControlMJob", "ControlMFolder", "BusinessApplication"} <= labels
     rels = {(r["neo4j_label"], r["role"]) for r in out["relationships"]}
-    assert ("WAS_ASSOCIATED_WITH", "seal_app_ref") in rels
+    assert ("BELONGS_TO_APPLICATION", "seal_app_ref") in rels
+    # K8: the job-grain edge deprecated with the folder flip — active options
+    # no longer offer it.
+    assert ("WAS_ASSOCIATED_WITH", "seal_app_ref") not in rels
 
 
 def test_changeset_artifact_shape(sessions, store):

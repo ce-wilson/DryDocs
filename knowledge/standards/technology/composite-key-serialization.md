@@ -24,8 +24,8 @@ multi-part identity travel as one string?* — at two different grains.
 
 Wherever the `(folder_id, job_id)` ControlMJob node key is rendered as a
 single string, the form is the psgmgr-derived **`ctlm_id`** composite:
-`folder_id.job_id` (e.g. `161015.7`). Split on `.` recovers the node key
-exactly.
+`folder_id.job_id` (synthetic example: `1015.7`). Split on `.` recovers the
+node key exactly.
 
 - **Precedent:** the internal psgmgr schema derives this column
   (`TABLE_ID || '.' || JOB_ID`); the P2 gate (§B, 2026-07-14) made it the
@@ -59,7 +59,7 @@ with **`:`** — **never `;`**.
   shapes differ — `ControlMJob` is two-part where `Port` is not.
 - **Compatibility by construction:** key values are identifiers and never
   contain `:`; the Rule-1 dot composite nests cleanly as a value
-  (`ctlm_id=161015.7`).
+  (`ctlm_id=1015.7`).
 - **Parser:** `drydocs_core/manual_mappings.py::_parse_key` enforces this
   grammar for both the tier-5 loader and the mapping-store
   materialization. Changed from `;` to `:` on 2026-08-03 while ZERO manual

@@ -20,8 +20,9 @@
 # No `targets:` — the review spine (config/review-labels.yaml) maps Control-M and
 # docs SOURCES to their labels and has no entry covering :BusinessApplication or
 # :Port. Declaring labels the spine cannot check is the drift these suites exist to
-# catch (the sibling seal-attribution-coverage suite still names a retired
-# `Application` label, which is what that looks like once it has set).
+# catch (the old seal-attribution-coverage suite named a retired `Application`
+# label until its K8 rewrite as folder-attribution-coverage, which is what that
+# looks like once it has set).
 classification: Internal-Public
 schema: drydocs.graph-tests.v1
 suite: business-application-identity

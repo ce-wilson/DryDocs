@@ -162,18 +162,22 @@ QUERY_SPECS: dict[str, QuerySpec] = {
             id="explorer.folder-applications.v1",
             database="drydocs",
             description=(
-                "ControlMFolder -> BusinessApplication crosswalk: which SEAL application "
-                "each folder's jobs are attributed to, via the gated edges "
-                "CONTAINS_JOB + WAS_ASSOCIATED_WITH {role:'seal_app_ref'} (K1/K2), with "
-                "the folder's data center (SCHEDULED_ON server) and job count."
+                "ControlMFolder -> BusinessApplication crosswalk: the ruled folder-grain "
+                "attribution edge BELONGS_TO_APPLICATION {role:'seal_app_ref'} onto the "
+                "application's BatchProcessing Port (K7/K8 — re-bound from the retired "
+                "job-grain derivation per gate §A2), with the ORIGIN disclosure flag "
+                "(§B3), the folder's data center and job count. Jobs inherit the "
+                "attribution via CONTAINS_JOB (§A1)."
             ),
             cypher=(
-                "MATCH (f:ControlMFolder)-[:CONTAINS_JOB]->(j:ControlMJob)"
-                "-[:WAS_ASSOCIATED_WITH {role: 'seal_app_ref'}]->(a:BusinessApplication) "
-                "WHERE NOT f:SchemaMeta "
+                "MATCH (f:ControlMFolder)-[r:BELONGS_TO_APPLICATION {role: 'seal_app_ref'}]"
+                "->(p:Port)<-[:HAS_PORT]-(a:BusinessApplication) "
+                "WHERE NOT f:SchemaMeta AND p.kind = 'BatchProcessing' "
                 "OPTIONAL MATCH (f)-[:SCHEDULED_ON]->(s:ControlMServer) "
+                "OPTIONAL MATCH (f)-[:CONTAINS_JOB]->(j:ControlMJob) "
                 "RETURN f.sched_table AS folder, s.name AS data_center, "
-                "a.app_id AS app_id, a.name AS application, count(DISTINCT j) AS jobs "
+                "a.app_id AS app_id, a.name AS application, r.origin AS origin, "
+                "count(DISTINCT j) AS jobs "
                 "ORDER BY folder LIMIT $limit"
             ),
             columns=(
@@ -181,6 +185,7 @@ QUERY_SPECS: dict[str, QuerySpec] = {
                 ColumnDef("data_center", "string", "Data center"),
                 ColumnDef("app_id", "string", "Application ID"),
                 ColumnDef("application", "string", "Application"),
+                ColumnDef("origin", "string", "Origin"),
                 ColumnDef("jobs", "int", "Jobs"),
             ),
             classification="internal",
@@ -191,20 +196,21 @@ QUERY_SPECS: dict[str, QuerySpec] = {
             database="drydocs",
             description=(
                 "Control-M APPLICATION codes classified by their OBSERVED mapping "
-                "pattern to :BusinessApplication (SME review 2026-07-21): a code whose "
-                "folders' jobs all attribute to ONE application is a 'direct "
-                "(dedicated code)' candidate; a code spanning several applications is "
-                "a 'shared platform code' (e.g. a cloud-ETL platform code carrying "
-                "many apps); no attribution = the SME work queue. DERIVED from the "
-                "gated job-level edges only — the authoritative code->application "
-                "mapping table is a gate-bound O13 mapping domain, not this view."
+                "pattern to :BusinessApplication (SME review 2026-07-21; re-bound to "
+                "the K7-ruled folder-grain edges at K8 per gate §A2): a code whose "
+                "folders all attribute to ONE application is a 'direct (dedicated "
+                "code)' candidate; a code spanning several applications is a 'shared "
+                "platform code'; no attribution = the SME work queue. The "
+                "authoritative code->application mapping is the K9 defined-mapping "
+                "store (app-code-mapping console domain); this view is the observed "
+                "cross-check."
             ),
             cypher=(
                 "MATCH (ca:ControlMApplication) WHERE NOT ca:SchemaMeta "
                 "OPTIONAL MATCH (ca)-[:CONTAINS_FOLDER]->(f:ControlMFolder) "
                 "OPTIONAL MATCH (f)-[:CONTAINS_JOB]->(j:ControlMJob) "
-                "OPTIONAL MATCH (j)-[:WAS_ASSOCIATED_WITH {role: 'seal_app_ref'}]"
-                "->(a:BusinessApplication) "
+                "OPTIONAL MATCH (f)-[:BELONGS_TO_APPLICATION {role: 'seal_app_ref'}]"
+                "->(:Port)<-[:HAS_PORT]-(a:BusinessApplication) "
                 "WITH ca, count(DISTINCT f) AS folders, count(DISTINCT j) AS jobs, "
                 "collect(DISTINCT a.app_id) AS app_ids "
                 "RETURN ca.name AS app_code, "

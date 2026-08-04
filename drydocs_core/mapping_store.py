@@ -139,12 +139,16 @@ CREATE TABLE manual_load_file (
   notes         TEXT
 );
 
+-- Rekeyed at K8 (gate seal-app-ref-edge-reshape §B1/§D2): manual tier-5
+-- rows are authored at the APP-CODE grain targeting app_id; folder_id NULL
+-- = code-level row (the loader fans out over CONTAINS_FOLDER), folder_id
+-- set = a per-folder pin on a shared platform code.
 CREATE TABLE manual_mapping (
   file                     TEXT NOT NULL REFERENCES manual_load_file(file),
   line_no                  INTEGER NOT NULL,
-  folder_id                TEXT NOT NULL,
-  job_id                   TEXT NOT NULL,
-  seal_id                  TEXT NOT NULL,
+  app_code                 TEXT NOT NULL,
+  folder_id                TEXT,
+  app_id                   TEXT NOT NULL,
   create_target_if_missing INTEGER NOT NULL,
   authored_by              TEXT NOT NULL,
   authored_on              TEXT,
@@ -169,12 +173,15 @@ CREATE VIEW v_vocab_active AS
 CREATE VIEW v_label_options AS
   SELECT label, class, prov_type FROM node_classification ORDER BY label;
 
--- Manual rows whose job key maps to more than one application — the steward
--- screen's conflict queue (within the manual tier itself).
+-- Manual rows whose authoring key maps to more than one application — the
+-- steward screen's conflict queue (within the manual tier itself). The key
+-- is (app_code, folder_id): two code-level rows naming different apps
+-- conflict, as do two pins on the same folder (folder→application is 1:1,
+-- the K7 OWNER-NOT-USER ruling).
 CREATE VIEW v_manual_conflicts AS
-  SELECT folder_id, job_id, count(DISTINCT seal_id) AS targets
-  FROM manual_mapping GROUP BY folder_id, job_id
-  HAVING count(DISTINCT seal_id) > 1;
+  SELECT app_code, folder_id, count(DISTINCT app_id) AS targets
+  FROM manual_mapping GROUP BY app_code, folder_id
+  HAVING count(DISTINCT app_id) > 1;
 
 -- ── O24 SEAL-contact override list (ui-write-surface gate SME-3: the M2
 -- origin-flagged store). Overrides NEVER write the graph and NEVER silently
@@ -517,15 +524,15 @@ def _ingest_manual_loads(
         hashes[f"source:{file_rel}"] = _sha256(csv_path)
         for line_no, row in enumerate(rows, start=2):
             conn.execute(
-                "INSERT INTO manual_mapping (file, line_no, folder_id, job_id, seal_id, "
+                "INSERT INTO manual_mapping (file, line_no, app_code, folder_id, app_id, "
                 "create_target_if_missing, authored_by, authored_on, note) "
                 "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
                 (
                     file_rel,
                     line_no,
+                    row.app_code,
                     row.folder_id,
-                    row.job_id,
-                    row.seal_id,
+                    row.app_id,
                     int(row.create_target_if_missing),
                     row.authored_by,
                     row.authored_on,
@@ -776,16 +783,16 @@ def manual_mapping_rows_from_store(
     )
     try:
         cur = conn.execute(
-            "SELECT folder_id, job_id, seal_id, create_target_if_missing, "
+            "SELECT app_code, folder_id, app_id, create_target_if_missing, "
             "file, authored_by, authored_on, note "
             "FROM manual_mapping WHERE file = ? ORDER BY line_no",
             (file_rel,),
         )
         rows = [
             ManualMappingRow(
-                folder_id=r[0],
-                job_id=r[1],
-                seal_id=r[2],
+                app_code=r[0],
+                folder_id=r[1],
+                app_id=r[2],
                 create_target_if_missing=bool(r[3]),
                 manual_load_file=r[4],
                 authored_by=r[5],
@@ -802,6 +809,31 @@ def manual_mapping_rows_from_store(
             "in config/manual-loads/manifest.yaml?"
         )
     return rows
+
+
+def app_code_rows_from_store(
+    *,
+    app_code_mappings_path: str | Path | None = None,
+) -> list[dict]:
+    """Authored app-code mapping rows (K9 store; gate §E2: the store IS the
+    source of record for this domain), read back across the SQL boundary of
+    an in-memory build — the K8 folder-attribution loader's input.
+
+    Every returned row is AUTHORED (origin defined | override | manual-pin):
+    matched-fallback is refused at authoring and exists only as a load-time
+    derivation the loader discloses on the edge (§B3).
+    """
+    conn = build(":memory:", app_code_mappings_path=app_code_mappings_path)
+    try:
+        cur = conn.execute(
+            "SELECT app_code, folder_id, tier, app_id, declared_end_state, "
+            "origin, rationale, authored_by, authored_on "
+            "FROM app_code_mapping ORDER BY line_no"
+        )
+        cols = [d[0] for d in cur.description]
+        return [dict(zip(cols, r, strict=True)) for r in cur]
+    finally:
+        conn.close()
 
 
 def tables(conn: sqlite3.Connection) -> Iterable[str]:

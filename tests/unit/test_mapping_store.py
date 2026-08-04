@@ -128,25 +128,28 @@ def test_views_answer():
 
 @pytest.fixture()
 def manual_fixture(tmp_path: Path) -> dict[str, Path]:
-    """A tmp repo-root with a registered, loadable manual CSV (K2 shape)."""
+    """A tmp repo-root with a registered, loadable manual CSV (the K7-ruled
+    folder-grain shape, K8)."""
     loads_dir = tmp_path / "config" / "manual-loads"
     loads_dir.mkdir(parents=True)
-    csv_path = loads_dir / "jobs-to-apps.csv"
+    csv_path = loads_dir / "app-codes-to-apps.csv"
     header = (
         "source_label,source_key,relationship,rel_props,target_label,target_key,"
         "create_target_if_missing,note,authored_by,authored_on"
     )
     row = (
-        "ControlMJob,folder_id=F0001:job_id={job},WAS_ASSOCIATED_WITH,"
-        "role=seal_app_ref,BusinessApplication,seal_id=APP-9876,{create},"
+        "ControlMFolder,app_code={code},BELONGS_TO_APPLICATION,"
+        "role=seal_app_ref,Port,app_id=APP-9876,{create},"
         "{note},steward01,2026-07-18"
     )
     csv_path.write_text(
         "\n".join(
             [
                 header,
-                row.format(job="J0002", create="false", note="support team confirmed owner"),
-                row.format(job="J0003", create="true", note="same series as J0002"),
+                row.format(code="ARA", create="false", note="support team confirmed owner"),
+                row.format(
+                    code="SRV:folder_id=F0002", create="true", note="per-folder platform pin"
+                ),
                 "",
             ]
         ),
@@ -158,10 +161,10 @@ def manual_fixture(tmp_path: Path) -> dict[str, Path]:
         schema: drydocs.manual-loads.v1
         status: confirmed
         files:
-          - file: config/manual-loads/jobs-to-apps.csv
+          - file: config/manual-loads/app-codes-to-apps.csv
             scope: fixture
             status: pending-load
-            replaces_with: seal-attribution automation (fixture)
+            replaces_with: app-code defined mapping (fixture)
             authored_by: steward01
         """),
         encoding="utf-8",
@@ -206,11 +209,11 @@ def test_build_ingests_registered_manual_rows(manual_fixture):
     conn = build(":memory:", manifest_path=manual_fixture["manifest"])
     try:
         rows = conn.execute(
-            "SELECT folder_id, job_id, seal_id FROM manual_mapping ORDER BY line_no"
+            "SELECT app_code, folder_id, app_id FROM manual_mapping ORDER BY line_no"
         ).fetchall()
-        assert rows == [("F0001", "J0002", "APP-9876"), ("F0001", "J0003", "APP-9876")]
+        assert rows == [("ARA", None, "APP-9876"), ("SRV", "F0002", "APP-9876")]
         conflicts = conn.execute("SELECT count(*) FROM v_manual_conflicts").fetchone()[0]
-        assert conflicts == 0  # both rows agree on the target
+        assert conflicts == 0  # each authoring key names one target
     finally:
         conn.close()
 
@@ -428,16 +431,16 @@ def test_is_current_tracks_source_edits(manual_fixture, tmp_path: Path):
 
     with manual_fixture["csv"].open("a", encoding="utf-8", newline="") as fh:
         fh.write(
-            "ControlMJob,folder_id=F0001:job_id=J0004,WAS_ASSOCIATED_WITH,"
-            "role=seal_app_ref,BusinessApplication,seal_id=APP-9876,false,"
+            "ControlMFolder,app_code=NEW,BELONGS_TO_APPLICATION,"
+            "role=seal_app_ref,Port,app_id=APP-9876,false,"
             "added after build,steward01,2026-07-18\n"
         )
     assert not is_current(db, manifest_path=manual_fixture["manifest"])
 
     conn = build(db, manifest_path=manual_fixture["manifest"])
     try:
-        jobs = [r[0] for r in conn.execute("SELECT job_id FROM manual_mapping ORDER BY line_no")]
-        assert jobs == ["J0002", "J0003", "J0004"]  # the edit is served
+        codes = [r[0] for r in conn.execute("SELECT app_code FROM manual_mapping ORDER BY line_no")]
+        assert codes == ["ARA", "SRV", "NEW"]  # the edit is served
     finally:
         conn.close()
     assert is_current(db, manifest_path=manual_fixture["manifest"])

@@ -21,7 +21,12 @@ columns need to change — adapters and Cypher do not.
 # not which one is stale. tests/unit/test_no_shadow_definitions.py keeps a
 # second copy from reappearing. Phase C (ADR 0002-A-1) may move the live models
 # here — one definition, MOVED.
-from .attribution import ManualMappingRow, SealAttributionRow, StgAppFactRow
+from .attribution import (
+    FolderAttributionRow,
+    ManualMappingRow,
+    SealAttributionRow,
+    StgAppFactRow,
+)
 from .code_snapshot import CodeModuleRow
 from .controlm import (
     ControlMConditionInRow,
@@ -59,6 +64,7 @@ __all__ = [
     # SEAL attribution (K2 — STG_APP_FACT facts -> WAS_ASSOCIATED_WITH edges)
     "StgAppFactRow",
     "SealAttributionRow",
+    "FolderAttributionRow",
     "ManualMappingRow",
     # Self-documentation code graph (G33 / Epic U)
     "CodeModuleRow",

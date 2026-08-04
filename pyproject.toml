@@ -100,6 +100,7 @@ ignore = [
 # exactly what E402 flags. The guard is the point: these modules skip cleanly
 # when an optional dependency is absent.
 "tests/unit/test_seal_attribution.py" = ["E402"]
+"tests/unit/test_folder_attribution.py" = ["E402"]
 "tests/unit/test_manual_loads.py" = ["E402"]
 # N818 wants an `Error` suffix on exception names. `WriteRejected` and
 # `Forbidden` have 55 call sites between them across drydocs_api, and these same

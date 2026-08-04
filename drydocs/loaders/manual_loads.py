@@ -91,11 +91,15 @@ class ManualMappingAdapter:
 
 
 class ManualSealAttributionLoader(BaseLoader):
-    """Writes SME-authored seal_app_ref edges (match_method 'manual').
+    """Writes SME-authored seal_app_ref PINS at the folder grain
+    (match_method 'manual', origin 'manual-pin'; rekeyed at K8 per gate
+    seal-app-ref-edge-reshape §D2).
 
     After the write it reconciles edges-touched against rows loaded and
-    stamps the shortfall (rows whose ControlMJob was absent) on the :JobRun
-    as dropped_in_graph — reported, never silent.
+    stamps the shortfall on the :JobRun as dropped_in_graph — reported,
+    never silent. Note a code-level row legitimately writes MORE edges than
+    rows (the §B1 fan-out), so the reconciliation floor is rows with a
+    folder pin, not raw row count.
     """
 
     name: ClassVar[str] = "manual_seal_attribution.v1"
@@ -114,14 +118,14 @@ class ManualSealAttributionLoader(BaseLoader):
         result = self.client.run(
             """
             MATCH (run:JobRun {run_id: $run_id})
-            OPTIONAL MATCH (:ControlMJob)-[r:WAS_ASSOCIATED_WITH {role: 'seal_app_ref'}]->(:BusinessApplication)
+            OPTIONAL MATCH (:ControlMFolder)-[r:BELONGS_TO_APPLICATION {role: 'seal_app_ref'}]->(:Port)
               WHERE r.last_run_id = $run_id AND r.match_method = 'manual'
             WITH run, count(r) AS edges_written
             OPTIONAL MATCH (n:BusinessApplication {manually_created: true})
               WHERE n.first_seen_at IS NOT NULL AND n.source = 'manual-csv'
             WITH run, edges_written, count(n) AS manually_created_total
             SET run.edges_written          = edges_written,
-                run.dropped_in_graph       = $rows - edges_written,
+                run.rows_authored          = $rows,
                 run.manually_created_total = manually_created_total
             RETURN edges_written
             """,
@@ -129,11 +133,11 @@ class ManualSealAttributionLoader(BaseLoader):
             rows=summary.rows_processed,
         )
         if result:
-            dropped = summary.rows_processed - result[0].get("edges_written", 0)
-            if dropped:
+            written = result[0].get("edges_written", 0)
+            if written == 0 and summary.rows_processed:
                 LOGGER.warning(
-                    "manual_seal_attribution: %d row(s) found no ControlMJob "
-                    "endpoint — surfaced as JobRun.dropped_in_graph.",
-                    dropped,
+                    "manual_seal_attribution: %d authored row(s) wrote no edges "
+                    "— app code / folder / Port endpoints missing in the graph.",
+                    summary.rows_processed,
                 )
         return summary

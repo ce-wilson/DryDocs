@@ -31,8 +31,9 @@ Ingest commands:
                                     from external/orchestration/bmc-controlm/
   drydocs load-essential-graphrag — Essential GraphRAG ebook lexical graph
                                     (Q2 experiment; local gitignored PDF)
-  drydocs load-seal-attribution   — K2: STG_APP_FACT facts -> job
-                                    WAS_ASSOCIATED_WITH {role: seal_app_ref} edges
+  drydocs load-folder-attribution — K8: app-code defined mapping + the K2
+                                    fallback -> folder BELONGS_TO_APPLICATION
+                                    {role: seal_app_ref} edges onto Batch Ports
   drydocs load-manual-mappings    — tier-5 SME-authored mapping CSV
                                     (config/manual-loads/, PIN semantics)
   drydocs load-code-snapshot      — G33 self-documentation: newest depgraph
@@ -148,6 +149,13 @@ from .loaders.essential_graphrag import (
     EssentialGraphragAdapter,
     EssentialGraphragLoader,
 )
+from .loaders.folder_attribution import (
+    FolderAttributionAdapter,
+    FolderAttributionLoader,
+    check_folder_preconditions,
+    fetch_folder_codes,
+    fetch_pinned_folders,
+)
 from .loaders.manual_loads import (
     ManualLoadError,
     ManualMappingAdapter,
@@ -157,12 +165,8 @@ from .loaders.manual_loads import (
 from .loaders.patch_window import PatchWindowQuery
 from .loaders.runs_on_resolution import RunsOnResolutionPass
 from .loaders.seal_attribution import (
-    SealAttributionAdapter,
-    SealAttributionLoader,
     TierReconcilers,
-    check_sequencing_preconditions,
     fetch_app_name_reconciler,
-    fetch_pinned_attributions,
 )
 from .loaders.software_registry import (
     DEFAULT_REGISTRY_PATH,
@@ -337,7 +341,7 @@ COMMAND_LOADERS: dict[str, tuple[type, ...]] = {
     "load-vendor-docs": (VendorDocsLoader,),
     "load-doc-traceability": tuple(cls for cls, _, _ in DOC_TRACEABILITY_CHAIN),
     "load-essential-graphrag": (EssentialGraphragLoader,),
-    "load-seal-attribution": (SealAttributionLoader,),
+    "load-folder-attribution": (FolderAttributionLoader,),
     "load-manual-mappings": (ManualSealAttributionLoader,),
 }
 
@@ -378,10 +382,12 @@ CANONICAL_LOAD_SEQUENCE: tuple[tuple[str, str, str], ...] = (
         "G33 self-documentation; ritual-driven (newest committed snapshot)",
     ),
     (
-        "load-seal-attribution",
+        "load-folder-attribution",
         "gated",
-        "the stg_app_fact dataset (controlm@[db].drydocs_stg.stg_app_fact) needs "
-        "ingest-controlm + refresh-reference first (gate §E preconditions)",
+        "K8 folder-grain attribution: the app-code defined mapping "
+        "(config/overrides/app-code-mappings.csv) + the stg_app_fact fallback "
+        "feed need ingest-controlm + refresh-reference first (gate §E "
+        "preconditions)",
     ),
     ("m1-verify", "standing", "M1 invariants"),
     ("m3-verify", "standing", "M3 invariants"),
@@ -1536,59 +1542,74 @@ def load_essential_graphrag(
     console.print(summary.as_dict())
 
 
-@app.command(name="load-seal-attribution")
-def load_seal_attribution(
+@app.command(name="load-folder-attribution")
+def load_folder_attribution(
     csv_path: Path | None = typer.Option(
         None,
         "--csv",
-        help="STG_APP_FACT export CSV; omit to run the Oracle extract "
-        "(controlm_app_facts.sql against DRYDOCS_STG).",
+        help="STG_APP_FACT export CSV feeding the K2 FALLBACK; omit to run "
+        "the Oracle extract (controlm_app_facts.sql against DRYDOCS_STG); "
+        "--no-fallback skips the fact feed entirely.",
+    ),
+    no_fallback: bool = typer.Option(
+        False,
+        "--no-fallback",
+        help="Authored store rows only — skip the K2 matched-fallback feed.",
     ),
     batch_size: int = typer.Option(1000, "--batch-size"),
 ) -> None:
-    """K2: attribute jobs to SEAL applications from STG_APP_FACT facts.
+    """K8: attribute folders to SEAL applications (BELONGS_TO_APPLICATION).
 
-    Match policy SME-confirmed at gate seal-attribution-match-policy
-    (2026-07-14): precedence SEAL > FID > APP_NAME > ALIAS, one-to-one accept
-    at the top available tier, deterministic multi-hit tie-break (flagged for
-    audit), manually-pinned jobs excluded (PIN-CONFLICTs surfaced). Writes
-    ONLY (:ControlMJob)-[:WAS_ASSOCIATED_WITH {role:'seal_app_ref'}]->
-    (:BusinessApplication) edges — never nodes. Coverage counts (matched + unmatched
-    + pinned = eligible) are stamped on the :JobRun and reconciled by
-    graph-tests/seal-attribution-coverage.yaml.
+    Gate seal-app-ref-edge-reshape (SIGNED OFF 2026-08-03): the app-code
+    DEFINED mapping (config/overrides/app-code-mappings.csv, the K9 store)
+    is primary — one row per Control-M app code, fanned out to folders via
+    CONTAINS_FOLDER (§B1). The K2 match policy DEMOTES to a fallback for
+    codes with no authored row; every fallback value is DISCLOSED via
+    origin=matched-fallback (§B3). Writes ONLY (:ControlMFolder)-
+    [:BELONGS_TO_APPLICATION {role:'seal_app_ref'}]->(:Port) edges onto the
+    application's BatchProcessing Port (§C1) — never nodes. Folder ->
+    application is 1:1 (OWNER-NOT-USER); coverage counts (attributed +
+    unmatched + conflicts + pinned = eligible folders) are stamped on the
+    :JobRun and reconciled by graph-tests/folder-attribution-coverage.yaml.
     """
-    _gate_loader(SealAttributionLoader)  # confirmed-gate (overlay-aware) before any DB write
-    if csv_path is not None:
+    _gate_loader(FolderAttributionLoader)  # confirmed-gate (overlay-aware) before any DB write
+    from drydocs_core.mapping_store import app_code_rows_from_store
+
+    if no_fallback:
+        inner = None
+    elif csv_path is not None:
         inner = _csv_adapter(csv_path)
     else:
         sql = (SQL_DIR / "controlm_app_facts.sql").read_text(encoding="utf-8")
         inner = _oracle_adapter(sql, name="controlm_app_facts.sql")
     with _client() as cli:
-        # Sequencing preconditions (gate §E): jobs + SEAL reference first.
-        jobs, apps = check_sequencing_preconditions(cli)
-        if not jobs or not apps:
+        # Sequencing preconditions (gate §E): folders + SEAL reference first.
+        folders, apps = check_folder_preconditions(cli)
+        if not folders or not apps:
             console.print(
                 f"[red]Sequencing precondition failed (gate §E): the graph has "
-                f"{jobs} ControlMJob and {apps} Application nodes — run "
+                f"{folders} ControlMFolder and {apps} Application nodes — run "
                 f"`drydocs ingest-controlm` and `drydocs refresh-reference` "
                 f"(SEAL) before the attribution load.[/]"
             )
             raise typer.Exit(2)
-        adapter = SealAttributionAdapter(
-            inner,
+        adapter = FolderAttributionAdapter(
+            app_code_rows_from_store(),
+            fetch_folder_codes(cli),
+            fact_source=inner,
             reconcilers=TierReconcilers(
                 app_name=fetch_app_name_reconciler(cli),
             ),
-            pinned=fetch_pinned_attributions(cli),
+            pinned=fetch_pinned_folders(cli),
         )
-        summary = SealAttributionLoader(cli, adapter, batch_size=batch_size).load()
+        summary = FolderAttributionLoader(cli, adapter, batch_size=batch_size).load()
         console.print(summary.as_dict())
         if adapter.coverage is not None:
             console.print({"coverage": adapter.coverage.as_dict()})
             if not adapter.coverage.reconciles():
                 console.print(
-                    "[red]Coverage invariant violated: matched + unmatched + "
-                    "pinned != eligible_jobs (gate §B).[/]"
+                    "[red]Coverage invariant violated: attributed + unmatched + "
+                    "conflicts + pinned != eligible_folders.[/]"
                 )
                 raise typer.Exit(1)
 

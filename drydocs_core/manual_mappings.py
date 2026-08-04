@@ -13,8 +13,10 @@ THE RULES enforced (unchanged from the loader docstring):
   and a loadable status.
 - No new relationship types: the relationship column must name an existing
   relationship_vocabulary.yaml entry (label + role).
-- Supported shape: exactly the K2 shape today
-  (ControlMJob -[WAS_ASSOCIATED_WITH {role: seal_app_ref}]-> BusinessApplication).
+- Supported shape: exactly the K7-ruled folder-grain shape (K8 flip;
+  gate seal-app-ref-edge-reshape §D2 — ONE shape everywhere):
+  ControlMFolder -[BELONGS_TO_APPLICATION {role: seal_app_ref}]-> Port,
+  authored at the APP-CODE grain (§B1) with an optional per-folder narrowing.
 """
 
 from __future__ import annotations
@@ -33,13 +35,15 @@ VOCABULARY_PATH = (
     Path(drydocs_core.__file__).resolve().parent / "ontology" / "relationship_vocabulary.yaml"
 )
 
-# The one shape the manual writer supports today (K2). Extending this map is
-# a deliberate code change reviewed against the vocabulary — never dynamic.
+# The one shape the manual writer supports today — the K7-ruled folder-grain
+# edge (flipped from the K2 job-grain shape at K8, matching K2_SHAPE in
+# drydocs_api/mappings.py per gate §D2). Extending this map is a deliberate
+# code change reviewed against the vocabulary — never dynamic.
 SUPPORTED_SHAPE = {
-    "source_label": "ControlMJob",
-    "relationship": "WAS_ASSOCIATED_WITH",
+    "source_label": "ControlMFolder",
+    "relationship": "BELONGS_TO_APPLICATION",
     "role": "seal_app_ref",
-    "target_label": "BusinessApplication",
+    "target_label": "Port",
 }
 LOADABLE_STATUSES = ("pending-load", "loaded")
 
@@ -186,22 +190,25 @@ def parse_mapping_csv(
 
             source_key = _parse_key(raw.get("source_key") or "", "source_key", line_no)
             target_key = _parse_key(raw.get("target_key") or "", "target_key", line_no)
-            missing = {"folder_id", "job_id"} - source_key.keys()
-            if missing:
+            if "app_code" not in source_key:
                 raise ManualLoadError(
-                    f"row {line_no}: source_key missing {sorted(missing)} "
-                    "(ControlMJob node key is (folder_id, job_id))"
+                    f"row {line_no}: source_key missing app_code — authoring is "
+                    "per Control-M app code (gate seal-app-ref-edge-reshape §B1); "
+                    "add folder_id=<id> alongside it only to pin ONE folder of a "
+                    "shared platform code."
                 )
-            if "seal_id" not in target_key:
+            if "app_id" not in target_key:
                 raise ManualLoadError(
-                    f"row {line_no}: target_key missing seal_id " "(Application node key)"
+                    f"row {line_no}: target_key missing app_id (the Port key is "
+                    "(parent_app_id, kind); the loader targets the application's "
+                    "BatchProcessing :Port per gate §C1)"
                 )
 
             rows.append(
                 ManualMappingRow(
-                    folder_id=source_key["folder_id"],
-                    job_id=source_key["job_id"],
-                    seal_id=target_key["seal_id"],
+                    app_code=source_key["app_code"],
+                    folder_id=source_key.get("folder_id"),
+                    app_id=target_key["app_id"],
                     create_target_if_missing=raw.get("create_target_if_missing", "false"),
                     manual_load_file=manifest_file,
                     authored_by=raw.get("authored_by") or "",

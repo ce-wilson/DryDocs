@@ -58,13 +58,15 @@ def test_render_carries_no_timestamps() -> None:
 
 def test_acceptance_edges_present() -> None:
     """The C8 acceptance set: edges the stale 2026-06-09 render was missing
-    (docs_*, m3_runs_on_*) plus the ACTIVE m3_seal_app_ref must all render.
-    (seal_requires_scheduler left this set 2026-07-21 — deprecated at the C12
-    platforms-taxonomy gate, now pinned on the exclusion side below.)
+    (docs_*, m3_runs_on_*) plus the ACTIVE folder-attribution edge must all
+    render. (seal_requires_scheduler left this set 2026-07-21 — deprecated
+    at the C12 platforms-taxonomy gate; m3_seal_app_ref moved to the
+    exclusion side at K8, 2026-08-04 — the job-grain edge deprecated when
+    m3_belongs_to_application activated, per the K7 sign-off.)
     """
     out = render_schema_graph()
     for vocab_id in (
-        "m3_seal_app_ref",
+        "m3_belongs_to_application",
         "m3_runs_on_agent_host",
         "m3_runs_on_etl_host",
         "m3_runs_on_host_group",
@@ -88,6 +90,7 @@ def test_deprecated_and_removed_entries_excluded() -> None:
         "seal_of_role",
         "seal_held_by",
         "seal_requires_scheduler",
+        "m3_seal_app_ref",
     ):
         assert (
             f"r.vocab_id = '{vocab_id}'" not in out

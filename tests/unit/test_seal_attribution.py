@@ -1,10 +1,13 @@
-"""Offline tests for the K2 SEAL attribution loader.
+"""Offline tests for the K2 match policy (now the K8 fallback resolver).
 
 Pins the match policy exactly as SME-confirmed at gate
 seal-attribution-match-policy (config/gate-log.md, 2026-07-14): precedence
 tiers (§A), coverage reconciliation (§B), deterministic multi-hit tie-break
-(§C), the edge write shape (§D), and PIN semantics (§F). Pure — synthetic
-fixtures only, no network/DB.
+(§C), and PIN semantics (§F). The policy was NOT re-opened at the K7
+close-out (gate seal-app-ref-edge-reshape §B3) — it DEMOTED to the fallback
+tier feeding the folder-grain loader, so these tests keep pinning it; the
+edge-write and loader pins moved to test_folder_attribution.py with the
+grain. Pure — synthetic fixtures only, no network/DB.
 """
 
 from __future__ import annotations
@@ -15,24 +18,17 @@ import pytest
 
 yaml = pytest.importorskip("yaml")
 
-from drydocs.graph_verify import Assertion, load_suite
 from drydocs.loaders.seal_attribution import (
     ATTRIBUTION_TIERS,
     MATCH_METHOD_BY_TIER,
-    SealAttributionAdapter,
-    SealAttributionLoader,
     TierReconcilers,
     resolve_attributions,
+    validate_fact_rows,
 )
-from drydocs_core.adapters import CsvAdapter
-from drydocs_core.models import SealAttributionRow, StgAppFactRow
+from drydocs_core.models import StgAppFactRow
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
-FIXTURE_CSV = REPO_ROOT / "tests" / "fixtures" / "attribution" / "stg_app_fact__synthetic.csv"
-AUTOMATED_CYPHER = REPO_ROOT / "drydocs" / "loaders" / "cypher" / "seal_attribution.cypher"
-MANUAL_CYPHER = REPO_ROOT / "drydocs" / "loaders" / "cypher" / "manual_seal_attribution.cypher"
 VOCAB_FILE = REPO_ROOT / "drydocs_core" / "ontology" / "relationship_vocabulary.yaml"
-SUITE_FILE = REPO_ROOT / "graph-tests" / "seal-attribution-coverage.yaml"
 
 
 def _fact(
@@ -211,143 +207,53 @@ def test_pinned_job_with_no_derivation_holds_without_conflict() -> None:
     assert conflict.derived_seal_id is None and conflict.agrees is None
 
 
-# --- fixture batch end-to-end (adapter) ---------------------------------------
+# --- fact validation seam ------------------------------------------------------
 
 
-def _fixture_adapter() -> SealAttributionAdapter:
-    return SealAttributionAdapter(
-        CsvAdapter(FIXTURE_CSV),
-        reconcilers=TierReconcilers(
-            fid={"FID-ALPHA": "SL0002"},
-            app_name={"SYNTHETIC PAYMENTS HUB": "SL0003", "OTHER APP": "SL0099"},
-            alias={"PAYHUB": "SL0004"},
-        ),
-        pinned={("900004", "6"): "SL0005", ("900004", "8"): "SL0777"},
-    )
-
-
-def test_fixture_batch_counts_pin_exactly() -> None:
-    adapter = _fixture_adapter()
-    with adapter:
-        decisions = list(adapter.rows())
-    cov = adapter.coverage
-    assert cov is not None and cov.reconciles()
-    assert cov.eligible_jobs == 10
-    assert cov.matched == 6 and cov.unmatched == 2 and cov.pinned == 2
-    assert cov.matched_by_method == {"seal": 3, "fid": 1, "app_name": 1, "alias": 1}
-    assert len(cov.multi_hits) == 2
-    assert sum(1 for c in cov.pin_conflicts if c.agrees is not None) == 2
-    assert cov.corroboration_disagree == 1
-    assert cov.ignored_fact_rows == 1
-    assert cov.unresolved_facts_by_tier == {"APP_NAME": 1}
-    assert cov.fact_rows_rejected == 0
-
-    by_job = {(d["folder_id"], d["job_id"]): (d["seal_id"], d["match_method"]) for d in decisions}
-    assert by_job == {
-        ("900001", "3"): ("SL0001", "seal"),
-        ("900001", "7"): ("SL0002", "fid"),
-        ("900002", "2"): ("SL0003", "app_name"),
-        ("900002", "4"): ("SL0004", "alias"),
-        ("900003", "1"): ("SL0003", "seal"),  # run_recency tie-break
-        ("900003", "5"): ("SL0004", "seal"),  # run_recency tie-break
-    }
-    # every emitted decision re-validates against the loader's row model
-    for d in decisions:
-        SealAttributionRow.model_validate(d)
-
-
-def test_adapter_counts_malformed_fact_rows_as_rejects() -> None:
-    class _Inner:
-        def rows(self):
-            yield {
+def test_validate_fact_rows_counts_malformed_rows_as_rejects() -> None:
+    facts, rejected, samples = validate_fact_rows(
+        [
+            {
                 "run_id": "r",
                 "folder_id": "f",
                 "job_id": "",  # invalid
                 "fact_type": "SEAL",
                 "fact_value": "SL1",
-            }
-            yield {
+            },
+            {
                 "run_id": "r",
                 "folder_id": "f",
                 "job_id": "1",
                 "fact_type": "SEAL",
                 "fact_value": "SL1",
-            }
-
-    adapter = SealAttributionAdapter(_Inner())
-    decisions = list(adapter.rows())
-    assert len(decisions) == 1
-    assert adapter.coverage is not None
-    assert adapter.coverage.fact_rows_rejected == 1
-    assert adapter.fact_rejects and adapter.fact_rejects[0]["row_index"] == 0
+            },
+        ]
+    )
+    assert len(facts) == 1
+    assert rejected == 1
+    assert samples and samples[0]["row_index"] == 0
 
 
-# --- §D cypher shape pins ------------------------------------------------------
+# --- K7 demotion pins -----------------------------------------------------------
 
 
-def test_automated_cypher_creates_no_nodes() -> None:
-    text = AUTOMATED_CYPHER.read_text(encoding="utf-8")
-    code = "\n".join(line for line in text.splitlines() if not line.strip().startswith("//"))
-    merges = [line for line in code.splitlines() if "MERGE" in line]
-    assert len(merges) == 1, "the automated path MERGEs exactly one thing: the edge"
-    assert "MERGE (j)-[r:WAS_ASSOCIATED_WITH {role: 'seal_app_ref'}]->(a)" in code
-    assert "MATCH (j:ControlMJob {folder_id: row.folder_id, job_id: row.job_id})" in code
-    # S3 / gate business-application-identity §C1: the canonical node is keyed on the
-    # neutral app_id. `row.seal_id` keeps its name on purpose — it is the value a
-    # Control-M CMDLINE carried, i.e. evidence, which §B2(ii) rules stays in the
-    # source's own terms. The two halves of the two-part rule, on one line.
-    assert "MATCH (a:BusinessApplication {app_id: row.seal_id})" in code
-
-
-def test_automated_cypher_on_create_set_split_matches_the_gate() -> None:
-    text = AUTOMATED_CYPHER.read_text(encoding="utf-8")
-    on_create = text.split("ON CREATE SET", 1)[1].split("SET r.last_seen_at", 1)[0]
-    assert "r.first_seen_at" in on_create
-    assert "r.source" in on_create and "'controlm-variable-normalization'" in on_create
-    assert "r.match_method" in on_create
-    every_run = text.split("SET r.last_seen_at", 1)[1]
-    assert "r.last_run_id" in every_run
-
-
-def test_automated_cypher_carries_the_pin_guard() -> None:
-    text = AUTOMATED_CYPHER.read_text(encoding="utf-8")
-    assert "NOT EXISTS" in text and "m.match_method = 'manual'" in text
-
-
-def test_manual_cypher_stamps_manual_provenance_and_guards_node_creation() -> None:
-    text = MANUAL_CYPHER.read_text(encoding="utf-8")
-    assert "r.match_method     = 'manual'" in text
-    assert "'manual-csv'" in text
-    assert "r.manual_load_file" in text and "r.authored_by" in text
-    # node creation only inside the SME-authorized FOREACH guard
-    assert "FOREACH (_ IN CASE WHEN row.create_target_if_missing THEN [1] ELSE [] END |" in text
-    assert "n.manually_created" in text
-    merge_app_lines = [line for line in text.splitlines() if "MERGE (n:BusinessApplication" in line]
-    assert len(merge_app_lines) == 1, "Application MERGE exists only in the FOREACH guard"
-
-
-# --- activation pins (vocabulary + verify suite) --------------------------------
-
-
-def test_vocab_entry_is_active_with_loader_and_supplement_recorded() -> None:
+def test_job_grain_vocab_entry_is_deprecated_with_no_loader() -> None:
+    """The K8 flip (gate §A1): the job-grain edge is retired — the vocabulary
+    entry records the supersession and names no loader or supplement. The
+    K7 sign-off's 'stays active until the K7 build migrates it' clause is
+    this downgrade's authority (recorded in the entry note)."""
     vocab = yaml.safe_load(VOCAB_FILE.read_text(encoding="utf-8"))
     entry = next(r for r in vocab["local_relationships"] if r["id"] == "m3_seal_app_ref")
-    assert entry["status"] == "active"
-    assert entry["loader"] == "seal_attribution.cypher"
-    assert entry["supplement"] == "ontology_supplement.cypher"
-    assert entry["neo4j_label"] == "WAS_ASSOCIATED_WITH"
-    assert entry["role"] == "seal_app_ref"
+    assert entry["status"] == "deprecated"
+    assert entry["loader"] is None
+    assert entry["supplement"] is None
+    assert "m3_belongs_to_application" in entry["note"]
 
 
-def test_coverage_suite_loads_and_asserts_empty_invariants() -> None:
-    suite = load_suite(SUITE_FILE)
-    assert suite.name == "seal-attribution-coverage"
-    assert len(suite.cases) >= 6
-    assert all(c.assertion is Assertion.EMPTY for c in suite.cases)
-
-
-def test_loader_class_wiring() -> None:
-    assert SealAttributionLoader.name == "seal_attribution.v1"
-    assert SealAttributionLoader.row_model is SealAttributionRow
-    assert SealAttributionLoader.cypher_path is not None
-    assert SealAttributionLoader.cypher_path.exists()
+def test_retired_job_grain_writer_files_are_gone() -> None:
+    """§A1: no per-job application edge is authored — the module keeps only
+    the resolver; the edge-writer cypher is deleted."""
+    assert not (REPO_ROOT / "drydocs" / "loaders" / "cypher" / "seal_attribution.cypher").exists()
+    module = (REPO_ROOT / "drydocs" / "loaders" / "seal_attribution.py").read_text(encoding="utf-8")
+    assert "class SealAttributionLoader" not in module
+    assert "BaseLoader" not in module

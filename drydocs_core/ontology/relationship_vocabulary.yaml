@@ -933,11 +933,18 @@ local_relationships:
       forward. The match policy itself is NOT re-opened (§B3): it DEMOTES to
       a fallback tier for app codes with no steward-defined row, and every
       fallback-derived value is DISCLOSED via the origin flag rather than
-      presented as defined. Stays active until the K7 build migrates it.
-    supplement:   ontology_supplement.cypher
-    loader:       seal_attribution.cypher
+      presented as defined.
+      DEPRECATED at the K8 build (2026-08-04): the job-grain writer and its
+      cypher are retired (drydocs.loaders.seal_attribution keeps only the
+      match-policy resolver, feeding the K8 fallback); producer-side the
+      migration is the reload itself under wipe-and-rebuild (§F1) — the
+      company-side migration of live job edges is theirs (guardrail 6 /
+      tracker T23). AUTHORIZED DOWNGRADE: the K7 sign-off's "stays active
+      until the K7 build migrates it" clause is this flip's authority.
+    supplement:   ~
+    loader:       ~
     domain:       controlm
-    status:       active
+    status:       deprecated
 
   - id:           m3_belongs_to_application
     neo4j_label:  BELONGS_TO_APPLICATION
@@ -969,12 +976,15 @@ local_relationships:
       (shared platform code) resolves per folder with :AreaProduct as a
       ROUTING step, never an edge target — there is no direct mapping of
       batch technical components to area product (SME 2026-08-03).
-      PLANNED — no loader until the K7 build items land; nothing writes this
-      edge yet.
-    supplement:   ~
-    loader:       ~
+      ACTIVATED at the K8 build (2026-08-04): loader
+      folder_attribution.cypher (app-code defined mapping + the demoted K2
+      fallback, origin-flagged per §B3); manual tier-5 pins via
+      manual_seal_attribution.cypher (rekeyed to this shape, §D2); the 1:1
+      graph-test lives in graph-tests/folder-attribution-coverage.yaml.
+    supplement:   ontology_supplement.cypher
+    loader:       folder_attribution.cypher
     domain:       controlm
-    status:       planned
+    status:       active
 
   - id:           m3_invokes
     neo4j_label:  INVOKES

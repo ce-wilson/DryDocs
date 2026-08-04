@@ -237,25 +237,24 @@ MATCH (local:OntologyTerm:LocalRelationship {iri: "https://drydocs.local/ontolog
 MATCH (prov:OntologyTerm:ProvProperty       {iri: "http://www.w3.org/ns/prov#wasInformedBy"})
 MERGE (local)-[:MAPS_TO]->(prov);
 
-// WAS_ASSOCIATED_WITH {role: seal_app_ref}  —  ControlMJob → Application  (prov:wasAssociatedWith)
-// K2 activation (gate seal-attribution-match-policy, 2026-07-14). IRI is
-// role-discriminated: the label hosts future roles (owner/author) with their
-// own declarations. K3 rider: type-checks while :BusinessApplication is prov:SoftwareAgent —
-// the K4 reclass re-opens the edge shape at its own gate. (Comment ';' is
-// harmless since D5: run_script splits client-side, comment-aware.)
-MERGE (n:OntologyTerm:LocalRelationship {iri: "https://drydocs.local/ontology#wasAssociatedWithSealAppRef"})
-  SET n.label  = "WAS_ASSOCIATED_WITH",
+// BELONGS_TO_APPLICATION {role: seal_app_ref}  —  ControlMFolder → Port  (LOCAL, no PROV verb)
+// K8 activation (gate seal-app-ref-edge-reshape, SIGNED OFF 2026-08-03) —
+// supersedes the job-grain WAS_ASSOCIATED_WITH {role: seal_app_ref} term
+// (K2, deprecated at K8; its supplement block retired with it). prov_maps_to
+// is deliberately null (§D1 option a): Collection → Entity governance/
+// containment with no natural PROV verb — the SCHEDULED_ON precedent — so
+// this block declares the term and creates NO MAPS_TO edge.
+MERGE (n:OntologyTerm:LocalRelationship {iri: "https://drydocs.local/ontology#belongsToApplication"})
+  SET n.label  = "BELONGS_TO_APPLICATION",
       n.role   = "seal_app_ref",
-      n.domain = "ControlMJob",
-      n.range  = "BusinessApplication",
-      n.notes  = "Job attributed to its SEAL-registered application via STG_APP_FACT "
-               + "semantic facts (precedence SEAL > FID > APP_NAME > ALIAS; never raw "
-               + "job.APPLICATION). Matrix row: Activity → Agent = prov:wasAssociatedWith. "
-               + "role=seal_app_ref discriminates from future owner/author roles. "
-               + "Loader: seal_attribution.cypher; manual tier-5 pins via manual_seal_attribution.cypher.";
-MATCH (local:OntologyTerm:LocalRelationship {iri: "https://drydocs.local/ontology#wasAssociatedWithSealAppRef"})
-MATCH (prov:OntologyTerm:ProvProperty       {iri: "http://www.w3.org/ns/prov#wasAssociatedWith"})
-MERGE (local)-[:MAPS_TO]->(prov);
+      n.domain = "ControlMFolder",
+      n.range  = "Port",
+      n.notes  = "Folder-grain attribution to the application's BatchProcessing Port "
+               + "(§C1 supernode avoidance; jobs inherit via CONTAINS_JOB, §A1). Authored "
+               + "per app code (§B1, K9 store) with the demoted K2 match policy as the "
+               + "disclosed fallback (§B3 origin flag). Folder → application is 1:1 "
+               + "(OWNER-NOT-USER), enforced as a graph-test. Loader: "
+               + "folder_attribution.cypher; manual tier-5 pins via manual_seal_attribution.cypher.";
 
 
 // =============================================================================

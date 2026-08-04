@@ -793,15 +793,18 @@ datasets:
     feeds_taxonomy: [applications]      # semantic facts attribute a ControlMJob to an Application (SEAL)
     adapter: oracle
     gate_spec: config/gate-prompts/seal-attribution-match-policy.yaml
-    loader: drydocs/loaders/seal_attribution.py   # built with the flip (K2); cypher seal_attribution.cypher
+    loader: drydocs/loaders/folder_attribution.py   # K8 folder-grain loader; cypher folder_attribution.cypher (the K2 job-grain writer retired 2026-08-04)
     confirmed: true                     # gate seal-attribution-match-policy SIGNED OFF 24/24 (2026-07-14) — transfers per Q6
     replaces: stg-app-fact
     notes: >
       Python normalizer output over CM_DEF_SETVAR_VW (K1: job.APPLICATION is
       NOT reliable SEAL identity — this table's semantic facts are the feed
-      instead). Rows carry fact_type in {SEAL, FID, APP_NAME, ALIAS, ...};
-      feeds the ACTIVE m3_seal_app_ref mapping. Mechanism-only here — no
-      real SEAL/FID/app-name values. Extract:
+      instead). Rows carry fact_type in {SEAL, FID, APP_NAME, ALIAS, ...}.
+      Since K8 (gate seal-app-ref-edge-reshape §B3) this feed is the demoted
+      FALLBACK behind the app-code defined mapping
+      (config/overrides/app-code-mappings.csv): it feeds the ACTIVE
+      m3_belongs_to_application folder edge with origin=matched-fallback.
+      Mechanism-only here — no real SEAL/FID/app-name values. Extract:
       drydocs/loaders/sql/controlm_app_facts.sql (ORDER BY = tie-break
       contract).
 

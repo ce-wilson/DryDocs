@@ -1,16 +1,26 @@
-"""SEAL attribution rows (backlog K2, gate seal-attribution-match-policy).
+"""SEAL attribution rows (backlog K2/K8, gates seal-attribution-match-policy
+and seal-app-ref-edge-reshape).
 
-Three contracts:
+Four contracts:
 
 - :class:`StgAppFactRow` — one DRYDOCS_STG.STG_APP_FACT row (semantic facts
   mined from Control-M variables by the C3/C4 normalization stream). The
-  attribution loader's *input*; validated inside the adapter before the
+  attribution resolver's *input*; validated inside the adapter before the
   match policy runs.
-- :class:`SealAttributionRow` — one resolved attribution *decision*
-  (job -> Application), the shape ``seal_attribution.cypher`` consumes.
-  Produced only by the match-policy resolver, never read from a source.
+- :class:`SealAttributionRow` — one resolved K2 job-grain *decision*. Since
+  the K7 close-out (2026-08-03) this is an INTERNAL shape only: the K2 match
+  policy DEMOTES to the fallback tier feeding the folder-grain resolver
+  (§B3) and no per-job application edge is authored (§A1).
+- :class:`FolderAttributionRow` — one folder-grain attribution, the shape
+  ``folder_attribution.cypher`` consumes (K8): ControlMFolder
+  -[BELONGS_TO_APPLICATION {role: seal_app_ref}]-> Port, carrying the §B3
+  origin flag so fallback-derived values are disclosed, never presented as
+  defined.
 - :class:`ManualMappingRow` — one SME-authored manual mapping CSV row
-  (config/manual-loads/TEMPLATE-node-mapping.csv), the tier-5 final option.
+  (config/manual-loads/TEMPLATE-node-mapping.csv), the tier-5 final option —
+  authored at the app-code grain per gate §B1 (one authoring mechanism per
+  code; the loader fans out to folders), with an optional folder_id for a
+  per-folder pin on a shared platform code.
 
 Mechanism only: fact-type names and node keys — real SEAL ids / app names
 never appear in committed fixtures (synthetic twins only).
@@ -85,13 +95,14 @@ class StgAppFactRow(BaseModel):
 
 
 class SealAttributionRow(BaseModel):
-    """One accepted attribution decision — the ``$batch`` row shape of
-    ``seal_attribution.cypher`` (gate §D: the edge write shape).
+    """One accepted K2 job-grain decision (gate seal-attribution-match-policy).
 
     ``match_method`` is the winning precedence tier (``seal`` | ``fid`` |
-    ``app_name`` | ``alias``) — recorded ON CREATE so mixed-precedence
-    attribution stays auditable (gate §E). The manual path never produces
-    this row (it has its own loader + ``match_method: 'manual'``).
+    ``app_name`` | ``alias``). Since the K7 close-out this shape never
+    reaches the graph — it is the K2 fallback's INTERNAL result, aggregated
+    to the folder grain by the K8 resolver (§B3 demotion); the folder edge
+    it feeds carries ``origin: matched-fallback`` so the derivation is
+    disclosed.
     """
 
     folder_id: str = Field(..., min_length=1)
@@ -105,33 +116,66 @@ class SealAttributionRow(BaseModel):
         return _stripped_str(v)
 
 
+class FolderAttributionRow(BaseModel):
+    """One folder-grain attribution — the ``$batch`` row shape of
+    ``folder_attribution.cypher`` (K8; gate seal-app-ref-edge-reshape §D2:
+    ONE shape everywhere).
+
+    ``origin`` is the §B3 disclosure flag: ``defined`` / ``override`` /
+    ``manual-pin`` rows come from the steward store (authored); a
+    ``matched-fallback`` row was derived by the demoted K2 match policy at
+    load time and is never presented as though it were defined.
+    ``match_method`` mirrors the origin for authored rows and records the
+    winning K2 tier for fallback rows. ``tier`` is the authored row's
+    app-code tier (§B2), absent on fallback rows.
+    """
+
+    folder_id: str = Field(..., min_length=1)
+    app_id: str = Field(..., min_length=1)
+    origin: str = Field(..., pattern=r"^(defined|override|manual-pin|matched-fallback)$")
+    match_method: str = Field(..., pattern=r"^(defined|override|manual|seal|fid|app_name|alias)$")
+    tier: str | None = Field(None, pattern=r"^(seal-born|platform|dual-coded)$")
+    source: str = Field(..., min_length=1)
+
+    @field_validator("folder_id", "app_id", mode="before")
+    @classmethod
+    def _keys(cls, v: Any) -> str:
+        return _stripped_str(v)
+
+    @field_validator("tier", mode="before")
+    @classmethod
+    def _tier(cls, v: Any) -> str | None:
+        return _str_or_none(v)
+
+
 class ManualMappingRow(BaseModel):
-    """One SME-authored manual mapping (tier 5, gate §F).
+    """One SME-authored manual mapping (tier 5, gate §F; rekeyed at K8).
 
     Parsed from a CSV following config/manual-loads/TEMPLATE-node-mapping.csv.
     The generic template columns are validated upstream (supported shape,
     vocabulary existence, manifest registration) — this row is the already-
-    narrowed ControlMJob -[WAS_ASSOCIATED_WITH {role: seal_app_ref}]->
-    Application shape the manual cypher consumes.
+    narrowed ControlMFolder -[BELONGS_TO_APPLICATION {role: seal_app_ref}]->
+    Port shape the manual cypher consumes. Authored at the APP-CODE grain
+    (§B1); ``folder_id`` narrows a row to one folder (a per-folder pin on a
+    shared platform code) and is otherwise None — the loader fans a
+    code-level row out over CONTAINS_FOLDER.
     """
 
-    folder_id: str = Field(..., min_length=1)
-    job_id: str = Field(..., min_length=1)
-    seal_id: str = Field(..., min_length=1)
+    app_code: str = Field(..., min_length=1)
+    folder_id: str | None = None
+    app_id: str = Field(..., min_length=1)
     create_target_if_missing: bool = False
     manual_load_file: str = Field(..., min_length=1)
     authored_by: str = Field(..., min_length=1)
     authored_on: str | None = None
     note: str | None = None
 
-    @field_validator(
-        "folder_id", "job_id", "seal_id", "manual_load_file", "authored_by", mode="before"
-    )
+    @field_validator("app_code", "app_id", "manual_load_file", "authored_by", mode="before")
     @classmethod
     def _keys(cls, v: Any) -> str:
         return _stripped_str(v)
 
-    @field_validator("authored_on", "note", mode="before")
+    @field_validator("folder_id", "authored_on", "note", mode="before")
     @classmethod
     def _optionals(cls, v: Any) -> str | None:
         return _str_or_none(v)

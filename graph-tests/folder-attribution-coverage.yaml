@@ -1,0 +1,105 @@
+# folder-attribution-coverage suite — the K8 coverage invariant + the K7
+# 1:1 rule (gate seal-app-ref-edge-reshape, SIGNED OFF 2026-08-03).
+#
+# The folder-attribution loader (folder_attribution.v1) stamps its per-run
+# coverage counts on its :JobRun (eligible_folders / attributed / unmatched /
+# pinned / conflict_count / edges_written / dropped_in_graph); these cases
+# reconcile the stamps against the live edges. Unmatched folders are
+# surfaced by the counts, never a failure — what FAILS here is bookkeeping
+# drift or a policy violation: shape props missing, an origin or
+# match_method outside the ruled vocabulary, and above all a folder with
+# TWO application edges (folder → application is 1:1, the OWNER-NOT-USER
+# ruling — a defect, not a state; a graph-test because Neo4j cannot declare
+# relationship cardinality).
+# classification: Internal-Public (shape/consistency only — no counts/IDs).
+classification: Internal-Public
+schema: drydocs.graph-tests.v1
+suite: folder-attribution-coverage
+description: >
+  Coverage + shape invariants for the K8 folder-grain attribution load:
+  BELONGS_TO_APPLICATION {role: seal_app_ref} edges carry the ruled property
+  shape onto BatchProcessing Ports; every folder carries at most ONE
+  application edge (1:1, manual pins included); origin discloses how each
+  value arose (§B3); every folder_attribution.v1 run's coverage stamps
+  reconcile (attributed + unmatched + conflicts + pinned = eligible;
+  attributed = edges written + dropped_in_graph, drops surfaced, never
+  silent).
+# No `targets:` — the review spine (config/review-labels.yaml) has no entry
+# covering :Port, and declaring labels the spine cannot check is the drift
+# the sibling business-application-identity suite documents.
+cases:
+  - id: TC-01
+    description: every folder edge carries the ruled shape props (§D2 — one shape everywhere)
+    cypher: >
+      MATCH (:ControlMFolder)-[r:BELONGS_TO_APPLICATION {role: 'seal_app_ref'}]->(:Port)
+      WHERE r.origin IS NULL OR r.match_method IS NULL OR r.source IS NULL
+         OR r.first_seen_at IS NULL OR r.last_seen_at IS NULL
+         OR r.last_run_id IS NULL
+      RETURN r.origin AS origin, r.match_method AS match_method
+    assert: empty
+
+  - id: TC-02
+    description: origin stays inside the ruled §B3 vocabulary, and match_method inside authored + K2 tiers
+    cypher: >
+      MATCH (:ControlMFolder)-[r:BELONGS_TO_APPLICATION {role: 'seal_app_ref'}]->(:Port)
+      WHERE NOT r.origin IN ['defined', 'matched-fallback', 'override', 'manual-pin']
+         OR NOT r.match_method IN ['defined', 'override', 'manual',
+                                   'seal', 'fid', 'app_name', 'alias']
+      RETURN DISTINCT r.origin AS origin, r.match_method AS match_method
+    assert: empty
+
+  - id: TC-03
+    description: folder -> application is 1:1 (OWNER-NOT-USER) — a folder with two application edges is a DEFECT, manual pins included
+    cypher: >
+      MATCH (f:ControlMFolder)-[r:BELONGS_TO_APPLICATION {role: 'seal_app_ref'}]->(:Port)
+      WITH f, count(r) AS application_edges
+      WHERE application_edges > 1
+      RETURN f.folder_id AS folder_id, application_edges
+    assert: empty
+
+  - id: TC-04
+    description: the edge lands ONLY on BatchProcessing Ports (§C1 — never :BusinessApplication, never the Event port)
+    cypher: >
+      MATCH (:ControlMFolder)-[r:BELONGS_TO_APPLICATION {role: 'seal_app_ref'}]->(t)
+      WHERE NOT (t:Port AND t.kind = 'BatchProcessing')
+      RETURN labels(t) AS wrong_target, t.kind AS kind
+    assert: empty
+
+  - id: TC-05
+    description: every attribution run's coverage stamps reconcile — attributed + unmatched + conflicts + pinned = eligible
+    cypher: >
+      MATCH (run:JobRun {loader: 'folder_attribution.v1'})
+      WHERE run.status = 'OK' AND run.eligible_folders IS NOT NULL
+        AND run.attributed + run.unmatched + run.conflict_count + run.pinned
+            <> run.eligible_folders
+      RETURN run.run_id AS unreconciled_run
+    assert: empty
+
+  - id: TC-06
+    description: the latest attribution run's edge bookkeeping matches the live graph — attributed = edges_written + dropped_in_graph (no silent drops)
+    cypher: >
+      MATCH (run:JobRun {loader: 'folder_attribution.v1'})
+      WHERE run.status = 'OK' AND run.edges_written IS NOT NULL
+      WITH run ORDER BY run.completed_at DESC LIMIT 1
+      OPTIONAL MATCH (:ControlMFolder)-[r:BELONGS_TO_APPLICATION {role: 'seal_app_ref'}]->(:Port)
+        WHERE r.last_run_id = run.run_id
+      WITH run, count(r) AS live_edges
+      WHERE run.edges_written <> live_edges
+         OR run.attributed <> run.edges_written + run.dropped_in_graph
+      RETURN run.run_id AS drifted_run, live_edges, run.edges_written AS stamped
+    assert: empty
+
+  - id: TC-07
+    description: manually-created Application nodes always carry their audit pointers (§F.4 — counted separately, never anonymous)
+    cypher: >
+      MATCH (a:BusinessApplication {manually_created: true})
+      WHERE a.manual_load_file IS NULL OR a.authored_by IS NULL
+      RETURN a.app_id AS unstamped_manual_node
+    assert: empty
+
+  - id: TC-08
+    description: no live job-grain attribution edges remain (§A1 — the K2 shape is retired; company-side migration is theirs, this guards the producer's wipe-and-rebuild)
+    cypher: >
+      MATCH (j:ControlMJob)-[r:WAS_ASSOCIATED_WITH {role: 'seal_app_ref'}]->(:BusinessApplication)
+      RETURN j.folder_id AS folder_id, j.job_id AS job_id
+    assert: empty

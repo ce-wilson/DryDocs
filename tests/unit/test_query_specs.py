@@ -120,21 +120,25 @@ def test_jobs_spec_resolves_folder_node_and_data_center():
 
 
 def test_folder_applications_spec_uses_gated_edges():
-    """Folder -> BusinessApplication rides the gated attribution edges only."""
+    """Folder -> BusinessApplication rides the RULED folder-grain edge only
+    (K7/K8, re-bound per gate §A2), with the §B3 origin disclosed."""
     spec = QUERY_SPECS["explorer.folder-applications.v1"]
-    assert "WAS_ASSOCIATED_WITH {role: 'seal_app_ref'}" in spec.cypher
-    assert "CONTAINS_JOB" in spec.cypher
+    assert "BELONGS_TO_APPLICATION {role: 'seal_app_ref'}" in spec.cypher
+    assert "WAS_ASSOCIATED_WITH" not in spec.cypher, "the job-grain derivation is retired (§A1)"
+    assert "HAS_PORT" in spec.cypher and "BatchProcessing" in spec.cypher
     assert ":BusinessApplication" in spec.cypher
+    assert "origin" in [c.name for c in spec.columns]
 
 
 def test_app_codes_spec_classifies_both_mapping_patterns():
-    """The SME two-pattern model (2026-07-21): dedicated codes map direct,
-    shared platform codes fan out to many applications — the spec derives the
-    pattern from observed cardinality over the GATED edges, and does not
-    invent a code->application ontology edge (that is a gate decision)."""
+    """The SME two-pattern model (2026-07-21), re-bound to the ruled
+    folder-grain edges at K8: dedicated codes map direct, shared platform
+    codes fan out to many applications. The authoritative mapping is the K9
+    defined-mapping store; this spec stays the observed cross-check."""
     spec = QUERY_SPECS["explorer.controlm-app-codes.v1"]
     assert ":ControlMApplication" in spec.cypher and "CONTAINS_FOLDER" in spec.cypher
-    assert "WAS_ASSOCIATED_WITH {role: 'seal_app_ref'}" in spec.cypher
+    assert "BELONGS_TO_APPLICATION {role: 'seal_app_ref'}" in spec.cypher
+    assert "WAS_ASSOCIATED_WITH" not in spec.cypher, "the job-grain derivation is retired (§A1)"
     assert "direct (dedicated code)" in spec.cypher
     assert "shared platform code" in spec.cypher
     assert "unmapped" in spec.cypher

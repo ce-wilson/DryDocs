@@ -30,9 +30,10 @@ MAPPING_ROLES = ("steward", "admin")
 # attribution onto the application's BatchProcessing :Port, AUTHORED per app
 # code (§B1 — the loader fans out to folders via m3_contains_folder). The
 # job-grain K2 shape is retired for authoring (§A1: no per-job application
-# edge is authored going forward); the loader chain's own migration is K8, so
-# a drafted artifact QUEUES in git until that build lands. Extending this is
-# a deliberate change reviewed against the vocabulary.
+# edge is authored going forward). K8 LANDED 2026-08-04: the loader chain
+# (manual_mappings SUPPORTED_SHAPE + folder_attribution.v1) enforces this
+# same shape end to end, so a drafted artifact is loadable once registered.
+# Extending this is a deliberate change reviewed against the vocabulary.
 K2_SHAPE = {
     "source_label": "ControlMFolder",
     "relationship": "BELONGS_TO_APPLICATION",
@@ -363,14 +364,14 @@ def draft_changeset(
         "csv": out.getvalue(),
         "manifest_snippet": manifest_snippet,
         "entries": len(entries),
-        "lifecycle": "draft → submitted (PR) → gated → loaded (at the K8 loader build)",
+        "lifecycle": "draft → submitted (PR) → gated → loaded (drydocs load-manual-mappings)",
         "note": (
             "The server wrote NOTHING. Commit this file under config/manual-loads/, "
             "register it in manifest.yaml (fill replaces_with), and take it through "
-            "the existing K2 gate. The folder-grain loader is the K8 build — until "
-            "it lands the registered file QUEUES fail-closed (the loader chain still "
-            "enforces the job-grain shape). Manual = tier 5 — it never overrides "
-            "SEAL evidence."
+            "the existing K2 gate. The K8 folder-grain loader chain enforces this "
+            "same shape end to end (manual_mappings SUPPORTED_SHAPE), so the "
+            "registered file loads via `drydocs load-manual-mappings`. Manual = "
+            "tier 5 — it never overrides SEAL evidence."
         ),
     }
 

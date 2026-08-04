@@ -222,13 +222,9 @@ MATCH (a:SchemaMeta {name: 'ControlMJobRun'}), (b:SchemaMeta {name: 'AppUser'})
 MERGE (a)-[r:EXECUTED_BY]->(b)
   SET r.vocab_id = 'm3_executed_by', r.prov_maps_to = 'prov:wasAssociatedWith', r.domain = 'controlm', r.status = 'planned';
 
-MATCH (a:SchemaMeta {name: 'ControlMJob'}), (b:SchemaMeta {name: 'BusinessApplication'})
-MERGE (a)-[r:WAS_ASSOCIATED_WITH]->(b)
-  SET r.vocab_id = 'm3_seal_app_ref', r.role = 'seal_app_ref', r.prov_maps_to = 'prov:wasAssociatedWith', r.domain = 'controlm', r.status = 'active';
-
 MATCH (a:SchemaMeta {name: 'ControlMFolder'}), (b:SchemaMeta {name: 'Port'})
 MERGE (a)-[r:BELONGS_TO_APPLICATION]->(b)
-  SET r.vocab_id = 'm3_belongs_to_application', r.role = 'seal_app_ref', r.prov_maps_to = null, r.domain = 'controlm', r.status = 'planned';
+  SET r.vocab_id = 'm3_belongs_to_application', r.role = 'seal_app_ref', r.prov_maps_to = null, r.domain = 'controlm', r.status = 'active';
 
 MATCH (a:SchemaMeta {name: 'ControlMJob'}), (b:SchemaMeta {name: 'Script'})
 MERGE (a)-[r:INVOKES]->(b)

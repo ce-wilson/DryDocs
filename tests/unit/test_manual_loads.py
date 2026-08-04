@@ -48,8 +48,8 @@ def _repo(
     csv_path = csv_dir / "batch1-mappings.csv"
     csv_path.write_text(
         CSV_HEADER + "\n"
-        "ControlMJob,folder_id=900001:job_id=3,WAS_ASSOCIATED_WITH,"
-        "role=seal_app_ref,BusinessApplication,seal_id=SL0001,false,"
+        "ControlMFolder,app_code=ARA,BELONGS_TO_APPLICATION,"
+        "role=seal_app_ref,Port,app_id=SL0001,false,"
         "synthetic test row,tester0001,2026-07-14\n",
         encoding="utf-8",
     )
@@ -57,7 +57,7 @@ def _repo(
         "file": "internal/manual/batch1-mappings.csv",
         "scope": "synthetic test mappings",
         "status": "pending-load",
-        "replaces_with": "stg-app-fact automated attribution (seal_attribution.py)",
+        "replaces_with": "app-code defined mapping (folder_attribution.py)",
         "authored_by": "tester0001",
     }
     manifest = {
@@ -128,8 +128,8 @@ def test_shipped_manifest_is_confirmed_with_empty_queue() -> None:
 # --- never mint a relationship type (§F.1) --------------------------------------
 
 
-def test_the_k2_shape_is_a_registered_vocabulary_entry() -> None:
-    assert relationship_registered("WAS_ASSOCIATED_WITH", "seal_app_ref")
+def test_the_ruled_shape_is_a_registered_vocabulary_entry() -> None:
+    assert relationship_registered("BELONGS_TO_APPLICATION", "seal_app_ref")
 
 
 def test_unregistered_relationships_are_refused() -> None:
@@ -141,8 +141,8 @@ def test_csv_naming_an_unregistered_relationship_is_refused(tmp_path: Path) -> N
     manifest_path, csv_path = _repo(tmp_path)
     csv_path.write_text(
         CSV_HEADER + "\n"
-        "ControlMJob,folder_id=900001:job_id=3,MADE_UP_REL,role=seal_app_ref,"
-        "BusinessApplication,seal_id=SL0001,false,x,tester0001,2026-07-14\n",
+        "ControlMFolder,app_code=ARA,MADE_UP_REL,role=seal_app_ref,"
+        "Port,app_id=SL0001,false,x,tester0001,2026-07-14\n",
         encoding="utf-8",
     )
     with pytest.raises(ManualLoadError, match="never mint a relationship type"):
@@ -166,15 +166,29 @@ def test_unsupported_shape_is_refused_loudly(tmp_path: Path) -> None:
         parse_mapping_csv(csv_path, manifest_path=manifest_path)
 
 
-def test_source_key_missing_a_node_key_part_is_refused(tmp_path: Path) -> None:
+def test_source_key_missing_the_app_code_is_refused(tmp_path: Path) -> None:
+    """§B1: authoring is per app code — a bare folder_id row cannot say which
+    code it resolves, so it is refused rather than guessed."""
     manifest_path, csv_path = _repo(tmp_path)
     csv_path.write_text(
         CSV_HEADER + "\n"
-        "ControlMJob,folder_id=900001,WAS_ASSOCIATED_WITH,role=seal_app_ref,"
-        "BusinessApplication,seal_id=SL0001,false,x,tester0001,2026-07-14\n",
+        "ControlMFolder,folder_id=900001,BELONGS_TO_APPLICATION,role=seal_app_ref,"
+        "Port,app_id=SL0001,false,x,tester0001,2026-07-14\n",
         encoding="utf-8",
     )
-    with pytest.raises(ManualLoadError, match="job_id"):
+    with pytest.raises(ManualLoadError, match="app_code"):
+        parse_mapping_csv(csv_path, manifest_path=manifest_path)
+
+
+def test_target_key_missing_the_app_id_is_refused(tmp_path: Path) -> None:
+    manifest_path, csv_path = _repo(tmp_path)
+    csv_path.write_text(
+        CSV_HEADER + "\n"
+        "ControlMFolder,app_code=ARA,BELONGS_TO_APPLICATION,role=seal_app_ref,"
+        "Port,seal_id=SL0001,false,x,tester0001,2026-07-14\n",
+        encoding="utf-8",
+    )
+    with pytest.raises(ManualLoadError, match="app_id"):
         parse_mapping_csv(csv_path, manifest_path=manifest_path)
 
 
@@ -187,18 +201,30 @@ def test_valid_row_parses_to_the_narrowed_shape(tmp_path: Path) -> None:
     assert len(rows) == 1
     row = rows[0]
     assert isinstance(row, ManualMappingRow)
-    assert (row.folder_id, row.job_id, row.seal_id) == ("900001", "3", "SL0001")
+    assert (row.app_code, row.folder_id, row.app_id) == ("ARA", None, "SL0001")
     assert row.create_target_if_missing is False
     assert row.manual_load_file == "internal/manual/batch1-mappings.csv"
     assert row.authored_by == "tester0001"
+
+
+def test_per_folder_pin_row_carries_the_folder_id(tmp_path: Path) -> None:
+    manifest_path, csv_path = _repo(tmp_path)
+    csv_path.write_text(
+        CSV_HEADER + "\n"
+        "ControlMFolder,app_code=DPL:folder_id=900002,BELONGS_TO_APPLICATION,"
+        "role=seal_app_ref,Port,app_id=SL0002,false,x,tester0001,2026-08-04\n",
+        encoding="utf-8",
+    )
+    rows = parse_mapping_csv(csv_path, manifest_path=manifest_path)
+    assert (rows[0].app_code, rows[0].folder_id, rows[0].app_id) == ("DPL", "900002", "SL0002")
 
 
 def test_create_target_flag_parses_truthy_strings(tmp_path: Path) -> None:
     manifest_path, csv_path = _repo(tmp_path)
     csv_path.write_text(
         CSV_HEADER + "\n"
-        "ControlMJob,folder_id=900001:job_id=3,WAS_ASSOCIATED_WITH,"
-        "role=seal_app_ref,BusinessApplication,seal_id=SL0001,TRUE,x,tester0001,2026-07-14\n",
+        "ControlMFolder,app_code=ARA,BELONGS_TO_APPLICATION,"
+        "role=seal_app_ref,Port,app_id=SL0001,TRUE,x,tester0001,2026-07-14\n",
         encoding="utf-8",
     )
     rows = parse_mapping_csv(csv_path, manifest_path=manifest_path)
@@ -212,11 +238,9 @@ def test_template_header_matches_the_parser_contract() -> None:
 
 def test_template_row_is_the_k7_ruled_shape() -> None:
     """K9 rekeyed the template from job identity to app_code (K7 gate
-    seal-app-ref-edge-reshape §F2): a manual row now pins the folder-grain
-    ruled edge, authored per app code. The PARSER deliberately still enforces
-    the job-grain K2 shape (SUPPORTED_SHAPE below) until the K8 loader build
-    migrates the chain — a new-shape file registered before K8 queues
-    fail-closed rather than loading under the retired grain."""
+    seal-app-ref-edge-reshape §F2); K8 flipped the parser to match, so the
+    template, SUPPORTED_SHAPE and the loader chain now enforce ONE shape
+    end to end (§D2)."""
     row = TEMPLATE.read_text(encoding="utf-8").splitlines()[1].split(",")
     assert row[0] == "ControlMFolder"
     assert row[1] == "app_code=<CODE>"
@@ -226,12 +250,12 @@ def test_template_row_is_the_k7_ruled_shape() -> None:
     assert row[5] == "app_id=<APPID>"
 
 
-def test_shape_constant_is_the_k2_edge() -> None:
+def test_shape_constant_is_the_k7_ruled_edge() -> None:
     assert SUPPORTED_SHAPE == {
-        "source_label": "ControlMJob",
-        "relationship": "WAS_ASSOCIATED_WITH",
+        "source_label": "ControlMFolder",
+        "relationship": "BELONGS_TO_APPLICATION",
         "role": "seal_app_ref",
-        "target_label": "BusinessApplication",
+        "target_label": "Port",
     }
 
 
@@ -240,7 +264,7 @@ def test_adapter_and_loader_wiring(tmp_path: Path) -> None:
     rows = parse_mapping_csv(csv_path, manifest_path=manifest_path)
     with ManualMappingAdapter(rows) as adapter:
         emitted = list(adapter.rows())
-    assert emitted[0]["seal_id"] == "SL0001"
+    assert emitted[0]["app_id"] == "SL0001"
     assert ManualSealAttributionLoader.name == "manual_seal_attribution.v1"
     assert ManualSealAttributionLoader.row_model is ManualMappingRow
     assert ManualSealAttributionLoader.cypher_path is not None

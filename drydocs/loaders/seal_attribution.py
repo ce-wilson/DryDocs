@@ -1,7 +1,16 @@
-"""SEAL attribution loader — STG_APP_FACT facts -> job WAS_ASSOCIATED_WITH edges.
+"""K2 match policy — STG_APP_FACT facts -> job-grain attribution DECISIONS.
 
-Backlog K2. The match policy implemented here is the one SME-confirmed at the
-``seal-attribution-match-policy`` gate (config/gate-log.md, 2026-07-14):
+Backlog K2, DEMOTED at the K7 close-out (gate seal-app-ref-edge-reshape,
+SIGNED OFF 2026-08-03, §A1/§B3): this module no longer writes the graph.
+The job-grain WAS_ASSOCIATED_WITH writer it used to carry is retired — no
+per-job application edge is authored — and the match policy survives as the
+FALLBACK tier feeding the folder-grain loader (drydocs.loaders
+.folder_attribution), which aggregates these decisions per folder and
+discloses the derivation with ``origin: matched-fallback`` on the edge.
+
+The match policy itself is the one SME-confirmed at the
+``seal-attribution-match-policy`` gate (config/gate-log.md, 2026-07-14) and
+was NOT re-opened at K7:
 
 - §A  Fact-type precedence SEAL > FID > APP_NAME > ALIAS; a SEAL-tier hit
       attributes alone (lower tiers = corroboration only); one-to-one accept
@@ -14,14 +23,14 @@ Backlog K2. The match policy implemented here is the one SME-confirmed at the
       (app_fact_sk — the extract orders by stg_run.started_at so feed order
       IS run recency), then (b) lexicographically lowest seal_id. Every
       multi-hit is flagged on the coverage report for after-the-fact audit.
-- §D  Edge shape: MERGE (j)-[r:WAS_ASSOCIATED_WITH {role:'seal_app_ref'}]->(a)
-      with ON CREATE first_seen_at/source/match_method, SET last_seen_at/
-      last_run_id — see seal_attribution.cypher. The loader creates NO nodes.
+- §D  (RETIRED at K7) the job-grain edge write shape — superseded by the
+      folder-grain BELONGS_TO_APPLICATION shape in folder_attribution.cypher.
 - §E  Runs only after jobs + SEAL reference loads; job.APPLICATION is never
       a SEAL-identity substitute (this module never reads it).
-- §F  Manual mappings PIN: a job carrying a manual edge is excluded from the
-      automated write; a derived match for it surfaces as a PIN-CONFLICT
-      (agreeing or disagreeing) — retirement is a human act (manual_loads.py).
+- §F  Manual mappings PIN (now at the folder grain): a pinned folder is
+      excluded from the automated write; a derived match for it surfaces as
+      a PIN-CONFLICT (agreeing or disagreeing) — retirement is a human act
+      (manual_loads.py).
 
 The resolver (:func:`resolve_attributions`) is pure — offline-testable with
 no Neo4j. Reconciliation for the FID / APP_NAME / ALIAS tiers is an injected
@@ -34,16 +43,13 @@ unresolved (counted, never guessed) until a table is wired company-side.
 from __future__ import annotations
 
 import logging
-from collections.abc import Iterable, Iterator, Mapping
+from collections.abc import Iterable, Mapping
 from dataclasses import dataclass, field
-from pathlib import Path
-from typing import TYPE_CHECKING, Any, ClassVar
+from typing import TYPE_CHECKING
 
 from pydantic import ValidationError
 
 from drydocs_core.models import SealAttributionRow, StgAppFactRow
-
-from .base import BaseLoader
 
 if TYPE_CHECKING:
     from drydocs_core.neo4j_client import Neo4jClient
@@ -307,138 +313,33 @@ def _resolve_job(
 
 
 # ---------------------------------------------------------------------------
-# Adapter + loader
+# Fact validation seam (shared with the K8 folder-attribution adapter)
 # ---------------------------------------------------------------------------
 
 
-class SealAttributionAdapter:
-    """Wraps a raw STG_APP_FACT adapter (CSV or Oracle) and yields resolved
-    attribution decisions. The wrapped adapter's rows are validated to
-    :class:`StgAppFactRow` here (rejects counted in coverage — reported,
-    never dropped silently); BaseLoader then re-validates the emitted
-    decisions against :class:`SealAttributionRow`.
-    """
-
-    def __init__(
-        self,
-        inner: Any,
-        *,
-        reconcilers: TierReconcilers | None = None,
-        pinned: Mapping[tuple[str, str], str] | None = None,
-        max_rejects_kept: int = 20,
-    ) -> None:
-        self.inner = inner
-        self.reconcilers = reconcilers or TierReconcilers()
-        self.pinned = dict(pinned or {})
-        self.max_rejects_kept = max_rejects_kept
-        self.coverage: AttributionCoverage | None = None
-        self.fact_rejects: list[dict] = []
-
-    def __enter__(self) -> SealAttributionAdapter:
-        enter = getattr(self.inner, "__enter__", None)
-        if enter is not None:
-            enter()
-        return self
-
-    def __exit__(self, *exc: Any) -> None:
-        exit_ = getattr(self.inner, "__exit__", None)
-        if exit_ is not None:
-            exit_(*exc)
-
-    def rows(self) -> Iterator[dict]:
-        facts: list[StgAppFactRow] = []
-        rejected = 0
-        for idx, raw in enumerate(self.inner.rows()):
-            try:
-                facts.append(StgAppFactRow.model_validate(raw))
-            except ValidationError as exc:
-                rejected += 1
-                if len(self.fact_rejects) < self.max_rejects_kept:
-                    self.fact_rejects.append({"row_index": idx, "errors": exc.errors(), "raw": raw})
-        decisions, coverage = resolve_attributions(
-            facts, reconcilers=self.reconcilers, pinned=self.pinned
-        )
-        coverage.fact_rows_rejected = rejected
-        self.coverage = coverage
-        for decision in decisions:
-            yield decision.model_dump(mode="json")
-
-
-class SealAttributionLoader(BaseLoader):
-    """Writes the gate-confirmed WAS_ASSOCIATED_WITH {role: seal_app_ref}
-    edges and stamps the run's coverage counts onto its :JobRun so the
-    graph_verify coverage invariant (graph-tests/seal-attribution-coverage.yaml)
-    can reconcile them (§B: the invariant joins graph_verify)."""
-
-    name: ClassVar[str] = "seal_attribution.v1"
-    source_id: ClassVar[str | None] = "controlm@[db].drydocs_stg.stg_app_fact"
-    cypher_path: ClassVar[Path | None] = (
-        Path(__file__).resolve().parent / "cypher" / "seal_attribution.cypher"
-    )
-    row_model: ClassVar[type] = SealAttributionRow
-    source_label: ClassVar[str] = "csv"  # 'oracle' when fed from DRYDOCS_STG
-
-    def load(self):
-        summary = super().load()
-        coverage = getattr(self.adapter, "coverage", None)
-        if coverage is not None:
-            self._stamp_coverage(coverage)
-        return summary
-
-    def _stamp_coverage(self, coverage: AttributionCoverage) -> None:
-        # edges_written counts what this run actually touched; the shortfall
-        # vs matched (decisions whose job or Application node was absent) is
-        # surfaced as dropped_in_graph — reported, never silent (§B).
-        result = self.client.run(
-            """
-            MATCH (run:JobRun {run_id: $run_id})
-            OPTIONAL MATCH (:ControlMJob)-[r:WAS_ASSOCIATED_WITH {role: 'seal_app_ref'}]->(:BusinessApplication)
-              WHERE r.last_run_id = $run_id
-            WITH run, count(r) AS edges_written
-            SET run.eligible_jobs      = $eligible_jobs,
-                run.matched            = $matched,
-                run.unmatched          = $unmatched,
-                run.pinned             = $pinned,
-                run.multi_hit_count    = $multi_hit_count,
-                run.pin_conflict_count = $pin_conflict_count,
-                run.edges_written      = edges_written,
-                run.dropped_in_graph   = $matched - edges_written
-            RETURN edges_written
-            """,
-            run_id=self.run_id,
-            eligible_jobs=coverage.eligible_jobs,
-            matched=coverage.matched,
-            unmatched=coverage.unmatched,
-            pinned=coverage.pinned,
-            multi_hit_count=len(coverage.multi_hits),
-            pin_conflict_count=sum(1 for c in coverage.pin_conflicts if c.agrees is not None),
-        )
-        if result:
-            dropped = coverage.matched - result[0].get("edges_written", 0)
-            if dropped:
-                LOGGER.warning(
-                    "seal_attribution: %d decision(s) found no graph endpoints "
-                    "(job or Application missing) — surfaced as "
-                    "JobRun.dropped_in_graph, follow up via the coverage suite.",
-                    dropped,
-                )
+def validate_fact_rows(
+    raws: Iterable[dict],
+    *,
+    max_rejects_kept: int = 20,
+) -> tuple[list[StgAppFactRow], int, list[dict]]:
+    """Validate raw STG_APP_FACT rows; rejects are counted and sampled,
+    never dropped silently (§B). Returns (facts, rejected_count, samples)."""
+    facts: list[StgAppFactRow] = []
+    rejects: list[dict] = []
+    rejected = 0
+    for idx, raw in enumerate(raws):
+        try:
+            facts.append(StgAppFactRow.model_validate(raw))
+        except ValidationError as exc:
+            rejected += 1
+            if len(rejects) < max_rejects_kept:
+                rejects.append({"row_index": idx, "errors": exc.errors(), "raw": raw})
+    return facts, rejected, rejects
 
 
 # ---------------------------------------------------------------------------
 # Live-graph helpers (thin; the CLI wires these into the adapter)
 # ---------------------------------------------------------------------------
-
-
-def fetch_pinned_attributions(client: Neo4jClient) -> dict[tuple[str, str], str]:
-    """Jobs carrying a manually-asserted seal_app_ref edge (gate §F: PIN)."""
-    rows = client.run(
-        """
-        MATCH (j:ControlMJob)-[r:WAS_ASSOCIATED_WITH {role: 'seal_app_ref'}]->(a:BusinessApplication)
-        WHERE r.match_method = 'manual'
-        RETURN j.folder_id AS folder_id, j.job_id AS job_id, a.seal_id AS seal_id
-        """
-    )
-    return {(str(r["folder_id"]), str(r["job_id"])): str(r["seal_id"]) for r in rows}
 
 
 def fetch_app_name_reconciler(client: Neo4jClient) -> dict[str, str]:
