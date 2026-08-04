@@ -712,10 +712,14 @@ function SealOverridePane({
     setStatus('drafting…')
     try {
       const art = await mappings.draftOverride(drafts)
-      download(art.filename, art.csv, 'text/csv')
+      // S4: the draft is now DURABLE in var/mapping.db before anything is
+      // downloaded, so an interrupted session no longer loses the edit and a
+      // second steward's draft cannot be overwritten by this one.
+      const patch = await mappings.promoteDraft(art.draft_id)
+      download(patch.filename, patch.diff, 'text/x-patch')
       setDrafts([])
       setStatus(
-        `updated override list downloaded (${art.entries} new, ${art.total_rows} total) — replace ${'config/overrides/seal-contact-overrides.csv'} and commit; the server wrote NOTHING`,
+        `diff downloaded (${art.entries} new row(s) over ${art.committed_rows} committed) — apply it on a branch with \`git apply\` against ${patch.path} and commit; the server wrote NO committed file`,
       )
     } catch (e) {
       setStatus(`draft failed: ${(e as Error).message}`)

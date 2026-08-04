@@ -9,6 +9,7 @@ from __future__ import annotations
 
 import csv
 import io
+import re
 from pathlib import Path
 
 import pytest
@@ -28,6 +29,7 @@ from drydocs_api.mappings import (
     list_domains,
     mapping_grid,
     mapping_options,
+    promote_draft,
     source_corrections_report,
 )
 from drydocs_api.personas import PERSONAS
@@ -261,39 +263,260 @@ def test_override_grid_carries_origin_flag(sessions, override_store):
     assert all(r["origin"] in ("source", "override") for r in out["rows"])
 
 
-def test_draft_override_returns_full_updated_file(sessions, override_store):
-    """The artifact is the COMPLETE updated committed file (existing rows +
-    drafts) — commit-by-replace; authored_by is server-stamped; the server
-    wrote nothing."""
+_A_DRAFT = {
+    "app_id": "APP-9012",
+    "role_name": "l1 ops manager",
+    "seal_holder_sid": "U444444",
+    "override_holder_sid": "U555555",
+    "override_holder_name": "Ada Admin",
+    "rationale": "SEAL points at the retired rota owner",
+}
+
+
+def test_draft_override_writes_a_row_not_a_file(sessions, override_store):
+    """S4: drafting persists ROWS to var/mapping.db and returns a receipt.
+
+    It used to return the complete updated file (commit-by-replace), which one
+    editor could hold in a browser download while a second editor built their
+    own copy from the same base — whichever was committed last erased the
+    other. The receipt names the draft instead; the diff comes from promotion.
+    """
     token = _token(sessions, "asmith7734")
-    out = draft_override(
-        [
-            {
-                "app_id": "APP-9012",
-                "role_name": "l1 ops manager",
-                "seal_holder_sid": "U444444",
-                "override_holder_sid": "U555555",
-                "override_holder_name": "Ada Admin",
-                "rationale": "SEAL points at the retired rota owner",
-            }
-        ],
-        token,
+    out = draft_override([_A_DRAFT], token, sessions, override_store)
+
+    assert "csv" not in out, "drafting must no longer hand back a whole replacement file"
+    assert out["domain"] == "seal-contact-override"
+    assert out["entries"] == 1 and out["pending"] == 1
+    assert out["committed_rows"] == 2
+    assert out["draft_id"].startswith("asmith7734-")  # readable in v_open_drafts
+
+    stored = override_store.draft_payloads(out["draft_id"])
+    assert len(stored) == 1
+    row = stored[0]
+    # The stored row is already in COMMITTED-FILE shape: app_seal_id (not the
+    # wire's app_id), canonicalized role, server-stamped author.
+    assert row["app_seal_id"] == "APP-9012"
+    assert row["role_name"] == "L1 Operate Manager"
+    assert row["authored_by"] == "asmith7734"  # session persona, never client-supplied
+    assert row["status"] == "active"
+    assert "NO committed file was written" in out["note"]
+
+
+def test_concurrent_drafts_from_two_sessions_both_survive(sessions, override_store):
+    """The property commit-by-replace could not offer.
+
+    Two stewards drafting at the same time get two independent drafts; neither
+    overwrites the other, and each promotes to its own diff.
+    """
+    alice = _token(sessions, "kchen2190")
+    bob = _token(sessions, "asmith7734")
+
+    a = draft_override(
+        [{**_A_DRAFT, "override_holder_sid": "U555555"}], alice, sessions, override_store
+    )
+    b = draft_override(
+        [{**_A_DRAFT, "app_id": "APP-3333", "override_holder_sid": "U666666"}],
+        bob,
         sessions,
         override_store,
     )
-    rows = list(csv.DictReader(io.StringIO(out["csv"])))
-    assert out["filename"] == "seal-contact-overrides.csv"
-    assert out["entries"] == 1 and out["total_rows"] == 3
-    # The artifact IS config/overrides/seal-contact-overrides.csv, so it keeps the
-    # committed header app_seal_id even though the request field above is app_id.
-    assert [r["app_seal_id"] for r in rows] == ["APP-1234", "APP-5678", "APP-9012"]
-    new = rows[-1]
-    assert new["role_name"] == "L1 Operate Manager"  # canonicalized
-    assert new["authored_by"] == "asmith7734"  # session persona, never client-supplied
-    assert new["status"] == "active"
-    # committed rows survive byte-faithfully through the store round-trip
-    assert rows[0]["override_holder_name"] == "Sam Steward"
+    assert a["draft_id"] != b["draft_id"]
+
+    pending = {d["draft_id"]: d for d in override_store.open_drafts()}
+    assert set(pending) == {a["draft_id"], b["draft_id"]}
+    assert pending[a["draft_id"]]["authored_by"] == "kchen2190"
+    assert pending[b["draft_id"]]["authored_by"] == "asmith7734"
+
+    # Each still holds exactly its own row — no cross-contamination.
+    assert override_store.draft_payloads(a["draft_id"])[0]["override_holder_sid"] == "U555555"
+    assert override_store.draft_payloads(b["draft_id"])[0]["override_holder_sid"] == "U666666"
+
+
+def test_draft_survives_a_store_rebuild(sessions, override_store, tmp_path, monkeypatch):
+    """A rebuild is routine — editing any source file makes the store stale —
+    so it must not discard pending work. Everything else in the file is
+    derived and IS discarded; the draft table is the deliberate exception."""
+    from drydocs_core import mapping_store as core
+
+    token = _token(sessions, "kchen2190")
+    out = draft_override([_A_DRAFT], token, sessions, override_store)
+
+    # Touch the committed source: the next read sees drift and rebuilds.
+    fix = Path(core.SEAL_CONTACT_OVERRIDES_PATH)
+    fix.write_text(
+        fix.read_text(encoding="utf-8")
+        + "APP-7777,L2 Operate Manager,,U888888,,added out of band,kchen2190,2026-07-22,active\n",
+        encoding="utf-8",
+    )
+    assert not core.is_current(override_store._db_path), "fixture edit should make the store stale"
+
+    # The rebuild happens inside this read; the draft must come through it.
+    assert override_store.draft_payloads(out["draft_id"])[0]["app_seal_id"] == "APP-9012"
+    assert [d["draft_id"] for d in override_store.open_drafts()] == [out["draft_id"]]
+
+
+def test_promote_emits_an_additive_diff_that_round_trips(sessions, override_store):
+    """The promote half of ADR 0009 rule 5.
+
+    The diff must (a) apply cleanly to the committed file it was generated
+    against and (b) produce a file that parses to the committed rows plus the
+    drafted ones — no reformatting of untouched lines.
+    """
+    from drydocs_core import mapping_store as core
+
+    token = _token(sessions, "kchen2190")
+    drafted = draft_override([_A_DRAFT], token, sessions, override_store)
+    out = promote_draft(drafted["draft_id"], token, sessions, override_store)
+
+    assert out["entries"] == 1
+    assert out["filename"].endswith(".patch")
     assert "wrote NOTHING" in out["note"]
+
+    committed = Path(core.SEAL_CONTACT_OVERRIDES_PATH).read_text(encoding="utf-8")
+    patched = _apply_unified_diff(committed, out["diff"])
+
+    # (a) additive: every committed line survives byte-identically, in order.
+    assert patched.startswith(committed)
+    added = [
+        ln for ln in out["diff"].splitlines() if ln.startswith("+") and not ln.startswith("+++")
+    ]
+    removed = [
+        ln for ln in out["diff"].splitlines() if ln.startswith("-") and not ln.startswith("---")
+    ]
+    assert len(added) == 1 and removed == [], "a new override is an append, not a rewrite"
+
+    # (b) round-trip: the patched file parses to old rows + the drafted one.
+    rows = list(csv.DictReader(io.StringIO(patched)))
+    assert [r["app_seal_id"] for r in rows] == ["APP-1234", "APP-5678", "APP-9012"]
+    assert rows[-1]["role_name"] == "L1 Operate Manager"
+    assert rows[-1]["authored_by"] == "kchen2190"
+    # committed rows survive byte-faithfully
+    assert rows[0]["override_holder_name"] == "Sam Steward"
+
+    # Promotion closes the draft: the rows stay as the record of what was
+    # proposed, but the draft is no longer pending.
+    assert override_store.open_drafts() == []
+    with pytest.raises(ChangesetValidationError):
+        promote_draft(drafted["draft_id"], token, sessions, override_store)
+
+
+def test_promote_diff_applies_with_real_git(sessions, override_store, tmp_path):
+    """The same diff, validated by the tool that will actually apply it.
+
+    _apply_unified_diff above is our reader of the patch; `git apply` is the
+    one the user runs. Both must accept it, or the artifact is only
+    theoretically correct.
+    """
+    import shutil
+    import subprocess
+
+    git = shutil.which("git")
+    if git is None:
+        pytest.skip("git not on PATH")
+
+    from drydocs_core import mapping_store as core
+
+    token = _token(sessions, "kchen2190")
+    drafted = draft_override([_A_DRAFT], token, sessions, override_store)
+    out = promote_draft(drafted["draft_id"], token, sessions, override_store)
+
+    work = tmp_path / "apply"
+    target = work / out["path"]
+    target.parent.mkdir(parents=True, exist_ok=True)
+    target.write_text(
+        Path(core.SEAL_CONTACT_OVERRIDES_PATH).read_text(encoding="utf-8"), encoding="utf-8"
+    )
+    patch = work / "change.patch"
+    patch.write_text(out["diff"], encoding="utf-8")
+
+    subprocess.run([git, "init", "-q"], cwd=work, check=True)
+    done = subprocess.run(
+        [git, "apply", "--verbose", str(patch)], cwd=work, capture_output=True, text=True
+    )
+    assert done.returncode == 0, f"git refused the emitted diff:\n{done.stderr}"
+    rows = list(csv.DictReader(io.StringIO(target.read_text(encoding="utf-8"))))
+    assert [r["app_seal_id"] for r in rows] == ["APP-1234", "APP-5678", "APP-9012"]
+
+
+def test_no_endpoint_writes_a_tracked_file():
+    """ADR 0009 rule 1, enforced rather than asserted in prose: git is the only
+    commit target.
+
+    S4 gave this service its first durable write, and it goes to
+    var/mapping.db — DERIVED and gitignored. The line that must not be crossed
+    is a write to a file git tracks, which would put the source of truth
+    somewhere the HITL gate never reviews and the cross-repo port cannot carry.
+
+    Static and deliberately absolute: drydocs_api may not call a filesystem
+    WRITE primitive at all. SQLite writes reach the draft buffer through the
+    sqlite3 driver, not through these, so the rule costs nothing today and a
+    future `write_text` has to argue with this test first.
+    """
+    import ast
+
+    banned_funcs = {"write_text", "write_bytes", "unlink", "rmdir", "remove", "rename", "replace"}
+    api_dir = Path(__file__).resolve().parents[2] / "drydocs_api"
+    offenders: list[str] = []
+
+    for path in sorted(api_dir.glob("*.py")):
+        tree = ast.parse(path.read_text(encoding="utf-8"), filename=str(path))
+        for node in ast.walk(tree):
+            if not isinstance(node, ast.Call):
+                continue
+            fn = node.func
+            if isinstance(fn, ast.Name) and fn.id == "open":
+                mode = ""
+                if len(node.args) > 1 and isinstance(node.args[1], ast.Constant):
+                    mode = str(node.args[1].value)
+                for kw in node.keywords:
+                    if kw.arg == "mode" and isinstance(kw.value, ast.Constant):
+                        mode = str(kw.value.value)
+                if any(ch in mode for ch in "wax+"):
+                    offenders.append(f"{path.name}:{node.lineno}: open(..., {mode!r})")
+            elif isinstance(fn, ast.Attribute) and fn.attr in banned_funcs:
+                offenders.append(f"{path.name}:{node.lineno}: .{fn.attr}()")
+
+    assert not offenders, (
+        "drydocs_api must not write files — propose in the DB, land in git "
+        "(ADR 0009 rule 5). Drafts belong in the mapping.db draft table; a "
+        "committed file changes only through a promoted diff:\n" + "\n".join(offenders)
+    )
+
+
+def _apply_unified_diff(original: str, diff: str) -> str:
+    """Minimal unified-diff applier — the test's own reader of the artifact.
+
+    Deliberately independent of the code that produced the diff: reusing the
+    promoter's new_text would prove only that it equals itself.
+    """
+    src = original.splitlines(keepends=True)
+    out: list[str] = []
+    pos = 0
+    lines = diff.splitlines()
+    i = 0
+    while i < len(lines):
+        line = lines[i]
+        if not line.startswith("@@"):
+            i += 1
+            continue
+        header = re.match(r"@@ -(\d+)(?:,(\d+))? \+\d+(?:,\d+)? @@", line)
+        assert header, f"unparseable hunk header: {line}"
+        start = int(header.group(1)) - 1
+        out.extend(src[pos:start])
+        pos = start
+        i += 1
+        while i < len(lines) and not lines[i].startswith("@@"):
+            body = lines[i]
+            if body.startswith("+"):
+                out.append(body[1:] + "\n")
+            elif body.startswith("-"):
+                pos += 1
+            elif body.startswith(" "):
+                out.append(src[pos])
+                pos += 1
+            i += 1
+    out.extend(src[pos:])
+    return "".join(out)
 
 
 @pytest.mark.parametrize(
@@ -410,9 +633,13 @@ def test_app_code_grid_carries_tier_origin_and_end_state(sessions, app_code_stor
     assert "PLT folders drain" in dual["declared_end_state"]
 
 
-def test_draft_app_code_mapping_returns_full_updated_file(sessions, app_code_store):
-    """O24 mechanics verbatim: the artifact is the COMPLETE updated committed
-    file; authored_by is server-stamped; the server wrote nothing."""
+def test_draft_app_code_mapping_writes_a_row_and_promotes(sessions, app_code_store):
+    """O24 mechanics verbatim, including the S4 move: drafting writes a ROW,
+    promotion emits the additive diff, authored_by is server-stamped, and the
+    server writes no committed file. Converted alongside the overrides so one
+    module does not carry two different write models."""
+    from drydocs_core import mapping_store as core
+
     token = _token(sessions, "asmith7734")
     out = draft_app_code_mapping(
         [
@@ -426,16 +653,23 @@ def test_draft_app_code_mapping_returns_full_updated_file(sessions, app_code_sto
         sessions,
         app_code_store,
     )
-    rows = list(csv.DictReader(io.StringIO(out["csv"])))
-    assert out["filename"] == "app-code-mappings.csv"
-    assert out["entries"] == 1 and out["total_rows"] == 6
-    new = rows[-1]
-    assert new["app_code"] == "PRC"
-    assert new["origin"] == "defined"  # the default authoring origin
-    assert new["authored_by"] == "asmith7734"  # session persona, never client-supplied
+    assert "csv" not in out
+    assert out["domain"] == "app-code-mapping"
+    assert out["entries"] == 1 and out["committed_rows"] == 5
+    row = app_code_store.draft_payloads(out["draft_id"])[0]
+    assert row["app_code"] == "PRC"
+    assert row["origin"] == "defined"  # the default authoring origin
+    assert row["authored_by"] == "asmith7734"  # session persona, never client-supplied
+
+    promoted = promote_draft(out["draft_id"], token, sessions, app_code_store)
+    committed = Path(core.APP_CODE_MAPPINGS_PATH).read_text(encoding="utf-8")
+    patched = _apply_unified_diff(committed, promoted["diff"])
+    assert patched.startswith(committed)  # additive, untouched lines untouched
+    rows = list(csv.DictReader(io.StringIO(patched)))
+    assert len(rows) == 6 and rows[-1]["app_code"] == "PRC"
     # committed rows survive byte-faithfully through the store round-trip
     assert rows[0]["app_code"] == "PRA" and rows[0]["app_id"] == "APP-1234"
-    assert "wrote NOTHING" in out["note"]
+    assert "wrote NOTHING" in promoted["note"]
 
 
 @pytest.mark.parametrize(

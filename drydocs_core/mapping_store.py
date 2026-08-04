@@ -76,7 +76,10 @@ APP_CODE_TIERS = ("seal-born", "platform", "dual-coded")
 APP_CODE_ORIGINS = ("defined", "matched-fallback", "override", "manual-pin")
 APP_CODE_AUTHORED_ORIGINS = ("defined", "override", "manual-pin")
 
-SCHEMA_VERSION = "drydocs.mapping-store.v1"
+# v2 adds the S4 draft table. Bumped deliberately: is_current() compares this
+# through meta, so a pre-S4 database — which has no draft table for the API to
+# write to — reads as stale and gets rebuilt rather than failing at first write.
+SCHEMA_VERSION = "drydocs.mapping-store.v2"
 
 # Table DDL. Nullable columns mirror the YAML's reality (property supplements
 # have no to_node, infrastructure edges have no prov term, etc.).
@@ -267,7 +270,53 @@ CREATE VIEW v_dual_coded_migrations AS
   SELECT app_code, app_id, declared_end_state, authored_by, authored_on
   FROM app_code_mapping WHERE tier = 'dual-coded'
   ORDER BY app_code, line_no;
+
+-- ── S4 / ADR 0009 rule 5: the draft write-ahead buffer.
+--
+-- THE ONE TABLE IN THIS FILE THAT IS NOT DERIVED FROM GIT. Console edits land
+-- here as ROWS so an unfinished or concurrent edit has somewhere durable to
+-- live; promotion emits a YAML/CSV diff for a branch, and git stays the only
+-- commit target. Before this, POST /mappings/overrides/draft returned the
+-- whole updated file (commit-by-replace) — correct for one small list and one
+-- editor, and unable to survive a second.
+--
+-- Being non-derived has two consequences, both deliberate:
+--   * build() CARRIES THESE ROWS OVER a rebuild. A rebuild is routine — any
+--     source edit triggers one — and must not discard pending work.
+--   * deleting var/mapping.db still discards unpromoted drafts. The store's
+--     "deletable at any moment without data loss" contract holds for
+--     everything DERIVED; an unpromoted draft is by definition work that has
+--     not reached git yet, which is exactly what promotion is for.
+--
+-- Deliberately absent from _DUMP_ORDER: the CSV dumps are the deterministic
+-- view of derived state, and draft rows are neither derived nor deterministic.
+-- payload is the VALIDATED row as canonical JSON (sorted keys) — validation
+-- happens before the write, so a stored draft can never be one the committed
+-- file would refuse.
+CREATE TABLE draft (
+  draft_id    TEXT NOT NULL,
+  seq         INTEGER NOT NULL,
+  domain      TEXT NOT NULL,
+  payload     TEXT NOT NULL,
+  authored_by TEXT NOT NULL,
+  authored_on TEXT,
+  status      TEXT NOT NULL DEFAULT 'open'
+      CHECK (status IN ('open','promoted','discarded')),
+  PRIMARY KEY (draft_id, seq)
+);
+
+-- What is pending, by editing session. Two sessions drafting at once show up
+-- as two rows here rather than one clobbering the other.
+CREATE VIEW v_open_drafts AS
+  SELECT draft_id, domain, count(*) AS entries,
+         min(authored_by) AS authored_by, min(authored_on) AS authored_on
+  FROM draft WHERE status = 'open'
+  GROUP BY draft_id, domain
+  ORDER BY draft_id;
 """
+
+#: Draft columns, in the order build() carries them over a rebuild.
+_DRAFT_COLUMNS = ("draft_id", "seq", "domain", "payload", "authored_by", "authored_on", "status")
 
 _DUMP_ORDER = {
     "meta": "key",
@@ -320,14 +369,28 @@ def build(
     app_code_mappings_path: str | Path | None = None,
 ) -> sqlite3.Connection:
     """Build the materialization from the committed sources. Existing file at
-    ``db_path`` is replaced (it is derived; the sources are the truth)."""
+    ``db_path`` is replaced (it is derived; the sources are the truth).
+
+    ONE EXCEPTION, added at S4: `draft` rows are carried across the rebuild.
+    Everything else in the file is derived and is meant to be thrown away, but
+    a draft is pending work that has not reached git yet — and a rebuild is
+    routine, since editing any source file makes the store stale. Discarding
+    drafts here would make the write-ahead buffer useless exactly when it is
+    doing its job.
+    """
+    carried: list[tuple] = []
     if db_path != ":memory:":
         db_file = Path(db_path)
         db_file.parent.mkdir(parents=True, exist_ok=True)
         if db_file.exists():
+            carried = _drafts_to_carry_over(db_file)
             db_file.unlink()
     conn = sqlite3.connect(str(db_path))
     conn.executescript(_DDL)
+    if carried:
+        cols = ", ".join(_DRAFT_COLUMNS)
+        placeholders = ", ".join("?" * len(_DRAFT_COLUMNS))
+        conn.executemany(f"INSERT INTO draft ({cols}) VALUES ({placeholders})", carried)
 
     ontology_map_path = Path(ontology_map_path)
     vocabulary_path = Path(vocabulary_path)
@@ -355,6 +418,121 @@ def build(
     conn.executemany("INSERT INTO meta (key, value) VALUES (?, ?)", sorted(meta.items()))
     conn.commit()
     return conn
+
+
+def _drafts_to_carry_over(db_file: Path) -> list[tuple]:
+    """Existing draft rows, read before the rebuild replaces the file.
+
+    Best-effort by design: a database written before S4 has no `draft` table,
+    and a corrupt or foreign file is not something a REBUILD should die on —
+    both cases mean "nothing pending to carry", not "investigate". The rebuild
+    itself is the fix for either.
+    """
+    cols = ", ".join(_DRAFT_COLUMNS)
+    try:
+        conn = sqlite3.connect(f"file:{db_file.as_posix()}?mode=ro", uri=True)
+    except sqlite3.Error:
+        return []
+    try:
+        return list(conn.execute(f"SELECT {cols} FROM draft ORDER BY draft_id, seq"))
+    except sqlite3.Error:
+        return []  # pre-S4 schema: no draft table
+    finally:
+        conn.close()
+
+
+# ---------------------------------------------------------------------------
+# S4 draft buffer — the only WRITE path into this store. Promotion (turning
+# open drafts into a reviewable YAML/CSV diff) lives with the endpoints in
+# drydocs_api.mappings, per ADR 0009's affects list; the store owns the table,
+# its carry-over, and these accessors.
+# ---------------------------------------------------------------------------
+
+DRAFT_STATUSES = ("open", "promoted", "discarded")
+
+
+def add_draft(
+    conn: sqlite3.Connection,
+    *,
+    draft_id: str,
+    domain: str,
+    payloads: Iterable[dict],
+    authored_by: str,
+    authored_on: str | None = None,
+) -> int:
+    """Append validated rows to a draft. Returns the number written.
+
+    Rows are appended after whatever `draft_id` already holds, so a session can
+    add to its own draft across requests. Callers validate BEFORE calling —
+    payload is stored as canonical JSON (sorted keys) so a draft is diffable
+    and a stored row can never be one the committed file would refuse.
+    """
+    start = conn.execute(
+        "SELECT coalesce(max(seq), 0) FROM draft WHERE draft_id = ?", (draft_id,)
+    ).fetchone()[0]
+    rows = [
+        (
+            draft_id,
+            start + i,
+            domain,
+            json.dumps(payload, sort_keys=True),
+            authored_by,
+            authored_on,
+            "open",
+        )
+        for i, payload in enumerate(payloads, start=1)
+    ]
+    if not rows:
+        return 0
+    cols = ", ".join(_DRAFT_COLUMNS)
+    placeholders = ", ".join("?" * len(_DRAFT_COLUMNS))
+    conn.executemany(f"INSERT INTO draft ({cols}) VALUES ({placeholders})", rows)
+    conn.commit()
+    return len(rows)
+
+
+def draft_payloads(conn: sqlite3.Connection, draft_id: str, *, status: str = "open") -> list[dict]:
+    """The rows of one draft, in authoring order."""
+    cur = conn.execute(
+        "SELECT payload FROM draft WHERE draft_id = ? AND status = ? ORDER BY seq",
+        (draft_id, status),
+    )
+    return [json.loads(r[0]) for r in cur]
+
+
+def draft_domain(conn: sqlite3.Connection, draft_id: str) -> str | None:
+    row = conn.execute(
+        "SELECT domain FROM draft WHERE draft_id = ? ORDER BY seq LIMIT 1", (draft_id,)
+    ).fetchone()
+    return row[0] if row else None
+
+
+def open_drafts(conn: sqlite3.Connection, *, domain: str | None = None) -> list[dict]:
+    """Pending drafts, one entry per editing session."""
+    sql = "SELECT draft_id, domain, entries, authored_by, authored_on FROM v_open_drafts"
+    params: tuple = ()
+    if domain is not None:
+        sql += " WHERE domain = ?"
+        params = (domain,)
+    return [
+        dict(zip(("draft_id", "domain", "entries", "authored_by", "authored_on"), r, strict=True))
+        for r in conn.execute(sql, params)
+    ]
+
+
+def set_draft_status(conn: sqlite3.Connection, draft_id: str, status: str) -> int:
+    """Move a whole draft to `promoted` or `discarded`. Returns rows affected.
+
+    Promotion does not DELETE: the rows stay as the record of what was proposed,
+    which is what makes a promoted diff traceable back to its editing session.
+    """
+    if status not in DRAFT_STATUSES:
+        raise MappingStoreError(
+            f"unknown draft status {status!r}; expected one of {DRAFT_STATUSES}"
+        )
+    cur = conn.execute("UPDATE draft SET status = ? WHERE draft_id = ?", (status, draft_id))
+    conn.commit()
+    return cur.rowcount
 
 
 def _hash_source(path: Path) -> str:

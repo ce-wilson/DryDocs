@@ -19,6 +19,16 @@ holds database credentials or picks a database; this component does.
   (`POST /mappings/changeset`), and the override-list draft/report pair
   (`POST /mappings/overrides/draft`, `GET /mappings/overrides/report`) over the
   origin-flagged mapping store. `GET /demo` serves the O13 demo page.
+- **Draft buffer + promote** (S4, ADR 0009 rule 5): override and defined-mapping
+  drafting writes ROWS to the `draft` table in `var/mapping.db` and returns a
+  receipt; `GET /mappings/drafts` lists what is pending per editing session and
+  `POST /mappings/drafts/{draft_id}/promote` emits a unified diff to apply on a
+  branch. This replaced commit-by-replace, where drafting returned the complete
+  updated file — correct for one editor, and unable to survive a second, since
+  two stewards each built a whole file from the same base and the later commit
+  erased the earlier. **Git is still the only commit target**: the service
+  writes nothing tracked, and `tests/unit/test_mapping_api.py` enforces that
+  statically rather than trusting it.
 - **Auth stub** (`personas.py` + `sessions.py`): synthetic personas, opaque
   bearer tokens, role resolved server-side per request. Enterprise OIDC
   replaces the stub company-side (gitignored twin) per the ADR's Evidence.

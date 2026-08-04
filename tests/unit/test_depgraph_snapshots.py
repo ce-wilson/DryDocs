@@ -139,9 +139,9 @@ def test_capability_refusal_quotes_the_pin_rather_than_a_frozen_sha() -> None:
     end = script.index("--- instrument CURRENCY")
     refusal = script[start:end]
     assert "$pinDesc" in refusal, "the refusal no longer quotes the configured pin"
-    assert not re.search(r"depgraph [0-9a-f]{7}\b", refusal), (
-        "the refusal hardcodes a commit SHA again; it goes stale at the next pin bump"
-    )
+    assert not re.search(
+        r"depgraph [0-9a-f]{7}\b", refusal
+    ), "the refusal hardcodes a commit SHA again; it goes stale at the next pin bump"
 
 
 def test_powershell_keeps_non_ascii_out_of_quoted_strings() -> None:

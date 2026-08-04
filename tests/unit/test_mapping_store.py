@@ -28,6 +28,8 @@ from drydocs_core.mapping_store import (
 
 EXPECTED_TABLES = [
     "app_code_mapping",
+    # S4: the write-ahead buffer — the one table not derived from git.
+    "draft",
     "manual_load_file",
     "manual_mapping",
     "meta",
@@ -82,14 +84,17 @@ def test_build_is_deterministic(tmp_path: Path):
             conn.close()
         dumps.append({p.name: p.read_bytes() for p in paths})
     assert dumps[0] == dumps[1]
-    assert set(dumps[0]) == {f"{t}.csv" for t in EXPECTED_TABLES}
+    # Every DERIVED table is dumped. `draft` is not: it is per-session user
+    # state rather than a materialization of committed text, so dumping it
+    # would make this very byte-identity assertion impossible to hold.
+    assert set(dumps[0]) == {f"{t}.csv" for t in EXPECTED_TABLES if t != "draft"}
 
 
 def test_meta_records_source_hashes():
     conn = build(":memory:")
     try:
         meta = dict(conn.execute("SELECT key, value FROM meta"))
-        assert meta["schema_version"] == "drydocs.mapping-store.v1"
+        assert meta["schema_version"] == "drydocs.mapping-store.v2"  # v2 = + the S4 draft table
         assert "source:taxonomy-ontology-map.yaml" in meta
         assert "source:relationship_vocabulary.yaml" in meta
     finally:
@@ -451,3 +456,130 @@ def test_is_current_false_for_missing_or_foreign_file(manual_fixture, tmp_path: 
     foreign = tmp_path / "foreign.db"
     foreign.write_bytes(b"not a sqlite database")
     assert not is_current(foreign, manifest_path=manual_fixture["manifest"])
+
+
+# ---------------------------------------------------------------------------
+# S4 — the draft write-ahead buffer (ADR 0009 rule 5). The one table here that
+# is NOT derived from git, and the only reason build() is not purely
+# destructive.
+# ---------------------------------------------------------------------------
+
+
+def test_draft_table_is_not_in_the_deterministic_dumps():
+    """The CSV dumps are the deterministic view of DERIVED state. Draft rows
+    are neither derived nor deterministic (ids are per-session), so including
+    them would make byte-identical dumps impossible for identical sources —
+    the property test_build_is_deterministic exists to protect."""
+    from drydocs_core.mapping_store import _DUMP_ORDER
+
+    assert "draft" not in _DUMP_ORDER
+
+
+def test_drafts_survive_a_rebuild(tmp_path: Path):
+    """A rebuild is ROUTINE — any source edit makes the store stale — so it
+    must not discard pending work. Everything else in the file is derived and
+    is meant to be thrown away; this table is the deliberate exception."""
+    from drydocs_core.mapping_store import add_draft, draft_payloads, open_drafts
+
+    db = tmp_path / "mapping.db"
+    conn = build(db)
+    try:
+        add_draft(
+            conn,
+            draft_id="kchen2190-aaaa",
+            domain="seal-contact-override",
+            payloads=[{"app_seal_id": "APP-1"}, {"app_seal_id": "APP-2"}],
+            authored_by="kchen2190",
+            authored_on="2026-08-04",
+        )
+    finally:
+        conn.close()
+
+    conn = build(db)  # the rebuild that used to be purely destructive
+    try:
+        assert [d["entries"] for d in open_drafts(conn)] == [2]
+        assert [p["app_seal_id"] for p in draft_payloads(conn, "kchen2190-aaaa")] == [
+            "APP-1",
+            "APP-2",
+        ]
+    finally:
+        conn.close()
+
+
+def test_two_sessions_drafting_at_once_do_not_collide(tmp_path: Path):
+    """The property commit-by-replace could not offer: concurrent editors."""
+    from drydocs_core.mapping_store import add_draft, draft_payloads, open_drafts
+
+    conn = build(tmp_path / "mapping.db")
+    try:
+        add_draft(
+            conn,
+            draft_id="alice-1111",
+            domain="seal-contact-override",
+            payloads=[{"app_seal_id": "A"}],
+            authored_by="alice",
+            authored_on="2026-08-04",
+        )
+        add_draft(
+            conn,
+            draft_id="bob-2222",
+            domain="seal-contact-override",
+            payloads=[{"app_seal_id": "B"}],
+            authored_by="bob",
+            authored_on="2026-08-04",
+        )
+        # Appending to one draft leaves the other alone and keeps seq ordering.
+        add_draft(
+            conn,
+            draft_id="alice-1111",
+            domain="seal-contact-override",
+            payloads=[{"app_seal_id": "C"}],
+            authored_by="alice",
+            authored_on="2026-08-04",
+        )
+        assert [p["app_seal_id"] for p in draft_payloads(conn, "alice-1111")] == ["A", "C"]
+        assert [p["app_seal_id"] for p in draft_payloads(conn, "bob-2222")] == ["B"]
+        assert {d["draft_id"] for d in open_drafts(conn)} == {"alice-1111", "bob-2222"}
+    finally:
+        conn.close()
+
+
+def test_promoting_keeps_the_rows_as_the_record(tmp_path: Path):
+    """Promotion moves a draft out of `open` but does not DELETE it — the rows
+    are what makes a promoted diff traceable back to its editing session."""
+    from drydocs_core.mapping_store import add_draft, draft_payloads, open_drafts, set_draft_status
+
+    conn = build(tmp_path / "mapping.db")
+    try:
+        add_draft(
+            conn,
+            draft_id="kchen2190-bbbb",
+            domain="seal-contact-override",
+            payloads=[{"app_seal_id": "APP-1"}],
+            authored_by="kchen2190",
+            authored_on="2026-08-04",
+        )
+        assert set_draft_status(conn, "kchen2190-bbbb", "promoted") == 1
+        assert open_drafts(conn) == []
+        assert draft_payloads(conn, "kchen2190-bbbb") == []  # no longer open
+        assert len(draft_payloads(conn, "kchen2190-bbbb", status="promoted")) == 1
+        with pytest.raises(MappingStoreError):
+            set_draft_status(conn, "kchen2190-bbbb", "nonsense")
+    finally:
+        conn.close()
+
+
+def test_carry_over_tolerates_a_pre_s4_database(tmp_path: Path):
+    """A database built before the draft table exists must REBUILD, not crash:
+    for a derived file every unreadable state means 'rebuild'."""
+    import sqlite3
+
+    from drydocs_core.mapping_store import _drafts_to_carry_over
+
+    old = tmp_path / "old.db"
+    sqlite3.connect(str(old)).close()  # no draft table at all
+    assert _drafts_to_carry_over(old) == []
+
+    foreign = tmp_path / "foreign.db"
+    foreign.write_bytes(b"not a sqlite database")
+    assert _drafts_to_carry_over(foreign) == []

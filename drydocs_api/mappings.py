@@ -8,14 +8,24 @@ snippet) for the git → gate → loader chain. The server writes nothing; the
 loader stays the only graph writer; no new HITL gates are introduced — the
 artifact travels the K2-gated manual-loads mechanism as-is.
 
+S4 (ADR 0009 rule 5) adds the one write this service does perform, and it is
+NOT to a committed file: override/defined-mapping drafting writes ROWS to the
+`draft` table in var/mapping.db, and a separate promote step turns a draft into
+a unified diff for a branch. Git is still the only commit target — what changed
+is that an unfinished or concurrent edit now has somewhere durable to live
+instead of existing only as a whole-file download that the next editor's
+download would silently overwrite.
+
 Role gate: steward or admin (user < steward < admin — the O13 persona model).
 """
 
 from __future__ import annotations
 
 import csv
+import difflib
 import io
 import sqlite3
+import uuid
 from dataclasses import dataclass
 from datetime import date
 from pathlib import Path
@@ -183,6 +193,80 @@ class MappingStore:
         conn = sqlite3.connect(f"file:{self._db_path.as_posix()}?mode=ro", uri=True)
         conn.row_factory = sqlite3.Row
         return conn
+
+    # ── S4 draft buffer (ADR 0009 rule 5) ────────────────────────────────────
+    # The read path above stays mode=ro deliberately: every other table is
+    # derived from a committed file, and nothing in this service may write one.
+    # `draft` is the single exception, so it gets the single writable door.
+
+    def _connect_rw(self) -> sqlite3.Connection:
+        from drydocs_core.mapping_store import build, is_current
+
+        if not is_current(self._db_path):
+            build(self._db_path).close()  # carries existing drafts across (S4)
+        conn = sqlite3.connect(str(self._db_path))
+        conn.row_factory = sqlite3.Row
+        return conn
+
+    def add_draft(
+        self,
+        *,
+        draft_id: str,
+        domain: str,
+        payloads: list[dict],
+        authored_by: str,
+        authored_on: str,
+    ) -> int:
+        from drydocs_core import mapping_store as core
+
+        conn = self._connect_rw()
+        try:
+            return core.add_draft(
+                conn,
+                draft_id=draft_id,
+                domain=domain,
+                payloads=payloads,
+                authored_by=authored_by,
+                authored_on=authored_on,
+            )
+        finally:
+            conn.close()
+
+    def draft_payloads(self, draft_id: str) -> list[dict]:
+        from drydocs_core import mapping_store as core
+
+        conn = self._connect()
+        try:
+            return core.draft_payloads(conn, draft_id)
+        finally:
+            conn.close()
+
+    def draft_domain(self, draft_id: str) -> str | None:
+        from drydocs_core import mapping_store as core
+
+        conn = self._connect()
+        try:
+            return core.draft_domain(conn, draft_id)
+        finally:
+            conn.close()
+
+    def open_drafts(self, domain: str | None = None) -> list[dict]:
+        from drydocs_core import mapping_store as core
+
+        conn = self._connect()
+        try:
+            return core.open_drafts(conn, domain=domain)
+        finally:
+            conn.close()
+
+    def set_draft_status(self, draft_id: str, status: str) -> int:
+        from drydocs_core import mapping_store as core
+
+        conn = self._connect_rw()
+        try:
+            return core.set_draft_status(conn, draft_id, status)
+        finally:
+            conn.close()
 
     def _select(self, sql: str, params: tuple = ()) -> _Grid:
         conn = self._connect()
@@ -378,19 +462,63 @@ def draft_changeset(
 
 # ---------------------------------------------------------------------------
 # O24 — SEAL-contact overrides (ui-write-surface gate SME-3: M2 tier).
-# The server still writes NOTHING: drafting returns the UPDATED committed
-# file as an artifact; the mapping-store table persists it once committed
-# (the file-to-table loop that keeps var/mapping.db rebuildable).
+#
+# S4 / ADR 0009 rule 5 changed the WRITE shape here. Drafting used to return
+# the complete updated file (commit-by-replace) — correct for one small list
+# and one editor, and unable to survive a second: two sessions each got a whole
+# file built from the same committed base, so whichever was committed last
+# silently erased the other's work. Drafting now writes ROWS to the mapping.db
+# draft buffer, and a separate promote step turns a draft into a unified diff
+# for a branch.
+#
+# What has NOT changed, and is the whole point of the ADR: the server still
+# writes no committed file. Git remains the only commit target; promotion
+# produces a diff a human applies and a gate reviews.
 # ---------------------------------------------------------------------------
+
+#: domain id -> (mapping_store module attribute holding the committed path,
+#: committed column order). Resolved at CALL time via getattr so tests can
+#: monkeypatch the module constant and redirect the whole chain at a fixture.
+_DOMAIN_FILES = {
+    "seal-contact-override": ("SEAL_CONTACT_OVERRIDES_PATH", OVERRIDE_HEADER),
+    "app-code-mapping": ("APP_CODE_MAPPINGS_PATH", APP_CODE_HEADER),
+}
+
+
+def _committed_path(domain: str) -> Path:
+    from drydocs_core import mapping_store as core
+
+    attr, _ = _DOMAIN_FILES[domain]
+    return Path(getattr(core, attr))
+
+
+def _new_draft_id(persona_id: str) -> str:
+    """A per-session draft id.
+
+    Random, not derived: two sessions must land on DIFFERENT ids even when they
+    draft byte-identical rows at the same moment — distinct ids are exactly what
+    makes concurrent drafts survive each other. The persona prefix keeps it
+    readable in `v_open_drafts` without making it guessable-by-collision.
+    """
+    return f"{persona_id}-{uuid.uuid4().hex[:8]}"
 
 
 def draft_override(
-    entries: list[dict], token: str, sessions: InMemorySessionStore, store: MappingStore
+    entries: list[dict],
+    token: str,
+    sessions: InMemorySessionStore,
+    store: MappingStore,
+    *,
+    draft_id: str | None = None,
 ) -> dict:
-    """Validate drafted override entries and return the complete updated
-    config/overrides/seal-contact-overrides.csv content (existing committed
-    rows + the drafts). Fail-closed mirror of the store's own ingestion rules
-    so a returned artifact can never be refused at materialization."""
+    """Validate drafted override entries and WRITE THEM AS ROWS to the draft
+    buffer. Returns a receipt, not a file — promotion emits the diff.
+
+    Validation is unchanged and still fail-closed against the store's own
+    ingestion rules, so a stored draft can never be one the committed file
+    would refuse. Pass ``draft_id`` to append to an existing draft; omit it to
+    start a new one.
+    """
     from drydocs_core.models.seal import canonicalize_role
 
     session = _authorize(token, sessions)
@@ -439,44 +567,158 @@ def draft_override(
             }
         )
 
-    out = io.StringIO()
-    writer = csv.writer(out, lineterminator="\n")
-    writer.writerow(OVERRIDE_HEADER)
-    for row in [*existing, *new_rows]:
-        writer.writerow(["" if row.get(c) is None else row.get(c) for c in OVERRIDE_HEADER])
+    draft_id = draft_id or _new_draft_id(session.persona_id)
+    written = store.add_draft(
+        draft_id=draft_id,
+        domain="seal-contact-override",
+        payloads=new_rows,
+        authored_by=session.persona_id,
+        authored_on=today,
+    )
     return {
-        "filename": "seal-contact-overrides.csv",
-        "csv": out.getvalue(),
-        "entries": len(new_rows),
-        "total_rows": len(existing) + len(new_rows),
+        "draft_id": draft_id,
+        "domain": "seal-contact-override",
+        "entries": written,
+        "pending": len(store.draft_payloads(draft_id)),
+        "committed_rows": len(existing),
         "note": (
-            "The server wrote NOTHING. This is the complete updated override list — "
-            "replace config/overrides/seal-contact-overrides.csv with it and commit "
-            "(git review is the review); var/mapping.db rematerializes it on the next "
-            "read. Overrides NEVER write the graph and NEVER replace the SEAL value — "
-            "the surfaces keep both, origin-flagged, and the source-corrections report "
-            "carries the fix request to the application owners (AO privilege)."
+            "Drafted to var/mapping.db — NO committed file was written. The rows are "
+            "durable across a store rebuild and do not collide with another session's "
+            "draft. Promote this draft_id to get the diff to apply and commit "
+            "(git review is the review). Overrides NEVER write the graph and NEVER "
+            "replace the SEAL value — the surfaces keep both, origin-flagged, and the "
+            "source-corrections report carries the fix request to the application "
+            "owners (AO privilege)."
         ),
     }
 
 
+def list_drafts(
+    token: str, sessions: InMemorySessionStore, store: MappingStore, domain: str | None = None
+) -> dict:
+    """Pending drafts, one entry per editing session — the surface that makes
+    a second editor's work visible instead of silently overwritable."""
+    _authorize(token, sessions)
+    return {"drafts": store.open_drafts(domain)}
+
+
+def promote_draft(
+    draft_id: str, token: str, sessions: InMemorySessionStore, store: MappingStore
+) -> dict:
+    """Turn an open draft into a unified diff against the committed file.
+
+    This is the promote half of ADR 0009 rule 5: propose in the DB, land in git.
+    The diff is purely ADDITIVE — the committed text is carried through
+    verbatim and the drafted rows are appended — so it applies cleanly to the
+    file it was generated against and a reviewer sees exactly the new rows.
+
+    The server still writes nothing. The caller applies the diff on a branch,
+    the gate reviews it, and var/mapping.db rematerializes from the committed
+    file on the next read.
+    """
+    _authorize(token, sessions)
+    domain = store.draft_domain(draft_id)
+    if domain is None:
+        raise UnknownDomainError(f"no draft {draft_id!r}")
+    if domain not in _DOMAIN_FILES:
+        raise UnknownDomainError(f"draft {draft_id!r} targets unknown domain {domain!r}")
+    payloads = store.draft_payloads(draft_id)
+    if not payloads:
+        raise ChangesetValidationError(
+            f"draft {draft_id!r} has no open entries (already promoted or discarded)"
+        )
+
+    _, header = _DOMAIN_FILES[domain]
+    path = _committed_path(domain)
+    committed = path.read_text(encoding="utf-8")
+    new_text = _append_rows(committed, header, payloads)
+
+    rel = _repo_relative(path)
+    diff = "".join(
+        difflib.unified_diff(
+            committed.splitlines(keepends=True),
+            new_text.splitlines(keepends=True),
+            fromfile=f"a/{rel}",
+            tofile=f"b/{rel}",
+        )
+    )
+    store.set_draft_status(draft_id, "promoted")
+    return {
+        "draft_id": draft_id,
+        "domain": domain,
+        "path": rel,
+        "filename": f"{path.stem}-{draft_id}.patch",
+        "diff": diff,
+        "entries": len(payloads),
+        "note": (
+            "The server wrote NOTHING. Apply this diff on a branch "
+            "(`git apply <file>`), review it, and commit — git is the only commit "
+            "target. The draft rows stay in var/mapping.db marked 'promoted' as the "
+            "record of what was proposed."
+        ),
+    }
+
+
+def _append_rows(committed: str, header: tuple[str, ...], rows: list[dict]) -> str:
+    """Committed text carried through VERBATIM with the drafted rows appended.
+
+    Verbatim matters: rebuilding the whole file from parsed rows would rewrite
+    quoting and line endings the author never touched, turning a two-line
+    addition into a whole-file diff that no reviewer can read — and that is
+    also what makes two concurrent promotions conflict on every line instead of
+    only where they actually disagree.
+    """
+    if committed and not committed.endswith("\n"):
+        committed += "\n"
+    out = io.StringIO()
+    writer = csv.writer(out, lineterminator="\n")
+    for row in rows:
+        writer.writerow(["" if row.get(c) is None else row.get(c) for c in header])
+    return committed + out.getvalue()
+
+
+def _repo_relative(path: Path) -> str:
+    """Repo-relative POSIX path for the diff header, with an absolute-path
+    fallback so a fixture outside the repo still produces a readable diff."""
+    import drydocs_core
+
+    root = Path(drydocs_core.__file__).resolve().parent.parent
+    try:
+        return path.resolve().relative_to(root).as_posix()
+    except ValueError:
+        return path.name
+
+
 # ---------------------------------------------------------------------------
 # K9 — the K7 defined-mapping store (gate seal-app-ref-edge-reshape §E1/§E2).
-# O24 mechanics verbatim: the server writes NOTHING — drafting returns the
-# UPDATED committed file as an artifact, git review is the review, and
-# var/mapping.db rematerializes it once committed. Store rows never write
-# the graph (§E3); the K8 loader is the only graph writer.
+# O24 mechanics verbatim, including the S4 move to the draft buffer: the server
+# writes NOTHING to a committed file — drafting writes rows, promotion emits
+# the diff, git review is the review, and var/mapping.db rematerializes once
+# committed. Store rows never write the graph (§E3); the K8 loader is the only
+# graph writer.
+#
+# Converted alongside the overrides rather than left on commit-by-replace: it
+# is the same mechanism on a sibling file, both share promote_draft(), and two
+# different write models living in one module is exactly the confusion ADR 0009
+# set out to remove.
 # ---------------------------------------------------------------------------
 
 
 def draft_app_code_mapping(
-    entries: list[dict], token: str, sessions: InMemorySessionStore, store: MappingStore
+    entries: list[dict],
+    token: str,
+    sessions: InMemorySessionStore,
+    store: MappingStore,
+    *,
+    draft_id: str | None = None,
 ) -> dict:
-    """Validate drafted defined-mapping rows and return the complete updated
-    config/overrides/app-code-mappings.csv content (existing committed rows +
-    the drafts). Validation is the STORE'S OWN rule set (shared function), so
-    a returned artifact can never be refused at materialization — including
-    the 1:1 duplicate check against the already-committed rows."""
+    """Validate drafted defined-mapping rows and WRITE THEM AS ROWS to the
+    draft buffer. Returns a receipt; promotion emits the diff.
+
+    Validation is the STORE'S OWN rule set (shared function), so a stored draft
+    can never be refused at materialization — including the 1:1 duplicate check
+    against the already-committed rows.
+    """
     from drydocs_core.mapping_store import MappingStoreError, validate_app_code_row
 
     session = _authorize(token, sessions)
@@ -503,25 +745,27 @@ def draft_app_code_mapping(
         except MappingStoreError as exc:
             raise ChangesetValidationError(str(exc)) from exc
 
-    out = io.StringIO()
-    writer = csv.writer(out, lineterminator="\n")
-    writer.writerow(APP_CODE_HEADER)
-    for row in [*existing, *new_rows]:
-        writer.writerow(["" if row.get(c) is None else row.get(c) for c in APP_CODE_HEADER])
+    draft_id = draft_id or _new_draft_id(session.persona_id)
+    written = store.add_draft(
+        draft_id=draft_id,
+        domain="app-code-mapping",
+        payloads=new_rows,
+        authored_by=session.persona_id,
+        authored_on=today,
+    )
     return {
-        "filename": "app-code-mappings.csv",
-        "csv": out.getvalue(),
-        "entries": len(new_rows),
-        "total_rows": len(existing) + len(new_rows),
+        "draft_id": draft_id,
+        "domain": "app-code-mapping",
+        "entries": written,
+        "pending": len(store.draft_payloads(draft_id)),
+        "committed_rows": len(existing),
         "note": (
-            "The server wrote NOTHING. This is the complete updated defined-mapping "
-            "list — replace config/overrides/app-code-mappings.csv with it and "
-            "commit (git review is the review); var/mapping.db rematerializes it on "
-            "the next read. Rows never write the graph — the K8 loader fans each "
-            "code out to its folders and stays the only graph writer (§E3). "
-            "Overrides in THIS domain may be PERMANENT (§E2): the arrangement is "
-            "the arrangement, so the rationale travels with the row instead of a "
-            "corrected-in-source lifecycle."
+            "Drafted to var/mapping.db — NO committed file was written. Promote this "
+            "draft_id to get the diff to apply and commit (git review is the review). "
+            "Rows never write the graph — the K8 loader fans each code out to its "
+            "folders and stays the only graph writer (§E3). Overrides in THIS domain "
+            "may be PERMANENT (§E2): the arrangement is the arrangement, so the "
+            "rationale travels with the row instead of a corrected-in-source lifecycle."
         ),
     }
 

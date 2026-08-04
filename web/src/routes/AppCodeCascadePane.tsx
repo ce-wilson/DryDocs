@@ -354,11 +354,15 @@ export default function AppCodeCascadePane({
           rationale: e.rationale,
         })),
       )
-      download(art.filename, art.csv, 'text/csv')
-      setArtifactNote(art.note)
+      // S4: drafting persists rows; promotion turns them into the diff to
+      // apply on a branch. Two steps, one click — the durability is the point,
+      // not extra ceremony for the steward.
+      const patch = await mappings.promoteDraft(art.draft_id)
+      download(patch.filename, patch.diff, 'text/x-patch')
+      setArtifactNote(patch.note)
       setTray((prev) => prev.map((e) => (e.lifecycle === 'draft' ? { ...e, lifecycle: 'submitted' } : e)))
       setStatus(
-        `updated defined-mapping list downloaded (${art.entries} new, ${art.total_rows} total) — the server wrote NOTHING`,
+        `diff downloaded (${art.entries} new row(s) over ${art.committed_rows} committed) — apply it on a branch with \`git apply\`; the server wrote NO committed file`,
       )
     } catch (e) {
       setStatus(`draft failed: ${(e as Error).message}`)

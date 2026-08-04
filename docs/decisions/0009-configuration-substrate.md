@@ -223,7 +223,7 @@ and it does not change any contract.
 ## Action items
 
 1. [ ] Widen `mapping_store.py`: add `source_registry`, `precedence`, `source_mapping`, `classification`, `crosswalk` tables; extend the parity test to each.
-2. [ ] Design the `draft` table + promote path: `POST /mappings/draft` writes a row; `POST /mappings/draft/{id}/promote` emits the YAML/CSV diff; the console stops receiving whole files. Retro-fit `O24` overrides onto it.
+2. [x] **DONE 2026-08-04 (S4).** `draft` table + promote path: `POST /mappings/overrides/draft` and `POST /mappings/app-code/draft` write ROWS and return a receipt; `POST /mappings/drafts/{draft_id}/promote` emits the unified diff; `GET /mappings/drafts` lists what is pending per session; the console downloads a `.patch` instead of a whole file. Both O24 overrides and the K9 defined-mapping domain were retro-fitted together — one module carrying two write models was the confusion this rule set out to remove. `build()` carries draft rows across a rebuild (a rebuild is routine; discarding pending work would defeat the buffer), and deleting `var/mapping.db` still discards unpromoted drafts — the "deletable without data loss" contract holds for everything DERIVED, and an unpromoted draft is by definition work that has not reached git yet.
 3. [ ] Add a `mapping.db` staleness check — compare stored source hashes on open, warn loudly on drift.
 4. [ ] Split `config/taxonomy-ontology-map.yaml` into `config/ontology-map/*.yaml` with a deterministic concatenating loader + a migration test proving parsed-output equivalence.
 5. [ ] Split `relationship_vocabulary.yaml` the same way; duplicate `id` across domains must fail the suite.

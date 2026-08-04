@@ -45,8 +45,10 @@ from drydocs_api.mappings import (
     draft_changeset,
     draft_override,
     list_domains,
+    list_drafts,
     mapping_grid,
     mapping_options,
+    promote_draft,
     source_corrections_report,
 )
 from drydocs_api.personas import UnknownPersonaError
@@ -70,6 +72,9 @@ class RawBody(BaseModel):
 
 class ChangesetBody(BaseModel):
     entries: list = []
+    # S4: append to an existing draft instead of starting a new one, so a
+    # multi-step edit stays one reviewable unit. Omitted = new draft.
+    draft_id: str | None = None
 
 
 class EphemeralRegisterBody(BaseModel):
@@ -329,9 +334,9 @@ def create_app(runner=None, store: InMemorySessionStore | None = None):
     # materialization; the ONLY "write" is a returned change artifact. ──
     mapping_store = MappingStore()
 
-    def _mapping_call(fn, *args):
+    def _mapping_call(fn, *args, **kwargs):
         try:
-            return fn(*args)
+            return fn(*args, **kwargs)
         except InvalidTokenError:
             raise HTTPException(401, "invalid session") from None
         except Forbidden as exc:
@@ -365,15 +370,35 @@ def create_app(runner=None, store: InMemorySessionStore | None = None):
             draft_changeset, body.entries, _token(authorization), sessions, mapping_store
         )
 
-    # ── O24 SEAL-contact overrides (ui-write-surface gate SME-3, M2 tier):
-    # drafting returns the UPDATED committed file; the report is the AO-facing
-    # source-corrections artifact. The server still writes nothing. ──
+    # ── O24 SEAL-contact overrides (ui-write-surface gate SME-3, M2 tier),
+    # moved to the S4 draft buffer: drafting writes ROWS to var/mapping.db and
+    # returns a receipt; promotion emits the diff to apply on a branch. The
+    # server still writes no committed file — git is the only commit target. ──
     @app.post("/mappings/overrides/draft")
     def post_override_draft(
         body: ChangesetBody, authorization: str | None = Header(default=None)
     ) -> dict[str, object]:
         return _mapping_call(
-            draft_override, body.entries, _token(authorization), sessions, mapping_store
+            draft_override,
+            body.entries,
+            _token(authorization),
+            sessions,
+            mapping_store,
+            draft_id=body.draft_id,
+        )
+
+    @app.get("/mappings/drafts")
+    def get_drafts(
+        domain: str | None = None, authorization: str | None = Header(default=None)
+    ) -> dict[str, object]:
+        return _mapping_call(list_drafts, _token(authorization), sessions, mapping_store, domain)
+
+    @app.post("/mappings/drafts/{draft_id}/promote")
+    def post_promote_draft(
+        draft_id: str, authorization: str | None = Header(default=None)
+    ) -> dict[str, object]:
+        return _mapping_call(
+            promote_draft, draft_id, _token(authorization), sessions, mapping_store
         )
 
     @app.get("/mappings/overrides/report")

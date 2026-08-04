@@ -58,12 +58,36 @@ export interface OverrideEntry {
   rationale: string
 }
 
-export interface OverrideArtifact {
-  filename: string
-  csv: string
+// S4 (ADR 0009 rule 5): drafting no longer hands back a whole replacement
+// file. It writes ROWS to the mapping.db draft buffer and returns this
+// receipt; a separate promote call turns the draft into a unified diff. The
+// old shape could not survive two editors — each held a full file built from
+// the same base, so whichever was committed last erased the other.
+export interface DraftReceipt {
+  draft_id: string
+  domain: string
   entries: number
-  total_rows: number
+  pending: number
+  committed_rows: number
   note: string
+}
+
+export interface PromotedDiff {
+  draft_id: string
+  domain: string
+  path: string
+  filename: string
+  diff: string
+  entries: number
+  note: string
+}
+
+export interface OpenDraft {
+  draft_id: string
+  domain: string
+  entries: number
+  authored_by: string
+  authored_on: string
 }
 
 export interface CorrectionsReport {
@@ -75,10 +99,10 @@ export interface CorrectionsReport {
 }
 
 // K9/K11 — the K7 defined-mapping store (app-code -> application). Drafting
-// returns the COMPLETE updated committed file (commit-by-replace, O24
-// mechanics); validation is the store's own rule set server-side, so an
-// artifact can never be refused at materialization. authored_by is
-// server-stamped from the session — never sent from here.
+// writes rows to the draft buffer (S4, O24 mechanics verbatim); validation is
+// the store's own rule set server-side, so a stored draft can never be refused
+// at materialization. authored_by is server-stamped from the session — never
+// sent from here.
 export interface AppCodeEntry {
   app_code: string
   tier: 'seal-born' | 'platform' | 'dual-coded'
@@ -89,21 +113,15 @@ export interface AppCodeEntry {
   rationale?: string
 }
 
-export interface AppCodeArtifact {
-  filename: string
-  csv: string
-  entries: number
-  total_rows: number
-  note: string
-}
-
 export interface MappingsApi {
   domains(): Promise<MappingDomain[]>
   grid(domainId: string): Promise<MappingGrid>
   options(): Promise<MappingOptions>
   draftChangeset(entries: DraftEntry[]): Promise<ChangesetArtifact>
-  draftOverride(entries: OverrideEntry[]): Promise<OverrideArtifact>
-  draftAppCode(entries: AppCodeEntry[]): Promise<AppCodeArtifact>
+  draftOverride(entries: OverrideEntry[], draftId?: string): Promise<DraftReceipt>
+  draftAppCode(entries: AppCodeEntry[], draftId?: string): Promise<DraftReceipt>
+  drafts(domain?: string): Promise<OpenDraft[]>
+  promoteDraft(draftId: string): Promise<PromotedDiff>
   correctionsReport(): Promise<CorrectionsReport>
 }
 
@@ -137,16 +155,30 @@ export function createMappingsApi(baseUrl: string, personaId: string): MappingsA
         'mappings/changeset',
       )
     },
-    async draftOverride(entries) {
-      return json<OverrideArtifact>(
-        await client.authedPost('/mappings/overrides/draft', { entries }),
+    async draftOverride(entries, draftId) {
+      return json<DraftReceipt>(
+        await client.authedPost('/mappings/overrides/draft', { entries, draft_id: draftId }),
         'mappings/overrides/draft',
       )
     },
-    async draftAppCode(entries) {
-      return json<AppCodeArtifact>(
-        await client.authedPost('/mappings/app-code/draft', { entries }),
+    async draftAppCode(entries, draftId) {
+      return json<DraftReceipt>(
+        await client.authedPost('/mappings/app-code/draft', { entries, draft_id: draftId }),
         'mappings/app-code/draft',
+      )
+    },
+    async drafts(domain) {
+      const q = domain ? `?domain=${encodeURIComponent(domain)}` : ''
+      const body = await json<{ drafts: OpenDraft[] }>(
+        await client.authedGet(`/mappings/drafts${q}`),
+        'mappings/drafts',
+      )
+      return body.drafts
+    },
+    async promoteDraft(draftId) {
+      return json<PromotedDiff>(
+        await client.authedPost(`/mappings/drafts/${encodeURIComponent(draftId)}/promote`, {}),
+        'mappings/drafts/promote',
       )
     },
     async correctionsReport() {
