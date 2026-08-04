@@ -565,6 +565,20 @@ verification status in [BRACKETS]; spend review on [UNRULED].
     REAL psgmgr folder id in step 62's standard doc examples — now
     synthetic. Verify your copy took the fixed examples, not the originals.
 
+64. K12 + K14 + STATUS-DOC REFRESH [SMALL, LIKE-FOR-LIKE] (`5978d78`; claim
+    `30ab908`, batch with the step-63 ledgering). K12: `controlm.yaml` gains
+    the `applications:` app-code section (pure classification; jobless
+    folders name-DERIVED and flagged) and the map entry's capture WAIVER is
+    replaced with the real path — your side takes both wholesale
+    (canonical-producer), but note the SECTION CONTENT reflects the
+    producer's reduced sample; re-derive yours from your real extract if you
+    maintain a parallel capture. K14: two ctlm_id strays converted to the
+    dot form (MappingsRoute.tsx React key; mapping_demo.html slash join) —
+    clean adds. Also the K2 rows in `docs/controlm-staging-ingestion-flow.md`
+    and `docs/controlm-c3-normalization-status.md` now state the K8
+    folder-grain shape; if your copies carry company edits, merge the row,
+    do not overwrite the file. Suite stays 1399.
+
 ACCEPTANCE GATE (behavior is the contract, not a byte-compare):
 - Track 1 (portable):
     poetry run pytest tests/unit/test_variable_classifier.py tests/unit/test_variable_resolver.py \
@@ -581,7 +595,7 @@ ACCEPTANCE GATE (behavior is the contract, not a byte-compare):
   capability_assert=false skips per T18). A retired-id refusal from
   `SourceRegistry.from_yaml` is the D4 guard WORKING, not a port failure — rebind the
   loader in `loader-source-overlay.yaml`, never by re-adding the retired id.
-  Producer reference at the current head (step 63, the K8 build): 1399
+  Producer reference at the current head (steps 63-64, the K8/K12/K14 builds): 1399
   passed / 5 skipped with the production CSV PRESENT and no
   RECONCILE_BEFORE_DIR (4 J7 guards + the graphrag PDF) — like-for-like with
   step 61's 1384 / 5 (+15, the K8 folder-attribution + demotion guards) and
