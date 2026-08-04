@@ -75,6 +75,13 @@ class VendorTree:
     product: str
     version: str
     base_url: str
+    #: The config/doc-source-registry.yaml entry that governs this capture.
+    #: DISTINCT from `id`, which names ONE fetch of ONE tree at ONE version —
+    #: a corpus outlives its captures. Declared here rather than derived
+    #: because the graph is keyed by it and `drydocs docs-verify` searches by
+    #: it (Q7). None = not registered yet; conversion refuses rather than
+    #: guessing (docmeta invariant 1).
+    corpus_id: str | None = None
     toc_path: str = "toc.json"
     #: Only capture pages under this top-level book. None = the whole tree.
     book: str | None = None
@@ -91,6 +98,7 @@ TREES: dict[str, VendorTree] = {
     for t in [
         VendorTree(
             id="bmc-controlm-9.0.20-utilities",
+            corpus_id="bmc-controlm-utilities",
             vendor="BMC",
             product="Control-M",
             version="9.0.20",
@@ -239,6 +247,7 @@ def render_plan(
         "CAPTURE PLAN",
         "-" * 64,
         f"  tree id        : {tree.id}",
+        f"  corpus entry   : {tree.corpus_id or '(UNREGISTERED — convert will refuse)'}",
         f"  vendor/product : {tree.vendor} {tree.product} {tree.version}",
         f"  base url       : {tree.base_url}",
         f"  subtree filter : {tree.book or '(entire tree)'}",
@@ -341,6 +350,7 @@ def capture(
 
     manifest = {
         "capture_id": tree.id,
+        "corpus_id": tree.corpus_id,
         "vendor": tree.vendor,
         "product": tree.product,
         "version": tree.version,

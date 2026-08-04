@@ -225,9 +225,36 @@ class VendorDocChunkRow(BaseModel):
 
     # --- corpus / document fields (denormalized onto every chunk row) ---
     corpus_id: str = Field(
-        ..., min_length=1, description="Capture id, e.g. 'bmc-controlm-9.0.20-utilities'."
+        ...,
+        min_length=1,
+        description=(
+            "The doc-source-registry CORPUS id, e.g. 'bmc-controlm-utilities' — NOT the "
+            "capture id. `drydocs docs-verify` looks a corpus up through its registry "
+            "entry's graph_locator (Q7), so a graph keyed by capture id reports a loaded "
+            "corpus as MISSING."
+        ),
     )
-    doc_id: str = Field(..., min_length=1, description="Topic file stem, e.g. '3921'.")
+    capture_id: str = Field(
+        ...,
+        min_length=1,
+        description=(
+            "Which CAPTURE of that corpus produced this row, e.g. "
+            "'bmc-controlm-9.0.20-utilities'. One corpus has many captures over time; "
+            "the capture id embeds the version, which is what keeps two versions of the "
+            "same topic from merging onto one node."
+        ),
+    )
+    doc_id: str = Field(
+        ...,
+        min_length=1,
+        description=(
+            "Capture-scoped topic identity, '<capture_id>/<file stem>' e.g. "
+            "'bmc-controlm-9.0.20-utilities/3921'. Scoped rather than the bare stem "
+            "because Author-it reuses topic ids ACROSS publications: MERGE on a bare "
+            "'3921' would silently overwrite the 9.0.20 topic with its 9.0.21 namesake "
+            "and take the version distinction with it."
+        ),
+    )
     title: str = Field(..., min_length=1)
     abstract: str = Field(
         "", description="First paragraph — cheap triage before spending context on chunks."

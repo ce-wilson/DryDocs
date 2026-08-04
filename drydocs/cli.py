@@ -1403,6 +1403,14 @@ def load_bmc_docs(
 @app.command(name="convert-vendor-docs")
 def convert_vendor_docs(
     capture_id: str = typer.Argument(..., help="Capture id, e.g. bmc-controlm-9.0.20-utilities."),
+    corpus_id: str | None = typer.Option(
+        None,
+        "--corpus-id",
+        help=(
+            "doc-source-registry corpus this capture belongs to. Defaults to what the "
+            "capture manifest declared, else the registry entry naming this capture."
+        ),
+    ),
 ) -> None:
     """Stage 2 of the vendor-docs pipeline: captured HTML -> markdown.
 
@@ -1412,7 +1420,7 @@ def convert_vendor_docs(
     rule, and writes markdown/ + convert-manifest.json beside the capture.
     No graph, no network — safe to re-run.
     """
-    from drydocs.loaders.vendor_docs import convert_capture
+    from drydocs.loaders.vendor_docs import CorpusNotRegisteredError, convert_capture
     from drydocs_core.data_root import vendor_docs_dir
 
     base = vendor_docs_dir(capture_id)
@@ -1421,7 +1429,11 @@ def convert_vendor_docs(
             f"[red]No capture at {base}[/] — run scripts/external_vendor_scrape.py first."
         )
         raise typer.Exit(1)
-    summary = convert_capture(capture_id)
+    try:
+        summary = convert_capture(capture_id, corpus_id=corpus_id)
+    except CorpusNotRegisteredError as exc:
+        console.print(f"[red]Unregistered corpus:[/] {exc}")
+        raise typer.Exit(1) from exc
     console.print(summary.render())
 
 

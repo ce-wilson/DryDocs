@@ -14,7 +14,15 @@ re-runnable stages.
     (scripts/external_vendor_scrape.py)   (here)                          (here)
 
 Re-running any stage is idempotent: convert rewrites markdown from the same
-bytes, and the load MERGEs on ``doc_id``.
+bytes, and the load MERGEs on ``doc_id``. The load's delta-only provenance
+tail is what makes "idempotent" a REPORTED fact rather than a claim — see the
+tail note in ``cypher/vendor_docs.cypher``.
+
+A CAPTURE IS NOT A CORPUS. ``bmc-controlm-9.0.20-utilities`` is one fetch of
+one tree at one version; ``bmc-controlm-utilities`` is the registry entry that
+governs it and the id ``docs-verify`` searches for. Both ride every row, and
+the capture id scopes ``doc_id`` so two versions of a topic cannot merge onto
+one node — see :func:`resolve_corpus_id`.
 
 TAXONOMY ONLY. This writes :Document, :Chunk and the publisher's own TOC
 hierarchy — all transcription of structure the vendor already publishes. It
@@ -38,6 +46,7 @@ from pydantic import BaseModel
 from drydocs_core.data_root import vendor_docs_dir
 from drydocs_core.docs.vendor_html import html_to_markdown
 from drydocs_core.models.docs import VendorDocChunkRow
+from drydocs_core.source_registry import SourceRegistry
 
 from .base import BaseLoader, compute_row_checksum
 
@@ -49,6 +58,52 @@ CYPHER_DIR = Path(__file__).resolve().parent / "cypher"
 
 TRUST = "VERBATIM"
 CLASSIFICATION = "External"
+
+
+# --------------------------------------------------------------------------- #
+# corpus identity — a capture is not a corpus
+# --------------------------------------------------------------------------- #
+class CorpusNotRegisteredError(RuntimeError):
+    """A capture that no ``config/doc-source-registry.yaml`` entry claims."""
+
+
+def resolve_corpus_id(capture_id: str, *, registry: SourceRegistry | None = None) -> str:
+    """Which REGISTRY corpus this capture belongs to.
+
+    Two ids, and conflating them is a silent reporting bug rather than a
+    crash. ``bmc-controlm-9.0.20-utilities`` is a CAPTURE — one fetch of one
+    tree at one version. ``bmc-controlm-utilities`` is the CORPUS — the
+    doc-source-registry entry that governs it, and the id ``drydocs
+    docs-verify`` searches for, because that entry's ``graph_locator`` says
+    ``match: corpus_id, value: bmc-controlm-utilities`` (Q7). A graph keyed by
+    the capture id therefore answers "corpus missing" for a corpus that is
+    fully loaded — the reconciliation check reporting a false negative, which
+    is worse than not having run it.
+
+    Resolution is REGISTRY-DRIVEN, never a string transform of the capture id:
+    the entry that names this capture in its ``manifest`` path owns it. An
+    unregistered capture raises rather than inventing an id — docmeta
+    invariant 1 (no doc content loads while its registry entry is missing).
+    """
+    reg = registry or SourceRegistry.from_yaml()
+    owners = [
+        src.id
+        for src in (reg.get(sid) for sid in reg.ids())
+        if src.home == "doc-registry" and f"/{capture_id}/" in str(src.data.get("manifest") or "")
+    ]
+    if len(owners) == 1:
+        return owners[0]
+    if not owners:
+        raise CorpusNotRegisteredError(
+            f"capture {capture_id!r} belongs to no corpus: no config/doc-source-registry.yaml "
+            f"entry names it in its `manifest:` path. Register the corpus before converting it "
+            f"(docmeta invariant 1), or pass an explicit corpus id."
+        )
+    raise CorpusNotRegisteredError(
+        f"capture {capture_id!r} is claimed by {len(owners)} registry entries ({', '.join(owners)}) "
+        f"— exactly one entry must own a capture. Pass an explicit corpus id to disambiguate."
+    )
+
 
 # --------------------------------------------------------------------------- #
 # page_role — an explicit title rule, never an LLM
@@ -79,6 +134,7 @@ def derive_page_role(title: str) -> str:
 @dataclass
 class ConvertSummary:
     capture_id: str
+    corpus_id: str
     documents: int
     toc_nodes: int
     roles: dict[str, int]
@@ -89,15 +145,33 @@ class ConvertSummary:
         roles = "  ".join(f"{r}={self.roles.get(r, 0)}" for r in ROLES)
         return (
             f"converted {self.documents} documents / {self.toc_nodes} toc nodes "
-            f"({self.markdown_bytes / 1e6:.1f} MB markdown)\n  roles: {roles}\n"
+            f"({self.markdown_bytes / 1e6:.1f} MB markdown)\n"
+            f"  corpus: {self.corpus_id}  (capture: {self.capture_id})\n"
+            f"  roles: {roles}\n"
             f"  related links carried (data, not edges): {self.related_links}"
         )
 
 
-def convert_capture(capture_id: str, *, root: Path | None = None) -> ConvertSummary:
-    """Stage 2: captured HTML -> markdown + ``convert-manifest.json``."""
+def convert_capture(
+    capture_id: str,
+    *,
+    corpus_id: str | None = None,
+    root: Path | None = None,
+    registry: SourceRegistry | None = None,
+) -> ConvertSummary:
+    """Stage 2: captured HTML -> markdown + ``convert-manifest.json``.
+
+    ``corpus_id`` resolves in three steps, most explicit first: the argument,
+    then whatever the capture manifest declared, then the registry lookup in
+    :func:`resolve_corpus_id`. It is never DERIVED from the capture id.
+    """
     base = root or vendor_docs_dir(capture_id)
     capture_manifest = json.loads((base / "capture-manifest.json").read_text(encoding="utf-8"))
+    corpus = (
+        corpus_id
+        or capture_manifest.get("corpus_id")
+        or resolve_corpus_id(capture_id, registry=registry)
+    )
     pages_dir, md_dir = base / "pages", base / "markdown"
     md_dir.mkdir(parents=True, exist_ok=True)
 
@@ -116,7 +190,8 @@ def convert_capture(capture_id: str, *, root: Path | None = None) -> ConvertSumm
             roles[role] = roles.get(role, 0) + 1
             related_total += len(converted.related)
             docs[page] = {
-                "doc_id": Path(page).stem,
+                # Capture-SCOPED, not the bare stem — see VendorDocChunkRow.doc_id.
+                "doc_id": f"{capture_id}/{Path(page).stem}",
                 "page": page,
                 "markdown": md_name,
                 "title": converted.title,
@@ -138,6 +213,7 @@ def convert_capture(capture_id: str, *, root: Path | None = None) -> ConvertSumm
 
     manifest = {
         "capture_id": capture_id,
+        "corpus_id": corpus,
         "vendor": capture_manifest["vendor"],
         "product": capture_manifest["product"],
         "doc_version": capture_manifest["version"],
@@ -152,6 +228,7 @@ def convert_capture(capture_id: str, *, root: Path | None = None) -> ConvertSumm
 
     return ConvertSummary(
         capture_id=capture_id,
+        corpus_id=corpus,
         documents=len(docs),
         toc_nodes=len(capture_manifest["pages"]),
         roles=roles,
@@ -205,7 +282,10 @@ class VendorDocsAdapter:
             for seq, heading, level, chunk_text in split_chunks(text):
                 chunk_id = f"{doc['doc_id']}#{seq:03d}"
                 yield {
-                    "corpus_id": manifest["capture_id"],
+                    # corpus_id is the REGISTRY id (what docs-verify searches
+                    # for); capture_id says which fetch produced the row.
+                    "corpus_id": manifest["corpus_id"],
+                    "capture_id": manifest["capture_id"],
                     "doc_id": doc["doc_id"],
                     "title": doc["title"],
                     "abstract": doc["abstract"],
