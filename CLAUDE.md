@@ -186,6 +186,11 @@ units from `docs/restructure/backlog.yaml`. Each backlog item names its agent + 
 
 - **Verify before asserting.** A recalled fact or stale doc that names a file/flag/column may
   be wrong — confirm it exists before relying on it.
+- **Live-verification claims name their venue (J18).** A "verified live" claim names the
+  machine/container/database it ran on (e.g. "desktop, `neo4jtest`, `drydocs` DB") — the two
+  machines hold independent graphs, so an untagged claim reads as a defect from the other
+  machine. Prefer sample-reproducible evidence ("`ingest-controlm` on the bundled samples
+  reproduces X") over machine-pinned claims.
 - **Governed renders publish VERBATIM.** Two surface classes, two rules. *Governed surfaces*
   — `docs/design/*` renders, gate pages, `docs/plan/board.html` — are deterministic renderer
   output that the HITL loop keys anchors on (L5 digital / L6 paper feedback re-attachment):

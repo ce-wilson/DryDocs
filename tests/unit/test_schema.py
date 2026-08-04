@@ -7,6 +7,8 @@ from pathlib import Path
 
 import pytest
 
+from drydocs_core.cypher_split import strip_comments
+
 try:
     import yaml
 
@@ -97,13 +99,17 @@ def test_constraints_are_idempotent() -> None:
 
 
 def test_ontology_labels_present() -> None:
-    text = ONTOLOGY_FILE.read_text(encoding="utf-8")
+    # Comment-stripped (J26): a label named only in a comment is not a label the
+    # schema declares — the pin is on CODE, so a comment cannot false-pass it.
+    text = strip_comments(ONTOLOGY_FILE.read_text(encoding="utf-8"))
     for label in EXPECTED_ONTOLOGY_LABELS:
         assert label in text, f"Expected label :{label} not found in ontology.cypher"
 
 
 def test_ontology_merges_are_idempotent() -> None:
-    text = ONTOLOGY_FILE.read_text(encoding="utf-8")
+    # Comment-stripped (J26): a comment DESCRIBING the bare-CREATE trap must not
+    # trip the ban — the file has to be able to explain its own rule.
+    text = strip_comments(ONTOLOGY_FILE.read_text(encoding="utf-8"))
     # Every node-creation statement should be MERGE, not CREATE.
     bare_creates = re.findall(r"\bCREATE\s+\(", text)
     assert not bare_creates, (
@@ -145,7 +151,9 @@ def test_vocabulary_active_entries_declared_in_supplements() -> None:
             failures.append(f"[{rel['id']}] supplement '{supplement}' declared but file not found")
             continue
 
-        text = supplement_path.read_text(encoding="utf-8")
+        # Comment-stripped (J26; the G29 lesson) — a commented-out MERGE must not
+        # satisfy a declaration check, same reading supplements.declared_terms uses.
+        text = strip_comments(supplement_path.read_text(encoding="utf-8"))
         label = rel["neo4j_label"]
         if label not in text:
             failures.append(f"[{rel['id']}] label '{label}' not found in {supplement}")

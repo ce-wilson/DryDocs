@@ -717,6 +717,29 @@ verification status in [BRACKETS]; spend review on [UNRULED].
     dev_teams/catalog_lobs same-shape gap is INBOXED producer-side, not
     fixed — do not expect it in this range.
 
+71. J18+J26+J27+J28 — THE J-SERIES CLOSE-OUT (one batch, 1420→1427/5).
+    J18: live-verification claims name their venue (backlog pull-rule step 5
+    + CLAUDE.md §6; P3/G33 close notes retro-tagged). J26: text-guard sweep —
+    negative assertions over committed Cypher/SQL now read COMMENT-STRIPPED
+    text (strip_comments / a `--` line filter); the family inventory +
+    self-description regression proofs live in
+    tests/unit/test_text_guard_conventions.py. J27: the two .gitignore
+    comments that named the org/domain are reworded to describe the corpus;
+    J15's guard gained scan D (no domain-shaped token in .gitignore, empty
+    allowlist). J28: render_gates.py classifies by SLUGIFIED-HEADING identity
+    — a body citation or PARTIAL ruling never closes a gate; prompts may
+    self-declare via a `# SIGNED OFF`/`# DEFERRED` marker line (F1/F2
+    crosswalk prompts got theirs); gates.json 41→43 rows, 8→10 open.
+    ***YOUR SIDE:*** all four are like-for-like, with two cautions. (a) J28
+    re-renders gates.json from YOUR gate-log — expect YOUR open list to grow
+    if your log carries citation-only or partial-ruling prompts; that is the
+    fix working, not drift. If any of your signed gates use prose headings
+    without the slug, add the `# SIGNED OFF` marker line to the prompt file
+    (the F1/F2 pattern) rather than editing log headings. (b) J27's scan D
+    reds a .gitignore that names any domain — reword or allowlist WITH a
+    reason in the same commit that takes the guard. J13 (the publish-ceiling
+    term sweep) remains OPEN and user-gated — not in this range.
+
 ACCEPTANCE GATE (behavior is the contract, not a byte-compare):
 - Track 1 (portable):
     poetry run pytest tests/unit/test_variable_classifier.py tests/unit/test_variable_resolver.py \
@@ -733,14 +756,14 @@ ACCEPTANCE GATE (behavior is the contract, not a byte-compare):
   capability_assert=false skips per T18). A retired-id refusal from
   `SourceRegistry.from_yaml` is the D4 guard WORKING, not a port failure — rebind the
   loader in `loader-source-overlay.yaml`, never by re-adding the retired id.
-  Producer reference at the current head (step 70, the C22 catalog loader
-  sweep): 1420
+  Producer reference at the current head (step 71, the J-series close-out):
+  1427
   passed / 5 skipped with the production CSV PRESENT and no
   RECONCILE_BEFORE_DIR (4 J7 guards + the graphrag PDF) — the like-for-like
   chain: step 58 1356/5 → step 61 1384/5 (+28 K9 guards) → step 63 1399/5
   (+15 K8) → step 65 1403/5 (+4 K10) → step 66 1410/5 (+7 K11; step 67 no
   delta) → step 68 1413/5 (+3 U12; step 69 no delta) → step 70 1420/5
-  (+7 C22). The
+  (+7 C22) → step 71 1427/5 (+7 J18/J26/J27/J28). The
   step-60 figure (1354 / 7) was CSV-ABSENT without RECONCILE_BEFORE_DIR and is
   not comparable line-for-line; `aa0a0eb`'s commit message quotes 1358 / 3,
   which is the step-59 run with RECONCILE_BEFORE_DIR set. Earlier producer

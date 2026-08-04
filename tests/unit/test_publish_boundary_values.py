@@ -201,6 +201,29 @@ def test_folder_name_numeric_segments_are_synthetic_everywhere() -> None:
     )
 
 
+_DOMAIN_TOKEN = re.compile(r"\b[a-z0-9-]+\.(?:com|net|org|io)\b", re.IGNORECASE)
+# Domains .gitignore comments MAY name: none today. The public site domain
+# (dry-docs.com) would be the first legitimate entry if a rule ever needs it.
+GITIGNORE_DOMAIN_ALLOWLIST: frozenset[str] = frozenset()
+
+
+def test_gitignore_comments_name_no_domains() -> None:
+    """Scan D (J27): the root .gitignore sits in the publishable tree and its
+    comments explain what the ignored corpora ARE — which is the useful half.
+    An internal domain in a comment is a real value in a publishable file, the
+    exact class CLAUDE.md §3 bans. Shape-guarded like the id scans: the test
+    embeds no real domain, so it cannot leak what it protects against."""
+    violations = [
+        m.group(0)
+        for m in _DOMAIN_TOKEN.finditer(_read(".gitignore"))
+        if m.group(0).lower() not in GITIGNORE_DOMAIN_ALLOWLIST
+    ]
+    assert not violations, (
+        ".gitignore names domain(s) — describe the corpus instead, or allowlist "
+        "WITH A REASON in test_publish_boundary_values.py: " + ", ".join(sorted(set(violations)))
+    )
+
+
 def test_seal_variable_values_in_tests_are_synthetic() -> None:
     """Scan C: a value paired with %%SEAL in any tracked test file is a SEAL id
     by construction — it must come from the synthetic block."""

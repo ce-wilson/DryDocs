@@ -1,4 +1,8 @@
 # SME gate-prompt spec — AutoSys -> BMC Control-M baseline crosswalk (F1).
+# SIGNED OFF 2026-07-14 (gate-log; 13 confirmations ACCEPTED IN FULL, chad.wilson).
+# Marker added 2026-08-04 (J28): the log entry's prose heading predates the
+# heading-names-its-slug convention, so the prompt records its own disposition
+# the way its siblings (controlm-avg-run-supplement etc.) do.
 # Reviews config/crosswalks/autosys-to-bmc.yaml row-by-row before the `autosys-export`
 # source in config/source-registry.yaml is ever flipped to confirmed: true. No loader
 # exists yet; this gate is the crosswalk sign-off, not a load-step sign-off.

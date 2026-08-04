@@ -7,10 +7,30 @@ from pathlib import Path
 
 import pytest
 
+from drydocs_core.cypher_split import strip_comments
+
 ROOT = Path(__file__).resolve().parent.parent.parent
 CYPHER_DIR = ROOT / "drydocs" / "loaders" / "cypher"
 SQL_DIR = ROOT / "drydocs" / "loaders" / "sql"
 SCHEMA_DIR = ROOT / "drydocs_core" / "schema"
+
+
+def _cypher_code(name: str) -> str:
+    """A template's CODE — ``//`` and ``/* */`` comments stripped (J26).
+
+    Negative assertions read this, never raw text: a raw-text ban forbids the
+    file from DESCRIBING the very thing it deliberately omits, and this repo's
+    doctrine is that the reasoning is the audit trail. Positive presence pins
+    may keep reading raw text — a comment can only false-pass those.
+    """
+    return strip_comments((CYPHER_DIR / name).read_text(encoding="utf-8"))
+
+
+def _sql_code(name: str) -> str:
+    """SQL with ``--`` line-comment tails dropped (the same J26 rule)."""
+    text = (SQL_DIR / name).read_text(encoding="utf-8")
+    return "\n".join(line.split("--")[0] for line in text.splitlines())
+
 
 ALL_CYPHERS = [
     "controlm_folders.cypher",
@@ -56,7 +76,7 @@ def test_cypher_idempotent_merge(name: str) -> None:
 
 
 def test_folders_uses_sched_table_not_parent_table() -> None:
-    text = (CYPHER_DIR / "controlm_folders.cypher").read_text(encoding="utf-8")
+    text = _cypher_code("controlm_folders.cypher")
     assert "row.sched_table" in text
     # NO parent_table on the folder loader (that lives on the job side).
     assert "row.parent_table" not in text
@@ -203,7 +223,7 @@ def test_dependencies_match_on_the_composite_node_key() -> None:
 
 
 def test_conditions_in_carries_boolean_expr_props() -> None:
-    text = (CYPHER_DIR / "controlm_conditions_in.cypher").read_text(encoding="utf-8")
+    text = _cypher_code("controlm_conditions_in.cypher")
     for fragment in ["and_or", "parentheses", "order_"]:
         assert fragment in text, f"in.cypher missing {fragment}"
     # No SIGN on the IN side.
@@ -211,7 +231,7 @@ def test_conditions_in_carries_boolean_expr_props() -> None:
 
 
 def test_conditions_out_carries_sign() -> None:
-    text = (CYPHER_DIR / "controlm_conditions_out.cypher").read_text(encoding="utf-8")
+    text = _cypher_code("controlm_conditions_out.cypher")
     assert "row.sign" in text
     assert "and_or" not in text
 
@@ -363,12 +383,12 @@ def test_dependencies_derived_has_no_was_generated_by() -> None:
     already-loaded jobs — it creates no new node, so it never had (and still
     has no) a WAS_GENERATED_BY tail. Confirms this loader is out of scope for
     the checksum guard."""
-    text = (CYPHER_DIR / "controlm_dependencies_derived.cypher").read_text(encoding="utf-8")
+    text = _cypher_code("controlm_dependencies_derived.cypher")
     assert "WAS_GENERATED_BY" not in text
 
 
 def test_dependencies_materializes_derived_edge() -> None:
-    text = (CYPHER_DIR / "controlm_dependencies_derived.cypher").read_text(encoding="utf-8")
+    text = _cypher_code("controlm_dependencies_derived.cypher")
     # the derived predecessor edge is :WAS_INFORMED_BY (PROV-O wasInformedBy),
     # not the earlier :DEPENDS_ON working name
     assert ":WAS_INFORMED_BY" in text
@@ -395,7 +415,7 @@ def test_sql_references_psgmgr(name: str) -> None:
 
 
 def test_folder_sql_uses_sched_table() -> None:
-    text = (SQL_DIR / "controlm_folders.sql").read_text(encoding="utf-8")
+    text = _sql_code("controlm_folders.sql")
     assert "T.SCHED_TABLE" in text
     # Confirm NO is_current_version filter on the folder side (that column
     # doesn't exist on CM_DEF_VTAB).
@@ -424,7 +444,7 @@ def test_dependencies_sql_is_direct_only() -> None:
     """Phased-loader change (ported 2026-07-23): the SQL emits DIRECT
     predecessor pairs only — no recursive CTE, no stored closure, no cycle
     guard needed (nothing recurses). Transitive reach is a Neo4j traversal."""
-    text = (SQL_DIR / "controlm_dependencies_recursive.sql").read_text(encoding="utf-8")
+    text = _sql_code("controlm_dependencies_recursive.sql")
     assert "RecursiveJobDependencies" not in text
     assert "UNION ALL" not in text
     for alias in ("AS in_table_job_id", "AS out_condition", "AS out_table_job_id"):

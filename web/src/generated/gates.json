@@ -564,6 +564,31 @@
         "G45",
         "J24"
       ]
+    },
+    {
+      "kind": "prompt-only",
+      "date": null,
+      "title": "seal-tom-attribution-reshape (rulings/citations logged — gate sign-off not recorded)",
+      "status": "open",
+      "prompt_files": [
+        "config/gate-prompts/seal-tom-attribution-reshape.yaml"
+      ],
+      "log_ref": null,
+      "unblocks": [
+        "K3",
+        "G35"
+      ]
+    },
+    {
+      "kind": "prompt-only",
+      "date": null,
+      "title": "software-usage-patterns (rulings/citations logged — gate sign-off not recorded)",
+      "status": "open",
+      "prompt_files": [
+        "config/gate-prompts/software-usage-patterns.yaml"
+      ],
+      "log_ref": null,
+      "unblocks": []
     }
   ]
 }

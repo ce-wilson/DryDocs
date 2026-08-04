@@ -35,10 +35,13 @@ drydocs/data/
 stg_out/
 /stg_*/
 
-# SDLC-Docs — Fidelity-internal source corpus: keep LOCAL for reference, never commit/publish.
-# Internal, confidential material per PUBLISH-BOUNDARY.md (real org name "Fidelity/FMR", internal fmr.com
-# URLs, internal tool/standard code names). Ignore the WHOLE corpus (docx/doc/pdf/xls/txt/json,
-# any type) and keep only the clean design artifacts SDLC-Docs/extracted/*.md tracked.
+# SDLC-Docs — employer-internal source corpus (the SDLC process docs the extracted
+# design artifacts were distilled from): keep LOCAL for reference, never commit/publish.
+# Internal, confidential material per PUBLISH-BOUNDARY.md — the raw files carry the
+# employer's real name, internal URLs, and internal tool/standard code names (which is
+# exactly why the comment here names none of them; J27). Ignore the WHOLE corpus
+# (docx/doc/pdf/xls/txt/json, any type) and keep only the clean design artifacts
+# SDLC-Docs/extracted/*.md tracked.
 /SDLC-Docs/*
 !/SDLC-Docs/extracted/
 /SDLC-Docs/extracted/*

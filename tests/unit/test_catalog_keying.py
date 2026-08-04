@@ -33,6 +33,7 @@ from drydocs.loaders.catalog import (
     ProductLineRow,
     ProductRow,
 )
+from drydocs_core.cypher_split import strip_comments
 
 _CYPHER = Path(__file__).resolve().parents[2] / "drydocs" / "loaders" / "cypher"
 
@@ -162,6 +163,24 @@ def test_sponsoring_product_line_is_deliberately_unmodelled() -> None:
 # --------------------------------------------------------------------------- #
 # the join, having been ruled by-id, must not fail silently (C17 -> C22 sweep)
 # --------------------------------------------------------------------------- #
+def _assert_orphan_shape(raw: str, var: str, parent_match: str, orphan_id_set: str) -> None:
+    """The C22 orphan-shape guard, over the template's CODE only (J26): the
+    negative assertions read comment-stripped text so the file can quote the
+    old defect shape in a `//` comment without tripping its own guard."""
+    # column-aligned SETs, so compare on collapsed whitespace rather than
+    # pinning the alignment (a reformat is not a regression)
+    code = re.sub(r"[ \t]+", " ", strip_comments(raw))
+    assert parent_match in code
+    assert f"{var}.orphan = true" in code
+    assert orphan_id_set in code
+    # written on every run, not just ON CREATE, so a parent that DISAPPEARS is
+    # caught on the next load rather than staying false forever
+    assert f"ON CREATE SET {var}.orphan" not in code
+    # ...and no hard parent MATCH remains anywhere in the file — that is the
+    # defect shape itself (a MATCH after the MERGE silently drops the row)
+    assert not re.search(r"(?m)^\s*MATCH\b", code)
+
+
 @pytest.mark.parametrize(
     ("cypher_file", "var", "parent_match", "orphan_id_set"),
     [
@@ -194,23 +213,18 @@ def test_an_unresolved_parent_is_recorded_on_the_node(
     fixed products.cypher; C22 swept the shape into the other two hierarchy
     loaders. The miss is now a queryable property on every grain."""
     raw = (_CYPHER / cypher_file).read_text(encoding="utf-8")
-    # column-aligned SETs, so compare on collapsed whitespace rather than
-    # pinning the alignment (a reformat is not a regression)
-    text = re.sub(r"[ \t]+", " ", raw)
-    assert parent_match in text
-    assert f"{var}.orphan = true" in text
-    assert orphan_id_set in text
-    # written on every run, not just ON CREATE, so a parent that DISAPPEARS is
-    # caught on the next load rather than staying false forever
-    assert f"ON CREATE SET {var}.orphan" not in text
-    # ...and no hard parent MATCH remains anywhere in the file — that is the
-    # defect shape itself (a MATCH after the MERGE silently drops the row)
-    assert not re.search(r"(?m)^\s*MATCH\b", raw)
+    _assert_orphan_shape(raw, var, parent_match, orphan_id_set)
 
 
 # --------------------------------------------------------------------------- #
 # C22 §b — a sparse refresh must not blank what a full extract loaded
 # --------------------------------------------------------------------------- #
+def _assert_sparse_name_coalesce(raw: str, var: str) -> None:
+    code = re.sub(r"[ \t]+", " ", strip_comments(raw))
+    assert f"{var}.name = coalesce(row.name, {var}.name)" in code
+    assert f"{var}.name = row.name" not in code
+
+
 @pytest.mark.parametrize(
     ("cypher_file", "var"),
     [("products.cypher", "p"), ("product_lines.cypher", "pl"), ("area_products.cypher", "ap")],
@@ -219,9 +233,29 @@ def test_a_sparse_refresh_does_not_blank_the_name(cypher_file: str, var: str) ->
     """`SET x.name = row.name` blanks the stored name the first time a partial
     extract omits the column. coalesce keeps the existing value when the row
     carries none — the same-shape fix in all three hierarchy loaders."""
-    text = re.sub(r"[ \t]+", " ", (_CYPHER / cypher_file).read_text(encoding="utf-8"))
-    assert f"{var}.name = coalesce(row.name, {var}.name)" in text
-    assert f"{var}.name = row.name" not in text
+    _assert_sparse_name_coalesce((_CYPHER / cypher_file).read_text(encoding="utf-8"), var)
+
+
+def test_the_guards_survive_the_file_describing_its_own_mechanism() -> None:
+    """J26 regression pin. A guard that reads prose makes the file unable to
+    explain itself — the repo's doctrine is that the reasoning IS the audit
+    trail. Quote the ENTIRE pre-C17 defect verbatim in comments (the ON CREATE
+    orphan flag, the unconditional name SET, the hard parent MATCH) and every
+    negative assertion above must still hold, because comments are not code."""
+    raw = (_CYPHER / "products.cypher").read_text(encoding="utf-8")
+    described = raw + (
+        "\n// the pre-C17 defect, quoted verbatim so the next reader sees the shape:\n"
+        "//   ON CREATE SET p.orphan = false\n"
+        "//   SET p.name = row.name\n"
+        "// MATCH (pl:ProductLine {product_line_id: row.parent_product_line_id})\n"
+    )
+    _assert_orphan_shape(
+        described,
+        "p",
+        "OPTIONAL MATCH (pl:ProductLine",
+        "p.orphan_parent_product_line_id = row.parent_product_line_id",
+    )
+    _assert_sparse_name_coalesce(described, "p")
 
 
 def test_a_row_with_no_name_still_loads_and_carries_none() -> None:
