@@ -39,7 +39,13 @@ shrink-ambition):
 
 **Template:** [`TEMPLATE-node-mapping.csv`](TEMPLATE-node-mapping.csv).
 Composite node keys are `field=value` pairs joined by `;`
-(e.g. `folder_id=<FOLDER>;job_id=<JOB>`).
+(e.g. `folder_id=<FOLDER>;job_id=<JOB>`). **Rekeyed to app_code at K9** (K7
+gate seal-app-ref-edge-reshape §F2, 2026-08-03): a manual row now pins the
+FOLDER-grain ruled edge — authored per app code (`app_code=<CODE>` →
+`BELONGS_TO_APPLICATION {role: seal_app_ref}` → `Port`, key `app_id=<APPID>`);
+the loader fans the code out to its folders and jobs inherit (§A1/§B1). The
+loader chain itself still enforces the job-grain K2 shape until the K8 build
+migrates it, so a new-shape file registered before K8 queues fail-closed.
 
 **Status: proposed.** Nothing reads this directory yet — the loader arrives
 with the K2 build, after the gate signs off. classification: Internal-Public

@@ -210,6 +210,22 @@ def test_template_header_matches_the_parser_contract() -> None:
     assert header == CSV_HEADER
 
 
+def test_template_row_is_the_k7_ruled_shape() -> None:
+    """K9 rekeyed the template from job identity to app_code (K7 gate
+    seal-app-ref-edge-reshape §F2): a manual row now pins the folder-grain
+    ruled edge, authored per app code. The PARSER deliberately still enforces
+    the job-grain K2 shape (SUPPORTED_SHAPE below) until the K8 loader build
+    migrates the chain — a new-shape file registered before K8 queues
+    fail-closed rather than loading under the retired grain."""
+    row = TEMPLATE.read_text(encoding="utf-8").splitlines()[1].split(",")
+    assert row[0] == "ControlMFolder"
+    assert row[1] == "app_code=<CODE>"
+    assert row[2] == "BELONGS_TO_APPLICATION"
+    assert row[3] == "role=seal_app_ref"
+    assert row[4] == "Port"
+    assert row[5] == "app_id=<APPID>"
+
+
 def test_shape_constant_is_the_k2_edge() -> None:
     assert SUPPORTED_SHAPE == {
         "source_label": "ControlMJob",

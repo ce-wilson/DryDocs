@@ -15,11 +15,14 @@ import pytest
 
 from drydocs_api.handlers import Forbidden
 from drydocs_api.mappings import (
+    APP_CODE_HEADER,
     DOMAINS,
+    K2_SHAPE,
     OVERRIDE_HEADER,
     ChangesetValidationError,
     MappingStore,
     UnknownDomainError,
+    draft_app_code_mapping,
     draft_changeset,
     draft_override,
     list_domains,
@@ -60,7 +63,7 @@ def test_user_role_is_refused(sessions, store):
         mapping_grid("ontology-map", token, sessions, store)
     with pytest.raises(Forbidden):
         draft_changeset(
-            [{"folder_id": "F", "job_id": "J", "app_id": "S", "rationale": "r"}],
+            [{"app_code": "PRA", "app_id": "S", "rationale": "r"}],
             token,
             sessions,
             store,
@@ -137,20 +140,20 @@ def test_options_feed_the_dropdowns(sessions, store):
 
 
 def test_changeset_artifact_shape(sessions, store):
+    """K9: the changeset artifact carries the K7 RULED edge shape, keyed by
+    app_code (§B1 — job identity retired for authoring at §A1)."""
     token = _token(sessions, "kchen2190")
     out = draft_changeset(
         [
             {
-                "folder_id": "F0001",
-                "job_id": "J0002",
+                "app_code": "PRA",
                 "app_id": "APP-9876",
                 "rationale": "support team confirmed owner",
             },
             {
-                "folder_id": "F0001",
-                "job_id": "J0003",
+                "app_code": "PRB",
                 "app_id": "APP-9876",
-                "rationale": "same series as J0002",
+                "rationale": "same platform team",
                 "create_target_if_missing": True,
             },
         ],
@@ -160,15 +163,18 @@ def test_changeset_artifact_shape(sessions, store):
     )
     rows = list(csv.DictReader(io.StringIO(out["csv"])))
     assert len(rows) == 2
-    assert rows[0]["source_label"] == "ControlMJob"
-    assert rows[0]["source_key"] == "folder_id=F0001;job_id=J0002"
+    assert rows[0]["source_label"] == "ControlMFolder"
+    assert rows[0]["source_key"] == "app_code=PRA"
+    assert rows[0]["relationship"] == "BELONGS_TO_APPLICATION"
     assert rows[0]["rel_props"] == "role=seal_app_ref"
+    assert rows[0]["target_label"] == "Port"
+    assert rows[0]["target_key"] == "app_id=APP-9876"
     assert rows[0]["authored_by"] == "kchen2190"  # session persona, never client-supplied
     assert rows[1]["create_target_if_missing"] == "true"
     assert "pending-load" in out["manifest_snippet"]
     assert "replaces_with" in out["manifest_snippet"]
-    # The artifact parses under the SAME validation chain the loader uses
-    # once registered — assert the header matches the committed template.
+    assert "K8" in out["note"]  # honest: the folder-grain loader is the K8 build
+    # The artifact's header matches the committed (rekeyed) template.
     template = (
         Path(__file__).resolve().parents[2]
         / "config"
@@ -178,12 +184,24 @@ def test_changeset_artifact_shape(sessions, store):
     assert out["csv"].splitlines()[0] == template.read_text(encoding="utf-8").splitlines()[0]
 
 
+def test_k2_shape_is_the_ruled_edge():
+    """The constant follows gate seal-app-ref-edge-reshape §A1/§C1/§D1."""
+    assert K2_SHAPE == {
+        "source_label": "ControlMFolder",
+        "relationship": "BELONGS_TO_APPLICATION",
+        "role": "seal_app_ref",
+        "target_label": "Port",
+    }
+
+
 @pytest.mark.parametrize(
     "bad,reason",
     [
         ([], "empty"),
-        ([{"folder_id": "F", "job_id": "J", "app_id": "S", "rationale": "  "}], "rationale"),
-        ([{"folder_id": "", "job_id": "J", "app_id": "S", "rationale": "r"}], "required"),
+        ([{"app_code": "PRA", "app_id": "S", "rationale": "  "}], "rationale"),
+        ([{"app_code": "", "app_id": "S", "rationale": "r"}], "app_code required"),
+        # the retired job-grain entry shape is refused, not silently remapped
+        ([{"folder_id": "F", "job_id": "J", "app_id": "S", "rationale": "r"}], "job grain"),
     ],
 )
 def test_changeset_fails_closed(sessions, store, bad, reason):
@@ -330,6 +348,124 @@ def test_override_endpoints_refuse_user_role(sessions, override_store):
         )
     with pytest.raises(Forbidden):
         source_corrections_report(token, sessions, override_store)
+
+
+# ---------------------------------------------------------------------------
+# K9 — the K7 defined-mapping store (gate seal-app-ref-edge-reshape §E1/§E2).
+# Synthetic values only (publish boundary).
+# ---------------------------------------------------------------------------
+
+
+@pytest.fixture()
+def app_code_store(tmp_path, monkeypatch) -> MappingStore:
+    """A store whose committed defined-mapping list is a fixture covering all
+    three tiers — the module constant is monkeypatched so the WHOLE read chain
+    (is_current -> build) resolves to it."""
+    fix = tmp_path / "app-code-mappings.csv"
+    fix.write_text(
+        ",".join(APP_CODE_HEADER) + "\n"
+        # tier 1: seal-born, code-level 1:1
+        "PRA,,seal-born,APP-1234,,defined,,kchen2190,2026-08-03\n"
+        # tier 2: the shared platform code declares itself (no single app)...
+        "PLT,,platform,,,defined,,kchen2190,2026-08-03\n"
+        # ...and resolves per folder
+        "PLT,F0001,platform,APP-5678,,defined,,kchen2190,2026-08-03\n"
+        # a per-folder override sits beside the defined row, origin-flagged
+        "PLT,F0001,platform,APP-9012,,override,platform row predates the team split,"
+        "kchen2190,2026-08-03\n"
+        # tier 3: dual-coded carries its DECLARED end state (§B2)
+        "PRB,,dual-coded,APP-3456,all workload under PRB once the PLT folders drain,"
+        "defined,,kchen2190,2026-08-03\n",
+        encoding="utf-8",
+    )
+    monkeypatch.setattr("drydocs_core.mapping_store.APP_CODE_MAPPINGS_PATH", fix)
+    return MappingStore(tmp_path / "mapping.db")
+
+
+def test_app_code_domain_registered():
+    dom = next(d for d in DOMAINS if d["id"] == "app-code-mapping")
+    assert dom["available"] and dom["kind"] == "defined"
+    assert dom["source"] == "config/overrides/app-code-mappings.csv"
+
+
+def test_app_code_grid_carries_tier_origin_and_end_state(sessions, app_code_store):
+    """Every row is origin-flagged (§B3); code-level rows precede their
+    per-folder resolutions; the dual-coded row's declared end state is on the
+    surface (§B2)."""
+    token = _token(sessions, "kchen2190")
+    out = mapping_grid("app-code-mapping", token, sessions, app_code_store)
+    assert {"app_code", "tier", "origin", "declared_end_state"} <= set(out["keys"])
+    rows = [(r["app_code"], r["folder_id"], r["origin"], r["app_id"]) for r in out["rows"]]
+    assert rows == [
+        ("PLT", None, "defined", None),  # code-level before per-folder
+        ("PLT", "F0001", "defined", "APP-5678"),
+        ("PLT", "F0001", "override", "APP-9012"),  # adjacent, origin-flagged
+        ("PRA", None, "defined", "APP-1234"),
+        ("PRB", None, "defined", "APP-3456"),
+    ]
+    dual = next(r for r in out["rows"] if r["tier"] == "dual-coded")
+    assert "PLT folders drain" in dual["declared_end_state"]
+
+
+def test_draft_app_code_mapping_returns_full_updated_file(sessions, app_code_store):
+    """O24 mechanics verbatim: the artifact is the COMPLETE updated committed
+    file; authored_by is server-stamped; the server wrote nothing."""
+    token = _token(sessions, "asmith7734")
+    out = draft_app_code_mapping(
+        [
+            {
+                "app_code": "PRC",
+                "tier": "seal-born",
+                "app_id": "APP-7777",
+            }
+        ],
+        token,
+        sessions,
+        app_code_store,
+    )
+    rows = list(csv.DictReader(io.StringIO(out["csv"])))
+    assert out["filename"] == "app-code-mappings.csv"
+    assert out["entries"] == 1 and out["total_rows"] == 6
+    new = rows[-1]
+    assert new["app_code"] == "PRC"
+    assert new["origin"] == "defined"  # the default authoring origin
+    assert new["authored_by"] == "asmith7734"  # session persona, never client-supplied
+    # committed rows survive byte-faithfully through the store round-trip
+    assert rows[0]["app_code"] == "PRA" and rows[0]["app_id"] == "APP-1234"
+    assert "wrote NOTHING" in out["note"]
+
+
+@pytest.mark.parametrize(
+    "bad",
+    [
+        [],
+        # dual-coded without the §B2 declared end state
+        [{"app_code": "PRD", "tier": "dual-coded", "app_id": "APP-1"}],
+        # matched-fallback is derived at load, never authored
+        [{"app_code": "PRD", "tier": "seal-born", "app_id": "APP-1", "origin": "matched-fallback"}],
+        # override without rationale (permanence makes the why load-bearing)
+        [{"app_code": "PRD", "tier": "seal-born", "app_id": "APP-1", "origin": "override"}],
+        # platform code-level row must not name a single application
+        [{"app_code": "PRD", "tier": "platform", "app_id": "APP-1"}],
+        # duplicate of a COMMITTED row (1:1, OWNER-NOT-USER)
+        [{"app_code": "PRA", "tier": "seal-born", "app_id": "APP-1"}],
+    ],
+)
+def test_draft_app_code_mapping_fails_closed(sessions, app_code_store, bad):
+    token = _token(sessions, "kchen2190")
+    with pytest.raises(ChangesetValidationError):
+        draft_app_code_mapping(bad, token, sessions, app_code_store)
+
+
+def test_app_code_endpoints_refuse_user_role(sessions, app_code_store):
+    token = _token(sessions, "jdoe4821")
+    with pytest.raises(Forbidden):
+        draft_app_code_mapping(
+            [{"app_code": "PRC", "tier": "seal-born", "app_id": "APP-7777"}],
+            token,
+            sessions,
+            app_code_store,
+        )
 
 
 def test_source_corrections_report_content(sessions, override_store):

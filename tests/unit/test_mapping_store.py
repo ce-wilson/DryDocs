@@ -27,6 +27,7 @@ from drydocs_core.mapping_store import (
 )
 
 EXPECTED_TABLES = [
+    "app_code_mapping",
     "manual_load_file",
     "manual_mapping",
     "meta",
@@ -306,6 +307,111 @@ def test_override_edit_flips_is_current(manual_fixture, tmp_path: Path):
             "kchen2190,2026-07-21,active\n"
         )
     assert not is_current(db, manifest_path=manual_fixture["manifest"], overrides_path=fix)
+
+
+# ---------------------------------------------------------------------------
+# K9 — the K7 defined-mapping store (gate seal-app-ref-edge-reshape §E1/§E2).
+# All values synthetic (publish boundary).
+# ---------------------------------------------------------------------------
+
+APP_CODE_HEADER_LINE = (
+    "app_code,folder_id,tier,app_id,declared_end_state,origin,rationale,authored_by,authored_on"
+)
+
+
+def _app_code_csv(tmp_path: Path, *rows: str) -> Path:
+    path = tmp_path / "app-code-mappings.csv"
+    path.write_text("\n".join([APP_CODE_HEADER_LINE, *rows, ""]), encoding="utf-8")
+    return path
+
+
+def test_app_code_round_trip_grid_and_migration_view(tmp_path: Path):
+    """All three tiers materialize; the grid orders code-level rows before
+    their per-folder resolutions with defined/override adjacent (§B3); the
+    dual-coded view surfaces every migration with its declared end state
+    (§B2 — a stalled migration cannot hide)."""
+    fix = _app_code_csv(
+        tmp_path,
+        "PRA,,seal-born,APP-1234,,defined,,kchen2190,2026-08-03",
+        "PLT,,platform,,,defined,,kchen2190,2026-08-03",
+        "PLT,F0001,platform,APP-5678,,defined,,kchen2190,2026-08-03",
+        "PLT,F0001,platform,APP-9012,,override,team split predates the row,kchen2190,2026-08-03",
+        "PRB,,dual-coded,APP-3456,all workload under PRB by the drain,defined,,kchen2190,2026-08-03",
+    )
+    conn = build(":memory:", app_code_mappings_path=fix)
+    try:
+        stored = conn.execute(
+            "SELECT app_code, folder_id, tier, app_id, origin FROM app_code_mapping "
+            "ORDER BY line_no"
+        ).fetchall()
+        assert stored == [
+            ("PRA", None, "seal-born", "APP-1234", "defined"),
+            ("PLT", None, "platform", None, "defined"),
+            ("PLT", "F0001", "platform", "APP-5678", "defined"),
+            ("PLT", "F0001", "platform", "APP-9012", "override"),
+            ("PRB", None, "dual-coded", "APP-3456", "defined"),
+        ]
+        grid = conn.execute("SELECT app_code, folder_id, origin FROM v_app_code_grid").fetchall()
+        assert grid == [
+            ("PLT", None, "defined"),  # code-level before per-folder
+            ("PLT", "F0001", "defined"),
+            ("PLT", "F0001", "override"),  # adjacent, origin-flagged
+            ("PRA", None, "defined"),
+            ("PRB", None, "defined"),
+        ]
+        migrations = conn.execute(
+            "SELECT app_code, app_id, declared_end_state FROM v_dual_coded_migrations"
+        ).fetchall()
+        assert migrations == [("PRB", "APP-3456", "all workload under PRB by the drain")]
+    finally:
+        conn.close()
+
+
+@pytest.mark.parametrize(
+    "row,reason",
+    [
+        (",,seal-born,APP-1,,defined,,u1,2026-08-03", "missing app_code"),
+        ("PRA,,tier-9,APP-1,,defined,,u1,2026-08-03", "unknown tier"),
+        ("PRA,,seal-born,APP-1,,matched-fallback,,u1,2026-08-03", "fallback never authored"),
+        ("PRA,,seal-born,APP-1,,invented,,u1,2026-08-03", "unknown origin"),
+        ("PRA,F1,seal-born,APP-1,,defined,,u1,2026-08-03", "seal-born is code-level"),
+        ("PRA,,seal-born,,,defined,,u1,2026-08-03", "seal-born needs app_id"),
+        ("PLT,,platform,APP-1,,defined,,u1,2026-08-03", "platform code-level has no single app"),
+        ("PLT,F1,platform,,,defined,,u1,2026-08-03", "per-folder row needs app_id"),
+        ("PRB,,dual-coded,APP-1,,defined,,u1,2026-08-03", "dual-coded needs end state"),
+        ("PRA,,seal-born,APP-1,by friday,defined,,u1,2026-08-03", "end state is tier-3 only"),
+        ("PRA,,seal-born,APP-1,,override,,u1,2026-08-03", "override needs rationale"),
+        ("PRA,,seal-born,APP-1,,defined,,,2026-08-03", "missing authored_by"),
+    ],
+)
+def test_app_code_ingestion_fails_closed(tmp_path: Path, row: str, reason: str):
+    with pytest.raises(MappingStoreError):
+        build(":memory:", app_code_mappings_path=_app_code_csv(tmp_path, row)).close()
+
+
+def test_app_code_duplicate_row_is_a_defect(tmp_path: Path):
+    """Folder → application is 1:1 (OWNER-NOT-USER): a second authoring row
+    for the same (app_code, folder_id, origin) is refused loudly, never
+    last-row-wins."""
+    fix = _app_code_csv(
+        tmp_path,
+        "PRA,,seal-born,APP-1,,defined,,u1,2026-08-03",
+        "PRA,,seal-born,APP-2,,defined,,u1,2026-08-03",
+    )
+    with pytest.raises(MappingStoreError, match="1:1"):
+        build(":memory:", app_code_mappings_path=fix).close()
+
+
+def test_app_code_edit_flips_is_current(tmp_path: Path):
+    """The defined-mapping list is a tracked source (O14): editing it makes
+    the built file stale, so a committed row is always served next read."""
+    fix = _app_code_csv(tmp_path)
+    db = tmp_path / "store" / "mapping.db"
+    build(db, app_code_mappings_path=fix).close()
+    assert is_current(db, app_code_mappings_path=fix)
+    with fix.open("a", encoding="utf-8", newline="") as fh:
+        fh.write("PRA,,seal-born,APP-1234,,defined,,kchen2190,2026-08-03\n")
+    assert not is_current(db, app_code_mappings_path=fix)
 
 
 # ---------------------------------------------------------------------------

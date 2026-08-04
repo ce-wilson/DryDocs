@@ -44,3 +44,33 @@ touches edge meaning or the graph).
 
 No real SIDs or company values may be committed here (PUBLISH-BOUNDARY.md) —
 this repo's copy stays mechanism-only; real override lists live company-side.
+
+## app-code-mappings.csv — the K7 defined-mapping store (K9)
+
+Ratified at the **seal-app-ref-edge-reshape gate** (K7, SIGNED OFF 2026-08-03,
+`config/gate-log.md`): the steward-DEFINED Control-M app-code → application
+mapping. This domain differs from the contact overrides above in two ruled
+ways: the store **IS a graph-loadable source of record** (§E2 — no machine
+feed exists to defer to), and **override rows may be PERMANENT** — the
+folder-to-application relation runs through a platform code, so there is no
+pending source fix to wait for and no corrected-in-source lifecycle (hence
+no `status` column). Rows still never write the graph directly; the K8
+loader is the only graph writer (§E3), fanning each code-level row out to
+its folders via `m3_contains_folder` (§B1) as
+`(:ControlMFolder)-[:BELONGS_TO_APPLICATION {role: seal_app_ref}]->(:Port)`.
+
+| column | required | meaning |
+|---|---|---|
+| `app_code` | yes | the Control-M app code (the `:ControlMApplication` authoring key) |
+| `folder_id` | no | empty = code-level row (fan-out); set = a tier-2 per-folder resolution |
+| `tier` | yes | `seal-born` (1:1, code-level) · `platform` (shared code, resolved per folder) · `dual-coded` (migrating — both attributions simultaneously correct) |
+| `app_id` | see rules | the target application. Required for seal-born, dual-coded, and per-folder rows; must be EMPTY on a platform code-level row (no single application exists) |
+| `declared_end_state` | tier 3 only | REQUIRED on dual-coded rows (§B2) — the explicit end state that keeps a stalled migration visible |
+| `origin` | yes | `defined` · `override` · `manual-pin`. `matched-fallback` is refused here — it is derived by the K2 fallback at load and disclosed on the edge, never authored |
+| `rationale` | override/pin | required when origin ≠ `defined` — permanence makes the why load-bearing |
+| `authored_by` | yes | steward persona (server-stamped in console drafts) |
+| `authored_on` | no | ISO date |
+
+Folder → application is **1:1** (OWNER-NOT-USER): a duplicate row for the
+same (app_code, folder_id, origin) is refused at materialization. Mechanism
+only in this repo — real code rows live company-side.

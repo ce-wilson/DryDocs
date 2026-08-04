@@ -25,13 +25,19 @@ from drydocs_api.sessions import InMemorySessionStore, Session
 
 MAPPING_ROLES = ("steward", "admin")
 
-# The one changeset shape the manual-loads mechanism supports today (K2).
-# Extending this is a deliberate change reviewed against the vocabulary.
+# The one changeset shape the manual-loads mechanism supports — the K7 RULED
+# edge (gate seal-app-ref-edge-reshape §A1/§C1/§D1, 2026-08-03): folder-grain
+# attribution onto the application's BatchProcessing :Port, AUTHORED per app
+# code (§B1 — the loader fans out to folders via m3_contains_folder). The
+# job-grain K2 shape is retired for authoring (§A1: no per-job application
+# edge is authored going forward); the loader chain's own migration is K8, so
+# a drafted artifact QUEUES in git until that build lands. Extending this is
+# a deliberate change reviewed against the vocabulary.
 K2_SHAPE = {
-    "source_label": "ControlMJob",
-    "relationship": "WAS_ASSOCIATED_WITH",
+    "source_label": "ControlMFolder",
+    "relationship": "BELONGS_TO_APPLICATION",
     "role": "seal_app_ref",
-    "target_label": "BusinessApplication",
+    "target_label": "Port",
 }
 
 # Registry-driven domain strip (wf-mapping-01 ①). available=False rows render
@@ -82,6 +88,20 @@ DOMAINS: tuple[dict, ...] = (
         "tier": None,
         "available": True,
     },
+    # K9 — the K7 defined-mapping store (gate seal-app-ref-edge-reshape
+    # §E1/§E2, 2026-08-03): the steward-defined app-code → application
+    # domain, O24 mechanics verbatim (committed CSV → mapping.db → this
+    # console). Unlike the contact overrides it IS a graph-loadable source
+    # of record (no machine feed exists to defer to), and override rows may
+    # be PERMANENT — no corrected-in-source lifecycle in this domain.
+    {
+        "id": "app-code-mapping",
+        "title": "App code → Application (the K7 defined-mapping store)",
+        "kind": "defined",
+        "source": "config/overrides/app-code-mappings.csv",
+        "tier": None,
+        "available": True,
+    },
 )
 
 # The committed override-list column order — the draft artifact reproduces the
@@ -103,6 +123,21 @@ OVERRIDE_HEADER = (
     "authored_by",
     "authored_on",
     "status",
+)
+
+# The defined-mapping list's committed column order (K9). A NEW file, so no
+# S3 alias boundary applies: the header is app_id from day one (§E1 wire
+# rule) — there is no legacy CSV whose parsing a rename would break.
+APP_CODE_HEADER = (
+    "app_code",
+    "folder_id",
+    "tier",
+    "app_id",
+    "declared_end_state",
+    "origin",
+    "rationale",
+    "authored_by",
+    "authored_on",
 )
 
 
@@ -179,6 +214,14 @@ class MappingStore:
                 "rationale, authored_by, authored_on, status "
                 "FROM v_seal_contact_grid"
             )
+        # No alias needed: the K9 file is post-S3, so table, grid and wire all
+        # already say app_id.
+        if domain_id == "app-code-mapping":
+            return self._select(
+                "SELECT app_code, folder_id, tier, app_id, declared_end_state, "
+                "origin, rationale, authored_by, authored_on "
+                "FROM v_app_code_grid"
+            )
         raise UnknownDomainError(domain_id)
 
     def override_rows(self) -> list[dict]:
@@ -186,6 +229,12 @@ class MappingStore:
         draft artifact)."""
         cols = ", ".join(OVERRIDE_HEADER)
         return self._select(f"SELECT {cols} FROM seal_contact_override ORDER BY line_no").rows
+
+    def app_code_rows(self) -> list[dict]:
+        """The committed defined-mapping list in file column order (for the
+        full-file draft artifact)."""
+        cols = ", ".join(APP_CODE_HEADER)
+        return self._select(f"SELECT {cols} FROM app_code_mapping ORDER BY line_no").rows
 
     def source_corrections(self) -> list[dict]:
         return self._select("SELECT * FROM v_source_corrections").rows
@@ -246,8 +295,8 @@ def draft_changeset(
         raise ChangesetValidationError("changeset is empty")
     if not store.relationship_registered(K2_SHAPE["relationship"], K2_SHAPE["role"]):
         raise ChangesetValidationError(
-            "relationship WAS_ASSOCIATED_WITH{role=seal_app_ref} is not registered "
-            "in the vocabulary materialization — rebuild var/mapping.db"
+            f"relationship {K2_SHAPE['relationship']}{{role={K2_SHAPE['role']}}} is "
+            "not registered in the vocabulary materialization — rebuild var/mapping.db"
         )
 
     today = date.today().isoformat()
@@ -268,13 +317,15 @@ def draft_changeset(
         ]
     )
     for i, entry in enumerate(entries, start=1):
-        folder_id = str(entry.get("folder_id") or "").strip()
-        job_id = str(entry.get("job_id") or "").strip()
+        # K7 §A1/§B1: authoring is per APP CODE (job identity is retired —
+        # the loader fans a code out to its folders, jobs inherit).
+        app_code = str(entry.get("app_code") or "").strip()
         app_id = str(entry.get("app_id") or "").strip()
         rationale = str(entry.get("rationale") or "").strip()
-        if not (folder_id and job_id and app_id):
+        if not (app_code and app_id):
             raise ChangesetValidationError(
-                f"entry {i}: folder_id, job_id and app_id are all required"
+                f"entry {i}: app_code and app_id are both required — authoring is "
+                "per app code (K7 §B1); the job-grain changeset was retired at §A1"
             )
         if not rationale:
             raise ChangesetValidationError(
@@ -284,16 +335,14 @@ def draft_changeset(
         writer.writerow(
             [
                 K2_SHAPE["source_label"],
-                f"folder_id={folder_id};job_id={job_id}",
+                f"app_code={app_code}",
                 K2_SHAPE["relationship"],
                 f"role={K2_SHAPE['role']}",
                 K2_SHAPE["target_label"],
-                # S3 BOUNDARY: the manual-load CSV's target_key grammar is unchanged.
-                # manual_mappings.py parses `seal_id=<value>` by name and refuses a row
-                # without it, so every committed config/manual-loads/*.csv (and the
-                # TEMPLATE) would stop loading if this emitted app_id. The wire field
-                # above is app_id; the file format follows at §G3's retirement gate.
-                f"seal_id={app_id}",
+                # Post-S3 grammar: the K7 rekey (gate §F2) IS the authorized
+                # format change, and no committed manual CSV exists producer-side
+                # (manifest files: []) — so the new artifact says app_id outright.
+                f"app_id={app_id}",
                 "true" if entry.get("create_target_if_missing") else "false",
                 rationale,
                 session.persona_id,
@@ -301,7 +350,7 @@ def draft_changeset(
             ]
         )
 
-    filename = f"jobs-to-apps-{today}-{session.persona_id}.csv"
+    filename = f"app-codes-to-apps-{today}-{session.persona_id}.csv"
     manifest_snippet = (
         f"  - file: config/manual-loads/{filename}\n"
         f"    scope: <what these mappings cover — mechanism description>\n"
@@ -314,12 +363,14 @@ def draft_changeset(
         "csv": out.getvalue(),
         "manifest_snippet": manifest_snippet,
         "entries": len(entries),
-        "lifecycle": "draft → submitted (PR) → gated → loaded (next load run)",
+        "lifecycle": "draft → submitted (PR) → gated → loaded (at the K8 loader build)",
         "note": (
             "The server wrote NOTHING. Commit this file under config/manual-loads/, "
             "register it in manifest.yaml (fill replaces_with), and take it through "
-            "the existing K2 gate; `drydocs load-manual-mappings` applies it on the "
-            "next load run. Manual = tier 5 — it never overrides SEAL evidence."
+            "the existing K2 gate. The folder-grain loader is the K8 build — until "
+            "it lands the registered file QUEUES fail-closed (the loader chain still "
+            "enforces the job-grain shape). Manual = tier 5 — it never overrides "
+            "SEAL evidence."
         ),
     }
 
@@ -404,6 +455,72 @@ def draft_override(
             "read. Overrides NEVER write the graph and NEVER replace the SEAL value — "
             "the surfaces keep both, origin-flagged, and the source-corrections report "
             "carries the fix request to the application owners (AO privilege)."
+        ),
+    }
+
+
+# ---------------------------------------------------------------------------
+# K9 — the K7 defined-mapping store (gate seal-app-ref-edge-reshape §E1/§E2).
+# O24 mechanics verbatim: the server writes NOTHING — drafting returns the
+# UPDATED committed file as an artifact, git review is the review, and
+# var/mapping.db rematerializes it once committed. Store rows never write
+# the graph (§E3); the K8 loader is the only graph writer.
+# ---------------------------------------------------------------------------
+
+
+def draft_app_code_mapping(
+    entries: list[dict], token: str, sessions: InMemorySessionStore, store: MappingStore
+) -> dict:
+    """Validate drafted defined-mapping rows and return the complete updated
+    config/overrides/app-code-mappings.csv content (existing committed rows +
+    the drafts). Validation is the STORE'S OWN rule set (shared function), so
+    a returned artifact can never be refused at materialization — including
+    the 1:1 duplicate check against the already-committed rows."""
+    from drydocs_core.mapping_store import MappingStoreError, validate_app_code_row
+
+    session = _authorize(token, sessions)
+    if not entries:
+        raise ChangesetValidationError("no defined-mapping entries drafted")
+
+    today = date.today().isoformat()
+    existing = store.app_code_rows()
+    # Seed the duplicate check with the committed rows: a draft that re-authors
+    # an existing (app_code, folder_id, origin) key is a defect, not an edit.
+    seen: set[tuple[str, str, str]] = {
+        (r["app_code"], r["folder_id"] or "", r["origin"] or "") for r in existing
+    }
+    new_rows: list[dict] = []
+    for i, entry in enumerate(entries, start=1):
+        candidate = {
+            **entry,
+            "origin": entry.get("origin") or "defined",
+            "authored_by": session.persona_id,  # server-stamped, never client-supplied
+            "authored_on": entry.get("authored_on") or today,
+        }
+        try:
+            new_rows.append(validate_app_code_row(candidate, where=f"entry {i}", seen=seen))
+        except MappingStoreError as exc:
+            raise ChangesetValidationError(str(exc)) from exc
+
+    out = io.StringIO()
+    writer = csv.writer(out, lineterminator="\n")
+    writer.writerow(APP_CODE_HEADER)
+    for row in [*existing, *new_rows]:
+        writer.writerow(["" if row.get(c) is None else row.get(c) for c in APP_CODE_HEADER])
+    return {
+        "filename": "app-code-mappings.csv",
+        "csv": out.getvalue(),
+        "entries": len(new_rows),
+        "total_rows": len(existing) + len(new_rows),
+        "note": (
+            "The server wrote NOTHING. This is the complete updated defined-mapping "
+            "list — replace config/overrides/app-code-mappings.csv with it and "
+            "commit (git review is the review); var/mapping.db rematerializes it on "
+            "the next read. Rows never write the graph — the K8 loader fans each "
+            "code out to its folders and stays the only graph writer (§E3). "
+            "Overrides in THIS domain may be PERMANENT (§E2): the arrangement is "
+            "the arrangement, so the rationale travels with the row instead of a "
+            "corrected-in-source lifecycle."
         ),
     }
 

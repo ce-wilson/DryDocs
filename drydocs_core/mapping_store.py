@@ -23,6 +23,10 @@ Sources materialized (all read-only here):
                                              -> seal_contact_override (O24 —
                                                 the ui-write-surface gate's M2
                                                 origin-flagged store)
+- config/overrides/app-code-mappings.csv     -> app_code_mapping (K9 — the K7
+                                                defined-mapping store, gate
+                                                seal-app-ref-edge-reshape
+                                                §E1/§E2)
 
 Manual CSV ingestion reuses the SAME validation chain as the tier-5 loader
 (drydocs_core.manual_mappings — manifest gate, vocabulary check, supported
@@ -64,6 +68,14 @@ ONTOLOGY_MAP_PATH = REPO_ROOT / "config" / "taxonomy-ontology-map.yaml"
 SEAL_CONTACT_OVERRIDES_PATH = REPO_ROOT / "config" / "overrides" / "seal-contact-overrides.csv"
 _OVERRIDES_META_KEY = "source:config/overrides/seal-contact-overrides.csv"
 _OVERRIDE_STATUSES = ("active", "corrected-in-seal")
+APP_CODE_MAPPINGS_PATH = REPO_ROOT / "config" / "overrides" / "app-code-mappings.csv"
+_APP_CODE_META_KEY = "source:config/overrides/app-code-mappings.csv"
+APP_CODE_TIERS = ("seal-born", "platform", "dual-coded")
+# The full origin enum every surface discloses (K7 §B3). 'matched-fallback'
+# is DERIVED by the K2 fallback at load time and disclosed on the edge — it
+# is never authored, so the committed store admits only the other three.
+APP_CODE_ORIGINS = ("defined", "matched-fallback", "override", "manual-pin")
+APP_CODE_AUTHORED_ORIGINS = ("defined", "override", "manual-pin")
 
 SCHEMA_VERSION = "drydocs.mapping-store.v1"
 
@@ -209,6 +221,46 @@ CREATE VIEW v_source_corrections AS
          override_holder_name, rationale, authored_by, authored_on
   FROM seal_contact_override WHERE status = 'active'
   ORDER BY app_seal_id, role_name, line_no;
+
+-- ── K9 defined-mapping store (K7 gate seal-app-ref-edge-reshape §E1/§E2):
+-- the steward-DEFINED app-code → application domain. Unlike the contact
+-- overrides above, these rows ARE a graph-loadable source of record — no
+-- machine feed exists to defer to (§E2) — and override rows may be
+-- PERMANENT (no corrected-in-source lifecycle, hence no status column).
+-- Rows never write the graph directly; the loader (K8) stays the only
+-- graph writer (§E3). folder_id empty = code-level row, fanned out to
+-- folders by the loader via m3_contains_folder (§B1); folder_id set = a
+-- tier-2 per-folder resolution.
+CREATE TABLE app_code_mapping (
+  line_no            INTEGER PRIMARY KEY,
+  app_code           TEXT NOT NULL,
+  folder_id          TEXT,
+  tier               TEXT NOT NULL
+      CHECK (tier IN ('seal-born','platform','dual-coded')),
+  app_id             TEXT,
+  declared_end_state TEXT,
+  origin             TEXT NOT NULL
+      CHECK (origin IN ('defined','matched-fallback','override','manual-pin')),
+  rationale          TEXT,
+  authored_by        TEXT NOT NULL,
+  authored_on        TEXT
+);
+
+-- The /mappings grid: code-level rows before their per-folder resolutions;
+-- a defined row and its override render adjacent, origin-flagged (§B3 —
+-- attribution is never presented without its origin).
+CREATE VIEW v_app_code_grid AS
+  SELECT app_code, folder_id, tier, app_id, declared_end_state, origin,
+         rationale, authored_by, authored_on
+  FROM app_code_mapping
+  ORDER BY app_code, folder_id IS NOT NULL, folder_id, line_no;
+
+-- Tier-3 visibility (§B2): every dual-coded row with its DECLARED end
+-- state — the surface a stalled migration cannot hide from.
+CREATE VIEW v_dual_coded_migrations AS
+  SELECT app_code, app_id, declared_end_state, authored_by, authored_on
+  FROM app_code_mapping WHERE tier = 'dual-coded'
+  ORDER BY app_code, line_no;
 """
 
 _DUMP_ORDER = {
@@ -219,6 +271,7 @@ _DUMP_ORDER = {
     "manual_load_file": "file",
     "manual_mapping": "file, line_no",
     "seal_contact_override": "line_no",
+    "app_code_mapping": "line_no",
 }
 
 
@@ -252,6 +305,7 @@ def build(
     vocabulary_path: str | Path = VOCABULARY_PATH,
     manifest_path: str | Path = MANIFEST_PATH,
     overrides_path: str | Path | None = None,
+    app_code_mappings_path: str | Path | None = None,
 ) -> sqlite3.Connection:
     """Build the materialization from the committed sources. Existing file at
     ``db_path`` is replaced (it is derived; the sources are the truth)."""
@@ -269,11 +323,13 @@ def build(
     # None resolves at CALL time (not def time) so tests can monkeypatch the
     # module constant to point the whole read chain at a fixture list.
     overrides_path = Path(overrides_path or SEAL_CONTACT_OVERRIDES_PATH)
+    app_code_mappings_path = Path(app_code_mappings_path or APP_CODE_MAPPINGS_PATH)
 
     _ingest_vocabulary(conn, vocabulary_path)
     _ingest_ontology_map(conn, ontology_map_path)
     csv_hashes = _ingest_manual_loads(conn, manifest_path, vocabulary_path)
     _ingest_seal_overrides(conn, overrides_path)
+    _ingest_app_code_mappings(conn, app_code_mappings_path)
 
     meta = {
         "schema_version": SCHEMA_VERSION,
@@ -281,6 +337,7 @@ def build(
         "source:relationship_vocabulary.yaml": _sha256(vocabulary_path),
         "source:manual-loads/manifest.yaml": _sha256(manifest_path),
         _OVERRIDES_META_KEY: _sha256(overrides_path),
+        _APP_CODE_META_KEY: _sha256(app_code_mappings_path),
         **csv_hashes,
     }
     conn.executemany("INSERT INTO meta (key, value) VALUES (?, ?)", sorted(meta.items()))
@@ -300,6 +357,7 @@ def source_hashes(
     vocabulary_path: str | Path = VOCABULARY_PATH,
     manifest_path: str | Path = MANIFEST_PATH,
     overrides_path: str | Path | None = None,
+    app_code_mappings_path: str | Path | None = None,
 ) -> dict[str, str]:
     """The meta rows a build() from these sources WOULD store, computed without
     building — staleness detection is then one dict comparison (is_current).
@@ -308,12 +366,14 @@ def source_hashes(
     vocabulary_path = Path(vocabulary_path)
     manifest_path = Path(manifest_path)
     overrides_path = Path(overrides_path or SEAL_CONTACT_OVERRIDES_PATH)
+    app_code_mappings_path = Path(app_code_mappings_path or APP_CODE_MAPPINGS_PATH)
     expected = {
         "schema_version": SCHEMA_VERSION,
         "source:taxonomy-ontology-map.yaml": _hash_source(ontology_map_path),
         "source:relationship_vocabulary.yaml": _hash_source(vocabulary_path),
         "source:manual-loads/manifest.yaml": _hash_source(manifest_path),
         _OVERRIDES_META_KEY: _hash_source(overrides_path),
+        _APP_CODE_META_KEY: _hash_source(app_code_mappings_path),
     }
     manifest = _load_yaml(manifest_path)
     repo_root = manifest_path.resolve().parents[2]
@@ -332,6 +392,7 @@ def is_current(
     vocabulary_path: str | Path = VOCABULARY_PATH,
     manifest_path: str | Path = MANIFEST_PATH,
     overrides_path: str | Path | None = None,
+    app_code_mappings_path: str | Path | None = None,
 ) -> bool:
     """Whether the materialization at ``db_path`` matches the committed sources
     EXACTLY: same schema version, same source set (added/removed manifest files
@@ -354,6 +415,7 @@ def is_current(
         vocabulary_path=vocabulary_path,
         manifest_path=manifest_path,
         overrides_path=overrides_path,
+        app_code_mappings_path=app_code_mappings_path,
     )
 
 
@@ -531,6 +593,132 @@ def _ingest_seal_overrides(conn: sqlite3.Connection, path: Path) -> None:
                     authored_by,
                     _text(raw.get("authored_on")),
                     status,
+                ),
+            )
+
+
+def validate_app_code_row(
+    row: dict[str, Any], *, where: str, seen: set[tuple[str, str, str]]
+) -> dict[str, str | None]:
+    """Validate ONE defined-mapping row against the K7 tier rules (§B1/§B2)
+    and return it normalized. Shared by the CSV ingestion below and the API
+    draft endpoint, so a drafted artifact can never be refused at
+    materialization. ``seen`` accumulates (app_code, folder_id, origin) keys
+    across the file for the duplicate check — folder → application is 1:1
+    (OWNER-NOT-USER), so a duplicate authoring row is a defect, not a state.
+    """
+    app_code = _text(row.get("app_code"))
+    folder_id = _text(row.get("folder_id"))
+    tier = _text(row.get("tier"))
+    app_id = _text(row.get("app_id"))
+    end_state = _text(row.get("declared_end_state"))
+    origin = _text(row.get("origin"))
+    rationale = _text(row.get("rationale"))
+    authored_by = _text(row.get("authored_by"))
+
+    if not app_code:
+        raise MappingStoreError(f"{where}: app_code is required")
+    if tier not in APP_CODE_TIERS:
+        raise MappingStoreError(f"{where}: tier {tier!r} not in {APP_CODE_TIERS}")
+    if origin == "matched-fallback":
+        raise MappingStoreError(
+            f"{where}: origin 'matched-fallback' is derived by the K2 fallback at "
+            "load time and disclosed on the edge (§B3) — it is never authored "
+            "into the committed store"
+        )
+    if origin not in APP_CODE_AUTHORED_ORIGINS:
+        raise MappingStoreError(f"{where}: origin {origin!r} not in {APP_CODE_AUTHORED_ORIGINS}")
+    if tier == "seal-born":
+        if folder_id:
+            raise MappingStoreError(
+                f"{where}: a seal-born row is code-level 1:1 — fan-out covers its "
+                "folders (§B1); a per-folder row contradicts tier 1"
+            )
+        if not app_id:
+            raise MappingStoreError(f"{where}: a seal-born row requires app_id (1:1)")
+    elif tier == "platform":
+        if folder_id and not app_id:
+            raise MappingStoreError(
+                f"{where}: a platform per-folder resolution row requires app_id"
+            )
+        if not folder_id and app_id:
+            raise MappingStoreError(
+                f"{where}: a shared platform code has no single application — "
+                "resolution is per folder (§B2); leave app_id empty on the "
+                "code-level row"
+            )
+    else:  # dual-coded
+        if folder_id:
+            raise MappingStoreError(
+                f"{where}: a dual-coded row is code-level — the platform-code side "
+                "of the migration resolves per folder under the PLATFORM code's rows"
+            )
+        if not app_id:
+            raise MappingStoreError(f"{where}: a dual-coded row requires app_id")
+        if not end_state:
+            raise MappingStoreError(
+                f"{where}: a dual-coded row requires declared_end_state (§B2 — a "
+                "stalled migration must be visible, never silently permanent)"
+            )
+    if end_state and tier != "dual-coded":
+        raise MappingStoreError(
+            f"{where}: declared_end_state belongs to dual-coded rows only (§B2)"
+        )
+    if origin != "defined" and not rationale:
+        raise MappingStoreError(
+            f"{where}: rationale is REQUIRED on {origin} rows — an override may be "
+            "PERMANENT in this domain (§E2), so the why must travel with it"
+        )
+    if not authored_by:
+        raise MappingStoreError(f"{where}: authored_by is required")
+
+    key = (app_code, folder_id or "", origin or "")
+    if key in seen:
+        raise MappingStoreError(
+            f"{where}: duplicate {origin} row for app_code={app_code}"
+            + (f" folder_id={folder_id}" if folder_id else "")
+            + " — folder → application is 1:1 (OWNER-NOT-USER); author one row"
+        )
+    seen.add(key)
+    return {
+        "app_code": app_code,
+        "folder_id": folder_id,
+        "tier": tier,
+        "app_id": app_id,
+        "declared_end_state": end_state,
+        "origin": origin,
+        "rationale": rationale,
+        "authored_by": authored_by,
+        "authored_on": _text(row.get("authored_on")),
+    }
+
+
+def _ingest_app_code_mappings(conn: sqlite3.Connection, path: Path) -> None:
+    """Ingest the committed defined-mapping list (K9). Validation fails loudly
+    per row — the file is steward-authored and IS the source of record for
+    this domain (§E2), so a bad row is a mistake to fix at the source."""
+    if not path.exists():
+        raise MappingStoreError(f"mapping-store source not found: {path}")
+    seen: set[tuple[str, str, str]] = set()
+    with path.open(encoding="utf-8", newline="") as fh:
+        reader = csv.DictReader(fh)
+        for line_no, raw in enumerate(reader, start=2):
+            row = validate_app_code_row(raw, where=f"{path.name} line {line_no}", seen=seen)
+            conn.execute(
+                "INSERT INTO app_code_mapping (line_no, app_code, folder_id, tier, "
+                "app_id, declared_end_state, origin, rationale, authored_by, "
+                "authored_on) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+                (
+                    line_no,
+                    row["app_code"],
+                    row["folder_id"],
+                    row["tier"],
+                    row["app_id"],
+                    row["declared_end_state"],
+                    row["origin"],
+                    row["rationale"],
+                    row["authored_by"],
+                    row["authored_on"],
                 ),
             )
 
