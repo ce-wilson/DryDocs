@@ -767,6 +767,34 @@ verification status in [BRACKETS]; spend review on [UNRULED].
     vocabulary file predates section 0b — take the vocabulary file in the
     same commit as the test.
 
+73. Q13 — VENDOR-DOCS PIPELINE VERIFIED (laptop `6cbe44b`, 1430→1449/5;
+    ledgered desktop-side — the close commit did not touch this file). The
+    2026-07-31 pipeline was closed with three silent-reporting fixes, all the
+    "succeeds loudly, does nothing" class: vendor_docs.cypher gained the
+    delta-only WAS_GENERATED_BY tail (rows_changed was structurally 0 —
+    placed ABOVE the SUBSECTION_OF empty-list UNWIND that drops TOC-depth<=1
+    rows, ordering test-pinned); rows now carry BOTH the registry corpus_id
+    and the capture id (docs-verify would have reported a loaded corpus as
+    MISSING); bare-stem doc_id resolution. ***YOUR SIDE:*** like-for-like;
+    if your tree loads vendor-docs corpora, RE-RUN the loader post-port so
+    the change-reporting is honest, and expect docs-verify to reconcile
+    where it previously read MISSING.
+
+74. J29 — UTF-8 NO-BOM STANDARD for loader-read formats (1449→1450/5). SME
+    ruling: every .cypher/.sql/.csv is UTF-8 WITHOUT BOM (UTF-8 itself was
+    the deliberate readability choice; the BOM is a writer artifact —
+    PowerShell Out-File/'>', Excel CSV export). Guard =
+    tests/unit/test_file_encoding.py (J22 tracked+untracked walk), proven on
+    a probe; three producer sample CSVs stripped; vendor .xsd captures
+    exempt (XML self-declares encoding; VERBATIM trust). Diagnosis note: the
+    M3-reload cypher-shell BOM rejection was a PS 5.1 PIPE injection, not
+    repo files. ***YOUR SIDE:*** the guard WILL red any BOM'd .cypher/.sql/
+    .csv in YOUR tree — likely candidates are Excel-exported tier-5 manual
+    CSVs. Strip them in the same commit that takes the test (a BOM'd CSV
+    read with plain utf-8 breaks header matching silently, so this is a fix,
+    not churn). cypher-shell scripts: copy the file and use `-f`; never pipe
+    content through PowerShell 5.1.
+
 ACCEPTANCE GATE (behavior is the contract, not a byte-compare):
 - Track 1 (portable):
     poetry run pytest tests/unit/test_variable_classifier.py tests/unit/test_variable_resolver.py \
@@ -783,15 +811,16 @@ ACCEPTANCE GATE (behavior is the contract, not a byte-compare):
   capability_assert=false skips per T18). A retired-id refusal from
   `SourceRegistry.from_yaml` is the D4 guard WORKING, not a port failure — rebind the
   loader in `loader-source-overlay.yaml`, never by re-adding the retired id.
-  Producer reference at the current head (step 72, the doc-06 envelope gates):
-  1430
+  Producer reference at the current head (step 74, the encoding standard):
+  1450
   passed / 5 skipped with the production CSV PRESENT and no
   RECONCILE_BEFORE_DIR (4 J7 guards + the graphrag PDF) — the like-for-like
   chain: step 58 1356/5 → step 61 1384/5 (+28 K9 guards) → step 63 1399/5
   (+15 K8) → step 65 1403/5 (+4 K10) → step 66 1410/5 (+7 K11; step 67 no
   delta) → step 68 1413/5 (+3 U12; step 69 no delta) → step 70 1420/5
   (+7 C22) → step 71 1427/5 (+7 J18/J26/J27/J28) → step 72 1430/5 (+3 M4
-  property-term guards). The
+  property-term guards) → step 73 1449/5 (+19 Q13) → step 74 1450/5
+  (+1 J29). The
   step-60 figure (1354 / 7) was CSV-ABSENT without RECONCILE_BEFORE_DIR and is
   not comparable line-for-line; `aa0a0eb`'s commit message quotes 1358 / 3,
   which is the step-59 run with RECONCILE_BEFORE_DIR set. Earlier producer

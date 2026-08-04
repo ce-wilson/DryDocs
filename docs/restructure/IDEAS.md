@@ -27,12 +27,13 @@ Tags help grooming: `idea` · `bug` · `doc` · `source` (new data source) · `q
 <!-- add new ideas at the top -->
 
 - 2026-08-04 — [bug] `provision.ps1` cannot run as documented on this desktop: it requires
-  `cypher-shell` on the host PATH (only in the container), and the three provisioning
-  `.cypher` files carry a UTF-8 BOM that `cypher-shell -f` rejects outright ("Invalid
-  input '﻿'"). Worked around today (M3 reload) by BOM-stripping copies + `docker exec
-  cypher-shell -f`. Fix candidates: strip the BOMs in-repo (+ a guard — the D5 splitter
-  tolerates BOM so the CLI path never noticed), and either document the docker-exec form
-  in provision.ps1 or make it exec-aware. (desktop, `neo4jtest` — J18)
+  `cypher-shell` on the host PATH, which only exists inside the container. Worked around
+  at the M3 reload via `docker cp` + `docker exec cypher-shell -f`. Fix: document the
+  docker-exec form in the provision.ps1 header or make the script exec-aware. NOTE the
+  BOM half of the original entry was WRONG and is resolved: the repo .cypher files were
+  clean — the BOM was injected by a PowerShell 5.1 pipe into docker exec; the encoding
+  standard + guard landed as J29 (done 2026-08-04). Avoid piping file content to native
+  commands in PS 5.1; copy the file in and use `-f`. (desktop, `neo4jtest` — J18)
 
 - 2026-08-04 — [question] venue divergence (J18): the DESKTOP `neo4jtest` reports server
   5.26.27, while `config/dev-environment.yaml` + runbook Appendix A say 2026.05.0 EE —

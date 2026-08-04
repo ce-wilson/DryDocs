@@ -1,4 +1,4 @@
-﻿Legacy Asset Type,Taxonomy Category,Target DataHub Entity,Proposed Naming Convention,Description / Notes,,,,,,,,,,
+Legacy Asset Type,Taxonomy Category,Target DataHub Entity,Proposed Naming Convention,Description / Notes,,,,,,,,,,
 Organization,People & Org,CorpGroup,urn:li:corpGroup:{org_name},High-level business units or departments.,,,,,,,,,,
 Group,People & Org,CorpGroup,urn:li:corpGroup:{group_name},"AD groups, team names, or data stewardship groups.",,,,,,,,,,
 Manager / Employee,People & Org,CorpUser,urn:li:corpuser:{ldap_id},Individual human users. Both map to standard users; use title fields for hierarchy.,,,,,,,,,,

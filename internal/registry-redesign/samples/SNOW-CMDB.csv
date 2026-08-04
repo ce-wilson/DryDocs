@@ -1,4 +1,4 @@
-﻿Business Application is software used by business users to perform a business function,,,,,,,,
+Business Application is software used by business users to perform a business function,,,,,,,,
 ,,,,,,,,
 Catalog,Base class,Description,Relationship,Dependent class,Child,Parent,CMDB rel type,Display name
 Company,Company,,,,,,Parent::Child_of,

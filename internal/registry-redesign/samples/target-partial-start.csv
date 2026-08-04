@@ -1,4 +1,4 @@
-﻿Current — Core identity (all 18 entries),,,,,,,,,,
+Current — Core identity (all 18 entries),,,,,,,,,,
 ,,,,,,,,,,
 id,kind,conf,classification,adapter,,orchestrator,,source,feeds_taxonomy,
 controlm-psgmgr,orchestration,yes,Internal,oracle,,bmc-controlm,,oracle:psgmgr.CM_* objects,"folders, jobs, conditions, dependencies, variables, hosts, runtime_stats",
