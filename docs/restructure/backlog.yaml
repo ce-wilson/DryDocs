@@ -2577,7 +2577,7 @@ items:
     agent: main
     model: sonnet
     priority: p2
-    status: todo
+    status: in_progress   # claimed 2026-08-05 (desktop, pushed before work)
     depends_on: [K18]
     inputs: [drydocs_api/mappings.py, drydocs/loaders/folder_attribution.py, config/overrides/app-code-mappings.csv]
     acceptance: >
