@@ -196,8 +196,13 @@ GUARDRAILS (durable — apply to every port):
 
    WHAT IS PRE-FILLED vs WHAT YOU FILL: the subject, the producer gate reference, and
    the six-and-six inventory are FACTS OF THE PRODUCER GATE — verified against
-   `config/gate-log.md` (2026-07-20 entry), `relationship_vocabulary.yaml`, and
-   `config/taxonomy-ontology-map.yaml`, so they are written out. The check RESULTS and
+   `config/gate-log.md` (2026-07-20 entry), the relationship vocabulary, and the
+   taxonomy-ontology map, so they are written out. (Both of those were single YAML
+   FILES when this was written and are fragment DIRECTORIES since S5 / step 81 —
+   `drydocs_core/ontology/relationship_vocabulary/` and
+   `config/taxonomy-ontology-map/`, merged lexically by
+   `drydocs_core/yaml_fragments.py`. The verification still holds; only the shape of
+   what was read changed. Path corrected 2026-08-05.) The check RESULTS and
    the sign-off are yours: they describe what ran against the COMPANY tree, which no
    producer session can know. They are bracketed placeholders, deliberately not
    invented — an entry citing numbers nobody ran is worse than no entry.
@@ -903,8 +908,8 @@ verification status in [BRACKETS]; spend review on [UNRULED].
     (step 68 retention); take the fix and REGENERATE your newest snapshot —
     your current one likely carries ignored names in rels the same way.
 
-83. DDLINEAGE RETIRED — TOPOLOGY 5 -> 4 (X1 ADR amendment + X2 sweep)
-    [LIVE-DB MIGRATION on your side]. Nothing ever wrote or read
+83. DDLINEAGE RETIRED — TOPOLOGY 5 -> 4 (X1 ADR amendment `bb934d0` + X2
+    sweep `b97636c`) [LIVE-DB MIGRATION on your side]. Nothing ever wrote or read
     `ddlineage` (writer pinned to `drydocs` w/ TrustBoundaryError; your
     G30-equivalent spec repoint came in an earlier range) — ADR 0002 now
     carries a dated amendment retiring it; the deployed set is
@@ -1010,7 +1015,8 @@ verification status in [BRACKETS]; spend review on [UNRULED].
     on a default ANSI-codepage console and fails only where the console
     output encoding carries a preamble (`chcp 65001`, where
     `[Console]::OutputEncoding.GetPreamble().Length` is 3). The note is
-    corrected in `provisioning/README.md`. `docker cp` + `-f` sidesteps
+    corrected in `drydocs_core/schema/provisioning/README.md`. `docker cp`
+    + `-f` sidesteps
     console encoding entirely and is what the script does, so the
     RECOMMENDATION is unchanged; only the reason was wrong. A rule
     stated too broadly gets ignored the first time someone watches it
