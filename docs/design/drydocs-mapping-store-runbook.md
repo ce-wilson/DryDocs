@@ -1,7 +1,9 @@
 # Runbook — build, inspect & maintain the mapping store (`var/mapping.db`)
 
 <!-- anchor: front-matter -->
-- **Status:** DESCRIPTIVE — documents the working procedure. **Rev 2, 2026-08-04**
+- **Status:** DESCRIPTIVE — documents the working procedure. **Rev 3, 2026-08-04** (the two source paths were still the pre-S5 MONOLITH
+  files; both are fragment DIRECTORIES now — caught by the currency audit, not by a
+  reader; on top of Rev 2, where)
   (the store stopped being purely derived: S4's `draft` write-ahead buffer means
   DELETING the file can now lose unpromoted work, so the "nothing here can lose data"
   rule gains a stated exception; schema `v1` → `v2`; the table/view inventory catches up
@@ -87,8 +89,8 @@ store connects to nothing.
 Two refresh paths exist; both are safe to run at any time.
 
 - **Implicit (O14, the normal path):** every `drydocs_api` `/mappings/*` read checks
-  `is_current()` and rebuilds on drift — edits to `config/taxonomy-ontology-map.yaml`,
-  `drydocs_core/ontology/relationship_vocabulary.yaml`, `config/manual-loads/`, or
+  `is_current()` and rebuilds on drift — edits to `config/taxonomy-ontology-map/`,
+  `drydocs_core/ontology/relationship_vocabulary/`, `config/manual-loads/`, or
   `config/overrides/seal-contact-overrides.csv` are picked up on the next request with
   no restart and no manual step.
 - **Explicit (this runbook's path):** rerun the build, optionally with the

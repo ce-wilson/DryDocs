@@ -93,7 +93,7 @@ h1, h2, h3, h4, h5, h6, p, table, pre, ul, ol, blockquote { position: relative; 
 <body>
 <main>
 <h1>Runbook — run and operate <code>drydocs-api</code> (the thin read API, ADR 0005)</h1>
-<ul id="front-matter"><span class="dd-margin-tag" aria-hidden="true">front-matter</span><li><strong>Module:</strong> drydocs-api — this runbook IS the module runbook for drydocs-api (V1 coverage rule; V8 ruled AUTHOR-DISTINCT rather than extending the mapping-store runbook, see Purpose &amp; scope).</li><li><strong>Status:</strong> DESCRIPTIVE — documents the working procedure. <strong>Rev 1, 2026-08-04</strong>, authored at commit <code>c28a4d1</code> (post-S4: the draft/promote write surfaces are live and the <code>/mappings/*/draft</code> endpoints return receipts rather than whole files).</li><li><strong>Classification:</strong> Internal-Public (mechanism only — localhost ports, synthetic persona ids already present in committed public code; NO credentials — Neo4j settings live only in the repo-root <code>.env</code>, never here)</li><li><strong>Audience:</strong> anyone running the API — locally for the console or the demo, or operating it as the console&#x27;s backend — and anyone diagnosing a refused request</li><li><strong>Companion:</strong> <code>drydocs_api/README.md</code> (the component&#x27;s own surface list), <code>docs/design/drydocs-mapping-demo-runbook.md</code> (the <code>/demo</code> page this serves), <code>docs/design/drydocs-web-console-runbook.md</code> (the React console that consumes it), <code>docs/design/drydocs-mapping-store-runbook.md</code> (the SQLite store it reads), <code>docs/design/drydocs-startup-refresh-runbook.md</code> (the graph the query routes need)</li></ul>
+<ul id="front-matter"><span class="dd-margin-tag" aria-hidden="true">front-matter</span><li><strong>Module:</strong> drydocs-api — this runbook IS the module runbook for drydocs-api (V1 coverage rule; V8 ruled AUTHOR-DISTINCT rather than extending the mapping-store runbook, see Purpose &amp; scope).</li><li><strong>Status:</strong> DESCRIPTIVE — documents the working procedure. <strong>Rev 2, 2026-08-04</strong>, (Rev 1 same day cited the write-guard oracle as a &quot;test_guard.py&quot; that does not exist — the cases live in <code>tests/unit/test_drydocs_api.py</code>; found by the currency audit that became <code>tests/unit/test_runbook_currency.py</code>) authored at commit <code>c28a4d1</code> (post-S4: the draft/promote write surfaces are live and the <code>/mappings/*/draft</code> endpoints return receipts rather than whole files).</li><li><strong>Classification:</strong> Internal-Public (mechanism only — localhost ports, synthetic persona ids already present in committed public code; NO credentials — Neo4j settings live only in the repo-root <code>.env</code>, never here)</li><li><strong>Audience:</strong> anyone running the API — locally for the console or the demo, or operating it as the console&#x27;s backend — and anyone diagnosing a refused request</li><li><strong>Companion:</strong> <code>drydocs_api/README.md</code> (the component&#x27;s own surface list), <code>docs/design/drydocs-mapping-demo-runbook.md</code> (the <code>/demo</code> page this serves), <code>docs/design/drydocs-web-console-runbook.md</code> (the React console that consumes it), <code>docs/design/drydocs-mapping-store-runbook.md</code> (the SQLite store it reads), <code>docs/design/drydocs-startup-refresh-runbook.md</code> (the graph the query routes need)</li></ul>
 <h2 id="purpose-scope"><span class="dd-margin-tag" aria-hidden="true">purpose-scope</span>Purpose &amp; scope</h2>
 <p><strong>Purpose.</strong> Start <code>drydocs-api</code>, understand which of its surfaces read and which write, and diagnose a refusal. It is the server the web console and the <code>/demo</code> page talk to, and the only component that turns an HTTP request into a graph query.</p>
 <p><strong>Why this is its own document rather than a chapter of another one (V8&#x27;s ruling).</strong> Two existing runbooks touch this component and neither can absorb it:</p>
@@ -128,7 +128,7 @@ curl http://localhost:8001/mappings/domains -H &quot;Authorization: Bearer &lt;t
 <pre><code>CREATE (n:Probe) RETURN n     -&gt;  rejected, never executed</code></pre>
 <p>Three layers enforce it and all three should be present:</p>
 <ul><li><code>drydocs_api/guard.py</code> rejects write clauses (<code>CREATE</code>, <code>MERGE</code>, <code>DELETE</code>, <code>SET</code>, … plus <code>LOAD CSV</code>) by parsing the Cypher, with string and comment regions excluded so a literal cannot smuggle one in;</li><li>the live runner pins <code>neo4j.RoutingControl.READ</code>, so even a guard miss cannot write;</li><li>the graph credentials are server-side and read-only by intent.</li></ul>
-<p>Canonical expected values live in <code>tests/unit/test_guard.py</code> and <code>tests/unit/test_mapping_api.py</code> — the suite is the oracle, and <code>test_no_endpoint_writes_a_tracked_file</code> additionally proves this service writes no file git tracks.</p>
+<p>Canonical expected values live in <code>tests/unit/test_drydocs_api.py</code> (the write-guard cases) and <code>tests/unit/test_mapping_api.py</code> — the suite is the oracle, and <code>test_no_endpoint_writes_a_tracked_file</code> additionally proves this service writes no file git tracks.</p>
 <p><strong>4. Nothing in the API writes a committed file:</strong></p>
 <pre class="powershell"><code>poetry run pytest tests/unit/test_mapping_api.py -q</code></pre>
 <h2 id="rollback"><span class="dd-margin-tag" aria-hidden="true">rollback</span>Rollback</h2>
@@ -151,16 +151,16 @@ curl http://localhost:8001/mappings/domains -H &quot;Authorization: Bearer &lt;t
 <ol>
 <li>Click the <strong>✎</strong> button beside any section (or numbered step) and type your note — notes save in your browser as you type.</li>
 <li>When finished, click <strong>Copy feedback</strong> in the bottom-right toolbar. Your notes are copied as anchor-keyed YAML.</li>
-<li>Create the feedback file (it is YAML, <em>not</em> markdown) — <strong>Copy To:</strong> <code>docs/design/feedback/</code> · <strong>File Name:</strong> <code>drydocs-api-runbook-rev1.yaml</code></li>
+<li>Create the feedback file (it is YAML, <em>not</em> markdown) — <strong>Copy To:</strong> <code>docs/design/feedback/</code> · <strong>File Name:</strong> <code>drydocs-api-runbook-rev2.yaml</code></li>
 <li>Paste the copied block into that file, save, and commit (or send the file back to the team).</li>
 </ol>
 </section>
 </main>
-<footer class="dd-print-footer">Rev 1 · commit c28a4d1</footer>
+<footer class="dd-print-footer">Rev 2 · commit c28a4d1</footer>
 <script>
 
 (function(){
-  var DOC="drydocs-api-runbook", FILE="drydocs-api-runbook-rev1.yaml", DIR="docs/design/feedback/", KEY="drydocs-doc-feedback:"+DOC;
+  var DOC="drydocs-api-runbook", FILE="drydocs-api-runbook-rev2.yaml", DIR="docs/design/feedback/", KEY="drydocs-doc-feedback:"+DOC;
   function load(){ try{return JSON.parse(localStorage.getItem(KEY)||"{}");}catch(e){return {};} }
   function save(){ localStorage.setItem(KEY, JSON.stringify(state)); }
   var state=load(), badge;

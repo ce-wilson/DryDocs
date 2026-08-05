@@ -1,7 +1,8 @@
 # Runbook — start the mapping-store demo site (O13 `/demo`)
 
 <!-- anchor: front-matter -->
-- **Status:** DESCRIPTIVE — documents the working procedure. **Rev 2, 2026-07-21**
+- **Status:** DESCRIPTIVE — documents the working procedure. **Rev 3, 2026-08-04** (S5: the ontology-map source is a fragment DIRECTORY, not a
+  monolith file — currency audit; on top of Rev 2, 2026-07-21)
   (L14 refit onto `runbook.outline.yaml`; relocated from `docs/runbook-mapping-demo.md`
   to `docs/design/` — the D6 either/or decided at execution: this doc now validates and
   renders through the Epic L pipeline. Content reflects the post-O24 five-domain state.)
@@ -67,7 +68,7 @@ Stop with `Ctrl+C` in the terminal.
 
 The store is self-refreshing: it builds itself when absent **and rebuilds itself when
 the committed sources drift** (source-hash check on every read — the O14 guard), so
-edits to `config/taxonomy-ontology-map.yaml`, `config/manual-loads/`, or
+edits to `config/taxonomy-ontology-map/`, `config/manual-loads/`, or
 `config/overrides/seal-contact-overrides.csv` are picked up on the next request
 without a restart. Explicit builds remain available (e.g. for the CSV dumps):
 

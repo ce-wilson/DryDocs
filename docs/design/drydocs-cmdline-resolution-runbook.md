@@ -1,6 +1,9 @@
 # Runbook — CMD_LINE staging, resolution & parse (the G39→G48→G40 chain)
 
 <!-- anchor: front-matter -->
+- **Rev note, 2026-08-04:** the resolver path was pre-relocate
+  (`drydocs_core/controlm/`); it lives under `drydocs_core/orchestration/controlm/`.
+  Found by the currency audit.
 - **Status:** DESCRIPTIVE — documents the working procedure. **Rev 1, 2026-07-29**
   (reflects commit `ba6b83b`: the G48 build that completed the chain — store schema
   v3, `resolution_quality` provenance, the `resolve-cmdline-staging` verb)
@@ -11,7 +14,7 @@
   parseable, structured job detail — producer-side with synthetic data, or
   company-side against the real graph + XML exports
 - **Companion:** `drydocs/cmdline_staging.py` (the store + all three steps),
-  `drydocs_core/controlm/resolver.py` (the ONE resolver, G46),
+  `drydocs_core/orchestration/controlm/resolver.py` (the ONE resolver, G46),
   `drydocs_lineage/extractors/controlm_xml.py` (the XML seam, G47),
   `config/gate-prompts/rua-load-shapes.yaml` (G22 — the terminus any load waits on)
 

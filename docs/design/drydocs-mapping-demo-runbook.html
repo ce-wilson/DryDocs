@@ -93,7 +93,7 @@ h1, h2, h3, h4, h5, h6, p, table, pre, ul, ol, blockquote { position: relative; 
 <body>
 <main>
 <h1>Runbook — start the mapping-store demo site (O13 <code>/demo</code>)</h1>
-<ul id="front-matter"><span class="dd-margin-tag" aria-hidden="true">front-matter</span><li><strong>Status:</strong> DESCRIPTIVE — documents the working procedure. <strong>Rev 2, 2026-07-21</strong> (L14 refit onto <code>runbook.outline.yaml</code>; relocated from <code>docs/runbook-mapping-demo.md</code> to <code>docs/design/</code> — the D6 either/or decided at execution: this doc now validates and renders through the Epic L pipeline. Content reflects the post-O24 five-domain state.)</li><li><strong>Classification:</strong> Internal-Public (mechanism only — localhost ports and the three synthetic demo personas; no credentials, no company values)</li><li><strong>Audience:</strong> anyone demoing the mapping-stewardship flow without a graph, or developing against the <code>/mappings/*</code> API offline</li><li><strong>Companion:</strong> <code>docs/design/drydocs-web-console-runbook.md</code> (the full React console — this demo page is its single-page predecessor), <code>docs/design/drydocs-startup-refresh-runbook.md</code> (the graph-backed startup this one deliberately avoids needing), <code>UI-WIP/wf-mapping-01.html</code> (the wireframe this demo is the live-data twin of)</li></ul>
+<ul id="front-matter"><span class="dd-margin-tag" aria-hidden="true">front-matter</span><li><strong>Status:</strong> DESCRIPTIVE — documents the working procedure. <strong>Rev 3, 2026-08-04</strong> (S5: the ontology-map source is a fragment DIRECTORY, not a monolith file — currency audit; on top of Rev 2, 2026-07-21) (L14 refit onto <code>runbook.outline.yaml</code>; relocated from <code>docs/runbook-mapping-demo.md</code> to <code>docs/design/</code> — the D6 either/or decided at execution: this doc now validates and renders through the Epic L pipeline. Content reflects the post-O24 five-domain state.)</li><li><strong>Classification:</strong> Internal-Public (mechanism only — localhost ports and the three synthetic demo personas; no credentials, no company values)</li><li><strong>Audience:</strong> anyone demoing the mapping-stewardship flow without a graph, or developing against the <code>/mappings/*</code> API offline</li><li><strong>Companion:</strong> <code>docs/design/drydocs-web-console-runbook.md</code> (the full React console — this demo page is its single-page predecessor), <code>docs/design/drydocs-startup-refresh-runbook.md</code> (the graph-backed startup this one deliberately avoids needing), <code>UI-WIP/wf-mapping-01.html</code> (the wireframe this demo is the live-data twin of)</li></ul>
 <h2 id="purpose-scope"><span class="dd-margin-tag" aria-hidden="true">purpose-scope</span>Purpose &amp; scope</h2>
 <p><strong>Purpose.</strong> Bring up the single-page mapping-stewardship demo: a FastAPI server (<code>drydocs_api</code>) serving <code>/demo</code>, backed by the SQLite mapping-store materialization (<code>var/mapping.db</code>). <strong>Neo4j is NOT required</strong> — the graph driver is lazy and only <code>/query/*</code> / <code>/raw-cypher</code> touch it; every <code>/mappings/*</code> endpoint reads the SQLite store, which auto-builds from the committed YAML/CSV sources on first use.</p>
 <p><strong>In scope.</strong> The <code>/demo</code> page and the <code>/mappings/*</code> API it exercises, offline.</p>
@@ -108,7 +108,7 @@ poetry install --with api      # fastapi + uvicorn are an optional dependency gr
 <p><em>Success:</em> logged in as <code>kchen2190</code>, the domain strip renders (see Verify).</p>
 <p>Stop with <code>Ctrl+C</code> in the terminal.</p>
 <h2 id="refresh-ingest"><span class="dd-margin-tag" aria-hidden="true">refresh-ingest</span>Refresh / ingest</h2>
-<p>The store is self-refreshing: it builds itself when absent <strong>and rebuilds itself when the committed sources drift</strong> (source-hash check on every read — the O14 guard), so edits to <code>config/taxonomy-ontology-map.yaml</code>, <code>config/manual-loads/</code>, or <code>config/overrides/seal-contact-overrides.csv</code> are picked up on the next request without a restart. Explicit builds remain available (e.g. for the CSV dumps):</p>
+<p>The store is self-refreshing: it builds itself when absent <strong>and rebuilds itself when the committed sources drift</strong> (source-hash check on every read — the O14 guard), so edits to <code>config/taxonomy-ontology-map/</code>, <code>config/manual-loads/</code>, or <code>config/overrides/seal-contact-overrides.csv</code> are picked up on the next request without a restart. Explicit builds remain available (e.g. for the CSV dumps):</p>
 <pre class="powershell"><code>poetry run python scripts/build_mapping_db.py                       # writes var/mapping.db
 poetry run python scripts/build_mapping_db.py --dump-dir var/dumps  # + gate-reviewable CSVs</code></pre>
 <p><code>var/mapping.db</code> is DERIVED — never commit it; the committed YAML/CSV sources are truth.</p>
@@ -129,16 +129,16 @@ poetry run python scripts/build_mapping_db.py --dump-dir var/dumps  # + gate-rev
 <ol>
 <li>Click the <strong>✎</strong> button beside any section (or numbered step) and type your note — notes save in your browser as you type.</li>
 <li>When finished, click <strong>Copy feedback</strong> in the bottom-right toolbar. Your notes are copied as anchor-keyed YAML.</li>
-<li>Create the feedback file (it is YAML, <em>not</em> markdown) — <strong>Copy To:</strong> <code>docs/design/feedback/</code> · <strong>File Name:</strong> <code>drydocs-mapping-demo-runbook-rev2.yaml</code></li>
+<li>Create the feedback file (it is YAML, <em>not</em> markdown) — <strong>Copy To:</strong> <code>docs/design/feedback/</code> · <strong>File Name:</strong> <code>drydocs-mapping-demo-runbook-rev3.yaml</code></li>
 <li>Paste the copied block into that file, save, and commit (or send the file back to the team).</li>
 </ol>
 </section>
 </main>
-<footer class="dd-print-footer">Rev 2 · commit —</footer>
+<footer class="dd-print-footer">Rev 3 · commit —</footer>
 <script>
 
 (function(){
-  var DOC="drydocs-mapping-demo-runbook", FILE="drydocs-mapping-demo-runbook-rev2.yaml", DIR="docs/design/feedback/", KEY="drydocs-doc-feedback:"+DOC;
+  var DOC="drydocs-mapping-demo-runbook", FILE="drydocs-mapping-demo-runbook-rev3.yaml", DIR="docs/design/feedback/", KEY="drydocs-doc-feedback:"+DOC;
   function load(){ try{return JSON.parse(localStorage.getItem(KEY)||"{}");}catch(e){return {};} }
   function save(){ localStorage.setItem(KEY, JSON.stringify(state)); }
   var state=load(), badge;

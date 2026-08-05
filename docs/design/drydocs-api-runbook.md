@@ -4,7 +4,10 @@
 - **Module:** drydocs-api — this runbook IS the module runbook for drydocs-api
   (V1 coverage rule; V8 ruled AUTHOR-DISTINCT rather than extending the mapping-store
   runbook, see Purpose & scope).
-- **Status:** DESCRIPTIVE — documents the working procedure. **Rev 1, 2026-08-04**,
+- **Status:** DESCRIPTIVE — documents the working procedure. **Rev 2, 2026-08-04**, (Rev 1 same day cited the write-guard oracle as
+  a "test_guard.py" that does not exist — the cases live in
+  `tests/unit/test_drydocs_api.py`; found by the currency audit that became
+  `tests/unit/test_runbook_currency.py`)
   authored at commit `c28a4d1` (post-S4: the draft/promote write surfaces are live and
   the `/mappings/*/draft` endpoints return receipts rather than whole files).
 - **Classification:** Internal-Public (mechanism only — localhost ports, synthetic
@@ -160,7 +163,7 @@ Three layers enforce it and all three should be present:
 - the live runner pins `neo4j.RoutingControl.READ`, so even a guard miss cannot write;
 - the graph credentials are server-side and read-only by intent.
 
-Canonical expected values live in `tests/unit/test_guard.py` and
+Canonical expected values live in `tests/unit/test_drydocs_api.py` (the write-guard cases) and
 `tests/unit/test_mapping_api.py` — the suite is the oracle, and
 `test_no_endpoint_writes_a_tracked_file` additionally proves this service writes no file
 git tracks.
