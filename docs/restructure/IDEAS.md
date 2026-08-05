@@ -26,6 +26,17 @@ Tags help grooming: `idea` · `bug` · `doc` · `source` (new data source) · `q
 
 <!-- add new ideas at the top -->
 
+- 2026-08-05 — [bug] **`meta.depgraph.dirty` conflates "untracked files present" with "the
+  instrument differs from its pin".** The 20260805 snapshot records `depgraph.commit:
+  773fb1e, dirty: true` — but the sibling is at EXACTLY the pin, and the dirt is three
+  untracked paths (`.claude/`, two screenshots), no modified tracked source. A reader of
+  that header reasonably concludes the snapshot was produced by modified instrument code,
+  which would make it unusable for comparison. Fix is small: compute the flag from tracked
+  changes only (`git status --porcelain --untracked-files=no`), or split it into
+  `dirty_tracked` / `untracked_present`. Third finding in the instrument-provenance class
+  (see the two inboxed 2026-08-04), which is starting to argue for one grooming pass over
+  the whole `meta` header rather than another point fix.
+
 - 2026-08-05 — [bug] **The company side cannot fetch the producer, and has been answering
   from a cached ref without knowing it was one.** A company session reported "producer repo
   not reachable — private or removed" and fell back to `cewilson/main @ 5f79d145`. The repo

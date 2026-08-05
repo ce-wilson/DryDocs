@@ -1,16 +1,16 @@
 {
   "meta": {
     "project": "drydocs",
-    "captured_at": "2026-08-04T19:34:06",
-    "date": "20260804",
+    "captured_at": "2026-08-05T00:48:20",
+    "date": "20260805",
     "scan": "DryDocs",
     "tree": true,
     "git": {
-      "commit": "937755a",
-      "full": "937755aafa722f9b549b92a5ba0c8d912016fac7",
+      "commit": "940b651",
+      "full": "940b651354234e8c6264ccd63861c87ded611690",
       "branch": "main",
-      "describe": "937755a",
-      "subject": "chore(ideas): inbox the two company-side findings from the live provisioning session",
+      "describe": "940b651",
+      "subject": "docs(port): roll the ledger - two unrecorded ports, steps 84-90, and a broken fetch",
       "dirty": false,
       "pr": null
     },
@@ -7448,6 +7448,24 @@
       "kind": "file"
     },
     {
+      "file_id": "drydocs/docs/design/drydocs-api-runbook.html",
+      "name": "drydocs-api-runbook.html",
+      "extension": ".html",
+      "rel_path": "docs/design/drydocs-api-runbook.html",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/docs/design/drydocs-api-runbook.md",
+      "name": "drydocs-api-runbook.md",
+      "extension": ".md",
+      "rel_path": "docs/design/drydocs-api-runbook.md",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
       "file_id": "drydocs/docs/design/drydocs-cmdline-resolution-runbook.html",
       "name": "drydocs-cmdline-resolution-runbook.html",
       "extension": ".html",
@@ -7466,6 +7484,24 @@
       "kind": "file"
     },
     {
+      "file_id": "drydocs/docs/design/drydocs-core-runbook.html",
+      "name": "drydocs-core-runbook.html",
+      "extension": ".html",
+      "rel_path": "docs/design/drydocs-core-runbook.html",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/docs/design/drydocs-core-runbook.md",
+      "name": "drydocs-core-runbook.md",
+      "extension": ".md",
+      "rel_path": "docs/design/drydocs-core-runbook.md",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
       "file_id": "drydocs/docs/design/drydocs-lineage-mac-runbook.html",
       "name": "drydocs-lineage-mac-runbook.html",
       "extension": ".html",
@@ -7479,6 +7515,24 @@
       "name": "drydocs-lineage-mac-runbook.md",
       "extension": ".md",
       "rel_path": "docs/design/drydocs-lineage-mac-runbook.md",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/docs/design/drydocs-load-runbook.html",
+      "name": "drydocs-load-runbook.html",
+      "extension": ".html",
+      "rel_path": "docs/design/drydocs-load-runbook.html",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/docs/design/drydocs-load-runbook.md",
+      "name": "drydocs-load-runbook.md",
+      "extension": ".md",
+      "rel_path": "docs/design/drydocs-load-runbook.md",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -12695,10 +12749,10 @@
       "kind": "file"
     },
     {
-      "file_id": "drydocs/knowledge/depgraph-snapshots/drydocs-20260804.json",
-      "name": "drydocs-20260804.json",
+      "file_id": "drydocs/knowledge/depgraph-snapshots/drydocs-20260804-1933.json",
+      "name": "drydocs-20260804-1933.json",
       "extension": ".json",
-      "rel_path": "knowledge/depgraph-snapshots/drydocs-20260804.json",
+      "rel_path": "knowledge/depgraph-snapshots/drydocs-20260804-1933.json",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -14162,6 +14216,15 @@
       "kind": "file"
     },
     {
+      "file_id": "drydocs/tests/unit/test_load_sequence_surfaces.py",
+      "name": "test_load_sequence_surfaces.py",
+      "extension": ".py",
+      "rel_path": "tests/unit/test_load_sequence_surfaces.py",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
       "file_id": "drydocs/tests/unit/test_loader_run_log.py",
       "name": "test_loader_run_log.py",
       "extension": ".py",
@@ -14436,6 +14499,15 @@
       "name": "test_runbook_coverage.py",
       "extension": ".py",
       "rel_path": "tests/unit/test_runbook_coverage.py",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/tests/unit/test_runbook_currency.py",
+      "name": "test_runbook_currency.py",
+      "extension": ".py",
+      "rel_path": "tests/unit/test_runbook_currency.py",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -17672,6 +17744,14 @@
       "drydocs/tests/unit/test_load_map_declarations.py"
     ],
     [
+      "drydocs/tests/unit/test_load_sequence_surfaces.py",
+      "drydocs/drydocs/__init__.py"
+    ],
+    [
+      "drydocs/tests/unit/test_load_sequence_surfaces.py",
+      "drydocs/drydocs/cli.py"
+    ],
+    [
       "drydocs/tests/unit/test_loader_run_log.py",
       "drydocs/drydocs/loaders/base.py"
     ],
@@ -17910,6 +17990,14 @@
     [
       "drydocs/tests/unit/test_row_checksum.py",
       "drydocs/drydocs_core/models/__init__.py"
+    ],
+    [
+      "drydocs/tests/unit/test_runbook_currency.py",
+      "drydocs/drydocs/__init__.py"
+    ],
+    [
+      "drydocs/tests/unit/test_runbook_currency.py",
+      "drydocs/drydocs/cli.py"
     ],
     [
       "drydocs/tests/unit/test_runs_on_resolution.py",
@@ -22419,6 +22507,16 @@
     [
       "drydocs/docs/design",
       "CONTAINS",
+      "drydocs/docs/design/drydocs-api-runbook.html"
+    ],
+    [
+      "drydocs/docs/design",
+      "CONTAINS",
+      "drydocs/docs/design/drydocs-api-runbook.md"
+    ],
+    [
+      "drydocs/docs/design",
+      "CONTAINS",
       "drydocs/docs/design/drydocs-cmdline-resolution-runbook.html"
     ],
     [
@@ -22429,12 +22527,32 @@
     [
       "drydocs/docs/design",
       "CONTAINS",
+      "drydocs/docs/design/drydocs-core-runbook.html"
+    ],
+    [
+      "drydocs/docs/design",
+      "CONTAINS",
+      "drydocs/docs/design/drydocs-core-runbook.md"
+    ],
+    [
+      "drydocs/docs/design",
+      "CONTAINS",
       "drydocs/docs/design/drydocs-lineage-mac-runbook.html"
     ],
     [
       "drydocs/docs/design",
       "CONTAINS",
       "drydocs/docs/design/drydocs-lineage-mac-runbook.md"
+    ],
+    [
+      "drydocs/docs/design",
+      "CONTAINS",
+      "drydocs/docs/design/drydocs-load-runbook.html"
+    ],
+    [
+      "drydocs/docs/design",
+      "CONTAINS",
+      "drydocs/docs/design/drydocs-load-runbook.md"
     ],
     [
       "drydocs/docs/design",
@@ -25219,7 +25337,7 @@
     [
       "drydocs/knowledge/depgraph-snapshots",
       "CONTAINS",
-      "drydocs/knowledge/depgraph-snapshots/drydocs-20260804.json"
+      "drydocs/knowledge/depgraph-snapshots/drydocs-20260804-1933.json"
     ],
     [
       "drydocs/knowledge/depgraph-snapshots",
@@ -25969,6 +26087,11 @@
     [
       "drydocs/tests/unit",
       "CONTAINS",
+      "drydocs/tests/unit/test_load_sequence_surfaces.py"
+    ],
+    [
+      "drydocs/tests/unit",
+      "CONTAINS",
       "drydocs/tests/unit/test_loader_run_log.py"
     ],
     [
@@ -26120,6 +26243,11 @@
       "drydocs/tests/unit",
       "CONTAINS",
       "drydocs/tests/unit/test_runbook_coverage.py"
+    ],
+    [
+      "drydocs/tests/unit",
+      "CONTAINS",
+      "drydocs/tests/unit/test_runbook_currency.py"
     ],
     [
       "drydocs/tests/unit",
@@ -26986,13 +27114,13 @@
     "projects": [
       "drydocs"
     ],
-    "files": 1514,
-    "edges": 528,
+    "files": 1522,
+    "edges": 532,
     "circular_files": 0,
     "processes": 0,
     "data_assets": 0,
     "hosts": 0,
-    "rels": 1773,
+    "rels": 1781,
     "directories": 260
   }
 }
