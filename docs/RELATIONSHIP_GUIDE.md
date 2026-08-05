@@ -150,6 +150,63 @@ exactly one hop longer than either half-edge alone.
 
 ---
 
+## The field-meaning rule — ownership, routing, and attribution (J32)
+
+> **Status: standing rule, recorded 2026-08-05 (backlog J32).** Like the join-restatement
+> rule above, this is a **methodology** rule for reading source fields, not a new
+> relationship type: no vocabulary entry, no map entry, no loader change. Read it before
+> ingesting ANY source field that contains a SEAL id.
+
+### The rule
+
+Ownership, routing, and attribution are three different facts, and all three serialize as
+the same thing: a SEAL id in a column. **A SEAL id in a field is not an attribution claim
+unless that field's job is to attribute.** The graph has exactly ONE place where
+attribution is authored — the confirmed app-code mapping
+(`config/overrides/app-code-mappings.csv` through the K8 folder-attribution loader, gate
+`seal-app-ref-edge-reshape`). Every other SEAL-bearing field is loaded as what it is —
+a registration, a routing instruction, a corroborating signal — and never collapsed into
+a `BELONGS_TO_APPLICATION` edge.
+
+### The test for any new source
+
+Ask what the field's **job** is, not what it **contains**. "This column holds a SEAL id"
+tells you the serialization; only "this column exists so that X" tells you the fact. If X
+is not "to state which application owns this work," the field does not author attribution
+— model it as its own fact or leave it as evidence for the steward queue.
+
+### The three observed instances (evidence, not hypotheticals)
+
+1. **Registration is not work** (`config/gate-prompts/fid-identity-and-scope.yaml` §G,
+   the live counterexample): a run-as account whose name encodes a platform is
+   REGISTERED in the directory to the platform's application, while the jobs executing
+   as it are ATTRIBUTED elsewhere by the confirmed mapping. §G confirms the account edge
+   asserts registration only (`assignment_kind: 'registration'`), forbids any transitive
+   read onto jobs (§G2), and treats the disagreement as a first-class finding (§G4) —
+   visible only because both facts were loaded uncollapsed.
+2. **Routing is not ownership, twice over** (`external/orchestration/autosys/README.md`):
+   an AutoSys failure alert carries TWO SEAL ids as escalation routing
+   (`SEAL=<a>_<b>` in the incident payload). Ingested naively as attribution, that
+   manufactures a job belonging to two applications — the exact defect the 1:1
+   OWNER-NOT-USER ruling forbids.
+3. **The Control-M escalation DB routes by SEAL for the same reason**
+   (`cm_escalation_db`, `ECOMPONENT = 'SEAL'`): it exists to route an incident to a
+   support queue. Its SEAL is a corroborating fallback in the resolution hierarchy
+   (folder variable first — see the remediation standards-rules registry), never a
+   primary ownership source.
+
+### Related, deliberately separate
+
+The "norm, not an invariant" rule in
+[`knowledge/standards/technology/folder-naming-convention.md`](../knowledge/standards/technology/folder-naming-convention.md)
+(the five cross-system joins that are *usually* right) is about a join's
+**reliability** — corroborate, count the residual, route disagreements to a human. This
+rule is about a field's **meaning**. A field can pass the reliability test and still fail
+this one: an escalation row's SEAL can be 100% accurate as routing and still be wrong as
+attribution. Apply both, in that order — meaning first, then reliability.
+
+---
+
 ## Creating a new relationship — 8-step checklist
 
 Work top to bottom. Each step has exactly one file to touch.

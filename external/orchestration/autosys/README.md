@@ -44,10 +44,12 @@ Two traps in that registry, to be handled before any load and NOT discovered at 
   a free-text `info` column alongside a date, not in a status field. Parsing prose into
   status is a gate decision, not a loader convenience.
 
-Third instance of the standing rule (see `fid-identity-and-scope` §G): **a SEAL id appearing
-in a field is not an attribution claim unless that field's job is to attribute.** An AutoSys
-failure alert can carry two SEAL ids as escalation *routing*; ingesting that as attribution
-would manufacture a job belonging to two applications.
+Third instance of the standing field-meaning rule (written down in
+`docs/RELATIONSHIP_GUIDE.md` § "The field-meaning rule", J32; the first instance is
+`fid-identity-and-scope` §G): **a SEAL id appearing in a field is not an attribution claim
+unless that field's job is to attribute.** An AutoSys failure alert can carry two SEAL ids
+as escalation *routing*; ingesting that as attribution would manufacture a job belonging
+to two applications.
 
 ## To activate
 1. Add `SOURCE-MANIFEST.md` (where AutoSys defs come from, version).
