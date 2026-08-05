@@ -26,10 +26,7 @@ the CODE wins on disagreement. A pointer cannot go stale; only a copy can.
 from __future__ import annotations
 
 import re
-import subprocess
 from pathlib import Path
-
-import pytest
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
 DESIGN_DIR = REPO_ROOT / "docs" / "design"
@@ -60,12 +57,32 @@ def _runbooks() -> dict[str, str]:
 
 
 def _cli_verbs() -> set[str]:
-    out = subprocess.run(
-        ["poetry", "run", "drydocs", "--help"], capture_output=True, text=True, cwd=REPO_ROOT
-    )
-    if out.returncode != 0:
-        pytest.skip("drydocs CLI unavailable")
-    return set(re.findall(r"^\|?\s*([a-z][a-z0-9-]+)\s", out.stdout, re.M))
+    """The registered command names, read from Typer rather than from `--help`.
+
+    THIS USED TO SHELL OUT AND PARSE THE RENDERED HELP, and on 2026-08-04 — the
+    first run on the laptop after it was written — that failed twice over, both
+    times on the ENVIRONMENT rather than on the thing under test:
+
+    * ``subprocess.run(..., text=True)`` decodes with the locale codec. Under
+      cp1252 the box character ``┐`` (UTF-8 ``E2 94 90``) is undecodable, the
+      reader thread raised, and ``stdout`` came back ``None``.
+    * the command rows begin with the box char ``│``, not ``|``, so the pattern
+      matched nothing — and an empty verb set makes EVERY documented verb look
+      unregistered, i.e. the guard fails loudly for a reason that has nothing to
+      do with runbooks.
+
+    A tightened regex was measured against the real set and did agree exactly
+    (37/37, no false positives). It was still the wrong fix: it buys correctness
+    today at the price of a dependency on how rich draws a table. ``app.registered_commands``
+    is the same answer with nothing to parse. Same source the sibling N3 guard
+    uses (tests/unit/test_load_map_declarations.py).
+    """
+    from drydocs import cli
+
+    return {
+        info.name or info.callback.__name__.replace("_", "-")
+        for info in cli.app.registered_commands
+    }
 
 
 def test_every_path_a_runbook_names_exists() -> None:

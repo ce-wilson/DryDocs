@@ -1,8 +1,11 @@
 # Runbook — DryDocs local startup & refresh (EE container + sample ingest)
 
 <!-- anchor: front-matter -->
-- **Status:** DESCRIPTIVE — documents the working procedure. **Rev 9, 2026-08-04**
-  (`ddlineage` retired — ADR 0002 X1 amendment: the topology enumerations drop to four
+- **Status:** DESCRIPTIVE — documents the working procedure. **Rev 10, 2026-08-04**
+  (Appendix B is now a PROFILE of the one declared load sequence, not a copy of it —
+  it gains the standing `docs-verify` step it had been missing and a guard now fails
+  if it drifts again (N6); on top of
+  Rev 9, same day, where `ddlineage` retired — ADR 0002 X1 amendment: the topology enumerations drop to four
   names (drydocs, ddcontext, ddschema, ddall) and a host still carrying the fifth
   drops it per Epic X; on top of Rev 8, same day, where
   the rollback promise retires on the laptop — the copy it pointed at no longer
@@ -29,6 +32,33 @@
   `internal/helpmeloginlocalneo4j.md` (login/port troubleshooting evidence),
   `.claude/skills/run-drydocs/SKILL.md` (agent-facing run notes)
 
+> **What changed in Rev 10 (2026-08-04) — Appendix B stops being a second load
+> sequence.** This runbook and `scripts/ingest.sh` each carried their own copy of the
+> load order, and the two disagreed: the script ran seven steps, Appendix B ran twelve,
+> and nothing anywhere said whether that gap was a decision or an oversight. That
+> ambiguity was the real defect — a deliberate subset and a forgotten step look identical
+> from the outside — so N6 ruled it rather than just reconciling the counts.
+>
+> The ruling: the script's shorter list is **deliberate**. A scheduled Control-M ingest is
+> not a full refresh, and the four steps it skips each have a reason now recorded in code
+> (`cli.SCHEDULED_INGEST_EXCLUSIONS`) — `refresh-reference` is a weekly chain on a
+> different cadence, `load-software-registry` and `load-bmc-docs` are repo-triggered
+> corpora that change when the repo does rather than when the estate does, and
+> `docs-verify` would fail that path by design, since it loads no doc corpora.
+>
+> Appendix B's omission was **not** deliberate: `docs-verify` is a standing step and a cold
+> start is exactly when the doc corpora get loaded, so it is now the last line of the
+> block. Mechanically, both surfaces became *profiles* of the single declaration in
+> `drydocs/cli.py`. `ingest.sh` reads its profile at run time and has no list left to
+> drift; Appendix B is prose and cannot read anything, so
+> `tests/unit/test_load_sequence_surfaces.py` holds it to the same answer and fails on the
+> next divergence — including the one that started this, a step present in both operator
+> surfaces and missing from the declaration.
+>
+> One consequence worth stating for the reader of the block itself: Appendix B is no longer
+> free-form. Editing it now means editing the declaration, and a step added here alone will
+> fail the suite.
+>
 > **What changed in Rev 8 (2026-08-04) — the rollback copy the doc promised no longer
 > exists on the laptop.** Appendix A told every reader that `neo4j-drydocs-ee` was "kept
 > stopped as a rollback copy." On the laptop the container had already been removed, and
@@ -243,10 +273,16 @@ samples; the Oracle variant is the same chain with scope binds.
    `:Component`/`:TestCase`, and `docs/design/feedback/*.yaml` → `:FeedbackNote`. It
    shipped after Rev 2 was signed and was never added here, so a rebuilt container had
    no doc graph until someone remembered the verb.
-4. **One-shot alternative:** `scripts/ingest.sh [args…]` runs check → bootstrap →
-   bootstrap-schema-graph → supplements → ingest-controlm → m1/m3-verify in order and
-   fails fast; arguments are forwarded to the `ingest-controlm` step. Deliberately the
-   same sequence as Appendix B — if the two ever differ, one of them is wrong.
+4. **One-shot alternative:** `scripts/ingest.sh [args…]` runs the **`scheduled-ingest`
+   profile** and fails fast; arguments are forwarded to the `ingest-controlm` step. That
+   profile is a deliberate SUBSET of Appendix B's `cold-start` profile — it skips the
+   weekly reference chain, the two repo-triggered corpora, and `docs-verify`, each for a
+   reason recorded in `cli.SCHEDULED_INGEST_EXCLUSIONS` (N6). The script reads the
+   declaration at run time rather than listing steps, so it cannot drift; to see what it
+   will do without running it:
+   ```powershell
+   poetry run python -c "from drydocs.cli import load_profile; print(*[s.command for s in load_profile('scheduled-ingest')], sep='\n')"
+   ```
 5. **Derived artifacts** (the session ritual — renders are deterministic, so a clean
    tree stays clean):
    ```powershell
@@ -351,7 +387,10 @@ still hold its own stopped copy; G50 is open there. Wherever two Neo4j container
 `docker port` is the only way to tell which one `.env` is talking to.
 
 **B. The full cold-start command sequence,** in one block (each step's success check is
-in the sections above):
+in the sections above). This is the **`cold-start` profile** of
+`cli.CANONICAL_LOAD_SEQUENCE` — not an independent list. `tests/unit/test_load_sequence_surfaces.py`
+compares this block against the declaration and fails on any difference, so a step added
+or removed here alone breaks the suite (N6, Rev 10):
 
 ```powershell
 docker start neo4jtest
@@ -366,9 +405,21 @@ poetry run drydocs load-bmc-docs
 poetry run drydocs load-doc-traceability
 poetry run drydocs m1-verify
 poetry run drydocs m3-verify
+poetry run drydocs docs-verify
 ```
 
-The three per-file supplement verbs this block used to list are gone on purpose: they
-covered `base`/`seal`/`catalog` and silently omitted `registry`, so
-`load-software-registry` two lines down was MATCHing terms nothing had seeded.
-`apply-supplements` is the whole chain and verifies it landed (Rev 5).
+Re-derive it rather than trusting this copy — the declaration wins on any disagreement:
+
+```powershell
+poetry run python -c "from drydocs.cli import load_profile; print(*[s.command for s in load_profile('cold-start')], sep='\n')"
+```
+
+Two absences here are decisions, not gaps. The three per-file supplement verbs this block
+used to list are gone on purpose: they covered `base`/`seal`/`catalog` and silently omitted
+`registry`, so `load-software-registry` two lines down was MATCHing terms nothing had
+seeded — `apply-supplements` is the whole chain and verifies it landed (Rev 5). And the
+`optional`/`gated` steps of the sequence (`load-batch-orchestrators`, `load-vendor-docs`,
+`load-essential-graphrag`, `load-code-snapshot`, `load-folder-attribution`) are not part of
+a cold start; run them from the Refresh section when you want them. `load-doc-traceability`
+is the one `optional` step that IS here, because a cold start is precisely when the doc
+graph is empty.

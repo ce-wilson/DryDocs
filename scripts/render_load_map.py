@@ -206,12 +206,15 @@ def build_load_map() -> dict:
 
     sequence = [
         {
-            "command": command,
-            "mode": mode,
-            "note": note,
-            "loaders": [cls.name for cls in cli.COMMAND_LOADERS.get(command, ())],
+            "command": step.command,
+            "mode": step.mode,
+            # N6: which operator surfaces run this step. Sorted so the render is
+            # deterministic — the declaration holds an unordered frozenset.
+            "profiles": sorted(step.profiles),
+            "note": step.note,
+            "loaders": [cls.name for cls in cli.COMMAND_LOADERS.get(step.command, ())],
         }
-        for command, mode, note in cli.CANONICAL_LOAD_SEQUENCE
+        for step in cli.CANONICAL_LOAD_SEQUENCE
     ]
 
     sourceless = [
@@ -323,18 +326,31 @@ def build_load_map_html(data: dict) -> str:
     # -- the canonical sequence -----------------------------------------------
     add("<h2>Canonical load sequence</h2>")
     add(
-        '<p class="sub">Declared ONCE in drydocs/cli.py (CANONICAL_LOAD_SEQUENCE); '
-        "ingest.sh and the startup/refresh runbook derive from it (N6).</p>"
+        '<p class="sub">Declared ONCE in drydocs/cli.py (CANONICAL_LOAD_SEQUENCE). '
+        "<b>runs in</b> names the operator surfaces that run each step (N6): "
+        "<code>scheduled-ingest</code> is <code>scripts/ingest.sh</code>, which reads "
+        "the declaration at run time; <code>cold-start</code> is Appendix B of the "
+        "startup/refresh runbook, held to it by test_load_sequence_surfaces.py. A "
+        "standing step outside <code>scheduled-ingest</code> is a ruled omission with a "
+        "reason in cli.SCHEDULED_INGEST_EXCLUSIONS, not a gap.</p>"
     )
-    add("<table><tr><th>#</th><th>command</th><th>mode</th><th>loaders</th><th>note</th></tr>")
+    add(
+        "<table><tr><th>#</th><th>command</th><th>mode</th><th>runs in</th>"
+        "<th>loaders</th><th>note</th></tr>"
+    )
     for i, step in enumerate(data["sequence"], 1):
         loaders = (
             ", ".join(f"<code>{_esc(n)}</code>" for n in step["loaders"])
             or '<span class="muted">—</span>'
         )
+        profiles = (
+            ", ".join(f"<code>{_esc(p)}</code>" for p in step["profiles"])
+            or '<span class="muted">—</span>'
+        )
         add(
             f"<tr><td>{i}</td><td><code>drydocs {_esc(step['command'])}</code></td>"
             f'<td><span class="chip mode-{_esc(step["mode"])}">{_esc(step["mode"])}</span></td>'
+            f"<td>{profiles}</td>"
             f"<td>{loaders}</td><td>{_esc(step['note'])}</td></tr>"
         )
     add("</table>")

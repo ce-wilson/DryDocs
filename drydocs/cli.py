@@ -61,6 +61,7 @@ import logging
 import uuid
 from datetime import UTC
 from pathlib import Path
+from typing import NamedTuple
 
 import typer
 from rich.console import Console
@@ -354,12 +355,91 @@ AD_HOC_COMMANDS: frozenset[str] = frozenset({"load", "load-manual-mappings"})
 # startup/refresh runbook derive from it (N6 retires their independent copies).
 # mode: "standing" = every full refresh; "optional" = site/experiment decision;
 # "gated" = blocked on a source confirmation or precondition named in the note.
-CANONICAL_LOAD_SEQUENCE: tuple[tuple[str, str, str], ...] = (
-    ("check", "standing", "Neo4j + APOC reachable"),
-    ("bootstrap", "standing", "constraints + ontology seed"),
-    (
+#
+# N6 (2026-08-04) added `profiles`. Before it, the two operator surfaces ran
+# DIFFERENT step sets and nothing said whether that was a decision or drift —
+# which is the actual defect, because a deliberate subset and an accidental one
+# look identical from outside. A profile names an operator surface; membership
+# is declared per step; each surface then filters the ONE sequence instead of
+# keeping a list of its own.
+
+
+class LoadStep(NamedTuple):
+    """One step of the canonical sequence.
+
+    A NamedTuple, not a bare 3-tuple, because N6 widened it: unpacking sites
+    that assumed ``for command, mode, note in ...`` now fail loudly at import
+    rather than silently binding ``note`` to a set of profile names.
+    """
+
+    command: str
+    mode: str
+    profiles: frozenset[str]
+    note: str
+
+
+#: The operator surfaces that RUN a filtered view of the sequence. Adding one
+#: means adding a surface, not a preference — every profile here has a real file
+#: that derives from it and a guard that proves the derivation.
+LOAD_PROFILES: dict[str, str] = {
+    "scheduled-ingest": (
+        "scripts/ingest.sh — unattended scheduled ingestion (Control-M / cron). "
+        "The Control-M estate chain plus what it needs and the invariant checks; "
+        "deliberately NOT a full refresh (see SCHEDULED_INGEST_EXCLUSIONS)"
+    ),
+    "cold-start": (
+        "docs/design/drydocs-startup-refresh-runbook.md Appendix B — a human "
+        "bringing an empty container all the way up, so every standing step runs "
+        "plus the self-documentation corpus that makes the graph demonstrable"
+    ),
+}
+
+#: N6's RULING, made machine-checkable: every `standing` step the scheduled
+#: ingest does NOT run needs a reason here. Without this the omission of four
+#: steps from ingest.sh was indistinguishable from someone forgetting them.
+#: (`optional`/`gated` steps need no entry — not running them is what those
+#: modes already mean.) Guarded by tests/unit/test_load_sequence_surfaces.py.
+SCHEDULED_INGEST_EXCLUSIONS: dict[str, str] = {
+    "refresh-reference": (
+        "different cadence, declared on the command itself: the M1 reference "
+        "chain is WEEKLY (REFRESH_REFERENCE_CHAIN's own comment, and the "
+        "command's help text) while Control-M ingestion runs on the batch "
+        "schedule. Running it every ingest would re-load the catalog/SEAL feeds "
+        "many times a week for no source change"
+    ),
+    "load-software-registry": (
+        "repo-triggered, not estate-triggered: the registry is loaded from "
+        "config/taxonomy/software-registry.yaml, so it changes when the REPO "
+        "changes and not when Control-M data does. The runbook's own framing is "
+        "'after ANY container rebuild', which is the cold-start profile"
+    ),
+    "load-bmc-docs": (
+        "same class as load-software-registry — a vendor document corpus read "
+        "from external/orchestration/bmc-controlm/. It moves with the repo, not "
+        "with the batch estate, and re-chunking a static corpus on every ingest "
+        "is cost for no change"
+    ),
+    "docs-verify": (
+        "it would FAIL this profile by design. docs-verify reconciles the "
+        "doc-source registry against what the graph holds, and the scheduled "
+        "profile deliberately loads no doc corpora — under `set -e` a non-zero "
+        "exit here would abort a Control-M ingest over a reconciliation that was "
+        "never supposed to hold on this path"
+    ),
+}
+
+
+_ALL = frozenset({"scheduled-ingest", "cold-start"})
+_COLD = frozenset({"cold-start"})
+_NONE: frozenset[str] = frozenset()
+
+CANONICAL_LOAD_SEQUENCE: tuple[LoadStep, ...] = (
+    LoadStep("check", "standing", _ALL, "Neo4j + APOC reachable"),
+    LoadStep("bootstrap", "standing", _ALL, "constraints + ontology seed"),
+    LoadStep(
         "bootstrap-schema-graph",
         "standing",
+        _ALL,
         "schema meta-graph rendered + applied to ddschema (C21/G51). Targets a "
         "DIFFERENT database, so it is chain-independent of everything below and "
         "could sit anywhere — it sits here because a wiped DBMS is exactly when "
@@ -368,46 +448,73 @@ CANONICAL_LOAD_SEQUENCE: tuple[tuple[str, str, str], ...] = (
         "Appendix B) and missing ONLY here, so the generated load-map published "
         "15 steps while both real paths ran 16",
     ),
-    ("apply-supplements", "standing", "the ONE verified supplement chain (G29)"),
-    ("refresh-reference", "standing", "catalog + SEAL + dev teams (M1)"),
-    ("ingest-controlm", "standing", "folders -> jobs -> conditions -> derived deps (M3)"),
-    ("load-software-registry", "standing", "vendor/product registry (plan 07)"),
-    (
+    LoadStep("apply-supplements", "standing", _ALL, "the ONE verified supplement chain (G29)"),
+    LoadStep("refresh-reference", "standing", _COLD, "catalog + SEAL + dev teams (M1)"),
+    LoadStep(
+        "ingest-controlm", "standing", _ALL, "folders -> jobs -> conditions -> derived deps (M3)"
+    ),
+    LoadStep("load-software-registry", "standing", _COLD, "vendor/product registry (plan 07)"),
+    LoadStep(
         "load-batch-orchestrators",
         "optional",
+        _NONE,
         "declared batch-port USES_SOFTWARE edges (C14); MATCH-only — needs the "
         "SEAL chain and the software registry already loaded",
     ),
-    ("load-bmc-docs", "standing", "BMC corpus lexical graph"),
-    (
+    LoadStep("load-bmc-docs", "standing", _COLD, "BMC corpus lexical graph"),
+    LoadStep(
         "load-vendor-docs",
         "optional",
+        _NONE,
         "Q13 captured vendor documentation (verbatim, out-of-repo capture -> "
         "convert -> load); taxonomy only, gated until its corpus is confirmed",
     ),
-    ("load-essential-graphrag", "optional", "Q2 experiment -> ddcontext database"),
-    ("load-doc-traceability", "optional", "L7 self-documentation (design docs + feedback)"),
-    (
+    LoadStep("load-essential-graphrag", "optional", _NONE, "Q2 experiment -> ddcontext database"),
+    LoadStep(
+        "load-doc-traceability",
+        "optional",
+        _COLD,
+        "L7 self-documentation (design docs + feedback). The one `optional` step "
+        "a profile runs: a cold start is exactly when the doc graph is empty, and "
+        "it stayed missing from the runbook until Rev 5 for want of saying so",
+    ),
+    LoadStep(
         "load-code-snapshot",
         "optional",
+        _NONE,
         "G33 self-documentation; ritual-driven (newest committed snapshot)",
     ),
-    (
+    LoadStep(
         "load-folder-attribution",
         "gated",
+        _NONE,
         "K8 folder-grain attribution: the app-code defined mapping "
         "(config/overrides/app-code-mappings.csv) + the stg_app_fact fallback "
         "feed need ingest-controlm + refresh-reference first (gate §E "
         "preconditions)",
     ),
-    ("m1-verify", "standing", "M1 invariants"),
-    ("m3-verify", "standing", "M3 invariants"),
-    (
+    LoadStep("m1-verify", "standing", _ALL, "M1 invariants"),
+    LoadStep("m3-verify", "standing", _ALL, "M3 invariants"),
+    LoadStep(
         "docs-verify",
         "standing",
+        _COLD,
         "doc corpora declared vs loaded (registry-driven; non-zero on wrong-db)",
     ),
 )
+
+
+def load_profile(name: str) -> tuple[LoadStep, ...]:
+    """The steps ONE operator surface runs, in canonical order.
+
+    This is the derivation N6 exists for: ``scripts/ingest.sh`` calls this at
+    run time, so that script has no sequence of its own left to drift from.
+    The runbook's Appendix B cannot call anything — it is prose — so its copy is
+    held to the same answer by tests/unit/test_load_sequence_surfaces.py.
+    """
+    if name not in LOAD_PROFILES:
+        raise KeyError(f"unknown load profile {name!r} — declared: {sorted(LOAD_PROFILES)}")
+    return tuple(step for step in CANONICAL_LOAD_SEQUENCE if name in step.profiles)
 
 
 # --- helpers -----------------------------------------------------------------

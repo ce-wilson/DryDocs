@@ -4,8 +4,12 @@
 - **Module:** drydocs-load — this runbook IS the module runbook for drydocs-load
   (V1 coverage rule; V3 ruled AUTHOR-DISTINCT, see Purpose & scope for the overlap ruling
   against the system-level startup/refresh runbook).
-- **Status:** DESCRIPTIVE — documents the working procedure. **Rev 1, 2026-08-04**,
-  authored at commit `0b67b66`.
+- **Status:** DESCRIPTIVE — documents the working procedure. **Rev 2, 2026-08-04**
+  (N6 landed: the two operator surfaces are now PROFILES of the declaration rather than
+  hand-maintained copies, so the "until N6 lands they can disagree" framing below is
+  replaced by what the profiles are; the re-derive one-liner is also fixed — N6 widened
+  each step from a 3-tuple to a named `LoadStep`, which broke the unpacking this document
+  told readers to run); on top of Rev 1, authored at commit `0b67b66`.
 - **Classification:** Internal-Public (mechanism only — bundled sample data, env-var
   NAMES, no credentials, no company values)
 - **Audience:** anyone running ONE loader rather than the whole chain, reading a run
@@ -38,13 +42,13 @@ answers "run, read, and repair one loader".**
 ### And this document deliberately does NOT restate the load sequence
 
 There is exactly one canonical sequence, `cli.CANONICAL_LOAD_SEQUENCE`, published to
-`docs/plan/load-map.html` and `web/src/generated/load-map.json`. Two hand-maintained
-copies already exist — `scripts/ingest.sh` and the startup/refresh runbook's Appendix B —
-and **N6 exists to retire that duplication**. A third copy here would make N6's job worse,
+`docs/plan/load-map.html` and `web/src/generated/load-map.json`. The two operator surfaces
+— `scripts/ingest.sh` and the startup/refresh runbook's Appendix B — are **profiles** of
+it since N6, not copies of it. A third copy here would put back exactly what N6 removed,
 so there is none. To see the sequence, open the load map or run:
 
 ```powershell
-poetry run python -c "from drydocs.cli import CANONICAL_LOAD_SEQUENCE as s; [print(f'{m:9} {c}') for c, m, _ in s]"
+poetry run python -c "from drydocs.cli import CANONICAL_LOAD_SEQUENCE as s; print(*[f'{x.mode:9} {x.command}' for x in s], sep='\n')"
 ```
 
 This is not fastidiousness. On 2026-08-04 the drydocs-core runbook copied the topology
@@ -227,11 +231,15 @@ authority and will fail if this drifts): `drydocs.loaders`, `drydocs.cli`,
 |---|---|
 | `cli.CANONICAL_LOAD_SEQUENCE` | the declaration, single source |
 | `docs/plan/load-map.html` + `web/src/generated/load-map.json` | the generated view |
-| `scripts/ingest.sh` | the scheduled subset (hand-maintained — **N6**) |
-| startup/refresh runbook, Appendix B | the cold-start block (hand-maintained — **N6**) |
+| `scripts/ingest.sh` | the `scheduled-ingest` profile — READ at run time, no list of its own |
+| startup/refresh runbook, Appendix B | the `cold-start` profile — prose, held to the declaration by `tests/unit/test_load_sequence_surfaces.py` |
 
-N6 makes the last two derive from the first. Until it lands they can disagree, and on
-2026-08-04 they did: `bootstrap-schema-graph` was in both operator surfaces and missing
-from the declaration.
+Since N6 (2026-08-04) both surfaces derive from the declaration. The scheduled profile is
+deliberately the smaller one — a Control-M ingest is not a full refresh — and every
+standing step it skips carries its reason in `cli.SCHEDULED_INGEST_EXCLUSIONS`, because
+an unexplained subset is indistinguishable from an oversight. That ambiguity was the
+actual defect N6 closed; the exhibit was `bootstrap-schema-graph`, which ran in both
+operator surfaces while missing from the declaration, so the published load map counted
+15 steps where both real paths ran 16.
 
 **C. Reject and envelope reference:** `knowledge/standards/node-status-envelope.md`.

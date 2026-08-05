@@ -26,6 +26,25 @@ Tags help grooming: `idea` · `bug` · `doc` · `source` (new data source) · `q
 
 <!-- add new ideas at the top -->
 
+- 2026-08-04 — [idea] **The load sequence is config-living-in-code and now guarded — it may
+  deserve an enforcement-matrix row.** `render_enforcement_matrix.py`'s own docstring calls
+  `code_resident` "config living in code, the page's KPI example", and `cli.CANONICAL_LOAD_SEQUENCE`
+  (with `LOAD_PROFILES` / `SCHEDULED_INGEST_EXCLUSIONS`) is exactly that — except it now has
+  guards, so it would land `enforced` rather than `unguarded`. Blocked on a small design
+  question rather than effort: every SURFACES row today has a `file:` under `config/`, so a
+  code-resident row needs the registry to accept a module path. (Noticed at N6; deliberately
+  NOT done there — the matrix is an O12/admin surface, not N6's scope.)
+
+- 2026-08-04 — [bug] **A guard written on one machine had never actually executed on the
+  other, and passed by accident when it did.** `test_runbook_currency.py::_cli_verbs` shelled
+  out to `drydocs --help` and parsed it. On the laptop that failed twice at once: `text=True`
+  decodes with cp1252, which cannot decode the `┐` in Typer's rich box (`0x90`), so `stdout`
+  came back `None`; and the rows start with `│`, not `|`, so the pattern would have matched
+  nothing anyway — which makes EVERY documented verb look unregistered. Fixed at N6 by
+  reading `app.registered_commands` instead of parsing a rendered table. The general question
+  worth grooming: how many other guards shell out and parse human-facing output, and is
+  "never parse a render when the object is importable" worth writing down as a standard?
+
 - 2026-08-04 — [bug] **T23 FIRED company-side, exactly as its own row predicted — the tracker
   status should stop saying "pending (producer belief)".** The company ran
   `drydocs load seal_applications` against a graph that took the S3 CODE but never the S3

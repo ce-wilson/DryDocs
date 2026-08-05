@@ -4,30 +4,49 @@
     {
       "command": "check",
       "mode": "standing",
+      "profiles": [
+        "cold-start",
+        "scheduled-ingest"
+      ],
       "note": "Neo4j + APOC reachable",
       "loaders": []
     },
     {
       "command": "bootstrap",
       "mode": "standing",
+      "profiles": [
+        "cold-start",
+        "scheduled-ingest"
+      ],
       "note": "constraints + ontology seed",
       "loaders": []
     },
     {
       "command": "bootstrap-schema-graph",
       "mode": "standing",
+      "profiles": [
+        "cold-start",
+        "scheduled-ingest"
+      ],
       "note": "schema meta-graph rendered + applied to ddschema (C21/G51). Targets a DIFFERENT database, so it is chain-independent of everything below and could sit anywhere — it sits here because a wiped DBMS is exactly when the meta-graph gets forgotten. ADDED 2026-08-04: it was already in both operator surfaces (scripts/ingest.sh step 3/6 and the startup runbook's Appendix B) and missing ONLY here, so the generated load-map published 15 steps while both real paths ran 16",
       "loaders": []
     },
     {
       "command": "apply-supplements",
       "mode": "standing",
+      "profiles": [
+        "cold-start",
+        "scheduled-ingest"
+      ],
       "note": "the ONE verified supplement chain (G29)",
       "loaders": []
     },
     {
       "command": "refresh-reference",
       "mode": "standing",
+      "profiles": [
+        "cold-start"
+      ],
       "note": "catalog + SEAL + dev teams (M1)",
       "loaders": [
         "catalog_lobs.v1",
@@ -42,6 +61,10 @@
     {
       "command": "ingest-controlm",
       "mode": "standing",
+      "profiles": [
+        "cold-start",
+        "scheduled-ingest"
+      ],
       "note": "folders -> jobs -> conditions -> derived deps (M3)",
       "loaders": [
         "controlm_folders.v1",
@@ -55,6 +78,9 @@
     {
       "command": "load-software-registry",
       "mode": "standing",
+      "profiles": [
+        "cold-start"
+      ],
       "note": "vendor/product registry (plan 07)",
       "loaders": [
         "software_registry.v1"
@@ -63,6 +89,7 @@
     {
       "command": "load-batch-orchestrators",
       "mode": "optional",
+      "profiles": [],
       "note": "declared batch-port USES_SOFTWARE edges (C14); MATCH-only — needs the SEAL chain and the software registry already loaded",
       "loaders": [
         "batch_port_orchestrator.v1"
@@ -71,6 +98,9 @@
     {
       "command": "load-bmc-docs",
       "mode": "standing",
+      "profiles": [
+        "cold-start"
+      ],
       "note": "BMC corpus lexical graph",
       "loaders": [
         "bmc_docs.v1"
@@ -79,6 +109,7 @@
     {
       "command": "load-vendor-docs",
       "mode": "optional",
+      "profiles": [],
       "note": "Q13 captured vendor documentation (verbatim, out-of-repo capture -> convert -> load); taxonomy only, gated until its corpus is confirmed",
       "loaders": [
         "vendor_docs.v1"
@@ -87,6 +118,7 @@
     {
       "command": "load-essential-graphrag",
       "mode": "optional",
+      "profiles": [],
       "note": "Q2 experiment -> ddcontext database",
       "loaders": [
         "essential_graphrag.v1"
@@ -95,7 +127,10 @@
     {
       "command": "load-doc-traceability",
       "mode": "optional",
-      "note": "L7 self-documentation (design docs + feedback)",
+      "profiles": [
+        "cold-start"
+      ],
+      "note": "L7 self-documentation (design docs + feedback). The one `optional` step a profile runs: a cold start is exactly when the doc graph is empty, and it stayed missing from the runbook until Rev 5 for want of saying so",
       "loaders": [
         "doc_sections.v1",
         "doc_traceability.v1",
@@ -105,6 +140,7 @@
     {
       "command": "load-code-snapshot",
       "mode": "optional",
+      "profiles": [],
       "note": "G33 self-documentation; ritual-driven (newest committed snapshot)",
       "loaders": [
         "code_snapshot.v1"
@@ -113,6 +149,7 @@
     {
       "command": "load-folder-attribution",
       "mode": "gated",
+      "profiles": [],
       "note": "K8 folder-grain attribution: the app-code defined mapping (config/overrides/app-code-mappings.csv) + the stg_app_fact fallback feed need ingest-controlm + refresh-reference first (gate §E preconditions)",
       "loaders": [
         "folder_attribution.v1"
@@ -121,18 +158,29 @@
     {
       "command": "m1-verify",
       "mode": "standing",
+      "profiles": [
+        "cold-start",
+        "scheduled-ingest"
+      ],
       "note": "M1 invariants",
       "loaders": []
     },
     {
       "command": "m3-verify",
       "mode": "standing",
+      "profiles": [
+        "cold-start",
+        "scheduled-ingest"
+      ],
       "note": "M3 invariants",
       "loaders": []
     },
     {
       "command": "docs-verify",
       "mode": "standing",
+      "profiles": [
+        "cold-start"
+      ],
       "note": "doc corpora declared vs loaded (registry-driven; non-zero on wrong-db)",
       "loaders": []
     }

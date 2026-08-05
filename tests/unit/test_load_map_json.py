@@ -101,6 +101,11 @@ def test_sequence_mirrors_the_declaration():
     from drydocs import cli
 
     committed = json.loads(COMMITTED.read_text(encoding="utf-8"))
-    assert [(s["command"], s["mode"], s["note"]) for s in committed["sequence"]] == list(
-        cli.CANONICAL_LOAD_SEQUENCE
-    ), "load-map.json sequence drifted from cli.CANONICAL_LOAD_SEQUENCE"
+    # Profiles are a sorted list in JSON and a frozenset in the declaration (N6),
+    # so compare them as sets rather than asserting the render's ordering twice.
+    rendered = [
+        (s["command"], s["mode"], frozenset(s["profiles"]), s["note"])
+        for s in committed["sequence"]
+    ]
+    declared = [(s.command, s.mode, s.profiles, s.note) for s in cli.CANONICAL_LOAD_SEQUENCE]
+    assert rendered == declared, "load-map.json sequence drifted from cli.CANONICAL_LOAD_SEQUENCE"

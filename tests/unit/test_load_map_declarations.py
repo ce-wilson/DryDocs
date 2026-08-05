@@ -178,22 +178,26 @@ def test_every_concrete_loader_is_reachable_or_ad_hoc():
 def test_sequence_steps_are_real_commands_with_valid_modes():
     registered = _registered_command_names()
     seen: set[str] = set()
-    for command, mode, note in cli.CANONICAL_LOAD_SEQUENCE:
-        assert command in registered, (
-            f"CANONICAL_LOAD_SEQUENCE step {command!r} is not a registered " "Typer command."
+    for step in cli.CANONICAL_LOAD_SEQUENCE:
+        assert step.command in registered, (
+            f"CANONICAL_LOAD_SEQUENCE step {step.command!r} is not a registered " "Typer command."
         )
-        assert command not in seen, f"duplicate sequence step {command!r}"
-        seen.add(command)
-        assert mode in (
+        assert step.command not in seen, f"duplicate sequence step {step.command!r}"
+        seen.add(step.command)
+        assert step.mode in (
             "standing",
             "optional",
             "gated",
-        ), f"step {command!r}: mode {mode!r} not in standing|optional|gated"
-        assert note.strip(), f"step {command!r}: empty note"
+        ), f"step {step.command!r}: mode {step.mode!r} not in standing|optional|gated"
+        assert step.note.strip(), f"step {step.command!r}: empty note"
 
 
 def test_loader_commands_are_sequenced_or_declared_ad_hoc():
-    sequenced = {command for command, _, _ in cli.CANONICAL_LOAD_SEQUENCE}
+    """NOTE the direction: this walks COMMAND_LOADERS, so it only ever reaches
+    LOADER-backed verbs. Non-loader steps are checked from the operator surfaces
+    inward by tests/unit/test_load_sequence_surfaces.py (N6) — that asymmetry is
+    how `bootstrap-schema-graph` stayed undeclared while both surfaces ran it."""
+    sequenced = {step.command for step in cli.CANONICAL_LOAD_SEQUENCE}
     stray = sorted(
         command
         for command in cli.COMMAND_LOADERS
