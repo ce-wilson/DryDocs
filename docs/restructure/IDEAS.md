@@ -62,6 +62,19 @@ question a 1,000-line file with the trail at the bottom could not answer.
 
 <!-- add new ideas at the top -->
 
+- **`Idea-70`** · 2026-08-05 · `[decision]` · **new** · prio? **Medium** —
+  **`fcdo-frameworks` corpus activation — SME "under consideration" at the
+  fcdo-crosswalk sign-off (gate-log 2026-08-05).** The gate confirmed the
+  vocabulary crosswalk (rows 1-4/6-8) and the SME remarked on §A that
+  activating the corpus (`config/doc-source-registry.yaml` `confirmed:` flip)
+  is now under consideration, since the alignment check it was waiting on has
+  passed. Two sub-decisions ride together: (a) the activation flip itself
+  (producer-side registry state; the actual Confluence scrape stays
+  company-side/on-network), and (b) whether the flip should wait for the
+  row-5 recapture (Descriptive Metadata Framework) or proceed independently
+  — the crosswalk gate deliberately did NOT make either call. Groom as a
+  user-gated decision item, not a build item.
+
 - **`Idea-69`** · 2026-08-05 · `[bug]` · **groomed → K18** · prio? **High** —
   **CORRECTED SAME DAY — the claim below was WRONG in its headline and is kept
   only for the narrow residue.** I reported that "every code authored through the K11 steward screen
