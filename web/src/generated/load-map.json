@@ -1355,9 +1355,9 @@
       "urn": null,
       "replaces": null,
       "classification": "Internal",
-      "confirmed": false,
+      "confirmed": true,
       "ledger": {
-        "state": "placeholder",
+        "state": "pending",
         "path": null
       },
       "taxonomy_captures": [],

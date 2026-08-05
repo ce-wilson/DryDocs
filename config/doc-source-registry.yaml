@@ -154,7 +154,7 @@ sources:
     graph_locator:                      # no connector has run — nothing to locate until the confluence fetch exists
       match: none
       value: ~
-    confirmed: false                    # crosswalk gate not yet drafted (ALIGNMENT-PLAN Phase 1 / backlog W1) — moved here from the dropped pipeline twin (N9)
+    confirmed: true                     # ACTIVATED by user ruling in-chat 2026-08-05 (gate-log RECORD): the fcdo-crosswalk gate it waited on signed the same day 13/13; activation proceeds independently of the row-5 recapture ("settle our ontology with what they published"). The scrape itself stays company-network-side; T4 sme-confirm curation still applies to every ingested page.
     notes: >
       The FCDO firmwide data-publishing frameworks corpus (ontology/taxonomy/
       provenance/ETL standards from the internal governance group). Purpose:

@@ -62,18 +62,21 @@ question a 1,000-line file with the trail at the bottom could not answer.
 
 <!-- add new ideas at the top -->
 
-- **`Idea-70`** · 2026-08-05 · `[decision]` · **new** · prio? **Medium** —
+- **`Idea-70`** · 2026-08-05 · `[decision]` · **closed — RULED same day, no item** · prio? **Med** —
   **`fcdo-frameworks` corpus activation — SME "under consideration" at the
-  fcdo-crosswalk sign-off (gate-log 2026-08-05).** The gate confirmed the
-  vocabulary crosswalk (rows 1-4/6-8) and the SME remarked on §A that
-  activating the corpus (`config/doc-source-registry.yaml` `confirmed:` flip)
-  is now under consideration, since the alignment check it was waiting on has
-  passed. Two sub-decisions ride together: (a) the activation flip itself
-  (producer-side registry state; the actual Confluence scrape stays
-  company-side/on-network), and (b) whether the flip should wait for the
-  row-5 recapture (Descriptive Metadata Framework) or proceed independently
-  — the crosswalk gate deliberately did NOT make either call. Groom as a
-  user-gated decision item, not a build item.
+  fcdo-crosswalk sign-off (gate-log 2026-08-05).** RULED in-chat the same
+  session ("flip to activate. I want to settle our ontology with what they
+  published"): (a) `confirmed: true` flipped in
+  `config/doc-source-registry.yaml` with a gate-log RECORD entry; (b) the
+  flip proceeds INDEPENDENTLY of the row-5 recapture — activation is the
+  path that produces the recapture evidence. Test moved with the flip.
+  No backlog item needed; the executed-pre-groom pattern.
+  ORIGINAL ENTRY: the gate confirmed the vocabulary crosswalk (rows 1-4/6-8)
+  and the SME remarked on §A that activating the corpus is under
+  consideration, since the alignment check it was waiting on has passed.
+  Sub-decisions: (a) the activation flip itself (producer-side registry
+  state; the actual Confluence scrape stays company-side/on-network), and
+  (b) wait for the row-5 recapture or proceed independently.
 
 - **`Idea-69`** · 2026-08-05 · `[bug]` · **groomed → K18** · prio? **High** —
   **CORRECTED SAME DAY — the claim below was WRONG in its headline and is kept

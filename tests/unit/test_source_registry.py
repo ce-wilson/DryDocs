@@ -351,9 +351,11 @@ def test_doc_ledger_union_gates_doc_corpora() -> None:
     assert bmc.home == "doc-registry"
     assert bmc.urn is None  # doc corpora keep docmeta identity
     reg.require_confirmed("essential-graphrag")
-    with pytest.raises(UnconfirmedSourceError) as exc:
-        reg.require_confirmed("fcdo-frameworks")  # crosswalk gate not drafted (W1)
-    assert "doc-source-registry" in str(exc.value)
+    # ACTIVATED 2026-08-05 (user ruling in-chat, gate-log RECORD): the covering
+    # crosswalk gate (fcdo-crosswalk) signed the same day; before that, this
+    # line pinned the UnconfirmedSourceError refusal.
+    fcdo = reg.require_confirmed("fcdo-frameworks")
+    assert fcdo.home == "doc-registry"
 
 
 def test_temp_registry_does_not_union_shipped_ledgers(tmp_path: Path) -> None:

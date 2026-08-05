@@ -1449,3 +1449,26 @@ or added.
 | C1 row 5 blocked | **CONFIRMED** — stays OPEN, signed neither way, until the registered `fcdo-frameworks` scrape recaptures the Descriptive Metadata Framework. |
 | C2 absence ≠ absence | **CONFIRMED** — transcript absence is never treated as absence from their standard. |
 | D1–D2 sign-off | **CONFIRMED** — rows 1–4, 6–8 and the file status flip proposed → confirmed; row 5 stays `blocked-on-recapture`; the guard test moves to the post-gate state in the same commit (F1/F2 precedent); corpus activation stays a separate, later decision. |
+
+
+## 2026-08-05 — RECORD: `fcdo-frameworks` corpus ACTIVATED (user ruling in-chat, same day as the fcdo-crosswalk sign-off)
+
+- **What this records:** the in-chat user ruling activating the `fcdo-frameworks`
+  doc corpus — `config/doc-source-registry.yaml` `confirmed: false → true`. A record
+  on the G51/X1 idiom (direction, not a gate session): no ontology edge, no
+  vocabulary status change, no graph write. The stated rationale: "settle our
+  ontology with what they published" — the crosswalk gate this flip waited on
+  (its `confirmed: false` comment named it) signed the same day, 13/13.
+- **The Idea-70 sub-question, ruled with the flip:** activation proceeds
+  INDEPENDENTLY of the row-5 recapture. Crosswalk row 5 stays
+  `blocked-on-recapture` regardless — that is crosswalk-side state, untouched here;
+  if anything, activation is the path that PRODUCES the recapture evidence
+  (Descriptive Metadata is the first-priority recapture target in the entry's notes).
+- **What activation does and does not do:** `require_confirmed("fcdo-frameworks")`
+  now passes, so the docmeta pipeline may ingest the corpus when the Confluence
+  connector runs — which is company-network-side only; nothing can be scraped from
+  the producer machine. T4 `sme-confirm` curation still applies per ingested page,
+  and `target_db: ddcontext` keeps the corpus out of ground truth.
+- **Test moved with the flip** (same commit, the F1/K2 pattern):
+  `test_doc_ledger_union_gates_doc_corpora` now pins the confirmed state where it
+  previously pinned the `UnconfirmedSourceError` refusal.

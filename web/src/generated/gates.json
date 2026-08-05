@@ -553,6 +553,19 @@
       ]
     },
     {
+      "kind": "log-entry",
+      "date": "2026-08-05",
+      "title": "RECORD: `fcdo-frameworks` corpus ACTIVATED (user ruling in-chat, same day as the fcdo-crosswalk sign-off)",
+      "status": "recorded",
+      "prompt_files": [
+        "config/gate-prompts/fcdo-crosswalk.yaml"
+      ],
+      "log_ref": "config/gate-log.md:1454",
+      "unblocks": [
+        "W1"
+      ]
+    },
+    {
       "kind": "prompt-only",
       "date": null,
       "title": "bmc-docs-example (gate page rendered — session not yet run)",

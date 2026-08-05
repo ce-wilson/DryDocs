@@ -156,6 +156,18 @@ sources:
       source_url) live on the :Document node and the local PDF is gitignored. Same
       permanent-stub rationale as bmc-docs.
 
+  - id: fcdo-frameworks
+    status: stub                             # docs corpus, no connector run yet — Confluence page metadata (version/author/when) IS the envelope once the company-side scrape runs
+    notes: >
+      Activated 2026-08-05 (user ruling in-chat, gate-log RECORD; covering gate
+      fcdo-crosswalk, signed the same day). No connector has run — the current
+      capture is screenshot transcriptions whose scraped_on is capture time,
+      never authorship (the bmc-docs rule). Unlike bmc-docs this stub is NOT
+      presumed permanent: a real envelope exists at the source (Confluence page
+      version/author/updated metadata) and the company-side scrape can carry it
+      — decide the mapping when the connector's first run lands, alongside the
+      Descriptive Metadata recapture (crosswalk row 5).
+
   - id: "repo:design-docs"
     status: stub                             # repo-native markdown/yaml: git history IS the audit envelope; no source-system created_by/updated_at columns exist
     notes: >
