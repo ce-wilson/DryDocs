@@ -1,0 +1,261 @@
+# SME gate-prompt spec — functional-id (FID) identity, ownership-over-time, and
+# HOW MUCH of the FID directory to ingest.
+#
+# DRAFTED 2026-08-04 (user direction, desktop session). Two things collided and turned
+# out to be one problem:
+#   (1) An SME evidence email labeled a column "FID" while the values in it were FID
+#       NAMES. The records were pulled from the FID directory and the correct mapping
+#       is available — but it was deliberately NOT applied yet, on hygiene grounds:
+#       "FIDs can be transferred to different owners and SEAL ids, and the originating
+#       SEAL id may or may not be captured." That instinct is right, and this gate is
+#       what turns it into a rule instead of a hesitation.
+#   (2) The K2 attribution match policy (SIGNED 2026-07-14) put FID second in the
+#       precedence order SEAL > FID > APP_NAME > ALIAS — and TierReconcilers.fid
+#       (drydocs/loaders/seal_attribution.py) is EMPTY producer-side: "FID and ALIAS
+#       have no producer-side reconciliation source yet, so their facts stay
+#       unresolved (counted, never guessed) until a table is wired company-side."
+#       The FID directory IS that table. So this is not a side quest — it is the
+#       tier-2 unblock, and every ruling below lands on a signed gate's open seam.
+# The scoping question in plain terms: one application can carry ~200 functional
+# accounts, the overwhelming majority of which never run a batch job. §D answers "how
+# much" with a measurement rather than a guess.
+# AMENDED 2026-08-05 (user, live counterexample — §G): a run-as account whose name
+# encodes a platform (MALCOLM) is REGISTERED to the platform's application, while the
+# jobs it runs are ATTRIBUTED to a newer product-aligned application. Neither source is
+# wrong; they answer different questions. This retires the draft's working assumption
+# that the directory's application column is evidence of a JOB's application — and it
+# means the signed K2 FID tier is mis-specified, not merely unimplemented (§G3).
+# GATE-BOUND: no node class change, no edge, no loader, no pull until every section signs.
+# Mechanism-only: no real functional ids, names, SEAL ids, SIDs, or addresses in this
+# repo — real rows are Internal and live company-side.
+classification: Internal-Public
+schema: drydocs.gate-prompt.v1
+id: fid-identity-and-scope
+title: "SME Gate — functional-id identity (FID vs FID name), ownership as an as-of fact, transfer detection, and the ingest scope"
+step: "Pre-pull gate — rules identity and scope BEFORE any directory extract is taken; unblocks the K2 FID reconciliation tier"
+summary: >
+  A functional id is a service account that Control-M jobs run as, that owns install
+  entitlements, and that carries an application (SEAL) assignment in the firm's ID
+  directory. DryDocs already models the account (:AppUser, prov:SoftwareAgent, "service
+  account / FID that jobs run as") and already depends on the FID -> application join
+  in a signed gate it cannot currently satisfy. Two properties of the directory make a
+  naive join unsafe: the account's application assignment is CURRENT STATE ONLY —
+  accounts transfer between owners and applications, the record shows where it sits
+  today, and the originating application may never have been captured; and the join key
+  the rest of our data uses (the NAME a job runs as) is not the key the directory is
+  built on (the id). This gate rules: A identity and the name<->id crosswalk · B
+  ownership as an as-of fact and how transfers become visible at all · C the edge into
+  the application · D INGEST SCOPE — which rows, which columns, how often · E source
+  registration and audit envelope · F the mislabeled-evidence rule · G REGISTRATION vs
+  WORK, and the K2 tier defect it exposes.
+meta:
+  Module: "drydocs_core/ontology (one new vocabulary entry) · drydocs/loaders/seal_attribution.py (TierReconcilers.fid — the empty seam this fills) · config/source-registry.yaml (new system + dataset) · config/audit-fields.yaml (new entry) · knowledge/depgraph-snapshots-style dated snapshots (§B3)"
+  Source: "The firm's functional-id directory (ID-owner application). A real system of record with a UI, an export, per-record audit columns, and an application assignment — unlike the outlook-dl case, this one IS ingestible."
+  Registry ref: "NOT YET REGISTERED — §E registers the system + dataset at build, confirmed: false. Company-side the export is the pull surface; producer-side this repo holds mechanism only."
+  Classification: "Internal — real rows carry functional ids, names, SEAL ids, employee SIDs, support-team names and mailbox addresses. THIS PAGE Internal-Public (mechanism only)."
+  Vocabulary: "AppUser is an EXISTING node class (10-node-classifications.yaml, prov:SoftwareAgent, 'Service account / FID that jobs run as (EPV, Run-as-User)'). Existing AppUser edges: m3_executed_by (ControlMJobRun -> AppUser, planned), m3_delegates_to (AppUser -> ExecutionHost, planned). NO edge to an application exists — §C proposes one."
+  Ontology map: "config/taxonomy-ontology-map.yaml fid-directory (proposed 2026-08-04, this gate's entry)"
+  Related gates: "seal-attribution-match-policy (SIGNED 2026-07-14 — the FID tier this gate unblocks; its precedence order and match_method vocabulary are UNCHANGED here, cite don't re-decide) · business-application-identity (app_id is the neutral key; seal_id is a deprecated alias — §C writes app_id) · audit-envelope-phase4 (the two-era capture ruling §B3 follows) · software-version-context (the evidence batch that raised this; its §F rollup is blocked on this page) · email-dl-contact-point (where the support-owner/mailbox columns belong if they are ever pulled — §D3 defers them there rather than absorbing them)"
+
+mapping:
+  - n: 1
+    element: "Directory record: functional id (the directory's own key)"
+    target: ":AppUser {fid}"
+    edge: "n/a — node identity (§A1)"
+  - n: 2
+    element: "Directory record: account NAME (the value Control-M jobs carry as run-as owner)"
+    target: ":AppUser.fid_name  [property, plus the name -> fid crosswalk that makes the Control-M join work]"
+    edge: "n/a (§A2)"
+  - n: 3
+    element: "Directory record: application (SEAL) assignment, as of the extract"
+    target: ":BusinessApplication {app_id}"
+    edge: "(:AppUser)-[:BELONGS_TO_APPLICATION {role:'service_account', as_of, source, origin:'declared'}]->(:BusinessApplication)  [PROPOSED — §C]"
+  - n: 4
+    element: "STG_APP_FACT row, fact_type=FID, currently UNRESOLVED (K2 tier 2)"
+    target: "resolved app_id via the name->fid->application chain"
+    edge: "feeds TierReconcilers.fid — the existing K2 writer, NOT a new edge (§C4)"
+  - n: 5
+    element: "Directory record present in the extract but matching no demand set (§D1)"
+    target: "no node written"
+    edge: "no edge — out of scope by design, counted in the census (§D2), never loaded 'because it was in the file'"
+  - n: 6
+    element: "Two dated extracts disagreeing on one account's application assignment"
+    target: "a transfer OBSERVATION"
+    edge: "derived by DIFF, not readable from either extract alone (§B3)"
+
+provenance:
+  - label: ":AppUser  [EXISTING node class, no loader yet — 10-node-classifications.yaml, prov:SoftwareAgent]"
+    source_object: "the firm's functional-id directory, demand-set extract (§D1), taken as a dated retained snapshot"
+    key: "fid  — the DIRECTORY's own key, not the name (§A1); uniqueness constraint on AppUser.fid"
+    loader: "not yet built — phase 3 of docs/restructure/09-fid-identity-and-scope.md"
+    properties:
+      - {name: fid, origin: source, from: "the directory's account id column", note: "stable across renames; a renameable key silently splits a node, which is why the name is not it"}
+      - {name: fid_name, origin: source, from: "the directory's account name column", note: "the value EVERY other source we hold joins on — so the name -> id crosswalk is on the hot path and its miss rate is a first-class reported number (§A2)"}
+      - {name: status, origin: source, from: "the directory's status column", note: "a PROPERTY, never a pull filter — historical jobs reference retired accounts (§B5)"}
+      - {name: "account type", origin: source, from: "the directory's functional/account type column", note: "explanatory only; §Q5 asks whether non-application types ever appear as run-as owners, which would retire even that use"}
+      - {name: "description / purpose", origin: source, from: "the directory's free-text columns", note: "context for SME review; carries no join semantics"}
+      - {name: "support owners / teams / mailboxes", origin: source, from: "NOT PULLED", note: "real contact data with a home already proposed at gate email-dl-contact-point — deferred there to keep one contact model (§D3)"}
+      - {name: "the four audit-envelope properties", origin: source, from: "the directory's create/update timestamp + user columns", note: "registered status: stub until confirmed object-by-object (§E2). They say the RECORD changed and when — never what it changed FROM (§B3)"}
+  - label: "(:AppUser)-[:BELONGS_TO_APPLICATION {role:'service_account'}]->(:BusinessApplication)  [PROPOSED — §C1]"
+    source_object: "the same directory extract — the account's application (SEAL) assignment column, as of that extract"
+    key: "(AppUser.fid, BusinessApplication.app_id)"
+    loader: "not yet built — phase 4"
+    properties:
+      - {name: app_id, origin: source, from: "the directory's application assignment column", note: "neutral identity key per business-application-identity; CURRENT STATE ONLY — the originating application may never have been captured (§B4)"}
+      - {name: role, origin: derived, from: "literal 'service_account'", note: "what distinguishes this triple from m3_belongs_to_application (ControlMFolder -> Port) on the shared label"}
+      - {name: as_of, origin: source, from: "the extract date", note: "NOT the load date. Every downstream fact derived through this join inherits it (§B1) — and a derived fact that loses its as_of cannot have it restored"}
+      - {name: origin, origin: derived, from: "literal 'declared'", note: "the directory asserts it; nothing derives it"}
+      - {name: "originating application", origin: source, from: "NOT AVAILABLE", note: "treated as UNKNOWN, never inferred from a name prefix or back-dated from today's assignment (§B4)"}
+  - label: "TierReconcilers.fid  [the K2 tier-2 seam this gate fills — NOT a new edge]"
+    source_object: "the SAME name -> id -> application crosswalk built for the two blocks above; no second mapping table (§C4)"
+    key: "normalized fid_name -> app_id"
+    loader: "drydocs/loaders/seal_attribution.py — EXISTING writer, currently injected with an empty dict"
+    properties:
+      - {name: match_method, origin: derived, from: "the K2 tier that resolved the fact — 'fid'", note: "the seal-attribution-match-policy vocabulary is UNCHANGED by this gate; only the empty table is filled"}
+      - {name: "unresolved facts", origin: derived, from: "rows whose name resolves to no directory id", note: "reported and counted, never matched by fuzzy similarity — these names differ by an environment suffix or one token, exactly where approximate matching is most confident and most wrong (§F3)"}
+  - label: "transfer observation  [DERIVED BY DIFF — readable from no single extract]"
+    source_object: "two dated retained snapshots of the same demand set (§B3)"
+    key: "(AppUser.fid, earlier_as_of, later_as_of)"
+    loader: "not built — phase 6, and impossible before two snapshots exist"
+    properties:
+      - {name: "from / to application", origin: derived, from: "the disagreement between two snapshots' assignment columns", note: "a disagreement is the account MOVING, not drift and not an error (§B2)"}
+      - {name: "observed between", origin: derived, from: "the two extract dates", note: "the move is bounded by the snapshot interval, never timestamped more precisely than the evidence allows"}
+
+sections:
+
+  - id: A
+    title: "IDENTITY — which column is the key, and what the other one is"
+    body: >
+      The directory carries both a short opaque id and a structured name. The name is
+      what every OTHER source we hold speaks: a Control-M job's run-as owner is a name,
+      the evidence email's column was names, and the environment suffix convention
+      (FID_D / FID_Q / FID_P, already handled in drydocs_core/orchestration/controlm/
+      variables.py) is a NAME convention. The id is what the directory itself is keyed
+      on and what survives a rename. Choosing one as the node key and the other as a
+      property is therefore not cosmetic — it decides which joins are exact and which
+      need a crosswalk.
+    confirmations:
+      - "A1. :AppUser is keyed on the DIRECTORY ID (`fid`), not the name. Rationale: it is the system of record's own key, it is stable across renames, and a key that can be renamed is a key that silently splits a node. Uniqueness constraint on AppUser.fid."
+      - "A2. `fid_name` is a PROPERTY, and the name -> id resolution is an explicit crosswalk step in the loader, reported like any other match tier — never an assumed 1:1. Every inbound join we have today arrives by name, so the crosswalk is on the hot path and its miss rate is a first-class number, not a log line."
+      - "A3. NAME UNIQUENESS — SME rules: is a functional-id name unique across the directory at a point in time, and is it ever REUSED after an account is retired? If names are reused, the name->id crosswalk needs a time qualifier and every historical join by name is ambiguous. RECOMMENDATION: assume NOT safe until the directory owner confirms; the cost of the assumption is one extra column, the cost of the opposite mistake is silent mis-attribution of historical jobs."
+      - "A4. The environment triplet (_D/_Q/_P suffix family) is a NAME-level convention: three accounts, three ids, one logical service. This gate does NOT collapse them — three :AppUser nodes. Whether a logical-service grouping node is warranted is deferred, not decided here."
+
+  - id: B
+    title: "OWNERSHIP OVER TIME — the hygiene rule the user was right to hesitate on"
+    body: >
+      The directory record answers "which application owns this account TODAY". It does
+      not carry ownership history, and the originating application may never have been
+      recorded. The record's own audit columns (create/update timestamps and the SIDs
+      behind them) tell you the record CHANGED and when — they do not tell you what it
+      changed FROM. This is precisely the two-era capture problem ruled at
+      audit-envelope-phase4 for SEAL lifecycle dates, and it has the same consequence:
+      a single extract can never reveal a transfer.
+    confirmations:
+      - "B1. FID -> application is an AS-OF ASSERTION, never an immutable fact. Every edge written from this source carries `as_of` (the extract date, not the load date) and `origin: 'declared'`. Any downstream fact derived through this join inherits the as_of — including the software-version rollup (software-version-context §F2)."
+      - "B2. A LATER extract disagreeing with an earlier one is NOT drift and NOT an error — it is the account moving, which is the directory working as designed. The loader reports it as a transfer, updates the current edge, and does not silently overwrite the historical claim's as_of trail."
+      - "B3. TRANSFER DETECTION REQUIRES DIFFING, so extracts are RETAINED as dated snapshots, not overwritten — the depgraph-snapshot precedent (dated file + git-commit meta header), including its retention rule. Without retained snapshots, transfers are permanently invisible and any 'as of' we stamp is decoration."
+      - "B4. The ORIGINATING application is treated as UNKNOWN, never inferred. No back-dating an account's current application onto historical jobs, no inferring origin from a name prefix. Where history matters and is absent, the answer is 'not captured' — which is a true answer and is what makes the graph trustworthy for the audit questions it will eventually be asked."
+      - "B5. RETIRED / non-active accounts are IN SCOPE for ingest (status is a property, not a filter). Historical Control-M jobs reference accounts that are no longer active; filtering on active status at pull time makes those jobs unresolvable and looks identical to a coverage gap."
+
+  - id: C
+    title: "THE EDGE INTO THE APPLICATION"
+    body: >
+      No AppUser -> application edge exists in the vocabulary today. The two registered
+      AppUser edges run to a job run (m3_executed_by) and to a host (m3_delegates_to,
+      prov:actedOnBehalfOf, which requires Agent -> Agent). :BusinessApplication was
+      reclassed prov:Entity at K4, so actedOnBehalfOf does NOT type-check here — this
+      is Agent -> Entity, the family that already has no PROV row (reg_uses_software's
+      recorded reasoning).
+    confirmations:
+      - "C1. Register vocabulary entry `seal_appuser_belongs_to_application`: AppUser -> BusinessApplication, neo4j_label BELONGS_TO_APPLICATION, role service_account, prov_maps_to ~ (LOCAL, Agent -> Entity), domain seal, status planned until the loader exists. SAME label as m3_belongs_to_application (ControlMFolder -> Port) but a different triple — the C8-clean new-entry precedent; `role` is what distinguishes them on the shared label."
+      - "C2. TARGET IS :BusinessApplication, not the BatchProcessing :Port. Recorded against seal-app-ref-edge-reshape §C1, which sent FOLDER attribution to the Port to keep batch topology off the app node: an account's application assignment is an OWNERSHIP RECORD fact (the directory's own semantics), not batch wiring. SME confirms rather than inherits."
+      - "C3. CARDINALITY is N:1 (many accounts to one application) and is NOT constrained in the schema — the standing rule that Neo4j cannot declare relationship cardinality, so it is a graph-test if it is anything. Mid-transfer states are normal."
+      - "C4. The K2 reconciler is fed from the SAME crosswalk, not a parallel one: TierReconcilers.fid is populated from this ingest (name -> app_id, via §A2 then §C1). No second mapping table. A fact resolved this way keeps match_method 'fid' — the K2 tier vocabulary is UNCHANGED by this gate."
+
+  - id: D
+    title: "SCOPE — how much of the directory to pull"
+    body: >
+      One application can carry roughly two hundred functional accounts. Most exist for
+      reasons DryDocs does not model — break-glass and privileged-access ids, identity-
+      mapping ids, verification-environment ids, component-typed ids. Pulling all of
+      them for every application would multiply the confidential surface, the review
+      burden, and the noise, to answer questions nobody asked. Pulling too few makes
+      run-as owners unresolvable and looks exactly like a defect. The scope should
+      therefore be DEMAND-DRIVEN and MEASURED, not estimated: DryDocs already knows
+      which accounts it needs, because they are the ones it cannot currently resolve.
+    confirmations:
+      - "D1. THE PULL LIST IS THE UNION OF THREE DEMAND SETS, each computable from data already held: (i) RUN-AS OWNERS — distinct job owner values in the Control-M extract (the run_as / J.OWNER value the CLI already filters on); (ii) UNRESOLVED FID FACTS — distinct fact_value on STG_APP_FACT rows with fact_type='FID' that the K2 resolver currently counts as unresolved; (iii) EVIDENCE ROWS — account names appearing in registered adhoc evidence (the version email, corpus adhoc-sme-email). No fourth set is added without a use case."
+      - "D2. A ONE-TIME CENSUS RUNS FIRST, on a single application, before any bulk pull: total directory rows for that application vs |demand set|, broken down by the directory's own type/status columns. The census is the number that settles this question — 'about two hundred' becomes 'N of ~200, and here is what the other rows are'. The census output is Internal and is reported as counts, never as a row dump."
+      - "D3. COLUMN SCOPE IS MINIMAL, and 'the export has it' is not a reason to keep a column. IN: directory id · name · status + status timestamp · functional/account type · application (SEAL) assignment · create/update timestamps and their user SIDs (the audit envelope, §E2) · description/purpose text. OUT for now: support owners, support teams, mailbox addresses and contact columns — real contact data with a real home already proposed elsewhere (gate email-dl-contact-point). Deferring them there keeps one contact model instead of two."
+      - "D4. REFRESH IS ON-DEMAND, NOT SCHEDULED. The event that invalidates this data is a transfer, which no schedule anticipates; a cadence would manufacture snapshot churn while still missing same-week moves. Re-pull triggers: a new evidence batch, an unresolved-FID count that crosses a threshold, or a known reorganization. Each pull is retained per §B3."
+      - "D5. EXPANSION IS A DECISION, NOT A DRIFT: widening beyond the demand sets (e.g. 'all accounts for the applications we already touch') re-opens this section rather than being absorbed as a loader change."
+
+  - id: E
+    title: "SOURCE REGISTRATION AND AUDIT ENVELOPE"
+    body: >
+      A system with a UI, an export, and per-record audit columns is a first-class
+      pipeline source, and registering it is what makes the pull auditable instead of
+      someone's spreadsheet.
+    confirmations:
+      - "E1. Register a SYSTEM row + a DATASET row in config/source-registry.yaml (schema v2 grammar; layer: human — this is an identity/account directory, not a data store), classification Internal, authority SOR for account identity, confirmed: false until this gate signs. Real connection coordinates stay in the internal twin."
+      - "E2. Register a config/audit-fields.yaml entry mapping the directory's create/update timestamp + user columns onto the frozen envelope (source_created_by / source_created_at / source_updated_by / source_updated_at), status stub until the mapping is confirmed object-by-object. NOTE the standing distinction: these say when the RECORD changed, not what it changed from (§B3) — the envelope is necessary and not sufficient."
+      - "E3. Extracts land under the internal/ boundary company-side. This repo carries the mechanism: registry entries, the crosswalk shape, the loader, the census method — never rows."
+
+  - id: F
+    title: "THE MISLABELED EVIDENCE — how a correction is recorded"
+    body: >
+      The originating email labeled a column FID and populated it with names. The
+      correct values are now available. The temptation is to fix the attachment.
+    confirmations:
+      - "F1. THE EVIDENCE IS NOT EDITED. The stored :Document keeps the email as sent, mislabeled column and all (software-version-context §D4 stores it citation-only and VERBATIM). A corrected copy of an evidence document is no longer evidence."
+      - "F2. THE CORRECTION IS A MAPPING, recorded once and applied at load: the column labeled FID is read as `fid_name` and resolved through the §A2 crosswalk. Recorded on the corpus's known-defect note (software-version-context §D3) so the next reader of that attachment does not repeat the misreading."
+      - "F3. Rows whose name does not resolve to a directory id are reported unresolved and load nothing — never matched by fuzzy similarity to a nearby name. Names in this family differ by an environment suffix or a single token, which is exactly the shape where fuzzy matching is most confident and most wrong."
+
+  - id: G
+    title: "REGISTRATION vs WORK — the live counterexample, and the K2 tier defect it exposes"
+    body: >
+      SME evidence 2026-08-05, and the section that changes the most: a Control-M
+      run-as account whose NAME encodes a data platform is REGISTERED in the directory
+      to that platform's application, while the FOLDER whose jobs run as it is
+      ATTRIBUTED to a newer, product-aligned application. Neither source is wrong.
+      They answer different questions — WHO OWNS THE ACCOUNT versus WHOSE WORK THE
+      FOLDER IS — and this gate's earlier sections were drafted as if the directory
+      answered the second. It does not, and no amount of column scoping fixes that.
+      The repo has already ruled this exact shape one grain up: seal-app-ref-edge-reshape
+      §B1's OWNER-NOT-USER ruling ("a folder belongs to whoever OWNS it, not whoever
+      USES it — a platform team's all-tenants utility folder belongs to the platform
+      team"). The platform account serving a consumer application is the same fact
+      pattern, applied to an account instead of a folder. The naming corroborates the
+      registration and NOT the consumption, which is exactly why §B4's ban on inferring
+      an application from a name prefix has to hold — here the prefix confidently
+      yields the wrong application for the job.
+    confirmations:
+      - "G1. THE EDGE ASSERTS REGISTRATION, NEVER CONSUMPTION. (:AppUser)-[:BELONGS_TO_APPLICATION {role:'service_account'}]->(:BusinessApplication) means 'this application owns this account'. Edge property `assignment_kind: 'registration'` makes that explicit on the data rather than only in this page."
+      - "G2. NO TRANSITIVE READ ONTO JOBS. An account's registration MUST NOT propagate to the jobs that run as it — not in a loader, not in a QuerySpec, not in a convenience view. The two facts MEET ON THE JOB and nowhere else: (:ControlMJob)-[:EXECUTED_BY]->(:AppUser)-[:BELONGS_TO_APPLICATION]->(app A) alongside (:ControlMFolder)-[:BELONGS_TO_APPLICATION]->(:Port)<-(app B). A traversal that shortcuts from job to app A is the defect this confirmation exists to forbid."
+      - "G3. THE K2 FID TIER IS MIS-SPECIFIED, NOT MERELY UNIMPLEMENTED — and this is a change to a SIGNED gate, so it returns to HITL rather than being absorbed as a loader detail. seal-attribution-match-policy orders SEAL > FID > APP_NAME > ALIAS as evidence of the JOB's application; §G's evidence shows the FID tier carries registration, so filling TierReconcilers.fid as originally specified would resolve a job to the account's owning application and CONTRADICT a confirmed app-code mapping. The tier is harmless today only because the table is empty. RE-SCOPE PROPOSED: FID evidence resolves ONLY where no confirmed folder attribution exists, and never overrides one; a FID-tier result that disagrees with a confirmed mapping is reported as a disagreement, never written."
+      - "G4. THE DISAGREEMENT IS A FINDING, NOT A QA METRIC. 'Jobs attributed to application X running as accounts registered to application Y' is a first-class report and a remediation input — the intersection is where the estate's real cross-application execution becomes visible, and it exists only because both facts were loaded uncollapsed."
+      - "G5. THREE READINGS, DISTINGUISHED PER CASE AND NEVER GLOBALLY: (a) different subjects, both correct — a platform account serving a consumer application; (b) STALE DIRECTORY — an application decomposition into product-aligned SEALs happened and re-registration lagged, so the directory is wrong and this is a remediation candidate (drydocs_remediation); (c) wrong folder attribution. No single source distinguishes them. The graph does, one disagreement at a time, with a human ruling each — which is the strongest available argument for loading both and collapsing neither."
+      - "G6. A DERIVED THIRD FACT IS NOT AUTHORED HERE. 'Which application's work this account actually performs' is derivable from the jobs and is asserted by no source. It stays a REPORT for now; promoting it to an edge is its own gate, after G4's report has run long enough to show whether the answer is stable."
+
+open_questions:
+  - "Q0 (raised by §G, and it reorders the rest): is the registration/work split DESIGNED or STALE in the general case — i.e. what proportion of disagreements are §G5(a) versus §G5(b)? The census (§D2) now has to report the disagreement breakdown, not just the row counts, because that ratio decides whether the directory is a trustworthy ownership source with expected consumer divergence, or a lagging record needing remediation."
+  - "Q1 (blocks A3): are functional-id NAMES unique at a point in time, and are they ever reused after retirement? Directory owner answers; everything about historical joins by name depends on it."
+  - "Q2: does the directory expose ANY history surface at all — a transfer log, an audit table, a prior-application column — or is snapshot diffing genuinely the only route (§B3)? Worth one question to the directory owner before we build diffing."
+  - "Q3: is the export the only pull mechanism, or is there an API? Determines whether the demand-set pull (§D1) can be a targeted query or must be a full extract filtered on our side — which changes the confidential surface even when the loaded scope is identical."
+  - "Q4 [ANSWERED IN THE NEGATIVE 2026-08-05 — see §G]: does the directory's application assignment agree with the Control-M-derived attribution where both exist? It does not, in at least one confirmed case, and the drafting of this question assumed agreement was the expected state. Retained as the MEASUREMENT question (what is the rate, and what is its §G5 breakdown) rather than the open question of whether disagreement occurs at all. NOTE what this does to the precedence review it was deferring: §G3 makes that re-scope urgent rather than future."
+  - "Q5: do accounts of the non-application types (component, privileged-access, verification) ever appear as Control-M run-as owners? If yes, type cannot be used even as an explanatory filter and §D2's breakdown is the only lens."
+  - "Q6: is there an application-level roll-up in the directory (all accounts for an application) or only per-account lookup? Decides whether the census is one query or N."
+
+risks:
+  - "Point-in-time fact treated as durable: the single largest failure mode, and the one the user's hesitation already identified. §B1/§B4 are the countermeasure; note that once a derived fact loses its as_of, no later cleanup can restore it."
+  - "Fuzzy name matching: names differ by environment suffix and single tokens, so approximate matching would be both highly confident and wrong. §F3 forbids it."
+  - "Scope creep by export convenience: a full extract is easier to request than a filtered one, and once it exists the pressure is to load it. §D1/§D5 are the countermeasure."
+  - "Confidential surface: the directory carries employee SIDs, mailbox addresses, and support-team names. §D3 narrows the columns; §E3 keeps rows out of this repo."
+  - "Two crosswalks: building a private name->application map for the version work while K2's TierReconcilers.fid stays empty would fork the join. §C4 forbids it."
+
+decision: ~          # transcribed to config/gate-log.md on sign-off
+status: awaiting-sme
+drafted: 2026-08-04
+unblocks:
+  - "seal-attribution-match-policy tier 2 (TierReconcilers.fid — empty producer-side since the K2 build)"
+  - "software-version-context §F (the application-level version rollup)"

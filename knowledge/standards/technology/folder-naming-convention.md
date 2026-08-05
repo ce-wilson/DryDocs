@@ -44,6 +44,95 @@ So `P` + `R` + `AOC` + `G` → `PRAOCG`.
 
 ---
 
+## TWO internal standards, not one (SME, 2026-08-05)
+
+The `authority: internal-standards` in this file's frontmatter models **one** internal
+tier. There are at least **two**, and they nest:
+
+```
+Vendor (BMC baseline)  →  Company / Platform team  →  Lower support group
+   folder field exists      DAT SRE standard             HLT standard
+                            (framework-coded)            (application-coded)
+```
+
+`refines:` is therefore a **chain, not a flag** — the HLT standard refines the DAT SRE
+standard, which refines the BMC baseline. Both internal levels are `authority: tier 2`
+under `config/precedence.yaml` today, which cannot express which of the two wins where
+they differ. Recorded as a gap; not resolved here.
+
+The two standards produce **different folder grammars off a shared 6-char prefix**:
+
+| | DAT SRE (platform team) | HLT (support group) |
+|---|---|---|
+| Persona it serves | SRE — monitor **by application**, roll job failures up to the owning PAT product | L2/L3 app support — monitor by application and by the escalation queues that correlate to the SEAL CI |
+| Prefix pos 3–5 | **framework/platform** code | **application** code |
+| Prefix pos 6 | `G` (smart folder) | **frequency letter** — current, not legacy |
+| SEAL | a **token inside the folder name** (the app code has none) | carried by the **app code itself** |
+| Framework identity | *is* the app code | moves to a **sub-application**, `PR<Appcode>-<Platform App Code>` |
+| Grammar | `PR<fw>G-AREA_PRODUCT-SEAL-PROCESS-ZONE-FREQ` | `PR<app><Freq>-HLDM\|HLDF-<SOR/Reporting Seal>-<DataSetGroup_BusProcess>-<Zone>-<Freq>` |
+
+### Tier discrimination — mechanically derivable, NOT a steward act
+
+**Positions 3–5 of the prefix discriminate the K7 tier.** Match them against the
+platform-code list (six framework codes; real values in the VALUES twin):
+
+- **pos 3–5 ∈ platform list** → **tier 2**. The `PR<fw>` application is a *framework with
+  no direct SEAL*; its folders belong to many consuming applications. The resolving SEAL
+  is the **SEAL token inside the folder name**, so per-folder resolution is derivable from
+  the name for the common case. The `AREA_PRODUCT` token is *specified* to equal the **PAT
+  Area Product name** exactly — no roll-ups, no breakings — but see the conformance caveat
+  immediately below before treating that as a resolvable key.
+- **pos 3–5 ∉ platform list** → **tier 1**, code carries the SEAL, fan-out is correct.
+
+This closes the gap recorded against `folder_attribution.py` — a platform code is
+declarable from the folder name plus a six-row list, instead of being discovered after
+a silent tier-1 fan-out.
+
+> ⚠️ **A specified "must" is not a data invariant (SME, 2026-08-05).** The
+> `AREA_PRODUCT` ↔ PAT Area Product name equality holds for the **majority** of DAT
+> products, **not all** — the standards page carries its own caveat ("exceptions exist —
+> confirm with SME before relying on the product↔area-product mapping"), and the DAT
+> standard governs only the Data & Analytics product line, with HLT following the same
+> shape *by convention* under separate guidelines. The existence of an automated
+> conformance checker for promotion is itself evidence that non-conformant folders are in
+> the estate.
+>
+> **Consequence for any loader:** the token is a **resolution attempt with a residual**,
+> never a lookup that must succeed. A folder whose `AREA_PRODUCT` token matches no PAT
+> Area Product is **surfaced**, not guessed at and not dropped — which is exactly the K7
+> steward path, so that fallback is a normal outcome rather than a rare one. Do not build
+> anything that treats an unmatched token as a defect in the folder.
+
+### The standing pattern: every cross-system join here is a norm, not an invariant
+
+Five in this family so far, and they behave identically: the app-code `descr` prefix, a
+functional id's registered SEAL, an alert's routing SEAL, the framework token in prefix
+positions 3–5, and this `AREA_PRODUCT` ↔ PAT equality. Each is *usually* right, which is
+the dangerous kind — hand-sampling confirms them and the tail fails silently.
+
+**The rule that follows:** none of these may be used as a key that must resolve. Each
+needs the same three-part handling — corroborate rather than validate, report the
+residual as a count, and route disagreements to a human. Deriving from one, or reddening
+a test on one, is a defect in the consumer, not in the data.
+
+### The sub-application seam — a declared application→software link
+
+Under the HLT standard the framework does not disappear; it becomes a **sub-application**
+on the job: `PR<Appcode>-<Platform App Code>`. That is a *declared* statement that a given
+application runs on a given ETL framework — i.e. an
+`(:BusinessApplication)-[:USES_SOFTWARE]->(:SoftwareProduct)` fact already present in the
+scheduling data, at scale, with an authoring standard behind it. Two of the six framework
+codes have no `config/taxonomy/software-registry.yaml` product row yet (the DPL gap that
+`invocation_patterns` already records, plus Snowflake ETL), so registering those products
+is the prerequisite.
+
+### `1 SEAL per folder` — independent corroboration of the K7 1:1 rule
+
+The HLT data-classification rule states **one SEAL per folder**, using the Reporting App
+SEAL where data is aggregated from multiple sources. That is the company's own naming
+standard independently asserting what `graph-tests/folder-attribution-coverage.yaml`
+enforces as folder→application 1:1 — arrived at from opposite directions.
+
 ## Position 6 — historical meaning (important context)
 
 The 6th character was **originally a frequency indicator**, not a folder-type marker:
@@ -56,6 +145,21 @@ The 6th character was **originally a frequency indicator**, not a folder-type ma
 | … | others *(to confirm — SME said "etc.")* |
 
 **Today, everything is a SMART folder**, so position 6 is now `G` (Smart folder) rather than a frequency code. Expect **legacy folder names still carrying frequency codes** (`…D`, `…W`, `…M`) in the existing estate — graph/analysis logic should treat position 6 as *either* frequency (legacy) *or* `G` (current), not assume one.
+
+> **CORRECTED 2026-08-05 (SME standards pages).** "Frequency at position 6 = legacy" is
+> true only of the **DAT SRE** standard, where `G` is current. Under the **HLT** standard a
+> frequency letter at position 6 is the **CURRENT** convention — an HLT folder prefix is
+> `PR<Appcode><Freq>`. So a frequency letter is *not* evidence of a legacy name; which
+> standard the prefix follows decides how to read position 6, and pos 3–5 is what tells
+> you the standard. The "treat as either, never assume" advice stands — the *reason* was
+> wrong.
+>
+> Confirmed frequency tokens: `D` daily · `W` weekly · `M` monthly · `Q` quarterly ·
+> `Y` yearly · `R` request/adhoc · `H` holiday · `G` smart/group folder. Zone tokens
+> (folder = data layer, next-to-last token): `RAW` raw placement · `TRUS` trusted
+> (placement + ingestion) · `RFND` refined (CDC + semantic) · `PROV` provision to
+> consumption · `ONPM` on-premise · `TECH` tech-debt/workaround, removed after cutover.
+> These close several *(to confirm)* gaps below.
 
 ---
 
@@ -72,7 +176,12 @@ The 6th character was **originally a frequency indicator**, not a folder-type ma
 | `PRAOC` | **Platform** | Ab Initio ETL platform (data lake, SRE-dictated) | **No direct SEAL** |
 | `PRDCL` | **Platform** | Java/PySpark jobs loading to AWS cloud (SRE-dictated) | No direct SEAL |
 | `PRSRV` | **Application** | Servicing reporting & analytics — team-created, application-tied | direct SEAL — sanitized sample id **70003** (Consumer Servicing Reporting & Analytics) |
-| `PRARA` | *(observed)* | Advice reporting & analytics (`ARA` mnemonic unconfirmed) | SEAL via declared folder variable — sanitized sample id **70002** (Retail Advice Reporting & Analytics); code-type to confirm |
+| `PRARA` | **Application** *(confirmed 2026-08-05)* | **A**dvice **R**eporting & **A**nalytics — mnemonic confirmed, code-type confirmed tier 1 | direct SEAL — sanitized sample id **70002** (Retail Advice Reporting & Analytics) |
+
+**Completeness (2026-08-05):** the platform list is now **closed at six framework codes**
+(real values in the VALUES twin), and the HLT application codes are enumerated at five.
+"Extend as confirmed" no longer applies to the platform side — a seventh framework code
+would be a change to the DAT SRE standard, not a discovery.
 
 ### Observed job inventory (2026-06-11 query — conclusions only; full real counts in the values twin)
 

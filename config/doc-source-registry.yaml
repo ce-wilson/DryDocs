@@ -164,6 +164,43 @@ sources:
       Data Contracts (DPROD) frameworks + the Taxonomy Framework property
       tables — the known capture holes that block crosswalk sign-off.
 
+  - id: adhoc-sme-email
+    classification: Internal              # real threads carry named individuals, internal addresses, SEAL ids, functional ids
+    source: "SME-compiled email threads and their attachments, saved company-side under internal/ — one :Document per email, never a corpus per email"
+    connector: email
+    manifest: ~                           # no capture manifest — there is no connector; each Document records its own custodian + digest (gate §D4)
+    trust_default: VERBATIM               # the document is the SME's own words, stored as sent
+    tier: T4
+    curation: sme-confirm                 # T4 ladder (ADR 0006 §4)
+    target_db: ddcontext                  # SME context, never ground truth
+    refresh: manual
+    taxonomy_path: ~
+    graph_locator:                        # nothing has loaded — no connector exists; locator lands with the first citation write
+      match: none
+      value: ~
+    confirmed: false                      # gate software-version-context §D is AWAITING SME — no loader may write from this entry
+    notes: >
+      THE LANDING ZONE for one-time evidence that arrives as email: a fact
+      an SME compiled by hand, for a review, with no system of record behind
+      it and no pipeline planned. Registering one corpus (rather than one per
+      email) keeps the ledger a ledger instead of an inbox.
+      SHAPE (gate software-version-context §D4, awaiting SME): CITATION-ONLY —
+      one :Document carrying doc_id / subject / sent_at / custodian /
+      source_digest / corpus_id, with NO body text and NO :Chunk chain. The
+      body carries named individuals and internal addresses, and there is no
+      email connector to refetch it reproducibly; the Document→Chunk spine
+      stays available without rework if one is ever built. Raw messages and
+      attachments live company-side under internal/, never in this repo.
+      TRUST IS SPLIT, and the split is the point: the DOCUMENT is VERBATIM;
+      FACTS DERIVED FROM IT are GROUNDED at best — these attachments are
+      hand-compiled tables. KNOWN DEFECT, first instance (2026-08-04): a
+      software-version table labeled a column "FID" while populating it with
+      functional-id NAMES. The evidence is never edited (a corrected copy of
+      an evidence document is no longer evidence); the correction is a
+      MAPPING applied at load, recorded here so the next reader of that
+      attachment does not repeat the misreading. See gate
+      fid-identity-and-scope §F.
+
   - id: jpmc-reports
     classification: External            # public SEC filings / investor-relations PDFs
     source: "scripts/ingest_jpmc_reports.py (REMOVED 2026-07-22 — one-off script with hardcoded connection, superseded by module loaders; recover via git history if needed. 2 local-only PDFs: annualreport-2024 + mda10k-2024; never committed — the root /*.pdf gitignore precedent)"

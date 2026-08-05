@@ -16,10 +16,98 @@ Captured 2026-06-11 from SME (chat); relocated here 2026-07-27 (J14).
 
 | Code | Type | Meaning | SEAL tie |
 |---|---|---|---|
-| `PRAOC` | **Platform** | Ab Initio ETL platform (data lake, SRE-dictated) | **No direct SEAL** |
-| `PRDCL` | **Platform** | Java/PySpark jobs loading to AWS cloud (SRE-dictated) | No direct SEAL |
+| `PRAOC` | **Platform** | Ab Initio ETL platform (data lake, SRE-dictated) | **Carries the PLATFORM's SEAL** — see correction below |
+| `PRDCL` | **Platform** | Java/PySpark jobs loading to AWS cloud (SRE-dictated) | Carries the platform's SEAL |
+
+> **CORRECTED 2026-08-05 (SME).** "No direct SEAL" was wrong as stated, and the standards
+> diagram's "framework, no direct SEAL" means something narrower. **A platform app code
+> DOES carry a SEAL — the platform's own.** The Data Lake owns `AOC` and the app-code
+> registry gives it the Data Lake's SEAL; what the code does not identify is the
+> **consuming** application, because *other SEALs' jobs run under that same code*.
+>
+> Two consequences worth keeping straight:
+> - The K8 loader's "declare a platform code by leaving `app_id` EMPTY" encoding discards
+>   a true fact (the platform's own SEAL) in order to signal a different one (this code
+>   does not identify consumers). An explicit row kind is the right discriminator; the
+>   store's app_id-required check is correct as it stands.
+> - Under OWNER-NOT-USER, a platform's OWN utility folders legitimately belong to the
+>   platform's SEAL. So "platform code" does not mean "attributes nothing" — it means
+>   attribution is per folder, and some of those folders resolve to the platform itself.
+>
+> Separately and NOT the same thing: `DDC` shows codes get **repurposed** over time
+> because the 3-char namespace is scarce. That is a durability problem (a code is an
+> as-of identifier), not a many-consumers problem.
 | `PRSRV` | **Application** | Home Lending **Servicing** — created by our team (same platform, similar standards for Grafana dashboards) | **SEAL 110865** |
 | `PRARA` | *(observed)* | Application field of the worked example folder (`PRARAG-…`); `ARA` ≈ Advice & Reporting? *(mnemonic unconfirmed)* | **SEAL 111027** Home Lending Advice and Reporting (via declared folder variable; code-type to confirm) |
+
+### THE PLATFORM-CODE LIST — complete as of 2026-08-05 (SME standards page)
+
+**This is the tier-2 list the K8 loader needs and could not previously get** (see the
+mechanism twin's "Tier discrimination" section). Sourced from the DAT SRE standard's
+Framework → APPCODE table. Every row here is a **framework/platform** code: the
+`PR<code>` application is a framework with **no direct SEAL**, and its folders belong to
+many consuming applications.
+
+| Framework | App (PR-form) | APPCODE | Server | Software-registry product |
+|---|---|---|---|---|
+| DPL (Data Pipeline On Cloud, AWS) — also PySpark transformations | `PRDCL` | `DCL` | P032 | **no product row yet** (the standing gap) |
+| Ab Initio (on cloud) | `PRAOC` | `AOC` | P032 | `abinitio` |
+| Informatica → Snowflake | `PRIOS` | `IOS` | P014 | `informatica-powercenter` |
+| Snowflake ETL | `PRSFS` | `SFS` | P014 | **no product row yet** (snowflake) |
+| ABICOLO (DCM) — Informatica TD→SF + DMV | `PRDDC` | `DDC` | P032 | `informatica-powercenter` (+ DMV) |
+| (legacy) Data Pipeline — predecessor of PRDCL | `PRDPL` | `DPL` | — | same gap as DCL |
+
+⚠️ **`DDC` / SEAL 111374 is the worked example of code repurposing:** the code was
+*originally* created for the PySpark conversion and has since been **repurposed —
+nothing PySpark now**. SEAL 111374 carries two deployments: the Informatica platform
+supporting Teradata → Snowflake, and DMV (Data Migration & Validation across Teradata and
+Snowflake). This is why the app-code `descr` column is majority-correct-not-authoritative:
+a repurposed code keeps its old description until someone edits it.
+
+### HLT application codes (tier 1 — code carries the SEAL)
+
+Five HLT Control-M apps. Each carries one application QR on its jobs (`PR<appcode>-HL-QR`).
+
+| App code | SEAL | Application (Reporting & Analytics) |
+|---|---|---|
+| `PREBM` | 111025 | Chase MyHome Explore, Buy, Manage R&A |
+| `PRCOH` | 111026 | Correspondent Originations Platform R&A |
+| `PRARA` | 111027 | Chase MyHome Advice R&A |
+| `PRSRV` | 110865 | Home Loan Servicing R&A |
+| `PRORG` | 110866 | Chase MyHome Originations R&A |
+
+Confirms and supersedes the *(observed / mnemonic unconfirmed)* `PRARA` row above:
+`ARA` = **Advice Reporting & Analytics**, SEAL 111027, tier 1, app-tied.
+
+### HPSM → ServiceNow escalation queues (system of record: `internal/orchestration/hlt-hpsm-snow-queue-mapping.yaml`, carries SNOW group `sys_id`s)
+
+Each app maps to one **L3** group (primary escalation target) and three **L2** groups by
+platform (`…TD` Teradata · `…EXA` Exadata · `…SQL` SQLServer).
+
+| App code | L3 queue | L2 queues (TD · EXA · SQL) | PTO (Mgd / Fed) |
+|---|---|---|---|
+| `PREBM` | `C3CMHEBMRA` | `C2CMHEBMRATD` · `C2CMHEBMRAEXA` · `C2CMHEBMRASQL` | ✓ / – |
+| `PRCOH` | `C3COPRA` | `C2COPRATD` · `C2COPRAEXA` · `C2COPRASQL` | ✓ / – |
+| `PRARA` | `C3CMHARA` | `C2CMHARATD` · `C2CMHARAEXA` · `C2CMHARASQL` | ✓ / ✓ |
+| `PRSRV` | `C3HLSRA` | `C2HLSRATD` · `C2HLSRAEXA` · `C2HLSRASQL` | ✓ / – |
+| `PRORG` | `C3CMHORA` | `C2CMHORATD` · `C2CMHORAEXA` · `C2CMHORASQL` | ✓ / – |
+
+**The "book of work" claim (HLT standard, verbatim intent):** when Control-M jobs are
+active and the job↔SCIM relationship is **1:1**, the SCIM HPSM queues can serve as the
+Control-M inventory of folders/jobs **by SEAL**. Default queue is L3 to enforce hygiene:
+if the SCIM is undefined, is in `PRPL`, or is decommissioned, **the L3 team is
+accountable**. That accountability default is what makes the inventory claim hold —
+worth keeping intact if this is ever modeled.
+
+### Sources of record (internal)
+
+| Standard | Source of record |
+|---|---|
+| DAT SRE (platform framework naming) | `go/dtjobstandards` — Control-M Job Naming Standards (ADESRE 3811523057) |
+| HLT (application code naming) | Control-M guidelines for HLT AWS modernization effort (ADEOPS 3428013015) |
+| Automated conformance check | Autom8 **Control-M Standards Checker** — XML check that files intended for future production promotion meet scheduling guidelines (`autom8.gaiacloud.jpmchase.net/control-m-standards-checker`) |
+| HPSM/SNOW queue mapping | `internal/orchestration/hlt-hpsm-snow-queue-mapping.yaml` |
+| App-code → SEAL registry | `internal/orchestration/controlm-app-codes-with-seal.csv` |
 
 ### Real ↔ synthetic twin key (sanitized sample ids used in publishable files)
 

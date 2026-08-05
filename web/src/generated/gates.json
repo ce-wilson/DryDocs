@@ -593,6 +593,17 @@
     {
       "kind": "prompt-only",
       "date": null,
+      "title": "fid-identity-and-scope (gate page rendered — session not yet run)",
+      "status": "open",
+      "prompt_files": [
+        "config/gate-prompts/fid-identity-and-scope.yaml"
+      ],
+      "log_ref": null,
+      "unblocks": []
+    },
+    {
+      "kind": "prompt-only",
+      "date": null,
       "title": "rua-load-shapes (gate page rendered — session not yet run)",
       "status": "open",
       "prompt_files": [
@@ -627,6 +638,17 @@
       "status": "open",
       "prompt_files": [
         "config/gate-prompts/software-usage-patterns.yaml"
+      ],
+      "log_ref": null,
+      "unblocks": []
+    },
+    {
+      "kind": "prompt-only",
+      "date": null,
+      "title": "software-version-context (gate page rendered — session not yet run)",
+      "status": "open",
+      "prompt_files": [
+        "config/gate-prompts/software-version-context.yaml"
       ],
       "log_ref": null,
       "unblocks": []

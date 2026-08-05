@@ -1365,6 +1365,26 @@
       "loaders": []
     },
     {
+      "id": "adhoc-sme-email",
+      "home": "doc-registry",
+      "system": null,
+      "origin": null,
+      "kind": "doc-corpus",
+      "authority": null,
+      "derived": false,
+      "urn": null,
+      "replaces": null,
+      "classification": "Internal",
+      "confirmed": false,
+      "ledger": {
+        "state": "placeholder",
+        "path": null
+      },
+      "taxonomy_captures": [],
+      "ontology_mappings": [],
+      "loaders": []
+    },
+    {
       "id": "jpmc-reports",
       "home": "doc-registry",
       "system": null,

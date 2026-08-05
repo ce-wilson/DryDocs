@@ -1,0 +1,212 @@
+# SME gate-prompt spec — adding SOFTWARE VERSION as graph context, from an adhoc
+# evidence email, at the grain the evidence actually has.
+#
+# DRAFTED 2026-08-04 (user direction, desktop session): an SME email compiled for a
+# software-version readiness review lists, per application, which Ab Initio install
+# paths are in play. The user's opening proposal was
+#   (:BusinessApplication)-[:USES_SOFTWARE {version}]->(:SoftwareProduct)-[:documented_by]->(email)
+# This page proposes a corrected shape and asks the SME to rule on it. TWO defects in
+# the opening proposal are named up front so the gate is not re-litigating them blind:
+#   (1) Neo4j cannot attach a relationship to a relationship. "[:documented_by] email"
+#       hanging off the USES_SOFTWARE edge is not expressible as drawn — evidence
+#       attaches by property pointer, by node-grain edge, or by reifying the assertion
+#       (§D2, three options).
+#   (2) The evidence rows are NOT (application, product) rows. They are
+#       (functional-id name, install path) rows — the same application appears MANY
+#       times with different versions, and the application is reached only by a
+#       MUTABLE ownership join (§A1). Writing the app-level edge directly bakes a
+#       time-varying derivation into a fact and discards the grain that makes it
+#       re-derivable.
+# GATE-BOUND: nothing below is written, no vocabulary entry flips, no loader is built
+# until §G signs. Mechanism-only: no real SEAL ids, functional ids, install roots,
+# person names, or email addresses in this repo — real rows are Internal and live
+# company-side.
+classification: Internal-Public
+schema: drydocs.gate-prompt.v1
+id: software-version-context
+title: "SME Gate — software VERSION as context: evidence grain, edge shape, version cardinality, and how an adhoc email attaches as evidence"
+step: "Pre-build gate — rules the shape BEFORE any adhoc loader is written; the app-level rollup is separately blocked on gate fid-identity-and-scope"
+summary: >
+  DryDocs knows WHICH software an application uses (USES_SOFTWARE, ACTIVE — registry
+  stack rows, batch-port declared rows, app-code-mapping confirmed rows). It does not
+  know WHICH VERSION, per application, in the estate. The first concrete evidence is
+  an SME-compiled email listing install paths per functional id for one software
+  product (Ab Initio), gathered for a version-readiness review — unstructured context,
+  one-time, with no pipeline behind it and none planned. This gate rules how that fact
+  enters the graph without (a) inventing a grain the evidence does not have, (b)
+  losing the document it came from, or (c) creating an adhoc edge nobody can later
+  find and sweep. Sections: A grain · B edge shape and version cardinality · C the
+  path -> product+version derivation · D the evidence document · E adhoc boundary and
+  replacement path · F the application-level rollup (blocked) · G confirmations.
+meta:
+  Module: "drydocs_core/ontology (one new vocabulary entry) · config/taxonomy/software-registry.yaml (products, unchanged) · config/doc-source-registry.yaml (adhoc-sme-email corpus, registered unconfirmed) · a future adhoc loader (not built)"
+  Source: "ONE SME-compiled email + its attached table. No system of record, no feed, no refresh. The install-path inventory behind it was gathered by hand for a readiness review."
+  Registry ref: "adhoc-sme-email (config/doc-source-registry.yaml, confirmed: false — registered by this gate's prep commit, loads nothing) · software-registry products row `abinitio` already exists (versions: [] — plan-07 Phase 3 detection target)"
+  Classification: "Internal — the real rows carry functional ids, SEAL ids, install roots, and named individuals. THIS PAGE Internal-Public (mechanism only)."
+  Vocabulary: "reg_uses_software (ACTIVE, BusinessApplication -> SoftwareProduct; local Agent->Entity, no PROV row) is the existing entry. This gate proposes ONE new entry at the AppUser grain (§B1) — same label, different from/to, the C8-clean new-entry precedent (RELATIONSHIP_GUIDE)."
+  Ontology map: "config/taxonomy-ontology-map.yaml software-version-context (proposed 2026-08-04, this gate's entry)"
+  Related gates: "software-usage-patterns (plan-07 Phase 3 — the AUTOMATED replacement this adhoc load must name, §E1) · fid-identity-and-scope (the FID->application join this gate's §F depends on) · seal-app-ref-edge-reshape §C1 (the OWNER-NOT-USER + app-node-stays-a-record rulings, cited in §F not re-decided) · bmc-docs-lexical-load (the Document/Chunk shape §D4 declines to use) · audit-envelope-phase4 (the stub precedent §B3 applies)"
+
+mapping:
+  - n: 1
+    element: "Evidence row: (functional-id NAME, install path) — e.g. `<fid-name>, <install-root>/abinitio-V<a>-<b>-<c>-<d>`"
+    target: ":AppUser {fid...}  +  :SoftwareProduct {product_id: 'abinitio'}  [product node EXISTS]"
+    edge: "(:AppUser)-[:USES_SOFTWARE {version, install_path, source, origin, as_of, evidence_doc_id}]->(:SoftwareProduct)  [PROPOSED — new vocabulary entry, §B1]"
+  - n: 2
+    element: "Same evidence row, application column (SEAL id)"
+    target: ":BusinessApplication {app_id}"
+    edge: "(:BusinessApplication)-[:USES_SOFTWARE {version, source, origin:'declared', as_of}]->(:SoftwareProduct)  [PROPOSED AND BLOCKED — §F, depends on gate fid-identity-and-scope]"
+  - n: 3
+    element: "The email itself (subject, sent date, custodian, attachment digest)"
+    target: ":Document {doc_id, corpus_id: 'adhoc-sme-email'}  [PROPOSED — citation-only, §D4]"
+    edge: "evidence attaches per §D2 — one of: edge property pointer (recommended) | node-grain HAD_PRIMARY_SOURCE | reified assertion node"
+  - n: 4
+    element: "Version string parsed out of the install path"
+    target: "edge property `version` (+ `version_raw`)"
+    edge: "NOT appended to SoftwareProduct.versions[] — §C2. The registry YAML stays human-curated; observed versions live on edges."
+  - n: 5
+    element: "An evidence row whose functional id resolves to no :AppUser, or whose path matches no product"
+    target: "no node written"
+    edge: "no edge — counted in the load report as unresolved, never guessed (the manual-loads coverage precedent)"
+
+provenance:
+  - label: "(:AppUser)-[:USES_SOFTWARE]->(:SoftwareProduct)  [PROPOSED, no loader yet — the §A1 load grain]"
+    source_object: "the SME evidence table attached to one email (corpus adhoc-sme-email); one row per (functional-id name, install path)"
+    key: "(AppUser.fid, SoftwareProduct.product_id, install_path)  — MERGE keyed {source, install_path}, §B2"
+    loader: "not yet built — this gate authorizes the shape only; the adhoc loader is a separate step, registered in config/manual-loads/manifest.yaml per §E4"
+    properties:
+      - {name: install_path, origin: source, from: "the evidence row's path column, verbatim", note: "the row's identity and the MERGE key — carried unchanged so a parser change can never silently re-key an existing edge"}
+      - {name: version_raw, origin: source, from: "the version token as it appears inside install_path", note: "preserves the evidence exactly; §C3"}
+      - {name: version, origin: derived, from: "normalization of version_raw (separator + no zero-padding, §C3)", note: "the form a comparison query needs; never written back to the curated product registry (§C2)"}
+      - {name: source, origin: derived, from: "literal 'adhoc-abinitio-version-<yyyymmdd>'", note: "dated so the batch is one MATCH away from being found, re-run, or swept (§E1)"}
+      - {name: origin, origin: derived, from: "literal 'declared'", note: "human-asserted, never derived — the batch-port precedent; superseded rather than swept when a derived edge for the same pair arrives (§E2)"}
+      - {name: as_of, origin: source, from: "the email's sent date", note: "NOT the load date — first_seen_at/last_seen_at/last_run_id keep their standing when-WE-saw-it meaning (§B4)"}
+      - {name: evidence_doc_id, origin: derived, from: "the :Document minted for this email in corpus adhoc-sme-email", note: "the §D2 option (a) pointer; what makes a later migration to a reified assertion mechanical"}
+      - {name: "the four audit-envelope properties", origin: derived, from: "NOT WRITTEN", note: "this source has no native audit columns — an email's author and sent date are the DOCUMENT's provenance, not the row's. config/audit-fields.yaml entry stays status: stub (§B3)"}
+  - label: "(:BusinessApplication)-[:USES_SOFTWARE]->(:SoftwareProduct)  [PROPOSED AND BLOCKED — §F]"
+    source_object: "DERIVED from the fid-grain edges above through the fid -> application join; the evidence table's own application column is NOT the source of record for it"
+    key: "(BusinessApplication.app_id, SoftwareProduct.product_id, version)"
+    loader: "not built and not authorized — blocked on gate fid-identity-and-scope; not written provisionally, not written behind a flag"
+    properties:
+      - {name: app_id, origin: derived, from: "the fid -> application join (gate fid-identity-and-scope §C1)", note: "neutral identity key per business-application-identity; a point-in-time assertion, never an immutable fact"}
+      - {name: as_of, origin: derived, from: "inherited from the fid-grain edge AND the join's own as_of, whichever is older", note: "so a later ownership transfer re-derives this edge rather than contradicting it (§F2)"}
+      - {name: "join method / confidence", origin: derived, from: "the fid-join tier that resolved it", note: "carried on the edge so a rollup built on a weak join is visibly weak"}
+  - label: ":Document {corpus_id: 'adhoc-sme-email'}  [PROPOSED — citation-only, §D4]"
+    source_object: "the email as sent, stored company-side under internal/"
+    key: "doc_id"
+    loader: "no email connector exists — the Document is minted by the adhoc loader from a hand-recorded citation, which is exactly why §D5 requires the stored path on the registry entry"
+    properties:
+      - {name: "subject / sent_at / custodian", origin: source, from: "the email headers", note: "recorded as sent; the evidence is never edited (fid-identity-and-scope §F1)"}
+      - {name: source_digest, origin: derived, from: "hash of the stored message + attachment", note: "the freshness/tamper anchor the rest of the doc ledger relies on"}
+      - {name: "body text / :Chunk chain", origin: source, from: "NOT LOADED", note: "the body carries named individuals and internal addresses (Internal), and there is no connector to refetch it reproducibly (§D4)"}
+      - {name: trust, origin: derived, from: "VERBATIM for the document, GROUNDED for facts derived from it", note: "the split is the point — the attachment is a hand-compiled table with a known column mislabel (§D3)"}
+
+sections:
+
+  - id: A
+    title: "GRAIN — what the evidence rows actually are"
+    body: >
+      The table in the email has one row per (functional-id name, install path). The
+      SAME application appears repeatedly with different install paths, and therefore
+      different versions — this is a filesystem/entitlement inventory, not a
+      one-fact-per-application statement. The application column is not measured; it
+      is reached by joining the functional id to its owning application, and that join
+      is exactly the mutable, point-in-time thing gate fid-identity-and-scope exists to
+      rule. Writing the application-level edge as the PRIMARY fact would therefore bake
+      a derivation into a fact, and lose the only grain at which the fact can later be
+      re-derived when ownership moves.
+    confirmations:
+      - "A1. The LOAD GRAIN is the functional id: (:AppUser)-[:USES_SOFTWARE]->(:SoftwareProduct), one edge per (fid, install path). The application-level edge is DERIVED from it (§F), never authored directly from this evidence."
+      - "A2. SEMANTICS of the edge — the SME rules which of these the row asserts, because USES_SOFTWARE means USES: (a) the functional id RUNS workload on this install (usage); (b) the functional id is ENTITLED to this install / the install is present on its hosts (availability). If (b), the edge label is wrong and this gate needs a second vocabulary entry rather than reusing USES_SOFTWARE. RECOMMENDATION: ask the compiler of the table; a readiness review usually inventories availability, and the OWNER-NOT-USER distinction already cost us one modeling round at K7."
+      - "A3. If A2 resolves to (b) availability, this gate PAUSES at A3 and returns for a second draft rather than proceeding through B–F on the wrong verb."
+
+  - id: B
+    title: "EDGE SHAPE and VERSION CARDINALITY"
+    body: >
+      reg_uses_software is registered from_node BusinessApplication only. A different
+      from_node is a new vocabulary entry sharing the label — the same C8-clean
+      precedent that gave docs_chunk_part_of and doc_section_part_of separate entries
+      on PART_OF. The version multiplicity is the sharp edge: the existing edge MERGEs
+      keyed on {source} (C14), which is correct while one source asserts one fact per
+      pair, and WRONG here, where one source asserts several versions for one pair.
+      G3 already ruled this family 1:N and forbade a uniqueness constraint, so the fix
+      is the MERGE key, not a constraint.
+    confirmations:
+      - "B1. Register vocabulary entry `reg_appuser_uses_software`: AppUser -> SoftwareProduct, neo4j_label USES_SOFTWARE, prov_maps_to ~ (LOCAL — Agent -> Entity has no PROV usage row; the identical reasoning already recorded on reg_uses_software), domain registry, status planned until the loader exists."
+      - "B2. MERGE KEY is {source, install_path} — NOT {source}, and NOT {source, version}. install_path is the row's identity; version is derived FROM it (§C1), so keying on the derived value would make a parser change silently re-key existing edges. Two installs that parse to the same version stay two edges, which is the truthful answer."
+      - "B3. EDGE PROPERTIES: version · version_raw · install_path · source · origin · status · as_of · evidence_doc_id. The four audit-envelope properties are NOT written — this source has no native audit columns (an email has an author and a sent date, which is the DOCUMENT's provenance, not the row's). The corresponding config/audit-fields.yaml entry stays `status: stub`, the audit-envelope-phase4 precedent."
+      - "B4. `as_of` carries the email's sent date, NOT the load date. first_seen_at/last_seen_at/last_run_id keep their standing meaning (when WE saw it) and are not overloaded."
+
+  - id: C
+    title: "DERIVATION — install path -> product + version"
+    body: >
+      The path embeds both the product and the version by convention
+      (`<install-root>/abinitio-V<a>-<b>-<c>[-<d>]`). That is a naming convention, not
+      a contract — the same class of signal as the PRAOCG folder code and the
+      CMD_LINE launcher patterns, both of which are gate-ruled rather than assumed.
+    confirmations:
+      - "C1. The path -> product match is a PATTERN TABLE row, authored in the same shape as config/taxonomy/software-registry.yaml#invocation_patterns (id, product, field, match_type, pattern, example, status) rather than as loader-embedded regex — so the two software-detection surfaces share one reviewable table instead of forking."
+      - "C2. Observed versions do NOT auto-append to the `abinitio` product's `versions:` list in config/taxonomy/software-registry.yaml. That file is human-curated and is the source of truth for what the product IS; what the estate is RUNNING lives on edges. (Confirming this is what keeps a mislabeled evidence row from silently editing the registry.)"
+      - "C3. Version normalization: store BOTH — `version_raw` verbatim from the path (`V4-3-2-2`) and `version` normalized (`4.3.2.2`). Neither alone is sufficient: raw preserves the evidence, normalized is what a comparison query needs. SME confirms the normalized form's separator and whether a missing 4th component is padded (`4.3.2` vs `4.3.2.0`) — RECOMMENDATION: never pad; absent is not zero."
+      - "C4. A path that matches no pattern row is reported unresolved and loads nothing (mapping row 5). No nearest-match product assignment, ever — the coverage_policy already standing in the software-registry invocation_patterns section."
+
+  - id: D
+    title: "THE EVIDENCE DOCUMENT — saving and referencing the email"
+    body: >
+      The user's requirement is explicit: save the email and reference it, with no
+      pipeline built and none planned. DryDocs already has the ledger for exactly this
+      — config/doc-source-registry.yaml, whose `connector` vocabulary already includes
+      `email`. What it does NOT have is a way to hang a document off a RELATIONSHIP,
+      which is what the opening sketch drew.
+    confirmations:
+      - "D1. Register ONE corpus `adhoc-sme-email` (not one corpus per email): connector email, tier T4, curation sme-confirm, target_db ddcontext, trust_default GROUNDED, refresh manual, graph_locator match corpus_id, confirmed false. Individual emails are :Document rows inside it. Registering per-email corpora does not scale and would turn the ledger into an inbox."
+      - "D2. EVIDENCE ATTACHMENT — the SME picks ONE. (a) PROPERTY POINTER: each edge carries `evidence_doc_id`; doc -> what-it-evidenced is a property scan. RECOMMENDED for an adhoc batch of this size: no new node class, no new edge, and the pointer survives if the edge is later swept. (b) NODE-GRAIN EDGE: (:AppUser)-[:HAD_PRIMARY_SOURCE]->(:Document), extending the ACTIVE seal_had_primary_source pattern to a second from_node — traversable, but it answers 'this fid was sourced from that email', not 'THIS VERSION claim came from that email'. (c) REIFIED ASSERTION: a :SoftwareUsage influence node carrying version/install_path/as_of, with edges to product and Document — the seal_qualified_attribution pattern. Correct and precise; rejected as the OPENING shape because doc_feedback_authored_by set the precedent that reification is not taken on until there is a disambiguating payload the collapsed form cannot carry, and one shared batch document is not that. Note (a) and (c) are not exclusive over time: if a recurring version feed later arrives, (c) is the upgrade path and (a)'s pointer is what makes the migration mechanical."
+      - "D3. TRUST TIERING is split, and the split is the point: the DOCUMENT is VERBATIM (it is the SME's own words, stored as sent); the FACTS DERIVED FROM IT are GROUNDED at best — the table was hand-compiled and its identifier column is known-mislabeled (gate fid-identity-and-scope §A). Record the known defect ON the corpus entry, so no later reader treats the attachment as clean."
+      - "D4. CITATION-ONLY, not lexical: the email loads as ONE :Document carrying doc_id, subject, sent_at, custodian, source_digest, corpus_id — and NO body text, NO :Chunk chain. The body carries named individuals and internal addresses (Internal), and there is no email connector to fetch it reproducibly. The Document/Chunk spine is available later without rework if the connector is ever built."
+      - "D5. The RAW email + attachment are stored outside the graph, company-side, under the internal/ boundary, with the stored path recorded on the registry entry — never committed to this repo."
+
+  - id: E
+    title: "ADHOC BOUNDARY — how this stays findable and closable"
+    body: >
+      config/manual-loads/README.md already states the standing rule for human-authored
+      facts: every manual load is tech debt by definition, is registered before it
+      loads, and NAMES the automation that will replace it. This load is that, in a
+      different file format.
+    confirmations:
+      - "E1. `source` value is `adhoc-abinitio-version-<yyyymmdd>` — dated, so the batch is one MATCH away from being found, re-run, or swept, and a second readiness review does not collide with the first."
+      - "E2. `origin` is `declared` (the batch-port precedent): asserted by a human, never derived, and superseded rather than swept when a derived edge for the same pair arrives."
+      - "E3. NAMED REPLACEMENT: plan-07 Phase 3 CMD_LINE detection (gate software-usage-patterns) is the automation path for product; VERSION detection from resolved CMD_LINE paths is the extension this evidence justifies asking for. Recording the replacement here is what keeps the adhoc row from becoming permanent by default."
+      - "E4. This load is registered in config/manual-loads/manifest.yaml even though the payload is not the tier-5 node-mapping CSV shape, so one queue holds every human-authored fact rather than two."
+
+  - id: F
+    title: "THE APPLICATION-LEVEL ROLLUP — blocked, deliberately"
+    body: >
+      The rollup is the fact the support user actually wants ("which Ab Initio versions
+      is my application on?"). It is one join away — and that join is the whole subject
+      of gate fid-identity-and-scope: a functional id's application is a CURRENT-state
+      attribute of a mutable, transferable account, whose originating application may
+      never have been recorded.
+    confirmations:
+      - "F1. The rollup edge (:BusinessApplication)-[:USES_SOFTWARE {source:'adhoc-abinitio-version-<yyyymmdd>', origin:'declared', version, as_of}]->(:SoftwareProduct) is DERIVED from the §A1 fid-grain edges through the fid->application join, and is written ONLY after gate fid-identity-and-scope signs. Until then it is not written at all — not as a provisional edge, not behind a flag."
+      - "F2. The rollup carries `as_of` and the fid-join's method/confidence, so a later ownership transfer re-derives it rather than contradicting it."
+      - "F3. Target is :BusinessApplication, NOT the BatchProcessing :Port. Recorded because seal-app-ref-edge-reshape §C1 sent folder attribution to the Port precisely to keep batch topology off the app node — the distinction that keeps both rulings consistent is that 'what software this application uses' is a RECORD fact about the application (where USES_SOFTWARE already lives, C12), while folder containment is topology. SME confirms this reading rather than inheriting it silently."
+
+open_questions:
+  - "Q1 (blocks §A): does the source table assert usage or availability (§A2)? Only the person who compiled it can answer, and the answer changes the verb."
+  - "Q2: does the estate run more than one Ab Initio version PER functional id simultaneously (parallel installs for migration), or does the multi-row pattern reflect accumulated history / uncleaned installs? The first makes multi-edge correct and permanent; the second means the graph should carry a `current` discriminator the evidence does not supply."
+  - "Q3: is the install path stable enough to be a MERGE key (§B2), or do paths get re-pointed by symlink such that the same logical install changes path? A symlinked estate would make path a poor key and push identity onto (fid, version)."
+  - "Q4: version DETECTION from resolved CMD_LINE (§E3) — does the Phase-3 parser already surface enough of the path to derive a version, or is that a parser change? Answer scopes whether the automated replacement is near or far."
+  - "Q5: does any other software product in the registry carry the same version-in-path convention (Informatica, internal utilities)? If yes, the §C1 pattern table is the general surface from the start rather than an Ab Initio special case."
+
+risks:
+  - "Grain collapse (the defect this gate exists to prevent): writing the application-level edge directly makes the fact unrepairable when a functional id transfers — the evidence is gone and only the derived claim remains."
+  - "Silent registry edit: an auto-append of observed versions into config/taxonomy/software-registry.yaml would let a hand-compiled spreadsheet rewrite the curated product ledger. §C2 forbids it."
+  - "Adhoc permanence: an undated `source` value makes the batch unfindable and it becomes load-bearing by accident. §E1/§E3 are the countermeasure."
+  - "Evidence laundering: loading the derived facts while the email itself lives only in someone's mailbox means the graph asserts something no one can check. §D1/§D5 are the countermeasure."
+  - "Version-string ambiguity: `V4-3-2` and `V4-3-2-0` compare unequal as strings and may or may not be the same install. §C3 makes the choice explicit rather than emergent from a parser."
+
+decision: ~          # transcribed to config/gate-log.md on sign-off
+status: awaiting-sme
+drafted: 2026-08-04
+depends_on:
+  - fid-identity-and-scope   # §F only; §A-§E can sign independently

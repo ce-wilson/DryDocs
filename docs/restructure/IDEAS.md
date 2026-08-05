@@ -26,6 +26,174 @@ Tags help grooming: `idea` · `bug` · `doc` · `source` (new data source) · `q
 
 <!-- add new ideas at the top -->
 
+- 2026-08-05 — [bug] **CORRECTED SAME DAY — the claim below was WRONG in its headline and is kept
+  only for the narrow residue.** I reported that "every code authored through the K11 steward screen
+  is tier-1 by construction". It is not.
+  [`AppCodeCascadePane.tsx:288`](../../web/src/routes/AppCodeCascadePane.tsx) has a three-value tier
+  selector — `seal-born | platform | dual-coded` — and `tier === 'platform'` authors **per-folder**
+  rows (`app_code + folder_id + app_id`), which the loader indexes into `by_folder` and resolves per
+  folder. That IS K7 §B2's "resolves per folder", built and wired end to end. The screen handles
+  platform codes correctly. WHAT SURVIVES, and it is much smaller: the **code-level platform
+  DECLARATION** — the empty-app_id row whose only job is to mark a code so its *unresolved* folders
+  surface as `platform-unresolved` instead of falling through to the K2 fuzzy fallback — cannot be
+  authored through the store. Consequence is bounded to folders under a platform code that the
+  steward has not yet resolved per-folder: they get a fuzzy match instead of surfacing to a human.
+  Worth closing, not urgent, and NOT the silent fan-out I described. ALSO REVISED (user,
+  2026-08-05): platform app codes DO carry a SEAL — the platform's own — so "declare by absence of
+  app_id" was always the wrong encoding; an explicit row kind is the fix, and the store's
+  app_id-required check is correct as it stands.
+  ORIGINAL ENTRY, for the record: **K9/K11 cannot author a tier-2 platform declaration — the store
+  requires the exact field the loader requires to be empty.** Found reviewing the K series (user request).
+  [`drydocs_api/mappings.py:413`](../../drydocs_api/mappings.py) refuses a changeset entry unless
+  BOTH `app_code` and `app_id` are present ("app_code and app_id are both required — authoring is per
+  app code (K7 §B1)"), and the same requirement repeats in the second validator (~:541). But
+  [`folder_attribution.py:216-224`](../../drydocs/loaders/folder_attribution.py) uses an **empty
+  `app_id`** as the SOLE mechanism to mark a code as a declared platform code — a populated app_id is
+  read as a tier-1 code-level attribution and fans out to every folder under the code. **Consequence:
+  every code authored through the K11 steward screen is tier-1 BY CONSTRUCTION**, and a platform code
+  can only be declared by hand-writing an authored row that bypasses the store. This is the same
+  silent fan-out logged against the app-code CSV, reached by a second independent route — so the fix
+  cannot be "sanitize the CSV". FIX SHAPE: the store needs an explicit platform-declaration entry kind
+  (app_code + no target + rationale), not a relaxation of the app_id check — the check is right for
+  tier-1 rows and dropping it would let a blank target through as an ordinary attribution. Severity:
+  the loader is correct, the gate is correct, the WRITE PATH is the gap; nothing is mis-written today
+  because no producer-side platform code has been authored yet.
+- 2026-08-05 — [question] **"tier" names three different things — but the VALUE SPACES do not
+  collide, so this is naming hygiene, not the ambiguity I first claimed (corrected same day).** The
+  K7 row-kind tier is a STRING enum (`seal-born | platform | dual-coded`, `AppCodeCascadePane.tsx`);
+  the K2 match-precedence tier is an INT (1 SEAL … 5 manual); `drydocs_api/mappings.py` stamps the
+  int form on SUPPORTED_SHAPE definitions. `folder_attribution.py` writes the STRING onto the
+  BELONGS_TO_APPLICATION edge, so a `tier` edge property is not ambiguous in practice — I said a
+  `tier=2` edge could mean "platform" or "matched by FID"; it cannot, because the edge carries the
+  string. Still worth a rename (`row_kind` vs `match_tier`) for readers, and worth doing before
+  either surfaces in a QuerySpec, but it is cosmetic rather than a correctness risk.
+- 2026-08-05 — [question] **A Control-M app code is NOT a durable identifier — the 3-char limit
+  forces reuse (user, 2026-08-05).** Codes are a scarce namespace, so they get retired and reissued
+  with a different meaning; `DDC` is the documented case (created for the PySpark conversion,
+  repurposed, nothing PySpark now). CONSEQUENCE for the K9 store, which is about to be hand-keyed:
+  a code→application mapping is an **as-of assertion**, not a fact — the same shape as the FID→SEAL
+  registration ruled in `fid-identity-and-scope` §B1, and the third current-state-only identifier
+  found this week. `authored_on` already gives the store an as_of; what nothing prevents is a REUSED
+  code silently inheriting its predecessor's mapping, and folders authored under the old meaning
+  keeping an attribution that is now wrong. Wants: effective dating on the mapping, or at minimum a
+  reuse detection that surfaces "this code's mapping predates folders that appeared under it".
+
+- 2026-08-05 — [bug] **The app-code CSV is TIER-1-SHAPED, and loading it as authored rows would
+  silently fan a platform code's own SEAL onto every consumer folder under it.** THE MECHANISM (built,
+  [`folder_attribution.py:216-224`](../../drydocs/loaders/folder_attribution.py)): the ONLY way to
+  declare a tier-2 platform code is an authored row with **`app_id` EMPTY** — a populated app_id is
+  read as a code-level tier-1 attribution and fans out. `internal/orchestration/controlm-app-codes-with-seal.csv`
+  (company-side) populates `seal_id` on every row, including the platform codes, so a straight
+  CSV→authored-rows conversion can NEVER produce a platform declaration. Confirmed real by the user
+  2026-08-05: `AOC` (registered to the CCB Cloud Data Processing Platform SEAL, the datalake seal for
+  Ab Initio) and `DCL` (the DPL launcher spine, registered to a consumer app) are both shared platform
+  codes whose folders serve many consuming applications. K7 ALREADY RULED THIS — tier 2, "e.g. the DPL
+  launcher spine", folders SURFACE for steward completion, never auto-picked
+  ([`k7-folder-mapping-decisions.md:14`](k7-folder-mapping-decisions.md)) — so the 1:1 graph-test does
+  NOT red; the defect is upstream, at tier assignment. FIX SHAPE: an explicit platform-code list
+  applied BEFORE conversion, dropping `seal_id` for those codes rather than carrying it. The failure is
+  silent and looks correct — `AOC→110777` is a true statement about the PLATFORM, just not about the
+  consumer folders it would be stamped on. The only in-file hint of platform-ness is the word
+  "Platform" in `descr`, which is the untrustworthy column (below). **UNBLOCKED SAME DAY:** the SME
+  supplied the DAT SRE standard's Framework → APPCODE table — the platform list is CLOSED AT SIX
+  codes (values in `internal/standards/technology/folder-naming-convention.md`), and tier is
+  MECHANICALLY DERIVABLE from the folder name: prefix positions 3–5 ∈ platform list → tier 2, else
+  tier 1. So the fix is a six-row list plus a name parse, NOT a steward capture exercise — and the
+  tier-2 resolving SEAL is a token inside the folder name, so per-folder resolution is derivable for
+  the common case too. Mechanism written up in
+  [`knowledge/standards/technology/folder-naming-convention.md`](../../knowledge/standards/technology/folder-naming-convention.md).
+- 2026-08-05 — [source] **The Control-M SUB-APPLICATION field is a declared app→software link — a far
+  better USES_SOFTWARE source than the adhoc version email.** Under the HLT standard the framework
+  does not vanish when the app code is application-tied; it moves to a sub-application
+  `PR<Appcode>-<Platform App Code>`. That is an authored, standards-backed statement that an
+  application runs on an ETL framework — already present in the scheduling data, at scale, with a
+  naming standard behind it. Feeds gate `software-version-context` directly: the email gives VERSION
+  at fid grain, this gives PRODUCT at application grain, and the two are complementary rather than
+  competing. PREREQUISITE: two of the six framework codes have no `config/taxonomy/software-registry.yaml`
+  product row — DPL (the standing gap `invocation_patterns` already records, now with a name and a
+  framework table behind it) and Snowflake ETL. Register those products first.
+- 2026-08-05 — [chore] **`refines:` in the standards frontmatter is a CHAIN, not a flag — and
+  `config/precedence.yaml` cannot express two internal tiers.** SME framing: Vendor → Company/Platform
+  team → Lower support group. Concretely: BMC baseline ← DAT SRE standard (platform team,
+  framework-coded) ← HLT standard (support group, application-coded). Both internal levels sit at
+  precedence tier 2 today, so where the two internal standards DIFFER — and they do, in folder
+  grammar, in what position 6 means, and in whether the app code carries the SEAL — nothing records
+  which wins. Also corrected a real defect in the publishable standard: "frequency at position 6 =
+  legacy" is true only of the DAT standard; under HLT a frequency letter at position 6 is CURRENT.
+- 2026-08-05 — [question] **Control-M app code → SEAL cardinality — CORRECTED 2026-08-05: `uniq -d`
+  tests the registry key, NOT the tier, and is necessary but NOT sufficient.** `AOC` and `DCL` are each
+  a UNIQUE row in the file and still 1:many in reality (see the tier-1-shaped-CSV entry above). K8
+  authors one steward row per app code and fans it out to folders (§B1), while
+  `graph-tests/folder-attribution-coverage.yaml` enforces folder→application **1:1**. **Many codes →
+  one SEAL is SAFE and already exercised** — SEAL 35806 (a reporting engine) registered ONE CODE PER
+  SCHEMA, and two distinct codes carry SEAL 111809. **One code → many CONSUMERS is real and is tier 2**,
+  handled by K7's surfacing rule rather than by the cardinality of the file. Still worth running
+  `awk -F, 'NR>1{print $1}' <file> | sort | uniq -d` — a duplicated code would ALSO make the K9 manual
+  tier-5 pins ambiguous (they were rekeyed to `app_code=<CODE>` and are hand-authored) — but an empty
+  result proves only that the registry is a function, not that any code is tier 1. **NOT a validity
+  test (user, 2026-08-05):**
+  `descr` leads with the seal id on MOST rows but not all, so column 2 vs the head of column 3 is a
+  CORROBORATION signal with a known-imperfect base rate — never a pass/fail check and never a
+  derivation source. `seal_id` is the field; `descr` is prose about it. A majority-correct column is
+  the dangerous kind: it survives spot-checks and fails silently in the tail. Use the comparison only
+  to produce a REVIEW QUEUE of disagreeing rows (candidate stale renames / decommissioned SEALs /
+  copy-paste), each ruled by a human — same disposition as the §G5 disagreement classes.
+- 2026-08-05 — [idea] **Generalize the registration/routing/attribution rule — three instances in two
+  days.** (1) A FID is REGISTERED to the platform app while its jobs are ATTRIBUTED elsewhere
+  (`fid-identity-and-scope` §G). (2) An AutoSys failure alert carries TWO SEAL ids as escalation
+  ROUTING (`SEAL=<a>_<b>` in the incident payload) — ingested naively that manufactures a job
+  belonging to two applications. (3) The Control-M escalation DB routes by SEAL for the same reason.
+  Candidate standing rule for `docs/RELATIONSHIP_GUIDE.md` or a knowledge/standards note: **a SEAL id
+  appearing in a field is not an attribution claim unless that field's job is to attribute** —
+  ownership, routing, and attribution are three different facts that all serialize as a SEAL id, and
+  the graph has exactly one place (the confirmed app-code mapping) where the third is authored.
+- 2026-08-05 — [source] **AutoSys attributes at a NAME-PREFIX grain, not a folder grain — crosswalk
+  row 12, needs a gate amendment.** Placeholder captured in
+  [`external/orchestration/autosys/README.md`](../../external/orchestration/autosys/README.md); the
+  `autosys-crosswalk` gate is SIGNED (11 rows, 2026-07-14) so this cannot be appended to
+  `config/crosswalks/autosys-to-bmc.yaml` silently. Observed: the AutoSys code registry maps a code to
+  a LIST of instance-qualified name prefixes (`t08.x; u08.x; l08.x`), and a job name is a dotted
+  namespace `<instance>.<lob>.<app>.<name>.<type>` — so attribution is a prefix MATCH, not a container
+  lookup, and the environment lives in the instance prefix (the FID-name env-triplet convention one
+  level up). Two load traps to handle before, not during, a load: a SENTINEL SEAL id whose row says
+  the code must not be used (needs an explicit reject list — a lookup miss is not the same thing), and
+  lifecycle state ("SEAL Decommissioned NO New EDIT ACCESS Permitted") trapped in a free-text info
+  column beside a date.
+
+- 2026-08-04 — [source] **Software VERSION as graph context, from an adhoc evidence email — two gates
+  drafted, both awaiting SME.** An SME email compiled for a version-readiness review lists install
+  paths per functional id for one ETL product. Opening proposal was
+  `(:BusinessApplication)-[:USES_SOFTWARE {version}]->(:SoftwareProduct)-[:documented_by]->(email)`;
+  two defects named in the draft: (1) Neo4j cannot hang a relationship off a relationship, so the
+  evidence attaches by property pointer / node-grain edge / reified assertion — not as drawn; (2) the
+  rows are **(fid-name, install-path)** rows, not (application, product) rows — the same app appears
+  many times with different versions and is reached only through a MUTABLE ownership join, so writing
+  the app-level edge directly bakes a time-varying derivation into a fact. Gate
+  `software-version-context` proposes: load at the AppUser grain (new vocab entry
+  `reg_appuser_uses_software`, same label, C8-clean), MERGE keyed `{source, install_path}` (NOT
+  `{source}` — C14's key assumes one fact per pair and this source asserts several), version parsed
+  from the path via a pattern table shaped like `invocation_patterns`, observed versions NEVER
+  auto-appended to the curated `software-registry.yaml` product row, evidence attached by
+  `evidence_doc_id` pointer with reification as the named upgrade path. Corpus `adhoc-sme-email`
+  registered (`confirmed: false`, citation-only, connector `email`). App-level rollup deliberately
+  BLOCKED on the FID gate. **Groom both gates + the doc-09 phases into backlog items once signed.**
+- 2026-08-04 — [source] **The FID directory is the K2 tier-2 unblock — it was never a side quest.**
+  `TierReconcilers.fid` has been an empty dict since the K2 build ("no producer-side reconciliation
+  source yet"), while the signed match policy orders SEAL > **FID** > APP_NAME > ALIAS. The firm's ID
+  directory is that table, and it is ingestible (UI, export, audit columns, application assignment) —
+  unlike the outlook-dl case. Gate `fid-identity-and-scope` + [doc 09](09-fid-identity-and-scope.md)
+  drafted: `:AppUser` keyed on the directory **id** (not the name — a renameable key silently splits a
+  node) with `fid_name` + an explicit crosswalk on the hot path, since every source we hold joins by
+  NAME; `BELONGS_TO_APPLICATION {role:'service_account', as_of}` to `:BusinessApplication`; ownership
+  is an **as-of assertion**, transfers are normal not drift, and **transfer detection requires
+  snapshot diffing** — a single extract can never reveal one, so dated retained snapshots or the
+  `as_of` stamp is decoration. Scope answered by MEASUREMENT not judgment: demand-driven pull list
+  (run-as owners ∪ unresolved FID facts ∪ evidence rows), preceded by a one-application census that
+  turns "about 200 accounts" into "N of ~200, and here is what the rest are". Retired accounts stay in
+  scope (historical jobs reference them); contact columns defer to `email-dl-contact-point`.
+  Six open questions need the directory owner — name reuse after retirement is the one that decides
+  whether every historical join by name is ambiguous.
+
 - 2026-08-05 — [bug] **`meta.depgraph.dirty` conflates "untracked files present" with "the
   instrument differs from its pin".** The 20260805 snapshot records `depgraph.commit:
   773fb1e, dirty: true` — but the sibling is at EXACTLY the pin, and the dirt is three
