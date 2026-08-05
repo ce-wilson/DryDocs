@@ -12342,7 +12342,7 @@ items:
     agent: main
     model: sonnet
     priority: p2
-    status: in_progress   # claimed 2026-08-04 (laptop, pushed before work) — the laptop is this session's venue (J18).
+    status: in_progress   # claimed 2026-08-04 (laptop, pushed before work) — the laptop is this session's venue (J18). GATE PASSED, DROP BLOCKED ON A PERMISSION — the agent cannot run it; the user must. EMPTINESS PROBE (laptop, container neo4jtest, Neo4j 2026.05.0 EE, 2026-08-04): ddlineage MATCH (n) count = 0, MATCH ()-[r]->() count = 0. So the acceptance's stop-condition does NOT fire — this is a clean drop, not a defect report. db.labels() returns [DataAsset, ControlMJob], which is the label-token store the 02_proxy_constraints pass registers, NOT data — a token is not a node, and the probe the acceptance specifies is the node/rel count. ddall constituents at probe time: ddall.drydocs, ddall.ddcontext, ddall.ddlineage. ORDERING CONFIRMED THE HARD WAY: DROP DATABASE was attempted before the alias and the platform REFUSED it (42N82, 'cannot drop database with aliases') — the alias-first step in the acceptance is enforced by Neo4j, not merely conventional. Nothing was changed by that attempt. REMAINING: the two statements below, then SHOW DATABASES (expect drydocs/ddcontext/ddschema/ddall + neo4j/system) and the smoke.
     depends_on: [X2]
     inputs: [drydocs_core/schema/provisioning/README.md, config/dev-environment.yaml]
     acceptance: >
