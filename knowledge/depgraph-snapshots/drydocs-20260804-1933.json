@@ -1,16 +1,16 @@
 {
   "meta": {
     "project": "drydocs",
-    "captured_at": "2026-08-04T16:11:13",
+    "captured_at": "2026-08-04T19:34:06",
     "date": "20260804",
     "scan": "DryDocs",
     "tree": true,
     "git": {
-      "commit": "a782860",
-      "full": "a7828602f292130093fda35e0512cc83eeab9427",
+      "commit": "937755a",
+      "full": "937755aafa722f9b549b92a5ba0c8d912016fac7",
       "branch": "main",
-      "describe": "a782860",
-      "subject": "feat(ritual): snapshot.ps1 compares the depgraph checkout against the pin and warns on drift",
+      "describe": "937755a",
+      "subject": "chore(ideas): inbox the two company-side findings from the live provisioning session",
       "dirty": false,
       "pr": null
     },
@@ -12695,10 +12695,10 @@
       "kind": "file"
     },
     {
-      "file_id": "drydocs/knowledge/depgraph-snapshots/drydocs-20260804-1548.json",
-      "name": "drydocs-20260804-1548.json",
+      "file_id": "drydocs/knowledge/depgraph-snapshots/drydocs-20260804.json",
+      "name": "drydocs-20260804.json",
       "extension": ".json",
-      "rel_path": "knowledge/depgraph-snapshots/drydocs-20260804-1548.json",
+      "rel_path": "knowledge/depgraph-snapshots/drydocs-20260804.json",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -14427,6 +14427,15 @@
       "name": "test_row_checksum.py",
       "extension": ".py",
       "rel_path": "tests/unit/test_row_checksum.py",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/tests/unit/test_runbook_coverage.py",
+      "name": "test_runbook_coverage.py",
+      "extension": ".py",
+      "rel_path": "tests/unit/test_runbook_coverage.py",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -16632,6 +16641,10 @@
     ],
     [
       "drydocs/drydocs_api/mappings.py",
+      "drydocs/drydocs_core/__init__.py"
+    ],
+    [
+      "drydocs/drydocs_api/mappings.py",
       "drydocs/drydocs_core/mapping_store.py"
     ],
     [
@@ -17701,6 +17714,10 @@
     [
       "drydocs/tests/unit/test_mapping_api.py",
       "drydocs/drydocs_api/sessions.py"
+    ],
+    [
+      "drydocs/tests/unit/test_mapping_api.py",
+      "drydocs/drydocs_core/__init__.py"
     ],
     [
       "drydocs/tests/unit/test_mapping_api.py",
@@ -25202,7 +25219,7 @@
     [
       "drydocs/knowledge/depgraph-snapshots",
       "CONTAINS",
-      "drydocs/knowledge/depgraph-snapshots/drydocs-20260804-1548.json"
+      "drydocs/knowledge/depgraph-snapshots/drydocs-20260804.json"
     ],
     [
       "drydocs/knowledge/depgraph-snapshots",
@@ -26102,6 +26119,11 @@
     [
       "drydocs/tests/unit",
       "CONTAINS",
+      "drydocs/tests/unit/test_runbook_coverage.py"
+    ],
+    [
+      "drydocs/tests/unit",
+      "CONTAINS",
       "drydocs/tests/unit/test_runs_on_resolution.py"
     ],
     [
@@ -26964,13 +26986,13 @@
     "projects": [
       "drydocs"
     ],
-    "files": 1513,
-    "edges": 526,
+    "files": 1514,
+    "edges": 528,
     "circular_files": 0,
     "processes": 0,
     "data_assets": 0,
     "hosts": 0,
-    "rels": 1772,
+    "rels": 1773,
     "directories": 260
   }
 }
