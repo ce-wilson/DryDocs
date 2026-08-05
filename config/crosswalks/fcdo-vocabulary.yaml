@@ -1,0 +1,158 @@
+# =============================================================================
+# config/crosswalks/fcdo-vocabulary.yaml
+#
+# FCDO vocabulary crosswalk: DryDocs terms <-> the firmwide data-publishing
+# framework terms (internal/fcdo-reference/ALIGNMENT-PLAN.md Phase 1).
+#
+# This is a VOCABULARY crosswalk, not an orchestrator crosswalk: it maps our
+# ontology terms onto the standard-vocabulary terms the firmwide frameworks
+# require (PROV-O, DCAT, SKOS, ADMS, RDFS, OpenLineage). It carries its own
+# schema id so the orchestrator runtime (drydocs_core/orchestration/crosswalk.py,
+# ADR 0008 rule 3) deliberately skips it — nothing resolves native job concepts
+# through this file.
+#
+# STOP AT THE GATE: this whole file is `status: proposed`. Nothing here changes
+# the ontology, activates the `fcdo-frameworks` corpus, or authorizes a graph
+# write. Rows become confirmed only through the HITL gate
+# (docs/restructure/03-hitl-sme-flow.md; gate spec:
+# config/gate-prompts/fcdo-crosswalk.yaml) with a config/gate-log.md entry.
+# Rows whose evidence sits in a known capture hole are `blocked-on-recapture`
+# and MUST NOT be signed until the registered `fcdo-frameworks` scrape
+# (config/doc-source-registry.yaml) recaptures the missing framework pages —
+# absence from the transcript is not absence from their standard.
+#
+# classification: Internal-Public — mechanism-only. Standard CURIEs only
+# (prov:, dcat:, skos:, adms:, rdfs:, the public OpenLineage spec); no internal
+# URLs, org names, or firm-namespace CURIE prefixes — those stay in internal/.
+# =============================================================================
+
+schema: drydocs.vocab-crosswalk.v1
+updated: 2026-08-05
+id: fcdo-vocabulary
+local: drydocs
+counterpart: fcdo-frameworks            # config/doc-source-registry.yaml corpus id
+classification: Internal-Public
+narrative_ref: internal/fcdo-reference/ALIGNMENT-PLAN.md
+gate_spec: config/gate-prompts/fcdo-crosswalk.yaml
+status: proposed                        # flips only via the fcdo-crosswalk gate (gate-log entry)
+
+rows:
+  - n: 1
+    drydocs: "ControlMJob (dd:ControlMJob, prov:Activity)"
+    fcdo: "OpenLineage Job (prov:Activity)"
+    fidelity: exact
+    status: proposed
+    note: >
+      Type-identical today: their Council-approved ETL model classes the
+      OpenLineage Job as prov:Activity, exactly how the relationship
+      vocabulary already classes dd:ControlMJob. Their Job properties
+      (job name, source-code location/text) have direct counterparts in
+      the job definition fields we already carry.
+
+  - n: 2
+    drydocs: "JobRun (dd:JobRun, loader-run activity) / planned ControlMJobRun (dd:ControlMJobRun)"
+    fcdo: "OpenLineage Run (prov:Activity)"
+    fidelity: exact
+    status: proposed
+    note: >
+      Both our run labels are prov:Activity, matching their Run classing.
+      dd:JobRun (a loader execution) and the planned dd:ControlMJobRun (an
+      actual Control-M execution) stay distinct labels — the crosswalk maps
+      the CLASSING, not a merge. The required Run property semantics (run
+      UUID, nominalTime, parent run/job link, errorMessage,
+      START/COMPLETE/FAIL/ABORT events) are registered as planned on the
+      ControlMJobRun build by backlog W2, including wiring the three seeded
+      :OlClass nodes (OL Run / OL Job / OL Dataset) via MAPS_TO. Scope note
+      (user ruling 2026-07-31): our run data is batch history, not a live
+      run-event stream — the alignment is name-conformance for a mode we do
+      not run, never a mandate to build event ingestion.
+
+  - n: 3
+    drydocs: "DataAsset (dcat:Dataset)"
+    fcdo: "Dataset (dcat:Dataset)"
+    fidelity: exact
+    status: proposed
+    note: >
+      Identical: both sides class the dataset concept as dcat:Dataset. Our
+      planned DataAsset (the D1 proxy-URN node) needs no rename or reshape.
+
+  - n: 4
+    drydocs: "READS_FROM / WRITES_TO (planned; prov:used / prov:generated)"
+    fcdo: "prov:used / prov:wasGeneratedBy on the Run"
+    fidelity: approximate
+    status: proposed
+    note: >
+      Same PROV predicates, DIFFERENT GRAIN — record both. Their mandate
+      hangs dataset I/O on the Run (each execution used / generated the
+      dataset); our planned READS_FROM / WRITES_TO hang it on the
+      DEFINITION (ETLProcess | ControlMJob -> DataAsset), because our
+      source is job definitions, not an event stream. Direction also
+      differs in wording only: our matrix rows are Activity->Entity (USED,
+      GENERATED); wasGeneratedBy is the Entity->Activity inverse of the
+      same assertion. If run-grain lineage ever builds (see row 2's scope
+      note), it lands on ControlMJobRun without displacing the
+      definition-grain edges.
+
+  - n: 5
+    drydocs: "Loader provenance envelope (WAS_GENERATED_BY -> JobRun + envelope properties)"
+    fcdo: "Metadata envelope pattern (Descriptive Metadata Framework)"
+    fidelity: approximate
+    status: blocked-on-recapture
+    note: >
+      Equivalence claim only: our loader envelope (delta-only
+      WAS_GENERATED_BY edges to the JobRun plus the audited envelope
+      properties) plays the role their descriptive-metadata envelope
+      (shared identifier/title/description) plays. BLOCKED: the Descriptive
+      Metadata Framework is a known capture hole — the equivalence cannot
+      be reviewed row-by-row until the registered fcdo-frameworks scrape
+      recaptures it. Do not sign this row from the transcript evidence.
+
+  - n: 6
+    drydocs: "Vocabulary/mapping lifecycle states (planned / active / superseded ...)"
+    fcdo: "adms:status concept scheme (Proposed -> Approved/Rejected -> Deprecated -> Retired)"
+    fidelity: approximate
+    status: proposed
+    note: >
+      DOCUMENTATION-ONLY equivalence: planned ~ Proposed, active ~ Approved,
+      superseded/retired ~ Deprecated/Retired. Records how our lifecycle
+      states read in their terms for anyone crossing the two systems. Our
+      proposed -> confirmed -> applied HITL machinery does NOT change — no
+      status value, gate flow, or mechanism name is renamed by this row.
+
+  - n: 7
+    drydocs: "SUBCLASS_OF / MAPS_TO meta-graph (OntologyTerm anchors)"
+    fcdo: "rdfs:subClassOf / rdfs:subPropertyOf upper-ontology bridging"
+    fidelity: exact
+    status: proposed
+    note: >
+      Already equivalent: our SUBCLASS_OF / MAPS_TO edges onto seeded
+      OntologyTerm anchors are their recommended rdfs:subClassOf /
+      rdfs:subPropertyOf bridging pattern expressed in property-graph form.
+
+  - n: 8
+    drydocs: "RECONCILES_TO {confidence} (CatalogLOB -> BusinessSegment)"
+    fcdo: "skos:closeMatch + a firm-namespace mappingConfidence property (0-1)"
+    fidelity: approximate
+    status: proposed
+    note: >
+      Property-name note: our RECONCILES_TO already carries skos:closeMatch
+      semantics with a confidence property (0.0-1.0), matching their
+      taxonomy mapping properties and their mapping-confidence property in
+      spirit. Approximate because ours is an edge property on a local
+      relationship type, theirs a property on an RDF mapping resource; the
+      semantics align, the carrier differs.
+
+# Known capture holes (internal/fcdo-reference/ALIGNMENT-PLAN.md, Evidence
+# caveats). Any row whose evidence sits in one of these is blocked-on-recapture;
+# the gate must not sign it until the registered fcdo-frameworks scrape
+# recaptures the framework. The other three holes block no current row but
+# bound what this crosswalk can claim.
+capture_holes:
+  - framework: "Descriptive Metadata Framework"
+    blocks_rows: [5]
+  - framework: "Data Quality Framework"
+    blocks_rows: []
+  - framework: "Data Contracts / DPROD Framework"
+    blocks_rows: []
+  - framework: "Taxonomy Framework normative property tables"
+    blocks_rows: []

@@ -598,6 +598,19 @@
     {
       "kind": "prompt-only",
       "date": null,
+      "title": "fcdo-crosswalk (gate page rendered — session not yet run)",
+      "status": "open",
+      "prompt_files": [
+        "config/gate-prompts/fcdo-crosswalk.yaml"
+      ],
+      "log_ref": null,
+      "unblocks": [
+        "W1"
+      ]
+    },
+    {
+      "kind": "prompt-only",
+      "date": null,
       "title": "fid-identity-and-scope (gate page rendered — session not yet run)",
       "status": "open",
       "prompt_files": [

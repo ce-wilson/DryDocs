@@ -309,11 +309,12 @@
       "guard_tests": [],
       "gate_ref": "F1 autosys-crosswalk + F2 airflow-crosswalk sign-offs (2026-07-14)",
       "status": "unguarded",
-      "pending_entries": 2,
+      "pending_entries": 11,
       "env_refs": [],
       "files": [
         "config/crosswalks/airflow-to-bmc.yaml",
-        "config/crosswalks/autosys-to-bmc.yaml"
+        "config/crosswalks/autosys-to-bmc.yaml",
+        "config/crosswalks/fcdo-vocabulary.yaml"
       ],
       "content": null,
       "extra_contents": {}
@@ -348,6 +349,7 @@
         "config/gate-prompts/email-dl-contact-point.yaml",
         "config/gate-prompts/envelope-property-terms.yaml",
         "config/gate-prompts/etlprocess-kind-enum.yaml",
+        "config/gate-prompts/fcdo-crosswalk.yaml",
         "config/gate-prompts/fid-identity-and-scope.yaml",
         "config/gate-prompts/platforms-taxonomy.yaml",
         "config/gate-prompts/product-cabinet-attribution.yaml",
@@ -471,11 +473,12 @@
       ],
       "gate_ref": "autosys-crosswalk / airflow-crosswalk (both SIGNED OFF 2026-07-14)",
       "status": "gate-pending",
-      "pending_entries": 2,
+      "pending_entries": 11,
       "env_refs": [],
       "files": [
         "config/crosswalks/airflow-to-bmc.yaml",
-        "config/crosswalks/autosys-to-bmc.yaml"
+        "config/crosswalks/autosys-to-bmc.yaml",
+        "config/crosswalks/fcdo-vocabulary.yaml"
       ],
       "content": null,
       "extra_contents": {}

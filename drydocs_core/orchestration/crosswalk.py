@@ -38,6 +38,13 @@ DEFAULT_CROSSWALK_DIR = _REPO_ROOT / "config" / "crosswalks"
 
 SCHEMA_ID = "drydocs.crosswalk.v1"
 
+#: Sibling crosswalk kinds that share ``config/crosswalks/`` but are NOT
+#: orchestrator crosswalks — e.g. the FCDO vocabulary crosswalk (backlog W1),
+#: which maps ontology terms to standard vocabularies and has its own guards.
+#: The directory scan skips these deliberately; any OTHER schema id still
+#: fails loudly, so a typo'd orchestrator crosswalk cannot vanish silently.
+SIBLING_SCHEMA_IDS: frozenset[str] = frozenset({"drydocs.vocab-crosswalk.v1"})
+
 #: The fidelity vocabulary. A row carrying anything else is a malformed file,
 #: not a new tier — adding one is a gate decision, so it fails loudly here.
 FIDELITIES: frozenset[str] = frozenset({"exact", "approximate", "no-equivalent"})
@@ -181,11 +188,22 @@ def load_crosswalk(path: str | Path) -> Crosswalk:
 
 
 def load_crosswalks(directory: str | Path = DEFAULT_CROSSWALK_DIR) -> tuple[Crosswalk, ...]:
-    """Every ``*.yaml`` crosswalk in *directory*, in sorted filename order."""
+    """Every orchestrator crosswalk in *directory*, in sorted filename order.
+
+    Files declaring a recognized sibling schema (:data:`SIBLING_SCHEMA_IDS`)
+    are skipped — they are not orchestrator crosswalks and have their own
+    consumers/guards. An unknown schema still raises via :func:`_parse`.
+    """
     directory = Path(directory)
     if not directory.is_dir():
         raise CrosswalkError(f"crosswalk directory not found: {directory}")
-    return tuple(load_crosswalk(p) for p in sorted(directory.glob("*.yaml")))
+    walks: list[Crosswalk] = []
+    for p in sorted(directory.glob("*.yaml")):
+        doc = yaml.safe_load(p.read_text(encoding="utf-8")) or {}
+        if doc.get("schema") in SIBLING_SCHEMA_IDS:
+            continue
+        walks.append(_parse(doc, p))
+    return tuple(walks)
 
 
 @lru_cache(maxsize=8)
