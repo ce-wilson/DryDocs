@@ -11613,7 +11613,7 @@ items:
     agent: main
     model: sonnet
     priority: p2
-    status: todo
+    status: in_progress
     depends_on: []
     inputs: [internal/fcdo-reference/ALIGNMENT-PLAN.md, drydocs_core/ontology/relationship_vocabulary.yaml, config/crosswalks/, config/gate-prompts/]
     acceptance: >
