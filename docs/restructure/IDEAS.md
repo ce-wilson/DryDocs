@@ -277,7 +277,10 @@ question a 1,000-line file with the trail at the bottom could not answer.
   worth grooming: how many other guards shell out and parse human-facing output, and is
   "never parse a render when the object is importable" worth writing down as a standard?
 
-- 2026-08-04 — [bug] **T23 FIRED company-side, exactly as its own row predicted — the tracker
+- **`GROOMED 2026-08-05 → S10`** *(the missing loader guard is now an item and was BUILT the same
+  day; the tracker-row half was not groomed — it was DONE in the same commit, T23's row now carries
+  the firing as direct evidence. Nothing here stays open.)* —
+  2026-08-04 — [bug] **T23 FIRED company-side, exactly as its own row predicted — the tracker
   status should stop saying "pending (producer belief)".** The company ran
   `drydocs load seal_applications` against a graph that took the S3 CODE but never the S3
   re-key, and got `Neo.ClientError.Schema.ConstraintValidationFailed: Node(97) already exists
@@ -407,8 +410,15 @@ question a 1,000-line file with the trail at the bottom could not answer.
   `pat_product_owners`, and the `products` step-2a supplement fields — because those are back-flow
   and ride the same trigger as the 2026-07-27 company-catalog line below: the COMPANY gate's own
   sign-off. Do not open a second back-flow item for them.
+  **GROOMED 2026-08-05 → C26** *(the parked half only)*: those three gaps are now named in C26's
+  notes as absorbed, so they ride C26/C27's trigger inside the backlog rather than in this file.
+  Nothing about this entry stays open — the bug half went to C22 in the 2026-08-02 groom.
 
-- 2026-08-01 — [question] **We model no Sub-LoB, and the SME fact that closed C17 says it is a
+- **`GROOMED 2026-08-05 → C26, C27`** *(absorbed into the company-catalog pair exactly as this
+  entry's own last line instructed — the Sub-LoB grain and the `:LOB`-vs-`:CatalogLOB` label
+  ruling are C27's §(a) and §(b), settled in ONE pass; the invisible-flattening argument is
+  recorded in C27's notes as the reason it is gate-worthy rather than shruggable.)* —
+  2026-08-01 — [question] **We model no Sub-LoB, and the SME fact that closed C17 says it is a
   real grain with its own numeric id. CONFIRMED BUILT company-side the same day** — their
   `product_lines.cypher` carries `parent_sub_lob_id` and anchors the line under
   `MERGE (sl:SubLOB {sub_lob_id: …})` when it is populated, falling back to `:LOB {lob_id}`
@@ -495,7 +505,13 @@ question a 1,000-line file with the trail at the bottom could not answer.
   likely moot in practice — the console is a Vite SPA, no RSC actions — but the audit stays
   red until ruled. Pairs with the code-splitting design call O34 also parked.
 
-- 2026-07-27 — [idea] **Company catalog gate (`internal/org/catalog/`, page dated 2026-06-25) has
+- **`GROOMED 2026-08-05 → C26, C27`** *(the whole entry is now covered: C26 writes the divergence
+  down and reserves the four shapes as `planned` — actionable NOW, no trigger; C27 is the
+  adoption gate that still waits on the COMPANY gate's sign-off. The two sibling entries that
+  said "fold into that back-flow item; do not open a second one" — the 2026-08-01 Sub-LoB line
+  and the parked half of the 2026-08-02 catalog-comparison line — are absorbed into the same
+  pair. Nothing here stays open as inbox work.)* —
+  2026-07-27 — [idea] **Company catalog gate (`internal/org/catalog/`, page dated 2026-06-25) has
   drifted ahead of the producer catalog ontology — back-flow / divergence-ledger candidate.**
   Screenshot review of `_catalog_gate_page.html` ("SME Gate Prompt — PAT Catalog Loader", step 1
   of 3; sibling `_product_application_gate_page.html` likely steps 2–3): introduces `:SubLOB` +
