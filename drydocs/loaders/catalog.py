@@ -236,7 +236,11 @@ class DevTeamRow(BaseModel):
     model_config = ConfigDict(populate_by_name=True, str_strip_whitespace=True, extra="ignore")
 
     team_id: str = Field(..., min_length=1)
-    name: str = Field(..., min_length=1)
+    # Optional since C24 (the C22 §b shape, applied here): a sparse refresh
+    # carries the id without the name. A REQUIRED name is the worse failure —
+    # the row rejects wholesale and last_seen_at never advances, so an
+    # unrefreshed team is indistinguishable from a retired one. Never a key.
+    name: str | None = None
     jira_board_id: str | None = None
     parent_product_id: str | None = Field(
         None,
@@ -250,6 +254,11 @@ class DevTeamRow(BaseModel):
     @classmethod
     def _ids(cls, v: Any) -> Any:
         return _catalog_id(v)
+
+    @field_validator("name", mode="before")
+    @classmethod
+    def _sparse_name(cls, v: Any) -> Any:
+        return _name_or_none(v)
 
 
 class AreaProductRow(BaseModel):

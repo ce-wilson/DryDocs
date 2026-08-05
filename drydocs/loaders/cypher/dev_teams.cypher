@@ -13,7 +13,14 @@ UNWIND $batch AS row
 MERGE (dt:DevTeam {team_id: row.team_id})
   ON CREATE SET dt.first_seen_at = datetime($loaded_at),
                 dt.source     = 'catalog'
-SET dt.name         = row.name,
+// C24 (extends C22 §b to this loader): the unconditional `SET dt.name =
+// row.name` blanked the stored name the first time an extract omitted the
+// column. The model half moved with it — DevTeamRow.name was REQUIRED, which
+// C22 ruled the WORSE failure: a sparse row then rejects wholesale, so
+// last_seen_at never advances and the team looks retired rather than
+// unrefreshed. name is now optional with ''-to-None normalization; team_id
+// stays required, because optionality must not leak into keying.
+SET dt.name         = coalesce(row.name, dt.name),
     dt.last_seen_at = datetime($loaded_at),
     dt.last_run_id  = $run_id
 

@@ -25,8 +25,13 @@ UNWIND $batch AS row
 MERGE (l:CatalogLOB {lob_id: row.lob_id})
   ON CREATE SET l.first_seen_at = datetime($loaded_at),
                 l.source     = 'catalog'
-SET l.code         = row.code,
-    l.name         = row.name,
+// C24 (extends C22 §b to this loader): a SPARSE refresh must not blank what a
+// full extract loaded. The pre-C24 form was `SET l.code = row.code, l.name =
+// row.name` — and this file lost data TODAY rather than hypothetically, because
+// CatalogLOBRow already declared both fields `str | None`: an extract carrying
+// lob_id alone wrote null over a stored code and name on EVERY refresh.
+SET l.code         = coalesce(row.code, l.code),
+    l.name         = coalesce(row.name, l.name),
     l.last_seen_at = datetime($loaded_at),
     l.last_run_id  = $run_id
 

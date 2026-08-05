@@ -67,7 +67,7 @@ DOMAINS: tuple[dict, ...] = (
         # retired the job-grain edge, so this domain's coverage grid read a
         # relationship that no longer exists — it reported every row unresolved and
         # drafted a changeset the server refuses. Retired rather than re-bound: a
-        # folder and its jobs carry the SAME app code, so a job-grain grid is N× rows
+        # folder and its jobs carry the SAME app code, so a job-grain grid is N times rows
         # carrying ONE folder-level fact, and a grid that looks per-job invites being
         # read as per-job truth. Authoring lives at `app-code-mapping` (one row per app
         # code); "which application owns this job" stays a one-hop traversal.

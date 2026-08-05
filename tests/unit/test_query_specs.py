@@ -87,7 +87,7 @@ def test_mappings_coverage_spec_stays_retired():
     WHY A GUARD RATHER THAN A DELETION: the failure mode is re-adding a job-grain
     coverage spec because a grid "looks empty" — which would resurrect the surface
     without resurrecting the edge. A folder and its jobs carry the SAME app code,
-    so a job-grain grid is N× rows carrying one folder-level fact; "which
+    so a job-grain grid is N times the rows carrying one folder-level fact; "which
     application owns this job" is a one-hop traversal from the folder edge, not a
     spec of its own. Authoring lives at the app-code grain (K7 defined mapping).
     """

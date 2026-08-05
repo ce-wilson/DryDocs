@@ -227,13 +227,46 @@ def _assert_sparse_name_coalesce(raw: str, var: str) -> None:
 
 @pytest.mark.parametrize(
     ("cypher_file", "var"),
-    [("products.cypher", "p"), ("product_lines.cypher", "pl"), ("area_products.cypher", "ap")],
+    [
+        ("products.cypher", "p"),
+        ("product_lines.cypher", "pl"),
+        ("area_products.cypher", "ap"),
+        # C24 — the two files the C22 sweep stopped short of. EXTENDED here rather
+        # than pinned in a second test, so the next loader added to this family is
+        # caught by the same parametrization instead of by whoever remembers.
+        ("catalog_lobs.cypher", "l"),
+        ("dev_teams.cypher", "dt"),
+    ],
 )
 def test_a_sparse_refresh_does_not_blank_the_name(cypher_file: str, var: str) -> None:
     """`SET x.name = row.name` blanks the stored name the first time a partial
     extract omits the column. coalesce keeps the existing value when the row
-    carries none — the same-shape fix in all three hierarchy loaders."""
+    carries none — the same-shape fix in all five catalog loaders."""
     _assert_sparse_name_coalesce((_CYPHER / cypher_file).read_text(encoding="utf-8"), var)
+
+
+def test_the_catalog_lob_code_is_coalesced_too() -> None:
+    """C24 §a, and the reason this file was the urgent half: `code` is a SECOND
+    enrichment field on the same node, already declared `str | None` in the row
+    model. Coalescing only `name` would leave the identical defect live one
+    property over — and `code` is the human-readable LOB handle (AWMCIB, CCB),
+    so blanking it is more visible than blanking the name, not less."""
+    code = re.sub(r"[ \t]+", " ", strip_comments((_CYPHER / "catalog_lobs.cypher").read_text()))
+    assert "l.code = coalesce(row.code, l.code)" in code
+    assert "l.code = row.code" not in code
+
+
+def test_a_dev_team_row_with_no_name_still_loads() -> None:
+    """The model half of C24. DevTeamRow.name was REQUIRED (min_length=1), which
+    C22 ruled the worse failure mode: a sparse refresh rejects the whole row, so
+    `last_seen_at` never advances and an unrefreshed team is indistinguishable
+    from a retired one. team_id stays required — optionality must not leak into
+    keying (C17 §a)."""
+    assert DevTeamRow(team_id=7).name is None
+    assert DevTeamRow(team_id=7, name="   ").name is None
+    assert DevTeamRow(team_id=7, name=" Payments ").name == "Payments"
+    with pytest.raises(ValidationError):
+        DevTeamRow(name="Payments")  # type: ignore[call-arg]
 
 
 def test_the_guards_survive_the_file_describing_its_own_mechanism() -> None:
