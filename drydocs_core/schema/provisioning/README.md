@@ -89,22 +89,32 @@ Verified end to end 2026-08-04 (laptop, container `neo4jtest`, Neo4j 2026.05.0 E
 all six `cypher-shell` calls exit 0 and the smoke federates `2218 / 0 / 46` across the
 composite.
 
-> **Copy the file in and use `-f`. Do NOT pipe it.**
-> `Get-Content .\01_databases.cypher | docker exec -i $c cypher-shell …` **fails**, and the
-> error blames the file, which is what makes it cost an afternoon:
+> **Copy the file in and use `-f`. Piping works on some hosts and not others.**
+>
+> `Get-Content .\01_databases.cypher | docker exec -i $c cypher-shell …` succeeds on a
+> default ANSI-codepage console (verified on a company host, 2026-08-04) and **fails** on a
+> UTF-8 one, where the error blames the file:
 >
 > ```
 > Invalid input '﻿' … "﻿// ====…"  (line 1, column 1)
 > ```
 >
 > The file is clean — J29 byte-scans every tracked `.cypher` and this directory passes. The
-> BOM is added by the PIPE: PowerShell 5.1's `[Console]::OutputEncoding` is UTF-8 **with** a
-> 3-byte preamble, and it is written ahead of the first line on stdin redirection. Measured
-> here, not inferred, along with what does NOT fix it — `Get-Content -Raw` fails identically,
-> `$OutputEncoding` is already preamble-free so setting it changes nothing, and reassigning
-> `[Console]::OutputEncoding` mid-session is too late because the redirection is already
-> configured. `docker cp` + `-f` sidesteps the console encoding entirely, which is why it is
-> the documented form rather than a preference.
+> BOM comes from the PIPE, and only when the console output encoding carries a preamble.
+> Check yours:
+>
+> ```powershell
+> [Console]::OutputEncoding.GetPreamble().Length   # 3 = the pipe will BOM you; 0 = it won't
+> ```
+>
+> On `chcp 65001` that is 3, and the preamble is written ahead of the first line on stdin
+> redirection. Also measured, since each looks like it should help and none does: `-Raw`
+> fails identically, `$OutputEncoding` is a *different* setting and is already preamble-free,
+> and reassigning `[Console]::OutputEncoding` mid-session is too late because the redirection
+> is already configured. `docker cp` + `-f` sidesteps console encoding entirely and therefore
+> works on both — which is why it is the documented form and what `provision.ps1` does. This
+> replaces an earlier note here that called the pipe simply broken; it is host-dependent, and
+> a rule stated too broadly gets ignored the first time someone sees it not apply.
 
 ## Why these keys (no identity invented)
 

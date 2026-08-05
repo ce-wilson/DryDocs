@@ -122,14 +122,24 @@ function Invoke-CypherFile([string]$Db, [string]$File) {
   Write-Host "-> [$Db] $File" -ForegroundColor Cyan
   $local = Join-Path $here $File
   if ($useDocker) {
-    # COPY THE FILE IN, then -f. Do NOT pipe it (J29): PowerShell 5.1's
-    # [Console]::OutputEncoding is UTF-8 WITH a 3-byte preamble which is written ahead
-    # of the first line on stdin redirection, so `Get-Content x | docker exec -i` makes
-    # cypher-shell reject a clean file with "Invalid input '<BOM>'" at line 1 col 1 and
-    # blame the file. Measured 2026-08-04: -Raw fails identically, $OutputEncoding is
-    # already preamble-free, and reassigning [Console]::OutputEncoding mid-session is
-    # too late because the redirection is already configured. docker cp sidesteps the
-    # console encoding entirely.
+    # COPY THE FILE IN, then -f. Do NOT pipe it (J29) - but the reason is narrower
+    # than it first looked, and the narrower version is the useful one.
+    #
+    # `Get-Content x | docker exec -i ... cypher-shell` injects a BOM ONLY where the
+    # console output encoding carries one. On a UTF-8 console (chcp 65001)
+    # [Console]::OutputEncoding is UTF-8 WITH a 3-byte preamble, written ahead of the
+    # first line on stdin redirection, so cypher-shell rejects a CLEAN file with
+    # "Invalid input '<BOM>'" at line 1 col 1 and blames the file. On a default
+    # ANSI-codepage console there is no preamble and the pipe works - verified on a
+    # company host 2026-08-04, which is why this comment no longer says "PS 5.1 pipes
+    # are broken". Check your own with:
+    #     [Console]::OutputEncoding.GetPreamble().Length     # 3 = the pipe will BOM you
+    #
+    # docker cp sidesteps console encoding entirely, so it works on both - which is
+    # why it is what this script does rather than something conditional. Also measured:
+    # -Raw fails identically where the preamble exists, $OutputEncoding is a different
+    # setting and is already preamble-free, and reassigning [Console]::OutputEncoding
+    # mid-session is too late because the redirection is already configured.
     $remote = "/tmp/$File"
     docker cp $local "${Container}:$remote"
     if ($LASTEXITCODE -ne 0) { throw "docker cp failed for $File (exit $LASTEXITCODE)" }

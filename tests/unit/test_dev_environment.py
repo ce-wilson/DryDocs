@@ -195,12 +195,17 @@ def test_provisioning_is_exec_aware(monkeypatch):
 def test_provisioning_copies_the_file_instead_of_piping_it():
     """The J29 trap, guarded rather than remembered.
 
-    `Get-Content x.cypher | docker exec -i ... cypher-shell` fails: PowerShell 5.1's
-    [Console]::OutputEncoding is UTF-8 WITH a 3-byte preamble, written ahead of the
+    `Get-Content x.cypher | docker exec -i ... cypher-shell` injects a BOM where the
+    console output encoding carries a preamble -- on chcp 65001,
+    [Console]::OutputEncoding is UTF-8 WITH 3 preamble bytes, written ahead of the
     first line on stdin redirection, so cypher-shell rejects a CLEAN file with
-    "Invalid input '<BOM>'" at line 1 column 1 -- and blames the file. Measured
-    2026-08-04; -Raw fails identically and neither $OutputEncoding nor a mid-session
-    [Console]::OutputEncoding reassignment fixes it.
+    "Invalid input '<BOM>'" at line 1 column 1 and blames the file.
+
+    It is HOST-DEPENDENT, not universal: the same pipe succeeds on a default
+    ANSI-codepage console (verified on a company host 2026-08-04, which corrected an
+    earlier over-general claim here). This guard stands anyway, and that is the point
+    -- a provisioning script must not work only on the console its author happened to
+    have. docker cp + -f sidesteps console encoding entirely.
     """
     script = PROVISION_PS1.read_text(encoding="utf-8")
     # Comment lines only: the script DOCUMENTS the broken form so the next reader
