@@ -701,6 +701,17 @@
       "unblocks": [
         "C25"
       ]
+    },
+    {
+      "kind": "prompt-only",
+      "date": null,
+      "title": "tom-roles-enumeration-and-cardinality (gate page rendered — session not yet run)",
+      "status": "open",
+      "prompt_files": [
+        "config/gate-prompts/tom-roles-enumeration-and-cardinality.yaml"
+      ],
+      "log_ref": null,
+      "unblocks": []
     }
   ]
 }

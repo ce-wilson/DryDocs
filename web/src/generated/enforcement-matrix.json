@@ -363,6 +363,7 @@
         "config/gate-prompts/software-version-context.yaml",
         "config/gate-prompts/sosa-jobrun-observation.yaml",
         "config/gate-prompts/source-registry-v2.yaml",
+        "config/gate-prompts/tom-roles-enumeration-and-cardinality.yaml",
         "config/gate-prompts/ui-write-surface.yaml",
         "config/gate-log.md"
       ],

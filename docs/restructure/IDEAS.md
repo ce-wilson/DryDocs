@@ -62,6 +62,37 @@ question a 1,000-line file with the trail at the bottom could not answer.
 
 <!-- add new ideas at the top -->
 
+- **`Idea-72`** · 2026-08-05 · `[doc]` · **open** · prio? **Low** —
+  **A SIGNED gate page cites line numbers that have since moved.** The
+  business-application-identity gate's §D2 (signed 2026-07-27) names its four
+  `attribution_id` sites as `seal_applications.cypher:124,147,170` and
+  `seal_contacts.cypher:53`. They are now `152,175,198` and `55`. The FILES and
+  the FACT are still right — only the line numbers drifted — but §D2's whole
+  point was that the site count had been wrong once already, so it is the one
+  clause where a reader is most likely to check the citation and conclude the
+  page is stale. Found while drafting the G35 gate prompt, which cites the same
+  four sites. Question this raises beyond the fix: gate pages are governed
+  surfaces and a signed one is a historical record — is a line number ever
+  correctable in place, or does a drifted citation get a rider (the step-83
+  precedent) rather than an edit? Cheap either way; the RULE is the valuable part,
+  because L19's doc-drift sweep will hit the same question at scale.
+
+- **`Idea-71`** · 2026-08-05 · `[bug]` · **open** · prio? **Med** —
+  **`ownership.attributions.v1` returns a column that is always null.** The
+  QuerySpec ends `... e.sid AS holder_sid` (`drydocs_api/query_specs.py:451`),
+  but `:Employee` is keyed and written as `employee_id` at every site
+  (`seal_contacts.cypher:31`, `seal_applications.cypher:145,169,192`) and nothing
+  in the repo ever sets `.sid`. So the Holder SID column of the K4 attribution
+  review surface is empty for every row. Its sibling spec
+  `mappings.seal-contact-roles.v1` gets it right (`e.employee_id AS holder_sid`,
+  line 258), which is what makes this a typo rather than a design difference.
+  One-word fix; the reason it is worth an entry is the CLASS — a QuerySpec that
+  names a property no loader writes is green in every unit test, because the
+  guards check spec shape and not whether the property exists in the schema. That
+  is the same promise-vs-assertion family as J26. Found while reading the
+  attribution surfaces for the G35 gate prompt; not fixed there because G35 is an
+  `ontology`-layer item and this is `drydocs-api`.
+
 - **`Idea-70`** · 2026-08-05 · `[decision]` · **closed — RULED same day, no item** · prio? **Med** —
   **`fcdo-frameworks` corpus activation — SME "under consideration" at the
   fcdo-crosswalk sign-off (gate-log 2026-08-05).** RULED in-chat the same
