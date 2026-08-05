@@ -83,10 +83,6 @@ FOREIGN_PATHS: dict[str, str] = {
         "precisely to say `drydocs/docmeta/` does not exist producer-side — naming an "
         "absence is the opposite of a stale claim (T21)"
     ),
-    "connectors/base.py": (
-        "the same company module, cited in its short form in the T21 answer — see the "
-        "entry above"
-    ),
     "drydocs/scrapers/registry.py": (
         "COMPANY-side module, same inventory, same reason: `drydocs/scrapers/` does not "
         "exist producer-side and port-prompt says so (T21)"

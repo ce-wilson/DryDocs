@@ -18,9 +18,13 @@ finishes reading is not a control document. So:
 - a roll REPLACES the previous roll note; it does not stack another one;
 - if a section can only be understood by reading it twice, cut it rather than expand it.
 
-**Roll state.** Steps 52–54 COLLAPSED at the 2026-08-03 roll (applied in
-PORT-REPORT-f71967db and PORT-REPORT-40c35724). The live ledger is **EMPTY** —
-the next delta starts at `40c35724`; new sub-streams number from 55. The
+**Roll state (2026-08-05).** Steps 52–54 COLLAPSED at the 2026-08-03 roll (applied in
+PORT-REPORT-f71967db and PORT-REPORT-40c35724). The live ledger runs **55–96**
+below, delta since `40c35724`. Two company ports (PORT-REPORT-6713c142,
+PORT-REPORT-5f79d145) landed MID-RANGE with no producer-verifiable range or
+acceptance numbers, so NO step is collapsed yet — collapse waits for a
+PORT-REPORT the producer can review against git (guardrail 8), not a report
+name cited second-hand. The
 verification tags introduced at step 49 (`[SME-SIGNED]`, `[LIVE-VERIFIED]`,
 `[TEST-PINNED]`, `[STAGING-ONLY]`, `[RECORD-CORRECTION]`, `[UNRULED]`) carry
 forward; anything untagged is NOT confirmed — treat contracts as ASSUMED until
@@ -186,9 +190,10 @@ GUARDRAILS (durable — apply to every port):
    artifacts with producer git metadata; regenerate your own via the session-end ritual.
 
 5. DERIVED ARTIFACTS regenerate AFTER all config edits, never hand-merge:
-   `web/src/generated/gates.json` + `enforcement-matrix.json` + `load-map.json`
-   and `docs/plan/load-map.html` (all ride the default-paths board render —
-   J17/J20/N4/N5 — so one `render_board.py` run refreshes all five; COMPANY-SIDE
+   `web/src/generated/gates.json` + `enforcement-matrix.json` + `load-map.json`,
+   `docs/plan/load-map.html` and `docs/plan/ideas.html` (all ride the
+   default-paths board render — J17/J20/N4/N5, ideas since 2026-08-05 —
+   so one `render_board.py` run refreshes all six; COMPANY-SIDE
    under T19 your render currently EXCLUDES the load-map pair — keep that exclusion
    until the T19 gate rules),
    `docs/plan/board.html` (from the reconciled backlog), and `docs/design/*.html`
@@ -222,64 +227,19 @@ GUARDRAILS (durable — apply to every port):
      no separate Tier-A ratification entry is owed. The union-appended entry is the
      company record; the ported code and its tests are the enforcement.
 
-6a. PASTE-READY L7 RATIFICATION ENTRY (discharges tracker T11).
-   §6 Tier A requires the ratification entry to land in the COMPANY gate-log, and
-   port-prompt has said since 2026-07-21 that a snippet "was provided in the producer
-   session" — but the block itself was never committed, so no company session could
-   open it. It is committed here now. Copy it verbatim into the company `gate-log.md`
-   in gate-log date order, fill the four `[...]` placeholders from YOUR port report,
-   and flip T11.
-
-   WHAT IS PRE-FILLED vs WHAT YOU FILL: the subject, the producer gate reference, and
-   the six-and-six inventory are FACTS OF THE PRODUCER GATE — verified against
-   `config/gate-log.md` (2026-07-20 entry), the relationship vocabulary, and the
-   taxonomy-ontology map, so they are written out. (Both of those were single YAML
-   FILES when this was written and are fragment DIRECTORIES since S5 / step 81 —
-   `drydocs_core/ontology/relationship_vocabulary/` and
-   `config/taxonomy-ontology-map/`, merged lexically by
-   `drydocs_core/yaml_fragments.py`. The verification still holds; only the shape of
-   what was read changed. Path corrected 2026-08-05.) The check RESULTS and
-   the sign-off are yours: they describe what ran against the COMPANY tree, which no
-   producer session can know. They are bracketed placeholders, deliberately not
-   invented — an entry citing numbers nobody ran is worse than no entry.
-
-   ```markdown
-   ## [PORT DATE] — L7 · Documentation traceability + review feedback — RATIFIED (Tier A, adopted via port)
-
-   - **Tier:** A — the company held no signed position on documentation traceability
-     at adoption time. Per the two-tier gate-adoption doctrine (port-prompt §6), a
-     port MAY adopt a producer-signed outcome; this entry is the required company
-     record. A PORT-REPORT is evidence, not a gate ledger.
-   - **Subject:** the product-plane documentation ontology — 6 node classes
-     (DesignDoc, DocSection, Requirement, Component, TestCase, FeedbackNote) and 6
-     `doc_` relationship vocabulary entries (doc_section_part_of,
-     doc_requirement_specified_in, doc_requirement_implemented_by,
-     doc_requirement_verified_by, doc_feedback_annotates, doc_feedback_authored_by)
-     activated planned → active; taxonomy-ontology map entry
-     `doc-traceability-feedback` proposed → confirmed.
-   - **Producer gate reference:** producer gate-log 2026-07-20, "L7 · Documentation
-     traceability + review feedback (doc-traceability-feedback) — SIGNED OFF";
-     21 confirmed / 0 edited / 0 rejected; SME chad.wilson; gate spec
-     `config/gate-prompts/doc-traceability-feedback.yaml`; producer commit `0252d29`.
-     Adopted into this repo by `PORT-REPORT-6fd3270`.
-   - **Same-SME condition (§6 Tier A clause a):** MET — the SME who signed the
-     producer gate is the SME signing here.
-   - **Checks performed company-side (§6 Tier A clause b):**
-     - Full unit suite: [N] passed, [N] skipped.
-     - J7 reconcile guards with `RECONCILE_BEFORE_DIR` set: no active/confirmed/
-       applied downgrade, no dropped per-entry rows, gate-log append-only — [RESULT].
-     - Vocabulary + map entries resolved BY ID (never whole-file checkout); summaries
-       recomputed as the guard tests do — [RESULT].
-     - [Any company-side adaptation applied at adoption, or "none".]
-   - **Graph writes:** NONE ruled in by this entry. Per §6 and tracker T9, adoption
-     flips config status only; loading `load-doc-traceability` against the company
-     graph and verifying it remains a separate company action.
-   - **Signed off:** [SME NAME], [DATE].
-   ```
-
-   Note the deliberate shape: this ratifies an ADOPTION, so it records no new
-   decisions. If the company ever wants to change any of the 21 producer rulings,
-   that is a full company gate session (Tier B), not an edit to this entry.
+6a. TIER-A RATIFICATION TEMPLATE (T11 discharged 2026-07-27; the paste-ready L7
+   block that lived here was retired at the 2026-08-05 condensation — full text in
+   this file's git history). The COMPANY gate-log now holds three live instances of
+   the shape: L7 (ratified 2026-07-27), then `source-registry-v2` and `J23` (both
+   at PORT-REPORT-57914bf4). For any future Tier-A adoption, copy the newest
+   instance in YOUR gate-log and fill it. The required fields are fixed: Tier line
+   (why Tier A applies — "a PORT-REPORT is evidence, not a gate ledger"), Subject
+   (the exact statuses flipped), Producer gate reference (log date, counts, SME,
+   spec path, producer commit), Same-SME condition, Checks performed COMPANY-SIDE
+   (suite numbers, J7 guards, by-id resolution — REAL results, never invented),
+   Graph writes: NONE (T9), Sign-off. Facts of the producer gate are pre-knowable;
+   the check results and sign-off are yours alone. A ratification records no new
+   decisions — changing a producer ruling is a Tier-B gate session, not an edit.
 
 7. RECONCILE GUARDS: full unit suite green PLUS the J7 reconcile guards with
    RECONCILE_BEFORE_DIR set (proves no active/confirmed/applied downgrade, no dropped
@@ -315,13 +275,10 @@ GUARDRAILS (durable — apply to every port):
    Never overwrite the company pyproject version string; never import producer git tags.
 
 STANDING DIVERGENCES LEDGER (expected collisions — resolve as stated, do NOT "fix"):
-- **`catalog-pat` ≠ `pat-catalog` — RESOLVED 2026-07-31 by the v2 rename, kept as
-  history because it is the reason D4 exists.** The same string named DIFFERENT feeds
-  in the two repos, and presence/resolution tests cannot catch a wrong-but-resolving
-  value. The N7 ruling replaced both with `pat:product-catalog` + `pat:people-report`
-  — matching NEITHER legacy string, so neither repo's wrong value survived — and both
-  legacy ids sit in the D4 retired-id refusal list, which now makes the recurrence
-  structurally impossible rather than merely documented.
+- **`catalog-pat` ≠ `pat-catalog` — RESOLVED 2026-07-31 by the v2 rename** to
+  `pat:product-catalog` + `pat:people-report` (matching NEITHER legacy string); both
+  legacy ids sit in the D4 retired-id refusal list, making recurrence structurally
+  impossible. Kept one entry because it is the reason D4 exists.
 - **Registry v2 is now a COMPANY-CANONICAL SURFACE (PORT-REPORT-57914bf4).** The v2
   systems/datasets shape, `loader-source-overlay.yaml` (18 company loaders) and the
   retired-id refusal list are company-canonical from here. Future ports reconcile
@@ -441,7 +398,7 @@ OWED COMPANY-SIDE:
 | T8  | M0 equivalence unblocks: A3 filename + B1 dot rule (archive step 29) | pending (producer belief, as of 2026-08-01) |
 | T9  | Lineage curated live load — YOUR vocab gate + m3_* flips, then write_curated on your graph | pending (producer belief, as of 2026-08-01) |
 | T10 | MAC field contract validated vs a REAL DPL export — amend dpl_mac.py contract + fixtures together | pending (producer belief, as of 2026-08-01) |
-| T11 | L7 ratification entry in company gate-log (Tier A record) | **RATIFIED 2026-07-27** (company gate-log, prior port; reported at PORT-REPORT-57914bf4). The producer row read `pending` until 2026-07-31 — producer-side staleness, not a company gap. §6a stays as the STANDING Tier-A template (source-registry-v2 and J23 both used that shape) |
+| T11 | L7 ratification entry in company gate-log (Tier A record) | **RATIFIED 2026-07-27** (company gate-log; §6a is the standing template) |
 | T12 | Company platforms gate: AIS position vs producer C12 | **RULED — SUPERSEDE, 2026-07-21** (company gate-log): the AIS layer is superseded by the software-registry model; excision applied, Tier B holds discharged 2026-07-27, session packs retired |
 | T13 | DPL registry field contract validated vs a REAL per-SEAL export (pipeline_id.json/dataset_id.json) — amend dpl_registry.py header + fixtures together, cite provenance (the T10 discipline) | pending (producer belief, as of 2026-08-01) |
 | T14 | rua collector convergence: company's own -n implementation vs producer G18 v2 — reconcile to ONE v2 (flags, scripts.tsv columns incl. sha256, size cap, COLLECTOR_VERSION stamp) so bundles stay cross-ingestible. Step 49e's G45 listing fallback is the same family — reconcile together | pending (producer belief, as of 2026-08-01) |
@@ -451,10 +408,10 @@ OWED COMPANY-SIDE:
 | T18 | Depgraph fork capability catch-up (owed action 48e, PORT-REPORT-94132c80): your separately-owned depgraph fork lacks the U6 multi-root resolver (and `--tree`), and the producer remote is unreachable from it, so the port could not remediate. Until it catches up, `config/dev-environment.yaml` keeps `depgraph.capability_assert: false` (test skips, owed action recorded). When it gains the capabilities: flip the flag true and your `snapshot.ps1` refusal guard goes live | pending (producer belief, as of 2026-08-01) |
 | T19 | N3–N6 LOAD-MAP adoption gate — **narrowed 2026-08-01**: registry v2 is ADOPTED (N9 full-adopt at PORT-REPORT-57914bf4), so this row now covers ONLY the N3 class-declaration derivation, the N4/N5 renders and N6. The id-collision blocker is resolved by the v2 rename (`pat:product-catalog` / `pat:people-report`); what remains is the sourceless company-only loaders. Company `cli.py` still has no `COMMAND_LOADERS`/`CANONICAL_LOAD_SEQUENCE` and the load-map pair stays out of the company board render until this rules | pending (producer belief, as of 2026-08-01) |
 
-| T20 | **Catalog-loader review — DISCHARGED at PORT-REPORT-40c35724** (2026-08-03): item 1, the `products.cypher` orphan fix, is APPLIED company-side (preserving company enrichment + naming); items 2–8 live in the company's own backlog/inbox (C22 unioned in as todo; `product_lines`/`area_products` governance kept company's per the C17 gate-log ruling; count-orphans-before-applying rides T23). Full findings text preserved below for reference. **Original row:** (producer read your `pat_*`/`product_lines`/`products`/`snow_support_crosswalk` cypher; findings only — NO producer payload except item 1). **(1) `products.cypher` carries the defect producer fixed at C17 (`778a90d`):** the parent `MATCH (pl:ProductLine …)` sits AFTER `MERGE (p:Product …)`, so an unresolvable `parent_product_line_id` leaves a REAL Product with no `HAS_PRODUCT` edge and `orphan: false` still set from `ON CREATE` — unparented while reporting itself fine, and `orphan` has no writer that can ever set it true. Producer fix = `OPTIONAL MATCH` + the flag written on EVERY run + `orphan_parent_product_line_id` keeping the id that failed. This matters MORE on your side: you run it against the real catalog, so count the existing orphans before applying. **(2) `product_lines.cypher` MERGEs its parent** (`:SubLOB` / `:LOB`) rather than matching it, so a bad or missing parent id INVENTS a nameless anchor indistinguishable downstream from a real one — your own `pat_app_links.cypher` already has the right pattern (`is_stub: true`, `source: 'pat-stub'`, placeholder attrs only while stub); apply that governance or MATCH + report. **(3) same file, the ELSE branch** fires on "sub-lob absent" without also requiring `parent_lob_id`, so a row missing BOTH anchors MERGEs on a null key — verify what your Neo4j actually does there (a null property is not stored, so the match semantics are not what the code reads like) and guard the condition regardless. **(4) `snow_support_crosswalk.cypher` keys `:ServiceNowGroup` on the group NAME** (`MERGE …{group_name: row.snow_group}`) while `snow_group_sys_id` sits in the same row — C17 §a's ruling outside PAT: a rename mints a second node and orphans every edge on the first. Same shape for `:HpsmQueue` (`queue` vs `hpsm_sys_id`). Producer cannot see whether the flat `u_hpsm_queue_to_group` extract can join on sys_id, so this is a QUESTION with a recommendation, not a bug call: if sys_id is stable, it is the key and the name is an attribute. **(5) `pat_product_owners.cypher`** documents its own silent no-op on catalog refresh lag — count it (same rule as 1), and strip the literal example product id from the header before that file is ever ported; a real catalog id is a data value and must not reach the producer tree. **(6) `pat_app_links.cypher`'s** OPTIONAL-MATCH skip is CORRECT but uncounted, so refresh lag looks identical to a genuinely app-less product. **(7) `created_at` on nodes vs `first_seen_at` on edges** in the same files — producer uses `first_seen_at` for both everywhere; converge before more loaders copy it. **(8) `product_lines.cypher`'s** unconditional `SET pl.name = row.name` blanks a name on a sparse refresh, while `products.cypher` two files over uses `coalesce(row.name, p.name)` — your own better idiom, applied inconsistently (producer has the SAME bug in both `product_lines` and `area_products`; back-flow noted in IDEAS) | **DISCHARGED 2026-08-03** (PORT-REPORT-40c35724). Status cell corrected 2026-08-04: it still read `pending` while the row body already said DISCHARGED — the same producer-side staleness the T11 row documents, found by a producer review of PORT-REPORT-5f79d145. No company action was ever owed by it. |
+| T20 | **Catalog-loader review (8 findings on the company's `pat_*`/`product_lines`/`products`/`snow_support_crosswalk` cypher) — DISCHARGED at PORT-REPORT-40c35724** (2026-08-03): item 1, the `products.cypher` orphan fix, is APPLIED company-side; items 2–8 live in the company's own backlog/inbox; count-orphans-before-applying rides T23. The full 8-finding text was retired from this row at the 2026-08-05 condensation — it lives in this file's git history and PORT-REPORT-40c35724. Producer-side the same shape closed as C22 (step 70) + C24 (step 94). | **DISCHARGED 2026-08-03** (status cell corrected 2026-08-04 — producer-side staleness, the T11 class) |
 | T22 | **`_client(database)` follow-up — company backlog row DD6** (created 2026-08-03, the port's own finding): company `cli.py` `_client()` takes no `database` param, which (a) is already a LATENT crash in `patch_window_cmd` (calls `_client(database=...)` today), and (b) blocked the two new verbs — `docs-verify` (Q7) and `bootstrap-schema-graph` (targets `ddschema`). DD6 = add the param, wire both DEFERRED verbs, add the `ddschema` provisioning DDL (the G51 twin). Modules are already ported; only the thin CLI wrappers wait | pending (producer belief, as of 2026-08-03; company row DD6) |
 | T23 | **S3/C17 GRAPH writes on the company graph** — config/code landed at PORT-REPORT-40c35724, loads did NOT (guardrail 6: always yours). S3 re-key: **DROP `port_unique` FIRST**, then create `port_app_key` — a same-name re-declare succeeds and does nothing (verified live producer-side); all 8 key-bearing sites cut over in ONE apply or the constraint's null-tolerance silently doubles canonical nodes. C17: count existing orphans BEFORE the every-run `orphan` flag goes live (report's own note). **RIDER 2026-08-05, from a company-side T23 lookup the producer was shown:** that session first read T23 broadly (as C23 `IN_DIMENSION` bootstrap + G51 `ddschema` populate + all S3/C17 re-keys + the folder-attribution migration) from downstream references, then corrected itself against this row and converged on it — so the row is right as written, and G51 `ddschema` populate is **T22/DD6 territory, not T23**. **DIRECT EVIDENCE 2026-08-04 — this row's own prediction FIRED, so it is no longer only a producer belief.** The company ran `drydocs load seal_applications` against a graph that took the S3 CODE but never the S3 re-key and got `Neo.ClientError.Schema.ConstraintValidationFailed: Node(97) already exists with label 'BusinessApplication'`. Mechanism confirmed against producer source: pre-S3 nodes carry `seal_id` and NO `app_id`; `MERGE (a:BusinessApplication {app_id: row.app_id})` cannot match them because a uniqueness constraint IGNORES NULLS, so it mints a second node, and the next line `SET a.seal_id = row.app_id` then collides with the original's `seal_id` (both properties are separately unique-constrained, `constraints.cypher:43-44`). That is this row's "all 8 key-bearing sites cut over in ONE apply or the constraint's null-tolerance silently doubles canonical nodes", happening. **Remedy relayed:** backfill `app_id = seal_id` on the pre-cutover nodes BEFORE re-running, after checking whether the partial run already doubled any — batches commit per flush, so a mid-load crash leaves a partially-doubled graph, not a clean rollback. **Producer payload now exists (S10, built 2026-08-05, lands with this port):** all four `:BusinessApplication` MERGE loaders refuse up front when the target database holds a node with a null `app_id`, before any write and before the :JobRun. The refusal does NOT substitute for this row — it prevents the crash, it does not repair live state. Two things to keep straight, though. (1) **A CLOSED LOADER IS NOT A PERFORMED MIGRATION.** The company closed the folder-attribution *loader* (`folder_attribution.py` / `.cypher`) on 2026-08-04; the T23 leg is the SF1/F1 edge migration on LIVE state, which is exactly what step 55's `F1/G4-RIDER` note says wipe-and-rebuild does not cover. Do not let "the folder-attribution slice closed" on a board read as the migration being done. (2) That session could not fetch the producer and answered from a cached `cewilson/main @ 5f79d145` — see the fetch-access warning at the top of this file; a T-row read under those conditions is dated by construction | pending (producer belief, as of 2026-08-05 — the S3 re-key and C17 orphan-count legs were still open company-side at the 2026-08-04 lookup; the SF1 folder-attribution *loader* is closed, its edge migration is not) |
-| T21 | **What are `drydocs/docmeta/connectors/` and `drydocs/scrapers/`?** — **ANSWERED 2026-08-02, mixed and the useful kind.** `connectors/` is a company-authored acquisition framework (a `Connector` protocol, `fetch(source) -> list[RawPage]`; acquisition only, cleaning/hashing downstream) whose four members split exactly where the producer needs: `web.py` (public http(s) via stdlib `urllib`, injectable transport so it is offline-testable with a fake opener, SSRF scheme allow-list) and `filedrop.py` (local file/directory of text files via `pathlib`) are **company-agnostic with zero internal dependencies**, `base.py` is protocol + `RawPage` + `ConnectorUnavailable` (mechanism only), and `confluence.py` drives a vendor-bundled binary against the internal wiki realm — internal. `scrapers/` is a separate heavier internal-wiki scraper CLI + leaf utilities; **not agnostic as a suite**. So `web.py` + `filedrop.py` + the `base.py` protocol are a clean sanitizable back-flow reproduction that seeds producer **Q6**, unblocking **R7** and **Q12**; everything else is a purely-internal fetcher. Company recorded it as a back-flow candidate in their IDEAS (`8502c95c`). Producer owns the reproduction — the row stays open until Q6 carries it. **DISCHARGED 2026-08-04:** Q6 landed `drydocs_docmeta/` with exactly that shape — `connectors/base.py` (protocol + `RawPage` + `SourceUnavailableError`), `web.py` (stdlib urllib, injectable transport, SSRF scheme allow-list, and the Q12 page-count refusal Q6 required before a web connector could ship at all) and `filedrop.py`. Producer-AUTHORED against the described shape, never a copy of the company tree. | ANSWERED 2026-08-02; back-flow DISCHARGED 2026-08-04 (Q6) |
+| T21 | **What are `drydocs/docmeta/connectors/` and `drydocs/scrapers/`?** — ANSWERED 2026-08-02: a company acquisition framework whose agnostic members (web/filedrop connectors + the base protocol) seeded producer Q6; the rest (confluence connector, `scrapers/`) is purely internal. **DISCHARGED 2026-08-04:** Q6 landed `drydocs_docmeta/` producer-AUTHORED against the described shape, never a copy (step 75). Full analysis retired to this file's git history at the 2026-08-05 condensation. | ANSWERED 2026-08-02; back-flow DISCHARGED 2026-08-04 (Q6) |
 
   Done-means for T1–T10 are unchanged — they live verbatim in the archive's tracker
   section (guardrail 1 has the `git show` path; they are NOT restated here). T9 reminder: producer sign-off never substitutes for load verification on
@@ -699,10 +656,9 @@ verification status in [BRACKETS]; spend review on [UNRULED].
     the AutoSys twin domain slots in per §G by adding its own platforms.yaml
     ref + attribution loaders — the pane's orchestrator picker already
     renders it. `EXPECTED_CONSTRAINTS` does not move. Producer suite
-    1403→1410 (+7); web build + oxlint clean. NOTE the legacy finding
-    (inboxed, no item yet): `mappings.attribution-coverage.v1` still reads
-    the RETIRED job-grain edge — the job-application pane is legacy on both
-    sides after step 63.
+    1403→1410 (+7); web build + oxlint clean. The legacy finding this step
+    noted (`mappings.attribution-coverage.v1` reading the RETIRED job-grain
+    edge) closed producer-side at step 91 (K15).
 
 67. K13 — catalog_has_application SEMANTICS RECONCILED TO §G6 (docs/config
     only, no code behavior change). This is the producer ADOPTING YOUR
@@ -783,8 +739,8 @@ verification status in [BRACKETS]; spend review on [UNRULED].
     after the port so the every-run orphan flags exist (nodes loaded under
     the old cypher have no flag until touched); and if you extended
     status-item type handling anywhere, note the new fifth type. The
-    dev_teams/catalog_lobs same-shape gap is INBOXED producer-side, not
-    fixed — do not expect it in this range.
+    dev_teams/catalog_lobs same-shape gap closed at step 94 (C24) — it IS
+    in this range after all.
 
 71. J18+J26+J27+J28 — THE J-SERIES CLOSE-OUT (one batch, 1420→1427/5).
     J18: live-verification claims name their venue (backlog pull-rule step 5
@@ -1149,6 +1105,118 @@ verification status in [BRACKETS]; spend review on [UNRULED].
     `app.registered_commands`: **never parse a render when the object is
     importable.**
 
+91. K15 — THE JOB-GRAIN /mappings PANE RETIRED, NOT RE-BOUND (`192c510`)
+    [SME-RULED direction; web/API only]. Closes the step-66 legacy finding:
+    post-K8 the pane read the retired job-grain edge, reported every row
+    "unresolved", and drafted changesets the server refuses. The SME fact
+    that settled RETIRE over re-bind: a folder and its jobs carry the SAME
+    app code, so a job-grain grid is N× rows of one folder-level fact.
+    QuerySpec `mappings.attribution-coverage.v1` DELETED; the API domain row
+    stays `available: false` so a bookmarked tab renders visibly retired
+    rather than vanishing; MappingsRoute drops ~495 lines and defaults to
+    app-code-mapping. Your console carries the same dead pane after steps
+    63/66 — take this with them.
+
+92. GATE PROMPTS DRAFTED, NOTHING RULED [UNRULED] (`6244347`, `8d45832`).
+    Three new prompts await SME: software-version-context (loads at the
+    AppUser grain — the version rows are (fid-name, install-path) facts, and
+    the application is reached only through a MUTABLE ownership join, which
+    is why it is TWO gates not one), fid-identity-scope, and G32
+    content-topology. `6244347` also carries the naming-standard corrections
+    the version evidence forced — those port like-for-like. The prompt FILES
+    port; no config flips until signed. Your gates.json open list grows by
+    three on re-render — J28 working, not drift.
+
+93. S10 — REFUSE A PRE-CUTOVER GRAPH INSTEAD OF MINTING THE TWIN
+    (`04b267a`) [TEST-PINNED; born from YOUR 2026-08-04 incident — see the
+    T23 row]. `drydocs/loaders/app_identity.py` adds
+    `PreCutoverApplicationGuard`, mixed in on all four loaders that MERGE
+    the canonical `:BusinessApplication`; the check runs BEFORE preflight
+    and before `_open_run`, so a refused load writes NOTHING — not even the
+    :JobRun — and the refusal message carries the remedy (backfill or
+    rebuild, count duplicates first), not just the symptom. The coverage
+    test derives the MERGE-site list from the .cypher files, so a fifth
+    site added without the guard reds. Fixed in passing:
+    `batch_port_orchestrator`'s endpoint probe leaned on the deprecated
+    seal_id alias. ***YOUR SIDE:*** the guard PREVENTS the crash you
+    already hit; it does not repair live state — the S3 re-key/backfill
+    stays T23, exactly as that row says. Suite 1575/5 at this commit.
+
+94. C24 — catalog_lobs + dev_teams STOP BLANKING ON A SPARSE REFRESH
+    (`6a45a02`) [TEST-PINNED]. The two loaders step 70 inboxed, closed:
+    `catalog_lobs.cypher` coalesces BOTH `code` and `name` (code was losing
+    data on every id-only refresh — the more visible loss); `DevTeamRow.name`
+    goes optional with ''→None (a required name rejects a sparse row
+    wholesale, `last_seen_at` never advances, and an unrefreshed team reads
+    as retired); `team_id` stays required — optionality never leaks into
+    keying. The C22 parametrized coalesce pin now covers FIVE loaders, so a
+    sixth gets caught by the same test. ***YOUR SIDE:*** like-for-like;
+    same re-run note as step 70.
+
+95. W1–W3 + THE fcdo-crosswalk GATE — FCDO ALIGNMENT BUILT, SIGNED, AND THE
+    CORPUS ACTIVATED [SME-SIGNED] (`eaa4469` W1, `46a2b8c` W2, `2e4e726` W3;
+    gate `44a91ab` 13/13; activation `f53885d`). NEW
+    `config/crosswalks/fcdo-vocabulary.yaml` — 8 rows binding DryDocs terms
+    to standard CURIEs (PROV-O/DCAT/SKOS/ADMS/RDFS/OpenLineage),
+    mechanism-only (a test forbids firm-namespace strings). Its schema is a
+    SIBLING (`drydocs.vocab-crosswalk.v1`): `crosswalk.py` gains
+    `SIBLING_SCHEMA_IDS` so the orchestrator-crosswalk loader SKIPS it in
+    the directory scan while unknown schemas still fail loudly — take the
+    loader change, the config and `tests/unit/test_fcdo_crosswalk.py`
+    TOGETHER or the scan refuses the new file. Gate outcome: all rows
+    confirmed EXCEPT row 5 (loader envelope ↔ Descriptive Metadata),
+    blocked-on-recapture; the test pins the signed statuses. W2 registered
+    the property/enum alignments PLANNED on three landing spots
+    (ControlMJobRun Run semantics, SKOS-required attrs as the enum-gate
+    idiom, ColumnShape names); W3 documented the builder skill. The
+    `fcdo-frameworks` doc corpus flipped `confirmed: true` by user ruling
+    (gate-log RECORD; plus an audit-fields stub entry — `test_audit_fields`
+    requires one for every confirmed source, take them together).
+    ***YOUR SIDE:*** (a) gate ADOPTION is two-tier as always; the file
+    lands under the COMPANY enforcement-matrix row id `crosswalks`
+    (standing divergence above); (b) the row-5 recapture is YOURS — the
+    ruling waits on the company-side Confluence scrape, so that residue
+    closes on your side first.
+
+96. K18 — PLATFORM APP CODES CAN NO LONGER MASQUERADE AS TIER-1; `tier` →
+    `row_kind` ON EVERY SURFACE [TEST-PINNED; FORMAT-BREAKING company-side —
+    joins the T23 migration family] (`1386faf`; claim + the disagreement
+    rule on the item `1755f9b`). THE RENAME, precisely — five surfaces move
+    together, and taking a subset strands the others:
+    (1) `config/overrides/app-code-mappings.csv` header column `tier` →
+    `row_kind`; (2) the mapping-store column + views, `SCHEMA_VERSION` →
+    `drydocs.mapping-store.v3` (derived — rebuilds; S4 drafts carry);
+    (3) the wire (`AppCodeEntry.row_kind` in `mappingsApi.ts` /
+    `drydocs_api`); (4) the row model (`FolderAttributionRow.row_kind`);
+    (5) the EDGE PROPERTY — `folder_attribution.cypher` writes
+    `r.row_kind`, not `r.tier`, on BELONGS_TO_APPLICATION folder edges.
+    The K2 match-precedence tiers deliberately KEEP the word "tier" — no
+    property of theirs surfaces, and the value spaces never collided.
+    BEHAVIOR: the loader derives a row kind from PRAOCG name positions 3–5
+    against a CLOSED six-code platform list read from
+    `internal/standards/technology/platform-codes.yaml` (internal/ =
+    never-port; a missing file leaves the guard INERT, so a tree without a
+    twin behaves pre-K18). A platform-prefixed code never fans out even
+    when authored seal-born; a code-level platform DECLARATION now
+    REQUIRES `app_id` — the platform's OWN SEAL — plus rationale
+    (declare-by-absence retired; the legacy empty-app_id shape still reads
+    as a declaration, defensively). THE DISAGREEMENT RULE (SME, recorded
+    on the item): two row-kind signals never resolve silently — derivation
+    wins for BLOCKING fan-out, and every disagreement queues for a human
+    (`RowKindDisagreement` in coverage + a JobRun count); the inverse
+    direction (row says platform, name says application) queues without
+    blocking anything.
+    ***YOUR SIDE — FORMAT-BREAKING, sequence with steps 62/63:*** (a) your
+    tier-authored CSV rows re-author under the new header AND the
+    app_id-required rule in the same change that takes the store/loader;
+    (b) live `r.tier` edges migrate with the K8/T23 reload — one more
+    reason that migration is a single event, not a series; (c) the steward
+    pane gains a fourth authoring mode, "platform DECLARATION", where the
+    application you pick is the platform's own; (d) author YOUR OWN
+    platform-codes twin from your frameworks — the producer's six values
+    are its capture, not a contract. Suite 1597/5 at head (chain figure
+    below). K19 (the follow-on) is producer-backlog, not in this range.
+
 ACCEPTANCE GATE (behavior is the contract, not a byte-compare):
 - Track 1 (portable):
     poetry run pytest tests/unit/test_variable_classifier.py tests/unit/test_variable_resolver.py \
@@ -1165,7 +1233,8 @@ ACCEPTANCE GATE (behavior is the contract, not a byte-compare):
   capability_assert=false skips per T18). A retired-id refusal from
   `SourceRegistry.from_yaml` is the D4 guard WORKING, not a port failure — rebind the
   loader in `loader-source-overlay.yaml`, never by re-adding the retired id.
-  Producer reference at the current head (step 83, the ddlineage retirement):
+  Producer chain reference (like-for-like venue: CSV-PRESENT desktop, no
+  RECONCILE_BEFORE_DIR) — at step 83, the ddlineage retirement:
   1539
   passed / 5 skipped with the production CSV PRESENT and no
   RECONCILE_BEFORE_DIR (4 J7 guards + the graphrag PDF) — the like-for-like
@@ -1190,7 +1259,11 @@ ACCEPTANCE GATE (behavior is the contract, not a byte-compare):
   the chain is a chain of RUNS. Extend it from a CSV-present desktop
   run; do not adopt the laptop number as the reference. Your own
   baseline is above the producer floor either way — compare against your
-  last PORT-REPORT, never against these. The
+  last PORT-REPORT, never against these. **The chain RESUMES like-for-like
+  on the desktop (2026-08-05):** step 93 (S10) **1575/5** (quoted in
+  `04b267a`), and the current head after step 96 (K18) measured
+  **1597 passed / 5 skipped** — that is the producer reference figure;
+  steps 84–90 remain the venue-noted gap in between. The
   step-60 figure (1354 / 7) was CSV-ABSENT without RECONCILE_BEFORE_DIR and is
   not comparable line-for-line; `aa0a0eb`'s commit message quotes 1358 / 3,
   which is the step-59 run with RECONCILE_BEFORE_DIR set. Earlier producer
