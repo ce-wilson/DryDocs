@@ -596,6 +596,17 @@
     {
       "kind": "prompt-only",
       "date": null,
+      "title": "document-content-topology (gate page rendered — session not yet run)",
+      "status": "open",
+      "prompt_files": [
+        "config/gate-prompts/document-content-topology.yaml"
+      ],
+      "log_ref": null,
+      "unblocks": []
+    },
+    {
+      "kind": "prompt-only",
+      "date": null,
       "title": "email-dl-contact-point (gate page rendered — session not yet run)",
       "status": "open",
       "prompt_files": [

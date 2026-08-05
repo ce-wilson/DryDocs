@@ -346,6 +346,7 @@
         "config/gate-prompts/controlm-hosts-topology.yaml",
         "config/gate-prompts/controlm-q1q3-phase1.yaml",
         "config/gate-prompts/doc-traceability-feedback.yaml",
+        "config/gate-prompts/document-content-topology.yaml",
         "config/gate-prompts/email-dl-contact-point.yaml",
         "config/gate-prompts/envelope-property-terms.yaml",
         "config/gate-prompts/etlprocess-kind-enum.yaml",
