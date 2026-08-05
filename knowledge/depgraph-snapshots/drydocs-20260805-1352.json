@@ -1,16 +1,16 @@
 {
   "meta": {
     "project": "drydocs",
-    "captured_at": "2026-08-05T13:43:40",
+    "captured_at": "2026-08-05T13:52:25",
     "date": "20260805",
     "scan": "DryDocs",
     "tree": true,
     "git": {
-      "commit": "44a91ab",
-      "full": "44a91ab4446dc3a26b5727c8396f07cec28160b9",
+      "commit": "f53885d",
+      "full": "f53885d9a3dd85de78d1c3e29f1c12caeea40989",
       "branch": "main",
-      "describe": "44a91ab",
-      "subject": "feat(ontology): GATE fcdo-crosswalk SIGNED OFF 13/13 - vocabulary crosswalk confirmed, row 5 stays blocked-on-recapture",
+      "describe": "f53885d",
+      "subject": "feat(config): fcdo-frameworks corpus ACTIVATED (user ruling in-chat; gate-log RECORD)",
       "dirty": false,
       "pr": null
     },
@@ -12857,10 +12857,10 @@
       "kind": "file"
     },
     {
-      "file_id": "drydocs/knowledge/depgraph-snapshots/drydocs-20260805-1050.json",
-      "name": "drydocs-20260805-1050.json",
+      "file_id": "drydocs/knowledge/depgraph-snapshots/drydocs-20260805.json",
+      "name": "drydocs-20260805.json",
       "extension": ".json",
-      "rel_path": "knowledge/depgraph-snapshots/drydocs-20260805-1050.json",
+      "rel_path": "knowledge/depgraph-snapshots/drydocs-20260805.json",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -25609,7 +25609,7 @@
     [
       "drydocs/knowledge/depgraph-snapshots",
       "CONTAINS",
-      "drydocs/knowledge/depgraph-snapshots/drydocs-20260805-1050.json"
+      "drydocs/knowledge/depgraph-snapshots/drydocs-20260805.json"
     ],
     [
       "drydocs/knowledge/depgraph-snapshots",
