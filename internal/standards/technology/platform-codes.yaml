@@ -31,7 +31,7 @@ platform_codes:
   - code: IOS
     framework: "Informatica -> Snowflake"
   - code: SFS
-    framework: "Snowflake ETL"
+    framework: "Snowflake ETL"   # the standard's verbatim label; SME correction 2026-08-05: Snowflake is a TARGET DB platform (S3/Glue/Iceberg family), not an ETL product — the label names the loads-into-Snowflake job family. See the SFS note in folder-naming-convention.md.
   - code: DDC
     framework: "ABICOLO (DCM) — Informatica TD->SF + DMV (repurposed code; see the DDC caution in folder-naming-convention.md)"
   - code: DPL

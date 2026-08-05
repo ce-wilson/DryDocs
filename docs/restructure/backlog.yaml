@@ -12418,15 +12418,22 @@ items:
       deduped to one edge per (application, product) — an app has many sub-applications
       all naming the same platform, so fanning them in at sub-application grain builds a
       super node on the product. Inboxed, not in this item; needs two software-registry
-      product rows (DPL, Snowflake ETL) first.
+      product rows (DPL, Snowflake — see the correction below) first.
       MERGED IN 2026-08-05 (desktop, Idea-65's open residue): those TWO PRODUCT ROWS are
       now this item's prerequisite rather than a floating inbox line, because the gate
       cannot rule §C on a product vocabulary with holes in it. Two of the six framework
       codes have no `config/taxonomy/software-registry.yaml` row — DPL (the standing gap
       `invocation_patterns` already records, now with a name and a framework table behind
-      it) and Snowflake ETL. Registering them is taxonomy capture, reversible, and does not
-      pre-empt any §C ruling: a product row says the product exists, not that any
+      it) and the SFS/Snowflake row. Registering them is taxonomy capture, reversible, and
+      does not pre-empt any §C ruling: a product row says the product exists, not that any
       application uses it or at what version.
+      CORRECTED 2026-08-05 (user, in-session): AWS Snowflake is a TARGET DB PLATFORM, not
+      an ETL product — same family as AWS S3, AWS Glue tables, and AWS Iceberg tables. The
+      DAT SRE table's "Snowflake ETL" label names the loads-into-Snowflake JOB FAMILY the
+      SFS code marks, not a software product. So the missing registry row is `snowflake`
+      the data platform (a DBMS-family category, sibling of `oracle-db`), never a
+      "Snowflake ETL" tool row — and any app->platform edge derived from the SFS code
+      reads "loads into Snowflake," not "runs a Snowflake ETL framework."
 
   - id: C26
     epic: ontology-mapping

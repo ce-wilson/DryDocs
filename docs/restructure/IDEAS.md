@@ -245,7 +245,9 @@ question a 1,000-line file with the trail at the bottom could not answer.
   PREREQUISITE either way: two of the six framework codes have no
   `config/taxonomy/software-registry.yaml` product row — DPL (the standing gap `invocation_patterns`
   already records, now with a name and a framework table behind it) and Snowflake ETL. Register those
-  products first.
+  products first. *[Corrected 2026-08-05 (user): AWS Snowflake is a TARGET DB platform (S3/Glue/
+  Iceberg family), not an ETL product — the second row registers `snowflake` the data platform, not
+  a "Snowflake ETL" tool. Recorded in C25's notes and both folder-naming twins.]*
 - **`Idea-64`** · 2026-08-05 · `[chore]` · **open** · prio? **High** —
   **`refines:` in the standards frontmatter is a CHAIN, not a flag — and
   `config/precedence.yaml` cannot express two internal tiers.** SME framing: Vendor → Company/Platform

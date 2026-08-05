@@ -53,9 +53,17 @@ many consuming applications.
 | DPL (Data Pipeline On Cloud, AWS) — also PySpark transformations | `PRDCL` | `DCL` | P032 | **no product row yet** (the standing gap) |
 | Ab Initio (on cloud) | `PRAOC` | `AOC` | P032 | `abinitio` |
 | Informatica → Snowflake | `PRIOS` | `IOS` | P014 | `informatica-powercenter` |
-| Snowflake ETL | `PRSFS` | `SFS` | P014 | **no product row yet** (snowflake) |
+| Snowflake ETL *(the standard's label — see the SFS note below)* | `PRSFS` | `SFS` | P014 | **no product row yet** (`snowflake`, the data platform) |
 | ABICOLO (DCM) — Informatica TD→SF + DMV | `PRDDC` | `DDC` | P032 | `informatica-powercenter` (+ DMV) |
 | (legacy) Data Pipeline — predecessor of PRDCL | `PRDPL` | `DPL` | — | same gap as DCL |
+
+⚠️ **`SFS` typing correction (SME, 2026-08-05):** AWS Snowflake is a **target DB
+platform**, not an ETL product — the same family as AWS S3, AWS Glue tables, and AWS
+Iceberg tables. The standard's "Snowflake ETL" label (kept verbatim in the table above)
+names the loads-into-Snowflake **job family**, not a software product. The
+software-registry row this code needs is `snowflake` the data platform (DBMS-family
+category, sibling of `oracle-db`) — an edge derived from `SFS` means "loads into
+Snowflake," never "runs a Snowflake ETL framework."
 
 ⚠️ **`DDC` / SEAL 111374 is the worked example of code repurposing:** the code was
 *originally* created for the PySpark conversion and has since been **repurposed —

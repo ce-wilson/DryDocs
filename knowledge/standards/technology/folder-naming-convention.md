@@ -140,8 +140,13 @@ this section:
 
 Prerequisite either way: two of the six framework codes have no
 `config/taxonomy/software-registry.yaml` product row yet (the DPL gap that
-`invocation_patterns` already records, plus Snowflake ETL), so registering those products
-comes first.
+`invocation_patterns` already records, plus the Snowflake-family code), so registering
+those products comes first. One typing correction rides with that (SME, 2026-08-05):
+Snowflake is a **target DB platform** — the same family as S3, Glue tables, and Iceberg
+tables — not an ETL product. The standard's "Snowflake ETL" label names the
+loads-into-Snowflake job family, so its registry row is the data platform (a DBMS-family
+category, sibling of `oracle-db`), and an edge derived from that code means "loads into
+Snowflake," not "runs a Snowflake ETL framework."
 
 ### `1 SEAL per folder` — independent corroboration of the K7 1:1 rule
 
