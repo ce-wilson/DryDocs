@@ -62,12 +62,12 @@ its folders via `m3_contains_folder` (§B1) as
 | column | required | meaning |
 |---|---|---|
 | `app_code` | yes | the Control-M app code (the `:ControlMApplication` authoring key) |
-| `folder_id` | no | empty = code-level row (fan-out); set = a tier-2 per-folder resolution |
-| `tier` | yes | `seal-born` (1:1, code-level) · `platform` (shared code, resolved per folder) · `dual-coded` (migrating — both attributions simultaneously correct) |
-| `app_id` | see rules | the target application. Required for seal-born, dual-coded, and per-folder rows; must be EMPTY on a platform code-level row (no single application exists) |
-| `declared_end_state` | tier 3 only | REQUIRED on dual-coded rows (§B2) — the explicit end state that keeps a stalled migration visible |
+| `folder_id` | no | empty = code-level row; set = a per-folder platform resolution |
+| `row_kind` | yes | `seal-born` (1:1, code-level fan-out) · `platform` (shared code — the code-level row is a DECLARATION, resolved per folder) · `dual-coded` (migrating — both attributions simultaneously correct). Renamed from `tier` at K18 to stop colliding with the K2 match-precedence tiers |
+| `app_id` | yes | the target application — required on EVERY row (K18). On a platform code-level DECLARATION it is the platform's OWN SEAL (a fact about the code, never fanned out — the loader suppresses fan-out by row_kind, not by app_id emptiness); on a per-folder resolution it is the consuming application |
+| `declared_end_state` | dual-coded only | REQUIRED on dual-coded rows (§B2) — the explicit end state that keeps a stalled migration visible |
 | `origin` | yes | `defined` · `override` · `manual-pin`. `matched-fallback` is refused here — it is derived by the K2 fallback at load and disclosed on the edge, never authored |
-| `rationale` | override/pin | required when origin ≠ `defined` — permanence makes the why load-bearing |
+| `rationale` | override/pin/declaration | required when origin ≠ `defined` (permanence makes the why load-bearing) and on every platform code-level DECLARATION (K18 — the shared-code claim needs its why) |
 | `authored_by` | yes | steward persona (server-stamped in console drafts) |
 | `authored_on` | no | ISO date |
 

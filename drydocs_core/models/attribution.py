@@ -126,15 +126,16 @@ class FolderAttributionRow(BaseModel):
     ``matched-fallback`` row was derived by the demoted K2 match policy at
     load time and is never presented as though it were defined.
     ``match_method`` mirrors the origin for authored rows and records the
-    winning K2 tier for fallback rows. ``tier`` is the authored row's
-    app-code tier (§B2), absent on fallback rows.
+    winning K2 tier for fallback rows. ``row_kind`` is the authored row's
+    app-code kind (§B2; renamed from ``tier`` at K18 — the K2
+    match-precedence tiers keep that word), absent on fallback rows.
     """
 
     folder_id: str = Field(..., min_length=1)
     app_id: str = Field(..., min_length=1)
     origin: str = Field(..., pattern=r"^(defined|override|manual-pin|matched-fallback)$")
     match_method: str = Field(..., pattern=r"^(defined|override|manual|seal|fid|app_name|alias)$")
-    tier: str | None = Field(None, pattern=r"^(seal-born|platform|dual-coded)$")
+    row_kind: str | None = Field(None, pattern=r"^(seal-born|platform|dual-coded)$")
     source: str = Field(..., min_length=1)
     # The authoring steward for authored rows; None on matched-fallback rows
     # (the loader identity becomes the K10 confirmed_by instead).
@@ -145,9 +146,9 @@ class FolderAttributionRow(BaseModel):
     def _keys(cls, v: Any) -> str:
         return _stripped_str(v)
 
-    @field_validator("tier", "authored_by", mode="before")
+    @field_validator("row_kind", "authored_by", mode="before")
     @classmethod
-    def _tier(cls, v: Any) -> str | None:
+    def _row_kind(cls, v: Any) -> str | None:
         return _str_or_none(v)
 
 

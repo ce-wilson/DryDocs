@@ -16,10 +16,12 @@
 //     Python resolver already excludes pinned folders (surfacing
 //     PIN-CONFLICTs on the coverage report); this WHERE is the
 //     belt-and-suspenders backstop.
-//   - ON CREATE: first_seen_at / source / origin / match_method / tier
-//     (set once). origin is the §B3 disclosure flag: defined | override |
-//     manual-pin (authored) | matched-fallback (derived by the demoted K2
-//     policy at load time — never presented as defined).
+//   - ON CREATE: first_seen_at / source / origin / match_method / row_kind
+//     (set once; row_kind renamed from tier at K18 — the K7 kind enum, not
+//     the K2 match-precedence tier). origin is the §B3 disclosure flag:
+//     defined | override | manual-pin (authored) | matched-fallback
+//     (derived by the demoted K2 policy at load time — never presented as
+//     defined).
 //   - SET every run: last_seen_at / last_run_id (re-confirmation
 //     bookkeeping).
 //
@@ -49,7 +51,7 @@ MERGE (f)-[r:BELONGS_TO_APPLICATION {role: 'seal_app_ref'}]->(p)
                 r.source        = row.source,
                 r.origin        = row.origin,
                 r.match_method  = row.match_method,
-                r.tier          = row.tier
+                r.row_kind      = row.row_kind
 SET r.last_seen_at = datetime($loaded_at),
     r.last_run_id  = $run_id
 

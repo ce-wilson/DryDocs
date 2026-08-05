@@ -1,0 +1,38 @@
+# =============================================================================
+# internal/standards/technology/platform-codes.yaml
+#
+# THE CLOSED PLATFORM-CODE LIST — the machine-readable VALUES twin of the
+# tier-discrimination mechanism in
+# knowledge/standards/technology/folder-naming-convention.md (§Tier
+# discrimination) and the Framework -> APPCODE table in this directory's
+# folder-naming-convention.md (the values twin).
+#
+# classification: Internal (J23) — real framework codes from the DAT SRE
+# standard (go/dtjobstandards, ADESRE 3811523057). Consumed by
+# drydocs/loaders/folder_attribution.py::load_platform_codes (K18): a
+# Control-M app code or folder name whose prefix positions 3-5 match a code
+# here is PLATFORM-coded — code-level fan-out is suppressed and folders
+# resolve per folder or surface (K7 §B2).
+#
+# CLOSED AT SIX (SME standards page, 2026-08-05): a seventh framework code
+# would be a change to the DAT SRE standard, not a discovery — extend only
+# from that standard's table, never from observation.
+# =============================================================================
+
+schema: drydocs.platform-codes.v1
+updated: 2026-08-05
+source: "DAT SRE Control-M Job Naming Standards, Framework -> APPCODE table (see folder-naming-convention.md in this directory)"
+
+platform_codes:
+  - code: DCL
+    framework: "DPL (Data Pipeline On Cloud, AWS) — also PySpark transformations"
+  - code: AOC
+    framework: "Ab Initio (on cloud)"
+  - code: IOS
+    framework: "Informatica -> Snowflake"
+  - code: SFS
+    framework: "Snowflake ETL"
+  - code: DDC
+    framework: "ABICOLO (DCM) — Informatica TD->SF + DMV (repurposed code; see the DDC caution in folder-naming-convention.md)"
+  - code: DPL
+    framework: "(legacy) Data Pipeline — predecessor of PRDCL"

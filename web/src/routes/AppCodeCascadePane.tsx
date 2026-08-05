@@ -47,7 +47,7 @@ interface TrayEntry {
   label: string
   app_code: string
   folder_id: string | null
-  tier: AppCodeEntry['tier']
+  row_kind: AppCodeEntry['row_kind']
   app_id: string
   origin: 'defined' | 'override'
   declared_end_state: string | null
@@ -55,6 +55,12 @@ interface TrayEntry {
   authoredAt: string
   lifecycle: Exclude<Lifecycle, 'loaded'> // 'loaded' is DERIVED, never stored
 }
+
+// The dialog's authoring modes: the three row kinds plus the K18 explicit
+// platform DECLARATION (a code-level `platform` row carrying the platform's
+// OWN SEAL — attributes nothing; suppresses fan-out and routes folders to
+// per-folder resolution or the platform-unresolved queue).
+type AuthoringMode = AppCodeEntry['row_kind'] | 'platform-declaration'
 
 interface AppOption {
   app_id: string
@@ -279,15 +285,15 @@ export default function AppCodeCascadePane({
   }
 
   function addDrafts(entry: {
-    tier: AppCodeEntry['tier']
+    mode: AuthoringMode
     origin: 'defined' | 'override'
     rationale: string
     declaredEndState: string
   }) {
     const authoredAt = new Date().toISOString()
-    const perFolder = entry.tier === 'platform'
     const next: TrayEntry[] = []
-    if (perFolder) {
+    if (entry.mode === 'platform') {
+      // Per-folder RESOLUTION rows: app_id = the CONSUMING application.
       for (const f of checkedFolders) {
         if (!f.app_code) continue
         next.push({
@@ -295,7 +301,27 @@ export default function AppCodeCascadePane({
           label: `${f.app_code} · ${f.folder}`,
           app_code: f.app_code,
           folder_id: f.folder_id,
-          tier: entry.tier,
+          row_kind: 'platform',
+          app_id: appId,
+          origin: entry.origin,
+          declared_end_state: null,
+          rationale: entry.rationale,
+          authoredAt,
+          lifecycle: 'draft',
+        })
+      }
+    } else if (entry.mode === 'platform-declaration') {
+      // K18: the explicit code-level DECLARATION — app_id is the PLATFORM'S
+      // OWN SEAL (select the platform's application above). Attributes
+      // nothing; the loader suppresses fan-out by kind.
+      const codes = [...new Set(checkedFolders.map((f) => f.app_code).filter(Boolean))] as string[]
+      for (const code of codes) {
+        next.push({
+          key: `${code}|`,
+          label: `${code} (platform DECLARATION — no fan-out; folders resolve per folder or surface)`,
+          app_code: code,
+          folder_id: null,
+          row_kind: 'platform',
           app_id: appId,
           origin: entry.origin,
           declared_end_state: null,
@@ -314,10 +340,10 @@ export default function AppCodeCascadePane({
           label: `${code} (code-level — fan-out covers every folder under it)`,
           app_code: code,
           folder_id: null,
-          tier: entry.tier,
+          row_kind: entry.mode,
           app_id: appId,
           origin: entry.origin,
-          declared_end_state: entry.tier === 'dual-coded' ? entry.declaredEndState : null,
+          declared_end_state: entry.mode === 'dual-coded' ? entry.declaredEndState : null,
           rationale: entry.rationale,
           authoredAt,
           lifecycle: 'draft',
@@ -346,7 +372,7 @@ export default function AppCodeCascadePane({
       const art = await mappings.draftAppCode(
         drafts.map((e) => ({
           app_code: e.app_code,
-          tier: e.tier,
+          row_kind: e.row_kind,
           app_id: e.app_id || undefined,
           folder_id: e.folder_id ?? undefined,
           declared_end_state: e.declared_end_state ?? undefined,
@@ -713,7 +739,8 @@ export default function AppCodeCascadePane({
                     <LifecycleChip lifecycle={lc} />
                   </div>
                   <div className="mt-0.5 font-mono text-[10px] text-muted">
-                    → {e.app_id} · {e.tier}
+                    → {e.app_id} · {e.row_kind}
+                    {e.row_kind === 'platform' && !e.folder_id ? ' (declaration)' : ''}
                     {e.origin === 'override' ? ' · override' : ''}
                   </div>
                   {e.declared_end_state && (
@@ -790,19 +817,19 @@ function ApproveMappingDialog({
   codelessSelection: boolean
   onCancel: () => void
   onApprove: (entry: {
-    tier: AppCodeEntry['tier']
+    mode: AuthoringMode
     origin: 'defined' | 'override'
     rationale: string
     declaredEndState: string
   }) => void
 }) {
-  const [tier, setTier] = useState<AppCodeEntry['tier']>('seal-born')
+  const [mode, setMode] = useState<AuthoringMode>('seal-born')
   const [origin, setOrigin] = useState<'defined' | 'override'>('defined')
   const [rationale, setRationale] = useState('')
   const [declaredEndState, setDeclaredEndState] = useState('')
 
   const codes = [...new Set(folders.map((f) => f.app_code).filter(Boolean))]
-  const needsEndState = tier === 'dual-coded' && !declaredEndState.trim()
+  const needsEndState = mode === 'dual-coded' && !declaredEndState.trim()
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50" role="dialog" aria-modal="true" aria-label="Approve app-code mapping">
@@ -823,24 +850,35 @@ function ApproveMappingDialog({
         )}
 
         <label className="mt-3 block text-xs font-medium text-muted">
-          Tier (§B2)
+          Row kind (§B2 / K18)
           <select
-            value={tier}
-            onChange={(e) => setTier(e.target.value as AppCodeEntry['tier'])}
+            value={mode}
+            onChange={(e) => setMode(e.target.value as AuthoringMode)}
             className="mt-1 w-full rounded-md border border-edge bg-bg-2 p-1.5 text-xs text-text"
           >
             <option value="seal-born">seal-born — code created FOR this application (1:1, code-level row)</option>
-            <option value="platform">platform — shared code, resolves PER FOLDER (one row per selected folder)</option>
+            <option value="platform">platform resolution — shared code, resolves PER FOLDER (one row per selected folder)</option>
+            <option value="platform-declaration">
+              platform DECLARATION — code-level; app above = the platform&apos;s OWN application; no fan-out ever
+            </option>
             <option value="dual-coded">dual-coded — migrating; code-level row with a declared end state</option>
           </select>
         </label>
-        {tier !== 'platform' && (
+        {(mode === 'seal-born' || mode === 'dual-coded') && (
           <p className="mt-1 text-[10px] text-faint">
             Code-level row: the loader fans out to <strong>every</strong> folder under the code (§B1) — new
-            folders inherit the moment they appear, not just the ones selected.
+            folders inherit the moment they appear, not just the ones selected. A code whose name says
+            platform (prefix positions 3–5, K18) will NOT fan out — the disagreement queues for review.
           </p>
         )}
-        {tier === 'dual-coded' && (
+        {mode === 'platform-declaration' && (
+          <p className="mt-1 text-[10px] text-faint">
+            Declares the code SHARED: its folders resolve per folder or surface as platform-unresolved —
+            never auto-picked, never fanned out. The application selected above must be the platform&apos;s
+            own (its SEAL is a fact on the row, not an attribution target).
+          </p>
+        )}
+        {mode === 'dual-coded' && (
           <label className="mt-2 block text-xs font-medium text-muted">
             Declared end state <span className="text-brand-soft">(required — a stalled migration must stay visible, §B2)</span>
             <input
@@ -881,7 +919,7 @@ function ApproveMappingDialog({
           <button
             type="button"
             disabled={!rationale.trim() || needsEndState || codes.length === 0}
-            onClick={() => onApprove({ tier, origin, rationale: rationale.trim(), declaredEndState: declaredEndState.trim() })}
+            onClick={() => onApprove({ mode, origin, rationale: rationale.trim(), declaredEndState: declaredEndState.trim() })}
             className="rounded-md border border-brand bg-panel-2 px-2.5 py-1 text-xs font-semibold text-text disabled:cursor-not-allowed disabled:border-edge disabled:text-faint"
           >
             Approve → draft

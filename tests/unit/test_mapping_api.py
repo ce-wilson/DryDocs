@@ -586,21 +586,22 @@ def test_override_endpoints_refuse_user_role(sessions, override_store):
 @pytest.fixture()
 def app_code_store(tmp_path, monkeypatch) -> MappingStore:
     """A store whose committed defined-mapping list is a fixture covering all
-    three tiers — the module constant is monkeypatched so the WHOLE read chain
-    (is_current -> build) resolves to it."""
+    three row kinds — the module constant is monkeypatched so the WHOLE read
+    chain (is_current -> build) resolves to it."""
     fix = tmp_path / "app-code-mappings.csv"
     fix.write_text(
         ",".join(APP_CODE_HEADER) + "\n"
-        # tier 1: seal-born, code-level 1:1
+        # seal-born: code-level 1:1
         "PRA,,seal-born,APP-1234,,defined,,kchen2190,2026-08-03\n"
-        # tier 2: the shared platform code declares itself (no single app)...
-        "PLT,,platform,,,defined,,kchen2190,2026-08-03\n"
+        # the shared platform code declares itself (K18: the declaration
+        # carries the platform's OWN SEAL + rationale, and attributes nothing)...
+        "PLT,,platform,APP-9900,,defined,shared SRE-dictated code,kchen2190,2026-08-03\n"
         # ...and resolves per folder
         "PLT,F0001,platform,APP-5678,,defined,,kchen2190,2026-08-03\n"
         # a per-folder override sits beside the defined row, origin-flagged
         "PLT,F0001,platform,APP-9012,,override,platform row predates the team split,"
         "kchen2190,2026-08-03\n"
-        # tier 3: dual-coded carries its DECLARED end state (§B2)
+        # dual-coded carries its DECLARED end state (§B2)
         "PRB,,dual-coded,APP-3456,all workload under PRB once the PLT folders drain,"
         "defined,,kchen2190,2026-08-03\n",
         encoding="utf-8",
@@ -615,22 +616,23 @@ def test_app_code_domain_registered():
     assert dom["source"] == "config/overrides/app-code-mappings.csv"
 
 
-def test_app_code_grid_carries_tier_origin_and_end_state(sessions, app_code_store):
+def test_app_code_grid_carries_row_kind_origin_and_end_state(sessions, app_code_store):
     """Every row is origin-flagged (§B3); code-level rows precede their
     per-folder resolutions; the dual-coded row's declared end state is on the
-    surface (§B2)."""
+    surface (§B2). K18: the wire says row_kind, and the declaration row
+    carries the platform's own app_id."""
     token = _token(sessions, "kchen2190")
     out = mapping_grid("app-code-mapping", token, sessions, app_code_store)
-    assert {"app_code", "tier", "origin", "declared_end_state"} <= set(out["keys"])
+    assert {"app_code", "row_kind", "origin", "declared_end_state"} <= set(out["keys"])
     rows = [(r["app_code"], r["folder_id"], r["origin"], r["app_id"]) for r in out["rows"]]
     assert rows == [
-        ("PLT", None, "defined", None),  # code-level before per-folder
+        ("PLT", None, "defined", "APP-9900"),  # code-level (declaration) before per-folder
         ("PLT", "F0001", "defined", "APP-5678"),
         ("PLT", "F0001", "override", "APP-9012"),  # adjacent, origin-flagged
         ("PRA", None, "defined", "APP-1234"),
         ("PRB", None, "defined", "APP-3456"),
     ]
-    dual = next(r for r in out["rows"] if r["tier"] == "dual-coded")
+    dual = next(r for r in out["rows"] if r["row_kind"] == "dual-coded")
     assert "PLT folders drain" in dual["declared_end_state"]
 
 
@@ -650,10 +652,10 @@ def test_app_code_migration_report_reads_the_declared_end_states(sessions, app_c
     row = out["migrations"][0]
     assert set(row) == {"app_code", "app_id", "declared_end_state", "authored_by", "authored_on"}
     assert row["declared_end_state"], "a dual-coded row without an end state is the defect"
-    # Tier 3 ONLY — seal-born and platform rows are not migrations.
+    # Dual-coded ONLY — seal-born and platform rows are not migrations.
     codes = {r["app_code"] for r in out["migrations"]}
-    tiers = {r["app_code"]: r["tier"] for r in app_code_store.app_code_rows()}
-    assert all(tiers[c] == "dual-coded" for c in codes)
+    kinds = {r["app_code"]: r["row_kind"] for r in app_code_store.app_code_rows()}
+    assert all(kinds[c] == "dual-coded" for c in codes)
 
 
 def test_app_code_migration_report_refuses_user_role(sessions, app_code_store):
@@ -673,7 +675,7 @@ def test_draft_app_code_mapping_writes_a_row_and_promotes(sessions, app_code_sto
         [
             {
                 "app_code": "PRC",
-                "tier": "seal-born",
+                "row_kind": "seal-born",
                 "app_id": "APP-7777",
             }
         ],
@@ -705,15 +707,24 @@ def test_draft_app_code_mapping_writes_a_row_and_promotes(sessions, app_code_sto
     [
         [],
         # dual-coded without the §B2 declared end state
-        [{"app_code": "PRD", "tier": "dual-coded", "app_id": "APP-1"}],
+        [{"app_code": "PRD", "row_kind": "dual-coded", "app_id": "APP-1"}],
         # matched-fallback is derived at load, never authored
-        [{"app_code": "PRD", "tier": "seal-born", "app_id": "APP-1", "origin": "matched-fallback"}],
+        [
+            {
+                "app_code": "PRD",
+                "row_kind": "seal-born",
+                "app_id": "APP-1",
+                "origin": "matched-fallback",
+            }
+        ],
         # override without rationale (permanence makes the why load-bearing)
-        [{"app_code": "PRD", "tier": "seal-born", "app_id": "APP-1", "origin": "override"}],
-        # platform code-level row must not name a single application
-        [{"app_code": "PRD", "tier": "platform", "app_id": "APP-1"}],
+        [{"app_code": "PRD", "row_kind": "seal-born", "app_id": "APP-1", "origin": "override"}],
+        # K18: a platform DECLARATION requires the platform's own app_id...
+        [{"app_code": "PRD", "row_kind": "platform", "rationale": "shared code"}],
+        # ...and its rationale
+        [{"app_code": "PRD", "row_kind": "platform", "app_id": "APP-1"}],
         # duplicate of a COMMITTED row (1:1, OWNER-NOT-USER)
-        [{"app_code": "PRA", "tier": "seal-born", "app_id": "APP-1"}],
+        [{"app_code": "PRA", "row_kind": "seal-born", "app_id": "APP-1"}],
     ],
 )
 def test_draft_app_code_mapping_fails_closed(sessions, app_code_store, bad):
@@ -737,7 +748,7 @@ def test_app_code_endpoints_refuse_user_role(sessions, app_code_store):
     token = _token(sessions, "jdoe4821")
     with pytest.raises(Forbidden):
         draft_app_code_mapping(
-            [{"app_code": "PRC", "tier": "seal-born", "app_id": "APP-7777"}],
+            [{"app_code": "PRC", "row_kind": "seal-born", "app_id": "APP-7777"}],
             token,
             sessions,
             app_code_store,

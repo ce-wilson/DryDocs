@@ -43,13 +43,13 @@ def _authored(
     app_id: str | None,
     *,
     folder_id: str | None = None,
-    tier: str = "seal-born",
+    row_kind: str = "seal-born",
     origin: str = "defined",
 ) -> dict:
     return {
         "app_code": app_code,
         "folder_id": folder_id,
-        "tier": tier,
+        "row_kind": row_kind,
         "app_id": app_id,
         "declared_end_state": None,
         "origin": origin,
@@ -77,14 +77,14 @@ def test_code_level_row_fans_out_to_every_folder_under_the_code() -> None:
     for r in by_folder.values():
         assert r.app_id == "SL0001"
         assert r.origin == "defined" and r.match_method == "defined"
-        assert r.tier == "seal-born"
+        assert r.row_kind == "seal-born"
         assert r.source == AUTHORED_SOURCE
     assert cov.attributed == 2 and cov.unmatched == 1 and cov.reconciles()
 
 
 def test_per_folder_row_narrows_to_one_folder() -> None:
     rows, cov = resolve_folder_attributions(
-        [_authored("DPL", "SL0002", folder_id="f1", tier="platform")],
+        [_authored("DPL", "SL0002", folder_id="f1", row_kind="platform")],
         {"f1": "DPL", "f2": "DPL"},
         [],
     )
@@ -121,7 +121,7 @@ def test_authored_tie_is_a_conflict_never_an_auto_pick() -> None:
     rows, cov = resolve_folder_attributions(
         [
             _authored("ARA", "SL0001"),
-            _authored("ARA", "SL0002", tier="dual-coded"),
+            _authored("ARA", "SL0002", row_kind="dual-coded"),
         ],
         {"f1": "ARA"},
         [],
@@ -137,21 +137,130 @@ def test_authored_tie_is_a_conflict_never_an_auto_pick() -> None:
 
 
 def test_declared_platform_code_folders_surface_instead_of_falling_back() -> None:
-    """A code-level platform DECLARATION (empty app_id) means the code HAS a
-    defined row, so §B3's no-defined-row fallback does not apply — its
-    unresolved folders queue for the steward."""
+    """A code-level platform DECLARATION (K18 shape: row_kind='platform'
+    carrying the platform's OWN app_id) means the code HAS a defined row, so
+    §B3's no-defined-row fallback does not apply — its unresolved folders
+    queue for the steward, and the declared app_id is never fanned out."""
     rows, cov = resolve_folder_attributions(
         [
-            _authored("DPL", None, tier="platform"),
-            _authored("DPL", "SL0002", folder_id="f1", tier="platform"),
+            _authored("DPL", "SL0900", row_kind="platform"),  # SL0900 = the platform's own SEAL
+            _authored("DPL", "SL0002", folder_id="f1", row_kind="platform"),
         ],
         {"f1": "DPL", "f2": "DPL"},
         [_decision("f2", "1", "SL0777")],  # would resolve f2 — must NOT be used
     )
     assert [r.folder_id for r in rows] == ["f1"]
+    assert rows[0].app_id == "SL0002"  # the per-folder resolution, never SL0900
     (conflict,) = cov.conflicts
     assert conflict.folder_id == "f2" and conflict.kind == "platform-unresolved"
     assert cov.reconciles()
+
+
+def test_legacy_empty_app_id_declaration_still_reads_as_a_declaration() -> None:
+    """Back-compat: the pre-K18 declare-by-absence shape (no store can emit
+    it anymore, but a stale draft or company-side CSV might) is still honored
+    as a declaration rather than misread."""
+    rows, cov = resolve_folder_attributions(
+        [_authored("DPL", None, row_kind="platform")],
+        {"f1": "DPL"},
+        [],
+    )
+    assert rows == []
+    (conflict,) = cov.conflicts
+    assert conflict.kind == "platform-unresolved"
+
+
+# --- K18 — the name-derived row kind (the two-route silent fan-out fix) ----------
+
+
+def test_platform_prefixed_code_never_fans_out_even_when_authored_seal_born() -> None:
+    """THE K18 BUG: `PRZPL -> SEAL` is true of the platform and false of
+    every hosted consumer folder. With ZPL on the closed list, a seal-born
+    row for PRZPL must NOT fan out — its folders surface platform-unresolved
+    and the disagreement queues with fan-out marked blocked (claim-time
+    ruling: derivation wins for BLOCKING; a human rules the row)."""
+    rows, cov = resolve_folder_attributions(
+        [_authored("PRZPL", "SL0100")],  # claims seal-born; the name says platform
+        {"f1": "PRZPL", "f2": "PRZPL"},
+        [],
+        platform_codes=frozenset({"ZPL"}),
+    )
+    assert rows == []
+    assert {c.kind for c in cov.conflicts} == {"platform-unresolved"}
+    assert len(cov.conflicts) == 2
+    (dis,) = cov.row_kind_disagreements
+    assert dis.app_code == "PRZPL"
+    assert dis.declared_kind == "seal-born" and dis.derived_kind == "platform"
+    assert dis.blocked_fan_out is True
+    assert cov.reconciles()
+
+
+def test_application_prefixed_code_fans_out_normally() -> None:
+    """The acceptance's other half of the row-level pair: an application
+    prefix (ARA not on the list) fans out exactly as before — the guard
+    blocks nothing it should not."""
+    rows, cov = resolve_folder_attributions(
+        [_authored("PRARA", "SL0001")],
+        {"f1": "PRARA", "f2": "PRARA"},
+        [],
+        platform_codes=frozenset({"ZPL"}),
+    )
+    assert {r.folder_id for r in rows} == {"f1", "f2"}
+    assert cov.row_kind_disagreements == []
+    assert cov.reconciles()
+
+
+def test_inverse_disagreement_queues_but_blocks_nothing() -> None:
+    """Row declares platform, the name says application: nothing was going
+    to fan out (a declaration attributes nothing), but the row or the list
+    is wrong — queued for a human, fan-out flag False."""
+    rows, cov = resolve_folder_attributions(
+        [_authored("PRARA", "SL0900", row_kind="platform")],
+        {"f1": "PRARA"},
+        [],
+        platform_codes=frozenset({"ZPL"}),
+    )
+    assert rows == []  # declaration semantics hold either way
+    (dis,) = cov.row_kind_disagreements
+    assert dis.derived_kind == "application" and dis.blocked_fan_out is False
+    assert cov.reconciles()
+
+
+def test_empty_platform_list_leaves_the_guard_inert() -> None:
+    """No values twin (public clone) -> empty set -> pre-K18 behavior."""
+    rows, cov = resolve_folder_attributions(
+        [_authored("PRZPL", "SL0100")],
+        {"f1": "PRZPL"},
+        [],
+        platform_codes=frozenset(),
+    )
+    assert [r.folder_id for r in rows] == ["f1"]
+    assert cov.row_kind_disagreements == []
+
+
+def test_platform_prefix_parses_positions_3_to_5() -> None:
+    from drydocs.loaders.folder_attribution import platform_prefix
+
+    assert platform_prefix("PRZPLG") == "ZPL"  # 6-char folder name
+    assert platform_prefix("PRZPL") == "ZPL"  # 5-char app code
+    assert platform_prefix("przpl") == "ZPL"  # case-folded
+    assert platform_prefix("PRZ") is None  # too short to carry a mnemonic
+    assert platform_prefix(None) is None
+    assert platform_prefix("") is None
+
+
+def test_load_platform_codes_reads_the_values_twin_and_degrades_empty(tmp_path: Path) -> None:
+    from drydocs.loaders.folder_attribution import load_platform_codes
+
+    twin = tmp_path / "platform-codes.yaml"
+    twin.write_text(
+        "schema: drydocs.platform-codes.v1\nplatform_codes:\n"
+        "  - {code: zpl, framework: synthetic}\n"
+        "  - {code: ZQX, framework: synthetic}\n",
+        encoding="utf-8",
+    )
+    assert load_platform_codes(twin) == frozenset({"ZPL", "ZQX"})
+    assert load_platform_codes(tmp_path / "absent.yaml") == frozenset()
 
 
 # --- §B3 fallback demotion -------------------------------------------------------
@@ -170,7 +279,7 @@ def test_fallback_requires_unanimity_and_is_disclosed() -> None:
     by_folder = {r.folder_id: r for r in rows}
     assert by_folder["f1"].origin == "matched-fallback"
     assert by_folder["f1"].match_method == "seal"  # best tier among agreeing facts
-    assert by_folder["f1"].tier is None
+    assert by_folder["f1"].row_kind is None
     assert by_folder["f1"].source == FALLBACK_SOURCE
     assert by_folder["f2"].match_method == "alias"
     assert cov.attributed_by_origin == {"matched-fallback": 2}
@@ -303,7 +412,7 @@ def test_automated_cypher_creates_no_nodes_and_targets_the_batch_port() -> None:
 def test_automated_cypher_on_create_set_split_carries_the_origin_flag() -> None:
     text = AUTOMATED_CYPHER.read_text(encoding="utf-8")
     on_create = text.split("ON CREATE SET", 1)[1].split("SET r.last_seen_at", 1)[0]
-    for prop in ("r.first_seen_at", "r.source", "r.origin", "r.match_method", "r.tier"):
+    for prop in ("r.first_seen_at", "r.source", "r.origin", "r.match_method", "r.row_kind"):
         assert prop in on_create
     every_run = text.split("SET r.last_seen_at", 1)[1]
     assert "r.last_run_id" in every_run

@@ -149,10 +149,12 @@ OVERRIDE_HEADER = (
 # The defined-mapping list's committed column order (K9). A NEW file, so no
 # S3 alias boundary applies: the header is app_id from day one (§E1 wire
 # rule) — there is no legacy CSV whose parsing a rename would break.
+# K18: `tier` renamed `row_kind` end to end (column, wire, edge property)
+# before it could surface in a QuerySpec under the ambiguous name.
 APP_CODE_HEADER = (
     "app_code",
     "folder_id",
-    "tier",
+    "row_kind",
     "app_id",
     "declared_end_state",
     "origin",
@@ -313,7 +315,7 @@ class MappingStore:
         # already say app_id.
         if domain_id == "app-code-mapping":
             return self._select(
-                "SELECT app_code, folder_id, tier, app_id, declared_end_state, "
+                "SELECT app_code, folder_id, row_kind, app_id, declared_end_state, "
                 "origin, rationale, authored_by, authored_on "
                 "FROM v_app_code_grid"
             )

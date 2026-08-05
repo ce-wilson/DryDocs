@@ -69,17 +69,24 @@ _OVERRIDES_META_KEY = "source:config/overrides/seal-contact-overrides.csv"
 _OVERRIDE_STATUSES = ("active", "corrected-in-seal")
 APP_CODE_MAPPINGS_PATH = REPO_ROOT / "config" / "overrides" / "app-code-mappings.csv"
 _APP_CODE_META_KEY = "source:config/overrides/app-code-mappings.csv"
-APP_CODE_TIERS = ("seal-born", "platform", "dual-coded")
+# K18 rename: the K7 row-kind enum was previously (ambiguously) named `tier`,
+# colliding in prose with the K2 match-precedence tiers (an int-ranked walk).
+# The value space is unchanged — only the name migrated (column, CSV header,
+# wire, edge property), before either could surface in a QuerySpec.
+APP_CODE_ROW_KINDS = ("seal-born", "platform", "dual-coded")
 # The full origin enum every surface discloses (K7 §B3). 'matched-fallback'
 # is DERIVED by the K2 fallback at load time and disclosed on the edge — it
 # is never authored, so the committed store admits only the other three.
 APP_CODE_ORIGINS = ("defined", "matched-fallback", "override", "manual-pin")
 APP_CODE_AUTHORED_ORIGINS = ("defined", "override", "manual-pin")
 
-# v2 adds the S4 draft table. Bumped deliberately: is_current() compares this
-# through meta, so a pre-S4 database — which has no draft table for the API to
-# write to — reads as stale and gets rebuilt rather than failing at first write.
-SCHEMA_VERSION = "drydocs.mapping-store.v2"
+# v2 added the S4 draft table. v3 is the K18 row-format migration: the
+# app_code_mapping column `tier` becomes `row_kind`, and a code-level
+# platform row now CARRIES the platform's own app_id (declare-by-absence
+# retired — the empty-app_id encoding discarded a true fact, the platform's
+# SEAL, to signal a different one). Bumped so a pre-K18 database reads as
+# stale and rebuilds from the committed CSV rather than failing at query.
+SCHEMA_VERSION = "drydocs.mapping-store.v3"
 
 # Table DDL. Nullable columns mirror the YAML's reality (property supplements
 # have no to_node, infrastructure edges have no prov term, etc.).
@@ -239,13 +246,13 @@ CREATE VIEW v_source_corrections AS
 -- Rows never write the graph directly; the loader (K8) stays the only
 -- graph writer (§E3). folder_id empty = code-level row, fanned out to
 -- folders by the loader via m3_contains_folder (§B1); folder_id set = a
--- tier-2 per-folder resolution.
+-- per-folder platform resolution (K7 §B2).
 CREATE TABLE app_code_mapping (
   line_no            INTEGER PRIMARY KEY,
   app_code           TEXT NOT NULL,
   folder_id          TEXT,
-  tier               TEXT NOT NULL
-      CHECK (tier IN ('seal-born','platform','dual-coded')),
+  row_kind           TEXT NOT NULL
+      CHECK (row_kind IN ('seal-born','platform','dual-coded')),
   app_id             TEXT,
   declared_end_state TEXT,
   origin             TEXT NOT NULL
@@ -259,16 +266,16 @@ CREATE TABLE app_code_mapping (
 -- a defined row and its override render adjacent, origin-flagged (§B3 —
 -- attribution is never presented without its origin).
 CREATE VIEW v_app_code_grid AS
-  SELECT app_code, folder_id, tier, app_id, declared_end_state, origin,
+  SELECT app_code, folder_id, row_kind, app_id, declared_end_state, origin,
          rationale, authored_by, authored_on
   FROM app_code_mapping
   ORDER BY app_code, folder_id IS NOT NULL, folder_id, line_no;
 
--- Tier-3 visibility (§B2): every dual-coded row with its DECLARED end
+-- Dual-coded visibility (§B2): every dual-coded row with its DECLARED end
 -- state — the surface a stalled migration cannot hide from.
 CREATE VIEW v_dual_coded_migrations AS
   SELECT app_code, app_id, declared_end_state, authored_by, authored_on
-  FROM app_code_mapping WHERE tier = 'dual-coded'
+  FROM app_code_mapping WHERE row_kind = 'dual-coded'
   ORDER BY app_code, line_no;
 
 -- ── S4 / ADR 0009 rule 5: the draft write-ahead buffer.
@@ -790,16 +797,17 @@ def _ingest_seal_overrides(conn: sqlite3.Connection, path: Path) -> None:
 def validate_app_code_row(
     row: dict[str, Any], *, where: str, seen: set[tuple[str, str, str]]
 ) -> dict[str, str | None]:
-    """Validate ONE defined-mapping row against the K7 tier rules (§B1/§B2)
-    and return it normalized. Shared by the CSV ingestion below and the API
-    draft endpoint, so a drafted artifact can never be refused at
-    materialization. ``seen`` accumulates (app_code, folder_id, origin) keys
-    across the file for the duplicate check — folder → application is 1:1
-    (OWNER-NOT-USER), so a duplicate authoring row is a defect, not a state.
+    """Validate ONE defined-mapping row against the K7 row-kind rules
+    (§B1/§B2, K18) and return it normalized. Shared by the CSV ingestion
+    below and the API draft endpoint, so a drafted artifact can never be
+    refused at materialization. ``seen`` accumulates (app_code, folder_id,
+    origin) keys across the file for the duplicate check — folder →
+    application is 1:1 (OWNER-NOT-USER), so a duplicate authoring row is a
+    defect, not a state.
     """
     app_code = _text(row.get("app_code"))
     folder_id = _text(row.get("folder_id"))
-    tier = _text(row.get("tier"))
+    row_kind = _text(row.get("row_kind"))
     app_id = _text(row.get("app_id"))
     end_state = _text(row.get("declared_end_state"))
     origin = _text(row.get("origin"))
@@ -808,8 +816,8 @@ def validate_app_code_row(
 
     if not app_code:
         raise MappingStoreError(f"{where}: app_code is required")
-    if tier not in APP_CODE_TIERS:
-        raise MappingStoreError(f"{where}: tier {tier!r} not in {APP_CODE_TIERS}")
+    if row_kind not in APP_CODE_ROW_KINDS:
+        raise MappingStoreError(f"{where}: row_kind {row_kind!r} not in {APP_CODE_ROW_KINDS}")
     if origin == "matched-fallback":
         raise MappingStoreError(
             f"{where}: origin 'matched-fallback' is derived by the K2 fallback at "
@@ -818,24 +826,33 @@ def validate_app_code_row(
         )
     if origin not in APP_CODE_AUTHORED_ORIGINS:
         raise MappingStoreError(f"{where}: origin {origin!r} not in {APP_CODE_AUTHORED_ORIGINS}")
-    if tier == "seal-born":
+    # Every row kind requires app_id — including the code-level platform
+    # DECLARATION (K18): a platform code carries the platform's OWN SEAL, so
+    # the row states it as a fact. The old declare-by-absence encoding
+    # discarded that fact to signal "this code is shared" — the row_kind now
+    # says that explicitly, and the K8 loader (not app_id emptiness) is what
+    # keeps a declaration from fanning out.
+    if not app_id:
+        raise MappingStoreError(
+            f"{where}: app_id is required on every row — a {row_kind} "
+            + ("declaration carries the platform's OWN SEAL (K18); " if row_kind == "platform" else "row ")
+            + "declare-by-absence was retired at K18"
+        )
+    if row_kind == "seal-born":
         if folder_id:
             raise MappingStoreError(
                 f"{where}: a seal-born row is code-level 1:1 — fan-out covers its "
-                "folders (§B1); a per-folder row contradicts tier 1"
+                "folders (§B1); a per-folder row contradicts the seal-born kind"
             )
-        if not app_id:
-            raise MappingStoreError(f"{where}: a seal-born row requires app_id (1:1)")
-    elif tier == "platform":
-        if folder_id and not app_id:
+    elif row_kind == "platform":
+        # folder_id set  -> a per-folder RESOLUTION (app_id = the consumer).
+        # folder_id empty -> the code-level DECLARATION (app_id = the
+        #                    platform's own SEAL; attributes NOTHING — §B2).
+        if not folder_id and not rationale:
             raise MappingStoreError(
-                f"{where}: a platform per-folder resolution row requires app_id"
-            )
-        if not folder_id and app_id:
-            raise MappingStoreError(
-                f"{where}: a shared platform code has no single application — "
-                "resolution is per folder (§B2); leave app_id empty on the "
-                "code-level row"
+                f"{where}: a platform declaration row requires rationale — it "
+                "marks a shared code (fan-out suppressed, folders resolve per "
+                "folder or surface); the why must travel with it (K18)"
             )
     else:  # dual-coded
         if folder_id:
@@ -843,14 +860,12 @@ def validate_app_code_row(
                 f"{where}: a dual-coded row is code-level — the platform-code side "
                 "of the migration resolves per folder under the PLATFORM code's rows"
             )
-        if not app_id:
-            raise MappingStoreError(f"{where}: a dual-coded row requires app_id")
         if not end_state:
             raise MappingStoreError(
                 f"{where}: a dual-coded row requires declared_end_state (§B2 — a "
                 "stalled migration must be visible, never silently permanent)"
             )
-    if end_state and tier != "dual-coded":
+    if end_state and row_kind != "dual-coded":
         raise MappingStoreError(
             f"{where}: declared_end_state belongs to dual-coded rows only (§B2)"
         )
@@ -873,7 +888,7 @@ def validate_app_code_row(
     return {
         "app_code": app_code,
         "folder_id": folder_id,
-        "tier": tier,
+        "row_kind": row_kind,
         "app_id": app_id,
         "declared_end_state": end_state,
         "origin": origin,
@@ -895,14 +910,14 @@ def _ingest_app_code_mappings(conn: sqlite3.Connection, path: Path) -> None:
         for line_no, raw in enumerate(reader, start=2):
             row = validate_app_code_row(raw, where=f"{path.name} line {line_no}", seen=seen)
             conn.execute(
-                "INSERT INTO app_code_mapping (line_no, app_code, folder_id, tier, "
+                "INSERT INTO app_code_mapping (line_no, app_code, folder_id, row_kind, "
                 "app_id, declared_end_state, origin, rationale, authored_by, "
                 "authored_on) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
                 (
                     line_no,
                     row["app_code"],
                     row["folder_id"],
-                    row["tier"],
+                    row["row_kind"],
                     row["app_id"],
                     row["declared_end_state"],
                     row["origin"],
@@ -1009,7 +1024,7 @@ def app_code_rows_from_store(
     conn = build(":memory:", app_code_mappings_path=app_code_mappings_path)
     try:
         cur = conn.execute(
-            "SELECT app_code, folder_id, tier, app_id, declared_end_state, "
+            "SELECT app_code, folder_id, row_kind, app_id, declared_end_state, "
             "origin, rationale, authored_by, authored_on "
             "FROM app_code_mapping ORDER BY line_no"
         )

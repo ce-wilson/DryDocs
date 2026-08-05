@@ -103,9 +103,13 @@ export interface CorrectionsReport {
 // the store's own rule set server-side, so a stored draft can never be refused
 // at materialization. authored_by is server-stamped from the session — never
 // sent from here.
+// K18: `tier` renamed `row_kind` on the wire (the K7 kind enum; the K2 match
+// tiers keep the word). app_id is required on EVERY row — a code-level
+// platform DECLARATION carries the platform's OWN SEAL; the loader suppresses
+// its fan-out by kind, never by a missing field.
 export interface AppCodeEntry {
   app_code: string
-  tier: 'seal-born' | 'platform' | 'dual-coded'
+  row_kind: 'seal-born' | 'platform' | 'dual-coded'
   app_id?: string
   folder_id?: string
   declared_end_state?: string

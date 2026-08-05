@@ -94,7 +94,7 @@ def test_meta_records_source_hashes():
     conn = build(":memory:")
     try:
         meta = dict(conn.execute("SELECT key, value FROM meta"))
-        assert meta["schema_version"] == "drydocs.mapping-store.v2"  # v2 = + the S4 draft table
+        assert meta["schema_version"] == "drydocs.mapping-store.v3"  # v3 = the K18 row_kind format
         assert "source:taxonomy-ontology-map.yaml" in meta
         assert "source:relationship_vocabulary.yaml" in meta
     finally:
@@ -321,7 +321,7 @@ def test_override_edit_flips_is_current(manual_fixture, tmp_path: Path):
 # ---------------------------------------------------------------------------
 
 APP_CODE_HEADER_LINE = (
-    "app_code,folder_id,tier,app_id,declared_end_state,origin,rationale,authored_by,authored_on"
+    "app_code,folder_id,row_kind,app_id,declared_end_state,origin,rationale,authored_by,authored_on"
 )
 
 
@@ -332,14 +332,15 @@ def _app_code_csv(tmp_path: Path, *rows: str) -> Path:
 
 
 def test_app_code_round_trip_grid_and_migration_view(tmp_path: Path):
-    """All three tiers materialize; the grid orders code-level rows before
+    """All three row kinds materialize; the grid orders code-level rows before
     their per-folder resolutions with defined/override adjacent (§B3); the
     dual-coded view surfaces every migration with its declared end state
-    (§B2 — a stalled migration cannot hide)."""
+    (§B2 — a stalled migration cannot hide). K18: the platform code-level
+    DECLARATION carries the platform's OWN app_id."""
     fix = _app_code_csv(
         tmp_path,
         "PRA,,seal-born,APP-1234,,defined,,kchen2190,2026-08-03",
-        "PLT,,platform,,,defined,,kchen2190,2026-08-03",
+        "PLT,,platform,APP-9900,,defined,shared SRE-dictated code — resolves per folder,kchen2190,2026-08-03",
         "PLT,F0001,platform,APP-5678,,defined,,kchen2190,2026-08-03",
         "PLT,F0001,platform,APP-9012,,override,team split predates the row,kchen2190,2026-08-03",
         "PRB,,dual-coded,APP-3456,all workload under PRB by the drain,defined,,kchen2190,2026-08-03",
@@ -347,12 +348,12 @@ def test_app_code_round_trip_grid_and_migration_view(tmp_path: Path):
     conn = build(":memory:", app_code_mappings_path=fix)
     try:
         stored = conn.execute(
-            "SELECT app_code, folder_id, tier, app_id, origin FROM app_code_mapping "
+            "SELECT app_code, folder_id, row_kind, app_id, origin FROM app_code_mapping "
             "ORDER BY line_no"
         ).fetchall()
         assert stored == [
             ("PRA", None, "seal-born", "APP-1234", "defined"),
-            ("PLT", None, "platform", None, "defined"),
+            ("PLT", None, "platform", "APP-9900", "defined"),
             ("PLT", "F0001", "platform", "APP-5678", "defined"),
             ("PLT", "F0001", "platform", "APP-9012", "override"),
             ("PRB", None, "dual-coded", "APP-3456", "defined"),
@@ -377,15 +378,17 @@ def test_app_code_round_trip_grid_and_migration_view(tmp_path: Path):
     "row,reason",
     [
         (",,seal-born,APP-1,,defined,,u1,2026-08-03", "missing app_code"),
-        ("PRA,,tier-9,APP-1,,defined,,u1,2026-08-03", "unknown tier"),
+        ("PRA,,kind-9,APP-1,,defined,,u1,2026-08-03", "unknown row_kind"),
         ("PRA,,seal-born,APP-1,,matched-fallback,,u1,2026-08-03", "fallback never authored"),
         ("PRA,,seal-born,APP-1,,invented,,u1,2026-08-03", "unknown origin"),
         ("PRA,F1,seal-born,APP-1,,defined,,u1,2026-08-03", "seal-born is code-level"),
         ("PRA,,seal-born,,,defined,,u1,2026-08-03", "seal-born needs app_id"),
-        ("PLT,,platform,APP-1,,defined,,u1,2026-08-03", "platform code-level has no single app"),
+        # K18: app_id is required on EVERY row — declare-by-absence retired.
+        ("PLT,,platform,,,defined,why,u1,2026-08-03", "declaration needs the platform's own app_id"),
+        ("PLT,,platform,APP-1,,defined,,u1,2026-08-03", "declaration needs rationale"),
         ("PLT,F1,platform,,,defined,,u1,2026-08-03", "per-folder row needs app_id"),
         ("PRB,,dual-coded,APP-1,,defined,,u1,2026-08-03", "dual-coded needs end state"),
-        ("PRA,,seal-born,APP-1,by friday,defined,,u1,2026-08-03", "end state is tier-3 only"),
+        ("PRA,,seal-born,APP-1,by friday,defined,,u1,2026-08-03", "end state is dual-coded only"),
         ("PRA,,seal-born,APP-1,,override,,u1,2026-08-03", "override needs rationale"),
         ("PRA,,seal-born,APP-1,,defined,,,2026-08-03", "missing authored_by"),
     ],

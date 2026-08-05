@@ -156,6 +156,7 @@ from .loaders.folder_attribution import (
     check_folder_preconditions,
     fetch_folder_codes,
     fetch_pinned_folders,
+    load_platform_codes,
 )
 from .loaders.manual_loads import (
     ManualLoadError,
@@ -1731,6 +1732,9 @@ def load_folder_attribution(
                 app_name=fetch_app_name_reconciler(cli),
             ),
             pinned=fetch_pinned_folders(cli),
+            # K18: the closed platform-code list (values twin; empty when the
+            # internal file is absent — the derivation guard goes inert).
+            platform_codes=load_platform_codes(),
         )
         summary = FolderAttributionLoader(cli, adapter, batch_size=batch_size).load()
         console.print(summary.as_dict())

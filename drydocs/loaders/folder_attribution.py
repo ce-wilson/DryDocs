@@ -35,6 +35,25 @@ exactly one application. Enforced as a GRAPH-TEST
 (graph-tests/folder-attribution-coverage.yaml) because Neo4j cannot declare
 relationship cardinality; the resolver refuses to emit two rows for one
 folder by construction.
+
+K18 (2026-08-05) — the two silent-fan-out routes closed:
+
+- DERIVATION: the K7 row kind is mechanically derivable — prefix positions
+  3-5 of an app code / folder name matched against the CLOSED platform-code
+  list (six framework codes; values in the Internal twin, see
+  knowledge/standards/technology/folder-naming-convention.md §Tier
+  discrimination). A code-level row that carries a SEAL is NOT read as an
+  application attribution when the name says platform: fan-out is blocked
+  and the disagreement queues (the claim-time ruling: two row-kind signals
+  never resolve silently; derivation wins for BLOCKING, a human rules the
+  row).
+- AUTHORING: the platform declaration is an explicit row kind carrying the
+  platform's OWN app_id (declare-by-absence retired at the store, K18) —
+  the declaration attributes nothing BY KIND, not by a missing field.
+- `tier` renamed `row_kind` end to end (store column, wire, model, edge
+  property) before the ambiguous name could surface in a QuerySpec — the K2
+  match-precedence tiers keep their name; the value spaces never collided,
+  the prose did.
 """
 
 from __future__ import annotations
@@ -84,6 +103,51 @@ FALLBACK_SOURCE = "controlm-variable-normalization"
 # orchestrator is a per-domain constant — resolved from the C12-confirmed
 # platforms taxonomy, never hardcoded in Cypher.
 ORCHESTRATOR_PLATFORM_ID = "controlm"
+
+# K18: the closed platform-code list (six framework codes, DAT SRE standard —
+# closed means a seventh is a standards change, not a discovery). VALUES live
+# in the Internal twin; this mechanism is publishable and the tests use
+# synthetic codes. A missing file degrades to an EMPTY set: the derivation
+# guard goes inert (pre-K18 behavior), it never invents codes.
+PLATFORM_CODES_PATH = (
+    Path(__file__).resolve().parents[2]
+    / "internal"
+    / "standards"
+    / "technology"
+    / "platform-codes.yaml"
+)
+
+
+def load_platform_codes(path: Path | None = None) -> frozenset[str]:
+    """The 3-char platform codes from the values twin, upper-cased. Empty
+    when the file is absent (public clone / pre-capture environment) — the
+    caller's derivation guard simply never fires."""
+    import yaml
+
+    path = Path(path) if path is not None else PLATFORM_CODES_PATH
+    if not path.exists():
+        return frozenset()
+    doc = yaml.safe_load(path.read_text(encoding="utf-8")) or {}
+    codes = frozenset(
+        str(row.get("code") or "").strip().upper()
+        for row in doc.get("platform_codes", [])
+        if row.get("code")
+    )
+    return codes
+
+
+def platform_prefix(name: str | None) -> str | None:
+    """Positions 3-5 of a Control-M app code (``PRAOC`` -> ``AOC``) or folder
+    name (``PRAOCG`` -> ``AOC``) — the segment the PRAOCG convention assigns
+    the framework/application mnemonic. None when the name is too short to
+    carry one (e.g. the 5-char ``PUDLY`` platform-ordering exception still
+    parses; a 4-char name does not)."""
+    if not name:
+        return None
+    text = str(name).strip().upper()
+    if len(text) < 5:
+        return None
+    return text[2:5]
 
 
 def orchestrator_product_ref(
@@ -142,10 +206,30 @@ class FolderPinConflict:
     agrees: bool | None
 
 
+@dataclass(frozen=True)
+class RowKindDisagreement:
+    """A CODE-level disagreement between the name-derived row kind and the
+    authored row's declared kind (K18 claim-time ruling: never resolved
+    silently — derivation wins for BLOCKING fan-out, a human rules the row).
+
+    ``blocked_fan_out`` is True for the dangerous direction (row claims an
+    application kind, the name says platform — fan-out suppressed); False for
+    the inverse (row declares platform, the name says application — nothing
+    was going to fan out, but the list or the row is still wrong)."""
+
+    app_code: str
+    declared_kind: str
+    derived_kind: str
+    app_id: str | None
+    blocked_fan_out: bool
+
+
 @dataclass
 class FolderAttributionCoverage:
     """Per-run accounting. Invariant: attributed + unmatched + conflicts +
-    pinned == eligible_folders."""
+    pinned == eligible_folders. Row-kind disagreements are CODE-grain review
+    material — their folders land in ``conflicts`` as platform-unresolved,
+    so they ride the invariant through that count, not their own."""
 
     eligible_folders: int = 0
     attributed: int = 0
@@ -154,6 +238,7 @@ class FolderAttributionCoverage:
     attributed_by_origin: dict[str, int] = field(default_factory=dict)
     conflicts: list[FolderConflict] = field(default_factory=list)
     pin_conflicts: list[FolderPinConflict] = field(default_factory=list)
+    row_kind_disagreements: list[RowKindDisagreement] = field(default_factory=list)
     fact_rows_rejected: int = 0
 
     def reconciles(self) -> bool:
@@ -171,6 +256,7 @@ class FolderAttributionCoverage:
             "attributed_by_origin": dict(self.attributed_by_origin),
             "conflict_count": len(self.conflicts),
             "pin_conflict_count": sum(1 for c in self.pin_conflicts if c.agrees is not None),
+            "row_kind_disagreement_count": len(self.row_kind_disagreements),
             "fact_rows_rejected": self.fact_rows_rejected,
             "reconciles": self.reconciles(),
         }
@@ -187,41 +273,82 @@ def resolve_folder_attributions(
     k2_decisions: Iterable[Any],
     *,
     pinned: Mapping[str, str] | None = None,
+    platform_codes: frozenset[str] | None = None,
 ) -> tuple[list[FolderAttributionRow], FolderAttributionCoverage]:
     """Resolve every folder to at most ONE application (the 1:1 rule).
 
     ``authored`` — app-code store rows (mapping_store.app_code_rows_from_store
-    dicts: app_code / folder_id / tier / app_id / origin, all authored
+    dicts: app_code / folder_id / row_kind / app_id / origin, all authored
     origins). ``folder_codes`` — folder_id -> app_code (None for a folder
     with no app-code grouping), the graph fan-out index; its keys define the
     ELIGIBLE folder population. ``k2_decisions`` — job-grain
     SealAttributionRow decisions from the demoted K2 policy (§B3 fallback).
     ``pinned`` — folder_id -> app_id for folders carrying an existing
     manual-pin edge; excluded from the automated write, disagreements
-    surfaced (§F parity).
+    surfaced (§F parity). ``platform_codes`` — the K18 closed list
+    (load_platform_codes()); empty/None leaves the derivation guard inert.
     """
     pinned = pinned or {}
+    platform_codes = platform_codes or frozenset()
     coverage = FolderAttributionCoverage()
     coverage.eligible_folders = len(folder_codes)
 
-    # Index authored rows: per-folder rows and code-level rows.
+    # Index authored rows: per-folder rows and code-level rows. Code-level
+    # discrimination is BY ROW KIND (K18) — a platform declaration carries
+    # the platform's own app_id and still attributes nothing; the legacy
+    # empty-app_id shape is honored as a declaration for back-compat.
     by_folder: dict[str, list[Mapping[str, Any]]] = {}
     by_code: dict[str, list[Mapping[str, Any]]] = {}
     declared_platform_codes: set[str] = set()
     for row in authored:
         code = str(row.get("app_code") or "").strip()
         folder_id = row.get("folder_id")
+        kind = str(row.get("row_kind") or "").strip()
+        derived_platform = platform_prefix(code) in platform_codes
         if folder_id:
             by_folder.setdefault(str(folder_id).strip(), []).append(row)
-        elif row.get("app_id"):
-            by_code.setdefault(code, []).append(row)
-        else:
-            # A code-level platform DECLARATION (empty app_id): attributes
-            # nothing; marks the code so its unresolved folders surface as
+        elif kind == "platform" or not row.get("app_id"):
+            # The code-level platform DECLARATION: attributes nothing BY
+            # KIND; marks the code so its unresolved folders surface as
             # platform-unresolved instead of falling back (§B2 — a declared
             # code HAS a defined row, so §B3's "no defined row" fallback
-            # does not apply).
+            # does not apply). The row's app_id (the platform's own SEAL) is
+            # a recorded fact, never a fan-out target.
             declared_platform_codes.add(code)
+            if platform_codes and not derived_platform:
+                # Inverse disagreement: declared platform, name says
+                # application. Nothing was going to fan out — but either the
+                # row or the closed list is wrong, so a human rules it.
+                coverage.row_kind_disagreements.append(
+                    RowKindDisagreement(
+                        app_code=code,
+                        declared_kind=kind or "platform",
+                        derived_kind="application",
+                        app_id=(str(row.get("app_id")) if row.get("app_id") else None),
+                        blocked_fan_out=False,
+                    )
+                )
+        elif derived_platform:
+            # THE K18 GUARD — the silent fan-out this item exists to stop.
+            # The row claims an application kind (seal-born/dual-coded) but
+            # prefix positions 3-5 name a platform framework: `AOC -> SEAL`
+            # is true of the platform and false of every hosted consumer
+            # folder it would stamp. Derivation wins for BLOCKING (claim-time
+            # ruling): no fan-out; the code is treated as declared platform
+            # (folders resolve per folder or surface platform-unresolved)
+            # and the disagreement queues for a human.
+            declared_platform_codes.add(code)
+            coverage.row_kind_disagreements.append(
+                RowKindDisagreement(
+                    app_code=code,
+                    declared_kind=kind or "?",
+                    derived_kind="platform",
+                    app_id=str(row.get("app_id")),
+                    blocked_fan_out=True,
+                )
+            )
+        else:
+            by_code.setdefault(code, []).append(row)
 
     # Index K2 fallback decisions per folder (unanimity required).
     k2_by_folder: dict[str, dict[str, str]] = {}  # folder -> app_id -> best method
@@ -262,7 +389,7 @@ def resolve_folder_attributions(
                     app_id=app_id,
                     origin=origin,
                     match_method=MATCH_METHOD_BY_ORIGIN[origin],
-                    tier=row.get("tier"),
+                    row_kind=row.get("row_kind"),
                     source=AUTHORED_SOURCE,
                     authored_by=row.get("authored_by"),
                 )
@@ -282,7 +409,7 @@ def resolve_folder_attributions(
                     app_id=app_id,
                     origin="matched-fallback",
                     match_method=method,
-                    tier=None,
+                    row_kind=None,
                     source=FALLBACK_SOURCE,
                 )
             elif len(k2) > 1:
@@ -342,6 +469,7 @@ class FolderAttributionAdapter:
         fact_source: Any = None,
         reconcilers: TierReconcilers | None = None,
         pinned: Mapping[str, str] | None = None,
+        platform_codes: frozenset[str] | None = None,
         max_rejects_kept: int = 20,
     ) -> None:
         self.authored = list(authored)
@@ -349,6 +477,7 @@ class FolderAttributionAdapter:
         self.fact_source = fact_source
         self.reconcilers = reconcilers or TierReconcilers()
         self.pinned = dict(pinned or {})
+        self.platform_codes = platform_codes if platform_codes is not None else frozenset()
         self.max_rejects_kept = max_rejects_kept
         self.coverage: FolderAttributionCoverage | None = None
         self.fact_rejects: list[dict] = []
@@ -378,6 +507,7 @@ class FolderAttributionAdapter:
             self.folder_codes,
             decisions,
             pinned=self.pinned,
+            platform_codes=self.platform_codes,
         )
         coverage.fact_rows_rejected = rejected
         self.coverage = coverage
@@ -430,6 +560,7 @@ class FolderAttributionLoader(BaseLoader):
                 run.pinned             = $pinned,
                 run.conflict_count     = $conflict_count,
                 run.pin_conflict_count = $pin_conflict_count,
+                run.row_kind_disagreements = $row_kind_disagreements,
                 run.edges_written      = edges_written,
                 run.orchestrator_edges = orchestrator_edges,
                 run.dropped_in_graph   = $attributed - edges_written
@@ -442,6 +573,7 @@ class FolderAttributionLoader(BaseLoader):
             pinned=coverage.pinned,
             conflict_count=len(coverage.conflicts),
             pin_conflict_count=sum(1 for c in coverage.pin_conflicts if c.agrees is not None),
+            row_kind_disagreements=len(coverage.row_kind_disagreements),
         )
         if result:
             dropped = coverage.attributed - result[0].get("edges_written", 0)
