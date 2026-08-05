@@ -51,10 +51,18 @@ summary: >
   Python enum has 10 source names, the loader crosswalk maps 4 of those names, and
   the taxonomy capture lists 6. The measurable consequences are in §A: one signed
   concept that nothing can ever write, three source names permanently flagged
-  unmapped, one silent coercion that asserts a level the source never stated, and
-  one crosswalk entry that carries a Product Cabinet role name across a family
-  boundary K5 declared independent. Confirming this gate authorizes NO graph
-  write; the corrections land afterwards as their own logged changes.
+  unmapped, one silent coercion that DESTROYS a real role holding, and one
+  crosswalk entry that carries a Product Cabinet role name across a family
+  boundary K5 declared independent. NONE of the four lists is configurable —
+  they are hardcoded across three languages, and the only role list that lives in
+  YAML is read by no code at all. Confirming this gate authorizes NO graph write;
+  the corrections land afterwards as their own logged changes.
+  SME DIRECTION RECEIVED 2026-08-05, before the walk — recorded in `sme_direction`
+  below and worked into §A, §B and the new §F. It reshapes the page: the split is
+  REQUIRED vs OPTIONAL contacts, a missing required contact is FLAGGED while the
+  rest of the load proceeds, optional roles are 1-to-many with one person allowed
+  to hold several, and the role vocabulary may be declared up front OR during the
+  load. Three of those four are reversals of what the code does today.
 meta:
   Module: "drydocs-core (ontology) · drydocs-load (seal_contacts / seal_applications loaders) · drydocs-api (the two attribution QuerySpecs)"
   Source: "SEAL Technical Operating Model contact extract (source id seal-extract) — the DECO application row (three embedded contacts) plus the long-format contact extract (everything else). Live-registry evidence is SME screenshots reviewed 2026-07-27 (Internal; shape only, no values)"
@@ -64,6 +72,56 @@ meta:
   Ontology map: "config/taxonomy-ontology-map/20-mappings-seal.yaml #seal-tom-attribution — status: applied (confirmed 2026-07-10, applied 2026-07-15 at K4). Its role_vocabulary field states the fixed 7 and is one of the surfaces any ruling here must update"
   Precedence: "The signed 2026-07-10 §B ruling is the standing rule this AMENDS. The identity gate's §A1 fence (2026-07-27) and the K5 Product Cabinet ruling (2026-07-20) are NOT reopened — see the scope fence in this file's header"
   Source of record: "config/gate-log.md 2026-07-10 (the signed §B two-family revision) · docs/restructure/backlog.yaml G35 · drydocs_core/schema/seal_ontology_supplement.cypher:176-198 (the scheme as seeded)"
+
+# ---------------------------------------------------------------------------
+# SME direction received 2026-08-05, IN-CHAT, before the walk. Recorded verbatim
+# in substance so the walk confirms a written position rather than re-deriving
+# it. Worked into §A5, §A7, §B and the new §G. NOT a sign-off — nothing here is
+# ticked, and §F still governs.
+# ---------------------------------------------------------------------------
+sme_direction:
+  received: 2026-08-05
+  channel: "in-chat, producer session (laptop), during the G35 draft"
+  statements:
+    - id: required-set
+      said: >
+        Business applications have a SHORT LIST of REQUIRED contacts. The load
+        should FLAG if one is missing or not readable, but should LOAD THE REST.
+      changes: >
+        Introduces a distinction the model does not have in any form. It also
+        inverts the current failure mode twice over: today an unreadable role
+        name raises ValidationError and kills THAT ROW, while a missing required
+        contact is invisible because nothing checks per-application completeness.
+        The direction asks for the opposite of both — never fail a row for being
+        unreadable, always report an absent required contact.
+      still_needed: "WHICH roles are on the required list. The rule is recorded; the membership is an SME fact."
+    - id: optional-set-cardinality
+      said: >
+        There is an EXTENDED LIST of OPTIONAL roles that can be 1 role to many,
+        and the same person can be used in all 3.
+      changes: >
+        Confirms §B's premise — cardinality is per role class, not global — and
+        supplies the shape: required classes are the constrained ones, optional
+        classes are openly multi-holder. Also confirms that one PERSON across
+        several role classes is normal, which is the other half of what identity
+        gate §D2 pinned the 4-part key for.
+      reading_to_confirm: >
+        "all 3" is read as the THREE OPERATE MANAGER CLASSES (L1, L2, bare),
+        because that is exactly the case config/gate-log.md:882 records from the
+        live registry — one person holding all three on one application. On that
+        reading §A5 is ANSWERED: they are three role classes, not one concept
+        with a level, and mapping row 2 resolves to the SPLIT. If "all 3" instead
+        meant "any three optional roles", §A5 stays open and the level property
+        survives. FLAGGED rather than assumed.
+    - id: declaration-timing
+      said: >
+        The roles can either be declared up front or during the load.
+      changes: >
+        Answers §A7 (fixed scheme vs open-ended) in favour of OPEN WITH
+        DECLARATION, and retires the hardcoded SealRole enum as the admission
+        gate. Neither route is possible today: see §A8 — the vocabulary is not
+        configurable at all, and the one role list that lives in YAML is read by
+        no code.
 
 mapping:
   - n: 1
@@ -119,16 +177,21 @@ sections:
       - "A1 THE FOUR LISTS, as they stand on 2026-08-05: (i) the SIGNED SCHEME — 7 concepts in drydocs_core/schema/seal_ontology_supplement.cypher:176-198; (ii) the PYTHON ENUM — 10 source names in drydocs_core/models/seal.py:87-108 (SealRole), which is what a contact row is validated against; (iii) the LOADER CROSSWALK — 4 names mapped in drydocs/loaders/cypher/seal_contacts.cypher:41-46, everything else falling to ELSE null; (iv) the TAXONOMY CAPTURE — 6 names in config/taxonomy/business-application.yaml, which carries Chief Business Technologist and Risk Manager and carries neither CTO nor Application Owner. Confirm the divergence is understood as the actual state, not as an artefact of this page."
       - "A2 ORPHAN CONCEPT: `technology_risk_controls` is seeded in the scheme and is a member in good standing of the signed 7, and NOTHING WRITES IT. It appears in no crosswalk branch and in no literal at any loader site, so no Attribution can ever reach it. Conversely the source name that plausibly means the same thing — `Risk Manager` — has no concept and is flagged unmapped on every load. Rule whether these are the same role class under two names (crosswalk `Risk Manager` -> technology_risk_controls) or two different things (in which case the enumeration is short by one and technology_risk_controls needs a source that produces it)."
       - "A3 THE FLAG IS HALF-WIRED: seal_contacts.cypher's header states the K4 policy — role names outside the scheme are LOADED and flagged unmapped_role=true, 'surfaced for review, never guessed'. That holds only for names the Python enum already knows. `SealContactRow.role_name` is typed `SealRole` and its validator raises `unrecognised SEAL role` (drydocs_core/models/seal.py:461-467), so a genuinely NEW role name — exactly what a 7-to-9 registry drift produces — is rejected at validation and never reaches the Cypher that would have flagged it. The flag can only ever fire for the three known-but-unmapped names (Chief Business Technologist, Backup Application Owner, Risk Manager). Confirm the intended behaviour on an unknown name: hard-refuse the row, or admit it flagged."
-      - "A4 THE SILENT COERCION — the sharpest instance of the seven-vs-nine question, and it is a live defect, not a modelling preference: drydocs_core/models/seal.py:143 maps `\"operate manager\": \"L2 Operate Manager\"`. A bare Operate Manager row — the THIRD value the live registry shows — is silently rewritten to L2 before any loader sees it, then crosswalked to operate_manager with level='L2'. The graph then asserts a level the source never stated, with no flag, no note and no test covering that alias. Whatever §A rules about L1/L2/bare, this line must be ruled on explicitly."
-      - "A5 THE 7-vs-9 RULING: the live registry shows NINE distinct accountable role classes where the signed set has seven, with L1 Operate manager, L2 Operate manager and Operate Manager appearing as three separate concepts rather than one concept carrying a level. Rule the enumeration. If the answer is that they ARE three concepts, the level property on the Attribution becomes redundant and mapping row 2 changes; if the answer is that they are one concept with a level, then A4's coercion must instead become an explicit 'level unknown' rather than an assumed L2, and the registry's third value needs a crosswalk of its own. SME to state which nine (or which n) — the arithmetic 7 + splitting operate_manager into 3 = 9 fits, and so does 7 + Backup Application Owner + Chief Business Technologist = 9, and these are different rulings with different consequences."
+      - "A4 THE SILENT COERCION DESTROYS A REAL ROLE HOLDING — the sharpest instance of the seven-vs-nine question, and a live data-loss defect rather than a modelling preference. drydocs_core/models/seal.py:143 maps `\"operate manager\": \"L2 Operate Manager\"`, so a bare Operate Manager row — the THIRD value the live registry shows — is rewritten to L2 before any loader sees it. Because the SAME PERSON holds all three on one application (config/gate-log.md:882, the SME screenshots that pinned identity gate §D2), the rewritten row produces an attribution_id IDENTICAL to the genuine L2 row, and the loader's MERGE folds them into one node. Three source holdings become two, with no flag. REPRODUCED 2026-08-05 through the real validation path, no database needed: rows ['L1 Operate Manager','L2 Operate Manager','Operate Manager'] for one app and one sid yield 2 distinct attribution_id values from 3 rows. This is the exact collapse §D2 refused to allow into the KEY — it is happening one layer upstream, in the validator, for one of the three."
+      - "A4b AND THE SURVIVING ROW IS ORDER-DEPENDENT: seal_contacts.cypher MERGEs on attribution_id then SETs role_source_name, so which of the two colliding rows wins depends on batch order. Worse, role_source_name does not hold what the field ledger promises. config/source-mappings/seal-extract.yaml records role_name as \"EVIDENCE — kept verbatim\" (citing identity gate §B2(ii), the evidence-vocabulary rule), but SealContactRow.role_name is typed SealRole, so what reaches the graph is the CANONICALIZED enum value and the raw source string is discarded at validation. Confirm that verbatim means verbatim — which requires the raw string to survive alongside the canonical one, not instead of it."
+      - "A8 NONE OF IT IS CONFIGURABLE — this is the finding that makes the SME's declaration-timing direction (see sme_direction) a build, not a setting. The vocabulary is hardcoded across FOUR surfaces in THREE languages: (i) the SealRole enum, 10 admissible source names, drydocs_core/models/seal.py:87-108; (ii) the _ROLE_CANONICAL alias map, seal.py:112-150; (iii) the concept crosswalk, a 4-branch Cypher CASE at seal_contacts.cypher:41-46; (iv) the concept scheme itself, 7 MERGE statements at seal_ontology_supplement.cypher:176-198. The ONLY role list that lives in YAML — config/taxonomy/business-application.yaml `roles:` — is read by NO CODE: batch_port_orchestrator.py opens that file for applications and ports and never touches `roles:`, which is why it could drift to a sixth different list without any test noticing. Adding one role today is a Python edit plus a Cypher edit plus a supplement edit plus a schema re-run. Confirm the target: the role vocabulary becomes DATA (config-declared, or admitted at load per §G), read by one surface that all four current ones defer to."
+      - "A5 THE 7-vs-9 RULING — SME DIRECTION 2026-08-05 points to the SPLIT, pending one confirmation. The live registry shows NINE distinct accountable role classes against the signed seven, with L1 Operate manager, L2 Operate manager and Operate Manager as three separate values. The SME's optional-set direction says the same person can be used in ALL 3, which is only meaningful if the three ARE three role classes — and that is precisely the case gate-log.md:882 records. On that reading: operate_manager SPLITS into three concepts, the `level` property on the Attribution becomes redundant (the class carries it), c7.levels = 'L1,L2' is retired, and mapping row 2 resolves to SPLIT. CONFIRM the reading of \"all 3\" before it is applied — if it meant \"any three optional roles\" rather than the three Operate Manager classes, the split does not follow and the level property survives, in which case A4's coercion becomes an explicit 'level unknown' instead of an assumed L2. Note the arithmetic is not self-evidencing: 7 + splitting operate_manager into 3 = 9, and so does 7 + Backup Application Owner + Chief Business Technologist = 9. The SME states which."
       - "A6 CROSS-FAMILY LEAK (reported, not reopened): drydocs_core/models/seal.py:130 maps `\"tech partner\": \"CTO\"`. Tech Partner is a PRODUCT CABINET role, and K5 (signed 2026-07-20) ruled the two families INDEPENDENT, dropped the shared-cto concept, and fixed Product Cabinet attribution to :Product / :AreaProduct ONLY, NEVER :BusinessApplication. So an extract row reading 'Tech Partner' currently becomes a TOM `cto` Attribution on a BusinessApplication — the exact shape K5 forbids. K5's own rename history explains how it got there (the area-product Tech Partner was FORMERLY named CTO in SEAL) and is the reason this is a stale alias rather than a design choice. Confirm the alias is removed; K5's ruling is not being reopened by saying so."
-      - "A7 SCHEME DISCIPLINE: the tom_roles scheme is currently FIXED — new members require a new gate (the precedent the SME set for product_roles on 2026-07-20). Confirm it stays fixed after whatever renumbering §A5 produces, or rule it open-ended. This is the choice between 'a new role name is a gate' and 'a new role name is a flagged load', and A3 shows the code currently implements a third thing neither of those describes."
-  - title: "B. Cardinality is a per-role-class attribute, not a global rule"
+      - "A7 SCHEME DISCIPLINE — SME DIRECTION 2026-08-05 answers this: OPEN, WITH DECLARATION. The tom_roles scheme is currently FIXED (new members require a new gate — the precedent the SME set for product_roles on 2026-07-20), and the direction 'the roles can either be declared up front or during the load' supersedes that for this scheme. Confirm the supersession explicitly, because it is a deliberate divergence between the two role families: product_roles stays FIXED, tom_roles becomes OPEN. That asymmetry is defensible — the Product Cabinet is a governance construct DryDocs mirrors, while the TOM contact set is an operating-model surface that demonstrably grows (Backup Application Owner arrived 2026-05-18) — but it must be RECORDED as a choice, or the next reviewer will read one of the two schemes as drift from the other. §G specifies the mechanism."
+  - title: "B. Required vs optional, and cardinality as a per-role-class attribute"
     confirmations:
-      - "B1 THE FACT: the same application legitimately carries FOUR different people in one role class (Backup Information Owner) while other classes are effectively singleton. A global 'one holder per role' rule is therefore wrong, and so is a global 'any number' rule — cardinality varies BY ROLE CLASS and belongs on the class."
-      - "B2 IT WAS ALREADY HALF-RULED AND NEVER MODELLED: the signed §B wording carries cardinality in prose — 'Backup Information Owner (1-2 persons)' and 'Operate Manager L1 / L2 (one or both; 1-3 persons for 24h / 2-3 locations)'. None of it reached a file. Confirm that the ruling here is the same fact finally given somewhere to live, rather than a new requirement — and note the 1-2 in that prose is contradicted by the four-holder case in B1, so the numbers themselves need restating, not just relocating."
-      - "B3 WHERE IT LIVES: cardinality becomes an attribute of the TOMRole concept (mapping row 3) — a min/max or an explicit 'multi' marker per concept — seeded from the SME's numbers at the same time the enumeration in §A is seeded. Confirm the location; the alternative (cardinality as loader configuration) is rejected because it would make the rule invisible to anyone reading the graph."
-      - "B4 THE VALUES: the SME supplies the per-class cardinality for whatever set §A rules. Classes known to be multi-holder today: Backup Information Owner (observed 4), Operate Manager (1-3 per the signed prose). Everything else is presumed singleton until stated otherwise, and 'presumed' is recorded as such rather than asserted."
+      - "B0 THE ORGANIZING SPLIT — SME DIRECTION 2026-08-05: a business application has a SHORT LIST OF REQUIRED CONTACTS and an EXTENDED LIST OF OPTIONAL ROLES. This is the primary structure, and it does not exist in the model in any form today — not on the TOMRole concept, not in the loaders, not in the taxonomy capture, not in a test. Confirm `required` becomes an attribute of the role class, alongside the cardinality in B3."
+      - "B1 THE FACT CARDINALITY VARIES: the same application legitimately carries FOUR different people in one role class (Backup Information Owner) while other classes are effectively singleton. A global 'one holder per role' rule is wrong, and so is a global 'any number' rule — cardinality varies BY ROLE CLASS and belongs on the class. The SME direction supplies the shape: optional roles are openly 1-to-many; required roles are the constrained ones."
+      - "B1b ONE PERSON, SEVERAL ROLE CLASSES IS NORMAL — SME DIRECTION: 'the same person can be used in all 3'. This is the other axis and must not be confused with B1. B1 is many PEOPLE in one role class; B1b is one PERSON across many role classes. Identity gate §D2 pinned the 4-part attribution_id because BOTH occur — drop the sid and B1's four collapse, drop the role and B1b's three collapse. Confirm both axes are open by default and that neither is constrained without an explicit per-class rule."
+      - "B2 IT WAS ALREADY HALF-RULED AND NEVER MODELLED: the signed §B wording carries cardinality in prose — 'Backup Information Owner (1-2 persons)' and 'Operate Manager L1 / L2 (one or both; 1-3 persons for 24h / 2-3 locations)'. None of it reached a file. Confirm the ruling here is that same fact finally given somewhere to live — and note the 1-2 in that prose is contradicted by the four-holder case in B1, so the numbers need restating, not just relocating."
+      - "B3 WHERE IT LIVES: `required` (B0) and cardinality (mapping row 3) both become attributes of the TOMRole concept, seeded with the enumeration in §A. Confirm the location; cardinality as loader configuration is rejected because it would make the rule invisible to anyone reading the graph, and required-ness as loader configuration would put the completeness rule somewhere the completeness REPORT cannot cite."
+      - "B4 THE VALUES: the SME supplies (i) which classes are REQUIRED — the short list, the one fact this page still lacks — and (ii) the per-class cardinality for whatever set §A rules. Known today: Backup Information Owner is multi-holder (observed 4), Operate Manager is 1-3 per the signed prose. Everything else is PRESUMED singleton, and presumed is recorded as such rather than asserted."
+      - "B5 A MISSING REQUIRED CONTACT IS A FINDING, NOT A FAILURE — SME DIRECTION: 'the load should FLAG if one is missing or not readable, but should LOAD THE REST'. Today the code does the inverse on both counts: an unreadable role name raises ValidationError and kills THAT ROW (§A3), while a missing required contact is invisible because nothing checks per-application completeness at all. Confirm the target behaviour — the load NEVER fails a row for an unrecognised role, and EVERY application missing a required contact appears on a report. The two halves are one rule: whatever cannot be read must still be visible."
   - title: "C. The singleton rule is a graph-test, never a database constraint"
     confirmations:
       - "C1 NEO4J CANNOT EXPRESS IT: there is no declarative form for 'at most one Attribution per (application, role class)'. Uniqueness applies to a property or a property set on a node or relationship, not to a count over a traversal. Confirm the constraint route is closed on platform grounds, not on preference."
@@ -148,24 +211,40 @@ sections:
       - "E2 WHY IT INTERACTS WITH §B AND §C: an inherited holder and a directly-asserted holder in the same role class may be the reason a class looks multi-holder when the operating model says singleton. If inheritance is not modelled, §C4's graph-test will report violations that are not violations, and the first response to a noisy check is to weaken it."
       - "E3 THE RULING: either (i) model it — an assertion_mode property plus an inherited-from pointer (mapping row 6), which makes the override relationship legible and lets the cardinality check count direct assertions only; or (ii) declare it OUT OF SCOPE and record that DryDocs deliberately flattens inheritance, so the next reviewer meets a decision rather than an omission. Both are acceptable answers; leaving it unstated is not, because the data already carries the distinction and the loaders already discard it."
       - "E4 IF (i): the inherited-from parent is a CI in another system's hierarchy, not a BusinessApplication DryDocs holds. Confirm whether the pointer is a foreign reference recorded as a property, or a modelled node — the former is available now, the latter is a dependency on estate data DryDocs does not have."
-  - title: "F. Sign-off"
+  - title: "F. Declaration timing — up front, or during the load"
     confirmations:
-      - "F1 Sections A-E are reviewed and the direction is correct, OR amended by explicit SME edits recorded in config/gate-log.md."
-      - "F2 NOTHING IS APPLIED BY TICKING BOXES HERE and no graph write is authorized. The tom_roles scheme keeps its 7 concepts, seal_contacts.cypher keeps its 4-branch crosswalk, drydocs_core/models/seal.py keeps all 10 enum members and both contested aliases, and #seal-tom-attribution stays status: applied describing the fixed 7. Every correction is a SEPARATE, logged follow-up after this entry is transcribed."
-      - "F3 THE FOLLOW-UP SET IS AGREED AS ONE UNIT (they cannot land piecemeal without leaving the surfaces mutually inconsistent): the supplement's scheme seed; both loader crosswalks; the SealRole enum and _ROLE_CANONICAL aliases; the map entry's role_vocabulary text in config/taxonomy-ontology-map/20-mappings-seal.yaml; the vocabulary fragment 41-local-seal.yaml; NODE_QUICK_REFERENCE.md; config/taxonomy/business-application.yaml's `roles:` list (which G35's acceptance names explicitly); and the new cardinality graph-test."
-      - "F4 THE TAXONOMY CAPTURE IS RECONCILED to whatever §A rules — config/taxonomy/business-application.yaml currently lists 6 role names agreeing with neither the scheme nor the loader, and it is the file a future importer would treat as the source shape."
-      - "F5 MIGRATION IS ACKNOWLEDGED, not discovered later: because seal_contacts.cypher:55 builds attribution_id from the SOURCE role name while seal_applications.cypher uses literal concept ids, any renaming in §A re-keys every contact-side Attribution and orphans the old nodes, while the three DECO-side ones are unaffected. Confirm the follow-up carries a migration step, or that the graph is rebuilt from source rather than migrated."
-      - "F6 Safe to transcribe this decision into config/gate-log.md as an AMENDMENT to the 2026-07-10 entry (not a replacement — the original ruling stays readable, the amendment states what changed and why), and only once transcribed, to begin the follow-up work."
+      - "F1 THE DIRECTION: roles may be DECLARED UP FRONT (a config-declared vocabulary) or DURING THE LOAD (a name the source presents that DryDocs admits and records). Both routes end at the same place — the role class exists, carrying its `required` flag and its cardinality — and differ only in when and by whom it was named. Confirm both routes are wanted; up-front-only is simpler and would be a reasonable narrowing if the SME prefers it."
+      - "F2 WHAT AN AT-LOAD DECLARATION MUST CARRY: a role class admitted during a load has no `required` flag and no cardinality — nobody has ruled them. Confirm the default: it is OPTIONAL and multi-holder (the safe direction, since presuming REQUIRED would raise false completeness findings against every application, and presuming SINGLETON would raise false cardinality findings). It is also marked as UNDECLARED so it appears on a review surface — the unmapped_role precedent (§C5), not a silent admission."
+      - "F3 WHERE THE DECLARED VOCABULARY LIVES: a config file under config/taxonomy/ is the natural home, and the honest note is that config/taxonomy/business-application.yaml ALREADY has a `roles:` list which NOTHING READS (§A8). Confirm whether the declared vocabulary extends that list into the real source — which retires an orphaned file and its drift in one move — or takes a new file, leaving the old list to be deleted rather than reinterpreted. Leaving both is the one outcome to refuse."
+      - "F4 THE ADMISSION GATE MOVES: SealRole (a Python enum) stops being the admission list, because an enum cannot admit a name declared at load. Confirm the enum is retired as the gate and either deleted or demoted to a convenience alias set — and note that _ROLE_CANONICAL survives EITHER WAY, since alias tolerance ('l2 ops manager', 'bio') is a separate concern from vocabulary membership, and it is where the §A4 and §A6 defects actually live."
+      - "F5 THE SCHEME DIVERGENCE IS DELIBERATE (see §A7): tom_roles becomes OPEN, product_roles stays FIXED. Confirm, and confirm it is recorded as a skos:changeNote or equivalent on the scheme itself rather than only in the gate log — the two schemes sit side by side in the same supplement file, and a reader comparing them needs the reason in the same place as the difference."
+  - title: "G. Sign-off"
+    confirmations:
+      - "G1 Sections A-F are reviewed and the direction is correct, OR amended by explicit SME edits recorded in config/gate-log.md."
+      - "G2 NOTHING IS APPLIED BY TICKING BOXES HERE and no graph write is authorized. The tom_roles scheme keeps its 7 concepts, seal_contacts.cypher keeps its 4-branch crosswalk, drydocs_core/models/seal.py keeps all 10 enum members and both contested aliases, and #seal-tom-attribution stays status: applied describing the fixed 7. Every correction is a SEPARATE, logged follow-up after this entry is transcribed."
+      - "G3 THE FOLLOW-UP SET IS AGREED AS ONE UNIT (they cannot land piecemeal without leaving the surfaces mutually inconsistent). EXISTING surfaces to amend: the supplement's scheme seed; both loader crosswalks; the SealRole enum and _ROLE_CANONICAL aliases; the map entry's role_vocabulary text in config/taxonomy-ontology-map/20-mappings-seal.yaml; the vocabulary fragment 41-local-seal.yaml; NODE_QUICK_REFERENCE.md; config/taxonomy/business-application.yaml's `roles:` list (which G35's acceptance names explicitly); and the seal-extract field ledger's \"kept verbatim\" claim (§A4b). NEW surfaces the SME direction creates: the declared role vocabulary and its reader (§F3); the `required` + cardinality attributes on the concept (§B3); the per-application REQUIRED-CONTACT COMPLETENESS REPORT (§B5), which has no counterpart today; and the cardinality graph-test (§C4)."
+      - "G4 THE TAXONOMY CAPTURE IS RECONCILED to whatever §A rules — config/taxonomy/business-application.yaml currently lists 6 role names agreeing with neither the scheme nor the loader, and it is the file a future importer would treat as the source shape."
+      - "G5 MIGRATION IS ACKNOWLEDGED, not discovered later: because seal_contacts.cypher:55 builds attribution_id from the SOURCE role name while seal_applications.cypher uses literal concept ids, any renaming in §A re-keys every contact-side Attribution and orphans the old nodes, while the three DECO-side ones are unaffected. Confirm the follow-up carries a migration step, or that the graph is rebuilt from source rather than migrated."
+      - "G6 Safe to transcribe this decision into config/gate-log.md as an AMENDMENT to the 2026-07-10 entry (not a replacement — the original ruling stays readable, the amendment states what changed and why), and only once transcribed, to begin the follow-up work."
 
 open_questions:
+  - id: which-roles-are-required
+    note: >
+      THE ONE FACT THIS PAGE STILL LACKS. The SME's 2026-08-05 direction gives the
+      RULE — a short required list, an extended optional list, flag-but-load — and
+      not the MEMBERSHIP. Nothing in the repo can supply it: `required` does not
+      exist as a concept anywhere, so there is no stale value to check against and
+      no drift to reconcile. It is a clean SME fact, and §B4 is blocked on it.
   - id: which-nine
     note: >
       §A5 asks the SME to state WHICH nine. Two different arithmetics reach nine from
       the signed seven — splitting operate_manager into three, or adding Backup
       Application Owner and Chief Business Technologist — and they are different
-      rulings. The page deliberately does not guess, because the loader consequences
-      diverge: the first changes the level property's meaning, the second changes
-      which rows stop being flagged unmapped.
+      rulings. The 2026-08-05 direction points at the FIRST (one person in "all 3"
+      is only meaningful if the three are three classes), but the page records that
+      as a READING TO CONFIRM rather than an answer, because the loader consequences
+      diverge: the first retires the level property, the second changes which rows
+      stop being flagged unmapped.
   - id: cbt-vs-cto
     note: >
       Chief Business Technologist is in the enum, in the taxonomy capture, and in the
@@ -194,6 +273,16 @@ open_questions:
       acceptable; the page asks only that the deferral be explicit.
 
 risks:
+  - id: coercion-is-losing-data-now
+    note: >
+      HIGHEST, and it is not a risk of the ruling — it is a risk of the ruling being
+      SLOW. §A4 destroys a real role holding on every load that carries the bare
+      Operate Manager value, silently, and the collapse is order-dependent (§A4b).
+      Nothing about fixing seal.py:143 depends on how §A5 resolves: whether the
+      three become three classes or stay one concept with a level, the coercion is
+      wrong either way. If the walk is going to take more than one sitting, that one
+      line is worth pulling out as its own logged fix ahead of the gate, with the
+      gate then ruling the model around an already-stopped bleed.
   - id: piecemeal-application
     note: >
       HIGHEST. Seven surfaces currently agree with each other and with the signed seven.
