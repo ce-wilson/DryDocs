@@ -4,9 +4,12 @@
 - **Module:** drydocs-core — this runbook IS the module runbook for drydocs-core
   (V1 coverage rule). The mapping-store runbook covers ONE artifact of this module
   (`var/mapping.db`) and says so; everything else in core lives here.
-- **Status:** DESCRIPTIVE — documents the working procedure. **Rev 1, 2026-08-04**,
+- **Status:** DESCRIPTIVE — documents the working procedure. **Rev 2, 2026-08-04**,
   authored at commit `416d217` (post-S5 fragment directories, post-G51 `ddschema`,
-  post-G54 exec-aware provisioning).
+  post-G54 exec-aware provisioning). **Rev 2, same day:** the Verify step listed the
+  topology databases inline and named `ddlineage`, which the X1 amendment retired hours
+  later — the enumeration is now READ from `config/dev-environment.yaml` instead of
+  copied, which is the only version that cannot go stale.
 - **Classification:** Internal-Public (mechanism only — env-var NAMES, default paths and
   synthetic values; NO credentials, no company values. The one rule that keeps it that
   way: this runbook names variables, never their contents)
@@ -152,10 +155,18 @@ Prints no secret — `password` is a `SecretStr` and is not in the output.
 ```cypher
 SHOW DATABASES YIELD name, type, currentStatus;
 ```
-Expect `drydocs`, `ddlineage`, `ddcontext`, `ddschema` (standard) and `ddall`
-(composite), all `online`. The canonical list is `config/dev-environment.yaml`, and
+**Do not expect a list from this runbook — read the canonical one**, because the topology
+changes and a copy here goes stale (it did: this line named `ddlineage` for a few hours
+until the X1 amendment retired it):
+
+```powershell
+poetry run python -c "import yaml; print(yaml.safe_load(open('config/dev-environment.yaml'))['neo4j']['databases'])"
+```
+
+`config/dev-environment.yaml` is the canonical list, and
 `tests/unit/test_dev_environment.py` holds it BIDIRECTIONALLY against
-`01_databases.cypher` — a database in one and not the other fails the suite.
+`01_databases.cypher` — a database in one and not the other fails the suite. Every name
+it reports should come back `online` from `SHOW DATABASES`, plus the composite `ddall`.
 
 **3. The vocabulary registry is coherent.** These are guards, so run them rather than
 reading the file:
