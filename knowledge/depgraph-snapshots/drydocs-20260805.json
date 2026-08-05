@@ -1,16 +1,16 @@
 {
   "meta": {
     "project": "drydocs",
-    "captured_at": "2026-08-05T03:18:30",
+    "captured_at": "2026-08-05T10:39:28",
     "date": "20260805",
     "scan": "DryDocs",
     "tree": true,
     "git": {
-      "commit": "6a45a02",
-      "full": "6a45a022ff15ee66fb59a0c7a59ca7eb1e0aa67b",
+      "commit": "2f5b2ef",
+      "full": "2f5b2ef1a7967eba9d67d5f4492a5ce3bfb2b856",
       "branch": "main",
-      "describe": "6a45a02",
-      "subject": "fix(load): finish the C22 sweep — catalog_lobs and dev_teams stop blanking on a sparse refresh (C24)",
+      "describe": "2f5b2ef",
+      "subject": "chore(backlog): W1 done - FCDO vocabulary crosswalk drafted, gate session joins the AWAITING list",
       "dirty": false,
       "pr": null
     },
@@ -6566,6 +6566,15 @@
       "kind": "file"
     },
     {
+      "file_id": "drydocs/config/crosswalks/fcdo-vocabulary.yaml",
+      "name": "fcdo-vocabulary.yaml",
+      "extension": ".yaml",
+      "rel_path": "config/crosswalks/fcdo-vocabulary.yaml",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
       "file_id": "drydocs/config/dev-environment.yaml",
       "name": "dev-environment.yaml",
       "extension": ".yaml",
@@ -6732,6 +6741,15 @@
       "name": "etlprocess-kind-enum.yaml",
       "extension": ".yaml",
       "rel_path": "config/gate-prompts/etlprocess-kind-enum.yaml",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/config/gate-prompts/fcdo-crosswalk.yaml",
+      "name": "fcdo-crosswalk.yaml",
+      "extension": ".yaml",
+      "rel_path": "config/gate-prompts/fcdo-crosswalk.yaml",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -12839,10 +12857,10 @@
       "kind": "file"
     },
     {
-      "file_id": "drydocs/knowledge/depgraph-snapshots/drydocs-20260805.json",
-      "name": "drydocs-20260805.json",
+      "file_id": "drydocs/knowledge/depgraph-snapshots/drydocs-20260805-0318.json",
+      "name": "drydocs-20260805-0318.json",
       "extension": ".json",
-      "rel_path": "knowledge/depgraph-snapshots/drydocs-20260805.json",
+      "rel_path": "knowledge/depgraph-snapshots/drydocs-20260805-0318.json",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -14103,6 +14121,15 @@
       "name": "test_external_vendor_scrape.py",
       "extension": ".py",
       "rel_path": "tests/unit/test_external_vendor_scrape.py",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/tests/unit/test_fcdo_crosswalk.py",
+      "name": "test_fcdo_crosswalk.py",
+      "extension": ".py",
+      "rel_path": "tests/unit/test_fcdo_crosswalk.py",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -17655,6 +17682,14 @@
     [
       "drydocs/tests/unit/test_external_vendor_scrape.py",
       "drydocs/scripts/external_vendor_scrape.py"
+    ],
+    [
+      "drydocs/tests/unit/test_fcdo_crosswalk.py",
+      "drydocs/drydocs/gate_pages.py"
+    ],
+    [
+      "drydocs/tests/unit/test_fcdo_crosswalk.py",
+      "drydocs/drydocs_core/orchestration/crosswalk.py"
     ],
     [
       "drydocs/tests/unit/test_folder_attribution.py",
@@ -22192,6 +22227,11 @@
       "drydocs/config/crosswalks/autosys-to-bmc.yaml"
     ],
     [
+      "drydocs/config/crosswalks",
+      "CONTAINS",
+      "drydocs/config/crosswalks/fcdo-vocabulary.yaml"
+    ],
+    [
       "drydocs/config/gate-prompts",
       "CONTAINS",
       "drydocs/config/gate-prompts/airflow-crosswalk.yaml"
@@ -22260,6 +22300,11 @@
       "drydocs/config/gate-prompts",
       "CONTAINS",
       "drydocs/config/gate-prompts/etlprocess-kind-enum.yaml"
+    ],
+    [
+      "drydocs/config/gate-prompts",
+      "CONTAINS",
+      "drydocs/config/gate-prompts/fcdo-crosswalk.yaml"
     ],
     [
       "drydocs/config/gate-prompts",
@@ -25564,7 +25609,7 @@
     [
       "drydocs/knowledge/depgraph-snapshots",
       "CONTAINS",
-      "drydocs/knowledge/depgraph-snapshots/drydocs-20260805.json"
+      "drydocs/knowledge/depgraph-snapshots/drydocs-20260805-0318.json"
     ],
     [
       "drydocs/knowledge/depgraph-snapshots",
@@ -26200,6 +26245,11 @@
       "drydocs/tests/unit",
       "CONTAINS",
       "drydocs/tests/unit/test_external_vendor_scrape.py"
+    ],
+    [
+      "drydocs/tests/unit",
+      "CONTAINS",
+      "drydocs/tests/unit/test_fcdo_crosswalk.py"
     ],
     [
       "drydocs/tests/unit",
@@ -27356,13 +27406,13 @@
     "projects": [
       "drydocs"
     ],
-    "files": 1531,
-    "edges": 547,
+    "files": 1534,
+    "edges": 549,
     "circular_files": 0,
     "processes": 0,
     "data_assets": 0,
     "hosts": 0,
-    "rels": 1794,
+    "rels": 1797,
     "directories": 264
   }
 }
