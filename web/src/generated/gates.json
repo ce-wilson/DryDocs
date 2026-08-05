@@ -114,6 +114,7 @@
       "unblocks": [
         "K2",
         "K3",
+        "K17",
         "S3",
         "G35"
       ]
@@ -186,6 +187,7 @@
       "log_ref": "config/gate-log.md:329",
       "unblocks": [
         "K2",
+        "K17",
         "S3"
       ]
     },
@@ -349,6 +351,7 @@
         "K7",
         "K11",
         "K15",
+        "K17",
         "C17",
         "S1",
         "S3",
@@ -418,6 +421,7 @@
       "log_ref": "config/gate-log.md:1105",
       "unblocks": [
         "K2",
+        "K17",
         "N1",
         "N7",
         "N8",
@@ -599,7 +603,10 @@
         "config/gate-prompts/fid-identity-and-scope.yaml"
       ],
       "log_ref": null,
-      "unblocks": []
+      "unblocks": [
+        "K16",
+        "K17"
+      ]
     },
     {
       "kind": "prompt-only",
@@ -651,7 +658,9 @@
         "config/gate-prompts/software-version-context.yaml"
       ],
       "log_ref": null,
-      "unblocks": []
+      "unblocks": [
+        "C25"
+      ]
     }
   ]
 }

@@ -200,6 +200,24 @@ sources:
       MAPPING applied at load, recorded here so the next reader of that
       attachment does not repeat the misreading. See gate
       fid-identity-and-scope §F.
+      SIBLING — RECONCILE BEFORE BUILDING Q10 (flagged by the user 2026-08-05,
+      after this entry was registered without the cross-reference): backlog
+      Q10 plans a SECOND email corpus — the failure/activity emails (.msg +
+      Copilot JSON extracts) — and its acceptance is worded "a
+      doc-source-registry entry declares the email corpus", singular. Whoever
+      builds Q10 will find THIS entry already here and must decide EXTEND vs
+      ADD rather than discover the question at build time. They are currently
+      registered as two because four properties differ, not because nobody
+      looked: (1) SHAPE — this one is citation-only, Q10's loads the ACTIVE
+      lexical Document->Chunk spine; (2) CADENCE — one-off SME evidence with no
+      pipeline, vs a recurring operational feed with an extraction step;
+      (3) RETENTION — Q10's file-server extracts become the ONLY copy after the
+      6-18 month Outlook purge, so that corpus carries a backup obligation this
+      one does not; (4) ASSIGNMENT — Q10 needs an email->folder/process edge
+      through its own gate, this one attaches to a version fact by pointer.
+      If the SME rules them one corpus, this entry folds into Q10's and the
+      shape difference becomes a per-Document property — which is why the fold
+      is cheap TODAY and expensive after either has loaded.
 
   - id: jpmc-reports
     classification: External            # public SEC filings / investor-relations PDFs

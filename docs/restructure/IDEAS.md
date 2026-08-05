@@ -22,6 +22,20 @@ item, or (c) drop it. Strike through or delete what's been groomed so the inbox 
 
 Tags help grooming: `idea` · `bug` · `doc` · `source` (new data source) · `question` · `chore`.
 
+### Promotion marker (added 2026-08-05 — you could not tell from this file what had been groomed)
+
+An entry that produced backlog items keeps a **`GROOMED <date> → <ids>`** prefix, in place:
+
+`- **\`GROOMED 2026-08-05 → C25\`** *(what was promoted; what stays open)* — <the original entry>`
+
+**Why marked rather than moved.** The groom ritual says a groomed line moves to the audit
+trail at the bottom of this file. That works when an entry maps 1:1 to an item. It does not
+when one entry carries several findings and only part of it is actionable — moving the whole
+line files the open findings under "recently groomed", where nobody looks for open work.
+So: **fully consumed → move to the audit trail; partially consumed → mark in place and say
+what stays open.** Either way the inbox itself answers "was this groomed?", which is the
+question a 1,000-line file with the trail at the bottom could not answer.
+
 ## Inbox
 
 <!-- add new ideas at the top -->
@@ -160,7 +174,10 @@ Tags help grooming: `idea` · `bug` · `doc` · `source` (new data source) · `q
   lifecycle state ("SEAL Decommissioned NO New EDIT ACCESS Permitted") trapped in a free-text info
   column beside a date.
 
-- 2026-08-04 — [source] **Software VERSION as graph context, from an adhoc evidence email — two gates
+- **`GROOMED 2026-08-05 → C25`** *(the gate SESSION is now a backlog item; the rest of this entry
+  stays open — the sub-application USES_SOFTWARE source and the two missing product rows are not
+  in C25)* —
+  2026-08-04 — [source] **Software VERSION as graph context, from an adhoc evidence email — two gates
   drafted, both awaiting SME.** An SME email compiled for a version-readiness review lists install
   paths per functional id for one ETL product. Opening proposal was
   `(:BusinessApplication)-[:USES_SOFTWARE {version}]->(:SoftwareProduct)-[:documented_by]->(email)`;
@@ -177,7 +194,9 @@ Tags help grooming: `idea` · `bug` · `doc` · `source` (new data source) · `q
   `evidence_doc_id` pointer with reification as the named upgrade path. Corpus `adhoc-sme-email`
   registered (`confirmed: false`, citation-only, connector `email`). App-level rollup deliberately
   BLOCKED on the FID gate. **Groom both gates + the doc-09 phases into backlog items once signed.**
-- 2026-08-04 — [source] **The FID directory is the K2 tier-2 unblock — it was never a side quest.**
+- **`GROOMED 2026-08-05 → K16, K17`** *(census then gate session; the §G registration-vs-attribution
+  finding and the six directory-owner questions ride the gate page, not this entry)* —
+  2026-08-04 — [source] **The FID directory is the K2 tier-2 unblock — it was never a side quest.**
   `TierReconcilers.fid` has been an empty dict since the K2 build ("no producer-side reconciliation
   source yet"), while the signed match policy orders SEAL > **FID** > APP_NAME > ALIAS. The firm's ID
   directory is that table, and it is ingestible (UI, export, audit columns, application assignment) —
@@ -1029,6 +1048,19 @@ Tags help grooming: `idea` · `bug` · `doc` · `source` (new data source) · `q
 
 ## Recently groomed (audit trail)
 
+- 2026-08-05 (desktop, user directive "groom them into backlog items") — the two HITL gates
+  drafted the same day → **C25** (run the `software-version-context` gate — epic
+  ontology-mapping, phase 2, beside its C12/C14 USES_SOFTWARE siblings) and **K17** (run the
+  `fid-identity-and-scope` gate — epic seal-attribution, phase 9, the K2 tier-2 unblock),
+  plus **K16** (the doc-09 Phase-0 FID census). K17 depends on K16 BY DESIGN: the census
+  produces the §Q0 disagreement breakdown the gate cannot sign without, so grooming the gate
+  alone would have scheduled a session that cannot reach a ruling. Both gates were already
+  documented as artifacts — committed prompts, `status: open` rows in `gates.json`, format
+  guard passing — but had NO backlog item, so `unblocks: []` and nothing would ever pull
+  them. That gap is what this groom closes. The IDEAS entries themselves STAY in the inbox
+  (they carry findings wider than the gates: the app-code cardinality question, the
+  registration/routing/attribution rule, the sub-application USES_SOFTWARE source, the
+  tier-naming split) — only the gate-session work was promoted.
 - 2026-08-04 (desktop, user directive) — [idea] the backlog-sharding EPIC entry (2026-08-03;
   kept-parked at the same day's weekly groom) → **UN-PARKED and groomed as Epic Y: Y1 the
   sharding ADR ruling session, Y2 the shard build, Y3 the :BacklogItem/DEPENDS_ON vocabulary
