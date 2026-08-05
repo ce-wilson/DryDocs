@@ -222,6 +222,18 @@ rows:
       the producer's render ships the producer's sources as the consumer's map.
       (Row added 2026-07-29 when the J16 coverage guard caught the new file —
       the .json twin rides web/** and regenerates under guardrail 5.)
+  - path: "docs/plan/ideas.html"
+    disposition: canonical-company
+    note: >
+      DERIVED — the idea-inbox read view, a deterministic render of the
+      consumer's OWN docs/restructure/IDEAS.md (scripts/render_ideas.py, rides
+      the default board render). Same rule as board.html directly below, and the
+      reason is sharper here: an inbox is the LEAST portable artifact in the
+      repo — half-formed notes about the local estate — so taking the producer's
+      render would put the producer's unreviewed thinking in front of the
+      consumer's reviewers as if it were theirs. Regenerate from the reconciled
+      tree. (Row added 2026-08-05 with the page; the J16 coverage guard caught
+      the new file in the same run that created it, which is the guard working.)
   - path: "docs/plan/board.html"
     disposition: canonical-company
     note: >

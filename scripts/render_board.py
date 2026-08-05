@@ -6,7 +6,8 @@ TODO (MODULE_MAP.md) is resolved. Stdlib + ``drydocs.plan_board`` only.
 
 A default-paths run ALSO refreshes ``web/src/generated/gates.json`` (J17),
 ``web/src/generated/enforcement-matrix.json`` (J20),
-``web/src/generated/load-map.json`` (N4) and
+``web/src/generated/load-map.json`` (N4),
+``docs/plan/ideas.html`` (the inbox read view the board links to) and
 ``web/src/generated/software-registry.json`` (+ its ``web/public/vendor-icons/``
 assets — the software-registry <-> drydocs-icons soft link, 2026-07-31): all
 read sources this ritual edits
@@ -53,6 +54,7 @@ def main() -> None:
     if args.backlog == DEFAULT_BACKLOG_PATH and args.out == DEFAULT_BOARD_PATH:
         import render_enforcement_matrix
         import render_gates
+        import render_ideas
         import render_load_map
         import render_software_registry
 
@@ -60,6 +62,11 @@ def main() -> None:
         render_enforcement_matrix.main()
         render_load_map.main()
         render_software_registry.main()
+        # The inbox render (2026-08-05) rides here for the same reason as the
+        # others: the board links to it, so a groom that edits IDEAS.md without
+        # re-rendering would leave a committed page describing a stale inbox —
+        # exactly the J20 drift the one-command rule exists to prevent.
+        render_ideas.main()
 
 
 if __name__ == "__main__":

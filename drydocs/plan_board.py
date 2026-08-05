@@ -335,6 +335,9 @@ h3{font-size:1rem;margin:.3rem 0 .2rem}
 .capture button{font:inherit;padding:.35rem .8rem;border:1px solid #2563eb;border-radius:4px;
   background:#2563eb;color:#fff;cursor:pointer}
 .capture-hint{font-size:.78rem;color:#666;margin:.4rem 0 0}
+.capture-link{display:inline-block;margin-left:.4rem;padding:.15rem .55rem;border:1px solid #2563eb;
+  border-radius:4px;background:#fff;color:#2563eb;text-decoration:none;font-size:.78rem}
+.capture-link:hover{background:#eff6ff}
 .capture-status{font-size:.78rem;color:#166534;margin:.3rem 0 0;min-height:1.1em}
 """.strip()
 
@@ -536,7 +539,11 @@ document.addEventListener("DOMContentLoaded", () => {
         '    <button type="button" id="capture-copy">Copy line</button>\n'
         "  </div>\n"
         '  <p class="capture-hint">Copies <code>- [tag] text</code> to your clipboard — '
-        "paste into docs/restructure/IDEAS.md — the repo is the system of record.</p>\n"
+        "paste into docs/restructure/IDEAS.md — the repo is the system of record. "
+        # The inbox's own rendered surface (2026-08-05): capture had a button, REVIEW
+        # had none, so the one artifact in the inbox->backlog->board chain that could
+        # only be read as raw markdown was the one holding unreviewed work.
+        '<a class="capture-link" href="ideas.html">Review the idea inbox &rarr;</a></p>\n'
         '  <p class="capture-status" id="capture-status"></p>\n'
         "</div>\n"
         f"<script>\n{js}\n</script>\n</body></html>\n"

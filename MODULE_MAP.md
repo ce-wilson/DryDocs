@@ -58,6 +58,7 @@
 | `drydocs/gate_pages.py` | `drydocs-review` — HITL SME-gate prompt-page generator (load-step spec → self-contained interactive review page; repo stays the system of record) | gate pages (offline HTML) |
 | `drydocs/publishing/**` | `drydocs-review` — docs publish pipeline (Confluence push abstracted, H5) | external (docs target) |
 | `drydocs/plan_board.py` | `drydocs-plan` — backlog.yaml → HTML project board renderer (Epic I) | `docs/plan/board.html` |
+| `drydocs/plan_ideas.py` | `drydocs-plan` — IDEAS.md → HTML idea-inbox read view; reuses `design_doc.render_body` rather than adding a second markdown renderer | `docs/plan/ideas.html` |
 | `drydocs/doc_outline.py` | `drydocs-docgen` — canonical doc-outline completeness + traceability validator (Epic L) | — (pure; validates docs) |
 | `drydocs/design_doc.py` | `drydocs-docgen` — deterministic Markdown→HTML renderer, one surface: screen + @media print (Epic L; L13) | `docs/design/*.html` |
 | `drydocs/doc_pdf.py` | `drydocs-docgen` — headless-Chromium html→PDF via the @media print sheet (Brave-first), date-normalized (Epic L) | `docs/design/*.pdf` (build-on-demand) |

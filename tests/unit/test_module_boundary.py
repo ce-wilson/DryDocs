@@ -82,10 +82,21 @@ COMPONENT_GROUPS: dict[str, tuple[str, ...]] = {
     "plan": ("drydocs.plan_board",),
     # drydocs-docgen — canonical doc-outline validation + deterministic render + HITL
     # markup (Epic L). Imports only stdlib + config; never a component.
+    #
+    # plan_ideas lives HERE, not under "plan", and this guard is why (2026-08-05):
+    # it was written as a plan module and the boundary test caught it importing
+    # design_doc.render_body. The choice was duplicate a markdown renderer or file
+    # it where markdown rendering lives — and a second md->HTML implementation
+    # would drift from the Epic L one it was copied from. Its OUTPUT lands in
+    # docs/plan/ (hence the name), but the COMPONENT is docgen: what it does is
+    # render markdown deterministically. The same guard then caught the reverse
+    # import (a borrowed stylesheet from plan_board) and was right twice — the
+    # page now carries its own CSS, so docgen imports nothing but stdlib.
     "docgen": (
         "drydocs.doc_outline",
         "drydocs.design_doc",
         "drydocs.doc_pdf",
+        "drydocs.plan_ideas",
     ),
     # drydocs-remediation — detect → transform → prove → Jira (ADR 0002-B, G3).
     # Writes NO graph; Jira is the SoR; imports only drydocs_core.
