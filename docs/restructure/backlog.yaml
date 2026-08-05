@@ -10371,7 +10371,7 @@ items:
   # ── appended at the 2026-08-05 groom (SME direction, in-chat during G35) ────
   - id: O44
     epic: web-console
-    title: "Four-column ownership reconciliation pane: employee hierarchy | SEAL/TOM contacts | ServiceNow queues + technicians | PAT structure — with the cross-column relationships drawn"
+    title: "Ownership reconciliation ALLUVIAL diagram (a Sankey variant): four ordered columns — employee hierarchy | SEAL/TOM contacts | ServiceNow queues + technicians | PAT structure — with ribbons where an entity appears in both, and a terminating ribbon where it does not"
     type: requirement
     module: drydocs-web
     phase: 12
@@ -10382,11 +10382,26 @@ items:
     depends_on: [G35]
     inputs: [web/src/routes/OwnershipRoute.tsx, web/src/ownership/OwnershipGraphPane.tsx, web/src/routes/AppCodeCascadePane.tsx, drydocs_api/query_specs.py, config/gate-prompts/tom-roles-enumeration-and-cardinality.yaml, config/source-registry.yaml]
     acceptance: >
-      A console pane showing FOUR parallel columns over the same applications,
-      each column a different system's view of who owns what, with a row in one
-      column visually related to its counterparts in the others — and, per the SME
-      framing, a relationship drawn ONLY where the counterpart is actually present
-      in that column's list. (1) EMPLOYEE HIERARCHY, filterable by manager.
+      THE DIAGRAM TYPE IS NAMED, and it is not decoration: this is an ALLUVIAL
+      diagram — the Sankey family variant for CATEGORICAL data across several
+      ordered dimensions, where the same entities are re-partitioned column by
+      column and ribbons carry membership from one partition to the next. (SME
+      2026-08-05, correcting this item's first draft, which described the shape
+      and never named it.) Sankey is the family; alluvial is the member, and the
+      distinction decides the data contract — a general Sankey moves a QUANTITY
+      between distinct nodes, an alluvial moves the SAME ENTITIES between
+      categorizations. Build to the alluvial contract: nodes = (column, category),
+      links = (source category, target category, the entity set that is in both).
+      A console pane rendering FOUR ordered columns over the same applications and
+      people, each column a different system's view of who owns what, with a
+      ribbon drawn ONLY where the entity is actually present in both adjacent
+      columns' lists (the SME framing).
+      THE TERMINATING RIBBON IS THE PRODUCT. An entity that appears in one column
+      and not the next does not fade out quietly — a flow that stops IS the
+      finding, and it must be visually distinct from a flow that continues. That
+      is what makes this the reconciliation surface for G35 §D: a SEAL contact with
+      no ServiceNow counterpart is a roster disagreement made legible, and a
+      diagram that only draws matches would hide precisely the case it exists for. (1) EMPLOYEE HIERARCHY, filterable by manager.
       (2) SEAL/TOM CONTACTS, filterable by SEAL id, LOB, product line, product and
       contact role. (3) SERVICENOW: the queues/assignment groups matching the
       applications in column 1's list, showing their technician roles.
@@ -10431,6 +10446,18 @@ items:
         queues with a Technician role, and internal/remediation names a SNOW
         technician group + CTASK. That is enough to know the concept is real and
         not enough to build a column.
+      RIBBON WEIGHT IS AN OPEN DESIGN QUESTION, flagged rather than assumed: in a
+      Sankey the ribbon THICKNESS encodes a quantity, and this diagram has more
+      than one candidate — count of people, count of applications, or unweighted
+      equal-width membership bands. Pick before building; retrofitting a weight
+      changes the layout engine's input, not just a style.
+      NO LIBRARY IN THE STACK DOES THIS. web/package.json carries @xyflow/react
+      (node-and-edge graphs, not flows) and d3-force (force layout). An alluvial
+      needs d3-sankey or a hand-rolled SVG with a crossing-minimisation pass —
+      readable column ordering is most of the work in this diagram, and it is the
+      part a naive implementation gets wrong. A new dependency also lands in the
+      software registry, which is the third-party ledger, so it is a registration
+      as well as an install.
       NOT SPLIT INTO SEPARATE ITEMS on purpose: the two missing columns are
       SOURCE questions (does DryDocs ingest the HR hierarchy and the SNOW queue
       export, producer-side or company-side?) and that is a user decision, not an
