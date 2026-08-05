@@ -1,16 +1,16 @@
 {
   "meta": {
     "project": "drydocs",
-    "captured_at": "2026-08-05T00:48:20",
+    "captured_at": "2026-08-05T03:18:30",
     "date": "20260805",
     "scan": "DryDocs",
     "tree": true,
     "git": {
-      "commit": "940b651",
-      "full": "940b651354234e8c6264ccd63861c87ded611690",
+      "commit": "6a45a02",
+      "full": "6a45a022ff15ee66fb59a0c7a59ca7eb1e0aa67b",
       "branch": "main",
-      "describe": "940b651",
-      "subject": "docs(port): roll the ledger - two unrecorded ports, steps 84-90, and a broken fetch",
+      "describe": "6a45a02",
+      "subject": "fix(load): finish the C22 sweep — catalog_lobs and dev_teams stop blanking on a sparse refresh (C24)",
       "dirty": false,
       "pr": null
     },
@@ -18,7 +18,7 @@
       "commit": "773fb1e",
       "full": "773fb1ea11e8db41bc6200e19f701866e2cef3eb",
       "branch": "main",
-      "dirty": true,
+      "dirty": false,
       "version": "0.1.0",
       "capabilities": {
         "multi_root": true,
@@ -6737,6 +6737,15 @@
       "kind": "file"
     },
     {
+      "file_id": "drydocs/config/gate-prompts/fid-identity-and-scope.yaml",
+      "name": "fid-identity-and-scope.yaml",
+      "extension": ".yaml",
+      "rel_path": "config/gate-prompts/fid-identity-and-scope.yaml",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
       "file_id": "drydocs/config/gate-prompts/platforms-taxonomy.yaml",
       "name": "platforms-taxonomy.yaml",
       "extension": ".yaml",
@@ -6804,6 +6813,15 @@
       "name": "software-usage-patterns.yaml",
       "extension": ".yaml",
       "rel_path": "config/gate-prompts/software-usage-patterns.yaml",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/config/gate-prompts/software-version-context.yaml",
+      "name": "software-version-context.yaml",
+      "extension": ".yaml",
+      "rel_path": "config/gate-prompts/software-version-context.yaml",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -8069,6 +8087,15 @@
       "kind": "file"
     },
     {
+      "file_id": "drydocs/docs/plan/ideas.html",
+      "name": "ideas.html",
+      "extension": ".html",
+      "rel_path": "docs/plan/ideas.html",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
       "file_id": "drydocs/docs/plan/load-map.html",
       "name": "load-map.html",
       "extension": ".html",
@@ -8199,6 +8226,15 @@
       "name": "08-source-column-mappings.md",
       "extension": ".md",
       "rel_path": "docs/restructure/08-source-column-mappings.md",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/docs/restructure/09-fid-identity-and-scope.md",
+      "name": "09-fid-identity-and-scope.md",
+      "extension": ".md",
+      "rel_path": "docs/restructure/09-fid-identity-and-scope.md",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -9248,6 +9284,15 @@
       "kind": "file"
     },
     {
+      "file_id": "drydocs/drydocs/adapters",
+      "name": "adapters",
+      "extension": "",
+      "rel_path": "drydocs/adapters",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "dir"
+    },
+    {
       "file_id": "drydocs/drydocs/cli.py",
       "name": "cli.py",
       "extension": ".py",
@@ -9264,6 +9309,15 @@
       "project": "drydocs",
       "circular": false,
       "kind": "file"
+    },
+    {
+      "file_id": "drydocs/drydocs/controlm",
+      "name": "controlm",
+      "extension": "",
+      "rel_path": "drydocs/controlm",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "dir"
     },
     {
       "file_id": "drydocs/drydocs/data",
@@ -9468,6 +9522,15 @@
       "name": "__init__.py",
       "extension": ".py",
       "rel_path": "drydocs/loaders/__init__.py",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/drydocs/loaders/app_identity.py",
+      "name": "app_identity.py",
+      "extension": ".py",
+      "rel_path": "drydocs/loaders/app_identity.py",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -10175,10 +10238,37 @@
       "kind": "file"
     },
     {
+      "file_id": "drydocs/drydocs/models",
+      "name": "models",
+      "extension": "",
+      "rel_path": "drydocs/models",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "dir"
+    },
+    {
+      "file_id": "drydocs/drydocs/ontology",
+      "name": "ontology",
+      "extension": "",
+      "rel_path": "drydocs/ontology",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "dir"
+    },
+    {
       "file_id": "drydocs/drydocs/plan_board.py",
       "name": "plan_board.py",
       "extension": ".py",
       "rel_path": "drydocs/plan_board.py",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/drydocs/plan_ideas.py",
+      "name": "plan_ideas.py",
+      "extension": ".py",
+      "rel_path": "drydocs/plan_ideas.py",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -12749,10 +12839,10 @@
       "kind": "file"
     },
     {
-      "file_id": "drydocs/knowledge/depgraph-snapshots/drydocs-20260804-1933.json",
-      "name": "drydocs-20260804-1933.json",
+      "file_id": "drydocs/knowledge/depgraph-snapshots/drydocs-20260805.json",
+      "name": "drydocs-20260805.json",
       "extension": ".json",
-      "rel_path": "knowledge/depgraph-snapshots/drydocs-20260804-1933.json",
+      "rel_path": "knowledge/depgraph-snapshots/drydocs-20260805.json",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -13496,6 +13586,15 @@
       "kind": "file"
     },
     {
+      "file_id": "drydocs/scripts/render_ideas.py",
+      "name": "render_ideas.py",
+      "extension": ".py",
+      "rel_path": "scripts/render_ideas.py",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
       "file_id": "drydocs/scripts/render_load_map.py",
       "name": "render_load_map.py",
       "extension": ".py",
@@ -13707,6 +13806,15 @@
       "name": "test_agent_telemetry.py",
       "extension": ".py",
       "rel_path": "tests/unit/test_agent_telemetry.py",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/tests/unit/test_app_identity_guard.py",
+      "name": "test_app_identity_guard.py",
+      "extension": ".py",
+      "rel_path": "tests/unit/test_app_identity_guard.py",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -14337,6 +14445,15 @@
       "name": "test_plan_board.py",
       "extension": ".py",
       "rel_path": "tests/unit/test_plan_board.py",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/tests/unit/test_plan_ideas.py",
+      "name": "test_plan_ideas.py",
+      "extension": ".py",
+      "rel_path": "tests/unit/test_plan_ideas.py",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -16284,6 +16401,14 @@
       "drydocs/drydocs/loaders/seal_contacts.py"
     ],
     [
+      "drydocs/drydocs/loaders/app_identity.py",
+      "drydocs/drydocs/loaders/base.py"
+    ],
+    [
+      "drydocs/drydocs/loaders/app_identity.py",
+      "drydocs/drydocs_core/run_log.py"
+    ],
+    [
       "drydocs/drydocs/loaders/base.py",
       "drydocs/drydocs_core/adapters/__init__.py"
     ],
@@ -16326,6 +16451,10 @@
     [
       "drydocs/drydocs/loaders/business_segments.py",
       "drydocs/drydocs_core/neo4j_client.py"
+    ],
+    [
+      "drydocs/drydocs/loaders/catalog.py",
+      "drydocs/drydocs/loaders/app_identity.py"
     ],
     [
       "drydocs/drydocs/loaders/catalog.py",
@@ -16465,6 +16594,10 @@
     ],
     [
       "drydocs/drydocs/loaders/manual_loads.py",
+      "drydocs/drydocs/loaders/app_identity.py"
+    ],
+    [
+      "drydocs/drydocs/loaders/manual_loads.py",
       "drydocs/drydocs/loaders/base.py"
     ],
     [
@@ -16482,6 +16615,10 @@
     [
       "drydocs/drydocs/loaders/manual_loads.py",
       "drydocs/drydocs_core/models/__init__.py"
+    ],
+    [
+      "drydocs/drydocs/loaders/seal_applications.py",
+      "drydocs/drydocs/loaders/app_identity.py"
     ],
     [
       "drydocs/drydocs/loaders/seal_applications.py",
@@ -16506,6 +16643,10 @@
     [
       "drydocs/drydocs/loaders/seal_contacts.py",
       "drydocs/drydocs_core/models/__init__.py"
+    ],
+    [
+      "drydocs/drydocs/loaders/software_registry.py",
+      "drydocs/drydocs/loaders/app_identity.py"
     ],
     [
       "drydocs/drydocs/loaders/software_registry.py",
@@ -16534,6 +16675,10 @@
     [
       "drydocs/drydocs/loaders/vendor_docs.py",
       "drydocs/drydocs_core/source_registry.py"
+    ],
+    [
+      "drydocs/drydocs/plan_ideas.py",
+      "drydocs/drydocs/design_doc.py"
     ],
     [
       "drydocs/drydocs/publishing/__init__.py",
@@ -17136,6 +17281,10 @@
       "drydocs/drydocs/design_doc.py"
     ],
     [
+      "drydocs/scripts/render_ideas.py",
+      "drydocs/drydocs/plan_ideas.py"
+    ],
+    [
       "drydocs/scripts/render_load_map.py",
       "drydocs/drydocs/__init__.py"
     ],
@@ -17182,6 +17331,30 @@
     [
       "drydocs/tests/unit/test_agent_telemetry.py",
       "drydocs/drydocs_api/query_specs.py"
+    ],
+    [
+      "drydocs/tests/unit/test_app_identity_guard.py",
+      "drydocs/drydocs/loaders/app_identity.py"
+    ],
+    [
+      "drydocs/tests/unit/test_app_identity_guard.py",
+      "drydocs/drydocs/loaders/base.py"
+    ],
+    [
+      "drydocs/tests/unit/test_app_identity_guard.py",
+      "drydocs/drydocs/loaders/catalog.py"
+    ],
+    [
+      "drydocs/tests/unit/test_app_identity_guard.py",
+      "drydocs/drydocs/loaders/manual_loads.py"
+    ],
+    [
+      "drydocs/tests/unit/test_app_identity_guard.py",
+      "drydocs/drydocs/loaders/seal_applications.py"
+    ],
+    [
+      "drydocs/tests/unit/test_app_identity_guard.py",
+      "drydocs/drydocs/loaders/software_registry.py"
     ],
     [
       "drydocs/tests/unit/test_audit_fields.py",
@@ -17854,6 +18027,10 @@
     [
       "drydocs/tests/unit/test_plan_board.py",
       "drydocs/drydocs/plan_board.py"
+    ],
+    [
+      "drydocs/tests/unit/test_plan_ideas.py",
+      "drydocs/drydocs/plan_ideas.py"
     ],
     [
       "drydocs/tests/unit/test_port_reconcile_guards.py",
@@ -22087,6 +22264,11 @@
     [
       "drydocs/config/gate-prompts",
       "CONTAINS",
+      "drydocs/config/gate-prompts/fid-identity-and-scope.yaml"
+    ],
+    [
+      "drydocs/config/gate-prompts",
+      "CONTAINS",
       "drydocs/config/gate-prompts/platforms-taxonomy.yaml"
     ],
     [
@@ -22123,6 +22305,11 @@
       "drydocs/config/gate-prompts",
       "CONTAINS",
       "drydocs/config/gate-prompts/software-usage-patterns.yaml"
+    ],
+    [
+      "drydocs/config/gate-prompts",
+      "CONTAINS",
+      "drydocs/config/gate-prompts/software-version-context.yaml"
     ],
     [
       "drydocs/config/gate-prompts",
@@ -22812,6 +22999,11 @@
     [
       "drydocs/docs/plan",
       "CONTAINS",
+      "drydocs/docs/plan/ideas.html"
+    ],
+    [
+      "drydocs/docs/plan",
+      "CONTAINS",
       "drydocs/docs/plan/load-map.html"
     ],
     [
@@ -22863,6 +23055,11 @@
       "drydocs/docs/restructure",
       "CONTAINS",
       "drydocs/docs/restructure/08-source-column-mappings.md"
+    ],
+    [
+      "drydocs/docs/restructure",
+      "CONTAINS",
+      "drydocs/docs/restructure/09-fid-identity-and-scope.md"
     ],
     [
       "drydocs/docs/restructure",
@@ -23027,12 +23224,22 @@
     [
       "drydocs/drydocs",
       "CONTAINS",
+      "drydocs/drydocs/adapters"
+    ],
+    [
+      "drydocs/drydocs",
+      "CONTAINS",
       "drydocs/drydocs/cli.py"
     ],
     [
       "drydocs/drydocs",
       "CONTAINS",
       "drydocs/drydocs/cmdline_staging.py"
+    ],
+    [
+      "drydocs/drydocs",
+      "CONTAINS",
+      "drydocs/drydocs/controlm"
     ],
     [
       "drydocs/drydocs",
@@ -23087,7 +23294,22 @@
     [
       "drydocs/drydocs",
       "CONTAINS",
+      "drydocs/drydocs/models"
+    ],
+    [
+      "drydocs/drydocs",
+      "CONTAINS",
+      "drydocs/drydocs/ontology"
+    ],
+    [
+      "drydocs/drydocs",
+      "CONTAINS",
       "drydocs/drydocs/plan_board.py"
+    ],
+    [
+      "drydocs/drydocs",
+      "CONTAINS",
+      "drydocs/drydocs/plan_ideas.py"
     ],
     [
       "drydocs/drydocs",
@@ -23578,6 +23800,11 @@
       "drydocs/drydocs/loaders",
       "CONTAINS",
       "drydocs/drydocs/loaders/__init__.py"
+    ],
+    [
+      "drydocs/drydocs/loaders",
+      "CONTAINS",
+      "drydocs/drydocs/loaders/app_identity.py"
     ],
     [
       "drydocs/drydocs/loaders",
@@ -25337,7 +25564,7 @@
     [
       "drydocs/knowledge/depgraph-snapshots",
       "CONTAINS",
-      "drydocs/knowledge/depgraph-snapshots/drydocs-20260804-1933.json"
+      "drydocs/knowledge/depgraph-snapshots/drydocs-20260805.json"
     ],
     [
       "drydocs/knowledge/depgraph-snapshots",
@@ -25692,6 +25919,11 @@
     [
       "drydocs/scripts",
       "CONTAINS",
+      "drydocs/scripts/render_ideas.py"
+    ],
+    [
+      "drydocs/scripts",
+      "CONTAINS",
       "drydocs/scripts/render_load_map.py"
     ],
     [
@@ -25803,6 +26035,11 @@
       "drydocs/tests/unit",
       "CONTAINS",
       "drydocs/tests/unit/test_agent_telemetry.py"
+    ],
+    [
+      "drydocs/tests/unit",
+      "CONTAINS",
+      "drydocs/tests/unit/test_app_identity_guard.py"
     ],
     [
       "drydocs/tests/unit",
@@ -26153,6 +26390,11 @@
       "drydocs/tests/unit",
       "CONTAINS",
       "drydocs/tests/unit/test_plan_board.py"
+    ],
+    [
+      "drydocs/tests/unit",
+      "CONTAINS",
+      "drydocs/tests/unit/test_plan_ideas.py"
     ],
     [
       "drydocs/tests/unit",
@@ -27114,13 +27356,13 @@
     "projects": [
       "drydocs"
     ],
-    "files": 1522,
-    "edges": 532,
+    "files": 1531,
+    "edges": 547,
     "circular_files": 0,
     "processes": 0,
     "data_assets": 0,
     "hosts": 0,
-    "rels": 1781,
-    "directories": 260
+    "rels": 1794,
+    "directories": 264
   }
 }
