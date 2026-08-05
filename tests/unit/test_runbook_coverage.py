@@ -84,7 +84,6 @@ MODULE_EXEMPT: dict[str, str] = {
 #: without a backlog item that says who writes it.
 RUNBOOK_PENDING: frozenset[str] = frozenset(
     {
-        "drydocs-core",  # V2
         "drydocs-load",  # V3 — must rule its overlap with the system-level startup runbook
         "drydocs-review",  # V4
         "drydocs-docgen",  # V5
@@ -99,6 +98,14 @@ RUNBOOK_PENDING: frozenset[str] = frozenset(
 #: module. Ruled at V1, 2026-08-04. `satisfies` is the module it covers whole;
 #: None means it is narrower than its module and does not discharge coverage.
 RUNBOOK_DISPOSITION: dict[str, tuple[str | None, str, str]] = {
+    "drydocs-core-runbook.md": (
+        "drydocs-core",
+        "drydocs-core",
+        "V2: the module's four operate surfaces -- env roots, schema provisioning, the "
+        "vocabulary registry, run logs. The mapping-store runbook stays scoped to ONE "
+        "artifact of core and is NOT superseded by this; both are correct at their own "
+        "scope, which is exactly the distinction the two-map split exists to record",
+    ),
     "drydocs-api-runbook.md": (
         "drydocs-api",
         "drydocs-api",
@@ -115,9 +122,10 @@ RUNBOOK_DISPOSITION: dict[str, tuple[str | None, str, str]] = {
     "drydocs-mapping-store-runbook.md": (
         None,
         "drydocs-core",
-        "operates ONE artifact of core (var/mapping.db) and says so — it scopes HTTP "
+        "operates ONE artifact of core (var/mapping.db) and says so -- it scopes HTTP "
         "serving out explicitly. Core's config/env roots, schema provisioning, "
-        "vocabulary registry and run log are all outside it (V2's scope)",
+        "vocabulary registry and run log are outside it and are now covered by "
+        "drydocs-core-runbook.md (V2). Both are correct at their own scope",
     ),
     "drydocs-mapping-demo-runbook.md": (
         None,

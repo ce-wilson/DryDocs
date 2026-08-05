@@ -1,0 +1,218 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Runbook — operate drydocs-core: env roots, schema provisioning, the vocabulary registry, run logs</title>
+<style>
+:root { color-scheme: light dark; --ink:#1a1a1a; --mid:#555; --line:#d0d0d0; --faint:#f6f6f6; --bg:#fff; --link:#0a58ca; }
+@media (prefers-color-scheme: dark) { :root { --ink:#e6e6e6; --mid:#a0a0a0; --line:#3a3a3a; --faint:#1c1c1c; --bg:#141414; --link:#6ea8fe; } }
+:root[data-theme="dark"] { --ink:#e6e6e6; --mid:#a0a0a0; --line:#3a3a3a; --faint:#1c1c1c; --bg:#141414; --link:#6ea8fe; }
+:root[data-theme="light"] { --ink:#1a1a1a; --mid:#555; --line:#d0d0d0; --faint:#f6f6f6; --bg:#fff; --link:#0a58ca; }
+* { box-sizing: border-box; }
+body { font: 15px/1.6 "Segoe UI", system-ui, Arial, sans-serif; color: var(--ink); background: var(--bg); margin: 0; }
+main { max-width: 900px; margin: 0 auto; padding: 32px 24px 80px; }
+h1 { font-size: 28px; margin: 0 0 6px; letter-spacing:-0.3px; }
+h2 { font-size: 20px; margin: 34px 0 10px; padding-bottom:5px; border-bottom: 2px solid var(--ink); }
+h3 { font-size: 16px; margin: 22px 0 8px; }
+h4,h5,h6 { font-size: 14px; margin: 16px 0 6px; }
+p { margin: 10px 0; } strong { font-weight: 700; }
+a { color: var(--link); } a:hover { text-decoration: underline; }
+code { font-family: "Cascadia Mono","Consolas",monospace; font-size: 0.88em; background: var(--faint); padding: 1px 4px; border-radius: 3px; }
+pre { font-family: "Cascadia Mono","Consolas",monospace; font-size: 12.5px; line-height:1.45; border:1px solid var(--line); background: var(--faint); padding: 12px 14px; border-radius: 6px; overflow-x: auto; }
+pre code { background: none; padding: 0; }
+table { border-collapse: collapse; margin: 14px 0; font-size: 13.5px; display:block; overflow-x:auto; }
+th,td { border:1px solid var(--line); padding: 6px 9px; text-align:left; vertical-align: top; }
+th { background: var(--faint); font-weight:700; }
+blockquote { margin: 14px 0; padding: 2px 16px; border-left: 4px solid var(--line); color: var(--mid); }
+ul,ol { margin: 10px 0; padding-left: 26px; } li { margin: 4px 0; }
+hr { border:none; border-top:1px solid var(--line); margin: 26px 0; }
+:target { scroll-margin-top: 12px; } :target > :first-child, h2:target, h3:target { outline: 2px solid var(--link); outline-offset: 4px; }
+.dd-margin-tag, .dd-print-footer { display: none; }
+
+.dd-note-btn { border:1px solid var(--line); background:var(--bg); color:var(--mid); cursor:pointer; font-size:12px; line-height:1; padding:2px 6px; border-radius:5px; margin-right:6px; }
+.dd-note-btn:hover { color:var(--link); border-color:var(--link); }
+.dd-note-box { margin:6px 0 10px; }
+.dd-note-box textarea { width:100%; min-height:56px; font:13px/1.4 "Segoe UI",system-ui,sans-serif; color:var(--ink); background:var(--faint); border:1px solid var(--line); border-radius:6px; padding:8px; resize:vertical; }
+.dd-annotated { box-shadow:-3px 0 0 var(--link); padding-left:8px; }
+.dd-fb-bar { position:fixed; right:16px; bottom:16px; display:flex; flex-direction:column; gap:6px; align-items:stretch; background:var(--bg); border:1px solid var(--line); border-radius:10px; padding:8px 12px; box-shadow:0 2px 10px rgba(0,0,0,.15); font-size:13px; z-index:50; }
+.dd-fb-row { display:flex; gap:8px; align-items:center; justify-content:space-between; }
+.dd-fb-bar button { cursor:pointer; border:1px solid var(--link); background:var(--link); color:#fff; border-radius:6px; padding:5px 10px; font-size:13px; }
+.dd-fb-bar .dd-badge { font-weight:700; }
+.dd-fb-file { cursor:pointer; font-size:11px; color:var(--mid); white-space:nowrap; }
+.dd-fb-file code { font-size:11px; }
+.dd-fb-file:hover code { color:var(--link); }
+.dd-toast { position:fixed; right:16px; bottom:64px; background:var(--ink); color:var(--bg); padding:8px 12px; border-radius:8px; font-size:13px; z-index:60; opacity:0; transition:opacity .2s; }
+.dd-toast.show { opacity:1; }
+.dd-sme-feedback ol li { margin: 6px 0; }
+@media print { .dd-note-btn, .dd-note-box, .dd-fb-bar, .dd-toast, .dd-sme-feedback, .dd-sme-divider { display:none !important; } }
+@page { size: Letter; margin: 0.6in 0.62in 0.55in 0.62in; }
+@media print {
+:root, :root[data-theme="dark"], :root[data-theme="light"] { color-scheme: light; --ink:#1a1a1a; --mid:#555; --line:#bdbdbd; --fill:#eee; --faint:#f6f6f6; --bg:#fff; --link:#0a58ca; }
+html { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+body { font: 10.5px/1.45 "Segoe UI", system-ui, Arial, sans-serif; }
+main { max-width: 7.2in; margin: 0 auto; padding: 0 0 0 0.62in; position: relative; }
+h1 { font-size: 21px; margin: 0 0 2px; letter-spacing:-0.2px; }
+h2 { font-size: 14px; margin: 16px 0 8px; padding-bottom:4px; border-bottom: 2px solid var(--ink); text-transform: uppercase; letter-spacing: 0.6px; }
+h3 { font-size: 11.5px; margin: 13px 0 5px; padding-bottom:2px; border-bottom:1px solid var(--line); }
+h4,h5,h6 { font-size: 10.5px; margin: 9px 0 4px; }
+p { margin: 6px 0; }
+a { color: inherit; text-decoration: underline; }
+code { font-size: 9.2px; padding: 0 2px; border-radius: 2px; }
+table { display: table; width:100%; margin: 7px 0; font-size: 9.1px; overflow-x: visible; }
+th, td { padding: 3px 5px; }
+th { background: var(--fill); }
+td code, th code { background: transparent; padding: 0; }
+pre { font-size: 8.4px; line-height: 1.35; padding: 7px 9px; margin: 7px 0; white-space: pre; overflow: hidden; border-radius: 3px; }
+pre.sql { background:#fbfbfb; }
+blockquote { margin: 7px 0; padding: 2px 10px; border-left: 3px solid var(--line); break-inside: avoid; }
+ul,ol { margin: 6px 0 6px 16px; padding: 0; } li { margin: 3px 0; }
+hr { margin: 10px 0; }
+h2, h3, table, pre { break-inside: avoid; }
+
+/* L6 paper HITL: each anchored block sits in the left gutter (main's own padding-left,
+   reserved above) so a printed page carries the anchor id beside its section — no @page
+   margin-box support required, so headless Chromium print-to-pdf renders it reliably. */
+h1, h2, h3, h4, h5, h6, p, table, pre, ul, ol, blockquote { position: relative; }
+.dd-margin-tag {
+  display: block; position: absolute; left: -0.6in; top: 0.1em; width: 0.54in;
+  font: 6.2px/1.15 "Cascadia Mono","Consolas",monospace; text-align: right;
+  color: var(--mid); letter-spacing: 0.1px; word-break: break-word;
+}
+/* Rev/commit footer: `position: fixed` repeats on every printed page in Chromium's
+   headless print-to-pdf (the standard running-footer technique) without needing CSS
+   Paged-Media margin-box content(), which Chromium supports only partially. */
+.dd-print-footer {
+  display: block; position: fixed; left: 0.62in; right: 0.62in; bottom: 0.12in;
+  font-size: 8px; color: var(--mid); text-align: center;
+  border-top: 1px solid var(--line); padding-top: 3px;
+}
+}
+</style>
+</head>
+<body>
+<main>
+<h1>Runbook — operate <code>drydocs-core</code>: env roots, schema provisioning, the vocabulary registry, run logs</h1>
+<ul id="front-matter"><span class="dd-margin-tag" aria-hidden="true">front-matter</span><li><strong>Module:</strong> drydocs-core — this runbook IS the module runbook for drydocs-core (V1 coverage rule). The mapping-store runbook covers ONE artifact of this module (<code>var/mapping.db</code>) and says so; everything else in core lives here.</li><li><strong>Status:</strong> DESCRIPTIVE — documents the working procedure. <strong>Rev 1, 2026-08-04</strong>, authored at commit <code>416d217</code> (post-S5 fragment directories, post-G51 <code>ddschema</code>, post-G54 exec-aware provisioning).</li><li><strong>Classification:</strong> Internal-Public (mechanism only — env-var NAMES, default paths and synthetic values; NO credentials, no company values. The one rule that keeps it that way: this runbook names variables, never their contents)</li><li><strong>Audience:</strong> anyone configuring a DryDocs environment, provisioning the databases, or asked &quot;why did that loader see nothing?&quot; — the answer is usually one of the four surfaces below</li><li><strong>Companion:</strong> <code>drydocs_core/schema/provisioning/README.md</code> (the provisioning scripts this section points at), <code>docs/design/drydocs-mapping-store-runbook.md</code> (the SQLite materialization), <code>docs/design/drydocs-startup-refresh-runbook.md</code> (the SYSTEM-level cold start that calls into all of this), <code>docs/design/drydocs-api-runbook.md</code> (the reader), <code>docs/RELATIONSHIP_GUIDE.md</code> (how a vocabulary entry is authored)</li></ul>
+<h2 id="purpose-scope"><span class="dd-margin-tag" aria-hidden="true">purpose-scope</span>Purpose &amp; scope</h2>
+<p><strong>Purpose.</strong> Operate the four surfaces of <code>drydocs-core</code> that an SME or operator actually touches: <strong>where configuration comes from</strong>, <strong>how the databases and schema get provisioned</strong>, <strong>what the relationship-vocabulary registry guarantees</strong>, and <strong>where the run logs are</strong> when something needs reviewing.</p>
+<p><strong>Why it reads the way it does.</strong> Core is a library — it has no server to start and no chain of its own to run. Its failure modes are therefore almost never exceptions; they are <strong>silence</strong>: a loader that writes nothing, a MATCH that finds nothing, a log that was written somewhere you did not look. Each section below is organised around the silence it prevents rather than around the code.</p>
+<p><strong>In scope.</strong> <code>Neo4jSettings</code> and the env roots (<code>DRYDOCS_DATA_ROOT</code>, <code>DRYDOCS_LOGDIR</code>); the databases + constraints + ontology seed and when to re-apply them; the relationship-vocabulary registry and its guards; the run-log family; and the YAML fragment-directory contract that S5 introduced.</p>
+<p><strong>Out of scope.</strong> <code>var/mapping.db</code> (its own runbook); the loaders and the CLI load chain (startup/refresh runbook, <code>drydocs-load</code>); serving anything over HTTP (<code>drydocs-api</code>); authoring a NEW relationship type — that is an ontology decision through <code>docs/RELATIONSHIP_GUIDE.md</code> and the HITL gate, not an operation.</p>
+<h2 id="prerequisites"><span class="dd-margin-tag" aria-hidden="true">prerequisites</span>Prerequisites</h2>
+<ul><li><strong>Python toolchain:</strong> <code>poetry install</code> (the default group; the API group is optional and belongs to <code>drydocs-api</code>).</li><li><strong>A Neo4j ENTERPRISE DBMS</strong> for anything that provisions. Multi-database and composite are Enterprise-only; Community allows exactly one user database and cannot host the topology at all.</li><li><strong><code>.env</code> at the repo root</strong> — NAMES only here:</li></ul>
+<table><thead><tr><th>Variable</th><th>Default</th><th>What it decides</th></tr></thead><tbody><tr><td><code>NEO4J_URI</code></td><td><code>bolt://localhost:7687</code></td><td>which DBMS</td></tr><tr><td><code>NEO4J_USER</code></td><td><code>neo4j</code></td><td>—</td></tr><tr><td><code>NEO4J_PASSWORD</code></td><td>(none)</td><td>read server-side, never in a request</td></tr><tr><td><code>NEO4J_DATABASE</code></td><td>unset</td><td><strong>which database a verb writes to</strong></td></tr><tr><td><code>DRYDOCS_DATA_ROOT</code></td><td><code>~/data/DryDocs</code></td><td>out-of-repo source payloads</td></tr><tr><td><code>DRYDOCS_LOGDIR</code></td><td><code>~/logs/DryDocs</code></td><td>where every run log lands</td></tr><tr><td><code>DRYDOCS_CALLER</code></td><td>—</td><td>the <code>script:</code> stamp in a log header</td></tr></tbody></table>
+<p><code>DRYDOCS_LOGDIR</code> falls back to <code>SPIDERP_LOGDIR</code>, and <code>DRYDOCS_CALLER</code> to <code>SPIDERP_CALLER</code> — the Oracle path&#x27;s original names, kept deliberately so an existing scheduled job keeps working. If logs are &quot;missing&quot;, check the legacy name before concluding nothing ran.</p>
+<ul><li><strong><code>NEO4J_DATABASE</code> is the one worth double-checking.</strong> Left unset, writes land in the EE home database <code>neo4j</code>, which is NOT part of the ADR 0002 topology — the load succeeds and no query surface ever looks there. <code>config/dev-environment.yaml</code> carries the warning in the same words.</li></ul>
+<h2 id="startup"><span class="dd-margin-tag" aria-hidden="true">startup</span>Startup</h2>
+<p>Core has no process. &quot;Startup&quot; is bringing a fresh DBMS to the point where loaders can run.</p>
+<ol><li><strong>Provision the topology</strong> (databases + composite + proxy constraints). This is the provisioning README&#x27;s procedure, not repeated here: ``<code>powershell .\drydocs_core\schema\provisioning\provision.ps1 -Password &lt;pw&gt; </code>`<code> Since G54 the script is exec-aware: no host </code>cypher-shell<code> needed, it falls back to </code>docker cp<code> + </code>docker exec<code> and reads the container name from </code>config/dev-environment.yaml<code>. Success: it prints the transport it chose, then </code>OK  G1 topology provisioned + smoke passed`.</li></ol>
+<ol><li><strong>Confirm connectivity and APOC:</strong> ``<code>powershell poetry run drydocs check </code>`<code> Success: server version, then </code>APOC OK.<code> APOC is load-bearing — </code>bootstrap` refuses without it, and it was silently absent for weeks once (2026-07-28) because the plugin was requested by env var instead of mounted.</li></ol>
+<ol><li><strong>Apply constraints + the ontology seed:</strong> ``<code>powershell poetry run drydocs bootstrap </code>`` Idempotent. Success: constraints applied with a non-zero count — a &quot;Constraints applied.&quot; with zero constraints is the D8 defect, not a clean run.</li></ol>
+<ol><li><strong>Apply the schema meta-graph</strong> (its own database, <code>ddschema</code>): ``<code>powershell poetry run drydocs bootstrap-schema-graph </code>`<code> Success: </code>Schema meta-graph applied to &#x27;ddschema&#x27; (N label nodes)`. It guards on zero and exits 2, so a silent no-op cannot pass.</li></ol>
+<ol><li><strong>Apply the ontology supplements</strong> — ONE ordered chain, never the per-file verbs: ``<code>powershell poetry run drydocs apply-supplements </code>`<code> Success: a table with </code>Declared terms<code>, </code>Verified<code> and </code>OK yes<code> per supplement. The order is load-bearing (catalog reuses classes </code>seal<code> declares) and lives in one place, </code>drydocs_core/schema/supplements.py`.</li></ol>
+<h2 id="refresh-ingest"><span class="dd-margin-tag" aria-hidden="true">refresh-ingest</span>Refresh / ingest</h2>
+<p>Core is not ingested. What changes underneath it, and what to do:</p>
+<ul><li><strong>A config or vocabulary edit</strong> — nothing to re-run for core itself. Consumers re-read on next use, and <code>var/mapping.db</code> rebuilds itself on source-hash drift.</li><li><strong>A supplement edit</strong> — re-run <code>apply-supplements</code>. It is idempotent and it VERIFIES: every <code>:OntologyTerm</code> IRI a file declares is checked for presence afterwards, so a supplement that runs and seeds nothing FAILS the command instead of surfacing later as an empty loader MATCH. That verification is the whole reason the chain exists.</li><li><strong>A constraints edit</strong> — re-run <code>bootstrap</code>. Idempotent; a same-name re-declare succeeds and does nothing, which is the trap worth knowing: to CHANGE a constraint you must DROP it first, or the re-declare silently leaves the old one in place.</li><li><strong>A schema/label change</strong> — re-run <code>bootstrap-schema-graph</code> so the meta-graph matches.</li><li><strong>The fragment directories (S5).</strong> <code>relationship_vocabulary/</code> and <code>config/taxonomy-ontology-map/</code> are DIRECTORIES merged in lexical filename order (<code>00-header</code>, <code>10-node-classifications</code>, … <code>4x-local-*</code>). Adding a domain means adding a file, not editing a monolith. A duplicate key ACROSS fragments is a hard error, not last-one-wins — <code>FragmentSourceError</code> names both files.</li></ul>
+<h2 id="verify"><span class="dd-margin-tag" aria-hidden="true">verify</span>Verify</h2>
+<p><strong>1. Configuration resolves where you think it does</strong> — this answers most &quot;it wrote nothing&quot; reports:</p>
+<pre class="powershell"><code>poetry run python -c &quot;from drydocs_core.config import Neo4jSettings; from drydocs_core.data_root import resolve_data_root; from drydocs_core.run_log import resolve_log_dir; s = Neo4jSettings(); print(&#x27;uri     :&#x27;, s.uri); print(&#x27;database:&#x27;, s.database or &#x27;(UNSET -&gt; EE home db neo4j, NOT the topology)&#x27;); print(&#x27;data    :&#x27;, resolve_data_root()); print(&#x27;logs    :&#x27;, resolve_log_dir())&quot;</code></pre>
+<p>Prints no secret — <code>password</code> is a <code>SecretStr</code> and is not in the output.</p>
+<p><strong>2. The topology exists and is online:</strong></p>
+<pre class="cypher"><code>SHOW DATABASES YIELD name, type, currentStatus;</code></pre>
+<p>Expect <code>drydocs</code>, <code>ddlineage</code>, <code>ddcontext</code>, <code>ddschema</code> (standard) and <code>ddall</code> (composite), all <code>online</code>. The canonical list is <code>config/dev-environment.yaml</code>, and <code>tests/unit/test_dev_environment.py</code> holds it BIDIRECTIONALLY against <code>01_databases.cypher</code> — a database in one and not the other fails the suite.</p>
+<p><strong>3. The vocabulary registry is coherent.</strong> These are guards, so run them rather than reading the file:</p>
+<pre class="powershell"><code>poetry run pytest tests/unit/test_schema.py -q</code></pre>
+<p>They pin: every ACTIVE entry is declared in a supplement, the PROV matrix is complete, no duplicate ids across fragments, and every entry has an inverse label. An <code>active</code> entry with no supplement is the failure that matters — it means a loader can MATCH a term nothing seeds.</p>
+<p><strong>4. The run logs landed:</strong></p>
+<pre class="powershell"><code>Get-ChildItem (poetry run python -c &quot;from drydocs_core.run_log import resolve_log_dir; print(resolve_log_dir())&quot;) -Filter *.log | Sort-Object LastWriteTime -Descending | Select-Object -First 5</code></pre>
+<p>Names are <code>&lt;kind&gt;.&lt;name&gt;.&lt;YYYYmmdd-HHMMSS&gt;[-N].log</code> — loader runs use kind <code>load</code>. Each carries a header (date, script, loader, run id, source, target, os user, batch size) and a summary footer with <code>rows_processed / rows_rejected / rows_changed / status</code>.</p>
+<p><strong>5. Everything at once:</strong> <code>poetry run pytest -q</code> — core carries the largest share of the suite, and it is hermetic (no Neo4j needed).</p>
+<h2 id="rollback"><span class="dd-margin-tag" aria-hidden="true">rollback</span>Rollback</h2>
+<ul><li><strong>Config:</strong> revert the <code>.env</code> edit; nothing is cached across a process.</li><li><strong>Supplements, constraints, the meta-graph:</strong> all idempotent — re-running IS the rollback for a partial apply. The exception is a constraint whose DEFINITION changed: drop it explicitly first, because a same-name re-declare is a silent no-op.</li><li><strong>Vocabulary/config edits:</strong> git. They are committed text and that is the point — <code>var/mapping.db</code> and the graph are both derived from them, so reverting the file and re-running is a complete rollback with no migration step.</li><li><strong>A bad graph load:</strong> not this runbook&#x27;s — see the startup/refresh runbook and the loader&#x27;s own soft-delete/sweep mechanics. Core provides the schema, not the data.</li><li><strong>Destructive last resort:</strong> dropping and re-provisioning a database. Blast radius is that database&#x27;s entire contents, and for <code>drydocs</code> that is the whole estate load — budget a full re-ingest, and check <code>v_open_drafts</code> in <code>var/mapping.db</code> first if the console has unpromoted work.</li></ul>
+<h2 id="troubleshooting"><span class="dd-margin-tag" aria-hidden="true">troubleshooting</span>Troubleshooting</h2>
+<table><thead><tr><th>Symptom</th><th>Diagnosis</th><th>Fix</th></tr></thead><tbody><tr><td>A loader ran, reported OK, and the graph is empty</td><td><code>NEO4J_DATABASE</code> unset → wrote to the EE home db <code>neo4j</code>, outside the topology</td><td>set it to a topology database (normally <code>drydocs</code>) and re-run</td></tr><tr><td><code>bootstrap</code> refuses: &quot;APOC required&quot;</td><td>APOC absent — usually requested via <code>NEO4J_PLUGINS</code> (a download at startup) instead of mounted from the image</td><td>mount the plugins volume per the provisioning header; <code>drydocs check</code> confirms</td></tr><tr><td>&quot;Constraints applied.&quot; with zero constraints</td><td>the D8 defect — a silent no-op reported as success</td><td>check the guard; a real apply reports a count</td></tr><tr><td>A loader MATCHes nothing and rejects nothing</td><td>a supplement did not seed its terms</td><td><code>apply-supplements</code> — it verifies declared IRIs and fails loudly; never the per-file verbs, which is how <code>registry</code> was omitted for weeks</td></tr><tr><td>A constraint change did not take effect</td><td>same-name re-declare succeeds and does nothing</td><td>DROP it first, then create</td></tr><tr><td><code>FragmentSourceError: duplicate key</code></td><td>the same id in two fragments of one directory (S5)</td><td>the message names both files; ids are unique across the whole directory, not per file</td></tr><tr><td>Logs &quot;missing&quot;</td><td><code>DRYDOCS_LOGDIR</code> unset and <code>SPIDERP_LOGDIR</code> set, or vice versa</td><td>resolve it with the Verify step 1 one-liner rather than guessing</td></tr><tr><td><code>provision.ps1</code>: cypher-shell not found</td><td>pre-G54 script, or <code>-Container</code> unresolvable</td><td>current script auto-falls back to docker exec; check <code>neo4j.container</code> in <code>config/dev-environment.yaml</code></td></tr><tr><td>Enterprise-only feature refused</td><td>Community edition</td><td>the topology needs Enterprise; see backlog G53 for the single-DB contingency</td></tr></tbody></table>
+<h2 id="contacts-escalation"><span class="dd-margin-tag" aria-hidden="true">contacts-escalation</span>Contacts &amp; escalation</h2>
+<p>Mechanism only; no on-call rota. The line that matters: <strong>anything that changes what an edge MEANS is not an operation.</strong> A new relationship type, a status flip from <code>planned</code> to <code>active</code>, a new node classification — all route through <code>docs/RELATIONSHIP_GUIDE.md</code>, the relationship-vocabulary registry, and the HITL gate (<code>docs/restructure/03-hitl-sme-flow.md</code>). Applying a supplement is operational; deciding what it declares is not. Provisioning topology decisions are ADR-governed (ADR 0002 and its amendments) — a database is added by amending the ADR and <code>01_databases.cypher</code> together, never by hand on a live DBMS.</p>
+<h2 id="appendices"><span class="dd-margin-tag" aria-hidden="true">appendices</span>Appendices</h2>
+<p><strong>A. The four env roots and their fallbacks</strong> — the fallbacks exist so pre-rename scheduled jobs keep working, and they are the reason a path can look &quot;wrong&quot;:</p>
+<table><thead><tr><th>Resolver</th><th>Chain</th></tr></thead><tbody><tr><td><code>resolve_data_root()</code></td><td><code>DRYDOCS_DATA_ROOT</code> → <code>~/data/DryDocs</code></td></tr><tr><td><code>resolve_log_dir()</code></td><td><code>DRYDOCS_LOGDIR</code> → <code>SPIDERP_LOGDIR</code> → <code>~/logs/DryDocs</code></td></tr><tr><td><code>caller_stamp()</code></td><td><code>DRYDOCS_CALLER</code> → <code>SPIDERP_CALLER</code> → derived</td></tr><tr><td><code>Neo4jSettings</code></td><td>env prefix <code>NEO4J_</code>, then the defaults in the Prerequisites table</td></tr></tbody></table>
+<p><strong>B. The supplement chain</strong>, in its load-bearing order — the single source is <code>drydocs_core/schema/supplements.py</code>, and this table is a copy that can go stale:</p>
+<p><code>base</code> → <code>seal</code> → <code>catalog</code> → <code>registry</code>, plus <code>sosa</code> (opt-in, <code>--with-sosa</code>).</p>
+<p>Re-derive rather than trust:</p>
+<pre class="powershell"><code>poetry run python -c &quot;from drydocs_core.schema.supplements import SUPPLEMENTS; print([(s.name, s.filename) for s in SUPPLEMENTS])&quot;</code></pre>
+<p><strong>C. Vocabulary fragment directory</strong> (S5): <code>drydocs_core/ontology/relationship_vocabulary/</code> — <code>00-header</code>, <code>10-node-classifications</code>, <code>20-property-terms</code>, <code>30-prov-matrix</code>, then <code>4x-local-&lt;domain&gt;</code>. Merged in lexical filename order; ids unique across the directory.</p>
+<hr class="dd-sme-divider">
+<section class="dd-sme-feedback" aria-label="SME - Feedback">
+<h2>SME - Feedback</h2>
+<p>How to return your notes on this document:</p>
+<ol>
+<li>Click the <strong>✎</strong> button beside any section (or numbered step) and type your note — notes save in your browser as you type.</li>
+<li>When finished, click <strong>Copy feedback</strong> in the bottom-right toolbar. Your notes are copied as anchor-keyed YAML.</li>
+<li>Create the feedback file (it is YAML, <em>not</em> markdown) — <strong>Copy To:</strong> <code>docs/design/feedback/</code> · <strong>File Name:</strong> <code>drydocs-core-runbook-rev1.yaml</code></li>
+<li>Paste the copied block into that file, save, and commit (or send the file back to the team).</li>
+</ol>
+</section>
+</main>
+<footer class="dd-print-footer">Rev 1 · commit 416d217</footer>
+<script>
+
+(function(){
+  var DOC="drydocs-core-runbook", FILE="drydocs-core-runbook-rev1.yaml", DIR="docs/design/feedback/", KEY="drydocs-doc-feedback:"+DOC;
+  function load(){ try{return JSON.parse(localStorage.getItem(KEY)||"{}");}catch(e){return {};} }
+  function save(){ localStorage.setItem(KEY, JSON.stringify(state)); }
+  var state=load(), badge;
+  function count(){ return Object.keys(state).filter(function(k){return (state[k]||"").trim();}).length; }
+  function refresh(){ if(badge) badge.textContent=count(); }
+  function toast(msg){ var t=document.createElement("div"); t.className="dd-toast"; t.textContent=msg; document.body.appendChild(t); requestAnimationFrame(function(){t.classList.add("show");}); setTimeout(function(){t.classList.remove("show"); setTimeout(function(){t.remove();},250);},1600); }
+  function exportYaml(){
+    var lines=["# design-doc feedback — paste into docs/design/feedback/"+DOC+"-rev<N>.yaml","doc: "+DOC,"notes:"];
+    Object.keys(state).forEach(function(a){
+      var note=(state[a]||"").replace(/\r/g,""); if(!note.trim()) return;
+      lines.push("  - anchor: "+a); lines.push("    note: |");
+      note.split("\n").forEach(function(l){ lines.push("      "+l); });
+    });
+    return lines.join("\n")+"\n";
+  }
+  function attach(el){
+    var id=el.id;
+    var btn=document.createElement("button"); btn.className="dd-note-btn"; btn.type="button"; btn.textContent="✎"; btn.title="Annotate #"+id;
+    var box=document.createElement("div"); box.className="dd-note-box"; box.style.display=(state[id]||"").trim()?"block":"none";
+    var ta=document.createElement("textarea"); ta.value=state[id]||""; ta.setAttribute("placeholder","note for #"+id+" …");
+    ta.addEventListener("input",function(){ state[id]=ta.value; save(); refresh(); el.classList.toggle("dd-annotated", !!ta.value.trim()); });
+    if((state[id]||"").trim()) el.classList.add("dd-annotated");
+    box.appendChild(ta);
+    btn.addEventListener("click",function(){ box.style.display=box.style.display==="none"?"block":"none"; if(box.style.display==="block") ta.focus(); });
+    if(el.tagName==="LI"){ el.insertAdjacentElement("afterbegin", btn); el.appendChild(box); }
+    else { el.insertAdjacentElement("afterend", box); el.insertAdjacentElement("beforebegin", btn); }
+  }
+  function copyText(txt, ok){
+    var done=function(){toast(ok);};
+    var fallback=function(){ var t=document.createElement("textarea"); t.value=txt; document.body.appendChild(t); t.select(); try{document.execCommand("copy"); toast(ok);}catch(e){toast("copy failed — select the box");} t.remove(); };
+    if(navigator.clipboard&&navigator.clipboard.writeText){ navigator.clipboard.writeText(txt).then(done,fallback); } else { fallback(); }
+  }
+  function fileLine(label, value){
+    var d=document.createElement("div"); d.className="dd-fb-file"; d.title="click to copy";
+    var c=document.createElement("code"); c.textContent=value;
+    d.appendChild(document.createTextNode(label+" ")); d.appendChild(c);
+    d.addEventListener("click",function(){ copyText(value, label.replace(":","")+" copied"); });
+    return d;
+  }
+  document.addEventListener("DOMContentLoaded",function(){
+    document.querySelectorAll("main [id]").forEach(attach);
+    var bar=document.createElement("div"); bar.className="dd-fb-bar";
+    var row=document.createElement("div"); row.className="dd-fb-row";
+    var lbl=document.createElement("span"); lbl.innerHTML='notes <span class="dd-badge">0</span>'; badge=lbl.querySelector(".dd-badge");
+    var ex=document.createElement("button"); ex.type="button"; ex.textContent="Copy feedback";
+    ex.addEventListener("click",function(){ copyText(exportYaml(), "feedback copied — create "+DIR+FILE); });
+    row.appendChild(lbl); row.appendChild(ex);
+    bar.appendChild(row);
+    bar.appendChild(fileLine("file:", FILE));
+    bar.appendChild(fileLine("path:", DIR+FILE));
+    document.body.appendChild(bar); refresh();
+  });
+})();
+
+</script>
+</body>
+</html>
