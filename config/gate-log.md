@@ -1405,3 +1405,25 @@ rename of the frozen names.
 | B2/B3 the contested row | **B2 — `source_updated_by` → `dct:contributor`**, with the imprecision recorded in the entry note (DCMI defines no "modifier"; nearest term, same vocabulary family as the trio). |
 | C1/C2 registry home | **C1 — a new `property_terms` section in `relationship_vocabulary.yaml`** — the file already carries node_classifications, so it is the ontology registry; one file for the mapper agent and the drift guards. |
 | D1–D2 consequences | **CONFIRMED** — `dct:` (http://purl.org/dc/terms/) registered in namespaces.py + the ontology.cypher comment sync; `reference/standards/dcmi-terms/` stub added; drift guards extend (every envelope property carries a binding; every binding CURIE expands via `namespaces.expand()`). |
+
+
+## 2026-08-04 — RECORD: `ddlineage` retired from the deployed topology (X1; user ruling in-chat, 2026-08-04)
+
+- **What this records:** the in-chat user ruling of 2026-08-04 retiring `ddlineage`
+  from the provisioned topology, and its enactment path (Epic X). A record on the G51
+  idiom — direction, not a gate session: no ontology edge, no vocabulary status
+  change, zero writes to `drydocs`. ADR 0002 carries the dated amendment; the ADR's
+  own residency clause routes topology change through an amendment, and this entry is
+  the record it points at.
+- **The evidence acted on (standing since G30, re-confirmed at the same-day census):**
+  nothing writes `ddlineage` (writer pinned to `drydocs` with `TrustBoundaryError`,
+  D2) and nothing reads it (the four specs repointed at G30; the read-set allow-list
+  excludes it; `test_database_names.py` proves read targets have writers). Its only
+  remaining function was to exist empty on every host — the exact gap the G28 and G30
+  drift classes grew in.
+- **What stays deferred:** the proxy-node-spine design question transfers intact to
+  the residency clarification's named revisit trigger. Reopening now recreates the
+  database (one DDL line + the `ddall` alias) instead of finding it waiting.
+- **Enactment owned by:** X2 (live-surface repo sweep + port-ledger company caution —
+  their `ddlineage` drops by their hand), X3/X4 (per-machine drops behind zero-node
+  emptiness probes; a non-empty probe stops as a defect report).

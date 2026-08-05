@@ -526,6 +526,15 @@
       ]
     },
     {
+      "kind": "log-entry",
+      "date": "2026-08-04",
+      "title": "RECORD: `ddlineage` retired from the deployed topology (X1; user ruling in-chat, 2026-08-04)",
+      "status": "recorded",
+      "prompt_files": [],
+      "log_ref": "config/gate-log.md:1410",
+      "unblocks": []
+    },
+    {
       "kind": "prompt-only",
       "date": null,
       "title": "bmc-docs-example (gate page rendered — session not yet run)",

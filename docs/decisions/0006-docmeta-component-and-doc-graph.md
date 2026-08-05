@@ -35,7 +35,10 @@ Two facts changed since the plan was written:
    `HAS_CHUNK` list predates this.
 2. **The live database naming convention is `dd*`.** The deployed multi-DB
    topology (G6/G7) runs `drydocs`, `ddlineage`, `ddcontext`, `ddall` — the
-   plan's working name `drydocs_docs` predates the deploy.
+   plan's working name `drydocs_docs` predates the deploy. (Enumeration as of
+   this ADR's date, not a live census: `ddschema` was added 2026-08-03 (ADR
+   0002 G51 amendment) and `ddlineage` retired 2026-08-04 (ADR 0002 X1
+   amendment) — the convention point stands.)
 
 ## Decision
 

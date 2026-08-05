@@ -231,6 +231,45 @@ count it. Provisioned in `01_databases.cypher` at G51 — which also widened
 `test_database_names.py`'s guard after `SCHEMA_GRAPH_DATABASE` walked past its
 exact-identifier match while naming a database nothing created.
 
+## Topology amendment (2026-08-04, backlog X1) — `ddlineage` retired
+
+**D1 loses the database it never asked for.** User ruling 2026-08-04 (in-chat, recorded
+in `config/gate-log.md`): `ddlineage` is removed from the provisioned topology. The
+deployed set becomes **`drydocs`, `ddcontext`, `ddall`, `ddschema`**. This supersedes
+the residency clarification's closing disposition ("stays provisioned and aliased into
+`ddall`, documented as provisioned-for-later") — that section otherwise stands as
+written, and the history above it is not rewritten.
+
+**The standing evidence, unchanged since G30 and merely acted on now:** nothing writes
+`ddlineage` and nothing reads it. The lineage writer pins `DATABASE = "drydocs"` and
+raises `TrustBoundaryError` on any other binding (D2, asserted structurally per
+0002-C §5); the four reader specs were repointed to `drydocs` at G30; the
+`drydocs_api` read-set allow-list deliberately excludes it; and
+`tests/unit/test_database_names.py` proves every read target has a writer. Since G30
+its only function has been to exist, empty, on every provisioned host — a standing
+invitation for the next drift class (G28's `drydocs_deepdoc.DATABASE` and the G30 spec
+drift both grew in exactly this gap between "provisioned" and "used").
+
+**What retirement answers — and what it deliberately does not.** It answers where the
+database went. It does **not** answer the residency clarification's deferred design
+question (a `:ControlMJob` proxy-node spine in a lineage database, and a redefinition
+of "the M3 load owns those nodes"); that question transfers intact to the named
+revisit trigger, which stands: if component-per-database proves out at `dddocs` and
+lineage grows a proxy spine of its own, reopen — through the SME gate, as an
+amendment. The only change to the reopening cost is direction: it now *recreates* the
+database (one `CREATE DATABASE ... IF NOT EXISTS` plus the `ddall` alias line) rather
+than finds it waiting. The ADR's own accounting priced this: "`ddlineage` is empty, so
+choosing it later costs a design, not a data migration" — an empty database was never
+the expensive part, and keeping one provisioned bought nothing the DDL diff doesn't.
+
+**Enactment (owned by the Epic X items, not this record):** X2 sweeps the repo's live
+surfaces (provisioning DDL + `ddall` alias, the CLI sweep tuple, the
+`test_database_names.py` topology anchor 5 → 4, renders, and the port-ledger step
+carrying the company-side caution — their `ddlineage` exists live and drops on their
+side, by their hand). X3/X4 drop it per machine, each behind a zero-node emptiness
+probe: a non-empty probe is a defect report, not a cleanup, because it would mean
+something wrote a database nothing should write.
+
 ## Follow-up (small, bounded)
 
 1. **Provision now:** `drydocs_context` (writable) and the `drydocs_all` composite with constraints/
