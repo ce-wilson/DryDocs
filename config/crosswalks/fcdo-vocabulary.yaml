@@ -11,15 +11,14 @@
 # ADR 0008 rule 3) deliberately skips it — nothing resolves native job concepts
 # through this file.
 #
-# STOP AT THE GATE: this whole file is `status: proposed`. Nothing here changes
-# the ontology, activates the `fcdo-frameworks` corpus, or authorizes a graph
-# write. Rows become confirmed only through the HITL gate
-# (docs/restructure/03-hitl-sme-flow.md; gate spec:
-# config/gate-prompts/fcdo-crosswalk.yaml) with a config/gate-log.md entry.
-# Rows whose evidence sits in a known capture hole are `blocked-on-recapture`
-# and MUST NOT be signed until the registered `fcdo-frameworks` scrape
-# (config/doc-source-registry.yaml) recaptures the missing framework pages —
-# absence from the transcript is not absence from their standard.
+# GATE DISPOSITION: SIGNED OFF 2026-08-05 (gate fcdo-crosswalk, 13/13,
+# config/gate-log.md) — rows 1-4, 6-8 confirmed. Row 5 stays
+# `blocked-on-recapture`: it was signed NEITHER WAY and MUST NOT flip until
+# the registered `fcdo-frameworks` scrape (config/doc-source-registry.yaml)
+# recaptures the Descriptive Metadata Framework — absence from the transcript
+# is not absence from their standard. Confirming this crosswalk changed no
+# ontology term, activated no corpus, and authorized no graph write; the SME
+# noted corpus activation as under consideration, a separate registry decision.
 #
 # classification: Internal-Public — mechanism-only. Standard CURIEs only
 # (prov:, dcat:, skos:, adms:, rdfs:, the public OpenLineage spec); no internal
@@ -27,21 +26,21 @@
 # =============================================================================
 
 schema: drydocs.vocab-crosswalk.v1
-updated: 2026-08-05
+updated: 2026-08-05                     # same-day sign-off: drafted (W1) and gated in one session
 id: fcdo-vocabulary
 local: drydocs
 counterpart: fcdo-frameworks            # config/doc-source-registry.yaml corpus id
 classification: Internal-Public
 narrative_ref: internal/fcdo-reference/ALIGNMENT-PLAN.md
 gate_spec: config/gate-prompts/fcdo-crosswalk.yaml
-status: proposed                        # flips only via the fcdo-crosswalk gate (gate-log entry)
+status: confirmed                       # gate fcdo-crosswalk SIGNED OFF 2026-08-05 (config/gate-log.md); row 5 excluded
 
 rows:
   - n: 1
     drydocs: "ControlMJob (dd:ControlMJob, prov:Activity)"
     fcdo: "OpenLineage Job (prov:Activity)"
     fidelity: exact
-    status: proposed
+    status: confirmed
     note: >
       Type-identical today: their Council-approved ETL model classes the
       OpenLineage Job as prov:Activity, exactly how the relationship
@@ -53,7 +52,7 @@ rows:
     drydocs: "JobRun (dd:JobRun, loader-run activity) / planned ControlMJobRun (dd:ControlMJobRun)"
     fcdo: "OpenLineage Run (prov:Activity)"
     fidelity: exact
-    status: proposed
+    status: confirmed
     note: >
       Both our run labels are prov:Activity, matching their Run classing.
       dd:JobRun (a loader execution) and the planned dd:ControlMJobRun (an
@@ -71,7 +70,7 @@ rows:
     drydocs: "DataAsset (dcat:Dataset)"
     fcdo: "Dataset (dcat:Dataset)"
     fidelity: exact
-    status: proposed
+    status: confirmed
     note: >
       Identical: both sides class the dataset concept as dcat:Dataset. Our
       planned DataAsset (the D1 proxy-URN node) needs no rename or reshape.
@@ -80,7 +79,7 @@ rows:
     drydocs: "READS_FROM / WRITES_TO (planned; prov:used / prov:generated)"
     fcdo: "prov:used / prov:wasGeneratedBy on the Run"
     fidelity: approximate
-    status: proposed
+    status: confirmed
     note: >
       Same PROV predicates, DIFFERENT GRAIN — record both. Their mandate
       hangs dataset I/O on the Run (each execution used / generated the
@@ -111,7 +110,7 @@ rows:
     drydocs: "Vocabulary/mapping lifecycle states (planned / active / superseded ...)"
     fcdo: "adms:status concept scheme (Proposed -> Approved/Rejected -> Deprecated -> Retired)"
     fidelity: approximate
-    status: proposed
+    status: confirmed
     note: >
       DOCUMENTATION-ONLY equivalence: planned ~ Proposed, active ~ Approved,
       superseded/retired ~ Deprecated/Retired. Records how our lifecycle
@@ -123,7 +122,7 @@ rows:
     drydocs: "SUBCLASS_OF / MAPS_TO meta-graph (OntologyTerm anchors)"
     fcdo: "rdfs:subClassOf / rdfs:subPropertyOf upper-ontology bridging"
     fidelity: exact
-    status: proposed
+    status: confirmed
     note: >
       Already equivalent: our SUBCLASS_OF / MAPS_TO edges onto seeded
       OntologyTerm anchors are their recommended rdfs:subClassOf /
@@ -133,7 +132,7 @@ rows:
     drydocs: "RECONCILES_TO {confidence} (CatalogLOB -> BusinessSegment)"
     fcdo: "skos:closeMatch + a firm-namespace mappingConfidence property (0-1)"
     fidelity: approximate
-    status: proposed
+    status: confirmed
     note: >
       Property-name note: our RECONCILES_TO already carries skos:closeMatch
       semantics with a confidence property (0.0-1.0), matching their

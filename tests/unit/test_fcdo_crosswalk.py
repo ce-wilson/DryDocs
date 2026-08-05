@@ -2,12 +2,13 @@
 
 A VOCABULARY crosswalk, not an orchestrator one: it maps DryDocs ontology
 terms onto the standard vocabularies the firmwide frameworks require. These
-guards pin what the backlog acceptance demands:
+guards pin the POST-GATE state (gate fcdo-crosswalk SIGNED OFF 2026-08-05,
+13/13 — the F1/F2 flip-with-the-test precedent):
 
-- every row stays ``proposed`` (or ``blocked-on-recapture``) until the
-  fcdo-crosswalk gate signs it — nothing in this file is confirmed by a commit;
-- rows whose evidence sits in a named capture hole are ``blocked-on-recapture``,
-  and the hole ledger agrees with the row statuses;
+- the signed outcome holds exactly: file ``confirmed``, rows 1-4 and 6-8
+  ``confirmed``, row 5 ``blocked-on-recapture`` — row 5 was signed NEITHER
+  WAY and may not flip until the Descriptive Metadata Framework recapture;
+- the capture-hole ledger agrees with the row statuses;
 - the committed file and its gate prompt are mechanism-only (standard CURIEs,
   no internal names);
 - the orchestrator runtime deliberately SKIPS the sibling schema, so the
@@ -31,7 +32,7 @@ CROSSWALK = REPO / "config" / "crosswalks" / "fcdo-vocabulary.yaml"
 GATE_PROMPT = REPO / "config" / "gate-prompts" / "fcdo-crosswalk.yaml"
 
 VOCAB_SCHEMA_ID = "drydocs.vocab-crosswalk.v1"
-ROW_STATUSES = {"proposed", "blocked-on-recapture"}
+ROW_STATUSES = {"confirmed", "blocked-on-recapture"}
 
 
 def _doc() -> dict:
@@ -49,14 +50,17 @@ def test_file_exists_and_declares_the_sibling_schema() -> None:
     assert (REPO / doc["gate_spec"]).is_file()
 
 
-def test_nothing_is_confirmed_without_the_gate() -> None:
+def test_statuses_match_the_signed_gate_outcome() -> None:
+    """Gate fcdo-crosswalk, 2026-08-05: rows 1-4/6-8 confirmed, row 5 blocked.
+    Any other value means someone flipped a status outside a gate session."""
     doc = _doc()
-    assert doc["status"] == "proposed", "file status flips only via a gate-log entry"
+    assert doc["status"] == "confirmed", "file status was signed 2026-08-05 (gate-log)"
     assert doc["rows"], "no rows"
     for row in doc["rows"]:
-        assert row["status"] in ROW_STATUSES, (
-            f"row {row['n']}: status {row['status']!r} — confirmed is the gate's "
-            "verb, never a commit's"
+        expected = "blocked-on-recapture" if row["n"] == 5 else "confirmed"
+        assert row["status"] == expected, (
+            f"row {row['n']}: status {row['status']!r} != the signed outcome "
+            f"{expected!r} — status changes are gate decisions (gate-log entry required)"
         )
 
 

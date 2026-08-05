@@ -1427,3 +1427,25 @@ rename of the frozen names.
 - **Enactment owned by:** X2 (live-surface repo sweep + port-ledger company caution —
   their `ddlineage` drops by their hand), X3/X4 (per-machine drops behind zero-node
   emptiness probes; a non-empty probe stops as a defect report).
+
+
+## 2026-08-05 — GATE: fcdo-crosswalk (Epic W; drafted at W1) — SIGNED OFF, 13/13 (row 5 stays blocked-on-recapture)
+
+**Spec:** `config/gate-prompts/fcdo-crosswalk.yaml` · **SME:** chad.wilson, in-chat
+(section walkthrough; page rendered to `internal-local/gate-pages/`). The DryDocs ↔
+firmwide-framework vocabulary crosswalk (`config/crosswalks/fcdo-vocabulary.yaml`,
+8 rows). Ratifies the ALIGNMENT-PLAN verdict: already structurally aligned — every
+row maps an EXISTING DryDocs term to a standard term; nothing renamed, reshaped,
+or added.
+
+| Item | Ruling |
+|---|---|
+| A1–A4 scope | **CONFIRMED** — review-only; mechanism-only surfaces (standard CURIEs, no internal names); nothing new minted; the ALIGNMENT-PLAN skip list is binding. **SME remark on A:** activation of the `fcdo-frameworks` corpus is UNDER CONSIDERATION now that alignment is verified — it remains a separate registry decision, NOT flipped by this gate. |
+| B1 rows 1/2/3/7 exact | **CONFIRMED** — ControlMJob↔OL Job, JobRun/ControlMJobRun↔OL Run, DataAsset↔Dataset, SUBCLASS_OF/MAPS_TO↔rdfs bridging. |
+| B2 row 2 scope note | **CONFIRMED** — the 2026-07-31 batch-history ruling restated; name conformance only, no run-event-ingestion mandate. |
+| B3 row 4 grain split | **CONFIRMED** — their grain is the Run, ours the definition (ETLProcess \| ControlMJob); both grains recorded; any future run-grain lineage lands on ControlMJobRun without displacing the definition-grain edges. |
+| B4 row 6 documentation-only | **CONFIRMED** — the adms:status reading is a translation aid; the proposed→confirmed→applied HITL machinery changes in no way. |
+| B5 row 8 carrier difference | **CONFIRMED** — RECONCILES_TO {confidence} carries skos:closeMatch + mapping-confidence semantics on an edge property rather than an RDF mapping resource. |
+| C1 row 5 blocked | **CONFIRMED** — stays OPEN, signed neither way, until the registered `fcdo-frameworks` scrape recaptures the Descriptive Metadata Framework. |
+| C2 absence ≠ absence | **CONFIRMED** — transcript absence is never treated as absence from their standard. |
+| D1–D2 sign-off | **CONFIRMED** — rows 1–4, 6–8 and the file status flip proposed → confirmed; row 5 stays `blocked-on-recapture`; the guard test moves to the post-gate state in the same commit (F1/F2 precedent); corpus activation stays a separate, later decision. |

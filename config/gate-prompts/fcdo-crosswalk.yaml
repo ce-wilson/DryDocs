@@ -1,10 +1,12 @@
 # SME gate-prompt spec — FCDO vocabulary crosswalk (backlog W1).
-# NOT YET SIGNED OFF. Reviews config/crosswalks/fcdo-vocabulary.yaml row-by-row.
-# Confirming this gate flips crosswalk rows proposed -> confirmed (gate-log
-# entry) — it does NOT activate the fcdo-frameworks corpus, change any ontology
-# term, or authorize a graph write. Row 5 is blocked-on-recapture and CANNOT be
-# signed in this session unless the Descriptive Metadata Framework has been
-# recaptured via the registered fcdo-frameworks scrape.
+# SIGNED OFF 2026-08-05 (gate-log; 13 confirmations ACCEPTED IN FULL, chad.wilson,
+# in-chat) — rows 1-4, 6-8 + file status flipped confirmed; row 5 stays
+# blocked-on-recapture (signed NEITHER WAY — Descriptive Metadata Framework
+# recapture required first). SME remark on §A: fcdo-frameworks corpus activation
+# is under consideration, a separate registry decision this gate did not make.
+# Reviews config/crosswalks/fcdo-vocabulary.yaml row-by-row. Confirming this
+# gate did NOT activate the fcdo-frameworks corpus, change any ontology term,
+# or authorize a graph write.
 # Mechanism-only: standard CURIEs (prov:, dcat:, skos:, adms:, rdfs:, public
 # OpenLineage spec); no internal URLs/org names. classification: Internal-Public.
 classification: Internal-Public

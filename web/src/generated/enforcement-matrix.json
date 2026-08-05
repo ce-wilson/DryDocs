@@ -309,7 +309,7 @@
       "guard_tests": [],
       "gate_ref": "F1 autosys-crosswalk + F2 airflow-crosswalk sign-offs (2026-07-14)",
       "status": "unguarded",
-      "pending_entries": 11,
+      "pending_entries": 2,
       "env_refs": [],
       "files": [
         "config/crosswalks/airflow-to-bmc.yaml",
@@ -473,7 +473,7 @@
       ],
       "gate_ref": "autosys-crosswalk / airflow-crosswalk (both SIGNED OFF 2026-07-14)",
       "status": "gate-pending",
-      "pending_entries": 11,
+      "pending_entries": 2,
       "env_refs": [],
       "files": [
         "config/crosswalks/airflow-to-bmc.yaml",

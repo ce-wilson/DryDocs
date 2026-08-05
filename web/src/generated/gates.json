@@ -540,6 +540,19 @@
       "unblocks": []
     },
     {
+      "kind": "log-entry",
+      "date": "2026-08-05",
+      "title": "GATE: fcdo-crosswalk (Epic W; drafted at W1) — SIGNED OFF, 13/13 (row 5 stays blocked-on-recapture)",
+      "status": "signed-off",
+      "prompt_files": [
+        "config/gate-prompts/fcdo-crosswalk.yaml"
+      ],
+      "log_ref": "config/gate-log.md:1432",
+      "unblocks": [
+        "W1"
+      ]
+    },
+    {
       "kind": "prompt-only",
       "date": null,
       "title": "bmc-docs-example (gate page rendered — session not yet run)",
@@ -593,19 +606,6 @@
       "unblocks": [
         "G27",
         "W2"
-      ]
-    },
-    {
-      "kind": "prompt-only",
-      "date": null,
-      "title": "fcdo-crosswalk (gate page rendered — session not yet run)",
-      "status": "open",
-      "prompt_files": [
-        "config/gate-prompts/fcdo-crosswalk.yaml"
-      ],
-      "log_ref": null,
-      "unblocks": [
-        "W1"
       ]
     },
     {
