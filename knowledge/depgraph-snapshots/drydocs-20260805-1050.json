@@ -1,16 +1,16 @@
 {
   "meta": {
     "project": "drydocs",
-    "captured_at": "2026-08-05T10:39:28",
+    "captured_at": "2026-08-05T10:50:31",
     "date": "20260805",
     "scan": "DryDocs",
     "tree": true,
     "git": {
-      "commit": "2f5b2ef",
-      "full": "2f5b2ef1a7967eba9d67d5f4492a5ce3bfb2b856",
+      "commit": "80b25ee",
+      "full": "80b25ee73ad4a794e2cc9e4b41a54972b58561e4",
       "branch": "main",
-      "describe": "2f5b2ef",
-      "subject": "chore(backlog): W1 done - FCDO vocabulary crosswalk drafted, gate session joins the AWAITING list",
+      "describe": "80b25ee",
+      "subject": "chore(backlog): W2+W3 done - Epic W (FCDO alignment) fully built; only the crosswalk gate session remains",
       "dirty": false,
       "pr": null
     },
@@ -12857,10 +12857,10 @@
       "kind": "file"
     },
     {
-      "file_id": "drydocs/knowledge/depgraph-snapshots/drydocs-20260805-0318.json",
-      "name": "drydocs-20260805-0318.json",
+      "file_id": "drydocs/knowledge/depgraph-snapshots/drydocs-20260805.json",
+      "name": "drydocs-20260805.json",
       "extension": ".json",
-      "rel_path": "knowledge/depgraph-snapshots/drydocs-20260805-0318.json",
+      "rel_path": "knowledge/depgraph-snapshots/drydocs-20260805.json",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -25609,7 +25609,7 @@
     [
       "drydocs/knowledge/depgraph-snapshots",
       "CONTAINS",
-      "drydocs/knowledge/depgraph-snapshots/drydocs-20260805-0318.json"
+      "drydocs/knowledge/depgraph-snapshots/drydocs-20260805.json"
     ],
     [
       "drydocs/knowledge/depgraph-snapshots",
