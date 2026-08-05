@@ -1,17 +1,17 @@
 {
   "meta": {
     "project": "drydocs",
-    "captured_at": "2026-08-05T14:48:58",
+    "captured_at": "2026-08-05T16:09:12",
     "date": "20260805",
     "scan": "DryDocs",
     "tree": true,
     "git": {
-      "commit": "0bad42a",
-      "full": "0bad42a9f7cc99564849e4b931fcea7a1766852a",
+      "commit": "2ef0050",
+      "full": "2ef00505032e75728f4c8c4f43ff2ce496cb9178",
       "branch": "main",
-      "describe": "0bad42a",
-      "subject": "docs(port): roll the ledger to 96 - K18's rename spelled out surface-by-surface - and condense the discharged rows",
-      "dirty": true,
+      "describe": "2ef0050",
+      "subject": "feat(load): K19 - a mapping is an as-of assertion; reused codes queue for review",
+      "dirty": false,
       "pr": null
     },
     "depgraph": {
@@ -6872,6 +6872,15 @@
       "kind": "file"
     },
     {
+      "file_id": "drydocs/config/gate-prompts/tom-roles-enumeration-and-cardinality.yaml",
+      "name": "tom-roles-enumeration-and-cardinality.yaml",
+      "extension": ".yaml",
+      "rel_path": "config/gate-prompts/tom-roles-enumeration-and-cardinality.yaml",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
       "file_id": "drydocs/config/gate-prompts/ui-write-surface.yaml",
       "name": "ui-write-surface.yaml",
       "extension": ".yaml",
@@ -12875,10 +12884,10 @@
       "kind": "file"
     },
     {
-      "file_id": "drydocs/knowledge/depgraph-snapshots/drydocs-20260805.json",
-      "name": "drydocs-20260805.json",
+      "file_id": "drydocs/knowledge/depgraph-snapshots/drydocs-20260805-1448.json",
+      "name": "drydocs-20260805-1448.json",
       "extension": ".json",
-      "rel_path": "knowledge/depgraph-snapshots/drydocs-20260805.json",
+      "rel_path": "knowledge/depgraph-snapshots/drydocs-20260805-1448.json",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -22392,6 +22401,11 @@
     [
       "drydocs/config/gate-prompts",
       "CONTAINS",
+      "drydocs/config/gate-prompts/tom-roles-enumeration-and-cardinality.yaml"
+    ],
+    [
+      "drydocs/config/gate-prompts",
+      "CONTAINS",
       "drydocs/config/gate-prompts/ui-write-surface.yaml"
     ],
     [
@@ -25637,7 +25651,7 @@
     [
       "drydocs/knowledge/depgraph-snapshots",
       "CONTAINS",
-      "drydocs/knowledge/depgraph-snapshots/drydocs-20260805.json"
+      "drydocs/knowledge/depgraph-snapshots/drydocs-20260805-1448.json"
     ],
     [
       "drydocs/knowledge/depgraph-snapshots",
@@ -27434,13 +27448,13 @@
     "projects": [
       "drydocs"
     ],
-    "files": 1536,
+    "files": 1537,
     "edges": 549,
     "circular_files": 0,
     "processes": 0,
     "data_assets": 0,
     "hosts": 0,
-    "rels": 1799,
+    "rels": 1800,
     "directories": 264
   }
 }
