@@ -1,16 +1,16 @@
 {
   "meta": {
     "project": "drydocs",
-    "captured_at": "2026-08-05T16:09:12",
+    "captured_at": "2026-08-05T16:13:58",
     "date": "20260805",
     "scan": "DryDocs",
     "tree": true,
     "git": {
-      "commit": "2ef0050",
-      "full": "2ef00505032e75728f4c8c4f43ff2ce496cb9178",
+      "commit": "cfccf6a",
+      "full": "cfccf6a384a0cfa9f331f4c80910336c5194f572",
       "branch": "main",
-      "describe": "2ef0050",
-      "subject": "feat(load): K19 - a mapping is an as-of assertion; reused codes queue for review",
+      "describe": "cfccf6a",
+      "subject": "docs(ontology): J32 - the field-meaning rule gets a home in the relationship guide",
       "dirty": false,
       "pr": null
     },
@@ -12884,10 +12884,10 @@
       "kind": "file"
     },
     {
-      "file_id": "drydocs/knowledge/depgraph-snapshots/drydocs-20260805-1448.json",
-      "name": "drydocs-20260805-1448.json",
+      "file_id": "drydocs/knowledge/depgraph-snapshots/drydocs-20260805.json",
+      "name": "drydocs-20260805.json",
       "extension": ".json",
-      "rel_path": "knowledge/depgraph-snapshots/drydocs-20260805-1448.json",
+      "rel_path": "knowledge/depgraph-snapshots/drydocs-20260805.json",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -25651,7 +25651,7 @@
     [
       "drydocs/knowledge/depgraph-snapshots",
       "CONTAINS",
-      "drydocs/knowledge/depgraph-snapshots/drydocs-20260805-1448.json"
+      "drydocs/knowledge/depgraph-snapshots/drydocs-20260805.json"
     ],
     [
       "drydocs/knowledge/depgraph-snapshots",
