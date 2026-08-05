@@ -1,16 +1,16 @@
 {
   "meta": {
     "project": "drydocs",
-    "captured_at": "2026-08-05T16:13:58",
+    "captured_at": "2026-08-05T17:25:33",
     "date": "20260805",
     "scan": "DryDocs",
     "tree": true,
     "git": {
-      "commit": "cfccf6a",
-      "full": "cfccf6a384a0cfa9f331f4c80910336c5194f572",
+      "commit": "ceff696",
+      "full": "ceff69661795f6c58c979142b546253a6a96245d",
       "branch": "main",
-      "describe": "cfccf6a",
-      "subject": "docs(ontology): J32 - the field-meaning rule gets a home in the relationship guide",
+      "describe": "ceff696",
+      "subject": "fix(standards): SFS typing correction - Snowflake is a target DB platform, not ETL",
       "dirty": false,
       "pr": null
     },
@@ -12884,10 +12884,10 @@
       "kind": "file"
     },
     {
-      "file_id": "drydocs/knowledge/depgraph-snapshots/drydocs-20260805.json",
-      "name": "drydocs-20260805.json",
+      "file_id": "drydocs/knowledge/depgraph-snapshots/drydocs-20260805-1613.json",
+      "name": "drydocs-20260805-1613.json",
       "extension": ".json",
-      "rel_path": "knowledge/depgraph-snapshots/drydocs-20260805.json",
+      "rel_path": "knowledge/depgraph-snapshots/drydocs-20260805-1613.json",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -25651,7 +25651,7 @@
     [
       "drydocs/knowledge/depgraph-snapshots",
       "CONTAINS",
-      "drydocs/knowledge/depgraph-snapshots/drydocs-20260805.json"
+      "drydocs/knowledge/depgraph-snapshots/drydocs-20260805-1613.json"
     ],
     [
       "drydocs/knowledge/depgraph-snapshots",
