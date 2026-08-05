@@ -1,17 +1,17 @@
 {
   "meta": {
     "project": "drydocs",
-    "captured_at": "2026-08-05T14:32:46",
+    "captured_at": "2026-08-05T14:48:58",
     "date": "20260805",
     "scan": "DryDocs",
     "tree": true,
     "git": {
-      "commit": "149b093",
-      "full": "149b0934aa858637357684e6c54c49fd2e233b1f",
+      "commit": "0bad42a",
+      "full": "0bad42a9f7cc99564849e4b931fcea7a1766852a",
       "branch": "main",
-      "describe": "149b093",
-      "subject": "chore(backlog): K18 done - the platform-tier fan-out bug closed both routes; K19 unblocks to next_ready",
-      "dirty": false,
+      "describe": "0bad42a",
+      "subject": "docs(port): roll the ledger to 96 - K18's rename spelled out surface-by-surface - and condense the discharged rows",
+      "dirty": true,
       "pr": null
     },
     "depgraph": {
@@ -12875,10 +12875,10 @@
       "kind": "file"
     },
     {
-      "file_id": "drydocs/knowledge/depgraph-snapshots/drydocs-20260805-1352.json",
-      "name": "drydocs-20260805-1352.json",
+      "file_id": "drydocs/knowledge/depgraph-snapshots/drydocs-20260805.json",
+      "name": "drydocs-20260805.json",
       "extension": ".json",
-      "rel_path": "knowledge/depgraph-snapshots/drydocs-20260805-1352.json",
+      "rel_path": "knowledge/depgraph-snapshots/drydocs-20260805.json",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -25637,7 +25637,7 @@
     [
       "drydocs/knowledge/depgraph-snapshots",
       "CONTAINS",
-      "drydocs/knowledge/depgraph-snapshots/drydocs-20260805-1352.json"
+      "drydocs/knowledge/depgraph-snapshots/drydocs-20260805.json"
     ],
     [
       "drydocs/knowledge/depgraph-snapshots",
