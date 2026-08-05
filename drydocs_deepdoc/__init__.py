@@ -26,8 +26,9 @@ Scaffold status (2026-07-10, G4): interfaces + contracts; bodies raise
 from . import investigate, writer
 
 #: The write target — the isolated uncertain context graph (ADR 0002 D1).
-#: Name per the DEPLOYED topology (``drydocs`` / ``ddlineage`` / ``ddcontext`` /
-#: ``ddall``, created by ``drydocs_core/schema/provisioning/01_databases.cypher``).
+#: Name per the DEPLOYED topology (``drydocs`` / ``ddcontext`` / ``ddall`` /
+#: ``ddschema``, created by ``drydocs_core/schema/provisioning/01_databases.cypher``;
+#: ``ddlineage`` retired 2026-08-04, ADR 0002 X1 amendment).
 #: ADR 0002's original ``drydocs_context`` was superseded by the G6/G7 deploy and
 #: that supersession is recorded in ADR 0006 §1 + the gate-log dd*-convention entry.
 #: ``tests/unit/test_database_names.py`` pins this to what provisioning creates.

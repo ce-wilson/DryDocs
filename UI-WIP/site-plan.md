@@ -62,7 +62,7 @@ tags.)
 |---|--------|-------|------------------|---------------------------|-----------|-------|
 | 0 | **Overview** | `/` | radial hub (modules as spokes, health glyph per spoke) | — (benefit cards + onboarding checklist instead) | all | 1 |
 | 1 | **Explorer** | `/explorer` | tower/app drill-down graph (mock subpage 1) | Applications · Jobs · Conditions · Servers | `drydocs` DB | 1 |
-| 2 | **Lineage** | `/lineage` | React Flow source→target DAG (mock subpage 2) | Hops · Data assets · Schema definition · Row-level preview | `ddlineage` | 1 |
+| 2 | **Lineage** | `/lineage` | React Flow source→target DAG (mock subpage 2) | Hops · Data assets · Schema definition · Row-level preview | `drydocs` DB (G30; the plan's original `ddlineage` retired 2026-08-04, ADR 0002 X1) | 1 |
 | 3 | **Ownership** | `/ownership` | SEAL→PAT→team rollup graph (My Apps SVG pattern) | Teams · Memberships · Escalation routing | seal-attribution | 2 |
 | 4 | **Runbooks** | `/runbooks` | data-series provisioning chain (FileWatcher→RAW→ING→LD) | Series · Generated runbooks · Metadata completeness | runbook-automation | 2 |
 | 5 | **Remediation** | `/remediation` | finding→fix-batch flow | Findings · Fix batches · Jira handoffs | drydocs_remediation | 2 |
@@ -121,7 +121,7 @@ Each data frame is declared, not ad hoc:
 ```ts
 type QuerySpec = {
   id: string;               // "explorer.jobs.v1" — versioned like loaders
-  database: "drydocs" | "ddlineage" | "ddcontext" | "ddall";
+  database: "drydocs" | "ddcontext" | "ddall";   // the shipped SPEC_DATABASES set
   cypher: string;           // parameterized, read-only
   params: Record<string, unknown>;
   columns: ColumnDef[];     // names, types, formatters

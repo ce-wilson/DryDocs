@@ -2,8 +2,9 @@
 
 The drift this closes (backlog G28, found 2026-07-25): ``drydocs_deepdoc.DATABASE``
 was ``"drydocs_context"`` — a database
-``drydocs_core/schema/provisioning/01_databases.cypher`` never creates. It creates
-``drydocs`` / ``ddlineage`` / ``ddcontext`` / ``ddall``. ADR 0002's original
+``drydocs_core/schema/provisioning/01_databases.cypher`` never creates. At the time it
+created ``drydocs`` / ``ddlineage`` / ``ddcontext`` / ``ddall`` (the set has since
+gained ``ddschema`` at G51 and retired ``ddlineage`` at X1). ADR 0002's original
 ``drydocs_context`` / ``drydocs_all`` names were superseded by the G6/G7 deploy, and
 that supersession is on the record in ADR 0006 §1 ("the plan's working name predates
 the deploy") plus the gate-log dd*-convention entry — so provisioning is not a
@@ -54,13 +55,16 @@ SUPERSEDED_NAMES: frozenset[str] = frozenset(
         "drydocs_context",  # -> ddcontext   (ADR 0002 original; superseded at the G6/G7 deploy)
         "drydocs_all",  # -> ddall       (same)
         "drydocs_docs",  # -> dddocs      (docmeta plan working name; ADR 0006 §1 renamed it)
+        "ddlineage",  # retired outright 2026-08-04 (ADR 0002 X1 amendment; no successor)
     }
 )
 
 #: A line may name a superseded database ONLY if it says so. This is the escape hatch
 #: for supersession notes and history, and it is deliberately the *only* one — you can
-#: mention the old name, but you have to admit it is old.
-_ALLOWED_IN_LINE = re.compile(r"supersed|renamed|was\s+``|historical", re.IGNORECASE)
+#: mention the old name, but you have to admit it is old. ("retire" joined at X2 —
+#: ddlineage has no successor name, so "superseded" would be the wrong admission;
+#: "was `" widened from the double-backtick form for markdown-style comments.)
+_ALLOWED_IN_LINE = re.compile(r"supersed|renamed|retire|was\s+`|historical", re.IGNORECASE)
 
 _CREATE_DB = re.compile(
     r"CREATE\s+(?:COMPOSITE\s+)?DATABASE\s+([A-Za-z_][A-Za-z0-9_]*)", re.IGNORECASE
@@ -95,8 +99,11 @@ def _names_a_database(identifier: str) -> bool:
 
 
 def test_provisioning_creates_the_expected_topology() -> None:
-    """Anchor the other tests: ADR 0002 (+ 0006 §1 renames, + the G51 amendment)."""
-    assert _provisioned() == {"drydocs", "ddlineage", "ddcontext", "ddall", "ddschema"}
+    """Anchor the other tests: ADR 0002 (+ 0006 §1 renames, + the G51/X1 amendments).
+
+    5 -> 4 names at X2: ``ddlineage`` retired (ADR 0002 X1 amendment, 2026-08-04).
+    """
+    assert _provisioned() == {"drydocs", "ddcontext", "ddall", "ddschema"}
 
 
 def test_module_level_database_constants_are_provisioned() -> None:
@@ -158,8 +165,8 @@ def test_read_targets_and_write_targets_agree() -> None:
     reason. G30 ruled for ADR 0002 (see its "Residency clarification"); this test
     is what makes the two halves impossible to separate again.
 
-    ``ddlineage`` remains provisioned and composite-aliased on purpose — it is the
-    cheap option to revisit, being empty — so "provisioned" is deliberately NOT
+    ``ddlineage`` remained provisioned-but-excluded until it was retired outright
+    (ADR 0002 X1 amendment, 2026-08-04) — "provisioned" was deliberately never
     the test. Having a writer is.
     """
     from drydocs_api.query_specs import QUERY_SPECS, SPEC_DATABASES

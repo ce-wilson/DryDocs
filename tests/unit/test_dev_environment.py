@@ -46,9 +46,9 @@ def test_schema_and_required_fields():
     assert isinstance(neo["ports"]["bolt"], int)
     assert isinstance(neo["ports"]["http"], int)
     dbs = neo["databases"]
+    # "lineage" left this set 2026-08-04 (X2) — ddlineage retired, ADR 0002 X1 amendment.
     assert set(dbs) == {
         "ground_truth",
-        "lineage",
         "uncertain_context",
         "composite",
         "schema_meta",
@@ -177,9 +177,9 @@ def test_provisioning_is_exec_aware(monkeypatch):
         "provision.ps1 no longer DETECTS whether cypher-shell is on the host PATH -- "
         "it is back to assuming it (G54)"
     )
-    assert "docker cp" in script and "docker exec" in script, (
-        "the docker-exec fallback is gone; a Docker-only host cannot provision again"
-    )
+    assert (
+        "docker cp" in script and "docker exec" in script
+    ), "the docker-exec fallback is gone; a Docker-only host cannot provision again"
     # The container name must be READ, never hardcoded: config/dev-environment.yaml is
     # canonical-company in PORT-MANIFEST because the value differs per environment.
     assert "container:" in script, (
@@ -187,9 +187,9 @@ def test_provisioning_is_exec_aware(monkeypatch):
         "neo4j.container, not from a literal"
     )
     neo = _load()["neo4j"]
-    assert f'"{neo["container"]}"' not in script.split("STEP 2")[-1].split("#>")[-1], (
-        "the runner hardcodes the container name; it must come from the config file"
-    )
+    assert (
+        f'"{neo["container"]}"' not in script.split("STEP 2")[-1].split("#>")[-1]
+    ), "the runner hardcodes the container name; it must come from the config file"
 
 
 def test_provisioning_copies_the_file_instead_of_piping_it():
@@ -220,6 +220,6 @@ def test_provisioning_copies_the_file_instead_of_piping_it():
     ]
     assert not piped, (
         "provision.ps1 pipes a file into docker exec -- that injects a BOM and "
-        f"cypher-shell rejects it (J29). Use docker cp + -f:\n" + "\n".join(piped)
+        "cypher-shell rejects it (J29). Use docker cp + -f:\n" + "\n".join(piped)
     )
     assert "-f $remote" in script, "the fallback must execute the COPIED file with -f"

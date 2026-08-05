@@ -139,7 +139,7 @@ sections:
       - anchor: architecture-databases
         heading: "Databases"
         required: true
-        guidance: "drydocs / ddlineage / ddcontext / ddall and what lives where."
+        guidance: "drydocs / ddcontext / ddall / ddschema and what lives where (ddlineage retired 2026-08-04, ADR 0002 X1)."
 
   - anchor: beyond-loading
     heading: "Beyond loading: what the other components do"

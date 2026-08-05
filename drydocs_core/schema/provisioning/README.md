@@ -1,22 +1,22 @@
 # schema/provisioning — multi-DB topology (Epic G1 · ADR 0002 D1)
 
 Provisions the multi-database topology from
-[ADR 0002](../../../docs/decisions/0002-component-database-topology.md) — three estate
+[ADR 0002](../../../docs/decisions/0002-component-database-topology.md) — two estate
 databases, the schema meta-graph, and one composite — on a **Neo4j Enterprise** DBMS.
 Authoring + structure only — **no data load** here.
 
 | File | Run against | Purpose |
 |---|---|---|
-| `01_databases.cypher` | `system` | `CREATE DATABASE drydocs`, `ddlineage`, `ddcontext`, `ddschema`, `CREATE COMPOSITE DATABASE ddall` + aliases |
+| `01_databases.cypher` | `system` | `CREATE DATABASE drydocs`, `ddcontext`, `ddschema`, `CREATE COMPOSITE DATABASE ddall` + aliases |
 
-> **`ddlineage` is provisioned but not live** (G30 ruling, 2026-07-26 — see ADR 0002
-> "Residency clarification"). Curated lineage writes land in `drydocs` per ADR 0002 D1/D2;
-> nothing writes `ddlineage` today and no query spec reads it. It stays created and
-> composite-aliased so the decision stays cheap to revisit — it is empty, so moving
-> lineage into it later is a design change, not a data migration.
+> **`ddlineage` was retired 2026-08-04** (ADR 0002 X1 amendment, superseding the G30
+> "provisioned but not live" disposition). Curated lineage writes land in `drydocs` per
+> ADR 0002 D1/D2; nothing ever wrote or read `ddlineage`, and empty-but-provisioned is
+> the gap the G28/G30 drift classes grew in. On a host that still carries it, drop it
+> per the Epic X items (alias out of `ddall` first, behind a zero-node emptiness probe).
 
-| `02_proxy_constraints.cypher` | **each** of `drydocs`, `ddlineage`, `ddcontext` | proxy-node business keys: `DataAsset.assetId` UNIQUE, `ControlMJob (folder_id, job_id)` NODE KEY |
-| `smoke_drydocs_all.cypher` | `ddall` | read-only federated query — reads all three constituents, writes none |
+| `02_proxy_constraints.cypher` | **each** of `drydocs`, `ddcontext` | proxy-node business keys: `DataAsset.assetId` UNIQUE, `ControlMJob (folder_id, job_id)` NODE KEY |
+| `smoke_drydocs_all.cypher` | `ddall` | read-only federated query — reads both constituents, writes none |
 
 > **`ddschema` is in the topology but in neither the proxy-constraint pass nor `ddall`**
 > (G51, 2026-08-03). It holds the schema meta-graph written by `drydocs
@@ -25,7 +25,7 @@ Authoring + structure only — **no data load** here.
 > so its one constraint (`schemameta_name`) lives in `schema_graph.cypher` rather than
 > here; and it is not a `ddall` constituent, because it describes the schema, not the
 > estate — a federated support query would present labels as data.
-| `provision.ps1` | — | runner: applies 01 → 02 (×3) → smoke via `cypher-shell` |
+| `provision.ps1` | — | runner: applies 01 → 02 (×2) → smoke via `cypher-shell` |
 
 ## Run
 
@@ -71,7 +71,6 @@ docker exec $c cypher-shell -u neo4j -p $pw -d system -f /tmp/01_databases.cyphe
 #    by `drydocs bootstrap-schema-graph` (G51). Its absence is a decision.
 docker cp .\02_proxy_constraints.cypher "${c}:/tmp/02_proxy_constraints.cypher"
 docker exec $c cypher-shell -u neo4j -p $pw -d drydocs   -f /tmp/02_proxy_constraints.cypher
-docker exec $c cypher-shell -u neo4j -p $pw -d ddlineage -f /tmp/02_proxy_constraints.cypher
 docker exec $c cypher-shell -u neo4j -p $pw -d ddcontext -f /tmp/02_proxy_constraints.cypher
 
 # 3. read-only smoke  ->  the COMPOSITE

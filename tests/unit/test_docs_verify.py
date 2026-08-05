@@ -25,7 +25,9 @@ from drydocs.docs_verify import (
     verify,
 )
 
-DATABASES = ("drydocs", "ddcontext", "ddlineage")
+# The available-databases fixture. `ddlineage` was in this tuple until its retirement
+# (2026-08-04, ADR 0002 X1 amendment); no test keyed on its presence.
+DATABASES = ("drydocs", "ddcontext")
 
 
 def _fake(graph: dict[str, dict[str, dict]]):

@@ -435,14 +435,18 @@ DryDocs runs Neo4j Enterprise with a deliberate multi-database topology (ADR 000
 
 | Database | Holds | Trust tier |
 |---|---|---|
-| `drydocs` | ground truth: Control-M, SEAL, catalog | VERBATIM / GROUNDED |
-| `ddlineage` | cross-platform lineage | curated |
+| `drydocs` | ground truth: Control-M, SEAL, catalog — including curated lineage (ADR 0002 D1/D2) | VERBATIM / GROUNDED |
 | `ddcontext` | uncertain, exploratory, AI-inferred material | SYNTHESIZED |
-| `ddall` | a *composite* database aliasing all three | read-only view |
+| `ddschema` | the schema meta-graph (G51) — describes the schema, not the estate; not a `ddall` constituent | descriptive |
+| `ddall` | a *composite* database aliasing the two estate databases | read-only view |
+
+(A fifth name, `ddlineage`, was provisioned from G1 until 2026-08-04 — retired by the
+ADR 0002 X1 amendment after nothing ever wrote or read it; curated lineage lands in
+`drydocs`.)
 
 The point of `ddcontext` is architectural honesty: uncertain data lives in its own
 transaction domain, so it is *physically impossible* to write it into ground truth by
-accident. The composite database joins the three by **business key** (a proxy-node
+accident. The composite database joins its constituents by **business key** (a proxy-node
 pattern), never by internal node id — so context records survive a full rebuild of the
 ground-truth database and simply re-link. Promotion from `ddcontext` to `drydocs` is only
 ever a gate-confirmed load, never a cross-database edit.

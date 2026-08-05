@@ -44,9 +44,10 @@ from drydocs_api.guard import ensure_no_element_ids, ensure_read_only
 from drydocs_api.queries import ParamSpec
 
 # Databases a spec may read. Deliberately NOT the whole provisioned topology:
-# `ddlineage` is provisioned but written by nothing (G30 ruling 2026-07-26 — curated
-# lineage lands in `drydocs` per ADR 0002 D1/D2), so a spec pointed there would read
-# an empty database forever. Leaving it out makes that a deliberate edit rather than
+# `ddschema` describes the schema, not the estate; `ddlineage` (retired at X1 —
+# ADR 0002 amendment, 2026-08-04) was excluded here since G30 as
+# provisioned-but-written-by-nothing (curated lineage lands in `drydocs` per D1/D2).
+# Keeping the allow-list explicit makes a new database a deliberate edit rather than
 # a typo; `tests/unit/test_database_names.py` proves the read set has a writer.
 SPEC_DATABASES: frozenset[str] = frozenset({"drydocs", "ddcontext", "ddall"})
 # Databases whose content is synthesized/uncertain — results carry the
@@ -755,8 +756,8 @@ QUERY_SPECS: dict[str, QuerySpec] = {
         ),
         # O10 lineage frames — target `drydocs`, where the curated writer lands
         # (G30 ruling 2026-07-26; ADR 0002 "Residency clarification"). They were
-        # pointed at `ddlineage`, which is provisioned but written by nothing, so
-        # they read an empty database for the wrong reason. They still return zero
+        # pointed at `ddlineage`, which was written by nothing (retired at X1,
+        # 2026-08-04) — an empty database read for the wrong reason. They still return zero
         # rows until the lineage live-load gate flips the four m3_* vocabulary
         # entries — that gate, not the database, is what keeps them empty, and the
         # UI shows its SYNTHESIZED demo honestly meanwhile.
@@ -788,7 +789,7 @@ QUERY_SPECS: dict[str, QuerySpec] = {
         ),
         QuerySpec(
             id="lineage.data-assets.v1",
-            database="drydocs",  # G30: was ddlineage — see the block comment above
+            database="drydocs",  # G30: was `ddlineage` (retired at X1) — see the block comment
             description=(
                 "DataAsset inventory with writer/reader degree — which activities "
                 "produce and consume each asset."
@@ -812,7 +813,7 @@ QUERY_SPECS: dict[str, QuerySpec] = {
         ),
         QuerySpec(
             id="lineage.schema-definition.v1",
-            database="drydocs",  # G30: was ddlineage — see the block comment above
+            database="drydocs",  # G30: was `ddlineage` (retired at X1) — see the block comment
             description=(
                 "Definition-level schema of each DataAsset node: identity, kind, and "
                 "the property set present. Column-level schema arrives with the DPL "

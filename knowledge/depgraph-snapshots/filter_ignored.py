@@ -85,10 +85,7 @@ def main() -> int:
         doc["rels"] = [
             r
             for r in rels
-            if isinstance(r, list | tuple)
-            and len(r) >= 3
-            and r[0] in kept_ids
-            and r[2] in kept_ids
+            if isinstance(r, list | tuple) and len(r) >= 3 and r[0] in kept_ids and r[2] in kept_ids
         ]
 
     stats = doc.get("stats")

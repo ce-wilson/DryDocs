@@ -1832,7 +1832,8 @@ DOC_REGISTRY_PATH = Path(__file__).resolve().parents[1] / "config" / "doc-source
 #: `drydocs` is where the bmc-docs corpus actually lives today. The sweep is
 #: intersected with SHOW DATABASES at runtime, so an unprovisioned name here is
 #: reported as db-absent rather than raising from the driver.
-DOC_SWEEP_DATABASES = ("drydocs", "dddocs", "ddcontext", "ddlineage")
+#: (`ddlineage` retired 2026-08-04, ADR 0002 X1 amendment — swept here until then.)
+DOC_SWEEP_DATABASES = ("drydocs", "dddocs", "ddcontext")
 
 
 @app.command(name="docs-verify")

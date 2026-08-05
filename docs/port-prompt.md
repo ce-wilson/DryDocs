@@ -875,6 +875,29 @@ verification status in [BRACKETS]; spend review on [UNRULED].
     (step 68 retention); take the fix and REGENERATE your newest snapshot —
     your current one likely carries ignored names in rels the same way.
 
+83. DDLINEAGE RETIRED — TOPOLOGY 5 -> 4 (X1 ADR amendment + X2 sweep)
+    [LIVE-DB MIGRATION on your side]. Nothing ever wrote or read
+    `ddlineage` (writer pinned to `drydocs` w/ TrustBoundaryError; your
+    G30-equivalent spec repoint came in an earlier range) — ADR 0002 now
+    carries a dated amendment retiring it; the deployed set is
+    drydocs/ddcontext/ddall/ddschema. Sweep: provisioning DDL + ddall
+    alias dropped, provision.ps1 runs 02 twice not three times, smoke
+    reads two constituents, cli.py DOC_SWEEP_DATABASES, dev-environment
+    databases map (+ its key-set speed bump), startup-refresh runbook
+    Rev 9, `ddlineage` JOINED test_database_names' SUPERSEDED_NAMES (the
+    escape regex gained "retire" — a package source may name it only
+    while admitting it is old). ***YOUR SIDE:*** the DDL diff ports
+    like-for-like, but `CREATE ... IF NOT EXISTS` never DROPS: your live
+    `ddlineage` survives a green provision.ps1 run and its removal is a
+    MANUAL migration by your hand — alias out of `ddall` FIRST, then a
+    zero-node emptiness probe, then `DROP DATABASE ddlineage`; a
+    NON-EMPTY probe means something on your side writes a database the
+    producer never did — STOP and treat that as a defect report, not a
+    cleanup (the producer's per-machine drops are backlog X3/X4, same
+    protocol). SUPERSEDED_NAMES will red any company-local module that
+    names `ddlineage` without a retire/supersede admission — that is the
+    sweep finding your stragglers, not a port failure.
+
 ACCEPTANCE GATE (behavior is the contract, not a byte-compare):
 - Track 1 (portable):
     poetry run pytest tests/unit/test_variable_classifier.py tests/unit/test_variable_resolver.py \
@@ -891,8 +914,8 @@ ACCEPTANCE GATE (behavior is the contract, not a byte-compare):
   capability_assert=false skips per T18). A retired-id refusal from
   `SourceRegistry.from_yaml` is the D4 guard WORKING, not a port failure — rebind the
   loader in `loader-source-overlay.yaml`, never by re-adding the retired id.
-  Producer reference at the current head (step 81, the registry split):
-  1515
+  Producer reference at the current head (step 83, the ddlineage retirement):
+  1539
   passed / 5 skipped with the production CSV PRESENT and no
   RECONCILE_BEFORE_DIR (4 J7 guards + the graphrag PDF) — the like-for-like
   chain: step 58 1356/5 → step 61 1384/5 (+28 K9 guards) → step 63 1399/5
@@ -902,7 +925,10 @@ ACCEPTANCE GATE (behavior is the contract, not a byte-compare):
   property-term guards) → step 73 1449/5 (+19 Q13) → step 74 1450/5
   (+1 J29) → steps 75–78 1501/5 (measured at `0c77426`: Q6/Q12 docmeta
   suites + SDLC outline pins) → step 80 1505/5 (+4 L20) → step 81 1515/5
-  (+10 S5 fragments). The
+  (+10 S5 fragments) → step 83 1539/5 (step 82 no delta; the interval
+  also carries not-yet-ledgered laptop suites — mapping-store/API
+  expansion, runbook coverage, dev-environment, depgraph-snapshot
+  guards — ledger them before rolling past this step). The
   step-60 figure (1354 / 7) was CSV-ABSENT without RECONCILE_BEFORE_DIR and is
   not comparable line-for-line; `aa0a0eb`'s commit message quotes 1358 / 3,
   which is the step-59 run with RECONCILE_BEFORE_DIR set. Earlier producer

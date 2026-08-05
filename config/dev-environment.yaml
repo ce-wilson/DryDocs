@@ -39,10 +39,11 @@ neo4j:
   # (restart=no) as a rollback copy). If a connection is refused, trust
   # `docker port <container>` over any template value.
   databases:              # ADR 0002 topology — provisioned, not implicit
+    # (a `lineage: ddlineage` row lived here until 2026-08-04 — retired, ADR 0002 X1
+    # amendment; curated lineage writes land in ground_truth per D1/D2)
     ground_truth: drydocs      # main load + lineage writers; default load target
-    lineage: ddlineage         # cross-platform lineage (drydocs_lineage)
     uncertain_context: ddcontext  # SYNTHESIZED/unverified only (drydocs_deepdoc)
-    composite: ddall           # read-only federation of the three estate databases
+    composite: ddall           # read-only federation of both estate databases
     # Schema meta-graph (`drydocs bootstrap-schema-graph`, C21/G51). Its own database
     # because exemplar nodes carry REAL labels beside :SchemaMeta and `drydocs`' NODE
     # KEYs enforce property existence the exemplars don't have. Deliberately NOT an

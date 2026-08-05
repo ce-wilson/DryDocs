@@ -1,8 +1,11 @@
 # Runbook — DryDocs local startup & refresh (EE container + sample ingest)
 
 <!-- anchor: front-matter -->
-- **Status:** DESCRIPTIVE — documents the working procedure. **Rev 8, 2026-08-04**
-  (the rollback promise retires on the laptop — the copy it pointed at no longer
+- **Status:** DESCRIPTIVE — documents the working procedure. **Rev 9, 2026-08-04**
+  (`ddlineage` retired — ADR 0002 X1 amendment: the topology enumerations drop to four
+  names (drydocs, ddcontext, ddschema, ddall) and a host still carrying the fifth
+  drops it per Epic X; on top of Rev 8, same day, where
+  the rollback promise retires on the laptop — the copy it pointed at no longer
   exists, so Appendix A stops offering a recovery path that isn't there; on top of
   Rev 7, where the topology enumerations catch up with the verb — Appendix A, Startup step 4, and
   the one-shot script now all count five databases; on top of Rev 6, where
@@ -196,7 +199,7 @@ check; go to Troubleshooting.
    *Opt-in:* `--with-sosa` appends the EXPERIMENTAL SOSA/SSN supplement. It is not a
    declared company standard and is never in the default chain — leave it off unless
    you are deliberately working layer-4.
-4. **First-time only — multi-DB topology** (drydocs + ddlineage + ddcontext + ddschema
+4. **First-time only — multi-DB topology** (drydocs + ddcontext + ddschema
    + the ddall composite): run the G1 provisioning per
    `drydocs_core/schema/provisioning/README.md` (`provision.ps1`). Skip on an
    already-provisioned container.
@@ -206,6 +209,10 @@ check; go to Troubleshooting.
    nothing about a newly added name. `ddschema` was created by hand during C21 and only
    provisioned by DDL at G51 — on any machine that predates G51, confirm with
    `SHOW DATABASES` rather than inferring it from a successful `provision.ps1` run.
+   The same asymmetry runs the other way for a RETIRED name: provisioning never drops
+   anything, so a container that predates the 2026-08-04 `ddlineage` retirement (ADR
+   0002 X1) still carries it after a green `provision.ps1` — dropping it is the manual
+   Epic X step (alias out of `ddall`, zero-node probe, then `DROP DATABASE ddlineage`).
 
 <!-- anchor: refresh-ingest -->
 ## Refresh / ingest
@@ -333,7 +340,7 @@ Change it *there* first, then here; verify against `docker port`, never assume:
 | Plugins | `apoc` (174 procs) + `gds` (471 procs), both 2026.05.0. Needs `apoc.*,gds.*` in BOTH `dbms.security.procedures.unrestricted` and `..._allowlist`. NOT `NEO4J_PLUGINS` — see Rev 4 |
 | HTTP / Browser | container 7474 → host **7474** (`http://localhost:7474/browser/`) |
 | Bolt | container 7687 → host **7687** (`bolt://localhost:7687`) |
-| Databases | `drydocs`, `ddlineage`, `ddcontext` + composite `ddall` (G1/G7), and `ddschema` for the schema meta-graph (G51) — deliberately NOT a `ddall` constituent, since it describes the schema rather than the estate |
+| Databases | `drydocs`, `ddcontext` + composite `ddall` (G1/G7), and `ddschema` for the schema meta-graph (G51) — deliberately NOT a `ddall` constituent, since it describes the schema rather than the estate. (`ddlineage` retired 2026-08-04, ADR 0002 X1 — a container provisioned earlier still shows it until the Epic X drop) |
 | Credentials | `.env` only (`NEO4J_URI` / `NEO4J_USER` / `NEO4J_PASSWORD`) |
 
 **No rollback copy exists on the laptop.** The retired `neo4j-drydocs-ee` (7476/7689) container

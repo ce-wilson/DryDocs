@@ -51,10 +51,11 @@ def test_runbook_header_carries_rev_and_commit() -> None:
     assert header["doc_id"] == "drydocs-startup-refresh-runbook"
     assert header["doc_type"] == "Runbook"
     assert (
-        header["rev"] == 8
-    )  # Rev 8, 2026-08-04 (G52: the rollback copy Appendix A promised no longer exists on
-    # the laptop — container gone, its orphaned data volume deleted; the claim is now
-    # venue-named per J18 rather than stated flat, since the desktop may still hold one)
+        header["rev"] == 9
+    )  # Rev 9, 2026-08-04 (X2: ddlineage retired — ADR 0002 X1 amendment; topology
+    # enumerations drop to four names and the provisioning-never-drops asymmetry is
+    # written into startup step 4). Rev 8 same day was G52: the rollback copy Appendix A
+    # promised no longer exists on the laptop; venue-named per J18.
     assert header["doc_status"] == "DESCRIPTIVE"
     assert header["commit"], "front-matter commit citation should parse"
     assert header["path"] == "docs/design/drydocs-startup-refresh-runbook.md"
