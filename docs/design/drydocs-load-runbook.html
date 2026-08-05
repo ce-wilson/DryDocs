@@ -1,0 +1,215 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Runbook — operate drydocs-load: individual loaders, their envelopes, snapshots and sweeps</title>
+<style>
+:root { color-scheme: light dark; --ink:#1a1a1a; --mid:#555; --line:#d0d0d0; --faint:#f6f6f6; --bg:#fff; --link:#0a58ca; }
+@media (prefers-color-scheme: dark) { :root { --ink:#e6e6e6; --mid:#a0a0a0; --line:#3a3a3a; --faint:#1c1c1c; --bg:#141414; --link:#6ea8fe; } }
+:root[data-theme="dark"] { --ink:#e6e6e6; --mid:#a0a0a0; --line:#3a3a3a; --faint:#1c1c1c; --bg:#141414; --link:#6ea8fe; }
+:root[data-theme="light"] { --ink:#1a1a1a; --mid:#555; --line:#d0d0d0; --faint:#f6f6f6; --bg:#fff; --link:#0a58ca; }
+* { box-sizing: border-box; }
+body { font: 15px/1.6 "Segoe UI", system-ui, Arial, sans-serif; color: var(--ink); background: var(--bg); margin: 0; }
+main { max-width: 900px; margin: 0 auto; padding: 32px 24px 80px; }
+h1 { font-size: 28px; margin: 0 0 6px; letter-spacing:-0.3px; }
+h2 { font-size: 20px; margin: 34px 0 10px; padding-bottom:5px; border-bottom: 2px solid var(--ink); }
+h3 { font-size: 16px; margin: 22px 0 8px; }
+h4,h5,h6 { font-size: 14px; margin: 16px 0 6px; }
+p { margin: 10px 0; } strong { font-weight: 700; }
+a { color: var(--link); } a:hover { text-decoration: underline; }
+code { font-family: "Cascadia Mono","Consolas",monospace; font-size: 0.88em; background: var(--faint); padding: 1px 4px; border-radius: 3px; }
+pre { font-family: "Cascadia Mono","Consolas",monospace; font-size: 12.5px; line-height:1.45; border:1px solid var(--line); background: var(--faint); padding: 12px 14px; border-radius: 6px; overflow-x: auto; }
+pre code { background: none; padding: 0; }
+table { border-collapse: collapse; margin: 14px 0; font-size: 13.5px; display:block; overflow-x:auto; }
+th,td { border:1px solid var(--line); padding: 6px 9px; text-align:left; vertical-align: top; }
+th { background: var(--faint); font-weight:700; }
+blockquote { margin: 14px 0; padding: 2px 16px; border-left: 4px solid var(--line); color: var(--mid); }
+ul,ol { margin: 10px 0; padding-left: 26px; } li { margin: 4px 0; }
+hr { border:none; border-top:1px solid var(--line); margin: 26px 0; }
+:target { scroll-margin-top: 12px; } :target > :first-child, h2:target, h3:target { outline: 2px solid var(--link); outline-offset: 4px; }
+.dd-margin-tag, .dd-print-footer { display: none; }
+
+.dd-note-btn { border:1px solid var(--line); background:var(--bg); color:var(--mid); cursor:pointer; font-size:12px; line-height:1; padding:2px 6px; border-radius:5px; margin-right:6px; }
+.dd-note-btn:hover { color:var(--link); border-color:var(--link); }
+.dd-note-box { margin:6px 0 10px; }
+.dd-note-box textarea { width:100%; min-height:56px; font:13px/1.4 "Segoe UI",system-ui,sans-serif; color:var(--ink); background:var(--faint); border:1px solid var(--line); border-radius:6px; padding:8px; resize:vertical; }
+.dd-annotated { box-shadow:-3px 0 0 var(--link); padding-left:8px; }
+.dd-fb-bar { position:fixed; right:16px; bottom:16px; display:flex; flex-direction:column; gap:6px; align-items:stretch; background:var(--bg); border:1px solid var(--line); border-radius:10px; padding:8px 12px; box-shadow:0 2px 10px rgba(0,0,0,.15); font-size:13px; z-index:50; }
+.dd-fb-row { display:flex; gap:8px; align-items:center; justify-content:space-between; }
+.dd-fb-bar button { cursor:pointer; border:1px solid var(--link); background:var(--link); color:#fff; border-radius:6px; padding:5px 10px; font-size:13px; }
+.dd-fb-bar .dd-badge { font-weight:700; }
+.dd-fb-file { cursor:pointer; font-size:11px; color:var(--mid); white-space:nowrap; }
+.dd-fb-file code { font-size:11px; }
+.dd-fb-file:hover code { color:var(--link); }
+.dd-toast { position:fixed; right:16px; bottom:64px; background:var(--ink); color:var(--bg); padding:8px 12px; border-radius:8px; font-size:13px; z-index:60; opacity:0; transition:opacity .2s; }
+.dd-toast.show { opacity:1; }
+.dd-sme-feedback ol li { margin: 6px 0; }
+@media print { .dd-note-btn, .dd-note-box, .dd-fb-bar, .dd-toast, .dd-sme-feedback, .dd-sme-divider { display:none !important; } }
+@page { size: Letter; margin: 0.6in 0.62in 0.55in 0.62in; }
+@media print {
+:root, :root[data-theme="dark"], :root[data-theme="light"] { color-scheme: light; --ink:#1a1a1a; --mid:#555; --line:#bdbdbd; --fill:#eee; --faint:#f6f6f6; --bg:#fff; --link:#0a58ca; }
+html { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+body { font: 10.5px/1.45 "Segoe UI", system-ui, Arial, sans-serif; }
+main { max-width: 7.2in; margin: 0 auto; padding: 0 0 0 0.62in; position: relative; }
+h1 { font-size: 21px; margin: 0 0 2px; letter-spacing:-0.2px; }
+h2 { font-size: 14px; margin: 16px 0 8px; padding-bottom:4px; border-bottom: 2px solid var(--ink); text-transform: uppercase; letter-spacing: 0.6px; }
+h3 { font-size: 11.5px; margin: 13px 0 5px; padding-bottom:2px; border-bottom:1px solid var(--line); }
+h4,h5,h6 { font-size: 10.5px; margin: 9px 0 4px; }
+p { margin: 6px 0; }
+a { color: inherit; text-decoration: underline; }
+code { font-size: 9.2px; padding: 0 2px; border-radius: 2px; }
+table { display: table; width:100%; margin: 7px 0; font-size: 9.1px; overflow-x: visible; }
+th, td { padding: 3px 5px; }
+th { background: var(--fill); }
+td code, th code { background: transparent; padding: 0; }
+pre { font-size: 8.4px; line-height: 1.35; padding: 7px 9px; margin: 7px 0; white-space: pre; overflow: hidden; border-radius: 3px; }
+pre.sql { background:#fbfbfb; }
+blockquote { margin: 7px 0; padding: 2px 10px; border-left: 3px solid var(--line); break-inside: avoid; }
+ul,ol { margin: 6px 0 6px 16px; padding: 0; } li { margin: 3px 0; }
+hr { margin: 10px 0; }
+h2, h3, table, pre { break-inside: avoid; }
+
+/* L6 paper HITL: each anchored block sits in the left gutter (main's own padding-left,
+   reserved above) so a printed page carries the anchor id beside its section — no @page
+   margin-box support required, so headless Chromium print-to-pdf renders it reliably. */
+h1, h2, h3, h4, h5, h6, p, table, pre, ul, ol, blockquote { position: relative; }
+.dd-margin-tag {
+  display: block; position: absolute; left: -0.6in; top: 0.1em; width: 0.54in;
+  font: 6.2px/1.15 "Cascadia Mono","Consolas",monospace; text-align: right;
+  color: var(--mid); letter-spacing: 0.1px; word-break: break-word;
+}
+/* Rev/commit footer: `position: fixed` repeats on every printed page in Chromium's
+   headless print-to-pdf (the standard running-footer technique) without needing CSS
+   Paged-Media margin-box content(), which Chromium supports only partially. */
+.dd-print-footer {
+  display: block; position: fixed; left: 0.62in; right: 0.62in; bottom: 0.12in;
+  font-size: 8px; color: var(--mid); text-align: center;
+  border-top: 1px solid var(--line); padding-top: 3px;
+}
+}
+</style>
+</head>
+<body>
+<main>
+<h1>Runbook — operate <code>drydocs-load</code>: individual loaders, their envelopes, snapshots and sweeps</h1>
+<ul id="front-matter"><span class="dd-margin-tag" aria-hidden="true">front-matter</span><li><strong>Module:</strong> drydocs-load — this runbook IS the module runbook for drydocs-load (V1 coverage rule; V3 ruled AUTHOR-DISTINCT, see Purpose &amp; scope for the overlap ruling against the system-level startup/refresh runbook).</li><li><strong>Status:</strong> DESCRIPTIVE — documents the working procedure. <strong>Rev 1, 2026-08-04</strong>, authored at commit <code>0b67b66</code>.</li><li><strong>Classification:</strong> Internal-Public (mechanism only — bundled sample data, env-var NAMES, no credentials, no company values)</li><li><strong>Audience:</strong> anyone running ONE loader rather than the whole chain, reading a run envelope, deciding whether a rejected row matters, or sweeping soft-removed nodes</li><li><strong>Companion:</strong> <code>docs/design/drydocs-startup-refresh-runbook.md</code> (the SYSTEM-level cold start that calls this module — <strong>it owns the sequence, this document does not</strong>), <code>docs/plan/load-map.html</code> (the generated canonical sequence), <code>docs/design/drydocs-core-runbook.md</code> (schema, env roots, run logs), <code>knowledge/standards/node-status-envelope.md</code> (the envelope this runbook reads)</li></ul>
+<h2 id="purpose-scope"><span class="dd-margin-tag" aria-hidden="true">purpose-scope</span>Purpose &amp; scope</h2>
+<p><strong>Purpose.</strong> Operate the load module at the grain the cold-start procedure does not: one loader at a time. Reading its envelope, judging its rejects, re-running it safely, recomputing snapshots, and sweeping what a source stopped sending.</p>
+<h3>The overlap ruling (V3)</h3>
+<p>The startup/refresh runbook is <strong>SYSTEM-level</strong>: container up → schema bootstrapped → sample data ingested → invariants green, spanning <code>graph-infra</code>, <code>drydocs-core</code> and this module. Declaring it the drydocs-load module runbook would have required either narrowing it (it covers Docker and provisioning, which are not this module) or widening this module to own the container (which is not its either). Neither is honest, so <strong>the two are distinct and cross-reference</strong>.</p>
+<p><strong>THE DIVISION, in one line: the startup/refresh runbook answers &quot;run the chain&quot;; this one answers &quot;run, read, and repair one loader&quot;.</strong></p>
+<h3>And this document deliberately does NOT restate the load sequence</h3>
+<p>There is exactly one canonical sequence, <code>cli.CANONICAL_LOAD_SEQUENCE</code>, published to <code>docs/plan/load-map.html</code> and <code>web/src/generated/load-map.json</code>. Two hand-maintained copies already exist — <code>scripts/ingest.sh</code> and the startup/refresh runbook&#x27;s Appendix B — and <strong>N6 exists to retire that duplication</strong>. A third copy here would make N6&#x27;s job worse, so there is none. To see the sequence, open the load map or run:</p>
+<pre class="powershell"><code>poetry run python -c &quot;from drydocs.cli import CANONICAL_LOAD_SEQUENCE as s; [print(f&#x27;{m:9} {c}&#x27;) for c, m, _ in s]&quot;</code></pre>
+<p>This is not fastidiousness. On 2026-08-04 the drydocs-core runbook copied the topology database list inline and it was stale within hours, because a concurrent amendment retired one of them. A copy is kept current by discipline; a pointer cannot go stale at all.</p>
+<p><strong>In scope.</strong> Running one loader; the run envelope and status items; rejected rows; idempotency and safe re-runs; soft-delete and <code>sweep-removed</code>; snapshots (<code>snapshot</code>, <code>prune-snapshots</code>); <code>docs-verify</code>; staging (<code>drydocs.staging</code>, <code>drydocs.cmdline_staging</code>).</p>
+<p><strong>Out of scope.</strong> The cold start and the full chain (startup/refresh runbook); schema, constraints, supplements and env roots (core runbook); <code>var/mapping.db</code> (mapping-store runbook); serving anything (<code>drydocs-api</code>); what a loader&#x27;s edges MEAN — that is the ontology and the HITL gate.</p>
+<h2 id="prerequisites"><span class="dd-margin-tag" aria-hidden="true">prerequisites</span>Prerequisites</h2>
+<ul><li><strong>A provisioned, bootstrapped graph.</strong> Databases exist, constraints applied, supplements verified — the core runbook&#x27;s Startup, or the startup/refresh runbook&#x27;s cold start. A loader against an unbootstrapped graph fails on a missing constraint or, worse, MATCHes a term nothing seeded and quietly writes nothing.</li><li><strong><code>NEO4J_DATABASE</code> set to a topology database</strong> (normally <code>drydocs</code>). Unset, writes land in the EE home db <code>neo4j</code> where no query surface looks. This is the single most common cause of &quot;the loader said OK and the graph is empty&quot;.</li><li><strong><code>poetry install</code></strong> — the default group; no API extras needed.</li><li><strong>Source data</strong>: the bundled samples need nothing. Oracle-backed and out-of-repo payload runs need <code>ORACLE_*</code> credentials and/or <code>DRYDOCS_DATA_ROOT</code> per the core runbook.</li><li><strong>Know where the logs go</strong> before you start, not after: <code>DRYDOCS_LOGDIR</code>, falling back to <code>SPIDERP_LOGDIR</code>, then <code>~/logs/DryDocs</code>.</li></ul>
+<h2 id="startup"><span class="dd-margin-tag" aria-hidden="true">startup</span>Startup</h2>
+<p>This module has no service. &quot;Startup&quot; is running a single loader deliberately.</p>
+<ol><li><strong>Confirm the graph is ready</strong> (cheap, and it is the check that prevents a silent run): ``<code>powershell poetry run drydocs check </code>`<code> Success: server version and </code>APOC OK.`</li></ol>
+<ol><li><strong>Pick the verb.</strong> Every load verb is listed by <code>poetry run drydocs --help</code>; the sequence they belong to is the load map, not this page.</li></ol>
+<ol><li><strong>Run ONE loader</strong> — most take <code>--csv</code> for a specific file, and the Control-M chain takes <code>--use-oracle</code> and scoping flags: ``<code>powershell poetry run drydocs load catalog_lobs --csv internal/org/catalog/catalog_lobs.csv poetry run drydocs ingest-controlm --use-oracle --folder &quot;PATTERN_%&quot; </code>`<code> Success: the run envelope printed at close, with </code>&#x27;status&#x27;: &#x27;OK&#x27;`.</li></ol>
+<ol><li><strong>Read the envelope before moving on.</strong> It is the whole point of the run: ``<code> rows_processed / rows_rejected / rows_changed nodes_marked_removed / nodes_reactivated / unresolved_parents status </code>`<code> </code>rows_processed: 8, rows_changed: 0<code> is a healthy no-op re-run. </code>rows_rejected &gt; 0` is a data question, not necessarily a failure — see Troubleshooting.</li></ol>
+<h2 id="refresh-ingest"><span class="dd-margin-tag" aria-hidden="true">refresh-ingest</span>Refresh / ingest</h2>
+<p><strong>The recurring chain is the startup/refresh runbook&#x27;s.</strong> What belongs here is what you do to ONE loader between chain runs.</p>
+<ul><li><strong>Re-running is safe.</strong> Every loader is idempotent — MERGE on a business key, <code>ON CREATE</code> for first-seen, unconditional <code>SET</code> for enrichment. A second run with the same input reports <code>rows_changed: 0</code>.</li><li><strong>A sparse extract is the exception worth knowing.</strong> A partial source can blank an enrichment property where a loader still writes <code>SET x.name = row.name</code> instead of <code>coalesce(row.name, x.name)</code>. C22 fixed the three catalog loaders; <strong>C24 is open for <code>dev_teams.cypher</code> and <code>catalog_lobs.cypher</code></strong>, so on those two prefer a full extract until it lands.</li><li><strong>Soft delete, then sweep.</strong> A row that a source stops sending is MARKED removed, not deleted — <code>nodes_marked_removed</code> in the envelope. It stays queryable and tombstoned until you explicitly: ``<code>powershell poetry run drydocs sweep-removed </code>`<code> Hard-deletes what was soft-marked. Run it deliberately: a source outage looks exactly like a deletion to a loader, so sweeping straight after a failed extract removes real nodes. Check </code>nodes_marked_removed` against what you expect BEFORE sweeping.</li><li><strong>Snapshots</strong> recompute without re-loading source: ``<code>powershell poetry run drydocs snapshot poetry run drydocs prune-snapshots        # deletes older than N years, keeps the newest </code>``</li><li><strong>Doc corpora</strong> reconcile declared-vs-loaded, and exit non-zero on the wrong database — which makes it a useful <code>NEO4J_DATABASE</code> check on its own: ``<code>powershell poetry run drydocs docs-verify </code>``</li></ul>
+<h2 id="verify"><span class="dd-margin-tag" aria-hidden="true">verify</span>Verify</h2>
+<p><strong>1. The envelope said OK</strong> — necessary, not sufficient. <code>status: OK</code> with <code>rows_processed: 0</code> means the loader ran and found no input.</p>
+<p><strong>2. The invariants hold:</strong></p>
+<pre class="powershell"><code>poetry run drydocs m1-verify
+poetry run drydocs m3-verify</code></pre>
+<p>M1 covers the reference/catalog/SEAL layer, M3 the Control-M chain. These are assertions about the populated graph, so they are the real proof a load worked — the envelope only proves the loader ran.</p>
+<p><strong>3. The run log exists and its footer agrees with the console.</strong> Newest first:</p>
+<pre class="powershell"><code>Get-ChildItem (poetry run python -c &quot;from drydocs_core.run_log import resolve_log_dir; print(resolve_log_dir())&quot;) -Filter load.*.log | Sort-Object LastWriteTime -Descending | Select-Object -First 3</code></pre>
+<p>Header carries date, script, loader, run id, source, target, os user, batch size; the footer carries the same counts the console printed. If they disagree, trust the log — it is written at close from the graph.</p>
+<p><strong>4. Status items, for anything that needs review.</strong> They are measurements written to <code>:JobRun.status_items</code> by <code>BaseLoader._close_run</code>, never typed by a human. An empty list on an existing <code>:JobRun</code> means <strong>healthy — a producer ran and found nothing to report</strong>, which is a different statement from &quot;nothing ran&quot;. <code>knowledge/standards/node-status-envelope.md</code> is the contract.</p>
+<p><strong>5. The suite</strong>, for the loader contracts themselves: <code>poetry run pytest -q</code> (hermetic, no graph needed).</p>
+<h2 id="rollback"><span class="dd-margin-tag" aria-hidden="true">rollback</span>Rollback</h2>
+<ul><li><strong>A bad run of an idempotent loader:</strong> fix the source and re-run. That IS the rollback — MERGE-on-business-key means the second run converges rather than duplicating.</li><li><strong>Rows that should not have been written:</strong> they are soft-marked on the next clean run when the source no longer sends them; <code>sweep-removed</code> then removes them. Prefer this over hand-deleting, because it goes through the same tombstone path everything else does.</li><li><strong>A sweep you regret:</strong> hard delete is not reversible from here. Recovery is a re-load from source. This is the reason the two steps are separate verbs.</li><li><strong>A snapshot:</strong> recompute with <code>snapshot</code>; it is derived from the graph.</li><li><strong>The whole database:</strong> out of scope — the startup/refresh runbook&#x27;s re-ingest, or the core runbook&#x27;s destructive last resort with its blast radius stated there.</li></ul>
+<h2 id="troubleshooting"><span class="dd-margin-tag" aria-hidden="true">troubleshooting</span>Troubleshooting</h2>
+<table><thead><tr><th>Symptom</th><th>Diagnosis</th><th>Fix</th></tr></thead><tbody><tr><td><code>status: OK</code>, graph empty</td><td><code>NEO4J_DATABASE</code> unset → wrote to the EE home db</td><td>set it to <code>drydocs</code>; <code>docs-verify</code> exits non-zero on the wrong db</td></tr><tr><td><code>rows_processed: 0</code></td><td>the loader found no input rows — path, filter or scope</td><td>check the <code>source:</code> line in the run-log header, which records what it actually read</td></tr><tr><td><code>rows_rejected &gt; 0</code></td><td>rows failed the row model (the loader shares the store&#x27;s validation chain)</td><td>the log carries UNCAPPED reject detail; a reject is a data question — decide, do not ignore</td></tr><tr><td><code>unresolved_parents &gt; 0</code></td><td>a parent id did not resolve; the node was written with an orphan flag and the failing id kept</td><td>that is by design (C17/C22) — count them, then fix the source or the load order</td></tr><tr><td>Constraint violation naming an existing node</td><td>a key changed underneath the graph, e.g. the S3 <code>seal_id</code> → <code>app_id</code> cutover against a graph never re-keyed. Uniqueness IGNORES NULLS, so a MERGE on the new key creates a twin and the old key then collides</td><td>backfill the new key on existing nodes BEFORE re-running; see the S3 tracker note</td></tr><tr><td>Loader MATCHes nothing, rejects nothing</td><td>a supplement did not seed its terms</td><td><code>apply-supplements</code> (core runbook) — it verifies and fails loudly</td></tr><tr><td>A name went blank after a refresh</td><td>sparse extract + an unconditional <code>SET</code></td><td>C22&#x27;s <code>coalesce</code> fix; C24 is open for <code>dev_teams</code>/<code>catalog_lobs</code></td></tr><tr><td><code>nodes_marked_removed</code> unexpectedly large</td><td>a source outage looks identical to a deletion</td><td>do NOT sweep; re-run against a good extract first</td></tr><tr><td>No run log</td><td><code>DRYDOCS_LOGDIR</code> vs the <code>SPIDERP_LOGDIR</code> fallback</td><td>resolve it, do not guess (core runbook, Verify step 1)</td></tr></tbody></table>
+<h2 id="contacts-escalation"><span class="dd-margin-tag" aria-hidden="true">contacts-escalation</span>Contacts &amp; escalation</h2>
+<p>Mechanism only; no on-call rota. The boundary that matters: <strong>running a loader is operational; changing what it writes is not.</strong> A new relationship type, a status flip from <code>planned</code> to <code>active</code>, a new mapping — all route through <code>docs/RELATIONSHIP_GUIDE.md</code>, the relationship-vocabulary registry and the HITL gate (<code>docs/restructure/03-hitl-sme-flow.md</code>). Manual tier-5 mappings carry their own manifest governance (<code>config/manual-loads/manifest.yaml</code>, gate <code>seal-attribution-match-policy</code> §F). <strong>The loader is the only graph writer</strong> — no console, API or agent surface writes the graph, and that contract is enforced in <code>drydocs-api</code>&#x27;s own guard rather than assumed.</p>
+<h2 id="appendices"><span class="dd-margin-tag" aria-hidden="true">appendices</span>Appendices</h2>
+<p><strong>A. The module&#x27;s surface</strong>, per <code>MODULE_MAP</code> (<code>tests/unit/test_module_boundary.py</code> is the authority and will fail if this drifts): <code>drydocs.loaders</code>, <code>drydocs.cli</code>, <code>drydocs.snapshots</code>, <code>drydocs.staging</code>, <code>drydocs.cmdline_staging</code>, <code>drydocs.docs_verify</code>.</p>
+<p><strong>B. Where the sequence lives</strong> — deliberately not reproduced here:</p>
+<table><thead><tr><th>Surface</th><th>What it is</th></tr></thead><tbody><tr><td><code>cli.CANONICAL_LOAD_SEQUENCE</code></td><td>the declaration, single source</td></tr><tr><td><code>docs/plan/load-map.html</code> + <code>web/src/generated/load-map.json</code></td><td>the generated view</td></tr><tr><td><code>scripts/ingest.sh</code></td><td>the scheduled subset (hand-maintained — <strong>N6</strong>)</td></tr><tr><td>startup/refresh runbook, Appendix B</td><td>the cold-start block (hand-maintained — <strong>N6</strong>)</td></tr></tbody></table>
+<p>N6 makes the last two derive from the first. Until it lands they can disagree, and on 2026-08-04 they did: <code>bootstrap-schema-graph</code> was in both operator surfaces and missing from the declaration.</p>
+<p><strong>C. Reject and envelope reference:</strong> <code>knowledge/standards/node-status-envelope.md</code>.</p>
+<hr class="dd-sme-divider">
+<section class="dd-sme-feedback" aria-label="SME - Feedback">
+<h2>SME - Feedback</h2>
+<p>How to return your notes on this document:</p>
+<ol>
+<li>Click the <strong>✎</strong> button beside any section (or numbered step) and type your note — notes save in your browser as you type.</li>
+<li>When finished, click <strong>Copy feedback</strong> in the bottom-right toolbar. Your notes are copied as anchor-keyed YAML.</li>
+<li>Create the feedback file (it is YAML, <em>not</em> markdown) — <strong>Copy To:</strong> <code>docs/design/feedback/</code> · <strong>File Name:</strong> <code>drydocs-load-runbook-rev1.yaml</code></li>
+<li>Paste the copied block into that file, save, and commit (or send the file back to the team).</li>
+</ol>
+</section>
+</main>
+<footer class="dd-print-footer">Rev 1 · commit 0b67b66</footer>
+<script>
+
+(function(){
+  var DOC="drydocs-load-runbook", FILE="drydocs-load-runbook-rev1.yaml", DIR="docs/design/feedback/", KEY="drydocs-doc-feedback:"+DOC;
+  function load(){ try{return JSON.parse(localStorage.getItem(KEY)||"{}");}catch(e){return {};} }
+  function save(){ localStorage.setItem(KEY, JSON.stringify(state)); }
+  var state=load(), badge;
+  function count(){ return Object.keys(state).filter(function(k){return (state[k]||"").trim();}).length; }
+  function refresh(){ if(badge) badge.textContent=count(); }
+  function toast(msg){ var t=document.createElement("div"); t.className="dd-toast"; t.textContent=msg; document.body.appendChild(t); requestAnimationFrame(function(){t.classList.add("show");}); setTimeout(function(){t.classList.remove("show"); setTimeout(function(){t.remove();},250);},1600); }
+  function exportYaml(){
+    var lines=["# design-doc feedback — paste into docs/design/feedback/"+DOC+"-rev<N>.yaml","doc: "+DOC,"notes:"];
+    Object.keys(state).forEach(function(a){
+      var note=(state[a]||"").replace(/\r/g,""); if(!note.trim()) return;
+      lines.push("  - anchor: "+a); lines.push("    note: |");
+      note.split("\n").forEach(function(l){ lines.push("      "+l); });
+    });
+    return lines.join("\n")+"\n";
+  }
+  function attach(el){
+    var id=el.id;
+    var btn=document.createElement("button"); btn.className="dd-note-btn"; btn.type="button"; btn.textContent="✎"; btn.title="Annotate #"+id;
+    var box=document.createElement("div"); box.className="dd-note-box"; box.style.display=(state[id]||"").trim()?"block":"none";
+    var ta=document.createElement("textarea"); ta.value=state[id]||""; ta.setAttribute("placeholder","note for #"+id+" …");
+    ta.addEventListener("input",function(){ state[id]=ta.value; save(); refresh(); el.classList.toggle("dd-annotated", !!ta.value.trim()); });
+    if((state[id]||"").trim()) el.classList.add("dd-annotated");
+    box.appendChild(ta);
+    btn.addEventListener("click",function(){ box.style.display=box.style.display==="none"?"block":"none"; if(box.style.display==="block") ta.focus(); });
+    if(el.tagName==="LI"){ el.insertAdjacentElement("afterbegin", btn); el.appendChild(box); }
+    else { el.insertAdjacentElement("afterend", box); el.insertAdjacentElement("beforebegin", btn); }
+  }
+  function copyText(txt, ok){
+    var done=function(){toast(ok);};
+    var fallback=function(){ var t=document.createElement("textarea"); t.value=txt; document.body.appendChild(t); t.select(); try{document.execCommand("copy"); toast(ok);}catch(e){toast("copy failed — select the box");} t.remove(); };
+    if(navigator.clipboard&&navigator.clipboard.writeText){ navigator.clipboard.writeText(txt).then(done,fallback); } else { fallback(); }
+  }
+  function fileLine(label, value){
+    var d=document.createElement("div"); d.className="dd-fb-file"; d.title="click to copy";
+    var c=document.createElement("code"); c.textContent=value;
+    d.appendChild(document.createTextNode(label+" ")); d.appendChild(c);
+    d.addEventListener("click",function(){ copyText(value, label.replace(":","")+" copied"); });
+    return d;
+  }
+  document.addEventListener("DOMContentLoaded",function(){
+    document.querySelectorAll("main [id]").forEach(attach);
+    var bar=document.createElement("div"); bar.className="dd-fb-bar";
+    var row=document.createElement("div"); row.className="dd-fb-row";
+    var lbl=document.createElement("span"); lbl.innerHTML='notes <span class="dd-badge">0</span>'; badge=lbl.querySelector(".dd-badge");
+    var ex=document.createElement("button"); ex.type="button"; ex.textContent="Copy feedback";
+    ex.addEventListener("click",function(){ copyText(exportYaml(), "feedback copied — create "+DIR+FILE); });
+    row.appendChild(lbl); row.appendChild(ex);
+    bar.appendChild(row);
+    bar.appendChild(fileLine("file:", FILE));
+    bar.appendChild(fileLine("path:", DIR+FILE));
+    document.body.appendChild(bar); refresh();
+  });
+})();
+
+</script>
+</body>
+</html>

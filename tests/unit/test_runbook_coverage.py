@@ -84,7 +84,6 @@ MODULE_EXEMPT: dict[str, str] = {
 #: without a backlog item that says who writes it.
 RUNBOOK_PENDING: frozenset[str] = frozenset(
     {
-        "drydocs-load",  # V3 — must rule its overlap with the system-level startup runbook
         "drydocs-review",  # V4
         "drydocs-docgen",  # V5
         "drydocs-lineage",  # V6 — two chain-scoped runbooks exist; neither covers the module
@@ -98,6 +97,16 @@ RUNBOOK_PENDING: frozenset[str] = frozenset(
 #: module. Ruled at V1, 2026-08-04. `satisfies` is the module it covers whole;
 #: None means it is narrower than its module and does not discharge coverage.
 RUNBOOK_DISPOSITION: dict[str, tuple[str | None, str, str]] = {
+    "drydocs-load-runbook.md": (
+        "drydocs-load",
+        "drydocs-load",
+        "V3 ruled AUTHOR-DISTINCT: the startup/refresh runbook is SYSTEM-level and declaring "
+        "it this module's runbook would need it narrowed (it owns Docker and provisioning, "
+        "which are not drydocs-load) or this module widened to own the container (which is "
+        "not either). The division: startup/refresh answers 'run the chain', this answers "
+        "'run, read and repair ONE loader'. It deliberately restates no sequence -- a third "
+        "copy would make N6's job worse",
+    ),
     "drydocs-core-runbook.md": (
         "drydocs-core",
         "drydocs-core",
@@ -149,9 +158,11 @@ RUNBOOK_DISPOSITION: dict[str, tuple[str | None, str, str]] = {
     "drydocs-startup-refresh-runbook.md": (
         None,
         "drydocs-load",
-        "SYSTEM-level: container, provisioning and sample ingest ACROSS modules. It is "
-        "not drydocs-load's module runbook, and V3's own title says it must rule the "
-        "overlap rather than inherit it",
+        "SYSTEM-level: container, provisioning and sample ingest ACROSS modules. V3 "
+        "RULED (2026-08-04): it is NOT drydocs-load's module runbook and stays "
+        "system-level; drydocs-load-runbook.md is distinct and the two cross-reference. "
+        "This one still owns the cold-start SEQUENCE (Appendix B), which N6 will make "
+        "derive from cli.CANONICAL_LOAD_SEQUENCE",
     ),
 }
 
