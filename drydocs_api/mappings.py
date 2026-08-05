@@ -63,12 +63,22 @@ DOMAINS: tuple[dict, ...] = (
         "available": True,
     },
     {
+        # RETIRED at K15 (2026-08-05). K7 §A1 ruled attribution FOLDER-grain and K8
+        # retired the job-grain edge, so this domain's coverage grid read a
+        # relationship that no longer exists — it reported every row unresolved and
+        # drafted a changeset the server refuses. Retired rather than re-bound: a
+        # folder and its jobs carry the SAME app code, so a job-grain grid is N× rows
+        # carrying ONE folder-level fact, and a grid that looks per-job invites being
+        # read as per-job truth. Authoring lives at `app-code-mapping` (one row per app
+        # code); "which application owns this job" stays a one-hop traversal.
+        # The row STAYS in the registry, unavailable — a silently vanished domain reads
+        # as a bug to anyone who bookmarked ?domain=job-application.
         "id": "job-application",
-        "title": "Job → Application (tier-5 manual CSV)",
+        "title": "Job → Application (RETIRED at K15 — folder grain supersedes)",
         "kind": "manual",
-        "source": "config/manual-loads/",
+        "source": "(retired 2026-08-05 — author at app-code-mapping; jobs inherit their folder)",
         "tier": 5,
-        "available": True,
+        "available": False,
     },
     {
         "id": "fid-seal",

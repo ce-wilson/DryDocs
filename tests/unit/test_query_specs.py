@@ -74,14 +74,37 @@ def test_every_spec_is_versioned_read_only_and_classified():
         assert is_write_cypher(spec.cypher) is None
 
 
-def test_mappings_coverage_spec_registered():
-    """O13: the stewardship coverage grid binds to its versioned spec — status
-    (resolved/unresolved/conflict) and match_method (the K2 tier evidence) are
-    grid-visible columns, keyed folder_id/job_id for the assign dialog."""
-    spec = query_spec("mappings.attribution-coverage.v1")
-    assert spec.database == "drydocs"
-    names = {c.name for c in spec.columns}
-    assert {"status", "match_method", "folder_id", "job_id", "app_id"} <= names
+def test_mappings_coverage_spec_stays_retired():
+    """K15 (2026-08-05): the O13 job-grain coverage spec is RETIRED, and this test
+    is the guard that keeps it that way — inverted from the registration test it
+    replaces.
+
+    It read (:ControlMJob)-[:WAS_ASSOCIATED_WITH {role:'seal_app_ref'}]->(app),
+    the edge K8 retired when K7 §A1 moved attribution to the FOLDER grain. Post-K8
+    it reported every row 'unresolved' and its assign dialog drafted a changeset
+    the server refuses.
+
+    WHY A GUARD RATHER THAN A DELETION: the failure mode is re-adding a job-grain
+    coverage spec because a grid "looks empty" — which would resurrect the surface
+    without resurrecting the edge. A folder and its jobs carry the SAME app code,
+    so a job-grain grid is N× rows carrying one folder-level fact; "which
+    application owns this job" is a one-hop traversal from the folder edge, not a
+    spec of its own. Authoring lives at the app-code grain (K7 defined mapping).
+    """
+    assert "mappings.attribution-coverage.v1" not in QUERY_SPECS
+    with pytest.raises(UnknownSpecError):
+        query_spec("mappings.attribution-coverage.v1")
+
+    # No SURVIVING spec may read the retired job-grain edge (K15 acceptance).
+    job_grain = re.compile(
+        r"\(\s*j\s*:\s*ControlMJob\s*\)\s*-\s*\[\s*r?\s*:\s*WAS_ASSOCIATED_WITH"
+    )
+    offenders = [
+        sid
+        for sid, spec in QUERY_SPECS.items()
+        if "seal_app_ref" in spec.cypher and job_grain.search(spec.cypher)
+    ]
+    assert offenders == [], f"specs still reading the retired job-grain edge: {offenders}"
 
 
 def test_lineage_frames_have_specs():

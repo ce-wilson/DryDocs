@@ -79,11 +79,23 @@ def test_every_spec_excludes_the_exemplars() -> None:
 
 
 def test_property_qualified_exemplar_edges_are_not_a_defense() -> None:
-    """The subtle case: the meta-graph's WAS_ASSOCIATED_WITH exemplar edge
-    CARRIES role='seal_app_ref', so the role predicate alone would have
-    matched the exemplar chain — the two specs riding that edge must carry
-    the label predicate explicitly."""
-    for spec_id in ("explorer.folder-applications.v1", "mappings.attribution-coverage.v1"):
+    """The subtle case: a meta-graph exemplar edge CARRIES role='seal_app_ref',
+    so the role predicate alone would have matched the exemplar chain — any spec
+    riding a seal_app_ref edge must carry the label predicate explicitly.
+
+    K15 (2026-08-05): this was a two-spec list; the job-grain half
+    (mappings.attribution-coverage.v1) is retired with the pane, and the
+    surviving explorer spec was re-bound to the FOLDER-grain
+    BELONGS_TO_APPLICATION at K8. Enumerating specs by role rather than by a
+    hardcoded pair means the guard now covers whatever rides that role next,
+    instead of going quietly out of date the way the pair did.
+    """
+    riding = [sid for sid, spec in QUERY_SPECS.items() if "seal_app_ref" in spec.cypher]
+    assert "explorer.folder-applications.v1" in riding, (
+        "the folder-grain attribution spec should still ride seal_app_ref — if it "
+        "does not, this guard has lost its subject and needs re-pointing, not deleting"
+    )
+    for spec_id in riding:
         assert _EXCLUSION_RE.search(QUERY_SPECS[spec_id].cypher), spec_id
 
 
