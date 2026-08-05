@@ -12038,11 +12038,17 @@ items:
       off the USES_SOFTWARE edge; (2) the evidence rows are (fid-name, install-path)
       rows, so writing the app-level edge directly bakes a mutable ownership join into a
       fact and discards the only grain at which it can later be re-derived. SEPARATELY
-      WORTH KNOWING: the Control-M SUB-APPLICATION field (PR<Appcode>-<Platform App
-      Code>) is a standards-backed application→framework declaration already present in
-      the scheduling data at scale — a better USES_SOFTWARE source than this email, at
-      the application grain rather than the fid grain. It is inboxed, not in this item,
-      and it needs two software-registry product rows (DPL, Snowflake ETL) first.
+      WORTH KNOWING (corrected 2026-08-05 — an earlier draft of this note called it "a
+      better USES_SOFTWARE source than this email", which overclaimed it): the Control-M
+      SUB-APPLICATION field (PR<Appcode>-<Platform App Code>) declares WHICH PLATFORM an
+      application runs on — documenting the platform is the naming standard's intent — so
+      it is a standards-backed app→platform source at estate scale, good for a first-pass
+      C1 container diagram. It is NOT a substitute for this email: it carries PRODUCT and
+      never VERSION, so it does not touch the fact this gate is about. And it must be
+      deduped to one edge per (application, product) — an app has many sub-applications
+      all naming the same platform, so fanning them in at sub-application grain builds a
+      super node on the product. Inboxed, not in this item; needs two software-registry
+      product rows (DPL, Snowflake ETL) first.
 
   - id: L22
     epic: doc-infrastructure

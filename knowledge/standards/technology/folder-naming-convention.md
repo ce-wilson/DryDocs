@@ -115,16 +115,33 @@ needs the same three-part handling — corroborate rather than validate, report 
 residual as a count, and route disagreements to a human. Deriving from one, or reddening
 a test on one, is a defect in the consumer, not in the data.
 
-### The sub-application seam — a declared application→software link
+### The sub-application seam — a declared application→platform link
 
 Under the HLT standard the framework does not disappear; it becomes a **sub-application**
-on the job: `PR<Appcode>-<Platform App Code>`. That is a *declared* statement that a given
-application runs on a given ETL framework — i.e. an
-`(:BusinessApplication)-[:USES_SOFTWARE]->(:SoftwareProduct)` fact already present in the
-scheduling data, at scale, with an authoring standard behind it. Two of the six framework
-codes have no `config/taxonomy/software-registry.yaml` product row yet (the DPL gap that
+on the job: `PR<Appcode>-<Platform App Code>`. **Documenting the platform is the intent of
+the naming standard**, so this is a first-class statement that a given application runs on
+a given ETL framework — present in the scheduling data at scale, with an authoring standard
+behind it. Its natural use is a **first-pass C1 (container) view**: which applications sit
+on which ETL platform, across the estate, with no new collection.
+
+Two limits decide how far it can be taken, and both were mis-stated in an earlier draft of
+this section:
+
+- **It carries PRODUCT, never VERSION.** `ABI` says Ab Initio; it does not say `v4-3-2-2`.
+  So this is not an alternative source for the version facts the `software-version-context`
+  gate is about — it is a different fact that happens to share an edge type. The two are
+  complementary; neither substitutes for the other.
+- **Load it deduped at application grain, or it builds a super node.** An application has
+  many sub-applications, and they all name the same platform. Writing one edge per
+  sub-application fans the whole estate into a handful of `:SoftwareProduct` nodes, and a
+  product node holding an edge per sub-application per application is a traversal hazard
+  before it is a correctness problem. The edge is **one per (application, product)**; the
+  sub-application rows are supporting evidence for it, not instances of it.
+
+Prerequisite either way: two of the six framework codes have no
+`config/taxonomy/software-registry.yaml` product row yet (the DPL gap that
 `invocation_patterns` already records, plus Snowflake ETL), so registering those products
-is the prerequisite.
+comes first.
 
 ### `1 SEAL per folder` — independent corroboration of the K7 1:1 rule
 

@@ -116,16 +116,28 @@ question a 1,000-line file with the trail at the bottom could not answer.
   tier-2 resolving SEAL is a token inside the folder name, so per-folder resolution is derivable for
   the common case too. Mechanism written up in
   [`knowledge/standards/technology/folder-naming-convention.md`](../../knowledge/standards/technology/folder-naming-convention.md).
-- 2026-08-05 — [source] **The Control-M SUB-APPLICATION field is a declared app→software link — a far
-  better USES_SOFTWARE source than the adhoc version email.** Under the HLT standard the framework
-  does not vanish when the app code is application-tied; it moves to a sub-application
-  `PR<Appcode>-<Platform App Code>`. That is an authored, standards-backed statement that an
-  application runs on an ETL framework — already present in the scheduling data, at scale, with a
-  naming standard behind it. Feeds gate `software-version-context` directly: the email gives VERSION
-  at fid grain, this gives PRODUCT at application grain, and the two are complementary rather than
-  competing. PREREQUISITE: two of the six framework codes have no `config/taxonomy/software-registry.yaml`
-  product row — DPL (the standing gap `invocation_patterns` already records, now with a name and a
-  framework table behind it) and Snowflake ETL. Register those products first.
+- 2026-08-05 — [source] **The Control-M SUB-APPLICATION field declares WHICH PLATFORM an application
+  runs on — a first-pass C1 source, NOT a replacement for the version email.** ~~a far better
+  USES_SOFTWARE source than the adhoc version email~~ — **CORRECTED SAME DAY (user):** that
+  overclaimed it on both axes. Under the HLT standard the framework does not vanish when the app code
+  is application-tied; it moves to a sub-application `PR<Appcode>-<Platform App Code>`. **Documenting
+  the platform IS the intent of the naming standard** — so the field is a faithful, standards-backed,
+  at-scale statement of *app → platform*, and that is genuinely useful. What it is not:
+  - **It answers no versioning question.** `ABI` says Ab Initio, never `v4-3-2-2`. The version email
+    and this field are not two sources for one fact; they are two different facts (PRODUCT vs
+    VERSION), and only the email carries the one the readiness review actually asked for. Treating
+    this as "the better source" would have left the gate's whole subject unsourced.
+  - **Mapping it at sub-application grain manufactures a super node.** An app has MANY
+    sub-applications, all naming the same platform — fan every one into `:SoftwareProduct {abinitio}`
+    and that single node collects an edge per sub-application per app across the estate, which is a
+    traversal hazard, not just noise. If this is loaded, the edge is **one per (application, product),
+    deduped at app grain**, with the sub-application rows as supporting evidence rather than as edges.
+  Standing use: **fine for a first-pass C1 (container) diagram** — which apps sit on which ETL
+  platform, at estate scale, for free. Anything finer waits for a real source.
+  PREREQUISITE either way: two of the six framework codes have no
+  `config/taxonomy/software-registry.yaml` product row — DPL (the standing gap `invocation_patterns`
+  already records, now with a name and a framework table behind it) and Snowflake ETL. Register those
+  products first.
 - 2026-08-05 — [chore] **`refines:` in the standards frontmatter is a CHAIN, not a flag — and
   `config/precedence.yaml` cannot express two internal tiers.** SME framing: Vendor → Company/Platform
   team → Lower support group. Concretely: BMC baseline ← DAT SRE standard (platform team,
