@@ -59,6 +59,7 @@ from __future__ import annotations
 
 import logging
 import uuid
+from dataclasses import asdict
 from datetime import UTC
 from pathlib import Path
 from typing import NamedTuple
@@ -155,6 +156,7 @@ from .loaders.folder_attribution import (
     FolderAttributionLoader,
     check_folder_preconditions,
     fetch_folder_codes,
+    fetch_folder_first_seen,
     fetch_pinned_folders,
     load_platform_codes,
 )
@@ -1735,11 +1737,25 @@ def load_folder_attribution(
             # K18: the closed platform-code list (values twin; empty when the
             # internal file is absent — the derivation guard goes inert).
             platform_codes=load_platform_codes(),
+            # K19: folder first-seen dates feed the mapping-age check — a
+            # mapping older than folders it lands on queues for review.
+            folder_first_seen=fetch_folder_first_seen(cli),
         )
         summary = FolderAttributionLoader(cli, adapter, batch_size=batch_size).load()
         console.print(summary.as_dict())
         if adapter.coverage is not None:
             console.print({"coverage": adapter.coverage.as_dict()})
+            # K19 review queue: which as-of assertions predate their folders.
+            # Reported to the steward, never re-attributed automatically — a
+            # reissued code and a growing application look identical here.
+            if adapter.coverage.mapping_age_suspects:
+                console.print(
+                    {
+                        "mapping_age_review_queue": [
+                            asdict(s) for s in adapter.coverage.mapping_age_suspects
+                        ]
+                    }
+                )
             if not adapter.coverage.reconciles():
                 console.print(
                     "[red]Coverage invariant violated: attributed + unmatched + "

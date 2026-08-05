@@ -54,6 +54,19 @@ K18 (2026-08-05) — the two silent-fan-out routes closed:
   property) before the ambiguous name could surface in a QuerySpec — the K2
   match-precedence tiers keep their name; the value spaces never collided,
   the prose did.
+
+K19 (2026-08-05) — a mapping is an AS-OF assertion, not a fact. The 3-char
+app-code namespace is scarce, so codes are retired and REISSUED with a
+different meaning (`DDC`: created for one purpose, repurposed, the original
+gone). Nothing structural stops a reused code from silently inheriting its
+predecessor's mapping, so folders authored under the NEW meaning keep an
+attribution that is now wrong. The check: any authored row whose
+``authored_on`` PREDATES the first-seen date of folders it is being applied
+to queues as a ``MappingAgeSuspect`` — a REVIEW queue with counts, never an
+automatic re-attribution, because a reissued code and a genuinely growing
+application are indistinguishable without a human. Detection only:
+effective dating (valid_from/valid_to) would preserve mapping history,
+which is an ontology question for a gate (the item's own scope note).
 """
 
 from __future__ import annotations
@@ -224,6 +237,28 @@ class RowKindDisagreement:
     blocked_fan_out: bool
 
 
+@dataclass(frozen=True)
+class MappingAgeSuspect:
+    """An authored row older than folders it is being applied to (K19).
+
+    The code may have been REISSUED since the row was authored — or the
+    application simply grew. The two are indistinguishable without a human,
+    so this is review-queue material with counts, never a re-attribution.
+    One suspect per authored ROW (each row is its own as-of assertion), so a
+    fresh override on a stale defined row shows exactly which assertion aged.
+    Same-day is NOT postdating — only a folder first seen strictly after
+    ``authored_on`` counts."""
+
+    app_code: str
+    origin: str
+    authored_on: str
+    app_id: str | None
+    folders_postdating: int
+    folders_covered: int
+    earliest_postdating_first_seen: str
+    sample_folders: tuple[str, ...]
+
+
 @dataclass
 class FolderAttributionCoverage:
     """Per-run accounting. Invariant: attributed + unmatched + conflicts +
@@ -239,6 +274,10 @@ class FolderAttributionCoverage:
     conflicts: list[FolderConflict] = field(default_factory=list)
     pin_conflicts: list[FolderPinConflict] = field(default_factory=list)
     row_kind_disagreements: list[RowKindDisagreement] = field(default_factory=list)
+    # K19: review-only, OUTSIDE the invariant — a suspect folder is still
+    # attributed (the mapping stands until a human rules it), so it already
+    # rides the invariant through `attributed`.
+    mapping_age_suspects: list[MappingAgeSuspect] = field(default_factory=list)
     fact_rows_rejected: int = 0
 
     def reconciles(self) -> bool:
@@ -257,6 +296,7 @@ class FolderAttributionCoverage:
             "conflict_count": len(self.conflicts),
             "pin_conflict_count": sum(1 for c in self.pin_conflicts if c.agrees is not None),
             "row_kind_disagreement_count": len(self.row_kind_disagreements),
+            "mapping_age_suspect_count": len(self.mapping_age_suspects),
             "fact_rows_rejected": self.fact_rows_rejected,
             "reconciles": self.reconciles(),
         }
@@ -449,6 +489,65 @@ def resolve_folder_attributions(
 
 
 # ---------------------------------------------------------------------------
+# K19 — mapping-age detection (pure; review queue, never a write)
+# ---------------------------------------------------------------------------
+
+
+def detect_mapping_age_suspects(
+    authored: Iterable[Mapping[str, Any]],
+    folder_codes: Mapping[str, str | None],
+    folder_first_seen: Mapping[str, str],
+    *,
+    max_sample: int = 10,
+) -> list[MappingAgeSuspect]:
+    """Answer "is this mapping older than the folders it is being applied
+    to?" — one :class:`MappingAgeSuspect` per authored row with at least one
+    folder first seen strictly AFTER the row's ``authored_on``.
+
+    ``folder_first_seen`` maps folder_id -> ISO first-seen date (the graph's
+    ``ControlMFolder.first_seen_at``, date part). Comparison is on the date
+    part only, so a folder first seen the same day the row was authored does
+    not count. Rows without ``authored_on`` and folders without a first-seen
+    date are skipped — no date, no age claim. Every row KIND is checked
+    (a platform declaration ages the same way an attribution does); a
+    per-folder row is checked against its one folder only.
+    """
+    suspects: list[MappingAgeSuspect] = []
+    for row in authored:
+        authored_on = str(row.get("authored_on") or "").strip()[:10]
+        if not authored_on:
+            continue
+        code = str(row.get("app_code") or "").strip()
+        folder_id = row.get("folder_id")
+        if folder_id:
+            covered = [str(folder_id).strip()]
+        else:
+            covered = sorted(f for f, c in folder_codes.items() if c == code)
+        postdating = sorted(
+            f
+            for f in covered
+            if str(folder_first_seen.get(f) or "")[:10] > authored_on
+        )
+        if not postdating:
+            continue
+        suspects.append(
+            MappingAgeSuspect(
+                app_code=code,
+                origin=str(row.get("origin") or ""),
+                authored_on=authored_on,
+                app_id=(str(row.get("app_id")) if row.get("app_id") else None),
+                folders_postdating=len(postdating),
+                folders_covered=len(covered),
+                earliest_postdating_first_seen=min(
+                    str(folder_first_seen[f])[:10] for f in postdating
+                ),
+                sample_folders=tuple(postdating[:max_sample]),
+            )
+        )
+    return suspects
+
+
+# ---------------------------------------------------------------------------
 # Adapter + loader
 # ---------------------------------------------------------------------------
 
@@ -470,6 +569,7 @@ class FolderAttributionAdapter:
         reconcilers: TierReconcilers | None = None,
         pinned: Mapping[str, str] | None = None,
         platform_codes: frozenset[str] | None = None,
+        folder_first_seen: Mapping[str, str] | None = None,
         max_rejects_kept: int = 20,
     ) -> None:
         self.authored = list(authored)
@@ -478,6 +578,8 @@ class FolderAttributionAdapter:
         self.reconcilers = reconcilers or TierReconcilers()
         self.pinned = dict(pinned or {})
         self.platform_codes = platform_codes if platform_codes is not None else frozenset()
+        # K19: folder_id -> ISO first-seen date; empty leaves the age check inert.
+        self.folder_first_seen = dict(folder_first_seen or {})
         self.max_rejects_kept = max_rejects_kept
         self.coverage: FolderAttributionCoverage | None = None
         self.fact_rejects: list[dict] = []
@@ -510,6 +612,9 @@ class FolderAttributionAdapter:
             platform_codes=self.platform_codes,
         )
         coverage.fact_rows_rejected = rejected
+        coverage.mapping_age_suspects = detect_mapping_age_suspects(
+            self.authored, self.folder_codes, self.folder_first_seen
+        )
         self.coverage = coverage
         for row in rows:
             yield row.model_dump(mode="json")
@@ -561,6 +666,7 @@ class FolderAttributionLoader(BaseLoader):
                 run.conflict_count     = $conflict_count,
                 run.pin_conflict_count = $pin_conflict_count,
                 run.row_kind_disagreements = $row_kind_disagreements,
+                run.mapping_age_suspects   = $mapping_age_suspects,
                 run.edges_written      = edges_written,
                 run.orchestrator_edges = orchestrator_edges,
                 run.dropped_in_graph   = $attributed - edges_written
@@ -574,7 +680,18 @@ class FolderAttributionLoader(BaseLoader):
             conflict_count=len(coverage.conflicts),
             pin_conflict_count=sum(1 for c in coverage.pin_conflicts if c.agrees is not None),
             row_kind_disagreements=len(coverage.row_kind_disagreements),
+            mapping_age_suspects=len(coverage.mapping_age_suspects),
         )
+        # K19: reported, never re-attributed — a reissued code and a growing
+        # application look identical from here; a human rules each suspect.
+        if coverage.mapping_age_suspects:
+            LOGGER.warning(
+                "folder_attribution: %d mapping(s) predate folders they were "
+                "applied to (codes: %s) — possible reissued code(s), review "
+                "queue in the coverage report.",
+                len(coverage.mapping_age_suspects),
+                ", ".join(sorted({s.app_code for s in coverage.mapping_age_suspects})),
+            )
         if result:
             dropped = coverage.attributed - result[0].get("edges_written", 0)
             if dropped:
@@ -614,6 +731,20 @@ def fetch_folder_codes(client: Neo4jClient) -> dict[str, str | None]:
         """
     )
     return {str(r["folder_id"]): (str(r["app_code"]) if r.get("app_code") else None) for r in rows}
+
+
+def fetch_folder_first_seen(client: Neo4jClient) -> dict[str, str]:
+    """Every live folder's first-seen DATE (K19 age-check input). The date
+    part only — same-day authoring must not read as postdating. A folder
+    without the stamp is simply absent (no date, no age claim)."""
+    rows = client.run(
+        """
+        MATCH (f:ControlMFolder)
+        WHERE NOT f:SchemaMeta AND f.first_seen_at IS NOT NULL
+        RETURN f.folder_id AS folder_id, toString(date(f.first_seen_at)) AS first_seen
+        """
+    )
+    return {str(r["folder_id"]): str(r["first_seen"]) for r in rows}
 
 
 def fetch_pinned_folders(client: Neo4jClient) -> dict[str, str]:

@@ -23,6 +23,7 @@ from drydocs.loaders.folder_attribution import (
     FALLBACK_SOURCE,
     FolderAttributionAdapter,
     FolderAttributionLoader,
+    detect_mapping_age_suspects,
     resolve_folder_attributions,
 )
 from drydocs.loaders.seal_attribution import TierReconcilers
@@ -381,6 +382,84 @@ def test_adapter_authored_only_run_needs_no_fact_source() -> None:
     rows = list(adapter.rows())
     assert len(rows) == 1
     assert adapter.coverage is not None and adapter.coverage.fact_rows_rejected == 0
+
+
+# --- K19 mapping-age detection (as-of assertions, reissued codes) ----------------
+
+
+def test_reissued_code_two_eras_queues_for_review_and_still_attributes() -> None:
+    """THE K19 case: one code, two eras, folders on both sides. The mapping
+    was authored under the code's OLD meaning; a folder first seen after
+    that date may carry the code's NEW meaning — indistinguishable from
+    growth without a human, so it QUEUES (with counts) and the attribution
+    still stands (never an automatic re-attribution)."""
+    authored = [{**_authored("DDC", "SL0001"), "authored_on": "2025-01-15"}]
+    folder_codes = {"f_era1": "DDC", "f_era2": "DDC"}
+    first_seen = {"f_era1": "2024-06-01", "f_era2": "2026-03-01"}
+
+    suspects = detect_mapping_age_suspects(authored, folder_codes, first_seen)
+    assert len(suspects) == 1
+    s = suspects[0]
+    assert s.app_code == "DDC" and s.app_id == "SL0001" and s.origin == "defined"
+    assert s.authored_on == "2025-01-15"
+    assert s.folders_postdating == 1 and s.folders_covered == 2
+    assert s.sample_folders == ("f_era2",)
+    assert s.earliest_postdating_first_seen == "2026-03-01"
+
+    # The mapping still applies to BOTH eras until a human rules it.
+    rows, cov = resolve_folder_attributions(authored, folder_codes, [])
+    assert {r.folder_id for r in rows} == {"f_era1", "f_era2"}
+    assert all(r.app_id == "SL0001" for r in rows)
+    assert cov.reconciles()
+
+
+def test_mapping_age_needs_dates_on_both_sides_and_same_day_is_not_postdating() -> None:
+    authored = [
+        {**_authored("ARA", "SL0001"), "authored_on": "2025-01-15"},
+        {**_authored("UND", "SL0002"), "authored_on": None},  # no as-of, no age claim
+    ]
+    folder_codes = {"f_same": "ARA", "f_nodate": "ARA", "f_new": "UND"}
+    first_seen = {"f_same": "2025-01-15", "f_new": "2026-03-01"}  # f_nodate absent
+    assert detect_mapping_age_suspects(authored, folder_codes, first_seen) == []
+
+
+def test_per_folder_row_is_aged_against_its_one_folder_only() -> None:
+    authored = [
+        {
+            **_authored("DPL", "SL0003", folder_id="f_pin", row_kind="platform"),
+            "authored_on": "2025-06-01",
+        }
+    ]
+    # A sibling folder under the same code postdates the row, but the row
+    # narrows to f_pin — only f_pin's date can age it.
+    folder_codes = {"f_pin": "DPL", "f_other": "DPL"}
+    assert (
+        detect_mapping_age_suspects(authored, folder_codes, {"f_other": "2026-07-01"}) == []
+    )
+    suspects = detect_mapping_age_suspects(authored, folder_codes, {"f_pin": "2026-07-01"})
+    assert len(suspects) == 1 and suspects[0].folders_covered == 1
+
+
+def test_adapter_carries_the_age_queue_into_coverage() -> None:
+    adapter = FolderAttributionAdapter(
+        [{**_authored("DDC", "SL0001"), "authored_on": "2025-01-15"}],
+        {"f_era1": "DDC", "f_era2": "DDC"},
+        folder_first_seen={"f_era1": "2024-06-01", "f_era2": "2026-03-01"},
+    )
+    rows = list(adapter.rows())
+    assert len(rows) == 2  # attribution unchanged by the queue
+    cov = adapter.coverage
+    assert cov is not None and cov.reconciles()
+    assert len(cov.mapping_age_suspects) == 1
+    assert cov.as_dict()["mapping_age_suspect_count"] == 1
+
+    # No first-seen data -> the check is inert, not wrong.
+    silent = FolderAttributionAdapter(
+        [{**_authored("DDC", "SL0001"), "authored_on": "2025-01-15"}],
+        {"f_era2": "DDC"},
+    )
+    list(silent.rows())
+    assert silent.coverage is not None and silent.coverage.mapping_age_suspects == []
 
 
 # --- §D cypher shape pins --------------------------------------------------------
