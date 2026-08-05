@@ -1,16 +1,16 @@
 {
   "meta": {
     "project": "drydocs",
-    "captured_at": "2026-08-05T13:52:25",
+    "captured_at": "2026-08-05T14:32:46",
     "date": "20260805",
     "scan": "DryDocs",
     "tree": true,
     "git": {
-      "commit": "f53885d",
-      "full": "f53885d9a3dd85de78d1c3e29f1c12caeea40989",
+      "commit": "149b093",
+      "full": "149b0934aa858637357684e6c54c49fd2e233b1f",
       "branch": "main",
-      "describe": "f53885d",
-      "subject": "feat(config): fcdo-frameworks corpus ACTIVATED (user ruling in-chat; gate-log RECORD)",
+      "describe": "149b093",
+      "subject": "chore(backlog): K18 done - the platform-tier fan-out bug closed both routes; K19 unblocks to next_ready",
       "dirty": false,
       "pr": null
     },
@@ -6719,6 +6719,15 @@
       "kind": "file"
     },
     {
+      "file_id": "drydocs/config/gate-prompts/document-content-topology.yaml",
+      "name": "document-content-topology.yaml",
+      "extension": ".yaml",
+      "rel_path": "config/gate-prompts/document-content-topology.yaml",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
       "file_id": "drydocs/config/gate-prompts/email-dl-contact-point.yaml",
       "name": "email-dl-contact-point.yaml",
       "extension": ".yaml",
@@ -12812,6 +12821,15 @@
       "kind": "file"
     },
     {
+      "file_id": "drydocs/internal/standards/technology/platform-codes.yaml",
+      "name": "platform-codes.yaml",
+      "extension": ".yaml",
+      "rel_path": "internal/standards/technology/platform-codes.yaml",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
       "file_id": "drydocs/knowledge",
       "name": "knowledge",
       "extension": "",
@@ -12857,10 +12875,10 @@
       "kind": "file"
     },
     {
-      "file_id": "drydocs/knowledge/depgraph-snapshots/drydocs-20260805.json",
-      "name": "drydocs-20260805.json",
+      "file_id": "drydocs/knowledge/depgraph-snapshots/drydocs-20260805-1352.json",
+      "name": "drydocs-20260805-1352.json",
       "extension": ".json",
-      "rel_path": "knowledge/depgraph-snapshots/drydocs-20260805.json",
+      "rel_path": "knowledge/depgraph-snapshots/drydocs-20260805-1352.json",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -22289,6 +22307,11 @@
     [
       "drydocs/config/gate-prompts",
       "CONTAINS",
+      "drydocs/config/gate-prompts/document-content-topology.yaml"
+    ],
+    [
+      "drydocs/config/gate-prompts",
+      "CONTAINS",
       "drydocs/config/gate-prompts/email-dl-contact-point.yaml"
     ],
     [
@@ -25557,6 +25580,11 @@
       "drydocs/internal/standards/technology/folder-naming-convention.md"
     ],
     [
+      "drydocs/internal/standards/technology",
+      "CONTAINS",
+      "drydocs/internal/standards/technology/platform-codes.yaml"
+    ],
+    [
       "drydocs/knowledge",
       "CONTAINS",
       "drydocs/knowledge/ARCHITECTURE.md"
@@ -25609,7 +25637,7 @@
     [
       "drydocs/knowledge/depgraph-snapshots",
       "CONTAINS",
-      "drydocs/knowledge/depgraph-snapshots/drydocs-20260805.json"
+      "drydocs/knowledge/depgraph-snapshots/drydocs-20260805-1352.json"
     ],
     [
       "drydocs/knowledge/depgraph-snapshots",
@@ -27406,13 +27434,13 @@
     "projects": [
       "drydocs"
     ],
-    "files": 1534,
+    "files": 1536,
     "edges": 549,
     "circular_files": 0,
     "processes": 0,
     "data_assets": 0,
     "hosts": 0,
-    "rels": 1797,
+    "rels": 1799,
     "directories": 264
   }
 }
