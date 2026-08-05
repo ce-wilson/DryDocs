@@ -26,6 +26,40 @@ Tags help grooming: `idea` · `bug` · `doc` · `source` (new data source) · `q
 
 <!-- add new ideas at the top -->
 
+- 2026-08-04 — [bug] **T23 FIRED company-side, exactly as its own row predicted — the tracker
+  status should stop saying "pending (producer belief)".** The company ran
+  `drydocs load seal_applications` against a graph that took the S3 CODE but never the S3
+  re-key, and got `Neo.ClientError.Schema.ConstraintValidationFailed: Node(97) already exists
+  with label 'BusinessApplication'`. Mechanism confirmed against producer source: pre-S3 nodes
+  carry `seal_id` and NO `app_id`; `MERGE (a:BusinessApplication {app_id: row.app_id})` cannot
+  match them because a uniqueness constraint IGNORES NULLS, so it mints a second node, and the
+  next line `SET a.seal_id = row.app_id` then collides with the original's `seal_id` (both
+  properties are separately unique-constrained, constraints.cypher:43-44). T23's row already
+  says "all 8 key-bearing sites cut over in ONE apply or the constraint's null-tolerance
+  silently doubles canonical nodes" — this is that sentence happening. Fix relayed: backfill
+  `app_id = seal_id` on pre-S3 nodes BEFORE re-running, after checking whether the partial run
+  (batches commit per flush) already doubled any. Producer action: T23's status cell reads
+  "pending (producer belief, as of 2026-08-03)" and there is now direct evidence — update it
+  at the next port roll, and consider whether the loader should FAIL LOUDLY on a
+  `:BusinessApplication` with a null app_id rather than silently creating its twin, which is
+  the guard the null-tolerance argument implies but nothing implements.
+
+- 2026-08-04 — [question] **`apply-supplements` would silently skip the company's two local
+  supplements — the exact defect G29 was built to remove.** Producer's chain is the ONE ordered
+  list `base -> seal -> catalog -> registry` (+ opt-in sosa) in
+  `drydocs_core/schema/supplements.py`. The company additionally runs
+  `apply-resource-pools-supplement` (Control-M QUANTITATIVE resource pools, feeds
+  `controlm_quantitatives.py`) and `apply-platforms-supplement` (now a documented SUPERSEDED
+  no-op, T12) — verified 2026-08-04 that NEITHER verb nor supplement file exists producer-side,
+  so they are genuinely company-local, not producer staleness. Consequence: if the company
+  adopts `apply-supplements` as its one chain, resource-pools is omitted and whatever MATCHes
+  its terms goes quiet — which is precisely how the pre-G29 three-verb block omitted `registry`
+  and left `load-software-registry` MATCHing terms nothing had seeded. Relayed as "add your two
+  to your own SUPPLEMENTS list before switching". Open producer-side question: should
+  `apply-supplements` VERIFY that every supplement file present on disk is in the chain, so a
+  local addition cannot be silently skipped? That guard would be portable and would have caught
+  this class on either side.
+
 - 2026-08-04 — [bug] **N6 is now the only thing keeping three load sequences honest, and it is
   ready.** Asked to confirm the load sequence, a check of all three surfaces found them agreeing
   on the shape and disagreeing on membership. `bootstrap-schema-graph` was in BOTH operator
