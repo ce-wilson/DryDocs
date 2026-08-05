@@ -122,6 +122,42 @@ GUARDRAILS (durable — apply to every port):
    from outside; a row count makes staleness self-announce as a mismatch instead of a
    confident "that row does not exist."
 
+   RE-DERIVE, DON'T TRUST THE PROSE (added 2026-08-05). The steps below quote facts
+   that live in code and config, and a quoted fact is a COPY — it is current the day
+   it is written and silently wrong afterwards. `tests/unit/test_runbook_currency.py`
+   now covers this file, but it can only prove the things named here EXIST; it cannot
+   prove a step's instructions are still right. So the four facts a port actually acts
+   on each ship a command that regenerates them. **The output wins over the prose,
+   always — if they disagree, the prose is the stale one and says so here in advance.**
+   Run each in YOUR checkout, not the producer's: that is the point of them, because a
+   disposition, a verb set and a load sequence are all legitimately yours to differ on.
+
+   ```powershell
+   # 1. MANIFEST DISPOSITION for one path — first matching row wins, and hand-reading
+   #    that order is exactly what goes wrong. Reports the winning row, the default_ok
+   #    fall-back, or an undecided path (J16).
+   poetry run python -c "import re,sys,yaml;g=lambda p:re.compile(''.join('.*' if s=='**' else '[^/]*' if s=='*' else '[^/]' if s=='?' else re.escape(s) for s in re.split(r'(\*\*|\*|\?)',p)));m=yaml.safe_load(open('PORT-MANIFEST.yaml',encoding='utf-8'));q=sys.argv[1];r=[x for x in m['rows'] if g(x['path']).fullmatch(q)];o=[x for x in m['default_ok'] if g(x['path']).fullmatch(q)];print(q,'->',(r[0]['path']+'  '+r[0]['disposition']) if r else ('default_ok '+o[0]['path']+'  '+m['default']) if o else 'FALLS THROUGH - undecided (J16)')" drydocs/cli.py
+
+   # 2. REGISTERED CLI VERBS — the T22 deferrals are about verbs; this is the live set.
+   poetry run python -c "from drydocs.cli import app;print(*sorted(i.name or i.callback.__name__.replace('_','-') for i in app.registered_commands),sep='\n')"
+
+   # 3. THE CANONICAL LOAD SEQUENCE and its operator profiles (step 90 / T19). Absent
+   #    company-side until T19 rules, in which case this raises ImportError — which is
+   #    itself the answer.
+   poetry run python -c "from drydocs.cli import CANONICAL_LOAD_SEQUENCE as s;print(*[f'{x.mode:9} {sorted(x.profiles)}  {x.command}' for x in s],sep='\n')"
+
+   # 4. THE DATABASE TOPOLOGY (step 83) — config, not prose. Compare against a live
+   #    SHOW DATABASES before any drop.
+   poetry run python -c "import yaml;d=yaml.safe_load(open('config/dev-environment.yaml',encoding='utf-8'))['neo4j']['databases'];print(*[k+': '+v for k,v in d.items()],sep='\n')"
+   ```
+
+   All four were run in both PowerShell 5.1 and bash before being written here, because
+   a one-liner that does not work is worse than none — the reader stops trusting the
+   idiom rather than the line. Two things they deliberately do NOT cover: commit SHAs
+   (three cited here legitimately resolve in another repo — two company-side, one the
+   `depgraph` sibling) and the acceptance test counts, which are measurements and
+   already carry their own "trust the live test files over this note" rule.
+
 2. DISJOINT HISTORIES: no common ancestor exists — never `git merge`/`git pull`.
    Small ranges: cherry-pick / `git am --3way`, resolving collisions per manifest.
    Ranges dominated by chore(ritual)/derived-file commits: scoped TREE-RECONCILE —
@@ -913,7 +949,9 @@ verification status in [BRACKETS]; spend review on [UNRULED].
     `ddlineage` (writer pinned to `drydocs` w/ TrustBoundaryError; your
     G30-equivalent spec repoint came in an earlier range) — ADR 0002 now
     carries a dated amendment retiring it; the deployed set is
-    drydocs/ddcontext/ddall/ddschema. Sweep: provisioning DDL + ddall
+    drydocs/ddcontext/ddall/ddschema (re-derive #4 — that list is a copy,
+    and the LIVE `SHOW DATABASES` is what a drop must be judged against).
+    Sweep: provisioning DDL + ddall
     alias dropped, provision.ps1 runs 02 twice not three times, smoke
     reads two constituents, cli.py DOC_SWEEP_DATABASES, dev-environment
     databases map (+ its key-set speed bump), startup-refresh runbook
@@ -1086,7 +1124,10 @@ verification status in [BRACKETS]; spend review on [UNRULED].
     check walks `COMMAND_LOADERS` and therefore only ever reaches
     loader-backed verbs. The new guard starts at the SURFACES and works
     inward, which is the direction that catches a non-loader verb.
-    ***YOUR SIDE — READ THIS AS NEW STRUCTURE, NOT A DIFF.*** Company
+    ***YOUR SIDE — READ THIS AS NEW STRUCTURE, NOT A DIFF.*** Run
+    re-derive #3 first: an ImportError is the honest answer that your tree
+    has no declaration yet, and after adoption it is how you check the
+    step-vs-profile table above against what you actually shipped. Company
     `cli.py` still has no `COMMAND_LOADERS` and no
     `CANONICAL_LOAD_SEQUENCE` at all; that is the open **T19** row, and
     N6 is the last of the N3–N6 slice it narrowed to. `drydocs/cli.py`
