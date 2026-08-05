@@ -119,31 +119,6 @@ Tags help grooming: `idea` · `bug` · `doc` · `source` (new data source) · `q
   the desktop drifted silently. If the ruling is "re-point with a venue note", that gap is
   the thing worth an item.
 
-- 2026-08-03 — [idea] **EPIC: backlog.yaml has outgrown single-file text editing — shard it,
-  derive the summary, query it from the graph.** Trigger: during the DD6 session the company
-  agent worked lines 10,573–10,669 of a 10.6k-line file; producer copy is 10,784 lines / 722KB /
-  280 items. The port's duplicate-`summary:` defect (shipped in company `1a3aff20`, since fixed by
-  clean rebuild) was a STRUCTURAL consequence of the format: agents regex-splice a shared mutable
-  blob, and pyyaml's last-key-wins hid the duplicate from `test_backlog`. Three phases, ordered:
-  **(1) guard now, both sides — BUILT producer-side 2026-08-03 (`c5b689e`, port-prompt step 55);
-  reaches the company on the next port**; **(2) shard** — `backlog/items/<id>.yaml` one-item-per-
-  file, `summary` + `next_ready` become DERIVED (board render computes them, never stored where
-  agents append); per-entry-by-id reconciliation becomes the filesystem; claim = push a one-file
-  status change (shrinks the two-machine claim-collision window, the 2026-07-28 lesson); kills the
-  extract/merge/splice script class. Touches test_backlog, render_board, J7 guards, groom skill,
-  PORT-MANIFEST rows — both repos must move together ⇒ gate-worthy, own epic. **(3) graph as the
-  QUERY surface only** — load `:BacklogItem` + `DEPENDS_ON` (next_ready is a one-hop Cypher query;
-  agents query instead of reading 10k lines), but the graph stays a derived projection: git remains
-  the sole source of truth and claim channel — a graph write is even less cross-machine-visible
-  than an unpushed commit. Phase 2 is what makes phase 3 trivial and pays off even with no Neo4j
-  running.
-  KEPT-UPDATED 2026-08-04 (weekly groom) — **user ruled KEEP PARKED at this groom** (asked
-  explicitly, since phases 2–3 are a plan change: new epic, both repos move together). The
-  phase-1 guard already closed the defect class that triggered the entry; the shard is better
-  timed after the in-flight `40c35724..6713c14` port lands and its PORT-REPORT is reviewed,
-  because phase 2 rewrites exactly the files that port carries (test_backlog, render_board,
-  the groom skill, PORT-MANIFEST rows).
-
 - 2026-08-02 — [question] **`DesignDoc.commit` is an author's claim, not a git fact — decide
   whether the writer persona's staleness ranking should use it.** `drydocs-startup-refresh-runbook`
   carries `a135a6d` (2026-07-20, from the doc's own "reflected commit" prose) while the file's
@@ -833,6 +808,15 @@ Tags help grooming: `idea` · `bug` · `doc` · `source` (new data source) · `q
   an app). Cosmetic; hide or restructure later.
 
 ## Recently groomed (audit trail)
+
+- 2026-08-04 (desktop, user directive) — [idea] the backlog-sharding EPIC entry (2026-08-03;
+  kept-parked at the same day's weekly groom) → **UN-PARKED and groomed as Epic Y: Y1 the
+  sharding ADR ruling session, Y2 the shard build, Y3 the :BacklogItem/DEPENDS_ON vocabulary
+  via the gate, Y4 the query surface.** Phase 1's guard had already shipped (`c5b689e`, port
+  step 55) and stays outside the epic. The park condition travels with Y2 as a prose
+  precondition (in-flight port PORT-REPORT review first). Fresh exhibit recorded at the groom:
+  the three same-afternoon roll-up rebase conflicts of 2026-08-04 (X1-claim/V8, X2-close/V2,
+  X3-close/V3), all in the stored summary/next_ready block Y2 derives away.
 
 - 2026-08-04 (session close, laptop) — [question] "nothing compares the checkout against
   `expected_commit`" → **RULED AND BUILT SAME SESSION (user: "warn in snapshot.ps1"), no
