@@ -90,7 +90,6 @@ RUNBOOK_PENDING: frozenset[str] = frozenset(
         "drydocs-docgen",  # V5
         "drydocs-lineage",  # V6 — two chain-scoped runbooks exist; neither covers the module
         "drydocs-remediation",  # V7
-        "drydocs-api",  # V8 — decides: extend the mapping-store runbook, or author fresh
         "drydocs-agents",  # V9
         "drydocs-docmeta",  # BUILT at Q6; no V-item yet, so this list is where it is visible
     }
@@ -100,6 +99,14 @@ RUNBOOK_PENDING: frozenset[str] = frozenset(
 #: module. Ruled at V1, 2026-08-04. `satisfies` is the module it covers whole;
 #: None means it is narrower than its module and does not discharge coverage.
 RUNBOOK_DISPOSITION: dict[str, tuple[str | None, str, str]] = {
+    "drydocs-api-runbook.md": (
+        "drydocs-api",
+        "drydocs-api",
+        "V8 ruled AUTHOR-DISTINCT over extending the mapping-store runbook: that one "
+        "scopes HTTP serving out in its own words, and the demo runbook covers one route "
+        "of twenty-two. Extending either would have produced a document whose title no "
+        "longer described it",
+    ),
     "drydocs-web-console-runbook.md": (
         "drydocs-web",
         "drydocs-web",
@@ -115,9 +122,10 @@ RUNBOOK_DISPOSITION: dict[str, tuple[str | None, str, str]] = {
     "drydocs-mapping-demo-runbook.md": (
         None,
         "drydocs-api",
-        "operates the /demo page only, not the mappings API, the draft/promote surfaces "
-        "or the server itself. V8 rules whether to extend the mapping-store runbook into "
-        "the api module runbook or author a distinct one",
+        "operates the /demo page only -- one route of twenty-two -- not the mappings API, "
+        "the draft/promote surfaces or the server itself. V8 RULED (2026-08-04): author "
+        "drydocs-api-runbook.md distinct rather than widen this one or the mapping-store "
+        "runbook; both stay deliberately narrower than the module",
     ),
     "drydocs-lineage-mac-runbook.md": (
         None,

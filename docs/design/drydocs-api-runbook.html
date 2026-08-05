@@ -1,0 +1,220 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Runbook — run and operate drydocs-api (the thin read API, ADR 0005)</title>
+<style>
+:root { color-scheme: light dark; --ink:#1a1a1a; --mid:#555; --line:#d0d0d0; --faint:#f6f6f6; --bg:#fff; --link:#0a58ca; }
+@media (prefers-color-scheme: dark) { :root { --ink:#e6e6e6; --mid:#a0a0a0; --line:#3a3a3a; --faint:#1c1c1c; --bg:#141414; --link:#6ea8fe; } }
+:root[data-theme="dark"] { --ink:#e6e6e6; --mid:#a0a0a0; --line:#3a3a3a; --faint:#1c1c1c; --bg:#141414; --link:#6ea8fe; }
+:root[data-theme="light"] { --ink:#1a1a1a; --mid:#555; --line:#d0d0d0; --faint:#f6f6f6; --bg:#fff; --link:#0a58ca; }
+* { box-sizing: border-box; }
+body { font: 15px/1.6 "Segoe UI", system-ui, Arial, sans-serif; color: var(--ink); background: var(--bg); margin: 0; }
+main { max-width: 900px; margin: 0 auto; padding: 32px 24px 80px; }
+h1 { font-size: 28px; margin: 0 0 6px; letter-spacing:-0.3px; }
+h2 { font-size: 20px; margin: 34px 0 10px; padding-bottom:5px; border-bottom: 2px solid var(--ink); }
+h3 { font-size: 16px; margin: 22px 0 8px; }
+h4,h5,h6 { font-size: 14px; margin: 16px 0 6px; }
+p { margin: 10px 0; } strong { font-weight: 700; }
+a { color: var(--link); } a:hover { text-decoration: underline; }
+code { font-family: "Cascadia Mono","Consolas",monospace; font-size: 0.88em; background: var(--faint); padding: 1px 4px; border-radius: 3px; }
+pre { font-family: "Cascadia Mono","Consolas",monospace; font-size: 12.5px; line-height:1.45; border:1px solid var(--line); background: var(--faint); padding: 12px 14px; border-radius: 6px; overflow-x: auto; }
+pre code { background: none; padding: 0; }
+table { border-collapse: collapse; margin: 14px 0; font-size: 13.5px; display:block; overflow-x:auto; }
+th,td { border:1px solid var(--line); padding: 6px 9px; text-align:left; vertical-align: top; }
+th { background: var(--faint); font-weight:700; }
+blockquote { margin: 14px 0; padding: 2px 16px; border-left: 4px solid var(--line); color: var(--mid); }
+ul,ol { margin: 10px 0; padding-left: 26px; } li { margin: 4px 0; }
+hr { border:none; border-top:1px solid var(--line); margin: 26px 0; }
+:target { scroll-margin-top: 12px; } :target > :first-child, h2:target, h3:target { outline: 2px solid var(--link); outline-offset: 4px; }
+.dd-margin-tag, .dd-print-footer { display: none; }
+
+.dd-note-btn { border:1px solid var(--line); background:var(--bg); color:var(--mid); cursor:pointer; font-size:12px; line-height:1; padding:2px 6px; border-radius:5px; margin-right:6px; }
+.dd-note-btn:hover { color:var(--link); border-color:var(--link); }
+.dd-note-box { margin:6px 0 10px; }
+.dd-note-box textarea { width:100%; min-height:56px; font:13px/1.4 "Segoe UI",system-ui,sans-serif; color:var(--ink); background:var(--faint); border:1px solid var(--line); border-radius:6px; padding:8px; resize:vertical; }
+.dd-annotated { box-shadow:-3px 0 0 var(--link); padding-left:8px; }
+.dd-fb-bar { position:fixed; right:16px; bottom:16px; display:flex; flex-direction:column; gap:6px; align-items:stretch; background:var(--bg); border:1px solid var(--line); border-radius:10px; padding:8px 12px; box-shadow:0 2px 10px rgba(0,0,0,.15); font-size:13px; z-index:50; }
+.dd-fb-row { display:flex; gap:8px; align-items:center; justify-content:space-between; }
+.dd-fb-bar button { cursor:pointer; border:1px solid var(--link); background:var(--link); color:#fff; border-radius:6px; padding:5px 10px; font-size:13px; }
+.dd-fb-bar .dd-badge { font-weight:700; }
+.dd-fb-file { cursor:pointer; font-size:11px; color:var(--mid); white-space:nowrap; }
+.dd-fb-file code { font-size:11px; }
+.dd-fb-file:hover code { color:var(--link); }
+.dd-toast { position:fixed; right:16px; bottom:64px; background:var(--ink); color:var(--bg); padding:8px 12px; border-radius:8px; font-size:13px; z-index:60; opacity:0; transition:opacity .2s; }
+.dd-toast.show { opacity:1; }
+.dd-sme-feedback ol li { margin: 6px 0; }
+@media print { .dd-note-btn, .dd-note-box, .dd-fb-bar, .dd-toast, .dd-sme-feedback, .dd-sme-divider { display:none !important; } }
+@page { size: Letter; margin: 0.6in 0.62in 0.55in 0.62in; }
+@media print {
+:root, :root[data-theme="dark"], :root[data-theme="light"] { color-scheme: light; --ink:#1a1a1a; --mid:#555; --line:#bdbdbd; --fill:#eee; --faint:#f6f6f6; --bg:#fff; --link:#0a58ca; }
+html { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+body { font: 10.5px/1.45 "Segoe UI", system-ui, Arial, sans-serif; }
+main { max-width: 7.2in; margin: 0 auto; padding: 0 0 0 0.62in; position: relative; }
+h1 { font-size: 21px; margin: 0 0 2px; letter-spacing:-0.2px; }
+h2 { font-size: 14px; margin: 16px 0 8px; padding-bottom:4px; border-bottom: 2px solid var(--ink); text-transform: uppercase; letter-spacing: 0.6px; }
+h3 { font-size: 11.5px; margin: 13px 0 5px; padding-bottom:2px; border-bottom:1px solid var(--line); }
+h4,h5,h6 { font-size: 10.5px; margin: 9px 0 4px; }
+p { margin: 6px 0; }
+a { color: inherit; text-decoration: underline; }
+code { font-size: 9.2px; padding: 0 2px; border-radius: 2px; }
+table { display: table; width:100%; margin: 7px 0; font-size: 9.1px; overflow-x: visible; }
+th, td { padding: 3px 5px; }
+th { background: var(--fill); }
+td code, th code { background: transparent; padding: 0; }
+pre { font-size: 8.4px; line-height: 1.35; padding: 7px 9px; margin: 7px 0; white-space: pre; overflow: hidden; border-radius: 3px; }
+pre.sql { background:#fbfbfb; }
+blockquote { margin: 7px 0; padding: 2px 10px; border-left: 3px solid var(--line); break-inside: avoid; }
+ul,ol { margin: 6px 0 6px 16px; padding: 0; } li { margin: 3px 0; }
+hr { margin: 10px 0; }
+h2, h3, table, pre { break-inside: avoid; }
+
+/* L6 paper HITL: each anchored block sits in the left gutter (main's own padding-left,
+   reserved above) so a printed page carries the anchor id beside its section — no @page
+   margin-box support required, so headless Chromium print-to-pdf renders it reliably. */
+h1, h2, h3, h4, h5, h6, p, table, pre, ul, ol, blockquote { position: relative; }
+.dd-margin-tag {
+  display: block; position: absolute; left: -0.6in; top: 0.1em; width: 0.54in;
+  font: 6.2px/1.15 "Cascadia Mono","Consolas",monospace; text-align: right;
+  color: var(--mid); letter-spacing: 0.1px; word-break: break-word;
+}
+/* Rev/commit footer: `position: fixed` repeats on every printed page in Chromium's
+   headless print-to-pdf (the standard running-footer technique) without needing CSS
+   Paged-Media margin-box content(), which Chromium supports only partially. */
+.dd-print-footer {
+  display: block; position: fixed; left: 0.62in; right: 0.62in; bottom: 0.12in;
+  font-size: 8px; color: var(--mid); text-align: center;
+  border-top: 1px solid var(--line); padding-top: 3px;
+}
+}
+</style>
+</head>
+<body>
+<main>
+<h1>Runbook — run and operate <code>drydocs-api</code> (the thin read API, ADR 0005)</h1>
+<ul id="front-matter"><span class="dd-margin-tag" aria-hidden="true">front-matter</span><li><strong>Module:</strong> drydocs-api — this runbook IS the module runbook for drydocs-api (V1 coverage rule; V8 ruled AUTHOR-DISTINCT rather than extending the mapping-store runbook, see Purpose &amp; scope).</li><li><strong>Status:</strong> DESCRIPTIVE — documents the working procedure. <strong>Rev 1, 2026-08-04</strong>, authored at commit <code>c28a4d1</code> (post-S4: the draft/promote write surfaces are live and the <code>/mappings/*/draft</code> endpoints return receipts rather than whole files).</li><li><strong>Classification:</strong> Internal-Public (mechanism only — localhost ports, synthetic persona ids already present in committed public code; NO credentials — Neo4j settings live only in the repo-root <code>.env</code>, never here)</li><li><strong>Audience:</strong> anyone running the API — locally for the console or the demo, or operating it as the console&#x27;s backend — and anyone diagnosing a refused request</li><li><strong>Companion:</strong> <code>drydocs_api/README.md</code> (the component&#x27;s own surface list), <code>docs/design/drydocs-mapping-demo-runbook.md</code> (the <code>/demo</code> page this serves), <code>docs/design/drydocs-web-console-runbook.md</code> (the React console that consumes it), <code>docs/design/drydocs-mapping-store-runbook.md</code> (the SQLite store it reads), <code>docs/design/drydocs-startup-refresh-runbook.md</code> (the graph the query routes need)</li></ul>
+<h2 id="purpose-scope"><span class="dd-margin-tag" aria-hidden="true">purpose-scope</span>Purpose &amp; scope</h2>
+<p><strong>Purpose.</strong> Start <code>drydocs-api</code>, understand which of its surfaces read and which write, and diagnose a refusal. It is the server the web console and the <code>/demo</code> page talk to, and the only component that turns an HTTP request into a graph query.</p>
+<p><strong>Why this is its own document rather than a chapter of another one (V8&#x27;s ruling).</strong> Two existing runbooks touch this component and neither can absorb it:</p>
+<ul><li>the <strong>mapping-store</strong> runbook operates <code>var/mapping.db</code> and scopes HTTP serving OUT in its own words — extending it would mean reversing its stated scope;</li><li>the <strong>mapping-demo</strong> runbook covers the <code>/demo</code> page, which is one route of twenty-two.</li></ul>
+<p>Extending either would have produced a document whose title no longer described it. So <code>drydocs-api</code> is authored distinct, and the two siblings stay narrower than it on purpose.</p>
+<p><strong>THE OPERATING RULE, and everything else here is downstream of it: the loader is the only graph writer.</strong> This service never writes the graph. Not &quot;should not&quot; — three independent layers stop it, and they are listed in Verify because an operator&#x27;s job is to confirm they are still in place, not to trust that they are.</p>
+<p><strong>In scope.</strong> Starting the server; the read surfaces (<code>/query/*</code>, <code>/raw-cypher</code>, <code>/specs/*</code>, <code>/exports/*</code>, <code>/mappings/*</code> reads); the one thing it DOES write — the S4 draft buffer in <code>var/mapping.db</code>; the persona/role gate; and the refusals.</p>
+<p><strong>Out of scope.</strong> The React console itself (its own runbook); building or repairing <code>var/mapping.db</code> (the mapping-store runbook); the graph, its schema and its loaders (the startup/refresh runbook) — this service reads the graph and never loads it.</p>
+<h2 id="prerequisites"><span class="dd-margin-tag" aria-hidden="true">prerequisites</span>Prerequisites</h2>
+<ul><li><strong>The API dependency group installed.</strong> FastAPI and uvicorn are OPTIONAL (<code>[tool.poetry.group.api]</code>) so the default install and the unit suite stay framework-free: ``<code>powershell poetry install --with api </code>`<code> Without it the import fails at </code>create_app`, not at startup — the failure names FastAPI.</li><li><strong><code>var/mapping.db</code></strong> — nothing to do. It auto-builds from the committed YAML/CSV on first use and rebuilds whenever those sources drift (O14). Absent, stale, corrupt and foreign all mean the same thing: rebuild.</li><li><strong>Neo4j — ONLY for the graph routes.</strong> The driver is LAZY, so <code>/mappings/*</code>, <code>/demo</code> and <code>/health</code> all work with no graph at all. <code>/query/*</code>, <code>/raw-cypher</code> and <code>/specs/*/run</code> need one per the startup/refresh runbook.</li><li><strong><code>.env</code> at the repo root</strong> for the graph routes: <code>NEO4J_URI</code>, <code>NEO4J_USER</code>, <code>NEO4J_PASSWORD</code>, <code>NEO4J_DATABASE</code>. Names only here; the values live in that file and are read server-side. A credential never arrives in a request and never reaches a browser (ADR 0005).</li></ul>
+<h2 id="startup"><span class="dd-margin-tag" aria-hidden="true">startup</span>Startup</h2>
+<ol><li><strong>Install the API group</strong> (once per environment): ``<code>powershell poetry install --with api </code>`<code> Success: </code>poetry run python -c &quot;import fastapi, uvicorn&quot;` prints nothing.</li></ol>
+<ol><li><strong>Start the server:</strong> ``<code>powershell poetry run uvicorn drydocs_api.app:create_app --factory --port 8001 </code>`<code> Success: uvicorn logs </code>Application startup complete<code> on </code>http://127.0.0.1:8001<code>. The </code>--factory<code> flag is required — </code>create_app` is a factory, not a module-level app.</li></ol>
+<ol><li><strong>Confirm it is up</strong> (no auth needed): ``<code>powershell curl http://localhost:8001/health </code>`<code> Success: </code>{&quot;status&quot;:&quot;ok&quot;}`. This route touches neither the graph nor the store, so a healthy answer here proves the process only.</li></ol>
+<ol><li><strong>Get a session token.</strong> Every other route needs one; roles are resolved server-side per request and never sent by the client: ``<code>powershell curl -X POST http://localhost:8001/login -H &quot;Content-Type: application/json&quot; </code> -d &#x27;{\&quot;persona_id\&quot;:\&quot;kchen2190\&quot;}&#x27; ``<code> Success: a token. The synthetic personas are </code>jdoe4821<code> (user), </code>kchen2190<code> (steward) and </code>asmith7734<code> (admin) — </code>user<code> is deliberately refused by every </code>/mappings/*` route, which is a working gate rather than a broken install.</li></ol>
+<ol><li><strong>Point a consumer at it.</strong> The console reads <code>VITE_API_URL</code> (<code>web/.env.example</code>); the <code>/demo</code> page is same-origin and needs no CORS. Only <code>localhost:5173</code> and <code>:4173</code> are allowed origins.</li></ol>
+<h2 id="refresh-ingest"><span class="dd-margin-tag" aria-hidden="true">refresh-ingest</span>Refresh / ingest</h2>
+<p><strong>This service has no ingest.</strong> That is the design, not an omission: it reads what the loaders wrote, and the CLI chain in the startup/refresh runbook is what refreshes the graph. The two things that DO change underneath a running server:</p>
+<ul><li><strong>The mapping store.</strong> Edit any committed source (<code>config/taxonomy-ontology-map/</code>, <code>drydocs_core/ontology/relationship_vocabulary/</code>, <code>config/overrides/*.csv</code>, <code>config/manual-loads/</code>) and the next read rebuilds <code>var/mapping.db</code> automatically — source-hash comparison against the build-time <code>meta</code> rows. No restart, no manual build.</li><li><strong>The graph.</strong> Run the load chain per the startup/refresh runbook. The API needs no restart; it holds one lazy driver and queries per request.</li></ul>
+<p><strong>The one write this service performs</strong>, added at S4 (ADR 0009 rule 5): console edits land as ROWS in the <code>draft</code> table of <code>var/mapping.db</code>, and <code>promote</code> turns a draft into a unified diff for a branch. Committed files are never touched. Full sequence:</p>
+<pre><code>POST /mappings/overrides/draft      -&gt; {draft_id, entries, pending, committed_rows}
+GET  /mappings/drafts               -&gt; what is pending, per editing session
+POST /mappings/drafts/{id}/promote  -&gt; {diff}  -&gt;  git apply on a branch  -&gt;  gate</code></pre>
+<p>Two properties worth knowing when operating it: drafts survive a store REBUILD (carried across deliberately — a rebuild is routine), and they do NOT survive DELETING <code>var/mapping.db</code>. Check <code>SELECT * FROM v_open_drafts;</code> before removing that file.</p>
+<h2 id="verify"><span class="dd-margin-tag" aria-hidden="true">verify</span>Verify</h2>
+<p><strong>1. The service answers and the store is readable</strong> (no graph needed):</p>
+<pre class="powershell"><code>curl http://localhost:8001/health
+curl http://localhost:8001/mappings/domains -H &quot;Authorization: Bearer &lt;token&gt;&quot;</code></pre>
+<p>Expect <code>status: ok</code>, then the domain registry with <code>ontology-map</code>, <code>job-application</code>, <code>seal-contact-override</code> and <code>app-code-mapping</code> marked <code>available: true</code>.</p>
+<p><strong>2. The role gate holds.</strong> Log in as <code>jdoe4821</code> (role <code>user</code>) and call any <code>/mappings/*</code> route: expect <strong>403</strong>. A 200 here means the gate is gone.</p>
+<p><strong>3. The write guard holds — this is the check that matters.</strong> Post a write query to <code>/raw-cypher</code> and expect it REFUSED:</p>
+<pre><code>CREATE (n:Probe) RETURN n     -&gt;  rejected, never executed</code></pre>
+<p>Three layers enforce it and all three should be present:</p>
+<ul><li><code>drydocs_api/guard.py</code> rejects write clauses (<code>CREATE</code>, <code>MERGE</code>, <code>DELETE</code>, <code>SET</code>, … plus <code>LOAD CSV</code>) by parsing the Cypher, with string and comment regions excluded so a literal cannot smuggle one in;</li><li>the live runner pins <code>neo4j.RoutingControl.READ</code>, so even a guard miss cannot write;</li><li>the graph credentials are server-side and read-only by intent.</li></ul>
+<p>Canonical expected values live in <code>tests/unit/test_guard.py</code> and <code>tests/unit/test_mapping_api.py</code> — the suite is the oracle, and <code>test_no_endpoint_writes_a_tracked_file</code> additionally proves this service writes no file git tracks.</p>
+<p><strong>4. Nothing in the API writes a committed file:</strong></p>
+<pre class="powershell"><code>poetry run pytest tests/unit/test_mapping_api.py -q</code></pre>
+<h2 id="rollback"><span class="dd-margin-tag" aria-hidden="true">rollback</span>Rollback</h2>
+<p><strong>The server is stateless — stop it and start it again.</strong> There is no migration to undo and no state in the process; every route recomputes from the store or the graph.</p>
+<ul><li><strong>A bad <code>var/mapping.db</code>:</strong> delete it and let the next read rebuild it — BUT check <code>v_open_drafts</code> first (S4). Unpromoted drafts are the one thing in that file not derived from git, and deleting it discards them.</li><li><strong>A draft you do not want:</strong> it is a row, not a file. Mark it discarded, or promote and simply not apply the diff. Nothing committed has changed either way.</li><li><strong>A promoted diff already applied:</strong> it is a normal git commit on a branch — revert it like any other. This is the entire point of promote-emits-a-diff rather than server-writes-a-file.</li><li><strong>The graph:</strong> not this runbook&#x27;s to roll back. See the startup/refresh runbook; this service cannot have damaged it.</li></ul>
+<h2 id="troubleshooting"><span class="dd-margin-tag" aria-hidden="true">troubleshooting</span>Troubleshooting</h2>
+<table><thead><tr><th>Symptom</th><th>Diagnosis</th><th>Fix</th></tr></thead><tbody><tr><td><code>ModuleNotFoundError: fastapi</code> at startup</td><td>the API group is optional and not installed</td><td><code>poetry install --with api</code></td></tr><tr><td>uvicorn: &quot;Factory has not returned an app&quot; / app not found</td><td><code>--factory</code> omitted; <code>create_app</code> is a factory</td><td>add <code>--factory</code></td></tr><tr><td><strong>401</strong> on every route</td><td>no token, or the header is not <code>Authorization: Bearer &lt;token&gt;</code></td><td><code>POST /login</code> and send the bearer header</td></tr><tr><td><strong>403</strong> on <code>/mappings/*</code></td><td>logged in as <code>jdoe4821</code>, role <code>user</code></td><td>log in as <code>kchen2190</code> (steward) or <code>asmith7734</code> (admin) — the refusal is correct</td></tr><tr><td><strong>404 <code>unknown mapping domain</code></strong></td><td>domain registered but <code>available: false</code> (<code>fid-seal</code>, <code>alias-seal</code> — their reconciler tables are not built)</td><td>expected; not a fault</td></tr><tr><td><strong>422</strong> on a draft</td><td>fail-closed validation mirroring the store&#x27;s own rules (missing rationale, un-canonicalizable role, override equal to the SEAL value, duplicate defined-mapping key)</td><td>the message names the entry and the rule</td></tr><tr><td><code>/query/*</code> or <code>/raw-cypher</code> fails while <code>/mappings/*</code> works</td><td>the driver is LAZY — only graph routes need Neo4j</td><td>start the container per the startup/refresh runbook</td></tr><tr><td>A write query is refused</td><td>working as designed — the guard, then READ routing</td><td>if you need to write, use the loader; that is the rule, not a limitation</td></tr><tr><td>Browser blocked by CORS</td><td>only <code>localhost:5173</code> and <code>:4173</code> are allowed origins</td><td>serve the console from one of them, or use <code>/demo</code> (same-origin)</td></tr><tr><td>Grid shows stale mappings</td><td>it should not — O14 rebuilds on source drift</td><td>confirm the committed source actually changed; the store keys on content hashes</td></tr></tbody></table>
+<h2 id="contacts-escalation"><span class="dd-margin-tag" aria-hidden="true">contacts-escalation</span>Contacts &amp; escalation</h2>
+<p>The component is owned by whoever is operating the console stack; this runbook documents mechanism only and carries no on-call rota. <strong>Anything touching mapping SEMANTICS — a quintuple entry, a vocabulary term, an override, a defined mapping — is HITL-gated (<code>docs/restructure/03-hitl-sme-flow.md</code>) and is not an operational decision.</strong> The governing sign-offs are <code>ui-write-surface</code> SME-3 (2026-07-21) for the override surface and <code>seal-app-ref-edge-reshape</code> (2026-08-03) for the defined-mapping domain. A draft is a proposal; the gate reviews the promoted diff. Escalation beyond the repo does not apply — this is a local read service over local artifacts.</p>
+<h2 id="appendices"><span class="dd-margin-tag" aria-hidden="true">appendices</span>Appendices</h2>
+<p><strong>A. Route inventory</strong> (22 routes; <code>drydocs_api/README.md</code> carries the component-level description of each group):</p>
+<table><thead><tr><th>Group</th><th>Routes</th><th>Needs Neo4j</th></tr></thead><tbody><tr><td>Health</td><td><code>GET /health</code></td><td>no</td></tr><tr><td>Auth</td><td><code>POST /login</code>, <code>POST /logout</code></td><td>no</td></tr><tr><td>Named queries</td><td><code>GET /queries</code>, <code>POST /query/{id}</code></td><td><strong>yes</strong></td></tr><tr><td>Ad-hoc</td><td><code>POST /raw-cypher</code> (guarded read-only)</td><td><strong>yes</strong></td></tr><tr><td>QuerySpecs</td><td><code>GET /specs</code>, <code>POST /specs/ephemeral</code>, <code>POST /specs/{id}/run</code>, <code>POST /specs/{id}/export</code></td><td><strong>yes</strong></td></tr><tr><td>Exports</td><td><code>GET /exports/{id}/manifest</code></td><td>no</td></tr><tr><td>Mappings (read)</td><td>`GET /mappings/domains</td><td>grid/{domain}</td><td>options<code>, </code>GET /mappings/overrides/report<code>, </code>GET /mappings/app-code/migrations`</td><td>no</td></tr><tr><td>Mappings (draft)</td><td><code>POST /mappings/changeset</code>, <code>POST /mappings/overrides/draft</code>, <code>POST /mappings/app-code/draft</code></td><td>no</td></tr><tr><td>Drafts (S4)</td><td><code>GET /mappings/drafts</code>, <code>POST /mappings/drafts/{id}/promote</code></td><td>no</td></tr><tr><td>Demo</td><td><code>GET /demo</code></td><td>no</td></tr></tbody></table>
+<p>Re-derive this list rather than trusting it — if the table and the code disagree, the code wins and the table is the defect:</p>
+<pre class="powershell"><code>Select-String -Path drydocs_api\app.py -Pattern &#x27;@app\.(get|post)\(&quot;&#x27; | ForEach-Object { $_.Line.Trim() }</code></pre>
+<p><strong>B. Personas</strong> (synthetic, committed in <code>drydocs_api/personas.py</code>): <code>jdoe4821</code> = user, <code>kchen2190</code> = steward, <code>asmith7734</code> = admin. Enterprise OIDC replaces the stub company-side per ADR 0005; the role model does not change with it.</p>
+<hr class="dd-sme-divider">
+<section class="dd-sme-feedback" aria-label="SME - Feedback">
+<h2>SME - Feedback</h2>
+<p>How to return your notes on this document:</p>
+<ol>
+<li>Click the <strong>✎</strong> button beside any section (or numbered step) and type your note — notes save in your browser as you type.</li>
+<li>When finished, click <strong>Copy feedback</strong> in the bottom-right toolbar. Your notes are copied as anchor-keyed YAML.</li>
+<li>Create the feedback file (it is YAML, <em>not</em> markdown) — <strong>Copy To:</strong> <code>docs/design/feedback/</code> · <strong>File Name:</strong> <code>drydocs-api-runbook-rev1.yaml</code></li>
+<li>Paste the copied block into that file, save, and commit (or send the file back to the team).</li>
+</ol>
+</section>
+</main>
+<footer class="dd-print-footer">Rev 1 · commit c28a4d1</footer>
+<script>
+
+(function(){
+  var DOC="drydocs-api-runbook", FILE="drydocs-api-runbook-rev1.yaml", DIR="docs/design/feedback/", KEY="drydocs-doc-feedback:"+DOC;
+  function load(){ try{return JSON.parse(localStorage.getItem(KEY)||"{}");}catch(e){return {};} }
+  function save(){ localStorage.setItem(KEY, JSON.stringify(state)); }
+  var state=load(), badge;
+  function count(){ return Object.keys(state).filter(function(k){return (state[k]||"").trim();}).length; }
+  function refresh(){ if(badge) badge.textContent=count(); }
+  function toast(msg){ var t=document.createElement("div"); t.className="dd-toast"; t.textContent=msg; document.body.appendChild(t); requestAnimationFrame(function(){t.classList.add("show");}); setTimeout(function(){t.classList.remove("show"); setTimeout(function(){t.remove();},250);},1600); }
+  function exportYaml(){
+    var lines=["# design-doc feedback — paste into docs/design/feedback/"+DOC+"-rev<N>.yaml","doc: "+DOC,"notes:"];
+    Object.keys(state).forEach(function(a){
+      var note=(state[a]||"").replace(/\r/g,""); if(!note.trim()) return;
+      lines.push("  - anchor: "+a); lines.push("    note: |");
+      note.split("\n").forEach(function(l){ lines.push("      "+l); });
+    });
+    return lines.join("\n")+"\n";
+  }
+  function attach(el){
+    var id=el.id;
+    var btn=document.createElement("button"); btn.className="dd-note-btn"; btn.type="button"; btn.textContent="✎"; btn.title="Annotate #"+id;
+    var box=document.createElement("div"); box.className="dd-note-box"; box.style.display=(state[id]||"").trim()?"block":"none";
+    var ta=document.createElement("textarea"); ta.value=state[id]||""; ta.setAttribute("placeholder","note for #"+id+" …");
+    ta.addEventListener("input",function(){ state[id]=ta.value; save(); refresh(); el.classList.toggle("dd-annotated", !!ta.value.trim()); });
+    if((state[id]||"").trim()) el.classList.add("dd-annotated");
+    box.appendChild(ta);
+    btn.addEventListener("click",function(){ box.style.display=box.style.display==="none"?"block":"none"; if(box.style.display==="block") ta.focus(); });
+    if(el.tagName==="LI"){ el.insertAdjacentElement("afterbegin", btn); el.appendChild(box); }
+    else { el.insertAdjacentElement("afterend", box); el.insertAdjacentElement("beforebegin", btn); }
+  }
+  function copyText(txt, ok){
+    var done=function(){toast(ok);};
+    var fallback=function(){ var t=document.createElement("textarea"); t.value=txt; document.body.appendChild(t); t.select(); try{document.execCommand("copy"); toast(ok);}catch(e){toast("copy failed — select the box");} t.remove(); };
+    if(navigator.clipboard&&navigator.clipboard.writeText){ navigator.clipboard.writeText(txt).then(done,fallback); } else { fallback(); }
+  }
+  function fileLine(label, value){
+    var d=document.createElement("div"); d.className="dd-fb-file"; d.title="click to copy";
+    var c=document.createElement("code"); c.textContent=value;
+    d.appendChild(document.createTextNode(label+" ")); d.appendChild(c);
+    d.addEventListener("click",function(){ copyText(value, label.replace(":","")+" copied"); });
+    return d;
+  }
+  document.addEventListener("DOMContentLoaded",function(){
+    document.querySelectorAll("main [id]").forEach(attach);
+    var bar=document.createElement("div"); bar.className="dd-fb-bar";
+    var row=document.createElement("div"); row.className="dd-fb-row";
+    var lbl=document.createElement("span"); lbl.innerHTML='notes <span class="dd-badge">0</span>'; badge=lbl.querySelector(".dd-badge");
+    var ex=document.createElement("button"); ex.type="button"; ex.textContent="Copy feedback";
+    ex.addEventListener("click",function(){ copyText(exportYaml(), "feedback copied — create "+DIR+FILE); });
+    row.appendChild(lbl); row.appendChild(ex);
+    bar.appendChild(row);
+    bar.appendChild(fileLine("file:", FILE));
+    bar.appendChild(fileLine("path:", DIR+FILE));
+    document.body.appendChild(bar); refresh();
+  });
+})();
+
+</script>
+</body>
+</html>
