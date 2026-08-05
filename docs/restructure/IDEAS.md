@@ -22,11 +22,33 @@ item, or (c) drop it. Strike through or delete what's been groomed so the inbox 
 
 Tags help grooming: `idea` · `bug` · `doc` · `source` (new data source) · `question` · `chore`.
 
-### Promotion marker (added 2026-08-05 — you could not tell from this file what had been groomed)
+### Entry header (added 2026-08-05, user direction — the inbox needed identity, state and priority)
 
-An entry that produced backlog items keeps a **`GROOMED <date> → <ids>`** prefix, in place:
+Every inbox entry carries a one-line header, then its body:
 
-`- **\`GROOMED 2026-08-05 → C25\`** *(what was promoted; what stays open)* — <the original entry>`
+```
+- **`Idea-N`** · 2026-07-22 · `[idea]` · **open** · prio? **Med** —
+  <the entry text>
+```
+
+The header and the body render as ONE line (the Epic L markdown renderer has no hard
+break), which is why the header ends in `—`: it reads as a prefix, the same shape the
+file already used (`2026-08-05 — [bug] **Title**`), just carrying identity and state.
+
+| Field | Rule |
+|---|---|
+| **id** | `Idea-<n>`, assigned in CAPTURE order — oldest is `Idea-1`. Ids are **stable references**: never renumber, never reuse. A new capture takes the next free number wherever it sits in the file (new entries still go at the TOP; position is chronology, the id is identity). |
+| **split** | A big entry whose parts have DIFFERENT dispositions splits into `Idea-Na`, `Idea-Nb`, … Split only when the parts would carry different **status or priority or target item** — not merely because an entry is long. |
+| **date** | Capture date. Unchanged by later edits; a later finding is a `KEPT-UPDATED <date>` line in the body. |
+| **tag** | `idea` · `bug` · `doc` · `source` · `question` · `chore` — as before. |
+| **status** | `open` (needs a decision or a groom) · `parked → <trigger>` (deliberately waiting on a NAMED trigger) · `groomed → <ids>` (produced backlog items) · `merged → <id>` (folded into an existing item's acceptance or notes) · `closed` (resolved, kept for the record). |
+| **prio** | **the user's** call: `High` · `Med` · `Low` · `Deferred`. Written `prio?` while the value is **proposed by the agent and not yet confirmed**; written `prio` once the user has ruled it. Confirming is a one-character delete, which is the point. |
+
+**Why `merged` exists, and why it is the most useful status.** Most inbox entries are not
+new work — they are a fact that belongs INSIDE work already scheduled. Filing those as new
+items inflates the backlog and splits one change across two owners; leaving them in the inbox
+loses them. `merged → C25` says the finding now rides that item's acceptance, so whoever
+picks it up gets the finding for free.
 
 **Why marked rather than moved.** The groom ritual says a groomed line moves to the audit
 trail at the bottom of this file. That works when an entry maps 1:1 to an item. It does not
@@ -40,7 +62,8 @@ question a 1,000-line file with the trail at the bottom could not answer.
 
 <!-- add new ideas at the top -->
 
-- 2026-08-05 — [bug] **CORRECTED SAME DAY — the claim below was WRONG in its headline and is kept
+- **`Idea-69`** · 2026-08-05 · `[bug]` · **groomed → K18** · prio? **High** —
+  **CORRECTED SAME DAY — the claim below was WRONG in its headline and is kept
   only for the narrow residue.** I reported that "every code authored through the K11 steward screen
   is tier-1 by construction". It is not.
   [`AppCodeCascadePane.tsx:288`](../../web/src/routes/AppCodeCascadePane.tsx) has a three-value tier
@@ -72,7 +95,8 @@ question a 1,000-line file with the trail at the bottom could not answer.
   tier-1 rows and dropping it would let a blank target through as an ordinary attribution. Severity:
   the loader is correct, the gate is correct, the WRITE PATH is the gap; nothing is mis-written today
   because no producer-side platform code has been authored yet.
-- 2026-08-05 — [question] **"tier" names three different things — but the VALUE SPACES do not
+- **`Idea-68`** · 2026-08-05 · `[question]` · **merged → K18** · prio? **Low** —
+  **"tier" names three different things — but the VALUE SPACES do not
   collide, so this is naming hygiene, not the ambiguity I first claimed (corrected same day).** The
   K7 row-kind tier is a STRING enum (`seal-born | platform | dual-coded`, `AppCodeCascadePane.tsx`);
   the K2 match-precedence tier is an INT (1 SEAL … 5 manual); `drydocs_api/mappings.py` stamps the
@@ -81,7 +105,8 @@ question a 1,000-line file with the trail at the bottom could not answer.
   `tier=2` edge could mean "platform" or "matched by FID"; it cannot, because the edge carries the
   string. Still worth a rename (`row_kind` vs `match_tier`) for readers, and worth doing before
   either surfaces in a QuerySpec, but it is cosmetic rather than a correctness risk.
-- 2026-08-05 — [question] **A Control-M app code is NOT a durable identifier — the 3-char limit
+- **`Idea-67`** · 2026-08-05 · `[question]` · **groomed → K19** · prio? **Med** —
+  **A Control-M app code is NOT a durable identifier — the 3-char limit
   forces reuse (user, 2026-08-05).** Codes are a scarce namespace, so they get retired and reissued
   with a different meaning; `DDC` is the documented case (created for the PySpark conversion,
   repurposed, nothing PySpark now). CONSEQUENCE for the K9 store, which is about to be hand-keyed:
@@ -92,7 +117,8 @@ question a 1,000-line file with the trail at the bottom could not answer.
   keeping an attribution that is now wrong. Wants: effective dating on the mapping, or at minimum a
   reuse detection that surfaces "this code's mapping predates folders that appeared under it".
 
-- 2026-08-05 — [bug] **The app-code CSV is TIER-1-SHAPED, and loading it as authored rows would
+- **`Idea-66`** · 2026-08-05 · `[bug]` · **groomed → K18** · prio? **High** —
+  **The app-code CSV is TIER-1-SHAPED, and loading it as authored rows would
   silently fan a platform code's own SEAL onto every consumer folder under it.** THE MECHANISM (built,
   [`folder_attribution.py:216-224`](../../drydocs/loaders/folder_attribution.py)): the ONLY way to
   declare a tier-2 platform code is an authored row with **`app_id` EMPTY** — a populated app_id is
@@ -116,7 +142,8 @@ question a 1,000-line file with the trail at the bottom could not answer.
   tier-2 resolving SEAL is a token inside the folder name, so per-folder resolution is derivable for
   the common case too. Mechanism written up in
   [`knowledge/standards/technology/folder-naming-convention.md`](../../knowledge/standards/technology/folder-naming-convention.md).
-- 2026-08-05 — [source] **The Control-M SUB-APPLICATION field declares WHICH PLATFORM an application
+- **`Idea-65`** · 2026-08-05 · `[source]` · **merged → C25** · prio? **Med** —
+  **The Control-M SUB-APPLICATION field declares WHICH PLATFORM an application
   runs on — a first-pass C1 source, NOT a replacement for the version email.** ~~a far better
   USES_SOFTWARE source than the adhoc version email~~ — **CORRECTED SAME DAY (user):** that
   overclaimed it on both axes. Under the HLT standard the framework does not vanish when the app code
@@ -138,7 +165,8 @@ question a 1,000-line file with the trail at the bottom could not answer.
   `config/taxonomy/software-registry.yaml` product row — DPL (the standing gap `invocation_patterns`
   already records, now with a name and a framework table behind it) and Snowflake ETL. Register those
   products first.
-- 2026-08-05 — [chore] **`refines:` in the standards frontmatter is a CHAIN, not a flag — and
+- **`Idea-64`** · 2026-08-05 · `[chore]` · **open** · prio? **High** —
+  **`refines:` in the standards frontmatter is a CHAIN, not a flag — and
   `config/precedence.yaml` cannot express two internal tiers.** SME framing: Vendor → Company/Platform
   team → Lower support group. Concretely: BMC baseline ← DAT SRE standard (platform team,
   framework-coded) ← HLT standard (support group, application-coded). Both internal levels sit at
@@ -146,7 +174,8 @@ question a 1,000-line file with the trail at the bottom could not answer.
   grammar, in what position 6 means, and in whether the app code carries the SEAL — nothing records
   which wins. Also corrected a real defect in the publishable standard: "frequency at position 6 =
   legacy" is true only of the DAT standard; under HLT a frequency letter at position 6 is CURRENT.
-- 2026-08-05 — [question] **Control-M app code → SEAL cardinality — CORRECTED 2026-08-05: `uniq -d`
+- **`Idea-63a`** · 2026-08-05 · `[question]` · **closed — answered; the cardinality question is settled** · prio? **Med** —
+  **Control-M app code → SEAL cardinality — CORRECTED 2026-08-05: `uniq -d`
   tests the registry key, NOT the tier, and is necessary but NOT sufficient.** `AOC` and `DCL` are each
   a UNIQUE row in the file and still 1:many in reality (see the tier-1-shaped-CSV entry above). K8
   authors one steward row per app code and fans it out to folders (§B1), while
@@ -156,15 +185,20 @@ question a 1,000-line file with the trail at the bottom could not answer.
   handled by K7's surfacing rule rather than by the cardinality of the file. Still worth running
   `awk -F, 'NR>1{print $1}' <file> | sort | uniq -d` — a duplicated code would ALSO make the K9 manual
   tier-5 pins ambiguous (they were rekeyed to `app_code=<CODE>` and are hand-authored) — but an empty
-  result proves only that the registry is a function, not that any code is tier 1. **NOT a validity
-  test (user, 2026-08-05):**
+  result proves only that the registry is a function, not that any code is tier 1. *(Split 2026-08-05:
+  the `descr` half became `Idea-63b` — different disposition, since the cardinality question has an
+  answer and the review queue is unbuilt work.)*
+- **`Idea-63b`** · 2026-08-05 · `[question]` · **merged → K18** · prio? **Med** —
+  **The app-code CSV's `descr` column is a corroboration signal, never a validity
+  test (user, 2026-08-05).**
   `descr` leads with the seal id on MOST rows but not all, so column 2 vs the head of column 3 is a
   CORROBORATION signal with a known-imperfect base rate — never a pass/fail check and never a
   derivation source. `seal_id` is the field; `descr` is prose about it. A majority-correct column is
   the dangerous kind: it survives spot-checks and fails silently in the tail. Use the comparison only
   to produce a REVIEW QUEUE of disagreeing rows (candidate stale renames / decommissioned SEALs /
   copy-paste), each ruled by a human — same disposition as the §G5 disagreement classes.
-- 2026-08-05 — [idea] **Generalize the registration/routing/attribution rule — three instances in two
+- **`Idea-62`** · 2026-08-05 · `[idea]` · **groomed → J32** · prio? **High** —
+  **Generalize the registration/routing/attribution rule — three instances in two
   days.** (1) A FID is REGISTERED to the platform app while its jobs are ATTRIBUTED elsewhere
   (`fid-identity-and-scope` §G). (2) An AutoSys failure alert carries TWO SEAL ids as escalation
   ROUTING (`SEAL=<a>_<b>` in the incident payload) — ingested naively that manufactures a job
@@ -173,7 +207,8 @@ question a 1,000-line file with the trail at the bottom could not answer.
   appearing in a field is not an attribution claim unless that field's job is to attribute** —
   ownership, routing, and attribution are three different facts that all serialize as a SEAL id, and
   the graph has exactly one place (the confirmed app-code mapping) where the third is authored.
-- 2026-08-05 — [source] **AutoSys attributes at a NAME-PREFIX grain, not a folder grain — crosswalk
+- **`Idea-61`** · 2026-08-05 · `[source]` · **open** · prio? **Med** —
+  **AutoSys attributes at a NAME-PREFIX grain, not a folder grain — crosswalk
   row 12, needs a gate amendment.** Placeholder captured in
   [`external/orchestration/autosys/README.md`](../../external/orchestration/autosys/README.md); the
   `autosys-crosswalk` gate is SIGNED (11 rows, 2026-07-14) so this cannot be appended to
@@ -186,7 +221,8 @@ question a 1,000-line file with the trail at the bottom could not answer.
   lifecycle state ("SEAL Decommissioned NO New EDIT ACCESS Permitted") trapped in a free-text info
   column beside a date.
 
-- **`GROOMED 2026-08-05 → C25`** *(the gate SESSION is now a backlog item; the rest of this entry
+- **`Idea-60`** · 2026-08-04 · `[source]` · **groomed → C25** · prio? **Med** —
+  *(the gate SESSION is now a backlog item; the rest of this entry
   stays open — the sub-application USES_SOFTWARE source and the two missing product rows are not
   in C25)* —
   2026-08-04 — [source] **Software VERSION as graph context, from an adhoc evidence email — two gates
@@ -206,7 +242,8 @@ question a 1,000-line file with the trail at the bottom could not answer.
   `evidence_doc_id` pointer with reification as the named upgrade path. Corpus `adhoc-sme-email`
   registered (`confirmed: false`, citation-only, connector `email`). App-level rollup deliberately
   BLOCKED on the FID gate. **Groom both gates + the doc-09 phases into backlog items once signed.**
-- **`GROOMED 2026-08-05 → K16, K17`** *(census then gate session; the §G registration-vs-attribution
+- **`Idea-59`** · 2026-08-04 · `[source]` · **groomed → K16, K17** · prio? **High** —
+  *(census then gate session; the §G registration-vs-attribution
   finding and the six directory-owner questions ride the gate page, not this entry)* —
   2026-08-04 — [source] **The FID directory is the K2 tier-2 unblock — it was never a side quest.**
   `TierReconcilers.fid` has been an empty dict since the K2 build ("no producer-side reconciliation
@@ -225,7 +262,8 @@ question a 1,000-line file with the trail at the bottom could not answer.
   Six open questions need the directory owner — name reuse after retirement is the one that decides
   whether every historical join by name is ambiguous.
 
-- 2026-08-05 — [bug] **`meta.depgraph.dirty` conflates "untracked files present" with "the
+- **`Idea-58`** · 2026-08-05 · `[bug]` · **open** · prio? **Med** —
+  **`meta.depgraph.dirty` conflates "untracked files present" with "the
   instrument differs from its pin".** The 20260805 snapshot records `depgraph.commit:
   773fb1e, dirty: true` — but the sibling is at EXACTLY the pin, and the dirt is three
   untracked paths (`.claude/`, two screenshots), no modified tracked source. A reader of
@@ -236,7 +274,8 @@ question a 1,000-line file with the trail at the bottom could not answer.
   (see the two inboxed 2026-08-04), which is starting to argue for one grooming pass over
   the whole `meta` header rather than another point fix.
 
-- 2026-08-05 — [bug] **The company side cannot fetch the producer, and has been answering
+- **`Idea-57`** · 2026-08-05 · `[bug]` · **open** · prio? **High** —
+  **The company side cannot fetch the producer, and has been answering
   from a cached ref without knowing it was one.** A company session reported "producer repo
   not reachable — private or removed" and fell back to `cewilson/main @ 5f79d145`. The repo
   is neither private-to-them-by-design nor removed: `gh repo view ce-wilson/DryDocs` from
@@ -249,7 +288,8 @@ question a 1,000-line file with the trail at the bottom could not answer.
   reader of the answer — should the port prompt require every producer-tree citation to
   quote the SHA it was read at, so a stale read announces itself?
 
-- 2026-08-05 — [chore] **The port ledger is being reconstructed after the fact, not rolled
+- **`Idea-56`** · 2026-08-05 · `[chore]` · **open** · prio? **High** —
+  **The port ledger is being reconstructed after the fact, not rolled
   at the port.** Rolling it today found TWO unrecorded ports (`6713c142`, `5f79d145`) while
   the section still named `40c35724`; the `40c35724` entry itself admits the same thing
   happened to `f71967db`. Three in a row. Consequence: range, port commit, backup tag and
@@ -258,7 +298,8 @@ question a 1,000-line file with the trail at the bottom could not answer.
   lands in the producer repo as an artifact, or the roll becomes a step in the port prompt's
   own closing sequence.
 
-- 2026-08-04 — [idea] **The load sequence is config-living-in-code and now guarded — it may
+- **`Idea-55`** · 2026-08-04 · `[idea]` · **open** · prio? **Low** —
+  **The load sequence is config-living-in-code and now guarded — it may
   deserve an enforcement-matrix row.** `render_enforcement_matrix.py`'s own docstring calls
   `code_resident` "config living in code, the page's KPI example", and `cli.CANONICAL_LOAD_SEQUENCE`
   (with `LOAD_PROFILES` / `SCHEDULED_INGEST_EXCLUSIONS`) is exactly that — except it now has
@@ -267,7 +308,8 @@ question a 1,000-line file with the trail at the bottom could not answer.
   code-resident row needs the registry to accept a module path. (Noticed at N6; deliberately
   NOT done there — the matrix is an O12/admin surface, not N6's scope.)
 
-- 2026-08-04 — [bug] **A guard written on one machine had never actually executed on the
+- **`Idea-54`** · 2026-08-04 · `[bug]` · **open** · prio? **Med** —
+  **A guard written on one machine had never actually executed on the
   other, and passed by accident when it did.** `test_runbook_currency.py::_cli_verbs` shelled
   out to `drydocs --help` and parsed it. On the laptop that failed twice at once: `text=True`
   decodes with cp1252, which cannot decode the `┐` in Typer's rich box (`0x90`), so `stdout`
@@ -277,7 +319,8 @@ question a 1,000-line file with the trail at the bottom could not answer.
   worth grooming: how many other guards shell out and parse human-facing output, and is
   "never parse a render when the object is importable" worth writing down as a standard?
 
-- **`GROOMED 2026-08-05 → S10`** *(the missing loader guard is now an item and was BUILT the same
+- **`Idea-53`** · 2026-08-04 · `[bug]` · **groomed → S10 (BUILT 2026-08-05)** · prio? **High** —
+  *(the missing loader guard is now an item and was BUILT the same
   day; the tracker-row half was not groomed — it was DONE in the same commit, T23's row now carries
   the firing as direct evidence. Nothing here stays open.)* —
   2026-08-04 — [bug] **T23 FIRED company-side, exactly as its own row predicted — the tracker
@@ -298,7 +341,8 @@ question a 1,000-line file with the trail at the bottom could not answer.
   `:BusinessApplication` with a null app_id rather than silently creating its twin, which is
   the guard the null-tolerance argument implies but nothing implements.
 
-- 2026-08-04 — [question] **`apply-supplements` would silently skip the company's two local
+- **`Idea-52`** · 2026-08-04 · `[question]` · **open** · prio? **Med** —
+  **`apply-supplements` would silently skip the company's two local
   supplements — the exact defect G29 was built to remove.** Producer's chain is the ONE ordered
   list `base -> seal -> catalog -> registry` (+ opt-in sosa) in
   `drydocs_core/schema/supplements.py`. The company additionally runs
@@ -314,7 +358,8 @@ question a 1,000-line file with the trail at the bottom could not answer.
   local addition cannot be silently skipped? That guard would be portable and would have caught
   this class on either side.
 
-- 2026-08-04 — [bug] **N6 is now the only thing keeping three load sequences honest, and it is
+- **`Idea-51`** · 2026-08-04 · `[bug]` · **open** · prio? **Med** —
+  **N6 is now the only thing keeping three load sequences honest, and it is
   ready.** Asked to confirm the load sequence, a check of all three surfaces found them agreeing
   on the shape and disagreeing on membership. `bootstrap-schema-graph` was in BOTH operator
   surfaces (`scripts/ingest.sh` step 3/6, the startup runbook's Appendix B) and missing ONLY from
@@ -330,7 +375,8 @@ question a 1,000-line file with the trail at the bottom could not answer.
   and docs-verify that the runbook and the declaration carry — deliberate for a scheduled
   Control-M ingest, but nothing records that it is deliberate, so it reads identically to drift.
 
-- 2026-08-04 — [source] **`controlm-pipeline-stub` captured + integration plan written (internal).**
+- **`Idea-50`** · 2026-08-04 · `[source]` · **parked → the internal DPL build starts landing** · prio? **Med** —
+  **`controlm-pipeline-stub` captured + integration plan written (internal).**
   The internal DPL Control-M XML builder/validator package (config → generate → validate →
   upload → runtime, 14/14 green) is captured VERBATIM at
   `internal/controlm-config/reference/controlm-pipeline-stub-capture.md`, and the
@@ -352,7 +398,8 @@ question a 1,000-line file with the trail at the bottom could not answer.
   it had: epic placement for the producer twins (G-series vs a new epic) is explicitly a user
   call at that groom, so promoting now would be inventing the answer.
 
-- 2026-08-04 — [question] venue divergence (J18): the DESKTOP `neo4jtest` reports server
+- **`Idea-49`** · 2026-08-04 · `[question]` · **parked → user ruling: recreate the desktop container, or re-point the version fact** · prio? **Med** —
+  venue divergence (J18): the DESKTOP `neo4jtest` reports server
   5.26.27, while `config/dev-environment.yaml` + runbook Appendix A say 2026.05.0 EE —
   and its `ddschema` was missing today despite G51 (provisioned 2026-08-03, desktop),
   i.e. the topology state postdating the wipe did not survive to today. Likely the
@@ -373,19 +420,22 @@ question a 1,000-line file with the trail at the bottom could not answer.
   the desktop drifted silently. If the ruling is "re-point with a venue note", that gap is
   the thing worth an item.
 
-- 2026-08-02 — [question] **`DesignDoc.commit` is an author's claim, not a git fact — decide
+- **`Idea-48`** · 2026-08-02 · `[question]` · **open** · prio? **Low** —
+  **`DesignDoc.commit` is an author's claim, not a git fact — decide
   whether the writer persona's staleness ranking should use it.** `drydocs-startup-refresh-runbook`
   carries `a135a6d` (2026-07-20, from the doc's own "reflected commit" prose) while the file's
   last touch is `554a4e8` (2026-07-31, Rev 5). Both readings are defensible — "what the author says
   it reflects" vs "when it was edited" — but the plan doesn't say which, so the ranking is undefined.
 
-- 2026-08-02 — [idea] **The 45 `.cypher` files are now nodes with zero edges — nothing joins a
+- **`Idea-47`** · 2026-08-02 · `[idea]` · **parked → gate §H5 (loader→cypher edge is a new edge type)** · prio? **Low** —
+  **The 45 `.cypher` files are now nodes with zero edges — nothing joins a
   loader to the Cypher it executes**, even though the path is a literal in the `.py`
   (`CYPHER_DIR / "code_snapshot.cypher"`). `drydocs/loaders/` holds 32 `.cypher` + 24 `.py` +
   15 `.sql` side by side, unconnected. depgraph does not emit the edge and the loader could not
   load it if it did (new edge type → gate). This is gate §H5's named future item, now with the
   nodes already in place — the remaining work is the edge, not the corpus.
-- 2026-08-01 — [source] **Company catalog-loader review (screenshots, same day as C17) — three
+- **`Idea-46`** · 2026-08-01 · `[source]` · **merged → C22 (bug half) + C26 (back-flow half)** · prio? **Med** —
+  **Company catalog-loader review (screenshots, same day as C17) — three
   back-flow candidates and one confirmation.** CONFIRMS C17 §a from the other side: the company's
   `product_lines.cypher` takes `product_line_id` + `parent_lob_id` + `parent_sub_lob_id` and keys
   on ids throughout, i.e. the id-carrying extract the ruling assumed is not hypothetical — it is
@@ -414,7 +464,8 @@ question a 1,000-line file with the trail at the bottom could not answer.
   notes as absorbed, so they ride C26/C27's trigger inside the backlog rather than in this file.
   Nothing about this entry stays open — the bug half went to C22 in the 2026-08-02 groom.
 
-- **`GROOMED 2026-08-05 → C26, C27`** *(absorbed into the company-catalog pair exactly as this
+- **`Idea-45`** · 2026-08-01 · `[question]` · **groomed → C26, C27** · prio? **Med** —
+  *(absorbed into the company-catalog pair exactly as this
   entry's own last line instructed — the Sub-LoB grain and the `:LOB`-vs-`:CatalogLOB` label
   ruling are C27's §(a) and §(b), settled in ONE pass; the invisible-flattening argument is
   recorded in C27's notes as the reason it is gate-worthy rather than shruggable.)* —
@@ -439,14 +490,16 @@ question a 1,000-line file with the trail at the bottom could not answer.
   `:CatalogLOB`-keyed field and MERGE a phantom LOB. Fold into that back-flow item when its
   trigger fires; do not open a second one.
 
-- 2026-07-31 — [source] **fcdo-frameworks live Confluence scrape (company-side).**
+- **`Idea-44`** · 2026-07-31 · `[source]` · **parked → company network access** · prio? **Med** —
+  **fcdo-frameworks live Confluence scrape (company-side).**
   Registered on-demand in `config/doc-source-registry.yaml` (connector: confluence, T4,
   ddcontext); page-ID target list in `internal/fcdo-reference/README.md`. Priority
   recapture: Descriptive Metadata, Data Quality, Data Contracts (DPROD), Taxonomy
   Framework property tables — the capture holes that block crosswalk sign-off. Needs the
   docmeta confluence connector (or an interim company-side capture) — company network only.
 
-- 2026-07-29 — [question] **psgmgr replica vs Control-M XML export: which source wins per
+- **`Idea-43`** · 2026-07-29 · `[question]` · **open — HITL, user/SME rules** · prio? **High** —
+  **psgmgr replica vs Control-M XML export: which source wins per
   object when they disagree?** (Guardrail 3 of the XML-fed cmd-line resolution idea → G46/
   G47/G48; the build fills a nullable derived column and decides NO source-of-truth
   question.) Needs a config/precedence.yaml ruling + a named owner-and-sunset for the dual
@@ -456,7 +509,8 @@ question a 1,000-line file with the trail at the bottom could not answer.
   CM_DEF_VJOB_DETAIL retirement note gains a second path. HITL — user/SME rules this,
   never a groom.
 
-- 2026-07-28 — [question] **Retire the `depgraph` sibling repo entirely by bringing the SCANNER
+- **`Idea-42`** · 2026-07-28 · `[question]` · **open — user call** · prio? **Med** —
+  **Retire the `depgraph` sibling repo entirely by bringing the SCANNER
   in-house?** The user's reaction to the fork merge was *"I didn't realize it was still used
   after we made it a module"* — and that instinct was half right in a way worth acting on. ADR
   0002-C absorbed depgraph's **lineage** assets into drydocs-core, but the **scanner** never
@@ -480,7 +534,8 @@ question a 1,000-line file with the trail at the bottom could not answer.
   time ("the wrapper is now bigger than the seam it wraps"). Worth deciding before a fourth step
   appears. What has NOT changed: no scan capability was missing this time — `main` already
   reported `tree: true`, so the sibling checkout was not the constraint.
-- 2026-07-28 — [question] **`config/dev-environment.yaml` under a `canonical-producer` row —
+- **`Idea-41`** · 2026-07-28 · `[question]` · **open — user call** · prio? **Med** —
+  **`config/dev-environment.yaml` under a `canonical-producer` row —
   decide the disposition producer-side too, not just company-side.** Step 48 raises this for the
   consumer, but the asymmetry is ours: `config/**` is `canonical-producer`, and U7 has just made
   that file *producer-local infrastructure* (sibling repo path, expected instrument commit, on
@@ -497,7 +552,8 @@ question a 1,000-line file with the trail at the bottom could not answer.
   the first time, `-Tree` works). Semantic merge details in DryDocs `8a82e3b` and the depgraph
   merge commit; the `add_rel` signature/shape collision and three regions git auto-merged that
   should have conflicted are the parts worth re-reading if that code is touched again.
-- 2026-07-28 — [chore] **react-router high advisory (GHSA-qwww-vcr4-c8h2, RSC-mode CSRF) cannot
+- **`Idea-40`** · 2026-07-28 · `[chore]` · **open** · prio? **Med** —
+  **react-router high advisory (GHSA-qwww-vcr4-c8h2, RSC-mode CSRF) cannot
   clear without the v7→v8 major migration** — v8 absorbs `react-router-dom` (its latest is
   still 7.18.1, inside the vulnerable 7.12.0–8.2.0 range), so `npm audit fix` is a no-op and
   the fix means rewriting the router imports against `react-router@8.3.0`. Escalated from O34
@@ -505,7 +561,8 @@ question a 1,000-line file with the trail at the bottom could not answer.
   likely moot in practice — the console is a Vite SPA, no RSC actions — but the audit stays
   red until ruled. Pairs with the code-splitting design call O34 also parked.
 
-- **`GROOMED 2026-08-05 → C26, C27`** *(the whole entry is now covered: C26 writes the divergence
+- **`Idea-39`** · 2026-07-27 · `[idea]` · **groomed → C26, C27** · prio? **Med** —
+  *(the whole entry is now covered: C26 writes the divergence
   down and reserves the four shapes as `planned` — actionable NOW, no trigger; C27 is the
   adoption gate that still waits on the COMPANY gate's sign-off. The two sibling entries that
   said "fold into that back-flow item; do not open a second one" — the 2026-08-01 Sub-LoB line
@@ -541,7 +598,8 @@ question a 1,000-line file with the trail at the bottom could not answer.
   (LOB vs CatalogLOB) and the key ruling (app_id) should be settled in the same pass. Still
   parked on its original trigger: the COMPANY gate's own sign-off.
 
-- 2026-07-27 — [question] **Internal platform vocabulary in the sample corpus — ruling
+- **`Idea-38`** · 2026-07-27 · `[question]` · **merged → J13** · prio? **High** —
+  **Internal platform vocabulary in the sample corpus — ruling
   needed.** Residual from the groomed J14/J15 publish-boundary pair: the samples still carry
   real-looking internal platform tokens (`HLDM`, `PRARAG`, `svc.hldm`, `/opt/scripts/hldm/`,
   `host-hldm-01`, datacenter codes) — a different value class from SEALIDs, deliberately left
@@ -558,13 +616,15 @@ question a 1,000-line file with the trail at the bottom could not answer.
   synthetic-sample product NAMES that echo real ones ("Home Lending Servicing" in
   lob-product-team.yaml, paired only with synthetic ids).
 
-- 2026-07-25 — [idea] **Supplement shape C — registration-vs-instance-seed re-slice** (the
+- **`Idea-37`** · 2026-07-25 · `[idea]` · **parked → the SME convenes the supplement-shape gate** · prio? **Low** —
+  **Supplement shape C — registration-vs-instance-seed re-slice** (the
   parked sibling of shape A, now groomed as **G29**). Re-sliced so that registering an
   ontology term and seeding an instance of it are separate operations rather than two halves
   of one supplement file. Explicitly **gate-worthy, not a refactor** — it changes what a
   supplement MEANS, so it routes through the HITL gate rather than a build item. Groom when
   the SME convenes it; G29 deliberately does not touch it.
-- 2026-07-25 — [source] **Databricks Unity Catalog researched — full notes at
+- **`Idea-36`** · 2026-07-25 · `[source]` · **closed — cited, no item of its own (confirmed at the 2026-07-25 groom)** · prio? **Low** —
+  **Databricks Unity Catalog researched — full notes at
   [`reference/research/databricks-unity-catalog.md`](../../reference/research/databricks-unity-catalog.md)
   (SME saw "Unity Catalog works so well in Databricks" and asked what it captures).** Public
   vendor build of the layer `docs/patterns/data-catalog/` models. Headline: its four semantic
@@ -596,7 +656,8 @@ question a 1,000-line file with the trail at the bottom could not answer.
   SEAL stays the single issuing registry, so the property encoded a fact that cannot vary. The
   governed-namespace citation stands; its worked example moved to the source-field ledger shape
   instead.)
-- 2026-07-25 — [idea] **Acronym catalog scoped by domain — so agents and humans stop colliding
+- **`Idea-35`** · 2026-07-25 · `[idea]` · **merged → G34 (content inside its scaffold); parked → the gate-log Q6 ruling** · prio? **Med** —
+  **Acronym catalog scoped by domain — so agents and humans stop colliding
   on the same three letters (SME, chat).** Direct fallout of the Q6 reopen below: `Ais` cost
   real time because two readings are both plausible — "as-is" (the standard architecture
   modeling idiom) and "Application Integration Streaming" (an org platform family) — and
@@ -632,7 +693,8 @@ question a 1,000-line file with the trail at the bottom could not answer.
   `planned`, schema public / definitions internal, deliberately defining NO terms. When Q6 is
   ruled and this line grooms, it becomes content INSIDE G34's scaffold (senses, scopes,
   does-NOT-mean notes as SKOS), not a new home.
-- 2026-07-25 — [question] **Q6 REOPENED: is the AIS acronym entry worth keeping at all?**
+- **`Idea-34`** · 2026-07-25 · `[question]` · **open — SME rules** · prio? **Low** —
+  **Q6 REOPENED: is the AIS acronym entry worth keeping at all?**
   (SME, chat). C12/Q6 ruled the expansion "Application Integration Streaming" survives as
   `config/taxonomy/software-registry.yaml#acronyms` — the durable "what did that name mean"
   home. The SME now reports the premise was wrong: they read `Ais` as **"as-is"**, never as
@@ -658,7 +720,8 @@ question a 1,000-line file with the trail at the bottom could not answer.
   spent and was retired from the tree — the acronym question is now free-standing and no
   longer gated by a pending session. Still open, still the SME's: groom when they rule — a
   Q6 amendment entry in `gate-log.md`, not a new gate.
-- 2026-07-24 — [bug] **Unlocated user-reported typo: "apply-catalog … at the bottom says
+- **`Idea-33`** · 2026-07-24 · `[bug]` · **open — needs the user to point at the exact spot** · prio? **Low** —
+  **Unlocated user-reported typo: "apply-catalog … at the bottom says
   apply ontology" (chat).** Searched cli.py docstrings/messages, runbook .md/.html both revs,
   run-drydocs skill, RELATIONSHIP_GUIDE, repo-README, feedback html, gate docs — no such
   string exists. Best guess: startup-refresh runbook step 3 says "the three domain
@@ -677,7 +740,8 @@ question a 1,000-line file with the trail at the bottom could not answer.
   call and the order is enforced in code. Offered as the likely origin, NOT declared closed:
   if the user meant somewhere else, the report is still open. The runbook itself stays
   untouched and its three owed edits are the separate 2026-07-26 [doc] entry above.
-- 2026-07-23 — [idea] **Oracle connection for the lineage/remediation path (user note,
+- **`Idea-32`** · 2026-07-23 · `[idea]` · **open** · prio? **Med** —
+  **Oracle connection for the lineage/remediation path (user note,
   chat pm).** The lineage jobs step still stages a CSV by hand through a JDBC client;
   the Oracle connection is planned — and the user's note ties it to the REMEDIATION
   context ("switch to the remediation since this last update was related"). Candidate
@@ -685,7 +749,8 @@ question a 1,000-line file with the trail at the bottom could not answer.
   `ingest-controlm --use-oracle` runs — runbook Rev 2 records the equivalence) plus
   the remediation-side staging reads (STG_APP_FACT-family fact tables per the
   company-side greenfield docs). Clarify scope with the SME before building.
-- 2026-07-23 — [source] **Company-side greenfield remediation standards not yet
+- **`Idea-31`** · 2026-07-23 · `[source]` · **parked → the remediation M2 generalization opens** · prio? **Med** —
+  **Company-side greenfield remediation standards not yet
   producer-modeled.** Two docs live in the company `drydocs_remediation` path (seen in
   review 2026-07-23): (1) the Control-M file-name component standard — FileName
   decomposed into FilePrefix / FileBusinessDate / FileSequence / FileExtension /
@@ -700,7 +765,8 @@ question a 1,000-line file with the trail at the bottom could not answer.
   standard and `transform.py` still notes the canonical variable map is "a company-side
   ratified value". Candidate: bring both docs in as the ratified maps when the
   remediation M2 generalization opens (FR-REM-5's schedule/command/conditions slice).
-- 2026-07-22 — [idea] **PDN trigger design: milestone/SLA grain + graph-computed slack,
+- **`Idea-30a`** · 2026-07-22 · `[idea]` · **parked → cm_avg_run + calendar projection land** · prio? **Med** —
+  **PDN trigger design: milestone/SLA grain + graph-computed slack,
   not per-job failure mail (SME, chat pm).** Current state: dev teams default ON/DO-MAIL
   + SHOUT to L2-on-failure → hundreds of ignored mails daily (alert fatigue — the
   motivating stat for the notification model). SME ruling direction: a failure must NOT
@@ -720,6 +786,10 @@ question a 1,000-line file with the trail at the bottom could not answer.
   delivers, DL from the email-dl-contact-point NOTIFIES mapping receives. Feeds: the DL
   gate B2 grain question (stream/milestone grain confirms folder-preference), the
   runbook module ETA logic, and the company-side probe list.
+- **`Idea-30b`** · 2026-07-23 · `[idea]` · **parked → cm_avg_run + calendar projection land** · prio? **Med** —
+  **Deadline-calibration audit — the SAME slack computation that gates a PDN also tells you
+  whether a deadline is honest.** *(Split from `Idea-30a` 2026-08-05: 30a designs the trigger,
+  30b audits the one that already exists — different deliverables, same feed.)*
   KEPT-UPDATED 2026-07-23 (SME, chat): the BIM install probe is ANSWERED — one
   production SLA/BIM job exists (SEAL 90489) — but it fires near-DAILY and is ignored:
   mechanism right, calibration wrong. Cause candidates (distinguishable): (1) deadline
@@ -736,7 +806,8 @@ question a 1,000-line file with the trail at the bottom could not answer.
   (gate-worthy): an alert channel earns attention only with a low base rate AND
   actionable content (remaining slack + recovery action) — any mechanism without
   calibrated thresholds degrades to ignored noise.
-- 2026-07-22 — [idea] *(KEPT-UPDATED 2026-07-26: distinct from **Q10**, the email BODY as a
+- **`Idea-29`** · 2026-07-22 · `[idea]` · **parked → gate email-dl-contact-point signs** · prio? **Med** —
+  *(KEPT-UPDATED 2026-07-26: distinct from **Q10**, the email BODY as a
   document corpus. This entry is about DL MEMBERSHIP as an ontology mapping — the two touch
   the same source and must not be merged.)* **Email DLs need an ontology mapping (user, chat pm).** DL = the
   contact/notification channel for an app/team; only configured in Outlook (no feed,
@@ -755,7 +826,8 @@ question a 1,000-line file with the trail at the bottom could not answer.
   runbooks / Jira sign-offs / email threads (brownfield bootstrap, rejected as end
   state). C2 keyed convention must SHARE the description-metadata plan's template
   phase (two 4000-char conventions must not fork).
-- 2026-07-22 — [source] **Tier-1/tier-2 app-code rows: the SME still owes the enumeration.**
+- **`Idea-28`** · 2026-07-22 · `[source]` · **open — SME data entry, not a backlog item** · prio? **High** —
+  **Tier-1/tier-2 app-code rows: the SME still owes the enumeration.**
   (Re-inboxed slim 2026-08-04 from the groomed defined-mapping mega-entry — everything else
   in it was resolved by the K7 sign-off 2026-08-03 and the K9 build; see the audit trail.)
   Declared tier-1 examples so far: ARA=70002 (CMH Advice R&A), SRV=70003 (HL Servicing R&A).
@@ -766,13 +838,15 @@ question a 1,000-line file with the trail at the bottom could not answer.
   taxonomy (lob-product-team.yaml OQ `area-product-missing`) — tier 2 makes that layer
   load-bearing, so the two OQs converge when the SME supplies the list.
 
-- 2026-07-22 — [idea] **Env toggle = one canonical node identity, never per-env node
+- **`Idea-27`** · 2026-07-22 · `[idea]` · **parked → an env-toggle item exists to attach to** · prio? **Low** —
+  **Env toggle = one canonical node identity, never per-env node
   identities.** When the header env toggle [Prod|UAT|Dev] gets built, it must re-scope
   DATA under one canonical node, not split identities (`job-dev`/`job-prod`
   anti-pattern). (Backstage assessment T8, UI-WIP/backstage-catalog-assessment.md §3;
   design constraint for the shell — attach to the env-toggle item when one exists.)
 
-- 2026-07-22 — [chore] **Company adoption: route the XML run's WARN flood through the new
+- **`Idea-26`** · 2026-07-22 · `[chore]` · **open — next port** · prio? **Low** —
+  **Company adoption: route the XML run's WARN flood through the new
   loader run logs (next port).** Producer BUILT the generalized run-log family same day
   (user directive after the first company XML run flooded the console with per-row
   `description_tokens` WARNINGs): `drydocs_core/run_log.py` + `BaseLoader` wiring —
@@ -784,7 +858,8 @@ question a 1,000-line file with the trail at the bottom could not answer.
   the console handler to WARNING-summary-only once the stream lands in the file — the
   file is the review surface, the console shows counts.
 
-- 2026-07-22 — [idea] **Control-M compact-timestamp normalization (mechanism, from the
+- **`Idea-25`** · 2026-07-22 · `[idea]` · **parked → a producer extractor starts consuming a temporal field** · prio? **Low** —
+  **Control-M compact-timestamp normalization (mechanism, from the
   company XML-loader's second timestamp bug).** Control-M XML exports carry compact
   timestamps `yyyyMMddHHmmss` + literal `UTC` suffix (invented example: `20250101093000UTC`);
   fed raw into Cypher `datetime()` they throw `CypherSyntaxError` — not ISO 8601, and
@@ -821,21 +896,24 @@ question a 1,000-line file with the trail at the bottom could not answer.
   Trigger re-checked 2026-08-04 (Control-M inbox groom): `controlm_xml.py` still consumes
   no temporal fields — stays parked.
 
-- 2026-07-21 — [chore] **Next cross-repo port: carry the AIS acronym expansion across
+- **`Idea-24`** · 2026-07-21 · `[chore]` · **open — next port** · prio? **Low** —
+  **Next cross-repo port: carry the AIS acronym expansion across
   files.** Producer's authoritative home is `software-registry.yaml#acronyms`; the company's
   PROVISIONAL gloss sits on their `source-registry.yaml` docs-source entry with a
   PORT-MANIFEST canonical-producer row expecting the producer expansion at next cherrypick —
   different files, so the port must transplant the value, not same-file overwrite. Also
   still open company-side: no 06-29 gate-log entry (their audit gap; backfill offered).
 
-- 2026-07-21 — [idea] **m7 build follow-up** (from gate `cmdline-nfr-vetting`): migrate
+- **`Idea-23`** · 2026-07-21 · `[idea]` · **parked → the writer ETLProcess endpoint work makes the edge landable** · prio? **Med** —
+  **m7 build follow-up** (from gate `cmdline-nfr-vetting`): migrate
   payload invocations out of the m3_invokes 1..n fold onto the registered `USES_ARTIFACT`
   edge + stamp `script_role` {launcher, payload} and the artifact_* properties on :Script.
   Feed now EXISTS (G16 value-contract facts + G15 launcher properties); groom once the
   writer's ETLProcess endpoint work makes the edge landable — the vocab entry
   `m7_uses_artifact` stays `planned` until that build's own flip.
 
-- 2026-07-21 — [idea] **Public marketing-site brand kit** captured in
+- **`Idea-22`** · 2026-07-21 · `[idea]` · **parked → the public site starts** · prio? **Low** —
+  **Public marketing-site brand kit** captured in
   `UI-WIP/WEBSITE-IDEAS.MD` (3 logo directions incl. the core+orbit modernization, secondary
   palette, hero/feature/architecture landing structure). This is the PUBLIC SITE
   (website-and-backstory workstream, 'overnight ledger' editorial identity — site not
@@ -843,7 +921,8 @@ question a 1,000-line file with the trail at the bottom could not answer.
   Epic O extension groom. Groom when the public site starts; the icon/logo direction
   should stay consistent with the O22 console glyph set.
 
-- 2026-07-21 — [idea] **FW-really-API confirmed live** — the greenfield-provenance use case
+- **`Idea-21`** · 2026-07-21 · `[idea]` · **open** · prio? **Med** —
+  **FW-really-API confirmed live** — the greenfield-provenance use case
   for the fix module: a file-watcher-shaped job's `.tok` is produced by an UPSTREAM API-call
   job writing the file locally, no external push exists — the name/type lies. Already
   codified as the `_FW`-really-API anti-pattern + design principle 8 (intent from resolved
@@ -854,7 +933,8 @@ question a 1,000-line file with the trail at the bottom could not answer.
   finds only the XML variable reference) → *artifact-not-in-SCM* flag on :Script; (b)
   pipeline-id-keyed code discovery has NO key for non-DPL python jobs → PATH-keyed Script
   identity is the fallback, and the GUID-vs-path boundary is the kind discriminator.
-- 2026-07-21 — [source] **DPL ingestion leg + AWS zone model traced** (company ingestion
+- **`Idea-20`** · 2026-07-21 · `[source]` · **open** · prio? **Med** —
+  **DPL ingestion leg + AWS zone model traced** (company ingestion
   template; mechanism-only — values stay company-side). Upstream of the launcher spine:
   FM drop of a `.dat` + `.tok` landing pair → Control-M file-watcher condition grammar
   (`TOK-IN-COND…` / `FW_DAT#DAT-IN-COND…`, FW-OK-on-FAIL) → a **separate
@@ -876,7 +956,8 @@ question a 1,000-line file with the trail at the bottom could not answer.
   CMD_LINE only); (d) cross-job `%%\\JOB\VAR` runtime threading (run GUIDs, record
   counts passed between jobs) — context-graph flavored, definition-level no-op.
 
-- 2026-07-21 — [idea] **Back-flow the company's un-back-flowed advances (bd7952f follow-up 3).**
+- **`Idea-19`** · 2026-07-21 · `[idea]` · **open** · prio? **Med** —
+  **Back-flow the company's un-back-flowed advances (bd7952f follow-up 3).**
   The 2026-07-20 bundle port went bidirectional (+288 producer / +148 company) precisely
   because these never came back; reproduce mechanism-only via the screenshot/describe
   channel: snow-support schema supplements (`hpsm_queue_key`/`sn_group_name` constraint
@@ -888,7 +969,8 @@ question a 1,000-line file with the trail at the bottom could not answer.
   drydocs-review back-flow epic. Until these land, every future port repeats the
   squash-reconcile instead of a clean linear apply.
 
-- 2026-07-21 — [chore] **Company-side heads-ups from the port-report gap review** (their
+- **`Idea-18`** · 2026-07-21 · `[chore]` · **open — relay next company session** · prio? **Low** —
+  **Company-side heads-ups from the port-report gap review** (their
   tracker — recorded here so they aren't lost; relay next company session): (a) the
   `test_schema_graph.py` drift-guard sequencing conflict — see the new reconcile-port
   skill ledger note (re-add only after their doc-vocab gate); (b) confirm
@@ -907,7 +989,8 @@ question a 1,000-line file with the trail at the bottom could not answer.
   "NOT merged" state in 5eba0c3, and the historical port reports (0eb1a8d, aa049d3,
   e6f8cca, e418258, eeaffa2, f7970e5) all exist as files company-side.
 
-- 2026-07-20 — [chore] **Post-squash ref cleanup (user decision, destructive)**: origin still
+- **`Idea-17`** · 2026-07-20 · `[chore]` · **open — user decision, destructive** · prio? **Low** —
+  **Post-squash ref cleanup (user decision, destructive)**: origin still
   carries two pre-squash-history branches — `feat/mapping-store` (SUPERSEDED: the Initial-import
   squash absorbed its content and main then evolved past it; its only unique file was the
   regenerable web-console `.print.html`, since retired by L13) and
@@ -916,13 +999,15 @@ question a 1,000-line file with the trail at the bottom could not answer.
   new safety tag `archive/old-history-2026-07-20` (this machine's pre-squash history; the other
   machine has `archive/full-history`). Deleting the remote branches is the user's call.
 
-- 2026-07-20 — [chore] **USER MANUAL STEP: add the SNYK_TOKEN repo secret** so the new CI
+- **`Idea-16`** · 2026-07-20 · `[chore]` · **open — USER MANUAL STEP** · prio? **Med** —
+  **USER MANUAL STEP: add the SNYK_TOKEN repo secret** so the new CI
   snyk job (44523ab) runs for real — token from app.snyk.io (Account settings → API
   token) → repo Settings → Secrets and variables → Actions. Until then every scan step
   skips cleanly by design. After the first green scan: triage `snyk code` advisory
   findings and decide whether to gate it (the ruff-idiom follow-up).
 
-- 2026-07-20 — [idea] **Replace SEAL/PAT naming with industry-standard, SaaS-configurable
+- **`Idea-15`** · 2026-07-20 · `[idea]` · **parked → two user decisions (display-label scope; placement is a plan change)** · prio? **Med** —
+  **Replace SEAL/PAT naming with industry-standard, SaaS-configurable
   terminology** (user request; web research DONE same day →
   `knowledge/upgrade-plans/generic-terminology-research.md`). Candidates validated:
   SEAL → **Application Portfolio** holding **Business Application**s (ServiceNow
@@ -947,7 +1032,8 @@ question a 1,000-line file with the trail at the bottom could not answer.
   (`config/source-mappings/seal-extract.yaml`) carrying what each source CALLS it; build = S3.
   Decisions 1 (display-label scope) and 2 (placement/plan-change) remain the parked user calls.
 
-- 2026-07-19 — [idea] **depgraph metric extensions (codeflow takeaways — ideas, not code)**:
+- **`Idea-14`** · 2026-07-19 · `[idea]` · **parked → depgraph work resumes** · prio? **Low** —
+  **depgraph metric extensions (codeflow takeaways — ideas, not code)**:
   compute codeflow's three genuinely useful metrics ON TOP of our existing ast-accurate
   graph, in the depgraph sibling repo (stdlib, deterministic, rides the snapshot JSON,
   flows into Neo4j at Fork 3): (1) **blast radius** — reverse transitive reachability per
@@ -959,15 +1045,18 @@ question a 1,000-line file with the trail at the bottom could not answer.
   ritual component (browser-only app, regex-heuristic edges vs our ast, Node-vm headless
   hack, no Neo4j path) — take the ideas only.
 
-- 2026-07-18 — [idea] **ETL-tooling inventory as a DryDocs domain** (re-inboxed slim from the
+- **`Idea-13`** · 2026-07-18 · `[idea]` · **parked → a catalog/domain owner asks for it** · prio? **Low** —
+  **ETL-tooling inventory as a DryDocs domain** (re-inboxed slim from the
   groomed mapping-store line): a gap no catalog covers — DataHub/OpenMetadata inventory data
   assets, not the tooling estate. DryDocs should own it. Context in the mapping-store plan §5
   (internal DataHub adoption).
 
-- 2026-07-18 — [idea] JobRun.started_at/status indexes (GraphAcademy advisor residual) — fold
+- **`Idea-12`** · 2026-07-18 · `[idea]` · **merged → the provenance-audit-fields plan (docs 06/06a), at its next touch** · prio? **Low** —
+  JobRun.started_at/status indexes (GraphAcademy advisor residual) — fold
   into the provenance-audit-fields plan (docs 06/06a) at its next touch, not standalone.
 
-- 2026-07-17 — [idea] **SaaS knowledge-graph scaffold research (chat)**: no drop-in template exists
+- **`Idea-11`** · 2026-07-17 · `[idea]` · **closed — research; whitespace confirmed, no item** · prio? **Low** —
+  **SaaS knowledge-graph scaffold research (chat)**: no drop-in template exists
   for what DryDocs is. Candidates assessed: Neo4j Labs `create-context-graph` (Apache-2.0 scaffolder,
   FastAPI+Next.js+Chakra — stack mismatch vs ReUI decision, auto-extract-by-default = anti-HITL, no
   lineage/batch-job domains → pattern quarry only: its "one domain YAML drives the whole generated
@@ -980,7 +1069,8 @@ question a 1,000-line file with the trail at the bottom could not answer.
   fits QuerySpec export) and DryDocs-as-template play à la create-context-graph ("pick your
   orchestrator, get a scaffolded support graph") for the standalone-generalization goal.
 
-- 2026-07-14 — [source] **K2 FID / ALIAS reconciliation tables are company-side unblocks.**
+- **`Idea-10`** · 2026-07-14 · `[source]` · **merged → K16, K17 (the FID half); the ALIAS tier stays open** · prio? **Med** —
+  **K2 FID / ALIAS reconciliation tables are company-side unblocks.**
   The attribution loader's TierReconcilers seam ships empty for FID and ALIAS (facts stay
   unresolved, counted in coverage) — tier 2 needs a FID -> seal_id source and tier 4 an
   alias table before those tiers resolve anything. APP_NAME reconciles today from the
@@ -990,19 +1080,22 @@ question a 1,000-line file with the trail at the bottom could not answer.
   value; the SEAL is also embedded in folder names) — a FID→seal_id pairing may be
   derivable from the already-ingested variables, not only from company tables.
 
-- 2026-07-12 — [idea] **dry-docs.com site visual language**: seed from the whitepaper's
+- **`Idea-9`** · 2026-07-12 · `[idea]` · **parked → website work starts** · prio? **Low** —
+  **dry-docs.com site visual language**: seed from the whitepaper's
   "overnight ledger" identity (greenbar/banner-page/mono-display; canonical source stays
   docs/whitepaper/drydocs-whitepaper.md). Parked until website work starts — the site is
   not started and the domain's availability is unresolved. (Re-inboxed slim at the
   2026-07-13 groom from the artifact-design-review line, sub-item 3.)
 
-- 2026-07-12 — [doc] **/documentation skill has NO white-paper guideline** (types: README, API,
+- **`Idea-8`** · 2026-07-12 · `[doc]` · **open** · prio? **Low** —
+  **/documentation skill has NO white-paper guideline** (types: README, API,
   runbook, architecture, onboarding). Wrote docs/whitepaper/drydocs-whitepaper.md deriving
   structure from the architecture-doc type + white-paper conventions; if white papers recur,
   add a "White paper" type to the skill (exec summary → problem → approach → architecture →
   governance → roadmap) and consider an Epic L outline for it (whitepaper.outline.yaml).
 
-- 2026-07-11 — [idea] **Lineage live-load gate session** (captured at the G9 close). The Fork-3
+- **`Idea-7`** · 2026-07-11 · `[idea]` · **parked → the SME schedules the lineage gate** · prio? **Med** —
+  **Lineage live-load gate session** (captured at the G9 close). The Fork-3
   writer is built and REFUSES by design: the four vocabulary entries (m3_invokes / m3_triggers /
   m3_reads_from / m3_writes_to) are `status: planned`, so `write_curated` raises
   GateBoundVocabularyError until the HITL gate flips them active. When the SME schedules that
@@ -1012,7 +1105,8 @@ question a 1,000-line file with the trail at the bottom could not answer.
   Refs: 0002-C §4/§7, drydocs_lineage/writer.py, tests/unit/test_lineage_writer.py (the gate
   test flips deliberately at activation).
 
-- 2026-07-10 — [idea] **Remediation next slices — tracked in the TDD, not itemized here**
+- **`Idea-6`** · 2026-07-10 · `[idea]` · **parked → the remediation gates open (TDD §6/§7 is the tracking surface)** · prio? **Low** —
+  **Remediation next slices — tracked in the TDD, not itemized here**
   (captured at the G3 close, same day). What remains after G3/0002-B closed: the Tier-2
   agentic lane (FR-REM-4 — gated on OQ-2 registry shape + OQ-4 agent runtime, both open
   HITL questions), XML I/O (gated on the vendor schema acquisition — company-side .dtd /
@@ -1020,14 +1114,16 @@ question a 1,000-line file with the trail at the bottom could not answer.
   + B1 var.text rule (company-side; adjudicates the real M0 unit's equivalence verdict —
   the resolver stays untouched until then). Groom into items only when their gates open;
   `docs/design/drydocs-remediation-tdd.md` §6/§7 is the tracking surface.
-- 2026-07-10 — [idea] **Phase C packaging (deferred by ADR 0002-A-1 at the G2 relocate)**: the
+- **`Idea-5`** · 2026-07-10 · `[idea]` · **parked → Phase C proper** · prio? **Low** —
+  **Phase C packaging (deferred by ADR 0002-A-1 at the G2 relocate)**: the
   pieces deliberately NOT executed in Phase B — (a) make `drydocs-core` independently
   installable (packaging-only commit: per-package pyprojects + path deps, NO file moves),
   (b) the remainder's 4-way component split (load/review/plan/docgen as real packages) and
   load's final name. UPDATED at the G3 close (same day): G3 completed IN-MONOREPO, so
   trigger (a) expired unfired — no early promotion needed; the whole line now waits for
   Phase C proper. Refs: ADR 0002-A-1 §Consequences, PORT-MANIFEST header sequencing note.
-- 2026-07-09 — [idea] **Control-M Workbench as the remediation greenfield test bed — PARKED**
+- **`Idea-4`** · 2026-07-09 · `[idea]` · **parked → BMC EPD entitlement, or OQ-1 closes company-side** · prio? **Low** —
+  **Control-M Workbench as the remediation greenfield test bed — PARKED**
   (user call, 2026-07-09). The Workbench Docker image (dev Control-M, plain `docker run`, no
   Kubernetes/Helm) would let fix packages be DEPLOYED + EXECUTED against a disposable env
   before the Jira handoff — stronger than the offline equivalence proof, still SoD-safe.
@@ -1038,14 +1134,16 @@ question a 1,000-line file with the trail at the bottom could not answer.
   §Workbench + SYNTHESIZED notes), `drydocs-remediation-tdd.md` §HITL OQ-1. (Control-M for
   Kubernetes / Helm-chart offering deliberately SKIPPED — different product, agents-in-K8s,
   no current use case.)
-- 2026-07-08 — [doc] **BRD outline (Epic L, deferred)** — the third canonical doc type after
+- **`Idea-3`** · 2026-07-08 · `[doc]` · **parked → the BRD shape settles upstream** · prio? **Low** —
+  **BRD outline (Epic L, deferred)** — the third canonical doc type after
   TDD (L1) and Runbook (L8). Parked, not promoted: the BRD is a work-in-progress upstream and
   the user flagged it as "definitely a later phase", so there is no stable outline to write an
   acceptance test against yet. When the BRD shape settles, promote as `docs/design/templates/
   brd.outline.yaml` (reuse the `drydocs.doc-outline.v1` schema + traceability spine) into Epic L.
   Seed from the corpus: `SDLC-Docs/BRD - Table of Contents.docx`, `business requirements document
   template 31.docx`, `Business Requirements Template - FULL CDI Version.docx`.
-- 2026-07-06 — [idea] **`drydocs-docmeta` component plan written** — full plan in
+- **`Idea-2`** · 2026-07-06 · `[idea]` · **groomed → Q4, Q5, Q6 (P1–P3); P4–P7 stay plan-tracked** · prio? **Med** —
+  **`drydocs-docmeta` component plan written** — full plan in
   `knowledge/upgrade-plans/docmeta-component.md`: component boundary (new `docmeta`
   COMPONENT_GROUP, imports core only, CLI via entrypoint exemption), config
   `doc-source-registry.yaml` + test guard, `drydocs_docs` DB + composite delta, phases
@@ -1071,10 +1169,34 @@ question a 1,000-line file with the trail at the bottom could not answer.
   plan-tracked until Q4–Q6 land. NEW RIDER (GraphAcademy advisor, 2026-07-17): when the docmeta
   loaders land, add existence constraints on `Document.trust_default` / `Chunk.tier_rule`
   (silent null = provenance undercount).
-- 2026-07-03 — [chore] `common/` shows up in ADK `/list-apps` (it's a shared-tools package, not
+- **`Idea-1`** · 2026-07-03 · `[chore]` · **open** · prio? **Low** —
+  `common/` shows up in ADK `/list-apps` (it's a shared-tools package, not
   an app). Cosmetic; hide or restructure later.
 
 ## Recently groomed (audit trail)
+
+- 2026-08-05 (desktop, user directive: number the inbox, add status + priority, and
+  "extend or supplement existing backlog items with the ideas… I don't want every idea
+  moved, but they do need to be reviewed again") — **all 69 inbox entries reviewed and
+  headered.** Ids assigned in CAPTURE order (`Idea-1` oldest, `Idea-69` newest), so a new
+  capture at the top never renumbers anything below it. Three entries SPLIT because their
+  halves had different dispositions, which is the only reason to split: `Idea-63a` (the
+  cardinality question — answered, closed) vs `63b` (the `descr` review queue — unbuilt,
+  merged into K18); `Idea-30a` (design the PDN trigger) vs `30b` (audit the deadline of the
+  BIM job that already exists).
+  **Outcome of the review — the point of it was NOT to promote everything.** 3 promoted
+  (**K18** derive the tier from the folder name + give the store a platform-declaration row
+  kind; **K19** app-code mapping as an as-of assertion, reuse detection; **J32** write down
+  the registration/routing/attribution rule). 5 MERGED into items that already exist, which
+  is the disposition this pass was really for — **J13** absorbed the platform-vocabulary
+  ruling (`Idea-38`: it is the same user-gated decision J13 already waits on, now with four
+  value classes named), **C25** absorbed the two missing software-registry product rows
+  (`Idea-65`) as a prerequisite, **G34** absorbed the acronym-catalog CONTENT shape
+  (`Idea-35`) into its scaffold, and `Idea-68`/`Idea-63b` ride K18 as clauses. The rest
+  carry a status and a proposed priority and STAY here: 22 `parked` with a named trigger,
+  28 `open`, 3 `closed`. (71 headers over 69 ids — the two splits account for the difference.)
+  Every priority carries a trailing `*` — proposed by the agent, not confirmed by the user.
+  Clearing the star is the review pass this file now supports and could not before.
 
 - 2026-08-05 (desktop, user directive "groom them into backlog items") — the two HITL gates
   drafted the same day → **C25** (run the `software-version-context` gate — epic

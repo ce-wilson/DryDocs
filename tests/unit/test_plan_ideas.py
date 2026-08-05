@@ -9,6 +9,7 @@ drift class (a gate-prompt commit regenerated gates.json but not the matrix).
 
 from __future__ import annotations
 
+import re
 from pathlib import Path
 
 from drydocs.plan_ideas import (
@@ -22,8 +23,8 @@ _SAMPLE = """# IDEAS — the idea board (inbox)
 
 ## Inbox
 
-- **`GROOMED 2026-01-01 → Z9`** *(partially — the rest stays open)* — [idea] a thing.
-- [bug] another thing with `code` and **bold**.
+- **`Idea-2`** · 2026-01-01 · `[idea]` · **groomed → Z9** · prio? **High** — a thing.
+- **`Idea-1`** · 2026-01-01 · `[bug]` · **open** · prio? **Low** — another with `code` and **bold**.
 
 ## Recently groomed (audit trail)
 
@@ -52,7 +53,8 @@ def test_content_and_backlink_render() -> None:
     html = render_ideas(_SAMPLE)
     assert "idea inbox" in html
     assert 'href="board.html"' in html, "the page must link back to the board"
-    assert "GROOMED 2026-01-01" in html, "promotion markers must survive the render"
+    assert "Idea-2" in html, "entry ids must survive the render"
+    assert "groomed → Z9" in html, "status must survive the render"
     assert "<code>code</code>" in html and "<strong>bold</strong>" in html
 
 
@@ -85,3 +87,41 @@ def test_committed_ideas_page_matches_its_source() -> None:
         "docs/plan/ideas.html is stale — re-run `python scripts/render_board.py` "
         "(it renders the inbox too) and commit the refresh"
     )
+
+
+_HEADER = re.compile(
+    r"^- \*\*`(Idea-\d+[a-z]?)`\*\* · \d{4}-\d{2}-\d{2} · `\[[a-z]+\]` · "
+    r"\*\*(open|parked|groomed|merged|closed)\b.*?\*\* · prio\?? "
+    r"\*\*(High|Med|Low|Deferred)\*\* —"
+)
+
+
+def _inbox_entries() -> list[str]:
+    lines = DEFAULT_IDEAS_PATH.read_text(encoding="utf-8").split("\n")
+    start = lines.index("## Inbox")
+    end = next(i for i, line in enumerate(lines) if line.startswith("## ") and i > start)
+    return [line for line in lines[start:end] if line.startswith("- ")]
+
+
+def test_every_inbox_entry_carries_the_header() -> None:
+    """The Idea-<n> / status / prio scheme (user direction 2026-08-05) is only useful if
+    it is COMPLETE. One unheadered entry and "scan the inbox by priority" stops working
+    silently — the entry simply does not appear in the scan, which reads as "nothing to
+    review here" rather than as a formatting slip."""
+    bad = [line[:110] for line in _inbox_entries() if not _HEADER.match(line)]
+    assert not bad, f"inbox entries missing or malforming the header: {bad}"
+
+
+def test_idea_ids_are_unique() -> None:
+    """Ids are stable references — the backlog notes and the audit trail cite them by
+    number, so reusing one silently re-points every citation of it."""
+    ids = [_HEADER.match(line).group(1) for line in _inbox_entries()]  # type: ignore[union-attr]
+    dupes = sorted({i for i in ids if ids.count(i) > 1})
+    assert not dupes, f"duplicate Idea ids: {dupes}"
+
+
+def test_no_markdown_escape_leaks_into_the_render() -> None:
+    """The Epic L renderer does not process backslash escapes, so a `\\*` written to mean
+    "literal asterisk" reaches the published page as backslash-asterisk. Caught this way
+    once already, on the first draft of the prio marker."""
+    assert "\\*" not in DEFAULT_IDEAS_OUT_PATH.read_text(encoding="utf-8")
