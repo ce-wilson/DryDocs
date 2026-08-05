@@ -88,6 +88,28 @@ Never invent an edge inside a loader. For each new concept:
      `capture: waived — <reason>` (the platforms.yaml retrofit is the
      precedent for what a silent skip costs — never omit the field).
 
+### Optional aid — `fcdo-ontology-builder` (flat/denormalized sources)
+
+For a flat or denormalized source (a wide export, a catalog CSV), the
+firmwide `fcdo-ontology-builder` agent skill can accelerate this step.
+Optional and company-side only (the tool belongs to the internal governance
+group; adoption plan = `internal/fcdo-reference/ALIGNMENT-PLAN.md` Phase 3):
+
+- Feed it **header-only or redacted extracts ONLY** — never real data values.
+- Reuse from its output: the SKOS enum extraction (candidate concept schemes
+  from low-cardinality columns) and the HTML data-dictionary render.
+- Its classes are generic RDFS/OWL guesses — translate them through
+  `ontology-mapper` into decision-matrix terms (item 1 above); never adopt
+  them as node labels directly.
+- It does **no data profiling** (it is a structural profiler): counts, null
+  rates, grain checks, and join-coverage probes stay ours (step 1) — its
+  output cannot substitute for the profile conclusions the gate spec carries.
+- It **never bypasses the HITL gate**: everything it touches still lands
+  `proposed`/`planned` and stops at step 4 like every other artifact.
+
+Worked example: the PAT-catalog analysis (ALIGNMENT-PLAN Phase 3, citing the
+capture's transcript §Part 3).
+
 ## Step 4 — Gate spec
 
 Write `config/gate-prompts/<source-short>-<topic>.yaml`
