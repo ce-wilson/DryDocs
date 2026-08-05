@@ -34,6 +34,7 @@ from drydocs_core.manual_mappings import (  # noqa: F401 — re-exported surface
 )
 from drydocs_core.models import ManualMappingRow
 
+from .app_identity import PreCutoverApplicationGuard
 from .base import BaseLoader
 
 LOGGER = logging.getLogger(__name__)
@@ -90,7 +91,7 @@ class ManualMappingAdapter:
             yield row.model_dump(mode="json")
 
 
-class ManualSealAttributionLoader(BaseLoader):
+class ManualSealAttributionLoader(PreCutoverApplicationGuard, BaseLoader):
     """Writes SME-authored seal_app_ref PINS at the folder grain
     (match_method 'manual', origin 'manual-pin'; rekeyed at K8 per gate
     seal-app-ref-edge-reshape §D2).

@@ -14,10 +14,11 @@ from typing import ClassVar
 
 from drydocs_core.models import SealApplicationRow
 
+from .app_identity import PreCutoverApplicationGuard
 from .base import BaseLoader
 
 
-class SealApplicationsLoader(BaseLoader):
+class SealApplicationsLoader(PreCutoverApplicationGuard, BaseLoader):
     name: ClassVar[str] = "seal_applications.v1"
     source_id: ClassVar[str | None] = "seal:app-extract"
     cypher_path: ClassVar[Path | None] = (

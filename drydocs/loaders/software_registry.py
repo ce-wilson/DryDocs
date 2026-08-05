@@ -22,6 +22,7 @@ import yaml
 
 from drydocs_core.models.registry import SoftwareProductRow
 
+from .app_identity import PreCutoverApplicationGuard
 from .base import BaseLoader
 
 if TYPE_CHECKING:  # pragma: no cover
@@ -77,7 +78,7 @@ class RegistryYamlAdapter:
             }
 
 
-class SoftwareRegistryLoader(BaseLoader):
+class SoftwareRegistryLoader(PreCutoverApplicationGuard, BaseLoader):
     name: ClassVar[str] = "software_registry.v1"
     source_id: ClassVar[str | None] = "repo:software-registry"
     cypher_path: ClassVar[Path] = CYPHER_DIR / "software_registry.cypher"

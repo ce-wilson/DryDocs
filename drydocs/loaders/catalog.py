@@ -30,6 +30,7 @@ from pydantic import BaseModel, ConfigDict, Field, field_validator
 
 from drydocs_core.precedence import Claim, PrecedenceResolver
 
+from .app_identity import PreCutoverApplicationGuard
 from .base import BaseLoader
 
 _CYPHER = Path(__file__).resolve().parent / "cypher"
@@ -433,7 +434,7 @@ class AreaProductsLoader(BaseLoader):
     orphan_label: ClassVar[str | None] = "AreaProduct"  # C22 §c — envelope surfacing
 
 
-class PatProductMappingLoader(BaseLoader):
+class PatProductMappingLoader(PreCutoverApplicationGuard, BaseLoader):
     name: ClassVar[str] = "pat_product_mapping.v1"
     # the PAT team report (seal_ids / alignment), not the catalog hierarchy —
     # the C9 team_applications feed, split out at the v2 registry (N9)

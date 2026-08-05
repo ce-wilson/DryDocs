@@ -206,7 +206,12 @@ class BatchPortOrchestratorLoader(BaseLoader):
 
     def _assert_endpoint_registries_present(self) -> None:
         """Fail loudly when either MATCH-only endpoint registry is empty."""
-        apps = self._count_real_nodes("BusinessApplication", "seal_id")
+        # Counts on the CANONICAL key (S3 re-key), not the deprecated seal_id
+        # alias this line used through 2026-08-05. Both are written today, so the
+        # counts agree — but the alias retires at §G3, and a presence probe that
+        # retires with it would start reporting an empty registry against a
+        # perfectly good graph. (Noticed at S10; the alias is why it still worked.)
+        apps = self._count_real_nodes("BusinessApplication", "app_id")
         if not apps:
             raise RuntimeError(
                 f"Loader {self.name}: refusing to load — no :BusinessApplication "
