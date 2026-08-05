@@ -39,6 +39,34 @@ is the WHY + the acceptance oracle; this prompt is sequencing + delta context on
 
 ## Last completed port
 
+> **PRODUCER FETCH IS BROKEN COMPANY-SIDE — read this before guardrail 1 (2026-08-05).**
+> A company-side session reported *"live fetch failed (producer repo not reachable —
+> private or removed)"* and answered from the locally-cached `cewilson/main @ 5f79d145`.
+> The repo is **not** removed: checked from the producer at 2026-08-05,
+> `ce-wilson/DryDocs` is `PRIVATE` and healthy (`pushedAt` matched the push made minutes
+> earlier). So the failure is **access** — an expired PAT, a lapsed SSO authorization on
+> the token, or a proxy — and all three look identical to `git fetch`.
+>
+> Why it matters more than a broken command: guardrail 1 says *read at producer HEAD, not
+> at the ref you last fetched*, and that is currently impossible on the company side. Every
+> "the producer tracker says…" answer over there is pinned 2026-08-04 state presented as
+> current — the exact failure guardrail 1 was written to prevent, arrived at this time not
+> by choice. **Restore fetch before the next port**; until then treat company-side reads of
+> this file as dated, and expect the reader not to have seen any step below.
+
+- **Producer head `5f79d145`** (2026-08-04), applied company-side as
+  **PORT-REPORT-5f79d145**. Reported, not producer-verifiable.
+- **Producer head `6713c142`** (2026-08-03), applied company-side as
+  **PORT-REPORT-6713c142** (71 commits before `5f79d145`). Reported, not
+  producer-verifiable.
+- **Both of the above went UNRECORDED here until this roll (2026-08-05)**, and the
+  section below still named `40c35724` as the last port — two ports stale, not one. They
+  surfaced only because a company-side T23 lookup cited both report names. This is the
+  third consecutive roll to discover an unrecorded port after the fact (the `f71967db`
+  one is admitted in the `40c35724` entry below): **the ledger is not being rolled at the
+  port, it is being reconstructed afterwards.** Neither report's range, port commit,
+  backup tag or acceptance numbers reached the producer, so those fields are simply
+  unknown for both — an absence this section cannot repair retroactively.
 - **Producer head `40c35724`** (2026-08-03), applied company-side as
   **PORT-REPORT-40c35724** — range `f71967db..40c35724`, 34 commits, scoped
   TREE-RECONCILE. Port commit `1a3aff20` on `drydocs-port-20260803`
@@ -384,7 +412,7 @@ OWED COMPANY-SIDE:
 
 | T20 | **Catalog-loader review — DISCHARGED at PORT-REPORT-40c35724** (2026-08-03): item 1, the `products.cypher` orphan fix, is APPLIED company-side (preserving company enrichment + naming); items 2–8 live in the company's own backlog/inbox (C22 unioned in as todo; `product_lines`/`area_products` governance kept company's per the C17 gate-log ruling; count-orphans-before-applying rides T23). Full findings text preserved below for reference. **Original row:** (producer read your `pat_*`/`product_lines`/`products`/`snow_support_crosswalk` cypher; findings only — NO producer payload except item 1). **(1) `products.cypher` carries the defect producer fixed at C17 (`778a90d`):** the parent `MATCH (pl:ProductLine …)` sits AFTER `MERGE (p:Product …)`, so an unresolvable `parent_product_line_id` leaves a REAL Product with no `HAS_PRODUCT` edge and `orphan: false` still set from `ON CREATE` — unparented while reporting itself fine, and `orphan` has no writer that can ever set it true. Producer fix = `OPTIONAL MATCH` + the flag written on EVERY run + `orphan_parent_product_line_id` keeping the id that failed. This matters MORE on your side: you run it against the real catalog, so count the existing orphans before applying. **(2) `product_lines.cypher` MERGEs its parent** (`:SubLOB` / `:LOB`) rather than matching it, so a bad or missing parent id INVENTS a nameless anchor indistinguishable downstream from a real one — your own `pat_app_links.cypher` already has the right pattern (`is_stub: true`, `source: 'pat-stub'`, placeholder attrs only while stub); apply that governance or MATCH + report. **(3) same file, the ELSE branch** fires on "sub-lob absent" without also requiring `parent_lob_id`, so a row missing BOTH anchors MERGEs on a null key — verify what your Neo4j actually does there (a null property is not stored, so the match semantics are not what the code reads like) and guard the condition regardless. **(4) `snow_support_crosswalk.cypher` keys `:ServiceNowGroup` on the group NAME** (`MERGE …{group_name: row.snow_group}`) while `snow_group_sys_id` sits in the same row — C17 §a's ruling outside PAT: a rename mints a second node and orphans every edge on the first. Same shape for `:HpsmQueue` (`queue` vs `hpsm_sys_id`). Producer cannot see whether the flat `u_hpsm_queue_to_group` extract can join on sys_id, so this is a QUESTION with a recommendation, not a bug call: if sys_id is stable, it is the key and the name is an attribute. **(5) `pat_product_owners.cypher`** documents its own silent no-op on catalog refresh lag — count it (same rule as 1), and strip the literal example product id from the header before that file is ever ported; a real catalog id is a data value and must not reach the producer tree. **(6) `pat_app_links.cypher`'s** OPTIONAL-MATCH skip is CORRECT but uncounted, so refresh lag looks identical to a genuinely app-less product. **(7) `created_at` on nodes vs `first_seen_at` on edges** in the same files — producer uses `first_seen_at` for both everywhere; converge before more loaders copy it. **(8) `product_lines.cypher`'s** unconditional `SET pl.name = row.name` blanks a name on a sparse refresh, while `products.cypher` two files over uses `coalesce(row.name, p.name)` — your own better idiom, applied inconsistently (producer has the SAME bug in both `product_lines` and `area_products`; back-flow noted in IDEAS) | **DISCHARGED 2026-08-03** (PORT-REPORT-40c35724). Status cell corrected 2026-08-04: it still read `pending` while the row body already said DISCHARGED — the same producer-side staleness the T11 row documents, found by a producer review of PORT-REPORT-5f79d145. No company action was ever owed by it. |
 | T22 | **`_client(database)` follow-up — company backlog row DD6** (created 2026-08-03, the port's own finding): company `cli.py` `_client()` takes no `database` param, which (a) is already a LATENT crash in `patch_window_cmd` (calls `_client(database=...)` today), and (b) blocked the two new verbs — `docs-verify` (Q7) and `bootstrap-schema-graph` (targets `ddschema`). DD6 = add the param, wire both DEFERRED verbs, add the `ddschema` provisioning DDL (the G51 twin). Modules are already ported; only the thin CLI wrappers wait | pending (producer belief, as of 2026-08-03; company row DD6) |
-| T23 | **S3/C17 GRAPH writes on the company graph** — config/code landed at PORT-REPORT-40c35724, loads did NOT (guardrail 6: always yours). S3 re-key: **DROP `port_unique` FIRST**, then create `port_app_key` — a same-name re-declare succeeds and does nothing (verified live producer-side); all 8 key-bearing sites cut over in ONE apply or the constraint's null-tolerance silently doubles canonical nodes. C17: count existing orphans BEFORE the every-run `orphan` flag goes live (report's own note) | pending (producer belief, as of 2026-08-03) |
+| T23 | **S3/C17 GRAPH writes on the company graph** — config/code landed at PORT-REPORT-40c35724, loads did NOT (guardrail 6: always yours). S3 re-key: **DROP `port_unique` FIRST**, then create `port_app_key` — a same-name re-declare succeeds and does nothing (verified live producer-side); all 8 key-bearing sites cut over in ONE apply or the constraint's null-tolerance silently doubles canonical nodes. C17: count existing orphans BEFORE the every-run `orphan` flag goes live (report's own note). **RIDER 2026-08-05, from a company-side T23 lookup the producer was shown:** that session first read T23 broadly (as C23 `IN_DIMENSION` bootstrap + G51 `ddschema` populate + all S3/C17 re-keys + the folder-attribution migration) from downstream references, then corrected itself against this row and converged on it — so the row is right as written, and G51 `ddschema` populate is **T22/DD6 territory, not T23**. Two things to keep straight, though. (1) **A CLOSED LOADER IS NOT A PERFORMED MIGRATION.** The company closed the folder-attribution *loader* (`folder_attribution.py` / `.cypher`) on 2026-08-04; the T23 leg is the SF1/F1 edge migration on LIVE state, which is exactly what step 55's `F1/G4-RIDER` note says wipe-and-rebuild does not cover. Do not let "the folder-attribution slice closed" on a board read as the migration being done. (2) That session could not fetch the producer and answered from a cached `cewilson/main @ 5f79d145` — see the fetch-access warning at the top of this file; a T-row read under those conditions is dated by construction | pending (producer belief, as of 2026-08-05 — the S3 re-key and C17 orphan-count legs were still open company-side at the 2026-08-04 lookup; the SF1 folder-attribution *loader* is closed, its edge migration is not) |
 | T21 | **What are `drydocs/docmeta/connectors/` and `drydocs/scrapers/`?** — **ANSWERED 2026-08-02, mixed and the useful kind.** `connectors/` is a company-authored acquisition framework (a `Connector` protocol, `fetch(source) -> list[RawPage]`; acquisition only, cleaning/hashing downstream) whose four members split exactly where the producer needs: `web.py` (public http(s) via stdlib `urllib`, injectable transport so it is offline-testable with a fake opener, SSRF scheme allow-list) and `filedrop.py` (local file/directory of text files via `pathlib`) are **company-agnostic with zero internal dependencies**, `base.py` is protocol + `RawPage` + `ConnectorUnavailable` (mechanism only), and `confluence.py` drives a vendor-bundled binary against the internal wiki realm — internal. `scrapers/` is a separate heavier internal-wiki scraper CLI + leaf utilities; **not agnostic as a suite**. So `web.py` + `filedrop.py` + the `base.py` protocol are a clean sanitizable back-flow reproduction that seeds producer **Q6**, unblocking **R7** and **Q12**; everything else is a purely-internal fetcher. Company recorded it as a back-flow candidate in their IDEAS (`8502c95c`). Producer owns the reproduction — the row stays open until Q6 carries it. **DISCHARGED 2026-08-04:** Q6 landed `drydocs_docmeta/` with exactly that shape — `connectors/base.py` (protocol + `RawPage` + `SourceUnavailableError`), `web.py` (stdlib urllib, injectable transport, SSRF scheme allow-list, and the Q12 page-count refusal Q6 required before a web connector could ship at all) and `filedrop.py`. Producer-AUTHORED against the described shape, never a copy of the company tree. | ANSWERED 2026-08-02; back-flow DISCHARGED 2026-08-04 (Q6) |
 
   Done-means for T1–T10 are unchanged — they live verbatim in the archive's tracker
@@ -898,6 +926,182 @@ verification status in [BRACKETS]; spend review on [UNRULED].
     names `ddlineage` without a retire/supersede admission — that is the
     sweep finding your stragglers, not a port failure.
 
+    ***RIDER (2026-08-05) — BOTH PRODUCER DROPS ARE NOW DONE, and they
+    taught two things worth having BEFORE you run yours.*** X3 closed on
+    the desktop container and X4 on the laptop (`e495e88`, `e164e7f`);
+    both probed zero nodes AND zero relationships first, so neither was
+    a defect report. (1) **ALIAS-FIRST IS PLATFORM-ENFORCED, not just
+    good manners** — `DROP DATABASE ddlineage` attempted ahead of the
+    alias was REFUSED outright with `42N82, cannot drop database with
+    aliases`, changing nothing. If you get 42N82 you have the order
+    wrong, not a broken database. (2) **The clause order is
+    `DROP ALIAS <name> IF EXISTS FOR DATABASE`** — NOT
+    `DROP ALIAS <name> FOR DATABASE IF EXISTS`, which parses as a
+    different statement and fails. (The alias name is back-quoted in
+    Cypher because it contains a dot: `ddall.ddlineage`.) Also measured: `db.labels()` on the emptied
+    database still returns `[DataAsset, ControlMJob]`; that is the label
+    TOKEN store the 02_proxy_constraints pass registered, not data. A
+    token is not a node — probe with node/relationship COUNTS, or you
+    will talk yourself out of a legitimate drop. On the laptop the drop
+    statements had to be run by the operator by hand (the agent's
+    permission layer refused them on every route), so budget for a
+    human step rather than an unattended one.
+
+84. DEPGRAPH INSTRUMENT — PIN BUMP + A CURRENCY CHECK ON THE RITUAL
+    (`299af39`, `a782860`). The depgraph sibling consolidated onto its
+    own main at `773fb1e`; the pin in `config/dev-environment.yaml`
+    moved `5006567 -> 773fb1e` and the sibling checkout was pulled to
+    match. `snapshot.ps1` now compares the checkout it is about to run
+    against that pin and classifies ahead / behind / diverged / unknown.
+    It **WARNS, never refuses** — a snapshot taken on a drifted
+    instrument is still a snapshot, and a ritual that blocks gets
+    skipped. ***YOUR SIDE:*** `knowledge/depgraph-snapshots/**` is
+    canonical-producer (tooling ports) while `*.json` is never-port
+    (outputs never cross) — that row pair is unchanged and still
+    correct. The `depgraph:` block in `config/dev-environment.yaml` is
+    canonical-company: your fork lives at a GHE remote and your pin is
+    your own, so **take the script, keep your block**. One defect worth
+    knowing because it was caught only by a test matrix and not by
+    running it: the first classifier compared a freshly-read `HEAD`
+    instead of the resolved pin commit, and cheerfully reported
+    "behind" as "ahead".
+
+85. S4 — THE CONSOLE DRAFT SUBSTRATE (`0f87fb2`, + mapping-store runbook
+    Rev 2 `f7c0502`). `var/mapping.db` gains a `draft` table and a
+    `v_open_drafts` view; `SCHEMA_VERSION` -> `drydocs.mapping-store.v2`;
+    `build()` now CARRIES drafts across a rebuild instead of losing
+    them. `drydocs_api` gains draft writes (`/mappings/drafts`,
+    `/mappings/drafts/{id}/promote`) that return a receipt and emit an
+    ADDITIVE unified diff rather than editing config in place — ADR 0009
+    rule 5, propose in the DB and land in git. ***YOUR SIDE:*** this is
+    the first thing that ever WRITES to the mapping store, so the
+    runbook line "nothing here can lose data because it is all derived"
+    stopped being true the day S4 landed; Rev 2 says so. `drydocs_api/**`
+    and `drydocs_core/**` are evaluate-on-collision — your QuerySpecs
+    legitimately differ, so hand-merge rather than adopt.
+
+86. J30 — `wip/k9-laptop` DISPOSED (`5467476`). A long-lived producer
+    branch was audited against `main` and deleted; the one thing it held
+    that `main` lacked — `app_code_migrations()` and
+    `app_code_migration_report()` — was lifted into `drydocs_api`. Pure
+    producer housekeeping; carried here only so the API surface delta is
+    attributable rather than appearing from nowhere in a diff.
+
+87. G54 — `provision.ps1` IS EXEC-AWARE: A DOCKER-ONLY HOST PROVISIONS
+    WITH NO FLAGS (`13e1de6`, `f03a810`, `b1501ea`). `cypher-shell` ships
+    INSIDE the Neo4j image (`/var/lib/neo4j/bin/cypher-shell`), so a
+    machine whose only Neo4j is the container has none on PATH — the
+    documented invocation could not complete there, and the header used
+    to claim the image satisfied a requirement that is true of the IMAGE
+    and not of the PATH. The script now detects that and falls back to
+    `docker cp` + `docker exec … -f`, reading the container name from
+    `config/dev-environment.yaml` (`neo4j.container`), overridable with
+    `-Container`, forceable with `-ForceDockerExec`; it announces which
+    transport it took, and pins the IN-container address to
+    `bolt://localhost:7687` because the host port mapping is a host fact.
+    ***YOUR SIDE:*** the SCRIPT is portable and needs no edit — it reads
+    whatever container name your own `config/dev-environment.yaml`
+    declares (canonical-company, so keep yours). What is not portable is
+    the header's `docker run` block: container, ports, image tag and
+    source, credential handling are yours to re-author.
+    **A CORRECTION THAT MATTERS TO YOU SPECIFICALLY:** J29 (step 74)
+    left a note here saying PS 5.1 pipes inject a BOM. That was stated
+    too broadly, and a company screenshot disproved it — the pipe works
+    on a default ANSI-codepage console and fails only where the console
+    output encoding carries a preamble (`chcp 65001`, where
+    `[Console]::OutputEncoding.GetPreamble().Length` is 3). The note is
+    corrected in `provisioning/README.md`. `docker cp` + `-f` sidesteps
+    console encoding entirely and is what the script does, so the
+    RECOMMENDATION is unchanged; only the reason was wrong. A rule
+    stated too broadly gets ignored the first time someone watches it
+    not apply.
+
+88. V-SERIES — MODULE RUNBOOKS, AND COVERAGE BECAME A TEST
+    (`d11f6c0` V1, `b8eed6d` V8, `523b929` V2, `23889eb` V3, `0b67b66`).
+    Three new module runbooks — `drydocs-api`, `drydocs-core`,
+    `drydocs-load` — each carrying a `- **Module:** <name>` front-matter
+    line, plus `tests/unit/test_runbook_coverage.py`, which asserts every
+    module in `MODULE_MAP` either HAS a runbook or sits in a named
+    exemption with a written reason. `RUNBOOK_PENDING` is shrink-only
+    (the N2 `LEDGER_PENDING` idiom): six modules remain on it. ***YOUR
+    SIDE:*** `docs/design/**` is `evaluate`, deliberately not
+    canonical-producer — the controlm-ingestion-tdd rows are the
+    precedent for a doc you finalize becoming your own canonical-company
+    row. The coverage guard reads YOUR `MODULE_MAP`, so if your module
+    set differs the guard will name the difference; that is the guard
+    working. Worth one warning from the producer's own week: the
+    `drydocs-core` runbook copied the topology database list inline and
+    was stale within HOURS, because X1 retired `ddlineage` the same day.
+    It now READS the list instead. Copy nothing into a runbook that a
+    one-liner can re-derive.
+
+89. RUNBOOK CURRENCY — THE SECOND GUARD, BECAUSE COVERAGE IS NOT TRUTH
+    (`fa6e6e0`). V1 proves a runbook EXISTS. It says nothing about
+    whether the runbook is still TRUE, and on one day that gap cost
+    three separate catches, every one of them found by a person noticing
+    rather than by a test. `tests/unit/test_runbook_currency.py` checks
+    that the things a runbook NAMES still exist: repo-relative paths in
+    backticks, and `drydocs` CLI verbs. It found four stale paths on its
+    first run — two from the S5 monolith->directory split, one package
+    relocate, one file that never existed — the class of change that
+    updates every importer automatically and every DOCUMENT not at all.
+    It also caught its own author, in the very rev note describing the
+    error it was written for: **backticks are an existence claim**, so a
+    note explaining that an earlier revision cited a dead path must
+    quote that path as plain text. ***YOUR SIDE:*** it cannot prove a
+    SENTENCE is still true — "nothing here can lose data" is not
+    detectable by grep — so it narrows the gap rather than closing it.
+    `HISTORICAL_PATHS` is the exemption dict, shrink-only, reason
+    required.
+
+90. N6 — ONE LOAD SEQUENCE, TWO PROFILES, AND THE RULING RECORDED
+    (`7884b23`, with `7a60e99` as its precursor). Two files told an
+    operator what to run — `scripts/ingest.sh` and the startup runbook's
+    Appendix B — each carrying its own ordered list. They disagreed by
+    five steps and NOTHING recorded whether that gap was a decision.
+    **That ambiguity was the defect, not the step counts:** a deliberate
+    subset and a forgotten step look identical from outside. The ruling:
+    the scheduled list is deliberately shorter (a Control-M ingest is
+    not a full refresh), and each standing step it skips now carries a
+    reason in `cli.SCHEDULED_INGEST_EXCLUSIONS` — `refresh-reference` is
+    a weekly chain on another cadence; `load-software-registry` and
+    `load-bmc-docs` are repo-triggered corpora; `docs-verify` would FAIL
+    that path by design, and under `set -e` would abort an ingest over a
+    reconciliation never meant to hold there. Appendix B's omission was
+    NOT deliberate and it gains `docs-verify` (runbook **Rev 10**).
+    Mechanically: sequence steps widen from 3-tuples to a named
+    `LoadStep` carrying `profiles`; `LOAD_PROFILES` +
+    `load_profile(name)`; `ingest.sh` READS its profile at run time and
+    has no list left to drift; `tests/unit/test_load_sequence_surfaces.py`
+    holds Appendix B to the same declaration. The precursor `7a60e99` is
+    the exhibit: `bootstrap-schema-graph` ran in BOTH operator surfaces
+    while missing from the declaration, so the published load map
+    counted 15 steps where both real paths ran 16 — the old completeness
+    check walks `COMMAND_LOADERS` and therefore only ever reaches
+    loader-backed verbs. The new guard starts at the SURFACES and works
+    inward, which is the direction that catches a non-loader verb.
+    ***YOUR SIDE — READ THIS AS NEW STRUCTURE, NOT A DIFF.*** Company
+    `cli.py` still has no `COMMAND_LOADERS` and no
+    `CANONICAL_LOAD_SEQUENCE` at all; that is the open **T19** row, and
+    N6 is the last of the N3–N6 slice it narrowed to. `drydocs/cli.py`
+    is `evaluate` (keep consumer verbs, add producer verbs), so the
+    declaration lands as an addition. If you adopt it, your profile
+    membership is YOUR ruling to make — the reasons above are the
+    producer's cadence, and your Control-M schedule may justify a
+    different subset. What should NOT differ is that the subset is
+    written down: an unexplained omission is indistinguishable from an
+    oversight, which is the whole point.
+    One incidental fix rides along, and it is a warning about guards in
+    general: `test_runbook_currency.py::_cli_verbs` shelled out to
+    `drydocs --help` and PARSED it. On a cp1252 console that decode
+    fails on the box character `┐` (`0x90`) so `stdout` came back
+    `None`, and the rows begin with `│` rather than `|` so the pattern
+    would have matched nothing anyway — which makes EVERY documented
+    verb look unregistered. A tightened regex was measured and did agree
+    exactly (37/37), and was still the wrong fix. It now reads
+    `app.registered_commands`: **never parse a render when the object is
+    importable.**
+
 ACCEPTANCE GATE (behavior is the contract, not a byte-compare):
 - Track 1 (portable):
     poetry run pytest tests/unit/test_variable_classifier.py tests/unit/test_variable_resolver.py \
@@ -925,10 +1129,21 @@ ACCEPTANCE GATE (behavior is the contract, not a byte-compare):
   property-term guards) → step 73 1449/5 (+19 Q13) → step 74 1450/5
   (+1 J29) → steps 75–78 1501/5 (measured at `0c77426`: Q6/Q12 docmeta
   suites + SDLC outline pins) → step 80 1505/5 (+4 L20) → step 81 1515/5
-  (+10 S5 fragments) → step 83 1539/5 (step 82 no delta; the interval
-  also carries not-yet-ledgered laptop suites — mapping-store/API
-  expansion, runbook coverage, dev-environment, depgraph-snapshot
-  guards — ledger them before rolling past this step). The
+  (+10 S5 fragments) → step 83 1539/5. **Steps 84–90 are now ledgered
+  (2026-08-05) — that instruction is discharged; what those steps still
+  LACK is a like-for-like figure, for a venue reason worth stating
+  rather than papering over (J18).** The only measurement at step 90 was
+  taken on the LAPTOP: **1551 passed / 7 skipped**, with the production
+  CSV **ABSENT** and no RECONCILE_BEFORE_DIR. The 1539/5 above was
+  CSV-**PRESENT**, so the two differ in two environment dimensions at
+  once and `1539 -> 1551` is NOT a `+12` delta: three CSV-backed tests
+  are skipping here that were passing there, and the graphrag PDF is
+  present here where it was absent there. Reconciling those by
+  arithmetic would give ~1554/4 — which is a calculation, not a run, and
+  the chain is a chain of RUNS. Extend it from a CSV-present desktop
+  run; do not adopt the laptop number as the reference. Your own
+  baseline is above the producer floor either way — compare against your
+  last PORT-REPORT, never against these. The
   step-60 figure (1354 / 7) was CSV-ABSENT without RECONCILE_BEFORE_DIR and is
   not comparable line-for-line; `aa0a0eb`'s commit message quotes 1358 / 3,
   which is the step-59 run with RECONCILE_BEFORE_DIR set. Earlier producer

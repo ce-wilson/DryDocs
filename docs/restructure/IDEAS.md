@@ -26,6 +26,28 @@ Tags help grooming: `idea` · `bug` · `doc` · `source` (new data source) · `q
 
 <!-- add new ideas at the top -->
 
+- 2026-08-05 — [bug] **The company side cannot fetch the producer, and has been answering
+  from a cached ref without knowing it was one.** A company session reported "producer repo
+  not reachable — private or removed" and fell back to `cewilson/main @ 5f79d145`. The repo
+  is neither private-to-them-by-design nor removed: `gh repo view ce-wilson/DryDocs` from
+  the producer returns `PRIVATE` and healthy with a current `pushedAt`. So it is an ACCESS
+  failure — expired PAT, lapsed SSO authorization on the token, or a proxy — and all three
+  are indistinguishable from `git fetch`. Blocks guardrail 1 outright ("read at producer
+  HEAD, not the ref you last fetched"). Warning added at the top of `port-prompt.md`
+  §"Last completed port", but the fix is company-side credential work. **The design question
+  worth grooming:** a cached-ref read is currently indistinguishable from a live one to the
+  reader of the answer — should the port prompt require every producer-tree citation to
+  quote the SHA it was read at, so a stale read announces itself?
+
+- 2026-08-05 — [chore] **The port ledger is being reconstructed after the fact, not rolled
+  at the port.** Rolling it today found TWO unrecorded ports (`6713c142`, `5f79d145`) while
+  the section still named `40c35724`; the `40c35724` entry itself admits the same thing
+  happened to `f71967db`. Three in a row. Consequence: range, port commit, backup tag and
+  acceptance numbers are simply unknown for both new entries and cannot be recovered
+  retroactively. Worth a real fix rather than more diligence — either the company report
+  lands in the producer repo as an artifact, or the roll becomes a step in the port prompt's
+  own closing sequence.
+
 - 2026-08-04 — [idea] **The load sequence is config-living-in-code and now guarded — it may
   deserve an enforcement-matrix row.** `render_enforcement_matrix.py`'s own docstring calls
   `code_resident` "config living in code, the page's KPI example", and `cli.CANONICAL_LOAD_SEQUENCE`
