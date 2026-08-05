@@ -3,9 +3,23 @@
   DBMS, then run the read-only smoke. Idempotent (safe to re-run).
 
   REQUIRES:
-    * cypher-shell on PATH (bundled in the Neo4j Docker image and tarball).
     * a Neo4j ENTERPRISE instance — multi-database + composite are Enterprise-only.
       Community edition (exactly one database) CANNOT host this topology.
+    * a way to REACH it, and the script picks one for you (G54, 2026-08-04):
+        - `cypher-shell` on the host PATH, if present; otherwise
+        - `docker cp` + `docker exec <container> cypher-shell -f`, with the container
+          name read from config/dev-environment.yaml (`neo4j.container`), overridable
+          with -Container. `-ForceDockerExec` takes that path unconditionally.
+      cypher-shell ships INSIDE the image (/var/lib/neo4j/bin/cypher-shell), so a host
+      whose only Neo4j is the container has none — this header used to claim the image
+      satisfied the requirement, which is true of the IMAGE and not of the PATH.
+
+  OTHER ENVIRONMENTS — THIS STEP HAS TO BE RE-CREATED, NOT COPIED. Everything below
+  (container name, ports, image tag, credentials) is producer-local. config/dev-environment.yaml
+  is `canonical-company` in PORT-MANIFEST for exactly this reason: each side keeps its own
+  file. The SCRIPT is portable and needs no edit — it reads the container name from
+  whatever that file says on your side; the docker run lines below are the part you
+  re-author against your own names, ports, image source and secret handling.
 
   Local dev Enterprise via Docker (free evaluation license). Canonical names/ports/
   plugins live in config/dev-environment.yaml — change them THERE, then here
@@ -44,7 +58,14 @@
 param(
   [string]$Uri      = $env:NEO4J_URI,
   [string]$User     = $env:NEO4J_USER,
-  [string]$Password = $env:NEO4J_PASSWORD
+  [string]$Password = $env:NEO4J_PASSWORD,
+  # G54: only used when cypher-shell is absent from the host PATH. Left empty it is
+  # read from config/dev-environment.yaml (neo4j.container).
+  [string]$Container,
+  # Force the docker-exec path even where a host cypher-shell exists - for a mixed
+  # install whose client version does not match the server, and to exercise the
+  # fallback on a machine that would otherwise never take it.
+  [switch]$ForceDockerExec
 )
 $ErrorActionPreference = "Stop"
 $here = $PSScriptRoot
@@ -52,10 +73,77 @@ if (-not $Uri)      { $Uri  = "bolt://localhost:7687" }
 if (-not $User)     { $User = "neo4j" }
 if (-not $Password) { throw "Set -Password or the NEO4J_PASSWORD environment variable." }
 
+# --- transport selection (G54): host cypher-shell, or docker exec into the container --
+# cypher-shell ships INSIDE the Neo4j image, not on the host, so a machine whose only
+# Neo4j is the container has no such binary on PATH and the documented invocation could
+# not complete. The header above already owns the `docker run` lines, so this path
+# already assumes Docker; detect and fall back rather than making the operator translate.
+$useDocker = $false
+if (-not $ForceDockerExec -and (Get-Command cypher-shell -ErrorAction SilentlyContinue)) {
+  Write-Host "transport: host cypher-shell" -ForegroundColor DarkGray
+} else {
+  if (-not $Container) {
+    # Read the container name from config/dev-environment.yaml rather than hardcoding
+    # it: that file is the canonical per-environment record, and it is canonical-company
+    # in PORT-MANIFEST precisely because the value differs per side.
+    $cfgPath = Join-Path $here "..\..\..\config\dev-environment.yaml"
+    if (Test-Path $cfgPath) {
+      $cfg = Get-Content $cfgPath -Raw
+      # Scoped to the `neo4j:` block so a same-named key elsewhere cannot match.
+      if ($cfg -match '(?ms)^neo4j:[\r\n]+(.*?)(?=^\S|\Z)') {
+        $block = $Matches[1]
+        if ($block -match '(?m)^\s+container:\s*(\S+)') { $Container = $Matches[1] }
+      }
+    }
+  }
+  if (-not $Container) {
+    throw @"
+cypher-shell is not on PATH and no container name could be resolved.
+
+  cypher-shell ships inside the Neo4j image (/var/lib/neo4j/bin/cypher-shell), so a
+  Docker-only host has none. Either install the Neo4j tarball/client, or pass
+  -Container <name>, or set neo4j.container in config/dev-environment.yaml.
+"@
+  }
+  if (-not (Get-Command docker -ErrorAction SilentlyContinue)) {
+    throw "Neither cypher-shell nor docker is on PATH - nothing can reach the DBMS from here."
+  }
+  $useDocker = $true
+  # INSIDE the container the server is on its own bolt port, always 7687 - the host
+  # port mapping in dev-environment.yaml is a HOST fact and is irrelevant here. Passing
+  # the host URI through would break on any container whose ports were remapped, which
+  # has happened before (the 7476/7689 container, retired 2026-07-23).
+  $execUri = "bolt://localhost:7687"
+  Write-Host "transport: docker exec [$Container] (cypher-shell absent from host PATH - G54)" -ForegroundColor Yellow
+  Write-Host "           in-container address $execUri; host port mapping does not apply" -ForegroundColor DarkGray
+}
+
 function Invoke-CypherFile([string]$Db, [string]$File) {
   Write-Host "-> [$Db] $File" -ForegroundColor Cyan
-  cypher-shell -a $Uri -u $User -p $Password -d $Db -f (Join-Path $here $File)
-  if ($LASTEXITCODE -ne 0) { throw "cypher-shell failed on [$Db] $File (exit $LASTEXITCODE)" }
+  $local = Join-Path $here $File
+  if ($useDocker) {
+    # COPY THE FILE IN, then -f. Do NOT pipe it (J29): PowerShell 5.1's
+    # [Console]::OutputEncoding is UTF-8 WITH a 3-byte preamble which is written ahead
+    # of the first line on stdin redirection, so `Get-Content x | docker exec -i` makes
+    # cypher-shell reject a clean file with "Invalid input '<BOM>'" at line 1 col 1 and
+    # blame the file. Measured 2026-08-04: -Raw fails identically, $OutputEncoding is
+    # already preamble-free, and reassigning [Console]::OutputEncoding mid-session is
+    # too late because the redirection is already configured. docker cp sidesteps the
+    # console encoding entirely.
+    $remote = "/tmp/$File"
+    docker cp $local "${Container}:$remote"
+    if ($LASTEXITCODE -ne 0) { throw "docker cp failed for $File (exit $LASTEXITCODE)" }
+    try {
+      docker exec $Container cypher-shell -a $execUri -u $User -p $Password -d $Db -f $remote
+      $code = $LASTEXITCODE
+    } finally {
+      docker exec $Container rm -f $remote | Out-Null
+    }
+    if ($code -ne 0) { throw "cypher-shell failed on [$Db] $File (exit $code)" }
+  } else {
+    cypher-shell -a $Uri -u $User -p $Password -d $Db -f $local
+    if ($LASTEXITCODE -ne 0) { throw "cypher-shell failed on [$Db] $File (exit $LASTEXITCODE)" }
+  }
 }
 
 # 1. databases + composite (run on the system database)

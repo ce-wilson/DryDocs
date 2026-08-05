@@ -37,13 +37,24 @@ Authoring + structure only — **no data load** here.
 Idempotent (`IF NOT EXISTS` throughout). On a fresh topology the smoke returns `0 / 0 / 0`;
 success is that the federated query **runs** (both aliases resolve, no write).
 
-### Docker-only host: run each file explicitly
+**Docker-only host? Nothing to do — the script handles it (G54, fixed 2026-08-04).**
+`cypher-shell` ships inside the image at `/var/lib/neo4j/bin/cypher-shell`, so a machine
+whose only Neo4j is the container has none on PATH. `provision.ps1` now detects that and
+falls back to `docker cp` + `docker exec … -f`, reading the container name from
+`config/dev-environment.yaml` (`neo4j.container`). Override with `-Container <name>`;
+force the path with `-ForceDockerExec`. It announces which transport it took.
 
-`provision.ps1` shells out to `cypher-shell` **on the host PATH**, and on a machine whose
-only Neo4j is the container that binary does not exist there — it lives inside the image at
-`/var/lib/neo4j/bin/cypher-shell` (backlog **G54**). Run the same four steps by hand, from
-this directory. Substitute your own container name and credentials: `config/dev-environment.yaml`
-is per-side local infrastructure, so never copy another environment's values.
+> **Other environments re-create this step, they do not copy it.** The SCRIPT is portable
+> and needs no edit — it reads whatever container name your own `config/dev-environment.yaml`
+> declares. What is **not** portable is everything the header's `docker run` block names:
+> container, ports, image tag and source, credential handling. `config/dev-environment.yaml`
+> is `canonical-company` in PORT-MANIFEST precisely so each side keeps its own; re-author the
+> container step against your names and secret handling, then run the script unchanged.
+
+### Running each file by hand
+
+Only needed to apply one step in isolation, or to diagnose a failing one — `provision.ps1`
+does all of this for you. From this directory:
 
 ```powershell
 cd drydocs_core\schema\provisioning

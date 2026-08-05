@@ -162,3 +162,59 @@ def test_provisioning_header_warns_off_the_download_form():
     assert "DO NOT use" in header and "NEO4J_PLUGINS" in header
     for proc in ("apoc.*", "gds.*"):
         assert proc in header, f"allowlist for {proc} missing from the documented run"
+
+
+def test_provisioning_is_exec_aware(monkeypatch):
+    """G54: the script must reach a Docker-only host, not assume the host PATH.
+
+    cypher-shell ships INSIDE the Neo4j image, so a machine whose only Neo4j is the
+    container has no such binary. The documented invocation could not complete there,
+    and the header used to claim the image satisfied the requirement -- true of the
+    IMAGE, not of the PATH.
+    """
+    script = PROVISION_PS1.read_text(encoding="utf-8")
+    assert "Get-Command cypher-shell" in script, (
+        "provision.ps1 no longer DETECTS whether cypher-shell is on the host PATH -- "
+        "it is back to assuming it (G54)"
+    )
+    assert "docker cp" in script and "docker exec" in script, (
+        "the docker-exec fallback is gone; a Docker-only host cannot provision again"
+    )
+    # The container name must be READ, never hardcoded: config/dev-environment.yaml is
+    # canonical-company in PORT-MANIFEST because the value differs per environment.
+    assert "container:" in script, (
+        "the fallback must resolve the container from config/dev-environment.yaml's "
+        "neo4j.container, not from a literal"
+    )
+    neo = _load()["neo4j"]
+    assert f'"{neo["container"]}"' not in script.split("STEP 2")[-1].split("#>")[-1], (
+        "the runner hardcodes the container name; it must come from the config file"
+    )
+
+
+def test_provisioning_copies_the_file_instead_of_piping_it():
+    """The J29 trap, guarded rather than remembered.
+
+    `Get-Content x.cypher | docker exec -i ... cypher-shell` fails: PowerShell 5.1's
+    [Console]::OutputEncoding is UTF-8 WITH a 3-byte preamble, written ahead of the
+    first line on stdin redirection, so cypher-shell rejects a CLEAN file with
+    "Invalid input '<BOM>'" at line 1 column 1 -- and blames the file. Measured
+    2026-08-04; -Raw fails identically and neither $OutputEncoding nor a mid-session
+    [Console]::OutputEncoding reassignment fixes it.
+    """
+    script = PROVISION_PS1.read_text(encoding="utf-8")
+    # Comment lines only: the script DOCUMENTS the broken form so the next reader
+    # does not rediscover it, and a guard that reds on its own warning is useless.
+    piped = [
+        line
+        for line in script.splitlines()
+        if not line.lstrip().startswith("#")
+        and "Get-Content" in line
+        and "docker exec" in line
+        and "|" in line
+    ]
+    assert not piped, (
+        "provision.ps1 pipes a file into docker exec -- that injects a BOM and "
+        f"cypher-shell rejects it (J29). Use docker cp + -f:\n" + "\n".join(piped)
+    )
+    assert "-f $remote" in script, "the fallback must execute the COPIED file with -f"
