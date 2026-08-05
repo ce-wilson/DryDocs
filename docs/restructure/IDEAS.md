@@ -62,6 +62,40 @@ question a 1,000-line file with the trail at the bottom could not answer.
 
 <!-- add new ideas at the top -->
 
+- **`Idea-74`** · 2026-08-05 · `[source]` · **open — user decision, blocks O44 column 3** · prio? **Med** —
+  **Does DryDocs ingest the ServiceNow queue/assignment-group export, and
+  producer-side or company-side?** O44's third column wants the SNOW queues that
+  match an application and the technician roles inside them. `snow:cmdb-ci-classes`
+  is registered (Q4 ruling, 2026-07-31) but `confirmed: false`, `adapter: ~`, and
+  it captures CMDB **classes** — not queues, not assignment groups, not people.
+  The concept is real and evidenced in prose only: the runbook skill's
+  template-spec cites AO (L3) and RE/RRT (L2) Snow queues with a `Technician`
+  role, and `internal/remediation/governance/critical-batch-and-self-heal.md`
+  names a SNOW technician group plus a CTASK peer-review task. So the shape is
+  known and no dataset carries it. Decide (a) register a second SNOW dataset for
+  the queue/group export and build it here, (b) company-side only, in which case
+  O44 column 3 is permanently empty and its acceptance should say so, or (c) defer.
+  Note this is ALSO the other half of G35 §D — the ServiceNow TOM Accountable view
+  is the surface whose counts disagree with SEAL's, and neither is ingested today.
+
+- **`Idea-73`** · 2026-08-05 · `[source]` · **open — user decision, blocks O44 column 1** · prio? **High** —
+  **Where does the employee hierarchy come from, and does it live producer-side at
+  all?** Established while drafting G35: `:Employee` is a node class (`prov:Agent`)
+  with **no Employee-to-Employee edge anywhere** in the relationship vocabulary —
+  no `REPORTS_TO`, no manager edge, no source feeding one, no backlog item that
+  would create one. Two separate SME directions now depend on it: G35 §B7 ("if a
+  person is in the role, create the relationship to the employee hierarchy in a
+  later pass") and O44's first column, whose manager filter is its whole point.
+  The 2026-07-23 producer-session HR-hierarchy direction — single `:Employee`
+  spine, two-scope HR supplement, two-pass loader, `REPORTS_TO` current-state
+  sweep — was written for the **company** `hr-emp-hierarchy` gate, which is
+  probably why nothing landed here. Decide whether the producer repo gets a
+  hierarchy at all (with what source — `pat:people-report` carries teams, not
+  reporting lines), or whether both directions are company-side and the producer
+  records that explicitly. Marked High because two committed directions currently
+  defer to something that does not exist, and a deferral pointing at nothing is an
+  omission with better wording.
+
 - **`Idea-72`** · 2026-08-05 · `[doc]` · **open** · prio? **Low** —
   **A SIGNED gate page cites line numbers that have since moved.** The
   business-application-identity gate's §D2 (signed 2026-07-27) names its four
