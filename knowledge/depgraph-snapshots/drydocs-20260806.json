@@ -1,16 +1,16 @@
 {
   "meta": {
     "project": "drydocs",
-    "captured_at": "2026-08-06T15:25:26",
+    "captured_at": "2026-08-06T16:29:15",
     "date": "20260806",
     "scan": "DryDocs",
     "tree": true,
     "git": {
-      "commit": "6a11064",
-      "full": "6a11064926e6e1e66efff1ec53e9c80e4ecd50f9",
+      "commit": "cc3e98e",
+      "full": "cc3e98e084c064d72c3305682db9b65b8bda11dc",
       "branch": "main",
-      "describe": "6a11064",
-      "subject": "fix(code-graph): fonts join images - the asset-class skip (SME revisit 2026-08-06)",
+      "describe": "cc3e98e",
+      "subject": "chore(ideas): inbox the port-ledger gap - ten commits past step 101, two of them code",
       "dirty": false,
       "pr": null
     },
@@ -18,7 +18,7 @@
       "commit": "773fb1e",
       "full": "773fb1ea11e8db41bc6200e19f701866e2cef3eb",
       "branch": "main",
-      "dirty": false,
+      "dirty": true,
       "version": "0.1.0",
       "capabilities": {
         "multi_root": true,
@@ -9320,15 +9320,6 @@
       "kind": "file"
     },
     {
-      "file_id": "drydocs/drydocs/adapters",
-      "name": "adapters",
-      "extension": "",
-      "rel_path": "drydocs/adapters",
-      "project": "drydocs",
-      "circular": false,
-      "kind": "dir"
-    },
-    {
       "file_id": "drydocs/drydocs/cli.py",
       "name": "cli.py",
       "extension": ".py",
@@ -9345,15 +9336,6 @@
       "project": "drydocs",
       "circular": false,
       "kind": "file"
-    },
-    {
-      "file_id": "drydocs/drydocs/controlm",
-      "name": "controlm",
-      "extension": "",
-      "rel_path": "drydocs/controlm",
-      "project": "drydocs",
-      "circular": false,
-      "kind": "dir"
     },
     {
       "file_id": "drydocs/drydocs/data",
@@ -10281,24 +10263,6 @@
       "project": "drydocs",
       "circular": false,
       "kind": "file"
-    },
-    {
-      "file_id": "drydocs/drydocs/models",
-      "name": "models",
-      "extension": "",
-      "rel_path": "drydocs/models",
-      "project": "drydocs",
-      "circular": false,
-      "kind": "dir"
-    },
-    {
-      "file_id": "drydocs/drydocs/ontology",
-      "name": "ontology",
-      "extension": "",
-      "rel_path": "drydocs/ontology",
-      "project": "drydocs",
-      "circular": false,
-      "kind": "dir"
     },
     {
       "file_id": "drydocs/drydocs/plan_board.py",
@@ -12902,10 +12866,10 @@
       "kind": "file"
     },
     {
-      "file_id": "drydocs/knowledge/depgraph-snapshots/drydocs-20260806.json",
-      "name": "drydocs-20260806.json",
+      "file_id": "drydocs/knowledge/depgraph-snapshots/drydocs-20260806-1525.json",
+      "name": "drydocs-20260806-1525.json",
       "extension": ".json",
-      "rel_path": "knowledge/depgraph-snapshots/drydocs-20260806.json",
+      "rel_path": "knowledge/depgraph-snapshots/drydocs-20260806-1525.json",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -23371,22 +23335,12 @@
     [
       "drydocs/drydocs",
       "CONTAINS",
-      "drydocs/drydocs/adapters"
-    ],
-    [
-      "drydocs/drydocs",
-      "CONTAINS",
       "drydocs/drydocs/cli.py"
     ],
     [
       "drydocs/drydocs",
       "CONTAINS",
       "drydocs/drydocs/cmdline_staging.py"
-    ],
-    [
-      "drydocs/drydocs",
-      "CONTAINS",
-      "drydocs/drydocs/controlm"
     ],
     [
       "drydocs/drydocs",
@@ -23437,16 +23391,6 @@
       "drydocs/drydocs",
       "CONTAINS",
       "drydocs/drydocs/migrations"
-    ],
-    [
-      "drydocs/drydocs",
-      "CONTAINS",
-      "drydocs/drydocs/models"
-    ],
-    [
-      "drydocs/drydocs",
-      "CONTAINS",
-      "drydocs/drydocs/ontology"
     ],
     [
       "drydocs/drydocs",
@@ -25726,7 +25670,7 @@
     [
       "drydocs/knowledge/depgraph-snapshots",
       "CONTAINS",
-      "drydocs/knowledge/depgraph-snapshots/drydocs-20260806.json"
+      "drydocs/knowledge/depgraph-snapshots/drydocs-20260806-1525.json"
     ],
     [
       "drydocs/knowledge/depgraph-snapshots",
@@ -27544,7 +27488,7 @@
     "processes": 0,
     "data_assets": 0,
     "hosts": 0,
-    "rels": 1805,
-    "directories": 264
+    "rels": 1801,
+    "directories": 260
   }
 }
