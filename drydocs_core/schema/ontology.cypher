@@ -152,9 +152,11 @@ MERGE (n:OntologyTerm:SwoProperty {iri:"http://www.ebi.ac.uk/swo/SWO_0000150"}) 
 //       iri for an unregistered type would fabricate a registration.
 //   Extensions with NEITHER a language nor a media type ('', .example, .lock,
 //   .conf) stay unbound and are reported by the CLI, never guessed.
-//   IMAGE FILES (.png/.svg/.webp) are NOT loaded at all (SME ruling
-//   2026-08-06) — their terms were seeded 2026-08-05 and removed the next
-//   day; no image/* term belongs here while that ruling stands.
+//   BINARY ASSETS (images .png/.svg/.webp/..., fonts .ttf/.woff/...) are NOT
+//   loaded at all (SME ruling 2026-08-06, fonts added on same-day revisit) —
+//   their terms (image/*, font/ttf) were seeded 2026-08-05 and removed the
+//   next day; no asset-class term belongs here while that ruling stands
+//   (ASSET_EXTENSIONS_SKIPPED in drydocs/loaders/code_snapshot.py).
 MERGE (n:OntologyTerm:MediaType {iri:"https://www.iana.org/assignments/media-types/text/markdown"})   SET n.label = "Markdown",   n.media_type = "text/markdown",   n.registered = true;
 MERGE (n:OntologyTerm:MediaType {iri:"https://www.iana.org/assignments/media-types/text/html"})       SET n.label = "HTML",       n.media_type = "text/html",       n.registered = true;
 MERGE (n:OntologyTerm:MediaType {iri:"https://www.iana.org/assignments/media-types/text/css"})        SET n.label = "CSS",        n.media_type = "text/css",        n.registered = true;
@@ -169,7 +171,6 @@ MERGE (n:OntologyTerm:MediaType {iri:"https://www.iana.org/assignments/media-typ
 MERGE (n:OntologyTerm:MediaType {iri:"https://www.iana.org/assignments/media-types/application/sql"})  SET n.label = "SQL file",  n.media_type = "application/sql",  n.registered = true;
 MERGE (n:OntologyTerm:MediaType {iri:"https://www.iana.org/assignments/media-types/application/vnd.mermaid"}) SET n.label = "Mermaid", n.media_type = "application/vnd.mermaid", n.registered = true;
 MERGE (n:OntologyTerm:MediaType {iri:"https://www.iana.org/assignments/media-types/application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"}) SET n.label = "Excel workbook (OOXML)", n.media_type = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", n.registered = true;
-MERGE (n:OntologyTerm:MediaType {iri:"https://www.iana.org/assignments/media-types/font/ttf"})        SET n.label = "TrueType font", n.media_type = "font/ttf",     n.registered = true;
 MERGE (n:OntologyTerm:MediaType {iri:"https://drydocs.local/format#typescript"})       SET n.label = "TypeScript",       n.media_type = "application/typescript",   n.registered = false;
 MERGE (n:OntologyTerm:MediaType {iri:"https://drydocs.local/format#powershell"})       SET n.label = "PowerShell",       n.media_type = "application/x-powershell", n.registered = false;
 MERGE (n:OntologyTerm:MediaType {iri:"https://drydocs.local/format#cypher"})           SET n.label = "Cypher",           n.media_type = "application/x-cypher-query", n.registered = false;

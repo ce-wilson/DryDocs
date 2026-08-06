@@ -522,10 +522,12 @@ node_classifications:
       and `rel_path` collides across the drydocs / drydocs_core roots (§C4).
       MUST NEVER also carry :SoftwareProduct — §F1, enforced as a graph-test because
       Neo4j cannot declare label mutual-exclusion.
-      SCOPE (SME ruling 2026-08-06): IMAGE FILES (.png/.svg/.webp) are not
-      code-graph content — both snapshot loaders skip them (counted +
-      CLI-reported; IMAGE_EXTENSIONS_SKIPPED in drydocs/loaders/code_snapshot.py).
-      The snapshot artifact still carries them; the graph declines to model them.
+      SCOPE (SME ruling 2026-08-06, two parts same day): BINARY ASSETS — images
+      (.png/.svg/.webp/...) and, on revisit, fonts (.ttf/.woff/...) — are not
+      code-graph content; both snapshot loaders skip them (counted +
+      CLI-reported; ASSET_EXTENSIONS_SKIPPED in drydocs/loaders/code_snapshot.py).
+      A third asset class would be a new ruling, not a list edit. The snapshot
+      artifact still carries them; the graph declines to model them.
   - label: CodeDirectory
     class: "dd:CodeDirectory"
     prov_type: Collection

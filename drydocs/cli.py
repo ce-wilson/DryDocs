@@ -1268,13 +1268,14 @@ def load_code_snapshot(
     except CodeSnapshotError as exc:
         console.print(f"[red]{exc}[/]")
         raise typer.Exit(2) from exc
-    # SME ruling 2026-08-06: image files are not code-graph content — both
-    # passes skip them; the counts are reported so the exclusion stays visible.
-    if adapter.skipped_images:
+    # SME ruling 2026-08-06: binary assets (images + fonts) are not code-graph
+    # content — both passes skip them; counts reported so the exclusion stays
+    # visible.
+    if adapter.skipped_assets:
         console.print(
-            f"[yellow]IMAGES SKIPPED[/]: {adapter.skipped_images} image file(s) "
-            f"(+{tree_adapter.skipped_images if tree_adapter else 0} containment rel(s)) — "
-            "not code-graph content (SME ruling 2026-08-06; see IMAGE_EXTENSIONS_SKIPPED)"
+            f"[yellow]ASSETS SKIPPED[/]: {adapter.skipped_assets} image/font file(s) "
+            f"(+{tree_adapter.skipped_assets if tree_adapter else 0} containment rel(s)) — "
+            "not code-graph content (SME ruling 2026-08-06; see ASSET_EXTENSIONS_SKIPPED)"
         )
     # Counts always reported, never silent: extensions with NEITHER a seeded
     # SWO language term NOR a seeded MediaType format term load their node fine
