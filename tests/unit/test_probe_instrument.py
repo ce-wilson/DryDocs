@@ -131,6 +131,36 @@ def test_tree_probe_does_not_leak_help_text_to_stdout(capsys):
     assert capsys.readouterr().out == ""
 
 
+# --- ts_imports --------------------------------------------------------------
+
+
+def _extractors_module(default_names):
+    mod = types.ModuleType("depgraph.extractors")
+
+    class _E:
+        def __init__(self, name):
+            self.name = name
+
+    mod.default_extractors = lambda: [_E(n) for n in default_names]
+    return mod
+
+
+def test_ts_imports_true_when_default_extractors_carry_it():
+    imp = _fake_importer({"depgraph.extractors": _extractors_module(["python-imports", "ts-imports"])})
+    assert probe_mod._probe_ts_imports(imp) is True
+
+
+def test_ts_imports_false_when_absent_or_opt_in():
+    """An extractor that exists but is not in default_extractors() still leaves
+    a plain snapshot without front-end edges — membership is what scan() consults."""
+    imp = _fake_importer({"depgraph.extractors": _extractors_module(["python-imports"])})
+    assert probe_mod._probe_ts_imports(imp) is False
+
+
+def test_ts_imports_false_when_module_missing():
+    assert probe_mod._probe_ts_imports(_fake_importer({})) is False
+
+
 # --- reporting / policy ------------------------------------------------------
 
 
@@ -142,7 +172,13 @@ def test_missing_reports_only_unmet_requirements():
 
 def test_probe_reports_not_importable_without_depgraph():
     caps = probe_mod.probe(_fake_importer({}))
-    assert caps == {"multi_root": False, "tree": False, "version": None, "importable": False}
+    assert caps == {
+        "multi_root": False,
+        "tree": False,
+        "ts_imports": False,
+        "version": None,
+        "importable": False,
+    }
 
 
 def test_main_emits_json_and_exits_zero_by_default(capsys, monkeypatch):
@@ -160,7 +196,7 @@ def test_main_exits_nonzero_when_a_required_capability_is_missing(capsys, monkey
 
 def test_every_capability_has_a_stated_reason():
     """The refusal message quotes these; an unreasoned capability is unexplainable."""
-    assert set(probe_mod.CAPABILITY_REASONS) == {"multi_root", "tree"}
+    assert set(probe_mod.CAPABILITY_REASONS) == {"multi_root", "tree", "ts_imports"}
     assert all(v.strip() for v in probe_mod.CAPABILITY_REASONS.values())
 
 

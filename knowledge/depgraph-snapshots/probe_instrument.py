@@ -39,6 +39,11 @@ CAPABILITY_REASONS: dict[str, str] = {
         "scan root shares one namespace; without it the edge count silently collapses"
     ),
     "tree": "`scan --tree` walks the full file tree (-Tree snapshots)",
+    "ts_imports": (
+        "a plain scan emits first-party .ts/.tsx/.js/.jsx import edges (O42); "
+        "without it the front-end reads as 94 edge-less nodes and a diff "
+        "against a TS-capable snapshot shows a phantom edge collapse"
+    ),
 }
 
 Importer = Callable[[str], Any]
@@ -79,6 +84,21 @@ def _probe_tree(import_module: Importer) -> bool:
     return "--tree" in buf.getvalue()
 
 
+def _probe_ts_imports(import_module: Importer) -> bool:
+    """True when a PLAIN scan will emit TS/JS import edges.
+
+    Behavioural like the others: membership in ``default_extractors()`` is the
+    thing `scan()` actually consults, so it is the thing probed — an extractor
+    that exists but is opt-in would still leave a plain snapshot without
+    front-end edges.
+    """
+    try:
+        mod = import_module("depgraph.extractors")
+        return any(e.name == "ts-imports" for e in mod.default_extractors())
+    except Exception:
+        return False
+
+
 def _version(import_module: Importer) -> str | None:
     try:
         return getattr(import_module("depgraph"), "__version__", None)
@@ -104,6 +124,7 @@ def probe(import_module: Importer | None = None) -> dict[str, Any]:
     return {
         "multi_root": _probe_multi_root(import_module),
         "tree": _probe_tree(import_module),
+        "ts_imports": _probe_ts_imports(import_module),
         "version": _version(import_module),
         "importable": importable,
     }

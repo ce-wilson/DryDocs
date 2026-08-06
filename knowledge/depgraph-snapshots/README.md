@@ -134,6 +134,17 @@ Each snapshot's summary line reports `files`, `edges`, `circular_files`. To see 
 > comparable** to a roots-only one at the node level at all — compare `meta.scan`/`meta.tree`
 > first, same lesson as the three markers above.
 
+> **⚠ Instrument change — first-party TS/JS import edges appear after 2026-08-06 (O42,
+> depgraph `a56d2fc`).** The scanner gained a `ts-imports` extractor (default-on, same
+> shape as `python-imports`): relative-specifier resolution over `.ts/.tsx/.js/.jsx`,
+> bare specifiers stay third-party, asset imports drop. On unchanged code the edge
+> count jumps **549 → ~775** — that is the front end's ~226 import edges becoming
+> visible, not growth, and an edge diff across this boundary shows every `web/src`
+> dependency as "added". `meta.depgraph.capabilities.ts_imports` discriminates: a
+> snapshot without the key (or `false`) was scanned by a TS-blind instrument. Same
+> lesson as every marker above — read `meta.depgraph` before concluding anything
+> from a cross-boundary diff.
+
 - or diff the two `.json` files (`git diff` / any JSON diff tool), or watch the summary counts.
 
 ### Seeded comparison — the v1 rewrite (original vs this version)

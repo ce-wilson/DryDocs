@@ -99,7 +99,10 @@ depgraph:
   # current is a maintenance obligation, not a formality. Nothing yet compares
   # the checkout against this value automatically — that gap is in IDEAS.md.
   expected_branch: main
-  expected_commit: 773fb1e
+  # PIN BUMPED 2026-08-06 (O42): a56d2fc adds the ts-imports extractor —
+  # first-party .ts/.tsx/.js/.jsx edges in every plain scan. Edge-count
+  # jump across this bump is the instrument, not growth (snapshots README).
+  expected_commit: a56d2fc
   # What snapshot.ps1 REFUSES to scan without. These are probed behaviourally
   # (knowledge/depgraph-snapshots/probe_instrument.py) rather than by version
   # string — capability is the thing that matters, and depgraph's 0.1.0 spans

@@ -121,6 +121,13 @@
 > reality until that is ruled on. A test asserts the exception is load-bearing — remove it and the
 > guard fails.
 
+## Non-Python surfaces (outside the import-boundary invariant)
+
+| Surface | Module | Inventory + dependency story |
+|---|---|---|
+| `web/` (React/TS console) | `drydocs-web` (Epic O, phase 12) | **Not a Python package** — the core/component import invariant and `test_module_boundary.py` do not apply. It is NOT outside the code graph (O42, 2026-08-06): the all-files snapshot carries every `web/` file, and the depgraph `ts-imports` extractor (sibling repo `a56d2fc`; capability `meta.depgraph.capabilities.ts_imports`) emits first-party `.ts/.tsx` import edges — 94 modules, ~226 edges — so blast-radius / orphan / coupling questions are answerable for the front end the same way as for Python. Component-level inventory (the WHAT-exists ledger, area-grouped, reciprocal with the software registry's `react` product) is [`config/taxonomy/ui-components.yaml`](config/taxonomy/ui-components.yaml), drift-guarded by `tests/unit/test_ui_components.py`. Binary assets (images/fonts) are ruled OUT of the graph (2026-08-06 asset ruling). |
+| `agents/` (Google ADK service) | `drydocs-agents` (Epic R, phase 15) | Own venv; not a Python package of this monorepo, so absent from the boundary test. Its `.py` files still appear in the all-files snapshot as tree nodes. |
+
 ## Future, land in core when first written
 - `§`-format I/O (`§META …§OQ §SUPPLEMENTS §DOC §LEDGER`) → `drydocs_core.sigfmt`.
 - classification helpers (today: `config/classification.yaml` + `tests/unit/test_classification.py`)

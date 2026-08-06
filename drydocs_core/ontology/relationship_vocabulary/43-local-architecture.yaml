@@ -156,7 +156,11 @@
       so this CANNOT distinguish `import x` from `from x import y`, nor a
       TYPE_CHECKING-only import from a runtime one. Do NOT read an IMPORTS edge as
       "breaks if removed". Carries the M2 pull-provenance properties like every other
-      edge (§D3 — the no-properties divergence was rejected).
+      edge (§D3 — the no-properties divergence was rejected). WIDENED 2026-08-06
+      (O42): the instrument's ts-imports extractor (depgraph a56d2fc) emits the same
+      bare pairs for first-party .ts/.tsx/.js/.jsx imports, so front-end modules now
+      carry this edge too — same meaning, same limits (an `import type` is
+      indistinguishable from a value import, the TS analog of the §D2 caveat).
     supplement:   ontology_supplement.cypher
     loader:       code_snapshot.v1
     domain:       architecture

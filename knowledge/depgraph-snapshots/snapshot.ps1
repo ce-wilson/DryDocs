@@ -258,7 +258,7 @@ $meta = [ordered]@{
   git         = [ordered]@{ commit=$commit; full=$full; branch=$branch; describe=$describe; subject=$subject; dirty=$dirty; pr=$pr }
   # WHICH INSTRUMENT PRODUCED THIS (U7). Without it a scanner regression is
   # invisible in the artifact and shows up only as numbers nobody questions.
-  depgraph    = [ordered]@{ commit=$depCommit; full=$depFull; branch=$depBranch; dirty=$depDirty; version=$caps.version; capabilities=[ordered]@{ multi_root=[bool]$caps.multi_root; tree=[bool]$caps.tree } }
+  depgraph    = [ordered]@{ commit=$depCommit; full=$depFull; branch=$depBranch; dirty=$depDirty; version=$caps.version; capabilities=[ordered]@{ multi_root=[bool]$caps.multi_root; tree=[bool]$caps.tree; ts_imports=[bool]$caps.ts_imports } }
 }
 $metaJson = ($meta | ConvertTo-Json -Depth 6 -Compress)
 $raw = Get-Content $tmp -Raw

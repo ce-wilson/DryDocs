@@ -62,6 +62,20 @@ question a 1,000-line file with the trail at the bottom could not answer.
 
 <!-- add new ideas at the top -->
 
+- **`Idea-77`** · 2026-08-06 · `[chore]` · **open** · prio? **Low** —
+  **`web/src/components/HeroArt.tsx` is an orphan — the code graph's first
+  front-end finding.** The O42 TS import edges went live (226 edges, depgraph
+  `a56d2fc`) and the very first orphan query returned exactly one component:
+  nothing imports HeroArt and it imports nothing first-party. The repo's own
+  comments corroborate — `OverviewRoute.tsx:16` says the radial hub was
+  "DEMOTED to a small decorative mark", and only a css comment still cites the
+  file. Decide: delete it (with the index.css hero block that styles it), or
+  re-wire it in. Either way, remove-or-use — a knowingly dead component defeats
+  the inventory drift guard's purpose. *(Found at the O42 close, desktop; the
+  query is `MATCH (m:CodeModule) WHERE m.extension IN ['.ts','.tsx'] AND NOT
+  (m)-[:IMPORTS]-() ...` — vite.config.ts is the other hit and is legitimately
+  edge-less.)*
+
 - **`Idea-76`** · 2026-08-06 · `[chore]` · **open** · prio? **Med** —
   **The port ledger stops at step 101 / `a14a802`, and ten commits have landed
   since — including the whole G22 gate session.** The internal port that started
