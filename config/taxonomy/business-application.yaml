@@ -92,9 +92,9 @@ nodes:
   memberships:
     - sealid: 70001
       roles:
-        - { role: Backup Information Owner, sid: K123456 }
+        - { role: Application Owner, sid: K123456 }
         - { role: Design Authority, sid: K234567 }
-        - { role: Chief Business Technologist, sid: K345678 }
+        - { role: Chief Technology Officer(CTO), sid: K345678 }
         - { role: L2 Operate Manager, sid: K456789 }
         - { role: Risk Manager, sid: K567890 }
     - sealid: 70002
@@ -112,11 +112,23 @@ nodes:
         - { role: L2 Operate Manager, sid: M345678 }
         - { role: Risk Manager, sid: M456789 }
 
-  # Role — distinct role types observed (org:Role).
+  # Role — distinct role types observed (org:Role). DERIVED: the union of the role
+  # names in `memberships` above, nothing more. It is an OBSERVATION of the sample,
+  # not a vocabulary declaration — the vocabulary question is open at gate G35
+  # (config/gate-prompts/tom-roles-enumeration-and-cardinality.yaml), whose §A1 cites
+  # this list as one of four divergent role lists and whose §H4 requires it to be
+  # reconciled to whatever §A rules. Nothing reads it (G35 §A8).
+  #
+  # 2026-08-06: the 70001 membership block was re-pointed by the SME — Backup
+  # Information Owner -> Application Owner, Chief Business Technologist -> Chief
+  # Technology Officer(CTO). 70002/70003 were left as captured, so the union grew
+  # from 6 to 8 rather than swapping two names. See the note under `counts`.
   roles:
+    - Application Owner
     - Backup Information Owner
-    - Design Authority
     - Chief Business Technologist
+    - Chief Technology Officer(CTO)
+    - Design Authority
     - L1 Operate Manager
     - L2 Operate Manager
     - Risk Manager
@@ -124,9 +136,9 @@ nodes:
 counts:
   business_applications: 3
   ports_per_app: 2          # EventProcessing + BatchProcessing
-  memberships: 15
-  distinct_roles: 6
-  distinct_employees: 15    # by SID
+  memberships: 15           # 5 + 6 + 4; unchanged by the 2026-08-06 re-point (a swap, not an add)
+  distinct_roles: 8         # was 6; +Application Owner, +Chief Technology Officer(CTO) from 70001
+  distinct_employees: 15    # by SID; unchanged — the 70001 SIDs kept their positions
 
 open_questions:
   - id: two-port-derivation
