@@ -1,16 +1,16 @@
 {
   "meta": {
     "project": "drydocs",
-    "captured_at": "2026-08-05T17:25:33",
+    "captured_at": "2026-08-05T22:54:36",
     "date": "20260805",
     "scan": "DryDocs",
     "tree": true,
     "git": {
-      "commit": "ceff696",
-      "full": "ceff69661795f6c58c979142b546253a6a96245d",
+      "commit": "78a2d92",
+      "full": "78a2d92956e567343ee5cd418cf108f109904b27",
       "branch": "main",
-      "describe": "ceff696",
-      "subject": "fix(standards): SFS typing correction - Snowflake is a target DB platform, not ETL",
+      "describe": "78a2d92",
+      "subject": "merge feat/code-tree-load: containment tree + media-type layer (SME ruling 2026-08-05)",
       "dirty": false,
       "pr": null
     },
@@ -9743,6 +9743,15 @@
       "kind": "file"
     },
     {
+      "file_id": "drydocs/drydocs/loaders/cypher/code_tree.cypher",
+      "name": "code_tree.cypher",
+      "extension": ".cypher",
+      "rel_path": "drydocs/loaders/cypher/code_tree.cypher",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
       "file_id": "drydocs/drydocs/loaders/cypher/controlm_conditions_in.cypher",
       "name": "controlm_conditions_in.cypher",
       "extension": ".cypher",
@@ -12884,10 +12893,10 @@
       "kind": "file"
     },
     {
-      "file_id": "drydocs/knowledge/depgraph-snapshots/drydocs-20260805-1613.json",
-      "name": "drydocs-20260805-1613.json",
+      "file_id": "drydocs/knowledge/depgraph-snapshots/drydocs-20260805.json",
+      "name": "drydocs-20260805.json",
       "extension": ".json",
-      "rel_path": "knowledge/depgraph-snapshots/drydocs-20260805-1613.json",
+      "rel_path": "knowledge/depgraph-snapshots/drydocs-20260805.json",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -24046,6 +24055,11 @@
     [
       "drydocs/drydocs/loaders/cypher",
       "CONTAINS",
+      "drydocs/drydocs/loaders/cypher/code_tree.cypher"
+    ],
+    [
+      "drydocs/drydocs/loaders/cypher",
+      "CONTAINS",
       "drydocs/drydocs/loaders/cypher/controlm_conditions_in.cypher"
     ],
     [
@@ -25651,7 +25665,7 @@
     [
       "drydocs/knowledge/depgraph-snapshots",
       "CONTAINS",
-      "drydocs/knowledge/depgraph-snapshots/drydocs-20260805-1613.json"
+      "drydocs/knowledge/depgraph-snapshots/drydocs-20260805.json"
     ],
     [
       "drydocs/knowledge/depgraph-snapshots",
@@ -27448,13 +27462,13 @@
     "projects": [
       "drydocs"
     ],
-    "files": 1537,
+    "files": 1538,
     "edges": 549,
     "circular_files": 0,
     "processes": 0,
     "data_assets": 0,
     "hosts": 0,
-    "rels": 1800,
+    "rels": 1801,
     "directories": 264
   }
 }
