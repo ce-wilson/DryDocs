@@ -1254,8 +1254,10 @@ def load_code_snapshot(
             summary = loader.load()
             console.print(summary.as_dict())
             is_tree_snapshot = adapter.skipped_directories > 0
+            tree_adapter = None
             if is_tree_snapshot:
-                tree_loader = CodeTreeLoader(cli, CodeTreeAdapter(path), full_extract=True)
+                tree_adapter = CodeTreeAdapter(path)
+                tree_loader = CodeTreeLoader(cli, tree_adapter, full_extract=True)
                 tree_summary = tree_loader.load()
                 console.print(tree_summary.as_dict())
             else:
@@ -1266,6 +1268,14 @@ def load_code_snapshot(
     except CodeSnapshotError as exc:
         console.print(f"[red]{exc}[/]")
         raise typer.Exit(2) from exc
+    # SME ruling 2026-08-06: image files are not code-graph content — both
+    # passes skip them; the counts are reported so the exclusion stays visible.
+    if adapter.skipped_images:
+        console.print(
+            f"[yellow]IMAGES SKIPPED[/]: {adapter.skipped_images} image file(s) "
+            f"(+{tree_adapter.skipped_images if tree_adapter else 0} containment rel(s)) — "
+            "not code-graph content (SME ruling 2026-08-06; see IMAGE_EXTENSIONS_SKIPPED)"
+        )
     # Counts always reported, never silent: extensions with NEITHER a seeded
     # SWO language term NOR a seeded MediaType format term load their node fine
     # but carry no type edge at all (IS_ENCODED_IN and HAS_MEDIA_TYPE skipped).

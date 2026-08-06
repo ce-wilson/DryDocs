@@ -19,6 +19,7 @@ from drydocs.loaders.code_snapshot import (
     DEFAULT_SNAPSHOT_DIR,
     EXTENSION_LANGUAGE_IRI,
     EXTENSION_MEDIA_TYPE_IRI,
+    IMAGE_EXTENSIONS_SKIPPED,
     CodeSnapshotAdapter,
     CodeSnapshotError,
     CodeSnapshotLoader,
@@ -342,6 +343,39 @@ def test_adapter_maps_extension_to_media_type_case_folded(tmp_path: Path) -> Non
     assert model.media_type_iri == EXTENSION_MEDIA_TYPE_IRI[".md"]
 
 
+def test_image_files_are_skipped_by_both_adapters(tmp_path: Path) -> None:
+    """SME ruling 2026-08-06: image files are not code-graph content. The
+    module adapter emits no row for them; the tree adapter drops them from
+    child lists (an image must not sneak back in as a CONTAINS_ENTRY stub);
+    both COUNT what they skip — never silent."""
+    doc = _tree_snapshot()
+    doc["nodes"].append(
+        {
+            "file_id": "drydocs/docs/logo.PNG",  # case-folded like the media lookup
+            "kind": "file",
+            "rel_path": "docs/logo.PNG",
+            "name": "logo.PNG",
+            "extension": ".PNG",
+            "project": "drydocs",
+            "circular": False,
+        }
+    )
+    doc["rels"].append(["drydocs/docs", "CONTAINS", "drydocs/docs/logo.PNG"])
+    path = _write(tmp_path, "drydocs-20260101-0000.json", doc)
+
+    with CodeSnapshotAdapter(path) as adapter:
+        rows = list(adapter.rows())
+    assert adapter.skipped_images == 1
+    assert all("logo" not in r["file_id"] for r in rows)
+    assert ".PNG" not in adapter.unmapped_extensions, "skipped, not unmapped"
+
+    with CodeTreeAdapter(path) as tree_adapter:
+        tree_rows = list(tree_adapter.rows())
+    assert tree_adapter.skipped_images == 1
+    all_children = [c for r in tree_rows for c in r["child_dir_ids"] + r["child_file_ids"]]
+    assert "docs/logo.PNG" not in all_children
+
+
 def test_media_type_map_never_fakes_an_iana_registration() -> None:
     """Two provenance tiers by construction: every IANA-shaped iri must point
     at the real registry tree, and the conventional unregistered types
@@ -496,8 +530,16 @@ def test_committed_newest_snapshot_tree_loads_whole(tmp_path: Path) -> None:
     assert len(rows) == n_dirs
     roots = [r for r in rows if r.is_root]
     assert len(roots) == 1
+    # Every rel is either loaded or a COUNTED image skip — nothing vanishes.
     total_children = sum(len(r.child_dir_ids) + len(r.child_file_ids) for r in rows)
-    assert total_children == len(doc.get("rels", []))
+    assert total_children + adapter.skipped_images == len(doc.get("rels", []))
+    n_images = sum(
+        1
+        for n in doc["nodes"]
+        if n.get("kind") == "file"
+        and str(n.get("extension") or "").lower() in IMAGE_EXTENSIONS_SKIPPED
+    )
+    assert adapter.skipped_images == n_images
     # Non-root keys unique and never equal to a key claimed by two dirs.
     ids = [r.file_id for r in rows if not r.is_root]
     assert len(ids) == len(set(ids))

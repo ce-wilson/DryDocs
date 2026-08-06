@@ -99,9 +99,6 @@ EXTENSION_MEDIA_TYPE_IRI: dict[str, str] = {
     ".sql": _IANA + "application/sql",  # format binding; the LANGUAGE binding rides IS_ENCODED_IN
     ".mermaid": _IANA + "application/vnd.mermaid",
     ".xlsx": _IANA + "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-    ".png": _IANA + "image/png",
-    ".svg": _IANA + "image/svg+xml",
-    ".webp": _IANA + "image/webp",
     ".ttf": _IANA + "font/ttf",
     ".ts": _LOCAL_FORMAT + "typescript",
     ".tsx": _LOCAL_FORMAT + "typescript",
@@ -109,6 +106,14 @@ EXTENSION_MEDIA_TYPE_IRI: dict[str, str] = {
     ".cypher": _LOCAL_FORMAT + "cypher",
     ".ipynb": _LOCAL_FORMAT + "jupyter-notebook",
 }
+
+# SME ruling 2026-08-06: IMAGE FILES ARE NOT CODE-GRAPH CONTENT. Both adapters
+# skip them at load — counted and CLI-reported, never silent. This is a
+# LOAD-TIME rule, not an instrument change: the snapshot still carries the
+# images (scanner scope is the ritual's concern, and the committed artifact
+# stays a faithful capture); the graph just declines to model them. Case-folded
+# compare, like the media-type lookup.
+IMAGE_EXTENSIONS_SKIPPED: frozenset[str] = frozenset({".png", ".svg", ".webp"})
 
 
 class CodeSnapshotError(RuntimeError):
@@ -225,6 +230,7 @@ class CodeSnapshotAdapter:
         self.path = Path(path)
         self.unmapped_extensions: dict[str, int] = {}
         self.skipped_directories = 0
+        self.skipped_images = 0  # SME ruling 2026-08-06 — images are not loaded
 
     def __enter__(self) -> CodeSnapshotAdapter:
         return self
@@ -280,6 +286,10 @@ class CodeSnapshotAdapter:
                 self.skipped_directories += 1
                 continue
             extension = node.get("extension", "")
+            # SME ruling 2026-08-06: image files are not code-graph content.
+            if extension.lower() in IMAGE_EXTENSIONS_SKIPPED:
+                self.skipped_images += 1
+                continue
             language_iri = EXTENSION_LANGUAGE_IRI.get(extension)
             media_type_iri = EXTENSION_MEDIA_TYPE_IRI.get(extension.lower())
             if language_iri is None and media_type_iri is None:
@@ -348,6 +358,7 @@ class CodeTreeAdapter:
 
     def __init__(self, path: Path | str) -> None:
         self.path = Path(path)
+        self.skipped_images = 0  # SME ruling 2026-08-06 — images are not loaded
 
     def __enter__(self) -> CodeTreeAdapter:
         return self
@@ -414,6 +425,15 @@ class CodeTreeAdapter:
                     f"{self.path.name}: rel {rel!r} names an endpoint absent from "
                     "nodes (or a non-dir parent) — snapshot is inconsistent, refusing"
                 )
+            # SME ruling 2026-08-06: an image child must not become a stub
+            # :CodeModule via the containment edge — same skip as the module
+            # adapter, counted here because this pass sees its own rels.
+            if child_kind != "dir" and (
+                str(node_by_raw[child_raw].get("extension") or "").lower()
+                in IMAGE_EXTENSIONS_SKIPPED
+            ):
+                self.skipped_images += 1
+                continue
             bucket = child_dirs if child_kind == "dir" else child_files
             bucket.setdefault(parent_raw, []).append(_emit_key(child_raw))
 
