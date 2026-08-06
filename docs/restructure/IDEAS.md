@@ -62,33 +62,6 @@ question a 1,000-line file with the trail at the bottom could not answer.
 
 <!-- add new ideas at the top -->
 
-- **`Idea-78`** · 2026-08-06 · `[feature]` · **open — plan written, needs grooming** · prio? **High** —
-  **SME Context-Intake page: the front door for the unstructured email corpus
-  (the Q10 "SME assignment surface"), planned end-to-end.** User direction
-  in-session; full plan at `UI-WIP/sme-intake-page-plan.md`. Seven sections top
-  to bottom: PAT + SEAL area cascade (hint channel, "unknown" first-class) →
-  context-type dropdown from a NEW `config/taxonomy/context-types.yaml`
-  (job-failure, missed-data-load, missed-file, data-issue — growing, taxonomy
-  layer so growth is not a gate) → drag-drop upload for .msg + Copilot .json
-  pairs (.txt TBD; data-root staging, Internal stamp, sha256, never the repo) →
-  FCDO-style "review for ontology" pass (proposed bindings, SME confirms) →
-  read-only related-nodes QuerySpec over the structured graph → ADK agent
-  first-pass correlation (accept / modify / stay-unassigned) → confirm into the
-  O24 origin-flagged store (`origin: sme-intake`) and an ADMIN review queue.
-  Nothing writes the graph: corpus load waits on Q10←G31←G32, the assignment
-  edge is gate-registered `planned` per Q10's own acceptance; admin-accepted
-  records park on a "waiting on gate" chip. Seven proposed build slices
-  (O45–O51 indicative) + open questions are in the plan. *(Grooming: the
-  console slices join Epic O; Q10 keeps the corpus/load half.)* AMENDED
-  same day (user): §8 **reviewer-quality signal + admin block** — per-SME
-  auto-accept rate / too-fast rate / admin-return rate over a rolling window,
-  limits in `config/review-quality.yaml`; crossing a limit FLAGS the SME on
-  the admin queue's quality rail, and the admin (never the machine) can block
-  the persona from submitting — reversible, recorded who/when/why. The user
-  recalled a backlog item ranking auto-acceptance to flag poor-quality work;
-  searched 2026-08-06 — no such item exists in backlog/IDEAS/gates/history
-  (possibly company-side drydocs-review), so this entry is now that
-  requirement's home.
 
 - **`Idea-77`** · 2026-08-06 · `[chore]` · **open** · prio? **Low** —
   **`web/src/components/HeroArt.tsx` is an orphan — the code graph's first
@@ -1348,6 +1321,34 @@ question a 1,000-line file with the trail at the bottom could not answer.
   an app). Cosmetic; hide or restructure later.
 
 ## Recently groomed (audit trail)
+
+- **`Idea-78`** · 2026-08-06 · `[feature]` · **groomed → O45–O51 (2026-08-06, same day as capture)** · prio? **High** —
+  **SME Context-Intake page: the front door for the unstructured email corpus
+  (the Q10 "SME assignment surface"), planned end-to-end.** User direction
+  in-session; full plan at `UI-WIP/sme-intake-page-plan.md`. Seven sections top
+  to bottom: PAT + SEAL area cascade (hint channel, "unknown" first-class) →
+  context-type dropdown from a NEW `config/taxonomy/context-types.yaml`
+  (job-failure, missed-data-load, missed-file, data-issue — growing, taxonomy
+  layer so growth is not a gate) → drag-drop upload for .msg + Copilot .json
+  pairs (.txt TBD; data-root staging, Internal stamp, sha256, never the repo) →
+  FCDO-style "review for ontology" pass (proposed bindings, SME confirms) →
+  read-only related-nodes QuerySpec over the structured graph → ADK agent
+  first-pass correlation (accept / modify / stay-unassigned) → confirm into the
+  O24 origin-flagged store (`origin: sme-intake`) and an ADMIN review queue.
+  Nothing writes the graph: corpus load waits on Q10←G31←G32, the assignment
+  edge is gate-registered `planned` per Q10's own acceptance; admin-accepted
+  records park on a "waiting on gate" chip. Seven proposed build slices
+  (O45–O51 indicative) + open questions are in the plan. *(Grooming: the
+  console slices join Epic O; Q10 keeps the corpus/load half.)* AMENDED
+  same day (user): §8 **reviewer-quality signal + admin block** — per-SME
+  auto-accept rate / too-fast rate / admin-return rate over a rolling window,
+  limits in `config/review-quality.yaml`; crossing a limit FLAGS the SME on
+  the admin queue's quality rail, and the admin (never the machine) can block
+  the persona from submitting — reversible, recorded who/when/why. The user
+  recalled a backlog item ranking auto-acceptance to flag poor-quality work;
+  searched 2026-08-06 — no such item exists in backlog/IDEAS/gates/history
+  (possibly company-side drydocs-review), so this entry is now that
+  requirement's home.
 
 - 2026-08-05 (desktop, user directive: number the inbox, add status + priority, and
   "extend or supplement existing backlog items with the ideas… I don't want every idea
