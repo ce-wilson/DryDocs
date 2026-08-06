@@ -18,8 +18,8 @@ finishes reading is not a control document. So:
 - a roll REPLACES the previous roll note; it does not stack another one;
 - if a section can only be understood by reading it twice, cut it rather than expand it.
 
-**Roll state (2026-08-05).** Steps 52–54 COLLAPSED at the 2026-08-03 roll (applied in
-PORT-REPORT-f71967db and PORT-REPORT-40c35724). The live ledger runs **55–96**
+**Roll state (2026-08-06).** Steps 52–54 COLLAPSED at the 2026-08-03 roll (applied in
+PORT-REPORT-f71967db and PORT-REPORT-40c35724). The live ledger runs **55–101**
 below, delta since `40c35724`. Two company ports (PORT-REPORT-6713c142,
 PORT-REPORT-5f79d145) landed MID-RANGE with no producer-verifiable range or
 acceptance numbers, so NO step is collapsed yet — collapse waits for a
@@ -36,6 +36,12 @@ from the newest entry. Both gaps (the f71967db port unrecorded here;
 O27/O28/C17/Q7/R6/S1 never ledgered) were caught by the company session's own
 range enumeration — the guardrail-2 safety net working, not a reason to keep
 the habit.
+**THIS ROLL (2026-08-06) IS THE FIRST ONE RUN THAT WAY, and it was run BEFORE the port
+rather than reconstructed after it** — breaking the three-roll streak the note above
+describes. 25 commits had landed since the step-96 roll (`0bad42a`) with no ledger
+entry; walking `0bad42a..HEAD` commit-by-commit produced steps **97–101** and confirmed
+the rest are ritual (7 snapshots/renders) or producer-only backlog state (claims, the
+O44 groom, Idea-75). Unported range as of this roll: **`5f79d145..HEAD` = 106 commits.**
 
 Authorities are unchanged: [`PORT-MANIFEST.yaml`](../PORT-MANIFEST.yaml) is the WHAT
 (per-path disposition, first-matching-glob-row wins); [`git-readme.md`](../git-readme.md)
@@ -43,20 +49,14 @@ is the WHY + the acceptance oracle; this prompt is sequencing + delta context on
 
 ## Last completed port
 
-> **PRODUCER FETCH IS BROKEN COMPANY-SIDE — read this before guardrail 1 (2026-08-05).**
-> A company-side session reported *"live fetch failed (producer repo not reachable —
-> private or removed)"* and answered from the locally-cached `cewilson/main @ 5f79d145`.
-> The repo is **not** removed: checked from the producer at 2026-08-05,
-> `ce-wilson/DryDocs` is `PRIVATE` and healthy (`pushedAt` matched the push made minutes
-> earlier). So the failure is **access** — an expired PAT, a lapsed SSO authorization on
-> the token, or a proxy — and all three look identical to `git fetch`.
->
-> Why it matters more than a broken command: guardrail 1 says *read at producer HEAD, not
-> at the ref you last fetched*, and that is currently impossible on the company side. Every
-> "the producer tracker says…" answer over there is pinned 2026-08-04 state presented as
-> current — the exact failure guardrail 1 was written to prevent, arrived at this time not
-> by choice. **Restore fetch before the next port**; until then treat company-side reads of
-> this file as dated, and expect the reader not to have seen any step below.
+> **FETCH RESOLVED (2026-08-06) — the 2026-08-05 blocker is CLOSED.** SME confirms
+> producer fetch works company-side, so guardrail 1 is executable again: read at producer
+> **HEAD**, not at the ref you last fetched. The prior failure was access (the repo was
+> `PRIVATE` and healthy throughout), and its lesson stands rather than expires — a failed
+> fetch degraded silently into answering from a cached `5f79d145`, which reads exactly like
+> a current answer. **If fetch fails again, STOP and say so; do not fall back to a cached
+> ref.** That fallback is the one failure guardrail 1 exists to prevent, and it cost a
+> cycle of "the producer tracker says…" answers that were two days stale.
 
 - **Producer head `5f79d145`** (2026-08-04), applied company-side as
   **PORT-REPORT-5f79d145**. Reported, not producer-verifiable.
@@ -1216,6 +1216,105 @@ verification status in [BRACKETS]; spend review on [UNRULED].
     platform-codes twin from your frameworks — the producer's six values
     are its capture, not a contract. Suite 1597/5 at head (chain figure
     below). K19 (the follow-on) is producer-backlog, not in this range.
+
+97. K19 — A MAPPING IS AN AS-OF ASSERTION; REUSED CODES QUEUE FOR REVIEW
+    (`2ef0050`; claim `e4b09c9`) [TEST-PINNED]. The K18 follow-on, and NOT a
+    format break. The 3-char app-code namespace is scarce, so codes get
+    retired and REISSUED with a new meaning (DDC is the documented case);
+    nothing stopped a reused code from silently inheriting its predecessor's
+    mapping. `detect_mapping_age_suspects()` (pure, `folder_attribution.py`)
+    flags any authored row whose `authored_on` strictly predates the
+    first-seen date of a folder it applies to — one suspect per authored ROW,
+    since each row is its own as-of assertion. Same-day is not postdating; no
+    date on either side is no age claim. REVIEW-ONLY and deliberately OUTSIDE
+    the coverage invariant: suspect folders stay attributed, because a
+    reissued code and a growing application are indistinguishable without a
+    human. Surfaced where the steward already looks (coverage `as_dict`,
+    `run.mapping_age_suspects`, a loader warning, the CLI review-queue print).
+    CHOICE recorded: detection only, NO `valid_from`/`valid_to` — effective
+    dating IS preserved mapping history, which routes to a gate, and it would
+    be a second CSV format break (v4) immediately behind K18's v3.
+    ***YOUR SIDE:*** needs `ControlMFolder.first_seen_at` populated or every
+    row reads "no age claim" and the queue is inertly empty — which looks
+    identical to clean.
+
+98. J32 — THE FIELD-MEANING RULE GETS A HOME (`cfccf6a`; claim `10ac1ee`)
+    [prose only — no vocabulary entry, no map entry, no loader change].
+    Ownership, routing and attribution are three different facts that all
+    serialize as a SEAL id, and the graph has exactly ONE place where the
+    third is authored — the confirmed app-code mapping. Everything else
+    carrying a SEAL loads as what it IS (a registration, a routing
+    instruction, a corroborating signal), never collapsed into
+    BELONGS_TO_APPLICATION. New standing section in
+    `docs/RELATIONSHIP_GUIDE.md` carrying the rule, the test for any new
+    source (ask what the field's JOB is, not what it contains), and three
+    observed instances as evidence. Rider: the AutoSys README now points at
+    the guide as the canonical home.
+    ***YOUR SIDE:*** take it before your next SEAL-bearing source, not after.
+
+99. CODE-GRAPH — CONTAINMENT TREE + MEDIA-TYPE LAYER (`d7ae7af`, merged
+    `78a2d92` `--no-ff`) [SME-RULED in-session 2026-08-05; LIVE-VERIFIED
+    desktop / `neo4jtest` / `drydocs` DB]. Admits the two decisions G33
+    deferred: directories enter the graph, and the non-`.py` majority gets
+    typed. `:CodeDirectory` (prov:Collection, keyed `file_id`) +
+    `CONTAINS_ENTRY` (prov:hadMember), ONE label for the whole tree so
+    traversal is a single `-[:CONTAINS_ENTRY*]->`; the repo-root dir maps
+    onto the existing `:Project`. New `code_tree.v1` loader running after
+    `code_snapshot.v1` in `load-code-snapshot`. `HAS_MEDIA_TYPE`
+    (dcat:mediaType) with 22 seeded `:MediaType` terms — 18 IANA-registered
+    (iri = the registration page) + 4 conventional under
+    `drydocs.local/format#` with `registered:false`; extensions with neither
+    binding stay UNBOUND and CLI-reported, never guessed.
+    **CONSTRAINT COUNT 52 → 53** (`codedirectory_file_id`) — your
+    `EXPECTED_CONSTRAINTS` moves a SECOND time (it went 54→55 at the step-82
+    port). ***THE CAUTION:*** `CodeTreeAdapter` keys its maps on RAW snapshot
+    ids — after prefix stripping the repo root and the `drydocs/` package dir
+    COLLIDE. Live: 1537 module + 264 dir rows, 0 rejected.
+
+100. SFS TYPING CORRECTION — SNOWFLAKE IS A TARGET DB PLATFORM, NOT ETL
+    (`ceff696`) [SME-RULED in-session 2026-08-05] [RECORD-CORRECTION].
+    "Snowflake ETL" in the captured DAT SRE table names the
+    loads-into-Snowflake JOB FAMILY the SFS code marks — not a software
+    product. Consequence for the C25 prerequisite: the second missing
+    software-registry row is `snowflake` the DATA PLATFORM (DBMS family,
+    sibling of `oracle-db`), never a Snowflake ETL tool row, and an
+    SFS-derived edge reads loads-into-Snowflake, not
+    runs-a-Snowflake-ETL-framework. Recorded in both folder-naming twins and
+    the platform-codes values twin (comment only — the K18 guard reads the
+    CODE, all six still parse); the captured DAT table stays verbatim.
+    ***YOUR SIDE:*** if you already authored a Snowflake registry row, check
+    which family it landed in before C25.
+
+101. G35 — THE SEAL TOM ROLE VOCABULARY: gate drafted, four clauses ruled,
+    and ONE CODE FIX APPLIED AHEAD OF SIGN-OFF [SME-RULED; the fix
+    TEST-PINNED; **the gate itself UNSIGNED**] (`867eadb`, `b79f691`,
+    `3df06de`, `80fd9a1`, `80180c1`, `e5c5adc`, `50337ad`, `67daf0a`;
+    O44 groom `ba712af`+`4188f81`; Idea-75 `d0123d5`).
+    **THE ONLY PART THAT CHANGES BEHAVIOR is `50337ad`**, and it is a data-loss
+    fix: `drydocs_core/models/seal.py` gains `SealRole.OPERATE_MANAGER` and
+    re-points `_ROLE_CANONICAL["operate manager"]` from `"L2 Operate Manager"`
+    to `"Operate Manager"`. Before it, a bare Operate Manager row was
+    rewritten to L2 and MERGEd onto that person's genuine L2
+    `attribution_id` — three source holdings became two, silently, survivor
+    decided by batch order. NEW `tests/unit/test_seal_roles.py` (the module
+    had NO tests) pins the invariant, not the instance: no alias may resolve
+    to a canonical name asserting a level the alias does not itself name.
+    RULED BUT NOT APPLIED — nothing ontological moved, the scheme still seeds
+    7 concepts and `seal_contacts.cypher` still has its 4-branch crosswalk:
+    L1/L2/bare Operate Manager are three classes; the `tech partner`→`CTO`
+    alias STAYS (verified NOT a K5 breach — `HAD_ROLE` is minted only on a
+    crosswalk hit and `cto` is not a branch); CBT is an optional class
+    deliberately left unmapped so it loads flagged. Four clauses reached
+    `config/gate-log.md` as two RECORD entries — the convention for a
+    confirmed clause inside an unsigned gate.
+    ***YOUR SIDE — CHECK BEFORE YOU RELOAD:*** if your real contact extract
+    carries a bare "Operate Manager" alongside an L2 for the same person on
+    the same app, those two have been ONE node. Taking `50337ad` makes them
+    two, so it is a re-key, not a no-op. Producer has no bundled SEAL sample
+    to reproduce with (both `seal_*__sample.csv` were deleted at `9d59f53`
+    for carrying real seal_ids and never replaced), so this was measured on
+    the synthetic taxonomy capture: 13 rows → 9 validating → 8 attributions
+    before, 9 after.
 
 ACCEPTANCE GATE (behavior is the contract, not a byte-compare):
 - Track 1 (portable):
