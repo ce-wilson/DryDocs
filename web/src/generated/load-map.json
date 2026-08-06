@@ -1014,7 +1014,13 @@
         "path": "config/source-mappings/design-docs.yaml"
       },
       "taxonomy_captures": [],
-      "ontology_mappings": [],
+      "ontology_mappings": [
+        {
+          "id": "doc-traceability-feedback",
+          "status": "confirmed",
+          "label": null
+        }
+      ],
       "loaders": [
         {
           "name": "doc_feedback.v1",
@@ -1230,7 +1236,13 @@
         "path": null
       },
       "taxonomy_captures": [],
-      "ontology_mappings": [],
+      "ontology_mappings": [
+        {
+          "id": "job-seal-app-ref",
+          "status": "confirmed",
+          "label": "WAS_ASSOCIATED_WITH"
+        }
+      ],
       "loaders": [
         {
           "name": "folder_attribution.v1",
@@ -1372,6 +1384,32 @@
       },
       "taxonomy_captures": [],
       "ontology_mappings": [],
+      "loaders": []
+    },
+    {
+      "id": "seal-pat-scrape",
+      "home": "doc-registry",
+      "system": null,
+      "origin": null,
+      "kind": "doc-corpus",
+      "authority": null,
+      "derived": false,
+      "urn": null,
+      "replaces": null,
+      "classification": "Internal",
+      "confirmed": false,
+      "ledger": {
+        "state": "placeholder",
+        "path": null
+      },
+      "taxonomy_captures": [],
+      "ontology_mappings": [
+        {
+          "id": "seal-doc-source-of-record",
+          "status": "confirmed",
+          "label": "HAD_PRIMARY_SOURCE"
+        }
+      ],
       "loaders": []
     },
     {
@@ -1558,28 +1596,11 @@
   ],
   "map_entries_without_registry_source": [
     {
-      "id": "job-seal-app-ref",
-      "status": "confirmed",
-      "label": "WAS_ASSOCIATED_WITH",
-      "source": "controlm-variable-normalization"
-    },
-    {
       "id": "dl-contact-point",
       "status": "proposed",
       "label": "HAS_CONTACT_POINT",
-      "source": "outlook-dl"
-    },
-    {
-      "id": "seal-doc-source-of-record",
-      "status": "confirmed",
-      "label": "HAD_PRIMARY_SOURCE",
-      "source": "seal-pat-scrape"
-    },
-    {
-      "id": "doc-traceability-feedback",
-      "status": "confirmed",
-      "label": null,
-      "source": "design-doc-outline"
+      "source": "outlook-dl",
+      "exemption": "N8 ruling 2026-08-06 — NO FEED BY DESIGN, deliberately unregistered. The DL is defined only in Outlook/Exchange; no extract exists and none is planned (the gate's store-as-source discussion: HAS_CONTACT_POINT rows are steward-authored in the O24 store, which IS the source). Registering `outlook-dl` would fabricate a machine feed the source_evidence above explicitly says does not exist. The load-map render displays this reason (the SOURCELESS_LOADERS written-reason idiom); if the email-dl gate ever rules for extraction-fed candidate rows, that ruling replaces this exemption with a real registration."
     }
   ]
 }

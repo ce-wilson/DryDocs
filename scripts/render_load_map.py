@@ -135,8 +135,14 @@ def build_load_map() -> dict:
             mappings_by_source.setdefault(source, []).append(row)
         else:
             # never silently dropped — a map entry pointing at no registered
-            # source is drift worth seeing on the one surface
-            unmatched_map_sources.append({**row, "source": source})
+            # source is drift worth seeing on the one surface. An entry may
+            # carry an explicit `source_exemption` (the SOURCELESS_LOADERS
+            # written-reason idiom; N8): it stays listed WITH its reason, so
+            # a ruled no-feed-by-design is distinguishable from drift.
+            exemption = str(m.get("source_exemption") or "").strip()
+            unmatched_map_sources.append(
+                {**row, "source": source, **({"exemption": exemption} if exemption else {})}
+            )
 
     systems: list[dict] = []
     for entry in system_entries:  # registry order — the file's own grouping
@@ -487,20 +493,30 @@ def build_load_map_html(data: dict) -> str:
             f"<p><code>{_esc(loader['name'])}</code> ({_esc(loader['class'])}) — "
             f"runs in: {cmds}.<br><em>{_esc(loader['reason'])}</em></p>"
         )
-    if data["map_entries_without_registry_source"]:
+    unmatched = data["map_entries_without_registry_source"]
+    drift = [m for m in unmatched if not m.get("exemption")]
+    exempt = [m for m in unmatched if m.get("exemption")]
+    if drift:
         add("<h2>Map entries citing unregistered sources</h2>")
         add(
             '<div class="warn">These taxonomy-ontology-map entries name a '
             "<code>taxonomy.source</code> with no source-registry entry — surfaced "
-            "here, never dropped; rule each at grooming (register the feed or "
-            're-point the entry).<ul class="tight">'
+            "here, never dropped; rule each at grooming (register the feed, "
+            're-point the entry, or record a source_exemption).<ul class="tight">'
         )
-        for m in data["map_entries_without_registry_source"]:
+        for m in drift:
             add(
                 f"<li>{_status_chip(m['status'])} <code>{_esc(m['id'])}</code> → "
                 f"<code>{_esc(m['source'])}</code></li>"
             )
         add("</ul></div>")
+    if exempt:
+        add("<h2>Source-exempt map entries (ruled, no feed by design)</h2>")
+        for m in exempt:
+            add(
+                f"<p>{_status_chip(m['status'])} <code>{_esc(m['id'])}</code> → "
+                f"<code>{_esc(m['source'])}</code><br><em>{_esc(m['exemption'])}</em></p>"
+            )
     add("</body></html>")
     return "\n".join(out) + "\n"
 

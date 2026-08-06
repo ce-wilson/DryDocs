@@ -43,7 +43,7 @@
 # =============================================================================
 
 schema: drydocs.doc-source-registry.v1
-updated: 2026-07-31
+updated: 2026-08-06
 
 sources:
   # ---- Currently ingested corpora (backfill, Q5) ----------------------------
@@ -163,6 +163,32 @@ sources:
       when the confluence connector runs: Descriptive Metadata, Data Quality,
       Data Contracts (DPROD) frameworks + the Taxonomy Framework property
       tables — the known capture holes that block crosswalk sign-off.
+
+  - id: seal-pat-scrape
+    classification: Internal              # SEAL/PAT pages carry app records, SEAL ids, owner names
+    source: "SEAL + PAT internal application/product pages (planned drydocs-docmeta scrape — NO capture exists yet; company-network only)"
+    connector: web
+    manifest: ~                           # arrives with the docmeta component gate, with the capture
+    trust_default: VERBATIM               # a direct page fetch, stored as fetched
+    tier: T2
+    curation: sme-confirm                 # T2 ladder (ADR 0006 §4)
+    target_db: dddocs                     # Document->Chunk spine (docmeta component)
+    refresh: on-demand
+    taxonomy_path: ~
+    graph_locator:                        # nothing scraped, nothing loaded — locator lands with the connector
+      match: none
+      value: ~
+    confirmed: false                      # the docmeta component gate is the activation gate — no loader may write from this entry
+    notes: >
+      LIGHTWEIGHT REGISTRY STUB (N8 ruling 2026-08-06): registered so the
+      confirmed map entry seal-doc-source-of-record (HAD_PRIMARY_SOURCE,
+      gate-signed 2026-07-10) cites a real ledger id instead of a
+      forward-reference the load-map render flagged as drift. The stub
+      changes NOTHING about activation: the drydocs-docmeta component gate
+      still owns the scraper, the capture file, and the confirmed flip —
+      exactly what that map entry's capture-waiver said, now with the
+      registration half done. The 2026-07-10 gate §D promoted docmeta from
+      parked to REQUIRED; this entry is where that promise is ledgered.
 
   - id: adhoc-sme-email
     classification: Internal              # real threads carry named individuals, internal addresses, SEAL ids, functional ids

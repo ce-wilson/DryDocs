@@ -122,7 +122,13 @@ mappings:
 
   - id: job-seal-app-ref
     taxonomy:
-      source: controlm-variable-normalization
+      # N8 RE-POINT 2026-08-06: was `controlm-variable-normalization` — a stream
+      # NAME that was never a registry id (the N4 render flagged it day one). The
+      # feed this entry actually rides is the registered derived dataset below —
+      # this entry's own source_evidence already said so ("STG_APP_FACT semantic
+      # facts ... NEVER raw job.APPLICATION"); the normalization stream is that
+      # dataset's PRODUCER (see cm_def_setvar_vw's notes), not a source id.
+      source: "controlm@[db].drydocs_stg.stg_app_fact"
       element: "Job is attributed to its SEAL-registered application (fact_type SEAL)"
     ontology:
       from_node: ControlMJob                # prov:Activity

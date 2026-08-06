@@ -10,7 +10,12 @@
 
   - id: doc-traceability-feedback
     taxonomy:
-      source: design-doc-outline
+      # N8 RE-POINT 2026-08-06: was `design-doc-outline` — the render/validation
+      # TOOL's name, never a registry id. The registered feed is repo:design-docs,
+      # whose entry names this very mapping as its gate_spec and whose
+      # feeds_taxonomy already lists requirements/components/test_cases/
+      # feedback_notes — the edges this entry declares.
+      source: "repo:design-docs"
       element: "Design-doc traceability matrix (requirement -> design-section anchor -> component/module -> test) and anchor-keyed SME feedback notes (docs/design/feedback/*.yaml) modeled as DryDocs graph edges (backlog L7)"
     ontology:
       from_node: DesignDoc                  # dd:DesignDoc (new, prov:Entity)

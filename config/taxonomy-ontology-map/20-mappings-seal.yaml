@@ -201,6 +201,16 @@
     status: proposed
     proposed_at: 2026-07-22
     gate_spec: config/gate-prompts/email-dl-contact-point.yaml
+    source_exemption: >
+      N8 ruling 2026-08-06 — NO FEED BY DESIGN, deliberately unregistered. The
+      DL is defined only in Outlook/Exchange; no extract exists and none is
+      planned (the gate's store-as-source discussion: HAS_CONTACT_POINT rows
+      are steward-authored in the O24 store, which IS the source). Registering
+      `outlook-dl` would fabricate a machine feed the source_evidence above
+      explicitly says does not exist. The load-map render displays this reason
+      (the SOURCELESS_LOADERS written-reason idiom); if the email-dl gate ever
+      rules for extraction-fed candidate rows, that ruling replaces this
+      exemption with a real registration.
     open_questions:
       - "Class: vcard:Group-aligned Entity (recommended — a channel record, not an accountable party) vs prov:Agent (only if NOTIFIES must be PROV-mapped) — gate section A."
       - "NOTIFIES authoring surface (gate section C, the 2026-07-22 SME amendment): escalation-db special-instructions keyed convention [recommended — shares the description-metadata plan's template discipline so the two 4000-char conventions don't fork] vs job Description field [demoted to per-job exception carrier] vs extraction-only [rejected as end state]; grain follows the attribution close-out (folder preferred, per-job exceptions)."
