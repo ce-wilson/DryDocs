@@ -88,6 +88,31 @@ Handling rules (all inherited from Q10 + the publish boundary):
 - Parse-preview per file: subject / sent_at / from for `.msg` (display only,
   MAPI parse best-effort), pretty-printed keys for `.json`. Parse failure is a
   warning chip, not a rejection — the file still lands.
+
+**Thread reuse → ingest the diff (user direction 2026-08-06).** People reuse
+old email threads: a "new" email is routinely a reply or forward carrying the
+whole prior conversation as a quoted tail. Rule:
+
+- **Detect thread identity at ingest**: conversation headers where the `.msg`
+  carries them, normalized subject (Re:/FW: stripped), and quoted-content
+  overlap against the digests/text of evidence already in the store. Matching
+  is a flag, never an auto-decision.
+- **The original file always lands whole** — evidence is never edited (the
+  adhoc-sme-email rule: a trimmed copy of evidence is no longer evidence).
+  What changes is the REVIEW PAYLOAD: when the upload continues a known
+  thread, the payload offered to ontology review is the **delta** — the new
+  content above the quoted tail — not the whole thread again.
+- **The SME decides if the delta adds value**: the upload row shows
+  "continues the thread of intake `<id>`" with an inline diff (new content
+  highlighted against the prior evidence). Two actions: **Adds value** (the
+  delta proceeds through sections 4–7 as this intake's content) or **No new
+  value** (the intake records the thread linkage + the decision and STOPS —
+  nothing proposed, nothing queued, but the record exists so the same thread
+  bouncing back a third time shows both prior decisions).
+- Why this matters downstream: without the delta rule, every reply re-proposes
+  every entity in the thread, the ontology-review panel drowns in repeats, and
+  the corpus (when Q10 loads it) would chunk the same paragraphs N times —
+  thread-position would masquerade as corroboration.
 - Registry note: the corpus entry itself is Q10's decision (extend
   `adhoc-sme-email` vs add a sibling — four properties differ; that ruling
   belongs to the Q10 build, not this page). The page writes intake records, not
@@ -161,6 +186,16 @@ draft → ontology-reviewed → correlated → sme-confirmed
 
 Admin view: the same page with a queue rail (`?as=admin`), diff-style display of
 what the SME confirmed vs what the extractor proposed, accept/return actions.
+
+**Stepper component — decided 2026-08-06, no new library.** The status machine
+renders through an `IntakeStepper` adapted from `LoadsTimeline` (ordered stage
+array, one StatusChip per stage, ui-conventions tokens). Action buttons
+(Accept / Send back / Reject) render from a **legal-transitions map the API
+returns per record** — the server owns the machine, the UI never encodes it a
+second time, and adding a hop later is a server-side change. No workflow
+library (XState, flow builders): the registry discipline makes a new dependency
+non-free, and the machine already has one home in the O46 store. `@xyflow/react`
+is already in-stack if the flow ever wants drawing as a diagram.
 
 **The load boundary is absolute and pre-ruled:**
 - The corpus load (Document → Chunk) waits on Q10, which waits on G31 → G32

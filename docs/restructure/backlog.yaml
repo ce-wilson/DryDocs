@@ -10552,8 +10552,17 @@ items:
       origin-flagged store (origin: sme-intake, the O24 shape) with the draft →
       … → admin-accepted status machine from the plan; parse-preview
       (.msg subject/sent_at/from best-effort, .json keys) is display-only and a
-      parse failure is a warning, not a rejection. NO graph write anywhere;
-      unit-tested without Neo4j.
+      parse failure is a warning, not a rejection. THREAD REUSE → INGEST THE
+      DIFF (user direction 2026-08-06): ingest detects thread identity
+      (conversation headers where present, normalized subject, quoted-content
+      overlap against stored evidence) and, on a match, links the new intake to
+      the prior one(s) and computes the DELTA — the new content above the
+      quoted tail — as the review payload; the original file still lands WHOLE
+      (evidence is never edited; a trimmed copy of evidence is no longer
+      evidence). Detection flags, never auto-decides: the SME's add-value
+      ruling is O47's surface. The API returns a legal-transitions map per
+      record so the UI never encodes the status machine a second time. NO
+      graph write anywhere; unit-tested without Neo4j.
     notes: >
       Slice 2 (plan §3 + §7's store half). The corpus REGISTRY entry is
       deliberately NOT this item: extend-vs-add against adhoc-sme-email is
@@ -10589,8 +10598,17 @@ items:
       where the mapping exists and FLAGS (never blocks) a conflict, and
       "unknown" selectable at every level; context-type dropdown from the O45
       generated artifact; drag-drop upload wired to the O46 endpoint with the
-      paired-evidence row display. Identifiers render as IdChip, statuses per
-      the ui-conventions token map. Sections 4-7 render as disabled
+      paired-evidence row display. When O46 flags a thread continuation, the
+      upload row shows "continues the thread of intake <id>" with an INLINE
+      DIFF (new content highlighted against the prior evidence) and the SME
+      decides: Adds-value (the delta proceeds as this intake's content) or
+      No-new-value (linkage + decision recorded, intake STOPS — nothing
+      proposed; a third bounce of the same thread shows both prior decisions).
+      The status machine renders through an IntakeStepper adapted from
+      LoadsTimeline (StatusChip tokens; action buttons from the API's
+      legal-transitions map — no client-side workflow library, decided
+      2026-08-06). Identifiers render as IdChip, statuses per the
+      ui-conventions token map. Sections 4-7 render as disabled
       placeholders naming their slice — never silently absent.
     notes: >
       Slice 3 (plan §1-§3). The area selector is a HINT channel by design —
