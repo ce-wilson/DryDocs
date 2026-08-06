@@ -172,6 +172,42 @@ what the SME confirmed vs what the extractor proposed, accept/return actions.
 - Admin acceptance therefore parks records at `admin-accepted` until both gates
   clear; the queue shows a "waiting on gate" chip, honest about why.
 
+### 8. Reviewer-quality signal + admin block (added 2026-08-06, user direction)
+
+> User recall: "there was a backlog item that ranked a user's auto acceptance so
+> we could flag poor quality work." Searched 2026-08-06 — no such item exists in
+> backlog.yaml, IDEAS, the gate prompts, or git history; it may have been a
+> company-side drydocs-review discussion. Captured HERE as the requirement's home
+> so it cannot get lost again.
+
+The intake flow is exactly where rubber-stamping would do damage: an SME who
+accepts every agent candidate without reading is indistinguishable from a
+careful one unless the system measures the difference. Mechanism:
+
+- **Per-SME quality signals**, derived from intake records the store already
+  holds (no new data entry): submissions in a rolling window; **auto-accept
+  rate** (agent candidates accepted with zero modification); **too-fast rate**
+  (confirm faster than a floor per evidence size); **admin-return rate** (their
+  submissions returned by admin — the strongest signal, because it is another
+  human's judgment, not a heuristic).
+- **Defined limits** live in `config/review-quality.yaml` (admin-editable via
+  the AdminConfig surface, versioned in git like every config): window size,
+  `auto_accept_rate_max`, `min_review_seconds`, `admin_return_rate_max`. The
+  limits FLAG, they never act: crossing one puts the SME on the admin queue's
+  quality rail with the metric that tripped (Meter + StatusChip idiom).
+- **Admin block, human-decided**: once flagged, the admin can block the persona
+  from submitting (their drafts survive; the block records who/when/why in the
+  store and is reversible with a note). The machine measures, the human blocks —
+  the same measure-then-decide posture as every HITL surface in this repo.
+  No auto-block, ever: a threshold is a tripwire, not a judge.
+- **Ranking view** for admins: per-user panel (submissions, auto-accept %,
+  return %, median review time) using the StatTiles/Meter reuse patterns — the
+  point is coaching and triage, not a leaderboard; visible to admins only.
+- Downstream value: the quality signal is exactly what the future graph-write
+  trust model needs (an SME's confirmation weight), so the store schema keeps
+  the per-decision detail (what was accepted, modified fields, durations), not
+  just the rollup.
+
 ## What can build now vs what waits
 
 | Can build now (no graph writes) | Waits on |
@@ -196,7 +232,11 @@ what the SME confirmed vs what the extractor proposed, accept/return actions.
 5. **O49** Related-nodes QuerySpec + panel (section 5) and agent correlation
    (section 6; mock-able behind the same interface).
 6. **O50** Admin queue + status machine (section 7) — ends at `admin-accepted`.
-7. **Q10 (existing)** stays the load owner: registry ruling (extend-vs-add
+7. **O51** Reviewer-quality signals + admin block (section 8):
+   `config/review-quality.yaml` + guard, the derived metrics over intake
+   records, the quality rail + per-user panel, and the block/unblock action.
+   Depends on O46 (the store) and O50 (the queue it renders into).
+8. **Q10 (existing)** stays the load owner: registry ruling (extend-vs-add
    against `adhoc-sme-email`), Document→Chunk load, and the assignment-edge gate.
 
 Numbering indicative — grooming assigns real ids and the epic split (O for the

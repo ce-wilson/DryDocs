@@ -77,9 +77,18 @@ question a 1,000-line file with the trail at the bottom could not answer.
   O24 origin-flagged store (`origin: sme-intake`) and an ADMIN review queue.
   Nothing writes the graph: corpus load waits on Q10←G31←G32, the assignment
   edge is gate-registered `planned` per Q10's own acceptance; admin-accepted
-  records park on a "waiting on gate" chip. Six proposed build slices
-  (O45–O50 indicative) + open questions are in the plan. *(Grooming: the
-  console slices join Epic O; Q10 keeps the corpus/load half.)*
+  records park on a "waiting on gate" chip. Seven proposed build slices
+  (O45–O51 indicative) + open questions are in the plan. *(Grooming: the
+  console slices join Epic O; Q10 keeps the corpus/load half.)* AMENDED
+  same day (user): §8 **reviewer-quality signal + admin block** — per-SME
+  auto-accept rate / too-fast rate / admin-return rate over a rolling window,
+  limits in `config/review-quality.yaml`; crossing a limit FLAGS the SME on
+  the admin queue's quality rail, and the admin (never the machine) can block
+  the persona from submitting — reversible, recorded who/when/why. The user
+  recalled a backlog item ranking auto-acceptance to flag poor-quality work;
+  searched 2026-08-06 — no such item exists in backlog/IDEAS/gates/history
+  (possibly company-side drydocs-review), so this entry is now that
+  requirement's home.
 
 - **`Idea-77`** · 2026-08-06 · `[chore]` · **open** · prio? **Low** —
   **`web/src/components/HeroArt.tsx` is an orphan — the code graph's first
