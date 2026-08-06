@@ -1727,3 +1727,64 @@ or added.
   G23.
 - **Still open:** C1–C3, D1/D2/D4, E1–E3, F1–F2, G1–G2, H1–H2, I1–I3, §J
   sign-off.
+
+## 2026-08-06 — RECORD: rua load shapes, third batch — section C mints the new meanings (G22; gate `rua-load-shapes`, still UNSIGNED)
+
+- **Scope:** the only remaining section that MINTS vocabulary rather than ruling
+  existing entries. All three clauses ruled as recommended. Everything lands
+  `status: planned` via ontology-mapper per the RELATIONSHIP_GUIDE flow —
+  **nothing active at this gate.**
+- **C1 — THAT SHAPE.** `(:DataAsset)-[:WAS_ATTRIBUTED_TO {role:
+  'directory_owner'}]->(:AppUser)`. Entity → Agent is the matrix row, and
+  role-discrimination on the shared label is the house pattern — five entries
+  use it, several active.
+- **C1 precedent correction, recorded because the page overstates it.**
+  `arch_owns_code`, the entry cited as the precedent, is **itself `status:
+  planned` with `loader: ~`** and has never loaded anything. The shape is right;
+  the load-bearing precedent is the role-discriminated label, not that entry.
+- **C1 is BLOCKED AT BUILD, NOT AT RULING** — recorded explicitly so **G55 and
+  G23 do not walk into it**. Its `to_node` is the `:AppUser` whose key A1 held on
+  K17. The entry lands `planned` today and cannot be built before K17 signs.
+- **C1 identity sub-ruling** (taken on the recommendation stated at the session):
+  `directories.tsv` carries `owner` as a bare unix account name that may be a
+  service account **or a person**. A directory owner resolves to `:AppUser`
+  **only on a known functional-id match**; everything else stages **unresolved
+  and counted** per the never-silent rule, never guessed onto an Agent.
+- **C2 — two parts, both as recommended.** (i) **from_node:** a profile is a
+  `:Script` carrying `script_role: profile` — a profile IS a shell script file,
+  so this mints no new node class, reuses the discriminator A4 brought in
+  (`launcher | payload`, now three values), and inherits C3's SWO typing free.
+  (ii) **edge:** dot-sourcing gets its own local **`SOURCES`** type with
+  `prov_maps_to: ~`, because the Entity→Entity matrix row is
+  `prov:wasDerivedFrom` — "transformed or computed from another entity" — and
+  **sourcing is not derivation**; mapping it there would assert something false.
+  Precedent for a local label with no PROV row is active: `m3_scheduled_on`.
+  `m3_invokes` is reused **only** for actual execution from a profile.
+- **C2's evidence was staged deliberately unnamed.** `rua_code_ops.py` (G21)
+  stages dependency candidates with `needs_vocabulary: True`, writes **no**
+  relationships, and separates the verbs itself: `_SOURCE_VERBS = {".",
+  "source"}`, annotated *"shell inclusion verbs, never an invocation"* and *"a
+  profile is environment inclusion, not a gated Activity, so the edge MEANING is
+  the G22 gate's."* The build refused to name the edge and left it here, which
+  is the terminus working as designed.
+- **C3 — ADOPT, and cheaper than the page describes.**
+  `(:Script)-[:IS_ENCODED_IN]->(SwoClass)` by extension.
+  `EXTENSION_LANGUAGE_IRI` **already** carries `.sh` → SWO_0000124 and `.sql` →
+  SWO_0000126 beside `.py`, and the 2026-08-05 ruling added a parallel
+  `EXTENSION_MEDIA_TYPE_IRI` layer under the same E1(b) discipline. So C3 is
+  "point the existing adapter at `:Script` too," not "build a binding."
+- **C3's addition — `.ksh` binds to the SAME Shell term as `.sh`** (SME ruling:
+  a **peer**, not a separate language). Not cosmetic: the signed `m3_triggers`
+  note names the `.ksh` wrapper as the **common case in this estate** — "one
+  .ksh wrapper script that launches the Informatica / Ab Initio / DPL workload"
+  — so leaving it out left the most frequent extension unbound and merely
+  CLI-reported.
+- **APPLIED at the session** (`drydocs/loaders/code_snapshot.py`), with a test
+  asserting the two extensions resolve to the **same** IRI so they cannot drift
+  apart later. This is adapter DATA that stands alone and improves `:CodeModule`
+  typing today, independent of whether `:Script` ever loads — it is not a
+  vocabulary flip. **The `IS_ENCODED_IN` edge itself still rides G55.**
+- **Boundary re-confirmed as pre-ruled:** `run_as` / `J.OWNER` is Agent
+  territory (PROV/ORG), **never** an SWO binding.
+- **Still open:** D1/D2/D4, E1–E3, F1–F2, G1–G2, H1–H2, I1–I3, §J sign-off.
+  Sections A, B, C and H3 are done.

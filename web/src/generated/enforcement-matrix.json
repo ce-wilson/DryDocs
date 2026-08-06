@@ -332,7 +332,7 @@
       ],
       "gate_ref": "(is the gate record)",
       "status": "gate-pending",
-      "pending_entries": 77,
+      "pending_entries": 82,
       "env_refs": [],
       "files": [
         "config/gate-prompts/airflow-crosswalk.yaml",

@@ -312,6 +312,18 @@ def test_adapter_maps_extension_to_seeded_swo_iri(tmp_path: Path) -> None:
     assert adapter.unmapped_extensions == {}
 
 
+def test_ksh_binds_to_the_same_shell_term_as_sh() -> None:
+    """SME ruling 2026-08-06 (gate rua-load-shapes §C3): .ksh is a PEER of .sh,
+    not a separate language.
+
+    Stated as an equality rather than a literal IRI so the two can never drift
+    apart in a later edit. It matters because the signed m3_triggers note names
+    the .ksh wrapper as the common case in this estate, so an unbound .ksh means
+    the most frequent extension is the one that stays merely CLI-reported.
+    """
+    assert EXTENSION_LANGUAGE_IRI[".ksh"] == EXTENSION_LANGUAGE_IRI[".sh"]
+
+
 def test_adapter_counts_unmapped_extensions(tmp_path: Path) -> None:
     """Since the 2026-08-05 ruling 'unmapped' means NEITHER a language nor a
     media type — an extension with either binding is typed, not unmapped."""

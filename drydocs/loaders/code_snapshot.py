@@ -68,6 +68,14 @@ SNAPSHOT_GLOB = "drydocs-*.json"  # dated dependency snapshots ONLY — never tr
 EXTENSION_LANGUAGE_IRI: dict[str, str] = {
     ".py": "http://www.ebi.ac.uk/swo/SWO_0000118",  # Python
     ".sh": "http://www.ebi.ac.uk/swo/SWO_0000124",  # Shell
+    # .ksh binds to the SAME Shell term as .sh — SME ruling 2026-08-06 (gate
+    # rua-load-shapes §C3). ksh IS a shell, so this binds a seeded term rather
+    # than inventing one, and it is not a cosmetic addition: the signed
+    # m3_triggers note names the .ksh wrapper as the COMMON case in this estate
+    # ("one .ksh wrapper script that launches the Informatica / Ab Initio / DPL
+    # workload"), so leaving it out left the most frequent extension unbound and
+    # merely CLI-reported.
+    ".ksh": "http://www.ebi.ac.uk/swo/SWO_0000124",  # Shell (ksh)
     ".sql": "http://www.ebi.ac.uk/swo/SWO_0000126",  # SQL
 }
 

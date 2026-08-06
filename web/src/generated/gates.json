@@ -631,6 +631,23 @@
       ]
     },
     {
+      "kind": "log-entry",
+      "date": "2026-08-06",
+      "title": "RECORD: rua load shapes, third batch — section C mints the new meanings (G22; gate `rua-load-shapes`, still UNSIGNED)",
+      "status": "recorded",
+      "prompt_files": [
+        "config/gate-prompts/rua-load-shapes.yaml"
+      ],
+      "log_ref": "config/gate-log.md:1731",
+      "unblocks": [
+        "K7",
+        "G22",
+        "G45",
+        "J24",
+        "G55"
+      ]
+    },
+    {
       "kind": "prompt-only",
       "date": null,
       "title": "bmc-docs-example (gate page rendered — session not yet run)",
