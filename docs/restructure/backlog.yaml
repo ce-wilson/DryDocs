@@ -10559,6 +10559,15 @@ items:
       deliberately NOT this item: extend-vs-add against adhoc-sme-email is
       Q10's first decision, pre-analyzed in Q10's notes. .txt evidence class is
       an open question in the plan — accept the file, tag kind: note, revisit.
+      STORAGE RULED 2026-08-06 (plan "File storage" section): local data root
+      for dev, company-side backed-up Linux share is the deployment plan of
+      record, object storage a later candidate — so storage stays behind ONE
+      configured base path + the digest identity; records carry the relative
+      key only, no filesystem assumption above the seam (local -> share ->
+      object store must be a config change, never a code change). Demo/test
+      fixtures: SYNTHETIC evidence in tests/fixtures/intake/ referencing only
+      reserved-block ids + sample names — one corpus for tests and demos (the
+      plan's Demo script section).
   - id: O47
     epic: web-console
     title: "Intake page shell: /intake route, sme persona, area cascade (PAT + SEAL) and context-type + upload sections"

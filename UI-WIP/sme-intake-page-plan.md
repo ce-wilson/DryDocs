@@ -242,6 +242,76 @@ careful one unless the system measures the difference. Mechanism:
 Numbering indicative — grooming assigns real ids and the epic split (O for the
 console surface, Q10 keeps the corpus/load half).
 
+## File storage — ruled 2026-08-06 (user direction + assessment)
+
+The user's framing: local for testing, plan B is Linux server hosting — or does
+it need something else? **Answer: it needs no new technology, but any home must
+meet three requirements**, all derived from rulings already on the books:
+
+1. **Backup obligation** — Q10's retention note: after Outlook purges (6–18
+   months) the extract store is the ONLY copy; a system of record, not a cache.
+2. **Access control matching `Internal`** — every intake is classification-
+   stamped; the store's ACLs are part of honoring that stamp.
+3. **Durable identity independent of location** — already designed in (O46):
+   sha256 digests + store-referenced paths, so files can move without the
+   records lying.
+
+The staging plan, in order:
+
+| Stage | Home | Status |
+|---|---|---|
+| Dev / testing | `DRYDOCS_DATA_ROOT/context-intake/` (this machine) | plan of record now |
+| Hosted (plan B) | company-side **Linux file server share**, backed up | plan of record for deployment — meets all three requirements with no new tech |
+| Eventual candidate | S3-compatible **object storage** (the estate already runs S3 for the DPL zones) | revisit when company-side lands; NOT a dependency |
+
+**The design consequence, and it is the whole point:** storage lives behind ONE
+configured base path (the `DRYDOCS_DATA_ROOT` idiom O46 already uses) plus the
+digest identity — so local → Linux share → object store is a **config change,
+never a code change**. O46 must not let a filesystem assumption leak above that
+seam (no hardlinks, no path math in records beyond the relative key).
+
+## Demo script — grounded in the sample estate (added 2026-08-06)
+
+The bundled samples already load a complete synthetic estate on `neo4jtest`
+(SEAL ids in the reserved 70001–70099 block; publish-boundary safe), so demo
+sessions should run on exactly what the graph already holds — the demo *is*
+the ontology working, not a mockup:
+
+**Scenario 1 — job failure (the primary demo; exercises every section):**
+- Synthetic `.msg` + Copilot `.json` pair: *"PARAD0060_PEX_EXPLOANRQTDTL_AWS_RFND
+  failed 03:12 — refund file not produced"* (a real sample job in folder
+  `PRARAG-HLDM-70002-PEX-RFND-DLY`).
+- Walk: SME picks SEAL **70002** → PAT levels back-fill from the sample catalog
+  (LOB → Product → Area Product, `catalog_lobs`/`pat_product_mapping` samples);
+  context type `job-failure`; upload the pair; ontology review recognizes the
+  JOB name, the FOLDER (PRAOCG-coded name), and the SEAL id — three entity
+  classes, three match tiers; related nodes show folder → its 5 sample jobs →
+  the application → its dev team (`CONTAINS_JOB`, attribution, `dev_teams`
+  sample); the agent proposes the folder with the evidence chain; admin
+  accepts → **parks on the waiting-on-gate chip** (the honest ending is part
+  of the demo).
+- Why this one first: it lights up the largest confirmed-ontology surface —
+  containment, SEAL attribution, PAT hierarchy — with zero new data.
+
+**Scenario 2 — missed file (conditions traversal):**
+- Email: an upstream file never arrived, a downstream job sat waiting. The
+  sample conditions (`controlm_conditions_in/out`, dependencies) let related
+  nodes walk the WAS_INFORMED_BY/condition chain — the demo shows the graph
+  answering "what was this job waiting on" from the email's job name alone.
+  Context type `missed-file`.
+
+**Scenario 3 — the quality rail (O51):**
+- A scripted persona rapid-accepts scenario-1 candidates without modification;
+  the auto-accept + too-fast limits trip; the admin queue shows the flag; the
+  admin blocks, the persona's next submit is refused with the recorded reason,
+  unblock with note. Thirty seconds, and it demonstrates the measure-then-
+  human-decides posture end to end.
+
+**Fixture rule:** demo evidence files are SYNTHETIC, live in
+`tests/fixtures/intake/` (committed — they reference only reserved-block ids
+and sample names), and double as the O46/O48 unit-test fixtures — one corpus
+of truth for tests and demos, the bundled-samples precedent.
+
 ## Open questions (for the SME, not guessed here)
 
 - `.txt` handling: same evidence class as `.msg`, or a separate "note" kind?
