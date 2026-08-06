@@ -522,3 +522,15 @@ node_classifications:
       and `rel_path` collides across the drydocs / drydocs_core roots (§C4).
       MUST NEVER also carry :SoftwareProduct — §F1, enforced as a graph-test because
       Neo4j cannot declare label mutual-exclusion.
+  - label: CodeDirectory
+    class: "dd:CodeDirectory"
+    prov_type: Collection
+    note: >
+      One source-tree DIRECTORY, keyed on file_id (repo-relative path) — shares
+      the CodeModule key space because a path is a dir or a file, never both.
+      prov:Collection: it collects its entries (u2_contains_entry). SME RULING
+      2026-08-05 (direct in-session instruction): admits the containment tree
+      the G33 gate deferred (":Directory nodes and CONTAINS edges are a gate
+      decision"). The repo ROOT directory is NOT a CodeDirectory — the tree
+      loader maps it onto the existing single :Project node, so gate §B1(a)
+      (one root, nothing else hangs off it) holds unchanged.

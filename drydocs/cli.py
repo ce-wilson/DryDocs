@@ -128,6 +128,8 @@ from .loaders.code_snapshot import (
     CodeSnapshotAdapter,
     CodeSnapshotError,
     CodeSnapshotLoader,
+    CodeTreeAdapter,
+    CodeTreeLoader,
     select_newest_snapshot,
 )
 from .loaders.controlm_conditions_in import ControlMConditionsInLoader
@@ -340,7 +342,7 @@ COMMAND_LOADERS: dict[str, tuple[type, ...]] = {
     ),
     "load-software-registry": (SoftwareRegistryLoader,),
     "load-batch-orchestrators": (BatchPortOrchestratorLoader,),
-    "load-code-snapshot": (CodeSnapshotLoader,),
+    "load-code-snapshot": (CodeSnapshotLoader, CodeTreeLoader),
     "load-bmc-docs": (BmcDocsLoader,),
     "load-vendor-docs": (VendorDocsLoader,),
     "load-doc-traceability": tuple(cls for cls, _, _ in DOC_TRACEABILITY_CHAIN),
@@ -1221,8 +1223,11 @@ def load_code_snapshot(
 
     MERGEs the newest knowledge/depgraph-snapshots/drydocs-*.json into one
     (:Project {project_id:'drydocs'}) root + :CodeModule nodes (keyed file_id)
-    + HAS_MODULE / IMPORTS / IS_ENCODED_IN edges. Idempotent; re-runnable from
-    committed files (ADR 0002 D3). abs_path never loads (§H4).
+    + HAS_MODULE / IMPORTS / IS_ENCODED_IN / HAS_MEDIA_TYPE edges, then the
+    containment layer (:CodeDirectory + CONTAINS_ENTRY from the v2 rels
+    section — SME ruling 2026-08-05 admitted the tree the G33 gate deferred).
+    Idempotent; re-runnable from committed files (ADR 0002 D3). abs_path never
+    loads (§H4).
 
     WHOLE-TREE snapshots are the normal shape (meta.tree == true) since the
     scanner stopped taking a hand-maintained root list; §G1(a)'s "refuse
@@ -1231,9 +1236,9 @@ def load_code_snapshot(
     NO `meta` header at all (the headerless one-off shape §G1 was really
     protecting against — the assertion stays POSITIVE because those files carry
     no `meta`, so a truthiness test on meta.tree would ACCEPT them), and a
-    `meta.tree` that is not a boolean. Directories in a tree snapshot are
-    counted and reported, never loaded — :Directory and CONTAINS would be a new
-    node class and a new edge type, both gate decisions (CLAUDE.md §6).
+    `meta.tree` that is not a boolean. The tree loader additionally refuses a
+    roots-only snapshot (meta.tree == false: no containment to load) — the
+    module loader still loads it, so `-CodeOnly` comparison files stay loadable.
     """
     _gate_loader(CodeSnapshotLoader)  # confirmed-gate (overlay-aware) before any DB write
     try:
@@ -1242,30 +1247,33 @@ def load_code_snapshot(
         console.print(f"snapshot: {path.name}")
         with _client() as cli:
             # Every snapshot is a FULL scan of the source tree by construction,
-            # so the run declares full_extract: the D7 mark pass flags
-            # :CodeModule nodes whose file left the tree between snapshots.
+            # so both runs declare full_extract: the D7 mark pass flags
+            # :CodeModule / :CodeDirectory nodes that left the tree between
+            # snapshots.
             loader = CodeSnapshotLoader(cli, adapter, full_extract=True)
             summary = loader.load()
+            console.print(summary.as_dict())
+            is_tree_snapshot = adapter.skipped_directories > 0
+            if is_tree_snapshot:
+                tree_loader = CodeTreeLoader(cli, CodeTreeAdapter(path), full_extract=True)
+                tree_summary = tree_loader.load()
+                console.print(tree_summary.as_dict())
+            else:
+                console.print(
+                    "[yellow]TREE SKIPPED[/]: roots-only snapshot (no directory nodes) — "
+                    "no containment layer to load"
+                )
     except CodeSnapshotError as exc:
         console.print(f"[red]{exc}[/]")
         raise typer.Exit(2) from exc
-    console.print(summary.as_dict())
-    # The adapter's contract says directories are "counted, not dropped in
-    # silence — the count is reported by the CLI". It was counted and never
-    # printed, so "the tree is not in the graph yet" could only be inferred from
-    # a node total nobody checks. Print it and the claim becomes true.
-    if adapter.skipped_directories:
-        console.print(
-            f"[yellow]DIRECTORIES SKIPPED[/]: {adapter.skipped_directories} tree node(s) "
-            "of kind 'dir' — :Directory nodes and CONTAINS edges are a gate decision "
-            "(CLAUDE.md §6), so the containment tree stays in the snapshot, not the graph"
-        )
-    # Counts always reported, never silent: extensions with no seeded SWO term
-    # load their node fine but skip the IS_ENCODED_IN edge (§E2 partial use).
+    # Counts always reported, never silent: extensions with NEITHER a seeded
+    # SWO language term NOR a seeded MediaType format term load their node fine
+    # but carry no type edge at all (IS_ENCODED_IN and HAS_MEDIA_TYPE skipped).
     for ext, n in sorted(adapter.unmapped_extensions.items()):
         console.print(
-            f"[yellow]NO SWO TERM[/]: {n} node(s) with extension '{ext}' — "
-            "IS_ENCODED_IN skipped (no seeded SwoClass term; see EXTENSION_LANGUAGE_IRI)"
+            f"[yellow]UNTYPED EXTENSION[/]: {n} node(s) with extension '{ext or '<none>'}' — "
+            "no seeded SwoClass or MediaType term (see EXTENSION_LANGUAGE_IRI / "
+            "EXTENSION_MEDIA_TYPE_IRI); reported, never guessed"
         )
 
 

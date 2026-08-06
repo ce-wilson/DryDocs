@@ -137,6 +137,45 @@ MERGE (n:OntologyTerm:SwoProperty {iri:"http://www.ebi.ac.uk/swo/SWO_0000087"}) 
 MERGE (n:OntologyTerm:SwoProperty {iri:"http://www.ebi.ac.uk/swo/SWO_0000150"}) SET n.label = "uses platform";
 
 
+// ----- Media-type terms (file-format layer; SME ruling 2026-08-05) ----------
+//   Consumer: the code-snapshot loader's HAS_MEDIA_TYPE edge (u2_has_media_type)
+//   — non-.py files in the all-files tree snapshot get a FORMAT binding the way
+//   .py gets a LANGUAGE binding (IS_ENCODED_IN). Two provenance tiers, split by
+//   `registered`:
+//     * registered:true  — IANA-registered media types; the iri IS the IANA
+//       registration page (the DCAT convention for dcat:mediaType values).
+//       Each was verified against iana.org at seeding (2026-08-05); the two
+//       recent ones: application/toml registered 2024-10-21,
+//       application/vnd.mermaid registered 2023-09-18.
+//     * registered:false — CONVENTIONAL types with no IANA registration
+//       (TypeScript, PowerShell, Cypher, Jupyter). Local IRIs — an IANA-shaped
+//       iri for an unregistered type would fabricate a registration.
+//   Extensions with NEITHER a language nor a media type ('', .example, .lock,
+//   .conf) stay unbound and are reported by the CLI, never guessed.
+MERGE (n:OntologyTerm:MediaType {iri:"https://www.iana.org/assignments/media-types/text/markdown"})   SET n.label = "Markdown",   n.media_type = "text/markdown",   n.registered = true;
+MERGE (n:OntologyTerm:MediaType {iri:"https://www.iana.org/assignments/media-types/text/html"})       SET n.label = "HTML",       n.media_type = "text/html",       n.registered = true;
+MERGE (n:OntologyTerm:MediaType {iri:"https://www.iana.org/assignments/media-types/text/css"})        SET n.label = "CSS",        n.media_type = "text/css",        n.registered = true;
+MERGE (n:OntologyTerm:MediaType {iri:"https://www.iana.org/assignments/media-types/text/javascript"}) SET n.label = "JavaScript", n.media_type = "text/javascript", n.registered = true;
+MERGE (n:OntologyTerm:MediaType {iri:"https://www.iana.org/assignments/media-types/text/csv"})        SET n.label = "CSV",        n.media_type = "text/csv",        n.registered = true;
+MERGE (n:OntologyTerm:MediaType {iri:"https://www.iana.org/assignments/media-types/text/plain"})      SET n.label = "Plain text", n.media_type = "text/plain",      n.registered = true;
+MERGE (n:OntologyTerm:MediaType {iri:"https://www.iana.org/assignments/media-types/application/json"}) SET n.label = "JSON",      n.media_type = "application/json", n.registered = true;
+MERGE (n:OntologyTerm:MediaType {iri:"https://www.iana.org/assignments/media-types/application/yaml"}) SET n.label = "YAML",      n.media_type = "application/yaml", n.registered = true;
+MERGE (n:OntologyTerm:MediaType {iri:"https://www.iana.org/assignments/media-types/application/toml"}) SET n.label = "TOML",      n.media_type = "application/toml", n.registered = true;
+MERGE (n:OntologyTerm:MediaType {iri:"https://www.iana.org/assignments/media-types/application/xml"})  SET n.label = "XML",       n.media_type = "application/xml",  n.registered = true;
+MERGE (n:OntologyTerm:MediaType {iri:"https://www.iana.org/assignments/media-types/application/pdf"})  SET n.label = "PDF",       n.media_type = "application/pdf",  n.registered = true;
+MERGE (n:OntologyTerm:MediaType {iri:"https://www.iana.org/assignments/media-types/application/sql"})  SET n.label = "SQL file",  n.media_type = "application/sql",  n.registered = true;
+MERGE (n:OntologyTerm:MediaType {iri:"https://www.iana.org/assignments/media-types/application/vnd.mermaid"}) SET n.label = "Mermaid", n.media_type = "application/vnd.mermaid", n.registered = true;
+MERGE (n:OntologyTerm:MediaType {iri:"https://www.iana.org/assignments/media-types/application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"}) SET n.label = "Excel workbook (OOXML)", n.media_type = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", n.registered = true;
+MERGE (n:OntologyTerm:MediaType {iri:"https://www.iana.org/assignments/media-types/image/png"})       SET n.label = "PNG",        n.media_type = "image/png",       n.registered = true;
+MERGE (n:OntologyTerm:MediaType {iri:"https://www.iana.org/assignments/media-types/image/svg+xml"})   SET n.label = "SVG",        n.media_type = "image/svg+xml",   n.registered = true;
+MERGE (n:OntologyTerm:MediaType {iri:"https://www.iana.org/assignments/media-types/image/webp"})      SET n.label = "WebP",       n.media_type = "image/webp",      n.registered = true;
+MERGE (n:OntologyTerm:MediaType {iri:"https://www.iana.org/assignments/media-types/font/ttf"})        SET n.label = "TrueType font", n.media_type = "font/ttf",     n.registered = true;
+MERGE (n:OntologyTerm:MediaType {iri:"https://drydocs.local/format#typescript"})       SET n.label = "TypeScript",       n.media_type = "application/typescript",   n.registered = false;
+MERGE (n:OntologyTerm:MediaType {iri:"https://drydocs.local/format#powershell"})       SET n.label = "PowerShell",       n.media_type = "application/x-powershell", n.registered = false;
+MERGE (n:OntologyTerm:MediaType {iri:"https://drydocs.local/format#cypher"})           SET n.label = "Cypher",           n.media_type = "application/x-cypher-query", n.registered = false;
+MERGE (n:OntologyTerm:MediaType {iri:"https://drydocs.local/format#jupyter-notebook"}) SET n.label = "Jupyter notebook", n.media_type = "application/x-ipynb+json", n.registered = false;
+
+
 // ----- OpenLineage label vocabulary -----------------------------------------
 //   OL doesn't publish OWL; we record canonical names for cross-reference.
 MERGE (n:OntologyTerm:OlClass {iri:"https://openlineage.io/spec/Run"})     SET n.label = "OL Run";

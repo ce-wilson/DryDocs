@@ -1,22 +1,31 @@
-"""CodeSnapshotLoader — DryDocs' own code-dependency snapshot into the graph.
+"""CodeSnapshotLoader + CodeTreeLoader — DryDocs' own snapshot into the graph.
 
 G33 / Epic U (self-documentation); gate ``self-documentation-code-graph``
 SIGNED OFF 2026-07-27 (config/gate-prompts/self-documentation-code-graph.yaml,
-36/36). Reads the NEWEST ``knowledge/depgraph-snapshots/drydocs-*.json``
-(dependency mode) and MERGEs it into ``drydocs``: one ``(:Project
-{project_id:'drydocs'})`` root, ``:CodeModule`` nodes keyed on ``file_id``,
-HAS_MODULE / IMPORTS / IS_ENCODED_IN edges — all idempotent, re-runnable from
-committed files (ADR 0002 D3).
+36/36). Reads the NEWEST ``knowledge/depgraph-snapshots/drydocs-*.json`` and
+MERGEs it into ``drydocs``, in two passes over the same file:
+
+* :class:`CodeSnapshotLoader` (``code_snapshot.v1``) — the FILE layer: one
+  ``(:Project {project_id:'drydocs'})`` root, ``:CodeModule`` nodes keyed on
+  ``file_id``, HAS_MODULE / IMPORTS / IS_ENCODED_IN / HAS_MEDIA_TYPE edges.
+* :class:`CodeTreeLoader` (``code_tree.v1``) — the CONTAINMENT layer (SME
+  ruling 2026-08-05, admitting the tree the G33 gate deferred):
+  ``:CodeDirectory`` nodes + CONTAINS_ENTRY edges from the snapshot's v2
+  ``rels`` section; the repo-root dir maps onto the existing :Project (§B1(a)
+  holds — one root, no duplicate).
+
+All idempotent, re-runnable from committed files (ADR 0002 D3).
 
 THE DISCRIMINATOR IS A POSITIVE ASSERTION (§G1(a) + the 2026-07-27
-post-sign-off review finding): the two tree-mode files in the same directory
+post-sign-off review finding, half-REVERSED by SME direction when the
+all-files tree became the ritual default): the historical tree-mode one-offs
 declare the SAME schema string but carry NO ``meta`` key at all, and a naive
 ``*.json`` name-sort picks ``tree-this-version.json`` as "newest" ('t' > 'd').
-So this loader (1) globs ``drydocs-*.json`` ONLY, and (2) refuses — loudly,
+So these loaders (1) glob ``drydocs-*.json`` ONLY, and (2) refuse — loudly,
 :class:`CodeSnapshotError`, never a silent no-op — any file whose ``meta`` is
-absent or whose ``meta.tree`` is not exactly ``false``. A negative
-"refuse if tree is true" check would ACCEPT the tree files; do not weaken
-this back to one.
+absent or whose ``meta.tree`` is not a boolean. The load-bearing half is the
+POSITIVE ``meta`` assertion (those files carry no ``meta``, so a truthiness
+test on ``meta.tree`` would ACCEPT them); do not weaken it.
 
 snapshot.ps1 stays DECOUPLED (§H3): nothing here is imported by the session
 ritual, which must keep working with no database running.
@@ -31,7 +40,7 @@ from collections.abc import Iterator
 from pathlib import Path
 from typing import TYPE_CHECKING, ClassVar
 
-from drydocs_core.models.code_snapshot import CodeModuleRow
+from drydocs_core.models.code_snapshot import CodeDirectoryRow, CodeModuleRow
 
 from .base import BaseLoader
 
@@ -44,11 +53,13 @@ CYPHER_DIR = Path(__file__).resolve().parent / "cypher"
 DEFAULT_SNAPSHOT_DIR = Path(__file__).resolve().parents[2] / "knowledge" / "depgraph-snapshots"
 # v2 (first seen 2026-07-27, ritual snapshot 20260727-2019) is a SUPERSET of
 # v1 for this loader's concern: nodes/edges/meta are unchanged; v2 adds
-# lineage sections (processes/data_assets/hosts/rels) and stats, which this
-# loader does NOT load — it warns when they carry content (never silent).
+# lineage sections (processes/data_assets/hosts/rels) and stats. `rels` IS
+# loaded since the 2026-08-05 ruling (CodeTreeLoader — the containment tree);
+# the remaining lineage sections are not — read_snapshot warns when they
+# carry content (never silent).
 SNAPSHOT_SCHEMAS = ("depgraph-machine-first/v1", "depgraph-machine-first/v2")
 SNAPSHOT_SCHEMA = SNAPSHOT_SCHEMAS[0]  # back-compat name (fixtures/tests)
-_V2_UNLOADED_SECTIONS = ("processes", "data_assets", "hosts", "rels")
+_V2_UNLOADED_SECTIONS = ("processes", "data_assets", "hosts")
 SNAPSHOT_GLOB = "drydocs-*.json"  # dated dependency snapshots ONLY — never tree-*.json
 
 # §E1(b)/§E2: extension -> the ALREADY-SEEDED SwoClass term (ontology.cypher).
@@ -58,6 +69,45 @@ EXTENSION_LANGUAGE_IRI: dict[str, str] = {
     ".py": "http://www.ebi.ac.uk/swo/SWO_0000118",  # Python
     ".sh": "http://www.ebi.ac.uk/swo/SWO_0000124",  # Shell
     ".sql": "http://www.ebi.ac.uk/swo/SWO_0000126",  # SQL
+}
+
+# Extension -> the ALREADY-SEEDED :MediaType format term (ontology.cypher;
+# SME ruling 2026-08-05 — the non-.py majority of the tree gets typed the way
+# .py gets a language). Same E1(b) discipline as EXTENSION_LANGUAGE_IRI: bind
+# to a seeded term, derive from data the artifact carries, invent nothing.
+# IANA-registered types use the registration page as iri (DCAT convention);
+# conventional unregistered types (TypeScript, PowerShell, Cypher, Jupyter)
+# use drydocs.local/format# — an IANA-shaped iri would fabricate a
+# registration. Lookup is CASE-FOLDED ('.MD' binds like '.md'). Extensions
+# with neither a language nor a media type stay unbound and are CLI-reported.
+_IANA = "https://www.iana.org/assignments/media-types/"
+_LOCAL_FORMAT = "https://drydocs.local/format#"
+EXTENSION_MEDIA_TYPE_IRI: dict[str, str] = {
+    ".md": _IANA + "text/markdown",
+    ".html": _IANA + "text/html",
+    ".css": _IANA + "text/css",
+    ".js": _IANA + "text/javascript",
+    ".csv": _IANA + "text/csv",
+    ".txt": _IANA + "text/plain",
+    ".json": _IANA + "application/json",
+    ".yaml": _IANA + "application/yaml",
+    ".yml": _IANA + "application/yaml",
+    ".toml": _IANA + "application/toml",
+    ".xml": _IANA + "application/xml",
+    ".xsd": _IANA + "application/xml",  # an XSD document IS XML; no XSD-specific type exists
+    ".pdf": _IANA + "application/pdf",
+    ".sql": _IANA + "application/sql",  # format binding; the LANGUAGE binding rides IS_ENCODED_IN
+    ".mermaid": _IANA + "application/vnd.mermaid",
+    ".xlsx": _IANA + "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    ".png": _IANA + "image/png",
+    ".svg": _IANA + "image/svg+xml",
+    ".webp": _IANA + "image/webp",
+    ".ttf": _IANA + "font/ttf",
+    ".ts": _LOCAL_FORMAT + "typescript",
+    ".tsx": _LOCAL_FORMAT + "typescript",
+    ".ps1": _LOCAL_FORMAT + "powershell",
+    ".cypher": _LOCAL_FORMAT + "cypher",
+    ".ipynb": _LOCAL_FORMAT + "jupyter-notebook",
 }
 
 
@@ -161,11 +211,14 @@ def read_snapshot(path: Path | str) -> dict:
 
 
 class CodeSnapshotAdapter:
-    """Yields one row per snapshot node, imports nested, meta denormalized.
+    """Yields one row per snapshot FILE node, imports nested, meta denormalized.
 
     §H4: ``abs_path`` is dropped here — it never reaches the row model, the
     Cypher, or the graph. ``unmapped_extensions`` counts nodes whose extension
-    has no seeded SWO term (edge skipped, reported by the CLI — never silent).
+    has NEITHER a seeded SWO language term NOR a seeded MediaType format term
+    (both edges skipped, reported by the CLI — never silent; before the
+    2026-08-05 ruling this counted "no SWO term", which was nearly every
+    non-.py file).
     """
 
     def __init__(self, path: Path | str) -> None:
@@ -218,19 +271,18 @@ class CodeSnapshotAdapter:
             imports_by_source.setdefault(_key(edge[0]), []).append(_key(edge[1]))
 
         for node in doc.get("nodes", []):
-            # DIRECTORIES ARE NOT CODE MODULES. An all-files snapshot carries
-            # kind: 'dir' nodes; turning those into graph nodes is a NEW node class
-            # and the CONTAINS edge is a NEW edge type, both of which are gate
-            # decisions (CLAUDE.md §6) and neither of which this loader may invent.
-            # They are counted, not dropped in silence — the count is reported by
-            # the CLI so "the tree is not in the graph yet" is visible rather than
-            # inferred from a node total nobody checks.
+            # DIRECTORIES ARE NOT CODE MODULES. They are still not loaded HERE —
+            # :CodeDirectory nodes + CONTAINS_ENTRY edges are CodeTreeAdapter/
+            # CodeTreeLoader's job (SME ruling 2026-08-05 admitted the tree the
+            # G33 gate deferred). Counted so the CLI can cross-check the two
+            # loaders' row totals against the snapshot.
             if node.get("kind") == "dir":
                 self.skipped_directories += 1
                 continue
             extension = node.get("extension", "")
             language_iri = EXTENSION_LANGUAGE_IRI.get(extension)
-            if language_iri is None:
+            media_type_iri = EXTENSION_MEDIA_TYPE_IRI.get(extension.lower())
+            if language_iri is None and media_type_iri is None:
                 self.unmapped_extensions[extension] = self.unmapped_extensions.get(extension, 0) + 1
             file_id = _key(node.get("file_id") or "")
             # `project` (§B1(a)) was "the scan root, one of six" — a concept that
@@ -257,6 +309,7 @@ class CodeSnapshotAdapter:
                 "circular": bool(node.get("circular", False)),
                 "imports": sorted(imports_by_source.get(file_id, [])),
                 "language_iri": language_iri,
+                "media_type_iri": media_type_iri,
                 "project_id": project_id,
                 "captured_at": meta.get("captured_at"),
                 "git_commit": git.get("commit") or "",
@@ -277,3 +330,131 @@ class CodeSnapshotLoader(BaseLoader):
     row_model: ClassVar[type] = CodeModuleRow
     source_label: ClassVar[str] = "snapshot"
     sweep_label: ClassVar[str | None] = "CodeModule"
+
+
+class CodeTreeAdapter:
+    """Yields one row per snapshot DIRECTORY node, children from the ``rels``
+    section (SME ruling 2026-08-05 — the containment layer).
+
+    Children are classified by the child node's ``kind`` (dir vs file), never
+    by path-string guessing — the tree instrument note's whole point (U9) is
+    that the ``rels`` section reads containment FROM the tree. A rel naming an
+    endpoint absent from ``nodes`` is malformed and refuses the load.
+
+    Rows are yielded parents-before-children (sorted by path depth) so a
+    multi-batch load MERGEs a parent's node statement before — or in the same
+    flush as — its children's edge statements.
+    """
+
+    def __init__(self, path: Path | str) -> None:
+        self.path = Path(path)
+
+    def __enter__(self) -> CodeTreeAdapter:
+        return self
+
+    def __exit__(
+        self,
+        exc_type: type[BaseException] | None,
+        exc: BaseException | None,
+        tb: TracebackType | None,
+    ) -> None:
+        return None
+
+    def rows(self) -> Iterator[dict]:
+        doc = read_snapshot(self.path)
+        meta = doc["meta"]
+        git = meta.get("git") or {}
+        project_id = meta.get("project") or "drydocs"
+        if not meta.get("tree"):
+            raise CodeSnapshotError(
+                f"{self.path.name}: meta.tree is false — a roots-only dependency "
+                "snapshot carries no containment tree, so there is nothing for the "
+                "tree loader to load (run the default all-files snapshot.ps1)"
+            )
+        rels = doc.get("rels") or []
+        if not rels:
+            raise CodeSnapshotError(
+                f"{self.path.name}: tree snapshot carries zero rels — refusing an "
+                "empty containment load (the 'succeeds loudly, does nothing' rule)"
+            )
+
+        # Key normalisation (§C2), with a subtlety the module adapter never
+        # faces: after stripping the leading project segment, the repo ROOT
+        # ('drydocs', rel_path '.') and the top-level `drydocs/` PACKAGE dir
+        # ('drydocs/drydocs') would COLLIDE on 'drydocs'. So the maps below
+        # key on the snapshot's RAW ids (unique by construction) and the strip
+        # happens only at emission — root rows emit file_id = project_id and
+        # is_root=True, which the Cypher maps onto :Project, never a node key.
+        strip = f"{project_id}/"
+
+        def _emit_key(raw_id: str) -> str:
+            if raw_id.startswith(strip):
+                return raw_id[len(strip) :]
+            return raw_id
+
+        kind_by_raw: dict[str, str] = {}
+        node_by_raw: dict[str, dict] = {}
+        for node in doc.get("nodes", []):
+            raw = node.get("file_id") or ""
+            kind_by_raw[raw] = node.get("kind") or "file"
+            node_by_raw[raw] = node
+
+        child_dirs: dict[str, list[str]] = {}
+        child_files: dict[str, list[str]] = {}
+        for rel in rels:
+            if not (isinstance(rel, list | tuple) and len(rel) == 3 and rel[1] == "CONTAINS"):
+                raise CodeSnapshotError(
+                    f"{self.path.name}: malformed rel {rel!r} — expected "
+                    "[parent_file_id, 'CONTAINS', child_file_id]"
+                )
+            parent_raw, child_raw = rel[0], rel[2]
+            child_kind = kind_by_raw.get(child_raw)
+            if kind_by_raw.get(parent_raw) != "dir" or child_kind is None:
+                raise CodeSnapshotError(
+                    f"{self.path.name}: rel {rel!r} names an endpoint absent from "
+                    "nodes (or a non-dir parent) — snapshot is inconsistent, refusing"
+                )
+            bucket = child_dirs if child_kind == "dir" else child_files
+            bucket.setdefault(parent_raw, []).append(_emit_key(child_raw))
+
+        dir_raws = sorted(
+            (k for k, kind in kind_by_raw.items() if kind == "dir"),
+            key=lambda k: (k.count("/"), k),
+        )
+        for raw in dir_raws:
+            node = node_by_raw[raw]
+            is_root = node.get("rel_path") == "."
+            file_id = project_id if is_root else _emit_key(raw)
+            if is_root:
+                project = "."
+            else:
+                project = file_id.split("/", 1)[0] if "/" in file_id else file_id
+            yield {
+                "file_id": file_id,
+                "is_root": is_root,
+                "name": node.get("name"),
+                "rel_path": node.get("rel_path"),
+                "project": project,
+                "child_dir_ids": sorted(child_dirs.get(raw, [])),
+                "child_file_ids": sorted(child_files.get(raw, [])),
+                "project_id": project_id,
+                "captured_at": meta.get("captured_at"),
+                "git_commit": git.get("commit") or "",
+                "git_full": git.get("full") or "",
+                "git_branch": git.get("branch") or "",
+                "git_dirty": bool(git.get("dirty", False)),
+            }
+
+
+class CodeTreeLoader(BaseLoader):
+    """The containment-tree loader (SME ruling 2026-08-05). Runs AFTER
+    CodeSnapshotLoader in ``load-code-snapshot`` — same snapshot file, same
+    full-scan-by-construction property, so the CLI passes ``full_extract=True``
+    and the D7 mark pass sweeps :CodeDirectory nodes that left the tree."""
+
+    name: ClassVar[str] = "code_tree.v1"
+    source_id: ClassVar[str | None] = "repo:depgraph-snapshot"
+    cypher_path: ClassVar[Path] = CYPHER_DIR / "code_tree.cypher"
+    row_model: ClassVar[type] = CodeDirectoryRow
+    source_label: ClassVar[str] = "snapshot"
+    sweep_label: ClassVar[str | None] = "CodeDirectory"
