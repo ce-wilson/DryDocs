@@ -566,6 +566,19 @@
       ]
     },
     {
+      "kind": "log-entry",
+      "date": "2026-08-06",
+      "title": "RECORD: Operate Manager is THREE role classes (G35 §A5, confirmed in-chat 2026-08-05; the coercion fixed 2026-08-06)",
+      "status": "signed-off",
+      "prompt_files": [
+        "config/gate-prompts/tom-roles-enumeration-and-cardinality.yaml"
+      ],
+      "log_ref": "config/gate-log.md:1476",
+      "unblocks": [
+        "O44"
+      ]
+    },
+    {
       "kind": "prompt-only",
       "date": null,
       "title": "bmc-docs-example (gate page rendered — session not yet run)",
@@ -705,7 +718,7 @@
     {
       "kind": "prompt-only",
       "date": null,
-      "title": "tom-roles-enumeration-and-cardinality (gate page rendered — session not yet run)",
+      "title": "tom-roles-enumeration-and-cardinality (rulings/citations logged — gate sign-off not recorded)",
       "status": "open",
       "prompt_files": [
         "config/gate-prompts/tom-roles-enumeration-and-cardinality.yaml"

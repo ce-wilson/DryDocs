@@ -91,6 +91,14 @@ class SealRole(str, Enum):
     L1/L2 Operate Manager and Risk Manager are optional but commonly
     set by production support teams; Backup Application Owner became
     effective 2026-05-18.
+
+    This enum is the ADMISSION LIST for source role names — what a contact
+    row is allowed to say — and not the ontology's concept scheme. A name
+    admitted here still has to crosswalk to a :TOMRole in
+    loaders/cypher/seal_contacts.cypher; one that doesn't is loaded and
+    flagged ``unmapped_role`` rather than guessed at (the K4 policy).
+    Membership here is therefore the cheap, reversible half of the
+    vocabulary question that gate G35 is deciding in full.
     """
 
     APPLICATION_OWNER = "Application Owner"
@@ -101,6 +109,11 @@ class SealRole(str, Enum):
     CHIEF_BUSINESS_TECHNOLOGIST = "Chief Business Technologist"
     L1_OPERATE_MANAGER = "L1 Operate Manager"
     L2_OPERATE_MANAGER = "L2 Operate Manager"
+    # Added 2026-08-06 on SME direction (gate G35 §A5, confirmed three times):
+    # L1, L2 and bare Operate Manager are THREE role classes that may be held by
+    # three different people or by one. Before this, a bare 'Operate Manager' had
+    # no admissible value of its own and was rewritten to L2 — see _ROLE_CANONICAL.
+    OPERATE_MANAGER = "Operate Manager"
     BACKUP_APPLICATION_OWNER = "Backup Application Owner"
     # Kept from the original DryDocs v3 §F design even though it doesn't
     # appear in the published SEAL spec — production support teams set
@@ -134,13 +147,24 @@ _ROLE_CANONICAL: dict[str, str] = {
     # CBT
     "chief business technologist": "Chief Business Technologist",
     "cbt": "Chief Business Technologist",
-    # Operate managers
+    # Operate managers — THREE classes, not one with a level. An alias may only
+    # resolve to the level it actually names: 'l2 manager' says L2, so it maps to
+    # L2, while a bare 'operate manager' says no level and maps to the bare class.
+    #
+    # FIXED 2026-08-06 (SME direction, gate G35 §A5). Until this date the last line
+    # read `"operate manager": "L2 Operate Manager"`, which asserted a level the
+    # source never stated — and, because the same person routinely holds all three
+    # on one application, produced an attribution_id identical to that person's
+    # genuine L2 row. seal_contacts.cypher MERGEs on attribution_id, so the two
+    # folded into one node: three source holdings became two, silently, with which
+    # row survived depending on batch order. Reproduced on the bundled sample
+    # (13 rows -> 8 attributions on app 70001) before the fix.
     "l1 operate manager": "L1 Operate Manager",
     "l1 ops manager": "L1 Operate Manager",
     "l2 operate manager": "L2 Operate Manager",
     "l2 ops manager": "L2 Operate Manager",
     "l2 manager": "L2 Operate Manager",
-    "operate manager": "L2 Operate Manager",
+    "operate manager": "Operate Manager",
     # Backup App Owner (effective 2026-05-18)
     "backup application owner": "Backup Application Owner",
     "bao": "Backup Application Owner",

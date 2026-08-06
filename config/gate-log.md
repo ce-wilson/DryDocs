@@ -1472,3 +1472,60 @@ or added.
 - **Test moved with the flip** (same commit, the F1/K2 pattern):
   `test_doc_ledger_union_gates_doc_corpora` now pins the confirmed state where it
   previously pinned the `UnconfirmedSourceError` refusal.
+
+## 2026-08-06 — RECORD: Operate Manager is THREE role classes (G35 §A5, confirmed in-chat 2026-08-05; the coercion fixed 2026-08-06)
+
+- **Why this entry exists at all, and it is the useful part.** The confirmation
+  happened on **2026-08-05** and lived only inside the gate-prompt YAML
+  (`config/gate-prompts/tom-roles-enumeration-and-cardinality.yaml` §A5 and
+  `sme_direction`), committed as `3df06de` on the **laptop** — the desktop has no
+  G35 commits. It never reached this log, so the durable source of record held
+  nothing while git held a dated, attributable ruling. It surfaced only because the
+  SME asked, a day later, whether it had been confirmed. That is the
+  "did the gate land?" failure mode arriving on schedule: **a CONFIRMED CLAUSE
+  inside an UNSIGNED gate has no home in a log organised by sign-off.** Recorded on
+  the G51/X1/`fcdo-frameworks` RECORD idiom — direction, not a gate session.
+- **What was confirmed (2026-08-05, in-chat):** *"three separate role classes, not
+  one concept with a level."* Restated 2026-08-06 with the cardinality attached:
+  *"L1 Operate Manager, L2 Operate Manager, Operate Manager are 3 separate roles
+  that could be distinct individuals or the same."* Three statements across two
+  days, consistent each time.
+- **What it settles inside G35:** mapping row 2 resolves RE-OPENED → SPLIT;
+  `operate_manager` becomes three concepts; the `Attribution.level` property retires
+  as a role discriminator rather than moving, because it never carried information
+  the role NAME did not already have; `c7.levels = 'L1,L2'` retires with it. The
+  count arithmetic closes exactly — the signed 7 with `operate_manager` split into 3
+  IS the 9 the live registry shows.
+- **What was APPLIED on 2026-08-06, ahead of sign-off and on explicit instruction**
+  (`drydocs_core/models/seal.py`): `SealRole` gained `OPERATE_MANAGER =
+  "Operate Manager"` and `_ROLE_CANONICAL["operate manager"]` was re-pointed from
+  `"L2 Operate Manager"` to `"Operate Manager"`. **Two lines, not one** — deleting
+  the bad alias alone leaves the bare name with no admissible value, and an
+  unrecognised name is not flagged, it kills the row.
+- **The defect that fix ends.** The alias asserted a level the source never stated.
+  Because the same person routinely holds all three on one application (recorded at
+  line 882 of this log, from the SME screenshots that pinned identity gate §D2), the
+  rewritten row produced an `attribution_id` identical to that person's genuine L2
+  row; `seal_contacts.cypher` MERGEs on `attribution_id`, so the two folded into one
+  node. Three source holdings became two, silently, with the survivor decided by
+  batch order. Measured on the bundled taxonomy sample, application 70001:
+  **13 rows → 9 validating → 8 attributions before, 9 after. Zero merged.**
+- **Scope — NO ONTOLOGY CHANGE, and this is the line that matters.** `SealRole` is
+  the admission list for SOURCE NAMES, not the concept scheme. `tom_roles` still
+  seeds 7 concepts, `seal_contacts.cypher` still has its 4-branch crosswalk, and no
+  `:TOMRole` was created — so a bare Operate Manager row now loads and arrives
+  flagged `unmapped_role = true`, which is the K4 policy working as designed:
+  loaded, surfaced for review, never guessed. **Creating the three concepts is still
+  §A's ruling to make, and G35 remains unsigned.**
+- **Guarded by `tests/unit/test_seal_roles.py` (NEW).** The module had **no tests at
+  all**, which is how an alias that destroyed a role holding survived long enough to
+  be found by reading rather than by failing. Beyond pinning the three classes it
+  asserts the invariant the defect violated: **no alias may resolve to a canonical
+  name asserting a level the alias does not itself name.** A future
+  `"ops manager" → L2` fails that test instead of silently merging.
+- **Still open in G35, unchanged by any of this:** the bare class has no DEFINITION
+  (§A5c), and four classes from the SME's 2026-08-06 thirteen-class list
+  (Deployment Owner, Deployment Information Owner, Application Module Owner, Site
+  Reliability Engineer) cannot be loaded at all — they hit the same
+  `unrecognised SEAL role` refusal, which is §A3's question and is untouched by this
+  fix.
