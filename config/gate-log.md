@@ -1647,3 +1647,83 @@ or added.
 - **Still open — everything else:** A3/A4/A5/A6, rider R2 (B1-or-B2 + B3), C1–C3,
   D1/D2/D4, E1–E3, F1–F2, G1–G2, H1–H2, I1–I3, and §J sign-off. G22 stays
   `in_progress`; the terminus holds.
+
+## 2026-08-06 — RECORD: rua load shapes, second batch — rider R2 ruled B2, and section A closes (G22; gate `rua-load-shapes`, still UNSIGNED)
+
+- **Scope:** the same session as the entry above, continued. Section A is now
+  fully ruled and rider R2 is decided. The gate remains unsigned and the
+  terminus holds — no loader exists, nothing rua-shaped writes the graph.
+- **A CORRECTION TO HOW THE PREVIOUS BATCH WAS RECORDED, and it is the same
+  failure this convention exists to prevent.** B2/B3 were ruled and written to
+  the gate page in commit `45af31e`, which **did not touch this log**. For one
+  commit the ruling existed only in a YAML file — precisely the state the entry
+  above was written to end. Folded in here rather than left implicit. The rule
+  is not "write a RECORD entry when a batch feels big enough"; it is **the same
+  commit, every time a clause is confirmed.**
+- **B2 CHOSEN — `m3_invokes.to_node` broadens to `Script|ETLProcess`.** One edge
+  meaning, two endpoint classes, endpoint recorded per edge. On the record:
+  the union-endpoint precedent already exists in this vocabulary
+  (`m3_reads_from`/`m3_writes_to` take `ETLProcess | ControlMJob` as
+  `from_node`); **G12 is done and already lands INVOKES directly on an
+  `:ETLProcess`** for the abioncloud wrapper-payload expansion, so B1 would have
+  meant re-modeling working code; and B1 splits "what does this job call?"
+  across two labels chosen by what the callee happens to be — a two-query answer
+  permanently. **B1 recorded as NOT CHOSEN, not deleted** — a page showing only
+  the winner cannot be audited.
+- **B3 CONFIRMED** — the raw evidence string is kept verbatim. It carries more
+  weight under B2 than it would have under B1: when one label can land on two
+  endpoint classes, the verbatim evidence is the only way to re-check that the
+  class was chosen correctly.
+- **A3 ACTIVATE — `m3_invokes`.** Feed verified at the ruling rather than
+  assumed: `controlm_inventory` CMD_LINE facts (G14), the G39/G40 interim seam,
+  G16 `SCRIPT_PATH` facts — all `done`. **Two signed rulings ride in with it and
+  are not re-opened:** cardinality 1..n per job (cmdline-lineage-review,
+  2026-07-16), and `:Script` identity stays **PATH-KEYED** with same-basename
+  duplicates going to SME merge, never auto-merged. **That second one constrains
+  D1** — the URN this gate rules must render that path key or amend a signed
+  ruling; it cannot quietly replace it.
+- **A4 ACTIVATE — `m7_uses_artifact` — and deliberately in the same breath as
+  A3.** Feed is specific: `FACT_REGISTRY` carries `ETL_ARTIFACT_URI` /
+  `ETL_ARTIFACT_KIND` / `ETL_ARTIFACT_SHA` plus `ETL_PLATFORM` /
+  `ETL_PLATFORM_FLAGS` with alias rollups, under the aliases-suggest-values-decide
+  contract — never the variable NAME alone (the 2,384-variable gap analysis
+  found that names lie). **Why together:** the `m3_invokes` note says payload
+  invocations MIGRATE onto this label at its build. Activating A3 alone would
+  land payloads in the 1..n INVOKES fold first, so the migration would move
+  edges already in the graph instead of routing them correctly on first load.
+  Riders already SME-ruled at cmdline-nfr-vetting (2026-07-21, SME-3) come with
+  it: `script_role {launcher, payload}` plus `platform` / `artifact_uri` /
+  `artifact_kind` / `platform_flags` / `script_path`.
+- **A4 note for §G2:** `ETL_ARTIFACT_SHA` is a **content hash arriving on the
+  variable**, so a DPL-managed artifact can be hash-BEARING where the rua
+  listing is hash-absent — a corroboration path G2 as drafted does not
+  anticipate.
+- **A5 ACTIVATE, WITH THE RESTRICTION RESTATED.** The SME changed the page's own
+  words rather than ticking them. New wording: activate for **structured,
+  launcher- or registry-grounded evidence — `dataset_flow` AND parsed CMD_LINE
+  file-ops — but NOT script-body content grep.** Why: the drafted "never parsed
+  prose" read as excluding the CMD_LINE feed, and **a signed gate already put
+  that case here** — the `m3_triggers` note (confirmed 2026-07-15) says the pure
+  unix file-operation wrapper case "is m3_reads_from / m3_writes_to with
+  ControlMJob as the Activity." Excluding file-ops would have left a signed case
+  with nowhere to land. Both feeds verified: `dpl_mac` maps `dataset_flow.json`
+  input/output datasets to candidates; `controlm_inventory` (G14) parses
+  MOVE/COPY/COMPRESS into the same, with counters for non-dataflow ops and
+  missing operands.
+- **A5's accepted consequence, which lands on D1/G1:** `local_file` DataAssets
+  will be numerous and transient — one per MOVE operand — so whether they are
+  the same node class as registered datasets is a real question this activation
+  creates, and those clauses have to answer it.
+- **A6 CONFIRMED, and exercised the same day.** Anything not ticked stays planned
+  and candidate-side; declining is a normal outcome. Of the six candidates the
+  G22 acceptance named: **one was already active before the session**
+  (ControlMJob RUNS_ON ExecutionHost, P3 2026-07-27), **three activate** (A3, A4,
+  A5), **one is declined** (A2, redundant), **one is held** (A1, on K17's
+  unsigned AppUser identity).
+- **Consequences are FOLLOW-UP BUILD work, not gate edits** (§I1, the K2/G27
+  pattern): groomed 2026-08-06 as **G55** — flips to active WITH supplement
+  blocks, declined entries retired, new meanings landing as `planned`. G55
+  depends on G22 being **signed**, not merely opened. The loader itself stays
+  G23.
+- **Still open:** C1–C3, D1/D2/D4, E1–E3, F1–F2, G1–G2, H1–H2, I1–I3, §J
+  sign-off.

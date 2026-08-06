@@ -614,6 +614,23 @@
       ]
     },
     {
+      "kind": "log-entry",
+      "date": "2026-08-06",
+      "title": "RECORD: rua load shapes, second batch — rider R2 ruled B2, and section A closes (G22; gate `rua-load-shapes`, still UNSIGNED)",
+      "status": "recorded",
+      "prompt_files": [
+        "config/gate-prompts/rua-load-shapes.yaml"
+      ],
+      "log_ref": "config/gate-log.md:1651",
+      "unblocks": [
+        "K7",
+        "G22",
+        "G45",
+        "J24",
+        "G55"
+      ]
+    },
+    {
       "kind": "prompt-only",
       "date": null,
       "title": "bmc-docs-example (gate page rendered — session not yet run)",
@@ -694,23 +711,6 @@
         "K17",
         "K19",
         "J32"
-      ]
-    },
-    {
-      "kind": "prompt-only",
-      "date": null,
-      "title": "rua-load-shapes (rulings/citations logged — gate sign-off not recorded)",
-      "status": "open",
-      "prompt_files": [
-        "config/gate-prompts/rua-load-shapes.yaml"
-      ],
-      "log_ref": null,
-      "unblocks": [
-        "K7",
-        "G22",
-        "G45",
-        "J24",
-        "G55"
       ]
     },
     {
