@@ -87,58 +87,131 @@ nodes:
     - kind: EventProcessing
     - kind: BatchProcessing
 
+  # Employee — the people the memberships point at. INVENTED NAMES, supplied by the SME
+  # on 2026-08-06 so the sample can be demonstrated end to end; SIDs are synthetic and
+  # follow the file's existing K###### shape. Real rosters live in internal/ and are
+  # referenced by SID — this block does NOT change that rule, it gives the synthetic
+  # sample the one thing it lacked: a person who is recognisably the SAME person in two
+  # places. That is what makes the multi-role and multi-application shapes below legible,
+  # and what a reconciliation surface (backlog O44) needs to draw anything at all.
+  employees:
+    - { sid: K123456, name: Agent Smith }
+    - { sid: K234567, name: Lana Wachowski }
+    - { sid: K345678, name: Lilly Wachowski }
+    - { sid: K456789, name: Agent Brown }
+    - { sid: K567890, name: Joel Silver }
+    - { sid: K678901, name: Agent Jones }
+    - { sid: K789012, name: Spoon Boy }
+
   # Membership ▸ Role ▸ Employee (n-ary). Keyed (sealid, role, sid). Employees referenced by
   # SID only — real names/emails are confidential (synthetic in the sample) -> internal/.
+  #
+  # REBUILT 2026-08-06 from the SME's role list (13 classes; see the `roles:` register).
+  # SIDs are now PERSON-scoped rather than app-scoped: the earlier K/L/M-per-application
+  # pattern implied 15 different people and made every cross-application question
+  # unaskable. The four role/SID pairs the SME set on 70001 are preserved exactly.
+  #
+  # The three applications are deliberately DIFFERENT SHAPES, because a sample where every
+  # app looks the same cannot exercise the rules being written about it at gate G35:
+  #   70001 FULL      — all 13 classes present. Carries the two cases the gate turns on:
+  #                     one person (Agent Brown) holding L1 Operate Manager, L2 Operate
+  #                     Manager AND Operate Manager, which is the config/gate-log.md:882
+  #                     case and the one the seal.py:143 coercion silently collapses; and
+  #                     one person (Joel Silver) holding three DIFFERENT classes (§B1b).
+  #   70002 WIDE      — FOUR holders of Backup Information Owner, the observed shape that
+  #                     §B1 rules normal rather than anomalous, plus L1/L2 Operate Manager
+  #                     held by two different people.
+  #   70003 MINIMAL   — the core classes only, no optional ones. An application with
+  #                     legitimately absent optional roles, so §C4's presence check has a
+  #                     negative case to be correct about instead of only positive ones.
   memberships:
     - sealid: 70001
       roles:
         - { role: Application Owner, sid: K123456 }
+        - { role: Primary Information Owner, sid: K567890 }
+        - { role: Backup Information Owner, sid: K678901 }
+        - { role: Chief Technology Officer, sid: K345678 }
         - { role: Design Authority, sid: K234567 }
-        - { role: Chief Technology Officer(CTO), sid: K345678 }
+        - { role: Deployment Owner, sid: K567890 }
+        - { role: Deployment Information Owner, sid: K567890 }
+        - { role: Application Module Owner, sid: K789012 }
+        - { role: L1 Operate Manager, sid: K456789 }
         - { role: L2 Operate Manager, sid: K456789 }
-        - { role: Risk Manager, sid: K567890 }
+        - { role: Operate Manager, sid: K456789 }
+        - { role: Site Reliability Engineer, sid: K789012 }
+        - { role: Backup Application Owner, sid: K678901 }
     - sealid: 70002
       roles:
-        - { role: Backup Information Owner, sid: L123456 }
-        - { role: Design Authority, sid: L234567 }
-        - { role: Chief Business Technologist, sid: L345678 }
-        - { role: L1 Operate Manager, sid: L456789 }
-        - { role: L2 Operate Manager, sid: L567890 }
-        - { role: Risk Manager, sid: L678901 }
+        - { role: Application Owner, sid: K567890 }
+        - { role: Primary Information Owner, sid: K234567 }
+        - { role: Backup Information Owner, sid: K123456 }
+        - { role: Backup Information Owner, sid: K456789 }
+        - { role: Backup Information Owner, sid: K678901 }
+        - { role: Backup Information Owner, sid: K789012 }
+        - { role: Chief Technology Officer, sid: K345678 }
+        - { role: Design Authority, sid: K234567 }
+        - { role: L1 Operate Manager, sid: K456789 }
+        - { role: L2 Operate Manager, sid: K678901 }
+        - { role: Site Reliability Engineer, sid: K789012 }
+        - { role: Backup Application Owner, sid: K123456 }
     - sealid: 70003
       roles:
-        - { role: Backup Information Owner, sid: M123456 }
-        - { role: Design Authority, sid: M234567 }
-        - { role: L2 Operate Manager, sid: M345678 }
-        - { role: Risk Manager, sid: M456789 }
+        - { role: Application Owner, sid: K123456 }
+        - { role: Primary Information Owner, sid: K567890 }
+        - { role: Backup Information Owner, sid: K678901 }
+        - { role: Chief Technology Officer, sid: K345678 }
+        - { role: Design Authority, sid: K234567 }
+        - { role: L2 Operate Manager, sid: K456789 }
 
-  # Role — distinct role types observed (org:Role). DERIVED: the union of the role
-  # names in `memberships` above, nothing more. It is an OBSERVATION of the sample,
-  # not a vocabulary declaration — the vocabulary question is open at gate G35
-  # (config/gate-prompts/tom-roles-enumeration-and-cardinality.yaml), whose §A1 cites
-  # this list as one of four divergent role lists and whose §H4 requires it to be
-  # reconciled to whatever §A rules. Nothing reads it (G35 §A8).
+  # Role — distinct role types observed (org:Role). DERIVED: the union of the role names
+  # in `memberships` above, nothing more. It is an OBSERVATION of the sample, not a
+  # vocabulary declaration — the vocabulary question is open at gate G35
+  # (config/gate-prompts/tom-roles-enumeration-and-cardinality.yaml), whose §A1 cites this
+  # list as one of four divergent role lists and whose §H4 requires it to be reconciled to
+  # whatever §A rules. Nothing reads it (G35 §A8). Listed in the SME's own order rather
+  # than sorted, because that order groups the classes and the grouping is information.
   #
-  # 2026-08-06: the 70001 membership block was re-pointed by the SME — Backup
-  # Information Owner -> Application Owner, Chief Business Technologist -> Chief
-  # Technology Officer(CTO). 70002/70003 were left as captured, so the union grew
-  # from 6 to 8 rather than swapping two names. See the note under `counts`.
+  # 2026-08-06: REPLACED WHOLESALE from the 13-class list the SME supplied in chat. This
+  # supersedes the same day's earlier 70001 re-point (which had produced an 8-name union),
+  # and it is a TAXONOMY capture — reversible by construction, and it rules nothing. The
+  # same list is recorded in G35 as `sme_direction` for the walk to rule on; until §A is
+  # signed, the scheme still holds its 7 concepts and the loaders their 4-branch crosswalk.
+  #
+  # THREE THINGS THIS LIST CHANGES, all of them questions for the gate rather than answers:
+  #   FOUR CLASSES ARE NEW to the repo entirely — Deployment Owner, Deployment Information
+  #   Owner, Application Module Owner, Site Reliability Engineer. None appears in the signed
+  #   scheme, the SealRole enum, the loader crosswalk or any prior capture.
+  #   TWO NAMES ARE GONE — Chief Business Technologist and Risk Manager. Both are still live
+  #   in the SealRole enum and both are still flagged unmapped by the loader, so their
+  #   absence here is a capture change, NOT a retirement.
+  #   THE PARENTHETICALS ARE ABBREVIATIONS, not part of the name: the SME wrote every
+  #   acronym in "Name (ABBREV)" form and left it off the four classes that have none, so
+  #   they are recorded in `abbrev` and the earlier "Chief Technology Officer(CTO)" literal
+  #   is read as the same convention rather than as a source string. See G35 §A3b.
   roles:
-    - Application Owner
-    - Backup Information Owner
-    - Chief Business Technologist
-    - Chief Technology Officer(CTO)
-    - Design Authority
-    - L1 Operate Manager
-    - L2 Operate Manager
-    - Risk Manager
+    - { role: Application Owner, abbrev: AO }
+    - { role: Primary Information Owner, abbrev: PIO }
+    - { role: Backup Information Owner, abbrev: BIO }
+    - { role: Chief Technology Officer, abbrev: CTO }
+    - { role: Design Authority, abbrev: DA }
+    - { role: Deployment Owner }
+    - { role: Deployment Information Owner }
+    - { role: Application Module Owner }
+    - { role: L1 Operate Manager }
+    - { role: L2 Operate Manager }
+    - { role: Operate Manager }
+    - { role: Site Reliability Engineer, abbrev: SRE }
+    - { role: Backup Application Owner, abbrev: BAO }
 
 counts:
   business_applications: 3
   ports_per_app: 2          # EventProcessing + BatchProcessing
-  memberships: 15           # 5 + 6 + 4; unchanged by the 2026-08-06 re-point (a swap, not an add)
-  distinct_roles: 8         # was 6; +Application Owner, +Chief Technology Officer(CTO) from 70001
-  distinct_employees: 15    # by SID; unchanged — the 70001 SIDs kept their positions
+  memberships: 31           # 13 (70001 full) + 12 (70002 wide) + 6 (70003 minimal)
+  distinct_roles: 13        # the SME's list of 2026-08-06, in full; every class appears on 70001
+  distinct_employees: 7     # by SID. WAS 15, and the drop is the POINT: SIDs are now
+                            # person-scoped, so the same seven people recur across roles and
+                            # across applications. 31 memberships over 7 people is what makes
+                            # the multi-role and multi-application shapes visible at all.
 
 open_questions:
   - id: two-port-derivation
