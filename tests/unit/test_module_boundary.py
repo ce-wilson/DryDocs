@@ -58,6 +58,10 @@ COMPONENT_GROUPS: dict[str, tuple[str, ...]] = {
     # Classified load, not review: the item chose drydocs-load because the verb sits
     # beside m1-verify/m3-verify and must work BEFORE the docmeta component exists
     # (Q6). RE-HOME it to docmeta if that component takes over corpus state.
+    # drydocs.seal_samples = generates the two SEAL fixtures REFRESH_REFERENCE_CHAIN
+    # declares (drydocs/data/ is gitignored, so they are built per machine, never
+    # committed). Load, same bucket as staging: it produces loader INPUT and its
+    # output filenames are the chain's own constants.
     "load": (
         "drydocs.loaders",
         "drydocs.cli",
@@ -65,6 +69,7 @@ COMPONENT_GROUPS: dict[str, tuple[str, ...]] = {
         "drydocs.staging",
         "drydocs.cmdline_staging",
         "drydocs.docs_verify",
+        "drydocs.seal_samples",
     ),
     # drydocs-review — SME review + graph acceptance + docs publish (Epic H).
     # The default-deny test below FORCES a new review module to be classified here

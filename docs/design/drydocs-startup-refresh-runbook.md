@@ -250,6 +250,18 @@ check; go to Troubleshooting.
 The recurring load on a READY system. Everything below runs against the bundled CSV
 samples; the Oracle variant is the same chain with scope binds.
 
+> **The two SEAL samples are NOT bundled — generate them once per machine.**
+> `drydocs/data/` is gitignored (*"may contain sensitive source data"*), and both
+> `seal_*__sample.csv` were deleted in 2026-07 for carrying real `seal_id` values. The
+> chain still declares them, and a missing sample **skips rather than fails** — you get
+> `No sample for seal_applications; skipping`, exit 0, and **no attribution nodes**,
+> which looks like a clean run. Generate them from the synthetic taxonomy capture:
+> ```powershell
+> poetry run python scripts/build_seal_samples.py
+> ```
+> Expect `rows_rejected=5` on the contact stage. That is correct, not a defect: four
+> role classes in the capture have no admissible source name yet (gate G35 §A3).
+
 1. **Reference data (M1 chain):**
    ```powershell
    poetry run drydocs refresh-reference           # catalog + SEAL + dev teams (+ snapshots)
