@@ -588,6 +588,31 @@
       "unblocks": []
     },
     {
+      "kind": "log-entry",
+      "date": "2026-08-06",
+      "title": "RECORD: rua load shapes, three partial rulings (G22; gate `rua-load-shapes`, still UNSIGNED)",
+      "status": "recorded",
+      "prompt_files": [
+        "config/gate-prompts/controlm-hosts-topology.yaml",
+        "config/gate-prompts/fid-identity-and-scope.yaml",
+        "config/gate-prompts/rua-load-shapes.yaml"
+      ],
+      "log_ref": "config/gate-log.md:1586",
+      "unblocks": [
+        "K7",
+        "K16",
+        "K17",
+        "K19",
+        "P1",
+        "P3",
+        "P5",
+        "G22",
+        "G45",
+        "J24",
+        "J32"
+      ]
+    },
+    {
       "kind": "prompt-only",
       "date": null,
       "title": "bmc-docs-example (gate page rendered — session not yet run)",
@@ -657,7 +682,7 @@
     {
       "kind": "prompt-only",
       "date": null,
-      "title": "fid-identity-and-scope (gate page rendered — session not yet run)",
+      "title": "fid-identity-and-scope (rulings/citations logged — gate sign-off not recorded)",
       "status": "open",
       "prompt_files": [
         "config/gate-prompts/fid-identity-and-scope.yaml"
@@ -673,7 +698,7 @@
     {
       "kind": "prompt-only",
       "date": null,
-      "title": "rua-load-shapes (gate page rendered — session not yet run)",
+      "title": "rua-load-shapes (rulings/citations logged — gate sign-off not recorded)",
       "status": "open",
       "prompt_files": [
         "config/gate-prompts/rua-load-shapes.yaml"

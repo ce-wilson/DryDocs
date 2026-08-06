@@ -1582,3 +1582,68 @@ or added.
   vocabulary and still emitted by the source, and it is the one whose absence costs
   something — §A2 pairs it with `technology_risk_controls`, a signed concept that
   nothing can write.
+
+## 2026-08-06 — RECORD: rua load shapes, three partial rulings (G22; gate `rua-load-shapes`, still UNSIGNED)
+
+- **Why a RECORD and not a sign-off.** The G22 session opened 2026-08-06 and ruled
+  three of its ~25 clauses before pausing. The gate is not signed and its terminus
+  still holds — nothing rua-shaped writes the graph. On the convention set the same
+  day for G35: **a confirmed clause inside an unsigned gate has no home in a log
+  organised by sign-off**, so it is written here in the same commit as the page
+  edit, or it exists only in a YAML file nobody re-reads.
+- **A1 — `m3_delegates_to` (AppUser -DELEGATES_TO-> ExecutionHost): HOLD, pending K17.**
+  Not declined — *blocked on identity*. `ControlMJob.run_as` carries the **linux
+  tenant name**, which is the functional-id NAME and not the directory key;
+  `fid-identity-and-scope` §A1/§A2 keys `:AppUser` on `fid` with `fid_name` a
+  property and an explicit, miss-rate-reported name→fid crosswalk. That gate is
+  **drafted and unsigned** (K17, preceded by the K16 census). No `AppUser`
+  constraint is deployed, so activating here would key the node on the NAME by
+  default — the exact silent split §A1 exists to prevent, made worse by §A3 leaving
+  name-reuse-after-retirement unresolved.
+- **A1's second half, and the reason it is not merely a sequencing nit.** SME
+  direction of 2026-08-05: a run-as account may be **registered to a different
+  application than the job's Control-M app code**. Registration is not attribution
+  (J32, the standing rule now in `docs/RELATIONSHIP_GUIDE.md`); no transitive read
+  job→account→application is permitted (fid §G2); the K2 FID tier is **mis-specified
+  rather than merely unimplemented**, harmless today only because the table is empty
+  (fid §G3); the disagreement is a **finding** with three readings distinguished per
+  case (fid §G4/§G5). The rua envelope corroborates presence and authors no identity.
+- **A2 — `m3_runs_on_etl_host`: DECLINED as redundant (SME).** ETL placement is *the
+  same fact* as job placement, so the entry would be a synonym splitting "where does
+  this run?" across two labels. The job side is already built and **active** (P3,
+  2026-07-27): `NODE_ID x CM_HOSTS.GRPNAME` → `RUNS_ON {host_group}` (2-hop, the
+  Control-M in-application load balancer); else `NODE_ID x CM_HOSTS.NODEID` →
+  `RUNS_ON {agent_host}` (1-hop, hard-coded); P4 census counts any NODE_ID matching
+  both.
+- **COLUMN CORRECTION, recorded because it nearly landed wrong.** The join is
+  **`NODE_ID`, never `GROUP_NAME`**. `psgmgr CM_DEF_VJOB.GROUP_NAME` is the vendor
+  `APPLGROUP` — the *application* group (schema-crosswalk §COL) — which is the exact
+  collision gate `controlm-hosts-topology` named the class `ControlMHostGroup` to
+  avoid (signed 2026-07-09; guarded in `controlm_hosts.cypher:8` and
+  `ontology_supplement.cypher:104`). Two different fields, both spellable as
+  "group": **J32's read-the-field's-job rule, third observed instance.**
+- **A2's follow-up build (not done at the gate, per §I1):** `m3_runs_on_etl_host`
+  goes `planned → deprecated` pointing at `m3_runs_on_agent_host` /
+  `m3_runs_on_host_group`, and `ontology_supplement.cypher` trims its documented
+  role enum from `(host_group | agent_host | etl_host)`. Grooms as an item; nothing
+  in the vocabulary changed today.
+- **H3 — CONFIRMED, added at the session.** A job resolving **1-hop** where its peers
+  resolve 2-hop is a **finding**: it is pinned off its load-balanced host group and
+  therefore **has no failover**. SME evidence: development teams do not always know
+  what belongs in the Control-M GUI host field and hard-code a server name there, so
+  a 1-hop edge is frequently a mis-filled field rather than a deliberate pin.
+  Reported, never auto-corrected — the two are indistinguishable in the data and
+  only a human knows which (the H2 / P5 remediation-feeder pattern). Costs no new
+  machinery: the `role` property, `r.source`, and `drydocs/cli.py`'s `pinned_host`
+  already carry it. What H3 adds is that the difference is a **finding**, not a
+  formatting detail.
+- **D3 SME INPUT (not a ruling): `CM_HOSTS.NODEID` is the REAL SERVER NAME.** So the
+  rua envelope's host meets `:ExecutionHost` on `nodeid` directly, the deployed
+  `executionhost_nodeid` UNIQUE constraint stands as the key, and the
+  **not-replicated** `CMS_MACHINE_MAP` (NODEID → HOSTNAME + DOMAIN_NAME) is not on
+  the critical path after all — the join that looked blocked is available. D3 still
+  has to rule the spelling on each side (`rua_host` vs `rua_fqdn`), the AppUser half
+  (blocked behind A1/K17), and what `cross_host_collisions` means.
+- **Still open — everything else:** A3/A4/A5/A6, rider R2 (B1-or-B2 + B3), C1–C3,
+  D1/D2/D4, E1–E3, F1–F2, G1–G2, H1–H2, I1–I3, and §J sign-off. G22 stays
+  `in_progress`; the terminus holds.
