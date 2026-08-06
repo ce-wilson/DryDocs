@@ -610,6 +610,8 @@
         "G45",
         "J24",
         "G55",
+        "G56",
+        "G57",
         "J32"
       ]
     },
@@ -627,7 +629,9 @@
         "G22",
         "G45",
         "J24",
-        "G55"
+        "G55",
+        "G56",
+        "G57"
       ]
     },
     {
@@ -644,7 +648,28 @@
         "G22",
         "G45",
         "J24",
-        "G55"
+        "G55",
+        "G56",
+        "G57"
+      ]
+    },
+    {
+      "kind": "log-entry",
+      "date": "2026-08-06",
+      "title": "RECORD: rua load shapes, D-AMENDMENT — shared storage breaks the independence assumption (G22; gate `rua-load-shapes`, still UNSIGNED)",
+      "status": "recorded",
+      "prompt_files": [
+        "config/gate-prompts/rua-load-shapes.yaml"
+      ],
+      "log_ref": "config/gate-log.md:1792",
+      "unblocks": [
+        "K7",
+        "G22",
+        "G45",
+        "J24",
+        "G55",
+        "G56",
+        "G57"
       ]
     },
     {

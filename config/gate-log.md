@@ -1788,3 +1788,74 @@ or added.
   territory (PROV/ORG), **never** an SWO binding.
 - **Still open:** D1/D2/D4, E1–E3, F1–F2, G1–G2, H1–H2, I1–I3, §J sign-off.
   Sections A, B, C and H3 are done.
+
+## 2026-08-06 — RECORD: rua load shapes, D-AMENDMENT — shared storage breaks the independence assumption (G22; gate `rua-load-shapes`, still UNSIGNED)
+
+- **Status of section D: D1, D2 and D4 REMAIN UNTICKED.** This entry records SME
+  *direction* that constrains what they may say; it does not rule them. D3's
+  ExecutionHost half is settled (NODEID is the real server name); its AppUser
+  half holds behind K17 with A1 and C1.
+- **The caveat.** A deployment path may be **shared** — the SME's case is roughly
+  20 VSI hosts against one shared filesystem — and then the same path on N hosts
+  is **one file seen N times**, not N deployments.
+- **Not derivable from any bundle we hold.** The collector captures **no mount
+  table** — no `findmnt`, no `/proc/mounts`, no `df`. The envelope carries
+  `scan_roots` but never which filesystem a root sits on, and the ownership
+  sweep's `-xdev` stays on one filesystem without recording which. So today this
+  is a declaration, not an inference.
+- **It reaches IDENTITY, not only semantics.** Path-keying merges
+  same-path-across-hosts into one node — **correct** under shared storage,
+  **ambiguous** under local storage, where two hosts may hold genuinely different
+  content at the same path. That is two artifacts sharing a path, and a merge
+  would report drift on things that were never the same file. Content hash is the
+  only discriminator and the metadata-only listings (premise 2) carry none, so
+  with scope unknown **and** no hash the case is undecidable from data.
+- **THE CONSEQUENCE THAT MATTERS.** §G2 drift detection and the G24 corroboration
+  both assume occurrences are **independent observations**. N views of one file
+  are **one** observation — compare them and they always agree, which
+  manufactures confidence rather than establishing it. So **`storage_scope:
+  unknown` must not default to independent**: it suppresses the corroboration
+  claim and counts the node identity-unconfirmed-across-hosts. That count is the
+  review queue.
+- **Correction to the session's own earlier reading.** `cross_host_collisions`
+  was recommended as a measure of **deployment** breadth. Under shared storage it
+  measures **mount** breadth — a different fact. Recorded because the wrong
+  reading was already on the page.
+- **Shape the amendment adds:** occurrences carry `mount_root` + `fstype` +
+  `storage_scope` (local | shared | unknown). A storage-locus **node is
+  DEFERRED, not declined** — minting it now would create an entity with no
+  source, since no bundle carries a storage inventory. Carrying `mount_root`
+  from the start makes promoting it later cheap; un-minting a node class is not.
+- **THE COLLECTOR WORKAROUND (SME direction) — make it derived instead of
+  declared.** Three refinements taken at the session:
+  1. **`lsblk` cannot answer it.** `server:/path` is an **NFS** mount spec and
+     NFS is not a block device, so it never appears in `lsblk`. The mount table
+     is the only source: `findmnt -rn -o SOURCE,TARGET,FSTYPE,OPTIONS`, with
+     `/proc/mounts` as the no-`findmnt` fallback. Both read-only; no privilege
+     change to the collector's safety story.
+  2. **`/etc/fstab` is configured INTENT, not actual state.** Autofs, systemd and
+     manual mounts are mounted without appearing there; stale lines appear
+     without being mounted. Capture actual state.
+  3. **"On the SAN" does not mean shared** — the correction that changes the
+     answer. Twenty hosts each with their **own LUN** from one array is twenty
+     separate filesystems and twenty files that genuinely drift; twenty hosts
+     mounting **one NFS export** is one file seen twenty times. **Sharing follows
+     from FSTYPE, never from the array** — nfs/nfs4/cifs shared, xfs/ext4
+     single-host unless gfs2/ocfs2 clustered. The `type` column the SME named is
+     the load-bearing one, and `lsblk` alone would actively mislead.
+- **T14 CAVEAT WITHDRAWN on SME correction:** nothing has been loaded yet and the
+  company-side twin collector is **not present**, so a bundle schema bump costs
+  no convergence debt. This is the cheapest moment it will ever be.
+- **What the workaround does NOT remove:** bundles already collected stay
+  scope-unknown, so the `unknown`-suppresses-corroboration rule stands either
+  way. The collector change reduces how often that state occurs; it does not
+  retire it.
+- **Groomed, not built at the gate** — capturing a fact is an instrument change,
+  not a decision about what an edge means, and the collector runs on production
+  hosts. **G56** = the mount capture (schema v3, optional section, derived
+  `storage_scope`). **G57** = the `rua_*` → `bkup_*` rename the SME made, which
+  is cheap NOW precisely because nothing has been loaded: renaming a property
+  already on nodes is a migration, renaming one never written is an edit. G57
+  deliberately does **not** rewrite this log's history, and follows the
+  source-registry v2 §Q6 precedent for the gate id — rename transfers with one
+  amendment entry, nothing is re-gated.
