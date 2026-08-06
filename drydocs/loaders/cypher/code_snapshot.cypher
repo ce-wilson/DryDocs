@@ -1,7 +1,8 @@
 // =============================================================================
 // code_snapshot.cypher  —  knowledge/depgraph-snapshots/drydocs-*.json ->
 //                          :Project + :CodeModule + HAS_MODULE + IMPORTS +
-//                          IS_ENCODED_IN
+//                          IS_ENCODED_IN + HAS_MEDIA_TYPE (SME ruling 2026-08-05;
+//                          the containment tree loads separately, code_tree.cypher)
 //
 // Gate: self-documentation-code-graph SIGNED OFF 2026-07-27 (config/gate-log.md;
 // spec config/gate-prompts/self-documentation-code-graph.yaml). Bindings:
@@ -84,6 +85,22 @@ FOREACH (l IN CASE WHEN lang IS NULL THEN [] ELSE [lang] END |
                   enc.loader        = $loader
   SET enc.last_seen_at = datetime($loaded_at),
       enc.last_run_id  = $run_id
+)
+
+// Media-type binding (u2_has_media_type; SME ruling 2026-08-05) — same shape
+// as IS_ENCODED_IN: the adapter derives row.media_type_iri from the extension
+// (case-folded), null = no seeded term, edge skipped. Targets the seeded
+// :MediaType terms (ontology.cypher) — a mapped term missing from the graph
+// means bootstrap has not run.
+WITH row, m
+OPTIONAL MATCH (fmt:OntologyTerm:MediaType {iri: row.media_type_iri})
+FOREACH (f IN CASE WHEN fmt IS NULL THEN [] ELSE [fmt] END |
+  MERGE (m)-[hmt:HAS_MEDIA_TYPE]->(f)
+    ON CREATE SET hmt.first_seen_at = datetime($loaded_at),
+                  hmt.source        = 'depgraph-snapshot',
+                  hmt.loader        = $loader
+  SET hmt.last_seen_at = datetime($loaded_at),
+      hmt.last_run_id  = $run_id
 )
 
 // Dependencies (u1_imports) — importer -> imported (§D1). Rows with no

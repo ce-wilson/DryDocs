@@ -77,6 +77,76 @@ class CodeModuleRow(BaseModel):
         "None = no seeded term, IS_ENCODED_IN edge skipped for this row.",
     )
 
+    # ---- media-type binding (SME ruling 2026-08-05) ------------------------
+    media_type_iri: str | None = Field(
+        default=None,
+        description="IRI of the seeded MediaType format term derived from extension "
+        "(IANA registration page for registered types, drydocs.local/format# for "
+        "conventional unregistered ones); None = no seeded term, HAS_MEDIA_TYPE "
+        "edge skipped for this row.",
+    )
+
+    # ---- :Project root + snapshot provenance (denormalized meta) -----------
+    project_id: str = Field(
+        ...,
+        min_length=1,
+        description="The single :Project root key (§B1(a)) — 'drydocs' for this repo.",
+    )
+    captured_at: str = Field(..., description="meta.captured_at ISO timestamp of the snapshot.")
+    git_commit: str = Field(
+        default="", description="meta.git.commit (short) the snapshot describes."
+    )
+    git_full: str = Field(default="", description="meta.git.full — full commit hash.")
+    git_branch: str = Field(default="", description="meta.git.branch at capture.")
+    git_dirty: bool = Field(
+        default=False, description="meta.git.dirty — worktree had uncommitted changes."
+    )
+
+
+class CodeDirectoryRow(BaseModel):
+    """One :CodeDirectory node row + its outbound CONTAINS_ENTRY children.
+
+    Tree-loader companion to :class:`CodeModuleRow` (SME ruling 2026-08-05
+    admitting the containment tree the G33 gate deferred). One row per
+    DIRECTORY node of the tree snapshot; children come from the v2 ``rels``
+    section split by the child node's ``kind``. The repo-root directory row
+    carries ``is_root=True`` — the Cypher authors its edges from the single
+    :Project node and never creates a :CodeDirectory for it (gate §B1(a)
+    holds: one root, no duplicate).
+    """
+
+    model_config = ConfigDict(
+        populate_by_name=True,
+        str_strip_whitespace=True,
+        extra="ignore",
+    )
+
+    file_id: str = Field(
+        ...,
+        min_length=1,
+        description=":CodeDirectory key — repo-relative path (project_id for the root row).",
+    )
+    is_root: bool = Field(
+        default=False,
+        description="True for the repo-root directory: edges author from :Project, "
+        "no :CodeDirectory node is created.",
+    )
+    name: str = Field(..., description="Bare directory name.")
+    rel_path: str = Field(..., description="Path relative to the repo root ('.' for the root).")
+    project: str = Field(
+        ...,
+        min_length=1,
+        description="Top-level path segment property, same convention as CodeModuleRow.",
+    )
+    child_dir_ids: list[str] = Field(
+        default_factory=list,
+        description="file_ids of immediate child DIRECTORIES (CONTAINS_ENTRY targets).",
+    )
+    child_file_ids: list[str] = Field(
+        default_factory=list,
+        description="file_ids of immediate child FILES (CONTAINS_ENTRY targets).",
+    )
+
     # ---- :Project root + snapshot provenance (denormalized meta) -----------
     project_id: str = Field(
         ...,

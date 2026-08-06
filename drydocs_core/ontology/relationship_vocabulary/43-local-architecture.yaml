@@ -161,6 +161,60 @@
     loader:       code_snapshot.v1
     domain:       architecture
     status:       active
+  - id:           u2_contains_entry
+    neo4j_label:  CONTAINS_ENTRY
+    inverse_label: "entry of"
+    role:         ~
+    from_node:    CodeDirectory
+    to_node:      CodeModule
+    prov_maps_to: "prov:hadMember"
+    sosa_maps_to: ~
+    note: >
+      Filesystem containment — parent directory holds this entry. SME RULING
+      2026-08-05 (direct in-session instruction): the G33 gate's deferred
+      ":Directory + CONTAINS" decision is ADMITTED; the all-files tree loads
+      whole. Polymorphic by design: parent is :Project at the repo root (the
+      root dir node maps onto the existing single :Project — B1(a) holds, no
+      duplicate root) and :CodeDirectory below; child is :CodeDirectory or
+      :CodeModule. ONE label for the whole tree so path traversal is a single
+      -[:CONTAINS_ENTRY*]-> pattern; the CONTAINS_JOB/CONTAINS_FOLDER
+      per-kind precedent was deliberately not followed (two child kinds would
+      force two labels and break traversal). Edges come from the snapshot's
+      v2 `rels` section — read from the tree, never guessed from path strings
+      (the 1800-rel section the loader previously warned it did not load).
+      prov:hadMember, Collection -> any matrix row.
+    supplement:   ontology_supplement.cypher
+    loader:       code_tree.v1
+    domain:       architecture
+    status:       active
+  - id:           u2_has_media_type
+    neo4j_label:  HAS_MEDIA_TYPE
+    inverse_label: "media type of"
+    role:         ~
+    from_node:    CodeModule
+    to_node:      MediaType
+    prov_maps_to: ~
+    sosa_maps_to: ~
+    note: >
+      File -> its serialization format, derived from node.extension exactly as
+      u1_is_encoded_in derives language (the E1(b) precedent: bind to a seeded
+      term, derive from data the artifact carries, invent nothing). SME RULING
+      2026-08-05: the non-.py majority of the tree snapshot (~1,140 files) gets
+      typed. Targets seeded :MediaType terms (ontology.cypher): IANA-registered
+      types carry the IANA registration page as iri (the DCAT convention;
+      each verified against iana.org at seeding — incl. application/toml
+      reg. 2024-10-21 and application/vnd.mermaid reg. 2023-09-18);
+      conventional unregistered types (TypeScript, PowerShell, Cypher,
+      Jupyter) carry drydocs.local/format# IRIs + registered:false — an
+      IANA-shaped iri for an unregistered type would fabricate a registration.
+      Extensions with neither binding ('', .example, .lock, .conf) stay unbound
+      and are CLI-reported, never guessed. Maps to dcat:mediaType (non-PROV
+      standard, hence prov_maps_to null). Format, not language: .py gets
+      IS_ENCODED_IN, not this edge.
+    supplement:   ontology_supplement.cypher
+    loader:       code_snapshot.v1
+    domain:       architecture
+    status:       active
   - id:           u1_is_encoded_in
     neo4j_label:  IS_ENCODED_IN
     inverse_label: "encodes"

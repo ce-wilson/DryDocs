@@ -418,3 +418,53 @@ MERGE (n:OntologyTerm:LocalRelationship {iri: "https://drydocs.local/ontology#is
 MATCH (local:OntologyTerm:LocalRelationship {iri: "https://drydocs.local/ontology#isEncodedIn"})
 MATCH (swo:OntologyTerm:SwoProperty         {iri: "http://www.ebi.ac.uk/swo/SWO_0000741"})
 MERGE (local)-[:MAPS_TO]->(swo);
+
+// --- Containment tree + format layer (SME ruling 2026-08-05) ----------------
+// The G33 gate deferred directories and non-Python typing ("a gate decision").
+// The SME admitted both by direct in-session ruling 2026-08-05: the all-files
+// tree snapshot loads whole — :CodeDirectory nodes, CONTAINS_ENTRY edges, and
+// a media-type binding for the non-.py files IS_ENCODED_IN cannot cover.
+
+MERGE (n:OntologyTerm:LocalClass {iri: "https://drydocs.local/ontology#CodeDirectory"})
+  SET n.label = "Code Directory",
+      n.notes = "One source-tree DIRECTORY (prov:Collection — it collects its entries), keyed "
+              + "on file_id = repo-relative path, sharing the CodeModule key space (a path is "
+              + "a dir or a file, never both). The repo ROOT directory is NOT a CodeDirectory "
+              + "— it is the :Project node (one root per repo, gate B1(a) holds).";
+MATCH (lc:OntologyTerm:LocalClass {iri: "https://drydocs.local/ontology#CodeDirectory"})
+MATCH (pc:OntologyTerm:ProvClass  {iri: "http://www.w3.org/ns/prov#Collection"})
+MERGE (lc)-[r:SUBCLASS_OF]->(pc)
+  ON CREATE SET r.source = "drydocs.ontology_supplement";
+
+// CONTAINS_ENTRY  —  Project|CodeDirectory → CodeDirectory|CodeModule  (prov:hadMember; u2_contains_entry)
+MERGE (n:OntologyTerm:LocalRelationship {iri: "https://drydocs.local/ontology#containsEntry"})
+  SET n.label  = "CONTAINS_ENTRY",
+      n.domain = "CodeDirectory",
+      n.range  = "CodeModule",
+      n.notes  = "Filesystem containment: parent directory holds this entry. ONE label for the "
+               + "whole tree (parent is :Project at the root, :CodeDirectory below; child is a "
+               + "dir or a file) so path traversal is a single -[:CONTAINS_ENTRY*]-> pattern — "
+               + "the CONTAINS_JOB/CONTAINS_FOLDER per-kind precedent was deliberately NOT "
+               + "followed here (two child kinds would force two labels and break traversal). "
+               + "prov:hadMember, Collection -> any matrix row. Edges come from the snapshot's "
+               + "v2 rels section, read from the tree, never guessed from path strings.";
+MATCH (local:OntologyTerm:LocalRelationship {iri: "https://drydocs.local/ontology#containsEntry"})
+MATCH (prov:OntologyTerm:ProvProperty       {iri: "http://www.w3.org/ns/prov#hadMember"})
+MERGE (local)-[:MAPS_TO]->(prov);
+
+// HAS_MEDIA_TYPE  —  CodeModule → MediaType  (dcat:mediaType; u2_has_media_type)
+MERGE (n:OntologyTerm:LocalRelationship {iri: "https://drydocs.local/ontology#hasMediaType"})
+  SET n.label  = "HAS_MEDIA_TYPE",
+      n.domain = "CodeModule",
+      n.range  = "MediaType",
+      n.notes  = "File -> its serialization format, derived from node.extension exactly as "
+               + "IS_ENCODED_IN derives language (the E1(b) precedent: bind to a seeded term, "
+               + "derive from data the artifact carries, invent nothing). Targets the seeded "
+               + ":MediaType terms (ontology.cypher): IANA-registered types carry the IANA "
+               + "registration page as iri; conventional unregistered types (TypeScript, "
+               + "PowerShell, Cypher, Jupyter) carry local IRIs + registered:false. Realises "
+               + "dcat:mediaType. Format, not language — a .py module gets IS_ENCODED_IN, "
+               + "not this edge.";
+MATCH (local:OntologyTerm:LocalRelationship {iri: "https://drydocs.local/ontology#hasMediaType"})
+MATCH (dcat:OntologyTerm:DcatProperty       {iri: "http://www.w3.org/ns/dcat#mediaType"})
+MERGE (local)-[:MAPS_TO]->(dcat);

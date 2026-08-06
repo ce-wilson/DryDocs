@@ -162,3 +162,7 @@ CREATE CONSTRAINT feedback_note_key   IF NOT EXISTS FOR (f:FeedbackNote)        
 // m1-verify, NOT a constraint — Neo4j cannot declare label exclusion (§F1).
 CREATE CONSTRAINT project_id          IF NOT EXISTS FOR (p:Project)             REQUIRE p.project_id IS UNIQUE;
 CREATE CONSTRAINT codemodule_file_id  IF NOT EXISTS FOR (m:CodeModule)          REQUIRE m.file_id IS UNIQUE;
+// :CodeDirectory shares the file_id key space with :CodeModule (both are
+// repo-relative paths; a path is a dir or a file, never both — SME ruling
+// 2026-08-05, admitting the containment tree the G33 gate deferred).
+CREATE CONSTRAINT codedirectory_file_id IF NOT EXISTS FOR (d:CodeDirectory)     REQUIRE d.file_id IS UNIQUE;

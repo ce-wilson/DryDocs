@@ -153,6 +153,10 @@ MERGE (n:SchemaMeta:Project {name: 'Project'})
   SET n.class = 'dd:Project', n.prov_type = 'Collection';
 MERGE (n:SchemaMeta:CodeModule {name: 'CodeModule'})
   SET n.class = 'dd:CodeModule', n.prov_type = 'Entity';
+MERGE (n:SchemaMeta:CodeDirectory {name: 'CodeDirectory'})
+  SET n.class = 'dd:CodeDirectory', n.prov_type = 'Collection';
+// (no node_classifications entry)
+MERGE (n:SchemaMeta:MediaType {name: 'MediaType'});
 // (no node_classifications entry)
 MERGE (n:SchemaMeta:SwoClass {name: 'SwoClass'});
 // (no node_classifications entry)
@@ -395,6 +399,14 @@ MERGE (a)-[r:HAS_MODULE]->(b)
 MATCH (a:SchemaMeta {name: 'CodeModule'})
 MERGE (a)-[r:IMPORTS]->(a)
   SET r.vocab_id = 'u1_imports', r.prov_maps_to = 'prov:wasDerivedFrom', r.domain = 'architecture', r.status = 'active';
+
+MATCH (a:SchemaMeta {name: 'CodeDirectory'}), (b:SchemaMeta {name: 'CodeModule'})
+MERGE (a)-[r:CONTAINS_ENTRY]->(b)
+  SET r.vocab_id = 'u2_contains_entry', r.prov_maps_to = 'prov:hadMember', r.domain = 'architecture', r.status = 'active';
+
+MATCH (a:SchemaMeta {name: 'CodeModule'}), (b:SchemaMeta {name: 'MediaType'})
+MERGE (a)-[r:HAS_MEDIA_TYPE]->(b)
+  SET r.vocab_id = 'u2_has_media_type', r.prov_maps_to = null, r.domain = 'architecture', r.status = 'active';
 
 MATCH (a:SchemaMeta {name: 'CodeModule'}), (b:SchemaMeta {name: 'SwoClass'})
 MERGE (a)-[r:IS_ENCODED_IN]->(b)
