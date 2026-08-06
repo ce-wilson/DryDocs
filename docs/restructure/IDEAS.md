@@ -62,6 +62,17 @@ question a 1,000-line file with the trail at the bottom could not answer.
 
 <!-- add new ideas at the top -->
 
+- **`Idea-76`** · 2026-08-06 · `[chore]` · **open** · prio? **Med** —
+  **The port ledger stops at step 101 / `a14a802`, and ten commits have landed
+  since — including the whole G22 gate session.** The internal port that started
+  2026-08-06 classified the range ending at `a14a802`, so everything after it is
+  outside what the company side has seen: `180f4ae` (the SEAL sample generator —
+  already flagged as owed step 102), the five G22 gate commits, the desktop's two
+  code-graph asset-skip rulings, and the `.ksh` → SWO binding in
+  `code_snapshot.py`. Two of those are code changes, not just gate prose. Roll the
+  ledger before the next port so the company side is classifying a range that ends
+  somewhere deliberate. *(Noticed at the G22 session close, laptop.)*
+
 - **`Idea-75`** · 2026-08-06 · `[bug]` · **open — needs a K5 amendment gate, not an edit** · prio? **High** —
   **`tech_partner` is scoped to a node class that has no rows and no loader, and
   the SME says it belongs one level up.** SME, in-chat 2026-08-06: *"in the catalog
