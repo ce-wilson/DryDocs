@@ -1,16 +1,16 @@
 {
   "meta": {
     "project": "drydocs",
-    "captured_at": "2026-08-06T17:07:28",
+    "captured_at": "2026-08-06T18:04:39",
     "date": "20260806",
     "scan": "DryDocs",
     "tree": true,
     "git": {
-      "commit": "c2a6f58",
-      "full": "c2a6f5871c5eb4865e9710dfbd8e8c84ddb9d483",
+      "commit": "2e7da36",
+      "full": "2e7da36cbcdc2c7a05bf15026a7f1972688a5813",
       "branch": "main",
-      "describe": "c2a6f58",
-      "subject": "fix(config): N8 done - the four unregistered-source map entries ruled per entry",
+      "describe": "2e7da36",
+      "subject": "chore(backlog): groom - 7 promoted (O45-O51, the SME Context-Intake page slices from Idea-78)",
       "dirty": false,
       "pr": null
     },
@@ -5986,6 +5986,15 @@
       "name": "sme-agent-test-runbook.md",
       "extension": ".md",
       "rel_path": "UI-WIP/sme-agent-test-runbook.md",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/UI-WIP/sme-intake-page-plan.md",
+      "name": "sme-intake-page-plan.md",
+      "extension": ".md",
+      "rel_path": "UI-WIP/sme-intake-page-plan.md",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -12903,10 +12912,10 @@
       "kind": "file"
     },
     {
-      "file_id": "drydocs/knowledge/depgraph-snapshots/drydocs-20260806-1659.json",
-      "name": "drydocs-20260806-1659.json",
+      "file_id": "drydocs/knowledge/depgraph-snapshots/drydocs-20260806.json",
+      "name": "drydocs-20260806.json",
       "extension": ".json",
-      "rel_path": "knowledge/depgraph-snapshots/drydocs-20260806-1659.json",
+      "rel_path": "knowledge/depgraph-snapshots/drydocs-20260806.json",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -22846,6 +22855,11 @@
     [
       "drydocs/UI-WIP",
       "CONTAINS",
+      "drydocs/UI-WIP/sme-intake-page-plan.md"
+    ],
+    [
+      "drydocs/UI-WIP",
+      "CONTAINS",
       "drydocs/UI-WIP/sme-ui-launch-guide.md"
     ],
     [
@@ -26631,7 +26645,7 @@
     [
       "drydocs/knowledge/depgraph-snapshots",
       "CONTAINS",
-      "drydocs/knowledge/depgraph-snapshots/drydocs-20260806-1659.json"
+      "drydocs/knowledge/depgraph-snapshots/drydocs-20260806.json"
     ],
     [
       "drydocs/knowledge/depgraph-snapshots",
@@ -28443,13 +28457,13 @@
     "projects": [
       "drydocs"
     ],
-    "files": 1542,
+    "files": 1543,
     "edges": 780,
     "circular_files": 0,
     "processes": 0,
     "data_assets": 0,
     "hosts": 0,
-    "rels": 1805,
+    "rels": 1806,
     "directories": 264
   }
 }
