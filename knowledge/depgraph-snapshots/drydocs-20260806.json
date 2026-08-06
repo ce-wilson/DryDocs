@@ -1,17 +1,17 @@
 {
   "meta": {
     "project": "drydocs",
-    "captured_at": "2026-08-06T16:59:19",
+    "captured_at": "2026-08-06T17:07:28",
     "date": "20260806",
     "scan": "DryDocs",
     "tree": true,
     "git": {
-      "commit": "0cede10",
-      "full": "0cede10990ea8080f415fba1164c738e690b1f0c",
+      "commit": "c2a6f58",
+      "full": "c2a6f5871c5eb4865e9710dfbd8e8c84ddb9d483",
       "branch": "main",
-      "describe": "0cede10",
-      "subject": "chore(backlog): claim N8 + O42 (desktop) - the load-map source rulings and the web/ import edges",
-      "dirty": true,
+      "describe": "c2a6f58",
+      "subject": "fix(config): N8 done - the four unregistered-source map entries ruled per entry",
+      "dirty": false,
       "pr": null
     },
     "depgraph": {
@@ -12903,10 +12903,10 @@
       "kind": "file"
     },
     {
-      "file_id": "drydocs/knowledge/depgraph-snapshots/drydocs-20260806.json",
-      "name": "drydocs-20260806.json",
+      "file_id": "drydocs/knowledge/depgraph-snapshots/drydocs-20260806-1659.json",
+      "name": "drydocs-20260806-1659.json",
       "extension": ".json",
-      "rel_path": "knowledge/depgraph-snapshots/drydocs-20260806.json",
+      "rel_path": "knowledge/depgraph-snapshots/drydocs-20260806-1659.json",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -26631,7 +26631,7 @@
     [
       "drydocs/knowledge/depgraph-snapshots",
       "CONTAINS",
-      "drydocs/knowledge/depgraph-snapshots/drydocs-20260806.json"
+      "drydocs/knowledge/depgraph-snapshots/drydocs-20260806-1659.json"
     ],
     [
       "drydocs/knowledge/depgraph-snapshots",
