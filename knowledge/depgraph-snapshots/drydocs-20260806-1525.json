@@ -1,16 +1,16 @@
 {
   "meta": {
     "project": "drydocs",
-    "captured_at": "2026-08-06T14:46:17",
+    "captured_at": "2026-08-06T15:25:26",
     "date": "20260806",
     "scan": "DryDocs",
     "tree": true,
     "git": {
-      "commit": "5359b00",
-      "full": "5359b0008ad84e208f18753b1f6e3d58a614f0bc",
+      "commit": "6a11064",
+      "full": "6a11064926e6e1e66efff1ec53e9c80e4ecd50f9",
       "branch": "main",
-      "describe": "5359b00",
-      "subject": "fix(code-graph): image files are not code-graph content (SME ruling 2026-08-06)",
+      "describe": "6a11064",
+      "subject": "fix(code-graph): fonts join images - the asset-class skip (SME revisit 2026-08-06)",
       "dirty": false,
       "pr": null
     },
@@ -12902,10 +12902,10 @@
       "kind": "file"
     },
     {
-      "file_id": "drydocs/knowledge/depgraph-snapshots/drydocs-20260805-2254.json",
-      "name": "drydocs-20260805-2254.json",
+      "file_id": "drydocs/knowledge/depgraph-snapshots/drydocs-20260806.json",
+      "name": "drydocs-20260806.json",
       "extension": ".json",
-      "rel_path": "knowledge/depgraph-snapshots/drydocs-20260805-2254.json",
+      "rel_path": "knowledge/depgraph-snapshots/drydocs-20260806.json",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -25726,7 +25726,7 @@
     [
       "drydocs/knowledge/depgraph-snapshots",
       "CONTAINS",
-      "drydocs/knowledge/depgraph-snapshots/drydocs-20260805-2254.json"
+      "drydocs/knowledge/depgraph-snapshots/drydocs-20260806.json"
     ],
     [
       "drydocs/knowledge/depgraph-snapshots",
