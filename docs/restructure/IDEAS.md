@@ -62,6 +62,44 @@ question a 1,000-line file with the trail at the bottom could not answer.
 
 <!-- add new ideas at the top -->
 
+- **`Idea-75`** · 2026-08-06 · `[bug]` · **open — needs a K5 amendment gate, not an edit** · prio? **High** —
+  **`tech_partner` is scoped to a node class that has no rows and no loader, and
+  the SME says it belongs one level up.** SME, in-chat 2026-08-06: *"in the catalog
+  there is a role hierarchy ProductCatalog-Product with role 'Tech Partner'"* — i.e.
+  Tech Partner attaches at the **Product** level. The signed K5 gate
+  (product-cabinet-attribution, 2026-07-20) ruled the opposite: §B118 records
+  *"tech_partner ALSO attaches ONLY to :AreaProduct"*, and
+  `catalog_ontology_supplement.cypher:373-374` seeds it `scope = "AreaProduct"`.
+  **The repo's own company role doc agrees with the SME, not with the gate.**
+  `docs/Product/technology_roles_and_responsibilities.md` defines Tech Partner as
+  *"accountable technology leader **for a product**"* and lists **Area Tech
+  Partner** as a SEPARATE role (*"owns the technical strategy for the domain"*),
+  noting a Tech Partner *"may also assume Area Tech Partner responsibilities based
+  on product size"* — which is exactly the kind of overlap that makes two roles look
+  like one. K5's stated basis for the AreaProduct scope was *"the rename history
+  naming it the area-product role"*, so the likeliest reading is that the two roles
+  were conflated at the gate.
+  **Two consequences, both measurable now.** (1) `area_products: 0` in
+  `config/taxonomy/lob-product-team.yaml` and `catalog_has_area_product` is still
+  `status: planned` — so `tech_partner` is scoped exclusively to a node class with
+  zero instances and no loader, making it **a signed concept nothing can write**.
+  That is precisely the `technology_risk_controls` failure mode (G35 §A2) reproduced
+  on the catalog side, and it went unnoticed for the same reason: nothing tests that
+  a seeded concept is reachable. (2) If Tech Partner is product-level, then **Area
+  Tech Partner has no concept at all** in a scheme K5 fixed at exactly 7 — the first
+  worked example on this side of what a FIXED scheme costs.
+  **Do NOT fix by editing the supplement.** K5 is signed; per CLAUDE.md a signed
+  ruling is re-opened through a gate. Needs a K5-amendment gate on the G35 model
+  (G35 amends the 2026-07-10 §B the same way). Note G35's scope fence explicitly
+  declines to reopen K5, so this cannot be folded into that walk.
+  *Adjacent but separate:* the SME also ruled 2026-08-06 that the SEAL-side
+  `"tech partner" -> "CTO"` alias STAYS (G35 §A6). That is about a contact-extract
+  NAME; this is about which catalog node the ProductRole attaches to. Both true at
+  once — but if Tech Partner is product-level, K5's change_note (*"this area-product
+  role was formerly named 'CTO' in SEAL; SEAL's CTO now denotes the product-level
+  role"*) needs re-reading at the same gate, because its two halves may have been
+  describing the same level.
+
 - **`Idea-74`** · 2026-08-05 · `[source]` · **open — user decision, blocks O44 column 3** · prio? **Med** —
   **Does DryDocs ingest the ServiceNow queue/assignment-group export, and
   producer-side or company-side?** O44's third column wants the SNOW queues that
