@@ -1529,3 +1529,56 @@ or added.
   Reliability Engineer) cannot be loaded at all — they hit the same
   `unrecognised SEAL role` refusal, which is §A3's question and is untouched by this
   fix.
+
+## 2026-08-06 — RECORD: Tech Partner → CTO alias KEPT; Chief Business Technologist restored as an optional, deliberately unmapped role (G35 §A6 + G10)
+
+- **What this records:** two in-chat SME rulings of 2026-08-06, on the G51/X1 RECORD
+  idiom (direction, not a gate session). *"Leave the product catalog role 'Tech
+  Partner' maps to seal contact 'Chief Technology Officer (CTO)'. Make one update for
+  SEAL, add optional role: Chief Business Technologist (CBT) but do not create a
+  cypher relationship mapping for it, in case it appears."* Between them they dispose
+  of **§A6** and the whole of **G10** — the first register line answered outright.
+- **Ruling 1 — the alias stays.** `_ROLE_CANONICAL["tech partner"] = "CTO"` is
+  CONFIRMED as a deliberate name crosswalk rather than a stale leftover. What it
+  asserts is narrow and is recorded that way: **the two role families use different
+  names for the same accountable person**, so a contact row saying Tech Partner means
+  the SEAL CTO contact. K5's own rename history corroborates it — the area-product
+  Tech Partner was formerly named CTO in SEAL.
+- **Ruling 2 — CBT is a class, and it is optional.** Chief Business Technologist is a
+  role class in its own right, **not** an alias of Chief Technology Officer, and it is
+  OPTIONAL. Admissible so a row is never refused; deliberately absent from the concept
+  crosswalk so it arrives flagged for review.
+- **NEITHER RULING NEEDED A CODE CHANGE, and that is the point.** The Tech Partner
+  alias already exists. CBT is already admissible (`SealRole` plus its `cbt` alias)
+  and has no Cypher branch, so a CBT row already loads with
+  `unmapped_role = true`. The instruction turns an accident into an intention: the K4
+  policy — *loaded, surfaced for review, never guessed* — used **on purpose**, to
+  record a name the source may emit without minting a concept for it. Only
+  `config/taxonomy/business-application.yaml` changed, which now carries CBT and Chief
+  Technology Officer on the SAME application held by DIFFERENT people, so the sample
+  states they are two classes instead of leaving it to be inferred.
+- **A CORRECTION THE RULING FORCED, recorded because the overstatement is in committed
+  history.** G35 §A6 had claimed a Tech Partner row *"becomes a TOM `cto` Attribution
+  on a BusinessApplication — the exact shape K5 forbids."* **It does not.**
+  `seal_contacts.cypher:75` mints `HAD_ROLE` only when the crosswalk returns non-null
+  (*"never mint concepts here"*), and the crosswalk has four branches — Backup
+  Information Owner, Design Authority, L1 and L2 Operate Manager. `cto` is not among
+  them. A contact-side Tech Partner row therefore produces an Attribution carrying
+  `role_source_name = 'CTO'` and **no concept edge of any kind**; the `cto` concept is
+  reached only from `seal_applications.cypher` via the DECO row's own
+  `chief_tech_officer_sid`, a BusinessApplication field. **K5's boundary was never
+  crossed**, which makes "leave it" a safer ruling than the page had implied.
+- **What stays open (§A6c):** the alias makes 'Tech Partner' and 'CTO'
+  indistinguishable downstream — `role_source_name` records `'CTO'` for both — which
+  collides with the identity gate's §B2 evidence rule (the source's own term is kept)
+  and with §A4b's question about the canonicalizer generally. Harmless if the two
+  names are genuinely one role; unrecoverable if a Product Cabinet Tech Partner ever
+  lands in the contact extract.
+- **The two rulings went opposite ways on the same kind of evidence, and that is the
+  record worth keeping.** Tech Partner ↔ CTO: one role, two names. CBT ↔ CTO: two
+  roles despite a shared name family. A shared naming history is evidence, not proof,
+  and on 2026-08-06 it went each way once.
+- **Still unruled:** Risk Manager (G12) is now the only name absent from the stated
+  vocabulary and still emitted by the source, and it is the one whose absence costs
+  something — §A2 pairs it with `technology_risk_controls`, a signed concept that
+  nothing can write.

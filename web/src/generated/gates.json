@@ -579,6 +579,15 @@
       ]
     },
     {
+      "kind": "log-entry",
+      "date": "2026-08-06",
+      "title": "RECORD: Tech Partner → CTO alias KEPT; Chief Business Technologist restored as an optional, deliberately unmapped role (G35 §A6 + G10)",
+      "status": "recorded",
+      "prompt_files": [],
+      "log_ref": "config/gate-log.md:1533",
+      "unblocks": []
+    },
+    {
       "kind": "prompt-only",
       "date": null,
       "title": "bmc-docs-example (gate page rendered — session not yet run)",

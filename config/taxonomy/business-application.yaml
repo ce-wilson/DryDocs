@@ -131,6 +131,7 @@ nodes:
         - { role: Primary Information Owner, sid: K567890 }
         - { role: Backup Information Owner, sid: K678901 }
         - { role: Chief Technology Officer, sid: K345678 }
+        - { role: Chief Business Technologist, sid: K123456 }
         - { role: Design Authority, sid: K234567 }
         - { role: Deployment Owner, sid: K567890 }
         - { role: Deployment Information Owner, sid: K567890 }
@@ -181,18 +182,36 @@ nodes:
   #   FOUR CLASSES ARE NEW to the repo entirely — Deployment Owner, Deployment Information
   #   Owner, Application Module Owner, Site Reliability Engineer. None appears in the signed
   #   scheme, the SealRole enum, the loader crosswalk or any prior capture.
-  #   TWO NAMES ARE GONE — Chief Business Technologist and Risk Manager. Both are still live
-  #   in the SealRole enum and both are still flagged unmapped by the loader, so their
-  #   absence here is a capture change, NOT a retirement.
+  #   ONE NAME IS GONE — Risk Manager. It is still live in the SealRole enum and still
+  #   flagged unmapped by the loader, so its absence here is a capture change, NOT a
+  #   retirement. Chief Business Technologist was also absent from the list and was
+  #   RESTORED the same day by a separate SME ruling (below).
   #   THE PARENTHETICALS ARE ABBREVIATIONS, not part of the name: the SME wrote every
   #   acronym in "Name (ABBREV)" form and left it off the four classes that have none, so
   #   they are recorded in `abbrev` and the earlier "Chief Technology Officer(CTO)" literal
   #   is read as the same convention rather than as a source string. See G35 §A3b.
+  # 2026-08-06, SECOND RULING THE SAME DAY — Chief Business Technologist (CBT) is RESTORED
+  # as an OPTIONAL role class: "add optional role: Chief Business Technologist (CBT) but do
+  # not create a cypher relationship mapping for it, in case it appears". Both halves already
+  # hold in code and NEITHER needed a change: CBT is admissible (SealRole line 109, aliases
+  # 148-149) and no Cypher crosswalk branch exists for it, so a CBT row loads and arrives
+  # flagged unmapped_role=true. That is the K4 policy used ON PURPOSE rather than as a gap —
+  # a name the source may emit is recorded rather than refused, and no concept is minted for
+  # it (seal_contacts.cypher:75, "never mint concepts here"). It also DISPOSES of G35's G10:
+  # CBT is a role class in its own right, not an alias of Chief Technology Officer, which is
+  # why 70001 now carries BOTH, held by different people.
+  #
+  # NOTE what is deliberately NOT recorded here: a `required` / `optional` field. G35 §B3
+  # rules that required-ness becomes an attribute of the TOMRole CONCEPT, and adding it to
+  # this capture would create a fifth divergent surface for the exact fact the gate is trying
+  # to give one home. The optional ruling lives in the gate and the gate log; this file
+  # records only that the class was observed.
   roles:
     - { role: Application Owner, abbrev: AO }
     - { role: Primary Information Owner, abbrev: PIO }
     - { role: Backup Information Owner, abbrev: BIO }
     - { role: Chief Technology Officer, abbrev: CTO }
+    - { role: Chief Business Technologist, abbrev: CBT }
     - { role: Design Authority, abbrev: DA }
     - { role: Deployment Owner }
     - { role: Deployment Information Owner }
@@ -206,8 +225,9 @@ nodes:
 counts:
   business_applications: 3
   ports_per_app: 2          # EventProcessing + BatchProcessing
-  memberships: 31           # 13 (70001 full) + 12 (70002 wide) + 6 (70003 minimal)
-  distinct_roles: 13        # the SME's list of 2026-08-06, in full; every class appears on 70001
+  memberships: 32           # 14 (70001 full) + 12 (70002 wide) + 6 (70003 minimal)
+  distinct_roles: 14        # the SME's 13-class list of 2026-08-06 + Chief Business Technologist,
+                            # restored the same day as an optional class; every class appears on 70001
   distinct_employees: 7     # by SID. WAS 15, and the drop is the POINT: SIDs are now
                             # person-scoped, so the same seven people recur across roles and
                             # across applications. 31 memberships over 7 people is what makes
