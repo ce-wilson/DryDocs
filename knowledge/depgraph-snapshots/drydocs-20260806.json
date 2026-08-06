@@ -1,16 +1,16 @@
 {
   "meta": {
     "project": "drydocs",
-    "captured_at": "2026-08-05T22:54:36",
-    "date": "20260805",
+    "captured_at": "2026-08-06T14:46:17",
+    "date": "20260806",
     "scan": "DryDocs",
     "tree": true,
     "git": {
-      "commit": "78a2d92",
-      "full": "78a2d92956e567343ee5cd418cf108f109904b27",
+      "commit": "5359b00",
+      "full": "5359b0008ad84e208f18753b1f6e3d58a614f0bc",
       "branch": "main",
-      "describe": "78a2d92",
-      "subject": "merge feat/code-tree-load: containment tree + media-type layer (SME ruling 2026-08-05)",
+      "describe": "5359b00",
+      "subject": "fix(code-graph): image files are not code-graph content (SME ruling 2026-08-06)",
       "dirty": false,
       "pr": null
     },
@@ -10382,6 +10382,15 @@
       "kind": "file"
     },
     {
+      "file_id": "drydocs/drydocs/seal_samples.py",
+      "name": "seal_samples.py",
+      "extension": ".py",
+      "rel_path": "drydocs/seal_samples.py",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
       "file_id": "drydocs/drydocs/sme_notes.py",
       "name": "sme_notes.py",
       "extension": ".py",
@@ -12893,10 +12902,10 @@
       "kind": "file"
     },
     {
-      "file_id": "drydocs/knowledge/depgraph-snapshots/drydocs-20260805.json",
-      "name": "drydocs-20260805.json",
+      "file_id": "drydocs/knowledge/depgraph-snapshots/drydocs-20260805-2254.json",
+      "name": "drydocs-20260805-2254.json",
       "extension": ".json",
-      "rel_path": "knowledge/depgraph-snapshots/drydocs-20260805.json",
+      "rel_path": "knowledge/depgraph-snapshots/drydocs-20260805-2254.json",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -13545,6 +13554,15 @@
       "name": "build_mapping_db.py",
       "extension": ".py",
       "rel_path": "scripts/build_mapping_db.py",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/scripts/build_seal_samples.py",
+      "name": "build_seal_samples.py",
+      "extension": ".py",
+      "rel_path": "scripts/build_seal_samples.py",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -14733,6 +14751,24 @@
       "name": "test_seal_attribution.py",
       "extension": ".py",
       "rel_path": "tests/unit/test_seal_attribution.py",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/tests/unit/test_seal_roles.py",
+      "name": "test_seal_roles.py",
+      "extension": ".py",
+      "rel_path": "tests/unit/test_seal_roles.py",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/tests/unit/test_seal_samples.py",
+      "name": "test_seal_samples.py",
+      "extension": ".py",
+      "rel_path": "tests/unit/test_seal_samples.py",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -17320,6 +17356,10 @@
       "drydocs/drydocs_core/mapping_store.py"
     ],
     [
+      "drydocs/scripts/build_seal_samples.py",
+      "drydocs/drydocs/seal_samples.py"
+    ],
+    [
       "drydocs/scripts/doc_to_pdf.py",
       "drydocs/drydocs/doc_pdf.py"
     ],
@@ -18306,6 +18346,22 @@
     [
       "drydocs/tests/unit/test_seal_attribution.py",
       "drydocs/drydocs_core/yaml_fragments.py"
+    ],
+    [
+      "drydocs/tests/unit/test_seal_roles.py",
+      "drydocs/drydocs_core/models/seal.py"
+    ],
+    [
+      "drydocs/tests/unit/test_seal_samples.py",
+      "drydocs/drydocs/cli.py"
+    ],
+    [
+      "drydocs/tests/unit/test_seal_samples.py",
+      "drydocs/drydocs/seal_samples.py"
+    ],
+    [
+      "drydocs/tests/unit/test_seal_samples.py",
+      "drydocs/drydocs_core/models/seal.py"
     ],
     [
       "drydocs/tests/unit/test_sme_notes.py",
@@ -23415,6 +23471,11 @@
     [
       "drydocs/drydocs",
       "CONTAINS",
+      "drydocs/drydocs/seal_samples.py"
+    ],
+    [
+      "drydocs/drydocs",
+      "CONTAINS",
       "drydocs/drydocs/sme_notes.py"
     ],
     [
@@ -25665,7 +25726,7 @@
     [
       "drydocs/knowledge/depgraph-snapshots",
       "CONTAINS",
-      "drydocs/knowledge/depgraph-snapshots/drydocs-20260805.json"
+      "drydocs/knowledge/depgraph-snapshots/drydocs-20260805-2254.json"
     ],
     [
       "drydocs/knowledge/depgraph-snapshots",
@@ -25966,6 +26027,11 @@
       "drydocs/scripts",
       "CONTAINS",
       "drydocs/scripts/build_mapping_db.py"
+    ],
+    [
+      "drydocs/scripts",
+      "CONTAINS",
+      "drydocs/scripts/build_seal_samples.py"
     ],
     [
       "drydocs/scripts",
@@ -26621,6 +26687,16 @@
       "drydocs/tests/unit",
       "CONTAINS",
       "drydocs/tests/unit/test_seal_attribution.py"
+    ],
+    [
+      "drydocs/tests/unit",
+      "CONTAINS",
+      "drydocs/tests/unit/test_seal_roles.py"
+    ],
+    [
+      "drydocs/tests/unit",
+      "CONTAINS",
+      "drydocs/tests/unit/test_seal_samples.py"
     ],
     [
       "drydocs/tests/unit",
@@ -27462,13 +27538,13 @@
     "projects": [
       "drydocs"
     ],
-    "files": 1538,
-    "edges": 549,
+    "files": 1542,
+    "edges": 554,
     "circular_files": 0,
     "processes": 0,
     "data_assets": 0,
     "hosts": 0,
-    "rels": 1801,
+    "rels": 1805,
     "directories": 264
   }
 }
