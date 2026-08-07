@@ -1,0 +1,79 @@
+# SME gate-prompt spec — dpl dataset-registry contract (backlog id: at next
+# groom). DRAFTED 2026-08-07, UNSIGNED. The sibling of
+# dpl-pipeline-registry-contract, same two-step shape, run separately because
+# the artifacts differ (dataset_id.json vs pipeline_id.json), the ASSUMED
+# contract differs, and the join target differs — datasets join the G17 MAC
+# dataset_flow evidence and the catalog registration views, not the launcher
+# tokens. The SME identifies a real export (HITL, Internal), the agent
+# profiles it, the rulings close or re-scope the contract and its audit stub.
+# GATE-BOUND: this page PROPOSES; rendering it builds, flips, and stamps
+# nothing. Mechanism-only: GUIDs, SEAL ids and registry URLs stay company-side.
+classification: Internal-Public
+schema: drydocs.gate-prompt.v1
+id: dpl-dataset-registry-contract
+title: "SME Gate — dpl dataset-registry contract: identify a real export (HITL, Internal), profile it against the ASSUMED contract (agent), then rule the contract, the audit stub, and discovery precedence"
+step: "Follows rua-load-shapes (G22, signed 2026-08-07). The registry row dpl:dataset-registry is confirmed: true under the same activation as its pipeline sibling, and carries the same ASSUMED-contract caveat — plus its own: the clone-lag ruling (SME 2026-07-23) that the BULK export is the backup discovery source when per-SEAL pulls lag."
+summary: >
+  Two steps, in order. (1) HITL, INTERNAL: the SME identifies the source data
+  — a real dataset_id.json export (which SEALs, per-SEAL API or bulk export,
+  pulled when). Real values recorded company-side / in internal/, never on
+  this page; the run names its venue (J18). (2) AGENT: parse and profile it —
+  field census against the ASSUMED contract, createdBy/lastModifiedBy
+  evidence for the audit stub, and GUID join coverage against the G17
+  dataset_flow READS/WRITES candidates (with zone distribution) and the
+  catalog registration views' dpl_dataset identities. Zero graph writes.
+  Section C consumes the profile: contract confirmed or amended, audit stub
+  closed or standing, and per-SEAL-vs-bulk discovery precedence ruled in
+  config/precedence.yaml terms.
+meta:
+  Module: "drydocs_lineage (G25 extractor: dpl_registry.py, dataset leg) — taxonomy-first staging; no loader exists and none is built here"
+  Source: "dpl:dataset-registry (source-registry, confirmed: true at G22) — per-SEAL dataset_id.json Swagger exports; bulk export = backup discovery (clone-lag caveat, SME 2026-07-23)"
+  Precedent: "G22 §G GUID-as-business-key with urn:drydocs:dataasset fallback for unmanaged assets; audit-envelope-phase4 (dpl stub ruled ASSUMED-contract, revisit = a real export parsing = THIS gate); G41 (DPL-registered catalog rows land on the same dpl_dataset identity; other origins stay their own); A5's accepted consequence (numerous transient local_file DataAssets are NOT this registry's population)"
+  Registry ref: "adapter stays ~; confirmed stays true — this gate validates the CONTRACT; its only writes are config/audit-fields and config/precedence entries"
+  Classification: "Internal-Public page; §A capture is Internal — SEAL ids, GUIDs, dataset names, zone prefixes never land here"
+  Source of record: "config/gate-log.md (transcription target) · docs/restructure/03-hitl-sme-flow.md · tracker T13"
+
+mapping:
+  - n: 1
+    element: "A real dataset_id.json export (§A)"
+    target: "the ASSUMED field contract — validated field-by-field, present/absent/empty counted"
+    edge: "contract validation  [clause C1 — THE CENTER OF THE GATE]"
+  - n: 2
+    element: "createdBy / lastModifiedBy (existence + population rate)"
+    target: "the audit-envelope stub for this source — closes or stands on evidence"
+    edge: "audit evidence  [clause C2]"
+  - n: 3
+    element: "Registry GUID x G17 dataset_flow inputDatasets/outputDatasets candidates"
+    target: "join coverage per zone (RAW/TRUSTED/REFINED) — how much of the MAC lineage evidence the registry knows"
+    edge: "coverage  [clause C3]"
+  - n: 4
+    element: "Per-SEAL API vs bulk export naming the same GUID"
+    target: "discovery-source precedence, ruled in config/precedence.yaml terms (never ad hoc per load)"
+    edge: "precedence  [clause C4]"
+
+provenance:
+  - label: "What is staged and test-pinned today"
+    source_object: "drydocs_lineage/extractors/dpl_registry.py (G25, dataset leg) + synthetic fixtures"
+    key: "G25 (2026-07-23) — GUID + version + active staged; contract ASSUMED (T13); clone-lag cross-check column exists for exactly the §C4 question"
+    loader: "~ (deliberately none)"
+    properties:
+      - {name: assumed_contract, origin: source, from: "G25 fixture shape", note: "the dataset-leg assumption under test — §B reports per-field truth; real fields the assumption lacks are NAMED"}
+      - {name: flow_join, origin: derived, from: "G17 dpl_mac (dataset_flow.json)", note: "inputDatasets/outputDatasets carry GUID + version + zone — the READS_FROM/WRITES_TO candidate feed this registry should corroborate; join coverage is the §C3 fact"}
+
+sections:
+  - title: "A. HITL — identify the source data (INTERNAL; the SME acts, the agent records)"
+    confirmations:
+      - "A1 [identify]: the SME identifies a REAL dataset_id.json export — which SEALs, per-SEAL API or bulk, pulled when, from which venue (J18). Recorded company-side / in internal/; this page carries SEAL count, form (api/bulk) and pull date only. [named / deferred]"
+      - "A2 [identify]: if BOTH forms are available, the SME provides a same-day pair for at least one SEAL — the §C4 precedence ruling wants a measured divergence, not a guessed one. [paired / single-form]"
+  - title: "B. Agent — profile the existing data (staged-only, deterministic, zero graph writes)"
+    confirmations:
+      - "B1 [profile]: parse the §A export(s); field census against the ASSUMED contract — per field: present / absent / present-but-empty, with counts; unassumed real fields listed by name. [profile attached]"
+      - "B2 [profile]: createdBy / lastModifiedBy — existence, population rate, value shape; the audit stub's revisit evidence. [profile attached]"
+      - "B3 [profile]: GUID join against the G17 dataset_flow candidates — match / registry-only / flow-only counts, broken out per zone (RAW/TRUSTED/REFINED); plus overlap with the catalog views' dpl_dataset identities (the G41 seam). [profile attached]"
+      - "B4 [profile]: if §A2 paired — the api-vs-bulk diff for the same SEAL/day: GUIDs in one and not the other, field-level divergence counts (the clone-lag measurement, made concrete). [profile attached / n-a]"
+  - title: "C. Rulings — the profile decides, the SME signs"
+    confirmations:
+      - "C1: the field contract is CONFIRMED or AMENDED field-by-field (extractor follows at its next build; T13's dataset half closes either way). [confirm / amend]"
+      - "C2: the audit-envelope stub for this source CLOSES (envelope written in config/audit-fields.yaml, the source's per-entry row) or STANDS re-affirmed on evidence. [closes / stands]"
+      - "C3: the §B3 join coverage is ACCEPTED as the lineage-enrichment baseline; registry-only and flow-only populations get a disposition in words (finding classes, not cleanup chores). [ruled / deferred]"
+      - "C4: discovery precedence ruled — per-SEAL API vs bulk export, in config/precedence.yaml terms, with the §B4 measurement cited (or the ruling deferred until a paired sample exists). [ruled / deferred]"

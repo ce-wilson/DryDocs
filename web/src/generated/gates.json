@@ -898,6 +898,28 @@
     {
       "kind": "prompt-only",
       "date": null,
+      "title": "dpl-dataset-registry-contract (gate page rendered — session not yet run)",
+      "status": "open",
+      "prompt_files": [
+        "config/gate-prompts/dpl-dataset-registry-contract.yaml"
+      ],
+      "log_ref": null,
+      "unblocks": []
+    },
+    {
+      "kind": "prompt-only",
+      "date": null,
+      "title": "dpl-pipeline-registry-contract (gate page rendered — session not yet run)",
+      "status": "open",
+      "prompt_files": [
+        "config/gate-prompts/dpl-pipeline-registry-contract.yaml"
+      ],
+      "log_ref": null,
+      "unblocks": []
+    },
+    {
+      "kind": "prompt-only",
+      "date": null,
       "title": "email-dl-contact-point (gate page rendered — session not yet run)",
       "status": "open",
       "prompt_files": [
@@ -938,6 +960,28 @@
         "K19",
         "J32"
       ]
+    },
+    {
+      "kind": "prompt-only",
+      "date": null,
+      "title": "repo-manifest-data-profile (gate page rendered — session not yet run)",
+      "status": "open",
+      "prompt_files": [
+        "config/gate-prompts/repo-manifest-data-profile.yaml"
+      ],
+      "log_ref": null,
+      "unblocks": []
+    },
+    {
+      "kind": "prompt-only",
+      "date": null,
+      "title": "rua-bundle-data-profile (gate page rendered — session not yet run)",
+      "status": "open",
+      "prompt_files": [
+        "config/gate-prompts/rua-bundle-data-profile.yaml"
+      ],
+      "log_ref": null,
+      "unblocks": []
     },
     {
       "kind": "prompt-only",

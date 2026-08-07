@@ -1,0 +1,76 @@
+# SME gate-prompt spec — dpl pipeline-registry contract (backlog id: at next
+# groom). DRAFTED 2026-08-07, UNSIGNED. The T13 discharge gate for
+# dpl:pipeline-registry: the field contract has been ASSUMED since G25 — never
+# validated against a real export — and the two dpl audit stubs
+# (audit-envelope-phase4) are ruled stubs FOR THAT REASON. The SME identifies
+# a real per-SEAL export (HITL, Internal), the agent parses and profiles it,
+# and the rulings close or re-scope the contract on evidence.
+# GATE-BOUND: this page PROPOSES; rendering it builds, flips, and stamps
+# nothing. Mechanism-only: GUIDs, SEAL ids and registry URLs stay company-side.
+classification: Internal-Public
+schema: drydocs.gate-prompt.v1
+id: dpl-pipeline-registry-contract
+title: "SME Gate — dpl pipeline-registry contract: identify a real export (HITL, Internal), profile it against the ASSUMED contract (agent), then close or re-scope T13 and the audit stubs"
+step: "Follows rua-load-shapes (G22, signed 2026-08-07). The registry row dpl:pipeline-registry is confirmed: true — §G ruled GUID-vs-URN, §H ruled the three-signal usage discipline — but its envelope entry is a ruled STUB because the field contract (tracker T13) is assumed: claiming createdBy/lastModifiedBy exist, or that they do not, is a guess until a real export parses."
+summary: >
+  Two steps, in order. (1) HITL, INTERNAL: the SME identifies the source data
+  — a real pipeline_id.json export (which SEALs, from which registry DB,
+  pulled when). Real GUIDs/SEALs/URLs are recorded company-side / in
+  internal/, never on this page; the run names its venue (J18). (2) AGENT:
+  parse the identified export against the ASSUMED contract and profile it —
+  field census (present / absent / present-but-empty per field), version and
+  active-flag distributions, and GUID join coverage against the G15/G17
+  staged pipeline tokens. Zero graph writes. Section C consumes the profile:
+  T13 closes or re-scopes, the audit stub closes or stands, and the
+  active-flag stays the third usage signal it was ruled to be.
+meta:
+  Module: "drydocs_lineage (G25 extractor: dpl_registry.py) — taxonomy-first staging; no loader exists and none is built here"
+  Source: "dpl:pipeline-registry (source-registry, confirmed: true at G22) — per-SEAL pipeline_id.json Swagger exports; the registry sits ABOVE the pipelines (shared GUID join with G15/G17)"
+  Precedent: "G22 §G clause (f) GUID-as-business-key (ADR 0001) and §H clause (g) three-signal usage (referenced / registry-active / present-on-server, never conflated); audit-envelope-phase4 (both dpl stubs ruled ASSUMED-contract, revisit trigger = a real export parsing = THIS gate); T10/T13 discipline (contracts are ASSUMED until your side validates them)"
+  Registry ref: "adapter stays ~; confirmed stays true (G22's ruling is not re-opened) — this gate validates the CONTRACT, and its only writes are config/audit-fields entries"
+  Classification: "Internal-Public page; §A capture is Internal — SEAL ids, GUIDs, registry hosts never land here"
+  Source of record: "config/gate-log.md (transcription target) · docs/restructure/03-hitl-sme-flow.md · tracker T13"
+
+mapping:
+  - n: 1
+    element: "A real per-SEAL pipeline_id.json export (§A)"
+    target: "the ASSUMED field contract — validated field-by-field, present/absent/empty counted"
+    edge: "contract validation  [clause C1 — THE CENTER OF THE GATE]"
+  - n: 2
+    element: "createdBy / lastModifiedBy (existence + population rate)"
+    target: "the audit-envelope stub for this source — closes (fields exist, envelope written) or stands (absent, out-of-reach-not-absent re-affirmed)"
+    edge: "audit evidence  [clause C2]"
+  - n: 3
+    element: "active flag distribution"
+    target: "the THIRD usage signal (G22 §H) — staged, corroborated, never conflated with referenced or present-on-server"
+    edge: "signal discipline restated  [clause C3]"
+  - n: 4
+    element: "Registry GUID x G15/G17 staged pipeline tokens"
+    target: "join coverage — how much of the launcher/MAC evidence the registry actually knows"
+    edge: "coverage  [clause C4]"
+
+provenance:
+  - label: "What is staged and test-pinned today"
+    source_object: "drydocs_lineage/extractors/dpl_registry.py (G25) + synthetic fixtures"
+    key: "G25 (2026-07-23) — GUID + version + active staged; field contract ASSUMED (T13); cross_check clone-lag column = the stale-main measurement"
+    loader: "~ (deliberately none)"
+    properties:
+      - {name: assumed_contract, origin: source, from: "G25 fixture shape", note: "the fields the extractor stages today are the ASSUMPTION under test — §B reports each as present / absent / empty in the real export, and any real field the assumption lacks is NAMED, not dropped"}
+      - {name: registry_axis, origin: source, from: "G25", note: "per-SEAL Swagger, version + active; the DPL registry DB is per-SEAL (2026-07-21 company trace) — §A names which SEALs the sample covers, coverage is per-SEAL by construction"}
+
+sections:
+  - title: "A. HITL — identify the source data (INTERNAL; the SME acts, the agent records)"
+    confirmations:
+      - "A1 [identify]: the SME identifies a REAL pipeline_id.json export — which SEALs' registries, pulled when, by whom, from which venue (J18). Recorded company-side / in internal/; this page carries SEAL COUNT and pull date only. [named / deferred]"
+      - "A2 [identify]: the SME rules whether the sample is REPRESENTATIVE — one SEAL's registry validates one SEAL's contract; claiming the fleet needs either more SEALs in §A1 or an explicit scope note on every §C ruling. [representative / scoped]"
+  - title: "B. Agent — profile the existing data (staged-only, deterministic, zero graph writes)"
+    confirmations:
+      - "B1 [profile]: parse the §A export(s) with the G25 extractor; field census against the ASSUMED contract — per field: present / absent / present-but-empty, with counts. Fields in the real export that the assumption LACKS are listed by name. [profile attached]"
+      - "B2 [profile]: createdBy / lastModifiedBy specifically — existence, population rate, and value shape (person vs service principal), the exact evidence the audit stub's revisit trigger names. [profile attached]"
+      - "B3 [profile]: version + active distributions, and the GUID join against G15/G17 staged tokens — match / registry-only / evidence-only counts (the §H three-signal feed). [profile attached]"
+  - title: "C. Rulings — the profile decides, the SME signs"
+    confirmations:
+      - "C1: the field contract is CONFIRMED as assumed, or AMENDED field-by-field (the extractor's next build follows the amendment; tracker T13 closes either way — it asked for the validation, not a particular answer). [confirm / amend]"
+      - "C2: the audit-envelope stub for this source CLOSES (fields exist — the envelope entry is written in config/audit-fields.yaml, the source's per-entry row) or STANDS re-affirmed on evidence. [closes / stands]"
+      - "C3: active stays the third usage signal — staged and corroborated, never collapsed into 'used' (restating G22 §H on this data, so the number sits next to the rule). [confirm]"
+      - "C4: the §B3 join coverage is ACCEPTED as the enrichment baseline, with registry-only and evidence-only populations dispositioned in words (a finding class each, not a cleanup chore). [ruled / deferred]"

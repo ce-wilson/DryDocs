@@ -1,0 +1,77 @@
+# SME gate-prompt spec — repo manifest data profile (backlog id: at next groom).
+# DRAFTED 2026-08-07, UNSIGNED. The load-readiness gate for
+# bitbucket:repo-objects-manifest: rua-load-shapes (G22, SIGNED 28/28) ruled
+# identity + occurrence grain + origin precedence; this gate names the REAL
+# repos (HITL), profiles their sweeps (agent), and is THE VENUE where a human
+# sets trusted_ref — the registry field only a human may write.
+# GATE-BOUND: this page PROPOSES; rendering it builds, flips, and stamps
+# nothing. Mechanism-only: producer fixtures are synthetic; real repo names,
+# refs and Bitbucket access stay company-side (PUBLISH-BOUNDARY.md).
+classification: Internal-Public
+schema: drydocs.gate-prompt.v1
+id: repo-manifest-data-profile
+title: "SME Gate — repo manifest data profile: name the repos and bless trusted_ref (HITL, Internal), profile the sweeps (agent), then rule corroboration and the commit_date stub"
+step: "Follows rua-load-shapes (G22, signed 2026-08-07). The registry row bitbucket:repo-objects-manifest is confirmed: true with trusted_ref: ~ — null means server-extract-only truth until a HUMAN sets it. The corroboration sweep may NAME a candidate ref mechanically; only this gate blesses one."
+summary: >
+  Two steps, in order. (1) HITL, INTERNAL: the SME identifies the source data
+  — which repos are in scope for script corroboration, and per repo the one
+  ref the team keeps clean (the trusted_ref candidate). Real repo names and
+  refs are recorded company-side / in internal/, never on this page. (2)
+  AGENT: run the G24 object sweep per identified repo in staging — zero graph
+  writes — and bring back the census: object counts, ref tips, content-hash
+  corroboration against server occurrences, clone-lag, and the commit_date
+  evidence the audit-fields stub is waiting on. Section C consumes the
+  profile: per-repo trusted_ref set or declined, corroboration thresholds
+  ruled, and the audit stub closed or re-scoped on evidence.
+meta:
+  Module: "drydocs_lineage (G24 code-repo seam: extractor + corroboration report) — staging only; no loader exists and none is built here"
+  Source: "bitbucket:repo-objects-manifest (source-registry, confirmed: true at G22) — per-repo repo_objects.tsv: git rev-list --all --objects + ref tips"
+  Precedent: "G22 §D2 (occurrence locator = repo+branch+commit+path), §E (origin precedence server-extract vs code-repo), §G2 (content hash = the version discriminator); audit-envelope-phase4 (the commit_date stub: ref-tip date is NOT the file's date — revisit trigger IS this manifest contract)"
+  Registry ref: "trusted_ref stays ~ until §C here sets it; adapter stays ~ — this gate admits data and blesses intent, it builds nothing"
+  Classification: "Internal-Public page; §A capture is Internal — repo names, refs, and real paths never land here"
+  Source of record: "config/gate-log.md (transcription target) · docs/restructure/03-hitl-sme-flow.md"
+
+mapping:
+  - n: 1
+    element: "The repo set the SME names (§A)"
+    target: "the corroboration scope — repos outside it contribute no code-repo occurrences"
+    edge: "scope admission  [clause C1]"
+  - n: 2
+    element: "The one ref a repo's team keeps clean (§A, human intent)"
+    target: "registry trusted_ref — null stays null unless a human blesses a ref here"
+    edge: "intent  [clause C2 — THE CENTER OF THE GATE]"
+  - n: 3
+    element: "Server occurrence vs repo occurrence, matched on content hash"
+    target: "corroborated / server-only (stale-main or never-committed) / repo-only (present-but-unused candidate) — three findings, never conflated (G22 §H discipline)"
+    edge: "corroboration  [clause C3]"
+  - n: 4
+    element: "Ref-tip commit_date on swept objects"
+    target: "the audit-fields stub: is a per-FILE authorship date derivable from this contract, or does the stub stand?"
+    edge: "audit evidence  [clause C4]"
+
+provenance:
+  - label: "What is staged and test-pinned today"
+    source_object: "drydocs_lineage/extractors/code_repo.py (G24) + synthetic producer fixtures"
+    key: "G24 (2026-07-27) — sweep + corroboration report, staging only; the never-in-repo evidence case (2026-07-21, mechanism-only) is why server-extract stays a first-class origin"
+    loader: "~ (deliberately none)"
+    properties:
+      - {name: sweep_contract, origin: source, from: "repo_objects.tsv", note: "objects + ref tips per repo; producer fixtures synthetic; real access company-side behind the manifest contract"}
+      - {name: clone_lag, origin: derived, from: "G25 cross-check pattern", note: "the stale-main measurement — how far the swept clone trails the ref tip, reported per repo in §B"}
+
+sections:
+  - title: "A. HITL — identify the source data (INTERNAL; the SME acts, the agent records)"
+    confirmations:
+      - "A1 [identify]: the SME names the repos in corroboration scope — which repos hold the scripts the rua bundles and reference facts see. Recorded company-side / in internal/; this page carries the count only. [named / deferred]"
+      - "A2 [identify]: per §A1 repo, the SME names the trusted_ref CANDIDATE — the one ref that team keeps clean — or states that no such ref exists (a legitimate answer: server-extract-only truth). Candidates only; §C2 blesses. [named / none / deferred]"
+      - "A3 [identify]: the SME names where the sweeps run (venue, J18) — real Bitbucket access is company-side; the producer sees synthetic fixtures and counts. [named]"
+  - title: "B. Agent — profile the existing data (staged-only, deterministic, zero graph writes)"
+    confirmations:
+      - "B1 [profile]: run the G24 sweep per §A repo; report per repo: object count, ref count, ref tips with dates, clone-lag vs the named candidate ref. [profile attached]"
+      - "B2 [profile]: content-hash corroboration against the staged server occurrences — corroborated / server-only / repo-only counts per repo, with the hash-absent population (metadata-only rua listings) counted as UNCORROBORATABLE, not as misses. [profile attached]"
+      - "B3 [profile]: commit_date evidence — for a sample of corroborated objects, the ref-tip date vs the object's own last-change commit date; the delta distribution is the §C4 fact. [profile attached]"
+  - title: "C. Rulings — the profile decides, the SME signs"
+    confirmations:
+      - "C1: the §A repo set is ADMITTED as the corroboration scope (or trimmed, named). [admit / trim / decline]"
+      - "C2: per repo, trusted_ref is SET to the blessed ref or left ~ (server-extract-only truth stands). Transcribed to the registry row per repo — the only write this gate authorizes, and it is a config write, not a graph write. [set / null per repo]"
+      - "C3: corroboration thresholds ruled — at what match rate a repo's occurrences enrich lineage, and the three-way finding classes (corroborated / server-only / repo-only) stay separate signals per G22 §H. [ruled / deferred]"
+      - "C4: the commit_date audit stub CLOSES (a per-file date is derivable and §B3 shows it honest) or STANDS (ref-tip date stays out-of-reach-not-absent, revisit trigger unchanged). Evidence-decided, never convenience-decided. [closes / stands]"

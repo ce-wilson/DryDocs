@@ -62,6 +62,17 @@ question a 1,000-line file with the trail at the bottom could not answer.
 
 <!-- add new ideas at the top -->
 
+- **`Idea-85`** · 2026-08-07 · `[chore]` · **open** · prio? **Med** —
+  **Backlog ids + scheduling for the four post-G22 data-profile gate prompts**
+  (drafted 2026-08-07, unsigned): `rua-bundle-data-profile`,
+  `repo-manifest-data-profile`, `dpl-pipeline-registry-contract`,
+  `dpl-dataset-registry-contract` in `config/gate-prompts/`. Each has the same
+  two-step shape per SME direction: §A HITL identify-the-source-data (Internal)
+  → §B agent profiles the existing data → §C rulings. The dpl pair discharges
+  T13; repo-manifest is the trusted_ref blessing venue; rua-bundle gates any
+  load population beyond the G22-walked bundles. Promote with ids + agent/model
+  at next groom; sessions are company-side (real data lives there).
+
 - **`Idea-83`** · 2026-08-07 · `[bug]` · **groomed → J33 (2026-08-07)** · prio? **Low** —
   **Three standing rich-ANSI test failures on this desktop, pre-existing (not
   G55).** `test_supplements.py::test_chain_applies_in_registry_order` +

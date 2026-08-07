@@ -1,0 +1,73 @@
+# SME gate-prompt spec — rua bundle data profile (backlog id: at next groom).
+# DRAFTED 2026-08-07, UNSIGNED. The load-readiness gate for the first REAL
+# exec-hosts:rua-bundle load: rua-load-shapes (G22, SIGNED 28/28) ruled the
+# SHAPES; this gate rules the DATA — the SME names the population, the agent
+# profiles it, and nothing loads a population this page has not walked.
+# GATE-BOUND: this page PROPOSES; rendering it builds, flips, and stamps
+# nothing. Mechanism-only: every spelling below is the synthetic sample-corpus
+# contract; real hosts/paths/users stay company-side (PUBLISH-BOUNDARY.md).
+classification: Internal-Public
+schema: drydocs.gate-prompt.v1
+id: rua-bundle-data-profile
+title: "SME Gate — rua bundle data profile: name the load population (HITL, Internal), profile it (agent, staged-only), then admit it to the G23 curated load"
+step: "Follows rua-load-shapes (G22, signed 2026-08-07) and the G23 curated-load build. The registry row exec-hosts:rua-bundle is confirmed: true — authority to load — but the ruled shapes were walked on samples plus two captured production bundles, and the live bundle population may have grown. No population loads before this page walks it."
+summary: >
+  Two steps before the first real load, in order. (1) HITL, INTERNAL: the SME
+  identifies the source data — which hosts' bundles constitute the load
+  population, where they sit, and which collector produced each. Real values
+  are recorded company-side / in internal/, never on this page. (2) AGENT:
+  profile the identified population through the G20 extractor in staging —
+  zero graph writes — and bring the coverage numbers back here. The rulings
+  in section C consume that profile: they admit (or trim) the population,
+  dispose of the hash-absent and collision cases the profile counts, and
+  clear the F1 sweep. Anything unticked stays out of the curated load.
+meta:
+  Module: "drydocs_lineage (G20 extractor staging) + the G23 curated loader (built, gate-bound by THIS page for any population beyond the walked samples)"
+  Source: "exec-hosts:rua-bundle (source-registry, confirmed: true at G22) — rua_*.tar.gz bundles from drydocs_lineage/collect/rua_inventory.sh"
+  Precedent: "rua-load-shapes clauses D1-D4 (identity/occurrence grain), G2 (hash-bearing corroboration only), F1 (confidential path set); the never-silent house rule (every drop counted)"
+  Registry ref: "adapter stays ~ on the registry row; this gate admits DATA, it builds nothing"
+  Classification: "Internal-Public page; the §A capture is Internal by construction — hostnames, run-as users, and real paths never land here"
+  Source of record: "config/gate-log.md (transcription target) · docs/restructure/03-hitl-sme-flow.md"
+
+mapping:
+  - n: 1
+    element: "The bundle population the SME names (§A)"
+    target: "the G23 curated-load input set — nothing outside it loads"
+    edge: "population admission  [clause C1]"
+  - n: 2
+    element: "Metadata-only listing rows (no sha256, no body copy)"
+    target: "occurrence records staged hash-absent; excluded from G2 drift corroboration by rule"
+    edge: "profile disposition  [clause C2]"
+  - n: 3
+    element: "Same script id on different hosts (cross_host_collisions counter)"
+    target: "lineage-review SME MERGE queue — never auto-merged (the signed A3 rider)"
+    edge: "profile disposition  [clause C3]"
+
+provenance:
+  - label: "What G22 already walked (the baseline this profile extends)"
+    source_object: "two captured production bundles + the synthetic sample corpus"
+    key: "561 scripts staged across the two bundles (172 + 389) at the 2026-07-28 company dry run; terminus held, zero graph writes"
+    loader: "~ (G23 built but gate-bound for new populations)"
+    properties:
+      - {name: listing_fallback, origin: source, from: "company _stage_scripts fix", note: "scripts.tsv (v2) wins over scripts.csv when both present; csv rows stage metadata-only"}
+      - {name: collector_versions, origin: source, from: "meta.txt COLLECTOR_VERSION", note: "company runs its own -n twin (T14) — §B reports the version mix so convergence is a fact, not a hope"}
+
+sections:
+  - title: "A. HITL — identify the source data (INTERNAL; the SME acts, the agent records)"
+    confirmations:
+      - "A1 [identify]: the SME names the bundle population for the first real load — which execution hosts, which bundle files, collected when, sitting where. Recorded in the company-side session note / internal/, referenced from here only by count and date. [named / deferred]"
+      - "A2 [identify]: the SME names the collector provenance per bundle — company -n twin vs producer collector, versions per meta.txt. A mixed-version population is admissible only if §B shows the envelope fields this load reads are present in both. [named / deferred]"
+      - "A3 [identify]: the SME rules whether the two already-walked production bundles are IN or OUT of this population (they were captured for G22 shape-walking; re-collection may supersede them). [in / out / re-collect]"
+  - title: "B. Agent — profile the existing data (staged-only, deterministic, zero graph writes)"
+    confirmations:
+      - "B1 [profile]: run the G20 extractor over every §A bundle in staging; report per bundle: script rows staged, tsv-vs-csv listing form, hash_missing, script_copies_missing, envelope rua_* completeness (missing meta.txt fields counted, never guessed). [profile attached]"
+      - "B2 [profile]: report cross_host_collisions across the whole population (the D3 identity ruling's live evidence feed) — each collision listed for the §C3 merge queue, none merged. [profile attached]"
+      - "B3 [profile]: extension census over staged script paths (.sh/.ksh/.sql/other) — the SWO-binding coverage number (C3 ruled .ksh = Shell peer); 'other' extensions are named, not binned. [profile attached]"
+      - "B4 [profile]: F1 sweep — the population's real paths swept against the ruled confidential set; ONLY THE COUNT crosses to this page (additions are company-side Internal edits, per the G22 F1 ruling). [count attached]"
+  - title: "C. Rulings — the profile decides, the SME signs"
+    confirmations:
+      - "C1: the §A population, as profiled, is ADMITTED to the G23 curated load (or trimmed — named exclusions with reasons). [admit / trim / decline]"
+      - "C2: hash-absent occurrences load as metadata-only occurrence records, excluded from G2 drift corroboration, counters kept — restating the G22 premise on this population's actual numbers. [confirm / amend]"
+      - "C3: every §B2 collision goes to lineage-review for SME merge; the load proceeds WITH collisions staged-unmerged (the signed rider). [confirm / amend]"
+      - "C4: the F1 count is cleared — zero unruled confidential paths in the population, or the additions are made company-side BEFORE the load. [cleared / blocked]"
+      - "C5: refresh cadence — how often this population re-profiles before a re-load (a fresh bundle set re-enters at §A, not at the loader). [ruled / deferred]"
