@@ -151,7 +151,13 @@ systems:
     cmdb_ci: ~
     layer: technology
     classification: Internal
-    locator: {}
+    locator:
+      # THE POINTER, NEVER THE VALUE (internal/README.md): the internal MWAA
+      # implementation-docs URL is a real internal address and lives ONLY in the
+      # file below. Distinct from the apache.org `publisher_url` on the `apache`
+      # vendor row in config/taxonomy/software-registry.yaml — that says who
+      # PUBLISHES Airflow; this says where OUR deployment is documented.
+      internal_docs: internal/airflow-reference/mwaa-internal-docs.md   # id airflow:internal-implementation-docs
     sdlc: ~
     notes: "Crosswalk-only activation; no DAG-export feed exists (external/orchestration/airflow/)."
 
