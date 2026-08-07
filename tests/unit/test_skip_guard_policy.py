@@ -37,10 +37,34 @@ _SEGMENT_RE = re.compile(
 _GLOB_CHARS = set("*?[")
 
 
+def _is_prose(literal: str) -> bool:
+    """A quoted literal that MENTIONS a gitignored tree in a sentence, rather than
+    naming a path this file opens.
+
+    Same carve-out class as the glob exclusion above, and added for the same reason:
+    the policy's job is catching a REFERENCE THAT GETS READ, and a reason-string is
+    never read. Added 2026-08-07 after `test_runbook_currency.py` was flagged for a
+    HISTORICAL_PATHS *explanation* — "…The pack retired to internal-local/archive/"
+    — which opens nothing. A skip guard there would have been a lie, and worse than
+    the false positive: it would let that file's real assertions silently skip.
+
+    Whitespace is the discriminator because this repo's paths never contain spaces
+    (config, fixtures and manifest rows are all unspaced), so the port failure this
+    policy exists for — a bare `drydocs/data/...` literal that gets opened — is
+    still caught exactly as before. Deliberately NOT weakened any further: a spaceless
+    path literal remains an offense whatever surrounds it.
+    """
+    return any(ch.isspace() for ch in literal)
+
+
 def _references_local_assets(text: str) -> bool:
     for m in _LITERAL_RE.finditer(text):
-        if not _GLOB_CHARS.intersection(m.group(1)):
-            return True
+        literal = m.group(1)
+        if _GLOB_CHARS.intersection(literal):
+            continue  # manifest/pattern row, not a filesystem read
+        if _is_prose(literal):
+            continue  # a sentence that MENTIONS the tree, not a path opened here
+        return True
     return bool(_SEGMENT_RE.search(text))
 
 
@@ -79,3 +103,13 @@ def test_policy_checker_catches_the_port_failure_shape() -> None:
 
     clean = 'FIXTURE = Path("tests/fixtures/lineage/jobs.csv")\n'
     assert not _references_local_assets(clean)
+
+    # A reason-string that MENTIONS the tree is not a read (the 2026-08-07 carve-out;
+    # the real shape came from test_runbook_currency.py's HISTORICAL_PATHS note).
+    prose = '"the pack retired to internal-local/archive/company-prompts/ at cleanup"\n'
+    assert not _references_local_assets(prose)
+
+    # ...but the carve-out must not swallow the failure the policy exists for: a
+    # spaceless path literal is still an offense even inside a prose-heavy file.
+    prose_plus_real = prose + 'sample = Path("drydocs/data/samples/x.csv")\n'
+    assert _references_local_assets(prose_plus_real)
