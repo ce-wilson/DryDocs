@@ -1,16 +1,16 @@
 {
   "meta": {
     "project": "drydocs",
-    "captured_at": "2026-08-06T18:04:39",
+    "captured_at": "2026-08-06T19:33:27",
     "date": "20260806",
     "scan": "DryDocs",
     "tree": true,
     "git": {
-      "commit": "2e7da36",
-      "full": "2e7da36cbcdc2c7a05bf15026a7f1972688a5813",
+      "commit": "f59119b",
+      "full": "f59119bf340baafd146f521408ed365961e6cb8b",
       "branch": "main",
-      "describe": "2e7da36",
-      "subject": "chore(backlog): groom - 7 promoted (O45-O51, the SME Context-Intake page slices from Idea-78)",
+      "describe": "f59119b",
+      "subject": "docs(ui): thread-reuse delta rule + IntakeStepper decision merged into the intake plan and O46/O47",
       "dirty": false,
       "pr": null
     },
@@ -12912,10 +12912,10 @@
       "kind": "file"
     },
     {
-      "file_id": "drydocs/knowledge/depgraph-snapshots/drydocs-20260806.json",
-      "name": "drydocs-20260806.json",
+      "file_id": "drydocs/knowledge/depgraph-snapshots/drydocs-20260806-1804.json",
+      "name": "drydocs-20260806-1804.json",
       "extension": ".json",
-      "rel_path": "knowledge/depgraph-snapshots/drydocs-20260806.json",
+      "rel_path": "knowledge/depgraph-snapshots/drydocs-20260806-1804.json",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -26645,7 +26645,7 @@
     [
       "drydocs/knowledge/depgraph-snapshots",
       "CONTAINS",
-      "drydocs/knowledge/depgraph-snapshots/drydocs-20260806.json"
+      "drydocs/knowledge/depgraph-snapshots/drydocs-20260806-1804.json"
     ],
     [
       "drydocs/knowledge/depgraph-snapshots",
