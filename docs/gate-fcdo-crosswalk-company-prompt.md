@@ -59,6 +59,18 @@ the corpus out of ground truth.
 3. **Run the recapture scrape** (Confluence connector, company network). The
    Descriptive Metadata Framework is the first-priority target — activation is
    the path that PRODUCES the row-5 evidence.
+   *Scrape reference — there is NO shipped connector command yet* (the registry
+   entry's own comment: "no connector has run"). Assemble from three pieces:
+   the page-ID target list lives producer-side in
+   `internal/fcdo-reference/README.md` (never ported — carry it over
+   out-of-band, or enumerate the space's child pages directly); the fetch
+   primitive to mirror is `internal-local/confluence/read_page.py` (NOTE: it
+   uses the Cloud v2 API — your Server/DC instance wants
+   `/rest/api/content/{id}?expand=body.storage,version`); the pipeline shape
+   to mirror is the vendor-docs three-stage chain
+   (`scripts/external_vendor_scrape.py` capture → `drydocs
+   convert-vendor-docs` → `drydocs load-vendor-docs`), with the corpus landing
+   in `ddcontext` under T4 `sme-confirm` per-page curation.
 4. **The row-5 ruling** once the recapture lands: map the Descriptive Metadata
    Framework row, or rule it unmappable with reason. This is a gate ruling —
    either side may draft the session, both sides record it. Until then row 5
