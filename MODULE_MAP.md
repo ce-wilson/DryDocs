@@ -81,6 +81,7 @@ The backlog `modules:` comments cite this section rather than re-explaining it.
 | `drydocs/sme_notes.py` | `drydocs-review` — SME-notes harvester: owner-attributed inline `SME[sid] $FR/$UC/$OQ/$NOTES` comments → requirement buckets (Epic H) | — (scans repo; reports) |
 | `drydocs/gate_pages.py` | `drydocs-review` — HITL SME-gate prompt-page generator (load-step spec → self-contained interactive review page; repo stays the system of record) | gate pages (offline HTML) |
 | `drydocs/publishing/**` | `drydocs-review` — docs publish pipeline (Confluence push abstracted, H5) | external (docs target) |
+| `drydocs/fid_census.py` | `drydocs-review` — the doc-09 phase-0 FID directory census (K16): demand-set scope + the registration-vs-attribution disagreement rate the `fid-identity-and-scope` gate cannot sign without. Pure (no file, no DB, no writes; every input injected) and **counts-only by return type** — the method is producer-side, the measured values are Internal and company-side | — (returns counts) |
 | `drydocs/plan_board.py` | `drydocs-plan` — backlog.yaml → HTML project board renderer (Epic I) | `docs/plan/board.html` |
 | `drydocs/plan_ideas.py` | `drydocs-plan` — IDEAS.md → HTML idea-inbox read view; reuses `design_doc.render_body` rather than adding a second markdown renderer | `docs/plan/ideas.html` |
 | `drydocs/doc_outline.py` | `drydocs-docgen` — canonical doc-outline completeness + traceability validator (Epic L) | — (pure; validates docs) |

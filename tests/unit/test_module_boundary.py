@@ -74,6 +74,12 @@ COMPONENT_GROUPS: dict[str, tuple[str, ...]] = {
     # drydocs-review — SME review + graph acceptance + docs publish (Epic H).
     # The default-deny test below FORCES a new review module to be classified here
     # rather than being silently unguarded.
+    # drydocs.fid_census = the K16 / doc-09 phase-0 measurement that the
+    # fid-identity-and-scope gate cannot sign without. Classified REVIEW, not load or
+    # config: it loads nothing and configures nothing — it produces the counts an SME
+    # rules from, which is what this bucket is. Same reasoning that puts
+    # source_mappings here. Imports NO first-party module (stdlib only) by design: the
+    # method is ported to the company side, which is where the measured values live.
     "review": (
         "drydocs.graph_verify",
         "drydocs.review_labels",
@@ -82,6 +88,7 @@ COMPONENT_GROUPS: dict[str, tuple[str, ...]] = {
         "drydocs.sme_notes",
         "drydocs.gate_pages",
         "drydocs.publishing",
+        "drydocs.fid_census",
     ),
     # drydocs-plan — backlog.yaml -> HTML project board renderer (Epic I).
     "plan": ("drydocs.plan_board",),

@@ -127,6 +127,30 @@ attribution disagreement breakdown above**. That converts *"about two hundred"* 
 attribution disagree"* — which is the number the scoping decision actually needs.
 Output is Internal and is reported as **counts, never a row dump**.
 
+### The numbers (fills in from the company-side run — K16 phase 0-counts)
+
+The method is built and tested; these cells stay empty on the producer side by design,
+because this repo holds no directory extract. **An empty cell means "not measured yet,"
+never "zero"** — the distinction the whole gate turns on.
+
+| Measurement | Value | Source field on `FidCensus` |
+|---|---|---|
+| (a) total directory rows for the application | _pending_ | `directory_rows_total` |
+| (b) \|demand set ∩ that application\| | _pending_ | `demand_in_application` |
+| — of which, per demand set (i / ii / iii) | _pending_ | `demand_by_source` |
+| demanded but absent from the directory | _pending_ | `demand_not_in_directory` |
+| (c) remainder (a) − (b), by type / by status | _pending_ | `remainder_by_type` · `remainder_by_status` |
+| §Q5 — account types seen as run-as owners | _pending_ | `run_as_owner_types` |
+| **Q0** — comparable / agree / disagree / undecidable | _pending_ | `comparable` · `agreements` · `disagreements` · `undecidable` |
+| **Q0** — §G5 breakdown of the disagreements | _pending_ | `disagreements_by_reading` |
+| spelling near-misses (reported, never folded) | _pending_ | `case_only_mismatches` |
+
+The §G5 breakdown row is the one that **cannot be filled by running the method**. The
+census parks every disagreement in `unruled` and waits: §G5 says the three readings are
+*"distinguished per case and never globally… a human ruling each."* So that row fills as
+the directory owner rules cases, and the count still sitting in `unruled` is itself a
+reportable number rather than a gap.
+
 Two things the census settles for free:
 
 - whether non-application account types ever appear as run-as owners (gate §Q5) — if
@@ -140,6 +164,8 @@ Two things the census settles for free:
 | Phase | Work | Gate state |
 |-------|------|-----------|
 | **0** | Census on one application (counts only); answer the six gate open questions with the directory owner | before sign-off |
+| **0-method** | ✅ **METHOD DELIVERED 2026-08-07 (K16, producer side)** — `drydocs/fid_census.py`, guarded by `tests/unit/test_fid_census.py`. Pure: no file, no database, no writes; every input injected. Run it with [`docs/k16-fid-census-company-prompt.md`](../k16-fid-census-company-prompt.md) | before sign-off |
+| **0-counts** | ⬜ **AWAITING THE COMPANY-SIDE RUN** — the numbers are Internal and cannot be produced in this repo, which holds no directory extract. The table below fills in from that run | before sign-off |
 | **1** | Register the system + dataset (`config/source-registry.yaml` v2, `confirmed: false`); register the audit-envelope entry as `stub` | at sign-off |
 | **2** | Demand-set extract → dated retained snapshot under `internal/` company-side | after sign-off |
 | **3** | `name → fid` crosswalk + `:AppUser` load, keyed on the directory id; miss rate reported as a first-class number | after sign-off |
