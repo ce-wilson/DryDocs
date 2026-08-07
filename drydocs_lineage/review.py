@@ -153,13 +153,71 @@ def _job_card(graph: LineageGraph, job) -> str:
     )
 
 
+def _archival_rows(rows: list[dict], css: str) -> str:
+    items = []
+    for r in rows:
+        hosts = ", ".join(r.get("hosts", [])) or "&mdash;"
+        items.append(
+            f'<li class="arow {css}"><span class="apath">{_e(r.get("path", ""))}</span> '
+            f'<span class="ahosts">{_e(hosts)}</span>'
+            f'<div class="areason">{_e(r.get("reason", ""))}</div></li>'
+        )
+    return "<ul class='arows'>" + "".join(items) + "</ul>" if items else ""
+
+
+def _archival_section(report) -> str:
+    """The G58 dead-script archival section (gate rua-load-shapes §E1/§E3/§H1):
+    coverage stated ON the report, three dispositions separately counted, the
+    scope-gated misdeployment suppression visible, archived-state
+    cross-referenced from G24, and the registry axis's unknowns surfaced.
+    Findings are review material — reported, never auto-actioned (§H2)."""
+    archived = (
+        f"already archived (repo-only): {len(report.already_archived)} &middot; "
+        f"never committed (G24): {report.never_committed}"
+        if report.corroboration_run
+        else "archived-state not observed &mdash; corroboration not run"
+    )
+    registry = (
+        f"active_unknown: {report.active_unknown}"
+        if report.active_unknown is not None
+        else "registry axis not observed on this run"
+    )
+    parts = [
+        '<section class="wrap checks archival">',
+        "<h2>Dead-script archival report</h2>",
+        f'<div class="coverage {"warn" if report.metadata_only else ""}">'
+        f"{_e(report.coverage_statement)}</div>",
+        '<div class="prov">',
+        f"<span><b>scripts</b> {report.scripts_total}</span>",
+        f"<span><b>in use (CMD_LINE-referenced)</b> {report.in_use}</span>",
+        f"<span><b>dead (archive &amp; remove)</b> {len(report.dead)}</span>",
+        f"<span><b>misdeployed (relocate, never delete)</b> {len(report.misdeployed)}</span>",
+        f"<span><b>dynamically called (keep)</b> {len(report.dynamically_called)}</span>",
+        f"<span><b>misdeployment checks suppressed (scope not local)</b> "
+        f"{report.misdeployment_suppressed}</span>",
+        f"<span>{archived}</span>",
+        f"<span>{_e(registry)}</span>",
+        "</div>",
+        _archival_rows(report.dead, "dead"),
+        _archival_rows(report.misdeployed, "mis"),
+        _archival_rows(report.dynamically_called, "dyn"),
+        "</section>",
+    ]
+    return "".join(parts)
+
+
 def to_html(
     graph: LineageGraph,
     *,
     doc_id: str = "lineage-review",
     generated_at: str | None = None,
+    archival=None,
 ) -> str:
-    """Render the graph as a single self-contained SME review page."""
+    """Render the graph as a single self-contained SME review page.
+
+    ``archival`` is an optional G58 :class:`~.archival.ArchivalReport` — when
+    given, the dead-script section renders after the assertion panel (this is
+    the surface the §E3 curation ladder already lives on)."""
     gen = generated_at or datetime.now(UTC).strftime("%Y-%m-%d %H:%M UTC")
     doc = _e(doc_id)
 
@@ -217,6 +275,10 @@ def to_html(
             f'{_e(a["label"])} <span class="adetail">{a["detail"]}</span></li>'
         )
     w("</ul></section>")
+
+    # the G58 archival section (optional — rendered when a report is supplied)
+    if archival is not None:
+        w(_archival_section(archival))
 
     # folder sections
     for folder in sorted(folders):
@@ -295,6 +357,19 @@ overflow:auto;margin:0 0 8px;white-space:pre-wrap;word-break:break-all}
 .note{width:100%;min-height:60px;margin-top:12px;border:1px dashed #9bb0d0;border-radius:7px;
 padding:8px 10px;font:13px inherit;resize:vertical;background:#fbfdff}
 .empty{color:var(--mut)}code{background:#eef2f8;padding:1px 5px;border-radius:4px}
+.archival h2{border-bottom-color:var(--warn)}
+.coverage{font-size:13px;background:#eef2f8;border:1px solid var(--line);border-radius:7px;
+padding:9px 12px;margin:8px 0 10px}
+.coverage.warn{background:var(--warnbg);border-color:#ecd58a;color:var(--warn);font-weight:600}
+.arows{list-style:none;margin:10px 0 0;padding:0;display:grid;gap:6px}
+.arow{font-size:12px;border:1px solid var(--line);border-left-width:4px;border-radius:6px;
+padding:6px 10px;background:var(--card)}
+.arow.dead{border-left-color:var(--fail)}
+.arow.mis{border-left-color:var(--warn)}
+.arow.dyn{border-left-color:var(--ok)}
+.apath{font-family:ui-monospace,Menlo,Consolas,monospace;font-weight:600;word-break:break-all}
+.ahosts{color:var(--mut);margin-left:8px}
+.areason{color:var(--mut);margin-top:2px}
 """
 
 _JS = """
