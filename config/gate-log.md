@@ -2048,3 +2048,106 @@ or added.
   footnote to it.
 - **Still open:** D1/D2/D4, H1–H2, I1–I3, §J sign-off. Sections A, B, C, E, F, G
   and H3 are done.
+
+## 2026-08-06 — RECORD: rua load shapes, section D — one file one node, and the second observation that was being thrown away
+
+**Gate:** `rua-load-shapes` (backlog G22) · **still UNSIGNED** — a RECORD entry, not a
+sign-off. D1, D2, D3 and D4 all ruled at the SME session; §D now closes.
+
+- **D1 RULED — the segments are the NORMALIZED ABSOLUTE PATH, and a SIGNED gate had
+  already answered it.** `cmdline-lineage-review` (2026-07-16) §c: *"Script identity
+  stays PATH-keyed; duplicates surface, never auto-merge"*, with the live case recorded
+  as *"one logical .ksh at two mounts"*. That retires **basename** outright, and G2
+  (same session) put the content hash on occurrence records, so the path is the only
+  surviving candidate. URN: `urn:drydocs:script:{normalized-abs-path}` — the **same
+  grammar G1 stated for unmanaged assets**, so D1 and G1 land as one grammar, not two.
+- **Normalization is mechanical only:** collapse duplicate slashes, strip the trailing
+  slash, count-and-reject relative / `..`-bearing paths as malformed. **No symlink
+  resolution and no case folding** — POSIX paths are case-sensitive and nothing on the
+  capture side ever resolved a link, so both would be guesses dressed as normalization.
+- **The cross-host case is the one thing §c does not cover**, and the D-amendment had
+  already chosen the answer: §c is same-basename at *different* paths; the amendment is
+  the *same* path on N hosts. **Keep one node and suppress the CLAIM rather than
+  re-key** — `storage_scope` local-or-unknown marks the node
+  identity-unconfirmed-across-hosts with no corroboration asserted. Putting the honesty
+  in the claim layer keeps A3's signed path key intact instead of quietly amending it.
+
+- **D2 RULED — reified occurrence records as their own node class, planned-first — AND
+  THE CLAUSE EXPOSED A LIVE AS-BUILT DEFECT.** `rua_inventory._stage_artifact`, on a
+  second arrival of the same staged id, increments `cross_host_collisions` and **drops
+  the record**: first-write-wins, so the second host's origin, sha256, owner, perms,
+  mtime and envelope never land at all. D2 was drafted against *"squashed into node
+  properties that overwrite each other"* — **the real behaviour is worse than the
+  failure the clause names**, because a discarded observation cannot be recovered by any
+  later loader.
+- The repo side keeps its occurrences but as a **packed string** — `code_repo.py`
+  accumulates `ref|commit|commit_date|blob_sha` newline-delimited into one `occurrences`
+  property. Fine as staging; ruled out as graph shape by ADR 0001's own words, *"a string
+  is not queryable."*
+- **Why a reified node and not edge properties:** it is the only shape that holds both
+  origins uniformly. The server occurrence's locator is host+path, the repo occurrence's
+  is repo+ref+commit — an edge-property shape hung off `:ExecutionHost` cannot carry the
+  repo half at all, and one-file-from-three-sources is this gate's whole premise.
+  Standards binding: **`prov:specializationOf`**, the term ADR 0001 already cites.
+- **This does NOT contradict the D-amendment's deferral of the storage-locus node.** That
+  one was deferred as *"an entity with no source"*; occurrences have a source in every
+  bundle — every listing row IS one. The deferral reason does not transfer.
+- **The extractor fix is a precondition of G23's existing acceptance, not new scope:**
+  G23 already demands a two-source fixture proving single-node merge, and it cannot pass
+  while the extractor drops the second occurrence. Merged into G23 rather than groomed
+  as a new item.
+
+- **D3 RULED — three parts.** (i) **The match is `rua_fqdn` → `ExecutionHost.nodeid`, NOT
+  `rua_host`.** `config/source-mappings/psgmgr.yaml` records NODEID as *"member agent
+  host FQDN (8,161 distinct); ExecutionHost node key (constraint
+  `executionhost_nodeid`)"* — the deployed key already holds fully-qualified names, so
+  the bare hostname would simply fail to match. The envelope stamps both spellings, so
+  honouring this costs nothing. Where `rua_fqdn` is absent or unqualified the record
+  stages **unresolved and counted**, never matched on the bare hostname: a cross-domain
+  prefix match is the guess the never-silent house rule forbids, and its failure mode is
+  binding a script to the **wrong server**, which is worse than not binding it. P3's
+  `executionhost_nodeid` UNIQUE constraint stands as the key; rua mints no second host
+  identity — which is what the SME's nodeid-is-the-real-server-name input implied.
+- (ii) **The AppUser half is HELD** behind A1/K17, exactly as C1's `to_node` is. Ruling
+  `(user, uid)` vs user-only while the `:AppUser` key is unsettled would re-create the
+  silent split `fid-identity-and-scope` §A1 exists to prevent.
+- (iii) **What `cross_host_collisions` means:** not "two scripts" and not "deployed
+  twice". It is the **ambiguity signal** — one file seen N times under shared storage, or
+  N genuinely different files under local storage, undecidable without fstype (G56) or a
+  content hash (absent *by contract* in the metadata-only listings, premise 2). It is the
+  review-queue feed, which is what it was built as. A rename (*collision* implies
+  conflict; the counter measures repetition) rides G55/G23, not the gate.
+
+- **D4 RULED STUB — ruled here rather than deferred to the envelope gate.** The deciding
+  argument: **deferring and ruling produce identical load behaviour**, since
+  `audit-fields.yaml`'s own rule is that loaders must not write envelope properties for
+  stub sources. Ruling is strictly better — same behaviour, and the reason is recorded
+  instead of re-derived later.
+- **The reason is standing law already.** meta.txt is a **capture** envelope, not an
+  authorship one: `collected_at` / `collected_by` fall under the CAPTURE_DATE rule signed
+  at `controlm-q1q3-phase1` — *"replication time — never authorship"*. The two per-file
+  candidates were considered and both rejected: **`mtime`** is when the inode was last
+  written on that host, which a deployment `cp` resets, making it a **deploy** timestamp
+  — and §E1 of this same gate ruled that presence is a deployment fact and nothing more,
+  so mtime inherits that limit exactly; **`owner`** is an ACL fact and not the changer (it
+  is C1's `directory_owner` input, never `source_updated_by`). Both stay **plain
+  properties**, the same disposition AUTHOR has on the Control-M entry.
+- **The as-built split is confirmed as built:** 12 envelope keys stamped on every staged
+  record, the full meta.txt retained un-stamped in `coverage.meta`. Nothing is lost and
+  nothing unratified is stamped.
+- **Applied this session** as the `exec-hosts:rua-bundle` entry in
+  `config/audit-fields.yaml` — documentary only (a stub writes nothing), matching the
+  `audit-envelope-phase4` precedent where four ruled stubs landed the same day as their
+  gate.
+- **§J PRECONDITION FOUND, verified against the guard rather than assumed:**
+  `tests/unit/test_audit_fields.py::test_every_confirmed_source_has_an_entry` requires
+  every `confirmed: true` registry source to hold an audit-fields entry — and
+  `exec-hosts:rua-bundle`, `bitbucket:repo-objects-manifest`, `dpl:pipeline-registry` and
+  `dpl:dataset-registry` are **all `confirmed: false` today**. Flipping them at §J without
+  entries **fails the suite**. §D4's authority covers the rua envelope only, so the other
+  three are **not** ruled here; §J must rule or groom them. Likely quick: bitbucket is the
+  git-history-IS-the-envelope permanent stub already used for `repo:software-registry` /
+  `repo:design-docs` / `repo:depgraph-snapshot`, with the manifest's `commit` +
+  `commit_date` as the **pointer into** that envelope rather than the envelope itself; the
+  two dpl rows need their extract's columns looked at first.
+- **Still open:** H1–H2, I1–I3, §J sign-off. Sections A, B, C, D, E, F, G and H3 are done.

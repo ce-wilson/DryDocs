@@ -6885,6 +6885,18 @@ items:
       Sequenced after the gate on purpose (K2 -> K4 loader precedent:
       gate first, build same day after sign-off). Synthetic fixtures only
       in-repo; real bundles stay in the G19 landing zone.
+      MERGED 2026-08-06 (gate rua-load-shapes D2, an as-built defect the
+      clause exposed): rua_inventory._stage_artifact currently DROPS the
+      second arrival of a staged id — it increments cross_host_collisions
+      and returns, so the second host's origin/sha256/owner/perms/mtime
+      and envelope never land. The two-source fixture in this item's own
+      acceptance CANNOT pass until that is fixed, so the extractor change
+      is a precondition of this item rather than new scope: occurrences
+      must ACCUMULATE as reified records (D2's ruled grain), not
+      first-write-wins. Note also that code_repo.py keeps its occurrences
+      as a newline-packed string property, fine for staging but ruled out
+      as graph shape by ADR 0001 (a string is not queryable) — the load
+      reads the parsed records, never the packed form.
 
   - id: G39
     epic: component-topology

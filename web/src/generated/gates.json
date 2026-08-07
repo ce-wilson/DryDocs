@@ -607,6 +607,7 @@
         "P3",
         "P5",
         "G22",
+        "G23",
         "G45",
         "J24",
         "G55",
@@ -627,6 +628,7 @@
       "unblocks": [
         "K7",
         "G22",
+        "G23",
         "G45",
         "J24",
         "G55",
@@ -646,6 +648,7 @@
       "unblocks": [
         "K7",
         "G22",
+        "G23",
         "G45",
         "J24",
         "G55",
@@ -665,6 +668,7 @@
       "unblocks": [
         "K7",
         "G22",
+        "G23",
         "G45",
         "J24",
         "G55",
@@ -684,6 +688,7 @@
       "unblocks": [
         "K7",
         "G22",
+        "G23",
         "G45",
         "J24",
         "G55",
@@ -703,6 +708,7 @@
       "unblocks": [
         "K7",
         "G22",
+        "G23",
         "G45",
         "J24",
         "G55",
@@ -722,11 +728,41 @@
       "unblocks": [
         "K7",
         "G22",
+        "G23",
         "G45",
         "J24",
         "G55",
         "G56",
         "G57"
+      ]
+    },
+    {
+      "kind": "log-entry",
+      "date": "2026-08-06",
+      "title": "RECORD: rua load shapes, section D — one file one node, and the second observation that was being thrown away",
+      "status": "recorded",
+      "prompt_files": [
+        "config/gate-prompts/audit-envelope-phase4.yaml",
+        "config/gate-prompts/controlm-q1q3-phase1.yaml",
+        "config/gate-prompts/fid-identity-and-scope.yaml",
+        "config/gate-prompts/rua-load-shapes.yaml"
+      ],
+      "log_ref": "config/gate-log.md:2052",
+      "unblocks": [
+        "K7",
+        "K16",
+        "K17",
+        "K19",
+        "M3",
+        "N1",
+        "G22",
+        "G23",
+        "G45",
+        "J24",
+        "G55",
+        "G56",
+        "G57",
+        "J32"
       ]
     },
     {

@@ -30,7 +30,7 @@
 # =============================================================================
 schema: drydocs.audit-fields.v1
 classification: Internal-Public
-updated: 2026-08-04                    # M3: the four Phase-4 rulings (gate audit-envelope-phase4). Earlier N9: re-keyed to the v2 dataset ids (gate source-registry-v2; Q6 transfers)
+updated: 2026-08-06                    # G22 §D4: exec-hosts:rua-bundle RULED stub (gate rua-load-shapes). 2026-08-04 M3: the four Phase-4 rulings (gate audit-envelope-phase4). Earlier N9: re-keyed to the v2 dataset ids (gate source-registry-v2; Q6 transfers)
 
 # The four envelope property names, frozen (test-enforced).
 envelope:
@@ -212,3 +212,24 @@ sources:
       exactly which commit the capture describes, and git blame answers who/when
       per file. Same permanent-stub rationale as software-registry; revisit only
       at a doc-06 Phase 4 gate.
+
+  - id: "exec-hosts:rua-bundle"
+    status: stub                             # RULED stub: meta.txt is a CAPTURE envelope, not authorship (gate rua-load-shapes §D4, 2026-08-06)
+    notes: >
+      Ruled 2026-08-06 (gate rua-load-shapes §D4, SME). The bundle carries no
+      source-authorship columns at all. meta.txt is a COLLECTION envelope —
+      collected_at/collected_by are excluded under the standing CAPTURE_DATE
+      rule (replication time, never authorship; gate controlm-q1q3-phase1), and
+      the remaining keys (user/uid/groups/shell/host/fqdn/os/kernel/scan_roots)
+      describe the CAPTURE RUN, not the artifact's author.
+      The two per-file candidates were considered and BOTH rejected: mtime is
+      when the inode was last written on that host, which a deployment cp
+      resets, so it is a DEPLOY timestamp — §E1 of the same gate ruled that
+      presence is a deployment fact and nothing more, and mtime inherits that
+      limit exactly; owner is an ACL fact and not the changer (it is the §C1
+      directory_owner input, never source_updated_by). Both stay PLAIN
+      PROPERTIES, the same disposition AUTHOR has on the Control-M entry.
+      Revisit trigger: none foreseen from this source — a bundle can only ever
+      report filesystem metadata. Authorship for these scripts lives on the
+      code-repo side (bitbucket:repo-objects-manifest), whose own entry is a
+      §J precondition and is NOT ruled by §D4.
