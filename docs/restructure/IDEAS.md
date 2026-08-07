@@ -62,6 +62,21 @@ question a 1,000-line file with the trail at the bottom could not answer.
 
 <!-- add new ideas at the top -->
 
+- **`Idea-80`** · 2026-08-06 · `[idea]` · **open — needs grooming once G22 signs** · prio? **High** —
+  **The dead-script report drives DELETION, so it needs a coverage precondition and
+  three dispositions, not two.** G22 §E3 named the use case: identifying unused,
+  deprecated code for archival and removal. That raises the bar on the report the
+  usage axis feeds. (a) **Body-copy coverage is a precondition, not a footnote** —
+  script-to-script invocation is visible only where the bundle carried the script
+  BODY, and the metadata-only listings ship none, so on those bundles
+  "unreferenced" means "no CMD_LINE reference", never "nothing calls it"; a report
+  that omits its coverage will propose deleting leaf scripts it was structurally
+  unable to see callers for. (b) **Three dispositions** — genuinely dead (remove),
+  MISDEPLOYED (relocate; §E1's caveat that a script may have been deployed to the
+  wrong server), and unreferenced-but-dynamically-called (keep). (c) The
+  misdeployment case is only valid where `storage_scope` is local — under shared
+  storage every host sees one file. *(From the G22 §E session, laptop.)*
+
 
 - **`Idea-79`** · 2026-08-06 · `[idea]` · **open** · prio? **Med** —
   **`PORT-MANIFEST.yaml` needs a company-row overlay seam — ports keep clobbering

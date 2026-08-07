@@ -1859,3 +1859,70 @@ or added.
   deliberately does **not** rewrite this log's history, and follows the
   source-registry v2 §Q6 precedent for the gate id — rename transfers with one
   amendment entry, nothing is re-gated.
+
+## 2026-08-06 — RECORD: rua load shapes, section E — precedence, and "deployed" stops meaning "runs" (G22; gate `rua-load-shapes`, still UNSIGNED)
+
+- **All three E clauses CONFIRMED**, two of them with SME refinements that change
+  what the page said rather than merely ticking it.
+- **E1 — the server extract is the truth for WHAT IS DEPLOYED AND WHERE.** The
+  drafted phrase *"latest code that actually runs"* is an **overclaim and is
+  retired.** SME at the session: a script may have been **deployed to the wrong
+  server** — present, called by nothing on that host, and dead in place.
+  Presence is a deployment fact and nothing more.
+- **E1's caveat is also a feature.** A script present on host A and referenced by
+  no job on host A, while its twin on host B *is* referenced, is a
+  **misdeployment** and is detectable. It interacts with the D-amendment: under
+  shared storage "deployed to the wrong server" is close to meaningless, because
+  every host sees one file — so the misdeployment finding is only valid where
+  `storage_scope` is **local**.
+- **E2 — the flag's home is `config/source-registry.yaml`, on the DATASET row.**
+  v2 already gives each dataset its own `confirmed` and `authority` fields, which
+  is the per-instance grain this needs; the flag is per-repo, therefore
+  per-dataset; and `precedence.yaml` has no per-instance grain at all — it
+  governs *concepts* globally, so a per-repo flag there is a category error.
+- **E2 is tri-state and defaults to `unknown`, never `trusted`** — `trusted |
+  untrusted | unknown`. **SME refinement making it measurable rather than merely
+  declared:** the Bitbucket/GitHub repos are cross-referenced, and if main or
+  master is **significantly behind**, the team is most likely working on feature
+  branches and never raising the PR. So main's lag is a computable proxy that
+  should populate the flag where it can be measured, with the declared value able
+  to override.
+- **E2's second evidence instance**, from a different source and date than the
+  one the page cites — `dpl_mac.py`, CLONE AUTHORITY CAVEAT (SME, 2026-07-23):
+  *"the clone's main may LAG — the dev team pushes feature branches and does not
+  reliably merge, so the folder listing is a FLOOR on the pipeline/dataset
+  inventory, never the authority."* Two independent observations of one failure
+  mode — repo state not reflecting deployed state — from the script side and the
+  pipeline side. That is what makes the per-repo flag necessary rather than
+  merely cautious.
+- **A house rule is emerging and is worth naming: UNKNOWN MUST NOT DEFAULT TO THE
+  CONVENIENT VALUE.** Twice in this session — `storage_scope: unknown` does not
+  default to *independent* (D-amendment), and repo trust `unknown` does not
+  default to *trusted* (E2).
+- **E1/E2 in `precedence.yaml` terms** fit the file's existing **disjoint-governs**
+  pattern (the `seal-pat` row already uses it): `rua-server-extract` governs
+  `deployed-script-state`; `code-repo` governs `script-intent` + `script-history`.
+  **Different axis from the file's existing four**, and the rationale must say so
+  — the current rows arbitrate *what a thing IS*, these arbitrate *which source
+  is right about a mutable artifact's state versus its history*. Without that,
+  "authority 5" later reads as "less authoritative than naming conventions,"
+  which is meaningless. `tests/unit/test_precedence.py` guards the file, so the
+  rows arrive with a test — G55-adjacent build work, not a gate edit.
+- **E3 — CONFIRMED, and the SME NAMED THE USE CASE: identifying unused,
+  deprecated code for ARCHIVAL AND REMOVAL.** Consistent with H1 by construction
+  — H1 says the three signals stay separate axes, E3 says presence is not usage;
+  the same statement from two directions, recorded so neither is later read as
+  narrowing the other.
+- **The use case raises the bar, and that is why "flagged, never auto-judged" is
+  a SAFETY property rather than tidiness:** the output drives deletion, so a
+  false positive removes live code. **Three dispositions, not two** — genuinely
+  dead (archive and remove), **misdeployed** (relocate, not delete — the E1
+  caveat), and unreferenced-but-dynamically-called (keep).
+- **KNOWN FALSE-POSITIVE MODE that must ride the report.** Script-to-script
+  invocation is visible only where the bundle **carried the body**, and the
+  metadata-only listings of premise 2 carry **no body copies at all**. On those
+  bundles "unreferenced" means only "no CMD_LINE reference", never "nothing calls
+  it". Any archival report must state its body-copy coverage, or it will propose
+  deleting leaf scripts it was structurally unable to see callers for.
+- **Still open:** D1/D2/D4, F1–F2, G1–G2, H1–H2, I1–I3, §J sign-off. Sections A,
+  B, C, E and H3 are done.
