@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import { createApiAccess } from '../lib/graphApi'
 import { forceLayout, trimEdge, type PlacedNode } from '../lib/forceLayout'
+import { GNODE, GSUB } from './GraphSvg'
 
 // The LIVE graph view (backlog O6, wf-console-01 V5): real WAS_INFORMED_BY
 // dependency edges from the knowledge graph, through the GraphAccess seam with
@@ -13,8 +14,9 @@ import { forceLayout, trimEdge, type PlacedNode } from '../lib/forceLayout'
 // Rendering: the shared deterministic d3-force placement engine
 // (lib/forceLayout.ts — extracted at R6 when the Ask spoke's Tier-2 task graph
 // became the second scene needing it) + the in-repo SVG idiom (GraphSvg's
-// visual language, which stays local to this pane). NVL deferred — revisit when
+// visual language, whose text classes it shares). NVL deferred — revisit when
 // the V5 explorer grows the C4 zoom ladder or >200-node scenes (decision on O6).
+// O30: styled inline via Tailwind/token classes (App.css retired).
 
 const env = import.meta.env
 
@@ -34,6 +36,12 @@ function layout(edges: DepEdge[]): PlacedNode[] {
 }
 
 const JOB_COLOR = '#9B6BD4' // ControlMJob's label-family color (towers.ts idiom)
+
+const NOTE = 'mt-2 text-[13px] leading-[1.55] text-muted'
+const PANEL = 'overflow-hidden rounded-md border border-edge bg-panel'
+const P_HEAD =
+  'flex items-center justify-between gap-2.5 border-b border-edge bg-panel-2 px-3.5 py-2.5 text-[13.5px] font-semibold'
+const P_HEAD_M = 'font-mono text-[10.5px] font-normal text-muted'
 
 // Middle truncation: batch job names share long prefixes (PARAD00xx_PEX_…), so
 // head truncation would render every node identically — keep head AND tail.
@@ -85,14 +93,14 @@ export default function GraphExplorer({ personaId }: { personaId: string }) {
   const downstream = edges?.filter((e) => e.target === selected) ?? [] // … inform selected's successors
 
   return (
-    <main className="wrap">
-      <div className="view-head">
-        <h1 tabIndex={-1} data-view-heading className="outline-none">Graph — live dependency view</h1>
-        <span className="tag tag-live">
+    <main className="mx-auto max-w-[1180px] px-[30px]">
+      <div className="flex flex-wrap items-center gap-3 pb-1 pt-6">
+        <h1 tabIndex={-1} data-view-heading className="text-[21px] font-bold outline-none">Graph — live dependency view</h1>
+        <span className="whitespace-nowrap rounded-xs border border-green/50 bg-green/8 px-[9px] py-1 font-mono text-[10.5px] font-medium text-green">
           LIVE · knowledge graph · db {database || '—'} · api adapter (ADR 0005)
         </span>
       </div>
-      <p className="note">
+      <p className={NOTE}>
         Real <code>WAS_INFORMED_BY</code> dependency edges from the local EE database, shaped
         server-side by drydocs-api&#39;s <code>c4-graph</code> named query. An arrow A → B reads
         &#34;A was informed by B&#34;: A runs after B, connected by the hover-labeled condition.
@@ -100,33 +108,38 @@ export default function GraphExplorer({ personaId }: { personaId: string }) {
       </p>
 
       {error && (
-        <section className="panel gx-msg">
-          <div className="p-head">Graph unavailable</div>
-          <p className="note">{error}</p>
-          <p className="note">
+        <section className={`${PANEL} px-3.5 pb-3`}>
+          <div className={`${P_HEAD} -mx-3.5 mb-2`}>Graph unavailable</div>
+          <p className={NOTE}>{error}</p>
+          <p className={NOTE}>
             The live view needs the thin API and the Neo4j EE container running; the
             synthesized tower pages under Overview work without either.
           </p>
-          <div className="row">
-            <button className="primary" onClick={() => setAttempt((n) => n + 1)}>Retry</button>
+          <div className="my-2 flex flex-wrap items-center gap-2">
+            <button
+              className="rounded-sm border border-blue-bright bg-blue px-[0.9rem] py-[0.35rem] font-semibold text-white hover:bg-blue-bright"
+              onClick={() => setAttempt((n) => n + 1)}
+            >
+              Retry
+            </button>
           </div>
         </section>
       )}
-      {!error && edges === null && <p className="note">Connecting to drydocs-api…</p>}
+      {!error && edges === null && <p className={NOTE}>Connecting to drydocs-api…</p>}
       {edges !== null && edges.length === 0 && (
-        <p className="note">0 dependency edges in {database} — load the graph first (README quick start).</p>
+        <p className={NOTE}>0 dependency edges in {database} — load the graph first (README quick start).</p>
       )}
 
       {edges !== null && edges.length > 0 && (
-        <div className="gx-grid">
-          <div className="panel">
-            <div className="p-head">
+        <div className="my-4 grid grid-cols-1 gap-4 min-[901px]:grid-cols-[1.7fr_1fr]">
+          <div className={PANEL}>
+            <div className={P_HEAD}>
               Job dependency graph · WAS_INFORMED_BY
-              <span className="m">
+              <span className={P_HEAD_M}>
                 {placed.length} jobs · {edges.length} edges · server cap 200
               </span>
             </div>
-            <div className="graphbox">
+            <div className="p-2.5">
               <svg
                 viewBox={`0 0 ${W} ${H}`}
                 width="100%"
@@ -146,7 +159,7 @@ export default function GraphExplorer({ personaId }: { personaId: string }) {
                   const { x1, y1, x2, y2 } = trimEdge(a, b, R)
                   const dim = selected && e.source !== selected && e.target !== selected
                   return (
-                    <g key={i} className="gx-edge" opacity={dim ? 0.25 : 1}>
+                    <g key={i} opacity={dim ? 0.25 : 1}>
                       <title>{`${e.source} → ${e.target}${e.via ? ` · via ${e.via}` : ''}`}</title>
                       <line x1={x1} y1={y1} x2={x2} y2={y2} stroke="#3C4E66" strokeWidth="1.6" markerEnd="url(#gx-arr)" />
                     </g>
@@ -161,7 +174,7 @@ export default function GraphExplorer({ personaId }: { personaId: string }) {
                   return (
                     <g
                       key={n.id}
-                      className="gx-node"
+                      className="cursor-pointer [&:focus-visible_circle]:stroke-blue-bright [&:focus-visible_circle]:[stroke-width:3]"
                       opacity={dim ? 0.3 : 1}
                       role="button"
                       tabIndex={0}
@@ -184,10 +197,10 @@ export default function GraphExplorer({ personaId }: { personaId: string }) {
                         stroke={n.id === selected ? '#e8edf3' : JOB_COLOR}
                         strokeWidth="2"
                       />
-                      <text x={n.x} y={n.y + 1} textAnchor="middle" className="gnode">
+                      <text x={n.x} y={n.y + 1} textAnchor="middle" className={GNODE}>
                         {label(n.id)}
                       </text>
-                      <text x={n.x} y={n.y + 15} textAnchor="middle" className="gsub">
+                      <text x={n.x} y={n.y + 15} textAnchor="middle" className={GSUB}>
                         :ControlMJob
                       </text>
                     </g>
@@ -197,37 +210,41 @@ export default function GraphExplorer({ personaId }: { personaId: string }) {
             </div>
           </div>
 
-          <div className="panel gx-inspector">
-            <div className="p-head">
+          <div className={PANEL}>
+            <div className={P_HEAD}>
               Node inspector
-              <span className="m">{selected ? ':ControlMJob' : 'select a node'}</span>
+              <span className={P_HEAD_M}>{selected ? ':ControlMJob' : 'select a node'}</span>
             </div>
             {!selected && (
-              <p className="note">
+              <p className={`${NOTE} px-3.5 py-3`}>
                 Click a job to see its neighborhood: what it waits on (upstream) and what waits
                 on it (downstream), with the via-condition per edge.
               </p>
             )}
             {selected && (
-              <div className="gx-inspect-body">
-                <div className="gx-jobname">{selected}</div>
-                <h3>Upstream · was informed by ({upstream.length})</h3>
-                {upstream.length === 0 && <p className="note">No predecessors — chain entry point.</p>}
-                <ul>
+              <div className="px-3.5 py-3 text-[13px]">
+                <div className="mb-2.5 break-all font-mono text-sm font-semibold text-blue-bright">{selected}</div>
+                <h3 className="mb-1 mt-2.5 text-xs font-semibold uppercase tracking-[0.04em] text-[#c8d2de]">
+                  Upstream · was informed by ({upstream.length})
+                </h3>
+                {upstream.length === 0 && <p className={NOTE}>No predecessors — chain entry point.</p>}
+                <ul className="list-none">
                   {upstream.map((e, i) => (
-                    <li key={i}>
-                      <code>{e.target}</code>
-                      {e.via && <span className="gx-via"> via {e.via}</span>}
+                    <li key={i} className="border-b border-edge-soft py-[3px] last:border-b-0">
+                      <code className="text-xs text-text">{e.target}</code>
+                      {e.via && <span className="font-mono text-[10.5px] text-muted"> via {e.via}</span>}
                     </li>
                   ))}
                 </ul>
-                <h3>Downstream · informs ({downstream.length})</h3>
-                {downstream.length === 0 && <p className="note">No successors — chain terminal.</p>}
-                <ul>
+                <h3 className="mb-1 mt-2.5 text-xs font-semibold uppercase tracking-[0.04em] text-[#c8d2de]">
+                  Downstream · informs ({downstream.length})
+                </h3>
+                {downstream.length === 0 && <p className={NOTE}>No successors — chain terminal.</p>}
+                <ul className="list-none">
                   {downstream.map((e, i) => (
-                    <li key={i}>
-                      <code>{e.source}</code>
-                      {e.via && <span className="gx-via"> via {e.via}</span>}
+                    <li key={i} className="border-b border-edge-soft py-[3px] last:border-b-0">
+                      <code className="text-xs text-text">{e.source}</code>
+                      {e.via && <span className="font-mono text-[10.5px] text-muted"> via {e.via}</span>}
                     </li>
                   ))}
                 </ul>
@@ -237,7 +254,7 @@ export default function GraphExplorer({ personaId }: { personaId: string }) {
         </div>
       )}
 
-      <div className="foot">
+      <div className="pb-[46px] pt-5 text-center font-mono text-[11px] text-faint">
         Data: LIVE from the local Neo4j EE knowledge graph · GraphAccess seam, api adapter
         (drydocs-api, ADR 0005) · payload shaped server-side (c4-graph named query) · layout
         d3-force, deterministic

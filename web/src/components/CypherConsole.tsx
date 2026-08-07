@@ -12,18 +12,40 @@ const PRESETS: Record<string, string> = {
   'Label counts': 'MATCH (n) RETURN labels(n) AS labels, count(*) AS count ORDER BY count DESC',
 }
 
+// O30: styled inline via Tailwind/token classes (App.css retired). The code-bg
+// hardcode (#0a111b) is the mockup's dark language, kept for parity (O32 owns
+// the light pass).
+const NOTE = 'mt-2 text-[13px] leading-[1.55] text-muted'
+const ROW = 'my-2 flex flex-wrap items-center gap-2'
+const BTN = 'rounded-sm border border-edge bg-bg-2 px-[0.7rem] py-[0.35rem] hover:border-faint'
+const BTN_PRIMARY =
+  'rounded-sm border border-blue-bright bg-blue px-[0.9rem] py-[0.35rem] font-semibold text-white hover:bg-blue-bright'
+const STATUS = 'break-all text-[0.85rem] text-muted'
+const SECTION = 'my-4 rounded-md border border-edge bg-panel p-4'
+const H2 = 'mb-1.5 text-[15px] font-semibold'
+
 function ResultTable({ result }: { result: GraphResult }) {
   if (result.rows.length === 0) return <p>0 rows.</p>
   return (
-    <div className="scroll">
-      <table>
+    <div className="max-h-[420px] overflow-x-auto overflow-y-auto">
+      <table className="w-full border-collapse text-[12.5px]">
         <thead>
-          <tr>{result.keys.map((k) => <th key={k}>{k}</th>)}</tr>
+          <tr>
+            {result.keys.map((k) => (
+              <th key={k} className="border-b border-edge bg-panel-2 px-3 py-2 text-left font-semibold text-[#c8d2de]">
+                {k}
+              </th>
+            ))}
+          </tr>
         </thead>
         <tbody>
           {result.rows.map((row, i) => (
             <tr key={i}>
-              {result.keys.map((k) => <td key={k}>{JSON.stringify(row[k])}</td>)}
+              {result.keys.map((k) => (
+                <td key={k} className="border-b border-edge-soft px-3 py-2 font-mono text-[11.5px] text-[#b9c4d2]">
+                  {JSON.stringify(row[k])}
+                </td>
+              ))}
             </tr>
           ))}
         </tbody>
@@ -102,16 +124,16 @@ export default function CypherConsole({ personaId, role }: { personaId: string; 
   return (
     <main>
       <h1 tabIndex={-1} data-view-heading className="outline-none">Console — admin sandbox</h1>
-      <p className="note">
+      <p className={NOTE}>
         Direct bolt + ADK test surface (pre-dates the O1 access decision). Flow 1 talks
         straight to the local Docker Neo4j over bolt/WebSocket; flow 2 goes through the
         Google ADK api_server as persona <code>{personaId}</code>.
       </p>
 
       {!boltAllowed(role) && (
-        <section>
-          <h2>1 · Direct bolt — dev-mode only</h2>
-          <p className="note">
+        <section className={SECTION}>
+          <h2 className={H2}>1 · Direct bolt — dev-mode only</h2>
+          <p className={NOTE}>
             The raw-Cypher panel is a development tool: it renders only in dev builds, to
             admins (ADR 0005 — bolt-from-browser is not the deployment path). Deployment
             reads go through the drydocs-api adapter.
@@ -119,9 +141,9 @@ export default function CypherConsole({ personaId, role }: { personaId: string; 
         </section>
       )}
       {boltAllowed(role) && (
-      <section>
-        <h2>1 · Basic flow — Cypher → Neo4j → C4-ish rows</h2>
-        <div className="row">
+      <section className={SECTION}>
+        <h2 className={H2}>1 · Basic flow — Cypher → Neo4j → C4-ish rows</h2>
+        <div className={ROW}>
           <input value={uri} onChange={(e) => setUri(e.target.value)} title="bolt URI" />
           <input value={user} onChange={(e) => setUser(e.target.value)} title="user" />
           <input
@@ -132,25 +154,25 @@ export default function CypherConsole({ personaId, role }: { personaId: string; 
           />
           <input value={database} onChange={(e) => setDatabase(e.target.value)} title="database" />
         </div>
-        <div className="row">
+        <div className={ROW}>
           {Object.entries(PRESETS).map(([name, q]) => (
-            <button key={name} onClick={() => setQuery(q)}>{name}</button>
+            <button key={name} className={BTN} onClick={() => setQuery(q)}>{name}</button>
           ))}
         </div>
-        <textarea rows={4} value={query} onChange={(e) => setQuery(e.target.value)} />
-        <div className="row">
-          <button className="primary" onClick={onRunCypher}>Run Cypher</button>
-          <span className="status">{cypherStatus}</span>
+        <textarea className="w-full font-mono" rows={4} value={query} onChange={(e) => setQuery(e.target.value)} />
+        <div className={ROW}>
+          <button className={BTN_PRIMARY} onClick={onRunCypher}>Run Cypher</button>
+          <span className={STATUS}>{cypherStatus}</span>
         </div>
         {result && <ResultTable result={result} />}
       </section>
       )}
 
-      <section>
-        <h2>2 · Agent flows — ADK api_server</h2>
-        <div className="row">
+      <section className={SECTION}>
+        <h2 className={H2}>2 · Agent flows — ADK api_server</h2>
+        <div className={ROW}>
           <input value={adkUrl} onChange={(e) => setAdkUrl(e.target.value)} title="ADK server URL" />
-          <button onClick={onListApps}>List apps</button>
+          <button className={BTN} onClick={onListApps}>List apps</button>
           <select value={app} onChange={(e) => { setApp(e.target.value); setSessionId('') }}>
             {(apps.length ? apps : ['graph_query', 'core_ingest', 'controlm_fix']).map((a) => (
               <option key={a} value={a}>{a}</option>
@@ -158,6 +180,7 @@ export default function CypherConsole({ personaId, role }: { personaId: string; 
           </select>
         </div>
         <textarea
+          className="w-full font-mono"
           rows={3}
           value={message}
           onChange={(e) => setMessage(e.target.value)}
@@ -167,12 +190,12 @@ export default function CypherConsole({ personaId, role }: { personaId: string; 
               : 'Message for the agent (needs GOOGLE_API_KEY in agents/.env).'
           }
         />
-        <div className="row">
-          <button className="primary" onClick={onRunAgent}>Run agent</button>
-          <span className="status">{agentStatus} {sessionId && `· session ${sessionId}`}</span>
+        <div className={ROW}>
+          <button className={BTN_PRIMARY} onClick={onRunAgent}>Run agent</button>
+          <span className={STATUS}>{agentStatus} {sessionId && `· session ${sessionId}`}</span>
         </div>
         {events && (
-          <pre className="scroll">
+          <pre className="max-h-[420px] overflow-auto whitespace-pre-wrap break-words rounded-sm border border-edge-soft bg-[#0a111b] p-3 font-mono text-[0.8rem]">
             {events
               .map((e) => e.content?.parts?.map((p) => p.text).filter(Boolean).join('\n') ?? JSON.stringify(e))
               .join('\n---\n')}

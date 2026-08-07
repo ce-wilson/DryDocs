@@ -2,6 +2,13 @@ import type { GraphSpec } from '../data/towers'
 
 const R = 27
 
+// SVG text styles, shared with GraphExplorer's live pane (formerly App.css
+// .gnode/.gsub/.gedge — O30 moved them inline; the grays are the mockup's
+// dark-language values, kept verbatim for parity until the O32 light pass).
+export const GNODE = 'fill-[#e8edf3] text-[11px] font-semibold'
+export const GSUB = 'fill-[#8a97a8] font-mono text-[9px]'
+export const GEDGE = 'fill-[#8a97a8] font-mono text-[9px] font-medium'
+
 // Pure SVG graph renderer — port of the mockup's renderGraph(): circle nodes
 // with label + :sub, straight edges trimmed to the node radius, arrowheads.
 export default function GraphSvg({ graph, viewBox = '0 0 620 300', ariaLabel }: {
@@ -30,15 +37,15 @@ export default function GraphSvg({ graph, viewBox = '0 0 620 300', ariaLabel }: 
         return (
           <g key={i}>
             <line x1={x1} y1={y1} x2={x2} y2={y2} stroke="#3C4E66" strokeWidth="1.6" markerEnd={`url(#${markerId})`} />
-            <text x={(x1 + x2) / 2} y={(y1 + y2) / 2 - 6} textAnchor="middle" className="gedge">{rel}</text>
+            <text x={(x1 + x2) / 2} y={(y1 + y2) / 2 - 6} textAnchor="middle" className={GEDGE}>{rel}</text>
           </g>
         )
       })}
       {graph.nodes.map((n, i) => (
         <g key={i}>
           <circle cx={n.x} cy={n.y} r={R} fill={n.c} opacity=".16" stroke={n.c} strokeWidth="2" />
-          <text x={n.x} y={n.y + 1} textAnchor="middle" className="gnode">{n.label}</text>
-          <text x={n.x} y={n.y + 15} textAnchor="middle" className="gsub">:{n.sub}</text>
+          <text x={n.x} y={n.y + 1} textAnchor="middle" className={GNODE}>{n.label}</text>
+          <text x={n.x} y={n.y + 15} textAnchor="middle" className={GSUB}>:{n.sub}</text>
         </g>
       ))}
     </svg>
