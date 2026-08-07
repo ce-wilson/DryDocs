@@ -477,6 +477,20 @@ def test_no_endpoint_writes_a_tracked_file():
             elif isinstance(fn, ast.Attribute) and fn.attr in banned_funcs:
                 offenders.append(f"{path.name}:{node.lineno}: .{fn.attr}()")
 
+    # O46 amendment (2026-08-06) — the one argued-for exception this test's
+    # docstring anticipated: intake evidence (.msg/.json/.txt) lands WHOLE
+    # under DRYDOCS_DATA_ROOT/context-intake/ via write_bytes. That is a
+    # payload write to the gitignored data root, never to a file git tracks —
+    # the rule this test defends is untouched (the root-outside-the-repo seam
+    # is pinned by test_intake_api.py::test_records_reference_the_data_root_
+    # seam). ONLY the landing write is exempt, and only in intake.py:
+    # delete/rename/replace stay banned there too (evidence is never edited).
+    offenders = [
+        o
+        for o in offenders
+        if not (o.startswith("intake.py:") and o.endswith(".write_bytes()"))
+    ]
+
     assert not offenders, (
         "drydocs_api must not write files — propose in the DB, land in git "
         "(ADR 0009 rule 5). Drafts belong in the mapping.db draft table; a "

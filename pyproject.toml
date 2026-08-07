@@ -48,6 +48,7 @@ httpx2 = ">=2.9"           # fastapi.testclient transport. starlette >=1.3 tries
                            # your starlette. Don't hand-maintain this: test_drydocs_api.py::
                            # test_declared_test_transport_matches_what_starlette_resolves asks the
                            # installed starlette what it actually resolved and fails if this disagrees.
+python-multipart = ">=0.0.9"
 
 [tool.poetry.scripts]
 drydocs = "drydocs.cli:app"

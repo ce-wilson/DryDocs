@@ -100,6 +100,20 @@ def vendor_docs_dir(vendor_tree: str | None = None, *, create: bool = False) -> 
     return source_dir(*parts, create=create)
 
 
+def context_intake_dir(*, create: bool = False) -> Path:
+    """Landing zone for SME context-intake evidence + records (O46 — .msg/.json/.txt
+    uploads with real names and incident detail, classification Internal; the
+    intake.db record store sits beside the per-intake evidence dirs):
+
+        <root>/context-intake/intake.db
+        <root>/context-intake/<intake_id>/<filename>
+
+    The 2026-08-06 storage ruling keys on this being ONE configured base path:
+    records carry sha256 digests + relative keys only, so local → Linux share →
+    object store is a config change, never a code change."""
+    return source_dir("context-intake", create=create)
+
+
 def controlm_xml_dir(*, create: bool = False) -> Path:
     """Landing zone for Control-M XML definition exports (G47 — the
     9.0.21.300 config SoR; real folder/job/variable values are Internal).

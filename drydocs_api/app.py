@@ -37,6 +37,21 @@ from drydocs_api.exports import (
 )
 from drydocs_api.guard import WriteRejected
 from drydocs_api.handlers import Forbidden, login, logout, run_named, run_raw
+from drydocs_api.intake import (
+    IllegalTransitionError,
+    IntakeStore,
+    IntakeValidationError,
+    UnknownIntakeError,
+    add_evidence,
+    create_intake,
+    default_intake_root,
+    get_intake,
+    list_intakes,
+    thread_decision,
+)
+from drydocs_api.intake import (
+    transition as intake_transition,
+)
 from drydocs_api.mappings import (
     ChangesetValidationError,
     MappingStore,
@@ -76,6 +91,21 @@ class ChangesetBody(BaseModel):
     # S4: append to an existing draft instead of starting a new one, so a
     # multi-step edit stays one reviewable unit. Omitted = new draft.
     draft_id: str | None = None
+
+
+class IntakeCreateBody(BaseModel):
+    context_type: str
+    area: dict = {}
+    note: str = ""
+
+
+class IntakeTransitionBody(BaseModel):
+    to: str
+    note: str = ""
+
+
+class ThreadDecisionBody(BaseModel):
+    decision: str  # 'adds-value' | 'no-new-value'
 
 
 class EphemeralRegisterBody(BaseModel):
@@ -147,7 +177,7 @@ class LiveRunner:
 def create_app(runner=None, store: InMemorySessionStore | None = None):
     """App factory. ``runner``/``store`` are injectable for tests; the default
     is the live driver + a fresh in-memory session store."""
-    from fastapi import FastAPI, Header, HTTPException
+    from fastapi import FastAPI, Header, HTTPException, UploadFile
     from fastapi.middleware.cors import CORSMiddleware
 
     app = FastAPI(
@@ -330,6 +360,100 @@ def create_app(runner=None, store: InMemorySessionStore | None = None):
             raise HTTPException(
                 404, "unknown export id (manifests register when the download completes)"
             ) from None
+
+    # ── O46 SME context-intake — evidence + records land under the data root
+    # (never the repo tree, never the graph); the server owns the status
+    # machine and returns the legal-transitions map per record. ──
+    intake_store = IntakeStore(default_intake_root())
+
+    def _intake_call(fn, *args, **kwargs):
+        try:
+            return fn(*args, **kwargs)
+        except InvalidTokenError:
+            raise HTTPException(401, "invalid session") from None
+        except Forbidden as exc:
+            raise HTTPException(403, str(exc)) from None
+        except UnknownIntakeError as exc:
+            raise HTTPException(404, f"unknown intake {exc}") from None
+        except IntakeValidationError as exc:
+            raise HTTPException(422, str(exc)) from None
+        except IllegalTransitionError as exc:
+            raise HTTPException(409, str(exc)) from None
+
+    @app.post("/intake")
+    def post_intake(
+        body: IntakeCreateBody, authorization: str | None = Header(default=None)
+    ) -> dict[str, object]:
+        return _intake_call(
+            create_intake,
+            body.context_type,
+            body.area,
+            body.note,
+            _token(authorization),
+            sessions,
+            intake_store,
+        )
+
+    @app.get("/intake")
+    def get_intakes(authorization: str | None = Header(default=None)) -> dict[str, object]:
+        return _intake_call(list_intakes, _token(authorization), sessions, intake_store)
+
+    @app.get("/intake/{intake_id}")
+    def get_one_intake(
+        intake_id: str, authorization: str | None = Header(default=None)
+    ) -> dict[str, object]:
+        return _intake_call(get_intake, intake_id, _token(authorization), sessions, intake_store)
+
+    @app.post("/intake/{intake_id}/evidence")
+    async def post_intake_evidence(
+        intake_id: str,
+        files: list[UploadFile],
+        authorization: str | None = Header(default=None),
+    ) -> dict[str, object]:
+        out: dict[str, object] = {}
+        for f in files:
+            data = await f.read()
+            out = _intake_call(
+                add_evidence,
+                intake_id,
+                f.filename or "unnamed",
+                data,
+                _token(authorization),
+                sessions,
+                intake_store,
+            )
+        return out
+
+    @app.post("/intake/{intake_id}/transition")
+    def post_intake_transition(
+        intake_id: str,
+        body: IntakeTransitionBody,
+        authorization: str | None = Header(default=None),
+    ) -> dict[str, object]:
+        return _intake_call(
+            intake_transition,
+            intake_id,
+            body.to,
+            body.note,
+            _token(authorization),
+            sessions,
+            intake_store,
+        )
+
+    @app.post("/intake/{intake_id}/thread-decision")
+    def post_thread_decision(
+        intake_id: str,
+        body: ThreadDecisionBody,
+        authorization: str | None = Header(default=None),
+    ) -> dict[str, object]:
+        return _intake_call(
+            thread_decision,
+            intake_id,
+            body.decision,
+            _token(authorization),
+            sessions,
+            intake_store,
+        )
 
     # ── O13 mapping stewardship (plan M2) — reads from the mapping-store
     # materialization; the ONLY "write" is a returned change artifact. ──

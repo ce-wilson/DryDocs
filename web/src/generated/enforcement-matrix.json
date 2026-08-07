@@ -218,6 +218,7 @@
       "files": [
         "config/taxonomy/README.md",
         "config/taxonomy/business-application.yaml",
+        "config/taxonomy/context-types.yaml",
         "config/taxonomy/controlm.yaml",
         "config/taxonomy/lob-product-team.yaml",
         "config/taxonomy/oracle-schemas.yaml",
