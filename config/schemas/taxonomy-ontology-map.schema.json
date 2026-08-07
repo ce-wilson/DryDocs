@@ -1,0 +1,92 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "drydocs:config/schemas/taxonomy-ontology-map.schema.json",
+  "title": "config/taxonomy-ontology-map/*.yaml fragments (drydocs.taxonomy-ontology-map.v1)",
+  "description": "Shape only (S6), fragment-aware: the header fragment carries schema/updated, the summary fragment carries summary:, and a mappings fragment is either {mappings: [...]} or a BARE LIST of entries (the 20-50 domain files). Lifecycle semantics (confirmed-before-load) live in the HITL flow + tests/unit/test_taxonomy_ontology_map.py.",
+  "oneOf": [
+    {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/mapping_entry"
+      }
+    },
+    {
+      "$ref": "#/$defs/fragment_object"
+    }
+  ],
+  "$defs": {
+    "fragment_object": {
+      "type": "object",
+      "properties": {
+        "schema": {
+          "const": "drydocs.taxonomy-ontology-map.v1"
+        },
+        "updated": {
+          "description": "date or string (YAML parses bare dates)"
+        },
+        "summary": {},
+        "mappings": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/mapping_entry"
+          }
+        }
+      },
+      "anyOf": [
+        {
+          "required": [
+            "schema"
+          ]
+        },
+        {
+          "required": [
+            "mappings"
+          ]
+        },
+        {
+          "required": [
+            "summary"
+          ]
+        }
+      ]
+    },
+    "mapping_entry": {
+      "type": "object",
+      "required": [
+        "id",
+        "status"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^[a-z0-9_-]+$"
+        },
+        "status": {
+          "enum": [
+            "proposed",
+            "confirmed",
+            "applied",
+            "rejected"
+          ]
+        },
+        "vocab_id": {
+          "type": [
+            "string",
+            "null",
+            "array"
+          ],
+          "items": {
+            "type": "string"
+          },
+          "description": "one vocab id, or a list where one map entry activates several registry rows"
+        },
+        "taxonomy": {
+          "type": "object"
+        },
+        "ontology": {
+          "type": "object"
+        }
+      }
+    }
+  }
+}

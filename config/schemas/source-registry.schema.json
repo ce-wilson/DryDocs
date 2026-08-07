@@ -1,0 +1,192 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "drydocs:config/schemas/source-registry.schema.json",
+  "title": "config/source-registry.yaml (drydocs.source-registry.v2)",
+  "description": "Shape only (S6). Semantics - retired-id refusal, overlay binding, URN derivation, confirmed gating - live in drydocs_core/source_registry.py and tests/unit/test_source_registry.py.",
+  "type": "object",
+  "required": [
+    "schema",
+    "updated",
+    "systems",
+    "datasets"
+  ],
+  "properties": {
+    "schema": {
+      "const": "drydocs.source-registry.v2"
+    },
+    "updated": {
+      "description": "date or string (YAML parses bare dates)"
+    },
+    "systems": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "id",
+          "name",
+          "classification"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^[a-z0-9_-]+$"
+          },
+          "name": {
+            "type": "string"
+          },
+          "seal_id": {
+            "type": "string"
+          },
+          "cmdb_ci": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "layer": {
+            "enum": [
+              "human",
+              "business",
+              "data",
+              "technology"
+            ]
+          },
+          "classification": {
+            "type": "string"
+          },
+          "locator": {
+            "type": "object"
+          },
+          "sdlc": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "notes": {
+            "type": "string"
+          }
+        },
+        "not": {
+          "required": [
+            "urn"
+          ]
+        }
+      }
+    },
+    "datasets": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "id",
+          "system",
+          "artifact"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^[a-z0-9_-]+(@|:).+$"
+          },
+          "system": {
+            "type": "string"
+          },
+          "origin": {
+            "type": "string"
+          },
+          "artifact": {
+            "type": "string"
+          },
+          "artifact_kind": {
+            "type": "string"
+          },
+          "taxonomy_category": {
+            "type": "string"
+          },
+          "asset_type": {
+            "type": "string"
+          },
+          "authority": {
+            "enum": [
+              "SOR",
+              "ADS"
+            ]
+          },
+          "derived": {
+            "type": "boolean"
+          },
+          "feeds_taxonomy": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "adapter": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "loader": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "locator": {
+            "type": "object"
+          },
+          "confirmed": {
+            "type": "boolean"
+          },
+          "crosswalk": {},
+          "gate_spec": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "replaces": {
+            "type": [
+              "string",
+              "array"
+            ]
+          },
+          "trusted_ref": {},
+          "notes": {
+            "type": "string"
+          }
+        },
+        "not": {
+          "required": [
+            "urn"
+          ]
+        }
+      }
+    },
+    "retired": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "id",
+          "reason"
+        ],
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "replaced_by": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "reason": {
+            "type": "string"
+          }
+        }
+      }
+    }
+  }
+}

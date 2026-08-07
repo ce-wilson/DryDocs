@@ -1,0 +1,111 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "drydocs:config/schemas/source-mapping.schema.json",
+  "title": "config/source-mappings/*.yaml (drydocs.source-mapping.v1)",
+  "description": "Shape only (S6). Census reconciliation and SQL drift live in tests/unit/test_source_mapping_drift.py.",
+  "type": "object",
+  "required": [
+    "schema",
+    "source",
+    "classification",
+    "objects"
+  ],
+  "properties": {
+    "schema": {
+      "const": "drydocs.source-mapping.v1"
+    },
+    "source": {
+      "type": "string"
+    },
+    "classification": {
+      "type": "string"
+    },
+    "updated": {
+      "description": "date or string (YAML parses bare dates)"
+    },
+    "objects": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "name",
+          "columns"
+        ],
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "kind": {
+            "type": "string"
+          },
+          "note": {
+            "type": "string"
+          },
+          "profile": {
+            "type": "object"
+          },
+          "default_disposition": {
+            "type": "object",
+            "required": [
+              "disposition"
+            ],
+            "properties": {
+              "disposition": {
+                "$ref": "#/$defs/disposition"
+              },
+              "reason": {
+                "type": "string"
+              },
+              "count": {
+                "type": "integer"
+              },
+              "note": {
+                "type": "string"
+              }
+            }
+          },
+          "columns": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": [
+                "name",
+                "disposition"
+              ],
+              "properties": {
+                "name": {
+                  "type": "string"
+                },
+                "disposition": {
+                  "$ref": "#/$defs/disposition"
+                },
+                "origin": {
+                  "type": "string"
+                },
+                "target": {
+                  "type": "string"
+                },
+                "reason": {
+                  "type": "string"
+                },
+                "note": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "$defs": {
+    "disposition": {
+      "enum": [
+        "projected",
+        "filter-only",
+        "excluded",
+        "deferred"
+      ]
+    }
+  }
+}

@@ -1,0 +1,68 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "drydocs:config/schemas/precedence.schema.json",
+  "title": "config/precedence.yaml (drydocs.precedence.v1)",
+  "description": "Shape only (S6). Resolution semantics live in drydocs_core/precedence.py and tests/unit/test_precedence.py.",
+  "type": "object",
+  "required": [
+    "schema",
+    "updated",
+    "order"
+  ],
+  "properties": {
+    "schema": {
+      "const": "drydocs.precedence.v1"
+    },
+    "updated": {
+      "description": "date or string (YAML parses bare dates)"
+    },
+    "order": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": [
+          "id",
+          "authority",
+          "role",
+          "governs"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^[a-z0-9-]+$"
+          },
+          "authority": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "role": {
+            "type": "string"
+          },
+          "governs": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "minItems": 1
+          },
+          "source": {
+            "type": "string"
+          },
+          "rationale": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "conflict_policy": {
+      "type": "object"
+    },
+    "active": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "boolean"
+      }
+    }
+  }
+}

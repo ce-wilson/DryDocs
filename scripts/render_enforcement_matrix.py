@@ -208,6 +208,18 @@ SURFACES: list[dict] = [
         "guard_tests": ["test_orchestration_crosswalk.py"],
         "gate_ref": "autosys-crosswalk / airflow-crosswalk (both SIGNED OFF 2026-07-14)",
     },
+    {
+        "id": "config-schemas",
+        "title": "Config-family JSON Schemas",
+        "file": "config/schemas/",
+        # S6: shape contracts for the config families — editor-time validation
+        # with no Python dependency on the package. The guard validates every
+        # live family file against its schema AND proves the schemas stand
+        # alone (subprocess without drydocs_core on the path).
+        "consumers": ["tests/unit/test_config_schemas.py"],
+        "guard_tests": ["test_config_schemas.py"],
+        "gate_ref": None,
+    },
 ]
 
 # Top-level config/ entries that are deliberately NOT surfaces.

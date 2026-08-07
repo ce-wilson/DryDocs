@@ -40,9 +40,10 @@ def test_classification_vocabulary_shape() -> None:
     }, (  # J23: Internal absorbs the former Internal-Confidential
         f"classification levels drifted: {ids}"
     )
-    # publishable must be a bool on every level
-    for lvl in doc["levels"]:
-        assert isinstance(lvl.get("publishable"), bool), f"{lvl['id']} missing publishable bool"
+    # Shape (publishable is a bool, rank an int, required keys present) is the
+    # schema's job now — config/schemas/classification.schema.json, validated
+    # by tests/unit/test_config_schemas.py (S6). This test keeps the SEMANTIC
+    # pin only: the exact three-level vocabulary.
 
 
 @pytest.mark.skipif(not _YAML_AVAILABLE, reason="PyYAML not installed")

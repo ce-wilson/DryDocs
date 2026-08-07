@@ -485,6 +485,32 @@
       ],
       "content": null,
       "extra_contents": {}
+    },
+    {
+      "id": "config-schemas",
+      "title": "Config-family JSON Schemas",
+      "file": "config/schemas/",
+      "code_resident": false,
+      "consumers": [
+        "tests/unit/test_config_schemas.py"
+      ],
+      "guard_tests": [
+        "test_config_schemas.py"
+      ],
+      "gate_ref": null,
+      "status": "enforced",
+      "pending_entries": 0,
+      "env_refs": [],
+      "files": [
+        "config/schemas/classification.schema.json",
+        "config/schemas/precedence.schema.json",
+        "config/schemas/relationship-vocabulary.schema.json",
+        "config/schemas/source-mapping.schema.json",
+        "config/schemas/source-registry.schema.json",
+        "config/schemas/taxonomy-ontology-map.schema.json"
+      ],
+      "content": null,
+      "extra_contents": {}
     }
   ]
 }

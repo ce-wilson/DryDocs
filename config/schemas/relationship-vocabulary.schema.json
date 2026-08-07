@@ -1,0 +1,106 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "drydocs:config/schemas/relationship-vocabulary.schema.json",
+  "title": "drydocs_core/ontology/relationship_vocabulary/*.yaml fragments",
+  "description": "Shape only (S6), fragment-aware: a fragment is either a mapping carrying one or more sections (node_classifications / property_terms / prov_matrix / local_relationships), a bare list of local-relationship entries (the 4x-local domain files), or the comment-only header (empty document). Gate-bound activation semantics live in the vocabulary accessor + writers.",
+  "oneOf": [
+    {
+      "type": "null"
+    },
+    {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/local_relationship"
+      }
+    },
+    {
+      "type": "object",
+      "minProperties": 1,
+      "properties": {
+        "node_classifications": {},
+        "property_terms": {},
+        "prov_matrix": {
+          "type": "array"
+        },
+        "local_relationships": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/local_relationship"
+          }
+        }
+      },
+      "additionalProperties": false
+    }
+  ],
+  "$defs": {
+    "local_relationship": {
+      "type": "object",
+      "required": [
+        "id",
+        "neo4j_label",
+        "from_node",
+        "to_node",
+        "status"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^[a-z0-9_]+$"
+        },
+        "neo4j_label": {
+          "type": "string",
+          "pattern": "^[A-Z][A-Z0-9_]*$"
+        },
+        "inverse_label": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "from_node": {
+          "type": "string"
+        },
+        "to_node": {
+          "type": "string"
+        },
+        "role": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "prov_maps_to": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "status": {
+          "enum": [
+            "planned",
+            "active",
+            "deprecated"
+          ]
+        },
+        "domain": {
+          "type": "string"
+        },
+        "supplement": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "loader": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "note": {
+          "type": "string"
+        }
+      }
+    }
+  }
+}
