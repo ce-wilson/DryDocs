@@ -24,6 +24,11 @@ The `taxonomy-importer` sub-agent writes here. Keep imports faithful to the sour
 > class layer (the interim Ais* family was removed unbuilt — role over class). Its seed rows
 > carry the `software_registry_ref` crosswalk links.
 
+> **`context-types.yaml`** is an authored vocabulary, not an import: the controlled list
+> behind the SME intake page's context-type dropdown (O45; UI-WIP/sme-intake-page-plan.md §2).
+> Values are retired, never deleted; the console reads the generated artifact
+> `web/src/generated/context-types.json` (guard: `tests/unit/test_context_types.py`).
+
 ## Format
 One file per taxonomy, e.g. `lob-product-team.yaml`:
 ```yaml

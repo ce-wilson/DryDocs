@@ -1,0 +1,59 @@
+# =============================================================================
+# config/taxonomy/context-types.yaml — context-type vocabulary for SME intake.
+#
+# Created 2026-08-06 (backlog O45, slice 1 of the SME Context-Intake page plan,
+# UI-WIP/sme-intake-page-plan.md §2). This is the controlled list behind the
+# intake page's "context type" dropdown: what KIND of support situation the
+# uploaded evidence describes.
+#
+# THE HARD RULE holds: this file is pure classification (layer 1). Nothing here
+# is loaded to the graph and no entry implies an edge or a meaning — adding a
+# value is a config edit + SME nod, never a HITL gate. The list is expected to
+# grow as intake usage refines it (user direction 2026-08-05); the page's
+# "Other / not listed" free text is the growth signal and lands in the intake
+# note, never silently here.
+#
+# Values are NEVER deleted — retire them (status: retired) so historical intake
+# records keep resolving their context_type id. Ids are stable references.
+#
+# Served to the console as web/src/generated/context-types.json
+# (scripts/render_context_types.py, riding the default render_board.py run —
+# the J17/J20/N4 one-entry-point idiom); the page never hardcodes this list.
+# Guard: tests/unit/test_context_types.py (schema pin, id uniqueness, status
+# enum, generated-artifact drift).
+# =============================================================================
+
+schema: drydocs.context-types.v1
+classification: Internal-Public       # generic support-situation vocabulary; no firm data
+status: captured
+confirmed: true                       # seed list is the user's own enumeration (plan §2, 2026-08-05) — no gate needed for pure classification
+updated: 2026-08-06
+
+context_types:
+  - id: job-failure
+    label: Job failure
+    description: >
+      A scheduled batch job failed or ended not-OK — the evidence describes the
+      failure, its investigation, or its resolution.
+    status: active
+
+  - id: missed-data-load
+    label: Missed data load
+    description: >
+      An expected data load did not happen or did not complete in its window —
+      downstream consumers saw stale or absent data.
+    status: active
+
+  - id: missed-file
+    label: Missed file
+    description: >
+      An expected inbound or outbound file did not arrive, was late, or was
+      empty — file-watcher / transfer-level, before any load ran.
+    status: active
+
+  - id: data-issue
+    label: Data issue
+    description: >
+      The pipeline ran but the data is wrong — bad values, duplicates, schema
+      surprises, reconciliation breaks.
+    status: active

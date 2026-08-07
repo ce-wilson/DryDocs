@@ -1,0 +1,27 @@
+{
+  "schema": "drydocs.context-types.v1",
+  "updated": "2026-08-06",
+  "context_types": [
+    {
+      "id": "job-failure",
+      "label": "Job failure",
+      "description": "A scheduled batch job failed or ended not-OK \u2014 the evidence describes the failure, its investigation, or its resolution."
+    },
+    {
+      "id": "missed-data-load",
+      "label": "Missed data load",
+      "description": "An expected data load did not happen or did not complete in its window \u2014 downstream consumers saw stale or absent data."
+    },
+    {
+      "id": "missed-file",
+      "label": "Missed file",
+      "description": "An expected inbound or outbound file did not arrive, was late, or was empty \u2014 file-watcher / transfer-level, before any load ran."
+    },
+    {
+      "id": "data-issue",
+      "label": "Data issue",
+      "description": "The pipeline ran but the data is wrong \u2014 bad values, duplicates, schema surprises, reconciliation breaks."
+    }
+  ],
+  "retired": []
+}
