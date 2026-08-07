@@ -1,16 +1,16 @@
 {
   "meta": {
     "project": "drydocs",
-    "captured_at": "2026-08-07T12:30:19",
+    "captured_at": "2026-08-07T18:34:52",
     "date": "20260807",
     "scan": "DryDocs",
     "tree": true,
     "git": {
-      "commit": "cbb8b3d",
-      "full": "cbb8b3d70a75cb863b1458f817b9d7412019d516",
+      "commit": "9bf7ebb",
+      "full": "9bf7ebb21b5b0663edf5256c12cff2776da31643",
       "branch": "main",
-      "describe": "cbb8b3d",
-      "subject": "test(runbook-currency): exempt the retired fix-pack citation as historical",
+      "describe": "9bf7ebb",
+      "subject": "fix(tests): J36 — ryuk workaround automatic; integration suite needs no manual prep",
       "dirty": false,
       "pr": null
     },
@@ -7998,6 +7998,51 @@
       "kind": "file"
     },
     {
+      "file_id": "drydocs/docs/gate-airflow-crosswalk-company-prompt.md",
+      "name": "gate-airflow-crosswalk-company-prompt.md",
+      "extension": ".md",
+      "rel_path": "docs/gate-airflow-crosswalk-company-prompt.md",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/docs/gate-audit-envelope-phase4-company-prompt.md",
+      "name": "gate-audit-envelope-phase4-company-prompt.md",
+      "extension": ".md",
+      "rel_path": "docs/gate-audit-envelope-phase4-company-prompt.md",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/docs/gate-autosys-crosswalk-company-prompt.md",
+      "name": "gate-autosys-crosswalk-company-prompt.md",
+      "extension": ".md",
+      "rel_path": "docs/gate-autosys-crosswalk-company-prompt.md",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/docs/gate-envelope-property-terms-company-prompt.md",
+      "name": "gate-envelope-property-terms-company-prompt.md",
+      "extension": ".md",
+      "rel_path": "docs/gate-envelope-property-terms-company-prompt.md",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/docs/gate-ui-write-surface-company-prompt.md",
+      "name": "gate-ui-write-surface-company-prompt.md",
+      "extension": ".md",
+      "rel_path": "docs/gate-ui-write-surface-company-prompt.md",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
       "file_id": "drydocs/docs/generic-snowflake-data-catalog-ingestion-plan.md",
       "name": "generic-snowflake-data-catalog-ingestion-plan.md",
       "extension": ".md",
@@ -8074,6 +8119,15 @@
       "name": "next-session-cron-prompt.md",
       "extension": ".md",
       "rel_path": "docs/history/next-session-cron-prompt.md",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/docs/k16-fid-census-company-prompt.md",
+      "name": "k16-fid-census-company-prompt.md",
+      "extension": ".md",
+      "rel_path": "docs/k16-fid-census-company-prompt.md",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -9627,10 +9681,28 @@
       "kind": "file"
     },
     {
+      "file_id": "drydocs/drydocs/docs_coverage.py",
+      "name": "docs_coverage.py",
+      "extension": ".py",
+      "rel_path": "drydocs/docs_coverage.py",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
       "file_id": "drydocs/drydocs/docs_verify.py",
       "name": "docs_verify.py",
       "extension": ".py",
       "rel_path": "drydocs/docs_verify.py",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/drydocs/fid_census.py",
+      "name": "fid_census.py",
+      "extension": ".py",
+      "rel_path": "drydocs/fid_census.py",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -12336,6 +12408,24 @@
       "kind": "file"
     },
     {
+      "file_id": "drydocs/internal/airflow-reference",
+      "name": "airflow-reference",
+      "extension": "",
+      "rel_path": "internal/airflow-reference",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "dir"
+    },
+    {
+      "file_id": "drydocs/internal/airflow-reference/mwaa-internal-docs.md",
+      "name": "mwaa-internal-docs.md",
+      "extension": ".md",
+      "rel_path": "internal/airflow-reference/mwaa-internal-docs.md",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
       "file_id": "drydocs/internal/context-graph-analysis",
       "name": "context-graph-analysis",
       "extension": "",
@@ -13056,10 +13146,10 @@
       "kind": "file"
     },
     {
-      "file_id": "drydocs/knowledge/depgraph-snapshots/drydocs-20260807-0414.json",
-      "name": "drydocs-20260807-0414.json",
+      "file_id": "drydocs/knowledge/depgraph-snapshots/drydocs-20260807.json",
+      "name": "drydocs-20260807.json",
       "extension": ".json",
-      "rel_path": "knowledge/depgraph-snapshots/drydocs-20260807-0414.json",
+      "rel_path": "knowledge/depgraph-snapshots/drydocs-20260807.json",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -14001,6 +14091,15 @@
       "kind": "file"
     },
     {
+      "file_id": "drydocs/tests/integration/conftest.py",
+      "name": "conftest.py",
+      "extension": ".py",
+      "rel_path": "tests/integration/conftest.py",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
       "file_id": "drydocs/tests/integration/test_e2e_load.py",
       "name": "test_e2e_load.py",
       "extension": ".py",
@@ -14325,6 +14424,15 @@
       "kind": "file"
     },
     {
+      "file_id": "drydocs/tests/unit/test_docs_coverage.py",
+      "name": "test_docs_coverage.py",
+      "extension": ".py",
+      "rel_path": "tests/unit/test_docs_coverage.py",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
       "file_id": "drydocs/tests/unit/test_docs_verify.py",
       "name": "test_docs_verify.py",
       "extension": ".py",
@@ -14383,6 +14491,15 @@
       "name": "test_fcdo_crosswalk.py",
       "extension": ".py",
       "rel_path": "tests/unit/test_fcdo_crosswalk.py",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/tests/unit/test_fid_census.py",
+      "name": "test_fid_census.py",
+      "extension": ".py",
+      "rel_path": "tests/unit/test_fid_census.py",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -16332,6 +16449,15 @@
       "kind": "file"
     },
     {
+      "file_id": "drydocs/web/src/routes/SoftwareRoute.tsx",
+      "name": "SoftwareRoute.tsx",
+      "extension": ".tsx",
+      "rel_path": "web/src/routes/SoftwareRoute.tsx",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
       "file_id": "drydocs/web/src/routes/UnderTheHoodRoute.tsx",
       "name": "UnderTheHoodRoute.tsx",
       "extension": ".tsx",
@@ -16390,6 +16516,33 @@
       "name": "demoRunbooks.ts",
       "extension": ".ts",
       "rel_path": "web/src/runbooks/demoRunbooks.ts",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/web/src/software",
+      "name": "software",
+      "extension": "",
+      "rel_path": "web/src/software",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "dir"
+    },
+    {
+      "file_id": "drydocs/web/src/software/VendorIcon.tsx",
+      "name": "VendorIcon.tsx",
+      "extension": ".tsx",
+      "rel_path": "web/src/software/VendorIcon.tsx",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/web/src/software/softwareModel.ts",
+      "name": "softwareModel.ts",
+      "extension": ".ts",
+      "rel_path": "web/src/software/softwareModel.ts",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -16546,6 +16699,10 @@
     [
       "drydocs/drydocs/cli.py",
       "drydocs/drydocs/cmdline_staging.py"
+    ],
+    [
+      "drydocs/drydocs/cli.py",
+      "drydocs/drydocs/docs_coverage.py"
     ],
     [
       "drydocs/drydocs/cli.py",
@@ -16722,6 +16879,10 @@
     [
       "drydocs/drydocs/doc_outline.py",
       "drydocs/drydocs_core/doc_anchors.py"
+    ],
+    [
+      "drydocs/drydocs/docs_coverage.py",
+      "drydocs/drydocs/docs_verify.py"
     ],
     [
       "drydocs/drydocs/loaders/__init__.py",
@@ -17984,6 +18145,10 @@
       "drydocs/tests/unit/test_doc_registry.py"
     ],
     [
+      "drydocs/tests/unit/test_docs_coverage.py",
+      "drydocs/drydocs/docs_coverage.py"
+    ],
+    [
       "drydocs/tests/unit/test_docs_verify.py",
       "drydocs/drydocs/docs_verify.py"
     ],
@@ -18070,6 +18235,10 @@
     [
       "drydocs/tests/unit/test_fcdo_crosswalk.py",
       "drydocs/drydocs_core/orchestration/crosswalk.py"
+    ],
+    [
+      "drydocs/tests/unit/test_fid_census.py",
+      "drydocs/drydocs/fid_census.py"
     ],
     [
       "drydocs/tests/unit/test_folder_attribution.py",
@@ -18374,6 +18543,10 @@
     [
       "drydocs/tests/unit/test_load_map_json.py",
       "drydocs/drydocs/cli.py"
+    ],
+    [
+      "drydocs/tests/unit/test_load_map_json.py",
+      "drydocs/drydocs_api/query_specs.py"
     ],
     [
       "drydocs/tests/unit/test_load_map_json.py",
@@ -18918,6 +19091,10 @@
     [
       "drydocs/web/src/App.tsx",
       "drydocs/web/src/routes/RunbooksRoute.tsx"
+    ],
+    [
+      "drydocs/web/src/App.tsx",
+      "drydocs/web/src/routes/SoftwareRoute.tsx"
     ],
     [
       "drydocs/web/src/App.tsx",
@@ -19620,6 +19797,42 @@
       "drydocs/web/src/runbooks/demoRunbooks.ts"
     ],
     [
+      "drydocs/web/src/routes/SoftwareRoute.tsx",
+      "drydocs/web/src/components/MiniDag.tsx"
+    ],
+    [
+      "drydocs/web/src/routes/SoftwareRoute.tsx",
+      "drydocs/web/src/components/StatTiles.tsx"
+    ],
+    [
+      "drydocs/web/src/routes/SoftwareRoute.tsx",
+      "drydocs/web/src/components/ui/EmptyState.tsx"
+    ],
+    [
+      "drydocs/web/src/routes/SoftwareRoute.tsx",
+      "drydocs/web/src/lib/auth.ts"
+    ],
+    [
+      "drydocs/web/src/routes/SoftwareRoute.tsx",
+      "drydocs/web/src/lib/graphApi.ts"
+    ],
+    [
+      "drydocs/web/src/routes/SoftwareRoute.tsx",
+      "drydocs/web/src/modules/registry.ts"
+    ],
+    [
+      "drydocs/web/src/routes/SoftwareRoute.tsx",
+      "drydocs/web/src/routes/ModuleTemplate.tsx"
+    ],
+    [
+      "drydocs/web/src/routes/SoftwareRoute.tsx",
+      "drydocs/web/src/software/VendorIcon.tsx"
+    ],
+    [
+      "drydocs/web/src/routes/SoftwareRoute.tsx",
+      "drydocs/web/src/software/softwareModel.ts"
+    ],
+    [
       "drydocs/web/src/routes/UnderTheHoodRoute.tsx",
       "drydocs/web/src/components/StatTiles.tsx"
     ],
@@ -19730,6 +19943,10 @@
     [
       "drydocs/web/src/runbooks/demoRunbooks.ts",
       "drydocs/web/src/components/MiniDag.tsx"
+    ],
+    [
+      "drydocs/web/src/software/VendorIcon.tsx",
+      "drydocs/web/src/software/softwareModel.ts"
     ],
     [
       "drydocs/web/src/underhood/HallucinationSpotlight.tsx",
@@ -23979,12 +24196,42 @@
     [
       "drydocs/docs",
       "CONTAINS",
+      "drydocs/docs/gate-airflow-crosswalk-company-prompt.md"
+    ],
+    [
+      "drydocs/docs",
+      "CONTAINS",
+      "drydocs/docs/gate-audit-envelope-phase4-company-prompt.md"
+    ],
+    [
+      "drydocs/docs",
+      "CONTAINS",
+      "drydocs/docs/gate-autosys-crosswalk-company-prompt.md"
+    ],
+    [
+      "drydocs/docs",
+      "CONTAINS",
+      "drydocs/docs/gate-envelope-property-terms-company-prompt.md"
+    ],
+    [
+      "drydocs/docs",
+      "CONTAINS",
+      "drydocs/docs/gate-ui-write-surface-company-prompt.md"
+    ],
+    [
+      "drydocs/docs",
+      "CONTAINS",
       "drydocs/docs/generic-snowflake-data-catalog-ingestion-plan.md"
     ],
     [
       "drydocs/docs",
       "CONTAINS",
       "drydocs/docs/history"
+    ],
+    [
+      "drydocs/docs",
+      "CONTAINS",
+      "drydocs/docs/k16-fid-census-company-prompt.md"
     ],
     [
       "drydocs/docs",
@@ -24749,7 +24996,17 @@
     [
       "drydocs/drydocs",
       "CONTAINS",
+      "drydocs/drydocs/docs_coverage.py"
+    ],
+    [
+      "drydocs/drydocs",
+      "CONTAINS",
       "drydocs/drydocs/docs_verify.py"
+    ],
+    [
+      "drydocs/drydocs",
+      "CONTAINS",
+      "drydocs/drydocs/fid_census.py"
     ],
     [
       "drydocs/drydocs",
@@ -26649,6 +26906,11 @@
     [
       "drydocs/internal",
       "CONTAINS",
+      "drydocs/internal/airflow-reference"
+    ],
+    [
+      "drydocs/internal",
+      "CONTAINS",
       "drydocs/internal/context-graph-analysis"
     ],
     [
@@ -26710,6 +26972,11 @@
       "drydocs/internal/agent-platform",
       "CONTAINS",
       "drydocs/internal/agent-platform/smartsdk-3-adr0007-compatibility.md"
+    ],
+    [
+      "drydocs/internal/airflow-reference",
+      "CONTAINS",
+      "drydocs/internal/airflow-reference/mwaa-internal-docs.md"
     ],
     [
       "drydocs/internal/context-graph-analysis",
@@ -27079,7 +27346,7 @@
     [
       "drydocs/knowledge/depgraph-snapshots",
       "CONTAINS",
-      "drydocs/knowledge/depgraph-snapshots/drydocs-20260807-0414.json"
+      "drydocs/knowledge/depgraph-snapshots/drydocs-20260807.json"
     ],
     [
       "drydocs/knowledge/depgraph-snapshots",
@@ -27544,6 +27811,11 @@
     [
       "drydocs/tests/integration",
       "CONTAINS",
+      "drydocs/tests/integration/conftest.py"
+    ],
+    [
+      "drydocs/tests/integration",
+      "CONTAINS",
       "drydocs/tests/integration/test_e2e_load.py"
     ],
     [
@@ -27719,6 +27991,11 @@
     [
       "drydocs/tests/unit",
       "CONTAINS",
+      "drydocs/tests/unit/test_docs_coverage.py"
+    ],
+    [
+      "drydocs/tests/unit",
+      "CONTAINS",
       "drydocs/tests/unit/test_docs_verify.py"
     ],
     [
@@ -27750,6 +28027,11 @@
       "drydocs/tests/unit",
       "CONTAINS",
       "drydocs/tests/unit/test_fcdo_crosswalk.py"
+    ],
+    [
+      "drydocs/tests/unit",
+      "CONTAINS",
+      "drydocs/tests/unit/test_fid_census.py"
     ],
     [
       "drydocs/tests/unit",
@@ -28409,6 +28691,11 @@
     [
       "drydocs/web/src",
       "CONTAINS",
+      "drydocs/web/src/software"
+    ],
+    [
+      "drydocs/web/src",
+      "CONTAINS",
       "drydocs/web/src/styles"
     ],
     [
@@ -28864,6 +29151,11 @@
     [
       "drydocs/web/src/routes",
       "CONTAINS",
+      "drydocs/web/src/routes/SoftwareRoute.tsx"
+    ],
+    [
+      "drydocs/web/src/routes",
+      "CONTAINS",
       "drydocs/web/src/routes/UnderTheHoodRoute.tsx"
     ],
     [
@@ -28890,6 +29182,16 @@
       "drydocs/web/src/runbooks",
       "CONTAINS",
       "drydocs/web/src/runbooks/demoRunbooks.ts"
+    ],
+    [
+      "drydocs/web/src/software",
+      "CONTAINS",
+      "drydocs/web/src/software/VendorIcon.tsx"
+    ],
+    [
+      "drydocs/web/src/software",
+      "CONTAINS",
+      "drydocs/web/src/software/softwareModel.ts"
     ],
     [
       "drydocs/web/src/styles",
@@ -28941,13 +29243,13 @@
     "projects": [
       "drydocs"
     ],
-    "files": 1567,
-    "edges": 810,
+    "files": 1582,
+    "edges": 826,
     "circular_files": 0,
     "processes": 0,
     "data_assets": 0,
     "hosts": 0,
-    "rels": 1832,
-    "directories": 266
+    "rels": 1849,
+    "directories": 268
   }
 }
