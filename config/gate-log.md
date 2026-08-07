@@ -2211,3 +2211,85 @@ sign-off. H1 and H2 confirmed; with H3 (already recorded) **§H now closes**.
   otherwise the finding report understates by exactly the `active_unknown` count. The
   never-silent house rule applied to the report rather than to the load.
 - **Still open:** I1–I3, §J sign-off. Sections A–H are done.
+
+## 2026-08-06 — RECORD: rua load shapes, section I — the consequences ledger, and a tracker that knew more than the clause
+
+**Gate:** `rua-load-shapes` (backlog G22) · **still UNSIGNED** — a RECORD entry, not a
+sign-off. I1, I2 and I3 confirmed; **§I closes, and every clause but §J is now ruled.**
+
+- **I1 CONFIRMED — mechanism verified present, and two things fixed at the ruling.** G55
+  exists (groomed at this session) and its acceptance already encodes the three
+  dispositions: activated entries go planned → active **with** their supplement block (an
+  entry cannot be active without one — that is what `active` MEANS in `00-header.yaml`'s
+  lifecycle), new meanings land `status: planned` via ontology-mapper, declined entries
+  retire with a note naming the ruling, date and replacement. No loader is built there
+  either; that is G23.
+- **Fix 1 — G55's `inputs` were incomplete, corrected at this session.** They named
+  `40-local-controlm.yaml` only, which carries `m3_invokes` (B2's widening) but none of the
+  rest this gate ruled. Added **`43-local-architecture.yaml`** — where C1's
+  `WAS_ATTRIBUTED_TO {role: directory_owner}` belongs beside its own `arch_owns_code`
+  precedent, where C2's `SOURCES` belongs, and where C3's `IS_ENCODED_IN` **already lives**
+  — and **`10-node-classifications.yaml`**, where D2's occurrence node class belongs (the
+  same file already holds the `:Script` and `:AppUser` labels). Not pedantry: an inputs
+  list is what a sub-agent reads, so an unlisted fragment is an unedited fragment.
+- **Fix 2 — D2 ruled a NODE class, not only an edge**, and the supplement discipline
+  applies identically: `10-node-classifications.yaml`'s own header requires every `dd:*`
+  class to be MERGEd as `:OntologyTerm:LocalClass` in a supplement, so the occurrence class
+  needs label + class + prov_type + its supplement block exactly as an activated
+  relationship does.
+- **The G55 open question is raised here, which is what its notes asked for.** The
+  lifecycle offers planned | active | deprecated | removed and **none** describes
+  *"declared, never built, ruled unnecessary"* — `deprecated` asserts data is kept (false;
+  `m3_runs_on_etl_host` never loaded), `removed` asserts data and code were deleted (also
+  false; there was never any). **Recommendation for §J:** use `removed` with an explicit
+  never-built note — the deletion clause is vacuously satisfied and no schema change is
+  needed — rather than minting a fifth status, which would itself be a vocabulary change
+  riding a gate. §J rules it; G55 must not decide it alone.
+
+- **I2 CONFIRMED, with one correction the page needs because it predates source-registry
+  v2.** *"precedence.yaml rows"* is a **pre-v2 drafting artifact and no row is owed.**
+  `precedence.yaml` is an ordered **authority** chain about *what something IS* — four
+  authorities, each with a `governs:` concept list and a conflict policy for when
+  authorities disagree about an object's meaning. **§E is not that question:** both code
+  feeds agree what a script IS and disagree about *which copy is current*, which is
+  feed-level, and `precedence.yaml` has no grain for it.
+- **Feed-level authority already has its home**, built at N7 and signed 2026-07-31:
+  source-registry v2 **dataset rows carry an `authority` field** — verified in place,
+  `exec-hosts:rua-bundle` carries `authority: SOR` today — beside `trusted_ref` on the repo
+  row (built at G24). §E's ruling already landed there this session as the corrected
+  `bitbucket` system note. Recorded deliberately so a later reader does not read the
+  absence as an oversight and add a row that would mis-state what `precedence.yaml`
+  governs.
+- **gates.json verified live**, not assumed: `scripts/render_gates.py` regenerates it and
+  the file has moved in every commit of this session. **The guard is stronger than the page
+  describes, in exactly the way this gate needed** —
+  `test_a_citation_or_partial_ruling_never_accounts_for_a_gate` means the RECORD entries do
+  **not** make G22 count as accounted-for, and `test_unsigned_but_cited_gates_render_open`
+  keeps G22 rendering **open** until §J signs. Status derives from the log heading
+  **verbatim** (signed-off | deferred | pending | recorded), so the page never reinterprets
+  the record — precisely the property the RECORD convention depended on, now confirmed
+  rather than hoped for.
+- F1's classification output is a **test** over the QuerySpec registry (no publishable spec
+  returns a column in the confidential set), not a config row — vacuous today since every
+  spec is Internal, and it guards forward.
+
+- **I3 CONFIRMED, with a material amendment — the tracker records something the clause does
+  not**, found by reading T16 rather than citing it.
+- **(1) "The seam retires" is imprecise, and the halves differ.** T16 says the G39 **staging
+  stand-in** retires *as the feed*, while the **G40 parse stays as a cross-check**. One is
+  retired, one is kept; collapsing them would quietly delete a live check.
+- **(2) The amendment that changes the clause — T16 records a SECOND retirement path that
+  I3 does not:** *"if the XML export becomes a standing feed, this retirement gains a SECOND
+  path — the unruled precedence question decides, not the port."* So *"no re-gate needed"*
+  holds **only** for the single-path case where `CM_DEF_VJOB_DETAIL` lands and the staging
+  seam steps aside. **Two standing feeds for the same CMD_LINE fact is a precedence
+  question**, §E is its home, and §E did not rule it because it was never on the page — so
+  the two-feed case **re-gates**. Note this is feed-level precedence, exactly the grain §I2
+  just placed on the source-registry dataset row rather than in `precedence.yaml`.
+- **(3) The premise is a belief, not a verified fact**, and I3 should say so: T16's status
+  is *"pending (producer belief, as of 2026-08-01)"*, so the table being built for real
+  company-side is expected, not confirmed.
+- Everything else in the clause stands: the fact *shapes* are what a re-gate turns on, and
+  a like-for-like feed swap disturbs no ruling this gate made.
+
+- **Still open: §J sign-off only.** Sections A through I are done.

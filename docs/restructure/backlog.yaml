@@ -12059,6 +12059,8 @@ items:
     depends_on: [G22]
     inputs:
       - drydocs_core/ontology/relationship_vocabulary/40-local-controlm.yaml
+      - drydocs_core/ontology/relationship_vocabulary/43-local-architecture.yaml
+      - drydocs_core/ontology/relationship_vocabulary/10-node-classifications.yaml
       - drydocs_core/ontology/relationship_vocabulary/00-header.yaml
       - drydocs_core/schema/ontology_supplement.cypher
       - config/gate-log.md
@@ -12109,6 +12111,20 @@ items:
       alternative is a fifth status (`declined`), which is itself a vocabulary
       change and would ride a gate. Raise at G22 sign-off rather than choosing
       here.
+      INPUTS CORRECTED 2026-08-06 (gate rua-load-shapes I1): the list named
+      40-local-controlm.yaml only, which carries m3_invokes (B2's widening) but
+      none of the rest this gate ruled. Added 43-local-architecture.yaml — C1's
+      WAS_ATTRIBUTED_TO {role: directory_owner} belongs beside its own
+      arch_owns_code precedent there, C2's SOURCES belongs there, and C3's
+      IS_ENCODED_IN already lives there — and 10-node-classifications.yaml,
+      where D2's occurrence NODE class belongs (the same file already holds the
+      :Script and :AppUser labels). An inputs list is what a sub-agent reads, so
+      an unlisted fragment is an unedited fragment.
+      NOTE FOR (b), also from I1: D2 ruled a NODE class, not only an edge, and
+      the supplement discipline is identical — 10-node-classifications.yaml's
+      header requires every dd:* class to be MERGEd as :OntologyTerm:LocalClass
+      in a supplement, so the occurrence class needs label + class + prov_type
+      + its supplement block exactly as an activated relationship does.
 
   - id: G56
     epic: component-topology
