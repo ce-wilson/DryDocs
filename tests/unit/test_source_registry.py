@@ -436,20 +436,27 @@ def test_real_registry_gate_state() -> None:
         "repo:software-registry",
         "repo:depgraph-snapshot",
         "repo:design-docs",
+        # The four rua-chain rows, moved DELIBERATELY at gate rua-load-shapes
+        # (G22, SIGNED OFF 2026-08-07, 28/28 — config/gate-log.md). Each row
+        # named THIS gate as its own activation condition; §D1/§D2 ruled
+        # identity + occurrence grain, §E precedence between origins, §G/§H
+        # clauses (f)/(g). Confirmed is authority to LOAD, not a loader: every
+        # one of these rows still carries `adapter: ~` and the curated build is
+        # G23 (same state autosys/airflow have held since 2026-07-14).
+        "exec-hosts:rua-bundle",
+        "bitbucket:repo-objects-manifest",
+        "dpl:pipeline-registry",
+        "dpl:dataset-registry",
     ):
         assert reg.is_confirmed(live), f"{live} should be confirmed"
     # Everything else landed confirmed: false at the N9 per-row sweep.
     for placeholder in (
         "oracle:schema-inventory",
         "snowflake:schema-inventory",
-        "exec-hosts:rua-bundle",
-        "dpl:pipeline-registry",
-        "dpl:dataset-registry",
         "snow:cmdb-ci-classes",
         "seal@[db].psgmgr.cm_escalation_db",
         "controlm@[db].psgmgr.cm_hist_vw",
         "controlm:deftable-xml-export",
-        "bitbucket:repo-objects-manifest",
     ):
         assert not reg.is_confirmed(placeholder), f"{placeholder} should be unconfirmed"
         with pytest.raises(UnconfirmedSourceError):

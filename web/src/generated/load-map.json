@@ -1062,9 +1062,9 @@
       "urn": "urn:drydocs:dataset:(exec-hosts,rua-bundle,prod)",
       "replaces": "rua-inventory",
       "classification": "Internal",
-      "confirmed": false,
+      "confirmed": true,
       "ledger": {
-        "state": "placeholder",
+        "state": "pending",
         "path": null
       },
       "taxonomy_captures": [],
@@ -1082,9 +1082,9 @@
       "urn": "urn:drydocs:dataset:(dpl,pipeline-registry,prod)",
       "replaces": "dpl-registry",
       "classification": "Internal",
-      "confirmed": false,
+      "confirmed": true,
       "ledger": {
-        "state": "placeholder",
+        "state": "pending",
         "path": null
       },
       "taxonomy_captures": [],
@@ -1102,9 +1102,9 @@
       "urn": "urn:drydocs:dataset:(dpl,dataset-registry,prod)",
       "replaces": "dpl-registry",
       "classification": "Internal",
-      "confirmed": false,
+      "confirmed": true,
       "ledger": {
-        "state": "placeholder",
+        "state": "pending",
         "path": null
       },
       "taxonomy_captures": [],
@@ -1162,9 +1162,9 @@
       "urn": "urn:drydocs:dataset:(bitbucket,repo-objects-manifest,prod)",
       "replaces": "code-repo",
       "classification": "Internal",
-      "confirmed": false,
+      "confirmed": true,
       "ledger": {
-        "state": "placeholder",
+        "state": "pending",
         "path": null
       },
       "taxonomy_captures": [],

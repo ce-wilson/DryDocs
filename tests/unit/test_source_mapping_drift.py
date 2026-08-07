@@ -18,8 +18,10 @@ source registry:
    dispositioned BY NAME, never swept (synthetic cases pin the mechanics).
 3. **Registry integration** — every ``confirmed: true`` source either carries a
    ``locator.mapping`` pointer to an existing ledger, or is on the explicit
-   LEDGER_PENDING list (the four legacy confirmed sources predating doc 08 —
-   shrink-only; a NEW confirmed source without a ledger fails).
+   LEDGER_PENDING list (confirmed sources with no ledger YET — a NEW confirmed
+   source either ships its ledger or extends that list in a deliberate commit
+   with its reason and removal condition named, which is the point: the debt is
+   visible and attributed, never silent).
 4. **Lineage extractor CSV contract** (the G9 tech-debt finding #2, merged
    here): the extractor's ``CSV_CONTRACT`` must match the ``row.get()`` keys in
    its code AND remain a subset of ``controlm_jobs.sql``'s alias list — a
@@ -242,6 +244,24 @@ def test_census_with_uncounted_sweep_fails() -> None:
 # its column ledger belongs to the doc-08 STG census (Phase 2), not K2.
 # seal:app-extract / pat:*: confidential extracts — real column mappings go to
 # the internal twin when ledgered.
+#
+# THE FOUR rua-CHAIN ROWS, added 2026-08-07 as a DELIBERATE extension at gate
+# rua-load-shapes (G22, SIGNED OFF 28/28) — the sanctioned path above, taken
+# rather than shipping four ledgers, with the reason and the removal condition
+# named per source. The guard's own risk (a loader silently sweeping columns)
+# cannot occur for any of them yet: all four carry `adapter: ~`.
+#   exec-hosts:rua-bundle / bitbucket:repo-objects-manifest — their column
+#     contracts ARE pinned in code (scripts.tsv/scripts.csv; MANIFEST_COLUMNS),
+#     but G22 ruled the graph SHAPES, and the per-column DISPOSITION (which
+#     columns become node properties vs occurrence properties) is exactly what
+#     G23 decides. Ledgering now would invent dispositions the gate did not
+#     rule. REMOVED BY: G23.
+#   dpl:pipeline-registry / dpl:dataset-registry — the airflow/autosys reason
+#     precisely: the field contract is ASSUMED and has never been validated
+#     against a real per-SEAL export (tracker T13), so a ledger would transcribe
+#     SYNTHETIC FIXTURES as if they were source vocabulary. That is the failure
+#     the seal-extract ledger header warns about by name — the gap that let
+#     `SEALID` live in the repo for months. REMOVED BY: T13, then G23.
 LEDGER_PENDING = frozenset(
     {
         # seal:app-extract left this list 2026-08-01 (S3) — it gained
@@ -253,6 +273,10 @@ LEDGER_PENDING = frozenset(
         "airflow:dag-export",
         "autosys:export",
         "controlm@[db].drydocs_stg.stg_app_fact",
+        "exec-hosts:rua-bundle",
+        "bitbucket:repo-objects-manifest",
+        "dpl:pipeline-registry",
+        "dpl:dataset-registry",
     }
 )
 

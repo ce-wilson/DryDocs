@@ -57,7 +57,7 @@
 # =============================================================================
 
 schema: drydocs.source-registry.v2
-updated: 2026-07-31
+updated: 2026-08-07     # gate rua-load-shapes SIGNED OFF (G22, 28/28): exec-hosts:rua-bundle, bitbucket:repo-objects-manifest and the two dpl registries flip confirmed:true
 
 # ---------------------------------------------------------------------------
 # SYSTEMS — the things we connect to. layer = BDAT four-value view
@@ -657,7 +657,7 @@ datasets:
     authority: SOR
     feeds_taxonomy: [scripts, hosts]
     adapter: ~                          # G20 extractor (drydocs_lineage/extractors/rua_inventory.py) — staging only; no loader before G22
-    confirmed: false                    # G22 rua-load gate pending (clauses a–g); NOTHING writes the graph before it
+    confirmed: true                     # gate rua-load-shapes SIGNED OFF 2026-08-07 (G22, 28/28) — clauses a–g all ruled. Authority to load, NOT a loader: the curated build is G23 and adapter stays ~
     replaces: rua-inventory
     notes: >
       rua_*.tar.gz bundles collected on execution hosts by
@@ -676,7 +676,7 @@ datasets:
     authority: SOR
     feeds_taxonomy: [pipelines]
     adapter: ~                          # G25 extractor (drydocs_lineage/extractors/dpl_registry.py) — taxonomy-first staging, no loader
-    confirmed: false                    # G22 clauses (f)/(g) own the rulings this feeds; NOTHING writes the graph before it
+    confirmed: true                     # gate rua-load-shapes SIGNED OFF 2026-08-07 (G22, 28/28) — §G ruled clause (f) GUID-vs-URN, §H ruled clause (g) three-signal usage. Field contract still ASSUMED (T13): the envelope entry is a ruled stub
     replaces: dpl-registry
     notes: >
       pipeline_id.json Swagger exports (per SEAL) — another forced-split
@@ -695,7 +695,7 @@ datasets:
     authority: SOR
     feeds_taxonomy: [datasets]
     adapter: ~
-    confirmed: false                    # same activation condition as dpl:pipeline-registry
+    confirmed: true                     # same activation condition as dpl:pipeline-registry — gate rua-load-shapes SIGNED OFF 2026-08-07 (G22, 28/28)
     replaces: dpl-registry
     notes: "dataset_id.json Swagger exports (per SEAL); clone-lag caveat (SME 2026-07-23) — bulk export is the backup discovery source."
 
@@ -747,7 +747,7 @@ datasets:
     authority: SOR
     feeds_taxonomy: [scripts]
     adapter: ~                          # G24 extractor (drydocs_lineage/extractors/code_repo.py) — staging + corroboration report, no loader
-    confirmed: false                    # G22 owns identity/dedup + precedence between origins; NOTHING writes the graph before it
+    confirmed: true                     # gate rua-load-shapes SIGNED OFF 2026-08-07 (G22, 28/28) — §D1/§D2 ruled identity + occurrence grain, §E ruled precedence between origins. trusted_ref below stays null: only a human sets it
     replaces: code-repo
     trusted_ref: ~                      # HUMAN-BLESSED intent line (G24): the one ref this repo's team keeps clean.
                                         # null = server-extract-only truth (the stale-main case). The corroboration

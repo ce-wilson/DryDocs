@@ -2293,3 +2293,111 @@ sign-off. I1, I2 and I3 confirmed; **§I closes, and every clause but §J is now
   a like-for-like feed swap disturbs no ruling this gate made.
 
 - **Still open: §J sign-off only.** Sections A through I are done.
+
+## 2026-08-07 — GATE: rua-load-shapes (G22) — SIGNED OFF, 28/28
+
+**Gate:** `config/gate-prompts/rua-load-shapes.yaml` · **backlog G22** · SME sign-off
+2026-08-07. THE TERMINUS of the G18–G21 / G24 / G25 candidate chain: nothing rua-shaped
+wrote the graph before this entry, and the terminus held for the whole walk — five staging
+seams, two real production bundles on the company side, zero graph writes.
+
+Walked section by section 2026-08-06 → 2026-08-07, with each section transcribed to the page
+and recorded here as it closed (nine `RECORD:` entries above this one, all of them still
+accurate — this entry supersedes none of them, it closes the gate they left open).
+
+### Per-item outcomes (28)
+
+| Items | Outcome |
+|---|---|
+| **A1** | **HELD** behind K17 — `m3_delegates_to` may not activate while its subject has no agreed key |
+| **A2** | **DECLINED** as redundant — ETL placement is the same fact as job placement |
+| **A3 · A4 · A5** | **ACTIVATE** — `m3_invokes` (endpoint widened per B2), `m7_uses_artifact` (deliberately in the same breath), `m3_reads_from` / `m3_writes_to` with the restriction restated |
+| **A6** | **CONFIRMED** — anything unticked stays planned and candidate-side |
+| **B2 · B3** | **B2 CHOSEN** (B1 not chosen) · **B3 CONFIRMED** |
+| **C1 · C2 · C3** | **RULED** — all three land `status: planned`; C3's `.ksh` adapter addition applied at the session |
+| **D1 · D2 · D3 · D4** | **RULED** — normalized absolute path · reified occurrence nodes · three parts · stub |
+| **E1 · E2 · E3** | **CONFIRMED** — E1 with the SME caveat that retires "latest code that actually runs" |
+| **F1 · F2** | **F1 RULED** the confidential set · **F2 CONFIRMED** |
+| **G1 · G2** | **G1 RULED** both-not-either · **G2 CONFIRMED**, scoped to scripts |
+| **H1 · H2 · H3** | **CONFIRMED** — H3 added at the session on SME evidence |
+| **I1 · I2 · I3** | **CONFIRMED** — I2 with one correction, I3 with a material amendment |
+
+Count: A1–A6 (6) + B2+B3 (2) + C1–C3 (3) + D1–D4 (4) + E1–E3 (3) + F1–F2 (2) + G1–G2 (2) +
+H1–H3 (3) + I1–I3 (3) = **28**. Of the six activation candidates the acceptance named, one was
+already active before the session, **three activate, one is declined, one is held**.
+
+### The three preconditions, all found during the walk rather than at drafting
+
+**(1) The audit-fields entries §D4 refused to rule.** All three land `status: stub`, with
+**three different reasons**, because they are not the same case.
+
+- **`bitbucket:repo-objects-manifest`** carries no author field at all, and its one date is not
+  what it looks like: a manifest row is one *(ref-tip, path)* pair, so `commit_date` is the
+  **tip's** date — `corroborate()` ranks refs by it to name `candidate_ref`. It records when the
+  **branch** last moved, never when the **file** changed, so `source_updated_at` would assert a
+  change date belonging to an unrelated commit. That is the mtime error §D4 rejected on the rua
+  side, arriving through a different column. Its reason also differs from the `repo:*` stubs it
+  resembles: for our own repo "git IS the audit trail" is true **and reachable** via `git blame`,
+  whereas this envelope lives in a repo DryDocs never holds — **out of reach rather than absent**,
+  which is what makes its revisit trigger real, the manifest contract being ours to specify.
+- **`dpl:pipeline-registry` / `dpl:dataset-registry`** stage no audit columns either, but the
+  honest reason is that **the field contract is assumed and has never been validated**
+  (`dpl_registry.py` says so in its own header; tracker **T13** is the named trigger, status
+  *pending (producer belief, as of 2026-08-01)*). A real export may well carry `createdBy` /
+  `lastModifiedBy`; until one parses, claiming either an envelope **or** its permanent absence
+  would be a guess. Precedent verified rather than assumed: `autosys:export` and
+  `airflow:dag-export` are both `confirmed: true` from signed crosswalk gates while their audit
+  entries read that native columns are unknowable until a live export exists.
+
+**(2) The G55 lifecycle question §I1 raised — RULED `deprecated`, which reverses this session's
+own recommendation.** §I1 and the G55 notes both recommended `removed`. Checking the registry
+before writing it into §J found the question **already answered by a signed gate**: four entries
+retired never-built (`loader: ~`) sit at `deprecated` — `m3_seal_app_ref`,
+`seal_requires_scheduler`, and `arch_contains_batch` + `arch_contains_folder`, the last two
+retired at **K7** (`seal-app-ref-edge-reshape` §C2, **SIGNED OFF 2026-08-03**) with notes reading
+verbatim *"never gated, never loaded"* — exactly the case §I1 said the lifecycle had no status
+for. **Nothing in the registry is `removed`.**
+
+`removed` is wrong rather than second-best: it means *code deleted*, so it would license deleting
+the entry **and the note naming the ruling** — the opposite of retiring something on the record —
+and it would split the retired set across two statuses that mean the same thing. **The real
+defect was the gloss**, amended at this sign-off in `00-header.yaml`: the old one-line wording
+described only the was-loaded case and read as *false* for never-built entries, which is what sent
+two readers looking for a fifth status. Comment-only — no status, entry, direction or semantics
+moves (the C15 carve-out class). A fifth status would additionally have failed
+`tests/unit/test_lineage_writer.py`, which pins the vocabulary to the four values.
+
+*Why the first pass missed it:* the fragments align their columns (`status:       deprecated`), so
+a single-space grep matched nothing and read as "no precedent exists". The lesson is the one this
+gate kept re-learning — D1 was the same shape, where `cmdline-lineage-review` §c had already
+retired basename as a candidate.
+
+**(3) The source-registry flips.** All four dataset rows go `confirmed: true`, each against the
+activation condition its own row states: `exec-hosts:rua-bundle` (clauses a–g, all ruled),
+`bitbucket:repo-objects-manifest` (§D1/§D2 identity + occurrence grain, §E precedence between
+origins), `dpl:pipeline-registry` (§G clause f + §H clause g), `dpl:dataset-registry` (same
+condition). **The flip is authority to load, not a loader:** every row keeps `adapter: ~` and G23
+is the curated build — the autosys/airflow rows are the standing precedent for exactly that state.
+
+### What this sign-off does NOT unblock
+
+Recorded so it is not read as a clean release: **A1 stays held behind K17**, and **C1 lands
+`planned` but cannot be built before K17 signs** — both need the `:AppUser` key that
+`fid-identity-and-scope` owns.
+
+### Follow-ups carried out of the gate
+
+- **G55** — apply the vocabulary consequences (activations → `active` with supplement blocks; new
+  meanings → `planned`; `m3_runs_on_etl_host` → `deprecated` per (2) above). Now unblocked.
+- **A second inputs gap, the same class as §I1's:** `tests/unit/test_lineage_writer.py` is the
+  terminus **in code** — `test_live_load_is_gate_bound_against_the_real_registry` asserts a live
+  load **raises** `GateBoundVocabularyError` on `m3_invokes`, and its own docstring says it flips
+  to the execution contract *deliberately, not silently*, once the gate activates those entries.
+  The A3/A5 flips **are** that event, so the guard inverts at G55 and must be retired
+  deliberately — never repaired by deleting the raises-check. `tests/unit/test_schema_graph.py`
+  rides along, since deprecating `m3_runs_on_etl_host` drops it from `RENDERED_STATUSES`.
+- **G23** — the curated rua load, carrying the extractor fix §D2 merged into it (the second
+  arrival of a staged id is currently dropped, and G23's own two-source fixture cannot pass until
+  it is fixed).
+- **G56** (collector mount capture, schema v3 — the D-amendment's workaround) and **G57** (the
+  `rua_*` → `bkup_*` rename).

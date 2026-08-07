@@ -332,6 +332,7 @@
         "C17",
         "S3",
         "J24",
+        "G55",
         "J28"
       ]
     },
@@ -360,6 +361,7 @@
         "G35",
         "G36",
         "J24",
+        "G55",
         "J28"
       ]
     },
@@ -458,6 +460,7 @@
         "C17",
         "S3",
         "J24",
+        "G55",
         "J28"
       ]
     },
@@ -499,6 +502,7 @@
         "O25",
         "S3",
         "J24",
+        "G55",
         "J28"
       ]
     },
@@ -806,6 +810,37 @@
         "G55",
         "G56",
         "G57"
+      ]
+    },
+    {
+      "kind": "log-entry",
+      "date": "2026-08-07",
+      "title": "GATE: rua-load-shapes (G22) — SIGNED OFF, 28/28",
+      "status": "signed-off",
+      "prompt_files": [
+        "config/gate-prompts/fid-identity-and-scope.yaml",
+        "config/gate-prompts/rua-load-shapes.yaml",
+        "config/gate-prompts/seal-app-ref-edge-reshape.yaml"
+      ],
+      "log_ref": "config/gate-log.md:2297",
+      "unblocks": [
+        "K7",
+        "K11",
+        "K15",
+        "K16",
+        "K17",
+        "K19",
+        "C17",
+        "G22",
+        "G23",
+        "S3",
+        "G45",
+        "J24",
+        "G55",
+        "G56",
+        "G57",
+        "J28",
+        "J32"
       ]
     },
     {

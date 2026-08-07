@@ -30,7 +30,7 @@
 # =============================================================================
 schema: drydocs.audit-fields.v1
 classification: Internal-Public
-updated: 2026-08-06                    # G22 §D4: exec-hosts:rua-bundle RULED stub (gate rua-load-shapes). 2026-08-04 M3: the four Phase-4 rulings (gate audit-envelope-phase4). Earlier N9: re-keyed to the v2 dataset ids (gate source-registry-v2; Q6 transfers)
+updated: 2026-08-07                    # G22 §J SIGN-OFF: bitbucket:repo-objects-manifest + the two dpl registries RULED stub (gate rua-load-shapes, 28/28) — the §D4 preconditions. 2026-08-06 G22 §D4: exec-hosts:rua-bundle RULED stub (gate rua-load-shapes). 2026-08-04 M3: the four Phase-4 rulings (gate audit-envelope-phase4). Earlier N9: re-keyed to the v2 dataset ids (gate source-registry-v2; Q6 transfers)
 
 # The four envelope property names, frozen (test-enforced).
 envelope:
@@ -233,3 +233,67 @@ sources:
       report filesystem metadata. Authorship for these scripts lives on the
       code-repo side (bitbucket:repo-objects-manifest), whose own entry is a
       §J precondition and is NOT ruled by §D4.
+
+  - id: "bitbucket:repo-objects-manifest"
+    status: stub                             # RULED stub: the manifest is a POINTER into git history, and its one date is a ref-tip fact (gate rua-load-shapes §J, 2026-08-07)
+    notes: >
+      Ruled 2026-08-07 (gate rua-load-shapes §J, SME) — the entry §D4 named as a
+      sign-off precondition and deliberately left unruled there.
+      The manifest contract carries repo / ref / commit / commit_date / path /
+      blob_sha and NO author field of any kind (a `git rev-list --all --objects`
+      sweep plus ref tips returns object ids, never authorship).
+      THE ONE DATE IS NOT WHAT IT LOOKS LIKE, and that is this ruling's
+      substance: a manifest row is one (ref-tip, path) pair, so `commit_date` is
+      the TIP's date — code_repo.corroborate() ranks refs by it to name
+      candidate_ref mechanically. It records when the BRANCH last moved, not when
+      the FILE changed, so source_updated_at would assert a change date belonging
+      to some unrelated commit that happened to touch another file. That is
+      precisely the mtime error §D4 rejected on the rua side, arriving through a
+      different column.
+      WHY THE REASON DIFFERS FROM THE repo:* STUBS IT RESEMBLES
+      (repo:software-registry / repo:design-docs / repo:depgraph-snapshot): for
+      OUR OWN repo, "git IS the audit trail" is true AND reachable — git blame
+      answers who and when. Here the envelope lives in a Bitbucket/GitHub repo
+      DryDocs never holds; the manifest is deliberately a POINTER across the
+      company boundary, so the envelope exists but is OUT OF REACH rather than
+      absent. Same status, different reason, and the difference is what makes the
+      revisit trigger real.
+      REVISIT TRIGGER (unlike the rua entry, this one is foreseeable): the
+      manifest contract is OURS to specify. If the company tooling adds author /
+      author_date columns — or resolves the per-path LAST-TOUCHING commit rather
+      than the ref tip — the envelope becomes available and this entry is
+      re-gated.
+
+  - id: "dpl:pipeline-registry"
+    status: stub                             # RULED stub: the field contract is ASSUMED, never validated — unknown until T13 (gate rua-load-shapes §J, 2026-08-07)
+    notes: >
+      Ruled 2026-08-07 (gate rua-load-shapes §J, SME) — the second entry §D4
+      named as a sign-off precondition without ruling it.
+      The observed field set is pipelineId + version + active + ownerSealId |
+      sealId + name: no audit columns at all. BUT THE HONEST REASON IS NOT "this
+      source has none" — it is that THE CONTRACT IS ASSUMED AND HAS NEVER BEEN
+      VALIDATED. dpl_registry.py states it plainly ("ASSUMED FIELD CONTRACT
+      (defined by the SYNTHETIC fixtures, adjust when a real sample validates it
+      — the dpl_mac discipline)"), and the gate page's own provenance block
+      records the same ("field contract ASSUMED until a real export validates").
+      REVISIT TRIGGER IS A NAMED TRACKER, not a hope: T13 (docs/port-prompt.md) —
+      "DPL registry field contract validated vs a REAL per-SEAL export
+      (pipeline_id.json/dataset_id.json)", status pending (producer belief, as of
+      2026-08-01). A real Swagger export may well carry createdBy /
+      lastModifiedBy; until one parses, claiming either an envelope OR its
+      permanent absence would be a guess. Stub is the state that says so.
+      PRECEDENT, verified rather than taken on the page's word: autosys:export
+      and airflow:dag-export are both confirmed: true from signed crosswalk gates
+      while their audit entries read that native audit columns are unknowable
+      until a live export exists — confirmed source, stub envelope, loader
+      separately gated. Exactly the shape here.
+
+  - id: "dpl:dataset-registry"
+    status: stub                             # same ruling, same tracker trigger as dpl:pipeline-registry (gate rua-load-shapes §J, 2026-08-07)
+    notes: >
+      Ruled 2026-08-07 (gate rua-load-shapes §J, SME). Same export tool, same
+      assumed contract (datasetId + version + active + ownerSealId | sealId +
+      name), same T13 validation trigger — see dpl:pipeline-registry for the full
+      reasoning. Recorded as its OWN entry rather than a cross-reference because
+      the guard keys on ids: a source without its own row is a source with no
+      envelope decision, whatever a neighbouring note says.

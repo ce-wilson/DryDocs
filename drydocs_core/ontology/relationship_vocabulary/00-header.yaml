@@ -18,8 +18,24 @@
 #   Add here BEFORE writing any Cypher. Status lifecycle:
 #     planned    → declared but loader not yet written
 #     active     → supplement + loader both exist
-#     deprecated → no longer loaded; data kept in graph
-#     removed    → data and code both deleted
+#     deprecated → no longer loaded; any data already in the graph is KEPT.
+#                  A never-built entry (loader ~) retired at a gate lands here
+#                  TOO — there was never any data, so nothing is being deleted,
+#                  and the entry + its note stay as the audit trail of the
+#                  ruling. GLOSS AMENDED 2026-08-07 (gate rua-load-shapes §J):
+#                  the old one-line wording described only the was-loaded case
+#                  and read as FALSE for never-built entries, sending readers
+#                  looking for a fifth status. The practice was already settled
+#                  — four entries retired never-built are deprecated
+#                  (m3_seal_app_ref, seal_requires_scheduler, arch_contains_batch
+#                  and arch_contains_folder, the last two at K7
+#                  seal-app-ref-edge-reshape §C2, SIGNED 2026-08-03, whose notes
+#                  read "never gated, never loaded"), and none is `removed`.
+#                  Comment-only clarification: no status, entry, direction or
+#                  semantics moves (the C15 carve-out class).
+#     removed    → data and code both deleted. NOT the never-built case: the
+#                  entry and its ruling note would go with it, which is the
+#                  opposite of retiring something on the record.
 #
 # Fields:
 #   id            unique snake_case identifier

@@ -174,7 +174,16 @@ def test_registry_carries_the_trusted_ref_field() -> None:
     # v2 (N9): code-repo retired -> the bitbucket:repo-objects-manifest dataset;
     # classification lives on the bitbucket SYSTEM row.
     entry = next(s for s in reg["datasets"] if s["id"] == "bitbucket:repo-objects-manifest")
+    # trusted_ref STAYS null: §E2 (gate rua-load-shapes, 2026-08-06) confirmed
+    # the field is two-state with the safe default — the corroboration sweep
+    # NAMES a candidate ref mechanically, only a human SETS this, and null
+    # already means "untrusted or unknown, treat the same". Signing the gate
+    # does not bless a ref.
     assert "trusted_ref" in entry and entry["trusted_ref"] is None
-    assert entry["confirmed"] is False
+    # Flipped DELIBERATELY at that gate's §J sign-off (2026-08-07, 28/28): the
+    # row named G22 as its own activation condition, and §D1/§D2 (identity +
+    # occurrence grain) and §E (precedence between origins) ruled it. Still no
+    # loader — `adapter: ~`; the curated build is G23.
+    assert entry["confirmed"] is True
     system = next(s for s in reg["systems"] if s["id"] == entry["system"])
     assert system["classification"] == "Internal"
