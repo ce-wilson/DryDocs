@@ -62,6 +62,20 @@ question a 1,000-line file with the trail at the bottom could not answer.
 
 <!-- add new ideas at the top -->
 
+- **`Idea-81`** · 2026-08-07 · `[idea]` · **open** · prio? **Med** —
+  **Split wiring readiness out of the registry `confirmed` flag.** The a14a8028
+  fix session (company, 2026-08-06) surfaced a semantics drift: producer uses
+  `confirmed` for SEMANTIC confirmation (gate-signed; the class that transfers per
+  Q6), while the company additionally encodes PIPELINE-WIRING readiness in the same
+  flag (`cm_hosts` stays `false` because their P3 host stage isn't wired, despite the
+  transferable gate). Company suggestion, endorsed at the fix session's Q1-B ruling:
+  a separate `wired`/`ready` field on registry entries rather than overloading
+  `confirmed` — then a divergence like T15/P3 is expressible as
+  `confirmed: true, wired: false` instead of a pinned-guard standing divergence.
+  Registry schema change → gate territory; groom toward the config layer.
+  (Source: company `gate-log.md` standing-divergence entry + PORT-REPORT-a14a8028
+  fix close-out, ledgered in docs/port-prompt.md.)
+
 - **`Idea-80`** · 2026-08-06 · `[idea]` · **open — needs grooming once G22 signs** · prio? **High** —
   **The dead-script report drives DELETION, so it needs a coverage precondition and
   three dispositions, not two.** G22 §E3 named the use case: identifying unused,

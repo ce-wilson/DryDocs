@@ -114,6 +114,43 @@ is the WHY + the acceptance oracle; this prompt is sequencing + delta context on
   company re-adds via `git diff pre-cewilson-port-20260806..HEAD -- PORT-MANIFEST.yaml`.
   Next-port base = `a14a8028`; 28 producer commits (G22 rulings, N8, O42, O45/O46
   intake slices) were already pending at review time.
+  **FIX-SESSION CLOSE-OUT (company run, 2026-08-06; producer fix prompt
+  `docs/port-fix-a14a8028-company-prompt.md`):** branch `drydocs-port-20260806` at
+  **7 commits** (`rev-list pre-cewilson-port-20260806..HEAD` = 7), still **NOT merged**,
+  backup tag intact. Suite **14 → 7 failed (1865 / 7 / 31)** — all 7 are documented
+  deferrals, none silent: WP1.4 + the WP2 ×6. Per-package: `4283305` B3-proper
+  (**corrects the quick-wins rider above — `e21c9f2f` never actually committed
+  `PORT-MANIFEST.yaml`**; the 9-row `default_ok` block lived uncommitted AND
+  mojibake-corrupted; re-added clean UTF-8 here); `7392e56` WP1 (BOM strip in Python,
+  ASCII-ify two .ps1, prune 29 snapshots to newest-only, −3); `a4f9c46` WP3 (−5: the 4
+  named + a masked deftable-xml one); `722884e` PORT-REPORT close-out. **Decisions:**
+  (1) **Q1-B** — `cm_hosts` stays `confirmed: false` + namespace floor `>=5`, guards
+  PINNED with re-arm triggers, standing divergence registered in company `gate-log.md`;
+  a **masked second divergence surfaced and was pinned too**:
+  `controlm:deftable-xml-export confirmed: true` (live XML ingestion). (2) **WP1.4
+  DEFERRED as infra-blocked, not faked** — company's newest snapshot is roots-only
+  (predates the all-files default); a clean all-files snapshot needs the depgraph
+  instrument, but theirs (`@ 1b969ef`) reports `multi_root: false` and `snapshot.ps1`
+  refuses. (3) **WP2 — B ruling, folder-attribution stayed HELD, zero WP2 edits.** The
+  company vocab holds the K8 seal-app-ref reshape explicitly (`m3_belongs_to_application`
+  `status: planned` / "COMPANY HOLD (Tier B) … pending a company gate that
+  supersedes-or-reconciles" the still-`active` job-grain K2 edge `m3_seal_app_ref`) —
+  so greening the 6 is a GATE decision, not mechanics; the **`seal-app-ref-edge-reshape`
+  gate is queued as its own session**, and this SUPERSEDES the fix prompt's WP2 framing
+  (which presented the reshape as owed mechanics) and the prompt's ~1870/0/31 close-out
+  expectation. (4) `control-m.md` stray = company-only draft feedback, renamed to
+  `controlm-ingestion-tdd-rev7.yaml` so its notes load. (5) Company memory corrected:
+  **no publish boundary company-side** — seal_id / server / schema names are the graph
+  metadata DryDocs documents, not PII; the classification lens is DIRECTIONAL (applies
+  at the export/back-flow crossing, not at rest in company GHE). **For the producer
+  (ledgered here):** `confirmed`-field semantics drift — producer uses it for semantic
+  confirmation (Q6 transfer), company additionally encodes P3 wiring readiness; company
+  suggests a separate `wired`/`ready` flag rather than overloading `confirmed` (inboxed
+  as an idea). **T23 now BLOCKS on the `seal-app-ref-edge-reshape` gate**; its
+  live-graph sequence is recorded company-side (2026-08-04 partial-doubling check →
+  DROP `port_unique` → backfill `app_id = seal_id` → S10 refuses on nulls; all 8
+  key-bearing sites in ONE apply). The `--no-ff` merge onto company `main` remains the
+  SME's decision.
 - **Producer head `5f79d145`** (2026-08-04), applied company-side as
   **PORT-REPORT-5f79d145**. Reported, not producer-verifiable.
 - **Producer head `6713c142`** (2026-08-03), applied company-side as
