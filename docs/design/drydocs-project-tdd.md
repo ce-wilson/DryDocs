@@ -113,7 +113,7 @@ lineage writer will write curated lineage (gate-bound), and remediation writes n
 `config/source-registry.yaml` declares every source (kind, orchestrator, adapter,
 `confirmed:` gate, structured `locator:` — application → platform → service → schema →
 mapping); loads fail closed on unconfirmed sources. `config/classification.yaml` defines the
-four sensitivity tiers; every source must carry one. `config/source-mappings/<source>.yaml`
+three sensitivity tiers; every source must carry one. `config/source-mappings/<source>.yaml`
 is the column ledger: one disposition per profiled column
 (projected / filter-only / excluded+reason / deferred) with staging-vs-graph targets.
 `config/precedence.yaml` resolves inter-source disagreement (baseline → internal standards →
@@ -166,7 +166,7 @@ deepdoc) are unrelated to the **C4 model's** levels 1–4 used in the appendix d
 | `drydocs-review` | — | `graph_review`/`graph_verify`, `review_labels`, `source_mappings` accessor, `gate_pages`, `sme_notes`, `publishing/` | HTML / Confluence artifacts | consumer-canonical wiring (port manifest); gate-page format test-enforced |
 | `drydocs-plan` | — | `plan_board` — backlog.yaml → board render | `docs/plan/board.html` | pure/offline; own boundary bucket |
 | `drydocs-docgen` | — | `doc_outline` validator, `design_doc` deterministic renderer, `doc_pdf`, markup transcription | `docs/design/*` renders, PDFs | outline auto-discovery test covers every committed TDD |
-| `drydocs_lineage` | **C2** | extractors (Control-M inventory) → `LineageGraph` candidates; curated-write boundary | curated lineage only — **gate-bound** (writer refuses until the rel vocabulary confirms) | G9 re-home; candidates never ground truth |
+| `drydocs_lineage` | **C2** | extractors (Control-M inventory) → `LineageGraph` candidates; curated-write boundary. **Feature — dead-code census, the overdue housekeeping task:** cross the presence axis (what is deployed, and where) against the reference axis (what actually calls it) to find unused and deprecated code, yielding **three dispositions — dead → remove, misdeployed → relocate/remove, dynamically-called → keep** (G22 §E1/§E3, SME 2026-08-06). Reported, never auto-judged: the output drives deletion, so a false positive removes live code | curated lineage only — **gate-bound** (writer refuses until the rel vocabulary confirms) | G9 re-home; candidates never ground truth. The census is only as good as its coverage — script-to-script calls are visible only where the bundle carried the script BODY, so a report must state its body-copy coverage (Idea-80) |
 | `drydocs_deepdoc` | **C3** | on-demand deep-dive passes (scaffold) | `drydocs_context` (future) | G4 scaffold |
 | `drydocs_remediation` | **C1** | detect → classify → transform → prove → package | **Jira packages only** — no graph, no production | separation of duties is structural (ADR 0002-B) |
 | `drydocs-web` | — | JS/TS console + graph viz (design in flight, Epic O) | — | not a Python package; outside the boundary guard by design |
@@ -198,8 +198,12 @@ union-append / per-entry / evaluate / never-port), with `git-readme.md` and
 ## Classification & security
 
 The repo is private-but-sometimes-published. Tiers: External / Internal-Public (publishable)
-vs Internal / Internal-Confidential (excluded; `internal/` twins + gitignored
-`internal-local/`). Enforced by `test_classification.py` (every source classified),
+vs **Internal** (excluded; `internal/` twins + gitignored `internal-local/`). **Three tiers,
+not four** — the former Internal-Confidential level collapsed into Internal on 2026-07-31
+(J23, user ruling): the private repo plus the publish boundary is the protection, and the
+extra tier's pointer-never-the-data discipline was preventing `internal/` from holding the
+values the work needs. Where a source is confidential, that is a **handling note on the
+entry**, not a separate tier. Enforced by `test_classification.py` (every source classified),
 `test_publishing.py` (publish pipeline validation), root-image/`internal-local/` gitignore
 safety nets, and CI (J5) running the guards on every push. Mechanism-not-instance is the
 writing rule: object/column names are public vocabulary; SIDs, hosts, folder names, service
