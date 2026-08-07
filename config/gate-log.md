@@ -2151,3 +2151,63 @@ sign-off. D1, D2, D3 and D4 all ruled at the SME session; §D now closes.
   `commit_date` as the **pointer into** that envelope rather than the envelope itself; the
   two dpl rows need their extract's columns looked at first.
 - **Still open:** H1–H2, I1–I3, §J sign-off. Sections A, B, C, D, E, F, G and H3 are done.
+
+## 2026-08-06 — RECORD: rua load shapes, section H — three axes that can each only prove presence
+
+**Gate:** `rua-load-shapes` (backlog G22) · **still UNSIGNED** — a RECORD entry, not a
+sign-off. H1 and H2 confirmed; with H3 (already recorded) **§H now closes**.
+
+- **H1 CONFIRMED — and it confirms what the code was already written against**, the G1
+  shape a second time. `dpl_registry.py`'s own docstring: the active flag is *"a THIRD
+  usage signal (beside referenced and present-on-server), staged only: any conflation
+  with 'used' is a G22 clause-(f)/(g) ruling, never decided here."* **Verified clean at
+  the ruling** rather than assumed: no `used` property exists anywhere in the codebase,
+  so H1 ratifies a state that already holds and requests no cleanup.
+- **(i) Each axis is three-valued, not two.** The registry flag normalizes
+  bool / ACTIVE / INACTIVE / Y / N to true or false, and **any other spelling stays empty
+  and is counted** (`active_unknown`). Under the house rule set at the D-amendment —
+  *unknown must not default to the convenient value* — an empty flag reads as neither
+  active nor inactive. This constrains H2 directly.
+- **(ii) No axis can prove absence.** All three are **positive-only** observations, each
+  bounded by a *different* coverage limit:
+  **referenced** by body-copy coverage (E3's named blind spot — the metadata-only
+  listings of premise 2 carry no bodies, so script-to-script calls are structurally
+  invisible); **present-on-server** by `scan_roots` — a script outside the scanned roots
+  is absent-from-*bundle*, never absent-from-server; **registry-active** by which SEALs
+  were exported, and G25's own note makes the registry a **backup discovery source**
+  rather than a census, because the promotion clone's `main` may lag.
+  So *"absent on axis X"* always means *"not observed by feed X"*, never *"does not
+  exist."*
+- **(iii) Why that matters here and not only in E3:** it makes E3's
+  flagged-never-auto-judged a **structural** property of the three axes rather than a
+  cautious choice someone could later optimize away.
+
+- **H2 CONFIRMED — and the precedent it names was verified SIGNED**, checked rather than
+  taken on the page's word: `controlm-avg-run-supplement` (2026-07-14, 20 confirmations;
+  the source-registry row cites it as the confirming gate) §P5 — *"NODE_GROUP
+  cross-validation vs CM_HOSTS/RUNS_ON is a bonus report feeding remediation,
+  **non-blocking** for this supplement."* Non-blocking is the load-bearing word, and it
+  is what *"not load errors"* means concretely.
+- **(i) The mechanism already exists and has a name**, so H2 costs no new machinery:
+  `drydocs_remediation/detect.py` emits findings with **`ratified=False`** — WARN-only
+  downstream — until the machine-readable standards-rules registry drives that field, and
+  detection is **failure-driven rather than scheduled** (ADR 0002-B §2). H2's two findings
+  are candidate **rules** for that registry, and `ratified` IS the
+  reported-never-auto-corrected mechanism in built form. Registry entries ride I1/G55, not
+  the gate.
+- **(ii) The two findings are not the same kind of finding**, and conflating them would be
+  its own error given E3's deletion use case.
+  **`active=false-but-referenced`** means *something still calls what the registry calls
+  retired* — an **operational-risk** finding, a live caller against a decommission
+  candidate. It is never a delete candidate; it points the opposite way.
+  **`active=true-but-unreferenced`** means the registry says live and nothing was observed
+  calling it — this is the one that *looks* like a delete candidate, and it is **the most
+  dangerous false positive available**, because E3's known blind spot (no body copies, so
+  script-to-script calls are invisible) is exactly what would hide the caller. It
+  therefore inherits E3's body-copy coverage precondition in full: on a metadata-only
+  bundle it may not be reported as a deletion candidate at all.
+- **(iii) The third case the clause omits:** an **unknown** active flag produces *neither*
+  finding. It must be reported as unclassifiable-and-counted, never silently dropped —
+  otherwise the finding report understates by exactly the `active_unknown` count. The
+  never-silent house rule applied to the report rather than to the load.
+- **Still open:** I1–I3, §J sign-off. Sections A–H are done.
