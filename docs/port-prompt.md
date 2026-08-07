@@ -86,8 +86,17 @@ is the WHY + the acceptance oracle; this prompt is sequencing + delta context on
   registry note says the confirmation TRANSFERS per Q6 — company may flip citing it, or
   ratify under the two-tier doctrine); namespace table 5 rows vs ≥6; a `;`-split
   citation parse; `control-m.md` stray feedback file; `AppCodeCascadePane` route
-  clean-added but its ledger row missed — producer row exists verbatim at
-  `config/taxonomy/ui-components.yaml:91`. B3 ×1 = the manifest clobber (below). Decisions applied: Epic X `ddlineage`
+  clean-added but its ledger row missed. B3 ×1 = the manifest clobber (below).
+  **QUICK-WINS RIDER (2026-08-06, company commit `e21c9f2f`, branch at 3 commits, revert
+  tag unchanged):** B3 FIXED — company `default_ok` block re-added verbatim from the tag
+  (9 rows covering all 89 paths, guard green). ui_components FIXED **by reversal, not
+  ledger-add**: `AppCodeCascadePane` is HELD company-side (K7–K15 folder-attribution /
+  app-code reshape is a Tier-B hold — the port had wrongly clean-added the WEB half of
+  held K18 work); component removed + `MappingsRoute` reverted to the held version — it
+  joins the folder-attribution hold. This SUPERSEDES the "copy `ui-components.yaml:91`
+  verbatim" relay above, and is the second silent-over-adoption-of-held-work catch this
+  cycle. Suite company-side now **14 failed** (was 16); remaining = Group A ×4 + K8
+  reshape ×6 + config/data divergence ×4. Decisions applied: Epic X `ddlineage`
   retirement adopted at CONFIG level (live DB drop owed, `SHOW DATABASES` first);
   **company Catalog gate 2026-06-25 REVERSED** → full producer catalog model adopted
   (`code` reinstated, TC-CAT-003 retired, logged in company `config/gate-log.md`);
