@@ -96,6 +96,32 @@ SUPPLEMENTS: tuple[Supplement, ...] = (
 
 BY_NAME: dict[str, Supplement] = {s.name: s for s in SUPPLEMENTS}
 
+#: A ``*supplement*.cypher`` beside this module that is DELIBERATELY not in the
+#: chain needs its reason here (the ``SCHEDULED_INGEST_EXCLUSIONS`` idiom, G59):
+#: filename -> why it is not applied. Without this, a supplement file someone
+#: drops beside the module — a locally added domain, a consumer-only supplement
+#: like the company's quantitative-resource-pools file — is silently absent from
+#: ``apply-supplements``, and whatever MATCHes its terms goes quiet (the
+#: pre-G29 three-verb failure class). ``tests/unit/test_supplements.py`` fails
+#: naming any file that is neither chained nor excused here. Empty today: every
+#: supplement on disk is in the chain.
+CHAIN_EXCLUSIONS: dict[str, str] = {}
+
+
+def unchained_supplement_files() -> tuple[str, ...]:
+    """Supplement-shaped files on disk the chain omits with NO written reason.
+
+    The guard's ground truth: globs ``*supplement*.cypher`` beside this module
+    and subtracts the chained filenames and the excused ones. Anything left is
+    a silent omission. Computed here, not in the test, so a consumer repo whose
+    chain carries supplements the producer does not have gets the same
+    protection from its OWN registry and its OWN exclusions — the test stays
+    repo-agnostic.
+    """
+    on_disk = {p.name for p in SCHEMA_DIR.glob("*supplement*.cypher")}
+    chained = {s.filename for s in SUPPLEMENTS}
+    return tuple(sorted(on_disk - chained - set(CHAIN_EXCLUSIONS)))
+
 
 def default_chain() -> tuple[Supplement, ...]:
     """The supplements a plain ``apply-supplements`` applies, in order."""

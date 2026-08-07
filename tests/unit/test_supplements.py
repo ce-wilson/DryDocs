@@ -58,6 +58,42 @@ def test_every_supplement_file_exists_and_declares_terms() -> None:
         assert sup.declared_terms(s.path), f"{s.name} declares no OntologyTerm IRIs"
 
 
+def test_no_supplement_file_on_disk_is_silently_outside_the_chain() -> None:
+    """G59: a ``*supplement*.cypher`` beside the registry that the chain omits
+    must fail BY NAME — a locally added supplement (the consumer's
+    quantitative-resource-pools case) cannot be quietly skipped by
+    ``apply-supplements``. A deliberate omission goes in CHAIN_EXCLUSIONS with
+    a written reason."""
+    missing = sup.unchained_supplement_files()
+    assert not missing, (
+        f"supplement file(s) on disk but absent from the ordered chain: {list(missing)} "
+        "— add each to SUPPLEMENTS (order is load-bearing — see the module docstring) "
+        "or to CHAIN_EXCLUSIONS with a written reason"
+    )
+
+
+def test_unchained_detection_names_the_dropped_file(tmp_path, monkeypatch) -> None:
+    """The guard actually fires: a supplement-shaped file appearing beside the
+    module is reported by NAME, not swallowed into a count."""
+    for s in sup.SUPPLEMENTS:
+        (tmp_path / s.filename).write_text("// copy", encoding="utf-8")
+    (tmp_path / "quantitative_ontology_supplement.cypher").write_text("// new", encoding="utf-8")
+    monkeypatch.setattr(sup, "SCHEMA_DIR", tmp_path)
+    assert sup.unchained_supplement_files() == ("quantitative_ontology_supplement.cypher",)
+
+
+def test_chain_exclusions_are_real_reasoned_and_not_contradictory() -> None:
+    """Exclusion hygiene (the SCHEDULED_INGEST_EXCLUSIONS idiom): every entry
+    names a file that exists (else the exclusion is stale), that is NOT also in
+    the chain (else it is contradictory), and carries a written reason — a bare
+    token reads as cargo cult."""
+    chained = {s.filename for s in sup.SUPPLEMENTS}
+    for filename, reason in sup.CHAIN_EXCLUSIONS.items():
+        assert (sup.SCHEMA_DIR / filename).exists(), f"stale exclusion: {filename} not on disk"
+        assert filename not in chained, f"{filename} is excluded AND chained — contradictory"
+        assert len(reason.split()) >= 5, f"{filename}: the reason must be a sentence, not a token"
+
+
 def test_declared_terms_reads_the_iris_the_file_merges() -> None:
     base = sup.declared_terms(sup.BY_NAME["base"].path)
     for anchor in ("ControlMServer", "ControlMFolder", "ControlMJob"):
