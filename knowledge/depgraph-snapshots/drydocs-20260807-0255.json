@@ -1,16 +1,16 @@
 {
   "meta": {
     "project": "drydocs",
-    "captured_at": "2026-08-07T02:25:31",
+    "captured_at": "2026-08-07T02:55:52",
     "date": "20260807",
     "scan": "DryDocs",
     "tree": true,
     "git": {
-      "commit": "2435a7d",
-      "full": "2435a7d8a492abf345fad06d68b47c870fcb2909",
+      "commit": "ba7fbaf",
+      "full": "ba7fbafd2f23ffb157c87883caf36f8c0f634239",
       "branch": "main",
-      "describe": "2435a7d",
-      "subject": "feat(ontology): G55 — apply the G22 vocabulary consequences (flips-are-follow-ups half of rua-load-shapes)",
+      "describe": "ba7fbaf",
+      "subject": "feat(lineage): G23 — the rua curated load, per the signed rua-load-shapes rulings",
       "dirty": false,
       "pr": null
     },
@@ -11085,6 +11085,15 @@
       "kind": "file"
     },
     {
+      "file_id": "drydocs/drydocs_core/ontology/swo_adapter.py",
+      "name": "swo_adapter.py",
+      "extension": ".py",
+      "rel_path": "drydocs_core/ontology/swo_adapter.py",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
       "file_id": "drydocs/drydocs_core/orchestration",
       "name": "orchestration",
       "extension": "",
@@ -12984,10 +12993,10 @@
       "kind": "file"
     },
     {
-      "file_id": "drydocs/knowledge/depgraph-snapshots/drydocs-20260807-0201.json",
-      "name": "drydocs-20260807-0201.json",
+      "file_id": "drydocs/knowledge/depgraph-snapshots/drydocs-20260807.json",
+      "name": "drydocs-20260807.json",
       "extension": ".json",
-      "rel_path": "knowledge/depgraph-snapshots/drydocs-20260807-0201.json",
+      "rel_path": "knowledge/depgraph-snapshots/drydocs-20260807.json",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -14473,6 +14482,15 @@
       "name": "test_lineage_rua_code_ops.py",
       "extension": ".py",
       "rel_path": "tests/unit/test_lineage_rua_code_ops.py",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/tests/unit/test_lineage_rua_load.py",
+      "name": "test_lineage_rua_load.py",
+      "extension": ".py",
+      "rel_path": "tests/unit/test_lineage_rua_load.py",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -16690,6 +16708,10 @@
       "drydocs/drydocs_core/models/code_snapshot.py"
     ],
     [
+      "drydocs/drydocs/loaders/code_snapshot.py",
+      "drydocs/drydocs_core/ontology/swo_adapter.py"
+    ],
+    [
       "drydocs/drydocs/loaders/controlm.py",
       "drydocs/drydocs/loaders/controlm_conditions_in.py"
     ],
@@ -17439,7 +17461,19 @@
     ],
     [
       "drydocs/drydocs_lineage/writer.py",
+      "drydocs/drydocs_core/ontology/swo_adapter.py"
+    ],
+    [
+      "drydocs/drydocs_lineage/writer.py",
       "drydocs/drydocs_core/yaml_fragments.py"
+    ],
+    [
+      "drydocs/drydocs_lineage/writer.py",
+      "drydocs/drydocs_lineage/extractors/code_repo.py"
+    ],
+    [
+      "drydocs/drydocs_lineage/writer.py",
+      "drydocs/drydocs_lineage/extractors/rua_inventory.py"
     ],
     [
       "drydocs/drydocs_lineage/writer.py",
@@ -17548,6 +17582,22 @@
     [
       "drydocs/tests/integration/test_e2e_load.py",
       "drydocs/drydocs_core/neo4j_client.py"
+    ],
+    [
+      "drydocs/tests/integration/test_e2e_load.py",
+      "drydocs/drydocs_lineage/extractors/__init__.py"
+    ],
+    [
+      "drydocs/tests/integration/test_e2e_load.py",
+      "drydocs/drydocs_lineage/extractors/code_repo.py"
+    ],
+    [
+      "drydocs/tests/integration/test_e2e_load.py",
+      "drydocs/drydocs_lineage/model.py"
+    ],
+    [
+      "drydocs/tests/integration/test_e2e_load.py",
+      "drydocs/drydocs_lineage/writer.py"
     ],
     [
       "drydocs/tests/integration/test_graph_qa_read_mode.py",
@@ -18124,6 +18174,22 @@
     [
       "drydocs/tests/unit/test_lineage_rua_code_ops.py",
       "drydocs/drydocs_lineage/model.py"
+    ],
+    [
+      "drydocs/tests/unit/test_lineage_rua_load.py",
+      "drydocs/drydocs_lineage/extractors/__init__.py"
+    ],
+    [
+      "drydocs/tests/unit/test_lineage_rua_load.py",
+      "drydocs/drydocs_lineage/extractors/code_repo.py"
+    ],
+    [
+      "drydocs/tests/unit/test_lineage_rua_load.py",
+      "drydocs/drydocs_lineage/model.py"
+    ],
+    [
+      "drydocs/tests/unit/test_lineage_rua_load.py",
+      "drydocs/drydocs_lineage/writer.py"
     ],
     [
       "drydocs/tests/unit/test_lineage_snowflake_catalog.py",
@@ -25748,6 +25814,11 @@
       "drydocs/drydocs_core/ontology/schema_graph.py"
     ],
     [
+      "drydocs/drydocs_core/ontology",
+      "CONTAINS",
+      "drydocs/drydocs_core/ontology/swo_adapter.py"
+    ],
+    [
       "drydocs/drydocs_core/ontology/relationship_vocabulary",
       "CONTAINS",
       "drydocs/drydocs_core/ontology/relationship_vocabulary/00-header.yaml"
@@ -26825,7 +26896,7 @@
     [
       "drydocs/knowledge/depgraph-snapshots",
       "CONTAINS",
-      "drydocs/knowledge/depgraph-snapshots/drydocs-20260807-0201.json"
+      "drydocs/knowledge/depgraph-snapshots/drydocs-20260807.json"
     ],
     [
       "drydocs/knowledge/depgraph-snapshots",
@@ -27586,6 +27657,11 @@
       "drydocs/tests/unit",
       "CONTAINS",
       "drydocs/tests/unit/test_lineage_rua_code_ops.py"
+    ],
+    [
+      "drydocs/tests/unit",
+      "CONTAINS",
+      "drydocs/tests/unit/test_lineage_rua_load.py"
     ],
     [
       "drydocs/tests/unit",
@@ -28657,13 +28733,13 @@
     "projects": [
       "drydocs"
     ],
-    "files": 1555,
-    "edges": 788,
+    "files": 1557,
+    "edges": 800,
     "circular_files": 0,
     "processes": 0,
     "data_assets": 0,
     "hosts": 0,
-    "rels": 1818,
+    "rels": 1820,
     "directories": 264
   }
 }
