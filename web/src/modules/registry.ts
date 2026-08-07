@@ -12,6 +12,7 @@ export type ModuleId =
   | 'runbooks'
   | 'remediation'
   | 'docs'
+  | 'software'
   | 'gates'
   | 'loads'
   | 'underhood'
@@ -134,6 +135,21 @@ export const MODULES: readonly ModuleDef[] = [
     retrieval: 'agent', // docmeta corpus Q&A — free-input, agent-interpreted (Epic R target)
     agent: 'docmeta-qa (ADK)',
 
+  },
+  {
+    id: 'software',
+    label: 'Software',
+    path: '/software',
+    tagline: 'Vendor to product to documentation, declared vs loaded',
+    backsOnto: 'software-registry.json + doc corpora (generated) · DESCRIBES in drydocs',
+    tabs: ['Products', 'Vendors', 'Documentation coverage', 'Corpora'],
+    phase: 3,
+    // FB-03: every column worth rendering here is a DELTA — gate state,
+    // declared-vs-loaded, an edge withheld pending G32. An end user reading
+    // "1016 pages staged, 0 loaded" without that context reads it as breakage.
+    // Same audience as /gates. Opening this later is a one-line change; the
+    // reverse is a retraction.
+    access: 'sme',
   },
   {
     id: 'gates',

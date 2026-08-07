@@ -60,6 +60,17 @@ export default function ModuleIcon({ id, className }: { id: ModuleId; className?
           <path d="M9 12h7M9 15.5h7M9 8.5h3" />
         </svg>
       )
+    case 'software':
+      // A package outline (the product) with a document mark (its docs) — the
+      // join this page exists to render. NOTE: this switch has no `default`, so
+      // a missing case returns undefined and the glyph silently vanishes from
+      // both the aside and the Overview hub with no compiler error.
+      return (
+        <svg viewBox="0 0 24 24" aria-hidden="true" {...common}>
+          <path d="M3 8.5 12 4l9 4.5v7L12 20l-9-4.5Z" />
+          <path d="M3 8.5 12 13l9-4.5M12 13v7" />
+        </svg>
+      )
     case 'gates':
       return (
         <svg viewBox="0 0 24 24" aria-hidden="true" {...common}>

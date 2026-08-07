@@ -36,7 +36,7 @@
 # cannot be re-run; this file is where they become durable. A case with no
 # `source` is a case nobody has ever seen pass.
 #
-# COVERAGE IS PARTIAL AND SAYS SO: 2 of 11 areas seeded. The rest are declared
+# COVERAGE IS PARTIAL AND SAYS SO: 3 of 12 areas seeded. The rest are declared
 # with `cases: []` so the gap is a visible number rather than an absence, and
 # the guard pins it.
 # =============================================================================
@@ -113,6 +113,34 @@ suites:
           Ready / Failed / Processing / Pending / Not Scheduled — with no
           module-local spelling.
         source: "O41 close note — status-vocab map adopted inspector + loads"
+
+  # ---------------------------------------------------------------------------
+  - id: TS-SOFTWARE
+    module: software
+    description: >
+      The /software ledger: vendor -> product -> corpus -> graph, with gate state
+      and the withheld-edge ruling visible per row. SEEDED WITH ONE CASE ONLY,
+      deliberately: that is the one behaviour actually watched at the Q16 build,
+      and a case nobody has seen pass does not belong here. The declared-vs-loaded
+      and independent-chip behaviours are asserted Python-side instead
+      (tests/unit/test_docs_coverage.py), which is where the same status ladder
+      lives; re-seed here from in-browser observation when the page is next opened.
+    cases:
+      - id: TC-SOFTWARE-01
+        description: Vendor icons resolve, and the near-miss fails SILENTLY rather than loudly
+        steps:
+          - Serve the console (npm run dev) and request /vendor-icons/neo4j.svg.
+          - Request the same path RELATIVE to the route: /software/vendor-icons/neo4j.svg.
+        expect: >
+          The absolute path returns 200 image/svg+xml. The relative path returns
+          200 text/html - the SPA index fallback, NOT a 404. That is the whole
+          point of the case: render_software_registry.py writes `asset` WITHOUT a
+          leading slash, so an <img> using it verbatim on /software silently
+          receives HTML with a 200 status and renders broken, producing NO failed
+          request and NO console error. VendorIcon.tsx therefore prepends the
+          slash. A future refactor that "simplifies" that away will look fine in
+          the network tab and be wrong on screen.
+        source: "Q16 build 2026-08-07 - verified against the Vite dev server (curl, both paths)"
 
   # --- declared, not yet seeded ----------------------------------------------
   # Present so the coverage gap is a number, not an absence. Seed each from

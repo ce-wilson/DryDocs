@@ -199,10 +199,13 @@ def test_unbound_components_are_counted_not_hidden() -> None:
     in), so binding it to either module would misstate it.
     Assigning the rest properly means reading imports, which is O42's TS
     resolver, not a naming heuristic.
+    66 -> 68 at Q16: SoftwareRoute (route-name) and VendorIcon (directory) both
+    bind to the new `software` module, so BOTH counts move by two — the
+    /software page is a fully-bound addition, not a partial one.
     """
     comps = _ui()["components"]
     bound = [c for c in comps if c.get("module")]
     assert (len(bound), len(comps)) == (
-        27,
-        66,
+        29,
+        68,
     ), f"module-binding coverage changed: {len(bound)}/{len(comps)} bound"

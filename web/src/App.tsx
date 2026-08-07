@@ -18,6 +18,7 @@ import LoadsRoute from './routes/LoadsRoute'
 import RunbooksRoute from './routes/RunbooksRoute'
 import RemediationRoute from './routes/RemediationRoute'
 import DocsRoute from './routes/DocsRoute'
+import SoftwareRoute from './routes/SoftwareRoute'
 import GatesRoute from './routes/GatesRoute'
 import UnderTheHoodRoute from './routes/UnderTheHoodRoute'
 import './App.css'
@@ -77,6 +78,16 @@ export default function App() {
         <Route path="docs" element={<DocsRoute persona={persona} />} />
         <Route path="docs/document/:docId" element={<DocsRoute persona={persona} />} />
         {/* FB-03: SME designation (steward+admin) from the module registry */}
+        <Route
+          path="software"
+          element={
+            persona.role === 'steward' || persona.role === 'admin' ? (
+              <SoftwareRoute persona={persona} />
+            ) : (
+              <Navigate to="/" replace />
+            )
+          }
+        />
         <Route
           path="gates"
           element={persona.role === 'steward' || persona.role === 'admin' ? <GatesRoute /> : <Navigate to="/" replace />}

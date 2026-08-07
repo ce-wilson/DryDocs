@@ -72,6 +72,7 @@ areas:
   - { id: loads,         title: "Loads module panes" }
   - { id: ownership,     title: "Ownership module panes" }
   - { id: underhood,     title: "/under-the-hood benchmark showcase" }
+  - { id: software,      title: "Software registry / documentation-coverage panes" }
 
 components:
   # --- entry (2) ---
@@ -93,6 +94,7 @@ components:
   - { id: AssetPathRoute,          area: route,        path: routes/AssetPathRoute.tsx }
   - { id: ConsoleRoute,            area: route,        path: routes/ConsoleRoute.tsx }
   - { id: DocsRoute,               area: route,        path: routes/DocsRoute.tsx,                        module: docs,       module_evidence: route-name }
+  - { id: SoftwareRoute,           area: route,        path: routes/SoftwareRoute.tsx,                    module: software,   module_evidence: route-name }
   - { id: GatesRoute,              area: route,        path: routes/GatesRoute.tsx,                       module: gates,      module_evidence: route-name }
   - { id: LineageRoute,            area: route,        path: routes/LineageRoute.tsx,                     module: lineage,    module_evidence: route-name }
   - { id: LoadsRoute,              area: route,        path: routes/LoadsRoute.tsx,                       module: loads,      module_evidence: route-name }
@@ -153,6 +155,7 @@ components:
 
   # --- loads (1) ---
   - { id: LoadsTimeline,           area: loads,        path: loads/LoadsTimeline.tsx,                     module: loads,      module_evidence: directory }
+  - { id: VendorIcon,              area: software,     path: software/VendorIcon.tsx,                     module: software,   module_evidence: directory }
 
   # --- ownership (2) ---
   - { id: AssetSearchPanel,        area: ownership,    path: ownership/AssetSearchPanel.tsx,              module: ownership,  module_evidence: directory }

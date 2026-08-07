@@ -99,7 +99,7 @@ def test_every_case_cites_verified_behaviour() -> None:
 def test_coverage_is_pinned_so_the_gap_stays_visible() -> None:
     suites = _tests()["suites"]
     seeded = [s for s in suites if s["cases"]]
-    assert (len(seeded), len(suites)) == (2, 11), (
+    assert (len(seeded), len(suites)) == (3, 12), (
         f"UI test coverage changed: {len(seeded)}/{len(suites)} suites seeded — "
         f"update the pin (and be glad)"
     )

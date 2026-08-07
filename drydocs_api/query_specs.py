@@ -485,6 +485,44 @@ QUERY_SPECS: dict[str, QuerySpec] = {
         ),
         # O18 docs frames — the lexical corpus (Document -> Chunk, PART_OF).
         QuerySpec(
+            id="software.doc-coverage.v1",
+            database="drydocs",
+            description=(
+                "Registered software products as the graph holds them, with the count "
+                "of :Document nodes joined by the gate-confirmed DESCRIBES edge. A ZERO "
+                "HERE MEANS NO EDGE IN THIS DATABASE AND NOTHING MORE: "
+                "config/doc-source-registry.yaml is the declaration, and a corpus "
+                "targeting a database this spec cannot read (dddocs, unprovisioned "
+                "pending G32) is absent by TOPOLOGY, not by defect. `drydocs "
+                "docs-coverage` is the multi-database reconciliation a single-database "
+                "spec cannot perform."
+            ),
+            cypher=(
+                "MATCH (sp:SoftwareProduct) WHERE NOT sp:SchemaMeta "
+                "OPTIONAL MATCH (sp)-[:MADE_BY]->(v:Vendor) WHERE NOT v:SchemaMeta "
+                "OPTIONAL MATCH (d:Document)-[r:DESCRIBES]->(sp) WHERE NOT d:SchemaMeta "
+                "WITH sp, v, count(DISTINCT d) AS documents, "
+                "collect(DISTINCT r.target_version) AS versions "
+                "RETURN sp.product_id AS product_id, sp.name AS name, "
+                "coalesce(v.vendor_id, '-') AS vendor_id, sp.category AS category, "
+                "documents, "
+                "CASE WHEN size(versions) = 0 THEN '-' ELSE reduce(s = '', x IN versions | "
+                "CASE WHEN s = '' THEN toString(x) ELSE s + ', ' + toString(x) END) END "
+                "AS target_versions "
+                "ORDER BY documents DESC, product_id LIMIT $limit"
+            ),
+            columns=(
+                ColumnDef("product_id", "string", "Product"),
+                ColumnDef("name", "string", "Name"),
+                ColumnDef("vendor_id", "string", "Vendor"),
+                ColumnDef("category", "string", "Category"),
+                ColumnDef("documents", "int", "Documents (DESCRIBES)"),
+                ColumnDef("target_versions", "string", "Target versions"),
+            ),
+            classification="internal-public",
+            params=_LIMIT,
+        ),
+        QuerySpec(
             id="docs.documents.v1",
             database="drydocs",
             description=(
