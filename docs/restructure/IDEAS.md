@@ -62,7 +62,7 @@ question a 1,000-line file with the trail at the bottom could not answer.
 
 <!-- add new ideas at the top -->
 
-- **`Idea-89`** · 2026-08-07 · `[bug]` · **open** · prio? **Med** —
+- **`Idea-89`** · 2026-08-07 · `[bug]` · **closed → fixed in place 2026-08-07 (SME ruling); no item minted** · prio **Med** —
   **`OverviewRoute` renders ALL modules unfiltered — the Overview pick-list offers
   routes the persona will bounce off.** `OverviewRoute.tsx:94` maps `MODULES` with no
   `canAccessModule` filter, while `Aside.tsx:50` does filter
@@ -76,8 +76,16 @@ question a 1,000-line file with the trail at the bottom could not answer.
   disabled-with-a-reason (vanishing is what the aside already does, so consistency
   argues for the filter). (Found at the /software build, 2026-08-07, laptop —
   `/software` inherited the defect rather than causing it.)
-  **A groom read this as promotable and was told to inbox it — worth a ruling next
-  groom.**
+  **RULED 2026-08-07 (SME): VANISH, matching what the aside already does.** The
+  disabled-with-a-reason alternative is DECLINED — *"I don't want to overcomplicate
+  the UI; we are still in proof-of-concept early stages, authentication will be
+  added later if needed."* That reason is the durable half: a second access idiom
+  is complexity bought against a decision NOT YET MADE, and the moment real
+  authentication lands the whole affordance gets re-decided anyway. One idiom, one
+  place. FIXED IN PLACE rather than promoted: with the behaviour question ruled,
+  what remained was a one-line `.filter(...)` making the pick-list agree with the
+  aside — minting an item to close it the same minute is ceremony, not audit. The
+  groom was right to flag the disagreement; the ruling is what dissolved it.
 
 - **`Idea-88`** · 2026-08-07 · `[idea]` · **parked → the G32 residency ruling, then Q14's term gate** · prio? **Med** —
   **The only loaded software↔docs edge has NO registry declaration behind it — close

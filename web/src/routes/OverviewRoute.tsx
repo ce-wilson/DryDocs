@@ -5,7 +5,7 @@ import { canDrill } from '../lib/views'
 import { createApiAccess } from '../lib/graphApi'
 import { parseStatusItems, type StatusItem } from '../lib/status'
 import { HealthGlyph } from '../components/ui/StatusItems'
-import { MODULES } from '../modules/registry'
+import { MODULES, canAccessModule } from '../modules/registry'
 import { TOWERS } from '../data/towers'
 import ModuleIcon from '../components/ModuleIcon'
 import ModuleToolbar from '../layout/ModuleToolbar'
@@ -91,7 +91,15 @@ export default function OverviewRoute({ persona }: { persona: Persona }) {
             <section data-wf="WF-LND-05" className="rounded-lg border border-edge bg-panel p-4">
               <h3 className="text-sm font-semibold text-text">What do you want to look at?</h3>
               <ul className="mt-3 grid grid-cols-1 gap-1.5 sm:grid-cols-2">
-                {MODULES.map((m) => (
+                {/* FB-03, matching Aside.tsx exactly: a module a persona cannot
+                    open does not appear. VANISHING, not disabled-with-a-reason —
+                    SME ruling 2026-08-07: the console is a proof of concept and
+                    real authentication comes later, so a second access idiom is
+                    complexity bought against a decision not yet made. Before
+                    this, the pick-list rendered EVERY module while the aside
+                    filtered, so `gates`/`underhood` (and then `software`) showed
+                    here for the `user` persona and bounced to / on click. */}
+                {MODULES.filter((m) => canAccessModule(m.access, persona.role)).map((m) => (
                   <li key={m.id}>
                     <Link
                       to={m.path}
